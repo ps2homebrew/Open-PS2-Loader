@@ -17,9 +17,15 @@ void printUsage(void)
 {
 	printf("Usage: %s [SOURCE_ISO] [DEST_DRIVE] [GAME_NAME] [TYPE]\n", PROGRAM_NAME);
 	printf("%s command-line version %s\n\n", PROGRAM_EXTNAME, PROGRAM_VER);
-	printf("Example 1: %s C:\\ISO\\WORMS4.ISO E WORMS_4_MAYHEM DVD\n", PROGRAM_NAME);	
-	printf("Example 2: %s \"C:\\ISO\\WORMS 4.ISO\" E \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);		
-	printf("Example 3: %s \"C:\\ISO\\MICRO MACHINES V4.ISO\" E \"Micro Machines v4\" CD\n", PROGRAM_NAME);			
+#ifdef _WIN32
+	printf("Example 1: %s C:\\ISO\\WORMS4.ISO E WORMS_4_MAYHEM DVD\n", PROGRAM_NAME);
+	printf("Example 2: %s \"C:\\ISO\\WORMS 4.ISO\" E \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);
+	printf("Example 3: %s \"C:\\ISO\\MICRO MACHINES V4.ISO\" E \"Micro Machines v4\" CD\n", PROGRAM_NAME);
+#else
+	printf("Example 1: %s /home/user/WORMS4.ISO /media/disk WORMS_4_MAYHEM DVD\n", PROGRAM_NAME);
+	printf("Example 2: %s \"/home/user/WORMS 4.ISO\" /media/disk \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);
+	printf("Example 3: %s \"/home/user/MICRO MACHINES V4.ISO\" /media/disk \"Micro Machines v4\" CD\n", PROGRAM_NAME);
+#endif
 }
 
 //-----------------------------------------------------------------------
@@ -52,13 +58,17 @@ int check_cfg(const char *drive, const char *game_name, const char *game_id)
 	FILE *fh_cfg;
 	cfg_t cfg;
 	char cfg_path[256];
-	char cfg_image[256];	
+	char cfg_image[256];
 
 #ifdef DEBUG
 	printf("check_cfg drive:%s name:%s id:%s\n", drive, game_name, game_id);
 #endif
-	
+
+#ifdef _WIN32
 	sprintf(cfg_path, "%s:\\ul.cfg", drive);
+#else
+	sprintf(cfg_path, "%s/ul.cfg", drive);
+#endif
 	sprintf(cfg_image, "ul.%s", game_id);
 
 	fh_cfg = fopen(cfg_path, "rb");
@@ -66,7 +76,7 @@ int check_cfg(const char *drive, const char *game_name, const char *game_id)
 		while ((r = fread(&cfg, 1, sizeof(cfg_t), fh_cfg)) != 0) {
 			if (r != sizeof(cfg_t)) {
 				fclose(fh_cfg);
-				return -3;				
+				return -3;
 			}
 			if (!strcmp(cfg.name, game_name)) {
 				fclose(fh_cfg);
@@ -75,11 +85,11 @@ int check_cfg(const char *drive, const char *game_name, const char *game_id)
 			if (!strcmp(cfg.image, cfg_image)) {
 				fclose(fh_cfg);
 				return -2;
-			}			
+			}
 		}
 		fclose(fh_cfg);
-	}		
-		
+	}
+
 	return 0;
 }
 
@@ -94,33 +104,36 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 #ifdef DEBUG
 	printf("write_cfg drive:%s name:%s id:%s media:%s parts:%d\n", drive, game_name, game_id, media, parts);
 #endif
-	
+
+#ifdef _WIN32
 	sprintf(cfg_path, "%s:\\ul.cfg", drive);
-	
+#else
+	sprintf(cfg_path, "%s/ul.cfg", drive);
+#endif
 	memset(&cfg, 0, sizeof(cfg_t));
 	
 	strncpy(cfg.name, game_name, 32);
 	sprintf(cfg.image, "ul.%s", game_id);
 	cfg.parts = parts;
-	cfg.pad[4] = 0x08; // To be like USBA 
+	cfg.pad[4] = 0x08; // To be like USBA
 	
 	if (!strcmp(media, "CD"))
 		cfg.media = 0x12;
 	else if (!strcmp(media, "DVD"))
-		cfg.media = 0x14;	
-	
+		cfg.media = 0x14;
+
 	fh_cfg = fopen(cfg_path, "ab");
 	if (!fh_cfg)
 		return -1;
-		
+
 	r = fwrite(&cfg, 1, sizeof(cfg_t), fh_cfg);
 	if (r != sizeof(cfg_t)) {
 		fclose(fh_cfg);
 		return -2;
 	}
-	
-	fclose(fh_cfg);		
-	
+
+	fclose(fh_cfg);
+
 	return 0;
 }
 
@@ -136,63 +149,66 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, u
 #ifdef DEBUG
 	printf("write_parts drive:%s name:%s id:%s filesize:0x%x parts:%d\n", drive, game_name, game_id, filesize, parts);
 #endif
-		
+
 	iso_pos = 0;
 	buf = malloc(WR_SIZE+2048);
 	if (!buf)
 		return -1;
-		
-	for (i=0; i<parts; i++) {
-		sprintf(part_path, "%s:\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
 
+	for (i=0; i<parts; i++) {
+#ifdef _WIN32
+		sprintf(part_path, "%s:\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
+#else
+		sprintf(part_path, "%s/ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
+#endif
 		fh_part = fopen(part_path, "wb");
 		if (!fh_part) {
 			free(buf);
 			return -2;
 		}
-			
+
 		nbytes = filesize;
 		if (nbytes > 1073741824)
-			nbytes = 1073741824;	
-			
-		rpos = 0;	
+			nbytes = 1073741824;
+
+		rpos = 0;
 		if (nbytes) {
 			do {
 				if (nbytes > WR_SIZE)
 					size = WR_SIZE;
-				else	
+				else
 					size = nbytes;
-	
+
 				r = isofs_ReadISO(iso_pos, size, buf);
 				if (r != size) {
 					free(buf);
 					fclose(fh_part);
     				return -3;
-				}				
-				
+				}
+
 				printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, iso_pos >> 11);
-				
-				// write to file	
-				r = fwrite(buf, 1, size, fh_part);			
+
+				// write to file
+				r = fwrite(buf, 1, size, fh_part);
 				if (r != size) {
 					free(buf);
 					fclose(fh_part);
     				return -4;
 				}
-				
-				size = r;		
+
+				size = r;
 				rpos += size;
 				iso_pos += size;
 				nbytes -= size;
-			
-			} while (nbytes);	
+
+			} while (nbytes);
 		}
-		filesize -= rpos;				
-		fclose(fh_part);			
+		filesize -= rpos;
+		fclose(fh_part);
 	}
-	
+
 	free(buf);
-	
+
 	return 0;
 }
 
@@ -206,55 +222,55 @@ int ParseSYSTEMCNF(char *system_cnf, char *boot_path)
 #ifdef DEBUG
 	printf("ParseSYSTEMCNF %s\n", system_cnf);
 #endif
-		
+
 	fd = isofs_Open("\\SYSTEM.CNF;1");
 	if (fd < 0)
 		return -1;
-		
+
 	fsize = isofs_Seek(fd, 0, SEEK_END);
 	isofs_Seek(fd, 0, SEEK_SET);
-	
+
 	r = isofs_Read(fd, systemcnf_buf, fsize);
 	if (r != fsize) {
 		isofs_Close(fd);
 		return -2;
 	}
-		
+
 	isofs_Close(fd);
-	
+
 #ifdef DEBUG
 	printf("ParseSYSTEMCNF trying to retrieve elf path...\n");
 #endif
-		
+
 	p = strtok((char *)systemcnf_buf, "\n");
-	
+
 	while (p) {
 		p2 = strstr(p, "BOOT2");
 		if (p2) {
 			p2 += 5;
-			
+
 			while ((*p2 <= ' ') && (*p2 > '\0'))
 				p2++;
-				
+
 			if (*p2 != '=')
 				return -3;
 			p2++;
 
 			while ((*p2 <= ' ') && (*p2 > '\0')	&& (*p2!='\r') && (*p2!='\n'))
 				p2++;
-											
+
 			if (*p2 == '\0')
 				return -3;
-			
-			path_found = 1;	
+
+			path_found = 1;
 			strcpy(boot_path, p2);
 		}
 		p = strtok(NULL, "\n");
 	}
-	
+
 	if (!path_found)
-		return -4;	
-	
+		return -4;
+
 	return 0;
 }
 
@@ -267,7 +283,7 @@ int main(int argc, char **argv, char **env)
 	int num_parts;
 	char *p;
 	u32 filesize;
-	
+
 	// args check
 	if ((argc != 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) || (strlen(argv[3]) > 32)) {
 		printUsage();
@@ -277,17 +293,17 @@ int main(int argc, char **argv, char **env)
 #ifdef _WIN32
 	if (strlen(argv[2]) != 1) {
 		printUsage();
-		exit(EXIT_FAILURE);		
+		exit(EXIT_FAILURE);
 	}
 #endif
-		
+
 #ifdef DEBUG
 	printf("DEBUG_MODE ON\n");
-	printf("isofs Init...\n");	
+	printf("isofs Init...\n");
 #endif
-	
+
 	// Init isofs
-	filesize = isofs_Init(argv[1]); 
+	filesize = isofs_Init(argv[1]);
 	if (!filesize) {
 		printf("Error: failed to open ISO file!\n");
 		exit(EXIT_FAILURE);
@@ -302,9 +318,9 @@ int main(int argc, char **argv, char **env)
 	printf("ISO filesize: 0x%x\n", filesize);
 	printf("Number of parts: %d\n", num_parts);
 #endif
-								
+
 	// parse system.cnf in ISO file
-	ret = ParseSYSTEMCNF("\\SYSTEM.CNF;1", ElfPath);	
+	ret = ParseSYSTEMCNF("\\SYSTEM.CNF;1", ElfPath);
 	if (ret < 0) {
 		switch (ret) {
 			case -1:
@@ -318,16 +334,16 @@ int main(int argc, char **argv, char **env)
 				break;				
 			case -4:
 				printf("Error: failed to locate elf path from ISO file!\n");
-				break;								
+				break;
 		}
 		isofs_Reset();
-		exit(EXIT_FAILURE);		
-	}	
-	
+		exit(EXIT_FAILURE);
+	}
+
 #ifdef DEBUG
 	printf("Elf Path: %s\n", ElfPath);
 #endif
-	
+
 	// get GameID
 	strcpy(GameID, &ElfPath[8]);
 	p = strstr(GameID, ";1");
@@ -349,10 +365,10 @@ int main(int argc, char **argv, char **env)
 				break;
 			case -3:
 				printf("Error: can't read ul.cfg on drive!\n");
-				break;				
+				break;
 		}
 		isofs_Reset();
-		exit(EXIT_FAILURE);		
+		exit(EXIT_FAILURE);
 	}
 
 	// write ISO parts to drive
@@ -370,12 +386,12 @@ int main(int argc, char **argv, char **env)
 				break;
 			case -4:
 				printf("Error: failed to write datas to part file!\n");
-				break;				
+				break;
 		}
 		isofs_Reset();
-		exit(EXIT_FAILURE);		
+		exit(EXIT_FAILURE);
 	}
-		
+
 	// append the game to ul.cfg
 	ret = write_cfg(argv[2], argv[3], GameID, argv[4], num_parts);
 	if (ret < 0) {
@@ -388,15 +404,16 @@ int main(int argc, char **argv, char **env)
 				break;
 		}
 		isofs_Reset();
-		exit(EXIT_FAILURE);		
+		exit(EXIT_FAILURE);
 	}
 
 	isofs_Reset();
-		
+
 	printf("%s is installed!\n", argv[3]);
-	
+
 	// End program
 	exit(EXIT_SUCCESS);
 
 	return 0;
 }
+

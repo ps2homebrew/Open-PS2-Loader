@@ -1,6 +1,7 @@
 syntax: glob
 
 *.o
+*.s
 *.elf
 *.erl
 *.irx

@@ -263,8 +263,9 @@ int main(int argc, char **argv, char **env)
 {
 	int ret;
 	char ElfPath[256];
+	char GameID[256];
 	int num_parts;
-	char *p, *GameID;
+	char *p;
 	u32 filesize;
 	
 	// args check
@@ -323,7 +324,7 @@ int main(int argc, char **argv, char **env)
 #endif
 	
 	// get GameID
-	GameID = strtok(ElfPath, "cdrom0:\\");
+	strcpy(GameID, &ElfPath[8]);
 	p = strstr(GameID, ";1");
 	*p = 0;
 

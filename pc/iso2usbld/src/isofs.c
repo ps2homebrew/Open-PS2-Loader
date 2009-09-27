@@ -141,9 +141,6 @@ int isofs_ReadISO(u32 offset, u32 nbytes, void *buf)
 	
 	fseek(g_fh_iso, offset, SEEK_SET);	
 	r = fread(buf, 1, nbytes, g_fh_iso);
-	#ifdef DEBUG
-		printf("isofs_ReadISO: readed bytes = %d\n", r);
-	#endif		
 		
 	return r;
 }

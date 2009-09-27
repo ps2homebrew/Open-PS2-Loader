@@ -1,0 +1,38 @@
+# _____     ___ ____     ___ ____
+#  ____|   |    ____|   |        | |____|
+# |     ___|   |____ ___|    ____| |    \    PS2DEV Open Source Project.
+#-----------------------------------------------------------------------
+# Copyright 2001-2004, ps2dev - http://www.ps2dev.org
+# Licenced under Academic Free License version 2.0
+# Review ps2sdk README & LICENSE files for further details.
+#
+# $Id: Makefile 1 2007-05-08 16:56:27Z polo $
+
+EE_BIN = loader.elf
+EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o
+
+EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I. $(EE_INCS)
+EE_CFLAGS := -D_EE -O2 -G0 -Wall $(EE_CFLAGS)
+EE_LDFLAGS := -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib $(EE_LDFLAGS) -s
+EE_LIBS += -ldebug -lpatches -lc -lcdvd -lkernel 
+EE_C_COMPILE = $(EE_CC) $(EE_CFLAGS) $(EE_INCS)
+
+%.o : %.c
+	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
+
+%.o : %.s
+	$(EE_AS) $(EE_ASFLAGS) $< -o $@
+
+$(EE_BIN) : $(EE_OBJS) $(PS2SDK)/ee/startup/crt0.o
+	$(EE_CC) -nostartfiles -Tlinkfile $(EE_LDFLAGS) \
+		-o $(EE_BIN) $(PS2SDK)/ee/startup/crt0.o $(EE_OBJS) $(EE_LIBS)
+
+all: $(EE_BIN)
+
+clean:
+	rm -f *.o *.a *.s *.map *.bak *.elf
+
+clean_all:
+	rm -f *.o *.a *.s *.map *.bak *.elf
+
+include $(PS2SDK)/samples/Makefile.pref

@@ -282,21 +282,23 @@ int FindPath(char *pathname)
 	while(dirname != NULL) {
 		found_dir = 0;
 
-		(u8 *)tocEntryPointer = CachedDirInfo.cache;
+		tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
 		
 		// Always skip the first entry (self-refencing entry)
-		(u8 *)tocEntryPointer += tocEntryPointer->length;
-
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length);
+		
 		dir_entry = 0;
 
-		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); (u8 *)tocEntryPointer += tocEntryPointer->length) {
+		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); \
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length)) \
+		{
 			// If we have a null toc entry, then we've either reached the end of the dir, or have reached a sector boundary
 			if (tocEntryPointer->length == 0) {
 				#ifdef DEBUG
 					printf("Got a null pointer entry, so either reached end of dir, or end of sector\n");
 				#endif
 
-				(u8 *)tocEntryPointer = CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11);
+				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11));
 			}
 
 			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11))) {
@@ -320,7 +322,7 @@ int FindPath(char *pathname)
 						return 0;
 					}
 
-					(u8 *)tocEntryPointer = CachedDirInfo.cache;
+					tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
 				}
 				else {
 					CachedDirInfo.valid = 0;
@@ -746,15 +748,17 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 		// the directory is already cached, so check through the currently
 		// cached chunk of the directory first
 
-		(u8 *)tocEntryPointer = CachedDirInfo.cache;
+		tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
 
-		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); (u8 *)tocEntryPointer += tocEntryPointer->length) {
+		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); \
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length)) \
+		{
 			if (tocEntryPointer->length == 0) {
 				#ifdef DEBUG
 					printf("Got a null pointer entry, so either reached end of dir, or end of sector\n");
 				#endif
 
-				(u8 *)tocEntryPointer = CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11);
+				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11));
 			}
 
 			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11))) {
@@ -810,12 +814,14 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 	#endif
 
 	while (CachedDirInfo.cache_size > 0) {
-		(u8 *)tocEntryPointer = CachedDirInfo.cache;
-		
+		tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
+				
 		if (CachedDirInfo.cache_offset == 0)
-			(u8 *)tocEntryPointer += tocEntryPointer->length;
-
-		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); (u8 *)tocEntryPointer += tocEntryPointer->length) {
+			tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length);
+			
+		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); \
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length)) \
+		{
 			
 			if (tocEntryPointer->length == 0) {
 				#ifdef DEBUG
@@ -823,7 +829,7 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 					printf("Offset into cache = %d bytes\n", (int)tocEntryPointer - (int)CachedDirInfo.cache);
 				#endif
 
-				(u8 *)tocEntryPointer = CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11);
+				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11));
 			}
 
 			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11))) {

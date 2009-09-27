@@ -269,13 +269,18 @@ int main(int argc, char **argv, char **env)
 	u32 filesize;
 	
 	// args check
-	if ((argc != 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) \
-		|| (strlen(argv[2]) != 1) || (strlen(argv[3]) > 32)) {
-	
+	if ((argc != 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) || (strlen(argv[3]) > 32)) {
 		printUsage();
 		exit(EXIT_FAILURE);
 	}
-	
+
+#ifdef _WIN32
+	if (strlen(argv[2]) != 1) {
+		printUsage();
+		exit(EXIT_FAILURE);		
+	}
+#endif
+		
 #ifdef DEBUG
 	printf("DEBUG_MODE ON\n");
 	printf("isofs Init...\n");	
@@ -331,7 +336,7 @@ int main(int argc, char **argv, char **env)
 #ifdef DEBUG
 	printf("Game ID: %s\n", GameID);
 #endif
-		
+
 	// check for existing game
 	ret = check_cfg(argv[2], argv[3], GameID);
 	if (ret < 0) {

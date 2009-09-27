@@ -9,8 +9,8 @@ FILE *g_fh_iso;
 
 typedef struct {
 	u8  status;
-	u8  pad[3]; 
-	u32 lsn;  	
+	u8  pad[3];
+	u32 lsn;
 	u32 position;
 	u32 filesize;
 } FHANDLE;
@@ -19,14 +19,14 @@ typedef struct {
 FHANDLE isofs_fdhandles[MAX_FDHANDLES];
 
 struct dir_cache_info {
-	char pathname[1024];// The pathname of the cached directory
-	u32  valid;			// 1 if cache data is valid, 0 if not
+	char pathname[1024];	// The pathname of the cached directory
+	u32  valid;		// 1 if cache data is valid, 0 if not
 	u32  path_depth;	// The path depth of the cached directory (0 = root)
 	u32  sector_start;	// The start sector (LBA) of the cached directory
 	u32  sector_num;	// The total size of the directory (in sectors)
 	u32  cache_offset;	// The offset from sector_start of the cached area
 	u32  cache_size;	// The size of the cached directory area (in sectors)
-	u8  *cache;			// The actual cached data
+	u8  *cache;		// The actual cached data
 };
 
 static struct dir_cache_info CachedDirInfo;
@@ -45,10 +45,10 @@ enum PathMatch {
 
 struct rootDirTocHeader {
 	u16	length;
-	u32 tocLBA;
-	u32 tocLBA_bigend;
-	u32 tocSize;
-	u32 tocSize_bigend;
+	u32 	tocLBA;
+	u32 	tocLBA_bigend;
+	u32 	tocSize;
+	u32 	tocSize_bigend;
 	u8	dateStamp[8];
 	u8	reserved[6];
 	u8	reserved2;
@@ -68,14 +68,14 @@ struct asciiDate {
 
 struct cdVolDesc {
 	u8		filesystemType;	// 0x01 = ISO9660, 0x02 = Joliet, 0xFF = NULL
-	u8		volID[5];		// "CD001"
+	u8		volID[5];	// "CD001"
 	u8		reserved2;
 	u8		reserved3;
 	u8		sysIdName[32];
 	u8		volName[32];	// The ISO9660 Volume Name
 	u8		reserved5[8];
-	u32		volSize;		// Volume Size
-	u32		volSizeBig;		// Volume Size Big-Endian
+	u32		volSize;	// Volume Size
+	u32		volSizeBig;	// Volume Size Big-Endian
 	u8		reserved6[32];
 	u32		unknown1;
 	u32		unknown1_bigend;
@@ -114,18 +114,18 @@ struct dirTocEntry {
 	u8	 fileProperties;
 	u8	 reserved2[6];
 	u8	 filenameLength;
-	char filename[128];
+	char 	 filename[128];
 } __attribute__((packed));
 
 struct TocEntry {
-	u32		fileLBA;
-	u32		fileSize;
-	u8	    dateStamp[6];
-	u8 		padding0[2];
-	u8		fileProperties;
-	u8		padding1[3];
+	u32	fileLBA;
+	u32	fileSize;
+	u8	dateStamp[6];
+	u8 	padding0[2];
+	u8	fileProperties;
+	u8	padding1[3];
 	char	filename[128+1];
-	u8		padding2[3];
+	u8	padding2[3];
 } __attribute__((packed));
 
 static struct cdVolDesc CDVolDesc;

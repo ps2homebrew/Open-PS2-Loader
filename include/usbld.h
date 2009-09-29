@@ -1,21 +1,22 @@
-#include "tamtypes.h"
-#include "kernel.h"
-#include "sifrpc.h"
-#include "fileio.h"
-#include "iopcontrol.h"
-#include "iopheap.h"
-#include "string.h"
-#include "loadfile.h"
-#include "stdio.h"
-#include "sbv_patches.h"
+#include <tamtypes.h>
+#include <kernel.h>
+#include <sifrpc.h>
+#include <fileio.h>
+#include <iopcontrol.h>
+#include <iopheap.h>
+#include <string.h>
+#include <loadfile.h>
+#include <stdio.h>
+#include <sbv_patches.h>
 #include <libcdvd.h>
 #include <libmc.h>
+#include <libpad.h>
 #include <debug.h>
-#include "gsKit.h"
-#include "dmaKit.h"
-#include "gsToolkit.h"
-#include "malloc.h"
-#include "math.h"
+#include <gsKit.h>
+#include <dmaKit.h>
+#include <gsToolkit.h>
+#include <malloc.h>
+#include <math.h>
 
 #include <debug.h>
 

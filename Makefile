@@ -10,8 +10,12 @@ EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/config.o obj/loader.o 
 EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
-all: $(EE_BIN)
+all:
+	@mkdir -p obj
+	@mkdir -p asm
+	$(MAKE) $(EE_BIN)
 	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNUSBLD.ELF
+	$(MAKE) -C pc
 
 clean:
 	$(MAKE) -C loader clean
@@ -19,8 +23,11 @@ clean:
 	$(MAKE) -C modules/eesync clean
 	$(MAKE) -C modules/cdvdman clean
 	$(MAKE) -C modules/usbhdfsd clean	
-	$(MAKE) -C modules/isofs clean		
+	$(MAKE) -C modules/isofs clean
+	$(MAKE) -C pc clean
 	rm -f $(EE_BIN) asm/*.* obj/*.*
+
+rebuild: clean all
 
 loader.s:
 	$(MAKE) -C loader

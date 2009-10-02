@@ -59,7 +59,6 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
-
 void Reset()
 {
 	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF",0));

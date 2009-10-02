@@ -1,7 +1,7 @@
 #include "include/usbld.h"
 #include "string.h"
 #include "fileio.h"
-#include "sys\stat.h"
+#include <sys/stat.h>
 
 int filesize=0;
 

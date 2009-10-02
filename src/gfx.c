@@ -1,4 +1,5 @@
 #include "include/usbld.h"
+#include <assert.h>
 
 #define yfix(x) (x*gsGlobal->Height)/480
 					
@@ -51,23 +52,112 @@ u64 Background_b = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_c = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_d = GS_SETREG_RGBAQ(0x00,0x00,0x80,0x00,0x00);
 
-char infotxt[256]="WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED IN SOURCE CODE OF HD PROYECT <http://psx-scene.com>";
+char infotxt[256]="WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>";
 int z;
+
+/// scroll speed selector
+struct TSubMenuList* speed_item = NULL;
+unsigned int curscroll = 1;
+char scroll_speed[3][14] = {"Scroll Slow", "Scroll Medium", "Scroll Fast"};
+
+void ChangeScrollSpeed() {
+	curscroll = (curscroll + 1) % 3;
+	speed_item->item.text = scroll_speed[curscroll];
+	
+	// update the pad delays for KEY_UP and KEY_DOWN
+	// default delay is 7
+	SetButtonDelay(KEY_UP, 10 - curscroll * 3); // 0,1,2 -> 10, 7, 4
+	SetButtonDelay(KEY_DOWN, 10 - curscroll * 3);
+}
+
 
 char txt_settings[2][32]={"Configure theme", "Select language"};
 
-void InitGFX(){
+// forward decls.
+void MsgBox();
+void DrawConfig();
+void LoadResources();
+
+// Count of icons before and after the selected one
+unsigned int _vbefore = 1;
+unsigned int _vafter = 1;
+// spacing between icons, vertical.
+unsigned int _vspacing = 80;
+
+/// menu item selection callbacks
+void ExecExit(struct TMenuItem* self, int vorder) {
+	__asm__ __volatile__(
+		"	li $3, 0x04;"
+		"	syscall;"
+		"	nop;"
+	);
+}
+
+void ExecSettings(struct TMenuItem* self, int id) {
+	if (id == 1) {
+		DrawConfig();
+	} else if(id == 2) {
+		MsgBox();
+	} else if (id == 3) {
+		// scroll speed modifier
+		ChangeScrollSpeed();
+	}
+}
+
+/* Menu item definitions. Reversed order. */
+struct TSubMenuList *settings_submenu = NULL;
+
+struct TMenuItem settings_item = {
+	&config_icon, "Settings", NULL, NULL, NULL, &ExecSettings, NULL, NULL
+};
+
+struct TMenuItem exit_item = {
+	&exit_icon, "Exit", NULL, NULL, NULL, &ExecExit, NULL, NULL
+};
+
+void InitMenu() {
+	// initialize the menu
+	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1);
+	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2);
+	speed_item = AppendSubMenu(&settings_submenu, &config_icon, scroll_speed[curscroll], 3);
+	settings_item.submenu = settings_submenu;
+	
+	// add all menu items
+	menu = NULL;
+	AppendMenuItem(&exit_item);
+	AppendMenuItem(&settings_item);
+
+	// Epilogue
+	selected_item = menu;
+}
+
+void DestroyMenu() {
+	// destroy menu
+	struct TMenuList *cur = menu;
+	
+	while (cur) {
+		struct TMenuList *td = cur;
+		cur = cur->next;
+		
+		if (&td->item)
+			DestroySubMenu(&td->item->submenu);
+		
+		free(td);
+	}
+	
+	
+}
+
+void InitGFX() {
 
 	waveframe=0;
 	frame=0;
 	h_anim=100;
 	v_anim=100;
 	direc=0;
-	selected_h=2;
-	selected_v=0;
-	max_v=3;
 	max_settings=2;
 	max_games=10;
+	font.Vram = 0;
 
 	gsGlobal = gsKit_init_global();
 
@@ -86,9 +176,100 @@ void InitGFX(){
 
 	gsKit_init_screen(gsGlobal);
 
-	LoadFont();
-	
 	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
+
+	LoadResources();
+	InitMenu();
+}
+
+void DestroyGFX() {
+	/// TODO: un-initialize the GFX
+	
+	DestroyMenu();
+}
+
+struct TMenuList* AllocMenuItem(struct TMenuItem* item) {
+	struct TMenuList* it;
+	
+	it = malloc(sizeof(struct TMenuList));
+	
+	it->prev = NULL;
+	it->next = NULL;
+	it->item = item;
+	
+	return it;
+}
+
+void AppendMenuItem(struct TMenuItem* item) {
+	assert(item);
+	
+	if (menu == NULL) {
+		menu = AllocMenuItem(item);
+		return;
+	}
+	
+	struct TMenuList *cur = menu;
+	
+	// traverse till the end
+	while (cur->next)
+		cur = cur->next;
+	
+	// create new item
+	struct TMenuList *newitem = AllocMenuItem(item);
+	
+	// link
+	cur->next = newitem;
+	newitem->prev = cur;
+}
+
+
+struct TSubMenuList* AllocSubMenuItem(GSTEXTURE *icon, char *text, int id) {
+	struct TSubMenuList* it;
+	
+	it = malloc(sizeof(struct TSubMenuList));
+	
+	it->prev = NULL;
+	it->next = NULL;
+	it->item.icon = icon;
+	it->item.text = text;
+	it->item.id = id;
+	
+	return it;
+}
+
+struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id) {
+	if (*submenu == NULL) {
+		*submenu = AllocSubMenuItem(icon, text, id);
+		return *submenu; 
+	}
+	
+	struct TSubMenuList *cur = *submenu;
+	
+	// traverse till the end
+	while (cur->next)
+		cur = cur->next;
+	
+	// create new item
+	struct TSubMenuList *newitem = AllocSubMenuItem(icon, text, id);
+	
+	// link
+	cur->next = newitem;
+	newitem->prev = cur;
+	
+	return newitem;
+}
+
+void DestroySubMenu(struct TSubMenuList** submenu) {
+	// destroy sub menu
+	struct TSubMenuList *cur = *submenu;
+	
+	while (cur) {
+		struct TSubMenuList *td = cur;
+		cur = cur->next;
+		free(td);
+	}
+	
+	*submenu = NULL;
 }
 
 void DrawQuad(GSGLOBAL *gsGlobal, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int z, u64 color){
@@ -114,28 +295,23 @@ void Flip(){
 }
 
 void Intro(){
-	int background_loaded=0;
 	char introtxt[255];
-	background_image=0;
 	
 	for(frame=0;frame<125;frame++){
 		if(frame<=25){
 			TextColor(0x80,0x80,0x80,frame*4);
-		}else if(frame==75){
-			background_loaded=LoadBackground();
-			LoadIcons();
-		}else if(frame>75 && frame<100){
+		} else if(frame>75 && frame<100){
 			TextColor(0x80,0x80,0x80,0x80-(frame-75)*4);
 		}else if(frame>100){
 			TextColor(0x80,0x80,0x80,0x00);
 			waveframe+=0.1f;
 		}
+
 		DrawBackground();
 		sprintf(introtxt,"Open USB Loader %s", USBLD_VERSION);
 		DrawText(270, 255, introtxt, 1.0f, 0);
 		Flip();
 	}
-	background_image=background_loaded;
 }
 
 void DrawWave(int y, int xoffset){
@@ -150,28 +326,36 @@ void DrawWave(int y, int xoffset){
 	}
 }
 
+void LoadResources() {
+	background_image=LoadBackground();
+	LoadIcons();
+	UpdateIcons();
+	LoadFont();
+}
+
 void DrawBackground(){
 	z=1;
 
 	gsKit_vram_clear(gsGlobal);
+
 	//BACKGROUND
 	if(background_image==1){
-	background.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(background.Width, background.Height, background.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &background);
-	
-	DrawSprite_texture(gsGlobal, &background, 0.0f,  // X1
-		0.0f,  // Y2
-		0.0f,  // U1
-		0.0f,  // V1
-		640.0f, // X2
-		yfix(480), // Y2
-		background.Width, // U2
-		background.Height, // V2
-		z,
-		GS_SETREG_RGBAQ(0x80,0x80,0x80,0x80,0x00));
-	
-	gsKit_queue_exec(gsGlobal);
-	gsKit_vram_clear(gsGlobal);
+		background.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(background.Width, background.Height, background.PSM), GSKIT_ALLOC_USERBUFFER);
+		gsKit_texture_upload(gsGlobal, &background);
+		
+		DrawSprite_texture(gsGlobal, &background, 0.0f,  // X1
+			0.0f,  // Y2
+			0.0f,  // U1
+			0.0f,  // V1
+			640.0f, // X2
+			yfix(480), // Y2
+			background.Width, // U2
+			background.Height, // V2
+			z,
+			GS_SETREG_RGBAQ(0x80,0x80,0x80,0x80,0x00));
+		
+		gsKit_queue_exec(gsGlobal);
+		gsKit_vram_clear(gsGlobal);
 	}else{
 		DrawQuad_gouraud(gsGlobal, 0.0f, 0.0f, 640.0f, 0.0f, 0.0f, 512.0f, 640.0f, 512.0f, 2, Background_a, Background_b, Background_c, Background_d);
 		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
@@ -185,10 +369,6 @@ void DrawBackground(){
 			waveframe+=0.01f;
 		}
 	}
-	UpdateIcons();
-	LoadFont();
-	font.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(font.Width, font.Height, font.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &font);
 }
 
 void SetColor(int r, int g, int b){
@@ -240,11 +420,8 @@ void DrawConfig(){
 	while(1){
 		ReadPad();
 				
-		DrawBackground();
-						
-		DrawIcons();
-			
-		DrawInfo();
+		DrawScreen();
+
 		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
 		DrawQuad(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Darker);
 		DrawQuad(gsGlobal, 110.0f, 110.0f, 530.0f, 110.0f, 110.0f, 402.0f, 530.0f, 402.0f, z, Wave_a);
@@ -465,11 +642,7 @@ void MsgBox(){
 	while(1){
 		ReadPad();
 				
-		DrawBackground();
-						
-		DrawIcons();
-			
-		DrawInfo();
+		DrawScreen();
 		
 		TextColor(0xff,0xff,0xff,0xff);
 		
@@ -487,6 +660,10 @@ void MsgBox(){
 }
 
 void LoadFont(){
+	// No loading if already loaded
+	if (font.Vram)
+	    return;
+	
 	font.Width = 256;
 	font.Height = 256;
 	font.PSM = GS_PSM_CT32;
@@ -506,6 +683,7 @@ void LoadFont(){
 	for (i=0; i<512; i++) {
 		gsFont->Additional[i] = gsFont->CharWidth;
 	}
+
 	font.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(font.Width, font.Height, font.PSM), GSKIT_ALLOC_USERBUFFER);
 	gsKit_texture_upload(gsGlobal, &font);
 
@@ -660,7 +838,25 @@ void UpdateIcons(){
 
 }
 
-void DrawIcon(int id, int x, int y, float scale){
+void DrawIcon(GSTEXTURE *img, int x, int y, float scale){
+	if (img!=NULL) {
+		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+		DrawSprite_texture(gsGlobal, img, x-scale,  // X1
+			y-scale,  // Y2
+			0.0f,  // U1
+			0.0f,  // V1
+			x+60.0f+scale, // X2
+			y+60.0f+scale, // Y2
+			img->Width, // U2
+			img->Height, // V2
+			z,
+			GS_SETREG_RGBAQ(0x80,0x80,0x80,0x80,0x00));
+		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+		z++;
+	}
+}
+
+void DrawIconByIndex(int id, int x, int y, float scale){
 	GSTEXTURE *img=0;
 	switch(id){
 		case 1:
@@ -682,148 +878,335 @@ void DrawIcon(int id, int x, int y, float scale){
 			img=&language_icon;
 		break;
 	}
-	if (img!=NULL){
-		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
-		DrawSprite_texture(gsGlobal, img, x-scale,  // X1
-			y-scale,  // Y2
-			0.0f,  // U1
-			0.0f,  // V1
-			x+60.0f+scale, // X2
-			y+60.0f+scale, // Y2
-			img->Width, // U2
-			img->Height, // V2
-			z,
-			GS_SETREG_RGBAQ(0x80,0x80,0x80,0x80,0x00));
-		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
-		z++;
-	}
+	
+	DrawIcon(img, x, y, scale);
 }
 
-void DrawIcons(){
-	if(h_anim<100 && direc==1){
+void DrawIcons() {
+	// Menu item animation
+	if(h_anim<100 && direc==1) {
 		h_anim+=10;
-	}else if(h_anim>100 && direc==3){
+	} else if(h_anim>100 && direc==3) {
 		h_anim-=10;
 	}
 	
-	if(selected_h==1 && h_anim==100){
-		max_v=max_settings;
-		DrawSettings();
-	}else if(selected_h==2 && h_anim==100){
-		max_v=max_games;
-		DrawUSBGames();
-	}else if(selected_h==3 && h_anim==100){
-		max_v=max_games;
-		DrawHDDGames();
-	}else if(selected_h==4 && h_anim==100){
-		max_v=max_games;
-		DrawApps();
-	}
-	
-	TextColor(text_color[0],text_color[1],text_color[2],0xff);
-
-	DrawIcon(1,((3-selected_h)*100)+h_anim-250,120,selected_h==0?20:1);
-	if(selected_h==0)DrawText(((3-selected_h)*100)+h_anim-227,190,"Exit",1.0f,1);
-	DrawIcon(2,((3-selected_h)*100)+h_anim-150,120,selected_h==1?20:1);
-	if(selected_h==1)DrawText(((3-selected_h)*100)+h_anim-127,190,"Settings",1.0f,1);
-	DrawIcon(3,((3-selected_h)*100)+h_anim-50,120,selected_h==2?20:1);
-	if(selected_h==2)DrawText(((3-selected_h)*100)+h_anim-27,190,"USB Games",1.0f,1);
-	DrawIcon(3,((3-selected_h)*100)+h_anim+50,120,selected_h==3?20:1);
-	if(selected_h==3)DrawText(((3-selected_h)*100)+h_anim+73,190,"HDD Games",1.0f,1);
-	DrawIcon(3,((3-selected_h)*100)+h_anim+150,120,selected_h==4?20:1);
-	if(selected_h==4)DrawText(((3-selected_h)*100)+h_anim+173,190,"Apps",1.0f,1);
-}
-
-void DrawUSBGames(){
-	if(v_anim<100 && direc==4){
-		v_anim+=10;
-	}else if(v_anim>100 && direc==2){
-		v_anim-=10;
-	}
-	
-	TextColor(text_color[0],text_color[1],text_color[2],0xff);
-
-	if(selected_v>0)DrawIcon(4,(100)+50,v_anim-40,1);
-	DrawIcon(4,(100)+50,v_anim+130,10);
-	if(max_games>0){
-		if(v_anim==100)DrawText((100)+150,v_anim+153,actualgame->Game.Name,1.0f,0);
-	}else{
-		if(v_anim==100)DrawText((100)+150,v_anim+153,"No items",1.0f,0);
-	}
-	if(selected_v<=max_v-2)DrawIcon(4,(100)+50,v_anim+210,1);
-	if(selected_v<=max_v-3)DrawIcon(4,(100)+50,v_anim+290,1);
-}
-
-void DrawHDDGames(){
-	/*if(v_anim<100 && direc==4){
-		v_anim+=10;
-	}else if(v_anim>100 && direc==2){
-		v_anim-=10;
-	}*/
-	
-	v_anim=100;
-	
-	TextColor(text_color[0],text_color[1],text_color[2],0xff);
-
-	//if(selected_v>0)DrawIcon(4,(100)+50,v_anim-40,1);
-	DrawIcon(4,(100)+50,v_anim+130,10);
-	/*if(max_games>0){
-		if(v_anim==100)DrawText((100)+150,v_anim+153,actualgame->Game.Name,1.0f,0);
-	}else{*/
-		if(v_anim==100)DrawText((100)+150,v_anim+153,"Demo only",1.0f,0);
-	/*}
-	if(selected_v<=max_v-2)DrawIcon(4,(100)+50,v_anim+210,1);
-	if(selected_v<=max_v-3)DrawIcon(4,(100)+50,v_anim+290,1);*/
-}
-
-void DrawApps(){
-	/*if(v_anim<100 && direc==4){
-		v_anim+=10;
-	}else if(v_anim>100 && direc==2){
-		v_anim-=10;
-	}*/
-	
-	v_anim=100;
-	
-	TextColor(text_color[0],text_color[1],text_color[2],0xff);
-
-	//if(selected_v>0)DrawIcon(4,(100)+50,v_anim-40,1);
-	DrawIcon(4,(100)+50,v_anim+130,10);
-	/*if(max_games>0){
-		if(v_anim==100)DrawText((100)+150,v_anim+153,actualgame->Game.Name,1.0f,0);
-	}else{*/
-		if(v_anim==100)DrawText((100)+150,v_anim+153,"Demo only",1.0f,0);
-	/*}
-	if(selected_v<=max_v-2)DrawIcon(4,(100)+50,v_anim+210,1);
-	if(selected_v<=max_v-3)DrawIcon(4,(100)+50,v_anim+290,1);*/
-}
-
-void DrawSettings(){
-	if(v_anim<100 && direc==4){
-		v_anim+=10;
-	}else if(v_anim>100 && direc==2){
-		v_anim-=10;
+	if ((h_anim == 100) && (selected_item)) {
+		assert(selected_item->item);
+		
+		DrawSubMenu();
 	}
 	
 	TextColor(text_color[0],text_color[1],text_color[2],0xff);
 	
-	if(selected_v>0)DrawIcon(5+selected_v-1,(100)+50,v_anim-40,1);
-	DrawIcon(5+selected_v,(100)+50,v_anim+130,10);
-	if(v_anim==100)DrawText((100)+150,v_anim+153,txt_settings[selected_v],1.0f,0);
-	if(selected_v<=max_v-2)DrawIcon(5+selected_v+1,(100)+50,v_anim+210,1);
-	if(selected_v<=max_v-3)DrawIcon(5+selected_v+2,(100)+50,v_anim+290,1);
+	// we start at prev, if available
+	struct TMenuList *cur_item = selected_item;
+	int xpos = 50;
+	
+	if (selected_item->prev) {
+		xpos = -50;
+		cur_item = selected_item->prev;
+	}
+	
+	while (cur_item) {
+		DrawIcon(cur_item->item->icon, h_anim + xpos, 120, cur_item == selected_item ? 20:1);
+		
+		if(cur_item == selected_item)
+			DrawText(h_anim + xpos + 23, 190, cur_item->item->text, 1.0f, 1);
+		
+		cur_item = cur_item->next;
+		xpos += 100;
+	}
 }
 
-void DrawInfo(){
+void DrawInfo() {
 	char txt[16];
 
 	TextColor(text_color[0],text_color[1],text_color[2],0xff);
 	
 	strncpy(txt,&infotxt[frame/10],15);
 	DrawText(300,50,txt,1,0);
-	if (frame>2000){
-	frame=0;
-	}else{
-	frame++;	
+	
+	if (frame>2000) {
+	 frame=0;
+	} else {
+	 frame++;	
+	}
+}
+
+void DrawSubMenu() {
+	if (!selected_item)
+		return;
+
+	if(v_anim<100 && direc==4){
+		v_anim+=10;
+	}else if(v_anim>100 && direc==2){
+		v_anim-=10;
+	}
+	
+	TextColor(text_color[0],text_color[1],text_color[2],0xff);
+
+	struct TSubMenuList *cur = selected_item->item->current;
+	
+	if (!cur) // no rendering if empty
+		return;
+	
+	// prev item
+	struct TSubMenuList *prev = cur->prev;
+	
+	
+	int others = 0;
+	
+	while (prev && (others < _vbefore)) {
+		DrawIcon(prev->item.icon, (100)+50, (v_anim - 40) - others * _vspacing,1);
+		// Display the prev. item's text:
+		/* if ((v_anim>=80) || (others > 1))
+			DrawText((100)+150, (v_anim - 40) - others * _vspacing, prev->item.text,1.0f,0);
+		
+		*/
+		prev = prev->prev; others++;
+	}
+	
+	DrawIcon(cur->item.icon, (100)+50,v_anim+130,10);
+	// if(v_anim==100)
+	DrawText((100)+150,v_anim+153,cur->item.text,1.0f,0);
+
+	cur = cur->next;
+	
+	others = 0;
+	
+	while (cur && (others <= _vafter)) {
+		DrawIcon(cur->item.icon, (100)+50,v_anim + 210 + others * _vspacing,1);
+		DrawText((100)+150, v_anim + 235 + others * _vspacing,cur->item.text,1.0f,0);
+		cur = cur->next;
+		others++;
+	}
+}
+
+void MenuNextH() {
+	if (!selected_item) {
+		selected_item = menu;
+	}
+	
+	if(selected_item->next){
+		h_anim=200;
+		selected_item = selected_item->next;
+		
+		/*
+		if (selected_item->item->resetOrder) // reset the order if callback exists
+			selected_item->item->resetOrder(selected_item->item); // could also be getCurSelection to preserve the order
+		else{
+			selected_item->item->current = selected_item->item->submenu;
+		}
+		*/
+		if (!selected_item->item->current)
+			selected_item->item->current = selected_item->item->submenu;
+		
+		
+		actualgame=firstgame;
+		v_anim=100;
+		direc=3;
+	}
+}
+
+void MenuPrevH() {
+	if (!selected_item) {
+		selected_item = menu;
+	}
+	
+	if(selected_item->prev){
+		h_anim=0;
+		selected_item = selected_item->prev;
+		
+		/*
+		if (selected_item->item->resetOrder) // reset the order if callback exists
+			selected_v = selected_item->item->resetOrder(selected_item->item); // can preserve order this way
+		else {
+			selected_v = 0;
+			selected_item->item->current = selected_item->item->submenu;
+		}
+		*/
+		if (!selected_item->item->current)
+			selected_item->item->current = selected_item->item->submenu;
+		
+		actualgame=firstgame;
+		v_anim=100;
+		direc=1;
+	}
+}
+
+void MenuNextV() {
+	if (!selected_item)
+		return;
+	
+	struct TSubMenuList *cur = selected_item->item->current;
+	
+	if(cur && cur->next) {
+		if (selected_item->item->nextItem)
+			selected_item->item->nextItem(selected_item->item);
+	
+		selected_item->item->current = cur->next;
+		
+		v_anim=200;
+		direc=2;
+	}
+}
+
+void MenuPrevV() {
+	if (!selected_item)
+		return;
+	
+	struct TSubMenuList *cur = selected_item->item->current;
+	
+	if(cur && cur->prev) {
+		if (selected_item->item->prevItem)
+			selected_item->item->prevItem(selected_item->item);
+		
+		selected_item->item->current = cur->prev;
+			
+		v_anim=0;
+		direc=4;
+
+	}
+}
+
+void MenuItemExecute() {
+	if (selected_item && (selected_item->item->execute)) {
+		// selected submenu id. default -1 = no selection
+		int subid = -1;
+		
+		struct TSubMenuList *cur = selected_item->item->current;
+		
+		if (cur)
+			subid = cur->item.id;
+		
+		selected_item->item->execute(selected_item->item, subid);
+	}
+}
+
+void RefreshSubMenu() {
+	if (selected_item && (selected_item->item->refresh)) {
+		selected_item->item->refresh(selected_item->item);
+	}
+}
+
+void DrawScreenStatic() {
+	// we render a static variant of the menu (no animations)
+	// ------------------------------------------------------
+	// -------- 0. the background ---------------------------
+	// ------------------------------------------------------
+	DrawBackground();
+	
+	// ------------------------------------------------------
+	// -------- 1. the icons that symbolise the hmenu -------
+	// ------------------------------------------------------
+	TextColor(text_color[0],text_color[1],text_color[2], 0xff);
+	
+	// we start at 10, 10 and move by appropriate size right
+	
+	// we start at prev, if available
+	struct TMenuList *cur_item = menu;
+	
+	int xpos = 30;
+	
+	while (cur_item) {
+		if(cur_item == selected_item) {
+			DrawIcon(cur_item->item->icon, xpos, 10, 20);
+			DrawText(30, 80, cur_item->item->text, 1.0f, 0);
+			xpos += 80;
+		} else {
+			DrawIcon(cur_item->item->icon, xpos, 10, 1);
+			xpos += 60;
+		}
+
+		cur_item = cur_item->next;
+	}	
+	
+	// ------------------------------------------------------
+	// -------- 2. the submenu ------------------------------
+	// ------------------------------------------------------
+
+	// we want to display N previous, the current and N next items (N == sur_items)
+	// spacing is 45 pixels
+	// x offset is 10 pixels
+	// y offset is 100 pixels
+	// the selected item is displayed at 100 + 3 * 60 = 280 px.
+	if (!selected_item)
+		return;
+	
+	float iscale = -15.0f; // not a scale... an additional spacing in pixels
+	int draw_icons = 1;
+	int iconhalf = 30;
+	int spacing = 30;
+	
+	int icon_h_spacing = 0;
+	
+	if (draw_icons)
+		icon_h_spacing = 45;
+	
+	// count of items before and after selection
+	int sur_items = 5;
+	int curpos = 120 + sur_items * spacing;
+	
+	TextColor(text_color[0],text_color[1],text_color[2],0xff);
+	
+		
+	struct TSubMenuList *cur = selected_item->item->current;
+	
+	if (!cur) // no rendering if empty
+		return;
+	
+	// prev item
+	struct TSubMenuList *prev = cur->prev;
+	
+	int others = 1;
+	
+	while (prev && (others <= sur_items)) {
+		if (draw_icons)
+			DrawIcon(prev->item.icon, 10, curpos - others * spacing - iconhalf, iscale);
+		DrawText(10 + icon_h_spacing, curpos - others * spacing, prev->item.text,1.0f, 0);
+		
+		prev = prev->prev; others++;
+	}
+	
+	// a sorta yellow colour for the selection
+	TextColor(0xff, 0x080, 0x00, 0xff);
+	if (draw_icons)
+			DrawIcon(cur->item.icon, 10, curpos - iconhalf, iscale);
+	DrawText(10 + icon_h_spacing, curpos, cur->item.text, 1.0f, 0);
+		
+	cur = cur->next;
+	
+	others = 1;
+	
+	TextColor(text_color[0],text_color[1],text_color[2],0xff);
+	
+	while (cur && (others <= sur_items)) {
+		if (draw_icons)
+			DrawIcon(cur->item.icon, 10, curpos + others * spacing - iconhalf, iscale);
+		DrawText(10 + icon_h_spacing, curpos + others * spacing, cur->item.text, 1.0f, 0);
+		
+		cur = cur->next; others++;
+	}
+	
+}
+
+void SwapMenu() {
+	if (drawScreenPtr) {
+		drawScreenPtr = NULL;
+	} else {
+		drawScreenPtr = &DrawScreenStatic;
+	}
+}
+
+
+void DrawScreen() {
+	// do we have a custom renderer pointer?
+	if (drawScreenPtr) {
+		drawScreenPtr();
+	} else {
+		// default render:
+		DrawBackground();
+		DrawIcons();
+		DrawInfo();
 	}
 }

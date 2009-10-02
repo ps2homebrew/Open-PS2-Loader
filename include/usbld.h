@@ -1,22 +1,21 @@
-#include <tamtypes.h>
-#include <kernel.h>
-#include <sifrpc.h>
-#include <fileio.h>
-#include <iopcontrol.h>
-#include <iopheap.h>
-#include <string.h>
-#include <loadfile.h>
-#include <stdio.h>
-#include <sbv_patches.h>
+#include "tamtypes.h"
+#include "kernel.h"
+#include "sifrpc.h"
+#include "fileio.h"
+#include "iopcontrol.h"
+#include "iopheap.h"
+#include "string.h"
+#include "loadfile.h"
+#include "stdio.h"
+#include "sbv_patches.h"
 #include <libcdvd.h>
-#include <libmc.h>
 #include <libpad.h>
 #include <debug.h>
-#include <gsKit.h>
-#include <dmaKit.h>
-#include <gsToolkit.h>
-#include <malloc.h>
-#include <math.h>
+#include "gsKit.h"
+#include "dmaKit.h"
+#include "gsToolkit.h"
+#include "malloc.h"
+#include "math.h"
 
 #include <debug.h>
 
@@ -42,18 +41,78 @@ struct TGameList
 TGameList *firstgame;
 TGameList *actualgame;
 
+/// Forward decls.
+struct TMenuItem;
+struct TMenuList;
+
+/// a single submenu item
+struct TSubMenuItem {
+	/// Icon used for rendering of this item
+	GSTEXTURE *icon;
+	
+	/// item description
+	char *text;
+	
+	/// item id
+	int id;
+	
+};
+
+struct TSubMenuList {
+	struct TSubMenuItem item;
+	
+	struct TSubMenuList *prev, *next;
+};
+
+/// a single menu item. Linked list impl (for the ease of rendering)
+struct TMenuItem {
+	/// Icon used for rendering of this item
+	GSTEXTURE *icon;
+	
+	/// item description
+	char *text;
+	
+	void *userdata;
+	
+	/// submenu
+	struct TSubMenuList *submenu, *current;
+	
+	/// execute a menu/submenu item (id is the submenu id as specified in AppendSubMenu)
+	void (*execute)(struct TMenuItem *self, int id);
+	
+	void (*nextItem)(struct TMenuItem *self);
+	
+	void (*prevItem)(struct TMenuItem *self);
+	
+	int (*resetOrder)(struct TMenuItem *self);
+	
+	void (*refresh)(struct TMenuItem *self);
+};
+
+
+
+struct TMenuList {
+	struct TMenuItem *item;
+	
+	struct TMenuList *prev, *next;
+};
+
+/// menu item list.
+struct TMenuList *menu;
+struct TMenuList *selected_item;
+
 float waveframe;
 int frame;
 int h_anim;
 int v_anim;
 int direc;
-int selected_h;
-int selected_v;
-int max_v;
 int max_settings;
 int max_games;
 
 int background_image;
+
+// Default or custom screen rendering function pointer
+void (*drawScreenPtr)();
 
 char theme[32];
 int bg_color[3];
@@ -108,6 +167,11 @@ void UnloadPad();
 //GFX
 
 void InitGFX();
+void AppendMenuItem(struct TMenuItem* item);
+
+struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id);
+void DestroySubMenu(struct TSubMenuList** submenu);
+
 void Flip();
 void MsgBox();
 void DrawWave(int y, int xoffset);
@@ -122,13 +186,26 @@ void LoadFont();
 int LoadBackground();
 void LoadIcons();
 void UpdateIcons();
-void DrawIcon(int id, int x, int y, float scale);
+void DrawIcon(GSTEXTURE *img, int x, int y, float scale);
 void DrawIcons();
-void DrawUSBGames();
-void DrawHDDGames();
-void DrawApps();
-void DrawSettings();
 void DrawInfo();
+void DrawSubMenu();
+
+void MenuNextH();
+void MenuPrevH();
+void MenuNextV();
+void MenuPrevV();
+void MenuItemExecute();
+void RefreshSubMenu();
+
+// Static render
+void DrawScreenStatic();
+
+// swap static/normal render
+void SwapMenu();
+
+// Renders everything
+void DrawScreen();
 
 //CONFIG
 int ReadConfig(char *archivo);

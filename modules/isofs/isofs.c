@@ -14,6 +14,7 @@ IRX_ID(MODNAME, 1, 0);
 
 static char g_ISO_name[]="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 static char g_ISO_parts=0x69;
+static char g_ISO_media=0x69;
 
 struct irx_export_table _exp_isofs;
 
@@ -1472,6 +1473,12 @@ int isofs_InitDevice(void)
 	return 0;
 }
 
+//-------------------------------------------------------------- 
+int isofs_GetDiscType(void) // Export #7
+{
+	return (int)g_ISO_media;
+}
+
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
 {				
@@ -1527,6 +1534,11 @@ int _start(int argc, char** argv)
 	
 	if (g_ISO_parts==0x69){
 		printf("ERROR: incorrect number of parts\n");
+		return MODULE_NO_RESIDENT_END;
+	}
+	
+	if (g_ISO_media==0x69){
+		printf("ERROR: incorrect media type\n");
 		return MODULE_NO_RESIDENT_END;
 	}
 	

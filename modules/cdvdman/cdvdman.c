@@ -1705,7 +1705,9 @@ void cdvdman_cdinit(void)
 	int i;
 	void **export_tab;
 	char isofs_modname[8] = "isofs\0\0\0";
+#ifdef NETLOG_DEBUG
 	char netlog_modname[8] = "netlog\0\0";
+#endif
 	
 	if (cdvdman_inited)
 		return;

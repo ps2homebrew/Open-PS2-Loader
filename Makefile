@@ -1,6 +1,7 @@
 .SILENT:
 
 GSKIT = $(PS2DEV)/gsKit
+PS2ETH = $(PS2DEV)/ps2eth
 
 EE_BIN = main.elf
 EE_SRC_DIR = src/
@@ -15,37 +16,56 @@ EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include
 all:
 	@mkdir -p obj
 	@mkdir -p asm
+	echo "Building Open USB Loader..."
+	echo "    * Interface"
 	$(MAKE) $(EE_BIN)
-	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNUSBLD.ELF
+	echo "Compressing..."
+	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNUSBLD.ELF > /dev/null
+	echo "Building iso2usbld..."
 	$(MAKE) -C pc
 
 clean:
+	echo "Cleaning..."
+	echo "    * Interface"
+	rm -f $(EE_BIN) OPNUSBLD.ELF asm/*.* obj/*.*
+	echo "    * Loader"
 	$(MAKE) -C loader clean
+	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv clean
+	echo "    * eesync.irx"
 	$(MAKE) -C modules/eesync clean
+	echo "    * cdvdman.irx"
 	$(MAKE) -C modules/cdvdman clean
+	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd clean	
+	echo "    * isofs.irx"
 	$(MAKE) -C modules/isofs clean
+	echo "    * ps2dev9.irx"
 	$(MAKE) -C modules/dev9 clean	
+	echo "    * netlog.irx"
 	$(MAKE) -C modules/netlog clean	
+	echo "    * iso2usbld"
 	$(MAKE) -C pc clean
-	rm -f $(EE_BIN) asm/*.* obj/*.*
 
 rebuild: clean all
 
 loader.s:
+	echo "    * Loader"
 	$(MAKE) -C loader
 	bin2s loader/loader.elf asm/loader.s loader_elf
 
 imgdrv.s:
+	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv
 	bin2s modules/imgdrv/imgdrv.irx asm/imgdrv.s imgdrv_irx
 
 eesync.s:
+	echo "    * eesync.irx"
 	$(MAKE) -C modules/eesync
 	bin2s modules/eesync/eesync.irx asm/eesync.s eesync_irx
 
 cdvdman.s:
+	echo "    * cdvdman.irx"
 	$(MAKE) -C modules/cdvdman
 	bin2s modules/cdvdman/cdvdman.irx asm/cdvdman.s cdvdman_irx
 
@@ -54,14 +74,17 @@ usbd.s:
 	bin2s modules/usbd/usbd.irx asm/usbd.s usbd_irx
 	
 usbhdfsd.s:
+	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd
 	bin2s modules/usbhdfsd/bin/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
 	
 isofs.s:
+	echo "    * isofs.irx"
 	$(MAKE) -C modules/isofs
 	bin2s modules/isofs/isofs.irx asm/isofs.s isofs_irx
 
 ps2dev9.s:
+	echo "    * ps2dev9.irx"
 	$(MAKE) -C modules/dev9
 	bin2s modules/dev9/ps2dev9.irx asm/ps2dev9.s ps2dev9_irx
 	
@@ -72,6 +95,7 @@ ps2smap.s:
 	bin2s $(PS2ETH)/smap/ps2smap.irx asm/ps2smap.s ps2smap_irx
 
 netlog.s:
+	echo "    * netlog.irx"
 	$(MAKE) -C modules/netlog
 	bin2s modules/netlog/netlog.irx asm/netlog.s netlog_irx
 		

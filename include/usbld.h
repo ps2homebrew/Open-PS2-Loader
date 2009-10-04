@@ -89,8 +89,6 @@ struct TMenuItem {
 	void (*refresh)(struct TMenuItem *self);
 };
 
-
-
 struct TMenuList {
 	struct TMenuItem *item;
 	
@@ -167,6 +165,8 @@ void UnloadPad();
 //GFX
 
 void InitGFX();
+void InitMenu();
+
 void AppendMenuItem(struct TMenuItem* item);
 
 struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id);
@@ -183,6 +183,8 @@ void DrawConfig();
 void Aviso();
 void Intro();
 void LoadFont();
+void UpdateFont();
+int LoadRAW(char *path, GSTEXTURE *Texture);
 int LoadBackground();
 void LoadIcons();
 void UpdateIcons();

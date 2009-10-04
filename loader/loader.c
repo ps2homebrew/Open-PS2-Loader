@@ -57,14 +57,6 @@ int main(int argc, char **argv){
 	/* installing kernel hooks */
 	Install_Kernel_Hooks();
 
-    SifExitRpc();
-
-    New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
-    
-	SifInitRpc(0);
-
-    cdInit(CDVD_INIT_INIT);
-	
 	GS_BGCOLOUR = 0xff0000; 
 	
 	printf("Loading Elf...\n");

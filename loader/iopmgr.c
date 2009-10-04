@@ -12,6 +12,12 @@ extern int size_usbd_irx;
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+extern void *cdvdman_irx;
+extern int size_cdvdman_irx;
+
+extern void *eesync_irx;
+extern int size_eesync_irx;
+
 extern void *isofs_irx;
 extern int size_isofs_irx;
 
@@ -51,7 +57,6 @@ void list_modules(void)
 /*----------------------------------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int flag){
 	void   *rom_iop;
-	u8 *p;
 	int     i, j, r, fd=0;
 	ioprp_t ioprp_img;
 	char    ioprp_path[0x50];
@@ -101,32 +106,30 @@ int New_Reset_Iop(const char *arg, int flag){
 		ioprp_img.size_in = (ioprp_img.size_in & 0xffffffc0) + 0x40;
 	lseek(fd, 0, SEEK_SET);
 
-	p = find_free_ram((void *)0x01700000, (void *)0x01f00000, ioprp_img.size_in + 65536);
-	if (!p)
-		ioprp_img.data_in  = (void *)0x01700000;
-	else 
-		ioprp_img.data_in  = (void *)p;
-
-	p = find_free_ram((void *)0x017C0000, (void *)0x01f00000, ioprp_img.size_in + 65536);
-	if (!p)
-		ioprp_img.data_out  = (void *)0x017C0000;
-	else 
-		ioprp_img.data_out  = (void *)p;
-	
+	ioprp_img.data_in  = (void *)g_buf;	
+	if (eeloadcnf_reset)
+		ioprp_img.data_out = (void *)(g_buf+102400);
+	else {	
+		ioprp_img.data_out = ioprp_img.data_in;
+		ioprp_img.size_out = ioprp_img.size_in;
+	}
+		
 	read(fd, ioprp_img.data_in , ioprp_img.size_in);
 	close(fd);
 
 	fioExit();
-
+		
 	if (eeloadcnf_reset) {
 		r = Patch_EELOADCNF_Img(&ioprp_img);
+		if (r == 0){
+			GS_BGCOLOUR = 0x00FF00;
+			while (1){;}
+		}
 	}
-	else
-		r = Patch_Img(&ioprp_img);
-
-	if (r == 0){
-		GS_BGCOLOUR = 0x00FF00;
-		while (1){;}
+	else { 
+		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);		
+		Patch_Mod(&ioprp_img, "CDVDFSV", usbd_irx, size_usbd_irx);		
+		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
 
 	SifExitRpc();
@@ -208,31 +211,6 @@ int New_Reset_Iop(const char *arg, int flag){
 
  return 1;
 }
-
-//--------------------------------------------------------------
-void *find_free_ram(void *addr_start, void *addr_end, u32 len)
-{
-	u32 i, j;
-
-	addr_start = (void *)(((u32)addr_start) & 0xffffffc0); // 64bytes align check
-	
-	u32 memsize = (u32)addr_end - (u32)addr_start;
-	u8 *buf = (u8 *)addr_start;
-	
-	for (i = 0; i < memsize - len; ) {
-		for (j = 0; j < len; j++) {
-			if (buf[i + j] != 0)
-				break;
-		}
-		if (j == len)
-			return &buf[i];
-		else
-			i += (j + 0x40) & 0xffffffc0; // 64bytes align check
-	}
-	
-	return NULL;
-}
-
 
 /*----------------------------------------------------------------------------------------*/
 /* Reset IOP processor. This fonction replace SifIopReset from Ps2Sdk                     */

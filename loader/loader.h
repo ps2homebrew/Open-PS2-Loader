@@ -77,14 +77,12 @@ int  LoadElf(const char *path, t_ExecData *data) __attribute__((section(".unsafe
 
 /* iopmgr.c */
 int  New_Reset_Iop(const char *arg, int flag);
-void *find_free_ram(void *addr_start, void *addr_end, u32 len);
 int  Reset_Iop(const char *arg, int flag);
 int  Sync_Iop(void);
 
 /* misc.c */
-void CopyToEE(void *iopptr, unsigned int size, void *eedata);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
-int Patch_Img(ioprp_t *ioprp_img);
+int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
 int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
 void delay(int count);
 void Sbv_Patch(void);

@@ -1,27 +1,10 @@
 #include "loader.h"
 
-extern void *eesync_irx;
-extern int size_eesync_irx;
-
 extern void *cdvdman_irx;
 extern int size_cdvdman_irx;
 
 extern void *usbd_irx;
 extern int size_usbd_irx;
-
-/*----------------------------------------------------------------------------------------*/
-/* Copy 'size' bytes from 'iopptr' in IOP to 'eedata' in EE.                              */
-/*----------------------------------------------------------------------------------------*/
-void CopyToEE(void *iopptr, unsigned int size, void *eedata){
-	DI();
-	ee_kmode_enter();
-
-	memcpy(eedata, iopptr + 0xbc000000, size);
-
-	ee_kmode_exit();
-	EI();
-}
-
 
 /*----------------------------------------------------------------------------------------*/
 /* Copy 'size' bytes of 'eedata' from EE to 'iopptr' in IOP.                              */
@@ -44,72 +27,80 @@ void CopyToEE(void *iopptr, unsigned int size, void *eedata){
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Replace modules in a IOPRP image.                                                      */
+/* Replace a module in a IOPRP image.                                                      */
 /*----------------------------------------------------------------------------------------*/
-int Patch_Img(ioprp_t *ioprp_img)
-	{
-	int       offset_in, offset_out;
-	romdir_t *romdir_in, *romdir_out;
+int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
+{
+	int       i, offset_in, bytes_to_move, next_mod_offset, diff;
+	romdir_t *romdir_in;
+	u8 *p = (u8 *)ioprp_img->data_in;
 
-	memset(ioprp_img->data_out, 0, ioprp_img->size_in);
-	
+	// arrange modsize to next 16 bytes align
+	if (modsize % 0x10)
+		modsize = (modsize + 0x10) & 0xfffffff0;
+		
 	offset_in  = 0;
-	offset_out = 0;
-
 	romdir_in  = (romdir_t*)ioprp_img->data_in;
-	romdir_out = (romdir_t*)ioprp_img->data_out;
 
+	// scan for module offset & size
 	while(strlen(romdir_in->fileName) > 0)
 	{ 
-		if (!strcmp(romdir_in->fileName, "EESYNC"))
-		{
-			DIntr(); // get back eesync drv from kernel ram		
-			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), eesync_irx, size_eesync_irx);
-			romdir_out->fileSize = size_eesync_irx;
-			ee_kmode_exit();
-			EIntr();
-		}
-		else if (!strcmp(romdir_in->fileName, "CDVDMAN"))
-		{
-			DIntr(); // get back eesync drv from kernel ram		
-			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), cdvdman_irx, size_cdvdman_irx);
-			romdir_out->fileSize = size_cdvdman_irx;
-			ee_kmode_exit();
-			EIntr();
-		}
-		else if (!strcmp(romdir_in->fileName, "CDVDFSV"))
-		{
-			DIntr(); // get back eesync drv from kernel ram		
-			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), usbd_irx, size_usbd_irx);
-			romdir_out->fileSize = size_usbd_irx;
-			ee_kmode_exit();
-			EIntr();
-		}
-		else
-		{
-			if (romdir_in->fileSize)
-				memcpy((void*)((u32)ioprp_img->data_out+offset_out), (void*)((u32)ioprp_img->data_in+offset_in), romdir_in->fileSize);
-		}
+		if (!strcmp(romdir_in->fileName, name))
+			break;
 
 		if ((romdir_in->fileSize % 0x10)==0)
 			offset_in += romdir_in->fileSize;
 		else
 			offset_in += (romdir_in->fileSize + 0x10) & 0xfffffff0;
 
-		if ((romdir_out->fileSize % 0x10)==0)
-			offset_out += romdir_out->fileSize;
-		else
-			offset_out += (romdir_out->fileSize + 0x10) & 0xfffffff0;
-
 		romdir_in++;
-		romdir_out++;
 	}
+	
+	// if module found
+	if (offset_in) {
+		if ((romdir_in->fileSize % 0x10)==0)
+			next_mod_offset = offset_in + romdir_in->fileSize;
+		else
+			next_mod_offset = offset_in + ((romdir_in->fileSize + 0x10) & 0xfffffff0);
 
-	ioprp_img->size_out = offset_out;
-
+		bytes_to_move = ioprp_img->size_in - next_mod_offset;
+				
+		// and greater than one in IOPRP img
+		if (modsize >= romdir_in->fileSize) {
+			diff = modsize - romdir_in->fileSize;
+			if (diff > 0) {
+				if (bytes_to_move > 0) {
+					for (i = ioprp_img->size_in; i >= next_mod_offset; i--)
+						p[i + diff] = p[i];		
+												
+					ioprp_img->size_in += diff;
+				}
+			}
+		}
+		// or smaller than one in IOPRP
+		else {
+			diff = romdir_in->fileSize - modsize;
+			if (diff > 0) {
+				if (bytes_to_move > 0) {
+					for (i = 0; i < bytes_to_move; i++)
+						p[offset_in + modsize + i] = p[next_mod_offset + i];
+								
+					ioprp_img->size_in -= diff;
+				}
+			}	
+		}
+		
+		// finally replace module
+		DIntr();
+		ee_kmode_enter();
+		memcpy((void *)(ioprp_img->data_in+offset_in), modptr, modsize);
+		ee_kmode_exit();
+		EIntr();		
+		
+		// correct filesize in romdir
+		romdir_in->fileSize = modsize;
+	}
+	
 	return 1;
 }
 

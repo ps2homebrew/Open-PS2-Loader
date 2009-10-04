@@ -1536,12 +1536,7 @@ int _start(int argc, char** argv)
 		printf("ERROR: incorrect number of parts\n");
 		return MODULE_NO_RESIDENT_END;
 	}
-	
-	if (g_ISO_media==0x69){
-		printf("ERROR: incorrect media type\n");
-		return MODULE_NO_RESIDENT_END;
-	}
-	
+		
 	sprintf(path,"mass:%s.%02x",g_ISO_name,0);
 	g_iso_fd0 = open(path, O_RDONLY);
 	printf("%s ret %d\n",path, g_iso_fd0);

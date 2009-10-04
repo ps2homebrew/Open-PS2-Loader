@@ -60,7 +60,7 @@ typedef struct {
 u8 g_buf[65536] __attribute__((aligned(64)));
 
 extern int set_reg_hook;
-extern int startup_device;
+extern int set_reg_disabled;
 
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));

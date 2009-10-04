@@ -1,7 +1,7 @@
 ENTRY(_start);
 
 SECTIONS {
-  .text 0x00090000: { *(.text) }
+  .text 0x000e8000: { *(.text) }
 	.reginfo ALIGN(128): { *(.reginfo) }
 
 	/* Static data.  */

@@ -57,7 +57,7 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
-u8 g_buf[65536] __attribute__((aligned(64)));
+u8 *g_buf;
 
 extern int set_reg_hook;
 extern int set_reg_disabled;

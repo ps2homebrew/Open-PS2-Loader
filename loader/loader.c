@@ -37,6 +37,8 @@ int main(int argc, char **argv){
 	
 	SifInitRpc(0);
 
+	g_buf = (u8 *)0x00088000;
+	
 	set_ipconfig();
 	
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);

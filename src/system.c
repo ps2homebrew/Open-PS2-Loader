@@ -152,7 +152,10 @@ void LaunchGame(TGame *game)
 	
 	memcpy((void*)((u32)&isofs_irx+i),isoname,strlen(isoname)+1);
 	memcpy((void*)((u32)&isofs_irx+i+33),&game->parts,1);
+	memcpy((void*)((u32)&isofs_irx+i+34),&game->media,1);
 	
+	FlushCache(0);
+		
 	SendIrxKernelRAM();
 
 /* NB: LOADER.ELF is embedded  */

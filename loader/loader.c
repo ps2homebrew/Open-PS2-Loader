@@ -41,6 +41,8 @@ int main(int argc, char **argv){
 	
 	set_ipconfig();
 	
+	argv[1][12]=0x00; // fix for 8+3 filename.
+
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);
 
 	GetIrxKernelRAM();
@@ -60,8 +62,6 @@ int main(int argc, char **argv){
 	Install_Kernel_Hooks();
 
 	GS_BGCOLOUR = 0xff0000; 
-	
-	printf("Loading Elf...\n");
 
 	LoadExecPS2(ElfPath, 0, NULL);	
 

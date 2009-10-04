@@ -19,6 +19,17 @@ int size_usbhdfsd_irx;
 void *isofs_irx;
 int size_isofs_irx;
 
+void *ps2dev9_irx;
+int size_ps2dev9_irx;
+
+void *ps2ip_irx;
+int size_ps2ip_irx;
+
+void *ps2smap_irx;
+int size_ps2smap_irx;
+
+void *netlog_irx;
+int size_netlog_irx;
 
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
@@ -82,7 +93,7 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 	return 0;
 }
 
-#define IRX_NUM 6
+#define IRX_NUM 10
 
 //-------------------------------------------------------------- 
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
@@ -106,10 +117,10 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	size_usbd_irx = irxptr_tab[n++].irxsize;
 	size_usbhdfsd_irx = irxptr_tab[n++].irxsize;
 	size_isofs_irx = irxptr_tab[n++].irxsize;
-	/*size_ps2dev9_irx = irxptr_tab[n++].irxsize; 
+	size_ps2dev9_irx = irxptr_tab[n++].irxsize; 
 	size_ps2ip_irx = irxptr_tab[n++].irxsize;
 	size_ps2smap_irx = irxptr_tab[n++].irxsize;
-	size_netlog_irx = irxptr_tab[n++].irxsize;*/
+	size_netlog_irx = irxptr_tab[n++].irxsize;
 			
 	n = 0;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
@@ -118,10 +129,10 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
 	usbhdfsd_irx = (void *)irxptr_tab[n++].irxaddr;
 	isofs_irx = (void *)irxptr_tab[n++].irxaddr;
-	/*ps2dev9_irx = (void *)irxptr_tab[n++].irxaddr;
+	ps2dev9_irx = (void *)irxptr_tab[n++].irxaddr;
 	ps2ip_irx = (void *)irxptr_tab[n++].irxaddr;
 	ps2smap_irx = (void *)irxptr_tab[n++].irxaddr;
-	netlog_irx = (void *)irxptr_tab[n++].irxaddr;	*/
+	netlog_irx = (void *)irxptr_tab[n++].irxaddr;
 }	
 
 // ------------------------------------------------------------------------

@@ -12,6 +12,24 @@ extern int size_isofs_irx;
 
 char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
 
+void set_ipconfig(void)
+{
+	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
+	g_ipconfig_len = 0;
+	
+	// add ip to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.10", 15);
+	g_ipconfig_len += strlen("192.168.0.10") + 1;
+
+	// add netmask to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], "255.255.255.0", 15);
+	g_ipconfig_len += strlen("255.255.255.0") + 1;
+
+	// add gateway to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.1", 15);
+	g_ipconfig_len += strlen("192.168.0.1") + 1;
+}
+
 int main(int argc, char **argv){
 	int i;
 	
@@ -19,6 +37,8 @@ int main(int argc, char **argv){
 	
 	SifInitRpc(0);
 
+	set_ipconfig();
+	
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);
 
 	GetIrxKernelRAM();

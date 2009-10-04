@@ -1,6 +1,8 @@
 #include "loader.h"
 #include "iopmgr.h"
 
+//#define NETLOG_DEBUG
+
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
 
@@ -12,6 +14,18 @@ extern int size_usbhdfsd_irx;
 
 extern void *isofs_irx;
 extern int size_isofs_irx;
+
+extern void *ps2dev9_irx;
+extern int size_ps2dev9_irx;
+
+extern void *ps2ip_irx;
+extern int size_ps2ip_irx;
+
+extern void *ps2smap_irx;
+extern int size_ps2smap_irx;
+
+extern void *netlog_irx;
+extern int size_netlog_irx;
 
 static int first_IOP_reset = 1;
 
@@ -175,7 +189,14 @@ int New_Reset_Iop(const char *arg, int flag){
 	
 	LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 	delay(3);
-	
+
+#ifdef NETLOG_DEBUG	
+	LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
+	LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
+	LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+#endif	
+		
 	LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
 	FlushCache(0);	
 	

@@ -18,6 +18,18 @@ extern int size_usbhdfsd_irx;
 extern void *isofs_irx;
 extern int size_isofs_irx;
 
+extern void *ps2dev9_irx;
+extern int size_ps2dev9_irx;
+
+extern void *ps2ip_irx;
+extern int size_ps2ip_irx;
+
+extern void *ps2smap_irx;
+extern int size_ps2smap_irx;
+
+extern void *netlog_irx;
+extern int size_netlog_irx;
+
 extern void *loader_elf;
 extern int size_loader_elf;
 
@@ -179,7 +191,7 @@ void LaunchGame(TGame *game)
 	ExecPS2((void *)eh->entry, 0, 2, argv);
 } 
 
-#define IRX_NUM 6
+#define IRX_NUM 10
 
 //-------------------------------------------------------------- 
 void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
@@ -199,10 +211,10 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxptr_tab[n++].irxsize = size_usbd_irx;
 	irxptr_tab[n++].irxsize = size_usbhdfsd_irx;
 	irxptr_tab[n++].irxsize = size_isofs_irx;
-	/*irxptr_tab[n++].irxsize = size_ps2dev9_irx;	
+	irxptr_tab[n++].irxsize = size_ps2dev9_irx;	
 	irxptr_tab[n++].irxsize = size_ps2ip_irx;	
 	irxptr_tab[n++].irxsize = size_ps2smap_irx;	
-	irxptr_tab[n++].irxsize = size_netlog_irx;	*/
+	irxptr_tab[n++].irxsize = size_netlog_irx;
 	 	
 	n = 0;
 	irxsrc[n++] = (void *)&imgdrv_irx;
@@ -211,10 +223,10 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxsrc[n++] = (void *)&usbd_irx;
 	irxsrc[n++] = (void *)&usbhdfsd_irx;
 	irxsrc[n++] = (void *)&isofs_irx;
-	/*irxsrc[n++] = (void *)&ps2dev9_irx;
+	irxsrc[n++] = (void *)&ps2dev9_irx;
 	irxsrc[n++] = (void *)&ps2ip_irx;
 	irxsrc[n++] = (void *)&ps2smap_irx;
-	irxsrc[n++] = (void *)&netlog_irx;*/
+	irxsrc[n++] = (void *)&netlog_irx;
 	
 	irxsize = 0;		
 

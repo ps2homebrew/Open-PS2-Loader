@@ -1,45 +1,13 @@
 #include "loader.h"
 #include "iopmgr.h"
 
-#define ELF_MAGIC	0x464c457f
-#define ELF_PT_LOAD	1
-
-typedef struct {
-	u8	ident[16];
-	u16	type;
-	u16	machine;
-	u32	version;
-	u32	entry;
-	u32	phoff;
-	u32	shoff;
-	u32	flags;
-	u16	ehsize;
-	u16	phentsize;
-	u16	phnum;
-	u16	shentsize;
-	u16	shnum;
-	u16	shstrndx;
-} elf_header_t;
-
-typedef struct {
-	u32	type;
-	u32	offset;
-	void	*vaddr;
-	u32	paddr;
-	u32	filesz;
-	u32	memsz;
-	u32	flags;
-	u32	align;
-} elf_pheader_t;
-
 static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
 static char g_argbuf[256];
 static char g_ElfPath[1024];
 
-u32 stack_my;
-u32 stack_orig;
 int set_reg_hook;
+int set_reg_disabled;
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -107,10 +75,8 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 {
 	char *p = g_argbuf;
-	int i, r, fd;
+	int i, r;
 	t_ExecData elf;
-	elf_header_t elf_header;
-	elf_pheader_t elf_pheader;
 
 	DI();
 	ee_kmode_enter();
@@ -150,6 +116,16 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 	// clear scratchpad memory
 	memset((void*)0x70000000, 0, 16 * 1024);
 	
+    SifExitRpc();
+
+    set_reg_disabled = 0;
+    New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
+    set_reg_disabled = 1;
+        
+	SifInitRpc(0);
+
+    cdInit(CDVD_INIT_INIT);
+	
 	// replacing cdrom in elf path by iso
 	if (strstr(g_argv[0], "cdrom")) {
 		u8 *ptr = (u8 *)g_argv[0];
@@ -175,64 +151,8 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 		FlushCache(2);
 		
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
-		
-		SifInitRpc(0);
 	}
 
-	GS_BGCOLOUR = 0x00ffff; 
-		
-	// load the ELF manually
-	fioInit();
- 	fd = open(g_ElfPath, O_RDONLY);
- 	if (fd < 0) {
-		goto error; // can't open file, exiting...
- 	}
-
-	GS_BGCOLOUR = 0x00ff00; 
-	
-	// read ELF header
-	if (read(fd, &elf_header, sizeof(elf_header)) != sizeof(elf_header)) {
-		close(fd);
-		goto error; // can't read header, exiting...
-	}
-
-	// check ELF magic
-	if ((*(u32*)elf_header.ident) != ELF_MAGIC) {
-		close(fd);
-		goto error; // not an ELF file, exiting...
-	}
-
-	// copy loadable program segments to RAM
-	for (i = 0; i < elf_header.phnum; i++) {
-		lseek(fd, elf_header.phoff+(i*sizeof(elf_pheader)), SEEK_SET);
-		read(fd, &elf_pheader, sizeof(elf_pheader));
-
-		if (elf_pheader.type != ELF_PT_LOAD)
-			continue;
-
-		lseek(fd, elf_pheader.offset, SEEK_SET);
-		read(fd, elf_pheader.vaddr, elf_pheader.filesz);
-
-		if (elf_pheader.memsz > elf_pheader.filesz)
-			memset(elf_pheader.vaddr + elf_pheader.filesz, 0,
-					elf_pheader.memsz - elf_pheader.filesz);
-	}
-
-	close(fd);
-
-	// exit services
-	fioExit();
-	LoadFileExit();
-	SifExitIopHeap();
-	SifExitRpc();
-
-	FlushCache(0);
-	FlushCache(2);
-
-	// finally, run game ELF ...
-	ExecPS2((void*)elf_header.entry, NULL, g_argc, g_argv);
-
-error:
 	GS_BGCOLOUR = 0xffffff; // white screen: error
 	SleepThread();	
 }

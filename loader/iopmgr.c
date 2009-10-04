@@ -27,8 +27,6 @@ extern int size_ps2smap_irx;
 extern void *netlog_irx;
 extern int size_netlog_irx;
 
-static int first_IOP_reset = 1;
-
 /*----------------------------------------------------------------------------------------*/
 
 void list_modules(void)
@@ -205,11 +203,8 @@ int New_Reset_Iop(const char *arg, int flag){
 	LoadFileExit();
 
 	// we have 4 SifSetReg calls to skip in ELF's SifResetIop, not when we use it ourselves
-	if (!first_IOP_reset) {
+	if (set_reg_disabled)
 		set_reg_hook = 4;
-	}
-	else
-		first_IOP_reset = 0;
 
  return 1;
 }

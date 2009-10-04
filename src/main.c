@@ -157,6 +157,10 @@ int main(void)
 	id=SifExecModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL, &ret);
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
 
+	delay(3);
+	
+	InitMenu();
+	
 	/// Init custom menu items
 	InitMenuItems();
 	

@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #define yfix(x) (x*gsGlobal->Height)/480
+#define yfix2(x) x+(gsGlobal->Height==512 ? x*0.157f : 0)
 					
 extern void *font_raw;
 extern int size_font_raw;
@@ -52,7 +53,7 @@ u64 Background_b = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_c = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_d = GS_SETREG_RGBAQ(0x00,0x00,0x80,0x00,0x00);
 
-char infotxt[256]="WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>";
+char infotxt[256]="               WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>";
 int z;
 
 /// scroll speed selector
@@ -116,6 +117,8 @@ struct TMenuItem exit_item = {
 };
 
 void InitMenu() {
+	LoadResources();
+
 	// initialize the menu
 	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1);
 	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2);
@@ -178,8 +181,6 @@ void InitGFX() {
 
 	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 
-	LoadResources();
-	InitMenu();
 }
 
 void DestroyGFX() {
@@ -296,11 +297,12 @@ void Flip(){
 
 void Intro(){
 	char introtxt[255];
+	int bg_loaded=0;
 	
 	for(frame=0;frame<125;frame++){
 		if(frame<=25){
 			TextColor(0x80,0x80,0x80,frame*4);
-		} else if(frame>75 && frame<100){
+		}else if(frame>75 && frame<100){
 			TextColor(0x80,0x80,0x80,0x80-(frame-75)*4);
 		}else if(frame>100){
 			TextColor(0x80,0x80,0x80,0x00);
@@ -311,7 +313,10 @@ void Intro(){
 		sprintf(introtxt,"Open USB Loader %s", USBLD_VERSION);
 		DrawText(270, 255, introtxt, 1.0f, 0);
 		Flip();
+		if (frame==75)bg_loaded=LoadBackground();
 	}
+	background_image=bg_loaded;
+	LoadFont(0);
 }
 
 void DrawWave(int y, int xoffset){
@@ -327,10 +332,11 @@ void DrawWave(int y, int xoffset){
 }
 
 void LoadResources() {
-	background_image=LoadBackground();
+	ReadConfig("mass:USBLD/usbld.cfg");
 	LoadIcons();
 	UpdateIcons();
-	LoadFont();
+	LoadFont(1);
+	UpdateFont();
 }
 
 void DrawBackground(){
@@ -369,6 +375,8 @@ void DrawBackground(){
 			waveframe+=0.01f;
 		}
 	}
+	UpdateIcons();
+	UpdateFont();
 }
 
 void SetColor(int r, int g, int b){
@@ -391,6 +399,7 @@ void DrawText(int x, int y, char *texto, float scale, int centered){
 	if(centered==1){
 		x=x-((strlen(texto)-1)*gsFont->CharWidth/2);
 	}
+
 	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
 	gsKit_font_print_scaled(gsGlobal, gsFont, x, yfix(y), 1, scale, color_text, texto);
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
@@ -622,6 +631,7 @@ void DrawConfig(){
 					SaveConfig("mass:USBLD/usbld.cfg");
 					background_image=LoadBackground();
 					LoadIcons();
+					LoadFont();
 				}
 			}
 			if(GetKey(KEY_CIRCLE)){
@@ -659,16 +669,19 @@ void MsgBox(){
 	}
 }
 
-void LoadFont(){
-	// No loading if already loaded
-	if (font.Vram)
-	    return;
+void LoadFont(int load_default){
+		
+	char tmp[255];
 	
 	font.Width = 256;
 	font.Height = 256;
 	font.PSM = GS_PSM_CT32;
-	font.Mem=(u32*)&font_raw;
-	
+	sprintf(tmp,"mass:USBLD/%s/%s",theme,"font.raw");
+
+	if(load_default==1 || LoadRAW(tmp, &font)==0){
+		font.Mem=(u32*)&font_raw;
+	}
+
 	gsFont = calloc(1,sizeof(GSFONT));
 	gsFont->Texture = &font;
 	gsFont->Additional=calloc(1,sizeof(short)*256);
@@ -684,9 +697,11 @@ void LoadFont(){
 		gsFont->Additional[i] = gsFont->CharWidth;
 	}
 
+}
+
+void UpdateFont(){
 	font.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(font.Width, font.Height, font.PSM), GSKIT_ALLOC_USERBUFFER);
 	gsKit_texture_upload(gsGlobal, &font);
-
 }
 
 int LoadRAW(char *path, GSTEXTURE *Texture){
@@ -718,8 +733,6 @@ int LoadBackground(){
 	text_color[0]=0xff;
 	text_color[1]=0xff;
 	text_color[2]=0xff;
-
-	ReadConfig("mass:USBLD/usbld.cfg");
 	
 	sprintf(tmp,"mass:USBLD/%s/%s",theme,"Background.raw");
 	
@@ -908,10 +921,10 @@ void DrawIcons() {
 	}
 	
 	while (cur_item) {
-		DrawIcon(cur_item->item->icon, h_anim + xpos, 120, cur_item == selected_item ? 20:1);
+		DrawIcon(cur_item->item->icon, h_anim + xpos, yfix2(120), cur_item == selected_item ? 20:1);
 		
-		if(cur_item == selected_item)
-			DrawText(h_anim + xpos + 23, 190, cur_item->item->text, 1.0f, 1);
+		if(cur_item == selected_item && h_anim==100)
+			DrawText(h_anim + xpos + 23, yfix2(190), cur_item->item->text, 1.0f, 1);
 		
 		cur_item = cur_item->next;
 		xpos += 100;
@@ -924,7 +937,7 @@ void DrawInfo() {
 	TextColor(text_color[0],text_color[1],text_color[2],0xff);
 	
 	strncpy(txt,&infotxt[frame/10],15);
-	DrawText(300,50,txt,1,0);
+	DrawText(300,yfix2(53),txt,1,0);
 	
 	if (frame>2000) {
 	 frame=0;
@@ -957,7 +970,7 @@ void DrawSubMenu() {
 	int others = 0;
 	
 	while (prev && (others < _vbefore)) {
-		DrawIcon(prev->item.icon, (100)+50, (v_anim - 40) - others * _vspacing,1);
+		DrawIcon(prev->item.icon, (100)+50, yfix2(((v_anim - 40) - others * _vspacing)),1);
 		// Display the prev. item's text:
 		/* if ((v_anim>=80) || (others > 1))
 			DrawText((100)+150, (v_anim - 40) - others * _vspacing, prev->item.text,1.0f,0);
@@ -966,17 +979,17 @@ void DrawSubMenu() {
 		prev = prev->prev; others++;
 	}
 	
-	DrawIcon(cur->item.icon, (100)+50,v_anim+130,10);
-	// if(v_anim==100)
-	DrawText((100)+150,v_anim+153,cur->item.text,1.0f,0);
+	DrawIcon(cur->item.icon, (100)+50,yfix2((v_anim+130)),10);
+	 if(v_anim==100)
+	DrawText((100)+150,yfix2((v_anim+153)),cur->item.text,1.0f,0);
 
 	cur = cur->next;
 	
 	others = 0;
 	
 	while (cur && (others <= _vafter)) {
-		DrawIcon(cur->item.icon, (100)+50,v_anim + 210 + others * _vspacing,1);
-		DrawText((100)+150, v_anim + 235 + others * _vspacing,cur->item.text,1.0f,0);
+		DrawIcon(cur->item.icon, (100)+50, yfix2((v_anim + 210 + others * _vspacing)),1);
+		//DrawText((100)+150, v_anim + 235 + others * _vspacing,cur->item.text,1.0f,0);
 		cur = cur->next;
 		others++;
 	}

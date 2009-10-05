@@ -15,6 +15,10 @@ IRX_ID(MODNAME, 1, 0);
 static char g_ISO_name[]="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 static char g_ISO_parts=0x69;
 static char g_ISO_media=0x69;
+static char skipmod_tab[256] = "\0";
+
+extern void *dummy_irx;
+extern int size_dummy_irx;
 
 struct irx_export_table _exp_isofs;
 
@@ -1184,6 +1188,31 @@ int isofs_GetDir(const char *pathname, struct TocEntry *tocEntry, int index)
 }
 
 //-------------------------------------------------------------- 
+int skipmod_check(const char *filename)
+{
+	char name[1024];
+	char modlist[256];	
+	int i;
+	char *p;
+
+	for (i=0; i<strlen(filename); i++)
+		name[i] = toupper(filename[i]);
+			
+	strcpy(modlist, skipmod_tab);	
+		
+	p = strtok(modlist, "\n");
+
+	while (p) {
+		if (strstr(name, p))
+			return 1;		
+			
+		p = strtok(NULL, "\n");			
+	}
+	
+	return 0;
+}
+
+//-------------------------------------------------------------- 
 int isofs_Open(const char *filename, int mode)
 {
 	register int fd;
@@ -1200,10 +1229,6 @@ int isofs_Open(const char *filename, int mode)
 		if (fh->status == 0)
 			break;
 	}
-		
-	// check if the file exists
-	if (isofs_FindFile(filename, &tocEntry) != 1)
-		return -1;
 
 	// check mode
 	if (mode != O_RDONLY)
@@ -1214,11 +1239,20 @@ int isofs_Open(const char *filename, int mode)
 		return -7;
 			
 	memset((void *)fh, 0, sizeof (FHANDLE));	
+		
+	// check if the file exists
+	if (isofs_FindFile(filename, &tocEntry) != 1)
+		return -1;
 				
 	fh->lsn = tocEntry.fileLBA;
 	fh->filesize = tocEntry.fileSize;	
 	fh->status = 1;
-	
+
+	if (skipmod_check(filename)) {
+		fh->filesize = size_dummy_irx;
+		fh->status = 0xff;
+	}
+		
 	#ifdef NETLOG_DEBUG
 		netlog_send("isofs_Open: fd = %d LBA = %d filesize = %d\n", fd, fh->lsn, fh->filesize);
 	#endif
@@ -1287,13 +1321,19 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 		
 	if (fh->position >= fh->filesize)
 		return 0;
-		
+
 	if (nbytes >= (fh->filesize - fh->position))
 		nbytes = fh->filesize - fh->position;
-				
-	offset = (fh->lsn << 11)+ fh->position;
 		
-	r = isofs_ReadISO(offset, nbytes, buf);		
+	if (fh->status == 0xff) {
+		u8 *p = (u8 *)dummy_irx;
+		memcpy(buf, &p[fh->position], nbytes);
+		r = nbytes;		
+	}	
+	else {			
+		offset = (fh->lsn << 11)+ fh->position;	
+		r = isofs_ReadISO(offset, nbytes, buf);		
+	}
 	fh->position += r;
 					
     return r;

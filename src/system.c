@@ -153,6 +153,7 @@ void LaunchGame(TGame *game)
 	memcpy((void*)((u32)&isofs_irx+i),isoname,strlen(isoname)+1);
 	memcpy((void*)((u32)&isofs_irx+i+33),&game->parts,1);
 	memcpy((void*)((u32)&isofs_irx+i+34),&game->media,1);
+	memcpy((void*)((u32)&isofs_irx+i+36),"USBD.IRX\0", 9);
 	
 	FlushCache(0);
 		

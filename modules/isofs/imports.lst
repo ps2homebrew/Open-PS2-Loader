@@ -36,9 +36,11 @@ I_strlen
 I_strcmp
 I_strncmp
 I_strrchr
+I_strstr
 I_strncpy
 I_strcat
 I_strtok
 I_sprintf
 I_tolower
+I_toupper
 sysclib_IMPORTS_end

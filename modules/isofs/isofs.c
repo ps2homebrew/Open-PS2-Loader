@@ -1203,7 +1203,7 @@ int skipmod_check(const char *filename)
 	p = strtok(modlist, "\n");
 
 	while (p) {
-		if (strstr(name, p))
+		if (strstr(p, name))
 			return 1;		
 			
 		p = strtok(NULL, "\n");			

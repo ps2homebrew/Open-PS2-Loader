@@ -91,7 +91,6 @@ void RefreshUSBGameList() {
 		actualgame=firstgame;
 	}
 
-	
 	fioClose(fd);
 }
 
@@ -156,14 +155,18 @@ void ExecSettings(struct TMenuItem* self, int id) {
 	if (id == 1) {
 		DrawConfig();
 	} else if(id == 2) {
-		MsgBox();
+		MsgBox("Not available yet");
 	} else if (id == 3) {
 		// scroll speed modifier
 		ChangeScrollSpeed();
 	} else if (id == 4) {
 		ChangeMenuType();
 	} else if (id == 6) {
-		SaveConfig("mass:USBLD/usbld.cfg");
+		if (SaveConfig("mass:USBLD/usbld.cfg")) {
+			MsgBox("Settings saved...");
+		} else {
+			MsgBox("Error writing settings!");
+		}
 	}
 }
 
@@ -204,6 +207,7 @@ void InitMenuItems() {
 	
 	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, scroll_speed_txt[scroll_speed], 3);
 	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, menu_type_txt[dynamic_menu ? 0 : 1], 4);
+	AppendSubMenu(&settings_submenu, &config_icon, "Save Settings", 6);
 	
 	settings_item.submenu = settings_submenu;
 	
@@ -238,6 +242,8 @@ int main(void)
 	
 	InitMenu();
 	
+	delay(1);
+	
 	/// Init custom menu items
 	InitMenuItems();
 	
@@ -247,6 +253,9 @@ int main(void)
 	StartPad();
 
 	Intro();
+	
+	// these seem to matter. Without them, something tends to crush into itself
+	delay(1);
 
 	max_games=0;
 	usbdelay=0;

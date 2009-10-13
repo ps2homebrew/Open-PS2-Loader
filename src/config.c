@@ -1,73 +1,82 @@
 #include "include/usbld.h"
-#include "string.h"
+#include <string.h>
 #include "fileio.h"
 #include <sys/stat.h>
 
 int filesize=0;
 
-char* substr(char* cadena, int comienzo, int longitud)
-{
-	if (longitud == 0) return 0;
+/// read a line from the specified file handle, up to maxlen characters long, into the buffer
+int readline(int fd, char* buffer, unsigned int maxlen) {
+	char ch = '\0';
+	buffer[0] = '\0';
+	int res = 1, n = 0;
 	
-	char *nuevo = (char*)malloc(sizeof(char) * longitud);
-	
-	strncpy(nuevo, cadena + comienzo, longitud);
-	
-	nuevo[longitud]=0;
+	while ((ch != 13)) {
+		res=fioRead(fd, &ch, 1);
 		
-	return nuevo;
-}
-
-char* readline(int fd){
-	char *buffer=malloc(sizeof(char)*filesize);
-	memset(buffer,0,sizeof(buffer));
-	char *ch="";
-	int res;
-	do{
-		ch[0]=0;
-		res=fioRead(fd, ch, 1);
-		if(ch[0]!=10 && ch[0]!=13){
-			strcat(buffer, ch);
+		if (res != 1) {
+			res = 0;
+			break;
 		}
-		if (res==0)return buffer;
-	}while(ch[0]!=13);
-	return buffer;
+		
+		if(ch != 10 && ch != 13) {
+			buffer[n++] = ch;
+			buffer[n] = '\0';
+		} else {
+			break;
+		}
+		
+		if (n == maxlen - 1)
+			break;
+	};
+
+	buffer[n] = '\0';
+	return res;
 }
 
-char *limpiarlinea(char *linea){
-	int x=0;
-	for(x=0;x<strlen(linea);x++){
-		if (linea[x]!=9 && linea[0]!=32)break;
-	}
-	//char *res=malloc(sizeof(linea));
-	//res= substr(linea, x, strlen(linea)-x+1);
-	//printf("%s\n",res);
+// as there seems to be no strpos in my libs (?)
+int strpos(const char* str, char c) {
+	int pos;
+	
+	for (pos = 0; *str; ++pos, ++str)
+		if (*str == c)
+			return pos;
 
-	return substr(linea, x, strlen(linea)-x+1);
+	return -1;
 }
 
-int read_bg_color(const char *string)
-{
+// a simple maximum of two inline
+inline int max(int a, int b) {
+	return a > b ? a : b;
+}
+
+// a simple minimum of two inline
+inline int min(int a, int b) {
+	return a < b ? a : b;
+}
+
+int strToColor(const char *string, int *color) {
 	int cnt=0, n=0;
-	bg_color[0]=0;
-	bg_color[1]=0;
-	bg_color[2]=0;
+	color[0]=0;
+	color[1]=0;
+	color[2]=0;
 
 	if (!string || !*string) return 0;
 	if (string[0]!='#') return 0;
 	
 	string++;
 
-	while (*string){
-		if ((*string >= '0') && (*string <= '9')){
-			bg_color[n] = bg_color[n] * 16 + (*string - '0');
-		}else if ( (*string >= 'A') && (*string <= 'F') ){
-			bg_color[n] = bg_color[n] * 16 + (*string - 'A'+10);
-		}else{
+	while (*string) {
+		if ((*string >= '0') && (*string <= '9')) {
+			color[n] = color[n] * 16 + (*string - '0');
+		} else if ( (*string >= 'A') && (*string <= 'F') ) {
+			color[n] = color[n] * 16 + (*string - 'A'+10);
+		} else {
 			break;
 		}
 
-		if(cnt==1){
+		// Two characters per color
+		if(cnt==1) {
 			cnt=0;
 			n++;
 		}else{
@@ -77,102 +86,201 @@ int read_bg_color(const char *string)
 		string++;
 	}
 	
-	SetColor(bg_color[0],bg_color[1],bg_color[2]);
-
-	return  0;
-
+	return 1;
 }
 
-int read_text_color(const char *string)
-{
-	int cnt=0, n=0;
-	text_color[0]=0;
-	text_color[1]=0;
-	text_color[2]=0;
-
-	if (!string || !*string) return 0;
-	if (string[0]!='#') return 0;
+int splitAssignment(const char* line, char* key, char* val) {
+	// find "=". 
+	// If found, the text before is key, after is val. 
+	// Otherwise malformed string is encountered
+	int eqpos = strpos(line, '=');
 	
-	string++;
+	if (eqpos < 0)
+		return 0;
+	
+	// copy the name and the value
+	strncpy(key, line, eqpos);
+	eqpos++;
+	strncpy(val, &line[eqpos], strlen(line) - eqpos);
+	
+	return 1;
+}
 
-	while (*string){
-		if ((*string >= '0') && (*string <= '9')){
-			text_color[n] = text_color[n] * 16 + (*string - '0');
-		}else if ( (*string >= 'A') && (*string <= 'F') ){
-			text_color[n] = text_color[n] * 16 + (*string - 'A'+10);
-		}else{
+void configValueToText(struct TConfigValue* val, char* buf, unsigned int size) {
+	snprintf(buf, size, "%s=%s", val->key, val->val);
+}
+
+struct TConfigValue* allocConfigItem(const char* key, const char* val) {
+	struct TConfigValue* it = (struct TConfigValue*)malloc(sizeof(struct TConfigValue));
+	strncpy(it->key, key, 15);
+	it->key[min(strlen(key), 14)] = '\0';
+	strncpy(it->val, val, 255);
+	it->val[min(strlen(val), 254)] = '\0';
+	it->next = NULL;
+	
+	return it;
+}
+
+/// Low level key addition. Does not check for uniqueness.
+void addConfigValue(struct TConfigSet* config, const char* key, const char* val) {
+	if (!config->tail) {
+		config->head = allocConfigItem(key, val);
+		config->tail = config->head;
+	} else {
+		config->tail->next = allocConfigItem(key, val);
+		config->tail = config->tail->next;
+	}
+}
+
+struct TConfigValue* getConfigItemForName(struct TConfigSet* config, const char* name) {
+	struct TConfigValue* val = config->head;
+	
+	while (val) {
+		if (strcmp(val->key, name) == 0)
 			break;
-		}
-
-		if(cnt==1){
-			cnt=0;
-			n++;
-		}else{
-			cnt++;
-		}
 		
-		string++;
+		val = val->next;
 	}
 	
-	TextColor(text_color[0],text_color[1],text_color[2],0xff);
-
-	return  0;
-
+	return val;
 }
 
-int ReadConfig(char *archivo){
+// --------------------------------------------------------------------------------------
+// ------------------------------ Config getters and setters ----------------------------
+// --------------------------------------------------------------------------------------
+void setConfigStr(struct TConfigSet* config, const char* key, const char* value) {
+	struct TConfigValue *it = getConfigItemForName(config, key);
+	
+	if (it) {
+		strncpy(it->val, value, 255);
+		it->val[min(strlen(value), 254)] = '\0';
+	} else {
+		addConfigValue(config, key, value);
+	}
+}
 
-	int fd=fioOpen(archivo, O_RDONLY);
+// sets the value to point to the value str in the config. Do not overwrite - it will overwrite the string in config
+int getConfigStr(struct TConfigSet* config, const char* key, char** value) {
+	struct TConfigValue *it = getConfigItemForName(config, key);
+	
+	if (it) {
+		*value = it->val;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+	
+void setConfigInt(struct TConfigSet* config, const char* key, const int value) {
+	char tmp[12];
+	
+	snprintf(tmp, 12, "%d", value);
+	setConfigStr(config, key, tmp);
+	
+}
+
+int getConfigInt(struct TConfigSet* config, char* key, int* value) {
+	char *valref = NULL;
+	
+	if (getConfigStr(config, key, &valref)) {
+		// convert to int
+		*value = atoi(valref);
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+void setConfigColor(struct TConfigSet* config, const char* key, int* color) {
+	char tmp[8];
+	
+	snprintf(tmp, 8, "#%02X%02X%02X", color[0], color[1], color[2]);
+	setConfigStr(config, key, tmp);
+}
+
+int getConfigColor(struct TConfigSet* config, const char* key, int* color) {
+	char *valref = NULL;
+	
+	if (getConfigStr(config, key, &valref)) {
+		// convert to color
+		strToColor(valref, color);
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
+int readConfig(struct TConfigSet* config, char *fname) {
+	int fd=fioOpen(fname, O_RDONLY);
+	
 	if (fd<=0) {
-		printf("No config. Exiting...\n");
+		//DEBUG: printf("No config. Exiting...\n");
 		return 0;
 	}
 	filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
 
-	char *linea=readline(fd);
-	if(!strncmp(linea,"<config>",8)){
-		do{
-			char *linea=readline(fd);
-			if(linea[0]==0)break;
-			linea=limpiarlinea(linea);
-			if(!strncmp(linea,"<bgcolor>",9)){
-				read_bg_color(substr(linea,9,strlen(linea)-19));
-			}else if(!strncmp(linea,"<txtcolor>",10)){
-				read_text_color(substr(linea,10,strlen(linea)-21));
-			}else if(!strncmp(linea,"<theme>",7)){
-				if(strcmp(theme,"<none>")){
-					sprintf(theme, "%s",substr(linea,7,strlen(linea)-15));
-				}
-			}
-		}while(strncmp(linea,"</config>",9));
-
+	char line[2048];
+	unsigned int lineno = 0;
+	
+	while (readline(fd, line, 2048)) {
+		lineno++;
+		
+		char key[255], val[255];
+		memset(key, 0, 255);
+		memset(val, 0, 255);
+		
+		if (splitAssignment(line, key, val)) {
+			// insert config value
+			setConfigStr(config, key, val);
+		} else {
+			// DEBUG: ignoring...
+			// printf("Malformed config file '%s' line %d: '%s'\n", fname, lineno, line);
+		}
 	}
+	
 	fioClose(fd);
 	return 1;
 }
 
-int SaveConfig(char *archivo){
-	char config[2048];
+int writeConfig(struct TConfigSet* config, char *fname) {
+	int fd=fioOpen(fname, O_WRONLY | O_CREAT | O_TRUNC);
 	
-	if(!strcmp(theme,"<none>")){
-		theme[0]=0;
-	}
+	if (fd<=0)
+		return 0;
 
-	int fd=fioOpen(archivo, O_WRONLY | O_CREAT);
-	if (fd>0) {
-		sprintf(config,"<config>\r\n"
-					   "\t<bgcolor>#%02X%02X%02X</bgcolor>\r\n"
-					   "\t<txtcolor>#%02X%02X%02X</txtcolor>\r\n"
-					   "\t<theme>%s</theme>\r\n"
-					   "</config>",bg_color[0],bg_color[1],bg_color[2],
-					   text_color[0],text_color[1],text_color[2],
-					   theme);
-		fioWrite(fd, config, strlen(config)+1);
-	}
-	fioClose(fd);
+	char line[2048];
+	struct TConfigValue* cur = config->head;
 	
+	while (cur) {
+		line[0] = '\0';
+		
+		configValueToText(cur, line, 2048);
+		
+		int len = strlen(line);
+
+		fioWrite(fd, line, len);
+		fioWrite(fd, "\r\n", 2);
+
+		// and advance
+		cur = cur->next;
+	}
+	
+	fioClose(fd);
 	return 1;
+}
+
+void clearConfig(struct TConfigSet* config) {
+	while (config->head) {
+		struct TConfigValue* cur = config->head;
+		config->head = cur->next;
+		
+		free(cur);
+	}
+	
+	config->head = NULL;
+	config->tail = NULL;
 }
 
 void ListDir(char* directory) {

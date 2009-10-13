@@ -9,7 +9,8 @@ EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/config.o obj/loader.o obj/imgdrv.o obj/eesync.o \
 		  obj/cdvdman.o obj/usbd.o obj/usbhdfsd.o obj/isofs.o obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o \
-		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o
+		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
+		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o
 EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
@@ -120,6 +121,18 @@ theme_icon.s:
 language_icon.s:
 	bin2s gfx/language.raw asm/language_icon.s language_raw
 
+apps_icon.s:
+	bin2s gfx/apps.raw asm/apps_icon.s apps_raw
+  
+menu_icon.s:
+	bin2s gfx/menu.raw asm/menu_icon.s menu_raw
+  
+scroll_icon.s:
+	bin2s gfx/scroll.raw asm/scroll_icon.s scroll_raw
+  
+usb_icon.s:
+	bin2s gfx/usb.raw asm/usb_icon.s usb_raw
+  
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 	

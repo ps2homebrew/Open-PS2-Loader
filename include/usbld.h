@@ -109,8 +109,11 @@ int max_games;
 
 int background_image;
 
-// Default or custom screen rendering function pointer
-void (*drawScreenPtr)();
+// Bool - either true or false (1/0)
+int dynamic_menu;
+
+// 0,1,2 scrolling speed
+unsigned int scroll_speed;
 
 char theme[32];
 int bg_color[3];
@@ -124,6 +127,10 @@ GSTEXTURE config_icon;
 GSTEXTURE exit_icon;
 GSTEXTURE theme_icon;
 GSTEXTURE language_icon;
+GSTEXTURE apps_icon;
+GSTEXTURE menu_icon;
+GSTEXTURE scroll_icon;
+GSTEXTURE usb_icon;
 
 void LoadGameList();
 
@@ -171,6 +178,7 @@ void AppendMenuItem(struct TMenuItem* item);
 
 struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id);
 void DestroySubMenu(struct TSubMenuList** submenu);
+void UpdateScrollSpeed();
 
 void Flip();
 void MsgBox();
@@ -180,6 +188,7 @@ void SetColor(int r, int g, int b);
 void TextColor(int r, int g, int b, int a);
 void DrawText(int x, int y, char *texto, float scale, int centered);
 void DrawConfig();
+void UploadTexture(GSTEXTURE* txt);
 void Aviso();
 void Intro();
 void LoadFont();
@@ -198,6 +207,8 @@ void MenuPrevH();
 void MenuNextV();
 void MenuPrevV();
 void MenuItemExecute();
+// Sets the selected item if it is found in the menu list
+void MenuSetSelectedItem(struct TMenuItem* item);
 void RefreshSubMenu();
 
 // Static render
@@ -205,6 +216,9 @@ void DrawScreenStatic();
 
 // swap static/normal render
 void SwapMenu();
+
+// Dynamic/Static render setter
+void SetMenuDynamic(int dynamic);
 
 // Renders everything
 void DrawScreen();

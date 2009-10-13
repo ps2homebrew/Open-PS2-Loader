@@ -25,11 +25,36 @@ extern int size_theme_raw;
 extern void *language_raw;
 extern int size_language_raw;
 
+extern void *apps_raw;
+extern int size_apps_raw;
+
+extern void *menu_raw;
+extern int size_menu_raw;
+
+extern void *scroll_raw;
+extern int size_scroll_raw;
+
+extern void *usb_raw;
+extern int size_usb_raw;
+
 GSGLOBAL *gsGlobal;
 GSTEXTURE font;
 GSFONT *gsFont;
 
 GSTEXTURE background;
+GSTEXTURE background2;
+
+// ID's of the texures
+#define DISC_ICON 0
+#define GAMES_ICON 1
+#define CONFIG_ICON 2
+#define EXIT_ICON 3
+#define THEME_ICON 4
+#define LANGUAGE_ICON 5
+#define APPS_ICON 6
+#define MENU_ICON 7
+#define SCROLL_ICON 8
+#define USB_ICON 9
 
 GSTEXTURE disc_icon;
 GSTEXTURE games_icon;
@@ -37,6 +62,10 @@ GSTEXTURE config_icon;
 GSTEXTURE exit_icon;
 GSTEXTURE theme_icon;
 GSTEXTURE language_icon;
+GSTEXTURE apps_icon;
+GSTEXTURE menu_icon;
+GSTEXTURE scroll_icon;
+GSTEXTURE usb_icon;
 
 u64 White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
 u64 Black = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x00,0x00);
@@ -56,103 +85,22 @@ u64 Background_d = GS_SETREG_RGBAQ(0x00,0x00,0x80,0x00,0x00);
 char infotxt[256]="               WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>";
 int z;
 
-/// scroll speed selector
-struct TSubMenuList* speed_item = NULL;
-unsigned int curscroll = 1;
-char scroll_speed[3][14] = {"Scroll Slow", "Scroll Medium", "Scroll Fast"};
-
-void ChangeScrollSpeed() {
-	curscroll = (curscroll + 1) % 3;
-	speed_item->item.text = scroll_speed[curscroll];
-	
-	// update the pad delays for KEY_UP and KEY_DOWN
-	// default delay is 7
-	SetButtonDelay(KEY_UP, 10 - curscroll * 3); // 0,1,2 -> 10, 7, 4
-	SetButtonDelay(KEY_DOWN, 10 - curscroll * 3);
-}
-
-
-char txt_settings[2][32]={"Configure theme", "Select language"};
-
-// forward decls.
-void MsgBox();
-void DrawConfig();
-void LoadResources();
-
 // Count of icons before and after the selected one
 unsigned int _vbefore = 1;
 unsigned int _vafter = 1;
 // spacing between icons, vertical.
 unsigned int _vspacing = 80;
 
-/// menu item selection callbacks
-void ExecExit(struct TMenuItem* self, int vorder) {
-	__asm__ __volatile__(
-		"	li $3, 0x04;"
-		"	syscall;"
-		"	nop;"
-	);
-}
+// forward decls.
+void MsgBox();
+void DrawConfig();
+void LoadResources();
+void DestroyMenu();
 
-void ExecSettings(struct TMenuItem* self, int id) {
-	if (id == 1) {
-		DrawConfig();
-	} else if(id == 2) {
-		MsgBox();
-	} else if (id == 3) {
-		// scroll speed modifier
-		ChangeScrollSpeed();
-	}
-}
-
-/* Menu item definitions. Reversed order. */
-struct TSubMenuList *settings_submenu = NULL;
-
-struct TMenuItem settings_item = {
-	&config_icon, "Settings", NULL, NULL, NULL, &ExecSettings, NULL, NULL
-};
-
-struct TMenuItem exit_item = {
-	&exit_icon, "Exit", NULL, NULL, NULL, &ExecExit, NULL, NULL
-};
-
-void InitMenu() {
-	LoadResources();
-
-	// initialize the menu
-	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1);
-	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2);
-	speed_item = AppendSubMenu(&settings_submenu, &config_icon, scroll_speed[curscroll], 3);
-	settings_item.submenu = settings_submenu;
-	
-	// add all menu items
-	menu = NULL;
-	AppendMenuItem(&exit_item);
-	AppendMenuItem(&settings_item);
-
-	// Epilogue
-	selected_item = menu;
-}
-
-void DestroyMenu() {
-	// destroy menu
-	struct TMenuList *cur = menu;
-	
-	while (cur) {
-		struct TMenuList *td = cur;
-		cur = cur->next;
-		
-		if (&td->item)
-			DestroySubMenu(&td->item->submenu);
-		
-		free(td);
-	}
-	
-	
-}
-
+// -------------------------------------------------------------------------------------------
+// ---------------------------------------- Initialization/Destruction of gfx ----------------
+// -------------------------------------------------------------------------------------------
 void InitGFX() {
-
 	waveframe=0;
 	frame=0;
 	h_anim=100;
@@ -161,6 +109,10 @@ void InitGFX() {
 	max_settings=2;
 	max_games=10;
 	font.Vram = 0;
+	background.Mem = 0;
+	background2.Mem = 0;
+	dynamic_menu = 1;
+	scroll_speed = 1;
 
 	gsGlobal = gsKit_init_global();
 
@@ -187,6 +139,31 @@ void DestroyGFX() {
 	/// TODO: un-initialize the GFX
 	
 	DestroyMenu();
+}
+
+// -------------------------------------------------------------------------------------------
+// ---------------------------------------- Menu manipulation --------------------------------
+// -------------------------------------------------------------------------------------------
+void InitMenu() {
+	LoadResources();
+
+	menu = NULL;
+	selected_item = NULL;
+}
+
+void DestroyMenu() {
+	// destroy menu
+	struct TMenuList *cur = menu;
+	
+	while (cur) {
+		struct TMenuList *td = cur;
+		cur = cur->next;
+		
+		if (&td->item)
+			DestroySubMenu(&td->item->submenu);
+		
+		free(td);
+	}
 }
 
 struct TMenuList* AllocMenuItem(struct TMenuItem* item) {
@@ -273,6 +250,16 @@ void DestroySubMenu(struct TSubMenuList** submenu) {
 	*submenu = NULL;
 }
 
+void UpdateScrollSpeed() {
+	// update the pad delays for KEY_UP and KEY_DOWN
+	// default delay is 7
+	SetButtonDelay(KEY_UP, 10 - scroll_speed * 3); // 0,1,2 -> 10, 7, 4
+	SetButtonDelay(KEY_DOWN, 10 - scroll_speed * 3);
+}
+
+// -------------------------------------------------------------------------------------------
+// ---------------------------------------- Rendering ----------------------------------------
+// -------------------------------------------------------------------------------------------
 void DrawQuad(GSGLOBAL *gsGlobal, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int z, u64 color){
 	gsKit_prim_quad(gsGlobal,x1,yfix(y1),x2,yfix(y2),x3,yfix(y3),x4,yfix(y4),z,color);
 }
@@ -310,7 +297,7 @@ void Intro(){
 		}
 
 		DrawBackground();
-		sprintf(introtxt,"Open USB Loader %s", USBLD_VERSION);
+		snprintf(introtxt, 255, "Open USB Loader %s", USBLD_VERSION);
 		DrawText(270, 255, introtxt, 1.0f, 0);
 		Flip();
 		if (frame==75)bg_loaded=LoadBackground();
@@ -337,19 +324,33 @@ void LoadResources() {
 	UpdateIcons();
 	LoadFont(1);
 	UpdateFont();
+	UpdateScrollSpeed();
 }
 
 void DrawBackground(){
 	z=1;
 
+	// The VRAM is too small to fit both the background and other images (icons + font)
+	// Thus the vram is cleared every frame, the background uploaded and drawn, then texture part of vram cleared again 
+	// Then the UpdateIcons uploads icons to vram and UpdateFont does the same for the font, before anything using them is rendered
 	gsKit_vram_clear(gsGlobal);
 
-	//BACKGROUND
-	if(background_image==1){
-		background.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(background.Width, background.Height, background.PSM), GSKIT_ALLOC_USERBUFFER);
-		gsKit_texture_upload(gsGlobal, &background);
+	GSTEXTURE* cback = NULL;
+	
+	if (dynamic_menu) {
+		cback = &background;
+	} else {
+		cback = &background2;
 		
-		DrawSprite_texture(gsGlobal, &background, 0.0f,  // X1
+		// if no second background is given, use the first
+		if (!cback->Mem)
+			cback = &background;
+	}
+	//BACKGROUND
+	if((background_image != 0) && cback && cback->Mem) {
+		UploadTexture(cback);
+	
+		DrawSprite_texture(gsGlobal, cback, 0.0f,  // X1
 			0.0f,  // Y2
 			0.0f,  // U1
 			0.0f,  // V1
@@ -443,7 +444,7 @@ void DrawConfig(){
 		DrawText(305,120,"Theme configuration",1,1);
 		
 		if(editing_bg_color==0){
-			sprintf(tmp,"Background color: #%02X%02X%02X", new_bg_color[0],new_bg_color[1],new_bg_color[2]);
+			snprintf(tmp, 255, "Background color: #%02X%02X%02X", new_bg_color[0],new_bg_color[1],new_bg_color[2]);
 			if(v_pos==0){
 				TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
 			}else{
@@ -452,28 +453,28 @@ void DrawConfig(){
 			DrawText(120,200,tmp,0.8f,0);
 		}else if(editing_bg_color==1){
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Background color: #  %02X%02X",new_bg_color[1],new_bg_color[2]);
+			snprintf(tmp, 255, "Background color: #  %02X%02X",new_bg_color[1],new_bg_color[2]);
 			DrawText(120,200,tmp,0.8f,0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"                   %02X", new_bg_color[0]);
+			snprintf(tmp, 255, "                   %02X", new_bg_color[0]);
 			DrawText(120,200,tmp,0.8f,0);
 		}else if(editing_bg_color==2){
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Background color: #%02X  %02X",new_bg_color[0],new_bg_color[2]);
+			snprintf(tmp, 255, "Background color: #%02X  %02X",new_bg_color[0],new_bg_color[2]);
 			DrawText(120,200,tmp,0.8f,0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"                     %02X", new_bg_color[1]);
+			snprintf(tmp, 255, "                     %02X", new_bg_color[1]);
 			DrawText(120,200,tmp,0.8f,0);
 		}else if(editing_bg_color==3){
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Background color: #%02X%02X",new_bg_color[0],new_bg_color[1]);
+			snprintf(tmp, 255, "Background color: #%02X%02X",new_bg_color[0],new_bg_color[1]);
 			DrawText(120,200,tmp,0.8f,0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"                       %02X", new_bg_color[2]);
+			snprintf(tmp, 255, "                       %02X", new_bg_color[2]);
 			DrawText(120,200,tmp,0.8f,0);
 		}
 		if(editing_text_color==0){
-			sprintf(tmp,"Text color: #%02X%02X%02X", new_text_color[0],new_text_color[1],new_text_color[2]);
+			snprintf(tmp, 255, "Text color: #%02X%02X%02X", new_text_color[0],new_text_color[1],new_text_color[2]);
 			if(v_pos==1){
 				TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
 			}else{
@@ -482,28 +483,28 @@ void DrawConfig(){
 			DrawText(120,240,tmp,0.8f,0);
 		}else if(editing_text_color==1){
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Text color: #  %02X%02X",new_text_color[1],new_text_color[2]);
+			snprintf(tmp, 255, "Text color: #  %02X%02X",new_text_color[1],new_text_color[2]);
 			DrawText(120,240,tmp,0.8f,0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"             %02X", new_text_color[0]);
+			snprintf(tmp, 255, "             %02X", new_text_color[0]);
 			DrawText(120,240,tmp,0.8f,0);
 		}else if(editing_text_color==2){
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Text color: #%02X  %02X",new_text_color[0],new_text_color[2]);
+			snprintf(tmp, 255, "Text color: #%02X  %02X",new_text_color[0],new_text_color[2]);
 			DrawText(120,240,tmp,0.8f,0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"               %02X", new_text_color[1]);
+			snprintf(tmp, 255, "               %02X", new_text_color[1]);
 			DrawText(120,240,tmp,0.8f,0);
 		}else if(editing_text_color==3){
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Text color: #%02X%02X",new_text_color[0],new_text_color[1]);
+			snprintf(tmp, 255, "Text color: #%02X%02X",new_text_color[0],new_text_color[1]);
 			DrawText(120,240,tmp,0.8f,0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"                 %02X", new_text_color[2]);
+			snprintf(tmp, 255, "                 %02X", new_text_color[2]);
 			DrawText(120,240,tmp,0.8f,0);
 		}
 		if(editing_theme_dir==0){
-			sprintf(tmp,"Selected Theme: %s", theme);
+			snprintf(tmp, 255, "Selected Theme: %s", theme);
 			if(v_pos==2){
 				TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
 			}else{
@@ -512,10 +513,10 @@ void DrawConfig(){
 			DrawText(120,280,tmp,0.8f, 0);
 		}else{
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			sprintf(tmp,"Selected Theme:");
+			snprintf(tmp, 255, "Selected Theme:");
 			DrawText(120,280,tmp,0.8f, 0);
 			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			sprintf(tmp,"                %s", theme_dir[selected_theme_dir]);
+			snprintf(tmp, 255, "                %s", theme_dir[selected_theme_dir]);
 			DrawText(120,280,tmp,0.8f, 0);
 		}
 		
@@ -648,6 +649,12 @@ void DrawConfig(){
 	}
 }
 
+/// Uploads texture to vram
+void UploadTexture(GSTEXTURE* txt) {
+	txt->Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(txt->Width, txt->Height, txt->PSM), GSKIT_ALLOC_USERBUFFER);
+	gsKit_texture_upload(gsGlobal, txt);
+}
+
 void MsgBox(){
 	while(1){
 		ReadPad();
@@ -676,7 +683,7 @@ void LoadFont(int load_default){
 	font.Width = 256;
 	font.Height = 256;
 	font.PSM = GS_PSM_CT32;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"font.raw");
+	snprintf(tmp, 255, "mass:USBLD/%s/%s",theme,"font.raw");
 
 	if(load_default==1 || LoadRAW(tmp, &font)==0){
 		font.Mem=(u32*)&font_raw;
@@ -699,31 +706,45 @@ void LoadFont(int load_default){
 
 }
 
-void UpdateFont(){
-	font.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(font.Width, font.Height, font.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &font);
+void UpdateFont() {
+	UploadTexture(&font);
 }
 
-int LoadRAW(char *path, GSTEXTURE *Texture){
-	int fd, size, ret=0;
-	void *buffer;
+int LoadRAW(char *path, GSTEXTURE *Texture) {
+	int fd;
+	unsigned int size;
 	
-	fd=fioOpen(path, O_RDONLY);
-	if(fd>=0){
-		size = fioLseek(fd, 0, SEEK_END);  
-		fioLseek(fd, 0, SEEK_SET);  	
-		buffer=malloc(size);
-		fioRead(fd, buffer, size);
-		if(Texture->Mem!=NULL)free(Texture->Mem);
-		Texture->Mem=buffer;
-		ret=1;
+	void *buffer;
+
+	if(Texture->Mem!=NULL) {
+		free(Texture->Mem);
+		Texture->Mem = NULL;
 	}
+
+	fd=fioOpen(path, O_RDONLY);
+	
+	if (fd < 0) // invalid file name, etc.
+		return 0;
+
+	size = fioLseek(fd, 0, SEEK_END);  
+	fioLseek(fd, 0, SEEK_SET);
+	
+	// TODO: should check the texture size... Is this the valid way?
+	// if (size != gsKit_texture_size(txt->Width, txt->Height, txt->PSM)) {
+	//	fioClose(fd);
+	//	return 0;
+	// }
+	
+	buffer=memalign(128, size); // The allocation is alligned to aid the DMA transfers
+	fioRead(fd, buffer, size);
+	
+	Texture->Mem=buffer;
+	
 	fioClose(fd);
-	return ret;
+	return 1;
 }
 
-int LoadBackground(){
-	int ret=0;
+int LoadBackground() {
 	char tmp[255];
 	
 	bg_color[0]=0x00;
@@ -734,124 +755,74 @@ int LoadBackground(){
 	text_color[1]=0xff;
 	text_color[2]=0xff;
 	
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"Background.raw");
+	background.Width = 640;
+	background.Height = 480;
+	background.PSM = GS_PSM_CT24;
+	background.Filter = GS_FILTER_LINEAR;
+
+	snprintf(tmp, 255, "mass:USBLD/%s/%s", theme, "background.raw");
 	
-	if(LoadRAW(tmp, &background)==1){
-		background.Width = 640;
-		background.Height = 480;
-		background.PSM = GS_PSM_CT24;
-		background.Filter = GS_FILTER_LINEAR;
-		ret=1;
-	}
+	int res = LoadRAW(tmp, &background);
 	
-	return ret;
+	// see if we can load the second one too
+	background2.Width = 640;
+	background2.Height = 480;
+	background2.PSM = GS_PSM_CT24;
+	background2.Filter = GS_FILTER_LINEAR;
+	snprintf(tmp, 255, "mass:USBLD/%s/%s", theme, "background2.raw");
+	
+	// the second image is not mandatory
+	LoadRAW(tmp, &background2);
+	
+	return res;
 }
 
-void LoadIcons(){
+void LoadIcon(GSTEXTURE* txt, char* iconname, void* defraw) {
 	char tmp[255];
 
-	//EXIT
-	exit_icon.Width = 64;
-	exit_icon.Height = 64;
-	exit_icon.PSM = GS_PSM_CT32;
-	exit_icon.Filter = GS_FILTER_LINEAR;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"exit.raw");
-	if(LoadRAW(tmp, &exit_icon)==0){
-	exit_icon.Mem=(u32*)&exit_raw;
-	//exit_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(exit_icon.Width, exit_icon.Height, exit_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	//gsKit_texture_upload(gsGlobal, &exit_icon);
-	}
+	txt->Width = 64;
+	txt->Height = 64;
+	txt->PSM = GS_PSM_CT32;
+	txt->Filter = GS_FILTER_LINEAR;
 	
-	//CONFIG
-	config_icon.Width = 64;
-	config_icon.Height = 64;
-	config_icon.PSM = GS_PSM_CT32;
-	config_icon.Filter = GS_FILTER_LINEAR;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"config.raw");
-	if(LoadRAW(tmp, &config_icon)==0){
-	config_icon.Mem=(u32*)&config_raw;
-	//config_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(config_icon.Width, config_icon.Height, config_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	//gsKit_texture_upload(gsGlobal, &config_icon);
-	}
+	snprintf(tmp, 254, "mass:USBLD/%s/%s",theme, iconname);
 	
-	//GAMES
-	games_icon.Width = 64;
-	games_icon.Height = 64;
-	games_icon.PSM = GS_PSM_CT32;
-	games_icon.Filter = GS_FILTER_LINEAR;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"games.raw");
-	if(LoadRAW(tmp, &games_icon)==0){
-	games_icon.Mem=(u32*)&games_raw;
-	//games_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(games_icon.Width, games_icon.Height, games_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	//gsKit_texture_upload(gsGlobal, &games_icon);
-	}
+	if (txt->Mem == defraw) // if we have a default, clear it now so it doesn't get
+		txt->Mem = NULL; // freed by accident
 	
-	//DISC
-	disc_icon.Width = 64;
-	disc_icon.Height = 64;
-	disc_icon.PSM = GS_PSM_CT32;
-	disc_icon.Filter = GS_FILTER_LINEAR;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"disc.raw");
-	if(LoadRAW(tmp, &disc_icon)==0){
-	disc_icon.Mem=(u32*)&disc_raw;
-	//disc_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(disc_icon.Width, disc_icon.Height, disc_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	//gsKit_texture_upload(gsGlobal, &disc_icon);
-	}
-	
-	//THEME
-	theme_icon.Width = 64;
-	theme_icon.Height = 64;
-	theme_icon.PSM = GS_PSM_CT32;
-	theme_icon.Filter = GS_FILTER_LINEAR;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"theme.raw");
-	if(LoadRAW(tmp, &theme_icon)==0){
-	theme_icon.Mem=(u32*)&theme_raw;
-	//theme_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(theme_icon.Width, theme_icon.Height, theme_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	//gsKit_texture_upload(gsGlobal, &theme_icon);	
-	}
-	
-	//LANGUAGE
-	language_icon.Width = 64;
-	language_icon.Height = 64;
-	language_icon.PSM = GS_PSM_CT32;
-	language_icon.Filter = GS_FILTER_LINEAR;
-	sprintf(tmp,"mass:USBLD/%s/%s",theme,"language.raw");
-	if(LoadRAW(tmp, &language_icon)==0){
-	language_icon.Mem=(u32*)&language_raw;
-	//language_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(language_icon.Width, language_icon.Height, language_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	//gsKit_texture_upload(gsGlobal, &language_icon);
-	}
+	if(LoadRAW(tmp, txt)==0)
+		txt->Mem=(u32*)defraw; // if load could not be done, set the default
 }
 
-void UpdateIcons(){
-
-	//EXIT
-	exit_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(exit_icon.Width, exit_icon.Height, exit_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &exit_icon);
-
-	//CONFIG
-	config_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(config_icon.Width, config_icon.Height, config_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &config_icon);
-	
-	//GAMES
-	games_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(games_icon.Width, games_icon.Height, games_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &games_icon);
-
-	//DISC
-	disc_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(disc_icon.Width, disc_icon.Height, disc_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &disc_icon);
-	
-	//THEME
-	theme_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(theme_icon.Width, theme_icon.Height, theme_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &theme_icon);	
-	
-	//LANGUAGE
-	language_icon.Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(language_icon.Width, language_icon.Height, language_icon.PSM), GSKIT_ALLOC_USERBUFFER);
-	gsKit_texture_upload(gsGlobal, &language_icon);
-
+/// Loads icons to ram
+void LoadIcons() {
+	LoadIcon(&exit_icon, "exit.raw", &exit_raw);
+	LoadIcon(&config_icon, "config.raw", &config_raw);
+	LoadIcon(&games_icon, "games.raw", &games_raw);
+	LoadIcon(&disc_icon, "disc.raw", &disc_raw);
+	LoadIcon(&theme_icon, "theme.raw", &theme_raw);
+	LoadIcon(&language_icon, "language.raw", &language_raw);
+	LoadIcon(&apps_icon, "apps.raw", &apps_raw);
+	LoadIcon(&menu_icon, "menu.raw", &menu_raw);
+	LoadIcon(&scroll_icon, "scroll.raw", &scroll_raw);
+	LoadIcon(&usb_icon, "usb.raw", &usb_raw);
 }
 
-void DrawIcon(GSTEXTURE *img, int x, int y, float scale){
+/// Uploads the icons to vram
+void UpdateIcons() {
+	UploadTexture(&exit_icon);
+	UploadTexture(&config_icon);
+	UploadTexture(&games_icon);
+	UploadTexture(&disc_icon);
+	UploadTexture(&theme_icon);
+	UploadTexture(&language_icon);
+	UploadTexture(&apps_icon);
+	UploadTexture(&menu_icon);
+	UploadTexture(&scroll_icon);
+	UploadTexture(&usb_icon);
+}
+
+void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {
 	if (img!=NULL) {
 		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
 		DrawSprite_texture(gsGlobal, img, x-scale,  // X1
@@ -867,32 +838,6 @@ void DrawIcon(GSTEXTURE *img, int x, int y, float scale){
 		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 		z++;
 	}
-}
-
-void DrawIconByIndex(int id, int x, int y, float scale){
-	GSTEXTURE *img=0;
-	switch(id){
-		case 1:
-			img=&exit_icon;
-		break;
-		case 2:
-			img=&config_icon;
-		break;
-		case 3:
-			img=&games_icon;
-		break;
-		case 4:
-			img=&disc_icon;
-		break;
-		case 5:
-			img=&theme_icon;
-		break;
-		case 6:
-			img=&language_icon;
-		break;
-	}
-	
-	DrawIcon(img, x, y, scale);
 }
 
 void DrawIcons() {
@@ -924,7 +869,7 @@ void DrawIcons() {
 		DrawIcon(cur_item->item->icon, h_anim + xpos, yfix2(120), cur_item == selected_item ? 20:1);
 		
 		if(cur_item == selected_item && h_anim==100)
-			DrawText(h_anim + xpos + 23, yfix2(190), cur_item->item->text, 1.0f, 1);
+			DrawText(h_anim + xpos + 23, yfix2(205), cur_item->item->text, 1.0f, 1);
 		
 		cur_item = cur_item->next;
 		xpos += 100;
@@ -970,7 +915,7 @@ void DrawSubMenu() {
 	int others = 0;
 	
 	while (prev && (others < _vbefore)) {
-		DrawIcon(prev->item.icon, (100)+50, yfix2(((v_anim - 40) - others * _vspacing)),1);
+		DrawIcon(prev->item.icon, (100)+50, yfix2(((v_anim - 60) - others * _vspacing)),1);
 		// Display the prev. item's text:
 		/* if ((v_anim>=80) || (others > 1))
 			DrawText((100)+150, (v_anim - 40) - others * _vspacing, prev->item.text,1.0f,0);
@@ -1096,6 +1041,25 @@ void MenuItemExecute() {
 	}
 }
 
+void MenuSetSelectedItem(struct TMenuItem* item) {
+	struct TMenuList* itm = menu;
+	
+	while (itm) {
+		if (itm->item == item) {
+			selected_item = itm;
+			
+			h_anim = 100;
+			v_anim = 100;
+			direc = 0;
+			
+			return;
+		}
+			
+		
+		itm = itm->next;
+	}
+}
+
 void RefreshSubMenu() {
 	if (selected_item && (selected_item->item->refresh)) {
 		selected_item->item->refresh(selected_item->item);
@@ -1123,12 +1087,12 @@ void DrawScreenStatic() {
 	
 	while (cur_item) {
 		if(cur_item == selected_item) {
-			DrawIcon(cur_item->item->icon, xpos, 10, 20);
-			DrawText(30, 80, cur_item->item->text, 1.0f, 0);
-			xpos += 80;
+			DrawIcon(cur_item->item->icon, xpos + 20, 20, 20);
+ 			DrawText(30, 100, cur_item->item->text, 1.0f, 0);
+ 			xpos += 105;
 		} else {
-			DrawIcon(cur_item->item->icon, xpos, 10, 1);
-			xpos += 60;
+			DrawIcon(cur_item->item->icon, xpos, 20, 1);
+ 			xpos += 65;
 		}
 
 		cur_item = cur_item->next;
@@ -1139,16 +1103,16 @@ void DrawScreenStatic() {
 	// ------------------------------------------------------
 
 	// we want to display N previous, the current and N next items (N == sur_items)
-	// spacing is 45 pixels
+	// spacing is 30 pixels
 	// x offset is 10 pixels
-	// y offset is 100 pixels
-	// the selected item is displayed at 100 + 3 * 60 = 280 px.
+	// y offset is 125 pixels
+	// the selected item is displayed at 125 + 5 * 30 = 275 px.
 	if (!selected_item)
 		return;
 	
 	float iscale = -15.0f; // not a scale... an additional spacing in pixels
 	int draw_icons = 1;
-	int iconhalf = 30;
+	int iconhalf = 25;
 	int spacing = 30;
 	
 	int icon_h_spacing = 0;
@@ -1158,7 +1122,7 @@ void DrawScreenStatic() {
 	
 	// count of items before and after selection
 	int sur_items = 5;
-	int curpos = 120 + sur_items * spacing;
+	int curpos = 125 + sur_items * spacing;
 	
 	TextColor(text_color[0],text_color[1],text_color[2],0xff);
 	
@@ -1204,18 +1168,32 @@ void DrawScreenStatic() {
 }
 
 void SwapMenu() {
-	if (drawScreenPtr) {
-		drawScreenPtr = NULL;
-	} else {
-		drawScreenPtr = &DrawScreenStatic;
+	SetMenuDynamic(!dynamic_menu);
+}
+
+void SetMenuDynamic(int dynamic) {
+	dynamic_menu = dynamic;
+	
+	// reset the animation counters
+	h_anim = 100;
+	v_anim = 100;
+	direc = 0;
+	
+	// Fixup for NULL poiters in the cur. selections
+	if (!selected_item) 
+		selected_item = menu;
+	
+	if (selected_item) {
+		if (!selected_item->item->current)
+			selected_item->item->current = selected_item->item->submenu;
 	}
 }
 
 
 void DrawScreen() {
-	// do we have a custom renderer pointer?
-	if (drawScreenPtr) {
-		drawScreenPtr();
+	// dynamic or static render?
+	if (!dynamic_menu) {
+		DrawScreenStatic();
 	} else {
 		// default render:
 		DrawBackground();

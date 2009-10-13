@@ -99,6 +99,23 @@ struct TMenuList {
 struct TMenuList *menu;
 struct TMenuList *selected_item;
 
+// Configuration handling
+// single config value (linked list item)
+struct TConfigValue {
+        char key[15];
+        char val[255];
+
+        struct TConfigValue *next;
+};
+
+struct TConfigSet {
+	struct TConfigValue *head;
+	struct TConfigValue *tail;
+};
+
+// global config
+struct TConfigSet gConfig;
+
 float waveframe;
 int frame;
 int h_anim;
@@ -181,7 +198,11 @@ void DestroySubMenu(struct TSubMenuList** submenu);
 void UpdateScrollSpeed();
 
 void Flip();
-void MsgBox();
+void MsgBox(char* text);
+
+void LoadConfig(char* fname, int clearFirst);
+int SaveConfig(char* fname);
+
 void DrawWave(int y, int xoffset);
 void DrawBackground();
 void SetColor(int r, int g, int b);
@@ -223,7 +244,18 @@ void SetMenuDynamic(int dynamic);
 // Renders everything
 void DrawScreen();
 
+
+
 //CONFIG
-int ReadConfig(char *archivo);
-int SaveConfig(char *archivo);
+void setConfigStr(struct TConfigSet* config, const char* key, const char* value);
+int getConfigStr(struct TConfigSet* config, const char* key, char** value);
+void setConfigInt(struct TConfigSet* config, const char* key, const int value);
+int getConfigInt(struct TConfigSet* config, char* key, int* value);
+void setConfigColor(struct TConfigSet* config, const char* key, int* color);
+int getConfigColor(struct TConfigSet* config, const char* key, int* color);
+
+int readConfig(struct TConfigSet* config, char *fname);
+int writeConfig(struct TConfigSet* config, char *fname);
+void clearConfig(struct TConfigSet* config);
+
 void ListDir(char* directory);

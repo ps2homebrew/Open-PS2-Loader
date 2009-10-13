@@ -113,6 +113,22 @@ void InitGFX() {
 	background2.Mem = 0;
 	dynamic_menu = 1;
 	scroll_speed = 1;
+	gConfig.head = NULL;
+	gConfig.tail = NULL;
+
+	bg_color[0]=0x00;
+	bg_color[1]=0x00;
+	bg_color[2]=0xff;
+	
+	text_color[0]=0xff;
+	text_color[1]=0xff;
+	text_color[2]=0xff;
+	
+
+	
+	setConfigInt(&gConfig, "scrolling", scroll_speed);
+	setConfigInt(&gConfig, "menutype", dynamic_menu);
+	setConfigStr(&gConfig, "theme", "");
 
 	gsGlobal = gsKit_init_global();
 
@@ -251,6 +267,10 @@ void DestroySubMenu(struct TSubMenuList** submenu) {
 }
 
 void UpdateScrollSpeed() {
+	// sanitize the settings
+	if ((scroll_speed < 0) || (scroll_speed > 2))
+		scroll_speed = 1;
+	
 	// update the pad delays for KEY_UP and KEY_DOWN
 	// default delay is 7
 	SetButtonDelay(KEY_UP, 10 - scroll_speed * 3); // 0,1,2 -> 10, 7, 4
@@ -318,13 +338,51 @@ void DrawWave(int y, int xoffset){
 	}
 }
 
+void LoadConfig(char* fname, int clearFirst) {
+	if (clearFirst)
+		clearConfig(&gConfig);
+	
+	// fill the config from file
+	readConfig(&gConfig, fname);
+	
+	char *themename;
+	
+	// reinit all the values we are interested in from the config
+	if (getConfigInt(&gConfig, "scrolling", &scroll_speed))
+		UpdateScrollSpeed();
+	
+	getConfigInt(&gConfig, "menutype", &dynamic_menu);
+	if (getConfigStr(&gConfig, "theme", &themename))
+		strncpy(theme, themename, 32);
+	if (getConfigColor(&gConfig, "bgcolor", bg_color))
+		SetColor(bg_color[0],bg_color[1],bg_color[2]);
+				
+	if (getConfigColor(&gConfig, "textcolor", text_color))
+		TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+	
+	if ((dynamic_menu < 0) || (dynamic_menu > 1)) {
+		dynamic_menu = 1;
+		setConfigInt(&gConfig, "menutype", dynamic_menu);
+	}
+}
+
+int SaveConfig(char* fname) {
+	// set the config values to be sure they are up-to-date
+	setConfigInt(&gConfig, "scrolling", scroll_speed);
+	setConfigInt(&gConfig, "menutype", dynamic_menu);
+	setConfigStr(&gConfig, "theme", theme);
+	setConfigColor(&gConfig, "bgcolor", bg_color);
+	setConfigColor(&gConfig, "textcolor", text_color);
+	
+	return writeConfig(&gConfig, fname);
+}
+
 void LoadResources() {
-	ReadConfig("mass:USBLD/usbld.cfg");
+	LoadConfig("mass:USBLD/usbld.cfg", 0);
 	LoadIcons();
 	UpdateIcons();
 	LoadFont(1);
 	UpdateFont();
-	UpdateScrollSpeed();
 }
 
 void DrawBackground(){
@@ -652,10 +710,16 @@ void DrawConfig(){
 /// Uploads texture to vram
 void UploadTexture(GSTEXTURE* txt) {
 	txt->Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(txt->Width, txt->Height, txt->PSM), GSKIT_ALLOC_USERBUFFER);
+	
+	/* // VRAM ALLOCATION DEBUGGING
+	if (txt->Vram == GSKIT_ALLOC_ERROR)
+		printf("!!!Bad Vram allocation!!!");
+	*/
+	
 	gsKit_texture_upload(gsGlobal, txt);
 }
 
-void MsgBox(){
+void MsgBox(char* text){
 	while(1){
 		ReadPad();
 				
@@ -668,7 +732,7 @@ void MsgBox(){
 		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 		DrawLine(gsGlobal, 50.0f, 75.0f, 590.0f, 75.0f, 1, White);
 		DrawLine(gsGlobal, 50.0f, 410.0f, 590.0f, 410.0f, 1, White);
-		DrawText(310, 250, "Not available yet", 1.0f, 1);
+		DrawText(310, 250, text, 1.0f, 1);
 		DrawText(400, 417, "O Back", 1.0f, 0);
 		
 		Flip();
@@ -746,14 +810,6 @@ int LoadRAW(char *path, GSTEXTURE *Texture) {
 
 int LoadBackground() {
 	char tmp[255];
-	
-	bg_color[0]=0x00;
-	bg_color[1]=0x00;
-	bg_color[2]=0xff;
-	
-	text_color[0]=0xff;
-	text_color[1]=0xff;
-	text_color[2]=0xff;
 	
 	background.Width = 640;
 	background.Height = 480;
@@ -1201,3 +1257,4 @@ void DrawScreen() {
 		DrawInfo();
 	}
 }
+

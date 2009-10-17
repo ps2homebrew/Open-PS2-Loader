@@ -1,4 +1,5 @@
 #include "include/usbld.h"
+#include "include/lang.h"
 #include <assert.h>
 
 #define yfix(x) (x*gsGlobal->Height)/480
@@ -37,6 +38,9 @@ extern int size_scroll_raw;
 extern void *usb_raw;
 extern int size_usb_raw;
 
+extern void *save_raw;
+extern int size_save_raw;
+
 GSGLOBAL *gsGlobal;
 GSTEXTURE font;
 GSFONT *gsFont;
@@ -66,6 +70,7 @@ GSTEXTURE apps_icon;
 GSTEXTURE menu_icon;
 GSTEXTURE scroll_icon;
 GSTEXTURE usb_icon;
+GSTEXTURE save_icon;
 
 u64 White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
 u64 Black = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x00,0x00);
@@ -82,7 +87,7 @@ u64 Background_b = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_c = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_d = GS_SETREG_RGBAQ(0x00,0x00,0x80,0x00,0x00);
 
-char infotxt[256]="               WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>";
+char *infotxt;
 int z;
 
 // Count of icons before and after the selected one
@@ -124,7 +129,7 @@ void InitGFX() {
 	text_color[1]=0xff;
 	text_color[2]=0xff;
 	
-
+	infotxt = _l(_STR_WELCOME); // be sure to replace after doing a language change!
 	
 	setConfigInt(&gConfig, "scrolling", scroll_speed);
 	setConfigInt(&gConfig, "menutype", dynamic_menu);
@@ -217,7 +222,7 @@ void AppendMenuItem(struct TMenuItem* item) {
 }
 
 
-struct TSubMenuList* AllocSubMenuItem(GSTEXTURE *icon, char *text, int id) {
+struct TSubMenuList* AllocSubMenuItem(GSTEXTURE *icon, char *text, int id, int text_id) {
 	struct TSubMenuList* it;
 	
 	it = malloc(sizeof(struct TSubMenuList));
@@ -226,14 +231,15 @@ struct TSubMenuList* AllocSubMenuItem(GSTEXTURE *icon, char *text, int id) {
 	it->next = NULL;
 	it->item.icon = icon;
 	it->item.text = text;
+	it->item.text_id = text_id;
 	it->item.id = id;
 	
 	return it;
 }
 
-struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id) {
+struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id, int text_id) {
 	if (*submenu == NULL) {
-		*submenu = AllocSubMenuItem(icon, text, id);
+		*submenu = AllocSubMenuItem(icon, text, id, text_id);
 		return *submenu; 
 	}
 	
@@ -244,7 +250,7 @@ struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *ico
 		cur = cur->next;
 	
 	// create new item
-	struct TSubMenuList *newitem = AllocSubMenuItem(icon, text, id);
+	struct TSubMenuList *newitem = AllocSubMenuItem(icon, text, id, text_id);
 	
 	// link
 	cur->next = newitem;
@@ -264,6 +270,20 @@ void DestroySubMenu(struct TSubMenuList** submenu) {
 	}
 	
 	*submenu = NULL;
+}
+
+char *GetMenuItemText(struct TMenuItem* it) {
+	if (it->text_id >= 0)
+		return _l(it->text_id);
+	else
+		return it->text;
+}
+
+char *GetSubItemText(struct TSubMenuItem* it) {
+	if (it->text_id >= 0)
+		return _l(it->text_id);
+	else
+		return it->text;
 }
 
 void UpdateScrollSpeed() {
@@ -317,7 +337,7 @@ void Intro(){
 		}
 
 		DrawBackground();
-		snprintf(introtxt, 255, "Open USB Loader %s", USBLD_VERSION);
+		snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
 		DrawText(270, 255, introtxt, 1.0f, 0);
 		Flip();
 		if (frame==75)bg_loaded=LoadBackground();
@@ -364,6 +384,9 @@ void LoadConfig(char* fname, int clearFirst) {
 		dynamic_menu = 1;
 		setConfigInt(&gConfig, "menutype", dynamic_menu);
 	}
+	
+	if (getConfigInt(&gConfig, "language", &gLanguageID))
+		setLanguage(gLanguageID);
 }
 
 int SaveConfig(char* fname) {
@@ -373,6 +396,7 @@ int SaveConfig(char* fname) {
 	setConfigStr(&gConfig, "theme", theme);
 	setConfigColor(&gConfig, "bgcolor", bg_color);
 	setConfigColor(&gConfig, "textcolor", text_color);
+	setConfigInt(&gConfig, "language", gLanguageID);
 	
 	return writeConfig(&gConfig, fname);
 }
@@ -499,7 +523,7 @@ void DrawConfig(){
 		DrawQuad_gouraud(gsGlobal, 530.0f, 110.0f, 540.0f, 100.0f, 530.0f, 402.0f, 540.0f, 412.0f, z, Wave_b, Wave_d, Wave_b, Wave_d);
 		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 		
-		DrawText(305,120,"Theme configuration",1,1);
+		DrawText(305,120,_l(_STR_THEME_CONFIG),1,1);
 		
 		if(editing_bg_color==0){
 			snprintf(tmp, 255, "Background color: #%02X%02X%02X", new_bg_color[0],new_bg_color[1],new_bg_color[2]);
@@ -583,7 +607,7 @@ void DrawConfig(){
 		}else{
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
 		}
-		DrawText(310,370,"Save changes",1, 1);
+		DrawText(310,370,_l(_STR_SAVE_CHANGES),1, 1);
 		
 		if(editing_bg_color>0){
 			if(GetKey(KEY_UP)){
@@ -733,7 +757,7 @@ void MsgBox(char* text){
 		DrawLine(gsGlobal, 50.0f, 75.0f, 590.0f, 75.0f, 1, White);
 		DrawLine(gsGlobal, 50.0f, 410.0f, 590.0f, 410.0f, 1, White);
 		DrawText(310, 250, text, 1.0f, 1);
-		DrawText(400, 417, "O Back", 1.0f, 0);
+		DrawText(400, 417, _l(_STR_O_BACK), 1.0f, 0);
 		
 		Flip();
 		if(GetKey(KEY_CIRCLE))break;
@@ -862,6 +886,7 @@ void LoadIcons() {
 	LoadIcon(&menu_icon, "menu.raw", &menu_raw);
 	LoadIcon(&scroll_icon, "scroll.raw", &scroll_raw);
 	LoadIcon(&usb_icon, "usb.raw", &usb_raw);
+	LoadIcon(&save_icon, "save.raw", &save_raw);
 }
 
 /// Uploads the icons to vram
@@ -876,6 +901,7 @@ void UpdateIcons() {
 	UploadTexture(&menu_icon);
 	UploadTexture(&scroll_icon);
 	UploadTexture(&usb_icon);
+	UploadTexture(&save_icon);
 }
 
 void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {
@@ -925,7 +951,7 @@ void DrawIcons() {
 		DrawIcon(cur_item->item->icon, h_anim + xpos, yfix2(120), cur_item == selected_item ? 20:1);
 		
 		if(cur_item == selected_item && h_anim==100)
-			DrawText(h_anim + xpos + 23, yfix2(205), cur_item->item->text, 1.0f, 1);
+			DrawText(h_anim + xpos + 23, yfix2(205), GetMenuItemText(cur_item->item), 1.0f, 1);
 		
 		cur_item = cur_item->next;
 		xpos += 100;
@@ -982,7 +1008,7 @@ void DrawSubMenu() {
 	
 	DrawIcon(cur->item.icon, (100)+50,yfix2((v_anim+130)),10);
 	 if(v_anim==100)
-	DrawText((100)+150,yfix2((v_anim+153)),cur->item.text,1.0f,0);
+	DrawText((100)+150,yfix2((v_anim+153)),GetSubItemText(&cur->item),1.0f,0);
 
 	cur = cur->next;
 	
@@ -1144,7 +1170,7 @@ void DrawScreenStatic() {
 	while (cur_item) {
 		if(cur_item == selected_item) {
 			DrawIcon(cur_item->item->icon, xpos + 20, 20, 20);
- 			DrawText(30, 100, cur_item->item->text, 1.0f, 0);
+ 			DrawText(30, 100, GetMenuItemText(cur_item->item), 1.0f, 0);
  			xpos += 105;
 		} else {
 			DrawIcon(cur_item->item->icon, xpos, 20, 1);
@@ -1196,7 +1222,7 @@ void DrawScreenStatic() {
 	while (prev && (others <= sur_items)) {
 		if (draw_icons)
 			DrawIcon(prev->item.icon, 10, curpos - others * spacing - iconhalf, iscale);
-		DrawText(10 + icon_h_spacing, curpos - others * spacing, prev->item.text,1.0f, 0);
+		DrawText(10 + icon_h_spacing, curpos - others * spacing, GetSubItemText(&prev->item),1.0f, 0);
 		
 		prev = prev->prev; others++;
 	}
@@ -1205,7 +1231,7 @@ void DrawScreenStatic() {
 	TextColor(0xff, 0x080, 0x00, 0xff);
 	if (draw_icons)
 			DrawIcon(cur->item.icon, 10, curpos - iconhalf, iscale);
-	DrawText(10 + icon_h_spacing, curpos, cur->item.text, 1.0f, 0);
+	DrawText(10 + icon_h_spacing, curpos, GetSubItemText(&cur->item), 1.0f, 0);
 		
 	cur = cur->next;
 	
@@ -1216,7 +1242,7 @@ void DrawScreenStatic() {
 	while (cur && (others <= sur_items)) {
 		if (draw_icons)
 			DrawIcon(cur->item.icon, 10, curpos + others * spacing - iconhalf, iscale);
-		DrawText(10 + icon_h_spacing, curpos + others * spacing, cur->item.text, 1.0f, 0);
+		DrawText(10 + icon_h_spacing, curpos + others * spacing, GetSubItemText(&cur->item), 1.0f, 0);
 		
 		cur = cur->next; others++;
 	}

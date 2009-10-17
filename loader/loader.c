@@ -18,16 +18,16 @@ void set_ipconfig(void)
 	g_ipconfig_len = 0;
 	
 	// add ip to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.1.10", 15);
-	g_ipconfig_len += strlen("192.168.1.10") + 1;
+	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.10", 15);
+	g_ipconfig_len += strlen("192.168.0.10") + 1;
 
 	// add netmask to g_ipconfig buf
 	strncpy(&g_ipconfig[g_ipconfig_len], "255.255.255.0", 15);
 	g_ipconfig_len += strlen("255.255.255.0") + 1;
 
 	// add gateway to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.1.1", 15);
-	g_ipconfig_len += strlen("192.168.1.1") + 1;
+	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.1", 15);
+	g_ipconfig_len += strlen("192.168.0.1") + 1;
 }
 
 int main(int argc, char **argv){

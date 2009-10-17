@@ -32,8 +32,9 @@
 // Language ID's
 #define _LANG_ID_ENGLISH 0
 #define _LANG_ID_CZECH 1
+#define _LANG_ID_SPANISH 2
 // set to the maximal ID
-#define _LANG_ID_MAX 1
+#define _LANG_ID_MAX 2
 
 // getter for a localised string version
 extern char *_l(unsigned int id);

@@ -132,17 +132,17 @@ int New_Reset_Iop(const char *arg, int flag){
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
 
-	SifExitRpc();
+	/*SifExitRpc();  // Commenting this it works on PS3 with EE emulation
 	SifExitIopHeap();
 	LoadFileExit();
 	
-	/* Reseting IOP. */
+	// Reseting IOP.
 	while (!Reset_Iop(NULL, 0)) {;}
 	while (!Sync_Iop()){;}
 
 	SifInitRpc(0);
 	SifInitIopHeap();
-	LoadFileInit();
+	LoadFileInit();*/
 	Sbv_Patch();
 
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);

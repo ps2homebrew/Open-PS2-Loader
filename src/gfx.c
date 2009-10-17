@@ -966,7 +966,7 @@ void DrawInfo() {
 	strncpy(txt,&infotxt[frame/10],15);
 	DrawText(300,yfix2(53),txt,1,0);
 	
-	if (frame>2000) {
+	if (frame>strlen(infotxt)*10) {
 	 frame=0;
 	} else {
 	 frame++;	

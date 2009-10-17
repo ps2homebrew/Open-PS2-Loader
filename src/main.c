@@ -1,4 +1,5 @@
 #include "include/usbld.h"
+#include "include/lang.h"
 
 extern void *usbd_irx;
 extern int size_usbd_irx;
@@ -6,8 +7,11 @@ extern int size_usbd_irx;
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+// language id
+int gLanguageID = 0;
+
 // Submenu items variant of the game list... keeped in sync with the game item list (firstgame, actualgame)
-struct TSubMenuList* usb_submenu= NULL;
+struct TSubMenuList* usb_submenu = NULL;
 /// List of usb games
 struct TMenuItem usb_games_item;
 
@@ -17,13 +21,12 @@ struct TSubMenuList* speed_item = NULL;
 /// menu type selector
 struct TSubMenuList* menutype_item = NULL;
 
-char scroll_speed_txt[3][14] = {"Scroll Slow", "Scroll Medium", "Scroll Fast"};
-char menu_type_txt[2][14] = {"Dynamic Menu", "Static Menu"};
-char txt_settings[2][32]={"Configure theme", "Select language"};
+unsigned int scroll_speed_txt[3] = {_STR_SCROLL_SLOW, _STR_SCROLL_MEDIUM, _STR_SCROLL_FAST};
+unsigned int menu_type_txt[2] = { _STR_MENU_DYNAMIC,  _STR_MENU_STATIC};
 
 void ClearUSBSubMenu() {
 	DestroySubMenu(&usb_submenu);
-	AppendSubMenu(&usb_submenu, &disc_icon, "No Items", -1);
+	AppendSubMenu(&usb_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
 	usb_games_item.submenu = usb_submenu;
 	usb_games_item.current = usb_submenu;
 }
@@ -82,7 +85,7 @@ void RefreshUSBGameList() {
 			actualgame=list;
 			max_games++;
 			
-			AppendSubMenu(&usb_submenu, &disc_icon, actualgame->Game.Name, id);
+			AppendSubMenu(&usb_submenu, &disc_icon, actualgame->Game.Name, id, -1);
 		}
 		
 			
@@ -140,7 +143,7 @@ void ExecExit(struct TMenuItem* self, int vorder) {
 
 void ChangeScrollSpeed() {
 	scroll_speed = (scroll_speed + 1) % 3;
-	speed_item->item.text = scroll_speed_txt[scroll_speed];
+	speed_item->item.text_id = scroll_speed_txt[scroll_speed];
 	
 	UpdateScrollSpeed();
 }
@@ -148,14 +151,19 @@ void ChangeScrollSpeed() {
 void ChangeMenuType() {
 	SwapMenu();
 	
-	menutype_item->item.text = menu_type_txt[dynamic_menu ? 0 : 1];
+	menutype_item->item.text_id = menu_type_txt[dynamic_menu ? 0 : 1];
 }
 
 void ExecSettings(struct TMenuItem* self, int id) {
 	if (id == 1) {
 		DrawConfig();
 	} else if(id == 2) {
-		MsgBox("Not available yet");
+		// set the language
+		gLanguageID++;
+		if (gLanguageID > _LANG_ID_MAX)
+			gLanguageID = 0;
+			
+		setLanguage(gLanguageID);
 	} else if (id == 3) {
 		// scroll speed modifier
 		ChangeScrollSpeed();
@@ -163,9 +171,9 @@ void ExecSettings(struct TMenuItem* self, int id) {
 		ChangeMenuType();
 	} else if (id == 6) {
 		if (SaveConfig("mass:USBLD/usbld.cfg")) {
-			MsgBox("Settings saved...");
+			MsgBox(_l(_STR_SETTINGS_SAVED));
 		} else {
-			MsgBox("Error writing settings!");
+			MsgBox(_l(_STR_ERROR_SAVING_SETTINGS));
 		}
 	}
 }
@@ -175,39 +183,42 @@ void ExecSettings(struct TMenuItem* self, int id) {
 struct TSubMenuList *settings_submenu = NULL;
 
 struct TMenuItem exit_item = {
-	&exit_icon, "Exit", NULL, NULL, NULL, &ExecExit, NULL, NULL
+	&exit_icon, "Exit", _STR_EXIT, NULL, NULL, NULL, &ExecExit, NULL, NULL
 };
 
 struct TMenuItem settings_item = {
-	&config_icon, "Settings", NULL, NULL, NULL, &ExecSettings, NULL, NULL
+	&config_icon, "Settings", _STR_SETTINGS, NULL, NULL, NULL, &ExecSettings, NULL, NULL
 };
 
 struct TMenuItem usb_games_item  = {
-	&usb_icon, "USB Games", NULL, NULL, NULL, &ExecUSBGameSelection, &NextUSBGame, &PrevUSBGame, &ResetUSBOrder, &RefreshUSBGameList
+	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, &ExecUSBGameSelection, &NextUSBGame, &PrevUSBGame, &ResetUSBOrder, &RefreshUSBGameList
 };
 
 struct TMenuItem hdd_games_item = {
-	&games_icon, "HDD Games", NULL, NULL, NULL
+	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL
 };
 
 struct TMenuItem network_games_item = {
-	&games_icon, "Network Games", NULL, NULL, NULL
+	&games_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL
 };
 
 struct TMenuItem apps_item = {
-	&apps_icon, "Apps", NULL, NULL, NULL
+	&apps_icon, "Apps", _STR_APPS, NULL, NULL, NULL
 };
 
+
 void InitMenuItems() {
+	gLanguageID = _LANG_ID_ENGLISH;
+	
 	ClearUSBSubMenu();
 	
 	// initialize the menu
-	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1);
-	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2);
+	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_THEME);
+	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2, _STR_LANG_NAME);
 	
-	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, scroll_speed_txt[scroll_speed], 3);
-	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, menu_type_txt[dynamic_menu ? 0 : 1], 4);
-	AppendSubMenu(&settings_submenu, &config_icon, "Save Settings", 6);
+	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, "", 3, scroll_speed_txt[scroll_speed]);
+	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, "", 4, menu_type_txt[dynamic_menu ? 0 : 1]);
+	AppendSubMenu(&settings_submenu, &save_icon, "Save Changes", 6, _STR_SAVE_CHANGES);
 	
 	settings_item.submenu = settings_submenu;
 	

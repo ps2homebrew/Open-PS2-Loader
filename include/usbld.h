@@ -53,6 +53,9 @@ struct TSubMenuItem {
 	/// item description
 	char *text;
 	
+	/// item description in localised form (used if value is not negative)
+	int text_id;
+	
 	/// item id
 	int id;
 	
@@ -71,6 +74,9 @@ struct TMenuItem {
 	
 	/// item description
 	char *text;
+	
+	/// item description in localised form (used if value is not negative)
+	int text_id;
 	
 	void *userdata;
 	
@@ -123,6 +129,7 @@ int v_anim;
 int direc;
 int max_settings;
 int max_games;
+int gLanguageID;
 
 int background_image;
 
@@ -148,6 +155,7 @@ GSTEXTURE apps_icon;
 GSTEXTURE menu_icon;
 GSTEXTURE scroll_icon;
 GSTEXTURE usb_icon;
+GSTEXTURE save_icon;
 
 void LoadGameList();
 
@@ -193,7 +201,7 @@ void InitMenu();
 
 void AppendMenuItem(struct TMenuItem* item);
 
-struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id);
+struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id, int text_id);
 void DestroySubMenu(struct TSubMenuList** submenu);
 void UpdateScrollSpeed();
 

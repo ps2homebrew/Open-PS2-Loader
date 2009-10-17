@@ -1,7 +1,7 @@
 #include "loader.h"
 #include "iopmgr.h"
 
-//#define NETLOG_DEBUG
+#define NETLOG_DEBUG
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;

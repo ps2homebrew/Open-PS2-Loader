@@ -59,9 +59,38 @@ char *czech[] = {
 	"Language: Czech"
 };
 
+char *spanish[] = {
+	"               BIENVENIDO AL OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASADO EN EL CÓDIGO FUENTE DE HD PROJECT <http://psx-scene.com>", // gfx.c:85
+	"Open USB Loader %s", // gfx.c:320
+	"Configuración de tema", // gfx.c:502
+	"Guardar cambios", // gfx.c:586
+	"O Atrás", // gfx.c:736
+	"Scroll Lento", // main.c:21 
+	"Scroll Medio", 
+	"Scroll Rápido",
+	"Menú Dinámico",  // main.c:22
+	"Menú estático",
+	"Configurar tema",  // main.c:23
+	"Seleccionar idioma",  
+	"No hay elementos", // main.c:26
+	"No disponible todavia", // main.c:158
+	"Configuración guardada...", //  main.c:166
+	"¡Error escribiendo la configuración!", //  main.c:168
+	"Salir", // Menu item strings
+	"Configuración",
+	"Juegos USB",
+	"Juegos HDD",
+	"Juegos por RED",
+	"Apps",
+	"Tema", // Submenu items
+	"Idioma",
+	"Idioma: Español"
+};
+
 char **languages[] = {
 	english, // ID 0
-	czech    // ID 1
+	czech,   // ID 1
+	spanish  // ID 2
 };
 
 const char *english_name = "English";

@@ -1169,11 +1169,11 @@ void DrawScreenStatic() {
 	
 	while (cur_item) {
 		if(cur_item == selected_item) {
-			DrawIcon(cur_item->item->icon, xpos + 20, 20, 20);
- 			DrawText(30, 100, GetMenuItemText(cur_item->item), 1.0f, 0);
+			DrawIcon(cur_item->item->icon, xpos + 20, yfix2(20), 20);
+ 			DrawText(30, yfix2(100), GetMenuItemText(cur_item->item), 1.0f, 0);
  			xpos += 105;
 		} else {
-			DrawIcon(cur_item->item->icon, xpos, 20, 1);
+			DrawIcon(cur_item->item->icon, xpos, yfix2(20), 1);
  			xpos += 65;
 		}
 
@@ -1221,8 +1221,8 @@ void DrawScreenStatic() {
 	
 	while (prev && (others <= sur_items)) {
 		if (draw_icons)
-			DrawIcon(prev->item.icon, 10, curpos - others * spacing - iconhalf, iscale);
-		DrawText(10 + icon_h_spacing, curpos - others * spacing, GetSubItemText(&prev->item),1.0f, 0);
+			DrawIcon(prev->item.icon, 10, yfix2((curpos - others * spacing - iconhalf)), iscale);
+		DrawText(10 + icon_h_spacing, yfix2((curpos - others * spacing)), GetSubItemText(&prev->item),1.0f, 0);
 		
 		prev = prev->prev; others++;
 	}
@@ -1230,8 +1230,8 @@ void DrawScreenStatic() {
 	// a sorta yellow colour for the selection
 	TextColor(0xff, 0x080, 0x00, 0xff);
 	if (draw_icons)
-			DrawIcon(cur->item.icon, 10, curpos - iconhalf, iscale);
-	DrawText(10 + icon_h_spacing, curpos, GetSubItemText(&cur->item), 1.0f, 0);
+			DrawIcon(cur->item.icon, 10, yfix2((curpos - iconhalf)), iscale);
+	DrawText(10 + icon_h_spacing, yfix2(curpos), GetSubItemText(&cur->item), 1.0f, 0);
 		
 	cur = cur->next;
 	
@@ -1241,8 +1241,8 @@ void DrawScreenStatic() {
 	
 	while (cur && (others <= sur_items)) {
 		if (draw_icons)
-			DrawIcon(cur->item.icon, 10, curpos + others * spacing - iconhalf, iscale);
-		DrawText(10 + icon_h_spacing, curpos + others * spacing, GetSubItemText(&cur->item), 1.0f, 0);
+			DrawIcon(cur->item.icon, 10, yfix2((curpos + others * spacing - iconhalf)), iscale);
+		DrawText(10 + icon_h_spacing, yfix2((curpos + others * spacing)), GetSubItemText(&cur->item), 1.0f, 0);
 		
 		cur = cur->next; others++;
 	}

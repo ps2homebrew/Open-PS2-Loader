@@ -10,6 +10,7 @@
 #include "sbv_patches.h"
 #include <libcdvd.h>
 #include <libpad.h>
+#include <libmc.h>
 #include <debug.h>
 #include "gsKit.h"
 #include "dmaKit.h"
@@ -165,6 +166,7 @@ int usbdelay;
 
 void Reset();
 void delay(int count);
+void LoadUSBD();
 void LaunchGame(TGame *game);
 void SendIrxKernelRAM(void);
 

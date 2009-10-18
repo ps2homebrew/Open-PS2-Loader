@@ -9,8 +9,14 @@ extern int size_eesync_irx;
 extern void *cdvdman_irx;
 extern int size_cdvdman_irx;
 
-extern void *usbd_irx;
-extern int size_usbd_irx;
+void *usbd_irx;
+int size_usbd_irx;
+
+extern void *usbd_ps2_irx;
+extern int size_usbd_ps2_irx;
+
+extern void *usbd_ps3_irx;
+extern int size_usbd_ps3_irx;
 
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
@@ -101,6 +107,59 @@ void delay(int count) {
 	        ret = 0x01000000;
 		while(ret--) asm("nop\nnop\nnop\nnop");
 	}
+}
+
+int PS3Detect(){ //return 0=PS2 1=PS3-HARD 2=PS3-SOFT
+	int xparam2, size=0, i=0; 
+	void *buffer;
+	xparam2 = fioOpen("rom0:XPARAM2", O_RDONLY);
+	if (xparam2>0){
+		size = lseek(xparam2, 0, SEEK_END);
+		lseek(xparam2, 0, SEEK_SET);
+		buffer=malloc(size);
+		fioRead(xparam2, buffer, size);
+
+		for (i=0;i<size;i++){
+			if(!strcmp((const char*)((u32)buffer+i),"SCPS_110.01")){
+				return 2;
+			}
+		}
+	}
+	
+	fioClose(xparam2);
+	
+	if(xparam2 > 0) return 1;
+	return 0;
+}
+
+void LoadUSBD(){
+	int fd, ps3model;
+	
+	//first it searchs for custom usbd in MC
+	fd = fioOpen("mc0:/BEDATA-SYSTEM/USBD.IRX", O_RDONLY);
+	if (fd < 0){
+		fd = fioOpen("mc0:/BADATA-SYSTEM/USBD.IRX", O_RDONLY);
+		if (fd < 0){
+			fd = fioOpen("mc0:/BIDATA-SYSTEM/USBD.IRX", O_RDONLY);
+		}
+	}
+	if(fd > 0){
+		size_usbd_irx = fioLseek(fd, 1, SEEK_END);
+		usbd_irx=malloc(size_usbd_irx);
+		fioLseek(fd, 0, SEEK_SET);
+		fioRead(fd, usbd_irx, size_usbd_irx);
+		fioClose(fd);
+	}else{ // If don't exist it uses embedded
+		ps3model=PS3Detect();
+		if(ps3model==0){
+			usbd_irx=(void *)&usbd_ps2_irx;
+			size_usbd_irx=size_usbd_ps2_irx;
+		}else{
+			usbd_irx=(void *)&usbd_ps3_irx;
+			size_usbd_irx=size_usbd_ps3_irx;
+		}
+	}
+	SifExecModuleBuffer(usbd_irx, size_usbd_irx, 0, NULL, NULL);
 }
 
 unsigned int crctab[0x400];
@@ -224,7 +283,7 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxsrc[n++] = (void *)&imgdrv_irx;
 	irxsrc[n++] = (void *)&eesync_irx;	
 	irxsrc[n++] = (void *)&cdvdman_irx;
-	irxsrc[n++] = (void *)&usbd_irx;
+	irxsrc[n++] = (void *)usbd_irx;
 	irxsrc[n++] = (void *)&usbhdfsd_irx;
 	irxsrc[n++] = (void *)&isofs_irx;
 	irxsrc[n++] = (void *)&ps2dev9_irx;

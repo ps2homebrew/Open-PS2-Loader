@@ -1,9 +1,6 @@
 #include "include/usbld.h"
 #include "include/lang.h"
 
-extern void *usbd_irx;
-extern int size_usbd_irx;
-
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
@@ -238,15 +235,17 @@ int main(void)
 	Reset();
 	InitGFX();
 	
-	SifLoadModule("rom0:SIO2MAN",0,0);
-	SifLoadModule("rom0:MCMAN",0,0);
-	SifLoadModule("rom0:PADMAN",0,0);
-	
 	SifInitRpc(0);
 	
+	SifLoadModule("rom0:SIO2MAN",0,0);
+	SifLoadModule("rom0:MCMAN",0,0);
+	SifLoadModule("rom0:MCSERV",0,0);
+	SifLoadModule("rom0:PADMAN",0,0);
+	mcInit(MC_TYPE_MC);
+
 	int ret, id;
 	
-	id=SifExecModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL, &ret);
+	LoadUSBD();
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
 
 	delay(3);

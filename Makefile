@@ -8,10 +8,10 @@ EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/imgdrv.o obj/eesync.o \
-		  obj/cdvdman.o obj/usbd.o obj/usbhdfsd.o obj/isofs.o obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o \
+		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/isofs.o obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o
-EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lc
+EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lmc -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 all:
@@ -70,10 +70,12 @@ cdvdman.s:
 	$(MAKE) -C modules/cdvdman
 	bin2s modules/cdvdman/cdvdman.irx asm/cdvdman.s cdvdman_irx
 
-usbd.s:
-	#bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd.s usbd_irx
-	bin2s modules/usbd/usbd.irx asm/usbd.s usbd_irx
-	
+usbd_ps2.s:
+	bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd_ps2.s usbd_ps2_irx
+
+usbd_ps3.s:
+	bin2s modules/usbd/usbd.irx asm/usbd_ps3.s usbd_ps3_irx
+
 usbhdfsd.s:
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd

@@ -4,10 +4,11 @@
 typedef
 struct
 {
- unsigned int psize:8;
- unsigned int dsize:24;
- unsigned int daddr;
- unsigned int fcode;
+   u32 psize;
+   u32 daddr;
+   int fcode;
+   u32 unknown;
+ 
 } SifCmdHdr;
 
 typedef

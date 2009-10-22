@@ -132,17 +132,17 @@ int New_Reset_Iop(const char *arg, int flag){
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
 
-	/*SifExitRpc();  // Commenting this it works on PS3 with EE emulation
+	SifExitRpc();  // Commenting this it works on PS3 with EE emulation
 	SifExitIopHeap();
 	LoadFileExit();
 	
 	// Reseting IOP.
-	while (!Reset_Iop(NULL, 0)) {;}
+	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 	while (!Sync_Iop()){;}
 
 	SifInitRpc(0);
 	SifInitIopHeap();
-	LoadFileInit();*/
+	LoadFileInit();
 	Sbv_Patch();
 
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);
@@ -231,13 +231,13 @@ int Reset_Iop(const char *arg, int flag){
 	reset_pkt.flag = flag;
 
 	if (arg != NULL){
-		strncpy(reset_pkt.arg, arg, 0x50);
-		reset_pkt.arg[0x50] = '\0';
+		strncpy(reset_pkt.arg, arg, 0x50-1);
+		reset_pkt.arg[0x50-1] = '\0';
 		reset_pkt.size = strlen(reset_pkt.arg) + 1;
 	}
 
 	dmat.src  = &reset_pkt;
-	dmat.dest = (void *)SifGetReg(0x80000000); /* SIF_REG_SUBADDR */
+	dmat.dest = (void *)SifGetReg(0x80000000); // SIF_REG_SUBADDR
 	dmat.size = sizeof reset_pkt;
 	dmat.attr = 0x40 | SIF_DMA_INT_O;
 	SifWriteBackDCache(&reset_pkt, sizeof reset_pkt);
@@ -259,7 +259,6 @@ int Reset_Iop(const char *arg, int flag){
 
 	return 1;
 }
-
 
 /*----------------------------------------------------------------------------------------*/
 /* Synchronize IOP processor. This fonction replace SifIopReset from Ps2Sdk                     */

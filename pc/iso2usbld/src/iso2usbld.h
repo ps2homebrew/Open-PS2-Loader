@@ -1,3 +1,12 @@
+/*
+  Copyright 2009, jimmikaelkael
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+  Some parts of the code are taken from libcdvd by A.Lee & Nicholas Van Veen
+  Review license_libcdvd file for further details.
+*/
 
 #ifndef __ISO2USBLD_H__
 #define __ISO2USBLD_H__

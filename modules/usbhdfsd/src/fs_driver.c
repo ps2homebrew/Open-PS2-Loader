@@ -223,11 +223,9 @@ int fs_init(iop_device_t *driver)
 //---------------------------------------------------------------------------
 int fs_open(iop_file_t* fd, const char *name, int mode) {
 	fat_driver* fatd;
-	fs_rec* rec;
-	fs_rec* rec2;
+	fs_rec* rec = NULL;
 	int ret;
 	unsigned int cluster;
-	char escapeNotExist;
 
 	_fs_lock();
 
@@ -235,6 +233,18 @@ int fs_open(iop_file_t* fd, const char *name, int mode) {
 
 	fatd = fat_getData(fd->unit);
 	if (fatd == NULL) { _fs_unlock(); return -ENODEV; }
+	
+#ifndef WRITE_SUPPORT
+	//read only support
+	if (mode != 0 && mode != O_RDONLY) { //correct O_RDONLY  number?
+		XPRINTF("USBHDFSD: mode (%d) != O_RDONLY (%d) \n", mode, O_RDONLY);
+		return -EROFS;
+	}
+#endif	
+
+#ifdef WRITE_SUPPORT
+	fs_rec* rec2 = NULL;
+	char escapeNotExist;
 
 	//check if the file is already open
 	rec2 = fs_findFileSlotByName(name);
@@ -245,11 +255,13 @@ int fs_open(iop_file_t* fd, const char *name, int mode) {
 			return 	-EACCES;
 		}
 	}
+#endif
 
 	//check if the slot is free
 	rec = fs_findFreeFileSlot();
 	if (rec == NULL) { _fs_unlock(); return -EMFILE; }
 
+#ifdef WRITE_SUPPORT
 	if((mode & O_WRONLY))  { //dlanor: corrected bad test condition
 		cluster = 0; //start from root
 
@@ -272,6 +284,7 @@ int fs_open(iop_file_t* fd, const char *name, int mode) {
 			fat_truncateFile(fatd, cluster, rec->sfnSector, rec->sfnOffset);
 		}
 	}
+#endif
 
 	//find the file
 	cluster = 0; //allways start from root
@@ -292,10 +305,12 @@ int fs_open(iop_file_t* fd, const char *name, int mode) {
 	rec->filePos = 0;
 	rec->sizeChange  = 0;
 
+#ifdef WRITE_SUPPORT	
 	if ((mode & O_APPEND) && (mode & O_WRONLY)) {
 		XPRINTF("USBHDFSD: FAT I: O_APPEND detected!\n");
 		rec->filePos = rec->fatdir.size;
 	}
+#endif
 
 	//store the slot to user parameters
 	fd->privdata = rec;
@@ -320,6 +335,7 @@ int fs_close(iop_file_t* fd) {
 	fatd = fat_getData(fd->unit);
 	if (fatd == NULL) { _fs_unlock(); return -ENODEV; }
 
+#ifdef WRITE_SUPPORT	
 	if ((rec->mode & O_WRONLY)) {
 		//update direntry size and time
 		if (rec->sizeChange) {
@@ -328,7 +344,8 @@ int fs_close(iop_file_t* fd) {
 
 		FLUSH_SECTORS(fatd);
 	}
-
+#endif
+	
     _fs_unlock();
 	return 0;
 }
@@ -374,6 +391,7 @@ int fs_lseek(iop_file_t* fd, unsigned long offset, int whence) {
 //---------------------------------------------------------------------------
 int fs_write(iop_file_t* fd, void * buffer, int size )
 {
+#ifdef WRITE_SUPPORT	
 	fat_driver* fatd;
 	fs_rec* rec = (fs_rec*)fd->privdata;
 	int result;
@@ -414,6 +432,9 @@ int fs_write(iop_file_t* fd, void * buffer, int size )
 	
 	_fs_unlock();
 	return result;
+#else
+	return -EROFS;
+#endif	
 }
 
 //---------------------------------------------------------------------------
@@ -486,6 +507,7 @@ int getMillis()
 
 //---------------------------------------------------------------------------
 int fs_remove (iop_file_t *fd, const char *name) {
+#ifdef WRITE_SUPPORT	
 	fat_driver* fatd;
 	fs_rec* rec;
 	int result;
@@ -521,10 +543,14 @@ int fs_remove (iop_file_t *fd, const char *name) {
 
     _fs_unlock();
 	return result;
+#else
+	return fs_dummy();
+#endif	
 }
 
 //---------------------------------------------------------------------------
 int fs_mkdir  (iop_file_t *fd, const char *name) {
+#ifdef WRITE_SUPPORT	
 	fat_driver* fatd;
 	int ret;
 	int sfnOffset;
@@ -556,6 +582,9 @@ int fs_mkdir  (iop_file_t *fd, const char *name) {
 
     _fs_unlock();
 	return ret;
+#else
+	return fs_dummy();
+#endif	
 }
 
 //---------------------------------------------------------------------------
@@ -564,6 +593,7 @@ int fs_mkdir  (iop_file_t *fd, const char *name) {
 // example: fioRmdir("mass:/dir1");  //    <-- doesn't work (bug?)
 //          fioRmdir("mass0:/dir1"); //    <-- works fine
 int fs_rmdir  (iop_file_t *fd, const char *name) {
+#ifdef WRITE_SUPPORT	
 	fat_driver* fatd;
 	int ret;
 
@@ -576,6 +606,9 @@ int fs_rmdir  (iop_file_t *fd, const char *name) {
 	FLUSH_SECTORS(fatd);
     _fs_unlock();
 	return ret;
+#else
+	return fs_dummy();
+#endif	
 }
 
 //---------------------------------------------------------------------------

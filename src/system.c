@@ -21,6 +21,9 @@ extern int size_usbd_ps3_irx;
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+extern void *ingame_usbhdfsd_irx;
+extern int size_ingame_usbhdfsd_irx;
+
 extern void *isofs_irx;
 extern int size_isofs_irx;
 
@@ -272,7 +275,7 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxptr_tab[n++].irxsize = size_eesync_irx; 
 	irxptr_tab[n++].irxsize = size_cdvdman_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
-	irxptr_tab[n++].irxsize = size_usbhdfsd_irx;
+	irxptr_tab[n++].irxsize = size_ingame_usbhdfsd_irx;
 	irxptr_tab[n++].irxsize = size_isofs_irx;
 	irxptr_tab[n++].irxsize = size_ps2dev9_irx;	
 	irxptr_tab[n++].irxsize = size_ps2ip_irx;	
@@ -284,7 +287,7 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxsrc[n++] = (void *)&eesync_irx;	
 	irxsrc[n++] = (void *)&cdvdman_irx;
 	irxsrc[n++] = (void *)usbd_irx;
-	irxsrc[n++] = (void *)&usbhdfsd_irx;
+	irxsrc[n++] = (void *)&ingame_usbhdfsd_irx;
 	irxsrc[n++] = (void *)&isofs_irx;
 	irxsrc[n++] = (void *)&ps2dev9_irx;
 	irxsrc[n++] = (void *)&ps2ip_irx;

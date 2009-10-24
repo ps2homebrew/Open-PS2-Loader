@@ -693,7 +693,7 @@ int _start(int argc, char** argv)
 	
 	// register dummy cdvdstm exports, so that
 	// further load of CDVDSTM will fail	
-	//RegisterLibraryEntries(&_exp_cdvdstm);
+	RegisterLibraryEntries(&_exp_cdvdstm);
 	
 	// Create SCMD semaphore
 	cdvdman_createSCmdsema();

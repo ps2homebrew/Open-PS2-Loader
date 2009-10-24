@@ -33,10 +33,8 @@ struct irx_export_table _exp_isofs;
 
 static int g_isofs_io_sema;
 
-static int g_iso_fd0 = -1;
-static int g_iso_fd1 = -1;
-static int g_iso_fd2 = -1;
-static int g_iso_fd3 = -1;
+#define ISO_MAX_PARTS	8
+static int g_iso_fd[ISO_MAX_PARTS];
 
 // fs driver ops functions prototypes
 int fs_dummy(void);
@@ -234,55 +232,55 @@ iop_device_t *isofs_GetDevice(void) // Export #4
 }
 
 //-------------------------------------------------------------------------
-int isofs_ReadISO(u32 offset, u32 nbytes, void *buf)
+int isofs_Read0(u32 offset, u32 nbytes, void *buf, int part)
 {
 	register int r;
 	register int bytes_to_read;
 	u8 *p = (u8 *)buf;
 	
 	#ifdef NETLOG_DEBUG
-		netlog_send("isofs_ReadISO: offset = %d nbytes = %d\n", offset, nbytes);
+		netlog_send("isofs_Read0: offset = %d nbytes = %d part = %d\n", offset, nbytes, part);
 	#endif	
 
 	r = 0;
 	bytes_to_read = nbytes;
 		
 	if(offset<0x40000000){
-		lseek(g_iso_fd0, offset, SEEK_SET);
+		lseek(g_iso_fd[part+0], offset, SEEK_SET);
 		if ((offset + nbytes) > 0x3fffffff) {
 			bytes_to_read = 0x40000000 - offset;
 			nbytes -= bytes_to_read; 
 			offset = 0x40000000;
 		}	
-		r += read(g_iso_fd0, &p[r], bytes_to_read);
+		r += read(g_iso_fd[part+0], &p[r], bytes_to_read);
 		bytes_to_read = nbytes;	
 	}
 		
 	if(offset>=0x40000000 && offset<0x80000000){
-		lseek(g_iso_fd1, offset-0x40000000, SEEK_SET);
+		lseek(g_iso_fd[part+1], offset-0x40000000, SEEK_SET);
 		if ((offset + nbytes) > 0x7fffffff) {
 			bytes_to_read = 0x80000000 - offset;
 			nbytes -= bytes_to_read; 
 			offset = 0x80000000;
 		}			
-		r += read(g_iso_fd1, &p[r], bytes_to_read);	
+		r += read(g_iso_fd[part+1], &p[r], bytes_to_read);	
 		bytes_to_read = nbytes;
 	}
 	
 	if(offset>=0x80000000 && offset<0xc0000000){
-		lseek(g_iso_fd2, offset-0x80000000, SEEK_SET);
+		lseek(g_iso_fd[part+2], offset-0x80000000, SEEK_SET);
 		if ((offset + nbytes) > 0xbfffffff) {
 			bytes_to_read = 0xc0000000 - offset;
 			nbytes -= bytes_to_read; 
 			offset = 0xc0000000;
 		}					
-		r += read(g_iso_fd2, &p[r], bytes_to_read);	
+		r += read(g_iso_fd[part+2], &p[r], bytes_to_read);	
 		bytes_to_read = nbytes;
 	}
 		
 	if(offset>=0xC0000000 && offset<0x100000000){
-		lseek(g_iso_fd3, offset-0xC0000000, SEEK_SET);						
-		r += read(g_iso_fd3, &p[r], bytes_to_read);	
+		lseek(g_iso_fd[part+3], offset-0xC0000000, SEEK_SET);						
+		r += read(g_iso_fd[part+3], &p[r], bytes_to_read);	
 	}
 	
 	return r;
@@ -292,20 +290,78 @@ int isofs_ReadISO(u32 offset, u32 nbytes, void *buf)
 int isofs_ReadSect(u32 lsn, u32 nsectors, void *buf) // Export #5
 {
 	register int r;
-	register u32 offset, nbytes;
+	register u32 offset, nbytes_lo, nbytes_hi, u32limit;
 
 	#ifdef NETLOG_DEBUG
 		netlog_send("isofs_ReadSect: LBA = %d nsectors = %d\n", lsn, nsectors);
 	#endif	
-			
-	offset = lsn << 11;
-	nbytes = nsectors << 11;
-	
-	r = isofs_ReadISO(offset, nbytes, buf);
-	if (r != nbytes)
-		return 0;
-			
+
+	if (lsn < 0x200000) { 			// offset in bytes is inside u32 range
+		offset = lsn << 11;
+		nbytes_lo = nsectors << 11;
+		nbytes_hi = 0;
+		u32limit = 0xffffffff - offset;
+		if (nbytes_lo > u32limit) {	// we'll have bytes outside u32 range to read
+			nbytes_hi = nbytes_lo - u32limit; 
+			nbytes_lo = u32limit;
+		}
+		r = isofs_Read0(offset, nbytes_lo, buf, 0);
+		if (r != nbytes_lo)
+			return 0;
+		if (nbytes_hi) {
+			r = isofs_Read0(0, nbytes_hi, (void *)(buf+nbytes_lo), 4);
+			if (r != nbytes_hi)
+				return 0;			
+		}
+	}
+	else { 							// offset in bytes is outside u32 range
+		offset = (lsn-0x200000) << 11;
+		nbytes_hi = nsectors << 11;
+		r = isofs_Read0(offset, nbytes_hi, buf, 4);
+		if (r != nbytes_hi)
+			return 0;
+	}
+
 	return 1;
+}
+
+//-------------------------------------------------------------------------
+int isofs_ReadISO(u32 lsn, u32 pos, u32 nbytes, void *buf)
+{
+	register int r;
+	register u32 offset, nbytes_lo, nbytes_hi, u32limit;
+
+	#ifdef NETLOG_DEBUG
+		netlog_send("isofs_ReadISO: LBA = %d pos = %d nbytes = %d\n", lsn, pos, nbytes);
+	#endif	
+
+	if (lsn < 0x200000) { 			// offset in bytes is inside u32 range
+		offset = (lsn << 11) + pos;
+		nbytes_lo = nbytes;
+		nbytes_hi = 0;
+		u32limit = 0xffffffff - offset;
+		if (nbytes_lo > u32limit) {	// we'll have bytes outside u32 range to read
+			nbytes_hi = nbytes_lo - u32limit; 
+			nbytes_lo = u32limit;
+		}
+		r = isofs_Read0(offset, nbytes_lo, buf, 0);
+		if (r != nbytes_lo)
+			return 0;
+		if (nbytes_hi) {
+			r = isofs_Read0(0, nbytes_hi, (void *)(buf+nbytes_lo), 4);
+			if (r != nbytes_hi)
+				return r;			
+		}
+	}
+	else { 							// offset in bytes is outside u32 range
+		offset = ((lsn-0x200000) << 11) + pos;
+		nbytes_hi = nbytes;
+		r = isofs_Read0(offset, nbytes_hi, buf, 4);
+		if (r != nbytes_hi)
+			return r;
+	}
+
+	return nbytes;
 }
 
 //-------------------------------------------------------------------------
@@ -1315,7 +1371,6 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 {
 	register int r;
 	FHANDLE *fh;
-	register u32 offset;
 
 	#ifdef NETLOG_DEBUG
 		netlog_send("isofs_Read: fd = %d nbytes = %d\n", fd, nbytes);
@@ -1339,12 +1394,11 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 		memcpy(buf, &p[fh->position], nbytes);
 		r = nbytes;		
 	}	
-	else {			
-		offset = (fh->lsn << 11)+ fh->position;	
-		r = isofs_ReadISO(offset, nbytes, buf);		
+	else {
+		r = isofs_ReadISO(fh->lsn, fh->position, nbytes, buf);
 	}
 	fh->position += r;
-					
+
     return r;
 }
 
@@ -1532,7 +1586,9 @@ int isofs_GetDiscType(void) // Export #7
 int _start(int argc, char** argv)
 {				
 	iop_sema_t smp;
-	
+	register int i;
+	char path[255];
+
 	SifInitRpc(0);
 	
 	// Register isofs export table	
@@ -1555,7 +1611,6 @@ int _start(int argc, char** argv)
 #ifdef NETLOG_DEBUG	
 	iop_library_table_t *libtable;
 	iop_library_t *libptr;
-	register int i;
 	void **export_tab;	
 	char netlog_modname[8] = "netlog\0\0";
 
@@ -1579,37 +1634,22 @@ int _start(int argc, char** argv)
 	netlog_send = export_tab[6];
 #endif
 
-	char path[255];
-	
+	// check if number of parts have been filled
 	if (g_ISO_parts==0x69){
 		printf("ERROR: incorrect number of parts\n");
 		return MODULE_NO_RESIDENT_END;
 	}
+
+	// set all file handles to -1
+	memset(&g_iso_fd, -1,sizeof(g_iso_fd));
+
+	// open all ISO parts
+	for (i=0; i<g_ISO_parts; i++) {
+		sprintf(path,"mass:%s.%02x", g_ISO_name, i);
+		g_iso_fd[i] = open(path, O_RDONLY);
+		printf("%s ret %d\n", path, g_iso_fd[i]);
+	}
 		
-	sprintf(path,"mass:%s.%02x",g_ISO_name,0);
-	g_iso_fd0 = open(path, O_RDONLY);
-	printf("%s ret %d\n",path, g_iso_fd0);
-	
-	if (g_ISO_parts>=0x02){
-		sprintf(path,"mass:%s.%02x",g_ISO_name,1);
-		g_iso_fd1 = open(path, O_RDONLY);
-		printf("%s ret %d\n",path, g_iso_fd1);
-	}
-	
-	if (g_ISO_parts>=0x03){
-		sprintf(path,"mass:%s.%02x",g_ISO_name,2);
-		g_iso_fd2 = open(path, O_RDONLY);
-		printf("%s ret %d\n",path, g_iso_fd2);
-	}
-
-	if (g_ISO_parts>=0x04){
-		sprintf(path,"mass:%s.%02x",g_ISO_name,3);
-		g_iso_fd3 = open(path, O_RDONLY);
-		printf("%s ret %d\n",path, g_iso_fd3);
-	}
-
-	//g_iso_fd0 = open("mass:GAME.ISO", O_RDONLY);
-												
 	return MODULE_RESIDENT_END;
 }
 

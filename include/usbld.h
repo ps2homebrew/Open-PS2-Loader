@@ -41,6 +41,8 @@ struct TGameList
 
 TGameList *firstgame;
 TGameList *actualgame;
+TGameList *eth_firstgame;
+TGameList *eth_actualgame;
 
 /// Forward decls.
 struct TMenuItem;
@@ -130,6 +132,7 @@ int v_anim;
 int direc;
 int max_settings;
 int max_games;
+int eth_max_games;
 int gLanguageID;
 
 int background_image;
@@ -163,12 +166,17 @@ void LoadGameList();
 //SYSTEM
 
 int usbdelay;
+int ethdelay;
 
 void Reset();
 void delay(int count);
+void Start_LoadNetworkModules_Thread(void);
 void LoadUSBD();
-void LaunchGame(TGame *game);
+void LaunchGame(TGame *game, int mode);
 void SendIrxKernelRAM(void);
+
+#define USB_MODE	0
+#define ETH_MODE	1
 
 
 //PAD

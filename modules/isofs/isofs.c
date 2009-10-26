@@ -24,7 +24,11 @@ IRX_ID(MODNAME, 1, 0);
 static char g_ISO_name[]="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 static char g_ISO_parts=0x69;
 static char g_ISO_media=0x69;
+static char g_ISO_mode=0x69;
 static char skipmod_tab[256] = "\0";
+
+#define USB_MODE 	0
+#define ETH_MODE 	1
 
 extern void *dummy_irx;
 extern int size_dummy_irx;
@@ -1645,7 +1649,10 @@ int _start(int argc, char** argv)
 
 	// open all ISO parts
 	for (i=0; i<g_ISO_parts; i++) {
-		sprintf(path,"mass:%s.%02x", g_ISO_name, i);
+		if (g_ISO_mode == USB_MODE)
+			sprintf(path,"mass:%s.%02x", g_ISO_name, i);
+		else if (g_ISO_mode == ETH_MODE)
+			sprintf(path,"smb0:\\%s.%02x", g_ISO_name, i);
 		g_iso_fd[i] = open(path, O_RDONLY);
 		printf("%s ret %d\n", path, g_iso_fd[i]);
 	}

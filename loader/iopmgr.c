@@ -1,8 +1,6 @@
 #include "loader.h"
 #include "iopmgr.h"
 
-// #define NETLOG_DEBUG
-
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
 
@@ -32,6 +30,12 @@ extern int size_ps2smap_irx;
 
 extern void *netlog_irx;
 extern int size_netlog_irx;
+
+extern void *smbman_irx;
+extern int size_smbman_irx;
+
+extern void *dummy_irx;
+extern int size_dummy_irx;
 
 /*----------------------------------------------------------------------------------------*/
 
@@ -127,12 +131,15 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}
 	else { 
-		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);		
-		Patch_Mod(&ioprp_img, "CDVDFSV", usbd_irx, size_usbd_irx);		
+		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
+		if (GameMode == USB_MODE)
+			Patch_Mod(&ioprp_img, "CDVDFSV", usbd_irx, size_usbd_irx);
+		else if	(GameMode == ETH_MODE)
+			Patch_Mod(&ioprp_img, "CDVDFSV", dummy_irx, size_dummy_irx);
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
 
-	SifExitRpc();  // Commenting this it works on PS3 with EE emulation
+	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
 	
@@ -188,16 +195,18 @@ int New_Reset_Iop(const char *arg, int flag){
 	LoadFileInit();
 	Sbv_Patch();
 	
-	LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
-	delay(3);
-
-#ifdef NETLOG_DEBUG	
-	LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-	LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
-	LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
-	LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-#endif	
-		
+	if (GameMode == USB_MODE) {
+		LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
+		delay(3);
+	}
+	else if (GameMode == ETH_MODE) {
+		LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+		LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
+		LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
+		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+		LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
+	}	
+	
 	LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
 	FlushCache(0);	
 	

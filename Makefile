@@ -9,7 +9,7 @@ EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/imgdrv.o obj/eesync.o \
 		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/ingame_usbhdfsd.o obj/isofs.o \
-		  obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o \
+		  obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/dummy.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o
 EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lmc -lc
@@ -46,6 +46,10 @@ clean:
 	$(MAKE) -C modules/dev9 clean	
 	echo "    * netlog.irx"
 	$(MAKE) -C modules/netlog clean	
+	echo "    * smbman.irx"
+	$(MAKE) -C modules/smbman clean
+	echo "    * dummy.irx"
+	$(MAKE) -C modules/dummy_irx clean	
 	echo "    * iso2usbld"
 	$(MAKE) -C pc clean
 
@@ -108,7 +112,17 @@ netlog.s:
 	echo "    * netlog.irx"
 	$(MAKE) -C modules/netlog
 	bin2s modules/netlog/netlog.irx asm/netlog.s netlog_irx
-		
+
+smbman.s:
+	echo "    * smbman.irx"
+	$(MAKE) -C modules/smbman
+	bin2s modules/smbman/smbman.irx asm/smbman.s smbman_irx
+	
+dummy.s:
+	echo "    * dummy.irx"
+	$(MAKE) -C modules/dummy_irx
+	bin2s modules/dummy_irx/dummy.irx asm/dummy.s dummy_irx
+			
 font.s:
 	bin2s gfx/font.raw asm/font.s font_raw
 

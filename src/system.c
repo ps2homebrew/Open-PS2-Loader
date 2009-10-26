@@ -1,3 +1,9 @@
+/*
+  Copyright 2009, Ifcaro
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.  
+*/
+
 #include "include/usbld.h"
 
 extern void *imgdrv_irx;

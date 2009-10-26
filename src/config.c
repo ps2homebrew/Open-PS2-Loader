@@ -1,3 +1,9 @@
+/*
+  Copyright 2009, Ifcaro & volca
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.  
+*/
+
 #include "include/usbld.h"
 #include <string.h>
 #include "fileio.h"

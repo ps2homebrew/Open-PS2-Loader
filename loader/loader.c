@@ -1,3 +1,11 @@
+/*
+  Copyright 2009, Ifcaro & jimmikaelkael
+  Copyright 2006-2008 Polo
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+  Some parts of the code are taken from HD Project by Polo
+*/
 
 extern void *usbd_irx;
 extern int size_usbd_irx;

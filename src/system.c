@@ -39,8 +39,20 @@ extern int size_ps2smap_irx;
 extern void *netlog_irx;
 extern int size_netlog_irx;
 
+extern void *smbman_irx;
+extern int size_smbman_irx;
+
+extern void *dummy_irx;
+extern int size_dummy_irx;
+
 extern void *loader_elf;
 extern int size_loader_elf;
+
+extern void *_gp;
+
+#define IPCONFIG_MAX_LEN	64
+char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+int g_ipconfig_len;
 
 #define ELF_MAGIC		0x464c457f
 #define ELF_PT_LOAD		1
@@ -135,6 +147,54 @@ int PS3Detect(){ //return 0=PS2 1=PS3-HARD 2=PS3-SOFT
 	return 0;
 }
 
+void set_ipconfig(void)
+{
+	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
+	g_ipconfig_len = 0;
+	
+	// add ip to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.10", 15);
+	g_ipconfig_len += strlen("192.168.0.10") + 1;
+
+	// add netmask to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], "255.255.255.0", 15);
+	g_ipconfig_len += strlen("255.255.255.0") + 1;
+
+	// add gateway to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.1", 15);
+	g_ipconfig_len += strlen("192.168.0.1") + 1;
+}
+
+void th_LoadNetworkModules(void *args){
+	
+	int ret, id;
+	
+	set_ipconfig();
+	
+	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+	id=SifExecModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL, &ret);
+	id=SifExecModuleBuffer(&ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig, &ret);	
+	
+	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
+}
+
+void Start_LoadNetworkModules_Thread(void){
+	
+	ee_thread_t thread;
+	s32 thread_id;
+
+	memset(&thread, 0, sizeof(thread));
+
+	thread.func				= (void *)th_LoadNetworkModules;
+	thread.stack_size		= 0x100000;
+	thread.gp_reg			= &_gp;
+	thread.initial_priority	= 0x1e;
+
+	thread_id = CreateThread(&thread);
+
+	StartThread(thread_id, NULL);
+}
+
 void LoadUSBD(){
 	int fd, ps3model;
 	
@@ -191,7 +251,7 @@ unsigned int crc32(char *string)
     return crc;
 }
 
-void LaunchGame(TGame *game)
+void LaunchGame(TGame *game, int mode)
 {
 	u8 *boot_elf;
 	elf_header_t *eh;
@@ -201,6 +261,7 @@ void LaunchGame(TGame *game)
 	char *argv[2];
 	char isoname[32];
 	char filename[32];
+	u8 mode_val;
 	
 	sprintf(filename,"%s",game->Image+3);
 	
@@ -214,9 +275,18 @@ void LaunchGame(TGame *game)
 	
 	memcpy((void*)((u32)&isofs_irx+i),isoname,strlen(isoname)+1);
 	memcpy((void*)((u32)&isofs_irx+i+33),&game->parts,1);
-	memcpy((void*)((u32)&isofs_irx+i+34),&game->media,1);
-	memcpy((void*)((u32)&isofs_irx+i+36),"USBD.IRX\nDECI2.IRX\nSNMON.IRX\0", 29);
-	
+	memcpy((void*)((u32)&isofs_irx+i+34),&game->media,1);	
+	if (mode == USB_MODE) {
+		mode_val = USB_MODE;
+		memcpy((void*)((u32)&isofs_irx+i+35),&mode_val,1);
+		memcpy((void*)((u32)&isofs_irx+i+36),"USBD.IRX\nDECI2.IRX\nSNMON.IRX\0", 29);
+	}
+	else if (mode == ETH_MODE) {
+		mode_val = ETH_MODE;
+		memcpy((void*)((u32)&isofs_irx+i+35),&mode_val,1);
+		memcpy((void*)((u32)&isofs_irx+i+36),"DEV9.IRX\nSMAP.IRX\nDECI2.IRX\nSNMON.IRX\0", 38);
+	}
+		
 	FlushCache(0);
 		
 	SendIrxKernelRAM();
@@ -251,13 +321,17 @@ void LaunchGame(TGame *game)
 	FlushCache(0);
 	FlushCache(2);
 	
-	argv[0] = filename;
+	if (mode == USB_MODE)
+		argv[0] = "USB_MODE";
+	else if (mode == ETH_MODE)
+		argv[0] = "ETH_MODE";
+		
 	argv[1] = filename;
 	
 	ExecPS2((void *)eh->entry, 0, 2, argv);
 } 
 
-#define IRX_NUM 10
+#define IRX_NUM 12
 
 //-------------------------------------------------------------- 
 void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
@@ -281,6 +355,8 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxptr_tab[n++].irxsize = size_ps2ip_irx;	
 	irxptr_tab[n++].irxsize = size_ps2smap_irx;	
 	irxptr_tab[n++].irxsize = size_netlog_irx;
+	irxptr_tab[n++].irxsize = size_smbman_irx;	
+	irxptr_tab[n++].irxsize = size_dummy_irx;	
 	 	
 	n = 0;
 	irxsrc[n++] = (void *)&imgdrv_irx;
@@ -293,6 +369,8 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxsrc[n++] = (void *)&ps2ip_irx;
 	irxsrc[n++] = (void *)&ps2smap_irx;
 	irxsrc[n++] = (void *)&netlog_irx;
+	irxsrc[n++] = (void *)&smbman_irx;
+	irxsrc[n++] = (void *)&dummy_irx;	
 	
 	irxsize = 0;		
 

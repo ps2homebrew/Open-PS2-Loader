@@ -31,6 +31,12 @@ int size_ps2smap_irx;
 void *netlog_irx;
 int size_netlog_irx;
 
+void *smbman_irx;
+int size_smbman_irx;
+
+void *dummy_irx;
+int size_dummy_irx;
+
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
 
@@ -93,7 +99,7 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 	return 0;
 }
 
-#define IRX_NUM 10
+#define IRX_NUM 12
 
 //-------------------------------------------------------------- 
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
@@ -121,6 +127,8 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	size_ps2ip_irx = irxptr_tab[n++].irxsize;
 	size_ps2smap_irx = irxptr_tab[n++].irxsize;
 	size_netlog_irx = irxptr_tab[n++].irxsize;
+	size_smbman_irx = irxptr_tab[n++].irxsize;
+	size_dummy_irx = irxptr_tab[n++].irxsize;	
 			
 	n = 0;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
@@ -133,6 +141,8 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	ps2ip_irx = (void *)irxptr_tab[n++].irxaddr;
 	ps2smap_irx = (void *)irxptr_tab[n++].irxaddr;
 	netlog_irx = (void *)irxptr_tab[n++].irxaddr;
+	smbman_irx = (void *)irxptr_tab[n++].irxaddr;
+	dummy_irx = (void *)irxptr_tab[n++].irxaddr;	
 }	
 
 // ------------------------------------------------------------------------

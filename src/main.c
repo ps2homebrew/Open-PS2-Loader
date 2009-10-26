@@ -4,13 +4,29 @@
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+extern void *ps2dev9_irx;
+extern int size_ps2dev9_irx;
+
+extern void *ps2ip_irx;
+extern int size_ps2ip_irx;
+
+extern void *ps2smap_irx;
+extern int size_ps2smap_irx;
+
+extern void *smbman_irx;
+extern int size_smbman_irx;
+
 // language id
 int gLanguageID = 0;
 
 // Submenu items variant of the game list... keeped in sync with the game item list (firstgame, actualgame)
 struct TSubMenuList* usb_submenu = NULL;
+struct TSubMenuList* eth_submenu = NULL;
+
 /// List of usb games
 struct TMenuItem usb_games_item;
+/// List of network games
+struct TMenuItem network_games_item;
 
 /// scroll speed selector
 struct TSubMenuList* speed_item = NULL;
@@ -125,7 +141,114 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(0, 0);
 	padPortClose(1, 0);
 	padReset();
-	LaunchGame(&actualgame->Game);
+	LaunchGame(&actualgame->Game, USB_MODE);
+}
+
+void ClearETHSubMenu() {
+	DestroySubMenu(&eth_submenu);
+	AppendSubMenu(&eth_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
+	network_games_item.submenu = eth_submenu;
+	network_games_item.current = eth_submenu;
+}
+
+void RefreshETHGameList() {
+	int fd, size, n;
+	TGameList *list;
+	TGame buffer;
+	
+	if(ethdelay<=100)  {
+		ethdelay++;
+		return;
+	}
+		  
+	ethdelay = 0;
+	fd=fioOpen("smb0:\\ul.cfg", O_RDONLY);
+	
+	if(fd<0) { // file could not be opened. reset menu
+		if(eth_max_games>0) {
+			eth_actualgame=eth_firstgame;
+			while(eth_actualgame->next!=0){
+				eth_actualgame=eth_actualgame->next;
+				free(eth_actualgame->prev);
+			}
+			free(eth_actualgame);
+		}
+		eth_max_games=0;
+		
+		ClearETHSubMenu();
+		return;
+	}
+
+	// only refresh if the list is empty
+	if (eth_max_games==0) {
+		DestroySubMenu(&eth_submenu);
+		eth_submenu = NULL;
+		network_games_item.submenu = eth_submenu;
+		network_games_item.current = eth_submenu;
+
+		size = fioLseek(fd, 0, SEEK_END);  
+		fioLseek(fd, 0, SEEK_SET); 
+		
+		int id = 1; // game id (or order)
+		for(n=0;n<size;n+=0x40,++id){
+			fioRead(fd, &buffer, 0x40);
+			list=(TGameList*)malloc(sizeof(TGameList));
+			memcpy(&list->Game,&buffer,sizeof(TGame));
+			if(eth_actualgame!=NULL){
+				eth_actualgame->next=list;
+				list->prev=eth_actualgame;
+			}else{
+				eth_firstgame=list;
+				list->prev=0;
+			}
+			list->next=0;
+			eth_actualgame=list;
+			eth_max_games++;
+			
+			AppendSubMenu(&eth_submenu, &disc_icon, eth_actualgame->Game.Name, id, -1);
+		}
+		
+			
+		network_games_item.submenu = eth_submenu;
+		network_games_item.current = eth_submenu;
+		eth_actualgame=eth_firstgame;
+	}
+
+	fioClose(fd);
+}
+
+// --------------------- Network Menu item callbacks --------------------
+void PrevETHGame(struct TMenuItem *self) {
+	if (!eth_actualgame)
+		return;
+	
+	if(eth_actualgame->prev!=NULL){
+		eth_actualgame=eth_actualgame->prev;
+	}
+}
+
+void NextETHGame(struct TMenuItem *self) {
+	if (!eth_actualgame)
+		return;
+
+	if(eth_actualgame->next!=NULL){
+		eth_actualgame=eth_actualgame->next;
+	}
+}
+
+int ResetETHOrder(struct TMenuItem *self) {
+	eth_actualgame = eth_firstgame;
+	return 0;
+}
+
+void ExecETHGameSelection(struct TMenuItem* self, int id) {
+	if (id == -1)
+		return;
+	
+	padPortClose(0, 0);
+	padPortClose(1, 0);
+	padReset();
+	LaunchGame(&eth_actualgame->Game, ETH_MODE);
 }
 
 // --------------------- Exit/Settings Menu item callbacks --------------------
@@ -196,7 +319,7 @@ struct TMenuItem hdd_games_item = {
 };
 
 struct TMenuItem network_games_item = {
-	&games_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL
+	&games_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &NextETHGame, &PrevETHGame, &ResetETHOrder, &RefreshETHGameList
 };
 
 struct TMenuItem apps_item = {
@@ -208,6 +331,7 @@ void InitMenuItems() {
 	gLanguageID = _LANG_ID_ENGLISH;
 	
 	ClearUSBSubMenu();
+	ClearETHSubMenu();	
 	
 	// initialize the menu
 	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_THEME);
@@ -225,7 +349,7 @@ void InitMenuItems() {
 	AppendMenuItem(&settings_item);
 	AppendMenuItem(&usb_games_item);
 	AppendMenuItem(&hdd_games_item);
-	// TODO: For example: AppendMenuItem(&network_games_item);
+	AppendMenuItem(&network_games_item);
 	AppendMenuItem(&apps_item);
 }
 
@@ -244,12 +368,12 @@ int main(void)
 	mcInit(MC_TYPE_MC);
 
 	int ret, id;
-	
+		
 	LoadUSBD();
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
-
-	delay(3);
 	
+	delay(3);
+		
 	InitMenu();
 	
 	delay(1);
@@ -266,9 +390,12 @@ int main(void)
 	
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
-
+	
+	Start_LoadNetworkModules_Thread();	
+	
 	max_games=0;
 	usbdelay=0;
+	ethdelay=0;
 	frame=0;
 	TextColor(0x80,0x80,0x80,0x80);
 	

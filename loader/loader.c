@@ -44,7 +44,12 @@ int main(int argc, char **argv){
 	argv[1][12]=0x00; // fix for 8+3 filename.
 
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);
-
+		
+	if (!strcmp(argv[0], "USB_MODE"))
+		GameMode = USB_MODE;
+	else if (!strcmp(argv[0], "ETH_MODE"))
+		GameMode = ETH_MODE;
+		
 	GetIrxKernelRAM();
 	
 	// Clearing user mem, so better not to have anything valuable on stack

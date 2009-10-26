@@ -6,6 +6,12 @@ extern int size_cdvdman_irx;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
+extern void *smbman_irx;
+extern int size_smbman_irx;
+
+extern void *dummy_irx;
+extern int size_dummy_irx;
+
 /*----------------------------------------------------------------------------------------*/
 /* Copy 'size' bytes of 'eedata' from EE to 'iopptr' in IOP.                              */
 /*----------------------------------------------------------------------------------------*/
@@ -236,10 +242,17 @@ int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 		else if (!strcmp(romdir_in->fileName, "CDVDFSV")) {
 			DIntr(); // get back dummy drv from kernel ram		
 			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), usbd_irx, size_usbd_irx);
+			if (GameMode == USB_MODE) {
+				memcpy((void*)((u32)ioprp_img->data_out+offset_out), usbd_irx, size_usbd_irx);
+				romdir_out->fileSize = size_usbd_irx;
+			}
+			else if (GameMode == ETH_MODE) {
+				memcpy((void*)((u32)ioprp_img->data_out+offset_out), dummy_irx, size_dummy_irx);
+				romdir_out->fileSize = size_dummy_irx;
+			}
 			ee_kmode_exit();
 			EIntr();
-			romdir_out->fileSize = size_usbd_irx;
+			
 		}
 		else if((strcmp(romdir_in->fileName, "ROMDIR")) && (strcmp(romdir_in->fileName, "IOPBTCONF"))) {
 			memcpy((void*)((u32)ioprp_img->data_out+offset_out), (void*)((u32)ioprp_img->data_in+offset_in), romdir_in->fileSize);

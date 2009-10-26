@@ -66,6 +66,10 @@ extern int set_reg_disabled;
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 int g_ipconfig_len;
 
+int GameMode;
+#define USB_MODE 	0
+#define ETH_MODE 	1
+
 /* modmgr.c */
 int  LoadFileInit();
 void LoadFileExit();

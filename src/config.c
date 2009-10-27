@@ -216,6 +216,47 @@ int getConfigColor(struct TConfigSet* config, const char* key, int* color) {
 	}
 }
 
+void readIPConfig(){
+	char ipconfig[255];
+	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_RDONLY);
+	if (fd<=0) {
+		//DEBUG: printf("No config. Exiting...\n");
+		return;
+	}
+	filesize = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	
+	fioRead(fd, &ipconfig, filesize);
+		
+	sscanf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3],
+															&ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],
+															&ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
+
+	
+	fioClose(fd);
+	
+	return;
+}
+
+void writeIPConfig(){
+	char ipconfig[255];
+	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
+	if (fd<=0) {
+		//DEBUG: printf("No config. Exiting...\n");
+		return;
+	}
+		
+	sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
+															ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
+															ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+
+	fioWrite(fd, ipconfig, strlen(ipconfig)+1);
+	
+	fioClose(fd);
+	
+	return;
+}
+
 
 int readConfig(struct TConfigSet* config, char *fname) {
 	int fd=fioOpen(fname, O_RDONLY);

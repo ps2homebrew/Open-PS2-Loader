@@ -135,6 +135,11 @@ void InitGFX() {
 	text_color[1]=0xff;
 	text_color[2]=0xff;
 	
+	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
+	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
+	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
+	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
+	
 	infotxt = _l(_STR_WELCOME); // be sure to replace after doing a language change!
 	
 	setConfigInt(&gConfig, "scrolling", scroll_speed);
@@ -371,15 +376,15 @@ void LoadConfig(char* fname, int clearFirst) {
 	// fill the config from file
 	readConfig(&gConfig, fname);
 	
-	char *themename;
+	char *temp;
 	
 	// reinit all the values we are interested in from the config
 	if (getConfigInt(&gConfig, "scrolling", &scroll_speed))
 		UpdateScrollSpeed();
 	
 	getConfigInt(&gConfig, "menutype", &dynamic_menu);
-	if (getConfigStr(&gConfig, "theme", &themename))
-		strncpy(theme, themename, 32);
+	if (getConfigStr(&gConfig, "theme", &temp))
+		strncpy(theme, temp, 32);
 	if (getConfigColor(&gConfig, "bgcolor", bg_color))
 		SetColor(bg_color[0],bg_color[1],bg_color[2]);
 				
@@ -393,6 +398,9 @@ void LoadConfig(char* fname, int clearFirst) {
 	
 	if (getConfigInt(&gConfig, "language", &gLanguageID))
 		setLanguage(gLanguageID);
+		
+	if (getConfigStr(&gConfig, "pc_ip", &temp))
+		sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
 }
 
 int SaveConfig(char* fname) {
@@ -404,10 +412,17 @@ int SaveConfig(char* fname) {
 	setConfigColor(&gConfig, "textcolor", text_color);
 	setConfigInt(&gConfig, "language", gLanguageID);
 	
+	char temp[255];
+	
+	sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	
+	setConfigStr(&gConfig, "pc_ip", temp);
+	
 	return writeConfig(&gConfig, fname);
 }
 
 void LoadResources() {
+	readIPConfig();
 	LoadConfig("mass:USBLD/usbld.cfg", 0);
 	LoadIcons();
 	UpdateIcons();
@@ -733,6 +748,373 @@ void DrawConfig(){
 		SetColor(new_bg_color[0],new_bg_color[1],new_bg_color[2]);
 		TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
 		
+		Flip();
+	}
+}
+
+void DrawIPConfig(){
+	char tmp[255];
+	int v_pos=0, i;
+	int new_ps2_ip[4];
+	int new_ps2_netmask[4];
+	int new_ps2_gateway[4];
+	int new_pc_ip[4];
+	int editing_ps2_ip=0;
+	int editing_ps2_netmask=0;
+	int editing_ps2_gateway=0;
+	int editing_pc_ip=0;
+	
+	for(i=0;i<4;i++){
+		new_ps2_ip[i]=ps2_ip[i];
+		new_ps2_netmask[i]=ps2_netmask[i];
+		new_ps2_gateway[i]=ps2_gateway[i];
+		new_pc_ip[i]=pc_ip[i];
+	}	
+
+	while(1){
+		ReadPad();
+				
+		DrawScreen();
+
+		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+		DrawQuad(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Darker);
+		DrawQuad(gsGlobal, 110.0f, 110.0f, 530.0f, 110.0f, 110.0f, 402.0f, 530.0f, 402.0f, z, Wave_a);
+		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 110.0f, 110.0f, 530.0f, 110.0f, z, Wave_a, Wave_a, Wave_d, Wave_d);
+		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 110.0f, 110.0f, 100.0f, 412.0f, 110.0f, 402.0f, z, Wave_a, Wave_b, Wave_a, Wave_b);
+		DrawQuad_gouraud(gsGlobal, 110.0f, 402.0f, 530.0f, 402.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Wave_b, Wave_b, Wave_d, Wave_d);
+		DrawQuad_gouraud(gsGlobal, 530.0f, 110.0f, 540.0f, 100.0f, 530.0f, 402.0f, 540.0f, 412.0f, z, Wave_b, Wave_d, Wave_b, Wave_d);
+		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+		
+		DrawText(305,120,_l(_STR_IP_CONFIG),1,1);
+		
+		if(editing_ps2_ip==0){
+			snprintf(tmp, 255, "PS2 IP: %3d.%3d.%3d.%3d", new_ps2_ip[0],new_ps2_ip[1],new_ps2_ip[2],new_ps2_ip[3]);
+			if(v_pos==0){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			}
+			DrawText(120,180,tmp,0.8f,0);
+		}else if(editing_ps2_ip==1){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 IP:    .%3d.%3d.%3d",new_ps2_ip[1],new_ps2_ip[2], new_ps2_ip[3]);
+			DrawText(120,180,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "        %3d", new_ps2_ip[0]);
+			DrawText(120,180,tmp,0.8f,0);
+		}else if(editing_ps2_ip==2){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 IP: %3d.   .%3d.%3d",new_ps2_ip[0],new_ps2_ip[2],new_ps2_ip[3]);
+			DrawText(120,180,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "            %3d", new_ps2_ip[1]);
+			DrawText(120,180,tmp,0.8f,0);
+		}else if(editing_ps2_ip==3){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 IP: %3d.%3d.   .%3d",new_ps2_ip[0],new_ps2_ip[1], new_ps2_ip[3]);
+			DrawText(120,180,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                %3d", new_ps2_ip[2]);
+			DrawText(120,180,tmp,0.8f,0);
+		}else if(editing_ps2_ip==4){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 IP: %3d.%3d.%3d.",new_ps2_ip[0],new_ps2_ip[1], new_ps2_ip[2]);
+			DrawText(120,180,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                    %3d", new_ps2_ip[3]);
+			DrawText(120,180,tmp,0.8f,0);
+		}
+		if(editing_ps2_netmask==0){
+			snprintf(tmp, 255, "PS2 NETMASK: %3d.%3d.%3d.%3d", new_ps2_netmask[0],new_ps2_netmask[1],new_ps2_netmask[2],new_ps2_netmask[3]);
+			if(v_pos==1){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			}
+			DrawText(120,220,tmp,0.8f,0);
+		}else if(editing_ps2_netmask==1){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 NETMASK:    .%3d.%3d.%3d",new_ps2_netmask[1],new_ps2_netmask[2], new_ps2_netmask[3]);
+			DrawText(120,220,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "             %3d", new_ps2_netmask[0]);
+			DrawText(120,220,tmp,0.8f,0);
+		}else if(editing_ps2_netmask==2){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 NETMASK: %3d.   .%3d.%3d",new_ps2_netmask[0],new_ps2_netmask[2],new_ps2_netmask[3]);
+			DrawText(120,220,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                 %3d", new_ps2_netmask[1]);
+			DrawText(120,220,tmp,0.8f,0);
+		}else if(editing_ps2_netmask==3){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 NETMASK: %3d.%3d.   .%3d",new_ps2_netmask[0],new_ps2_netmask[1], new_ps2_netmask[3]);
+			DrawText(120,220,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                     %3d", new_ps2_netmask[2]);
+			DrawText(120,220,tmp,0.8f,0);
+		}else if(editing_ps2_netmask==4){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 NETMASK: %3d.%3d.%3d.",new_ps2_netmask[0],new_ps2_netmask[1], new_ps2_netmask[2]);
+			DrawText(120,220,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                         %3d", new_ps2_netmask[3]);
+			DrawText(120,220,tmp,0.8f,0);
+		}	
+		if(editing_ps2_gateway==0){
+			snprintf(tmp, 255, "PS2 GATEWAY: %3d.%3d.%3d.%3d", new_ps2_gateway[0],new_ps2_gateway[1],new_ps2_gateway[2],new_ps2_gateway[3]);
+			if(v_pos==2){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			}
+			DrawText(120,260,tmp,0.8f,0);
+		}else if(editing_ps2_gateway==1){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 GATEWAY:    .%3d.%3d.%3d",new_ps2_gateway[1],new_ps2_gateway[2], new_ps2_gateway[3]);
+			DrawText(120,260,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "             %3d", new_ps2_gateway[0]);
+			DrawText(120,260,tmp,0.8f,0);
+		}else if(editing_ps2_gateway==2){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 GATEWAY: %3d.   .%3d.%3d",new_ps2_gateway[0],new_ps2_gateway[2],new_ps2_gateway[3]);
+			DrawText(120,260,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                 %3d", new_ps2_gateway[1]);
+			DrawText(120,260,tmp,0.8f,0);
+		}else if(editing_ps2_gateway==3){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 GATEWAY: %3d.%3d.   .%3d",new_ps2_gateway[0],new_ps2_gateway[1], new_ps2_gateway[3]);
+			DrawText(120,260,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                     %3d", new_ps2_gateway[2]);
+			DrawText(120,260,tmp,0.8f,0);
+		}else if(editing_ps2_gateway==4){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PS2 GATEWAY: %3d.%3d.%3d.",new_ps2_gateway[0],new_ps2_gateway[1], new_ps2_gateway[2]);
+			DrawText(120,260,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                         %3d", new_ps2_gateway[3]);
+			DrawText(120,260,tmp,0.8f,0);
+		}
+		if(editing_pc_ip==0){
+			snprintf(tmp, 255, "PC IP: %3d.%3d.%3d.%3d", new_pc_ip[0],new_pc_ip[1],new_pc_ip[2],new_pc_ip[3]);
+			if(v_pos==3){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			}
+			DrawText(120,300,tmp,0.8f,0);
+		}else if(editing_pc_ip==1){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PC IP:    .%3d.%3d.%3d",new_pc_ip[1],new_pc_ip[2], new_pc_ip[3]);
+			DrawText(120,300,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "       %3d", new_pc_ip[0]);
+			DrawText(120,300,tmp,0.8f,0);
+		}else if(editing_pc_ip==2){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PC IP: %3d.   .%3d.%3d",new_pc_ip[0],new_pc_ip[2],new_pc_ip[3]);
+			DrawText(120,300,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "           %3d", new_pc_ip[1]);
+			DrawText(120,300,tmp,0.8f,0);
+		}else if(editing_pc_ip==3){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PC IP: %3d.%3d.   .%3d",new_pc_ip[0],new_pc_ip[1], new_pc_ip[3]);
+			DrawText(120,300,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "               %3d", new_pc_ip[2]);
+			DrawText(120,300,tmp,0.8f,0);
+		}else if(editing_pc_ip==4){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PC IP: %3d.%3d.%3d.",new_pc_ip[0],new_pc_ip[1], new_pc_ip[2]);
+			DrawText(120,300,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "                   %3d", new_pc_ip[3]);
+			DrawText(120,300,tmp,0.8f,0);
+		}	
+		
+		if(v_pos==4){
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+		}else{
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+		}
+		DrawText(310,370,_l(_STR_SAVE_CHANGES),1, 1);
+		
+		if(editing_ps2_ip>0){
+			if(GetKey(KEY_UP)){
+				if(new_ps2_ip[editing_ps2_ip-1]<255){
+					new_ps2_ip[editing_ps2_ip-1]++;
+				}
+			}else if(GetKey(KEY_DOWN)){
+				if(new_ps2_ip[editing_ps2_ip-1]>0){
+					new_ps2_ip[editing_ps2_ip-1]--;
+				}
+			}else if(GetKey(KEY_LEFT)){
+				if(editing_ps2_ip>1){
+					editing_ps2_ip--;
+				}
+			}else if(GetKey(KEY_RIGHT)){
+				if(editing_ps2_ip<4){
+					editing_ps2_ip++;
+				}
+			}else if(GetKey(KEY_CIRCLE)){
+				editing_ps2_ip=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				new_ps2_ip[0]=ps2_ip[0];
+				new_ps2_ip[1]=ps2_ip[1];
+				new_ps2_ip[2]=ps2_ip[2];
+				new_ps2_ip[3]=ps2_ip[3];
+			}else if(GetKey(KEY_CROSS)){
+				editing_ps2_ip=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				ps2_ip[0]=new_ps2_ip[0];
+				ps2_ip[1]=new_ps2_ip[1];
+				ps2_ip[2]=new_ps2_ip[2];
+				ps2_ip[3]=new_ps2_ip[3];
+			}
+		}else if(editing_ps2_netmask>0){
+			if(GetKey(KEY_UP)){
+				if(new_ps2_netmask[editing_ps2_netmask-1]<255){
+					new_ps2_netmask[editing_ps2_netmask-1]++;
+				}
+			}else if(GetKey(KEY_DOWN)){
+				if(new_ps2_netmask[editing_ps2_netmask-1]>0){
+					new_ps2_netmask[editing_ps2_netmask-1]--;
+				}
+			}else if(GetKey(KEY_LEFT)){
+				if(editing_ps2_netmask>1){
+					editing_ps2_netmask--;
+				}
+			}else if(GetKey(KEY_RIGHT)){
+				if(editing_ps2_netmask<4){
+					editing_ps2_netmask++;
+				}
+			}else if(GetKey(KEY_CIRCLE)){
+				editing_ps2_netmask=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				new_ps2_netmask[0]=ps2_netmask[0];
+				new_ps2_netmask[1]=ps2_netmask[1];
+				new_ps2_netmask[2]=ps2_netmask[2];
+				new_ps2_netmask[3]=ps2_netmask[3];
+			}else if(GetKey(KEY_CROSS)){
+				editing_ps2_netmask=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				ps2_netmask[0]=new_ps2_netmask[0];
+				ps2_netmask[1]=new_ps2_netmask[1];
+				ps2_netmask[2]=new_ps2_netmask[2];
+				ps2_netmask[3]=new_ps2_netmask[3];
+			}
+		}else if(editing_ps2_gateway>0){
+			if(GetKey(KEY_UP)){
+				if(new_ps2_gateway[editing_ps2_gateway-1]<255){
+					new_ps2_gateway[editing_ps2_gateway-1]++;
+				}
+			}else if(GetKey(KEY_DOWN)){
+				if(new_ps2_gateway[editing_ps2_gateway-1]>0){
+					new_ps2_gateway[editing_ps2_gateway-1]--;
+				}
+			}else if(GetKey(KEY_LEFT)){
+				if(editing_ps2_gateway>1){
+					editing_ps2_gateway--;
+				}
+			}else if(GetKey(KEY_RIGHT)){
+				if(editing_ps2_gateway<4){
+					editing_ps2_gateway++;
+				}
+			}else if(GetKey(KEY_CIRCLE)){
+				editing_ps2_gateway=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				new_ps2_gateway[0]=ps2_gateway[0];
+				new_ps2_gateway[1]=ps2_gateway[1];
+				new_ps2_gateway[2]=ps2_gateway[2];
+				new_ps2_gateway[3]=ps2_gateway[3];
+			}else if(GetKey(KEY_CROSS)){
+				editing_ps2_gateway=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				ps2_gateway[0]=new_ps2_gateway[0];
+				ps2_gateway[1]=new_ps2_gateway[1];
+				ps2_gateway[2]=new_ps2_gateway[2];
+				ps2_gateway[3]=new_ps2_gateway[3];
+			}                 
+		}else if(editing_pc_ip>0){
+			if(GetKey(KEY_UP)){
+				if(new_pc_ip[editing_pc_ip-1]<255){
+					new_pc_ip[editing_pc_ip-1]++;
+				}
+			}else if(GetKey(KEY_DOWN)){
+				if(new_pc_ip[editing_pc_ip-1]>0){
+					new_pc_ip[editing_pc_ip-1]--;
+				}
+			}else if(GetKey(KEY_LEFT)){
+				if(editing_pc_ip>1){
+					editing_pc_ip--;
+				}
+			}else if(GetKey(KEY_RIGHT)){
+				if(editing_pc_ip<4){
+					editing_pc_ip++;
+				}
+			}else if(GetKey(KEY_CIRCLE)){
+				editing_pc_ip=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				new_pc_ip[0]=pc_ip[0];
+				new_pc_ip[1]=pc_ip[1];
+				new_pc_ip[2]=pc_ip[2];
+				new_pc_ip[3]=pc_ip[3];
+			}else if(GetKey(KEY_CROSS)){
+				editing_pc_ip=0;
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+				pc_ip[0]=new_pc_ip[0];
+				pc_ip[1]=new_pc_ip[1];
+				pc_ip[2]=new_pc_ip[2];
+				pc_ip[3]=new_pc_ip[3];
+			}           
+		}else{
+			if(GetKey(KEY_UP)){
+				if(v_pos>0){
+					v_pos--;
+				}
+			}else if(GetKey(KEY_DOWN)){
+				if(v_pos<4){
+					v_pos++;
+				}
+			}else if(GetKey(KEY_CROSS)){
+				if(v_pos==0){
+					SetButtonDelay(KEY_UP, 1);
+					SetButtonDelay(KEY_DOWN, 1);
+					editing_ps2_ip=1;
+				}else if(v_pos==1){
+					SetButtonDelay(KEY_UP, 1);
+					SetButtonDelay(KEY_DOWN, 1);
+					editing_ps2_netmask=1;
+				}else if(v_pos==2){
+					SetButtonDelay(KEY_UP, 1);
+					SetButtonDelay(KEY_DOWN, 1);
+					editing_ps2_gateway=1;
+				}else if(v_pos==3){
+					SetButtonDelay(KEY_UP, 1);
+					SetButtonDelay(KEY_DOWN, 1);
+					editing_pc_ip=1;
+				}else if(v_pos==4){
+					writeIPConfig();
+					SaveConfig("mass:USBLD/usbld.cfg");
+				}
+			}else if(GetKey(KEY_CIRCLE)){
+				break;
+			}
+
+		}
+
 		Flip();
 	}
 }

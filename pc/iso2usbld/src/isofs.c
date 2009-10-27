@@ -1,6 +1,8 @@
 
 #include "iso2usbld.h"
 
+//#define DEBUG
+
 static int isofs_inited = 0;
 
 #define MAX_DIR_CACHE_SECTORS 32
@@ -138,10 +140,10 @@ int isofs_ReadISO(u32 offset, u32 nbytes, void *buf)
 	#ifdef DEBUG
 		printf("isofs_ReadISO: offset = %x nbytes = %d\n", offset, nbytes);
 	#endif	
-	
-	fseek(g_fh_iso, offset, SEEK_SET);	
-	r = fread(buf, 1, nbytes, g_fh_iso);
 		
+	fseeko64(g_fh_iso, offset, SEEK_SET);	 
+	r = fread(buf, 1, nbytes, g_fh_iso);
+			
 	return r;
 }
 
@@ -952,7 +954,7 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 		
 	if (fh->position >= fh->filesize)
 		return 0;
-		
+				
 	if (nbytes >= (fh->filesize - fh->position))
 		nbytes = fh->filesize - fh->position;
 				
@@ -1023,17 +1025,10 @@ u32 isofs_Init(const char *iso_path)
 			return 0;
 	}
 	
-	fseek(g_fh_iso, 0, SEEK_END);
-	r = ftell(g_fh_iso);
-	if (r == -1) { // fix to detect correct file size > to int range 	
-		fseek(g_fh_iso, 0x80000000, SEEK_END);		
-		r = ftell(g_fh_iso);
-		if (r == -1)
-			return 0;
-		r += 0x80000000;
-	}
+	fseeko64(g_fh_iso, 0, SEEK_END);
+	r = ftello64(g_fh_iso);
 		
-	fseek(g_fh_iso, 0, SEEK_SET);
+	fseeko64(g_fh_iso, 0, SEEK_SET);
 	
 	isofs_inited = 1;
 	

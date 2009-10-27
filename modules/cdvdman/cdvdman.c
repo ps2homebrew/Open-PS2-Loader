@@ -1445,14 +1445,12 @@ void sysmemSendEE(void *buf, void *EE_addr, int size)
 	dmat.size = size;
 	dmat.src = (void *)buf;
 	dmat.attr = 0;
-		
-	while (1) {
+
+	id = 0;
+	while (!id) {
 		CpuSuspendIntr(&oldstate);
 		id = sceSifSetDma(&dmat, 1);
 		CpuResumeIntr(oldstate);
-		if (id)
-			break;
-		DelayThread(500);
 	}
 	
 	while (sceSifDmaStat(id) >= 0);
@@ -2391,11 +2389,10 @@ int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err)
 			// catch calls from rpc, in this case err is an EE address to send datas
 			p = (u8 *)err;
 			sysmemSendEE((void *)buf, &p[rpos], rsectors << 11);
+			DelayThread(5000);
 		}
 	
 		nsectors += rsectors;
-		
-		//DelayThread(10);
 		
 	} while (nsectors < sectors);
 

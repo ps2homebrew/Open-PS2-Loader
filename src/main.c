@@ -291,11 +291,14 @@ void ExecSettings(struct TMenuItem* self, int id) {
 			
 		setLanguage(gLanguageID);
 	} else if (id == 3) {
+		// ipconfig
+		DrawIPConfig();
+	} else if (id == 4) {
 		// scroll speed modifier
 		ChangeScrollSpeed();
-	} else if (id == 4) {
+	} else if (id == 5) {
 		ChangeMenuType();
-	} else if (id == 6) {
+	} else if (id == 7) {
 		if (SaveConfig("mass:USBLD/usbld.cfg")) {
 			MsgBox(_l(_STR_SETTINGS_SAVED));
 		} else {
@@ -342,10 +345,11 @@ void InitMenuItems() {
 	// initialize the menu
 	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_THEME);
 	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2, _STR_LANG_NAME);
+	AppendSubMenu(&settings_submenu, &language_icon, "Network config", 3, _STR_IPCONFIG);
 	
-	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, "", 3, scroll_speed_txt[scroll_speed]);
-	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, "", 4, menu_type_txt[dynamic_menu ? 0 : 1]);
-	AppendSubMenu(&settings_submenu, &save_icon, "Save Changes", 6, _STR_SAVE_CHANGES);
+	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, "", 4, scroll_speed_txt[scroll_speed]);
+	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, "", 5, menu_type_txt[dynamic_menu ? 0 : 1]);
+	AppendSubMenu(&settings_submenu, &save_icon, "Save Changes", 7, _STR_SAVE_CHANGES);
 	
 	settings_item.submenu = settings_submenu;
 	

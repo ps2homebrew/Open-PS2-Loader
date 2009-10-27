@@ -7,6 +7,7 @@ char *english[] = {
 	"               WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>", // gfx.c:85
 	"Open USB Loader %s", // gfx.c:320
 	"Theme configuration", // gfx.c:502
+	"IP configuration", // gfx.c:764
 	"Save changes", // gfx.c:586
 	"O Back", // gfx.c:736
 	"Scroll Slow", // main.c:21 
@@ -15,6 +16,7 @@ char *english[] = {
 	"Dynamic Menu",  // main.c:22
 	"Static Menu",
 	"Configure theme",  // main.c:23
+	"Network config",
 	"Select language",  
 	"No Items", // main.c:26
 	"Not available yet", // main.c:158
@@ -35,6 +37,7 @@ char *czech[] = {
 	"               OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. ZALOZENO NA ZDROJ. KODECH PROJEKTU HD PROJECT <http://psx-scene.com>", // gfx.c:85
 	"Open USB Loader %s", // gfx.c:320
 	"Nastaveni vzhledu", // gfx.c:502
+	"IP configuration", // gfx.c:764
 	"Ulozit zmeny", // gfx.c:586
 	"O Zpet", // gfx.c:736
 	"Posuv Pomaly", // main.c:21 
@@ -43,6 +46,7 @@ char *czech[] = {
 	"Dynamicke Menu",  // main.c:22
 	"Staticke Menu",
 	"Nastaveni vzhledu",  // main.c:23
+	"Network config",
 	"Volba jazyka",
 	"Zadne Polozky", // main.c:26
 	"Neni doposud k dispozici", // main.c:158
@@ -63,6 +67,7 @@ char *spanish[] = {
 	"               BIENVENIDO AL OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASADO EN EL CÓDIGO FUENTE DE HD PROJECT <http://psx-scene.com>", // gfx.c:85
 	"Open USB Loader %s", // gfx.c:320
 	"Configuración de tema", // gfx.c:502
+	"Configuración de red", // gfx.c:764
 	"Guardar cambios", // gfx.c:586
 	"O Atrás", // gfx.c:736
 	"Scroll Lento", // main.c:21 
@@ -71,6 +76,7 @@ char *spanish[] = {
 	"Menú Dinámico",  // main.c:22
 	"Menú estático",
 	"Configurar tema",  // main.c:23
+	"Configurar red",
 	"Seleccionar idioma",  
 	"No hay elementos", // main.c:26
 	"No disponible todavia", // main.c:158

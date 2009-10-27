@@ -260,7 +260,7 @@ int smbRead(int fd, void *buf, u32 nbytes)
 	if (!fh->status) 
 		return -5;
 
-	//s//printf(mbuf, "smbman: smbRead fd %d nbytes %d fh->position=%d fh->filesize=%d\n", fd, (int)nbytes, fh->position, fh->filesize);
+	//sprintf(mbuf, "smbman: smbRead fd %d nbytes %d fh->position=%d fh->filesize=%d\n", fd, (int)nbytes, fh->position, fh->filesize);
 	//smbEchoSMBServer(mbuf, strlen(mbuf));
 		
 	if (fh->position >= fh->filesize)
@@ -291,7 +291,7 @@ int smbRead(int fd, void *buf, u32 nbytes)
 		} while (nbytes);	
 	}	
 	
-	//s//printf(mbuf, "smbman: smbRead ret=%d\n", rpos);
+	//sprintf(mbuf, "smbman: smbRead ret=%d\n", rpos);
 	//smbEchoSMBServer(mbuf, strlen(mbuf));	
 										
     return rpos;

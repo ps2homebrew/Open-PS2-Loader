@@ -379,11 +379,11 @@ int smb_SessionSetupRequest(u8 *buf, int bsize, char *User, char *Password, char
 	smb_buf[offset++] = 0;								// nul terminator
 	if (bsize < (offset + 10)) 							// room space check
 		return -2;			
-	memcpy(&smb_buf[offset], "X\0G\0M\0R\0\0\0", 10);	// NativeOS	
+	memcpy(&smb_buf[offset], "S\0M\0B\0\0\0\0\0", 10);	// NativeOS	
 	offset += 10;	
 	if (bsize < (offset + 10)) 							// room space check
 		return -2;			
-	memcpy(&smb_buf[offset], "X\0G\0M\0R\0\0\0", 10); 	// NativeLanMan
+	memcpy(&smb_buf[offset], "S\0M\0B\0\0\0\0\0", 10); 	// NativeLanMan
 	offset += 10;		
 	
 	bytecount = 1 + (length1 << 1) + 2 + (length2 << 1) + 2 + 10 + 10;

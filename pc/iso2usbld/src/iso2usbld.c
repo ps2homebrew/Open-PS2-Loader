@@ -30,6 +30,8 @@ void printUsage(void)
 	printf("Example 1: %s C:\\ISO\\WORMS4.ISO E WORMS_4_MAYHEM DVD\n", PROGRAM_NAME);
 	printf("Example 2: %s \"C:\\ISO\\WORMS 4.ISO\" E \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);
 	printf("Example 3: %s \"C:\\ISO\\MICRO MACHINES V4.ISO\" E \"Micro Machines v4\" CD\n", PROGRAM_NAME);
+	printf("Example 4: %s \"C:\\ISO\\WORMS 4.ISO\" E:\\MyDir WORMS_4 DVD\n", PROGRAM_NAME);
+	printf("Example 5: %s \"C:\\ISO\\WORMS 4.ISO\" \\\\MyComputer\\shared WORMS_4 DVD\n", PROGRAM_NAME);
 #else
 	printf("Example 1: %s /home/user/WORMS4.ISO /media/disk WORMS_4_MAYHEM DVD\n", PROGRAM_NAME);
 	printf("Example 2: %s \"/home/user/WORMS 4.ISO\" /media/disk \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);
@@ -115,7 +117,10 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 #endif
 
 #ifdef _WIN32
-	sprintf(cfg_path, "%s:\\ul.cfg", drive);
+	if (strlen(drive) == 1) 
+		sprintf(cfg_path, "%s:\\ul.cfg", drive);
+	else
+		sprintf(cfg_path, "%s\\ul.cfg", drive);
 #else
 	sprintf(cfg_path, "%s/ul.cfg", drive);
 #endif
@@ -166,7 +171,10 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, u
 
 	for (i=0; i<parts; i++) {
 #ifdef _WIN32
-		sprintf(part_path, "%s:\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
+		if (strlen(drive) == 1)
+			sprintf(part_path, "%s:\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
+		else
+			sprintf(part_path, "%s\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
 #else
 		sprintf(part_path, "%s/ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
 #endif
@@ -238,6 +246,7 @@ int ParseSYSTEMCNF(char *system_cnf, char *boot_path)
 
 	fsize = isofs_Seek(fd, 0, SEEK_END);
 	isofs_Seek(fd, 0, SEEK_SET);
+	printf("fsize = %d\n", fsize);
 
 	r = isofs_Read(fd, systemcnf_buf, fsize);
 	if (r != fsize) {
@@ -246,7 +255,7 @@ int ParseSYSTEMCNF(char *system_cnf, char *boot_path)
 	}
 
 	isofs_Close(fd);
-
+	
 #ifdef DEBUG
 	printf("ParseSYSTEMCNF trying to retrieve elf path...\n");
 #endif
@@ -298,13 +307,6 @@ int main(int argc, char **argv, char **env)
 		printUsage();
 		exit(EXIT_FAILURE);
 	}
-
-#ifdef _WIN32
-	if (strlen(argv[2]) != 1) {
-		printUsage();
-		exit(EXIT_FAILURE);
-	}
-#endif
 
 #ifdef DEBUG
 	printf("DEBUG_MODE ON\n");

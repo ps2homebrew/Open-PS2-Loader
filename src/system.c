@@ -182,6 +182,8 @@ void th_LoadNetworkModules(void *args){
 	id=SifExecModuleBuffer(&ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig, &ret);	
 	
 	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
+	
+	SleepThread();
 }
 
 void Start_LoadNetworkModules_Thread(void){

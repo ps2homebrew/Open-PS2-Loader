@@ -143,6 +143,15 @@ int dynamic_menu;
 // 0,1,2 scrolling speed
 unsigned int scroll_speed;
 
+// IP config
+
+int ps2_ip[4];
+int ps2_netmask[4];
+int ps2_gateway[4];
+int pc_ip[4];
+
+// Theme config
+
 char theme[32];
 int bg_color[3];
 int text_color[3];
@@ -227,6 +236,7 @@ void SetColor(int r, int g, int b);
 void TextColor(int r, int g, int b, int a);
 void DrawText(int x, int y, char *texto, float scale, int centered);
 void DrawConfig();
+void DrawIPConfig();
 void UploadTexture(GSTEXTURE* txt);
 void Aviso();
 void Intro();
@@ -271,6 +281,9 @@ void setConfigInt(struct TConfigSet* config, const char* key, const int value);
 int getConfigInt(struct TConfigSet* config, char* key, int* value);
 void setConfigColor(struct TConfigSet* config, const char* key, int* color);
 int getConfigColor(struct TConfigSet* config, const char* key, int* color);
+
+void readIPConfig();
+void writeIPConfig();
 
 int readConfig(struct TConfigSet* config, char *fname);
 int writeConfig(struct TConfigSet* config, char *fname);

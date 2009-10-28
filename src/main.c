@@ -25,6 +25,8 @@ extern int size_smbman_irx;
 // language id
 int gLanguageID = 0;
 
+int eth_inited = 0;
+
 // Submenu items variant of the game list... keeped in sync with the game item list (firstgame, actualgame)
 struct TSubMenuList* usb_submenu = NULL;
 struct TSubMenuList* eth_submenu = NULL;
@@ -248,8 +250,13 @@ int ResetETHOrder(struct TMenuItem *self) {
 }
 
 void ExecETHGameSelection(struct TMenuItem* self, int id) {
-	if (id == -1)
+	if (id == -1) {
+		if (!eth_inited) {
+			Start_LoadNetworkModules_Thread();
+			eth_inited = 1;
+		}
 		return;
+	}
 	
 	padPortClose(0, 0);
 	padPortClose(1, 0);
@@ -378,32 +385,31 @@ int main(void)
 	mcInit(MC_TYPE_MC);
 
 	int ret, id;
-		
+	
 	LoadUSBD();
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
 	
 	delay(3);
-		
+	
 	InitMenu();
-	
+
 	delay(1);
-	
+
 	/// Init custom menu items
 	InitMenuItems();
-	
+
 	// first column is usb games
 	MenuSetSelectedItem(&usb_games_item);
-	
+
 	StartPad();
 
 	Intro();
-	
+
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
-	
-	Start_LoadNetworkModules_Thread();	
-	
+
 	max_games=0;
+	eth_max_games=0;
 	usbdelay=0;
 	ethdelay=0;
 	frame=0;

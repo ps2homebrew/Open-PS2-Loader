@@ -26,16 +26,16 @@ void set_ipconfig(void)
 	g_ipconfig_len = 0;
 	
 	// add ip to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.10", 15);
-	g_ipconfig_len += strlen("192.168.0.10") + 1;
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_ip, 15);
+	g_ipconfig_len += strlen(g_ps2_ip) + 1;
 
 	// add netmask to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "255.255.255.0", 15);
-	g_ipconfig_len += strlen("255.255.255.0") + 1;
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_netmask, 15);
+	g_ipconfig_len += strlen(g_ps2_netmask) + 1;
 
 	// add gateway to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.1", 15);
-	g_ipconfig_len += strlen("192.168.0.1") + 1;
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_gateway, 15);
+	g_ipconfig_len += strlen(g_ps2_gateway) + 1;
 }
 
 int main(int argc, char **argv){
@@ -47,16 +47,23 @@ int main(int argc, char **argv){
 
 	g_buf = (u8 *)0x00088000;
 	
-	set_ipconfig();
-	
 	argv[1][12]=0x00; // fix for 8+3 filename.
 
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);
 		
-	if (!strcmp(argv[0], "USB_MODE"))
+	if (!strncmp(argv[0], "USB_MODE", 8))
 		GameMode = USB_MODE;
-	else if (!strcmp(argv[0], "ETH_MODE"))
+	else if (!strncmp(argv[0], "ETH_MODE", 8))
 		GameMode = ETH_MODE;
+		
+	char *p = strtok(&argv[0][9], " ");
+	strcpy(g_ps2_ip, p);
+	p = strtok(NULL, " ");
+	strcpy(g_ps2_netmask, p);
+	p = strtok(NULL, " ");
+	strcpy(g_ps2_gateway, p);
+
+	set_ipconfig();
 		
 	GetIrxKernelRAM();
 	

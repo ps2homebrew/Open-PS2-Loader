@@ -22,6 +22,8 @@
 #define MODNAME "smbman"
 IRX_ID(MODNAME, 1, 1);
 
+static char g_pc_ip[]="xxx.xxx.xxx.xxx";
+
 int smbman_initdev(void);
 
 // smb driver ops functions prototypes
@@ -79,6 +81,7 @@ FHANDLE smbman_fdhandles[MAX_FDHANDLES];
 int _start(int argc, char** argv)
 {	
 	iop_sema_t smp;
+	char tree_str[255];
 			
 	//printf("smbman v1.0 - jimmikaelkael\n");
 
@@ -95,10 +98,11 @@ int _start(int argc, char** argv)
 	smbman_io_sema = CreateSema(&smp);
 		
     // Next open the Connection with SMB server
-    smbConnect("192.168.0.2", 445);
+    smbConnect(g_pc_ip, 445);
     	
-    // Then open a session and a tree connect on the share resource 	
-    smbLogin("GUEST", "", "\\\\192.168.0.2\\PUBLIC");
+    // Then open a session and a tree connect on the share resource
+    sprintf(tree_str, "\\\\%s\\PUBLIC", g_pc_ip);
+    smbLogin("GUEST", "", tree_str);
     								
 	return MODULE_RESIDENT_END;
 }

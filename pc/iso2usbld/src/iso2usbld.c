@@ -10,6 +10,8 @@
 
 #include "iso2usbld.h"
 
+//#define DEBUG
+
 #define WR_SIZE 	524288
 
 u32 crctab[0x400];
@@ -31,7 +33,7 @@ void printUsage(void)
 	printf("Example 2: %s \"C:\\ISO\\WORMS 4.ISO\" E \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);
 	printf("Example 3: %s \"C:\\ISO\\MICRO MACHINES V4.ISO\" E \"Micro Machines v4\" CD\n", PROGRAM_NAME);
 	printf("Example 4: %s \"C:\\ISO\\WORMS 4.ISO\" E:\\MyDir WORMS_4 DVD\n", PROGRAM_NAME);
-	printf("Example 5: %s \"C:\\ISO\\WORMS 4.ISO\" \\\\MyComputer\\shared WORMS_4 DVD\n", PROGRAM_NAME);
+	printf("Example 5: %s \"C:\\ISO\\WORMS 4.ISO\" \\\\MyComputer\\PS2SMB WORMS_4 DVD\n", PROGRAM_NAME);
 #else
 	printf("Example 1: %s /home/user/WORMS4.ISO /media/disk WORMS_4_MAYHEM DVD\n", PROGRAM_NAME);
 	printf("Example 2: %s \"/home/user/WORMS 4.ISO\" /media/disk \"WORMS 4: MAYHEM\" DVD\n", PROGRAM_NAME);
@@ -152,13 +154,14 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 }
 
 //----------------------------------------------------------------
-int write_parts(const char *drive, const char *game_name, const char *game_id, u32 filesize, int parts)
+int write_parts(const char *drive, const char *game_name, const char *game_id, s64 filesize, int parts)
 {
 	FILE *fh_part;
 	char part_path[256];
 	int i, r;
 	u8 *buf;
-	u32 nbytes, size, rpos, iso_pos;
+	u32 size; 
+	s64 nbytes, rpos, iso_pos;
 
 #ifdef DEBUG
 	printf("write_parts drive:%s name:%s id:%s filesize:0x%x parts:%d\n", drive, game_name, game_id, filesize, parts);
@@ -203,7 +206,7 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, u
     				return -3;
 				}
 
-				printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, iso_pos >> 11);
+				printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, (int)(iso_pos >> 11));
 
 				// write to file
 				r = fwrite(buf, 1, size, fh_part);
@@ -246,7 +249,6 @@ int ParseSYSTEMCNF(char *system_cnf, char *boot_path)
 
 	fsize = isofs_Seek(fd, 0, SEEK_END);
 	isofs_Seek(fd, 0, SEEK_SET);
-	printf("fsize = %d\n", fsize);
 
 	r = isofs_Read(fd, systemcnf_buf, fsize);
 	if (r != fsize) {
@@ -298,9 +300,9 @@ int main(int argc, char **argv, char **env)
 	int ret;
 	char ElfPath[256];
 	char GameID[256];
-	int num_parts;
+	s64 num_parts;
 	char *p;
-	u32 filesize;
+	s64 filesize;
 
 	// args check
 	if ((argc != 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) || (strlen(argv[3]) > 32)) {
@@ -321,13 +323,14 @@ int main(int argc, char **argv, char **env)
 	}
 
 	// get needed number of parts
-	num_parts = filesize >> 30;
+	num_parts = filesize / 1073741824;
 	if (filesize & 0x3fffffff)
 		num_parts++;
 
 #ifdef DEBUG
-	printf("ISO filesize: 0x%x\n", filesize);
+	printf("ISO filesize: 0x%llx\n", filesize);
 	printf("Number of parts: %d\n", num_parts);
+	//return 0;
 #endif
 
 	// parse system.cnf in ISO file

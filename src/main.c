@@ -306,6 +306,7 @@ void ExecSettings(struct TMenuItem* self, int id) {
 	} else if (id == 5) {
 		ChangeMenuType();
 	} else if (id == 7) {
+		fioMkdir("mass:USBLD");
 		if (SaveConfig("mass:USBLD/usbld.cfg")) {
 			MsgBox(_l(_STR_SETTINGS_SAVED));
 		} else {

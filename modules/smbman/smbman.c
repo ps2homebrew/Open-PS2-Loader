@@ -101,7 +101,7 @@ int _start(int argc, char** argv)
     smbConnect(g_pc_ip, 445);
     	
     // Then open a session and a tree connect on the share resource
-    sprintf(tree_str, "\\\\%s\\PUBLIC", g_pc_ip);
+    sprintf(tree_str, "\\\\%s\\PS2SMB", g_pc_ip);
     smbLogin("GUEST", "", tree_str);
     								
 	return MODULE_RESIDENT_END;

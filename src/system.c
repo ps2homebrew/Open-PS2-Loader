@@ -155,20 +155,34 @@ int PS3Detect(){ //return 0=PS2 1=PS3-HARD 2=PS3-SOFT
 
 void set_ipconfig(void)
 {
+	int i;
+	char str[16];
+	
 	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
 	g_ipconfig_len = 0;
 	
 	// add ip to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.10", 15);
-	g_ipconfig_len += strlen("192.168.0.10") + 1;
+	sprintf(str, "%d.%d.%d.%d", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
+	strncpy(&g_ipconfig[g_ipconfig_len], str, 15);
+	g_ipconfig_len += strlen(str) + 1;
 
 	// add netmask to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "255.255.255.0", 15);
-	g_ipconfig_len += strlen("255.255.255.0") + 1;
+	sprintf(str, "%d.%d.%d.%d", ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
+	strncpy(&g_ipconfig[g_ipconfig_len], str, 15);
+	g_ipconfig_len += strlen(str) + 1;
 
 	// add gateway to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], "192.168.0.1", 15);
-	g_ipconfig_len += strlen("192.168.0.1") + 1;
+	sprintf(str, "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+	strncpy(&g_ipconfig[g_ipconfig_len], str, 15);
+	g_ipconfig_len += strlen(str) + 1;
+	
+	for (i=0;i<size_smbman_irx;i++){
+		if(!strcmp((const char*)((u32)&smbman_irx+i),"xxx.xxx.xxx.xxx")){
+			break;
+		}
+	}
+	sprintf(str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	memcpy((void*)((u32)&smbman_irx+i),str,strlen(str)+1);	
 }
 
 void th_LoadNetworkModules(void *args){
@@ -178,11 +192,22 @@ void th_LoadNetworkModules(void *args){
 	set_ipconfig();
 	
 	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		goto fini;
+	
 	id=SifExecModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		goto fini;
+	
 	id=SifExecModuleBuffer(&ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig, &ret);	
+	if ((id < 0) || ret)
+		goto fini;
 	
 	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
-	
+	if ((id < 0) || ret)
+		goto fini;
+
+fini:		
 	SleepThread();
 }
 
@@ -196,7 +221,7 @@ void Start_LoadNetworkModules_Thread(void){
 	thread.func				= (void *)th_LoadNetworkModules;
 	thread.stack_size		= 0x100000;
 	thread.gp_reg			= &_gp;
-	thread.initial_priority	= 0x1e;
+	thread.initial_priority	= 0x1;
 
 	thread_id = CreateThread(&thread);
 
@@ -269,6 +294,8 @@ void LaunchGame(TGame *game, int mode)
 	char *argv[2];
 	char isoname[32];
 	char filename[32];
+	char config_str[255];
+	char *mode_str = NULL;
 	u8 mode_val;
 	
 	sprintf(filename,"%s",game->Image+3);
@@ -328,12 +355,16 @@ void LaunchGame(TGame *game, int mode)
 	SifExitRpc();
 	FlushCache(0);
 	FlushCache(2);
-	
+
 	if (mode == USB_MODE)
-		argv[0] = "USB_MODE";
+		mode_str = "USB_MODE";
 	else if (mode == ETH_MODE)
-		argv[0] = "ETH_MODE";
+		mode_str = "ETH_MODE";
 		
+	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+	
+	argv[0] = config_str;	
 	argv[1] = filename;
 	
 	ExecPS2((void *)eh->entry, 0, 2, argv);

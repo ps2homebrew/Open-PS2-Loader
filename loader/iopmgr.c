@@ -73,11 +73,35 @@ int New_Reset_Iop(const char *arg, int flag){
 	int     i, j, r, fd=0;
 	ioprp_t ioprp_img;
 	char    ioprp_path[0x50];
+	char    tmp[0x50];	
 	int eeloadcnf_reset = 0;		
 	
 	GS_BGCOLOUR = 0xff00ff; 
-
+	
+	// Reseting IOP.
+	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
+	while (!Sync_Iop()){;}
+	
+	SifExitIopHeap();
 	SifInitRpc(0);
+	SifInitIopHeap();
+	LoadFileInit();
+	Sbv_Patch();
+	
+	if (GameMode == USB_MODE) {
+		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
+		LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
+		delay(3);
+	}
+	else if (GameMode == ETH_MODE) {
+		LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+		LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
+		LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
+		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+		LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
+	}	
+	
+	LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
 	
 	// check for reboot with IOPRP from cdrom
 	char *ioprp_pattern = "rom0:UDNL cdrom";
@@ -107,6 +131,13 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}	
 
+	// replacing cdrom in elf path by iso
+	if (strstr(ioprp_path, "cdrom")) {
+		strcpy(tmp, "iso");
+		strcat(tmp, &ioprp_path[5]);
+		strcpy(ioprp_path, tmp);
+	}		
+	
 	fioInit();
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
@@ -141,10 +172,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	}
 	else { 
 		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
-		if (GameMode == USB_MODE)
-			Patch_Mod(&ioprp_img, "CDVDFSV", usbd_irx, size_usbd_irx);
-		else if	(GameMode == ETH_MODE)
-			Patch_Mod(&ioprp_img, "CDVDFSV", dummy_irx, size_dummy_irx);
+		Patch_Mod(&ioprp_img, "CDVDFSV", dummy_irx, size_dummy_irx);
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
 
@@ -205,6 +233,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	Sbv_Patch();
 	
 	if (GameMode == USB_MODE) {
+		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
 		LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 		delay(3);
 	}

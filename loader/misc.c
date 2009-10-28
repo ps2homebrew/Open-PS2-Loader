@@ -251,14 +251,8 @@ int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 		else if (!strcmp(romdir_in->fileName, "CDVDFSV")) {
 			DIntr(); // get back dummy drv from kernel ram		
 			ee_kmode_enter();
-			if (GameMode == USB_MODE) {
-				memcpy((void*)((u32)ioprp_img->data_out+offset_out), usbd_irx, size_usbd_irx);
-				romdir_out->fileSize = size_usbd_irx;
-			}
-			else if (GameMode == ETH_MODE) {
-				memcpy((void*)((u32)ioprp_img->data_out+offset_out), dummy_irx, size_dummy_irx);
-				romdir_out->fileSize = size_dummy_irx;
-			}
+			memcpy((void*)((u32)ioprp_img->data_out+offset_out), dummy_irx, size_dummy_irx);
+			romdir_out->fileSize = size_dummy_irx;
 			ee_kmode_exit();
 			EIntr();
 			

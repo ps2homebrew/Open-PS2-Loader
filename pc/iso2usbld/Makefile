@@ -2,7 +2,7 @@ ifndef CC
 CC = gcc
 endif
 
-CFLAGS = -std=gnu99 -Wall -pedantic -I/usr/include -I/usr/local/include -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D_LARGEFILE_SOURCE=1
+CFLAGS = -std=gnu99 -Wall -pedantic -I/usr/include -I/usr/local/include
 
 all: bin/iso2usbld
 

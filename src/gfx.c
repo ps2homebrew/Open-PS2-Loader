@@ -369,12 +369,16 @@ void DrawWave(int y, int xoffset){
 	}
 }
 
-void LoadConfig(char* fname, int clearFirst) {
+int LoadConfig(char* fname, int clearFirst) {
+	int r;
+	
 	if (clearFirst)
 		clearConfig(&gConfig);
 	
 	// fill the config from file
-	readConfig(&gConfig, fname);
+	r = readConfig(&gConfig, fname);
+	if (!r)
+		return 0;
 	
 	char *temp;
 	
@@ -401,6 +405,8 @@ void LoadConfig(char* fname, int clearFirst) {
 		
 	if (getConfigStr(&gConfig, "pc_ip", &temp))
 		sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
+		
+	return 1;	
 }
 
 int SaveConfig(char* fname) {
@@ -423,7 +429,10 @@ int SaveConfig(char* fname) {
 
 void LoadResources() {
 	readIPConfig();
-	LoadConfig("mass:USBLD/usbld.cfg", 0);
+	if (!LoadConfig("mass:USBLD/usbld.cfg", 0)) {
+		if (!LoadConfig("mc0:/SYS-CONF/usbld.cfg", 0))
+			LoadConfig("mc1:/SYS-CONF/usbld.cfg", 0);
+	}
 	LoadIcons();
 	UpdateIcons();
 	LoadFont(1);

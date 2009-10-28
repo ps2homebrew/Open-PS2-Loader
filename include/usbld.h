@@ -227,7 +227,7 @@ void UpdateScrollSpeed();
 void Flip();
 void MsgBox(char* text);
 
-void LoadConfig(char* fname, int clearFirst);
+int LoadConfig(char* fname, int clearFirst);
 int SaveConfig(char* fname);
 
 void DrawWave(int y, int xoffset);

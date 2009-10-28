@@ -65,6 +65,9 @@ extern int set_reg_disabled;
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 int g_ipconfig_len;
+char g_ps2_ip[16];
+char g_ps2_netmask[16];
+char g_ps2_gateway[16];
 
 int GameMode;
 #define USB_MODE 	0

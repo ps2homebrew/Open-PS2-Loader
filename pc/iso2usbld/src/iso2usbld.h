@@ -24,11 +24,11 @@
 typedef	unsigned char 		u8;
 typedef unsigned short 		u16;
 typedef unsigned int		u32;
-typedef unsigned long		u64;
+typedef unsigned __int64	u64;
 typedef signed char 		s8;
 typedef signed short 		s16;
 typedef signed int			s32;
-typedef signed long			s64;
+typedef signed __int64		s64;
 
 typedef struct {
 	char name[32];
@@ -38,12 +38,12 @@ typedef struct {
 	u8   pad[15];
 } cfg_t;
 
-u32 isofs_Init(const char *iso_path);
+s64 isofs_Init(const char *iso_path);
 int isofs_Reset(void);
 int isofs_Open(const char *filename);
 int isofs_Close(int fd);
 int isofs_Read(int fd, void *buf, u32 nbytes);
 int isofs_Seek(int fd, u32 offset, int origin);
-int isofs_ReadISO(u32 offset, u32 nbytes, void *buf);
+int isofs_ReadISO(s64 offset, u32 nbytes, void *buf);
 
 #endif

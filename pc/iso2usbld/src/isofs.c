@@ -1,3 +1,12 @@
+/*
+  Copyright 2009, jimmikaelkael
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+  Some parts of the code are taken from libcdvd by A.Lee & Nicholas Van Veen
+  Review license_libcdvd file for further details.
+*/
 
 #include "iso2usbld.h"
 
@@ -133,7 +142,7 @@ struct TocEntry {
 static struct cdVolDesc CDVolDesc;
 
 //-------------------------------------------------------------------------
-int isofs_ReadISO(u32 offset, u32 nbytes, void *buf)
+int isofs_ReadISO(s64 offset, u32 nbytes, void *buf)
 {
 	register int r;
 	
@@ -151,7 +160,8 @@ int isofs_ReadISO(u32 offset, u32 nbytes, void *buf)
 int isofs_ReadSect(u32 lsn, u32 nsectors, void *buf)
 {
 	register int r;
-	register u32 offset, nbytes;
+	register u32 nbytes;
+	s64 offset;
 
 	#ifdef DEBUG
 		printf("isofs_ReadSect: LBA = %d nsectors = %d\n", lsn, nsectors);
@@ -936,7 +946,7 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 {
 	register int r;
 	FHANDLE *fh;
-	register u32 offset;
+	s64 offset;
 
 	#ifdef DEBUG
 		printf("isofs_Read: fd = %d nbytes = %d\n", fd, nbytes);
@@ -1007,9 +1017,9 @@ int isofs_Seek(int fd, u32 offset, int origin)
 }
 
 //-------------------------------------------------------------------------
-u32 isofs_Init(const char *iso_path)
+s64 isofs_Init(const char *iso_path)
 {
-	u32 r;
+	s64 r;
 	
 	#ifdef DEBUG
 		printf("isofs_Init: ISO path %s\n", iso_path);

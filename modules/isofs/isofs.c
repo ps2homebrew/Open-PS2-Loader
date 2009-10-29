@@ -1272,7 +1272,7 @@ int skipmod_check(const char *filename)
 	p = strtok(modlist, "\n");
 
 	while (p) {
-		if (strstr(p, name))
+		if (strstr(name, p))
 			return 1;		
 			
 		p = strtok(NULL, "\n");			
@@ -1394,7 +1394,7 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 		nbytes = fh->filesize - fh->position;
 		
 	if (fh->status == 0xff) {
-		u8 *p = (u8 *)dummy_irx;
+		u8 *p = (u8 *)&dummy_irx;
 		memcpy(buf, &p[fh->position], nbytes);
 		r = nbytes;		
 	}	

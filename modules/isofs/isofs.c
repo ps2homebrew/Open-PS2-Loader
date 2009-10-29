@@ -210,6 +210,9 @@ static struct cdVolDesc CDVolDesc;
 
 static char isofs_dopen_dirname[1024+1];
 
+static char skipmod_name[1024];
+static char skipmod_modlist[256];	
+	
 #ifdef NETLOG_DEBUG
 // !!! netlog exports functions pointers !!!
 int (*netlog_send)(const char *format, ...);
@@ -1259,21 +1262,21 @@ int isofs_GetDir(const char *pathname, struct TocEntry *tocEntry, int index)
 //-------------------------------------------------------------- 
 int skipmod_check(const char *filename)
 {
-	char name[1024];
-	char modlist[256];	
 	int i;
 	char *p;
-
+	
 	for (i=0; i<strlen(filename); i++)
-		name[i] = toupper(filename[i]);
+		skipmod_name[i] = toupper(filename[i]);
 			
-	strcpy(modlist, skipmod_tab);	
+	strcpy(skipmod_modlist, skipmod_tab);	
 		
-	p = strtok(modlist, "\n");
+	p = strtok(skipmod_modlist, "\n");
 
 	while (p) {
-		if (strstr(name, p))
-			return 1;		
+		if (strlen(skipmod_name) >= strlen(p)) {
+			if (strstr(skipmod_name, p))
+				return 1;		
+		}
 			
 		p = strtok(NULL, "\n");			
 	}

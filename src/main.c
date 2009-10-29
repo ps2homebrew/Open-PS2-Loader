@@ -154,7 +154,12 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 
 void ClearETHSubMenu() {
 	DestroySubMenu(&eth_submenu);
-	AppendSubMenu(&eth_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
+	
+	if (eth_inited)
+		AppendSubMenu(&eth_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
+	else
+		AppendSubMenu(&eth_submenu, &netconfig_icon, "", -1, _STR_START_NETWORK);
+	
 	network_games_item.submenu = eth_submenu;
 	network_games_item.current = eth_submenu;
 }
@@ -254,6 +259,7 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 		if (!eth_inited) {
 			Start_LoadNetworkModules_Thread();
 			eth_inited = 1;
+			ClearETHSubMenu();
 		}
 		return;
 	}
@@ -336,7 +342,7 @@ struct TMenuItem hdd_games_item = {
 };
 
 struct TMenuItem network_games_item = {
-	&games_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &NextETHGame, &PrevETHGame, &ResetETHOrder, &RefreshETHGameList
+	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &NextETHGame, &PrevETHGame, &ResetETHOrder, &RefreshETHGameList
 };
 
 struct TMenuItem apps_item = {
@@ -348,12 +354,12 @@ void InitMenuItems() {
 	gLanguageID = _LANG_ID_ENGLISH;
 	
 	ClearUSBSubMenu();
-	ClearETHSubMenu();	
+	ClearETHSubMenu();
 	
 	// initialize the menu
 	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_THEME);
 	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2, _STR_LANG_NAME);
-	AppendSubMenu(&settings_submenu, &language_icon, "Network config", 3, _STR_IPCONFIG);
+	AppendSubMenu(&settings_submenu, &netconfig_icon, "Network config", 3, _STR_IPCONFIG);
 	
 	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, "", 4, scroll_speed_txt[scroll_speed]);
 	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, "", 5, menu_type_txt[dynamic_menu ? 0 : 1]);

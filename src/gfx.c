@@ -47,6 +47,12 @@ extern int size_usb_raw;
 extern void *save_raw;
 extern int size_save_raw;
 
+extern void *netconfig_raw;
+extern int size_netconfig_raw;
+
+extern void *network_raw;
+extern int size_network_raw;
+
 GSGLOBAL *gsGlobal;
 GSTEXTURE font;
 GSFONT *gsFont;
@@ -65,6 +71,8 @@ GSTEXTURE background2;
 #define MENU_ICON 7
 #define SCROLL_ICON 8
 #define USB_ICON 9
+#define NETCONFIG_ICON 10
+#define NETWORK_ICON 11
 
 GSTEXTURE disc_icon;
 GSTEXTURE games_icon;
@@ -77,6 +85,8 @@ GSTEXTURE menu_icon;
 GSTEXTURE scroll_icon;
 GSTEXTURE usb_icon;
 GSTEXTURE save_icon;
+GSTEXTURE netconfig_icon;
+GSTEXTURE network_icon;
 
 u64 White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
 u64 Black = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x00,0x00);
@@ -1284,6 +1294,9 @@ void LoadIcons() {
 	LoadIcon(&scroll_icon, "scroll.raw", &scroll_raw);
 	LoadIcon(&usb_icon, "usb.raw", &usb_raw);
 	LoadIcon(&save_icon, "save.raw", &save_raw);
+	LoadIcon(&netconfig_icon, "netconfig.raw", &netconfig_raw);
+	LoadIcon(&network_icon, "network.raw", &network_raw);
+	
 }
 
 /// Uploads the icons to vram
@@ -1299,6 +1312,8 @@ void UpdateIcons() {
 	UploadTexture(&scroll_icon);
 	UploadTexture(&usb_icon);
 	UploadTexture(&save_icon);
+	UploadTexture(&network_icon);
+	UploadTexture(&netconfig_icon);
 }
 
 void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {

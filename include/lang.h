@@ -30,6 +30,7 @@
 #define _STR_LANGUAGE 25
 // Menu item text directly...
 #define _STR_LANG_NAME 26
+#define _STR_START_NETWORK 27
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

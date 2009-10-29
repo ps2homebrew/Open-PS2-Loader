@@ -169,6 +169,8 @@ GSTEXTURE menu_icon;
 GSTEXTURE scroll_icon;
 GSTEXTURE usb_icon;
 GSTEXTURE save_icon;
+GSTEXTURE netconfig_icon;
+GSTEXTURE network_icon;
 
 void LoadGameList();
 

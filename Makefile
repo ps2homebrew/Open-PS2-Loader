@@ -11,7 +11,7 @@ EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o ob
 		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/ingame_usbhdfsd.o obj/isofs.o \
 		  obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/dummy.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
-		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o
+		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o
 EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lmc -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
@@ -161,6 +161,12 @@ usb_icon.s:
 
 save_icon.s:
 	bin2s gfx/save.raw asm/save_icon.s save_raw
+
+netconfig_icon.s:
+	bin2s gfx/netconfig.raw asm/netconfig_icon.s netconfig_raw
+
+network_icon.s:
+	bin2s gfx/network.raw asm/network_icon.s network_raw
 
   
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c

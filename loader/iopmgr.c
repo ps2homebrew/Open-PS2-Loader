@@ -46,8 +46,9 @@ extern int size_smbman_irx;
 extern void *dummy_irx;
 extern int size_dummy_irx;
 
-/*----------------------------------------------------------------------------------------*/
+static int iop_reboot_count = 0;
 
+/*----------------------------------------------------------------------------------------*/
 void list_modules(void)
 {
 	int c = 0;
@@ -64,7 +65,6 @@ void list_modules(void)
 	} while (smod_get_next_mod(&info, &info) != 0);
 }
 
-
 /*----------------------------------------------------------------------------------------*/
 /* Reset IOP processor. This fonction hook reset iop if an update sequence is requested.  */
 /*----------------------------------------------------------------------------------------*/
@@ -78,31 +78,38 @@ int New_Reset_Iop(const char *arg, int flag){
 	
 	GS_BGCOLOUR = 0xff00ff; 
 	
-	// Reseting IOP.
-	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
-	while (!Sync_Iop()){;}
+	iop_reboot_count++;
 	
-	SifExitIopHeap();
 	SifInitRpc(0);
-	SifInitIopHeap();
-	LoadFileInit();
-	Sbv_Patch();
+
+	if (iop_reboot_count > 2) { 
+		// above 2nd IOP reset, we can't be sure we'll be able to read IOPRP without 
+		// Resetting IOP (game IOPRP is loaded at 2nd reset), so...
+		// Reseting IOP.
+		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
+		while (!Sync_Iop()){;}
 	
-	if (GameMode == USB_MODE) {
-		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
-		LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
-		delay(3);
-	}
-	else if (GameMode == ETH_MODE) {
-		LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-		LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
-		LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
-		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-		LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
+		SifExitIopHeap();	
+		SifInitRpc(0);
+		SifInitIopHeap();
+		LoadFileInit();
+		Sbv_Patch();
+
+		if (GameMode == USB_MODE) {
+			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
+			LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
+			delay(3);
+		}
+		else if (GameMode == ETH_MODE) {
+			LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+			LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
+			LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
+			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+			LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
+		}
+		LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
 	}	
-	
-	LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
-	
+
 	// check for reboot with IOPRP from cdrom
 	char *ioprp_pattern = "rom0:UDNL cdrom";
 	for (i=0; i<0x50; i++) {
@@ -131,13 +138,16 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}	
 
-	// replacing cdrom in elf path by iso
-	if (strstr(ioprp_path, "cdrom")) {
-		strcpy(tmp, "iso");
-		strcat(tmp, &ioprp_path[5]);
-		strcpy(ioprp_path, tmp);
-	}		
-	
+	if (iop_reboot_count > 2) {
+		// we have loaded isofs, but not cdvdman replacement so...
+		// replacing cdrom in elf path by iso
+		if (strstr(ioprp_path, "cdrom")) {
+			strcpy(tmp, "iso");
+			strcat(tmp, &ioprp_path[5]);
+			strcpy(ioprp_path, tmp);
+		}
+	}
+
 	fioInit();
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){

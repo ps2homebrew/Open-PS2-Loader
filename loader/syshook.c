@@ -68,7 +68,7 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 	{
 		set_reg_hook--;
 		// We should have a mode to do this: this is corresponding to HD-Loader's mode 3
-		//if (set_reg_hook == 0) {
+		//if ((set_reg_hook == 0) && (iop_reboot_count > 2)) {
 		//	SetSyscall(119, Old_SifSetDma);
 		//	SetSyscall(121, Old_SifSetReg);
 		//}

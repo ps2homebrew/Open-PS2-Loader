@@ -30,7 +30,8 @@ char *english[] = {
 	"Apps",
 	"Theme", // Submenu items
 	"Language",
-	"Language: English"
+	"Language: English",
+	"Start network"
 };
 
 char *czech[] = {
@@ -46,7 +47,7 @@ char *czech[] = {
 	"Dynamicke Menu",  // main.c:22
 	"Staticke Menu",
 	"Nastaveni vzhledu",  // main.c:23
-	"Network config",
+	"Nastaveni site",
 	"Volba jazyka",
 	"Zadne Polozky", // main.c:26
 	"Neni doposud k dispozici", // main.c:158
@@ -60,7 +61,8 @@ char *czech[] = {
 	"Aplikace",
 	"Vzhled", // Submenu items
 	"Jazyk",
-	"Language: Czech"
+	"Language: Czech",
+	"Spustit sit"
 };
 
 char *spanish[] = {
@@ -90,7 +92,8 @@ char *spanish[] = {
 	"Apps",
 	"Tema", // Submenu items
 	"Idioma",
-	"Idioma: Español"
+	"Idioma: Español",
+	"Start network" // TODO: Spanish translation
 };
 
 char **languages[] = {

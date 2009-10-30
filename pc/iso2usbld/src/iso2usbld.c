@@ -159,7 +159,7 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 		cfg.media = 0x14;
 
 	/*	
-	fh_cfg = open(cfg_path, O_WRONLY|O_APPEND);
+	fh_cfg = open(cfg_path, O_WRONLY|O_CREAT|O_APPEND);
 	if (fh_cfg < 0)
 		return -1;
 

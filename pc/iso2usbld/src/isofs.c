@@ -16,6 +16,7 @@ static int isofs_inited = 0;
 
 #define MAX_DIR_CACHE_SECTORS 32
 
+//int g_fh_iso;
 FILE *g_fh_iso;
 
 typedef struct {
@@ -144,15 +145,27 @@ static struct cdVolDesc CDVolDesc;
 //-------------------------------------------------------------------------
 int isofs_ReadISO(s64 offset, u32 nbytes, void *buf)
 {
-	register int r;
+	int r;
 	
 	#ifdef DEBUG
-		printf("isofs_ReadISO: offset = %x nbytes = %d\n", offset, nbytes);
+		printf("isofs_ReadISO: offset = %lld nbytes = %d\n", offset, nbytes);
 	#endif	
 		
+	//lseek64(g_fh_iso, offset, SEEK_SET);	 
+	//r = read(g_fh_iso, buf, nbytes);
 	fseeko64(g_fh_iso, offset, SEEK_SET);	 
 	r = fread(buf, 1, nbytes, g_fh_iso);
-			
+	
+/*
+	int i;
+	u8 *p = (u8 *)buf;
+	for (i=0; i<nbytes; i++) {
+		if ((i%16)==0)
+			printf("\n");
+		printf("%02x ", p[i]);	
+	}
+	printf("\n");
+*/		
 	return r;
 }
 
@@ -969,9 +982,17 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 		nbytes = fh->filesize - fh->position;
 				
 	offset = (fh->lsn << 11)+ fh->position;
-		
-	r = isofs_ReadISO(offset, nbytes, buf);		
+
+	#ifdef DEBUG
+		printf("isofs_Read: offset =%lld nbytes = %d\n", offset, nbytes);
+	#endif
+			
+	r = isofs_ReadISO(offset, nbytes, buf);			
 	fh->position += r;
+	
+	#ifdef DEBUG
+		printf("isofs_Read: readed bytes = %d\n", r);
+	#endif	
 					
     return r;
 }
@@ -1030,14 +1051,18 @@ s64 isofs_Init(const char *iso_path)
 		CachedDirInfo.cache = (u8 *)isofs_dircache;			
 		isofs_FlushCache();	
 	
+		//g_fh_iso = open(iso_path, O_RDONLY);
+		//if (g_fh_iso < 0)
+		//	return 0;
 		g_fh_iso = fopen(iso_path, "rb");
 		if (!g_fh_iso)
-			return 0;
+			return 0;		
 	}
 	
+	//r = lseek64(g_fh_iso, 0, SEEK_END);		
+	//lseek64(g_fh_iso, 0, SEEK_SET);
 	fseeko64(g_fh_iso, 0, SEEK_END);
-	r = ftello64(g_fh_iso);
-		
+	r = ftello64(g_fh_iso);		
 	fseeko64(g_fh_iso, 0, SEEK_SET);
 	
 	isofs_inited = 1;
@@ -1055,9 +1080,11 @@ int isofs_Reset(void)
 	if (isofs_inited) {
 		
 		isofs_FlushCache();	
+		//close(g_fh_iso);
 		fclose(g_fh_iso);
 	}
 	
+	//g_fh_iso = -1;
 	g_fh_iso = NULL;
 	isofs_inited = 0;
 	

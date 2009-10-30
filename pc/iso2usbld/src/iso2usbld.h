@@ -15,7 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #define PROGRAM_NAME "iso2usbld"
 #define PROGRAM_EXTNAME "ISO installer for Open USB Loader"
@@ -24,11 +25,19 @@
 typedef	unsigned char 		u8;
 typedef unsigned short 		u16;
 typedef unsigned int		u32;
+#ifdef _WIN32
 typedef unsigned __int64	u64;
+#else
+typedef unsigned long long	u64;
+#endif
 typedef signed char 		s8;
 typedef signed short 		s16;
-typedef signed int			s32;
+typedef signed int		s32;
+#ifdef _WIN32
 typedef signed __int64		s64;
+#else
+typedef signed long long	s64;
+#endif
 
 typedef struct {
 	char name[32];

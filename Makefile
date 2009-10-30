@@ -23,8 +23,6 @@ all:
 	$(MAKE) $(EE_BIN)
 	echo "Compressing..."
 	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNUSBLD.ELF > /dev/null
-	echo "Building iso2usbld..."
-	$(MAKE) -C pc
 
 clean:
 	echo "Cleaning..."
@@ -49,11 +47,15 @@ clean:
 	echo "    * smbman.irx"
 	$(MAKE) -C modules/smbman clean
 	echo "    * dummy.irx"
-	$(MAKE) -C modules/dummy_irx clean	
+	$(MAKE) -C modules/dummy_irx clean
 	echo "    * iso2usbld"
 	$(MAKE) -C pc clean
 
 rebuild: clean all
+
+pc_tools:
+	echo "Building iso2usbld..."
+	$(MAKE) -C pc
 
 loader.s:
 	echo "    * Loader"

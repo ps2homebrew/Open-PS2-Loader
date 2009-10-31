@@ -183,30 +183,48 @@ void set_ipconfig(void)
 	}
 	sprintf(str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	memcpy((void*)((u32)&smbman_irx+i),str,strlen(str)+1);	
+	memcpy((void*)((u32)&smbman_irx+i+16),&gPCPort, 4);
 }
 
 void th_LoadNetworkModules(void *args){
 	
 	int ret, id;
 	
+	gNetworkStartup = 4;
+	
 	set_ipconfig();
 	
 	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
 		goto fini;
+	}
+	
+	gNetworkStartup = 3;
 	
 	id=SifExecModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
 		goto fini;
+	}
+	
+	gNetworkStartup = 2;
 	
 	id=SifExecModuleBuffer(&ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig, &ret);	
-	if ((id < 0) || ret)
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
 		goto fini;
+	}
+	
+	gNetworkStartup = 1;
 	
 	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
 		goto fini;
+	}
 
+	gNetworkStartup = 0; // ok, all loaded
 fini:		
 	SleepThread();
 }

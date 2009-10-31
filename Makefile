@@ -86,13 +86,13 @@ usbd_ps3.s:
 usbhdfsd.s:
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd
-	bin2s modules/usbhdfsd/bin/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
+	bin2s modules/usbhdfsd/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
 
 ingame_usbhdfsd.s:
 	echo "    * ingame_usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd clean
 	$(MAKE) -C modules/usbhdfsd -f Makefile.readonly
-	bin2s modules/usbhdfsd/bin/usbhdfsd.irx asm/ingame_usbhdfsd.s ingame_usbhdfsd_irx
+	bin2s modules/usbhdfsd/usbhdfsd.irx asm/ingame_usbhdfsd.s ingame_usbhdfsd_irx
 
 isofs.s:
 	echo "    * isofs.irx"

@@ -124,6 +124,8 @@ struct TConfigSet {
 
 // global config
 struct TConfigSet gConfig;
+// global config file path
+const char *gConfigPath;
 
 float waveframe;
 int frame;
@@ -229,8 +231,10 @@ void UpdateScrollSpeed();
 void Flip();
 void MsgBox(char* text);
 
-int LoadConfig(char* fname, int clearFirst);
-int SaveConfig(char* fname);
+// restores the on-line running settings from the global config var.
+void gfxStoreConfig();
+// stores the graphics related settings into the global config var.
+void gfxRestoreConfig();
 
 void DrawWave(int y, int xoffset);
 void DrawBackground();
@@ -274,7 +278,9 @@ void SetMenuDynamic(int dynamic);
 // Renders everything
 void DrawScreen();
 
-
+// main.c config handling
+int storeConfig();
+int restoreConfig();
 
 //CONFIG
 void setConfigStr(struct TConfigSet* config, const char* key, const char* value);
@@ -287,8 +293,8 @@ int getConfigColor(struct TConfigSet* config, const char* key, int* color);
 void readIPConfig();
 void writeIPConfig();
 
-int readConfig(struct TConfigSet* config, char *fname);
-int writeConfig(struct TConfigSet* config, char *fname);
+int readConfig(struct TConfigSet* config, const char *fname);
+int writeConfig(struct TConfigSet* config, const char *fname);
 void clearConfig(struct TConfigSet* config);
 
 void ListDir(char* directory);

@@ -27,6 +27,80 @@ int gLanguageID = 0;
 
 int eth_inited = 0;
 
+// --------------------- Configuration handling --------------------
+int loadConfig(const char* fname, int clearFirst) {
+	if (clearFirst)
+		clearConfig(&gConfig);
+	
+	// fill the config from file
+	int result = readConfig(&gConfig, fname);
+	
+	if (!result)
+		return 0;
+	
+	gfxRestoreConfig();
+
+	char *temp;
+	
+	// restore non-graphics settings as well
+	if (getConfigStr(&gConfig, "pc_ip", &temp))
+		sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
+	
+	return 1;
+}
+
+int saveConfig(const char* fname) {
+	gfxStoreConfig();
+	
+	char temp[255];
+	
+	sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	
+	setConfigStr(&gConfig, "pc_ip", temp);
+
+	// Not writing the IP config, too dangerous to change it by accident...
+	return writeConfig(&gConfig, fname);
+}
+
+int restoreConfig() {
+	readIPConfig();
+
+	// look for mc0 and mc1 first, then mass
+	// the first to load succesfully will store the config location
+	const char* configLocations[] = {
+		"mc0:/SYS-CONF/usbld.cfg",
+		"mc1:/SYS-CONF/usbld.cfg",
+		"mass:/USBLD/usbld.cfg",
+		NULL
+	};
+	
+	unsigned int loc = 0;
+	gConfigPath = NULL;
+	const char *curPath;
+	
+	while ((curPath = configLocations[loc++]) != NULL) {
+		if (loadConfig(curPath, 1) != 0) {
+			gConfigPath = curPath;
+			break;
+		}
+	}
+	
+	return gConfigPath == NULL ? 0 : 1;
+}
+
+int storeConfig() {
+	// use the global path if found, else default to mc0
+	const char *confPath = gConfigPath;
+	
+	if (!confPath)
+		confPath = "mc0:/SYS-CONF/usbld.cfg";
+	
+	// TODO: do we have to create the directory first?
+	// EG: fioMkdir("mass:USBLD");
+	return saveConfig(confPath);
+}
+
+// --------------------- Menu variables, handling & initialization --------------------
 // Submenu items variant of the game list... keeped in sync with the game item list (firstgame, actualgame)
 struct TSubMenuList* usb_submenu = NULL;
 struct TSubMenuList* eth_submenu = NULL;
@@ -312,8 +386,7 @@ void ExecSettings(struct TMenuItem* self, int id) {
 	} else if (id == 5) {
 		ChangeMenuType();
 	} else if (id == 7) {
-		fioMkdir("mass:USBLD");
-		if (SaveConfig("mass:USBLD/usbld.cfg")) {
+		if (storeConfig()) {
 			MsgBox(_l(_STR_SETTINGS_SAVED));
 		} else {
 			MsgBox(_l(_STR_ERROR_SAVING_SETTINGS));
@@ -322,7 +395,6 @@ void ExecSettings(struct TMenuItem* self, int id) {
 }
 
 // --------------------- Menu initialization --------------------
-
 struct TSubMenuList *settings_submenu = NULL;
 
 struct TMenuItem exit_item = {
@@ -377,11 +449,20 @@ void InitMenuItems() {
 	AppendMenuItem(&apps_item);
 }
 
-// --------------------- Main --------------------
-int main(void)
-{
+
+// main initialization function
+void init() {
 	Reset();
+
 	InitGFX();
+
+	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
+	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
+	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
+	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
+	
+	gConfig.head = NULL;
+	gConfig.tail = NULL;
 	
 	SifInitRpc(0);
 	
@@ -392,34 +473,50 @@ int main(void)
 	mcInit(MC_TYPE_MC);
 
 	int ret, id;
-	
+		
 	LoadUSBD();
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
 	
 	delay(3);
+
+	// try to restore config
+	// if successful, it will remember the config location for further writes
+	restoreConfig();
 	
 	InitMenu();
-
+	
 	delay(1);
-
+	
 	/// Init custom menu items
 	InitMenuItems();
-
+	
 	// first column is usb games
 	MenuSetSelectedItem(&usb_games_item);
-
+	
 	StartPad();
 
-	Intro();
+	eth_max_games=0;	
+	max_games=0;
+	usbdelay=0;
+	ethdelay=0;
+	frame=0;	
 
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
+}
 
-	max_games=0;
-	eth_max_games=0;
-	usbdelay=0;
-	ethdelay=0;
-	frame=0;
+// --------------------- Main --------------------
+int main(void)
+{
+	init();
+	
+	Intro();
+	
+	// these seem to matter. Without them, something tends to crush into itself
+	delay(1);
+	
+	Start_LoadNetworkModules_Thread();	
+	
 	TextColor(0x80,0x80,0x80,0x80);
 	
 	while(1)

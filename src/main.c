@@ -102,12 +102,13 @@ int restoreConfig() {
 int storeConfig() {
 	// use the global path if found, else default to mc0
 	const char *confPath = gConfigPath;
+
+	if (gIPConfigChanged)
+		writeIPConfig();
 	
-	if (!confPath)
+	if (!confPath) // default to SYS-CONF on mc0
 		confPath = "mc0:/SYS-CONF/usbld.cfg";
 	
-	// TODO: do we have to create the directory first?
-	// EG: fioMkdir("mass:USBLD");
 	return saveConfig(confPath);
 }
 
@@ -434,8 +435,6 @@ struct TMenuItem apps_item = {
 
 
 void InitMenuItems() {
-	gLanguageID = _LANG_ID_ENGLISH;
-	
 	ClearUSBSubMenu();
 	ClearETHSubMenu();
 	
@@ -476,7 +475,13 @@ void init() {
 	gNetworkStartup = 0;
 	// autostart network?
 	gNetAutostart = 0;
+	// no change to the ipconfig was done
+	gIPConfigChanged = 0;
 	
+	// default to english
+	gLanguageID = _LANG_ID_ENGLISH;
+	setLanguage(gLanguageID);
+
 	gConfig.head = NULL;
 	gConfig.tail = NULL;
 	
@@ -552,7 +557,9 @@ int main(void)
 			MenuPrevV();
 		}else if(GetKey(KEY_DOWN)){
 			MenuNextV();
-		}else if(GetKey(KEY_CROSS)){
+		}
+		
+		if(GetKeyOn(KEY_CROSS)){
 			// handle via callback in the menuitem
 			MenuItemExecute();
 		}

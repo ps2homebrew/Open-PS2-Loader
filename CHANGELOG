@@ -1,0 +1,52 @@
+-----------------------------------------------------------------------------
+
+  Copyright 2009, Ifcaro & jimmikaelkael
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+-----------------------------------------------------------------------------
+
+Open USB Loader ChangeLog:
+
+Version 0.5
+-------------------------------------------------
+- isofs/cdvdman now use disc type
+- cdvdman now has streams
+- Added network support
+- Static interface available
+- Added language support
+- It works in PS3 with PS2 emulation by software 
+
+Version 0.41
+-------------------------------------------------
+- Added theme support
+- Now uses latest usb driver from svn 
+
+Version 0.4
+-------------------------------------------------
+- New interface
+- Core and drivers 100% open source 
+
+-------------------------------------------------------------------------
+
+Version 0.3
+-------------------------------------------------
+- Discontinued (open usb loader starts) 
+
+Version 0.2b
+-------------------------------------------------
+- It uses a embedded free USBD module.
+- Select video mode 
+
+Version 0.2
+-------------------------------------------------
+- Replace USB Advance's reset function for a reset using "rom0:UDNL rom0:EELOADCNF" as argument.
+- It works in PS3 with PS2 emulation by software 
+
+Version 0.1
+-------------------------------------------------
+- Replaces ExtraeModulo() function instead of run after that. 
+
+Version 0.0
+-------------------------------------------------
+- Initial version 

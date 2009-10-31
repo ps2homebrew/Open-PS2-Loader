@@ -1,0 +1,23 @@
+-----------------------------------------------------------------------------
+
+  Copyright 2009, Ifcaro & jimmikaelkael
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+-----------------------------------------------------------------------------
+
+Main code is based on HD Project 1.081
+Copyright (C) 2006-2008 Polo <polo35580@hotmail.fr>
+
+Adaptation to USB Advance format and User interface
+Copyright (C) 2009 Ifcaro <taslokooo@gmail.com>
+
+GUI Improvements and static list by volca
+
+Most of compatibility patches in loader are done by jimmikaelkael
+
+CDVDMAN, SMBMAN & ISOFS modules
+Copyright (C) 2009 jimmikaelkael
+
+NETLOG module
+Copyright (C) 2009 misfire <misfire@xploderfreax.de>

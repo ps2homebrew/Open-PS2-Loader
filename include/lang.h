@@ -31,6 +31,11 @@
 // Menu item text directly...
 #define _STR_LANG_NAME 26
 #define _STR_START_NETWORK 27
+#define _STR_NETWORK_LOADING 28
+#define _STR_NETWORK_STARTUP_ERROR 29
+#define _STR_NETWORK_AUTOSTART 30
+#define _STR_ON 31
+#define _STR_OFF 32
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

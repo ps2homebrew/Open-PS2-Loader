@@ -750,6 +750,7 @@ void DrawIPConfig(){
 	int editing_ps2_netmask=0;
 	int editing_ps2_gateway=0;
 	int editing_pc_ip=0;
+	int editing_port=0;
 	
 	for(i=0;i<4;i++){
 		new_ps2_ip[i]=ps2_ip[i];
@@ -757,6 +758,9 @@ void DrawIPConfig(){
 		new_ps2_gateway[i]=ps2_gateway[i];
 		new_pc_ip[i]=pc_ip[i];
 	}	
+	
+	int new_port = gPCPort;
+	int old_autostart = gNetAutostart;
 
 	while(1){
 		ReadPad();
@@ -764,12 +768,12 @@ void DrawIPConfig(){
 		DrawScreen();
 
 		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
-		DrawQuad(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Darker);
+		DrawQuad(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 100.0f, 422.0f, 540.0f, 422.0f, z, Darker);
 		DrawQuad(gsGlobal, 110.0f, 110.0f, 530.0f, 110.0f, 110.0f, 402.0f, 530.0f, 402.0f, z, Wave_a);
 		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 110.0f, 110.0f, 530.0f, 110.0f, z, Wave_a, Wave_a, Wave_d, Wave_d);
-		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 110.0f, 110.0f, 100.0f, 412.0f, 110.0f, 402.0f, z, Wave_a, Wave_b, Wave_a, Wave_b);
-		DrawQuad_gouraud(gsGlobal, 110.0f, 402.0f, 530.0f, 402.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Wave_b, Wave_b, Wave_d, Wave_d);
-		DrawQuad_gouraud(gsGlobal, 530.0f, 110.0f, 540.0f, 100.0f, 530.0f, 402.0f, 540.0f, 412.0f, z, Wave_b, Wave_d, Wave_b, Wave_d);
+		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 110.0f, 110.0f, 100.0f, 422.0f, 110.0f, 402.0f, z, Wave_a, Wave_b, Wave_a, Wave_b);
+		DrawQuad_gouraud(gsGlobal, 110.0f, 402.0f, 530.0f, 402.0f, 100.0f, 422.0f, 540.0f, 422.0f, z, Wave_b, Wave_b, Wave_d, Wave_d);
+		DrawQuad_gouraud(gsGlobal, 530.0f, 110.0f, 540.0f, 100.0f, 530.0f, 402.0f, 540.0f, 422.0f, z, Wave_b, Wave_d, Wave_b, Wave_d);
 		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 		
 		DrawText(305,120,_l(_STR_IP_CONFIG),1,1);
@@ -921,14 +925,40 @@ void DrawIPConfig(){
 			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
 			snprintf(tmp, 255, "                   %3d", new_pc_ip[3]);
 			DrawText(120,300,tmp,0.8f,0);
-		}	
+		}
+		if(editing_port==0) {
+			snprintf(tmp, 255, "PC PORT: %4d", new_port);
+			if(v_pos==4) {
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			}
+			DrawText(120,340,tmp,0.8f,0);
+		}else if (editing_port==1){
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+			snprintf(tmp, 255, "PC PORT: ");
+			DrawText(120,340,tmp,0.8f,0);
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			snprintf(tmp, 255, "         %4d", new_port);
+			DrawText(120,340,tmp,0.8f,0);
+		}
 		
-		if(v_pos==4){
+		// net autostart
+		if(v_pos==5) {
 			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
 		}else{
 			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
 		}
-		DrawText(310,370,_l(_STR_SAVE_CHANGES),1, 1);
+		
+		snprintf(tmp, 255, "%s: %s", _l(_STR_NETWORK_AUTOSTART), gNetAutostart ? _l(_STR_ON) : _l(_STR_OFF));
+		DrawText(120,380,tmp,0.8f,0);
+		
+		if(v_pos==6){
+			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+		}else{
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+		}
+		DrawText(310,410,_l(_STR_SAVE_CHANGES),1, 1);
 		
 		if(editing_ps2_ip>0){
 			if(GetKey(KEY_UP)){
@@ -1066,13 +1096,32 @@ void DrawIPConfig(){
 				pc_ip[2]=new_pc_ip[2];
 				pc_ip[3]=new_pc_ip[3];
 			}           
-		}else{
+		} else if(editing_port>0) { 
+			// if editing, up and down will rise/lower the port, circle will exit restoring changes, X will store
+			if(GetKey(KEY_UP)) {
+				if (new_port < 1024)
+					new_port++;
+			} else if(GetKey(KEY_DOWN)) {
+				if (new_port > 0)
+					new_port--;
+			} else if(GetKey(KEY_CIRCLE)) {
+				new_port = gPCPort;
+				editing_port = 0;	
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+			} else if(GetKey(KEY_CROSS)) {
+				gPCPort = new_port;
+				editing_port = 0;	
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+			}
+		} else {
 			if(GetKey(KEY_UP)){
 				if(v_pos>0){
 					v_pos--;
 				}
 			}else if(GetKey(KEY_DOWN)){
-				if(v_pos<4){
+				if(v_pos<7){
 					v_pos++;
 				}
 			}else if(GetKey(KEY_CROSS)){
@@ -1093,10 +1142,19 @@ void DrawIPConfig(){
 					SetButtonDelay(KEY_DOWN, 1);
 					editing_pc_ip=1;
 				}else if(v_pos==4){
+					SetButtonDelay(KEY_UP, 1);
+					SetButtonDelay(KEY_DOWN, 1);
+					editing_port=1;
+				} else if(v_pos==5){
+					gNetAutostart = !gNetAutostart;
+				}else if(v_pos==6){
+					old_autostart = gNetAutostart;
 					writeIPConfig();
 					storeConfig();
+					break; // This will give the user a visual clue that he saved ok
 				}
 			}else if(GetKey(KEY_CIRCLE)){
+				gNetAutostart = old_autostart;
 				break;
 			}
 
@@ -1353,6 +1411,26 @@ void DrawInfo() {
 	}
 }
 
+void DrawNetStatus() {
+	char txt[64];
+	
+	// also display network status in lower left corner
+	if (gNetworkStartup > 0) {
+		// darkening quad...
+		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+
+		DrawQuad(gsGlobal, 100.0f, yfix2(360.0f), 
+			           500.0f, yfix2(360.0f), 
+				   100.0f, yfix2(400.0f), 
+				   500.0f, yfix2(400.0f), z, Darker);
+				   
+		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+
+		snprintf(txt, 64, _l(_STR_NETWORK_LOADING), gNetworkStartup);
+		DrawText(115,yfix2(375),txt,1,0);
+	}
+}
+
 void DrawSubMenu() {
 	if (!selected_item)
 		return;
@@ -1569,8 +1647,10 @@ void DrawScreenStatic() {
 	// x offset is 10 pixels
 	// y offset is 125 pixels
 	// the selected item is displayed at 125 + 5 * 30 = 275 px.
-	if (!selected_item)
+	if (!selected_item) {
+		DrawNetStatus();
 		return;
+	}
 	
 	float iscale = -15.0f; // not a scale... an additional spacing in pixels
 	int draw_icons = 1;
@@ -1591,8 +1671,10 @@ void DrawScreenStatic() {
 		
 	struct TSubMenuList *cur = selected_item->item->current;
 	
-	if (!cur) // no rendering if empty
+	if (!cur) { // no rendering if empty
+		DrawNetStatus();
 		return;
+	}
 	
 	// prev item
 	struct TSubMenuList *prev = cur->prev;
@@ -1626,7 +1708,9 @@ void DrawScreenStatic() {
 		
 		cur = cur->next; others++;
 	}
-	
+
+	// Inform about network state...
+	DrawNetStatus();
 }
 
 void SwapMenu() {
@@ -1661,6 +1745,7 @@ void DrawScreen() {
 		DrawBackground();
 		DrawIcons();
 		DrawInfo();
+		DrawNetStatus();
 	}
 }
 

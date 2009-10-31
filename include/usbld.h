@@ -151,6 +151,12 @@ int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
 int pc_ip[4];
+int gPCPort;
+
+// describes what is happening in the network startup thread (>0 means loading, <0 means error)...
+int gNetworkStartup;
+// config parameter ("net_auto") - nonzero means net will autoload
+int gNetAutostart;
 
 // Theme config
 

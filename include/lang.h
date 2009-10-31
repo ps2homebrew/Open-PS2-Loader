@@ -36,6 +36,7 @@
 #define _STR_NETWORK_AUTOSTART 30
 #define _STR_ON 31
 #define _STR_OFF 32
+#define _STR_OK 33
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

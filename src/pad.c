@@ -11,48 +11,9 @@ int ret;
 int port, slot;
 int i;
 struct padButtonStatus buttons;
-u32 oldpaddata;
 u32 paddata;
 int delaycnt[16];
 int paddelay[16];
-
-#define KEY_LEFT 1
-#define KEY_DOWN 2
-#define KEY_RIGHT 3
-#define KEY_UP 4
-#define KEY_START 5
-#define KEY_R3 6
-#define KEY_L3 7
-#define KEY_SELECT 8
-#define KEY_SQUARE 9
-#define KEY_CROSS 10
-#define KEY_CIRCLE 11
-#define KEY_TRIANGLE 12
-#define KEY_R1 13
-#define KEY_L1 14
-#define KEY_R2 15
-#define KEY_L2 16
-
-// KEY_ to PAD_ conversion table
-const int keyToPad[17] = {
-	-1,
-	PAD_LEFT,
-	PAD_DOWN,
-	PAD_RIGHT,
-	PAD_UP,
-	PAD_START,
-	PAD_R3,
-	PAD_L3,
-	PAD_SELECT,
-	PAD_SQUARE,
-	PAD_CROSS,
-	PAD_CIRCLE,
-	PAD_TRIANGLE,
-	PAD_R1,
-	PAD_L1,
-	PAD_R2,
-	PAD_L2
-};
 
 /*
  * Global var's
@@ -179,8 +140,6 @@ int initializePad(int port, int slot){
 
     waitPadReady(port, slot);
 
-    oldpaddata = 0;
-    
     return 1;
 }
 
@@ -188,54 +147,178 @@ void ReadPad(){
         ret = padRead(port, slot, &buttons); // port, slot, buttons
             
         if (ret != 0) {
-		oldpaddata = paddata;
-		paddata = 0xffff ^ buttons.btns;
-	}
+            paddata = 0xffff ^ buttons.btns;
+		}
 }
 
-int GetKey(int num) {
+int GetKey(int num){
 
 	int n, rtn=0;
 	
-	if ( (num<=0) || (num>=17) )
-		return 0;
-	
-	int keyid = keyToPad[num--];
-	
-	if(paddata & keyid) {
-		delaycnt[num]++;
-		if(delaycnt[num]>paddelay[num]) {
-			rtn=1;
-			
-			for(n=0;n<16;n++)
-				delaycnt[n]=paddelay[n];
-			
-			delaycnt[num]=0;
-		}
+	switch(num){
+		case KEY_LEFT:
+			if(paddata & PAD_LEFT){
+				delaycnt[0]++;
+				if(delaycnt[0]>paddelay[0]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[0]=0;
+				}
+			}
+			break;
+		case KEY_DOWN:
+			if(paddata & PAD_DOWN){
+				delaycnt[1]++;
+				if(delaycnt[1]>paddelay[1]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[1]=0;
+				}
+			}
+			break;
+		case KEY_RIGHT:
+			if(paddata & PAD_RIGHT){
+				delaycnt[2]++;
+				if(delaycnt[2]>paddelay[2]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[2]=0;
+				}
+			}
+			break;
+		case KEY_UP:
+			if(paddata & PAD_UP){
+				delaycnt[3]++;
+				if(delaycnt[3]>paddelay[3]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[3]=0;
+				}
+			}
+			break;
+		case KEY_START:
+			if(paddata & PAD_START){
+				delaycnt[4]++;
+				if(delaycnt[4]>paddelay[4]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[4]=0;
+				}
+			}
+			break;
+		case KEY_R3:
+			if(paddata & PAD_R3){
+				delaycnt[5]++;
+				if(delaycnt[5]>paddelay[5]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[5]=0;
+				}
+			}
+			break;
+		case KEY_L3:
+			if(paddata & PAD_L3){
+				delaycnt[6]++;
+				if(delaycnt[6]>paddelay[6]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[6]=0;
+				}
+			}
+			break;
+		case KEY_SELECT:
+			if(paddata & PAD_SELECT){
+				delaycnt[7]++;
+				if(delaycnt[7]>paddelay[7]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[7]=0;
+				}
+			}
+			break;
+		case KEY_SQUARE:
+			if(paddata & PAD_SQUARE){
+				delaycnt[8]++;
+				if(delaycnt[8]>paddelay[8]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[8]=0;
+				}
+			}
+			break;
+		case KEY_CROSS:
+			if(paddata & PAD_CROSS){
+				delaycnt[9]++;
+				if(delaycnt[9]>paddelay[9]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[9]=0;
+				}
+			}
+			break;
+		case KEY_CIRCLE:
+			if(paddata & PAD_CIRCLE){
+				delaycnt[10]++;
+				if(delaycnt[10]>paddelay[10]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[10]=0;
+				}
+			}
+			break;
+		case KEY_TRIANGLE:
+			if(paddata & PAD_TRIANGLE){
+				delaycnt[11]++;
+				if(delaycnt[11]>paddelay[11]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[11]=0;
+				}
+			}
+			break;
+		case KEY_R1:
+			if(paddata & PAD_R1){
+				delaycnt[12]++;
+				if(delaycnt[12]>paddelay[12]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[12]=0;
+				}
+			}
+			break;
+		case KEY_L1:
+			if(paddata & PAD_L1){
+				delaycnt[13]++;
+				if(delaycnt[13]>paddelay[13]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[14]=0;
+				}
+			}
+			break;
+		case KEY_R2:
+			if(paddata & PAD_R2){
+				delaycnt[14]++;
+				if(delaycnt[14]>paddelay[14]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[14]=0;
+				}
+			}
+			break;
+		case KEY_L2:
+			if(paddata & PAD_L2){
+				delaycnt[15]++;
+				if(delaycnt[15]>paddelay[15]){
+					rtn=1;
+					for(n=0;n<16;n++)delaycnt[n]=paddelay[n];
+					delaycnt[15]=0;
+				}
+			}
+			break;
 	}
 
 	return rtn;
-}
-
-int GetKeyOn(int num) {
-	// old v.s. new pad data
-	int keyid = keyToPad[num];
-	
-	return (paddata & keyid) && (!(oldpaddata & keyid));
-}
-
-int GetKeyOff(int num) {
-	// old v.s. new pad data
-	int keyid = keyToPad[num];
-	
-	return (!(paddata & keyid)) && (oldpaddata & keyid);
-}
-
-int GetKeyPressed(int num) {
-	// old v.s. new pad data
-	int keyid = keyToPad[num];
-	
-	return (paddata & keyid);
 }
 
 void SetButtonDelay(int button, int btndelay){

@@ -157,8 +157,6 @@ int gPCPort;
 int gNetworkStartup;
 // config parameter ("net_auto") - nonzero means net will autoload
 int gNetAutostart;
-// true if the ip config should be saved as well
-int gIPConfigChanged;
 
 // Theme config
 
@@ -222,11 +220,6 @@ void SendIrxKernelRAM(void);
 int StartPad();
 void ReadPad();
 int GetKey(int num);
-
-int GetKeyOn(int num);
-int GetKeyOff(int num);
-int GetKeyPressed(int num);
-
 void SetButtonDelay(int button, int btndelay);
 void UnloadPad();
 

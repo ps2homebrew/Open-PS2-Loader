@@ -505,7 +505,6 @@ void DrawConfig(){
 	int editing_text_color=0;
 	int editing_theme_dir=0;
 	int selected_theme_dir=0;
-	int themechanged = 0;
 	
 	if(theme[0]==0){
 		strcpy(theme,"<none>");
@@ -616,7 +615,7 @@ void DrawConfig(){
 		}else{
 			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
 		}
-		DrawText(310,370,_l(_STR_OK),1, 1);
+		DrawText(310,370,_l(_STR_SAVE_CHANGES),1, 1);
 		
 		if(editing_bg_color>0){
 			if(GetKey(KEY_UP)){
@@ -635,17 +634,20 @@ void DrawConfig(){
 				if(editing_bg_color<3){
 					editing_bg_color++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_bg_color=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
 				new_bg_color[0]=bg_color[0];
 				new_bg_color[1]=bg_color[1];
 				new_bg_color[2]=bg_color[2];
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_bg_color=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
+				bg_color[0]=new_bg_color[0];
+				bg_color[1]=new_bg_color[1];
+				bg_color[2]=new_bg_color[2];
 			}
 		}else if(editing_text_color>0){
 			if(GetKey(KEY_UP)){
@@ -664,17 +666,21 @@ void DrawConfig(){
 				if(editing_text_color<3){
 					editing_text_color++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_text_color=0;
 				SetButtonDelay(KEY_UP, 10);
 				SetButtonDelay(KEY_DOWN, 10);
 				new_text_color[0]=text_color[0];
 				new_text_color[1]=text_color[1];
 				new_text_color[2]=text_color[2];
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_text_color=0;
 				SetButtonDelay(KEY_UP, 10);
 				SetButtonDelay(KEY_DOWN, 10);
+				text_color[0]=new_text_color[0];
+				text_color[1]=new_text_color[1];
+				text_color[2]=new_text_color[2];
+
 			}
 		}else if(editing_theme_dir>0){
 			if(GetKey(KEY_UP)){
@@ -685,11 +691,11 @@ void DrawConfig(){
 				if(selected_theme_dir<max_theme_dir-1){
 					selected_theme_dir++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_theme_dir=0;
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_theme_dir=0;
-				themechanged = 1;
+				strcpy(theme,theme_dir[selected_theme_dir]);
 			}
 		}else{
 			if(GetKey(KEY_UP)){
@@ -700,7 +706,7 @@ void DrawConfig(){
 				if(v_pos<3){
 					v_pos++;
 				}
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				if(v_pos==0){
 					SetButtonDelay(KEY_UP, 1);
 					SetButtonDelay(KEY_DOWN, 1);
@@ -712,24 +718,11 @@ void DrawConfig(){
 				}else if(v_pos==2){
 					editing_theme_dir=1;
 					ListDir("mass:USBLD");
-				}else if(v_pos==3) {
-					// store the settings into the global variables
-					bg_color[0]=new_bg_color[0];
-					bg_color[1]=new_bg_color[1];
-					bg_color[2]=new_bg_color[2];
-					
-					text_color[0]=new_text_color[0];
-					text_color[1]=new_text_color[1];
-					text_color[2]=new_text_color[2];
-				
-					// Load the new theme if it changed
-					if (themechanged) {
-						strcpy(theme,theme_dir[selected_theme_dir]);
-						background_image=LoadBackground();
-						LoadIcons();
-						LoadFont();
-					}
-					break;
+				}else if(v_pos==3){
+					storeConfig();
+					background_image=LoadBackground();
+					LoadIcons();
+					LoadFont();
 				}
 			}
 			if(GetKey(KEY_CIRCLE)){
@@ -744,9 +737,6 @@ void DrawConfig(){
 		
 		Flip();
 	}
-	
-	// revert to old button delays
-	UpdateScrollSpeed();
 }
 
 void DrawIPConfig(){
@@ -770,8 +760,7 @@ void DrawIPConfig(){
 	}	
 	
 	int new_port = gPCPort;
-	int new_autostart = gNetAutostart;
-	int ipchanged = gIPConfigChanged;
+	int old_autostart = gNetAutostart;
 
 	while(1){
 		ReadPad();
@@ -961,7 +950,7 @@ void DrawIPConfig(){
 			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
 		}
 		
-		snprintf(tmp, 255, "%s: %s", _l(_STR_NETWORK_AUTOSTART), new_autostart ? _l(_STR_ON) : _l(_STR_OFF));
+		snprintf(tmp, 255, "%s: %s", _l(_STR_NETWORK_AUTOSTART), gNetAutostart ? _l(_STR_ON) : _l(_STR_OFF));
 		DrawText(120,380,tmp,0.8f,0);
 		
 		if(v_pos==6){
@@ -969,7 +958,7 @@ void DrawIPConfig(){
 		}else{
 			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
 		}
-		DrawText(310,410,_l(_STR_OK),1, 1);
+		DrawText(310,410,_l(_STR_SAVE_CHANGES),1, 1);
 		
 		if(editing_ps2_ip>0){
 			if(GetKey(KEY_UP)){
@@ -988,7 +977,7 @@ void DrawIPConfig(){
 				if(editing_ps2_ip<4){
 					editing_ps2_ip++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_ps2_ip=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
@@ -996,11 +985,14 @@ void DrawIPConfig(){
 				new_ps2_ip[1]=ps2_ip[1];
 				new_ps2_ip[2]=ps2_ip[2];
 				new_ps2_ip[3]=ps2_ip[3];
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_ps2_ip=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
-				ipchanged = 1;
+				ps2_ip[0]=new_ps2_ip[0];
+				ps2_ip[1]=new_ps2_ip[1];
+				ps2_ip[2]=new_ps2_ip[2];
+				ps2_ip[3]=new_ps2_ip[3];
 			}
 		}else if(editing_ps2_netmask>0){
 			if(GetKey(KEY_UP)){
@@ -1019,7 +1011,7 @@ void DrawIPConfig(){
 				if(editing_ps2_netmask<4){
 					editing_ps2_netmask++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_ps2_netmask=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
@@ -1027,11 +1019,14 @@ void DrawIPConfig(){
 				new_ps2_netmask[1]=ps2_netmask[1];
 				new_ps2_netmask[2]=ps2_netmask[2];
 				new_ps2_netmask[3]=ps2_netmask[3];
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_ps2_netmask=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
-				ipchanged = 1;
+				ps2_netmask[0]=new_ps2_netmask[0];
+				ps2_netmask[1]=new_ps2_netmask[1];
+				ps2_netmask[2]=new_ps2_netmask[2];
+				ps2_netmask[3]=new_ps2_netmask[3];
 			}
 		}else if(editing_ps2_gateway>0){
 			if(GetKey(KEY_UP)){
@@ -1050,7 +1045,7 @@ void DrawIPConfig(){
 				if(editing_ps2_gateway<4){
 					editing_ps2_gateway++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_ps2_gateway=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
@@ -1058,11 +1053,14 @@ void DrawIPConfig(){
 				new_ps2_gateway[1]=ps2_gateway[1];
 				new_ps2_gateway[2]=ps2_gateway[2];
 				new_ps2_gateway[3]=ps2_gateway[3];
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_ps2_gateway=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
-				ipchanged = 1;
+				ps2_gateway[0]=new_ps2_gateway[0];
+				ps2_gateway[1]=new_ps2_gateway[1];
+				ps2_gateway[2]=new_ps2_gateway[2];
+				ps2_gateway[3]=new_ps2_gateway[3];
 			}                 
 		}else if(editing_pc_ip>0){
 			if(GetKey(KEY_UP)){
@@ -1081,7 +1079,7 @@ void DrawIPConfig(){
 				if(editing_pc_ip<4){
 					editing_pc_ip++;
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
+			}else if(GetKey(KEY_CIRCLE)){
 				editing_pc_ip=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
@@ -1089,10 +1087,14 @@ void DrawIPConfig(){
 				new_pc_ip[1]=pc_ip[1];
 				new_pc_ip[2]=pc_ip[2];
 				new_pc_ip[3]=pc_ip[3];
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				editing_pc_ip=0;
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
+				pc_ip[0]=new_pc_ip[0];
+				pc_ip[1]=new_pc_ip[1];
+				pc_ip[2]=new_pc_ip[2];
+				pc_ip[3]=new_pc_ip[3];
 			}           
 		} else if(editing_port>0) { 
 			// if editing, up and down will rise/lower the port, circle will exit restoring changes, X will store
@@ -1102,12 +1104,12 @@ void DrawIPConfig(){
 			} else if(GetKey(KEY_DOWN)) {
 				if (new_port > 0)
 					new_port--;
-			} else if(GetKeyOn(KEY_CIRCLE)) {
+			} else if(GetKey(KEY_CIRCLE)) {
 				new_port = gPCPort;
 				editing_port = 0;	
 				SetButtonDelay(KEY_UP, 5);
 				SetButtonDelay(KEY_DOWN, 5);
-			} else if(GetKeyOn(KEY_CROSS)) {
+			} else if(GetKey(KEY_CROSS)) {
 				gPCPort = new_port;
 				editing_port = 0;	
 				SetButtonDelay(KEY_UP, 5);
@@ -1119,10 +1121,10 @@ void DrawIPConfig(){
 					v_pos--;
 				}
 			}else if(GetKey(KEY_DOWN)){
-				if(v_pos<6){
+				if(v_pos<7){
 					v_pos++;
 				}
-			}else if(GetKeyOn(KEY_CROSS)){
+			}else if(GetKey(KEY_CROSS)){
 				if(v_pos==0){
 					SetButtonDelay(KEY_UP, 1);
 					SetButtonDelay(KEY_DOWN, 1);
@@ -1144,38 +1146,15 @@ void DrawIPConfig(){
 					SetButtonDelay(KEY_DOWN, 1);
 					editing_port=1;
 				} else if(v_pos==5){
-					new_autostart = !new_autostart;
+					gNetAutostart = !gNetAutostart;
 				}else if(v_pos==6){
-					gNetAutostart = new_autostart;
-					
-					ps2_ip[0]=new_ps2_ip[0];
-					ps2_ip[1]=new_ps2_ip[1];
-					ps2_ip[2]=new_ps2_ip[2];
-					ps2_ip[3]=new_ps2_ip[3];
-
-					ps2_netmask[0]=new_ps2_netmask[0];
-					ps2_netmask[1]=new_ps2_netmask[1];
-					ps2_netmask[2]=new_ps2_netmask[2];
-					ps2_netmask[3]=new_ps2_netmask[3];
-					
-					ps2_gateway[0]=new_ps2_gateway[0];
-					ps2_gateway[1]=new_ps2_gateway[1];
-					ps2_gateway[2]=new_ps2_gateway[2];
-					ps2_gateway[3]=new_ps2_gateway[3];
-
-					pc_ip[0]=new_pc_ip[0];
-					pc_ip[1]=new_pc_ip[1];
-					pc_ip[2]=new_pc_ip[2];
-					pc_ip[3]=new_pc_ip[3];
-
-					// this should only set a global flag
-					// so it does! :)
-					gIPConfigChanged = ipchanged;
-					
+					old_autostart = gNetAutostart;
+					writeIPConfig();
+					storeConfig();
 					break; // This will give the user a visual clue that he saved ok
 				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				gNetAutostart = new_autostart;
+			}else if(GetKey(KEY_CIRCLE)){
+				gNetAutostart = old_autostart;
 				break;
 			}
 
@@ -1183,9 +1162,6 @@ void DrawIPConfig(){
 
 		Flip();
 	}
-	
-	// revert to old button delays
-	UpdateScrollSpeed();
 }
 
 /// Uploads texture to vram

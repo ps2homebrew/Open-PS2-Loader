@@ -36,8 +36,7 @@ char *english[] = {
 	"Network startup error",
 	"Network startup automatic",
 	"On",
-	"Off",
-	"Ok"
+	"Off"
 };
 
 char *czech[] = {
@@ -73,8 +72,7 @@ char *czech[] = {
 	"Chyba pri spousteni site",
 	"Automaticke spusteni site",
 	"Zap",
-	"Vyp",
-	"Ok"
+	"Vyp"
 };
 
 char *spanish[] = {
@@ -110,8 +108,7 @@ char *spanish[] = {
 	"Network startup error",
 	"Network startup automatic",
 	"On",
-	"Off",
-	"Ok"
+	"Off"
 };
 
 char **languages[] = {

@@ -31,7 +31,12 @@ char *english[] = {
 	"Theme", // Submenu items
 	"Language",
 	"Language: English",
-	"Start network"
+	"Start network",
+	"Network loading: %d",
+	"Network startup error",
+	"Network startup automatic",
+	"On",
+	"Off"
 };
 
 char *czech[] = {
@@ -62,7 +67,12 @@ char *czech[] = {
 	"Vzhled", // Submenu items
 	"Jazyk",
 	"Language: Czech",
-	"Spustit sit"
+	"Spustit sit",
+	"Nacitani site: %d",
+	"Chyba pri spousteni site",
+	"Automaticke spusteni site",
+	"Zap",
+	"Vyp"
 };
 
 char *spanish[] = {
@@ -93,7 +103,12 @@ char *spanish[] = {
 	"Tema", // Submenu items
 	"Idioma",
 	"Idioma: Español",
-	"Start network" // TODO: Spanish translation
+	"Start network", // TODO: Spanish translations...
+	"Network loading: %d",
+	"Network startup error",
+	"Network startup automatic",
+	"On",
+	"Off"
 };
 
 char **languages[] = {

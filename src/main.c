@@ -46,17 +46,28 @@ int loadConfig(const char* fname, int clearFirst) {
 	if (getConfigStr(&gConfig, "pc_ip", &temp))
 		sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
 	
+	getConfigInt(&gConfig, "pc_port", &gPCPort);
+	getConfigInt(&gConfig, "net_auto", &gNetAutostart);
+	
+	if (gPCPort < 0)
+		gPCPort = 445;
+	
 	return 1;
 }
 
 int saveConfig(const char* fname) {
 	gfxStoreConfig();
 	
+	if (gPCPort < 0)
+		gPCPort = 445;
+	
 	char temp[255];
 	
 	sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	
 	setConfigStr(&gConfig, "pc_ip", temp);
+	setConfigInt(&gConfig, "pc_port", gPCPort);
+	setConfigInt(&gConfig, "net_auto", gNetAutostart);
 
 	// Not writing the IP config, too dangerous to change it by accident...
 	return writeConfig(&gConfig, fname);
@@ -229,7 +240,7 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 void ClearETHSubMenu() {
 	DestroySubMenu(&eth_submenu);
 	
-	if (eth_inited)
+	if (eth_inited || gNetAutostart)
 		AppendSubMenu(&eth_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
 	else
 		AppendSubMenu(&eth_submenu, &netconfig_icon, "", -1, _STR_START_NETWORK);
@@ -460,6 +471,11 @@ void init() {
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
 	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
+	gPCPort = 445;
+	// loading progress of the network
+	gNetworkStartup = 0;
+	// autostart network?
+	gNetAutostart = 0;
 	
 	gConfig.head = NULL;
 	gConfig.tail = NULL;
@@ -514,8 +530,11 @@ int main(void)
 	
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
-	
-	Start_LoadNetworkModules_Thread();	
+
+	if (gNetAutostart != 0) {
+		Start_LoadNetworkModules_Thread();
+		eth_inited = 1;
+	}
 	
 	TextColor(0x80,0x80,0x80,0x80);
 	
@@ -537,10 +556,16 @@ int main(void)
 			// handle via callback in the menuitem
 			MenuItemExecute();
 		}
-
+		
 		Flip();
 		
 		RefreshSubMenu();
+		
+		// if error starting network happened, message out and disable
+		if (gNetworkStartup < 0) {
+			MsgBox(_l(_STR_NETWORK_STARTUP_ERROR));
+			gNetworkStartup = 0;
+		}
 	}
 
 	return 0;

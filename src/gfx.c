@@ -145,13 +145,9 @@ void InitGFX() {
 	text_color[1]=0xff;
 	text_color[2]=0xff;
 	
-	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
-	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
-	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
-	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 4;
-	
 	infotxt = _l(_STR_WELCOME); // be sure to replace after doing a language change!
 	
+	// defaults
 	setConfigInt(&gConfig, "scrolling", scroll_speed);
 	setConfigInt(&gConfig, "menutype", dynamic_menu);
 	setConfigStr(&gConfig, "theme", "");
@@ -174,7 +170,6 @@ void InitGFX() {
 	gsKit_init_screen(gsGlobal);
 
 	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
-
 }
 
 void DestroyGFX() {
@@ -379,17 +374,7 @@ void DrawWave(int y, int xoffset){
 	}
 }
 
-int LoadConfig(char* fname, int clearFirst) {
-	int r;
-	
-	if (clearFirst)
-		clearConfig(&gConfig);
-	
-	// fill the config from file
-	r = readConfig(&gConfig, fname);
-	if (!r)
-		return 0;
-	
+void gfxRestoreConfig() {
 	char *temp;
 	
 	// reinit all the values we are interested in from the config
@@ -412,14 +397,9 @@ int LoadConfig(char* fname, int clearFirst) {
 	
 	if (getConfigInt(&gConfig, "language", &gLanguageID))
 		setLanguage(gLanguageID);
-		
-	if (getConfigStr(&gConfig, "pc_ip", &temp))
-		sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
-		
-	return 1;	
 }
 
-int SaveConfig(char* fname) {
+void gfxStoreConfig() {
 	// set the config values to be sure they are up-to-date
 	setConfigInt(&gConfig, "scrolling", scroll_speed);
 	setConfigInt(&gConfig, "menutype", dynamic_menu);
@@ -427,22 +407,10 @@ int SaveConfig(char* fname) {
 	setConfigColor(&gConfig, "bgcolor", bg_color);
 	setConfigColor(&gConfig, "textcolor", text_color);
 	setConfigInt(&gConfig, "language", gLanguageID);
-	
-	char temp[255];
-	
-	sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	
-	setConfigStr(&gConfig, "pc_ip", temp);
-	
-	return writeConfig(&gConfig, fname);
 }
 
 void LoadResources() {
 	readIPConfig();
-	if (!LoadConfig("mass:USBLD/usbld.cfg", 0)) {
-		if (!LoadConfig("mc0:/SYS-CONF/usbld.cfg", 0))
-			LoadConfig("mc1:/SYS-CONF/usbld.cfg", 0);
-	}
 	LoadIcons();
 	UpdateIcons();
 	LoadFont(1);
@@ -751,7 +719,7 @@ void DrawConfig(){
 					editing_theme_dir=1;
 					ListDir("mass:USBLD");
 				}else if(v_pos==3){
-					SaveConfig("mass:USBLD/usbld.cfg");
+					storeConfig();
 					background_image=LoadBackground();
 					LoadIcons();
 					LoadFont();
@@ -1126,7 +1094,7 @@ void DrawIPConfig(){
 					editing_pc_ip=1;
 				}else if(v_pos==4){
 					writeIPConfig();
-					SaveConfig("mass:USBLD/usbld.cfg");
+					storeConfig();
 				}
 			}else if(GetKey(KEY_CIRCLE)){
 				break;

@@ -216,7 +216,7 @@ int getConfigColor(struct TConfigSet* config, const char* key, int* color) {
 	}
 }
 
-void readIPConfig(){
+void readIPConfig() {
 	char ipconfig[255];
 	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_RDONLY);
 	if (fd<=0) {
@@ -238,7 +238,7 @@ void readIPConfig(){
 	return;
 }
 
-void writeIPConfig(){
+void writeIPConfig() {
 	char ipconfig[255];
 	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
 	if (fd<=0) {
@@ -258,16 +258,14 @@ void writeIPConfig(){
 }
 
 
-int readConfig(struct TConfigSet* config, char *fname) {
+int readConfig(struct TConfigSet* config, const char *fname) {
 	int fd=fioOpen(fname, O_RDONLY);
 	
 	if (fd<=0) {
 		//DEBUG: printf("No config. Exiting...\n");
 		return 0;
 	}
-	filesize = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-
+	
 	char line[2048];
 	unsigned int lineno = 0;
 	
@@ -291,12 +289,12 @@ int readConfig(struct TConfigSet* config, char *fname) {
 	return 1;
 }
 
-int writeConfig(struct TConfigSet* config, char *fname) {
+int writeConfig(struct TConfigSet* config, const char *fname) {
 	int fd=fioOpen(fname, O_WRONLY | O_CREAT | O_TRUNC);
 	
 	if (fd<=0)
 		return 0;
-
+	
 	char line[2048];
 	struct TConfigValue* cur = config->head;
 	

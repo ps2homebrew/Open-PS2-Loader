@@ -981,7 +981,7 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 	if (nbytes >= (fh->filesize - fh->position))
 		nbytes = fh->filesize - fh->position;
 				
-	offset = (fh->lsn << 11)+ fh->position;
+	offset = (((s64)fh->lsn) << 11)+ fh->position;
 
 	#ifdef DEBUG
 		printf("isofs_Read: offset =%lld nbytes = %d\n", offset, nbytes);

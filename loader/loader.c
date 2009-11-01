@@ -39,7 +39,6 @@ void set_ipconfig(void)
 }
 
 int main(int argc, char **argv){
-	int i;
 	
 	printf("Starting...\n");
 	
@@ -64,19 +63,8 @@ int main(int argc, char **argv){
 	strcpy(g_ps2_gateway, p);
 
 	set_ipconfig();
-		
-	GetIrxKernelRAM();
 	
-	// Clearing user mem, so better not to have anything valuable on stack
-	for (i = 0x100000; i < 0x02000000; i += 64) {
-		asm (
-			"\tsq $0, 0(%0) \n"
-			"\tsq $0, 16(%0) \n"
-			"\tsq $0, 32(%0) \n"
-			"\tsq $0, 48(%0) \n"
-			:: "r" (i)
-		);
-	}
+	GetIrxKernelRAM();
 
 	/* installing kernel hooks */
 	Install_Kernel_Hooks();

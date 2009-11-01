@@ -46,6 +46,8 @@ extern int size_smbman_irx;
 extern void *dummy_irx;
 extern int size_dummy_irx;
 
+static int iop_reboot_count = 0;
+
 /*----------------------------------------------------------------------------------------*/
 void list_modules(void)
 {

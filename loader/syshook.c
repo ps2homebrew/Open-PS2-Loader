@@ -17,7 +17,6 @@ static char g_ElfPath[1024];
 
 int set_reg_hook;
 int set_reg_disabled;
-int iop_reboot_count = 0;
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -68,17 +67,11 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 	if(set_reg_hook)
 	{
 		set_reg_hook--;
-
-		if (set_reg_hook == 0) {
-
-			GS_BGCOLOUR = 0x000000;
-
-			// We should have a mode to do this: this is corresponding to HD-Loader's mode 3
-			if (iop_reboot_count == 2) {
-				//SetSyscall(119, Old_SifSetDma);
-				//SetSyscall(121, Old_SifSetReg);
-			}
-		}
+		// We should have a mode to do this: this is corresponding to HD-Loader's mode 3
+		//if ((set_reg_hook == 0) && (iop_reboot_count == 2)) {
+		//	SetSyscall(119, Old_SifSetDma);
+		//	SetSyscall(121, Old_SifSetReg);
+		//}
 		return 1;
 	}
 

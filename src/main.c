@@ -26,6 +26,117 @@ extern int size_smbman_irx;
 int gLanguageID = 0;
 
 int eth_inited = 0;
+// --------------------------- Dialogs ---------------------------
+// Dialog definition for IP configuration
+struct UIItem diaIPConfig[] = {
+	{UI_LABEL, 0, {.label = {"", _STR_IPCONFIG}}},
+	
+	{UI_SPLITTER},
+
+	// ---- IP address ----
+	{UI_LABEL, 0, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
+	
+	{UI_LABEL, 0, {.label = {"IP", -1}}}, {UI_SPACER}, 
+	
+	{UI_INT, 1, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 2, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 3, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 4, {.intvalue = {10, 10, 0, 255}}},
+
+	{UI_BREAK},
+
+	//  ---- Netmask ----
+	{UI_LABEL, 0, {.label = {"MASK", -1}}},
+	{UI_SPACER}, 
+	
+	{UI_INT, 5, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 6, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 7, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 8, {.intvalue = {0, 0, 0, 255}}},
+	
+	{UI_BREAK},
+	
+	//  ---- Gateway ----
+	{UI_LABEL, 0, {.label = {"GW", -1}}},
+	{UI_SPACER}, 
+	
+	{UI_INT, 9, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 10, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 11, {.intvalue = {0, 0, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 12, {.intvalue = {1, 1, 0, 255}}},
+	
+	{UI_SPLITTER},
+	
+	//  ---- PC ----
+	{UI_LABEL, 0, {.label = {"- PC -", -1}}},
+	{UI_BREAK},
+	
+	{UI_LABEL, 0, {.label = {"IP", -1}}},
+	{UI_SPACER}, 
+	
+	{UI_INT, 13, {.intvalue = {192, 192, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 14, {.intvalue = {168, 168, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 15, {.intvalue = {0, 0, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 16, {.intvalue = {1, 1, 0, 255}}},
+	
+	{UI_BREAK},
+	
+	{UI_LABEL, 0, {.label = {"PORT", -1}}},	{UI_SPACER}, {UI_INT, 17, {.intvalue = {445, 445, 0, 1024}}},
+	
+	{UI_BREAK},
+	
+	//  ---- PC share name ----
+	{UI_LABEL, 0, {.label = {"SHARE NAME", -1}}}, {UI_SPACER}, {UI_STRING, 18, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
+	
+	{UI_LABEL, 0, {.label = {"", _STR_NETWORK_AUTOSTART}}}, {UI_SPACER}, {UI_BOOL, 19, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	//  ---- Ok ----
+	{UI_SPLITTER},
+	{UI_OK, 100},
+	
+	// end of dialogue
+	{UI_TERMINATOR}
+};
+
+// Renders the IP dialog, stores the values if result is ok
+void showIPConfig() {
+	size_t i;
+	// upload current values
+	for (i = 0; i < 4; ++i)
+		diaSetInt(diaIPConfig, 1 + i, ps2_ip[i]);
+	
+	for (i = 0; i < 4; ++i)
+		diaSetInt(diaIPConfig, 5 + i, ps2_netmask[i]);
+	
+	for (i = 0; i < 4; ++i)
+		diaSetInt(diaIPConfig, 9 + i, ps2_gateway[i]);
+	
+	for (i = 0; i < 4; ++i)
+		diaSetInt(diaIPConfig, 13 + i, pc_ip[i]);
+	
+	diaSetInt(diaIPConfig, 17, gPCPort);
+	// TODO: Share name!
+	diaSetInt(diaIPConfig, 19, gNetAutostart);
+	
+	// show dialog
+	if (diaExecuteDialog(diaIPConfig)) {
+		// Ok pressed, store values
+		for (i = 0; i < 4; ++i)
+			diaGetInt(diaIPConfig, 1 + i, &ps2_ip[i]);
+	
+		for (i = 0; i < 4; ++i)
+			diaGetInt(diaIPConfig, 5 + i, &ps2_netmask[i]);
+		
+		for (i = 0; i < 4; ++i)
+			diaGetInt(diaIPConfig, 9 + i, &ps2_gateway[i]);
+		
+		for (i = 0; i < 4; ++i)
+			diaGetInt(diaIPConfig, 13 + i, &pc_ip[i]);
+		
+		diaGetInt(diaIPConfig, 17, &gPCPort);
+		diaGetInt(diaIPConfig, 19, &gNetAutostart);
+	}
+}
 
 // --------------------- Configuration handling --------------------
 int loadConfig(const char* fname, int clearFirst) {
@@ -391,7 +502,7 @@ void ExecSettings(struct TMenuItem* self, int id) {
 		setLanguage(gLanguageID);
 	} else if (id == 3) {
 		// ipconfig
-		DrawIPConfig();
+		showIPConfig();
 	} else if (id == 4) {
 		// scroll speed modifier
 		ChangeScrollSpeed();

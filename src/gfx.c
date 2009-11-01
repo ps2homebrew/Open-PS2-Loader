@@ -1516,6 +1516,212 @@ void DrawSubMenu() {
 	}
 }
 
+
+char* ShowKeyb(){
+	char *text=(char*)malloc(255);
+	int i, len=0, selkeyb=1;
+	int selchar=0, selcommand=-1;
+	char c[2]="\0\0";
+	char *keyb;
+	
+	char keyb1[40]={'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+				   'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+				   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '\'',
+				   'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?'};
+				   
+	char keyb2[40]={'!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
+				   'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+				   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', '"',
+				   'Z', 'X', 'C', 'V', 'B', 'N', 'M', '-', '_', '/'};
+				   
+	char keyb3[40]={'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', '[', ']',
+				   'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', ';', ':',
+				   'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'œ', '`', '¡',
+				   'ß', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', ',', '.', '¿'};
+				   
+	char keyb4[40]={'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', '<', '>',
+				   'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', '=', '+',
+				   'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Œ', '~', '"',
+				   'ß', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ÿ', '-', '_', '/'};
+	
+	char *commands[4]={"BACKSPACE []", "SPACE /\\", "ENTER |>", "MODE"};
+	
+	text[0]=0;
+	keyb=keyb1;
+	
+	while(1){
+		ReadPad();
+				
+		DrawScreen();
+		
+		TextColor(0xff,0xff,0xff,0xff);
+		
+		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+		DrawQuad(gsGlobal, 0.0f, 0.0f, 640.0f, 0.0f, 0.0f, 512.0f, 640.0f, 512.0f, z, Darker);
+		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+		
+		//Text
+		DrawText(50, yfix2(120), text, 1.0f, 0);
+		
+		// Numbers
+		for(i=0;i<=9;i++){
+			if(i==selchar){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(0xff,0xff,0xff,0xff);
+			}
+			c[0]=keyb[i];
+			DrawText(50+(i*32), yfix2(170), c, 1.0f, 0);
+		}
+		
+		// QWERTYUIOP
+		for(i=0;i<=9;i++){
+			if(i+10==selchar){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(0xff,0xff,0xff,0xff);
+			}
+			c[0]=keyb[i+10];
+			DrawText(50+(i*32), yfix2(200), c, 1.0f, 0);
+		}
+		
+		// ASDFGHJKL'
+		for(i=0;i<=9;i++){
+			if(i+20==selchar){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(0xff,0xff,0xff,0xff);
+			}
+			c[0]=keyb[i+20];
+			DrawText(50+(i*32), yfix2(230), c, 1.0f, 0);
+		}
+		
+		// ZXCVBNM,.?
+		for(i=0;i<=9;i++){
+			if(i+30==selchar){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(0xff,0xff,0xff,0xff);
+			}
+			c[0]=keyb[i+30];
+			DrawText(50+(i*32), yfix2(260), c, 1.0f, 0);
+		}
+		
+		// Commands
+		for(i=0;i<=3;i++){
+			if(i==selcommand){
+				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
+			}else{
+				TextColor(0xff,0xff,0xff,0xff);
+			}
+			DrawText(384, yfix2((170+(30*i))), commands[i], 1.0f, 0);
+		}
+		
+		Flip();
+		
+		if(GetKey(KEY_LEFT)){
+			if(selchar>-1 && selchar>0 && (selchar!=10 && selchar!=20 && selchar!=30)){
+				selchar--;
+			}else{
+				if(selchar>-1){
+					selcommand=selchar/10;
+					selchar=-1;
+				}else{
+					selchar=selcommand*10+9;
+					selcommand=-1;
+				}
+			}
+		}else if(GetKey(KEY_RIGHT)){
+			if(selchar>-1 && selchar<39 && (selchar!=9 && selchar!=19 && selchar!=29)){
+				selchar++;
+			}else{
+				if(selchar>-1){
+					selcommand=selchar/10;
+					selchar=-1;
+				}else{
+					selchar=selcommand*10;
+					selcommand=-1;
+					
+				}
+			}
+		}else if(GetKey(KEY_UP)){
+			if(selchar>-1){
+				if(selchar>9){
+					selchar-=10;
+				}else{
+					selchar+=30;
+				}
+			}else{
+				if(selcommand>0){
+					selcommand--;
+				}else{
+					selcommand=3;
+				}
+			}
+		}else if(GetKey(KEY_DOWN)){
+			if(selchar>-1){
+				if(selchar<30){
+					selchar+=10;
+				}else{
+					selchar-=30;
+				}
+			}else{
+				if(selcommand<3){
+					selcommand++;
+				}else{
+					selcommand=0;
+				}
+			}
+		}else if(GetKey(KEY_CROSS)){
+			if(len<254 && selchar>-1){
+				len++;
+				c[0]=keyb[selchar];
+				strcat(text,c);
+			}else if(selcommand==0){
+				if(len>0){ // BACKSPACE
+					len--;
+					text[len]=0;
+				}		
+			}else if(selcommand==1){
+				if(len<254){ // SPACE
+					len++;
+					c[0]=' ';
+					strcat(text,c);
+				}
+			}else if(selcommand==2){
+				return text; //ENTER
+			}else if(selcommand==3){
+				if(selkeyb<4){ // MODE
+					selkeyb++;
+				}else{
+					selkeyb=1;
+				}
+				if(selkeyb==1)keyb=keyb1;
+				if(selkeyb==2)keyb=keyb2;
+				if(selkeyb==3)keyb=keyb3;
+				if(selkeyb==4)keyb=keyb4;
+			}
+		}else if(GetKey(KEY_SQUARE)){
+			if(len>0){ // BACKSPACE
+				len--;
+				text[len]=0;
+			}
+		}else if(GetKey(KEY_TRIANGLE)){
+			if(len<254 && selchar>-1){ // SPACE
+				len++;
+				c[0]=' ';
+				strcat(text,c);
+			}
+		}else if(GetKey(KEY_START)){
+			return text; //ENTER
+		}
+		
+		if(GetKey(KEY_CIRCLE))break;
+	}
+	
+	return NULL;
+}
+
 void MenuNextH() {
 	if (!selected_item) {
 		selected_item = menu;

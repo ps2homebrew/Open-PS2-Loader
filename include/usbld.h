@@ -61,7 +61,6 @@ struct TSubMenuItem {
 	
 	/// item id
 	int id;
-	
 };
 
 struct TSubMenuList {
@@ -126,6 +125,56 @@ struct TConfigSet {
 struct TConfigSet gConfig;
 // global config file path
 const char *gConfigPath;
+
+
+// UI dialog item definition
+typedef enum {
+	// terminates the definition of dialog. Mandatory
+	UI_TERMINATOR,
+	// A string label
+	UI_LABEL,
+	// Break to next line
+	UI_BREAK,
+	// Break to next line, draw line splitter
+	UI_SPLITTER,
+	// A spacer of a few pixels
+	UI_SPACER,
+	// Ok button
+	UI_OK,
+	// draw integer input box
+	UI_INT,
+	// draw string input box
+	UI_STRING,
+	// bool value (On/Off). (Uses int value for storage)
+	UI_BOOL
+}  UIItemType;
+
+// UI item definition (for dialogues)
+struct UIItem {
+	UIItemType type;
+	int id; // id of this item
+	
+	union {
+		struct {
+			char *text;
+			int stringId; // if zero, the text is used
+		} label;
+		
+		struct { // integer value
+			// default value
+			int def;
+			int current;
+			int min;
+			int max;
+		} intvalue;
+		
+		struct { // fixed 32 character string
+			// default value
+			char def[32];
+			char text[32];
+		} stringvalue;
+	};
+};
 
 float waveframe;
 int frame;
@@ -253,7 +302,7 @@ void DrawWave(int y, int xoffset);
 void DrawBackground();
 void SetColor(int r, int g, int b);
 void TextColor(int r, int g, int b, int a);
-void DrawText(int x, int y, char *texto, float scale, int centered);
+void DrawText(int x, int y, const char *texto, float scale, int centered);
 void DrawConfig();
 void DrawIPConfig();
 void UploadTexture(GSTEXTURE* txt);
@@ -290,6 +339,14 @@ void SetMenuDynamic(int dynamic);
 
 // Renders everything
 void DrawScreen();
+
+/// Dialog display
+int diaExecuteDialog(struct UIItem *ui);
+int diaGetInt(struct UIItem* ui, int id, int *value);
+int diaSetInt(struct UIItem* ui, int id, int value);
+int diaGetString(struct UIItem* ui, int id, char **value);
+int diaSetString(struct UIItem* ui, int id, const char *text);
+
 
 // main.c config handling
 int storeConfig();

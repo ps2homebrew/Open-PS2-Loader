@@ -4,12 +4,24 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
+
 #include "include/usbld.h"
 #include "include/lang.h"
 #include <assert.h>
 
+// Row height in dialogues
+#define UI_ROW_HEIGHT 10
+// UI spacing of the dialogues (pixels between consecutive items)
+#define UI_SPACING_H 10
+#define UI_SPACING_V 2
+// spacer ui element width (simulates tab)
+#define UI_SPACER_WIDTH 50
+// length of breaking line in pixels
+#define UI_BREAK_LEN 600
+
 #define yfix(x) (x*gsGlobal->Height)/480
 #define yfix2(x) x+(gsGlobal->Height==512 ? x*0.157f : 0)
+
 					
 extern void *font_raw;
 extern int size_font_raw;
@@ -486,7 +498,7 @@ void TextColor(int r, int g, int b, int a){
 	color_text = GS_SETREG_RGBAQ(r,g,b,a,0x00);
 }
 
-void DrawText(int x, int y, char *texto, float scale, int centered){
+void DrawText(int x, int y, const char *texto, float scale, int centered){
 	if(centered==1){
 		x=x-((strlen(texto)-1)*gsFont->CharWidth/2);
 	}
@@ -1771,5 +1783,464 @@ void DrawScreen() {
 		DrawInfo();
 		DrawNetStatus();
 	}
+}
+
+
+// ----------------------------------------------------------------------------
+// --------------------------- Dialogue handling ------------------------------
+// ----------------------------------------------------------------------------
+const char *diaGetLocalisedText(const char* def, int id) {
+	if (id >= 0)
+		return _l(id);
+	
+	return def;
+}
+// returns true if the item is controllable (e.g. a value can be changed on it)
+int diaIsControllable(struct UIItem *ui) {
+	return (ui->type >= UI_OK);
+}
+
+// returns true if the given item should be preceded with nextline
+int diaShouldBreakLine(struct UIItem *ui) {
+	return (ui->type == UI_SPLITTER || ui->type == UI_OK || ui->type == UI_BREAK);
+}
+
+// returns true if the given item should be superseded with nextline
+int diaShouldBreakLineAfter(struct UIItem *ui) {
+	return (ui->type == UI_SPLITTER || ui->type == UI_OK);
+}
+
+// renders an ui item (either selected or not)
+// sets width and height of the render into the parameters
+void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h) {
+	// height fixed for now
+	*h = UI_ROW_HEIGHT;
+	
+	// all texts are rendered up from the given point!
+	
+	if (selected) {
+		if (haveFocus) // a slightly different color for focus instead of selection
+			TextColor(0xff, 0x080, 0x00, 0xff);
+		else
+			TextColor(0x00, 0x0ff, 0x00, 0xff);
+			
+	} else {
+		if (diaIsControllable(item))
+			TextColor(0x00, 0x0ff, 0x80, 0xff);
+		else
+			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+
+	}
+	
+	// let's see what do we have here?
+	switch (item->type) {
+		case UI_TERMINATOR:
+			return;
+		case UI_LABEL: {
+				// width is text lenght in pixels...
+				const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
+				*w = strlen(txt) * gsFont->CharWidth;
+			
+				DrawText(x, y, txt, 1.0f, 0);
+				break;
+			}
+		case UI_SPLITTER: {
+				// a line. Thanks to the font rendering, we need to shift up by one font line
+				*w = 0; // nothing to render at all
+				*h = UI_SPACING_H;
+				int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
+				// two lines for lesser eye strain :)
+				DrawLine(gsGlobal, x, ypos, x + UI_BREAK_LEN, ypos, 1, White);
+				DrawLine(gsGlobal, x, ypos + 1, x + UI_BREAK_LEN, ypos + 1, 1, White);
+				break;
+			}
+		case UI_BREAK:
+			*w = 0; // nothing to render at all
+			*h = 0;
+			break;
+
+		case UI_SPACER: {
+				// next column divisible by spacer
+				*w = (UI_SPACER_WIDTH - (x + UI_SPACING_H) % UI_SPACER_WIDTH);
+				*h = 0;
+				break;
+			}
+
+		case UI_OK: {
+				const char *txt = _l(_STR_OK);
+				*w = strlen(txt) * 2 * gsFont->CharWidth;
+				*h = 2 * gsFont->CharHeight;
+				
+				DrawText(x, y, txt, 2.0f, 0);
+				break;
+			}
+		case UI_INT: {
+				char tmp[10];
+				
+				snprintf(tmp, 10, "%d", item->intvalue.current);
+				*w = strlen(tmp) * gsFont->CharWidth;
+				
+				DrawText(x, y, tmp, 1.0f, 0);
+				break;
+			}
+		case UI_STRING: {
+				*w = strlen(item->stringvalue.text) * gsFont->CharWidth;
+				
+				DrawText(x, y, item->stringvalue.text, 1.0f, 0);
+				break;
+			}
+		case UI_BOOL: {
+				const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
+				*w = strlen(txtval) * gsFont->CharWidth;
+				
+				DrawText(x, y, txtval, 1.0f, 0);
+				break;
+			}
+	}
+}
+
+// renders whole ui screen (for given dialog setup)
+void diaRenderUI(struct UIItem *ui, struct UIItem *cur, int haveFocus) {
+	// clear screen.
+	DrawBackground();
+	
+	// TODO: Sanitize these values
+	int x0 = 20;
+	int y0 = 20;
+	
+	// render all items
+	struct UIItem *rc = ui;
+	int x = x0, y = y0, hmax = 0;
+	
+	while (rc->type != UI_TERMINATOR) {
+		int w = 0, h = 0;
+
+		if (diaShouldBreakLine(rc)) {
+			x = x0;
+			
+			if (hmax > 0)
+				y += hmax + UI_SPACING_H; 
+			
+			hmax = 0;
+		}
+		
+		diaRenderItem(x, y, rc, rc == cur, haveFocus, &w, &h);
+		
+		if (w > 0)
+			x += w + UI_SPACING_V;
+		
+		hmax = (h > hmax) ? h : hmax;
+		
+		if (diaShouldBreakLineAfter(rc)) {
+			x = x0;
+			
+			if (hmax > 0)
+				y += hmax + UI_SPACING_H; 
+			
+			hmax = 0;
+		}
+		
+		rc++;
+	}
+	
+	// flip display
+	Flip();
+}
+
+// sets the ui item value to the default again
+void diaResetValue(struct UIItem *item) {
+	switch(item->type) {
+		case UI_INT:
+		case UI_BOOL:
+			item->intvalue.current = item->intvalue.def;
+			return;
+		case UI_STRING:
+			strncpy(item->stringvalue.text, item->stringvalue.def, 32);
+			return;
+		default:
+			return;
+	}
+}
+
+int diaHandleInput(struct UIItem *item) {
+	// circle loses focus, sets old values first
+	if (GetKeyOn(KEY_CIRCLE)) {
+		diaResetValue(item);
+		return 0;
+	}
+	
+	// cross loses focus without setting default
+	if (GetKeyOn(KEY_CROSS))
+		return 0;
+	
+	// UI item type dependant part:
+	if (item->type == UI_BOOL) {
+		// a trick. Set new value, lose focus
+		item->intvalue.current = !item->intvalue.current;
+		return 0;
+	} if (item->type == UI_INT) {
+		// to be sure
+		SetButtonDelay(KEY_UP, 1);
+		SetButtonDelay(KEY_DOWN, 1);
+
+		// up and down
+		if (GetKey(KEY_UP) && (item->intvalue.current < item->intvalue.max))
+			item->intvalue.current++;
+		
+		if (GetKey(KEY_DOWN) && (item->intvalue.current > item->intvalue.min))
+			item->intvalue.current--;
+		
+	} else if (item->type == UI_STRING) {
+		// TODO: Code. Virt keyboard needs to be done first somehow (overlay?)
+		// should work like this:
+		/* 
+		char tmp[32];
+		if (diaShowStringInput(tmp, 32))
+			strncpy(item->stringvalue.text, tmp, 32);
+		return 0;
+		*/
+	}
+	
+	return 1;
+}
+
+struct UIItem *diaGetFirstControl(struct UIItem *ui) {
+	struct UIItem *cur = ui;
+	
+	while (!diaIsControllable(cur)) {
+		if (cur->type == UI_TERMINATOR)
+			return ui; 
+		
+		cur++;
+	}
+	
+	return cur;
+}
+
+struct UIItem *diaGetLastControl(struct UIItem *ui) {
+	struct UIItem *last = diaGetFirstControl(ui);
+	struct UIItem *cur = last;
+	
+	while (cur->type != UI_TERMINATOR) {
+		cur++;
+		
+		if (diaIsControllable(cur))
+			last = cur;
+	}
+	
+	return last;
+}
+
+struct UIItem *diaGetNextControl(struct UIItem *cur, struct UIItem* dflt) {
+	while (cur->type != UI_TERMINATOR) {
+		cur++;
+		
+		if (diaIsControllable(cur))
+			return cur;
+	}
+	
+	return dflt;
+}
+
+struct UIItem *diaGetPrevControl(struct UIItem* cur, struct UIItem *ui) {
+	struct UIItem *newf = cur;
+	
+	while (newf != ui) {
+		newf--;
+		
+		if (diaIsControllable(newf))
+			return newf;
+	}
+	
+	return cur;
+}
+
+// finds first control on previous line...
+struct UIItem *diaGetPrevLine(struct UIItem* cur, struct UIItem *ui) {
+	struct UIItem *newf = cur;
+	
+	int lb = 0;
+	int hadCtrl = 0; // had the scanned line any control?
+	
+	while (newf != ui) {
+		newf--;
+		
+		if ((lb > 0) && (diaIsControllable(newf)))
+			hadCtrl = 1;
+		
+		if (diaShouldBreakLine(newf)) {// is this a line break?
+			if (hadCtrl || lb == 0) {
+				lb++;
+				hadCtrl = 0;
+			}
+		}
+		
+		// twice the break? find first control
+		if (lb == 2)
+			return diaGetFirstControl(newf);
+	}
+	
+	return cur;
+}
+
+struct UIItem *diaGetNextLine(struct UIItem* cur, struct UIItem *ui) {
+	struct UIItem *newf = cur;
+	
+	int lb = 0;
+	
+	while (newf->type != UI_TERMINATOR) {
+		newf++;
+		
+		if (diaShouldBreakLine(newf)) {// is this a line break?
+				lb++;
+		}
+		
+		if (lb == 1)
+			return diaGetFirstControl(newf);
+	}
+	
+	return cur;
+}
+
+int diaExecuteDialog(struct UIItem *ui) {
+	struct UIItem *cur = diaGetFirstControl(ui);
+	
+	// what? no controllable item? Exit!
+	if (cur == ui)
+		return -1;
+	
+	int haveFocus = 0;
+	
+	// okay, we have the first selectable item
+	// we can proceed with rendering etc. etc.
+	while (1) {
+		diaRenderUI(ui, cur, haveFocus);
+		
+		ReadPad();
+		
+		if (haveFocus) {
+			haveFocus = diaHandleInput(cur);
+			
+			if (!haveFocus) {
+				SetButtonDelay(KEY_UP, 5);
+				SetButtonDelay(KEY_DOWN, 5);
+			}
+		} else {
+			if (GetKey(KEY_LEFT)) {
+				struct UIItem *newf = diaGetPrevControl(cur, ui);
+				
+				if (newf == cur)
+					cur = diaGetLastControl(ui);
+				else 
+					cur = newf;
+			}
+			
+			if (GetKey(KEY_RIGHT)) {
+				struct UIItem *newf = diaGetNextControl(cur, cur);
+				
+				if (newf == cur)
+					cur = diaGetFirstControl(ui);
+				else 
+					cur = newf;
+			}
+			
+			if(GetKey(KEY_UP)) {
+				// find
+				struct UIItem *newf = diaGetPrevLine(cur, ui);
+				
+				if (newf == cur)
+					cur = diaGetLastControl(ui);
+				else 
+					cur = newf;
+			}
+			
+			if(GetKey(KEY_DOWN)) {
+				// find
+				struct UIItem *newf = diaGetNextLine(cur, ui);
+				
+				if (newf == cur)
+					cur = diaGetFirstControl(ui);
+				else 
+					cur = newf;
+			}
+			
+			// circle breaks focus or exits with false result
+			if (GetKeyOn(KEY_CIRCLE))
+					return 0;
+			
+			// see what key events we have
+			if (GetKeyOn(KEY_CROSS)) {
+				haveFocus = 1;
+				
+				if (cur->type == UI_OK)
+					return 1;
+			}
+		}
+	}
+}
+
+struct UIItem* diaFindByID(struct UIItem* ui, int id) {
+	while (ui->type != UI_TERMINATOR) {
+		if (ui->id == id)
+			return ui;
+			
+		ui++;
+	}
+	
+	return NULL;
+}
+
+int diaGetInt(struct UIItem* ui, int id, int *value) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if ((item->type != UI_INT) && (item->type != UI_BOOL))
+		return 0;
+	
+	*value = item->intvalue.current;
+	return 1;
+}
+
+int diaSetInt(struct UIItem* ui, int id, int value) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if ((item->type != UI_INT) && (item->type != UI_BOOL))
+		return 0;
+	
+	item->intvalue.def = value;
+	item->intvalue.current = value;
+	return 1;
+}
+
+int diaGetString(struct UIItem* ui, int id, char **value) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if (item->type != UI_INT)
+		return 0;
+	
+	*value = item->stringvalue.text;
+	return 1;
+}
+
+int diaSetString(struct UIItem* ui, int id, const char *text) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if (item->type != UI_INT)
+		return 0;
+	
+	strncpy(item->stringvalue.def, text, 32);
+	strncpy(item->stringvalue.text, text, 32);
+	return 1;
 }
 

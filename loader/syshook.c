@@ -195,5 +195,4 @@ void Install_Kernel_Hooks(void)
 	
 	Old_LoadExecPS2 = GetSyscall(6);
 	SetSyscall(6, &HookLoadExecPS2);	
-	
 }

@@ -318,6 +318,7 @@ void DrawIcon(GSTEXTURE *img, int x, int y, float scale);
 void DrawIcons();
 void DrawInfo();
 void DrawSubMenu();
+char* ShowKeyb();
 
 void MenuNextH();
 void MenuPrevH();

@@ -310,6 +310,7 @@ void LaunchGame(TGame *game, int mode)
 	void *pdata;
 	int i;
 	char *argv[2];
+	char gamename[33];
 	char isoname[32];
 	char filename[32];
 	char config_str[255];
@@ -318,7 +319,10 @@ void LaunchGame(TGame *game, int mode)
 	
 	sprintf(filename,"%s",game->Image+3);
 	
-	sprintf(isoname,"ul.%08X.%s",crc32(game->Name),filename);
+	memset(gamename, 0, 33);
+	strncpy(gamename, game->Name, 32);
+
+	sprintf(isoname,"ul.%08X.%s",crc32(gamename),filename);
 	
 	for (i=0;i<size_isofs_irx;i++){
 		if(!strcmp((const char*)((u32)&isofs_irx+i),"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")){

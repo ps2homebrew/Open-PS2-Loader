@@ -955,6 +955,7 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 		(u8 *)tocEntryPointer = CachedDirInfo.cache;
 
 		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); (u8 *)tocEntryPointer += tocEntryPointer->length) {
+			
 			if (tocEntryPointer->length == 0) {
 				#ifdef NETLOG_DEBUG
 					netlog_send("Got a null pointer entry, so either reached end of dir, or end of sector\n");
@@ -1016,6 +1017,7 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 	#endif
 
 	while (CachedDirInfo.cache_size > 0) {
+		
 		(u8 *)tocEntryPointer = CachedDirInfo.cache;
 		
 		if (CachedDirInfo.cache_offset == 0)

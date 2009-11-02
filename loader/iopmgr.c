@@ -74,7 +74,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	char    tmp[0x50];	
 	int eeloadcnf_reset = 0;		
 	
-	GS_BGCOLOUR = 0xff00ff; 
+	GS_BGCOLOUR = 0xFF00FF;
 	
 	iop_reboot_count++;
 	
@@ -187,7 +187,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
-	
+
 	// Reseting IOP.
 	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 	while (!Sync_Iop()){;}
@@ -239,6 +239,8 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifInitIopHeap();
 	LoadFileInit();
 	Sbv_Patch();
+	
+	GS_BGCOLOUR = 0x00FFFF;
 	
 	if (GameMode == USB_MODE) {
 		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);

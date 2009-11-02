@@ -684,6 +684,7 @@ cdvdman_status_t cdvdman_stat;
 
 cdvdman_NCmd_t cdvdman_NCmd;
 
+char cdvdman_filepath[1025];
 
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
@@ -2767,15 +2768,21 @@ int cdvdman_findfile(const char *filepath, cd_file_t *cdfile)
 {
 	int r;
 	static struct TocEntry tocEntry;	
-		
+
 	WaitSema(cdvdman_searchfilesema);
-		
-	r = isofs_FindFile(filepath, &tocEntry);
+
+	char *p = (char *)filepath;
+	if ((!strncmp(p, "\\\\", 2)) || (!strncmp(p, "//", 2)))
+		p++;
+
+	strcpy(cdvdman_filepath, p);
+
+	r = isofs_FindFile(cdvdman_filepath, &tocEntry);
 	if (!r) {
 		SignalSema(cdvdman_searchfilesema);
 		return 0;
 	}
-			
+	
 	cdfile->lsn = tocEntry.fileLBA;
 	cdfile->size = tocEntry.fileSize; 
 	strncpy(cdfile->name, tocEntry.filename, 16); 		
@@ -2783,7 +2790,7 @@ int cdvdman_findfile(const char *filepath, cd_file_t *cdfile)
 	// must fill date too
 
 	SignalSema(cdvdman_searchfilesema);
-					
+			
 	return 1;	
 }
 

@@ -64,7 +64,7 @@ int RecvTimeout(int sock, u8 *buf, int bsize, int timeout)
 int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 {
 	int sock;
-	int ret, retries;
+	int ret;
 	struct sockaddr_in sock_addr;
 	
 	// Creating socket
@@ -78,18 +78,13 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 	sock_addr.sin_addr = dst_IP;
 	sock_addr.sin_family = AF_INET;
 	sock_addr.sin_port = htons(dst_port);
-		 	
-	// 3 attemps to connect
-	for (retries = 0; retries < 3; retries++) {
+
+	while (1) {
 		ret = lwip_connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
 		if (ret >= 0)
 			break;
 		DelayThread(100);	 
 	}
-	if (retries >= 3) {
-		//printf("smbman - tcp: failed to connect socket...\n");
-		return -2;
-	}		
 		
 	return sock;
 }
@@ -100,12 +95,9 @@ int tcp_ConnectSMBClient(char *SMBServerIP, int SMBServerPort)
 	int size, recv_size, total_packet_size;
 	int i, err;
 	struct in_addr dst_addr;
-	int retries;
 	
 	// SMB server IP
 	dst_addr.s_addr = inet_addr(SMBServerIP);
-
-	retries = 0;
 	
 conn_open:
 
@@ -199,10 +191,7 @@ conn_close:
 	
 		//printf("smbman - tcp_ConnectSMBClient: TCP session finished\n");
 		
-		retries++;
-	
-		if (retries < 3)
-			goto conn_open;
+		goto conn_open;
 	}
 		
 	return err;		

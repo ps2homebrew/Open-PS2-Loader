@@ -85,6 +85,7 @@ usbd_ps3.s:
 
 usbhdfsd.s:
 	echo "    * usbhdfsd.irx"
+	$(MAKE) -C modules/usbhdfsd clean
 	$(MAKE) -C modules/usbhdfsd
 	bin2s modules/usbhdfsd/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
 

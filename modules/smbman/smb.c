@@ -13,10 +13,10 @@
 const u8 *smb_hdrSMBmagic = "\xffSMB";
 
 // To hold the Negociate Protocol Response
-smb_NegProt_Rsp smb_NegProt_Response;
+smb_NegProt_Rsp smb_NegProt_Response __attribute__((aligned(64)));
 
 // To hold the Session Setup Response
-smb_SessSetup_Rsp smb_SessSetup_Response;
+smb_SessSetup_Rsp smb_SessSetup_Response __attribute__((aligned(64)));
 
 //-------------------------------------------------------------------------
 u16 smb_GetShort(u8 *src, int offset) // Converts little-endian u16 value to big-endian
@@ -598,7 +598,7 @@ int smb_SessionSetupResponse(u8 *buf, int bsize, smb_SessSetup_Rsp **SessSetupRs
 }
 
 //-------------------------------------------------------------------------
-int smb_FindFirst2Request(u8 *buf, int bsize, char *search_pattern, u16 UID, u16 TID, int maxent) // Builds a Find First2 Request message
+/*int smb_FindFirst2Request(u8 *buf, int bsize, char *search_pattern, u16 UID, u16 TID, int maxent) // Builds a Find First2 Request message
 {
 	u8 *smb_buf;
 	u8 wordcount = 15; // size of our SMB parameters: 15 words
@@ -1082,7 +1082,7 @@ int smb_EchoResponse(u8 *buf, int bsize, u8 *msg, int sz_msg) // analyze Echo Re
 	// return total size of the packet	
 	return offset + 4;	
 }
-
+*/
 //-------------------------------------------------------------------------
 int smb_NTCreateAndXRequest(u8 *buf, int bsize, u16 UID, u16 TID, char *filename) // Builds a NT Create AndX Request message
 {

@@ -6,15 +6,15 @@
 
 #include "tcp.h"
 
-u8 SMB_buf[65536+1024];
+static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
 
 smb_NegProt_Rsp *NegProtResponse;
 smb_SessSetup_Rsp *SessSetupResponse;
 
-static u16 UID, TID, SID;
+static u16 UID, TID; //, SID;
 static int main_socket;
 
-static int getdir_index = 0;
+//static int getdir_index = 0;
 
 const u8 *dialects[1] = {
 	//(const u8 *)"PC NETWORK PROGRAM 1.0",
@@ -268,7 +268,7 @@ int tcp_DisconnectSMBClient(void)
 }
 
 //-------------------------------------------------------------------------
-int tcp_GetDir(char *name, int maxent, smb_FindFirst2_Entry *smbT)
+/*int tcp_GetDir(char *name, int maxent, smb_FindFirst2_Entry *smbT)
 {
 	int size, nument, EOS, err, recv_size, total_packet_size;
 	
@@ -443,7 +443,7 @@ int tcp_EchoSMBServer(u8 *msg, int sz_msg)
 	
 	return 0;
 }
-
+*/
 //-------------------------------------------------------------------------
 int tcp_Open(char *filename, u16 *FID, u32 *filesize)
 {

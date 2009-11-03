@@ -194,12 +194,12 @@ void HookLoadExecPS2(const char *filename, int argc, char *argv[])
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
-	Old_SifSetDma  = GetSyscallHandler(119);
+	Old_SifSetDma  = GetSyscall(119);
 	SetSyscall(119, &Hook_SifSetDma);
 
-	Old_SifSetReg  = GetSyscallHandler(121);
+	Old_SifSetReg  = GetSyscall(121);
 	SetSyscall(121, &Hook_SifSetReg);
 	
-	Old_LoadExecPS2 = GetSyscallHandler(6);
+	Old_LoadExecPS2 = GetSyscall(6);
 	SetSyscall(6, &HookLoadExecPS2);	
 }

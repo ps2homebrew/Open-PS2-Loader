@@ -442,13 +442,13 @@ int smb_NegProtResponse(u8 *buf, int bsize, smb_NegProt_Rsp **NegProtRsp);						
 int smb_SessionSetupRequest(u8 *buf, int bsize, char *User, char *Password, char *share_name); 				// Builds a Session Setup Request message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_SessionSetupResponse(u8 *buf, int bsize, smb_SessSetup_Rsp **SessSetupRsp, u16 *UID, u16 *TID); 	// analyze Session Setup Response message
 	
-int smb_FindFirst2Request(u8 *buf, int bsize, char *search_pattern, u16 UID, u16 TID, int maxent); 			// Builds a Find First2 Request message
-int smb_FindFirst2Response(u8 *buf, int bsize, int *nument, smb_FindFirst2_Entry *info, int *EOS, u16 *Sid);// Analyze Find First2 Response message
-int smb_FindNext2Request(u8 *buf, int bsize, u16 UID, u16 TID, u16 SID, int maxent); 						// Builds a Find Next2 Request message
-int smb_FindNext2Response(u8 *buf, int bsize, int *nument, smb_FindFirst2_Entry *info, int *EOS);			// Analyze Find Next2 Response message
+//int smb_FindFirst2Request(u8 *buf, int bsize, char *search_pattern, u16 UID, u16 TID, int maxent); 			// Builds a Find First2 Request message
+//int smb_FindFirst2Response(u8 *buf, int bsize, int *nument, smb_FindFirst2_Entry *info, int *EOS, u16 *Sid);// Analyze Find First2 Response message
+//int smb_FindNext2Request(u8 *buf, int bsize, u16 UID, u16 TID, u16 SID, int maxent); 						// Builds a Find Next2 Request message
+//int smb_FindNext2Response(u8 *buf, int bsize, int *nument, smb_FindFirst2_Entry *info, int *EOS);			// Analyze Find Next2 Response message
 
-int smb_EchoRequest(u8 *buf, int bsize, u8 *msg, int sz_msg);  												// Builds an Echo Request message
-int smb_EchoResponse(u8 *buf, int bsize, u8 *msg, int sz_msg); 												// Analyze an Echo Response message
+//int smb_EchoRequest(u8 *buf, int bsize, u8 *msg, int sz_msg);  												// Builds an Echo Request message
+//int smb_EchoResponse(u8 *buf, int bsize, u8 *msg, int sz_msg); 												// Analyze an Echo Response message
 	
 int smb_NTCreateAndXRequest(u8 *buf, int bsize, u16 UID, u16 TID, char *filename); 							// Builds a NT Create AndX Request message
 int smb_NTCreateAndXResponse(u8 *buf, int bsize, u16 *FID, u32 *filesize);									// analyze NT Create AndX Response message

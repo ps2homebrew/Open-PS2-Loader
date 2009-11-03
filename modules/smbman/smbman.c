@@ -11,6 +11,7 @@
 #include <intrman.h>
 #include <sifman.h>
 #include <sifrpc.h>
+#include <sysmem.h>
 #include <ioman.h>
 #include <thsemap.h>
 #include <errno.h>
@@ -76,7 +77,7 @@ typedef struct {  // size = 11
 } FHANDLE;
 
 #define MAX_FDHANDLES 		128
-FHANDLE smbman_fdhandles[MAX_FDHANDLES];
+FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
@@ -85,8 +86,6 @@ int _start(int argc, char** argv)
 	char tree_str[255];
 			
 	//printf("smbman v1.0 - jimmikaelkael\n");
-
-	SifInitRpc(0);
 		
 	// Install new device driver
 	if (smbman_initdev())
@@ -97,8 +96,7 @@ int _start(int argc, char** argv)
 	smp.max = 1;
 	smp.option = 0;
 	smbman_io_sema = CreateSema(&smp);
-		
-	
+
     // Next open the Connection with SMB server
     smbConnect(g_pc_ip, g_pc_port);
     	
@@ -153,7 +151,7 @@ int smbDisconnect(void)
 }
 
 //-------------------------------------------------------------- 
-int smbEchoSMBServer(u8 *msg, int size)
+/*int smbEchoSMBServer(u8 *msg, int size)
 {
 	int r;
 
@@ -165,7 +163,7 @@ int smbEchoSMBServer(u8 *msg, int size)
 	
 	return r;
 }
-
+*/
 //-------------------------------------------------------------- 
 int smbOpen(int unit, char *filename, int flags)
 {
@@ -278,8 +276,8 @@ int smbRead(int fd, void *buf, u32 nbytes)
 	rpos = 0;	
 	if (nbytes) {
 		do {
-			if (nbytes > 0xffff)
-				size = 0xffff;
+			if (nbytes > MAX_SMB_BUF)
+				size = MAX_SMB_BUF;
 			else	
 				size = nbytes;
 
@@ -335,7 +333,7 @@ int smbSeek(int fd, u32 offset, int origin)
 }
 
 //-------------------------------------------------------------- 
-int smbGetDir(char *dirname, int maxent, void *info)
+/*int smbGetDir(char *dirname, int maxent, void *info)
 {
 	int r;
 	
@@ -349,7 +347,7 @@ int smbGetDir(char *dirname, int maxent, void *info)
 	
 	return r;	
 }
-
+*/
 //-------------------------------------------------------------- 
 int smb_dummy(void)
 {

@@ -17,11 +17,13 @@
 #include "poll.h"
 #include "smb.h"
 
+#define MAX_SMB_BUF 	15360 // must fit on u16 !!! 
+
 int tcp_ConnectSMBClient(char *SMBServerIP, int SMBServerPort);
 int tcp_SessionSetup(char *User, char *Password, char *Share);
 int tcp_DisconnectSMBClient(void);
-int tcp_GetDir(char *name, int maxent, smb_FindFirst2_Entry *info);
-int tcp_EchoSMBServer(u8 *msg, int sz_msg);
+//int tcp_GetDir(char *name, int maxent, smb_FindFirst2_Entry *info);
+//int tcp_EchoSMBServer(u8 *msg, int sz_msg);
 int tcp_Open(char *filename, u16 *FID, u32 *filesize);
 int tcp_Read(u16 FID, void *buf, u32 offset, u16 nbytes);
 int tcp_Close(u16 FID);

@@ -38,10 +38,10 @@ struct UIItem diaIPConfig[] = {
 	
 	{UI_LABEL, 0, {.label = {"IP", -1}}}, {UI_SPACER}, 
 	
-	{UI_INT, 1, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 2, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 3, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 4, {.intvalue = {10, 10, 0, 255}}},
+	{UI_INT, 2, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 3, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 4, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 5, {.intvalue = {10, 10, 0, 255}}},
 
 	{UI_BREAK},
 
@@ -49,10 +49,10 @@ struct UIItem diaIPConfig[] = {
 	{UI_LABEL, 0, {.label = {"MASK", -1}}},
 	{UI_SPACER}, 
 	
-	{UI_INT, 5, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
 	{UI_INT, 6, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
 	{UI_INT, 7, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 8, {.intvalue = {0, 0, 0, 255}}},
+	{UI_INT, 8, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 9, {.intvalue = {0, 0, 0, 255}}},
 	
 	{UI_BREAK},
 	
@@ -60,10 +60,10 @@ struct UIItem diaIPConfig[] = {
 	{UI_LABEL, 0, {.label = {"GW", -1}}},
 	{UI_SPACER}, 
 	
-	{UI_INT, 9, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 10, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 11, {.intvalue = {0, 0, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 12, {.intvalue = {1, 1, 0, 255}}},
+	{UI_INT, 10, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 11, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 12, {.intvalue = {0, 0, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 13, {.intvalue = {1, 1, 0, 255}}},
 	
 	{UI_SPLITTER},
 	
@@ -74,10 +74,10 @@ struct UIItem diaIPConfig[] = {
 	{UI_LABEL, 0, {.label = {"IP", -1}}},
 	{UI_SPACER}, 
 	
-	{UI_INT, 13, {.intvalue = {192, 192, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 14, {.intvalue = {168, 168, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 15, {.intvalue = {0, 0, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 16, {.intvalue = {1, 1, 0, 255}}},
+	{UI_INT, 14, {.intvalue = {192, 192, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 15, {.intvalue = {168, 168, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 16, {.intvalue = {0, 0, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
+	{UI_INT, 17, {.intvalue = {1, 1, 0, 255}}},
 	
 	{UI_BREAK},
 	
@@ -92,7 +92,36 @@ struct UIItem diaIPConfig[] = {
 	
 	//  ---- Ok ----
 	{UI_SPLITTER},
-	{UI_OK, 100},
+	{UI_OK},
+	
+	// end of dialogue
+	{UI_TERMINATOR}
+};
+
+// Dialog for per-game compatibility settings
+// Dialog definition for IP configuration
+#define COMPAT_SAVE 100
+#define COMPAT_TEST 101
+#define COMPAT_REMOVE 102
+struct UIItem diaCompatConfig[] = {
+	{UI_LABEL, 110, {.label = {"<Game Label>", -1}}},
+	
+	{UI_SPLITTER},
+	
+	{UI_LABEL, 111, {.label = {"", _STR_COMPAT_SETTINGS}}}, {UI_BREAK}, {UI_BREAK}, {UI_BREAK},
+
+	{UI_LABEL, 0, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, 10, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, 11, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, 12, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
+	{UI_OK}, {UI_SPACER}, {UI_BUTTON, COMPAT_SAVE, {.label = {"", _STR_SAVE_CHANGES}}}, 
+		 {UI_SPACER}, {UI_BUTTON, COMPAT_TEST, {.label = {"Test", -1}}},
+	
+	{UI_SPLITTER},
+	
+	{UI_BUTTON, COMPAT_REMOVE, {.label = {"", _STR_REMOVE_ALL_SETTINGS}}},
 	
 	// end of dialogue
 	{UI_TERMINATOR}
@@ -102,41 +131,80 @@ struct UIItem diaIPConfig[] = {
 void showIPConfig() {
 	size_t i;
 	// upload current values
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < 4; ++i) {
 		diaSetInt(diaIPConfig, 1 + i, ps2_ip[i]);
-	
-	for (i = 0; i < 4; ++i)
 		diaSetInt(diaIPConfig, 5 + i, ps2_netmask[i]);
-	
-	for (i = 0; i < 4; ++i)
 		diaSetInt(diaIPConfig, 9 + i, ps2_gateway[i]);
-	
-	for (i = 0; i < 4; ++i)
 		diaSetInt(diaIPConfig, 13 + i, pc_ip[i]);
+	}
 	
 	diaSetInt(diaIPConfig, 17, gPCPort);
-	// TODO: Share name!
+	diaSetString(diaIPConfig, 18, gPCShareName);
 	diaSetInt(diaIPConfig, 19, gNetAutostart);
 	
 	// show dialog
 	if (diaExecuteDialog(diaIPConfig)) {
+		// sanitize the values
 		// Ok pressed, store values
-		for (i = 0; i < 4; ++i)
+		for (i = 0; i < 4; ++i) {
 			diaGetInt(diaIPConfig, 1 + i, &ps2_ip[i]);
-	
-		for (i = 0; i < 4; ++i)
 			diaGetInt(diaIPConfig, 5 + i, &ps2_netmask[i]);
-		
-		for (i = 0; i < 4; ++i)
 			diaGetInt(diaIPConfig, 9 + i, &ps2_gateway[i]);
-		
-		for (i = 0; i < 4; ++i)
 			diaGetInt(diaIPConfig, 13 + i, &pc_ip[i]);
+		}
 		
 		diaGetInt(diaIPConfig, 17, &gPCPort);
+		diaGetString(diaIPConfig, 18, gPCShareName);
 		diaGetInt(diaIPConfig, 19, &gNetAutostart);
+		
+		// has to be non-empty
+		if (strlen(gPCShareName) == 0) {
+			strncpy(gPCShareName, "PS2SMB", 32);
+		}
 	}
 }
+
+// returns COMPAT_TEST on testing request
+int showCompatConfig(const char* game, const char* prefix, int ntype) {
+	char temp[255];
+	int mode[3];
+	int i;
+	
+	diaSetLabel(diaCompatConfig, 110, game);
+	
+	for (i = 0; i < 3; ++i) {
+		snprintf(temp, 255, "%s_%d_%d", prefix, ntype, i+1);
+		
+		if (!getConfigInt(&gConfig, temp, &mode[i]))
+			mode[i] = 0;
+		
+		diaSetInt(diaCompatConfig, i+10, mode[i]);
+	}
+	
+	// show dialog
+	int result = diaExecuteDialog(diaCompatConfig);
+	
+	if (result == COMPAT_REMOVE) {
+		for (i = 0; i < 3; ++i) {
+			snprintf(temp, 255, "%s_%d_%d", prefix, ntype, i+1);
+			configRemoveKey(&gConfig, temp);
+		}
+		
+		MsgBox(_l(_STR_REMOVED_ALL_SETTINGS));
+	} else if (result > 0) { // okay pressed or other button
+		for (i = 0; i < 3; ++i) {
+			diaGetInt(diaCompatConfig, i+10, &mode[i]);
+			snprintf(temp, 255, "%s_%d_%d", prefix, ntype, i+1);
+			setConfigInt(&gConfig, temp, mode[i]);
+		}
+		
+		if (result == COMPAT_SAVE) // write the config
+			storeConfig();
+	}
+	
+	return result;
+}
+
 
 // --------------------- Configuration handling --------------------
 int loadConfig(const char* fname, int clearFirst) {
@@ -160,6 +228,9 @@ int loadConfig(const char* fname, int clearFirst) {
 	getConfigInt(&gConfig, "pc_port", &gPCPort);
 	getConfigInt(&gConfig, "net_auto", &gNetAutostart);
 	
+	if (getConfigStr(&gConfig, "pc_share", &temp))
+		strncpy(gPCShareName, temp, 32);
+	
 	if (gPCPort < 0)
 		gPCPort = 445;
 	
@@ -179,6 +250,7 @@ int saveConfig(const char* fname) {
 	setConfigStr(&gConfig, "pc_ip", temp);
 	setConfigInt(&gConfig, "pc_port", gPCPort);
 	setConfigInt(&gConfig, "net_auto", gNetAutostart);
+	setConfigStr(&gConfig, "pc_share", gPCShareName);
 
 	// Not writing the IP config, too dangerous to change it by accident...
 	return writeConfig(&gConfig, fname);
@@ -220,7 +292,15 @@ int storeConfig() {
 	if (!confPath) // default to SYS-CONF on mc0
 		confPath = "mc0:/SYS-CONF/usbld.cfg";
 	
-	return saveConfig(confPath);
+	int result = saveConfig(confPath);
+	
+	if (result) {
+		MsgBox(_l(_STR_SETTINGS_SAVED));
+	} else {
+		MsgBox(_l(_STR_ERROR_SAVING_SETTINGS));
+	}
+		
+	return result;
 }
 
 // --------------------- Menu variables, handling & initialization --------------------
@@ -252,7 +332,7 @@ void ClearUSBSubMenu() {
 void RefreshUSBGameList() {
 	int fd, size, n;
 	TGameList *list;
-	TGame buffer;
+	char buffer[0x040];
 
 	if(usbdelay<=100)  {
 		usbdelay++;
@@ -289,9 +369,19 @@ void RefreshUSBGameList() {
 		
 		int id = 1; // game id (or order)
 		for(n=0;n<size;n+=0x40,++id){
-			fioRead(fd, &buffer, 0x40);
+			fioRead(fd, buffer, 0x40);
+			
+			
 			list=(TGameList*)malloc(sizeof(TGameList));
-			memcpy(&list->Game,&buffer,sizeof(TGame));
+			
+			// to ensure no leaks happen, we copy manually and pad the strings
+			memcpy(&list->Game.Name, buffer, 32);
+			list->Game.Name[32] = '\0';
+			memcpy(&list->Game.Image, &buffer[32], 16);
+			list->Game.Image[16] = '\0';
+			memcpy(&list->Game.parts, &buffer[48], 1);
+			memcpy(&list->Game.media, &buffer[49], 1);
+			
 			if(actualgame!=NULL){
 				actualgame->next=list;
 				list->prev=actualgame;
@@ -302,6 +392,8 @@ void RefreshUSBGameList() {
 			list->next=0;
 			actualgame=list;
 			max_games++;
+			
+			
 			
 			AppendSubMenu(&usb_submenu, &disc_icon, actualgame->Game.Name, id, -1);
 		}
@@ -349,6 +441,14 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	LaunchGame(&actualgame->Game, USB_MODE);
 }
 
+void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
+	if (id == -1)
+		return;
+	
+	if (showCompatConfig(actualgame->Game.Name,  actualgame->Game.Image, USB_MODE) == COMPAT_TEST)
+		ExecUSBGameSelection(self, id);
+}
+
 void ClearETHSubMenu() {
 	DestroySubMenu(&eth_submenu);
 	
@@ -364,7 +464,7 @@ void ClearETHSubMenu() {
 void RefreshETHGameList() {
 	int fd, size, n;
 	TGameList *list;
-	TGame buffer;
+	char buffer[0x040];
 	
 	if(ethdelay<=100)  {
 		ethdelay++;
@@ -403,7 +503,14 @@ void RefreshETHGameList() {
 		for(n=0;n<size;n+=0x40,++id){
 			fioRead(fd, &buffer, 0x40);
 			list=(TGameList*)malloc(sizeof(TGameList));
-			memcpy(&list->Game,&buffer,sizeof(TGame));
+			
+			memcpy(&list->Game.Name, buffer, 32);
+			list->Game.Name[32] = '\0';
+			memcpy(&list->Game.Image, &buffer[32], 16);
+			list->Game.Image[16] = '\0';
+			memcpy(&list->Game.parts, &buffer[48], 1);
+			memcpy(&list->Game.media, &buffer[49], 1);
+			
 			if(eth_actualgame!=NULL){
 				eth_actualgame->next=list;
 				list->prev=eth_actualgame;
@@ -467,6 +574,14 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	LaunchGame(&eth_actualgame->Game, ETH_MODE);
 }
 
+void AltExecETHGameSelection(struct TMenuItem* self, int id) {
+	if (id == -1)
+		return;
+	
+	if (showCompatConfig(eth_actualgame->Game.Name,  eth_actualgame->Game.Image, ETH_MODE) == COMPAT_TEST)
+		ExecETHGameSelection(self, id);
+}
+
 // --------------------- Exit/Settings Menu item callbacks --------------------
 /// menu item selection callbacks
 void ExecExit(struct TMenuItem* self, int vorder) {
@@ -509,11 +624,7 @@ void ExecSettings(struct TMenuItem* self, int id) {
 	} else if (id == 5) {
 		ChangeMenuType();
 	} else if (id == 7) {
-		if (storeConfig()) {
-			MsgBox(_l(_STR_SETTINGS_SAVED));
-		} else {
-			MsgBox(_l(_STR_ERROR_SAVING_SETTINGS));
-		}
+		storeConfig();
 	}
 }
 
@@ -529,7 +640,7 @@ struct TMenuItem settings_item = {
 };
 
 struct TMenuItem usb_games_item  = {
-	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, &ExecUSBGameSelection, &NextUSBGame, &PrevUSBGame, &ResetUSBOrder, &RefreshUSBGameList
+	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, &ExecUSBGameSelection, &NextUSBGame, &PrevUSBGame, &ResetUSBOrder, &RefreshUSBGameList, &AltExecUSBGameSelection
 };
 
 struct TMenuItem hdd_games_item = {
@@ -537,7 +648,7 @@ struct TMenuItem hdd_games_item = {
 };
 
 struct TMenuItem network_games_item = {
-	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &NextETHGame, &PrevETHGame, &ResetETHOrder, &RefreshETHGameList
+	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &NextETHGame, &PrevETHGame, &ResetETHOrder, &RefreshETHGameList, &AltExecETHGameSelection
 };
 
 struct TMenuItem apps_item = {
@@ -588,6 +699,8 @@ void init() {
 	gNetAutostart = 0;
 	// no change to the ipconfig was done
 	gIPConfigChanged = 0;
+	// Default PC share name
+	strncpy(gPCShareName, "PS2SMB", 32);
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;
@@ -673,6 +786,9 @@ int main(void)
 		if(GetKeyOn(KEY_CROSS)){
 			// handle via callback in the menuitem
 			MenuItemExecute();
+		} else if(GetKeyOn(KEY_TRIANGLE)){
+			// handle via callback in the menuitem
+			MenuItemAltExecute();
 		}
 		
 		Flip();

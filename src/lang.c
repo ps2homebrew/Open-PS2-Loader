@@ -37,7 +37,10 @@ char *english[] = {
 	"Network startup automatic",
 	"On",
 	"Off",
-	"Ok"
+	"Ok",
+	"Compatibility settings",
+	"Remove all settings",
+	"Removed all keys for the game"
 };
 
 char *czech[] = {
@@ -74,7 +77,10 @@ char *czech[] = {
 	"Automaticke spusteni site",
 	"Zap",
 	"Vyp",
-	"Ok"
+	"Ok",
+	"Nastaveni kompatibility",
+	"Odstranit vsechna nastaveni",
+	"Vsechna nastaveni hry odstranena"
 };
 
 char *spanish[] = {
@@ -111,7 +117,10 @@ char *spanish[] = {
 	"Network startup automatic",
 	"On",
 	"Off",
-	"Ok"
+	"Ok",
+	"Compatibility settings",
+	"Remove all settings",
+	"Removed all keys for the game"
 };
 
 char **languages[] = {

@@ -112,14 +112,26 @@ int splitAssignment(const char* line, char* key, char* val) {
 	return 1;
 }
 
+int configKeyValidate(const char* key) {
+	if (strlen(key) == 0)
+		return 0;
+	
+	int eqpos = strpos(key, '=');
+	
+	if (eqpos < 0)
+		return 1;
+	
+	return 0;
+}
+
 void configValueToText(struct TConfigValue* val, char* buf, unsigned int size) {
 	snprintf(buf, size, "%s=%s", val->key, val->val);
 }
 
 struct TConfigValue* allocConfigItem(const char* key, const char* val) {
 	struct TConfigValue* it = (struct TConfigValue*)malloc(sizeof(struct TConfigValue));
-	strncpy(it->key, key, 15);
-	it->key[min(strlen(key), 14)] = '\0';
+	strncpy(it->key, key, 32);
+	it->key[min(strlen(key), 31)] = '\0';
 	strncpy(it->val, val, 255);
 	it->val[min(strlen(val), 254)] = '\0';
 	it->next = NULL;
@@ -142,7 +154,7 @@ struct TConfigValue* getConfigItemForName(struct TConfigSet* config, const char*
 	struct TConfigValue* val = config->head;
 	
 	while (val) {
-		if (strcmp(val->key, name) == 0)
+		if (strncmp(val->key, name, 32) == 0)
 			break;
 		
 		val = val->next;
@@ -154,7 +166,10 @@ struct TConfigValue* getConfigItemForName(struct TConfigSet* config, const char*
 // --------------------------------------------------------------------------------------
 // ------------------------------ Config getters and setters ----------------------------
 // --------------------------------------------------------------------------------------
-void setConfigStr(struct TConfigSet* config, const char* key, const char* value) {
+int setConfigStr(struct TConfigSet* config, const char* key, const char* value) {
+	if (!configKeyValidate(key))
+		return 0;
+	
 	struct TConfigValue *it = getConfigItemForName(config, key);
 	
 	if (it) {
@@ -163,10 +178,15 @@ void setConfigStr(struct TConfigSet* config, const char* key, const char* value)
 	} else {
 		addConfigValue(config, key, value);
 	}
+	
+	return 1;
 }
 
 // sets the value to point to the value str in the config. Do not overwrite - it will overwrite the string in config
 int getConfigStr(struct TConfigSet* config, const char* key, char** value) {
+	if (!configKeyValidate(key))
+		return 0;
+	
 	struct TConfigValue *it = getConfigItemForName(config, key);
 	
 	if (it) {
@@ -177,12 +197,11 @@ int getConfigStr(struct TConfigSet* config, const char* key, char** value) {
 	}
 }
 	
-void setConfigInt(struct TConfigSet* config, const char* key, const int value) {
+int setConfigInt(struct TConfigSet* config, const char* key, const int value) {
 	char tmp[12];
 	
 	snprintf(tmp, 12, "%d", value);
-	setConfigStr(config, key, tmp);
-	
+	return setConfigStr(config, key, tmp);
 }
 
 int getConfigInt(struct TConfigSet* config, char* key, int* value) {
@@ -197,11 +216,11 @@ int getConfigInt(struct TConfigSet* config, char* key, int* value) {
 	}
 }
 
-void setConfigColor(struct TConfigSet* config, const char* key, int* color) {
+int setConfigColor(struct TConfigSet* config, const char* key, int* color) {
 	char tmp[8];
 	
 	snprintf(tmp, 8, "#%02X%02X%02X", color[0], color[1], color[2]);
-	setConfigStr(config, key, tmp);
+	return setConfigStr(config, key, tmp);
 }
 
 int getConfigColor(struct TConfigSet* config, const char* key, int* color) {
@@ -214,6 +233,35 @@ int getConfigColor(struct TConfigSet* config, const char* key, int* color) {
 	} else {
 		return 0;
 	}
+}
+
+int configRemoveKey(struct TConfigSet* config, const char* key) {
+	// remove config key from config set
+	if (!configKeyValidate(key))
+		return 0;
+	
+	struct TConfigValue* val = config->head;
+	struct TConfigValue* prev = NULL;
+	
+	while (val) {
+		if (strncmp(val->key, key, 32) == 0) {
+			if (prev)
+				prev->next = val->next;
+			
+			if (val == config->head)
+				config->head = val->next;
+			
+			if (val == config->tail)
+				config->tail = val->next;
+			
+			free(val);
+		}
+		
+		prev = val;
+		val = val->next;
+	}
+	
+	return 1;
 }
 
 void readIPConfig() {

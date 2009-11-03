@@ -184,6 +184,7 @@ void set_ipconfig(void)
 	sprintf(str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	memcpy((void*)((u32)&smbman_irx+i),str,strlen(str)+1);	
 	memcpy((void*)((u32)&smbman_irx+i+16),&gPCPort, 4);
+	memcpy((void*)((u32)&smbman_irx+i+20), gPCShareName, 32);
 }
 
 void th_LoadNetworkModules(void *args){

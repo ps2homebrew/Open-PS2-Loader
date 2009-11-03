@@ -16,6 +16,8 @@
 #define UI_SPACING_V 2
 // spacer ui element width (simulates tab)
 #define UI_SPACER_WIDTH 50
+// minimal pixel width of spacer
+#define UI_SPACER_MINIMAL 30
 // length of breaking line in pixels
 #define UI_BREAK_LEN 600
 
@@ -1517,9 +1519,8 @@ void DrawSubMenu() {
 }
 
 
-char* ShowKeyb(){
-	char *text=(char*)malloc(255);
-	int i, len=0, selkeyb=1;
+int ShowKeyb(char* text, size_t maxLen) {
+	int i, len=strlen(text), selkeyb=1;
 	int selchar=0, selcommand=-1;
 	char c[2]="\0\0";
 	char *keyb;
@@ -1544,15 +1545,14 @@ char* ShowKeyb(){
 				   'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Œ', '~', '"',
 				   'ß', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ÿ', '-', '_', '/'};
 	
-	char *commands[4]={"BACKSPACE []", "SPACE /\\", "ENTER |>", "MODE"};
+	char *commands[4]={"BACKSPACE []", "SPACE /\\", "ENTER (Start)", "MODE (Sel.)"};
 	
-	text[0]=0;
 	keyb=keyb1;
 	
 	while(1){
 		ReadPad();
 				
-		DrawScreen();
+		DrawBackground();
 		
 		TextColor(0xff,0xff,0xff,0xff);
 		
@@ -1562,6 +1562,12 @@ char* ShowKeyb(){
 		
 		//Text
 		DrawText(50, yfix2(120), text, 1.0f, 0);
+		
+		// separating line for simpler orientation
+		int ypos = yfix2(135);
+		DrawLine(gsGlobal, 25, ypos, 600, ypos, 1, White);
+		DrawLine(gsGlobal, 25, ypos + 1, 600, ypos + 1, 1, White);
+
 		
 		// Numbers
 		for(i=0;i<=9;i++){
@@ -1672,8 +1678,8 @@ char* ShowKeyb(){
 					selcommand=0;
 				}
 			}
-		}else if(GetKey(KEY_CROSS)){
-			if(len<254 && selchar>-1){
+		}else if(GetKeyOn(KEY_CROSS)){
+			if(len<(maxLen-1) && selchar>-1){
 				len++;
 				c[0]=keyb[selchar];
 				strcat(text,c);
@@ -1683,13 +1689,13 @@ char* ShowKeyb(){
 					text[len]=0;
 				}		
 			}else if(selcommand==1){
-				if(len<254){ // SPACE
+				if(len<(maxLen-1)){ // SPACE
 					len++;
 					c[0]=' ';
 					strcat(text,c);
 				}
 			}else if(selcommand==2){
-				return text; //ENTER
+				return 1; //ENTER
 			}else if(selcommand==3){
 				if(selkeyb<4){ // MODE
 					selkeyb++;
@@ -1707,19 +1713,29 @@ char* ShowKeyb(){
 				text[len]=0;
 			}
 		}else if(GetKey(KEY_TRIANGLE)){
-			if(len<254 && selchar>-1){ // SPACE
+			if(len<(maxLen-1) && selchar>-1){ // SPACE
 				len++;
 				c[0]=' ';
 				strcat(text,c);
 			}
-		}else if(GetKey(KEY_START)){
-			return text; //ENTER
+		}else if(GetKeyOn(KEY_START)){
+			return 1; //ENTER
+		} else if (GetKeyOn(KEY_SELECT)) {
+			if(selkeyb<4){ // MODE
+				selkeyb++;
+			}else{
+				selkeyb=1;
+			}
+			if(selkeyb==1)keyb=keyb1;
+			if(selkeyb==2)keyb=keyb2;
+			if(selkeyb==3)keyb=keyb3;
+			if(selkeyb==4)keyb=keyb4;
 		}
 		
 		if(GetKey(KEY_CIRCLE))break;
 	}
 	
-	return NULL;
+	return 0;
 }
 
 void MenuNextH() {
@@ -1820,6 +1836,20 @@ void MenuItemExecute() {
 			subid = cur->item.id;
 		
 		selected_item->item->execute(selected_item->item, subid);
+	}
+}
+
+void MenuItemAltExecute() {
+	if (selected_item && (selected_item->item->altExecute)) {
+		// selected submenu id. default -1 = no selection
+		int subid = -1;
+		
+		struct TSubMenuList *cur = selected_item->item->current;
+		
+		if (cur)
+			subid = cur->item.id;
+		
+		selected_item->item->altExecute(selected_item->item, subid);
 	}
 }
 
@@ -2013,7 +2043,7 @@ int diaShouldBreakLine(struct UIItem *ui) {
 
 // returns true if the given item should be superseded with nextline
 int diaShouldBreakLineAfter(struct UIItem *ui) {
-	return (ui->type == UI_SPLITTER || ui->type == UI_OK);
+	return (ui->type == UI_SPLITTER);
 }
 
 // renders an ui item (either selected or not)
@@ -2042,6 +2072,8 @@ void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocu
 	switch (item->type) {
 		case UI_TERMINATOR:
 			return;
+		
+		case UI_BUTTON:	
 		case UI_LABEL: {
 				// width is text lenght in pixels...
 				const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
@@ -2067,19 +2099,26 @@ void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocu
 
 		case UI_SPACER: {
 				// next column divisible by spacer
-				*w = (UI_SPACER_WIDTH - (x + UI_SPACING_H) % UI_SPACER_WIDTH);
+				*w = (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
+		
+				if (*w < UI_SPACER_MINIMAL) {
+					x += *w + UI_SPACER_MINIMAL;
+					*w += (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
+				}
+
 				*h = 0;
 				break;
 			}
 
 		case UI_OK: {
 				const char *txt = _l(_STR_OK);
-				*w = strlen(txt) * 2 * gsFont->CharWidth;
-				*h = 2 * gsFont->CharHeight;
+				*w = strlen(txt) * gsFont->CharWidth;
+				*h = gsFont->CharHeight;
 				
-				DrawText(x, y, txt, 2.0f, 0);
+				DrawText(x, y, txt, 1.0f, 0);
 				break;
 			}
+
 		case UI_INT: {
 				char tmp[10];
 				
@@ -2102,14 +2141,31 @@ void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocu
 				DrawText(x, y, txtval, 1.0f, 0);
 				break;
 			}
+		case UI_ENUM: {
+				const char* tv = item->enumvalue.values[item->intvalue.current];
+
+				if (!tv)
+					tv = "<no value>";
+
+				*w = strlen(tv) * gsFont->CharWidth;
+				
+				DrawText(x, y, tv, 1.0f, 0);
+				break;
+		}
 	}
 }
 
 // renders whole ui screen (for given dialog setup)
 void diaRenderUI(struct UIItem *ui, struct UIItem *cur, int haveFocus) {
-	// clear screen.
+	// clear screen, draw background
 	DrawBackground();
 	
+	// darken for better contrast
+	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+	DrawQuad(gsGlobal, 0.0f, 0.0f, 640.0f, 0.0f, 0.0f, 512.0f, 640.0f, 512.0f, z, Darker);
+	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+
+
 	// TODO: Sanitize these values
 	int x0 = 20;
 	int y0 = 20;
@@ -2197,14 +2253,30 @@ int diaHandleInput(struct UIItem *item) {
 			item->intvalue.current--;
 		
 	} else if (item->type == UI_STRING) {
-		// TODO: Code. Virt keyboard needs to be done first somehow (overlay?)
-		// should work like this:
-		/* 
 		char tmp[32];
-		if (diaShowStringInput(tmp, 32))
+		strncpy(tmp, item->stringvalue.text, 32);
+
+		if (ShowKeyb(tmp, 32))
 			strncpy(item->stringvalue.text, tmp, 32);
+
 		return 0;
-		*/
+	} else if (item->type == UI_ENUM) {
+		int cur = item->intvalue.current;
+
+		if (item->enumvalue.values[cur] == NULL) {
+			if (cur > 0)
+				item->intvalue.current--;
+			else
+				return 0;
+		}
+
+		if (GetKey(KEY_UP) && (cur > 0))
+			item->intvalue.current--;
+		
+		++cur;
+
+		if (GetKey(KEY_DOWN) && (item->enumvalue.values[cur] != NULL))
+			item->intvalue.current = cur;
 	}
 	
 	return 1;
@@ -2378,6 +2450,9 @@ int diaExecuteDialog(struct UIItem *ui) {
 			if (GetKeyOn(KEY_CROSS)) {
 				haveFocus = 1;
 				
+				if (cur->type == UI_BUTTON)
+					return cur->id;
+
 				if (cur->type == UI_OK)
 					return 1;
 			}
@@ -2402,7 +2477,7 @@ int diaGetInt(struct UIItem* ui, int id, int *value) {
 	if (!item)
 		return 0;
 	
-	if ((item->type != UI_INT) && (item->type != UI_BOOL))
+	if ((item->type != UI_INT) && (item->type != UI_BOOL) && (item->type != UI_ENUM))
 		return 0;
 	
 	*value = item->intvalue.current;
@@ -2415,7 +2490,7 @@ int diaSetInt(struct UIItem* ui, int id, int value) {
 	if (!item)
 		return 0;
 	
-	if ((item->type != UI_INT) && (item->type != UI_BOOL))
+	if ((item->type != UI_INT) && (item->type != UI_BOOL) && (item->type != UI_ENUM))
 		return 0;
 	
 	item->intvalue.def = value;
@@ -2423,16 +2498,16 @@ int diaSetInt(struct UIItem* ui, int id, int value) {
 	return 1;
 }
 
-int diaGetString(struct UIItem* ui, int id, char **value) {
+int diaGetString(struct UIItem* ui, int id, char *value) {
 	struct UIItem *item = diaFindByID(ui, id);
 	
 	if (!item)
 		return 0;
 	
-	if (item->type != UI_INT)
+	if (item->type != UI_STRING)
 		return 0;
 	
-	*value = item->stringvalue.text;
+	strncpy(value, item->stringvalue.text, 32);
 	return 1;
 }
 
@@ -2442,7 +2517,7 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 	if (!item)
 		return 0;
 	
-	if (item->type != UI_INT)
+	if (item->type != UI_STRING)
 		return 0;
 	
 	strncpy(item->stringvalue.def, text, 32);
@@ -2450,3 +2525,15 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 	return 1;
 }
 
+int diaSetLabel(struct UIItem* ui, int id, const char *text) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if (item->type != UI_LABEL)
+		return 0;
+	
+	item->label.text = text;
+	return 1;
+}

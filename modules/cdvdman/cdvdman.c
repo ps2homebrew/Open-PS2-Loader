@@ -702,7 +702,15 @@ int _start(int argc, char** argv)
 	
 	// Start NCMD server thread
 	cdvdman_startNCmdthread();
-	
+
+	FlushDcache();
+	CpuEnableIntr();
+
+	if (!sceSifCheckInit())
+		sceSifInit();
+
+	sceSifInitRpc(0);
+		
 	// Start RPC servers threads
 	cdvdman_startrpcthreads();
 	
@@ -718,10 +726,10 @@ void cdvdman_startrpcthreads(void)
 	// Create and starts all needed rpc server threads
 	int thid;
 	rpcthread_param_t *th_p;
-	
+
 	thid = cdvdman_createthread((void *)cdvdfsv_rpc1_th, 0x51, 0x2000);
 	StartThread(thid, 0);
-	
+
 	thid = cdvdman_createthread((void *)cdvdfsv_rpc2_th, 0x51, 0x2000);
 	StartThread(thid, 0);
 

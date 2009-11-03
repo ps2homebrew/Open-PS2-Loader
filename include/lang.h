@@ -37,6 +37,9 @@
 #define _STR_ON 31
 #define _STR_OFF 32
 #define _STR_OK 33
+#define _STR_COMPAT_SETTINGS 34
+#define _STR_REMOVE_ALL_SETTINGS 35
+#define _STR_REMOVED_ALL_SETTINGS 36
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

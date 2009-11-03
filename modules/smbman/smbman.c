@@ -25,6 +25,7 @@ IRX_ID(MODNAME, 1, 1);
 
 static char g_pc_ip[]="xxx.xxx.xxx.xxx";
 static int g_pc_port = 445; // &g_pc_ip + 16
+static char g_pc_share[32]="PS2SMB";
 
 int smbman_initdev(void);
 
@@ -101,7 +102,7 @@ int _start(int argc, char** argv)
     smbConnect(g_pc_ip, g_pc_port);
     	
     // Then open a session and a tree connect on the share resource
-    sprintf(tree_str, "\\\\%s\\PS2SMB", g_pc_ip);
+    sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
     smbLogin("GUEST", "", tree_str);
     								
 	return MODULE_RESIDENT_END;

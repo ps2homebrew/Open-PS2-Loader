@@ -25,8 +25,8 @@
 typedef
 struct TGame
 {
-	char           Name[32];
-	char           Image[15];
+	char           Name[33];
+	char           Image[16];
 	unsigned char  parts;
 	unsigned char  media;
 } TGame;
@@ -95,6 +95,9 @@ struct TMenuItem {
 	int (*resetOrder)(struct TMenuItem *self);
 	
 	void (*refresh)(struct TMenuItem *self);
+	
+	/// Alternate execution (can be used for item configuration for example)
+	void (*altExecute)(struct TMenuItem *self, int id);
 };
 
 struct TMenuList {
@@ -110,7 +113,7 @@ struct TMenuList *selected_item;
 // Configuration handling
 // single config value (linked list item)
 struct TConfigValue {
-        char key[15];
+        char key[32];
         char val[255];
 
         struct TConfigValue *next;
@@ -140,13 +143,17 @@ typedef enum {
 	// A spacer of a few pixels
 	UI_SPACER,
 	// Ok button
-	UI_OK,
+	UI_OK, // Just a shortcut for BUTTON with OK label and id 1!
+	// Universal button (display's label, returns id on X)
+	UI_BUTTON,
 	// draw integer input box
 	UI_INT,
 	// draw string input box
 	UI_STRING,
 	// bool value (On/Off). (Uses int value for storage)
-	UI_BOOL
+	UI_BOOL,
+	// enumeration (multiple strings)
+	UI_ENUM
 }  UIItemType;
 
 // UI item definition (for dialogues)
@@ -156,7 +163,7 @@ struct UIItem {
 	
 	union {
 		struct {
-			char *text;
+			const char *text;
 			int stringId; // if zero, the text is used
 		} label;
 		
@@ -173,6 +180,10 @@ struct UIItem {
 			char def[32];
 			char text[32];
 		} stringvalue;
+		
+		struct { // enumeration definition. Enum uses intvalue for storage...	
+			char **values; // last one has to be NULL
+		} enumvalue;
 	};
 };
 
@@ -201,6 +212,8 @@ int ps2_netmask[4];
 int ps2_gateway[4];
 int pc_ip[4];
 int gPCPort;
+
+char gPCShareName[32];
 
 // describes what is happening in the network startup thread (>0 means loading, <0 means error)...
 int gNetworkStartup;
@@ -318,13 +331,14 @@ void DrawIcon(GSTEXTURE *img, int x, int y, float scale);
 void DrawIcons();
 void DrawInfo();
 void DrawSubMenu();
-char* ShowKeyb();
+int ShowKeyb(char* text, size_t maxLen);
 
 void MenuNextH();
 void MenuPrevH();
 void MenuNextV();
 void MenuPrevV();
 void MenuItemExecute();
+void MenuItemAltExecute();
 // Sets the selected item if it is found in the menu list
 void MenuSetSelectedItem(struct TMenuItem* item);
 void RefreshSubMenu();
@@ -345,21 +359,25 @@ void DrawScreen();
 int diaExecuteDialog(struct UIItem *ui);
 int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
-int diaGetString(struct UIItem* ui, int id, char **value);
+int diaGetString(struct UIItem* ui, int id, char *value);
 int diaSetString(struct UIItem* ui, int id, const char *text);
-
+// set label pointer into the label's text (must be valid while rendering dialog)
+int diaSetLabel(struct UIItem* ui, int id, const char *text);
 
 // main.c config handling
 int storeConfig();
 int restoreConfig();
 
 //CONFIG
-void setConfigStr(struct TConfigSet* config, const char* key, const char* value);
+// returns nonzero for valid config key name
+int configKeyValidate(const char* key);
+int setConfigStr(struct TConfigSet* config, const char* key, const char* value);
 int getConfigStr(struct TConfigSet* config, const char* key, char** value);
-void setConfigInt(struct TConfigSet* config, const char* key, const int value);
+int setConfigInt(struct TConfigSet* config, const char* key, const int value);
 int getConfigInt(struct TConfigSet* config, char* key, int* value);
-void setConfigColor(struct TConfigSet* config, const char* key, int* color);
+int setConfigColor(struct TConfigSet* config, const char* key, int* color);
 int getConfigColor(struct TConfigSet* config, const char* key, int* color);
+int configRemoveKey(struct TConfigSet* config, const char* key);
 
 void readIPConfig();
 void writeIPConfig();

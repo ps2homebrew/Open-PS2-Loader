@@ -1303,10 +1303,6 @@ int isofs_Open(const char *filename, int mode)
 		if (fh->status == 0)
 			break;
 	}
-
-	// check mode
-	if (mode != O_RDONLY)
-		return -2;	
 			
 	// too much files opened
 	if (fd == MAX_FDHANDLES)

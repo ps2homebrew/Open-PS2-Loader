@@ -7,7 +7,6 @@ I_ReceiveMbx
 thmsgbx_IMPORTS_end
 
 intrman_IMPORTS_start
-I_CpuEnableIntr
 I_CpuSuspendIntr
 I_CpuResumeIntr
 I_QueryIntrContext
@@ -21,11 +20,9 @@ ioman_IMPORTS_end
 loadcore_IMPORTS_start
 I_RegisterLibraryEntries
 I_GetLibraryEntryTable
-I_FlushDcache
 loadcore_IMPORTS_end
 
 sifcmd_IMPORTS_start
-I_sceSifInitRpc
 I_sceSifRegisterRpc
 I_sceSifSetRpcQueue
 I_sceSifRpcLoop
@@ -33,9 +30,7 @@ sifcmd_IMPORTS_end
 
 sifman_IMPORTS_start
 I_sceSifSetDma 
-I_sceSifDmaStat
-I_sceSifCheckInit
-I_sceSifInit
+I_sceSifDmaStat 
 sifman_IMPORTS_end
 
 sysclib_IMPORTS_start

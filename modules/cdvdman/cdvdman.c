@@ -666,7 +666,7 @@ int cdvdman_searchfilesema;
 int cdvdman_inited;
 int cdvdman_cdNCmdBreak;
 
-cdvdman_readee_t cdvdman_eereadx __attribute__ ((aligned(64)));
+cdvdman_readee_t cdvdman_eereadx;
 
 static int cdvdman_diskready = CDVD_READY_READY;
 
@@ -678,14 +678,13 @@ void *cdvdman_pMbxcur;
 void *cdvdman_pMbxbuf;
 
 u8 cdvdman_iopmread_buf[16] __attribute__ ((aligned(64)));
-#define MAX_FSVBUF_SECTORS	4
-u8 cdvdman_fsvbuf[MAX_FSVBUF_SECTORS*2048] __attribute__ ((aligned(64)));
+u8 cdvdman_fsvbuf[8288] __attribute__ ((aligned(64)));
 
 cdvdman_status_t cdvdman_stat;
 
 cdvdman_NCmd_t cdvdman_NCmd;
 
-char cdvdman_filepath[1025] __attribute__ ((aligned(64)));
+char cdvdman_filepath[1025];
 
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
@@ -702,15 +701,7 @@ int _start(int argc, char** argv)
 	
 	// Start NCMD server thread
 	cdvdman_startNCmdthread();
-
-	FlushDcache();
-	CpuEnableIntr();
-
-	if (!sceSifCheckInit())
-		sceSifInit();
-
-	sceSifInitRpc(0);
-		
+	
 	// Start RPC servers threads
 	cdvdman_startrpcthreads();
 	
@@ -726,10 +717,10 @@ void cdvdman_startrpcthreads(void)
 	// Create and starts all needed rpc server threads
 	int thid;
 	rpcthread_param_t *th_p;
-
+	
 	thid = cdvdman_createthread((void *)cdvdfsv_rpc1_th, 0x51, 0x2000);
 	StartThread(thid, 0);
-
+	
 	thid = cdvdman_createthread((void *)cdvdfsv_rpc2_th, 0x51, 0x2000);
 	StartThread(thid, 0);
 
@@ -1224,17 +1215,17 @@ int cdvdman_readee(u32 lsn, u32 sectors, void *buf, u8 datapattern, void *addr1,
 			}		
 	
 			if (flag_64b == 0) { // not 64 bytes aligned buf
-				if (sectors_to_read < MAX_FSVBUF_SECTORS)
+				if (sectors_to_read < 4)
 					nsectors = sectors_to_read;
 				else
-					nsectors = MAX_FSVBUF_SECTORS-1;
+					nsectors = 3;	
 				temp = nsectors + 1;
 			}
 			else { // 64 bytes aligned buf
-				if (sectors_to_read < (MAX_FSVBUF_SECTORS+1))
+				if (sectors_to_read < 5)
 					nsectors = sectors_to_read;
 				else
-					nsectors = MAX_FSVBUF_SECTORS;
+					nsectors = 4;
 				temp = nsectors;		
 			}
 			
@@ -2054,10 +2045,6 @@ int sceCdPosToInt(cd_location_t *p)
 	
 	register int result;
 
-#ifdef NETLOG_DEBUG		
-	pNetlogSend("sceCdPosToInt\n");
-#endif
-	
 	result = ((u32)p->minute >> 16) *  10 + ((u32)p->minute & 0xF);
 	result *= 60;
 	result += ((u32)p->second >> 16) * 10 + ((u32)p->second & 0xF);
@@ -2074,10 +2061,6 @@ cd_location_t *sceCdIntToPos(int i, cd_location_t *p)
 
 	register int sc, se, mi;
 
-#ifdef NETLOG_DEBUG		
-	pNetlogSend("sceCdIntToPos\n");
-#endif
-	
 	i += 150;
 	se = i / 75;
 	sc = i - se * 75;
@@ -2216,10 +2199,6 @@ int sceCdReadCdda(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 //-------------------------------------------------------------- 
 int sceCdGetReadPos(void)
 { 	
-#ifdef NETLOG_DEBUG		
-	pNetlogSend("sceCdGetReadPos\n");
-#endif
-	
 	return cdvdman_stat.cdcurlsn;
 }
 
@@ -2366,7 +2345,7 @@ int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
 		
 	if (!iop_bufaddr) {
 		cdvdman_stat.Stiopbuf = sceCdGetFsvRbuf();
-		cdvdman_stat.Stsectmax = MAX_FSVBUF_SECTORS;
+		cdvdman_stat.Stsectmax = 4;
 	}
 	else	
 		cdvdman_stat.Stiopbuf = iop_bufaddr;
@@ -2377,6 +2356,7 @@ int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
 //-------------------------------------------------------------- 
 int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err)
 {
+	
 	u32 rsectors;
 	int nsectors, rpos, bpos;
 	u8 *p;
@@ -2450,6 +2430,7 @@ int sceCdStStart(u32 lsn, cd_read_mode_t *mode)
 #ifdef NETLOG_DEBUG	
 	pNetlogSend("sceCdStStart lsn=%d\n", lsn);
 #endif
+
 
 	if (mode->datapattern)
 		cdvdman_stat.cderror = CDVD_ERR_READ;
@@ -2790,10 +2771,6 @@ int cdvdman_findfile(const char *filepath, cd_file_t *cdfile)
 
 	WaitSema(cdvdman_searchfilesema);
 
-#ifdef NETLOG_DEBUG		
-	pNetlogSend("cdvdman_findfile path = %s\n", filepath);
-#endif
-
 	char *p = (char *)filepath;
 	if ((!strncmp(p, "\\\\", 2)) || (!strncmp(p, "//", 2)))
 		p++;
@@ -2810,10 +2787,6 @@ int cdvdman_findfile(const char *filepath, cd_file_t *cdfile)
 	cdfile->size = tocEntry.fileSize; 
 	strncpy(cdfile->name, tocEntry.filename, 16); 		
 
-#ifdef NETLOG_DEBUG		
-	pNetlogSend("cdvdman_findfile lsn = %d size = %d\n", cdfile->lsn, cdfile->size);
-#endif
-	
 	// must fill date too
 
 	SignalSema(cdvdman_searchfilesema);

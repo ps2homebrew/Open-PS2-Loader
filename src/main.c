@@ -379,8 +379,8 @@ void RefreshUSBGameList() {
 			list->Game.Name[32] = '\0';
 			memcpy(&list->Game.Image, &buffer[32], 16);
 			list->Game.Image[16] = '\0';
-			memcpy(&list->Game.parts, &buffer[48], 1);
-			memcpy(&list->Game.media, &buffer[49], 1);
+			memcpy(&list->Game.parts, &buffer[47], 1);
+			memcpy(&list->Game.media, &buffer[48], 1);
 			
 			if(actualgame!=NULL){
 				actualgame->next=list;
@@ -508,8 +508,8 @@ void RefreshETHGameList() {
 			list->Game.Name[32] = '\0';
 			memcpy(&list->Game.Image, &buffer[32], 16);
 			list->Game.Image[16] = '\0';
-			memcpy(&list->Game.parts, &buffer[48], 1);
-			memcpy(&list->Game.media, &buffer[49], 1);
+			memcpy(&list->Game.parts, &buffer[47], 1);
+			memcpy(&list->Game.media, &buffer[48], 1);
 			
 			if(eth_actualgame!=NULL){
 				eth_actualgame->next=list;

@@ -1,11 +1,11 @@
 IOP_BIN  = ps2dev9.irx
-IOP_OBJS = ps2dev9.o exports.o imports.o
-IOP_LIBS =
 
 IOP_INCS +=
-IOP_CFLAGS  += -Wall -fno-builtin-printf
+IOP_CFLAGS  += -Wall -fno-builtin-printf -DDISBABLE_DEV9SHUTDOWN -DDEV9X_DEV #-DCHECK_LOADED -DPOWEROFF -DPCMCIA -DDEBUG
 IOP_LDFLAGS += -s
 
+IOP_OBJS = ps2dev9.o exports.o imports.o
+IOP_LIBS =
 
 all: $(IOP_BIN)
 

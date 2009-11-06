@@ -19,8 +19,16 @@
 /* Please keep these in alphabetical order!  */
 #include "dmacman.h"
 #include "intrman.h"
+#ifdef DEV9X_DEV
+#include "ioman.h"
+#endif
 #include "loadcore.h"
+#ifdef POWEROFF
+#include "poweroff.h"
+#endif
+#ifdef DEBUG
 #include "stdio.h"
+#endif
 #include "thbase.h"
 #include "thsemap.h"
 

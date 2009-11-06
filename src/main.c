@@ -81,14 +81,14 @@ struct UIItem diaIPConfig[] = {
 	
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, {.label = {"PORT", -1}}},	{UI_SPACER}, {UI_INT, 17, {.intvalue = {445, 445, 0, 1024}}},
+	{UI_LABEL, 0, {.label = {"PORT", -1}}},	{UI_SPACER}, {UI_INT, 18, {.intvalue = {445, 445, 0, 1024}}},
 	
 	{UI_BREAK},
 	
 	//  ---- PC share name ----
-	{UI_LABEL, 0, {.label = {"SHARE NAME", -1}}}, {UI_SPACER}, {UI_STRING, 18, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"SHARE NAME", -1}}}, {UI_SPACER}, {UI_STRING, 19, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
 	
-	{UI_LABEL, 0, {.label = {"", _STR_NETWORK_AUTOSTART}}}, {UI_SPACER}, {UI_BOOL, 19, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"", _STR_NETWORK_AUTOSTART}}}, {UI_SPACER}, {UI_BOOL, 20, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	//  ---- Ok ----
 	{UI_SPLITTER},
@@ -138,9 +138,9 @@ void showIPConfig() {
 		diaSetInt(diaIPConfig, 14 + i, pc_ip[i]);
 	}
 	
-	diaSetInt(diaIPConfig, 17, gPCPort);
-	diaSetString(diaIPConfig, 18, gPCShareName);
-	diaSetInt(diaIPConfig, 19, gNetAutostart);
+	diaSetInt(diaIPConfig, 18, gPCPort);
+	diaSetString(diaIPConfig, 19, gPCShareName);
+	diaSetInt(diaIPConfig, 20, gNetAutostart);
 	
 	// show dialog
 	if (diaExecuteDialog(diaIPConfig)) {
@@ -153,9 +153,9 @@ void showIPConfig() {
 			diaGetInt(diaIPConfig, 14 + i, &pc_ip[i]);
 		}
 		
-		diaGetInt(diaIPConfig, 17, &gPCPort);
-		diaGetString(diaIPConfig, 18, gPCShareName);
-		diaGetInt(diaIPConfig, 19, &gNetAutostart);
+		diaGetInt(diaIPConfig, 18, &gPCPort);
+		diaGetString(diaIPConfig, 19, gPCShareName);
+		diaGetInt(diaIPConfig, 20, &gNetAutostart);
 		
 		// has to be non-empty
 		if (strlen(gPCShareName) == 0) {

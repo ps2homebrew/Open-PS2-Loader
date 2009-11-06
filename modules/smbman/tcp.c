@@ -129,8 +129,8 @@ conn_open:
 		goto conn_close;		
 	}
 	
-	// Receive the Negociate Protocol Response with a timeout of 20 seconds
-	size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 20000);
+	// Receive the Negociate Protocol Response with a timeout of 2 seconds
+	size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 2000);
 	if (size <= 0) {
 		//printf("smbman - tcp_ConnectSMBClient: failed to receive Negociate Protocol Response...\n");
 		err = -4;
@@ -143,7 +143,7 @@ conn_open:
 	
 	while (recv_size < total_packet_size) {
 		
-		size = RecvTimeout(main_socket, &SMB_buf[recv_size], sizeof(SMB_buf) - recv_size, 20000);
+		size = RecvTimeout(main_socket, &SMB_buf[recv_size], sizeof(SMB_buf) - recv_size, 2000);
 		if (size <= 0) {
 			//printf("smbman - tcp_ConnectSMBClient: failed to receive Negociate Protocol Response...\n");
 			err = -4;
@@ -216,8 +216,8 @@ int tcp_SessionSetup(char *User, char *Password, char *Share)
 		return -2;
 	}
 	
-	// Receive the Session Setup Response with a timeout of 10 seconds
-	size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 10000);
+	// Receive the Session Setup Response with a timeout of 2 seconds
+	size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 2000);
 	if (size <= 0) {
 		//printf("smbman - tcp_SessionSetup: failed to receive Session Setup Response...\n");
 		return -3;
@@ -229,7 +229,7 @@ int tcp_SessionSetup(char *User, char *Password, char *Share)
 	
 	while (recv_size < total_packet_size) {
 		
-		size = RecvTimeout(main_socket, &SMB_buf[recv_size], sizeof(SMB_buf) - recv_size, 10000);
+		size = RecvTimeout(main_socket, &SMB_buf[recv_size], sizeof(SMB_buf) - recv_size, 2000);
 		if (size <= 0) {
 			//printf("smbman - tcp_SessionSetup: failed to receive Session Setup Response...\n");
 			return -3;

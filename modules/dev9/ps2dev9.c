@@ -18,8 +18,17 @@
 #include "dmacman.h"
 #include "thbase.h"
 #include "thsemap.h"
+#ifdef DEBUG
 #include "stdio.h"
+#endif
 #include "dev9.h"
+#ifdef POWEROFF
+#include "poweroff.h"
+#endif
+#ifdef DEV9X_DEV
+#include "ioman.h"
+#include "ioman_add.h"
+#endif
 
 #include "dev9regs.h"
 #include "speedregs.h"
@@ -29,10 +38,15 @@
 #define DRIVERNAME "dev9"
 IRX_ID(MODNAME, 1, 1);
 
+#ifdef DEBUG
 #define M_PRINTF(format, args...)	\
 	printf(MODNAME ": " format, ## args)
-
-#define VERSION "1.0 (no-poweroff)"
+#else
+#define M_PRINTF(format, args...)	\
+	do {} while (0)
+#endif
+	
+#define VERSION "1.0"
 #define BANNER "\nDEV9 device driver v%s - Copyright (c) 2003 Marcus R. Brown\n\n"
 
 #define DEV9_INTR		13
@@ -43,14 +57,18 @@ IRX_ID(MODNAME, 1, 1);
 #define SSBUS_R_1420		0xbf801420
 
 static int dev9type = -1;	/* 0 for PCMCIA, 1 for expansion bay */
+#ifdef PCMCIA
 static int using_aif = 0;	/* 1 if using AIF on a T10K */
+#endif
 
 static void (*p_dev9_intr_cb)(int flag) = NULL;
 static int dma_lock_sem = -1;	/* used to arbitrate DMA */
 static int dma_complete_sem = -1; /* signalled on DMA transfer completion.  */
 
+#ifdef PCMCIA
 static int pcic_cardtype;	/* Translated value of bits 0-1 of 0xbf801462 */
 static int pcic_voltage;	/* Translated value of bits 2-3 of 0xbf801462 */
+#endif
 
 static s16 eeprom_data[5];	/* 2-byte EEPROM status (0/-1 = invalid, 1 = valid),
 				   6-byte MAC address,
@@ -67,6 +85,10 @@ static dev9_dma_cb_t dev9_predma_cbs[4], dev9_postdma_cbs[4];
 static int dev9_intr_dispatch(int flag);
 static int dev9_dma_intr(void *arg);
 
+#ifdef POWEROFF
+static void dev9x_on_shutdown(void*);
+#endif
+
 static void smap_set_stat(int stat);
 static int read_eeprom_data(void);
 
@@ -75,12 +97,14 @@ static int smap_device_reset(void);
 static int smap_subsys_init(void);
 static int smap_device_init(void);
 
+#ifdef PCMCIA
 static void pcmcia_set_stat(int stat);
 static int pcic_ssbus_mode(int voltage);
 static int pcmcia_device_probe(void);
 static int pcmcia_device_reset(void);
 static int card_find_manfid(u32 manfid);
 static int pcmcia_init(void);
+#endif
 
 static void expbay_set_stat(int stat);
 static int expbay_device_probe(void);
@@ -89,17 +113,68 @@ static int expbay_init(void);
 
 struct irx_export_table _exp_dev9;
 
+#ifdef DEV9X_DEV
+int dev9x_dummy() { return 0; }
+int dev9x_devctl(const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
+{
+	if (cmd == 0x4401)
+		return dev9type;
+	
+	return 0;
+}
+
+/* driver ops func tab */
+void *dev9x_ops[27] = {
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_devctl,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy,
+	(void*)dev9x_dummy	
+};
+
+/* driver descriptor */
+static iop_ext_device_t dev9x_dev = {
+	"dev9x", 
+	IOP_DT_FS | 0x10000000, /* EXT FS */
+	1,
+	"DEV9",
+	(struct _iop_ext_device_ops *)&dev9x_ops
+};
+#endif
+
 int _start(int argc, char **argv)
 {
 	USE_DEV9_REGS;
 	int idx, res = 1;
 	u16 dev9hw;
 
+	M_PRINTF(BANNER, VERSION);
+
+#ifdef CHECK_LOADED	
 	iop_library_table_t *libtable;
-	iop_library_t *libptr;
-
-	printf(BANNER, VERSION);
-
+	iop_library_t *libptr;	
 	libtable = GetLibraryEntryTable();
 	libptr = libtable->tail;
 	while ((libptr != 0))
@@ -114,7 +189,8 @@ int _start(int argc, char **argv)
 			return 1;
 		}
 		libptr = libptr->prev;
-        }
+	}
+#endif	
 
 	for (idx = 0; idx < 16; idx++)
 		dev9_shutdown_cbs[idx] = NULL;
@@ -122,7 +198,11 @@ int _start(int argc, char **argv)
 	dev9hw = DEV9_REG(DEV9_R_REV) & 0xf0;
 	if (dev9hw == 0x20) {		/* CXD9566 (PCMCIA) */
 		dev9type = 0;
+#ifdef PCMCIA		
 		res = pcmcia_init();
+#else
+		return 1;		
+#endif		
 	} else if (dev9hw == 0x30) {	/* CXD9611 (Expansion Bay) */
 		dev9type = 1;
 		res = expbay_init();
@@ -130,11 +210,18 @@ int _start(int argc, char **argv)
 
 	if (res)
 		return res;
-
+	
+#ifdef DEV9X_DEV
+	DelDrv("dev9x");
+	AddDrv((iop_device_t *)&dev9x_dev);	
+#endif
+		
 	if (RegisterLibraryEntries(&_exp_dev9) != 0) {
 		return 1;
 	}
-
+#ifdef POWEROFF
+	AddPowerOffHandler(dev9x_on_shutdown, 0);
+#endif
 	/* Normal termination.  */
 	M_PRINTF("Dev9 loaded.\n");
 
@@ -159,7 +246,7 @@ void dev9RegisterPostDmaCb(int ctrl, dev9_dma_cb_t cb){
 	dev9_postdma_cbs[ctrl] = cb;
 }
 
-// flag is 1 if a card (pcmcia) was removed or added
+/* flag is 1 if a card (pcmcia) was removed or added */
 static int dev9_intr_dispatch(int flag)
 {
 	USE_SPD_REGS;
@@ -181,7 +268,7 @@ static int dev9_intr_dispatch(int flag)
 			}
 		}
 	}
-
+	
 	return 0;
 }
 
@@ -197,7 +284,11 @@ static int dev9_dma_intr(void *arg)
 static void smap_set_stat(int stat)
 {
 	if (dev9type == 0)
+#ifdef PCMCIA	
 		pcmcia_set_stat(stat);
+#else
+		return;
+#endif				
 	else if (dev9type == 1)
 		expbay_set_stat(stat);
 }
@@ -205,7 +296,11 @@ static void smap_set_stat(int stat)
 static int smap_device_probe()
 {
 	if (dev9type == 0)
+#ifdef PCMCIA	
 		return pcmcia_device_probe();
+#else
+		return -1;		
+#endif		
 	else if (dev9type == 1)
 		return expbay_device_probe();
 
@@ -215,7 +310,11 @@ static int smap_device_probe()
 static int smap_device_reset()
 {
 	if (dev9type == 0)
+#ifdef PCMCIA	
 		return pcmcia_device_reset();
+#else
+		return -1;
+#endif		
 	else if (dev9type == 1)
 		return expbay_device_reset();
 
@@ -225,6 +324,7 @@ static int smap_device_reset()
 /* Export 6 */
 void dev9Shutdown()
 {
+#ifdef DISABLE_DEV9SHUTDOWN	
 	int idx;
 	USE_DEV9_REGS;
 
@@ -233,8 +333,10 @@ void dev9Shutdown()
 			dev9_shutdown_cbs[idx]();
 
 	if (dev9type == 0) {	/* PCMCIA */
+#ifdef PCMCIA	
 		DEV9_REG(DEV9_R_POWER) = 0;
 		DEV9_REG(DEV9_R_1474) = 0;
+#endif		
 	} else if (dev9type == 1) {
 		DEV9_REG(DEV9_R_1466) = 1;
 		DEV9_REG(DEV9_R_1464) = 0;
@@ -243,6 +345,7 @@ void dev9Shutdown()
 		DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~1;
 	}
 	DelayThread(1000000);
+#endif	
 }
 
 /* Export 7 */
@@ -419,12 +522,16 @@ void dev9LEDCtl(int ctl)
 
 /* Export 11 */
 int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb){
+#ifndef DISABLE_DEV9SHUTDOWN	
 	if (idx < 16)
 	{
 		dev9_shutdown_cbs[idx] = cb;
 		return 0;
 	}
 	return -1;
+#else
+	return 0;
+#endif
 }
 
 static int smap_subsys_init(void)
@@ -469,10 +576,12 @@ static int smap_subsys_init(void)
 
 static int smap_device_init(void)
 {
+#ifdef DEBUG	
 	USE_SPD_REGS;
 	const char *spdnames[] = { "(unknown)", "TS", "ES1", "ES2" };
-	int idx, res;
-	u16 spdrev;
+	int idx;
+	u16 spdrev;	
+#endif
 
 	eeprom_data[0] = 0;
 
@@ -482,6 +591,9 @@ static int smap_device_init(void)
 	}
 
 	smap_device_reset();
+
+#ifdef PCMCIA
+	int res;
 
 	/* Locate the SPEED Lite chip and get the bus ready for the
 	   PCMCIA device.  */
@@ -497,7 +609,9 @@ static int smap_device_init(void)
 			return -1;
 		}
 	}
-
+#endif
+	
+#ifdef DEBUG	
 	/* Print out the SPEED chip revision.  */
 	spdrev = SPD_REG16(SPD_R_REV_1);
 	idx    = (spdrev & 0xffff) - 14;
@@ -507,9 +621,12 @@ static int smap_device_init(void)
 		idx = 0;	/* Unknown revision */
 
 	M_PRINTF("SPEED chip '%s', revision 0x%0X\n", spdnames[idx], spdrev);
+#endif
+	
 	return 0;
 }
 
+#ifdef PCMCIA
 static int pcic_get_cardtype()
 {
 	USE_DEV9_REGS;
@@ -621,7 +738,9 @@ static int pcic_ssbus_mode(int voltage)
 
 static int pcmcia_device_probe()
 {
+#ifdef DEBUG	
 	const char *pcic_ct_names[] = { "No", "16-bit", "CardBus" };
+#endif	
 	int voltage;
 
 	pcic_voltage = pcic_get_voltage();
@@ -737,9 +856,9 @@ static int pcmcia_intr(void *unused)
 	if (cstc1 & 0x03 || cstc2 & 0x03) {	/* Card removed or added? */
 		if (p_dev9_intr_cb)
 			p_dev9_intr_cb(1);
-
+		
 		/* Shutdown the card.  */
-		DEV9_REG(DEV9_R_POWER) = 0;
+		DEV9_REG(DEV9_R_POWER) = 0;	
 		DEV9_REG(DEV9_R_1474) = 0;
 
 		pcmcia_device_probe();
@@ -811,6 +930,7 @@ static int pcmcia_init(void)
 	M_PRINTF("CXD9566 (PCMCIA type) initialized.\n");
 	return 0;
 }
+#endif
 
 static void expbay_set_stat(int stat)
 {
@@ -831,7 +951,7 @@ static int expbay_device_reset(void)
 	if (expbay_device_probe() < 0)
 		return -1;
 
-	DEV9_REG(DEV9_R_POWER) = (DEV9_REG(DEV9_R_POWER) & ~1) | 0x04;	// power on
+	DEV9_REG(DEV9_R_POWER) = (DEV9_REG(DEV9_R_POWER) & ~1) | 0x04;	/* power on */
 	DelayThread(500000);
 
 	DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1460) | 0x01;
@@ -861,7 +981,7 @@ static int expbay_init(void)
 	_sw(0xe01a3043, SSBUS_R_1418);
 	_sw(0xef1a3043, SSBUS_R_141c);
 
-	if ((DEV9_REG(DEV9_R_POWER) & 0x04) == 0) { // if not already powered
+	if ((DEV9_REG(DEV9_R_POWER) & 0x04) == 0) { /* if not already powered */
 		DEV9_REG(DEV9_R_1466) = 1;
 		DEV9_REG(DEV9_R_1464) = 0;
 		DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1464);
@@ -882,3 +1002,12 @@ static int expbay_init(void)
 	M_PRINTF("CXD9611 (Expansion Bay type) initialized.\n");
 	return 0;
 }
+
+#ifdef POWEROFF
+static void dev9x_on_shutdown(void*p)
+{
+	M_PRINTF("shutdown\n");
+	dev9IntrDisable(-1);
+	dev9Shutdown();
+}
+#endif

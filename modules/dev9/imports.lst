@@ -14,13 +14,32 @@ intrman_IMPORTS_end
 
 loadcore_IMPORTS_start
 I_RegisterLibraryEntries
+#ifdef PCMCIA
 I_QueryBootMode
+#endif
+#ifdef CHECK_LOADED
 I_GetLibraryEntryTable
+#endif
 loadcore_IMPORTS_end
 
+#ifdef DEV9X_DEV
+ioman_IMPORTS_start
+I_AddDrv
+I_DelDrv
+ioman_IMPORTS_end
+#endif
+
+#ifdef POWEROFF
+poweroff_IMPORTS_start
+I_AddPowerOffHandler
+poweroff_IMPORTS_end
+#endif
+
+#ifdef DEBUG
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end
+#endif
 
 thbase_IMPORTS_start
 I_DelayThread

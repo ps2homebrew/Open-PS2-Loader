@@ -9,6 +9,7 @@
 
 #include "loader.h"
 #include "iopmgr.h"
+#include <syscallnr.h>
 
 static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
@@ -194,12 +195,12 @@ void HookLoadExecPS2(const char *filename, int argc, char *argv[])
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
-	Old_SifSetDma  = GetSyscall(119);
-	SetSyscall(119, &Hook_SifSetDma);
+	Old_SifSetDma  = GetSyscallHandler(__NR_SifSetDma);
+	SetSyscall(__NR_SifSetDma, &Hook_SifSetDma);
 
-	Old_SifSetReg  = GetSyscall(121);
-	SetSyscall(121, &Hook_SifSetReg);
+	Old_SifSetReg  = GetSyscallHandler(__NR_SifSetReg);
+	SetSyscall(__NR_SifSetReg, &Hook_SifSetReg);
 	
-	Old_LoadExecPS2 = GetSyscall(6);
-	SetSyscall(6, &HookLoadExecPS2);	
+	Old_LoadExecPS2 = GetSyscallHandler(__NR_LoadExecPS2);
+	SetSyscall(__NR_LoadExecPS2, &HookLoadExecPS2);	
 }

@@ -132,10 +132,10 @@ void showIPConfig() {
 	size_t i;
 	// upload current values
 	for (i = 0; i < 4; ++i) {
-		diaSetInt(diaIPConfig, 1 + i, ps2_ip[i]);
-		diaSetInt(diaIPConfig, 5 + i, ps2_netmask[i]);
-		diaSetInt(diaIPConfig, 9 + i, ps2_gateway[i]);
-		diaSetInt(diaIPConfig, 13 + i, pc_ip[i]);
+		diaSetInt(diaIPConfig, 2 + i, ps2_ip[i]);
+		diaSetInt(diaIPConfig, 6 + i, ps2_netmask[i]);
+		diaSetInt(diaIPConfig, 10 + i, ps2_gateway[i]);
+		diaSetInt(diaIPConfig, 14 + i, pc_ip[i]);
 	}
 	
 	diaSetInt(diaIPConfig, 17, gPCPort);
@@ -147,10 +147,10 @@ void showIPConfig() {
 		// sanitize the values
 		// Ok pressed, store values
 		for (i = 0; i < 4; ++i) {
-			diaGetInt(diaIPConfig, 1 + i, &ps2_ip[i]);
-			diaGetInt(diaIPConfig, 5 + i, &ps2_netmask[i]);
-			diaGetInt(diaIPConfig, 9 + i, &ps2_gateway[i]);
-			diaGetInt(diaIPConfig, 13 + i, &pc_ip[i]);
+			diaGetInt(diaIPConfig, 2 + i, &ps2_ip[i]);
+			diaGetInt(diaIPConfig, 6 + i, &ps2_netmask[i]);
+			diaGetInt(diaIPConfig, 10 + i, &ps2_gateway[i]);
+			diaGetInt(diaIPConfig, 14 + i, &pc_ip[i]);
 		}
 		
 		diaGetInt(diaIPConfig, 17, &gPCPort);

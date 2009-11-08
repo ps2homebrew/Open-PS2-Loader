@@ -4,8 +4,8 @@
 // Language support...
 
 char *english[] = {
-	"               WELCOME TO OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com>", // gfx.c:85
-	"Open USB Loader %s", // gfx.c:320
+	"               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^", // gfx.c:85
+	"Open PS2 Loader %s", // gfx.c:320
 	"Theme configuration", // gfx.c:502
 	"IP configuration", // gfx.c:764
 	"Save changes", // gfx.c:586
@@ -44,8 +44,8 @@ char *english[] = {
 };
 
 char *czech[] = {
-	"               OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. ZALOZENO NA ZDROJ. KODECH PROJEKTU HD PROJECT <http://psx-scene.com>", // gfx.c:85
-	"Open USB Loader %s", // gfx.c:320
+	"               OPEN PS2 LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. ZALOZENO NA ZDROJ. KODECH PROJEKTU HD PROJECT <http://psx-scene.com>", // gfx.c:85
+	"Open PS2 Loader %s", // gfx.c:320
 	"Nastaveni vzhledu", // gfx.c:502
 	"IP configuration", // gfx.c:764
 	"Ulozit zmeny", // gfx.c:586
@@ -84,8 +84,8 @@ char *czech[] = {
 };
 
 char *spanish[] = {
-	"               BIENVENIDO AL OPEN USB LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. BASADO EN EL CÓDIGO FUENTE DE HD PROJECT <http://psx-scene.com>", // gfx.c:85
-	"Open USB Loader %s", // gfx.c:320
+	"               BIENVENIDO A OPEN PS2 LOADER. EL CODIGO PRINCIPAL ESTA BASADO EN EL DE HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DE USB ADVANCE Y INTERFAZ GRAFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYORIA DEL NUCLEO DEL LOADER ESTA HECHO POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ ESTAN HECHAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^", // gfx.c:85
+	"Open PS2 Loader %s", // gfx.c:320
 	"Configuración de tema", // gfx.c:502
 	"Configuración de red", // gfx.c:764
 	"Guardar cambios", // gfx.c:586
@@ -93,7 +93,7 @@ char *spanish[] = {
 	"Scroll Lento", // main.c:21 
 	"Scroll Medio", 
 	"Scroll Rápido",
-	"Menú Dinámico",  // main.c:22
+	"Menú dinámico",  // main.c:22
 	"Menú estático",
 	"Configurar tema",  // main.c:23
 	"Configurar red",
@@ -111,16 +111,16 @@ char *spanish[] = {
 	"Tema", // Submenu items
 	"Idioma",
 	"Idioma: Español",
-	"Start network", // TODO: Spanish translations...
-	"Network loading: %d",
-	"Network startup error",
-	"Network startup automatic",
-	"On",
-	"Off",
-	"Ok",
-	"Compatibility settings",
-	"Remove all settings",
-	"Removed all keys for the game"
+	"Iniciar red", 
+	"Iniciando red: %d",
+	"Error al iniciar red",
+	"Iniciar red automáticamente",
+	"Activado",
+	"Desactivado",
+	"Aceptar",
+	"Configuración de compatibilidad",
+	"Borrar la configuración",
+	"Borrar todas las claves del juego"
 };
 
 char **languages[] = {

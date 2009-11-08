@@ -187,6 +187,8 @@ struct UIItem {
 	};
 };
 
+char *infotxt;
+
 float waveframe;
 int frame;
 int h_anim;

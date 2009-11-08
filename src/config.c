@@ -377,46 +377,46 @@ void clearConfig(struct TConfigSet* config) {
 }
 
 void ListDir(char* directory) {
-   int ret=-1;
-   int n_dir=0;
-   int n_reg=0;
-   fio_dirent_t record;
-   int i=0;
+	int ret=-1;
+	int n_dir=0;
+	fio_dirent_t record;
+	int i=0;
    
+	// free the prev. list
+	i = 0;
+	while (theme_dir[i] && i < 256) {
+		free(theme_dir[i]);
+		theme_dir[i] = NULL;
+		++i;
+	}
 
-   if ((ret = fioDopen(directory)) < 0) {
-      //printf("Error opening dir\n");
-      return;
-   }
+	theme_dir[0]=malloc(7);
+	sprintf(theme_dir[0],"<none>");
+	n_dir=1;
+	
+	if ((ret = fioDopen(directory)) < 0) {
+		//printf("Error opening dir\n");
+		return;
+	}
 
-   i=0;
-   n_dir=0;
-   n_reg=0;
-   
-   theme_dir[0]=malloc(7);
-   sprintf(theme_dir[0],"<none>");
-
-   while (fioDread(ret, &record) > 0) {
-
-      /*Keep track of number of files */
-      if (FIO_SO_ISDIR(record.stat.mode)) {
-		if(record.name[0]!='.' && (record.name[0]!='.' && record.name[1]!='.')){
-			//printf("%s\n",record.name);
-			theme_dir[n_dir-1]=malloc(sizeof(record.name));
-			sprintf(theme_dir[n_dir-1],"%s",record.name);
+	while (fioDread(ret, &record) > 0) {
+		/*Keep track of number of files */
+		if (FIO_SO_ISDIR(record.stat.mode)) {
+			if(record.name[0]!='.' && (record.name[0]!='.' && record.name[1]!='.')){
+				//printf("%s\n",record.name);
+				theme_dir[n_dir]=malloc(sizeof(record.name));
+				sprintf(theme_dir[n_dir],"%s",record.name);
+				n_dir++;
+			}
 		}
-         n_dir++;
-      }
-
-      if (FIO_SO_ISREG(record.stat.mode)) {
-         n_reg++;
-      }
-      i++;
-	  
-	  max_theme_dir=n_dir-1;
-
-   }
-   if (ret >= 0) fioDclose(ret);
-   free(&record);
-
+		
+		if (n_dir >= 254)
+			break; // ensure padding is there!
+	}
+	
+	
+	max_theme_dir = n_dir;
+	theme_dir[max_theme_dir] = NULL;
+	
+	fioDclose(ret);
 } 

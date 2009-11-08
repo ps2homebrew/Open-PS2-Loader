@@ -40,6 +40,14 @@
 #define _STR_COMPAT_SETTINGS 34
 #define _STR_REMOVE_ALL_SETTINGS 35
 #define _STR_REMOVED_ALL_SETTINGS 36
+#define _STR_SCROLLING 37
+#define _STR_MENUTYPE 38
+#define _STR_SLOW 39
+#define _STR_MEDIUM 40
+#define _STR_FAST 41
+#define _STR_STATIC 42
+#define _STR_DYNAMIC 43
+
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0
@@ -54,5 +62,6 @@ extern char *_l(unsigned int id);
 // language setter (see _LANG_ID constants)
 void setLanguage(int langID);
 
+const char **getLanguageList();
 
 #endif

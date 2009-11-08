@@ -40,7 +40,14 @@ char *english[] = {
 	"Ok",
 	"Compatibility settings",
 	"Remove all settings",
-	"Removed all keys for the game"
+	"Removed all keys for the game",
+	"Scrolling", // _STR_SCROLLING
+	"Menu type", // _STR_MENUTYPE
+	"Slow", // _STR_SLOW
+	"Medium", // _STR_MEDIUM
+	"Fast", // _STR_FAST
+	"Static", // _STR_STATIC
+	"Dynamic", // _STR_DYNAMIC
 };
 
 char *czech[] = {
@@ -80,7 +87,14 @@ char *czech[] = {
 	"Ok",
 	"Nastaveni kompatibility",
 	"Odstranit vsechna nastaveni",
-	"Vsechna nastaveni hry odstranena"
+	"Vsechna nastaveni hry odstranena",
+	"Posuv", // _STR_SCROLLING
+	"Typ menu", // _STR_MENUTYPE
+	"Pomalu", // _STR_SLOW
+	"Stredne", // _STR_MEDIUM
+	"Rychle", // _STR_FAST
+	"Staticke", // _STR_STATIC
+	"Dynamicke", // _STR_DYNAMIC
 };
 
 char *spanish[] = {
@@ -120,13 +134,27 @@ char *spanish[] = {
 	"Aceptar",
 	"Configuración de compatibilidad",
 	"Borrar la configuración",
-	"Borrar todas las claves del juego"
+	"Borrar todas las claves del juego",
+	"Scroll", // _STR_SCROLLING
+	"Menú", // _STR_MENUTYPE
+	"Lento", // _STR_SLOW
+	"Medio", // _STR_MEDIUM
+	"Rápido", // _STR_FAST
+	"estático", // _STR_STATIC
+	"dinámico", // _STR_DYNAMIC
 };
 
 char **languages[] = {
 	english, // ID 0
 	czech,   // ID 1
 	spanish  // ID 2
+};
+
+const char *language_names[] = {
+	"English",
+	"Cesky (Czech)",
+	"Español (Spanish)",
+	NULL  // Null termination for UI enumeration to have padding
 };
 
 const char *english_name = "English";
@@ -147,4 +175,8 @@ void setLanguage(int langID) {
 		langID = _LANG_ID_MAX;	
 		
 	lang_strs = languages[langID];
+}
+
+const char **getLanguageList() {
+	return language_names;
 }

@@ -2157,7 +2157,7 @@ void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocu
 // renders whole ui screen (for given dialog setup)
 void diaRenderUI(struct UIItem *ui, struct UIItem *cur, int haveFocus) {
 	// clear screen, draw background
-	DrawBackground();
+	DrawScreen();
 	
 	// darken for better contrast
 	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
@@ -2390,7 +2390,7 @@ int diaExecuteDialog(struct UIItem *ui) {
 	
 	// okay, we have the first selectable item
 	// we can proceed with rendering etc. etc.
-	while (1) {
+	while (1) {	
 		diaRenderUI(ui, cur, haveFocus);
 		
 		ReadPad();

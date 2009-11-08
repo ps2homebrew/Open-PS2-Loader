@@ -18,16 +18,16 @@ EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include
 all:
 	@mkdir -p obj
 	@mkdir -p asm
-	echo "Building Open USB Loader..."
+	echo "Building Open PS2 Loader..."
 	echo "    * Interface"
 	$(MAKE) $(EE_BIN)
 	echo "Compressing..."
-	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNUSBLD.ELF > /dev/null
+	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNPS2LD.ELF > /dev/null
 
 clean:
 	echo "Cleaning..."
 	echo "    * Interface"
-	rm -f $(EE_BIN) OPNUSBLD.ELF asm/*.* obj/*.*
+	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"
 	$(MAKE) -C loader clean
 	echo "    * imgdrv.irx"

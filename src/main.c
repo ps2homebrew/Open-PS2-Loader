@@ -218,6 +218,8 @@ int loadConfig(const char* fname, int clearFirst) {
 		return 0;
 	
 	gfxRestoreConfig();
+		
+	infotxt = _l(_STR_WELCOME);
 
 	char *temp;
 	

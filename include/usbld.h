@@ -173,6 +173,8 @@ struct UIItem {
 			int current;
 			int min;
 			int max;
+			// if UI_ENUM is used, this contains enumeration values
+			const char **enumvalues; // last one has to be NULL
 		} intvalue;
 		
 		struct { // fixed 32 character string
@@ -180,10 +182,6 @@ struct UIItem {
 			char def[32];
 			char text[32];
 		} stringvalue;
-		
-		struct { // enumeration definition. Enum uses intvalue for storage...	
-			char **values; // last one has to be NULL
-		} enumvalue;
 	};
 };
 
@@ -284,7 +282,7 @@ void SendIrxKernelRAM(void);
 #define KEY_L2 16
 
 int StartPad();
-void ReadPad();
+int ReadPad();
 int GetKey(int num);
 
 int GetKeyOn(int num);
@@ -326,12 +324,17 @@ void Intro();
 void LoadFont();
 void UpdateFont();
 int LoadRAW(char *path, GSTEXTURE *Texture);
+
+void LoadTheme(int themeid);
 int LoadBackground();
 void LoadIcons();
 void UpdateIcons();
+
 void DrawIcon(GSTEXTURE *img, int x, int y, float scale);
 void DrawIcons();
 void DrawInfo();
+// on-screen hint with optional action button icon
+void DrawHint(const char* hint, int key);
 void DrawSubMenu();
 int ShowKeyb(char* text, size_t maxLen);
 
@@ -339,6 +342,7 @@ void MenuNextH();
 void MenuPrevH();
 void MenuNextV();
 void MenuPrevV();
+struct TMenuItem* MenuGetCurrent();
 void MenuItemExecute();
 void MenuItemAltExecute();
 // Sets the selected item if it is found in the menu list
@@ -365,6 +369,8 @@ int diaGetString(struct UIItem* ui, int id, char *value);
 int diaSetString(struct UIItem* ui, int id, const char *text);
 // set label pointer into the label's text (must be valid while rendering dialog)
 int diaSetLabel(struct UIItem* ui, int id, const char *text);
+// sets the current enum value list for given control
+int diaSetEnum(struct UIItem* ui, int id, const char **enumvals);
 
 // main.c config handling
 int storeConfig();

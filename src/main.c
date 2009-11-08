@@ -26,6 +26,13 @@ extern int size_smbman_irx;
 int gLanguageID = 0;
 
 int eth_inited = 0;
+
+// frames since button was pressed
+int inactiveFrames;
+
+// minimal inactive frames for hint display
+#define HINT_FRAMES_MIN 64
+
 // --------------------------- Dialogs ---------------------------
 // Dialog definition for IP configuration
 struct UIItem diaIPConfig[] = {
@@ -99,7 +106,6 @@ struct UIItem diaIPConfig[] = {
 };
 
 // Dialog for per-game compatibility settings
-// Dialog definition for IP configuration
 #define COMPAT_SAVE 100
 #define COMPAT_TEST 101
 #define COMPAT_REMOVE 102
@@ -122,6 +128,29 @@ struct UIItem diaCompatConfig[] = {
 	{UI_SPLITTER},
 	
 	{UI_BUTTON, COMPAT_REMOVE, {.label = {"", _STR_REMOVE_ALL_SETTINGS}}},
+	
+	// end of dialogue
+	{UI_TERMINATOR}
+};
+
+// Dialog for ui settings
+#define UICFG_THEME 10
+#define UICFG_LANG 11
+#define UICFG_SCROLL 12
+#define UICFG_MENU 13
+#define UICFG_SAVE 14
+struct UIItem diaUIConfig[] = {
+	{UI_LABEL, 111, {.label = {"", _STR_SETTINGS}}},
+	{UI_SPLITTER},
+
+	{UI_LABEL, 0, {.label = {"", _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, 10, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, 11, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, 12, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, 13, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
+	{UI_OK}, {UI_SPACER}, {UI_BUTTON, UICFG_SAVE, {.label = {"", _STR_SAVE_CHANGES}}}, 
 	
 	// end of dialogue
 	{UI_TERMINATOR}
@@ -205,6 +234,63 @@ int showCompatConfig(const char* game, const char* prefix, int ntype) {
 	return result;
 }
 
+void showUIConfig() {
+	// configure the enumerations
+	const char* scrollSpeeds[] = {
+		_l(_STR_SLOW),
+		_l(_STR_MEDIUM),
+		_l(_STR_FAST),
+		NULL
+	};
+	
+	// Theme list update
+	ListDir("mass:USBLD/");
+	
+	const char* menuTypes[] = {
+		_l(_STR_STATIC),
+		_l(_STR_DYNAMIC),
+		NULL
+	};
+
+	// search for the theme index in the current theme list
+	size_t i;
+	size_t themeid = 0;
+	for(i = 0; i < max_theme_dir; ++i)  {
+		if (strcmp(theme_dir[i], theme) == 0) {
+			themeid = i;
+			break;
+		}
+	}
+	
+	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
+	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)theme_dir);
+	diaSetEnum(diaUIConfig, UICFG_LANG, getLanguageList());
+	diaSetEnum(diaUIConfig, UICFG_MENU, menuTypes);
+	
+	// and the current values
+	diaSetInt(diaUIConfig, UICFG_SCROLL, scroll_speed);
+	diaSetInt(diaUIConfig, UICFG_THEME, themeid);
+	diaSetInt(diaUIConfig, UICFG_LANG, gLanguageID);
+	diaSetInt(diaUIConfig, UICFG_MENU, dynamic_menu);
+	
+	int ret = diaExecuteDialog(diaUIConfig);
+	if (ret) {
+		// transfer values back into config
+		diaGetInt(diaUIConfig, UICFG_SCROLL, &scroll_speed);
+		diaGetInt(diaUIConfig, UICFG_THEME, &themeid);
+		diaGetInt(diaUIConfig, UICFG_LANG, &gLanguageID);
+		diaGetInt(diaUIConfig, UICFG_MENU, &dynamic_menu);
+	
+		// update the value interpretation
+		setLanguage(gLanguageID);
+		UpdateScrollSpeed();
+		SetMenuDynamic(dynamic_menu);
+		LoadTheme(themeid);
+		
+		if (ret == UICFG_SAVE)
+			storeConfig();
+	}
+}
 
 // --------------------- Configuration handling --------------------
 int loadConfig(const char* fname, int clearFirst) {
@@ -212,10 +298,7 @@ int loadConfig(const char* fname, int clearFirst) {
 		clearConfig(&gConfig);
 	
 	// fill the config from file
-	int result = readConfig(&gConfig, fname);
-	
-	if (!result)
-		return 0;
+	 
 	
 	gfxRestoreConfig();
 		
@@ -609,22 +692,10 @@ void ChangeMenuType() {
 
 void ExecSettings(struct TMenuItem* self, int id) {
 	if (id == 1) {
-		DrawConfig();
-	} else if(id == 2) {
-		// set the language
-		gLanguageID++;
-		if (gLanguageID > _LANG_ID_MAX)
-			gLanguageID = 0;
-			
-		setLanguage(gLanguageID);
+		showUIConfig();
 	} else if (id == 3) {
 		// ipconfig
 		showIPConfig();
-	} else if (id == 4) {
-		// scroll speed modifier
-		ChangeScrollSpeed();
-	} else if (id == 5) {
-		ChangeMenuType();
 	} else if (id == 7) {
 		storeConfig();
 	}
@@ -664,11 +735,7 @@ void InitMenuItems() {
 	
 	// initialize the menu
 	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_THEME);
-	AppendSubMenu(&settings_submenu, &language_icon, "Language", 2, _STR_LANG_NAME);
 	AppendSubMenu(&settings_submenu, &netconfig_icon, "Network config", 3, _STR_IPCONFIG);
-	
-	speed_item = AppendSubMenu(&settings_submenu, &scroll_icon, "", 4, scroll_speed_txt[scroll_speed]);
-	menutype_item = AppendSubMenu(&settings_submenu, &menu_icon, "", 5, menu_type_txt[dynamic_menu ? 0 : 1]);
 	AppendSubMenu(&settings_submenu, &save_icon, "Save Changes", 7, _STR_SAVE_CHANGES);
 	
 	settings_item.submenu = settings_submenu;
@@ -683,17 +750,23 @@ void InitMenuItems() {
 	AppendMenuItem(&apps_item);
 }
 
-
 // main initialization function
 void init() {
 	Reset();
 
 	InitGFX();
+	
+	theme_dir[0] = NULL;
+	max_games = 0;
+	eth_max_games = 0;
+
 
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
 	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
+	
+	// SMB port on pc
 	gPCPort = 445;
 	// loading progress of the network
 	gNetworkStartup = 0;
@@ -746,10 +819,25 @@ void init() {
 	max_games=0;
 	usbdelay=0;
 	ethdelay=0;
-	frame=0;	
+	frame=0;
+	inactiveFrames = 0;
 
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
+}
+
+int netLoadInfo() {
+	char txt[64];
+	
+	// display network status in lower left corner
+	if (gNetworkStartup > 0) {
+		snprintf(txt, 64, _l(_STR_NETWORK_LOADING), gNetworkStartup);
+		DrawHint(txt, -1);
+
+		return 1;
+	}
+
+	return 0;
 }
 
 // --------------------- Main --------------------
@@ -771,7 +859,10 @@ int main(void)
 	
 	while(1)
 	{
-		ReadPad();
+		if (ReadPad())
+			inactiveFrames = 0;
+		else
+			inactiveFrames++;
 
 		DrawScreen();
 				
@@ -793,6 +884,21 @@ int main(void)
 			MenuItemAltExecute();
 		}
 		
+		if (!netLoadInfo()) {
+			// see the inactivity
+			if (inactiveFrames >= HINT_FRAMES_MIN) {
+				struct TMenuItem* cur = MenuGetCurrent();
+				// show hint (depends on the current menu item)
+
+				if ((cur == &usb_games_item) && (max_games > 0)) 
+					DrawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
+				else if ((cur == &network_games_item) && (eth_max_games > 0))
+					DrawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
+				else if (cur == &settings_item)
+					DrawHint(_l(_STR_SETTINGS), KEY_CROSS);
+			}
+		}
+
 		Flip();
 		
 		RefreshSubMenu();

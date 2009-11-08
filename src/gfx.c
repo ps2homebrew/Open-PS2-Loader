@@ -67,6 +67,18 @@ extern int size_netconfig_raw;
 extern void *network_raw;
 extern int size_network_raw;
 
+extern void *cross_raw;
+extern int size_cross_raw;
+
+extern void *triangle_raw;
+extern int size_triangle_raw;
+
+extern void *circle_raw;
+extern int size_circle_raw;
+
+extern void *square_raw;
+extern int size_square_raw;
+
 GSGLOBAL *gsGlobal;
 GSTEXTURE font;
 GSFONT *gsFont;
@@ -102,6 +114,13 @@ GSTEXTURE save_icon;
 GSTEXTURE netconfig_icon;
 GSTEXTURE network_icon;
 
+// Button icons
+GSTEXTURE cross_icon;
+GSTEXTURE triangle_icon;
+GSTEXTURE square_icon;
+GSTEXTURE circle_icon;
+
+
 u64 White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
 u64 Black = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x00,0x00);
 u64 Darker = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x60,0x00);
@@ -117,6 +136,7 @@ u64 Background_b = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_c = GS_SETREG_RGBAQ(0x00,0x00,0x20,0x00,0x00);
 u64 Background_d = GS_SETREG_RGBAQ(0x00,0x00,0x80,0x00,0x00);
 
+char *infotxt;
 int z;
 
 // Count of icons before and after the selected one
@@ -141,7 +161,6 @@ void InitGFX() {
 	v_anim=100;
 	direc=0;
 	max_settings=2;
-	max_games=10;
 	font.Vram = 0;
 	background.Mem = 0;
 	background2.Mem = 0;
@@ -762,445 +781,6 @@ void DrawConfig(){
 	UpdateScrollSpeed();
 }
 
-void DrawIPConfig(){
-	char tmp[255];
-	int v_pos=0, i;
-	int new_ps2_ip[4];
-	int new_ps2_netmask[4];
-	int new_ps2_gateway[4];
-	int new_pc_ip[4];
-	int editing_ps2_ip=0;
-	int editing_ps2_netmask=0;
-	int editing_ps2_gateway=0;
-	int editing_pc_ip=0;
-	int editing_port=0;
-	
-	for(i=0;i<4;i++){
-		new_ps2_ip[i]=ps2_ip[i];
-		new_ps2_netmask[i]=ps2_netmask[i];
-		new_ps2_gateway[i]=ps2_gateway[i];
-		new_pc_ip[i]=pc_ip[i];
-	}	
-	
-	int new_port = gPCPort;
-	int new_autostart = gNetAutostart;
-	int ipchanged = gIPConfigChanged;
-
-	while(1){
-		ReadPad();
-				
-		DrawScreen();
-
-		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
-		DrawQuad(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 100.0f, 422.0f, 540.0f, 422.0f, z, Darker);
-		DrawQuad(gsGlobal, 110.0f, 110.0f, 530.0f, 110.0f, 110.0f, 402.0f, 530.0f, 402.0f, z, Wave_a);
-		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 110.0f, 110.0f, 530.0f, 110.0f, z, Wave_a, Wave_a, Wave_d, Wave_d);
-		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 110.0f, 110.0f, 100.0f, 422.0f, 110.0f, 402.0f, z, Wave_a, Wave_b, Wave_a, Wave_b);
-		DrawQuad_gouraud(gsGlobal, 110.0f, 402.0f, 530.0f, 402.0f, 100.0f, 422.0f, 540.0f, 422.0f, z, Wave_b, Wave_b, Wave_d, Wave_d);
-		DrawQuad_gouraud(gsGlobal, 530.0f, 110.0f, 540.0f, 100.0f, 530.0f, 402.0f, 540.0f, 422.0f, z, Wave_b, Wave_d, Wave_b, Wave_d);
-		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
-		
-		DrawText(305,120,_l(_STR_IP_CONFIG),1,1);
-		
-		if(editing_ps2_ip==0){
-			snprintf(tmp, 255, "PS2 IP: %3d.%3d.%3d.%3d", new_ps2_ip[0],new_ps2_ip[1],new_ps2_ip[2],new_ps2_ip[3]);
-			if(v_pos==0){
-				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			}else{
-				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			}
-			DrawText(120,180,tmp,0.8f,0);
-		}else if(editing_ps2_ip==1){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 IP:    .%3d.%3d.%3d",new_ps2_ip[1],new_ps2_ip[2], new_ps2_ip[3]);
-			DrawText(120,180,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "        %3d", new_ps2_ip[0]);
-			DrawText(120,180,tmp,0.8f,0);
-		}else if(editing_ps2_ip==2){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 IP: %3d.   .%3d.%3d",new_ps2_ip[0],new_ps2_ip[2],new_ps2_ip[3]);
-			DrawText(120,180,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "            %3d", new_ps2_ip[1]);
-			DrawText(120,180,tmp,0.8f,0);
-		}else if(editing_ps2_ip==3){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 IP: %3d.%3d.   .%3d",new_ps2_ip[0],new_ps2_ip[1], new_ps2_ip[3]);
-			DrawText(120,180,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                %3d", new_ps2_ip[2]);
-			DrawText(120,180,tmp,0.8f,0);
-		}else if(editing_ps2_ip==4){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 IP: %3d.%3d.%3d.",new_ps2_ip[0],new_ps2_ip[1], new_ps2_ip[2]);
-			DrawText(120,180,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                    %3d", new_ps2_ip[3]);
-			DrawText(120,180,tmp,0.8f,0);
-		}
-		if(editing_ps2_netmask==0){
-			snprintf(tmp, 255, "PS2 NETMASK: %3d.%3d.%3d.%3d", new_ps2_netmask[0],new_ps2_netmask[1],new_ps2_netmask[2],new_ps2_netmask[3]);
-			if(v_pos==1){
-				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			}else{
-				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			}
-			DrawText(120,220,tmp,0.8f,0);
-		}else if(editing_ps2_netmask==1){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 NETMASK:    .%3d.%3d.%3d",new_ps2_netmask[1],new_ps2_netmask[2], new_ps2_netmask[3]);
-			DrawText(120,220,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "             %3d", new_ps2_netmask[0]);
-			DrawText(120,220,tmp,0.8f,0);
-		}else if(editing_ps2_netmask==2){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 NETMASK: %3d.   .%3d.%3d",new_ps2_netmask[0],new_ps2_netmask[2],new_ps2_netmask[3]);
-			DrawText(120,220,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                 %3d", new_ps2_netmask[1]);
-			DrawText(120,220,tmp,0.8f,0);
-		}else if(editing_ps2_netmask==3){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 NETMASK: %3d.%3d.   .%3d",new_ps2_netmask[0],new_ps2_netmask[1], new_ps2_netmask[3]);
-			DrawText(120,220,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                     %3d", new_ps2_netmask[2]);
-			DrawText(120,220,tmp,0.8f,0);
-		}else if(editing_ps2_netmask==4){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 NETMASK: %3d.%3d.%3d.",new_ps2_netmask[0],new_ps2_netmask[1], new_ps2_netmask[2]);
-			DrawText(120,220,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                         %3d", new_ps2_netmask[3]);
-			DrawText(120,220,tmp,0.8f,0);
-		}	
-		if(editing_ps2_gateway==0){
-			snprintf(tmp, 255, "PS2 GATEWAY: %3d.%3d.%3d.%3d", new_ps2_gateway[0],new_ps2_gateway[1],new_ps2_gateway[2],new_ps2_gateway[3]);
-			if(v_pos==2){
-				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			}else{
-				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			}
-			DrawText(120,260,tmp,0.8f,0);
-		}else if(editing_ps2_gateway==1){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 GATEWAY:    .%3d.%3d.%3d",new_ps2_gateway[1],new_ps2_gateway[2], new_ps2_gateway[3]);
-			DrawText(120,260,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "             %3d", new_ps2_gateway[0]);
-			DrawText(120,260,tmp,0.8f,0);
-		}else if(editing_ps2_gateway==2){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 GATEWAY: %3d.   .%3d.%3d",new_ps2_gateway[0],new_ps2_gateway[2],new_ps2_gateway[3]);
-			DrawText(120,260,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                 %3d", new_ps2_gateway[1]);
-			DrawText(120,260,tmp,0.8f,0);
-		}else if(editing_ps2_gateway==3){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 GATEWAY: %3d.%3d.   .%3d",new_ps2_gateway[0],new_ps2_gateway[1], new_ps2_gateway[3]);
-			DrawText(120,260,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                     %3d", new_ps2_gateway[2]);
-			DrawText(120,260,tmp,0.8f,0);
-		}else if(editing_ps2_gateway==4){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PS2 GATEWAY: %3d.%3d.%3d.",new_ps2_gateway[0],new_ps2_gateway[1], new_ps2_gateway[2]);
-			DrawText(120,260,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                         %3d", new_ps2_gateway[3]);
-			DrawText(120,260,tmp,0.8f,0);
-		}
-		if(editing_pc_ip==0){
-			snprintf(tmp, 255, "PC IP: %3d.%3d.%3d.%3d", new_pc_ip[0],new_pc_ip[1],new_pc_ip[2],new_pc_ip[3]);
-			if(v_pos==3){
-				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			}else{
-				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			}
-			DrawText(120,300,tmp,0.8f,0);
-		}else if(editing_pc_ip==1){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PC IP:    .%3d.%3d.%3d",new_pc_ip[1],new_pc_ip[2], new_pc_ip[3]);
-			DrawText(120,300,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "       %3d", new_pc_ip[0]);
-			DrawText(120,300,tmp,0.8f,0);
-		}else if(editing_pc_ip==2){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PC IP: %3d.   .%3d.%3d",new_pc_ip[0],new_pc_ip[2],new_pc_ip[3]);
-			DrawText(120,300,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "           %3d", new_pc_ip[1]);
-			DrawText(120,300,tmp,0.8f,0);
-		}else if(editing_pc_ip==3){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PC IP: %3d.%3d.   .%3d",new_pc_ip[0],new_pc_ip[1], new_pc_ip[3]);
-			DrawText(120,300,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "               %3d", new_pc_ip[2]);
-			DrawText(120,300,tmp,0.8f,0);
-		}else if(editing_pc_ip==4){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PC IP: %3d.%3d.%3d.",new_pc_ip[0],new_pc_ip[1], new_pc_ip[2]);
-			DrawText(120,300,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                   %3d", new_pc_ip[3]);
-			DrawText(120,300,tmp,0.8f,0);
-		}
-		if(editing_port==0) {
-			snprintf(tmp, 255, "PC PORT: %4d", new_port);
-			if(v_pos==4) {
-				TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			}else{
-				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			}
-			DrawText(120,340,tmp,0.8f,0);
-		}else if (editing_port==1){
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-			snprintf(tmp, 255, "PC PORT: ");
-			DrawText(120,340,tmp,0.8f,0);
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "         %4d", new_port);
-			DrawText(120,340,tmp,0.8f,0);
-		}
-		
-		// net autostart
-		if(v_pos==5) {
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-		}else{
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-		}
-		
-		snprintf(tmp, 255, "%s: %s", _l(_STR_NETWORK_AUTOSTART), new_autostart ? _l(_STR_ON) : _l(_STR_OFF));
-		DrawText(120,380,tmp,0.8f,0);
-		
-		if(v_pos==6){
-			TextColor(bg_color[0]/2,bg_color[1]/2,bg_color[2]/2, 0x80);
-		}else{
-			TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-		}
-		DrawText(310,410,_l(_STR_OK),1, 1);
-		
-		if(editing_ps2_ip>0){
-			if(GetKey(KEY_UP)){
-				if(new_ps2_ip[editing_ps2_ip-1]<255){
-					new_ps2_ip[editing_ps2_ip-1]++;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(new_ps2_ip[editing_ps2_ip-1]>0){
-					new_ps2_ip[editing_ps2_ip-1]--;
-				}
-			}else if(GetKey(KEY_LEFT)){
-				if(editing_ps2_ip>1){
-					editing_ps2_ip--;
-				}
-			}else if(GetKey(KEY_RIGHT)){
-				if(editing_ps2_ip<4){
-					editing_ps2_ip++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_ps2_ip=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				new_ps2_ip[0]=ps2_ip[0];
-				new_ps2_ip[1]=ps2_ip[1];
-				new_ps2_ip[2]=ps2_ip[2];
-				new_ps2_ip[3]=ps2_ip[3];
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_ps2_ip=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				ipchanged = 1;
-			}
-		}else if(editing_ps2_netmask>0){
-			if(GetKey(KEY_UP)){
-				if(new_ps2_netmask[editing_ps2_netmask-1]<255){
-					new_ps2_netmask[editing_ps2_netmask-1]++;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(new_ps2_netmask[editing_ps2_netmask-1]>0){
-					new_ps2_netmask[editing_ps2_netmask-1]--;
-				}
-			}else if(GetKey(KEY_LEFT)){
-				if(editing_ps2_netmask>1){
-					editing_ps2_netmask--;
-				}
-			}else if(GetKey(KEY_RIGHT)){
-				if(editing_ps2_netmask<4){
-					editing_ps2_netmask++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_ps2_netmask=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				new_ps2_netmask[0]=ps2_netmask[0];
-				new_ps2_netmask[1]=ps2_netmask[1];
-				new_ps2_netmask[2]=ps2_netmask[2];
-				new_ps2_netmask[3]=ps2_netmask[3];
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_ps2_netmask=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				ipchanged = 1;
-			}
-		}else if(editing_ps2_gateway>0){
-			if(GetKey(KEY_UP)){
-				if(new_ps2_gateway[editing_ps2_gateway-1]<255){
-					new_ps2_gateway[editing_ps2_gateway-1]++;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(new_ps2_gateway[editing_ps2_gateway-1]>0){
-					new_ps2_gateway[editing_ps2_gateway-1]--;
-				}
-			}else if(GetKey(KEY_LEFT)){
-				if(editing_ps2_gateway>1){
-					editing_ps2_gateway--;
-				}
-			}else if(GetKey(KEY_RIGHT)){
-				if(editing_ps2_gateway<4){
-					editing_ps2_gateway++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_ps2_gateway=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				new_ps2_gateway[0]=ps2_gateway[0];
-				new_ps2_gateway[1]=ps2_gateway[1];
-				new_ps2_gateway[2]=ps2_gateway[2];
-				new_ps2_gateway[3]=ps2_gateway[3];
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_ps2_gateway=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				ipchanged = 1;
-			}                 
-		}else if(editing_pc_ip>0){
-			if(GetKey(KEY_UP)){
-				if(new_pc_ip[editing_pc_ip-1]<255){
-					new_pc_ip[editing_pc_ip-1]++;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(new_pc_ip[editing_pc_ip-1]>0){
-					new_pc_ip[editing_pc_ip-1]--;
-				}
-			}else if(GetKey(KEY_LEFT)){
-				if(editing_pc_ip>1){
-					editing_pc_ip--;
-				}
-			}else if(GetKey(KEY_RIGHT)){
-				if(editing_pc_ip<4){
-					editing_pc_ip++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_pc_ip=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				new_pc_ip[0]=pc_ip[0];
-				new_pc_ip[1]=pc_ip[1];
-				new_pc_ip[2]=pc_ip[2];
-				new_pc_ip[3]=pc_ip[3];
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_pc_ip=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-			}           
-		} else if(editing_port>0) { 
-			// if editing, up and down will rise/lower the port, circle will exit restoring changes, X will store
-			if(GetKey(KEY_UP)) {
-				if (new_port < 1024)
-					new_port++;
-			} else if(GetKey(KEY_DOWN)) {
-				if (new_port > 0)
-					new_port--;
-			} else if(GetKeyOn(KEY_CIRCLE)) {
-				new_port = gPCPort;
-				editing_port = 0;	
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-			} else if(GetKeyOn(KEY_CROSS)) {
-				gPCPort = new_port;
-				editing_port = 0;	
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-			}
-		} else {
-			if(GetKey(KEY_UP)){
-				if(v_pos>0){
-					v_pos--;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(v_pos<6){
-					v_pos++;
-				}
-			}else if(GetKeyOn(KEY_CROSS)){
-				if(v_pos==0){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_ps2_ip=1;
-				}else if(v_pos==1){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_ps2_netmask=1;
-				}else if(v_pos==2){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_ps2_gateway=1;
-				}else if(v_pos==3){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_pc_ip=1;
-				}else if(v_pos==4){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_port=1;
-				} else if(v_pos==5){
-					new_autostart = !new_autostart;
-				}else if(v_pos==6){
-					gNetAutostart = new_autostart;
-					
-					ps2_ip[0]=new_ps2_ip[0];
-					ps2_ip[1]=new_ps2_ip[1];
-					ps2_ip[2]=new_ps2_ip[2];
-					ps2_ip[3]=new_ps2_ip[3];
-
-					ps2_netmask[0]=new_ps2_netmask[0];
-					ps2_netmask[1]=new_ps2_netmask[1];
-					ps2_netmask[2]=new_ps2_netmask[2];
-					ps2_netmask[3]=new_ps2_netmask[3];
-					
-					ps2_gateway[0]=new_ps2_gateway[0];
-					ps2_gateway[1]=new_ps2_gateway[1];
-					ps2_gateway[2]=new_ps2_gateway[2];
-					ps2_gateway[3]=new_ps2_gateway[3];
-
-					pc_ip[0]=new_pc_ip[0];
-					pc_ip[1]=new_pc_ip[1];
-					pc_ip[2]=new_pc_ip[2];
-					pc_ip[3]=new_pc_ip[3];
-
-					// this should only set a global flag
-					// so it does! :)
-					gIPConfigChanged = ipchanged;
-					
-					break; // This will give the user a visual clue that he saved ok
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				gNetAutostart = new_autostart;
-				break;
-			}
-
-		}
-
-		Flip();
-	}
-	
-	// revert to old button delays
-	UpdateScrollSpeed();
-}
-
 /// Uploads texture to vram
 void UploadTexture(GSTEXTURE* txt) {
 	txt->Vram = gsKit_vram_alloc(gsGlobal, gsKit_texture_size(txt->Width, txt->Height, txt->PSM), GSKIT_ALLOC_USERBUFFER);
@@ -1302,6 +882,40 @@ int LoadRAW(char *path, GSTEXTURE *Texture) {
 	return 1;
 }
 
+void LoadTheme(int themeid) {
+	// themeid == 0 means the default theme
+	strcpy(theme,theme_dir[themeid]);
+	background_image=LoadBackground();
+	LoadIcons();
+	LoadFont(0);
+
+	struct TConfigSet themeConfig;
+	themeConfig.head = NULL;
+	themeConfig.tail = NULL;
+
+	// try to load the config from the theme dir
+	char tmp[255];
+	snprintf(tmp, 255, "mass:USBLD/%s/theme.cfg", theme);
+
+	// set default colors
+	bg_color[0]=0x00;
+	bg_color[1]=0x00;
+	bg_color[2]=0xff;
+
+	text_color[0]=0xff;
+	text_color[1]=0xff;
+	text_color[2]=0xff;
+
+	if (readConfig(&themeConfig, tmp)) {
+		// load the color value overrides if present
+		getConfigColor(&themeConfig, "bgcolor", bg_color);
+		getConfigColor(&themeConfig, "textcolor", text_color);
+	}
+
+	SetColor(bg_color[0],bg_color[1],bg_color[2]);
+	TextColor(text_color[0], text_color[1], text_color[2], 0xff);	
+}
+
 int LoadBackground() {
 	char tmp[255];
 	
@@ -1327,11 +941,11 @@ int LoadBackground() {
 	return res;
 }
 
-void LoadIcon(GSTEXTURE* txt, char* iconname, void* defraw) {
+void LoadIcon(GSTEXTURE* txt, char* iconname, void* defraw, size_t w, size_t h) {
 	char tmp[255];
 
-	txt->Width = 64;
-	txt->Height = 64;
+	txt->Width = w;
+	txt->Height = h;
 	txt->PSM = GS_PSM_CT32;
 	txt->Filter = GS_FILTER_LINEAR;
 	
@@ -1346,20 +960,25 @@ void LoadIcon(GSTEXTURE* txt, char* iconname, void* defraw) {
 
 /// Loads icons to ram
 void LoadIcons() {
-	LoadIcon(&exit_icon, "exit.raw", &exit_raw);
-	LoadIcon(&config_icon, "config.raw", &config_raw);
-	LoadIcon(&games_icon, "games.raw", &games_raw);
-	LoadIcon(&disc_icon, "disc.raw", &disc_raw);
-	LoadIcon(&theme_icon, "theme.raw", &theme_raw);
-	LoadIcon(&language_icon, "language.raw", &language_raw);
-	LoadIcon(&apps_icon, "apps.raw", &apps_raw);
-	LoadIcon(&menu_icon, "menu.raw", &menu_raw);
-	LoadIcon(&scroll_icon, "scroll.raw", &scroll_raw);
-	LoadIcon(&usb_icon, "usb.raw", &usb_raw);
-	LoadIcon(&save_icon, "save.raw", &save_raw);
-	LoadIcon(&netconfig_icon, "netconfig.raw", &netconfig_raw);
-	LoadIcon(&network_icon, "network.raw", &network_raw);
-	
+	LoadIcon(&exit_icon, "exit.raw", &exit_raw, 64, 64);
+	LoadIcon(&config_icon, "config.raw", &config_raw, 64, 64);
+	LoadIcon(&games_icon, "games.raw", &games_raw, 64, 64);
+	LoadIcon(&disc_icon, "disc.raw", &disc_raw, 64, 64);
+	LoadIcon(&theme_icon, "theme.raw", &theme_raw, 64, 64);
+	LoadIcon(&language_icon, "language.raw", &language_raw, 64, 64);
+	LoadIcon(&apps_icon, "apps.raw", &apps_raw, 64, 64);
+	LoadIcon(&menu_icon, "menu.raw", &menu_raw, 64, 64);
+	LoadIcon(&scroll_icon, "scroll.raw", &scroll_raw, 64, 64);
+	LoadIcon(&usb_icon, "usb.raw", &usb_raw, 64, 64);
+	LoadIcon(&save_icon, "save.raw", &save_raw, 64, 64);
+	LoadIcon(&netconfig_icon, "netconfig.raw", &netconfig_raw, 64, 64);
+	LoadIcon(&network_icon, "network.raw", &network_raw, 64, 64);
+
+	// button icons (small ones)
+	LoadIcon(&cross_icon, "cross.raw", &cross_raw, 22, 22);
+	LoadIcon(&triangle_icon, "triangle.raw", &triangle_raw, 22, 22);
+	LoadIcon(&square_icon, "square.raw", &square_raw, 22, 22);
+	LoadIcon(&circle_icon, "circle.raw", &circle_raw, 22, 22);
 }
 
 /// Uploads the icons to vram
@@ -1377,6 +996,12 @@ void UpdateIcons() {
 	UploadTexture(&save_icon);
 	UploadTexture(&network_icon);
 	UploadTexture(&netconfig_icon);
+
+	// Buttons
+	UploadTexture(&cross_icon);
+	UploadTexture(&triangle_icon);
+	UploadTexture(&square_icon);
+	UploadTexture(&circle_icon);
 }
 
 void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {
@@ -1396,6 +1021,25 @@ void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {
 		z++;
 	}
 }
+
+void DrawIconN(GSTEXTURE *img, int x, int y, float scale) {
+	if (img!=NULL) {
+		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+		DrawSprite_texture(gsGlobal, img, x,  // X1
+			y,  // Y2
+			0.0f,  // U1
+			0.0f,  // V1
+			x+img->Width * scale, // X2
+			y+img->Height * scale, // Y2
+			img->Width, // U2
+			img->Height, // V2
+			z,
+			GS_SETREG_RGBAQ(0x80,0x80,0x80,0x80,0x00));
+		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+		z++;
+	}
+}
+
 
 void DrawIcons() {
 	// Menu item animation
@@ -1448,23 +1092,48 @@ void DrawInfo() {
 	}
 }
 
-void DrawNetStatus() {
-	char txt[64];
+void DrawHint(const char* hint, int key) {
+	size_t w = strlen(hint) * gsFont->CharWidth + 45;
+
+	// if key is drawn or not:
+	GSTEXTURE *icon = NULL;
+
+	switch (key) {
+		case KEY_CROSS:
+			icon = &cross_icon;
+			break;
+		case KEY_SQUARE:
+			icon = &square_icon;
+			break;
+		case KEY_TRIANGLE:
+			icon = &triangle_icon;
+			break;
+		case KEY_CIRCLE:
+			icon = &circle_icon;
+			break;
+	}
+
+	if (icon) {
+		w += 25;
+	}
+
+	int x = 625 - w;
 	
-	// also display network status in lower left corner
-	if (gNetworkStartup > 0) {
-		// darkening quad...
-		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+	// darkening quad...
+	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
 
-		DrawQuad(gsGlobal, 100.0f, yfix2(360.0f), 
-			           500.0f, yfix2(360.0f), 
-				   100.0f, yfix2(400.0f), 
-				   500.0f, yfix2(400.0f), z, Darker);
-				   
-		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+	DrawQuad(gsGlobal, x    , yfix2(360.0f), 
+		           x + w, yfix2(360.0f), 
+			   x    , yfix2(400.0f), 
+			   x + w, yfix2(400.0f), z, Darker);
+			   
+	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 
-		snprintf(txt, 64, _l(_STR_NETWORK_LOADING), gNetworkStartup);
-		DrawText(115,yfix2(375),txt,1,0);
+	if (icon) {
+		DrawIconN(icon, x+ 10, yfix2(370), 1.0f);
+		DrawText(x + 40, yfix2(375), hint, 1, 0);
+	} else {
+		DrawText(x+ 15, yfix2(375), hint, 1, 0);
 	}
 }
 
@@ -1824,6 +1493,13 @@ void MenuPrevV() {
 	}
 }
 
+struct TMenuItem* MenuGetCurrent() {
+	if (!selected_item)
+		return NULL;
+
+	return selected_item->item;
+}
+
 void MenuItemExecute() {
 	if (selected_item && (selected_item->item->execute)) {
 		// selected submenu id. default -1 = no selection
@@ -1918,10 +1594,8 @@ void DrawScreenStatic() {
 	// x offset is 10 pixels
 	// y offset is 125 pixels
 	// the selected item is displayed at 125 + 5 * 30 = 275 px.
-	if (!selected_item) {
-		DrawNetStatus();
+	if (!selected_item) 
 		return;
-	}
 	
 	float iscale = -15.0f; // not a scale... an additional spacing in pixels
 	int draw_icons = 1;
@@ -1942,10 +1616,8 @@ void DrawScreenStatic() {
 		
 	struct TSubMenuList *cur = selected_item->item->current;
 	
-	if (!cur) { // no rendering if empty
-		DrawNetStatus();
+	if (!cur) // no rendering if empty
 		return;
-	}
 	
 	// prev item
 	struct TSubMenuList *prev = cur->prev;
@@ -1979,9 +1651,6 @@ void DrawScreenStatic() {
 		
 		cur = cur->next; others++;
 	}
-
-	// Inform about network state...
-	DrawNetStatus();
 }
 
 void SwapMenu() {
@@ -2016,7 +1685,6 @@ void DrawScreen() {
 		DrawBackground();
 		DrawIcons();
 		DrawInfo();
-		DrawNetStatus();
 	}
 }
 
@@ -2141,7 +1809,7 @@ void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocu
 				break;
 			}
 		case UI_ENUM: {
-				const char* tv = item->enumvalue.values[item->intvalue.current];
+				const char* tv = item->intvalue.enumvalues[item->intvalue.current];
 
 				if (!tv)
 					tv = "<no value>";
@@ -2262,7 +1930,7 @@ int diaHandleInput(struct UIItem *item) {
 	} else if (item->type == UI_ENUM) {
 		int cur = item->intvalue.current;
 
-		if (item->enumvalue.values[cur] == NULL) {
+		if (item->intvalue.enumvalues[cur] == NULL) {
 			if (cur > 0)
 				item->intvalue.current--;
 			else
@@ -2274,7 +1942,7 @@ int diaHandleInput(struct UIItem *item) {
 		
 		++cur;
 
-		if (GetKey(KEY_DOWN) && (item->enumvalue.values[cur] != NULL))
+		if (GetKey(KEY_DOWN) && (item->intvalue.enumvalues[cur] != NULL))
 			item->intvalue.current = cur;
 	}
 	
@@ -2390,7 +2058,7 @@ int diaExecuteDialog(struct UIItem *ui) {
 	
 	// okay, we have the first selectable item
 	// we can proceed with rendering etc. etc.
-	while (1) {	
+	while (1) {
 		diaRenderUI(ui, cur, haveFocus);
 		
 		ReadPad();
@@ -2534,5 +2202,18 @@ int diaSetLabel(struct UIItem* ui, int id, const char *text) {
 		return 0;
 	
 	item->label.text = text;
+	return 1;
+}
+
+int diaSetEnum(struct UIItem* ui, int id, const char **enumvals) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if (item->type != UI_ENUM)
+		return 0;
+	
+	item->intvalue.enumvalues = enumvals;
 	return 1;
 }

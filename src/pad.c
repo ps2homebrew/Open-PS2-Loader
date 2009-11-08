@@ -11,8 +11,8 @@ int ret;
 int port, slot;
 int i;
 struct padButtonStatus buttons;
-u32 oldpaddata;
 u32 paddata;
+u32 oldpaddata;
 int delaycnt[16];
 int paddelay[16];
 
@@ -179,18 +179,27 @@ int initializePad(int port, int slot){
 
     waitPadReady(port, slot);
 
-    oldpaddata = 0;
-    
     return 1;
 }
 
-void ReadPad(){
+int ReadPad() {
+	int rcode = 0;
+
         ret = padRead(port, slot, &buttons); // port, slot, buttons
             
         if (ret != 0) {
+		u32 newpdata = 0xffff ^ buttons.btns; 
+		
+		if (newpdata != 0x0) // something
+			rcode = 1;
+		else
+			rcode = 0;
+
 		oldpaddata = paddata;
-		paddata = 0xffff ^ buttons.btns;
+		paddata = newpdata;
 	}
+
+	return rcode;
 }
 
 int GetKey(int num) {

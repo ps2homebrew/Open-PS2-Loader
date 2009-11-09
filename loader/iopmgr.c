@@ -260,7 +260,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
 		LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
 		LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
-		LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
 		LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
 	}	
 	

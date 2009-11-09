@@ -133,6 +133,7 @@ int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 
 	romdir_in  = (romdir_t*)ioprp_img->data_in;
 	romdir_out = (romdir_t*)ioprp_img->data_out;
+	memset(ioprp_img->data_out, 0, ioprp_img->size_in);
 
 	// First search for EXTINFO
 	while(strcmp(romdir_in->fileName, "EXTINFO")) {

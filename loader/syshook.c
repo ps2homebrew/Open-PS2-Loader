@@ -11,9 +11,10 @@
 #include "iopmgr.h"
 #include <syscallnr.h>
 
+#define MAX_G_ARGS 15
 static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
-static char g_argbuf[256];
+static char g_argbuf[580];
 static char g_ElfPath[1024];
 
 int set_reg_hook;
@@ -94,35 +95,34 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 }
 
 // ------------------------------------------------------------------------
-void NewLoadExecPS2(const char *filename, int argc, char *argv[])
+static void t_loadElf(void)
 {
-	char *p = g_argbuf;
 	int i, r;
 	t_ExecData elf;
-
-	DI();
-	ee_kmode_enter();
 	
-	// copy args from main ELF
-	g_argc = argc > MAX_ARGS ? MAX_ARGS : argc;
+    SifExitRpc();
 
-	memset(g_argbuf, 0, sizeof(g_argbuf));
+    set_reg_disabled = 0;
+    New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
+    set_reg_disabled = 1;
 
-	strcpy(p, filename);
-	g_argv[0] = p;
-	p += strlen(filename) + 1;
-	g_argc++;
+	iop_reboot_count = 1;
+           
+	SifInitRpc(0);
+	fioExit();
+	SifExitIopHeap();
+	LoadFileExit();
 
-	for (i = 0; i < argc; i++) {
-		strcpy(p, argv[i]);
-		g_argv[i + 1] = p;
-		p += strlen(argv[i]) + 1;
+    cdInit(CDVD_INIT_INIT);
+	
+	// replacing cdrom in elf path by iso
+	if (strstr(g_argv[0], "cdrom")) {
+		u8 *ptr = (u8 *)g_argv[0];
+		strcpy(g_ElfPath, "iso");
+		strcat(g_ElfPath, &ptr[5]);		
 	}
 	
-	ee_kmode_exit();
-	EI();
-		
-	ResetEE(0x7f);
+	GS_BGCOLOUR = 0x00ff00; 
 
 	// wipe user memory
 	for (i = 0x00100000; i < 0x02000000; i += 64) {
@@ -134,39 +134,11 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 			:: "r" (i)
 		);
 	}
-
-	// clear scratchpad memory
-	memset((void*)0x70000000, 0, 16 * 1024);
-	
-    SifExitRpc();
-
-    set_reg_disabled = 0;
-    New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
-    set_reg_disabled = 1;
-        
-	SifInitRpc(0);
-
-    cdInit(CDVD_INIT_INIT);
-	
-	// replacing cdrom in elf path by iso
-	if (strstr(g_argv[0], "cdrom")) {
-		u8 *ptr = (u8 *)g_argv[0];
-		strcpy(g_ElfPath, "iso");
-		strcat(g_ElfPath, &ptr[5]);		
-	}
-	
-	SifInitRpc(0);
-	LoadFileInit();
-
-	GS_BGCOLOUR = 0x00ff00; 
-		
+			
 	r = LoadElf(g_ElfPath, &elf);
 		
 	if ((!r) && (elf.epc)) {
 		// exit services
-		fioExit();
-		LoadFileExit();
-		SifExitIopHeap();
 		SifExitRpc();
 
 		FlushCache(0);
@@ -175,6 +147,41 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
 	}
 
+	GS_BGCOLOUR = 0xffffff; // white screen: error
+	SleepThread();		
+}
+
+// ------------------------------------------------------------------------
+void NewLoadExecPS2(const char *filename, int argc, char *argv[])
+{
+	char *p = g_argbuf;
+	int i, arglen;
+	
+	DI();
+	ee_kmode_enter();
+	
+	// copy args from main ELF
+	g_argc = argc > MAX_G_ARGS ? MAX_G_ARGS : argc;
+
+	memset(g_argbuf, 0, sizeof(g_argbuf));
+
+	strncpy(p, filename, 256);
+	g_argv[0] = p;
+	p += strlen(filename) + 1;
+	g_argc++;
+
+	for (i = 0; i < (g_argc-1); i++) {
+		arglen = strlen(argv[i]) + 1;
+		memcpy(p, argv[i], arglen);
+		g_argv[i + 1] = p;
+		p += arglen;
+	}
+	
+	ee_kmode_exit();
+	EI();
+	
+	ExecPS2(t_loadElf, NULL, 0, NULL);
+		
 	GS_BGCOLOUR = 0xffffff; // white screen: error
 	SleepThread();	
 }

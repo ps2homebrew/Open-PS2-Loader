@@ -79,20 +79,25 @@ int New_Reset_Iop(const char *arg, int flag){
 	iop_reboot_count++;
 	
 	SifInitRpc(0);
-
+	
 	if (iop_reboot_count > 2) { 
 		// above 2nd IOP reset, we can't be sure we'll be able to read IOPRP without 
 		// Resetting IOP (game IOPRP is loaded at 2nd reset), so...
 		// Reseting IOP.
+		SifExitRpc();
+		
 		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 		while (!Sync_Iop()){;}
 	
-		SifExitIopHeap();	
+		fioExit();
+		SifExitIopHeap();
 		SifInitRpc(0);
 		SifInitIopHeap();
 		LoadFileInit();
 		Sbv_Patch();
 
+		GS_BGCOLOUR = 0x00A5FF;
+			
 		if (GameMode == USB_MODE) {
 			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
 			LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
@@ -106,7 +111,7 @@ int New_Reset_Iop(const char *arg, int flag){
 			LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
 		}
 		LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
-	}	
+	}
 
 	// check for reboot with IOPRP from cdrom
 	char *ioprp_pattern = "rom0:UDNL cdrom";
@@ -146,7 +151,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}
 
-	fioInit();
+	fioInit();		
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
 		GS_BGCOLOUR = 0x000080;
@@ -165,12 +170,12 @@ int New_Reset_Iop(const char *arg, int flag){
 		ioprp_img.data_out = ioprp_img.data_in;
 		ioprp_img.size_out = ioprp_img.size_in;
 	}
-		
-	read(fd, ioprp_img.data_in , ioprp_img.size_in);
-	close(fd);
 
+	read(fd, ioprp_img.data_in , ioprp_img.size_in);
+	
+	close(fd);
 	fioExit();
-		
+			
 	if (eeloadcnf_reset) {
 		r = Patch_EELOADCNF_Img(&ioprp_img);
 		if (r == 0){
@@ -183,7 +188,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		Patch_Mod(&ioprp_img, "CDVDFSV", dummy_irx, size_dummy_irx);
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
-
+	
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
@@ -196,7 +201,11 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifInitIopHeap();
 	LoadFileInit();
 	Sbv_Patch();
-
+	
+	SifInitIopHeap();
+	LoadFileExit();
+	Sbv_Patch();	
+	
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);
 	
 	if (rom_iop){
@@ -251,7 +260,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
 		LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
 		LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
-		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+		LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
 		LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
 	}	
 	

@@ -44,8 +44,12 @@ int main(int argc, char **argv){
 	
 	SifInitRpc(0);
 
+#ifdef LOAD_EECORE_DOWN
+	g_buf = (u8 *)0x01700000;
+#else
 	g_buf = (u8 *)0x00088000;
-	
+#endif  
+
 	argv[1][12]=0x00; // fix for 8+3 filename.
 
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);

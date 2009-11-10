@@ -60,15 +60,21 @@ int main(int argc, char **argv){
 		GameMode = ETH_MODE;
 	
 	// bitmask of the compat. settings
-	int mask = 0;
-	mask = atoi(argv[2]);
-	
 	char *p = strtok(&argv[0][9], " ");
 	strcpy(g_ps2_ip, p);
 	p = strtok(NULL, " ");
 	strcpy(g_ps2_netmask, p);
 	p = strtok(NULL, " ");
 	strcpy(g_ps2_gateway, p);
+
+	/* // Commenting out till I find the reason of the freezes.
+	p = strtok(NULL, " ");
+	int mask = 0;
+	
+	if (p) {
+		mask = atoi(p);
+	}
+	*/
 
 	set_ipconfig();
 	

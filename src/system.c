@@ -310,7 +310,7 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	elf_pheader_t *eph;
 	void *pdata;
 	int i;
-	char *argv[3];
+	char *argv[2];
 	char gamename[33];
 	char isoname[32];
 	char filename[32];
@@ -384,17 +384,14 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	else if (mode == ETH_MODE)
 		mode_str = "ETH_MODE";
 		
-	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
-		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], compatmask);
 	
-	char mask_str[16];
-	snprintf(mask_str, 16, "%d", compatmask);
-		
 	argv[0] = config_str;	
 	argv[1] = filename;
-	argv[2] = mask_str;
 	
-	ExecPS2((void *)eh->entry, 0, 3, argv);
+	ExecPS2((void *)eh->entry, 0, 2, argv);
 } 
 
 #define IRX_NUM 12

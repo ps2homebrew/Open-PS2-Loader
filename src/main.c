@@ -109,6 +109,7 @@ struct UIItem diaIPConfig[] = {
 #define COMPAT_SAVE 100
 #define COMPAT_TEST 101
 #define COMPAT_REMOVE 102
+#define COMPAT_MODE_COUNT 5
 struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 110, {.label = {"<Game Label>", -1}}},
 	
@@ -119,6 +120,8 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 0, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, 10, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, 11, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, 12, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, 13, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, 14, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -193,39 +196,55 @@ void showIPConfig() {
 	}
 }
 
+int getImageCompatMask(const char* image, int ntype) {
+	char gkey[255];
+	unsigned int modemask;
+	
+	snprintf(gkey, 255, "%s_%d", image, ntype);
+	
+	if (!getConfigInt(&gConfig, gkey, &modemask))
+		modemask = 0;
+	
+	return modemask;
+}
+
+void setImageCompatMask(const char* image, int ntype, int mask) {
+	char gkey[255];
+	
+	snprintf(gkey, 255, "%s_%d", image, ntype);
+	
+	setConfigInt(&gConfig, gkey, mask);
+}
+
 // returns COMPAT_TEST on testing request
 int showCompatConfig(const char* game, const char* prefix, int ntype) {
-	char temp[255];
-	int mode[3];
+	char gkey[255];
+	
+	int modes = getImageCompatMask(prefix, ntype);
+	
 	int i;
 	
 	diaSetLabel(diaCompatConfig, 110, game);
 	
-	for (i = 0; i < 3; ++i) {
-		snprintf(temp, 255, "%s_%d_%d", prefix, ntype, i+1);
-		
-		if (!getConfigInt(&gConfig, temp, &mode[i]))
-			mode[i] = 0;
-		
-		diaSetInt(diaCompatConfig, i+10, mode[i]);
+	for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
+		diaSetInt(diaCompatConfig, i+10, (modes & (1 << i)) > 0 ? 1 : 0);
 	}
 	
 	// show dialog
 	int result = diaExecuteDialog(diaCompatConfig);
 	
 	if (result == COMPAT_REMOVE) {
-		for (i = 0; i < 3; ++i) {
-			snprintf(temp, 255, "%s_%d_%d", prefix, ntype, i+1);
-			configRemoveKey(&gConfig, temp);
-		}
-		
+		configRemoveKey(&gConfig, gkey);
 		MsgBox(_l(_STR_REMOVED_ALL_SETTINGS));
 	} else if (result > 0) { // okay pressed or other button
-		for (i = 0; i < 3; ++i) {
-			diaGetInt(diaCompatConfig, i+10, &mode[i]);
-			snprintf(temp, 255, "%s_%d_%d", prefix, ntype, i+1);
-			setConfigInt(&gConfig, temp, mode[i]);
+		modes = 0;
+		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
+			int mdpart;
+			diaGetInt(diaCompatConfig, i+10, &mdpart);
+			modes |= (mdpart ? 1 : 0) << i;
 		}
+		
+		setImageCompatMask(prefix, ntype, modes);
 		
 		if (result == COMPAT_SAVE) // write the config
 			storeConfig();
@@ -291,6 +310,7 @@ void showUIConfig() {
 			storeConfig();
 	}
 }
+
 
 // --------------------- Configuration handling --------------------
 int loadConfig(const char* fname, int clearFirst) {
@@ -526,14 +546,18 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(0, 0);
 	padPortClose(1, 0);
 	padReset();
-	LaunchGame(&actualgame->Game, USB_MODE);
+	
+	// find the compat mask
+	int cmask = getImageCompatMask(actualgame->Game.Image, USB_MODE);
+	
+	LaunchGame(&actualgame->Game, USB_MODE, cmask);
 }
 
 void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(actualgame->Game.Name,  actualgame->Game.Image, USB_MODE) == COMPAT_TEST)
+	if (showCompatConfig(actualgame->Game.Name, actualgame->Game.Image, USB_MODE) == COMPAT_TEST)
 		ExecUSBGameSelection(self, id);
 }
 
@@ -659,7 +683,10 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(0, 0);
 	padPortClose(1, 0);
 	padReset();
-	LaunchGame(&eth_actualgame->Game, ETH_MODE);
+	
+	int cmask = getImageCompatMask(actualgame->Game.Image, ETH_MODE);
+	
+	LaunchGame(&eth_actualgame->Game, ETH_MODE, cmask);
 }
 
 void AltExecETHGameSelection(struct TMenuItem* self, int id) {

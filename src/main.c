@@ -298,12 +298,15 @@ int loadConfig(const char* fname, int clearFirst) {
 		clearConfig(&gConfig);
 	
 	// fill the config from file
-	 
+	int result = readConfig(&gConfig, fname);
+	
+	if (!result)
+		return 0;
 	
 	gfxRestoreConfig();
-		
+	
 	infotxt = _l(_STR_WELCOME);
-
+	
 	char *temp;
 	
 	// restore non-graphics settings as well

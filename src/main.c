@@ -197,8 +197,6 @@ void showIPConfig() {
 }
 
 int getImageCompatMask(const char* image, int ntype) {
-	/* // Commenting out till I find the reason of the freezes.
-	// This causes exceptions. Sources in snprintf. commenting out for now.
 	char gkey[255];
 	unsigned int modemask;
 	
@@ -207,8 +205,7 @@ int getImageCompatMask(const char* image, int ntype) {
 	if (!getConfigInt(&gConfig, gkey, &modemask))
 		modemask = 0;
 	
-	return modemask;*/
-	return 0;
+	return modemask;
 }
 
 void setImageCompatMask(const char* image, int ntype, int mask) {

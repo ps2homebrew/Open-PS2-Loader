@@ -17,7 +17,11 @@ GUI Improvements and static list by volca
 Most of compatibility patches in loader are done by jimmikaelkael
 
 CDVDMAN, SMBMAN & ISOFS modules
-Copyright (C) 2009 jimmikaelkael
+Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
 
-NETLOG module
+NETLOG module, and other contributions
 Copyright (C) 2009 misfire <misfire@xploderfreax.de>
+
+SMSMAP, SMSTCPIP modules by Eugene Plotnikov
+
+Original DEV9 module by Marcus R. Brown

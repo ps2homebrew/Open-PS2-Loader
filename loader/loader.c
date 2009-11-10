@@ -58,7 +58,11 @@ int main(int argc, char **argv){
 		GameMode = USB_MODE;
 	else if (!strncmp(argv[0], "ETH_MODE", 8))
 		GameMode = ETH_MODE;
-		
+	
+	// bitmask of the compat. settings
+	int mask = 0;
+	mask = atoi(argv[2]);
+	
 	char *p = strtok(&argv[0][9], " ");
 	strcpy(g_ps2_ip, p);
 	p = strtok(NULL, " ");

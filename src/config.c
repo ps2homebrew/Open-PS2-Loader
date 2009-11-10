@@ -288,6 +288,9 @@ void readIPConfig() {
 
 void writeIPConfig() {
 	char ipconfig[255];
+	
+	fioMkdir("mc0:/SYS-CONF");
+	
 	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
 	if (fd<0) {
 		//DEBUG: printf("No config. Exiting...\n");
@@ -338,6 +341,13 @@ int readConfig(struct TConfigSet* config, const char *fname) {
 }
 
 int writeConfig(struct TConfigSet* config, const char *fname) {
+
+	if (!strncmp (fname,"mc0:/SYS-CONF",13)){
+		fioMkdir("mc0:/SYS-CONF");
+	}else if (!strncmp (fname,"mc1:/SYS-CONF",13)){
+		fioMkdir("mc1:/SYS-CONF");
+	}
+
 	int fd=fioOpen(fname, O_WRONLY | O_CREAT | O_TRUNC);
 	
 	if (fd<0)

@@ -193,6 +193,8 @@ void showIPConfig() {
 		if (strlen(gPCShareName) == 0) {
 			strncpy(gPCShareName, "PS2SMB", 32);
 		}
+		
+		gIPConfigChanged = 1;
 	}
 }
 

@@ -20,6 +20,25 @@ extern int size_isofs_irx;
 
 char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
 
+unsigned int _strtoui(const char* p) {
+        // converts string to unsigned integer. stops on illegal characters.
+        // put here because including atoi rises the size of loader.elf by another kilobyte
+		// and that causes some games to stop working
+        if (!p)
+                return 0;
+
+        int r = 0;
+
+        while (*p) {
+                if ((*p < '0') || (*p > '9'))
+                        return r;
+
+                r = r * 10 + (*p++ - '0');
+        }
+
+        return r;
+}
+
 void set_ipconfig(void)
 {
 	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
@@ -68,8 +87,7 @@ int main(int argc, char **argv){
 
 	// bitmask of the compat. settings
 	p = strtok(NULL, " ");
-	
-	int mask = atoi(p);
+	unsigned int mask = _strtoui(p);
 	
 	set_ipconfig();
 	

@@ -68,11 +68,9 @@ int main(int argc, char **argv){
 
 	// bitmask of the compat. settings
 	p = strtok(NULL, " ");
-	int mask = 0;
 	
-	if (p) {
-		mask = atoi(p);
-	}
+	int mask = atoi(p);
+	
 	set_ipconfig();
 	
 	GetIrxKernelRAM();

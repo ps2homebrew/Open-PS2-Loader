@@ -338,11 +338,20 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 		mode_val = USB_MODE;
 		memcpy((void*)((u32)&isofs_irx+i+35),&mode_val,1);
 		memcpy((void*)((u32)&isofs_irx+i+36),"USBD.IRX\nDECI2.IRX\nSNMON.IRX\0", 29);
+		if (compatmask & COMPAT_MODE_5)
+			memcpy((void*)((u32)&isofs_irx+i+36+28),"\nEYETOY.IRX\0", 12);
 	}
 	else if (mode == ETH_MODE) {
 		mode_val = ETH_MODE;
 		memcpy((void*)((u32)&isofs_irx+i+35),&mode_val,1);
 		memcpy((void*)((u32)&isofs_irx+i+36),"DEV9.IRX\nSMAP.IRX\nDECI2.IRX\nSNMON.IRX\0", 38);
+		int off_str = 37;
+		if (compatmask & COMPAT_MODE_4) {
+			memcpy((void*)((u32)&isofs_irx+i+36+off_str),"\nUSBD.IRX\0", 10);
+			off_str += 9;
+		}
+		if (compatmask & COMPAT_MODE_5)
+			memcpy((void*)((u32)&isofs_irx+i+36+off_str),"\nEYETOY.IRX\0", 12);		
 	}
 		
 	FlushCache(0);

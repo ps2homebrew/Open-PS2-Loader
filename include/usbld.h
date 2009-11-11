@@ -222,6 +222,12 @@ int gNetAutostart;
 // true if the ip config should be saved as well
 int gIPConfigChanged;
 
+#define COMPAT_MODE_1 		0x01
+#define COMPAT_MODE_2 		0x02
+#define COMPAT_MODE_3 		0x04
+#define COMPAT_MODE_4 		0x08
+#define COMPAT_MODE_5 		0x10
+
 // Theme config
 
 char theme[32];

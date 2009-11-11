@@ -69,7 +69,7 @@ int main(int argc, char **argv){
 	g_buf = (u8 *)0x00088000;
 #endif  
 
-	argv[1][12]=0x00; // fix for 8+3 filename.
+	argv[1][11]=0x00; // fix for 8+3 filename.
 
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);
 		
@@ -86,8 +86,7 @@ int main(int argc, char **argv){
 	strcpy(g_ps2_gateway, p);
 
 	// bitmask of the compat. settings
-	p = strtok(NULL, " ");
-	unsigned int mask = _strtoui(p);
+	unsigned int mask = _strtoui(argv[2]);
 	
 	set_ipconfig();
 	

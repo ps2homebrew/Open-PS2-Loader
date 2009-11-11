@@ -1231,8 +1231,15 @@ int ShowKeyb(char* text, size_t maxLen) {
 				   'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Œ', '~', '"',
 				   'ß', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ÿ', '-', '_', '/'};
 	
-	char *commands[4]={"BACKSPACE []", "SPACE /\\", "ENTER (Start)", "MODE (Sel.)"};
-	
+	char *commands[4]={"BACKSPACE", "SPACE", "ENTER", "MODE"};
+
+	GSTEXTURE *cmdicons[4] = {
+		&square_icon,
+		&triangle_icon,
+		&start_icon,
+		&select_icon
+	};
+
 	keyb=keyb1;
 	
 	while(1){
@@ -1306,7 +1313,9 @@ int ShowKeyb(char* text, size_t maxLen) {
 			}else{
 				TextColor(0xff,0xff,0xff,0xff);
 			}
-			DrawText(384, yfix2((170+(30*i))), commands[i], 1.0f, 0);
+
+			DrawIconN(cmdicons[i], 384, yfix2((165+(30*i))), 1.0f);
+			DrawText(414, yfix2((170+(30*i))), commands[i], 1.0f, 0);
 		}
 		
 		Flip();

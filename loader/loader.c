@@ -59,7 +59,6 @@ int main(int argc, char **argv){
 	else if (!strncmp(argv[0], "ETH_MODE", 8))
 		GameMode = ETH_MODE;
 	
-	// bitmask of the compat. settings
 	char *p = strtok(&argv[0][9], " ");
 	strcpy(g_ps2_ip, p);
 	p = strtok(NULL, " ");
@@ -67,15 +66,13 @@ int main(int argc, char **argv){
 	p = strtok(NULL, " ");
 	strcpy(g_ps2_gateway, p);
 
-	/* // Commenting out till I find the reason of the freezes.
+	// bitmask of the compat. settings
 	p = strtok(NULL, " ");
 	int mask = 0;
 	
 	if (p) {
 		mask = atoi(p);
 	}
-	*/
-
 	set_ipconfig();
 	
 	GetIrxKernelRAM();

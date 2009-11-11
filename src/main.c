@@ -199,8 +199,6 @@ void showIPConfig() {
 }
 
 int getImageCompatMask(const char* image, int ntype) {
-	/* // Commenting out till I find the reason of the freezes.
-	// This causes exceptions. Sources in snprintf. commenting out for now.
 	char gkey[255];
 	unsigned int modemask;
 	
@@ -209,8 +207,7 @@ int getImageCompatMask(const char* image, int ntype) {
 	if (!getConfigInt(&gConfig, gkey, &modemask))
 		modemask = 0;
 	
-	return modemask;*/
-	return 0;
+	return modemask;
 }
 
 void setImageCompatMask(const char* image, int ntype, int mask) {
@@ -689,7 +686,7 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(1, 0);
 	padReset();
 	
-	int cmask = getImageCompatMask(actualgame->Game.Image, ETH_MODE);
+	int cmask = getImageCompatMask(eth_actualgame->Game.Image, ETH_MODE);
 	
 	LaunchGame(&eth_actualgame->Game, ETH_MODE, cmask);
 }

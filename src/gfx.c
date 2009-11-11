@@ -79,6 +79,12 @@ extern int size_circle_raw;
 extern void *square_raw;
 extern int size_square_raw;
 
+extern void *select_raw;
+extern int size_select_raw;
+
+extern void *start_raw;
+extern int size_start_raw;
+
 GSGLOBAL *gsGlobal;
 GSTEXTURE font;
 GSFONT *gsFont;
@@ -119,6 +125,8 @@ GSTEXTURE cross_icon;
 GSTEXTURE triangle_icon;
 GSTEXTURE square_icon;
 GSTEXTURE circle_icon;
+GSTEXTURE select_icon;
+GSTEXTURE start_icon;
 
 
 u64 White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
@@ -979,6 +987,8 @@ void LoadIcons() {
 	LoadIcon(&triangle_icon, "triangle.raw", &triangle_raw, 22, 22);
 	LoadIcon(&square_icon, "square.raw", &square_raw, 22, 22);
 	LoadIcon(&circle_icon, "circle.raw", &circle_raw, 22, 22);
+	LoadIcon(&select_icon, "select.raw", &select_raw, 22, 22);
+	LoadIcon(&start_icon, "start.raw", &start_raw, 22, 22);
 }
 
 /// Uploads the icons to vram
@@ -1002,6 +1012,8 @@ void UpdateIcons() {
 	UploadTexture(&triangle_icon);
 	UploadTexture(&square_icon);
 	UploadTexture(&circle_icon);
+	UploadTexture(&select_icon);
+	UploadTexture(&start_icon);
 }
 
 void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {
@@ -1110,6 +1122,12 @@ void DrawHint(const char* hint, int key) {
 			break;
 		case KEY_CIRCLE:
 			icon = &circle_icon;
+			break;
+		case KEY_SELECT:
+			icon = &select_icon;
+			break;
+		case KEY_START:
+			icon = &start_icon;
 			break;
 	}
 

@@ -12,7 +12,7 @@ EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o ob
 		  obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/dummy.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
-		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o
+		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o
 EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lmc -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
@@ -183,6 +183,12 @@ triangle_icon.s:
 
 square_icon.s:
 	bin2s gfx/square.raw asm/square_icon.s square_raw
+
+select_icon.s:
+	bin2s gfx/select.raw asm/select_icon.s select_raw
+
+start_icon.s:
+	bin2s gfx/start.raw asm/start_icon.s start_raw
 
   
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c

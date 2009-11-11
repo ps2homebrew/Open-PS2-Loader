@@ -86,7 +86,7 @@ int main(int argc, char **argv){
 	strcpy(g_ps2_gateway, p);
 
 	// bitmask of the compat. settings
-	unsigned int mask = _strtoui(argv[2]);
+	g_compat_mask = _strtoui(argv[2]);
 	
 	set_ipconfig();
 	

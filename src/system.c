@@ -54,6 +54,9 @@ extern int size_dummy_irx;
 extern void *loader_elf;
 extern int size_loader_elf;
 
+extern void *alt_loader_elf;
+extern int size_alt_loader_elf;
+
 extern void *_gp;
 
 #define IPCONFIG_MAX_LEN	64
@@ -305,7 +308,7 @@ unsigned int crc32(char *string)
 
 void LaunchGame(TGame *game, int mode, int compatmask)
 {
-	u8 *boot_elf;
+	u8 *boot_elf = NULL;
 	elf_header_t *eh;
 	elf_pheader_t *eph;
 	void *pdata;
@@ -338,7 +341,7 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 		mode_val = USB_MODE;
 		memcpy((void*)((u32)&isofs_irx+i+35),&mode_val,1);
 		memcpy((void*)((u32)&isofs_irx+i+36),"USBD.IRX\nDECI2.IRX\nSNMON.IRX\0", 29);
-		if (compatmask & COMPAT_MODE_5)
+		if (compatmask & COMPAT_MODE_4)
 			memcpy((void*)((u32)&isofs_irx+i+36+28),"\nEYETOY.IRX\0", 12);
 	}
 	else if (mode == ETH_MODE) {
@@ -347,11 +350,11 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 		memcpy((void*)((u32)&isofs_irx+i+36),"DEV9.IRX\nSMAP.IRX\nDECI2.IRX\nSNMON.IRX\0", 38);
 		int off_str = 37;
 		if (compatmask & COMPAT_MODE_4) {
-			memcpy((void*)((u32)&isofs_irx+i+36+off_str),"\nUSBD.IRX\0", 10);
-			off_str += 9;
+			memcpy((void*)((u32)&isofs_irx+i+36+off_str),"\nEYETOY.IRX\0", 12);
+			off_str += 11;
 		}
 		if (compatmask & COMPAT_MODE_5)
-			memcpy((void*)((u32)&isofs_irx+i+36+off_str),"\nEYETOY.IRX\0", 12);		
+			memcpy((void*)((u32)&isofs_irx+i+36+off_str),"\nUSBD.IRX\0", 10);
 	}
 		
 	FlushCache(0);
@@ -359,7 +362,10 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	SendIrxKernelRAM();
 
 /* NB: LOADER.ELF is embedded  */
-	boot_elf = (u8 *)&loader_elf;
+	if (compatmask & COMPAT_MODE_1)
+		boot_elf = (u8 *)&alt_loader_elf;
+	else
+		boot_elf = (u8 *)&loader_elf;
 	eh = (elf_header_t *)boot_elf;
 	if (_lw((u32)&eh->ident) != ELF_MAGIC)
 		while (1);

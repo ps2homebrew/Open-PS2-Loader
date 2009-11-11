@@ -7,7 +7,7 @@ EE_BIN = main.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/imgdrv.o obj/eesync.o \
+EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
 		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/ingame_usbhdfsd.o obj/isofs.o \
 		  obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/dummy.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
@@ -30,7 +30,7 @@ clean:
 	echo "    * Interface"
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"
-	$(MAKE) -C loader clean
+	$(MAKE) -C loader clean	
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv clean
 	echo "    * eesync.irx"
@@ -60,9 +60,16 @@ pc_tools:
 
 loader.s:
 	echo "    * Loader"
+	$(MAKE) -C loader clean
 	$(MAKE) -C loader
 	bin2s loader/loader.elf asm/loader.s loader_elf
 
+alt_loader.s:
+	echo "    * Alternative Loader"
+	$(MAKE) -C loader clean
+	$(MAKE) -C loader -f Makefile.alt
+	bin2s loader/loader.elf asm/alt_loader.s alt_loader_elf
+	
 imgdrv.s:
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv

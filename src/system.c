@@ -384,14 +384,17 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	else if (mode == ETH_MODE)
 		mode_str = "ETH_MODE";
 		
-	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
-		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], compatmask);
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 	
+	char cmask[10];
+	snprintf(cmask, 10, "%d", compatmask);
 	argv[0] = config_str;	
 	argv[1] = filename;
+	argv[2] = cmask;
 	
-	ExecPS2((void *)eh->entry, 0, 2, argv);
+	ExecPS2((void *)eh->entry, 0, 3, argv);
 } 
 
 #define IRX_NUM 12

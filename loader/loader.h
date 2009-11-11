@@ -69,6 +69,13 @@ int g_ipconfig_len;
 char g_ps2_ip[16];
 char g_ps2_netmask[16];
 char g_ps2_gateway[16];
+u32 g_compat_mask;
+
+#define COMPAT_MODE_1 		0x01
+#define COMPAT_MODE_2 		0x02
+#define COMPAT_MODE_3 		0x04
+#define COMPAT_MODE_4 		0x08
+#define COMPAT_MODE_5 		0x10
 
 int GameMode;
 #define USB_MODE 	0

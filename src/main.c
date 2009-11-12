@@ -36,66 +36,66 @@ int inactiveFrames;
 // --------------------------- Dialogs ---------------------------
 // Dialog definition for IP configuration
 struct UIItem diaIPConfig[] = {
-	{UI_LABEL, 0, {.label = {"", _STR_IPCONFIG}}},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_IPCONFIG}}},
 	
 	{UI_SPLITTER},
 
 	// ---- IP address ----
-	{UI_LABEL, 0, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
 	
-	{UI_LABEL, 0, {.label = {"IP", -1}}}, {UI_SPACER}, 
+	{UI_LABEL, 0, NULL, {.label = {"IP", -1}}}, {UI_SPACER}, 
 	
-	{UI_INT, 2, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 3, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 4, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 5, {.intvalue = {10, 10, 0, 255}}},
+	{UI_INT, 2, NULL, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 3, NULL, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 4, NULL, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 5, NULL, {.intvalue = {10, 10, 0, 255}}},
 
 	{UI_BREAK},
 
 	//  ---- Netmask ----
-	{UI_LABEL, 0, {.label = {"MASK", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"MASK", -1}}},
 	{UI_SPACER}, 
 	
-	{UI_INT, 6, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 7, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 8, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 9, {.intvalue = {0, 0, 0, 255}}},
+	{UI_INT, 6, NULL, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 7, NULL, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 8, NULL, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 9, NULL, {.intvalue = {0, 0, 0, 255}}},
 	
 	{UI_BREAK},
 	
 	//  ---- Gateway ----
-	{UI_LABEL, 0, {.label = {"GW", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"GW", -1}}},
 	{UI_SPACER}, 
 	
-	{UI_INT, 10, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 11, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 12, {.intvalue = {0, 0, 0, 255}}}, 	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 13, {.intvalue = {1, 1, 0, 255}}},
+	{UI_INT, 10, NULL, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 11, NULL, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 12, NULL, {.intvalue = {0, 0, 0, 255}}}, 	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 13, NULL, {.intvalue = {1, 1, 0, 255}}},
 	
 	{UI_SPLITTER},
 	
 	//  ---- PC ----
-	{UI_LABEL, 0, {.label = {"- PC -", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"- PC -", -1}}},
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, {.label = {"IP", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"IP", -1}}},
 	{UI_SPACER}, 
 	
-	{UI_INT, 14, {.intvalue = {192, 192, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 15, {.intvalue = {168, 168, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 16, {.intvalue = {0, 0, 0, 255}}},	{UI_LABEL, 0, {.label = {".", -1}}},
-	{UI_INT, 17, {.intvalue = {1, 1, 0, 255}}},
+	{UI_INT, 14, NULL, {.intvalue = {192, 192, 0, 255}}},	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 15, NULL, {.intvalue = {168, 168, 0, 255}}},	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 16, NULL, {.intvalue = {0, 0, 0, 255}}},	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
+	{UI_INT, 17, NULL, {.intvalue = {1, 1, 0, 255}}},
 	
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, {.label = {"PORT", -1}}},	{UI_SPACER}, {UI_INT, 18, {.intvalue = {445, 445, 0, 1024}}},
+	{UI_LABEL, 0, NULL, {.label = {"PORT", -1}}},	{UI_SPACER}, {UI_INT, 18, NULL, {.intvalue = {445, 445, 0, 1024}}},
 	
 	{UI_BREAK},
 	
 	//  ---- PC share name ----
-	{UI_LABEL, 0, {.label = {"SHARE NAME", -1}}}, {UI_SPACER}, {UI_STRING, 19, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"SHARE NAME", -1}}}, {UI_SPACER}, {UI_STRING, 19, NULL, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
 	
-	{UI_LABEL, 0, {.label = {"", _STR_NETWORK_AUTOSTART}}}, {UI_SPACER}, {UI_BOOL, 20, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_NETWORK_AUTOSTART}}}, {UI_SPACER}, {UI_BOOL, 20, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	//  ---- Ok ----
 	{UI_SPLITTER},
@@ -111,26 +111,26 @@ struct UIItem diaIPConfig[] = {
 #define COMPAT_REMOVE 102
 #define COMPAT_MODE_COUNT 5
 struct UIItem diaCompatConfig[] = {
-	{UI_LABEL, 110, {.label = {"<Game Label>", -1}}},
+	{UI_LABEL, 110, NULL, {.label = {"<Game Label>", -1}}},
 	
 	{UI_SPLITTER},
 	
-	{UI_LABEL, 111, {.label = {"", _STR_COMPAT_SETTINGS}}}, {UI_BREAK}, {UI_BREAK}, {UI_BREAK},
+	{UI_LABEL, 111, NULL, {.label = {"", _STR_COMPAT_SETTINGS}}}, {UI_BREAK}, {UI_BREAK}, {UI_BREAK},
 
-	{UI_LABEL, 0, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, 10, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, 11, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, 12, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, 13, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, 14, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, 10, "Load alt. core", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, 11, "Lowmem PS2IP", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, 12, "Unhook SifSetDma", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, 13, "Disable EyeToy", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, 14, "Disable USB", {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
-	{UI_OK}, {UI_SPACER}, {UI_BUTTON, COMPAT_SAVE, {.label = {"", _STR_SAVE_CHANGES}}}, 
-		 {UI_SPACER}, {UI_BUTTON, COMPAT_TEST, {.label = {"Test", -1}}},
+	{UI_OK}, {UI_SPACER}, {UI_BUTTON, COMPAT_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}}, 
+		 {UI_SPACER}, {UI_BUTTON, COMPAT_TEST, NULL, {.label = {"Test", -1}}},
 	
 	{UI_SPLITTER},
 	
-	{UI_BUTTON, COMPAT_REMOVE, {.label = {"", _STR_REMOVE_ALL_SETTINGS}}},
+	{UI_BUTTON, COMPAT_REMOVE, NULL, {.label = {"", _STR_REMOVE_ALL_SETTINGS}}},
 	
 	// end of dialogue
 	{UI_TERMINATOR}
@@ -143,17 +143,17 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_MENU 13
 #define UICFG_SAVE 14
 struct UIItem diaUIConfig[] = {
-	{UI_LABEL, 111, {.label = {"", _STR_SETTINGS}}},
+	{UI_LABEL, 111, NULL, {.label = {"", _STR_SETTINGS}}},
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, {.label = {"", _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, 10, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, 11, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, 12, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, 13, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, 10, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, 11,  NULL,{.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, 12, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, 13, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
-	{UI_OK}, {UI_SPACER}, {UI_BUTTON, UICFG_SAVE, {.label = {"", _STR_SAVE_CHANGES}}}, 
+	{UI_OK}, {UI_SPACER}, {UI_BUTTON, UICFG_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}}, 
 	
 	// end of dialogue
 	{UI_TERMINATOR}

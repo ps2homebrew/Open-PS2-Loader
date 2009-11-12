@@ -63,6 +63,16 @@ u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 
 
 /*----------------------------------------------------------------------------------------*/
+/* This fonction unhook SifSetDma/SifSetReg sycalls		                                  */
+/*----------------------------------------------------------------------------------------*/
+void Apply_Mode3(void)
+{
+	SetSyscall(__NR_SifSetDma, Old_SifSetDma);
+	SetSyscall(__NR_SifSetReg, Old_SifSetReg);	
+}
+
+
+/*----------------------------------------------------------------------------------------*/
 /* This fonction replace SifSetReg syscall in kernel.                                     */
 /*----------------------------------------------------------------------------------------*/
 int Hook_SifSetReg(u32 register_num, int register_value)
@@ -77,8 +87,12 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 
 			// We should have a mode to do this: this is corresponding to HD-Loader's mode 3
 			if ((g_compat_mask & COMPAT_MODE_3) && (iop_reboot_count == 2)) {
-				SetSyscall(__NR_SifSetDma, Old_SifSetDma);
-				SetSyscall(__NR_SifSetReg, Old_SifSetReg);
+				__asm__(
+					"la $v1, Apply_Mode3\n\t"
+					"sw $v1, 8($sp)\n\t"
+					"jr $ra\n\t"
+					"nop\n\t"
+				);
 			}
 		}
 		return 1;
@@ -109,9 +123,6 @@ static void t_loadElf(void)
 	iop_reboot_count = 1;
            
 	SifInitRpc(0);
-	fioExit();
-	SifExitIopHeap();
-	LoadFileExit();
 
     cdInit(CDVD_INIT_INIT);
 	
@@ -122,7 +133,7 @@ static void t_loadElf(void)
 		strcat(g_ElfPath, &ptr[5]);		
 	}
 	
-	GS_BGCOLOUR = 0x00ff00; 
+	GS_BGCOLOUR = 0x00ff00;
 
 	// wipe user memory
 	for (i = 0x00100000; i < 0x02000000; i += 64) {
@@ -139,6 +150,9 @@ static void t_loadElf(void)
 		
 	if ((!r) && (elf.epc)) {
 		// exit services
+		fioExit();
+		SifExitIopHeap();
+		LoadFileExit();		
 		SifExitRpc();
 
 		FlushCache(0);

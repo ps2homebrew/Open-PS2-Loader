@@ -161,6 +161,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	ioprp_img.size_in = lseek(fd, 0, SEEK_END);
 	if (ioprp_img.size_in % 0x40)
 		ioprp_img.size_in = (ioprp_img.size_in & 0xffffffc0) + 0x40;
+
 	lseek(fd, 0, SEEK_SET);
 
 	ioprp_img.data_in  = (void *)g_buf;	
@@ -172,10 +173,10 @@ int New_Reset_Iop(const char *arg, int flag){
 	}
 
 	read(fd, ioprp_img.data_in , ioprp_img.size_in);
-	
+
 	close(fd);
 	fioExit();
-			
+		
 	if (eeloadcnf_reset) {
 		r = Patch_EELOADCNF_Img(&ioprp_img);
 		if (r == 0){
@@ -183,12 +184,12 @@ int New_Reset_Iop(const char *arg, int flag){
 			while (1){;}
 		}
 	}
-	else { 
+	else {
 		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
 		Patch_Mod(&ioprp_img, "CDVDFSV", dummy_irx, size_dummy_irx);
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
-	
+
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
@@ -201,10 +202,6 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifInitIopHeap();
 	LoadFileInit();
 	Sbv_Patch();
-	
-	SifInitIopHeap();
-	LoadFileExit();
-	Sbv_Patch();	
 	
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);
 	
@@ -248,7 +245,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifInitIopHeap();
 	LoadFileInit();
 	Sbv_Patch();
-	
+
 	GS_BGCOLOUR = 0x00FFFF;
 	
 	if (GameMode == USB_MODE) {

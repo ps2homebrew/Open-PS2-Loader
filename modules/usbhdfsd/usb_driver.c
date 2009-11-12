@@ -660,6 +660,7 @@ inline int cbw_scsi_read_sector(mass_dev* dev, int lba, void* buffer, int sector
     return ret;
 }
 
+#ifdef WRITE_SUPPORT
 inline int cbw_scsi_write_sector(mass_dev* dev, int lba, void* buffer, int sectorSize, int sectorCount)
 {
     int ret;
@@ -697,6 +698,7 @@ inline int cbw_scsi_write_sector(mass_dev* dev, int lba, void* buffer, int secto
     ret = usb_bulk_manage_status(dev, -TAG_WRITE);
     return ret;
 }
+#endif
 
 mass_dev* mass_stor_findDevice(int devId, int create)
 {
@@ -731,6 +733,7 @@ int mass_stor_readSector(mass_dev* mass_device, unsigned int sector, unsigned ch
 	return (size / mass_device->sectorSize) * mass_device->sectorSize;
 }
 
+#ifdef WRITE_SUPPORT
 /* size should be a multiple of sector size */
 int mass_stor_writeSector(mass_dev* mass_device, unsigned int sector, unsigned char* buffer, int size) {
     //assert(size % mass_device->sectorSize == 0);
@@ -743,7 +746,7 @@ int mass_stor_writeSector(mass_dev* mass_device, unsigned int sector, unsigned c
 	}
 	return (size / mass_device->sectorSize) * mass_device->sectorSize;
 }
-
+#endif
 
 /* test that endpoint is bulk endpoint and if so, update device info */
 void usb_bulk_probeEndpoint(int devId, mass_dev* dev, UsbEndpointDescriptor* endpoint) {

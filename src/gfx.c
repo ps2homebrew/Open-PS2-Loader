@@ -1129,6 +1129,8 @@ void DrawHint(const char* hint, int key) {
 		case KEY_START:
 			icon = &start_icon;
 			break;
+		default:
+			icon = NULL; 
 	}
 
 	if (icon) {
@@ -1146,12 +1148,13 @@ void DrawHint(const char* hint, int key) {
 			   x + w, yfix2(400.0f), z, Darker);
 			   
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+	TextColor(0xff,0xff,0xff,0xff);
 
 	if (icon) {
 		DrawIconN(icon, x+ 10, yfix2(370), 1.0f);
 		DrawText(x + 40, yfix2(375), hint, 1, 0);
 	} else {
-		DrawText(x+ 15, yfix2(375), hint, 1, 0);
+		DrawText(x + 15, yfix2(375), hint, 1, 0);
 	}
 }
 
@@ -1897,6 +1900,10 @@ void diaRenderUI(struct UIItem *ui, struct UIItem *cur, int haveFocus) {
 		}
 		
 		rc++;
+	}
+
+	if ((cur != NULL) && (!haveFocus) && (cur->hint != NULL)) {
+		DrawHint(cur->hint, -1);
 	}
 	
 	// flip display

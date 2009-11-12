@@ -262,7 +262,7 @@ void delay(int count);
 void Start_LoadNetworkModules_Thread(void);
 void LoadUSBD();
 void LaunchGame(TGame *game, int mode, int compatmask);
-void SendIrxKernelRAM(void);
+void SendIrxKernelRAM(int compatmask);
 
 #define USB_MODE	0
 #define ETH_MODE	1

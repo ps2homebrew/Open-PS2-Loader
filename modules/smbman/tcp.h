@@ -17,7 +17,11 @@
 #include "poll.h"
 #include "smb.h"
 
+#ifdef LIGHT_MEM
+#define MAX_SMB_BUF 	4096 // must fit on u16 !!! 
+#else
 #define MAX_SMB_BUF 	15360 // must fit on u16 !!! 
+#endif
 
 int tcp_ConnectSMBClient(char *SMBServerIP, int SMBServerPort);
 int tcp_SessionSetup(char *User, char *Password, char *Share);

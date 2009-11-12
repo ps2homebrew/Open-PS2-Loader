@@ -38,7 +38,7 @@ extern int size_dummy_irx;
 		id = SifSetDma(&dmadata, 1);
 	} while (!id);
 
-	while (SifDmaStat(id) > 0) {;} 
+	while (SifDmaStat(id) >= 0) {;} 
 }
 
 /*----------------------------------------------------------------------------------------*/
@@ -60,6 +60,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 	// scan for module offset & size
 	while(strlen(romdir_in->fileName) > 0)
 	{ 
+		//scr_printf("%s:%d ", romdir_in->fileName, romdir_in->fileSize);
 		if (!strcmp(romdir_in->fileName, name))
 			break;
 
@@ -115,6 +116,8 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 		// correct filesize in romdir
 		romdir_in->fileSize = modsize;
 	}
+
+	ioprp_img->size_out = ioprp_img->size_in;
 	
 	return 1;
 }

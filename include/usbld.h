@@ -160,6 +160,7 @@ typedef enum {
 struct UIItem {
 	UIItemType type;
 	int id; // id of this item
+	const char *hint; // shown if not NULL
 	
 	union {
 		struct {

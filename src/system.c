@@ -30,6 +30,9 @@ extern int size_usbhdfsd_irx;
 extern void *ingame_usbhdfsd_irx;
 extern int size_ingame_usbhdfsd_irx;
 
+extern void *alt_ingame_usbhdfsd_irx;
+extern int size_alt_ingame_usbhdfsd_irx;
+
 extern void *isofs_irx;
 extern int size_isofs_irx;
 
@@ -446,7 +449,10 @@ void SendIrxKernelRAM(int compatmask) // Send IOP modules that core must use to 
 	irxptr_tab[n++].irxsize = size_eesync_irx; 
 	irxptr_tab[n++].irxsize = size_cdvdman_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
-	irxptr_tab[n++].irxsize = size_ingame_usbhdfsd_irx;
+	if (compatmask & COMPAT_MODE_2)
+		irxptr_tab[n++].irxsize = size_alt_ingame_usbhdfsd_irx;
+	else
+		irxptr_tab[n++].irxsize = size_ingame_usbhdfsd_irx;
 	irxptr_tab[n++].irxsize = size_isofs_irx;
 	irxptr_tab[n++].irxsize = size_ps2dev9_irx;
 	if (compatmask & COMPAT_MODE_2)
@@ -466,7 +472,10 @@ void SendIrxKernelRAM(int compatmask) // Send IOP modules that core must use to 
 	irxsrc[n++] = (void *)&eesync_irx;	
 	irxsrc[n++] = (void *)&cdvdman_irx;
 	irxsrc[n++] = (void *)usbd_irx;
-	irxsrc[n++] = (void *)&ingame_usbhdfsd_irx;
+	if (compatmask & COMPAT_MODE_2)
+		irxsrc[n++] = (void *)&alt_ingame_usbhdfsd_irx;
+	else
+		irxsrc[n++] = (void *)&ingame_usbhdfsd_irx;
 	irxsrc[n++] = (void *)&isofs_irx;
 	irxsrc[n++] = (void *)&ps2dev9_irx;
 	if (compatmask & COMPAT_MODE_2)

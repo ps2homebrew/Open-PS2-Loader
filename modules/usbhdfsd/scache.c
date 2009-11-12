@@ -40,7 +40,15 @@
 #define BLOCK_SIZE 4096
 
 //number of cache slots (1 slot = block)
+#ifdef LIGHT_MEM
+#define CACHE_SIZE 6
+#else
+#ifdef INGAME_DRIVER
+#define CACHE_SIZE 16
+#else
 #define CACHE_SIZE 32
+#endif
+#endif
 
 //when the flushCounter reaches FLUSH_TRIGGER then flushSectors is called
 //#define FLUSH_TRIGGER 16
@@ -124,7 +132,7 @@ int getIndexRead(cache_set* cache, unsigned int sector) {
 //---------------------------------------------------------------------------
 /* select the best record where to store new sector */
 int getIndexWrite(cache_set* cache, unsigned int sector) {
-	int i, ret;
+	int i;
 	int minTax = 0x0FFFFFFF;
 	int index = 0;
 
@@ -135,6 +143,8 @@ int getIndexWrite(cache_set* cache, unsigned int sector) {
 		}
 	}
 
+#ifdef WRITE_SUPPORT
+	int ret;
 	//this sector is dirty - we need to flush it first
 	if (cache->rec[index].writeDirty) {
 		XPRINTF("scache: getIndexWrite: sector is dirty : %d   index=%d \n", cache->rec[index].sector, index);
@@ -146,6 +156,8 @@ int getIndexWrite(cache_set* cache, unsigned int sector) {
 		}
 
 	}
+#endif
+		
 	cache->rec[index].tax +=2;
 	cache->rec[index].sector = sector;
 
@@ -159,7 +171,6 @@ int getIndexWrite(cache_set* cache, unsigned int sector) {
 	flush dirty sectors
  */
 int scache_flushSectors(cache_set* cache) {
-	int i,ret;
 	int counter = 0;
 
 	XPRINTF("cache: flushSectors devId = %i \n", cache->dev->devId);
@@ -172,6 +183,8 @@ int scache_flushSectors(cache_set* cache) {
 		return 0;
 	}
 
+#ifdef WRITE_SUPPORT	
+	int i,ret;
 	for (i = 0; i < CACHE_SIZE; i++) {
 		if (cache->rec[i].writeDirty) {
 			XPRINTF("scache: flushSectors dirty index=%d sector=%d \n", i, cache->rec[i].sector);
@@ -185,6 +198,8 @@ int scache_flushSectors(cache_set* cache) {
 			counter ++;
 		}
 	}
+#endif
+	
 	cache->writeFlag = 0;
 	return counter;
 }

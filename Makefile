@@ -8,7 +8,7 @@ EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
-		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/ingame_usbhdfsd.o obj/isofs.o \
+		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/ingame_usbhdfsd.o obj/alt_ingame_usbhdfsd.o obj/isofs.o \
 		  obj/ps2dev9.o obj/ps2ip.o obj/alt_ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/alt_smbman.o obj/dummy.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
@@ -107,6 +107,12 @@ ingame_usbhdfsd.s:
 	$(MAKE) -C modules/usbhdfsd -f Makefile.readonly
 	bin2s modules/usbhdfsd/usbhdfsd.irx asm/ingame_usbhdfsd.s ingame_usbhdfsd_irx
 
+alt_ingame_usbhdfsd.s:
+	echo "    * alternative ingame_usbhdfsd.irx"
+	$(MAKE) -C modules/usbhdfsd clean
+	$(MAKE) -C modules/usbhdfsd -f Makefile.readonly.alt
+	bin2s modules/usbhdfsd/usbhdfsd.irx asm/alt_ingame_usbhdfsd.s alt_ingame_usbhdfsd_irx
+	
 isofs.s:
 	echo "    * isofs.irx"
 	$(MAKE) -C modules/isofs

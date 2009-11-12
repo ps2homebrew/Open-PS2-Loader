@@ -13,7 +13,7 @@ IOP_OBJS = usb_driver.o fs_driver.o part_driver.o fat_driver.o scache.o usbhdfsd
 IOP_LIBS =
 
 IOP_INCS +=
-IOP_CFLAGS  += -Wall -fno-builtin-printf -DINGAME_DRIVER
+IOP_CFLAGS  += -Wall -fno-builtin-printf -DINGAME_DRIVER -DLIGHT_MEM
 IOP_LDFLAGS += -s
 
 WRITE_SUPPORT=0

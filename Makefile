@@ -42,7 +42,11 @@ clean:
 	echo "    * isofs.irx"
 	$(MAKE) -C modules/isofs clean
 	echo "    * ps2dev9.irx"
-	$(MAKE) -C modules/dev9 clean	
+	$(MAKE) -C modules/dev9 clean
+	echo "    * SMSTCPIP.irx"
+	$(MAKE) -C modules/SMSTCPIP clean	
+	echo "    * SMSMAP.irx"
+	$(MAKE) -C modules/SMSMAP clean
 	echo "    * netlog.irx"
 	$(MAKE) -C modules/netlog clean	
 	echo "    * smbman.irx"
@@ -114,10 +118,16 @@ ps2dev9.s:
 	bin2s modules/dev9/ps2dev9.irx asm/ps2dev9.s ps2dev9_irx
 	
 ps2ip.s:
-	bin2s $(PS2SDK)/iop/irx/ps2ip.irx asm/ps2ip.s ps2ip_irx
+	echo "    * SMSTCPIP.irx"
+	$(MAKE) -C modules/SMSTCPIP
+	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/ps2ip.s ps2ip_irx
+	#bin2s $(PS2SDK)/iop/irx/ps2ip.irx asm/ps2ip.s ps2ip_irx
 	
 ps2smap.s:
-	bin2s $(PS2ETH)/smap/ps2smap.irx asm/ps2smap.s ps2smap_irx
+	echo "    * SMSMAP.irx"
+	$(MAKE) -C modules/SMSMAP
+	bin2s modules/SMSMAP/SMSMAP.irx asm/ps2smap.s ps2smap_irx
+	#bin2s $(PS2ETH)/smap/ps2smap.irx asm/ps2smap.s ps2smap_irx
 
 netlog.s:
 	echo "    * netlog.irx"

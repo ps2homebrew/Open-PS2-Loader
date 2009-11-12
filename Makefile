@@ -9,7 +9,7 @@ EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
 		  obj/cdvdman.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/ingame_usbhdfsd.o obj/isofs.o \
-		  obj/ps2dev9.o obj/ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/dummy.o \
+		  obj/ps2dev9.o obj/ps2ip.o obj/alt_ps2ip.o obj/ps2smap.o obj/netlog.o obj/smbman.o obj/alt_smbman.o obj/dummy.o \
 		  obj/font.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
 		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o
@@ -69,7 +69,7 @@ loader.s:
 	bin2s loader/loader.elf asm/loader.s loader_elf
 
 alt_loader.s:
-	echo "    * Alternative Loader"
+	echo "    * alternative Loader"
 	$(MAKE) -C loader clean
 	$(MAKE) -C loader -f Makefile.alt
 	bin2s loader/loader.elf asm/alt_loader.s alt_loader_elf
@@ -119,10 +119,17 @@ ps2dev9.s:
 	
 ps2ip.s:
 	echo "    * SMSTCPIP.irx"
+	$(MAKE) -C modules/SMSTCPIP clean
 	$(MAKE) -C modules/SMSTCPIP
 	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/ps2ip.s ps2ip_irx
 	#bin2s $(PS2SDK)/iop/irx/ps2ip.irx asm/ps2ip.s ps2ip_irx
-	
+
+alt_ps2ip.s:
+	echo "    * alternative SMSTCPIP.irx"
+	$(MAKE) -C modules/SMSTCPIP clean
+	$(MAKE) -C modules/SMSTCPIP -f Makefile.alt
+	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/alt_ps2ip.s alt_ps2ip_irx
+		
 ps2smap.s:
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/SMSMAP
@@ -136,9 +143,16 @@ netlog.s:
 
 smbman.s:
 	echo "    * smbman.irx"
+	$(MAKE) -C modules/smbman clean
 	$(MAKE) -C modules/smbman
 	bin2s modules/smbman/smbman.irx asm/smbman.s smbman_irx
-	
+
+alt_smbman.s:
+	echo "    * alternative smbman.irx"
+	$(MAKE) -C modules/smbman clean
+	$(MAKE) -C modules/smbman -f Makefile.alt
+	bin2s modules/smbman/smbman.irx asm/alt_smbman.s alt_smbman_irx
+		
 dummy.s:
 	echo "    * dummy.irx"
 	$(MAKE) -C modules/dummy_irx

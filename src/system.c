@@ -39,6 +39,9 @@ extern int size_ps2dev9_irx;
 extern void *ps2ip_irx;
 extern int size_ps2ip_irx;
 
+extern void *alt_ps2ip_irx;
+extern int size_alt_ps2ip_irx;
+
 extern void *ps2smap_irx;
 extern int size_ps2smap_irx;
 
@@ -47,6 +50,9 @@ extern int size_netlog_irx;
 
 extern void *smbman_irx;
 extern int size_smbman_irx;
+
+extern void *alt_smbman_irx;
+extern int size_alt_smbman_irx;
 
 extern void *dummy_irx;
 extern int size_dummy_irx;
@@ -188,6 +194,16 @@ void set_ipconfig(void)
 	memcpy((void*)((u32)&smbman_irx+i),str,strlen(str)+1);	
 	memcpy((void*)((u32)&smbman_irx+i+16),&gPCPort, 4);
 	memcpy((void*)((u32)&smbman_irx+i+20), gPCShareName, 32);
+	
+	for (i=0;i<size_alt_smbman_irx;i++){
+		if(!strcmp((const char*)((u32)&alt_smbman_irx+i),"xxx.xxx.xxx.xxx")){
+			break;
+		}
+	}
+	sprintf(str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	memcpy((void*)((u32)&alt_smbman_irx+i),str,strlen(str)+1);	
+	memcpy((void*)((u32)&alt_smbman_irx+i+16),&gPCPort, 4);
+	memcpy((void*)((u32)&alt_smbman_irx+i+20), gPCShareName, 32);	
 }
 
 void th_LoadNetworkModules(void *args){
@@ -359,7 +375,7 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 		
 	FlushCache(0);
 		
-	SendIrxKernelRAM();
+	SendIrxKernelRAM(compatmask);
 
 /* NB: LOADER.ELF is embedded  */
 	if (compatmask & COMPAT_MODE_1)
@@ -415,7 +431,7 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 #define IRX_NUM 12
 
 //-------------------------------------------------------------- 
-void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
+void SendIrxKernelRAM(int compatmask) // Send IOP modules that core must use to Kernel RAM
 {
 	u32 *total_irxsize = (u32 *)0x80030000;
 	void *irxtab = (void *)0x80030010;
@@ -432,11 +448,17 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxptr_tab[n++].irxsize = size_usbd_irx;
 	irxptr_tab[n++].irxsize = size_ingame_usbhdfsd_irx;
 	irxptr_tab[n++].irxsize = size_isofs_irx;
-	irxptr_tab[n++].irxsize = size_ps2dev9_irx;	
-	irxptr_tab[n++].irxsize = size_ps2ip_irx;	
+	irxptr_tab[n++].irxsize = size_ps2dev9_irx;
+	if (compatmask & COMPAT_MODE_2)
+		irxptr_tab[n++].irxsize = size_alt_ps2ip_irx;
+	else	
+		irxptr_tab[n++].irxsize = size_ps2ip_irx;
 	irxptr_tab[n++].irxsize = size_ps2smap_irx;	
 	irxptr_tab[n++].irxsize = size_netlog_irx;
-	irxptr_tab[n++].irxsize = size_smbman_irx;	
+	if (compatmask & COMPAT_MODE_2)
+		irxptr_tab[n++].irxsize = size_alt_smbman_irx;
+	else
+		irxptr_tab[n++].irxsize = size_smbman_irx;
 	irxptr_tab[n++].irxsize = size_dummy_irx;	
 	 	
 	n = 0;
@@ -447,10 +469,16 @@ void SendIrxKernelRAM(void) // Send IOP modules that core must use to Kernel RAM
 	irxsrc[n++] = (void *)&ingame_usbhdfsd_irx;
 	irxsrc[n++] = (void *)&isofs_irx;
 	irxsrc[n++] = (void *)&ps2dev9_irx;
-	irxsrc[n++] = (void *)&ps2ip_irx;
+	if (compatmask & COMPAT_MODE_2)
+		irxsrc[n++] = (void *)&alt_ps2ip_irx;
+	else
+		irxsrc[n++] = (void *)&ps2ip_irx;
 	irxsrc[n++] = (void *)&ps2smap_irx;
 	irxsrc[n++] = (void *)&netlog_irx;
-	irxsrc[n++] = (void *)&smbman_irx;
+	if (compatmask & COMPAT_MODE_2)
+		irxsrc[n++] = (void *)&alt_smbman_irx;
+	else
+		irxsrc[n++] = (void *)&smbman_irx;
 	irxsrc[n++] = (void *)&dummy_irx;	
 	
 	irxsize = 0;		

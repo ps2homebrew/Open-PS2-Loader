@@ -10,7 +10,11 @@
 
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
+#ifdef LIGHT_MEM
+#define MEM_SIZE 0x1000
+#else
 #define MEM_SIZE 0x3000
+#endif
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
    sends a lot of data out of ROM (or other static memory), this
@@ -93,7 +97,11 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_SND_QUEUELEN        (2*TCP_SND_BUF/TCP_MSS)
 
 /* TCP receive window. */
+#ifdef LIGHT_MEM
+#define TCP_WND                 8192
+#else
 #define TCP_WND                 16384
+#endif
 
 /* Maximum number of retransmissions of data segments. */
 #define TCP_MAXRTX              12

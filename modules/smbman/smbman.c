@@ -77,7 +77,7 @@ typedef struct {  // size = 11
 	u32 filesize; // 7
 } FHANDLE;
 
-#define MAX_FDHANDLES 		128
+#define MAX_FDHANDLES 		32
 FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
 //-------------------------------------------------------------------------

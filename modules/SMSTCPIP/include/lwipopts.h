@@ -13,7 +13,7 @@ a lot of data that needs to be copied, this should be set high. */
 #ifdef LIGHT_MEM
 #define MEM_SIZE 0x1000
 #else
-#define MEM_SIZE 0x3000
+#define MEM_SIZE 0x2000
 #endif
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
@@ -23,15 +23,15 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
-#define MEMP_NUM_UDP_PCB 15
+#define MEMP_NUM_UDP_PCB 1
 
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
-#define MEMP_NUM_TCP_PCB 15 
+#define MEMP_NUM_TCP_PCB 1 
 
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN 15
+#define MEMP_NUM_TCP_PCB_LISTEN 1
 
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
@@ -60,7 +60,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
-#define PBUF_POOL_SIZE         25
+#define PBUF_POOL_SIZE         12
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
 //Boman666: Should be atleast 1518 to be compatible with ps2smap
@@ -90,7 +90,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_MSS                 1460
 
 /* TCP sender buffer space (bytes). */
-#define TCP_SND_BUF             (TCP_MSS*4)
+#define TCP_SND_BUF             (TCP_MSS*2)
 
 /* TCP sender buffer space (pbufs). This must be at least = 2 *
    TCP_SND_BUF/TCP_MSS for things to work. */

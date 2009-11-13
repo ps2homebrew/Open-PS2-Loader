@@ -9,6 +9,7 @@
 #include "fileio.h"
 #include <sys/stat.h>
 
+static char IPconfig_path[] = "mc?:/SYS-CONF/IPCONFIG.DAT";
 int filesize=0;
 
 /// read a line from the specified file handle, up to maxlen characters long, into the buffer
@@ -266,10 +267,17 @@ int configRemoveKey(struct TConfigSet* config, const char* key) {
 
 void readIPConfig() {
 	char ipconfig[255];
-	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_RDONLY);
+	
+	IPconfig_path[2] = '0';
+	int fd=fioOpen(IPconfig_path, O_RDONLY);
 	if (fd<0) {
-		//DEBUG: printf("No config. Exiting...\n");
-		return;
+		IPconfig_path[2] = '1';
+		fd=fioOpen(IPconfig_path, O_RDONLY);
+		if (fd<0) {
+			//DEBUG: printf("No config. Exiting...\n");
+			IPconfig_path[2] = '?';
+			return;
+		}
 	}
 	filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
@@ -289,14 +297,29 @@ void readIPConfig() {
 void writeIPConfig() {
 	char ipconfig[255];
 	
-	fioMkdir("mc0:/SYS-CONF");
-	
-	int fd=fioOpen("mc0:/SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
-	if (fd<0) {
-		//DEBUG: printf("No config. Exiting...\n");
-		return;
+	if (!strncmp (IPconfig_path,"mc0:/SYS-CONF",13)){
+		fioMkdir("mc0:/SYS-CONF");
+	}else if (!strncmp (IPconfig_path,"mc1:/SYS-CONF",13)){
+		fioMkdir("mc1:/SYS-CONF");
 	}
-		
+
+	if (IPconfig_path[2] == '?')
+		IPconfig_path[2] = '0';
+	
+	int fd=fioOpen(IPconfig_path, O_WRONLY | O_CREAT);
+	if (fd<0) {
+		if (IPconfig_path[2] == '0')
+			IPconfig_path[2] = '1';
+		else
+			IPconfig_path[2] = '0';
+		fd=fioOpen(IPconfig_path, O_WRONLY | O_CREAT);
+		if (fd<0) {
+			//DEBUG: printf("No config. Exiting...\n");
+			IPconfig_path[2] = '?';
+			return;
+		}
+	}
+	
 	sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
 															ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
 															ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);

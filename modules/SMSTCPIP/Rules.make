@@ -15,6 +15,12 @@ ifeq ($(IOP_CC_VERSION),3.2.2)
 CFLAGS_TARGET  = -miop
 ASFLAGS_TARGET = -march=r3000
 LDFLAGS_TARGET = -miop
+else
+ifeq ($(IOP_CC_VERSION),gcc 3.2.2)
+CFLAGS_TARGET  = -miop
+ASFLAGS_TARGET = -march=r3000
+LDFLAGS_TARGET = -miop
+endif
 endif
 
 IOP_INCS := $(IOP_INCS) -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include -Iinclude

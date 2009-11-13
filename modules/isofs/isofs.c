@@ -94,7 +94,7 @@ typedef struct {
 #define MAX_FDHANDLES 		32
 FHANDLE isofs_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
-#define MAX_DIR_CACHE_SECTORS 32
+#define MAX_DIR_CACHE_SECTORS 4
 
 struct dir_cache_info {
 	char pathname[1024];// The pathname of the cached directory
@@ -107,8 +107,8 @@ struct dir_cache_info {
 	u8  *cache;			// The actual cached data
 };
 
-static struct dir_cache_info CachedDirInfo;
-static u8 isofs_dircache[MAX_DIR_CACHE_SECTORS * 2048];
+static struct dir_cache_info CachedDirInfo __attribute__((aligned(64)));
+static u8 isofs_dircache[MAX_DIR_CACHE_SECTORS * 2048] __attribute__((aligned(64)));
 
 enum Cache_getMode {
 	CACHE_START = 0,

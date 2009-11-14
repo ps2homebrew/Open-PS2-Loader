@@ -18,7 +18,7 @@
 #include "smb.h"
 
 #ifdef LIGHT_MEM
-#define MAX_SMB_BUF 	4096 // must fit on u16 !!! 
+#define MAX_SMB_BUF 	3072 // must fit on u16 !!! 
 #else
 #define MAX_SMB_BUF 	15360 // must fit on u16 !!! 
 #endif

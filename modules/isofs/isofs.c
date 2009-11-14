@@ -94,7 +94,7 @@ typedef struct {
 #define MAX_FDHANDLES 		32
 FHANDLE isofs_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
-#define MAX_DIR_CACHE_SECTORS 4
+#define MAX_DIR_CACHE_SECTORS 2
 
 struct dir_cache_info {
 	char pathname[1024];// The pathname of the cached directory

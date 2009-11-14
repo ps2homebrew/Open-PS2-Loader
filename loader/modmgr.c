@@ -198,7 +198,7 @@ int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *a
 		dma_id = SifSetDma(&sifdma, 1);
 	} while (!dma_id);
 
-	while (SifDmaStat(dma_id) > 0) {;}
+	while (SifDmaStat(dma_id) >= 0) {;}
 
 	struct _lf_module_buffer_load_arg arg;
 

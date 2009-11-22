@@ -339,6 +339,10 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	char config_str[255];
 	char *mode_str = NULL;
 	u8 mode_val;
+	//char partname[64];
+	//char str[16];
+	//char partsector_str[255];
+	//int fd, r;
 	
 	sprintf(filename,"%s",game->Image+3);
 	
@@ -377,7 +381,20 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	}
 		
 	FlushCache(0);
-		
+
+	//strcpy(partsector_str, "");
+	//fd = fioDopen("mass:");
+	//if (fd >= 0) {
+	//	for (i=0; i<game->parts; i++) {
+	//		sprintf(partname,"%s.%02x",isoname, i);	
+	//		r = fioIoctl(fd, 0xBEEFC0DE, partname);
+	//		sprintf(str, "%d ", r);
+	//		strcat(partsector_str, str);
+	//	}
+	//	fioDclose(fd);
+	//}
+	// partsector_str can be passed as an arg to the loader
+	
 	SendIrxKernelRAM(compatmask);
 
 /* NB: LOADER.ELF is embedded  */

@@ -36,6 +36,7 @@
 #include "usbhd_common.h"
 #include "fat_driver.h"
 #include "fat_write.h"
+#include "fat.h"
 
 //#define DEBUG  //comment out this line when not debugging
 
@@ -43,6 +44,7 @@
 
 #define IOCTL_CKFREE 0xBABEC0DE  //dlanor: Ioctl request code => Check free space
 #define IOCTL_RENAME 0xFEEDC0DE  //dlanor: Ioctl request code => Rename
+#define IOCTL_GETCLUSTER 0xBEEFC0DE  //jimmikaelkael: Ioctl request code => Rename
 
 #define FLUSH_SECTORS		fat_flushSectors
 
@@ -748,6 +750,35 @@ int fs_format (iop_file_t *fd)
 }
 
 //---------------------------------------------------------------------------
+#ifndef INGAME_DRIVER
+unsigned int fs_getFileSector(iop_file_t *fd, char *name)
+{
+	fat_driver* fatd;
+	int ret;
+	unsigned int cluster = 0;
+	fs_rec* rec = NULL;
+
+	fatd = fat_getData(fd->unit);
+	if (fatd == NULL)
+		return 0;
+
+	rec = fs_findFreeFileSlot();
+	if (rec == NULL)
+		return 0;
+
+	ret = fat_getFileStartCluster(fatd, name, &cluster, &rec->fatdir);
+	if (ret < 0) {
+		rec->file_flag = -1;
+		return 0;
+	}
+
+	rec->file_flag = -1;
+
+	return fat_cluster2sector(&fatd->partBpb, cluster);
+}
+#endif
+
+//---------------------------------------------------------------------------
 int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
 {
 	fat_driver* fatd;
@@ -769,6 +800,11 @@ int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
 		case IOCTL_RENAME:  //Request to rename opened file/folder
 			ret = fs_dummy();
 			break;
+#ifndef INGAME_DRIVER
+		case IOCTL_GETCLUSTER:
+			ret = fs_getFileSector(fd, (char *)data);
+			break;	
+#endif			
 		default:
 			ret = fs_dummy();
 	}

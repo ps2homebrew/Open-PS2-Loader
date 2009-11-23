@@ -51,7 +51,7 @@ char *english[] = {
 };
 
 char *czech[] = {
-	"               OPEN PS2 LOADER. (C) 2009 IFCARO <http://ps2dev.ifcaro.net>. ZALOZENO NA ZDROJ. KODECH PROJEKTU HD PROJECT <http://psx-scene.com>", // gfx.c:85
+	"               VITEJTE V PROGRAMU OPEN PS2 LOADER. ZALOZENO NA ZDROJ. KODECH PROJEKTU HD PROJECT <http://psx-scene.com> ADAPTACE NA USB ADVANCE FORMAT A PRVOTNI GUI STVORIL IFCARO <http://ps2dev.ifcaro.net> VETSINU KODU LOADERU SEPSAL JIMMIKAELKAEL. PRIDAVNE PRACE NA GUI PROVEDL VOLCA. DEKUJEME ZE POUZIVATE TENTO PROGRAM ^^ ", // gfx.c:85
 	"Open PS2 Loader %s", // gfx.c:320
 	"Nastaveni vzhledu", // gfx.c:502
 	"IP configuration", // gfx.c:764

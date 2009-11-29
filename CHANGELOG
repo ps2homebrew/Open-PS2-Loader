@@ -10,9 +10,10 @@ Open PS2 Loader ChangeLog:
 
 Version 0.5
 -------------------------------------------------
+- Added compatibility modes
 - isofs/cdvdman now use disc type
 - cdvdman now has streams
-- Added network support
+- Added game loading through network
 - Static interface available
 - Added language support
 - It works in PS3 with PS2 emulation by software 

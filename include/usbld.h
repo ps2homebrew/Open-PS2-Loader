@@ -20,7 +20,7 @@
 
 #include <debug.h>
 
-#define USBLD_VERSION "0.41"
+#define USBLD_VERSION "0.5"
 
 typedef
 struct TGame

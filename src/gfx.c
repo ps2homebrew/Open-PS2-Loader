@@ -28,6 +28,9 @@
 extern void *font_raw;
 extern int size_font_raw;
 
+extern void *font_cyrillic_raw;
+extern int size_font_cyrillic_raw;
+
 extern void *exit_raw;
 extern int size_exit_raw;
 
@@ -833,6 +836,9 @@ void LoadFont(int load_default){
 
 	if(load_default==1 || LoadRAW(tmp, &font)==0){
 		font.Mem=(u32*)&font_raw;
+	}
+	if(!strcmp(_l(_STR_LANG_NAME),"язык: –усский") || !strcmp(_l(_STR_LANG_NAME),"≈зик: Ѕългарски")){
+		font.Mem=(u32*)&font_cyrillic_raw;
 	}
 
 	gsFont = calloc(1,sizeof(GSFONT));

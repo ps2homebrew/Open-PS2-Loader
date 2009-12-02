@@ -62,7 +62,7 @@ inline int min(int a, int b) {
 	return a < b ? a : b;
 }
 
-int strToColor(const char *string, int *color) {
+int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
 	color[0]=0;
 	color[1]=0;
@@ -217,14 +217,14 @@ int getConfigInt(struct TConfigSet* config, char* key, int* value) {
 	}
 }
 
-int setConfigColor(struct TConfigSet* config, const char* key, int* color) {
+int setConfigColor(struct TConfigSet* config, const char* key, unsigned char* color) {
 	char tmp[8];
 	
 	snprintf(tmp, 8, "#%02X%02X%02X", color[0], color[1], color[2]);
 	return setConfigStr(config, key, tmp);
 }
 
-int getConfigColor(struct TConfigSet* config, const char* key, int* color) {
+int getConfigColor(struct TConfigSet* config, const char* key, unsigned char* color) {
 	char *valref = NULL;
 	
 	if (getConfigStr(config, key, &valref)) {

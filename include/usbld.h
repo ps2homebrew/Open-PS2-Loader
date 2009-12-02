@@ -31,8 +31,8 @@ struct TGame
 	unsigned char  media;
 } TGame;
 
-TGame **usbGameList;
-TGame **ethGameList;
+TGame *usbGameList;
+TGame *ethGameList;
 
 int usb_max_games;
 int eth_max_games;
@@ -303,6 +303,8 @@ void AppendMenuItem(struct TMenuItem* item);
 
 struct TSubMenuList* AppendSubMenu(struct TSubMenuList** submenu, GSTEXTURE *icon, char *text, int id, int text_id);
 void DestroySubMenu(struct TSubMenuList** submenu);
+void SortSubMenu(struct TSubMenuList** submenu);
+
 void UpdateScrollSpeed();
 
 void Flip();

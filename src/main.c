@@ -457,7 +457,7 @@ void ClearSubMenu(struct TSubMenuList** submenu, struct TMenuItem* mi) {
 	mi->current = *submenu;
 }
 
-void RefreshGameList(TGame ***list, int* max_games, const char* prefix, struct TSubMenuList** submenu, struct TMenuItem* mi) {
+void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TSubMenuList** submenu, struct TMenuItem* mi) {
 	int fd, size;
 	char buffer[0x040];
 
@@ -485,14 +485,13 @@ void RefreshGameList(TGame ***list, int* max_games, const char* prefix, struct T
 		size_t count = size / 0x040;
 		*max_games = count;
 		
-		// pointer array so we can sort the games in the future
-		*list = (TGame**)malloc(sizeof(TGame*) * count);
+		*list = (TGame*)malloc(sizeof(TGame) * count);
 		
 		int id;
 		for(id = 1; id <= count; ++id) {
 			fioRead(fd, buffer, 0x40);
 			
-			TGame *g = (TGame*)malloc(sizeof(TGame));
+			TGame *g = &(*list)[id-1];
 			
 			// to ensure no leaks happen, we copy manually and pad the strings
 			memcpy(g->Name, buffer, 32);
@@ -501,10 +500,8 @@ void RefreshGameList(TGame ***list, int* max_games, const char* prefix, struct T
 			g->Image[16] = '\0';
 			memcpy(&g->parts, &buffer[47], 1);
 			memcpy(&g->media, &buffer[48], 1);
-
-			(*list)[id-1] = g;
 			
-			AppendSubMenu(submenu, &disc_icon, (*list)[id-1]->Name, id, -1);
+			AppendSubMenu(submenu, &disc_icon, g->Name, id, -1);
 		}
 		
 		mi->submenu = *submenu;
@@ -539,16 +536,16 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	padReset();
 	
 	// find the compat mask
-	int cmask = getImageCompatMask(usbGameList[id - 1]->Image, USB_MODE);
+	int cmask = getImageCompatMask(usbGameList[id - 1].Image, USB_MODE);
 	
-	LaunchGame(usbGameList[id - 1], USB_MODE, cmask);
+	LaunchGame(&usbGameList[id - 1], USB_MODE, cmask);
 }
 
 void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(usbGameList[id - 1]->Name, usbGameList[id - 1]->Image, USB_MODE) == COMPAT_TEST)
+	if (showCompatConfig(usbGameList[id - 1].Name, usbGameList[id - 1].Image, USB_MODE) == COMPAT_TEST)
 		ExecUSBGameSelection(self, id);
 }
 
@@ -581,16 +578,16 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(1, 0);
 	padReset();
 	
-	int cmask = getImageCompatMask(ethGameList[id - 1]->Image, ETH_MODE);
+	int cmask = getImageCompatMask(ethGameList[id - 1].Image, ETH_MODE);
 	
-	LaunchGame(ethGameList[id - 1], ETH_MODE, cmask);
+	LaunchGame(&ethGameList[id - 1], ETH_MODE, cmask);
 }
 
 void AltExecETHGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(ethGameList[id - 1]->Name,  ethGameList[id - 1]->Image, ETH_MODE) == COMPAT_TEST)
+	if (showCompatConfig(ethGameList[id - 1].Name,  ethGameList[id - 1].Image, ETH_MODE) == COMPAT_TEST)
 		ExecETHGameSelection(self, id);
 }
 
@@ -797,14 +794,44 @@ int main(void)
 
 		DrawScreen();
 				
+		// L1 - page up/down modifier (5 instead of 1 item skip)
+		int pgmod = GetKeyPressed(KEY_L1);
+		
 		if(GetKey(KEY_LEFT)){
 			MenuPrevH();
 		}else if(GetKey(KEY_RIGHT)){
 			MenuNextH();
 		}else if(GetKey(KEY_UP)){
-			MenuPrevV();
+			int i;
+			for (i = 0; i < 4*(pgmod ? 1 : 0) + 1; ++i)
+				MenuPrevV();
 		}else if(GetKey(KEY_DOWN)){
-			MenuNextV();
+			int i;
+			for (i = 0; i < 4*(pgmod ? 1 : 0) + 1; ++i)
+				MenuNextV();
+		}
+		
+		// home
+		if (GetKeyOn(KEY_L2)) {
+			struct TMenuItem* cur = MenuGetCurrent();
+			
+			if ((cur == &usb_games_item) || (cur == &eth_games_item)) {
+				cur->current = cur->submenu;
+			}
+		}
+		
+		// end
+		if (GetKeyOn(KEY_R2)) {
+			struct TMenuItem* cur = MenuGetCurrent();
+			
+			if ((cur == &usb_games_item) || (cur == &eth_games_item)) {
+				if (!cur->current)
+					cur->current = cur->submenu;
+				
+				if (cur->current)
+					while (cur->current->next)
+						cur->current = cur->current->next;
+			}
 		}
 		
 		if(GetKeyOn(KEY_CROSS)){
@@ -814,6 +841,18 @@ int main(void)
 			// handle via callback in the menuitem
 			MenuItemAltExecute();
 		}
+		
+		// sort the list on SELECT press
+		if (GetKeyOn(KEY_SELECT)) {
+			struct TMenuItem* cur = MenuGetCurrent();
+			
+			if ((cur == &usb_games_item) || (cur == &eth_games_item)) {
+				SortSubMenu(&cur->submenu);
+				cur->current = cur->submenu;
+			}
+		}
+		
+
 		
 		if (!netLoadInfo()) {
 			// see the inactivity

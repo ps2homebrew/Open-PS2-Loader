@@ -362,6 +362,62 @@ char *GetSubItemText(struct TSubMenuItem* it) {
 		return it->text;
 }
 
+void swap(struct TSubMenuList* a, struct TSubMenuList* b) {
+	struct TSubMenuList *pa, *nb;
+	pa = a->prev;
+	nb = b->next;
+	
+	a->next = nb;
+	b->prev = pa;
+	b->next = a;
+	a->prev = b;
+	
+	if (pa)
+		pa->next = b;
+	
+	if (nb)
+		nb->prev = a;
+}
+
+// Sorts the given submenu by comparing the on-screen titles
+void SortSubMenu(struct TSubMenuList** submenu) {
+	// a simple bubblesort
+	// *submenu = mergeSort(*submenu);
+	struct TSubMenuList *head = *submenu;
+	int sorted = 0;
+	
+	if ((*submenu == NULL) || ((*submenu)->next == NULL))
+		return;
+	
+	while (!sorted) {
+		sorted = 1;
+		
+		struct TSubMenuList *tip = head;
+		
+		while (tip->next) {
+			struct TSubMenuList *nxt = tip->next;
+			
+			char *txt1 = GetSubItemText(&tip->item);
+			char *txt2 = GetSubItemText(&nxt->item);
+			
+			int cmp = strcmp(txt1, txt2);
+			
+			if (cmp > 0) {
+				swap(tip, nxt);
+				
+				if (tip == head) 
+					head = nxt;
+				
+				sorted = 0;
+			} else {
+				tip = tip->next;
+			}
+		}
+	}
+	
+	*submenu = head;
+}
+
 void UpdateScrollSpeed() {
 	// sanitize the settings
 	if ((scroll_speed < 0) || (scroll_speed > 2))

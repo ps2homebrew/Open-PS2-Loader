@@ -88,6 +88,12 @@ extern int size_select_raw;
 extern void *start_raw;
 extern int size_start_raw;
 
+extern void *up_dn_raw;
+extern int size_up_dn_raw;
+
+extern void *lt_rt_raw;
+extern int size_lt_rt_raw;
+
 GSGLOBAL *gsGlobal;
 GSTEXTURE font;
 GSFONT *gsFont;
@@ -130,6 +136,8 @@ GSTEXTURE square_icon;
 GSTEXTURE circle_icon;
 GSTEXTURE select_icon;
 GSTEXTURE start_icon;
+GSTEXTURE up_dn_icon;
+GSTEXTURE lt_rt_icon;
 
 
 u64 White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
@@ -187,7 +195,16 @@ void InitGFX() {
 	text_color[0]=0xff;
 	text_color[1]=0xff;
 	text_color[2]=0xff;
-	
+
+	default_bg_color[0] = 0x00;
+	default_bg_color[1] = 0x00;
+	default_bg_color[2] = 0xff;	
+
+	default_text_color[0]=0xff;
+	default_text_color[1]=0xff;
+	default_text_color[2]=0xff;
+
+
 	infotxt = _l(_STR_WELCOME); // be sure to replace after doing a language change!
 	
 	// defaults
@@ -427,11 +444,11 @@ void gfxRestoreConfig() {
 	getConfigInt(&gConfig, "menutype", &dynamic_menu);
 	if (getConfigStr(&gConfig, "theme", &temp))
 		strncpy(theme, temp, 32);
-	if (getConfigColor(&gConfig, "bgcolor", bg_color))
-		SetColor(bg_color[0],bg_color[1],bg_color[2]);
+	if (getConfigColor(&gConfig, "bgcolor", default_bg_color))
+		SetColor(default_bg_color[0],default_bg_color[1],default_bg_color[2]);
 				
-	if (getConfigColor(&gConfig, "textcolor", text_color))
-		TextColor(text_color[0], text_color[1], text_color[2], 0xff);
+	if (getConfigColor(&gConfig, "textcolor", default_text_color))
+		TextColor(default_text_color[0], default_text_color[1], default_text_color[2], 0xff);
 	
 	if ((dynamic_menu < 0) || (dynamic_menu > 1)) {
 		dynamic_menu = 1;
@@ -447,8 +464,8 @@ void gfxStoreConfig() {
 	setConfigInt(&gConfig, "scrolling", scroll_speed);
 	setConfigInt(&gConfig, "menutype", dynamic_menu);
 	setConfigStr(&gConfig, "theme", theme);
-	setConfigColor(&gConfig, "bgcolor", bg_color);
-	setConfigColor(&gConfig, "textcolor", text_color);
+	setConfigColor(&gConfig, "bgcolor", default_bg_color);
+	setConfigColor(&gConfig, "textcolor", default_text_color);
 	setConfigInt(&gConfig, "language", gLanguageID);
 }
 
@@ -537,259 +554,6 @@ void DrawText(int x, int y, const char *texto, float scale, int centered){
 	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
 	gsKit_font_print_scaled(gsGlobal, gsFont, x, yfix(y), 1, scale, color_text, texto);
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
-}
-
-void DrawConfig(){
-	char tmp[255];
-	int v_pos=0;
-	int new_bg_color[3];
-	int new_text_color[3];
-	int editing_bg_color=0;
-	int editing_text_color=0;
-	int editing_theme_dir=0;
-	int selected_theme_dir=0;
-	int themechanged = 0;
-	
-	if(theme[0]==0){
-		strcpy(theme,"<none>");
-	}
-	
-	new_bg_color[0]=bg_color[0];
-	new_bg_color[1]=bg_color[1];
-	new_bg_color[2]=bg_color[2];
-	new_text_color[0]=text_color[0];
-	new_text_color[1]=text_color[1];
-	new_text_color[2]=text_color[2];
-
-	while(1){
-		ReadPad();
-				
-		DrawScreen();
-
-		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
-		DrawQuad(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Darker);
-		DrawQuad(gsGlobal, 110.0f, 110.0f, 530.0f, 110.0f, 110.0f, 402.0f, 530.0f, 402.0f, z, Wave_a);
-		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 540.0f, 100.0f, 110.0f, 110.0f, 530.0f, 110.0f, z, Wave_a, Wave_a, Wave_d, Wave_d);
-		DrawQuad_gouraud(gsGlobal, 100.0f, 100.0f, 110.0f, 110.0f, 100.0f, 412.0f, 110.0f, 402.0f, z, Wave_a, Wave_b, Wave_a, Wave_b);
-		DrawQuad_gouraud(gsGlobal, 110.0f, 402.0f, 530.0f, 402.0f, 100.0f, 412.0f, 540.0f, 412.0f, z, Wave_b, Wave_b, Wave_d, Wave_d);
-		DrawQuad_gouraud(gsGlobal, 530.0f, 110.0f, 540.0f, 100.0f, 530.0f, 402.0f, 540.0f, 412.0f, z, Wave_b, Wave_d, Wave_b, Wave_d);
-		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
-		
-		DrawText(305,120,_l(_STR_THEME_CONFIG),1,1);
-		
-		if(editing_bg_color==0){
-			snprintf(tmp, 255, "Background color: #%02X%02X%02X", new_bg_color[0],new_bg_color[1],new_bg_color[2]);
-			if(v_pos==0){
-				TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			}else{
-				TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			}
-			DrawText(120,200,tmp,0.8f,0);
-		}else if(editing_bg_color==1){
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Background color: #  %02X%02X",new_bg_color[1],new_bg_color[2]);
-			DrawText(120,200,tmp,0.8f,0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                   %02X", new_bg_color[0]);
-			DrawText(120,200,tmp,0.8f,0);
-		}else if(editing_bg_color==2){
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Background color: #%02X  %02X",new_bg_color[0],new_bg_color[2]);
-			DrawText(120,200,tmp,0.8f,0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                     %02X", new_bg_color[1]);
-			DrawText(120,200,tmp,0.8f,0);
-		}else if(editing_bg_color==3){
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Background color: #%02X%02X",new_bg_color[0],new_bg_color[1]);
-			DrawText(120,200,tmp,0.8f,0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                       %02X", new_bg_color[2]);
-			DrawText(120,200,tmp,0.8f,0);
-		}
-		if(editing_text_color==0){
-			snprintf(tmp, 255, "Text color: #%02X%02X%02X", new_text_color[0],new_text_color[1],new_text_color[2]);
-			if(v_pos==1){
-				TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			}else{
-				TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			}
-			DrawText(120,240,tmp,0.8f,0);
-		}else if(editing_text_color==1){
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Text color: #  %02X%02X",new_text_color[1],new_text_color[2]);
-			DrawText(120,240,tmp,0.8f,0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "             %02X", new_text_color[0]);
-			DrawText(120,240,tmp,0.8f,0);
-		}else if(editing_text_color==2){
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Text color: #%02X  %02X",new_text_color[0],new_text_color[2]);
-			DrawText(120,240,tmp,0.8f,0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "               %02X", new_text_color[1]);
-			DrawText(120,240,tmp,0.8f,0);
-		}else if(editing_text_color==3){
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Text color: #%02X%02X",new_text_color[0],new_text_color[1]);
-			DrawText(120,240,tmp,0.8f,0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                 %02X", new_text_color[2]);
-			DrawText(120,240,tmp,0.8f,0);
-		}
-		if(editing_theme_dir==0){
-			snprintf(tmp, 255, "Selected Theme: %s", theme);
-			if(v_pos==2){
-				TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			}else{
-				TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			}
-			DrawText(120,280,tmp,0.8f, 0);
-		}else{
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-			snprintf(tmp, 255, "Selected Theme:");
-			DrawText(120,280,tmp,0.8f, 0);
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-			snprintf(tmp, 255, "                %s", theme_dir[selected_theme_dir]);
-			DrawText(120,280,tmp,0.8f, 0);
-		}
-		
-		if(v_pos==3){
-			TextColor(new_bg_color[0]/2,new_bg_color[1]/2,new_bg_color[2]/2, 0x80);
-		}else{
-			TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-		}
-		DrawText(310,370,_l(_STR_OK),1, 1);
-		
-		if(editing_bg_color>0){
-			if(GetKey(KEY_UP)){
-				if(new_bg_color[editing_bg_color-1]<255){
-					new_bg_color[editing_bg_color-1]++;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(new_bg_color[editing_bg_color-1]>0){
-					new_bg_color[editing_bg_color-1]--;
-				}
-			}else if(GetKey(KEY_LEFT)){
-				if(editing_bg_color>1){
-					editing_bg_color--;
-				}
-			}else if(GetKey(KEY_RIGHT)){
-				if(editing_bg_color<3){
-					editing_bg_color++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_bg_color=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-				new_bg_color[0]=bg_color[0];
-				new_bg_color[1]=bg_color[1];
-				new_bg_color[2]=bg_color[2];
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_bg_color=0;
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
-			}
-		}else if(editing_text_color>0){
-			if(GetKey(KEY_UP)){
-				if(new_text_color[editing_text_color-1]<255){
-					new_text_color[editing_text_color-1]++;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(new_text_color[editing_text_color-1]>0){
-					new_text_color[editing_text_color-1]--;
-				}
-			}else if(GetKey(KEY_LEFT)){
-				if(editing_text_color>1){
-					editing_text_color--;
-				}
-			}else if(GetKey(KEY_RIGHT)){
-				if(editing_text_color<3){
-					editing_text_color++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_text_color=0;
-				SetButtonDelay(KEY_UP, 10);
-				SetButtonDelay(KEY_DOWN, 10);
-				new_text_color[0]=text_color[0];
-				new_text_color[1]=text_color[1];
-				new_text_color[2]=text_color[2];
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_text_color=0;
-				SetButtonDelay(KEY_UP, 10);
-				SetButtonDelay(KEY_DOWN, 10);
-			}
-		}else if(editing_theme_dir>0){
-			if(GetKey(KEY_UP)){
-				if(selected_theme_dir>0){
-					selected_theme_dir--;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(selected_theme_dir<max_theme_dir-1){
-					selected_theme_dir++;
-				}
-			}else if(GetKeyOn(KEY_CIRCLE)){
-				editing_theme_dir=0;
-			}else if(GetKeyOn(KEY_CROSS)){
-				editing_theme_dir=0;
-				themechanged = 1;
-			}
-		}else{
-			if(GetKey(KEY_UP)){
-				if(v_pos>0){
-					v_pos--;
-				}
-			}else if(GetKey(KEY_DOWN)){
-				if(v_pos<3){
-					v_pos++;
-				}
-			}else if(GetKeyOn(KEY_CROSS)){
-				if(v_pos==0){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_bg_color=1;
-				}else if(v_pos==1){
-					SetButtonDelay(KEY_UP, 1);
-					SetButtonDelay(KEY_DOWN, 1);
-					editing_text_color=1;
-				}else if(v_pos==2){
-					editing_theme_dir=1;
-					ListDir("mass:USBLD");
-				}else if(v_pos==3) {
-					// store the settings into the global variables
-					bg_color[0]=new_bg_color[0];
-					bg_color[1]=new_bg_color[1];
-					bg_color[2]=new_bg_color[2];
-					
-					text_color[0]=new_text_color[0];
-					text_color[1]=new_text_color[1];
-					text_color[2]=new_text_color[2];
-				
-					// Load the new theme if it changed
-					if (themechanged) {
-						strcpy(theme,theme_dir[selected_theme_dir]);
-						background_image=LoadBackground();
-						LoadIcons();
-						LoadFont();
-					}
-					break;
-				}
-			}
-			if(GetKey(KEY_CIRCLE)){
-				SetColor(bg_color[0],bg_color[1],bg_color[2]);
-				TextColor(text_color[0], text_color[1], text_color[2], 0xff);
-				break;
-			}
-		}
-		
-		SetColor(new_bg_color[0],new_bg_color[1],new_bg_color[2]);
-		TextColor(new_text_color[0], new_text_color[1], new_text_color[2], 0xff);
-		
-		Flip();
-	}
-	
-	// revert to old button delays
-	UpdateScrollSpeed();
 }
 
 /// Uploads texture to vram
@@ -912,13 +676,13 @@ void LoadTheme(int themeid) {
 	snprintf(tmp, 255, "mass:USBLD/%s/theme.cfg", theme);
 
 	// set default colors
-	bg_color[0]=0x00;
-	bg_color[1]=0x00;
-	bg_color[2]=0xff;
+	bg_color[0]=default_bg_color[0];
+	bg_color[1]=default_bg_color[1];
+	bg_color[2]=default_bg_color[2];
 
-	text_color[0]=0xff;
-	text_color[1]=0xff;
-	text_color[2]=0xff;
+	text_color[0]=default_text_color[0];
+	text_color[1]=default_text_color[1];
+	text_color[2]=default_text_color[2];
 
 	if (readConfig(&themeConfig, tmp)) {
 		// load the color value overrides if present
@@ -995,6 +759,8 @@ void LoadIcons() {
 	LoadIcon(&circle_icon, "circle.raw", &circle_raw, 22, 22);
 	LoadIcon(&select_icon, "select.raw", &select_raw, 22, 22);
 	LoadIcon(&start_icon, "start.raw", &start_raw, 22, 22);
+	LoadIcon(&up_dn_icon, "up_dn.raw", &up_dn_raw, 22, 22);
+	LoadIcon(&lt_rt_icon, "lt_rt.raw", &lt_rt_raw, 22, 22);
 }
 
 /// Uploads the icons to vram
@@ -1020,6 +786,9 @@ void UpdateIcons() {
 	UploadTexture(&circle_icon);
 	UploadTexture(&select_icon);
 	UploadTexture(&start_icon);
+	UploadTexture(&up_dn_icon);
+	UploadTexture(&lt_rt_icon);
+	
 }
 
 void DrawIcon(GSTEXTURE *img, int x, int y, float scale) {
@@ -1442,6 +1211,87 @@ int ShowKeyb(char* text, size_t maxLen) {
 	return 0;
 }
 
+int ShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
+	int selc = 0;
+	unsigned char col[3];
+
+	col[0] = *r; col[1] = *g; col[2] = *b;
+	SetButtonDelay(KEY_LEFT, 1);
+	SetButtonDelay(KEY_RIGHT, 1);
+
+
+	while(1) {
+		ReadPad();
+				
+		DrawBackground();
+		
+		TextColor(0xff,0xff,0xff,0x080);
+		
+		gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
+		DrawQuad(gsGlobal, 0.0f, 0.0f, 640.0f, 0.0f, 0.0f, 512.0f, 640.0f, 512.0f, z, Darker);
+
+		// "Color selection"
+		DrawText(50, yfix2(50), "Colour selection", 1.0f, 0);
+
+		// 3 bars representing the colors...
+		size_t co;
+		for (co = 0; co < 3; ++co) {
+			unsigned char cc[3] = {0,0,0};
+			cc[co] = col[co];
+
+			u64 dcol = GS_SETREG_RGBAQ(cc[0],cc[1],cc[2],0x00,0x00);
+			float y = yfix2(75.0f + co * 25);
+
+			DrawQuad(gsGlobal, 75.0f, y, 275.0f, y, 75.0f, y + 20, 275.0f, y + 20, z, White);
+			DrawQuad(gsGlobal, 79.0f, y + 4, 269.0f, y + 4, 79.0f, y + 16, 269.0f, y + 16, z + 1, dcol);
+
+			if (selc == co)
+				// draw <> in front of the bar
+				DrawIconN(&lt_rt_icon, 50, y, 1.0f);
+				
+		}
+
+		// target color itself
+		u64 dcol = GS_SETREG_RGBAQ(col[0],col[1],col[2],0x00,0x00);
+		float x, y;
+		x = 300;
+		y = yfix2(75);
+		DrawQuad(gsGlobal, x, y, x+100, y, x, y+100, x+100, y+100, z, White);
+		DrawQuad(gsGlobal, x+5, y+5, x+95, y + 5, x + 5, y+95, x+95, y+95, z + 1, dcol);
+
+		gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+		// separating line for simpler orientation
+		Flip();
+		
+		if(GetKey(KEY_LEFT)) {
+			if (col[selc] > 0)
+				col[selc]--;
+		}else if(GetKey(KEY_RIGHT)) {
+			if (col[selc] < 255)
+				col[selc]++;
+		}else if(GetKey(KEY_UP)) {
+			if (selc > 0)
+				selc--;		
+		}else if(GetKey(KEY_DOWN)) {
+			if (selc < 2)
+				selc++;		
+		}else if(GetKeyOn(KEY_CROSS)) {
+			*r = col[0];
+			*g = col[1];
+			*b = col[2];
+			SetButtonDelay(KEY_LEFT, 5);
+			SetButtonDelay(KEY_RIGHT, 5);
+			return 1;
+		}else if(GetKeyOn(KEY_CIRCLE)) {
+			SetButtonDelay(KEY_LEFT, 5);
+			SetButtonDelay(KEY_RIGHT, 5);
+			return 0;
+		}
+	}
+	
+	return 0;
+}
+
 void MenuNextH() {
 	if (!selected_item) {
 		selected_item = menu;
@@ -1451,18 +1301,9 @@ void MenuNextH() {
 		h_anim=200;
 		selected_item = selected_item->next;
 		
-		/*
-		if (selected_item->item->resetOrder) // reset the order if callback exists
-			selected_item->item->resetOrder(selected_item->item); // could also be getCurSelection to preserve the order
-		else{
-			selected_item->item->current = selected_item->item->submenu;
-		}
-		*/
 		if (!selected_item->item->current)
 			selected_item->item->current = selected_item->item->submenu;
 		
-		
-		actualgame=firstgame;
 		v_anim=100;
 		direc=3;
 	}
@@ -1477,18 +1318,9 @@ void MenuPrevH() {
 		h_anim=0;
 		selected_item = selected_item->prev;
 		
-		/*
-		if (selected_item->item->resetOrder) // reset the order if callback exists
-			selected_v = selected_item->item->resetOrder(selected_item->item); // can preserve order this way
-		else {
-			selected_v = 0;
-			selected_item->item->current = selected_item->item->submenu;
-		}
-		*/
 		if (!selected_item->item->current)
 			selected_item->item->current = selected_item->item->submenu;
 		
-		actualgame=firstgame;
 		v_anim=100;
 		direc=1;
 	}
@@ -1501,9 +1333,6 @@ void MenuNextV() {
 	struct TSubMenuList *cur = selected_item->item->current;
 	
 	if(cur && cur->next) {
-		if (selected_item->item->nextItem)
-			selected_item->item->nextItem(selected_item->item);
-	
 		selected_item->item->current = cur->next;
 		
 		v_anim=200;
@@ -1518,9 +1347,6 @@ void MenuPrevV() {
 	struct TSubMenuList *cur = selected_item->item->current;
 	
 	if(cur && cur->prev) {
-		if (selected_item->item->prevItem)
-			selected_item->item->prevItem(selected_item->item);
-		
 		selected_item->item->current = cur->prev;
 			
 		v_anim=0;
@@ -1855,6 +1681,17 @@ void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocu
 				DrawText(x, y, tv, 1.0f, 0);
 				break;
 		}
+		case UI_COLOUR: {
+				u64 dcol = GS_SETREG_RGBAQ(item->colourvalue.r,item->colourvalue.g,item->colourvalue.b, 0x00, 0x00);
+				if (selected)
+					DrawQuad(gsGlobal, x, y, x + 25, y, x, y + 15, x+25, y + 15, z, White);
+				else
+					DrawQuad(gsGlobal, x, y, x + 25, y, x, y + 15, x+25, y + 15, z, Darker);
+
+				DrawQuad(gsGlobal, x + 2, y + 2, x + 23, y + 2, x + 2, y + 13, x+23, y + 13, z, dcol);
+				*w = 15;
+				break;
+		}
 	}
 }
 
@@ -1984,6 +1821,20 @@ int diaHandleInput(struct UIItem *item) {
 
 		if (GetKey(KEY_DOWN) && (item->intvalue.enumvalues[cur] != NULL))
 			item->intvalue.current = cur;
+	} else if (item->type == UI_COLOUR) {
+		unsigned char col[3];
+
+		col[0] = item->colourvalue.r;
+		col[1] = item->colourvalue.g;
+		col[2] = item->colourvalue.b;
+
+		if (ShowColSel(&col[0], &col[1], &col[2])) {
+			item->colourvalue.r = col[0];
+			item->colourvalue.g = col[1];
+			item->colourvalue.b = col[2];
+		}
+
+		return 0;
 	}
 	
 	return 1;
@@ -2229,6 +2080,36 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 	
 	strncpy(item->stringvalue.def, text, 32);
 	strncpy(item->stringvalue.text, text, 32);
+	return 1;
+}
+
+int diaGetColour(struct UIItem* ui, int id, unsigned char *col) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if (item->type != UI_COLOUR)
+		return 0;
+
+	col[0] = item->colourvalue.r;
+	col[1] = item->colourvalue.g;
+	col[2] = item->colourvalue.b;
+	return 1;
+}
+
+int diaSetColour(struct UIItem* ui, int id, const unsigned char *col) {
+	struct UIItem *item = diaFindByID(ui, id);
+	
+	if (!item)
+		return 0;
+	
+	if (item->type != UI_COLOUR)
+		return 0;
+
+	item->colourvalue.r = col[0];
+	item->colourvalue.g = col[1];
+	item->colourvalue.b = col[2];
 	return 1;
 }
 

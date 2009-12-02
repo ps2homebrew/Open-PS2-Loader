@@ -31,18 +31,11 @@ struct TGame
 	unsigned char  media;
 } TGame;
 
-typedef
-struct TGameList
-{
-	void *prev;
-	TGame Game;
-	void *next;
-} TGameList;
+TGame **usbGameList;
+TGame **ethGameList;
 
-TGameList *firstgame;
-TGameList *actualgame;
-TGameList *eth_firstgame;
-TGameList *eth_actualgame;
+int usb_max_games;
+int eth_max_games;
 
 /// Forward decls.
 struct TMenuItem;
@@ -87,12 +80,6 @@ struct TMenuItem {
 	
 	/// execute a menu/submenu item (id is the submenu id as specified in AppendSubMenu)
 	void (*execute)(struct TMenuItem *self, int id);
-	
-	void (*nextItem)(struct TMenuItem *self);
-	
-	void (*prevItem)(struct TMenuItem *self);
-	
-	int (*resetOrder)(struct TMenuItem *self);
 	
 	void (*refresh)(struct TMenuItem *self);
 	
@@ -153,7 +140,9 @@ typedef enum {
 	// bool value (On/Off). (Uses int value for storage)
 	UI_BOOL,
 	// enumeration (multiple strings)
-	UI_ENUM
+	UI_ENUM,
+	// Colour selection
+	UI_COLOUR
 }  UIItemType;
 
 // UI item definition (for dialogues)
@@ -183,6 +172,12 @@ struct UIItem {
 			char def[32];
 			char text[32];
 		} stringvalue;
+		
+		struct {
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+		} colourvalue;
 	};
 };
 
@@ -194,8 +189,6 @@ int h_anim;
 int v_anim;
 int direc;
 int max_settings;
-int max_games;
-int eth_max_games;
 int gLanguageID;
 
 int background_image;
@@ -232,8 +225,10 @@ int gIPConfigChanged;
 // Theme config
 
 char theme[32];
-int bg_color[3];
-int text_color[3];
+unsigned char bg_color[3];
+unsigned char text_color[3];
+unsigned char default_bg_color[3];
+unsigned char default_text_color[3];
 char *theme_dir[255];
 int max_theme_dir;
 
@@ -374,6 +369,8 @@ int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
 int diaGetString(struct UIItem* ui, int id, char *value);
 int diaSetString(struct UIItem* ui, int id, const char *text);
+int diaGetColour(struct UIItem* ui, int id, unsigned char *col);
+int diaSetColour(struct UIItem* ui, int id, const unsigned char *col);
 // set label pointer into the label's text (must be valid while rendering dialog)
 int diaSetLabel(struct UIItem* ui, int id, const char *text);
 // sets the current enum value list for given control
@@ -390,8 +387,8 @@ int setConfigStr(struct TConfigSet* config, const char* key, const char* value);
 int getConfigStr(struct TConfigSet* config, const char* key, char** value);
 int setConfigInt(struct TConfigSet* config, const char* key, const int value);
 int getConfigInt(struct TConfigSet* config, char* key, int* value);
-int setConfigColor(struct TConfigSet* config, const char* key, int* color);
-int getConfigColor(struct TConfigSet* config, const char* key, int* color);
+int setConfigColor(struct TConfigSet* config, const char* key, unsigned char* color);
+int getConfigColor(struct TConfigSet* config, const char* key, unsigned char* color);
 int configRemoveKey(struct TConfigSet* config, const char* key);
 
 void readIPConfig();

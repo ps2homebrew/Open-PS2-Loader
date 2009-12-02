@@ -141,15 +141,23 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_LANG 11
 #define UICFG_SCROLL 12
 #define UICFG_MENU 13
-#define UICFG_SAVE 14
+#define UICFG_BGCOL 14
+#define UICFG_TXTCOL 15
+
+#define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 111, NULL, {.label = {"", _STR_SETTINGS}}},
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, 10, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, 11,  NULL,{.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, 12, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, 13, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, UICFG_THEME, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, UICFG_LANG,  NULL,{.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, UICFG_MENU, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
+	{UI_LABEL, 0, NULL, {.label = {"Bg. col", -1}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Txt. col", -1}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -293,6 +301,8 @@ void showUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_THEME, themeid);
 	diaSetInt(diaUIConfig, UICFG_LANG, gLanguageID);
 	diaSetInt(diaUIConfig, UICFG_MENU, dynamic_menu);
+	diaSetColour(diaUIConfig, UICFG_BGCOL, default_bg_color);
+	diaSetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -301,12 +311,15 @@ void showUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_THEME, &themeid);
 		diaGetInt(diaUIConfig, UICFG_LANG, &gLanguageID);
 		diaGetInt(diaUIConfig, UICFG_MENU, &dynamic_menu);
+		diaGetColour(diaUIConfig, UICFG_BGCOL, default_bg_color);
+		diaGetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 	
 		// update the value interpretation
 		setLanguage(gLanguageID);
 		UpdateScrollSpeed();
 		SetMenuDynamic(dynamic_menu);
 		LoadTheme(themeid);
+		infotxt = _l(_STR_WELCOME);
 		
 		if (ret == UICFG_SAVE)
 			storeConfig();
@@ -414,14 +427,14 @@ int storeConfig() {
 }
 
 // --------------------- Menu variables, handling & initialization --------------------
-// Submenu items variant of the game list... keeped in sync with the game item list (firstgame, actualgame)
+// Submenu items variant of the game list... keeped in sync with the game item list
 struct TSubMenuList* usb_submenu = NULL;
 struct TSubMenuList* eth_submenu = NULL;
 
 /// List of usb games
 struct TMenuItem usb_games_item;
 /// List of network games
-struct TMenuItem network_games_item;
+struct TMenuItem eth_games_item;
 
 /// scroll speed selector
 struct TSubMenuList* speed_item = NULL;
@@ -432,115 +445,91 @@ struct TSubMenuList* menutype_item = NULL;
 unsigned int scroll_speed_txt[3] = {_STR_SCROLL_SLOW, _STR_SCROLL_MEDIUM, _STR_SCROLL_FAST};
 unsigned int menu_type_txt[2] = { _STR_MENU_DYNAMIC,  _STR_MENU_STATIC};
 
+void ClearSubMenu(struct TSubMenuList** submenu, struct TMenuItem* mi) {
+	DestroySubMenu(submenu);
+	
+	if ((submenu != &eth_submenu) || (eth_inited || gNetAutostart))
+		AppendSubMenu(submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
+	else
+		AppendSubMenu(submenu, &netconfig_icon, "", -1, _STR_START_NETWORK);
+
+	mi->submenu = *submenu;
+	mi->current = *submenu;
+}
+
+void RefreshGameList(TGame ***list, int* max_games, const char* prefix, struct TSubMenuList** submenu, struct TMenuItem* mi) {
+	int fd, size;
+	char buffer[0x040];
+
+	char path[64];
+	snprintf(path, 64, "%sul.cfg", prefix);
+	fd=fioOpen(path, O_RDONLY);
+	
+	if(fd<0) { // file could not be opened. reset menu
+		free(*list);
+		*list = NULL;
+		ClearSubMenu(submenu, mi);
+		return;
+	}
+
+	// only refresh if the list is empty
+	if (*max_games==0) {
+		DestroySubMenu(submenu);
+		*submenu = NULL;
+		mi->submenu = *submenu;
+		mi->current = *submenu;
+
+		size = fioLseek(fd, 0, SEEK_END);  
+		fioLseek(fd, 0, SEEK_SET); 
+		
+		size_t count = size / 0x040;
+		*max_games = count;
+		
+		// pointer array so we can sort the games in the future
+		*list = (TGame**)malloc(sizeof(TGame*) * count);
+		
+		int id;
+		for(id = 1; id <= count; ++id) {
+			fioRead(fd, buffer, 0x40);
+			
+			TGame *g = (TGame*)malloc(sizeof(TGame));
+			
+			// to ensure no leaks happen, we copy manually and pad the strings
+			memcpy(g->Name, buffer, 32);
+			g->Name[32] = '\0';
+			memcpy(g->Image, &buffer[32], 16);
+			g->Image[16] = '\0';
+			memcpy(&g->parts, &buffer[47], 1);
+			memcpy(&g->media, &buffer[48], 1);
+
+			(*list)[id-1] = g;
+			
+			AppendSubMenu(submenu, &disc_icon, (*list)[id-1]->Name, id, -1);
+		}
+		
+		mi->submenu = *submenu;
+		mi->current = *submenu;
+	}
+
+	fioClose(fd);
+}
+
+
 void ClearUSBSubMenu() {
-	DestroySubMenu(&usb_submenu);
-	AppendSubMenu(&usb_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
-	usb_games_item.submenu = usb_submenu;
-	usb_games_item.current = usb_submenu;
+	ClearSubMenu(&usb_submenu, &usb_games_item);
 }
 
 void RefreshUSBGameList() {
-	int fd, size, n;
-	TGameList *list;
-	char buffer[0x040];
-
 	if(usbdelay<=100)  {
 		usbdelay++;
 		return;
 	}
 	  
 	usbdelay = 0;
-	fd=fioOpen("mass:ul.cfg", O_RDONLY);
-	
-	if(fd<0) { // file could not be opened. reset menu
-		if(max_games>0) {
-			actualgame=firstgame;
-			while(actualgame->next!=0){
-				actualgame=actualgame->next;
-				free(actualgame->prev);
-			}
-			free(actualgame);
-		}
-		max_games=0;
-		
-		ClearUSBSubMenu();
-		return;
-	}
-
-	// only refresh if the list is empty
-	if (max_games==0) {
-		DestroySubMenu(&usb_submenu);
-		usb_submenu = NULL;
-		usb_games_item.submenu = usb_submenu;
-		usb_games_item.current = usb_submenu;
-
-		size = fioLseek(fd, 0, SEEK_END);  
-		fioLseek(fd, 0, SEEK_SET); 
-		
-		int id = 1; // game id (or order)
-		for(n=0;n<size;n+=0x40,++id){
-			fioRead(fd, buffer, 0x40);
-			
-			
-			list=(TGameList*)malloc(sizeof(TGameList));
-			
-			// to ensure no leaks happen, we copy manually and pad the strings
-			memcpy(&list->Game.Name, buffer, 32);
-			list->Game.Name[32] = '\0';
-			memcpy(&list->Game.Image, &buffer[32], 16);
-			list->Game.Image[16] = '\0';
-			memcpy(&list->Game.parts, &buffer[47], 1);
-			memcpy(&list->Game.media, &buffer[48], 1);
-			
-			if(actualgame!=NULL){
-				actualgame->next=list;
-				list->prev=actualgame;
-			}else{
-				firstgame=list;
-				list->prev=0;
-			}
-			list->next=0;
-			actualgame=list;
-			max_games++;
-			
-			
-			
-			AppendSubMenu(&usb_submenu, &disc_icon, actualgame->Game.Name, id, -1);
-		}
-		
-			
-		usb_games_item.submenu = usb_submenu;
-		usb_games_item.current = usb_submenu;
-		actualgame=firstgame;
-	}
-
-	fioClose(fd);
+	RefreshGameList(&usbGameList, &usb_max_games, "mass:", &usb_submenu, &usb_games_item);
 }
 
 // --------------------- USB Menu item callbacks --------------------
-void PrevUSBGame(struct TMenuItem *self) {
-	if (!actualgame)
-		return;
-	
-	if(actualgame->prev!=NULL){
-		actualgame=actualgame->prev;
-	}
-}
-
-void NextUSBGame(struct TMenuItem *self) {
-	if (!actualgame)
-		return;
-
-	if(actualgame->next!=NULL){
-		actualgame=actualgame->next;
-	}
-}
-
-int ResetUSBOrder(struct TMenuItem *self) {
-	actualgame = firstgame;
-	return 0;
-}
-
 void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
@@ -550,128 +539,34 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	padReset();
 	
 	// find the compat mask
-	int cmask = getImageCompatMask(actualgame->Game.Image, USB_MODE);
+	int cmask = getImageCompatMask(usbGameList[id - 1]->Image, USB_MODE);
 	
-	LaunchGame(&actualgame->Game, USB_MODE, cmask);
+	LaunchGame(usbGameList[id - 1], USB_MODE, cmask);
 }
 
 void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(actualgame->Game.Name, actualgame->Game.Image, USB_MODE) == COMPAT_TEST)
+	if (showCompatConfig(usbGameList[id - 1]->Name, usbGameList[id - 1]->Image, USB_MODE) == COMPAT_TEST)
 		ExecUSBGameSelection(self, id);
 }
 
 void ClearETHSubMenu() {
-	DestroySubMenu(&eth_submenu);
-	
-	if (eth_inited || gNetAutostart)
-		AppendSubMenu(&eth_submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
-	else
-		AppendSubMenu(&eth_submenu, &netconfig_icon, "", -1, _STR_START_NETWORK);
-	
-	network_games_item.submenu = eth_submenu;
-	network_games_item.current = eth_submenu;
+	ClearSubMenu(&eth_submenu, &eth_games_item);
 }
 
 void RefreshETHGameList() {
-	int fd, size, n;
-	TGameList *list;
-	char buffer[0x040];
-	
 	if(ethdelay<=100)  {
 		ethdelay++;
 		return;
 	}
-		  
+	  
 	ethdelay = 0;
-	fd=fioOpen("smb0:\\ul.cfg", O_RDONLY);
-	
-	if(fd<0) { // file could not be opened. reset menu
-		if(eth_max_games>0) {
-			eth_actualgame=eth_firstgame;
-			while(eth_actualgame->next!=0){
-				eth_actualgame=eth_actualgame->next;
-				free(eth_actualgame->prev);
-			}
-			free(eth_actualgame);
-		}
-		eth_max_games=0;
-		
-		ClearETHSubMenu();
-		return;
-	}
-
-	// only refresh if the list is empty
-	if (eth_max_games==0) {
-		DestroySubMenu(&eth_submenu);
-		eth_submenu = NULL;
-		network_games_item.submenu = eth_submenu;
-		network_games_item.current = eth_submenu;
-
-		size = fioLseek(fd, 0, SEEK_END);  
-		fioLseek(fd, 0, SEEK_SET); 
-		
-		int id = 1; // game id (or order)
-		for(n=0;n<size;n+=0x40,++id){
-			fioRead(fd, &buffer, 0x40);
-			list=(TGameList*)malloc(sizeof(TGameList));
-			
-			memcpy(&list->Game.Name, buffer, 32);
-			list->Game.Name[32] = '\0';
-			memcpy(&list->Game.Image, &buffer[32], 16);
-			list->Game.Image[16] = '\0';
-			memcpy(&list->Game.parts, &buffer[47], 1);
-			memcpy(&list->Game.media, &buffer[48], 1);
-			
-			if(eth_actualgame!=NULL){
-				eth_actualgame->next=list;
-				list->prev=eth_actualgame;
-			}else{
-				eth_firstgame=list;
-				list->prev=0;
-			}
-			list->next=0;
-			eth_actualgame=list;
-			eth_max_games++;
-			
-			AppendSubMenu(&eth_submenu, &disc_icon, eth_actualgame->Game.Name, id, -1);
-		}
-		
-			
-		network_games_item.submenu = eth_submenu;
-		network_games_item.current = eth_submenu;
-		eth_actualgame=eth_firstgame;
-	}
-
-	fioClose(fd);
+	RefreshGameList(&ethGameList, &eth_max_games, "smb0:\\", &eth_submenu, &eth_games_item);
 }
 
 // --------------------- Network Menu item callbacks --------------------
-void PrevETHGame(struct TMenuItem *self) {
-	if (!eth_actualgame)
-		return;
-	
-	if(eth_actualgame->prev!=NULL){
-		eth_actualgame=eth_actualgame->prev;
-	}
-}
-
-void NextETHGame(struct TMenuItem *self) {
-	if (!eth_actualgame)
-		return;
-
-	if(eth_actualgame->next!=NULL){
-		eth_actualgame=eth_actualgame->next;
-	}
-}
-
-int ResetETHOrder(struct TMenuItem *self) {
-	eth_actualgame = eth_firstgame;
-	return 0;
-}
-
 void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1) {
 		if (!eth_inited) {
@@ -686,16 +581,16 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(1, 0);
 	padReset();
 	
-	int cmask = getImageCompatMask(eth_actualgame->Game.Image, ETH_MODE);
+	int cmask = getImageCompatMask(ethGameList[id - 1]->Image, ETH_MODE);
 	
-	LaunchGame(&eth_actualgame->Game, ETH_MODE, cmask);
+	LaunchGame(ethGameList[id - 1], ETH_MODE, cmask);
 }
 
 void AltExecETHGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(eth_actualgame->Game.Name,  eth_actualgame->Game.Image, ETH_MODE) == COMPAT_TEST)
+	if (showCompatConfig(ethGameList[id - 1]->Name,  ethGameList[id - 1]->Image, ETH_MODE) == COMPAT_TEST)
 		ExecETHGameSelection(self, id);
 }
 
@@ -745,15 +640,15 @@ struct TMenuItem settings_item = {
 };
 
 struct TMenuItem usb_games_item  = {
-	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, &ExecUSBGameSelection, &NextUSBGame, &PrevUSBGame, &ResetUSBOrder, &RefreshUSBGameList, &AltExecUSBGameSelection
+	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, &ExecUSBGameSelection, &RefreshUSBGameList, &AltExecUSBGameSelection
 };
 
 struct TMenuItem hdd_games_item = {
 	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL
 };
 
-struct TMenuItem network_games_item = {
-	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &NextETHGame, &PrevETHGame, &ResetETHOrder, &RefreshETHGameList, &AltExecETHGameSelection
+struct TMenuItem eth_games_item = {
+	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &RefreshETHGameList, &AltExecETHGameSelection
 };
 
 struct TMenuItem apps_item = {
@@ -778,7 +673,7 @@ void InitMenuItems() {
 	AppendMenuItem(&settings_item);
 	AppendMenuItem(&usb_games_item);
 	AppendMenuItem(&hdd_games_item);
-	AppendMenuItem(&network_games_item);
+	AppendMenuItem(&eth_games_item);
 	AppendMenuItem(&apps_item);
 }
 
@@ -789,7 +684,7 @@ void init() {
 	InitGFX();
 	
 	theme_dir[0] = NULL;
-	max_games = 0;
+	usb_max_games = 0;
 	eth_max_games = 0;
 
 
@@ -847,12 +742,16 @@ void init() {
 	
 	StartPad();
 
+	usb_max_games=0;
 	eth_max_games=0;	
-	max_games=0;
 	usbdelay=0;
 	ethdelay=0;
 	frame=0;
 	inactiveFrames = 0;
+	
+	usbGameList = NULL;
+	ethGameList = NULL;
+	
 
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
@@ -922,9 +821,9 @@ int main(void)
 				struct TMenuItem* cur = MenuGetCurrent();
 				// show hint (depends on the current menu item)
 
-				if ((cur == &usb_games_item) && (max_games > 0)) 
+				if ((cur == &usb_games_item) && (usb_max_games > 0)) 
 					DrawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
-				else if ((cur == &network_games_item) && (eth_max_games > 0))
+				else if ((cur == &eth_games_item) && (eth_max_games > 0))
 					DrawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
 				else if (cur == &settings_item)
 					DrawHint(_l(_STR_SETTINGS), KEY_CROSS);

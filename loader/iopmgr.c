@@ -16,35 +16,26 @@ extern int size_imgdrv_irx;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
-extern void *usbhdfsd_irx;
-extern int size_usbhdfsd_irx;
-
 extern void *cdvdman_irx;
 extern int size_cdvdman_irx;
+
+extern void *cdvdfsv_irx;
+extern int size_cdvdfsv_irx;
 
 extern void *eesync_irx;
 extern int size_eesync_irx;
 
-extern void *isofs_irx;
-extern int size_isofs_irx;
-
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
 
-extern void *ps2ip_irx;
-extern int size_ps2ip_irx;
+extern void *smstcpip_irx;
+extern int size_smstcpip_irx;
 
-extern void *ps2smap_irx;
-extern int size_ps2smap_irx;
+extern void *smsmap_irx;
+extern int size_smsmap_irx;
 
 extern void *netlog_irx;
 extern int size_netlog_irx;
-
-extern void *smbman_irx;
-extern int size_smbman_irx;
-
-extern void *dummy_irx;
-extern int size_dummy_irx;
 
 /*----------------------------------------------------------------------------------------*/
 void list_modules(void)
@@ -71,7 +62,6 @@ int New_Reset_Iop(const char *arg, int flag){
 	int     i, j, r, fd=0;
 	ioprp_t ioprp_img;
 	char    ioprp_path[0x50];
-	char    tmp[0x50];	
 	int eeloadcnf_reset = 0;		
 	
 	GS_BGCOLOUR = 0xFF00FF;
@@ -84,33 +74,37 @@ int New_Reset_Iop(const char *arg, int flag){
 		// above 2nd IOP reset, we can't be sure we'll be able to read IOPRP without 
 		// Resetting IOP (game IOPRP is loaded at 2nd reset), so...
 		// Reseting IOP.
-		SifExitRpc();
 		
+		SifExitRpc();
+		SifExitIopHeap();
+		LoadFileExit();
+
+		// Reseting IOP.
 		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 		while (!Sync_Iop()){;}
-	
-		fioExit();
-		SifExitIopHeap();
+
 		SifInitRpc(0);
 		SifInitIopHeap();
 		LoadFileInit();
 		Sbv_Patch();
+		
+		LoadIRXfromKernel(cdvdman_irx, size_cdvdman_irx, 0, NULL);
 
 		GS_BGCOLOUR = 0x00A5FF;
 			
 		if (GameMode == USB_MODE) {
 			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
-			LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 			delay(3);
+			//LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+			//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+			//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
 		}
 		else if (GameMode == ETH_MODE) {
-			LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-			LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
-			LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
+			LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+			LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
 			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-			LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
 		}
-		LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
 	}
 
 	// check for reboot with IOPRP from cdrom
@@ -139,18 +133,8 @@ int New_Reset_Iop(const char *arg, int flag){
 			eeloadcnf_reset = 1;
 			break;
 		}
-	}	
-
-	if (iop_reboot_count > 2) {
-		// we have loaded isofs, but not cdvdman replacement so...
-		// replacing cdrom in elf path by iso
-		if (strstr(ioprp_path, "cdrom")) {
-			strcpy(tmp, "iso");
-			strcat(tmp, &ioprp_path[5]);
-			strcpy(ioprp_path, tmp);
-		}
 	}
-
+	
 	fioInit();		
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
@@ -186,14 +170,14 @@ int New_Reset_Iop(const char *arg, int flag){
 	}
 	else {
 		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
-		Patch_Mod(&ioprp_img, "CDVDFSV", dummy_irx, size_dummy_irx);
+		Patch_Mod(&ioprp_img, "CDVDFSV", cdvdfsv_irx, size_cdvdfsv_irx);
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
 
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
-
+	
 	// Reseting IOP.
 	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 	while (!Sync_Iop()){;}
@@ -239,7 +223,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	}
 
 	while (!Sync_Iop()) {;}
-
+	
 	SifExitIopHeap();
 	SifInitRpc(0);
 	SifInitIopHeap();
@@ -250,24 +234,25 @@ int New_Reset_Iop(const char *arg, int flag){
 	
 	if (GameMode == USB_MODE) {
 		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
-		LoadIRXfromKernel(usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 		delay(3);
+		//LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+		//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+		//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
 	}
 	else if (GameMode == ETH_MODE) {
-		LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-		LoadIRXfromKernel(ps2ip_irx, size_ps2ip_irx, 0, NULL);
-		LoadIRXfromKernel(ps2smap_irx, size_ps2smap_irx, g_ipconfig_len, g_ipconfig);
+		LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
 		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-		LoadIRXfromKernel(smbman_irx, size_smbman_irx, 0, NULL);
+		cdInit(CDVD_INIT_INIT);
 	}	
-	
-	LoadIRXfromKernel(isofs_irx, size_isofs_irx, 0, NULL);
+
 	FlushCache(0);	
-	
+		
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
-
+	
 	// we have 4 SifSetReg calls to skip in ELF's SifResetIop, not when we use it ourselves
 	if (set_reg_disabled)
 		set_reg_hook = 4;

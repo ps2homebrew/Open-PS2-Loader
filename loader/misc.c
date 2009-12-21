@@ -12,14 +12,8 @@
 extern void *cdvdman_irx;
 extern int size_cdvdman_irx;
 
-extern void *usbd_irx;
-extern int size_usbd_irx;
-
-extern void *smbman_irx;
-extern int size_smbman_irx;
-
-extern void *dummy_irx;
-extern int size_dummy_irx;
+extern void *cdvdfsv_irx;
+extern int size_cdvdfsv_irx;
 
 /*----------------------------------------------------------------------------------------*/
 /* Copy 'size' bytes of 'eedata' from EE to 'iopptr' in IOP.                              */
@@ -253,10 +247,10 @@ int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 			romdir_out->fileSize = size_cdvdman_irx;
 		}
 		else if (!strcmp(romdir_in->fileName, "CDVDFSV")) {
-			DIntr(); // get back dummy drv from kernel ram		
+			DIntr(); // get back cdvdfsv drv from kernel ram		
 			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), dummy_irx, size_dummy_irx);
-			romdir_out->fileSize = size_dummy_irx;
+			memcpy((void*)((u32)ioprp_img->data_out+offset_out), cdvdfsv_irx, size_cdvdfsv_irx);
+			romdir_out->fileSize = size_cdvdfsv_irx;
 			ee_kmode_exit();
 			EIntr();
 			

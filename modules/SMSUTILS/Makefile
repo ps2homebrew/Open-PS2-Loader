@@ -1,13 +1,15 @@
-IOP_BIN      = SMSUTILS.irx
-IOP_OBJS     = SMSUTILS.o
-IOP_CFLAGS  += -Wall -fno-builtin-printf
-IOP_LDFLAGS  = -Wl,-s
+
+IOP_BIN = SMSUTILS.irx
+IOP_OBJS = SMSUTILS.o
+
+IOP_INCS += -I$(PS2SDK)/iop/include
+IOP_CFLAGS += -Wall -fno-builtin
+IOP_LDFLAGS += -Wl,-s
 
 all: $(IOP_BIN)
 
 clean:
-	rm -f *.elf *.o *.a *.irx
+	-rm -f *.o *.irx
 
-include $(PS2SDKSRC)/Defs.make
-include $(PS2SDKSRC)/iop/Rules.make
-include $(PS2SDKSRC)/iop/Rules.release
+include $(PS2SDK)/Defs.make
+include Rules.make

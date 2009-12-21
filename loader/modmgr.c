@@ -19,32 +19,29 @@ int size_eesync_irx;
 void *cdvdman_irx;
 int size_cdvdman_irx;
 
+void *cdvdfsv_irx;
+int size_cdvdfsv_irx;
+
+void *cddev_irx;
+int size_cddev_irx;
+
 void *usbd_irx;
 int size_usbd_irx;
-
-void *usbhdfsd_irx;
-int size_usbhdfsd_irx;
-
-void *isofs_irx;
-int size_isofs_irx;
 
 void *ps2dev9_irx;
 int size_ps2dev9_irx;
 
-void *ps2ip_irx;
-int size_ps2ip_irx;
+void *smstcpip_irx;
+int size_smstcpip_irx;
 
-void *ps2smap_irx;
-int size_ps2smap_irx;
+void *smsmap_irx;
+int size_smsmap_irx;
 
 void *netlog_irx;
 int size_netlog_irx;
 
 void *smbman_irx;
 int size_smbman_irx;
-
-void *dummy_irx;
-int size_dummy_irx;
 
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
@@ -108,7 +105,7 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 	return 0;
 }
 
-#define IRX_NUM 12
+#define IRX_NUM 10
 
 //-------------------------------------------------------------- 
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
@@ -128,30 +125,26 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	n = 0;
 	size_imgdrv_irx = irxptr_tab[n++].irxsize; 
 	size_eesync_irx = irxptr_tab[n++].irxsize; 	
-	size_cdvdman_irx = irxptr_tab[n++].irxsize; 
+	size_cdvdman_irx = irxptr_tab[n++].irxsize;
+	size_cdvdfsv_irx = irxptr_tab[n++].irxsize;
+	size_cddev_irx = irxptr_tab[n++].irxsize;
 	size_usbd_irx = irxptr_tab[n++].irxsize;
-	size_usbhdfsd_irx = irxptr_tab[n++].irxsize;
-	size_isofs_irx = irxptr_tab[n++].irxsize;
-	size_ps2dev9_irx = irxptr_tab[n++].irxsize; 
-	size_ps2ip_irx = irxptr_tab[n++].irxsize;
-	size_ps2smap_irx = irxptr_tab[n++].irxsize;
+	size_ps2dev9_irx = irxptr_tab[n++].irxsize;
+	size_smstcpip_irx = irxptr_tab[n++].irxsize;
+	size_smsmap_irx = irxptr_tab[n++].irxsize;
 	size_netlog_irx = irxptr_tab[n++].irxsize;
-	size_smbman_irx = irxptr_tab[n++].irxsize;
-	size_dummy_irx = irxptr_tab[n++].irxsize;	
 			
 	n = 0;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
 	eesync_irx = (void *)irxptr_tab[n++].irxaddr;
 	cdvdman_irx = (void *)irxptr_tab[n++].irxaddr;
+	cdvdfsv_irx = (void *)irxptr_tab[n++].irxaddr;
+	cddev_irx = (void *)irxptr_tab[n++].irxaddr;
 	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
-	usbhdfsd_irx = (void *)irxptr_tab[n++].irxaddr;
-	isofs_irx = (void *)irxptr_tab[n++].irxaddr;
 	ps2dev9_irx = (void *)irxptr_tab[n++].irxaddr;
-	ps2ip_irx = (void *)irxptr_tab[n++].irxaddr;
-	ps2smap_irx = (void *)irxptr_tab[n++].irxaddr;
+	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
+	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
 	netlog_irx = (void *)irxptr_tab[n++].irxaddr;
-	smbman_irx = (void *)irxptr_tab[n++].irxaddr;
-	dummy_irx = (void *)irxptr_tab[n++].irxaddr;	
 }	
 
 // ------------------------------------------------------------------------

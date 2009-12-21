@@ -11,6 +11,9 @@
 #include "iopmgr.h"
 #include <syscallnr.h>
 
+extern void *cddev_irx;
+extern int size_cddev_irx;
+
 #define MAX_G_ARGS 15
 static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
@@ -113,7 +116,7 @@ static void t_loadElf(void)
 {
 	int i, r;
 	t_ExecData elf;
-	
+
     SifExitRpc();
 
     set_reg_disabled = 0;
@@ -123,13 +126,13 @@ static void t_loadElf(void)
 	iop_reboot_count = 1;
            
 	SifInitRpc(0);
-
-    cdInit(CDVD_INIT_INIT);
+	LoadFileInit();
+	LoadIRXfromKernel(cddev_irx, size_cddev_irx, 0, NULL);
 	
-	// replacing cdrom in elf path by iso
+	// replacing cdrom in elf path by cddev
 	if (strstr(g_argv[0], "cdrom")) {
 		u8 *ptr = (u8 *)g_argv[0];
-		strcpy(g_ElfPath, "iso");
+		strcpy(g_ElfPath, "cddev");
 		strcat(g_ElfPath, &ptr[5]);		
 	}
 	
@@ -155,14 +158,18 @@ static void t_loadElf(void)
 		LoadFileExit();		
 		SifExitRpc();
 
+		// replacing cddev in elf path by cdrom
+		if (strstr(g_ElfPath, "cddev"))
+			memcpy(g_ElfPath, "cdrom", 5);
+		
 		FlushCache(0);
 		FlushCache(2);
 		
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
 	}
-
+	
 	GS_BGCOLOUR = 0xffffff; // white screen: error
-	SleepThread();		
+	SleepThread();
 }
 
 // ------------------------------------------------------------------------

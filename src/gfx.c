@@ -513,6 +513,8 @@ void gfxRestoreConfig() {
 	
 	if (getConfigInt(&gConfig, "language", &gLanguageID))
 		setLanguage(gLanguageID);
+		
+	getConfigInt(&gConfig, "exitmode", &exit_mode);
 }
 
 void gfxStoreConfig() {
@@ -523,6 +525,7 @@ void gfxStoreConfig() {
 	setConfigColor(&gConfig, "bgcolor", default_bg_color);
 	setConfigColor(&gConfig, "textcolor", default_text_color);
 	setConfigInt(&gConfig, "language", gLanguageID);
+	setConfigInt(&gConfig, "exitmode", exit_mode);
 }
 
 void LoadResources() {

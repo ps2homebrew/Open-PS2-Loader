@@ -143,6 +143,7 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_MENU 13
 #define UICFG_BGCOL 14
 #define UICFG_TXTCOL 15
+#define UICFG_EXITTO 16
 
 #define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
@@ -161,7 +162,13 @@ struct UIItem diaUIConfig[] = {
 	
 	{UI_SPLITTER},
 	
+	{UI_LABEL, 0, NULL, {.label = {"Exit to", -1}}}, {UI_SPACER}, {UI_ENUM, UICFG_EXITTO, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
 	{UI_OK}, {UI_SPACER}, {UI_BUTTON, UICFG_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}}, 
+	
+	{UI_SPLITTER},
 	
 	// end of dialogue
 	{UI_TERMINATOR}
@@ -280,6 +287,13 @@ void showUIConfig() {
 		_l(_STR_DYNAMIC),
 		NULL
 	};
+	
+	const char* exitTypes[] = {
+		"Browser",
+		"mc0:/BOOT/BOOT.ELF",
+		"mc0:/APPS/BOOT.ELF",
+		NULL
+	};
 
 	// search for the theme index in the current theme list
 	size_t i;
@@ -295,6 +309,7 @@ void showUIConfig() {
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)theme_dir);
 	diaSetEnum(diaUIConfig, UICFG_LANG, getLanguageList());
 	diaSetEnum(diaUIConfig, UICFG_MENU, menuTypes);
+	diaSetEnum(diaUIConfig, UICFG_EXITTO, exitTypes);
 	
 	// and the current values
 	diaSetInt(diaUIConfig, UICFG_SCROLL, scroll_speed);
@@ -303,6 +318,7 @@ void showUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_MENU, dynamic_menu);
 	diaSetColour(diaUIConfig, UICFG_BGCOL, default_bg_color);
 	diaSetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
+	diaSetInt(diaUIConfig, UICFG_EXITTO, exit_mode);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -313,6 +329,7 @@ void showUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_MENU, &dynamic_menu);
 		diaGetColour(diaUIConfig, UICFG_BGCOL, default_bg_color);
 		diaGetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
+		diaGetInt(diaUIConfig, UICFG_EXITTO, &exit_mode);
 	
 		// update the value interpretation
 		setLanguage(gLanguageID);
@@ -614,11 +631,20 @@ void AltExecETHGameSelection(struct TMenuItem* self, int id) {
 // --------------------- Exit/Settings Menu item callbacks --------------------
 /// menu item selection callbacks
 void ExecExit(struct TMenuItem* self, int vorder) {
-	__asm__ __volatile__(
-		"	li $3, 0x04;"
-		"	syscall;"
-		"	nop;"
-	);
+
+	if(exit_mode==0){
+		__asm__ __volatile__(
+			"	li $3, 0x04;"
+			"	syscall;"
+			"	nop;"
+		);
+	}else if(exit_mode==1){
+		ExecElf("mc0:/BOOT/BOOT.ELF");
+		MsgBox("Error launching mc0:/BOOT/BOOT.ELF");
+	}else if(exit_mode==2){
+		ExecElf("mc0:/APPS/BOOT.ELF");
+		MsgBox("Error launching mc0:/APPS/BOOT.ELF");
+	}
 }
 
 void ChangeScrollSpeed() {
@@ -720,6 +746,8 @@ void init() {
 	gIPConfigChanged = 0;
 	// Default PC share name
 	strncpy(gPCShareName, "PS2SMB", 32);
+	//Default exit mode
+	exit_mode=0;
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;

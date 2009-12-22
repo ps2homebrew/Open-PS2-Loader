@@ -467,6 +467,65 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	ExecPS2((void *)eh->entry, 0, 3, argv);
 } 
 
+int ExecElf(char *path){
+	int fd, size, i;
+	void *buffer;
+	elf_header_t *eh;
+	elf_pheader_t *eph;
+	char *argv[1];
+	void *pdata;
+
+	if ((fd = fioOpen(path, O_RDONLY)) < 0) {
+		return -1;
+	}
+
+	size = fioLseek(fd, 0, SEEK_END);
+	if (!size) {
+		fioClose(fd);
+		return -1;
+	}
+	buffer=malloc(size);
+	eh = (elf_header_t *)buffer;
+
+	fioLseek(fd, 0, SEEK_SET);
+
+	fioRead(fd, buffer, size);
+	fioClose(fd);
+
+	/* Load the ELF into RAM.  */
+	if (_lw((u32)&eh->ident) != ELF_MAGIC) {
+		return -1;
+	}
+
+	eph = (elf_pheader_t *)(buffer + eh->phoff);
+
+	/* Scan through the ELF's program headers and copy them into RAM, then
+	   zero out any non-loaded regions.  */
+	for (i = 0; i < eh->phnum; i++) {
+		if (eph[i].type != ELF_PT_LOAD)
+			continue;
+
+		pdata = (void *)(buffer + eph[i].offset);
+		memcpy(eph[i].vaddr, pdata, eph[i].filesz);
+
+		if (eph[i].memsz > eph[i].filesz)
+			memset(eph[i].vaddr + eph[i].filesz, 0,
+					eph[i].memsz - eph[i].filesz);
+	}
+
+	/* Let's go.  */
+	argv[0] = path;
+
+	fioExit();
+
+	FlushCache(0);
+	FlushCache(2);
+
+	ExecPS2((void *)eh->entry, 0, 1, argv);
+	
+	return 0;
+}
+
 #define IRX_NUM 10
 
 //-------------------------------------------------------------- 

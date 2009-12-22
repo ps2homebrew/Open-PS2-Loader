@@ -201,6 +201,9 @@ int dynamic_menu;
 // 0,1,2 scrolling speed
 unsigned int scroll_speed;
 
+// Exit mode
+int exit_mode;
+
 // IP config
 
 int ps2_ip[4];
@@ -260,6 +263,7 @@ void delay(int count);
 void Start_LoadNetworkModules_Thread(void);
 void LoadUSBD();
 void LaunchGame(TGame *game, int mode, int compatmask);
+int ExecElf(char *path);
 void SendIrxKernelRAM(int mode);
 
 #define USB_MODE	0

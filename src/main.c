@@ -511,6 +511,26 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 	fioClose(fd);
 }
 
+void FindUSBPartition(){
+	int i, fd;
+	char path[64];
+	
+	snprintf(USB_prefix,8,"mass0:");
+	
+	for(i=0;i<5;i++){
+		snprintf(path, 64, "mass%d:/ul.cfg", i);
+		fd=fioOpen(path, O_RDONLY);
+		
+		if(fd>=0) {
+			snprintf(USB_prefix,8,"mass%d:",i);
+			fioClose(fd);
+			break;
+		}
+		fioClose(fd);
+	}
+	
+	return;
+}
 
 void ClearUSBSubMenu() {
 	ClearSubMenu(&usb_submenu, &usb_games_item);
@@ -523,7 +543,7 @@ void RefreshUSBGameList() {
 	}
 	  
 	usbdelay = 0;
-	RefreshGameList(&usbGameList, &usb_max_games, "mass:", &usb_submenu, &usb_games_item);
+	RefreshGameList(&usbGameList, &usb_max_games, USB_prefix, &usb_submenu, &usb_games_item);
 }
 
 // --------------------- USB Menu item callbacks --------------------
@@ -777,6 +797,8 @@ int main(void)
 	
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
+	
+	FindUSBPartition();
 
 	if (gNetAutostart != 0) {
 		Start_LoadNetworkModules_Thread();

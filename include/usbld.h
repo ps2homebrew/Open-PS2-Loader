@@ -22,6 +22,8 @@
 
 #define USBLD_VERSION "0.5"
 
+char USB_prefix[8];
+
 typedef
 struct TGame
 {

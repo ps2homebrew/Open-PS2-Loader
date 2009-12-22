@@ -1299,7 +1299,7 @@ int ShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 			float y = yfix2(75.0f + co * 25);
 
 			DrawQuad(gsGlobal, 75.0f, y, 275.0f, y, 75.0f, y + 20, 275.0f, y + 20, z, White);
-			DrawQuad(gsGlobal, 79.0f, y + 4, 269.0f, y + 4, 79.0f, y + 16, 269.0f, y + 16, z + 1, dcol);
+			DrawQuad(gsGlobal, 79.0f, y + 4, 79 + (190.0f*(cc[co]*100/255)/100), y + 4, 79.0f, y + 16, 79 + (190.0f*(cc[co]*100/255)/100), y + 16, z + 1, dcol);
 
 			if (selc == co)
 				// draw <> in front of the bar

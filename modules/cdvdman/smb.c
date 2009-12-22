@@ -492,6 +492,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		RR->MaxCountLow = nbytes;
 		RR->MinCount = 0;
 		RR->ByteCount = 0;
+		RR->OffsetHigh = 0;
 
 		plwip_send(main_socket, SMB_buf, 63, 0); 
 		rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);

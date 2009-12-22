@@ -363,7 +363,7 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 
 		int j, offset = 44;
 	
-		fd = fioDopen("mass:");
+		fd = fioDopen(USB_prefix);
 		if (fd < 0) {
 			init_scr();
 			scr_clear();

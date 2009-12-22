@@ -28,11 +28,15 @@ static char g_pc_share[33]="PS2SMB";
 
 int smbman_initdev(void);
 
+struct irx_export_table _exp_smbman;
+
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
 {
 	char tree_str[255];
 
+	RegisterLibraryEntries(&_exp_smbman);
+	
     // Open the Connection with SMB server
    	smb_NegociateProtocol(g_pc_ip, g_pc_port, "NT LM 0.12"); 
 
@@ -46,6 +50,14 @@ int _start(int argc, char** argv)
     smbman_initdev();
 
 	return MODULE_RESIDENT_END;
+}
+
+//-------------------------------------------------------------------------
+int _shutdown(void)
+{
+	smb_Disconnect();
+
+	return 0;
 }
 
 //-------------------------------------------------------------- 
@@ -140,8 +152,6 @@ int smbman_initdev(void)
 //-------------------------------------------------------------- 
 int smb_deinit(iop_device_t *dev)
 {
-	smb_Disconnect();
-
 	DeleteSema(smbman_io_sema);
 
 	return 0;

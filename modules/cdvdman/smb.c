@@ -512,3 +512,11 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 
 	return 1;	
 }
+
+//-------------------------------------------------------------------------
+int smb_Disconnect(void)
+{
+	plwip_close(main_socket);
+
+	return 1;
+}

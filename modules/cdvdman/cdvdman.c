@@ -2924,3 +2924,13 @@ int _start(int argc, char **argv)
 	
     return MODULE_RESIDENT_END;
 }
+
+//-------------------------------------------------------------------------
+int _shutdown(void)
+{
+#ifdef SMB_DRIVER
+	smb_Disconnect();
+#endif
+
+	return 0;
+}

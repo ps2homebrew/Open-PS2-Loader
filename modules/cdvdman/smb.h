@@ -275,6 +275,7 @@ int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect); 
 int smb_SessionSetupTreeConnect(char *User, char *share_name); 		// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_OpenAndX(char *filename, u16 *FID); 						// process a Open AndX message
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
+int smb_Disconnect(void);
 
 #define MAX_SMB_BUF 		4096 // must fit on u16 !!! 
 #define MAX_SMB_SECTORS 	2

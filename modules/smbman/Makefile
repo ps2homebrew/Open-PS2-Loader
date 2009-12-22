@@ -5,7 +5,7 @@
 #  ------------------------------------------------------------------------
 
 IOP_BIN = smbman.irx
-IOP_OBJS = smbman.o smb.o imports.o
+IOP_OBJS = smbman.o smb.o imports.o exports.o
 
 ifeq ($(DEBUG),1)
 DEBUG_FLAGS = -DDEBUG

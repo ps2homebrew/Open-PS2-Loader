@@ -8,7 +8,7 @@ int _dummy(void) {
 DECLARE_EXPORT_TABLE(cdvdman, 1, 1)
 	DECLARE_EXPORT(_start)
 	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_shutdown)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(sceCdInit)
 	DECLARE_EXPORT(sceCdStandby)

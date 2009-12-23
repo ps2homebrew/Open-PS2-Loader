@@ -20,7 +20,7 @@
 
 #include <debug.h>
 
-#define USBLD_VERSION "0.5"
+#define USBLD_VERSION "0.6"
 
 char USB_prefix[8];
 

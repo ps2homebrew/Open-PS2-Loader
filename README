@@ -28,6 +28,11 @@ How to use
 
 First, you need an USB device compatible with PS2/PS3 formatted in FAT32
 (only if you want to load games from USB).
+For using games directly from USB, game parts file must be perfectly
+defragmented, either file by file, either by whole drive.
+You can use this great software, Power Defragmenter:
+http://my.opera.com/rejzor/blog/power-defragmenter-3-0-released
+
 For loading games by SMB protocol you need to share a folder called PS2SMB
 (it can be changed) make sure that it has permissions for anyone to access.
 The games have to be in USB Advance/Extreme format. There are some programs

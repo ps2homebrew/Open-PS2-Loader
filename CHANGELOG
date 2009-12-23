@@ -15,6 +15,7 @@ Version 0.6
 - Added compatibility for DVD9 layer1
 - Improved overall speed for both SMB/USB
 - Support for more embedded NAS devices
+- Support for multiple partitions
 
 Version 0.5
 -------------------------------------------------

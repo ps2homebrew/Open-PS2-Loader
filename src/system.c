@@ -197,7 +197,7 @@ void th_LoadNetworkModules(void *args){
 	
 	int ret, id;
 	
-	gNetworkStartup = 4;
+	gNetworkStartup = 5;
 	
 	set_ipconfig();
 	
@@ -207,13 +207,15 @@ void th_LoadNetworkModules(void *args){
 		goto fini;
 	}
 	
-	gNetworkStartup = 3;
+	gNetworkStartup = 4;
 
 	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {
 		gNetworkStartup = -1;
 		goto fini;
 	}
+	
+	gNetworkStartup = 3;
 	
 	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {

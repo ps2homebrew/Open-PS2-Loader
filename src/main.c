@@ -22,6 +22,23 @@ extern int size_ps2smap_irx;
 extern void *smbman_irx;
 extern int size_smbman_irx;
 
+extern void *ps2dev9_irx;
+extern int size_ps2dev9_irx;
+
+extern void *smsutils_irx;
+extern int size_smsutils_irx;
+
+extern void *smstcpip_irx;
+extern int size_smstcpip_irx;
+
+extern void *smsmap_irx;
+extern int size_smsmap_irx;
+#define IPCONFIG_MAX_LEN        64
+char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+int g_ipconfig_len;
+
+extern void set_ipconfig(void);
+
 // language id
 int gLanguageID = 0;
 
@@ -601,10 +618,20 @@ void RefreshETHGameList() {
 }
 
 // --------------------- Network Menu item callbacks --------------------
+// Forward decl.
+void LoadNetworkModules(void);
+
+void StartNetwork() {
+	if (0) // left here if we find a way to let it work without issues (see bug no. 16)
+		Start_LoadNetworkModules_Thread();
+	else
+		LoadNetworkModules();
+}
+
 void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1) {
 		if (!eth_inited) {
-			Start_LoadNetworkModules_Thread();
+			StartNetwork();
 			eth_inited = 1;
 			ClearETHSubMenu();
 		}
@@ -816,6 +843,66 @@ int netLoadInfo() {
 	return 0;
 }
 
+void netLoadDisplay() {
+	DrawBackground();
+	netLoadInfo();
+	Flip();
+}
+
+void LoadNetworkModules() {
+	
+	int ret, id;
+	
+	gNetworkStartup = 5;
+	netLoadDisplay();
+	
+	
+	set_ipconfig();
+	
+	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
+		return;
+	}
+	
+	gNetworkStartup = 4;
+	netLoadDisplay();
+	
+	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
+		return;
+	}
+	gNetworkStartup = 3;
+	netLoadDisplay();
+	
+	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
+		return;
+	}
+	
+	gNetworkStartup = 2;
+	netLoadDisplay();
+	
+	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);	
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
+		return;
+	}
+	
+	gNetworkStartup = 1;
+	netLoadDisplay();
+	
+	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gNetworkStartup = -1;
+		return;
+	}
+
+	gNetworkStartup = 0; // ok, all loaded
+}
+
 // --------------------- Main --------------------
 int main(void)
 {
@@ -828,8 +915,11 @@ int main(void)
 	
 	FindUSBPartition();
 
-	if (gNetAutostart != 0) {
-		Start_LoadNetworkModules_Thread();
+	ReadPad();
+	
+	// If automatic network startup is selected, start it now
+	if ((!GetKeyOn(KEY_L1)) && (gNetAutostart != 0)) {
+		StartNetwork();
 		eth_inited = 1;
 	}
 	

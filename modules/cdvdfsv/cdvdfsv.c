@@ -98,7 +98,7 @@ int sceCdStPause(void);														// #67
 int sceCdStResume(void); 													// #68
 int sceCdMmode(int mode); 													// #75
 int sceCdStSeekF(u32 lsn); 													// #77
-int sceCdReadDiskID(u32 *id);												// #79
+int sceCdReadDiskID(void *DiskID);											// #79
 int sceCdReadGUID(void *GUID);												// #80
 int sceCdSetTimeout(int param, int timeout);								// #81
 int sceCdReadModelID(void *ModelID);										// #82
@@ -737,7 +737,11 @@ void *rpcNCmd_cdreadchain(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdreadDiskID(u32 fno, void *buf, int size)
 {
-	*(int *)buf = sceCdReadDiskID((u32 *)buf);
+	u8 *p = (u8 *)buf;
+
+	mips_memset(p, 0, 10);
+	*(int *)buf = sceCdReadDiskID(&p[4]);
+	
 	return buf;	
 }
 

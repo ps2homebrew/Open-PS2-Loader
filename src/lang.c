@@ -48,6 +48,7 @@ char *english[] = {
 	"Fast", // _STR_FAST
 	"Static", // _STR_STATIC
 	"Dynamic", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE
 };
 
 char *czech[] = {
@@ -95,6 +96,7 @@ char *czech[] = {
 	"Rychle", // _STR_FAST
 	"Staticke", // _STR_STATIC
 	"Dynamicke", // _STR_DYNAMIC
+	"Vychozi nabidka", // _STR_DEF_DEVICE
 };
 
 char *spanish[] = {
@@ -142,6 +144,7 @@ char *spanish[] = {
 	"Rбpido", // _STR_FAST
 	"Estбtico", // _STR_STATIC
 	"Dinбmico", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE
 };
 
 char *french[] = {
@@ -189,6 +192,7 @@ char *french[] = {
 	"Rapide", // _STR_FAST
 	"Statique", // _STR_STATIC
 	"Dynamique", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *german[] = {
@@ -236,6 +240,7 @@ char *german[] = {
 	"Schnell", // _STR_FAST
 	"Statisch", // _STR_STATIC
 	"Dymanisch", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *portuguese[] = {
@@ -283,6 +288,7 @@ char *portuguese[] = {
 	"Rбpido", // _STR_FAST
 	"Estбtico", // _STR_STATIC
 	"Dinвmico", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *norwegian[] = {
@@ -330,6 +336,7 @@ char *norwegian[] = {
 	"Raskt", // _STR_FAST
 	"Statisk", // _STR_STATIC
 	"Dynamisk", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *turkish[] = {
@@ -377,6 +384,7 @@ char *turkish[] = {
 	"Hizli", // _STR_FAST
 	"Sabit", // _STR_STATIC
 	"Hareketli", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *polish[] = {
@@ -424,6 +432,7 @@ char *polish[] = {
 	"Szybko", // _STR_FAST
 	"Statycznie", // _STR_STATIC
 	"Dynamicznie", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *russian[] = {
@@ -471,6 +480,7 @@ char *russian[] = {
 	"Быстрый", // _STR_FAST
 	"Статическое", // _STR_STATIC
 	"Динамическое", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *indonesian[] = {
@@ -518,6 +528,7 @@ char *indonesian[] = {
 	"Cepat", // _STR_FAST
 	"Statis", // _STR_STATIC
 	"Dinamis", // _STR_DYNAMIC
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 char *bulgarian[] = {
@@ -565,6 +576,7 @@ char *bulgarian[] = {
 	"Много бързо",
 	"Статично",
 	"Динамично",
+	"Default menu", // _STR_DEF_DEVICE	
 };
 
 

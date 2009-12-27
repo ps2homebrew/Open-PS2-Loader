@@ -47,6 +47,7 @@
 #define _STR_FAST 41
 #define _STR_STATIC 42
 #define _STR_DYNAMIC 43
+#define _STR_DEFDEVICE 44
 
 
 // Language ID's

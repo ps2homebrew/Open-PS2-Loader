@@ -204,6 +204,9 @@ unsigned int scroll_speed;
 // Exit mode
 int exit_mode;
 
+// Default device
+int default_device;
+
 // IP config
 
 int ps2_ip[4];

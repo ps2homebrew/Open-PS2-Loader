@@ -161,6 +161,7 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_BGCOL 14
 #define UICFG_TXTCOL 15
 #define UICFG_EXITTO 16
+#define UICFG_DEFDEVICE 17
 
 #define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
@@ -171,6 +172,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, UICFG_LANG,  NULL,{.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, UICFG_MENU, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, UICFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -312,6 +314,14 @@ void showUIConfig() {
 		NULL
 	};
 
+	const char* deviceNames[] = {
+		_l(_STR_USB_GAMES),
+		_l(_STR_NET_GAMES),
+		_l(_STR_HDD_GAMES),
+		NULL
+	};
+
+
 	// search for the theme index in the current theme list
 	size_t i;
 	size_t themeid = 0;
@@ -327,6 +337,7 @@ void showUIConfig() {
 	diaSetEnum(diaUIConfig, UICFG_LANG, getLanguageList());
 	diaSetEnum(diaUIConfig, UICFG_MENU, menuTypes);
 	diaSetEnum(diaUIConfig, UICFG_EXITTO, exitTypes);
+	diaSetEnum(diaUIConfig, UICFG_DEFDEVICE, deviceNames);
 	
 	// and the current values
 	diaSetInt(diaUIConfig, UICFG_SCROLL, scroll_speed);
@@ -336,6 +347,7 @@ void showUIConfig() {
 	diaSetColour(diaUIConfig, UICFG_BGCOL, default_bg_color);
 	diaSetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 	diaSetInt(diaUIConfig, UICFG_EXITTO, exit_mode);
+	diaSetInt(diaUIConfig, UICFG_DEFDEVICE, default_device);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -347,6 +359,7 @@ void showUIConfig() {
 		diaGetColour(diaUIConfig, UICFG_BGCOL, default_bg_color);
 		diaGetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 		diaGetInt(diaUIConfig, UICFG_EXITTO, &exit_mode);
+		diaGetInt(diaUIConfig, UICFG_DEFDEVICE, &default_device);
 	
 		// update the value interpretation
 		setLanguage(gLanguageID);
@@ -775,6 +788,8 @@ void init() {
 	strncpy(gPCShareName, "PS2SMB", 32);
 	//Default exit mode
 	exit_mode=0;
+	// default device USB
+	default_device = 0;
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;
@@ -810,7 +825,19 @@ void init() {
 	InitMenuItems();
 	
 	// first column is usb games
-	MenuSetSelectedItem(&usb_games_item);
+	switch (default_device) {
+		case 1:	MenuSetSelectedItem(&eth_games_item);
+			break;
+		case 2:	MenuSetSelectedItem(&hdd_games_item);
+			break;
+		case 0:
+		default:
+			MenuSetSelectedItem(&usb_games_item);
+	}
+	
+	
+	
+	
 	
 	StartPad();
 

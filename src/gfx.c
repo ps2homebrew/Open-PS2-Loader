@@ -515,6 +515,7 @@ void gfxRestoreConfig() {
 		setLanguage(gLanguageID);
 		
 	getConfigInt(&gConfig, "exitmode", &exit_mode);
+	getConfigInt(&gConfig, "default_device", &default_device);
 }
 
 void gfxStoreConfig() {
@@ -526,6 +527,7 @@ void gfxStoreConfig() {
 	setConfigColor(&gConfig, "textcolor", default_text_color);
 	setConfigInt(&gConfig, "language", gLanguageID);
 	setConfigInt(&gConfig, "exitmode", exit_mode);
+	setConfigInt(&gConfig, "default_device", default_device);
 }
 
 void LoadResources() {

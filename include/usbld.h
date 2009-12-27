@@ -265,6 +265,7 @@ void Reset();
 void delay(int count);
 void Start_LoadNetworkModules_Thread(void);
 void LoadUSBD();
+int getDiscID(void *discID);
 void LaunchGame(TGame *game, int mode, int compatmask);
 int ExecElf(char *path);
 void SendIrxKernelRAM(int mode);

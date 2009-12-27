@@ -65,6 +65,8 @@ static int g_part_start[ISO_MAX_PARTS] = {
 	0
 }; 
 
+static char g_DiskID[] = "B00BS";
+
 #ifdef SMB_DRIVER
 static char g_pc_ip[]="xxx.xxx.xxx.xxx";
 static int g_pc_port = 445; // &g_pc_ip + 16
@@ -279,7 +281,7 @@ int sceCdRM(char *m, u32 *stat);											// #64
 int sceCdStPause(void);														// #67
 int sceCdStResume(void); 													// #68
 int sceCdStSeekF(u32 lsn); 													// #77
-int sceCdReadDiskID(u32 *id);												// #79
+int sceCdReadDiskID(void *DiskID);											// #79
 int sceCdReadGUID(void *GUID);												// #80
 int sceCdReadModelID(void *ModelID);										// #82
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); 					// #83
@@ -292,9 +294,6 @@ void fs_init(void);
 void cdvdman_cdinit();
 int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf);
 int cdvdman_readMechaconVersion(char *mname, u32 *stat);
-int cdvdman_getID(int mode, u8 *buf);
-int cdvdman_getdecflag0(void);
-int cdvdman_getdecflag1(void);
 int cdvdman_readID(int mode, u8 *buf);
 int skipmod_check(const char *filename);
 FHANDLE *cdvdman_getfilefreeslot(void);
@@ -404,6 +403,7 @@ int devctl_dummy2(void *args, void *buf);
 int devctl_retonly(void *args, void *buf);
 int devctl_cdreadclock(void *args, void *buf);
 int devctl_cdreadGUID(void *args, void *buf);
+int devctl_cdreadDiskID(void *args, void *buf);
 int devctl_cdgetdisktype(void *args, void *buf);
 int devctl_cdgeterror(void *args, void *buf);
 int devctl_cdtrayreq(void *args, void *buf);
@@ -438,7 +438,7 @@ void *devctl_tab[134] = {
 	(void *)devctl_dummy,
 	(void *)devctl_dummy,
 	(void *)devctl_cdreadGUID,
-	(void *)devctl_dummy,
+	(void *)devctl_cdreadDiskID,
 	(void *)devctl_cdgetdisktype,
 	(void *)devctl_cdgeterror,
 	(void *)devctl_cdtrayreq,
@@ -1838,10 +1838,10 @@ int sceCdStSeekF(u32 lsn)
 }
 
 //-------------------------------------------------------------------------
-int sceCdReadDiskID(u32 *id)
+int sceCdReadDiskID(void *DiskID)
 {
-	*((u16 *)id) = (u16)0xadde;
-	
+	mips_memcpy(DiskID, g_DiskID, 5);
+
 	return 1;
 }
 
@@ -1871,109 +1871,27 @@ int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer)
 }
 
 //-------------------------------------------------------------- 
-int cdvdman_getID(int mode, u8 *buf)
-{
-	u8 lbuf1[128];
-	u8 lbuf2[8];
-	u32 chksum = 0;
-	int i, j;
-
-	vu8 *reg = (vu8 *)0xbfbf0000;
-
-	for (j=0; j<32; j++) {
-		for (i=0; i<4; i++) {
-			lbuf1[j+i] = *reg;
-			lbuf2[i] = *reg;
-			reg++;
-		}
-		chksum += *(u32 *)&lbuf2[0];
-	}
-
-	for ( ; j<0x4000; j++) {
-		for (i=0; i<4; i++) {
-			lbuf2[i] = *reg;
-			reg++;
-		}
-		chksum += *(u32 *)&lbuf2[0];
-	}
-
-	if (chksum)
-		return 0;
-
-	if (mode == 0) { // GUID
-		*(u32 *)&buf[0] = *(u32 *)&lbuf1[8];
-		*(u32 *)&buf[4] = *(u32 *)&lbuf1[12];
-	}
-	else // ModelID
-		*(u32 *)&buf[0] = *(u32 *)&lbuf1[44];
-
-	return 1;
-}
-
-//-------------------------------------------------------------- 
-int cdvdman_getdecflag0(void)
-{
-	u16 *p;
-	p = (u16 *)QueryBootMode(6);
-	if (p) {
-		if ((*p & -4) == 0x60)
-			return 1;
-	}
-	return 0;
-}
-
-//-------------------------------------------------------------- 
-int cdvdman_getdecflag1(void)
-{
-	int *p;
-	p = (int *)QueryBootMode(6);
-	return (((u32)p < 1) ? 1 : 0);
-}
-
-//-------------------------------------------------------------- 
 int cdvdman_readID(int mode, u8 *buf)
 {
 	u8 lbuf[16];
 	int stat;
 	int r;
-	
-	if (cdvdman_getdecflag0()) {	
-		r = cdvdman_getID(mode, buf);
-		if ((r == 1) && (mode == 1)) { // ModelID
-			u32 *ModelID = (u32 *)&buf[0];
-			if (*ModelID == -1)
-				*ModelID = 0x001a0002;
-		}
+
+	r = sceCdRI(lbuf, &stat);
+	if ((r == 0) || (stat))
+		return 0;
+
+	if (mode == 0) { // GUID
+		u32 *GUID0 = (u32 *)&buf[0];
+		u32 *GUID1 = (u32 *)&buf[4];
+		*GUID0 = lbuf[0] | 0x08004600;
+		*GUID1 = *(u32 *)&lbuf[4];
 	}
-	else {
-		if (cdvdman_getdecflag1()) {
-			r = sceCdRI(lbuf, &stat);
-			if ((r == 0) || (stat))
-				return 0;
-		}
-		else {
-			if ((cdvdman_sysclock.lo == 0) && (cdvdman_sysclock.hi == 0)) {
-				iop_sys_clock_t sysclock;
-				GetSystemTime(&sysclock);
-				cdvdman_sysclock.lo = sysclock.lo;
-				cdvdman_sysclock.hi = sysclock.hi;
-			}
-			*(u32 *)&lbuf[0] = cdvdman_sysclock.lo;
-			*(u32 *)&lbuf[4] = cdvdman_sysclock.hi;
-		}
-		
-		if (mode == 0) { // GUID
-			u32 *GUID0 = (u32 *)&buf[0];
-			u32 *GUID1 = (u32 *)&buf[4];
-			*GUID0 = lbuf[0] | 0x08004600;
-			*GUID1 = *(u32 *)&lbuf[4];
-		}
-		else { // ModelID
-			u32 *ModelID = (u32 *)&buf[0];
-			*ModelID = (*(u32 *)&lbuf[0]) >> 8;
-		}
+	else { // ModelID
+		u32 *ModelID = (u32 *)&buf[0];
+		*ModelID = (*(u32 *)&lbuf[0]) >> 8;
 	}
-	
+
 	return 1;
 }
 
@@ -2399,6 +2317,13 @@ int devctl_cdreadclock(void *args, void *buf)
 int devctl_cdreadGUID(void *args, void *buf)
 {
 	sceCdReadGUID(buf);
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int devctl_cdreadDiskID(void *args, void *buf)
+{
+	sceCdReadDiskID(buf);
 	return 0;
 }
 

@@ -54,6 +54,9 @@ extern int size_netlog_irx;
 extern void *smbman_irx;
 extern int size_smbman_irx;
 
+extern void *discid_irx;
+extern int size_discid_irx;
+
 extern void *loader_elf;
 extern int size_loader_elf;
 
@@ -125,6 +128,9 @@ void Reset()
 	// apply sbv patches
     sbv_patch_enable_lmb();
     sbv_patch_disable_prefix_check();
+    
+    int ret;
+    SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
 }
 
 void delay(int count) {
@@ -317,6 +323,20 @@ unsigned int crc32(char *string)
     return crc;
 }
 
+int getDiscID(void *discID)
+{
+	int fd;
+
+	fd = fioOpen("discID:", O_RDONLY);
+	if (fd < 0)
+		return fd;
+	
+	fioRead(fd, discID, 5);
+	fioClose(fd);
+
+	return 1;	
+}
+
 void LaunchGame(TGame *game, int mode, int compatmask)
 {
 	u8 *boot_elf = NULL;
@@ -332,7 +352,7 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 	char *mode_str = NULL;
 	char partname[64];
 	int fd, r;
-	
+		
 	sprintf(filename,"%s",game->Image+3);
 	
 	memset(gamename, 0, 33);

@@ -58,11 +58,14 @@
 
 #include "smsutils.h"
 
+#include "thbase.h"
+
 #if LWIP_TCP
 
 /* Incremented every coarse grained timer shot
    (typically every 500 ms, determined by TCP_COARSE_TIMEOUT). */
 u32_t tcp_ticks;
+
 const u8_t tcp_backoff[13] =
     { 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7};
 
@@ -97,7 +100,7 @@ tcp_init(void)
   /* initialize timer */
   tcp_ticks = 0;
   tcp_timer = 0;
-  
+
 }
 
 /*
@@ -476,7 +479,9 @@ tcp_new_port(void)
   static u16_t port = TCP_LOCAL_PORT_RANGE_START;
   // randomize the port value a bit to avoid TCP conflicts
   // on lost connections
-  port += tcp_ticks % 100; 
+  iop_sys_clock_t tme;
+  GetSystemTime(&tme);
+  port += (tme.lo) % 8192; 
   
  again:
   if (++port > TCP_LOCAL_PORT_RANGE_END) {

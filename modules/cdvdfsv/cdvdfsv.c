@@ -625,7 +625,7 @@ void *cbrpc_cddiskready(u32 fno, void *buf, int size)
 {	// CD Disk Ready RPC callback
 	
 	if (*(int *)buf == 0)
-		sceCdDiskReady(0);
+		*(int *)buf = sceCdDiskReady(0);
 	else
 		*(int *)buf = sceCdDiskReady(1);
 	

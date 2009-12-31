@@ -187,7 +187,7 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 		
 	fh = smbman_getfilefreeslot();
 	if (fh) {
-		r = smb_NTCreateAndX(filename, &smb_fid, &filesize);
+		r = smb_OpenAndX(filename, &smb_fid, &filesize);
 		if (r == 1) {
 			f->privdata = fh;
 			fh->f = f;

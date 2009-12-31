@@ -179,6 +179,7 @@ typedef struct {
 	u32 MaxBufferSize;
 	u32 MaxMpxCount;
 	u32 SessionKey;
+	u32 StringsCF;
 	u8 PrimaryDomainServerName[32];
 } server_specs_t;
 
@@ -320,6 +321,11 @@ conn_open:
 	if (NPRsp->smbWordcount	!= 17)
 		goto conn_close;
 
+	if (NPRsp->Capabilities & SERVER_CAP_UNICODE)
+		server_specs.StringsCF = 2;
+	else
+		server_specs.StringsCF = 1;
+
 	// copy to global struct to keep needed information for further communication
 	server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
 	server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
@@ -339,14 +345,18 @@ conn_close:
 int smb_SessionSetupTreeConnect(char *User, char *share_name)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
-	register int i, offset, ss_size;
+	register int i, offset, ss_size, CF;
 
 	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
 
 	SSR->smbH.Magic = SMB_MAGIC;
 	SSR->smbH.Cmd = SMB_COM_SESSION_SETUP_ANDX;
 	SSR->smbH.Flags = SMB_FLAGS_CASELESS_PATHNAMES;
-	SSR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_UNICODE_STRING | SMB_FLAGS2_32BIT_STATUS;
+	SSR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
+	if (CF == 2)
+		SSR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;	
 	SSR->smbWordcount = 13;
 	SSR->MaxBufferSize = (u16)server_specs.MaxBufferSize;
 	SSR->MaxMpxCount = ((u16)server_specs.MaxMpxCount >= 2) ? 2 : (u16)server_specs.MaxMpxCount;
@@ -354,24 +364,22 @@ int smb_SessionSetupTreeConnect(char *User, char *share_name)
 	SSR->SessionKey = server_specs.SessionKey;
 	SSR->Capabilities = CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32;
 
-	// Fill ByteField as Unicode
+	// Fill ByteField
 	offset = 1;								// skip AnsiPassword
 	for (i = 0; i < strlen(User); i++) {
 		SSR->ByteField[offset] = User[i]; 	// add User name
-		offset += 2;
+		offset += CF;
 	}
-	offset += 2;							// null terminator
+	offset += CF;							// null terminator
 
-	for (i = 0; server_specs.PrimaryDomainServerName[i] != 0; i+=2) {
+	for (i = 0; server_specs.PrimaryDomainServerName[i] != 0; i+=CF) {
 		SSR->ByteField[offset] = server_specs.PrimaryDomainServerName[i]; // PrimaryDomain, acquired from Negociate Protocol Response Datas
-		offset += 2;
+		offset += CF;
 	}
-	offset += 2;							// null terminator
+	offset += CF;							// null terminator
 
-	mips_memcpy(&SSR->ByteField[offset], "S\0M\0B\0\0\0", 8);	// NativeOS	
-	offset += 8;	
-	mips_memcpy(&SSR->ByteField[offset], "S\0M\0B\0\0\0", 8); 	// NativeLanMan
-	offset += 8;	
+	for (i = 0; i < (CF << 1); i++)
+		SSR->ByteField[offset++] = 0;		// NativeOS, NativeLanMan	
 
 	SSR->ByteCount = offset;
 
@@ -387,9 +395,9 @@ int smb_SessionSetupTreeConnect(char *User, char *share_name)
 	offset = 1;
 	for (i = 0; i < strlen(share_name); i++) {
 		TCR->ByteField[offset] = share_name[i]; 	// add Share name
-		offset += 2;
+		offset += CF;
 	}
-	offset += 2;									// null terminator
+	offset += CF;									// null terminator
 
 	mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); 	// Service, any type of device
 	offset += 6;

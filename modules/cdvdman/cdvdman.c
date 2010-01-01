@@ -9,6 +9,7 @@
 #include "mass_stor.h"
 #include "dev9.h"
 #include "smb.h"
+#include "atad.h"
 
 #include <loadcore.h>
 #include <stdio.h>
@@ -37,13 +38,15 @@ static char skipmod_tab[] = "USBD.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";
 #ifdef SMB_DRIVER
 static char skipmod_tab[] = "DEV9.IRX\nSMAP.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";
 #endif
+#ifdef HDD_DRIVER
+static char skipmod_tab[] = "DEV9.IRX\nATAD.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";
+#endif
 
 //------------------ Patch Zone ----------------------
-#ifdef USB_DRIVER
-static char g_tag[] = "######    GAMESETTINGS    ######";
-#endif
 #ifdef SMB_DRIVER
 static char g_ISO_name[] = "######    GAMESETTINGS    ######";
+#else
+static char g_tag[] = "######    GAMESETTINGS    ######";
 #endif
 static char g_ISO_parts=0x69;
 static char g_ISO_media=0x69;
@@ -84,6 +87,10 @@ struct irx_export_table _exp_cdvdman;
 struct irx_export_table _exp_cdvdstm;
 #ifdef SMB_DRIVER
 struct irx_export_table _exp_dev9;
+#endif
+#ifdef HDD_DRIVER
+struct irx_export_table _exp_dev9;
+struct irx_export_table _exp_atad;
 #endif
 struct irx_export_table _exp_smsutils;
 
@@ -304,9 +311,12 @@ int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
 int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
 int cdvdman_cb_event(int reason);
 unsigned int event_alarm_cb(void *args);
+void cdvdman_poweroff_Thread(void *args);
+static int cdrom_intr_handler(void *args);
 void cdvdman_startThreads(void);
 void cdvdman_create_semaphores(void);
 void cdvdman_initdev(void);
+void cdvdman_get_part_specs(u32 lsn);
 
 // !!! usbd exports functions pointers !!!
 int (*pUsbRegisterDriver)(UsbDriver *driver); 															// #4
@@ -568,7 +578,10 @@ layer_info_t layer_info[2];
 
 cdvdman_status_t cdvdman_stat;
 static void *user_cb;
+
+#ifndef HDD_DRIVER
 static int cdvdman_layer1start = 0;
+#endif
 
 static int cdrom_io_sema;
 static int cdvdman_cdreadsema;
@@ -576,6 +589,7 @@ static int cdvdman_searchfilesema;
 
 #ifndef ALT_READ_CORE
 static int cdvdman_lockreadsema;
+static int cdvdman_poffsema;
 static int sync_flag;
 #endif
 
@@ -597,6 +611,20 @@ static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE + 2*2048] __attribute__((aligned(64)
 iop_sys_clock_t cdvdman_sysclock;
 
 static int fs_inited = 0;
+
+#ifdef HDD_DRIVER
+int atad_inited = 0;
+static apa_header apaHeader;
+static u32 apaHeader_lba = 0;
+
+typedef struct {
+	u32 part_offset; 	// in MB
+	u32 data_start; 	// in sectors
+	u32 part_size; 		// in KB
+} cdvdman_partspecs_t;
+
+cdvdman_partspecs_t cdvdman_partspecs;
+#endif
 
 //-------------------------------------------------------------------------
 #ifdef ALT_READ_CORE
@@ -1132,6 +1160,17 @@ void fs_init(void)
 
 	// DVD DL support
 	if (!g_gamesetting_disable_DVDDL) {
+		#ifdef HDD_DRIVER
+		int on_dual;
+		u32 layer1_start;
+		sceCdReadDvdDualInfo(&on_dual, &layer1_start);
+		if (on_dual) {
+			sceCdRead0(layer1_start + 16, 1, cdvdman_buf, NULL);
+			tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
+			layer_info[1].rootDirtocLBA = layer1_start + tocEntryPointer->fileLBA;
+			layer_info[1].rootDirtocLength = tocEntryPointer->length;			
+		}
+		#else
 		u32 volSize = (*((u32 *)&cdvdman_buf[0x50]));
 		sceCdRead0(volSize, 1, cdvdman_buf, NULL);
 		if ((cdvdman_buf[0x00] == 1) && (!strncmp(&cdvdman_buf[0x01], "CD001", 5))) {
@@ -1139,7 +1178,8 @@ void fs_init(void)
 			tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
 			layer_info[1].rootDirtocLBA = cdvdman_layer1start + tocEntryPointer->fileLBA;
 			layer_info[1].rootDirtocLength = tocEntryPointer->length;			
-		}		
+		}
+		#endif		
 	}
 
 	fs_inited = 1;
@@ -1354,10 +1394,14 @@ int sceCdGetDiskType(void)
 #ifdef NETLOG_DEBUG
 	pNetlogSend("sceCdGetdiskType\n");
 #endif
-	
+
 	cdvdman_stat.err = CDVD_ERR_NO;
-		
+
+#ifdef HDD_DRIVER
+	return apaHeader.game_specs.discType;
+#else		
 	return g_ISO_media;
+#endif	
 }
 
 //-------------------------------------------------------------------------
@@ -1665,6 +1709,7 @@ int sceCdStStop(void)
 }
 
 //-------------------------------------------------------------------------
+#ifndef HDD_DRIVER
 int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf)
 {
 	register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
@@ -1705,6 +1750,7 @@ int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf)
 
 	return 1;
 }
+#endif
 
 //-------------------------------------------------------------------------
 int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
@@ -1752,7 +1798,31 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 				
 		cdvdman_stat.err = CDVD_ERR_NO;
 		
+		#ifdef HDD_DRIVER
+		u32 offset = 0;
+		while (sectors) {
+			if (!((lsn >= cdvdman_partspecs.part_offset) && (lsn < (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)))))
+				cdvdman_get_part_specs(lsn);
+
+			if (cdvdman_stat.err != CDVD_ERR_NO)
+				break;
+
+			u32 nsectors = (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)) - lsn;
+			if (sectors < nsectors)
+				nsectors = sectors;
+				
+			u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);
+			if (ata_device_dma_transfer(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
+				cdvdman_stat.err = CDVD_ERR_READ;
+				break;
+			}
+			offset += nsectors << 11;
+			sectors -= nsectors;
+			lsn += nsectors;
+		}
+		#else
 		cdvdman_ReadSect(lsn, sectors, buf);
+		#endif
 			
 		#ifdef NETLOG_DEBUG		
 			pNetlogSend("sceCdRead0 ret=%d\n", r);
@@ -1853,8 +1923,13 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 		*on_dual = 1;
 	}
 	else {
-		*layer1_start = cdvdman_layer1start;	
-		*on_dual = (cdvdman_layer1start > 0) ? 1 : 0;
+		#ifdef HDD_DRIVER
+		*layer1_start = apaHeader.game_specs.layer1_start;
+		*on_dual = (apaHeader.game_specs.layer1_start > 0) ? 1 : 0;		
+		#else
+		*layer1_start = cdvdman_layer1start;
+		*on_dual = (cdvdman_layer1start > 0) ? 1 : 0;		
+		#endif
 	}
 	
 	return 1;
@@ -2523,8 +2598,13 @@ lbl_startlocate:
 					p = &slash[1];
 					
 					if (!g_gamesetting_disable_DVDDL) {
+						#ifdef HDD_DRIVER
+						if (tocEntryPointer->fileLBA > apaHeader.game_specs.layer1_start)
+							tocLBA = apaHeader.game_specs.layer1_start + tocEntryPointer->fileLBA;
+						#else
 						if (tocEntryPointer->fileLBA > cdvdman_layer1start)
 							tocLBA = cdvdman_layer1start + tocEntryPointer->fileLBA;
+						#endif
 					}
 						
 					goto lbl_startlocate;	
@@ -2762,10 +2842,33 @@ void cdvdman_cdread_Thread(void *args)
 }
 
 //-------------------------------------------------------------------------
+void cdvdman_poweroff_Thread(void *args)
+{
+	while (1) {
+		WaitSema(cdvdman_poffsema);
+		#ifndef USB_DRIVER
+		dev9Shutdown();
+		#endif
+		CDVDreg_SDATAIN = 0;
+		CDVDreg_SCOMMAND = 0x0f;
+	}
+}
+
+//-------------------------------------------------------------------------
+static int cdrom_intr_handler(void *args)
+{
+	if (((CDVDreg_PWOFF & 1) == 0) && (CDVDreg_PWOFF & 4))
+		iSignalSema(cdvdman_poffsema);
+
+	return 1;
+}
+
+//-------------------------------------------------------------------------
 void cdvdman_startThreads(void)
 {
 	iop_thread_t thread_param;
 	register int thid;
+	int oldstate;
 
 	cdvdman_stat.status = CDVD_STAT_PAUSE;
 	cdvdman_stat.err = CDVD_ERR_NO;
@@ -2778,6 +2881,20 @@ void cdvdman_startThreads(void)
 
 	thid = CreateThread(&thread_param);
 	StartThread(thid, NULL);
+
+	thread_param.thread = (void *)cdvdman_poweroff_Thread;
+ 	thread_param.stacksize = 0x2000;
+	thread_param.priority = 0x5a;
+	thread_param.attr = TH_C;
+	thread_param.option = 0;
+
+	thid = CreateThread(&thread_param);
+	StartThread(thid, NULL);
+
+	CpuSuspendIntr(&oldstate);
+	ReleaseIntrHandler(IOP_IRQ_CDVD);
+	RegisterIntrHandler(IOP_IRQ_CDVD, 1, cdrom_intr_handler, NULL);
+	CpuResumeIntr(oldstate);
 }
 #endif
 
@@ -2800,6 +2917,13 @@ void cdvdman_create_semaphores(void)
 	smp.option = 0;
 
 	cdvdman_lockreadsema = CreateSema(&smp);
+
+	smp.initial = 0;
+	smp.max = 1;
+	smp.attr = 0;	
+	smp.option = 0;
+
+	cdvdman_poffsema = CreateSema(&smp);	
 #endif	
 }
 
@@ -2820,6 +2944,28 @@ void cdvdman_initdev(void)
 }
 
 //-------------------------------------------------------------------------
+#ifdef HDD_DRIVER
+void cdvdman_get_part_specs(u32 lsn)
+{
+	register int i;
+	cdvdman_partspecs_t *ps = (cdvdman_partspecs_t *)&apaHeader.game_specs.part_specs[0];
+	
+	for (i = 0; i < apaHeader.game_specs.num_partitions; i++) {
+		if (lsn >= ps->part_offset) {
+			if (lsn < (ps->part_offset + (ps->part_size >> 11))) {
+				mips_memcpy(&cdvdman_partspecs, ps, sizeof(cdvdman_partspecs));
+				break;
+			}
+		}
+		ps++;
+	}
+
+	if (i >= apaHeader.game_specs.num_partitions)
+		cdvdman_stat.err = CDVD_ERR_READ;
+}
+#endif
+
+//-------------------------------------------------------------------------
 int _start(int argc, char **argv)
 {
 	// register exports
@@ -2828,6 +2974,26 @@ int _start(int argc, char **argv)
 #ifdef SMB_DRIVER
 	RegisterLibraryEntries(&_exp_dev9);
 	dev9_init();
+#endif
+#ifdef HDD_DRIVER
+	RegisterLibraryEntries(&_exp_dev9);
+	RegisterLibraryEntries(&_exp_atad);
+
+	if (apaHeader_lba == 0xffffffff)
+		return MODULE_NO_RESIDENT_END;
+
+	dev9_init();
+	atad_start();
+
+	atad_inited = 1;
+	if (ata_device_dma_transfer(0, &apaHeader, apaHeader_lba, 2, ATA_DIR_READ) != 0)
+		return MODULE_NO_RESIDENT_END;
+
+	// checking HDL's deadfeed magic
+	if (apaHeader.checksum != 0xdeadfeed)
+		return MODULE_NO_RESIDENT_END;
+
+	mips_memcpy(&cdvdman_partspecs, &apaHeader.game_specs.part_specs[0], sizeof(cdvdman_partspecs));
 #endif
 	RegisterLibraryEntries(&_exp_smsutils);
 
@@ -2843,8 +3009,12 @@ int _start(int argc, char **argv)
 	// register cdrom device driver
 	cdvdman_initdev();
 
-#ifdef USB_DRIVER
+#ifndef SMB_DRIVER
 	g_tag[0] = 0; // just to shut off warning
+#endif
+#ifdef HDD_DRIVER
+	g_ISO_media = 0x69;
+	g_ISO_parts = 0x69; // just to shut off warning
 #endif
 	
     return MODULE_RESIDENT_END;

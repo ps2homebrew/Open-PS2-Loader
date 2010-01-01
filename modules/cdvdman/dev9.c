@@ -27,6 +27,10 @@
 #include "ioman.h"
 #include "ioman_add.h"
 
+#ifdef HDD_DRIVER
+extern int atad_inited;
+#endif
+
 #ifdef DEV9_DEBUG
 #define M_PRINTF(format, args...)	\
 	printf(MODNAME ": " format, ## args)
@@ -114,9 +118,9 @@ void *dev9x_ops[27] = {
 	(void*)dev9x_dummy,
 	(void*)dev9x_dummy,
 	(void*)dev9x_devctl,
-	(void*)dev9x_dummy,
-	(void*)dev9x_dummy,
-	(void*)dev9x_dummy	
+	(void*)dev9_init,
+	(void*)dev9_init,
+	(void*)dev9_init	
 };
 
 /* driver descriptor */
@@ -160,6 +164,12 @@ int dev9_init(void)
 /* Export 4 */
 void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb)
 {
+#ifdef HDD_DRIVER
+	if (intr < 2) {
+		if (atad_inited)
+			return;
+	}
+#endif	
 	dev9_intr_cbs[intr] = cb;
 }
 
@@ -239,7 +249,6 @@ static int smap_device_reset()
 /* Export 6 */
 void dev9Shutdown()
 {
-#ifdef DISABLE_DEV9SHUTDOWN	
 	int idx;
 	USE_DEV9_REGS;
 
@@ -256,7 +265,6 @@ void dev9Shutdown()
 		DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~1;
 	}
 	DelayThread(1000000);
-#endif	
 }
 
 /* Export 7 */
@@ -433,16 +441,12 @@ void dev9LEDCtl(int ctl)
 
 /* Export 11 */
 int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb){
-#ifndef DISABLE_DEV9SHUTDOWN	
 	if (idx < 16)
 	{
 		dev9_shutdown_cbs[idx] = cb;
 		return 0;
 	}
 	return -1;
-#else
-	return 0;
-#endif
 }
 
 static int smap_subsys_init(void)
@@ -457,6 +461,7 @@ static int smap_subsys_init(void)
 	DisableIntr(IOP_IRQ_DMA_DEV9, &stat);
 	CpuSuspendIntr(&flags);
 	/* Enable the DEV9 DMAC channel.  */
+	ReleaseIntrHandler(IOP_IRQ_DMA_DEV9);
 	RegisterIntrHandler(IOP_IRQ_DMA_DEV9, 1, dev9_dma_intr, &dma_complete_sem);
 	dmac_set_dpcr2(dmac_get_dpcr2() | 0x80);
 	CpuResumeIntr(flags);
@@ -580,6 +585,7 @@ static int expbay_init(void)
 		return 1;
 
 	CpuSuspendIntr(&flags);
+	ReleaseIntrHandler(DEV9_INTR);
 	RegisterIntrHandler(DEV9_INTR, 1, expbay_intr, NULL);
 	EnableIntr(DEV9_INTR);
 	CpuResumeIntr(flags);

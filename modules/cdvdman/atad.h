@@ -57,33 +57,19 @@ typedef struct {
 typedef struct					// size = 1024
 {
 	u32		checksum;			// HDL uses 0xdeadfeed magic here
-	u32		magic;				// APA_MAGIC
-	u32		next;
-	u32 	prev;
-	char	id[APA_IDMAX];		// 16
-	char	rpwd[APA_PASSMAX];	// 48
-	char	fpwd[APA_PASSMAX];  // 56
-	u32		start;				// 64
-	u32		length;				// 68
-	u16		type;				// 72
-	u16		flags;				// 74
-	u32		nsub;				// 76
-	ps2time	created;			// 80
-	u32		main;				// 88
-	u32		number;				// 92
-	u32		modver;				// 96
-	u32		pading1[7];			// 100
-	struct {					// 128
-		u8  	pad[104];
-		u32 	layer1_start;
-		u32 	discType;
-		int 	num_partitions;
-		struct {
-			u32 	part_offset; 	// in MB
-			u32 	data_start; 	// in sectors
-			u32 	part_size; 		// in KB				
-		} part_specs[65];
-	} game_specs;
-} apa_header;
+	u32		magic;
+	char	gamename[160];
+	u8  	compat_flags;
+	u8		pad[3];
+	char	startup[60];
+	u32 	layer1_start;
+	u32 	discType;
+	int 	num_partitions;
+	struct {
+		u32 	part_offset; 	// in MB
+		u32 	data_start; 	// in sectors
+		u32 	part_size; 		// in KB				
+	} part_specs[65];
+} hdl_apa_header;
 
 #endif /* IOP_ATAD_H */

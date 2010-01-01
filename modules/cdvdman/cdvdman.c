@@ -614,7 +614,7 @@ static int fs_inited = 0;
 
 #ifdef HDD_DRIVER
 int atad_inited = 0;
-static apa_header apaHeader;
+static hdl_apa_header apaHeader;
 static u32 apaHeader_lba = 0;
 
 typedef struct {
@@ -1398,7 +1398,7 @@ int sceCdGetDiskType(void)
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef HDD_DRIVER
-	return apaHeader.game_specs.discType;
+	return apaHeader.discType;
 #else		
 	return g_ISO_media;
 #endif	
@@ -1924,8 +1924,8 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 	}
 	else {
 		#ifdef HDD_DRIVER
-		*layer1_start = apaHeader.game_specs.layer1_start;
-		*on_dual = (apaHeader.game_specs.layer1_start > 0) ? 1 : 0;		
+		*layer1_start = apaHeader.layer1_start;
+		*on_dual = (apaHeader.layer1_start > 0) ? 1 : 0;		
 		#else
 		*layer1_start = cdvdman_layer1start;
 		*on_dual = (cdvdman_layer1start > 0) ? 1 : 0;		
@@ -2599,8 +2599,8 @@ lbl_startlocate:
 					
 					if (!g_gamesetting_disable_DVDDL) {
 						#ifdef HDD_DRIVER
-						if (tocEntryPointer->fileLBA > apaHeader.game_specs.layer1_start)
-							tocLBA = apaHeader.game_specs.layer1_start + tocEntryPointer->fileLBA;
+						if (tocEntryPointer->fileLBA > apaHeader.layer1_start)
+							tocLBA = apaHeader.layer1_start + tocEntryPointer->fileLBA;
 						#else
 						if (tocEntryPointer->fileLBA > cdvdman_layer1start)
 							tocLBA = cdvdman_layer1start + tocEntryPointer->fileLBA;
@@ -2948,9 +2948,9 @@ void cdvdman_initdev(void)
 void cdvdman_get_part_specs(u32 lsn)
 {
 	register int i;
-	cdvdman_partspecs_t *ps = (cdvdman_partspecs_t *)&apaHeader.game_specs.part_specs[0];
+	cdvdman_partspecs_t *ps = (cdvdman_partspecs_t *)&apaHeader.part_specs[0];
 	
-	for (i = 0; i < apaHeader.game_specs.num_partitions; i++) {
+	for (i = 0; i < apaHeader.num_partitions; i++) {
 		if (lsn >= ps->part_offset) {
 			if (lsn < (ps->part_offset + (ps->part_size >> 11))) {
 				mips_memcpy(&cdvdman_partspecs, ps, sizeof(cdvdman_partspecs));
@@ -2960,7 +2960,7 @@ void cdvdman_get_part_specs(u32 lsn)
 		ps++;
 	}
 
-	if (i >= apaHeader.game_specs.num_partitions)
+	if (i >= apaHeader.num_partitions)
 		cdvdman_stat.err = CDVD_ERR_READ;
 }
 #endif
@@ -2993,7 +2993,7 @@ int _start(int argc, char **argv)
 	if (apaHeader.checksum != 0xdeadfeed)
 		return MODULE_NO_RESIDENT_END;
 
-	mips_memcpy(&cdvdman_partspecs, &apaHeader.game_specs.part_specs[0], sizeof(cdvdman_partspecs));
+	mips_memcpy(&cdvdman_partspecs, &apaHeader.part_specs[0], sizeof(cdvdman_partspecs));
 #endif
 	RegisterLibraryEntries(&_exp_smsutils);
 

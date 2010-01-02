@@ -1074,6 +1074,34 @@ int main(void)
 		eth_inited = 1;
 	}
 	
+	/* // For Testing HDD
+	int ret;
+    LoadHddModules();
+    
+    init_scr();
+    scr_clear();
+    
+    ret = hddCheck();
+    scr_printf("\n\t hddCheck ret=%d\n", ret);
+    ret = hddGetTotalSectors();
+    scr_printf("\t hddGetTotalSectors ret=%d\n", ret);
+
+    hdl_games_list_t *games;
+    ret = hddGetHDLGamelist(&games);
+    scr_printf("\t hddGetHDLGamelist ret=%d\n", ret);
+
+    int i;
+    for (i=0; i<games->count; i++){
+		hdl_game_info_t *game = &games->games[i];
+		//scr_printf("\t %s type=%x sector=%08x compat=%x sizeMB=%d\n", game->name, game->disctype, game->start_sector, game->compat_flags, game->total_size_in_kb/1024);
+		//scr_printf("\t %s - %s\n", game->name, game->startup);
+		//if (strcmp(game->name, "LEGO STAR WARS"))
+			LaunchHDDGame(game, 0, 0);
+	}
+    
+    SleepThread();
+    */
+	
 	TextColor(0x80,0x80,0x80,0x80);
 	
 	while(1)

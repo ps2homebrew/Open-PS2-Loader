@@ -18,7 +18,7 @@
 #define NETLOG_VER_MIN		1
 
 /* Default IP address and port of remote host */
-#define NETLOG_DEF_ADDR		"192.168.0.4"
+#define NETLOG_DEF_ADDR		"192.168.0.2"
 #define NETLOG_DEF_PORT		7411
 
 /* Max log message length */

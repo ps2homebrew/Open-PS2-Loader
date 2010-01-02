@@ -10,20 +10,17 @@
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
+extern void *ps2atad_irx;
+extern int size_ps2atad_irx;
 
-extern void *ps2ip_irx;
-extern int size_ps2ip_irx;
+extern void *poweroff_irx;
+extern int size_poweroff_irx;
 
-extern void *ps2smap_irx;
-extern int size_ps2smap_irx;
+extern void *ps2hdd_irx;
+extern int size_ps2hdd_irx;
 
 extern void *smbman_irx;
 extern int size_smbman_irx;
-
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
 
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
@@ -984,18 +981,8 @@ void netLoadDisplay() {
 void LoadNetworkModules() {
 	
 	int ret, id;
-	
-	gNetworkStartup = 5;
-	netLoadDisplay();
-	
-	
+		
 	set_ipconfig();
-	
-	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
-		gNetworkStartup = -1;
-		return;
-	}
 	
 	gNetworkStartup = 4;
 	netLoadDisplay();
@@ -1033,6 +1020,38 @@ void LoadNetworkModules() {
 	}
 
 	gNetworkStartup = 0; // ok, all loaded
+}
+
+void LoadHddModules(void)
+{	
+	int ret, id;
+	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+
+	gHddStartup = 3;
+
+    id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gHddStartup = -1;
+		return;
+	}
+
+	gHddStartup = 2;
+
+    id=SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gHddStartup = -1;
+		return;
+	}
+
+	gHddStartup = 1;
+
+    id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);		
+	if ((id < 0) || ret) {
+		gHddStartup = -1;
+		return;
+	}
+
+	gHddStartup = 0;
 }
 
 // --------------------- Main --------------------

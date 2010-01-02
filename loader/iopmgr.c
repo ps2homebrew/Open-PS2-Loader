@@ -105,6 +105,12 @@ int New_Reset_Iop(const char *arg, int flag){
 			LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
 			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
 		}
+		else if (GameMode == HDD_MODE) {
+			//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+			//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+			//cdInit(CDVD_INIT_INIT);
+		}
 	}
 
 	// check for reboot with IOPRP from cdrom
@@ -134,7 +140,7 @@ int New_Reset_Iop(const char *arg, int flag){
 			break;
 		}
 	}
-	
+
 	fioInit();		
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
@@ -173,7 +179,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		Patch_Mod(&ioprp_img, "CDVDFSV", cdvdfsv_irx, size_cdvdfsv_irx);
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
-
+	
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
@@ -245,6 +251,12 @@ int New_Reset_Iop(const char *arg, int flag){
 		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
 		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
 		cdInit(CDVD_INIT_INIT);
+	}	
+	else if (GameMode == HDD_MODE) {
+		//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+		//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+		//cdInit(CDVD_INIT_INIT);
 	}	
 
 	FlushCache(0);	

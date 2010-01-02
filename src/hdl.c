@@ -248,15 +248,21 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
  	register int ret;
 
  	u32 start_sector = header->start + offset / 512;
+ 	
  	ret = hddReadSectors(start_sector, 2, buf, 2 * 512);
  	if (ret == 0) {
+	 	
+	 	hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
+	 	
+	 	// checking deadfeed magic & PS2 game magic
+	 	if (hdl_header->checksum != 0xdeadfeed)
+	 		return -2;
+
 		// calculate total size
 		size = header->length;
 
 		for (i = 0; i < header->nsub; i++)
 			size += header->subs[i].length;
-
-		hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
 
 		memcpy(ginfo->partition_name, header->id, APA_IDMAX);
 		ginfo->partition_name[APA_IDMAX] = 0;

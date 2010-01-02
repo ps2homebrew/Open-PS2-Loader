@@ -144,7 +144,7 @@ void Reset()
     SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
     SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
     SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-    SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);    
 }
 
 void delay(int count) {
@@ -487,6 +487,100 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 		mode_str = "USB_MODE";
 	else if (mode == ETH_MODE)
 		mode_str = "ETH_MODE";
+		
+	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+	
+	char cmask[10];
+	snprintf(cmask, 10, "%d", compatmask);
+	argv[0] = config_str;	
+	argv[1] = filename;
+	argv[2] = cmask;
+	
+	ExecPS2((void *)eh->entry, 0, 3, argv);
+} 
+
+void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid)
+{
+	u8 *boot_elf = NULL;
+	elf_header_t *eh;
+	elf_pheader_t *eph;
+	void *pdata;
+	int i;
+	char *argv[2];
+	char filename[32];
+	char config_str[255];
+	char *mode_str = NULL;
+
+	set_ipconfig();
+
+	sprintf(filename,"%s",game->startup);
+	
+	for (i=0;i<size_hdd_cdvdman_irx;i++){
+		if(!strcmp((const char*)((u32)&hdd_cdvdman_irx+i),"######    GAMESETTINGS    ######")){
+			break;
+		}
+	}
+
+	/*
+	if (compatmask & COMPAT_MODE_2) {
+		u32 alt_read_mode = 1;
+		memcpy((void*)((u32)&hdd_cdvdman_irx+i+35),&alt_read_mode,1);
+	}
+	if (compatmask & COMPAT_MODE_5) {
+		u32 no_dvddl = 1;
+		memcpy((void*)((u32)&hdd_cdvdman_irx+i+36),&no_dvddl,4);
+	}
+	if (compatmask & COMPAT_MODE_4) {
+		u32 no_pss = 1;
+		memcpy((void*)((u32)&hdd_cdvdman_irx+i+40),&no_pss,4);
+	}
+	*/
+		
+	// game id
+	memcpy((void*)((u32)&hdd_cdvdman_irx+i+84), &gameid, 5);
+
+	memcpy((void*)((u32)&hdd_cdvdman_irx+i+44),&game->start_sector,4);		
+
+	FlushCache(0);
+
+	SendIrxKernelRAM(HDD_MODE);
+
+/* NB: LOADER.ELF is embedded  */
+	if (compatmask & COMPAT_MODE_1)
+		boot_elf = (u8 *)&alt_loader_elf;
+	else
+		boot_elf = (u8 *)&loader_elf;
+	eh = (elf_header_t *)boot_elf;
+	if (_lw((u32)&eh->ident) != ELF_MAGIC)
+		while (1);
+
+	eph = (elf_pheader_t *)(boot_elf + eh->phoff);
+
+/* Scan through the ELF's program headers and copy them into RAM, then
+									zero out any non-loaded regions.  */
+	for (i = 0; i < eh->phnum; i++)
+	{
+		if (eph[i].type != ELF_PT_LOAD)
+		continue;
+
+		pdata = (void *)(boot_elf + eph[i].offset);
+		memcpy(eph[i].vaddr, pdata, eph[i].filesz);
+
+		if (eph[i].memsz > eph[i].filesz)
+			memset(eph[i].vaddr + eph[i].filesz, 0,
+					eph[i].memsz - eph[i].filesz);
+	}
+
+/* Let's go.  */
+	fioExit();
+	SifInitRpc(0);
+	SifExitRpc();
+	FlushCache(0);
+	FlushCache(2);
+
+	mode_str = "HDD_MODE";
 		
 	sprintf(config_str, "%s %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \

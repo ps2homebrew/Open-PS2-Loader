@@ -258,24 +258,6 @@ GSTEXTURE network_icon;
 
 void LoadGameList();
 
-//SYSTEM
-
-int usbdelay;
-int ethdelay;
-
-void Reset();
-void delay(int count);
-void Start_LoadNetworkModules_Thread(void);
-void LoadUSBD();
-int getDiscID(void *discID);
-void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
-int ExecElf(char *path);
-void SendIrxKernelRAM(int mode);
-
-#define USB_MODE	0
-#define ETH_MODE	1
-#define HDD_MODE	2
-
 //HDL
 
 #define PS2PART_IDMAX			32
@@ -305,6 +287,25 @@ int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize);
 int hddGetHDLGamelist(hdl_games_list_t **game_list);
+
+//SYSTEM
+
+int usbdelay;
+int ethdelay;
+
+void Reset();
+void delay(int count);
+void Start_LoadNetworkModules_Thread(void);
+void LoadUSBD();
+int getDiscID(void *discID);
+void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
+void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid);
+int ExecElf(char *path);
+void SendIrxKernelRAM(int mode);
+
+#define USB_MODE	0
+#define ETH_MODE	1
+#define HDD_MODE	2
 
 //PAD
 

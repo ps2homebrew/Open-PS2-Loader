@@ -363,7 +363,7 @@ int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 
 #ifdef NETLOG_DEBUG
 // !!! netlog exports functions pointers !!!
 int (*pNetlogSend)(const char *format, ...);
-static int netlog_inited = 0;
+int netlog_inited = 0;
 #endif
 
 // driver ops func tab
@@ -1146,6 +1146,28 @@ void fs_init(void)
 		sprintf(tmp_str,"%s.%02x", g_ISO_name, i);
 		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i]);
 	}
+#endif
+
+#ifdef HDD_DRIVER
+#ifdef NETLOG_DEBUG
+		pNetlogSend("fs_init: apa header LBA = %d\n", g_part_start[0]);
+#endif
+
+	int r=ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
+	if (r != 0) {
+#ifdef NETLOG_DEBUG
+		pNetlogSend("fs_init: failed to read apa header %d\n", r);
+#endif
+	}
+
+	// checking HDL's deadfeed magic
+	if (apaHeader.checksum != 0xdeadfeed) {
+#ifdef NETLOG_DEBUG
+		pNetlogSend("fs_init: failed to find deadfeed magic\n");
+#endif
+	}
+
+	mips_memcpy(&cdvdman_partspecs, &apaHeader.part_specs[0], sizeof(cdvdman_partspecs));
 #endif
 
 	mips_memset(&cdvdman_fdhandles[0], 0, MAX_FDHANDLES * sizeof(FHANDLE));
@@ -2978,21 +3000,10 @@ int _start(int argc, char **argv)
 	RegisterLibraryEntries(&_exp_dev9);
 	RegisterLibraryEntries(&_exp_atad);
 
-	if (g_part_start[0] == 0xffffffff) // checking apa Header LBA
-		return MODULE_NO_RESIDENT_END;
-
 	dev9_init();
 	atad_start();
 
 	atad_inited = 1;
-	if (ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ) != 0)
-		return MODULE_NO_RESIDENT_END;
-
-	// checking HDL's deadfeed magic
-	if (apaHeader.checksum != 0xdeadfeed)
-		return MODULE_NO_RESIDENT_END;
-
-	mips_memcpy(&cdvdman_partspecs, &apaHeader.part_specs[0], sizeof(cdvdman_partspecs));
 #endif
 	RegisterLibraryEntries(&_exp_smsutils);
 

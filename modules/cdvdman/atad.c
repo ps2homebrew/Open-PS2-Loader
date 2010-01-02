@@ -29,6 +29,14 @@
 #include <speedregs.h>
 #include <atahw.h>
 
+//#define NETLOG_DEBUG
+
+#ifdef NETLOG_DEBUG
+// !!! netlog exports functions pointers !!!
+extern int (*pNetlogSend)(const char *format, ...);
+extern int netlog_inited;
+#endif
+
 #ifdef DEV9_DEBUG
 #define M_PRINTF(format, args...)	\
 	printf(MODNAME ": " format, ## args)
@@ -251,7 +259,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector,
 			using_timeout = 1;
 			break;
 		case 4:
-			atad_cmd_state.dir = (command & 0xffff) ^ 0x25;
+			atad_cmd_state.dir = ATA_DIR_READ;
 			using_timeout = 1;
 	}
 
@@ -375,6 +383,10 @@ static int ata_dma_complete(void *buf, int blkcount, int dir)
 				M_PRINTF("Error: Command error while doing DMA.\n");
 				M_PRINTF("Error: Command error status 0x%02x, error 0x%02x.\n",
 						ata_hwport->r_status, ata_get_error());
+				#ifdef NETLOG_DEBUG
+					pNetlogSend("Error: Command error status 0x%02x, error 0x%02x.\n",
+						ata_hwport->r_status, ata_get_error());
+				#endif		
 				return -503;
 			} else {
 				M_PRINTF("Warning: Got command interrupt, but not an error.\n");
@@ -477,24 +489,24 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 
 		ata_dma_set_dir(dir);
 
-		/* Variable lba is only 32 bits so no change for lcyl and hcyl.  */
+		/* Variable lba is only 32 bits so no change for lcyl and hcyl.  */		
 		lcyl = (lba >> 8) & 0xff;
 		hcyl = (lba >> 16) & 0xff;
 
-		if (((lba >> 16) - 0x0ffe) >= 0) {
+		//if (((lba >> 16) - 0x0ffe) >= 0) {
 			/* Setup for 48-bit LBA.  */
 			/* Combine bits 24-31 and bits 0-7 of lba into sector.  */
-			sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
+		//	sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
 			/* 0x40 enables LBA.  */
-			select = ((device << 4) | 0x40) & 0xffff;
-			command = ATA_C_READ_DMA_EXT;
-		} else {
+		//	select = ((device << 4) | 0x40) & 0xffff;
+		//	command = ATA_C_READ_DMA_EXT;
+		//} else {
 			/* Setup for 28-bit LBA.  */
 			sector = lba & 0xff;
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
 			command = ATA_C_READ_DMA;
-		}
+		//}
 
 		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
 					hcyl, select, command)) != 0)

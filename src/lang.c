@@ -49,6 +49,9 @@ char *english[] = {
 	"Static", // _STR_STATIC
 	"Dynamic", // _STR_DYNAMIC
 	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *czech[] = {
@@ -97,6 +100,9 @@ char *czech[] = {
 	"Staticke", // _STR_STATIC
 	"Dynamicke", // _STR_DYNAMIC
 	"Vychozi nabidka", // _STR_DEF_DEVICE
+	"Nacist z disku", // _STR_LOAD_FROM_DISC
+	"Prosim cekejte", // _STR_PLEASE_WAIT
+	"Chyba pri nacitani Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *spanish[] = {
@@ -145,6 +151,9 @@ char *spanish[] = {
 	"Estбtico", // _STR_STATIC
 	"Dinбmico", // _STR_DYNAMIC
 	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *french[] = {
@@ -193,6 +202,9 @@ char *french[] = {
 	"Statique", // _STR_STATIC
 	"Dynamique", // _STR_DYNAMIC
 	"Default menu", // _STR_DEF_DEVICE	
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *german[] = {
@@ -241,6 +253,9 @@ char *german[] = {
 	"Statisch", // _STR_STATIC
 	"Dymanisch", // _STR_DYNAMIC
 	"Default menu", // _STR_DEF_DEVICE	
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *portuguese[] = {
@@ -289,6 +304,9 @@ char *portuguese[] = {
 	"Estбtico", // _STR_STATIC
 	"Dinвmico", // _STR_DYNAMIC
 	"Default menu", // _STR_DEF_DEVICE	
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *norwegian[] = {
@@ -336,7 +354,10 @@ char *norwegian[] = {
 	"Raskt", // _STR_FAST
 	"Statisk", // _STR_STATIC
 	"Dynamisk", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE	
+	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *turkish[] = {
@@ -384,7 +405,10 @@ char *turkish[] = {
 	"Hizli", // _STR_FAST
 	"Sabit", // _STR_STATIC
 	"Hareketli", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE	
+	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *polish[] = {
@@ -432,7 +456,10 @@ char *polish[] = {
 	"Szybko", // _STR_FAST
 	"Statycznie", // _STR_STATIC
 	"Dynamicznie", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE	
+	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *russian[] = {
@@ -480,7 +507,10 @@ char *russian[] = {
 	"Быстрый", // _STR_FAST
 	"Статическое", // _STR_STATIC
 	"Динамическое", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE	
+	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *indonesian[] = {
@@ -528,7 +558,10 @@ char *indonesian[] = {
 	"Cepat", // _STR_FAST
 	"Statis", // _STR_STATIC
 	"Dinamis", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE	
+	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 char *bulgarian[] = {
@@ -576,7 +609,10 @@ char *bulgarian[] = {
 	"Много бързо",
 	"Статично",
 	"Динамично",
-	"Default menu", // _STR_DEF_DEVICE	
+	"Default menu", // _STR_DEF_DEVICE
+	"Load from disc", // _STR_LOAD_FROM_DISC
+	"Please wait", // _STR_PLEASE_WAIT
+	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
 

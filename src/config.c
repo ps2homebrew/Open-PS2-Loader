@@ -62,6 +62,23 @@ inline int min(int a, int b) {
 	return a < b ? a : b;
 }
 
+// single digit from hex decode
+int fromHex(char digit) {
+	if ((digit >= '0') && (digit <= '9')) {
+		return (digit - '0');
+	} else if ( (digit >= 'A') && (digit <= 'F') ) {
+		return (digit - 'A' + 10);
+	} else if ( (digit >= 'a') && (digit <= 'f') ) {
+		return (digit - 'a' + 10);	
+	} else
+		return -1;
+}
+
+static const char htab[16] = "0123456789ABCDEF";
+char toHex(int digit) {
+	return htab[digit & 0x0F];
+}
+
 int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
 	color[0]=0;
@@ -74,10 +91,9 @@ int strToColor(const char *string, unsigned char *color) {
 	string++;
 
 	while (*string) {
-		if ((*string >= '0') && (*string <= '9')) {
-			color[n] = color[n] * 16 + (*string - '0');
-		} else if ( (*string >= 'A') && (*string <= 'F') ) {
-			color[n] = color[n] * 16 + (*string - 'A'+10);
+		int fh = fromHex(*string);
+		if (fh >= 0) {
+			color[n] = color[n] * 16 + fh;
 		} else {
 			break;
 		}

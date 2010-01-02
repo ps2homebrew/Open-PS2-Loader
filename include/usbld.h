@@ -224,6 +224,8 @@ int gNetAutostart;
 // true if the ip config should be saved as well
 int gIPConfigChanged;
 
+int gHddStartup;
+
 #define COMPAT_MODE_1 		0x01
 #define COMPAT_MODE_2 		0x02
 #define COMPAT_MODE_3 		0x04
@@ -272,7 +274,37 @@ void SendIrxKernelRAM(int mode);
 
 #define USB_MODE	0
 #define ETH_MODE	1
+#define HDD_MODE	2
 
+//HDL
+
+#define PS2PART_IDMAX			32
+#define HDL_GAME_NAME_MAX  		64
+
+typedef struct
+{
+	char 	partition_name[PS2PART_IDMAX + 1];
+	char	name[HDL_GAME_NAME_MAX + 1];
+	char	startup[8 + 1 + 3 + 1];
+	u8 		compat_flags;
+	u32 	layer_break;
+	int 	disctype;
+  	u32 	start_sector;
+  	u32 	total_size_in_kb;
+} hdl_game_info_t;
+
+typedef struct
+{
+	u32 			count;
+	hdl_game_info_t *games;
+	u32 			total_chunks;
+  	u32 			free_chunks;
+} hdl_games_list_t;
+
+int hddCheck(void);
+u32 hddGetTotalSectors(void);
+int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize);
+int hddGetHDLGamelist(hdl_games_list_t **game_list);
 
 //PAD
 

@@ -7,14 +7,15 @@ EE_BIN = main.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
-		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
+EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
+		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/hdd_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
+		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/iomanx.o obj/filexio.o \
 		  obj/font.o obj/font_cyrillic.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
 		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		  obj/up_dn_icon.o obj/lt_rt_icon.o
-EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpatches -lpad -lm -lmc -lc
+EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lfileXio -lpatches -lpad -lm -lmc -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 all:
@@ -39,6 +40,7 @@ clean:
 	echo "    * cdvdman.irx"
 	$(MAKE) -C modules/cdvdman -f Makefile.usb clean
 	$(MAKE) -C modules/cdvdman -f Makefile.smb clean
+	$(MAKE) -C modules/cdvdman -f Makefile.hdd clean
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/cdvdfsv clean
 	echo "    * cddev.irx"
@@ -99,7 +101,12 @@ smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"
 	$(MAKE) -C modules/cdvdman -f Makefile.smb rebuild
 	bin2s modules/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
-		
+
+hdd_cdvdman.s:
+	echo "    * hdd_cdvdman.irx"
+	$(MAKE) -C modules/cdvdman -f Makefile.hdd rebuild
+	bin2s modules/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
+
 cdvdfsv.s:
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/cdvdfsv
@@ -156,7 +163,22 @@ discid.s:
 	echo "    * discID.irx"
 	$(MAKE) -C modules/discID
 	bin2s modules/discID/discID.irx asm/discid.s discid_irx
-			
+
+ps2atad.s:
+	bin2s $(PS2SDK)/iop/irx/ps2atad.irx asm/ps2atad.s ps2atad_irx
+
+poweroff.s:
+	bin2s $(PS2SDK)/iop/irx/poweroff.irx asm/poweroff.s poweroff_irx
+
+ps2hdd.s:
+	bin2s $(PS2SDK)/iop/irx/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
+
+iomanx.s:
+	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx
+
+filexio.s:
+	bin2s $(PS2SDK)/iop/irx/fileXio.irx asm/filexio.s filexio_irx
+
 font.s:
 	bin2s gfx/font.raw asm/font.s font_raw
 	

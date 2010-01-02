@@ -77,6 +77,8 @@ int main(int argc, char **argv){
 		GameMode = USB_MODE;
 	else if (!strncmp(argv[0], "ETH_MODE", 8))
 		GameMode = ETH_MODE;
+	else if (!strncmp(argv[0], "HDD_MODE", 8))
+		GameMode = HDD_MODE;	
 	
 	char *p = strtok(&argv[0][9], " ");
 	strcpy(g_ps2_ip, p);

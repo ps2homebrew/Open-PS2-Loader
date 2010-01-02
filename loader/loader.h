@@ -80,6 +80,7 @@ u32 g_compat_mask;
 int GameMode;
 #define USB_MODE 	0
 #define ETH_MODE 	1
+#define HDD_MODE 	2
 
 /* modmgr.c */
 int  LoadFileInit();

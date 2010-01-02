@@ -266,7 +266,7 @@ void delay(int count);
 void Start_LoadNetworkModules_Thread(void);
 void LoadUSBD();
 int getDiscID(void *discID);
-void LaunchGame(TGame *game, int mode, int compatmask);
+void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
 int ExecElf(char *path);
 void SendIrxKernelRAM(int mode);
 
@@ -393,6 +393,9 @@ int storeConfig();
 int restoreConfig();
 
 //CONFIG
+int fromHex(char digit);
+char toHex(int digit);
+
 // returns nonzero for valid config key name
 int configKeyValidate(const char* key);
 int setConfigStr(struct TConfigSet* config, const char* key, const char* value);

@@ -337,7 +337,7 @@ int getDiscID(void *discID)
 	return 1;	
 }
 
-void LaunchGame(TGame *game, int mode, int compatmask)
+void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 {
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
@@ -383,6 +383,9 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 			memcpy((void*)((u32)&usb_cdvdman_irx+i+40),&no_pss,4);
 		}	
 
+		// game id
+		memcpy((void*)((u32)&usb_cdvdman_irx+i+84), &gameid, 5);
+		
 		int j, offset = 44;
 	
 		fd = fioDopen(USB_prefix);
@@ -422,6 +425,9 @@ void LaunchGame(TGame *game, int mode, int compatmask)
 			u32 no_pss = 1;
 			memcpy((void*)((u32)&smb_cdvdman_irx+i+40),&no_pss,4);
 		}
+		
+		// game id
+		memcpy((void*)((u32)&smb_cdvdman_irx+i+84), &gameid, 5);
 		
 		for (i=0;i<size_smb_cdvdman_irx;i++){
 			if(!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"xxx.xxx.xxx.xxx")){

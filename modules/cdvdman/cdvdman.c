@@ -613,6 +613,7 @@ iop_sys_clock_t cdvdman_sysclock;
 static int fs_inited = 0;
 
 #ifdef HDD_DRIVER
+int lba_48bit = 0;
 int atad_inited = 0;
 static hdl_apa_header apaHeader;
 
@@ -3023,7 +3024,8 @@ int _start(int argc, char **argv)
 	g_tag[0] = 0; // just to shut off warning
 #endif
 #ifdef HDD_DRIVER
-	g_ISO_media = 0x69;
+	if (g_ISO_media != 0x69)
+		lba_48bit = g_ISO_media;
 	g_ISO_parts = 0x69; // just to shut off warning
 #endif
 	

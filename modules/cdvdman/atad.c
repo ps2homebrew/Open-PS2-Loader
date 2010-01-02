@@ -48,6 +48,8 @@ extern int netlog_inited;
 #define BANNER "ATA device driver %s - Copyright (c) 2003 Marcus R. Brown\n"
 #define VERSION "v1.1"
 
+extern int lba_48bit;
+
 static int ata_evflg = -1;
 
 /* Local device info.  */
@@ -493,20 +495,20 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 		lcyl = (lba >> 8) & 0xff;
 		hcyl = (lba >> 16) & 0xff;
 
-		//if (((lba >> 16) - 0x0ffe) >= 0) {
+		if (lba_48bit) {
 			/* Setup for 48-bit LBA.  */
 			/* Combine bits 24-31 and bits 0-7 of lba into sector.  */
-		//	sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
+			sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
 			/* 0x40 enables LBA.  */
-		//	select = ((device << 4) | 0x40) & 0xffff;
-		//	command = ATA_C_READ_DMA_EXT;
-		//} else {
+			select = ((device << 4) | 0x40) & 0xffff;
+			command = ATA_C_READ_DMA_EXT;
+		} else {
 			/* Setup for 28-bit LBA.  */
 			sector = lba & 0xff;
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
 			command = ATA_C_READ_DMA;
-		//}
+		}
 
 		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
 					hcyl, select, command)) != 0)

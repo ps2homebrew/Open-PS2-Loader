@@ -48,7 +48,9 @@
 #define _STR_STATIC 42
 #define _STR_DYNAMIC 43
 #define _STR_DEFDEVICE 44
-
+#define _STR_LOAD_FROM_DISC 45
+#define  _STR_PLEASE_WAIT 46
+#define  _STR_ERROR_LOADING_ID 47
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

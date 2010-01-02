@@ -126,6 +126,9 @@ struct UIItem diaIPConfig[] = {
 #define COMPAT_SAVE 100
 #define COMPAT_TEST 101
 #define COMPAT_REMOVE 102
+#define COMPAT_LOADFROMDISC 104
+#define COMPAT_MODE_BASE 10
+#define COMPAT_GAMEID 50
 #define COMPAT_MODE_COUNT 5
 struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 110, NULL, {.label = {"<Game Label>", -1}}},
@@ -134,11 +137,16 @@ struct UIItem diaCompatConfig[] = {
 	
 	{UI_LABEL, 111, NULL, {.label = {"", _STR_COMPAT_SETTINGS}}}, {UI_BREAK}, {UI_BREAK}, {UI_BREAK},
 
-	{UI_LABEL, 0, NULL, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, 10, "Load alt. core", {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, 11, "Alternative data read method", {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, 12, "Unhook Syscalls", {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, 13, "0 PSS mode", {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, 14, "Disable DVD-DL", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , "Load alt. core", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, "Alternative data read method", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, "Unhook Syscalls", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, "0 PSS mode", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, "Disable DVD-DL", {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
+	{UI_LABEL, 0, NULL, {.label = {"Game ID", -1}}}, {UI_SPACER}, {UI_STRING, COMPAT_GAMEID, NULL, {.stringvalue = {"", ""}}}, {UI_BREAK},
+	{UI_BUTTON, COMPAT_LOADFROMDISC, NULL, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
 	
 	{UI_SPLITTER},
 	
@@ -252,10 +260,60 @@ void setImageCompatMask(const char* image, int ntype, int mask) {
 	setConfigInt(&gConfig, gkey, mask);
 }
 
+
+char *getImageGameID(const char* image) {
+	char gkey[255];
+	char *gid;
+	
+	snprintf(gkey, 255, "gameid_%s", image);
+	
+	if (!getConfigStr(&gConfig, gkey, &gid))
+		gid = "";
+	
+	return gid;
+}
+
+// dst has to have 5 bytes space
+void getImageGameIDBin(const char* image, void* dst) {
+	char gkey[255];
+	char *gid;
+	
+	snprintf(gkey, 255, "gameid_%s", image);
+	
+	if (!getConfigStr(&gConfig, gkey, &gid))
+		gid = "";
+	
+	// convert from hex to binary
+	memset(dst, 0, 5);
+	char* cdst = dst;
+	int p = 0;
+	while (*gid && p < 10) {
+		int dv = -1;
+		
+		while (dv < 0 && *gid) // skip spaces, etc
+			dv = fromHex(*(gid++));
+		
+		if (dv < 0)
+			break;
+		
+		*cdst = *cdst * 16 + dv;
+		if ((++p & 1) == 0)
+			cdst++;
+	}
+}
+
+void setImageGameID(const char* image, const char *gid) {
+	char gkey[255];
+	
+	snprintf(gkey, 255, "gameid_%s", image);
+	setConfigStr(&gConfig, gkey, gid);
+}
+
 // returns COMPAT_TEST on testing request
 int showCompatConfig(const char* game, const char* prefix, int ntype) {
 	char gkey[255];
-	
+	char *hexid;
+
 	int modes = getImageCompatMask(prefix, ntype);
 	
 	int i;
@@ -263,11 +321,49 @@ int showCompatConfig(const char* game, const char* prefix, int ntype) {
 	diaSetLabel(diaCompatConfig, 110, game);
 	
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
-		diaSetInt(diaCompatConfig, i+10, (modes & (1 << i)) > 0 ? 1 : 0);
+		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (modes & (1 << i)) > 0 ? 1 : 0);
 	}
 	
+	// Find out the current game ID
+	hexid = getImageGameID(prefix);
+	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
+	
 	// show dialog
-	int result = diaExecuteDialog(diaCompatConfig);
+	int result = 0;
+	
+	do {
+		result = diaExecuteDialog(diaCompatConfig);
+		
+		if (result == COMPAT_LOADFROMDISC) {
+			// Draw "please wait..." screen
+			DrawBackground();
+			DrawHint(_l(_STR_PLEASE_WAIT), -1);
+			Flip();
+			
+			// load game ID, inject
+			char discID[5];
+			memset(discID, 0, 5);
+			
+			if (getDiscID(discID) >= 0) {
+				// convert to hexadecimal string
+				char nhexid[16];
+				
+				unsigned int n;
+				// this may seem stupid but it seems snprintf handles %X as signed...
+				for(n = 0; n < 5; ++n) {
+					nhexid[n*3    ] = toHex(discID[n] >> 4);
+					nhexid[n*3 + 1] = toHex(discID[n] & 0x0f);
+					nhexid[n*3 + 2] = ' ';
+				}
+				
+				nhexid[14] = '\0';
+				
+				diaSetString(diaCompatConfig, COMPAT_GAMEID, nhexid);
+			} else {
+				MsgBox(_l(_STR_ERROR_LOADING_ID));
+			}
+		}
+	} while (result == COMPAT_LOADFROMDISC);
 	
 	if (result == COMPAT_REMOVE) {
 		configRemoveKey(&gConfig, gkey);
@@ -276,11 +372,14 @@ int showCompatConfig(const char* game, const char* prefix, int ntype) {
 		modes = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
 			int mdpart;
-			diaGetInt(diaCompatConfig, i+10, &mdpart);
+			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
 			modes |= (mdpart ? 1 : 0) << i;
 		}
 		
 		setImageCompatMask(prefix, ntype, modes);
+		
+		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
+		setImageGameID(prefix, hexid);
 		
 		if (result == COMPAT_SAVE) // write the config
 			storeConfig();
@@ -605,7 +704,10 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	// find the compat mask
 	int cmask = getImageCompatMask(usbGameList[id - 1].Image, USB_MODE);
 	
-	LaunchGame(&usbGameList[id - 1], USB_MODE, cmask);
+	char* gid[5];
+	getImageGameIDBin(usbGameList[id - 1].Image, gid);
+	
+	LaunchGame(&usbGameList[id - 1], USB_MODE, cmask, gid);
 }
 
 void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
@@ -657,7 +759,10 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	
 	int cmask = getImageCompatMask(ethGameList[id - 1].Image, ETH_MODE);
 	
-	LaunchGame(&ethGameList[id - 1], ETH_MODE, cmask);
+	char* gid[5];
+	getImageGameIDBin(ethGameList[id - 1].Image, gid);
+	
+	LaunchGame(&ethGameList[id - 1], ETH_MODE, cmask, gid);
 }
 
 void AltExecETHGameSelection(struct TMenuItem* self, int id) {

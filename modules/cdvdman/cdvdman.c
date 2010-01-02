@@ -56,7 +56,7 @@ static int g_gamesetting_0_pss=0;
 
 #define ISO_MAX_PARTS	10
 static int g_part_start[ISO_MAX_PARTS] = {
-	0,
+	0,	// is apa header LBA in HDD use
 	0,
 	0,
 	0,
@@ -615,7 +615,6 @@ static int fs_inited = 0;
 #ifdef HDD_DRIVER
 int atad_inited = 0;
 static hdl_apa_header apaHeader;
-static u32 apaHeader_lba = 0;
 
 typedef struct {
 	u32 part_offset; 	// in MB
@@ -2979,14 +2978,14 @@ int _start(int argc, char **argv)
 	RegisterLibraryEntries(&_exp_dev9);
 	RegisterLibraryEntries(&_exp_atad);
 
-	if (apaHeader_lba == 0xffffffff)
+	if (g_part_start[0] == 0xffffffff) // checking apa Header LBA
 		return MODULE_NO_RESIDENT_END;
 
 	dev9_init();
 	atad_start();
 
 	atad_inited = 1;
-	if (ata_device_dma_transfer(0, &apaHeader, apaHeader_lba, 2, ATA_DIR_READ) != 0)
+	if (ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ) != 0)
 		return MODULE_NO_RESIDENT_END;
 
 	// checking HDL's deadfeed magic

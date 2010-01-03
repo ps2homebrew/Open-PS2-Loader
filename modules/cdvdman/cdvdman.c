@@ -29,8 +29,8 @@
 
 //#define NETLOG_DEBUG
 
-#define MODNAME "cdvdman"
-IRX_ID(MODNAME, 1, 1);
+#define MODNAME "dev9"
+IRX_ID(MODNAME, 2, 8);
 
 #ifdef USB_DRIVER
 static char skipmod_tab[] = "USBD.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";

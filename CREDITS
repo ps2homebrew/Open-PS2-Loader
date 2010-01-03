@@ -12,14 +12,10 @@ Copyright (C) 2006-2008 Polo <polo35580@hotmail.fr>
 Adaptation to USB Advance format and User interface
 Copyright (C) 2009 Ifcaro <taslokooo@gmail.com>
 
-GUI Improvements and static list by volca
-
-Most of compatibility patches in loader are done by jimmikaelkael
-
 Main Project developpers:
 Ifcaro, volca, jimmikaelkael
 
-CDVDMAN, CDVDFSV, CDDEV & SMBMAN modules
+CDVDMAN, CDVDFSV, CDDEV, DISCID & SMBMAN modules by jimmikaelkael
 Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
 
 NETLOG module, and other contributions
@@ -27,4 +23,6 @@ Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 
 SMSUTILS, SMSMAP & SMSTCPIP modules by Eugene Plotnikov
 
-Original DEV9 module by Marcus R. Brown
+DEV9, ATAD modules and derived code used in cdvdman by Marcus R. Brown
+
+PS2HDD module has been taken from PS2SDK

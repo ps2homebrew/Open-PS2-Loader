@@ -1129,7 +1129,7 @@ int main(void)
 				hdl_game_info_t *game = &games->games[i];
 				//scr_printf("\t %s type=%x sector=%08x compat=%x sizeMB=%d\n", game->name, game->disctype, game->start_sector, game->compat_flags, game->total_size_in_kb/1024);
 				//scr_printf("\t %s - %s\n", game->name, game->startup);
-				if (!strcmp(game->name, "MAXPAYNE"))
+				if (!strcmp(game->name, "GODOFWAR2"))
 					LaunchHDDGame(game, 0, 0, &transfer_mode);
 			}
 		}

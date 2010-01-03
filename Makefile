@@ -60,7 +60,9 @@ clean:
 	echo "    * smbman.irx"
 	$(MAKE) -C modules/smbman clean
 	echo "    * discID.irx"
-	$(MAKE) -C modules/discID clean	
+	$(MAKE) -C modules/discID clean
+	echo "    * ps2atad.irx"
+	$(MAKE) -C modules/atad clean	
 	echo "    * iso2usbld"
 	$(MAKE) -C pc clean
 
@@ -165,7 +167,9 @@ discid.s:
 	bin2s modules/discID/discID.irx asm/discid.s discid_irx
 
 ps2atad.s:
-	bin2s $(PS2SDK)/iop/irx/ps2atad.irx asm/ps2atad.s ps2atad_irx
+	echo "    * ps2atad.irx"
+	$(MAKE) -C modules/atad
+	bin2s modules/atad/ps2atad.irx asm/ps2atad.s ps2atad_irx
 
 poweroff.s:
 	bin2s $(PS2SDK)/iop/irx/poweroff.irx asm/poweroff.s poweroff_irx

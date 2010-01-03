@@ -288,8 +288,8 @@ int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddIs48bit(void);
 int hddSetTransferMode(int type, int mode);
-int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize);
 int hddGetHDLGamelist(hdl_games_list_t **game_list);
+int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo);
 
 #define MDMA_MODE		0x20
 #define UDMA_MODE		0x40

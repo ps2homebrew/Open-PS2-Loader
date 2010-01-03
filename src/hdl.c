@@ -118,6 +118,8 @@ typedef struct					// size = 1024
 #define APA_DEVCTL_IS_48BIT				0x00006840
 #define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
 
+static apa_partition_table_t *ptable = NULL;
+
 //-------------------------------------------------------------------------
 int hddCheck(void)
 {
@@ -156,7 +158,7 @@ int hddSetTransferMode(int type, int mode)
 }
 
 //-------------------------------------------------------------------------
-int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize)
+static int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize)
 {
 	u8 args[16];
 
@@ -164,6 +166,21 @@ int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize)
 	*(u32 *)&args[4] = nsectors;
 
 	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, buf, bufsize) != 0)
+		return -1;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+static int hddWriteSectors(u32 lba, u32 nsectors, void *buf)
+{
+	u8 args[16];
+
+	*(u32 *)&args[0] = lba;
+	*(u32 *)&args[4] = nsectors;
+	*(u32 *)&args[8] = (u32)buf;
+
+	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_WRITE, args, 12, NULL, 0) != 0)
 		return -1;
 
 	return 0;
@@ -302,15 +319,15 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 int hddGetHDLGamelist(hdl_games_list_t **game_list)
 {
 	register int ret;
-	apa_partition_table_t *table;
 
-	ret = apaReadPartitionTable(&table);
+	ret = apaReadPartitionTable(&ptable);
 	if (ret == 0) {
+		
 		u32 i, count = 0;
 		void *tmp;
 
-		for (i = 0; i < table->part_count; i++)
-			count += ((table->parts[i].header.flags == 0) && (table->parts[i].header.type == 0x1337));
+		for (i = 0; i < ptable->part_count; i++)
+			count += ((ptable->parts[i].header.flags == 0) && (ptable->parts[i].header.type == 0x1337));
 
 		tmp = malloc(sizeof(hdl_game_info_t) * count);
 		if (tmp != NULL) {
@@ -323,11 +340,11 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 				memset(*game_list, 0, sizeof(hdl_games_list_t));
 				(*game_list)->count = count;
 				(*game_list)->games = tmp;
-				(*game_list)->total_chunks = table->total_chunks;
-				(*game_list)->free_chunks = table->free_chunks;
+				(*game_list)->total_chunks = ptable->total_chunks;
+				(*game_list)->free_chunks = ptable->free_chunks;
 
-				for (i = 0; ((ret == 0) && (i < table->part_count)); i++) {
-					apa_header *header = &table->parts[i].header;
+				for (i = 0; ((ret == 0) && (i < ptable->part_count)); i++) {
+					apa_header *header = &ptable->parts[i].header;
 					if ((header->flags == 0) && (header->type == 0x1337))
 						ret = hddGetHDLGameInfo(header, (*game_list)->games + index++);
 				}
@@ -346,6 +363,37 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 	return ret;
 }
 
+//-------------------------------------------------------------------------
+int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
+{	
+	// !!!! UNTESTED !!!!
+ 	const u32 offset = 0x101000;
+ 	char buf[1024];
 
+ 	if (ptable == NULL)
+ 		return -1;
 
+ 	apa_header *header = &ptable->parts[game_index].header;
+ 	if (header == NULL)
+ 		return -2;
 
+ 	u32 start_sector = header->start + offset / 512;
+
+ 	if (hddReadSectors(start_sector, 2, buf, 2 * 512) != 0)
+ 		return -3;
+
+	hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
+
+	// checking deadfeed magic & PS2 game magic
+	if (hdl_header->checksum != 0xdeadfeed)
+		return -4;
+
+	// just change game name and compat flags !!!
+	strcpy(hdl_header->gamename, ginfo->name);
+	hdl_header->compat_flags = ginfo->compat_flags;
+
+ 	if (hddWriteSectors(start_sector, 2, buf) != 0)
+ 		return -5;
+
+ 	return 0;
+}

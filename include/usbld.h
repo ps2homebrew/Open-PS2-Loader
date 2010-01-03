@@ -225,6 +225,7 @@ int gNetAutostart;
 int gIPConfigChanged;
 
 int gHddStartup;
+int gDev9_loaded;
 
 #define COMPAT_MODE_1 		0x01
 #define COMPAT_MODE_2 		0x02
@@ -285,8 +286,19 @@ typedef struct
 
 int hddCheck(void);
 u32 hddGetTotalSectors(void);
+int hddIs48bit(void);
+int hddSetTransferMode(int type, int mode);
 int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize);
 int hddGetHDLGamelist(hdl_games_list_t **game_list);
+
+#define MDMA_MODE		0x20
+#define UDMA_MODE		0x40
+
+typedef struct
+{
+	int type;  	// MDMA / UDMA
+	int mode;
+} hdd_transfer_mode_t;
 
 //SYSTEM
 
@@ -299,7 +311,7 @@ void Start_LoadNetworkModules_Thread(void);
 void LoadUSBD();
 int getDiscID(void *discID);
 void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
-void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid);
+void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid, hdd_transfer_mode_t *transfer_mode);
 int ExecElf(char *path);
 void SendIrxKernelRAM(int mode);
 

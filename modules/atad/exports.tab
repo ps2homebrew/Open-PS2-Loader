@@ -22,6 +22,7 @@ DECLARE_EXPORT_TABLE(atad, 1, 2)
 	DECLARE_EXPORT(ata_device_flush_cache)
 	DECLARE_EXPORT(ata_device_is_sce)
 	DECLARE_EXPORT(ata_device_is_48bit)
+	DECLARE_EXPORT(ata_device_set_transfer_mode)
 
 END_EXPORT_TABLE
 

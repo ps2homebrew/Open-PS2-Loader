@@ -115,6 +115,8 @@ typedef struct					// size = 1024
 #define APA_DEVCTL_ATA_READ				0x00006836// arg  = hddAtaTransfer_t 
 #define APA_DEVCTL_ATA_WRITE			0x00006837// arg  = hddAtaTransfer_t 
 #define APA_DEVCTL_SCE_IDENTIFY_DRIVE	0x00006838// bufp = buffer for atadSceIdentifyDrive 
+#define APA_DEVCTL_IS_48BIT				0x00006840
+#define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
 
 //-------------------------------------------------------------------------
 int hddCheck(void)
@@ -134,6 +136,23 @@ int hddCheck(void)
 u32 hddGetTotalSectors(void)
 {
 	return fileXioDevctl("hdd0:", APA_DEVCTL_TOTAL_SECTORS, NULL, 0, NULL, 0);
+}
+
+//-------------------------------------------------------------------------
+int hddIs48bit(void)
+{
+	return fileXioDevctl("hdd0:", APA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
+}
+
+//-------------------------------------------------------------------------
+int hddSetTransferMode(int type, int mode)
+{
+	u8 args[16];
+
+	*(u32 *)&args[0] = type;
+	*(u32 *)&args[4] = mode;
+
+	return fileXioDevctl("hdd0:", APA_DEVCTL_SET_TRANSFER_MODE, args, 8, NULL, 0);
 }
 
 //-------------------------------------------------------------------------

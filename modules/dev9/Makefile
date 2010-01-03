@@ -1,7 +1,7 @@
 IOP_BIN  = ps2dev9.irx
 
 IOP_INCS +=
-IOP_CFLAGS  += -Wall -fno-builtin-printf -DDISBABLE_DEV9SHUTDOWN -DDEV9X_DEV #-DCHECK_LOADED -DPOWEROFF -DPCMCIA -DDEBUG
+IOP_CFLAGS  += -Wall -fno-builtin-printf -DCHECK_LOADED -DDEV9X_DEV #-DPOWEROFF -DPCMCIA -DDEBUG
 IOP_LDFLAGS += -s
 
 IOP_OBJS = ps2dev9.o exports.o imports.o

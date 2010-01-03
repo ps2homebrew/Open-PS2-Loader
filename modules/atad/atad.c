@@ -654,7 +654,7 @@ int ata_device_smart_get_status(int device)
 }
 
 /* Set features - set transfer mode.  */
-static int ata_device_set_transfer_mode(int device, int type, int mode)
+int ata_device_set_transfer_mode(int device, int type, int mode)
 {
 	int res;
 

@@ -144,7 +144,8 @@ void Reset()
     SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
     SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
     SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-    SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);    
+    
+    gDev9_loaded = 0;
 }
 
 void delay(int count) {
@@ -501,7 +502,7 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 	ExecPS2((void *)eh->entry, 0, 3, argv);
 } 
 
-void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid)
+void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid, hdd_transfer_mode_t *transfer_mode)
 {
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
@@ -512,6 +513,8 @@ void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid)
 	char filename[32];
 	char config_str[255];
 	char *mode_str = NULL;
+
+	hddSetTransferMode(transfer_mode->type, transfer_mode->mode);
 
 	set_ipconfig();
 
@@ -541,7 +544,12 @@ void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid)
 	// game id
 	memcpy((void*)((u32)&hdd_cdvdman_irx+i+84), &gameid, 5);
 
-	memcpy((void*)((u32)&hdd_cdvdman_irx+i+44),&game->start_sector,4);		
+	// patch 48bit flag
+	u8 flag_48bit = hddIs48bit() & 0xff;
+	memcpy((void*)((u32)&hdd_cdvdman_irx+i+34), &flag_48bit, 1);	
+
+	// patch start_sector
+	memcpy((void*)((u32)&hdd_cdvdman_irx+i+44), &game->start_sector, 4);		
 
 	FlushCache(0);
 

@@ -324,7 +324,6 @@ static int smap_device_reset()
 /* Export 6 */
 void dev9Shutdown()
 {
-#ifdef DISABLE_DEV9SHUTDOWN	
 	int idx;
 	USE_DEV9_REGS;
 
@@ -345,7 +344,6 @@ void dev9Shutdown()
 		DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~1;
 	}
 	DelayThread(1000000);
-#endif	
 }
 
 /* Export 7 */
@@ -522,16 +520,12 @@ void dev9LEDCtl(int ctl)
 
 /* Export 11 */
 int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb){
-#ifndef DISABLE_DEV9SHUTDOWN	
 	if (idx < 16)
 	{
 		dev9_shutdown_cbs[idx] = cb;
 		return 0;
 	}
 	return -1;
-#else
-	return 0;
-#endif
 }
 
 static int smap_subsys_init(void)

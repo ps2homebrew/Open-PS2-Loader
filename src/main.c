@@ -10,6 +10,9 @@
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+extern void *ps2dev9_irx;
+extern int size_ps2dev9_irx;
+
 extern void *ps2atad_irx;
 extern int size_ps2atad_irx;
 
@@ -983,6 +986,19 @@ void LoadNetworkModules() {
 	int ret, id;
 		
 	set_ipconfig();
+
+	if (!gDev9_loaded) {
+		gNetworkStartup = 5;
+		netLoadDisplay();
+
+    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+		if ((id < 0) || ret) {
+			gNetworkStartup = -1;
+			return;
+		}
+
+		gDev9_loaded = 1;
+	}
 	
 	gNetworkStartup = 4;
 	netLoadDisplay();
@@ -1026,6 +1042,18 @@ void LoadHddModules(void)
 {	
 	int ret, id;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+
+	if (!gDev9_loaded) {
+		gHddStartup = 4;
+
+    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+		if ((id < 0) || ret) {
+			gHddStartup = -1;
+			return;
+		}
+
+		gDev9_loaded = 1;
+	}
 
 	gHddStartup = 3;
 
@@ -1074,33 +1102,39 @@ int main(void)
 		eth_inited = 1;
 	}
 	
-	/* // For Testing HDD
+	// For Testing HDD
+	/*
 	int ret;
     LoadHddModules();
     
-    init_scr();
-    scr_clear();
+    //init_scr();
+    //scr_clear();
     
     ret = hddCheck();
-    scr_printf("\n\t hddCheck ret=%d\n", ret);
-    ret = hddGetTotalSectors();
-    scr_printf("\t hddGetTotalSectors ret=%d\n", ret);
+    //scr_printf("\n\t hddCheck ret=%d\n", ret);
+    if (ret == 0) {
+    	ret = hddGetTotalSectors();
+    	//scr_printf("\t hddGetTotalSectors ret=%d\n", ret);
 
-    hdl_games_list_t *games;
-    ret = hddGetHDLGamelist(&games);
-    scr_printf("\t hddGetHDLGamelist ret=%d\n", ret);
+    	hdl_games_list_t *games;
+    	ret = hddGetHDLGamelist(&games);
+    	//scr_printf("\t hddGetHDLGamelist ret=%d\n", ret);
+    	if (ret == 0) {
+    		hdd_transfer_mode_t transfer_mode;
+    		transfer_mode.type = UDMA_MODE;
+    		transfer_mode.mode = 4;
 
-    int i;
-    for (i=0; i<games->count; i++){
-		hdl_game_info_t *game = &games->games[i];
-		//scr_printf("\t %s type=%x sector=%08x compat=%x sizeMB=%d\n", game->name, game->disctype, game->start_sector, game->compat_flags, game->total_size_in_kb/1024);
-		//scr_printf("\t %s - %s\n", game->name, game->startup);
-		//if (strcmp(game->name, "LEGO STAR WARS"))
-			LaunchHDDGame(game, 0, 0);
+    		int i;
+    		for (i=0; i<games->count; i++){
+				hdl_game_info_t *game = &games->games[i];
+				//scr_printf("\t %s type=%x sector=%08x compat=%x sizeMB=%d\n", game->name, game->disctype, game->start_sector, game->compat_flags, game->total_size_in_kb/1024);
+				//scr_printf("\t %s - %s\n", game->name, game->startup);
+				if (!strcmp(game->name, "MAXPAYNE"))
+					LaunchHDDGame(game, 0, 0, &transfer_mode);
+			}
+		}
 	}
-    
-    SleepThread();
-    */
+	*/
 	
 	TextColor(0x80,0x80,0x80,0x80);
 	

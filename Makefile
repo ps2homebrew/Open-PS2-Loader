@@ -62,7 +62,9 @@ clean:
 	echo "    * discID.irx"
 	$(MAKE) -C modules/discID clean
 	echo "    * ps2atad.irx"
-	$(MAKE) -C modules/atad clean	
+	$(MAKE) -C modules/atad clean
+	echo "    * ps2hdd.irx"
+	$(MAKE) -C modules/ps2hdd clean	
 	echo "    * iso2usbld"
 	$(MAKE) -C pc clean
 
@@ -175,7 +177,9 @@ poweroff.s:
 	bin2s $(PS2SDK)/iop/irx/poweroff.irx asm/poweroff.s poweroff_irx
 
 ps2hdd.s:
-	bin2s $(PS2SDK)/iop/irx/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
+	echo "    * ps2hdd.irx"
+	$(MAKE) -C modules/ps2hdd
+	bin2s modules/ps2hdd/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx

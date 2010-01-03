@@ -389,7 +389,7 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 		return -4;
 
 	// just change game name and compat flags !!!
-	strcpy(hdl_header->gamename, ginfo->name);
+	strncpy(hdl_header->gamename, ginfo->name, 159);
 	hdl_header->compat_flags = ginfo->compat_flags;
 
  	if (hddWriteSectors(start_sector, 2, buf) != 0)

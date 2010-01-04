@@ -1109,17 +1109,13 @@ int main(void)
     	ret = hddGetHDLGamelist(&games);
     	//scr_printf("\t hddGetHDLGamelist ret=%d\n", ret);
     	if (ret == 0) {
-    		hdd_transfer_mode_t transfer_mode;
-    		transfer_mode.type = UDMA_MODE;
-    		transfer_mode.mode = 4;
-
     		int i;
     		for (i=0; i<games->count; i++){
 				hdl_game_info_t *game = &games->games[i];
 				//scr_printf("\t %s type=%x sector=%08x compat=%x sizeMB=%d\n", game->name, game->disctype, game->start_sector, game->compat_flags, game->total_size_in_kb/1024);
 				//scr_printf("\t %s - %s\n", game->name, game->startup);
 				if (!strcmp(game->name, "GODOFWAR2"))
-					LaunchHDDGame(game, 0, 0, &transfer_mode);
+					LaunchHDDGame(game, 0);
 			}
 		}
 	}

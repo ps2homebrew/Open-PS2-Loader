@@ -83,8 +83,10 @@ typedef struct					// size = 1024
 	u32		checksum;			// HDL uses 0xdeadfeed magic here
 	u32		magic;
 	char	gamename[160];
-	u8  	compat_flags;
-	u8		pad[3];
+	u8  	hdl_compat_flags;
+	u8  	ops2l_compat_flags;
+	u8		dma_type;
+	u8		dma_mode;
 	char	startup[60];
 	u32 	layer1_start;
 	u32 	discType;
@@ -184,6 +186,12 @@ static int hddWriteSectors(u32 lba, u32 nsectors, void *buf)
 		return -1;
 
 	return 0;
+}
+
+//-------------------------------------------------------------------------
+static int hddFlushCache(void)
+{
+	return fileXioDevctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -304,7 +312,10 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 		ginfo->partition_name[APA_IDMAX] = 0;
 		strcpy(ginfo->name, hdl_header->gamename);
 		strcpy(ginfo->startup, hdl_header->startup);
-		ginfo->compat_flags = hdl_header->compat_flags;
+		ginfo->hdl_compat_flags = hdl_header->hdl_compat_flags;
+		ginfo->ops2l_compat_flags = hdl_header->ops2l_compat_flags;
+		ginfo->dma_type = hdl_header->dma_type;
+		ginfo->dma_mode = hdl_header->dma_mode;
 		ginfo->layer_break = hdl_header->layer1_start;
 		ginfo->disctype = hdl_header->discType;
 		ginfo->start_sector = start_sector;
@@ -390,10 +401,15 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 
 	// just change game name and compat flags !!!
 	strncpy(hdl_header->gamename, ginfo->name, 159);
-	hdl_header->compat_flags = ginfo->compat_flags;
+	hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
+	hdl_header->ops2l_compat_flags = ginfo->ops2l_compat_flags;
+	hdl_header->dma_type = ginfo->dma_type;
+	hdl_header->dma_mode = ginfo->dma_mode;
 
  	if (hddWriteSectors(start_sector, 2, buf) != 0)
  		return -5;
+
+	hddFlushCache();
 
  	return 0;
 }

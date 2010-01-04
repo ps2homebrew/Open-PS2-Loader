@@ -145,7 +145,20 @@ int New_Reset_Iop(const char *arg, int flag){
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
 		GS_BGCOLOUR = 0x000080;
-		while (1){;}
+
+		// some games like SOCOM3 uses faulty IOPRP path like "cdrom0:\RUN\IRX\DNAS300.IMGG;1"
+		// this part ensure it will not get stucked on red screen
+		char *p = strrchr(ioprp_path, '.');
+		if (p) {
+			p[4] = ';';
+			p[5] = '1';
+			p[6] = 0;
+
+			fd = open(ioprp_path, O_RDONLY);
+		}
+
+		if (fd < 0)
+			while (1){;}
 	}
 
 	ioprp_img.size_in = lseek(fd, 0, SEEK_END);

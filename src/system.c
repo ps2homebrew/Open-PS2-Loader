@@ -66,6 +66,9 @@ extern int size_iomanx_irx;
 extern void *filexio_irx;
 extern int size_filexio_irx;
 
+extern void *poweroff_irx;
+extern int size_poweroff_irx;
+
 extern void *loader_elf;
 extern int size_loader_elf;
 
@@ -144,7 +147,10 @@ void Reset()
     SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
     SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
     SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-    
+    SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+
+    poweroffInit();
+
     gDev9_loaded = 0;
 }
 
@@ -526,7 +532,6 @@ void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid, hdd_tran
 		}
 	}
 
-	/*
 	if (compatmask & COMPAT_MODE_2) {
 		u32 alt_read_mode = 1;
 		memcpy((void*)((u32)&hdd_cdvdman_irx+i+35),&alt_read_mode,1);
@@ -539,8 +544,7 @@ void LaunchHDDGame(hdl_game_info_t *game, int compatmask, void* gameid, hdd_tran
 		u32 no_pss = 1;
 		memcpy((void*)((u32)&hdd_cdvdman_irx+i+40),&no_pss,4);
 	}
-	*/
-		
+	
 	// game id
 	memcpy((void*)((u32)&hdd_cdvdman_irx+i+84), &gameid, 5);
 

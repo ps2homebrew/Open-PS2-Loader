@@ -17,6 +17,7 @@
 #include "gsToolkit.h"
 #include "malloc.h"
 #include "math.h"
+#include <libpwroff.h>
 
 #include <debug.h>
 

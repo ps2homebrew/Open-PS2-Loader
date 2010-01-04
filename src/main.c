@@ -16,9 +16,6 @@ extern int size_ps2dev9_irx;
 extern void *ps2atad_irx;
 extern int size_ps2atad_irx;
 
-extern void *poweroff_irx;
-extern int size_poweroff_irx;
-
 extern void *ps2hdd_irx;
 extern int size_ps2hdd_irx;
 
@@ -1044,7 +1041,7 @@ void LoadHddModules(void)
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
 	if (!gDev9_loaded) {
-		gHddStartup = 4;
+		gHddStartup = 3;
 
     	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
 		if ((id < 0) || ret) {
@@ -1055,17 +1052,9 @@ void LoadHddModules(void)
 		gDev9_loaded = 1;
 	}
 
-	gHddStartup = 3;
-
-    id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
-		gHddStartup = -1;
-		return;
-	}
-
 	gHddStartup = 2;
 
-    id=SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+    id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {
 		gHddStartup = -1;
 		return;
@@ -1106,7 +1095,7 @@ int main(void)
 	/*
 	int ret;
     LoadHddModules();
-    
+
     //init_scr();
     //scr_clear();
     
@@ -1134,8 +1123,10 @@ int main(void)
 			}
 		}
 	}
+
+	poweroffShutdown(); // does poweroff
 	*/
-	
+
 	TextColor(0x80,0x80,0x80,0x80);
 	
 	while(1)

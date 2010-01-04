@@ -15,7 +15,7 @@ EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o ob
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
 		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		  obj/up_dn_icon.o obj/lt_rt_icon.o
-EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lfileXio -lpatches -lpad -lm -lmc -lc
+EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lc
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 all:

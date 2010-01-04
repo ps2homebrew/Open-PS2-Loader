@@ -1932,7 +1932,17 @@ int sceCdStSeekF(u32 lsn)
 //-------------------------------------------------------------------------
 int sceCdReadDiskID(void *DiskID)
 {
-	mips_memcpy(DiskID, g_DiskID, 5);
+	int i;
+	u8 *p = (u8 *)DiskID;
+
+	for (i=0; i<5; i++) {
+		if (p[i]!=0)
+			break;
+	}
+	if (i == 5)
+		*((u16 *)DiskID) = (u16)0xadde;
+	else
+		mips_memcpy(DiskID, g_DiskID, 5);
 
 	return 1;
 }

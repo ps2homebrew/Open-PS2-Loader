@@ -44,6 +44,10 @@ int eth_inited = 0;
 // frames since button was pressed
 int inactiveFrames;
 
+int hddfound;
+hdl_games_list_t *hddGameList;
+
+
 // minimal inactive frames for hint display
 #define HINT_FRAMES_MIN 64
 
@@ -167,6 +171,7 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_TXTCOL 15
 #define UICFG_EXITTO 16
 #define UICFG_DEFDEVICE 17
+#define UICFG_USEHDD 18
 
 #define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
@@ -178,6 +183,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, UICFG_MENU, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, UICFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_USEHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_USEHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -237,7 +243,15 @@ void showIPConfig() {
 	}
 }
 
-int getImageCompatMask(const char* image, int ntype) {
+int getImageCompatMask(int id, const char* image, int ntype) {
+	// hdd has an exception
+	if (ntype == HDD_MODE) {
+		if (!hddfound)
+			return 0;
+		// read from the game's description
+		return hddGameList->games[id - 1].ops2l_compat_flags;
+	}
+	
 	char gkey[255];
 	unsigned int modemask;
 	
@@ -249,7 +263,21 @@ int getImageCompatMask(const char* image, int ntype) {
 	return modemask;
 }
 
-void setImageCompatMask(const char* image, int ntype, int mask) {
+void setImageCompatMask(int id, const char* image, int ntype, int mask) {
+	if (ntype == HDD_MODE) {
+		if (!hddfound)
+			return 0;
+		
+		// write to the game's description
+		hddGameList->games[id - 1].ops2l_compat_flags = (unsigned char)mask;
+		
+		/* TODO: STORE:
+		!!!! UNTESTED: (!the id may be off, causing game header to overwrite a different one!). You've been warned!
+		hddSetHDLGameInfo(id - 1, hddGameList->games[id - 1]);
+		*/
+		return;
+	}
+	
 	char gkey[255];
 	
 	snprintf(gkey, 255, "%s_%d", image, ntype);
@@ -306,12 +334,22 @@ void setImageGameID(const char* image, const char *gid) {
 	setConfigStr(&gConfig, gkey, gid);
 }
 
-// returns COMPAT_TEST on testing request
-int showCompatConfig(const char* game, const char* prefix, int ntype) {
+/** Shows compatibility settings window
+* @param id the game id (index into the game list + 1)
+* @param game the textual name if the game (readable form)
+* @param prefix the string id of the game, unique, without spaces
+* @param ntype the source type of the execution environment (HDD_MODE, USB_MODE, ETH_MODE)
+* @return id of the dialogue button used to exit the dialogue, or either -1 or 0 on error or success without result
+* @note returns COMPAT_TEST on testing request
+*/
+int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 	char gkey[255];
 	char *hexid;
-
-	int modes = getImageCompatMask(prefix, ntype);
+	
+	if (id <= 0)
+		return -1;
+	
+	int modes = getImageCompatMask(id, prefix, ntype);
 	
 	int i;
 	
@@ -373,7 +411,7 @@ int showCompatConfig(const char* game, const char* prefix, int ntype) {
 			modes |= (mdpart ? 1 : 0) << i;
 		}
 		
-		setImageCompatMask(prefix, ntype, modes);
+		setImageCompatMask(id, prefix, ntype, modes);
 		
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		setImageGameID(prefix, hexid);
@@ -444,6 +482,7 @@ void showUIConfig() {
 	diaSetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 	diaSetInt(diaUIConfig, UICFG_EXITTO, exit_mode);
 	diaSetInt(diaUIConfig, UICFG_DEFDEVICE, default_device);
+	diaSetInt(diaIPConfig, UICFG_USEHDD, gUseHdd);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -456,6 +495,7 @@ void showUIConfig() {
 		diaGetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 		diaGetInt(diaUIConfig, UICFG_EXITTO, &exit_mode);
 		diaGetInt(diaUIConfig, UICFG_DEFDEVICE, &default_device);
+		diaGetInt(diaIPConfig, UICFG_USEHDD, &gUseHdd);
 	
 		// update the value interpretation
 		setLanguage(gLanguageID);
@@ -493,6 +533,7 @@ int loadConfig(const char* fname, int clearFirst) {
 	
 	getConfigInt(&gConfig, "pc_port", &gPCPort);
 	getConfigInt(&gConfig, "net_auto", &gNetAutostart);
+	getConfigInt(&gConfig, "use_hdd", &gUseHdd);
 	
 	if (getConfigStr(&gConfig, "pc_share", &temp))
 		strncpy(gPCShareName, temp, 32);
@@ -516,6 +557,7 @@ int saveConfig(const char* fname) {
 	setConfigStr(&gConfig, "pc_ip", temp);
 	setConfigInt(&gConfig, "pc_port", gPCPort);
 	setConfigInt(&gConfig, "net_auto", gNetAutostart);
+	setConfigInt(&gConfig, "use_hdd", gUseHdd);
 	setConfigStr(&gConfig, "pc_share", gPCShareName);
 
 	// Not writing the IP config, too dangerous to change it by accident...
@@ -573,11 +615,14 @@ int storeConfig() {
 // Submenu items variant of the game list... keeped in sync with the game item list
 struct TSubMenuList* usb_submenu = NULL;
 struct TSubMenuList* eth_submenu = NULL;
+struct TSubMenuList* hdd_submenu = NULL;
 
 /// List of usb games
 struct TMenuItem usb_games_item;
 /// List of network games
 struct TMenuItem eth_games_item;
+/// List of hdd games
+struct TMenuItem hdd_games_item;
 
 /// scroll speed selector
 struct TSubMenuList* speed_item = NULL;
@@ -654,6 +699,27 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 	fioClose(fd);
 }
 
+int RefreshHDDGameList() {
+        int ret = hddGetHDLGamelist(&hddGameList);
+	
+	if (ret != 0)
+		return -1;
+	
+	// iterate the games, create items for them
+	int id;
+	for (id = 1; id <= hddGameList->count; id++) {
+		hdl_game_info_t *game = &hddGameList->games[id - 1];
+		
+		AppendSubMenu(&hdd_submenu, &disc_icon, game->name, id, -1);
+	};
+	
+	hdd_games_item.submenu = hdd_submenu;
+	hdd_games_item.current = hdd_submenu;
+	
+	return 0;
+}
+
+
 void FindUSBPartition(){
 	int i, fd;
 	char path[64];
@@ -699,7 +765,7 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	padReset();
 	
 	// find the compat mask
-	int cmask = getImageCompatMask(usbGameList[id - 1].Image, USB_MODE);
+	int cmask = getImageCompatMask(id, usbGameList[id - 1].Image, USB_MODE);
 	
 	char* gid[5];
 	getImageGameIDBin(usbGameList[id - 1].Image, gid);
@@ -711,7 +777,7 @@ void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(usbGameList[id - 1].Name, usbGameList[id - 1].Image, USB_MODE) == COMPAT_TEST)
+	if (showCompatConfig(id, usbGameList[id - 1].Name, usbGameList[id - 1].Image, USB_MODE) == COMPAT_TEST)
 		ExecUSBGameSelection(self, id);
 }
 
@@ -754,7 +820,7 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	padPortClose(1, 0);
 	padReset();
 	
-	int cmask = getImageCompatMask(ethGameList[id - 1].Image, ETH_MODE);
+	int cmask = getImageCompatMask(id, ethGameList[id - 1].Image, ETH_MODE);
 	
 	char* gid[5];
 	getImageGameIDBin(ethGameList[id - 1].Image, gid);
@@ -766,9 +832,53 @@ void AltExecETHGameSelection(struct TMenuItem* self, int id) {
 	if (id == -1)
 		return;
 	
-	if (showCompatConfig(ethGameList[id - 1].Name,  ethGameList[id - 1].Image, ETH_MODE) == COMPAT_TEST)
+	if (showCompatConfig(id, ethGameList[id - 1].Name,  ethGameList[id - 1].Image, ETH_MODE) == COMPAT_TEST)
 		ExecETHGameSelection(self, id);
 }
+
+
+// --------------------- HDD Menu item callbacks --------------------
+void LoadHddModules(void);
+
+void StartHdd() {
+	// For Testing HDD
+	LoadHddModules();
+
+	hddfound = hddCheck();
+}
+
+void ExecHDDGameSelection(struct TMenuItem* self, int id) {
+	if (id <= 0)
+		return;
+		
+	padPortClose(0, 0);
+	padPortClose(1, 0);
+	padReset();
+	
+	// hash to ensure no spaces are present
+	char imgnam[12];
+	unsigned int crc = crc32(hddGameList->games[id - 1].name);
+	snprintf(imgnam, 12, "%X", crc);
+	
+	char* gid[5];
+	getImageGameIDBin(imgnam, gid);
+	
+	LaunchHDDGame(&hddGameList->games[id - 1], gid);
+}
+
+void AltExecHDDGameSelection(struct TMenuItem* self, int id) {
+	if (id == -1)
+		return;
+	
+	// Example Game id storage impl (maybe hdd_id%d would be better?):
+	char imgnam[12];
+	unsigned int crc = crc32(hddGameList->games[id - 1].name);
+	snprintf(imgnam, 12, "%X", crc);
+	
+	if (showCompatConfig(id, hddGameList->games[id - 1].name,  imgnam, HDD_MODE) == COMPAT_TEST)
+		ExecHDDGameSelection(self, id);
+}
+
 
 // --------------------- Exit/Settings Menu item callbacks --------------------
 /// menu item selection callbacks
@@ -829,7 +939,7 @@ struct TMenuItem usb_games_item  = {
 };
 
 struct TMenuItem hdd_games_item = {
-	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL
+	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL, &ExecHDDGameSelection, NULL, &AltExecHDDGameSelection
 };
 
 struct TMenuItem eth_games_item = {
@@ -857,9 +967,18 @@ void InitMenuItems() {
 	AppendMenuItem(&exit_item);
 	AppendMenuItem(&settings_item);
 	AppendMenuItem(&usb_games_item);
-	AppendMenuItem(&hdd_games_item);
+	
+	// show hdd icon if found
+	if (hddfound) {
+		// hdd items population
+		RefreshHDDGameList();
+		AppendMenuItem(&hdd_games_item);
+	}
+	
 	AppendMenuItem(&eth_games_item);
-	AppendMenuItem(&apps_item);
+	
+	// Commenting out for now, not used:
+	// AppendMenuItem(&apps_item);
 }
 
 // main initialization function
@@ -882,8 +1001,9 @@ void init() {
 	gPCPort = 445;
 	// loading progress of the network
 	gNetworkStartup = 0;
-	// autostart network?
+	// autostart network, hdd?
 	gNetAutostart = 0;
+	gUseHdd = 0;
 	// no change to the ipconfig was done
 	gIPConfigChanged = 0;
 	// Default PC share name
@@ -892,6 +1012,8 @@ void init() {
 	exit_mode=0;
 	// default device USB
 	default_device = 0;
+	// 1 if the harddrive is found
+	hddfound = 0;
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;
@@ -919,6 +1041,11 @@ void init() {
 	// if successful, it will remember the config location for further writes
 	restoreConfig();
 	
+	// HDD startup
+	if (gUseHdd)
+		StartHdd();
+	
+	// initialize menu
 	InitMenu();
 	
 	delay(1);
@@ -936,10 +1063,6 @@ void init() {
 		default:
 			MenuSetSelectedItem(&usb_games_item);
 	}
-	
-	
-	
-	
 	
 	StartPad();
 
@@ -1054,7 +1177,7 @@ void LoadHddModules(void)
 
 	gHddStartup = 2;
 
-    id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
+	id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {
 		gHddStartup = -1;
 		return;
@@ -1062,7 +1185,7 @@ void LoadHddModules(void)
 
 	gHddStartup = 1;
 
-    id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);		
+	id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);		
 	if ((id < 0) || ret) {
 		gHddStartup = -1;
 		return;
@@ -1090,38 +1213,6 @@ int main(void)
 		StartNetwork();
 		eth_inited = 1;
 	}
-	
-	// For Testing HDD
-	/*
-	int ret;
-    LoadHddModules();
-
-    //init_scr();
-    //scr_clear();
-    
-    ret = hddCheck();
-    //scr_printf("\n\t hddCheck ret=%d\n", ret);
-    if (ret == 0) {
-    	ret = hddGetTotalSectors();
-    	//scr_printf("\t hddGetTotalSectors ret=%d\n", ret);
-
-    	hdl_games_list_t *games;
-    	ret = hddGetHDLGamelist(&games);
-    	//scr_printf("\t hddGetHDLGamelist ret=%d\n", ret);
-    	if (ret == 0) {
-    		int i;
-    		for (i=0; i<games->count; i++){
-				hdl_game_info_t *game = &games->games[i];
-				//scr_printf("\t %s type=%x sector=%08x compat=%x sizeMB=%d\n", game->name, game->disctype, game->start_sector, game->compat_flags, game->total_size_in_kb/1024);
-				//scr_printf("\t %s - %s\n", game->name, game->startup);
-				if (!strcmp(game->name, "GODOFWAR2"))
-					LaunchHDDGame(game, 0);
-			}
-		}
-	}
-
-	poweroffShutdown(); // does poweroff
-	*/
 
 	TextColor(0x80,0x80,0x80,0x80);
 	

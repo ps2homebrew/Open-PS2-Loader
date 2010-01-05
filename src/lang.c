@@ -615,6 +615,56 @@ char *bulgarian[] = {
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
 };
 
+char *dutch[] = {
+	"               WELKOM BIJ DE OPEN PS2 LOADER. BASIS CODE GEBASEERD OP DE SOURCE CODES VAN HD PROJECT <http://psx-scene.com> TOEVOEGING VAN USB ADVANCE FORMAAT EN HET BEGIN VAN DE GUI GEMAAKT DOOR IFCARO <http://ps2dev.ifcaro.net> HET MEESTE VAN DE LAAD CORE IS GEMAAKT DOOR JIMMIKAELKAEL. ALLE GUI VERBETERINGEN ZIJN GEMAAKT DOOR VOLCA. BEDANKT DAT JE ONS PROGRAMMA GEBRUIKT ^^", // gfx.c:85
+	"Open PS2 Loader %s", // gfx.c:320
+	"Thema configuratie", // gfx.c:502
+	"IP configuratie", // gfx.c:764
+	"Bewaar veranderingen", // gfx.c:586
+	"O Terug", // gfx.c:736
+	"Scroll Langzaam", // main.c:21 
+	"Scroll Normaal", 
+	"Scroll Snel",
+	"Dynamisch Menu",  // main.c:22
+	"Statisch Menu",
+	"Configureer thema",  // main.c:23
+	"Netwerk configuratie",
+	"Selecteer taal",  
+	"Geen Items", // main.c:26
+	"Nog niet beschikbaar", // main.c:158
+	"Instellingen bewaard...", //  main.c:166
+	"Fout bij schrijven van instellingen!", //  main.c:168
+	"Sluiten", // Menu item strings
+	"Instellingen",
+	"USB Spellen",
+	"HDD Spellen",
+	"Netwerk Spellen",
+	"Applicaties",
+	"Thema", // Submenu items
+	"Taal",
+	"Taal: Nederlands",
+	"Start netwerk",
+	"Netwerk laden: %d",
+	"Netwerk start fout",
+	"Netwerk automatisch laden",
+	"Aan",
+	"Uit",
+	"Ok",
+	"Compatibiliteit instellingen",
+	"Verwijder alle instellingen",
+	"Alle keys voor de spellen verwijderd",
+	"Scrollen", // _STR_SCROLLING
+	"Menu type", // _STR_MENUTYPE
+	"Langzaam", // _STR_SLOW
+	"Normaal", // _STR_MEDIUM
+	"Snel", // _STR_FAST
+	"Statisch", // _STR_STATIC
+	"Dynamisch", // _STR_DYNAMIC
+	"Standard menu", // _STR_DEF_DEVICE
+	"Laad van Disc", // _STR_LOAD_FROM_DISC
+	"Even Wachten", // _STR_PLEASE_WAIT
+	"Fout bij laden van de Game ID", // _STR_ERROR_LOADING_ID
+};
 
 char **languages[] = {
 	english, // ID 0
@@ -628,7 +678,8 @@ char **languages[] = {
 	polish,   // ID 8
 	russian,   // ID 9
 	indonesian,  // ID 10
-	bulgarian  // ID 11
+	bulgarian,  // ID 11
+	dutch // ID 12
 };
 
 const char *language_names[] = {
@@ -644,6 +695,7 @@ const char *language_names[] = {
 	"Русский (Russian)",
 	"Indonesia (Indonesian)",
 	"Български (Bulgarian)",
+	"Nederlands (Dutch)",
 	NULL  // Null termination for UI enumeration to have padding
 };
 

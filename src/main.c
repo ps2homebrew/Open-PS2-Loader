@@ -482,7 +482,7 @@ void showUIConfig() {
 	diaSetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 	diaSetInt(diaUIConfig, UICFG_EXITTO, exit_mode);
 	diaSetInt(diaUIConfig, UICFG_DEFDEVICE, default_device);
-	diaSetInt(diaIPConfig, UICFG_USEHDD, gUseHdd);
+	diaSetInt(diaUIConfig, UICFG_USEHDD, gUseHdd);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -495,7 +495,7 @@ void showUIConfig() {
 		diaGetColour(diaUIConfig, UICFG_TXTCOL, default_text_color);
 		diaGetInt(diaUIConfig, UICFG_EXITTO, &exit_mode);
 		diaGetInt(diaUIConfig, UICFG_DEFDEVICE, &default_device);
-		diaGetInt(diaIPConfig, UICFG_USEHDD, &gUseHdd);
+		diaGetInt(diaUIConfig, UICFG_USEHDD, &gUseHdd);
 	
 		// update the value interpretation
 		setLanguage(gLanguageID);

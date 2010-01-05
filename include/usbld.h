@@ -225,7 +225,11 @@ int gNetAutostart;
 // true if the ip config should be saved as well
 int gIPConfigChanged;
 
+/// Indicates the hdd module loading sequence
 int gHddStartup;
+/// true if the usage of hdd was selected in options
+int gUseHdd;
+/// true if dev9 irx loaded already
 int gDev9_loaded;
 
 #define COMPAT_MODE_1 		0x01
@@ -321,6 +325,7 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid);
 int ExecElf(char *path);
 void SendIrxKernelRAM(int mode);
+unsigned int crc32(char *string);
 
 #define USB_MODE	0
 #define ETH_MODE	1

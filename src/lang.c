@@ -52,6 +52,7 @@ char *english[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *czech[] = {
@@ -103,6 +104,7 @@ char *czech[] = {
 	"Nacist z disku", // _STR_LOAD_FROM_DISC
 	"Prosim cekejte", // _STR_PLEASE_WAIT
 	"Chyba pri nacitani Game ID", // _STR_ERROR_LOADING_ID
+	"Pouzivat Pevny Disk", // _STR_USEHDD
 };
 
 char *spanish[] = {
@@ -154,6 +156,7 @@ char *spanish[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *french[] = {
@@ -205,6 +208,7 @@ char *french[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *german[] = {
@@ -256,6 +260,7 @@ char *german[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *portuguese[] = {
@@ -307,6 +312,7 @@ char *portuguese[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *norwegian[] = {
@@ -358,6 +364,7 @@ char *norwegian[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *turkish[] = {
@@ -409,6 +416,7 @@ char *turkish[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *polish[] = {
@@ -460,6 +468,7 @@ char *polish[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *russian[] = {
@@ -511,6 +520,7 @@ char *russian[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *indonesian[] = {
@@ -562,6 +572,7 @@ char *indonesian[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *bulgarian[] = {
@@ -613,6 +624,7 @@ char *bulgarian[] = {
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char *dutch[] = {
@@ -664,6 +676,7 @@ char *dutch[] = {
 	"Laad van Disc", // _STR_LOAD_FROM_DISC
 	"Even Wachten", // _STR_PLEASE_WAIT
 	"Fout bij laden van de Game ID", // _STR_ERROR_LOADING_ID
+	"Use Hard Drive", // _STR_USEHDD
 };
 
 char **languages[] = {

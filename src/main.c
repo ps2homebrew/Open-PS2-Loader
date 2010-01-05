@@ -266,7 +266,7 @@ int getImageCompatMask(int id, const char* image, int ntype) {
 void setImageCompatMask(int id, const char* image, int ntype, int mask) {
 	if (ntype == HDD_MODE) {
 		if (!hddfound)
-			return 0;
+			return;
 		
 		// write to the game's description
 		hddGameList->games[id - 1].ops2l_compat_flags = (unsigned char)mask;

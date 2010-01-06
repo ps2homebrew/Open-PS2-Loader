@@ -516,6 +516,10 @@ int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize)
 	if (NTCRsp->smbH.Magic != SMB_MAGIC)
 		return -1;
 
+	// check there's no error
+	if ((NTCRsp->smbH.Eclass | NTCRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -1000;
+
 	*FID = NTCRsp->FID;
 	*filesize = NTCRsp->FileSize;
 

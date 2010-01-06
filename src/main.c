@@ -844,7 +844,7 @@ void StartHdd() {
 	// For Testing HDD
 	LoadHddModules();
 
-	hddfound = hddCheck();
+	hddfound = !hddCheck();
 }
 
 void ExecHDDGameSelection(struct TMenuItem* self, int id) {
@@ -1277,7 +1277,9 @@ int main(void)
 		if (GetKeyOn(KEY_SELECT)) {
 			struct TMenuItem* cur = MenuGetCurrent();
 			
-			if ((cur == &usb_games_item) || (cur == &eth_games_item)) {
+			if ((cur == &usb_games_item) || 
+			    (cur == &eth_games_item) ||
+			    (cur == &hdd_games_item)) {
 				SortSubMenu(&cur->submenu);
 				cur->current = cur->submenu;
 			}

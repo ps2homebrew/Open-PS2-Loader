@@ -680,7 +680,9 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	ee_kmode_enter();
 				
 	for (i = 0; i <	IRX_NUM; i++) {
-		irxptr_tab[i].irxaddr = irxptr; 
+		if ((((u32)irxptr + irxptr_tab[i].irxsize) >= 0x80050000) && ((u32)irxptr < 0x80060000))
+			irxptr = (void *)0x80060000;
+		irxptr_tab[i].irxaddr = irxptr;
 		
 		memcpy((void *)irxptr_tab[i].irxaddr, (void *)irxsrc[i], irxptr_tab[i].irxsize);
 		

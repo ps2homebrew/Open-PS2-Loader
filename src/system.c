@@ -540,11 +540,21 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 		}
 	}
 
+	/*
 	if (game->hdl_compat_flags & HDL_COMPAT_MODE_1) {
 		u32 alt_read_mode = 1;
 		memcpy((void*)((u32)&hdd_cdvdman_irx+i+35),&alt_read_mode,1);
 	}
 	if (game->hdl_compat_flags & HDL_COMPAT_MODE_2) {
+		u32 no_dvddl = 1;
+		memcpy((void*)((u32)&hdd_cdvdman_irx+i+36),&no_dvddl,4);
+	}
+	*/
+	if (game->ops2l_compat_flags & COMPAT_MODE_2) {
+		u32 alt_read_mode = 1;
+		memcpy((void*)((u32)&hdd_cdvdman_irx+i+35),&alt_read_mode,1);
+	}
+	if (game->ops2l_compat_flags & COMPAT_MODE_5) {
 		u32 no_dvddl = 1;
 		memcpy((void*)((u32)&hdd_cdvdman_irx+i+36),&no_dvddl,4);
 	}

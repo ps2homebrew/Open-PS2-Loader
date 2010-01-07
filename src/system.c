@@ -560,7 +560,7 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 	}
 	if (game->ops2l_compat_flags & COMPAT_MODE_4) {
 		u32 no_pss = 1;
-		memcpy((void*)((u32)&usb_cdvdman_irx+i+40),&no_pss,4);
+		memcpy((void*)((u32)&hdd_cdvdman_irx+i+40),&no_pss,4);
 	}
 
 	// game id
@@ -575,7 +575,7 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 
 	FlushCache(0);
 
-	LaunchLoaderElf(filename, HDD_MODE, game->hdl_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1); // pass hdl compat flags as only Mode 3 is important to be passed like that
+	LaunchLoaderElf(filename, HDD_MODE, game->ops2l_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1);
 } 
 
 int ExecElf(char *path){

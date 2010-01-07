@@ -271,10 +271,10 @@ void setImageCompatMask(int id, const char* image, int ntype, int mask) {
 		// write to the game's description
 		hddGameList->games[id - 1].ops2l_compat_flags = (unsigned char)mask;
 		
-		/* TODO: STORE:
-		!!!! UNTESTED: (!the id may be off, causing game header to overwrite a different one!). You've been warned!
-		hddSetHDLGameInfo(id - 1, hddGameList->games[id - 1]);
+		/* !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
+		hddSetHDLGameInfo(id - 1, &hddGameList->games[id - 1]);
 		*/
+		
 		return;
 	}
 	
@@ -699,23 +699,23 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 	fioClose(fd);
 }
 
-int RefreshHDDGameList() {
-        int ret = hddGetHDLGamelist(&hddGameList);
-	
+int RefreshHDDGameList() {	
+	int ret = hddGetHDLGamelist(&hddGameList);
+
 	if (ret != 0)
 		return -1;
-	
+
 	// iterate the games, create items for them
 	int id;
 	for (id = 1; id <= hddGameList->count; id++) {
 		hdl_game_info_t *game = &hddGameList->games[id - 1];
-		
+
 		AppendSubMenu(&hdd_submenu, &disc_icon, game->name, id, -1);
 	};
-	
+
 	hdd_games_item.submenu = hdd_submenu;
 	hdd_games_item.current = hdd_submenu;
-	
+
 	return 0;
 }
 

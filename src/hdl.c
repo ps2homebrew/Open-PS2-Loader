@@ -122,6 +122,8 @@ typedef struct					// size = 1024
 
 static apa_partition_table_t *ptable = NULL;
 
+static u8 hdd_buf[16384];
+
 //-------------------------------------------------------------------------
 int hddCheck(void)
 {
@@ -176,13 +178,16 @@ static int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize)
 //-------------------------------------------------------------------------
 static int hddWriteSectors(u32 lba, u32 nsectors, void *buf)
 {
-	u8 args[16];
+	int argsz;
+	u8 *args = (u8 *)hdd_buf;
 
 	*(u32 *)&args[0] = lba;
-	*(u32 *)&args[4] = nsectors;
-	*(u32 *)&args[8] = (u32)buf;
+	*(u32 *)&args[4] = nsectors;	
+	memcpy(&args[8], buf, nsectors << 9);
 
-	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_WRITE, args, 12, NULL, 0) != 0)
+	argsz = 8 + (nsectors << 9);
+
+	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_WRITE, args, argsz, NULL, 0) != 0)
 		return -1;
 
 	return 0;
@@ -292,15 +297,11 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
  	register int ret;
 
  	u32 start_sector = header->start + offset / 512;
- 	
+
  	ret = hddReadSectors(start_sector, 2, buf, 2 * 512);
  	if (ret == 0) {
-	 	
+
 	 	hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
-	 	
-	 	// checking deadfeed magic & PS2 game magic
-	 	if (hdl_header->checksum != 0xdeadfeed)
-	 		return -2;
 
 		// calculate total size
 		size = header->length;
@@ -310,8 +311,8 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 
 		memcpy(ginfo->partition_name, header->id, APA_IDMAX);
 		ginfo->partition_name[APA_IDMAX] = 0;
-		strcpy(ginfo->name, hdl_header->gamename);
-		strcpy(ginfo->startup, hdl_header->startup);
+		strncpy(ginfo->name, hdl_header->gamename, HDL_GAME_NAME_MAX);
+		strncpy(ginfo->startup, hdl_header->startup, 12);
 		ginfo->hdl_compat_flags = hdl_header->hdl_compat_flags;
 		ginfo->ops2l_compat_flags = hdl_header->ops2l_compat_flags;
 		ginfo->dma_type = hdl_header->dma_type;
@@ -333,7 +334,7 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 
 	ret = apaReadPartitionTable(&ptable);
 	if (ret == 0) {
-		
+
 		u32 i, count = 0;
 		void *tmp;
 
@@ -346,7 +347,7 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 			memset(tmp, 0, sizeof(hdl_game_info_t) * count);
 			*game_list = malloc(sizeof(hdl_games_list_t));
 			if (*game_list != NULL) {
-				
+
 				u32 index = 0;
 				memset(*game_list, 0, sizeof(hdl_games_list_t));
 				(*game_list)->count = count;
@@ -400,8 +401,8 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 		return -4;
 
 	// just change game name and compat flags !!!
-	strncpy(hdl_header->gamename, ginfo->name, 159);
-	hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
+	//strncpy(hdl_header->gamename, ginfo->name, 159);
+	//hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
 	hdl_header->ops2l_compat_flags = ginfo->ops2l_compat_flags;
 	hdl_header->dma_type = ginfo->dma_type;
 	hdl_header->dma_mode = ginfo->dma_mode;

@@ -66,9 +66,13 @@ int getIlinkID(u8 *idbuf)
 	int err=0;
 
 	memset(idbuf, 0, 32);
-	if(CdReadIlinkID(idbuf, &err))
-		if(err==0)
-			return 0;
-	dprintf1("ps2hdd: Error: cannot get ilink id\n");
-	return -EIO;
+
+	// v12/v13 HDD fix: do not check iLinkID
+	//if(CdReadIlinkID(idbuf, &err))
+	//	if(err==0)
+	//		return 0;
+	//dprintf1("ps2hdd: Error: cannot get ilink id\n");
+	//return -EIO;
+	CdReadIlinkID(idbuf, &err);
+	return 0;
 }

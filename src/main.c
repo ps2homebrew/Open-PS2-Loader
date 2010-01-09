@@ -366,17 +366,16 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 			"UDMA 6",
 			NULL
 		};
-		int dmamode=0, i;
+		int dmamode=0;
 		
 		if(hddGameList->games[id - 1].dma_type == MDMA_MODE){
-			for(i=0;i<3;i++){
-				dmamode+= ((hddGameList->games[id - 1].dma_mode & (1 << i)) > 0 ? 1 : 0)*i;
-			}
+			dmamode = hddGameList->games[id - 1].dma_mode;
 		}else if(hddGameList->games[id - 1].dma_type == UDMA_MODE){
-			for(i=0;i<7;i++){
-				dmamode+= (((hddGameList->games[id - 1].dma_mode & (1 << i)) > 0 ? 1 : 0)*i);
-			}
+			dmamode = hddGameList->games[id - 1].dma_mode;
 			dmamode=dmamode+3;
+		}
+		else {
+			dmamode=7; // defaulting to UDMA 4
 		}
 		
 		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 5, dmaModes);
@@ -458,11 +457,11 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 			
 			if(dmamode<3){
 				hddGameList->games[id - 1].dma_type = MDMA_MODE;
-				hddGameList->games[id - 1].dma_mode = 1 << dmamode;
+				hddGameList->games[id - 1].dma_mode = dmamode;
 
 			}else{
 				hddGameList->games[id - 1].dma_type = UDMA_MODE;
-				hddGameList->games[id - 1].dma_mode = 1 << (dmamode-3);
+				hddGameList->games[id - 1].dma_mode = (dmamode-3);
 			}
 		}
 		

@@ -146,6 +146,10 @@ struct UIItem diaCompatConfig[] = {
 	
 	{UI_SPLITTER},
 	
+	{UI_LABEL, 0, NULL, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_MODE_BASE + 5, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
 	{UI_LABEL, 0, NULL, {.label = {"Game ID", -1}}}, {UI_SPACER}, {UI_STRING, COMPAT_GAMEID, NULL, {.stringvalue = {"", ""}}}, {UI_BREAK},
 	{UI_BUTTON, COMPAT_LOADFROMDISC, NULL, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
 	
@@ -271,9 +275,9 @@ void setImageCompatMask(int id, const char* image, int ntype, int mask) {
 		// write to the game's description
 		hddGameList->games[id - 1].ops2l_compat_flags = (unsigned char)mask;
 		
-		/* !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
+		// !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
 		hddSetHDLGameInfo(id - 1, &hddGameList->games[id - 1]);
-		*/
+		
 		
 		return;
 	}
@@ -284,7 +288,6 @@ void setImageCompatMask(int id, const char* image, int ntype, int mask) {
 	
 	setConfigInt(&gConfig, gkey, mask);
 }
-
 
 char *getImageGameID(const char* image) {
 	char gkey[255];
@@ -348,6 +351,43 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 	
 	if (id <= 0)
 		return -1;
+				
+	if(ntype==HDD_MODE){		
+		const char* dmaModes[] = {
+			"MDMA 0",
+			"MDMA 1",
+			"MDMA 2",
+			"UDMA 0",
+			"UDMA 1",
+			"UDMA 2",
+			"UDMA 3",
+			"UDMA 4",
+			"UDMA 5",
+			"UDMA 6",
+			NULL
+		};
+		int dmamode=0, i;
+		
+		if(hddGameList->games[id - 1].dma_type == MDMA_MODE){
+			for(i=0;i<3;i++){
+				dmamode+= ((hddGameList->games[id - 1].dma_mode & (1 << i)) > 0 ? 1 : 0)*i;
+			}
+		}else if(hddGameList->games[id - 1].dma_type == UDMA_MODE){
+			for(i=0;i<7;i++){
+				dmamode+= (((hddGameList->games[id - 1].dma_mode & (1 << i)) > 0 ? 1 : 0)*i);
+			}
+			dmamode=dmamode+3;
+		}
+		
+		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 5, dmaModes);
+		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 5, dmamode);
+		
+	}else{
+		const char* dmaModes[] = {
+			NULL
+		};
+		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 5, dmaModes);
+	}
 	
 	int modes = getImageCompatMask(id, prefix, ntype);
 	
@@ -409,6 +449,21 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 			int mdpart;
 			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
 			modes |= (mdpart ? 1 : 0) << i;
+		}
+		
+		if(ntype==HDD_MODE){
+			int dmamode=0;
+			
+			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + 5, &dmamode);
+			
+			if(dmamode<3){
+				hddGameList->games[id - 1].dma_type = MDMA_MODE;
+				hddGameList->games[id - 1].dma_mode = 1 << dmamode;
+
+			}else{
+				hddGameList->games[id - 1].dma_type = UDMA_MODE;
+				hddGameList->games[id - 1].dma_mode = 1 << (dmamode-3);
+			}
 		}
 		
 		setImageCompatMask(id, prefix, ntype, modes);

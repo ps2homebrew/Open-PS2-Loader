@@ -360,6 +360,15 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	char *argv[2];
 	char config_str[255];
 	char *mode_str = NULL;
+	u32 patch_table_addr;
+
+	if (alt_ee_core)
+		patch_table_addr = PATCH_TABLE_ALT_ADDR;
+	else
+		patch_table_addr = PATCH_TABLE_ADDR;
+
+	clear_game_patches(patch_table_addr);
+	apply_game_patches(patch_table_addr, filename, mode);
 
 	set_ipconfig();
 

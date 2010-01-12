@@ -333,6 +333,13 @@ unsigned int crc32(char *string);
 #define ETH_MODE	1
 #define HDD_MODE	2
 
+#define PATCH_TABLE_ADDR		0x000e7c00
+#define PATCH_TABLE_ALT_ADDR	0x017bfc00
+
+//patches
+void clear_game_patches(u32 patch_table_addr);
+void apply_game_patches(u32 patch_table_addr, char *game, int mode);
+
 //PAD
 
 #define KEY_LEFT 1

@@ -57,6 +57,11 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
+typedef struct {
+	u32 addr;
+	u32 val;
+} game_patch_t;
+
 u8 *g_buf;
 
 extern int set_reg_hook;

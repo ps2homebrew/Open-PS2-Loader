@@ -89,7 +89,7 @@ int main(int argc, char **argv){
 
 	// bitmask of the compat. settings
 	g_compat_mask = _strtoui(argv[2]);
-	
+
 	set_ipconfig();
 	
 	GetIrxKernelRAM();

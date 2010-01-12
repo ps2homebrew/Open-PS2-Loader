@@ -111,7 +111,7 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 {
 	int n;
-	void *irx_tab = (void *)0x80030010;
+	void *irx_tab = (void *)0x80031010;
 	irxptr_t irxptr_tab[IRX_NUM];
 
 	DIntr();

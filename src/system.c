@@ -357,18 +357,12 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	elf_pheader_t *eph;
 	void *pdata;
 	int i;
-	char *argv[2];
+	char *argv[3];
 	char config_str[255];
 	char *mode_str = NULL;
-	u32 patch_table_addr;
 
-	if (alt_ee_core)
-		patch_table_addr = PATCH_TABLE_ALT_ADDR;
-	else
-		patch_table_addr = PATCH_TABLE_ADDR;
-
-	clear_game_patches(patch_table_addr);
-	apply_game_patches(patch_table_addr, filename, mode);
+	clear_game_patches();
+	apply_game_patches(filename, mode);
 
 	set_ipconfig();
 
@@ -651,9 +645,9 @@ int ExecElf(char *path){
 //-------------------------------------------------------------- 
 void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel RAM
 {
-	u32 *total_irxsize = (u32 *)0x80030000;
-	void *irxtab = (void *)0x80030010;
-	void *irxptr = (void *)0x80030100;
+	u32 *total_irxsize = (u32 *)0x80031000;
+	void *irxtab = (void *)0x80031010;
+	void *irxptr = (void *)0x80031100;
 	irxptr_t irxptr_tab[IRX_NUM];
 	void *irxsrc[IRX_NUM];
 	int i, n;

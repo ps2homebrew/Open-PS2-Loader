@@ -52,6 +52,8 @@
 #define  _STR_PLEASE_WAIT 46
 #define  _STR_ERROR_LOADING_ID 47
 #define _STR_USEHDD 48
+#define _STR_AUTOSTARTHDD 49
+#define _STR_STARTHDD 50
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

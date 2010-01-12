@@ -229,6 +229,8 @@ int gIPConfigChanged;
 int gHddStartup;
 /// true if the usage of hdd was selected in options
 int gUseHdd;
+/// true if the hdd should start automatically
+int gHddAutostart;
 /// true if dev9 irx loaded already
 int gDev9_loaded;
 

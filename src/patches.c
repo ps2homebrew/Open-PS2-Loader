@@ -18,6 +18,7 @@ game_patch_t patches_tbl[MAX_PATCHES];
 
 void clear_game_patches(u32 patch_table_addr)
 {
+	tbl_offset = 0;
 	memset(&patches_tbl[0], 0, MAX_PATCHES+1);
 }
 

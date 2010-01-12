@@ -16,13 +16,19 @@ typedef struct {
 static int tbl_offset = 0;
 game_patch_t patches_tbl[MAX_PATCHES];
 
-void clear_game_patches(u32 patch_table_addr)
+void clear_game_patches(void)
 {
 	tbl_offset = 0;
-	memset(&patches_tbl[0], 0, MAX_PATCHES+1);
+	memset(&patches_tbl[0], 0, sizeof(patches_tbl));
+
+	DIntr();
+	ee_kmode_enter();
+	memset((void *)PATCH_TABLE_ADDR, 0, (MAX_PATCHES+1)<<2);
+	ee_kmode_exit();
+	EIntr();
 }
 
-void apply_game_patches(u32 patch_table_addr, char *game, int mode)
+void apply_game_patches(char *game, int mode)
 {
 	if (!strcmp(game, "SLES_524.58")) { // Disgaea Hour of Darkness PAL
 		if (mode == USB_MODE) {
@@ -37,5 +43,9 @@ void apply_game_patches(u32 patch_table_addr, char *game, int mode)
 		}
 	}
 
-	memcpy((void *)patch_table_addr, &patches_tbl[0], MAX_PATCHES);
+	DIntr();
+	ee_kmode_enter();
+	memcpy((void *)PATCH_TABLE_ADDR, &patches_tbl[0], MAX_PATCHES<<2);
+	ee_kmode_exit();
+	EIntr();
 }

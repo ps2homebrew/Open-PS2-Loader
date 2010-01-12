@@ -28,6 +28,7 @@ dev9_IMPORTS_start
  I_dev9IntrEnable
  I_dev9IntrDisable
  I_dev9RegisterIntrCb
+ I_dev9GetEEPROM
 dev9_IMPORTS_end
 
 ps2ip_IMPORTS_start

@@ -1334,19 +1334,16 @@ GetNodeAddr(SMap* pSMap)
 	u16	u16Sum = 0;
 	u16 u16MAC[4];
 
-	if (dev9GetEEPROM(&u16MAC[0]) < 0)
+	mips_memset(pSMap->au8HWAddr, 0, 6);
+
+	if ((dev9GetEEPROM(&u16MAC[0]) < 0) || (!u16MAC[0] && !u16MAC[1] && !u16MAC[2]))
 		return -1;
 
-	if (!u16MAC[0] && !u16MAC[1] && !u16MAC[2])
-		return -1;
-
-	for	(iA=0; iA<3; iA++)
+	for (iA=0; iA<3; iA++)
 		u16Sum += u16MAC[iA];
 
-	if	(u16Sum != u16MAC[3]) {
-		mips_memset(pSMap->au8HWAddr, 0, 6);
+	if (u16Sum != u16MAC[3])
 		return	-1;
-	}
 
 	mips_memcpy(pSMap->au8HWAddr, &u16MAC[0], 6);
 

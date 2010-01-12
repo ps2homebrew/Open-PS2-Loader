@@ -20,6 +20,8 @@
 #define UI_SPACER_MINIMAL 30
 // length of breaking line in pixels
 #define UI_BREAK_LEN 600
+// scroll speed when in dialogs
+#define DIA_SCROLL_SPEED 9
 
 #define yfix(x) (x*gsGlobal->Height)/480
 #define yfix2(x) x+(gsGlobal->Height==512 ? x*0.157f : 0)
@@ -2008,6 +2010,10 @@ int diaExecuteDialog(struct UIItem *ui) {
 	
 	int haveFocus = 0;
 	
+	// slower controls for dialogs
+	SetButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
+	SetButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
+
 	// okay, we have the first selectable item
 	// we can proceed with rendering etc. etc.
 	while (1) {
@@ -2019,8 +2025,8 @@ int diaExecuteDialog(struct UIItem *ui) {
 			haveFocus = diaHandleInput(cur);
 			
 			if (!haveFocus) {
-				SetButtonDelay(KEY_UP, 5);
-				SetButtonDelay(KEY_DOWN, 5);
+				SetButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
+				SetButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
 			}
 		} else {
 			if (GetKey(KEY_LEFT)) {
@@ -2062,18 +2068,24 @@ int diaExecuteDialog(struct UIItem *ui) {
 			}
 			
 			// circle breaks focus or exits with false result
-			if (GetKeyOn(KEY_CIRCLE))
+			if (GetKeyOn(KEY_CIRCLE)) {
+					UpdateScrollSpeed();
 					return 0;
+			}
 			
 			// see what key events we have
 			if (GetKeyOn(KEY_CROSS)) {
 				haveFocus = 1;
 				
-				if (cur->type == UI_BUTTON)
+				if (cur->type == UI_BUTTON) {
+					UpdateScrollSpeed();
 					return cur->id;
+				}
 
-				if (cur->type == UI_OK)
+				if (cur->type == UI_OK) {
+					UpdateScrollSpeed();
 					return 1;
+				}
 			}
 		}
 	}

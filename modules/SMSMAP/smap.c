@@ -1327,168 +1327,29 @@ static void Reset ( SMap* pSMap, int iReset ) {
 
 }  /* end Reset */
 
-static inline void
-EEPROMClockDataOut(SMap* pSMap,int val)
-{
-	SMAP_PP_SET_D(pSMap,val);
-
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(1);	//tDIS
-
-	SMAP_PP_CLK_OUT(pSMap,1);
-	DelayThread(1);	//tSKH, tDIH
-
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(1);	//tSKL
-}
-
-
-//1 clock with getting data
-
-static inline int
-EEPROMClockDataIn(SMap* pSMap)
-{
-	int	iRet;
-
-	SMAP_PP_SET_D(pSMap,0);
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(1);	//tSKL
-
-	SMAP_PP_CLK_OUT(pSMap,1);
-	DelayThread(1);	//tSKH, tPD0,1
-	iRet=SMAP_PP_GET_Q(pSMap);
-
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(1);	//tSKL
-
-	return	iRet;
-}
-
-
-//Put address(6bit)
-
-static void
-EEPROMPutAddr(SMap* pSMap,u8 u8Addr)
-{
-	int	iA;
-
-	u8Addr&=0x3f;
-	for	(iA=0;iA<6;++iA)
-	{
-		EEPROMClockDataOut(pSMap,(u8Addr&0x20) ? 1:0);
-		u8Addr<<=1;
-	}
-}
-
-
-//Get data(16bit)
-
-static u16
-GetDataFromEEPROM(SMap* pSMap)
-{
-	int	iA;
-	u16	u16Data=0;
-
-	for	(iA=0;iA<16;++iA)
-	{
-		u16Data<<=1;
-		u16Data|=EEPROMClockDataIn(pSMap);
-	}
-	return	u16Data;
-}
-
-
-//Instruction start(rise S, put start bit, op code)
-
-static void
-EEPROMStartOp(SMap* pSMap,int iOp)
-{
-
-	//Set port direction.
-
-	SMAP_REG8(pSMap,SMAP_PIOPORT_DIR)=(PP_SCLK|PP_CSEL|PP_DIN);
-
-	//Rise chip select.
-
-	SMAP_PP_SET_S(pSMap,0);
-	SMAP_PP_SET_D(pSMap,0);
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(1);	//tSKS
-
-	SMAP_PP_SET_S(pSMap,1);
-	SMAP_PP_SET_D(pSMap,0);
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(1);	//tCSS
-
-	//Put start bit.
-
-	EEPROMClockDataOut(pSMap,1);
-
-	//Put op code.
-
-	EEPROMClockDataOut(pSMap,(iOp>>1)&1);
-	EEPROMClockDataOut(pSMap,iOp&1);
-}
-
-
-//Chip select low
-
-static void
-EEPROMCSLow(SMap* pSMap)
-{
-	SMAP_PP_SET_S(pSMap,0);
-	SMAP_PP_SET_D(pSMap,0);
-	SMAP_PP_CLK_OUT(pSMap,0);
-	DelayThread(2);	//tSLSH
-}
-
-
-//EEPROM instruction
-
-static void
-ReadEEPROMExec(SMap* pSMap,u8 u8Addr,u16* pu16Data,int iN)
-{
-	int	iA;
-
-	EEPROMStartOp(pSMap,PP_OP_READ);
-	EEPROMPutAddr(pSMap,u8Addr);
-	for	(iA=0;iA<iN;++iA)
-	{
-		*pu16Data++=GetDataFromEEPROM(pSMap);
-	}
-	EEPROMCSLow(pSMap);
-}
-
-static void ReadFromEEPROM ( SMap* pSMap,u8 u8Addr,u16* pu16Data,int iN ) {
-
- int lFlags;
-
- CpuSuspendIntr ( &lFlags );
-  ReadEEPROMExec ( pSMap, u8Addr, pu16Data, iN );
- CpuResumeIntr( lFlags );
-
-}  /* end ReadFromEEPROM */
-
 static int
 GetNodeAddr(SMap* pSMap)
 {
 	int	iA;
-	u16*	pu16MAC=(u16*)pSMap->au8HWAddr;
-	u16	u16CHKSum;
-	u16	u16Sum=0;
+	u16	u16Sum = 0;
+	u16 u16MAC[4];
 
-	ReadFromEEPROM(pSMap,0x0,pu16MAC,3);
-	ReadFromEEPROM(pSMap,0x3,&u16CHKSum,1);
+	if (dev9GetEEPROM(&u16MAC[0]) < 0)
+		return -1;
 
-	for	(iA=0;iA<3;++iA)
-	{
-		u16Sum+=*pu16MAC++;
-	}
-	if	(u16Sum!=u16CHKSum)
-	{
-		mips_memset(pSMap->au8HWAddr,0,6);
+	if (!u16MAC[0] && !u16MAC[1] && !u16MAC[2])
+		return -1;
+
+	for	(iA=0; iA<3; iA++)
+		u16Sum += u16MAC[iA];
+
+	if	(u16Sum != u16MAC[3]) {
+		mips_memset(pSMap->au8HWAddr, 0, 6);
 		return	-1;
 	}
+
+	mips_memcpy(pSMap->au8HWAddr, &u16MAC[0], 6);
+
 	return	0;
 }
 

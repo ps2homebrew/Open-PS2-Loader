@@ -40,6 +40,7 @@ extern void set_ipconfig(void);
 int gLanguageID = 0;
 
 int eth_inited = 0;
+int hdd_inited = 0;
 
 // frames since button was pressed
 int inactiveFrames;
@@ -176,6 +177,7 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_EXITTO 16
 #define UICFG_DEFDEVICE 17
 #define UICFG_USEHDD 18
+#define UICFG_AUTOSTARTHDD 19
 
 #define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
@@ -188,6 +190,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, UICFG_MENU, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, UICFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_USEHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_USEHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_AUTOSTARTHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSTARTHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -537,6 +540,7 @@ void showUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_EXITTO, exit_mode);
 	diaSetInt(diaUIConfig, UICFG_DEFDEVICE, default_device);
 	diaSetInt(diaUIConfig, UICFG_USEHDD, gUseHdd);
+	diaSetInt(diaUIConfig, UICFG_AUTOSTARTHDD, gHddAutostart);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -550,7 +554,8 @@ void showUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_EXITTO, &exit_mode);
 		diaGetInt(diaUIConfig, UICFG_DEFDEVICE, &default_device);
 		diaGetInt(diaUIConfig, UICFG_USEHDD, &gUseHdd);
-	
+		diaGetInt(diaUIConfig, UICFG_AUTOSTARTHDD, &gHddAutostart);
+		
 		// update the value interpretation
 		setLanguage(gLanguageID);
 		UpdateScrollSpeed();
@@ -588,6 +593,7 @@ int loadConfig(const char* fname, int clearFirst) {
 	getConfigInt(&gConfig, "pc_port", &gPCPort);
 	getConfigInt(&gConfig, "net_auto", &gNetAutostart);
 	getConfigInt(&gConfig, "use_hdd", &gUseHdd);
+	getConfigInt(&gConfig, "autostart_hdd", &gHddAutostart);
 	
 	if (getConfigStr(&gConfig, "pc_share", &temp))
 		strncpy(gPCShareName, temp, 32);
@@ -612,8 +618,9 @@ int saveConfig(const char* fname) {
 	setConfigInt(&gConfig, "pc_port", gPCPort);
 	setConfigInt(&gConfig, "net_auto", gNetAutostart);
 	setConfigInt(&gConfig, "use_hdd", gUseHdd);
+	setConfigInt(&gConfig, "autostart_hdd", gHddAutostart);
 	setConfigStr(&gConfig, "pc_share", gPCShareName);
-
+	
 	// Not writing the IP config, too dangerous to change it by accident...
 	return writeConfig(&gConfig, fname);
 }
@@ -753,7 +760,8 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 	fioClose(fd);
 }
 
-int RefreshHDDGameList() {	
+int RefreshHDDGameList() {
+	DestroySubMenu(&hdd_submenu);
 	int ret = hddGetHDLGamelist(&hddGameList);
 
 	if (ret != 0)
@@ -902,9 +910,22 @@ void StartHdd() {
 }
 
 void ExecHDDGameSelection(struct TMenuItem* self, int id) {
-	if (id <= 0)
+	if (id == -1) {
+		if (!hdd_inited) {
+			StartHdd();
+			hdd_inited = 1;
+			
+			if (hddfound) {
+				RefreshHDDGameList();
+			} else {
+				DestroySubMenu(&hdd_submenu);
+				hdd_games_item.submenu = NULL;
+				hdd_games_item.current = NULL;
+			}
+		}
 		return;
-		
+	}
+	
 	padPortClose(0, 0);
 	padPortClose(1, 0);
 	padReset();
@@ -1023,9 +1044,22 @@ void InitMenuItems() {
 	AppendMenuItem(&usb_games_item);
 	
 	// show hdd icon if found
-	if (hddfound) {
+	if (gUseHdd) {
 		// hdd items population
-		RefreshHDDGameList();
+		if (gHddAutostart && hddfound) {
+			RefreshHDDGameList();
+		} else {
+			// clear the menu item, 
+			// add start item, insert into menu
+			DestroySubMenu(&hdd_submenu);
+			
+			AppendSubMenu(&hdd_submenu, &disc_icon, "", -1, _STR_STARTHDD);
+			
+			hdd_games_item.submenu = hdd_submenu;
+			hdd_games_item.current = hdd_submenu;
+			
+		}
+		
 		AppendMenuItem(&hdd_games_item);
 	}
 	
@@ -1058,6 +1092,7 @@ void init() {
 	// autostart network, hdd?
 	gNetAutostart = 0;
 	gUseHdd = 0;
+	gHddAutostart = 0;
 	// no change to the ipconfig was done
 	gIPConfigChanged = 0;
 	// Default PC share name
@@ -1068,6 +1103,7 @@ void init() {
 	default_device = 0;
 	// 1 if the harddrive is found
 	hddfound = 0;
+	hdd_inited = 0;
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;
@@ -1096,8 +1132,10 @@ void init() {
 	restoreConfig();
 	
 	// HDD startup
-	if (gUseHdd)
+	if (gUseHdd && gHddAutostart) {
+		hdd_inited = 1;
 		StartHdd();
+	}
 	
 	// initialize menu
 	InitMenu();

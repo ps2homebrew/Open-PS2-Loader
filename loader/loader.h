@@ -60,6 +60,7 @@ typedef struct {
 typedef struct {
 	u32 addr;
 	u32 val;
+	u32 check;
 } game_patch_t;
 
 u8 *g_buf;

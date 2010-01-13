@@ -46,6 +46,13 @@ void apply_game_patches(char *game, int mode)
 			patches_tbl[tbl_offset++].check = 0x34441000;
 		}
 	}
+	else if (!strcmp(game, "SLUS_212.00")) { // Armored Core Nine Breaker NTSC U
+		if (mode == USB_MODE) {
+			patches_tbl[tbl_offset].addr = 0x0014a834;		// Skip failing case on binding a RPC server
+			patches_tbl[tbl_offset].val = 0x00000000;
+			patches_tbl[tbl_offset++].check = 0x1040fff6;
+		}
+	}
 
 	DIntr();
 	ee_kmode_enter();

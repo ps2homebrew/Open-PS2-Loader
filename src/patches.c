@@ -14,10 +14,24 @@ typedef struct {
 	u32 check;
 } game_patch_t;
 
+typedef struct {
+	char *game;
+	int mode;
+	game_patch_t patch;
+} patchlist_t;
+
+static patchlist_t patch_list[5] = {
+	{ "SLES_524.58", USB_MODE, { 0x00122244, 0x100000a0, 0x142000a0 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
+	{ "SLES_524.58", ETH_MODE, { 0x001f8d38, 0x3c02000d, 0x3c02000e }}, // Disgaea Hour of Darkness PAL - reduce buffer allocated on IOP from 921600 bytes
+	{ "SLES_524.58", ETH_MODE, { 0x001f8d3c, 0x34449000, 0x34441000 }}, // to 888832 bytes allowing modules to not conflict with IOP ram usage
+	{ "SLUS_212.00", USB_MODE, { 0x0014a834, 0x00000000, 0x1040fff6 }}, // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
+	{ NULL, 0, { 0, 0, 0 }}												// terminater
+};
+
 static int tbl_offset = 0;
 game_patch_t patches_tbl[MAX_PATCHES];
 
-void clear_game_patches(void)
+void clear_patches_table(void)
 {
 	tbl_offset = 0;
 	memset(&patches_tbl[0], 0, sizeof(patches_tbl));
@@ -29,29 +43,17 @@ void clear_game_patches(void)
 	EIntr();
 }
 
-void apply_game_patches(char *game, int mode)
+void fill_patches_table(char *game, int mode)
 {
-	if (!strcmp(game, "SLES_524.58")) { // Disgaea Hour of Darkness PAL
-		if (mode == USB_MODE) {
-			patches_tbl[tbl_offset].addr = 0x00122244; 		// disable cdvd timeout stuff
-			patches_tbl[tbl_offset].val = 0x100000a0;
-			patches_tbl[tbl_offset++].check = 0x142000a0;
+	patchlist_t *p = (patchlist_t *)&patch_list[0];
+
+	while (p->game) {
+		if ((!strcmp(game, p->game)) && (mode == p->mode)) {
+			patches_tbl[tbl_offset].addr = p->patch.addr;
+			patches_tbl[tbl_offset].val = p->patch.val;
+			patches_tbl[tbl_offset++].check = p->patch.check;
 		}
-		else if (mode == ETH_MODE) {
-			patches_tbl[tbl_offset].addr = 0x001f8d38; 		// reduce buffer allocated on IOP from 921600 bytes
-			patches_tbl[tbl_offset].val = 0x3c02000d;		// to 888832 bytes thus allowing ethernet modules to
-			patches_tbl[tbl_offset++].check = 0x3c02000e;	// load properly
-			patches_tbl[tbl_offset].addr = 0x001f8d3c;
-			patches_tbl[tbl_offset].val = 0x34449000;
-			patches_tbl[tbl_offset++].check = 0x34441000;
-		}
-	}
-	else if (!strcmp(game, "SLUS_212.00")) { // Armored Core Nine Breaker NTSC U
-		if (mode == USB_MODE) {
-			patches_tbl[tbl_offset].addr = 0x0014a834;		// Skip failing case on binding a RPC server
-			patches_tbl[tbl_offset].val = 0x00000000;
-			patches_tbl[tbl_offset++].check = 0x1040fff6;
-		}
+		p++;
 	}
 
 	DIntr();

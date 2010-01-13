@@ -335,8 +335,8 @@ unsigned int crc32(char *string);
 
 //patches
 #define PATCH_TABLE_ADDR	0x80030000
-void clear_game_patches(void);
-void apply_game_patches(char *game, int mode);
+void clear_patches_table(void);
+void fill_patches_table(char *game, int mode);
 
 //PAD
 

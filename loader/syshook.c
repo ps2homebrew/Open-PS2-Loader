@@ -120,7 +120,8 @@ static void apply_game_patches(void)
 	game_patch_t *p = (game_patch_t *)0x80030000;
 
 	while (p->addr) {
-		_sw(p->val, p->addr);
+		if (_lw(p->addr) == p->check)
+			_sw(p->val, p->addr);
 		p++;
 	}
 

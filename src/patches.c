@@ -11,6 +11,7 @@
 typedef struct {
 	u32 addr;
 	u32 val;
+	u32 check;
 } game_patch_t;
 
 static int tbl_offset = 0;
@@ -23,7 +24,7 @@ void clear_game_patches(void)
 
 	DIntr();
 	ee_kmode_enter();
-	memset((void *)PATCH_TABLE_ADDR, 0, (MAX_PATCHES+1)<<2);
+	memset((void *)PATCH_TABLE_ADDR, 0, sizeof(game_patch_t) * (MAX_PATCHES+1));
 	ee_kmode_exit();
 	EIntr();
 }
@@ -32,20 +33,23 @@ void apply_game_patches(char *game, int mode)
 {
 	if (!strcmp(game, "SLES_524.58")) { // Disgaea Hour of Darkness PAL
 		if (mode == USB_MODE) {
-			patches_tbl[tbl_offset].addr = 0x00122244; 	// disable cdvd timeout stuff
-			patches_tbl[tbl_offset++].val = 0x100000a0;
+			patches_tbl[tbl_offset].addr = 0x00122244; 		// disable cdvd timeout stuff
+			patches_tbl[tbl_offset].val = 0x100000a0;
+			patches_tbl[tbl_offset++].check = 0x142000a0;
 		}
 		else if (mode == ETH_MODE) {
-			patches_tbl[tbl_offset].addr = 0x001f8d38; 	// reduce buffer allocated on IOP from 921600 bytes
-			patches_tbl[tbl_offset++].val = 0x3c02000d;	// to 851968 bytes thus allowing ethernet modules to
-			patches_tbl[tbl_offset].addr = 0x001f8d3c;	// load properly
-			patches_tbl[tbl_offset++].val = 0x34449000;
+			patches_tbl[tbl_offset].addr = 0x001f8d38; 		// reduce buffer allocated on IOP from 921600 bytes
+			patches_tbl[tbl_offset].val = 0x3c02000d;		// to 888832 bytes thus allowing ethernet modules to
+			patches_tbl[tbl_offset++].check = 0x3c02000e;	// load properly
+			patches_tbl[tbl_offset].addr = 0x001f8d3c;
+			patches_tbl[tbl_offset].val = 0x34449000;
+			patches_tbl[tbl_offset++].check = 0x34441000;
 		}
 	}
 
 	DIntr();
 	ee_kmode_enter();
-	memcpy((void *)PATCH_TABLE_ADDR, &patches_tbl[0], MAX_PATCHES<<2);
+	memcpy((void *)PATCH_TABLE_ADDR, &patches_tbl[0], sizeof(game_patch_t) * MAX_PATCHES);
 	ee_kmode_exit();
 	EIntr();
 }

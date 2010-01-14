@@ -361,8 +361,8 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	char config_str[255];
 	char *mode_str = NULL;
 
-	clear_patches_table();
-	fill_patches_table(filename, mode);
+	clear_patches_code();
+	fill_patches_code(filename, mode);
 
 	set_ipconfig();
 

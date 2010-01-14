@@ -111,24 +111,7 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 	return 1;
 }
 
-// ------------------------------------------------------------------------
-static void apply_game_patches(void)
-{
-	DIntr();
-	ee_kmode_enter();
-
-	game_patch_t *p = (game_patch_t *)0x80030000;
-
-	while (p->addr) {
-		if (_lw(p->addr) == p->check)
-			_sw(p->val, p->addr);
-		p++;
-	}
-
-	ee_kmode_exit();
-	EIntr();
-}
-
+void (*apply_game_patches)(void);
 // ------------------------------------------------------------------------
 static void t_loadElf(void)
 {
@@ -180,8 +163,13 @@ static void t_loadElf(void)
 		if (strstr(g_ElfPath, "cddev"))
 			memcpy(g_ElfPath, "cdrom", 5);
 		
-		// applying needed game patches if any
+		// applying needed game patches if any, the patch function is stored in kernel ram
+		DIntr();
+		ee_kmode_enter();
+		apply_game_patches = (void *)0x80030800;
 		apply_game_patches();
+		ee_kmode_exit();
+		EIntr();
 		
 		FlushCache(0);
 		FlushCache(2);

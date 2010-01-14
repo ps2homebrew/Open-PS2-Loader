@@ -334,9 +334,8 @@ unsigned int crc32(char *string);
 #define HDD_MODE	2
 
 //patches
-#define PATCH_TABLE_ADDR	0x80030000
-void clear_patches_table(void);
-void fill_patches_table(char *game, int mode);
+void clear_patches_code(void);
+void fill_patches_code(char *game, int mode);
 
 //PAD
 

@@ -111,7 +111,6 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 	return 1;
 }
 
-void (*apply_game_patches)(void);
 // ------------------------------------------------------------------------
 static void t_loadElf(void)
 {
@@ -162,15 +161,10 @@ static void t_loadElf(void)
 		// replacing cddev in elf path by cdrom
 		if (strstr(g_ElfPath, "cddev"))
 			memcpy(g_ElfPath, "cdrom", 5);
-		
-		// applying needed game patches if any, the patch function is stored in kernel ram
-		DIntr();
-		ee_kmode_enter();
-		apply_game_patches = (void *)0x80030800;
+
+		// applying needed game patches if any
 		apply_game_patches();
-		ee_kmode_exit();
-		EIntr();
-		
+
 		FlushCache(0);
 		FlushCache(2);
 		

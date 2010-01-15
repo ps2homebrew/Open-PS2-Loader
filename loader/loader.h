@@ -57,12 +57,6 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
-typedef struct {
-	u32 addr;
-	u32 val;
-	u32 check;
-} game_patch_t;
-
 u8 *g_buf;
 
 extern int set_reg_hook;
@@ -83,6 +77,7 @@ u32 g_compat_mask;
 #define COMPAT_MODE_4 		0x08
 #define COMPAT_MODE_5 		0x10
 
+char GameID[16];
 int GameMode;
 #define USB_MODE 	0
 #define ETH_MODE 	1
@@ -115,5 +110,8 @@ void Install_Kernel_Hooks(void);
 u32  (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
 int  (*Old_SifSetReg)(u32 register_num, int register_value);
 void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
+
+/* patches.c */
+void apply_game_patches(void);
 
 #endif

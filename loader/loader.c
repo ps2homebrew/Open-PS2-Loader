@@ -72,7 +72,8 @@ int main(int argc, char **argv){
 	argv[1][11]=0x00; // fix for 8+3 filename.
 
 	sprintf(ElfPath,"cdrom0:\\%s;1",argv[1]);
-		
+	strcpy(GameID, argv[1]);
+
 	if (!strncmp(argv[0], "USB_MODE", 8))
 		GameMode = USB_MODE;
 	else if (!strncmp(argv[0], "ETH_MODE", 8))

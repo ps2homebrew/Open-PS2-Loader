@@ -333,10 +333,6 @@ unsigned int crc32(char *string);
 #define ETH_MODE	1
 #define HDD_MODE	2
 
-//patches
-void clear_patches_code(void);
-void fill_patches_code(char *game, int mode);
-
 //PAD
 
 #define KEY_LEFT 1

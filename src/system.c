@@ -361,9 +361,6 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	char config_str[255];
 	char *mode_str = NULL;
 
-	clear_patches_code();
-	fill_patches_code(filename, mode);
-
 	set_ipconfig();
 
 	SendIrxKernelRAM(mode);
@@ -645,9 +642,9 @@ int ExecElf(char *path){
 //-------------------------------------------------------------- 
 void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel RAM
 {
-	u32 *total_irxsize = (u32 *)0x80031000;
-	void *irxtab = (void *)0x80031010;
-	void *irxptr = (void *)0x80031100;
+	u32 *total_irxsize = (u32 *)0x80030000;
+	void *irxtab = (void *)0x80030010;
+	void *irxptr = (void *)0x80030100;
 	irxptr_t irxptr_tab[IRX_NUM];
 	void *irxsrc[IRX_NUM];
 	int i, n;

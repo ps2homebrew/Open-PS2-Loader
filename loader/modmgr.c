@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, Ifcaro & jimmikaelkael
+  Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
@@ -76,6 +76,36 @@ void LoadFileExit()
 	_lf_init = 0;
 	memset(&_lf_cd, 0, sizeof(_lf_cd));
 }
+
+
+/*----------------------------------------------------------------------------------------*/
+/* Load an irx module from path with waiting.                                             */
+/*----------------------------------------------------------------------------------------*/
+int LoadModule(const char *path, int arg_len, const char *args)
+{
+	struct _lf_module_load_arg arg;
+
+	if (LoadFileInit() < 0)
+		return -E_LIB_API_INIT;
+
+	memset(&arg, 0, sizeof arg);
+
+	strncpy(arg.path, path, LF_PATH_MAX - 1);
+	arg.path[LF_PATH_MAX - 1] = 0;
+
+	if ((args) && (arg_len))
+	{
+		arg.p.arg_len = arg_len > LF_ARG_MAX ? LF_ARG_MAX : arg_len;
+		memcpy(arg.args, args, arg.p.arg_len);
+	}
+	else arg.p.arg_len = 0;
+
+	if (SifCallRpc(&_lf_cd, LF_F_MOD_LOAD, 0x0, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
+		return -E_SIF_RPC_CALL;
+
+	return 0;
+}
+
 
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path without waiting.                                               */

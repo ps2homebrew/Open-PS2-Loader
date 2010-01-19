@@ -1,3 +1,12 @@
+/*
+  Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
+  Copyright 2006-2008 Polo
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+  Some parts of the code are taken from HD Project by Polo
+*/
+
 #ifndef _LOADER_H_
 #define _LOADER_H_
 
@@ -8,21 +17,13 @@
 #include <sifrpc.h>
 #include <string.h>
 #include <sbv_patches.h>
-#include <debug.h>
-#include <smod.h>
-#include <smem.h>
 
-#include "libcdvd.h"
 
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
 
 #define MAX_ARGS     0x40
 #define MAX_MOD_ARGS 0x50
 #define MAX_PATH     0x100
-
-#define VMC_HDD     0x1
-#define VMC_MASS    0x2
-#define VMC_HOST    0x3
 
 
 typedef
@@ -86,6 +87,7 @@ int GameMode;
 /* modmgr.c */
 int  LoadFileInit();
 void LoadFileExit();
+int LoadModule(const char *path, int arg_len, const char *args);
 int  LoadModuleAsync(const char *path, int arg_len, const char *args);
 void GetIrxKernelRAM(void);
 int LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv);
@@ -98,6 +100,9 @@ int  Reset_Iop(const char *arg, int flag);
 int  Sync_Iop(void);
 
 /* misc.c */
+unsigned int _strtoui(const char* p);
+void set_ipconfig(void);
+u8 *find_pattern_with_mask(u8 *buf, u32 bufsize, u8 *bytes, u8 *mask, u32 len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
 int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
 int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
@@ -106,6 +111,7 @@ void Sbv_Patch(void);
 
 /* syshook.c */
 void Install_Kernel_Hooks(void);
+void Remove_Kernel_Hooks(void);
 
 u32  (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
 int  (*Old_SifSetReg)(u32 register_num, int register_value);
@@ -113,5 +119,8 @@ void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
 
 /* patches.c */
 void apply_game_patches(void);
+
+/* padhook.c */
+int Install_PadRead_Hook(void);
 
 #endif

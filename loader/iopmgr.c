@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, Ifcaro & jimmikaelkael
+  Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
@@ -38,6 +38,7 @@ extern void *netlog_irx;
 extern int size_netlog_irx;
 
 /*----------------------------------------------------------------------------------------*/
+/*
 void list_modules(void)
 {
 	int c = 0;
@@ -53,7 +54,7 @@ void list_modules(void)
 		scr_printf("   \t%-21.21s  %2d  %3x%c", name, info.id, info.version, (++c & 1) ? ' ' : '\n');
 	} while (smod_get_next_mod(&info, &info) != 0);
 }
-
+*/
 /*----------------------------------------------------------------------------------------*/
 /* Reset IOP processor. This fonction hook reset iop if an update sequence is requested.  */
 /*----------------------------------------------------------------------------------------*/
@@ -263,7 +264,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
 		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
 		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-		cdInit(CDVD_INIT_INIT);
+		//cdInit(CDVD_INIT_INIT);
 	}	
 	else if (GameMode == HDD_MODE) {
 		//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
@@ -278,6 +279,9 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifExitIopHeap();
 	LoadFileExit();
 	
+	// Patch padread function to install In Game Reset
+	//Install_PadRead_Hook();
+
 	// we have 4 SifSetReg calls to skip in ELF's SifResetIop, not when we use it ourselves
 	if (set_reg_disabled)
 		set_reg_hook = 4;

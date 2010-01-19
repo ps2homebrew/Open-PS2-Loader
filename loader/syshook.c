@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, Ifcaro & jimmikaelkael
+  Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
@@ -164,7 +164,7 @@ static void t_loadElf(void)
 
 		// applying needed game patches if any
 		apply_game_patches();
-
+		
 		FlushCache(0);
 		FlushCache(2);
 		
@@ -234,4 +234,16 @@ void Install_Kernel_Hooks(void)
 	
 	Old_LoadExecPS2 = GetSyscallHandler(__NR_LoadExecPS2);
 	SetSyscall(__NR_LoadExecPS2, &HookLoadExecPS2);	
+}
+
+
+/*----------------------------------------------------------------------------------------*/
+/* Restore original LoadExecPS2, SifSetDma and SifSetReg syscalls in kernel.              */
+/*----------------------------------------------------------------------------------------*/
+void Remove_Kernel_Hooks(void)
+{
+	if(!(g_compat_mask & COMPAT_MODE_3))
+		Apply_Mode3();
+
+	SetSyscall(__NR_LoadExecPS2, Old_LoadExecPS2);
 }

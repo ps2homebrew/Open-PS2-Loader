@@ -117,23 +117,6 @@ static u32 AC9Bpattern_mask[] = {
 	0xffffffff
 };
 
-//-------------------------------------------------------------------------
-static u8 *find_pattern_with_mask(u8 *buf, u32 bufsize, u8 *bytes, u8 *mask, u32 len)
-{
-	register u32 i, j;
-
-	for (i = 0; i < bufsize - len; i++) {
-		for (j = 0; j < len; j++) {
-			if ((buf[i + j] & mask[j]) != bytes[j])
-				break;
-		}
-		if (j == len)
-			return &buf[i];
-	}
-
-	return NULL;
-}
-
 static void NIS_generic_patches(void)
 {
 	u8 *ptr;

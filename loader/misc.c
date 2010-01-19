@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, Ifcaro & jimmikaelkael
+  Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
@@ -14,6 +14,73 @@ extern int size_cdvdman_irx;
 
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
+
+
+/*----------------------------------------------------------------------------------------*/
+/* This function converts string to unsigned integer. Stops on illegal characters.        */
+/* Put here because including atoi rises the size of loader.elf by another kilobyte       */
+/* and that causes some games to stop working.                                            */
+/*----------------------------------------------------------------------------------------*/
+unsigned int _strtoui(const char* p)
+{
+	if (!p)
+		return 0;
+
+	int r = 0;
+
+	while (*p)
+	{
+		if ((*p < '0') || (*p > '9'))
+			return r;
+
+		r = r * 10 + (*p++ - '0');
+	}
+
+	return r;
+}
+
+
+/*----------------------------------------------------------------------------------------*/
+/* This function format g_ipconfig with ip, netmask, and gateway                          */
+/*----------------------------------------------------------------------------------------*/
+void set_ipconfig(void)
+{
+	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
+	g_ipconfig_len = 0;
+	
+	// add ip to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_ip, 15);
+	g_ipconfig_len += strlen(g_ps2_ip) + 1;
+
+	// add netmask to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_netmask, 15);
+	g_ipconfig_len += strlen(g_ps2_netmask) + 1;
+
+	// add gateway to g_ipconfig buf
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_gateway, 15);
+	g_ipconfig_len += strlen(g_ps2_gateway) + 1;
+}
+
+
+/*----------------------------------------------------------------------------------------*/
+/* This function retrieve a pattern in a buffer, using a mask                             */
+/*----------------------------------------------------------------------------------------*/
+u8 *find_pattern_with_mask(u8 *buf, u32 bufsize, u8 *bytes, u8 *mask, u32 len)
+{
+	register u32 i, j;
+
+	for (i = 0; i < bufsize - len; i++) {
+		for (j = 0; j < len; j++) {
+			if ((buf[i + j] & mask[j]) != bytes[j])
+				break;
+		}
+		if (j == len)
+			return &buf[i];
+	}
+
+	return NULL;
+}
+
 
 /*----------------------------------------------------------------------------------------*/
 /* Copy 'size' bytes of 'eedata' from EE to 'iopptr' in IOP.                              */

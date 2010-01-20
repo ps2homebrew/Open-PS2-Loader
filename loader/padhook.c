@@ -1,40 +1,87 @@
 /*
+  padhook.c Open PS2 Loader In Game Reset
+ 
   Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
-  scePadRead Hooking function taken from ps2rd. See below.
-*/
 
-/*
- * padhook.c - scePadRead hooking
- *
- * Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
- * Copyright (C) 2009 misfire <misfire@xploderfreax.de>
- *
- * This file is part of ps2rd, the PS2 remote debugger.
- *
- * ps2rd is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ps2rd is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ps2rd.  If not, see <http://www.gnu.org/licenses/>.
- */
+  Reset SPU function taken from PS2SDK freesd.
+  Copyright (c) 2004 TyRaNiD <tiraniddo@hotmail.com>
+  Copyright (c) 2004,2007 Lukasz Bruun <mail@lukasz.dk>
+
+  scePadRead Hooking function taken from ps2rd.
+  Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
+  Copyright (C) 2009 misfire <misfire@xploderfreax.de>
+*/
 
 #include "loader.h"
 #include "padhook.h"
 
+
 /* scePadRead prototypes */
 static int (*scePadRead)(int port, int slot, u8* data);
 static int (*scePad2Read)(int socket, u8* data);
+
+
+// Reset SPU Sound processor
+static void ResetSPU()
+{
+	u32 core;
+	volatile u16 *statx;
+
+	DIntr();
+	ee_kmode_enter();
+
+	// Stop SPU Dma Core 0
+	*SD_DMA_CHCR(0) &= ~SD_DMA_START;
+	*U16_REGISTER(0x1B0) = 0;
+
+	// Stop SPU Dma Core 1
+	*SD_DMA_CHCR(1) &= ~SD_DMA_START;
+	*U16_REGISTER(0x1B0 +  1024) = 0;
+
+	// Initialize SPU2
+	*U32_REGISTER(0x1404)  = 0xBF900000;
+	*U32_REGISTER(0x140C)  = 0xBF900800;
+	*U32_REGISTER(0x10F0) |= 0x80000;
+	*U32_REGISTER(0x1570) |= 8;
+	*U32_REGISTER(0x1014)  = 0x200B31E1;
+	*U32_REGISTER(0x1414)  = 0x200B31E1;
+
+	*SD_C_SPDIF_OUT = 0;
+	delay(1);
+	*SD_C_SPDIF_OUT = 0x8000;
+	delay(1);
+
+	*U32_REGISTER(0x10F0) |= 0xB0000;
+
+	for(core=0; core < 2; core++)
+	{
+		*U16_REGISTER(0x1B0)	= 0;
+		*SD_CORE_ATTR(core)		= 0;
+		delay(1);
+		*SD_CORE_ATTR(core)		= SD_SPU2_ON;
+
+		*SD_P_MVOLL(core)		= 0;
+		*SD_P_MVOLR(core)		= 0;
+		
+		statx = U16_REGISTER(0x344 + (core * 1024));
+
+		while(*statx & 0x7FF);
+		
+		*SD_A_KOFF_HI(core)		= 0xFFFF;
+		*SD_A_KOFF_LO(core)		= 0xFFFF; // Should probably only be 0xFF
+	}
+
+	*SD_S_PMON_HI(1)	= 0;
+	*SD_S_PMON_LO(1)	= 0;
+	*SD_S_NON_HI(1)		= 0;
+	*SD_S_NON_LO(1)		= 0;
+
+	ee_kmode_exit();
+	EIntr();
+}
 
 // Go home function is call when combo trick is press
 static void Go_Home(void)
@@ -75,10 +122,17 @@ static void Go_Home(void)
 	LoadFileInit();
 	Sbv_Patch();
 		
+	GS_BGCOLOUR = 0xFF8000; // Blue sky
+
 	// Load basic modules
 	LoadModule("rom0:SIO2MAN", 0, NULL);
 	LoadModule("rom0:MCMAN", 0, NULL);
 	LoadModule("rom0:MCSERV", 0, NULL);
+
+	GS_BGCOLOUR = 0x800080; // Purple
+
+	// Reset SPU Sound processor
+	ResetSPU();
 
 	// Load BOOT.ELF
 	r = LoadElf("mc0:/BOOT/BOOT.ELF", &elf);

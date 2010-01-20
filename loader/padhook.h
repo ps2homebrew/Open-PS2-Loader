@@ -1,35 +1,53 @@
 /*
+  padhook.h Open PS2 Loader In Game Reset
+ 
   Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
-  scePadRead Hooking function taken from ps2rd. See below.
+
+  SPU definitions taken from PS2SDK freesd.
+  Copyright (c) 2004 TyRaNiD <tiraniddo@hotmail.com>
+  Copyright (c) 2004,2007 Lukasz Bruun <mail@lukasz.dk>
+
+  scePadRead Pattern taken from ps2rd.
+  Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
+  Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
 
-/*
- * padhook.h - scePadRead patterns
- *
- * Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
- * Copyright (C) 2009 misfire <misfire@xploderfreax.de>
- *
- * This file is part of ps2rd, the PS2 remote debugger.
- *
- * ps2rd is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ps2rd is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ps2rd.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include <tamtypes.h>
+
+
+// SD_CORE_ATTR Macros
+#define SD_SPU2_ON					(1 << 15)
+
+// SPU DMA Channels 0,1 - 1088 bytes apart
+#define SD_DMA_CHCR(ch)     ((volatile u32*)(0xBF8010C8+(ch*1088)))
+#define SD_DMA_START		    (1 << 24)
+
+// SPDIF OUT
+#define SD_C_SPDIF_OUT			((volatile u16*)0xBF9007C0)
+
+// Base of SPU2 regs is 0x0xBF900000
+#define U16_REGISTER(x)    ((volatile u16 *) (0xBF900000 | (x)))
+#define U32_REGISTER(x)	   ((volatile u32 *) (0xBF800000 | (x)))
+
+#define SD_BASE_REG(reg)   ((volatile u16 *)(0xBF900000 + reg))
+
+#define SD_A_REG(core, reg) SD_BASE_REG(0x1A0 + ((core) << 10) + (reg)) 
+#define SD_A_KOFF_HI(core)  SD_A_REG((core), 0x04)
+#define SD_A_KOFF_LO(core)  SD_A_REG((core), 0x06) 
+#define SD_P_REG(core, reg) SD_BASE_REG(0x760 + ((core) * 40) + (reg))
+#define SD_P_MVOLL(core)    SD_P_REG((core), 0x00)
+#define SD_P_MVOLR(core)    SD_P_REG((core), 0x02)
+#define SD_S_REG(core, reg) SD_BASE_REG(0x180 + ((core) << 10) + (reg)) 
+#define SD_S_PMON_HI(core)  SD_S_REG((core), 0x00)
+#define SD_S_PMON_LO(core)  SD_S_REG((core), 0x02)
+#define SD_S_NON_HI(core)   SD_S_REG((core), 0x04)
+#define SD_S_NON_LO(core)   SD_S_REG((core), 0x06)
+#define SD_CORE_ATTR(core)  SD_S_REG((core), 0x1A)
+
+
 
 /**************************************************************************
  * For libpad support

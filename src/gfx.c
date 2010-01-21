@@ -1414,12 +1414,16 @@ void MenuPrevV() {
 	struct TSubMenuList *cur = selected_item->item->current;
 
 	// if the current item is on the page start, move the page start one page up before moving the item
-	if (selected_item->item->pagestart == cur) {
-		int itms = STATIC_PAGE_SIZE + 1; // +1 because the selection will move as well
+	if (selected_item->item->pagestart) {
+		if (selected_item->item->pagestart == cur) {
+			int itms = STATIC_PAGE_SIZE + 1; // +1 because the selection will move as well
 
-		while (--itms && selected_item->item->pagestart->prev) {
-			selected_item->item->pagestart = selected_item->item->pagestart->prev;	
+			while (--itms && selected_item->item->pagestart->prev) {
+				selected_item->item->pagestart = selected_item->item->pagestart->prev;	
+			}
 		}
+	} else {
+		selected_item->item->pagestart = cur;
 	}
 	
 	if(cur && cur->prev) {

@@ -6,16 +6,16 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: Makefile 1 2007-05-08 16:56:27Z polo $
+# $Id: Makefile 1 2010-01-21 10:25:27Z polo $
 
 EE_BIN = loader.elf
-EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o patches.o padhook.o
+EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o patches.o padhook.o crt0.o
 
-EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I. $(EE_INCS)
-EE_CFLAGS := -D_EE -O2 -G0 -Wall $(EE_CFLAGS)
-EE_LDFLAGS := -Wl,-Map,loader.map -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib $(EE_LDFLAGS) -s
-EE_LIBS += -lpatches -lc -lkernel
-EE_C_COMPILE = $(EE_CC) $(EE_CFLAGS) $(EE_INCS)
+EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
+EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)
+
+EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
+EE_LIBS += -lpatches -lkernel -lc
 
 %.o : %.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
@@ -23,16 +23,16 @@ EE_C_COMPILE = $(EE_CC) $(EE_CFLAGS) $(EE_INCS)
 %.o : %.s
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
-$(EE_BIN) : $(EE_OBJS) $(PS2SDK)/ee/startup/crt0.o
-	$(EE_CC) -nostartfiles -Tlinkfile $(EE_LDFLAGS) \
-		-o $(EE_BIN) $(PS2SDK)/ee/startup/crt0.o $(EE_OBJS) $(EE_LIBS)
+$(EE_BIN) : $(EE_OBJS)
+	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker loader.map
+
 	
 all: $(EE_BIN)
 
 clean:
-	rm -f *.o *.a *.s *.map *.bak *.elf
+	rm -f *.o *.a *.map *.bak *.elf
 
 clean_all:
-	rm -f *.o *.a *.s *.map *.bak *.elf
+	rm -f *.o *.a *.map *.bak *.elf
 
 include $(PS2SDK)/samples/Makefile.pref

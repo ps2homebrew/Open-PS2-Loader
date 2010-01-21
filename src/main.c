@@ -776,7 +776,8 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 int RefreshHDDGameList() {
 	DestroySubMenu(&hdd_submenu);
 	int ret = hddGetHDLGamelist(&hddGameList);
-
+	hdd_submenu = NULL;
+	
 	if (ret != 0)
 		return -1;
 

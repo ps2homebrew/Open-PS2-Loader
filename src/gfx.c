@@ -392,7 +392,7 @@ void SortSubMenu(struct TSubMenuList** submenu) {
 	struct TSubMenuList *head = *submenu;
 	int sorted = 0;
 	
-	if ((*submenu == NULL) || ((*submenu)->next == NULL))
+	if ((submenu == NULL) || (*submenu == NULL) || ((*submenu)->next == NULL))
 		return;
 	
 	while (!sorted) {

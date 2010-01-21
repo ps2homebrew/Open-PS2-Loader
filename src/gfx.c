@@ -232,6 +232,10 @@ void InitGFX() {
 	gsKit_init_screen(gsGlobal);
 
 	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
+
+	// reset the contents of the screen to avoid garbage being displayed
+	DrawBackground();
+	Flip();
 }
 
 void DestroyGFX() {
@@ -1408,13 +1412,21 @@ void MenuPrevV() {
 		return;
 	
 	struct TSubMenuList *cur = selected_item->item->current;
+
+	// if the current item is on the page start, move the page start one page up before moving the item
+	if (selected_item->item->pagestart == cur) {
+		int itms = STATIC_PAGE_SIZE + 1; // +1 because the selection will move as well
+
+		while (--itms && selected_item->item->pagestart->prev) {
+			selected_item->item->pagestart = selected_item->item->pagestart->prev;	
+		}
+	}
 	
 	if(cur && cur->prev) {
 		selected_item->item->current = cur->prev;
 			
 		v_anim=0;
 		direc=4;
-
 	}
 }
 
@@ -1479,6 +1491,33 @@ void RefreshSubMenu() {
 }
 
 void DrawScreenStatic() {
+	// ------------------------------------------------------
+	// -------- Preparations --------------------------------
+	// ------------------------------------------------------
+	// verify the item is in visible range
+	int icnt = STATIC_PAGE_SIZE;
+	int found = 0;
+
+	struct TSubMenuList *cur = selected_item->item->current;
+	struct TSubMenuList *ps  = selected_item->item->pagestart;
+
+	while (icnt-- && ps) {
+		if (ps == cur) {
+			found = 1;
+			break;
+		}
+
+		ps = ps->next;
+	}
+
+	// page not properly aligned?
+	if (!found)
+		selected_item->item->pagestart = cur;
+
+	// reset to page start after cur. item visibility determination
+	ps  = selected_item->item->pagestart;
+
+
 	// we render a static variant of the menu (no animations)
 	// ------------------------------------------------------
 	// -------- 0. the background ---------------------------
@@ -1533,48 +1572,29 @@ void DrawScreenStatic() {
 		icon_h_spacing = 45;
 	
 	// count of items before and after selection
-	int sur_items = 5;
-	int curpos = 125 + sur_items * spacing;
+	// int sur_items = 5;
+	int curpos = 125; // + sur_items * spacing;
 	
 	TextColor(text_color[0],text_color[1],text_color[2],0xff);
 	
 		
-	struct TSubMenuList *cur = selected_item->item->current;
-	
 	if (!cur) // no rendering if empty
 		return;
 	
-	// prev item
-	struct TSubMenuList *prev = cur->prev;
+	int others = 0;
 	
-	int others = 1;
-	
-	while (prev && (others <= sur_items)) {
+	while (ps && (others <= STATIC_PAGE_SIZE)) {
 		if (draw_icons)
-			DrawIcon(prev->item.icon, 10, yfix2((curpos - others * spacing - iconhalf)), iscale);
-		DrawText(10 + icon_h_spacing, yfix2((curpos - others * spacing)), GetSubItemText(&prev->item),1.0f, 0);
+			DrawIcon(ps->item.icon, 10, yfix2((curpos + others * spacing - iconhalf)), iscale);
 		
-		prev = prev->prev; others++;
-	}
-	
-	// a sorta yellow colour for the selection
-	TextColor(0xff, 0x080, 0x00, 0xff);
-	if (draw_icons)
-			DrawIcon(cur->item.icon, 10, yfix2((curpos - iconhalf)), iscale);
-	DrawText(10 + icon_h_spacing, yfix2(curpos), GetSubItemText(&cur->item), 1.0f, 0);
+		if (ps == cur)
+			TextColor(0xff, 0x080, 0x00, 0xff);
+		else
+			TextColor(text_color[0],text_color[1],text_color[2],0xff);
+
+		DrawText(10 + icon_h_spacing, yfix2((curpos + others * spacing)), GetSubItemText(&ps->item), 1.0f, 0);
 		
-	cur = cur->next;
-	
-	others = 1;
-	
-	TextColor(text_color[0],text_color[1],text_color[2],0xff);
-	
-	while (cur && (others <= sur_items)) {
-		if (draw_icons)
-			DrawIcon(cur->item.icon, 10, yfix2((curpos + others * spacing - iconhalf)), iscale);
-		DrawText(10 + icon_h_spacing, yfix2((curpos + others * spacing)), GetSubItemText(&cur->item), 1.0f, 0);
-		
-		cur = cur->next; others++;
+		ps = ps->next; others++;
 	}
 }
 
@@ -1975,7 +1995,7 @@ struct UIItem *diaGetPrevLine(struct UIItem* cur, struct UIItem *ui) {
 		}
 		
 		// twice the break? find first control
-		if (lb == 2)
+		if (lb == 2) 
 			return diaGetFirstControl(newf);
 	}
 	
@@ -1995,7 +2015,7 @@ struct UIItem *diaGetNextLine(struct UIItem* cur, struct UIItem *ui) {
 		}
 		
 		if (lb == 1)
-			return diaGetFirstControl(newf);
+			return diaGetNextControl(newf, cur);
 	}
 	
 	return cur;

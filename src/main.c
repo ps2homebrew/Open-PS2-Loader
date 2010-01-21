@@ -1359,7 +1359,9 @@ int main(void)
 		if (GetKeyOn(KEY_L2)) {
 			struct TMenuItem* cur = MenuGetCurrent();
 			
-			if ((cur == &usb_games_item) || (cur == &eth_games_item)) {
+			if ((cur == &usb_games_item) || 
+			    (cur == &eth_games_item) ||
+			    (cur == &hdd_games_item)) {
 				cur->current = cur->submenu;
 			}
 		}
@@ -1368,7 +1370,9 @@ int main(void)
 		if (GetKeyOn(KEY_R2)) {
 			struct TMenuItem* cur = MenuGetCurrent();
 			
-			if ((cur == &usb_games_item) || (cur == &eth_games_item)) {
+			if ((cur == &usb_games_item) || 
+			    (cur == &eth_games_item) ||
+			    (cur == &hdd_games_item)) {
 				if (!cur->current)
 					cur->current = cur->submenu;
 				

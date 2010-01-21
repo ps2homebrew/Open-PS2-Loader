@@ -767,6 +767,7 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 		
 		mi->submenu = *submenu;
 		mi->current = *submenu;
+		mi->pagestart = *submenu;
 	}
 
 	fioClose(fd);
@@ -792,6 +793,7 @@ int RefreshHDDGameList() {
 	
 	hdd_games_item.submenu = hdd_submenu;
 	hdd_games_item.current = hdd_submenu;
+	hdd_games_item.pagestart = hdd_submenu;
 
 	return 0;
 }

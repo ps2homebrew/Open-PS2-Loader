@@ -23,6 +23,9 @@
 
 #define USBLD_VERSION "0.6"
 
+// count of items per page (for page up/down navigation)
+#define STATIC_PAGE_SIZE 10
+
 char USB_prefix[8];
 
 typedef
@@ -78,8 +81,8 @@ struct TMenuItem {
 	
 	void *userdata;
 	
-	/// submenu
-	struct TSubMenuList *submenu, *current;
+	/// submenu, selection and page start (only used in static mode)
+	struct TSubMenuList *submenu, *current, *pagestart;
 	
 	/// execute a menu/submenu item (id is the submenu id as specified in AppendSubMenu)
 	void (*execute)(struct TMenuItem *self, int id);
@@ -233,6 +236,8 @@ int gUseHdd;
 int gHddAutostart;
 /// true if dev9 irx loaded already
 int gDev9_loaded;
+/// Sort the game lists automatically
+int gAutosort;
 
 #define COMPAT_MODE_1 		0x01
 #define COMPAT_MODE_2 		0x02

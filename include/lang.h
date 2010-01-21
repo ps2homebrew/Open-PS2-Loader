@@ -54,6 +54,7 @@
 #define _STR_USEHDD 48
 #define _STR_AUTOSTARTHDD 49
 #define _STR_STARTHDD 50
+#define _STR_AUTOSORT 51
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

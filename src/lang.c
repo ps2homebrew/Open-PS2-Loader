@@ -55,7 +55,6 @@ char *english[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *czech[] = {
@@ -110,7 +109,6 @@ char *czech[] = {
 	"Pouzivat Pevny Disk", // _STR_USEHDD
 	"Automaticky spoustet HDD", // _STR_AUTOSTARTHDD
 	"Start HDD", // _STR_STARTHDD
-	"Automaticke razeni", // _STR_AUTOSORT
 };
 
 char *spanish[] = {
@@ -165,7 +163,6 @@ char *spanish[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD	
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *french[] = {
@@ -220,7 +217,6 @@ char *french[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *german[] = {
@@ -275,7 +271,6 @@ char *german[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *portuguese[] = {
@@ -330,7 +325,6 @@ char *portuguese[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *norwegian[] = {
@@ -385,7 +379,6 @@ char *norwegian[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *turkish[] = {
@@ -440,7 +433,6 @@ char *turkish[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *polish[] = {
@@ -495,7 +487,6 @@ char *polish[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *russian[] = {
@@ -550,7 +541,6 @@ char *russian[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *indonesian[] = {
@@ -605,7 +595,6 @@ char *indonesian[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *bulgarian[] = {
@@ -660,7 +649,6 @@ char *bulgarian[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char *dutch[] = {
@@ -715,7 +703,6 @@ char *dutch[] = {
 	"Use Hard Drive", // _STR_USEHDD
 	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
 	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
 };
 
 char **languages[] = {

@@ -1125,18 +1125,18 @@ PhyGetDuplex(SMap* pSMap)
 static void __ForceSPD100M_FD(SMap* pSMap)
 {
 	int i;
-	int link_flag = 0;
 	
 	/* Confirm link status, wait 1s is needed. */
-	i = SMAP_FORCEMODE_TIMEOUT;
+confirm_link:
+	i = 100;
 	while (--i) {
 		int phy = _smap_phy_read(DsPHYTER_BMSR);
 		if (phy & PHY_BMSR_LINK)
 			break;
 		DelayThread(1000);
 	}
-	if (i > 0)
-		link_flag = 1;
+	if (i == 0)
+		goto confirm_link;
 
 	_smap_phy_write(DsPHYTER_BMCR, PHY_BMCR_100M|PHY_BMCR_DUPM);
 	pSMap->u32Flags |= SMAP_F_CHECK_FORCE100M;
@@ -1145,17 +1145,15 @@ static void __ForceSPD100M_FD(SMap* pSMap)
 	while (--i)
 		DelayThread(1000);
 	
-	if (link_flag) {	
-		/* Force 100 Mbps full duplex mode */
-		u32 u32E3Val = EMAC3REG_READ(pSMap, SMAP_EMAC3_MODE1);		
-		u32E3Val |= (E3_FDX_ENABLE|E3_FLOWCTRL_ENABLE|E3_ALLOW_PF);
-		u32E3Val &= ~E3_MEDIA_MSK;
-		u32E3Val |= E3_MEDIA_100M;
-		EMAC3REG_WRITE(pSMap, SMAP_EMAC3_MODE1, u32E3Val);
-		pSMap->u32Flags &= ~(SMAP_F_CHECK_FORCE100M|SMAP_F_CHECK_FORCE10M);
-		pSMap->u32Flags |= SMAP_F_LINKESTABLISH;
-		PhySetDSP(pSMap);
-	}
+	/* Force 100 Mbps full duplex mode */
+	u32 u32E3Val = EMAC3REG_READ(pSMap, SMAP_EMAC3_MODE1);		
+	u32E3Val |= (E3_FDX_ENABLE|E3_FLOWCTRL_ENABLE|E3_ALLOW_PF);
+	u32E3Val &= ~E3_MEDIA_MSK;
+	u32E3Val |= E3_MEDIA_100M;
+	EMAC3REG_WRITE(pSMap, SMAP_EMAC3_MODE1, u32E3Val);
+	pSMap->u32Flags &= ~(SMAP_F_CHECK_FORCE100M|SMAP_F_CHECK_FORCE10M);
+	pSMap->u32Flags |= SMAP_F_LINKESTABLISH;
+	PhySetDSP(pSMap);
 }
 #endif
 

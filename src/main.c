@@ -178,7 +178,6 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_DEFDEVICE 17
 #define UICFG_USEHDD 18
 #define UICFG_AUTOSTARTHDD 19
-#define UICFG_AUTOSORT 20
 
 #define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
@@ -190,7 +189,8 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_MENUTYPE}}}, {UI_SPACER}, {UI_ENUM, UICFG_MENU, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, UICFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_USEHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_USEHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_AUTOSTARTHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSTARTHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -200,11 +200,6 @@ struct UIItem diaUIConfig[] = {
 	{UI_SPLITTER},
 	
 	{UI_LABEL, 0, NULL, {.label = {"Exit to", -1}}}, {UI_SPACER}, {UI_ENUM, UICFG_EXITTO, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	
-	{UI_SPLITTER},
-	
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_USEHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_USEHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_AUTOSTARTHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSTARTHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -546,7 +541,6 @@ void showUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_DEFDEVICE, default_device);
 	diaSetInt(diaUIConfig, UICFG_USEHDD, gUseHdd);
 	diaSetInt(diaUIConfig, UICFG_AUTOSTARTHDD, gHddAutostart);
-	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -561,7 +555,6 @@ void showUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_DEFDEVICE, &default_device);
 		diaGetInt(diaUIConfig, UICFG_USEHDD, &gUseHdd);
 		diaGetInt(diaUIConfig, UICFG_AUTOSTARTHDD, &gHddAutostart);
-		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
 		
 		// update the value interpretation
 		setLanguage(gLanguageID);
@@ -601,7 +594,6 @@ int loadConfig(const char* fname, int clearFirst) {
 	getConfigInt(&gConfig, "net_auto", &gNetAutostart);
 	getConfigInt(&gConfig, "use_hdd", &gUseHdd);
 	getConfigInt(&gConfig, "autostart_hdd", &gHddAutostart);
-	getConfigInt(&gConfig, "autosort", &gAutosort);
 	
 	if (getConfigStr(&gConfig, "pc_share", &temp))
 		strncpy(gPCShareName, temp, 32);
@@ -628,7 +620,6 @@ int saveConfig(const char* fname) {
 	setConfigInt(&gConfig, "use_hdd", gUseHdd);
 	setConfigInt(&gConfig, "autostart_hdd", gHddAutostart);
 	setConfigStr(&gConfig, "pc_share", gPCShareName);
-	setConfigInt(&gConfig, "autosort", gAutosort);
 	
 	// Not writing the IP config, too dangerous to change it by accident...
 	return writeConfig(&gConfig, fname);
@@ -762,9 +753,6 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 			AppendSubMenu(submenu, &disc_icon, g->Name, id, -1);
 		}
 		
-		if (gAutosort)
-			SortSubMenu(submenu);
-		
 		mi->submenu = *submenu;
 		mi->current = *submenu;
 	}
@@ -787,9 +775,6 @@ int RefreshHDDGameList() {
 		AppendSubMenu(&hdd_submenu, &disc_icon, game->name, id, -1);
 	};
 
-	if (gAutosort)
-		SortSubMenu(&hdd_submenu);
-	
 	hdd_games_item.submenu = hdd_submenu;
 	hdd_games_item.current = hdd_submenu;
 
@@ -1017,27 +1002,27 @@ void ExecSettings(struct TMenuItem* self, int id) {
 struct TSubMenuList *settings_submenu = NULL;
 
 struct TMenuItem exit_item = {
-	&exit_icon, "Exit", _STR_EXIT, NULL, NULL, NULL, NULL, &ExecExit, NULL, NULL
+	&exit_icon, "Exit", _STR_EXIT, NULL, NULL, NULL, &ExecExit, NULL, NULL
 };
 
 struct TMenuItem settings_item = {
-	&config_icon, "Settings", _STR_SETTINGS, NULL, NULL, NULL, NULL, &ExecSettings, NULL, NULL
+	&config_icon, "Settings", _STR_SETTINGS, NULL, NULL, NULL, &ExecSettings, NULL, NULL
 };
 
 struct TMenuItem usb_games_item  = {
-	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, NULL, &ExecUSBGameSelection, &RefreshUSBGameList, &AltExecUSBGameSelection
+	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, &ExecUSBGameSelection, &RefreshUSBGameList, &AltExecUSBGameSelection
 };
 
 struct TMenuItem hdd_games_item = {
-	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL, NULL, &ExecHDDGameSelection, NULL, &AltExecHDDGameSelection
+	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL, &ExecHDDGameSelection, NULL, &AltExecHDDGameSelection
 };
 
 struct TMenuItem eth_games_item = {
-	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, NULL, &ExecETHGameSelection, &RefreshETHGameList, &AltExecETHGameSelection
+	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, &ExecETHGameSelection, &RefreshETHGameList, &AltExecETHGameSelection
 };
 
 struct TMenuItem apps_item = {
-	&apps_icon, "Apps", _STR_APPS, NULL, NULL, NULL, NULL
+	&apps_icon, "Apps", _STR_APPS, NULL, NULL, NULL
 };
 
 
@@ -1046,7 +1031,7 @@ void InitMenuItems() {
 	ClearETHSubMenu();
 	
 	// initialize the menu
-	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_SETTINGS);
+	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_THEME);
 	AppendSubMenu(&settings_submenu, &netconfig_icon, "Network config", 3, _STR_IPCONFIG);
 	AppendSubMenu(&settings_submenu, &save_icon, "Save Changes", 7, _STR_SAVE_CHANGES);
 	
@@ -1089,7 +1074,7 @@ void init() {
 	Reset();
 
 	InitGFX();
-
+	
 	theme_dir[0] = NULL;
 	usb_max_games = 0;
 	eth_max_games = 0;
@@ -1119,8 +1104,6 @@ void init() {
 	// 1 if the harddrive is found
 	hddfound = 0;
 	hdd_inited = 0;
-	// autosort defaults to zero
-	gAutosort = 0;
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;
@@ -1143,8 +1126,6 @@ void init() {
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
 	
 	delay(3);
-
-	StartPad();
 
 	// try to restore config
 	// if successful, it will remember the config location for further writes
@@ -1175,6 +1156,8 @@ void init() {
 			MenuSetSelectedItem(&usb_games_item);
 	}
 	
+	StartPad();
+
 	usb_max_games=0;
 	eth_max_games=0;	
 	usbdelay=0;
@@ -1334,21 +1317,20 @@ int main(void)
 
 		DrawScreen();
 				
+		// L1 - page up/down modifier (5 instead of 1 item skip)
+		int pgmod = GetKeyPressed(KEY_L1);
+		
 		if(GetKey(KEY_LEFT)){
 			MenuPrevH();
-		} else if(GetKey(KEY_RIGHT)){
+		}else if(GetKey(KEY_RIGHT)){
 			MenuNextH();
-		} else if(GetKey(KEY_UP)) {
-			MenuPrevV();
-		} else if(GetKey(KEY_DOWN)){
-			MenuNextV();
-		} else if(GetKey(KEY_L1)) {
+		}else if(GetKey(KEY_UP)){
 			int i;
-			for (i = 0; i < STATIC_PAGE_SIZE; ++i)
+			for (i = 0; i < 4*(pgmod ? 1 : 0) + 1; ++i)
 				MenuPrevV();
-		} else if(GetKey(KEY_R1)){
+		}else if(GetKey(KEY_DOWN)){
 			int i;
-			for (i = 0; i < STATIC_PAGE_SIZE; ++i)
+			for (i = 0; i < 4*(pgmod ? 1 : 0) + 1; ++i)
 				MenuNextV();
 		}
 		
@@ -1387,8 +1369,7 @@ int main(void)
 		if (GetKeyOn(KEY_SELECT)) {
 			struct TMenuItem* cur = MenuGetCurrent();
 			
-			if ((cur == &usb_games_item) ||
- 
+			if ((cur == &usb_games_item) || 
 			    (cur == &eth_games_item) ||
 			    (cur == &hdd_games_item)) {
 				SortSubMenu(&cur->submenu);

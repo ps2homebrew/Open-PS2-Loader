@@ -99,8 +99,7 @@ static void Go_Home(void)
 	Remove_Kernel_Hooks();
 
 	// Reset EE Coprocessors & Controlers
-	// But don't reset VU0 & VU1 otherwise some games hang
-	ResetEE(0xED);
+	ResetEE(0x07);
 
 	GS_BGCOLOUR = 0x800000; // Dark Blue
 
@@ -188,6 +187,19 @@ static void Go_Home(void)
 	);
 }
 
+static void Power_Off(void)
+{
+	DIntr();
+	ee_kmode_enter();
+
+	*((u8*)0xBF402017) = 0;
+	*((u8*)0xBF402016) = 0xF;
+
+	ee_kmode_exit();
+	EIntr();
+
+}
+
 // Hook function for libpad scePadRead
 static int Hook_scePadRead(int port, int slot, u8* data)
 {
@@ -195,10 +207,21 @@ static int Hook_scePadRead(int port, int slot, u8* data)
 
 	ret = scePadRead(port, slot, data);
 
-	// Combo R1 + R2 + L1 + L2 + Start + Select
-	if ( (data[2] == 0xf6) && (data[3] == 0xf0) )
+	// Combo R1 + L1 + R2 + L2
+	if ( data[3] == 0xf0 )
 	{
-		Go_Home();
+		// + Start + Select
+		if ( data[2] == 0xf6 )
+		{
+			// Return to home
+			Go_Home();
+		}
+		// + R3 + L3
+		else if ( data[2] == 0xf9 )
+		{
+			// Turn off PS2
+			Power_Off();
+		}
 	}
 
 	return ret;
@@ -211,10 +234,21 @@ static int Hook_scePad2Read(int socket, u8* data)
 
 	ret = scePad2Read(socket, data);
 
-	// Combo R1 + R2 + L1 + L2 + Start + Select
-	if ( (data[0] == 0xf6) && (data[1] == 0xf0) )
+	// Combo R1 + L1 + R2 + L2
+	if ( data[1] == 0xf0 )
 	{
-		Go_Home();
+		// + Start + Select
+		if ( data[0] == 0xf6 )
+		{
+			// Return to home
+			Go_Home();
+		}
+		// + R3 + L3
+		else if ( data[0] == 0xf9 )
+		{
+			// Turn off PS2
+			Power_Off();
+		}
 	}
 
 	return ret;

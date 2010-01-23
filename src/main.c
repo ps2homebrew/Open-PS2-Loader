@@ -131,7 +131,7 @@ struct UIItem diaIPConfig[] = {
 #define COMPAT_LOADFROMDISC 104
 #define COMPAT_MODE_BASE 10
 #define COMPAT_GAMEID 50
-#define COMPAT_MODE_COUNT 5
+#define COMPAT_MODE_COUNT 6
 struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 110, NULL, {.label = {"<Game Label>", -1}}},
 	
@@ -144,10 +144,11 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, "Unhook Syscalls", {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, "0 PSS mode", {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, "Disable DVD-DL", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 6", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, "Disable IGR", {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
-	{UI_LABEL, 0, NULL, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_MODE_BASE + 5, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_MODE_BASE + 6, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -386,14 +387,14 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 			dmamode=7; // defaulting to UDMA 4
 		}
 		
-		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 5, dmaModes);
-		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 5, dmamode);
+		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 6, dmaModes);
+		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 6, dmamode);
 		
 	}else{
 		const char* dmaModes[] = {
 			NULL
 		};
-		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 5, dmaModes);
+		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 6, dmaModes);
 	}
 	
 	int modes = getImageCompatMask(id, prefix, ntype);
@@ -461,7 +462,7 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 		if(ntype==HDD_MODE){
 			int dmamode=0;
 			
-			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + 5, &dmamode);
+			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + 6, &dmamode);
 			
 			if(dmamode<3){
 				hddGameList->games[id - 1].dma_type = MDMA_MODE;

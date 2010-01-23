@@ -244,6 +244,7 @@ int gAutosort;
 #define COMPAT_MODE_3 		0x04
 #define COMPAT_MODE_4 		0x08
 #define COMPAT_MODE_5 		0x10
+#define COMPAT_MODE_6 		0x20
 
 // Theme config
 

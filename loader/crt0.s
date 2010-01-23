@@ -1,12 +1,14 @@
-# _____     ___ ____     ___ ____
-#  ____|   |    ____|   |        | |____|
-# |     ___|   |____ ___|    ____| |    \    PS2DEV Open Source Project.
-#-----------------------------------------------------------------------
-# Copyright (c) 2001-2007 ps2dev - http://www.ps2dev.org
+# Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
+# Copyright 2006-2008 Polo
+# Licenced under Academic Free License version 3.0
+# Review OPNPS2LD README & LICENSE files for further details.
+#
+# Copyright 2001-2004, ps2dev - http://www.ps2dev.org
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: crt0.s 1514 2010-01-21 20:49:17Z Polo $
+# Modified crt0.s
+# Remove _ps2sdk_args_parse, _ps2sdk_libc_init and _ps2sdk_libc_deinit weak functions for size optimization
 
    .weak  _init
    .type  _init, @function

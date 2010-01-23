@@ -86,82 +86,101 @@ static void ResetSPU()
 // Go home function is call when combo trick is press
 static void Go_Home(void)
 {
-	int r, argc;
+	int ret, argc;
 	t_ExecData elf;
 	char *argv[2];
+
+	ret  = 0;
+	argc = 1;
 
 	GS_BGCOLOUR = 0xFFFFFF; // White
 
 	// Remove kernel hook
 	Remove_Kernel_Hooks();
 
-	// Reset EE Processor help with most games, not with some other ...
-	// TODO: Find the correct value
-	ResetEE(0x7F);
+	// Reset EE Coprocessors & Controlers
+	// But don't reset VU0 & VU1 otherwise some games hang
+	ResetEE(0xED);
 
 	GS_BGCOLOUR = 0x800000; // Dark Blue
 
-	// Exit Services
-	SifExitRpc();
-	SifExitIopHeap();
-	LoadFileExit();
+	if ( ExitMode != OSDS_MODE)
+	{
+		// Exit Services
+		SifExitRpc();
+		SifExitIopHeap();
+		LoadFileExit();
 
-	GS_BGCOLOUR = 0x008000; // Dark Green
+		GS_BGCOLOUR = 0x008000; // Dark Green
 
-	// Reset IO Processor
-	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0));
-	while (!Sync_Iop());
+		// Reset IO Processor
+		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0));
+		while (!Sync_Iop());
 
-	GS_BGCOLOUR = 0x000080; // Dark Red
+		GS_BGCOLOUR = 0x000080; // Dark Red
 
-	// Init RPC
-	SifInitRpc(0);
+		// Init RPC
+		SifInitRpc(0);
 
-	// Init Services
-	SifInitIopHeap();
-	LoadFileInit();
+		// Init Services
+		SifInitIopHeap();
+		LoadFileInit();
 		
-	GS_BGCOLOUR = 0xFF8000; // Blue sky
+		GS_BGCOLOUR = 0xFF8000; // Blue sky
 
-	// Load basic modules
-	LoadModule("rom0:SIO2MAN", 0, NULL);
-	LoadModule("rom0:MCMAN", 0, NULL);
-	LoadModule("rom0:MCSERV", 0, NULL);
+		// Load basic modules
+		LoadModule("rom0:SIO2MAN", 0, NULL);
+		LoadModule("rom0:MCMAN", 0, NULL);
+		LoadModule("rom0:MCSERV", 0, NULL);
+	}
 
 	GS_BGCOLOUR = 0x800080; // Purple
 
 	// Reset SPU Sound processor
 	ResetSPU();
 
-	// Load BOOT.ELF
-	r = LoadElf("mc0:/BOOT/BOOT.ELF", &elf);
-	if (!r && elf.epc) {
+	if ( ExitMode != OSDS_MODE)
+	{
+		// Load BOOT.ELF
+		if ( ExitMode == BOOT_MODE)
+			ret = LoadElf("mc0:/BOOT/BOOT.ELF", &elf);
+		else if ( ExitMode == APPS_MODE)
+			ret = LoadElf("mc0:/APPS/BOOT.ELF", &elf);
 
-		GS_BGCOLOUR = 0x00FFFF; // Yellow
+		if (!ret && elf.epc) {
 
-		// Exit services
-		fioExit();
-		LoadFileExit();
-		SifExitIopHeap();
-		SifExitRpc();
+			GS_BGCOLOUR = 0x00FFFF; // Yellow
 
-		FlushCache(0);
-		FlushCache(2);
+			// Exit services
+			fioExit();
+			LoadFileExit();
+			SifExitIopHeap();
+			SifExitRpc();
+
+			FlushCache(0);
+			FlushCache(2);
 		
-		argc = 1;
-		argv[0] = "mc0:/BOOT/BOOT.ELF";
-		argv[1] = NULL;
+			if ( ExitMode == BOOT_MODE)
+				argv[0] = "mc0:/BOOT/BOOT.ELF";
+			else if ( ExitMode == APPS_MODE)
+				argv[0] = "mc0:/APPS/BOOT.ELF";
+			argv[1] = NULL;
 
-		GS_BGCOLOUR = 0x0080FF; // Orange
+			GS_BGCOLOUR = 0x0080FF; // Orange
 
-		// Execute BOOT.ELF
-		ExecPS2((void*)elf.epc, (void*)elf.gp, argc, argv);
+			// Execute BOOT.ELF
+			ExecPS2((void*)elf.epc, (void*)elf.gp, argc, argv);
+		}
+
+		GS_BGCOLOUR = 0x0000FF; // Red
+		delay(5);
 	}
 
-	GS_BGCOLOUR = 0x0000FF; // Red
-	delay(5);
-
-	// Exit to PS2Browser if LoadElf failed
+	// FlushCache before exiting
+	FlushCache(0);
+	FlushCache(2);
+		
+	// Exit to PS2Browser
 	__asm__ __volatile__(
 		"	li $3, 0x04;"
 		"	syscall;"

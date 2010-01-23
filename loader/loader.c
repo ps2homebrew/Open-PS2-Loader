@@ -35,7 +35,14 @@ int main(int argc, char **argv){
 	else if (!strncmp(argv[0], "HDD_MODE", 8))
 		GameMode = HDD_MODE;	
 	
-	char *p = strtok(&argv[0][9], " ");
+	if (!strncmp(&argv[0][9], "0", 1))
+		ExitMode = OSDS_MODE;
+	else if (!strncmp(&argv[0][9], "1", 1))
+		ExitMode = BOOT_MODE;
+	else if (!strncmp(&argv[0][9], "2", 1))
+		ExitMode = APPS_MODE;
+	
+	char *p = strtok(&argv[0][11], " ");
 	strcpy(g_ps2_ip, p);
 	p = strtok(NULL, " ");
 	strcpy(g_ps2_netmask, p);

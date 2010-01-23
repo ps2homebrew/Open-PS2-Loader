@@ -76,12 +76,18 @@ u32 g_compat_mask;
 #define COMPAT_MODE_3 		0x04
 #define COMPAT_MODE_4 		0x08
 #define COMPAT_MODE_5 		0x10
+#define COMPAT_MODE_6 		0x20
 
 char GameID[16];
 int GameMode;
 #define USB_MODE 	0
 #define ETH_MODE 	1
 #define HDD_MODE 	2
+
+int ExitMode;
+#define OSDS_MODE 0
+#define BOOT_MODE 1
+#define APPS_MODE 2
 
 /* modmgr.c */
 int  LoadFileInit();

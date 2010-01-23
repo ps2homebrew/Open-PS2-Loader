@@ -120,7 +120,6 @@ static void Go_Home(void)
 	// Init Services
 	SifInitIopHeap();
 	LoadFileInit();
-	Sbv_Patch();
 		
 	GS_BGCOLOUR = 0xFF8000; // Blue sky
 

@@ -358,13 +358,3 @@ int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 		while(ret--) asm("nop\nnop\nnop\nnop");
 	}
 }
-
-
-/*----------------------------------------------------------------------------------------*/
-/* Apply SBV patchs.                                                                      */
-/*----------------------------------------------------------------------------------------*/
- void Sbv_Patch(void)
-{
-	sbv_patch_enable_lmb();
-	sbv_patch_disable_prefix_check();
-}

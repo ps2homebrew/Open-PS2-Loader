@@ -16,6 +16,7 @@
 #include <iopheap.h>
 #include <sifrpc.h>
 #include <string.h>
+#include <sbv_patches.h>
 
 
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
@@ -112,6 +113,7 @@ void CopyToIop(void *eedata, unsigned int size, void *iopptr);
 int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
 int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
 void delay(int count);
+void Sbv_Patch(void);
 
 /* syshook.c */
 void Install_Kernel_Hooks(void);

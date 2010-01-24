@@ -17,8 +17,8 @@ EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o patches.o padhook.o crt0.o
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
 EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)
 
-EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s
-EE_LIBS += -lc -lkernel -lc
+EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
+EE_LIBS += -lpatches -lc -lkernel -lc
 
 %.o : %.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@

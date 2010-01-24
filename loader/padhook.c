@@ -124,6 +124,7 @@ static void Go_Home(void)
 		// Init Services
 		SifInitIopHeap();
 		LoadFileInit();
+		Sbv_Patch();
 		
 		GS_BGCOLOUR = 0xFF8000; // Blue sky
 
@@ -142,9 +143,13 @@ static void Go_Home(void)
 	{
 		// Load BOOT.ELF
 		if ( ExitMode == BOOT_MODE)
-			ret = LoadElf("mc0:/BOOT/BOOT.ELF", &elf);
+			argv[0] = "mc0:/BOOT/BOOT.ELF";
 		else if ( ExitMode == APPS_MODE)
-			ret = LoadElf("mc0:/APPS/BOOT.ELF", &elf);
+			argv[0] = "mc0:/APPS/BOOT.ELF";
+
+		argv[1] = NULL;
+
+		ret = LoadElf(argv[0], &elf);
 
 		if (!ret && elf.epc) {
 
@@ -159,12 +164,6 @@ static void Go_Home(void)
 			FlushCache(0);
 			FlushCache(2);
 		
-			if ( ExitMode == BOOT_MODE)
-				argv[0] = "mc0:/BOOT/BOOT.ELF";
-			else if ( ExitMode == APPS_MODE)
-				argv[0] = "mc0:/APPS/BOOT.ELF";
-			argv[1] = NULL;
-
 			GS_BGCOLOUR = 0x0080FF; // Orange
 
 			// Execute BOOT.ELF

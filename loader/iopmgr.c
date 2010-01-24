@@ -87,7 +87,8 @@ int New_Reset_Iop(const char *arg, int flag){
 		SifInitRpc(0);
 		SifInitIopHeap();
 		LoadFileInit();
-		
+		Sbv_Patch();
+
 		LoadIRXfromKernel(cdvdman_irx, size_cdvdman_irx, 0, NULL);
 
 		GS_BGCOLOUR = 0x00A5FF;
@@ -204,6 +205,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifInitRpc(0);
 	SifInitIopHeap();
 	LoadFileInit();
+	Sbv_Patch();
 	
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);
 	
@@ -246,6 +248,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifInitRpc(0);
 	SifInitIopHeap();
 	LoadFileInit();
+	Sbv_Patch();
 
 	GS_BGCOLOUR = 0x00FFFF;
 	

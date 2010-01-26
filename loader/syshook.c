@@ -23,6 +23,7 @@ static char g_ElfPath[1024];
 int set_reg_hook;
 int set_reg_disabled;
 int iop_reboot_count = 0;
+int pad_hooked = 0;
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -114,14 +115,16 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 // ------------------------------------------------------------------------
 static void t_loadElf(void)
 {
-	int i, r;
+	int i, r, fd;
 	t_ExecData elf;
+	elf_header_t *header;
+	elf_pheader_t *prog_header;
 
-    SifExitRpc();
+	SifExitRpc();
 
-    set_reg_disabled = 0;
-    New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
-    set_reg_disabled = 1;
+	set_reg_disabled = 0;
+	New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
+	set_reg_disabled = 1;
 
 	iop_reboot_count = 1;
            
@@ -148,10 +151,49 @@ static void t_loadElf(void)
 			:: "r" (i)
 		);
 	}
-			
+
 	r = LoadElf(g_ElfPath, &elf);
-		
-	if ((!r) && (elf.epc)) {
+
+	if ((!r) && (elf.epc))
+	{
+		// Patch padread function to install In Game Reset
+		if(!(g_compat_mask & COMPAT_MODE_6))
+		{
+			fioInit();
+
+			// Open g_ElfPath file
+			fd = open(g_ElfPath, O_RDONLY);
+
+			if (fd > 0)
+			{
+				// Read elf header
+				header = (elf_header_t *)g_buf;
+				lseek(fd, 0, SEEK_SET);
+				read(fd, g_buf, sizeof(elf_header_t));
+
+				// Read program segments header
+				prog_header = (elf_pheader_t *)(g_buf + header->phoff);
+				lseek(fd, header->phoff, SEEK_SET);
+				read(fd, (void *)prog_header, header->phnum * header->phentsize);
+
+				// Try to find scePadRead in each program segments
+				for (i = 0; i < header->phnum; i++)
+				{
+					if (prog_header[i].type != 1)
+						continue;
+
+					pad_hooked = Install_PadRead_Hook((u32)prog_header[i].vaddr, prog_header[i].memsz);
+					
+					if ( pad_hooked )
+						break;
+				}
+			}
+			else
+				pad_hooked = Install_PadRead_Hook(0x00100000, 0x01e00000);
+
+			close(fd);
+		}
+
 		// exit services
 		fioExit();
 		SifExitIopHeap();

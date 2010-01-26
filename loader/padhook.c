@@ -83,6 +83,40 @@ static void ResetSPU()
 	EIntr();
 }
 
+// Shutdown Dev9 hardware
+static void Shutdown_Dev9()
+{
+	u16 dev9_hw_type;
+	
+	DIntr();
+	ee_kmode_enter();
+
+	// Get dev9 hardware type
+	dev9_hw_type = *DEV9_R_146E & 0xf0;
+	
+	// Shutdown Pcmcia
+	if ( dev9_hw_type == 0x20 )
+	{
+		*DEV9_R_146C = 0;
+		*DEV9_R_1474 = 0;
+	}
+	// Shutdown Expansion Bay
+	else if ( dev9_hw_type == 0x30 )
+	{
+		*DEV9_R_1466 = 1;
+		*DEV9_R_1464 = 0;
+		*DEV9_R_1460 = *DEV9_R_1464;
+		*DEV9_R_146C = *DEV9_R_146C & ~4;
+		*DEV9_R_1460 = *DEV9_R_146C & ~1;
+	}
+
+	//Wait a sec
+	delay(5);
+	
+	ee_kmode_exit();
+	EIntr();
+}
+
 // Go home function is call when combo trick is press
 static void Go_Home(void)
 {
@@ -98,11 +132,13 @@ static void Go_Home(void)
 	// Remove kernel hook
 	Remove_Kernel_Hooks();
 
+	GS_BGCOLOUR = 0x00FF00; // Dark Blue
+
 	// Reset EE Coprocessors & Controlers
 	ResetEE(0x07);
 
 	GS_BGCOLOUR = 0x800000; // Dark Blue
-
+	
 	if ( ExitMode != OSDS_MODE)
 	{
 		// Exit Services
@@ -113,8 +149,8 @@ static void Go_Home(void)
 		GS_BGCOLOUR = 0x008000; // Dark Green
 
 		// Reset IO Processor
-		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0));
-		while (!Sync_Iop());
+		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
+		while (!Sync_Iop()){;}
 
 		GS_BGCOLOUR = 0x000080; // Dark Red
 
@@ -174,6 +210,9 @@ static void Go_Home(void)
 		delay(5);
 	}
 
+	// Shutdown Dev9 hardware
+	Shutdown_Dev9();
+	
 	// FlushCache before exiting
 	FlushCache(0);
 	FlushCache(2);
@@ -186,13 +225,18 @@ static void Go_Home(void)
 	);
 }
 
+// Poweroff PlayStation 2
 static void Power_Off(void)
 {
+	// Shutdown Dev9 hardware
+	Shutdown_Dev9();
+
 	DIntr();
 	ee_kmode_enter();
 
-	*((u8*)0xBF402017) = 0;
-	*((u8*)0xBF402016) = 0xF;
+	// PowerOff PS2
+	*CDVD_R_SDIN = 0;
+	*CDVD_R_SCMD = 0xF;
 
 	ee_kmode_exit();
 	EIntr();
@@ -256,17 +300,17 @@ static int Hook_scePad2Read(int socket, u8* data)
 /*
  * This function patch the padRead calls
  */
-int Install_PadRead_Hook(void)
+int Install_PadRead_Hook(u32 start, u32 memscope)
 {
+	int ret;
 	u8 *ptr;
-	u32 memscope, inst, fncall;
+	u32 inst, fncall;
 	u32 pattern[1], mask[1];
-	u32 start = 0x00100000;
 	int scePadRead_style = 1;
+	
+	ret = 0;
 
 	GS_BGCOLOUR = 0x800080; /* Purple while padRead pattern search */
-
-	memscope = 0x01f00000 - start;
 
 	/* First try to locate the orginal libpad's scePadRead function */
 	ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern0, (u8 *)padReadpattern0_1_mask, sizeof(padReadpattern0));
@@ -286,9 +330,10 @@ int Install_PadRead_Hook(void)
 								ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern6, (u8 *)padReadpattern6_mask, sizeof(padReadpattern6));
 								if (!ptr) {
 									ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern7, (u8 *)padReadpattern7_mask, sizeof(padReadpattern7));
-									if (!ptr) {
+									if (!ptr)
+									{
 										GS_BGCOLOUR = 0x000000;
-										return 0;
+										return ret;
 									}
 								}
 							}
@@ -338,6 +383,8 @@ int Install_PadRead_Hook(void)
 		ptr = find_pattern_with_mask(ptr, memscope, (u8 *)pattern, (u8 *)mask, sizeof(pattern));
 		if (ptr)
 		{
+			ret = 1;
+
 			fncall = (u32)ptr;
 			_sw(inst, fncall); /* overwrite the original scePadRead function call with our function call */
 
@@ -347,5 +394,5 @@ int Install_PadRead_Hook(void)
 
 	GS_BGCOLOUR = 0x000000; /* Black, done */
 
-	return 1;
+	return ret;
 }

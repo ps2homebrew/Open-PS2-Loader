@@ -18,22 +18,18 @@
 #include <tamtypes.h>
 
 
+// SPU2 Registers
+#define U16_REGISTER(x)    ((volatile u16 *) (0xBF900000 | (x)))
+#define U32_REGISTER(x)	   ((volatile u32 *) (0xBF800000 | (x)))
 // SD_CORE_ATTR Macros
 #define SD_SPU2_ON					(1 << 15)
-
 // SPU DMA Channels 0,1 - 1088 bytes apart
 #define SD_DMA_CHCR(ch)     ((volatile u32*)(0xBF8010C8+(ch*1088)))
 #define SD_DMA_START		    (1 << 24)
-
 // SPDIF OUT
 #define SD_C_SPDIF_OUT			((volatile u16*)0xBF9007C0)
-
 // Base of SPU2 regs is 0x0xBF900000
-#define U16_REGISTER(x)    ((volatile u16 *) (0xBF900000 | (x)))
-#define U32_REGISTER(x)	   ((volatile u32 *) (0xBF800000 | (x)))
-
-#define SD_BASE_REG(reg)   ((volatile u16 *)(0xBF900000 + reg))
-
+#define SD_BASE_REG(reg)    ((volatile u16 *)(0xBF900000 + reg))
 #define SD_A_REG(core, reg) SD_BASE_REG(0x1A0 + ((core) << 10) + (reg)) 
 #define SD_A_KOFF_HI(core)  SD_A_REG((core), 0x04)
 #define SD_A_KOFF_LO(core)  SD_A_REG((core), 0x06) 
@@ -47,6 +43,19 @@
 #define SD_S_NON_LO(core)   SD_S_REG((core), 0x06)
 #define SD_CORE_ATTR(core)  SD_S_REG((core), 0x1A)
 
+
+// DEV9 Registers
+#define DEV9_R_1460 ((volatile u16*)0xBF801460)
+#define DEV9_R_1464 ((volatile u16*)0xBF801464)
+#define DEV9_R_1466 ((volatile u16*)0xBF801466)
+#define DEV9_R_146C ((volatile u16*)0xBF80146C)
+#define DEV9_R_146E ((volatile u16*)0xBF80146E)
+#define DEV9_R_1474 ((volatile u16*)0xBF801474)
+
+
+// CDVD Registers
+#define CDVD_R_SCMD ((volatile u8*)0xBF402016)
+#define CDVD_R_SDIN ((volatile u8*)0xBF402017)
 
 
 /**************************************************************************

@@ -53,6 +53,36 @@ typedef struct
 	u32 dummy;  
 } t_ExecData;
 
+typedef struct
+{
+	u8	ident[16];
+	u16	type;
+	u16	machine;
+	u32	version;
+	u32	entry;
+	u32	phoff;
+	u32	shoff;
+	u32	flags;
+	u16	ehsize;
+	u16	phentsize;
+	u16	phnum;
+	u16	shentsize;
+	u16	shnum;
+	u16	shstrndx;
+} elf_header_t;
+
+typedef struct
+{
+	u32	type;
+	u32	offset;
+	void	*vaddr;
+	u32	paddr;
+	u32	filesz;
+	u32	memsz;
+	u32	flags;
+	u32	align;
+} elf_pheader_t;
+
 typedef struct {
 	void *irxaddr;
 	int irxsize;
@@ -63,6 +93,7 @@ u8 *g_buf;
 extern int set_reg_hook;
 extern int set_reg_disabled;
 extern int iop_reboot_count;
+extern int pad_hooked;
 
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
@@ -127,6 +158,6 @@ void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
 void apply_game_patches(void);
 
 /* padhook.c */
-int Install_PadRead_Hook(void);
+int Install_PadRead_Hook(u32 start, u32 memscope);
 
 #endif

@@ -565,6 +565,14 @@ void showUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
 		
 		// update the value interpretation
+		// to be sure first (re)initialize the lang system again if we encounter custom language selection
+		if (gLanguageID == _LANG_ID_CUSTOM) {
+			if (initLangSystem() != 0) { // language file not found?
+				MsgBox(_l(_STR_ERR_LOADING_LANGFILE));
+				gLanguageID = _LANG_ID_ENGLISH; // default to english in this case
+			}
+		}
+		
 		setLanguage(gLanguageID);
 		UpdateScrollSpeed();
 		SetMenuDynamic(dynamic_menu);
@@ -1147,9 +1155,12 @@ void init() {
 	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
 	
 	delay(3);
-
+	
+	// Initialize the language system - loads the custom language file if found
+	initLangSystem();
+	
 	StartPad();
-
+	
 	// try to restore config
 	// if successful, it will remember the config location for further writes
 	restoreConfig();

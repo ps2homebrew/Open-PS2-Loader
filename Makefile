@@ -10,7 +10,7 @@ EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
 		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/hdd_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
-		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/iomanx.o obj/filexio.o \
+		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/iomanx.o obj/filexio.o obj/util.o\
 		  obj/font.o obj/font_cyrillic.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
 		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \

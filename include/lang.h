@@ -55,6 +55,7 @@
 #define _STR_AUTOSTARTHDD 49
 #define _STR_STARTHDD 50
 #define _STR_AUTOSORT 51
+#define _STR_ERR_LOADING_LANGFILE 52
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0
@@ -70,8 +71,10 @@
 #define _LANG_ID_INDONESIAN 10
 #define _LANG_ID_BULGARIAN 11
 #define _LANG_ID_DUTCH 12
+#define _LANG_ID_CUSTOM 13
+
 // set to the maximal ID
-#define _LANG_ID_MAX 12
+#define _LANG_ID_MAX 13
 
 // getter for a localised string version
 extern char *_l(unsigned int id);
@@ -81,4 +84,6 @@ void setLanguage(int langID);
 
 const char **getLanguageList();
 
+int initLangSystem();
+void deinitLangSystem();
 #endif

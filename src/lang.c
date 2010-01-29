@@ -833,11 +833,13 @@ int loadLangFromFile(const char* fpath) {
 	
 	while (readline(fd, line, 2048) && strid < LANG_STR_COUNT) {
 		// copy the line into the buffer
-		custom_lang[strid] = (char*)malloc(strlen(line) * sizeof(char));
+		custom_lang[strid] = (char*)malloc((strlen(line) + 1) * sizeof(char));
 		strcpy(custom_lang[strid], line);
 		strid++;
 	}
-		
+	
+	fioClose(fd);
+	
 	// did not read all the strings?
 	if (strid != LANG_STR_COUNT) {
 		freeCustomLang();

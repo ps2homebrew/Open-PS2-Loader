@@ -103,7 +103,7 @@ int LoadModule(const char *path, int arg_len, const char *args)
 	if (SifCallRpc(&_lf_cd, LF_F_MOD_LOAD, 0x0, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
 		return -E_SIF_RPC_CALL;
 
-	return 0;
+	return arg.p.result;
 }
 
 

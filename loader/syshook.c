@@ -179,7 +179,7 @@ static void t_loadElf(void)
 				// Try to find scePadRead in each program segments
 				for (i = 0; i < header->phnum; i++)
 				{
-					if (prog_header[i].type != 1)
+					if (prog_header[i].type != 1 || prog_header[i].memsz == 0)
 						continue;
 
 					pad_hooked = Install_PadRead_Hook((u32)prog_header[i].vaddr, prog_header[i].memsz);

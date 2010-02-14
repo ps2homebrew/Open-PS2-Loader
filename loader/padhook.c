@@ -23,6 +23,9 @@
 static int (*scePadRead)(int port, int slot, u8* data);
 static int (*scePad2Read)(int socket, u8* data);
 
+/* Stack pointer variable used to check $sp value */
+static u32 Stack_Pointer = 0;
+
 
 // Reset SPU Sound processor
 static void ResetSPU()
@@ -117,99 +120,9 @@ static void Shutdown_Dev9()
 	EIntr();
 }
 
-// Go home function is call when combo trick is press
-static void Go_Home(void)
+// Return to PS2 Browser
+static void Go_Browser(void)
 {
-	int ret, argc;
-	t_ExecData elf;
-	char *argv[2];
-
-	ret  = 0;
-	argc = 1;
-
-	GS_BGCOLOUR = 0xFFFFFF; // White
-
-	// Remove kernel hook
-	Remove_Kernel_Hooks();
-
-	GS_BGCOLOUR = 0x00FF00; // Dark Blue
-
-	// Reset EE Coprocessors & Controlers
-	ResetEE(0x07);
-
-	GS_BGCOLOUR = 0x800000; // Dark Blue
-	
-	if ( ExitMode != OSDS_MODE)
-	{
-		// Exit Services
-		SifExitRpc();
-		SifExitIopHeap();
-		LoadFileExit();
-
-		GS_BGCOLOUR = 0x008000; // Dark Green
-
-		// Reset IO Processor
-		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
-		while (!Sync_Iop()){;}
-
-		GS_BGCOLOUR = 0x000080; // Dark Red
-
-		// Init RPC
-		SifInitRpc(0);
-
-		// Init Services
-		SifInitIopHeap();
-		LoadFileInit();
-		Sbv_Patch();
-		
-		GS_BGCOLOUR = 0xFF8000; // Blue sky
-
-		// Load basic modules
-		LoadModule("rom0:SIO2MAN", 0, NULL);
-		LoadModule("rom0:MCMAN", 0, NULL);
-		LoadModule("rom0:MCSERV", 0, NULL);
-	}
-
-	GS_BGCOLOUR = 0x800080; // Purple
-
-	// Reset SPU Sound processor
-	ResetSPU();
-
-	if ( ExitMode != OSDS_MODE)
-	{
-		// Load BOOT.ELF
-		if ( ExitMode == BOOT_MODE)
-			argv[0] = "mc0:/BOOT/BOOT.ELF";
-		else if ( ExitMode == APPS_MODE)
-			argv[0] = "mc0:/APPS/BOOT.ELF";
-
-		argv[1] = NULL;
-
-		ret = LoadElf(argv[0], &elf);
-
-		if (!ret && elf.epc) {
-
-			GS_BGCOLOUR = 0x00FFFF; // Yellow
-
-			// Exit services
-			fioExit();
-			LoadFileExit();
-			SifExitIopHeap();
-			SifExitRpc();
-
-			FlushCache(0);
-			FlushCache(2);
-		
-			GS_BGCOLOUR = 0x0080FF; // Orange
-
-			// Execute BOOT.ELF
-			ExecPS2((void*)elf.epc, (void*)elf.gp, argc, argv);
-		}
-
-		GS_BGCOLOUR = 0x0000FF; // Red
-		delay(5);
-	}
-
 	// Shutdown Dev9 hardware
 	Shutdown_Dev9();
 	
@@ -240,7 +153,156 @@ static void Power_Off(void)
 
 	ee_kmode_exit();
 	EIntr();
+}
 
+// Load home ELF
+static void t_loadElf(void)
+{
+	int ret;
+	char *argv[2];
+	t_ExecData elf;
+
+	GS_BGCOLOUR = 0x008000; // Dark Green
+
+	// Exit RPC & CMD
+	SifExitRpc();
+
+	GS_BGCOLOUR = 0x000080; // Dark Red
+
+	// Reset IO Processor
+	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
+	while (!Sync_Iop()){;}
+
+	GS_BGCOLOUR = 0xFF80FF; // Pink
+
+	// Init RPC & CMD
+	SifInitRpc(0);
+
+	// Apply Sbv patches
+	Sbv_Patch();
+	
+	GS_BGCOLOUR = 0xFF8000; // Blue sky
+
+	// Load basic modules
+	LoadModule("rom0:SIO2MAN", 0, NULL);
+	LoadModule("rom0:MCMAN", 0, NULL);
+
+	// Load BOOT.ELF
+	if ( ExitMode == BOOT_MODE)
+		argv[0] = "mc0:/BOOT/BOOT.ELF";
+	else if ( ExitMode == APPS_MODE)
+		argv[0] = "mc0:/APPS/BOOT.ELF";
+
+	argv[1] = NULL;
+
+	ret = LoadElf(argv[0], &elf);
+	
+	if (!ret && elf.epc) {
+
+		GS_BGCOLOUR = 0x00FFFF; // Yellow
+
+		// Exit services
+		fioExit();
+		LoadFileExit();
+		SifExitIopHeap();
+		SifExitRpc();
+
+		FlushCache(0);
+		FlushCache(2);
+
+		GS_BGCOLOUR = 0x0080FF; // Orange
+
+		// Execute BOOT.ELF
+		ExecPS2((void*)elf.epc, (void*)elf.gp, 1, argv);
+	}
+
+	GS_BGCOLOUR = 0x0000FF; // Red
+	delay(5);
+
+	// Return to PS2 Browser
+	Go_Browser();
+}
+
+static const unsigned char Cop0_regName[32][10] =
+{
+	"Index",    "Random",   "EntryLo0", "EntryLo1",
+	"Context",  "PageMask", "Wired",    "Reg7",
+	"BadVAddr", "Count",    "EntryHi",  "Compare", 
+	"Status",   "Cause",    "ExceptPC", "PRevID",
+	"Config",   "Reg17",    "Reg18",    "Reg19",
+	"Reg20",    "Reg21",    "Reg22",    "BadPAddr",
+	"Debug",    "Perf",     "Reg26",    "Reg27", 
+	"TagLo",    "TagHi",    "ErrorPC",  "Reg31"
+};
+
+// Go home function is call when combo trick is press
+static void Go_Home(void)
+{
+	u32 Cop0_Index, Cop0_Perf;
+
+	GS_BGCOLOUR = 0xFFFFFF; // White
+
+	// Remove kernel hook
+	Remove_Kernel_Hooks();
+
+	GS_BGCOLOUR = 0x800000; // Dark Blue
+
+	// Reset EE Coprocessors & Controlers
+	ResetEE(0x07);
+
+	GS_BGCOLOUR = 0x800080; // Purple
+
+	// Reset SPU Sound processor
+	ResetSPU();
+	
+	// Check Translation Look-Aside Buffer
+	Cop0_Index = GetCop0(0);
+	
+	// Init TLB
+	if(Cop0_Index != 0x26)
+	{
+		__asm__ __volatile__(
+			"	li $3, 0x82;"
+			"	syscall;"
+			"	nop;"
+		);
+	}
+
+	// Check Performance Counter
+	Cop0_Perf = GetCop0(25);
+
+	// Stop Performance Counter
+	if(Cop0_Perf & 0x80000000)
+	{
+		__asm__ __volatile__(
+			" mfc0 $3, $25;"
+			" lui	 $2, 0x8000;"
+			" or	 $3, $3, $2;"
+			" xor	 $3, $3, $2;"
+			" mtc0 $3, $25;"
+			" sync.p;"
+		);
+	}
+
+	// Check Stack Pointer
+	__asm__ __volatile__(
+		"	sd $29, Stack_Pointer;"
+	);
+		
+	// Some game use a stack pointer in scratchpad mem, so fix it to 0x2000000
+	if(Stack_Pointer >= 0x70000000)
+	{
+		__asm__ __volatile__(
+			"	la $29, 0x2000000;"
+		);
+	}
+
+		// Execute home loader
+	if ( ExitMode != OSDS_MODE)
+		ExecPS2(t_loadElf, NULL, 0, NULL);
+
+	// Return to PS2 Browser
+	Go_Browser();
 }
 
 // Hook function for libpad scePadRead

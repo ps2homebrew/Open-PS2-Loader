@@ -395,6 +395,7 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 			NULL
 		};
 		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + 6, dmaModes);
+		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + 6, 0);
 	}
 	
 	int modes = getImageCompatMask(id, prefix, ntype);

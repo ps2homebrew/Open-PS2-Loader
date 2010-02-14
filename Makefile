@@ -7,7 +7,7 @@ EE_BIN = main.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
+EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/unzip.o obj/explode.o obj/unreduce.o obj/unshrink.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o \
 		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/hdd_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
 		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/iomanx.o obj/filexio.o obj/util.o\
@@ -15,8 +15,8 @@ EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o ob
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
 		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		  obj/up_dn_icon.o obj/lt_rt_icon.o
-EE_LIBS = $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lc
-EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
+EE_LIBS = $(PS2SDK)/ports/lib/libz.a $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lc
+EE_INCS += -I $(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 all:
 	@mkdir -p obj
@@ -261,6 +261,9 @@ lt_rt_icon.s:
 
   
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
+	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
+	
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)unzip/%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 	
 $(EE_OBJS_DIR)%.o : %.s

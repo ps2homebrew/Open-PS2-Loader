@@ -312,7 +312,7 @@ void LoadUSBD(){
 
 unsigned int crctab[0x400];
 
-unsigned int crc32(char *string)
+unsigned int USBA_crc32(char *string)
 {
     int crc, table, count, byte;
 
@@ -433,7 +433,7 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 	memset(gamename, 0, 33);
 	strncpy(gamename, game->Name, 32);
 
-	sprintf(isoname,"ul.%08X.%s",crc32(gamename),filename);
+	sprintf(isoname,"ul.%08X.%s",USBA_crc32(gamename),filename);
 	
 	if (mode == USB_MODE) {
 		for (i=0;i<size_usb_cdvdman_irx;i++){

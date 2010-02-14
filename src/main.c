@@ -497,7 +497,7 @@ void showUIConfig() {
 	};
 	
 	// Theme list update
-	ListDir("mass:USBLD/");
+	ListDir("OPL/");
 	
 	const char* menuTypes[] = {
 		_l(_STR_STATIC),
@@ -652,7 +652,7 @@ int restoreConfig() {
 	const char* configLocations[] = {
 		"mc0:/SYS-CONF/usbld.cfg",
 		"mc1:/SYS-CONF/usbld.cfg",
-		"mass:/USBLD/usbld.cfg",
+		"mass:/OPL/usbld.cfg",
 		NULL
 	};
 	
@@ -960,7 +960,7 @@ void ExecHDDGameSelection(struct TMenuItem* self, int id) {
 	
 	// hash to ensure no spaces are present
 	char imgnam[12];
-	unsigned int crc = crc32(hddGameList->games[id - 1].name);
+	unsigned int crc = USBA_crc32(hddGameList->games[id - 1].name);
 	snprintf(imgnam, 12, "%X", crc);
 	
 	char* gid[5];
@@ -975,7 +975,7 @@ void AltExecHDDGameSelection(struct TMenuItem* self, int id) {
 	
 	// Example Game id storage impl (maybe hdd_id%d would be better?):
 	char imgnam[12];
-	unsigned int crc = crc32(hddGameList->games[id - 1].name);
+	unsigned int crc = USBA_crc32(hddGameList->games[id - 1].name);
 	snprintf(imgnam, 12, "%X", crc);
 	
 	if (showCompatConfig(id, hddGameList->games[id - 1].name,  imgnam, HDD_MODE) == COMPAT_TEST)
@@ -1102,6 +1102,9 @@ void init() {
 	Reset();
 
 	InitGFX();
+	
+	LoadFont(1);
+	OpenIntro();
 
 	theme_dir[0] = NULL;
 	usb_max_games = 0;
@@ -1157,6 +1160,8 @@ void init() {
 	
 	delay(3);
 	
+	FindUSBPartition();
+	
 	// Initialize the language system - loads the custom language file if found
 	initLangSystem();
 	
@@ -1171,9 +1176,11 @@ void init() {
 		hdd_inited = 1;
 		StartHdd();
 	}
-	
+
 	// initialize menu
 	InitMenu();
+
+	CloseIntro();
 	
 	delay(1);
 	
@@ -1197,6 +1204,7 @@ void init() {
 	ethdelay=0;
 	frame=0;
 	inactiveFrames = 0;
+	zipfile=NULL;
 	
 	usbGameList = NULL;
 	ethGameList = NULL;
@@ -1324,13 +1332,11 @@ int main(void)
 {
 	init();
 	
-	Intro();
+	//Intro();
 	
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
 	
-	FindUSBPartition();
-
 	ReadPad();
 	
 	// If automatic network startup is selected, start it now

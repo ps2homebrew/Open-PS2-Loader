@@ -460,11 +460,10 @@ void Flip(){
 	gsKit_clear(gsGlobal, Black);
 }
 
-void Intro(){
+void OpenIntro(){
 	char introtxt[255];
-	int bg_loaded=0;
-	
-	for(frame=0;frame<125;frame++){
+
+	for(frame=0;frame<75;frame++){
 		if(frame<=25){
 			TextColor(0x80,0x80,0x80,frame*4);
 		}else if(frame>75 && frame<100){
@@ -478,10 +477,25 @@ void Intro(){
 		snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
 		DrawText(270, 255, introtxt, 1.0f, 0);
 		Flip();
-		if (frame==75)bg_loaded=LoadBackground();
+	}
+}
+
+void CloseIntro(){
+	char introtxt[255];
+	int bg_loaded = LoadBackground();
+
+	for(frame=75;frame<125;frame++){
+		if(frame>100){
+			TextColor(0x80,0x80,0x80,0x00);
+			waveframe+=0.1f;
+		}
+
+		DrawBackground();
+		snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
+		DrawText(270, 255, introtxt, 1.0f, 0);
+		Flip();
 	}
 	background_image=bg_loaded;
-	LoadFont(0);
 }
 
 void DrawWave(int y, int xoffset){
@@ -538,9 +552,10 @@ void gfxStoreConfig() {
 
 void LoadResources() {
 	readIPConfig();
+	FindTheme();
 	LoadIcons();
 	UpdateIcons();
-	LoadFont(1);
+	LoadFont(0);
 	UpdateFont();
 }
 
@@ -663,7 +678,7 @@ void LoadFont(int load_default){
 	font.Width = 256;
 	font.Height = 256;
 	font.PSM = GS_PSM_CT32;
-	snprintf(tmp, 255, "mass:USBLD/%s/%s",theme,"font.raw");
+	snprintf(tmp, 255, "font.raw");
 
 	if(load_default==1 || LoadRAW(tmp, &font)==0){
 		font.Mem=(u32*)&font_raw;
@@ -696,43 +711,151 @@ void UpdateFont() {
 int LoadRAW(char *path, GSTEXTURE *Texture) {
 	int fd;
 	unsigned int size;
+	char file[255];
 	
 	void *buffer;
 
-	if(Texture->Mem!=NULL) {
-		free(Texture->Mem);
-		Texture->Mem = NULL;
-	}
+	if(theme_zipped==0){
+		snprintf(file, 255, "%s%s/%s", theme_prefix, theme, path);
+		fd=fioOpen(file, O_RDONLY);
+		
+		if (fd < 0) // invalid file name, etc.
+			return 0;
+			
+		if(Texture->Mem!=NULL) {
+			free(Texture->Mem);
+			Texture->Mem = NULL;
+		}
 
-	fd=fioOpen(path, O_RDONLY);
-	
-	if (fd < 0) // invalid file name, etc.
+
+		size = fioLseek(fd, 0, SEEK_END);  
+		fioLseek(fd, 0, SEEK_SET);
+		
+		// TODO: should check the texture size... Is this the valid way?
+		// if (size != gsKit_texture_size(txt->Width, txt->Height, txt->PSM)) {
+		//	fioClose(fd);
+		//	return 0;
+		// }
+		
+		buffer=memalign(128, size); // The allocation is alligned to aid the DMA transfers
+		fioRead(fd, buffer, size);
+		
+		Texture->Mem=buffer;
+		
+		fioClose(fd);
+	}else{
+		if(zipfile==NULL){
+			snprintf(file, 255, "%s%s.zip", theme_prefix, theme);
+			zipfile = unzOpen(file);
+			if(zipfile==NULL){
+				snprintf(file, 255, "%s%s.ZIP", theme_prefix, theme);
+				zipfile = unzOpen(file);
+			}
+		}
+		if(zipfile==NULL)return 0;
+			unz_file_info info;
+			
+			if(unzLocateFile(zipfile,path,1) == UNZ_OK){
+				char name[132];
+				unzGetCurrentFileInfo(zipfile, &info, name,128, NULL,0, NULL,0);
+				size = info.uncompressed_size;
+				
+				printf("ZIP: %s (%d)\n", name, size);
+								
+				buffer=memalign(128, size); // The allocation is alligned to aid the DMA transfers
+			
+				if(unzOpenCurrentFile(zipfile) == UNZ_OK){
+					unzReadCurrentFile(zipfile, buffer, size);
+					if(unzCloseCurrentFile(zipfile) == UNZ_CRCERROR)return 0;
+					
+					if(Texture->Mem!=NULL) {
+						free(Texture->Mem);
+						Texture->Mem = NULL;
+					}
+					
+					Texture->Mem=buffer;
+				}
+				
+				//unzClose(zipfile);
+				
+				return 1;
+			}
+		//unzClose(zipfile);
+		
 		return 0;
-
-	size = fioLseek(fd, 0, SEEK_END);  
-	fioLseek(fd, 0, SEEK_SET);
+	}
 	
-	// TODO: should check the texture size... Is this the valid way?
-	// if (size != gsKit_texture_size(txt->Width, txt->Height, txt->PSM)) {
-	//	fioClose(fd);
-	//	return 0;
-	// }
-	
-	buffer=memalign(128, size); // The allocation is alligned to aid the DMA transfers
-	fioRead(fd, buffer, size);
-	
-	Texture->Mem=buffer;
-	
-	fioClose(fd);
 	return 1;
 }
 
+void FindTheme(){
+	char tmp[255], tmp_zip[255], tmp_ZIP[255];
+	int i, fd;
+	
+	for(i=0;i<3;i++){
+
+		switch(i){
+			case 0:
+				snprintf(tmp, 255, "mc0:OPL/%s/", theme);
+				snprintf(tmp_zip, 255, "mc0:OPL/%s.zip", theme);
+				snprintf(tmp_ZIP, 255, "mc0:OPL/%s.ZIP", theme);
+			break;
+			case 1:
+				snprintf(tmp, 255, "mc1:OPL/%s/", theme);
+				snprintf(tmp_zip, 255, "mc1:OPL/%s.zip", theme);
+				snprintf(tmp_ZIP, 255, "mc1:OPL/%s.ZIP", theme);
+			break;
+			case 2:
+				snprintf(tmp, 255, "%sOPL/%s/", USB_prefix, theme);
+				snprintf(tmp_zip, 255, "%sOPL/%s.zip", USB_prefix, theme);
+				snprintf(tmp_ZIP, 255, "%sOPL/%s.ZIP", USB_prefix, theme);
+			break;
+		}
+		
+		
+		if((fd=fioDopen(tmp))>=0){
+			fioDclose(fd);
+			if(i<2){
+				snprintf(theme_prefix, 32, "mc%d:OPL/",i);
+			}else{
+				snprintf(theme_prefix, 32, "%sOPL/",USB_prefix);
+			}
+			theme_zipped=0;
+			break;
+		}else if((fd=fioOpen(tmp_zip, O_RDONLY))>=0){
+			fioClose(fd);
+			if(i<2){
+				snprintf(theme_prefix, 32, "mc%d:OPL/",i);
+			}else{
+				snprintf(theme_prefix, 32, "%sOPL/",USB_prefix);
+			}
+			theme_zipped=1;
+			break;
+		}else if((fd=fioOpen(tmp_ZIP, O_RDONLY))>=0){
+			fioClose(fd);
+			if(i<2){
+				snprintf(theme_prefix, 32, "mc%d:OPL/",i);
+			}else{
+				snprintf(theme_prefix, 32, "%sOPL/",USB_prefix);
+			}
+			theme_zipped=1;
+			break;
+		}
+	
+	}
+	
+}
+
 void LoadTheme(int themeid) {
+
 	// themeid == 0 means the default theme
 	strcpy(theme,theme_dir[themeid]);
-	background_image=LoadBackground();
+
+	FindTheme();
+
 	LoadIcons();
 	LoadFont(0);
+	background_image=LoadBackground(); //Load the background last because it closes the zip file there
 
 	struct TConfigSet themeConfig;
 	themeConfig.head = NULL;
@@ -740,7 +863,7 @@ void LoadTheme(int themeid) {
 
 	// try to load the config from the theme dir
 	char tmp[255];
-	snprintf(tmp, 255, "mass:USBLD/%s/theme.cfg", theme);
+	snprintf(tmp, 255, "mass:OPL/%s/theme.cfg", theme);
 
 	// set default colors
 	bg_color[0]=default_bg_color[0];
@@ -769,7 +892,7 @@ int LoadBackground() {
 	background.PSM = GS_PSM_CT24;
 	background.Filter = GS_FILTER_LINEAR;
 
-	snprintf(tmp, 255, "mass:USBLD/%s/%s", theme, "background.raw");
+	snprintf(tmp, 255, "background.raw");
 	
 	int res = LoadRAW(tmp, &background);
 	
@@ -778,28 +901,33 @@ int LoadBackground() {
 	background2.Height = 480;
 	background2.PSM = GS_PSM_CT24;
 	background2.Filter = GS_FILTER_LINEAR;
-	snprintf(tmp, 255, "mass:USBLD/%s/%s", theme, "background2.raw");
+	snprintf(tmp, 255, "background2.raw");
 	
 	// the second image is not mandatory
 	LoadRAW(tmp, &background2);
+	
+	if(zipfile!=NULL){
+		unzClose(zipfile);
+		zipfile=NULL;
+	}
 	
 	return res;
 }
 
 void LoadIcon(GSTEXTURE* txt, char* iconname, void* defraw, size_t w, size_t h) {
-	char tmp[255];
+	//char tmp[255];
 
 	txt->Width = w;
 	txt->Height = h;
 	txt->PSM = GS_PSM_CT32;
 	txt->Filter = GS_FILTER_LINEAR;
 	
-	snprintf(tmp, 254, "mass:USBLD/%s/%s",theme, iconname);
+	//snprintf(tmp, 254, "mass:OPL/%s/%s",theme, iconname);
 	
 	if (txt->Mem == defraw) // if we have a default, clear it now so it doesn't get
 		txt->Mem = NULL; // freed by accident
 	
-	if(LoadRAW(tmp, txt)==0)
+	if(LoadRAW(iconname, txt)==0)
 		txt->Mem=(u32*)defraw; // if load could not be done, set the default
 }
 

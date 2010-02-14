@@ -17,6 +17,7 @@
 #include "gsToolkit.h"
 #include "malloc.h"
 #include "math.h"
+#include "src/unzip/unzip.h"
 #include <libpwroff.h>
 
 #include <debug.h>
@@ -27,6 +28,7 @@
 #define STATIC_PAGE_SIZE 10
 
 char USB_prefix[8];
+char theme_prefix[32];
 
 typedef
 struct TGame
@@ -255,6 +257,8 @@ unsigned char default_bg_color[3];
 unsigned char default_text_color[3];
 char *theme_dir[255];
 int max_theme_dir;
+int theme_zipped;
+unzFile zipfile;
 
 GSTEXTURE disc_icon;
 GSTEXTURE games_icon;
@@ -333,7 +337,7 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid);
 int ExecElf(char *path);
 void SendIrxKernelRAM(int mode);
-unsigned int crc32(char *string);
+unsigned int USBA_crc32(char *string);
 
 #define USB_MODE	0
 #define ETH_MODE	1
@@ -399,11 +403,13 @@ void DrawConfig();
 void DrawIPConfig();
 void UploadTexture(GSTEXTURE* txt);
 void Aviso();
-void Intro();
+void OpenIntro();
+void CloseIntro();
 void LoadFont();
 void UpdateFont();
 int LoadRAW(char *path, GSTEXTURE *Texture);
 
+void FindTheme();
 void LoadTheme(int themeid);
 int LoadBackground();
 void LoadIcons();

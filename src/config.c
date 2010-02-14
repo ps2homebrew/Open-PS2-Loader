@@ -364,7 +364,8 @@ void ListDir(char* directory) {
 	int n_dir=0;
 	fio_dirent_t record;
 	int i=0;
-   
+	char dir[255];
+	
 	// free the prev. list
 	i = 0;
 	while (theme_dir[i] && i < 256) {
@@ -376,27 +377,47 @@ void ListDir(char* directory) {
 	theme_dir[0]=malloc(7);
 	sprintf(theme_dir[0],"<none>");
 	n_dir=1;
-	
-	if ((ret = fioDopen(directory)) < 0) {
-		//printf("Error opening dir\n");
-		return;
-	}
 
-	while (fioDread(ret, &record) > 0) {
-		/*Keep track of number of files */
-		if (FIO_SO_ISDIR(record.stat.mode)) {
-			if(record.name[0]!='.' && (record.name[0]!='.' && record.name[1]!='.')){
-				//printf("%s\n",record.name);
-				theme_dir[n_dir]=malloc(sizeof(record.name));
-				sprintf(theme_dir[n_dir],"%s",record.name);
-				n_dir++;
-			}
-		}
-		
-		if (n_dir >= 254)
-			break; // ensure padding is there!
-	}
+	for(i=0;i<3;i++){
 	
+		switch(i){
+			case 0:
+				snprintf(dir, 255, "mc0:%s", directory);
+			break;
+			case 1:
+				snprintf(dir, 255, "mc1:%s", directory);
+			break;
+			case 2:
+				snprintf(dir, 255, "%s%s", USB_prefix, directory);
+			break;
+		}
+	
+		if ((ret = fioDopen(dir)) >= 0) {
+			while (fioDread(ret, &record) > 0) {
+				/*Keep track of number of files */
+				if (FIO_SO_ISDIR(record.stat.mode)) {
+					if(record.name[0]!='.' && (record.name[0]!='.' && record.name[1]!='.')){
+						//printf("%s\n",record.name);
+						theme_dir[n_dir]=malloc(sizeof(record.name));
+						sprintf(theme_dir[n_dir],"%s",record.name);
+						n_dir++;
+					}
+				}else{
+					if(strstr(record.name,".zip") || strstr(record.name,".ZIP")){
+						//printf("%s\n",record.name);
+						theme_dir[n_dir]=malloc(sizeof(record.name));
+						sprintf(theme_dir[n_dir],"%s",record.name);
+						theme_dir[n_dir][strlen(theme_dir[n_dir])-4]='\0';
+						n_dir++;
+					}
+				}
+				
+				if (n_dir >= 254)
+					break; // ensure padding is there!
+			}
+				fioDclose(ret);
+		}
+	}
 	
 	max_theme_dir = n_dir;
 	theme_dir[max_theme_dir] = NULL;

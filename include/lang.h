@@ -56,6 +56,7 @@
 #define _STR_STARTHDD 50
 #define _STR_AUTOSORT 51
 #define _STR_ERR_LOADING_LANGFILE 52
+#define _STR_DEBUG 53
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0

@@ -65,7 +65,8 @@ int New_Reset_Iop(const char *arg, int flag){
 	char    ioprp_path[0x50];
 	int eeloadcnf_reset = 0;		
 	
-	GS_BGCOLOUR = 0xFF00FF;
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0xFF00FF;
 	
 	iop_reboot_count++;
 	
@@ -91,7 +92,8 @@ int New_Reset_Iop(const char *arg, int flag){
 
 		LoadIRXfromKernel(cdvdman_irx, size_cdvdman_irx, 0, NULL);
 
-		GS_BGCOLOUR = 0x00A5FF;
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x00A5FF;
 			
 		if (GameMode == USB_MODE) {
 			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
@@ -145,7 +147,8 @@ int New_Reset_Iop(const char *arg, int flag){
 	fioInit();		
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
-		GS_BGCOLOUR = 0x000080;
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x000080;
 
 		// some games like SOCOM3 uses faulty IOPRP path like "cdrom0:\RUN\IRX\DNAS300.IMGG;1"
 		// this part ensure it will not get stucked on red screen
@@ -184,7 +187,8 @@ int New_Reset_Iop(const char *arg, int flag){
 	if (eeloadcnf_reset) {
 		r = Patch_EELOADCNF_Img(&ioprp_img);
 		if (r == 0){
-			GS_BGCOLOUR = 0x00FF00;
+			if(!DisableDebug)
+				GS_BGCOLOUR = 0x00FF00;
 			while (1){;}
 		}
 	}
@@ -238,7 +242,8 @@ int New_Reset_Iop(const char *arg, int flag){
 		ee_kmode_exit();
 		EIntr();
 	}else{
-		GS_BGCOLOUR = 0xFF0000;
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0xFF0000;
 		while (1){;}
 	}
 
@@ -250,7 +255,8 @@ int New_Reset_Iop(const char *arg, int flag){
 	LoadFileInit();
 	Sbv_Patch();
 
-	GS_BGCOLOUR = 0x00FFFF;
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x00FFFF;
 	
 	if (GameMode == USB_MODE) {
 		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);

@@ -42,7 +42,12 @@ int main(int argc, char **argv){
 	else if (!strncmp(&argv[0][9], "2", 1))
 		ExitMode = APPS_MODE;
 	
-	char *p = strtok(&argv[0][11], " ");
+	DisableDebug = 0;
+
+	if (!strncmp(&argv[0][11], "1", 1))
+		DisableDebug = 1;
+
+	char *p = strtok(&argv[0][13], " ");
 	strcpy(g_ps2_ip, p);
 	p = strtok(NULL, " ");
 	strcpy(g_ps2_netmask, p);
@@ -59,11 +64,13 @@ int main(int argc, char **argv){
 	/* installing kernel hooks */
 	Install_Kernel_Hooks();
 
-	GS_BGCOLOUR = 0xff0000; 
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0xff0000; 
 
 	LoadExecPS2(ElfPath, 0, NULL);	
 
-	GS_BGCOLOUR = 0x0000ff;
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x0000ff;
 	SleepThread();
 
 	return 0;

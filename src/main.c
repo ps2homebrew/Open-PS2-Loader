@@ -180,6 +180,7 @@ struct UIItem diaCompatConfig[] = {
 #define UICFG_USEHDD 18
 #define UICFG_AUTOSTARTHDD 19
 #define UICFG_AUTOSORT 20
+#define UICFG_DEBUG 21
 
 #define UICFG_SAVE 114
 struct UIItem diaUIConfig[] = {
@@ -206,6 +207,10 @@ struct UIItem diaUIConfig[] = {
 	
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_USEHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_USEHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_AUTOSTARTHDD}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSTARTHDD, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	
+	{UI_SPLITTER},
+	
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, UICFG_DEBUG, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
@@ -549,6 +554,7 @@ void showUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_USEHDD, gUseHdd);
 	diaSetInt(diaUIConfig, UICFG_AUTOSTARTHDD, gHddAutostart);
 	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
+	diaSetInt(diaUIConfig, UICFG_DEBUG, disable_debug);
 	
 	int ret = diaExecuteDialog(diaUIConfig);
 	if (ret) {
@@ -564,6 +570,7 @@ void showUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_USEHDD, &gUseHdd);
 		diaGetInt(diaUIConfig, UICFG_AUTOSTARTHDD, &gHddAutostart);
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
+		diaGetInt(diaUIConfig, UICFG_DEBUG, &disable_debug);
 		
 		// update the value interpretation
 		// to be sure first (re)initialize the lang system again if we encounter custom language selection
@@ -1137,6 +1144,8 @@ void init() {
 	hdd_inited = 0;
 	// autosort defaults to zero
 	gAutosort = 0;
+	//Default disable debug colors
+	disable_debug=0;
 	
 	// default to english
 	gLanguageID = _LANG_ID_ENGLISH;

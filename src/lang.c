@@ -3,7 +3,7 @@
 #include "include/util.h"
 
 // Language support...
-#define LANG_STR_COUNT 53
+#define LANG_STR_COUNT 54
 char *english[LANG_STR_COUNT] = {
 	"               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^", // gfx.c:85
 	"Open PS2 Loader %s", // gfx.c:320
@@ -58,6 +58,7 @@ char *english[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *czech[LANG_STR_COUNT] = {
@@ -114,6 +115,7 @@ char *czech[LANG_STR_COUNT] = {
 	"Start HDD", // _STR_STARTHDD
 	"Automaticke razeni", // _STR_AUTOSORT
 	"Chyba pri nacitani lokalizace", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *spanish[LANG_STR_COUNT] = {
@@ -170,6 +172,7 @@ char *spanish[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD	
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *french[LANG_STR_COUNT] = {
@@ -226,6 +229,7 @@ char *french[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *german[LANG_STR_COUNT] = {
@@ -282,6 +286,7 @@ char *german[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *portuguese[LANG_STR_COUNT] = {
@@ -338,6 +343,7 @@ char *portuguese[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *norwegian[LANG_STR_COUNT] = {
@@ -394,6 +400,7 @@ char *norwegian[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *turkish[LANG_STR_COUNT] = {
@@ -450,6 +457,7 @@ char *turkish[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *polish[LANG_STR_COUNT] = {
@@ -506,6 +514,7 @@ char *polish[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *russian[LANG_STR_COUNT] = {
@@ -562,6 +571,7 @@ char *russian[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *indonesian[LANG_STR_COUNT] = {
@@ -618,6 +628,7 @@ char *indonesian[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *bulgarian[LANG_STR_COUNT] = {
@@ -674,6 +685,7 @@ char *bulgarian[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char *dutch[LANG_STR_COUNT] = {
@@ -730,6 +742,7 @@ char *dutch[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
+	"Disable Debug Colors", // _STR_DEBUG	
 };
 
 char **custom_lang = NULL;

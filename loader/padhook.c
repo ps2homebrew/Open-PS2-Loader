@@ -162,18 +162,21 @@ static void t_loadElf(void)
 	char *argv[2];
 	t_ExecData elf;
 
-	GS_BGCOLOUR = 0x008000; // Dark Green
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x008000; // Dark Green
 
 	// Exit RPC & CMD
 	SifExitRpc();
 
-	GS_BGCOLOUR = 0x000080; // Dark Red
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x000080; // Dark Red
 
 	// Reset IO Processor
 	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 	while (!Sync_Iop()){;}
 
-	GS_BGCOLOUR = 0xFF80FF; // Pink
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0xFF80FF; // Pink
 
 	// Init RPC & CMD
 	SifInitRpc(0);
@@ -181,7 +184,8 @@ static void t_loadElf(void)
 	// Apply Sbv patches
 	Sbv_Patch();
 	
-	GS_BGCOLOUR = 0xFF8000; // Blue sky
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0xFF8000; // Blue sky
 
 	// Load basic modules
 	LoadModule("rom0:SIO2MAN", 0, NULL);
@@ -199,7 +203,8 @@ static void t_loadElf(void)
 	
 	if (!ret && elf.epc) {
 
-		GS_BGCOLOUR = 0x00FFFF; // Yellow
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x00FFFF; // Yellow
 
 		// Exit services
 		fioExit();
@@ -210,47 +215,42 @@ static void t_loadElf(void)
 		FlushCache(0);
 		FlushCache(2);
 
-		GS_BGCOLOUR = 0x0080FF; // Orange
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x0080FF; // Orange
 
 		// Execute BOOT.ELF
 		ExecPS2((void*)elf.epc, (void*)elf.gp, 1, argv);
 	}
 
-	GS_BGCOLOUR = 0x0000FF; // Red
-	delay(5);
+	if(!DisableDebug)
+	{
+		GS_BGCOLOUR = 0x0000FF; // Red
+		delay(5);
+	}
 
 	// Return to PS2 Browser
 	Go_Browser();
 }
-
-static const unsigned char Cop0_regName[32][10] =
-{
-	"Index",    "Random",   "EntryLo0", "EntryLo1",
-	"Context",  "PageMask", "Wired",    "Reg7",
-	"BadVAddr", "Count",    "EntryHi",  "Compare", 
-	"Status",   "Cause",    "ExceptPC", "PRevID",
-	"Config",   "Reg17",    "Reg18",    "Reg19",
-	"Reg20",    "Reg21",    "Reg22",    "BadPAddr",
-	"Debug",    "Perf",     "Reg26",    "Reg27", 
-	"TagLo",    "TagHi",    "ErrorPC",  "Reg31"
-};
 
 // Go home function is call when combo trick is press
 static void Go_Home(void)
 {
 	u32 Cop0_Index, Cop0_Perf;
 
-	GS_BGCOLOUR = 0xFFFFFF; // White
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0xFFFFFF; // White
 
 	// Remove kernel hook
 	Remove_Kernel_Hooks();
 
-	GS_BGCOLOUR = 0x800000; // Dark Blue
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x800000; // Dark Blue
 
 	// Reset EE Coprocessors & Controlers
 	ResetEE(0x07);
 
-	GS_BGCOLOUR = 0x800080; // Purple
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x800080; // Purple
 
 	// Reset SPU Sound processor
 	ResetSPU();
@@ -372,7 +372,8 @@ int Install_PadRead_Hook(u32 start, u32 memscope)
 	
 	ret = 0;
 
-	GS_BGCOLOUR = 0x800080; /* Purple while padRead pattern search */
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x800080; /* Purple while padRead pattern search */
 
 	/* First try to locate the orginal libpad's scePadRead function */
 	ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern0, (u8 *)padReadpattern0_1_mask, sizeof(padReadpattern0));
@@ -394,7 +395,8 @@ int Install_PadRead_Hook(u32 start, u32 memscope)
 									ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern7, (u8 *)padReadpattern7_mask, sizeof(padReadpattern7));
 									if (!ptr)
 									{
-										GS_BGCOLOUR = 0x000000;
+										if(!DisableDebug)
+											GS_BGCOLOUR = 0x000000;
 										return ret;
 									}
 								}
@@ -408,7 +410,8 @@ int Install_PadRead_Hook(u32 start, u32 memscope)
 		}
 	}
 
- 	GS_BGCOLOUR = 0x008000; /* Green while padRead patches */
+	if(!DisableDebug)
+	 	GS_BGCOLOUR = 0x008000; /* Green while padRead patches */
 
 	/* Save original scePadRead ptr */
 	if (scePadRead_style == 2)
@@ -454,7 +457,8 @@ int Install_PadRead_Hook(u32 start, u32 memscope)
 		}
 	}
 
-	GS_BGCOLOUR = 0x000000; /* Black, done */
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x000000; /* Black, done */
 
 	return ret;
 }

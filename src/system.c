@@ -405,7 +405,7 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	else if (mode == HDD_MODE)
 		mode_str = "HDD_MODE";
 
-	sprintf(config_str, "%s %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, exit_mode, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+	sprintf(config_str, "%s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, exit_mode, disable_debug, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
 		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 

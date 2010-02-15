@@ -536,6 +536,7 @@ void gfxRestoreConfig() {
 		
 	getConfigInt(&gConfig, "exitmode", &exit_mode);
 	getConfigInt(&gConfig, "default_device", &default_device);
+	getConfigInt(&gConfig, "disable_debug", &disable_debug);
 }
 
 void gfxStoreConfig() {
@@ -548,6 +549,7 @@ void gfxStoreConfig() {
 	setConfigInt(&gConfig, "language", gLanguageID);
 	setConfigInt(&gConfig, "exitmode", exit_mode);
 	setConfigInt(&gConfig, "default_device", default_device);
+	setConfigInt(&gConfig, "disable_debug", disable_debug);
 }
 
 void LoadResources() {

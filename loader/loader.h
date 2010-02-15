@@ -19,8 +19,6 @@
 #include <sbv_patches.h>
 
 
-#define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
-
 #define MAX_ARGS     0x40
 #define MAX_MOD_ARGS 0x50
 #define MAX_PATH     0x100
@@ -120,6 +118,9 @@ int ExitMode;
 #define OSDS_MODE 0
 #define BOOT_MODE 1
 #define APPS_MODE 2
+
+int DisableDebug;
+#define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
 
 /* modmgr.c */
 int  LoadFileInit();

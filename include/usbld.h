@@ -210,6 +210,9 @@ unsigned int scroll_speed;
 // Exit mode
 int exit_mode;
 
+// Disable Debug Colors
+int disable_debug;
+
 // Default device
 int default_device;
 

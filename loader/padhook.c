@@ -289,8 +289,9 @@ static void Go_Home(void)
 		"	sd $29, Stack_Pointer;"
 	);
 		
-	// Some game use a stack pointer in scratchpad mem, so fix it to 0x2000000
-	if(Stack_Pointer >= 0x70000000)
+	// Some game use a stack pointer under user mem or in scratchpad mem
+	// So fix it to 0x2000000
+	if(Stack_Pointer <= 0x100000 || Stack_Pointer >= 0x70000000)
 	{
 		__asm__ __volatile__(
 			"	la $29, 0x2000000;"

@@ -1,8 +1,5 @@
 .SILENT:
 
-GSKIT = $(PS2DEV)/gsKit
-PS2ETH = $(PS2DEV)/ps2eth
-
 EE_BIN = main.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
@@ -32,7 +29,7 @@ clean:
 	echo "    * Interface"
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"
-	$(MAKE) -C loader clean	
+	$(MAKE) -C loader clean
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv clean
 	echo "    * eesync.irx"
@@ -44,19 +41,19 @@ clean:
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/cdvdfsv clean
 	echo "    * cddev.irx"
-	$(MAKE) -C modules/cddev clean	
+	$(MAKE) -C modules/cddev clean
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd clean
 	echo "    * ps2dev9.irx"
 	$(MAKE) -C modules/dev9 clean
 	echo "    * SMSUTILS.irx"
-	$(MAKE) -C modules/SMSUTILS clean	
+	$(MAKE) -C modules/SMSUTILS clean
 	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/SMSTCPIP clean	
+	$(MAKE) -C modules/SMSTCPIP clean
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/SMSMAP clean
 	echo "    * netlog.irx"
-	$(MAKE) -C modules/netlog clean	
+	$(MAKE) -C modules/netlog clean
 	echo "    * smbman.irx"
 	$(MAKE) -C modules/smbman clean
 	echo "    * discID.irx"
@@ -64,7 +61,7 @@ clean:
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/atad clean
 	echo "    * ps2hdd.irx"
-	$(MAKE) -C modules/ps2hdd clean	
+	$(MAKE) -C modules/ps2hdd clean
 	echo "    * iso2usbld"
 	$(MAKE) -C pc clean
 
@@ -262,12 +259,12 @@ lt_rt_icon.s:
   
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
-	
+
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)unzip/%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
-	
+
 $(EE_OBJS_DIR)%.o : %.s
 	$(EE_AS) $(EE_ASFLAGS) $(EE_ASM_DIR)$< -o $@
-			
+
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal

@@ -163,12 +163,6 @@ static void t_loadElf(void)
 	t_ExecData elf;
 
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0x008000; // Dark Green
-
-	// Exit RPC & CMD
-	SifExitRpc();
-
-	if(!DisableDebug)
 		GS_BGCOLOUR = 0x000080; // Dark Red
 
 	// Reset IO Processor
@@ -240,6 +234,33 @@ static void Go_Home(void)
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xFFFFFF; // White
 
+	// Check Stack Pointer
+	// It's still a bit too late, but it should work with most games
+	__asm__ __volatile__(
+		"	sd $29, Stack_Pointer;"
+	);
+
+	// Make sure Stack Pointer is located between 0x500000 and 0x2000000
+	// Homebrew don't like when $sp is not in user mem
+	// And this let enought space for program (0x100000 to 0x500000)
+	if(Stack_Pointer <= 0x500000 || Stack_Pointer >= 0x2000000)
+	{
+		__asm__ __volatile__(
+			"	la $29, 0x2000000;"
+		);
+	}
+
+	// XenoSaga3 special fix
+	// Otherwise a "DMAC(5) does not exist" appear when reseting IOP
+	if(Stack_Pointer > 0x100000 || Stack_Pointer < 0x200000)
+	{
+		// Init RPC & CMD
+		SifInitRpc(0);
+	}
+
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x008000; // Dark Green
+
 	// Remove kernel hook
 	Remove_Kernel_Hooks();
 
@@ -247,6 +268,8 @@ static void Go_Home(void)
 		GS_BGCOLOUR = 0x800000; // Dark Blue
 
 	// Reset EE Coprocessors & Controlers
+	// Only DMAC, VIF0, VIF1, and VU1
+	// With more some game hang, with less some other game hang
 	ResetEE(0x07);
 
 	if(!DisableDebug)
@@ -256,8 +279,10 @@ static void Go_Home(void)
 	ResetSPU();
 	
 	// Check Translation Look-Aside Buffer
+	// Some game (GT4, GTA) modify memory map
+	// A re-init is needed to properly access memory
 	Cop0_Index = GetCop0(0);
-	
+
 	// Init TLB
 	if(Cop0_Index != 0x26)
 	{
@@ -269,6 +294,8 @@ static void Go_Home(void)
 	}
 
 	// Check Performance Counter
+	// Some game (GT4) start performance counter
+	// When counter overflow, an exception occur, so stop them
 	Cop0_Perf = GetCop0(25);
 
 	// Stop Performance Counter
@@ -281,20 +308,6 @@ static void Go_Home(void)
 			" xor	 $3, $3, $2;"
 			" mtc0 $3, $25;"
 			" sync.p;"
-		);
-	}
-
-	// Check Stack Pointer
-	__asm__ __volatile__(
-		"	sd $29, Stack_Pointer;"
-	);
-		
-	// Some game use a stack pointer under user mem or in scratchpad mem
-	// So fix it to 0x2000000
-	if(Stack_Pointer <= 0x100000 || Stack_Pointer >= 0x70000000)
-	{
-		__asm__ __volatile__(
-			"	la $29, 0x2000000;"
 		);
 	}
 

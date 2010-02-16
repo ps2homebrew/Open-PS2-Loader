@@ -25,7 +25,7 @@ all:
 	echo "    * Interface"
 	$(MAKE) $(EE_BIN)
 	echo "Compressing..."
-	$(PS2DEV)/bin/ps2-packer/ps2-packer main.elf OPNPS2LD.ELF > /dev/null
+	ps2-packer main.elf OPNPS2LD.ELF > /dev/null
 
 clean:
 	echo "Cleaning..."

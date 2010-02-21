@@ -7,7 +7,7 @@
 # Review ps2sdk README & LICENSE files for further details.
 
 
-IOP_CC_VERSION := $(shell $(IOP_CC) -v 2>&1 | sed -n 's/^.*version.* //p')
+IOP_CC_VERSION := $(shell $(IOP_CC) -v 2>&1 | sed -n 's/^.*versi[^ ]*n.* //p')
 
 ASFLAGS_TARGET = -mcpu=r3000
 

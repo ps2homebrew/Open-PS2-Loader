@@ -115,11 +115,11 @@ struct irx_export_table _exp_dev9;
 
 #ifdef DEV9X_DEV
 int dev9x_dummy() { return 0; }
-int dev9x_devctl(const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
+int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
 {
 	if (cmd == 0x4401)
 		return dev9type;
-	
+
 	return 0;
 }
 

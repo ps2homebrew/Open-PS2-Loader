@@ -18,8 +18,14 @@ extern int size_usb_cdvdman_irx;
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
 
+extern void *smb_pcmcia_cdvdman_irx;
+extern int size_smb_pcmcia_cdvdman_irx;
+
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
+
+extern void *hdd_pcmcia_cdvdman_irx;
+extern int size_hdd_pcmcia_cdvdman_irx;
 
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
@@ -350,6 +356,19 @@ int getDiscID(void *discID)
 	return 1;	
 }
 
+int pcmcia_check(void)
+{
+	int ret;
+
+	fileXioInit();
+	ret = fileXioDevctl("dev9x0:", 0x4401, NULL, 0, NULL, 0);
+
+	if (ret == 0) 	// PCMCIA
+		return 1;
+
+	return 0;	// ExpBay 	
+}
+
 void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 {
 	u8 *boot_elf = NULL;
@@ -655,10 +674,18 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	irxptr_tab[n++].irxsize = size_eesync_irx; 
 	if (mode == USB_MODE)
 		irxptr_tab[n++].irxsize = size_usb_cdvdman_irx;
-	if (mode == ETH_MODE)
-		irxptr_tab[n++].irxsize = size_smb_cdvdman_irx;
-	if (mode == HDD_MODE)
-		irxptr_tab[n++].irxsize = size_hdd_cdvdman_irx;
+	if (mode == ETH_MODE) {
+		if (pcmcia_check())
+			irxptr_tab[n++].irxsize = size_smb_pcmcia_cdvdman_irx;
+		else
+			irxptr_tab[n++].irxsize = size_smb_cdvdman_irx;
+	}
+	if (mode == HDD_MODE) {
+		if (pcmcia_check())
+			irxptr_tab[n++].irxsize = size_hdd_pcmcia_cdvdman_irx;
+		else
+			irxptr_tab[n++].irxsize = size_hdd_cdvdman_irx;
+	}
 	irxptr_tab[n++].irxsize = size_cdvdfsv_irx;
 	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
@@ -672,10 +699,18 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	irxsrc[n++] = (void *)&eesync_irx;
 	if (mode == USB_MODE)
 		irxsrc[n++] = (void *)&usb_cdvdman_irx;
-	if (mode == ETH_MODE)
-		irxsrc[n++] = (void *)&smb_cdvdman_irx;
-	if (mode == HDD_MODE)
-		irxsrc[n++] = (void *)&hdd_cdvdman_irx;
+	if (mode == ETH_MODE) {
+		if (pcmcia_check())
+			irxsrc[n++] = (void *)&smb_pcmcia_cdvdman_irx;
+		else
+			irxsrc[n++] = (void *)&smb_cdvdman_irx;
+	}
+	if (mode == HDD_MODE) {
+		if (pcmcia_check())
+			irxsrc[n++] = (void *)&hdd_pcmcia_cdvdman_irx;
+		else
+			irxsrc[n++] = (void *)&hdd_cdvdman_irx;
+	}
 	irxsrc[n++] = (void *)&cdvdfsv_irx;
 	irxsrc[n++] = (void *)&cddev_irx;
 	irxsrc[n++] = (void *)usbd_irx;

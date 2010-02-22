@@ -355,7 +355,7 @@ int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat);
 int cdrom_dopen(iop_file_t *f, char *dirname);
 int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
 int cdrom_dclose(iop_file_t *f);
-int	cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
+int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
 s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where);
 int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
 int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen);

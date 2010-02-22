@@ -41,6 +41,7 @@ loadcore_IMPORTS_start
 I_FlushDcache
 I_RegisterLibraryEntries
 I_GetLibraryEntryTable
+I_QueryBootMode
 loadcore_IMPORTS_end
 
 sysclib_IMPORTS_start

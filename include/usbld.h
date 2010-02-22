@@ -19,6 +19,7 @@
 #include "math.h"
 #include "src/unzip/unzip.h"
 #include <libpwroff.h>
+#include <fileXio_rpc.h>
 
 #include <debug.h>
 

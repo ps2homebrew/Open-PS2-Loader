@@ -10,7 +10,7 @@
 
 
 #define MAX_PADS 4
-#define DEFAULT_PAD_DELAY 15
+#define DEFAULT_PAD_DELAY 7
 
 struct pad_data_t {
 	int port, slot;

@@ -57,6 +57,7 @@
 #define _STR_AUTOSORT 51
 #define _STR_ERR_LOADING_LANGFILE 52
 #define _STR_DEBUG 53
+#define _STR_NO_CONTROLLER 54
 
 // Language ID's
 #define _LANG_ID_ENGLISH 0
@@ -82,6 +83,9 @@ extern char *_l(unsigned int id);
 
 // language setter (see _LANG_ID constants)
 void setLanguage(int langID);
+
+/** @return nonzero for cyrillic languages */
+int langIsCyrillic();
 
 const char **getLanguageList();
 

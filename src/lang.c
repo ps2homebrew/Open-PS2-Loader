@@ -3,7 +3,7 @@
 #include "include/util.h"
 
 // Language support...
-#define LANG_STR_COUNT 54
+#define LANG_STR_COUNT 55
 char *english[LANG_STR_COUNT] = {
 	"               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^", // gfx.c:85
 	"Open PS2 Loader %s", // gfx.c:320
@@ -59,6 +59,7 @@ char *english[LANG_STR_COUNT] = {
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE
 	"Disable Debug Colors", // _STR_DEBUG	
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER
 };
 
 char *czech[LANG_STR_COUNT] = {
@@ -116,6 +117,7 @@ char *czech[LANG_STR_COUNT] = {
 	"Automaticke razeni", // _STR_AUTOSORT
 	"Chyba pri nacitani lokalizace", // _STR_ERR_LOADING_LANGFILE	
 	"Disable Debug Colors", // _STR_DEBUG	
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *spanish[LANG_STR_COUNT] = {
@@ -173,17 +175,18 @@ char *spanish[LANG_STR_COUNT] = {
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
 	"Disable Debug Colors", // _STR_DEBUG	
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *french[LANG_STR_COUNT] = {
 	"              BIENVENUE DANS OPEN PS2 LOADER. CODE PRINCIPAL FONDÉ SUR LE CODE SOIRCE D'HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> LA PLUPART DU CODE DU CŒUR DU LOADER EST DE JIMMIKAELKAEL. TOUTES LES AMELIORATIONS DU GUI SONT DE VOLCA. MERCI D'UTILISER NOTRE PROGRAMME ^^", // gfx.c:85
 	"Open PS2 Loader %s", // gfx.c:320
-	"Réglage du thème", // gfx.c:502
+	"Réglages du thème", // gfx.c:502
 	"Réglages IP", // gfx.c:764
 	"Sauvegarder les changements", // gfx.c:586
 	"O retour", // gfx.c:736
-	"Défilement lent", // main.c:21 
-	"Défilement moyen", 
+	"Défilement lent", // main.c:21
+	"Défilement moyen",
 	"Défilement rapide",
 	"Menu dynamique",  // main.c:22
 	"Menu statique",
@@ -198,17 +201,17 @@ char *french[LANG_STR_COUNT] = {
 	"Réglages",
 	"Jeux sur USB",
 	"Jeux sur disque dur",
-	"Jeux via réseau",
+	"Jeux sur réseau",
 	"Applications",
-	"Theme", // Submenu items
+	"Thème", // Submenu items
 	"Langue",
 	"Langue : français",
 	"Démarrer support réseau",
 	"Chargement réseau: %d",
 	"Erreur de démarrage réseau",
 	"Démarrage réseau automatique",
-	"On",
-	"Off",
+	"Oui",
+	"Non",
 	"Ok",
 	"Réglages de compatibilité",
 	"Désactiver tous les réglages",
@@ -220,16 +223,17 @@ char *french[LANG_STR_COUNT] = {
 	"Rapide", // _STR_FAST
 	"Statique", // _STR_STATIC
 	"Dynamique", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE	
-	"Load from disc", // _STR_LOAD_FROM_DISC
-	"Please wait", // _STR_PLEASE_WAIT
-	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
-	"Use Hard Drive", // _STR_USEHDD
-	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
-	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
-	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Menu par défaut", // _STR_DEF_DEVICE
+	"Lire du disque", // _STR_LOAD_FROM_DISC
+	"Patientez", // _STR_PLEASE_WAIT
+	"Erreur de chargement du Game ID", // _STR_ERROR_LOADING_ID
+	"Utiliser disque dur", // _STR_USEHDD
+	"Démarrage disque dur automatique", // _STR_AUTOSTARTHDD
+	"Démarrer disque dur", // _STR_STARTHDD
+	"Tri automatique", // _STR_AUTOSORT
+	"Erreur de chargement du fichier de langue", // _STR_ERR_LOADING_LANGFILE
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER
 };
 
 char *german[LANG_STR_COUNT] = {
@@ -286,7 +290,8 @@ char *german[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *portuguese[LANG_STR_COUNT] = {
@@ -343,7 +348,8 @@ char *portuguese[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *norwegian[LANG_STR_COUNT] = {
@@ -400,7 +406,8 @@ char *norwegian[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *turkish[LANG_STR_COUNT] = {
@@ -458,6 +465,7 @@ char *turkish[LANG_STR_COUNT] = {
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
 	"Disable Debug Colors", // _STR_DEBUG	
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER
 };
 
 char *polish[LANG_STR_COUNT] = {
@@ -514,7 +522,8 @@ char *polish[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *russian[LANG_STR_COUNT] = {
@@ -572,6 +581,7 @@ char *russian[LANG_STR_COUNT] = {
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
 	"Disable Debug Colors", // _STR_DEBUG	
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER
 };
 
 char *indonesian[LANG_STR_COUNT] = {
@@ -628,7 +638,8 @@ char *indonesian[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char *bulgarian[LANG_STR_COUNT] = {
@@ -686,6 +697,7 @@ char *bulgarian[LANG_STR_COUNT] = {
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
 	"Disable Debug Colors", // _STR_DEBUG	
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER
 };
 
 char *dutch[LANG_STR_COUNT] = {
@@ -742,7 +754,8 @@ char *dutch[LANG_STR_COUNT] = {
 	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG	
+	"Disable Debug Colors", // _STR_DEBUG
+	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
 };
 
 char **custom_lang = NULL;
@@ -784,6 +797,7 @@ const char *language_names[] = {
 const char *english_name = "English";
 
 char **lang_strs = english;
+int curLangID;
 
 // localised string getter
 char *_l(unsigned int id) {
@@ -798,8 +812,10 @@ void setLanguage(int langID) {
 	if (langID > _LANG_ID_MAX)
 		langID = _LANG_ID_MAX;	
 		
+	curLangID = langID;
+	
 	if (langID == _LANG_ID_CUSTOM) {
-		if (custom_lang != NULL)	
+		if (custom_lang != NULL)
 			lang_strs = custom_lang;
 	} else {
 		lang_strs = languages[langID];
@@ -863,10 +879,21 @@ int loadLangFromFile(const char* fpath) {
 	return 0;
 }
 
+int langIsCyrillic() {
+	if ((curLangID == _LANG_ID_RUSSIAN) || (curLangID == _LANG_ID_BULGARIAN)) {
+		return 1;
+	}
+	
+	return 0;
+}
+
 int initLangSystem() {
 	int mcid;
 	char path[32];
+
+	curLangID = _LANG_ID_ENGLISH;
 	
+
 	// search for ops2l.lang file on the mc's
 	for (mcid = 0; mcid < 2; ++mcid) {
 		snprintf(path, 32, "mc%d:SYS-CONF/OPNPS2LD.LNG", mcid);

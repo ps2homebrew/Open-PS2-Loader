@@ -6,6 +6,9 @@
 
 #include "include/usbld.h"
 #include "include/lang.h"
+#include "include/pad.h"
+#include "include/gfx.h"
+#include "include/dia.h"
 
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
@@ -51,6 +54,8 @@ hdl_games_list_t *hddGameList;
 
 // minimal inactive frames for hint display
 #define HINT_FRAMES_MIN 64
+// count of frames till the refresh happens
+#define LIST_REFRESH_DELAY 100
 
 // --------------------------- Dialogs ---------------------------
 // Dialog definition for IP configuration
@@ -425,9 +430,9 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 		
 		if (result == COMPAT_LOADFROMDISC) {
 			// Draw "please wait..." screen
-			DrawBackground();
-			DrawHint(_l(_STR_PLEASE_WAIT), -1);
-			Flip();
+			drawBackground();
+			drawHint(_l(_STR_PLEASE_WAIT), -1);
+			flip();
 			
 			// load game ID, inject
 			char discID[5];
@@ -449,14 +454,14 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 				
 				diaSetString(diaCompatConfig, COMPAT_GAMEID, nhexid);
 			} else {
-				MsgBox(_l(_STR_ERROR_LOADING_ID));
+				msgBox(_l(_STR_ERROR_LOADING_ID));
 			}
 		}
 	} while (result == COMPAT_LOADFROMDISC);
 	
 	if (result == COMPAT_REMOVE) {
 		configRemoveKey(&gConfig, gkey);
-		MsgBox(_l(_STR_REMOVED_ALL_SETTINGS));
+		msgBox(_l(_STR_REMOVED_ALL_SETTINGS));
 	} else if (result > 0) { // okay pressed or other button
 		modes = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -576,15 +581,15 @@ void showUIConfig() {
 		// to be sure first (re)initialize the lang system again if we encounter custom language selection
 		if (gLanguageID == _LANG_ID_CUSTOM) {
 			if (initLangSystem() != 0) { // language file not found?
-				MsgBox(_l(_STR_ERR_LOADING_LANGFILE));
+				msgBox(_l(_STR_ERR_LOADING_LANGFILE));
 				gLanguageID = _LANG_ID_ENGLISH; // default to english in this case
 			}
 		}
 		
 		setLanguage(gLanguageID);
-		UpdateScrollSpeed();
-		SetMenuDynamic(dynamic_menu);
-		LoadTheme(themeid);
+		updateScrollSpeed();
+		setMenuDynamic(dynamic_menu);
+		loadTheme(themeid);
 		infotxt = _l(_STR_WELCOME);
 		
 		if (ret == UICFG_SAVE)
@@ -690,9 +695,9 @@ int storeConfig() {
 	int result = saveConfig(confPath);
 	
 	if (result) {
-		MsgBox(_l(_STR_SETTINGS_SAVED));
+		msgBox(_l(_STR_SETTINGS_SAVED));
 	} else {
-		MsgBox(_l(_STR_ERROR_SAVING_SETTINGS));
+		msgBox(_l(_STR_ERROR_SAVING_SETTINGS));
 	}
 		
 	return result;
@@ -700,39 +705,38 @@ int storeConfig() {
 
 // --------------------- Menu variables, handling & initialization --------------------
 // Submenu items variant of the game list... keeped in sync with the game item list
-struct TSubMenuList* usb_submenu = NULL;
-struct TSubMenuList* eth_submenu = NULL;
-struct TSubMenuList* hdd_submenu = NULL;
+struct submenu_list_t* usb_submenu = NULL;
+struct submenu_list_t* eth_submenu = NULL;
+struct submenu_list_t* hdd_submenu = NULL;
 
 /// List of usb games
-struct TMenuItem usb_games_item;
+struct menu_item_t usb_games_item;
 /// List of network games
-struct TMenuItem eth_games_item;
+struct menu_item_t eth_games_item;
 /// List of hdd games
-struct TMenuItem hdd_games_item;
+struct menu_item_t hdd_games_item;
 
 /// scroll speed selector
-struct TSubMenuList* speed_item = NULL;
+struct submenu_list_t* speed_item = NULL;
 
 /// menu type selector
-struct TSubMenuList* menutype_item = NULL;
+struct submenu_list_t* menutype_item = NULL;
 
 unsigned int scroll_speed_txt[3] = {_STR_SCROLL_SLOW, _STR_SCROLL_MEDIUM, _STR_SCROLL_FAST};
 unsigned int menu_type_txt[2] = { _STR_MENU_DYNAMIC,  _STR_MENU_STATIC};
 
-void ClearSubMenu(struct TSubMenuList** submenu, struct TMenuItem* mi) {
-	DestroySubMenu(submenu);
+void ClearSubMenu(struct submenu_list_t** submenu, struct menu_item_t* mi) {
+	destroySubMenu(submenu);
 	
 	if ((submenu != &eth_submenu) || (eth_inited || gNetAutostart))
-		AppendSubMenu(submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
+		appendSubMenu(submenu, &disc_icon, "", -1, _STR_NO_ITEMS);
 	else
-		AppendSubMenu(submenu, &netconfig_icon, "", -1, _STR_START_NETWORK);
+		appendSubMenu(submenu, &netconfig_icon, "", -1, _STR_START_NETWORK);
 
 	mi->submenu = *submenu;
 	mi->current = *submenu;
 }
-
-void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TSubMenuList** submenu, struct TMenuItem* mi) {
+void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct submenu_list_t** submenu, struct menu_item_t* mi) {
 	int fd, size;
 	char buffer[0x040];
 
@@ -746,52 +750,61 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct TS
 		ClearSubMenu(submenu, mi);
 		return;
 	}
+	
+	if (*max_games != 0) {
+		fioClose(fd);
+		return;
+	}
 
 	// only refresh if the list is empty
-	if (*max_games==0) {
-		DestroySubMenu(submenu);
-		*submenu = NULL;
-		mi->submenu = *submenu;
-		mi->current = *submenu;
+	destroySubMenu(submenu);
+	*submenu = NULL;
+	mi->submenu = *submenu;
+	mi->current = *submenu;
 
-		size = fioLseek(fd, 0, SEEK_END);  
-		fioLseek(fd, 0, SEEK_SET); 
-		
-		size_t count = size / 0x040;
-		*max_games = count;
-		
-		*list = (TGame*)malloc(sizeof(TGame) * count);
-		
-		int id;
-		for(id = 1; id <= count; ++id) {
-			fioRead(fd, buffer, 0x40);
-			
-			TGame *g = &(*list)[id-1];
-			
-			// to ensure no leaks happen, we copy manually and pad the strings
-			memcpy(g->Name, buffer, 32);
-			g->Name[32] = '\0';
-			memcpy(g->Image, &buffer[32], 16);
-			g->Image[16] = '\0';
-			memcpy(&g->parts, &buffer[47], 1);
-			memcpy(&g->media, &buffer[48], 1);
-			
-			AppendSubMenu(submenu, &disc_icon, g->Name, id, -1);
-		}
-		
-		if (gAutosort)
-			SortSubMenu(submenu);
-		
-		mi->submenu = *submenu;
-		mi->current = *submenu;
-		mi->pagestart = *submenu;
+	size = fioLseek(fd, 0, SEEK_END);  
+	fioLseek(fd, 0, SEEK_SET); 
+	
+	size_t count = size / 0x040;
+	*max_games = count;
+	
+	if (*list) {
+		free(*list);
+		*list = NULL;
 	}
+	
+	*list = (TGame*)malloc(sizeof(TGame) * count);
+	
+	int id;
+	for(id = 1; id <= count; ++id) {
+		fioRead(fd, buffer, 0x40);
+		
+		TGame *g = &(*list)[id-1];
+		
+		// to ensure no leaks happen, we copy manually and pad the strings
+		memcpy(g->Name, buffer, 32);
+		g->Name[32] = '\0';
+		memcpy(g->Image, &buffer[32], 16);
+		g->Image[16] = '\0';
+		memcpy(&g->parts, &buffer[47], 1);
+		memcpy(&g->media, &buffer[48], 1);
+		
+		appendSubMenu(submenu, &disc_icon, g->Name, id, -1);
+	}
+	
+	if (gAutosort)
+		sortSubMenu(submenu);
+	
+	mi->submenu = *submenu;
+	mi->current = *submenu;
+	mi->pagestart = *submenu;
+	
 
 	fioClose(fd);
 }
 
 int RefreshHDDGameList() {
-	DestroySubMenu(&hdd_submenu);
+	destroySubMenu(&hdd_submenu);
 	int ret = hddGetHDLGamelist(&hddGameList);
 	hdd_submenu = NULL;
 	
@@ -803,11 +816,11 @@ int RefreshHDDGameList() {
 	for (id = 1; id <= hddGameList->count; id++) {
 		hdl_game_info_t *game = &hddGameList->games[id - 1];
 
-		AppendSubMenu(&hdd_submenu, &disc_icon, game->name, id, -1);
+		appendSubMenu(&hdd_submenu, &disc_icon, game->name, id, -1);
 	};
 
 	if (gAutosort)
-		SortSubMenu(&hdd_submenu);
+		sortSubMenu(&hdd_submenu);
 	
 	hdd_games_item.submenu = hdd_submenu;
 	hdd_games_item.current = hdd_submenu;
@@ -816,7 +829,7 @@ int RefreshHDDGameList() {
 	return 0;
 }
 
-
+// --------------------- USB Menu item callbacks --------------------
 void FindUSBPartition(){
 	int i, fd;
 	char path[64];
@@ -832,7 +845,6 @@ void FindUSBPartition(){
 			fioClose(fd);
 			break;
 		}
-		fioClose(fd);
 	}
 	
 	return;
@@ -842,24 +854,23 @@ void ClearUSBSubMenu() {
 	ClearSubMenu(&usb_submenu, &usb_games_item);
 }
 
-void RefreshUSBGameList() {
-	if(usbdelay<=100)  {
-		usbdelay++;
-		return;
+void RefreshUSBGameList(struct menu_item_t *self, short force) {
+	// do we have to refresh? If the game list is empty, delay is greater than 100 or force is used, then yes
+	if (force || usbdelay > LIST_REFRESH_DELAY) {
+		usbdelay = 0;
+		
+		if (force)
+			usb_max_games = 0;
+		
+		RefreshGameList(&usbGameList, &usb_max_games, USB_prefix, &usb_submenu, &usb_games_item);
 	}
-	  
-	usbdelay = 0;
-	RefreshGameList(&usbGameList, &usb_max_games, USB_prefix, &usb_submenu, &usb_games_item);
 }
 
-// --------------------- USB Menu item callbacks --------------------
-void ExecUSBGameSelection(struct TMenuItem* self, int id) {
+void ExecUSBGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1)
 		return;
 	
-	padPortClose(0, 0);
-	padPortClose(1, 0);
-	padReset();
+	unloadPads();
 	
 	// find the compat mask
 	int cmask = getImageCompatMask(id, usbGameList[id - 1].Image, USB_MODE);
@@ -870,7 +881,7 @@ void ExecUSBGameSelection(struct TMenuItem* self, int id) {
 	LaunchGame(&usbGameList[id - 1], USB_MODE, cmask, gid);
 }
 
-void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
+void AltExecUSBGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1)
 		return;
 	
@@ -878,23 +889,25 @@ void AltExecUSBGameSelection(struct TMenuItem* self, int id) {
 		ExecUSBGameSelection(self, id);
 }
 
+// --------------------- Network Menu item callbacks --------------------
+// Forward decl.
+void LoadNetworkModules(void);
+
 void ClearETHSubMenu() {
 	ClearSubMenu(&eth_submenu, &eth_games_item);
 }
 
-void RefreshETHGameList() {
-	if(ethdelay<=100)  {
-		ethdelay++;
-		return;
-	}
-	  
-	ethdelay = 0;
-	RefreshGameList(&ethGameList, &eth_max_games, "smb0:\\", &eth_submenu, &eth_games_item);
-}
+void RefreshETHGameList(struct menu_item_t *self, short force) {
+	// do we have to refresh? If the game list is empty, delay is greater than 100 or force is used, then yes
+	if (force || ethdelay++ > LIST_REFRESH_DELAY) {
+		ethdelay = 0;
 
-// --------------------- Network Menu item callbacks --------------------
-// Forward decl.
-void LoadNetworkModules(void);
+		if (force)
+			eth_max_games = 0;
+		
+		RefreshGameList(&ethGameList, &eth_max_games, "smb0:\\", &eth_submenu, &eth_games_item);
+	}
+}
 
 void StartNetwork() {
 	if (0) // left here if we find a way to let it work without issues (see bug no. 16)
@@ -903,7 +916,7 @@ void StartNetwork() {
 		LoadNetworkModules();
 }
 
-void ExecETHGameSelection(struct TMenuItem* self, int id) {
+void ExecETHGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1) {
 		if (!eth_inited) {
 			StartNetwork();
@@ -913,9 +926,7 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 		return;
 	}
 	
-	padPortClose(0, 0);
-	padPortClose(1, 0);
-	padReset();
+	unloadPads();
 	
 	int cmask = getImageCompatMask(id, ethGameList[id - 1].Image, ETH_MODE);
 	
@@ -925,7 +936,7 @@ void ExecETHGameSelection(struct TMenuItem* self, int id) {
 	LaunchGame(&ethGameList[id - 1], ETH_MODE, cmask, gid);
 }
 
-void AltExecETHGameSelection(struct TMenuItem* self, int id) {
+void AltExecETHGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1)
 		return;
 	
@@ -944,7 +955,7 @@ void StartHdd() {
 	hddfound = !hddCheck();
 }
 
-void ExecHDDGameSelection(struct TMenuItem* self, int id) {
+void ExecHDDGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1) {
 		if (!hdd_inited) {
 			StartHdd();
@@ -953,7 +964,7 @@ void ExecHDDGameSelection(struct TMenuItem* self, int id) {
 			if (hddfound) {
 				RefreshHDDGameList();
 			} else {
-				DestroySubMenu(&hdd_submenu);
+				destroySubMenu(&hdd_submenu);
 				hdd_games_item.submenu = NULL;
 				hdd_games_item.current = NULL;
 			}
@@ -961,9 +972,7 @@ void ExecHDDGameSelection(struct TMenuItem* self, int id) {
 		return;
 	}
 	
-	padPortClose(0, 0);
-	padPortClose(1, 0);
-	padReset();
+	unloadPads();
 	
 	// hash to ensure no spaces are present
 	char imgnam[12];
@@ -976,7 +985,7 @@ void ExecHDDGameSelection(struct TMenuItem* self, int id) {
 	LaunchHDDGame(&hddGameList->games[id - 1], gid);
 }
 
-void AltExecHDDGameSelection(struct TMenuItem* self, int id) {
+void AltExecHDDGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1)
 		return;
 	
@@ -992,7 +1001,7 @@ void AltExecHDDGameSelection(struct TMenuItem* self, int id) {
 
 // --------------------- Exit/Settings Menu item callbacks --------------------
 /// menu item selection callbacks
-void ExecExit(struct TMenuItem* self, int vorder) {
+void ExecExit(struct menu_item_t* self, int vorder) {
 
 	if(exit_mode==0){
 		__asm__ __volatile__(
@@ -1002,10 +1011,10 @@ void ExecExit(struct TMenuItem* self, int vorder) {
 		);
 	}else if(exit_mode==1){
 		ExecElf("mc0:/BOOT/BOOT.ELF");
-		MsgBox("Error launching mc0:/BOOT/BOOT.ELF");
+		msgBox("Error launching mc0:/BOOT/BOOT.ELF");
 	}else if(exit_mode==2){
 		ExecElf("mc0:/APPS/BOOT.ELF");
-		MsgBox("Error launching mc0:/APPS/BOOT.ELF");
+		msgBox("Error launching mc0:/APPS/BOOT.ELF");
 	}
 }
 
@@ -1013,16 +1022,16 @@ void ChangeScrollSpeed() {
 	scroll_speed = (scroll_speed + 1) % 3;
 	speed_item->item.text_id = scroll_speed_txt[scroll_speed];
 	
-	UpdateScrollSpeed();
+	updateScrollSpeed();
 }
 
 void ChangeMenuType() {
-	SwapMenu();
+	swapMenu();
 	
 	menutype_item->item.text_id = menu_type_txt[dynamic_menu ? 0 : 1];
 }
 
-void ExecSettings(struct TMenuItem* self, int id) {
+void ExecSettings(struct menu_item_t* self, int id) {
 	if (id == 1) {
 		showUIConfig();
 	} else if (id == 3) {
@@ -1034,29 +1043,29 @@ void ExecSettings(struct TMenuItem* self, int id) {
 }
 
 // --------------------- Menu initialization --------------------
-struct TSubMenuList *settings_submenu = NULL;
+struct submenu_list_t *settings_submenu = NULL;
 
-struct TMenuItem exit_item = {
+struct menu_item_t exit_item = {
 	&exit_icon, "Exit", _STR_EXIT, NULL, NULL, NULL, NULL, &ExecExit, NULL, NULL
 };
 
-struct TMenuItem settings_item = {
+struct menu_item_t settings_item = {
 	&config_icon, "Settings", _STR_SETTINGS, NULL, NULL, NULL, NULL, &ExecSettings, NULL, NULL
 };
 
-struct TMenuItem usb_games_item  = {
+struct menu_item_t usb_games_item  = {
 	&usb_icon, "USB Games", _STR_USB_GAMES, NULL, NULL, NULL, NULL, &ExecUSBGameSelection, &RefreshUSBGameList, &AltExecUSBGameSelection
 };
 
-struct TMenuItem hdd_games_item = {
+struct menu_item_t hdd_games_item = {
 	&games_icon, "HDD Games", _STR_HDD_GAMES, NULL, NULL, NULL, NULL, &ExecHDDGameSelection, NULL, &AltExecHDDGameSelection
 };
 
-struct TMenuItem eth_games_item = {
+struct menu_item_t eth_games_item = {
 	&network_icon, "Network Games", _STR_NET_GAMES, NULL, NULL, NULL, NULL, &ExecETHGameSelection, &RefreshETHGameList, &AltExecETHGameSelection
 };
 
-struct TMenuItem apps_item = {
+struct menu_item_t apps_item = {
 	&apps_icon, "Apps", _STR_APPS, NULL, NULL, NULL, NULL
 };
 
@@ -1066,17 +1075,17 @@ void InitMenuItems() {
 	ClearETHSubMenu();
 	
 	// initialize the menu
-	AppendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_SETTINGS);
-	AppendSubMenu(&settings_submenu, &netconfig_icon, "Network config", 3, _STR_IPCONFIG);
-	AppendSubMenu(&settings_submenu, &save_icon, "Save Changes", 7, _STR_SAVE_CHANGES);
+	appendSubMenu(&settings_submenu, &theme_icon, "Theme", 1, _STR_SETTINGS);
+	appendSubMenu(&settings_submenu, &netconfig_icon, "Network config", 3, _STR_IPCONFIG);
+	appendSubMenu(&settings_submenu, &save_icon, "Save Changes", 7, _STR_SAVE_CHANGES);
 	
 	settings_item.submenu = settings_submenu;
 	
 	// add all menu items
 	menu = NULL;
-	AppendMenuItem(&exit_item);
-	AppendMenuItem(&settings_item);
-	AppendMenuItem(&usb_games_item);
+	appendMenuItem(&exit_item);
+	appendMenuItem(&settings_item);
+	appendMenuItem(&usb_games_item);
 	
 	// show hdd icon if found
 	if (gUseHdd) {
@@ -1086,37 +1095,53 @@ void InitMenuItems() {
 		} else {
 			// clear the menu item, 
 			// add start item, insert into menu
-			DestroySubMenu(&hdd_submenu);
+			destroySubMenu(&hdd_submenu);
 			
-			AppendSubMenu(&hdd_submenu, &disc_icon, "", -1, _STR_STARTHDD);
+			appendSubMenu(&hdd_submenu, &disc_icon, "", -1, _STR_STARTHDD);
 			
 			hdd_games_item.submenu = hdd_submenu;
 			hdd_games_item.current = hdd_submenu;
 			
 		}
 		
-		AppendMenuItem(&hdd_games_item);
+		appendMenuItem(&hdd_games_item);
 	}
 	
-	AppendMenuItem(&eth_games_item);
+	appendMenuItem(&eth_games_item);
 	
 	// Commenting out for now, not used:
 	// AppendMenuItem(&apps_item);
+}
+
+void initInputSystem() {
+	padInit(0);
+
+	// init all pads
+	int ctrls, first = 1;
+	do {
+		
+		ctrls = startPads();
+		
+		if (!first) {
+			drawBackground();
+			drawHint(_l(_STR_NO_CONTROLLER), -1);
+			flip();
+		}
+		
+		first = 0;
+	} while (!ctrls);
 }
 
 // main initialization function
 void init() {
 	Reset();
 
-	InitGFX();
+	initGFX();
 	
-	LoadFont(1);
-	OpenIntro();
+	loadFont(1);
+	openIntro();
 
 	theme_dir[0] = NULL;
-	usb_max_games = 0;
-	eth_max_games = 0;
-
 
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
@@ -1173,8 +1198,9 @@ void init() {
 	
 	// Initialize the language system - loads the custom language file if found
 	initLangSystem();
-	
-	StartPad();
+
+	// init here so we don't have to repeat
+	initInputSystem();
 	
 	// try to restore config
 	// if successful, it will remember the config location for further writes
@@ -1187,9 +1213,9 @@ void init() {
 	}
 
 	// initialize menu
-	InitMenu();
+	initMenu();
 
-	CloseIntro();
+	closeIntro();
 	
 	delay(1);
 	
@@ -1198,17 +1224,15 @@ void init() {
 	
 	// first column is usb games
 	switch (default_device) {
-		case 1:	MenuSetSelectedItem(&eth_games_item);
+		case 1:	menuSetSelectedItem(&eth_games_item);
 			break;
-		case 2:	MenuSetSelectedItem(&hdd_games_item);
+		case 2:	menuSetSelectedItem(&hdd_games_item);
 			break;
 		case 0:
 		default:
-			MenuSetSelectedItem(&usb_games_item);
+			menuSetSelectedItem(&usb_games_item);
 	}
 	
-	usb_max_games=0;
-	eth_max_games=0;	
 	usbdelay=0;
 	ethdelay=0;
 	frame=0;
@@ -1217,7 +1241,6 @@ void init() {
 	
 	usbGameList = NULL;
 	ethGameList = NULL;
-	
 
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
@@ -1229,7 +1252,7 @@ int netLoadInfo() {
 	// display network status in lower left corner
 	if (gNetworkStartup > 0) {
 		snprintf(txt, 64, _l(_STR_NETWORK_LOADING), gNetworkStartup);
-		DrawHint(txt, -1);
+		drawHint(txt, -1);
 
 		return 1;
 	}
@@ -1238,9 +1261,9 @@ int netLoadInfo() {
 }
 
 void netLoadDisplay() {
-	DrawBackground();
+	drawBackground();
 	netLoadInfo();
-	Flip();
+	flip();
 }
 
 void LoadNetworkModules() {
@@ -1346,46 +1369,46 @@ int main(void)
 	// these seem to matter. Without them, something tends to crush into itself
 	delay(1);
 	
-	ReadPad();
+	readPads();
 	
 	// If automatic network startup is selected, start it now
-	if ((!GetKeyOn(KEY_L1)) && (gNetAutostart != 0)) {
+	if ((!getKeyOn(KEY_L1)) && (gNetAutostart != 0)) {
 		StartNetwork();
 		eth_inited = 1;
 	}
 
-	TextColor(0x80,0x80,0x80,0x80);
+	textColor(0x80,0x80,0x80,0x80);
 	
 	while(1)
 	{
-		if (ReadPad())
+		if (readPads())
 			inactiveFrames = 0;
 		else
 			inactiveFrames++;
 
-		DrawScreen();
+		drawScreen();
 				
-		if(GetKey(KEY_LEFT)){
-			MenuPrevH();
-		} else if(GetKey(KEY_RIGHT)){
-			MenuNextH();
-		} else if(GetKey(KEY_UP)) {
-			MenuPrevV();
-		} else if(GetKey(KEY_DOWN)){
-			MenuNextV();
-		} else if(GetKey(KEY_L1)) {
+		if(getKey(KEY_LEFT)){
+			menuPrevH();
+		} else if(getKey(KEY_RIGHT)){
+			menuNextH();
+		} else if(getKey(KEY_UP)) {
+			menuPrevV();
+		} else if(getKey(KEY_DOWN)){
+			menuNextV();
+		} else if(getKey(KEY_L1)) {
 			int i;
 			for (i = 0; i < STATIC_PAGE_SIZE; ++i)
-				MenuPrevV();
-		} else if(GetKey(KEY_R1)){
+				menuPrevV();
+		} else if(getKey(KEY_R1)){
 			int i;
 			for (i = 0; i < STATIC_PAGE_SIZE; ++i)
-				MenuNextV();
+				menuNextV();
 		}
 		
 		// home
-		if (GetKeyOn(KEY_L2)) {
-			struct TMenuItem* cur = MenuGetCurrent();
+		if (getKeyOn(KEY_L2)) {
+			struct menu_item_t* cur = menuGetCurrent();
 			
 			if ((cur == &usb_games_item) || 
 			    (cur == &eth_games_item) ||
@@ -1395,8 +1418,8 @@ int main(void)
 		}
 		
 		// end
-		if (GetKeyOn(KEY_R2)) {
-			struct TMenuItem* cur = MenuGetCurrent();
+		if (getKeyOn(KEY_R2)) {
+			struct menu_item_t* cur = menuGetCurrent();
 			
 			if ((cur == &usb_games_item) || 
 			    (cur == &eth_games_item) ||
@@ -1410,51 +1433,53 @@ int main(void)
 			}
 		}
 		
-		if(GetKeyOn(KEY_CROSS)){
+		if(getKeyOn(KEY_CROSS)){
 			// handle via callback in the menuitem
-			MenuItemExecute();
-		} else if(GetKeyOn(KEY_TRIANGLE)){
+			menuItemExecute();
+		} else if(getKeyOn(KEY_TRIANGLE)){
 			// handle via callback in the menuitem
-			MenuItemAltExecute();
+			menuItemAltExecute();
+		} else if(getKeyOn(KEY_CIRCLE)){
+			// handle via callback in the menuitem
+			refreshSubMenu(1);
 		}
 		
 		// sort the list on SELECT press
-		if (GetKeyOn(KEY_SELECT)) {
-			struct TMenuItem* cur = MenuGetCurrent();
+		if (getKeyOn(KEY_SELECT)) {
+			struct menu_item_t* cur = menuGetCurrent();
 			
 			if ((cur == &usb_games_item) ||
- 
 			    (cur == &eth_games_item) ||
 			    (cur == &hdd_games_item)) {
-				SortSubMenu(&cur->submenu);
+				sortSubMenu(&cur->submenu);
 				cur->current = cur->submenu;
 			}
 		}
 		
-
-		
 		if (!netLoadInfo()) {
 			// see the inactivity
 			if (inactiveFrames >= HINT_FRAMES_MIN) {
-				struct TMenuItem* cur = MenuGetCurrent();
+				struct menu_item_t* cur = menuGetCurrent();
 				// show hint (depends on the current menu item)
 
-				if ((cur == &usb_games_item) && (usb_max_games > 0)) 
-					DrawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
-				else if ((cur == &eth_games_item) && (eth_max_games > 0))
-					DrawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
+				if ((cur == &usb_games_item) && (usbGameList)) 
+					drawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
+				else if ((cur == &eth_games_item) && (ethGameList))
+					drawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
+				else if ((cur == &hdd_games_item) && (hddGameList))
+					drawHint(_l(_STR_COMPAT_SETTINGS), KEY_TRIANGLE);
 				else if (cur == &settings_item)
-					DrawHint(_l(_STR_SETTINGS), KEY_CROSS);
+					drawHint(_l(_STR_SETTINGS), KEY_CROSS);
 			}
 		}
 
-		Flip();
+		flip();
 		
-		RefreshSubMenu();
+		refreshSubMenu(0);
 		
 		// if error starting network happened, message out and disable
 		if (gNetworkStartup < 0) {
-			MsgBox(_l(_STR_NETWORK_STARTUP_ERROR));
+			msgBox(_l(_STR_NETWORK_STARTUP_ERROR));
 			gNetworkStartup = 0;
 		}
 	}

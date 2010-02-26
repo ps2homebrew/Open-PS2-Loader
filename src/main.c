@@ -1142,6 +1142,8 @@ void init() {
 	openIntro();
 
 	theme_dir[0] = NULL;
+	usb_max_games = 0;
+	eth_max_games = 0;
 
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;

@@ -83,23 +83,25 @@ const int keyToPad[17] = {
  */
 int waitPadReady(struct pad_data_t* pad) {
 	int state;
-	state = PAD_STATE_DISCONN; // whatever... just not stable
 	
 	// busy wait for the pad to get ready
 	do {
-		state=padGetState(pad->port, pad->slot);
-	} while((state != PAD_STATE_STABLE) && (state != PAD_STATE_FINDCTP1));
-    
-	return 0;
+		state = padGetState(pad->port, pad->slot);
+	} while((state != PAD_STATE_STABLE) && (state != PAD_STATE_FINDCTP1) && (state != PAD_STATE_DISCONN));
+    	
+	return state;
 };
 
 int initializePad(struct pad_data_t* pad) {
 	int ret;
 	int modes;
 	int i;
-
-	waitPadReady(pad);
-
+	
+	// is there any device connected to that port?
+	if (waitPadReady(pad) == PAD_STATE_DISCONN) {
+		return 1; // nope, don't waste your time here!
+	}
+	
 	// How many different modes can this device operate in?
 	// i.e. get # entrys in the modetable
 	modes = padInfoMode(pad->port, pad->slot, PAD_MODETABLE, -1);
@@ -327,7 +329,7 @@ int startPad(struct pad_data_t* pad) {
 	if(padPortOpen(pad->port, pad->slot, pad->padBuf) == 0) {
 		return 0;
 	}
-    
+	
 	if(!initializePad(pad)) {
 	        return 0;
 	}

@@ -16,26 +16,26 @@
 IRX_ID(MODNAME, 1, 1);
 
 typedef struct {
-	u32 lsn; 			
-	u32 size; 			
-	char name[16]; 		
-	u8 date[8];
-	u32 flag; 		
+	u32	lsn;
+	u32	size;
+	char	name[16];
+	u8	date[8];
+	u32	flag;
 } cdl_file_t;
 
 typedef struct {
-	u8 trycount; 		
-	u8 spindlctrl; 		
-	u8 datapattern; 	
-	u8 pad; 			
+	u8	trycount;
+	u8	spindlctrl;
+	u8	datapattern;
+	u8	pad;
 } cd_read_mode_t;
 
 // cdvdman imports
-int sceCdInit(int init_mode);												// #4
-int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode); 		// #6
-int sceCdSync(int mode); 													// #11
-int sceCdDiskReady(int mode); 												// #13
-int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer);		// #84
+int sceCdInit(int init_mode);						// #4
+int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode); 	// #6
+int sceCdSync(int mode); 						// #11
+int sceCdDiskReady(int mode); 						// #13
+int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer);	// #84
 
 // driver ops protypes
 int cddev_dummy(void);
@@ -78,9 +78,9 @@ static iop_device_t cddev_dev = {
 
 typedef struct {
 	iop_file_t *f;
-	u32 lsn;
-	u32 filesize;
-	u32 position;
+	u32	lsn;
+	u32	filesize;
+	u32	position;
 } FHANDLE;
 
 #define MAX_FDHANDLES 		64
@@ -90,9 +90,9 @@ static int cddev_io_sema;
 
 #define CDDEV_FS_SECTORS	30
 #define CDDEV_FS_BUFSIZE	CDDEV_FS_SECTORS * 2048
-static u8 cddev_fs_buf[CDDEV_FS_BUFSIZE + 2*2048] __attribute__((aligned(64))); 
+static u8 cddev_fs_buf[CDDEV_FS_BUFSIZE + 2*2048] __attribute__((aligned(64)));
 
-//-------------------------------------------------------------------------
+//-------------------------------------------------------------- 
 int _start(int argc, char** argv)
 {
 	DelDrv("cddev");
@@ -120,7 +120,7 @@ int cddev_init(iop_device_t *dev)
 	smp.option = 0;
 
 	cddev_io_sema = CreateSema(&smp);
-		
+
 	return 0;
 }
 
@@ -128,7 +128,7 @@ int cddev_init(iop_device_t *dev)
 int cddev_deinit(iop_device_t *dev)
 {
 	DeleteSema(cddev_io_sema);
-	
+
 	return 0;
 }
 
@@ -137,13 +137,13 @@ FHANDLE *cddev_getfilefreeslot(void)
 {
 	register int i;
 	FHANDLE *fh;
-	
+
 	for (i=0; i<MAX_FDHANDLES; i++) {
 		fh = (FHANDLE *)&cddev_fdhandles[i];
 		if (fh->f == NULL)
 			return fh;
 	}
-	
+
 	return 0;
 }
 
@@ -156,9 +156,9 @@ int cddev_open(iop_file_t *f, char *filename, int mode)
 
 	if (!filename)
 		return -ENOENT;
-			 
+
 	WaitSema(cddev_io_sema);
-		
+
 	fh = cddev_getfilefreeslot();
 	if (fh) {
 		sceCdDiskReady(0);
@@ -180,9 +180,9 @@ int cddev_open(iop_file_t *f, char *filename, int mode)
 	}
 	else
 		r = -EMFILE;
-			
+
 	SignalSema(cddev_io_sema);
-	
+
 	return r;
 }
 
@@ -268,12 +268,12 @@ int cddev_lseek(iop_file_t *f, u32 offset, int where)
 				r = -EINVAL;
 				goto ssema;
 			}
-			break;			
-		case SEEK_END:	
-			r = fh->filesize;		
-			break;	
+			break;
+		case SEEK_END:
+			r = fh->filesize;
+			break;
 		default:
-			r = -EINVAL;	
+			r = -EINVAL;
 			goto ssema;
 	}
 

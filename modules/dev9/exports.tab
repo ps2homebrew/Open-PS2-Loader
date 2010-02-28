@@ -1,0 +1,20 @@
+DECLARE_EXPORT_TABLE(dev9, 1, 1)
+	DECLARE_EXPORT(_start)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(shutdown)
+	DECLARE_EXPORT(_retonly)
+
+	/* 4 */
+	DECLARE_EXPORT(dev9RegisterIntrCb)
+	DECLARE_EXPORT(dev9DmaTransfer)
+	DECLARE_EXPORT(dev9Shutdown)
+	DECLARE_EXPORT(dev9IntrEnable)
+	DECLARE_EXPORT(dev9IntrDisable)
+	DECLARE_EXPORT(dev9GetEEPROM)
+	DECLARE_EXPORT(dev9LEDCtl)
+	DECLARE_EXPORT(dev9RegisterShutdownCb)
+	DECLARE_EXPORT(dev9RegisterPreDmaCb)
+	DECLARE_EXPORT(dev9RegisterPostDmaCb)
+END_EXPORT_TABLE
+
+void _retonly() {}

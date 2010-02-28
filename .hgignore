@@ -1,0 +1,10 @@
+syntax: glob
+
+*.o
+*.s
+*.elf
+*.erl
+*.irx
+*.exe
+
+pc/iso2usbld/bin/iso2usbld

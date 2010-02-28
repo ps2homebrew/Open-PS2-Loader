@@ -23,7 +23,7 @@ static char g_ElfPath[1024];
 int set_reg_hook;
 int set_reg_disabled;
 int iop_reboot_count = 0;
-int pad_hooked = 0;
+
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -184,14 +184,10 @@ static void t_loadElf(void)
 					if (prog_header[i].type != 1 || prog_header[i].memsz == 0)
 						continue;
 
-					pad_hooked = Install_PadRead_Hook((u32)prog_header[i].vaddr, prog_header[i].memsz);
-					
-					if ( pad_hooked )
+					if ( Install_PadOpen_Hook((u32)prog_header[i].vaddr, (u32)prog_header[i].vaddr + prog_header[i].memsz) )
 						break;
 				}
 			}
-			else
-				pad_hooked = Install_PadRead_Hook(0x00100000, 0x01e00000);
 
 			close(fd);
 		}
@@ -257,7 +253,7 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 }
 
 // ------------------------------------------------------------------------
-void HookLoadExecPS2(const char *filename, int argc, char *argv[])
+void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
 {
 	__asm__(
 		"la $v1, NewLoadExecPS2\n\t"
@@ -267,8 +263,46 @@ void HookLoadExecPS2(const char *filename, int argc, char *argv[])
 	);	
 }
 
+// ------------------------------------------------------------------------
+int Hook_CreateThread(threadparam_t *thread_param)
+{
+	int ret;
+	u32 mem_start, mem_end;
+
+	ret = Old_CreateThread(thread_param);
+
+	// Patch padread function to install In Game Reset
+	if(!(g_compat_mask & COMPAT_MODE_6))
+	{
+		if( thread_param->init_priority == 0 || (thread_param->init_priority < 5 && thread_param->current_priority == 0) )
+		{
+			if((u32)thread_param->entry >= 0x00400000)
+				mem_start = (u32)thread_param->entry - 0x00300000;
+			else
+				mem_start = 0x00100000;
+
+			if((mem_end = (u32)thread_param->stack) <= (u32)thread_param->entry)
+				mem_end = 0x01f00000;
+
+			if(!Install_PadOpen_Hook(mem_start, mem_end))
+			{
+				if(!Install_PadOpen_Hook(0x00100000, 0x01f00000))
+				{
+					if(!DisableDebug)
+						GS_BGCOLOUR = 0x0000FF; /* Red to signal no IGR available */
+					delay(3);
+					if(!DisableDebug)
+						GS_BGCOLOUR = 0x000000; /* Black */
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
 /*----------------------------------------------------------------------------------------*/
-/* Replace SifSetDma and SifSetReg syscalls in kernel.                                    */
+/* Replace SifSetDma, SifSetReg, LoadExecPS2, and CreateThread syscalls in kernel.        */
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
@@ -279,12 +313,14 @@ void Install_Kernel_Hooks(void)
 	SetSyscall(__NR_SifSetReg, &Hook_SifSetReg);
 	
 	Old_LoadExecPS2 = GetSyscallHandler(__NR_LoadExecPS2);
-	SetSyscall(__NR_LoadExecPS2, &HookLoadExecPS2);	
+	SetSyscall(__NR_LoadExecPS2, &Hook_LoadExecPS2);	
+
+	Old_CreateThread = GetSyscallHandler(__NR_CreateThread);
+	SetSyscall(__NR_CreateThread, &Hook_CreateThread);
 }
 
-
 /*----------------------------------------------------------------------------------------*/
-/* Restore original LoadExecPS2, SifSetDma and SifSetReg syscalls in kernel.              */
+/* Restore original SifSetDma, SifSetReg, LoadExecPS2, & CreateThread syscalls in kernel. */
 /*----------------------------------------------------------------------------------------*/
 void Remove_Kernel_Hooks(void)
 {
@@ -292,4 +328,5 @@ void Remove_Kernel_Hooks(void)
 		Apply_Mode3();
 
 	SetSyscall(__NR_LoadExecPS2, Old_LoadExecPS2);
+	SetSyscall(__NR_CreateThread, Old_CreateThread);
 }

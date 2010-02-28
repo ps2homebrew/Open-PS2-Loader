@@ -86,12 +86,34 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
+typedef struct {
+	void *pattern;
+	void *mask;
+	int   size;
+	int   version;	
+} pattern_t;
+
+typedef struct {
+    int    status;
+    void (*entry)(void *);
+    void  *stack;
+    int    stack_size;
+    void  *gp;
+    int    init_priority;
+    int    current_priority;
+    u32    attr;
+    u32    option;
+    int    wait_type;
+    int    wait_id;
+    int    wakeup_count;
+} threadparam_t ;
+
+
 u8 *g_buf;
 
 extern int set_reg_hook;
 extern int set_reg_disabled;
 extern int iop_reboot_count;
-extern int pad_hooked;
 
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
@@ -154,11 +176,12 @@ void Remove_Kernel_Hooks(void);
 u32  (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
 int  (*Old_SifSetReg)(u32 register_num, int register_value);
 void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
+int  (*Old_CreateThread)(threadparam_t *thread_param);
 
 /* patches.c */
 void apply_game_patches(void);
 
 /* padhook.c */
-int Install_PadRead_Hook(u32 start, u32 memscope);
+int Install_PadOpen_Hook(u32 mem_start, u32 mem_end);
 
 #endif

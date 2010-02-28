@@ -10,7 +10,8 @@
   Copyright (c) 2004 TyRaNiD <tiraniddo@hotmail.com>
   Copyright (c) 2004,2007 Lukasz Bruun <mail@lukasz.dk>
 
-  scePadRead Hooking function taken from ps2rd.
+  PadOpen Hooking function inspired from ps2rd.
+  Hook scePadPortOpen/scePad2CreateSocket instead of scePadRead/scePad2Read
   Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
   Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
@@ -18,16 +19,28 @@
 #include "loader.h"
 #include "padhook.h"
 
+/* scePadPortOpen & scePad2CreateSocket prototypes */
+static int (*scePadPortOpen)( int port, int slot, void* addr );
+static int (*scePad2CreateSocket)( pad2socketparam_t *SocketParam, void *addr );
 
-/* scePadRead prototypes */
-static int (*scePadRead)(int port, int slot, u8* data);
-static int (*scePad2Read)(int socket, u8* data);
+/* Monitored pad data */
+static paddata_t Pad_Data;
 
-/* Stack pointer variable used to check $sp value */
-static u32 Stack_Pointer = 0;
+/* Monitored power button data */
+static powerbuttondata_t Power_Button;
 
+/* IGR Interrupt handler & Thread ID */
+static int IGR_Intc_ID   = -1;
+static int IGR_Thread_ID = -1;
 
-// Reset SPU Sound processor
+/* IGR thread stack & stack size */
+#define IGR_STACK_SIZE (16 * 512)
+static u8 IGR_Stack[IGR_STACK_SIZE] __attribute__ ((aligned(16)));
+
+/* Extern symbol */
+extern void *_gp;
+
+// Reset SPU sound processor
 static void ResetSPU()
 {
 	u32 core;
@@ -138,29 +151,18 @@ static void Go_Browser(void)
 	);
 }
 
-// Poweroff PlayStation 2
-static void Power_Off(void)
-{
-	// Shutdown Dev9 hardware
-	Shutdown_Dev9();
-
-	DIntr();
-	ee_kmode_enter();
-
-	// PowerOff PS2
-	*CDVD_R_SDIN = 0;
-	*CDVD_R_SCMD = 0xF;
-
-	ee_kmode_exit();
-	EIntr();
-}
-
 // Load home ELF
 static void t_loadElf(void)
 {
 	int ret;
 	char *argv[2];
 	t_ExecData elf;
+
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0x80FF00; // Blue Green
+
+	// Init RPC & CMD
+	SifInitRpc(0);
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x000080; // Dark Red
@@ -197,9 +199,6 @@ static void t_loadElf(void)
 	
 	if (!ret && elf.epc) {
 
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x00FFFF; // Yellow
-
 		// Exit services
 		fioExit();
 		LoadFileExit();
@@ -226,253 +225,359 @@ static void t_loadElf(void)
 	Go_Browser();
 }
 
-// Go home function is call when combo trick is press
-static void Go_Home(void)
+// Poweroff PlayStation 2
+static void PowerOff_PS2(void)
+{
+	// Shutdown Dev9 hardware
+	Shutdown_Dev9();
+
+	DIntr();
+	ee_kmode_enter();
+
+	// PowerOff PS2
+	*CDVD_R_SDIN = 0x00;
+	*CDVD_R_SCMD = 0x0F;
+
+	ee_kmode_exit();
+	EIntr();
+}
+
+// In Game Reset Thread
+static void IGR_Thread(void *arg)
 {
 	u32 Cop0_Index, Cop0_Perf;
 
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0xFFFFFF; // White
-
-	// Check Stack Pointer
-	// It's still a bit too late, but it should work with most games
-	__asm__ __volatile__(
-		"	sd $29, Stack_Pointer;"
-	);
-
-	// Make sure Stack Pointer is located between 0x500000 and 0x2000000
-	// Homebrew don't like when $sp is not in user mem
-	// And this let enought space for program (0x100000 to 0x500000)
-	if(Stack_Pointer <= 0x500000 || Stack_Pointer >= 0x2000000)
-	{
-		__asm__ __volatile__(
-			"	la $29, 0x2000000;"
-		);
-	}
-
-	// XenoSaga3 special fix
-	// Otherwise a "DMAC(5) does not exist" appear when reseting IOP
-	if(Stack_Pointer > 0x100000 || Stack_Pointer < 0x200000)
-	{
-		// Init RPC & CMD
-		SifInitRpc(0);
-	}
-
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0x008000; // Dark Green
-
-	// Remove kernel hook
-	Remove_Kernel_Hooks();
-
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0x800000; // Dark Blue
-
-	// Reset EE Coprocessors & Controlers
-	// Only DMAC, VIF0, VIF1, and VU1
-	// With more some game hang, with less some other game hang
-	ResetEE(0x07);
-
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0x800080; // Purple
-
-	// Reset SPU Sound processor
-	ResetSPU();
+	// Place our IGR thread in WAIT state
+	// It will be woken up by our IGR interrupt handler
+	SleepThread();
 	
-	// Check Translation Look-Aside Buffer
-	// Some game (GT4, GTA) modify memory map
-	// A re-init is needed to properly access memory
-	Cop0_Index = GetCop0(0);
-
-	// Init TLB
-	if(Cop0_Index != 0x26)
+	// If Pad Combo is Start + Select then Return to Home
+	if(Pad_Data.combo_type == IGR_COMBO_START_SELECT)
 	{
-		__asm__ __volatile__(
-			"	li $3, 0x82;"
-			"	syscall;"
-			"	nop;"
-		);
-	}
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0xFFFFFF; // White
 
-	// Check Performance Counter
-	// Some game (GT4) start performance counter
-	// When counter overflow, an exception occur, so stop them
-	Cop0_Perf = GetCop0(25);
+		// Re-Init RPC & CMD
+		SifExitRpc();
+		SifInitRpc(0);
 
-	// Stop Performance Counter
-	if(Cop0_Perf & 0x80000000)
-	{
-		__asm__ __volatile__(
-			" mfc0 $3, $25;"
-			" lui	 $2, 0x8000;"
-			" or	 $3, $3, $2;"
-			" xor	 $3, $3, $2;"
-			" mtc0 $3, $25;"
-			" sync.p;"
-		);
-	}
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x800000; // Dark Blue
+
+		// Remove kernel hook
+		Remove_Kernel_Hooks();
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x008000; // Dark Green
+
+		// Reset Data Decompression Vector Unit 0 & 1
+		ResetEE(0x04);
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x800080; // Purple
+
+		// Reset SPU Sound processor
+		ResetSPU();
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x0000FF; // Red
+
+		// Check Translation Look-Aside Buffer
+		// Some game (GT4, GTA) modify memory map
+		// A re-init is needed to properly access memory
+		Cop0_Index = GetCop0(0);
+
+		// Init TLB
+		if(Cop0_Index != 0x26)
+		{
+			__asm__ __volatile__(
+				"	li $3, 0x82;"
+				"	syscall;"
+				"	nop;"
+			);
+		}
+
+		// Check Performance Counter
+		// Some game (GT4) start performance counter
+		// When counter overflow, an exception occur, so stop them
+		Cop0_Perf = GetCop0(25);
+
+		// Stop Performance Counter
+		if(Cop0_Perf & 0x80000000)
+		{
+			__asm__ __volatile__(
+				" mfc0 $3, $25;"
+				" lui	 $2, 0x8000;"
+				" or	 $3, $3, $2;"
+				" xor	 $3, $3, $2;"
+				" mtc0 $3, $25;"
+				" sync.p;"
+			);
+		}
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x00FFFF; // Yellow
+
+		// Exit services
+		fioExit();
+		LoadFileExit();
+		SifExitIopHeap();
+		SifExitRpc();
+
+		FlushCache(0);
+		FlushCache(2);
 
 		// Execute home loader
-	if ( ExitMode != OSDS_MODE)
-		ExecPS2(t_loadElf, NULL, 0, NULL);
+		if ( ExitMode != OSDS_MODE)
+			ExecPS2(t_loadElf, &_gp, 0, NULL);
 
-	// Return to PS2 Browser
-	Go_Browser();
+		// Return to PS2 Browser
+		Go_Browser();
+	}
+
+	// If combo is R3 + L3 or Reset failed, Poweroff PS2
+	PowerOff_PS2();
 }
 
-// Hook function for libpad scePadRead
-static int Hook_scePadRead(int port, int slot, u8* data)
+// IGR VBLANK_START interrupt handler install to monitor combo trick in pad data aera
+static int IGR_Intc_Handler(int cause)
+{
+	// First check pad state
+	if ( ( (Pad_Data.libpad == IGR_LIBPAD_V1) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V1) ) ||
+			 ( (Pad_Data.libpad == IGR_LIBPAD_V2) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V2) ) )
+	{
+		// Combo R1 + L1 + R2 + L2
+		if ( Pad_Data.pad_buf[Pad_Data.pos_combo1] == IGR_COMBO_R1_L1_R2_L2 )
+		{
+			// Combo Start + Select OR R3 + L3
+			if ( ( Pad_Data.pad_buf[Pad_Data.pos_combo2] == IGR_COMBO_START_SELECT ) || // Start + Select combo, so reset
+				   ( Pad_Data.pad_buf[Pad_Data.pos_combo2] == IGR_COMBO_R3_L3 ) )         // R3 + L3 combo, so poweroff
+				Pad_Data.combo_type = Pad_Data.pad_buf[Pad_Data.pos_combo2];
+		}
+	}
+
+	ee_kmode_enter();
+
+	// Check power button press
+	if ( (*CDVD_R_NDIN & 0x20) && (*CDVD_R_POFF & 0x04) )
+		Power_Button.press++;
+
+	// Start VBlank counter when power button is pressed
+	if( Power_Button.press )
+	{
+		// Check number of power button press after 1 sec
+		if( Power_Button.vb_count++ >= 50 )
+		{
+			if( Power_Button.press == 1 )
+				Pad_Data.combo_type = IGR_COMBO_R3_L3; // power button press 1 time, so poweroff
+			else
+				Pad_Data.combo_type = IGR_COMBO_START_SELECT; // power button press 2 time, so reset
+		}
+	}
+
+	// Cancel poweroff to catch the second button press
+	*CDVD_R_SDIN = 0x00;
+	*CDVD_R_SCMD = 0x1B;
+
+	ee_kmode_exit();
+
+	// If a combo is set, disable VBLANK_START interrupts, and wakeup our IGR thread
+	if (Pad_Data.combo_type != 0x00)
+	{
+		// Disable VBLANK_START Interrupts
+		iDisableIntc(kINTC_VBLANK_START);
+
+		// WakeUp IGR thread
+		iWakeupThread(IGR_Thread_ID);
+	}
+
+	// Exit handler
+	__asm__ __volatile__(
+		" sync.l;"
+		" ei;"
+	);
+
+	return 0;
+}
+
+// Install IGR thread, and Pad interrupt handler
+static void Install_IGR(void *addr, int libpad)
+{
+	ee_thread_t thread_param;
+
+	// Reset power button data
+	Power_Button.press    = 0;
+	Power_Button.vb_count = 0;
+	
+	// Set pad library version, and buffer
+	Pad_Data.libpad     = libpad;
+	Pad_Data.pad_buf    = addr;
+	Pad_Data.combo_type = 0x00;
+
+	// Set positions of pad data and pad state in buffer
+	if(libpad == IGR_LIBPAD_V1)
+	{
+		Pad_Data.pos_combo1 = 3;
+		Pad_Data.pos_combo2 = 2;
+		Pad_Data.pos_state  = 112;
+	}
+	else
+	{
+		Pad_Data.pos_combo1 = 29;
+		Pad_Data.pos_combo2 = 28;
+		Pad_Data.pos_state  = 4;
+	}
+
+	// Delete IGR thread if already created
+	if(IGR_Thread_ID >= 0)
+	{
+		TerminateThread(IGR_Thread_ID);
+		DeleteThread(IGR_Thread_ID);
+	}
+
+	// Create and start IGR thread
+	thread_param.gp_reg           = &_gp;
+	thread_param.func             = IGR_Thread;
+	thread_param.stack            = (void*)IGR_Stack;
+	thread_param.stack_size       = IGR_STACK_SIZE;
+	thread_param.initial_priority = 1;
+	thread_param.current_priority = 99;
+	IGR_Thread_ID                 = CreateThread(&thread_param);
+
+	StartThread(IGR_Thread_ID, NULL);
+
+	// Delete IGR interrupt handler if already created
+	if(IGR_Intc_ID >= 0)
+	{
+		DIntr();
+		RemoveIntcHandler(kINTC_VBLANK_START, IGR_Intc_ID);
+		EIntr();
+	}
+
+	// Create IGR interrupt handler
+	DIntr();
+	IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_START, IGR_Intc_Handler, 0);
+	EnableIntc(kINTC_VBLANK_START);
+	EIntr();
+}
+
+// Hook function for libpad scePadPortOpen
+static int Hook_scePadPortOpen( int port, int slot, void* addr )
 {
 	int ret;
 
-	ret = scePadRead(port, slot, data);
+	ret = scePadPortOpen(port, slot, addr);
 
-	// Combo R1 + L1 + R2 + L2
-	if ( data[3] == 0xf0 )
-	{
-		// + Start + Select
-		if ( data[2] == 0xf6 )
-		{
-			// Return to home
-			Go_Home();
-		}
-		// + R3 + L3
-		else if ( data[2] == 0xf9 )
-		{
-			// Turn off PS2
-			Power_Off();
-		}
-	}
+	// Install IGR with libpad1 parameters
+	if(port == 0 && slot == 0)
+		Install_IGR(addr, IGR_LIBPAD_V1);
 
 	return ret;
 }
 
-// Hook function for libpad2 scePad2Read
-static int Hook_scePad2Read(int socket, u8* data)
+// Hook function for libpad2 scePad2CreateSocket
+static int Hook_scePad2CreateSocket( pad2socketparam_t *SocketParam, void *addr )
 {
 	int ret;
 
-	ret = scePad2Read(socket, data);
+	ret = scePad2CreateSocket(SocketParam, addr);
 
-	// Combo R1 + L1 + R2 + L2
-	if ( data[1] == 0xf0 )
-	{
-		// + Start + Select
-		if ( data[0] == 0xf6 )
-		{
-			// Return to home
-			Go_Home();
-		}
-		// + R3 + L3
-		else if ( data[0] == 0xf9 )
-		{
-			// Turn off PS2
-			Power_Off();
-		}
-	}
+	// Install IGR with libpad2 parameters
+	if(SocketParam->port == 0 && SocketParam->slot == 0)
+		Install_IGR(addr, IGR_LIBPAD_V2);
 
 	return ret;
 }
 
 /*
- * This function patch the padRead calls
+ * This function patch the padOpen calls
+ * scePadPortOpen or scePad2CreateSocket
  */
-int Install_PadRead_Hook(u32 start, u32 memscope)
+int Install_PadOpen_Hook(u32 mem_start, u32 mem_end)
 {
-	int ret;
-	u8 *ptr;
+	int i, found;
+	u8 *ptr, *ptr2;
 	u32 inst, fncall;
+	u32 mem_size, mem_size2;
 	u32 pattern[1], mask[1];
-	int scePadRead_style = 1;
-	
-	ret = 0;
 
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0x800080; /* Purple while padRead pattern search */
+	pattern_t padopen_patterns[NB_PADOPEN_PATTERN] = {
+		{ padPortOpenpattern0     , padPortOpenpattern0_mask     , sizeof(padPortOpenpattern0)     , 1 },
+		{ pad2CreateSocketpattern0, pad2CreateSocketpattern0_mask, sizeof(pad2CreateSocketpattern0), 2 },
+		{ padPortOpenpattern1     , padPortOpenpattern1_mask     , sizeof(padPortOpenpattern1)     , 1 },
+		{ pad2CreateSocketpattern1, pad2CreateSocketpattern1_mask, sizeof(pad2CreateSocketpattern1), 2 },
+		{ padPortOpenpattern2     , padPortOpenpattern2_mask     , sizeof(padPortOpenpattern2)     , 1 }
+	};
 
-	/* First try to locate the orginal libpad's scePadRead function */
-	ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern0, (u8 *)padReadpattern0_1_mask, sizeof(padReadpattern0));
-	if (!ptr) {
-		ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern1, (u8 *)padReadpattern0_1_mask, sizeof(padReadpattern1));
-		if (!ptr) {
-			ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern2, (u8 *)padReadpattern2_mask, sizeof(padReadpattern2));
-			if (!ptr) {
-				ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern3, (u8 *)padReadpattern3_mask, sizeof(padReadpattern3));
-				if (!ptr) {
-					ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)pad2Readpattern0, (u8 *)pad2Readpattern0_mask, sizeof(pad2Readpattern0));
-					if (!ptr) {
-						ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern4, (u8 *)padReadpattern4_mask, sizeof(padReadpattern4));
-						if (!ptr) {
-							ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern5, (u8 *)padReadpattern5_mask, sizeof(padReadpattern5));
-							if (!ptr) {
-								ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern6, (u8 *)padReadpattern6_mask, sizeof(padReadpattern6));
-								if (!ptr) {
-									ptr = find_pattern_with_mask((u8 *)start, memscope, (u8 *)padReadpattern7, (u8 *)padReadpattern7_mask, sizeof(padReadpattern7));
-									if (!ptr)
-									{
-										if(!DisableDebug)
-											GS_BGCOLOUR = 0x000000;
-										return ret;
-									}
-								}
-							}
-						}
+	found = 0;
+
+	/* Loop for each libpad version */
+	for(i = 0; i < NB_PADOPEN_PATTERN; i++)
+	{
+		ptr = (u8 *)mem_start;
+		while (ptr)
+		{
+			if(!DisableDebug)
+				GS_BGCOLOUR = 0x800080; /* Purple while PadOpen pattern search */
+
+			mem_size = mem_end - (u32)ptr;
+
+			/* First try to locate the orginal libpad's PadOpen function */
+			ptr = find_pattern_with_mask(ptr, mem_size, padopen_patterns[i].pattern, padopen_patterns[i].mask, padopen_patterns[i].size);
+			if (ptr)
+			{				
+				found = 1;
+
+				if(!DisableDebug)
+				 	GS_BGCOLOUR = 0x008000; /* Green while PadOpen patches */
+
+				/* Save original PadOpen ptr */
+				if (padopen_patterns[i].version == 1)
+					scePadPortOpen = (void *)ptr;
+				else
+					scePad2CreateSocket = (void *)ptr;
+
+				/* Retrieve PadOpen call Instruction code */
+				inst = 0x0c000000;
+				inst |= 0x03ffffff & ((u32)ptr >> 2);
+
+				/* Make pattern with function call code saved above */
+				pattern[0] = inst;
+				mask[0] = 0xffffffff;
+
+				/* Get Hook_PadOpen call Instruction code */
+				inst = 0x0c000000;
+				if (padopen_patterns[i].version == 1)
+					inst |= 0x03ffffff & ((u32)Hook_scePadPortOpen >> 2);
+				else
+					inst |= 0x03ffffff & ((u32)Hook_scePad2CreateSocket >> 2);
+
+				/* Search & patch for calls to PadOpen */
+				ptr2 = (u8 *)0x00100000;
+				while (ptr2)
+				{
+					mem_size2 = 0x01f00000 - (u32)ptr2;
+
+					ptr2 = find_pattern_with_mask(ptr2, mem_size2, (u8 *)pattern, (u8 *)mask, sizeof(pattern));
+					if (ptr2)
+					{
+						fncall = (u32)ptr2;
+						_sw(inst, fncall); /* overwrite the original PadOpen function call with our function call */
+
+						ptr2 += 8;
 					}
-					else /* If found scePad2Read pattern */
-						scePadRead_style = 2;
 				}
+				ptr += 8;
 			}
 		}
-	}
 
-	if(!DisableDebug)
-	 	GS_BGCOLOUR = 0x008000; /* Green while padRead patches */
-
-	/* Save original scePadRead ptr */
-	if (scePadRead_style == 2)
-		scePad2Read = (void *)ptr;
-	else
-		scePadRead = (void *)ptr;
-
-	/* Retrieve scePadRead call Instruction code */
-	inst = 0x0c000000;
-	inst |= 0x03ffffff & ((u32)ptr >> 2);
-
-	/* Make pattern with function call code saved above */
-	pattern[0] = inst;
-	mask[0] = 0xffffffff;
-
-	/* Get Hook_scePadRead call Instruction code */
-	if (scePadRead_style == 2)
-	{
-		inst = 0x0c000000;
-		inst |= 0x03ffffff & ((u32)Hook_scePad2Read >> 2);
-	}
-	else
-	{
-		inst = 0x0c000000;
-		inst |= 0x03ffffff & ((u32)Hook_scePadRead >> 2);
-	}
-
-	/* Search & patch for calls to scePadRead */
-	ptr = (u8 *)start;
-	while (ptr)
-	{
-		memscope = 0x01f00000 - (u32)ptr;
-
-		ptr = find_pattern_with_mask(ptr, memscope, (u8 *)pattern, (u8 *)mask, sizeof(pattern));
-		if (ptr)
-		{
-			ret = 1;
-
-			fncall = (u32)ptr;
-			_sw(inst, fncall); /* overwrite the original scePadRead function call with our function call */
-
-			ptr += 8;
-		}
+		/* Assume that only one libpad version is use per game... Not sure ... */
+		if(found == 1)
+			break;
 	}
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x000000; /* Black, done */
 
-	return ret;
+	return found;
 }

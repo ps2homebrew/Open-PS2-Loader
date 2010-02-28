@@ -9,10 +9,6 @@
   SPU definitions taken from PS2SDK freesd.
   Copyright (c) 2004 TyRaNiD <tiraniddo@hotmail.com>
   Copyright (c) 2004,2007 Lukasz Bruun <mail@lukasz.dk>
-
-  scePadRead Pattern taken from ps2rd.
-  Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
-  Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
 
 #include <tamtypes.h>
@@ -54,326 +50,237 @@
 
 
 // CDVD Registers
+#define CDVD_R_NDIN ((volatile u8*)0xBF402005)
+#define CDVD_R_POFF ((volatile u8*)0xBF402008)
 #define CDVD_R_SCMD ((volatile u8*)0xBF402016)
 #define CDVD_R_SDIN ((volatile u8*)0xBF402017)
 
 
-/**************************************************************************
- * For libpad support
- *
- * libpad	2.1.1.0
- * libpad	2.1.3.0
- * libpad	2.2.0.0
- * libpad	2.3.0.0
- * libpad	2.4.0.0
- * libpad	2.4.1.0
- * libpad	2.5.0.0
- * libpad	2.6.0.0
- * libpad	2.7.0.0
- */
-static u32 padReadpattern0[] = {
-	0x0080382d,		// daddu a3, a0, zero
-	0x24030070,		// li 	 v1, $00000070
-	0x2404001c,		// li  	 a0, $0000001c
-	0x70e31818,		// mult1 v1, a3, v1
-	0x00a42018,		// mult	 a0, a1, a0
-	0x27bdff00,		// addiu sp, sp, $ffXX
-	0x3c020000,		// lui 	 v0, $XXXX
-	0xff000000,		// sd 	 XX, $XXXX(XX)
-	0xffbf0000,		// sd  	 ra, $XXXX(sp)
-	0x24420000,		// addiu v0, v0, $XXXX
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x0c000000		// jal   scePadGetDmaStr
-};
+// PAD defs
+typedef struct {
+	u32 option;
+	int port;
+	int slot;
+	int number;
+	u16 name[16];
+} pad2socketparam_t;
 
-/**************************************************************************
+typedef struct {
+ int libpad;
+ u8 *pad_buf;
+ int pos_combo1;
+ int pos_combo2;
+ int pos_state;
+ u8  combo_type;
+} paddata_t;
+
+typedef struct {
+ int press;
+ int vb_count;
+} powerbuttondata_t;
+
+#define IGR_LIBPAD_V1 1
+#define IGR_LIBPAD_V2 2
+
+#define IGR_PAD_STABLE_V1 0x06
+#define IGR_PAD_STABLE_V2 0x01
+
+#define IGR_COMBO_R1_L1_R2_L2  0xF0
+#define IGR_COMBO_START_SELECT 0xF6
+#define IGR_COMBO_R3_L3        0xF9
+
+#define NB_PADOPEN_PATTERN 5
+
+/*******************************************************
  * For libpad support
  *
- * libpad	2.1.0.0
+ * libpad          2.1.1.0
+ * libpad          2.1.3.0
+ * libpad          2.2.0.0
+ * libpad          2.3.0.0
+ * libpad          2.4.1.0
+ * libpad          2.5.0.0
+ * libpad          2.6.0.0
+ * libpad          2.7.0.0
+ * libpad          2.7.1.0
+ * libpad          2.8.0.0
+ * libpad          3.0.0.0
+ * libpad          3.0.1.0
+ * libpad          3.0.2.0
  */
-static u32 padReadpattern1[] = {
-	0x0080382d,		// daddu a3, a0, zero
-	0x24020060,		// li 	 v0, $00000060
-	0x24040180,		// li  	 a0, $00000180
-	0x00a21018,		// mult  v0, a1, v0
-	0x70e42018,		// mult1 a0, a3, a0
-	0x27bdff00,		// addiu sp, sp, $ffXX
-	0x3c030000,		// lui 	 v1, $XXXX
-	0xff000000,		// sd 	 XX, $XXXX(XX)
-	0xffbf0000,		// sd  	 ra, $XXXX(sp)
-	0x24630000,		// addiu v1, v1, $XXXX
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x00000000, 		// ...
-	0x0c000000		// jal   scePadGetDmaStr
+static u32 padPortOpenpattern0[] = {
+	0x27bdff50,		//	addiu		sp, sp, $ff50
+	0xffb40050,		//	sd		 	s4, $0050(sp)
+	0xffb30040,		//	sd		  s3, $0040(sp)
+	0x00c0a02d,		//	daddu		s4, a2, zero
+	0xffb20030,		//	sd			s2, $0030(sp)
+	0x0080982d,		//	daddu		s3, a0, zero
+	0xffbf00a0,		//	sd			ra, $00a0(sp)
+	0x00a0902d,		//	daddu		s2, a1, zero
+	0xffbe0090,		//	sd			fp, $0090(sp)
+	0x3282003f,		//	andi		v0, s4, $003f
+	0xffb70080,		//	sd			s7, $0080(sp)
+	0xffb60070,		//	sd			s6, $0070(sp)
+	0xffb50060,		//	sd			s5, $0060(sp)
+	0xffb10020,		//	sd			s1, $0020(sp)
+	0x10400000,		//	beq			v0, zero, $XXXXXXXX
+	0xffb00010,		//	sd			s0, $0010(sp)
+	0x3c020000,		//	lui			v0, $XXXX
+	0x8c430000,		//	lw			v1, $XXXX(v0)
+	0x10600000,		//	beq			v1, zero, $XXXXXXXX
+	0x3c040000,		//	lui			a0, $XXXX
+	0x0280282d,		//	daddu		a1, s4, zero
+	0x0c000000		//	jal			scePrintf
 };
-static u32 padReadpattern0_1_mask[] = {
+static u32 padPortOpenpattern0_mask[] = {
 	0xffffffff,
 	0xffffffff,
 	0xffffffff,
 	0xffffffff,
 	0xffffffff,
-	0xffffff00,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
 	0xffff0000,
-	0xff000000,
+	0xffffffff,
 	0xffff0000,
 	0xffff0000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
+	0xffff0000,
+	0xffff0000,
+	0xffffffff,
 	0xfc000000
 };
 
-/**************************************************************************
+/*******************************************************
  * For libpad support
  *
- * libpad	2.7.1.0
- * libpad	2.8.0.0
+ * libpad          1.6.3.0
+ * libpad          2.0.0.0
  */
-static u32 padReadpattern2[] = {
-	0x27bdff00,		// addiu sp, sp, $ffXX
-	0x24030070,		// li 	 v1, $00000070
-	0xffb10000,		// sd 	 s1, $XXXX(sp)
-	0x3c020000,		// lui	 v0, $XXXX
-	0xffb20000,		// sd 	 s2, $XXXX(sp)
-	0x0080882d,		// daddu s1, a0, zero
-	0x00a0902d,		// daddu s2, a1, zero
-	0x2404001c,		// li 	 a0, $0000001c
-	0x72231818,		// mult1 v1, s1, v1
-	0x02442018,		// mult  a0, s2, a0
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x0c000000		// jal   DIntr
+static u32 padPortOpenpattern1[] = {
+	0x27bdff60,		//	addiu		sp, sp, $ff60               
+	0xffb20030,		//	sd			s2, $0030(sp)               
+	0xffb70080,		//	sd			s7, $0080(sp)               
+	0x00c0902d,		//	daddu		s2, a2, zero                
+	0xffb60070,		//	sd			s6, $0070(sp)               
+	0x0080b82d,		//	daddu		s7, a0, zero                
+	0xffbf0090,		//	sd			ra, $0090(sp)               
+	0x00a0b02d,		//	daddu		s6, a1, zero                
+	0xffb50060,		//	sd			s5, $0060(sp)               
+	0x3242003f,		//	andi		v0, s2, $003f               
+	0xffb40050,		//	sd			s4, $0050(sp)               
+	0xffb30040,		//	sd			s3, $0040(sp)               
+	0xffb10020,		//	sd			s1, $0020(sp)               
+	0x10400000,		//	beq			v0, zero, $XXXXXXXX         
+	0xffb00010,		//	sd			s0, $0010(sp)               
+	0x3c040000,		//	lui			a0, $XXXX                   
+	0x0240282d,		//	daddu		a1, s2, zero
+	0x0c000000		//	jal			printf
 };
-static u32 padReadpattern2_mask[] = {
-	0xffffff00,
+static u32 padPortOpenpattern1_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
 	0xffffffff,
 	0xffff0000,
+	0xffffffff,
 	0xffff0000,
-	0xffff0000,
 	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
 	0xfc000000
 };
 
-/**************************************************************************
+/*******************************************************
  * For libpad support
  *
- * libpad      3.0.0.0
+ * libpad          1.5.0.0
  */
-static u32 padReadpattern3[] = {
-	0x27bdff00,		// addiu sp, sp, $ffXX
-	0x24030070,		// li 	 v1, $00000070
-	0xffb10000,		// sd 	 s1, $XXXX(sp)
-	0x3c020000,		// lui	 v0, $XXXX
-	0xffb20000,		// sd 	 s2, $XXXX(sp)
-	0x0080882d,		// daddu s1, a0, zero
-	0x00a0902d,		// daddu s2, a1, zero
-	0x2404001c,		// li 	 a0, $0000001c
-	0x72231818,		// mult1 v1, s1, v1
-	0x02442018,		// mult  a0, s2, a0
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x0c000000		// jal   DIntr
+static u32 padPortOpenpattern2[] = {
+	0x27bdff70,		//	addiu		sp, sp, $ff70
+	0xffb20030,		//	sd			s2, $0030(sp)
+	0xffb50060,		//	sd			s5, $0060(sp)
+	0x00c0902d,		//	daddu		s2, a2, zero
+	0xffb40050,		//	sd			s4, $0050(sp)
+	0x0080a82d,		//	daddu		s5, a0, zero
+	0xffbf0080,		//	sd			ra, $0080(sp)
+	0x00a0a02d,		//	daddu		s4, a1, zero
+	0xffb60070,		//	sd			s6, $0070(sp)
+	0x3242000f,		//	andi		v0, s2, $000f
+	0xffb30040,		//	sd			s3, $0040(sp)
+	0xffb10020,		//	sd			s1, $0020(sp)
+	0x10400000,		//	beq			v0, zero, $XXXXXXXX
+	0xffb00010,		//	sd			s0, $0010(sp)
+	0x3c040000,		//	lui			a0, $XXXX
+	0x0c000000		//	jal			printf
 };
-static u32 padReadpattern3_mask[] = {
-	0xffffff00,
+static u32 padPortOpenpattern2_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
 	0xffffffff,
 	0xffff0000,
+	0xffffffff,
 	0xffff0000,
-	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
 	0xfc000000
 };
 
 /**************************************************************************
  * For libpad2 support
  *
- * libpad2	2.4.0.0
- * libpad2	2.5.0.0
- * libpad2	2.7.0.0
- * libpad2	2.7.1.0
- * libpad2	2.8.0.0
- * libpad2      3.0.0.0
- * libpad2      3.0.2.0
+ * libpad2  3.0.0.0
+ * libpad2  3.0.2.0
  */
-static u32 pad2Readpattern0[] = {
-	0x27bdffc0,		// addiu sp, sp, $ffc0
-	0x24020000, 		// li 	 v0, $XXXX
-	0xffb10010,		// sd 	 s1, $0010(sp)
-	0x3c030000, 		// lui 	 v1, $XXXX
-	0x0080882d,		// daddu s1, a0, zero
-	0xffb20020,		// sd 	 s2, $0020(sp)
-	0x02222018,		// mult  a0, s1, v0
-	0x24660000, 		// addiu a2, v1, $XXXX
-	0xffbf0030,		// sd 	 ra, $0030(sp)
-	0x00a0902d,		// daddu s2, a1, zero
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x0c000000		// jal   scePad2LinkDriver
+static u32 pad2CreateSocketpattern0[] = {
+	0x27bdff90,		//	addiu		sp, sp, $ff90
+	0x0080302d,		//	daddu		a2, a0, zero
+	0xffb10040,		//	sd			s1, $0040(sp)
+	0x00a0882d,		//	daddu		s1, a1, zero
+	0xffbf0060,		//	sd			ra, $0060(sp)
+	0xffb20050,		//	sd			s2, $0050(sp)
+	0x3222003f,		//	andi		v0, s1, $003f
+	0x10400000,		//	beq			v0, zero, $XXXXXXXX
+	0xffb00030,		//	sd			s0, $0030(sp)
+	0x3c040000,		//	lui			a0, $XXXX
+	0x0c000000,		//	jal			scePrintf
+	0x24840000,		//	addiu		a0, a0, $XXXX
+	0x10000000,		//	beq			zero, zero, $XXXXXXXX
+	0x2402ffff,		//	addiu		v0, zero, $ffff
+	0x50c00000,		//	beql		a2, zero, $XXXXXXXX
+	0xafa00000,		//	sw			zero, $0000(sp)
+	0x8cc20000,		//	lw			v0, $0000(a2)
+	0x8cc30004,		//	lw			v1, $0004(a2)
+	0x8cc40008,		//	lw			a0, $0008(a2)
+	0x8cc5000c,		//	lw			a1, $000c(a2)
+	0xafa20000,		//	sw			v0, $0000(sp)
+	0xafa30008,		//	sw			v1, $0008(sp)
+	0xafa4000c,		//	sw			a0, $000c(sp)
+	0xafa50010		//	sw			a1, $0010(sp)
 };
-static u32 pad2Readpattern0_mask[] = {
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffff0000,
+static u32 pad2CreateSocketpattern0_mask[] = {
 	0xffffffff,
 	0xffffffff,
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0xfc000000
-};
-
-/**************************************************************************
- * For libpad support
- *
- * libpad	1.5.0.0
- */
-static u32 padReadpattern4[] = {
-	0x27bdffc0,		// addiu	sp, sp, $ffc0
-	0x00052900,		// sll		a1, a1, 4
-	0x000421c0,		// sll		a0, a0, 7
-	0x3c020000,		// lui		v0, PadDataAddrHi
-	0x00a42821,		// addu		a1, a1, a0
-	0xffb20020,		// sd		s2, $0020(sp)
-	0xffb10010,		// sd		s1, $0010(sp)
-	0x24420000,		// addiu	v0, v0, PadDataAddrLo
-	0xffbf0030,		// sd		ra, $0030(sp)
-	0x00451021,		// addu		v0, v0, a1
-	0xffb00000,		// sd		s0, $0000(sp)
-	0x00c0902d,		// daddu	s2, a2, zero
-	0x8c50000c,		// lw		s0, $000c(v0)
-	0x24050100,		// li		a1, $00000100
-	0x0c000000		// jal		sceSifWriteBackDCache
-};
-static u32 padReadpattern4_mask[] = {
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xfc000000
-};
-
-/**************************************************************************
- * For libpad support
- *
- * libpad	1.6.2.0
- * libpad	1.6.3.0
- */
-static u32 padReadpattern5[] = {
-	0x24020060,		// li		v0, $00000060
-	0x24070300,		// li		a3, $00000300
-	0x00a21818,		// mult		v1, a1, v0
-	0x70872018,		// mult1	a0, a0, a3
-	0x27bdffc0,		// addiu	sp, sp, $ffc0
-	0x3c020000,		// lui		v0, PadDataAddrHi
-	0xffb20020,		// sd		s2, $0020(sp)
-	0x24420000,		// addiu	v0, v0, PadDataAddrLo
-	0xffb10010,		// sd		s1, $0010(sp)
-	0x00c0902d,		// daddu	s2, a2, zero
-	0x00641821,		// addu		v1, v1, a0
-	0xffbf0030,		// sd		ra, $0030(sp)
-	0xffb00000,		// sd		s0, $0000(sp)
-	0x00621821,		// addu		v1, v1, v0
-	0x8c70000c,		// lw		s0, $000c(v1)
-	0x24050100,		// li		a1, $00000100
-	0x0c000000,		// jal		sceSifWriteBackDCache
-};
-static u32 padReadpattern5_mask[] = {
 	0xffffffff,
 	0xffffffff,
 	0xffffffff,
@@ -382,107 +289,74 @@ static u32 padReadpattern5_mask[] = {
 	0xffff0000,
 	0xffffffff,
 	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xfc000000
-};
-
-/**************************************************************************
- * For libpad support
- *
- * libpad	2.0.0.0
- * libpad	2.0.5.0
- */
-static u32 padReadpattern6[] = {
-	0x24020060,		// li		v0, $00000060
-	0x24030180,		// li		v1, $00000180
-	0x00a22818,		// mult		a1, a1, v0
-	0x70832018,		// mult1	a0, a0, v1
-	0x27bdffe0,		// addiu	sp, sp, $ffe0
-	0x3c020000,		// lui		v0, PadDataAddrHi
-	0xffbf0010,		// sd		ra, $0010(sp)
-	0x24420000,		// addiu	v0, v0, PadDataAddrLo
-	0xffb00000,		// sd		s0, $0000(sp)
-	0x00a42821,		// addu		a1, a1, a0
-	0x00a22821,		// addu		a1, a1, v0
-	0x8cb0000c,		// lw		s0, $000c(a1)
-	0x0200202d,		// daddu	a0, s0, zero
-	0x0c000000,		// jal		SyncDCache
-};
-static u32 padReadpattern6_mask[] = {
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xfc000000
-};
-
-/**************************************************************************
- * For libpad support
- *
- * libpad          3.0.1.0
- * libpad          3.0.2.0
- */
-static u32 padReadpattern7[] = {
-	0x27bdffb0,		// addiu	sp, sp, $ffb0
-	0xffb20020,		// sd		s2, $0020(sp)
-	0xffb10010,		// sd		s1, $0010(sp)
-	0x00c0902d,		// daddu	s2, a2, zero
-	0xffb00000,		// sd		s0, $0000(sp)
-	0x0080882d,		// daddu	s1, a0, zero
-	0xffb30030,		// sd		s3, $0030(sp)
-	0xffbf0040,		// sd		ra, $0040(sp)
-	0x0c000000,		// jal		DI
-	0x00a0802d,		// daddu	s0, a1, zero
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x00000000,		// ...
-	0x0c000000,		// jal		scePadGetDmaStr
-};
-static u32 padReadpattern7_mask[] = {
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffff0000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
 	0xfc000000,
+	0xffff0000,
+	0xffff0000,
 	0xffffffff,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0xfc000000
+	0xffff0000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff
+};
+
+/**************************************************************************
+ * For libpad2 support
+ *
+ * libpad2	2.5.0.0
+ */
+static u32 pad2CreateSocketpattern1[] = {
+	0x27bdff70,		//	addiu		sp, sp, $ff70
+	0x0080302d,		//	daddu		a2, a0, zero
+	0xffb30060,		//	sd			s3, $0060(sp)
+	0x00a0982d,		//	daddu		s3, a1, zero
+	0xffbf0080,		//	sd			ra, $0080(sp)
+	0xffb40070,		//	sd			s4, $0070(sp)
+	0x3262003f,		//	andi		v0, s3, $003f
+	0xffb20050,		//	sd			s2, $0050(sp)
+	0xffb10040,		//	sd			s1, $0040(sp)
+	0x10400000,		//	beq			v0, zero, $XXXXXXXX
+	0xffb00030,		//	sd			s0, $0030(sp)
+	0x10000000,		//	beq			zero, zero, $XXXXXXXX
+	0x2402ffff,		//	addiu		v0, zero, $ffff
+	0x50c00000,		//	beql		a2, zero, $XXXXXXXX
+	0xafa00000,		//	sw			zero, $0000(sp)
+	0x8cc20000,		//	lw			v0, $0000(a2)
+	0x8cc30004,		//	lw			v1, $0004(a2)
+	0x8cc40008,		//	lw			a0, $0008(a2)
+	0x8cc5000c,		//	lw			a1, $000c(a2)
+	0xafa20000,		//	sw			v0, $0000(sp)
+	0xafa30008,		//	sw			v1, $0008(sp)
+	0xafa4000c,		//	sw			a0, $000c(sp)
+	0xafa50010		//	sw			a1, $0010(sp)
+};
+static u32 pad2CreateSocketpattern1_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff
 };

@@ -285,13 +285,6 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifExitIopHeap();
 	LoadFileExit();
 	
-	// Patch padread function to install In Game Reset
-	if( !(g_compat_mask & COMPAT_MODE_6) )
-	{
-		if( !pad_hooked || iop_reboot_count > 2 )
-			Install_PadRead_Hook(0x00100000, 0x01e00000);
-	}
-
 	// we have 4 SifSetReg calls to skip in ELF's SifResetIop, not when we use it ourselves
 	if (set_reg_disabled)
 		set_reg_hook = 4;

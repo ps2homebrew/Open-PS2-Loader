@@ -311,8 +311,6 @@ int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
 int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
 int cdvdman_cb_event(int reason);
 unsigned int event_alarm_cb(void *args);
-void cdvdman_poweroff_Thread(void *args);
-static int cdrom_intr_handler(void *args);
 void cdvdman_startThreads(void);
 void cdvdman_create_semaphores(void);
 void cdvdman_initdev(void);
@@ -589,7 +587,6 @@ static int cdvdman_searchfilesema;
 
 #ifndef ALT_READ_CORE
 static int cdvdman_lockreadsema;
-static int cdvdman_poffsema;
 static int sync_flag;
 #endif
 
@@ -2872,33 +2869,10 @@ void cdvdman_cdread_Thread(void *args)
 }
 
 //-------------------------------------------------------------------------
-void cdvdman_poweroff_Thread(void *args)
-{
-	while (1) {
-		WaitSema(cdvdman_poffsema);
-		#ifndef USB_DRIVER
-		dev9Shutdown();
-		#endif
-		CDVDreg_SDATAIN = 0;
-		CDVDreg_SCOMMAND = 0x0f;
-	}
-}
-
-//-------------------------------------------------------------------------
-static int cdrom_intr_handler(void *args)
-{
-	if (((CDVDreg_PWOFF & 1) == 0) && (CDVDreg_PWOFF & 4))
-		iSignalSema(cdvdman_poffsema);
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
 void cdvdman_startThreads(void)
 {
 	iop_thread_t thread_param;
 	register int thid;
-	int oldstate;
 
 	cdvdman_stat.status = CDVD_STAT_PAUSE;
 	cdvdman_stat.err = CDVD_ERR_NO;
@@ -2911,20 +2885,6 @@ void cdvdman_startThreads(void)
 
 	thid = CreateThread(&thread_param);
 	StartThread(thid, NULL);
-
-	thread_param.thread = (void *)cdvdman_poweroff_Thread;
-	thread_param.stacksize = 0x2000;
-	thread_param.priority = 0x5a;
-	thread_param.attr = TH_C;
-	thread_param.option = 0;
-
-	thid = CreateThread(&thread_param);
-	StartThread(thid, NULL);
-
-	CpuSuspendIntr(&oldstate);
-	ReleaseIntrHandler(IOP_IRQ_CDVD);
-	RegisterIntrHandler(IOP_IRQ_CDVD, 1, cdrom_intr_handler, NULL);
-	CpuResumeIntr(oldstate);
 }
 #endif
 
@@ -2947,13 +2907,6 @@ void cdvdman_create_semaphores(void)
 	smp.option = 0;
 
 	cdvdman_lockreadsema = CreateSema(&smp);
-
-	smp.initial = 0;
-	smp.max = 1;
-	smp.attr = 0;
-	smp.option = 0;
-
-	cdvdman_poffsema = CreateSema(&smp);
 #endif
 }
 

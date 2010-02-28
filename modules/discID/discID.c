@@ -17,29 +17,29 @@
 #define MODNAME "discID"
 IRX_ID(MODNAME, 1, 1);
 
-#define CDVDreg_30		      (*(volatile unsigned char *)0xBF402030)
-#define CDVDreg_31		      (*(volatile unsigned char *)0xBF402031)
-#define CDVDreg_32		      (*(volatile unsigned char *)0xBF402032)
-#define CDVDreg_33		      (*(volatile unsigned char *)0xBF402033)
-#define CDVDreg_34		      (*(volatile unsigned char *)0xBF402034)
-#define CDVDreg_KEYSTATE      (*(volatile unsigned char *)0xBF402038)
-#define CDVDreg_KEYXOR        (*(volatile unsigned char *)0xBF402039)
+#define CDVDreg_30		(*(volatile unsigned char *)0xBF402030)
+#define CDVDreg_31		(*(volatile unsigned char *)0xBF402031)
+#define CDVDreg_32		(*(volatile unsigned char *)0xBF402032)
+#define CDVDreg_33		(*(volatile unsigned char *)0xBF402033)
+#define CDVDreg_34		(*(volatile unsigned char *)0xBF402034)
+#define CDVDreg_KEYSTATE	(*(volatile unsigned char *)0xBF402038)
+#define CDVDreg_KEYXOR		(*(volatile unsigned char *)0xBF402039)
 
 typedef struct {
-	u8 trycount; 		
-	u8 spindlctrl; 		
-	u8 datapattern; 	
-	u8 pad; 			
+	u8 trycount;
+	u8 spindlctrl;
+	u8 datapattern;
+	u8 pad;
 } cd_read_mode_t;
 
 // cdvdman imports
-int sceCdInit(int init_mode);												// #4
-int sceCdStandby(void);														// #5
-int sceCdSync(int mode); 													// #11
-int sceCdGetDiskType(void);													// #12
-int sceCdDiskReady(int mode); 												// #13
-int sceCdStop(void); 														// #15
-int sceCdReadKey(int arg1, int arg2, u32 lsn, char *key);					// #35
+int sceCdInit(int init_mode);					// #4
+int sceCdStandby(void);						// #5
+int sceCdSync(int mode); 					// #11
+int sceCdGetDiskType(void);					// #12
+int sceCdDiskReady(int mode); 					// #13
+int sceCdStop(void); 						// #15
+int sceCdReadKey(int arg1, int arg2, u32 lsn, char *key);	// #35
 
 // driver ops protypes
 int discID_dummy(void);
@@ -66,12 +66,12 @@ void *discID_ops[17] = {
 	(void*)discID_dummy,
 	(void*)discID_dummy,
 	(void*)discID_dummy,
-	(void*)discID_dummy,
+	(void*)discID_dummy
 };
 
 // driver descriptor
 static iop_device_t discID_dev = {
-	"discID", 
+	"discID",
 	IOP_DT_FS,
 	1,
 	"discID",
@@ -98,7 +98,7 @@ int discID_init(iop_device_t *dev)
 	smp.option = 0;
 
 	discID_io_sema = CreateSema(&smp);
-		
+
 	return 0;
 }
 
@@ -106,7 +106,7 @@ int discID_init(iop_device_t *dev)
 int discID_deinit(iop_device_t *dev)
 {
 	DeleteSema(discID_io_sema);
-	
+
 	return 0;
 }
 
@@ -205,7 +205,7 @@ int discID_read(iop_file_t *f, void *buf, u32 size)
 
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
-{	
+{
 	DelDrv("discID");
 	AddDrv((iop_device_t *)&discID_dev);
 
@@ -222,4 +222,3 @@ DECLARE_IMPORT(13, sceCdDiskReady)
 DECLARE_IMPORT(15, sceCdStop)
 DECLARE_IMPORT(35, sceCdReadKey)
 END_IMPORT_TABLE
-

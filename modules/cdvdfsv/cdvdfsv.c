@@ -20,41 +20,41 @@
 IRX_ID(MODNAME, 1, 1);
 
 typedef struct {
-	u8 stat;  			
-	u8 second; 			
-	u8 minute; 			
-	u8 hour; 			
-	u8 week; 			
-	u8 day; 			
-	u8 month; 			
-	u8 year; 			
+	u8 stat;
+	u8 second;
+	u8 minute;
+	u8 hour;
+	u8 week;
+	u8 day;
+	u8 month;
+	u8 year;
 } cd_clock_t;
 
 typedef struct {
-	u32 lsn; 			
-	u32 size; 			
-	char name[16]; 		
-	u8 date[8]; 		
+	u32	lsn;
+	u32	size;
+	char	name[16];
+	u8	date[8];
 } cd_file_t;
 
 typedef struct {
-	u32 lsn; 			
-	u32 size; 			
-	char name[16]; 		
-	u8 date[8];
-	u32 flag; 		
+	u32	lsn;
+	u32	size;
+	char	name[16];
+	u8	date[8];
+	u32	flag;
 } cdl_file_t;
 
 typedef struct {
-	u8 trycount; 		
-	u8 spindlctrl; 		
-	u8 datapattern; 	
-	u8 pad; 			
+	u8	trycount;
+	u8	spindlctrl;
+	u8	datapattern;
+	u8	pad;
 } cd_read_mode_t;
 
 // cdGetError() return values
-#define CDVD_ERR_FAIL		-1			// error in cdGetError()
-#define CDVD_ERR_NO			0x00		// no error occurred
+#define CDVD_ERR_FAIL		-1		// error in cdGetError()
+#define CDVD_ERR_NO		0x00		// no error occurred
 #define CDVD_ERR_ABRT		0x01		// command was aborted due to cdBreak() call
 #define CDVD_ERR_CMD		0x10		// unsupported command
 #define CDVD_ERR_OPENS		0x11		// tray is open
@@ -71,121 +71,121 @@ typedef struct {
 #define CDVD_ERR_READCFR  	0xFE		// error setting command
 
 // cdvdman imports
-int sceCdInit(int init_mode);												// #4
-int sceCdStandby(void);														// #5
-int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode); 		// #6
-int sceCdSeek(u32 lsn);														// #7
-int sceCdGetError(void); 													// #8
-int sceCdSearchFile(cd_file_t *fp, const char *name); 						// #10
-int sceCdSync(int mode); 													// #11
-int sceCdGetDiskType(void);													// #12
-int sceCdDiskReady(int mode); 												// #13
-int sceCdTrayReq(int mode, u32 *traycnt); 									// #14
-int sceCdStop(void); 														// #15
-int sceCdReadClock(cd_clock_t *rtc); 										// #24
-int sceCdStatus(void); 														// #28
-int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out); 				// #29
-int sceCdPause(void);														// #38
-int sceCdBreak(void);														// #39
-int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr); 				// #56
-int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err); 				// #57
-int sceCdStSeek(u32 lsn);													// #58			
-int sceCdStStart(u32 lsn, cd_read_mode_t *mode);							// #59
-int sceCdStStat(void); 														// #60
-int sceCdStStop(void);														// #61	
-int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode);		// #62
-int sceCdStPause(void);														// #67
-int sceCdStResume(void); 													// #68
-int sceCdMmode(int mode); 													// #75
-int sceCdStSeekF(u32 lsn); 													// #77
-int sceCdReadDiskID(void *DiskID);											// #79
-int sceCdReadGUID(void *GUID);												// #80
-int sceCdSetTimeout(int param, int timeout);								// #81
-int sceCdReadModelID(void *ModelID);										// #82
-int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); 					// #83
-int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer);		// #84
+int sceCdInit(int init_mode);						// #4
+int sceCdStandby(void);							// #5
+int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode); 	// #6
+int sceCdSeek(u32 lsn);							// #7
+int sceCdGetError(void); 						// #8
+int sceCdSearchFile(cd_file_t *fp, const char *name); 			// #10
+int sceCdSync(int mode); 						// #11
+int sceCdGetDiskType(void);						// #12
+int sceCdDiskReady(int mode); 						// #13
+int sceCdTrayReq(int mode, u32 *traycnt); 				// #14
+int sceCdStop(void); 							// #15
+int sceCdReadClock(cd_clock_t *rtc); 					// #24
+int sceCdStatus(void); 							// #28
+int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out); 		// #29
+int sceCdPause(void);							// #38
+int sceCdBreak(void);							// #39
+int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr); 		// #56
+int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err); 		// #57
+int sceCdStSeek(u32 lsn);						// #58
+int sceCdStStart(u32 lsn, cd_read_mode_t *mode);			// #59
+int sceCdStStat(void); 							// #60
+int sceCdStStop(void);							// #61
+int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode);	// #62
+int sceCdStPause(void);							// #67
+int sceCdStResume(void); 						// #68
+int sceCdMmode(int mode); 						// #75
+int sceCdStSeekF(u32 lsn); 						// #77
+int sceCdReadDiskID(void *DiskID);					// #79
+int sceCdReadGUID(void *GUID);						// #80
+int sceCdSetTimeout(int param, int timeout);				// #81
+int sceCdReadModelID(void *ModelID);					// #82
+int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); 		// #83
+int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer);	// #84
 
-typedef struct {		
-	int func_ret;
-	int cdvdfsv_ver;
-	int cdvdman_ver;
-	int debug_mode;
+typedef struct {
+	int	func_ret;
+	int	cdvdfsv_ver;
+	int	cdvdman_ver;
+	int	debug_mode;
 } cdvdinit_res_t;
 
 typedef struct {
-	int result;
+	int	result;
 	cd_clock_t rtc;
 } cdvdreadclock_res_t;
 
 typedef struct {
-	int result;
-	u32 param1;
-	u32 param2;	
+	int	result;
+	u32	param1;
+	u32	param2;
 } cdvdSCmd_res_t;
 
 typedef struct {
-	u16 cmd;
-	u16 in_size;
-	void *in;
+	u16	cmd;
+	u16	in_size;
+	void	*in;
 } cdapplySCmd_t __attribute__((aligned(64)));
 
-typedef struct {        // size =0x124
-	cd_file_t cdfile; 	// 0x000
-	char name[256]; 	// 0x020
-	void *dest;			// 0x120
+typedef struct {		// size =0x124
+	cd_file_t cdfile;	// 0x000
+	char	name[256]; 	// 0x020
+	void	*dest;		// 0x120
 } SearchFilePkt_t;
 
 typedef struct {		// size =0x128
 	cdl_file_t cdfile; 	// 0x000
-	char name[256]; 	// 0x024
-	void *dest;			// 0x124
+	char	name[256]; 	// 0x024
+	void	*dest;		// 0x124
 } SearchFilePkt2_t;
 
 typedef struct {		// size =0x12c
 	cdl_file_t cdfile; 	// 0x000
-	char name[256]; 	// 0x024
-	void *dest;			// 0x124
-	int layer;			// 0x128
+	char	name[256]; 	// 0x024
+	void	*dest;		// 0x124
+	int	layer;		// 0x128
 } SearchFilePktl_t;
 
 typedef struct {
-	u32 lsn;
-	u32 sectors;
-	void *buf;
+	u32	lsn;
+	u32	sectors;
+	void	*buf;
 	cd_read_mode_t mode;
-	void *eeaddr1;
-	void *eeaddr2;
+	void	*eeaddr1;
+	void	*eeaddr2;
 } RpcCdvd_t;
 
 typedef struct {
-	u32 lsn;
-	u32 sectors;
-	void *buf;
-	int cmd;
+	u32	lsn;
+	u32	sectors;
+	void	*buf;
+	int	cmd;
 	cd_read_mode_t mode;
-	u32 pad;
+	u32	pad;
 } RpcCdvdStream_t;
 
 typedef struct {
-	u32 bufmax;
-	u32 bankmax;
-	void *buf;
-	u32 pad;	
+	u32	bufmax;
+	u32	bankmax;
+	void	*buf;
+	u32	pad;
 } RpcCdvdStInit_t;
 
 typedef struct {
-	u32 lsn;		// sector location to start reading from
-	u32 sectors;	// number of sectors to read
-	void *buf;		// buffer address to read to ( bit0: 0=EE, 1=IOP )
-} RpcCdvdchain_t;	// (EE addresses must be on 64byte alignment)
+	u32	lsn;		// sector location to start reading from
+	u32	sectors;	// number of sectors to read
+	void	*buf;		// buffer address to read to ( bit0: 0=EE, 1=IOP )
+} RpcCdvdchain_t;		// (EE addresses must be on 64byte alignment)
 
 typedef struct { // size = 144
-	u32 b1len;
-	u32 b2len;
-	void *pdst1;
-	void *pdst2;
-	u8 buf1[64];
-	u8 buf2[64];
+	u32	b1len;
+	u32	b2len;
+	void	*pdst1;
+	void	*pdst2;
+	u8	buf1[64];
+	u8	buf2[64];
 } cdvdfsv_readee_t;
 
 // internal prototypes
@@ -249,9 +249,9 @@ void sendcurlsnEE(void *eeaddr, u32 lsn);
 
 // rpcSCmd funcs array
 void *rpcSCmd_tab[40] = {
-    (void *)rpcSCmd_dummy,
-    (void *)rpcSCmd_cdreadclock,
-	(void *)rpcSCmd_dummy, // cdwriteclock
+	(void *)rpcSCmd_dummy,
+	(void *)rpcSCmd_cdreadclock,
+	(void *)rpcSCmd_dummy,		// cdwriteclock
 	(void *)rpcSCmd_cdgetdisktype,
 	(void *)rpcSCmd_cdgeterror,
 	(void *)rpcSCmd_cdtrayreq,
@@ -280,11 +280,11 @@ void *rpcSCmd_tab[40] = {
 	(void *)rpcSCmd_dummy,
 	(void *)rpcSCmd_dummy,
 	(void *)rpcSCmd_dummy,
-	(void *)rpcSCmd_dummy, // CancelPowerOff
-	(void *)rpcSCmd_dummy, // BlueLedCtrl
+	(void *)rpcSCmd_dummy,		// CancelPowerOff
+	(void *)rpcSCmd_dummy,		// BlueLedCtrl
 	(void *)rpcSCmd_cdpoweroff,
 	(void *)rpcSCmd_cdmmode,
-	(void *)rpcSCmd_dummy, // SetThreadPriority
+	(void *)rpcSCmd_dummy,		// SetThreadPriority
 	(void *)rpcSCmd_cdreadGUID,
 	(void *)rpcSCmd_cdsettimeout,
 	(void *)rpcSCmd_cdreadModelID,
@@ -293,44 +293,44 @@ void *rpcSCmd_tab[40] = {
 
 // rpcNCmd funcs array
 void *rpcNCmd_tab[24] = {
-    (void *)rpcNCmd_dummy,
-    (void *)rpcNCmd_cdread,
-    (void *)rpcNCmd_cdread,		// Cdda Read
-    (void *)rpcNCmd_cdread,		// Dvd Read
-    (void *)rpcNCmd_cdgettoc,
-    (void *)rpcNCmd_cdseek,
-    (void *)rpcNCmd_cdstandby,
-    (void *)rpcNCmd_cdstop,
-    (void *)rpcNCmd_cdpause,
-    (void *)rpcNCmd_cdstream,
-    (void *)rpcNCmd_dummy,		// CDDA Stream
-    (void *)rpcNCmd_dummy,    
-    (void *)rpcNCmd_dummy,		// Apply NCMD
-    (void *)rpcNCmd_iopmread,
-    (void *)rpcNCmd_cddiskready,
-    (void *)rpcNCmd_cdreadchain,
-    (void *)rpcNCmd_dummy,
-    (void *)rpcNCmd_cdreadDiskID,
-    (void *)rpcNCmd_dummy,
-    (void *)rpcNCmd_dummy,		// ???
-    (void *)rpcNCmd_dummy,
-    (void *)rpcNCmd_dummy,
-    (void *)rpcNCmd_dummy,
-    (void *)rpcNCmd_cdgetdisktype
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_cdread,
+	(void *)rpcNCmd_cdread,		// Cdda Read
+	(void *)rpcNCmd_cdread,		// Dvd Read
+	(void *)rpcNCmd_cdgettoc,
+	(void *)rpcNCmd_cdseek,
+	(void *)rpcNCmd_cdstandby,
+	(void *)rpcNCmd_cdstop,
+	(void *)rpcNCmd_cdpause,
+	(void *)rpcNCmd_cdstream,
+	(void *)rpcNCmd_dummy,		// CDDA Stream
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_dummy,		// Apply NCMD
+	(void *)rpcNCmd_iopmread,
+	(void *)rpcNCmd_cddiskready,
+	(void *)rpcNCmd_cdreadchain,
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_cdreadDiskID,
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_dummy,		// ???
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_dummy,
+	(void *)rpcNCmd_cdgetdisktype
 };
 
 // cdvdStsubcall funcs array
 void *cdvdStsubcall_tab[10] = {
-    (void *)cdvdSt_dummy,
-    (void *)cdvdSt_start,
-    (void *)cdvdSt_read,
-    (void *)cdvdSt_stop,
-    (void *)cdvdSt_seek,
-    (void *)cdvdSt_init,
-    (void *)cdvdSt_stat,
-    (void *)cdvdSt_pause,
-    (void *)cdvdSt_resume,
-    (void *)cdvdSt_seekF
+	(void *)cdvdSt_dummy,
+	(void *)cdvdSt_start,
+	(void *)cdvdSt_read,
+	(void *)cdvdSt_stop,
+	(void *)cdvdSt_seek,
+	(void *)cdvdSt_init,
+	(void *)cdvdSt_stat,
+	(void *)cdvdSt_pause,
+	(void *)cdvdSt_resume,
+	(void *)cdvdSt_seekF
 };
 
 cd_read_mode_t cdvdfsv_Stmode;
@@ -359,17 +359,17 @@ static u8 curlsn_buf[16] __attribute__ ((aligned(64)));
 
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
-{			
+{
 	iop_thread_t thread_param;
 	int thread_id;
-	
+
 	FlushDcache();
 	CpuEnableIntr();
 
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)init_thread;
- 	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x2000;
 	thread_param.priority = 0x51;
 
 	thread_id = CreateThread(&thread_param);
@@ -385,12 +385,12 @@ void init_thread(void *args)
 		sceSifInit();
 
 	sceSifInitRpc(0);
-	
+
 	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, (CDVDFSV_BUF_SECTORS << 11)+2048, NULL);
 	if (!cdvdfsv_buf)
 		SleepThread();
-		
-	cdvdfsv_startrpcthreads();	
+
+	cdvdfsv_startrpcthreads();
 }
 
 //-------------------------------------------------------------------------
@@ -402,7 +402,7 @@ void cdvdfsv_startrpcthreads(void)
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)cdvdfsv_rpc1_th;
- 	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x2000;
 	thread_param.priority = 0x51;
 
 	thread_id = CreateThread(&thread_param);
@@ -411,30 +411,30 @@ void cdvdfsv_startrpcthreads(void)
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)cdvdfsv_rpc2_th;
- 	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x2000;
 	thread_param.priority = 0x51;
-	
+
 	thread_id = CreateThread(&thread_param);
 	StartThread(thread_id, 0);
 
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)cdvdfsv_rpc0_th;
- 	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x2000;
 	thread_param.priority = 0x51;
-	
+
 	thread_id = CreateThread(&thread_param);
-	StartThread(thread_id, 0);		
+	StartThread(thread_id, 0);
 }
 
 //-------------------------------------------------------------------------
 void cdvdfsv_rpc0_th(void *args)
 {
-	sceSifSetRpcQueue(&rpc0_DQ, GetThreadId());	
-	
-	sceSifRegisterRpc(&S596_rpcSD, 0x80000596, (void *)cbrpc_S596, S596_rpcbuf, NULL, NULL, &rpc0_DQ);	
+	sceSifSetRpcQueue(&rpc0_DQ, GetThreadId());
+
+	sceSifRegisterRpc(&S596_rpcSD, 0x80000596, (void *)cbrpc_S596, S596_rpcbuf, NULL, NULL, &rpc0_DQ);
 	sceSifRegisterRpc(&cddiskready2_rpcSD, 0x8000059c, (void *)cbrpc_cddiskready2, cddiskready2_rpcbuf, NULL, NULL, &rpc0_DQ);
-		
+
 	sceSifRpcLoop(&rpc0_DQ);
 }
 
@@ -446,11 +446,11 @@ void cdvdfsv_rpc1_th(void *args)
 	// Starts SCMD rpc server;
 
 	sceSifSetRpcQueue(&rpc1_DQ, GetThreadId());	
-	
+
 	sceSifRegisterRpc(&cdinit_rpcSD, 0x80000592, (void *)cbrpc_cdinit, cdinit_rpcbuf, NULL, NULL, &rpc1_DQ);
 	sceSifRegisterRpc(&cdvdScmds_rpcSD, 0x80000593, (void *)cbrpc_cdvdScmds, cdvdScmds_rpcbuf, NULL, NULL, &rpc1_DQ);
 	sceSifRegisterRpc(&cddiskready_rpcSD, 0x8000059a, (void *)cbrpc_cddiskready, cddiskready_rpcbuf, NULL, NULL, &rpc1_DQ);
-		
+
 	sceSifRpcLoop(&rpc1_DQ);
 }
 
@@ -459,12 +459,12 @@ void cdvdfsv_rpc2_th(void *args)
 {
 	// Starts NCMD rpc server
 	// Starts Search file rpc server 
-	
-	sceSifSetRpcQueue(&rpc2_DQ, GetThreadId());	
-	
+
+	sceSifSetRpcQueue(&rpc2_DQ, GetThreadId());
+
 	sceSifRegisterRpc(&cdvdNcmds_rpcSD, 0x80000595, (void *)cbrpc_cdvdNcmds, cdvdNcmds_rpcbuf, NULL, NULL, &rpc2_DQ);
 	sceSifRegisterRpc(&cdsearchfile_rpcSD, 0x80000597, (void *)cbrpc_cdsearchfile, cdsearchfile_rpcbuf, NULL, NULL, &rpc2_DQ);
-		
+
 	sceSifRpcLoop(&rpc2_DQ);
 }
 
@@ -475,11 +475,11 @@ void *cbrpc_cdinit(u32 fno, void *buf, int size)
 	cdvdinit_res_t *r = (cdvdinit_res_t *)buf;
 
 	r->func_ret = sceCdInit(*(int *)buf);
-	
+
 	r->cdvdfsv_ver = 0x223;
 	r->cdvdman_ver = 0x223;
 	//r->debug_mode = 0xff;
-		
+
 	return buf;
 }
 
@@ -489,11 +489,11 @@ void *cbrpc_cdvdScmds(u32 fno, void *buf, int size)
 
 	if ((u32)(fno >= 40))
 		return rpcSCmd_dummy(fno, buf, size);
-	
-	// Call SCMD RPC sub function		
+
+	// Call SCMD RPC sub function
 	rpcSCmd_fn = (void *)rpcSCmd_tab[fno];
-	
-	return rpcSCmd_fn(fno, buf, size);	
+
+	return rpcSCmd_fn(fno, buf, size);
 }
 
 //-------------------------------------------------------------- 
@@ -501,7 +501,7 @@ void *rpcSCmd_cdapplySCmd(u32 fno, void *buf, int size)
 {	// CD ApplySCMD RPC SCMD
 
 	cdapplySCmd_t *SCmd = (cdapplySCmd_t *)buf;
-	
+
 	sceCdApplySCmd(SCmd->cmd, SCmd->in, SCmd->in_size, buf);
 	return buf;
 }
@@ -526,7 +526,7 @@ void *rpcSCmd_cdgetdisktype(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcSCmd_cdgeterror(u32 fno, void *buf, int size)
 {	// CD Get Error RPC SCMD
-	
+
 	*(int *)buf = sceCdGetError();
 	return buf;
 }
@@ -534,9 +534,9 @@ void *rpcSCmd_cdgeterror(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcSCmd_cdtrayreq(u32 fno, void *buf, int size)
 {	// CD Tray Req RPC SCMD
-	
+
 	cdvdSCmd_res_t *r = (cdvdSCmd_res_t *)buf;
-	
+
 	r->result = sceCdTrayReq(*((int *)buf), &r->param1);
 	return buf;
 }
@@ -623,22 +623,22 @@ void *rpcSCmd_dummy(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *cbrpc_cddiskready(u32 fno, void *buf, int size)
 {	// CD Disk Ready RPC callback
-	
+
 	if (*(int *)buf == 0)
 		*(int *)buf = sceCdDiskReady(0);
 	else
 		*(int *)buf = sceCdDiskReady(1);
-	
+
 	return buf;	
 }
 
 //-------------------------------------------------------------------------
 void *cbrpc_cddiskready2(u32 fno, void *buf, int size)
 {	// CD Disk Ready2 RPC callback
-	
+
 	*(int *)buf = sceCdDiskReady(0);
-	
-	return buf;	
+
+	return buf;
 }
 
 //-------------------------------------------------------------------------
@@ -648,10 +648,10 @@ void *cbrpc_cdvdNcmds(u32 fno, void *buf, int size)
 	if ((u32)(fno >= 24))
 		return rpcNCmd_dummy(fno, buf, size);
 
-	// Call NCMD RPC sub function						
+	// Call NCMD RPC sub function
 	rpcNCmd_fn = (void *)rpcNCmd_tab[fno];
-	
-	return rpcNCmd_fn(fno, buf, size);		
+
+	return rpcNCmd_fn(fno, buf, size);
 }
 
 //-------------------------------------------------------------------------
@@ -665,7 +665,7 @@ void *rpcNCmd_cdread(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdgettoc(u32 fno, void *buf, int size)
 {	// CD Get TOC RPC NCMD
-	
+
 	*(int *)buf = 1;
 	return buf;
 }
@@ -673,9 +673,9 @@ void *rpcNCmd_cdgettoc(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdseek(u32 fno, void *buf, int size)
 {	// CD Seek RPC NCMD
-	
+
 	*(int *)buf = sceCdSeek(*(u32 *)buf);
-	return buf;				
+	return buf;
 }
 
 //-------------------------------------------------------------------------
@@ -689,7 +689,7 @@ void *rpcNCmd_cdstandby(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdstop(u32 fno, void *buf, int size)
 {	// CD Stop RPC NCMD
-	
+
 	*(int *)buf = sceCdStop();
 	return buf;
 }
@@ -697,7 +697,7 @@ void *rpcNCmd_cdstop(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdpause(u32 fno, void *buf, int size)
 {	// CD Pause RPC NCMD
-	
+
 	*(int *)buf = sceCdPause();
 	return buf;
 }
@@ -705,7 +705,7 @@ void *rpcNCmd_cdpause(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdstream(u32 fno, void *buf, int size)
 {	// CD Stream RPC NCMD
-	
+
 	cdvd_Stsubcmdcall(buf);
 	return buf;
 }
@@ -721,15 +721,15 @@ void *rpcNCmd_iopmread(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void *rpcNCmd_cddiskready(u32 fno, void *buf, int size)
 {	// CD Disk Ready RPC NCMD
-	
+
 	*(int *)buf = sceCdDiskReady(0);
-	return buf;				
+	return buf;
 }
 
 //-------------------------------------------------------------------------
 void *rpcNCmd_cdreadchain(u32 fno, void *buf, int size)
 {	// CD ReadChain RPC NCMD
-	
+
 	cdvd_readchain(buf);
 	return buf;
 }
@@ -741,8 +741,8 @@ void *rpcNCmd_cdreadDiskID(u32 fno, void *buf, int size)
 
 	mips_memset(p, 0, 10);
 	*(int *)buf = sceCdReadDiskID(&p[4]);
-	
-	return buf;	
+
+	return buf;
 }
 
 //-------------------------------------------------------------------------
@@ -751,8 +751,8 @@ void *rpcNCmd_cdgetdisktype(u32 fno, void *buf, int size)
 	u8 *p = (u8 *)buf;
 	*(int *)&p[4] = sceCdGetDiskType();
 	*(int *)&p[0] = 1;
-	
-	return buf;	
+
+	return buf;
 }
 
 //-------------------------------------------------------------------------
@@ -764,18 +764,18 @@ void *rpcNCmd_dummy(u32 fno, void *buf, int size)
 
 //-------------------------------------------------------------- 
 void *cbrpc_S596(u32 fno, void *buf, int size)
-{ 	
+{
 	if (fno != 1)
 		return (void *)NULL;
-	
+
 	if (*(u32 *)buf == fno)
 		return (void *)&cbrpcS596_oldfno;
-		
+
 	cbrpcS596_oldfno = cbrpcS596_fno;
 
 	cbrpcS596_fno = fno;
-	
-	return (void *)&cbrpcS596_oldfno;					
+
+	return (void *)&cbrpcS596_oldfno;
 }
 
 //-------------------------------------------------------------------------
@@ -787,12 +787,12 @@ void *cbrpc_cdsearchfile(u32 fno, void *buf, int size)
 	void *ee_addr;
 	char *p;
 	SearchFilePkt_t *pkt = (SearchFilePkt_t *)buf;
-	SearchFilePkt2_t *pkt2 = (SearchFilePkt2_t *)buf;	
+	SearchFilePkt2_t *pkt2 = (SearchFilePkt2_t *)buf;
 	SearchFilePktl_t *pktl = (SearchFilePktl_t *)buf;
 	int pktsize = 0;
-	
+
 	if (size == sizeof(SearchFilePkt2_t)) {
-		ee_addr = (void *)pkt2->dest; 			 // Search File: Called from Not Dual_layer Version
+		ee_addr = (void *)pkt2->dest; 		// Search File: Called from Not Dual_layer Version
 		p = (void *)&pkt2->name[0];
 		pktsize = sizeof(cdl_file_t);
 		r = sceCdSearchFile((cd_file_t *)buf, p);
@@ -806,7 +806,7 @@ void *cbrpc_cdsearchfile(u32 fno, void *buf, int size)
 			r = sceCdLayerSearchFile((cdl_file_t *)buf, p, pktl->layer);
 			pktl->cdfile.flag = 0;
 		}
-		else {									// Search File: Called from Old Library
+		else {					// Search File: Called from Old Library
 			ee_addr = (void *)pkt->dest;
 			p = (char *)&pkt->name[0];
 			pktsize = sizeof(cd_file_t);
@@ -823,7 +823,7 @@ void *cbrpc_cdsearchfile(u32 fno, void *buf, int size)
 	while (!sceSifSetDma(&dmat, 1));
 	CpuResumeIntr(oldstate);
 	//while (sceSifDmaStat >= 0);
-	
+
 	*(int *)buf = r;
 
 	return buf;
@@ -832,15 +832,15 @@ void *cbrpc_cdsearchfile(u32 fno, void *buf, int size)
 //-------------------------------------------------------------------------
 void cdvd_Stsubcmdcall(void *buf)
 {	// call a Stream Sub function (below) depending on stream cmd sent
-	
+
 	RpcCdvdStream_t *St = (RpcCdvdStream_t *)buf;
-			
+
 	if ((u32)(St->cmd >= 10)) {
 		cdvdSt_dummy(buf);
 		return;
 	}
-	
-	cdvd_Stsubcall_fn = cdvdStsubcall_tab[St->cmd]; 		
+
+	cdvd_Stsubcall_fn = cdvdStsubcall_tab[St->cmd];
 	cdvd_Stsubcall_fn(buf);
 }
 
@@ -854,7 +854,7 @@ void cdvdSt_dummy(void *buf)
 void cdvdSt_start(void *buf)
 {
 	RpcCdvdStream_t *St = (RpcCdvdStream_t *)buf;
-	
+
 	*(int *)buf = sceCdStStart(St->lsn, &cdvdfsv_Stmode);
 }
 
@@ -919,7 +919,7 @@ void cdvdSt_stop(void *buf)
 void cdvdSt_seek(void *buf)
 {
 	RpcCdvdStream_t *St = (RpcCdvdStream_t *)buf;
-		
+
 	*(int *)buf = sceCdStSeek(St->lsn);
 }
 
@@ -927,7 +927,7 @@ void cdvdSt_seek(void *buf)
 void cdvdSt_init(void *buf)
 {
 	RpcCdvdStInit_t *r = (RpcCdvdStInit_t *)buf;
-		
+
 	*(int *)buf = sceCdStInit(r->bufmax, r->bankmax, r->buf);
 }
 
@@ -953,7 +953,7 @@ void cdvdSt_resume(void *buf)
 void cdvdSt_seekF(void *buf)
 {
 	RpcCdvdStream_t *St = (RpcCdvdStream_t *)buf;
-		
+
 	*(int *)buf = sceCdStSeekF(St->lsn);
 }
 
@@ -994,7 +994,7 @@ void cdvd_readchain(void *buf)
 			if ((u32)ch->buf & 1) { // IOP addr
 				sceCdRead0(lsn, nsectors, (void *)addr, NULL);
 			}
-			else {					// EE addr
+			else {			// EE addr
 				sceCdRead0(lsn, nsectors, cdvdfsv_buf, NULL);
 				sysmemSendEE(cdvdfsv_buf, (void *)addr, nsectors << 11);
 			}
@@ -1002,7 +1002,7 @@ void cdvd_readchain(void *buf)
 			lsn += nsectors;
 			tsectors -= nsectors;
 			addr += nsectors << 11;
-		}			
+		}
 		ch++;
 	}
 
@@ -1028,14 +1028,14 @@ void cdvd_readee(void *buf)
 
 	if ((r->mode.datapattern & 0xff) != 1) {
 		sector_size = 2340;
-		if ((r->mode.datapattern & 0xff) != 2) 
+		if ((r->mode.datapattern & 0xff) != 2)
 			sector_size = 2048;
 	}
 
 	r->eeaddr1 = (void *)((u32)r->eeaddr1 & 0x1fffffff);
 	r->eeaddr2 = (void *)((u32)r->eeaddr2 & 0x1fffffff);
 	r->buf = (void *)((u32)r->buf & 0x1fffffff);
-	
+
 	sceCdDiskReady(0);
 
 	sectors_to_read = r->sectors;  
@@ -1043,7 +1043,7 @@ void cdvd_readee(void *buf)
 
 	if (r->eeaddr2)
 		mips_memset((void *)curlsn_buf, 0, 16);
-	
+
 	readee.pdst1 = (void *)r->buf;
 	eeaddr_64b = (void *)(((u32)r->buf + 0x3f) & 0xffffffc0); // get the next 64-bytes aligned address
 
@@ -1067,10 +1067,10 @@ void cdvd_readee(void *buf)
 		if (temp)
 			flag_64b = 0;
 		else
-			flag_64b = 1;	
-	}	
+			flag_64b = 1;
+	}
 
-	while (1) {		
+	while (1) {
 		do {
 			if ((sectors_to_read == 0) || (sceCdGetError() == CDVD_ERR_ABRT)) {
 
@@ -1090,7 +1090,7 @@ void cdvd_readee(void *buf)
 				if (sectors_to_read < CDVDFSV_BUF_SECTORS)
 					nsectors = sectors_to_read;
 				else
-					nsectors = CDVDFSV_BUF_SECTORS-1;	
+					nsectors = CDVDFSV_BUF_SECTORS-1;
 				temp = nsectors + 1;
 			}
 			else { // 64 bytes aligned buf
@@ -1098,7 +1098,7 @@ void cdvd_readee(void *buf)
 					nsectors = sectors_to_read;
 				else
 					nsectors = CDVDFSV_BUF_SECTORS;
-				temp = nsectors;		
+				temp = nsectors;
 			}
 
 			sceCdRead0(r->lsn, temp, (void *)fsvRbuf, NULL);
@@ -1114,7 +1114,7 @@ void cdvd_readee(void *buf)
 					size_64bb = size_64b - 64;
 			}
 
-			if (size_64bb > 0) { 
+			if (size_64bb > 0) {
 				sysmemSendEE((void *)(fsvRbuf + readee.b1len), (void *)eeaddr_64b, size_64bb);
 				bytesent += size_64bb;
 			}
@@ -1125,8 +1125,8 @@ void cdvd_readee(void *buf)
 					temp += 2047;
 				temp = temp >> 11;
 				*((u32 *)&curlsn_buf[0]) = temp;
-				sysmemSendEE((void *)curlsn_buf, (void *)r->eeaddr2, 16);	
-			}	
+				sysmemSendEE((void *)curlsn_buf, (void *)r->eeaddr2, 16);
+			}
 
 			sectors_to_read -= nsectors;
 			r->lsn += nsectors;

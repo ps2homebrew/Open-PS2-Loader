@@ -124,16 +124,16 @@ DECLARE_EXPORT_TABLE(cdvdman, 1, 1)
 	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(_dummy)
-	DECLARE_EXPORT(_dummy)	
+	DECLARE_EXPORT(_dummy)
 END_EXPORT_TABLE
 
 // cdvdstm export table
 DECLARE_EXPORT_TABLE(cdvdstm, 1, 1)
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
 END_EXPORT_TABLE
 
 #ifdef SMB_DRIVER
@@ -195,16 +195,16 @@ DECLARE_EXPORT_TABLE(atad, 1, 3)
 	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(_dummy)
-	DECLARE_EXPORT(_dummy)	
+	DECLARE_EXPORT(_dummy)
 END_EXPORT_TABLE
 #endif
 
 // smsutils export table
 DECLARE_EXPORT_TABLE(smsutils, 1, 1)
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(_retonly)	
-	DECLARE_EXPORT(mips_memcpy)	
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(mips_memcpy)
 	DECLARE_EXPORT(mips_memset)
 END_EXPORT_TABLE

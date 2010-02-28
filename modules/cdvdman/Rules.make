@@ -51,4 +51,3 @@ $(IOP_BIN) : $(IOP_OBJS)
 
 $(IOP_LIB) : $(IOP_OBJS)
 	$(IOP_AR) cru $(IOP_LIB) $(IOP_OBJS)
-

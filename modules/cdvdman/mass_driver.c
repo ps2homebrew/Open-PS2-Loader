@@ -20,16 +20,16 @@ extern int *p_part_start;
 
 #define getBI32(__buf) ((((u8 *) (__buf))[3] << 0) | (((u8 *) (__buf))[2] << 8) | (((u8 *) (__buf))[1] << 16) | (((u8 *) (__buf))[0] << 24))
 
-#define USB_SUBCLASS_MASS_RBC			0x01
-#define USB_SUBCLASS_MASS_ATAPI			0x02
-#define USB_SUBCLASS_MASS_QIC			0x03
-#define USB_SUBCLASS_MASS_UFI			0x04
+#define USB_SUBCLASS_MASS_RBC		0x01
+#define USB_SUBCLASS_MASS_ATAPI		0x02
+#define USB_SUBCLASS_MASS_QIC		0x03
+#define USB_SUBCLASS_MASS_UFI		0x04
 #define USB_SUBCLASS_MASS_SFF_8070I 	0x05
-#define USB_SUBCLASS_MASS_SCSI			0x06
+#define USB_SUBCLASS_MASS_SCSI		0x06
 
-#define USB_PROTOCOL_MASS_CBI			0x00
+#define USB_PROTOCOL_MASS_CBI		0x00
 #define USB_PROTOCOL_MASS_CBI_NO_CCI	0x01
-#define USB_PROTOCOL_MASS_BULK_ONLY		0x50
+#define USB_PROTOCOL_MASS_BULK_ONLY	0x50
 
 #define TAG_TEST_UNIT_READY     0
 #define TAG_REQUEST_SENSE	3
@@ -50,22 +50,22 @@ typedef struct _cbw_packet
 	unsigned int signature;
 	unsigned int tag;
 	unsigned int dataTransferLength;
-	unsigned char flags;            //80->data in,  00->out
+	unsigned char flags;		//80->data in,  00->out
 	unsigned char lun;
-	unsigned char comLength;		//command data length
-	unsigned char comData[16];		//command data
+	unsigned char comLength;	//command data length
+	unsigned char comData[16];	//command data
 } cbw_packet __attribute__((packed));
 
 static cbw_packet cbw_test_unit_ready = {
 	CBW_TAG,
 	-TAG_TEST_UNIT_READY,
-	0,					//TUR_REPLY_LENGTH
+	0,				//TUR_REPLY_LENGTH
 	0x80,
 	0,
 	12,
 	{ 0x00, 			//test unit ready operation code
 		 0, 			//lun/reserved
-		 0 ,0 ,0 ,0 ,	//reserved		 
+		 0 ,0 ,0 ,0 ,		//reserved		 
 		 0 ,0 , 0 ,		//reserved
 		 0 ,0 ,0 		//reserved
 	}
@@ -82,7 +82,7 @@ static cbw_packet cbw_request_sense = {
 		 0, 			//lun/reserved
 		 0 ,0 , 		//reserved
 		 0 ,			//allocation length
-		 0 ,0 ,0 ,0 ,	//reserved
+		 0 ,0 ,0 ,0 ,		//reserved
 		 0 ,0 ,0 		//reserved
 	}
 };
@@ -96,10 +96,10 @@ static cbw_packet cbw_inquiry = {
 	12,
 	{ 0x12, 			//inquiry operation code
 		 0, 			//lun/reserved
-		 0,		 		//page code
+		 0,		 	//page code
 		 0 , 			//reserved
 		 0 ,			//inquiry reply length
-		 0 ,0 ,0 ,0 ,	//reserved
+		 0 ,0 ,0 ,0 ,		//reserved
 		 0 ,0 ,0 		//reserved
 	}
 };
@@ -107,7 +107,7 @@ static cbw_packet cbw_inquiry = {
 static cbw_packet cbw_start_stop_unit = {
 	CBW_TAG,
 	-TAG_START_STOP_UNIT,
-	0,					//START_STOP_REPLY_LENGTH
+	0,				//START_STOP_REPLY_LENGTH
 	0x80,
 	0,
 	12,
@@ -115,7 +115,7 @@ static cbw_packet cbw_start_stop_unit = {
 		 1, 			//lun/reserved/immed
 		 0, 0 , 		//reserved
 		 1 , 			//reserved/LoEj/Start "Start the media and acquire the format type"
-		 0 ,0 ,0 ,0 ,	//reserved
+		 0 ,0 ,0 ,0 ,		//reserved
 		 0 ,0 ,0 		//reserved
 	}
 };
@@ -129,7 +129,7 @@ static cbw_packet cbw_read_capacity = {
 	12,
 	{ 0x25, 			//read capacity operation code
 		 0, 			//lun/reserved/RelAdr
-		 0, 0 ,0 ,0 , 	//lba
+		 0, 0 ,0 ,0 , 		//lba
 		 0 , 			//reserved
 		 0 ,0 , 		//reserved/PMI
 		 0 ,0 ,0 		//reserved
@@ -145,7 +145,7 @@ static cbw_packet cbw_read_sector = {
 	12,
 	{ 0x28, 			//read operation code
 		 0, 			//LUN/DPO/FUA/Reserved/Reldr
-		 0, 0 ,0 ,0 , 	//lba
+		 0, 0 ,0 ,0 , 		//lba
 		 0 , 			//reserved
 		 0 ,0 , 		//Transfer length MSB
 		 0 ,0 ,0 		//reserved
@@ -162,8 +162,8 @@ typedef struct _csw_packet
 
 typedef struct _inquiry_data
 {
-    u8 peripheral_device_type;  // 00h - Direct access (Floppy), 1Fh none (no FDD connected)
-    u8 removable_media; // 80h - removeable
+    u8 peripheral_device_type;		// 00h - Direct access (Floppy), 1Fh none (no FDD connected)
+    u8 removable_media; 		// 80h - removeable
     u8 iso_ecma_ansi;
     u8 repsonse_data_format;
     u8 additional_length;
@@ -260,7 +260,7 @@ static void usb_bulk_clear_halt(mass_dev* dev, int direction)
 
 	ret = UsbClearEndpointFeature(
 		dev->controlEp, //Config pipe
-		0,				//HALT feature
+		0,		//HALT feature
 		endpoint,
 		usb_callback,
 		(void*)&cb_data
@@ -280,13 +280,13 @@ static void usb_bulk_reset(mass_dev* dev, int mode)
 
 	//Call Bulk only mass storage reset
 	ret = UsbControlTransfer(
-		dev->controlEp, 		//default pipe
-		0x21,					//bulk reset
+		dev->controlEp, 	//default pipe
+		0x21,			//bulk reset
 		0xFF,
 		0,
 		dev->interfaceNumber, 	//interface number
-		0,						//length
-		NULL,					//data
+		0,			//length
+		NULL,			//data
 		usb_callback,
 		(void*) &cb_data
 		);
@@ -373,13 +373,13 @@ static int usb_bulk_get_max_lun(mass_dev* dev)
 
 	//Call Bulk only mass storage reset
 	ret = UsbControlTransfer(
-		dev->controlEp, 		//default pipe
+		dev->controlEp, 	//default pipe
 		0xA1,
 		0xFE,
 		0,
 		dev->interfaceNumber, 	//interface number
-		1,						//length
-		&max_lun,				//data
+		1,			//length
+		&max_lun,		//data
 		usb_callback,
 		(void*) &cb_data
 		);
@@ -400,9 +400,9 @@ static void usb_bulk_command(mass_dev* dev, cbw_packet* packet )
 	usb_callback_data cb_data;
 
 	ret =  UsbBulkTransfer(
-		dev->bulkEpO,	//bulk output pipe
+		dev->bulkEpO,		//bulk output pipe
 		packet,			//data ptr
-		31,				//data length
+		31,			//data length
 		usb_callback,
 		(void*)&cb_data
 	);
@@ -429,7 +429,7 @@ static int usb_bulk_transfer(int pipe, void* buffer, int transferSize)
 
 		ret = UsbBulkTransfer(
 			pipe,			//bulk pipe epI(Read)  epO(Write)
-			(buf + offset),	//data ptr
+			(buf + offset),		//data ptr
 			blockSize,		//data length
 			usb_callback,
 			(void*)&cb_data
@@ -473,7 +473,7 @@ inline int cbw_scsi_request_sense(mass_dev* dev, void *buffer, int size)
 
 	XPRINTF("mass_driver: cbw_scsi_request_sense\n");
 
-	cbw->dataTransferLength = size;	//REQUEST_SENSE_REPLY_LENGTH
+	cbw->dataTransferLength = size;		//REQUEST_SENSE_REPLY_LENGTH
 	cbw->comData[4] = size;			//allocation length
 
 	usb_bulk_command(dev, cbw);
@@ -494,7 +494,7 @@ inline int cbw_scsi_inquiry(mass_dev* dev, void *buffer, int size)
 
 	XPRINTF("mass_driver: cbw_scsi_inquiry\n");
 
-	cbw->dataTransferLength = size;	//INQUIRY_REPLY_LENGTH
+	cbw->dataTransferLength = size;		//INQUIRY_REPLY_LENGTH
 	cbw->comData[4] = size;			//inquiry reply length
 
 	usb_bulk_command(dev, cbw);
@@ -529,7 +529,7 @@ inline int cbw_scsi_read_capacity(mass_dev* dev, void *buffer, int size)
 
 	XPRINTF("mass_driver: cbw_scsi_read_capacity\n");
 
-	cbw->dataTransferLength = size;	//READ_CAPACITY_REPLY_LENGTH
+	cbw->dataTransferLength = size;		//READ_CAPACITY_REPLY_LENGTH
 
 	ret = 1;
 	retryCount = 6;
@@ -567,8 +567,8 @@ inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, i
 	cbw->comData[2] = (lba & 0xFF000000) >> 24;		//lba 1 (MSB)
 	cbw->comData[3] = (lba & 0xFF0000) >> 16;		//lba 2
 	cbw->comData[4] = (lba & 0xFF00) >> 8;			//lba 3
-	cbw->comData[5] = (lba & 0xFF);					//lba 4 (LSB)
-	cbw->comData[7] = (sectorCount & 0xFF00) >> 8;	//Transfer length MSB
+	cbw->comData[5] = (lba & 0xFF);				//lba 4 (LSB)
+	cbw->comData[7] = (sectorCount & 0xFF00) >> 8;		//Transfer length MSB
 	cbw->comData[8] = (sectorCount & 0xFF);			//Transfer length LSB
 
 	usb_bulk_command(dev, cbw);
@@ -885,7 +885,7 @@ int mass_stor_init(void)
 	cb_sema = CreateSema(&smp);
 
 	driver.next 		= NULL;
-	driver.prev		    = NULL;
+	driver.prev		= NULL;
 	driver.name 		= "mass-stor";
 	driver.probe 		= mass_stor_probe;
 	driver.connect		= mass_stor_connect;
@@ -907,7 +907,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 	register int r = 0;
 	register u32 sectors, nbytes;
 	u8 *p = (u8 *)buf;
-	
+
 	while (nsectors > 0) {
 		sectors = nsectors;
 		if (sectors > 2)
@@ -917,12 +917,12 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 		mass_stor_readSector(p_part_start[part_num] + (lsn << 2), sectors << 2, p);
 		//mass_stor_readSector(part_lba + (lsn << 2), 8, cdvdman_io_buf);
 		//mips_memcpy(p, cdvdman_io_buf, nbytes);
-		
+
 		lsn += sectors;
 		r += sectors;
 		p += nbytes;
 		nsectors -= sectors;
-	}	
+	}
 
 	return 1;
 }

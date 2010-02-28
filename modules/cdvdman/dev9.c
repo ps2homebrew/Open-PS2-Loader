@@ -137,7 +137,7 @@ void *dev9x_ops[27] = {
 	(void*)dev9x_devctl,
 	(void*)dev9_init,
 	(void*)dev9_init,
-	(void*)dev9_init	
+	(void*)dev9_init
 };
 
 /* driver descriptor */
@@ -166,22 +166,22 @@ int dev9_init(void)
 #ifdef PCMCIA
 		res = pcmcia_init();
 #else
-		return 1;		
-#endif		
+		return 1;
+#endif
 	} else if (dev9hw == 0x30) {	/* CXD9611 (Expansion Bay) */
 		dev9type = 1;
 #ifndef PCMCIA
 		res = expbay_init();
 #else
-		return 1;		
-#endif		
+		return 1;
+#endif
 	}
 
 	if (res)
 		return res;
-	
+
 	DelDrv("dev9x");
-	AddDrv((iop_device_t *)&dev9x_dev);	
+	AddDrv((iop_device_t *)&dev9x_dev);
 
 	return 0;
 }
@@ -194,7 +194,7 @@ void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb)
 		if (atad_inited)
 			return;
 	}
-#endif	
+#endif
 	dev9_intr_cbs[intr] = cb;
 }
 
@@ -265,13 +265,13 @@ static int smap_device_probe()
 #ifdef PCMCIA
 		return pcmcia_device_probe();
 #else
-		return -1;		
+		return -1;
 #endif
 	else if (dev9type == 1)
 #ifndef PCMCIA
 		return expbay_device_probe();
 #else
-		return -1;		
+		return -1;
 #endif
 	return -1;
 }
@@ -545,7 +545,7 @@ static int smap_subsys_init(void)
 
 static int smap_device_init(void)
 {
-#ifdef DEV9_DEBUG	
+#ifdef DEV9_DEBUG
 	USE_SPD_REGS;
 	const char *spdnames[] = { "(unknown)", "TS", "ES1", "ES2" };
 	int idx;
@@ -580,7 +580,7 @@ static int smap_device_init(void)
 	}
 #endif
 
-#ifdef DEV9_DEBUG	
+#ifdef DEV9_DEBUG
 	/* Print out the SPEED chip revision.  */
 	spdrev = SPD_REG16(SPD_R_REV_1);
 	idx    = (spdrev & 0xffff) - 14;
@@ -591,7 +591,7 @@ static int smap_device_init(void)
 
 	M_PRINTF("SPEED chip '%s', revision 0x%0X\n", spdnames[idx], spdrev);
 #endif
-	
+
 	return 0;
 }
 
@@ -707,9 +707,9 @@ static int pcic_ssbus_mode(int voltage)
 
 static int pcmcia_device_probe()
 {
-#ifdef DEBUG	
+#ifdef DEBUG
 	const char *pcic_ct_names[] = { "No", "16-bit", "CardBus" };
-#endif	
+#endif
 	int voltage;
 
 	pcic_voltage = pcic_get_voltage();

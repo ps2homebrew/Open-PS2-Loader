@@ -15,13 +15,13 @@
 #define _USBD_MACRO_H
 
 // !!! usbd exports functions pointers !!!
-extern int (*pUsbRegisterDriver)(UsbDriver *driver); 															// #4
-extern void *(*pUsbGetDeviceStaticDescriptor)(int devId, void *data, u8 type); 									// #6
-extern int (*pUsbSetDevicePrivateData)(int devId, void *data); 													// #7
-extern int (*pUsbOpenEndpoint)(int devId, UsbEndpointDescriptor *desc); 										// #9
-extern int (*pUsbCloseEndpoint)(int id); 																		// #10
+extern int (*pUsbRegisterDriver)(UsbDriver *driver); 								// #4
+extern void *(*pUsbGetDeviceStaticDescriptor)(int devId, void *data, u8 type); 					// #6
+extern int (*pUsbSetDevicePrivateData)(int devId, void *data); 							// #7
+extern int (*pUsbOpenEndpoint)(int devId, UsbEndpointDescriptor *desc); 					// #9
+extern int (*pUsbCloseEndpoint)(int id); 									// #10
 extern int (*pUsbTransfer)(int id, void *data, u32 len, void *option, UsbCallbackProc callback, void *cbArg); 	// #11
-extern int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc); 									// #12
+extern int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc); 					// #12
 
 static int UsbControlTransfer(int epID, int reqtyp, int req, int val, int index, int leng, void *dataptr, void *doneCB, void* arg)
 
@@ -146,4 +146,3 @@ static int UsbControlTransfer(int epID, int reqtyp, int req, int val, int index,
 	0, (endpoint), 2, (pfn), (doneCB), (arg))
 
 #endif
-

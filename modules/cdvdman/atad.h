@@ -37,10 +37,10 @@ int ata_get_error(void);
 int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int dir);
 
 // APA Partition
-#define APA_MAGIC			0x00415041	// 'APA\0'
-#define APA_IDMAX			32
-#define APA_MAXSUB			64			// Maximum # of sub-partitions
-#define APA_PASSMAX			8
+#define APA_MAGIC		0x00415041	// 'APA\0'
+#define APA_IDMAX		32
+#define APA_MAXSUB		64		// Maximum # of sub-partitions
+#define APA_PASSMAX		8
 #define APA_FLAG_SUB		0x0001
 #define APA_MBR_VERSION		2
 
@@ -53,22 +53,22 @@ typedef struct {
 	u8	month;
 	u16	year;
 } ps2time;
-	
-typedef struct					// size = 1024
+
+typedef struct				// size = 1024
 {
-	u32		checksum;			// HDL uses 0xdeadfeed magic here
-	u32		magic;
+	u32	checksum;		// HDL uses 0xdeadfeed magic here
+	u32	magic;
 	char	gamename[160];
-	u8  	compat_flags;
-	u8		pad[3];
+	u8	compat_flags;
+	u8	pad[3];
 	char	startup[60];
-	u32 	layer1_start;
-	u32 	discType;
-	int 	num_partitions;
+	u32	layer1_start;
+	u32	discType;
+	int	num_partitions;
 	struct {
-		u32 	part_offset; 	// in MB
-		u32 	data_start; 	// in sectors
-		u32 	part_size; 		// in KB				
+		u32	part_offset;	// in MB
+		u32	data_start;	// in sectors
+		u32	part_size;	// in KB
 	} part_specs[65];
 } hdl_apa_header;
 

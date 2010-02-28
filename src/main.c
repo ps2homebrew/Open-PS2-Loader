@@ -856,7 +856,7 @@ void ClearUSBSubMenu() {
 
 void RefreshUSBGameList(struct menu_item_t *self, short force) {
 	// do we have to refresh? If the game list is empty, delay is greater than 100 or force is used, then yes
-	if (force || usbdelay > LIST_REFRESH_DELAY) {
+	if (force || usbdelay++ > LIST_REFRESH_DELAY) {
 		usbdelay = 0;
 		
 		if (force)
@@ -898,6 +898,9 @@ void ClearETHSubMenu() {
 }
 
 void RefreshETHGameList(struct menu_item_t *self, short force) {
+	if (!eth_inited)
+		return;
+
 	// do we have to refresh? If the game list is empty, delay is greater than 100 or force is used, then yes
 	if (force || ethdelay++ > LIST_REFRESH_DELAY) {
 		ethdelay = 0;

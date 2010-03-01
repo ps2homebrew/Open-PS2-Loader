@@ -342,6 +342,8 @@ static void IGR_Thread(void *arg)
 // IGR VBLANK_START interrupt handler install to monitor combo trick in pad data aera
 static int IGR_Intc_Handler(int cause)
 {
+	int i;
+
 	// First check pad state
 	if ( ( (Pad_Data.libpad == IGR_LIBPAD_V1) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V1) ) ||
 			 ( (Pad_Data.libpad == IGR_LIBPAD_V2) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V2) ) )
@@ -360,7 +362,14 @@ static int IGR_Intc_Handler(int cause)
 
 	// Check power button press
 	if ( (*CDVD_R_NDIN & 0x20) && (*CDVD_R_POFF & 0x04) )
+	{
+		// Increment button press counter
 		Power_Button.press++;
+
+		// Cancel poweroff to catch the second button press
+		*CDVD_R_SDIN = 0x00;
+		*CDVD_R_SCMD = 0x1B;
+	}
 
 	// Start VBlank counter when power button is pressed
 	if( Power_Button.press )
@@ -375,14 +384,20 @@ static int IGR_Intc_Handler(int cause)
 		}
 	}
 
-	// Cancel poweroff to catch the second button press
-	*CDVD_R_SDIN = 0x00;
-	*CDVD_R_SCMD = 0x1B;
-
 	ee_kmode_exit();
 
+	// If power button or combo is press, suspend all thread which return a RUN state to make sure IGR thread will wakeup
+	if ( Power_Button.press || Pad_Data.combo_type != 0x00 )
+	{
+		for(i = 3; i < 256; i++)
+		{
+			if(iReferThreadStatus( i, NULL ) == 0x01 )
+				iSuspendThread( i );
+		}
+	}
+
 	// If a combo is set, disable VBLANK_START interrupts, and wakeup our IGR thread
-	if (Pad_Data.combo_type != 0x00)
+	if ( Pad_Data.combo_type != 0x00 )
 	{
 		// Disable VBLANK_START Interrupts
 		iDisableIntc(kINTC_VBLANK_START);

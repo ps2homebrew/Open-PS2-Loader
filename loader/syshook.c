@@ -264,24 +264,21 @@ void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
 }
 
 // ------------------------------------------------------------------------
-int Hook_CreateThread(threadparam_t *thread_param)
+int Hook_CreateThread(ee_thread_t *thread_param)
 {
-	int ret;
 	u32 mem_start, mem_end;
-
-	ret = Old_CreateThread(thread_param);
 
 	// Patch padread function to install In Game Reset
 	if(!(g_compat_mask & COMPAT_MODE_6))
 	{
-		if( thread_param->init_priority == 0 || (thread_param->init_priority < 5 && thread_param->current_priority == 0) )
+		if( thread_param->initial_priority == 0 || (thread_param->initial_priority < 5 && thread_param->current_priority == 0) )
 		{
-			if((u32)thread_param->entry >= 0x00400000)
-				mem_start = (u32)thread_param->entry - 0x00300000;
+			if((u32)thread_param->func >= 0x00400000)
+				mem_start = (u32)thread_param->func - 0x00300000;
 			else
 				mem_start = 0x00100000;
 
-			if((mem_end = (u32)thread_param->stack) <= (u32)thread_param->entry)
+			if((mem_end = (u32)thread_param->stack) <= (u32)thread_param->func)
 				mem_end = 0x01f00000;
 
 			if(!Install_PadOpen_Hook(mem_start, mem_end))
@@ -298,7 +295,7 @@ int Hook_CreateThread(threadparam_t *thread_param)
 		}
 	}
 
-	return ret;
+	return Old_CreateThread(thread_param);
 }
 
 /*----------------------------------------------------------------------------------------*/

@@ -56,7 +56,6 @@
 #define CDVD_R_SDIN ((volatile u8*)0xBF402017)
 
 
-// PAD defs
 typedef struct {
 	u32 option;
 	int port;
@@ -78,6 +77,13 @@ typedef struct {
  int press;
  int vb_count;
 } powerbuttondata_t;
+
+typedef struct {
+	void *pattern;
+	void *mask;
+	int   size;
+	int   version;	
+} pattern_t;
 
 #define IGR_LIBPAD_V1 1
 #define IGR_LIBPAD_V2 2

@@ -75,13 +75,17 @@ extern int size_filexio_irx;
 extern void *poweroff_irx;
 extern int size_poweroff_irx;
 
+extern void *ps2atad_irx;
+extern int size_ps2atad_irx;
+
+extern void *ps2hdd_irx;
+extern int size_ps2hdd_irx;
+
 extern void *loader_elf;
 extern int size_loader_elf;
 
 extern void *alt_loader_elf;
 extern int size_alt_loader_elf;
-
-extern void *_gp;
 
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
@@ -92,7 +96,7 @@ int g_ipconfig_len;
 
 typedef struct
 {
-	u8	ident[16];			// struct definition for ELF object header
+	u8	ident[16];	// struct definition for ELF object header
 	u16	type;
 	u16	machine;
 	u32	version;
@@ -110,7 +114,7 @@ typedef struct
 
 typedef struct
 {
-	u32	type;				// struct definition for ELF program section header
+	u32	type;		// struct definition for ELF program section header
 	u32	offset;
 	void	*vaddr;
 	u32	paddr;
@@ -125,42 +129,43 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
-void Reset()
+void Reset(void)
 {
 	int ret;
 
 	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF",0));
-  	while(!SifIopSync());
-  	fioExit();
-  	SifExitIopHeap();
-  	SifLoadFileExit();
-  	SifExitRpc();
-  	SifExitCmd();
-  	
-  	SifInitRpc(0);
-  	FlushCache(0);
-  	FlushCache(2);
-	 	
-  	// init loadfile & iopheap services    		  	
+	while(!SifIopSync());
+	fioExit();
+	SifExitIopHeap();
+	SifLoadFileExit();
+	SifExitRpc();
+	SifExitCmd();
+
+	SifInitRpc(0);
+	FlushCache(0);
+	FlushCache(2);
+
+	// init loadfile & iopheap services
 	SifLoadFileInit();
 	SifInitIopHeap();
-	
+
 	// apply sbv patches
-    sbv_patch_enable_lmb();
-    sbv_patch_disable_prefix_check();
-    
-    // load modules
-    SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
-    SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
-    SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-    SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+	sbv_patch_enable_lmb();
+	sbv_patch_disable_prefix_check();
 
-    poweroffInit();
+	// load modules
+	SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
+	SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
+	SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
+	SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
 
-    gDev9_loaded = 0;
+	poweroffInit();
+
+	gDev9_loaded = 0;
 }
 
-void delay(int count) {
+void delay(int count)
+{
 	int i;
 	int ret;
 	for (i  = 0; i < count; i++) {
@@ -169,9 +174,11 @@ void delay(int count) {
 	}
 }
 
-int PS3Detect(){ //return 0=PS2 1=PS3-HARD 2=PS3-SOFT
+int PS3Detect(void)	//return 0=PS2 1=PS3-HARD 2=PS3-SOFT
+{
 	int xparam2, size=0, i=0; 
 	void *buffer;
+
 	xparam2 = fioOpen("rom0:XPARAM2", O_RDONLY);
 	if (xparam2>0){
 		size = lseek(xparam2, 0, SEEK_END);
@@ -185,9 +192,9 @@ int PS3Detect(){ //return 0=PS2 1=PS3-HARD 2=PS3-SOFT
 			}
 		}
 	}
-	
+
 	fioClose(xparam2);
-	
+
 	if(xparam2 > 0) return 1;
 	return 0;
 }
@@ -196,10 +203,10 @@ void set_ipconfig(void)
 {
 	int i;
 	char str[16];
-	
+
 	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
 	g_ipconfig_len = 0;
-	
+
 	// add ip to g_ipconfig buf
 	sprintf(str, "%d.%d.%d.%d", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
 	strncpy(&g_ipconfig[g_ipconfig_len], str, 15);
@@ -214,7 +221,8 @@ void set_ipconfig(void)
 	sprintf(str, "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 	strncpy(&g_ipconfig[g_ipconfig_len], str, 15);
 	g_ipconfig_len += strlen(str) + 1;
-	
+
+	// patch the smbman module with ip config
 	for (i=0;i<size_smbman_irx;i++){
 		if(!strcmp((const char*)((u32)&smbman_irx+i),"xxx.xxx.xxx.xxx")){
 			break;
@@ -226,120 +234,156 @@ void set_ipconfig(void)
 	memcpy((void*)((u32)&smbman_irx+i+20), gPCShareName, 32);
 }
 
-void th_LoadNetworkModules(void *args){
-	
+void LoadNetworkModules(void)
+{
 	int ret, id;
-		
+
 	set_ipconfig();
-	
+
+	if (!gDev9_loaded) {
+		gNetworkStartup = 5;
+		netLoadDisplay();
+
+    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+		if ((id < 0) || ret) {
+			gNetworkStartup = -1;
+			return;
+		}
+
+		gDev9_loaded = 1;
+	}
+
 	gNetworkStartup = 4;
+	netLoadDisplay();
 
 	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {
 		gNetworkStartup = -1;
-		goto fini;
+		return;
 	}
-	
 	gNetworkStartup = 3;
-	
+	netLoadDisplay();
+
 	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {
 		gNetworkStartup = -1;
-		goto fini;
+		return;
 	}
-	
+
 	gNetworkStartup = 2;
-	
-	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);	
+	netLoadDisplay();
+
+	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
 	if ((id < 0) || ret) {
 		gNetworkStartup = -1;
-		goto fini;
+		return;
 	}
-	
+
 	gNetworkStartup = 1;
-	
+	netLoadDisplay();
+
 	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
 	if ((id < 0) || ret) {
 		gNetworkStartup = -1;
-		goto fini;
+		return;
 	}
 
 	gNetworkStartup = 0; // ok, all loaded
-fini:		
-	SleepThread();
 }
 
-void Start_LoadNetworkModules_Thread(void){
-	
-	ee_thread_t thread;
-	s32 thread_id;
+void LoadHddModules(void)
+{
+	int ret, id;
+	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
-	memset(&thread, 0, sizeof(thread));
+	if (!gDev9_loaded) {
+		gHddStartup = 3;
 
-	thread.func				= (void *)th_LoadNetworkModules;
-	thread.stack_size		= 0x100000;
-	thread.gp_reg			= &_gp;
-	thread.initial_priority	= 0x1;
+		id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+		if ((id < 0) || ret) {
+			gHddStartup = -1;
+			return;
+		}
 
-	thread_id = CreateThread(&thread);
+		gDev9_loaded = 1;
+	}
 
-	StartThread(thread_id, NULL);
+	gHddStartup = 2;
+
+	id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
+	if ((id < 0) || ret) {
+		gHddStartup = -1;
+		return;
+	}
+
+	gHddStartup = 1;
+
+	id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
+	if ((id < 0) || ret) {
+		gHddStartup = -1;
+		return;
+	}
+
+	gHddStartup = 0;
 }
 
-void LoadUSBD(){
+void LoadUsbModules(void)
+{
 	int fd, ps3model;
-	
+
 	//first it searchs for custom usbd in MC
 	fd = fioOpen("mc0:/BEDATA-SYSTEM/USBD.IRX", O_RDONLY);
-	if (fd < 0){
+	if (fd < 0) {
 		fd = fioOpen("mc0:/BADATA-SYSTEM/USBD.IRX", O_RDONLY);
-		if (fd < 0){
+		if (fd < 0) {
 			fd = fioOpen("mc0:/BIDATA-SYSTEM/USBD.IRX", O_RDONLY);
 		}
 	}
-	if(fd > 0){
+	if (fd > 0) {
 		size_usbd_irx = fioLseek(fd, 1, SEEK_END);
-		usbd_irx=malloc(size_usbd_irx);
+		usbd_irx = malloc(size_usbd_irx);
 		fioLseek(fd, 0, SEEK_SET);
 		fioRead(fd, usbd_irx, size_usbd_irx);
 		fioClose(fd);
-	}else{ // If don't exist it uses embedded
-		ps3model=PS3Detect();
-		if(ps3model==0){
+	} else { // If don't exist it uses embedded
+		ps3model = PS3Detect();
+		if (ps3model == 0) {
 			usbd_irx=(void *)&usbd_ps2_irx;
 			size_usbd_irx=size_usbd_ps2_irx;
-		}else{
+		} else {
 			usbd_irx=(void *)&usbd_ps3_irx;
 			size_usbd_irx=size_usbd_ps3_irx;
 		}
 	}
+
 	SifExecModuleBuffer(usbd_irx, size_usbd_irx, 0, NULL, NULL);
+	SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, NULL);
+
+	delay(3);
 }
 
 unsigned int crctab[0x400];
 
 unsigned int USBA_crc32(char *string)
 {
-    int crc, table, count, byte;
+	int crc, table, count, byte;
 
-    for (table=0; table<256; table++)
-    {
-        crc = table << 24;
+	for (table=0; table<256; table++) {
+		crc = table << 24;
 
-        for (count=8; count>0; count--)
-        {
-            if (crc < 0) crc = crc << 1;
-            else crc = (crc << 1) ^ 0x04C11DB7;
-        }
-        crctab[255-table] = crc;
-    }
+		for (count=8; count>0; count--) {
+			if (crc < 0) crc = crc << 1;
+			else crc = (crc << 1) ^ 0x04C11DB7;
+		}
+		crctab[255-table] = crc;
+	}
 
-    do {
-        byte = string[count++];
-        crc = crctab[byte ^ ((crc >> 24) & 0xFF)] ^ ((crc << 8) & 0xFFFFFF00);
-    } while (string[count-1] != 0);
+	do {
+		byte = string[count++];
+		crc = crctab[byte ^ ((crc >> 24) & 0xFF)] ^ ((crc << 8) & 0xFFFFFF00);
+	} while (string[count-1] != 0);
 
-    return crc;
+	return crc;
 }
 
 int getDiscID(void *discID)
@@ -349,11 +393,11 @@ int getDiscID(void *discID)
 	fd = fioOpen("discID:", O_RDONLY);
 	if (fd < 0)
 		return fd;
-	
+
 	fioRead(fd, discID, 5);
 	fioClose(fd);
 
-	return 1;	
+	return 1;
 }
 
 int pcmcia_check(void)
@@ -366,7 +410,7 @@ int pcmcia_check(void)
 	if (ret == 0) 	// PCMCIA
 		return 1;
 
-	return 0;	// ExpBay 	
+	return 0;	// ExpBay
 }
 
 void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
@@ -397,8 +441,7 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 
 	// Scan through the ELF's program headers and copy them into RAM, then
 	// zero out any non-loaded regions.
-	for (i = 0; i < eh->phnum; i++)
-	{
+	for (i = 0; i < eh->phnum; i++) {
 		if (eph[i].type != ELF_PT_LOAD)
 		continue;
 
@@ -406,8 +449,7 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 		memcpy(eph[i].vaddr, pdata, eph[i].filesz);
 
 		if (eph[i].memsz > eph[i].filesz)
-			memset(eph[i].vaddr + eph[i].filesz, 0,
-					eph[i].memsz - eph[i].filesz);
+			memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
 	}
 
 	// Let's go.
@@ -435,7 +477,7 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	argv[2] = cmask;
 
 	ExecPS2((void *)eh->entry, 0, 3, argv);
-} 
+}
 
 void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 {
@@ -446,21 +488,21 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 	char partname[64];
 	char config_str[255];
 	int fd, r;
-		
+
 	sprintf(filename,"%s",game->Image+3);
-	
+
 	memset(gamename, 0, 33);
 	strncpy(gamename, game->Name, 32);
 
 	sprintf(isoname,"ul.%08X.%s",USBA_crc32(gamename),filename);
-	
+
 	if (mode == USB_MODE) {
 		for (i=0;i<size_usb_cdvdman_irx;i++){
-			if(!strcmp((const char*)((u32)&usb_cdvdman_irx+i),"######    GAMESETTINGS    ######")){
+			if (!strcmp((const char*)((u32)&usb_cdvdman_irx+i),"######    GAMESETTINGS    ######")) {
 				break;
 			}
 		}
-	
+
 		memcpy((void*)((u32)&usb_cdvdman_irx+i),isoname,strlen(isoname)+1);
 		memcpy((void*)((u32)&usb_cdvdman_irx+i+33),&game->parts,1);
 		memcpy((void*)((u32)&usb_cdvdman_irx+i+34),&game->media,1);
@@ -471,17 +513,17 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 		if (compatmask & COMPAT_MODE_5) {
 			u32 no_dvddl = 1;
 			memcpy((void*)((u32)&usb_cdvdman_irx+i+36),&no_dvddl,4);
-		}		
+		}
 		if (compatmask & COMPAT_MODE_4) {
 			u32 no_pss = 1;
 			memcpy((void*)((u32)&usb_cdvdman_irx+i+40),&no_pss,4);
-		}	
+		}
 
 		// game id
 		memcpy((void*)((u32)&usb_cdvdman_irx+i+84), &gameid, 5);
-		
+
 		int j, offset = 44;
-	
+
 		fd = fioDopen(USB_prefix);
 		if (fd < 0) {
 			init_scr();
@@ -498,12 +540,12 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 		fioDclose(fd);
 	}
 	else if (mode == ETH_MODE) {
-		for (i=0;i<size_smb_cdvdman_irx;i++){
-			if(!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"######    GAMESETTINGS    ######")){
+		for (i=0;i<size_smb_cdvdman_irx;i++) {
+			if (!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"######    GAMESETTINGS    ######")) {
 				break;
 			}
 		}
-	
+
 		memcpy((void*)((u32)&smb_cdvdman_irx+i),isoname,strlen(isoname)+1);
 		memcpy((void*)((u32)&smb_cdvdman_irx+i+33),&game->parts,1);
 		memcpy((void*)((u32)&smb_cdvdman_irx+i+34),&game->media,1);
@@ -519,25 +561,25 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 			u32 no_pss = 1;
 			memcpy((void*)((u32)&smb_cdvdman_irx+i+40),&no_pss,4);
 		}
-		
+
 		// game id
 		memcpy((void*)((u32)&smb_cdvdman_irx+i+84), &gameid, 5);
 		
-		for (i=0;i<size_smb_cdvdman_irx;i++){
-			if(!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"xxx.xxx.xxx.xxx")){
+		for (i=0;i<size_smb_cdvdman_irx;i++) {
+			if (!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"xxx.xxx.xxx.xxx")) {
 				break;
 			}
 		}
 		sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i),config_str,strlen(config_str)+1);	
+		memcpy((void*)((u32)&smb_cdvdman_irx+i),config_str,strlen(config_str)+1);
 		memcpy((void*)((u32)&smb_cdvdman_irx+i+16),&gPCPort, 4);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i+20), gPCShareName, 32);		
+		memcpy((void*)((u32)&smb_cdvdman_irx+i+20), gPCShareName, 32);
 	}
 
 	FlushCache(0);
 
 	LaunchLoaderElf(filename, mode, compatmask, compatmask & COMPAT_MODE_1);
-} 
+}
 
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 {
@@ -587,17 +629,18 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 
 	// patch 48bit flag
 	u8 flag_48bit = hddIs48bit() & 0xff;
-	memcpy((void*)((u32)&hdd_cdvdman_irx+i+34), &flag_48bit, 1);	
+	memcpy((void*)((u32)&hdd_cdvdman_irx+i+34), &flag_48bit, 1);
 
 	// patch start_sector
-	memcpy((void*)((u32)&hdd_cdvdman_irx+i+44), &game->start_sector, 4);		
+	memcpy((void*)((u32)&hdd_cdvdman_irx+i+44), &game->start_sector, 4);
 
 	FlushCache(0);
 
 	LaunchLoaderElf(filename, HDD_MODE, game->ops2l_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1);
 } 
 
-int ExecElf(char *path){
+int ExecElf(char *path)
+{
 	int fd, size, i;
 	void *buffer;
 	elf_header_t *eh;
@@ -614,7 +657,7 @@ int ExecElf(char *path){
 		fioClose(fd);
 		return -1;
 	}
-	buffer=malloc(size);
+	buffer = malloc(size);
 	eh = (elf_header_t *)buffer;
 
 	fioLseek(fd, 0, SEEK_SET);
@@ -652,7 +695,7 @@ int ExecElf(char *path){
 	FlushCache(2);
 
 	ExecPS2((void *)eh->entry, 0, 1, argv);
-	
+
 	return 0;
 }
 
@@ -691,9 +734,9 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	irxptr_tab[n++].irxsize = size_usbd_irx;
 	irxptr_tab[n++].irxsize = size_ps2dev9_irx;
 	irxptr_tab[n++].irxsize = size_smstcpip_irx;
-	irxptr_tab[n++].irxsize = size_smsmap_irx;	
+	irxptr_tab[n++].irxsize = size_smsmap_irx;
 	irxptr_tab[n++].irxsize = size_netlog_irx;
-	 	
+
 	n = 0;
 	irxsrc[n++] = (void *)&imgdrv_irx;
 	irxsrc[n++] = (void *)&eesync_irx;
@@ -718,27 +761,27 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	irxsrc[n++] = (void *)&smstcpip_irx;
 	irxsrc[n++] = (void *)&smsmap_irx;
 	irxsrc[n++] = (void *)&netlog_irx;
-	
-	irxsize = 0;		
+
+	irxsize = 0;
 
 	DIntr();
 	ee_kmode_enter();
-				
-	for (i = 0; i <	IRX_NUM; i++) {
+
+	for (i = 0; i < IRX_NUM; i++) {
 		if ((((u32)irxptr + irxptr_tab[i].irxsize) >= 0x80050000) && ((u32)irxptr < 0x80060000))
 			irxptr = (void *)0x80060000;
 		irxptr_tab[i].irxaddr = irxptr;
-		
+
 		memcpy((void *)irxptr_tab[i].irxaddr, (void *)irxsrc[i], irxptr_tab[i].irxsize);
-		
+
 		irxptr += irxptr_tab[i].irxsize;
 		irxsize += irxptr_tab[i].irxsize;
 	}
-	
-	memcpy((void *)irxtab, (void *)&irxptr_tab[0], sizeof(irxptr_tab));	
-	
+
+	memcpy((void *)irxtab, (void *)&irxptr_tab[0], sizeof(irxptr_tab));
+
 	*total_irxsize = irxsize;
-	
+
 	ee_kmode_exit();
 	EIntr();
-}	
+}

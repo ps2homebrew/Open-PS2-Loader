@@ -1,7 +1,3 @@
-/*stdio_IMPORTS_start
-I_printf
-stdio_IMPORTS_end
-*/
 ioman_IMPORTS_start
 I_AddDrv
 /*I_DelDrv*/

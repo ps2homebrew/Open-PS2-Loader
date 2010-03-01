@@ -23,5 +23,4 @@
 #include <loadcore.h>
 #include "loadcore_add.h"
 
-
 #endif /* IOP_IRX_IMPORTS_H */

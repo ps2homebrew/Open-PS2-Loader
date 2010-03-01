@@ -1,4 +1,3 @@
-/**/
 
 DECLARE_EXPORT_TABLE(eesync, 1, 1)
 	DECLARE_EXPORT(_start)

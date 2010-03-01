@@ -488,9 +488,12 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 		
 		if (result == COMPAT_SAVE) { // write the config
 			storeConfig();
-			// Store the new hdd info
-			// !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
-			hddSetHDLGameInfo(id - 1, &hddGameList->games[id - 1]);
+			
+			if (ntype == HDD_MODE && hddfound) {
+				// Store the new hdd info
+				// !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
+				hddSetHDLGameInfo(id - 1, &hddGameList->games[id - 1]);
+			}
 		}
 		
 		

@@ -294,10 +294,6 @@ void setImageCompatMask(int id, const char* image, int ntype, int mask) {
 		// write to the game's description
 		hddGameList->games[id - 1].ops2l_compat_flags = (unsigned char)mask;
 		
-		// !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
-		hddSetHDLGameInfo(id - 1, &hddGameList->games[id - 1]);
-		
-		
 		return;
 	}
 	
@@ -490,8 +486,15 @@ int showCompatConfig(int id, const char* game, const char* prefix, int ntype) {
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		setImageGameID(prefix, hexid);
 		
-		if (result == COMPAT_SAVE) // write the config
+		if (result == COMPAT_SAVE) { // write the config
 			storeConfig();
+			// Store the new hdd info
+			// !!!! TESTED by jimmi on his HDD: should be safe to go... but use at your own risk
+			hddSetHDLGameInfo(id - 1, &hddGameList->games[id - 1]);
+		}
+		
+		
+
 	}
 	
 	return result;

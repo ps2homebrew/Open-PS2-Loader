@@ -13,32 +13,6 @@
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
-
-extern void *ps2atad_irx;
-extern int size_ps2atad_irx;
-
-extern void *ps2hdd_irx;
-extern int size_ps2hdd_irx;
-
-extern void *smbman_irx;
-extern int size_smbman_irx;
-
-extern void *smsutils_irx;
-extern int size_smsutils_irx;
-
-extern void *smstcpip_irx;
-extern int size_smstcpip_irx;
-
-extern void *smsmap_irx;
-extern int size_smsmap_irx;
-#define IPCONFIG_MAX_LEN        64
-char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
-int g_ipconfig_len;
-
-extern void set_ipconfig(void);
-
 // language id
 int gLanguageID = 0;
 
@@ -897,7 +871,6 @@ void AltExecUSBGameSelection(struct menu_item_t* self, int id) {
 
 // --------------------- Network Menu item callbacks --------------------
 // Forward decl.
-void LoadNetworkModules(void);
 
 void ClearETHSubMenu() {
 	ClearSubMenu(&eth_submenu, &eth_games_item);
@@ -918,17 +891,10 @@ void RefreshETHGameList(struct menu_item_t *self, short force) {
 	}
 }
 
-void StartNetwork() {
-	if (0) // left here if we find a way to let it work without issues (see bug no. 16)
-		Start_LoadNetworkModules_Thread();
-	else
-		LoadNetworkModules();
-}
-
 void ExecETHGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1) {
 		if (!eth_inited) {
-			StartNetwork();
+			LoadNetworkModules();
 			eth_inited = 1;
 			ClearETHSubMenu();
 		}
@@ -955,8 +921,6 @@ void AltExecETHGameSelection(struct menu_item_t* self, int id) {
 
 
 // --------------------- HDD Menu item callbacks --------------------
-void LoadHddModules(void);
-
 void StartHdd() {
 	// For Testing HDD
 	LoadHddModules();
@@ -1189,34 +1153,29 @@ void init() {
 
 	gConfig.head = NULL;
 	gConfig.tail = NULL;
-	
+
 	SifInitRpc(0);
-	
+
 	SifLoadModule("rom0:SIO2MAN",0,0);
 	SifLoadModule("rom0:MCMAN",0,0);
 	SifLoadModule("rom0:MCSERV",0,0);
 	SifLoadModule("rom0:PADMAN",0,0);
 	mcInit(MC_TYPE_MC);
 
-	int ret, id;
-		
-	LoadUSBD();
-	id=SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, &ret);
-	
-	delay(3);
-	
+	LoadUsbModules();
+
 	FindUSBPartition();
-	
+
 	// Initialize the language system - loads the custom language file if found
 	initLangSystem();
 
 	// init here so we don't have to repeat
 	initInputSystem();
-	
+
 	// try to restore config
 	// if successful, it will remember the config location for further writes
 	restoreConfig();
-	
+
 	// HDD startup
 	if (gUseHdd && gHddAutostart) {
 		hdd_inited = 1;
@@ -1277,99 +1236,6 @@ void netLoadDisplay() {
 	flip();
 }
 
-void LoadNetworkModules() {
-	
-	int ret, id;
-		
-	set_ipconfig();
-
-	if (!gDev9_loaded) {
-		gNetworkStartup = 5;
-		netLoadDisplay();
-
-    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-		if ((id < 0) || ret) {
-			gNetworkStartup = -1;
-			return;
-		}
-
-		gDev9_loaded = 1;
-	}
-	
-	gNetworkStartup = 4;
-	netLoadDisplay();
-	
-	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
-		gNetworkStartup = -1;
-		return;
-	}
-	gNetworkStartup = 3;
-	netLoadDisplay();
-	
-	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
-		gNetworkStartup = -1;
-		return;
-	}
-	
-	gNetworkStartup = 2;
-	netLoadDisplay();
-	
-	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);	
-	if ((id < 0) || ret) {
-		gNetworkStartup = -1;
-		return;
-	}
-	
-	gNetworkStartup = 1;
-	netLoadDisplay();
-	
-	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
-		gNetworkStartup = -1;
-		return;
-	}
-
-	gNetworkStartup = 0; // ok, all loaded
-}
-
-void LoadHddModules(void)
-{	
-	int ret, id;
-	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
-
-	if (!gDev9_loaded) {
-		gHddStartup = 3;
-
-    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-		if ((id < 0) || ret) {
-			gHddStartup = -1;
-			return;
-		}
-
-		gDev9_loaded = 1;
-	}
-
-	gHddStartup = 2;
-
-	id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
-		gHddStartup = -1;
-		return;
-	}
-
-	gHddStartup = 1;
-
-	id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);		
-	if ((id < 0) || ret) {
-		gHddStartup = -1;
-		return;
-	}
-
-	gHddStartup = 0;
-}
-
 // --------------------- Main --------------------
 int main(void)
 {
@@ -1384,7 +1250,7 @@ int main(void)
 	
 	// If automatic network startup is selected, start it now
 	if ((!getKeyOn(KEY_L1)) && (gNetAutostart != 0)) {
-		StartNetwork();
+		LoadNetworkModules();
 		eth_inited = 1;
 	}
 

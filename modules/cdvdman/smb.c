@@ -24,7 +24,7 @@ extern int *p_part_start;
 
 #define SMB_MAGIC	0x424d53ff
 
-struct SMBHeader_t { //size = 36
+struct SMBHeader_t {			//size = 36
 	u32	sessionHeader;
 	u32	Magic;
 	u8	Cmd;
@@ -40,7 +40,7 @@ struct SMBHeader_t { //size = 36
 } __attribute__((packed));
 
 struct NegociateProtocolRequest_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u16	ByteCount;		// 37
 	u8	DialectFormat;		// 39
@@ -48,7 +48,7 @@ struct NegociateProtocolRequest_t {
 } __attribute__((packed));
 
 struct NegociateProtocolResponse_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u16	DialectIndex;		// 37
 	u8	SecurityMode;		// 39
@@ -67,7 +67,7 @@ struct NegociateProtocolResponse_t {
 } __attribute__((packed));
 
 struct SessionSetupAndXRequest_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u8	smbAndxCmd;		// 37
 	u8	smbAndxReserved;	// 38
@@ -85,7 +85,7 @@ struct SessionSetupAndXRequest_t {
 } __attribute__((packed));
 
 struct SessionSetupAndXResponse_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u8	smbAndxCmd;		// 37
 	u8	smbAndxReserved;	// 38
@@ -107,7 +107,7 @@ struct TreeConnectRequest_t {
 } __attribute__((packed));
 
 struct OpenAndXRequest_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u8	smbAndxCmd;		// 37
 	u8	smbAndxReserved;	// 38
@@ -125,7 +125,7 @@ struct OpenAndXRequest_t {
 } __attribute__((packed));
 
 struct OpenAndXResponse_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u8	smbAndxCmd;		// 37
 	u8	smbAndxReserved;	// 38
@@ -144,7 +144,7 @@ struct OpenAndXResponse_t {
 } __attribute__((packed));
 
 struct ReadAndXRequest_t {		// size = 63
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u8	smbAndxCmd;		// 37
 	u8	smbAndxReserved;	// 38
@@ -160,7 +160,7 @@ struct ReadAndXRequest_t {		// size = 63
 } __attribute__((packed));
 
 struct ReadAndXResponse_t {
-	struct SMBHeader_t smbH; 	// 0
+	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u8	smbAndxCmd;		// 37
 	u8	smbAndxReserved;	// 38
@@ -176,11 +176,11 @@ struct ReadAndXResponse_t {
 } __attribute__((packed));
 
 typedef struct {
-	u32 MaxBufferSize;
-	u32 MaxMpxCount;
-	u32 SessionKey;
-	u32 StringsCF;
-	u8 PrimaryDomainServerName[32];
+	u32	MaxBufferSize;
+	u32	MaxMpxCount;
+	u32	SessionKey;
+	u32	StringsCF;
+	u8	PrimaryDomainServerName[32];
 } server_specs_t;
 
 static server_specs_t server_specs;

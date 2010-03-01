@@ -36,18 +36,18 @@ int _start(int argc, char** argv)
 	char tree_str[255];
 
 	RegisterLibraryEntries(&_exp_smbman);
-	
-    // Open the Connection with SMB server
-   	smb_NegociateProtocol(g_pc_ip, g_pc_port, "NT LM 0.12"); 
 
-    // zero pad the string to be sure it does not overflow
-    g_pc_share[32] = '\0';
+	// Open the Connection with SMB server
+	smb_NegociateProtocol(g_pc_ip, g_pc_port, "NT LM 0.12");
 
-    // Then open a session and a tree connect on the share resource
-    sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-    smb_SessionSetupTreeConnect("GUEST", tree_str);
+	// zero pad the string to be sure it does not overflow
+	g_pc_share[32] = '\0';
 
-    smbman_initdev();
+	// Then open a session and a tree connect on the share resource
+	sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
+	smb_SessionSetupTreeConnect("GUEST", tree_str);
+
+	smbman_initdev();
 
 	return MODULE_RESIDENT_END;
 }
@@ -101,7 +101,7 @@ void *smbman_ops[17] = {
 
 // driver descriptor
 static iop_device_t smbdev = {
-	"smb", 
+	"smb",
 	IOP_DT_FS,
 	1,
 	"SMB ",
@@ -109,13 +109,13 @@ static iop_device_t smbdev = {
 };
 
 typedef struct {
-	iop_file_t *f;
-	u32 smb_fid;
-	u32 filesize;
-	u32 position;
+	iop_file_t 	*f;
+	u32		smb_fid;
+	u32		filesize;
+	u32		position;
 } FHANDLE;
 
-#define MAX_FDHANDLES 		64
+#define MAX_FDHANDLES		64
 FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
 //-------------------------------------------------------------- 
@@ -135,7 +135,7 @@ int smb_init(iop_device_t *dev)
 	smp.option = 0;
 
 	smbman_io_sema = CreateSema(&smp);
-	
+
 	return 0;
 }
 
@@ -182,9 +182,9 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 
 	if (!filename)
 		return -ENOENT;
-			 
+
 	WaitSema(smbman_io_sema);
-		
+
 	fh = smbman_getfilefreeslot();
 	if (fh) {
 		r = smb_OpenAndX(filename, &smb_fid, &filesize);
@@ -225,7 +225,7 @@ int smb_close(iop_file_t *f)
 		r = 0;
 	}
 
-ssema:	
+ssema:
 	SignalSema(smbman_io_sema);
 
 	return r;
@@ -238,7 +238,7 @@ int smb_lseek(iop_file_t *f, u32 pos, int where)
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 
 	WaitSema(smbman_io_sema);
-		
+
 	switch (where) {
 		case SEEK_CUR:
 			r = fh->position + pos;
@@ -253,17 +253,17 @@ int smb_lseek(iop_file_t *f, u32 pos, int where)
 				r = -EINVAL;
 				goto ssema;
 			}
-			break;			
-		case SEEK_END:	
-			r = fh->filesize;		
-			break;	
+			break;
+		case SEEK_END:
+			r = fh->filesize;
+			break;
 		default:
-			r = -EINVAL;	
+			r = -EINVAL;
 			goto ssema;
 	}
-	
+
 	fh->position = r;
-	
+
 ssema:
 	SignalSema(smbman_io_sema);
 
@@ -284,7 +284,7 @@ int smb_read(iop_file_t *f, void *buf, u32 size)
 
 	WaitSema(smbman_io_sema);
 
-	rpos = 0;	
+	rpos = 0;
 	while (size) {
 		nbytes = MAX_SMB_BUF;
 		if (size < nbytes)
@@ -299,11 +299,11 @@ int smb_read(iop_file_t *f, void *buf, u32 size)
 		rpos += nbytes;
 		buf += nbytes;
 		size -= nbytes;
-		fh->position += nbytes;		
+		fh->position += nbytes;
 	}
 
 ssema:
 	SignalSema(smbman_io_sema);
 
-	return rpos;	
+	return rpos;
 }

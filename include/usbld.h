@@ -140,6 +140,7 @@ int theme_zipped;
 unzFile zipfile;
 
 void LoadGameList();
+void netLoadDisplay();
 
 //HDL
 
@@ -151,10 +152,10 @@ typedef struct
 	char 	partition_name[PS2PART_IDMAX + 1];
 	char	name[HDL_GAME_NAME_MAX + 1];
 	char	startup[8 + 1 + 3 + 1];
-	u8 		hdl_compat_flags;
-	u8 		ops2l_compat_flags;
-	u8		dma_type;
-	u8		dma_mode;
+	u8 	hdl_compat_flags;
+	u8 	ops2l_compat_flags;
+	u8	dma_type;
+	u8	dma_mode;
 	u32 	layer_break;
 	int 	disctype;
   	u32 	start_sector;
@@ -163,10 +164,10 @@ typedef struct
 
 typedef struct
 {
-	u32 			count;
+	u32 		count;
 	hdl_game_info_t *games;
-	u32 			total_chunks;
-  	u32 			free_chunks;
+	u32 		total_chunks;
+  	u32 		free_chunks;
 } hdl_games_list_t;
 
 int hddCheck(void);
@@ -179,23 +180,24 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo);
 #define MDMA_MODE		0x20
 #define UDMA_MODE		0x40
 
-#define HDL_COMPAT_MODE_1 		0x01
-#define HDL_COMPAT_MODE_2 		0x02
-#define HDL_COMPAT_MODE_3 		0x04
-#define HDL_COMPAT_MODE_4 		0x08
-#define HDL_COMPAT_MODE_5 		0x10
-#define HDL_COMPAT_MODE_6 		0x20
-#define HDL_COMPAT_MODE_7 		0x40
-#define HDL_COMPAT_MODE_8 		0x80
+#define HDL_COMPAT_MODE_1 	0x01
+#define HDL_COMPAT_MODE_2 	0x02
+#define HDL_COMPAT_MODE_3 	0x04
+#define HDL_COMPAT_MODE_4 	0x08
+#define HDL_COMPAT_MODE_5 	0x10
+#define HDL_COMPAT_MODE_6 	0x20
+#define HDL_COMPAT_MODE_7 	0x40
+#define HDL_COMPAT_MODE_8 	0x80
 
 //SYSTEM
 int usbdelay;
 int ethdelay;
 
-void Reset();
+void Reset(void);
 void delay(int count);
-void Start_LoadNetworkModules_Thread(void);
-void LoadUSBD();
+void LoadNetworkModules(void);
+void LoadHddModules(void);
+void LoadUsbModules(void);
 int getDiscID(void *discID);
 void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid);

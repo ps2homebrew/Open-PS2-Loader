@@ -2,10 +2,10 @@
 #include "include/usbld.h"
 
 // APA Partition
-#define APA_MAGIC			0x00415041	// 'APA\0'
-#define APA_IDMAX			PS2PART_IDMAX
-#define APA_MAXSUB			64			// Maximum # of sub-partitions
-#define APA_PASSMAX			8
+#define APA_MAGIC		0x00415041	// 'APA\0'
+#define APA_IDMAX		PS2PART_IDMAX
+#define APA_MAXSUB		64		// Maximum # of sub-partitions
+#define APA_PASSMAX		8
 #define APA_FLAG_SUB		0x0001
 #define APA_MBR_VERSION		2
 
@@ -21,36 +21,36 @@ typedef struct {
 
 typedef struct
 {
-	u32		checksum;
-	u32		magic;				// APA_MAGIC
-	u32		next;
+	u32	checksum;
+	u32	magic;			// APA_MAGIC
+	u32	next;
 	u32 	prev;
 	char	id[APA_IDMAX];		// 16
 	char	rpwd[APA_PASSMAX];	// 48
-	char	fpwd[APA_PASSMAX];  // 56
-	u32		start;				// 64
-	u32		length;				// 68
-	u16		type;				// 72
-	u16		flags;				// 74
-	u32		nsub;				// 76
-	ps2time	created;			// 80
-	u32		main;				// 88
-	u32		number;				// 92
-	u32		modver;				// 96
-	u32		pading1[7];			// 100
+	char	fpwd[APA_PASSMAX];	// 56
+	u32	start;			// 64
+	u32	length;			// 68
+	u16	type;			// 72
+	u16	flags;			// 74
+	u32	nsub;			// 76
+	ps2time	created;		// 80
+	u32	main;			// 88
+	u32	number;			// 92
+	u32	modver;			// 96
+	u32	pading1[7];		// 100
 	char	pading2[128];		// 128
-	struct {					// 256
+	struct {			// 256
 		char 	magic[32];
 		u32 	version;
-		u32		nsector;
+		u32	nsector;
 		ps2time	created;
-		u32		osdStart;
-		u32		osdSize;
+		u32	osdStart;
+		u32	osdSize;
 		char	pading3[200];
 	} mbr;
 	struct {
-		u32 start;
-		u32 length;
+		u32	start;
+		u32	length;
 	} subs[APA_MAXSUB];
 } apa_header;
 
@@ -77,23 +77,23 @@ typedef struct
   apa_partition_t *parts;
 } apa_partition_table_t;
 
-typedef struct					// size = 1024
+typedef struct				// size = 1024
 {
-	u32		checksum;			// HDL uses 0xdeadfeed magic here
-	u32		magic;
+	u32	checksum;		// HDL uses 0xdeadfeed magic here
+	u32	magic;
 	char	gamename[160];
 	u8  	hdl_compat_flags;
 	u8  	ops2l_compat_flags;
-	u8		dma_type;
-	u8		dma_mode;
+	u8	dma_type;
+	u8	dma_mode;
 	char	startup[60];
 	u32 	layer1_start;
 	u32 	discType;
 	int 	num_partitions;
 	struct {
-		u32 	part_offset; 	// in MB
-		u32 	data_start; 	// in sectors
-		u32 	part_size; 		// in KB				
+		u32 	part_offset;	// in MB
+		u32 	data_start;	// in sectors
+		u32 	part_size;	// in KB
 	} part_specs[65];
 } hdl_apa_header;
 
@@ -102,21 +102,21 @@ typedef struct					// size = 1024
 //
 #define APA_DEVCTL_MAX_SECTORS		0x00004801	// max partition size(in sectors)
 #define APA_DEVCTL_TOTAL_SECTORS	0x00004802
-#define APA_DEVCTL_IDLE				0x00004803
+#define APA_DEVCTL_IDLE			0x00004803
 #define APA_DEVCTL_FLUSH_CACHE		0x00004804
-#define APA_DEVCTL_SWAP_TMP			0x00004805
+#define APA_DEVCTL_SWAP_TMP		0x00004805
 #define APA_DEVCTL_DEV9_SHUTDOWN	0x00004806
-#define APA_DEVCTL_STATUS			0x00004807
-#define APA_DEVCTL_FORMAT			0x00004808
+#define APA_DEVCTL_STATUS		0x00004807
+#define APA_DEVCTL_FORMAT		0x00004808
 #define APA_DEVCTL_SMART_STAT		0x00004809
-#define APA_DEVCTL_GETTIME				0x00006832 
-#define APA_DEVCTL_SET_OSDMBR			0x00006833// arg = hddSetOsdMBR_t
-#define APA_DEVCTL_GET_SECTOR_ERROR		0x00006834
+#define APA_DEVCTL_GETTIME		0x00006832
+#define APA_DEVCTL_SET_OSDMBR		0x00006833// arg = hddSetOsdMBR_t
+#define APA_DEVCTL_GET_SECTOR_ERROR	0x00006834
 #define APA_DEVCTL_GET_ERROR_PART_NAME	0x00006835// bufp = namebuffer[0x20]
-#define APA_DEVCTL_ATA_READ				0x00006836// arg  = hddAtaTransfer_t 
-#define APA_DEVCTL_ATA_WRITE			0x00006837// arg  = hddAtaTransfer_t 
+#define APA_DEVCTL_ATA_READ		0x00006836// arg  = hddAtaTransfer_t
+#define APA_DEVCTL_ATA_WRITE		0x00006837// arg  = hddAtaTransfer_t
 #define APA_DEVCTL_SCE_IDENTIFY_DRIVE	0x00006838// bufp = buffer for atadSceIdentifyDrive 
-#define APA_DEVCTL_IS_48BIT				0x00006840
+#define APA_DEVCTL_IS_48BIT		0x00006840
 #define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
 
 static apa_partition_table_t *ptable = NULL;
@@ -181,7 +181,7 @@ static int hddWriteSectors(u32 lba, u32 nsectors, void *buf)
 	u8 *args = (u8 *)hdd_buf;
 
 	*(u32 *)&args[0] = lba;
-	*(u32 *)&args[4] = nsectors;	
+	*(u32 *)&args[4] = nsectors;
 	memcpy(&args[8], buf, nsectors << 9);
 
 	argsz = 8 + (nsectors << 9);
@@ -291,16 +291,16 @@ static int apaReadPartitionTable(apa_partition_table_t **table)
 static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 {
 	u32 i, size;
- 	const u32 offset = 0x101000;
- 	char buf[1024];
- 	register int ret;
+	const u32 offset = 0x101000;
+	char buf[1024];
+	register int ret;
 
- 	u32 start_sector = header->start + offset / 512;
+	u32 start_sector = header->start + offset / 512;
 
- 	ret = hddReadSectors(start_sector, 2, buf, 2 * 512);
- 	if (ret == 0) {
+	ret = hddReadSectors(start_sector, 2, buf, 2 * 512);
+	if (ret == 0) {
 
-	 	hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
+		hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
 
 		// calculate total size
 		size = header->length;
@@ -376,22 +376,21 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 
 //-------------------------------------------------------------------------
 int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
-{	
-	// !!!! UNTESTED !!!!
- 	const u32 offset = 0x101000;
- 	char buf[1024];
+{
+	const u32 offset = 0x101000;
+	char buf[1024];
 
- 	if (ptable == NULL)
- 		return -1;
+	if (ptable == NULL)
+		return -1;
 
- 	apa_header *header = &ptable->parts[game_index].header;
- 	if (header == NULL)
- 		return -2;
+	apa_header *header = &ptable->parts[game_index].header;
+	if (header == NULL)
+		return -2;
 
- 	u32 start_sector = header->start + offset / 512;
+	u32 start_sector = header->start + offset / 512;
 
- 	if (hddReadSectors(start_sector, 2, buf, 2 * 512) != 0)
- 		return -3;
+	if (hddReadSectors(start_sector, 2, buf, 2 * 512) != 0)
+		return -3;
 
 	hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
 
@@ -406,8 +405,8 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 	hdl_header->dma_type = ginfo->dma_type;
 	hdl_header->dma_mode = ginfo->dma_mode;
 
- 	if (hddWriteSectors(start_sector, 2, buf) != 0)
- 		return -5;
+	if (hddWriteSectors(start_sector, 2, buf) != 0)
+		return -5;
 
 	hddFlushCache();
 

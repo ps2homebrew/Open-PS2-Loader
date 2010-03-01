@@ -750,7 +750,6 @@ int fs_format (iop_file_t *fd)
 }
 
 //---------------------------------------------------------------------------
-#ifndef INGAME_DRIVER
 unsigned int fs_getFileSector(iop_file_t *fd, char *name)
 {
 	fat_driver* fatd;
@@ -776,7 +775,6 @@ unsigned int fs_getFileSector(iop_file_t *fd, char *name)
 
 	return fat_cluster2sector(&fatd->partBpb, cluster);
 }
-#endif
 
 //---------------------------------------------------------------------------
 int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
@@ -800,11 +798,9 @@ int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
 		case IOCTL_RENAME:  //Request to rename opened file/folder
 			ret = fs_dummy();
 			break;
-#ifndef INGAME_DRIVER
 		case IOCTL_GETCLUSTER:
 			ret = fs_getFileSector(fd, (char *)data);
-			break;	
-#endif			
+			break;
 		default:
 			ret = fs_dummy();
 	}

@@ -339,7 +339,7 @@ static void IGR_Thread(void *arg)
 	PowerOff_PS2();
 }
 
-// IGR VBLANK_START interrupt handler install to monitor combo trick in pad data aera
+// IGR VBLANK_END interrupt handler install to monitor combo trick in pad data aera
 static int IGR_Intc_Handler(int cause)
 {
 	int i;
@@ -386,21 +386,37 @@ static int IGR_Intc_Handler(int cause)
 
 	ee_kmode_exit();
 
-	// If power button or combo is press, suspend all thread which return a RUN state to make sure IGR thread will wakeup
-	if ( Power_Button.press || Pad_Data.combo_type != 0x00 )
+	// If power button or combo is press
+	// Suspend all threads other then our IGR thread
+	// Disable all interrupts other then VBLANK_END ( and SBUS, TIMER2, TIMER3 use by kernel )
+	if ( Power_Button.vb_count == 1 || Pad_Data.combo_type != 0x00 )
 	{
+		// Suspend all threads
 		for(i = 3; i < 256; i++)
 		{
-			if(iReferThreadStatus( i, NULL ) == 0x01 )
+			if(i != IGR_Thread_ID )
 				iSuspendThread( i );
 		}
+
+		// Disable INTC
+		iDisableIntc(kINTC_GS          );
+		iDisableIntc(kINTC_VBLANK_START); 
+		iDisableIntc(kINTC_VIF0        );
+		iDisableIntc(kINTC_VIF1        );
+		iDisableIntc(kINTC_VU0         );
+		iDisableIntc(kINTC_VU1         );
+		iDisableIntc(kINTC_IPU         );
+		iDisableIntc(kINTC_TIMER0      );
+		iDisableIntc(kINTC_TIMER1      );
 	}
 
-	// If a combo is set, disable VBLANK_START interrupts, and wakeup our IGR thread
+	// If a combo is set
+	// Disable VBLANK_END interrupts
+	// WakeUp our IGR thread
 	if ( Pad_Data.combo_type != 0x00 )
 	{
-		// Disable VBLANK_START Interrupts
-		iDisableIntc(kINTC_VBLANK_START);
+		// Disable VBLANK_END Interrupts
+		iDisableIntc(kINTC_VBLANK_END);
 
 		// WakeUp IGR thread
 		iWakeupThread(IGR_Thread_ID);
@@ -443,37 +459,21 @@ static void Install_IGR(void *addr, int libpad)
 		Pad_Data.pos_state  = 4;
 	}
 
-	// Delete IGR thread if already created
-	if(IGR_Thread_ID >= 0)
-	{
-		TerminateThread(IGR_Thread_ID);
-		DeleteThread(IGR_Thread_ID);
-	}
-
 	// Create and start IGR thread
 	thread_param.gp_reg           = &_gp;
 	thread_param.func             = IGR_Thread;
 	thread_param.stack            = (void*)IGR_Stack;
 	thread_param.stack_size       = IGR_STACK_SIZE;
-	thread_param.initial_priority = 1;
+	thread_param.initial_priority = -1;
 	thread_param.current_priority = 99;
 	IGR_Thread_ID                 = CreateThread(&thread_param);
 
 	StartThread(IGR_Thread_ID, NULL);
 
-	// Delete IGR interrupt handler if already created
-	if(IGR_Intc_ID >= 0)
-	{
-		DIntr();
-		RemoveIntcHandler(kINTC_VBLANK_START, IGR_Intc_ID);
-		EIntr();
-	}
-
 	// Create IGR interrupt handler
-	DIntr();
-	IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_START, IGR_Intc_Handler, 0);
-	EnableIntc(kINTC_VBLANK_START);
-	EIntr();
+	DisableIntc(kINTC_VBLANK_END);
+	IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
+	EnableIntc(kINTC_VBLANK_END);
 }
 
 // Hook function for libpad scePadPortOpen

@@ -278,7 +278,7 @@ int Hook_CreateThread(ee_thread_t *thread_param)
 			else
 				mem_start = 0x00100000;
 
-			if((mem_end = (u32)thread_param->stack) <= (u32)thread_param->func)
+			if((mem_end = (u32)thread_param->stack) <= mem_start)
 				mem_end = 0x01f00000;
 
 			if(!Install_PadOpen_Hook(mem_start, mem_end))
@@ -295,6 +295,10 @@ int Hook_CreateThread(ee_thread_t *thread_param)
 		}
 	}
 
+	// Patch initial priority of IGR thread
+	if(thread_param->initial_priority == -1)
+		thread_param->initial_priority = 0;
+	
 	return Old_CreateThread(thread_param);
 }
 

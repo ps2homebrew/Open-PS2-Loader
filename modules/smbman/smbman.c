@@ -297,7 +297,6 @@ int smb_read(iop_file_t *f, void *buf, u32 size)
 		}
 
 		rpos += nbytes;
-		buf += nbytes;
 		size -= nbytes;
 		fh->position += nbytes;
 	}

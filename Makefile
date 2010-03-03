@@ -64,13 +64,13 @@ clean:
 	$(MAKE) -C modules/atad clean
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/ps2hdd clean
-	echo "    * iso2usbld"
+	echo "    * iso2opl"
 	$(MAKE) -C pc clean
 
 rebuild: clean all
 
 pc_tools:
-	echo "Building iso2usbld..."
+	echo "Building iso2opl..."
 	$(MAKE) -C pc
 
 loader.s:

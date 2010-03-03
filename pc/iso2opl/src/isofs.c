@@ -3,16 +3,15 @@
   Copyright (c) 2002, A.Lee & Nicholas Van Veen  
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from libcdvd by A.Lee & Nicholas Van Veen
   Review license_libcdvd file for further details.
 */
 
-#include "iso2usbld.h"
-
-//#define DEBUG
+#include "iso2opl.h"
 
 static int isofs_inited = 0;
+static int gIsBigEnd = 0;
 
 #define MAX_DIR_CACHE_SECTORS 32
 
@@ -143,29 +142,35 @@ struct TocEntry {
 static struct cdVolDesc CDVolDesc;
 
 //-------------------------------------------------------------------------
+u16 be16(u16 le_val)
+{
+	return ((le_val & 0xff) << 8) | ((le_val & 0xffff) >> 8);
+}
+
+//-------------------------------------------------------------------------
 int isofs_ReadISO(s64 offset, u32 nbytes, void *buf)
 {
 	int r;
-	
+
 	#ifdef DEBUG
 		printf("isofs_ReadISO: offset = %lld nbytes = %d\n", offset, nbytes);
-	#endif	
-		
+	#endif
+
 	//lseek64(g_fh_iso, offset, SEEK_SET);	 
 	//r = read(g_fh_iso, buf, nbytes);
 	fseeko64(g_fh_iso, offset, SEEK_SET);	 
 	r = fread(buf, 1, nbytes, g_fh_iso);
-	
+
 /*
 	int i;
 	u8 *p = (u8 *)buf;
 	for (i=0; i<nbytes; i++) {
 		if ((i%16)==0)
 			printf("\n");
-		printf("%02x ", p[i]);	
+		printf("%02x ", p[i]);
 	}
 	printf("\n");
-*/		
+*/
 	return r;
 }
 
@@ -178,15 +183,15 @@ int isofs_ReadSect(u32 lsn, u32 nsectors, void *buf)
 
 	#ifdef DEBUG
 		printf("isofs_ReadSect: LBA = %d nsectors = %d\n", lsn, nsectors);
-	#endif	
-			
-	offset = lsn << 11;
-	nbytes = nsectors << 11;
+	#endif
+
+	offset = lsn * 2048;
+	nbytes = nsectors * 2048;
 	
 	r = isofs_ReadISO(offset, nbytes, buf);
 	if (r != nbytes)
 		return 0;
-			
+
 	return 1;
 }
 
@@ -194,7 +199,7 @@ int isofs_ReadSect(u32 lsn, u32 nsectors, void *buf)
 int isofs_FlushCache(void)
 {
 	strcpy(CachedDirInfo.pathname, "");		// The pathname of the cached directory
-	CachedDirInfo.valid = 0;				// Cache is not valid
+	CachedDirInfo.valid = 0;			// Cache is not valid
 	CachedDirInfo.path_depth = 0;			// 0 = root)
 	CachedDirInfo.sector_start = 0;			// The start sector (LBA) of the cached directory
 	CachedDirInfo.sector_num = 0;			// The total size of the directory (in sectors)
@@ -202,7 +207,7 @@ int isofs_FlushCache(void)
 	CachedDirInfo.cache_size = 0;			// The size of the cached directory area (in sectors)
 
 	memset(CachedDirInfo.cache, 0, MAX_DIR_CACHE_SECTORS * 2048);
-	
+
 	return 1;
 }
 
@@ -231,7 +236,7 @@ int isofs_GetVolumeDescriptor(void)
 			break;
 	}
 
-	#ifdef DEBUG	
+	#ifdef DEBUG
 		switch (CDVolDesc.filesystemType) {
 			case 1:
 				printf("CD FileSystem is ISO9660\n");
@@ -267,16 +272,16 @@ void TocEntryCopy(struct TocEntry* tocEntry, struct dirTocEntry* internalTocEntr
 	register int i;
 	register int filenamelen;
 
-	tocEntry->fileSize = internalTocEntry->fileSize;
-	tocEntry->fileLBA = internalTocEntry->fileLBA;
+	tocEntry->fileSize = (gIsBigEnd ? internalTocEntry->fileSize_bigend : internalTocEntry->fileSize);
+	tocEntry->fileLBA = (gIsBigEnd ? internalTocEntry->fileLBA_bigend : internalTocEntry->fileLBA);
 	tocEntry->fileProperties = internalTocEntry->fileProperties;
 
 	if (CDVolDesc.filesystemType == 2) {
 		// This is a Joliet Filesystem, so use Unicode to ISO string copy
-		filenamelen = internalTocEntry->filenameLength >> 1;
+		filenamelen = internalTocEntry->filenameLength / 2;
 
 		for (i=0; i < filenamelen; i++)
-			tocEntry->filename[i] = internalTocEntry->filename[(i << 1) + 1];
+			tocEntry->filename[i] = internalTocEntry->filename[(i * 2) + 1];
 	}
 	else {
 		filenamelen = internalTocEntry->filenameLength;
@@ -308,25 +313,25 @@ int FindPath(char *pathname)
 		found_dir = 0;
 
 		tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
-		
+
 		// Always skip the first entry (self-refencing entry)
-		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length);
-		
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + (gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length));
+
 		dir_entry = 0;
 
-		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); \
-		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length)) \
+		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size * 2048)); \
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + (gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length))) \
 		{
 			// If we have a null toc entry, then we've either reached the end of the dir, or have reached a sector boundary
-			if (tocEntryPointer->length == 0) {
+			if ((gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length) == 0) {
 				#ifdef DEBUG
 					printf("Got a null pointer entry, so either reached end of dir, or end of sector\n");
 				#endif
 
-				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11));
+				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) / 2048) + 1) * 2048));
 			}
 
-			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11))) {
+			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size * 2048))) {
 				// If we've gone past the end of the cache
 				// then check if there are more sectors to load into the cache
 
@@ -354,7 +359,7 @@ int FindPath(char *pathname)
 					return 0;
 				}
 			}
-			
+
 			// If the toc Entry is a directory ...
 			if (tocEntryPointer->fileProperties & 0x02) {
 				// Convert to our format (inc ascii name), for the check
@@ -385,7 +390,7 @@ int FindPath(char *pathname)
 
 						if (CachedDirInfo.path_depth > 0)
 							CachedDirInfo.path_depth --;
-						
+
 						if (CachedDirInfo.path_depth == 0)
 						{
 							// If at root then just clear the path to root
@@ -426,7 +431,7 @@ int FindPath(char *pathname)
 			dir_entry++;
 		} // end of cache block search loop
 
-		
+
 		// if we've reached here, without finding the directory, then it's not there
 		if (found_dir != 1) {
 			CachedDirInfo.valid = 0;
@@ -437,10 +442,10 @@ int FindPath(char *pathname)
 		dirname = strtok(NULL,"\\/");
 
 		CachedDirInfo.sector_start = localTocEntry.fileLBA;
-		CachedDirInfo.sector_num = localTocEntry.fileSize >> 11;
+		CachedDirInfo.sector_num = localTocEntry.fileSize / 2048;
 		if (localTocEntry.fileSize & 0x7ff)
 			CachedDirInfo.sector_num++;
-		
+
 		// Cache the start of the found directory
 		// (used in searching if this isn't the last dir,
 		// or used by whatever requested the cache in the first place if it is the last dir)
@@ -465,7 +470,7 @@ int FindPath(char *pathname)
 	#ifdef DEBUG
 		printf("FindPath found the path\n");
 	#endif
-	
+
 	CachedDirInfo.valid = 1;
 	return 1;
 }
@@ -669,7 +674,9 @@ int isofs_Cache_Dir(const char *pathname, enum Cache_getMode getMode)
 	}
 
 	#ifdef DEBUG
-		printf("Read the CD root TOC - LBA = %d size = %d\n", CDVolDesc.rootToc.tocLBA, CDVolDesc.rootToc.tocSize);
+		printf("Read the CD root TOC - LBA = %d size = %d\n", \
+			(gIsBigEnd ? CDVolDesc.rootToc.tocLBA_bigend : CDVolDesc.rootToc.tocLBA), \
+			(gIsBigEnd ? CDVolDesc.rootToc.tocSize_bigend : CDVolDesc.rootToc.tocSize));
 	#endif
 
 	CachedDirInfo.path_depth = 0;
@@ -678,12 +685,12 @@ int isofs_Cache_Dir(const char *pathname, enum Cache_getMode getMode)
 	
 	// Setup the lba and sector size, for retrieving the root toc
 	CachedDirInfo.cache_offset = 0;
-	CachedDirInfo.sector_start = CDVolDesc.rootToc.tocLBA;
-	CachedDirInfo.sector_num = CDVolDesc.rootToc.tocSize >> 11;
-	if (CDVolDesc.rootToc.tocSize & 0x7ff)
+	CachedDirInfo.sector_start = (gIsBigEnd ? CDVolDesc.rootToc.tocLBA_bigend : CDVolDesc.rootToc.tocLBA);
+	CachedDirInfo.sector_num = (gIsBigEnd ? CDVolDesc.rootToc.tocSize_bigend : CDVolDesc.rootToc.tocSize) / 2048;
+	if ((gIsBigEnd ? CDVolDesc.rootToc.tocSize_bigend : CDVolDesc.rootToc.tocSize) & 0x7ff)
 		CachedDirInfo.sector_num++;
-			
-    CachedDirInfo.cache_size = CachedDirInfo.sector_num;
+
+	CachedDirInfo.cache_size = CachedDirInfo.sector_num;
 
 	if (CachedDirInfo.cache_size > MAX_DIR_CACHE_SECTORS)
 		CachedDirInfo.cache_size = MAX_DIR_CACHE_SECTORS;
@@ -701,7 +708,7 @@ int isofs_Cache_Dir(const char *pathname, enum Cache_getMode getMode)
 	#ifdef DEBUG
 		printf("Read the first block from the root directory\n");
 	#endif
-	
+
 	// FindPath should use the current directory cache to start it's search (in this case the root)
 	// and should change CachedDirInfo.pathname, to the path of the dir it finds
 	// it should also cache the first chunk of directory sectors,
@@ -748,7 +755,7 @@ void __splitpath(const char *constpath, char *dir, char *fname)
 		strncpy(fname, pathcopy, 128);
 		fname[128]=0;
 	}
-	
+
 	strtok(fname, ";");
 }
 
@@ -762,7 +769,7 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 	#ifdef DEBUG
 		printf("isofs_FindFile called\n");
 	#endif
-	
+
 	__splitpath(fname, pathname, filename);
 
 	#ifdef DEBUG
@@ -775,18 +782,18 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 
 		tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
 
-		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); \
-		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length)) \
+		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size * 2048)); \
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + (gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length))) \
 		{
-			if (tocEntryPointer->length == 0) {
+			if ((gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length) == 0) {
 				#ifdef DEBUG
 					printf("Got a null pointer entry, so either reached end of dir, or end of sector\n");
 				#endif
 
-				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11));
+				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) / 2048) + 1) * 2048));
 			}
 
-			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11))) {
+			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size * 2048))) {
 				// reached the end of the cache block
 				break;
 			}
@@ -794,7 +801,7 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 			//if ((tocEntryPointer->fileProperties & 0x02) == 0) {
 				// It's a file
 				TocEntryCopy(tocEntry, tocEntryPointer);
-				
+
 				if (strcasecmp(tocEntry->filename, filename) == 0) {
 					// and it matches !!
 					return 1;
@@ -840,30 +847,30 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 
 	while (CachedDirInfo.cache_size > 0) {
 		tocEntryPointer = (struct dirTocEntry *)CachedDirInfo.cache;
-				
+
 		if (CachedDirInfo.cache_offset == 0)
-			tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length);
-			
-		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11)); \
-		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + tocEntryPointer->length)) \
+			tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + (gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length));
+
+		for ( ; (u8 *)tocEntryPointer < (CachedDirInfo.cache + (CachedDirInfo.cache_size * 2048)); \
+		tocEntryPointer = (struct dirTocEntry *)((u8 *)tocEntryPointer + (gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length))) \
 		{
-			
-			if (tocEntryPointer->length == 0) {
+
+			if ((gIsBigEnd ? be16(tocEntryPointer->length) : tocEntryPointer->length) == 0) {
 				#ifdef DEBUG
 					printf("Got a null pointer entry, so either reached end of dir, or end of sector\n");
 					printf("Offset into cache = %d bytes\n", (int)tocEntryPointer - (int)CachedDirInfo.cache);
 				#endif
 
-				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) >> 11) + 1) << 11));
+				tocEntryPointer = (struct dirTocEntry *)(CachedDirInfo.cache + (((((u8 *)tocEntryPointer - CachedDirInfo.cache) / 2048) + 1) * 2048));
 			}
 
-			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size << 11))) {
+			if ((u8 *)tocEntryPointer >= (CachedDirInfo.cache + (CachedDirInfo.cache_size * 2048))) {
 				// reached the end of the cache block
 				break;
 			}
 
 			TocEntryCopy(tocEntry, tocEntryPointer);
-			
+
 			if (strcasecmp(tocEntry->filename, filename) == 0) {
 				#ifdef DEBUG
 					printf("Found a matching file\n");
@@ -876,19 +883,19 @@ int isofs_FindFile(const char *fname, struct TocEntry *tocEntry) // Export #6
 				printf("Non-matching file - looking for %s , found %s\n",filename, tocEntry->filename);
 			#endif
 		} // end of for loop
-		
+
 		#ifdef DEBUG
 			printf("Reached end of cache block\n");
 		#endif
 		// cache the next block
 		isofs_Cache_Dir(pathname, CACHE_NEXT);
 	}
-			
+
 	// we've run out of dir blocks to cache, and still not found it, so fail
 	#ifdef DEBUG
 		printf("isofs_FindFile: could not find file\n");
 	#endif
-	
+
 	return 0;
 }
 
@@ -897,7 +904,7 @@ int isofs_Open(const char *filename)
 {
 	register int fd;
 	FHANDLE *fh;
-	static struct TocEntry tocEntry;	
+	static struct TocEntry tocEntry;
 
 	#ifdef DEBUG
 		printf("isofs_Open: filename %s\n", filename);
@@ -905,29 +912,29 @@ int isofs_Open(const char *filename)
 
 	if (!isofs_inited)
 		return -13;
-		
+
 	// attribute new file handle	
 	for (fd = 0; fd < MAX_FDHANDLES; fd++) {
 		fh = (FHANDLE *)&isofs_fdhandles[fd];
 		if (fh->status == 0)
 			break;
 	}
-		
+
 	// check if the file exists
 	if (isofs_FindFile(filename, &tocEntry) != 1)
 		return -1;
-			
+
 	// too much files opened
 	if (fd == MAX_FDHANDLES)
 		return -7;
-			
-	memset((void *)fh, 0, sizeof (FHANDLE));	
-				
+
+	memset((void *)fh, 0, sizeof (FHANDLE));
+
 	fh->lsn = tocEntry.fileLBA;
-	fh->filesize = tocEntry.fileSize;	
+	fh->filesize = tocEntry.fileSize;
 	fh->status = 1;
-			
-	return fd;	
+
+	return fd;
 }
 
 //-------------------------------------------------------------- 
@@ -941,17 +948,17 @@ int isofs_Close(int fd)
 
 	if (!isofs_inited)
 		return -13;
-			
+
 	if (!((u32)fd < MAX_FDHANDLES))
 		return -5;
-			
-	fh = (FHANDLE *)&isofs_fdhandles[fd];	
-	if (!fh->status) 
-		return -5;	
-				
+
+	fh = (FHANDLE *)&isofs_fdhandles[fd];
+	if (!fh->status)
+		return -5;
+
 	fh->status = 0;
-			
-	return 0;		
+
+	return 0;
 }
 
 //-------------------------------------------------------------- 
@@ -967,33 +974,33 @@ int isofs_Read(int fd, void *buf, u32 nbytes)
 
 	if (!isofs_inited)
 		return -13;
-				
+
 	if (!((u32)fd < MAX_FDHANDLES))
 		return -5;
-			
-	fh = (FHANDLE *)&isofs_fdhandles[fd];	
+
+	fh = (FHANDLE *)&isofs_fdhandles[fd];
 	if (!fh->status) 
 		return -5;
-		
+
 	if (fh->position >= fh->filesize)
 		return 0;
-				
+
 	if (nbytes >= (fh->filesize - fh->position))
 		nbytes = fh->filesize - fh->position;
-				
-	offset = (((s64)fh->lsn) << 11)+ fh->position;
+
+	offset = (((s64)fh->lsn) * 2048)+ fh->position;
 
 	#ifdef DEBUG
 		printf("isofs_Read: offset =%lld nbytes = %d\n", offset, nbytes);
 	#endif
-			
-	r = isofs_ReadISO(offset, nbytes, buf);			
+
+	r = isofs_ReadISO(offset, nbytes, buf);
 	fh->position += r;
-	
+
 	#ifdef DEBUG
 		printf("isofs_Read: readed bytes = %d\n", r);
-	#endif	
-					
+	#endif
+
     return r;
 }
 
@@ -1038,16 +1045,16 @@ int isofs_Seek(int fd, u32 offset, int origin)
 }
 
 //-------------------------------------------------------------------------
-s64 isofs_Init(const char *iso_path)
+s64 isofs_Init(const char *iso_path, int isBigEndian)
 {
 	s64 r;
-	
+
 	#ifdef DEBUG
 		printf("isofs_Init: ISO path %s\n", iso_path);
 	#endif
 
 	if (!isofs_inited) {
-	
+		gIsBigEnd = isBigEndian;
 		CachedDirInfo.cache = (u8 *)isofs_dircache;			
 		isofs_FlushCache();	
 	

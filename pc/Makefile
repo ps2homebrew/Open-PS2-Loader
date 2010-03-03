@@ -1,7 +1,7 @@
 all:
-	make -C iso2usbld
+	make -C iso2opl
 
 clean:
-	make -C iso2usbld clean
+	make -C iso2opl clean
 
 rebuild: clean all

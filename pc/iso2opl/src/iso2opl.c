@@ -3,16 +3,14 @@
   Copyright (c) 2002, A.Lee & Nicholas Van Veen  
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from libcdvd by A.Lee & Nicholas Van Veen
   Review license_libcdvd file for further details.
 */
 
-#include "iso2usbld.h"
+#include "iso2opl.h"
 
-//#define DEBUG
-
-#define WR_SIZE 	524288
+#define WR_SIZE		524288
 
 u32 crctab[0x400];
 u8 systemcnf_buf[65536];
@@ -120,7 +118,7 @@ int check_cfg(const char *drive, const char *game_name, const char *game_id)
 			}
 		}
 		fclose(fh_cfg);
-	}	
+	}
 
 	return 0;
 }
@@ -147,18 +145,18 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 	sprintf(cfg_path, "%s/ul.cfg", drive);
 #endif
 	memset(&cfg, 0, sizeof(cfg_t));
-	
+
 	strncpy(cfg.name, game_name, 32);
 	sprintf(cfg.image, "ul.%s", game_id);
 	cfg.parts = parts;
 	cfg.pad[4] = 0x08; // To be like USBA
-	
+
 	if (!strcmp(media, "CD"))
 		cfg.media = 0x12;
 	else if (!strcmp(media, "DVD"))
 		cfg.media = 0x14;
 
-	/*	
+	/*
 	fh_cfg = open(cfg_path, O_WRONLY|O_CREAT|O_APPEND);
 	if (fh_cfg < 0)
 		return -1;
@@ -182,7 +180,7 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 	}
 
 	fclose(fh_cfg);
-		
+
 	return 0;
 }
 
@@ -198,7 +196,7 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, s
 	s64 nbytes, rpos, iso_pos;
 
 #ifdef DEBUG
-	printf("write_parts drive:%s name:%s id:%s filesize:0x%x parts:%d\n", drive, game_name, game_id, filesize, parts);
+	printf("write_parts drive:%s name:%s id:%s filesize:0x%llx parts:%d\n", drive, game_name, game_id, filesize, parts);
 #endif
 
 	iso_pos = 0;
@@ -238,7 +236,7 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, s
 				if (r != size) {
 					free(buf);
 					close(fh_part);
-    				return -3;
+				return -3;
 				}
 
 				printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, (int)(iso_pos >> 11));
@@ -248,7 +246,7 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, s
 				if (r != size) {
 					free(buf);
 					close(fh_part);
-    				return -4;
+				return -4;
 				}
 
 				size = r;
@@ -284,7 +282,7 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, s
 				if (r != size) {
 					free(buf);
 					fclose(fh_part);
-    				return -3;
+				return -3;
 				}
 
 				printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, (int)(iso_pos >> 11));
@@ -294,7 +292,7 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, s
 				if (r != size) {
 					free(buf);
 					fclose(fh_part);
-    				return -4;
+				return -4;
 				}
 
 				size = r;
@@ -384,6 +382,7 @@ int main(int argc, char **argv, char **env)
 	s64 num_parts;
 	char *p;
 	s64 filesize;
+	int isBigEnd;
 
 	// args check
 	if ((argc != 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) || (strlen(argv[3]) > 32)) {
@@ -391,13 +390,22 @@ int main(int argc, char **argv, char **env)
 		exit(EXIT_FAILURE);
 	}
 
+	// Big Endianness test
+	p = (char *)&isBigEnd;
+	memset(p, 0, 4);
+	p[3] = 1;
+
+	if (isBigEnd != 1)
+		isBigEnd = 0;
+
 #ifdef DEBUG
 	printf("DEBUG_MODE ON\n");
+	printf("Endianness: %d\n", isBigEnd);
 	printf("isofs Init...\n");
 #endif
 
 	// Init isofs
-	filesize = isofs_Init(argv[1]);
+	filesize = isofs_Init(argv[1], isBigEnd);
 	if (!filesize) {
 		printf("Error: failed to open ISO file!\n");
 		exit(EXIT_FAILURE);
@@ -410,7 +418,7 @@ int main(int argc, char **argv, char **env)
 
 #ifdef DEBUG
 	printf("ISO filesize: 0x%llx\n", filesize);
-	printf("Number of parts: %d\n", num_parts);
+	printf("Number of parts: %lld\n", num_parts);
 	//return 0;
 #endif
 
@@ -511,4 +519,3 @@ int main(int argc, char **argv, char **env)
 
 	return 0;
 }
-

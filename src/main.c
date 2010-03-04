@@ -810,7 +810,7 @@ int RefreshHDDGameList() {
 }
 
 // --------------------- USB Menu item callbacks --------------------
-void FindUSBPartition(){
+void FindUSBPartition() {
 	int i, fd;
 	char path[64];
 	
@@ -841,6 +841,9 @@ void RefreshUSBGameList(struct menu_item_t *self, short force) {
 		
 		if (force)
 			usb_max_games = 0;
+		
+		if (!usb_max_games)
+			FindUSBPartition();
 		
 		RefreshGameList(&usbGameList, &usb_max_games, USB_prefix, &usb_submenu, &usb_games_item);
 	}

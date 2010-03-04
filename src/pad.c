@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, Ifcaro
+  Copyright 2009, Ifcaro, Volca
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.  
 */
@@ -35,10 +35,6 @@ u32 oldpaddata;
 
 int delaycnt[16];
 int paddelay[16];
-
-
-int ret;
-int i;
 
 #define KEY_LEFT 1
 #define KEY_DOWN 2
@@ -187,7 +183,7 @@ int readPad(struct pad_data_t* pad)
 {
 	int rcode = 0;
 
-	ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
+	int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
             
         if (ret != 0)
 	{
@@ -208,6 +204,21 @@ int readPad(struct pad_data_t* pad)
 	return rcode;
 }
 
+/** Returns frame count based delay specified for the given key.
+* @param id The button id
+* @param repeat Boolean value specifying if we want initial key delay (0) or the repeat key delay (1)
+* @return the delay to the next key event
+*/
+int getKeyDelay(int id, int repeat) {
+	int delay = paddelay[id - 1];
+	
+	// if not in repeat, the delay is doubled
+	if (!repeat)
+		delay += delay;
+	
+	return delay;
+}
+
 /** polling method. Call every frame. */
 int readPads() {
 	int i;
@@ -220,6 +231,13 @@ int readPads() {
 		rslt |= readPad(&pad_data[i]);
 	}
 	
+	for (i = 0; i < 16; ++i) {
+		if (getKeyPressed(i + 1))
+			delaycnt[i]--;
+		else
+			delaycnt[i] = getKeyDelay(i + 1, 0);
+	}
+	
 	return rslt;
 }
 
@@ -228,35 +246,27 @@ int readPads() {
 * @return nonzero if button is being pressed just now
 */
 int getKey(int id) {
-	int rtn=0;
-	
-	if ( (id<=0) || (id>=17) )
+	if ( (id <= 0) || (id >= 17) )
 		return 0;
 
+	int kid = id - 1;
+	
 	// either the button was not pressed this frame, then reset counter and return
-	// or it wasn't, then handle the repetition
+	// or it was, then handle the repetition
 	if (getKeyOn(id)) {
-		delaycnt[id] = 0;
+		delaycnt[kid] = getKeyDelay(id, 0);
 		return 1;
-	}	
-	
-	if(!getKeyPressed(id)) {
-		delaycnt[id - 1] = 0;
+	}
+
+	if(!getKeyPressed(id))
 		return 0;
-	}
 
-	id--;
-	
-	// it is pressed - process the repetition
-	delaycnt[id]++;
-	
-	if(delaycnt[id] > paddelay[id]) {
-		rtn=1;
-		delaycnt[id]=0;
+	if(delaycnt[kid] <= 0) {
+		delaycnt[kid] = getKeyDelay(id, 1);
+		return 1;
 	}
 	
-
-	return rtn;
+	return 0;
 }
 
 /** Detects key-on event. Returns true if the button was not pressed the last frame but is pressed this frame.
@@ -369,7 +379,7 @@ int startPads() {
 	
 	int n;
 	for(n=0; n<16; ++n) {
-		delaycnt[n]=0;
+		delaycnt[n]=DEFAULT_PAD_DELAY;
 		paddelay[n]=DEFAULT_PAD_DELAY;
 	}
 	

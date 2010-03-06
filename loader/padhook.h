@@ -61,7 +61,7 @@ typedef struct {
 	int port;
 	int slot;
 	int number;
-	u16 name[16];
+	u8  name[16];
 } pad2socketparam_t;
 
 typedef struct {
@@ -95,7 +95,7 @@ typedef struct {
 #define IGR_COMBO_START_SELECT 0xF6
 #define IGR_COMBO_R3_L3        0xF9
 
-#define NB_PADOPEN_PATTERN 5
+#define NB_PADOPEN_PATTERN 6
 
 /*******************************************************
  * For libpad support
@@ -113,6 +113,7 @@ typedef struct {
  * libpad          3.0.0.0
  * libpad          3.0.1.0
  * libpad          3.0.2.0
+ * libpad          3.1.0.0
  */
 static u32 padPortOpenpattern0[] = {
 	0x27bdff50,		//	addiu		sp, sp, $ff50
@@ -166,10 +167,58 @@ static u32 padPortOpenpattern0_mask[] = {
 /*******************************************************
  * For libpad support
  *
+ * libpad          2.1.0.0
+ */
+static u32 padPortOpenpattern1[] = {
+	0x27bdff50,		//	addiu		sp, sp, $ff50
+	0xffb20030,		//	sd			s2, $0030(sp)
+	0xffb40050,		//	sd			s4, $0050(sp)
+	0x00c0902d,		//	daddu		s2, a2, zero
+	0xffb30040,		//	sd			s3, $0040(sp)
+	0x00a0a02d,		//	daddu		s4, a1, zero
+	0xffbf00a0,		//	sd			ra, $00a0(sp)
+	0x0080982d,		//	daddu		s3, a0, zero
+	0xffbe0090,		//	sd			fp, $0090(sp)
+	0x3242003f,		//	andi		v0, s2, $003f
+	0xffb70080,		//	sd			s7, $0080(sp)
+	0xffb60070,		//	sd			s6, $0070(sp)
+	0xffb50060,		//	sd			s5, $0060(sp)
+	0xffb10020,		//	sd			s1, $0020(sp)
+	0x10400000,		//	beq			v0, zero, $XXXXXXXX
+	0xffb00010,		//	sd			s0, $0010(sp)
+	0x3c040000,		//	lui			a0, $XXXX
+	0x0240282d,		//	daddu		a1, s2, zero
+	0x0c000000		//	jal			kprintf
+};
+static u32 padPortOpenpattern1_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xfc000000
+};
+
+/*******************************************************
+ * For libpad support
+ *
  * libpad          1.6.3.0
  * libpad          2.0.0.0
  */
-static u32 padPortOpenpattern1[] = {
+static u32 padPortOpenpattern2[] = {
 	0x27bdff60,		//	addiu		sp, sp, $ff60               
 	0xffb20030,		//	sd			s2, $0030(sp)               
 	0xffb70080,		//	sd			s7, $0080(sp)               
@@ -189,7 +238,7 @@ static u32 padPortOpenpattern1[] = {
 	0x0240282d,		//	daddu		a1, s2, zero
 	0x0c000000		//	jal			printf
 };
-static u32 padPortOpenpattern1_mask[] = {
+static u32 padPortOpenpattern2_mask[] = {
 	0xffffffff,
 	0xffffffff,
 	0xffffffff,
@@ -215,7 +264,7 @@ static u32 padPortOpenpattern1_mask[] = {
  *
  * libpad          1.5.0.0
  */
-static u32 padPortOpenpattern2[] = {
+static u32 padPortOpenpattern3[] = {
 	0x27bdff70,		//	addiu		sp, sp, $ff70
 	0xffb20030,		//	sd			s2, $0030(sp)
 	0xffb50060,		//	sd			s5, $0060(sp)
@@ -233,7 +282,7 @@ static u32 padPortOpenpattern2[] = {
 	0x3c040000,		//	lui			a0, $XXXX
 	0x0c000000		//	jal			printf
 };
-static u32 padPortOpenpattern2_mask[] = {
+static u32 padPortOpenpattern3_mask[] = {
 	0xffffffff,
 	0xffffffff,
 	0xffffffff,
@@ -255,8 +304,10 @@ static u32 padPortOpenpattern2_mask[] = {
 /**************************************************************************
  * For libpad2 support
  *
+ * libpad2  2.7.1.0
  * libpad2  3.0.0.0
  * libpad2  3.0.2.0
+ * libpad2  3.1.0.0
  */
 static u32 pad2CreateSocketpattern0[] = {
 	0x27bdff90,		//	addiu		sp, sp, $ff90

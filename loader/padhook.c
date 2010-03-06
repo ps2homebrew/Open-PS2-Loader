@@ -521,7 +521,8 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end)
 		{ pad2CreateSocketpattern0, pad2CreateSocketpattern0_mask, sizeof(pad2CreateSocketpattern0), 2 },
 		{ padPortOpenpattern1     , padPortOpenpattern1_mask     , sizeof(padPortOpenpattern1)     , 1 },
 		{ pad2CreateSocketpattern1, pad2CreateSocketpattern1_mask, sizeof(pad2CreateSocketpattern1), 2 },
-		{ padPortOpenpattern2     , padPortOpenpattern2_mask     , sizeof(padPortOpenpattern2)     , 1 }
+		{ padPortOpenpattern2     , padPortOpenpattern2_mask     , sizeof(padPortOpenpattern2)     , 1 },
+		{ padPortOpenpattern3     , padPortOpenpattern3_mask     , sizeof(padPortOpenpattern3)     , 1 }
 	};
 
 	found = 0;

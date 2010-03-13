@@ -986,10 +986,10 @@ void ExecExit(struct menu_item_t* self, int vorder) {
 			"	nop;"
 		);
 	}else if(exit_mode==1){
-		ExecElf("mc0:/BOOT/BOOT.ELF");
+		ExecElf("mc0:/BOOT/BOOT.ELF", 0, NULL);
 		msgBox("Error launching mc0:/BOOT/BOOT.ELF");
 	}else if(exit_mode==2){
-		ExecElf("mc0:/APPS/BOOT.ELF");
+		ExecElf("mc0:/APPS/BOOT.ELF", 0, NULL);
 		msgBox("Error launching mc0:/APPS/BOOT.ELF");
 	}
 }

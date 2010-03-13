@@ -201,7 +201,7 @@ void LoadUsbModules(void);
 int getDiscID(void *discID);
 void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid);
-int ExecElf(char *path);
+int ExecElf(char *path, int argc, char **argv);
 void SendIrxKernelRAM(int mode);
 unsigned int USBA_crc32(char *string);
 

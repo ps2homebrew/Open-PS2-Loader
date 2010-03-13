@@ -4,7 +4,7 @@ EE_BIN = main.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/unzip.o obj/explode.o obj/unreduce.o obj/unshrink.o obj/loader.o obj/alt_loader.o obj/imgdrv.o obj/eesync.o obj/dia.o \
+EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/unzip.o obj/explode.o obj/unreduce.o obj/unshrink.o obj/loader.o obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o obj/dia.o \
 		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
 		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/iomanx.o obj/filexio.o obj/util.o\
@@ -30,6 +30,8 @@ clean:
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"
 	$(MAKE) -C loader clean
+	echo "    * Elf Loader"
+	$(MAKE) -C elfldr clean
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv clean
 	echo "    * eesync.irx"
@@ -84,6 +86,12 @@ alt_loader.s:
 	$(MAKE) -C loader clean
 	$(MAKE) -C loader -f Makefile.alt
 	bin2s loader/loader.elf asm/alt_loader.s alt_loader_elf
+
+elfldr.s:
+	echo "    * Elf Loader"
+	$(MAKE) -C elfldr clean
+	$(MAKE) -C elfldr
+	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
 	
 imgdrv.s:
 	echo "    * imgdrv.irx"

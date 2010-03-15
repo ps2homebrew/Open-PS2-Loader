@@ -469,31 +469,31 @@ char *turkish[LANG_STR_COUNT] = {
 };
 
 char *polish[LANG_STR_COUNT] = {
-	"               WITAM W OPEN PS2 LOADER. GLÓWNY KOD WZOROWANY NA KODZIE ZRÓDLOWYM HD PROJEKTU <http://psx-scene.com> IMPLEMENTACJE FORMATU USB ADVANCE I GUI PRZEZ IFCARO <http://ps2dev.ifcaro.net> WIEKSZOSC JADRA LOADER'A WYKONANA PRZEZ JIMMIKAELKAEL. WSZYSTKIE ULEPSZENIA GUI WYKONANE PRZEZ VOLCA. DZIEKUJE ZA SKORZYSTANIE Z NASZEJ APLIKACJI. ^^", // gfx.c:85
+	"               WITAMY W OPEN PS2 LOADER. GLÓWNY KOD WZOROWANY NA KODZIE ZRÓDLOWYM HD PROJECT <http://psx-scene.com> IMPLEMENTACJE FORMATU USB ADVANCE I GUI PRZEZ IFCARO <http://ps2dev.ifcaro.net> WIEKSZOSC JADRA LOADERA WYKONANA PRZEZ JIMMIKAELKAEL. WSZYSTKIE ULEPSZENIA GUI WYKONANE PRZEZ VOLCA. DZIEKUJEMY ZA SKORZYSTANIE Z NASZEJ APLIKACJI. ^^", // gfx.c:85
 	"Open PS2 Loader %s", // gfx.c:320
-	"Ustawienia theme'u", // gfx.c:502
+	"Ustawienia skórki", // gfx.c:502
 	"Ustawienia IP", // gfx.c:764
-	"Zapisz Zmiany", // gfx.c:586
+	"Zapisz zmiany", // gfx.c:586
 	"O Powrót", // gfx.c:736
 	"Wolne przewijanie", // main.c:21 
 	"Normalne przewijanie", 
 	"Szybkie przewijanie",
-	"Dynamiczne Menu",  // main.c:22
-	"Statyczne Menu",
-	"stawienia Theme'ów",  // main.c:23
-	"Ustawienia Sieci",
-	"Wybierz Jezyk",  
-	"Brak Rzeczy", // main.c:26
-	"Jeszcze Niedostepne", // main.c:158
+	"Dynamiczne menu",  // main.c:22
+	"Statyczne menu",
+	"Konfiguruj skórkê",  // main.c:23
+	"Ustawienia sieci",
+	"Wybierz jezyk",  
+	"Brak gier", // main.c:26
+	"Jeszcze niedostepne", // main.c:158
 	"Ustawienia zostaly zapisane...", //  main.c:166
 	"Blad przy zapisie ustawien!", //  main.c:168
 	"Wyjscie", // Menu item strings
 	"Ustawienia",
 	"Gry z USB",
 	"Gry z HDD",
-	"Gry z Sieci",
+	"Gry przez siec",
 	"Programy",
-	"Theme", // Submenu items
+	"Skórka", // Submenu items
 	"Jezyk",
 	"Jezyk : Polski",
 	"Uruchom Siec",
@@ -503,27 +503,27 @@ char *polish[LANG_STR_COUNT] = {
 	"Wlaczone",
 	"Wylaczone",
 	"Ok",
-	"Ustawienia Kompatybilnosci",
+	"Ustawienia kompatybilnosci",
 	"Usun wszystkie ustawienia",
 	"Usunieto wszystkie klucze dla gry",
 	"Przewijanie", // _STR_SCROLLING
-	"Typ Menu", // _STR_MENUTYPE
+	"Rodzaj menu", // _STR_MENUTYPE
 	"Powoli", // _STR_SLOW
 	"Normalnie", // _STR_MEDIUM
 	"Szybko", // _STR_FAST
 	"Statycznie", // _STR_STATIC
 	"Dynamicznie", // _STR_DYNAMIC
-	"Default menu", // _STR_DEF_DEVICE
-	"Load from disc", // _STR_LOAD_FROM_DISC
-	"Please wait", // _STR_PLEASE_WAIT
-	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
-	"Use Hard Drive", // _STR_USEHDD
-	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
-	"Start Hard Drive", // _STR_STARTHDD
-	"Automatic sorting", // _STR_AUTOSORT
-	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE	
-	"Disable Debug Colors", // _STR_DEBUG
-	"No controller detected, waiting...", // _STR_NO_CONTROLLER	
+	"Domyslne menu", // _STR_DEF_DEVICE
+	"Uruchom z plyty", // _STR_LOAD_FROM_DISC
+	"Prosze czekac", // _STR_PLEASE_WAIT
+	"Blad podczas odczytywania Game ID", // _STR_ERROR_LOADING_ID
+	"Uzyj twardego dysku", // _STR_USEHDD
+	"Autostart twardego dysku", // _STR_AUTOSTARTHDD
+	"Uruchom twardy dysk", // _STR_STARTHDD
+	"Automatyczne sortowanie", // _STR_AUTOSORT
+	"Wystapil blad podczas wczytywania pliku jezykowego", // _STR_ERR_LOADING_LANGFILE	
+	"Wylacz kolory Debug", // _STR_DEBUG
+	"Nie wykryto podlaczonego kontrolera, oczekiwanie...", // _STR_NO_CONTROLLER
 };
 
 char *russian[LANG_STR_COUNT] = {

@@ -20,7 +20,7 @@
 #include "padhook.h"
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
-static int (*scePadPortOpen)( int port, int slot, void* addr );
+static int (*scePadPortOpen)( int port, int slot, void *addr );
 static int (*scePad2CreateSocket)( pad2socketparam_t *SocketParam, void *addr );
 
 /* Monitored pad data */
@@ -29,8 +29,7 @@ static paddata_t Pad_Data;
 /* Monitored power button data */
 static powerbuttondata_t Power_Button;
 
-/* IGR Interrupt handler & Thread ID */
-static int IGR_Intc_ID   = -1;
+/* IGR Thread ID */
 static int IGR_Thread_ID = -1;
 
 /* IGR thread stack & stack size */
@@ -359,7 +358,7 @@ static int IGR_Intc_Handler(int cause)
 	}
 
 	ee_kmode_enter();
-
+	
 	// Check power button press
 	if ( (*CDVD_R_NDIN & 0x20) && (*CDVD_R_POFF & 0x04) )
 	{
@@ -374,7 +373,7 @@ static int IGR_Intc_Handler(int cause)
 	// Start VBlank counter when power button is pressed
 	if( Power_Button.press )
 	{
-		// Check number of power button press after 1 sec
+		// Check number of power button press after 1 ~ sec
 		if( Power_Button.vb_count++ >= 50 )
 		{
 			if( Power_Button.press == 1 )
@@ -387,20 +386,15 @@ static int IGR_Intc_Handler(int cause)
 	ee_kmode_exit();
 
 	// If power button or combo is press
-	// Suspend all threads other then our IGR thread
-	// Disable all interrupts other then VBLANK_END ( and SBUS, TIMER2, TIMER3 use by kernel )
-	if ( Power_Button.vb_count == 1 || Pad_Data.combo_type != 0x00 )
+	// Disable all interrupts (not SBUS, TIMER2, TIMER3 use by kernel)
+	// Suspend and Change priority of all threads other then our IGR thread
+	// Wakeup and Change priority of our IGR thread
+	if ( Pad_Data.combo_type != 0x00 )
 	{
-		// Suspend all threads
-		for(i = 3; i < 256; i++)
-		{
-			if(i != IGR_Thread_ID )
-				iSuspendThread( i );
-		}
-
-		// Disable INTC
+		// Disable Interrupts
 		iDisableIntc(kINTC_GS          );
 		iDisableIntc(kINTC_VBLANK_START); 
+		iDisableIntc(kINTC_VBLANK_END  );
 		iDisableIntc(kINTC_VIF0        );
 		iDisableIntc(kINTC_VIF1        );
 		iDisableIntc(kINTC_VU0         );
@@ -408,18 +402,23 @@ static int IGR_Intc_Handler(int cause)
 		iDisableIntc(kINTC_IPU         );
 		iDisableIntc(kINTC_TIMER0      );
 		iDisableIntc(kINTC_TIMER1      );
-	}
 
-	// If a combo is set
-	// Disable VBLANK_END interrupts
-	// WakeUp our IGR thread
-	if ( Pad_Data.combo_type != 0x00 )
-	{
-		// Disable VBLANK_END Interrupts
-		iDisableIntc(kINTC_VBLANK_END);
-
-		// WakeUp IGR thread
-		iWakeupThread(IGR_Thread_ID);
+		// Loop for each threads
+		for(i = 3; i < 256; i++)
+		{
+			if(i == IGR_Thread_ID )
+			{
+				// WakeUp IGR thread
+				iWakeupThread(IGR_Thread_ID);
+				iChangeThreadPriority( i, 0 );
+			}
+			else
+			{
+				// Suspend all threads
+				iSuspendThread( i );
+				iChangeThreadPriority( i, 127 );
+			}
+		}
 	}
 
 	// Exit handler
@@ -464,15 +463,13 @@ static void Install_IGR(void *addr, int libpad)
 	thread_param.func             = IGR_Thread;
 	thread_param.stack            = (void*)IGR_Stack;
 	thread_param.stack_size       = IGR_STACK_SIZE;
-	thread_param.initial_priority = -1;
-	thread_param.current_priority = 99;
+	thread_param.initial_priority = 127;
 	IGR_Thread_ID                 = CreateThread(&thread_param);
 
 	StartThread(IGR_Thread_ID, NULL);
 
 	// Create IGR interrupt handler
-	DisableIntc(kINTC_VBLANK_END);
-	IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
+	AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
 	EnableIntc(kINTC_VBLANK_END);
 }
 
@@ -480,7 +477,12 @@ static void Install_IGR(void *addr, int libpad)
 static int Hook_scePadPortOpen( int port, int slot, void* addr )
 {
 	int ret;
+	
+	// Make sure scePadPortOpen function is still available
+	if(port == 0 && slot == 0)
+		Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_CHECK);
 
+	// Call original scePadPortOpen function
 	ret = scePadPortOpen(port, slot, addr);
 
 	// Install IGR with libpad1 parameters
@@ -495,7 +497,12 @@ static int Hook_scePad2CreateSocket( pad2socketparam_t *SocketParam, void *addr 
 {
 	int ret;
 
-	ret = scePad2CreateSocket(SocketParam, addr);
+	// Make sure scePad2CreateSocket function is still available
+	if(SocketParam->port == 0 && SocketParam->slot == 0)
+		Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_CHECK);
+
+	// Call original scePad2CreateSocket function
+	ret = scePad2CreateSocket( SocketParam, addr );
 
 	// Install IGR with libpad2 parameters
 	if(SocketParam->port == 0 && SocketParam->slot == 0)
@@ -504,96 +511,141 @@ static int Hook_scePad2CreateSocket( pad2socketparam_t *SocketParam, void *addr 
 	return ret;
 }
 
-/*
- * This function patch the padOpen calls
- * scePadPortOpen or scePad2CreateSocket
- */
-int Install_PadOpen_Hook(u32 mem_start, u32 mem_end)
+// This function patch the padOpen calls. (scePadPortOpen or scePad2CreateSocket)
+int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 {
-	int i, found;
-	u8 *ptr, *ptr2;
+	u32 *ptr, *ptr2;
 	u32 inst, fncall;
 	u32 mem_size, mem_size2;
 	u32 pattern[1], mask[1];
+	int i, found, patched;
 
 	pattern_t padopen_patterns[NB_PADOPEN_PATTERN] = {
 		{ padPortOpenpattern0     , padPortOpenpattern0_mask     , sizeof(padPortOpenpattern0)     , 1 },
 		{ pad2CreateSocketpattern0, pad2CreateSocketpattern0_mask, sizeof(pad2CreateSocketpattern0), 2 },
-		{ padPortOpenpattern1     , padPortOpenpattern1_mask     , sizeof(padPortOpenpattern1)     , 1 },
 		{ pad2CreateSocketpattern1, pad2CreateSocketpattern1_mask, sizeof(pad2CreateSocketpattern1), 2 },
+		{ pad2CreateSocketpattern2, pad2CreateSocketpattern2_mask, sizeof(pad2CreateSocketpattern2), 2 },
+		{ padPortOpenpattern1     , padPortOpenpattern1_mask     , sizeof(padPortOpenpattern1)     , 1 },
 		{ padPortOpenpattern2     , padPortOpenpattern2_mask     , sizeof(padPortOpenpattern2)     , 1 },
 		{ padPortOpenpattern3     , padPortOpenpattern3_mask     , sizeof(padPortOpenpattern3)     , 1 }
 	};
 
-	found = 0;
+	found   = 0;
+	patched = 0;
 
-	/* Loop for each libpad version */
+	// Loop for each libpad version
 	for(i = 0; i < NB_PADOPEN_PATTERN; i++)
 	{
-		ptr = (u8 *)mem_start;
+		ptr = (u32 *)mem_start;
 		while (ptr)
 		{
+			// Purple while PadOpen pattern search
 			if(!DisableDebug)
-				GS_BGCOLOUR = 0x800080; /* Purple while PadOpen pattern search */
+				GS_BGCOLOUR = 0x800080;
 
 			mem_size = mem_end - (u32)ptr;
 
-			/* First try to locate the orginal libpad's PadOpen function */
+			// First try to locate the orginal libpad's PadOpen function
 			ptr = find_pattern_with_mask(ptr, mem_size, padopen_patterns[i].pattern, padopen_patterns[i].mask, padopen_patterns[i].size);
 			if (ptr)
 			{				
 				found = 1;
-
+				
+				// Green while PadOpen patches
 				if(!DisableDebug)
-				 	GS_BGCOLOUR = 0x008000; /* Green while PadOpen patches */
+				 	GS_BGCOLOUR = 0x008000;
 
-				/* Save original PadOpen ptr */
-				if (padopen_patterns[i].version == 1)
+				// Save original PadOpen function
+				if (padopen_patterns[i].version == IGR_LIBPAD_V1)
 					scePadPortOpen = (void *)ptr;
 				else
 					scePad2CreateSocket = (void *)ptr;
 
-				/* Retrieve PadOpen call Instruction code */
-				inst = 0x0c000000;
-				inst |= 0x03ffffff & ((u32)ptr >> 2);
-
-				/* Make pattern with function call code saved above */
-				pattern[0] = inst;
-				mask[0] = 0xffffffff;
-
-				/* Get Hook_PadOpen call Instruction code */
-				inst = 0x0c000000;
-				if (padopen_patterns[i].version == 1)
-					inst |= 0x03ffffff & ((u32)Hook_scePadPortOpen >> 2);
-				else
-					inst |= 0x03ffffff & ((u32)Hook_scePad2CreateSocket >> 2);
-
-				/* Search & patch for calls to PadOpen */
-				ptr2 = (u8 *)0x00100000;
-				while (ptr2)
+				if(mode == PADOPEN_HOOK)
 				{
-					mem_size2 = 0x01f00000 - (u32)ptr2;
+					// Retrieve PadOpen call Instruction code
+					inst = 0x00000000;
+					inst |= 0x03ffffff & ((u32)ptr >> 2);
 
-					ptr2 = find_pattern_with_mask(ptr2, mem_size2, (u8 *)pattern, (u8 *)mask, sizeof(pattern));
-					if (ptr2)
+					// Make pattern with function call code saved above
+					// Ignore bits 24-27 because Jump type can be J(8) or JAL(C)
+					pattern[0] = inst;
+					mask[0] = 0xf0ffffff;
+
+					// Search & patch for calls to PadOpen
+					ptr2 = (u32 *)0x00100000;
+					while (ptr2)
 					{
-						fncall = (u32)ptr2;
-						_sw(inst, fncall); /* overwrite the original PadOpen function call with our function call */
+						mem_size2 = 0x01ff0000 - (u32)ptr2;
 
-						ptr2 += 8;
+						ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
+						if (ptr2)
+						{
+							patched = 1;
+
+							fncall = (u32)ptr2;
+
+							// Get PadOpen call Jump Instruction type. (JAL or J)
+							inst = (ptr2[0] & 0x0f000000);
+
+							// Get Hook_PadOpen call Instruction code
+							if (padopen_patterns[i].version == IGR_LIBPAD_V1)
+								inst |= 0x03ffffff & ((u32)Hook_scePadPortOpen >> 2);
+							else
+								inst |= 0x03ffffff & ((u32)Hook_scePad2CreateSocket >> 2);
+
+							// Overwrite the original PadOpen function call with our function call
+							_sw(inst, fncall);
+						}
 					}
-				}
-				ptr += 8;
+
+					if(!patched)
+					{
+						// Make pattern with function address saved above
+						pattern[0] = (u32)ptr;
+						mask[0] = 0xffffffff;
+
+						// Search & patch for PadOpen function address
+						ptr2 = (u32 *)0x00100000;
+						while (ptr2)
+						{
+							mem_size2 = 0x01ff0000 - (u32)ptr2;
+
+							ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
+							if (ptr2)
+							{
+								patched = 1;
+
+								fncall = (u32)ptr2;
+
+								// Get Hook_PadOpen function address
+								if (padopen_patterns[i].version == IGR_LIBPAD_V1)
+									inst = (u32)Hook_scePadPortOpen;
+								else
+									inst = (u32)Hook_scePad2CreateSocket;
+
+								// Overwrite the original PadOpen function address with our function address
+								_sw(inst, fncall);
+							}
+						}
+					}
+				}else
+					// Hooking is not required and padOpen function was found, so stop searching
+					break;
+
+				// Increment search pointer
+				ptr += padopen_patterns[i].size;
 			}
 		}
 
-		/* Assume that only one libpad version is use per game... Not sure ... */
-		if(found == 1)
+		// If a padOpen function call was patched or ( hooking is not required and a padOpen function was found ), so stop the libpad version search loop
+		if( patched == 1 || (mode == PADOPEN_CHECK && found == 1) )
 			break;
 	}
 
+	// Black, done
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0x000000; /* Black, done */
+		GS_BGCOLOUR = 0x000000;
 
-	return found;
+	return patched;
 }

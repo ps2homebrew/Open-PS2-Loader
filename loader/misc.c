@@ -65,13 +65,16 @@ void set_ipconfig(void)
 /*----------------------------------------------------------------------------------------*/
 /* This function retrieve a pattern in a buffer, using a mask                             */
 /*----------------------------------------------------------------------------------------*/
-u8 *find_pattern_with_mask(u8 *buf, u32 bufsize, u8 *bytes, u8 *mask, u32 len)
+u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 len)
 {
 	register u32 i, j;
 
+	len /= sizeof(u32);
+	bufsize /= sizeof(u32);
+	
 	for (i = 0; i < bufsize - len; i++) {
 		for (j = 0; j < len; j++) {
-			if ((buf[i + j] & mask[j]) != bytes[j])
+			if ((buf[i + j] & mask[j]) != pattern[j])
 				break;
 		}
 		if (j == len)

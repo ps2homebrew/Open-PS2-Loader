@@ -51,36 +51,6 @@ typedef struct
 	u32 dummy;  
 } t_ExecData;
 
-typedef struct
-{
-	u8	ident[16];
-	u16	type;
-	u16	machine;
-	u32	version;
-	u32	entry;
-	u32	phoff;
-	u32	shoff;
-	u32	flags;
-	u16	ehsize;
-	u16	phentsize;
-	u16	phnum;
-	u16	shentsize;
-	u16	shnum;
-	u16	shstrndx;
-} elf_header_t;
-
-typedef struct
-{
-	u32	type;
-	u32	offset;
-	void	*vaddr;
-	u32	paddr;
-	u32	filesz;
-	u32	memsz;
-	u32	flags;
-	u32	align;
-} elf_pheader_t;
-
 typedef struct {
 	void *irxaddr;
 	int irxsize;
@@ -124,12 +94,12 @@ int DisableDebug;
 /* modmgr.c */
 int  LoadFileInit();
 void LoadFileExit();
-int LoadModule(const char *path, int arg_len, const char *args);
+int  LoadModule(const char *path, int arg_len, const char *args);
 int  LoadModuleAsync(const char *path, int arg_len, const char *args);
 void GetIrxKernelRAM(void);
-int LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv);
+int  LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv);
 int  LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args);
-int  LoadElf(const char *path, t_ExecData *data) __attribute__((section(".unsafe")));
+int  LoadElf(const char *path, t_ExecData *data);
 
 /* iopmgr.c */
 int  New_Reset_Iop(const char *arg, int flag);
@@ -139,7 +109,7 @@ int  Sync_Iop(void);
 /* misc.c */
 unsigned int _strtoui(const char* p);
 void set_ipconfig(void);
-u8 *find_pattern_with_mask(u8 *buf, u32 bufsize, u8 *bytes, u8 *mask, u32 len);
+u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
 int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
 int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
@@ -153,12 +123,16 @@ void Remove_Kernel_Hooks(void);
 u32  (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
 int  (*Old_SifSetReg)(u32 register_num, int register_value);
 void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
+int  (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int  (*Old_CreateThread)(ee_thread_t *thread_param);
 
 /* patches.c */
 void apply_game_patches(void);
 
 /* padhook.c */
-int Install_PadOpen_Hook(u32 mem_start, u32 mem_end);
+#define PADOPEN_HOOK  0
+#define PADOPEN_CHECK 1
+
+int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode);
 
 #endif

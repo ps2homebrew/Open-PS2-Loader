@@ -24,12 +24,18 @@ int set_reg_hook;
 int set_reg_disabled;
 int iop_reboot_count = 0;
 
+static int padOpen_hooked = 0;
+
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
 /*----------------------------------------------------------------------------------------*/
 u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 {
+	// Hook padOpen function to install In Game Reset
+	if( !(g_compat_mask & COMPAT_MODE_6) && padOpen_hooked == 0 )
+		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
+
 	SifCmdResetData *reset_pkt = (SifCmdResetData*)sdd->src;
 	New_Reset_Iop(reset_pkt->arg, reset_pkt->flag);
 
@@ -116,10 +122,8 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 // ------------------------------------------------------------------------
 static void t_loadElf(void)
 {
-	int i, r, fd;
+	int i, r;
 	t_ExecData elf;
-	elf_header_t *header;
-	elf_pheader_t *prog_header;
 
 	SifExitRpc();
 
@@ -158,40 +162,6 @@ static void t_loadElf(void)
 
 	if ((!r) && (elf.epc))
 	{
-		// Patch padread function to install In Game Reset
-		if(!(g_compat_mask & COMPAT_MODE_6))
-		{
-			fioInit();
-
-			// Open g_ElfPath file
-			fd = open(g_ElfPath, O_RDONLY);
-
-			if (fd > 0)
-			{
-				// Read elf header
-				header = (elf_header_t *)g_buf;
-				lseek(fd, 0, SEEK_SET);
-				read(fd, g_buf, sizeof(elf_header_t));
-
-				// Read program segments header
-				prog_header = (elf_pheader_t *)(g_buf + header->phoff);
-				lseek(fd, header->phoff, SEEK_SET);
-				read(fd, (void *)prog_header, header->phnum * header->phentsize);
-
-				// Try to find scePadRead in each program segments
-				for (i = 0; i < header->phnum; i++)
-				{
-					if (prog_header[i].type != 1 || prog_header[i].memsz == 0)
-						continue;
-
-					if ( Install_PadOpen_Hook((u32)prog_header[i].vaddr, (u32)prog_header[i].vaddr + prog_header[i].memsz) )
-						break;
-				}
-			}
-
-			close(fd);
-		}
-
 		// exit services
 		fioExit();
 		SifExitIopHeap();
@@ -266,44 +236,35 @@ void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
 // ------------------------------------------------------------------------
 int Hook_CreateThread(ee_thread_t *thread_param)
 {
-	u32 mem_start, mem_end;
+	// Hook padOpen function to install In Game Reset
+	if( padOpen_hooked == 0 && thread_param->initial_priority == 0 )
+		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
 
-	// Patch padread function to install In Game Reset
-	if(!(g_compat_mask & COMPAT_MODE_6))
-	{
-		if( thread_param->initial_priority == 0 || (thread_param->initial_priority < 5 && thread_param->current_priority == 0) )
-		{
-			if((u32)thread_param->func >= 0x00400000)
-				mem_start = (u32)thread_param->func - 0x00300000;
-			else
-				mem_start = 0x00100000;
-
-			if((mem_end = (u32)thread_param->stack) <= mem_start)
-				mem_end = 0x01f00000;
-
-			if(!Install_PadOpen_Hook(mem_start, mem_end))
-			{
-				if(!Install_PadOpen_Hook(0x00100000, 0x01f00000))
-				{
-					if(!DisableDebug)
-						GS_BGCOLOUR = 0x0000FF; /* Red to signal no IGR available */
-					delay(3);
-					if(!DisableDebug)
-						GS_BGCOLOUR = 0x000000; /* Black */
-				}
-			}
-		}
-	}
-
-	// Patch initial priority of IGR thread
-	if(thread_param->initial_priority == -1)
-		thread_param->initial_priority = 0;
-	
 	return Old_CreateThread(thread_param);
 }
 
+// ------------------------------------------------------------------------
+int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
+{
+	// Hook padOpen function to install In Game Reset
+	if( (u32)entry >= 0x00100000 )
+		padOpen_hooked = Install_PadOpen_Hook( 0x00100000, 0x01ff0000, PADOPEN_HOOK );
+
+	__asm__(
+		"move $a0, %1\n\t"
+		"move $a1, %2\n\t"
+		"move $a2, %3\n\t"
+		"move $a3, %4\n\t"
+		"jr   %0\n\t"
+		::"r"((u32)Old_ExecPS2), "r"((u32)entry), "r"((u32)gp), "r"((u32)num_args), "r"((u32)args)
+	);
+
+	return 1;
+}
+
 /*----------------------------------------------------------------------------------------*/
-/* Replace SifSetDma, SifSetReg, LoadExecPS2, and CreateThread syscalls in kernel.        */
+/* Replace SifSetDma, SifSetReg, LoadExecPS2 syscalls in kernel. (Game Loader)            */
+/* Replace CreateThread and ExecPS2 syscalls in kernel. (In Game Reset)                   */
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
@@ -315,13 +276,21 @@ void Install_Kernel_Hooks(void)
 	
 	Old_LoadExecPS2 = GetSyscallHandler(__NR_LoadExecPS2);
 	SetSyscall(__NR_LoadExecPS2, &Hook_LoadExecPS2);	
+	
+	// If IGR is enabled hook ExecPS2 & CreateThread syscalls
+	if(!(g_compat_mask & COMPAT_MODE_6))
+	{
+		Old_CreateThread = GetSyscallHandler(__NR_CreateThread);
+		SetSyscall(__NR_CreateThread, &Hook_CreateThread);
 
-	Old_CreateThread = GetSyscallHandler(__NR_CreateThread);
-	SetSyscall(__NR_CreateThread, &Hook_CreateThread);
+		Old_ExecPS2 = GetSyscallHandler(__NR_ExecPS2);
+		SetSyscall(__NR_ExecPS2, &Hook_ExecPS2);
+	}
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Restore original SifSetDma, SifSetReg, LoadExecPS2, & CreateThread syscalls in kernel. */
+/* Restore original SifSetDma, SifSetReg, LoadExecPS2 syscalls in kernel. (Game loader)   */
+/* Restore original CreateThread and ExecPS2 syscalls in kernel. (In Game Reset)          */
 /*----------------------------------------------------------------------------------------*/
 void Remove_Kernel_Hooks(void)
 {
@@ -329,5 +298,11 @@ void Remove_Kernel_Hooks(void)
 		Apply_Mode3();
 
 	SetSyscall(__NR_LoadExecPS2, Old_LoadExecPS2);
-	SetSyscall(__NR_CreateThread, Old_CreateThread);
+
+	// If IGR is enabled unhook ExecPS2 & CreateThread syscalls
+	if(!(g_compat_mask & COMPAT_MODE_6))
+	{
+		SetSyscall(__NR_CreateThread, Old_CreateThread);
+		SetSyscall(__NR_ExecPS2, Old_ExecPS2);
+	}
 }

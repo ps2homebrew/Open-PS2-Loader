@@ -119,17 +119,17 @@ static u32 AC9Bpattern_mask[] = {
 
 static void NIS_generic_patches(void)
 {
-	u8 *ptr;
+	u32 *ptr;
 
 	if (GameMode == USB_MODE) { // Nippon Ichi Sofwtare games generic patch to disable cdvd timeout
-		ptr = find_pattern_with_mask((u8 *)0x100000, 0x01e00000, (u8 *)NIScdtimeoutpattern, (u8 *)NIScdtimeoutpattern_mask, 0x28);
+		ptr = find_pattern_with_mask((u32 *)0x100000, 0x01e00000, NIScdtimeoutpattern, NIScdtimeoutpattern_mask, 0x28);
 		if (ptr) {
 			u16 jmp = _lw((u32)ptr+32) & 0xffff;
 			_sw(0x10000000|jmp, (u32)ptr+32);
 		}
 	}
 	else if (GameMode == ETH_MODE) { // Nippon Ichi Sofwtare games generic patch to lower memory allocation for sounds
-		ptr = find_pattern_with_mask((u8 *)0x100000, 0x01e00000, (u8 *)NISsndiopmemallocpattern, (u8 *)NISsndiopmemallocpattern_mask, 0x28);
+		ptr = find_pattern_with_mask((u32 *)0x100000, 0x01e00000, NISsndiopmemallocpattern, NISsndiopmemallocpattern_mask, 0x28);
 		if (ptr) {
 			u16 val = _lw((u32)ptr+24) & 0xffff;
 			u16 val2 = _lw((u32)ptr+28) & 0xffff;			
@@ -141,10 +141,10 @@ static void NIS_generic_patches(void)
 
 static void AC9B_generic_patches(void)
 {
-	u8 *ptr;
+	u32 *ptr;
 
 	if (GameMode == USB_MODE) { // Armored Core 9 Breaker generic USB patch
-		ptr = find_pattern_with_mask((u8 *)0x100000, 0x01e00000, (u8 *)AC9Bpattern, (u8 *)AC9Bpattern_mask, 0x28);
+		ptr = find_pattern_with_mask((u32 *)0x100000, 0x01e00000, AC9Bpattern, AC9Bpattern_mask, 0x28);
 		if (ptr)
 			_sw(0, (u32)ptr+36);
 	}

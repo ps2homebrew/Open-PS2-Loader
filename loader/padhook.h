@@ -67,10 +67,13 @@ typedef struct {
 typedef struct {
  int libpad;
  u8 *pad_buf;
+ int vb_count;
  int pos_combo1;
  int pos_combo2;
  int pos_state;
+ int pos_frame;
  u8  combo_type;
+ u8  prev_frame;
 } paddata_t;
 
 typedef struct {

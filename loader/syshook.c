@@ -24,7 +24,7 @@ int set_reg_hook;
 int set_reg_disabled;
 int iop_reboot_count = 0;
 
-static int padOpen_hooked = 0;
+int padOpen_hooked = 0;
 
 
 /*----------------------------------------------------------------------------------------*/
@@ -237,7 +237,7 @@ void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
 int Hook_CreateThread(ee_thread_t *thread_param)
 {
 	// Hook padOpen function to install In Game Reset
-	if( padOpen_hooked == 0 && thread_param->initial_priority == 0 )
+	if( padOpen_hooked == 0 && ( thread_param->initial_priority == 0 || (thread_param->initial_priority < 5 && thread_param->current_priority == 0) ) )
 		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
 
 	return Old_CreateThread(thread_param);

@@ -343,10 +343,29 @@ static int IGR_Intc_Handler(int cause)
 {
 	int i;
 
+	// Write back the D-cache contents to update Pad Buffer
+	iSyncDCache(Pad_Data.pad_buf, Pad_Data.pad_buf + 256);
+	
 	// First check pad state
 	if ( ( (Pad_Data.libpad == IGR_LIBPAD_V1) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V1) ) ||
 			 ( (Pad_Data.libpad == IGR_LIBPAD_V2) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V2) ) )
 	{
+		// Check if pad buffer is still alive with pad data frame counter
+		// If pad frame change save it, otherwise tell to syshook to re-install padOpen hook
+		if( Pad_Data.vb_count++ >= 10)
+		{
+			if(Pad_Data.pad_buf[Pad_Data.pos_frame] != Pad_Data.prev_frame)
+			{
+				padOpen_hooked = 1;
+				Pad_Data.prev_frame = Pad_Data.pad_buf[Pad_Data.pos_frame];
+			}
+			else
+			{
+				padOpen_hooked = 0;
+			}
+			Pad_Data.vb_count = 0;
+		}
+
 		// Combo R1 + L1 + R2 + L2
 		if ( Pad_Data.pad_buf[Pad_Data.pos_combo1] == IGR_COMBO_R1_L1_R2_L2 )
 		{
@@ -438,11 +457,13 @@ static void Install_IGR(void *addr, int libpad)
 	// Reset power button data
 	Power_Button.press    = 0;
 	Power_Button.vb_count = 0;
-	
-	// Set pad library version, and buffer
-	Pad_Data.libpad     = libpad;
-	Pad_Data.pad_buf    = addr;
-	Pad_Data.combo_type = 0x00;
+
+	// Init Pad_Data informations
+	Pad_Data.vb_count      = 0;
+	Pad_Data.libpad        = libpad;
+	Pad_Data.pad_buf       = addr;
+	Pad_Data.combo_type    = 0x00;
+	Pad_Data.prev_frame    = 0x00;
 
 	// Set positions of pad data and pad state in buffer
 	if(libpad == IGR_LIBPAD_V1)
@@ -450,12 +471,14 @@ static void Install_IGR(void *addr, int libpad)
 		Pad_Data.pos_combo1 = 3;
 		Pad_Data.pos_combo2 = 2;
 		Pad_Data.pos_state  = 112;
+		Pad_Data.pos_frame  = 88;
 	}
 	else
 	{
 		Pad_Data.pos_combo1 = 29;
 		Pad_Data.pos_combo2 = 28;
 		Pad_Data.pos_state  = 4;
+		Pad_Data.pos_frame  = 124;
 	}
 
 	// Create and start IGR thread

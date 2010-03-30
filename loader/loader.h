@@ -62,6 +62,8 @@ extern int set_reg_hook;
 extern int set_reg_disabled;
 extern int iop_reboot_count;
 
+extern int padOpen_hooked;
+
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 int g_ipconfig_len;

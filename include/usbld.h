@@ -23,7 +23,7 @@
 
 #include <debug.h>
 
-#define USBLD_VERSION "0.6"
+#define USBLD_VERSION "0.7"
 
 // count of items per page (for page up/down navigation)
 #define STATIC_PAGE_SIZE 10

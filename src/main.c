@@ -764,8 +764,8 @@ void RefreshGameList(TGame **list, int* max_games, const char* prefix, struct su
 		// to ensure no leaks happen, we copy manually and pad the strings
 		memcpy(g->Name, buffer, 32);
 		g->Name[32] = '\0';
-		memcpy(g->Image, &buffer[32], 16);
-		g->Image[16] = '\0';
+		memcpy(g->Image, &buffer[32], 15);
+		g->Image[15] = '\0';
 		memcpy(&g->parts, &buffer[47], 1);
 		memcpy(&g->media, &buffer[48], 1);
 		

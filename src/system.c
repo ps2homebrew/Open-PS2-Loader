@@ -416,7 +416,7 @@ int pcmcia_check(void)
 	return 0;	// ExpBay
 }
 
-void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
+void LaunchLoaderElf(char *filename, char *mode_str, int size_irx, void *irx, int compatflags, int alt_ee_core)
 {
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
@@ -425,11 +425,10 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	int i;
 	char *argv[3];
 	char config_str[255];
-	char *mode_str = NULL;
 
 	set_ipconfig();
 
-	SendIrxKernelRAM(mode);
+	SendIrxKernelRAM(size_irx, irx);
 
 	// NB: LOADER.ELF is embedded
 	if (alt_ee_core)
@@ -462,13 +461,6 @@ void LaunchLoaderElf(char *filename, int mode, int compatflags, int alt_ee_core)
 	FlushCache(0);
 	FlushCache(2);
 
-	if (mode == USB_MODE)
-		mode_str = "USB_MODE";
-	else if (mode == ETH_MODE)
-		mode_str = "ETH_MODE";
-	else if (mode == HDD_MODE)
-		mode_str = "HDD_MODE";
-
 	sprintf(config_str, "%s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, exit_mode, disable_debug, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
 		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
@@ -490,7 +482,9 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 	char filename[32];
 	char partname[64];
 	char config_str[255];
-	int fd, r;
+	int fd, r, size_irx = 0;
+	void* irx = NULL;
+	char *mode_str = NULL;
 
 	sprintf(filename,"%s",game->Image+3);
 
@@ -500,6 +494,10 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 	sprintf(isoname,"ul.%08X.%s",USBA_crc32(gamename),filename);
 
 	if (mode == USB_MODE) {
+		size_irx = size_usb_cdvdman_irx;
+		irx = (void *)&usb_cdvdman_irx;
+		mode_str = "USB_MODE";
+
 		for (i=0;i<size_usb_cdvdman_irx;i++){
 			if (!strcmp((const char*)((u32)&usb_cdvdman_irx+i),"######    GAMESETTINGS    ######")) {
 				break;
@@ -543,50 +541,61 @@ void LaunchGame(TGame *game, int mode, int compatmask, void* gameid)
 		fioDclose(fd);
 	}
 	else if (mode == ETH_MODE) {
-		for (i=0;i<size_smb_cdvdman_irx;i++) {
-			if (!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"######    GAMESETTINGS    ######")) {
+		mode_str = "ETH_MODE";
+		if (pcmcia_check()) {
+			size_irx = size_smb_pcmcia_cdvdman_irx;
+			irx = (void *)&smb_pcmcia_cdvdman_irx;
+		}
+		else {
+			size_irx = size_smb_cdvdman_irx;
+			irx = (void *)&smb_cdvdman_irx;
+		}
+
+		for (i=0;i<size_irx;i++) {
+			if (!strcmp((const char*)((u32)irx+i),"######    GAMESETTINGS    ######")) {
 				break;
 			}
 		}
 
-		memcpy((void*)((u32)&smb_cdvdman_irx+i),isoname,strlen(isoname)+1);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i+33),&game->parts,1);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i+34),&game->media,1);
+		memcpy((void*)((u32)irx+i),isoname,strlen(isoname)+1);
+		memcpy((void*)((u32)irx+i+33),&game->parts,1);
+		memcpy((void*)((u32)irx+i+34),&game->media,1);
 		if (compatmask & COMPAT_MODE_2) {
 			u32 alt_read_mode = 1;
-			memcpy((void*)((u32)&smb_cdvdman_irx+i+35),&alt_read_mode,1);
+			memcpy((void*)((u32)irx+i+35),&alt_read_mode,1);
 		}
 		if (compatmask & COMPAT_MODE_5) {
 			u32 no_dvddl = 1;
-			memcpy((void*)((u32)&smb_cdvdman_irx+i+36),&no_dvddl,4);
+			memcpy((void*)((u32)irx+i+36),&no_dvddl,4);
 		}
 		if (compatmask & COMPAT_MODE_4) {
 			u32 no_pss = 1;
-			memcpy((void*)((u32)&smb_cdvdman_irx+i+40),&no_pss,4);
+			memcpy((void*)((u32)irx+i+40),&no_pss,4);
 		}
 
 		// game id
-		memcpy((void*)((u32)&smb_cdvdman_irx+i+84), &gameid, 5);
+		memcpy((void*)((u32)irx+i+84), &gameid, 5);
 		
-		for (i=0;i<size_smb_cdvdman_irx;i++) {
-			if (!strcmp((const char*)((u32)&smb_cdvdman_irx+i),"xxx.xxx.xxx.xxx")) {
+		for (i=0;i<size_irx;i++) {
+			if (!strcmp((const char*)((u32)irx+i),"xxx.xxx.xxx.xxx")) {
 				break;
 			}
 		}
 		sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i),config_str,strlen(config_str)+1);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i+16),&gPCPort, 4);
-		memcpy((void*)((u32)&smb_cdvdman_irx+i+20), gPCShareName, 32);
+		memcpy((void*)((u32)irx+i),config_str,strlen(config_str)+1);
+		memcpy((void*)((u32)irx+i+16),&gPCPort, 4);
+		memcpy((void*)((u32)irx+i+20), gPCShareName, 32);
 	}
 
 	FlushCache(0);
 
-	LaunchLoaderElf(filename, mode, compatmask, compatmask & COMPAT_MODE_1);
+	LaunchLoaderElf(filename, mode_str, size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
 }
 
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 {
-	int i;
+	int i, size_irx;
+	void* irx;
 	char filename[32];
 
 	if (game->dma_type == 0) {
@@ -598,8 +607,17 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 
 	sprintf(filename,"%s",game->startup);
 
-	for (i=0;i<size_hdd_cdvdman_irx;i++){
-		if(!strcmp((const char*)((u32)&hdd_cdvdman_irx+i),"######    GAMESETTINGS    ######")){
+	if (pcmcia_check()) {
+		size_irx = size_hdd_pcmcia_cdvdman_irx;
+		irx = (void *)&hdd_pcmcia_cdvdman_irx;
+	}
+	else {
+		size_irx = size_hdd_cdvdman_irx;
+		irx = (void *)&hdd_cdvdman_irx;
+	}
+
+	for (i=0;i<size_irx;i++){
+		if(!strcmp((const char*)((u32)irx+i),"######    GAMESETTINGS    ######")){
 			break;
 		}
 	}
@@ -616,30 +634,30 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 	*/
 	if (game->ops2l_compat_flags & COMPAT_MODE_2) {
 		u32 alt_read_mode = 1;
-		memcpy((void*)((u32)&hdd_cdvdman_irx+i+35),&alt_read_mode,1);
+		memcpy((void*)((u32)irx+i+35),&alt_read_mode,1);
 	}
 	if (game->ops2l_compat_flags & COMPAT_MODE_5) {
 		u32 no_dvddl = 1;
-		memcpy((void*)((u32)&hdd_cdvdman_irx+i+36),&no_dvddl,4);
+		memcpy((void*)((u32)irx+i+36),&no_dvddl,4);
 	}
 	if (game->ops2l_compat_flags & COMPAT_MODE_4) {
 		u32 no_pss = 1;
-		memcpy((void*)((u32)&hdd_cdvdman_irx+i+40),&no_pss,4);
+		memcpy((void*)((u32)irx+i+40),&no_pss,4);
 	}
 
 	// game id
-	memcpy((void*)((u32)&hdd_cdvdman_irx+i+84), &gameid, 5);
+	memcpy((void*)((u32)irx+i+84), &gameid, 5);
 
 	// patch 48bit flag
 	u8 flag_48bit = hddIs48bit() & 0xff;
-	memcpy((void*)((u32)&hdd_cdvdman_irx+i+34), &flag_48bit, 1);
+	memcpy((void*)((u32)irx+i+34), &flag_48bit, 1);
 
 	// patch start_sector
-	memcpy((void*)((u32)&hdd_cdvdman_irx+i+44), &game->start_sector, 4);
+	memcpy((void*)((u32)irx+i+44), &game->start_sector, 4);
 
 	FlushCache(0);
 
-	LaunchLoaderElf(filename, HDD_MODE, game->ops2l_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1);
+	LaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, game->ops2l_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1);
 } 
 
 int ExecElf(char *path, int argc, char **argv)
@@ -691,7 +709,7 @@ int ExecElf(char *path, int argc, char **argv)
 #define IRX_NUM 10
 
 //-------------------------------------------------------------- 
-void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel RAM
+void SendIrxKernelRAM(int size_irx, void *irx) // Send IOP modules that core must use to Kernel RAM
 {
 	u32 *total_irxsize = (u32 *)0x80030000;
 	void *irxtab = (void *)0x80030010;
@@ -704,20 +722,7 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	n = 0;
 	irxptr_tab[n++].irxsize = size_imgdrv_irx; 
 	irxptr_tab[n++].irxsize = size_eesync_irx; 
-	if (mode == USB_MODE)
-		irxptr_tab[n++].irxsize = size_usb_cdvdman_irx;
-	if (mode == ETH_MODE) {
-		if (pcmcia_check())
-			irxptr_tab[n++].irxsize = size_smb_pcmcia_cdvdman_irx;
-		else
-			irxptr_tab[n++].irxsize = size_smb_cdvdman_irx;
-	}
-	if (mode == HDD_MODE) {
-		if (pcmcia_check())
-			irxptr_tab[n++].irxsize = size_hdd_pcmcia_cdvdman_irx;
-		else
-			irxptr_tab[n++].irxsize = size_hdd_cdvdman_irx;
-	}
+	irxptr_tab[n++].irxsize = size_irx;
 	irxptr_tab[n++].irxsize = size_cdvdfsv_irx;
 	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
@@ -729,20 +734,7 @@ void SendIrxKernelRAM(int mode) // Send IOP modules that core must use to Kernel
 	n = 0;
 	irxsrc[n++] = (void *)&imgdrv_irx;
 	irxsrc[n++] = (void *)&eesync_irx;
-	if (mode == USB_MODE)
-		irxsrc[n++] = (void *)&usb_cdvdman_irx;
-	if (mode == ETH_MODE) {
-		if (pcmcia_check())
-			irxsrc[n++] = (void *)&smb_pcmcia_cdvdman_irx;
-		else
-			irxsrc[n++] = (void *)&smb_cdvdman_irx;
-	}
-	if (mode == HDD_MODE) {
-		if (pcmcia_check())
-			irxsrc[n++] = (void *)&hdd_pcmcia_cdvdman_irx;
-		else
-			irxsrc[n++] = (void *)&hdd_cdvdman_irx;
-	}
+	irxsrc[n++] = irx;
 	irxsrc[n++] = (void *)&cdvdfsv_irx;
 	irxsrc[n++] = (void *)&cddev_irx;
 	irxsrc[n++] = (void *)usbd_irx;

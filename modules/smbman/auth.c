@@ -4,6 +4,7 @@
 #include <sysclib.h>
 
 #include "des.h"
+#include "md4.h"
 
 /*
  * LM_Password_Hash: this function create a LM password hash from a given password
@@ -30,6 +31,28 @@ unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *ci
 	/* encrypt the magic string with the keys */
 	DES(K1, "KGS!@#$%", &cipher[0]);
 	DES(K2, "KGS!@#$%", &cipher[8]);
+
+	return (unsigned char *)cipher;
+}
+
+/*
+ * NTLM_Password_Hash: this function create a NTLM password hash from a given password
+ */
+unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *cipher)
+{
+	int i, j;
+	unsigned char tmp_pass[128];
+
+	strncpy(tmp_pass, password, 128);
+
+	/* turn the password to unicode */
+	for (i=0, j=0; i<strlen(password); i++, j+=2) {
+		tmp_pass[j] = password[i];
+		tmp_pass[j+1] = 0;
+	}
+
+	/* get the message digest */
+	MD4(tmp_pass, strlen(password) * 2, cipher);
 
 	return (unsigned char *)cipher;
 }

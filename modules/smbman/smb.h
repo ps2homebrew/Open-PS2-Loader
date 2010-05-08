@@ -272,7 +272,7 @@ int rawTCP_SetSessionHeader(u32 size);		// Write Session Service header
 int rawTCP_GetSessionHeader(void); 		// Read Session Service header
 
 int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect);	// process a Negociate Procotol message
-int smb_SessionSetupTreeConnect(char *User, char *share_name);			// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
+int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name);	// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize);			// process a Open AndX message
 int smb_ReadAndX(u16 FID, u32 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
 int smb_Close(u16 FID);								// process a Close message

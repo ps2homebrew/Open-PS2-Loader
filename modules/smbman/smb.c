@@ -10,7 +10,7 @@
 #include <thbase.h>
 
 #include "smb.h"
-#include "lmauth.h"
+#include "auth.h"
 
 #define SMB_MAGIC	0x424d53ff
 

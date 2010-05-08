@@ -45,7 +45,7 @@ int _start(int argc, char** argv)
 
 	// Then open a session and a tree connect on the share resource
 	sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-	smb_SessionSetupTreeConnect("GUEST", tree_str);
+	smb_SessionSetupTreeConnect("GUEST", NULL, tree_str); // user/tree must NOT be null
 
 	smbman_initdev();
 

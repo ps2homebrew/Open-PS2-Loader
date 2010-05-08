@@ -2,7 +2,7 @@
 
   Copyright 2009, Ifcaro & jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review OpenPS2Loader README & LICENSE files for further details.
   
 -----------------------------------------------------------------------------
 
@@ -26,3 +26,7 @@ SMSUTILS, SMSMAP & SMSTCPIP modules by Eugene Plotnikov
 DEV9, ATAD modules and derived code used in cdvdman by Marcus R. Brown
 
 PS2HDD module has been taken from PS2SDK
+
+SMB code in Open PS2 Loader includes DES algorithm developed
+by Eric Young (eay@mincom.oz.au)
+

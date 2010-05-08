@@ -10,6 +10,7 @@
 #include <thbase.h>
 
 #include "smb.h"
+#include "lmauth.h"
 
 #define SMB_MAGIC	0x424d53ff
 
@@ -51,8 +52,7 @@ struct NegociateProtocolResponse_t {
 	u16	ServerTimeZone;		// 68
 	u8	KeyLength;		// 70
 	u16	ByteCount;		// 71
-	u8	EncryptionKey[8];	// 73
-	u8	PrimaryDomainServerName[1024]; // 81
+	u8	ByteField[1024];	// 73
 } __attribute__((packed));
 
 struct SessionSetupAndXRequest_t {
@@ -231,8 +231,16 @@ typedef struct {
 	u32	SessionKey;
 	u32	StringsCF;
 	u32	SupportsNTSMB;
-	u8	PrimaryDomainServerName[32];
+	u8	PrimaryDomainServerName[64];
+	u8	EncryptionKey[8];
+	int	SecurityMode;		// 0 = share level, 1 = user level
+	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
 } server_specs_t;
+
+#define SERVER_SHARE_SECURITY_LEVEL	0
+#define SERVER_USER_SECURITY_LEVEL	1
+#define SERVER_USE_PLAINTEXT_PASSWORD	0
+#define SERVER_USE_ENCRYPTED_PASSWORD	1
 
 static server_specs_t server_specs;
 
@@ -382,11 +390,22 @@ conn_open:
 	else
 		server_specs.SupportsNTSMB = 0;
 
+	if (NPRsp->SecurityMode & NEGOCIATE_SECURITY_USER_LEVEL)
+		server_specs.SecurityMode = SERVER_USER_SECURITY_LEVEL;
+	else
+		server_specs.SecurityMode = SERVER_SHARE_SECURITY_LEVEL;
+
+	if (NPRsp->SecurityMode & NEGOCIATE_SECURITY_CHALLENGE_RESPONSE)
+		server_specs.PasswordType = SERVER_USE_ENCRYPTED_PASSWORD;
+	else
+		server_specs.PasswordType = SERVER_USE_PLAINTEXT_PASSWORD;
+
 	// copy to global struct to keep needed information for further communication
 	server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
 	server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
 	server_specs.SessionKey = NPRsp->SessionKey;
-	memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->PrimaryDomainServerName[0], 32);
+	memcpy(&server_specs.EncryptionKey[0], &NPRsp->ByteField[0], NPRsp->KeyLength);
+	memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->ByteField[NPRsp->KeyLength], 64);
 
 	return 1;
 
@@ -398,10 +417,15 @@ conn_close:
 }
 
 //-------------------------------------------------------------------------
-int smb_SessionSetupTreeConnect(char *User, char *share_name)
+int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
 	register int i, offset, ss_size, CF;
+	u8 LMpasswordhash[16];
+	u8 *challenge;
+	u8 LMresponse[24];
+	u8 password[64];
+	int passwordlen = 0;
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -421,7 +445,44 @@ int smb_SessionSetupTreeConnect(char *User, char *share_name)
 	SSR->Capabilities = CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_NT_SMBS | CLIENT_CAP_STATUS32;
 
 	// Fill ByteField
-	offset = 1;					// skip AnsiPassword
+	offset = 0;
+
+
+	if (server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) {
+
+		if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
+			challenge = (u8 *)server_specs.EncryptionKey;
+			LM_Password_Hash(Password, LMpasswordhash);
+			LM_Response(LMpasswordhash, challenge, LMresponse);
+			passwordlen = 24;
+			memcpy(password, LMresponse, passwordlen);
+			SSR->AnsiPasswordLength = passwordlen;
+
+			for (i = 0; i < passwordlen; i++) {
+				SSR->ByteField[offset] = password[i];	// add password
+				offset++;
+			}
+		}
+		else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
+			strncpy(password, Password, 14);
+			passwordlen = strlen(password);
+			//if (CF == 2)					// It seems that PlainText passwords and Unicode isn't meant to be...
+			//	SSR->UnicodePasswordLength = passwordlen * 2;
+			//else
+			SSR->AnsiPasswordLength = passwordlen;
+
+			memcpy(&SSR->ByteField[offset], password, passwordlen);
+			offset += passwordlen;
+			//for (i = 0; i < passwordlen; i++) {
+			//	SSR->ByteField[offset] = password[i];	// add password
+			//	offset += 1; //CF;
+			//}
+		}
+	}	
+
+	if (CF == 2)
+		offset += 1;				// pad needed only for unicode as aligment fix
+
 	for (i = 0; i < strlen(User); i++) {
 		SSR->ByteField[offset] = User[i]; 	// add User name
 		offset += CF;

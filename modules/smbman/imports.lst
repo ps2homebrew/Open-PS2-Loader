@@ -31,8 +31,10 @@ sysclib_IMPORTS_start
 I_memset
 I_memcpy
 I_strcpy
+I_strncpy
 I_strlen
 I_sprintf
+I_toupper
 sysclib_IMPORTS_end
 
 //stdio_IMPORTS_start

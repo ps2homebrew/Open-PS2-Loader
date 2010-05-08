@@ -9,7 +9,7 @@
 # $Id: $
 
 IOP_BIN = smbman.irx
-IOP_OBJS = smbman.o smb.o lmauth.o des.o imports.o exports.o
+IOP_OBJS = smbman.o smb.o auth.o des.o md4.o imports.o exports.o
 
 ifeq ($(DEBUG),1)
 DEBUG_FLAGS = -DDEBUG

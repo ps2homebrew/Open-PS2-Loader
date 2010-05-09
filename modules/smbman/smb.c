@@ -8,6 +8,7 @@
 #include <sysclib.h>
 #include <ps2ip.h>
 #include <thbase.h>
+#include <io_common.h>
 
 #include "smb.h"
 #include "auth.h"
@@ -118,6 +119,7 @@ struct NTCreateAndXRequest_t {
 	char	Name[1024];		// 87
 } __attribute__((packed));
 
+/*
 struct NTCreateAndXResponse_t {		// size = 107
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
@@ -141,6 +143,7 @@ struct NTCreateAndXResponse_t {		// size = 107
 	u8	IsDirectory;		// 104
 	u16	ByteCount;		// 105
 } __attribute__((packed));
+*/
 
 struct OpenAndXRequest_t {
 	struct SMBHeader_t smbH;	// 0
@@ -211,6 +214,35 @@ struct ReadAndXResponse_t {
 	u16	ByteCount;		// 61
 } __attribute__((packed));
 
+struct WriteAndXRequest_t {		// size = 63
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	FID;			// 41
+	u32	OffsetLow;		// 43
+	u32	Reserved;		// 47
+	u16	WriteMode;		// 51
+	u16	Remaining;		// 53
+	u16	DataLengthHigh;		// 55
+	u16	DataLengthLow;		// 57
+	u16	DataOffset;		// 59
+	u16	ByteCount;		// 61
+} __attribute__((packed));
+
+struct WriteAndXResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	Count;			// 41
+	u16	Remaining;		// 43
+	u16	CountHigh;		// 45
+	u16	Reserved;		// 47
+} __attribute__((packed));
+
 struct CloseRequest_t {			// size = 45
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
@@ -254,6 +286,20 @@ struct ReadAndXRequest_t smb_Read_Request = {
 	SMB_COM_NONE,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
+
+struct WriteAndXRequest_t smb_Write_Request = {
+	{	0,
+		SMB_MAGIC,
+		SMB_COM_WRITE_ANDX,
+		0, 0, 0, 0, "\0", 0, 0, 0, 0
+	},
+	12, 
+	SMB_COM_NONE,
+	0, 0, 0, 0, 0, 0x01, 0, 0, 0, 0x3b, 0 	// 0x01 is WriteThrough mode and 0x3b is DataOffset
+};
+
+#define LM_AUTH 	0
+#define NTLM_AUTH 	1
 
 static u16 UID, TID;
 static int main_socket;
@@ -421,11 +467,14 @@ int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
 	register int i, offset, ss_size, CF;
-	u8 LMpasswordhash[16];
+	u8 passwordhash[16];
 	u8 *challenge;
 	u8 LMresponse[24];
 	u8 password[64];
 	int passwordlen = 0;
+	int AuthType = NTLM_AUTH;
+
+lbl_session_setup:
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -452,11 +501,17 @@ int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name)
 
 		if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
 			challenge = (u8 *)server_specs.EncryptionKey;
-			LM_Password_Hash(Password, LMpasswordhash);
-			LM_Response(LMpasswordhash, challenge, LMresponse);
 			passwordlen = 24;
+			if (AuthType == LM_AUTH) {
+				LM_Password_Hash(Password, passwordhash);
+				SSR->AnsiPasswordLength = passwordlen;
+			}
+			else if (AuthType == NTLM_AUTH) {
+				NTLM_Password_Hash(Password, passwordhash);
+				SSR->UnicodePasswordLength = passwordlen;
+			}
+			LM_Response(passwordhash, challenge, LMresponse);			
 			memcpy(password, LMresponse, passwordlen);
-			SSR->AnsiPasswordLength = passwordlen;
 
 			for (i = 0; i < passwordlen; i++) {
 				SSR->ByteField[offset] = password[i];	// add password
@@ -530,6 +585,14 @@ int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name)
 	if (SSRsp->smbH.Magic != SMB_MAGIC)
 		return -1;
 
+	// check there's no auth failure
+	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL)
+		&& ((SSRsp->smbH.Eclass | (SSRsp->smbH.Ecode << 16)) == STATUS_LOGON_FAILURE)
+		&& (AuthType == NTLM_AUTH)) {
+		AuthType = LM_AUTH;
+		goto lbl_session_setup;
+	}
+
 	// check there's no error (NT STATUS error type!)
 	if ((SSRsp->smbH.Eclass | SSRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -1000;
@@ -541,8 +604,9 @@ int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name)
 	return 1;
 }
 
+/*
 //-------------------------------------------------------------------------
-int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize)
+int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize, int mode)
 {
 	struct NTCreateAndXRequest_t *NTCR = (struct NTCreateAndXRequest_t *)SMB_buf;
 	register int length;
@@ -559,10 +623,10 @@ int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize)
 	NTCR->smbAndxCmd = SMB_COM_NONE;	// no ANDX command
 	length = strlen(filename);
 	NTCR->NameLength = length;
-	NTCR->AccessMask = 0x20089;
-	NTCR->FileAttributes = EXT_ATTR_READONLY;
-	NTCR->ShareAccess = 1;
-	NTCR->CreateDisposition = 1;
+	NTCR->AccessMask = ((mode & O_RDWR) || (mode & O_WRONLY)) ? 0x2019f : 0x20089;
+	NTCR->FileAttributes = ((mode & O_RDWR) || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
+	NTCR->ShareAccess = ((mode & O_RDWR) || (mode & O_WRONLY)) ? 0x03 : 0x01;
+	NTCR->CreateDisposition = (mode & O_CREAT) ? 0x05 : 0x01;
 	NTCR->ImpersonationLevel = 2;
 	NTCR->SecurityFlags = 0x03;
 	NTCR->ByteCount = length+1;
@@ -577,9 +641,13 @@ int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize)
 	if (NTCRsp->smbH.Magic != SMB_MAGIC)
 		return -1;
 
+	// check if access denied
+	if ((NTCRsp->smbH.Eclass | (NTCRsp->smbH.Ecode << 16)) == STATUS_ACCESS_DENIED)
+		return -2;
+
 	// check there's no error
 	if ((NTCRsp->smbH.Eclass | NTCRsp->smbH.Ecode) != STATUS_SUCCESS)
-		return -1000;
+		return (NTCRsp->smbH.Eclass | (NTCRsp->smbH.Ecode << 16));
 
 	*FID = NTCRsp->FID;
 	*filesize = NTCRsp->FileSize;
@@ -589,15 +657,16 @@ int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize)
 
 	return 1;
 }
+*/
 
 //-------------------------------------------------------------------------
-int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize)
+int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize, int mode)
 {
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;
 
-	if (server_specs.SupportsNTSMB)
-		return smb_NTCreateAndX(filename, FID, filesize);
+	//if (server_specs.SupportsNTSMB)
+	//	return smb_NTCreateAndX(filename, FID, filesize, mode);
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -609,8 +678,14 @@ int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize)
 	OR->smbH.TID = TID;
 	OR->smbWordcount = 15;
 	OR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
-	OR->FileAttributes = EXT_ATTR_READONLY;
-	OR->CreateOptions = 1;
+	OR->AccessMask = (!(mode & O_RDONLY) || (mode & O_WRONLY)) ? 0x02 : 0x00;
+	OR->FileAttributes = (!(mode & O_RDONLY) || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
+	if (mode & O_CREAT)
+		OR->CreateOptions |= 0x10;
+	if (mode & O_TRUNC)
+		OR->CreateOptions |= 0x02;
+	else
+		OR->CreateOptions |= 0x01;
 	length = strlen(filename);
 	OR->ByteCount = length+1;
 	strcpy((char *)OR->Name, filename);
@@ -624,22 +699,32 @@ int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize)
 	if (ORsp->smbH.Magic != SMB_MAGIC)
 		return -1;
 
+	// check if access denied
+	if ((ORsp->smbH.Eclass | (ORsp->smbH.Ecode << 16)) == STATUS_ACCESS_DENIED)
+		return -2;
+
+	// check if access denied
+	if ((ORsp->smbH.Eclass | (ORsp->smbH.Ecode << 16)) == STATUS_OBJECT_NAME_NOT_FOUND)
+		return -3;
+
 	// check there's no error
-	if (ORsp->smbH.Eclass != STATUS_SUCCESS)
-		return -1000;
+	if ((ORsp->smbH.Eclass | ORsp->smbH.Ecode) != STATUS_SUCCESS)
+		return (ORsp->smbH.Eclass | (ORsp->smbH.Ecode << 16));
 
 	*FID = ORsp->FID;
 	*filesize = ORsp->FileSize;
 
-	// Prepare header of Read Request by advance
+	// Prepare header of Read/Write Requests by advance
 	smb_Read_Request.smbH.UID = UID;
 	smb_Read_Request.smbH.TID = TID;
+	smb_Write_Request.smbH.UID = UID;
+	smb_Write_Request.smbH.TID = TID;
 
 	return 1;
 }
 
 //-------------------------------------------------------------------------
-int smb_ReadAndX(u16 FID, u32 fileoffset, void *readbuf, u16 nbytes) // Builds a Read AndX Request message
+int smb_ReadAndX(u16 FID, u32 fileoffset, void *readbuf, u16 nbytes)
 {
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
 	register int r;
@@ -659,8 +744,8 @@ int smb_ReadAndX(u16 FID, u32 fileoffset, void *readbuf, u16 nbytes) // Builds a
 		return -1;
 
 	// check there's no error
-	if (RRsp->smbH.Eclass != STATUS_SUCCESS)
-		return -1000;
+	if ((RRsp->smbH.Eclass | RRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
 
 	r = RRsp->DataLengthLow;
 
@@ -668,6 +753,37 @@ int smb_ReadAndX(u16 FID, u32 fileoffset, void *readbuf, u16 nbytes) // Builds a
 		memcpy(readbuf, &SMB_buf[4 + RRsp->DataOffset], r);
 
 	return r;
+}
+
+//-------------------------------------------------------------------------
+int smb_WriteAndX(u16 FID, u32 fileoffset, void *writebuf, u16 nbytes)
+{
+	struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
+
+	memcpy(WR, &smb_Write_Request.smbH.sessionHeader, sizeof(struct WriteAndXRequest_t));
+
+	WR->FID = FID;
+	WR->OffsetLow = fileoffset;
+	WR->Remaining = nbytes;
+	WR->DataLengthLow = nbytes;
+	WR->ByteCount = nbytes;
+
+	memcpy((void *)(&SMB_buf[4 + WR->DataOffset]), writebuf, nbytes);
+
+	rawTCP_SetSessionHeader(59+nbytes);
+	GetSMBServerReply();
+
+	struct WriteAndXResponse_t *WRsp = (struct WriteAndXResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (WRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((WRsp->smbH.Eclass | WRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	return nbytes;
 }
 
 //-------------------------------------------------------------------------
@@ -696,8 +812,8 @@ int smb_Close(u16 FID)
 		return -1;
 
 	// check there's no error
-	if (CRsp->smbH.Eclass != STATUS_SUCCESS)
-		return -1000;
+	if ((CRsp->smbH.Eclass | CRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
 
 	return 1;
 }

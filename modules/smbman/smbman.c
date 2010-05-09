@@ -13,6 +13,7 @@
 #include <sifrpc.h>
 #include <sysmem.h>
 #include <thsemap.h>
+#include <io_common.h>
 #include <errno.h>
 
 #include "smb.h"
@@ -75,6 +76,7 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags);
 int smb_close(iop_file_t *f);
 int smb_lseek(iop_file_t *f, u32 pos, int where);
 int smb_read(iop_file_t *f, void *buf, u32 size);
+int smb_write(iop_file_t *f, void *buf, u32 size);
 
 int smbman_io_sema;
 
@@ -86,7 +88,7 @@ void *smbman_ops[17] = {
 	(void*)smb_open,
 	(void*)smb_close,
 	(void*)smb_read,
-	(void*)smb_dummy,
+	(void*)smb_write,
 	(void*)smb_lseek,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -113,6 +115,7 @@ typedef struct {
 	u32		smb_fid;
 	u32		filesize;
 	u32		position;
+	u32		mode;
 } FHANDLE;
 
 #define MAX_FDHANDLES		64
@@ -187,17 +190,30 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 
 	fh = smbman_getfilefreeslot();
 	if (fh) {
-		r = smb_OpenAndX(filename, &smb_fid, &filesize);
+		r = smb_OpenAndX(filename, &smb_fid, &filesize, mode);
 		if (r == 1) {
 			f->privdata = fh;
 			fh->f = f;
 			fh->smb_fid = smb_fid;
+			fh->mode = mode;
 			fh->filesize = filesize;
-			fh->position = 0;
+			fh->position = filesize;
+			if (fh->mode & O_TRUNC) {
+				fh->position = 0;
+				fh->filesize = 0;
+			}
 			r = 0;
 		}
-		else
-			r = -ENOENT;
+		else {
+			if (r == -1)
+				r = -EIO;
+			else if (r == -2)
+				r = -EPERM;
+			else if (r == -3)
+				r = -ENOENT;
+			else
+				r = -EIO;
+		}
 	}
 	else
 		r = -EMFILE;
@@ -284,7 +300,6 @@ int smb_read(iop_file_t *f, void *buf, u32 size)
 
 	WaitSema(smbman_io_sema);
 
-	rpos = 0;
 	while (size) {
 		nbytes = MAX_SMB_BUF;
 		if (size < nbytes)
@@ -306,3 +321,42 @@ ssema:
 
 	return rpos;
 }
+
+//-------------------------------------------------------------- 
+int smb_write(iop_file_t *f, void *buf, u32 size)
+{
+	FHANDLE *fh = (FHANDLE *)f->privdata;
+	register int r, wpos;
+	register u32 nbytes;
+
+	if ((!(fh->mode & O_RDWR)) && (!(fh->mode & O_WRONLY)))
+		return -EPERM;
+
+	wpos = 0;
+
+	WaitSema(smbman_io_sema);
+
+	while (size) {
+		nbytes = MAX_SMB_BUF;
+		if (size < nbytes)
+			nbytes = size;
+
+		r = smb_WriteAndX(fh->smb_fid, fh->position, (void *)(buf + wpos), (u16)nbytes);
+		if (r < 0) {
+   			wpos = -EIO;
+   			goto ssema;
+		}
+
+		wpos += nbytes;
+		size -= nbytes;
+		fh->position += nbytes;
+		if (fh->position > fh->filesize)
+			fh->filesize += fh->position - fh->filesize;
+	}
+
+ssema:
+	SignalSema(smbman_io_sema);
+
+	return wpos;
+}
+

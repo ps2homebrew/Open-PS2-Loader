@@ -72,7 +72,7 @@ clean:
 rebuild: clean all
 
 pc_tools:
-	echo "Building iso2opl..."
+	echo "Building iso2opl and opl2iso..."
 	$(MAKE) -C pc
 
 loader.s:

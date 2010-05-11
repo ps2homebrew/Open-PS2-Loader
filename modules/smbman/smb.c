@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, jimmikaelkael
+  Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 */
@@ -30,12 +30,44 @@ struct SMBHeader_t {			//size = 36
 	u16	MID;
 } __attribute__((packed));
 
+struct SMBTransactionRequest_t {	//size = 28
+	u16	TotalParamCount;
+	u16	TotalDataCount;
+	u16	MaxParamCount;
+	u16	MaxDataCount;
+	u8	MaxSetupCount;
+	u8	Reserved;
+	u16	Flag;
+	u32	Timeout;
+	u16	Reserved2;
+	u16	ParamCount;
+	u16	ParamOffset;
+	u16	DataCount;
+	u16	DataOffset;
+	u8	SetupCount;
+	u8	Reserved3;
+} __attribute__((packed));
+
+struct SMBTransactionResponse_t {	//size = 20
+	u16	TotalParamCount;
+	u16	TotalDataCount;
+	u16	Reserved;
+	u16	ParamCount;
+	u16	ParamOffset;
+	u16	ParamDisplacement;
+	u16	DataCount;
+	u16	DataOffset;
+	u16	DataDisplacement;
+	u8	SetupCount;
+	u8	Reserved2;
+} __attribute__((packed));
+
 struct NegociateProtocolRequest_t {
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u16	ByteCount;		// 37
 	u8	DialectFormat;		// 39
-	char	DialectName[64];	// 40
+	char	DialectName[0];		// 40
 } __attribute__((packed));
 
 struct NegociateProtocolResponse_t {
@@ -53,7 +85,7 @@ struct NegociateProtocolResponse_t {
 	u16	ServerTimeZone;		// 68
 	u8	KeyLength;		// 70
 	u16	ByteCount;		// 71
-	u8	ByteField[1024];	// 73
+	u8	ByteField[0];		// 73
 } __attribute__((packed));
 
 struct SessionSetupAndXRequest_t {
@@ -71,7 +103,7 @@ struct SessionSetupAndXRequest_t {
 	u32	reserved;		// 55
 	u32	Capabilities;		// 59
 	u16	ByteCount;		// 63
-	u8	ByteField[1024];	// 65
+	u8	ByteField[0];		// 65
 } __attribute__((packed));
 
 struct SessionSetupAndXResponse_t {
@@ -82,20 +114,150 @@ struct SessionSetupAndXResponse_t {
 	u16	smbAndxOffset;		// 39
 	u16	Action;			// 41
 	u16	ByteCount;		// 43
-	u8	ByteField[1024];	// 45
 } __attribute__((packed));
 
-struct TreeConnectRequest_t {
-	u8	smbWordcount;
-	u8	smbAndxCmd;
-	u8	smbAndxReserved;
-	u16	smbAndxOffset;
+struct TreeConnectAndXRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	Flags;			// 41
+	u16	PasswordLength;		// 43
+	u16	ByteCount;		// 45
+	u8	ByteField[0];		// 47
+} __attribute__((packed));
+
+struct TreeConnectAndXResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	OptionalSupport;	// 41
+	u16	ByteCount;		// 43
+} __attribute__((packed));
+
+struct TreeDisconnectRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+} __attribute__((packed));
+
+struct TreeDisconnectResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+} __attribute__((packed));
+
+struct NetShareEnumRequest_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionRequest_t smbTrans;	// 37
+	u16	ByteCount;				// 65
+	u8	ByteField[0];				// 67
+} __attribute__((packed));
+
+struct NetShareEnumResponse_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionResponse_t smbTrans; 	// 37
+	u16	ByteCount;				// 57
+	u8	ByteField[0];				// 59
+} __attribute__((packed));
+
+struct LogOffAndXRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	ByteCount;		// 41
+} __attribute__((packed));
+
+struct LogOffAndXResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	ByteCount;		// 41
+} __attribute__((packed));
+
+struct FindFirst2Request_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionRequest_t smbTrans;	// 37
+	u16	SubCommand;
+	u16	ByteCount;				// 65
+	u8	Padding[3];
+	u16	SearchAttributes;
+	u16	SearchCount;
 	u16	Flags;
-	u16	PasswordLength;
-	u16	ByteCount;
-	u8	ByteField[1024];
+	u16	LevelOfInterest;
+	u32	StorageType;
+	u8	SearchPattern[0];			// 67
 } __attribute__((packed));
 
+struct FindFirst2Response_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionResponse_t smbTrans; 	// 37
+	u16	ByteCount;				// 57
+/*
+	u8	Padding[1];
+	u16	SearchID;
+	u16	SearchCount;
+	u16	EndOfSearch;
+	u16	EAErrorOffset;
+	u16	LastNameOffset;
+	u8	Padding2[2];
+	u32	ResumeKey;
+	u32	Created;
+	u32	LastAccess;
+	u32	LastWrite;
+	u32	DataSize;
+	u32 	AllocationSize;
+	u16 	FileAttributes;
+	u8	FileNameLen;
+	u8	FileName[0];				// 59
+*/
+} __attribute__((packed));
+
+struct FindNext2Request_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionRequest_t smbTrans;	// 37
+	u16	SubCommand;
+	u16	ByteCount;				// 65
+} __attribute__((packed));
+
+struct FindNext2Response_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionResponse_t smbTrans; 	// 37
+	u16	ByteCount;				// 57
+/*
+	u8	Padding[1];
+	u16	SearchID;
+	u16	SearchCount;
+	u16	EndOfSearch;
+	u16	EAErrorOffset;
+	u16	LastNameOffset;
+	u8	Padding2[2];
+	u32	ResumeKey;
+	u32	Created;
+	u32	LastAccess;
+	u32	LastWrite;
+	u32	DataSize;
+	u32 	AllocationSize;
+	u16 	FileAttributes;
+	u8	FileNameLen;
+	u8	FileName[0];				// 59
+*/
+} __attribute__((packed));
+
+/*
 struct NTCreateAndXRequest_t {
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
@@ -116,10 +278,9 @@ struct NTCreateAndXRequest_t {
 	u32	ImpersonationLevel;	// 80
 	u8	SecurityFlags;		// 84
 	u16	ByteCount;		// 85
-	char	Name[1024];		// 87
+	char	Name[0];		// 87
 } __attribute__((packed));
 
-/*
 struct NTCreateAndXResponse_t {		// size = 107
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
@@ -160,7 +321,7 @@ struct OpenAndXRequest_t {
 	u32	AllocationSize;		// 55
 	u32	reserved[2];		// 59
 	u16	ByteCount;		// 67
-	u8	Name[1024];		// 69
+	u8	Name[0];		// 69
 } __attribute__((packed));
 
 struct OpenAndXResponse_t {
@@ -258,6 +419,7 @@ struct CloseResponse_t {
 } __attribute__((packed));
 
 typedef struct {
+	char	ServerIP[16];
 	u32	MaxBufferSize;
 	u32	MaxMpxCount;
 	u32	SessionKey;
@@ -301,7 +463,8 @@ struct WriteAndXRequest_t smb_Write_Request = {
 #define LM_AUTH 	0
 #define NTLM_AUTH 	1
 
-static u16 UID, TID;
+static int UID = -1; 
+static int TID = -1;
 static int main_socket;
 
 static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
@@ -453,26 +616,31 @@ conn_open:
 	memcpy(&server_specs.EncryptionKey[0], &NPRsp->ByteField[0], NPRsp->KeyLength);
 	memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->ByteField[NPRsp->KeyLength], 64);
 
-	return 1;
+	strncpy(server_specs.ServerIP, SMBServerIP, 16);
+
+	return 0;
 
 conn_close:	
 	lwip_close(main_socket);
 	goto conn_open;
 
-	return 0;
+	return -1;
 }
 
 //-------------------------------------------------------------------------
-int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name)
+int smb_SessionSetupAndX(char *User, char *Password, int PasswordType)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
-	register int i, offset, ss_size, CF;
+	register int i, offset, CF;
 	u8 passwordhash[16];
 	u8 *challenge;
 	u8 LMresponse[24];
 	u8 password[64];
 	int passwordlen = 0;
 	int AuthType = NTLM_AUTH;
+
+	if (UID != -1)
+		return -3;
 
 lbl_session_setup:
 
@@ -487,6 +655,7 @@ lbl_session_setup:
 	if (CF == 2)
 		SSR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	SSR->smbWordcount = 13;
+	SSR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
 	SSR->MaxBufferSize = (u16)server_specs.MaxBufferSize;
 	SSR->MaxMpxCount = ((u16)server_specs.MaxMpxCount >= 2) ? 2 : (u16)server_specs.MaxMpxCount;
 	SSR->VCNumber = 1;
@@ -496,25 +665,35 @@ lbl_session_setup:
 	// Fill ByteField
 	offset = 0;
 
-
-	if (server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) {
+	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) && (Password)) {
 
 		if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
 			challenge = (u8 *)server_specs.EncryptionKey;
 			passwordlen = 24;
-			if (AuthType == LM_AUTH) {
-				LM_Password_Hash(Password, passwordhash);
-				SSR->AnsiPasswordLength = passwordlen;
+			if (PasswordType == 0) {
+				if (AuthType == LM_AUTH) {
+					LM_Password_Hash(Password, passwordhash);
+					SSR->AnsiPasswordLength = passwordlen;
+				}
+				else if (AuthType == NTLM_AUTH) {
+					NTLM_Password_Hash(Password, passwordhash);
+					SSR->UnicodePasswordLength = passwordlen;
+				}
 			}
-			else if (AuthType == NTLM_AUTH) {
-				NTLM_Password_Hash(Password, passwordhash);
-				SSR->UnicodePasswordLength = passwordlen;
+			else if (PasswordType == 1) {
+				if (AuthType == LM_AUTH) {
+					memcpy(passwordhash, &Password[0], 16);
+					SSR->AnsiPasswordLength = passwordlen;
+				}
+				if (AuthType == NTLM_AUTH) {
+					memcpy(passwordhash, &Password[16], 16);
+					SSR->UnicodePasswordLength = passwordlen;
+				}
 			}
 			LM_Response(passwordhash, challenge, LMresponse);			
-			memcpy(password, LMresponse, passwordlen);
 
 			for (i = 0; i < passwordlen; i++) {
-				SSR->ByteField[offset] = password[i];	// add password
+				SSR->ByteField[offset] = LMresponse[i];	// add password
 				offset++;
 			}
 		}
@@ -535,8 +714,8 @@ lbl_session_setup:
 		}
 	}	
 
-	if (CF == 2)
-		offset += 1;				// pad needed only for unicode as aligment fix
+	if ((CF == 2) && (!(passwordlen & 1)))
+		offset += 1;				// pad needed only for unicode as aligment fix if password length is even
 
 	for (i = 0; i < strlen(User); i++) {
 		SSR->ByteField[offset] = User[i]; 	// add User name
@@ -555,28 +734,7 @@ lbl_session_setup:
 
 	SSR->ByteCount = offset;
 
-	SSR->smbAndxCmd = SMB_COM_TREE_CONNECT_ANDX;
-	SSR->smbAndxOffset = 61 + offset;
-	ss_size = offset;
-
-	struct TreeConnectRequest_t *TCR = (struct TreeConnectRequest_t *)&SSR->ByteField[offset];
-	TCR->smbWordcount = 4;
-	TCR->smbAndxCmd = SMB_COM_NONE;
-	TCR->PasswordLength = 1;
-
-	offset = 1;
-	for (i = 0; i < strlen(share_name); i++) {
-		TCR->ByteField[offset] = share_name[i];	// add Share name
-		offset += CF;
-	}
-	offset += CF;					// null terminator
-
-	memcpy(&TCR->ByteField[offset], "?????\0", 6); 	// Service, any type of device
-	offset += 6;
-
-	TCR->ByteCount = offset;
-
-	rawTCP_SetSessionHeader(72+ss_size+offset);
+	rawTCP_SetSessionHeader(61+offset);
 	GetSMBServerReply();
 
 	struct SessionSetupAndXResponse_t *SSRsp = (struct SessionSetupAndXResponse_t *)SMB_buf;
@@ -595,18 +753,189 @@ lbl_session_setup:
 
 	// check there's no error (NT STATUS error type!)
 	if ((SSRsp->smbH.Eclass | SSRsp->smbH.Ecode) != STATUS_SUCCESS)
-		return -1000;
+		return -2;
 
-	// keep UID & TID
-	UID = SSRsp->smbH.UID;
-	TID = SSRsp->smbH.TID;
+	// keep UID
+	UID = (int)SSRsp->smbH.UID;
 
-	return 1;
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType) // PasswordType: 0 = PlainText, 1 = Hash
+{
+	struct TreeConnectAndXRequest_t *TCR = (struct TreeConnectAndXRequest_t *)SMB_buf;
+	register int i, offset, CF;
+	u8 passwordhash[16];
+	u8 *challenge;
+	u8 LMresponse[24];
+	u8 password[64];
+	int passwordlen = 0;
+	int AuthType = NTLM_AUTH;
+
+	if (TID != -1)
+		return -3;
+
+lbl_tree_connect:
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
+
+	TCR->smbH.Magic = SMB_MAGIC;
+	TCR->smbH.Cmd = SMB_COM_TREE_CONNECT_ANDX;
+	TCR->smbH.Flags = SMB_FLAGS_CASELESS_PATHNAMES;
+	TCR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
+	if (CF == 2)
+		TCR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	TCR->smbH.UID = UID;
+	TCR->smbH.TID = TID;
+	TCR->smbWordcount = 4;
+	TCR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
+
+	// Fill ByteField
+	offset = 0;
+
+	if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
+
+		if (Password) {
+
+			if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
+				challenge = (u8 *)server_specs.EncryptionKey;
+				passwordlen = 24;
+				if (PasswordType == 0) {
+					if (AuthType == LM_AUTH)
+						LM_Password_Hash(Password, passwordhash);
+					else if (AuthType == NTLM_AUTH)
+						NTLM_Password_Hash(Password, passwordhash);
+				}
+				else if (PasswordType == 1) {
+					if (AuthType == LM_AUTH)
+						memcpy(passwordhash, &Password[0], 16);
+					if (AuthType == NTLM_AUTH)
+						memcpy(passwordhash, &Password[16], 16);
+				}
+				LM_Response(passwordhash, challenge, LMresponse);
+
+				for (i = 0; i < passwordlen; i++) {
+					TCR->ByteField[offset] = LMresponse[i];	// add password
+					offset++;
+				}
+			}
+			else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
+				strncpy(password, Password, 14);
+				passwordlen = strlen(password);
+				//if (CF == 2)					// It seems that PlainText passwords and Unicode isn't meant to be...
+				//	TCR->PasswordLength = passwordlen * 2;
+				//else
+
+				memcpy(&TCR->ByteField[offset], password, passwordlen);
+				offset += passwordlen;
+				//for (i = 0; i < passwordlen; i++) {
+				//	TCR->ByteField[offset] = password[i];	// add password
+				//	offset += 1; //CF;
+				//}
+			}
+		}
+		else {
+			passwordlen = 1;
+			offset += passwordlen;
+		}
+		TCR->PasswordLength = passwordlen;
+	}	
+
+	if ((CF == 2) && (!(passwordlen & 1)))
+		offset += 1;				// pad needed only for unicode as aligment fix is password len is even
+
+	for (i = 0; i < strlen(ShareName); i++) {
+		TCR->ByteField[offset] = ShareName[i];	// add Share name
+		offset += CF;
+	}
+	offset += CF;					// null terminator
+
+	memcpy(&TCR->ByteField[offset], "?????\0", 6); 	// Service, any type of device
+	offset += 6;
+
+	TCR->ByteCount = offset;
+
+	rawTCP_SetSessionHeader(43+offset);
+	GetSMBServerReply();
+
+	struct TreeConnectAndXResponse_t *TCRsp = (struct TreeConnectAndXResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (TCRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no auth failure
+	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL)
+		&& ((TCRsp->smbH.Eclass | (TCRsp->smbH.Ecode << 16)) == STATUS_LOGON_FAILURE)
+		&& (AuthType == NTLM_AUTH)) {
+		AuthType = LM_AUTH;
+		goto lbl_tree_connect;
+	}
+
+	// check there's no error (NT STATUS error type!)
+	if ((TCRsp->smbH.Eclass | TCRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	// keep TID
+	TID = (int)TCRsp->smbH.TID;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_NetShareEnum(void)
+{
+	struct NetShareEnumRequest_t *NSER = (struct NetShareEnumRequest_t *)SMB_buf;
+
+	if (TID == -1)
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	NSER->smbH.Magic = SMB_MAGIC;
+	NSER->smbH.Cmd = SMB_COM_TRANSACTION;
+	NSER->smbH.UID = UID;
+	NSER->smbH.TID = TID;
+	NSER->smbWordcount = 14;
+	
+	NSER->smbTrans.TotalParamCount = 19;
+	NSER->smbTrans.MaxParamCount = 1024;
+	NSER->smbTrans.TotalParamCount = 19;
+	NSER->smbTrans.MaxDataCount = 8096;
+	NSER->smbTrans.ParamCount = 19;
+	NSER->smbTrans.ParamOffset = 76;
+	NSER->smbTrans.DataOffset = 95;
+
+	NSER->ByteCount = 32;
+
+	memcpy(&NSER->ByteField[0], "\\PIPE\\LANMAN\0\0\0WrLeh\0B13BWz\0\x01\0\xa0\x1f", 32);
+
+	rawTCP_SetSessionHeader(95);
+	GetSMBServerReply();
+
+
+	struct NetShareEnumResponse_t *NSERsp = (struct NetShareEnumResponse_t *)SMB_buf;
+
+
+	// check sanity of SMB header
+	if (NSERsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((NSERsp->smbH.Eclass | NSERsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	NSERsp->smbTrans.ParamOffset
+
+	return 0;
 }
 
 /*
 //-------------------------------------------------------------------------
-int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize, int mode)
+int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
 {
 	struct NTCreateAndXRequest_t *NTCR = (struct NTCreateAndXRequest_t *)SMB_buf;
 	register int length;
@@ -617,8 +946,8 @@ int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize, int mode)
 	NTCR->smbH.Cmd = SMB_COM_NT_CREATE_ANDX;
 	NTCR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
 	NTCR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
-	NTCR->smbH.UID = UID;
-	NTCR->smbH.TID = TID;
+	NTCR->smbH.UID = (u16)UID;
+	NTCR->smbH.TID = (u16)TID;
 	NTCR->smbWordcount = 24;
 	NTCR->smbAndxCmd = SMB_COM_NONE;	// no ANDX command
 	length = strlen(filename);
@@ -649,18 +978,18 @@ int smb_NTCreateAndX(char *filename, u16 *FID, u32 *filesize, int mode)
 	if ((NTCRsp->smbH.Eclass | NTCRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return (NTCRsp->smbH.Eclass | (NTCRsp->smbH.Ecode << 16));
 
-	*FID = NTCRsp->FID;
+	*FID = (int)NTCRsp->FID;
 	*filesize = NTCRsp->FileSize;
 
-	smb_Read_Request.smbH.UID = UID;
-	smb_Read_Request.smbH.TID = TID;
+	smb_Read_Request.smbH.UID = (u16)UID;
+	smb_Read_Request.smbH.TID = (u16)TID;
 
-	return 1;
+	return 0;
 }
 */
 
 //-------------------------------------------------------------------------
-int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize, int mode)
+int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode)
 {
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;
@@ -674,8 +1003,8 @@ int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize, int mode)
 	OR->smbH.Cmd = SMB_COM_OPEN_ANDX;
 	OR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
 	OR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
-	OR->smbH.UID = UID;
-	OR->smbH.TID = TID;
+	OR->smbH.UID = (u16)UID;
+	OR->smbH.TID = (u16)TID;
 	OR->smbWordcount = 15;
 	OR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
 	OR->AccessMask = (!(mode & O_RDONLY) || (mode & O_WRONLY)) ? 0x02 : 0x00;
@@ -711,27 +1040,30 @@ int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize, int mode)
 	if ((ORsp->smbH.Eclass | ORsp->smbH.Ecode) != STATUS_SUCCESS)
 		return (ORsp->smbH.Eclass | (ORsp->smbH.Ecode << 16));
 
-	*FID = ORsp->FID;
+	*FID = (int)ORsp->FID;
 	*filesize = ORsp->FileSize;
 
 	// Prepare header of Read/Write Requests by advance
-	smb_Read_Request.smbH.UID = UID;
-	smb_Read_Request.smbH.TID = TID;
-	smb_Write_Request.smbH.UID = UID;
-	smb_Write_Request.smbH.TID = TID;
+	smb_Read_Request.smbH.UID = (u16)UID;
+	smb_Read_Request.smbH.TID = (u16)TID;
+	smb_Write_Request.smbH.UID = (u16)UID;
+	smb_Write_Request.smbH.TID = (u16)TID;
 
-	return 1;
+	return 0;
 }
 
 //-------------------------------------------------------------------------
-int smb_ReadAndX(u16 FID, u32 fileoffset, void *readbuf, u16 nbytes)
+int smb_ReadAndX(int FID, u32 fileoffset, void *readbuf, u16 nbytes)
 {
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
 	register int r;
 
+	if (FID == -1)
+		return -3;
+
 	memcpy(RR, &smb_Read_Request.smbH.sessionHeader, sizeof(struct ReadAndXRequest_t));
 
-	RR->FID = FID;
+	RR->FID = (u16)FID;
 	RR->OffsetLow = fileoffset;
 	RR->MaxCountLow = nbytes;
 
@@ -756,13 +1088,16 @@ int smb_ReadAndX(u16 FID, u32 fileoffset, void *readbuf, u16 nbytes)
 }
 
 //-------------------------------------------------------------------------
-int smb_WriteAndX(u16 FID, u32 fileoffset, void *writebuf, u16 nbytes)
+int smb_WriteAndX(int FID, u32 fileoffset, void *writebuf, u16 nbytes)
 {
 	struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
 
+	if (FID == -1)
+		return -3;
+
 	memcpy(WR, &smb_Write_Request.smbH.sessionHeader, sizeof(struct WriteAndXRequest_t));
 
-	WR->FID = FID;
+	WR->FID = (u16)FID;
 	WR->OffsetLow = fileoffset;
 	WR->Remaining = nbytes;
 	WR->DataLengthLow = nbytes;
@@ -787,9 +1122,12 @@ int smb_WriteAndX(u16 FID, u32 fileoffset, void *writebuf, u16 nbytes)
 }
 
 //-------------------------------------------------------------------------
-int smb_Close(u16 FID)
+int smb_Close(int FID)
 {
 	struct CloseRequest_t *CR = (struct CloseRequest_t *)SMB_buf;
+
+	if (FID == -1)
+		return -3;
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -797,10 +1135,10 @@ int smb_Close(u16 FID)
 	CR->smbH.Cmd = SMB_COM_CLOSE;
 	CR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
 	CR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
-	CR->smbH.UID = UID;
-	CR->smbH.TID = TID;
+	CR->smbH.UID = (u16)UID;
+	CR->smbH.TID = (u16)TID;
 	CR->smbWordcount = 3;
-	CR->FID = FID;
+	CR->FID = (u16)FID;
 
 	rawTCP_SetSessionHeader(41);
 	GetSMBServerReply();
@@ -815,7 +1153,76 @@ int smb_Close(u16 FID)
 	if ((CRsp->smbH.Eclass | CRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
-	return 1;
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_TreeDisconnect(void)
+{
+	struct TreeDisconnectRequest_t *TDR = (struct TreeDisconnectRequest_t *)SMB_buf;
+
+	if (TID == -1)
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	TDR->smbH.Magic = SMB_MAGIC;
+	TDR->smbH.Cmd = SMB_COM_TREE_DISCONNECT;
+	TDR->smbH.TID = (u16)TID;
+
+	rawTCP_SetSessionHeader(35);
+	GetSMBServerReply();
+
+	struct TreeDisconnectResponse_t *TDRsp = (struct TreeDisconnectResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (TDRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((TDRsp->smbH.Eclass | TDRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	TID = -1;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_LogOffAndX(void)
+{
+	struct LogOffAndXRequest_t *LR = (struct LogOffAndXRequest_t *)SMB_buf;
+
+	if (UID == -1)
+		return -3;
+
+	if (!(TID == -1))
+		smb_TreeDisconnect();
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	LR->smbH.Magic = SMB_MAGIC;
+	LR->smbH.Cmd = SMB_COM_LOGOFF_ANDX;
+	LR->smbH.UID = (u16)UID;
+	LR->smbWordcount = 2;
+	LR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
+
+	rawTCP_SetSessionHeader(39);
+	GetSMBServerReply();
+
+	struct LogOffAndXResponse_t *LRsp = (struct LogOffAndXResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (LRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((LRsp->smbH.Eclass | LRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	UID = -1;
+
+	return 0;
 }
 
 //-------------------------------------------------------------------------
@@ -823,5 +1230,5 @@ int smb_Disconnect(void)
 {
 	lwip_close(main_socket);
 
-	return 1;
+	return 0;
 }

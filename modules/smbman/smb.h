@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, jimmikaelkael
+  Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 */
@@ -275,11 +275,17 @@ int rawTCP_SetSessionHeader(u32 size);		// Write Session Service header
 int rawTCP_GetSessionHeader(void); 		// Read Session Service header
 
 int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect);	// process a Negociate Procotol message
-int smb_SessionSetupTreeConnect(char *User, char *Password, char *share_name);	// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
-int smb_OpenAndX(char *filename, u16 *FID, u32 *filesize, int mode);		// process a Open AndX message
-int smb_ReadAndX(u16 FID, u32 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
-int smb_WriteAndX(u16 FID, u32 offset, void *writebuf, u16 nbytes);		// process a Write AndX message
-int smb_Close(u16 FID);								// process a Close message
+int smb_SessionSetupAndX(char *User, char *Password, int PasswordType);		// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security
+int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType); 	// PasswordType: 0 = PlainText, 1 = Hash
+int smb_TreeDisconnect(void);
+int smb_NetShareEnum(void);
+int smb_LogOffAndX(void);
+
+int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode);		// process a Open AndX message
+int smb_ReadAndX(int FID, u32 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
+int smb_WriteAndX(int FID, u32 offset, void *writebuf, u16 nbytes);		// process a Write AndX message
+int smb_Close(int FID);								// process a Close message
+
 int smb_Disconnect(void);
 
 #define MAX_SMB_BUF 	15360 // must fit on u16 !!!

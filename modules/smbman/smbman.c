@@ -1,5 +1,5 @@
 /*
-  Copyright 2009, jimmikaelkael
+  Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 */
@@ -7,19 +7,12 @@
 #include <loadcore.h>
 #include <stdio.h>
 #include <sysclib.h>
-#include <thbase.h>
-#include <intrman.h>
-#include <sifman.h>
-#include <sifrpc.h>
-#include <sysmem.h>
-#include <thsemap.h>
-#include <io_common.h>
-#include <errno.h>
 
+#include "smb_fio.h"
 #include "smb.h"
 
 #define MODNAME "smbman"
-IRX_ID(MODNAME, 1, 1);
+IRX_ID(MODNAME, 2, 1);
 
 #define MAX_SECTORS 	7
 
@@ -46,9 +39,12 @@ int _start(int argc, char** argv)
 
 	// Then open a session and a tree connect on the share resource
 	sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-	smb_SessionSetupTreeConnect("GUEST", NULL, tree_str); // user/tree must NOT be null
+	smb_SessionSetupAndX("GUEST", NULL, 0);
+	smb_TreeConnectAndX(tree_str, NULL, 0);
+	//smb_TreeConnectAndX("\\\\192.168.0.2\\IPC$", NULL, 0);
+	//smb_NetShareEnum();
 
-	smbman_initdev();
+	smb_initdev();
 
 	return MODULE_RESIDENT_END;
 }
@@ -59,304 +55,5 @@ int _shutdown(void)
 	smb_Disconnect();
 
 	return 0;
-}
-
-//-------------------------------------------------------------- 
-// FS PART
-//-------------------------------------------------------------- 
-
-#include <ioman.h>
-#include <io_common.h>
-
-// smb driver ops functions prototypes
-int smb_dummy(void);
-int smb_init(iop_device_t *iop_dev);
-int smb_deinit(iop_device_t *dev);
-int smb_open(iop_file_t *f, char *filename, int mode, int flags);
-int smb_close(iop_file_t *f);
-int smb_lseek(iop_file_t *f, u32 pos, int where);
-int smb_read(iop_file_t *f, void *buf, u32 size);
-int smb_write(iop_file_t *f, void *buf, u32 size);
-
-int smbman_io_sema;
-
-// driver ops func tab
-void *smbman_ops[17] = {
-	(void*)smb_init,
-	(void*)smb_deinit,
-	(void*)smb_dummy,
-	(void*)smb_open,
-	(void*)smb_close,
-	(void*)smb_read,
-	(void*)smb_write,
-	(void*)smb_lseek,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy
-};
-
-// driver descriptor
-static iop_device_t smbdev = {
-	"smb",
-	IOP_DT_FS,
-	1,
-	"SMB ",
-	(struct _iop_device_ops *)&smbman_ops
-};
-
-typedef struct {
-	iop_file_t 	*f;
-	u32		smb_fid;
-	u32		filesize;
-	u32		position;
-	u32		mode;
-} FHANDLE;
-
-#define MAX_FDHANDLES		64
-FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
-
-//-------------------------------------------------------------- 
-int smb_dummy(void)
-{
-	return -EPERM;
-}
-
-//-------------------------------------------------------------- 
-int smb_init(iop_device_t *dev)
-{
-	iop_sema_t smp;
-
-	smp.initial = 1;
-	smp.max = 1;
-	smp.attr = 1;
-	smp.option = 0;
-
-	smbman_io_sema = CreateSema(&smp);
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
-int smbman_initdev(void)
-{	
-	DelDrv(smbdev.name);
-	if (AddDrv(&smbdev))
-		return 1;
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
-int smb_deinit(iop_device_t *dev)
-{
-	DeleteSema(smbman_io_sema);
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
-FHANDLE *smbman_getfilefreeslot(void)
-{
-	register int i;
-	FHANDLE *fh;
-
-	for (i=0; i<MAX_FDHANDLES; i++) {
-		fh = (FHANDLE *)&smbman_fdhandles[i];
-		if (fh->f == NULL)
-			return fh;
-	}
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
-int smb_open(iop_file_t *f, char *filename, int mode, int flags)
-{
-	register int r = 0;
-	FHANDLE *fh;
-	u16 smb_fid;
-	u32 filesize;
-
-	if (!filename)
-		return -ENOENT;
-
-	WaitSema(smbman_io_sema);
-
-	fh = smbman_getfilefreeslot();
-	if (fh) {
-		r = smb_OpenAndX(filename, &smb_fid, &filesize, mode);
-		if (r == 1) {
-			f->privdata = fh;
-			fh->f = f;
-			fh->smb_fid = smb_fid;
-			fh->mode = mode;
-			fh->filesize = filesize;
-			fh->position = filesize;
-			if (fh->mode & O_TRUNC) {
-				fh->position = 0;
-				fh->filesize = 0;
-			}
-			r = 0;
-		}
-		else {
-			if (r == -1)
-				r = -EIO;
-			else if (r == -2)
-				r = -EPERM;
-			else if (r == -3)
-				r = -ENOENT;
-			else
-				r = -EIO;
-		}
-	}
-	else
-		r = -EMFILE;
-
-	SignalSema(smbman_io_sema);
-
-	return r;
-}
-
-//-------------------------------------------------------------- 
-int smb_close(iop_file_t *f)
-{
-	FHANDLE *fh = (FHANDLE *)f->privdata;
-	register int r = 0;
-
-	WaitSema(smbman_io_sema);
-
-	if (fh) {
-		r = smb_Close(fh->smb_fid);
-		if (r != 1) {
-			r = -EIO;
-			goto ssema;
-		}
-		memset(fh, 0, sizeof(FHANDLE));
-		r = 0;
-	}
-
-ssema:
-	SignalSema(smbman_io_sema);
-
-	return r;
-}
-
-//-------------------------------------------------------------- 
-int smb_lseek(iop_file_t *f, u32 pos, int where)
-{
-	register int r;
-	FHANDLE *fh = (FHANDLE *)f->privdata;
-
-	WaitSema(smbman_io_sema);
-
-	switch (where) {
-		case SEEK_CUR:
-			r = fh->position + pos;
-			if (r > fh->filesize) {
-				r = -EINVAL;
-				goto ssema;
-			}
-			break;
-		case SEEK_SET:
-			r = pos;
-			if (fh->filesize < pos) {
-				r = -EINVAL;
-				goto ssema;
-			}
-			break;
-		case SEEK_END:
-			r = fh->filesize;
-			break;
-		default:
-			r = -EINVAL;
-			goto ssema;
-	}
-
-	fh->position = r;
-
-ssema:
-	SignalSema(smbman_io_sema);
-
-	return r;
-}
-
-//-------------------------------------------------------------- 
-int smb_read(iop_file_t *f, void *buf, u32 size)
-{
-	FHANDLE *fh = (FHANDLE *)f->privdata;
-	register int r, rpos;
-	register u32 nbytes;
-
-	rpos = 0;
-
-	if ((fh->position + size) > fh->filesize)
-		size = fh->filesize - fh->position;
-
-	WaitSema(smbman_io_sema);
-
-	while (size) {
-		nbytes = MAX_SMB_BUF;
-		if (size < nbytes)
-			nbytes = size;
-
-		r = smb_ReadAndX(fh->smb_fid, fh->position, (void *)(buf + rpos), (u16)nbytes);
-		if (r < 0) {
-   			rpos = -EIO;
-   			goto ssema;
-		}
-
-		rpos += nbytes;
-		size -= nbytes;
-		fh->position += nbytes;
-	}
-
-ssema:
-	SignalSema(smbman_io_sema);
-
-	return rpos;
-}
-
-//-------------------------------------------------------------- 
-int smb_write(iop_file_t *f, void *buf, u32 size)
-{
-	FHANDLE *fh = (FHANDLE *)f->privdata;
-	register int r, wpos;
-	register u32 nbytes;
-
-	if ((!(fh->mode & O_RDWR)) && (!(fh->mode & O_WRONLY)))
-		return -EPERM;
-
-	wpos = 0;
-
-	WaitSema(smbman_io_sema);
-
-	while (size) {
-		nbytes = MAX_SMB_BUF;
-		if (size < nbytes)
-			nbytes = size;
-
-		r = smb_WriteAndX(fh->smb_fid, fh->position, (void *)(buf + wpos), (u16)nbytes);
-		if (r < 0) {
-   			wpos = -EIO;
-   			goto ssema;
-		}
-
-		wpos += nbytes;
-		size -= nbytes;
-		fh->position += nbytes;
-		if (fh->position > fh->filesize)
-			fh->filesize += fh->position - fh->filesize;
-	}
-
-ssema:
-	SignalSema(smbman_io_sema);
-
-	return wpos;
 }
 

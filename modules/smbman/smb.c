@@ -916,7 +916,6 @@ int smb_NetShareEnum(void)
 	rawTCP_SetSessionHeader(95);
 	GetSMBServerReply();
 
-
 	struct NetShareEnumResponse_t *NSERsp = (struct NetShareEnumResponse_t *)SMB_buf;
 
 
@@ -928,7 +927,14 @@ int smb_NetShareEnum(void)
 	if ((NSERsp->smbH.Eclass | NSERsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
-	NSERsp->smbTrans.ParamOffset
+	// API status must be 0
+	if (*((u16 *)&SMB_buf[NSERsp->smbTrans.ParamOffset+4]) != 0)
+		return -1;
+
+	// Available Entries
+	//*((u16 *)&SMB_buf[NSERsp->smbTrans.ParamOffset+4+6])
+
+	// first share name at &SMB_buf[NSERsp->smbTrans.DataOffset+4]
 
 	return 0;
 }

@@ -7,6 +7,9 @@
 #ifndef __SMBMAN_H__
 #define __SMBMAN_H__
 
+#define PLAINTEXT_PASSWORD	0
+#define HASHED_PASSWORD		1
+
 // DEVCTL commands
 #define DEVCTL_GETPASSWORDHASHES	0xC0DE0001
 #define DEVCTL_LOGON			0xC0DE0002
@@ -14,18 +17,46 @@
 #define DEVCTL_GETSHARELIST		0xC0DE0004
 #define DEVCTL_OPENSHARE		0xC0DE0005
 #define DEVCTL_CLOSESHARE		0xC0DE0006
+#define DEVCTL_ECHO			0xC0DE0007
 
 // helpers for DEVCTL commands
 
-typedef struct
-{
-	u8 password[0];
+typedef struct {
+	char password[0];
 } smbGetPasswordHashes_in_t;
 
-typedef struct 			// size = 32
-{
+typedef struct {		// size = 32
 	u8 LMhash[16];
 	u8 NTLMhash[16];
 } smbGetPasswordHashes_out_t;
+
+typedef struct {		// size = 536
+	char serverIP[16];
+	int  serverPort;
+	char User[256];
+	char Password[256];
+	int  PasswordType;	// PLAINTEXT_PASSWORD or HASHED_PASSWORD
+} smbLogOn_in_t;
+
+typedef struct {		// size = 8
+	void *EE_addr;
+	int   maxent;
+} smbGetShareList_in_t;
+
+typedef struct {		// size = 520
+	char ShareName[256];
+	char Password[256];
+	int  PasswordType;	// PLAINTEXT_PASSWORD or HASHED_PASSWORD
+} smbOpenShare_in_t;
+
+typedef struct {		// size = 260
+	char echo[256];
+	int  len;
+} smbEcho_in_t;
+
+typedef struct {		// size = 512
+	char ShareName[256];
+	char ShareComment[256];
+} ShareEntry_t;
 
 #endif

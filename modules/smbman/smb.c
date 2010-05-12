@@ -184,6 +184,22 @@ struct LogOffAndXResponse_t {
 	u16	ByteCount;		// 41
 } __attribute__((packed));
 
+struct EchoRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	EchoCount;		// 37
+	u16	ByteCount;		// 39
+	u8	ByteField[0];		// 41
+} __attribute__((packed));
+
+struct EchoResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	SequenceNumber;		// 37
+	u16	ByteCount;		// 39
+	u8	ByteField[0];		// 41
+} __attribute__((packed));
+
 struct FindFirst2Request_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
@@ -418,24 +434,6 @@ struct CloseResponse_t {
 	u16	ByteCount;		// 37
 } __attribute__((packed));
 
-typedef struct {
-	char	ServerIP[16];
-	u32	MaxBufferSize;
-	u32	MaxMpxCount;
-	u32	SessionKey;
-	u32	StringsCF;
-	u32	SupportsNTSMB;
-	u8	PrimaryDomainServerName[64];
-	u8	EncryptionKey[8];
-	int	SecurityMode;		// 0 = share level, 1 = user level
-	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
-} server_specs_t;
-
-#define SERVER_SHARE_SECURITY_LEVEL	0
-#define SERVER_USER_SECURITY_LEVEL	1
-#define SERVER_USE_PLAINTEXT_PASSWORD	0
-#define SERVER_USE_ENCRYPTED_PASSWORD	1
-
 static server_specs_t server_specs;
 
 struct ReadAndXRequest_t smb_Read_Request = {
@@ -470,7 +468,13 @@ static int main_socket;
 static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
 
 //-------------------------------------------------------------------------
-int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
+server_specs_t *getServerSpecs(void)
+{
+	return &server_specs;
+}
+
+//-------------------------------------------------------------------------
+static int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
 {
 	// maximum for raw TCP transport (24 bits) !!!
 	SMB_buf[0] = 0;
@@ -482,7 +486,7 @@ int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful i
 }
 
 //-------------------------------------------------------------------------
-int rawTCP_GetSessionHeader(void) // Read Session Service header: careful it's raw TCP transport here and not NBT transport
+static int rawTCP_GetSessionHeader(void) // Read Session Service header: careful it's raw TCP transport here and not NBT transport
 {
 	register u32 size;
 
@@ -495,7 +499,7 @@ int rawTCP_GetSessionHeader(void) // Read Session Service header: careful it's r
 }
 
 //-------------------------------------------------------------------------
-int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
+static int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 {
 	register int sock, ret;
 	struct sockaddr_in sock_addr;
@@ -521,7 +525,7 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 }
 
 //-------------------------------------------------------------------------
-int GetSMBServerReply(void)
+static int GetSMBServerReply(void)
 {
 	register int rcv_size, totalpkt_size, pkt_size;
 
@@ -640,7 +644,7 @@ int smb_SessionSetupAndX(char *User, char *Password, int PasswordType)
 	int AuthType = NTLM_AUTH;
 
 	if (UID != -1)
-		return -3;
+		smb_LogOffAndX();
 
 lbl_session_setup:
 
@@ -670,7 +674,7 @@ lbl_session_setup:
 		if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
 			challenge = (u8 *)server_specs.EncryptionKey;
 			passwordlen = 24;
-			if (PasswordType == 0) {
+			if (PasswordType == PLAINTEXT_PASSWORD) {
 				if (AuthType == LM_AUTH) {
 					LM_Password_Hash(Password, passwordhash);
 					SSR->AnsiPasswordLength = passwordlen;
@@ -680,7 +684,7 @@ lbl_session_setup:
 					SSR->UnicodePasswordLength = passwordlen;
 				}
 			}
-			else if (PasswordType == 1) {
+			else if (PasswordType == HASHED_PASSWORD) {
 				if (AuthType == LM_AUTH) {
 					memcpy(passwordhash, &Password[0], 16);
 					SSR->AnsiPasswordLength = passwordlen;
@@ -774,7 +778,7 @@ int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType) // Pa
 	int AuthType = NTLM_AUTH;
 
 	if (TID != -1)
-		return -3;
+		smb_TreeDisconnect();
 
 lbl_tree_connect:
 
@@ -803,13 +807,13 @@ lbl_tree_connect:
 			if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
 				challenge = (u8 *)server_specs.EncryptionKey;
 				passwordlen = 24;
-				if (PasswordType == 0) {
+				if (PasswordType == PLAINTEXT_PASSWORD) {
 					if (AuthType == LM_AUTH)
 						LM_Password_Hash(Password, passwordhash);
 					else if (AuthType == NTLM_AUTH)
 						NTLM_Password_Hash(Password, passwordhash);
 				}
-				else if (PasswordType == 1) {
+				else if (PasswordType == HASHED_PASSWORD) {
 					if (AuthType == LM_AUTH)
 						memcpy(passwordhash, &Password[0], 16);
 					if (AuthType == NTLM_AUTH)
@@ -886,11 +890,13 @@ lbl_tree_connect:
 }
 
 //-------------------------------------------------------------------------
-int smb_NetShareEnum(void)
+int smb_NetShareEnum(ShareEntry_t *shareEntries, int maxEntries)
 {
+	register int i;
+	register int count = 0;
 	struct NetShareEnumRequest_t *NSER = (struct NetShareEnumRequest_t *)SMB_buf;
 
-	if (TID == -1)
+	if ((UID == -1) || (TID == -1))
 		return -3;
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
@@ -918,7 +924,6 @@ int smb_NetShareEnum(void)
 
 	struct NetShareEnumResponse_t *NSERsp = (struct NetShareEnumResponse_t *)SMB_buf;
 
-
 	// check sanity of SMB header
 	if (NSERsp->smbH.Magic != SMB_MAGIC)
 		return -1;
@@ -931,12 +936,33 @@ int smb_NetShareEnum(void)
 	if (*((u16 *)&SMB_buf[NSERsp->smbTrans.ParamOffset+4]) != 0)
 		return -1;
 
-	// Available Entries
-	//*((u16 *)&SMB_buf[NSERsp->smbTrans.ParamOffset+4+6])
+	// available entries
+	int AvailableEntries = (int)*((u16 *)&SMB_buf[NSERsp->smbTrans.ParamOffset+4+6]);
 
-	// first share name at &SMB_buf[NSERsp->smbTrans.DataOffset+4]
+	// data start
+	u8 *data = (u8 *)&SMB_buf[NSERsp->smbTrans.DataOffset+4];
+	u8 *p = (u8 *)data;
 
-	return 0;
+	for (i=0; i<AvailableEntries; i++) {
+
+		// calculate the padding after the Share name 
+		int padding = (strlen(p)+1+2) % 16 ? 16-((strlen(p)+1) % 16) : 0;
+
+		if (*((u16 *)&p[strlen(p)+1+padding-2]) == 0) { // Directory Tree type
+			if (strcmp(p, "IPC$")) { // filter IPC slot
+				if (count < maxEntries) {
+					count++;
+					strncpy(shareEntries->ShareName, p, 256);
+					strncpy(shareEntries->ShareComment, &data[*((u16 *)&p[strlen(p)+1+padding])], 256);
+				}
+			}
+		}
+
+		shareEntries++;
+		p += strlen(p)+1+padding+4;
+	}
+
+	return count;
 }
 
 /*
@@ -1227,6 +1253,40 @@ int smb_LogOffAndX(void)
 		return -2;
 
 	UID = -1;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_Echo(void *echo, int len)
+{
+	struct EchoRequest_t *ER = (struct EchoRequest_t *)SMB_buf;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	ER->smbH.Magic = SMB_MAGIC;
+	ER->smbH.Cmd = SMB_COM_ECHO;
+	ER->smbWordcount = 1;
+	ER->EchoCount = 1;
+
+	memcpy(&ER->ByteField[0], echo, (u16)len);
+	ER->ByteCount = (u16)len;
+
+	rawTCP_SetSessionHeader(37+(u16)len);
+	GetSMBServerReply();
+
+	struct EchoResponse_t *ERsp = (struct EchoResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (ERsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((ERsp->smbH.Eclass | ERsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	if (memcmp(&ERsp->ByteField[0], echo, len))
+		return -3;
 
 	return 0;
 }

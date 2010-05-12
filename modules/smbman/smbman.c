@@ -24,6 +24,7 @@ int smbman_initdev(void);
 
 struct irx_export_table _exp_smbman;
 
+//ShareEntry_t shareEntries[32];
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
 {
@@ -41,8 +42,18 @@ int _start(int argc, char** argv)
 	sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
 	smb_SessionSetupAndX("GUEST", NULL, 0);
 	smb_TreeConnectAndX(tree_str, NULL, 0);
-	//smb_TreeConnectAndX("\\\\192.168.0.2\\IPC$", NULL, 0);
-	//smb_NetShareEnum();
+	/*
+	int i, count;
+	smb_TreeConnectAndX("\\\\192.168.0.2\\IPC$", NULL, 0);
+	count = smb_NetShareEnum(&shareEntries[0], 32);
+	smb_TreeDisconnect();
+	ShareEntry_t *SE = (ShareEntry_t *)&shareEntries[0];
+	for (i=0; i<count; i++) {
+		smb_Echo(SE->ShareName, strlen(SE->ShareName));
+		smb_Echo(SE->ShareComment, strlen(SE->ShareComment));
+		SE++;
+	}
+	*/
 
 	smb_initdev();
 

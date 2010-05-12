@@ -7,6 +7,8 @@
 #ifndef __SMB_H__
 #define __SMB_H__
 
+#include "smbman.h"
+
 // SMB Headers are always 32 bytes long
 #define SMB_HDR_SIZE 32
 
@@ -265,21 +267,41 @@
 #define STATUS_OBJECT_NAME_NOT_FOUND		0xc0000034
 #define STATUS_LOGON_FAILURE			0xc000006d
 
+/*
 typedef struct _smb_time {
 	u32 timeLow;
 	u32 timeHigh;
 } smb_time;
+*/
+
+typedef struct {
+	char	ServerIP[16];
+	u32	MaxBufferSize;
+	u32	MaxMpxCount;
+	u32	SessionKey;
+	u32	StringsCF;
+	u32	SupportsNTSMB;
+	u8	PrimaryDomainServerName[64];
+	u8	EncryptionKey[8];
+	int	SecurityMode;		// 0 = share level, 1 = user level
+	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
+} server_specs_t;
+
+#define SERVER_SHARE_SECURITY_LEVEL	0
+#define SERVER_USER_SECURITY_LEVEL	1
+#define SERVER_USE_PLAINTEXT_PASSWORD	0
+#define SERVER_USE_ENCRYPTED_PASSWORD	1
 
 // function prototypes
-int rawTCP_SetSessionHeader(u32 size);		// Write Session Service header
-int rawTCP_GetSessionHeader(void); 		// Read Session Service header
+server_specs_t *getServerSpecs(void);
 
 int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect);	// process a Negociate Procotol message
 int smb_SessionSetupAndX(char *User, char *Password, int PasswordType);		// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security
 int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType); 	// PasswordType: 0 = PlainText, 1 = Hash
 int smb_TreeDisconnect(void);
-int smb_NetShareEnum(void);
+int smb_NetShareEnum(ShareEntry_t *shareEntries, int maxEntries);
 int smb_LogOffAndX(void);
+int smb_Echo(void *echo, int len);
 
 int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode);		// process a Open AndX message
 int smb_ReadAndX(int FID, u32 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
@@ -288,6 +310,8 @@ int smb_Close(int FID);								// process a Close message
 
 int smb_Disconnect(void);
 
-#define MAX_SMB_BUF 	15360 // must fit on u16 !!!
+#define MAX_SMB_BUF 	64511 // must fit on u16 !!!
+#define MAX_RD_BUF	4096
+#define MAX_WR_BUF	4096
 
 #endif

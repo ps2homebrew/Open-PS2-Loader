@@ -68,12 +68,18 @@ clean:
 	$(MAKE) -C modules/ps2hdd clean
 	echo "    * iso2opl"
 	$(MAKE) -C pc clean
+	echo "    * smblab"
+	$(MAKE) -C smblab clean
 
 rebuild: clean all
 
 pc_tools:
 	echo "Building iso2opl and opl2iso..."
 	$(MAKE) -C pc
+
+smb_lab:
+	echo "Building smblab..."
+	$(MAKE) -C smblab rebuild
 
 loader.s:
 	echo "    * Loader"

@@ -21,7 +21,7 @@
 int smbman_io_sema;
 
 // driver ops func tab
-void *smbman_ops[17] = {
+void *smbman_ops[27] = {
 	(void*)smb_init,
 	(void*)smb_deinit,
 	(void*)smb_dummy,
@@ -36,6 +36,16 @@ void *smbman_ops[17] = {
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_dummy,
+	(void*)smb_devctl,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy
@@ -345,13 +355,13 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 
 	switch(cmd) {
 
-		case DEVCTL_GETPASSWORDHASHES:
+		case SMB_DEVCTL_GETPASSWORDHASHES:
 			LM_Password_Hash((const unsigned char *)arg, (unsigned char *)bufp);
 			NTLM_Password_Hash((const unsigned char *)arg, (unsigned char *)(bufp + 16));
 			r = 0;
 			break;
 
-		case DEVCTL_LOGON:
+		case SMB_DEVCTL_LOGON:
 			r = smb_NegociateProtocol(logon->serverIP, logon->serverPort, "NT LM 0.12");
 			if (r < 0)
 				r = -EIO;
@@ -360,7 +370,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 				r = -EIO;
 			break;
 
-		case DEVCTL_LOGOFF:
+		case SMB_DEVCTL_LOGOFF:
 			smb_closeAll();
 			r = smb_LogOffAndX();
 			if (r < 0) {
@@ -371,7 +381,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			}
 			break;
 
-		case DEVCTL_GETSHARELIST:
+		case SMB_DEVCTL_GETSHARELIST:
 			specs = (server_specs_t *)getServerSpecs();
 			sprintf(tree_str, "\\\\%s\\IPC$", specs->ServerIP);
 			r = smb_TreeConnectAndX(tree_str, NULL, 0);
@@ -405,7 +415,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			r = sharecount;
 			break;
 
-		case DEVCTL_OPENSHARE:
+		case SMB_DEVCTL_OPENSHARE:
 			specs = (server_specs_t *)getServerSpecs();
 			sprintf(tree_str, "\\\\%s\\%s", specs->ServerIP, openshare->ShareName);
 			r = smb_TreeConnectAndX(tree_str, openshare->Password, openshare->PasswordType);
@@ -413,7 +423,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 				r = -EIO;
 			break;
 
-		case DEVCTL_CLOSESHARE:
+		case SMB_DEVCTL_CLOSESHARE:
 			smb_closeAll();
 			r = smb_TreeDisconnect();
 			if (r < 0) {
@@ -424,7 +434,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			}
 			break;
 
-		case DEVCTL_ECHO:
+		case SMB_DEVCTL_ECHO:
 			r = smb_Echo(echo->echo, echo->len);
 			if (r < 0)
 				r = -EIO;

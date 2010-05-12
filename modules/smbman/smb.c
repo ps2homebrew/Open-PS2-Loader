@@ -273,7 +273,6 @@ struct FindNext2Response_t {
 */
 } __attribute__((packed));
 
-/*
 struct NTCreateAndXRequest_t {
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
@@ -320,7 +319,6 @@ struct NTCreateAndXResponse_t {		// size = 107
 	u8	IsDirectory;		// 104
 	u16	ByteCount;		// 105
 } __attribute__((packed));
-*/
 
 struct OpenAndXRequest_t {
 	struct SMBHeader_t smbH;	// 0
@@ -632,14 +630,54 @@ conn_close:
 }
 
 //-------------------------------------------------------------------------
+static int AddPassword(char *Password, int PasswordType, int AuthType, u16 *AnsiPassLen, u16 *UnicodePassLen, u8 *Buffer)
+{
+	u8 passwordhash[16];
+	u8 LMresponse[24];
+	u16 passwordlen = 0;
+
+	if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
+		passwordlen = 24;
+		if (PasswordType == PLAINTEXT_PASSWORD) {
+			if (AuthType == LM_AUTH) {
+				LM_Password_Hash(Password, passwordhash);
+				memcpy(AnsiPassLen, &passwordlen, 2);
+			}
+			else if (AuthType == NTLM_AUTH) {
+				NTLM_Password_Hash(Password, passwordhash);
+				memcpy(UnicodePassLen, &passwordlen, 2);
+			}
+		}
+		else if (PasswordType == HASHED_PASSWORD) {
+			if (AuthType == LM_AUTH) {
+				memcpy(passwordhash, &Password[0], 16);
+				memcpy(AnsiPassLen, &passwordlen, 2);
+			}
+			if (AuthType == NTLM_AUTH) {
+				memcpy(passwordhash, &Password[16], 16);
+				memcpy(UnicodePassLen, &passwordlen, 2);
+			}
+		}
+		LM_Response(passwordhash, (u8 *) server_specs.EncryptionKey, LMresponse);
+		memcpy(Buffer, &LMresponse[0], passwordlen);
+	}
+	else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
+		// It seems that PlainText passwords and Unicode isn't meant to be...
+		passwordlen = strlen(Password);
+		if (passwordlen > 14)
+			passwordlen = 14;
+		memcpy(Buffer, Password, passwordlen);
+		memcpy(AnsiPassLen, &passwordlen, 2);
+	}
+
+	return passwordlen;
+}
+
+//-------------------------------------------------------------------------
 int smb_SessionSetupAndX(char *User, char *Password, int PasswordType)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
 	register int i, offset, CF;
-	u8 passwordhash[16];
-	u8 *challenge;
-	u8 LMresponse[24];
-	u8 password[64];
 	int passwordlen = 0;
 	int AuthType = NTLM_AUTH;
 
@@ -670,53 +708,9 @@ lbl_session_setup:
 	offset = 0;
 
 	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) && (Password)) {
-
-		if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
-			challenge = (u8 *)server_specs.EncryptionKey;
-			passwordlen = 24;
-			if (PasswordType == PLAINTEXT_PASSWORD) {
-				if (AuthType == LM_AUTH) {
-					LM_Password_Hash(Password, passwordhash);
-					SSR->AnsiPasswordLength = passwordlen;
-				}
-				else if (AuthType == NTLM_AUTH) {
-					NTLM_Password_Hash(Password, passwordhash);
-					SSR->UnicodePasswordLength = passwordlen;
-				}
-			}
-			else if (PasswordType == HASHED_PASSWORD) {
-				if (AuthType == LM_AUTH) {
-					memcpy(passwordhash, &Password[0], 16);
-					SSR->AnsiPasswordLength = passwordlen;
-				}
-				if (AuthType == NTLM_AUTH) {
-					memcpy(passwordhash, &Password[16], 16);
-					SSR->UnicodePasswordLength = passwordlen;
-				}
-			}
-			LM_Response(passwordhash, challenge, LMresponse);			
-
-			for (i = 0; i < passwordlen; i++) {
-				SSR->ByteField[offset] = LMresponse[i];	// add password
-				offset++;
-			}
-		}
-		else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
-			strncpy(password, Password, 14);
-			passwordlen = strlen(password);
-			//if (CF == 2)					// It seems that PlainText passwords and Unicode isn't meant to be...
-			//	SSR->UnicodePasswordLength = passwordlen * 2;
-			//else
-			SSR->AnsiPasswordLength = passwordlen;
-
-			memcpy(&SSR->ByteField[offset], password, passwordlen);
-			offset += passwordlen;
-			//for (i = 0; i < passwordlen; i++) {
-			//	SSR->ByteField[offset] = password[i];	// add password
-			//	offset += 1; //CF;
-			//}
-		}
-	}	
+		passwordlen = AddPassword(Password, PasswordType, AuthType, &SSR->AnsiPasswordLength, &SSR->UnicodePasswordLength, &SSR->ByteField[0]);
+		offset += passwordlen;
+	}
 
 	if ((CF == 2) && (!(passwordlen & 1)))
 		offset += 1;				// pad needed only for unicode as aligment fix if password length is even
@@ -770,10 +764,6 @@ int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType) // Pa
 {
 	struct TreeConnectAndXRequest_t *TCR = (struct TreeConnectAndXRequest_t *)SMB_buf;
 	register int i, offset, CF;
-	u8 passwordhash[16];
-	u8 *challenge;
-	u8 LMresponse[24];
-	u8 password[64];
 	int passwordlen = 0;
 	int AuthType = NTLM_AUTH;
 
@@ -802,50 +792,12 @@ lbl_tree_connect:
 
 	if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
 
-		if (Password) {
-
-			if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
-				challenge = (u8 *)server_specs.EncryptionKey;
-				passwordlen = 24;
-				if (PasswordType == PLAINTEXT_PASSWORD) {
-					if (AuthType == LM_AUTH)
-						LM_Password_Hash(Password, passwordhash);
-					else if (AuthType == NTLM_AUTH)
-						NTLM_Password_Hash(Password, passwordhash);
-				}
-				else if (PasswordType == HASHED_PASSWORD) {
-					if (AuthType == LM_AUTH)
-						memcpy(passwordhash, &Password[0], 16);
-					if (AuthType == NTLM_AUTH)
-						memcpy(passwordhash, &Password[16], 16);
-				}
-				LM_Response(passwordhash, challenge, LMresponse);
-
-				for (i = 0; i < passwordlen; i++) {
-					TCR->ByteField[offset] = LMresponse[i];	// add password
-					offset++;
-				}
-			}
-			else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
-				strncpy(password, Password, 14);
-				passwordlen = strlen(password);
-				//if (CF == 2)					// It seems that PlainText passwords and Unicode isn't meant to be...
-				//	TCR->PasswordLength = passwordlen * 2;
-				//else
-
-				memcpy(&TCR->ByteField[offset], password, passwordlen);
-				offset += passwordlen;
-				//for (i = 0; i < passwordlen; i++) {
-				//	TCR->ByteField[offset] = password[i];	// add password
-				//	offset += 1; //CF;
-				//}
-			}
-		}
-		else {
+		if (Password)
+			passwordlen = AddPassword(Password, PasswordType, AuthType, &TCR->PasswordLength, &TCR->PasswordLength, &TCR->ByteField[0]);
+		else
 			passwordlen = 1;
-			offset += passwordlen;
-		}
-		TCR->PasswordLength = passwordlen;
+
+		offset += passwordlen;
 	}	
 
 	if ((CF == 2) && (!(passwordlen & 1)))
@@ -965,7 +917,6 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int maxEntries)
 	return count;
 }
 
-/*
 //-------------------------------------------------------------------------
 int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
 {
@@ -984,9 +935,9 @@ int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
 	NTCR->smbAndxCmd = SMB_COM_NONE;	// no ANDX command
 	length = strlen(filename);
 	NTCR->NameLength = length;
-	NTCR->AccessMask = ((mode & O_RDWR) || (mode & O_WRONLY)) ? 0x2019f : 0x20089;
-	NTCR->FileAttributes = ((mode & O_RDWR) || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
-	NTCR->ShareAccess = ((mode & O_RDWR) || (mode & O_WRONLY)) ? 0x03 : 0x01;
+	NTCR->AccessMask = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? 0x2019f : 0x20089;
+	NTCR->FileAttributes = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
+	NTCR->ShareAccess = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? 0x03 : 0x01;
 	NTCR->CreateDisposition = (mode & O_CREAT) ? 0x05 : 0x01;
 	NTCR->ImpersonationLevel = 2;
 	NTCR->SecurityFlags = 0x03;
@@ -1015,10 +966,11 @@ int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
 
 	smb_Read_Request.smbH.UID = (u16)UID;
 	smb_Read_Request.smbH.TID = (u16)TID;
+	smb_Write_Request.smbH.UID = (u16)UID;
+	smb_Write_Request.smbH.TID = (u16)TID;
 
 	return 0;
 }
-*/
 
 //-------------------------------------------------------------------------
 int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode)
@@ -1026,8 +978,8 @@ int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode)
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;
 
-	//if (server_specs.SupportsNTSMB)
-	//	return smb_NTCreateAndX(filename, FID, filesize, mode);
+	if (server_specs.SupportsNTSMB)
+		return smb_NTCreateAndX(filename, FID, filesize, mode);
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 

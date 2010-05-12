@@ -274,7 +274,7 @@ void writeIPConfig() {
 															ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
 															ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 
-	fioWrite(fd, ipconfig, strlen(ipconfig)+1);
+	fioWrite(fd, ipconfig, strlen(ipconfig));
 	
 	fioClose(fd);
 	

@@ -303,7 +303,7 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries);
 int smb_LogOffAndX(void);
 int smb_Echo(void *echo, int len);
 
-int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode);		// process a Open AndX message
+int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode);		// process a Open AndX message
 int smb_ReadAndX(int FID, u32 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
 int smb_WriteAndX(int FID, u32 offset, void *writebuf, u16 nbytes);		// process a Write AndX message
 int smb_Close(int FID);								// process a Close message

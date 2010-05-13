@@ -312,8 +312,7 @@ struct NTCreateAndXResponse_t {		// size = 107
 	u32	FileAttributes;		// 80
 	u32	AllocationSize;		// 84
 	u32	AllocationSizeHigh;	// 88
-	u32	FileSize;		// 92
-	u32	FileSizeHigh;		// 96
+	s64	FileSize;		// 92
 	u16	FileType;		// 100
 	u16	IPCState;		// 102
 	u8	IsDirectory;		// 104
@@ -930,7 +929,7 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries)
 }
 
 //-------------------------------------------------------------------------
-int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
+int smb_NTCreateAndX(char *filename, int *FID, s64 *filesize, int mode)
 {
 	struct NTCreateAndXRequest_t *NTCR = (struct NTCreateAndXRequest_t *)SMB_buf;
 	register int length;
@@ -992,7 +991,7 @@ int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
 }
 
 //-------------------------------------------------------------------------
-int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode)
+int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode)
 {
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;

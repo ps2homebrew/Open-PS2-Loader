@@ -853,7 +853,7 @@ lbl_tree_connect:
 }
 
 //-------------------------------------------------------------------------
-int smb_NetShareEnum(ShareEntry_t *shareEntries, int maxEntries)
+int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries)
 {
 	register int i;
 	register int count = 0;
@@ -912,16 +912,17 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int maxEntries)
 		int padding = (strlen(p)+1+2) % 16 ? 16-((strlen(p)+1) % 16) : 0;
 
 		if (*((u16 *)&p[strlen(p)+1+padding-2]) == 0) { // Directory Tree type
-			if (strcmp(p, "IPC$")) { // filter IPC slot
-				if (count < maxEntries) {
+			if (maxEntries > 0) {
+				if ((count < maxEntries) && (i >= index)) {
 					count++;
 					strncpy(shareEntries->ShareName, p, 256);
 					strncpy(shareEntries->ShareComment, &data[*((u16 *)&p[strlen(p)+1+padding])], 256);
+					shareEntries++;
 				}
 			}
+			else // if maxEntries is 0 then we're just counting shares
+				count++;
 		}
-
-		shareEntries++;
 		p += strlen(p)+1+padding+4;
 	}
 
@@ -948,8 +949,15 @@ int smb_NTCreateAndX(char *filename, int *FID, u32 *filesize, int mode)
 	NTCR->NameLength = length;
 	NTCR->AccessMask = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? 0x2019f : 0x20089;
 	NTCR->FileAttributes = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
-	NTCR->ShareAccess = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? 0x03 : 0x01;
-	NTCR->CreateDisposition = (mode & O_CREAT) ? 0x05 : 0x01;
+	NTCR->ShareAccess = 0x01; // Share in read mode only
+	if (mode & O_CREAT)
+		NTCR->CreateDisposition |= 0x02;
+	if (mode & O_TRUNC)
+		NTCR->CreateDisposition |= 0x04;
+	else
+		NTCR->CreateDisposition |= 0x01;
+	if (NTCR->CreateDisposition == 0x06)
+		NTCR->CreateDisposition = 0x05;
 	NTCR->ImpersonationLevel = 2;
 	NTCR->SecurityFlags = 0x03;
 	NTCR->ByteCount = length+1;
@@ -1002,8 +1010,8 @@ int smb_OpenAndX(char *filename, int *FID, u32 *filesize, int mode)
 	OR->smbH.TID = (u16)TID;
 	OR->smbWordcount = 15;
 	OR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
-	OR->AccessMask = (!(mode & O_RDONLY) || (mode & O_WRONLY)) ? 0x02 : 0x00;
-	OR->FileAttributes = (!(mode & O_RDONLY) || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
+	OR->AccessMask = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? 0x02 : 0x00;
+	OR->FileAttributes = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
 	if (mode & O_CREAT)
 		OR->CreateOptions |= 0x10;
 	if (mode & O_TRUNC)

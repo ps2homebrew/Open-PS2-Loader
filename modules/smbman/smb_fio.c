@@ -71,6 +71,8 @@ typedef struct {
 #define MAX_FDHANDLES		64
 FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
+static ShareEntry_t ShareList __attribute__((aligned(64))); // Keep this aligned for DMA!
+
 //-------------------------------------------------------------- 
 int smb_dummy(void)
 {
@@ -336,43 +338,156 @@ ssema:
 	return wpos;
 }
 
-static u8 ShareListBuf[128 * sizeof(ShareEntry_t)] __attribute__((aligned(64)));
+//-------------------------------------------------------------- 
+void DMA_sendEE(void *buf, int size, void *EE_addr)
+{
+	SifDmaTransfer_t dmat;
+	int oldstate, id;
+
+	dmat.dest = (void *)EE_addr;
+	dmat.size = size;
+	dmat.src = (void *)buf;
+	dmat.attr = 0;
+
+	id = 0;
+	while (!id) {
+		CpuSuspendIntr(&oldstate);
+		id = sceSifSetDma(&dmat, 1);
+		CpuResumeIntr(oldstate);
+	}
+	while (sceSifDmaStat(id) >= 0);
+}
+
+//-------------------------------------------------------------- 
+static void smb_GetPasswordHashes(smbGetPasswordHashes_in_t *in, smbGetPasswordHashes_out_t *out)
+{
+	LM_Password_Hash((const unsigned char *)in->password, (unsigned char *)out->LMhash);
+	NTLM_Password_Hash((const unsigned char *)in->password, (unsigned char *)out->NTLMhash);
+}
+
+//-------------------------------------------------------------- 
+static int smb_LogOn(smbLogOn_in_t *logon)
+{
+	register int r;
+
+	r = smb_NegociateProtocol(logon->serverIP, logon->serverPort, "NT LM 0.12");
+	if (r < 0)
+		return r;
+
+	r = smb_SessionSetupAndX(logon->User, logon->Password, logon->PasswordType);
+	if (r < 0)
+		return r;
+
+	return 0;
+}
+
+//-------------------------------------------------------------- 
+static int smb_LogOff(void)
+{
+	smb_closeAll();
+
+	return smb_LogOffAndX();
+}
+
+//-------------------------------------------------------------- 
+static int smb_GetShareList(smbGetShareList_in_t *getsharelist)
+{
+	register int i, r, sharecount, shareindex;
+	char tree_str[256];
+	server_specs_t *specs;
+
+	specs = (server_specs_t *)getServerSpecs();
+
+	// Tree Connect on IPC slot
+	sprintf(tree_str, "\\\\%s\\IPC$", specs->ServerIP);
+	r = smb_TreeConnectAndX(tree_str, NULL, 0);
+	if (r < 0)
+		return r;
+
+	// does a 1st enum to count shares (+IPC)
+	r = smb_NetShareEnum((ShareEntry_t *)&ShareList, 0, 0);
+	if (r < 0)
+		return r;
+
+	sharecount = r;
+	shareindex = 0;
+
+	// now we list the following shares if any 
+	for (i=0; i<sharecount; i++) {
+
+		r = smb_NetShareEnum((ShareEntry_t *)&ShareList, i, 1);
+		if (r < 0)
+			return r;
+
+		// if the entry is not IPC, we send it on EE, and increment shareindex
+		if ((strcmp(ShareList.ShareName, "IPC$")) && (shareindex < getsharelist->maxent)) {
+			DMA_sendEE((void *)&ShareList, sizeof(ShareList), (void *)(getsharelist->EE_addr + (shareindex * sizeof(ShareEntry_t))));
+			shareindex++;
+		}
+	}
+
+	// disconnect the tree
+	r = smb_TreeDisconnect();
+	if (r < 0)
+		return r;
+
+	// return the number of shares	
+	return shareindex;
+}
+
+//-------------------------------------------------------------- 
+static int smb_OpenShare(smbOpenShare_in_t *openshare)
+{
+	register int r;
+	char tree_str[256];
+	server_specs_t *specs;
+
+	specs = (server_specs_t *)getServerSpecs();
+	sprintf(tree_str, "\\\\%s\\%s", specs->ServerIP, openshare->ShareName);
+
+	r = smb_TreeConnectAndX(tree_str, openshare->Password, openshare->PasswordType);
+	if (r < 0)
+		r = -EIO;
+
+	return r;
+}
+
+//-------------------------------------------------------------- 
+static int smb_CloseShare(void)
+{
+	smb_closeAll();
+
+	return smb_TreeDisconnect();
+}
+
+//-------------------------------------------------------------- 
+static int smb_EchoServer(smbEcho_in_t *echo)
+{
+	return smb_Echo(echo->echo, echo->len);
+}
 
 //-------------------------------------------------------------- 
 int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 arglen, void *bufp, u32 buflen)
 {
 	register int r = 0;
-	register int sharecount;
-	char tree_str[256];
-	server_specs_t *specs;
-
-	smbLogOn_in_t *logon = (smbLogOn_in_t *)arg;
-	smbGetShareList_in_t *getsharelist = (smbGetShareList_in_t *)arg;
-	smbOpenShare_in_t *openshare = (smbOpenShare_in_t *)arg;
-	smbEcho_in_t *echo = (smbEcho_in_t *)arg;
 
 	WaitSema(smbman_io_sema);
 
 	switch(cmd) {
 
 		case SMB_DEVCTL_GETPASSWORDHASHES:
-			LM_Password_Hash((const unsigned char *)arg, (unsigned char *)bufp);
-			NTLM_Password_Hash((const unsigned char *)arg, (unsigned char *)(bufp + 16));
+			smb_GetPasswordHashes((smbGetPasswordHashes_in_t *)arg, (smbGetPasswordHashes_out_t *)bufp);
 			r = 0;
 			break;
 
 		case SMB_DEVCTL_LOGON:
-			r = smb_NegociateProtocol(logon->serverIP, logon->serverPort, "NT LM 0.12");
-			if (r < 0)
-				r = -EIO;
-			r = smb_SessionSetupAndX(logon->User, logon->Password, logon->PasswordType);
+			r = smb_LogOn((smbLogOn_in_t *)arg);
 			if (r < 0)
 				r = -EIO;
 			break;
 
 		case SMB_DEVCTL_LOGOFF:
-			smb_closeAll();
-			r = smb_LogOffAndX();
+			r = smb_LogOff();
 			if (r < 0) {
 				if (r == -3)
 					r = -EINVAL;
@@ -382,50 +497,23 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			break;
 
 		case SMB_DEVCTL_GETSHARELIST:
-			specs = (server_specs_t *)getServerSpecs();
-			sprintf(tree_str, "\\\\%s\\IPC$", specs->ServerIP);
-			r = smb_TreeConnectAndX(tree_str, NULL, 0);
-			if (r < 0)
-				r = -EIO;
-			getsharelist->maxent = (getsharelist->maxent > 128 ? 128 : getsharelist->maxent);
-			sharecount = smb_NetShareEnum((ShareEntry_t *)ShareListBuf, getsharelist->maxent);
-			r = smb_TreeDisconnect();
+			r = smb_GetShareList((smbGetShareList_in_t *)arg);
 			if (r < 0) {
 				if (r == -3)
 					r = -EINVAL;
 				else
 					r = -EIO;
-			}
-			SifDmaTransfer_t dmat;
-			int oldstate, id;
-
-			dmat.dest = (void *)getsharelist->EE_addr;
-			dmat.size = sharecount * sizeof(ShareEntry_t);
-			dmat.src = (void *)ShareListBuf;
-			dmat.attr = 0;
-
-			id = 0;
-			while (!id) {
-				CpuSuspendIntr(&oldstate);
-				id = sceSifSetDma(&dmat, 1);
-				CpuResumeIntr(oldstate);
-			}
-			while (sceSifDmaStat(id) >= 0);
-			
-			r = sharecount;
+			}			
 			break;
 
 		case SMB_DEVCTL_OPENSHARE:
-			specs = (server_specs_t *)getServerSpecs();
-			sprintf(tree_str, "\\\\%s\\%s", specs->ServerIP, openshare->ShareName);
-			r = smb_TreeConnectAndX(tree_str, openshare->Password, openshare->PasswordType);
+			r = smb_OpenShare((smbOpenShare_in_t *)arg);
 			if (r < 0)
 				r = -EIO;
 			break;
 
 		case SMB_DEVCTL_CLOSESHARE:
-			smb_closeAll();
-			r = smb_TreeDisconnect();
+			r = smb_CloseShare();
 			if (r < 0) {
 				if (r == -3)
 					r = -EINVAL;
@@ -435,7 +523,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			break;
 
 		case SMB_DEVCTL_ECHO:
-			r = smb_Echo(echo->echo, echo->len);
+			r = smb_EchoServer((smbEcho_in_t *)arg);
 			if (r < 0)
 				r = -EIO;
 			break;

@@ -4,6 +4,7 @@
 #include <sifrpc.h>
 #include <loadfile.h>
 #include <fileio.h>
+#include <fileXio_rpc.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
@@ -40,7 +41,7 @@ extern int  size_filexio_irx;
 static char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 static int g_ipconfig_len;
 
-static ShareEntry_t sharelist[128] __attribute__((aligned(64)));
+static ShareEntry_t sharelist[128] __attribute__((aligned(64))); // Keep this aligned for DMA!
 
 //-------------------------------------------------------------- 
 void set_ipconfig(void)
@@ -59,7 +60,7 @@ void set_ipconfig(void)
 //-------------------------------------------------------------- 
 int main(int argc, char *argv[2])
 {
-	int ret, id;
+	int i, ret, id;
 	
 	init_scr();
 	scr_clear();
@@ -110,14 +111,54 @@ int main(int argc, char *argv[2])
 
 	fileXioInit();
 
+
+	// ----------------------------------------------------------------
+	// how to get password hashes:
+	// ----------------------------------------------------------------
+
+	smbGetPasswordHashes_in_t passwd;
+	smbGetPasswordHashes_out_t passwdhashes;
+
+	strcpy(passwd.password, "mypassw");
+
+	scr_printf("\t GETPASSWORDHASHES... ");
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes));
+	if (ret == 0) {
+		scr_printf("OK\n");
+		scr_printf("\t LMhash   = 0x");
+		for (i=0; i<16; i++)
+			scr_printf("%02X", passwdhashes.LMhash[i]);
+		scr_printf("\n");
+		scr_printf("\t NTLMhash = 0x");
+		for (i=0; i<16; i++)
+			scr_printf("%02X", passwdhashes.NTLMhash[i]);
+		scr_printf("\n");
+	}
+	else
+		scr_printf("Error %d\n", ret);
+
+	// we now have 32 bytes of hash (16 bytes LM hash + 16 bytes NTLM hash)
+	// ----------------------------------------------------------------
+
+
+	// ----------------------------------------------------------------
+	// how to LOGON to SMB server:
+	// ----------------------------------------------------------------
+
 	smbLogOn_in_t logon;
 
 	strcpy(logon.serverIP, "192.168.0.2");
 	logon.serverPort = 445;
 	strcpy(logon.User, "GUEST");
 	//strcpy(logon.User, "jimmikaelkael");
-	//strcpy(logon.Password, "mypass");
+	// we could reuse the generated hash
+	//memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+	//logon.PasswordType = HASHED_PASSWORD;
+	// or log sending the plaintext password
+	//strcpy(logon.Password, "mypassw");
 	//logon.PasswordType = PLAINTEXT_PASSWORD;
+	// or simply tell we're not sending password
+	//logon.PasswordType = NO_PASSWORD;
 
 	scr_printf("\t LOGON... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
@@ -126,7 +167,13 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+
+	// ----------------------------------------------------------------
+	// how to get the available share list:
+	// ----------------------------------------------------------------
+
 	smbGetShareList_in_t getsharelist;
+
 	getsharelist.EE_addr = (void *)&sharelist[0];
 	getsharelist.maxent = 128;
 
@@ -134,7 +181,6 @@ int main(int argc, char *argv[2])
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_GETSHARELIST, (void *)&getsharelist, sizeof(getsharelist), NULL, 0);
 	if (ret >= 0) {
 		scr_printf("OK count = %d\n", ret);
-		int i;
 		for (i=0; i<ret; i++) {
 			scr_printf("\t\t - %s: %s\n", sharelist[i].ShareName, sharelist[i].ShareComment);
 		}
@@ -142,11 +188,22 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+
+	// ----------------------------------------------------------------
+	// how to open a share:
+	// ----------------------------------------------------------------
+
 	smbOpenShare_in_t openshare;
 
 	strcpy(openshare.ShareName, "PS2SMB");
-	//strcpy(openshare.Password, "mypass");
-	//openshare.PasswordType = PLAINTEXT_PASSWORD;
+	// we could reuse the generated hash
+	//memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+	//logon.PasswordType = HASHED_PASSWORD;
+	// or log sending the plaintext password
+	//strcpy(logon.Password, "mypassw");
+	//logon.PasswordType = PLAINTEXT_PASSWORD;
+	// or simply tell we're not sending password
+	//logon.PasswordType = NO_PASSWORD;
 
 	scr_printf("\t OPENSHARE... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
@@ -155,9 +212,30 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+
+	// ----------------------------------------------------------------
+	// open file test:
+	// ----------------------------------------------------------------
+
 	int fd = open("smb:\\BFTP.iso", O_RDONLY);
 	if (fd >= 0)
 		close(fd);
+
+
+	// ----------------------------------------------------------------
+	// create file test:
+	// ----------------------------------------------------------------
+
+	fd = open("smb:\\testfile", O_RDWR | O_CREAT | O_TRUNC);
+	if (fd >= 0) {
+		write(fd, "test", 4);
+		close(fd);
+	}
+
+
+	// ----------------------------------------------------------------
+	// how to close a share:
+	// ----------------------------------------------------------------
 
 	scr_printf("\t CLOSESHARE... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
@@ -166,12 +244,35 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+
+	// ----------------------------------------------------------------
+	// how to send an Echo to SMB server:
+	// ----------------------------------------------------------------
+
+	smbEcho_in_t echo;
+
+	strcpy(echo.echo, "ECHO TEST");
+	echo.len = strlen("ECHO TEST");
+
+	scr_printf("\t ECHO... ");
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
+	if (ret == 0)
+		scr_printf("OK\n");
+	else
+		scr_printf("Error %d\n", ret);
+
+
+	// ----------------------------------------------------------------
+	// how to LOGOFF from SMB server:
+	// ----------------------------------------------------------------
+
 	scr_printf("\t LOGOFF... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
+
 
    	SleepThread();
    	return 0;

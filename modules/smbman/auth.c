@@ -10,6 +10,8 @@
 #include "des.h"
 #include "md4.h"
 
+static u8 passwd_buf[512] __attribute__((aligned(64)));
+
 /*
  * LM_Password_Hash: this function create a LM password hash from a given password
  */
@@ -45,18 +47,15 @@ unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *ci
 unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *cipher)
 {
 	int i, j;
-	unsigned char tmp_pass[128];
 
-	strncpy(tmp_pass, password, 128);
+	memset(passwd_buf, 0, sizeof(passwd_buf));
 
 	/* turn the password to unicode */
-	for (i=0, j=0; i<strlen(password); i++, j+=2) {
-		tmp_pass[j] = password[i];
-		tmp_pass[j+1] = 0;
-	}
+	for (i=0, j=0; i<strlen(password); i++, j+=2)
+		passwd_buf[j] = password[i];
 
 	/* get the message digest */
-	MD4(tmp_pass, strlen(password) * 2, cipher);
+	MD4(passwd_buf, j, cipher);
 
 	return (unsigned char *)cipher;
 }

@@ -299,7 +299,7 @@ int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect);	
 int smb_SessionSetupAndX(char *User, char *Password, int PasswordType);		// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security
 int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType); 	// PasswordType: 0 = PlainText, 1 = Hash
 int smb_TreeDisconnect(void);
-int smb_NetShareEnum(ShareEntry_t *shareEntries, int maxEntries);
+int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries);
 int smb_LogOffAndX(void);
 int smb_Echo(void *echo, int len);
 

@@ -23,7 +23,7 @@
 // helpers for DEVCTL commands
 
 typedef struct {
-	char password[0];
+	char password[256];
 } smbGetPasswordHashes_in_t;
 
 typedef struct {		// size = 32

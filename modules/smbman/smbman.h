@@ -7,8 +7,9 @@
 #ifndef __SMBMAN_H__
 #define __SMBMAN_H__
 
-#define PLAINTEXT_PASSWORD	0
-#define HASHED_PASSWORD		1
+#define NO_PASSWORD		-1
+#define PLAINTEXT_PASSWORD 	 0
+#define HASHED_PASSWORD		 1
 
 // DEVCTL commands
 #define SMB_DEVCTL_GETPASSWORDHASHES	0xC0DE0001

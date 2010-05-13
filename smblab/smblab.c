@@ -115,8 +115,9 @@ int main(int argc, char *argv[2])
 	strcpy(logon.serverIP, "192.168.0.2");
 	logon.serverPort = 445;
 	strcpy(logon.User, "GUEST");
-	//strcpy(logon.Password, "passw");
-	//logon.PasswordType = HASHED_PASSWORD;
+	//strcpy(logon.User, "jimmikaelkael");
+	//strcpy(logon.Password, "mypass");
+	//logon.PasswordType = PLAINTEXT_PASSWORD;
 
 	scr_printf("\t LOGON... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
@@ -124,12 +125,6 @@ int main(int argc, char *argv[2])
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
-
-	smbOpenShare_in_t openshare;
-
-	strcpy(openshare.ShareName, "PS2SMB");
-	//strcpy(openshare.Password, "passw");
-	//openshare.PasswordType = HASHED_PASSWORD;
 
 	smbGetShareList_in_t getsharelist;
 	getsharelist.EE_addr = (void *)&sharelist[0];
@@ -147,12 +142,22 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+	smbOpenShare_in_t openshare;
+
+	strcpy(openshare.ShareName, "PS2SMB");
+	//strcpy(openshare.Password, "mypass");
+	//openshare.PasswordType = PLAINTEXT_PASSWORD;
+
 	scr_printf("\t OPENSHARE... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
+
+	int fd = open("smb:\\BFTP.iso", O_RDONLY);
+	if (fd >= 0)
+		close(fd);
 
 	scr_printf("\t CLOSESHARE... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);

@@ -636,38 +636,51 @@ static int AddPassword(char *Password, int PasswordType, int AuthType, u16 *Ansi
 	u8 LMresponse[24];
 	u16 passwordlen = 0;
 
-	if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
-		passwordlen = 24;
-		if (PasswordType == PLAINTEXT_PASSWORD) {
-			if (AuthType == LM_AUTH) {
-				LM_Password_Hash(Password, passwordhash);
-				memcpy(AnsiPassLen, &passwordlen, 2);
+	if ((Password) && (PasswordType != NO_PASSWORD)) {
+		if (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) {
+			passwordlen = 24;
+			switch (PasswordType) {
+				case HASHED_PASSWORD:
+					if (AuthType == LM_AUTH) {
+						memcpy(passwordhash, &Password[0], 16);
+						memcpy(AnsiPassLen, &passwordlen, 2);
+					}
+					if (AuthType == NTLM_AUTH) {
+						memcpy(passwordhash, &Password[16], 16);
+						memcpy(UnicodePassLen, &passwordlen, 2);
+					}
+					break;
+
+				default:
+					if (AuthType == LM_AUTH) {
+						LM_Password_Hash(Password, passwordhash);
+						memcpy(AnsiPassLen, &passwordlen, 2);
+					}
+					else if (AuthType == NTLM_AUTH) {
+						NTLM_Password_Hash(Password, passwordhash);
+						memcpy(UnicodePassLen, &passwordlen, 2);
+					}
 			}
-			else if (AuthType == NTLM_AUTH) {
-				NTLM_Password_Hash(Password, passwordhash);
-				memcpy(UnicodePassLen, &passwordlen, 2);
-			}
+			LM_Response(passwordhash, server_specs.EncryptionKey, LMresponse);
+			memcpy(Buffer, LMresponse, passwordlen);
 		}
-		else if (PasswordType == HASHED_PASSWORD) {
-			if (AuthType == LM_AUTH) {
-				memcpy(passwordhash, &Password[0], 16);
-				memcpy(AnsiPassLen, &passwordlen, 2);
-			}
-			if (AuthType == NTLM_AUTH) {
-				memcpy(passwordhash, &Password[16], 16);
-				memcpy(UnicodePassLen, &passwordlen, 2);
-			}
+		else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
+			// It seems that PlainText passwords and Unicode isn't meant to be...
+			passwordlen = strlen(Password);
+			if (passwordlen > 14)
+				passwordlen = 14;
+			else if (passwordlen == 0)
+				passwordlen = 1;
+			memcpy(AnsiPassLen, &passwordlen, 2);
+			memcpy(Buffer, Password, passwordlen);
 		}
-		LM_Response(passwordhash, (u8 *) server_specs.EncryptionKey, LMresponse);
-		memcpy(Buffer, &LMresponse[0], passwordlen);
 	}
-	else if (server_specs.PasswordType == SERVER_USE_PLAINTEXT_PASSWORD) {
-		// It seems that PlainText passwords and Unicode isn't meant to be...
-		passwordlen = strlen(Password);
-		if (passwordlen > 14)
-			passwordlen = 14;
-		memcpy(Buffer, Password, passwordlen);
-		memcpy(AnsiPassLen, &passwordlen, 2);
+	else {
+		if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
+			passwordlen = 1;
+			memcpy(AnsiPassLen, &passwordlen, 2);
+			Buffer[0] = 0;
+		}
 	}
 
 	return passwordlen;
@@ -707,7 +720,7 @@ lbl_session_setup:
 	// Fill ByteField
 	offset = 0;
 
-	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) && (Password)) {
+	if (server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) {
 		passwordlen = AddPassword(Password, PasswordType, AuthType, &SSR->AnsiPasswordLength, &SSR->UnicodePasswordLength, &SSR->ByteField[0]);
 		offset += passwordlen;
 	}
@@ -790,15 +803,13 @@ lbl_tree_connect:
 	// Fill ByteField
 	offset = 0;
 
-	if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
-
-		if (Password)
-			passwordlen = AddPassword(Password, PasswordType, AuthType, &TCR->PasswordLength, &TCR->PasswordLength, &TCR->ByteField[0]);
-		else
-			passwordlen = 1;
-
-		offset += passwordlen;
-	}	
+	if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL)
+		passwordlen = AddPassword(Password, PasswordType, AuthType, &TCR->PasswordLength, &TCR->PasswordLength, &TCR->ByteField[offset]);
+	else {
+		passwordlen = 1;
+		TCR->PasswordLength = passwordlen;
+	}
+	offset += passwordlen;
 
 	if ((CF == 2) && (!(passwordlen & 1)))
 		offset += 1;				// pad needed only for unicode as aligment fix is password len is even

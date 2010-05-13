@@ -217,9 +217,24 @@ int main(int argc, char *argv[2])
 	// open file test:
 	// ----------------------------------------------------------------
 
-	int fd = open("smb:\\BFTP.iso", O_RDONLY);
-	if (fd >= 0)
-		close(fd);
+	int fd = fileXioOpen("smb:\\BFTP.iso", O_RDONLY, 0666);
+	if (fd >= 0) {
+		//s64 pos = 0x0100523200;
+		//u8 *p = (u8 *)&pos;
+		//scr_printf("\t pos = ");
+		//for (i=0; i<8; i++) {
+		//	scr_printf("%02X ", p[i]);
+		//}
+		//scr_printf("\n");
+		s64 filesize = fileXioLseek64(fd, 0, SEEK_END);
+		u8 *p = (u8 *)&filesize;
+		scr_printf("\t filesize = ");
+		for (i=0; i<8; i++) {
+			scr_printf("%02X ", p[i]);
+		}
+		scr_printf("\n");
+		fileXioClose(fd);
+	}
 
 
 	// ----------------------------------------------------------------

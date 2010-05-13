@@ -44,7 +44,7 @@ void *smbman_ops[27] = {
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
-	(void*)smb_dummy,
+	(void*)smb_lseek64,
 	(void*)smb_devctl,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -63,8 +63,8 @@ static iop_ext_device_t smbdev = {
 typedef struct {
 	iop_file_t 	*f;
 	int		smb_fid;
-	u32		filesize;
-	u32		position;
+	s64		filesize;
+	s64		position;
 	u32		mode;
 } FHANDLE;
 
@@ -145,7 +145,7 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 	register int r = 0;
 	FHANDLE *fh;
 	int smb_fid;
-	u32 filesize;
+	s64 filesize;
 
 	if (!filename)
 		return -ENOENT;
@@ -228,44 +228,11 @@ void smb_closeAll(void)
 //-------------------------------------------------------------- 
 int smb_lseek(iop_file_t *f, u32 pos, int where)
 {
-	register int r;
-	FHANDLE *fh = (FHANDLE *)f->privdata;
-
-	WaitSema(smbman_io_sema);
-
-	switch (where) {
-		case SEEK_CUR:
-			r = fh->position + pos;
-			if (r > fh->filesize) {
-				r = -EINVAL;
-				goto ssema;
-			}
-			break;
-		case SEEK_SET:
-			r = pos;
-			if (fh->filesize < pos) {
-				r = -EINVAL;
-				goto ssema;
-			}
-			break;
-		case SEEK_END:
-			r = fh->filesize;
-			break;
-		default:
-			r = -EINVAL;
-			goto ssema;
-	}
-
-	fh->position = r;
-
-ssema:
-	SignalSema(smbman_io_sema);
-
-	return r;
+	return (int)smb_lseek64(f, pos, where);
 }
 
 //-------------------------------------------------------------- 
-int smb_read(iop_file_t *f, void *buf, u32 size)
+int smb_read(iop_file_t *f, void *buf, int size)
 {
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 	register int r, rpos;
@@ -301,7 +268,7 @@ ssema:
 }
 
 //-------------------------------------------------------------- 
-int smb_write(iop_file_t *f, void *buf, u32 size)
+int smb_write(iop_file_t *f, void *buf, int size)
 {
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 	register int r, wpos;
@@ -336,6 +303,45 @@ ssema:
 	SignalSema(smbman_io_sema);
 
 	return wpos;
+}
+
+//-------------------------------------------------------------- 
+s64 smb_lseek64(iop_file_t *f, s64 pos, int where)
+{
+	s64 r;
+	FHANDLE *fh = (FHANDLE *)f->privdata;
+
+	WaitSema(smbman_io_sema);
+
+	switch (where) {
+		case SEEK_CUR:
+			r = fh->position + pos;
+			if (r > fh->filesize) {
+				r = -EINVAL;
+				goto ssema;
+			}
+			break;
+		case SEEK_SET:
+			r = pos;
+			if (fh->filesize < pos) {
+				r = -EINVAL;
+				goto ssema;
+			}
+			break;
+		case SEEK_END:
+			r = fh->filesize;
+			break;
+		default:
+			r = -EINVAL;
+			goto ssema;
+	}
+
+	fh->position = r;
+
+ssema:
+	SignalSema(smbman_io_sema);
+
+	return r;
 }
 
 //-------------------------------------------------------------- 

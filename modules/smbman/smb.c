@@ -310,9 +310,8 @@ struct NTCreateAndXResponse_t {		// size = 107
 	u8	LastWriteTime[8];	// 64
 	u8	ChangedTime[8];		// 72
 	u32	FileAttributes;		// 80
-	u32	AllocationSize;		// 84
-	u32	AllocationSizeHigh;	// 88
-	s64	FileSize;		// 92
+	u64	AllocationSize;		// 84
+	u64	FileSize;		// 92
 	u16	FileType;		// 100
 	u16	IPCState;		// 102
 	u8	IsDirectory;		// 104
@@ -402,7 +401,8 @@ struct WriteAndXRequest_t {		// size = 63
 	u16	DataLengthHigh;		// 55
 	u16	DataLengthLow;		// 57
 	u16	DataOffset;		// 59
-	u16	ByteCount;		// 61
+	u32	OffsetHigh;		// 61
+	u16	ByteCount;		// 65
 } __attribute__((packed));
 
 struct WriteAndXResponse_t {
@@ -450,9 +450,9 @@ struct WriteAndXRequest_t smb_Write_Request = {
 		SMB_COM_WRITE_ANDX,
 		0, 0, 0, 0, "\0", 0, 0, 0, 0
 	},
-	12, 
+	14, 
 	SMB_COM_NONE,
-	0, 0, 0, 0, 0, 0x01, 0, 0, 0, 0x3b, 0 	// 0x01 is WriteThrough mode and 0x3b is DataOffset
+	0, 0, 0, 0, 0, 0x01, 0, 0, 0, 0x3f, 0 	// 0x01 is WriteThrough mode and 0x3f is DataOffset
 };
 
 #define LM_AUTH 	0
@@ -993,6 +993,11 @@ int smb_NTCreateAndX(char *filename, int *FID, s64 *filesize, int mode)
 //-------------------------------------------------------------------------
 int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode)
 {
+	// does not supports filesize > 4Gb, so we'll have to use
+	// FindNext2 to find the real size.
+	// OpenAndX is needed for a few NAS units that doesn't supports
+	// NT SMB commands set.
+
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;
 
@@ -1055,7 +1060,7 @@ int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode)
 }
 
 //-------------------------------------------------------------------------
-int smb_ReadAndX(int FID, u32 fileoffset, void *readbuf, u16 nbytes)
+int smb_ReadAndX(int FID, s64 fileoffset, void *readbuf, u16 nbytes)
 {
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
 	register int r;
@@ -1066,7 +1071,8 @@ int smb_ReadAndX(int FID, u32 fileoffset, void *readbuf, u16 nbytes)
 	memcpy(RR, &smb_Read_Request.smbH.sessionHeader, sizeof(struct ReadAndXRequest_t));
 
 	RR->FID = (u16)FID;
-	RR->OffsetLow = fileoffset;
+	RR->OffsetLow = (u32)(fileoffset & 0xffffffff);
+	RR->OffsetHigh = (u32)((fileoffset >> 32) & 0xffffffff);
 	RR->MaxCountLow = nbytes;
 
 	GetSMBServerReply();
@@ -1090,7 +1096,7 @@ int smb_ReadAndX(int FID, u32 fileoffset, void *readbuf, u16 nbytes)
 }
 
 //-------------------------------------------------------------------------
-int smb_WriteAndX(int FID, u32 fileoffset, void *writebuf, u16 nbytes)
+int smb_WriteAndX(int FID, s64 fileoffset, void *writebuf, u16 nbytes)
 {
 	struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
 
@@ -1100,14 +1106,15 @@ int smb_WriteAndX(int FID, u32 fileoffset, void *writebuf, u16 nbytes)
 	memcpy(WR, &smb_Write_Request.smbH.sessionHeader, sizeof(struct WriteAndXRequest_t));
 
 	WR->FID = (u16)FID;
-	WR->OffsetLow = fileoffset;
+	WR->OffsetLow = (u32)(fileoffset & 0xffffffff);
+	WR->OffsetHigh = (u32)((fileoffset >> 32) & 0xffffffff);
 	WR->Remaining = nbytes;
 	WR->DataLengthLow = nbytes;
 	WR->ByteCount = nbytes;
 
 	memcpy((void *)(&SMB_buf[4 + WR->DataOffset]), writebuf, nbytes);
 
-	rawTCP_SetSessionHeader(59+nbytes);
+	rawTCP_SetSessionHeader(63+nbytes);
 	GetSMBServerReply();
 
 	struct WriteAndXResponse_t *WRsp = (struct WriteAndXResponse_t *)SMB_buf;

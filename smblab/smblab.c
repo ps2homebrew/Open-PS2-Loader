@@ -219,13 +219,7 @@ int main(int argc, char *argv[2])
 
 	int fd = fileXioOpen("smb:\\BFTP.iso", O_RDONLY, 0666);
 	if (fd >= 0) {
-		//s64 pos = 0x0100523200;
-		//u8 *p = (u8 *)&pos;
-		//scr_printf("\t pos = ");
-		//for (i=0; i<8; i++) {
-		//	scr_printf("%02X ", p[i]);
-		//}
-		//scr_printf("\n");
+		// 64bit filesize test
 		s64 filesize = fileXioLseek64(fd, 0, SEEK_END);
 		u8 *p = (u8 *)&filesize;
 		scr_printf("\t filesize = ");
@@ -233,6 +227,30 @@ int main(int argc, char *argv[2])
 			scr_printf("%02X ", p[i]);
 		}
 		scr_printf("\n");
+
+		// 64bit offset read test
+		fileXioLseek64(fd, filesize - 2041, SEEK_SET);
+		u8 buf[16];
+		fileXioRead(fd, buf, 16);
+		p = (u8 *)buf;
+		scr_printf("\t read = ");
+		for (i=0; i<16; i++) {
+			scr_printf("%02X", p[i]);
+		}
+		scr_printf("\n");
+
+		// 64bit write test
+		//fileXioLseek64(fd, filesize - 16, SEEK_SET);
+		//fileXioWrite(fd, "\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC", 16);
+		//fileXioLseek64(fd, filesize - 16, SEEK_SET);
+		//fileXioRead(fd, buf, 16);
+		//p = (u8 *)buf;
+		//scr_printf("\t read = ");
+		//for (i=0; i<16; i++) {
+		//	scr_printf("%02X", p[i]);
+		//}
+		//scr_printf("\n");
+
 		fileXioClose(fd);
 	}
 

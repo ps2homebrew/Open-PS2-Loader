@@ -216,23 +216,23 @@ struct QueryPathInformationResponse_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
 	struct SMBTransactionResponse_t smbTrans;	// 37
-	u16	ByteCount;				// 67
-	u8	ByteField[0];				// 69
+	u16	ByteCount;				// 57
+	u8	ByteField[0];				// 59
 } __attribute__((packed));
 
 struct FindFirst2Request_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
 	struct SMBTransactionRequest_t smbTrans;	// 37
-	u16	SubCommand;
-	u16	ByteCount;				// 65
-	u8	Padding[3];
-	u16	SearchAttributes;
-	u16	SearchCount;
-	u16	Flags;
-	u16	LevelOfInterest;
-	u32	StorageType;
-	u8	SearchPattern[0];			// 67
+	u16	SubCommand;				// 65
+	u16	ByteCount;				// 67
+	u8	Padding[3];				// 69
+	u16	SearchAttributes;			// 72
+	u16	SearchCount;				// 74
+	u16	Flags;					// 76
+	u16	LevelOfInterest;			// 78
+	u32	StorageType;				// 80
+	u8	SearchPattern[0];			// 84
 } __attribute__((packed));
 
 struct FindFirst2Response_t {
@@ -240,32 +240,15 @@ struct FindFirst2Response_t {
 	u8	smbWordcount;				// 36
 	struct SMBTransactionResponse_t smbTrans; 	// 37
 	u16	ByteCount;				// 57
-/*
-	u8	Padding[1];
-	u16	SearchID;
-	u16	SearchCount;
-	u16	EndOfSearch;
-	u16	EAErrorOffset;
-	u16	LastNameOffset;
-	u8	Padding2[2];
-	u32	ResumeKey;
-	u32	Created;
-	u32	LastAccess;
-	u32	LastWrite;
-	u32	DataSize;
-	u32 	AllocationSize;
-	u16 	FileAttributes;
-	u8	FileNameLen;
-	u8	FileName[0];				// 59
-*/
+	u8	ByteField[0];				// 59
 } __attribute__((packed));
 
 struct FindNext2Request_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
 	struct SMBTransactionRequest_t smbTrans;	// 37
-	u16	SubCommand;
-	u16	ByteCount;				// 65
+	u16	SubCommand;				// 65
+	u16	ByteCount;				// 67
 } __attribute__((packed));
 
 struct FindNext2Response_t {
@@ -273,24 +256,7 @@ struct FindNext2Response_t {
 	u8	smbWordcount;				// 36
 	struct SMBTransactionResponse_t smbTrans; 	// 37
 	u16	ByteCount;				// 57
-/*
-	u8	Padding[1];
-	u16	SearchID;
-	u16	SearchCount;
-	u16	EndOfSearch;
-	u16	EAErrorOffset;
-	u16	LastNameOffset;
-	u8	Padding2[2];
-	u32	ResumeKey;
-	u32	Created;
-	u32	LastAccess;
-	u32	LastWrite;
-	u32	DataSize;
-	u32 	AllocationSize;
-	u16 	FileAttributes;
-	u8	FileNameLen;
-	u8	FileName[0];				// 59
-*/
+	u8	ByteField[0];				// 59
 } __attribute__((packed));
 
 struct NTCreateAndXRequest_t {
@@ -971,7 +937,7 @@ int smb_QueryPathInformation(char *Path)
 	
 	QPIR->smbTrans.SetupCount = 1;
 	QPIR->SubCommand = TRANS2_QUERY_PATH_INFORMATION;
-	QPIR->LevelOfInterest = SMB_INFO_STANDARD;
+	QPIR->LevelOfInterest = SMB_QUERY_FILE_BASIC_INFO;
 
 	PathLen = 0;
 	for (i = 0; i < strlen(Path); i++) {
@@ -1013,6 +979,8 @@ int smb_NTCreateAndX(char *filename, int *FID, s64 *filesize, int mode)
 {
 	struct NTCreateAndXRequest_t *NTCR = (struct NTCreateAndXRequest_t *)SMB_buf;
 	register int length;
+
+	//smb_QueryPathInformation(filename);
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 

@@ -37,7 +37,7 @@ struct SMBTransactionRequest_t {	//size = 28
 	u16	MaxDataCount;
 	u8	MaxSetupCount;
 	u8	Reserved;
-	u16	Flag;
+	u16	Flags;
 	u32	Timeout;
 	u16	Reserved2;
 	u16	ParamCount;
@@ -198,6 +198,26 @@ struct EchoResponse_t {
 	u16	SequenceNumber;		// 37
 	u16	ByteCount;		// 39
 	u8	ByteField[0];		// 41
+} __attribute__((packed));
+
+struct QueryPathInformationRequest_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionRequest_t smbTrans;	// 37
+	u16	SubCommand;				// 65
+	u16	ByteCount;				// 67
+	u8	Padding[3];				// 69
+	u16	LevelOfInterest;			// 72
+	u32	Reserved;				// 74
+	u8	FileName[0];				// 76
+} __attribute__((packed));
+
+struct QueryPathInformationResponse_t {
+	struct SMBHeader_t smbH;			// 0
+	u8	smbWordcount;				// 36
+	struct SMBTransactionResponse_t smbTrans;	// 37
+	u16	ByteCount;				// 67
+	u8	ByteField[0];				// 69
 } __attribute__((packed));
 
 struct FindFirst2Request_t {
@@ -865,15 +885,13 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries)
 
 	NSER->smbH.Magic = SMB_MAGIC;
 	NSER->smbH.Cmd = SMB_COM_TRANSACTION;
-	NSER->smbH.UID = UID;
-	NSER->smbH.TID = TID;
+	NSER->smbH.UID = (u16)UID;
+	NSER->smbH.TID = (u16)TID;
 	NSER->smbWordcount = 14;
 	
-	NSER->smbTrans.TotalParamCount = 19;
+	NSER->smbTrans.TotalParamCount = NSER->smbTrans.ParamCount = 19;
 	NSER->smbTrans.MaxParamCount = 1024;
-	NSER->smbTrans.TotalParamCount = 19;
 	NSER->smbTrans.MaxDataCount = 8096;
-	NSER->smbTrans.ParamCount = 19;
 	NSER->smbTrans.ParamOffset = 76;
 	NSER->smbTrans.DataOffset = 95;
 
@@ -926,6 +944,68 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries)
 	}
 
 	return count;
+}
+
+//-------------------------------------------------------------------------
+int smb_QueryPathInformation(char *Path)
+{
+	register int PathLen, CF, i;
+	struct QueryPathInformationRequest_t *QPIR = (struct QueryPathInformationRequest_t *)SMB_buf;
+
+	if ((UID == -1) || (TID == -1))
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
+
+	QPIR->smbH.Magic = SMB_MAGIC;
+	QPIR->smbH.Cmd = SMB_COM_TRANSACTION2;
+	QPIR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
+	QPIR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		QPIR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	QPIR->smbH.UID = (u16)UID;
+	QPIR->smbH.TID = (u16)TID;
+	QPIR->smbWordcount = 15;
+	
+	QPIR->smbTrans.SetupCount = 1;
+	QPIR->SubCommand = TRANS2_QUERY_PATH_INFORMATION;
+	QPIR->LevelOfInterest = SMB_INFO_STANDARD;
+
+	PathLen = 0;
+	for (i = 0; i < strlen(Path); i++) {
+		QPIR->FileName[PathLen] = Path[i];	// add Path
+		PathLen += CF;
+	}
+	PathLen += CF;					// null terminator
+
+	QPIR->smbTrans.TotalParamCount = QPIR->smbTrans.ParamCount = 2+4+PathLen;
+	QPIR->smbTrans.ParamOffset = 68;
+	QPIR->smbTrans.MaxParamCount = 256; 		// Max Parameters len in reply
+	QPIR->smbTrans.MaxDataCount = 16384;		// Max Data len in reply
+
+	QPIR->ByteCount = sizeof(QPIR->Padding) + QPIR->smbTrans.TotalParamCount;
+
+	QPIR->smbTrans.DataOffset = QPIR->smbTrans.ParamOffset + QPIR->smbTrans.TotalParamCount;
+
+	rawTCP_SetSessionHeader(QPIR->smbTrans.DataOffset);
+	GetSMBServerReply();
+
+	struct QueryPathInformationResponse_t *QPIRsp = (struct QueryPathInformationResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (QPIRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((QPIRsp->smbH.Eclass | QPIRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	//data starts at &SMB_buf[QPIRsp->smbTrans.DataOffset+4]
+	// a 2nd query should be done with SMB_QUERY_FILE_STANDARD_INFO LevelOfInterest to get a valid 64bit size
+
+	return 0;
 }
 
 //-------------------------------------------------------------------------
@@ -994,7 +1074,7 @@ int smb_NTCreateAndX(char *filename, int *FID, s64 *filesize, int mode)
 int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode)
 {
 	// does not supports filesize > 4Gb, so we'll have to use
-	// FindNext2 to find the real size.
+	// smb_QueryPathInformation to find the real size.
 	// OpenAndX is needed for a few NAS units that doesn't supports
 	// NT SMB commands set.
 

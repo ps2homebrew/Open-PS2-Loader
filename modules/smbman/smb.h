@@ -304,8 +304,8 @@ int smb_LogOffAndX(void);
 int smb_Echo(void *echo, int len);
 
 int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode);		// process a Open AndX message
-int smb_ReadAndX(int FID, u32 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
-int smb_WriteAndX(int FID, u32 offset, void *writebuf, u16 nbytes);		// process a Write AndX message
+int smb_ReadAndX(int FID, s64 offset, void *readbuf, u16 nbytes);		// process a Read AndX message
+int smb_WriteAndX(int FID, s64 offset, void *writebuf, u16 nbytes);		// process a Write AndX message
 int smb_Close(int FID);								// process a Close message
 
 int smb_Disconnect(void);

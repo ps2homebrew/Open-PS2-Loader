@@ -19,6 +19,7 @@
 #define SMB_DEVCTL_OPENSHARE		0xC0DE0005
 #define SMB_DEVCTL_CLOSESHARE		0xC0DE0006
 #define SMB_DEVCTL_ECHO			0xC0DE0007
+#define SMB_DEVCTL_QUERYDISKINFO	0xC0DE0008
 
 // helpers for DEVCTL commands
 
@@ -54,6 +55,13 @@ typedef struct {		// size = 260
 	char echo[256];
 	int  len;
 } smbEcho_in_t;
+
+typedef struct {		// size = 16
+	int TotalUnits;
+	int BlocksPerUnit;
+	int BlockSize;
+	int FreeUnits;
+} smbQueryDiskInfo_out_t;
 
 typedef struct {		// size = 512
 	char ShareName[256];

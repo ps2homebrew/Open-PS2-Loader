@@ -306,6 +306,7 @@ int smb_SessionSetupAndX(char *User, char *Password, int PasswordType);		// proc
 int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType); 	// PasswordType: 0 = PlainText, 1 = Hash
 int smb_TreeDisconnect(void);
 int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries);
+int smb_QueryInformationDisk(smbQueryDiskInfo_out_t *QueryInformationDisk);
 int smb_QueryPathInformation(PathInformation_t *Info, char *Path);
 int smb_LogOffAndX(void);
 int smb_Echo(void *echo, int len);

@@ -271,46 +271,62 @@ int main(int argc, char *argv[2])
 
 
 	// ----------------------------------------------------------------
+	// how to query disk informations: (you must be connected to a share)
+	// ----------------------------------------------------------------
+	smbQueryDiskInfo_out_t querydiskinfo;
+
+	scr_printf("\t QUERYDISKINFO... ");
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_QUERYDISKINFO, NULL, 0, (void *)&querydiskinfo, sizeof(querydiskinfo));
+	if (ret == 0) {
+		scr_printf("OK\n");
+		scr_printf("\t Total Units = %d, BlocksPerUnit = %d\n", querydiskinfo.TotalUnits, querydiskinfo.BlocksPerUnit);
+		scr_printf("\t BlockSize = %d, FreeUnits = %d\n", querydiskinfo.BlockSize, querydiskinfo.FreeUnits);
+	}
+	else
+		scr_printf("Error %d\n", ret);
+
+
+	// ----------------------------------------------------------------
 	// getstat test:
 	// ----------------------------------------------------------------
 
 	scr_printf("\t IO getstat... ");
 
 	iox_stat_t stats;
-	ret = fileXioGetStat("smb:\\BFTP.iso", &stats);
-	if (ret == 0)
+	ret = fileXioGetStat("smb:\\dossier", &stats);
+	if (ret == 0) {
 		scr_printf("OK\n");
+
+		s64 smb_ctime, smb_atime, smb_mtime;
+		ps2time_t ctime, atime, mtime;
+
+		memcpy((void *)&smb_ctime, stats.ctime, 8);
+		memcpy((void *)&smb_atime, stats.atime, 8);
+		memcpy((void *)&smb_mtime, stats.mtime, 8);
+
+		smbtime2ps2time(smb_ctime, (ps2time_t *)&ctime);
+		smbtime2ps2time(smb_atime, (ps2time_t *)&atime);
+		smbtime2ps2time(smb_mtime, (ps2time_t *)&mtime);
+
+		s64 hisize = stats.hisize;
+		hisize = hisize << 32;
+		s64 size = hisize | stats.size;
+
+		scr_printf("\t size = %ld, mode = %04x\n", size, stats.mode);
+
+		scr_printf("\t ctime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+			ctime.year, ctime.month, ctime.day,
+			ctime.hour, ctime.min,   ctime.sec, ctime.unused);
+		scr_printf("\t atime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+			atime.year, atime.month, atime.day,
+			atime.hour, atime.min,   atime.sec, atime.unused);
+		scr_printf("\t mtime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+			mtime.year, mtime.month, mtime.day,
+			mtime.hour, mtime.min,   mtime.sec, mtime.unused);
+	}
 	else
 		scr_printf("Error %d\n", ret);
 
-	s64 smb_ctime, smb_atime, smb_mtime;
-	ps2time_t ctime, atime, mtime;
-
-	memcpy((void *)&smb_ctime, stats.ctime, 8);
-	memcpy((void *)&smb_atime, stats.atime, 8);
-	memcpy((void *)&smb_mtime, stats.mtime, 8);
-
-	smbtime2ps2time(smb_ctime, (ps2time_t *)&ctime);
-	smbtime2ps2time(smb_atime, (ps2time_t *)&atime);
-	smbtime2ps2time(smb_mtime, (ps2time_t *)&mtime);
-
-	s64 hisize = stats.hisize;
-	hisize = hisize << 32;
-	s64 size = hisize | stats.size;
-
-	scr_printf("\t size = %ld, mode = %04x\n", size, stats.mode);
-
-	scr_printf("\t ctime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
-		ctime.year, ctime.month, ctime.day,
-		ctime.hour, ctime.min,   ctime.sec, ctime.unused);
-	scr_printf("\t atime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
-		atime.year, atime.month, atime.day,
-		atime.hour, atime.min,   atime.sec, atime.unused);
-	scr_printf("\t mtime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
-		mtime.year, mtime.month, mtime.day,
-		mtime.hour, mtime.min,   mtime.sec, mtime.unused);
-
-	
 
 	// ----------------------------------------------------------------
 	// open file test:

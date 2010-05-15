@@ -12,6 +12,8 @@
 #include <iopcontrol.h>
 #include <iopheap.h>
 #include <debug.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include "smbman.h"
 
@@ -42,6 +44,61 @@ static char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 static int g_ipconfig_len;
 
 static ShareEntry_t sharelist[128] __attribute__((aligned(64))); // Keep this aligned for DMA!
+
+typedef struct {
+	u8	unused;
+	u8	sec;
+	u8	min;
+	u8	hour;
+	u8	day;
+	u8	month;
+	u16	year;
+} ps2time_t;
+
+#define isYearLeap(year)	(!((year) % 4) && (((year) % 100) || !((year) % 400)))
+
+//-------------------------------------------------------------- 
+// I wanted this to be done on IOP, but unfortunately, the compiler
+// can't handle div ops on 64 bit numbers.
+
+static ps2time_t *smbtime2ps2time(s64 smbtime, ps2time_t *ps2time)
+{
+	const int mdtab[2][12] = {  
+		{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
+  		{ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }	// leap year
+	};
+	register u32 dayclock, dayno;
+	s64 UnixSystemTime;
+	register int year = 1970;					// year of the Epoch
+
+	memset((void *)ps2time, 0, sizeof(ps2time_t));
+
+	// we add 5x10^6 to the number before scaling it to seconds and subtracting
+	// the constant (seconds between 01/01/1601 and the Epoch: 01/01/1970),
+	// so that we round in the same way windows does.
+	UnixSystemTime = (s64)(((smbtime + 5000000) / 10000000) - 11644473600);
+
+	dayclock = UnixSystemTime % 86400;
+	dayno = UnixSystemTime / 86400;
+
+	ps2time->sec = dayclock % 60;
+	ps2time->min = (dayclock % 3600) / 60;
+	ps2time->hour = dayclock / 3600;
+	while (dayno >= (isYearLeap(year) ? 366 : 365)) {
+		dayno -= (isYearLeap(year) ? 366 : 365);
+		year++;
+	}
+	ps2time->year = year;
+	ps2time->month = 0;
+	while (dayno >= mdtab[isYearLeap(year)][ps2time->month]) {
+		dayno -= mdtab[isYearLeap(year)][ps2time->month];
+		ps2time->month++;
+	}
+	ps2time->day = dayno + 1;
+	ps2time->month++;
+
+	return (ps2time_t *)ps2time;
+}
 
 //-------------------------------------------------------------- 
 void set_ipconfig(void)
@@ -212,6 +269,48 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+
+	// ----------------------------------------------------------------
+	// getstat test:
+	// ----------------------------------------------------------------
+
+	scr_printf("\t IO getstat... ");
+
+	iox_stat_t stats;
+	ret = fileXioGetStat("smb:\\BFTP.iso", &stats);
+	if (ret == 0)
+		scr_printf("OK\n");
+	else
+		scr_printf("Error %d\n", ret);
+
+	s64 smb_ctime, smb_atime, smb_mtime;
+	ps2time_t ctime, atime, mtime;
+
+	memcpy((void *)&smb_ctime, stats.ctime, 8);
+	memcpy((void *)&smb_atime, stats.atime, 8);
+	memcpy((void *)&smb_mtime, stats.mtime, 8);
+
+	smbtime2ps2time(smb_ctime, (ps2time_t *)&ctime);
+	smbtime2ps2time(smb_atime, (ps2time_t *)&atime);
+	smbtime2ps2time(smb_mtime, (ps2time_t *)&mtime);
+
+	s64 hisize = stats.hisize;
+	hisize = hisize << 32;
+	s64 size = hisize | stats.size;
+
+	scr_printf("\t size = %ld, mode = %04x\n", size, stats.mode);
+
+	scr_printf("\t ctime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+		ctime.year, ctime.month, ctime.day,
+		ctime.hour, ctime.min,   ctime.sec, ctime.unused);
+	scr_printf("\t atime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+		atime.year, atime.month, atime.day,
+		atime.hour, atime.min,   atime.sec, atime.unused);
+	scr_printf("\t mtime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+		mtime.year, mtime.month, mtime.day,
+		mtime.hour, mtime.min,   mtime.sec, mtime.unused);
+
+	
 
 	// ----------------------------------------------------------------
 	// open file test:

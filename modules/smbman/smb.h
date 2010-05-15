@@ -267,13 +267,6 @@
 #define STATUS_OBJECT_NAME_NOT_FOUND		0xc0000034
 #define STATUS_LOGON_FAILURE			0xc000006d
 
-/*
-typedef struct _smb_time {
-	u32 timeLow;
-	u32 timeHigh;
-} smb_time;
-*/
-
 typedef struct {
 	char	ServerIP[16];
 	u32	MaxBufferSize;
@@ -292,6 +285,19 @@ typedef struct {
 #define SERVER_USE_PLAINTEXT_PASSWORD	0
 #define SERVER_USE_ENCRYPTED_PASSWORD	1
 
+typedef struct {
+	s64 Created;
+	s64 LastAccess;
+	s64 LastWrite;
+	s64 Change;
+	u32 FileAttributes;
+	u64 AllocationSize;
+	u64 EndOfFile;
+	u32 LinkCount;
+	u8  DeletePending[1];
+	u8  IsDirectory[1];
+} PathInformation_t;
+
 // function prototypes
 server_specs_t *getServerSpecs(void);
 
@@ -300,6 +306,7 @@ int smb_SessionSetupAndX(char *User, char *Password, int PasswordType);		// proc
 int smb_TreeConnectAndX(char *ShareName, char *Password, int PasswordType); 	// PasswordType: 0 = PlainText, 1 = Hash
 int smb_TreeDisconnect(void);
 int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries);
+int smb_QueryPathInformation(PathInformation_t *Info, char *Path);
 int smb_LogOffAndX(void);
 int smb_Echo(void *echo, int len);
 

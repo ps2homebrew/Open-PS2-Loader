@@ -8,6 +8,7 @@
 #include <ioman.h>
 #include <io_common.h>
 #include <sifman.h>
+#include <sys/stat.h>
 #include <sysclib.h>
 #include <thsemap.h>
 #include <errno.h>
@@ -37,7 +38,7 @@ void *smbman_ops[27] = {
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
-	(void*)smb_dummy,
+	(void*)smb_getstat,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -303,6 +304,40 @@ ssema:
 	SignalSema(smbman_io_sema);
 
 	return wpos;
+}
+
+//-------------------------------------------------------------- 
+int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
+{
+	register int r;
+	PathInformation_t info;
+
+	WaitSema(smbman_io_sema);
+
+	memset((void *)stat, 0, sizeof(iox_stat_t));
+
+	r = smb_QueryPathInformation((PathInformation_t *)&info, (char *)filename);
+	if (r < 0) {
+		r = -EIO;
+		goto ssema;
+	}
+
+	memcpy(stat->ctime, &info.Created, 8);
+	memcpy(stat->atime, &info.LastAccess, 8);
+	memcpy(stat->mtime, &info.Change, 8);
+
+	stat->size = (int)(info.EndOfFile & 0xffffffff);
+	stat->hisize = (int)((info.EndOfFile >> 32) & 0xffffffff);
+
+	if (info.FileAttributes & EXT_ATTR_DIRECTORY)
+		stat->mode |= FIO_S_IFDIR;
+	else 
+		stat->mode |= FIO_S_IFREG;
+
+ssema:
+	SignalSema(smbman_io_sema);
+
+	return r;
 }
 
 //-------------------------------------------------------------- 

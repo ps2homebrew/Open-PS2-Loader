@@ -220,6 +220,22 @@ struct QueryPathInformationResponse_t {
 	u8	ByteField[0];				// 59
 } __attribute__((packed));
 
+struct BasicFileInfo_t {
+	s64 Created;
+	s64 LastAccess;
+	s64 LastWrite;
+	s64 Change;
+	u32 FileAttributes;
+} __attribute__((packed));
+
+struct StandardFileInfo_t {
+	u64 AllocationSize;
+	u64 EndOfFile;
+	u32 LinkCount;
+	u8  DeletePending[1];
+	u8  IsDirectory[1];
+} __attribute__((packed));
+
 struct FindFirst2Request_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
@@ -913,13 +929,17 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries)
 }
 
 //-------------------------------------------------------------------------
-int smb_QueryPathInformation(char *Path)
+int smb_QueryPathInformation(PathInformation_t *Info, char *Path)
 {
-	register int PathLen, CF, i;
+	register int PathLen, CF, i, queryType;
 	struct QueryPathInformationRequest_t *QPIR = (struct QueryPathInformationRequest_t *)SMB_buf;
 
 	if ((UID == -1) || (TID == -1))
 		return -3;
+
+	queryType = SMB_QUERY_FILE_BASIC_INFO;
+
+query:
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -937,7 +957,7 @@ int smb_QueryPathInformation(char *Path)
 	
 	QPIR->smbTrans.SetupCount = 1;
 	QPIR->SubCommand = TRANS2_QUERY_PATH_INFORMATION;
-	QPIR->LevelOfInterest = SMB_QUERY_FILE_BASIC_INFO;
+	QPIR->LevelOfInterest = queryType;
 
 	PathLen = 0;
 	for (i = 0; i < strlen(Path); i++) {
@@ -968,8 +988,30 @@ int smb_QueryPathInformation(char *Path)
 	if ((QPIRsp->smbH.Eclass | QPIRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
-	//data starts at &SMB_buf[QPIRsp->smbTrans.DataOffset+4]
-	// a 2nd query should be done with SMB_QUERY_FILE_STANDARD_INFO LevelOfInterest to get a valid 64bit size
+	if (queryType == SMB_QUERY_FILE_BASIC_INFO) {
+
+		struct BasicFileInfo_t *BFI = (struct BasicFileInfo_t *)&SMB_buf[QPIRsp->smbTrans.DataOffset+4];
+
+		Info->Created = BFI->Created;
+		Info->LastAccess = BFI->LastAccess;
+		Info->LastWrite = BFI->LastWrite;
+		Info->Change = BFI->Change;
+		Info->FileAttributes = BFI->FileAttributes;
+
+		// a 2nd query is done with SMB_QUERY_FILE_STANDARD_INFO LevelOfInterest to get a valid 64bit size
+		queryType = SMB_QUERY_FILE_STANDARD_INFO;
+		goto query;
+	}
+	else if (queryType == SMB_QUERY_FILE_STANDARD_INFO) {
+
+		struct StandardFileInfo_t *SFI = (struct StandardFileInfo_t *)&SMB_buf[QPIRsp->smbTrans.DataOffset+4];
+
+		Info->AllocationSize = SFI->AllocationSize;
+		Info->EndOfFile = SFI->EndOfFile;
+		Info->LinkCount = SFI->LinkCount;
+		Info->DeletePending[0] = SFI->DeletePending[0];
+		Info->IsDirectory[0] = SFI->IsDirectory[0];
+	}
 
 	return 0;
 }
@@ -979,8 +1021,6 @@ int smb_NTCreateAndX(char *filename, int *FID, s64 *filesize, int mode)
 {
 	struct NTCreateAndXRequest_t *NTCR = (struct NTCreateAndXRequest_t *)SMB_buf;
 	register int length;
-
-	//smb_QueryPathInformation(filename);
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 

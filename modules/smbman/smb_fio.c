@@ -508,6 +508,12 @@ static int smb_EchoServer(smbEcho_in_t *echo)
 }
 
 //-------------------------------------------------------------- 
+static int smb_QueryDiskInfo(smbQueryDiskInfo_out_t *querydiskinfo)
+{
+	return smb_QueryInformationDisk(querydiskinfo);
+}
+
+//-------------------------------------------------------------- 
 int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 arglen, void *bufp, u32 buflen)
 {
 	register int r = 0;
@@ -567,6 +573,16 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			r = smb_EchoServer((smbEcho_in_t *)arg);
 			if (r < 0)
 				r = -EIO;
+			break;
+
+		case SMB_DEVCTL_QUERYDISKINFO:
+			r = smb_QueryDiskInfo((smbQueryDiskInfo_out_t *)bufp);
+			if (r < 0) {
+				if (r == -3)
+					r = -EINVAL;
+				else
+					r = -EIO;
+			}
 			break;
 
 		default:

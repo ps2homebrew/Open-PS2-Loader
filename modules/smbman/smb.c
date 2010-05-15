@@ -200,6 +200,24 @@ struct EchoResponse_t {
 	u8	ByteField[0];		// 41
 } __attribute__((packed));
 
+struct QueryInformationDiskRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+	u8	ByteField[0];		// 39
+} __attribute__((packed));
+
+struct QueryInformationDiskResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	TotalUnits;		// 37
+	u16	BlocksPerUnit;		// 39
+	u16	BlockSize;		// 41
+	u16	FreeUnits;		// 43
+	u16	Reserved;		// 45
+	u16	ByteCount;		// 47
+} __attribute__((packed));
+
 struct QueryPathInformationRequest_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
@@ -926,6 +944,42 @@ int smb_NetShareEnum(ShareEntry_t *shareEntries, int index, int maxEntries)
 	}
 
 	return count;
+}
+
+//-------------------------------------------------------------------------
+int smb_QueryInformationDisk(smbQueryDiskInfo_out_t *QueryInformationDisk)
+{
+	struct QueryInformationDiskRequest_t *QIDR = (struct QueryInformationDiskRequest_t *)SMB_buf;
+
+	if ((UID == -1) || (TID == -1))
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	QIDR->smbH.Magic = SMB_MAGIC;
+	QIDR->smbH.Cmd = SMB_COM_QUERY_INFORMATION_DISK;
+	QIDR->smbH.UID = (u16)UID;
+	QIDR->smbH.TID = (u16)TID;
+
+	rawTCP_SetSessionHeader(35);
+	GetSMBServerReply();
+
+	struct QueryInformationDiskResponse_t *QIDRsp = (struct QueryInformationDiskResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (QIDRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((QIDRsp->smbH.Eclass | QIDRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	QueryInformationDisk->TotalUnits = QIDRsp->TotalUnits;
+	QueryInformationDisk->BlocksPerUnit = QIDRsp->BlocksPerUnit;
+	QueryInformationDisk->BlockSize = QIDRsp->BlockSize;
+	QueryInformationDisk->FreeUnits = QIDRsp->FreeUnits;
+
+	return 0;
 }
 
 //-------------------------------------------------------------------------

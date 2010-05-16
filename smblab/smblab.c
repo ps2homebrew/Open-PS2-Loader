@@ -329,51 +329,63 @@ int main(int argc, char *argv[2])
 
 
 	// ----------------------------------------------------------------
+	// create directory test:
+	// ----------------------------------------------------------------
+	scr_printf("\t IO mkdir... ");
+	ret = mkdir("smb:\\created");
+	if (ret == 0)
+		scr_printf("OK  ");
+	else
+		scr_printf("Error %d  ", ret);
+
+
+	// ----------------------------------------------------------------
 	// rename file test:
 	// ----------------------------------------------------------------
+	/*
 	scr_printf("\t IO rename... ");
 	ret = fileXioRename("smb:\\rename_me\\rename_me.txt", "smb:\\rename_me\\renamed.txt");
 	if (ret == 0)
-		scr_printf("OK\n");
+		scr_printf("OK  ");
 	else
-		scr_printf("Error %d\n", ret);
+		scr_printf("Error %d  ", ret);
+	*/
 
 
 	// ----------------------------------------------------------------
 	// rename directory test:
 	// ----------------------------------------------------------------
-	scr_printf("\t IO rename... ");
-	ret = fileXioRename("smb:\\rename_me", "smb:\\renamed");
+	scr_printf("IO rename... ");
+	ret = fileXioRename("smb:\\created", "smb:\\renamed");
 	if (ret == 0)
-		scr_printf("OK\n");
+		scr_printf("OK  ");
 	else
-		scr_printf("Error %d\n", ret);
+		scr_printf("Error %d  ", ret);
 
 
 	// ----------------------------------------------------------------
 	// delete file test:
 	// ----------------------------------------------------------------
 	/*
-	scr_printf("\t IO remove... ");
+	scr_printf("IO remove... ");
 	ret = remove("smb:\\delete_me\\delete_me.txt");
 	if (ret == 0)
-		scr_printf("OK\n");
+		scr_printf("OK  ");
 	else
-		scr_printf("Error %d\n", ret);
+		scr_printf("Error %d  ", ret);
 	*/
 
 
 	// ----------------------------------------------------------------
 	// delete directory test:
 	// ----------------------------------------------------------------
-	/*
-	scr_printf("\t IO rmdir... ");
-	ret = rmdir("smb:\\delete_me");
+	scr_printf("IO rmdir... ");
+	ret = rmdir("smb:\\renamed");
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
-	*/
+
 
 	// ----------------------------------------------------------------
 	// open file test:
@@ -445,7 +457,6 @@ int main(int argc, char *argv[2])
 	// ----------------------------------------------------------------
 	// how to send an Echo to SMB server:
 	// ----------------------------------------------------------------
-	/*
 	smbEcho_in_t echo;
 
 	strcpy(echo.echo, "ECHO TEST");
@@ -457,7 +468,7 @@ int main(int argc, char *argv[2])
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
-	*/
+
 
 	// ----------------------------------------------------------------
 	// how to LOGOFF from SMB server:

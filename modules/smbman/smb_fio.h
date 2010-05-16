@@ -21,6 +21,7 @@ int smb_lseek(iop_file_t *f, u32 pos, int where);
 int smb_read(iop_file_t *f, void *buf, int size);
 int smb_write(iop_file_t *f, void *buf, int size);
 int smb_remove(iop_file_t *f, const char *filename);
+int smb_mkdir(iop_file_t *f, const char *dirname);
 int smb_rmdir(iop_file_t *f, const char *dirname);
 int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat);
 int smb_rename(iop_file_t *f, const char *oldname, const char *newname);

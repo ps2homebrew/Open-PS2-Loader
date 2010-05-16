@@ -33,7 +33,7 @@ void *smbman_ops[27] = {
 	(void*)smb_write,
 	(void*)smb_lseek,
 	(void*)smb_dummy,
-	(void*)smb_dummy,
+	(void*)smb_remove,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -292,6 +292,8 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 				r = -EPERM;
 			else if (r == -3)
 				r = -ENOENT;
+			else if (r == -4)
+				r = -EINVAL;
 			else
 				r = -EIO;
 		}
@@ -315,7 +317,10 @@ int smb_close(iop_file_t *f)
 	if (fh) {
 		r = smb_Close(fh->smb_fid);
 		if (r != 0) {
-			r = -EIO;
+			if (r == -3)
+				r = -EINVAL;
+			else
+				r = -EIO;
 			goto io_unlock;
 		}
 		memset(fh, 0, sizeof(FHANDLE));
@@ -369,7 +374,10 @@ int smb_read(iop_file_t *f, void *buf, int size)
 
 		r = smb_ReadAndX(fh->smb_fid, fh->position, (void *)(buf + rpos), (u16)nbytes);
 		if (r < 0) {
-   			rpos = -EIO;
+			if (r == -3)
+				rpos = -EINVAL;
+			else
+   				rpos = -EIO;
    			goto io_unlock;
 		}
 
@@ -405,7 +413,10 @@ int smb_write(iop_file_t *f, void *buf, int size)
 
 		r = smb_WriteAndX(fh->smb_fid, fh->position, (void *)(buf + wpos), (u16)nbytes);
 		if (r < 0) {
-   			wpos = -EIO;
+			if (r == -3)
+				wpos = -EINVAL;
+			else
+   				wpos = -EIO;
    			goto io_unlock;
 		}
 
@@ -423,6 +434,26 @@ io_unlock:
 }
 
 //-------------------------------------------------------------- 
+int smb_remove(iop_file_t *f, char *filename)
+{
+	register int r;
+
+	smb_io_lock();
+
+	r = smb_Delete(filename);
+	if (r < 0) {
+		if (r == -3)
+			r = -EINVAL;
+		else
+   			r = -EIO;
+	}
+
+	smb_io_unlock();
+
+	return r;
+}
+
+//-------------------------------------------------------------- 
 int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 {
 	register int r;
@@ -434,7 +465,10 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 
 	r = smb_QueryPathInformation((PathInformation_t *)&info, (char *)filename);
 	if (r < 0) {
-		r = -EIO;
+		if (r == -3)
+			r = -EINVAL;
+		else
+   			r = -EIO;
 		goto io_unlock;
 	}
 

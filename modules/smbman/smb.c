@@ -480,7 +480,7 @@ struct WriteAndXRequest_t smb_Write_Request = {
 
 static int UID = -1; 
 static int TID = -1;
-static int main_socket;
+static int main_socket = -1;
 
 static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
 
@@ -524,7 +524,7 @@ static int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 	// Creating socket
 	sock = lwip_socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock < 0)
-		return -1;
+		return -2;
 
     	memset(&sock_addr, 0, sizeof(sock_addr));
 	sock_addr.sin_addr = dst_IP;
@@ -577,6 +577,10 @@ int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect)
 	dst_addr.s_addr = inet_addr(SMBServerIP);
 
 conn_open:
+
+	// Close the connection if it was already opened
+	if (main_socket != -1)
+		goto conn_close;
 
 	// Opening TCP session
 	main_socket = OpenTCPSession(dst_addr, SMBServerPort);
@@ -643,6 +647,7 @@ conn_open:
 
 conn_close:	
 	lwip_close(main_socket);
+	main_socket = -1;
 	goto conn_open;
 
 	return -1;

@@ -526,7 +526,7 @@ static int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 	if (sock < 0)
 		return -1;
 
-    memset(&sock_addr, 0, sizeof(sock_addr));
+    	memset(&sock_addr, 0, sizeof(sock_addr));
 	sock_addr.sin_addr = dst_IP;
 	sock_addr.sin_family = AF_INET;
 	sock_addr.sin_port = htons(dst_port);

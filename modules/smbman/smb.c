@@ -467,6 +467,20 @@ struct DeleteResponse_t {
 	u16	ByteCount;		// 37
 } __attribute__((packed));
 
+struct DeleteDirectoryRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+	u8	BufferFormat;		// 39
+	u8	DirectoryName[0];	// 40
+} __attribute__((packed));
+
+struct DeleteDirectoryResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+} __attribute__((packed));
+
 
 static server_specs_t server_specs;
 
@@ -1392,7 +1406,7 @@ int smb_Delete(char *Path)
 	}
 	PathLen += CF;					// null terminator
 
-	DR->ByteCount = PathLen;
+	DR->ByteCount = PathLen+1; 			// +1 for the BufferFormat byte
 
 	rawTCP_SetSessionHeader(38+PathLen);
 	GetSMBServerReply();
@@ -1405,6 +1419,54 @@ int smb_Delete(char *Path)
 
 	// check there's no error
 	if ((DRsp->smbH.Eclass | DRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_DeleteDirectory(char *Path)
+{
+	register int CF, PathLen, i;
+	struct DeleteDirectoryRequest_t *DDR = (struct DeleteDirectoryRequest_t *)SMB_buf;
+
+	if ((UID == -1) || (TID == -1))
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
+
+	DDR->smbH.Magic = SMB_MAGIC;
+	DDR->smbH.Cmd = SMB_COM_DELETE_DIRECTORY;
+	DDR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
+	DDR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		DDR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	DDR->smbH.UID = (u16)UID;
+	DDR->smbH.TID = (u16)TID;
+	DDR->BufferFormat = 0x04;
+
+	PathLen = 0;
+	for (i = 0; i < strlen(Path); i++) {
+		DDR->DirectoryName[PathLen] = Path[i];	// add Path
+		PathLen += CF;
+	}
+	PathLen += CF;					// null terminator
+
+	DDR->ByteCount = PathLen+1; 			// +1 for the BufferFormat byte
+
+	rawTCP_SetSessionHeader(36+PathLen);
+	GetSMBServerReply();
+
+	struct DeleteDirectoryResponse_t *DDRsp = (struct DeleteDirectoryResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (DDRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((DDRsp->smbH.Eclass | DDRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
 	return 0;

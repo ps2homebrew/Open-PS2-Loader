@@ -35,7 +35,7 @@ void *smbman_ops[27] = {
 	(void*)smb_dummy,
 	(void*)smb_remove,
 	(void*)smb_dummy,
-	(void*)smb_dummy,
+	(void*)smb_rmdir,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -454,6 +454,26 @@ int smb_remove(iop_file_t *f, char *filename)
 }
 
 //-------------------------------------------------------------- 
+int smb_rmdir(iop_file_t *f, char *dirname)
+{
+	register int r;
+
+	smb_io_lock();
+
+	r = smb_DeleteDirectory(dirname);
+	if (r < 0) {
+		if (r == -3)
+			r = -EINVAL;
+		else
+   			r = -EIO;
+	}
+
+	smb_io_unlock();
+
+	return r;
+}
+
+//-------------------------------------------------------------- 
 int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 {
 	register int r;
@@ -687,6 +707,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 
 		case SMB_DEVCTL_LOGOFF:
 			r = smb_LogOff();
+			smb_Disconnect();
 			if (r < 0) {
 				if (r == -3)
 					r = -EINVAL;

@@ -452,6 +452,22 @@ struct CloseResponse_t {
 	u16	ByteCount;		// 37
 } __attribute__((packed));
 
+struct DeleteRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	SearchAttributes;	// 37
+	u16	ByteCount;		// 39
+	u8	BufferFormat;		// 41
+	u8	FileName[0];		// 42
+} __attribute__((packed));
+
+struct DeleteResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+} __attribute__((packed));
+
+
 static server_specs_t server_specs;
 
 struct ReadAndXRequest_t smb_Read_Request = {
@@ -579,7 +595,7 @@ static int GetSMBServerReply(void)
 	if (rcv_size <= 0)
 		return -1;
 
-	rcv_size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 3000);
+	rcv_size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 10000); // 10s before the packet is considered lost
 	if (rcv_size <= 0)
 		return -2;
 
@@ -587,7 +603,7 @@ static int GetSMBServerReply(void)
 	totalpkt_size = rawTCP_GetSessionHeader() + 4;
 
 	while (rcv_size < totalpkt_size) {
-		pkt_size = RecvTimeout(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 3000);
+		pkt_size = RecvTimeout(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 3000); // 3s before the packet is considered lost
 		if (pkt_size <= 0)
 			return -2;
 		rcv_size += pkt_size;
@@ -1177,6 +1193,9 @@ int smb_OpenAndX(char *filename, int *FID, s64 *filesize, int mode)
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;
 
+	if ((UID == -1) || (TID == -1))
+		return -4;
+
 	if (server_specs.SupportsNTSMB)
 		return smb_NTCreateAndX(filename, FID, filesize, mode);
 
@@ -1241,7 +1260,7 @@ int smb_ReadAndX(int FID, s64 fileoffset, void *readbuf, u16 nbytes)
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
 	register int r;
 
-	if (FID == -1)
+	if ((UID == -1) || (TID == -1) || (FID == -1))
 		return -3;
 
 	memcpy(RR, &smb_Read_Request.smbH.sessionHeader, sizeof(struct ReadAndXRequest_t));
@@ -1276,7 +1295,7 @@ int smb_WriteAndX(int FID, s64 fileoffset, void *writebuf, u16 nbytes)
 {
 	struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
 
-	if (FID == -1)
+	if ((UID == -1) || (TID == -1) || (FID == -1))
 		return -3;
 
 	memcpy(WR, &smb_Write_Request.smbH.sessionHeader, sizeof(struct WriteAndXRequest_t));
@@ -1311,7 +1330,7 @@ int smb_Close(int FID)
 {
 	struct CloseRequest_t *CR = (struct CloseRequest_t *)SMB_buf;
 
-	if (FID == -1)
+	if ((UID == -1) || (TID == -1) || (FID == -1))
 		return -3;
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
@@ -1336,6 +1355,56 @@ int smb_Close(int FID)
 
 	// check there's no error
 	if ((CRsp->smbH.Eclass | CRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_Delete(char *Path)
+{
+	register int CF, PathLen, i;
+	struct DeleteRequest_t *DR = (struct DeleteRequest_t *)SMB_buf;
+
+	if ((UID == -1) || (TID == -1))
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
+
+	DR->smbH.Magic = SMB_MAGIC;
+	DR->smbH.Cmd = SMB_COM_DELETE;
+	DR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
+	DR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		DR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	DR->smbH.UID = (u16)UID;
+	DR->smbH.TID = (u16)TID;
+	DR->smbWordcount = 1;
+	DR->SearchAttributes = 0; // coud be other attributes to find Hidden/System files
+	DR->BufferFormat = 0x04;
+
+	PathLen = 0;
+	for (i = 0; i < strlen(Path); i++) {
+		DR->FileName[PathLen] = Path[i];	// add Path
+		PathLen += CF;
+	}
+	PathLen += CF;					// null terminator
+
+	DR->ByteCount = PathLen;
+
+	rawTCP_SetSessionHeader(38+PathLen);
+	GetSMBServerReply();
+
+	struct DeleteResponse_t *DRsp = (struct DeleteResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (DRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((DRsp->smbH.Eclass | DRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
 	return 0;

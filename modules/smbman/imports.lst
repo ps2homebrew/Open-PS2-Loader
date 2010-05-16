@@ -13,6 +13,7 @@ I_lwip_send
 I_lwip_close
 I_lwip_socket
 I_lwip_connect
+I_lwip_select
 I_inet_addr
 ps2ip_IMPORTS_end
 

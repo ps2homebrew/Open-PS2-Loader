@@ -331,8 +331,19 @@ int main(int argc, char *argv[2])
 	// ----------------------------------------------------------------
 	// delete file test:
 	// ----------------------------------------------------------------
-	scr_printf("\t IO delete... ");
-	ret = remove("smb:\\delete_me.txt");
+	scr_printf("\t IO remove... ");
+	ret = remove("smb:\\delete_me\\delete_me.txt");
+	if (ret == 0)
+		scr_printf("OK\n");
+	else
+		scr_printf("Error %d\n", ret);
+
+
+	// ----------------------------------------------------------------
+	// delete directory test:
+	// ----------------------------------------------------------------
+	scr_printf("\t IO rmdir... ");
+	ret = rmdir("smb:\\delete_me");
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
@@ -409,7 +420,7 @@ int main(int argc, char *argv[2])
 	// ----------------------------------------------------------------
 	// how to send an Echo to SMB server:
 	// ----------------------------------------------------------------
-
+	/*
 	smbEcho_in_t echo;
 
 	strcpy(echo.echo, "ECHO TEST");
@@ -421,7 +432,7 @@ int main(int argc, char *argv[2])
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
-
+	*/
 
 	// ----------------------------------------------------------------
 	// how to LOGOFF from SMB server:

@@ -28,12 +28,20 @@ sifman_IMPORTS_end
 
 thbase_IMPORTS_start
 I_DelayThread
+I_CreateThread
+I_StartThread
+I_DeleteThread
+I_USec2SysClock
+I_SetAlarm
+I_iSetAlarm
+I_CancelAlarm
 thbase_IMPORTS_end
 
 thsemap_IMPORTS_start
 I_CreateSema
 I_WaitSema
 I_SignalSema
+I_iSignalSema
 I_DeleteSema
 thsemap_IMPORTS_end
 

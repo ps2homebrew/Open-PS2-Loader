@@ -10,6 +10,7 @@
 #include <sifman.h>
 #include <sys/stat.h>
 #include <sysclib.h>
+#include <thbase.h>
 #include <thsemap.h>
 #include <errno.h>
 
@@ -74,6 +75,98 @@ FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
 static ShareEntry_t ShareList __attribute__((aligned(64))); // Keep this aligned for DMA!
 
+static int keepalive_mutex = -1;
+static int keepalive_inited = 0;
+static int keepalive_locked = 1;
+static int keepalive_tid;
+static iop_sys_clock_t keepalive_sysclock;
+
+//-------------------------------------------------------------------------
+// Timer Interrupt handler for Echoing the server every 3 seconds, when
+// not already doing IO, and counting after an IO operation has finished
+//
+static unsigned int timer_intr_handler(void *args)
+{
+	iSignalSema(keepalive_mutex);
+	iSetAlarm(&keepalive_sysclock, timer_intr_handler, NULL);
+
+	return (unsigned int)args;
+}
+
+//-------------------------------------------------------------------------
+static void keepalive_deinit(void)
+{
+	int oldstate;
+
+	// Cancel the alarm
+	if (keepalive_inited) {
+		CpuSuspendIntr(&oldstate);
+		CancelAlarm(timer_intr_handler, NULL);
+		CpuResumeIntr(oldstate);
+		keepalive_inited = 0;
+	}
+}
+
+//-------------------------------------------------------------------------
+static void keepalive_init(void)
+{
+	// set up the alarm
+	if ((!keepalive_inited) && (!keepalive_locked)) {
+		keepalive_deinit();
+		SetAlarm(&keepalive_sysclock, timer_intr_handler, NULL);
+		keepalive_inited = 1;
+	}
+}
+
+//-------------------------------------------------------------------------
+static void keepalive_lock(void)
+{
+	keepalive_locked = 1;
+}
+
+//-------------------------------------------------------------------------
+static void keepalive_unlock(void)
+{
+	keepalive_locked = 0;
+}
+
+//-------------------------------------------------------------------------
+static void smb_io_lock(void)
+{
+	keepalive_deinit();
+
+	WaitSema(smbman_io_sema);
+}
+
+//-------------------------------------------------------------------------
+static void smb_io_unlock(void)
+{
+	SignalSema(smbman_io_sema);
+	
+	keepalive_init();
+}
+
+//-------------------------------------------------------------------------
+static void keepalive_thread(void *args)
+{
+	register int r;
+
+	while (1) {
+		// wait for keepalive mutex
+		WaitSema(keepalive_mutex);
+
+		// ensure no IO is already processing
+		WaitSema(smbman_io_sema);
+
+		// echo the SMB server
+		r = smb_Echo("PS2 KEEPALIVE ECHO", 18);
+		if (r < 0)
+			keepalive_lock();
+
+		SignalSema(smbman_io_sema);
+	}
+}
+
 //-------------------------------------------------------------- 
 int smb_dummy(void)
 {
@@ -84,6 +177,7 @@ int smb_dummy(void)
 int smb_init(iop_device_t *dev)
 {
 	iop_sema_t smp;
+	iop_thread_t thread;
 
 	smp.initial = 1;
 	smp.max = 1;
@@ -91,6 +185,22 @@ int smb_init(iop_device_t *dev)
 	smp.option = 0;
 
 	smbman_io_sema = CreateSema(&smp);
+
+	// create a mutex for keep alive
+	keepalive_mutex = CreateMutex(IOP_MUTEX_LOCKED);
+
+	// set the keepalive timer (3 seconds)
+	USec2SysClock(3000*1000, &keepalive_sysclock);
+
+	// starting the keepalive thead
+	thread.attr = TH_C;
+	thread.option = 0;
+	thread.thread = (void *)keepalive_thread;
+	thread.stacksize = 0x2000;
+	thread.priority = 0x64;
+
+	keepalive_tid = CreateThread(&thread);
+	StartThread(keepalive_tid, NULL);
 
 	return 0;
 }
@@ -120,7 +230,13 @@ int smb_initdev(void)
 //-------------------------------------------------------------- 
 int smb_deinit(iop_device_t *dev)
 {
+	keepalive_deinit();
+	DeleteThread(keepalive_tid);
+
 	DeleteSema(smbman_io_sema);
+
+	DeleteSema(keepalive_mutex);
+	keepalive_mutex = -1;
 
 	return 0;
 }
@@ -151,7 +267,7 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 	if (!filename)
 		return -ENOENT;
 
-	WaitSema(smbman_io_sema);
+	smb_io_lock();
 
 	fh = smbman_getfilefreeslot();
 	if (fh) {
@@ -183,7 +299,7 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 	else
 		r = -EMFILE;
 
-	SignalSema(smbman_io_sema);
+	smb_io_unlock();
 
 	return r;
 }
@@ -194,21 +310,21 @@ int smb_close(iop_file_t *f)
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 	register int r = 0;
 
-	WaitSema(smbman_io_sema);
+	smb_io_lock();
 
 	if (fh) {
 		r = smb_Close(fh->smb_fid);
 		if (r != 0) {
 			r = -EIO;
-			goto ssema;
+			goto io_unlock;
 		}
 		memset(fh, 0, sizeof(FHANDLE));
 		fh->smb_fid = -1;
 		r = 0;
 	}
 
-ssema:
-	SignalSema(smbman_io_sema);
+io_unlock:
+	smb_io_unlock();
 
 	return r;
 }
@@ -239,12 +355,12 @@ int smb_read(iop_file_t *f, void *buf, int size)
 	register int r, rpos;
 	register u32 nbytes;
 
-	rpos = 0;
-
 	if ((fh->position + size) > fh->filesize)
 		size = fh->filesize - fh->position;
 
-	WaitSema(smbman_io_sema);
+	smb_io_lock();
+
+	rpos = 0;
 
 	while (size) {
 		nbytes = MAX_RD_BUF;
@@ -254,7 +370,7 @@ int smb_read(iop_file_t *f, void *buf, int size)
 		r = smb_ReadAndX(fh->smb_fid, fh->position, (void *)(buf + rpos), (u16)nbytes);
 		if (r < 0) {
    			rpos = -EIO;
-   			goto ssema;
+   			goto io_unlock;
 		}
 
 		rpos += nbytes;
@@ -262,8 +378,8 @@ int smb_read(iop_file_t *f, void *buf, int size)
 		fh->position += nbytes;
 	}
 
-ssema:
-	SignalSema(smbman_io_sema);
+io_unlock:
+	smb_io_unlock();
 
 	return rpos;
 }
@@ -278,9 +394,9 @@ int smb_write(iop_file_t *f, void *buf, int size)
 	if ((!(fh->mode & O_RDWR)) && (!(fh->mode & O_WRONLY)))
 		return -EPERM;
 
-	wpos = 0;
+	smb_io_lock();
 
-	WaitSema(smbman_io_sema);
+	wpos = 0;
 
 	while (size) {
 		nbytes = MAX_WR_BUF;
@@ -290,7 +406,7 @@ int smb_write(iop_file_t *f, void *buf, int size)
 		r = smb_WriteAndX(fh->smb_fid, fh->position, (void *)(buf + wpos), (u16)nbytes);
 		if (r < 0) {
    			wpos = -EIO;
-   			goto ssema;
+   			goto io_unlock;
 		}
 
 		wpos += nbytes;
@@ -300,8 +416,8 @@ int smb_write(iop_file_t *f, void *buf, int size)
 			fh->filesize += fh->position - fh->filesize;
 	}
 
-ssema:
-	SignalSema(smbman_io_sema);
+io_unlock:
+	smb_io_unlock();
 
 	return wpos;
 }
@@ -312,14 +428,14 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 	register int r;
 	PathInformation_t info;
 
-	WaitSema(smbman_io_sema);
+	smb_io_lock();
 
 	memset((void *)stat, 0, sizeof(iox_stat_t));
 
 	r = smb_QueryPathInformation((PathInformation_t *)&info, (char *)filename);
 	if (r < 0) {
 		r = -EIO;
-		goto ssema;
+		goto io_unlock;
 	}
 
 	memcpy(stat->ctime, &info.Created, 8);
@@ -334,8 +450,8 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 	else 
 		stat->mode |= FIO_S_IFREG;
 
-ssema:
-	SignalSema(smbman_io_sema);
+io_unlock:
+	smb_io_unlock();
 
 	return r;
 }
@@ -346,21 +462,21 @@ s64 smb_lseek64(iop_file_t *f, s64 pos, int where)
 	s64 r;
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 
-	WaitSema(smbman_io_sema);
+	smb_io_lock();
 
 	switch (where) {
 		case SEEK_CUR:
 			r = fh->position + pos;
 			if (r > fh->filesize) {
 				r = -EINVAL;
-				goto ssema;
+				goto io_unlock;
 			}
 			break;
 		case SEEK_SET:
 			r = pos;
 			if (fh->filesize < pos) {
 				r = -EINVAL;
-				goto ssema;
+				goto io_unlock;
 			}
 			break;
 		case SEEK_END:
@@ -368,13 +484,13 @@ s64 smb_lseek64(iop_file_t *f, s64 pos, int where)
 			break;
 		default:
 			r = -EINVAL;
-			goto ssema;
+			goto io_unlock;
 	}
 
 	fh->position = r;
 
-ssema:
-	SignalSema(smbman_io_sema);
+io_unlock:
+	smb_io_unlock();
 
 	return r;
 }
@@ -518,7 +634,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 {
 	register int r = 0;
 
-	WaitSema(smbman_io_sema);
+	smb_io_lock();
 
 	switch(cmd) {
 
@@ -531,6 +647,8 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			r = smb_LogOn((smbLogOn_in_t *)arg);
 			if (r < 0)
 				r = -EIO;
+			else
+				keepalive_unlock();
 			break;
 
 		case SMB_DEVCTL_LOGOFF:
@@ -540,7 +658,10 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 					r = -EINVAL;
 				else
 					r = -EIO;
+			
 			}
+			else
+				keepalive_lock();
 			break;
 
 		case SMB_DEVCTL_GETSHARELIST:
@@ -589,7 +710,7 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			r = -EINVAL;
 	}
 
-	SignalSema(smbman_io_sema);
+	smb_io_unlock();
 
 	return r;
 }

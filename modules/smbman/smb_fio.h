@@ -20,6 +20,7 @@ int smb_close(iop_file_t *f);
 int smb_lseek(iop_file_t *f, u32 pos, int where);
 int smb_read(iop_file_t *f, void *buf, int size);
 int smb_write(iop_file_t *f, void *buf, int size);
+int smb_remove(iop_file_t *f, char *filename);
 int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat);
 s64 smb_lseek64(iop_file_t *f, s64 pos, int where);
 int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 arglen, void *bufp, u32 buflen);

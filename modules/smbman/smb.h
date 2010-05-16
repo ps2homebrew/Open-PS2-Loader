@@ -316,7 +316,7 @@ int smb_ReadAndX(int FID, s64 offset, void *readbuf, u16 nbytes);		// process a 
 int smb_WriteAndX(int FID, s64 offset, void *writebuf, u16 nbytes);		// process a Write AndX message
 int smb_Close(int FID);								// process a Close message
 int smb_Delete(char *Path);
-int smb_DeleteDirectory(char *Path);
+int smb_ManageDirectory(char *Path, int cmd);
 int smb_Rename(char *oldPath, char *newPath);
 
 int smb_Disconnect(void);

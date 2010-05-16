@@ -41,7 +41,7 @@ void *smbman_ops[27] = {
 	(void*)smb_dummy,
 	(void*)smb_getstat,
 	(void*)smb_dummy,
-	(void*)smb_dummy,
+	(void*)smb_rename,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -257,7 +257,7 @@ FHANDLE *smbman_getfilefreeslot(void)
 }
 
 //-------------------------------------------------------------- 
-int smb_open(iop_file_t *f, char *filename, int mode, int flags)
+int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 {
 	register int r = 0;
 	FHANDLE *fh;
@@ -271,7 +271,7 @@ int smb_open(iop_file_t *f, char *filename, int mode, int flags)
 
 	fh = smbman_getfilefreeslot();
 	if (fh) {
-		r = smb_OpenAndX(filename, &smb_fid, &filesize, mode);
+		r = smb_OpenAndX((char *)filename, &smb_fid, &filesize, mode);
 		if (r == 0) {
 			f->privdata = fh;
 			fh->f = f;
@@ -434,13 +434,13 @@ io_unlock:
 }
 
 //-------------------------------------------------------------- 
-int smb_remove(iop_file_t *f, char *filename)
+int smb_remove(iop_file_t *f, const char *filename)
 {
 	register int r;
 
 	smb_io_lock();
 
-	r = smb_Delete(filename);
+	r = smb_Delete((char *)filename);
 	if (r < 0) {
 		if (r == -3)
 			r = -EINVAL;
@@ -454,13 +454,13 @@ int smb_remove(iop_file_t *f, char *filename)
 }
 
 //-------------------------------------------------------------- 
-int smb_rmdir(iop_file_t *f, char *dirname)
+int smb_rmdir(iop_file_t *f, const char *dirname)
 {
 	register int r;
 
 	smb_io_lock();
 
-	r = smb_DeleteDirectory(dirname);
+	r = smb_DeleteDirectory((char *)dirname);
 	if (r < 0) {
 		if (r == -3)
 			r = -EINVAL;
@@ -505,6 +505,26 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 		stat->mode |= FIO_S_IFREG;
 
 io_unlock:
+	smb_io_unlock();
+
+	return r;
+}
+
+//-------------------------------------------------------------- 
+int smb_rename(iop_file_t *f, const char *oldname, const char *newname)
+{
+	register int r;
+
+	smb_io_lock();
+
+	r = smb_Rename((char *)oldname, (char *)newname);
+	if (r < 0) {
+		if (r == -3)
+			r = -EINVAL;
+		else
+   			r = -EIO;
+	}
+
 	smb_io_unlock();
 
 	return r;

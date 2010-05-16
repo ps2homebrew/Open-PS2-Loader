@@ -329,26 +329,51 @@ int main(int argc, char *argv[2])
 
 
 	// ----------------------------------------------------------------
+	// rename file test:
+	// ----------------------------------------------------------------
+	scr_printf("\t IO rename... ");
+	ret = fileXioRename("smb:\\rename_me\\rename_me.txt", "smb:\\rename_me\\renamed.txt");
+	if (ret == 0)
+		scr_printf("OK\n");
+	else
+		scr_printf("Error %d\n", ret);
+
+
+	// ----------------------------------------------------------------
+	// rename directory test:
+	// ----------------------------------------------------------------
+	scr_printf("\t IO rename... ");
+	ret = fileXioRename("smb:\\rename_me", "smb:\\renamed");
+	if (ret == 0)
+		scr_printf("OK\n");
+	else
+		scr_printf("Error %d\n", ret);
+
+
+	// ----------------------------------------------------------------
 	// delete file test:
 	// ----------------------------------------------------------------
+	/*
 	scr_printf("\t IO remove... ");
 	ret = remove("smb:\\delete_me\\delete_me.txt");
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
+	*/
 
 
 	// ----------------------------------------------------------------
 	// delete directory test:
 	// ----------------------------------------------------------------
+	/*
 	scr_printf("\t IO rmdir... ");
 	ret = rmdir("smb:\\delete_me");
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
 		scr_printf("Error %d\n", ret);
-
+	*/
 
 	// ----------------------------------------------------------------
 	// open file test:

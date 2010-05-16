@@ -481,6 +481,20 @@ struct DeleteDirectoryResponse_t {
 	u16	ByteCount;		// 37
 } __attribute__((packed));
 
+struct RenameRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	SearchAttributes;	// 37
+	u16	ByteCount;		// 39
+	u8	ByteField[0];		// 41
+} __attribute__((packed));
+
+struct RenameResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u16	ByteCount;		// 37
+} __attribute__((packed));
+
 
 static server_specs_t server_specs;
 
@@ -1467,6 +1481,71 @@ int smb_DeleteDirectory(char *Path)
 
 	// check there's no error
 	if ((DDRsp->smbH.Eclass | DDRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -2;
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+int smb_Rename(char *oldPath, char *newPath)
+{
+	register int CF, offset, i;
+	struct RenameRequest_t *RR = (struct RenameRequest_t *)SMB_buf;
+
+	if ((UID == -1) || (TID == -1))
+		return -3;
+
+	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
+
+	RR->smbH.Magic = SMB_MAGIC;
+	RR->smbH.Cmd = SMB_COM_RENAME;
+	RR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
+	RR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		RR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	RR->smbH.UID = (u16)UID;
+	RR->smbH.TID = (u16)TID;
+	RR->smbWordcount = 1;
+
+	// NOTE: on samba seems it doesn't care of attribute to rename directories
+	// to be tested on windows 
+	RR->SearchAttributes = 0; // coud be other attributes to find Hidden/System files /Directories
+
+	offset = 0;
+	RR->ByteField[offset++] = 0x04;			// BufferFormat
+
+	for (i = 0; i < strlen(oldPath); i++) {
+		RR->ByteField[offset] = oldPath[i];	// add oldPath
+		offset += CF;
+	}
+	offset += CF;					// null terminator
+
+	RR->ByteField[offset++] = 0x04;			// BufferFormat
+
+	if (CF == 2)
+		offset++;				// pad needed for unicode
+
+	for (i = 0; i < strlen(newPath); i++) {
+		RR->ByteField[offset] = newPath[i];	// add newPath
+		offset += CF;
+	}
+	offset += CF;					// null terminator
+
+	RR->ByteCount = offset;
+
+	rawTCP_SetSessionHeader(37+offset);
+	GetSMBServerReply();
+
+	struct RenameResponse_t *RRsp = (struct RenameResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (RRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no error
+	if ((RRsp->smbH.Eclass | RRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
 	return 0;

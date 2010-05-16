@@ -467,7 +467,7 @@ struct DeleteResponse_t {
 	u16	ByteCount;		// 37
 } __attribute__((packed));
 
-struct DeleteDirectoryRequest_t {
+struct ManageDirectoryRequest_t {
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u16	ByteCount;		// 37
@@ -475,7 +475,7 @@ struct DeleteDirectoryRequest_t {
 	u8	DirectoryName[0];	// 40
 } __attribute__((packed));
 
-struct DeleteDirectoryResponse_t {
+struct ManageDirectoryResponse_t {
 	struct SMBHeader_t smbH;	// 0
 	u8	smbWordcount;		// 36
 	u16	ByteCount;		// 37
@@ -563,7 +563,7 @@ static int rawTCP_GetSessionHeader(void) // Read Session Service header: careful
 //-------------------------------------------------------------------------
 static int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 {
-	register int sock, ret;
+	register int sock, ret, retry_count;
 	struct sockaddr_in sock_addr;
 
 	// Creating socket
@@ -576,11 +576,13 @@ static int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 	sock_addr.sin_family = AF_INET;
 	sock_addr.sin_port = htons(dst_port);
 
-	while (1) {
+	retry_count = 0;
+	while (retry_count < 3) {
 		ret = lwip_connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
 		if (ret >= 0)
 			break;
-		DelayThread(100);
+		DelayThread(500);
+		retry_count++;
 	}
 
 	return sock;
@@ -644,10 +646,12 @@ static int GetSMBServerReply(void)
 int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect)
 {
 	struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
-	register int length;
+	register int length, retry_count;
 	struct in_addr dst_addr;
 
 	dst_addr.s_addr = inet_addr(SMBServerIP);
+
+	retry_count = 0;
 
 conn_open:
 
@@ -721,7 +725,10 @@ conn_open:
 conn_close:	
 	lwip_close(main_socket);
 	main_socket = -1;
-	goto conn_open;
+	retry_count++;
+
+	if (retry_count < 3)
+		goto conn_open;
 
 	return -1;
 }
@@ -1439,10 +1446,10 @@ int smb_Delete(char *Path)
 }
 
 //-------------------------------------------------------------------------
-int smb_DeleteDirectory(char *Path)
+int smb_ManageDirectory(char *Path, int cmd)
 {
 	register int CF, PathLen, i;
-	struct DeleteDirectoryRequest_t *DDR = (struct DeleteDirectoryRequest_t *)SMB_buf;
+	struct ManageDirectoryRequest_t *MDR = (struct ManageDirectoryRequest_t *)SMB_buf;
 
 	if ((UID == -1) || (TID == -1))
 		return -3;
@@ -1451,36 +1458,37 @@ int smb_DeleteDirectory(char *Path)
 
 	CF = server_specs.StringsCF;
 
-	DDR->smbH.Magic = SMB_MAGIC;
-	DDR->smbH.Cmd = SMB_COM_DELETE_DIRECTORY;
-	DDR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
-	DDR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	MDR->smbH.Magic = SMB_MAGIC;
+	
+	MDR->smbH.Cmd = (u8)cmd;
+	MDR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
+	MDR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
 	if (CF == 2)
-		DDR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
-	DDR->smbH.UID = (u16)UID;
-	DDR->smbH.TID = (u16)TID;
-	DDR->BufferFormat = 0x04;
+		MDR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	MDR->smbH.UID = (u16)UID;
+	MDR->smbH.TID = (u16)TID;
+	MDR->BufferFormat = 0x04;
 
 	PathLen = 0;
 	for (i = 0; i < strlen(Path); i++) {
-		DDR->DirectoryName[PathLen] = Path[i];	// add Path
+		MDR->DirectoryName[PathLen] = Path[i];	// add Path
 		PathLen += CF;
 	}
 	PathLen += CF;					// null terminator
 
-	DDR->ByteCount = PathLen+1; 			// +1 for the BufferFormat byte
+	MDR->ByteCount = PathLen+1; 			// +1 for the BufferFormat byte
 
 	rawTCP_SetSessionHeader(36+PathLen);
 	GetSMBServerReply();
 
-	struct DeleteDirectoryResponse_t *DDRsp = (struct DeleteDirectoryResponse_t *)SMB_buf;
+	struct ManageDirectoryResponse_t *MDRsp = (struct ManageDirectoryResponse_t *)SMB_buf;
 
 	// check sanity of SMB header
-	if (DDRsp->smbH.Magic != SMB_MAGIC)
+	if (MDRsp->smbH.Magic != SMB_MAGIC)
 		return -1;
 
 	// check there's no error
-	if ((DDRsp->smbH.Eclass | DDRsp->smbH.Ecode) != STATUS_SUCCESS)
+	if ((MDRsp->smbH.Eclass | MDRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -2;
 
 	return 0;

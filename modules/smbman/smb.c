@@ -12,6 +12,7 @@
 
 #include "smb.h"
 #include "auth.h"
+#include "poll.h"
 
 #define SMB_MAGIC	0x424d53ff
 
@@ -542,6 +543,34 @@ static int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 }
 
 //-------------------------------------------------------------------------
+static int RecvTimeout(int sock, void *buf, int bsize, int timeout_ms)
+{
+	register int ret;
+	struct pollfd pollfd[1];
+
+	pollfd->fd = sock;
+	pollfd->events = POLLIN;
+	pollfd->revents = 0;
+
+	ret = poll(pollfd, 1, timeout_ms);
+
+	// a result less than 0 is an error
+	if (ret < 0)
+		return -1;
+
+	// 0 is a timeout
+	if (ret == 0)
+		return 0;
+
+	// receive the packet
+	ret = lwip_recv(sock, buf, bsize, 0);
+	if (ret < 0)
+		return -2;
+
+	return ret;
+}
+
+//-------------------------------------------------------------------------
 static int GetSMBServerReply(void)
 {
 	register int rcv_size, totalpkt_size, pkt_size;
@@ -550,7 +579,7 @@ static int GetSMBServerReply(void)
 	if (rcv_size <= 0)
 		return -1;
 
-	rcv_size = lwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
+	rcv_size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 3000);
 	if (rcv_size <= 0)
 		return -2;
 
@@ -558,7 +587,7 @@ static int GetSMBServerReply(void)
 	totalpkt_size = rawTCP_GetSessionHeader() + 4;
 
 	while (rcv_size < totalpkt_size) {
-		pkt_size = lwip_recv(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 0);
+		pkt_size = RecvTimeout(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 3000);
 		if (pkt_size <= 0)
 			return -2;
 		rcv_size += pkt_size;

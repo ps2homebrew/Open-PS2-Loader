@@ -219,16 +219,19 @@ struct QueryInformationDiskResponse_t {
 	u16	ByteCount;		// 47
 } __attribute__((packed));
 
+struct QueryPathInformationRequestParam_t {
+	u16	LevelOfInterest;
+	u32	Reserved;
+	u8	FileName[0];
+} __attribute__((packed));
+
 struct QueryPathInformationRequest_t {
 	struct SMBHeader_t smbH;			// 0
 	u8	smbWordcount;				// 36
 	struct SMBTransactionRequest_t smbTrans;	// 37
 	u16	SubCommand;				// 65
 	u16	ByteCount;				// 67
-	u8	Padding[3];				// 69
-	u16	LevelOfInterest;			// 72
-	u32	Reserved;				// 74
-	u8	FileName[0];				// 76
+	u8	ByteField[0];				// 69
 } __attribute__((packed));
 
 struct QueryPathInformationResponse_t {
@@ -251,8 +254,8 @@ struct StandardFileInfo_t {
 	u64 AllocationSize;
 	u64 EndOfFile;
 	u32 LinkCount;
-	u8  DeletePending[1];
-	u8  IsDirectory[1];
+	u8  DeletePending;
+	u8  IsDirectory;
 } __attribute__((packed));
 
 struct FindFirst2RequestParam_t {
@@ -291,7 +294,7 @@ struct FindFirstNext2ResponseParam_t {
 } __attribute__((packed));
 
 struct FindFirst2ResponseData_t {
-	u16	NextEntryOffset;
+	u32	NextEntryOffset;
 	u32	FileIndex;
 	s64	Created;
 	s64	LastAccess;
@@ -973,6 +976,13 @@ int smb_NetShareEnum(int UID, int TID, ShareEntry_t *shareEntries, int index, in
 
 	NSER->ByteCount = 32;
 
+	// SMB PIPE PROTOCOL
+	// Transaction Name: "\PIPE\LANMAN"
+	// Function Code : 0x0000 = NetShareEnum
+	// Parameter Descriptor: "WrLeh"
+	// Return Descriptor: "B13BWz"
+	// Detail Level: 0x0001
+	// Receive Buffer Length: 0x1fa0
 	memcpy(&NSER->ByteField[0], "\\PIPE\\LANMAN\0\0\0WrLeh\0B13BWz\0\x01\0\xa0\x1f", 32);
 
 	rawTCP_SetSessionHeader(95);
@@ -1081,21 +1091,25 @@ query:
 	
 	QPIR->smbTrans.SetupCount = 1;
 	QPIR->SubCommand = TRANS2_QUERY_PATH_INFORMATION;
-	QPIR->LevelOfInterest = queryType;
+
+	QPIR->smbTrans.ParamOffset = 68;
+	QPIR->smbTrans.MaxParamCount = 256; 		// Max Parameters len in reply
+	QPIR->smbTrans.MaxDataCount = 16384;		// Max Data len in reply
+
+	struct QueryPathInformationRequestParam_t *QPIRParam = (struct QueryPathInformationRequestParam_t *)&SMB_buf[QPIR->smbTrans.ParamOffset+4];
+
+	QPIRParam->LevelOfInterest = queryType;
 
 	PathLen = 0;
 	for (i = 0; i < strlen(Path); i++) {
-		QPIR->FileName[PathLen] = Path[i];	// add Path
+		QPIRParam->FileName[PathLen] = Path[i];	// add Path
 		PathLen += CF;
 	}
 	PathLen += CF;					// null terminator
 
 	QPIR->smbTrans.TotalParamCount = QPIR->smbTrans.ParamCount = 2+4+PathLen;
-	QPIR->smbTrans.ParamOffset = 68;
-	QPIR->smbTrans.MaxParamCount = 256; 		// Max Parameters len in reply
-	QPIR->smbTrans.MaxDataCount = 16384;		// Max Data len in reply
 
-	QPIR->ByteCount = sizeof(QPIR->Padding) + QPIR->smbTrans.TotalParamCount;
+	QPIR->ByteCount = 3 + QPIR->smbTrans.TotalParamCount;
 
 	QPIR->smbTrans.DataOffset = QPIR->smbTrans.ParamOffset + QPIR->smbTrans.TotalParamCount;
 
@@ -1133,8 +1147,8 @@ query:
 		Info->AllocationSize = SFI->AllocationSize;
 		Info->EndOfFile = SFI->EndOfFile;
 		Info->LinkCount = SFI->LinkCount;
-		Info->DeletePending[0] = SFI->DeletePending[0];
-		Info->IsDirectory[0] = SFI->IsDirectory[0];
+		Info->DeletePending = SFI->DeletePending;
+		Info->IsDirectory = SFI->IsDirectory;
 	}
 
 	return 0;
@@ -1603,6 +1617,8 @@ int smb_FindFirstNext2(int UID, int TID, char *Path, int cmd, SearchInfo_t *info
 	info->fileInfo.LastWrite = FFRspData->LastWrite;
 	info->fileInfo.Change = FFRspData->Change;
 	info->fileInfo.FileAttributes = FFRspData->FileAttributes;
+	if (FFRspData->FileAttributes & EXT_ATTR_DIRECTORY)
+		info->fileInfo.IsDirectory = 1;
 	info->fileInfo.AllocationSize = FFRspData->AllocationSize;
 	info->fileInfo.EndOfFile = FFRspData->EndOfFile;
 	for (i = 0, j =0; i < FFRspData->FileNameLen; i++, j+=CF)
@@ -1717,35 +1733,29 @@ int smb_Connect(char *SMBServerIP, int SMBServerPort)
 conn_retry:
 
 	// Close the connection if it was already opened
-	if (main_socket != -1)
-		goto conn_abort;
+	smb_Disconnect();
 
 	// Opening TCP session
 	main_socket = OpenTCPSession(dst_addr, SMBServerPort);
-	if (main_socket < 0)
-		goto conn_retry;
+	if (main_socket < 0) {
+		retry_count++;
+		if (retry_count < 3)
+			goto conn_retry;
+	}
 
 	// We keep the server IP for SMB logon
 	strncpy(server_specs.ServerIP, SMBServerIP, 16);
 
 	return 0;
-
-conn_abort:	
-
-	lwip_close(main_socket);
-	main_socket = -1;
-	retry_count++;
-
-	if (retry_count < 3)
-		goto conn_retry;
-
-	return -1;
 }
 
 //-------------------------------------------------------------------------
 int smb_Disconnect(void)
 {
-	lwip_close(main_socket);
+	if (main_socket != -1) {
+		lwip_close(main_socket);
+		main_socket = -1;
+	}
 
 	return 0;
 }

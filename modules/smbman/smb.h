@@ -294,8 +294,8 @@ typedef struct {
 	u64 AllocationSize;
 	u64 EndOfFile;
 	u32 LinkCount;
-	u8  DeletePending[1];
-	u8  IsDirectory[1];
+	u8  DeletePending;
+	u8  IsDirectory;
 } PathInformation_t;
 
 typedef struct {

@@ -324,7 +324,7 @@ int main(int argc, char *argv[2])
 	scr_printf("\t IO getstat... ");
 
 	iox_stat_t stats;
-	ret = fileXioGetStat("smb:\\dossier", &stats);
+	ret = fileXioGetStat("smb:\\", &stats);
 	if (ret == 0) {
 		scr_printf("OK\n");
 
@@ -471,6 +471,41 @@ int main(int argc, char *argv[2])
 	}
 
 	//while(1);
+
+
+	// ----------------------------------------------------------------
+	// chdir test
+	// ----------------------------------------------------------------
+
+	scr_printf("\t IO chdir... ");
+	ret = fileXioChdir("smb:\\dossier");
+	if (ret == 0)
+		scr_printf("OK  ");
+	else
+		scr_printf("Error %d  ", ret);
+
+
+	// ----------------------------------------------------------------
+	// dopen/dread/dclose test
+	// ----------------------------------------------------------------
+
+	iox_dirent_t dirent;
+
+	scr_printf("IO dopen... ");
+	fd = fileXioDopen("smb:\\");
+	if (fd >= 0) {
+		scr_printf("OK\n\t ");
+		ret = 1;
+		while (ret == 1) {
+			ret = fileXioDread(fd, &dirent);
+			if (ret == 1)
+				scr_printf("%s ", dirent.name);
+		}
+		fileXioDclose(fd);
+		scr_printf("\n");
+	}
+	else
+		scr_printf("Error %d\n", ret);
 
 
 	// ----------------------------------------------------------------

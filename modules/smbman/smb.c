@@ -507,7 +507,7 @@ struct ReadAndXRequest_t smb_Read_Request = {
 	12, 
 	SMB_COM_NONE,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+} __attribute__((aligned(64)));
 
 struct WriteAndXRequest_t smb_Write_Request = {
 	{	0,
@@ -518,7 +518,7 @@ struct WriteAndXRequest_t smb_Write_Request = {
 	14, 
 	SMB_COM_NONE,
 	0, 0, 0, 0, 0, 0x01, 0, 0, 0, 0x3f, 0 	// 0x01 is WriteThrough mode and 0x3f is DataOffset
-};
+} __attribute__((aligned(64)));
 
 #define LM_AUTH 	0
 #define NTLM_AUTH 	1

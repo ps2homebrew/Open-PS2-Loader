@@ -36,9 +36,9 @@ void *smbman_ops[27] = {
 	(void*)smb_remove,
 	(void*)smb_mkdir,
 	(void*)smb_rmdir,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
-	(void*)smb_dummy,
+	(void*)smb_dopen,
+	(void*)smb_dclose,
+	(void*)smb_dread,
 	(void*)smb_getstat,
 	(void*)smb_dummy,
 	(void*)smb_rename,
@@ -74,12 +74,16 @@ typedef struct {
 FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
 static ShareEntry_t ShareList __attribute__((aligned(64))); // Keep this aligned for DMA!
+static u8 SearchBuf[4096] __attribute__((aligned(64)));
 
 static int keepalive_mutex = -1;
 static int keepalive_inited = 0;
 static int keepalive_locked = 1;
 static int keepalive_tid;
 static iop_sys_clock_t keepalive_sysclock;
+
+int UID = -1; //static
+int TID = -1; //static
 
 //-------------------------------------------------------------------------
 // Timer Interrupt handler for Echoing the server every 3 seconds, when
@@ -261,21 +265,33 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 {
 	register int r = 0;
 	FHANDLE *fh;
-	int smb_fid;
 	s64 filesize;
 
 	if (!filename)
 		return -ENOENT;
 
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
 	fh = smbman_getfilefreeslot();
 	if (fh) {
-		r = smb_OpenAndX((char *)filename, &smb_fid, &filesize, mode);
-		if (r == 0) {
+		r = smb_OpenAndX(UID, TID, (char *)filename, &filesize, mode);
+		if (r < 0) {
+			if (r == -1)
+				r = -EIO;
+			else if (r == -2)
+				r = -EPERM;
+			else if (r == -3)
+				r = -ENOENT;
+			else
+				r = -EIO;
+		}
+		else {
 			f->privdata = fh;
 			fh->f = f;
-			fh->smb_fid = smb_fid;
+			fh->smb_fid = r;
 			fh->mode = mode;
 			fh->filesize = filesize;
 			fh->position = filesize;
@@ -284,18 +300,6 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 				fh->filesize = 0;
 			}
 			r = 0;
-		}
-		else {
-			if (r == -1)
-				r = -EIO;
-			else if (r == -2)
-				r = -EPERM;
-			else if (r == -3)
-				r = -ENOENT;
-			else if (r == -4)
-				r = -EINVAL;
-			else
-				r = -EIO;
 		}
 	}
 	else
@@ -312,15 +316,15 @@ int smb_close(iop_file_t *f)
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 	register int r = 0;
 
+	if ((UID == -1) || (TID == -1) || (fh->smb_fid == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
 	if (fh) {
-		r = smb_Close(fh->smb_fid);
+		r = smb_Close(UID, TID, fh->smb_fid);
 		if (r != 0) {
-			if (r == -3)
-				r = -EINVAL;
-			else
-				r = -EIO;
+			r = -EIO;
 			goto io_unlock;
 		}
 		memset(fh, 0, sizeof(FHANDLE));
@@ -343,7 +347,7 @@ void smb_closeAll(void)
 	for (i=0; i<MAX_FDHANDLES; i++) {
 		fh = (FHANDLE *)&smbman_fdhandles[i];
 		if (fh->smb_fid != -1)
-			smb_Close(fh->smb_fid);
+			smb_Close(UID, TID, fh->smb_fid);
 	}
 }
 
@@ -360,6 +364,9 @@ int smb_read(iop_file_t *f, void *buf, int size)
 	register int r, rpos;
 	register u32 nbytes;
 
+	if ((UID == -1) || (TID == -1) || (fh->smb_fid == -1))
+		return -EINVAL;
+
 	if ((fh->position + size) > fh->filesize)
 		size = fh->filesize - fh->position;
 
@@ -372,12 +379,9 @@ int smb_read(iop_file_t *f, void *buf, int size)
 		if (size < nbytes)
 			nbytes = size;
 
-		r = smb_ReadAndX(fh->smb_fid, fh->position, (void *)(buf + rpos), (u16)nbytes);
+		r = smb_ReadAndX(UID, TID, fh->smb_fid, fh->position, (void *)(buf + rpos), (u16)nbytes);
 		if (r < 0) {
-			if (r == -3)
-				rpos = -EINVAL;
-			else
-   				rpos = -EIO;
+   			rpos = -EIO;
    			goto io_unlock;
 		}
 
@@ -399,6 +403,9 @@ int smb_write(iop_file_t *f, void *buf, int size)
 	register int r, wpos;
 	register u32 nbytes;
 
+	if ((UID == -1) || (TID == -1) || (fh->smb_fid == -1))
+		return -EINVAL;
+
 	if ((!(fh->mode & O_RDWR)) && (!(fh->mode & O_WRONLY)))
 		return -EPERM;
 
@@ -411,12 +418,9 @@ int smb_write(iop_file_t *f, void *buf, int size)
 		if (size < nbytes)
 			nbytes = size;
 
-		r = smb_WriteAndX(fh->smb_fid, fh->position, (void *)(buf + wpos), (u16)nbytes);
+		r = smb_WriteAndX(UID, TID, fh->smb_fid, fh->position, (void *)(buf + wpos), (u16)nbytes);
 		if (r < 0) {
-			if (r == -3)
-				wpos = -EINVAL;
-			else
-   				wpos = -EIO;
+   			wpos = -EIO;
    			goto io_unlock;
 		}
 
@@ -438,15 +442,14 @@ int smb_remove(iop_file_t *f, const char *filename)
 {
 	register int r;
 
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
-	r = smb_Delete((char *)filename);
-	if (r < 0) {
-		if (r == -3)
-			r = -EINVAL;
-		else
-   			r = -EIO;
-	}
+	r = smb_Delete(UID, TID, (char *)filename);
+	if (r < 0)
+   		r = -EIO;
 
 	smb_io_unlock();
 
@@ -458,15 +461,14 @@ int smb_mkdir(iop_file_t *f, const char *dirname)
 {
 	register int r;
 
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
-	r = smb_ManageDirectory((char *)dirname, SMB_COM_CREATE_DIRECTORY);
-	if (r < 0) {
-		if (r == -3)
-			r = -EINVAL;
-		else
-   			r = -EIO;
-	}
+	r = smb_ManageDirectory(UID, TID, (char *)dirname, SMB_COM_CREATE_DIRECTORY);
+	if (r < 0)
+   		r = -EIO;
 
 	smb_io_unlock();
 
@@ -478,19 +480,43 @@ int smb_rmdir(iop_file_t *f, const char *dirname)
 {
 	register int r;
 
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
-	r = smb_ManageDirectory((char *)dirname, SMB_COM_DELETE_DIRECTORY);
-	if (r < 0) {
-		if (r == -3)
-			r = -EINVAL;
-		else
-   			r = -EIO;
-	}
+	r = smb_ManageDirectory(UID, TID, (char *)dirname, SMB_COM_DELETE_DIRECTORY);
+	if (r < 0)
+   		r = -EIO;
 
 	smb_io_unlock();
 
 	return r;
+}
+
+//-------------------------------------------------------------- 
+int smb_dopen(iop_file_t *f, const char *dirname)
+{
+	//SearchInfo_t *info = (SearchInfo_t *)SearchBuf;
+
+	//smb_FindFirstNext2("\\*", TRANS2_FIND_FIRST2, info);
+	//while (!info->EOS) {
+	//	smb_FindFirstNext2(NULL, TRANS2_FIND_NEXT2, info);
+	//}
+
+	return 0;
+}
+
+//-------------------------------------------------------------- 
+int smb_dclose(iop_file_t *f)
+{
+	return 0;
+}
+
+//-------------------------------------------------------------- 
+int smb_dread(iop_file_t *f, iox_dirent_t *dirent)
+{
+	return 0;
 }
 
 //-------------------------------------------------------------- 
@@ -499,16 +525,16 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 	register int r;
 	PathInformation_t info;
 
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
 	memset((void *)stat, 0, sizeof(iox_stat_t));
 
-	r = smb_QueryPathInformation((PathInformation_t *)&info, (char *)filename);
+	r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, (char *)filename);
 	if (r < 0) {
-		if (r == -3)
-			r = -EINVAL;
-		else
-   			r = -EIO;
+   		r = -EIO;
 		goto io_unlock;
 	}
 
@@ -535,15 +561,14 @@ int smb_rename(iop_file_t *f, const char *oldname, const char *newname)
 {
 	register int r;
 
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
 	smb_io_lock();
 
-	r = smb_Rename((char *)oldname, (char *)newname);
-	if (r < 0) {
-		if (r == -3)
-			r = -EINVAL;
-		else
-   			r = -EIO;
-	}
+	r = smb_Rename(UID, TID, (char *)oldname, (char *)newname);
+	if (r < 0)
+   		r = -EIO;
 
 	smb_io_unlock();
 
@@ -617,11 +642,30 @@ static void smb_GetPasswordHashes(smbGetPasswordHashes_in_t *in, smbGetPasswordH
 }
 
 //-------------------------------------------------------------- 
+static int smb_tcpConnect(smbConnect_in_t *connect)
+{
+	register int r;
+
+	r = smb_Connect(connect->serverIP, connect->serverPort);
+	if (r < 0)
+		return r;
+
+	keepalive_unlock();
+
+	return 0;
+}
+
+//-------------------------------------------------------------- 
 static int smb_LogOn(smbLogOn_in_t *logon)
 {
 	register int r;
 
-	r = smb_NegociateProtocol(logon->serverIP, logon->serverPort, "NT LM 0.12");
+	if (UID != -1) {
+		smb_LogOffAndX(UID);
+		UID = -1;
+	}
+
+	r = smb_NegociateProtocol();
 	if (r < 0)
 		return r;
 
@@ -629,15 +673,32 @@ static int smb_LogOn(smbLogOn_in_t *logon)
 	if (r < 0)
 		return r;
 
+	UID = r;
+
 	return 0;
 }
 
 //-------------------------------------------------------------- 
 static int smb_LogOff(void)
 {
-	smb_closeAll();
+	register int r;
 
-	return smb_LogOffAndX();
+	if (UID == -1)
+		return -3;
+
+	if (!(TID == -1)) {
+		smb_closeAll();
+		smb_TreeDisconnect(UID, TID);
+		TID = -1;
+	}
+
+	r = smb_LogOffAndX(UID);
+	if (r < 0)
+		return r;
+
+	UID = -1;
+
+	return 0;
 }
 
 //-------------------------------------------------------------- 
@@ -649,14 +710,24 @@ static int smb_GetShareList(smbGetShareList_in_t *getsharelist)
 
 	specs = (server_specs_t *)getServerSpecs();
 
+	if (TID != -1) {
+		smb_TreeDisconnect(UID, TID);
+		TID = -1;
+	}
+
 	// Tree Connect on IPC slot
 	sprintf(tree_str, "\\\\%s\\IPC$", specs->ServerIP);
-	r = smb_TreeConnectAndX(tree_str, NULL, 0);
+	r = smb_TreeConnectAndX(UID, tree_str, NULL, 0);
 	if (r < 0)
 		return r;
 
+	TID = r;
+
+	if (UID == -1)
+		return -3;
+
 	// does a 1st enum to count shares (+IPC)
-	r = smb_NetShareEnum((ShareEntry_t *)&ShareList, 0, 0);
+	r = smb_NetShareEnum(UID, TID, (ShareEntry_t *)&ShareList, 0, 0);
 	if (r < 0)
 		return r;
 
@@ -666,7 +737,7 @@ static int smb_GetShareList(smbGetShareList_in_t *getsharelist)
 	// now we list the following shares if any 
 	for (i=0; i<sharecount; i++) {
 
-		r = smb_NetShareEnum((ShareEntry_t *)&ShareList, i, 1);
+		r = smb_NetShareEnum(UID, TID, (ShareEntry_t *)&ShareList, i, 1);
 		if (r < 0)
 			return r;
 
@@ -678,9 +749,11 @@ static int smb_GetShareList(smbGetShareList_in_t *getsharelist)
 	}
 
 	// disconnect the tree
-	r = smb_TreeDisconnect();
+	r = smb_TreeDisconnect(UID, TID);
 	if (r < 0)
 		return r;
+
+	TID = -1;
 
 	// return the number of shares	
 	return shareindex;
@@ -694,21 +767,39 @@ static int smb_OpenShare(smbOpenShare_in_t *openshare)
 	server_specs_t *specs;
 
 	specs = (server_specs_t *)getServerSpecs();
+
+	if (TID != -1) {
+		smb_TreeDisconnect(UID, TID);
+		TID = -1;
+	}
+
 	sprintf(tree_str, "\\\\%s\\%s", specs->ServerIP, openshare->ShareName);
-
-	r = smb_TreeConnectAndX(tree_str, openshare->Password, openshare->PasswordType);
+	r = smb_TreeConnectAndX(UID, tree_str, openshare->Password, openshare->PasswordType);
 	if (r < 0)
-		r = -EIO;
+		return r;
 
-	return r;
+	TID = r;
+
+	return 0;
 }
 
 //-------------------------------------------------------------- 
 static int smb_CloseShare(void)
 {
+	register int r;
+
+	if (TID == -1)
+		return -3;
+
 	smb_closeAll();
 
-	return smb_TreeDisconnect();
+	r = smb_TreeDisconnect(UID, TID);
+	if (r < 0)
+		return r;
+
+	TID = -1;
+
+	return 0;
 }
 
 //-------------------------------------------------------------- 
@@ -720,7 +811,20 @@ static int smb_EchoServer(smbEcho_in_t *echo)
 //-------------------------------------------------------------- 
 static int smb_QueryDiskInfo(smbQueryDiskInfo_out_t *querydiskinfo)
 {
-	return smb_QueryInformationDisk(querydiskinfo);
+	if ((UID == -1) || (TID == -1))
+		return -3;
+
+	return smb_QueryInformationDisk(UID, TID, querydiskinfo);
+}
+
+//-------------------------------------------------------------- 
+static int smb_tcpDisconnect()
+{
+	keepalive_lock();
+
+	smb_Disconnect();
+
+	return 0;
 }
 
 //-------------------------------------------------------------- 
@@ -732,6 +836,12 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 
 	switch(cmd) {
 
+		case SMB_DEVCTL_CONNECT:
+			r = smb_tcpConnect((smbConnect_in_t *)arg);
+			if (r < 0)
+				r = -EIO;
+			break;
+
 		case SMB_DEVCTL_GETPASSWORDHASHES:
 			smb_GetPasswordHashes((smbGetPasswordHashes_in_t *)arg, (smbGetPasswordHashes_out_t *)bufp);
 			r = 0;
@@ -741,13 +851,10 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 			r = smb_LogOn((smbLogOn_in_t *)arg);
 			if (r < 0)
 				r = -EIO;
-			else
-				keepalive_unlock();
 			break;
 
 		case SMB_DEVCTL_LOGOFF:
 			r = smb_LogOff();
-			smb_Disconnect();
 			if (r < 0) {
 				if (r == -3)
 					r = -EINVAL;
@@ -755,8 +862,6 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 					r = -EIO;
 			
 			}
-			else
-				keepalive_lock();
 			break;
 
 		case SMB_DEVCTL_GETSHARELIST:
@@ -799,6 +904,12 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 				else
 					r = -EIO;
 			}
+			break;
+
+		case SMB_DEVCTL_DISCONNECT:
+			r = smb_tcpDisconnect();
+			if (r < 0)
+				r = -EIO;
 			break;
 
 		default:

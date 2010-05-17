@@ -24,7 +24,8 @@ int smbman_initdev(void);
 
 struct irx_export_table _exp_smbman;
 
-//ShareEntry_t shareEntries[32];
+extern int UID, TID;
+
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
 {
@@ -34,27 +35,18 @@ int _start(int argc, char** argv)
 
 	if (!(g_pc_ip[0] == 0x78)) {
 		// Open the Connection with SMB server
-		smb_NegociateProtocol(g_pc_ip, g_pc_port, "NT LM 0.12");
+		smb_Connect(g_pc_ip, g_pc_port);
+
+		// negociate protocol
+		smb_NegociateProtocol();
 
 		// zero pad the string to be sure it does not overflow
 		g_pc_share[32] = '\0';
 
 		// Then open a session and a tree connect on the share resource
 		sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-		smb_SessionSetupAndX("GUEST", NULL, 0);
-		smb_TreeConnectAndX(tree_str, NULL, 0);
-		/*
-		int i, count;
-		smb_TreeConnectAndX("\\\\192.168.0.2\\IPC$", NULL, 0);
-		count = smb_NetShareEnum(&shareEntries[0], 32);
-		smb_TreeDisconnect();
-		ShareEntry_t *SE = (ShareEntry_t *)&shareEntries[0];
-		for (i=0; i<count; i++) {
-			smb_Echo(SE->ShareName, strlen(SE->ShareName));
-			smb_Echo(SE->ShareComment, strlen(SE->ShareComment));
-			SE++;
-		}
-		*/
+		UID = smb_SessionSetupAndX("GUEST", NULL, 0);
+		TID = smb_TreeConnectAndX(UID, tree_str, NULL, 0);
 	}
 
 	smb_initdev();

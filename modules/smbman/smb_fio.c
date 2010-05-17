@@ -42,7 +42,7 @@ void *smbman_ops[27] = {
 	(void*)smb_getstat,
 	(void*)smb_dummy,
 	(void*)smb_rename,
-	(void*)smb_dummy,
+	(void*)smb_chdir,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
 	(void*)smb_dummy,
@@ -68,13 +68,15 @@ typedef struct {
 	s64		filesize;
 	s64		position;
 	u32		mode;
+	char		name[256];
 } FHANDLE;
 
-#define MAX_FDHANDLES		64
+#define MAX_FDHANDLES		32
 FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 
 static ShareEntry_t ShareList __attribute__((aligned(64))); // Keep this aligned for DMA!
 static u8 SearchBuf[4096] __attribute__((aligned(64)));
+static char smb_curdir[4096] __attribute__((aligned(64)));
 
 static int keepalive_mutex = -1;
 static int keepalive_inited = 0;
@@ -246,7 +248,7 @@ int smb_deinit(iop_device_t *dev)
 }
 
 //-------------------------------------------------------------- 
-FHANDLE *smbman_getfilefreeslot(void)
+static FHANDLE *smbman_getfilefreeslot(void)
 {
 	register int i;
 	FHANDLE *fh;
@@ -258,6 +260,28 @@ FHANDLE *smbman_getfilefreeslot(void)
 	}
 
 	return 0;
+}
+
+//-------------------------------------------------------------- 
+static char *prepare_path(char *path)
+{
+	register int i;
+
+	char *p = (char *)path;
+	char *p2 = (char *)&path[strlen(path)];
+
+	while ((*p == '\\') || (*p == '/'))
+		p++;
+
+	while ((*p2 == '\\') || (*p2 == '/'))
+		*p2-- = 0;
+
+	for (i=0; i<strlen(p); i++) {
+		if (p[i] == '/')
+			p[i] = '\\';
+	}
+
+	return (char *)p;
 }
 
 //-------------------------------------------------------------- 
@@ -273,11 +297,13 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
+	char *path = prepare_path((char *)filename);
+
 	smb_io_lock();
 
 	fh = smbman_getfilefreeslot();
 	if (fh) {
-		r = smb_OpenAndX(UID, TID, (char *)filename, &filesize, mode);
+		r = smb_OpenAndX(UID, TID, path, &filesize, mode);
 		if (r < 0) {
 			if (r == -1)
 				r = -EIO;
@@ -299,6 +325,7 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 				fh->position = 0;
 				fh->filesize = 0;
 			}
+			strncpy(fh->name, path, 255);
 			r = 0;
 		}
 	}
@@ -322,10 +349,12 @@ int smb_close(iop_file_t *f)
 	smb_io_lock();
 
 	if (fh) {
-		r = smb_Close(UID, TID, fh->smb_fid);
-		if (r != 0) {
-			r = -EIO;
-			goto io_unlock;
+		if (fh->mode != O_DIROPEN) {
+			r = smb_Close(UID, TID, fh->smb_fid);
+			if (r != 0) {
+				r = -EIO;
+				goto io_unlock;
+			}
 		}
 		memset(fh, 0, sizeof(FHANDLE));
 		fh->smb_fid = -1;
@@ -442,12 +471,17 @@ int smb_remove(iop_file_t *f, const char *filename)
 {
 	register int r;
 
+	if (!filename)
+		return -ENOENT;
+
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
+	char *path = prepare_path((char *)filename);
+
 	smb_io_lock();
 
-	r = smb_Delete(UID, TID, (char *)filename);
+	r = smb_Delete(UID, TID, path);
 	if (r < 0)
    		r = -EIO;
 
@@ -461,12 +495,17 @@ int smb_mkdir(iop_file_t *f, const char *dirname)
 {
 	register int r;
 
+	if (!dirname)
+		return -ENOENT;
+
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
+	char *path = prepare_path((char *)dirname);
+
 	smb_io_lock();
 
-	r = smb_ManageDirectory(UID, TID, (char *)dirname, SMB_COM_CREATE_DIRECTORY);
+	r = smb_ManageDirectory(UID, TID, path, SMB_COM_CREATE_DIRECTORY);
 	if (r < 0)
    		r = -EIO;
 
@@ -479,16 +518,33 @@ int smb_mkdir(iop_file_t *f, const char *dirname)
 int smb_rmdir(iop_file_t *f, const char *dirname)
 {
 	register int r;
+	PathInformation_t info;
+
+	if (!dirname)
+		return -ENOENT;
 
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
+	char *path = prepare_path((char *)dirname);
+
 	smb_io_lock();
 
-	r = smb_ManageDirectory(UID, TID, (char *)dirname, SMB_COM_DELETE_DIRECTORY);
+	r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, path);
+	if (r < 0) {
+   		r = -EIO;
+		goto io_unlock;
+	}
+	if (!info.IsDirectory) {
+		r = -ENOTDIR;
+		goto io_unlock;
+	}
+
+	r = smb_ManageDirectory(UID, TID, path, SMB_COM_DELETE_DIRECTORY);
 	if (r < 0)
    		r = -EIO;
 
+io_unlock:
 	smb_io_unlock();
 
 	return r;
@@ -497,26 +553,116 @@ int smb_rmdir(iop_file_t *f, const char *dirname)
 //-------------------------------------------------------------- 
 int smb_dopen(iop_file_t *f, const char *dirname)
 {
-	//SearchInfo_t *info = (SearchInfo_t *)SearchBuf;
+	register int r = 0;
+	PathInformation_t info;
+	FHANDLE *fh;
 
-	//smb_FindFirstNext2("\\*", TRANS2_FIND_FIRST2, info);
-	//while (!info->EOS) {
-	//	smb_FindFirstNext2(NULL, TRANS2_FIND_NEXT2, info);
-	//}
+	if (!dirname)
+		return -ENOENT;
 
-	return 0;
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
+	char *path = prepare_path((char *)dirname);
+
+	smb_io_lock();
+
+	// test if the dir exists
+	r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, path);
+	if (r < 0) {
+   		r = -EIO;
+		goto io_unlock;
+	}
+
+	if (!info.IsDirectory) {
+   		r = -ENOTDIR;
+		goto io_unlock;
+	}
+
+	fh = smbman_getfilefreeslot();
+	if (fh) {
+		f->privdata = fh;
+		fh->f = f;
+		fh->mode = O_DIROPEN;
+		fh->filesize = 0;
+		fh->position = 0;
+
+		strncpy(fh->name, path, 253);
+		strcat(fh->name, "*");
+
+		r = 0;	
+	}
+	else
+		r = -EMFILE;
+
+io_unlock:
+	smb_io_unlock();
+
+	return r;
 }
 
 //-------------------------------------------------------------- 
 int smb_dclose(iop_file_t *f)
 {
-	return 0;
+	return smb_close(f);
 }
 
 //-------------------------------------------------------------- 
 int smb_dread(iop_file_t *f, iox_dirent_t *dirent)
 {
-	return 0;
+	FHANDLE *fh = (FHANDLE *)f->privdata;
+	register int r;
+
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
+	smb_io_lock();
+
+	memset((void *)dirent, 0, sizeof(iox_dirent_t));
+
+	SearchInfo_t *info = (SearchInfo_t *)SearchBuf;
+
+	if (fh->smb_fid == -1) {
+		r = smb_FindFirstNext2(UID, TID, fh->name, TRANS2_FIND_FIRST2, info);
+		if (r < 0) {
+			r = -EIO;
+			goto io_unlock;
+		}
+		fh->smb_fid = info->SID;
+		r = 1;
+	}
+	else {
+		info->SID = fh->smb_fid;
+		r = smb_FindFirstNext2(UID, TID, NULL, TRANS2_FIND_NEXT2, info);
+		if (r < 0) {
+			r = -EIO;
+			goto io_unlock;
+		}
+		r = 1;
+	}
+
+	if ((r == 1) && (info->EOS == 0)) {
+		memcpy(dirent->stat.ctime, &info->fileInfo.Created, 8);
+		memcpy(dirent->stat.atime, &info->fileInfo.LastAccess, 8);
+		memcpy(dirent->stat.mtime, &info->fileInfo.Change, 8);
+
+		dirent->stat.size = (int)(info->fileInfo.EndOfFile & 0xffffffff);
+		dirent->stat.hisize = (int)((info->fileInfo.EndOfFile >> 32) & 0xffffffff);
+
+		if (info->fileInfo.FileAttributes & EXT_ATTR_DIRECTORY)
+			dirent->stat.mode |= FIO_S_IFDIR;
+		else 
+			dirent->stat.mode |= FIO_S_IFREG;
+
+		strncpy(dirent->name, info->FileName, 255);
+	}
+	else
+		r = 0;
+
+io_unlock:
+	smb_io_unlock();
+
+	return r;
 }
 
 //-------------------------------------------------------------- 
@@ -525,14 +671,19 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 	register int r;
 	PathInformation_t info;
 
+	if (!filename)
+		return -ENOENT;
+
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
+
+	char *path = prepare_path((char *)filename);
 
 	smb_io_lock();
 
 	memset((void *)stat, 0, sizeof(iox_stat_t));
 
-	r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, (char *)filename);
+	r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, path);
 	if (r < 0) {
    		r = -EIO;
 		goto io_unlock;
@@ -561,15 +712,70 @@ int smb_rename(iop_file_t *f, const char *oldname, const char *newname)
 {
 	register int r;
 
+	if ((!oldname) || (!newname))
+		return -ENOENT;
+
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
+	char *oldpath = prepare_path((char *)oldname);
+	char *newpath = prepare_path((char *)newname);
+
 	smb_io_lock();
 
-	r = smb_Rename(UID, TID, (char *)oldname, (char *)newname);
+	r = smb_Rename(UID, TID, oldpath, newpath);
 	if (r < 0)
    		r = -EIO;
 
+	smb_io_unlock();
+
+	return r;
+}
+
+//-------------------------------------------------------------- 
+int smb_chdir(iop_file_t *f, const char *dirname)
+{
+	register int r = 0, i;
+	PathInformation_t info;
+
+	if (!dirname)
+		return -ENOENT;
+
+	if ((UID == -1) || (TID == -1))
+		return -EINVAL;
+
+	char *path = prepare_path((char *)dirname);
+
+	smb_io_lock();
+
+	if ((path[strlen(path)-1] == '.') && (path[strlen(path)] == '.')) {
+		if (strlen(smb_curdir) > 1) {
+			char *p = (char *)smb_curdir;
+			for (i=strlen(p)-1; i>=0; i--) {
+				if (p[i] == '\\') {
+					p[i] = 0;
+					break;
+				}
+			}
+		}
+	}
+	else {
+		r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, path);
+		if (r < 0) {
+   			r = -EIO;
+			goto io_unlock;
+		}
+
+		if (!info.IsDirectory) {
+	   		r = -ENOTDIR;
+			goto io_unlock;
+		}
+
+		strcat(smb_curdir, path);
+		strcat(smb_curdir, "\\");
+	}
+
+io_unlock:
 	smb_io_unlock();
 
 	return r;

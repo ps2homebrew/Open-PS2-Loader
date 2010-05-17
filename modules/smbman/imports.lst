@@ -51,6 +51,7 @@ I_memset
 I_memcpy
 I_memcmp
 I_strcpy
+I_strcat
 I_strncpy
 I_strcmp
 I_strlen

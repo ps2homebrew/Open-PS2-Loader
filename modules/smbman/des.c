@@ -453,7 +453,7 @@ static unsigned char *key7TOkey8(unsigned char *key7, unsigned char *key8)
 	return (unsigned char *)key8;
 }
 
-static unsigned char DES_Keys[96];
+static unsigned char DES_Keys[128] __attribute__((aligned(64)));
 
 /*
  * des_create_keys: take 64bit user key (key) as input and outputs

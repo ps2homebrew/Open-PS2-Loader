@@ -85,8 +85,8 @@ static int keepalive_locked = 1;
 static int keepalive_tid;
 static iop_sys_clock_t keepalive_sysclock;
 
-int UID = -1; //static
-int TID = -1; //static
+static int UID = -1;
+static int TID = -1;
 
 //-------------------------------------------------------------------------
 // Timer Interrupt handler for Echoing the server every 3 seconds, when

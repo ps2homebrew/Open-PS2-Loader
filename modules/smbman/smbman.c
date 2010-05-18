@@ -14,40 +14,12 @@
 #define MODNAME "smbman"
 IRX_ID(MODNAME, 2, 1);
 
-#define MAX_SECTORS 	7
-
-static char g_pc_ip[]="xxx.xxx.xxx.xxx";
-static int g_pc_port = 445; // &g_pc_ip + 16
-static char g_pc_share[33]="PS2SMB";
-
-int smbman_initdev(void);
-
 struct irx_export_table _exp_smbman;
-
-extern int UID, TID;
 
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
 {
-	char tree_str[255];
-
 	RegisterLibraryEntries(&_exp_smbman);
-
-	if (!(g_pc_ip[0] == 0x78)) {
-		// Open the Connection with SMB server
-		smb_Connect(g_pc_ip, g_pc_port);
-
-		// negociate protocol
-		smb_NegociateProtocol();
-
-		// zero pad the string to be sure it does not overflow
-		g_pc_share[32] = '\0';
-
-		// Then open a session and a tree connect on the share resource
-		sprintf(tree_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-		UID = smb_SessionSetupAndX("GUEST", NULL, 0);
-		TID = smb_TreeConnectAndX(UID, tree_str, NULL, 0);
-	}
 
 	smb_initdev();
 

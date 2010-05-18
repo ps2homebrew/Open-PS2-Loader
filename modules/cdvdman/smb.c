@@ -235,9 +235,9 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 	// Creating socket
 	sock = plwip_socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock < 0)
-		return -1;
+		return -2;
 
-    mips_memset(&sock_addr, 0, sizeof(sock_addr));
+    	mips_memset(&sock_addr, 0, sizeof(sock_addr));
 	sock_addr.sin_addr = dst_IP;
 	sock_addr.sin_family = AF_INET;
 	sock_addr.sin_port = htons(dst_port);
@@ -246,7 +246,7 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 		ret = plwip_connect(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
 		if (ret >= 0)
 			break;
-		DelayThread(100);
+		DelayThread(500);
 	}
 
 	return sock;
@@ -287,12 +287,10 @@ int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect)
 
 	dst_addr.s_addr = pinet_addr(SMBServerIP);
 
-conn_open:
-
 	// Opening TCP session
 	main_socket = OpenTCPSession(dst_addr, SMBServerPort);
-	if (main_socket < 0)
-		goto conn_open;
+
+negociate_retry:
 
 	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -312,14 +310,14 @@ conn_open:
 
 	// check sanity of SMB header
 	if (NPRsp->smbH.Magic != SMB_MAGIC)
-		goto conn_close;
+		goto negociate_retry;
 
 	// check there's no error
 	if (NPRsp->smbH.Eclass != STATUS_SUCCESS)
-		goto conn_close;
+		goto negociate_retry;
 		
 	if (NPRsp->smbWordcount != 17)
-		goto conn_close;
+		goto negociate_retry;
 
 	if (NPRsp->Capabilities & SERVER_CAP_UNICODE)
 		server_specs.StringsCF = 2;
@@ -333,12 +331,6 @@ conn_open:
 	mips_memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->PrimaryDomainServerName[0], 32);
 
 	return 1;
-
-conn_close:
-	plwip_close(main_socket);
-	goto conn_open;
-
-	return 0;
 }
 
 //-------------------------------------------------------------------------

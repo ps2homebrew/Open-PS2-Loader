@@ -198,6 +198,8 @@ void delay(int count);
 void LoadNetworkModules(void);
 void LoadHddModules(void);
 void LoadUsbModules(void);
+int SMBconnect(void);
+int SMBdisconnect(void);
 int getDiscID(void *discID);
 void LaunchGame(TGame *game, int mode, int compatmask, void* gameid);
 void LaunchHDDGame(hdl_game_info_t *game, void* gameid);

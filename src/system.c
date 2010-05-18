@@ -5,6 +5,7 @@
 */
 
 #include "include/usbld.h"
+#include "include/smbman.h"
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
@@ -204,7 +205,6 @@ int PS3Detect(void)	//return 0=PS2 1=PS3-HARD 2=PS3-SOFT
 
 void set_ipconfig(void)
 {
-	int i;
 	char str[16];
 
 	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
@@ -224,17 +224,6 @@ void set_ipconfig(void)
 	sprintf(str, "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 	strncpy(&g_ipconfig[g_ipconfig_len], str, 15);
 	g_ipconfig_len += strlen(str) + 1;
-
-	// patch the smbman module with ip config
-	for (i=0;i<size_smbman_irx;i++){
-		if(!strcmp((const char*)((u32)&smbman_irx+i),"xxx.xxx.xxx.xxx")){
-			break;
-		}
-	}
-	sprintf(str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	memcpy((void*)((u32)&smbman_irx+i),str,strlen(str)+1);	
-	memcpy((void*)((u32)&smbman_irx+i+16),&gPCPort, 4);
-	memcpy((void*)((u32)&smbman_irx+i+20), gPCShareName, 32);
 }
 
 void LoadNetworkModules(void)
@@ -363,6 +352,72 @@ void LoadUsbModules(void)
 	SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, NULL);
 
 	delay(3);
+}
+
+int SMBconnect(void)
+{
+	int ret;
+	smbConnect_in_t connect;
+	smbEcho_in_t echo;
+	smbLogOn_in_t logon;
+	smbOpenShare_in_t openshare;
+
+	// open tcp connection with the server
+	sprintf(connect.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	connect.serverPort = gPCPort;
+
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_CONNECT, (void *)&connect, sizeof(connect), NULL, 0);
+	if (ret < 0)
+		return -1;
+
+	// SMB server alive test
+	strcpy(echo.echo, "ALIVE ECHO TEST");
+	echo.len = strlen("ALIVE ECHO TEST");
+
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
+	if (ret < 0)
+		return -2;
+
+	// logon to SMB server
+	strcpy(logon.User, "GUEST");
+	logon.PasswordType = NO_PASSWORD;
+
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
+	if (ret < 0)
+		return -3;
+
+	// connect to the share
+	strcpy(openshare.ShareName, gPCShareName);
+	openshare.PasswordType = NO_PASSWORD;
+
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
+	if (ret < 0)
+		return -4;
+
+	return 0;	
+}
+
+int SMBdisconnect(void)
+{
+	int ret;
+
+	// closing share
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
+	if (ret < 0)
+		return -1;
+
+
+	// logoff from SMB server:
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
+	if (ret < 0)
+		return -2;
+
+	// closing tcp connection
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_DISCONNECT, NULL, 0, NULL, 0);
+	if (ret < 0)
+		return -3;
+
+	return 0;	
 }
 
 unsigned int crctab[0x400];

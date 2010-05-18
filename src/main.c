@@ -898,6 +898,7 @@ void ExecETHGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1) {
 		if (!eth_inited) {
 			LoadNetworkModules();
+			SMBconnect();
 			eth_inited = 1;
 			ClearETHSubMenu();
 		}
@@ -911,6 +912,9 @@ void ExecETHGameSelection(struct menu_item_t* self, int id) {
 	char* gid[5];
 	getImageGameIDBin(ethGameList[id - 1].Image, gid);
 	
+	if (eth_inited)
+		SMBdisconnect();
+
 	LaunchGame(&ethGameList[id - 1], ETH_MODE, cmask, gid);
 }
 
@@ -1254,6 +1258,7 @@ int main(void)
 	// If automatic network startup is selected, start it now
 	if ((!getKeyOn(KEY_L1)) && (gNetAutostart != 0)) {
 		LoadNetworkModules();
+		SMBconnect();
 		eth_inited = 1;
 	}
 

@@ -507,6 +507,72 @@ int main(int argc, char *argv[2])
 	else
 		scr_printf("Error %d\n", ret);
 
+	/*
+	// ----------------------------------------------------------------
+	// chdir test
+	// ----------------------------------------------------------------
+
+	scr_printf("\t IO chdir... ");
+	ret = fileXioChdir("smb:\\dossier2");
+	if (ret == 0)
+		scr_printf("OK  ");
+	else
+		scr_printf("Error %d  ", ret);
+
+
+	// ----------------------------------------------------------------
+	// dopen/dread/dclose test
+	// ----------------------------------------------------------------
+
+	scr_printf("IO dopen... ");
+	fd = fileXioDopen("smb:\\");
+	if (fd >= 0) {
+		scr_printf("OK\n\t ");
+		ret = 1;
+		while (ret == 1) {
+			ret = fileXioDread(fd, &dirent);
+			if (ret == 1)
+				scr_printf("%s ", dirent.name);
+		}
+		fileXioDclose(fd);
+		scr_printf("\n");
+	}
+	else
+		scr_printf("Error %d\n", ret);
+
+
+	// ----------------------------------------------------------------
+	// chdir test
+	// ----------------------------------------------------------------
+
+	scr_printf("\t IO chdir... ");
+	ret = fileXioChdir("smb:\\..");
+	if (ret == 0)
+		scr_printf("OK  ");
+	else
+		scr_printf("Error %d  ", ret);
+
+
+	// ----------------------------------------------------------------
+	// dopen/dread/dclose test
+	// ----------------------------------------------------------------
+
+	scr_printf("IO dopen... ");
+	fd = fileXioDopen("smb:\\");
+	if (fd >= 0) {
+		scr_printf("OK\n\t ");
+		ret = 1;
+		while (ret == 1) {
+			ret = fileXioDread(fd, &dirent);
+			if (ret == 1)
+				scr_printf("%s ", dirent.name);
+		}
+		fileXioDclose(fd);
+		scr_printf("\n");
+	}
+	else
+		scr_printf("Error %d\n", ret);
+	*/
 
 	// ----------------------------------------------------------------
 	// how to close a share:

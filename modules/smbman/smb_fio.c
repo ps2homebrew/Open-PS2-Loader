@@ -77,6 +77,7 @@ FHANDLE smbman_fdhandles[MAX_FDHANDLES] __attribute__((aligned(64)));
 static ShareEntry_t ShareList __attribute__((aligned(64))); // Keep this aligned for DMA!
 static u8 SearchBuf[4096] __attribute__((aligned(64)));
 static char smb_curdir[4096] __attribute__((aligned(64)));
+static char smb_curpath[4096] __attribute__((aligned(64)));
 
 static int keepalive_mutex = -1;
 static int keepalive_inited = 0;
@@ -182,15 +183,10 @@ int smb_dummy(void)
 //-------------------------------------------------------------- 
 int smb_init(iop_device_t *dev)
 {
-	iop_sema_t smp;
 	iop_thread_t thread;
 
-	smp.initial = 1;
-	smp.max = 1;
-	smp.attr = 1;
-	smp.option = 0;
-
-	smbman_io_sema = CreateSema(&smp);
+	// create a mutex for IO ops
+	smbman_io_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
 	// create a mutex for keep alive
 	keepalive_mutex = CreateMutex(IOP_MUTEX_LOCKED);
@@ -281,7 +277,17 @@ static char *prepare_path(char *path)
 			p[i] = '\\';
 	}
 
-	return (char *)p;
+	if (strlen(p) > 0) {
+		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1-1-strlen(p));
+		strcat(smb_curpath, "\\");
+		strcat(smb_curpath, p);
+	}
+	else {
+		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1-1);
+		strcat(smb_curpath, "\\");
+	}
+
+	return (char *)smb_curpath;
 }
 
 //-------------------------------------------------------------- 
@@ -587,7 +593,7 @@ int smb_dopen(iop_file_t *f, const char *dirname)
 		fh->filesize = 0;
 		fh->position = 0;
 
-		strncpy(fh->name, path, 253);
+		strncpy(fh->name, path, 254);
 		strcat(fh->name, "*");
 
 		r = 0;	
@@ -748,16 +754,17 @@ int smb_chdir(iop_file_t *f, const char *dirname)
 
 	smb_io_lock();
 
-	if ((path[strlen(path)-1] == '.') && (path[strlen(path)] == '.')) {
-		if (strlen(smb_curdir) > 1) {
-			char *p = (char *)smb_curdir;
-			for (i=strlen(p)-1; i>=0; i--) {
-				if (p[i] == '\\') {
-					p[i] = 0;
-					break;
-				}
+	if ((path[strlen(path)-2] == '.') && (path[strlen(path)-1] == '.')) {
+		char *p = (char *)smb_curdir;
+		for (i=strlen(p)-1; i>=0; i--) {
+			if (p[i] == '\\') {
+				p[i] = 0;
+				break;
 			}
 		}
+	}
+	else if (path[strlen(path)-1] == '.') {
+		smb_curdir[0] = 0;
 	}
 	else {
 		r = smb_QueryPathInformation(UID, TID, (PathInformation_t *)&info, path);
@@ -771,8 +778,7 @@ int smb_chdir(iop_file_t *f, const char *dirname)
 			goto io_unlock;
 		}
 
-		strcat(smb_curdir, path);
-		strcat(smb_curdir, "\\");
+		strncpy(smb_curdir, path, sizeof(smb_curdir)-1);
 	}
 
 io_unlock:

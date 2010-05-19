@@ -261,9 +261,13 @@ int GetSMBServerReply(void)
 	if (rcv_size <= 0)
 		return -1;
 
+receive:
 	rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
 	if (rcv_size <= 0)
 		return -2;
+
+	if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
+		goto receive;
 
 	// Handle fragmented packets
 	totalpkt_size = rawTCP_GetSessionHeader() + 4;
@@ -494,8 +498,12 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		RR->ByteCount = 0;
 		RR->OffsetHigh = 0;
 
-		plwip_send(main_socket, SMB_buf, 63, 0); 
+		plwip_send(main_socket, SMB_buf, 63, 0);
+receive:
 		rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
+
+		if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
+			goto receive;
 
 		// Handle fragmented packets
 		while (rcv_size < (rawTCP_GetSessionHeader() + 4)) {

@@ -646,9 +646,13 @@ static int GetSMBServerReply(void)
 	if (rcv_size <= 0)
 		return -1;
 
+receive:
 	rcv_size = RecvTimeout(main_socket, SMB_buf, sizeof(SMB_buf), 10000); // 10s before the packet is considered lost
 	if (rcv_size <= 0)
 		return -2;
+
+	if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
+		goto receive;
 
 	// Handle fragmented packets
 	totalpkt_size = rawTCP_GetSessionHeader() + 4;

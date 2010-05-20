@@ -10,7 +10,11 @@
 
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
+#ifdef INGAME_DRIVER
 #define MEM_SIZE 0x2000
+#else
+#define MEM_SIZE 0x3000
+#endif
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
    sends a lot of data out of ROM (or other static memory), this
@@ -19,15 +23,27 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
+#ifdef INGAME_DRIVER
 #define MEMP_NUM_UDP_PCB 1
+#else
+#define MEMP_NUM_UDP_PCB 4
+#endif
 
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
-#define MEMP_NUM_TCP_PCB 1 
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_TCP_PCB 1
+#else
+#define MEMP_NUM_TCP_PCB 5
+#endif 
 
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
+#ifdef INGAME_DRIVER
 #define MEMP_NUM_TCP_PCB_LISTEN 1
+#else
+#define MEMP_NUM_TCP_PCB_LISTEN 8
+#endif
 
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
@@ -146,7 +162,11 @@ a lot of data that needs to be copied, this should be set high. */
 #endif
 
 /* ---------- UDP options ---------- */
+#ifdef INGAME_DRIVER
 #define LWIP_UDP                0
+#else
+#define LWIP_UDP                1
+#endif
 #define UDP_TTL                 255
 
 

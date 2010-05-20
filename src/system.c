@@ -55,6 +55,9 @@ extern int size_smsutils_irx;
 extern void *smstcpip_irx;
 extern int size_smstcpip_irx;
 
+extern void *ingame_smstcpip_irx;
+extern int size_ingame_smstcpip_irx;
+
 extern void *smsmap_irx;
 extern int size_smsmap_irx;
 
@@ -713,6 +716,7 @@ void LaunchHDDGame(hdl_game_info_t *game, void* gameid)
 	FlushCache(0);
 
 	LaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, game->ops2l_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1);
+
 } 
 
 int ExecElf(char *path, int argc, char **argv)
@@ -782,7 +786,7 @@ void SendIrxKernelRAM(int size_irx, void *irx) // Send IOP modules that core mus
 	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
 	irxptr_tab[n++].irxsize = size_ps2dev9_irx;
-	irxptr_tab[n++].irxsize = size_smstcpip_irx;
+	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
 	irxptr_tab[n++].irxsize = size_smsmap_irx;
 	irxptr_tab[n++].irxsize = size_netlog_irx;
 
@@ -794,7 +798,7 @@ void SendIrxKernelRAM(int size_irx, void *irx) // Send IOP modules that core mus
 	irxsrc[n++] = (void *)&cddev_irx;
 	irxsrc[n++] = (void *)usbd_irx;
 	irxsrc[n++] = (void *)&ps2dev9_irx;
-	irxsrc[n++] = (void *)&smstcpip_irx;
+	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
 	irxsrc[n++] = (void *)&smsmap_irx;
 	irxsrc[n++] = (void *)&netlog_irx;
 

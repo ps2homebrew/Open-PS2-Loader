@@ -6,7 +6,7 @@ EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/unzip.o obj/explode.o obj/unreduce.o obj/unshrink.o obj/loader.o obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o obj/dia.o \
 		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
-		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
+		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
 		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/iomanx.o obj/filexio.o obj/util.o\
 		  obj/font.o obj/font_cyrillic.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
 		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
@@ -53,7 +53,8 @@ clean:
 	echo "    * SMSUTILS.irx"
 	$(MAKE) -C modules/SMSUTILS clean
 	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/SMSTCPIP clean
+	$(MAKE) -C modules/SMSTCPIP -f Makefile clean
+	$(MAKE) -C modules/SMSTCPIP -f Makefile.ingame clean
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/SMSMAP clean
 	echo "    * netlog.irx"
@@ -167,9 +168,14 @@ smsutils.s:
 
 smstcpip.s:
 	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/SMSTCPIP
+	$(MAKE) -C modules/SMSTCPIP -f Makefile rebuild
 	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/smstcpip.s smstcpip_irx
-		
+
+ingame_smstcpip.s:
+	echo "    * in-game SMSTCPIP.irx"
+	$(MAKE) -C modules/SMSTCPIP -f Makefile.ingame rebuild
+	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
+
 smsmap.s:
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/SMSMAP

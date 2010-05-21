@@ -144,7 +144,7 @@ int handle_tcp_client(int tcp_client_socket)
 
 	while (1) {
 		size = recv_nonblocking(tcp_client_socket, &tcp_buf[0], sizeof(tcp_buf));
-		if (size <= 0)
+		if (size < 0)
 			goto error;
 
 		if (size == CMD_SIZE) {
@@ -170,6 +170,17 @@ int handle_tcp_client(int tcp_client_socket)
 					else
 						pkt->hdr.result = pkt->hdr.num_sectors;
 					send_response(tcp_client_socket, &tcp_buf[0], sizeof(tcp_packet_t));
+					break;
+
+				case CMD_FLSH:
+					devctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
+					break;
+
+				case CMD_POWX:
+					devctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
+					devctl("hdd0:", APA_DEVCTL_DEV9_SHUTDOWN, NULL, 0, NULL, 0);
+					*((volatile u8 *)0xbf402017) = 0x00;
+					*((volatile u8 *)0xbf402016) = 0x0f;
 					break;
 
 				default:

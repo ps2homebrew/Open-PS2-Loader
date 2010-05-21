@@ -3,6 +3,7 @@
 
 #include <irx.h>
 
+#include <iomanX.h>
 #include <loadcore.h>
 #include <ps2ip.h>
 #include <sysclib.h>

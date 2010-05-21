@@ -154,8 +154,9 @@ int handle_tcp_client(int tcp_client_socket)
 				case CMD_STAT:
 					r = devctl("hdd0:", APA_DEVCTL_TOTAL_SECTORS, NULL, 0, NULL, 0);
 					if (r < 0)
-						r = -1;
-					pkt->hdr.result = r >> 1;
+						pkt->hdr.result = -1;
+					else
+						pkt->hdr.result = r >> 1;
 					send_response(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
 					break;
 
@@ -165,8 +166,9 @@ int handle_tcp_client(int tcp_client_socket)
 
 					r = devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, pkt->data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
 					if (r < 0)
-						r = -1;
-					pkt->hdr.result = pkt->hdr.num_sectors;
+						pkt->hdr.result = -1;
+					else
+						pkt->hdr.result = pkt->hdr.num_sectors;
 					send_response(tcp_client_socket, &tcp_buf[0], sizeof(tcp_packet_t));
 					break;
 

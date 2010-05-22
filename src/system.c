@@ -85,6 +85,9 @@ extern int size_ps2atad_irx;
 extern void *ps2hdd_irx;
 extern int size_ps2hdd_irx;
 
+extern void *hdldsvr_irx;
+extern int size_hdldsvr_irx;
+
 extern void *loader_elf;
 extern int size_loader_elf;
 
@@ -361,7 +364,7 @@ int SMBconnect(void)
 {
 	int ret;
 	smbConnect_in_t connect;
-	smbEcho_in_t echo;
+	//smbEcho_in_t echo;
 	smbLogOn_in_t logon;
 	smbOpenShare_in_t openshare;
 
@@ -374,13 +377,15 @@ int SMBconnect(void)
 		return -1;
 
 	// SMB server alive test
-	/*strcpy(echo.echo, "ALIVE ECHO TEST");
+	/*
+	strcpy(echo.echo, "ALIVE ECHO TEST");
 	echo.len = strlen("ALIVE ECHO TEST");
 
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
 	if (ret < 0)
 		return -2;
 	*/
+
 	// logon to SMB server
 	strcpy(logon.User, "GUEST");
 	logon.PasswordType = NO_PASSWORD;

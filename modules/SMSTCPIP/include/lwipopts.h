@@ -26,7 +26,7 @@ a lot of data that needs to be copied, this should be set high. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_UDP_PCB 1
 #else
-#define MEMP_NUM_UDP_PCB 4
+#define MEMP_NUM_UDP_PCB 15
 #endif
 
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
@@ -34,7 +34,7 @@ a lot of data that needs to be copied, this should be set high. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_TCP_PCB 1
 #else
-#define MEMP_NUM_TCP_PCB 5
+#define MEMP_NUM_TCP_PCB 15
 #endif 
 
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
@@ -42,7 +42,7 @@ a lot of data that needs to be copied, this should be set high. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_TCP_PCB_LISTEN 1
 #else
-#define MEMP_NUM_TCP_PCB_LISTEN 8
+#define MEMP_NUM_TCP_PCB_LISTEN 15
 #endif
 
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
@@ -72,7 +72,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
-#define PBUF_POOL_SIZE         12
+#define PBUF_POOL_SIZE         25
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
 //Boman666: Should be atleast 1518 to be compatible with ps2smap

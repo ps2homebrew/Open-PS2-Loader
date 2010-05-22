@@ -9,6 +9,7 @@ loadcore_IMPORTS_end
 
 ps2ip_IMPORTS_start
 I_lwip_recv
+I_lwip_recvfrom
 I_lwip_send
 I_lwip_close
 I_lwip_socket
@@ -36,6 +37,7 @@ thsemap_IMPORTS_end
 sysclib_IMPORTS_start
 I_memset
 I_memcpy
+I_strlen
 sysclib_IMPORTS_end
 
 //stdio_IMPORTS_start

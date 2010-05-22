@@ -374,13 +374,13 @@ int SMBconnect(void)
 		return -1;
 
 	// SMB server alive test
-	strcpy(echo.echo, "ALIVE ECHO TEST");
+	/*strcpy(echo.echo, "ALIVE ECHO TEST");
 	echo.len = strlen("ALIVE ECHO TEST");
 
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
 	if (ret < 0)
 		return -2;
-
+	*/
 	// logon to SMB server
 	strcpy(logon.User, "GUEST");
 	logon.PasswordType = NO_PASSWORD;

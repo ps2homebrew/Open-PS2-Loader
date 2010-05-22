@@ -807,6 +807,12 @@ int hddDevctl(iop_file_t *f, const char *devname, int cmd, void *arg,
 	case APA_DEVCTL_SET_TRANSFER_MODE:
 		rv=atadSetTransferMode(f->unit, ((hddAtaSetMode_t *)arg)->type, ((hddAtaSetMode_t *)arg)->mode);
 		break;
+
+	case APA_DEVCTL_ATA_IOP_WRITE:
+		rv=atadDmaTransfer(f->unit, ((hddAtaIOPTransfer_t *)arg)->data,
+			((hddAtaIOPTransfer_t *)arg)->lba, ((hddAtaIOPTransfer_t *)arg)->size,
+				ATAD_MODE_WRITE);
+		break;
 		
 	default:
 		rv=-EINVAL;

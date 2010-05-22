@@ -58,6 +58,7 @@ struct irx_export_table _exp_hdldsvr;
 #define APA_DEVCTL_SCE_IDENTIFY_DRIVE	0x00006838	// bufp = buffer for atadSceIdentifyDrive 
 #define APA_DEVCTL_IS_48BIT		0x00006840
 #define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
+#define APA_DEVCTL_ATA_IOP_WRITE	0x00006842
 
 
 void tcp_server_thread(void *args);
@@ -254,15 +255,32 @@ static int handle_tcp_client(int tcp_client_socket)
 			// 'read' command
 			// ------------------------------------------------
 			case CMD_READ:
+				// set up buffer
+				gstats.data = (u8 *)(((long)&gstats.buffer + HDD_SECTOR_SIZE - 1) & ~(HDD_SECTOR_SIZE - 1));
+
 				*(u32 *)&args[0] = pkt->hdr.start_sector;
 				*(u32 *)&args[4] = pkt->hdr.num_sectors;
 
-				r = devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, pkt->data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
-				if (r < 0)
-					pkt->hdr.result = -1;
-				else
-					pkt->hdr.result = pkt->hdr.num_sectors;
-				ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(tcp_packet_t));
+				if (pkt->hdr.num_sectors > 2) {
+					r = devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, gstats.data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
+					if (r < 0)
+						pkt->hdr.result = -1;
+					else
+						pkt->hdr.result = pkt->hdr.num_sectors;
+
+					ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
+					if (r == 0)
+						ack_tcp_command(tcp_client_socket, gstats.data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
+				}
+				else {
+					r = devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, pkt->data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
+					if (r < 0)
+						pkt->hdr.result = -1;
+					else
+						pkt->hdr.result = pkt->hdr.num_sectors;
+
+					ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(tcp_packet_t));
+				}
 
 				break;
 
@@ -306,7 +324,9 @@ static int handle_tcp_client(int tcp_client_socket)
 					u32 *out = gstats.bitmask_copy;
 					for (i=0; i<(NET_NUM_SECTORS+31)/32; ++i)
 						out[i] = gstats.bitmask[i];
+
 					memcpy(pkt->data, (void *)out, sizeof(gstats.bitmask_copy));
+
 					pkt->hdr.result = 0;
       					r = ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header)+sizeof(gstats.bitmask));
 					if (r < 0) {
@@ -320,11 +340,18 @@ static int handle_tcp_client(int tcp_client_socket)
 				else {
 					pkt->hdr.result = pkt->hdr.num_sectors;
 
+				#ifdef FAKE_WRITES
 					// fake write, we read instead
 					*(u32 *)&args[0] = pkt->hdr.start_sector;
 					*(u32 *)&args[4] = pkt->hdr.num_sectors;
 					devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, gstats.data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
-
+				#else
+					// !!! real writes !!!
+					*(u32 *)&args[0] = pkt->hdr.start_sector;
+					*(u32 *)&args[4] = pkt->hdr.num_sectors;
+					*(u32 *)&args[8] = (u32)gstats.data;
+					devctl("hdd0:", APA_DEVCTL_ATA_IOP_WRITE, args, 8+(pkt->hdr.num_sectors*HDD_SECTOR_SIZE), NULL, 0);
+				#endif
 					ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
 				}
 				break;

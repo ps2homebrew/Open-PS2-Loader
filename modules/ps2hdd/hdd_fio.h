@@ -62,6 +62,7 @@ typedef struct
 //#define APA_DEVCTL_FREE_SECTORS2		0x00006839 
 #define APA_DEVCTL_IS_48BIT				0x00006840
 #define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
+#define APA_DEVCTL_ATA_IOP_WRITE	0x00006842
 
 // structs for DEVCTL commands
 
@@ -71,6 +72,13 @@ typedef struct
 	u32 size;
 	u8 data[0];
 } hddAtaTransfer_t; 
+
+typedef struct
+{
+	u32 lba;
+	u32 size;
+	u8 *data;
+} hddAtaIOPTransfer_t; 
 
 typedef struct
 {

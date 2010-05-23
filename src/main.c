@@ -810,26 +810,6 @@ int RefreshHDDGameList() {
 }
 
 // --------------------- USB Menu item callbacks --------------------
-void FindUSBPartition() {
-	int i, fd;
-	char path[64];
-	
-	snprintf(USB_prefix,8,"mass0:");
-	
-	for(i=0;i<5;i++){
-		snprintf(path, 64, "mass%d:/ul.cfg", i);
-		fd=fioOpen(path, O_RDONLY);
-		
-		if(fd>=0) {
-			snprintf(USB_prefix,8,"mass%d:",i);
-			fioClose(fd);
-			break;
-		}
-	}
-	
-	return;
-}
-
 void ClearUSBSubMenu() {
 	ClearSubMenu(&usb_submenu, &usb_games_item);
 }
@@ -928,17 +908,10 @@ void AltExecETHGameSelection(struct menu_item_t* self, int id) {
 
 
 // --------------------- HDD Menu item callbacks --------------------
-void StartHdd() {
-	// For Testing HDD
-	LoadHddModules();
-
-	hddfound = !hddCheck();
-}
-
 void ExecHDDGameSelection(struct menu_item_t* self, int id) {
 	if (id == -1) {
 		if (!hdd_inited) {
-			StartHdd();
+			hddfound = StartHdd();
 			hdd_inited = 1;
 			
 			if (hddfound) {
@@ -1186,7 +1159,7 @@ void init() {
 	// HDD startup
 	if (gUseHdd && gHddAutostart) {
 		hdd_inited = 1;
-		StartHdd();
+		hddfound = StartHdd();
 	}
 
 	// initialize menu

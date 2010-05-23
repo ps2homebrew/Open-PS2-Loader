@@ -360,6 +360,44 @@ void LoadUsbModules(void)
 	delay(3);
 }
 
+void LoadHdldSvr(void)
+{
+	int ret, id;
+	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+
+	Reset();
+
+	set_ipconfig();
+
+    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		return;
+
+	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		return;
+
+	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		return;
+
+	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
+	if ((id < 0) || ret)
+		return;
+
+	id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		return;
+
+	id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
+	if ((id < 0) || ret)
+		return;
+
+	id=SifExecModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL, &ret);
+	if ((id < 0) || ret)
+		return;
+}
+
 int SMBconnect(void)
 {
 	int ret;

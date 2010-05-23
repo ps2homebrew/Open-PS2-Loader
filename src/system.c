@@ -5,6 +5,7 @@
 */
 
 #include "include/usbld.h"
+#include "include/pad.h"
 #include "include/smbman.h"
 
 extern void *imgdrv_irx;
@@ -325,6 +326,13 @@ void LoadHddModules(void)
 	gHddStartup = 0;
 }
 
+int StartHdd(void) {
+
+	LoadHddModules();
+
+	return !hddCheck();
+}
+
 void LoadUsbModules(void)
 {
 	int fd, ps3model;
@@ -360,22 +368,37 @@ void LoadUsbModules(void)
 	delay(3);
 }
 
+void FindUSBPartition(void) {
+	int i, fd;
+	char path[64];
+	
+	snprintf(USB_prefix,8,"mass0:");
+	
+	for(i=0;i<5;i++){
+		snprintf(path, 64, "mass%d:/ul.cfg", i);
+		fd=fioOpen(path, O_RDONLY);
+		
+		if(fd>=0) {
+			snprintf(USB_prefix,8,"mass%d:",i);
+			fioClose(fd);
+			break;
+		}
+	}
+	
+	return;
+}
+
 void LoadHdldSvr(void)
 {
 	int ret, id;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
+	unloadPads();
+
 	Reset();
 
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 	SifLoadModule("rom0:PADMAN", 0, NULL);
-
-	padInit(0);
-
-	// init all pads
-	ret = 0;
-	while (!ret)
-		ret = startPads();
 
 	set_ipconfig();
 
@@ -406,12 +429,20 @@ void LoadHdldSvr(void)
 	id=SifExecModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL, &ret);
 	if ((id < 0) || ret)
 		return;
+
+	padInit(0);
+
+	// init all pads
+	ret = 0;
+	while (!ret)
+		ret = startPads();
 }
 
-void UnloadHdldSvr(void)
+void UnloadHdldSvr(int hdd_init, int network_init)
 {
-	int ret, id;
-	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+	int ret;
+
+	unloadPads();
 
 	Reset();
 
@@ -423,7 +454,19 @@ void UnloadHdldSvr(void)
 
 	LoadUsbModules();
 
+	delay(3);
+
 	FindUSBPartition();
+
+	// HDD resume
+	if (hdd_init)
+		StartHdd();
+
+	// Network resume
+	if (network_init) {
+		LoadNetworkModules();
+		SMBconnect();
+	}
 
 	padInit(0);
 
@@ -431,16 +474,6 @@ void UnloadHdldSvr(void)
 	ret = 0;
 	while (!ret)
 		ret = startPads();
-
-	// HDD resume
-	if (hdd_inited)
-		StartHdd();
-
-	// Network resume
-	if (eth_inited) {
-		LoadNetworkModules();
-		SMBconnect();
-	}
 }
 
 int SMBconnect(void)

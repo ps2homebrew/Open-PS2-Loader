@@ -367,6 +367,16 @@ void LoadHdldSvr(void)
 
 	Reset();
 
+	SifLoadModule("rom0:SIO2MAN", 0, NULL);
+	SifLoadModule("rom0:PADMAN", 0, NULL);
+
+	padInit(0);
+
+	// init all pads
+	ret = 0;
+	while (!ret)
+		ret = startPads();
+
 	set_ipconfig();
 
     	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
@@ -396,6 +406,41 @@ void LoadHdldSvr(void)
 	id=SifExecModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL, &ret);
 	if ((id < 0) || ret)
 		return;
+}
+
+void UnloadHdldSvr(void)
+{
+	int ret, id;
+	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+
+	Reset();
+
+	SifLoadModule("rom0:SIO2MAN", 0, NULL);
+	SifLoadModule("rom0:MCMAN", 0, NULL);
+	SifLoadModule("rom0:MCSERV", 0, NULL);
+	SifLoadModule("rom0:PADMAN", 0, NULL);
+	mcInit(MC_TYPE_MC);
+
+	LoadUsbModules();
+
+	FindUSBPartition();
+
+	padInit(0);
+
+	// init all pads
+	ret = 0;
+	while (!ret)
+		ret = startPads();
+
+	// HDD resume
+	if (hdd_inited)
+		StartHdd();
+
+	// Network resume
+	if (eth_inited) {
+		LoadNetworkModules();
+		SMBconnect();
+	}
 }
 
 int SMBconnect(void)

@@ -199,6 +199,7 @@ void LoadNetworkModules(void);
 void LoadHddModules(void);
 void LoadUsbModules(void);
 void LoadHdldSvr(void);
+void UnloadHdldSvr(void);
 int SMBconnect(void);
 int SMBdisconnect(void);
 int getDiscID(void *discID);

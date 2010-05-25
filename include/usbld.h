@@ -174,6 +174,7 @@ int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddIs48bit(void);
 int hddSetTransferMode(int type, int mode);
+int hddFormat(void);
 int hddGetHDLGamelist(hdl_games_list_t **game_list);
 int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo);
 

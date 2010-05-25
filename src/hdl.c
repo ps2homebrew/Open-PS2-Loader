@@ -121,6 +121,13 @@ typedef struct				// size = 1024
 
 static apa_partition_table_t *ptable = NULL;
 
+// chunks_map
+#define	MAP_AVAIL	'.'
+#define	MAP_MAIN	'M'
+#define	MAP_SUB		's'
+#define	MAP_COLL	'x'
+#define	MAP_ALLOC	'*'
+
 static u8 hdd_buf[16384];
 
 //-------------------------------------------------------------------------
@@ -199,6 +206,12 @@ static int hddFlushCache(void)
 }
 
 //-------------------------------------------------------------------------
+int hddFormat(void)
+{
+	return fileXioDevctl("hdd0:", APA_DEVCTL_FORMAT, NULL, 0, NULL, 0);
+}
+
+//-------------------------------------------------------------------------
 static int apaCheckSum(apa_header *header)
 {
 	u32 *ptr=(u32 *)header;
@@ -211,30 +224,51 @@ static int apaCheckSum(apa_header *header)
 }
 
 //-------------------------------------------------------------------------
-static int apaAddPartition(apa_partition_table_t *table, apa_header *header, int existing, int linked)
+static int apaAddPartition(apa_partition_table_t *table, apa_header *header, int existing)
 {
-	if (table->part_count == table->part_alloc_) { // grow buffer
-		u32 bytes = (table->part_alloc_ + 16) * sizeof(apa_partition_t);
-		apa_partition_t *tmp = malloc(bytes);
-		if(tmp != NULL)
-		{
-			memset(tmp, 0, bytes);
-			if (table->parts != NULL) // copy existing
-				memcpy(tmp, table->parts, table->part_count * sizeof(apa_partition_t));
+	register u32 nbytes;
+
+	if (table->part_count == table->part_alloc_) {
+
+		// grow buffer of 16 parts
+		nbytes = (table->part_alloc_ + 16) * sizeof(apa_partition_t);
+		apa_partition_t *parts = malloc(nbytes);
+		if(parts != NULL) {
+
+			memset(parts, 0, nbytes);
+
+			// copy existing parts
+			if (table->parts != NULL)
+				memcpy(parts, table->parts, table->part_count * sizeof(apa_partition_t));
+
+			// free old parts mem
 			free(table->parts);
-			table->parts = tmp;
+			table->parts = parts;
 			table->part_alloc_ += 16;
 		}
-		else return -2;
+		else 
+			return -2;
 	}
 
+	// copy the part to its buffer
 	memcpy(&table->parts[table->part_count].header, header, sizeof(apa_header));
 	table->parts[table->part_count].existing = existing;
 	table->parts[table->part_count].modified = !existing;
-	table->parts[table->part_count].linked = linked;
-	++table->part_count;
+	table->parts[table->part_count].linked = 1;
+	table->part_count++;
 
 	return 0;
+}
+
+//-------------------------------------------------------------------------
+static void apaFreePartitionTable(apa_partition_table_t *table)
+{
+	register int i;
+
+	for (i=0; i<table->part_count; i++) {
+		if (table->parts)
+			free(table->parts);
+	}
 }
 
 //-------------------------------------------------------------------------
@@ -243,24 +277,34 @@ static int apaReadPartitionTable(apa_partition_table_t **table)
 	register u32 nsectors, lba;
 	register int ret;
 
+	// get number of sectors on device
 	nsectors = hddGetTotalSectors();
-	lba = 0;
 
-	*table = malloc(sizeof(apa_partition_table_t));
+	// if not already done allocate space for the partition table
 	if (*table == NULL) {
-		return -2;
+		*table = malloc(sizeof(apa_partition_table_t));
+		if (*table == NULL) {
+			return -2;
+		}
 	}
+	else // if partition table was already allocated, Free all 
+		apaFreePartitionTable(*table);
 
+	// clear the partition table
 	memset(*table, 0, sizeof(apa_partition_table_t));
 
+	// read the partition table
+	lba = 0;
 	do {
 		apa_header apaHeader;
+		// read partition header
 		ret = hddReadSectors(lba, sizeof(apa_header) >> 9, &apaHeader, sizeof(apa_header));
 		if (ret == 0) {
+			// check checksum & header magic
 			if ((apaCheckSum(&apaHeader) == apaHeader.checksum) && (apaHeader.magic == APA_MAGIC)) {
 				if (apaHeader.start < nsectors) {
-					if ((apaHeader.flags == 0) && (apaHeader.type == 0x1337))
-						ret = apaAddPartition(*table, &apaHeader, 1, 1);
+					//if ((apaHeader.flags == 0) && (apaHeader.type == 0x1337))
+						ret = apaAddPartition(*table, &apaHeader, 1);
 					if (ret == 0)
 						lba = apaHeader.next;
 				}
@@ -285,6 +329,212 @@ static int apaReadPartitionTable(apa_partition_table_t **table)
 	}
 
 	return ret;	
+}
+
+//-------------------------------------------------------------------------
+static int apaCheckLinkedList(apa_partition_table_t *table, int flag)
+
+{
+	register int i;
+
+	for (i=0; i<table->part_count; i++) {
+		apa_partition_t *prev = table->parts + (i > 0 ? i - 1 : table->part_count - 1);
+		apa_partition_t *curr = table->parts + i;
+		apa_partition_t *next = table->parts + (i + 1 < table->part_count ? i + 1 : 0);
+
+		if (curr->header.prev != prev->header.start) {
+			if (!flag)
+				return -1;
+			else {
+				curr->modified = 1;
+				curr->header.prev = prev->header.start;
+			}
+		}
+		if (curr->header.next != next->header.start) {
+			if (!flag)
+				return -1;
+			else {
+				curr->modified = 1;
+				curr->header.next = next->header.start;
+			}
+		}
+		if ((flag) && (curr->modified))
+			curr->header.checksum = apaCheckSum(&curr->header);
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+static int apaCheckPartitionTable(apa_partition_table_t *table)
+{
+	register int i, j, k;
+
+	u32 total_sectors = table->device_size_in_mb * 1024 * 2;
+
+	for (i=0; i<table->part_count; i++) {
+		apa_header *part_hdr = &table->parts[i].header;
+
+		// check checksum
+		if (part_hdr->checksum != apaCheckSum(part_hdr))
+			return -1;
+
+		// check for data behind end of HDD
+		if (!((part_hdr->start < total_sectors) && (part_hdr->start + part_hdr->length <= total_sectors)))
+			return -2;
+
+		// check partition length is multiple of 128 MB
+		if ((part_hdr->length % ((128 * 1024 * 1024) / 512)) != 0)
+			return -3;
+
+		// check partition start is multiple of partion length
+		if ((part_hdr->start % part_hdr->length) != 0)
+			return -4;
+
+		// check all subs partitions
+		if ((part_hdr->main == 0) && (part_hdr->flags == 0) && (part_hdr->start != 0)) {
+			int count = 0;
+
+			for (j=0; j<table->part_count; j++) {
+				apa_header *part2_hdr = &table->parts[j].header;
+				if (part2_hdr->main == part_hdr->start) { // sub-partition of current main partition
+					int found;
+					if (part2_hdr->flags != APA_FLAG_SUB)
+						return -5;
+
+					found = 0;
+					for (k=0; k<part_hdr->nsub; k++) {
+						if (part_hdr->subs[k].start == part2_hdr->start) { // in list
+							if (part_hdr->subs[k].length != part2_hdr->length)
+								return -6;
+							found = 1;
+							break;
+						}
+					}
+					if (!found)
+						return -7; // not found in the list
+
+					count++;
+				}
+			}
+			if (count != part_hdr->nsub)
+				return -8; // wrong number of sub-partitions
+		}
+	}
+
+	// verify double-linked list
+	if (apaCheckLinkedList(table, 0) < 0)
+		return -9; // bad links
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+static int apaWritePartitionTable(apa_partition_table_t *table)
+{
+	register int ret, i;
+
+	ret = apaCheckPartitionTable(table);
+	if (ret < 0)
+		return ret;
+
+	for (i=0; i<table->part_count; i++) {
+
+		if (ret == 0)
+			break;
+
+		if (table->parts[i].modified) {
+			apa_header *part_hdr = &table->parts[i].header;
+			ret = hddWriteSectors(part_hdr->start, 2, (void *)part_hdr);
+			if (ret < 0)
+				return -10;
+		}
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
+static int apaFindPartition(apa_partition_table_t *table, char *partname)
+{
+	register int ret, i;
+
+	ret = -1;
+
+	for (i=0; i<table->part_count; i++) {
+
+		apa_header *part_hdr = &table->parts[i].header;
+
+		// if part found, return its index
+		if ((part_hdr->main == 0) && (!strcmp(part_hdr->id, partname))) {
+			ret = i;
+			break;
+		}
+	}
+
+	return ret;
+}
+
+//-------------------------------------------------------------------------
+static int apaDeletePartition(apa_partition_table_t *table, char *partname)
+{
+	register int i, part_index;
+	register int count = 1;
+	u32 pending_deletes[APA_MAXSUB];
+
+	// retrieve part index
+	part_index = apaFindPartition(table, partname);
+	if (part_index < 0)
+		return -1;
+     
+	apa_header *part_hdr = &table->parts[part_index].header;
+
+	// Do not delete system partitions
+	if (part_hdr->type == 1)
+		return -2;
+
+	// preserve a list of starting sectors of partitions to be deleted
+	pending_deletes[0] = part_hdr->start;
+	for (i=0; i<part_hdr->nsub; i++)
+		pending_deletes[count++] = part_hdr->subs[i].start;
+
+	// remove partitions from the double-linked list
+	i = 0;
+	while (i<table->part_count) {
+		int j;
+		int found = 0;
+
+		for (j=0; j<count; j++) {
+			if (table->parts[i].header.start == pending_deletes[j]) {
+				found = 1;
+				break;
+			}
+		}
+
+		if (found) { 
+			// remove this partition
+			int part_num = table->parts[i].header.start / 262144; // 262144 sectors == 128M
+			int num_parts = table->parts[i].header.length / 262144;
+
+			memmove(table->parts + i, table->parts + i + 1, sizeof(apa_partition_t) * (table->part_count - i - 1));
+			table->part_count--;
+
+			// "free" num_parts starting at part_no
+			while (num_parts) {
+				table->chunks_map[part_num] = MAP_AVAIL;
+				part_num++;
+				num_parts--;
+				table->allocated_chunks--;
+				table->free_chunks++;
+			}
+		}
+		else
+			i++;
+	}
+
+	apaCheckLinkedList(table, 1);
+
+	return 0;
 }
 
 //-------------------------------------------------------------------------
@@ -336,6 +586,13 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 
 		u32 i, count = 0;
 		void *tmp;
+
+		if (*game_list != NULL) {
+			for (i = 0; i < (*game_list)->count; i++) {
+				if ((*game_list)->games != NULL)
+					free((*game_list)->games);
+			}
+		}
 
 		for (i = 0; i < ptable->part_count; i++)
 			count += ((ptable->parts[i].header.flags == 0) && (ptable->parts[i].header.type == 0x1337));
@@ -412,3 +669,24 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 
  	return 0;
 }
+
+//-------------------------------------------------------------------------
+// !!! UNTESTED: DO NOT USE !!!
+static int hddDeleteHDLGame(hdl_game_info_t *ginfo)
+{
+	register int ret;
+
+	if (ptable == NULL)
+		return -1;
+
+	ret = apaDeletePartition(ptable, ginfo->partition_name);
+	if (ret < 0)
+		return -2;
+
+	ret = apaWritePartitionTable(ptable);
+	if (ret < 0)
+		return -3;
+
+	return 0;
+}
+

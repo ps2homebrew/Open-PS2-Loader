@@ -206,7 +206,7 @@ static int hddFlushCache(void)
 }
 
 //-------------------------------------------------------------------------
-int hddFormat(void)
+int hddGetFormat(void)
 {
 	return fileXioDevctl("hdd0:", APA_DEVCTL_FORMAT, NULL, 0, NULL, 0);
 }

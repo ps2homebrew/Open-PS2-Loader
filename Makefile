@@ -5,7 +5,7 @@ DEBUG = 0
 FT_DIR = thirdparty/freetype-2.3.12
 FT_LIBDIR = $(FT_DIR)/objs
 
-FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/dialogs.o \
+FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o
 

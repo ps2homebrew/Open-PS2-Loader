@@ -96,7 +96,7 @@ static void ethLoadModules(void) {
 
 	// update Themes
 	char path[32];
-	sprintf(path, "%sTHM", ethPrefix);
+	sprintf(path, "%sTHM\\\\", ethPrefix);
 	thmAddElements(path, "\\\\");
 }
 

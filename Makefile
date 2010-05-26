@@ -1,31 +1,68 @@
 .SILENT:
 
-EE_BIN = main.elf
+DEBUG = 0
+
+FT_DIR = thirdparty/freetype-2.3.12
+FT_LIBDIR = $(FT_DIR)/objs
+
+FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/dialogs.o \
+		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o
+
+GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o obj/disc_icon.o \
+		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
+		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
+		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/freesans.o
+
+LOADER_OBJS = obj/loader.o \
+		obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
+		obj/usb_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
+		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
+		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
+
+EE_BIN = opl.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = obj/main.o obj/pad.o obj/gfx.o obj/system.o obj/lang.o obj/config.o obj/hdl.o obj/unzip.o obj/explode.o obj/unreduce.o obj/unshrink.o obj/loader.o obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o obj/dia.o \
-		  obj/usb_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
-		  obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
-		  obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/iomanx.o obj/filexio.o obj/util.o\
-		  obj/font.o obj/font_cyrillic.o obj/exit_icon.o obj/config_icon.o obj/games_icon.o obj/disc_icon.o obj/theme_icon.o obj/language_icon.o \
-		  obj/apps_icon.o obj/menu_icon.o obj/scroll_icon.o obj/usb_icon.o obj/save_icon.o obj/netconfig_icon.o obj/network_icon.o \
-		  obj/cross_icon.o obj/circle_icon.o obj/triangle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
-		  obj/up_dn_icon.o obj/lt_rt_icon.o
-EE_LIBS = $(PS2SDK)/ports/lib/libz.a $(GSKIT)/lib/libgskit.a $(GSKIT)/lib/libdmakit.a $(GSKIT)/lib/libgskit_toolkit.a -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lc
-EE_INCS += -I $(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
+EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(LOADER_OBJS)
+
+EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux
+#EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(FT_DIR)/include
+
+ifeq ($(DEBUG),1)
+EE_CFLAGS := -D__DEBUG -g
+else
+EE_CFLAGS := -O2
+endif
 
 all:
 	@mkdir -p obj
 	@mkdir -p asm
+
+	echo "Building Freetype..."
+	$(MAKE) -C $(FT_DIR) setup ps2 > /dev/null
+	$(MAKE) -C $(FT_DIR)
+	
 	echo "Building Open PS2 Loader..."
 	echo "    * Interface"
 	$(MAKE) $(EE_BIN)
-	echo "Compressing..."
-	ps2-packer main.elf OPNPS2LD.ELF > /dev/null
+	
+ifeq ($(DEBUG),0)
+	echo "Stripping..."
+	ee-strip opl.elf
 
+	echo "Compressing..."
+	ps2-packer opl.elf OPNPS2LD.ELF > /dev/null
+endif
+
+debug:
+	$(MAKE) DEBUG=1 all
+	
 clean:
 	echo "Cleaning..."
+	echo "    * Freetype..."
+	$(MAKE) -C $(FT_DIR) distclean
 	echo "    * Interface"
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"
@@ -78,11 +115,11 @@ rebuild: clean all
 
 pc_tools:
 	echo "Building iso2opl and opl2iso..."
-	$(MAKE) -C pc
+	$(MAKE) _WIN32=0 -C pc
 
-smb_lab:
-	echo "Building smblab..."
-	$(MAKE) -C smblab rebuild
+pc_tools_win32:
+	echo "Building WIN32 iso2opl and opl2iso..."
+	$(MAKE) _WIN32=1 -C pc
 
 loader.s:
 	echo "    * Loader"
@@ -223,83 +260,105 @@ iomanx.s:
 filexio.s:
 	bin2s $(PS2SDK)/iop/irx/fileXio.irx asm/filexio.s filexio_irx
 
-font.s:
-	bin2s gfx/font.raw asm/font.s font_raw
-	
-font_cyrillic.s:
-	bin2s gfx/font_cyrillic.raw asm/font_cyrillic.s font_cyrillic_raw
-	
+ps2fs.s:
+	bin2s $(PS2SDK)/iop/irx/ps2fs.irx asm/ps2fs.s ps2fs_irx 
+
+
+load0.s:
+	bin2s gfx/load0.png asm/load0.s load0_png
+
+load1.s:
+	bin2s gfx/load1.png asm/load1.s load1_png
+
+load2.s:
+	bin2s gfx/load2.png asm/load2.s load2_png
+
+load3.s:
+	bin2s gfx/load3.png asm/load3.s load3_png
+
+load4.s:
+	bin2s gfx/load4.png asm/load4.s load4_png
+
+load5.s:
+	bin2s gfx/load5.png asm/load5.s load5_png
+
+load6.s:
+	bin2s gfx/load6.png asm/load6.s load6_png
+
+load7.s:
+	bin2s gfx/load7.png asm/load7.s load7_png
+		
 exit_icon.s:
-	bin2s gfx/exit.raw asm/exit_icon.s exit_raw
+	bin2s gfx/exit.png asm/exit_icon.s exit_png
 	
 config_icon.s:
-	bin2s gfx/config.raw asm/config_icon.s config_raw
+	bin2s gfx/config.png asm/config_icon.s config_png
 	
-games_icon.s:
-	bin2s gfx/games.raw asm/games_icon.s games_raw
-
-disc_icon.s:
-	bin2s gfx/disc.raw asm/disc_icon.s disc_raw
-	
-theme_icon.s:
-	bin2s gfx/theme.raw asm/theme_icon.s theme_raw
-	
-language_icon.s:
-	bin2s gfx/language.raw asm/language_icon.s language_raw
-
-apps_icon.s:
-	bin2s gfx/apps.raw asm/apps_icon.s apps_raw
-
-  
-menu_icon.s:
-	bin2s gfx/menu.raw asm/menu_icon.s menu_raw
-
-  
-scroll_icon.s:
-	bin2s gfx/scroll.raw asm/scroll_icon.s scroll_raw
-
-  
-usb_icon.s:
-	bin2s gfx/usb.raw asm/usb_icon.s usb_raw
-
 save_icon.s:
-	bin2s gfx/save.raw asm/save_icon.s save_raw
+	bin2s gfx/save.png asm/save_icon.s save_png
 
-netconfig_icon.s:
-	bin2s gfx/netconfig.raw asm/netconfig_icon.s netconfig_raw
-
-network_icon.s:
-	bin2s gfx/network.raw asm/network_icon.s network_raw
-
+usb_icon.s:
+	bin2s gfx/usb.png asm/usb_icon.s usb_png
+	
+hdd_icon.s:
+	bin2s gfx/hdd.png asm/hdd_icon.s hdd_png
+	
+eth_icon.s:
+	bin2s gfx/eth.png asm/eth_icon.s eth_png
+		
+app_icon.s:
+	bin2s gfx/app.png asm/app_icon.s app_png
+  
+disc_icon.s:
+	bin2s gfx/disc.png asm/disc_icon.s disc_png
+	
 cross_icon.s:
-	bin2s gfx/cross.raw asm/cross_icon.s cross_raw
-
-circle_icon.s:
-	bin2s gfx/circle.raw asm/circle_icon.s circle_raw
+	bin2s gfx/cross.png asm/cross_icon.s cross_png
 
 triangle_icon.s:
-	bin2s gfx/triangle.raw asm/triangle_icon.s triangle_raw
+	bin2s gfx/triangle.png asm/triangle_icon.s triangle_png
+
+circle_icon.s:
+	bin2s gfx/circle.png asm/circle_icon.s circle_png
 
 square_icon.s:
-	bin2s gfx/square.raw asm/square_icon.s square_raw
+	bin2s gfx/square.png asm/square_icon.s square_png
 
 select_icon.s:
-	bin2s gfx/select.raw asm/select_icon.s select_raw
+	bin2s gfx/select.png asm/select_icon.s select_png
 
 start_icon.s:
-	bin2s gfx/start.raw asm/start_icon.s start_raw
+	bin2s gfx/start.png asm/start_icon.s start_png
 
-up_dn_icon.s:
-	bin2s gfx/up_dn.raw asm/up_dn_icon.s up_dn_raw
+left_icon.s:
+	bin2s gfx/left.png asm/left_icon.s left_png
 
-lt_rt_icon.s:
-	bin2s gfx/lt_rt.raw asm/lt_rt_icon.s lt_rt_raw
+right_icon.s:
+	bin2s gfx/right.png asm/right_icon.s right_png
 
+up_icon.s:
+	bin2s gfx/up.png asm/up_icon.s up_png
+
+down_icon.s:
+	bin2s gfx/down.png asm/down_icon.s down_png
+
+L1_icon.s:
+	bin2s gfx/L1.png asm/L1_icon.s L1_png
+
+L2_icon.s:
+	bin2s gfx/L2.png asm/L2_icon.s L2_png
+
+R1_icon.s:
+	bin2s gfx/R1.png asm/R1_icon.s R1_png
+
+R2_icon.s:
+	bin2s gfx/R2.png asm/R2_icon.s R2_png
+
+
+freesans.s:
+	bin2s thirdparty/FreeSans_basic_latin.ttf asm/freesans.s freesansfont_raw
   
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
-	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
-
-$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)unzip/%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
 $(EE_OBJS_DIR)%.o : %.s

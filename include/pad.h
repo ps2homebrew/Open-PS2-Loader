@@ -30,6 +30,13 @@ int getKeyOn(int num);
 int getKeyOff(int num);
 int getKeyPressed(int num);
 
+/** Sets the repetition delay for the specified button
+* @param button id (KEY_XXX values)
+* @param btndelay the delay in miliseconds per repeat (clamped by framerate!) */
 void setButtonDelay(int button, int btndelay);
+
+/** Gets the repetition delay for the specified button */
+int getButtonDelay(int button);
+
 
 #endif

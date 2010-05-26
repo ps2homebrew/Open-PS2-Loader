@@ -1,5 +1,5 @@
-
 #include "include/usbld.h"
+#include "include/hddsupport.h"
 
 // APA Partition
 #define APA_MAGIC		0x00415041	// 'APA\0'

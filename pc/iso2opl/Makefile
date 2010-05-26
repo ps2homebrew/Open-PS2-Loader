@@ -5,6 +5,11 @@ endif
 CFLAGS = -std=gnu99 -Wall -pedantic -I/usr/include -I/usr/local/include -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE
 #CFLAGS += -DDEBUG
 
+ifeq ($(_WIN32),1)
+	CFLAGS += -D_WIN32
+endif
+
+
 all: bin/iso2opl
 
 clean:

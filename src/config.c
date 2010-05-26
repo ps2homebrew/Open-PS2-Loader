@@ -6,14 +6,10 @@
 
 #include "include/usbld.h"
 #include "include/util.h"
+#include "include/ioman.h"
 #include <string.h>
-#include "fileio.h"
-#include <sys/stat.h>
 
-static char IPconfig_path[] = "mc?:/SYS-CONF/IPCONFIG.DAT";
-int filesize=0;
-
-int strToColor(const char *string, unsigned char *color) {
+static int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
 	color[0]=0;
 	color[1]=0;
@@ -46,40 +42,29 @@ int strToColor(const char *string, unsigned char *color) {
 	return 1;
 }
 
-int splitAssignment(const char* line, char* key, char* val) {
+static int splitAssignment(char* line, char* key, char* val) {
 	// find "=". 
 	// If found, the text before is key, after is val. 
 	// Otherwise malformed string is encountered
-	int eqpos = strpos(line, '=');
+	char* eqpos = strchr(line, '=');
 	
-	if (eqpos < 0)
-		return 0;
-	
-	// copy the name and the value
-	strncpy(key, line, eqpos);
-	eqpos++;
-	strncpy(val, &line[eqpos], strlen(line) - eqpos);
-	
-	return 1;
+	if (eqpos) {
+		// copy the name and the value
+		strncpy(key, line, eqpos - line);
+		eqpos++;
+		strcpy(val, eqpos);
+	}
+	return (int) eqpos;
 }
 
 int configKeyValidate(const char* key) {
 	if (strlen(key) == 0)
 		return 0;
 	
-	int eqpos = strpos(key, '=');
-	
-	if (eqpos < 0)
-		return 1;
-	
-	return 0;
+	return !strchr(key, '=');
 }
 
-void configValueToText(struct TConfigValue* val, char* buf, unsigned int size) {
-	snprintf(buf, size, "%s=%s", val->key, val->val);
-}
-
-struct TConfigValue* allocConfigItem(const char* key, const char* val) {
+static struct TConfigValue* allocConfigItem(const char* key, const char* val) {
 	struct TConfigValue* it = (struct TConfigValue*)malloc(sizeof(struct TConfigValue));
 	strncpy(it->key, key, 32);
 	it->key[min(strlen(key), 31)] = '\0';
@@ -91,7 +76,7 @@ struct TConfigValue* allocConfigItem(const char* key, const char* val) {
 }
 
 /// Low level key addition. Does not check for uniqueness.
-void addConfigValue(struct TConfigSet* config, const char* key, const char* val) {
+static void addConfigValue(struct TConfigSet* config, const char* key, const char* val) {
 	if (!config->tail) {
 		config->head = allocConfigItem(key, val);
 		config->tail = config->head;
@@ -101,7 +86,7 @@ void addConfigValue(struct TConfigSet* config, const char* key, const char* val)
 	}
 }
 
-struct TConfigValue* getConfigItemForName(struct TConfigSet* config, const char* name) {
+static struct TConfigValue* getConfigItemForName(struct TConfigSet* config, const char* name) {
 	struct TConfigValue* val = config->head;
 	
 	while (val) {
@@ -216,84 +201,93 @@ int configRemoveKey(struct TConfigSet* config, const char* key) {
 }
 
 void readIPConfig() {
-	char ipconfig[255];
+	int fd = openFile("mc?:SYS-CONF/IPCONFIG.DAT", O_RDONLY);
+	if (fd >= 0) {
+		char ipconfig[255];
+		int size = getFileSize(fd);
+		fioRead(fd, &ipconfig, size);
+		fioClose(fd);
 	
-	IPconfig_path[2] = '0';
-	int fd=fioOpen(IPconfig_path, O_RDONLY);
-	if (fd<0) {
-		IPconfig_path[2] = '1';
-		fd=fioOpen(IPconfig_path, O_RDONLY);
-		if (fd<0) {
-			//DEBUG: printf("No config. Exiting...\n");
-			IPconfig_path[2] = '?';
-			return;
-		}
+		sscanf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3],
+			&ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],
+			&ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
 	}
-	filesize = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	
-	fioRead(fd, &ipconfig, filesize);
-		
-	sscanf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3],
-															&ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],
-															&ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
-
-	
-	fioClose(fd);
 	
 	return;
 }
 
 void writeIPConfig() {
-	char ipconfig[255];
+	int fd = openFile("mc?:SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
+	if (fd >= 0) {
+		char ipconfig[255];
+		sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
+			ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
+			ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 	
-	if (!strncmp (IPconfig_path,"mc0:/SYS-CONF",13)){
-		fioMkdir("mc0:/SYS-CONF");
-	}else if (!strncmp (IPconfig_path,"mc1:/SYS-CONF",13)){
-		fioMkdir("mc1:/SYS-CONF");
+		fioWrite(fd, ipconfig, strlen(ipconfig));
+		fioClose(fd);
 	}
-
-	if (IPconfig_path[2] == '?')
-		IPconfig_path[2] = '0';
-	
-	int fd=fioOpen(IPconfig_path, O_WRONLY | O_CREAT);
-	if (fd<0) {
-		if (IPconfig_path[2] == '0')
-			IPconfig_path[2] = '1';
-		else
-			IPconfig_path[2] = '0';
-		fd=fioOpen(IPconfig_path, O_WRONLY | O_CREAT);
-		if (fd<0) {
-			//DEBUG: printf("No config. Exiting...\n");
-			IPconfig_path[2] = '?';
-			return;
-		}
-	}
-	
-	sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
-															ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
-															ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
-
-	fioWrite(fd, ipconfig, strlen(ipconfig));
-	
-	fioClose(fd);
-	
-	return;
 }
 
+char *getConfigDiscID(char* startup) {
+	char *gid;
+	char gkey[255];
+	snprintf(gkey, 255, "%s_discID", startup);
+	if (!getConfigStr(&gConfig, gkey, &gid))
+		gid = ""; // TODO is this correct ?
 
-int readConfig(struct TConfigSet* config, const char *fname) {
-	int fd=fioOpen(fname, O_RDONLY);
-	
-	if (fd<0) {
-		//DEBUG: printf("No config. Exiting...\n");
+	return gid;
+}
+
+void setConfigDiscID(char* startup, const char *gid) {
+	char gkey[255];
+	snprintf(gkey, 255, "%s_discID", startup);
+	setConfigStr(&gConfig, gkey, gid);
+}
+
+void removeConfigDiscID(char* startup) {
+	char gkey[255];
+	snprintf(gkey, 255, "%s_discID", startup);
+	configRemoveKey(&gConfig, gkey);
+}
+
+// dst has to have 5 bytes space
+void getConfigDiscIDBinary(char* startup, void* dst) {
+	char *gid;
+	char gkey[255];
+	snprintf(gkey, 255, "%s_discID", startup);
+	if (!getConfigStr(&gConfig, gkey, &gid))
+		gid = "";
+
+	// convert from hex to binary
+	memset(dst, 0, 5);
+	char* cdst = dst;
+	int p = 0;
+	while (*gid && p < 10) {
+		int dv = -1;
+
+		while (dv < 0 && *gid) // skip spaces, etc
+			dv = fromHex(*(gid++));
+
+		if (dv < 0)
+			break;
+
+		*cdst = *cdst * 16 + dv;
+		if ((++p & 1) == 0)
+			cdst++;
+	}
+}
+
+int readConfig(struct TConfigSet* config, char *fname) {
+	read_context_t* readContext = openReadContext(fname, 0, 512);
+	if (!readContext) {
+		LOG("No config. Exiting...\n");
 		return 0;
 	}
 	
-	char line[2048];
+	char* line;
 	unsigned int lineno = 0;
-	
-	while (readline(fd, line, 2048)) {
+	while (readLineContext(readContext, &line)) {
 		lineno++;
 		
 		char key[255], val[255];
@@ -304,47 +298,31 @@ int readConfig(struct TConfigSet* config, const char *fname) {
 			// insert config value
 			setConfigStr(config, key, val);
 		} else {
-			// DEBUG: ignoring...
-			// printf("Malformed config file '%s' line %d: '%s'\n", fname, lineno, line);
+			LOG("Malformed config file '%s' line %d: '%s'\n", fname, lineno, line);
 		}
 	}
-	
-	fioClose(fd);
+	closeReadContext(readContext);
 	return 1;
 }
 
-int writeConfig(struct TConfigSet* config, const char *fname) {
+int writeConfig(struct TConfigSet* config, char *fname) {
+	int fd = openFile(fname, O_WRONLY | O_CREAT | O_TRUNC);
+	if (fd >= 0) {
+		char line[512];
+		struct TConfigValue* cur = config->head;
 
-	if (!strncmp (fname,"mc0:/SYS-CONF",13)){
-		fioMkdir("mc0:/SYS-CONF");
-	}else if (!strncmp (fname,"mc1:/SYS-CONF",13)){
-		fioMkdir("mc1:/SYS-CONF");
+		while (cur) {
+			snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
+			fioWrite(fd, line, strlen(line));
+	
+			// and advance
+			cur = cur->next;
+		}
+
+		fioClose(fd);
+		return 1;
 	}
-
-	int fd=fioOpen(fname, O_WRONLY | O_CREAT | O_TRUNC);
-	
-	if (fd<0)
-		return 0;
-	
-	char line[2048];
-	struct TConfigValue* cur = config->head;
-	
-	while (cur) {
-		line[0] = '\0';
-		
-		configValueToText(cur, line, 2048);
-		
-		int len = strlen(line);
-
-		fioWrite(fd, line, len);
-		fioWrite(fd, "\r\n", 2);
-
-		// and advance
-		cur = cur->next;
-	}
-	
-	fioClose(fd);
-	return 1;
+	return 0;
 }
 
 void clearConfig(struct TConfigSet* config) {
@@ -358,69 +336,3 @@ void clearConfig(struct TConfigSet* config) {
 	config->head = NULL;
 	config->tail = NULL;
 }
-
-void ListDir(char* directory) {
-	int ret=-1;
-	int n_dir=0;
-	fio_dirent_t record;
-	int i=0;
-	char dir[255];
-	
-	// free the prev. list
-	i = 0;
-	while (theme_dir[i] && i < 256) {
-		free(theme_dir[i]);
-		theme_dir[i] = NULL;
-		++i;
-	}
-
-	theme_dir[0]=malloc(7);
-	sprintf(theme_dir[0],"<none>");
-	n_dir=1;
-
-	for(i=0;i<3;i++){
-	
-		switch(i){
-			case 0:
-				snprintf(dir, 255, "mc0:%s", directory);
-			break;
-			case 1:
-				snprintf(dir, 255, "mc1:%s", directory);
-			break;
-			case 2:
-				snprintf(dir, 255, "%s%s", USB_prefix, directory);
-			break;
-		}
-	
-		if ((ret = fioDopen(dir)) >= 0) {
-			while (fioDread(ret, &record) > 0) {
-				/*Keep track of number of files */
-				if (FIO_SO_ISDIR(record.stat.mode)) {
-					if(record.name[0]!='.' && (record.name[0]!='.' && record.name[1]!='.')){
-						//printf("%s\n",record.name);
-						theme_dir[n_dir]=malloc(sizeof(record.name));
-						sprintf(theme_dir[n_dir],"%s",record.name);
-						n_dir++;
-					}
-				}else{
-					if(strstr(record.name,".zip") || strstr(record.name,".ZIP")){
-						//printf("%s\n",record.name);
-						theme_dir[n_dir]=malloc(sizeof(record.name));
-						sprintf(theme_dir[n_dir],"%s",record.name);
-						theme_dir[n_dir][strlen(theme_dir[n_dir])-4]='\0';
-						n_dir++;
-					}
-				}
-				
-				if (n_dir >= 254)
-					break; // ensure padding is there!
-			}
-				fioDclose(ret);
-		}
-	}
-	
-	max_theme_dir = n_dir;
-	theme_dir[max_theme_dir] = NULL;
-	
-	fioDclose(ret);
-} 

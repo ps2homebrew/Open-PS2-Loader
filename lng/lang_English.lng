@@ -1,0 +1,79 @@
+# This file is a template for translators
+#
+# Put here the English name of your language
+English
+#
+# Now translate every line, keep the same order, don't add empty lines.
+# 
+# This file (lang_english.lng) might be incomplete, to be sure you translate
+# the correct sentences, please refer instead to the source file:
+#
+# OPL/src/lang.c
+# or
+# http://bitbucket.org/volca/open-ps2-loader/src/tip/src/lang.c
+#
+# Important: If your language require some custom glyphs you should provide a corresponding
+# TTF font file too, as by default OPL only come with "basic latin" codepage.
+#
+# Last note, don't put too much comments in your file, it will waste space and loading time.
+# One single comment line on top "name <yourmail@address.com>" should be enough
+#
+# Thanks for your work.
+# 
+               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^
+Open PS2 Loader %s
+Theme configuration
+IP configuration
+Save changes
+O Back
+Scroll Slow
+Scroll Medium
+Scroll Fast
+Dynamic Menu
+Static Menu
+Configure theme
+Network config
+Select language
+No Items
+Not available yet
+Settings saved...
+Error writing settings!
+Exit
+Settings
+USB Games
+HDD Games
+Network Games
+Apps
+Theme
+Language
+Language: English
+Start network
+Network loading: %d
+Network startup error
+Network startup automatic
+On
+Off
+Ok
+Compatibility settings
+Remove all settings
+Removed all keys for the game
+Scrolling
+Menu type
+Slow
+Medium
+Fast
+Static
+Dynamic
+Default menu
+Load from disc
+Please wait
+Error while loading the Game ID
+Use Hard Drive
+Autostart Hard Drive
+Start Hard Drive
+Automatic sorting
+Error loading the language file
+Disable Debug Colors
+No controller detected, waiting...
+Enable Cover Art
+Wide screen

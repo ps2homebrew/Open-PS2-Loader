@@ -56,7 +56,7 @@ static int g_gamesetting_0_pss=0;
 
 #define ISO_MAX_PARTS	10
 static int g_part_start[ISO_MAX_PARTS] = {
-	0,	// is apa header LBA in HDD use
+	0,	// is apa header LBA in HDD use, is Long filename in SMB+ISO
 	0,
 	0,
 	0,
@@ -1137,11 +1137,19 @@ void fs_init(void)
 	sprintf(tmp_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
 	smb_SessionSetupTreeConnect("GUEST", tmp_str);
 
-	// Open all parts files
-	for (i=0; i<g_ISO_parts; i++) {
-		sprintf(tmp_str,"%s.%02x", g_ISO_name, i);
-		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i]);
-	}
+    // if part table not null in SMB mode, then it is an ISO
+    if ( (*p_part_start) != 0) {
+    	if (g_ISO_media == 0x12)
+    		sprintf(tmp_str,"CD\\\\%s.%s.iso", g_ISO_name, (char *) p_part_start);
+    	else
+    		sprintf(tmp_str,"DVD\\\\%s.%s.iso", g_ISO_name, (char *) p_part_start);
+    	smb_OpenAndX(tmp_str, (u16 *)&g_part_start[0]);
+    }
+    else // Open all parts files
+		for (i=0; i<g_ISO_parts; i++) {
+			sprintf(tmp_str,"%s.%02x", g_ISO_name, i);
+			smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i]);
+		}
 #endif
 
 #ifdef HDD_DRIVER
@@ -1729,6 +1737,16 @@ int sceCdStStop(void)
 #ifndef HDD_DRIVER
 int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf)
 {
+	if (g_ISO_parts == 1) { // in this case, obviously we don't need to iterate parts
+#ifdef USB_DRIVER
+		mass_stor_ReadCD(lsn, nsectors, buf, 0);
+#endif
+#ifdef SMB_DRIVER
+		smb_ReadCD(lsn, nsectors, buf, 0);
+#endif
+		return 1;
+	}
+
 	register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
 	register int i, esc_flag = 0;
 	u8 *p = (u8 *)buf;

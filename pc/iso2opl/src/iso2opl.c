@@ -18,12 +18,17 @@ u8 systemcnf_buf[65536];
 //-----------------------------------------------------------------------
 void printVer(void)
 {
+#ifdef _WIN32
+	printf("%s version %s (Win32 Build)\n", PROGRAM_EXTNAME, PROGRAM_VER);
+#else
 	printf("%s version %s\n", PROGRAM_EXTNAME, PROGRAM_VER);
+#endif
 }
 
 //-----------------------------------------------------------------------
 void printUsage(void)
 {
+	printVer();
 	printf("Usage: %s [SOURCE_ISO] [DEST_DRIVE] [GAME_NAME] [TYPE]\n", PROGRAM_NAME);
 	printf("%s command-line version %s\n\n", PROGRAM_EXTNAME, PROGRAM_VER);
 #ifdef _WIN32
@@ -374,21 +379,122 @@ int ParseSYSTEMCNF(char *system_cnf, char *boot_path)
 }
 
 //-----------------------------------------------------------------------
-int main(int argc, char **argv, char **env)
+s64 GetGameID(char *isofile, int isBigEndian, short closeOnEnd, char *GameID)
 {
 	int ret;
 	char ElfPath[256];
+	char *p;
+	s64 filesize;
+
+	// Init isofs
+	filesize = isofs_Init(isofile, isBigEndian);
+	if (!filesize) {
+		printf("Error: failed to open ISO file: %s\n", isofile);
+		return 0;
+	}
+
+	// parse system.cnf in ISO file
+	ret = ParseSYSTEMCNF("\\SYSTEM.CNF;1", ElfPath);
+	if (ret < 0) {
+		switch (ret) {
+			case -1:
+				printf("Error: can't open SYSTEM.CNF from ISO file: %s\n", isofile);
+				break;
+			case -2:
+				printf("Error: failed to read SYSTEM.CNF from ISO file: %s\n", isofile);
+				break;
+			case -3:
+				printf("Error: failed to parse SYSTEM.CNF from ISO file: %s\n", isofile);
+				break;
+			case -4:
+				printf("Error: failed to locate elf path from ISO file: %s\n", isofile);
+				break;
+		}
+		return 0;
+	}
+
+#ifdef DEBUG
+	printf("Elf Path: %s\n", ElfPath);
+#endif
+
+	// get GameID
+	strcpy(GameID, &ElfPath[8]);
+	p = strstr(GameID, ";1");
+	*p = 0;
+
+#ifdef DEBUG
+	printf("Game ID: %s\n", GameID);
+#endif
+
+	if (closeOnEnd)
+		isofs_Reset();
+
+	return filesize;
+}
+
+//----------------------------------------------------------------
+int compute_name(const char *drive, const char *game_name, const char *game_id)
+{
+#ifdef DEBUG
+	printf("rename_iso drive:%s name:%s id:%s\n", drive, game_name, game_id);
+#endif
+
+#ifdef _WIN32
+	if (strlen(drive) == 1)
+		printf("%s:\\ul.%08X.%s.00\n", drive, crc32(game_name), game_id);
+	else
+		printf("%s\\ul.%08X.%s.00\n", drive, crc32(game_name), game_id);
+#else
+	printf("%s/ul.%08X.%s.00\n", drive, crc32(game_name), game_id);
+#endif
+	return 0;
+}
+
+//----------------------------------------------------------------
+void scan_dir(int isBigEndian)
+{
+	struct dirent* ent;
+	int size;
+	char GameID[256];
+	char *name;
+	char fullname[512];
+	char newname[512];
+	struct stat buf;
+
+	DIR* rep = opendir(".");
+	if (rep != NULL) {
+		while ((ent = readdir(rep)) != NULL) {
+			name = ent->d_name;
+			size = strlen(name);
+			sprintf(fullname,"./%s", name);
+			if ( ! stat(fullname, &buf) && ! S_ISDIR(buf.st_mode) ) {
+				if (strstr(name, ".iso")) {
+					if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.')) {
+						printf("%s seems to be correctly named\n", fullname);
+					}
+					else if (GetGameID(fullname, isBigEndian, 1, GameID)) {
+						sprintf(newname,"./%s.%s", GameID, name);
+						if (rename(fullname, newname) == 0)
+						{
+							printf("%s renamed to: %s\n", fullname, newname);
+						}
+					}
+				}
+			}
+		}
+		closedir(rep);
+	}
+}
+
+//-----------------------------------------------------------------------
+int main(int argc, char **argv, char **env)
+{
+	int ret;
 	char GameID[256];
 	s64 num_parts;
 	char *p;
 	s64 filesize;
 	int isBigEnd;
-
-	// args check
-	if ((argc != 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) || (strlen(argv[3]) > 32)) {
-		printUsage();
-		exit(EXIT_FAILURE);
-	}
 
 	// Big Endianness test
 	p = (char *)&isBigEnd;
@@ -404,57 +510,27 @@ int main(int argc, char **argv, char **env)
 	printf("isofs Init...\n");
 #endif
 
-	// Init isofs
-	filesize = isofs_Init(argv[1], isBigEnd);
-	if (!filesize) {
-		printf("Error: failed to open ISO file!\n");
+	// args check
+	if ((argc > 1) && (strcmp(argv[1], "SCAN") == 0))
+	{
+		scan_dir(isBigEnd);
+		exit(EXIT_SUCCESS);
+	}
+
+	if ((argc < 5) || (strcmp(argv[4], "CD") && strcmp(argv[4], "DVD")) || (strlen(argv[3]) > 32)) {
+		printUsage();
 		exit(EXIT_FAILURE);
 	}
 
-	// get needed number of parts
-	num_parts = filesize / 1073741824;
-	if (filesize & 0x3fffffff)
-		num_parts++;
-
 #ifdef DEBUG
-	printf("ISO filesize: 0x%llx\n", filesize);
-	printf("Number of parts: %lld\n", num_parts);
-	//return 0;
+	printf("DEBUG_MODE ON\n");
 #endif
 
-	// parse system.cnf in ISO file
-	ret = ParseSYSTEMCNF("\\SYSTEM.CNF;1", ElfPath);
-	if (ret < 0) {
-		switch (ret) {
-			case -1:
-				printf("Error: can't open SYSTEM.CNF from ISO file!\n");
-				break;
-			case -2:
-				printf("Error: failed to read SYSTEM.CNF from ISO file!\n");
-				break;
-			case -3:
-				printf("Error: failed to parse SYSTEM.CNF from ISO file!\n");
-				break;				
-			case -4:
-				printf("Error: failed to locate elf path from ISO file!\n");
-				break;
-		}
+	filesize = GetGameID(argv[1], isBigEnd, 0, GameID);
+	if (filesize==0) {
 		isofs_Reset();
 		exit(EXIT_FAILURE);
 	}
-
-#ifdef DEBUG
-	printf("Elf Path: %s\n", ElfPath);
-#endif
-
-	// get GameID
-	strcpy(GameID, &ElfPath[8]);
-	p = strstr(GameID, ";1");
-	*p = 0;
-
-#ifdef DEBUG
-	printf("Game ID: %s\n", GameID);
-#endif
 
 	// check for existing game
 	ret = check_cfg(argv[2], argv[3], GameID);
@@ -473,6 +549,17 @@ int main(int argc, char **argv, char **env)
 		isofs_Reset();
 		exit(EXIT_FAILURE);
 	}
+
+	// get needed number of parts
+	num_parts = filesize / 1073741824;
+	if (filesize & 0x3fffffff)
+		num_parts++;
+
+#ifdef DEBUG
+	printf("ISO filesize: 0x%llx\n", filesize);
+	printf("Number of parts: %d\n", num_parts);
+	//return 0;
+#endif
 
 	// write ISO parts to drive
 	ret = write_parts(argv[2], argv[3], GameID, filesize, num_parts);

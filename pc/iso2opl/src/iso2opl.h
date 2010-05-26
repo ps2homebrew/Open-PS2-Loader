@@ -17,6 +17,9 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define PROGRAM_NAME "iso2opl"
 #define PROGRAM_EXTNAME "ISO installer for Open PS2 Loader"

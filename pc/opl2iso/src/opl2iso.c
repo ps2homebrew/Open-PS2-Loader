@@ -256,7 +256,11 @@ int exportGame(const char* gameid) {
 //-----------------------------------------------------------------------
 int main(int argc, char **argv, char **env)
 {
+#ifdef _WIN32
+	printf("%s - %s version %s (Win32 Build)\n", PROGRAM_NAME, PROGRAM_EXTNAME, PROGRAM_VER);
+#else
 	printf("%s - %s version %s\n", PROGRAM_NAME, PROGRAM_EXTNAME, PROGRAM_VER);
+#endif
 	printf(" * This is a one-purpose utility used to convert games from ul.cfg\n");
 	printf(" * back to iso format into CD/DVD directories, to be directly usable\n");
 	printf(" * by open PS2 loader again\n");

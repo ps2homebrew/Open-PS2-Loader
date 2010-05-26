@@ -480,7 +480,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 	struct ReadAndXResponse_t *RRsp = (struct ReadAndXResponse_t *)SMB_buf;
 
 	FID = (u16)p_part_start[part_num];
-	offset = lsn << 11;
+	offset = lsn;
 		
 	while (nsectors > 0) {
 		sectors = nsectors;
@@ -492,11 +492,11 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		RR->smbH.sessionHeader = 0x3b000000;
 		RR->smbH.Flags = 0;
 		RR->FID = FID;
-		RR->OffsetLow = offset;
+		RR->OffsetLow = offset << 11;
+		RR->OffsetHigh = offset >> 21;
 		RR->MaxCountLow = nbytes;
 		RR->MinCount = 0;
 		RR->ByteCount = 0;
-		RR->OffsetHigh = 0;
 
 		plwip_send(main_socket, SMB_buf, 63, 0);
 receive:
@@ -514,7 +514,7 @@ receive:
 		mips_memcpy(p, &SMB_buf[4 + RRsp->DataOffset], nbytes);
 
 		p += nbytes;
-		offset += nbytes;
+		offset += sectors;
 		nsectors -= sectors;
 	}
 

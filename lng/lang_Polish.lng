@@ -1,0 +1,59 @@
+# translation by Berion
+Polish
+               WITAMY W PROGRAMIE OPEN PS2 LOADER. GŁÓWNY KOD OPARTY ZOSTAŁ NA KODZIE ŹRÓDŁOWYM HD PROJECT <http://psx-scene.com> IMPLEMENTACJE FORMATU USB ADVANCE I GUI PRZEZ IFCARO <http://ps2dev.ifcaro.net> WIĘKSZOŚĆ JĄDRA LOADERA WYKONANA PRZEZ JIMMIKAELKAEL. WSZYSTKIE ULEPSZENIA GUI WYKONANE PRZEZ VOLCA. DZIĘKUJEMY ZA SKORZYSTANIE Z NASZEJ APLIKACJI. ^^
+Open PS2 Loader %s
+Ustawienia skórki
+Ustawienia IP
+Zapisz zmiany
+"O" Powrót
+Wolne przewijanie
+Normalne przewijanie
+Szybkie przewijanie
+Dynamiczne menu
+Statyczne menu
+Konfiguruj skórkę
+Ustawienia sieci
+Wybierz język
+Nie znaleziono gier
+Jeszcze niedostępne
+Ustawienia zostały zapisane...
+Wystapił błąd przy zapisie ustawień!
+Wyjście
+Ustawienia
+Gry z USB
+Gry z HDD
+Gry przez sieć
+Programy
+Skórka
+Język
+Język : Polski
+Uruchom Sieć
+Ładowanie z sieci: %d
+Błąd podczas uruchamiania sieci
+Automatyczne uruchamianie sieci
+Włączone
+Wyłączone
+Ok
+Ustawienia kompatybilności
+Usuń wszystkie ustawienia
+Usunięto wszystkie klucze dla gry
+Przewijanie
+Rodzaj menu
+Powoli
+Normalnie
+Szybko
+Statycznie
+Dynamicznie
+Domyślne menu
+Uruchom z płyty
+Proszę czekać
+Błąd podczas odczytywania Game ID
+Użyj twardego dysku
+Autostart twardego dysku
+Uruchom twardy dysk
+Automatyczne sortowanie
+Wystąpił błąd podczas wczytywania pliku językowego
+Wyłącz kolory Debug
+Nie wykryto podłączonego kontrolera, oczekiwanie...
+Włącz Cover Arty
+Szerokokątny ekran

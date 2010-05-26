@@ -6,11 +6,18 @@
 
 #include "include/usbld.h"
 #include "include/pad.h"
+#include "include/ioman.h"
 #include <libpad.h>
-
+#include <timer.h>
+#include <time.h>
 
 #define MAX_PADS 4
-#define DEFAULT_PAD_DELAY 7
+
+// Cpu ticks per one milisecond
+#define CLOCKS_PER_MILISEC 147456
+
+// 200 ms per repeat
+#define DEFAULT_PAD_DELAY 200
 
 struct pad_data_t {
 	int port, slot;
@@ -26,35 +33,22 @@ struct pad_data_t {
 	int actuators;
 };
 
-unsigned short pad_count;
-struct pad_data_t pad_data[MAX_PADS];
+/// current time in miliseconds (last update time)
+static u32 curtime = 0;
+static u32 time_since_last = 0;
+
+static unsigned short pad_count;
+static struct pad_data_t pad_data[MAX_PADS];
 
 // gathered pad data
-u32 paddata;
-u32 oldpaddata;
+static u32 paddata;
+static u32 oldpaddata;
 
-int delaycnt[16];
-int paddelay[16];
-
-#define KEY_LEFT 1
-#define KEY_DOWN 2
-#define KEY_RIGHT 3
-#define KEY_UP 4
-#define KEY_START 5
-#define KEY_R3 6
-#define KEY_L3 7
-#define KEY_SELECT 8
-#define KEY_SQUARE 9
-#define KEY_CROSS 10
-#define KEY_CIRCLE 11
-#define KEY_TRIANGLE 12
-#define KEY_R1 13
-#define KEY_L1 14
-#define KEY_R2 15
-#define KEY_L2 16
+static int delaycnt[16];
+static int paddelay[16];
 
 // KEY_ to PAD_ conversion table
-const int keyToPad[17] = {
+static const int keyToPad[17] = {
 	-1,
 	PAD_LEFT,
 	PAD_DOWN,
@@ -77,7 +71,7 @@ const int keyToPad[17] = {
 /*
  * waitPadReady()
  */
-int waitPadReady(struct pad_data_t* pad) {
+static int waitPadReady(struct pad_data_t* pad) {
 	int state;
 	
 	// busy wait for the pad to get ready
@@ -88,8 +82,8 @@ int waitPadReady(struct pad_data_t* pad) {
 	return state;
 };
 
-int initializePad(struct pad_data_t* pad) {
-	int ret;
+static int initializePad(struct pad_data_t* pad) {
+	int tmp;
 	int modes;
 	int i;
 	
@@ -101,25 +95,26 @@ int initializePad(struct pad_data_t* pad) {
 	// How many different modes can this device operate in?
 	// i.e. get # entrys in the modetable
 	modes = padInfoMode(pad->port, pad->slot, PAD_MODETABLE, -1);
-	printf("The device has %d modes\n", modes);
+	LOG("PAD: The device has %d modes\n", modes);
 
 	if (modes > 0) {
-		printf("( ");
+		LOG("( ");
 		
 		for (i = 0; i < modes; i++) {
-			printf("%d ", padInfoMode(pad->port, pad->slot, PAD_MODETABLE, i));
+			tmp = padInfoMode(pad->port, pad->slot, PAD_MODETABLE, i);
+			LOG("%d ", tmp);
 		}
 	        
-	        printf(")");
+	        LOG(")");
 	}
 
-	printf("It is currently using mode %d\n", 
-	padInfoMode(pad->port, pad->slot, PAD_MODECURID, 0));
+	tmp = padInfoMode(pad->port, pad->slot, PAD_MODECURID, 0);
+	LOG("PAD: It is currently using mode %d\n", tmp);
 
 	// If modes == 0, this is not a Dual shock controller 
 	// (it has no actuator engines)
 	if (modes == 0) {
-		printf("This is a digital controller?\n");
+		LOG("PAD: This is a digital controller?\n");
 		return 1;
 	}
 
@@ -132,32 +127,34 @@ int initializePad(struct pad_data_t* pad) {
 	} while (i < modes);
 	
 	if (i >= modes) {
-		printf("This is no Dual Shock controller\n");
+		LOG("PAD: This is no Dual Shock controller\n");
 		return 1;
 	}
 
 	// If ExId != 0x0 => This controller has actuator engines
 	// This check should always pass if the Dual Shock test above passed
-	ret = padInfoMode(pad->port, pad->slot, PAD_MODECUREXID, 0);
-	if (ret == 0) {
-	        printf("This is no Dual Shock controller??\n");
+	tmp = padInfoMode(pad->port, pad->slot, PAD_MODECUREXID, 0);
+	if (tmp == 0) {
+	        LOG("PAD: This is no Dual Shock controller??\n");
 	        return 1;
 	}
 
-	printf("Enabling dual shock functions\n");
+	LOG("PAD: Enabling dual shock functions\n");
 
 	// When using MMODE_LOCK, user cant change mode with Select button
 	padSetMainMode(pad->port, pad->slot, PAD_MMODE_DUALSHOCK, PAD_MMODE_LOCK);
 
 	waitPadReady(pad);
-	printf("infoPressMode: %d\n", padInfoPressMode(pad->port, pad->slot));
+	tmp = padInfoPressMode(pad->port, pad->slot);
+	LOG("PAD: infoPressMode: %d\n", tmp);
 
 	waitPadReady(pad);        
-	printf("enterPressMode: %d\n", padEnterPressMode(pad->port, pad->slot));
+	tmp = padEnterPressMode(pad->port, pad->slot);
+	LOG("PAD: enterPressMode: %d\n", tmp);
 
 	waitPadReady(pad);
 	pad->actuators = padInfoAct(pad->port, pad->slot, -1, 0);
-	printf("# of actuators: %d\n", pad->actuators);
+	LOG("PAD: # of actuators: %d\n", pad->actuators);
 
 	if (pad->actuators != 0) {
 		pad->actAlign[0] = 0;   // Enable small engine
@@ -168,10 +165,10 @@ int initializePad(struct pad_data_t* pad) {
 		pad->actAlign[5] = 0xff;
 
 		waitPadReady(pad);
-		printf("padSetActAlign: %d\n", 
-		padSetActAlign(pad->port, pad->slot, pad->actAlign));
+		tmp = padSetActAlign(pad->port, pad->slot, pad->actAlign);
+		LOG("PAD: padSetActAlign: %d\n", tmp);
 	} else {
-		printf("Did not find any actuators.\n");
+		LOG("PAD: Did not find any actuators.\n");
 	}
 
 	waitPadReady(pad);
@@ -179,7 +176,7 @@ int initializePad(struct pad_data_t* pad) {
 	return 1;
 }
 
-int readPad(struct pad_data_t* pad)
+static int readPad(struct pad_data_t* pad)
 {
 	int rcode = 0;
 
@@ -204,12 +201,12 @@ int readPad(struct pad_data_t* pad)
 	return rcode;
 }
 
-/** Returns frame count based delay specified for the given key.
+/** Returns delay (in miliseconds) specified for the given key.
 * @param id The button id
 * @param repeat Boolean value specifying if we want initial key delay (0) or the repeat key delay (1)
 * @return the delay to the next key event
 */
-int getKeyDelay(int id, int repeat) {
+static int getKeyDelay(int id, int repeat) {
 	int delay = paddelay[id - 1];
 	
 	// if not in repeat, the delay is doubled
@@ -225,6 +222,11 @@ int readPads() {
 	oldpaddata = paddata;
 	paddata = 0;
 	
+	// in ms.
+	u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
+	time_since_last = newtime - curtime;
+	curtime = newtime;
+	
 	int rslt = 0;
 	
 	for (i = 0; i < pad_count; ++i) {
@@ -233,7 +235,7 @@ int readPads() {
 	
 	for (i = 0; i < 16; ++i) {
 		if (getKeyPressed(i + 1))
-			delaycnt[i]--;
+			delaycnt[i] -= time_since_last;
 		else
 			delaycnt[i] = getKeyDelay(i + 1, 0);
 	}
@@ -313,12 +315,22 @@ int getKeyPressed(int id) {
 * @param btndelay The button delay (in query count)
 */
 void setButtonDelay(int button, int btndelay) {
+	if ( (button<=0) || (button>=17) )
+		return;
+	
 	paddelay[button-1] = btndelay;
+}
+
+int getButtonDelay(int button) {
+	if ( (button<=0) || (button>=17) )
+		return 0;
+	
+	return paddelay[button-1];
 }
 
 /** Unloads a single pad. 
 * @see unloadPads */
-void unloadPad(struct pad_data_t* pad) {
+static void unloadPad(struct pad_data_t* pad) {
 	padPortClose(pad->port, pad->slot);
 }
 
@@ -335,7 +347,7 @@ void unloadPads() {
 /** Tries to start a single pad.
 * @param pad The pad data holding structure 
 * @return 0 Error, != 0 Ok */
-int startPad(struct pad_data_t* pad) {
+static int startPad(struct pad_data_t* pad) {
 	if(padPortOpen(pad->port, pad->slot, pad->padBuf) == 0) {
 		return 0;
 	}

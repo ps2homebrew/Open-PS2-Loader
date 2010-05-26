@@ -71,8 +71,8 @@ int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
 int diaGetString(struct UIItem* ui, int id, char *value);
 int diaSetString(struct UIItem* ui, int id, const char *text);
-int diaGetColour(struct UIItem* ui, int id, unsigned char *col);
-int diaSetColour(struct UIItem* ui, int id, const unsigned char *col);
+int diaGetColor(struct UIItem* ui, int id, unsigned char *col);
+int diaSetColor(struct UIItem* ui, int id, const unsigned char *col);
 // set label pointer into the label's text (must be valid while rendering dialog)
 int diaSetLabel(struct UIItem* ui, int id, const char *text);
 // sets the current enum value list for given control

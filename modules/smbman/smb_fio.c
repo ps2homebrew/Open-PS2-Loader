@@ -326,7 +326,7 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 			fh->smb_fid = r;
 			fh->mode = mode;
 			fh->filesize = filesize;
-			fh->position = filesize;
+			fh->position = 0;
 			if (fh->mode & O_TRUNC) {
 				fh->position = 0;
 				fh->filesize = 0;

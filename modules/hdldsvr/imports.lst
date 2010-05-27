@@ -20,6 +20,11 @@ I_lwip_select
 I_inet_addr
 ps2ip_IMPORTS_end
 
+smsutils_IMPORTS_start
+I_mips_memset
+I_mips_memcpy
+smsutils_IMPORTS_end
+
 thbase_IMPORTS_start
 I_DelayThread
 I_CreateThread
@@ -35,8 +40,6 @@ I_DeleteSema
 thsemap_IMPORTS_end
 
 sysclib_IMPORTS_start
-I_memset
-I_memcpy
 I_strlen
 sysclib_IMPORTS_end
 

@@ -152,19 +152,40 @@ int main(int argc, char *argv[2])
 	scr_printf("OK\n");
         	  
 	set_ipconfig();
- 
-	scr_printf("\t loading modules... ");
- 
-	id = SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
-	id = SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-	id = SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
-	id = SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-	id = SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
-	id = SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
-	id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
-	id = SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
 
-	scr_printf("OK\n");
+	scr_printf("\t loading iomanX... "); 
+	id = SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading fileXio... "); 
+	id = SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading poweroff... "); 
+	id = SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading ps2dev9... "); 
+	id = SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading smsutils... "); 
+	id = SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading smstcpip... "); 
+	id = SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading smsmap... "); 
+	id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t loading smbman... "); 
+	id = SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
+	scr_printf("ret=%d\n", ret); 
+
+	scr_printf("\t modules load OK\n");
 
 	fileXioInit();
 

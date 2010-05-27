@@ -70,6 +70,7 @@
 #define	SMAP_AUTONEGO_RETRY		3
 #define	SMAP_FORCEMODE_WAIT		2000
 #define	SMAP_FORCEMODE_TIMEOUT	1000
+#define	SMAP_LINK_WAIT		5000
 
 
 //Buffer Descriptor(BD) Offset and Definitions
@@ -471,12 +472,12 @@ static void		TXRXEnable(SMap* pSMap,int iEnable);
 static int		FIFOReset(SMap* pSMap);
 static int		EMAC3SoftReset(SMap* pSMap);
 static void		EMAC3SetDefValue(SMap* pSMap);
-static void		EMAC3Init(SMap* pSMap,int iReset);
+static int		EMAC3Init(SMap* pSMap,int iReset);
 static void		EMAC3ReInit(SMap* pSMap);
 static int		PhyInit(SMap* pSMap,int iReset);
 static int		PhyReset(SMap* pSMap);
 #ifdef FORCE_100M_FD
-static void		__ForceSPD100M_FD(SMap* pSMap);
+static int		__ForceSPD100M_FD(SMap* pSMap);
 #else
 static void		PhySetSpecific(SMap* pSMap);
 static int		AutoNegotiation(SMap* pSMap,int iEnableAutoNego);
@@ -488,7 +489,7 @@ static void		ForceSPD10M(SMap* pSMap);
 static void		ConfirmForceSPD(SMap* pSMap);
 #endif
 static void		PhySetDSP(SMap* pSMap);
-static void		Reset(SMap* pSMap,int iReset);
+static int		Reset(SMap* pSMap,int iReset);
 static int		GetNodeAddr(SMap* pSMap);
 static void		BaseInit(SMap* pSMap);
 
@@ -794,7 +795,7 @@ EMAC3SetDefValue(SMap* pSMap)
 }
 
 
-static void
+static int
 EMAC3Init(SMap* pSMap,int iReset)
 {
 
@@ -812,14 +813,14 @@ EMAC3Init(SMap* pSMap,int iReset)
 	if	(PhyInit(pSMap,iReset)<0)
 	{
 		dbgprintf("EMAC3Init: Phy init error\n");
-		return;
+		return -1;
 	}
 
 	//This flag may be set when unloading
 
 	if (iReset)
 	{
-		return;
+		return -2;
 	}
 
 	dev9IntrDisable ( INTR_BITMSK );
@@ -829,6 +830,8 @@ EMAC3Init(SMap* pSMap,int iReset)
 	//Permanently set to default value.
 
 	EMAC3SetDefValue(pSMap);
+	
+	return 0;
 }
 
 static void EMAC3ReInit ( SMap* pSMap ) {
@@ -851,7 +854,8 @@ static int PhyInit ( SMap* pSMap, int iReset ) {
 #endif
 
 #ifdef FORCE_100M_FD
- __ForceSPD100M_FD(pSMap);
+ iVal = __ForceSPD100M_FD(pSMap);
+ if ( iVal < 0 ) return iVal;
 #else
  iVal = AutoNegotiation ( pSMap, DISABLE );
 
@@ -1122,27 +1126,28 @@ PhyGetDuplex(SMap* pSMap)
 #endif
 
 #ifdef FORCE_100M_FD
-static void __ForceSPD100M_FD(SMap* pSMap)
+static int __ForceSPD100M_FD(SMap* pSMap)
 {
-	int i;
+	int iA;
 	
-	/* Confirm link status, wait 1s is needed. */
-confirm_link:
-	i = 100;
-	while (--i) {
+	/* Confirm link status */
+	for	(iA=SMAP_LINK_WAIT;iA!=0;--iA)
+	{
 		int phy = _smap_phy_read(DsPHYTER_BMSR);
 		if (phy & PHY_BMSR_LINK)
 			break;
 		DelayThread(1000);
 	}
-	if (i == 0)
-		goto confirm_link;
+	if 	(iA == 0)
+	{
+		return -1;
+	}
 
 	_smap_phy_write(DsPHYTER_BMCR, PHY_BMCR_100M|PHY_BMCR_DUPM);
 	pSMap->u32Flags |= SMAP_F_CHECK_FORCE100M;
 
-	i = SMAP_FORCEMODE_WAIT;
-	while (--i)
+	iA = SMAP_FORCEMODE_WAIT;
+	while (--iA)
 		DelayThread(1000);
 	
 	/* Force 100 Mbps full duplex mode */
@@ -1154,6 +1159,8 @@ confirm_link:
 	pSMap->u32Flags &= ~(SMAP_F_CHECK_FORCE100M|SMAP_F_CHECK_FORCE10M);
 	pSMap->u32Flags |= SMAP_F_LINKESTABLISH;
 	PhySetDSP(pSMap);
+
+	return 0;
 }
 #endif
 
@@ -1313,7 +1320,7 @@ PhySetDSP(SMap* pSMap)
 	pSMap->u32Flags|=SMAP_F_LINKVALID;
 }
 
-static void Reset ( SMap* pSMap, int iReset ) {
+static int Reset ( SMap* pSMap, int iReset ) {
 
  dev9IntrDisable ( INTR_BITMSK );
  SMap_ClearIRQ   ( INTR_BITMSK );
@@ -1321,8 +1328,12 @@ static void Reset ( SMap* pSMap, int iReset ) {
  SMAP_REG8( pSMap, SMAP_BD_MODE ) = 0;
 
  FIFOReset ( pSMap );
- EMAC3Init ( pSMap, iReset );
+ if 	(EMAC3Init ( pSMap, iReset ) < 0)
+ {
+	return -1;
+ }
 
+ return 0;
 }  /* end Reset */
 
 static int
@@ -1397,7 +1408,11 @@ SMap_Init(void)
 		return	FALSE;
 	}
 
-	Reset(pSMap,RESET_INIT);
+	if 	(Reset(pSMap,RESET_INIT) < 0)
+	{
+		return FALSE;
+	}
+
 	TXRXEnable(pSMap,DISABLE);
 
 	pSMap -> TX.u16PTRStart  = 0;

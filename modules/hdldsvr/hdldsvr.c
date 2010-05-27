@@ -13,6 +13,8 @@
 #include <thsemap.h>
 #include <errno.h>
 
+#include "smsutils.h"
+
 #define FAKE_WRITES
 
 #define MODNAME "hdldsvr"
@@ -240,6 +242,78 @@ static int handle_tcp_client(int tcp_client_socket)
 		switch (pkt->hdr.command) {
 
 			// ------------------------------------------------
+			// 'writ' command
+			// ------------------------------------------------
+			case CMD_WRIT:
+				// confirm write
+				pkt->hdr.result = 0;
+				r = ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
+				if (r < 0) {
+					reject_tcp_command(tcp_client_socket, "init_write b0rked");
+					goto error;
+				}
+
+				gstats.status = STATUS_BUSY_WRITE;
+				gstats.command = pkt->hdr.command;
+				gstats.start_sector = pkt->hdr.start_sector;
+				gstats.num_sectors = pkt->hdr.num_sectors;
+
+				// set-up buffer and clear bitmask
+				gstats.data = (u8*)(((long)&gstats.buffer[HDD_SECTOR_SIZE - 1]) & ~(HDD_SECTOR_SIZE - 1));
+				mips_memset (gstats.bitmask, 0, sizeof (gstats.bitmask));
+
+				break;
+
+
+			// ------------------------------------------------
+			// 'wris' command
+			// ------------------------------------------------
+			case CMD_WRIS:
+				if ((pkt->hdr.start_sector != gstats.start_sector) || (pkt->hdr.num_sectors != gstats.num_sectors)) {
+					reject_tcp_command(tcp_client_socket, "invalid write stat");
+					goto error;
+				}
+				r = check_datas(pkt->hdr.command, pkt->hdr.start_sector, pkt->hdr.num_sectors);
+				if (r < 0) {
+
+					// means we need retransmission of some datas so we send bitmask stats to the client
+					u32 *out = gstats.bitmask_copy;
+					for (i=0; i<(NET_NUM_SECTORS+31)/32; ++i)
+						out[i] = gstats.bitmask[i];
+
+					mips_memcpy(pkt->data, (void *)out, sizeof(gstats.bitmask_copy));
+
+					pkt->hdr.result = 0;
+      					r = ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header)+sizeof(gstats.bitmask));
+					if (r < 0) {
+						reject_tcp_command(tcp_client_socket, "init_write_stat failed");
+						goto error;
+
+					}
+
+					gstats.status = STATUS_BUSY_WRITE;
+				}
+				else {
+					pkt->hdr.result = pkt->hdr.num_sectors;
+
+				#ifdef FAKE_WRITES
+					// fake write, we read instead
+					*(u32 *)&args[0] = pkt->hdr.start_sector;
+					*(u32 *)&args[4] = pkt->hdr.num_sectors;
+					devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, gstats.data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
+				#else
+					// !!! real writes !!!
+					*(u32 *)&args[0] = pkt->hdr.start_sector;
+					*(u32 *)&args[4] = pkt->hdr.num_sectors;
+					*(u32 *)&args[8] = (u32)gstats.data;
+					devctl("hdd0:", APA_DEVCTL_ATA_IOP_WRITE, args, 8+(pkt->hdr.num_sectors*HDD_SECTOR_SIZE), NULL, 0);
+				#endif
+					ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
+				}
+				break;
+
+
+			// ------------------------------------------------
 			// 'stat' command
 			// ------------------------------------------------
 			case CMD_STAT:
@@ -284,78 +358,6 @@ static int handle_tcp_client(int tcp_client_socket)
 					ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(tcp_packet_t));
 				}
 
-				break;
-
-
-			// ------------------------------------------------
-			// 'writ' command
-			// ------------------------------------------------
-			case CMD_WRIT:
-				// confirm write
-				pkt->hdr.result = 0;
-				r = ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
-				if (r < 0) {
-					reject_tcp_command(tcp_client_socket, "init_write b0rked");
-					goto error;
-				}
-
-				gstats.status = STATUS_BUSY_WRITE;
-				gstats.command = pkt->hdr.command;
-				gstats.start_sector = pkt->hdr.start_sector;
-				gstats.num_sectors = pkt->hdr.num_sectors;
-
-				// set-up buffer and clear bitmask
-				gstats.data = (u8*)(((long)&gstats.buffer[HDD_SECTOR_SIZE - 1]) & ~(HDD_SECTOR_SIZE - 1));
-				memset (gstats.bitmask, 0, sizeof (gstats.bitmask));
-
-				break;
-
-
-			// ------------------------------------------------
-			// 'wris' command
-			// ------------------------------------------------
-			case CMD_WRIS:
-				if ((pkt->hdr.start_sector != gstats.start_sector) || (pkt->hdr.num_sectors != gstats.num_sectors)) {
-					reject_tcp_command(tcp_client_socket, "invalid write stat");
-					goto error;
-				}
-				r = check_datas(pkt->hdr.command, pkt->hdr.start_sector, pkt->hdr.num_sectors);
-				if (r < 0) {
-
-					// means we need retransmission of some datas so we send bitmask stats to the client
-					u32 *out = gstats.bitmask_copy;
-					for (i=0; i<(NET_NUM_SECTORS+31)/32; ++i)
-						out[i] = gstats.bitmask[i];
-
-					memcpy(pkt->data, (void *)out, sizeof(gstats.bitmask_copy));
-
-					pkt->hdr.result = 0;
-      					r = ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header)+sizeof(gstats.bitmask));
-					if (r < 0) {
-						reject_tcp_command(tcp_client_socket, "init_write_stat failed");
-						goto error;
-
-					}
-
-					gstats.status = STATUS_BUSY_WRITE;
-				}
-				else {
-					pkt->hdr.result = pkt->hdr.num_sectors;
-
-				#ifdef FAKE_WRITES
-					// fake write, we read instead
-					*(u32 *)&args[0] = pkt->hdr.start_sector;
-					*(u32 *)&args[4] = pkt->hdr.num_sectors;
-					devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, gstats.data, pkt->hdr.num_sectors*HDD_SECTOR_SIZE);
-				#else
-					// !!! real writes !!!
-					*(u32 *)&args[0] = pkt->hdr.start_sector;
-					*(u32 *)&args[4] = pkt->hdr.num_sectors;
-					*(u32 *)&args[8] = (u32)gstats.data;
-					devctl("hdd0:", APA_DEVCTL_ATA_IOP_WRITE, args, 8+(pkt->hdr.num_sectors*HDD_SECTOR_SIZE), NULL, 0);
-				#endif
-					ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
-				}
 				break;
 
 
@@ -479,7 +481,7 @@ void udp_server_thread(void *args)
 					u32 start_sector = pkt->start_sector - gstats.start_sector;
 
 					if (!GETBIT(gstats.bitmask, start_sector)) {
-						memcpy(gstats.data + start_sector*HDD_SECTOR_SIZE, pkt, HDD_SECTOR_SIZE*2);
+						mips_memcpy(gstats.data + start_sector*HDD_SECTOR_SIZE, pkt, HDD_SECTOR_SIZE*2);
 
 						SETBIT(gstats.bitmask, start_sector);
 						SETBIT(gstats.bitmask, start_sector + 1);

@@ -220,44 +220,13 @@ int main(int argc, char *argv[2])
 
 
 	// ----------------------------------------------------------------
-	// how to open connection to SMB server:
-	// ----------------------------------------------------------------
-
-	smbConnect_in_t connect;
-
-	strcpy(connect.serverIP, "192.168.0.2");
-	connect.serverPort = 445;
-
-	scr_printf("\t CONNECT... ");
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_CONNECT, (void *)&connect, sizeof(connect), NULL, 0);
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
-
-
-	// ----------------------------------------------------------------
-	// how to send an Echo to SMB server to test if it's alive:
-	// ----------------------------------------------------------------
-	smbEcho_in_t echo;
-
-	strcpy(echo.echo, "ALIVE ECHO TEST");
-	echo.len = strlen("ALIVE ECHO TEST");
-
-	scr_printf("ECHO... ");
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
-
-
-	// ----------------------------------------------------------------
 	// how to LOGON to SMB server:
 	// ----------------------------------------------------------------
 
 	smbLogOn_in_t logon;
 
+	strcpy(logon.serverIP, "192.168.0.2");
+	logon.serverPort = 445;
 	strcpy(logon.User, "GUEST");
 	//strcpy(logon.User, "jimmikaelkael");
 	// we could reuse the generated hash
@@ -269,8 +238,24 @@ int main(int argc, char *argv[2])
 	// or simply tell we're not sending password
 	//logon.PasswordType = NO_PASSWORD;
 
-	scr_printf("LOGON... ");
+	scr_printf("\t LOGON... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
+	if (ret == 0)
+		scr_printf("OK ");
+	else
+		scr_printf("Error %d ", ret);
+
+
+	// ----------------------------------------------------------------
+	// how to send an Echo to SMB server to test if it's alive:
+	// ----------------------------------------------------------------
+	smbEcho_in_t echo;
+
+	strcpy(echo.echo, "ALIVE ECHO TEST");
+	echo.len = strlen("ALIVE ECHO TEST");
+
+	scr_printf(" ECHO... ");
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
 	if (ret == 0)
 		scr_printf("OK\n");
 	else
@@ -617,18 +602,6 @@ int main(int argc, char *argv[2])
 		scr_printf("OK  ");
 	else
 		scr_printf("Error %d  ", ret);
-
-
-	// ----------------------------------------------------------------
-	// how to close connection to SMB server:
-	// ----------------------------------------------------------------
-
-	scr_printf("DISCONNECT... ");
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_DISCONNECT, NULL, 0, NULL, 0);
-	if (ret == 0)
-		scr_printf("OK");
-	else
-		scr_printf("Error %d", ret);
 
 
    	SleepThread();

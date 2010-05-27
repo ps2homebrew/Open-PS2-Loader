@@ -327,10 +327,10 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 			fh->mode = mode;
 			fh->filesize = filesize;
 			fh->position = 0;
-			if (fh->mode & O_TRUNC) {
-				fh->position = 0;
+			if (fh->mode & O_TRUNC)
 				fh->filesize = 0;
-			}
+			else if (fh->mode & O_APPEND)
+				fh->position = filesize;
 			strncpy(fh->name, path, 255);
 			r = 0;
 		}

@@ -24,6 +24,9 @@
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
 
+// for sleep()
+#include <unistd.h>
+
 #define UPDATE_FRAME_COUNT 250
 
 #define IO_MENU_UPDATE_DEFFERED 2
@@ -530,15 +533,35 @@ void unloadHdldSvr(void) {
 }
 
 static void handleHdlSrv() {
+	guiRenderTextScreen("HDL Server Starting...");
+	
 	// prepare for hdl, display screen with info
 	loadHdldSvr();
 	
-	// TODO: A propper screen with info display
-	// show a message box for now
-	guiMsgBox("HDL Server Running...");
-
-	// did someone press circle?
-	guiMsgBox("Press circle again to stop HDL...");
+	int terminate = 0;
+	
+	while (1) {
+		if (terminate != 0)
+			guiRenderTextScreen("Press cross to stop HDL...");
+		else
+			guiRenderTextScreen("HDL Server Running... [O][X] To stop");
+	
+		sleep(2);
+		
+		readPads();
+		
+		if(getKeyOn(KEY_CIRCLE) && terminate == 0) {
+			terminate++;
+		} else if(getKeyOn(KEY_CROSS) && terminate == 1) {
+			terminate++;
+		} else if (terminate > 0) 
+			terminate--;
+		
+		if (terminate >= 2)
+			break;
+	}
+	
+	guiRenderTextScreen("HDL Server Unloading...");
 	
 	// restore normal functionality again
 	unloadHdldSvr();

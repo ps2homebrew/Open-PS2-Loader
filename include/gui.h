@@ -132,4 +132,8 @@ void guiDrawBGArt();
 */
 void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data);
 
+/** Renders a single frame with a specified message on the screen
+*/
+void guiRenderTextScreen(const unsigned char* message);
+
 #endif

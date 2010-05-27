@@ -1079,3 +1079,18 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 		guiEndFrame();
 	}
 }
+
+void guiRenderTextScreen(const unsigned char* message) {
+	guiStartFrame();
+		
+	guiShow(0);
+		
+	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
+		
+	fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
+		
+	// so the io status icon will be rendered
+	guiDrawOverlays();
+		
+	guiEndFrame();
+}

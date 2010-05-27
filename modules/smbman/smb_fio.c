@@ -167,8 +167,9 @@ static void keepalive_thread(void *args)
 
 		// echo the SMB server
 		r = smb_Echo("PS2 KEEPALIVE ECHO", 18);
-		if (r < 0)
-			keepalive_lock();
+		if (r < 0) {
+			keepalive_lock();			
+		}
 
 		SignalSema(smbman_io_sema);
 	}
@@ -854,20 +855,6 @@ static void smb_GetPasswordHashes(smbGetPasswordHashes_in_t *in, smbGetPasswordH
 }
 
 //-------------------------------------------------------------- 
-static int smb_tcpConnect(smbConnect_in_t *connect)
-{
-	register int r;
-
-	r = smb_Connect(connect->serverIP, connect->serverPort);
-	if (r < 0)
-		return r;
-
-	keepalive_unlock();
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
 static int smb_LogOn(smbLogOn_in_t *logon)
 {
 	register int r;
@@ -876,6 +863,10 @@ static int smb_LogOn(smbLogOn_in_t *logon)
 		smb_LogOffAndX(UID);
 		UID = -1;
 	}
+
+	r = smb_Connect(logon->serverIP, logon->serverPort);
+	if (r < 0)
+		return r;
 
 	r = smb_NegociateProtocol();
 	if (r < 0)
@@ -886,6 +877,8 @@ static int smb_LogOn(smbLogOn_in_t *logon)
 		return r;
 
 	UID = r;
+
+	keepalive_unlock();
 
 	return 0;
 }
@@ -909,6 +902,10 @@ static int smb_LogOff(void)
 		return r;
 
 	UID = -1;
+
+	keepalive_lock();
+
+	smb_Disconnect();
 
 	return 0;
 }
@@ -1030,16 +1027,6 @@ static int smb_QueryDiskInfo(smbQueryDiskInfo_out_t *querydiskinfo)
 }
 
 //-------------------------------------------------------------- 
-static int smb_tcpDisconnect()
-{
-	keepalive_lock();
-
-	smb_Disconnect();
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
 int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 arglen, void *bufp, u32 buflen)
 {
 	register int r = 0;
@@ -1047,12 +1034,6 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 	smb_io_lock();
 
 	switch(cmd) {
-
-		case SMB_DEVCTL_CONNECT:
-			r = smb_tcpConnect((smbConnect_in_t *)arg);
-			if (r < 0)
-				r = -EIO;
-			break;
 
 		case SMB_DEVCTL_GETPASSWORDHASHES:
 			smb_GetPasswordHashes((smbGetPasswordHashes_in_t *)arg, (smbGetPasswordHashes_out_t *)bufp);
@@ -1116,12 +1097,6 @@ int smb_devctl(iop_file_t *f, const char *devname, int cmd, void *arg, u32 argle
 				else
 					r = -EIO;
 			}
-			break;
-
-		case SMB_DEVCTL_DISCONNECT:
-			r = smb_tcpDisconnect();
-			if (r < 0)
-				r = -EIO;
 			break;
 
 		default:

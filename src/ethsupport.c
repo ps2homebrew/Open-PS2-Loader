@@ -230,34 +230,25 @@ static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 
 int ethSMBConnect(void) {
 	int ret;
-	smbConnect_in_t connect;
-	//smbEcho_in_t echo;
 	smbLogOn_in_t logon;
+	smbEcho_in_t echo;
 	smbOpenShare_in_t openshare;
 
-	// open tcp connection with the server
-	sprintf(connect.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	connect.serverPort = gPCPort;
-
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_CONNECT, (void *)&connect, sizeof(connect), NULL, 0);
-	if (ret < 0)
-		return -1;
-
-	// SMB server alive test
-	/*
-	strcpy(echo.echo, "ALIVE ECHO TEST");
-	echo.len = strlen("ALIVE ECHO TEST");
-
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
-	if (ret < 0)
-		return -2;
-	*/
-
-	// logon to SMB server
+	// open tcp connection with the server / logon to SMB server
+	sprintf(logon.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	logon.serverPort = gPCPort;
 	strcpy(logon.User, "GUEST");
 	logon.PasswordType = NO_PASSWORD;
 
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
+	if (ret < 0)
+		return -2;
+
+	// SMB server alive test
+	strcpy(echo.echo, "ALIVE ECHO TEST");
+	echo.len = strlen("ALIVE ECHO TEST");
+
+	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
 	if (ret < 0)
 		return -3;
 
@@ -280,16 +271,10 @@ int ethSMBDisconnect(void) {
 	if (ret < 0)
 		return -1;
 
-
-	// logoff from SMB server:
+	// logoff/close tcp connection from SMB server:
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
 	if (ret < 0)
 		return -2;
-
-	// closing tcp connection
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_DISCONNECT, NULL, 0, NULL, 0);
-	if (ret < 0)
-		return -3;
 
 	return 0;	
 }

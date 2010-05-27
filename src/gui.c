@@ -881,14 +881,19 @@ static void guiMenuHandleInput() {
 	if (!mainMenuCurrent)
 		mainMenuCurrent = mainMenu;
 	
-	if (getKeyOn(KEY_UP)) {
+	if (getKey(KEY_UP)) {
 		if (mainMenuCurrent->prev)
 			mainMenuCurrent = mainMenuCurrent->prev;
+		else	// rewind to the last item
+			while (mainMenuCurrent->next)
+				mainMenuCurrent = mainMenuCurrent->next;
 	}
 	
-	if (getKeyOn(KEY_DOWN)) {
+	if (getKey(KEY_DOWN)) {
 		if (mainMenuCurrent->next)
 			mainMenuCurrent = mainMenuCurrent->next;
+		else
+			mainMenuCurrent = mainMenu;
 	}
 	
 	if (getKeyOn(KEY_CROSS)) {

@@ -88,6 +88,12 @@ static iop_sys_clock_t keepalive_sysclock;
 static int UID = -1;
 static int TID = -1;
 
+static smbLogOn_in_t glogon_info;
+static smbOpenShare_in_t gopenshare_info;
+
+static int smb_LogOn(smbLogOn_in_t *logon);
+static int smb_OpenShare(smbOpenShare_in_t *openshare);
+
 //-------------------------------------------------------------------------
 // Timer Interrupt handler for Echoing the server every 3 seconds, when
 // not already doing IO, and counting after an IO operation has finished
@@ -156,7 +162,7 @@ static void smb_io_unlock(void)
 //-------------------------------------------------------------------------
 static void keepalive_thread(void *args)
 {
-	register int r;
+	register int r, opened_share = 0;
 
 	while (1) {
 		// wait for keepalive mutex
@@ -168,7 +174,20 @@ static void keepalive_thread(void *args)
 		// echo the SMB server
 		r = smb_Echo("PS2 KEEPALIVE ECHO", 18);
 		if (r < 0) {
-			keepalive_lock();			
+			keepalive_lock();
+
+			if (TID != -1)
+				opened_share = 1;
+
+			if (UID != -1) {
+				r = smb_LogOn((smbLogOn_in_t *)&glogon_info);
+				if (r == 0) {
+					if (opened_share)
+						smb_OpenShare((smbOpenShare_in_t *)&gopenshare_info);
+				}
+			}
+
+			keepalive_unlock();
 		}
 
 		SignalSema(smbman_io_sema);
@@ -878,6 +897,8 @@ static int smb_LogOn(smbLogOn_in_t *logon)
 
 	UID = r;
 
+	memcpy((void *)&glogon_info, (void *)logon, sizeof(smbLogOn_in_t));
+
 	keepalive_unlock();
 
 	return 0;
@@ -891,7 +912,7 @@ static int smb_LogOff(void)
 	if (UID == -1)
 		return -3;
 
-	if (!(TID == -1)) {
+	if (TID != -1) {
 		smb_closeAll();
 		smb_TreeDisconnect(UID, TID);
 		TID = -1;
@@ -988,6 +1009,8 @@ static int smb_OpenShare(smbOpenShare_in_t *openshare)
 		return r;
 
 	TID = r;
+
+	memcpy((void *)&gopenshare_info, (void *)openshare, sizeof(smbOpenShare_in_t));
 
 	return 0;
 }

@@ -57,6 +57,7 @@ static ee_sema_t gQueueSema;
 
 static int isIOBlocked = 0;
 static int alarmID = 0;
+static int stopIOTimer = 0;
 
 int ioRegisterHandler(int type, io_request_handler_t handler) {
 	WaitSema(gProcSemaId);
@@ -322,7 +323,7 @@ static void ioThreadDispatcher ( void* apParam ) {
 }  /* end dispatcher */ 
 
 static void ioAlarmFunc(s32 id, u16 time, void *arg) {
-        if (!gIOTerminate) {
+        if (!gIOTerminate && !stopIOTimer) {
 		iWakeupThread ( gDispatcherThreadID ); 
 		iRotateThreadReadyQueue ( 30 ); 
 		alarmID = iSetAlarm ( 625, &ioAlarmFunc, NULL ); 
@@ -343,7 +344,7 @@ int ioPrintf(const char* format, ...) {
 }
 
 int ioBlockOps(int block) {
-	if (block) {
+	if (block && !isIOBlocked) {
 		isIOBlocked = 1;
 		
 		// wait for all io to finish
@@ -351,9 +352,18 @@ int ioBlockOps(int block) {
 			// TODO: This is in seconds, so can be too coarse
 			sleep(1);
 		}
+		
 		// now all io should be blocked
+		// stop the timer as well...
+		stopIOTimer = 1;
+		ReleaseAlarm(alarmID);
 	} else {
-		isIOBlocked = 0;
+		if (isIOBlocked) {
+			isIOBlocked = 0;
+			stopIOTimer = 0;
+			// create the alarm again
+			alarmID = SetAlarm( 625, &ioAlarmFunc, NULL); 
+		}
 	}
 
 	return IO_OK;

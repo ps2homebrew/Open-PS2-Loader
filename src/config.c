@@ -279,15 +279,15 @@ void getConfigDiscIDBinary(char* startup, void* dst) {
 }
 
 int readConfig(struct TConfigSet* config, char *fname) {
-	read_context_t* readContext = openReadContext(fname, 0, 512);
-	if (!readContext) {
+	file_buffer_t* fileBuffer = openFileBuffer(fname, O_RDONLY, 0, 4096);
+	if (!fileBuffer) {
 		LOG("No config. Exiting...\n");
 		return 0;
 	}
 	
 	char* line;
 	unsigned int lineno = 0;
-	while (readLineContext(readContext, &line)) {
+	while (readFileBuffer(fileBuffer, &line)) {
 		lineno++;
 		
 		char key[255], val[255];
@@ -301,25 +301,25 @@ int readConfig(struct TConfigSet* config, char *fname) {
 			LOG("Malformed config file '%s' line %d: '%s'\n", fname, lineno, line);
 		}
 	}
-	closeReadContext(readContext);
+	closeFileBuffer(fileBuffer);
 	return 1;
 }
 
 int writeConfig(struct TConfigSet* config, char *fname) {
-	int fd = openFile(fname, O_WRONLY | O_CREAT | O_TRUNC);
-	if (fd >= 0) {
+	file_buffer_t* fileBuffer = openFileBuffer(fname, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
+	if (fileBuffer) {
 		char line[512];
 		struct TConfigValue* cur = config->head;
 
 		while (cur) {
 			snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
-			fioWrite(fd, line, strlen(line));
-	
+			writeFileBuffer(fileBuffer, line, strlen(line));
+
 			// and advance
 			cur = cur->next;
 		}
 
-		fioClose(fd);
+		closeFileBuffer(fileBuffer);
 		return 1;
 	}
 	return 0;

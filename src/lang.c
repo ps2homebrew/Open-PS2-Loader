@@ -103,16 +103,16 @@ static void lngFreeFromFile() {
 }
 
 static int lngLoadFromFile(char* path, char *name) {
-	read_context_t* readContext = openReadContext(path, 1, 1024);
-	if (readContext) {
+	file_buffer_t* fileBuffer = openFileBuffer(path, O_RDONLY, 1, 1024);
+	if (fileBuffer) {
 		// file exists, try to read it and load the custom lang
 		lang_strs = (char**) malloc(LANG_STR_COUNT * sizeof(char**));
 
 		int strId = 0;
-		while (strId < LANG_STR_COUNT && readLineContext(readContext, &lang_strs[strId])) {
+		while (strId < LANG_STR_COUNT && readFileBuffer(fileBuffer, &lang_strs[strId])) {
 			strId++;
 		}
-		closeReadContext(readContext);
+		closeFileBuffer(fileBuffer);
 		
 		LOG("LANG: #### Loaded %d entries\n", strId);
 
@@ -164,12 +164,12 @@ static int lngReadEntry(int index, char* path, char* separator, char* name, unsi
 			memcpy(currLang->name, name + 5, length);
 			currLang->name[length - 1] = '\0';
 
-			/*read_context_t* readContext = openReadContext(currLang->filePath, 1, 1024);
-			if (readContext) {
+			/*file_buffer_t* fileBuffer = openFileBuffer(currLang->filePath, 1, 1024);
+			if (fileBuffer) {
 				// read localized name of language from file
-				if (readLineContext(readContext, &currLang->name))
-					readLineContext(readContext, &currLang->fontName);
-				closeReadContext(readContext);
+				if (readLineContext(fileBuffer, &currLang->name))
+					readLineContext(fileBuffer, &currLang->fontName);
+				closeFileBuffer(fileBuffer);
 			}*/
 
 			index++;

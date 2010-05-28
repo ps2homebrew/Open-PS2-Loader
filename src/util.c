@@ -129,35 +129,39 @@ int listDir(char* path, char* separator, int maxElem,
 }
 
 /* size will be the maximum line size possible */
-read_context_t* openReadContext(char* fpath, short allocResult, unsigned int size) {
-	read_context_t* readContext = NULL;
+file_buffer_t* openFileBuffer(char* fpath, int mode, short allocResult, unsigned int size) {
+	file_buffer_t* fileBuffer = NULL;
 
-	int fd = openFile(fpath, O_RDONLY);
+	int fd = openFile(fpath, mode);
 	if (fd >= 0) {
-		readContext = (read_context_t*) malloc(sizeof(read_context_t));
-		readContext->size = size;
-		readContext->available = 0;
-		readContext->buffer = (char*) malloc(size * sizeof(char));
-		readContext->lastPtr = NULL;
-		readContext->allocResult = allocResult;
-		readContext->fd = fd;
+		fileBuffer = (file_buffer_t*) malloc(sizeof(file_buffer_t));
+		fileBuffer->size = size;
+		fileBuffer->available = 0;
+		fileBuffer->buffer = (char*) malloc(size * sizeof(char));
+		if (mode == O_RDONLY)
+			fileBuffer->lastPtr = NULL;
+		else
+			fileBuffer->lastPtr = fileBuffer->buffer;
+		fileBuffer->allocResult = allocResult;
+		fileBuffer->fd = fd;
+		fileBuffer->mode = mode;
 	}
 
-	return readContext;
+	return fileBuffer;
 }
 
-int readLineContext(read_context_t* readContext, char** outBuf) {
+int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 	int lineSize = 0, read, length;
 	char* posLF = NULL;
 
 	while (1) {
 		// if lastPtr is set, then we continue the read from this point as reference
-		if (readContext->lastPtr) {
+		if (fileBuffer->lastPtr) {
 			// Calculate the remaining chars to the right of lastPtr
-			lineSize = readContext->available - (readContext->lastPtr - readContext->buffer);
+			lineSize = fileBuffer->available - (fileBuffer->lastPtr - fileBuffer->buffer);
 			/*LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
-					readContext->lastPtr - readContext->buffer, readContext->available, lineSize, readContext->lastPtr[lineSize]);*/
-			posLF = strchr(readContext->lastPtr, 0x0A);
+					fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]);*/
+			posLF = strchr(fileBuffer->lastPtr, 0x0A);
 		}
 
 		if (!posLF) { // We can come here either when the buffer is empty, or if the remaining chars don't have a LF
@@ -165,84 +169,111 @@ int readLineContext(read_context_t* readContext, char** outBuf) {
 			// if available, we shift the remaining chars to the left ...
 			if (lineSize) {
 				//LOG("##### LF not found, Shift %d characters from end to beginning\n", lineSize);
-				memmove(readContext->buffer, readContext->lastPtr, lineSize);
+				memmove(fileBuffer->buffer, fileBuffer->lastPtr, lineSize);
 			}
 
 			// ... and complete the buffer if we're not at EOF
-			if (readContext->fd >= 0) {
+			if (fileBuffer->fd >= 0) {
 
 				// Load as many characters necessary to fill the buffer
-				length = readContext->size - lineSize - 1;
+				length = fileBuffer->size - lineSize - 1;
 				//LOG("##### Asking for %d characters to complete buffer\n", length);
-				read = fioRead(readContext->fd, readContext->buffer + lineSize, length);
-				readContext->buffer[lineSize + read] = '\0';
+				read = fioRead(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
+				fileBuffer->buffer[lineSize + read] = '\0';
 
 				// Search again (from the lastly added chars only), the result will be "analyzed" in next if
-				posLF = strchr(readContext->buffer + lineSize, 0x0A);
+				posLF = strchr(fileBuffer->buffer + lineSize, 0x0A);
 
 				// Now update read context info
 				lineSize = lineSize + read;
 				//LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
 
 				// If buffer not full it means we are at EOF
-				if (readContext->size != lineSize + 1) {
+				if (fileBuffer->size != lineSize + 1) {
 					//LOG("##### Reached EOF\n");
-					fioClose(readContext->fd);
-					readContext->fd = -1;
+					fioClose(fileBuffer->fd);
+					fileBuffer->fd = -1;
 				}
 			}
 
-			readContext->lastPtr = readContext->buffer;
-			readContext->available = lineSize;
+			fileBuffer->lastPtr = fileBuffer->buffer;
+			fileBuffer->available = lineSize;
 		}
 
 		if(posLF)
-			lineSize = posLF - readContext->lastPtr;
+			lineSize = posLF - fileBuffer->lastPtr;
 
 		// Check the previous char (on Windows there are CR/LF instead of single linux LF)
 		if (lineSize)
-			if (*(readContext->lastPtr + lineSize - 1) == 0x0D)
+			if (*(fileBuffer->lastPtr + lineSize - 1) == 0x0D)
 				lineSize--;
 
-		readContext->lastPtr[lineSize] = '\0';
-		*outBuf = readContext->lastPtr;
+		fileBuffer->lastPtr[lineSize] = '\0';
+		*outBuf = fileBuffer->lastPtr;
 
-		//LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", readContext->lastPtr, lineSize, readContext->available, readContext->lastPtr - readContext->buffer);
+		//LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", fileBuffer->lastPtr, lineSize, fileBuffer->available, fileBuffer->lastPtr - fileBuffer->buffer);
 
 		// If we are at EOF and no more chars available to scan, then we are finished
-		if (!lineSize && !readContext->available && readContext->fd == -1)
+		if (!lineSize && !fileBuffer->available && fileBuffer->fd == -1)
 			return 0;
 
-		if (readContext->lastPtr[0] == 0x23) {// '#' for comment lines
+		if (fileBuffer->lastPtr[0] == 0x23) {// '#' for comment lines
 			if (posLF)
-				readContext->lastPtr = posLF + 1;
+				fileBuffer->lastPtr = posLF + 1;
 			else
-				readContext->lastPtr = NULL;
+				fileBuffer->lastPtr = NULL;
 			continue;
 		}
 
-		if (lineSize && readContext->allocResult) {
+		if (lineSize && fileBuffer->allocResult) {
 			*outBuf = (char*) malloc((lineSize + 1) * sizeof(char));
-			memcpy(*outBuf, readContext->lastPtr,  lineSize + 1);
+			memcpy(*outBuf, fileBuffer->lastPtr,  lineSize + 1);
 		}
 
 		// Either move the pointer to next chars, or set it to null to force a whole buffer read (if possible)
 		if (posLF)
-			readContext->lastPtr = posLF + 1;
+			fileBuffer->lastPtr = posLF + 1;
 		else {
-			readContext->lastPtr = NULL;
+			fileBuffer->lastPtr = NULL;
 		}
 
 		return 1;
 	}
 }
 
-void closeReadContext(read_context_t* readContext) {
-	if (readContext->fd >= 0)
-		fioClose(readContext->fd);
-	free(readContext->buffer);
-	free(readContext);
-	readContext = NULL;
+void writeFileBuffer(file_buffer_t* fileBuffer, char* inBuf, int size) {
+	//LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
+	if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
+		//LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
+		fioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+		fileBuffer->lastPtr = fileBuffer->buffer;
+		fileBuffer->available = 0;
+	}
+
+	if (size > fileBuffer->size) {
+		//LOG("writeFileBuffer direct write: %d\n", size);
+		fioWrite(fileBuffer->fd, inBuf, size);
+	}
+	else {
+		memcpy(fileBuffer->lastPtr, inBuf, size);
+		fileBuffer->lastPtr += size;
+		fileBuffer->available += size;
+
+		//LOG("writeFileBuffer lastPrt: %d\n", (fileBuffer->lastPtr - fileBuffer->buffer));
+	}
+}
+
+void closeFileBuffer(file_buffer_t* fileBuffer) {
+	if (fileBuffer->fd >= 0) {
+		if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
+			//LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
+			fioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+		}
+		fioClose(fileBuffer->fd);
+	}
+	free(fileBuffer->buffer);
+	free(fileBuffer);
+	fileBuffer = NULL;
 }
 
 // a simple maximum of two inline

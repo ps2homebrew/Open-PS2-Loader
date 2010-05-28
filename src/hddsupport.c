@@ -176,7 +176,7 @@ static void hddLaunchGame(int id) {
 
 	hdl_game_info_t* game = &hddGames->games[id];
 
-	char* gid[5];
+	char gid[5];
 	getConfigDiscIDBinary(hddGames->games[id].startup, gid);
 
 	if (game->dma_type == 0) {

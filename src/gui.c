@@ -340,7 +340,8 @@ void guiShowCompatConfig(int id, item_list_t *support) {
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
 	// Find out the current game ID
-	char *hexid = getConfigDiscID(startup);
+	char hexid[32];
+	getConfigDiscID(startup, hexid);
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
 	// show dialog
@@ -373,7 +374,8 @@ void guiShowCompatConfig(int id, item_list_t *support) {
 		support->itemSetCompatibility(id, compatMode, dmaMode, result == COMPAT_SAVE);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
-		setConfigDiscID(startup, hexid);
+		if (hexid[0] != '\0')
+			setConfigDiscID(startup, hexid);
 
 		if (result == COMPAT_SAVE)
 			saveConfig();

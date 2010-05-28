@@ -29,10 +29,6 @@
 // scroll speed (delay in ms!) when setting int value
 #define DIA_INT_SET_SPEED 100
 
-// button delay backups
-static int delay_up = 300;
-static int delay_down = 300;
-
 // Utility stuff
 int diaShowKeyb(char* text, size_t maxLen) {
 	int i, j, len=strlen(text), selkeyb=1;
@@ -228,10 +224,15 @@ int diaShowKeyb(char* text, size_t maxLen) {
 	return 0;
 }
 
+static int colPadSettings[16];
+
 
 int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 	int selc = 0;
+	int ret = 0;
 	unsigned char col[3];
+
+	padStoreSettings(colPadSettings);
 
 	col[0] = *r; col[1] = *g; col[2] = *b;
 	setButtonDelay(KEY_LEFT, 1);
@@ -298,17 +299,16 @@ int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 			*r = col[0];
 			*g = col[1];
 			*b = col[2];
-			setButtonDelay(KEY_LEFT, 5);
-			setButtonDelay(KEY_RIGHT, 5);
-			return 1;
+			ret = 1;
+			break;
 		}else if(getKeyOn(KEY_CIRCLE)) {
-			setButtonDelay(KEY_LEFT, 5);
-			setButtonDelay(KEY_RIGHT, 5);
-			return 0;
+			ret = 0;
+			break;
 		}
 	}
-	
-	return 0;
+
+	padRestoreSettings(colPadSettings);
+	return ret;
 }
 
 
@@ -696,14 +696,14 @@ static struct UIItem *diaGetNextLine(struct UIItem* cur, struct UIItem *ui) {
 	return cur;
 }
 
+static int diaPadSettings[16];
+
 static void diaStoreScrollSpeed(void) {
-	delay_up   = getButtonDelay(KEY_UP);
-	delay_down = getButtonDelay(KEY_DOWN);
+	padStoreSettings(diaPadSettings);
 }
 
 static void diaRestoreScrollSpeed(void) {
-	setButtonDelay(KEY_UP, delay_up);
-	setButtonDelay(KEY_DOWN, delay_down);
+	padRestoreSettings(diaPadSettings);
 }
 
 int diaExecuteDialog(struct UIItem *ui) {

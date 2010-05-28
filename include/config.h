@@ -27,8 +27,8 @@ int configRemoveKey(struct TConfigSet* config, const char* key);
 void readIPConfig();
 void writeIPConfig();
 
-char *getConfigDiscID(char* startup);
-void setConfigDiscID(char* startup, const char *gid);
+void getConfigDiscID(char* startup, char* discID);
+void setConfigDiscID(char* startup, const char *discID);
 void removeConfigDiscID(char* startup);
 void getConfigDiscIDBinary(char* startup, void* dst);
 

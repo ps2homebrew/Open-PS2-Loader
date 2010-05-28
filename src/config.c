@@ -128,9 +128,8 @@ int getConfigStr(struct TConfigSet* config, const char* key, char** value) {
 	if (it) {
 		*value = it->val;
 		return 1;
-	} else {
+	} else
 		return 0;
-	}
 }
 	
 int setConfigInt(struct TConfigSet* config, const char* key, const int value) {
@@ -229,20 +228,20 @@ void writeIPConfig() {
 	}
 }
 
-char *getConfigDiscID(char* startup) {
-	char *gid;
+void getConfigDiscID(char* startup, char* discID) {
+	char *valref = NULL;
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	if (!getConfigStr(&gConfig, gkey, &gid))
-		gid = ""; // TODO is this correct ?
-
-	return gid;
+	if (getConfigStr(&gConfig, gkey, &valref))
+		strncpy(discID, valref, 32);
+	else
+		discID[0] = '\0';
 }
 
-void setConfigDiscID(char* startup, const char *gid) {
+void setConfigDiscID(char* startup, const char *discID) {
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	setConfigStr(&gConfig, gkey, gid);
+	setConfigStr(&gConfig, gkey, discID);
 }
 
 void removeConfigDiscID(char* startup) {
@@ -253,28 +252,28 @@ void removeConfigDiscID(char* startup) {
 
 // dst has to have 5 bytes space
 void getConfigDiscIDBinary(char* startup, void* dst) {
-	char *gid;
+	memset(dst, 0, 5);
+
+	char *gid = NULL;
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	if (!getConfigStr(&gConfig, gkey, &gid))
-		gid = "";
+	if (getConfigStr(&gConfig, gkey, &gid)) {
+		// convert from hex to binary
+		char* cdst = dst;
+		int p = 0;
+		while (*gid && p < 10) {
+			int dv = -1;
 
-	// convert from hex to binary
-	memset(dst, 0, 5);
-	char* cdst = dst;
-	int p = 0;
-	while (*gid && p < 10) {
-		int dv = -1;
+			while (dv < 0 && *gid) // skip spaces, etc
+				dv = fromHex(*(gid++));
 
-		while (dv < 0 && *gid) // skip spaces, etc
-			dv = fromHex(*(gid++));
+			if (dv < 0)
+				break;
 
-		if (dv < 0)
-			break;
-
-		*cdst = *cdst * 16 + dv;
-		if ((++p & 1) == 0)
-			cdst++;
+			*cdst = *cdst * 16 + dv;
+			if ((++p & 1) == 0)
+				cdst++;
+		}
 	}
 }
 

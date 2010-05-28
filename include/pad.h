@@ -39,4 +39,10 @@ void setButtonDelay(int button, int btndelay);
 int getButtonDelay(int button);
 
 
+/** Store's the button delay into specified integer array (has to have 16 items) */
+void padStoreSettings(int* buffer);
+
+/** Restore's the button delay from specified integer array (has to have 16 items) */
+void padRestoreSettings(int* buffer);
+
 #endif

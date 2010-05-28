@@ -444,6 +444,7 @@ static void guiHandleOp(struct gui_update_t* item) {
 			submenuSort(item->menu.subMenu);
 			item->menu.menu->pagestart = NULL;
 			item->menu.menu->current = *item->menu.subMenu;
+			item->menu.menu->submenu = *item->menu.subMenu;
 			break;
 		
 		case GUI_OP_PIXMAP_LOADED:

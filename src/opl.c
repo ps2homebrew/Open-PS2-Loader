@@ -45,6 +45,22 @@ typedef struct {
 	struct submenu_list_t *subMenu;
 } opl_io_module_t;
 
+void clearIOModuleT(opl_io_module_t *mod) {
+	mod->subMenu = NULL;
+	mod->support = NULL;
+	mod->menuItem.altExecute = NULL;
+	mod->menuItem.execute = NULL;
+	mod->menuItem.hints = NULL;
+	mod->menuItem.icon_id = -1;
+	mod->menuItem.current = NULL;
+	mod->menuItem.submenu = NULL;
+	mod->menuItem.pagestart = NULL;
+	mod->menuItem.refresh = NULL;
+	mod->menuItem.text = NULL;
+	mod->menuItem.text_id = -1;
+	mod->menuItem.userdata = NULL;
+}
+
 // forward decl
 static void moduleCleanup(opl_io_module_t* mod);
 
@@ -128,13 +144,18 @@ static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
 
 static void initSupport(item_list_t* itemList, int startMode, int mode) {
 	if (!list_support[mode].support) {
+		itemList->uip = 1; // stop updates until we're done with init
 		list_support[mode].support = itemList;
 		initMenuForListSupport(&list_support[mode], startMode);
+		itemList->uip = 0;
 	}
 
 	if (startMode == 2 && !list_support[mode].support->enabled) {
+		// stop updates until we're done with init of the device
+		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
 		gFrameCounter = UPDATE_FRAME_COUNT;
+		list_support[mode].support->uip = 0;
 	}
 }
 
@@ -611,18 +632,11 @@ static void setDefaults(void) {
 	usbd_irx = NULL;
 	size_usbd_irx = 0;
 
-	list_support[USB_MODE].support = NULL;
-	list_support[USB_MODE].subMenu = NULL;
+	clearIOModuleT(&list_support[USB_MODE]);
+	clearIOModuleT(&list_support[ETH_MODE]);
+	clearIOModuleT(&list_support[HDD_MODE]);
+	clearIOModuleT(&list_support[APP_MODE]);
 	
-	list_support[ETH_MODE].support = NULL;
-	list_support[ETH_MODE].subMenu = NULL;
-	
-	list_support[HDD_MODE].support = NULL;
-	list_support[HDD_MODE].subMenu = NULL;
-	
-	list_support[APP_MODE].support = NULL;
-	list_support[APP_MODE].subMenu = NULL;
-
 	gConfig.head = NULL;
 	gConfig.tail = NULL;
 

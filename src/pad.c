@@ -398,3 +398,17 @@ int startPads() {
 	return pad_count;
 }
 
+void padStoreSettings(int* buffer) {
+	int i;
+	
+	for (i = 0; i < 16; i++)
+		buffer[i] = paddelay[i];
+}
+
+
+void padRestoreSettings(int* buffer) {
+	int i;
+	
+	for (i = 0; i < 16; i++)
+		paddelay[i] = buffer[i];
+}

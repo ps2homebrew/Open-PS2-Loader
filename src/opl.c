@@ -203,9 +203,9 @@ void _loadConfig() {
 	snprintf(path, 255, "%s/conf_opl.cfg", gBaseMCDir);
 	int result = readConfig(&gConfig, path);
 	
+	int themeID = -1, langID = -1;
 	if (result) {
 		char *temp;
-		int themeID = -1, langID = -1;
 
 		getConfigInt(&gConfig, "icons_cache_count", &gCountIconsCache);
 		getConfigInt(&gConfig, "covers_cache_count", &gCountCoversCache);
@@ -239,9 +239,10 @@ void _loadConfig() {
 		getConfigInt(&gConfig, "eth_mode", &gETHStartMode);
 		getConfigInt(&gConfig, "app_mode", &gAPPStartMode);
 
-		applyConfig(themeID, langID);
 	}
 	
+	applyConfig(themeID, langID);
+
 	lscret = result;
 	lscstatus = 0;
 }

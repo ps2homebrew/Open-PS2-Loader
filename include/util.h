@@ -11,16 +11,18 @@ int listDir(char* path, char* separator, int maxElem,
 
 typedef struct {
 	int fd;
+	int mode;
 	char* buffer;
 	unsigned int size;
 	unsigned int available;
 	char* lastPtr;
 	short allocResult;
-} read_context_t;
+} file_buffer_t;
 
-read_context_t* openReadContext(char* fpath, short allocResult, unsigned int size);
-int readLineContext(read_context_t* readContext, char** outBuf);
-void closeReadContext(read_context_t* readContext);
+file_buffer_t* openFileBuffer(char* fpath, int mode, short allocResult, unsigned int size);
+int readFileBuffer(file_buffer_t* readContext, char** outBuf);
+void writeFileBuffer(file_buffer_t* fileBuffer, char* inBuf, int size);
+void closeFileBuffer(file_buffer_t* fileBuffer);
 
 inline int max(int a, int b);
 inline int min(int a, int b);

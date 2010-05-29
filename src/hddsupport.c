@@ -5,6 +5,7 @@
 #include "include/textures.h"
 #include "include/themes.h"
 #include "include/ioman.h"
+#include "include/system.h"
 
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
@@ -33,15 +34,15 @@ static hdl_games_list_t* hddGames;
 static item_list_t hddGameList;
 
 static void hddLoadModules(void) {
-	int ret, id;
+	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
 #ifndef __DEBUG
 	if (!gDev9_loaded) {
 		gHddStartup = 4;
 
-		id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-		if ((id < 0) || ret) {
+		ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+		if (ret < 0) {
 			gHddStartup = -1;
 			return;
 		}
@@ -52,30 +53,30 @@ static void hddLoadModules(void) {
 
 	gHddStartup = 3;
 
-	id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+	if (ret < 0) {
 		gHddStartup = -1;
 		return;
 	}
 
 	gHddStartup = 2;
 
-	id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
+	if (ret < 0) {
 		gHddStartup = -1;
 		return;
 	}
 
 	gHddStartup = 1;
 
-	id=SifExecModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
+	if (ret < 0) {
 		gHddStartup = -1;
 		return;
 	}
 
-	int res = fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
-	if (res < 0) {
+	ret = fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
+	if (ret < 0) {
 		fileXioUmount(hddPrefix);
 		fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
 	}
@@ -91,7 +92,7 @@ static void hddLoadModules(void) {
 void hddInit(void) {
 	hddPrefix = "pfs0:";
 	hddFirstStart = 1;
-	hddGames = NULL;
+	//hddGames = NULL;
 
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddLoadModules);
 

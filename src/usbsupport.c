@@ -6,6 +6,7 @@
 #include "include/themes.h"
 #include "include/textures.h"
 #include "include/ioman.h"
+#include "include/system.h"
 
 extern void *usb_cdvdman_irx;
 extern int size_usb_cdvdman_irx;
@@ -18,6 +19,9 @@ extern int size_usbd_ps3_irx;
 
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
+
+void *usbd_irx;
+int size_usbd_irx;
 
 static char usbPrefix[8];
 static int usbULSizePrev = 0;
@@ -66,8 +70,8 @@ static void usbLoadModules(void) {
 		}
 	}
 
-	SifExecModuleBuffer(usbd_irx, size_usbd_irx, 0, NULL, NULL);
-	SifExecModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL, NULL);
+	sysLoadModuleBuffer(usbd_irx, size_usbd_irx, 0, NULL);
+	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 
 	delay(3);
 

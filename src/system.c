@@ -7,6 +7,7 @@
 #include "include/usbld.h"
 #include "include/util.h"
 #include "include/pad.h"
+#include "include/system.h"
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
@@ -71,6 +72,12 @@ extern int size_elfldr_elf;
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
+extern void *usbd_irx;
+extern int size_usbd_irx;
+
+#define MAX_MODULES	32
+static void *g_sysLoadedModBuffer[MAX_MODULES];
+
 #define ELF_MAGIC		0x464c457f
 #define ELF_PT_LOAD		1
 
@@ -119,8 +126,39 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
+int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
+
+	int i, id, ret, index = 0;
+
+	// check we have not reached MAX_MODULES
+	for (i=0; i<MAX_MODULES; i++) {
+		if (g_sysLoadedModBuffer[i] == NULL) {
+			index = i;
+			break;
+		}
+	}
+	if (i == MAX_MODULES)
+		return -1;
+
+	// check if the module was already loaded
+	for (i=0; i<MAX_MODULES; i++) {
+		if (g_sysLoadedModBuffer[i] == buffer) {
+			return 0;
+		}
+	}
+
+	// load the module
+	id = SifExecModuleBuffer(buffer, size, argc, argv, &ret);
+	if ((id < 0) || (ret))
+		return -2;
+
+	// add the module to the list
+	g_sysLoadedModBuffer[index] = buffer;
+
+	return 0;
+}
+
 void sysReset(void) {
-	int ret;
 
 #ifndef __DEBUG
 	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF",0));
@@ -144,11 +182,14 @@ void sysReset(void) {
 	sbv_patch_disable_prefix_check();
 #endif
 
+	// clears modules list
+	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES*4);
+
 	// load modules
-	SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
-	SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
-	SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-	SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+	sysLoadModuleBuffer(&discid_irx, size_discid_irx, 0, NULL);
+	sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
+	sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
+	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 
 	poweroffInit();
 
@@ -465,4 +506,4 @@ int sysExecElf(char *path, int argc, char **argv) {
 
 	return 0;
 }
-
+

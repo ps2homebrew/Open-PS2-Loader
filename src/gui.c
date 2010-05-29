@@ -16,6 +16,7 @@
 #include "include/dialogs.h"
 #include "include/util.h"
 #include "include/config.h"
+#include "include/system.h"
 
 #include <stdlib.h>
 #include <libvux.h>

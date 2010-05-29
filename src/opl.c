@@ -15,6 +15,7 @@
 #include "include/texcache.h"
 #include "include/dia.h"
 #include "include/menusys.h"
+#include "include/system.h"
 
 // temp
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
@@ -30,6 +31,9 @@
 #define UPDATE_FRAME_COUNT 250
 
 #define IO_MENU_UPDATE_DEFFERED 2
+
+extern void *usbd_irx;
+extern int size_usbd_irx;
 
 // forward decl
 static void handleHdlSrv();
@@ -473,7 +477,7 @@ extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
 void loadHdldSvr(void) {
-	int ret, id;
+	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 
@@ -491,32 +495,32 @@ void loadHdldSvr(void) {
 
 	int iplen = sysSetIPConfig(ipconfig);
 
-    	id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+    	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	if (ret < 0)
 		return;
 
-	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	ret = sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
+	if (ret < 0)
 		return;
 
-	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	ret = sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL);
+	if (ret < 0)
 		return;
 
-	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, iplen, ipconfig, &ret);
-	if ((id < 0) || ret)
+	ret = sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, iplen, ipconfig);
+	if (ret < 0)
 		return;
 
-	id=SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+	if (ret < 0)
 		return;
 
-	id=SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
-	if ((id < 0) || ret)
+	ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
+	if (ret < 0)
 		return;
 
-	id=SifExecModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL, &ret);
-	if ((id < 0) || ret)
+	ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
+	if (ret < 0)
 		return;
 
 	padInit(0);

@@ -6,6 +6,7 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/smbman.h"
+#include "include/system.h"
 
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
@@ -39,7 +40,7 @@ static base_game_info_t *ethGames = NULL;
 static item_list_t ethGameList;
 
 static void ethLoadModules(void) {
-	int ret, id, ipconfiglen;
+	int ret, ipconfiglen;
 	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 
 	ipconfiglen = sysSetIPConfig(ipconfig);
@@ -48,8 +49,8 @@ static void ethLoadModules(void) {
 	if (!gDev9_loaded) {
 		gNetworkStartup = 5;
 
-		id=SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-		if ((id < 0) || ret) {
+		ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+		if (ret < 0) {
 			gNetworkStartup = -1;
 			return;
 		}
@@ -59,23 +60,23 @@ static void ethLoadModules(void) {
 
 	gNetworkStartup = 4;
 
-	id=SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
+	if (ret < 0) {
 		gNetworkStartup = -1;
 		return;
 	}
 	gNetworkStartup = 3;
 
-	id=SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL);
+	if (ret < 0) {
 		gNetworkStartup = -1;
 		return;
 	}
 
 	gNetworkStartup = 2;
 
-	id=SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig);
+	if (ret < 0) {
 		gNetworkStartup = -1;
 		return;
 	}
@@ -83,8 +84,8 @@ static void ethLoadModules(void) {
 
 	gNetworkStartup = 1;
 
-	id=SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
-	if ((id < 0) || ret) {
+	ret = sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL);
+	if (ret < 0) {
 		gNetworkStartup = -1;
 		return;
 	}

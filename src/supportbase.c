@@ -2,6 +2,7 @@
 #include "include/lang.h"
 #include "include/util.h"
 #include "include/iosupport.h"
+#include "include/system.h"
 #include "include/supportbase.h"
 
 int sbIsSameSize(const char* prefix, int prevSize) {

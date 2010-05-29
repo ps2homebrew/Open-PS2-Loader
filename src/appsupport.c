@@ -2,6 +2,7 @@
 #include "include/lang.h"
 #include "include/appsupport.h"
 #include "include/themes.h"
+#include "include/system.h"
 
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"

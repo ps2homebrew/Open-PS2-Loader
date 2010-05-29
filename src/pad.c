@@ -412,3 +412,4 @@ void padRestoreSettings(int* buffer) {
 	for (i = 0; i < 16; i++)
 		paddelay[i] = buffer[i];
 }
+

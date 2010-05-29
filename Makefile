@@ -108,8 +108,6 @@ clean:
 	$(MAKE) -C modules/hdldsvr clean
 	echo "    * iso2opl"
 	$(MAKE) -C pc clean
-	echo "    * smblab"
-	$(MAKE) -C smblab clean
 
 rebuild: clean all
 

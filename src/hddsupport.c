@@ -37,6 +37,8 @@ static void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
+	printf("hddLoadModules()\n");
+
 	gHddStartup = 4;
 
 	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
@@ -69,6 +71,8 @@ static void hddLoadModules(void) {
 		return;
 	}
 
+	printf("hddLoadModules: modules loaded\n");
+
 	ret = fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
 	if (ret < 0) {
 		fileXioUmount(hddPrefix);
@@ -84,6 +88,7 @@ static void hddLoadModules(void) {
 }
 
 void hddInit(void) {
+	printf("hddInit()\n");
 	hddPrefix = "pfs0:";
 	hddFirstStart = 1;
 	//hddGames = NULL;

@@ -43,6 +43,8 @@ static void ethLoadModules(void) {
 	int ret, ipconfiglen;
 	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 
+	printf("ethLoadModules()\n");
+
 	ipconfiglen = sysSetIPConfig(ipconfig);
 
 	gNetworkStartup = 5;
@@ -86,6 +88,8 @@ static void ethLoadModules(void) {
 
 	gNetworkStartup = 0; // ok, all loaded
 
+	printf("ethLoadModules: modules loaded\n");
+
 	// connect
 	ethSMBConnect();
 
@@ -96,6 +100,8 @@ static void ethLoadModules(void) {
 }
 
 void ethInit(void) {
+	printf("ethInit()\n");
+
 	ethPrefix = "smb0:";
 	ethULSizePrev = -1;
 	memset(ethModifiedCDPrev, 0, 8);

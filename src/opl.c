@@ -155,7 +155,8 @@ static void initSupport(item_list_t* itemList, int startMode, int mode) {
 		itemList->uip = 0;
 	}
 
-	if (startMode == 2 && !list_support[mode].support->enabled) {
+	if ((startMode == 2 && !list_support[mode].support->enabled) || \
+	    (startMode && list_support[mode].support->enabled)) {
 		// stop updates until we're done with init of the device
 		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
@@ -556,11 +557,11 @@ void unloadHdldSvr(void) {
 	while (!ret)
 		ret = startPads();
 
-	// init all supports again
-	initAllSupport();
-
 	// now start io again
 	ioBlockOps(0);
+
+	// init all supports again
+	initAllSupport();
 }
 
 static void handleHdlSrv() {
@@ -725,10 +726,6 @@ static void init(void) {
 	// try to restore config
 	_loadConfig();
 
-#ifdef __DEBUG
-	debugSetActive();
-#endif
-
 	cacheInit();
 
 	// handler for deffered menu updates
@@ -760,6 +757,10 @@ int main(void)
 	reset();
 	
 	init();
+
+#ifdef __DEBUG
+	debugSetActive();
+#endif
 
 	// queue deffered init which shuts down the intro screen later
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);

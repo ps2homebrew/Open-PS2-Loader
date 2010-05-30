@@ -27,6 +27,7 @@ static struct TConfigValue* appGetConfigValue(int id) {
 }
 
 void appInit(void) {
+	printf("appInit()\n");
 	appFirstStart = 1;
 	configApps.head = NULL;
 	configApps.tail = NULL;

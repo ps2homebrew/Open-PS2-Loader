@@ -5,7 +5,7 @@ DEBUG = 0
 FT_DIR = thirdparty/freetype-2.3.12
 FT_LIBDIR = $(FT_DIR)/objs
 
-FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
+FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o
 
@@ -18,7 +18,7 @@ LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
-		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
+		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
 
 EE_BIN = opl.elf
 EE_SRC_DIR = src/
@@ -26,7 +26,7 @@ EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(LOADER_OBJS)
 
-EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux
+EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
 #EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(FT_DIR)/include
 
@@ -106,6 +106,8 @@ clean:
 	$(MAKE) -C modules/ps2hdd clean
 	echo "    * hdldsvr.irx"
 	$(MAKE) -C modules/hdldsvr clean
+	echo "    * udptty.irx"
+	$(MAKE) -C modules/udptty clean
 	echo "    * iso2opl"
 	$(MAKE) -C pc clean
 
@@ -251,6 +253,11 @@ hdldsvr.s:
 	echo "    * hdldsvr.irx"
 	$(MAKE) -C modules/hdldsvr
 	bin2s modules/hdldsvr/hdldsvr.irx asm/hdldsvr.s hdldsvr_irx
+
+udptty.s:
+	echo "    * udptty.irx"
+	$(MAKE) -C modules/udptty
+	bin2s modules/udptty/udptty.irx asm/udptty.s udptty_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx

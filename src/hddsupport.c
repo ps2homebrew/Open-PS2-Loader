@@ -37,19 +37,13 @@ static void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
-#ifndef __DEBUG
-	if (!gDev9_loaded) {
-		gHddStartup = 4;
+	gHddStartup = 4;
 
-		ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-		if (ret < 0) {
-			gHddStartup = -1;
-			return;
-		}
-
-		gDev9_loaded = 1;
+	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	if (ret < 0) {
+		gHddStartup = -1;
+		return;
 	}
-#endif
 
 	gHddStartup = 3;
 

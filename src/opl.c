@@ -16,6 +16,7 @@
 #include "include/dia.h"
 #include "include/menusys.h"
 #include "include/system.h"
+#include "include/debug.h"
 
 // temp
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
@@ -538,6 +539,10 @@ void unloadHdldSvr(void) {
 
 	sysReset();
 
+#ifdef __DEBUG
+	debugSetActive();
+#endif
+
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 	SifLoadModule("rom0:MCMAN", 0, NULL);
 	SifLoadModule("rom0:MCSERV", 0, NULL);
@@ -719,7 +724,11 @@ static void init(void) {
 	
 	// try to restore config
 	_loadConfig();
-	
+
+#ifdef __DEBUG
+	debugSetActive();
+#endif
+
 	cacheInit();
 
 	// handler for deffered menu updates
@@ -751,7 +760,7 @@ int main(void)
 	reset();
 	
 	init();
-	
+
 	// queue deffered init which shuts down the intro screen later
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);
 	

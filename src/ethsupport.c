@@ -45,17 +45,12 @@ static void ethLoadModules(void) {
 
 	ipconfiglen = sysSetIPConfig(ipconfig);
 
-#ifndef __DEBUG
-	if (!gDev9_loaded) {
-		gNetworkStartup = 5;
+	gNetworkStartup = 5;
 
-		ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-		if (ret < 0) {
-			gNetworkStartup = -1;
-			return;
-		}
-
-		gDev9_loaded = 1;
+	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	if (ret < 0) {
+		gNetworkStartup = -1;
+		return;
 	}
 
 	gNetworkStartup = 4;
@@ -80,7 +75,6 @@ static void ethLoadModules(void) {
 		gNetworkStartup = -1;
 		return;
 	}
-#endif
 
 	gNetworkStartup = 1;
 

@@ -160,9 +160,13 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 
 void sysReset(void) {
 
-#ifndef __DEBUG
+	SifInitRpc(0);
+	cdInit(CDVD_INIT_NOCHECK);
+	cdInit(CDVD_INIT_EXIT);
+
 	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF",0));
 	while(!SifIopSync());
+
 	fioExit();
 	SifExitIopHeap();
 	SifLoadFileExit();
@@ -180,7 +184,6 @@ void sysReset(void) {
 	// apply sbv patches
 	sbv_patch_enable_lmb();
 	sbv_patch_disable_prefix_check();
-#endif
 
 	// clears modules list
 	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES*4);
@@ -192,8 +195,6 @@ void sysReset(void) {
 	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 
 	poweroffInit();
-
-	gDev9_loaded = 0;
 }
 
 void sysPowerOff(void) {

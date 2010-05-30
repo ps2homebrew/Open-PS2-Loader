@@ -61,8 +61,6 @@ int gUSBStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
-/// true if dev9 irx loaded already
-int gDev9_loaded;
 /// Sort the game lists automatically
 int gAutosort;
 /// true if icons and covers Art should be displayed

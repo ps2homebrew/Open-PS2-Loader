@@ -47,6 +47,7 @@ static void thmFree(theme_t* theme) {
 }
 
 static int thmReadEntry(int index, char* path, char* separator, char* name, unsigned int mode) {
+	LOG("thmReadEntry() path=%s sep=%s name=%s\n", path, separator, name);
 	if (FIO_SO_ISDIR(mode) && strstr(name, "thm_")) {
 		theme_file_t* currTheme = &themes[nThemes + index];
 
@@ -57,7 +58,7 @@ static int thmReadEntry(int index, char* path, char* separator, char* name, unsi
 
 		length = strlen(path) + 1 + strlen(name) + 1;
 		currTheme->filePath = (char*) malloc(length * sizeof(char));
-		sprintf(currTheme->filePath, "%s%s%s%s", path, separator, name, separator);
+		sprintf(currTheme->filePath, "%s%s%s", path, name, separator);
 
 		LOG("Theme found: %s\n", currTheme->filePath);
 
@@ -155,6 +156,7 @@ static void setColors(theme_t* theme) {
 }
 
 static void thmLoad(char* themePath) {
+	LOG("thmLoad() path=%s\n", themePath);
 	theme_t* curT = gTheme;
 	theme_t* newT = (theme_t*) malloc(sizeof(theme_t));
 	memset(newT, 0, sizeof(theme_t));
@@ -298,7 +300,9 @@ static void thmRebuildGuiNames() {
 }
 
 void thmAddElements(char* path, char* separator) {
+	LOG("thmAddElements() path=%s sep=%s\n", path, separator);
 	nThemes += listDir(path, separator, MAX_THEMES_FILES - nThemes, &thmReadEntry);
+	LOG("thmAddElements() nThemes=%d\n", nThemes);
 	thmRebuildGuiNames();
 
 	char* temp;
@@ -309,6 +313,7 @@ void thmAddElements(char* path, char* separator) {
 }
 
 void thmInit() {
+	LOG("thmInit()\n");
 	gTheme = NULL;
 
 	rmGetScreenExtents(&screenWidth, &screenHeight);
@@ -320,10 +325,12 @@ void thmInit() {
 }
 
 char* thmGetValue() {
+	LOG("thmGetValue() id=%d name=%s\n", guiThemeID, guiThemesNames[guiThemeID]);
 	return guiThemesNames[guiThemeID];
 }
 
 void thmSetGuiValue(int themeID) {
+	LOG("thmSetGuiValue() id=%d\n", themeID);
 	if (guiThemeID != themeID) {
 		if (themeID != 0)
 			thmLoad(themes[themeID - 1].filePath);
@@ -336,10 +343,12 @@ void thmSetGuiValue(int themeID) {
 }
 
 int thmGetGuiValue() {
+	LOG("thmGetGuiValue() id=%d\n", guiThemeID);
 	return guiThemeID;
 }
 
 int thmFindGuiID(char* theme) {
+	LOG("thmFindGuiID() theme=%s\n", theme);
 	if (theme) {
 		int i = 0;
 		for (; i < nThemes; i++) {

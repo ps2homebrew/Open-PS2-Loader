@@ -6,6 +6,7 @@
 
 #include "include/usbld.h"
 #include "include/system.h"
+#include "include/ioman.h"
 
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
@@ -52,7 +53,7 @@ int debugSetActive(void) {
 	if (ret < 0)
 		return -5;
 
-	printf("OPL UDPtty debug enabled!\n");
+	LOG("OPL UDPtty debug enabled!\n");
 
 	return 0;
 }

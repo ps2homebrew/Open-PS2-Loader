@@ -147,7 +147,7 @@ static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
 	guiDeferUpdate(mc);
 }
 
-static void initSupport(item_list_t* itemList, int startMode, int mode) {
+static void initSupport(item_list_t* itemList, int startMode, int mode, int force_reinit) {
 	if (!list_support[mode].support) {
 		itemList->uip = 1; // stop updates until we're done with init
 		list_support[mode].support = itemList;
@@ -155,8 +155,8 @@ static void initSupport(item_list_t* itemList, int startMode, int mode) {
 		itemList->uip = 0;
 	}
 
-	if ((startMode == 2 && !list_support[mode].support->enabled) || \
-	    (startMode && list_support[mode].support->enabled)) {
+	if (((force_reinit) && (startMode && list_support[mode].support->enabled)) \
+	  || (startMode == 2 && !list_support[mode].support->enabled)) {
 		// stop updates until we're done with init of the device
 		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
@@ -165,29 +165,29 @@ static void initSupport(item_list_t* itemList, int startMode, int mode) {
 	}
 }
 
-static void initAllSupport() {
+static void initAllSupport(int force_reinit) {
 	int validMode = -1;
 
 	if (gUSBStartMode) {
 		validMode = USB_MODE;
-		initSupport(usbGetObject(0), gUSBStartMode, USB_MODE);
+		initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
 	}
 
 	if (gETHStartMode) {
 		validMode = ETH_MODE;
-		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE);
+		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit);
 	}
 
 	if (gHDDStartMode) {
 		validMode = HDD_MODE;
-		initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE);
+		initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
 	}
 
 	if (validMode == -1) // no game device inited, so force Apps ...
 		gAPPStartMode = 2;
 
 	if (gAPPStartMode)
-		initSupport(appGetObject(0), gAPPStartMode, APP_MODE);
+		initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
 }
 
 static void deinitAllSupport() {
@@ -337,7 +337,7 @@ void applyConfig(int themeID, int langID) {
 	if (gPCPort < 0)
 		gPCPort = 445;
 
-	initAllSupport();
+	initAllSupport(0);
 }
 
 int loadConfig() {
@@ -561,7 +561,7 @@ void unloadHdldSvr(void) {
 	ioBlockOps(0);
 
 	// init all supports again
-	initAllSupport();
+	initAllSupport(1);
 }
 
 static void handleHdlSrv() {

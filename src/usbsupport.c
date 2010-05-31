@@ -52,7 +52,7 @@ static int usbFindPartition(void) {
 }
 
 static void usbLoadModules(void) {
-	printf("usbLoadModules()\n");
+	LOG("usbLoadModules()\n");
 	//first it search for custom usbd in MC?
 	usbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_usbd_irx);
 	if (!usbd_irx) {
@@ -76,7 +76,7 @@ static void usbLoadModules(void) {
 
 	delay(3);
 
-	printf("usbLoadModules: modules loaded\n");
+	LOG("usbLoadModules: modules loaded\n");
 
 	// update Themes
 	usbFindPartition();
@@ -86,7 +86,7 @@ static void usbLoadModules(void) {
 }
 
 void usbInit(void) {
-	printf("usbInit()\n");
+	LOG("usbInit()\n");
 	usbULSizePrev = -1;
 	usbGameCount = 0;
 	usbGames = NULL;

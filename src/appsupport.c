@@ -3,6 +3,7 @@
 #include "include/appsupport.h"
 #include "include/themes.h"
 #include "include/system.h"
+#include "include/ioman.h"
 
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
@@ -27,7 +28,7 @@ static struct TConfigValue* appGetConfigValue(int id) {
 }
 
 void appInit(void) {
-	printf("appInit()\n");
+	LOG("appInit()\n");
 	appFirstStart = 1;
 	configApps.head = NULL;
 	configApps.tail = NULL;

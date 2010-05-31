@@ -37,7 +37,7 @@ static void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
-	printf("hddLoadModules()\n");
+	LOG("hddLoadModules()\n");
 
 	gHddStartup = 4;
 
@@ -71,7 +71,7 @@ static void hddLoadModules(void) {
 		return;
 	}
 
-	printf("hddLoadModules: modules loaded\n");
+	LOG("hddLoadModules: modules loaded\n");
 
 	ret = fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
 	if (ret < 0) {
@@ -88,7 +88,7 @@ static void hddLoadModules(void) {
 }
 
 void hddInit(void) {
-	printf("hddInit()\n");
+	LOG("hddInit()\n");
 	hddPrefix = "pfs0:";
 	hddFirstStart = 1;
 	//hddGames = NULL;
@@ -238,6 +238,7 @@ static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static void hddCleanUp(void) {
+	LOG("hddCleanUp()\n");
 	if (gHddStartup == 0)
 		fileXioUmount(hddPrefix);
 }

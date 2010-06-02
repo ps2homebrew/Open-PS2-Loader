@@ -755,23 +755,15 @@ unsigned int fs_getFileSector(iop_file_t *fd, char *name)
 	fat_driver* fatd;
 	int ret;
 	unsigned int cluster = 0;
-	fs_rec* rec = NULL;
+	fat_dir fatDir;
 
 	fatd = fat_getData(fd->unit);
 	if (fatd == NULL)
 		return 0;
 
-	rec = fs_findFreeFileSlot();
-	if (rec == NULL)
+	ret = fat_getFileStartCluster(fatd, name, &cluster, &fatDir);
+	if (ret < 0)
 		return 0;
-
-	ret = fat_getFileStartCluster(fatd, name, &cluster, &rec->fatdir);
-	if (ret < 0) {
-		rec->file_flag = -1;
-		return 0;
-	}
-
-	rec->file_flag = -1;
 
 	return fat_cluster2sector(&fatd->partBpb, cluster);
 }

@@ -357,14 +357,13 @@ int ioBlockOps(int block) {
 		// stop the timer as well...
 		stopIOTimer = 1;
 		ReleaseAlarm(alarmID);
-	} else {
-		if (isIOBlocked) {
-			isIOBlocked = 0;
-			stopIOTimer = 0;
-			// create the alarm again
-			alarmID = SetAlarm( 625, &ioAlarmFunc, NULL); 
-		}
+	} else if (!block && isIOBlocked) {
+		isIOBlocked = 0;
+		stopIOTimer = 0;
+		// create the alarm again
+		alarmID = SetAlarm( 625, &ioAlarmFunc, NULL); 
 	}
+	
 
 	return IO_OK;
 }

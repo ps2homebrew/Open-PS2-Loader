@@ -10,6 +10,9 @@
 #include "include/renderman.h"
 #include "include/ioman.h"
 
+// Allocateable space in vram, as indicated in GsKit's code
+#define __VRAM_SIZE 4194304
+
 GSGLOBAL *gsGlobal;
 s32 guiThreadID;
 
@@ -113,13 +116,27 @@ static void rmAppendUploadedTextures(GSTEXTURE *txt) {
 	uploadedTextures = entry;
 }
 
+
 static int rmUploadTexture(GSTEXTURE* txt) {
 	u32 size = gsKit_texture_size(txt->Width, txt->Height, txt->PSM);
+	// alignment of the allocation
 	size = (-GS_VRAM_BLOCKSIZE_256)&(size+GS_VRAM_BLOCKSIZE_256-1);
 
-	if(gsGlobal->CurrentPointer + size >= 4194304)
+	// too large to fit VRAM with the currently allocated space?
+	if(gsGlobal->CurrentPointer + size >= __VRAM_SIZE)
 	{
-		LOG("RM: Not enough VRAM for this allocation!\n");
+		
+		if (size >= __VRAM_SIZE) {
+			// Only log this if the allocation is too large itself
+			LOG("RM: Requested allocation is bigger than VRAM!\n"); 
+			// We won't allocate this, it's too large
+			txt->Vram = GSKIT_ALLOC_ERROR;
+			return 0;
+		}
+		
+		// Only log we needed to flush
+		// TOO VERBOSE...
+		// LOG("RM: Flush needed to free up VRAM\n");
 		rmFlush();
 	}
 	
@@ -412,7 +429,7 @@ void rmClip(int x, int y, int w, int h) {
 		clipRect.y1 = gsGlobal->Height;
 	else
 		clipRect.y1 = y + h;
-	clipRect.used = 1;
+	clipRect.used = 0; // TODO: 1;
 }
 
 /** Sets cipping to none */

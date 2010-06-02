@@ -676,7 +676,7 @@ static float guiCalcPerlin(float x, float y, float z) {
 	return nxyz; 
 }
 
-static float dir = 0.01;
+static float dir = 0.04;
 static float perz = -100;
 static int pery = 0;
 static unsigned char curbgColor[3] = {0,0,0};

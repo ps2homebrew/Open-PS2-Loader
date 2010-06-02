@@ -206,6 +206,19 @@ typedef struct _usb_callback_data
 
 static mass_dev g_mass_device;
 
+struct MSStoDSS_t {
+	int massSectorSize;
+	int shiftPos;
+};
+
+static struct MSStoDSS_t gMSStoDSS[4] = {
+	{ 512 ,  2 },
+	{ 1024,  1 },
+	{ 2048,  0 },
+	{ 4096, -1 },	
+};
+
+static int gShiftPos;
 
 static void usb_callback(int resultCode, int bytes, void *arg)
 {
@@ -622,7 +635,7 @@ int mass_stor_probe(int devId)
 	mass_dev* mass_device = &g_mass_device;
 
 	/* only one device supported */
-	if ((mass_device != NULL) && (mass_device->status & DEVICE_DETECTED)) {
+	if (mass_device->status & DEVICE_DETECTED) {
 		XPRINTF("mass_driver: Error - only one mass storage device allowed ! \n");
 		return 0;
 	}
@@ -679,11 +692,6 @@ int mass_stor_connect(int devId)
 
 	XPRINTF("mass_driver: connect: devId=%i\n", devId);
 	dev = &g_mass_device;
-
-	if (dev == NULL) {
-		XPRINTF("mass_driver: Error - unable to allocate space!\n");
-		return 1;
-	}
 
 	/* only one mass device allowed */
 	if (dev->devId != -1) {
@@ -762,11 +770,6 @@ int mass_stor_disconnect(int devId)
 
 	XPRINTF("mass_driver: disconnect: devId=%i\n", devId);
 
-	if (dev == NULL) {
-		XPRINTF("mass_driver: Error - disconnect: no device storage!\n");
-		return 0;
-	}
-
 	if ((dev->status & DEVICE_DETECTED) && devId == dev->devId) {
 		mass_stor_release(dev);
 		dev->devId = -1;
@@ -838,6 +841,13 @@ int mass_stor_warmup(mass_dev *dev)
 	dev->sectorSize = getBI32(&rcd.block_length);
 	dev->maxLBA     = getBI32(&rcd.last_lba);
 	XPRINTF("mass_driver: sectorSize %d maxLBA %d\n", dev->sectorSize, dev->maxLBA);
+
+	for (stat=0; stat<4; stat++) {
+		if (dev->sectorSize == gMSStoDSS[stat].massSectorSize) {
+			gShiftPos = gMSStoDSS[stat].shiftPos;
+			break;
+		}
+	}
 
 	return 0;
 }
@@ -914,7 +924,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 			sectors = 2;
 
 		nbytes = sectors << 11;	
-		mass_stor_readSector(p_part_start[part_num] + (lsn << 2), sectors << 2, p);
+		mass_stor_readSector(p_part_start[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);
 		//mass_stor_readSector(part_lba + (lsn << 2), 8, cdvdman_io_buf);
 		//mips_memcpy(p, cdvdman_io_buf, nbytes);
 

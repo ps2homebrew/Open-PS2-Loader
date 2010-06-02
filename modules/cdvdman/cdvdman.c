@@ -1122,7 +1122,7 @@ void fs_init(void)
 #endif
 
 #ifdef SMB_DRIVER
-	register int i;
+	register int i = 0;
 	char tmp_str[255];
 
 	ps2ip_init();
@@ -1137,19 +1137,20 @@ void fs_init(void)
 	sprintf(tmp_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
 	smb_SessionSetupTreeConnect("GUEST", tmp_str);
 
-    // if part table not null in SMB mode, then it is an ISO
-    if ( (*p_part_start) != 0) {
-    	if (g_ISO_media == 0x12)
-    		sprintf(tmp_str,"CD\\\\%s.%s.iso", g_ISO_name, (char *) p_part_start);
-    	else
-    		sprintf(tmp_str,"DVD\\\\%s.%s.iso", g_ISO_name, (char *) p_part_start);
-    	smb_OpenAndX(tmp_str, (u16 *)&g_part_start[0]);
-    }
-    else // Open all parts files
-		for (i=0; i<g_ISO_parts; i++) {
-			sprintf(tmp_str,"%s.%02x", g_ISO_name, i);
-			smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i]);
-		}
+	char *path_str = "%s.%02x";
+
+	// if part table [0] not zero, then it is a plain ISO
+	if (g_part_start[0] != 0)
+		path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s.iso" : "DVD\\%s.%s.iso";
+
+	sprintf(tmp_str, path_str, g_ISO_name, (char *)&g_part_start[0]);
+
+	// Open all parts files
+	do {
+		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i++]);
+		sprintf(tmp_str, "%s.%02x", g_ISO_name, i);
+
+	} while(i < g_ISO_parts);
 #endif
 
 #ifdef HDD_DRIVER
@@ -1157,7 +1158,7 @@ void fs_init(void)
 	pNetlogSend("fs_init: apa header LBA = %d\n", g_part_start[0]);
 #endif
 
-	int r=ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
+	int r = ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
 	if (r != 0) {
 #ifdef NETLOG_DEBUG
 		pNetlogSend("fs_init: failed to read apa header %d\n", r);

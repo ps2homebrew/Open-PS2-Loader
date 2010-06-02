@@ -1138,12 +1138,15 @@ void fs_init(void)
 	smb_SessionSetupTreeConnect("GUEST", tmp_str);
 
 	char *path_str = "%s.%02x";
+	char *game_name = NULL;
 
-	// if part table [0] not zero, then it is a plain ISO
-	if (g_part_start[0] != 0)
+	// if g_part_start[0] not zero, then it is a plain ISO
+	if (g_part_start[0] != 0) {
 		path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s.iso" : "DVD\\%s.%s.iso";
+		game_name = (char *)&g_part_start[0];
+	}
 
-	sprintf(tmp_str, path_str, g_ISO_name, (char *)&g_part_start[0]);
+	sprintf(tmp_str, path_str, g_ISO_name, game_name);
 
 	// Open all parts files
 	do {

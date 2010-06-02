@@ -104,9 +104,14 @@ void* readFile(char* path, int align, int* size) {
 		else
 			buffer = malloc(realSize);
 
-		fioRead(fd, buffer, realSize);
-		fioClose(fd);
-		*size = realSize;
+                if (!buffer) {
+                	LOG("readFile: Failed allocation of %d bytes", realSize);
+                	*size = 0;
+                } else {
+		        fioRead(fd, buffer, realSize);
+			fioClose(fd);
+			*size = realSize;
+		}
 	}
 	return buffer;
 }

@@ -49,6 +49,19 @@ static GSTEXTURE gBackgroundTex;
 static int screenWidth;
 static float wideScreenScale;
 
+#ifdef __DEBUG
+
+#include <timer.h>
+
+#define CLOCKS_PER_MILISEC 147456
+
+// debug version displays an FPS meter
+static u32 curtime = 0;
+static u32 time_since_last = 0;
+static u32 time_render = 0;
+
+#endif
+
 struct gui_update_list_t {
 	struct gui_update_t* item;
 	struct gui_update_list_t* next;
@@ -63,9 +76,11 @@ struct submenu_list_t *g_games_submenu = NULL;
 typedef struct {
 	void (*handleInput)(void);
 	void (*renderScreen)(void);
+	void (*renderBackground)(void);
 } gui_screen_handler_t;
 
 // forward decls.
+static void guiDrawBackground(void);
 
 // Main screen rendering/input
 static void guiMainHandleInput(void);
@@ -78,12 +93,14 @@ static void guiMenuRender(void);
 // default screen handler (main screen)
 static gui_screen_handler_t mainScreenHandler = {
 	&guiMainHandleInput,
-	&guiMainRender
+	&guiMainRender,
+	&guiDrawBackground
 };
 
 static gui_screen_handler_t menuScreenHandler = {
 	&guiMenuHandleInput,
-	&guiMenuRender
+	&guiMenuRender,
+	&guiDrawBackground
 };
 
 static gui_screen_handler_t *screenHandler = &mainScreenHandler;
@@ -100,7 +117,7 @@ static struct submenu_list_t *mainMenuCurrent;
 // Helper perlin noise data
 #define PLASMA_H 32
 #define PLASMA_W 32
-#define PLASMA_ROWS_PER_FRAME PLASMA_H
+#define PLASMA_ROWS_PER_FRAME 8
 #define FADE_SIZE 256
 
 static int pperm[512];
@@ -166,7 +183,7 @@ void guiInit(void) {
 	// background texture - for perlin
 	gBackgroundTex.Width = PLASMA_W;
 	gBackgroundTex.Height = PLASMA_H;
-	gBackgroundTex.Mem = malloc(PLASMA_W * PLASMA_H * 4);
+	gBackgroundTex.Mem = memalign(128, PLASMA_W * PLASMA_H * 4);
 	gBackgroundTex.PSM = GS_PSM_CT32;
 	gBackgroundTex.Filter = GS_FILTER_LINEAR;
 	gBackgroundTex.Vram = 0;
@@ -201,6 +218,12 @@ void guiUnlock(void) {
 }
 
 void guiStartFrame(void) {
+#ifdef __DEBUG
+	u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
+	time_since_last = newtime - curtime;
+	curtime = newtime;
+#endif
+
 	guiLock();
 	rmStartFrame();
 	gFrameCounter++;
@@ -208,6 +231,13 @@ void guiStartFrame(void) {
 
 void guiEndFrame(void) {
 	guiUnlock();
+	rmFlush();
+	
+#ifdef __DEBUG
+	u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
+	time_render = newtime - curtime;
+#endif
+		
 	rmEndFrame();
 }
 
@@ -669,7 +699,7 @@ void guiDrawBGPicture() {
 	GSTEXTURE* backTex = thmGetTexture(BACKGROUND_PICTURE);
 	if (backTex && backTex->Mem) {
 		rmDrawPixmap(backTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
-		rmFlush();
+
 	}
 	else
 		guiDrawBGPlasma();
@@ -726,6 +756,11 @@ void guiDrawBGPlasma() {
 	rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
 }
 
+static void guiDrawBackground(void) {
+	if (gInitComplete)
+		gTheme->drawBackground();
+}
+
 static void guiDrawOverlays() {
 	// are there any pending operations?
 	rmSetTransposition(0,0);
@@ -753,6 +788,22 @@ static void guiDrawOverlays() {
 	
 	if (bfadeout > 0)
 		guiDrawBusy();
+	
+#ifdef __DEBUG
+	// fps meter
+	char fps[10];
+	
+	if (time_since_last != 0)
+		snprintf(fps, 10, "%3.1f FPS", 1000.0f / (float) time_since_last);
+	else
+		snprintf(fps, 10, "---- FPS");
+	
+	fntRenderString(screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	
+	snprintf(fps, 10, "%3d ms", time_render);
+	
+	fntRenderString(screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+#endif
 }
 
 static void guiReadPads() {
@@ -763,9 +814,6 @@ static void guiReadPads() {
 }
 
 static void guiMainRender() {
-	if (gInitComplete)
-		gTheme->drawBackground();
-
 	menuDrawStatic();
 }
 
@@ -822,8 +870,6 @@ static void guiMainHandleInput() {
 }
 
 static void guiMenuRender() {
-	gTheme->drawBackground();
-
 	if (!mainMenu)
 		return;
 	
@@ -939,6 +985,17 @@ static void guiShow() {
 	if (screenHandlerTarget) {
 		// advance the effect
 		
+		// render the old screen background, transposed
+		rmSetTransposition(-transition, 0);
+		screenHandler->renderBackground();
+		
+		// render new screen background transposed
+		rmSetTransposition(screenWidth - transition, 0);
+		screenHandlerTarget->renderBackground();
+		
+		// Flush the backgrounds here to free up VRAM
+		rmFlush();
+		
 		// render the old screen, transposed
 		rmSetTransposition(-transition, 0);
 		screenHandler->renderScreen();
@@ -962,6 +1019,7 @@ static void guiShow() {
 		// reset transposition
 		rmSetTransposition(0,0);
 		// render with the set screen handler
+		screenHandler->renderBackground();
 		screenHandler->renderScreen();
 	}
 }
@@ -984,6 +1042,7 @@ void guiMainLoop(void) {
 		
 		// Render overlaying gui thingies :)
 		guiDrawOverlays();
+		
 		// handle deferred operations
 		guiHandleDeferredOps();
 		
@@ -1063,7 +1122,7 @@ void guiMsgBox(const char* text) {
 		
 		fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
 		fntRenderString(500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
-		
+
 		guiEndFrame();
 	}
 }
@@ -1091,15 +1150,15 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 
 void guiRenderTextScreen(const unsigned char* message) {
 	guiStartFrame();
-		
+	
 	guiShow(0);
-		
+	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
-		
+	
 	fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
-		
+	
 	// so the io status icon will be rendered
 	guiDrawOverlays();
-		
+	
 	guiEndFrame();
 }

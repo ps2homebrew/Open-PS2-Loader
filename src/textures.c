@@ -1,6 +1,7 @@
 #include "include/usbld.h"
 #include "include/textures.h"
 #include "include/util.h"
+#include "include/ioman.h"
 #include <libjpg.h>
 #include <png.h>
 
@@ -173,7 +174,14 @@ static void texPngReadPixels32(GSTEXTURE* texture, png_bytep* rowPointers) {
 static void texPngReadData(GSTEXTURE* texture, png_structp pngPtr, png_infop infoPtr,
 		void (*texPngReadPixels)(GSTEXTURE* texture, png_bytep *rowPointers)) {
 	int row, rowBytes = png_get_rowbytes(pngPtr, infoPtr);
-	texture->Mem = memalign(128, gsKit_texture_size_ee(texture->Width, texture->Height, texture->PSM));
+	size_t size = gsKit_texture_size_ee(texture->Width, texture->Height, texture->PSM);
+	texture->Mem = memalign(128, size);
+	
+	// failed allocation
+	if (!texture->Mem) {
+		LOG("texPngReadData: Failed to allocate %d bytes\n", size);
+		return;
+	}
 
 	png_bytep *rowPointers = calloc(texture->Height, sizeof(png_bytep));
 	for (row = 0; row < texture->Height; row++) {
@@ -300,10 +308,19 @@ int texJpgLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
 			if (jpg->width > maxWidth || jpg->height > maxHeight)
 				return ERR_BAD_DIMENSION;
 
-			texUpdate(texture, jpg->width, jpg->height);
-			texture->Mem = memalign(128, gsKit_texture_size_ee(jpg->width, jpg->height, psm));
-			jpgReadImage(jpg, (void*) texture->Mem);
-			result = 0;
+			size_t size = gsKit_texture_size_ee(jpg->width, jpg->height, psm);
+			texture->Mem = memalign(128, size);
+			
+			// failed allocation
+			if (!texture->Mem) {
+				LOG("texJpgLoad: Failed to allocate %d bytes\n", size);
+			} else {
+				// okay
+				texUpdate(texture, jpg->width, jpg->height);
+			
+				jpgReadImage(jpg, (void*) texture->Mem);
+				result = 0;
+			}
 		}
 	}
 

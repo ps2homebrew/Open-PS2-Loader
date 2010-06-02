@@ -29,6 +29,9 @@
 // scroll speed (delay in ms!) when setting int value
 #define DIA_INT_SET_SPEED 100
 
+static int screenWidth;
+static int screenHeight;
+
 // Utility stuff
 int diaShowKeyb(char* text, size_t maxLen) {
 	int i, j, len=strlen(text), selkeyb=1;
@@ -338,6 +341,20 @@ static int diaShouldBreakLineAfter(struct UIItem *ui) {
 	return (ui->type == UI_SPLITTER);
 }
 
+static void diaDrawHint(const char* text) {
+	int w, h;
+	int x, y;
+	
+	fntCalcDimensions(text, &w, &h);
+	
+	x = screenWidth - w - 40;
+	y = gTheme->usedHeight - 40;
+	
+	// render hint on the lower side of the screen.
+	rmDrawRect(x, y, ALIGN_NONE, w+10, h+10, gColDarker);
+	fntRenderString(x + 5, y + 5, ALIGN_NONE, text, gTheme->textColor);
+}
+
 /// renders an ui item (either selected or not)
 /// sets width and height of the render into the parameters
 static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h) {
@@ -378,6 +395,9 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				*w = 0; // nothing to render at all
 				*h = UI_SPACING_H;
 				int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
+				
+				// to ODD lines
+				ypos &= ~1;
 				
 				// two lines for lesser eye strain :)
 				rmDrawLine(x, ypos    , x + UI_BREAK_LEN, ypos    , gColWhite);
@@ -501,11 +521,9 @@ static void diaRenderUI(struct UIItem *ui, struct UIItem *cur, int haveFocus) {
 		rc++;
 	}
 
-	/* TODO: 
 	if ((cur != NULL) && (!haveFocus) && (cur->hint != NULL)) {
-		drawHint(cur->hint, -1);
+		diaDrawHint(cur->hint);
 	}
-	*/
 	
 	// flip display
 	rmEndFrame();
@@ -707,6 +725,8 @@ static void diaRestoreScrollSpeed(void) {
 }
 
 int diaExecuteDialog(struct UIItem *ui) {
+	rmGetScreenExtents(&screenWidth, &screenHeight);
+	
 	struct UIItem *cur = diaGetFirstControl(ui);
 	
 	// what? no controllable item? Exit!

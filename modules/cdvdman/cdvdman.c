@@ -1737,22 +1737,12 @@ int sceCdStStop(void)
 #ifndef HDD_DRIVER
 int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf)
 {
-	if (g_ISO_parts == 1) { // in this case, obviously we don't need to iterate parts
-#ifdef USB_DRIVER
-		mass_stor_ReadCD(lsn, nsectors, buf, 0);
-#endif
-#ifdef SMB_DRIVER
-		smb_ReadCD(lsn, nsectors, buf, 0);
-#endif
-		return 1;
-	}
-
 	register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
 	register int i, esc_flag = 0;
 	u8 *p = (u8 *)buf;
 
 	lbound = 0;
-	ubound = 0x80000;
+	ubound = (g_ISO_parts > 1) ? 0x80000 : 0xFFFFFFFF;
 	offslsn = lsn;
 	r = nlsn = 0;
 	sectors_to_read = nsectors;

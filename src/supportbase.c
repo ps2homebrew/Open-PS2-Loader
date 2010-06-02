@@ -5,6 +5,12 @@
 #include "include/system.h"
 #include "include/supportbase.h"
 
+/// internal linked list used to populate the list from directory listing
+struct game_list_t {
+	base_game_info_t gameinfo;
+	struct game_list_t *next;
+};
+
 int sbIsSameSize(const char* prefix, int prevSize) {
 	int size = -1;
 	char path[64];
@@ -54,24 +60,28 @@ static int isValidIsoName(char *name)
 	return 0;
 }
 
-static int scanForISO(char* path, char type, base_game_info_t **list, int index) {
+static int scanForISO(char* path, char type, struct game_list_t** glist) {
 	int fd, size, count = 0;
 	fio_dirent_t record;
 
 	if ((fd = fioDopen(path)) > 0) {
 		while (fioDread(fd, &record) > 0)
 			if ((size = isValidIsoName(record.name)) > 0) {
-				if (index >= 0) {
-					base_game_info_t *game = &(*list)[count + index];
+				struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
+				
+				next->next = *glist;
+				*glist = next;
+				
+				base_game_info_t *game = &(*glist)->gameinfo;
 
-					strncpy(game->name, &record.name[12], size);
-					game->name[size] = '\0';
-					strncpy(game->startup, record.name, BASE_GAME_STARTUP_MAX - 1);
-					game->startup[BASE_GAME_STARTUP_MAX - 1] = '\0';
-					game->parts = 0x01;
-					game->media = type;
-					game->isISO = 1;
-				}
+				strncpy(game->name, &record.name[12], size);
+				game->name[size] = '\0';
+				strncpy(game->startup, record.name, BASE_GAME_STARTUP_MAX - 1);
+				game->startup[BASE_GAME_STARTUP_MAX - 1] = '\0';
+				game->parts = 0x01;
+				game->media = type;
+				game->isISO = 1;
+
 				count++;
 			}
 		fioDclose(fd);
@@ -90,14 +100,16 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	*fsize = -1;
 	*gamecount = 0;
 
-	// count iso games in "cd" directory
+	// temporary storage for the game names
+	struct game_list_t *dlist_head = NULL;
 	
+	// count iso games in "cd" directory
 	snprintf(path, 64, "%sCD\\\\", prefix); // *.iso
-	count += scanForISO(path, 0x12, NULL, -1);
+	count += scanForISO(path, 0x12, &dlist_head);
 
 	// count iso games in "dvd" directory
 	snprintf(path, 64, "%sDVD\\\\", prefix); // *.iso
-	count += scanForISO(path, 0x14, NULL, -1);
+	count += scanForISO(path, 0x14, &dlist_head);
         
         
 	// count and process games in ul.cfg
@@ -134,14 +146,15 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	else if (count > 0)
 		*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
         
-	// process "cd" directory
-	snprintf(path, 64, "%sCD\\\\", prefix); // *.iso
-	id += scanForISO(path, 0x12, list, id);
-
-	// process "dvd" directory
-	snprintf(path, 64, "%sDVD\\\\", prefix); // *.iso
-	id += scanForISO(path, 0x14, list, id);
-        
+	// copy the dlist into the list
+	while ((id < count) && dlist_head) {
+		// copy one game, advance
+		struct game_list_t *cur = dlist_head;
+		dlist_head = dlist_head->next;
+		
+		memcpy(&(*list)[id++], &cur->gameinfo, sizeof(base_game_info_t));
+		free(cur);
+	}
         
 	*gamecount = count;
 }

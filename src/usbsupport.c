@@ -161,6 +161,8 @@ static void usbLaunchGame(int id) {
 		scr_printf("\n\t Fatal error opening %s...\n", usbPrefix);
 		while(1);
 	}
+	r = fioIoctl(fd, 0xDEADC0DE, partname);
+	LOG("mass storage device sectorsize = %d\n", r);
 	for (j = 0; j < game->parts; j++) {
 		sprintf(partname,"%s.%02x",isoname, j);
 		LOG("partname: %s\n", partname);

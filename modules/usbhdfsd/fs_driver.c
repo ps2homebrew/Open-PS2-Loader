@@ -41,10 +41,12 @@
 //#define DEBUG  //comment out this line when not debugging
 
 #include "mass_debug.h"
+#include "mass_stor.h"
 
 #define IOCTL_CKFREE 0xBABEC0DE  //dlanor: Ioctl request code => Check free space
 #define IOCTL_RENAME 0xFEEDC0DE  //dlanor: Ioctl request code => Rename
-#define IOCTL_GETCLUSTER 0xBEEFC0DE  //jimmikaelkael: Ioctl request code => Rename
+#define IOCTL_GETCLUSTER 0xBEEFC0DE        //jimmikaelkael: Ioctl request code => get file start cluster
+#define IOCTL_GETDEVSECTORSIZE 0xDEADC0DE  //jimmikaelkael: Ioctl request code => get mass storage device sector size
 
 #define FLUSH_SECTORS		fat_flushSectors
 
@@ -792,6 +794,9 @@ int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
 			break;
 		case IOCTL_GETCLUSTER:
 			ret = fs_getFileSector(fd, (char *)data);
+			break;
+		case IOCTL_GETDEVSECTORSIZE:
+			ret = mass_stor_sectorsize(fatd->dev);
 			break;
 		default:
 			ret = fs_dummy();

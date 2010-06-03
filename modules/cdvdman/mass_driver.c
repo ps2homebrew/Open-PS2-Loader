@@ -206,6 +206,7 @@ typedef struct _usb_callback_data
 
 static mass_dev g_mass_device;
 
+#ifndef _4K_SECTORS
 struct MSStoDSS_t {
 	int massSectorSize;
 	int shiftPos;
@@ -219,6 +220,9 @@ static struct MSStoDSS_t gMSStoDSS[4] = {
 };
 
 static int gShiftPos;
+#else
+static u8 _4K_buf[4096] __attribute__((aligned(64)));
+#endif
 
 static void usb_callback(int resultCode, int bytes, void *arg)
 {
@@ -842,12 +846,14 @@ int mass_stor_warmup(mass_dev *dev)
 	dev->maxLBA     = getBI32(&rcd.last_lba);
 	XPRINTF("mass_driver: sectorSize %d maxLBA %d\n", dev->sectorSize, dev->maxLBA);
 
+#ifndef _4K_SECTORS
 	for (stat=0; stat<4; stat++) {
 		if (dev->sectorSize == gMSStoDSS[stat].massSectorSize) {
 			gShiftPos = gMSStoDSS[stat].shiftPos;
 			break;
 		}
 	}
+#endif
 
 	return 0;
 }
@@ -924,10 +930,19 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 			sectors = 2;
 
 		nbytes = sectors << 11;	
-		mass_stor_readSector(p_part_start[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);
-		//mass_stor_readSector(part_lba + (lsn << 2), 8, cdvdman_io_buf);
-		//mips_memcpy(p, cdvdman_io_buf, nbytes);
 
+#ifndef _4K_SECTORS
+		mass_stor_readSector(p_part_start[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);
+#else
+		if (sectors == 1) {
+			mass_stor_readSector(p_part_start[part_num] + (lsn >> 1), 1, _4K_buf);
+			mips_memcpy(p, _4K_buf, nbytes);
+
+		}
+		else {
+			mass_stor_readSector(p_part_start[part_num] + (lsn >> 1), 1, p);
+		}
+#endif
 		lsn += sectors;
 		r += sectors;
 		p += nbytes;

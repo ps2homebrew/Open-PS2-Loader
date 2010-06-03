@@ -16,7 +16,8 @@ GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/
 
 LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
-		obj/usb_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
+		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
+		obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
 
@@ -75,6 +76,7 @@ clean:
 	$(MAKE) -C modules/eesync clean
 	echo "    * cdvdman.irx"
 	$(MAKE) -C modules/cdvdman -f Makefile.usb clean
+	$(MAKE) -C modules/cdvdman -f Makefile.usb.4Ksectors clean
 	$(MAKE) -C modules/cdvdman -f Makefile.smb clean
 	$(MAKE) -C modules/cdvdman -f Makefile.smb.pcmcia clean
 	$(MAKE) -C modules/cdvdman -f Makefile.hdd clean
@@ -153,6 +155,11 @@ usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
 	$(MAKE) -C modules/cdvdman -f Makefile.usb rebuild
 	bin2s modules/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
+
+usb_4Ksectors_cdvdman.s:
+	echo "    * usb_4Ksectors_cdvdman.irx"
+	$(MAKE) -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+	bin2s modules/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
 
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"

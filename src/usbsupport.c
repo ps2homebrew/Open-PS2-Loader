@@ -11,6 +11,9 @@
 extern void *usb_cdvdman_irx;
 extern int size_usb_cdvdman_irx;
 
+extern void *usb_4Ksectors_cdvdman_irx;
+extern int size_usb_4Ksectors_cdvdman_irx;
+
 extern void *usbd_ps2_irx;
 extern int size_usbd_ps2_irx;
 
@@ -148,7 +151,8 @@ static void usbLaunchGame(int id) {
 	char isoname[32];
 	base_game_info_t* game = &usbGames[id];
 
-	compatmask = sbPrepare(game, usbGameList.mode, isoname, size_usb_cdvdman_irx, &usb_cdvdman_irx, &i);
+	void *irx = &usb_cdvdman_irx;
+	int irx_size = size_usb_cdvdman_irx;
 
 	int j, offset = 44;
 	char partname[64];
@@ -161,8 +165,17 @@ static void usbLaunchGame(int id) {
 		scr_printf("\n\t Fatal error opening %s...\n", usbPrefix);
 		while(1);
 	}
+
 	r = fioIoctl(fd, 0xDEADC0DE, partname);
 	LOG("mass storage device sectorsize = %d\n", r);
+
+	if (r == 4096) {
+		irx = &usb_4Ksectors_cdvdman_irx;
+		irx_size = size_usb_4Ksectors_cdvdman_irx;
+	}
+
+	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &i);
+
 	for (j = 0; j < game->parts; j++) {
 		sprintf(partname,"%s.%02x",isoname, j);
 		LOG("partname: %s\n", partname);
@@ -170,11 +183,12 @@ static void usbLaunchGame(int id) {
 		memcpy((void*)((u32)&usb_cdvdman_irx + i + offset), &r, 4);
 		offset += 4;
 	}
+
 	fioDclose(fd);
 
 	FlushCache(0);
 
-	sysLaunchLoaderElf(game->startup, "USB_MODE", size_usb_cdvdman_irx, &usb_cdvdman_irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
 }
 
 static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

@@ -21,6 +21,7 @@ struct _mass_dev
 };
 
 int InitUSB(void);
+int mass_stor_sectorsize(mass_dev *dev);
 int mass_stor_disconnect(int devId);
 int mass_stor_connect(int devId);
 int mass_stor_probe(int devId);

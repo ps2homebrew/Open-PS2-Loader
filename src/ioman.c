@@ -4,6 +4,9 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <unistd.h>
+#ifdef __EESIO_DEBUG
+#include <sio.h>
+#endif
 
 #define MAX_IO_REQUESTS 64
 #define MAX_IO_HANDLERS 64
@@ -330,15 +333,23 @@ static void ioAlarmFunc(s32 id, u16 time, void *arg) {
 	}
 } 
 
+#ifdef __EESIO_DEBUG
+static char tbuf[2048];
+#endif
 
 int ioPrintf(const char* format, ...) {
 	WaitSema(gIOPrintfSemaId);
 	
 	va_list args;
 	va_start(args, format);
+#ifdef __EESIO_DEBUG
+	int ret = vsnprintf((char *)tbuf, sizeof(tbuf), format, args);
+	sio_putsn(tbuf);
+#else
 	int ret = vprintf(format, args);
+#endif
 	va_end(args);
-	
+ 
 	SignalSema(gIOPrintfSemaId);
 	return ret;
 }

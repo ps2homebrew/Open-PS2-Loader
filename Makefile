@@ -1,6 +1,7 @@
 .SILENT:
 
 DEBUG = 0
+EESIO_DEBUG = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
 FT_LIBDIR = $(FT_DIR)/objs
@@ -31,8 +32,11 @@ EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -
 #EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(FT_DIR)/include
 
-ifeq ($(DEBUG),1)
+ifeq ($(DEBUG),1) 
 EE_CFLAGS := -D__DEBUG -g
+ifeq ($(EESIO_DEBUG),1)
+EE_CFLAGS += -D__EESIO_DEBUG
+endif
 else
 EE_CFLAGS := -O2
 endif
@@ -59,6 +63,9 @@ endif
 
 debug:
 	$(MAKE) DEBUG=1 all
+
+EESIO_debug:
+	$(MAKE) EESIO_DEBUG=1 DEBUG=1 all
 	
 clean:
 	echo "Cleaning..."
@@ -126,7 +133,11 @@ pc_tools_win32:
 loader.s:
 	echo "    * Loader"
 	$(MAKE) -C loader clean
+ifeq ($(EESIO_DEBUG),1)
+	$(MAKE) EESIO_DEBUG=1 -C loader
+else
 	$(MAKE) -C loader
+endif
 	bin2s loader/loader.elf asm/loader.s loader_elf
 
 alt_loader.s:

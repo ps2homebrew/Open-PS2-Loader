@@ -65,10 +65,12 @@ int New_Reset_Iop(const char *arg, int flag){
 	char    ioprp_path[0x50];
 	int eeloadcnf_reset = 0;		
 	
+	DPRINTF("New_Reset_Iop start!\n");
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xFF00FF;
 	
 	iop_reboot_count++;
+	DPRINTF("IOP reboot count = %d\n", iop_reboot_count);
 	
 	SifInitRpc(0);
 	
@@ -144,9 +146,12 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}
 
+	DPRINTF("Reading IOPRP: '%s'\n", ioprp_path);
+
 	fioInit();		
 	fd = open(ioprp_path, O_RDONLY);
 	if (fd < 0){
+		DPRINTF("Failed to open IOPRP...\n");
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x000080;
 
@@ -166,6 +171,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	}
 
 	ioprp_img.size_in = lseek(fd, 0, SEEK_END);
+	DPRINTF("IOPRP size: %d bytes\n", ioprp_img.size_in);
 	if (ioprp_img.size_in % 0x40)
 		ioprp_img.size_in = (ioprp_img.size_in & 0xffffffc0) + 0x40;
 
@@ -183,34 +189,45 @@ int New_Reset_Iop(const char *arg, int flag){
 
 	close(fd);
 	fioExit();
-		
+	DPRINTF("IOPRP readed\n");
+
 	if (eeloadcnf_reset) {
+		DPRINTF("Patching EELOADCNF Image...\n");
 		r = Patch_EELOADCNF_Img(&ioprp_img);
 		if (r == 0){
+			DPRINTF("Patching failed!\n");
 			if(!DisableDebug)
 				GS_BGCOLOUR = 0x00FF00;
 			while (1){;}
 		}
 	}
 	else {
+		DPRINTF("Patching CDVDMAN...\n");
 		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
+		DPRINTF("Patching CDVDFSV...\n");
 		Patch_Mod(&ioprp_img, "CDVDFSV", cdvdfsv_irx, size_cdvdfsv_irx);
+		DPRINTF("Patching EESYNC...\n");
 		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
 	}
-	
+
+	DPRINTF("Exiting services...\n");
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
 	
 	// Reseting IOP.
+	DPRINTF("Resetting IOP...\n");
 	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
 	while (!Sync_Iop()){;}
 
+	DPRINTF("Init services...\n");
 	SifInitRpc(0);
 	SifInitIopHeap();
 	LoadFileInit();
+	DPRINTF("Applying Sbv patches...\n");
 	Sbv_Patch();
 	
+	DPRINTF("Sending patched IOPRP on IOP and try to reset with...\n");
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);
 	
 	if (rom_iop){
@@ -242,22 +259,26 @@ int New_Reset_Iop(const char *arg, int flag){
 		ee_kmode_exit();
 		EIntr();
 	}else{
+		DPRINTF("IOP memory allocation (%d bytes) failed!\n", ioprp_img.size_out);
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0xFF0000;
 		while (1){;}
 	}
 
 	while (!Sync_Iop()) {;}
-	
+
 	SifExitIopHeap();
+	DPRINTF("Init services...\n");
 	SifInitRpc(0);
 	SifInitIopHeap();
 	LoadFileInit();
+	DPRINTF("Applying Sbv patches...\n");
 	Sbv_Patch();
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x00FFFF;
-	
+
+	DPRINTF("Loading extra IOP modules...\n");
 	if (GameMode == USB_MODE) {
 		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
 		delay(3);
@@ -280,11 +301,13 @@ int New_Reset_Iop(const char *arg, int flag){
 	}	
 
 	FlushCache(0);	
-		
+
+	DPRINTF("Exiting services...\n");
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
-	
+
+	DPRINTF("New_Reset_Iop complete!\n");
 	// we have 4 SifSetReg calls to skip in ELF's SifResetIop, not when we use it ourselves
 	if (set_reg_disabled)
 		set_reg_hook = 4;

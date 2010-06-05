@@ -31,6 +31,16 @@
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
+#define LOG_INIT()		sio_init(38400, 0, 0, 0, 0)
+#define LOG_ENABLE()		do { } while(0)
+#else
+#ifdef __DEBUG
+#define LOG_INIT()		do { } while(0)
+#define LOG_ENABLE()		debugSetActive()
+#else
+#define LOG_INIT()		do { } while(0)
+#define LOG_ENABLE()		do { } while(0)
+#endif
 #endif
 
 #define UPDATE_FRAME_COUNT 250
@@ -544,11 +554,8 @@ void unloadHdldSvr(void) {
 
 	sysReset();
 
-#ifndef __EESIO_DEBUG
-#ifdef __DEBUG
-	debugSetActive();
-#endif
-#endif
+	LOG_INIT();
+	LOG_ENABLE();
 
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 	SifLoadModule("rom0:MCMAN", 0, NULL);
@@ -759,19 +766,14 @@ static void deferredInit(void) {
 // --------------------- Main --------------------
 int main(void)
 {
-#ifdef __EESIO_DEBUG
-	sio_init(38400, 0, 0, 0, 0);
-#endif
+	LOG_INIT();
+
 	// reset, load modules
 	reset();
 	
 	init();
 
-#ifndef __EESIO_DEBUG
-#ifdef __DEBUG
-	debugSetActive();
-#endif
-#endif
+	LOG_ENABLE();
 
 	// queue deffered init which shuts down the intro screen later
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);

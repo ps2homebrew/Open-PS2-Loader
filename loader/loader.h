@@ -18,6 +18,15 @@
 #include <string.h>
 #include <sbv_patches.h>
 
+#ifdef __EESIO_DEBUG
+#include <sio.h>
+#define DPRINTF(args...)	sio_printf(args)
+#define DINIT()			sio_init(38400, 0, 0, 0, 0)
+#else
+#define DPRINTF(args...)	do { } while(0)
+#define DINIT()			do { } while(0)
+#endif
+
 
 #define MAX_ARGS     0x40
 #define MAX_MOD_ARGS 0x50

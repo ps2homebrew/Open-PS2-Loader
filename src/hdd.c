@@ -1,5 +1,8 @@
 #include "include/usbld.h"
+#include "include/ioman.h"
 #include "include/hddsupport.h"
+
+#define TEST_WRITES
 
 // APA Partition
 #define APA_MAGIC		0x00415041	// 'APA\0'
@@ -269,6 +272,53 @@ static void apaFreePartitionTable(apa_partition_table_t *table)
 		if (table->parts)
 			free(table->parts);
 	}
+
+	if (table->chunks_map)
+		free(table->chunks_map);
+}
+
+//-------------------------------------------------------------------------
+static int apaSetPartitionTableStats(apa_partition_table_t *table)
+{
+	register int i;
+	char *chunks_map;
+
+	table->total_chunks = table->device_size_in_mb / 128;
+	chunks_map = malloc(table->total_chunks);
+	if (chunks_map == NULL)
+		return -1;
+
+	*chunks_map = MAP_AVAIL;
+	for (i=0; i<table->total_chunks; i++)
+		chunks_map[i] = MAP_AVAIL;
+
+	// build occupided/available space map
+	table->allocated_chunks = 0;
+	table->free_chunks = table->total_chunks;
+	for (i=0; i<table->part_count; i++) {
+		apa_header *part_hdr = (apa_header *)&table->parts[i].header;
+		int part_num = part_hdr->start / ((128 * 1024 * 1024) / 512);
+		int num_parts = part_hdr->length / ((128 * 1024 * 1024) / 512);
+
+		// "alloc" num_parts starting at part_num
+		while (num_parts) {
+			if (chunks_map[part_num] == MAP_AVAIL)
+				chunks_map[part_num] = (part_hdr->main == 0 ? MAP_MAIN : MAP_SUB);
+			else
+				chunks_map[part_num] = MAP_COLL; // collision
+			part_num++;
+			num_parts--;
+			table->allocated_chunks++;
+			table->free_chunks--;
+		}
+	}
+
+	if (table->chunks_map)
+		free(table->chunks_map);
+
+	table->chunks_map = (u8 *)chunks_map;
+
+	return 0;
 }
 
 //-------------------------------------------------------------------------
@@ -321,10 +371,12 @@ static int apaReadPartitionTable(apa_partition_table_t **table)
 
 	} while (ret == 0 && lba != 0);
 
-	if (ret == 0)
+	if (ret == 0) {
 		(*table)->device_size_in_mb = nsectors >> 11;
+		ret = apaSetPartitionTableStats(*table);
+	}
 	else {
-		free(*table);
+		apaFreePartitionTable(*table);
 		ret = 20000 + (*table)->part_count;
 	}
 
@@ -338,9 +390,9 @@ static int apaCheckLinkedList(apa_partition_table_t *table, int flag)
 	register int i;
 
 	for (i=0; i<table->part_count; i++) {
-		apa_partition_t *prev = table->parts + (i > 0 ? i - 1 : table->part_count - 1);
-		apa_partition_t *curr = table->parts + i;
-		apa_partition_t *next = table->parts + (i + 1 < table->part_count ? i + 1 : 0);
+		apa_partition_t *prev = (apa_partition_t *)&table->parts[(i > 0 ? i - 1 : table->part_count - 1)];
+		apa_partition_t *curr = (apa_partition_t *)&table->parts[i];
+		apa_partition_t *next = (apa_partition_t *)&table->parts[(i + 1 < table->part_count ? i + 1 : 0)];
 
 		if (curr->header.prev != prev->header.start) {
 			if (!flag)
@@ -426,6 +478,8 @@ static int apaCheckPartitionTable(apa_partition_table_t *table)
 	if (apaCheckLinkedList(table, 0) < 0)
 		return -9; // bad links
 
+	LOG("apaCheckPartitionTable OK!\n");
+
 	return 0;
 }
 
@@ -434,20 +488,23 @@ static int apaWritePartitionTable(apa_partition_table_t *table)
 {
 	register int ret, i;
 
+	LOG("apaWritePartitionTable\n");
+
 	ret = apaCheckPartitionTable(table);
 	if (ret < 0)
 		return ret;
 
 	for (i=0; i<table->part_count; i++) {
 
-		if (ret == 0)
-			break;
-
 		if (table->parts[i].modified) {
 			apa_header *part_hdr = &table->parts[i].header;
+#ifdef TEST_WRITES
+			LOG("writing 2 sectors at sector 0x%X\n", part_hdr->start);
+#else
 			ret = hddWriteSectors(part_hdr->start, 2, (void *)part_hdr);
 			if (ret < 0)
 				return -10;
+#endif
 		}
 	}
 
@@ -482,6 +539,8 @@ static int apaDeletePartition(apa_partition_table_t *table, char *partname)
 	register int count = 1;
 	u32 pending_deletes[APA_MAXSUB];
 
+	LOG("apaDeletePartition %s\n", partname);
+
 	// retrieve part index
 	part_index = apaFindPartition(table, partname);
 	if (part_index < 0)
@@ -495,8 +554,13 @@ static int apaDeletePartition(apa_partition_table_t *table, char *partname)
 
 	// preserve a list of starting sectors of partitions to be deleted
 	pending_deletes[0] = part_hdr->start;
-	for (i=0; i<part_hdr->nsub; i++)
+	LOG("apaDeletePartition: found part at %d \n", part_hdr->start / 262144);
+	for (i=0; i<part_hdr->nsub; i++) {
+		LOG("apaDeletePartition: found subpart at %d \n", part_hdr->subs[i].start / 262144);
 		pending_deletes[count++] = part_hdr->subs[i].start;
+	}
+
+	LOG("apaDeletePartition: number of subpartitions=%d count=%d\n", part_hdr->nsub, count);
 
 	// remove partitions from the double-linked list
 	i = 0;
@@ -511,15 +575,17 @@ static int apaDeletePartition(apa_partition_table_t *table, char *partname)
 			}
 		}
 
-		if (found) { 
+		if (found) {
 			// remove this partition
 			int part_num = table->parts[i].header.start / 262144; // 262144 sectors == 128M
 			int num_parts = table->parts[i].header.length / 262144;
 
-			memmove(table->parts + i, table->parts + i + 1, sizeof(apa_partition_t) * (table->part_count - i - 1));
+			LOG("apaDeletePartition: partition found! num_parts=%d part_num=%d\n", num_parts, part_num);
+
+			memmove((void *)&table->parts[i], (void *)&table->parts[i+1], sizeof(apa_partition_t) * (table->part_count-i-1));
 			table->part_count--;
 
-			// "free" num_parts starting at part_no
+			// "free" num_parts starting at part_num
 			while (num_parts) {
 				table->chunks_map[part_num] = MAP_AVAIL;
 				part_num++;
@@ -671,10 +737,11 @@ int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 }
 
 //-------------------------------------------------------------------------
-// !!! UNTESTED: DO NOT USE !!!
-static int hddDeleteHDLGame(hdl_game_info_t *ginfo)
+int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 {
 	register int ret;
+
+	LOG("hddDeleteHDLGame() game name='%s'\n", ginfo->name);
 
 	if (ptable == NULL)
 		return -1;
@@ -686,6 +753,10 @@ static int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 	ret = apaWritePartitionTable(ptable);
 	if (ret < 0)
 		return -3;
+
+	hddFlushCache();
+
+	LOG("hddDeleteHDLGame: '%s' deleted!\n", ginfo->name);
 
 	return 0;
 }

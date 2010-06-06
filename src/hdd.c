@@ -497,10 +497,10 @@ static int apaWritePartitionTable(apa_partition_table_t *table)
 	for (i=0; i<table->part_count; i++) {
 
 		if (table->parts[i].modified) {
-			apa_header *part_hdr = &table->parts[i].header;
 #ifdef TEST_WRITES
 			LOG("writing 2 sectors at sector 0x%X\n", part_hdr->start);
 #else
+			apa_header *part_hdr = &table->parts[i].header;
 			ret = hddWriteSectors(part_hdr->start, 2, (void *)part_hdr);
 			if (ret < 0)
 				return -10;

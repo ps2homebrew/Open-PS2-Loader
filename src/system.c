@@ -8,6 +8,7 @@
 #include "include/util.h"
 #include "include/pad.h"
 #include "include/system.h"
+#include "include/ioman.h"
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
@@ -307,25 +308,54 @@ unsigned int USBA_crc32(char *string) {
 }
 
 int sysGetDiscID(char *hexDiscID) {
-	int fd = fioOpen("discID:", O_RDONLY);
-	if (fd < 0)
-		return fd;
 
-	char discID[5];
+	cdInit(CDVD_INIT_NOCHECK);
+	LOG("cdvd RPC inited\n");
+	if (cdStatus() == CDVD_STAT_OPEN) // If tray is open, error
+		return -1;
+		
+	while (cdGetDiscType() == CDVD_TYPE_DETECT) {;}	// Trick : if tray is open before startup it detects it as closed...
+	if (cdGetDiscType() == CDVD_TYPE_NODISK)
+		return -1;
+
+	cdDiskReady(0); 	
+	LOG("Disc drive is ready\n");
+	CdvdDiscType_t cdmode = cdGetDiscType();	// If tray is closed, get disk type
+	if (cdmode == CDVD_TYPE_NODISK)
+		return -1;
+
+	if ((cdmode != CDVD_TYPE_PS2DVD) && (cdmode != CDVD_TYPE_PS2CD) && (cdmode != CDVD_TYPE_PS2CDDA)) {
+		cdStop();
+		cdSync(0);
+		LOG("Disc stopped\n");
+		LOG("Disc is not ps2 disc!\n");
+		return -2;
+	}
+
+	cdStandby();
+	cdSync(0);
+	LOG("Disc standby\n");
+
+	int fd = fioOpen("discID:", O_RDONLY);
+	if (fd < 0) {
+		cdStop();
+		cdSync(0);
+		LOG("Disc stopped\n");
+		return -3;
+	}
+
+	unsigned char discID[5];
 	memset(discID, 0, 5);
 	fioRead(fd, discID, 5);
 	fioClose(fd);
 
-	// convert to hexadecimal string
-	unsigned int n;
-	// this may seem stupid but it seems snprintf handles %X as signed...
-	for(n = 0; n < 5; ++n) {
-		hexDiscID[n * 3    ] = toHex(discID[n] >> 4);
-		hexDiscID[n * 3 + 1] = toHex(discID[n] & 0x0f);
-		hexDiscID[n * 3 + 2] = ' ';
-	}
+	cdStop();
+	cdSync(0);
+	LOG("Disc stopped\n");
 
-	hexDiscID[14] = '\0';
+	// convert to hexadecimal string
+	snprintf(hexDiscID, 15, "%02X %02X %02X %02X %02X", discID[0], discID[1], discID[2], discID[3], discID[4]);
+	LOG("PS2 Disc ID = %s\n", hexDiscID);
 
 	return 1;
 }

@@ -268,13 +268,15 @@ static void apaFreePartitionTable(apa_partition_table_t *table)
 {
 	register int i;
 
-	for (i=0; i<table->part_count; i++) {
-		if (table->parts)
-			free(table->parts);
-	}
+	if (table != NULL) {
+		for (i=0; i<table->part_count; i++) {
+			if (table->parts)
+				free(table->parts);
+		}
 
-	if (table->chunks_map)
-		free(table->chunks_map);
+		if (table->chunks_map)
+			free(table->chunks_map);
+	}
 }
 
 //-------------------------------------------------------------------------

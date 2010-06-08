@@ -36,9 +36,9 @@ $(EE_BIN) : $(EE_OBJS)
 all: $(EE_BIN)
 
 clean:
-	rm -f *.o *.a *.s *.map *.bak *.elf
+	rm -f *.o *.a *.map *.bak *.elf
 
 clean_all:
-	rm -f *.o *.a *.s *.map *.bak *.elf
+	rm -f *.o *.a *.map *.bak *.elf
 
 include $(PS2SDK)/samples/Makefile.pref

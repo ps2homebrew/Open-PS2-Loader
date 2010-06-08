@@ -239,6 +239,9 @@ static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 
 static void hddCleanUp(void) {
 	LOG("hddCleanUp()\n");
+
+	hddFreeHDLGamelist(hddGames);
+
 	if (gHddStartup == 0)
 		fileXioUmount(hddPrefix);
 }

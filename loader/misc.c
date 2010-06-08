@@ -434,7 +434,6 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img)
 	memcpy(&ptr[0], cdvdfsv_irx, size_cdvdfsv_irx);
 	ee_kmode_exit();
 	EIntr();
-
 	romdir_in++;
 	ptr += cdvdfsv_size;
 

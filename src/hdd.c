@@ -699,6 +699,25 @@ int hddGetHDLGamelist(hdl_games_list_t **game_list)
 }
 
 //-------------------------------------------------------------------------
+int hddFreeHDLGamelist(hdl_games_list_t *game_list)
+{
+	register int i;
+
+	apaFreePartitionTable(ptable);
+
+	if (game_list != NULL) {
+		for (i = 0; i < game_list->count; i++) {
+			if (game_list->games != NULL)
+				free(game_list->games);
+		}
+
+		free(game_list);
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------
 int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
 {
 	const u32 offset = 0x101000;

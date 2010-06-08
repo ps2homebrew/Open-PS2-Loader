@@ -73,7 +73,7 @@ u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 
 
 /*----------------------------------------------------------------------------------------*/
-/* This fonction unhook SifSetDma/SifSetReg sycalls		                                  */
+/* This fonction unhook SifSetDma/SifSetReg sycalls		                          */
 /*----------------------------------------------------------------------------------------*/
 void Apply_Mode3(void)
 {
@@ -125,7 +125,11 @@ static void t_loadElf(void)
 	int i, r;
 	t_ExecData elf;
 
+	DPRINTF("t_loadElf()\n");
+
 	SifExitRpc();
+
+	DPRINTF("t_loadElf: Resetting IOP...\n");
 
 	set_reg_disabled = 0;
 	New_Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0);
@@ -135,8 +139,10 @@ static void t_loadElf(void)
            
 	SifInitRpc(0);
 	LoadFileInit();
+
+	DPRINTF("t_loadElf: Loading cddev IOP module...\n");
 	LoadIRXfromKernel(cddev_irx, size_cddev_irx, 0, NULL);
-	
+
 	// replacing cdrom in elf path by cddev
 	if (strstr(g_argv[0], "cdrom")) {
 		u8 *ptr = (u8 *)g_argv[0];
@@ -144,8 +150,12 @@ static void t_loadElf(void)
 		strcat(g_ElfPath, &ptr[5]);		
 	}
 	
+	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
+	
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x00ff00;
+
+	DPRINTF("t_loadElf: cleaning user memory...\n");
 
 	// wipe user memory
 	for (i = 0x00100000; i < 0x02000000; i += 64) {
@@ -158,10 +168,16 @@ static void t_loadElf(void)
 		);
 	}
 
+	DPRINTF("t_loadElf: clear user memory done\n");
+
+	DPRINTF("t_loadElf: loading elf...");
 	r = LoadElf(g_ElfPath, &elf);
 
 	if ((!r) && (elf.epc))
 	{
+		DPRINTF(" done\n");
+
+		DPRINTF("t_loadElf: exiting services...\n");
 		// exit services
 		fioExit();
 		SifExitIopHeap();
@@ -172,15 +188,21 @@ static void t_loadElf(void)
 		if (strstr(g_ElfPath, "cddev"))
 			memcpy(g_ElfPath, "cdrom", 5);
 
+		DPRINTF("t_loadElf: real elf path = '%s'\n", g_ElfPath);
+
+		DPRINTF("t_loadElf: trying to apply game patches...\n");
 		// applying needed game patches if any
 		apply_game_patches();
-		
+	
 		FlushCache(0);
 		FlushCache(2);
-		
+
+		DPRINTF("t_loadElf: executing...\n");
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
 	}
 	
+	DPRINTF(" failed\n");
+
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xffffff; // white screen: error
 	SleepThread();

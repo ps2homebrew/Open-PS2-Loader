@@ -189,7 +189,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 /*----------------------------------------------------------------------------------------*/
 /* Place additionnal modules in a EELOADCNF type image.                                   */
 /*----------------------------------------------------------------------------------------*/
-int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
+/*int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 {
 	int       offset_in, offset_out;
 	romdir_t *romdir_in, *romdir_out;
@@ -347,6 +347,102 @@ int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
 	ioprp_img->size_out = offset_out;
 
 	return 1;
+}
+*/
+
+/*----------------------------------------------------------------------------------------*/
+/* Build an EELOAD Config file				                                  */
+/*----------------------------------------------------------------------------------------*/
+int Build_EELOADCNF_Img(ioprp_t *ioprp_img)
+{
+	int romdir_size, extinfo_size, iopbtconf_size, cdvdman_size, cdvdfsv_size;
+	romdir_t *romdir_in;
+
+	romdir_in = (romdir_t*)ioprp_img->data_in;
+	memset((void *)romdir_in, 0, 7 * sizeof(romdir_t));
+
+	// Build ROMDIR fs
+	strcpy(romdir_in->fileName, "RESET");
+	romdir_in->extinfo_size = 8;
+	romdir_in++;
+
+	strcpy(romdir_in->fileName, "ROMDIR");
+	romdir_size = 7 * sizeof(romdir_t);
+	romdir_in->fileSize = romdir_size;
+	romdir_in++;
+
+	strcpy(romdir_in->fileName, "EXTINFO");
+	extinfo_size = 8 + 8 + 24 + 24;
+	romdir_in->fileSize = extinfo_size;
+	romdir_in++;
+
+	strcpy(romdir_in->fileName, "IOPBTCONF");
+	romdir_in->extinfo_size = 8;
+
+	// Fill EXTINFO
+	u8 *ptr = (u8 *)(ioprp_img->data_in + romdir_size);
+	memcpy(&ptr[0], "\0\0\x04\x01\x07\x02\x02\x20", 8);
+	memcpy(&ptr[8], "\0\0\x04\x01\x07\x02\x02\x20", 8);
+	memcpy(&ptr[8+8], "\0\0\x04\x01\x12\x04\x88\x19\x99\x99\0\x02\0\0\x08\x03""CDVDMAN\0", 24);
+	memcpy(&ptr[8+8+24], "\0\0\x04\x01\x12\x04\x88\x19\x99\x99\0\x02\0\0\x08\x03""CDVDFSV\0", 24);
+	ptr += extinfo_size;
+
+	// Fill IOPBTCONF
+	char *iopbtconf_str0 = "@800\nSYSMEM\nLOADCORE\nEXCEPMAN\nINTRMANP\nINTRMANI\nSSBUSC\nDMACMAN\nTIMEMANP\nTIMEMANI\n";
+	char *iopbtconf_str1 = "SYSCLIB\nHEAPLIB\nEECONF\nTHREADMAN\nVBLANK\nIOMAN\nMODLOAD\nROMDRV\nSTDIO\nSIFMAN\n";
+	char *iopbtconf_str2 = "IGREETING\nSIFCMD\nREBOOT\nLOADFILE\nCDVDMAN\nCDVDFSV\nSIFINIT\nFILEIO\nSECRMAN\nEESYNC\n";
+
+	memcpy(&ptr[0], iopbtconf_str0, strlen(iopbtconf_str0));
+	memcpy(&ptr[strlen(iopbtconf_str0)], iopbtconf_str1, strlen(iopbtconf_str1));
+	memcpy(&ptr[strlen(iopbtconf_str0)+strlen(iopbtconf_str1)], iopbtconf_str2, strlen(iopbtconf_str2));
+	
+	// Fill IOPBTCONF filesize
+	iopbtconf_size = strlen(iopbtconf_str0)+strlen(iopbtconf_str1)+strlen(iopbtconf_str2);
+	romdir_in->fileSize = iopbtconf_size;
+	// arrange size to next 16 bytes multiple 
+	if (iopbtconf_size % 0x10)
+		iopbtconf_size = (iopbtconf_size + 0x10) & 0xfffffff0;
+	romdir_in++;
+	ptr += iopbtconf_size;
+
+	// Fill CDVDMAN
+	strcpy(romdir_in->fileName, "CDVDMAN");
+	romdir_in->extinfo_size = 24;
+	cdvdman_size = size_cdvdman_irx;
+	romdir_in->fileSize = cdvdman_size;
+	// arrange size to next 16 bytes multiple
+	if (cdvdman_size % 0x10)
+		cdvdman_size = (cdvdman_size + 0x10) & 0xfffffff0;
+	DIntr();
+	ee_kmode_enter();
+	memcpy(&ptr[0], cdvdman_irx, size_cdvdman_irx);
+	ee_kmode_exit();
+	EIntr();
+	romdir_in++;
+	ptr += cdvdman_size;
+
+	// Fill CDVDFSV
+	strcpy(romdir_in->fileName, "CDVDFSV");
+	romdir_in->extinfo_size = 24;
+	cdvdfsv_size = size_cdvdfsv_irx;
+	romdir_in->fileSize = cdvdfsv_size;
+	// arrange size to next 16 bytes multiple
+	if (cdvdfsv_size % 0x10)
+		cdvdfsv_size = (cdvdfsv_size + 0x10) & 0xfffffff0;
+	DIntr();
+	ee_kmode_enter();
+	memcpy(&ptr[0], cdvdfsv_irx, size_cdvdfsv_irx);
+	ee_kmode_exit();
+	EIntr();
+
+	romdir_in++;
+	ptr += cdvdfsv_size;
+
+	// Fill mini image size
+	ioprp_img->data_out = ioprp_img->data_in;
+	ioprp_img->size_out = ioprp_img->size_in = romdir_size + extinfo_size + iopbtconf_size + cdvdman_size + cdvdfsv_size;
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------------------*/

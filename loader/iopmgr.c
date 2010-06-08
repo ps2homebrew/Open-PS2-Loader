@@ -60,7 +60,7 @@ void list_modules(void)
 /*----------------------------------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int flag){
 	void   *rom_iop;
-	int     i, j, r, fd=0;
+	int     i, j, fd=0; //r
 	ioprp_t ioprp_img;
 	char    ioprp_path[0x50];
 	int eeloadcnf_reset = 0;		
@@ -146,68 +146,75 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}
 
-	DPRINTF("Reading IOPRP: '%s'\n", ioprp_path);
-
-	fioInit();		
-	fd = open(ioprp_path, O_RDONLY);
-	if (fd < 0){
-		DPRINTF("Failed to open IOPRP...\n");
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x000080;
-
-		// some games like SOCOM3 uses faulty IOPRP path like "cdrom0:\RUN\IRX\DNAS300.IMGG;1"
-		// this part ensure it will not get stucked on red screen
-		char *p = strrchr(ioprp_path, '.');
-		if (p) {
-			p[4] = ';';
-			p[5] = '1';
-			p[6] = 0;
-
-			fd = open(ioprp_path, O_RDONLY);
-		}
-
-		if (fd < 0)
-			while (1){;}
-	}
-
-	ioprp_img.size_in = lseek(fd, 0, SEEK_END);
-	DPRINTF("IOPRP size: %d bytes\n", ioprp_img.size_in);
-	if (ioprp_img.size_in % 0x40)
-		ioprp_img.size_in = (ioprp_img.size_in & 0xffffffc0) + 0x40;
-
-	lseek(fd, 0, SEEK_SET);
-
-	ioprp_img.data_in  = (void *)g_buf;	
-	if (eeloadcnf_reset)
-		ioprp_img.data_out = (void *)(g_buf+102400);
-	else {	
-		ioprp_img.data_out = ioprp_img.data_in;
-		ioprp_img.size_out = ioprp_img.size_in;
-	}
-
-	read(fd, ioprp_img.data_in , ioprp_img.size_in);
-
-	close(fd);
-	fioExit();
-	DPRINTF("IOPRP readed\n");
-
 	if (eeloadcnf_reset) {
-		DPRINTF("Patching EELOADCNF Image...\n");
-		r = Patch_EELOADCNF_Img(&ioprp_img);
-		if (r == 0){
-			DPRINTF("Patching failed!\n");
-			if(!DisableDebug)
-				GS_BGCOLOUR = 0x00FF00;
-			while (1){;}
-		}
+		ioprp_img.data_in = (void *)g_buf;
+		Build_EELOADCNF_Img(&ioprp_img);
 	}
 	else {
-		DPRINTF("Patching CDVDMAN...\n");
-		Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
-		DPRINTF("Patching CDVDFSV...\n");
-		Patch_Mod(&ioprp_img, "CDVDFSV", cdvdfsv_irx, size_cdvdfsv_irx);
-		DPRINTF("Patching EESYNC...\n");
-		Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
+		DPRINTF("Reading IOPRP: '%s'\n", ioprp_path);
+
+		fioInit();
+		fd = open(ioprp_path, O_RDONLY);
+		if (fd < 0){
+			DPRINTF("Failed to open IOPRP...\n");
+			if(!DisableDebug)
+				GS_BGCOLOUR = 0x000080;
+
+			// some games like SOCOM3 uses faulty IOPRP path like "cdrom0:\RUN\IRX\DNAS300.IMGG;1"
+			// this part ensure it will not get stucked on red screen
+			char *p = strrchr(ioprp_path, '.');
+			if (p) {
+				p[4] = ';';
+				p[5] = '1';
+				p[6] = 0;
+
+				fd = open(ioprp_path, O_RDONLY);
+			}
+
+			if (fd < 0)
+				while (1){;}
+		}
+
+		ioprp_img.size_in = lseek(fd, 0, SEEK_END);
+		DPRINTF("IOPRP size: %d bytes\n", ioprp_img.size_in);
+		if (ioprp_img.size_in % 0x40)
+			ioprp_img.size_in = (ioprp_img.size_in & 0xffffffc0) + 0x40;
+
+		lseek(fd, 0, SEEK_SET);
+
+		ioprp_img.data_in  = (void *)g_buf;
+		//if (eeloadcnf_reset)
+		//	ioprp_img.data_out = (void *)(g_buf+102400);
+		//else {	
+			ioprp_img.data_out = ioprp_img.data_in;
+			ioprp_img.size_out = ioprp_img.size_in;
+		//}
+
+		read(fd, ioprp_img.data_in , ioprp_img.size_in);
+
+		close(fd);
+		fioExit();
+	
+		DPRINTF("IOPRP readed\n");
+
+		//if (eeloadcnf_reset) {
+		//	DPRINTF("Patching EELOADCNF Image...\n");
+		//	r = Patch_EELOADCNF_Img(&ioprp_img);
+		//	if (r == 0){
+		//		DPRINTF("Patching failed!\n");
+		//		if(!DisableDebug)
+		//			GS_BGCOLOUR = 0x00FF00;
+		//		while (1){;}
+		//	}
+		//}
+		//else {
+			DPRINTF("Patching CDVDMAN...\n");
+			Patch_Mod(&ioprp_img, "CDVDMAN", cdvdman_irx, size_cdvdman_irx);
+			DPRINTF("Patching CDVDFSV...\n");
+			Patch_Mod(&ioprp_img, "CDVDFSV", cdvdfsv_irx, size_cdvdfsv_irx);
+			DPRINTF("Patching EESYNC...\n");
+			Patch_Mod(&ioprp_img, "EESYNC", eesync_irx, size_eesync_irx);
+		//}
 	}
 
 	DPRINTF("Exiting services...\n");

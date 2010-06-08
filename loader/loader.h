@@ -123,7 +123,8 @@ void set_ipconfig(void);
 u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
 int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
-int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
+//int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
+int Build_EELOADCNF_Img(ioprp_t *ioprp_img);
 void delay(int count);
 void Sbv_Patch(void);
 

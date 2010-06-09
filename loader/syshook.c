@@ -10,6 +10,8 @@
 #include "loader.h"
 #include "iopmgr.h"
 #include <syscallnr.h>
+#include <ee_regs.h>
+#include <ps2_reg_defs.h>
 
 extern void *cddev_irx;
 extern int size_cddev_irx;
@@ -26,6 +28,42 @@ int iop_reboot_count = 0;
 
 int padOpen_hooked = 0;
 
+static u32 restartEEpattern[] = {
+	0x00000000,		//	nop
+	0x0c000000,		//	jal	restartEE()
+	0x00000000,		//	nop
+	0x8fa30010,		//	lw	v1, $0010(sp)
+	0x0240302d,		//	daddu	a2, s2, zero
+	0x8fa50014,		//	lw	a1, $0014(sp)
+	0x8c67000c,		//	lw	a3, $000c(v1)
+	0x18e00009,		//	blez	a3, 2f
+	0x0000202d,		//	daddu	a0, zero, zero
+	0x00000000,		//	nop
+	0x8ca30000,		//	lw	v1, $0000(a1)
+	0x24840004,		//	addiu	a0, a0, $0004
+	0x24a50004,		//	addiu	a1, a1, $0004
+	0x0087102a,		//	slt	v0, a0, a3
+	0xacc30000		//	sw	v1, $0000(a2)
+};
+static u32 restartEEpattern_mask[] = {
+	0xffffffff,
+	0xfc000000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff
+};
+
+static void (*restartEE)(void);
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -120,6 +158,26 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 }
 
 // ------------------------------------------------------------------------
+void set_restartEE(void)
+{
+	u32 *ptr = (u32 *)0x80000000;
+
+	DIntr();
+	ee_kmode_enter();
+
+	ptr = find_pattern_with_mask(ptr, 0x80000, restartEEpattern, restartEEpattern_mask, sizeof(restartEEpattern));
+	if (ptr)
+		restartEE = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000);
+	else {
+		GS_BGCOLOUR = 0x0000FF;
+		while (1) {;}
+	}
+
+	ee_kmode_exit();
+	EIntr();
+}
+
+// ------------------------------------------------------------------------
 static void t_loadElf(void)
 {
 	int i, r;
@@ -152,10 +210,19 @@ static void t_loadElf(void)
 	
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
 	
+	DPRINTF("t_loadElf: System Restart...\n");
+	DIntr();
+	ee_kmode_enter();
+	restartEE();
+	while (!(*(vu32 *)R_EE_SBUS_SMFLAG & SBUS_CTRL_MSINT)) {;}
+	*(vu32 *)R_EE_SBUS_SMFLAG = SBUS_CTRL_MSINT;
+	ee_kmode_exit();
+	EIntr();
+
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x00ff00;
 
-	DPRINTF("t_loadElf: cleaning user memory...\n");
+	DPRINTF("t_loadElf: cleaning user memory...");
 
 	// wipe user memory
 	for (i = 0x00100000; i < 0x02000000; i += 64) {
@@ -168,7 +235,7 @@ static void t_loadElf(void)
 		);
 	}
 
-	DPRINTF("t_loadElf: clear user memory done\n");
+	DPRINTF(" done\n");
 
 	DPRINTF("t_loadElf: loading elf...");
 	r = LoadElf(g_ElfPath, &elf);
@@ -290,6 +357,11 @@ int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
+	sbv_patch_user_mem_clear(0x02000000);
+	FlushCache(0);
+
+	set_restartEE();
+
 	Old_SifSetDma  = GetSyscallHandler(__NR_SifSetDma);
 	SetSyscall(__NR_SifSetDma, &Hook_SifSetDma);
 

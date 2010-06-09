@@ -12,7 +12,7 @@
 char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
 
 int main(int argc, char **argv){
-	
+
 	DINIT();
 	DPRINTF("OPL EE core start!\n");
 

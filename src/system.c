@@ -566,7 +566,6 @@ void sysApplyKernelPatches(void) {
 			if (eph[i].type != ELF_PT_LOAD)
 				continue;
 
-			LOG("vaddr=%08x off=%x sz=%x\n" , (u32)eph[i].vaddr, eph[i].offset, eph[i].filesz);
 			memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
 
 			if (eph[i].memsz > eph[i].filesz)
@@ -575,7 +574,6 @@ void sysApplyKernelPatches(void) {
 
 		// insert a JAL to our kernel code into the ExecPS2 syscall
 		_sw(JAL(eh->entry), KSEG0(0x00002f88));
-		LOG("entry=%08x jal=%08x\n" , eh->entry, JAL(eh->entry));
 	}
 
 	ee_kmode_exit();

@@ -70,6 +70,9 @@ extern int size_alt_loader_elf;
 extern void *elfldr_elf;
 extern int size_elfldr_elf;
 
+extern void *kpatch_10K_elf;
+extern int size_kpatch_10K_elf;
+
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
@@ -93,6 +96,10 @@ static void *g_sysLoadedModBuffer[MAX_MODULES];
 #define DEV9_R_146C ((volatile u16*)0xBF80146C)
 #define DEV9_R_146E ((volatile u16*)0xBF80146E)
 #define DEV9_R_1474 ((volatile u16*)0xBF801474)
+
+#define	ROMSEG0(vaddr)	(0xbfc00000 | vaddr)
+#define	KSEG0(vaddr)	(0x80000000 | vaddr)
+#define	JAL(addr)	(0x0c000000 | ((addr & 0x03ffffff) >> 2))
 
 typedef struct {
 	u8	ident[16];	// struct definition for ELF object header
@@ -536,5 +543,45 @@ int sysExecElf(char *path, int argc, char **argv) {
 	ExecPS2((void *)eh->entry, 0, argc+1, elf_argv);
 
 	return 0;
+}
+
+void sysApplyKernelPatches(void) {
+
+	// Check in rom0 for a SCPH-10000, then apply ExecPS2 syscall patches
+	DIntr();
+	ee_kmode_enter();
+
+	if ((*(vu8 *)ROMSEG0(0x00003161) == '1')
+	 && (*(vu8 *)ROMSEG0(0x00003162) == '0')
+	 && (*(vu8 *)ROMSEG0(0x00003163) == '0')
+	 && (*(vu8 *)ROMSEG0(0x00003164) == 'J')) {
+
+		// we copy the patching to its placement in kernel memory
+		u8 *elfptr = (u8 *)&kpatch_10K_elf;
+		elf_header_t *eh = (elf_header_t *)elfptr;
+		elf_pheader_t *eph = (elf_pheader_t *)&elfptr[eh->phoff];
+		int i;
+
+		for (i = 0; i < eh->phnum; i++) {
+			if (eph[i].type != ELF_PT_LOAD)
+				continue;
+
+			LOG("vaddr=%08x off=%x sz=%x\n" , (u32)eph[i].vaddr, eph[i].offset, eph[i].filesz);
+			memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
+
+			if (eph[i].memsz > eph[i].filesz)
+				memset((void *)(eph[i].vaddr + eph[i].filesz), 0, eph[i].memsz - eph[i].filesz);
+		}
+
+		// insert a JAL to our kernel code into the ExecPS2 syscall
+		_sw(JAL(eh->entry), KSEG0(0x00002f88));
+		LOG("entry=%08x jal=%08x\n" , eh->entry, JAL(eh->entry));
+	}
+
+	ee_kmode_exit();
+	EIntr();
+
+	FlushCache(0);
+	FlushCache(2);
 }
 

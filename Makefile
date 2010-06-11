@@ -16,7 +16,7 @@ GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/
 		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/freesans.o
 
 LOADER_OBJS = obj/loader.o \
-		obj/alt_loader.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
+		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
 		obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
@@ -77,6 +77,8 @@ clean:
 	$(MAKE) -C loader clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
+	echo "    * 10K kernel patches"
+	$(MAKE) -C kpatch_10K clean
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv clean
 	echo "    * eesync.irx"
@@ -151,7 +153,12 @@ elfldr.s:
 	$(MAKE) -C elfldr clean
 	$(MAKE) -C elfldr
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
-	
+
+kpatch_10K.s:
+	echo "    * 10K kernel patches"
+	$(MAKE) -C kpatch_10K
+	bin2s kpatch_10K/kpatch.elf asm/kpatch_10K.s kpatch_10K_elf
+
 imgdrv.s:
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/imgdrv

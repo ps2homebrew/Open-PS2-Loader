@@ -768,6 +768,9 @@ int main(void)
 {
 	LOG_INIT();
 
+	// apply kernel patches
+	sysApplyKernelPatches();
+
 	// reset, load modules
 	reset();
 	

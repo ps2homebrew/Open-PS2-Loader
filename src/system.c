@@ -636,12 +636,12 @@ void sysApplyKernelPatches(void) {
 			// insert a JAL to our kernel code into the ExecPS2 syscall
 			_sw(JAL(eh->entry), KSEG0(0x00002f88));
 		}
+
+		ee_kmode_exit();
+		EIntr();
+
+		FlushCache(0);
+		FlushCache(2);
 	}
-
-	ee_kmode_exit();
-	EIntr();
-
-	FlushCache(0);
-	FlushCache(2);
 }
 

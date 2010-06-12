@@ -134,6 +134,12 @@ typedef struct {
 	int irxsize;
 } irxptr_t;
 
+typedef struct {
+	char fileName[10];
+	u16  extinfoSize;
+	int  fileSize;
+} romdir_t;
+
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 
 	int i, id, ret, index = 0;
@@ -545,35 +551,91 @@ int sysExecElf(char *path, int argc, char **argv) {
 	return 0;
 }
 
-void sysApplyKernelPatches(void) {
+static void *getRomdirFS(void) {
 
-	// Check in rom0 for a SCPH-10000, then apply ExecPS2 syscall patches
+	register int i;
+	vu32 *p_rom0 = (vu32 *)ROMSEG0(0x00000000);
+
 	DIntr();
 	ee_kmode_enter();
 
-	if ((*(vu8 *)ROMSEG0(0x00003161) == '1')
-	 && (*(vu8 *)ROMSEG0(0x00003162) == '0')
-	 && (*(vu8 *)ROMSEG0(0x00003163) == '0')
-	 && (*(vu8 *)ROMSEG0(0x00003164) == 'J')) {
+	// scan rom0:
+	for (i=0; i<0x400000; i+=4) {
+		// search for "RESET"
+		if ((*p_rom0++ == 0x45534552) && (*p_rom0 == 0x00000054))
+			break;
+	}
 
-		// we copy the patching to its placement in kernel memory
-		u8 *elfptr = (u8 *)&kpatch_10K_elf;
-		elf_header_t *eh = (elf_header_t *)elfptr;
-		elf_pheader_t *eph = (elf_pheader_t *)&elfptr[eh->phoff];
-		int i;
+	ee_kmode_exit();
+	EIntr();
 
-		for (i = 0; i < eh->phnum; i++) {
-			if (eph[i].type != ELF_PT_LOAD)
-				continue;
+	return (void *)ROMSEG0(i);
+}
 
-			memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
+static void *getROMfile(char *filename) {
 
-			if (eph[i].memsz > eph[i].filesz)
-				memset((void *)(eph[i].vaddr + eph[i].filesz), 0, eph[i].memsz - eph[i].filesz);
+	register u32 offset = 0;
+	void *addr = NULL;
+	romdir_t *romdir_fs = (romdir_t *)getRomdirFS();
+
+	DIntr();
+	ee_kmode_enter();
+
+	while (strlen(romdir_fs->fileName) > 0) {
+
+		if (!strcmp(romdir_fs->fileName, filename)) {
+			addr = (void *)ROMSEG0(offset);
+			break;
 		}
 
-		// insert a JAL to our kernel code into the ExecPS2 syscall
-		_sw(JAL(eh->entry), KSEG0(0x00002f88));
+		// arrange size to next 16 bytes multiple 
+		if ((romdir_fs->fileSize % 0x10) == 0)
+			offset += romdir_fs->fileSize;
+		else
+			offset += (romdir_fs->fileSize + 0x10) & 0xfffffff0;
+
+		romdir_fs++;
+	}
+
+	ee_kmode_exit();
+	EIntr();
+
+	return addr;
+}
+
+void sysApplyKernelPatches(void) {
+
+	u8 *romver = (u8 *)getROMfile("ROMVER");
+	if (romver) {
+
+		// Check in rom0 for PS2 with Protokernel
+		DIntr();
+		ee_kmode_enter();
+
+		if ((romver[0] == '0')
+		 && (romver[1] == '1')
+		 && (romver[2] == '0')
+		 && (romver[9] == '0')) {
+
+			// we copy the patching to its placement in kernel memory
+			u8 *elfptr = (u8 *)&kpatch_10K_elf;
+			elf_header_t *eh = (elf_header_t *)elfptr;
+			elf_pheader_t *eph = (elf_pheader_t *)&elfptr[eh->phoff];
+			int i;
+
+			for (i = 0; i < eh->phnum; i++) {
+				if (eph[i].type != ELF_PT_LOAD)
+					continue;
+
+				memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
+
+				if (eph[i].memsz > eph[i].filesz)
+					memset((void *)(eph[i].vaddr + eph[i].filesz), 0, eph[i].memsz - eph[i].filesz);
+			}
+
+			// insert a JAL to our kernel code into the ExecPS2 syscall
+			_sw(JAL(eh->entry), KSEG0(0x00002f88));
+		}
 	}
 
 	ee_kmode_exit();

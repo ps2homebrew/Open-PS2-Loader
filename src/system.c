@@ -617,24 +617,28 @@ void sysApplyKernelPatches(void) {
 		 && (romver[2] == '0')
 		 && (romver[9] == '0')) {
 
-			// we copy the patching to its placement in kernel memory
-			u8 *elfptr = (u8 *)&kpatch_10K_elf;
-			elf_header_t *eh = (elf_header_t *)elfptr;
-			elf_pheader_t *eph = (elf_pheader_t *)&elfptr[eh->phoff];
-			int i;
+			// if protokernel is unpatched
+			if (_lw((u32)KSEG0(0x00002f88)) == 0x0c0015fa) {
 
-			for (i = 0; i < eh->phnum; i++) {
-				if (eph[i].type != ELF_PT_LOAD)
-					continue;
+				// we copy the patching to its placement in kernel memory
+				u8 *elfptr = (u8 *)&kpatch_10K_elf;
+				elf_header_t *eh = (elf_header_t *)elfptr;
+				elf_pheader_t *eph = (elf_pheader_t *)&elfptr[eh->phoff];
+				int i;
 
-				memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
+				for (i = 0; i < eh->phnum; i++) {
+					if (eph[i].type != ELF_PT_LOAD)
+						continue;
 
-				if (eph[i].memsz > eph[i].filesz)
-					memset((void *)(eph[i].vaddr + eph[i].filesz), 0, eph[i].memsz - eph[i].filesz);
+					memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
+
+					if (eph[i].memsz > eph[i].filesz)
+						memset((void *)(eph[i].vaddr + eph[i].filesz), 0, eph[i].memsz - eph[i].filesz);
+				}
+
+				// insert a JAL to our kernel code into the ExecPS2 syscall
+				_sw(JAL(eh->entry), KSEG0(0x00002f88));
 			}
-
-			// insert a JAL to our kernel code into the ExecPS2 syscall
-			_sw(JAL(eh->entry), KSEG0(0x00002f88));
 		}
 
 		ee_kmode_exit();

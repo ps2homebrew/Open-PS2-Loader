@@ -25,17 +25,14 @@ extern int size_cdvdfsv_irx;
 extern void *eesync_irx;
 extern int size_eesync_irx;
 
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
-
 extern void *smstcpip_irx;
 extern int size_smstcpip_irx;
 
 extern void *smsmap_irx;
 extern int size_smsmap_irx;
 
-extern void *netlog_irx;
-extern int size_netlog_irx;
+extern void *udptty_irx;
+extern int size_udptty_irx;
 
 /*----------------------------------------------------------------------------------------*/
 /*
@@ -100,21 +97,25 @@ int New_Reset_Iop(const char *arg, int flag){
 		if (GameMode == USB_MODE) {
 			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
 			delay(3);
-			//LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-			//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
-			//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
-			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+#ifdef __LOAD_NET_MODULES
+			LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+			LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+			LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
+#endif
 		}
 		else if (GameMode == ETH_MODE) {
 			LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
 			LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
-			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+#ifdef __LOAD_NET_MODULES
+			LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
+#endif
 		}
 		else if (GameMode == HDD_MODE) {
-			//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
-			//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
-			//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-			//cdInit(CDVD_INIT_INIT);
+#ifdef __LOAD_NET_MODULES
+			LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+			LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+			LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
+#endif
 		}
 	}
 
@@ -289,22 +290,25 @@ int New_Reset_Iop(const char *arg, int flag){
 	if (GameMode == USB_MODE) {
 		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
 		delay(3);
-		//LoadIRXfromKernel(ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-		//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
-		//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
-		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
+#ifdef __LOAD_NET_MODULES
+		LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+		LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
+#endif
 	}
 	else if (GameMode == ETH_MODE) {
 		LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
 		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
-		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-		//cdInit(CDVD_INIT_INIT);
+#ifdef __LOAD_NET_MODULES
+		LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
+#endif
 	}	
 	else if (GameMode == HDD_MODE) {
-		//LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
-		//LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
-		//LoadIRXfromKernel(netlog_irx, size_netlog_irx, 0, NULL);
-		//cdInit(CDVD_INIT_INIT);
+#ifdef __LOAD_NET_MODULES
+		LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
+		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+		LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
+#endif
 	}	
 
 	FlushCache(0);	

@@ -249,6 +249,8 @@ static void IGR_Thread(void *arg)
 	// Place our IGR thread in WAIT state
 	// It will be woken up by our IGR interrupt handler
 	SleepThread();
+
+	DPRINTF("IGR thread woken up!\n");
 	
 	// If Pad Combo is Start + Select then Return to Home
 	if(Pad_Data.combo_type == IGR_COMBO_START_SELECT)
@@ -427,6 +429,7 @@ static int IGR_Intc_Handler(int cause)
 		{
 			if(i == IGR_Thread_ID )
 			{
+				DPRINTF("IGR: trying to wake IGR thread...\n");
 				// WakeUp IGR thread
 				iWakeupThread(IGR_Thread_ID);
 				iChangeThreadPriority( i, 0 );
@@ -502,15 +505,19 @@ static int Hook_scePadPortOpen( int port, int slot, void* addr )
 	int ret;
 	
 	// Make sure scePadPortOpen function is still available
-	if(port == 0 && slot == 0)
+	if(port == 0 && slot == 0) {
+		DPRINTF("IGR: Hook_scePadPortOpen - padOpen hooking check...\n");
 		Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_CHECK);
+	}
 
 	// Call original scePadPortOpen function
 	ret = scePadPortOpen(port, slot, addr);
 
 	// Install IGR with libpad1 parameters
-	if(port == 0 && slot == 0)
+	if(port == 0 && slot == 0) {
+		DPRINTF("IGR: Hook_scePadPortOpen - installing IGR...\n");
 		Install_IGR(addr, IGR_LIBPAD_V1);
+	}
 
 	return ret;
 }
@@ -571,7 +578,8 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 			// First try to locate the orginal libpad's PadOpen function
 			ptr = find_pattern_with_mask(ptr, mem_size, padopen_patterns[i].pattern, padopen_patterns[i].mask, padopen_patterns[i].size);
 			if (ptr)
-			{				
+			{
+				DPRINTF("IGR: found padopen pattern%d at 0x%08x mode=%d\n", i, (int)ptr, mode);
 				found = 1;
 				
 				// Green while PadOpen patches
@@ -595,6 +603,8 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 					pattern[0] = inst;
 					mask[0] = 0xf0ffffff;
 
+					DPRINTF("IGR: searching opcode %08x witk mask %08x\n", (int)pattern[0], (int)mask[0]);
+
 					// Search & patch for calls to PadOpen
 					ptr2 = (u32 *)0x00100000;
 					while (ptr2)
@@ -604,6 +614,8 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 						ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
 						if (ptr2)
 						{
+							DPRINTF("IGR: found padOpen call at 0x%08x\n", (int)ptr2);
+
 							patched = 1;
 
 							fncall = (u32)ptr2;
@@ -612,11 +624,16 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 							inst = (ptr2[0] & 0x0f000000);
 
 							// Get Hook_PadOpen call Instruction code
-							if (padopen_patterns[i].version == IGR_LIBPAD_V1)
+							if (padopen_patterns[i].version == IGR_LIBPAD_V1) {
+								DPRINTF("IGR: Hook_scePadPortOpen addr 0x%08x\n", (int)Hook_scePadPortOpen);
 								inst |= 0x03ffffff & ((u32)Hook_scePadPortOpen >> 2);
-							else
+							}
+							else {
+								DPRINTF("IGR: Hook_scePad2CreateSocket addr 0x%08x\n", (int)Hook_scePad2CreateSocket);
 								inst |= 0x03ffffff & ((u32)Hook_scePad2CreateSocket >> 2);
+							}
 
+							DPRINTF("IGR: patching padopen call at addr 0x%08x with opcode %08x\n", (int)fncall, (int)inst);
 							// Overwrite the original PadOpen function call with our function call
 							_sw(inst, fncall);
 						}
@@ -624,9 +641,13 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
 					if(!patched)
 					{
+						DPRINTF("IGR: 2nd padOpen patch attempt...\n");
+
 						// Make pattern with function address saved above
 						pattern[0] = (u32)ptr;
 						mask[0] = 0xffffffff;
+
+						DPRINTF("IGR: searching opcode %08x witk mask %08x\n", (int)pattern[0], (int)mask[0]);
 
 						// Search & patch for PadOpen function address
 						ptr2 = (u32 *)0x00100000;
@@ -637,33 +658,45 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 							ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
 							if (ptr2)
 							{
+								DPRINTF("IGR: found padOpen call at 0x%08x\n", (int)ptr2);
+
 								patched = 1;
 
 								fncall = (u32)ptr2;
 
 								// Get Hook_PadOpen function address
-								if (padopen_patterns[i].version == IGR_LIBPAD_V1)
+								if (padopen_patterns[i].version == IGR_LIBPAD_V1) {
+									DPRINTF("IGR: Hook_scePadPortOpen addr 0x%08x\n", (int)Hook_scePadPortOpen);
 									inst = (u32)Hook_scePadPortOpen;
-								else
+								}
+								else {
+									DPRINTF("IGR: Hook_scePad2CreateSocket addr 0x%08x\n", (int)Hook_scePad2CreateSocket);
 									inst = (u32)Hook_scePad2CreateSocket;
+								}
 
+								DPRINTF("IGR: patching padopen call at addr 0x%08x with opcode %08x\n", (int)fncall, (int)inst);
 								// Overwrite the original PadOpen function address with our function address
 								_sw(inst, fncall);
 							}
 						}
 					}
-				}else
+				}else {
+					DPRINTF("IGR: no hooking requested, breaking loop...\n");
 					// Hooking is not required and padOpen function was found, so stop searching
 					break;
+				}
 
 				// Increment search pointer
-				ptr += padopen_patterns[i].size;
+				//ptr += padopen_patterns[i].size;
+				ptr += (padopen_patterns[i].size >> 2);
 			}
 		}
 
 		// If a padOpen function call was patched or ( hooking is not required and a padOpen function was found ), so stop the libpad version search loop
-		if( patched == 1 || (mode == PADOPEN_CHECK && found == 1) )
+		if( patched == 1 || (mode == PADOPEN_CHECK && found == 1) ) {
+			DPRINTF("IGR: job done exiting...\n");
 			break;
+		}
 	}
 
 	// Black, done

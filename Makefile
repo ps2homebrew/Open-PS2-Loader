@@ -19,7 +19,7 @@ LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
 		obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
-		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/netlog.o obj/smbman.o obj/discid.o \
+		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
 
 EE_BIN = opl.elf
@@ -111,8 +111,6 @@ clean:
 	$(MAKE) -C modules/SMSTCPIP -f Makefile.ingame clean
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/SMSMAP clean
-	echo "    * netlog.irx"
-	$(MAKE) -C modules/netlog clean
 	echo "    * smbman.irx"
 	$(MAKE) -C modules/smbman clean
 	echo "    * discID.irx"
@@ -311,11 +309,6 @@ smsmap.s:
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/SMSMAP
 	bin2s modules/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
-
-netlog.s:
-	echo "    * netlog.irx"
-	$(MAKE) -C modules/netlog
-	bin2s modules/netlog/netlog.irx asm/netlog.s netlog_irx
 
 smbman.s:
 	echo "    * smbman.irx"

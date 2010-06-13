@@ -34,8 +34,8 @@ extern int size_ingame_smstcpip_irx;
 extern void *smsmap_irx;
 extern int size_smsmap_irx;
 
-extern void *netlog_irx;
-extern int size_netlog_irx;
+extern void *udptty_irx;
+extern int size_udptty_irx;
 
 extern void *smbman_irx;
 extern int size_smbman_irx;
@@ -385,7 +385,7 @@ int sysPcmciaCheck(void) {
 	return 0;	// ExpBay
 }
 
-#define IRX_NUM 10
+#define IRX_NUM 9
 
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
 	u32 *total_irxsize = (u32 *)0x80030000;
@@ -403,10 +403,9 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_cdvdfsv_irx;
 	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
-	irxptr_tab[n++].irxsize = size_ps2dev9_irx;
 	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
 	irxptr_tab[n++].irxsize = size_smsmap_irx;
-	irxptr_tab[n++].irxsize = size_netlog_irx;
+	irxptr_tab[n++].irxsize = size_udptty_irx;
 
 	n = 0;
 	irxsrc[n++] = (void *)&imgdrv_irx;
@@ -415,10 +414,9 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = (void *)&cdvdfsv_irx;
 	irxsrc[n++] = (void *)&cddev_irx;
 	irxsrc[n++] = (void *)usbd_irx;
-	irxsrc[n++] = (void *)&ps2dev9_irx;
 	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
 	irxsrc[n++] = (void *)&smsmap_irx;
-	irxsrc[n++] = (void *)&netlog_irx;
+	irxsrc[n++] = (void *)&udptty_irx;
 
 	irxsize = 0;
 

@@ -27,7 +27,11 @@
 #include <ps2ip.h>
 #include "ioman_add.h"
 
-//#define NETLOG_DEBUG
+#ifdef __IOPCORE_DEBUG
+#define DPRINTF(args...)	printf(args)
+#else
+#define DPRINTF(args...)	do { } while(0)
+#endif
 
 #define MODNAME "dev9"
 IRX_ID(MODNAME, 2, 8);
@@ -91,6 +95,11 @@ struct irx_export_table _exp_dev9;
 #ifdef HDD_DRIVER
 struct irx_export_table _exp_dev9;
 struct irx_export_table _exp_atad;
+#endif
+#ifdef USB_DRIVER
+#ifdef __USE_DEV9
+struct irx_export_table _exp_dev9;
+#endif
 #endif
 struct irx_export_table _exp_smsutils;
 
@@ -357,12 +366,6 @@ int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
 s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where);
 int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
 int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
-
-#ifdef NETLOG_DEBUG
-// !!! netlog exports functions pointers !!!
-int (*pNetlogSend)(const char *format, ...);
-int netlog_inited = 0;
-#endif
 
 // driver ops func tab
 void *cdrom_ops[27] = {
@@ -1104,9 +1107,7 @@ void fs_init(void)
 	if (fs_inited)
 		return;
 
-#ifdef NETLOG_DEBUG
-	pNetlogSend("fs_init\n");
-#endif
+	DPRINTF("fs_init\n");
 
 #ifdef USB_DRIVER
 	// initialize usbd exports
@@ -1157,23 +1158,15 @@ void fs_init(void)
 #endif
 
 #ifdef HDD_DRIVER
-#ifdef NETLOG_DEBUG
-	pNetlogSend("fs_init: apa header LBA = %d\n", g_part_start[0]);
-#endif
+	DPRINTF("fs_init: apa header LBA = %d\n", g_part_start[0]);
 
 	int r = ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
-	if (r != 0) {
-#ifdef NETLOG_DEBUG
-		pNetlogSend("fs_init: failed to read apa header %d\n", r);
-#endif
-	}
+	if (r != 0)
+		DPRINTF("fs_init: failed to read apa header %d\n", r);
 
 	// checking HDL's deadfeed magic
-	if (apaHeader.checksum != 0xdeadfeed) {
-#ifdef NETLOG_DEBUG
-		pNetlogSend("fs_init: failed to find deadfeed magic\n");
-#endif
-	}
+	if (apaHeader.checksum != 0xdeadfeed)
+		DPRINTF("fs_init: failed to find deadfeed magic\n");
 
 	mips_memcpy(&cdvdman_partspecs, &apaHeader.part_specs[0], sizeof(cdvdman_partspecs));
 #endif
@@ -1217,39 +1210,7 @@ void fs_init(void)
 //-------------------------------------------------------------------------
 void cdvdman_cdinit(void)
 {
-#ifdef NETLOG_DEBUG	
-	// Get netlog lib ptr
-	if (!netlog_inited) {
-	int i;
-	void **export_tab;	
-	iop_library_table_t *libtable;
-	iop_library_t *libptr;	
-	char netlog_modname[8] = "netlog\0\0";
-	libtable = GetLibraryEntryTable();
-	libptr = libtable->tail;
-
-	while (libptr != 0) {
-		for (i=0; i<8; i++) {
-			if (libptr->name[i] != netlog_modname[i])
-				break;
-		}
-		if (i==8)
-			break;
-		libptr = libptr->prev;
-	}
-
-	// Get netlog export table	 
-	export_tab = (void **)(((struct irx_export_table *)libptr)->fptrs);
-
-	// *****************************	
-	// Set functions pointers here
-	pNetlogSend = export_tab[6];
-	//...
-	netlog_inited = 1;
-	}
-
-	pNetlogSend("cdvdman_cdinit\n");
-#endif
+	DPRINTF("cdvdman_cdinit\n");
 
 	fs_init();
 }
@@ -1290,9 +1251,7 @@ int sceCdStandby(void)
 //-------------------------------------------------------------------------
 int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdRead lsn=%d sectors=%d buf=%08x\n", lsn, sectors, buf);
-#endif
+	DPRINTF("sceCdRead lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
 
 #ifdef ALT_READ_CORE
 	u8 wdbuf[16];
@@ -1339,9 +1298,7 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 //-------------------------------------------------------------------------
 int sceCdSeek(u32 lsn)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdSeek %d\n", lsn);
-#endif
+	DPRINTF("sceCdSeek %d\n", (int)lsn);
 
 	cdvdman_stat.err = CDVD_ERR_NO;
 
@@ -1365,9 +1322,7 @@ int sceCdSeek(u32 lsn)
 //-------------------------------------------------------------------------
 int sceCdGetError(void)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdGetError %d\n", cdvdman_stat.err);
-#endif
+	DPRINTF("sceCdGetError %d\n", cdvdman_stat.err);
 
 	return cdvdman_stat.err;
 }
@@ -1383,9 +1338,7 @@ int sceCdGetToc(void *toc)
 //-------------------------------------------------------------------------
 int sceCdSearchFile(cd_file_t *pcd_file, const char *name)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdSearchFile %s\n", name);
-#endif
+	DPRINTF("sceCdSearchFile %s\n", name);
 
 	return cdvdman_findfile(pcd_file, name, 0);
 }
@@ -1393,9 +1346,7 @@ int sceCdSearchFile(cd_file_t *pcd_file, const char *name)
 //-------------------------------------------------------------------------
 int sceCdSync(int mode)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdSync %d sync flag = %d\n", mode, sync_flag);
-#endif
+	DPRINTF("sceCdSync %d sync flag = %d\n", mode, sync_flag);
 
 #ifdef ALT_READ_CORE
 	if (mode >= 18)
@@ -1421,9 +1372,7 @@ int sceCdSync(int mode)
 //-------------------------------------------------------------------------
 int sceCdGetDiskType(void)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdGetdiskType\n");
-#endif
+	DPRINTF("sceCdGetdiskType\n");
 
 	cdvdman_stat.err = CDVD_ERR_NO;
 
@@ -1437,9 +1386,7 @@ int sceCdGetDiskType(void)
 //-------------------------------------------------------------------------
 int sceCdDiskReady(int mode)
 {
-#ifdef NETLOG_DEBUG
-	//pNetlogSend("sceCdDiskReady %d\n", mode);
-#endif
+	//DPRINTF("sceCdDiskReady %d\n", mode);
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 	if (mode == 0) {
@@ -1463,9 +1410,7 @@ int sceCdDiskReady(int mode)
 //-------------------------------------------------------------------------
 int sceCdTrayReq(int mode, u32 *traycnt)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdTrayReq\n");
-#endif
+	DPRINTF("sceCdTrayReq\n");
 
 	cdvdman_stat.err = CDVD_ERR_NO;
 	
@@ -1556,19 +1501,15 @@ int sceCdReadClock(cd_clock_t *rtc)
 //-------------------------------------------------------------------------
 int sceCdStatus(void)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdStatus %d\n", cdvdman_stat.status);
-#endif
+	DPRINTF("sceCdStatus %d\n", cdvdman_stat.status);
 
 	return cdvdman_stat.status;
 }
 
 //-------------------------------------------------------------------------
 int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out)
-{	
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdApplySCmd\n");
-#endif
+{
+	DPRINTF("sceCdApplySCmd\n");
 
 	return cdvdman_sendSCmd(cmd & 0xff, in, in_size, out, 16);
 }
@@ -1648,9 +1589,7 @@ int sceCdReadCdda(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 //-------------------------------------------------------------------------
 int sceCdGetReadPos(void)
 {
-#ifdef NETLOG_DEBUG
-	pNetlogSend("sceCdGetReadPos\n");
-#endif
+	DPRINTF("sceCdGetReadPos\n");
 
 	return 0;
 }
@@ -1799,9 +1738,7 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 			if (nsectors > CDVDMAN_BUF_SECTORS)
 				nsectors = CDVDMAN_BUF_SECTORS;
 
-			#ifdef NETLOG_DEBUG
-				pNetlogSend("sceCdRead0 lsn=%d rpos=%d nsectors=%d buf=%08x\n", lsn, rpos, nsectors, buf);
-			#endif
+			DPRINTF("sceCdRead0 lsn=%d rpos=%d nsectors=%d buf=%08x\n", (int)lsn, (int)rpos, (int)nsectors, (int)buf);
 
 			sceCdRead0(rpos, nsectors, cdvdman_buf, mode);	
 
@@ -1821,9 +1758,7 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 
 		WaitSema(cdvdman_cdreadsema);
 
-		#ifdef NETLOG_DEBUG
-			pNetlogSend("sceCdRead0 lsn=%d sectors=%d buf=%08x\n", lsn, sectors, buf);
-		#endif
+		DPRINTF("sceCdRead0 lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
 
 		cdvdman_stat.err = CDVD_ERR_NO;
 
@@ -1853,9 +1788,7 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 		cdvdman_ReadSect(lsn, sectors, buf);
 		#endif
 
-		#ifdef NETLOG_DEBUG
-			pNetlogSend("sceCdRead0 ret=%d\n", r);
-		#endif
+		DPRINTF("sceCdRead0 ret=%d\n", r);
 
 		SignalSema(cdvdman_cdreadsema);
 	}
@@ -1977,9 +1910,7 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 //-------------------------------------------------------------------------
 int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer)
 {
-//#ifdef NETLOG_DEBUG
-//	pNetlogSend("sceCdLayerSearchFile %s\n", name);
-//#endif
+	//DPRINTF("sceCdLayerSearchFile %s\n", name);
 
 	return cdvdman_findfile((cd_file_t *)fp, name, layer);
 }
@@ -2046,10 +1977,7 @@ int cdrom_init(iop_device_t *dev)
 
 	cdvdman_searchfilesema = CreateSema(&smp);
 
-#ifdef NETLOG_DEBUG
-	if (netlog_inited)
-		pNetlogSend("cdrom_init\n");
-#endif
+	DPRINTF("cdrom_init\n");
 
 	return 0;
 }
@@ -2059,10 +1987,7 @@ int cdrom_deinit(iop_device_t *dev)
 {
 	DeleteSema(cdrom_io_sema);
 
-#ifdef NETLOG_DEBUG
-	if (netlog_inited)
-		pNetlogSend("cdrom_deinit\n");
-#endif
+	DPRINTF("cdrom_deinit\n");
 
 	return 0;
 }
@@ -2122,10 +2047,7 @@ int cdrom_open(iop_file_t *f, char *filename, int mode)
 
 	fs_init();
 
-#ifdef NETLOG_DEBUG
-	sceCdInit(0);
-	pNetlogSend("cdrom_open %s mode=%d\n", filename, mode);
-#endif
+	DPRINTF("cdrom_open %s mode=%d\n", filename, mode);
 
 	fh = cdvdman_getfilefreeslot();
 	if (fh) {
@@ -2157,9 +2079,7 @@ int cdrom_open(iop_file_t *f, char *filename, int mode)
 	else
 		r = -EMFILE;
 
-#ifdef NETLOG_DEBUG
-	pNetlogSend("cdrom_open ret=%d lsn=%d size=%d\n", r, fh->lsn, fh->filesize);
-#endif
+	DPRINTF("cdrom_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
 
 	SignalSema(cdrom_io_sema);
 
@@ -2202,9 +2122,7 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 
 	WaitSema(cdrom_io_sema);
 
-#ifdef NETLOG_DEBUG
-	pNetlogSend("cdrom_read size=%d\n", size);
-#endif
+	DPRINTF("cdrom_read size=%d\n", (int)size);
 
 	while (size) {
 		nbytes = CDVDMAN_FS_BUFSIZE;
@@ -2229,9 +2147,7 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 		fh->position += nbytes;
 	}
 
-#ifdef NETLOG_DEBUG
-	pNetlogSend("cdrom_read ret=%d\n", rpos);
-#endif
+	DPRINTF("cdrom_read ret=%d\n", (int)rpos);
 
 	SignalSema(cdrom_io_sema);
 
@@ -2299,9 +2215,7 @@ int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 
 	WaitSema(cdrom_io_sema);
 
-#ifdef NETLOG_DEBUG
-	pNetlogSend("cdrom_dread fh->lsn=%d\n", fh->lsn);
-#endif
+	DPRINTF("cdrom_dread fh->lsn=%d\n", (int)fh->lsn);
 
 	sceCdRead0(fh->lsn, 1, cdvdman_fs_buf, NULL);
 
@@ -2323,9 +2237,7 @@ int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 	dirent->stat.mode = mode;
 	strcpy(dirent->name, tocEntryPointer->filename);
 
-#ifdef NETLOG_DEBUG
-	pNetlogSend("cdrom_dread mode=%04x name=%s\n", mode, dirent->name);
-#endif
+	DPRINTF("cdrom_dread mode=%04x name=%s\n", (int)mode, dirent->name);
 
 	SignalSema(cdrom_io_sema);
 
@@ -2567,9 +2479,7 @@ struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength)
 	struct dirTocEntry *tocEntryPointer;
 
 lbl_startlocate:
-	#ifdef NETLOG_DEBUG
-		pNetlogSend("cdvdman_locatefile start locating\n");
-	#endif
+	DPRINTF("cdvdman_locatefile start locating\n");
 
 	while (*p == '/')
 		p++;
@@ -2620,15 +2530,11 @@ lbl_startlocate:
 				strncpy(cdvdman_curdir, tocEntryPointer->filename, 256); // copy filename
 				cdvdman_curdir[filename_len] = 0;
 
-				#ifdef NETLOG_DEBUG
-					pNetlogSend("cdvdman_locatefile strcmp %s %s\n", cdvdman_dirname, cdvdman_curdir);
-				#endif
+				DPRINTF("cdvdman_locatefile strcmp %s %s\n", cdvdman_dirname, cdvdman_curdir);
 
 				r = strcmp(cdvdman_dirname, cdvdman_curdir);
 				if ((!r) && (!slash)) { // we searched a file so it's found
-					#ifdef NETLOG_DEBUG
-						pNetlogSend("cdvdman_locatefile found file! LBA=%d size=%d\n", tocEntryPointer->fileLBA, tocEntryPointer->fileSize);
-					#endif
+					DPRINTF("cdvdman_locatefile found file! LBA=%d size=%d\n", (int)tocEntryPointer->fileLBA, (int)tocEntryPointer->fileSize);
 					return tocEntryPointer;
 				}
 				else if ((!r) && (tocEntryPointer->fileProperties & 2)) { // we found it but it's a directory
@@ -2656,9 +2562,7 @@ lbl_startlocate:
 		while (tocPos < 2016);
 	}
 
-	#ifdef NETLOG_DEBUG
-		pNetlogSend("cdvdman_locatefile file not found!!!\n");
-	#endif
+	DPRINTF("cdvdman_locatefile file not found!!!\n");
 
 	return NULL;
 }
@@ -2675,17 +2579,13 @@ int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 
 	WaitSema(cdvdman_searchfilesema);
 
-	#ifdef NETLOG_DEBUG
-		pNetlogSend("cdvdman_findfile %s layer%d\n", name, layer);
-	#endif
+	DPRINTF("cdvdman_findfile %s layer%d\n", name, layer);
 
 	strncpy(cdvdman_filepath, name, 256);
 
 	cdvdman_trimspaces(cdvdman_filepath);
 	
-	#ifdef NETLOG_DEBUG
-		pNetlogSend("cdvdman_findfile cdvdman_filepath=%s\n", cdvdman_filepath);
-	#endif
+	DPRINTF("cdvdman_findfile cdvdman_filepath=%s\n", cdvdman_filepath);
 
 	if (g_gamesetting_disable_DVDDL)
 		layer = 0;
@@ -2735,9 +2635,7 @@ int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 		return 0;
 	}
 
-	#ifdef NETLOG_DEBUG
-		pNetlogSend("cdvdman_findfile found %s\n", name);
-	#endif
+	DPRINTF("cdvdman_findfile found %s\n", name);
 
 	SignalSema(cdvdman_searchfilesema);
 
@@ -2978,6 +2876,12 @@ int _start(int argc, char **argv)
 	atad_start();
 
 	atad_inited = 1;
+#endif
+#ifdef USB_DRIVER
+#ifdef __USE_DEV9
+	RegisterLibraryEntries(&_exp_dev9);
+	dev9_init();
+#endif
 #endif
 	RegisterLibraryEntries(&_exp_smsutils);
 

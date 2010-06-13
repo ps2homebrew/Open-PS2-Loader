@@ -64,9 +64,15 @@ endif
 debug:
 	$(MAKE) DEBUG=1 all
 
-EESIO_debug:
+ingame_debug:
+	$(MAKE) INGAME_DEBUG=1 DEBUG=1 all
+
+eesio_debug:
 	$(MAKE) EESIO_DEBUG=1 DEBUG=1 all
-	
+
+iopcore_debug:
+	$(MAKE) IOPCORE_DEBUG=1 DEBUG=1 all
+
 clean:
 	echo "Cleaning..."
 	echo "    * Freetype..."
@@ -135,16 +141,37 @@ pc_tools_win32:
 loader.s:
 	echo "    * Loader"
 	$(MAKE) -C loader clean
+ifeq ($(INGAME_DEBUG),1)
+	$(MAKE) LOAD_NET_MODULES=1 -C loader
+else
 ifeq ($(EESIO_DEBUG),1)
 	$(MAKE) EESIO_DEBUG=1 -C loader
 else
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) LOAD_NET_MODULES=1 -C loader
+else
 	$(MAKE) -C loader
+endif
+endif
 endif
 	bin2s loader/loader.elf asm/loader.s loader_elf
 
 alt_loader.s:
 	echo "    * alternative Loader"
 	$(MAKE) -C loader clean
+ifeq ($(INGAME_DEBUG),1)
+	$(MAKE) LOAD_NET_MODULES=1 -C loader
+else
+ifeq ($(EESIO_DEBUG),1)
+	$(MAKE) EESIO_DEBUG=1 -C loader
+else
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) LOAD_NET_MODULES=1 -C loader
+else
+	$(MAKE) -C loader
+endif
+endif
+endif
 	$(MAKE) -C loader -f Makefile.alt
 	bin2s loader/loader.elf asm/alt_loader.s alt_loader_elf
 
@@ -171,32 +198,64 @@ eesync.s:
 
 usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
+ifeq ($(INGAME_DEBUG),1)
+	$(MAKE) USE_DEV9=1 -C modules/cdvdman -f Makefile.usb rebuild
+else
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.usb rebuild
+else
 	$(MAKE) -C modules/cdvdman -f Makefile.usb rebuild
+endif
+endif
 	bin2s modules/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
 
 usb_4Ksectors_cdvdman.s:
 	echo "    * usb_4Ksectors_cdvdman.irx"
+ifeq ($(INGAME_DEBUG),1)
+	$(MAKE) USE_DEV9=1 -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+else
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+else
 	$(MAKE) -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+endif
+endif
 	bin2s modules/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
 
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.smb rebuild
+else
 	$(MAKE) -C modules/cdvdman -f Makefile.smb rebuild
+endif
 	bin2s modules/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
 
 smb_pcmcia_cdvdman.s:
 	echo "    * smb_pcmcia_cdvdman.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.smb.pcmcia rebuild
+else
 	$(MAKE) -C modules/cdvdman -f Makefile.smb.pcmcia rebuild
+endif
 	bin2s modules/cdvdman/cdvdman.irx asm/smb_pcmcia_cdvdman.s smb_pcmcia_cdvdman_irx
 
 hdd_cdvdman.s:
 	echo "    * hdd_cdvdman.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.hdd rebuild
+else
 	$(MAKE) -C modules/cdvdman -f Makefile.hdd rebuild
+endif
 	bin2s modules/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
 
 hdd_pcmcia_cdvdman.s:
 	echo "    * hdd_pcmcia_cdvdman.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.hdd.pcmcia rebuild
+else
 	$(MAKE) -C modules/cdvdman -f Makefile.hdd.pcmcia rebuild
+endif
 	bin2s modules/cdvdman/cdvdman.irx asm/hdd_pcmcia_cdvdman.s hdd_pcmcia_cdvdman_irx
 
 cdvdfsv.s:
@@ -237,7 +296,15 @@ smstcpip.s:
 
 ingame_smstcpip.s:
 	echo "    * in-game SMSTCPIP.irx"
+ifeq ($(INGAME_DEBUG),1)
+	$(MAKE) -C modules/SMSTCPIP -f Makefile rebuild
+else
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) -C modules/SMSTCPIP -f Makefile rebuild
+else
 	$(MAKE) -C modules/SMSTCPIP -f Makefile.ingame rebuild
+endif
+endif
 	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
 smsmap.s:

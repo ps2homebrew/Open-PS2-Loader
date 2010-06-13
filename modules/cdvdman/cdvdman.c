@@ -2230,14 +2230,15 @@ int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 	}
 	while (tocEntryPointer->filenameLength == 1);
 
-	mode = 0x1000;
-	if (tocEntryPointer->fileProperties == 0)
-		mode = 0x2000;
+	mode = 0x2124;
+	if (tocEntryPointer->fileProperties & 2)
+		mode = 0x116d;
 
 	dirent->stat.mode = mode;
-	strcpy(dirent->name, tocEntryPointer->filename);
+	dirent->stat.size = tocEntryPointer->fileSize;
+	strncpy(dirent->name, tocEntryPointer->filename, 256);
 
-	DPRINTF("cdrom_dread mode=%04x name=%s\n", (int)mode, dirent->name);
+	DPRINTF("cdrom_dread r=%d mode=%04x name=%s\n", r, (int)mode, dirent->name);
 
 	SignalSema(cdrom_io_sema);
 

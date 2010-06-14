@@ -166,7 +166,7 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode, short s
 	hddGames->games[id].ops2l_compat_flags = (unsigned char) compatMode;
 
 	if (save)
-		hddSetHDLGameInfo(id, &hddGames->games[id]);
+		hddSetHDLGameInfo(&hddGames->games[id]);
 }
 
 static void hddLaunchGame(int id) {

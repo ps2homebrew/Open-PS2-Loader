@@ -720,15 +720,21 @@ int hddFreeHDLGamelist(hdl_games_list_t *game_list)
 }
 
 //-------------------------------------------------------------------------
-int hddSetHDLGameInfo(int game_index, hdl_game_info_t *ginfo)
+int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
 {
 	const u32 offset = 0x101000;
 	char buf[1024];
+	int part_index;
 
 	if (ptable == NULL)
 		return -1;
 
-	apa_header *header = &ptable->parts[game_index].header;
+	// retrieve part index
+	part_index = apaFindPartition(ptable, ginfo->partition_name);
+	if (part_index < 0)
+		return -1;
+
+	apa_header *header = &ptable->parts[part_index].header;
 	if (header == NULL)
 		return -2;
 

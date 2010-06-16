@@ -2469,7 +2469,12 @@ void cdvdman_trimspaces(char* str)
 		if ((*p != 0x20) && (*p != 0x2e))
 			break;
 		*p = 0;
-	} 
+	}
+
+	while (!strcmp(&str[len-4], ";1;1")) {
+		str[len-2] = 0;	
+		len = strlen(str);
+	}
 }
 
 //-------------------------------------------------------------------------

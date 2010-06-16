@@ -23,6 +23,9 @@ extern int size_smsmap_irx;
 extern void *udptty_irx;
 extern int size_udptty_irx;
 
+extern void *ioptrap_irx;
+extern int size_ioptrap_irx;
+
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
@@ -52,6 +55,10 @@ int debugSetActive(void) {
 	ret = sysLoadModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL);
 	if (ret < 0)
 		return -5;
+
+	ret = sysLoadModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL);
+	if (ret < 0)
+		return -6;
 
 	LOG("OPL UDPtty debug enabled!\n");
 

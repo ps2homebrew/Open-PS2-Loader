@@ -40,6 +40,9 @@ int size_smsmap_irx;
 void *udptty_irx;
 int size_udptty_irx;
 
+void *ioptrap_irx;
+int size_ioptrap_irx;
+
 void *smbman_irx;
 int size_smbman_irx;
 
@@ -135,7 +138,7 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 	return 0;
 }
 
-#define IRX_NUM 9
+#define IRX_NUM 10
 
 //-------------------------------------------------------------- 
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
@@ -162,6 +165,7 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	size_smstcpip_irx = irxptr_tab[n++].irxsize;
 	size_smsmap_irx = irxptr_tab[n++].irxsize;
 	size_udptty_irx = irxptr_tab[n++].irxsize;
+	size_ioptrap_irx = irxptr_tab[n++].irxsize;
 			
 	n = 0;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
@@ -173,6 +177,7 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
 	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
 	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
+	ioptrap_irx = (void *)irxptr_tab[n++].irxaddr;
 }	
 
 // ------------------------------------------------------------------------

@@ -87,10 +87,11 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, "0 PSS mode", {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, "Disable DVD-DL", {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"Mode 6", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, "Disable IGR", {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Mode 7", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, "Reduced buffer", {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
-	{UI_LABEL, 0, NULL, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_MODE_BASE + 6, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	

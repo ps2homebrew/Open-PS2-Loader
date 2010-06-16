@@ -87,6 +87,7 @@ u32 g_compat_mask;
 #define COMPAT_MODE_4 		0x08
 #define COMPAT_MODE_5 		0x10
 #define COMPAT_MODE_6 		0x20
+#define COMPAT_MODE_7 		0x40
 
 char GameID[16];
 int GameMode;

@@ -1372,13 +1372,13 @@ int sceCdSync(int mode)
 //-------------------------------------------------------------------------
 int sceCdGetDiskType(void)
 {
-	DPRINTF("sceCdGetdiskType\n");
-
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef HDD_DRIVER
+	DPRINTF("sceCdGetdiskType=0x%x\n", (int)apaHeader.discType);
 	return apaHeader.discType;
 #else
+	DPRINTF("sceCdGetdiskType=0x%x\n", (int)g_ISO_media);
 	return g_ISO_media;
 #endif
 }
@@ -1415,7 +1415,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 	cdvdman_stat.err = CDVD_ERR_NO;
 	
 	if (traycnt)
-		*traycnt = 0;
+		*traycnt = 1;
 
 	return 1;
 }
@@ -2093,6 +2093,8 @@ int cdrom_close(iop_file_t *f)
 
 	WaitSema(cdrom_io_sema);
 
+	DPRINTF("cdrom_close\n");
+
 	if (fh)
 		mips_memset(fh, 0, sizeof(FHANDLE));
 
@@ -2515,6 +2517,7 @@ lbl_startlocate:
 
 	while (tocLength > 0)	{
 		sceCdRead0(tocLBA, 1, cdvdman_buf, NULL);
+		DPRINTF("cdvdman_locatefile tocLBA read done\n");
 
 		tocLength -= 2048;
 		tocLBA++;

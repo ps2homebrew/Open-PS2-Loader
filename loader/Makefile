@@ -19,8 +19,8 @@ EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)
 ifeq ($(EESIO_DEBUG),1) 
 EE_CFLAGS += -D__EESIO_DEBUG
 endif
-ifeq ($(LOAD_NET_MODULES),1)
-EE_CFLAGS += -D__LOAD_NET_MODULES
+ifeq ($(LOAD_DEBUG_MODULES),1)
+EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 endif
 
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s

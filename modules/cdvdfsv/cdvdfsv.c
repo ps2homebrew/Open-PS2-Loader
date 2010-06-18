@@ -386,7 +386,7 @@ void init_thread(void *args)
 
 	sceSifInitRpc(0);
 
-	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, (CDVDFSV_BUF_SECTORS << 11)+2048, NULL);
+	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, (CDVDFSV_BUF_SECTORS << 11), NULL);
 	if (!cdvdfsv_buf)
 		SleepThread();
 

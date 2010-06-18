@@ -83,7 +83,7 @@ static void hddLoadModules(void) {
 
 	// update Themes
 	char path[32];
-	sprintf(path, "%sTHM", hddPrefix);
+	sprintf(path, "%sTHM/", hddPrefix);
 	thmAddElements(path, "/");
 }
 

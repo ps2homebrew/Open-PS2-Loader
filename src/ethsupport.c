@@ -151,7 +151,7 @@ static int ethUpdateGameList(void) {
 	if (gNetworkStartup != 0)
 		return 0;
 	
-	sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
+	sbReadList(&ethGames, ethPrefix, "\\", &ethULSizePrev, &ethGameCount);
 	return ethGameCount;
 }
 

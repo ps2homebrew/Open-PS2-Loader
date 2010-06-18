@@ -51,7 +51,7 @@ static int usbFindPartition(void) {
 
 	// default to first partition (for themes, ...)
 	sprintf(usbPrefix, "mass0:");
-	return 0;
+	return 1;
 }
 
 static void usbLoadModules(void) {
@@ -84,7 +84,7 @@ static void usbLoadModules(void) {
 	// update Themes
 	usbFindPartition();
 	char path[32];
-	sprintf(path, "%sTHM", usbPrefix);
+	sprintf(path, "%sTHM/", usbPrefix);
 	thmAddElements(path, "/");
 }
 
@@ -114,7 +114,7 @@ static int usbNeedsUpdate(void) {
 
 static int usbUpdateGameList(void) {
 	if (usbFindPartition())
-		sbReadList(&usbGames, usbPrefix, &usbULSizePrev, &usbGameCount);
+		sbReadList(&usbGames, usbPrefix, "/", &usbULSizePrev, &usbGameCount);
 	else {
 		usbGameCount = 0;
 		usbULSizePrev = -1;
@@ -177,7 +177,11 @@ static void usbLaunchGame(int id) {
 	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &i);
 
 	for (j = 0; j < game->parts; j++) {
-		sprintf(partname,"%s.%02x",isoname, j);
+		if (game->isISO)
+			sprintf(partname,"%s/%s.%s.iso", (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
+		else
+			sprintf(partname,"%s.%02x",isoname, j);
+
 		LOG("partname: %s\n", partname);
 		r = fioIoctl(fd, 0xBEEFC0DE, partname);
 		memcpy((void*)((u32)&usb_cdvdman_irx + i + offset), &r, 4);

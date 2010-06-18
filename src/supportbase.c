@@ -90,7 +90,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 	return count;
 }
 
-void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount) {
+void sbReadList(base_game_info_t **list, const char* prefix, const char* sep, int *fsize, int* gamecount) {
 	int fd, size, id = 0;
 	size_t count = 0;
 	char path[64];
@@ -104,11 +104,11 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	struct game_list_t *dlist_head = NULL;
 	
 	// count iso games in "cd" directory
-	snprintf(path, 64, "%sCD\\\\", prefix); // *.iso
+	snprintf(path, 64, "%sCD%s", prefix, sep);
 	count += scanForISO(path, 0x12, &dlist_head);
 
 	// count iso games in "dvd" directory
-	snprintf(path, 64, "%sDVD\\\\", prefix); // *.iso
+	snprintf(path, 64, "%sDVD%s", prefix, sep);
 	count += scanForISO(path, 0x14, &dlist_head);
         
         

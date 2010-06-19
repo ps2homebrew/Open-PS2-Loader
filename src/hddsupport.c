@@ -226,9 +226,12 @@ static void hddLaunchGame(int id) {
 	// patch start_sector
 	memcpy((void*)((u32)irx+i+44), &game->start_sector, 4);
 
+	int compat_flags = game->ops2l_compat_flags;
+	hddFreeHDLGamelist(hddGames);
+
 	FlushCache(0);
 
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, game->ops2l_compat_flags, game->ops2l_compat_flags & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compat_flags, compat_flags & COMPAT_MODE_1);
 }
 
 static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
@@ -239,8 +242,6 @@ static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 
 static void hddCleanUp(void) {
 	LOG("hddCleanUp()\n");
-
-	hddFreeHDLGamelist(hddGames);
 
 	if (gHddStartup == 0)
 		fileXioUmount(hddPrefix);

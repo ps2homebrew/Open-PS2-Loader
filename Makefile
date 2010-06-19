@@ -20,7 +20,8 @@ LOADER_OBJS = obj/loader.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
 		obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
-		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o
+		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o \
+		obj/ps2link.o
 
 EE_BIN = opl.elf
 EE_SRC_DIR = src/
@@ -125,6 +126,8 @@ clean:
 	$(MAKE) -C modules/udptty clean
 	echo "    * ioptrap.irx"
 	$(MAKE) -C modules/ioptrap clean
+	echo "    * ps2link.irx"
+	$(MAKE) -C modules/ps2link clean
 	echo "    * iso2opl"
 	$(MAKE) -C pc clean
 
@@ -350,6 +353,11 @@ ioptrap.s:
 	echo "    * ioptrap.irx"
 	$(MAKE) -C modules/ioptrap
 	bin2s modules/ioptrap/ioptrap.irx asm/ioptrap.s ioptrap_irx
+
+ps2link.s:
+	echo "    * ps2link.irx"
+	$(MAKE) -C modules/ps2link
+	bin2s modules/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx

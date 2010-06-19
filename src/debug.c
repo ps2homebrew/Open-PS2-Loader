@@ -26,6 +26,9 @@ extern int size_udptty_irx;
 extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
 
+extern void *ps2link_irx;
+extern int size_ps2link_irx;
+
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
@@ -59,6 +62,10 @@ int debugSetActive(void) {
 	ret = sysLoadModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL);
 	if (ret < 0)
 		return -6;
+
+	ret = sysLoadModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL);
+	if (ret < 0)
+		return -7;
 
 	LOG("OPL UDPtty debug enabled!\n");
 

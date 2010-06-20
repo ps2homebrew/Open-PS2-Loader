@@ -28,7 +28,7 @@ int iop_reboot_count = 0;
 
 int padOpen_hooked = 0;
 
-static u32 restartEEpattern[] = {
+static u32 systemRestartpattern[] = {
 	0x00000000,		//	nop
 	0x0c000000,		//	jal	restartEE()
 	0x00000000,		//	nop
@@ -45,7 +45,7 @@ static u32 restartEEpattern[] = {
 	0x0087102a,		//	slt	v0, a0, a3
 	0xacc30000		//	sw	v1, $0000(a2)
 };
-static u32 restartEEpattern_mask[] = {
+static u32 systemRestartpattern_mask[] = {
 	0xffffffff,
 	0xfc000000,
 	0xffffffff,
@@ -63,7 +63,53 @@ static u32 restartEEpattern_mask[] = {
 	0xffffffff
 };
 
-static void (*restartEE)(void);
+static void (*systemRestart)(void);
+
+static u32 InitializeUserMempattern[] = {
+	0x27bdffe0,		//	addiu	sp, sp, $ffe0
+	0xffb00000,		//	sd	s0, $0000(sp)
+	0xffbf0010,		//	sd	ra, $0010(sp)
+	0x0c000000,		//	jal 	GetMemorySize
+	0x00000000,		//	daddu	s0, a0, zero	<-- some modchips are patching here, so we'll repatch
+	0x0040202d,		//	daddu	a0, v0, zero
+	0x0204102b,		//	sltu	v0, s0, a0
+	0x1040000a,		//	beq	v0, zero, 2f
+	0xdfbf0010,		//	ld	ra, $0010(sp)
+	0x700014a9,		//	por	v0, zero, zero
+	0x7e020000,		//	sq	v0, $0000(s0)
+	0x26100010,		//	addiu	s0, s0, $10
+	0x0204102b,		//	sltu	v0, s0, a0
+	0x00000000,		//	nop
+	0x00000000,		//	nop
+	0x1440fffa,		//	bne	v0, zero, 1b
+	0x700014a9		//	por	v0, zero, zero 
+/*
+	0xdfbf0010,		//	ld	ra, $0010(sp)
+	0xdfbf0000,		//	ld	s0, $0000(sp)
+	0x03e00008,		//	jr	ra
+	0x27bd0020		//	addiu	sp, sp, $0020
+*/
+};
+
+static u32 InitializeUserMempattern_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xfc000000,
+	0x00000000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff
+};
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -158,23 +204,37 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 }
 
 // ------------------------------------------------------------------------
-void set_restartEE(void)
+void init_systemRestart(void)
 {
-	u32 *ptr = (u32 *)0x80000000;
+	u32 *ptr;
 
 	DIntr();
 	ee_kmode_enter();
 
-	ptr = find_pattern_with_mask(ptr, 0x80000, restartEEpattern, restartEEpattern_mask, sizeof(restartEEpattern));
-	if (ptr)
-		restartEE = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000);
-	else {
-		GS_BGCOLOUR = 0x0000FF;
-		while (1) {;}
-	}
+	// patch InitializeUserMemory() to avoid user mem to be cleared
+	ptr = (u32 *)0x80001000;
+	ptr = find_pattern_with_mask(ptr, 0x7f000, InitializeUserMempattern, InitializeUserMempattern_mask, sizeof(InitializeUserMempattern));
+	if (!ptr)
+		goto err;
+	ptr[4] = 0x3c100200; // it will exit at first s0/a0 comparison
+
+	// scan for find kernel systemRestart function
+	ptr = (u32 *)0x80001000;
+	ptr = find_pattern_with_mask(ptr, 0x7f000, systemRestartpattern, systemRestartpattern_mask, sizeof(systemRestartpattern));
+	if (!ptr)
+		goto err;
+	systemRestart = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000); // get systemRestart function pointer
 
 	ee_kmode_exit();
 	EIntr();
+
+	FlushCache(0);
+
+	return;
+
+err:
+	GS_BGCOLOUR = 0x0000ff; // hangs on red screen
+	while (1) {;}
 }
 
 // ------------------------------------------------------------------------
@@ -213,7 +273,7 @@ static void t_loadElf(void)
 	DPRINTF("t_loadElf: System Restart...\n");
 	DIntr();
 	ee_kmode_enter();
-	restartEE();
+	systemRestart();
 	while (!(*(vu32 *)R_EE_SBUS_SMFLAG & SBUS_CTRL_MSINT)) {;}
 	*(vu32 *)R_EE_SBUS_SMFLAG = SBUS_CTRL_MSINT;
 	ee_kmode_exit();
@@ -357,10 +417,7 @@ int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
-	sbv_patch_user_mem_clear(0x02000000);
-	FlushCache(0);
-
-	set_restartEE();
+	init_systemRestart();
 
 	Old_SifSetDma  = GetSyscallHandler(__NR_SifSetDma);
 	SetSyscall(__NR_SifSetDma, &Hook_SifSetDma);

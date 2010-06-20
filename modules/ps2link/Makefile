@@ -9,9 +9,9 @@
 IOP_BIN  = ps2link.irx
 IOP_OBJS = net_fsys.o net_fio.o ps2link.o cmdHandler.o tty.o nprintf.o excepHandler.o imports.o
 
-IOP_INCS += -I../include
+IOP_INCS += -I$(PS2SDK)/iop/include
 IOP_LIBS += 
-IOP_LDFLAGS += 
+IOP_LDFLAGS += -s
 IOP_CFLAGS += -Wall -fno-builtin
 
 # Enable zero-copy on fileio writes.

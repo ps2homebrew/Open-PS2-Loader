@@ -21,6 +21,8 @@ static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
 static char g_argbuf[580];
 static char g_ElfPath[1024];
+static void *g_patchInitializeUserMem_addr;
+static u32 g_patchInitializeUserMem_val;
 
 int set_reg_hook;
 int set_reg_disabled;
@@ -204,26 +206,31 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 }
 
 // ------------------------------------------------------------------------
-void init_systemRestart(void)
+static void init_systemRestart(void)
 {
 	u32 *ptr;
 
 	DIntr();
 	ee_kmode_enter();
 
-	// patch InitializeUserMemory() to avoid user mem to be cleared
+	// scan to find kernel InitializeUserMemory()
 	ptr = (u32 *)0x80001000;
 	ptr = find_pattern_with_mask(ptr, 0x7f000, InitializeUserMempattern, InitializeUserMempattern_mask, sizeof(InitializeUserMempattern));
 	if (!ptr)
 		goto err;
-	ptr[4] = 0x3c100200; // it will exit at first s0/a0 comparison
+	// keep original opcode address and value
+	g_patchInitializeUserMem_addr = (void *)&ptr[4];
+	g_patchInitializeUserMem_val = ptr[4];
+	// patch InitializeUserMemory() to avoid user mem to be cleared
+	_sw(0x3c100200, (u32)g_patchInitializeUserMem_addr); // it will exit at first s0/a0 comparison
 
-	// scan for find kernel systemRestart function
+	// scan to find kernel systemRestart() function
 	ptr = (u32 *)0x80001000;
 	ptr = find_pattern_with_mask(ptr, 0x7f000, systemRestartpattern, systemRestartpattern_mask, sizeof(systemRestartpattern));
 	if (!ptr)
 		goto err;
-	systemRestart = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000); // get systemRestart function pointer
+	// get systemRestart function pointer
+	systemRestart = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000);
 
 	ee_kmode_exit();
 	EIntr();
@@ -235,6 +242,21 @@ void init_systemRestart(void)
 err:
 	GS_BGCOLOUR = 0x0000ff; // hangs on red screen
 	while (1) {;}
+}
+
+// ------------------------------------------------------------------------
+static void deinit_systemRestart(void)
+{
+	DIntr();
+	ee_kmode_enter();
+
+	// unpatch InitializeUserMemory()
+	_sw(g_patchInitializeUserMem_val, (u32)g_patchInitializeUserMem_addr);
+
+	ee_kmode_exit();
+	EIntr();
+
+	FlushCache(0);
 }
 
 // ------------------------------------------------------------------------
@@ -445,6 +467,8 @@ void Install_Kernel_Hooks(void)
 /*----------------------------------------------------------------------------------------*/
 void Remove_Kernel_Hooks(void)
 {
+	deinit_systemRestart();
+
 	if(!(g_compat_mask & COMPAT_MODE_3))
 		Apply_Mode3();
 

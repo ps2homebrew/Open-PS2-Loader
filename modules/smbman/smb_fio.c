@@ -298,12 +298,12 @@ static char *prepare_path(char *path)
 	}
 
 	if (strlen(p) > 0) {
-		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1-1-strlen(p));
+		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1-strlen(p));
 		strcat(smb_curpath, "\\");
 		strcat(smb_curpath, p);
 	}
 	else {
-		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1-1);
+		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1);
 		strcat(smb_curpath, "\\");
 	}
 
@@ -351,7 +351,7 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 				fh->filesize = 0;
 			else if (fh->mode & O_APPEND)
 				fh->position = filesize;
-			strncpy(fh->name, path, 255);
+			strncpy(fh->name, path, 256);
 			r = 0;
 		}
 	}
@@ -613,7 +613,7 @@ int smb_dopen(iop_file_t *f, const char *dirname)
 		fh->filesize = 0;
 		fh->position = 0;
 
-		strncpy(fh->name, path, 254);
+		strncpy(fh->name, path, 255);
 		strcat(fh->name, "*");
 
 		r = 0;	
@@ -667,7 +667,7 @@ int smb_dread(iop_file_t *f, iox_dirent_t *dirent)
 		r = 1;
 	}
 
-	if ((r == 1) && (info->EOS == 0)) {
+	if (r == 1) {
 		memcpy(dirent->stat.ctime, &info->fileInfo.Created, 8);
 		memcpy(dirent->stat.atime, &info->fileInfo.LastAccess, 8);
 		memcpy(dirent->stat.mtime, &info->fileInfo.Change, 8);
@@ -680,10 +680,8 @@ int smb_dread(iop_file_t *f, iox_dirent_t *dirent)
 		else 
 			dirent->stat.mode |= FIO_S_IFREG;
 
-		strncpy(dirent->name, info->FileName, 255);
+		strncpy(dirent->name, info->FileName, 256);
 	}
-	else
-		r = 0;
 
 io_unlock:
 	smb_io_unlock();

@@ -1646,6 +1646,10 @@ int smb_FindFirstNext2(int UID, int TID, char *Path, int cmd, SearchInfo_t *info
 	struct FindFirst2ResponseData_t *FFRspData = (struct FindFirst2ResponseData_t *)&SMB_buf[FFNRsp->smbTrans.DataOffset+4];
 
 	info->EOS = FFNRspParam->EndOfSearch;
+
+	if (FFNRspParam->SearchCount == 0)
+		return -4;
+
 	info->fileInfo.Created = FFRspData->Created;
 	info->fileInfo.LastAccess = FFRspData->LastAccess;
 	info->fileInfo.LastWrite = FFRspData->LastWrite;

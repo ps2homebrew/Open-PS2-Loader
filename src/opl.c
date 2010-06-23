@@ -183,25 +183,14 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 }
 
 static void initAllSupport(int force_reinit) {
-	int validMode = -1;
-
-	if (gUSBStartMode) {
-		validMode = USB_MODE;
+	if (gUSBStartMode)
 		initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
-	}
 
-	if (gETHStartMode) {
-		validMode = ETH_MODE;
+	if (gETHStartMode)
 		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit);
-	}
 
-	if (gHDDStartMode) {
-		validMode = HDD_MODE;
+	if (gHDDStartMode)
 		initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
-	}
-
-	if (validMode == -1) // no game device inited, so force Apps ...
-		gAPPStartMode = 2;
 
 	if (gAPPStartMode)
 		initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
@@ -721,7 +710,7 @@ static void setDefaults(void) {
 	gDefaultUITextColor[1] = 0x080;
 	gDefaultUITextColor[2] = 0x040;
 
-	gFrameCounter = UPDATE_FRAME_COUNT; // start refresh asap (risky ?)
+	gFrameCounter = UPDATE_FRAME_COUNT;
 }
 
 static void init(void) {

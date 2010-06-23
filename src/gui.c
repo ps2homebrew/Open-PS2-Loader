@@ -100,7 +100,7 @@ static gui_screen_handler_t mainScreenHandler = {
 static gui_screen_handler_t menuScreenHandler = {
 	&guiMenuHandleInput,
 	&guiMenuRender,
-	&guiDrawBackground
+	&guiDrawBGPlasma
 };
 
 static gui_screen_handler_t *screenHandler = &mainScreenHandler;
@@ -348,7 +348,7 @@ static void guiShowIPConfig() {
 	}
 }
 
-void guiShowCompatConfig(int id, item_list_t *support) {
+int guiShowCompatConfig(int id, item_list_t *support) {
 	int dmaMode = -1, compatMode = 0;
 	char* startup = support->itemGetStartup(id);
 	compatMode = support->itemGetCompatibility(id, &dmaMode);
@@ -411,6 +411,8 @@ void guiShowCompatConfig(int id, item_list_t *support) {
 		if (result == COMPAT_SAVE)
 			saveConfig();
 	}
+
+	return result;
 }
 
 int guiGetOpCompleted(int opid) {

@@ -388,6 +388,12 @@ int sysPcmciaCheck(void) {
 	return 0;	// ExpBay
 }
 
+void sysGetCDVDFSV(void **data_irx, int *size_irx)
+{
+	*data_irx = (void *)&cdvdfsv_irx;
+	*size_irx = size_cdvdfsv_irx;
+}
+
 #define IRX_NUM 10
 
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM

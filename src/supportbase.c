@@ -202,5 +202,23 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 	memcpy((void*)((u32)cdvdman_irx + i + 84), &gameid, 5);
 
 	*patchindex = i;
+
+	// patches cdvdfsv
+	void *cdvdfsv_irx;
+	int size_cdvdfsv_irx;
+
+	sysGetCDVDFSV(&cdvdfsv_irx, &size_cdvdfsv_irx);
+	u32 *p = (u32 *)cdvdfsv_irx;
+	for (i = 0; i < (size_cdvdfsv_irx >> 2); i++) {
+		if (*p == 0xC0DEC0DE) {
+			if (compatmask & COMPAT_MODE_7)
+				*p = 1;
+			else
+				*p = 0;
+			break;
+		}
+		p++;
+	}
+
 	return compatmask;
 }

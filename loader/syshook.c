@@ -13,9 +13,6 @@
 #include <ee_regs.h>
 #include <ps2_reg_defs.h>
 
-extern void *cddev_irx;
-extern int size_cddev_irx;
-
 #define MAX_G_ARGS 15
 static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
@@ -134,11 +131,11 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 /*----------------------------------------------------------------------------------------*/
 u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 {
-	if((sdd->attr == 0x44) && ((sdd->size==0x68) || (sdd->size==0x70)))
-	{
+	if((sdd->attr == 0x44) && ((sdd->size==0x68) || (sdd->size==0x70))) {
+
 		SifCmdResetData *reset_pkt = (SifCmdResetData*)sdd->src;
-		if(((reset_pkt->chdr.psize == 0x68) || (reset_pkt->chdr.psize == 0x70)) && (reset_pkt->chdr.fcode == 0x80000003))
-		{
+		if(((reset_pkt->chdr.psize == 0x68) || (reset_pkt->chdr.psize == 0x70)) && (reset_pkt->chdr.fcode == 0x80000003)) {
+
 			__asm__(
 				"la $v1, New_SifSetDma\n\t"
 				"sw $v1, 8($sp)\n\t"
@@ -173,8 +170,8 @@ void Apply_Mode3(void)
 /*----------------------------------------------------------------------------------------*/
 int Hook_SifSetReg(u32 register_num, int register_value)
 {
-	if(set_reg_hook)
-	{
+	if(set_reg_hook) {
+
 		set_reg_hook--;
 
 		if (set_reg_hook == 0) {
@@ -276,22 +273,13 @@ static void t_loadElf(void)
 	set_reg_disabled = 1;
 
 	iop_reboot_count = 1;
-           
+
 	SifInitRpc(0);
 	LoadFileInit();
 
-	DPRINTF("t_loadElf: Loading cddev IOP module...\n");
-	LoadIRXfromKernel(cddev_irx, size_cddev_irx, 0, NULL);
-
-	// replacing cdrom in elf path by cddev
-	if (strstr(g_argv[0], "cdrom")) {
-		u8 *ptr = (u8 *)g_argv[0];
-		strcpy(g_ElfPath, "cddev");
-		strcat(g_ElfPath, &ptr[5]);		
-	}
-	
+	strncpy(g_ElfPath, g_argv[0], 1024);	
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
-	
+
 	DPRINTF("t_loadElf: System Restart...\n");
 	DIntr();
 	ee_kmode_enter();
@@ -316,40 +304,32 @@ static void t_loadElf(void)
 			:: "r" (i)
 		);
 	}
-
 	DPRINTF(" done\n");
 
 	DPRINTF("t_loadElf: loading elf...");
 	r = LoadElf(g_ElfPath, &elf);
 
-	if ((!r) && (elf.epc))
-	{
+	if ((!r) && (elf.epc)) {
 		DPRINTF(" done\n");
 
 		DPRINTF("t_loadElf: exiting services...\n");
 		// exit services
 		fioExit();
 		SifExitIopHeap();
-		LoadFileExit();		
+		LoadFileExit();
 		SifExitRpc();
-
-		// replacing cddev in elf path by cdrom
-		if (strstr(g_ElfPath, "cddev"))
-			memcpy(g_ElfPath, "cdrom", 5);
-
-		DPRINTF("t_loadElf: real elf path = '%s'\n", g_ElfPath);
 
 		DPRINTF("t_loadElf: trying to apply game patches...\n");
 		// applying needed game patches if any
 		apply_game_patches();
-	
+
 		FlushCache(0);
 		FlushCache(2);
 
 		DPRINTF("t_loadElf: executing...\n");
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
 	}
-	
+
 	DPRINTF(" failed\n");
 
 	if(!DisableDebug)
@@ -362,10 +342,10 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 {
 	char *p = g_argbuf;
 	int i, arglen;
-	
-	DI();
+
+	DIntr();
 	ee_kmode_enter();
-	
+
 	// copy args from main ELF
 	g_argc = argc > MAX_G_ARGS ? MAX_G_ARGS : argc;
 
@@ -382,15 +362,15 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 		g_argv[i + 1] = p;
 		p += arglen;
 	}
-	
+
 	ee_kmode_exit();
-	EI();
-	
+	EIntr();
+
 	ExecPS2(t_loadElf, NULL, 0, NULL);
-		
+
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xffffff; // white screen: error
-	SleepThread();	
+	SleepThread();
 }
 
 // ------------------------------------------------------------------------
@@ -401,7 +381,7 @@ void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
 		"sw $v1, 8($sp)\n\t"
 		"jr $ra\n\t"
 		"nop\n\t"
-	);	
+	);
 }
 
 // ------------------------------------------------------------------------
@@ -446,10 +426,10 @@ void Install_Kernel_Hooks(void)
 
 	Old_SifSetReg  = GetSyscallHandler(__NR_SifSetReg);
 	SetSyscall(__NR_SifSetReg, &Hook_SifSetReg);
-	
+
 	Old_LoadExecPS2 = GetSyscallHandler(__NR_LoadExecPS2);
-	SetSyscall(__NR_LoadExecPS2, &Hook_LoadExecPS2);	
-	
+	SetSyscall(__NR_LoadExecPS2, &Hook_LoadExecPS2);
+
 	// If IGR is enabled hook ExecPS2 & CreateThread syscalls
 	if(!(g_compat_mask & COMPAT_MODE_6))
 	{

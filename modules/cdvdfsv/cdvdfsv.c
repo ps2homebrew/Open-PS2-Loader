@@ -355,6 +355,8 @@ static u8 cdvdNcmds_rpcbuf[1024] __attribute__((aligned(16)));
 static u8 S596_rpcbuf[16] __attribute__((aligned(16)));
 static u8 curlsn_buf[16] __attribute__ ((aligned(64)));
 
+static int g_reduced_buf = 0xC0DEC0DE;
+
 #define CDVDFSV_BUF_SECTORS		2
 
 //-------------------------------------------------------------------------
@@ -381,12 +383,17 @@ int _start(int argc, char** argv)
 //-------------------------------------------------------------------------
 void init_thread(void *args)
 {
+	int alloc_size = CDVDFSV_BUF_SECTORS << 11;
+
 	if (!sceSifCheckInit())
 		sceSifInit();
 
 	sceSifInitRpc(0);
 
-	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, (CDVDFSV_BUF_SECTORS << 11), NULL);
+	if (!g_reduced_buf)
+		alloc_size += 2048;
+
+	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, alloc_size, NULL);
 	if (!cdvdfsv_buf)
 		SleepThread();
 

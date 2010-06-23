@@ -18,7 +18,7 @@ GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/
 LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
-		obj/cdvdfsv.o obj/cddev.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
+		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o \
 		obj/ps2link.o
@@ -99,8 +99,6 @@ clean:
 	$(MAKE) -C modules/cdvdman -f Makefile.hdd.pcmcia clean
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/cdvdfsv clean
-	echo "    * cddev.irx"
-	$(MAKE) -C modules/cddev clean
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usbhdfsd clean
 	echo "    * ps2dev9.irx"
@@ -265,11 +263,6 @@ cdvdfsv.s:
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/cdvdfsv
 	bin2s modules/cdvdfsv/cdvdfsv.irx asm/cdvdfsv.s cdvdfsv_irx
-
-cddev.s:
-	echo "    * cddev.irx"
-	$(MAKE) -C modules/cddev
-	bin2s modules/cddev/cddev.irx asm/cddev.s cddev_irx
 
 usbd_ps2.s:
 	bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd_ps2.s usbd_ps2_irx

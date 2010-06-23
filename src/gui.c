@@ -103,7 +103,7 @@ static gui_screen_handler_t menuScreenHandler = {
 	&guiDrawBGPlasma
 };
 
-static gui_screen_handler_t *screenHandler = &mainScreenHandler;
+static gui_screen_handler_t *screenHandler = &menuScreenHandler;
 
 // screen transition handling
 static gui_screen_handler_t *screenHandlerTarget = NULL;
@@ -466,6 +466,7 @@ static void guiHandleOp(struct gui_update_t* item) {
 			
 		case GUI_OP_SELECT_MENU:
 			menuSetSelectedItem(item->menu.menu);
+			screenHandler = &mainScreenHandler;
 			break;
 			
 		case GUI_OP_CLEAR_SUBMENU:
@@ -913,11 +914,9 @@ static void guiMenuRender() {
 		if (fadeout < 0x20)
 			fadeout = 0x20;
 		
-		// TODO: colours from theme!
-		u64 colour = GS_SETREG_RGBA(0x060, 0x060, 0x060, fadeout);
-		
+		u64 colour = gTheme->textColor;
 		if (it == mainMenuCurrent)
-			colour = GS_SETREG_RGBA(0x080, 0x080, 0x040, 0x080);
+			colour = gTheme->selTextColor;
 		
 		// render, advance
 		fntRenderString(x - (w >> 1), y, ALIGN_NONE, text, colour);
@@ -961,7 +960,7 @@ static void guiMenuHandleInput() {
 			saveConfig();
 		} else if (id == 9) { // TODO: should we call opl.shutdown first ?
 			guiExecExit();
-		} else if (id == 11) { // TODO: is there a rule for the id ? Also should we call opl.shutdown first ?
+		} else if (id == 11) { // TODO: should we call opl.shutdown first ?
 			sysPowerOff();
 		} else {
 			if (gMenuExecHook)

@@ -14,6 +14,7 @@
 #include "include/pad.h"
 #include "include/texcache.h"
 #include "include/dia.h"
+#include "include/dialogs.h"
 #include "include/menusys.h"
 #include "include/system.h"
 #include "include/debug.h"
@@ -100,20 +101,6 @@ static void initHints(struct menu_item_t* menuItem, int startMode) {
 	}
 }
 
-static void itemAltExec(struct menu_item_t *self, int id) {
-	item_list_t *support = self->userdata;
-
-	if (id < 0)
-		return;
-
-	if (support) {
-		if (support->itemGetCompatibility)
-			guiShowCompatConfig(id, support);
-	}
-	else
-		guiMsgBox("NULL Support object. Please report");
-}
-
 static void itemExec(struct menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
@@ -125,9 +112,25 @@ static void itemExec(struct menu_item_t *self, int id) {
 			}
 		}
 		else { 
-                	support->itemInit();
+			support->itemInit();
 			menuRemoveHints(self); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
 			initHints(self, 2);
+		}
+	}
+	else
+		guiMsgBox("NULL Support object. Please report");
+}
+
+static void itemAltExec(struct menu_item_t *self, int id) {
+	item_list_t *support = self->userdata;
+
+	if (id < 0)
+		return;
+
+	if (support) {
+		if (support->itemGetCompatibility) {
+			if (guiShowCompatConfig(id, support) == COMPAT_TEST)
+				itemExec(self, id);
 		}
 	}
 	else
@@ -224,9 +227,8 @@ void menuExecHookFunc(int id) {
 }
 
 void menuFillHookFunc(struct submenu_list_t **menu) {
-	// TODO: STR_ constants for the strings
 	if (gHDDStartMode) // enabled at all?
-		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, -1);
+		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
 }
 
 // ----------------------------------------------------------

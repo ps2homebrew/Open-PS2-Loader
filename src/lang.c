@@ -74,6 +74,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Application start mode",
 	"Auto",
 	"Manual",
+	"Start HDL Server",
 };
 
 static int guiLangID = 0;

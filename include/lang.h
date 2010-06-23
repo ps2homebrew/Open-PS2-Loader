@@ -70,7 +70,8 @@
 #define _STR_APPMODE					65
 #define _STR_AUTO					66
 #define _STR_MANUAL					67
-#define LANG_STR_COUNT 68
+#define _STR_STARTHDL					68
+#define LANG_STR_COUNT 69
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

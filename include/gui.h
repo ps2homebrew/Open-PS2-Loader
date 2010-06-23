@@ -106,7 +106,7 @@ struct gui_update_t *guiOpCreate(gui_op_type_t type);
 /** For completeness, the deffered operations are destroyed automatically */
 void guiDestroyOp(struct gui_update_t *op);
 
-void guiShowCompatConfig(int id, item_list_t *support);
+int guiShowCompatConfig(int id, item_list_t *support);
 void guiMsgBox(const char* text);
 
 void guiUpdateScrollSpeed(void);

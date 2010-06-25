@@ -11,7 +11,7 @@
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
 #ifdef INGAME_DRIVER
-#define MEM_SIZE 0x2000
+#define MEM_SIZE 0x800
 #else
 #define MEM_SIZE 0x3000
 #endif
@@ -19,7 +19,11 @@ a lot of data that needs to be copied, this should be set high. */
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
    sends a lot of data out of ROM (or other static memory), this
    should be set high. */
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_PBUF 10
+#else
 #define MEMP_NUM_PBUF 40
+#endif
 
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
@@ -47,7 +51,12 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_TCP_SEG 15
+#else
 #define MEMP_NUM_TCP_SEG 40
+#endif
+
 /* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
    timeouts. */
 #define MEMP_NUM_SYS_TIMEOUT 5
@@ -55,20 +64,36 @@ a lot of data that needs to be copied, this should be set high. */
 /* The following four are used only with the sequential API and can be
    set to 0 if the application only will use the raw API. */
 /* MEMP_NUM_NETBUF: the number of struct netbufs. */
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_NETBUF 5
+#else
 #define MEMP_NUM_NETBUF 15
+#endif
 
 /* MEMP_NUM_NETCONN: the number of struct netconns. */
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_NETCONN 5
+#else
 #define MEMP_NUM_NETCONN 15
+#endif
 
 /* MEMP_NUM_APIMSG: the number of struct api_msg, used for
    communication between the TCP/IP stack and the sequential
    programs. */
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_API_MSG 5
+#else
 #define MEMP_NUM_API_MSG 40
+#endif
 
 /* MEMP_NUM_TCPIPMSG: the number of struct tcpip_msg, which is used
    for sequential API communication and incoming packets. Used in
    src/api/tcpip.c. */
+#ifdef INGAME_DRIVER
+#define MEMP_NUM_TCPIP_MSG 15
+#else
 #define MEMP_NUM_TCPIP_MSG 40
+#endif
 
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
@@ -126,9 +151,21 @@ a lot of data that needs to be copied, this should be set high. */
    available in the tcp snd_buf for select to return writable */
 #define TCP_SNDLOWAT		(TCP_SND_BUF/2)
 
+/* ----- TCPIP thread priority ----- */
+#ifdef INGAME_DRIVER
+#define TCPIP_THREAD_PRIO	16
+#else
+#define TCPIP_THREAD_PRIO	1
+#endif
+
 /* ---------- ARP options ---------- */
+#ifdef INGAME_DRIVER
+#define ARP_TABLE_SIZE 1
+#define ARP_QUEUEING 0
+#else
 #define ARP_TABLE_SIZE 10
 #define ARP_QUEUEING 1
+#endif
 
 /* ---------- IP options ---------- */
 /* Define IP_FORWARD to 1 if you wish to have the ability to forward

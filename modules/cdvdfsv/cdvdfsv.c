@@ -355,7 +355,7 @@ static u8 cdvdNcmds_rpcbuf[1024] __attribute__((aligned(16)));
 static u8 S596_rpcbuf[16] __attribute__((aligned(16)));
 static u8 curlsn_buf[16] __attribute__ ((aligned(64)));
 
-static int g_reduced_buf = 0xC0DEC0DE;
+static int g_reduced_iopmemusage = 0xC0DEC0DE;
 
 #define CDVDFSV_BUF_SECTORS		2
 
@@ -383,17 +383,12 @@ int _start(int argc, char** argv)
 //-------------------------------------------------------------------------
 void init_thread(void *args)
 {
-	int alloc_size = CDVDFSV_BUF_SECTORS << 11;
-
 	if (!sceSifCheckInit())
 		sceSifInit();
 
 	sceSifInitRpc(0);
 
-	if (!g_reduced_buf)
-		alloc_size += 2048;
-
-	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, alloc_size, NULL);
+	cdvdfsv_buf = AllocSysMemory(ALLOC_FIRST, (CDVDFSV_BUF_SECTORS << 11)+2048, NULL);
 	if (!cdvdfsv_buf)
 		SleepThread();
 
@@ -424,14 +419,16 @@ void cdvdfsv_startrpcthreads(void)
 	thread_id = CreateThread(&thread_param);
 	StartThread(thread_id, 0);
 
-	thread_param.attr = TH_C;
-	thread_param.option = 0;
-	thread_param.thread = (void *)cdvdfsv_rpc0_th;
-	thread_param.stacksize = 0x2000;
-	thread_param.priority = 0x51;
+	if (!g_reduced_iopmemusage) {
+		thread_param.attr = TH_C;
+		thread_param.option = 0;
+		thread_param.thread = (void *)cdvdfsv_rpc0_th;
+		thread_param.stacksize = 0x2000;
+		thread_param.priority = 0x51;
 
-	thread_id = CreateThread(&thread_param);
-	StartThread(thread_id, 0);
+		thread_id = CreateThread(&thread_param);
+		StartThread(thread_id, 0);
+	}
 }
 
 //-------------------------------------------------------------------------

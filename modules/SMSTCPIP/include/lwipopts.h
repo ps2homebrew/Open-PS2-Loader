@@ -11,7 +11,7 @@
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
 #ifdef INGAME_DRIVER
-#define MEM_SIZE 0x800
+#define MEM_SIZE 0x400
 #else
 #define MEM_SIZE 0x3000
 #endif
@@ -72,7 +72,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_NETCONN: the number of struct netconns. */
 #ifdef INGAME_DRIVER
-#define MEMP_NUM_NETCONN 5
+#define MEMP_NUM_NETCONN 1
 #else
 #define MEMP_NUM_NETCONN 15
 #endif
@@ -138,7 +138,11 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_SND_QUEUELEN        (2*TCP_SND_BUF/TCP_MSS)
 
 /* TCP receive window. */
+#ifdef INGAME_DRIVER
+#define TCP_WND                 5120
+#else
 #define TCP_WND                 8192
+#endif
 
 /* Maximum number of retransmissions of data segments. */
 #define TCP_MAXRTX              12

@@ -73,7 +73,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	DPRINTF("IOP reboot count = %d\n", iop_reboot_count);
 	
 	SifInitRpc(0);
-	
+
 	if (iop_reboot_count > 2) { 
 		// above 2nd IOP reset, we can't be sure we'll be able to read IOPRP without 
 		// Resetting IOP (game IOPRP is loaded at 2nd reset), so...
@@ -92,11 +92,14 @@ int New_Reset_Iop(const char *arg, int flag){
 		LoadFileInit();
 		Sbv_Patch();
 
+		if (GameMode == ETH_MODE)
+			start_smbauth_thread();
+
 		LoadIRXfromKernel(cdvdman_irx, size_cdvdman_irx, 0, NULL);
 
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00A5FF;
-			
+
 		if (GameMode == USB_MODE) {
 			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
 			delay(3);
@@ -240,7 +243,10 @@ int New_Reset_Iop(const char *arg, int flag){
 	LoadFileInit();
 	DPRINTF("Applying Sbv patches...\n");
 	Sbv_Patch();
-	
+
+	if (GameMode == ETH_MODE)
+		start_smbauth_thread();
+
 	DPRINTF("Sending patched IOPRP on IOP and try to reset with...\n");
 	rom_iop = SifAllocIopHeap(ioprp_img.size_out);
 	

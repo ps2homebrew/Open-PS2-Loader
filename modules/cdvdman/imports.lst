@@ -82,3 +82,11 @@ I_ClearEventFlag
 I_iSetEventFlag
 I_WaitEventFlag
 thevent_IMPORTS_end
+
+sifman_IMPORTS_start
+I_sceSifSetDma
+I_sceSifDmaStat
+I_sceSifSetDmaIntrHandler
+I_sceSifResetDmaIntrHandler
+sifman_IMPORTS_end
+

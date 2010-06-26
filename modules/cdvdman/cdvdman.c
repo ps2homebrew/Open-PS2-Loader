@@ -78,6 +78,8 @@ static char g_DiskID[] = "B00BS";
 static char g_pc_ip[]="xxx.xxx.xxx.xxx";
 static int g_pc_port = 445; // &g_pc_ip + 16
 static char g_pc_share[33]="PS2SMB";
+static char g_smb_user[32]="GUEST";   // "jimmikaelkael";
+static char g_smb_password[32]="\0";  // "mypassw";
 #endif
 
 //----------------------------------------------------
@@ -1129,14 +1131,14 @@ void fs_init(void)
 	ps2ip_init();
 
 	// Open the Connection with SMB server
-	smb_NegociateProtocol(g_pc_ip, g_pc_port, "NT LM 0.12");
+	smb_NegociateProtocol(g_pc_ip, g_pc_port, g_smb_user, g_smb_password);
 
 	// zero pad the string to be sure it does not overflow
 	g_pc_share[32] = '\0';
 
 	// Then open a session and a tree connect on the share resource
 	sprintf(tmp_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-	smb_SessionSetupTreeConnect("GUEST", tmp_str);
+	smb_SessionSetupTreeConnect(tmp_str);
 
 	char *path_str = "%s.%02x";
 	char *game_name = NULL;

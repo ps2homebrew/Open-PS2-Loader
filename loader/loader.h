@@ -139,6 +139,15 @@ void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
 int  (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int  (*Old_CreateThread)(ee_thread_t *thread_param);
 
+/* des.c */
+unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *cipher);
+
+/* md4.c */
+unsigned char *MD4(unsigned char *message, int len, unsigned char *cipher);
+
+/* smbauth.c */
+void start_smbauth_thread(void);
+
 /* patches.c */
 void apply_game_patches(void);
 

@@ -240,6 +240,9 @@ int ethSMBConnect(void) {
 	logon.serverPort = gPCPort;
 	strcpy(logon.User, "GUEST");
 	logon.PasswordType = NO_PASSWORD;
+	//strcpy(logon.User, "jimmikaelkael");
+	//strcpy(logon.Password, "mypassw");
+	//logon.PasswordType = PLAINTEXT_PASSWORD;
 
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
 	if (ret < 0)

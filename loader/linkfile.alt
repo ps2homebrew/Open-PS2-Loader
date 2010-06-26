@@ -9,7 +9,7 @@
 	Review ps2sdk README & LICENSE files for further details.
 	
 	Alternative linkfile
-	Loader section begin at 0x00090000 instead of 0x000e8000
+	Loader section begin at 0x00090000 instead of 0x000e7000
 */
 
 ENTRY(_start);

@@ -8,9 +8,15 @@
 #include <sysclib.h>
 #include <ps2ip.h>
 #include <thbase.h>
+#include <thsemap.h>
+#include <intrman.h>
+#include <sifman.h>
 
 #include "smsutils.h"
 #include "smb.h"
+
+#define DMA_ADDR 		0x000cff00
+#define	UNCACHEDSEG(vaddr)	(0x20000000 | vaddr)
 
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s); 						// #6
@@ -58,12 +64,11 @@ struct NegociateProtocolResponse_t {
 	u32	MaxRawBuffer;		// 48
 	u32	SessionKey;		// 52
 	u32	Capabilities;		// 56
-	u8	SystemTime[8];		// 60
+	s64	SystemTime;		// 60
 	u16	ServerTimeZone;		// 68
 	u8	KeyLength;		// 70
 	u16	ByteCount;		// 71
-	u8	EncryptionKey[8];	// 73
-	u8	PrimaryDomainServerName[1024]; // 81
+	u8	ByteField[0];		// 73
 } __attribute__((packed));
 
 struct SessionSetupAndXRequest_t {
@@ -181,9 +186,24 @@ typedef struct {
 	u32	SessionKey;
 	u32	StringsCF;
 	u8	PrimaryDomainServerName[32];
+	u8	EncryptionKey[8];
+	int	SecurityMode;		// 0 = share level, 1 = user level
+	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
+	char	Username[32];
+	u8	Password[48];		// either PlainText, either hashed
+	int	PasswordLen;
+	int	HashedFlag;
+	void	*IOPaddr;
 } server_specs_t;
 
-static server_specs_t server_specs;
+static server_specs_t server_specs __attribute__((aligned(64))); // this must still on this alignment, as it's used for DMA
+
+#define SERVER_SHARE_SECURITY_LEVEL	0
+#define SERVER_USER_SECURITY_LEVEL	1
+#define SERVER_USE_PLAINTEXT_PASSWORD	0
+#define SERVER_USE_ENCRYPTED_PASSWORD	1
+#define LM_AUTH 	0
+#define NTLM_AUTH 	1
 
 struct ReadAndXRequest_t smb_Read_Request = {
 	{	0,
@@ -198,6 +218,7 @@ struct ReadAndXRequest_t smb_Read_Request = {
 
 static u16 UID, TID;
 static int main_socket;
+static int hash_mutex = -1;
 
 static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
 
@@ -283,8 +304,16 @@ receive:
 }
 
 //-------------------------------------------------------------------------
-int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect)
+void _dma_intr_handler(void *args)
 {
+	if (server_specs.HashedFlag)
+		iSignalSema(hash_mutex);
+}
+
+//-------------------------------------------------------------------------
+int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password)
+{
+	char *dialect = "NT LM 0.12";
 	struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
 	register int length;
 	struct in_addr dst_addr;
@@ -328,21 +357,70 @@ negociate_retry:
 	else
 		server_specs.StringsCF = 1;
 
+	if (NPRsp->SecurityMode & NEGOCIATE_SECURITY_USER_LEVEL)
+		server_specs.SecurityMode = SERVER_USER_SECURITY_LEVEL;
+	else
+		server_specs.SecurityMode = SERVER_SHARE_SECURITY_LEVEL;
+
+	if (NPRsp->SecurityMode & NEGOCIATE_SECURITY_CHALLENGE_RESPONSE)
+		server_specs.PasswordType = SERVER_USE_ENCRYPTED_PASSWORD;
+	else
+		server_specs.PasswordType = SERVER_USE_PLAINTEXT_PASSWORD;
+
 	// copy to global struct to keep needed information for further communication
 	server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
 	server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
 	server_specs.SessionKey = NPRsp->SessionKey;
-	mips_memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->PrimaryDomainServerName[0], 32);
+	mips_memcpy(&server_specs.EncryptionKey[0], &NPRsp->ByteField[0], NPRsp->KeyLength);
+	mips_memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->ByteField[NPRsp->KeyLength], 32);
+	mips_memcpy(&server_specs.Username[0], Username, 32);
+	mips_memcpy(&server_specs.Password[0], Password, 32);
+	server_specs.IOPaddr = (void *)&server_specs;
+	server_specs.HashedFlag = 0;
+
+	hash_mutex = CreateMutex(IOP_MUTEX_LOCKED);
+
+	// add a DMA interrupt handler
+	sceSifSetDmaIntrHandler(_dma_intr_handler, NULL);
+
+	// doing DMA to EE with server_specs
+	SifDmaTransfer_t dmat[2];
+	int oldstate, id;
+	int flag = 1;
+
+	dmat[0].dest = (void *)UNCACHEDSEG((DMA_ADDR + 0x40));
+	dmat[0].size = sizeof(server_specs_t);
+	dmat[0].src = (void *)&server_specs;
+	dmat[0].attr = dmat[1].attr = SIF_DMA_INT_O;
+	dmat[1].dest = (void *)UNCACHEDSEG(DMA_ADDR);
+	dmat[1].size = 4;
+	dmat[1].src = (void *)&flag;
+
+	id = 0;
+	while (!id) {
+		CpuSuspendIntr(&oldstate);
+		id = sceSifSetDma(&dmat[0], 2);
+		CpuResumeIntr(oldstate);
+	}
+	while (sceSifDmaStat(id) >= 0);
+
+	// wait smbauth code on EE hashed the password
+	WaitSema(hash_mutex);
+	sceSifResetDmaIntrHandler();
+	DeleteSema(hash_mutex);
 
 	return 1;
 }
 
 //-------------------------------------------------------------------------
-int smb_SessionSetupTreeConnect(char *User, char *share_name)
+int smb_SessionSetupTreeConnect(char *share_name)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
 	register int i, offset, ss_size, CF;
+	int AuthType = NTLM_AUTH;
+	int password_len = 0;
 
+lbl_sstc:
 	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
 	CF = server_specs.StringsCF;
@@ -361,9 +439,25 @@ int smb_SessionSetupTreeConnect(char *User, char *share_name)
 	SSR->Capabilities = CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32;
 
 	// Fill ByteField
-	offset = 1;					// skip AnsiPassword
-	for (i = 0; i < strlen(User); i++) {
-		SSR->ByteField[offset] = User[i]; 	// add User name
+	offset = 0;
+
+	if (server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) {
+		password_len = server_specs.PasswordLen;
+		// Copy the password accordingly to auth type
+		mips_memcpy(&SSR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
+		// fill SSR->AnsiPasswordLength or SSR->UnicodePasswordLength accordingly to auth type
+		if (AuthType == LM_AUTH)
+			SSR->AnsiPasswordLength = password_len;
+		else
+			SSR->UnicodePasswordLength = password_len;
+		offset += password_len;
+	}
+
+	if ((CF == 2) && (!(password_len & 1)))
+		offset += 1;				// pad needed only for unicode as aligment fix if password length is even
+
+	for (i = 0; i < strlen(server_specs.Username); i++) {
+		SSR->ByteField[offset] = server_specs.Username[i]; 	// add User name
 		offset += CF;
 	}
 	offset += CF;					// null terminator
@@ -386,16 +480,29 @@ int smb_SessionSetupTreeConnect(char *User, char *share_name)
 	struct TreeConnectRequest_t *TCR = (struct TreeConnectRequest_t *)&SSR->ByteField[offset];
 	TCR->smbWordcount = 4;
 	TCR->smbAndxCmd = SMB_COM_NONE;
-	TCR->PasswordLength = 1;
 
-	offset = 1;
+	// Fill ByteField
+	offset = 0;
+
+	password_len = 1;
+	if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
+		password_len = server_specs.PasswordLen;
+		// Copy the password accordingly to auth type
+		mips_memcpy(&TCR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
+	}
+	TCR->PasswordLength = password_len;
+	offset += password_len;
+
+	if ((CF == 2) && (!(password_len & 1)))
+		offset += 1;				// pad needed only for unicode as aligment fix is password len is even
+
 	for (i = 0; i < strlen(share_name); i++) {
-		TCR->ByteField[offset] = share_name[i]; // add Share name
+		TCR->ByteField[offset] = share_name[i];	// add Share name
 		offset += CF;
 	}
 	offset += CF;					// null terminator
 
-	mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
+	mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); 	// Service, any type of device
 	offset += 6;
 
 	TCR->ByteCount = offset;
@@ -408,6 +515,14 @@ int smb_SessionSetupTreeConnect(char *User, char *share_name)
 	// check sanity of SMB header
 	if (SSRsp->smbH.Magic != SMB_MAGIC)
 		return -1;
+
+	// check there's no auth failure
+	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL)
+		&& ((SSRsp->smbH.Eclass | (SSRsp->smbH.Ecode << 16)) == STATUS_LOGON_FAILURE)
+		&& (AuthType == NTLM_AUTH)) {
+		AuthType = LM_AUTH;
+		goto lbl_sstc;
+	}
 
 	// check there's no error (NT STATUS error type!)
 	if ((SSRsp->smbH.Eclass | SSRsp->smbH.Ecode) != STATUS_SUCCESS)

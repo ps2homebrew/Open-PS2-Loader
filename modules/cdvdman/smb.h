@@ -261,6 +261,9 @@
 // NT Status
 #define STATUS_SUCCESS				0x00000000
 #define STATUS_NO_MEDIA_IN_DEVICE		0xc0000013
+#define STATUS_ACCESS_DENIED			0xc0000022
+#define STATUS_OBJECT_NAME_NOT_FOUND		0xc0000034
+#define STATUS_LOGON_FAILURE			0xc000006d
 
 typedef struct _smb_time {
 	u32 timeLow;
@@ -271,9 +274,9 @@ typedef struct _smb_time {
 int rawTCP_SetSessionHeader(u32 size);  // Write Session Service header 
 int rawTCP_GetSessionHeader(void); 	// Read Session Service header
 
-int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *dialect); // process a Negociate Procotol message
-int smb_SessionSetupTreeConnect(char *User, char *share_name); 			// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
-int smb_OpenAndX(char *filename, u16 *FID); 					// process a Open AndX message
+int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password); // process a Negociate Procotol message
+int smb_SessionSetupTreeConnect(char *share_name); 			// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
+int smb_OpenAndX(char *filename, u16 *FID); 				// process a Open AndX message
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
 int smb_Disconnect(void);
 

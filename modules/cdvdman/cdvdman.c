@@ -1415,7 +1415,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 	cdvdman_stat.err = CDVD_ERR_NO;
 	
 	if (traycnt)
-		*traycnt = 1;
+		*traycnt = 0;
 
 	return 1;
 }

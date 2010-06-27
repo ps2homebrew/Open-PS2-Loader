@@ -264,6 +264,8 @@ static void t_loadElf(void)
 
 	DPRINTF("t_loadElf()\n");
 
+	ResetSPU();
+
 	SifExitRpc();
 
 	DPRINTF("t_loadElf: Resetting IOP...\n");

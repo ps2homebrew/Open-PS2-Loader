@@ -306,7 +306,7 @@ receive:
 //-------------------------------------------------------------------------
 void _dma_intr_handler(void *args)
 {
-	if (server_specs.HashedFlag)
+	if (server_specs.HashedFlag == 1)
 		iSignalSema(hash_mutex);
 }
 
@@ -376,7 +376,7 @@ negociate_retry:
 	mips_memcpy(&server_specs.Username[0], Username, 32);
 	mips_memcpy(&server_specs.Password[0], Password, 32);
 	server_specs.IOPaddr = (void *)&server_specs;
-	server_specs.HashedFlag = 0;
+	server_specs.HashedFlag = (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) ? 0 : -1;
 
 	hash_mutex = CreateMutex(IOP_MUTEX_LOCKED);
 

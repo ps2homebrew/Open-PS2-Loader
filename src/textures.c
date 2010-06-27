@@ -37,6 +37,8 @@ extern void *L2_png;
 extern void *R1_png;
 extern void *R2_png;
 
+extern void *logo_png;
+
 // Not related to screen size, just to limit at some point
 static int maxWidth = 640;
 static int maxHeight = 512;
@@ -79,7 +81,8 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 	{ R1_ICON, "R1", &R1_png },
 	{ R2_ICON, "R2", &R2_png },
 	{ COVER_OVERLAY, "cover_overlay", NULL },
-	{ BACKGROUND_PICTURE, "background", NULL }		// No default background
+	{ BACKGROUND_PICTURE, "background", NULL },		// No default background
+	{ LOGO_PICTURE, "logo", &logo_png },
 };
 
 static void texUpdate(GSTEXTURE* texture, int width, int height) {

@@ -33,8 +33,9 @@
 #define R2_ICON				29
 #define COVER_OVERLAY		30
 #define BACKGROUND_PICTURE 31
+#define LOGO_PICTURE 32
 
-#define TEXTURES_COUNT 32
+#define TEXTURES_COUNT 33
 
 #define ERR_BAD_FILE      -1
 #define ERR_READ_STRUCT   -2

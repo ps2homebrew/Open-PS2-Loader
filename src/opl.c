@@ -261,8 +261,14 @@ void _loadConfig() {
 			sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
 
 		getConfigInt(&gConfig, "pc_port", &gPCPort);
+		
 		if (getConfigStr(&gConfig, "pc_share", &temp))
 			strncpy(gPCShareName, temp, 32);
+		if (getConfigStr(&gConfig, "pc_user", &temp))
+			strncpy(gPCUserName, temp, 32);
+		if (getConfigStr(&gConfig, "pc_pass", &temp))
+			strncpy(gPCPassword, temp, 32);
+		
 		getConfigInt(&gConfig, "autosort", &gAutosort);
 		getConfigInt(&gConfig, "default_device", &gDefaultDevice);
 		getConfigInt(&gConfig, "disable_debug", &gDisableDebug);
@@ -302,6 +308,8 @@ void _saveConfig() {
 	setConfigStr(&gConfig, "pc_ip", temp);
 	setConfigInt(&gConfig, "pc_port", gPCPort);
 	setConfigStr(&gConfig, "pc_share", gPCShareName);
+	setConfigStr(&gConfig, "pc_user", gPCUserName);
+	setConfigStr(&gConfig, "pc_pass", gPCPassword);
 	setConfigInt(&gConfig, "autosort", gAutosort);
 	setConfigInt(&gConfig, "default_device", gDefaultDevice);
 	setConfigInt(&gConfig, "disable_debug", gDisableDebug);
@@ -663,6 +671,11 @@ static void setDefaults(void) {
 	
 	// SMB port on pc
 	gPCPort = 445;
+	
+	// default values
+	strncpy(gPCShareName, "", 32);
+	strncpy(gPCUserName, "GUEST", 32);
+	strncpy(gPCPassword,  "", 32);
 	
 	// loading progress of the network and hdd. Value "6" should mean not started yet...
 	gNetworkStartup = 6;

@@ -47,6 +47,8 @@ int ps2_gateway[4];
 int pc_ip[4];
 int gPCPort;
 char gPCShareName[32];
+char gPCUserName[32];
+char gPCPassword[32];
 
 //// Settings
 

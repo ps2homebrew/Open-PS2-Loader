@@ -238,12 +238,31 @@ int ethSMBConnect(void) {
 	// open tcp connection with the server / logon to SMB server
 	sprintf(logon.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	logon.serverPort = gPCPort;
-	strcpy(logon.User, "GUEST");
-	logon.PasswordType = NO_PASSWORD;
-	//strcpy(logon.User, "jimmikaelkael");
-	//strcpy(logon.Password, "mypassw");
-	//logon.PasswordType = PLAINTEXT_PASSWORD;
-
+	
+	if (strlen(gPCPassword) > 0) {
+		smbGetPasswordHashes_in_t passwd;
+		smbGetPasswordHashes_out_t passwdhashes;
+		
+		// we'll try to generate hashed password first
+		strncpy(logon.User, gPCUserName, 32);
+		strncpy(passwd.password, gPCPassword, 32);
+		
+		ret = fileXioDevctl("smb:", SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes));
+	
+		if (ret == 0) {
+			// hash generated okay, can use
+			memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+			logon.PasswordType = HASHED_PASSWORD;
+		} else {
+			// failed hashing, failback to plaintext
+			strncpy(logon.Password, gPCPassword, 32);
+			logon.PasswordType = PLAINTEXT_PASSWORD;
+		}
+	} else {
+		strcpy(logon.User, "GUEST");
+		logon.PasswordType = NO_PASSWORD;
+	}
+	
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
 	if (ret < 0)
 		return -2;

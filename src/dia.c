@@ -12,6 +12,7 @@
 #include "include/renderman.h"
 #include "include/fntsys.h"
 #include "include/themes.h"
+#include "include/util.h"
 
 // Row height in dialogues
 #define UI_ROW_HEIGHT 10
@@ -441,10 +442,22 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				break;
 			}
 		case UI_STRING: {
-				
 				*w = fntRenderString(x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
 				break;
 			}
+		case UI_PASSWORD: {
+				char stars[32];
+				int i;
+				
+				int len = min(strlen(item->stringvalue.text), 30);
+				for (i = 0; i < len; ++i)
+					stars[i] = '*';
+				
+				stars[i] = '\0';
+				
+				*w = fntRenderString(x, y, ALIGN_NONE, stars, txtcol);
+				break;
+		}
 		case UI_BOOL: {
 				const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
 				
@@ -537,6 +550,7 @@ static void diaResetValue(struct UIItem *item) {
 			item->intvalue.current = item->intvalue.def;
 			return;
 		case UI_STRING:
+		case UI_PASSWORD:
 			strncpy(item->stringvalue.text, item->stringvalue.def, 32);
 			return;
 		default:
@@ -572,7 +586,7 @@ static int diaHandleInput(struct UIItem *item) {
 		if (getKey(KEY_DOWN) && (item->intvalue.current > item->intvalue.min))
 			item->intvalue.current--;
 		
-	} else if (item->type == UI_STRING) {
+	} else if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
 		char tmp[32];
 		strncpy(tmp, item->stringvalue.text, 32);
 
@@ -862,7 +876,7 @@ int diaGetString(struct UIItem* ui, int id, char *value) {
 	if (!item)
 		return 0;
 	
-	if (item->type != UI_STRING)
+	if ((item->type != UI_STRING) && (item->type != UI_PASSWORD))
 		return 0;
 	
 	strncpy(value, item->stringvalue.text, 32);
@@ -875,7 +889,7 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 	if (!item)
 		return 0;
 	
-	if (item->type != UI_STRING)
+	if ((item->type != UI_STRING) && (item->type != UI_PASSWORD))
 		return 0;
 	
 	strncpy(item->stringvalue.def, text, 32);

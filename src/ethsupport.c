@@ -217,6 +217,8 @@ static void ethLaunchGame(int id) {
 	memcpy((void*)((u32)irx + i), config_str, strlen(config_str) + 1);
 	memcpy((void*)((u32)irx + i + 16), &gPCPort, 4);
 	memcpy((void*)((u32)irx + i + 20), gPCShareName, 32);
+	memcpy((void*)((u32)irx + i + 56), gPCUserName, 32);
+	memcpy((void*)((u32)irx + i + 92), gPCPassword, 32);
 
 	FlushCache(0);
 

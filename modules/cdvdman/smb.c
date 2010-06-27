@@ -8,7 +8,6 @@
 #include <sysclib.h>
 #include <ps2ip.h>
 #include <thbase.h>
-#include <thsemap.h>
 #include <intrman.h>
 #include <sifman.h>
 
@@ -189,7 +188,7 @@ typedef struct {
 	u8	EncryptionKey[8];
 	int	SecurityMode;		// 0 = share level, 1 = user level
 	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
-	char	Username[32];
+	char	Username[36];
 	u8	Password[48];		// either PlainText, either hashed
 	int	PasswordLen;
 	int	HashedFlag;
@@ -218,7 +217,6 @@ struct ReadAndXRequest_t smb_Read_Request = {
 
 static u16 UID, TID;
 static int main_socket;
-static int hash_mutex = -1;
 
 static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
 
@@ -304,13 +302,6 @@ receive:
 }
 
 //-------------------------------------------------------------------------
-void _dma_intr_handler(void *args)
-{
-	if (server_specs.HashedFlag == 1)
-		iSignalSema(hash_mutex);
-}
-
-//-------------------------------------------------------------------------
 int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password)
 {
 	char *dialect = "NT LM 0.12";
@@ -378,11 +369,6 @@ negociate_retry:
 	server_specs.IOPaddr = (void *)&server_specs;
 	server_specs.HashedFlag = (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) ? 0 : -1;
 
-	hash_mutex = CreateMutex(IOP_MUTEX_LOCKED);
-
-	// add a DMA interrupt handler
-	sceSifSetDmaIntrHandler(_dma_intr_handler, NULL);
-
 	// doing DMA to EE with server_specs
 	SifDmaTransfer_t dmat[2];
 	int oldstate, id;
@@ -405,9 +391,8 @@ negociate_retry:
 	while (sceSifDmaStat(id) >= 0);
 
 	// wait smbauth code on EE hashed the password
-	WaitSema(hash_mutex);
-	sceSifResetDmaIntrHandler();
-	DeleteSema(hash_mutex);
+	while (!(server_specs.HashedFlag == 1))
+		DelayThread(2000);
 
 	return 1;
 }

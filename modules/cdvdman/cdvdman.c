@@ -77,9 +77,9 @@ static char g_DiskID[] = "B00BS";
 #ifdef SMB_DRIVER
 static char g_pc_ip[]="xxx.xxx.xxx.xxx";
 static int g_pc_port = 445; // &g_pc_ip + 16
-static char g_pc_share[33]="PS2SMB";
-static char g_smb_user[32]="GUEST";   // "jimmikaelkael";
-static char g_smb_password[32]="\0";  // "mypassw";
+static char g_pc_share[36]="PS2SMB";
+static char g_smb_user[36]="GUEST";
+static char g_smb_password[36]="\0";
 #endif
 
 //----------------------------------------------------

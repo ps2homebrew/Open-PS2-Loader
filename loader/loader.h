@@ -139,6 +139,9 @@ void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
 int  (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int  (*Old_CreateThread)(ee_thread_t *thread_param);
 
+/* spu.c */
+void ResetSPU();
+
 /* des.c */
 unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *cipher);
 

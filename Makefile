@@ -13,7 +13,7 @@ FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.
 GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o obj/disc_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
-		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/freesans.o
+		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o
 
 LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
@@ -385,6 +385,9 @@ load6.s:
 
 load7.s:
 	bin2s gfx/load7.png asm/load7.s load7_png
+	
+logo.s:
+	bin2s gfx/logo.png asm/logo.s logo_png
 		
 exit_icon.s:
 	bin2s gfx/exit.png asm/exit_icon.s exit_png

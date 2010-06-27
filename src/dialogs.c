@@ -24,7 +24,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_BREAK},
 
 	//  ---- Netmask ----
-	{UI_LABEL, 0, NULL, {.label = {"MASK", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"Mask", -1}}},
 	{UI_SPACER}, 
 	
 	{UI_INT, 6, NULL, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
@@ -35,7 +35,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_BREAK},
 	
 	//  ---- Gateway ----
-	{UI_LABEL, 0, NULL, {.label = {"GW", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"Gateway", -1}}},
 	{UI_SPACER}, 
 	
 	{UI_INT, 10, NULL, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
@@ -59,12 +59,14 @@ struct UIItem diaIPConfig[] = {
 	
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, NULL, {.label = {"PORT", -1}}},	{UI_SPACER}, {UI_INT, 18, NULL, {.intvalue = {445, 445, 0, 1024}}},
+	{UI_LABEL, 0, NULL, {.label = {"Port", -1}}},	{UI_SPACER}, {UI_INT, 18, NULL, {.intvalue = {445, 445, 0, 1024}}},
 	
 	{UI_BREAK},
 	
 	//  ---- PC share name ----
-	{UI_LABEL, 0, NULL, {.label = {"SHARE NAME", -1}}}, {UI_SPACER}, {UI_STRING, 19, NULL, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Share", -1}}}, {UI_SPACER}, {UI_STRING, 19, NULL, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"User", -1}}}, {UI_SPACER}, {UI_STRING, 20, NULL,  {.stringvalue = {"GUEST", "GUEST"}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"Password", -1}}}, {UI_SPACER}, {UI_PASSWORD, 21, "Leave empty for GUEST auth.",  {.stringvalue = {"", ""}}}, {UI_BREAK},
 	
 	//  ---- Ok ----
 	{UI_SPLITTER},

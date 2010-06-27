@@ -171,15 +171,18 @@ static int _smbauth_thread(void *args)
 
 	DPRINTF("smbauth thread woken up !!!\n");
 
-	/* generate the LM and NTLM hash then fill Password buffer with both hashes */
-	if (strlen(server_specs->Password) > 0)
-		GenerateLMHashes(server_specs->Password, server_specs->PasswordType, server_specs->EncryptionKey, &server_specs->PasswordLen, server_specs->Password);
+	server_specs_t *ss = (server_specs_t *)server_specs;
+	if (ss->HashedFlag == 0) {
+		/* generate the LM and NTLM hash then fill Password buffer with both hashes */
+		if (strlen(ss->Password) > 0)
+			GenerateLMHashes(ss->Password, ss->PasswordType, ss->EncryptionKey, &ss->PasswordLen, ss->Password);
+	}
 
 	/* used to notify cdvdman that password are now hashed */
-	server_specs->HashedFlag = 1;
+	ss->HashedFlag = 1;
 
 	/* we send back server_specs_t to IOP */
-	dmat.dest = (void *)server_specs->IOPaddr;
+	dmat.dest = (void *)ss->IOPaddr;
 	dmat.size = sizeof(server_specs_t);
 	dmat.src = (void *)server_specs;
 	dmat.attr = SIF_DMA_INT_O;

@@ -14,7 +14,6 @@ theme_t* gTheme;
 
 static int screenWidth;
 static int screenHeight;
-static int loadedTextures = -1;
 static int guiThemeID = 0;
 
 static int nThemes = 0;
@@ -23,10 +22,17 @@ static char **guiThemesNames = NULL;
 
 
 GSTEXTURE* thmGetTexture(unsigned int id) {
-	if (id > loadedTextures)
+	if (id > TEXTURES_COUNT)
 		return NULL;
-	else
-		return &gTheme->textures[id];
+	else {
+		// see if the texture is valid
+		GSTEXTURE* txt = &gTheme->textures[id];
+		
+		if (txt->Mem)
+			return txt;
+		else
+			return NULL;
+	}
 }
 
 static void thmFree(theme_t* theme) {
@@ -78,7 +84,6 @@ static int thmLoadResource(int texId, char* themePath, short psm) {
 	if ((success < 0) && gTheme->useDefault)
 		texPngLoad(texture, NULL, texId, psm);  // we don't mind the result of "default"
 
-	loadedTextures = texId;
 	return success;
 }
 
@@ -247,13 +252,20 @@ static void thmLoad(char* themePath) {
 		rmResetShiftRatio();
 	else
 		rmSetShiftRatio((float) screenHeight / newT->usedHeight);
-	loadedTextures = -1;
+	
 	gTheme = newT;
 	thmFree(curT);
+	
+	int i;
+	
+	// default all to not loaded...
+	for (i = 0; i <= TEXTURES_COUNT; ++i) {
+		gTheme->textures[i].Mem = NULL;
+	}
 
 	// First start with busy icon
 	char* path = themePath;
-	int customBusy = 0, i;
+	int customBusy = 0;
 	for (i = LOAD0_ICON; i <= LOAD7_ICON; i++) {
 		if (thmLoadResource(i, path, GS_PSM_CT32) >= 0)
 			customBusy = 1;
@@ -278,6 +290,9 @@ static void thmLoad(char* themePath) {
 	thmLoadResource(COVER_OVERLAY, themePath, GS_PSM_CT32);
 	thmLoadResource(BACKGROUND_PICTURE, themePath, GS_PSM_CT24);
 
+	// LOGO is hardcoded
+	thmLoadResource(LOGO_PICTURE, NULL, GS_PSM_CT24);
+	
 	// TODO: loadFont();
 }
 

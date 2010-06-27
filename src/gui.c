@@ -49,6 +49,9 @@ static GSTEXTURE gBackgroundTex;
 static int screenWidth;
 static float wideScreenScale;
 
+// forward decl.
+static void guiShow();
+
 #ifdef __DEBUG
 
 #include <timer.h>
@@ -202,6 +205,9 @@ void guiInit(void) {
 		
 		fadetbl[i] = t*t*t*(t*(t*6.0-15.0)+10.0); 
 	}
+	
+	// Render single screen
+	guiShow();
 }
 
 void guiEnd() {
@@ -329,6 +335,8 @@ static void guiShowIPConfig() {
 
 	diaSetInt(diaIPConfig, 18, gPCPort);
 	diaSetString(diaIPConfig, 19, gPCShareName);
+	diaSetString(diaIPConfig, 20, gPCUserName);
+	diaSetString(diaIPConfig, 21, gPCPassword);
 
 	// show dialog
 	if (diaExecuteDialog(diaIPConfig)) {
@@ -342,6 +350,8 @@ static void guiShowIPConfig() {
 
 		diaGetInt(diaIPConfig, 18, &gPCPort);
 		diaGetString(diaIPConfig, 19, gPCShareName);
+		diaGetString(diaIPConfig, 20, gPCUserName);
+		diaGetString(diaIPConfig, 21, gPCPassword);
 		gIPConfigChanged = 1;
 
 		applyConfig(-1, -1);
@@ -538,13 +548,24 @@ static int wfadeout = 0x080;
 static void guiRenderGreeting() {
 	rmUnclip();
 	
-	u64 mycolor = GS_SETREG_RGBA(0x20, 0x20, 0x20, wfadeout);
 	
-	char introtxt[255];
+	u64 mycolor = GS_SETREG_RGBA(0x60, 0x60, 0x60, wfadeout);
+	
+	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, mycolor);
-	
+	/*
+	char introtxt[255];
 	snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
 	fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
+	*/
+	
+	GSTEXTURE* logo = thmGetTexture(LOGO_PICTURE);
+	
+	if (logo) {
+		mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, bfadeout);
+		rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, mycolor);
+	}
+	
 	return;
 }
 
@@ -1114,7 +1135,7 @@ void guiMsgBox(const char* text) {
 		if(getKeyOn(KEY_CIRCLE)) 
 			terminate = 1;
 		
-		guiShow(0);
+		guiShow();
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
@@ -1136,7 +1157,7 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 		
 		readPads();
 		
-		guiShow(0);
+		guiShow();
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 		
@@ -1152,7 +1173,7 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 void guiRenderTextScreen(const unsigned char* message) {
 	guiStartFrame();
 	
-	guiShow(0);
+	guiShow();
 	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 	

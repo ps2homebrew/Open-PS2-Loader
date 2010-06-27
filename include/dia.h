@@ -21,6 +21,8 @@ typedef enum {
 	UI_INT,
 	// draw string input box
 	UI_STRING,
+	// draw password string input box
+	UI_PASSWORD,
 	// bool value (On/Off). (Uses int value for storage)
 	UI_BOOL,
 	// enumeration (multiple strings)

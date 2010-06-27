@@ -40,7 +40,7 @@ typedef struct {			// size = 156
 	u8	EncryptionKey[8];
 	int	SecurityMode;		// 0 = share level, 1 = user level
 	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
-	char	Username[32];
+	char	Username[36];
 	u8	Password[48];		// either PlainText, either hashed
 	int	PasswordLen;
 	int	HashedFlag;

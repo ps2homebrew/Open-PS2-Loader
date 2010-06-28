@@ -67,8 +67,6 @@ int debugSetActive(void) {
 	if (ret < 0)
 		return -7;
 
-	LOG("OPL UDPtty debug enabled!\n");
-
 	return 0;
 }
 

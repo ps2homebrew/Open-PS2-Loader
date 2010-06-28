@@ -17,6 +17,8 @@
 #include <sifrpc.h>
 #include <string.h>
 #include <sbv_patches.h>
+#include <smem.h>
+#include <smod.h>
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
@@ -88,6 +90,7 @@ u32 g_compat_mask;
 #define COMPAT_MODE_5 		0x10
 #define COMPAT_MODE_6 		0x20
 #define COMPAT_MODE_7 		0x40
+#define COMPAT_MODE_8 		0x80
 
 char GameID[16];
 int GameMode;
@@ -112,6 +115,8 @@ void GetIrxKernelRAM(void);
 int  LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv);
 int  LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args);
 int  LoadElf(const char *path, t_ExecData *data);
+void ChangeModuleName(const char *name, const char *newname);
+void ListModules(void);
 
 /* iopmgr.c */
 int  New_Reset_Iop(const char *arg, int flag);

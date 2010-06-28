@@ -22,7 +22,7 @@ static char **guiThemesNames = NULL;
 
 
 GSTEXTURE* thmGetTexture(unsigned int id) {
-	if (id > TEXTURES_COUNT)
+	if (id >= TEXTURES_COUNT)
 		return NULL;
 	else {
 		// see if the texture is valid
@@ -259,7 +259,7 @@ static void thmLoad(char* themePath) {
 	int i;
 	
 	// default all to not loaded...
-	for (i = 0; i <= TEXTURES_COUNT; ++i) {
+	for (i = 0; i < TEXTURES_COUNT; i++) {
 		gTheme->textures[i].Mem = NULL;
 	}
 

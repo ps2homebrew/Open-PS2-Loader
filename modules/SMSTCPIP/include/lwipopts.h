@@ -156,11 +156,11 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_SNDLOWAT		(TCP_SND_BUF/2)
 
 /* ----- TCPIP thread priority ----- */
-#ifdef INGAME_DRIVER
-#define TCPIP_THREAD_PRIO	16
-#else
+//#ifdef INGAME_DRIVER
+//#define TCPIP_THREAD_PRIO	16
+//#else
 #define TCPIP_THREAD_PRIO	1
-#endif
+//#endif
 
 /* ---------- ARP options ---------- */
 #ifdef INGAME_DRIVER

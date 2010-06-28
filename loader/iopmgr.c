@@ -38,24 +38,6 @@ extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
 
 /*----------------------------------------------------------------------------------------*/
-/*
-void list_modules(void)
-{
-	int c = 0;
-	smod_mod_info_t info;
-	u8 name[60];
-
-	if (!smod_get_next_mod(0, &info))
-		return;
-	scr_printf("\n\t List of modules currently loaded in the system:\n\n");
-	do {
-		smem_read(info.name, name, sizeof name);
-		if (!(c & 1)) scr_printf(" ");
-		scr_printf("   \t%-21.21s  %2d  %3x%c", name, info.id, info.version, (++c & 1) ? ' ' : '\n');
-	} while (smod_get_next_mod(&info, &info) != 0);
-}
-*/
-/*----------------------------------------------------------------------------------------*/
 /* Reset IOP processor. This fonction hook reset iop if an update sequence is requested.  */
 /*----------------------------------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int flag){
@@ -324,7 +306,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		LoadIRXfromKernel(udptty_irx, size_udptty_irx, 0, NULL);
 		LoadIRXfromKernel(ioptrap_irx, size_ioptrap_irx, 0, NULL);
 #endif
-	}	
+	}
 
 	FlushCache(0);	
 
@@ -332,6 +314,9 @@ int New_Reset_Iop(const char *arg, int flag){
 	SifExitRpc();
 	SifExitIopHeap();
 	LoadFileExit();
+
+	if (g_compat_mask & COMPAT_MODE_8)
+		ChangeModuleName("dev9", "cdvdman");
 
 	DPRINTF("New_Reset_Iop complete!\n");
 	// we have 4 SifSetReg calls to skip in ELF's SifResetIop, not when we use it ourselves

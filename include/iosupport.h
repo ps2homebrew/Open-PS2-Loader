@@ -13,6 +13,7 @@
 #define COMPAT_MODE_5 		0x10
 #define COMPAT_MODE_6 		0x20
 #define COMPAT_MODE_7 		0x40
+#define COMPAT_MODE_8 		0x80
 
 #define MDMA_MODE		0x20
 #define UDMA_MODE		0x40

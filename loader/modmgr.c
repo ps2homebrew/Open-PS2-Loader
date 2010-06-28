@@ -108,7 +108,7 @@ int LoadModule(const char *path, int arg_len, const char *args)
 
 
 /*----------------------------------------------------------------------------------------*/
-/* Load an irx module from path without waiting.                                               */
+/* Load an irx module from path without waiting.                                          */
 /*----------------------------------------------------------------------------------------*/
 int LoadModuleAsync(const char *path, int arg_len, const char *args)
 {
@@ -190,7 +190,7 @@ int LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv)
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Load an irx module from a EE buffer.                                                          */
+/* Load an irx module from a EE buffer.                                                   */
 /*----------------------------------------------------------------------------------------*/
 int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args)
 {
@@ -242,7 +242,7 @@ int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *a
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Load an elf file from EE buffer.                                                          */
+/* Load an elf file from EE buffer.                                                       */
 /*----------------------------------------------------------------------------------------*/
 int LoadElf(const char *path, t_ExecData *data)
 {
@@ -271,3 +271,51 @@ int LoadElf(const char *path, t_ExecData *data)
 
 	return 0;
 }
+
+/*----------------------------------------------------------------------------------------*/
+/* Find and change a module name.                                                         */
+/*----------------------------------------------------------------------------------------*/
+void ChangeModuleName(const char *name, const char *newname)
+{
+	u8 search_name[60];
+	smod_mod_info_t info;
+
+	if (!smod_get_next_mod(0, &info))
+		return;
+
+	int len = strlen(name);
+
+	do {
+		smem_read(info.name, search_name, sizeof(search_name));
+
+		if (!memcmp(search_name, name, len)) {
+			strncpy(search_name, newname, sizeof(search_name));
+			smem_write(info.name, search_name, strlen(search_name));
+			break;
+		}
+	} while (smod_get_next_mod(&info, &info));
+
+	FlushCache(0);
+}
+
+/*----------------------------------------------------------------------------------------*/
+/* List modules currently loaded in the system.                                           */
+/*----------------------------------------------------------------------------------------*/
+#ifdef __EESIO_DEBUG
+void ListModules(void)
+{
+	int c = 0;
+	smod_mod_info_t info;
+	u8 name[60];
+
+	if (!smod_get_next_mod(0, &info))
+		return;
+	DPRINTF("List of modules currently loaded in the system:\n");
+	do {
+		smem_read(info.name, name, sizeof name);
+		if (!(c & 1)) DPRINTF(" ");
+		DPRINTF("   %-21.21s  %2d  %3x%c", name, info.id, info.version, (++c & 1) ? ' ' : '\n');
+	} while (smod_get_next_mod(&info, &info));
+}
+#endif
+

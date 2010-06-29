@@ -6,7 +6,7 @@
 
 #include "loader.h"
 
-#define MAX_PATCHES		63
+#define ALL_MODE		-1
 
 typedef struct {
 	u32 addr;
@@ -34,7 +34,7 @@ static patchlist_t patch_list[15] = {
 	{ "SLUS_212.00", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
 	{ "SLES_538.19", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker PAL - skip failing case on binding a RPC server
 	{ "SLPS_254.08", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC J - skip failing case on binding a RPC server
-	{ "SLUS_202.30", ETH_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
+	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ NULL,                 0, { 0x00000000, 0x00000000, 0x00000000 }}  // terminater
 };
 
@@ -118,7 +118,7 @@ void apply_game_patches(void)
 
 	// if there are patches matching game name/mode then fill the patch table
 	while (p->game) {
-		if ((!strcmp(GameID, p->game)) && (GameMode == p->mode)) {
+		if ((!strcmp(GameID, p->game)) && ((p->mode == ALL_MODE) || (GameMode == p->mode))) {
 
 			if (p->patch.addr == 0xdeadbee0)
 				NIS_generic_patches(); 	// Nippon Ichi Software games generic patch

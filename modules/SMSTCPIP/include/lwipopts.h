@@ -165,11 +165,10 @@ a lot of data that needs to be copied, this should be set high. */
 /* ---------- ARP options ---------- */
 #ifdef INGAME_DRIVER
 #define ARP_TABLE_SIZE 1
-#define ARP_QUEUEING 0
 #else
 #define ARP_TABLE_SIZE 10
-#define ARP_QUEUEING 1
 #endif
+#define ARP_QUEUEING 1
 
 /* ---------- IP options ---------- */
 /* Define IP_FORWARD to 1 if you wish to have the ability to forward

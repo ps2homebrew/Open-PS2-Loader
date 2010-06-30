@@ -140,7 +140,7 @@ int New_Reset_Iop(const char *arg, int flag){
 
 	if (eeloadcnf_reset) {
 		ioprp_img.data_in = (void *)g_buf;
-		Build_EELOADCNF_Img(&ioprp_img);
+		Build_EELOADCNF_Img(&ioprp_img, XLoadfileCheck());
 	}
 	else {
 		DPRINTF("Reading IOPRP: '%s'\n", ioprp_path);

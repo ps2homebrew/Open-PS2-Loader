@@ -390,7 +390,7 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img)
 	// Fill IOPBTCONF
 	char *iopbtconf_str0 = "@800\nSYSMEM\nLOADCORE\nEXCEPMAN\nINTRMANP\nINTRMANI\nSSBUSC\nDMACMAN\nTIMEMANP\nTIMEMANI\n";
 	char *iopbtconf_str1 = "SYSCLIB\nHEAPLIB\nEECONF\nTHREADMAN\nVBLANK\nIOMAN\nMODLOAD\nROMDRV\nSTDIO\nSIFMAN\n";
-	char *iopbtconf_str2 = "IGREETING\nSIFCMD\nREBOOT\nLOADFILE\nCDVDMAN\nCDVDFSV\nSIFINIT\nFILEIO\nSECRMAN\nEESYNC\n";
+	char *iopbtconf_str2 = "IGREETING\nSIFCMD\nREBOOT\nXLOADFILE\nCDVDMAN\nCDVDFSV\nSIFINIT\nFILEIO\nSECRMAN\nEESYNC\n";
 
 	memcpy(&ptr[0], iopbtconf_str0, strlen(iopbtconf_str0));
 	memcpy(&ptr[strlen(iopbtconf_str0)], iopbtconf_str1, strlen(iopbtconf_str1));

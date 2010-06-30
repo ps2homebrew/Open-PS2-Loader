@@ -13,6 +13,9 @@
 #include <ee_regs.h>
 #include <ps2_reg_defs.h>
 
+extern void *cddev_irx;
+extern int size_cddev_irx;
+
 #define MAX_G_ARGS 15
 static int g_argc;
 static char *g_argv[1 + MAX_ARGS];
@@ -279,7 +282,19 @@ static void t_loadElf(void)
 	SifInitRpc(0);
 	LoadFileInit();
 
+	DPRINTF("t_loadElf: Loading cddev IOP module...\n");
+	LoadIRXfromKernel(cddev_irx, size_cddev_irx, 0, NULL);
+
 	strncpy(g_ElfPath, g_argv[0], 1024);	
+	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
+
+	// replacing cdrom in elf path by cddev
+	if (strstr(g_argv[0], "cdrom")) {
+		u8 *ptr = (u8 *)g_argv[0];
+		strcpy(g_ElfPath, "cddev");
+		strcat(g_ElfPath, &ptr[5]);		
+	}
+
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
 
 	DPRINTF("t_loadElf: System Restart...\n");
@@ -320,6 +335,12 @@ static void t_loadElf(void)
 		SifExitIopHeap();
 		LoadFileExit();
 		SifExitRpc();
+
+		// replacing cddev in elf path by cdrom
+		if (strstr(g_ElfPath, "cddev"))
+			memcpy(g_ElfPath, "cdrom", 5);
+
+		DPRINTF("t_loadElf: real elf path = '%s'\n", g_ElfPath);
 
 		DPRINTF("t_loadElf: trying to apply game patches...\n");
 		// applying needed game patches if any

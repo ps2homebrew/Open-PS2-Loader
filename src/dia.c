@@ -44,7 +44,7 @@ int diaShowKeyb(char* text, size_t maxLen) {
 				   'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
 				   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '\'',
 				   'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?'};
-				   
+
 	char keyb2[40]={'!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
 				   'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
 				   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', '"',
@@ -55,7 +55,7 @@ int diaShowKeyb(char* text, size_t maxLen) {
 				   'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', ';', ':',
 				   'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'œ', '`', '¡',
 				   'ß', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', ',', '.', '¿'};
-				   
+
 	char keyb4[40]={'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', '<', '>',
 				   'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', '=', '+',
 				   'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Œ', '~', '"',
@@ -79,7 +79,7 @@ int diaShowKeyb(char* text, size_t maxLen) {
 		readPads();
 		
 		rmStartFrame();
-	        gTheme->drawBackground();
+		gTheme->drawAltBackground();
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
@@ -231,7 +231,7 @@ int diaShowKeyb(char* text, size_t maxLen) {
 static int colPadSettings[16];
 
 
-int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
+static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 	int selc = 0;
 	int ret = 0;
 	unsigned char col[3];
@@ -248,7 +248,7 @@ int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		
 		rmStartFrame();
 	
-		gTheme->drawBackground();
+		gTheme->drawAltBackground();
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 		
@@ -490,10 +490,13 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 }
 
 /// renders whole ui screen (for given dialog setup)
-static void diaRenderUI(struct UIItem *ui, struct UIItem *cur, int haveFocus) {
+static void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus) {
 	rmStartFrame();
 	
-	gTheme->drawBackground();
+	if (inMenu)
+		gTheme->drawAltBackground();
+	else
+		gTheme->drawBackground();
 
 	// TODO: Sanitize these values
 	int x0 = 20;
@@ -738,7 +741,7 @@ static void diaRestoreScrollSpeed(void) {
 	padRestoreSettings(diaPadSettings);
 }
 
-int diaExecuteDialog(struct UIItem *ui) {
+int diaExecuteDialog(struct UIItem *ui, short inMenu) {
 	rmGetScreenExtents(&screenWidth, &screenHeight);
 	
 	struct UIItem *cur = diaGetFirstControl(ui);
@@ -758,7 +761,7 @@ int diaExecuteDialog(struct UIItem *ui) {
 	// okay, we have the first selectable item
 	// we can proceed with rendering etc. etc.
 	while (1) {
-		diaRenderUI(ui, cur, haveFocus);
+		diaRenderUI(ui, inMenu, cur, haveFocus);
 		
 		readPads();
 		

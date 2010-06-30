@@ -147,6 +147,8 @@ static void usbSetGameCompatibility(int id, int compatMode, int dmaMode, short s
 }
 
 static void usbLaunchGame(int id) {
+	shutdown(NO_EXCEPTION);
+
 	int i, compatmask;
 	char isoname[32];
 	base_game_info_t* game = &usbGames[id];

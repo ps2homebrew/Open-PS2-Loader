@@ -183,6 +183,8 @@ static void ethLaunchGame(int id) {
 	if (gNetworkStartup != 0)
 		return;
 
+	shutdown(NO_EXCEPTION);
+
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
 	char isoname[32];

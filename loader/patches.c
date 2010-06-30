@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[16] = {
+static patchlist_t patch_list[22] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -34,8 +34,13 @@ static patchlist_t patch_list[16] = {
 	{ "SLUS_212.00", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
 	{ "SLES_538.19", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker PAL - skip failing case on binding a RPC server
 	{ "SLPS_254.08", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC J - skip failing case on binding a RPC server
-	{ "SLUS_210.05", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac514 }}, // Kingdom Hearts 2 NTSC U - Gummi mission freezing fix (check addr is where to patch,
-									    // val is the amount of delay cycles)
+	{ "SLUS_210.05", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac514 }}, // Kingdom Hearts 2 US - [Gummi mission freezing fix (check addr is where to patch,
+	{ "SLES_541.14", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 UK - val is the amount of delay cycles)]
+	{ "SLES_542.32", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 FR
+	{ "SLES_542.33", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 DE
+	{ "SLES_542.34", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 IT
+	{ "SLES_542.35", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 ES
+	{ "SLPM_662.33", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac44c }}, // Kingdom Hearts 2 JPN
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ NULL,                 0, { 0x00000000, 0x00000000, 0x00000000 }}  // terminater
 };

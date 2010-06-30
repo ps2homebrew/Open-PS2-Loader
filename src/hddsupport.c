@@ -170,6 +170,8 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode, short s
 }
 
 static void hddLaunchGame(int id) {
+	shutdown(NO_EXCEPTION);
+
 	int i, size_irx = 0;
 	void** irx = NULL;
 	char filename[32];
@@ -240,11 +242,13 @@ static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
-static void hddCleanUp(void) {
+static void hddCleanUp(int exception) {
 	LOG("hddCleanUp()\n");
 
-	if (gHddStartup == 0)
-		fileXioUmount(hddPrefix);
+	if (gHddStartup == 0) {
+		if (exception & UNMOUNT_EXCEPTION == 0)
+			fileXioUmount(hddPrefix);
+	}
 }
 
 static item_list_t hddGameList = {

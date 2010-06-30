@@ -82,7 +82,7 @@ void clearIOModuleT(opl_io_module_t *mod) {
 }
 
 // forward decl
-static void moduleCleanup(opl_io_module_t* mod);
+static void moduleCleanup(opl_io_module_t* mod, int exception);
 
 // frame counter
 static int gFrameCounter;
@@ -106,10 +106,8 @@ static void itemExec(struct menu_item_t *self, int id) {
 
 	if (support) {
 		if (support->enabled) {
-			if (id >= 0) {
-				shutdown();
+			if (id >= 0)
 				support->itemLaunch(id);
-			}
 		}
 		else { 
 			support->itemInit();
@@ -196,11 +194,11 @@ static void initAllSupport(int force_reinit) {
 		initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
 }
 
-static void deinitAllSupport() {
-	moduleCleanup(&list_support[USB_MODE]);
-	moduleCleanup(&list_support[ETH_MODE]);
-	moduleCleanup(&list_support[HDD_MODE]);
-	moduleCleanup(&list_support[APP_MODE]);
+static void deinitAllSupport(int exception) {
+	moduleCleanup(&list_support[USB_MODE], exception);
+	moduleCleanup(&list_support[ETH_MODE], exception);
+	moduleCleanup(&list_support[HDD_MODE], exception);
+	moduleCleanup(&list_support[APP_MODE], exception);
 }
 
 #define MENU_ID_START_HDL 100
@@ -499,7 +497,7 @@ void loadHdldSvr(void) {
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
 
-	deinitAllSupport();
+	deinitAllSupport(NO_EXCEPTION);
 
 	unloadPads();
 
@@ -626,7 +624,7 @@ static void reset(void) {
 	mcInit(MC_TYPE_MC);
 }
 
-static void moduleCleanup(opl_io_module_t* mod) {
+static void moduleCleanup(opl_io_module_t* mod, int exception) {
 	if (!mod)
 		return;
 
@@ -634,10 +632,10 @@ static void moduleCleanup(opl_io_module_t* mod) {
 		return;
 
 	if (mod->support->itemCleanUp)
-		mod->support->itemCleanUp();
+		mod->support->itemCleanUp(exception);
 }
 
-void shutdown() {
+void shutdown(int exception) {
 	unloadPads();
 	ioEnd();
 	guiEnd();
@@ -646,7 +644,7 @@ void shutdown() {
 	rmEnd();
 	// clearConfig(gConfig);
 
-	deinitAllSupport();
+	deinitAllSupport(exception);
 }
 
 

@@ -83,7 +83,8 @@ typedef struct {
 } gui_screen_handler_t;
 
 // forward decls.
-static void guiDrawBackground(void);
+static void guiMainBackground(void);
+static void guiMenuBackground(void);
 
 // Main screen rendering/input
 static void guiMainHandleInput(void);
@@ -97,13 +98,13 @@ static void guiMenuRender(void);
 static gui_screen_handler_t mainScreenHandler = {
 	&guiMainHandleInput,
 	&guiMainRender,
-	&guiDrawBackground
+	&guiMainBackground
 };
 
 static gui_screen_handler_t menuScreenHandler = {
 	&guiMenuHandleInput,
 	&guiMenuRender,
-	&guiDrawBGPlasma
+	&guiMenuBackground
 };
 
 static gui_screen_handler_t *screenHandler = &menuScreenHandler;
@@ -297,7 +298,7 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 
-	int ret = diaExecuteDialog(diaUIConfig);
+	int ret = diaExecuteDialog(diaUIConfig, 1);
 	if (ret) {
 		int themeID = -1, langID = -1;
 		diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
@@ -339,7 +340,7 @@ static void guiShowIPConfig() {
 	diaSetString(diaIPConfig, 21, gPCPassword);
 
 	// show dialog
-	if (diaExecuteDialog(diaIPConfig)) {
+	if (diaExecuteDialog(diaIPConfig, 1)) {
 		// Ok pressed, store values
 		for (i = 0; i < 4; ++i) {
 			diaGetInt(diaIPConfig, 2 + i, &ps2_ip[i]);
@@ -387,7 +388,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 
 	// show dialog
 	do {
-		result = diaExecuteDialog(diaCompatConfig);
+		result = diaExecuteDialog(diaCompatConfig, 0);
 
 		if (result == COMPAT_LOADFROMDISC) {
 			char hexDiscID[15];
@@ -780,9 +781,14 @@ void guiDrawBGPlasma() {
 	rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
 }
 
-static void guiDrawBackground(void) {
+static void guiMainBackground(void) {
 	if (gInitComplete)
 		gTheme->drawBackground();
+}
+
+static void guiMenuBackground(void) {
+	if (gInitComplete)
+		gTheme->drawAltBackground();
 }
 
 static void guiDrawOverlays() {

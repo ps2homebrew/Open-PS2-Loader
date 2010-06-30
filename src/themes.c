@@ -197,6 +197,7 @@ static void thmLoad(char* themePath) {
 	}
 
 	newT->drawBackground = &guiDrawBGPicture;
+	newT->drawAltBackground = &guiDrawBGPlasma;
 	if (getConfigInt(&themeConfig, "background_mode", &intValue)) {
 		if (intValue == BG_MODE_COLOR)
 			newT->drawBackground = &guiDrawBGColor;
@@ -279,11 +280,11 @@ static void thmLoad(char* themePath) {
 	gTheme->busyIconsCount = i;
 
 	// Customizable icons
-	for (i = EXIT_ICON; i <= DISC_ICON; i++)
+	for (i = EXIT_ICON; i <= DOWN_ICON; i++)
 		thmLoadResource(i, themePath, GS_PSM_CT32);
 
 	// Not  customizable icons
-	for (i = CROSS_ICON; i <= R2_ICON; i++)
+	for (i = L1_ICON; i <= START_ICON; i++)
 		thmLoadResource(i, NULL, GS_PSM_CT32);
 
 	// Finish with background

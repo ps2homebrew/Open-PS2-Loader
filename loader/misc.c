@@ -353,7 +353,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 /*----------------------------------------------------------------------------------------*/
 /* Build an EELOAD Config file				                                  */
 /*----------------------------------------------------------------------------------------*/
-int Build_EELOADCNF_Img(ioprp_t *ioprp_img)
+int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile)
 {
 	int romdir_size, extinfo_size, iopbtconf_size, cdvdman_size, cdvdfsv_size;
 	romdir_t *romdir_in;
@@ -390,7 +390,9 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img)
 	// Fill IOPBTCONF
 	char *iopbtconf_str0 = "@800\nSYSMEM\nLOADCORE\nEXCEPMAN\nINTRMANP\nINTRMANI\nSSBUSC\nDMACMAN\nTIMEMANP\nTIMEMANI\n";
 	char *iopbtconf_str1 = "SYSCLIB\nHEAPLIB\nEECONF\nTHREADMAN\nVBLANK\nIOMAN\nMODLOAD\nROMDRV\nSTDIO\nSIFMAN\n";
-	char *iopbtconf_str2 = "IGREETING\nSIFCMD\nREBOOT\nXLOADFILE\nCDVDMAN\nCDVDFSV\nSIFINIT\nFILEIO\nSECRMAN\nEESYNC\n";
+	char *iopbtconf_str2 = "IGREETING\nSIFCMD\nREBOOT\nLOADFILE\nCDVDMAN\nCDVDFSV\nSIFINIT\nFILEIO\nSECRMAN\nEESYNC\n";
+	if (have_xloadfile)
+		iopbtconf_str2 = "IGREETING\nSIFCMD\nREBOOT\nXLOADFILE\nCDVDMAN\nCDVDFSV\nSIFINIT\nFILEIO\nSECRMAN\nEESYNC\n";
 
 	memcpy(&ptr[0], iopbtconf_str0, strlen(iopbtconf_str0));
 	memcpy(&ptr[strlen(iopbtconf_str0)], iopbtconf_str1, strlen(iopbtconf_str1));
@@ -440,6 +442,22 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img)
 	// Fill mini image size
 	ioprp_img->data_out = ioprp_img->data_in;
 	ioprp_img->size_out = ioprp_img->size_in = romdir_size + extinfo_size + iopbtconf_size + cdvdman_size + cdvdfsv_size;
+
+	return 0;
+}
+
+/*----------------------------------------------------------------------------------------*/
+/* XLoadfileCheck                                                                          */
+/*----------------------------------------------------------------------------------------*/
+int XLoadfileCheck(void)
+{
+	register int fd;
+
+	fd = open("rom0:XLOADFILE", O_RDONLY);
+	if (fd >= 0) {
+		close(fd);
+		return 1;
+	}
 
 	return 0;
 }

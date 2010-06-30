@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[15] = {
+static patchlist_t patch_list[16] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -34,6 +34,8 @@ static patchlist_t patch_list[15] = {
 	{ "SLUS_212.00", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
 	{ "SLES_538.19", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker PAL - skip failing case on binding a RPC server
 	{ "SLPS_254.08", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC J - skip failing case on binding a RPC server
+	{ "SLUS_210.05", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac514 }}, // Kingdom Hearts 2 NTSC U - Gummi mission freezing fix (check addr is where to patch,
+									    // val is the amount of delay cycles)
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ NULL,                 0, { 0x00000000, 0x00000000, 0x00000000 }}  // terminater
 };
@@ -88,6 +90,13 @@ static u32 AC9Bpattern_mask[] = {
 	0xffffffff
 };
 
+#define	JAL(addr)	(0x0c000000 | ((addr & 0x03ffffff) >> 2))
+#define	FNADDR(jal)	((jal & 0x03ffffff) << 2)
+
+static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
+static u32 g_delay_cycles;
+
+
 static void NIS_generic_patches(void)
 {
 	u32 *ptr;
@@ -112,6 +121,31 @@ static void AC9B_generic_patches(void)
 	}
 }
 
+static int delayed_cdRead(u32 lsn, u32 nsectors, void *buf, int *mode)
+{
+	register int r;
+	register u32 count;
+
+	r = cdRead(lsn, nsectors, buf, mode);
+	count = g_delay_cycles;
+	while(count--)
+		asm("nop\nnop\nnop\nnop");
+
+	return r;
+}
+
+static void KH2_generic_patches(u32 patch_addr, u32 delay_cycles)
+{
+	// set configureable delay cycles
+	g_delay_cycles = delay_cycles;
+
+	// get original cdRead() pointer
+	cdRead = (void *)FNADDR(_lw(patch_addr));
+
+	// overwrite with a JAL to our delayed_cdRead function
+	_sw(JAL((u32)delayed_cdRead), patch_addr);
+}
+
 void apply_game_patches(void)
 {
 	patchlist_t *p = (patchlist_t *)&patch_list[0];
@@ -124,6 +158,8 @@ void apply_game_patches(void)
 				NIS_generic_patches(); 	// Nippon Ichi Software games generic patch
 			else if (p->patch.addr == 0xdeadbee1)
 				AC9B_generic_patches(); // Armored Core 9 Breaker USB generic patch
+			else if (p->patch.addr == 0xdeadbee2)
+				KH2_generic_patches(p->patch.check, p->patch.val); // KH2 generic patch
 
 			// non-generic patches
 			else if (_lw(p->patch.addr) == p->patch.check)

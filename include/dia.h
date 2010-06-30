@@ -68,7 +68,7 @@ struct UIItem {
 };
 
 /// Dialog display
-int diaExecuteDialog(struct UIItem *ui);
+int diaExecuteDialog(struct UIItem *ui, short inMenu);
 int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
 int diaGetString(struct UIItem* ui, int id, char *value);

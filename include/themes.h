@@ -48,6 +48,7 @@ typedef struct {
 	GSTEXTURE textures[TEXTURES_COUNT];
 
 	void (*drawBackground)();
+	void (*drawAltBackground)();
 } theme_t;
 
 theme_t* gTheme;

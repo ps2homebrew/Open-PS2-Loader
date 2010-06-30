@@ -6,6 +6,9 @@
 #define HDD_MODE	2
 #define APP_MODE	3
 
+#define NO_EXCEPTION		0x00
+#define UNMOUNT_EXCEPTION	0x01
+
 #define COMPAT_MODE_1 		0x01
 #define COMPAT_MODE_2 		0x02
 #define COMPAT_MODE_3 		0x04
@@ -63,7 +66,7 @@ typedef struct
 	
 	int (*itemGetArt)(char* name, GSTEXTURE* resultTex, const char* type, short psm);
 
-	void (*itemCleanUp)(void);
+	void (*itemCleanUp)(int exception);
 	
 	int iconId;
 } item_list_t;

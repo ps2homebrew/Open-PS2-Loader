@@ -83,12 +83,24 @@ static char* appGetItemStartup(int id) {
 
 static void appLaunchItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
-	sysExecElf(cur->val, 0, NULL);
+	int fd = fioOpen(cur->val, O_RDONLY);
+	if (fd >= 0) {
+		fioClose(fd);
+
+		int exception = NO_EXCEPTION;
+		if (strncmp(cur->val, "pfs0:", 5) == 0)
+			exception = UNMOUNT_EXCEPTION;
+
+		shutdown(exception);
+		sysExecElf(cur->val, 0, NULL);
+	}
 }
 
 static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
 	// Looking for the ELF name
 	char* pos = strrchr(name, '/');
+	if (!pos)
+		pos = strrchr(name, ':');
 	if (pos) {
 		// We search on ever devices from fatest to slowest (HDD > ETH > USB)
 		static item_list_t *listSupport = NULL;

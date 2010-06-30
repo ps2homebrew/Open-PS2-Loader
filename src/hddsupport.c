@@ -246,7 +246,7 @@ static void hddCleanUp(int exception) {
 	LOG("hddCleanUp()\n");
 
 	if (gHddStartup == 0) {
-		if (exception & UNMOUNT_EXCEPTION == 0)
+		if ((exception & UNMOUNT_EXCEPTION) == 0)
 			fileXioUmount(hddPrefix);
 	}
 }

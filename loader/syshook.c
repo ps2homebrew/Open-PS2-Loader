@@ -123,7 +123,33 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
 
 	SifCmdResetData *reset_pkt = (SifCmdResetData*)sdd->src;
+
+	// we will use a different stack pointer for IOP reset, for the following reason:
+	// some games are using the top of ScratchPad memory as stack, trigerring a
+	// stack overflow during the 'hooked' IOP reset.
+	// Information provided by crazyc
+
+	// change stack pointer
+	u32 _sp = 0;
+#ifdef LOAD_EECORE_DOWN
+	u32 _new_sp = 0x01700000;
+#else
+	u32 _new_sp = 0x000e7000;
+#endif
+	__asm__(
+		"move %0, $sp\n\t"
+		"move $sp, %1\n\t"		
+		::"r"((u32)_sp), "r"((u32)_new_sp)
+	);
+
+	// does IOP reset
 	New_Reset_Iop(reset_pkt->arg, reset_pkt->flag);
+
+	// restore original stack pointer
+	__asm__(
+		"move $sp, %0\n\t"		
+		::"r"((u32)_sp)
+	);
 
 	return 1;
 }

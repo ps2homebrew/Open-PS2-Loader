@@ -46,7 +46,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	ioprp_t ioprp_img;
 	char    ioprp_path[0x50];
 	int eeloadcnf_reset = 0;		
-	
+
 	DPRINTF("New_Reset_Iop start!\n");
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xFF00FF;
@@ -323,7 +323,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	if (set_reg_disabled)
 		set_reg_hook = 4;
 
- return 1;
+	return 1;
 }
 
 /*----------------------------------------------------------------------------------------*/

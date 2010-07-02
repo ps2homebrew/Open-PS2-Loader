@@ -237,7 +237,7 @@ void start_smbauth_thread(void)
 	thread.stack = thread_stack;
 	thread.stack_size = sizeof(thread_stack);
 	thread.gp_reg = &_gp;
-	thread.initial_priority = 5;
+	thread.initial_priority = 1;
 
 	/* let's create the thread */
 	smbauth_thread_id = CreateThread(&thread);

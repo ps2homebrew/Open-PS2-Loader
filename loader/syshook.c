@@ -118,12 +118,6 @@ static u32 InitializeUserMempattern_mask[] = {
 /*----------------------------------------------------------------------------------------*/
 u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 {
-	// Hook padOpen function to install In Game Reset
-	if( !(g_compat_mask & COMPAT_MODE_6) && padOpen_hooked == 0 )
-		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
-
-	SifCmdResetData *reset_pkt = (SifCmdResetData*)sdd->src;
-
 	// we will use a different stack pointer for IOP reset, for the following reason:
 	// some games are using the top of ScratchPad memory as stack, trigerring a
 	// stack overflow during the 'hooked' IOP reset.
@@ -141,6 +135,12 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 		"move $sp, %1\n\t"		
 		::"r"((u32)_sp), "r"((u32)_new_sp)
 	);
+
+	// Hook padOpen function to install In Game Reset
+	if( !(g_compat_mask & COMPAT_MODE_6) && padOpen_hooked == 0 )
+		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
+
+	SifCmdResetData *reset_pkt = (SifCmdResetData*)sdd->src;
 
 	// does IOP reset
 	New_Reset_Iop(reset_pkt->arg, reset_pkt->flag);

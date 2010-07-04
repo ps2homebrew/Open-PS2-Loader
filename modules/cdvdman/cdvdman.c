@@ -2723,7 +2723,8 @@ retry:
 	return 1;
 }
 
-//-------------------------------------------------------------- 
+//--------------------------------------------------------------
+static u8 cb_args[8] __attribute__((aligned(16)));
 int cdvdman_cb_event(int reason)
 {
 	iop_sys_clock_t sys_clock;	
@@ -2732,7 +2733,8 @@ int cdvdman_cb_event(int reason)
 
 	if (user_cb) {
 		CpuSuspendIntr(&oldstate);
-		ptr = AllocSysMemory(ALLOC_FIRST, 8, NULL);
+		//ptr = AllocSysMemory(ALLOC_FIRST, 8, NULL);
+		ptr = (u8 *)cb_args;
 		CpuResumeIntr(oldstate);
 
 		if (ptr) {
@@ -2763,7 +2765,7 @@ unsigned int event_alarm_cb(void *args)
 	cbfunc = (void *)*((u32 *)&ptr[0]);
 	reason = *((u32 *)&ptr[4]);
 
-	FreeSysMemory(args);
+	//FreeSysMemory(args);
 
 	cbfunc(reason);
 

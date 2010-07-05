@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[25] = {
+static patchlist_t patch_list[26] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -41,6 +41,8 @@ static patchlist_t patch_list[25] = {
 	{ "SLES_542.34", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 IT
 	{ "SLES_542.35", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 ES
 	{ "SLPM_662.33", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac44c }}, // Kingdom Hearts 2 JPN
+	//{ "SLUS_212.87", ALL_MODE, { 0xdeadbee2, 0x000d0000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
+	{ "SLES_537.77", ALL_MODE, { 0xdeadbee2, 0x000d0000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ "SLES_503.25", ALL_MODE, { 0x00132ce4, 0x10000018, 0x0c046744 }}, // Max Payne PAL - skip IOP reset before to exec demo elfs
 	{ "SLUS_212.91", ALL_MODE, { 0x002efb28, 0x00000000, 0x10430009 }}, // Suikoden V NTSC U
@@ -142,7 +144,7 @@ static int delayed_cdRead(u32 lsn, u32 nsectors, void *buf, int *mode)
 	return r;
 }
 
-static void KH2_generic_patches(u32 patch_addr, u32 delay_cycles)
+static void generic_delayed_cdRead_patches(u32 patch_addr, u32 delay_cycles)
 {
 	// set configureable delay cycles
 	g_delay_cycles = delay_cycles;
@@ -167,7 +169,7 @@ void apply_game_patches(void)
 			else if (p->patch.addr == 0xdeadbee1)
 				AC9B_generic_patches(); // Armored Core 9 Breaker USB generic patch
 			else if (p->patch.addr == 0xdeadbee2)
-				KH2_generic_patches(p->patch.check, p->patch.val); // KH2 generic patch
+				generic_delayed_cdRead_patches(p->patch.check, p->patch.val); // slow reads generic patch
 
 			// non-generic patches
 			else if (_lw(p->patch.addr) == p->patch.check)

@@ -404,7 +404,7 @@ void cdvdfsv_startrpcthreads(void)
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)cdvdfsv_rpc1_th;
-	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x1900;
 	thread_param.priority = 0x51;
 
 	thread_id = CreateThread(&thread_param);
@@ -413,7 +413,7 @@ void cdvdfsv_startrpcthreads(void)
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)cdvdfsv_rpc2_th;
-	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x1900;
 	thread_param.priority = 0x51;
 
 	thread_id = CreateThread(&thread_param);
@@ -423,7 +423,7 @@ void cdvdfsv_startrpcthreads(void)
 		thread_param.attr = TH_C;
 		thread_param.option = 0;
 		thread_param.thread = (void *)cdvdfsv_rpc0_th;
-		thread_param.stacksize = 0x2000;
+		thread_param.stacksize = 0x800;
 		thread_param.priority = 0x51;
 
 		thread_id = CreateThread(&thread_param);

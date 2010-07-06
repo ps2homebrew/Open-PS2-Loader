@@ -228,6 +228,23 @@ static void hddLaunchGame(int id) {
 	// patch start_sector
 	memcpy((void*)((u32)irx+i+44), &game->start_sector, 4);
 
+	// patches cdvdfsv
+	void *cdvdfsv_irx;
+	int size_cdvdfsv_irx;
+
+	sysGetCDVDFSV(&cdvdfsv_irx, &size_cdvdfsv_irx);
+	u32 *p = (u32 *)cdvdfsv_irx;
+	for (i = 0; i < (size_cdvdfsv_irx >> 2); i++) {
+		if (*p == 0xC0DEC0DE) {
+			if (game->ops2l_compat_flags & COMPAT_MODE_7)
+				*p = 1;
+			else
+				*p = 0;
+			break;
+		}
+		p++;
+	}
+
 	int compat_flags = game->ops2l_compat_flags;
 	hddFreeHDLGamelist(hddGames);
 

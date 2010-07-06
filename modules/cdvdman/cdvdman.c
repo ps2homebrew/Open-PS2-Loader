@@ -1858,6 +1858,7 @@ int sceCdStPause(void)
 int sceCdStResume(void)
 {
 	cdvdman_stat.err = CDVD_ERR_NO;
+	cdvdman_stat.status = CDVD_STAT_SPIN;
 
 	return 1;
 }
@@ -2684,7 +2685,7 @@ int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size)
 	CDVDreg_SCOMMAND = cmd;
 	dummy = CDVDreg_SCOMMAND;
 
-	while (CDVDreg_SDATAIN & 0xffffff80) {;}
+	while (CDVDreg_SDATAIN & 0x80) {;}
 
 	i = 0;
 	if (!(CDVDreg_SDATAIN & 0x40)) {
@@ -2708,14 +2709,15 @@ int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size)
 //-------------------------------------------------------------- 
 int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size)
 {
-	int r;
+	int r, retryCount = 0;
 
 retry:
 
 	r = cdvdman_writeSCmd(cmd & 0xff, in, in_size, out, out_size);
-	if (!r) {
+	if (r == 0) {
 		DelayThread(2000);
-		goto retry;
+		if (++retryCount <= 2500)
+			goto retry;
 	}
 
 	DelayThread(2000);

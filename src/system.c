@@ -82,6 +82,9 @@ extern int size_smsutils_irx;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
+extern void eeload_patches;
+extern int size_eeload_patches;
+
 #define MAX_MODULES	32
 static void *g_sysLoadedModBuffer[MAX_MODULES];
 
@@ -397,7 +400,6 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 #define IRX_NUM 10
 
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
-	u32 *total_irxsize = (u32 *)0x80030000;
 	void *irxtab = (void *)0x80030010;
 	void *irxptr = (void *)0x80030100;
 	irxptr_t irxptr_tab[IRX_NUM];
@@ -450,10 +452,18 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 
 	memcpy((void *)irxtab, (void *)&irxptr_tab[0], sizeof(irxptr_tab));
 
-	*total_irxsize = irxsize;
-
 	ee_kmode_exit();
 	EIntr();
+
+	memcpy((void *)(0x000bd000), &eeload_patches, size_eeload_patches);
+	FlushCache(0);
+	FlushCache(2);
+	void (*EELOAD_patch1)()=(void *)(0x000bd138);
+	void (*EELOAD_patch2)()=(void *)(0x000bd000);
+	EELOAD_patch1();
+	FlushCache(0);
+	FlushCache(2);
+	EELOAD_patch2();
 }
 
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int compatflags, int alt_ee_core) {

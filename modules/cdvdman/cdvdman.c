@@ -1653,7 +1653,7 @@ int sceCdStStart(u32 lsn, cd_read_mode_t *mode)
 		cdvdman_stat.err = CDVD_ERR_NO;
 		cdvdman_stat.Stlsn = lsn;
 		cdvdman_stat.Ststat = 0;
-		cdvdman_stat.status = CDVD_STAT_SPIN;
+		cdvdman_stat.status = CDVD_STAT_PAUSE;
 	}
 
 	return 1;
@@ -1858,7 +1858,7 @@ int sceCdStPause(void)
 int sceCdStResume(void)
 {
 	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.status = CDVD_STAT_SPIN;
+	cdvdman_stat.status = CDVD_STAT_PAUSE;
 
 	return 1;
 }

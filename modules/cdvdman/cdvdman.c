@@ -1269,8 +1269,10 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 #else
 	cdvdman_stat.status = CDVD_STAT_READ;
 	if ((QueryIntrContext()) || (g_gamesetting_alt_read == 0)) {
-		if (sync_flag == 1)
+		if (sync_flag == 1) {
+			DPRINTF("sceCdRead: exiting (sync_flag)...\n");
 			return 0;
+		}
 
 		sync_flag = 1;
 		cdvdman_stat.cdread_lba = lsn;
@@ -1388,7 +1390,7 @@ int sceCdGetDiskType(void)
 //-------------------------------------------------------------------------
 int sceCdDiskReady(int mode)
 {
-	//DPRINTF("sceCdDiskReady %d\n", mode);
+	DPRINTF("sceCdDiskReady %d\n", mode);
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 	if (mode == 0) {
@@ -1522,6 +1524,8 @@ int *sceCdCallback(void *func)
 	int oldstate;
 	void *old_cb;
 
+	DPRINTF("sceCdCallback %08x\n", (int)func);
+
 	old_cb = user_cb;
 
 	CpuSuspendIntr(&oldstate);
@@ -1551,6 +1555,8 @@ int sceCdPause(void)
 //-------------------------------------------------------------------------
 int sceCdBreak(void)
 {
+	DPRINTF("sceCdBreak\n");
+
 	cdvdman_stat.err = CDVD_ERR_NO;
 	cdvdman_stat.status = CDVD_STAT_PAUSE;
 
@@ -1755,8 +1761,10 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 		SignalSema(cdvdman_searchfilesema);
 	}
 	else {
-		if (r)
+		if (r) {
+			DPRINTF("sceCdRead0 exiting (Intr context)...\n");
 			return 0;
+		}
 
 		WaitSema(cdvdman_cdreadsema);
 
@@ -1913,7 +1921,7 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 //-------------------------------------------------------------------------
 int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer)
 {
-	//DPRINTF("sceCdLayerSearchFile %s\n", name);
+	DPRINTF("sceCdLayerSearchFile %s\n", name);
 
 	return cdvdman_findfile((cd_file_t *)fp, name, layer);
 }
@@ -2745,6 +2753,8 @@ int cdvdman_cb_event(int reason)
 
 			sys_clock.lo = 100;
 			sys_clock.hi = 0;
+
+			DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
 
 			if (QueryIntrContext())
 				iSetAlarm(&sys_clock, event_alarm_cb, ptr);

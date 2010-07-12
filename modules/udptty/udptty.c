@@ -19,7 +19,12 @@
 #include <stdio.h>
 #include <thsemap.h>
 #include <ioman.h>
+#include <intrman.h>
+#include "intrman_add.h"
 #include <sysclib.h>
+#include <sysmem.h>
+#include <thbase.h>
+#include <thevent.h>
 #include <ps2ip.h>
 #include <errno.h>
 
@@ -69,6 +74,120 @@ static iop_device_t tty_device = {
 	&tty_ops
 };
 
+
+/* KPRTTY */
+#ifdef KPRTTY
+#define PRNT_IO_BEGIN		0x200
+#define PRNT_IO_END		0x201
+#define EA_SINGLE		0x00
+#define EA_MULTI		0x02
+
+typedef struct _KprArg {
+	int eflag;
+	int bsize;
+	char *kpbuf;
+	int prpos;
+	int calls;
+} KprArg;
+
+KprArg g_kprarg;
+
+#define KPR_BUFFER_SIZE		0x1000
+char kprbuffer[KPR_BUFFER_SIZE];
+
+
+void PrntFunc(void *common, int chr)
+{
+	KprArg *kpa = (KprArg*)common;
+
+	switch (chr) {
+		case 0:
+			break;
+		case PRNT_IO_BEGIN:
+			kpa->calls ++;
+			break;
+		case PRNT_IO_END:
+			break;
+		case '\n':
+			PrntFunc(common, '\r');
+		default:
+			if (kpa->prpos < kpa->bsize)
+				kpa->kpbuf[kpa->prpos ++] = chr;
+			break;
+	}
+}
+
+void *Kprnt(void *common, const char *format, void *arg)
+{
+	if (format)
+		prnt((print_callback_t)PrntFunc, common, format, arg);
+
+	return 0;
+}
+
+void *Kprintf_Handler(void *common, const char *format, void *arg)
+{
+	KprArg *kpa = (KprArg*)common;
+	void *res;
+
+	res = intrman_14(Kprnt, kpa, (void*)format, arg);
+ 
+	if (QueryIntrContext())
+		iSetEventFlag(kpa->eflag, 1);
+	else
+		SetEventFlag(kpa->eflag, 1);
+
+	return res;
+}
+
+void KPRTTY_Thread(void *args)
+{
+	u32 flags;
+	KprArg *kpa = (KprArg*)args;
+
+	while (1) {
+		WaitEventFlag(kpa->eflag, 1, WEF_AND | WEF_CLEAR, &flags);
+
+		if (kpa->prpos) {
+			if (strncmp(kpa->kpbuf, "WARNING: WaitSema KE_CAN_NOT_WAIT", kpa->prpos-2))
+				write(1, kpa->kpbuf, kpa->prpos);
+			kpa->prpos = 0;
+		}
+	}
+}
+
+void kprtty_init(void)
+{
+	iop_event_t efp;
+	iop_thread_t thp;
+	KprArg *kpa;
+	int thid;
+
+	kpa = &g_kprarg;
+
+	efp.attr = EA_SINGLE;
+	efp.option = 0;
+	efp.bits = 0;
+
+	thp.attr = TH_C;
+	thp.option = 0;
+	thp.thread = (void *)KPRTTY_Thread;
+	thp.stacksize = 0x800;
+	thp.priority = 8;
+
+	kpa->eflag = CreateEventFlag(&efp);
+	kpa->bsize = KPR_BUFFER_SIZE; 
+	kpa->kpbuf = kprbuffer;
+	kpa->prpos = 0;
+	kpa->calls = 0;
+
+	thid = CreateThread(&thp);
+	StartThread(thid, (void *)kpa);
+
+	Kprintf_set((kprintf_handler_func_t *)Kprintf_Handler, (u32)kpa);
+}
+#endif
+
 int _start(int argc, char** argv)
 {
 	// register exports
@@ -88,6 +207,13 @@ int _start(int argc, char** argv)
 
 	open(DEVNAME "00:", 0x1000|O_RDWR);
 	open(DEVNAME "00:", O_WRONLY);
+
+	printf("UDPTTY loaded!\n");
+
+#ifdef KPRTTY
+	kprtty_init();
+	printf("KPRTTY enabled!\n");
+#endif
 
 	return MODULE_RESIDENT_END;
 }
@@ -141,8 +267,8 @@ static int tty_write(iop_file_t *file, void *buf, size_t size)
 
 	WaitSema(tty_sema);
 	res = udp_send(buf, size);
-
 	SignalSema(tty_sema);
+
 	return res;
 }
 

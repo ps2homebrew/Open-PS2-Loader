@@ -18,9 +18,15 @@
 
 /* Please keep these in alphabetical order!  */
 #include "ioman.h"
+#include "intrman.h"
+#include "intrman_add.h"
 #include "loadcore.h"
 #include "ps2ip.h"
 #include "stdio.h"
+#include "sysclib.h"
+#include "sysmem.h"
+#include "thbase.h"
+#include "thevent.h"
 #include "thsemap.h"
 
 #endif /* IOP_IRX_IMPORTS_H */

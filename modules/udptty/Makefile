@@ -1,7 +1,7 @@
 IOP_BIN  = udptty.irx
 
 IOP_INCS +=
-IOP_CFLAGS += -Wall -fno-builtin-printf
+IOP_CFLAGS += -Wall -fno-builtin-printf -DKPRTTY
 IOP_LDFLAGS += -s
 
 IOP_OBJS = udptty.o imports.o exports.o

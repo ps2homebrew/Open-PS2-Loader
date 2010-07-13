@@ -15,7 +15,7 @@
 
 #include "smsutils.h"
 
-#define FAKE_WRITES
+//#define FAKE_WRITES
 
 #define MODNAME "hdldsvr"
 IRX_ID(MODNAME, 1, 1);

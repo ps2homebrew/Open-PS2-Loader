@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[29] = {
+static patchlist_t patch_list[31] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -51,6 +51,10 @@ static patchlist_t patch_list[29] = {
 	{ "SLUS_204.40", ALL_MODE, { 0x0021bb04, 0x00000000, 0x3c0c0041 }}, // Kya: Dark Lineage NTSC U - disable game debug prints
 	//{ "SLES_514.73", ALL_MODE, { 0x0021bb00, 0x03e00008, 0x27bdff90 }}, // Kya: Dark Lineage PAL - disable game debug prints
 	//{ "SLES_514.73", ALL_MODE, { 0x0021bb04, 0x00000000, 0x3c0c0041 }}, // Kya: Dark Lineage PAL - disable game debug prints
+	{ "SLUS_204.96", ALL_MODE, { 0x00104900, 0x03e00008, 0x27bdff90 }}, // V-Rally 3 NTSC U - disable game debug prints
+	{ "SLUS_204.96", ALL_MODE, { 0x00104904, 0x00000000, 0x3c0c002a }}, // V-Rally 3 NTSC U - disable game debug prints
+	//{ "SLES_507.25", ALL_MODE, { 0x00104900, 0x03e00008, 0x27bdff90 }}, // V-Rally 3 PAL - disable game debug prints
+	//{ "SLES_507.25", ALL_MODE, { 0x00104904, 0x00000000, 0x3c0c002a }}, // V-Rally 3 PAL - disable game debug prints
 	//{ "SLUS_212.91", ALL_MODE, { 0x002efb28, 0x00000000, 0x10430009 }}, // Suikoden V NTSC U
 	//{ "SLES_540.87", ALL_MODE, { 0x002f0718, 0x00000000, 0x10430009 }}, // Suikoden V PAL
 	{ NULL,                 0, { 0x00000000, 0x00000000, 0x00000000 }}  // terminater

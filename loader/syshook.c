@@ -372,6 +372,9 @@ static void t_loadElf(void)
 		// applying needed game patches if any
 		apply_game_patches(&g_ElfPath[8]);
 
+		// hook LoadModuleBuffer
+		loadModuleBuffer_patch();
+
 		FlushCache(0);
 		FlushCache(2);
 

@@ -168,5 +168,6 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode);
 
 /* loadmodulehook.c */
 void loadModuleBuffer_patch(void);
+void unloadModule_patch(void);
 
 #endif

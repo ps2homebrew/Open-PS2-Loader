@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[33] = {
+static patchlist_t patch_list[42] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -45,6 +45,15 @@ static patchlist_t patch_list[33] = {
 	{ "SLUS_212.87", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd15c }}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
 	{ "SLES_537.77", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
 	{ "SLES_537.77", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
+	{ "SCES_525.82", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // EveryBody's Golf PAL
+	{ "SCUS_971.30", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf 3 NTSC U
+	{ "SCUS_974.01", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! NTSC U
+	{ "SCUS_975.15", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! (GH) NTSC U
+	{ "SCUS_976.10", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Tennis NTSC U
+	{ "SCKA_200.35", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf 3 NTSC K
+	{ "SLUS_209.51", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Viewtiful Joe NTSC U
+	{ "SLES_526.78", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Viewtiful Joe PAL
+	{ "SLPM_656.99", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Viewtiful Joe NTSC J
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ "SLES_503.25", ALL_MODE, { 0x00132ce4, 0x10000018, 0x0c046744 }}, // Max Payne PAL - skip IOP reset before to exec demo elfs
 	{ "SLUS_204.40", ALL_MODE, { 0x0021bb00, 0x03e00008, 0x27bdff90 }}, // Kya: Dark Lineage NTSC U - disable game debug prints
@@ -180,6 +189,8 @@ void apply_game_patches(char *elfname)
 				AC9B_generic_patches(); // Armored Core 9 Breaker USB generic patch
 			else if (p->patch.addr == 0xdeadbee2)
 				generic_delayed_cdRead_patches(p->patch.check, p->patch.val); // slow reads generic patch
+			else if (p->patch.addr == 0xdeadbee3)
+				unloadModule_patch(); // patches SifStopModule/SifUnloadModule to fake unloading
 
 			// non-generic patches
 			else if (_lw(p->patch.addr) == p->patch.check)

@@ -43,6 +43,48 @@ static u32 loadModuleBuffer_pattern0_mask[] = {
 	0xffffffff
 };
 
+static u32 unloadModule_pattern0[] = {
+	0x27bdffc0, 	// addiu sp, sp, $ffc0
+	0xffb10020, 	// sd	 s1, $0020(sp)
+	0xffbf0030, 	// sd	 ra, $0030(sp)
+	0x0080882d, 	// daddu s1, a0, zero
+	0x0c000000, 	// jal	 SifLoadFileInit
+	0xffb00010, 	// sd	 s0, $0010(sp)
+	0x04400018, 	// bltz	 v0, xf
+	0x3c02ffff, 	// lui	 v0, $ffff
+	0x0c000000, 	// jal	 unknown
+	0x00000000, 	// nop
+	0x10400004, 	// beq	 v0, zero, xf
+	0x3c100000, 	// lui	 s0, $XXXX
+	0x3c02fffe, 	// lui	 v0, $fffe
+	0x10000011, 	// beq	 zero, zero, xf
+	0x3442fffc, 	// ori	 v0, v0, $fffc
+	0x3c040000 	// lui	 a0, $XXXX
+};
+static u32 unloadModule_pattern0_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xfc000000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xfc000000,
+	0xffffffff,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffff0000
+};
+
+static u32 unloadModule_patchcode[] = {
+	0x03e00008,	// jr	 ra
+	0x24020000	// addiu v0, zero, $0
+};
+
 // modules list to fake loading
 char *usb_modulefake_list[] = {
 	"USB_driver",
@@ -128,6 +170,34 @@ void loadModuleBuffer_patch(void)
 		}
 
 		GS_BGCOLOUR = 0x000000; // black, done
+	}
+}
+
+// patch function for Module unloading
+void unloadModule_patch(void)
+{
+	u32 *ptr = (u32 *)0x00100000;
+
+	GS_BGCOLOUR = 0x404000; //
+
+	// search for _sceSifLoadModuleBuffer function
+	ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern0, loadModuleBuffer_pattern0_mask, sizeof(loadModuleBuffer_pattern0));
+	if (ptr) {
+		ptr += (sizeof(loadModuleBuffer_pattern0) >> 2);
+
+		// search for _sceSifStopModule function (same pattern, but comes after)
+		ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern0, loadModuleBuffer_pattern0_mask, sizeof(loadModuleBuffer_pattern0));
+		if (ptr) {
+			memcpy((void *)ptr, (void *)unloadModule_patchcode, sizeof(unloadModule_patchcode));
+
+			// search for _sceSifUnloadModule function
+			ptr = (u32 *)0x00100000;
+			ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, unloadModule_pattern0, unloadModule_pattern0_mask, sizeof(unloadModule_pattern0));
+			if (ptr) {
+				memcpy((void *)ptr, (void *)unloadModule_patchcode, sizeof(unloadModule_patchcode));
+				GS_BGCOLOUR = 0x000000;
+			}
+		}
 	}
 }
 

@@ -43,6 +43,27 @@ static u32 loadModuleBuffer_pattern0_mask[] = {
 	0xffffffff
 };
 
+static u32 loadModuleBuffer_pattern1[] = {
+	0x24050006,	// addiu a1, zero, 6
+	0x0000302d,	// daddu a2, zero, zero
+	0x0200382d,	// daddu a3, s0, zero
+	0x24080200,	// addiu t0, zero, $0200
+	0x0200482d,	// daddu t1, s0, zero
+	0x240a0008,	// addiu t2, zero, 8
+	0x0c000000,	// jal SifCallRpc
+	0x0000582d	// daddu t3, zero, zero
+};
+static u32 loadModuleBuffer_pattern1_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xfc000000,
+	0xffffffff
+};
+
 static u32 unloadModule_pattern0[] = {
 	0x27bdffc0, 	// addiu sp, sp, $ffc0
 	0xffb10020, 	// sd	 s1, $0020(sp)
@@ -150,27 +171,32 @@ void loadModuleBuffer_patch(void)
 	u32 pattern[1];
 	u32 mask[1];
 
+	GS_BGCOLOUR = 0x004040; // olive while _sceSifLoadModuleBuffer calls search
+
 	// search for _sceSifLoadModuleBuffer function
 	ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern0, loadModuleBuffer_pattern0_mask, sizeof(loadModuleBuffer_pattern0));
 	if (ptr) {
-		GS_BGCOLOUR = 0x004040; // olive while _sceSifLoadModuleBuffer calls search
+		u32 *ptr2 = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern1, loadModuleBuffer_pattern1_mask, \
+				sizeof(loadModuleBuffer_pattern1));
+		if ((ptr2) && (((u32)ptr2 - (u32)ptr) < 0x200)) {
 
-		// get original SifLoadModuleBuffer pointer
-		_SifLoadModuleBuffer = (void *)ptr;
+			// get original SifLoadModuleBuffer pointer
+			_SifLoadModuleBuffer = (void *)ptr;
 
-		pattern[0] = JAL((u32)_SifLoadModuleBuffer);
-		mask[0] = 0xffffffff;
+			pattern[0] = JAL((u32)_SifLoadModuleBuffer);
+			mask[0] = 0xffffffff;
 
-		// search & hook _sceSifLoadModuleBuffer function calls
-		ptr = (u32 *)0x00100000;
-		while (ptr) {
-			ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, pattern, mask, sizeof(pattern));
-			if (ptr)
-				*ptr++ = JAL((u32)Hook_SifLoadModuleBuffer); // function hooking
+			// search & hook _sceSifLoadModuleBuffer function calls
+			ptr = (u32 *)0x00100000;
+			while (ptr) {
+				ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, pattern, mask, sizeof(pattern));
+				if (ptr)
+					*ptr++ = JAL((u32)Hook_SifLoadModuleBuffer); // function hooking
+			}
 		}
-
-		GS_BGCOLOUR = 0x000000; // black, done
 	}
+
+	GS_BGCOLOUR = 0x000000; // black, done
 }
 
 // patch function for Module unloading
@@ -178,25 +204,27 @@ void unloadModule_patch(void)
 {
 	u32 *ptr = (u32 *)0x00100000;
 
-	GS_BGCOLOUR = 0x404000; //
-
-	// search for _sceSifLoadModuleBuffer function
+	// search for _sceSifLoadModuleBuffer/_sceSifStopModule function
 	ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern0, loadModuleBuffer_pattern0_mask, sizeof(loadModuleBuffer_pattern0));
 	if (ptr) {
-		ptr += (sizeof(loadModuleBuffer_pattern0) >> 2);
+		u32 *ptr2 = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern1, loadModuleBuffer_pattern1_mask, \
+				sizeof(loadModuleBuffer_pattern1));
+		// confirm if it was _SifLoadMuduleBuffer
+		if ((ptr2) && (((u32)ptr2 - (u32)ptr) < 0x200)) {
+			// was LMB, so we search SifStopModule
+			ptr = find_pattern_with_mask(ptr2, 0x01f00000 - (u32)ptr2, loadModuleBuffer_pattern0, loadModuleBuffer_pattern0_mask, \
+				sizeof(loadModuleBuffer_pattern0));
+		}
 
-		// search for _sceSifStopModule function (same pattern, but comes after)
-		ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, loadModuleBuffer_pattern0, loadModuleBuffer_pattern0_mask, sizeof(loadModuleBuffer_pattern0));
 		if (ptr) {
+			// patch
 			memcpy((void *)ptr, (void *)unloadModule_patchcode, sizeof(unloadModule_patchcode));
 
 			// search for _sceSifUnloadModule function
 			ptr = (u32 *)0x00100000;
 			ptr = find_pattern_with_mask(ptr, 0x01f00000 - (u32)ptr, unloadModule_pattern0, unloadModule_pattern0_mask, sizeof(unloadModule_pattern0));
-			if (ptr) {
-				memcpy((void *)ptr, (void *)unloadModule_patchcode, sizeof(unloadModule_patchcode));
-				GS_BGCOLOUR = 0x000000;
-			}
+			if (ptr)
+				memcpy((void *)ptr, (void *)unloadModule_patchcode, sizeof(unloadModule_patchcode)); // patch
 		}
 	}
 }

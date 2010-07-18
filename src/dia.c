@@ -442,7 +442,12 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				break;
 			}
 		case UI_STRING: {
-				*w = fntRenderString(x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
+        			if(strlen(item->stringvalue.text))
+					*w = fntRenderString(x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
+				else {
+					char tmp[16] = "{not set}";
+					*w = fntRenderString(x, y, ALIGN_NONE, tmp, txtcol);
+				}
 				break;
 			}
 		case UI_PASSWORD: {

@@ -1,6 +1,6 @@
-# This file is a template for translators
+# This file is a template for translators. This file format must be UTF8
 #
-# Put here the English name of your language
+# Put here the English name of your language (will be displayed into OPL Settings menu).
 English
 #
 # Now translate every line, keep the same order, don't add empty lines.
@@ -12,8 +12,15 @@ English
 # or
 # http://bitbucket.org/volca/open-ps2-loader/src/tip/src/lang.c
 #
+# Any missing line translated will use the default english value from lang.c.
+#
 # Important: If your language require some custom glyphs you should provide a corresponding
 # TTF font file too, as by default OPL only come with "basic latin" codepage.
+#
+# Once the translation is complete, you can submit it to the dev team.
+#
+# To use your custom language into OPL, simply copy your file into your mc?:/OPL folder.
+# (File must start with the "lang_" prefix and have the ".lng" extension)
 #
 # Last note, don't put too much comments in your file, it will waste space and loading time.
 # One single comment line on top "name <yourmail@address.com>" should be enough
@@ -77,3 +84,14 @@ Disable Debug Colors
 No controller detected, waiting...
 Enable Cover Art
 Wide screen
+Power off
+Loading config
+Saving config
+Start device
+USB device start mode
+HDD device start mode
+ETH device start mode
+Application start mode
+Auto
+Manual
+Start HDL Server

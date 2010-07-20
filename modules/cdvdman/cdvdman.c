@@ -1379,6 +1379,8 @@ int sceCdGetDiskType(void)
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef HDD_DRIVER
+	fs_init();
+
 	DPRINTF("sceCdGetdiskType=0x%x\n", (int)apaHeader.discType);
 	return apaHeader.discType;
 #else

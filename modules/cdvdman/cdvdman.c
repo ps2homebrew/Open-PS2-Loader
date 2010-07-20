@@ -2177,6 +2177,8 @@ int cdrom_lseek(iop_file_t *f, u32 offset, int where)
 
 	WaitSema(cdrom_io_sema);
 
+	DPRINTF("cdrom_lseek offset=%d where=%d\n", (int)offset, (int)where);
+
 	switch (where) {
 		case SEEK_CUR:
 			r = fh->position + offset;
@@ -2193,7 +2195,7 @@ int cdrom_lseek(iop_file_t *f, u32 offset, int where)
 			}
 			break;
 		case SEEK_END:
-			r = fh->filesize;
+			r = fh->filesize - offset;
 			break;
 		default:
 			r = -EINVAL;
@@ -2201,8 +2203,11 @@ int cdrom_lseek(iop_file_t *f, u32 offset, int where)
 	}
 
 	fh->position = r;
+	if (fh->position > fh->filesize)
+		fh->position = fh->filesize;
 
 ssema:
+	DPRINTF("cdrom_lseek file offset=%d\n", (int)fh->position);
 	SignalSema(cdrom_io_sema);
 
 	return r;
@@ -2267,7 +2272,7 @@ int cdrom_dclose(iop_file_t *f)
 }
 
 //-------------------------------------------------------------- 
-int	cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
+int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 {
 	register int r = 0;
 
@@ -2284,6 +2289,7 @@ int	cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 //-------------------------------------------------------------- 
 s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where)
 { 
+	DPRINTF("cdrom_lseek64 where=%d\n", (int)where);
 	return (s64)cdrom_lseek(f, (u32)pos, where);
 }
 

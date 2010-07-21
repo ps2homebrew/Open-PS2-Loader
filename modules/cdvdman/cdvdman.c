@@ -2064,30 +2064,25 @@ int cdrom_open(iop_file_t *f, char *filename, int mode)
 
 	fh = cdvdman_getfilefreeslot();
 	if (fh) {
-		if (skipmod_check(filename)) {
+		r = cdvdman_findfile(&cdfile, filename, f->unit);
+		if (r) {
 			f->privdata = fh;
 			fh->f = f;
-			fh->lsn = -1;
-			fh->filesize = size_dummy_irx;
-			fh->position = 0;
-		}
-		else {
-			r = cdvdman_findfile(&cdfile, filename, f->unit);
-			if (r) {
-				f->privdata = fh;
-				fh->f = f;
-				if (!g_gamesetting_disable_DVDDL) {
-					if (f->mode == 0)
-						f->mode = r;
-				}
-				fh->lsn = cdfile.lsn;
-				fh->filesize = cdfile.size;
-				fh->position = 0;
-				r = 0;
+			if (!g_gamesetting_disable_DVDDL) {
+				if (f->mode == 0)
+					f->mode = r;
 			}
+			fh->filesize = cdfile.size;
+			fh->position = 0;
+			r = 0;
+
+			if (skipmod_check(filename))
+				fh->lsn = -1;
 			else
-				r = -ENOENT;
+				fh->lsn = cdfile.lsn;
 		}
+		else
+			r = -ENOENT;
 	}
 	else
 		r = -EMFILE;
@@ -2123,6 +2118,10 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 	register int rpos, sectorpos;
 	register u32 nsectors, nbytes;
 
+	WaitSema(cdrom_io_sema);
+
+	DPRINTF("cdrom_read size=%d file_position=%d\n", (int)size, (int)fh->position);
+
 	rpos = 0;
 
 	if ((fh->position + size) > fh->filesize)
@@ -2132,12 +2131,9 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 		u8 *p = (u8 *)&dummy_irx;
 		mips_memcpy(buf, &p[fh->position], size);
 		fh->position += size;
-		return size;
+		rpos = size;
+		goto ssema;
 	}
-
-	WaitSema(cdrom_io_sema);
-
-	DPRINTF("cdrom_read size=%d\n", (int)size);
 
 	while (size) {
 		nbytes = CDVDMAN_FS_BUFSIZE;
@@ -2162,8 +2158,8 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 		fh->position += nbytes;
 	}
 
+ssema:
 	DPRINTF("cdrom_read ret=%d\n", (int)rpos);
-
 	SignalSema(cdrom_io_sema);
 
 	return rpos;

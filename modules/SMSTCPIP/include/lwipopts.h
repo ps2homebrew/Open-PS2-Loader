@@ -164,7 +164,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- ARP options ---------- */
 #ifdef INGAME_DRIVER
-#define ARP_TABLE_SIZE 1
+#define ARP_TABLE_SIZE 2
 #else
 #define ARP_TABLE_SIZE 10
 #endif

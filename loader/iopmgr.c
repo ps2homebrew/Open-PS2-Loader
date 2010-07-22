@@ -56,7 +56,7 @@ int New_Reset_Iop(const char *arg, int flag){
 	
 	SifInitRpc(0);
 
-	if (iop_reboot_count > 2) { 
+	if (iop_reboot_count > 1) { 
 		// above 2nd IOP reset, we can't be sure we'll be able to read IOPRP without 
 		// Resetting IOP (game IOPRP is loaded at 2nd reset), so...
 		// Reseting IOP.
@@ -64,6 +64,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		SifExitRpc();
 		SifExitIopHeap();
 		LoadFileExit();
+		fioExit();
 
 		// Reseting IOP.
 		while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}

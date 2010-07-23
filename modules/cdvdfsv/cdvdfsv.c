@@ -16,8 +16,8 @@
 
 #include "smsutils.h"
 
-#define MODNAME "cdvdfsv"
-IRX_ID(MODNAME, 1, 1);
+#define MODNAME "cdvd_ee_driver"
+IRX_ID(MODNAME, 2, 2);
 
 typedef struct {
 	u8 stat;

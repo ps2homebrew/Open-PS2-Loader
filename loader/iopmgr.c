@@ -140,7 +140,7 @@ int New_Reset_Iop(const char *arg, int flag){
 		}
 	}
 
-	if (eeloadcnf_reset) {
+	if ((eeloadcnf_reset) || (ioprp_path[0] == '\0')) {
 		ioprp_img.data_in = (void *)g_buf;
 		Build_EELOADCNF_Img(&ioprp_img, XLoadfileCheck());
 	}

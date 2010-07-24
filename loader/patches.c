@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[44] = {
+static patchlist_t patch_list[46] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -56,6 +56,8 @@ static patchlist_t patch_list[44] = {
 	{ "SCUS_975.16", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak 3 US (GH)
 	{ "SCES_524.60", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak 3 PAL
 	{ "SCKA_200.40", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak 3 NTSC K
+	{ "SCUS_974.29", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak X NTSC U
+	{ "SCES_532.86", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak X PAL
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ "SLES_503.25", ALL_MODE, { 0x00132ce4, 0x10000018, 0x0c046744 }}, // Max Payne PAL - skip IOP reset before to exec demo elfs
 	{ "SLUS_204.40", ALL_MODE, { 0x0021bb00, 0x03e00008, 0x27bdff90 }}, // Kya: Dark Lineage NTSC U - disable game debug prints

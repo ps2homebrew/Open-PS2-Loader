@@ -20,8 +20,8 @@ LOADER_OBJS = obj/loader.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o eeload_patches/eeload_patches.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
-		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o \
-		obj/ps2link.o
+		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o \
+		obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o
 
 EE_BIN = opl.elf
 EE_SRC_DIR = src/
@@ -120,6 +120,8 @@ clean:
 	$(MAKE) -C modules/atad clean
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/ps2hdd clean
+	echo "    * genvmc.irx"
+	$(MAKE) -C modules/genvmc clean
 	echo "    * hdldsvr.irx"
 	$(MAKE) -C modules/hdldsvr clean
 	echo "    * udptty.irx"
@@ -338,6 +340,11 @@ ps2hdd.s:
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/ps2hdd
 	bin2s modules/ps2hdd/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
+
+genvmc.s:
+	echo "    * genvmc.irx"
+	$(MAKE) -C modules/genvmc
+	bin2s modules/genvmc/genvmc.irx asm/genvmc.s genvmc_irx
 
 hdldsvr.s:
 	echo "    * hdldsvr.irx"

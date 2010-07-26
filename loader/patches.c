@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[46] = {
+static patchlist_t patch_list[47] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -45,6 +45,7 @@ static patchlist_t patch_list[46] = {
 	{ "SLUS_212.87", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd15c }}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
 	{ "SLES_537.77", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
 	{ "SLES_537.77", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
+	{ "SLUS_214.32", ALL_MODE, { 0xdeadbee2, 0x00080000, 0x002baf34 }}, // NRA Gun Club NTSC U
 	{ "SCES_525.82", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // EveryBody's Golf PAL
 	{ "SCUS_974.01", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! NTSC U
 	{ "SCUS_975.15", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! (GH) NTSC U
@@ -185,7 +186,7 @@ void apply_game_patches(char *elfname)
 
 	// if there are patches matching game name/mode then fill the patch table
 	while (p->game) {
-		if (((!strncmp(elfname, p->game, 11)) || (!strcmp(GameID, p->game))) && ((p->mode == ALL_MODE) || (GameMode == p->mode))) {
+		if ((!strcmp(GameID, p->game)) && ((p->mode == ALL_MODE) || (GameMode == p->mode))) {
 
 			if (p->patch.addr == 0xdeadbee0)
 				NIS_generic_patches(); 	// Nippon Ichi Software games generic patch

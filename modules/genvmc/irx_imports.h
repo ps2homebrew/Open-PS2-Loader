@@ -7,6 +7,7 @@
 #include <ioman.h>
 #include <sysclib.h>
 #include <sysmem.h>
+#include <thbase.h>
 #include <thsemap.h>
 
 #endif

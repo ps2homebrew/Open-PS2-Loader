@@ -30,3 +30,12 @@ I_memcpy
 I_strcat
 I_strcpy
 sysclib_IMPORTS_end
+
+thbase_IMPORTS_start
+I_CreateThread
+I_StartThread
+I_DeleteThread
+I_TerminateThread
+I_ExitDeleteThread
+thbase_IMPORTS_end
+

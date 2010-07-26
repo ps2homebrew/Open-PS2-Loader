@@ -13,6 +13,7 @@
 #include <thsemap.h>
 #include <sysclib.h>
 #include <sysmem.h>
+#include <thbase.h>
 #include <errno.h>
 
 #include "genvmc.h"
@@ -66,8 +67,19 @@ static iop_ext_device_t genvmc_dev = {
 	(struct _iop_ext_device_ops *)&genvmc_ops
 };
 
-static int genvmc_io_sema;
-static int genvmc_fh = -1;
+// from cdvdman
+typedef struct {
+	u8 stat;  			
+	u8 second; 			
+	u8 minute; 			
+	u8 hour; 			
+	u8 week; 			
+	u8 day; 			
+	u8 month; 			
+	u8 year; 			
+} cd_clock_t;
+
+int sceCdRC(cd_clock_t *rtc);		 // #51
 
 // mc file attributes
 #define SCE_STM_R                     0x01
@@ -152,22 +164,15 @@ typedef struct {			// size = 512
 	u8  unused3[416];		// 96
 } McFsEntry;
 
-static MCDevInfo devinfo;
-static u8 cluster_buf[8192];
+static MCDevInfo devinfo __attribute__((aligned(64)));
+static u8 cluster_buf[16384] __attribute__((aligned(64)));
 
-// from cdvdman
-typedef struct {
-	u8 stat;  			
-	u8 second; 			
-	u8 minute; 			
-	u8 hour; 			
-	u8 week; 			
-	u8 day; 			
-	u8 month; 			
-	u8 year; 			
-} cd_clock_t;
+static int genvmc_io_sema = -1;
+static int genvmc_thread_sema = -1;
+static int genvmc_thid = -1;
+static int genvmc_fh = -1;
 
-int sceCdRC(cd_clock_t *rtc);		 // #51
+static statusVMCparam_t genvmc_stats;
 
 //-------------------------------------------------------------- 
 static void long_multiply(u32 v1, u32 v2, u32 *HI, u32 *LO)
@@ -230,27 +235,33 @@ static int mc_getmcrtime(sceMcStDateTime *time)
 }
 
 //--------------------------------------------------------------
-static int mc_writecluster(int cluster, void *buf)
+static int mc_writecluster(int fd, int cluster, void *buf, int dup)
 {
-	register int r;
+	register int r, size;
 	MCDevInfo *mcdi = (MCDevInfo *)&devinfo;
 
-	lseek(genvmc_fh, cluster * mcdi->cluster_size, SEEK_SET);
-	r = write(genvmc_fh, buf, mcdi->cluster_size);
-	if (r != mcdi->cluster_size)
+	lseek(fd, cluster * mcdi->cluster_size, SEEK_SET);
+	size = mcdi->cluster_size * dup;
+	r = write(fd, buf, size);
+	if (r != size)
 		return -1;
 
 	return 0;
 }
 
 //--------------------------------------------------------------
-static int vmc_create(int size_kb, int blocksize)
+static int vmc_format(char *filename, int size_kb, int blocksize, int *progress, char *msg)
 {
-	register int i, b, allocatable_clusters_per_card, ifc_index, fat_index;
-	register int ifc_length, fat_length, fat_entry, alloc_offset;
-	register int j = 0, z = 0;
+	register int i, r, b, ifc_index, fat_index;
+	register int ifc_length, fat_length, alloc_offset;
+	register int ret, j = 0, z = 0;
 	int oldstate;
 	MCDevInfo *mcdi = (MCDevInfo *)&devinfo;
+
+	strcpy(msg, "Creating VMC file...");
+	genvmc_fh = open(filename, O_RDWR|O_CREAT|O_TRUNC);
+	if (genvmc_fh < 0)
+		return -101;
 
 	// set superblock magic & version
 	memset((void *)&mcdi->magic, 0, sizeof (mcdi->magic) + sizeof (mcdi->version));
@@ -274,9 +285,16 @@ static int vmc_create(int size_kb, int blocksize)
 		mcdi->bad_block_list[i] = -1;
 
 	// erase all clusters
-	memset(cluster_buf, 0xff, mcdi->cluster_size);
-	for (i=0; i<mcdi->clusters_per_card; i++)
-		mc_writecluster(i, cluster_buf);
+	strcpy(msg, "Erasing VMC clusters...");
+	memset(cluster_buf, 0xff, sizeof(cluster_buf));
+	for (i=0; i<mcdi->clusters_per_card; i+=16) {
+		*progress = i / (mcdi->clusters_per_card / 99);
+		r = mc_writecluster(genvmc_fh, i, cluster_buf, 16);
+		if (r < 0) {
+			r = -102;
+			goto err_out;
+		}
+	}
 
 	// calculate fat & ifc length
 	fat_length = (((mcdi->clusters_per_card << 2) - 1) / mcdi->cluster_size) + 1; 	// get length of fat in clusters
@@ -302,8 +320,10 @@ static int vmc_create(int size_kb, int blocksize)
 	CpuSuspendIntr(&oldstate);
 	u8 *ifc_mem = AllocSysMemory(ALLOC_FIRST, (ifc_length * mcdi->cluster_size)+0XFF, NULL);
 	CpuResumeIntr(oldstate);
-	if (!ifc_mem)
-		return -1;
+	if (!ifc_mem) {
+		r = -103;
+		goto err_out;
+	}
 	memset(ifc_mem, 0, ifc_length * mcdi->cluster_size);
 
 	// build ifc clusters
@@ -314,14 +334,25 @@ static int vmc_create(int size_kb, int blocksize)
 			CpuSuspendIntr(&oldstate);
 			FreeSysMemory(ifc_mem);
 			CpuResumeIntr(oldstate);
-			return -2;
+			r = -104;
+			goto err_out;
 		}
 		ifc[j] = i;
 	}
 
 	// write ifc clusters
-	for (z=0; z<ifc_length; z++)
-		mc_writecluster(mcdi->ifc_list[z], &ifc_mem[z * mcdi->cluster_size]);
+	strcpy(msg, "Writing ifc clusters...");
+	for (z=0; z<ifc_length; z++) {
+		r = mc_writecluster(genvmc_fh, mcdi->ifc_list[z], &ifc_mem[z * mcdi->cluster_size], 1);
+		if (r < 0) {
+			// freeing ifc clusters memory
+			CpuSuspendIntr(&oldstate);
+			FreeSysMemory(ifc_mem);
+			CpuResumeIntr(oldstate);
+			r = -105;
+			goto err_out;
+		}
+	}
 
 	// freeing ifc clusters memory
 	CpuSuspendIntr(&oldstate);
@@ -339,58 +370,44 @@ static int vmc_create(int size_kb, int blocksize)
 	u32 hi, lo, temp;
 	long_multiply(mcdi->clusters_per_card, 0x10624dd3, &hi, &lo);
 	temp = (hi >> 6) - (mcdi->clusters_per_card >> 31);
-	allocatable_clusters_per_card = (((((temp << 5) - temp) << 2) + temp) << 3) + 1;
+	mcdi->max_allocatable_clusters = (((((temp << 5) - temp) << 2) + temp) << 3) + 1;
 	j = alloc_offset;
 
-	// allocate memory for fat clusters
-	CpuSuspendIntr(&oldstate);
-	u8 *fat_mem = AllocSysMemory(ALLOC_FIRST, (fat_length * mcdi->cluster_size)+0XFF, NULL);
-	CpuResumeIntr(oldstate);
-	if (!fat_mem)
-		return -3;
-	memset(fat_mem, 0, fat_length * mcdi->cluster_size);
-
-	// building FAT
-	u32 *fc = (u32 *)fat_mem;
+	// building/writing FAT clusters
+	strcpy(msg, "Writing fat clusters...");
 	i = (mcdi->clusters_per_card / mcdi->clusters_per_block) - 2; // 2 backup blocks
-	if (j < i * mcdi->clusters_per_block) {
-		z = 0;
-		do {
-			if (z == 0) {
-				mcdi->alloc_offset = j;
-				mcdi->rootdir_cluster = 0;
-				fat_entry = 0xffffffff; // marking rootdir end
-			}
-			else 
-				fat_entry = 0x7fffffff;	// marking free cluster
-			z++;
-			if (z == allocatable_clusters_per_card)
-				mcdi->max_allocatable_clusters = (j - mcdi->alloc_offset) + 1;
-			
-			fc[j - mcdi->alloc_offset] = fat_entry;
-			j++;	
-		} while (j < (i * mcdi->clusters_per_block));
+	for (z=0; j < (i * mcdi->clusters_per_block); j+=mcdi->FATentries_per_cluster) {
+
+		memset(cluster_buf, 0, mcdi->cluster_size);
+		u32 *fc = (u32 *)cluster_buf;
+		int sz_u32 = (i * mcdi->clusters_per_block) - j;
+		if (sz_u32 > mcdi->FATentries_per_cluster)
+			sz_u32 = mcdi->FATentries_per_cluster;
+		for (b=0; b<sz_u32; b++)
+			fc[b] = 0x7fffffff; // marking free cluster
+
+		if (z == 0) {
+			mcdi->alloc_offset = j;
+			mcdi->rootdir_cluster = 0;
+			fc[0] = 0xffffffff; // marking rootdir end
+		}
+		z+=sz_u32;
+
+		r = mc_writecluster(genvmc_fh, fat_index++, cluster_buf, 1);
+		if (r < 0) {
+			r = -107;
+			goto err_out;
+		}
 	}
-
-	// write fat clusters
-	for (b=0; b<fat_length; b++)
-		mc_writecluster(fat_index + b, &fat_mem[b * mcdi->cluster_size]);
-
-	// freeing fat clusters memory
-	CpuSuspendIntr(&oldstate);
-	FreeSysMemory(fat_mem);
-	CpuResumeIntr(oldstate);
 
 	// calculate alloc_end
 	mcdi->alloc_end = (i * mcdi->clusters_per_block) - mcdi->alloc_offset;
 
-	// calculate max allocatable clusters
-	if (mcdi->max_allocatable_clusters == 0)		
-		mcdi->max_allocatable_clusters = i * mcdi->clusters_per_block;
-
 	// just a security...
-	if (z < mcdi->clusters_per_block)
-		return -4;
+	if (z < mcdi->clusters_per_block) {
+		r = -108;
+		goto err_out;
+	}
 
 	mcdi->unknown1 = 0;
 	mcdi->unknown2 = 0;
@@ -422,17 +439,42 @@ static int vmc_create(int size_kb, int blocksize)
 	strcpy(rootdir_entry[1]->name, "..");
 
 	// write root directory cluster
-	mc_writecluster(mcdi->alloc_offset + mcdi->rootdir_cluster, cluster_buf);
+	strcpy(msg, "Writing root directory cluster...");
+	r = mc_writecluster(genvmc_fh, mcdi->alloc_offset + mcdi->rootdir_cluster, cluster_buf, 1);
+	if (r < 0) {
+		r = -109;
+		goto err_out;
+	}
 
 	// set superblock formatted flag
 	mcdi->cardform = 1;
 
-	// finally write superblock	
+	// finally write superblock
+	strcpy(msg, "Writing superblock...");
 	memset(cluster_buf, 0xff, mcdi->cluster_size);
 	memcpy(cluster_buf, (void *)mcdi, sizeof(MCDevInfo));
-	mc_writecluster(0, cluster_buf);
+	r = mc_writecluster(genvmc_fh, 0, cluster_buf, 1);
+	if (r < 0) {
+		r = -110;
+		goto err_out;
+	}
+
+	r = close(genvmc_fh);
+	if (r < 0)
+		return -111;
+	genvmc_fh = -1;
+
+	*progress = 100;
 
 	return 0;
+
+
+err_out:
+	ret = close(genvmc_fh);
+	if (!(ret < 0))
+		genvmc_fh = -1;
+
+	return r;
 }
 
 //-------------------------------------------------------------- 
@@ -445,6 +487,7 @@ int genvmc_dummy(void)
 int genvmc_init(iop_device_t *dev)
 {
 	genvmc_io_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
+	genvmc_thread_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
 	return 0;
 }
@@ -453,6 +496,102 @@ int genvmc_init(iop_device_t *dev)
 int genvmc_deinit(iop_device_t *dev)
 {
 	DeleteSema(genvmc_io_sema);
+	DeleteSema(genvmc_thread_sema);
+
+	return 0;
+}
+
+//-------------------------------------------------------------- 
+static void VMC_create_thread(void *args)
+{
+	register int r;
+	createVMCparam_t *param = (createVMCparam_t *)args;
+
+	WaitSema(genvmc_thread_sema);
+
+	genvmc_stats.VMC_status = GENVMC_STAT_BUSY;
+	genvmc_stats.VMC_error = 0;
+	genvmc_stats.VMC_progress = 0;
+	strcpy(genvmc_stats.VMC_msg, "Initializing...");
+
+	r = vmc_format(param->VMC_filename, param->VMC_size_mb * 1024, param->VMC_blocksize, &genvmc_stats.VMC_progress, genvmc_stats.VMC_msg);
+	if (r < 0) {
+		genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
+		genvmc_stats.VMC_error = r;
+		strcpy(genvmc_stats.VMC_msg, "Failed to format VMC file");
+		goto exit;
+	}
+
+	genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
+	genvmc_stats.VMC_error = 0;
+	genvmc_stats.VMC_progress = 100;
+	strcpy(genvmc_stats.VMC_msg, "VMC file created");
+
+exit:
+	SignalSema(genvmc_thread_sema);
+	genvmc_thid = -1;
+	ExitDeleteThread();
+}
+
+//-------------------------------------------------------------- 
+static int vmc_create(createVMCparam_t *param)
+{
+	register int r;
+	iop_thread_t thread_param;
+
+	thread_param.attr = TH_C;
+	thread_param.option = 0;
+	thread_param.thread = (void *)VMC_create_thread;
+	thread_param.stacksize = 0x2000;
+	thread_param.priority = (param->VMC_thread_priority < 0x0f) ? 0x0f : param->VMC_thread_priority;
+
+	// creating VMC create thread
+	genvmc_thid = CreateThread(&thread_param);
+	if (genvmc_thid < 0)
+		return -1;
+
+	// starting VMC create thread
+	r = StartThread(genvmc_thid, (void *)param);
+	if (r < 0)
+		return -2;
+
+	return 0;
+}
+
+//-------------------------------------------------------------- 
+static int vmc_abort(void)
+{
+	register int r;
+
+	if (genvmc_thid >= 0) {
+		// terminate VMC create thread
+		r = TerminateThread(genvmc_thid);
+		if (r < 0)
+			return -1;
+
+		// delete VMC create thread
+		r = DeleteThread(genvmc_thid);
+		if (r < 0)
+			return -2;
+
+		// try to close VMC file
+		if (genvmc_fh >= 0)
+			close(genvmc_fh);
+
+		// adjusting stats
+		genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
+		genvmc_stats.VMC_error = -201;
+		strcpy(genvmc_stats.VMC_msg, "Aborted...");
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------------------- 
+static int vmc_status(statusVMCparam_t *param)
+{
+	// copy global genvmc stats to output param
+	memcpy((void *)param, (void *)&genvmc_stats, sizeof(statusVMCparam_t));
 
 	return 0;
 }
@@ -461,7 +600,6 @@ int genvmc_deinit(iop_device_t *dev)
 int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
 {
 	register int r = 0;
-	createVMCparam_t *p;
 
 	if (!name)
 		return -ENOENT;
@@ -470,22 +608,25 @@ int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 argl
 
 	switch (cmd) {
 
+		// VMC file creation request command
 		case GENVMC_DEVCTL_CREATE_VMC:
-
-			p = (createVMCparam_t *)args;
-
-			genvmc_fh = open(p->VMC_filename, O_RDWR|O_CREAT|O_TRUNC);
-			if (genvmc_fh < 0) {
-				r = -EIO;
-				break;
-			}
-
-			r = vmc_create(p->VMC_size_mb * 1024, p->VMC_blocksize);
+			r = vmc_create((createVMCparam_t *)args);
 			if (r < 0)
 				r = -EIO;
+			break;
 
-			close(genvmc_fh);
+		// VMC file creation abort command
+		case GENVMC_DEVCTL_ABORT:
+			r = vmc_abort();
+			if (r < 0)
+				r = -EIO;
+			break;
 
+		// VMC file creation status command
+		case GENVMC_DEVCTL_STATUS:
+			r = vmc_status((statusVMCparam_t *)buf);
+			if (r < 0)
+				r = -EIO;
 			break;
 
 		default:
@@ -501,7 +642,9 @@ int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 argl
 int _start(int argc, char** argv)
 {
 	DelDrv("genvmc");
-	AddDrv((iop_device_t *)&genvmc_dev);
+
+	if (AddDrv((iop_device_t *)&genvmc_dev) < 0)
+		return MODULE_NO_RESIDENT_END;
 
 	return MODULE_RESIDENT_END;
 }

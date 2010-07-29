@@ -575,7 +575,7 @@ void unloadHdldSvr(void) {
 }
 
 static void handleHdlSrv() {
-	guiRenderTextScreen("HDL Server Starting...");
+	guiRenderTextScreen(_l(_STR_STARTINGHDL));
 	
 	// prepare for hdl, display screen with info
 	loadHdldSvr();
@@ -584,9 +584,9 @@ static void handleHdlSrv() {
 	
 	while (1) {
 		if (terminate != 0)
-			guiRenderTextScreen("Press cross to stop HDL...");
+			guiRenderTextScreen(_l(_STR_STOPHDL));
 		else
-			guiRenderTextScreen("HDL Server Running... [O][X] To stop");
+			guiRenderTextScreen(_l(_STR_RUNNINGHDL));
 	
 		sleep(2);
 		
@@ -603,7 +603,7 @@ static void handleHdlSrv() {
 			break;
 	}
 	
-	guiRenderTextScreen("HDL Server Unloading...");
+	guiRenderTextScreen(_l(_STR_UNLOADHDL));
 	
 	// restore normal functionality again
 	unloadHdldSvr();

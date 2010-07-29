@@ -9,20 +9,10 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"English (internal)",
 	"               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^",
 	"Open PS2 Loader %s",
-	"Theme configuration",
-	"IP configuration",
 	"Save changes",
 	"O Back",
-	"Scroll Slow",
-	"Scroll Medium", 
-	"Scroll Fast",
-	"Dynamic Menu",
-	"Static Menu",
-	"Configure theme",
 	"Network config",
-	"Select language",  
 	"No Items",
-	"Not available yet",
 	"Settings saved...",
 	"Error writing settings!",
 	"Exit",
@@ -33,11 +23,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Apps",
 	"Theme",
 	"Language",
-	"Language: English",
-	"Start network",
-	"Network loading: %d",
 	"Network startup error",
-	"Network startup automatic",
 	"On",
 	"Off",
 	"Ok",
@@ -45,19 +31,13 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Remove all settings",
 	"Removed all keys for the game",
 	"Scrolling", // _STR_SCROLLING
-	"Menu type", // _STR_MENUTYPE
 	"Slow", // _STR_SLOW
 	"Medium", // _STR_MEDIUM
 	"Fast", // _STR_FAST
-	"Static", // _STR_STATIC
-	"Dynamic", // _STR_DYNAMIC
 	"Default menu", // _STR_DEF_DEVICE
 	"Load from disc", // _STR_LOAD_FROM_DISC
 	"Please wait", // _STR_PLEASE_WAIT
 	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
-	"Use Hard Drive", // _STR_USEHDD
-	"Autostart Hard Drive", // _STR_AUTOSTARTHDD
-	"Start Hard Drive", // _STR_STARTHDD
 	"Automatic sorting", // _STR_AUTOSORT
 	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE
 	"Disable Debug Colors", // _STR_DEBUG	
@@ -71,10 +51,24 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"USB device start mode",
 	"HDD device start mode",
 	"ETH device start mode",
-	"Application start mode",
+	"Applications start mode",
 	"Auto",
 	"Manual",
 	"Start HDL Server",
+	"HDL Server Starting...",
+	"HDL Server Running... [O][X] To stop",
+	"Press [X] to stop HDL...",
+	"HDL Server Unloading...",
+	"Exit to",
+	"Background color",
+	"Text color",
+	"IP",
+	"Mask",
+	"Gateway",
+	"Port",
+	"Share",
+	"User",
+	"Password"
 };
 
 static int guiLangID = 0;

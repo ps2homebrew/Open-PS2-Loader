@@ -1,20 +1,10 @@
 Spanish
                BIENVENIDO A OPEN PS2 LOADER. EL CODIGO PRINCIPAL ESTA BASADO EN EL DE HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DE USB ADVANCE Y INTERFAZ GRAFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NUCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
 Open PS2 Loader %s
-Configuración de tema
-Configuración de red
 Guardar cambios
 O Atrás
-Desplazamiento Lento
-Desplazamiento Medio
-Desplazamiento Rápido
-Menú dinámico
-Menú estático
-Configurar tema
 Configurar red
-Seleccionar idioma
 No hay elementos
-Aún no disponible
 Configuración guardada...
 Error al escribir la configuración!
 Salir
@@ -25,11 +15,7 @@ Juegos por RED
 Apps
 Tema
 Idioma
-Idioma: Español
-Iniciar red
-Iniciando red: %d
 Error al iniciar red
-Iniciar red automáticamente
 Activado
 Desactivado
 Aceptar
@@ -37,9 +23,6 @@ Preferencias de compatibilidad
 Borrar la configuración
 Borrar todas las claves del juego
 Desplazamiento
-Tipo de menú
 Lento
 Medio
 Rápido
-Estático
-Dinámico

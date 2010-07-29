@@ -1,20 +1,10 @@
 German
                WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
 Open PS2 Loader %s
-Theme Einstellungen
-IP Einstellungen
 Anderungen speichern
 O Zurück
-Langsam scrollen
-Normal scrollen
-Schnell scrollen
-Dynamisches Menü
-Statisches Menü
-Theme einstellen
 Netzwerk Einstellungen
-Sprache auswählen
 Keine Items
-Derzeit nicht verfügbar
 Einstellungen gespeichert...
 Fehler beim speichern der Einstellungen!
 Ausgang
@@ -25,11 +15,7 @@ Netzwerk Spiele
 Programme
 Theme
 Sprache
-Sprache: Deutsch
-Starte Netzwerk
-Lade vom Netzwerk: %d
 Fehler beim starten des Netzwerks
-Netzwerk automatisch starten
 An
 Aus
 Ok
@@ -37,9 +23,6 @@ Kompatibilitäts Einstellungen
 Entferne alle Einstellungen
 Alle Einstellungen des Spiels entfernt
 Scrolling
-Menü Typ
 Langsam
 Normal
 Schnell
-Statisch
-Dymanisch

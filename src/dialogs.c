@@ -14,7 +14,7 @@ struct UIItem diaIPConfig[] = {
 	// ---- IP address ----
 	{UI_LABEL, 0, NULL, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
 	
-	{UI_LABEL, 0, NULL, {.label = {"IP", -1}}}, {UI_SPACER}, 
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_IP}}}, {UI_SPACER},
 	
 	{UI_INT, 2, NULL, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
 	{UI_INT, 3, NULL, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
@@ -24,7 +24,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_BREAK},
 
 	//  ---- Netmask ----
-	{UI_LABEL, 0, NULL, {.label = {"Mask", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_MASK}}},
 	{UI_SPACER}, 
 	
 	{UI_INT, 6, NULL, {.intvalue = {255, 255, 0, 255}}}, {UI_LABEL, 0, NULL, {.label = {".", -1}}},
@@ -35,7 +35,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_BREAK},
 	
 	//  ---- Gateway ----
-	{UI_LABEL, 0, NULL, {.label = {"Gateway", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_GATEWAY}}},
 	{UI_SPACER}, 
 	
 	{UI_INT, 10, NULL, {.intvalue = {192, 192, 0, 255}}}, 	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
@@ -49,7 +49,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"- PC -", -1}}},
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, NULL, {.label = {"IP", -1}}},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_IP}}},
 	{UI_SPACER}, 
 	
 	{UI_INT, 14, NULL, {.intvalue = {192, 192, 0, 255}}},	{UI_LABEL, 0, NULL, {.label = {".", -1}}},
@@ -59,14 +59,14 @@ struct UIItem diaIPConfig[] = {
 	
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, NULL, {.label = {"Port", -1}}},	{UI_SPACER}, {UI_INT, 18, NULL, {.intvalue = {445, 445, 0, 1024}}},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_PORT}}},	{UI_SPACER}, {UI_INT, 18, NULL, {.intvalue = {445, 445, 0, 1024}}},
 	
 	{UI_BREAK},
 	
 	//  ---- PC share name ----
-	{UI_LABEL, 0, NULL, {.label = {"Share", -1}}}, {UI_SPACER}, {UI_STRING, 19, NULL, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"User", -1}}}, {UI_SPACER}, {UI_STRING, 20, NULL,  {.stringvalue = {"GUEST", "GUEST"}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Password", -1}}}, {UI_SPACER}, {UI_PASSWORD, 21, "Leave empty for GUEST auth.",  {.stringvalue = {"", ""}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_SHARE}}}, {UI_SPACER}, {UI_STRING, 19, NULL, {.stringvalue = {"PS2SMB", "PS2SMB"}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_USER}}}, {UI_SPACER}, {UI_STRING, 20, NULL,  {.stringvalue = {"GUEST", "GUEST"}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_PASSWORD}}}, {UI_SPACER}, {UI_PASSWORD, 21, "Leave empty for GUEST auth.",  {.stringvalue = {"", ""}}}, {UI_BREAK},
 	
 	//  ---- Ok ----
 	{UI_SPLITTER},
@@ -125,12 +125,12 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, UICFG_DEBUG, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Exit to", -1}}}, {UI_SPACER}, {UI_ENUM, UICFG_EXITTO, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_EXITTO}}}, {UI_SPACER}, {UI_ENUM, UICFG_EXITTO, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
-	{UI_LABEL, 0, NULL, {.label = {"Bg. col", -1}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"Txt. col", -1}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_BGCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_TXTCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	

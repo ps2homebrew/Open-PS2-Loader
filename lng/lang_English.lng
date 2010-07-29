@@ -29,20 +29,10 @@ English
 # 
                WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^
 Open PS2 Loader %s
-Theme configuration
-IP configuration
 Save changes
 O Back
-Scroll Slow
-Scroll Medium
-Scroll Fast
-Dynamic Menu
-Static Menu
-Configure theme
 Network config
-Select language
 No Items
-Not available yet
 Settings saved...
 Error writing settings!
 Exit
@@ -53,11 +43,7 @@ Network Games
 Apps
 Theme
 Language
-Language: English
-Start network
-Network loading: %d
 Network startup error
-Network startup automatic
 On
 Off
 Ok
@@ -65,19 +51,13 @@ Compatibility settings
 Remove all settings
 Removed all keys for the game
 Scrolling
-Menu type
 Slow
 Medium
 Fast
-Static
-Dynamic
 Default menu
 Load from disc
 Please wait
 Error while loading the Game ID
-Use Hard Drive
-Autostart Hard Drive
-Start Hard Drive
 Automatic sorting
 Error loading the language file
 Disable Debug Colors
@@ -91,7 +71,21 @@ Start device
 USB device start mode
 HDD device start mode
 ETH device start mode
-Application start mode
+Applications start mode
 Auto
 Manual
 Start HDL Server
+HDL Server Starting...
+HDL Server Running... [O][X] To stop
+Press [X] to stop HDL...
+HDL Server Unloading...
+Exit to
+Background color
+Text color
+IP
+Mask
+Gateway
+Port
+Share
+User
+Password

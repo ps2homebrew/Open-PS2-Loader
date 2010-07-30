@@ -65,7 +65,8 @@
 #define _STR_SHARE					60
 #define _STR_USER					61
 #define _STR_PASSWORD					62
-#define LANG_STR_COUNT 63
+#define _STR_NOT_SET					63
+#define LANG_STR_COUNT 64
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

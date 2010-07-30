@@ -12,7 +12,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Save changes",
 	"O Back",
 	"Network config",
-	"No Items",
+	"<no values>",
 	"Settings saved...",
 	"Error writing settings!",
 	"Exit",
@@ -30,21 +30,21 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Compatibility settings",
 	"Remove all settings",
 	"Removed all keys for the game",
-	"Scrolling", // _STR_SCROLLING
-	"Slow", // _STR_SLOW
-	"Medium", // _STR_MEDIUM
-	"Fast", // _STR_FAST
-	"Default menu", // _STR_DEF_DEVICE
-	"Load from disc", // _STR_LOAD_FROM_DISC
-	"Please wait", // _STR_PLEASE_WAIT
-	"Error while loading the Game ID", // _STR_ERROR_LOADING_ID
-	"Automatic sorting", // _STR_AUTOSORT
-	"Error loading the language file", // _STR_ERR_LOADING_LANGFILE
-	"Disable Debug Colors", // _STR_DEBUG	
-	"No controller detected, waiting...", // _STR_NO_CONTROLLER
-	"Enable Cover Art", // _STR_COVERART
-	"Wide screen", // _STR_WIDE_SCREEN
-	"Power off", // _STR_POWEROFF
+	"Scrolling",
+	"Slow",
+	"Medium",
+	"Fast",
+	"Default menu",
+	"Load from disc",
+	"Please wait",
+	"Error while loading the Game ID",
+	"Automatic sorting",
+	"Error loading the language file",
+	"Disable Debug Colors",
+	"No controller detected, waiting...",
+	"Enable Cover Art",
+	"Wide screen",
+	"Power off",
 	"Loading config",
 	"Saving config",
 	"Start device",
@@ -68,7 +68,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Port",
 	"Share",
 	"User",
-	"Password"
+	"Password",
+	"<not set>"
 };
 
 static int guiLangID = 0;

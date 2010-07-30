@@ -4,7 +4,7 @@ Open PS2 Loader %s
 Sauvegarder les changements
 O retour
 Réglages réseau
-Vide
+<vide>
 Réglages sauvegardés...
 Erreur à l'écriture des réglages!
 Sortir
@@ -61,3 +61,4 @@ Port
 Partage
 Utilisateur
 Mot de passe
+<non défini>

@@ -32,7 +32,7 @@ Open PS2 Loader %s
 Save changes
 O Back
 Network config
-No Items
+<no values>
 Settings saved...
 Error writing settings!
 Exit
@@ -89,3 +89,4 @@ Port
 Share
 User
 Password
+<not set>

@@ -442,12 +442,10 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				break;
 			}
 		case UI_STRING: {
-        			if(strlen(item->stringvalue.text))
+       			if(strlen(item->stringvalue.text))
 					*w = fntRenderString(x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
-				else {
-					char tmp[16] = "{not set}";
-					*w = fntRenderString(x, y, ALIGN_NONE, tmp, txtcol);
-				}
+				else
+					*w = fntRenderString(x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
 				break;
 			}
 		case UI_PASSWORD: {
@@ -473,7 +471,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				const char* tv = item->intvalue.enumvalues[item->intvalue.current];
 
 				if (!tv)
-					tv = "<no value>";
+					tv = _l(_STR_NO_ITEMS);
 
 				*w = fntRenderString(x, y, ALIGN_NONE, tv, txtcol);
 				break;

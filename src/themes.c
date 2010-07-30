@@ -305,7 +305,7 @@ static void thmRebuildGuiNames() {
 	guiThemesNames = (char**) malloc((nThemes + 2) * sizeof(char**));
 
 	// add default internal
-	guiThemesNames[0] = "<none>";
+	guiThemesNames[0] = "<OPL>";
 
 	int i = 0;
 	for (; i < nThemes; i++) {

@@ -29,6 +29,7 @@ I_memset
 I_memcpy
 I_strcat
 I_strcpy
+I_strncmp
 sysclib_IMPORTS_end
 
 thbase_IMPORTS_start

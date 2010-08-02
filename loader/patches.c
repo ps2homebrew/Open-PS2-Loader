@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[47] = {
+static patchlist_t patch_list[58] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -59,6 +59,17 @@ static patchlist_t patch_list[47] = {
 	{ "SCKA_200.40", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak 3 NTSC K
 	{ "SCUS_974.29", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak X NTSC U
 	{ "SCES_532.86", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Jak X PAL
+	{ "SLES_820.28", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET PAL Disc1
+	{ "SLES_820.29", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET PAL Disc2
+	{ "SLUS_204.88", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-U Disc1
+	{ "SLUS_208.91", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-U Disc2
+	{ "SCPS_550.19", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-J
+	{ "SLPM_664.78", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-J (Ultimate Hits) Disc1
+	{ "SLPM_664.79", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-J (Ultimate Hits) Disc2
+	{ "SLPM_652.09", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-J (Limited Edition)
+	{ "SLPM_654.38", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-J (Director's Cut) Disc1
+	{ "SLPM_654.39", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-J (Director's Cut) Disc2
+	{ "SCAJ_200.70", ALL_MODE, { 0xbabecafe, 0x00000000, 0x00000000 }}, // SOTET NTSC-? (Director's Cut)
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14, 0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ "SLES_503.25", ALL_MODE, { 0x00132ce4, 0x10000018, 0x0c046744 }}, // Max Payne PAL - skip IOP reset before to exec demo elfs
 	{ "SLUS_204.40", ALL_MODE, { 0x0021bb00, 0x03e00008, 0x27bdff90 }}, // Kya: Dark Lineage NTSC U - disable game debug prints
@@ -176,8 +187,9 @@ static void generic_delayed_cdRead_patches(u32 patch_addr, u32 delay_cycles)
 	_sw(JAL((u32)delayed_cdRead), patch_addr);
 }
 
-void apply_game_patches(char *elfname)
+void apply_patches(void)
 {
+	register int exclude_LMB_patch = 0;
 	patchlist_t *p = (patchlist_t *)&patch_list[0];
 
 	// if there are patches matching game name/mode then fill the patch table
@@ -192,6 +204,8 @@ void apply_game_patches(char *elfname)
 				generic_delayed_cdRead_patches(p->patch.check, p->patch.val); // slow reads generic patch
 			else if (p->patch.addr == 0xdeadbee3)
 				unloadModule_patch(); // patches SifStopModule/SifUnloadModule to fake unloading
+			else if (p->patch.addr == 0xbabecafe)
+				exclude_LMB_patch = 1;
 
 			// non-generic patches
 			else if (_lw(p->patch.addr) == p->patch.check)
@@ -199,4 +213,8 @@ void apply_game_patches(char *elfname)
 		}
 		p++;
 	}
+
+	// hook LoadModuleBuffer
+	if (!exclude_LMB_patch)
+		loadModuleBuffer_patch();
 }

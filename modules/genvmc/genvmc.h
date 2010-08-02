@@ -21,6 +21,7 @@ typedef struct {		// size = 1036
 	int  VMC_size_mb;
 	int  VMC_blocksize;
 	int  VMC_thread_priority;
+	int  VMC_card_slot;	// 0=slot 1, 1=slot 2, anything else=blank
 } createVMCparam_t;
 
 typedef struct {		// size = 76

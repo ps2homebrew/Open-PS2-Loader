@@ -1,5 +1,7 @@
 /*
-  Copyright 2010, jimmikaelkael
+  Copyright 2010, jimmikaelkael <jimmikaelkael@wanadoo.fr>
+  Copyright 2010, crazyc
+
   Licenced under Academic Free License version 3.0
   Review Open PS2 Loader README & LICENSE files for further details.
 */
@@ -79,7 +81,12 @@ typedef struct {
 	u8 year; 			
 } cd_clock_t;
 
-int sceCdRC(cd_clock_t *rtc);		 // #51
+int sceCdRC(cd_clock_t *rtc);		 				// #51
+
+int sceMcDetectCard(int port, int slot);				// #05
+int sceMcReadPage(int port, int slot, int page, char *mcbuffer);	// #18
+int sceMcGetCardType(int port, int slot);				// #39
+
 
 // mc file attributes
 #define SCE_STM_R                     0x01
@@ -164,8 +171,10 @@ typedef struct {			// size = 512
 	u8  unused3[416];		// 96
 } McFsEntry;
 
+#define BLOCKKB 16
+
 static MCDevInfo devinfo __attribute__((aligned(64)));
-static u8 cluster_buf[16384] __attribute__((aligned(64)));
+static u8 cluster_buf[(BLOCKKB * 1024)+16] __attribute__((aligned(64)));
 
 static int genvmc_io_sema = -1;
 static int genvmc_thread_sema = -1;
@@ -250,7 +259,69 @@ static int mc_writecluster(int fd, int cluster, void *buf, int dup)
 }
 
 //--------------------------------------------------------------
-static int vmc_format(char *filename, int size_kb, int blocksize, int *progress, char *msg)
+// this is designed to work only with the rom0 mcman for max compatibility
+// but that means it isn't really possible to lock properly so don't write
+// to the card during the operation. hints came from mcdump.c by Polo35
+static int vmc_mccopy(char *filename, int slot, int *progress, char *msg)
+{
+	MCDevInfo *mcdi = (MCDevInfo *)&devinfo;
+	unsigned int blocks, pagesblock, clustersblock, i, j;
+	int ret;
+
+	strcpy(msg, "Checking memcard...");
+	if ((sceMcDetectCard(slot, 0) < -1) && (sceMcGetCardType(slot, 0) != 2)) 
+		return -98;
+
+	if (sceMcReadPage(slot, 0, 0, cluster_buf))
+		return -99;
+
+	memcpy(mcdi, cluster_buf, sizeof(MCDevInfo));
+	if (strncmp(mcdi->magic, SUPERBLOCK_MAGIC, sizeof(SUPERBLOCK_MAGIC)))
+		return -100;
+
+	pagesblock = (BLOCKKB * 1024) / mcdi->pagesize;
+	clustersblock = pagesblock / mcdi->pages_per_cluster;
+	blocks = mcdi->clusters_per_card / clustersblock;
+
+	genvmc_fh = open(filename, O_RDWR|O_CREAT|O_TRUNC);
+	if (genvmc_fh < 0)
+		return -101;
+
+	strcpy(msg, "Copying memcard to VMC...");
+	for (i = 0; i < blocks; i++) {
+		*progress = i / (blocks / 99);
+		for (j = 0; j < pagesblock; j++) {
+			if(sceMcReadPage(slot, 0, (i * pagesblock) + j, &cluster_buf[j * mcdi->pagesize])) {
+				ret = -102;
+				goto exit;
+			}
+		}
+		if (mc_writecluster(genvmc_fh, i * clustersblock, cluster_buf, clustersblock) < 0) {
+			ret = -103;
+			goto exit;
+		}
+	}
+	for (i = (blocks * clustersblock); i < mcdi->clusters_per_card; i++) {
+		for (j = 0; j < mcdi->pages_per_cluster; j++) {
+			if (sceMcReadPage(slot, 0, (i * mcdi->pages_per_cluster) + j, &cluster_buf[j * mcdi->pagesize])) {
+				ret = -102;
+				goto exit;
+			}
+		}
+		if (mc_writecluster(genvmc_fh, i, cluster_buf, 1) < 0) {
+			ret = -103;
+			goto exit;
+		}
+	}
+	*progress = 100;
+	ret = 0;
+exit:
+	close(genvmc_fh);
+	return ret;
+}
+
+//--------------------------------------------------------------
+static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progress, char *msg)
 {
 	register int i, r, b, ifc_index, fat_index;
 	register int ifc_length, fat_length, alloc_offset;
@@ -514,7 +585,11 @@ static void VMC_create_thread(void *args)
 	genvmc_stats.VMC_progress = 0;
 	strcpy(genvmc_stats.VMC_msg, "Initializing...");
 
-	r = vmc_format(param->VMC_filename, param->VMC_size_mb * 1024, param->VMC_blocksize, &genvmc_stats.VMC_progress, genvmc_stats.VMC_msg);
+	if (param->VMC_card_slot == -1)
+		r = vmc_mcformat(param->VMC_filename, param->VMC_size_mb * 1024, param->VMC_blocksize, &genvmc_stats.VMC_progress, genvmc_stats.VMC_msg);
+	else
+		r = vmc_mccopy(param->VMC_filename, param->VMC_card_slot, &genvmc_stats.VMC_progress, genvmc_stats.VMC_msg);		
+
 	if (r < 0) {
 		genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
 		genvmc_stats.VMC_error = r;
@@ -573,6 +648,9 @@ static int vmc_abort(void)
 		r = DeleteThread(genvmc_thid);
 		if (r < 0)
 			return -2;
+
+		SignalSema(genvmc_thread_sema);
+		genvmc_thid = -1;
 
 		// try to close VMC file
 		if (genvmc_fh >= 0)
@@ -650,7 +728,15 @@ int _start(int argc, char** argv)
 }
 
 //--------------------------------------------------------------
+// Extra import tables
+
 DECLARE_IMPORT_TABLE(cdvdman, 1, 1)
 DECLARE_IMPORT(51, sceCdRC)
+END_IMPORT_TABLE
+
+DECLARE_IMPORT_TABLE(mcman, 1, 1)
+DECLARE_IMPORT(5, sceMcDetectCard)
+DECLARE_IMPORT(18, sceMcReadPage)
+DECLARE_IMPORT(39, sceMcGetCardType)
 END_IMPORT_TABLE
 

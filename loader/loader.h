@@ -158,7 +158,7 @@ unsigned char *MD4(unsigned char *message, int len, unsigned char *cipher);
 void start_smbauth_thread(void);
 
 /* patches.c */
-void apply_game_patches(char *elfname);
+void apply_patches(void);
 
 /* padhook.c */
 #define PADOPEN_HOOK  0

@@ -368,12 +368,9 @@ static void t_loadElf(void)
 
 		DPRINTF("t_loadElf: real elf path = '%s'\n", g_ElfPath);
 
-		DPRINTF("t_loadElf: trying to apply game patches...\n");
-		// applying needed game patches if any
-		apply_game_patches(&g_ElfPath[8]);
-
-		// hook LoadModuleBuffer
-		loadModuleBuffer_patch();
+		DPRINTF("t_loadElf: trying to apply patches...\n");
+		// applying needed patches
+		apply_patches();
 
 		FlushCache(0);
 		FlushCache(2);

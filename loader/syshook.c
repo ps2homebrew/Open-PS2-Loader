@@ -118,24 +118,6 @@ static u32 InitializeUserMempattern_mask[] = {
 /*----------------------------------------------------------------------------------------*/
 u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 {
-	// we will use a different stack pointer for IOP reset, for the following reason:
-	// some games are using the top of ScratchPad memory as stack, trigerring a
-	// stack overflow during the 'hooked' IOP reset.
-	// Information provided by crazyc
-
-	// change stack pointer
-	u32 _sp = 0;
-#ifdef LOAD_EECORE_DOWN
-	u32 _new_sp = 0x01700000;
-#else
-	u32 _new_sp = 0x000e7000;
-#endif
-	__asm__(
-		"move %0, $sp\n\t"
-		"move $sp, %1\n\t"		
-		::"r"((u32)_sp), "r"((u32)_new_sp)
-	);
-
 	// Hook padOpen function to install In Game Reset
 	if( !(g_compat_mask & COMPAT_MODE_6) && padOpen_hooked == 0 )
 		padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
@@ -145,15 +127,8 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 	// does IOP reset
 	New_Reset_Iop(reset_pkt->arg, reset_pkt->flag);
 
-	// restore original stack pointer
-	__asm__(
-		"move $sp, %0\n\t"		
-		::"r"((u32)_sp)
-	);
-
 	return 1;
 }
-
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction replace SifSetDma syscall in kernel.                                     */
@@ -165,15 +140,15 @@ u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 		SifCmdResetData *reset_pkt = (SifCmdResetData*)sdd->src;
 		if(((reset_pkt->chdr.psize == 0x68) || (reset_pkt->chdr.psize == 0x70)) && (reset_pkt->chdr.fcode == 0x80000003)) {
 
-			__asm__(
-				"la $v1, New_SifSetDma\n\t"
+			__asm__ __volatile__ (
+				"la $v1, _SifSetDma\n\t"
 				"sw $v1, 8($sp)\n\t"
 				"jr $ra\n\t"
 				"nop\n\t"
 			);
 		}
 	}
-	__asm__(
+	__asm__ __volatile__ (
 		"move $a0, %1\n\t"
 		"move $a1, %2\n\t"
 		"jr   %0\n\t"
@@ -210,7 +185,7 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 
 			// We should have a mode to do this: this is corresponding to HD-Loader's mode 3
 			if ((g_compat_mask & COMPAT_MODE_3) && (iop_reboot_count == 2)) {
-				__asm__(
+				__asm__ __volatile__ (
 					"la $v1, Apply_Mode3\n\t"
 					"sw $v1, 8($sp)\n\t"
 					"jr $ra\n\t"
@@ -221,7 +196,7 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 		return 1;
 	}
 
-	__asm__(
+	__asm__ __volatile__ (
 		"move $a0, %1\n\t"
 		"move $a1, %2\n\t"
 		"jr   %0\n\t"
@@ -339,7 +314,7 @@ static void t_loadElf(void)
 
 	// wipe user memory
 	for (i = 0x00100000; i < 0x02000000; i += 64) {
-		__asm__ (
+		__asm__ __volatile__ (
 			"\tsq $0, 0(%0) \n"
 			"\tsq $0, 16(%0) \n"
 			"\tsq $0, 32(%0) \n"
@@ -387,10 +362,10 @@ static void t_loadElf(void)
 }
 
 // ------------------------------------------------------------------------
-void NewLoadExecPS2(const char *filename, int argc, char *argv[])
+void New_LoadExecPS2(const char *filename, int argc, char *argv[])
 {
-	char *p = g_argbuf;
-	int i, arglen;
+	register char *p = g_argbuf;
+	register int i, arglen;
 
 	DIntr();
 	ee_kmode_enter();
@@ -415,6 +390,9 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 	ee_kmode_exit();
 	EIntr();
 
+	FlushCache(0);
+	FlushCache(2);
+
 	ExecPS2(t_loadElf, NULL, 0, NULL);
 
 	if(!DisableDebug)
@@ -425,8 +403,8 @@ void NewLoadExecPS2(const char *filename, int argc, char *argv[])
 // ------------------------------------------------------------------------
 void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
 {
-	__asm__(
-		"la $v1, NewLoadExecPS2\n\t"
+	__asm__ __volatile__ (
+		"la $v1, _LoadExecPS2\n\t"
 		"sw $v1, 8($sp)\n\t"
 		"jr $ra\n\t"
 		"nop\n\t"
@@ -450,7 +428,7 @@ int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
 	if( (u32)entry >= 0x00100000 )
 		padOpen_hooked = Install_PadOpen_Hook( 0x00100000, 0x01ff0000, PADOPEN_HOOK );
 
-	__asm__(
+	__asm__ __volatile__ (
 		"move $a0, %1\n\t"
 		"move $a1, %2\n\t"
 		"move $a2, %3\n\t"

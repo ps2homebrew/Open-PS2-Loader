@@ -145,6 +145,10 @@ void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
 int  (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int  (*Old_CreateThread)(ee_thread_t *thread_param);
 
+/* asm.S */
+void _LoadExecPS2(const char *filename, int argc, char *argv[]);
+u32 _SifSetDma(SifDmaTransfer_t *sdd, s32 len);
+
 /* spu.c */
 void ResetSPU();
 

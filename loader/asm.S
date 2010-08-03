@@ -40,9 +40,9 @@ _LoadExecPS2:
 	.ent	_SifSetDma
 _SifSetDma:
 
-	addiu	$sp, $sp, -0x20
+	addiu	$sp, $sp, -0x10
 	sd	$ra, 0x0000($sp)
-	sd	$s0, 0x0010($sp)
+	sd	$s0, 0x0008($sp)
 
 	daddu	$s0, $sp, $zero
 
@@ -53,17 +53,16 @@ _SifSetDma:
 	lui	$v0, 0x000e
 	ori	$v0, $v0, 0x7000
 #endif
-	daddu	$sp, $v0, $zero
 
 	jal	New_SifSetDma
-	nop
+	daddu	$sp, $v0, $zero
 
 	daddu	$sp, $s0, $zero
 
-	ld	$s0, 0x0010($sp)
+	ld	$s0, 0x0008($sp)
 	ld	$ra, 0x0000($sp)
 	jr	$ra
-	addiu	$sp, $sp, 0x20
+	addiu	$sp, $sp, 0x10
 
 	.end	_SifSetDma
 

@@ -12,7 +12,7 @@
 # g_buf is located at 0x00088000
 
 EE_BIN = loader.elf
-EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o patches.o padhook.o spu.o smbauth.o des.o md4.o loadmodulehook.o crt0.o
+EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o patches.o padhook.o spu.o smbauth.o des.o md4.o loadmodulehook.o asm.o crt0.o
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
 EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)
@@ -27,6 +27,9 @@ EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
 EE_LIBS += -lpatches -lc -lkernel -lc
 
 %.o : %.c
+	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
+
+%.o : %.S
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
 %.o : %.s

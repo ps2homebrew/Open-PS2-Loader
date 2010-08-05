@@ -1,28 +1,65 @@
+# translation by El_Patas <el_patas69@hotmail.com>
 Spanish
-               BIENVENIDO A OPEN PS2 LOADER. EL CODIGO PRINCIPAL ESTA BASADO EN EL DE HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DE USB ADVANCE Y INTERFAZ GRAFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NUCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
+               BIENVENIDO A OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DE HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DE USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
 Open PS2 Loader %s
 Guardar cambios
 O Atrás
 Configurar red
-No hay elementos
+<No hay elementos>
 Configuración guardada...
-Error al escribir la configuración!
+¡Error al guardar la configuración!
 Salir
 Configuración
 Juegos por USB
 Juegos por HDD
 Juegos por RED
-Apps
-Tema
+Aplicaciones
+Estilo
 Idioma
 Error al iniciar red
 Activado
 Desactivado
 Aceptar
-Preferencias de compatibilidad
-Borrar la configuración
-Borrar todas las claves del juego
+Opciones de compatibilidad
+Borrar todas las opciones
+Opciones para el juego borradas
 Desplazamiento
 Lento
 Medio
 Rápido
+Menú por defecto
+Cargar del disco
+Espera por favor
+Error al cargar la ID del juego
+Lista de juegos ordenada por alfabeto
+Error al cargar archivo de idioma
+No mostrar los colores para depuración
+Mando no encontrado, esperando...
+Carátulas, serigrafías y fondos
+Pantalla panorámica
+Apagar PS2
+Cargando configuración
+Guardando configuración
+Iniciar dispositivo
+Modo de inicio para dispositivo USB
+Modo de inicio para dispositivo HDD
+Modo de inicio para dispositivo ETH
+Modo de inicio para Aplicaciones
+Automático
+Manual
+Iniciar servidor HDL
+Iniciando servidor HDL...
+Servidor HDL conectado... [O][X] Para desconectar
+Pulsa [X] para cerrar HDL...
+Cerrando servidor HDL...
+Salida hacia
+Color de fondo 
+Color de texto
+Dirección IP
+Máscara de subred
+Puerta de enlace predeterminada
+Puerto
+Unidad o carpeta compartida
+Cuenta de usuario compartida
+Contraseña
+<sin definir>

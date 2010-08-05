@@ -16,10 +16,10 @@
 extern void *cddev_irx;
 extern int size_cddev_irx;
 
-#define MAX_G_ARGS 15
-static int g_argc;
-static char *g_argv[1 + MAX_ARGS];
-static char g_argbuf[580];
+#define MAX_ARGS 	15
+
+int g_argc;
+char *g_argv[1 + MAX_ARGS];
 static char g_ElfPath[1024];
 static void *g_patchInitializeUserMem_addr;
 static u32 g_patchInitializeUserMem_val;
@@ -133,6 +133,7 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 /*----------------------------------------------------------------------------------------*/
 /* This fonction replace SifSetDma syscall in kernel.                                     */
 /*----------------------------------------------------------------------------------------*/
+/*
 u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 {
 	if((sdd->attr == 0x44) && ((sdd->size==0x68) || (sdd->size==0x70))) {
@@ -157,7 +158,7 @@ u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 
 	return 1;
 }
-
+*/
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction unhook SifSetDma/SifSetReg sycalls		                          */
@@ -261,7 +262,7 @@ static void deinit_systemRestart(void)
 }
 
 // ------------------------------------------------------------------------
-static void t_loadElf(void)
+void t_loadElf(void)
 {
 	int i, r;
 	t_ExecData elf;
@@ -359,56 +360,6 @@ static void t_loadElf(void)
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xffffff; // white screen: error
 	SleepThread();
-}
-
-// ------------------------------------------------------------------------
-void New_LoadExecPS2(const char *filename, int argc, char *argv[])
-{
-	register char *p = g_argbuf;
-	register int i, arglen;
-
-	DIntr();
-	ee_kmode_enter();
-
-	// copy args from main ELF
-	g_argc = argc > MAX_G_ARGS ? MAX_G_ARGS : argc;
-
-	memset(g_argbuf, 0, sizeof(g_argbuf));
-
-	strncpy(p, filename, 256);
-	g_argv[0] = p;
-	p += strlen(filename) + 1;
-	g_argc++;
-
-	for (i = 0; i < (g_argc-1); i++) {
-		arglen = strlen(argv[i]) + 1;
-		memcpy(p, argv[i], arglen);
-		g_argv[i + 1] = p;
-		p += arglen;
-	}
-
-	ee_kmode_exit();
-	EIntr();
-
-	FlushCache(0);
-	FlushCache(2);
-
-	ExecPS2(t_loadElf, NULL, 0, NULL);
-
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0xffffff; // white screen: error
-	SleepThread();
-}
-
-// ------------------------------------------------------------------------
-void Hook_LoadExecPS2(const char *filename, int argc, char *argv[])
-{
-	__asm__ __volatile__ (
-		"la $v1, _LoadExecPS2\n\t"
-		"sw $v1, 8($sp)\n\t"
-		"jr $ra\n\t"
-		"nop\n\t"
-	);
 }
 
 // ------------------------------------------------------------------------

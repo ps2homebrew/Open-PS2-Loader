@@ -30,11 +30,6 @@
 #endif
 
 
-#define MAX_ARGS     0x40
-#define MAX_MOD_ARGS 0x50
-#define MAX_PATH     0x100
-
-
 typedef
 struct romdir
 {
@@ -146,8 +141,8 @@ int  (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int  (*Old_CreateThread)(ee_thread_t *thread_param);
 
 /* asm.S */
-void _LoadExecPS2(const char *filename, int argc, char *argv[]);
-u32 _SifSetDma(SifDmaTransfer_t *sdd, s32 len);
+void Hook_LoadExecPS2(const char *filename, int argc, char *argv[]);
+u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len);
 
 /* spu.c */
 void ResetSPU();

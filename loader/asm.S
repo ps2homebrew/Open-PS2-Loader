@@ -123,13 +123,12 @@ _LoadExecPS2:
 	/* increment g_argc */
 	la	$v1, g_argc
 	lw	$v0, 0x0000($v1)
+	daddu	$s4, $v0, $zero /* g_argc(-1) */
 	addiu	$v0, $v0, 1
 	sw	$v0, 0x0000($v1)
-	daddu	$s4, $v0, $zero /* g_argc   */
-	addiu	$s6, $s4, -1    /* g_argc-1 */
 
 	/* copy args from main ELF to args buffer */
-	blez	$s6, 4f
+	blez	$s4, 4f
 	daddu	$s5, $zero, $zero /* counter */
 3:
 	/* get arg len and increment it */
@@ -138,7 +137,7 @@ _LoadExecPS2:
 	daddu	$a0, $a0, $v0
 	jal	strlen
 	lw	$a0, 0x0000($a0)
-	addiu	$s7, $v0, 1 /* arg len */
+	addiu	$s6, $v0, 1 /* arg len */
 
 	/* copy arg to main args buffer */
 	daddu	$a0, $s3, $zero
@@ -147,7 +146,7 @@ _LoadExecPS2:
 	daddu	$a1, $a1, $v0
 	lw	$a1, 0x0000($a1)
 	jal	memcpy
-	daddu	$a2, $s7, $zero
+	daddu	$a2, $s6, $zero
 
 	/* store arg pointer to g_argv[counter+1] */
 	la	$v0, g_argv
@@ -156,11 +155,11 @@ _LoadExecPS2:
 	sw	$s3, 0x0004($v0)
 
 	/* increment arg buffer pointer with arg len + 1 */
-	daddu	$s3, $s3, $s7
+	daddu	$s3, $s3, $s6
 
 	/* loop on every args */
 	addiu	$s5, $s5, 1
-	slt	$v1, $s5, $s6
+	slt	$v1, $s5, $s4
 	bne	$v1, $zero, 3b
 	nop
 4:
@@ -235,7 +234,7 @@ _SifSetDma:
 
 #ifdef LOAD_EECORE_DOWN
 	lui	$v0, 0x0170
-	//ori	$v0, $v0, 0x0000
+	/* ori	$v0, $v0, 0x0000 */
 #else
 	lui	$v0, 0x000e
 	ori	$v0, $v0, 0x7000

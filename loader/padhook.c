@@ -231,6 +231,7 @@ static void IGR_Thread(void *arg)
 
 		// Init TLB
 		if(Cop0_Index != 0x26)
+		//if (GetMemorySize() != 0x02000000)
 		{
 			__asm__ __volatile__(
 				"	li $3, 0x82;"

@@ -163,16 +163,19 @@ u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 /*----------------------------------------------------------------------------------------*/
 /* This fonction unhook SifSetDma/SifSetReg sycalls		                          */
 /*----------------------------------------------------------------------------------------*/
+/*
 void Apply_Mode3(void)
 {
 	SetSyscall(__NR_SifSetDma, Old_SifSetDma);
 	SetSyscall(__NR_SifSetReg, Old_SifSetReg);	
 }
+*/
 
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction replace SifSetReg syscall in kernel.                                     */
 /*----------------------------------------------------------------------------------------*/
+/*
 int Hook_SifSetReg(u32 register_num, int register_value)
 {
 	if(set_reg_hook) {
@@ -206,6 +209,7 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 
 	return 1;
 }
+*/
 
 // ------------------------------------------------------------------------
 static void init_systemRestart(void)
@@ -363,6 +367,7 @@ void t_loadElf(void)
 }
 
 // ------------------------------------------------------------------------
+/*
 int Hook_CreateThread(ee_thread_t *thread_param)
 {
 	// Hook padOpen function to install In Game Reset
@@ -371,8 +376,10 @@ int Hook_CreateThread(ee_thread_t *thread_param)
 
 	return Old_CreateThread(thread_param);
 }
+*/
 
 // ------------------------------------------------------------------------
+/*
 int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
 {
 	// Hook padOpen function to install In Game Reset
@@ -390,6 +397,7 @@ int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
 
 	return 1;
 }
+*/
 
 /*----------------------------------------------------------------------------------------*/
 /* Replace SifSetDma, SifSetReg, LoadExecPS2 syscalls in kernel. (Game Loader)            */
@@ -427,9 +435,8 @@ void Remove_Kernel_Hooks(void)
 {
 	deinit_systemRestart();
 
-	if(!(g_compat_mask & COMPAT_MODE_3))
-		Apply_Mode3();
-
+	SetSyscall(__NR_SifSetDma, Old_SifSetDma);
+	SetSyscall(__NR_SifSetReg, Old_SifSetReg);	
 	SetSyscall(__NR_LoadExecPS2, Old_LoadExecPS2);
 
 	// If IGR is enabled unhook ExecPS2 & CreateThread syscalls

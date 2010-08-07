@@ -143,6 +143,9 @@ int  (*Old_CreateThread)(ee_thread_t *thread_param);
 /* asm.S */
 void Hook_LoadExecPS2(const char *filename, int argc, char *argv[]);
 u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len);
+int Hook_SifSetReg(u32 register_num, int register_value);
+int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[]);
+int Hook_CreateThread(ee_thread_t *thread_param);
 
 /* spu.c */
 void ResetSPU();

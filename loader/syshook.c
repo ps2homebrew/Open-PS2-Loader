@@ -113,6 +113,38 @@ static u32 InitializeUserMempattern_mask[] = {
 	0xffffffff
 };
 
+static u32 InitializeTLBpattern[] = {
+	0x3c027000,		//	lui	v0, $7000
+	0x8c423ff0,		//	lw	v0, $3ff0(v0)
+	0x3c038001,		//	lui	v1, $8001
+	0xac620000,		//	sw	v0, $XXXX(v1)
+	0x3c02bfc0,		//	lui	v0, $bfc0
+	0x8c4201f8,		//	lw	v0, $01f8(v0)
+	0x3c038001,		//	lui	v1, $8001
+	0xac620000,		//	sw	v0, $XXXX(v1)
+	0x3c1d8000,		//	lui	sp, $800X
+	0x27bd0000,		//	addiu	sp, sp, $XXXX
+	0x0c000000,		//	jal	InitializeTLB
+	0x00000000		//	nop
+};
+static u32 InitializeTLBpattern_mask[] = {
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffff0000,
+	0xffffffff,
+	0xffffffff,
+	0xffffffff,
+	0xffff0000,
+	0xfffffff0,
+	0xffff0000,
+	0xfc000000,
+	0xffffffff
+};
+
+void (*InitializeTLB)(void);
+
+
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
 /*----------------------------------------------------------------------------------------*/
@@ -237,6 +269,14 @@ static void init_systemRestart(void)
 		goto err;
 	// get systemRestart function pointer
 	systemRestart = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000);
+
+	// scan to find kernel InitializeTLB() function
+	ptr = (u32 *)0x80001000;
+	ptr = find_pattern_with_mask(ptr, 0x7f000, InitializeTLBpattern, InitializeTLBpattern_mask, sizeof(InitializeTLBpattern));
+	if (!ptr)
+		goto err;
+	// get InitializeTLB function pointer
+	InitializeTLB = (void *)(((ptr[10] & 0x03ffffff) << 2) | 0x80000000);
 
 	ee_kmode_exit();
 	EIntr();

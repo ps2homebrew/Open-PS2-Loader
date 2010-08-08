@@ -82,7 +82,7 @@ static void Go_Browser(void)
 	// FlushCache before exiting
 	FlushCache(0);
 	FlushCache(2);
-		
+
 	// Exit to PS2Browser
 	__asm__ __volatile__(
 		"	li $3, 0x04;"
@@ -231,13 +231,10 @@ static void IGR_Thread(void *arg)
 
 		// Init TLB
 		if(Cop0_Index != 0x26)
-		//if (GetMemorySize() != 0x02000000)
 		{
-			__asm__ __volatile__(
-				"	li $3, 0x82;"
-				"	syscall;"
-				"	nop;"
-			);
+			ee_kmode_enter();
+			InitializeTLB();
+			ee_kmode_exit();
 		}
 
 		// Check Performance Counter

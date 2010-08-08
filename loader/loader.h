@@ -140,6 +140,8 @@ void (*Old_LoadExecPS2)(const char *filename, int argc, char *argv[]);
 int  (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
 int  (*Old_CreateThread)(ee_thread_t *thread_param);
 
+extern void (*InitializeTLB)(void);
+
 /* asm.S */
 void Hook_LoadExecPS2(const char *filename, int argc, char *argv[]);
 u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len);

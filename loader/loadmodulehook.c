@@ -107,25 +107,25 @@ static u32 unloadModule_patchcode[] = {
 };
 
 // modules list to fake loading
-char *usb_modulefake_list[] = {
+static char *usb_modulefake_list[] = {
 	"USB_driver",
 	"cdvd_st_driver",
 	NULL
 };
-char *eth_modulefake_list[] = {
+static char *eth_modulefake_list[] = {
 	"dev9",
 	"INET_SMAP_driver",
 	"cdvd_st_driver",
 	NULL
 };
-char *hdd_modulefake_list[] = {
+static char *hdd_modulefake_list[] = {
 	"atad_driver",
 	"dev9",
 	"cdvd_st_driver",
 	NULL
 };
 
-void *modulefake_list[3] = {
+static void *modulefake_list[3] = {
 	usb_modulefake_list,
 	eth_modulefake_list,
 	hdd_modulefake_list
@@ -152,7 +152,7 @@ static int Hook_SifLoadModuleBuffer(void *ptr, int arg_len, const char *args, in
 	// check if module is in the list
 	while (modlist[i]) {
 		// fake module load if needed
-		if (!strcmp(modname_buf, modlist[i])) {
+		if (!_strcmp(modname_buf, modlist[i])) {
 			if (modres)
 				*modres = 0;
 			return 0;

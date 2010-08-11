@@ -118,17 +118,27 @@ int  New_Reset_Iop(const char *arg, int flag);
 int  Reset_Iop(const char *arg, int flag);
 int  Sync_Iop(void);
 
-/* misc.c */
+/* util.c */
+inline void _strcpy(char *dst, const char *src);
+inline void _strcat(char *dst, const char *src);
+int _strncmp(const char *s1, const char *s2, int length);
+int _strcmp(const char *s1, const char *s2);
+char *_strchr(const char *string, int c);
+char *_strrchr(const char * string, int c);
+char *_strtok(char *strToken, const char *strDelimit);
+char *_strstr(const char *string, const char *substring);
+inline int _islower(int c);
+inline int _toupper(int c);
+int _memcmp(const void *s1, const void *s2, unsigned int length);
 unsigned int _strtoui(const char* p);
 void set_ipconfig(void);
 u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
 int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
-//int Patch_EELOADCNF_Img(ioprp_t *ioprp_img);
 int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile);
-int XLoadfileCheck(void);
-void delay(int count);
-void Sbv_Patch(void);
+inline int XLoadfileCheck(void);
+inline void delay(int count);
+inline void Sbv_Patch(void);
 
 /* syshook.c */
 void Install_Kernel_Hooks(void);

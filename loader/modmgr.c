@@ -293,8 +293,9 @@ void ChangeModuleName(const char *name, const char *newname)
 	do {
 		smem_read(info.name, search_name, sizeof(search_name));
 
-		if (!memcmp(search_name, name, len)) {
+		if (!_memcmp(search_name, name, len)) {
 			strncpy(search_name, newname, sizeof(search_name));
+			search_name[sizeof(search_name)-1] = 0;
 			smem_write(info.name, search_name, strlen(search_name));
 			break;
 		}

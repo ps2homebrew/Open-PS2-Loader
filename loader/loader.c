@@ -9,7 +9,7 @@
 
 #include "loader.h"
 
-char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
+static char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
 
 int main(int argc, char **argv){
 
@@ -27,42 +27,42 @@ int main(int argc, char **argv){
 
 	argv[1][11]=0x00; // fix for 8+3 filename.
 
-	strcpy(ElfPath, "cdrom0:\\");
-	strcat(ElfPath, argv[1]);
-	strcat(ElfPath, ";1");
-	strcpy(GameID, argv[1]);
+	_strcpy(ElfPath, "cdrom0:\\");
+	_strcat(ElfPath, argv[1]);
+	_strcat(ElfPath, ";1");
+	_strcpy(GameID, argv[1]);
 	DPRINTF("Elf path = '%s'\n", ElfPath);
 	DPRINTF("Game ID = '%s'\n", GameID);
 
-	if (!strncmp(argv[0], "USB_MODE", 8))
+	if (!_strncmp(argv[0], "USB_MODE", 8))
 		GameMode = USB_MODE;
-	else if (!strncmp(argv[0], "ETH_MODE", 8))
+	else if (!_strncmp(argv[0], "ETH_MODE", 8))
 		GameMode = ETH_MODE;
-	else if (!strncmp(argv[0], "HDD_MODE", 8))
+	else if (!_strncmp(argv[0], "HDD_MODE", 8))
 		GameMode = HDD_MODE;
 	DPRINTF("Game Mode = %d\n", GameMode);	
 
-	if (!strncmp(&argv[0][9], "0", 1))
+	if (!_strncmp(&argv[0][9], "0", 1))
 		ExitMode = OSDS_MODE;
-	else if (!strncmp(&argv[0][9], "1", 1))
+	else if (!_strncmp(&argv[0][9], "1", 1))
 		ExitMode = BOOT_MODE;
-	else if (!strncmp(&argv[0][9], "2", 1))
+	else if (!_strncmp(&argv[0][9], "2", 1))
 		ExitMode = APPS_MODE;
 	DPRINTF("Exit Mode = %d\n", ExitMode);	
 	
 	DisableDebug = 0;
 
-	if (!strncmp(&argv[0][11], "1", 1)) {
+	if (!_strncmp(&argv[0][11], "1", 1)) {
 		DisableDebug = 1;
 		DPRINTF("Debug color screens enabled\n");
 	}
 
-	char *p = strtok(&argv[0][13], " ");
-	strcpy(g_ps2_ip, p);
-	p = strtok(NULL, " ");
-	strcpy(g_ps2_netmask, p);
-	p = strtok(NULL, " ");
-	strcpy(g_ps2_gateway, p);
+	char *p = _strtok(&argv[0][13], " ");
+	_strcpy(g_ps2_ip, p);
+	p = _strtok(NULL, " ");
+	_strcpy(g_ps2_netmask, p);
+	p = _strtok(NULL, " ");
+	_strcpy(g_ps2_gateway, p);
 	DPRINTF("IP=%s NM=%s GW=%s\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway);	
 
 	// bitmask of the compat. settings

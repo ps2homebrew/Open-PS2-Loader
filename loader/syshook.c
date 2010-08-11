@@ -331,14 +331,15 @@ void t_loadElf(void)
 	DPRINTF("t_loadElf: Loading cddev IOP module...\n");
 	LoadIRXfromKernel(cddev_irx, size_cddev_irx, 0, NULL);
 
-	strncpy(g_ElfPath, g_argv[0], 1024);	
+	strncpy(g_ElfPath, g_argv[0], 1024);
+	g_ElfPath[1023] = 0;
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
 
 	// replacing cdrom in elf path by cddev
-	if (strstr(g_argv[0], "cdrom")) {
+	if (_strstr(g_argv[0], "cdrom")) {
 		u8 *ptr = (u8 *)g_argv[0];
-		strcpy(g_ElfPath, "cddev");
-		strcat(g_ElfPath, &ptr[5]);		
+		_strcpy(g_ElfPath, "cddev");
+		_strcat(g_ElfPath, &ptr[5]);		
 	}
 
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
@@ -383,7 +384,7 @@ void t_loadElf(void)
 		SifExitRpc();
 
 		// replacing cddev in elf path by cdrom
-		if (strstr(g_ElfPath, "cddev"))
+		if (_strstr(g_ElfPath, "cddev"))
 			memcpy(g_ElfPath, "cdrom", 5);
 
 		DPRINTF("t_loadElf: real elf path = '%s'\n", g_ElfPath);

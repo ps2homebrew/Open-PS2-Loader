@@ -194,7 +194,7 @@ void apply_patches(void)
 
 	// if there are patches matching game name/mode then fill the patch table
 	while (p->game) {
-		if ((!strcmp(GameID, p->game)) && ((p->mode == ALL_MODE) || (GameMode == p->mode))) {
+		if ((!_strcmp(GameID, p->game)) && ((p->mode == ALL_MODE) || (GameMode == p->mode))) {
 
 			if (p->patch.addr == 0xdeadbee0)
 				NIS_generic_patches(); 	// Nippon Ichi Software games generic patch

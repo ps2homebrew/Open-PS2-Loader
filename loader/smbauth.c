@@ -56,7 +56,7 @@ static server_specs_t *server_specs = (void *)UNCACHEDSEG((DMA_ADDR + 0x40));
 /*
  * LM_Password_Hash: this function create a LM password hash from a given password
  */
-unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *cipher)
+static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *cipher)
 {
 	unsigned char tmp_pass[14] = {"\0\0\0\0\0\0\0\0\0\0\0\0\0\0"};
 	unsigned char K1[7];
@@ -68,7 +68,7 @@ unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *ci
 
 	/* turn the password to uppercase */
 	for (i=0; i<14; i++) {
-		tmp_pass[i] = toupper(tmp_pass[i]);
+		tmp_pass[i] = _toupper(tmp_pass[i]);
 	}
 
 	/* get 2 7bytes keys from password */
@@ -85,7 +85,7 @@ unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *ci
 /*
  * NTLM_Password_Hash: this function create a NTLM password hash from a given password
  */
-unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *cipher)
+static unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *cipher)
 {
 	int i, j;
 
@@ -104,7 +104,7 @@ unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *
 /*
  * LM_Response: this function create a LM response from a given LM hash & challenge
  */
-unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned char *chal, unsigned char *cipher)
+static unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned char *chal, unsigned char *cipher)
 {
 	unsigned char P21[21];
 	unsigned char K[7];

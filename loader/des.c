@@ -64,7 +64,7 @@
 	(a)=(a)^(t)^(t>>(16-(n))))
 
 
-unsigned long des_SPtrans[8][64]={
+static unsigned long des_SPtrans[8][64]={
 /* nibble 0 */
 {
 0x00820200, 0x00020000, 0x80800000, 0x80820200,
@@ -217,7 +217,7 @@ unsigned long des_SPtrans[8][64]={
 0x00000020, 0x08208000, 0x00208020, 0x00000000,
 0x08000000, 0x08200020, 0x00008000, 0x00208020
 }};
-unsigned long des_skb[8][64]={
+static unsigned long des_skb[8][64]={
 /* for C bits (numbered as per FIPS 46) 1 2 3 4 5 6 */
 {
 0x00000000,0x00000010,0x20000000,0x20000010,

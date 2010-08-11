@@ -12,7 +12,7 @@
 # g_buf is located at 0x00088000
 
 EE_BIN = loader.elf
-EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o misc.o patches.o padhook.o spu.o smbauth.o des.o md4.o loadmodulehook.o asm.o crt0.o
+EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o util.o patches.o padhook.o spu.o smbauth.o des.o md4.o loadmodulehook.o asm.o crt0.o
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
 EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)
@@ -24,7 +24,13 @@ EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 endif
 
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
-EE_LIBS += -lpatches -lc -lkernel -lc
+EE_LIBS += -lpatches
+
+ifeq ($(EESIO_DEBUG),1) 
+EE_LIBS += -lc
+endif
+
+EE_LIBS += -lkernel
 
 %.o : %.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
@@ -38,7 +44,7 @@ EE_LIBS += -lpatches -lc -lkernel -lc
 $(EE_BIN) : $(EE_OBJS)
 	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker loader.map
 
-	
+
 all: $(EE_BIN)
 
 clean:

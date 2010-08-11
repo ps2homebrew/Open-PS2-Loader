@@ -2,7 +2,7 @@
   Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review Open PS2 Loader README & LICENSE files for further details.
   
   Some parts of the code are taken from HD Project by Polo
 */
@@ -15,6 +15,197 @@ extern int size_cdvdman_irx;
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
 
+
+/* Do not link to strcpy() from libc */
+inline void _strcpy(char *dst, const char *src)
+{
+	strncpy(dst, src, strlen(src)+1);
+}
+
+/* Do not link to strcat() from libc */
+inline void _strcat(char *dst, const char *src)
+{
+	_strcpy(&dst[strlen(dst)], src);
+}
+
+/* Do not link to strncmp() from libc */
+int _strncmp(const char *s1, const char *s2, int length)
+{
+	const char *a = s1;
+	const char *b = s2;
+
+	while (length > 0) {
+		if ((*a == 0) || (*b == 0))
+			return -1;
+		if (*a++ != *b++)
+			return 1;
+		length--;
+	}
+
+	return 0;
+}
+
+/* Do not link to strcmp() from libc */
+int _strcmp(const char *s1, const char *s2)
+{
+	register int i = 0;
+
+	while ((s1[i] != 0) && (s1[i] == s2[i]))
+		i++;
+
+	if (s1[i] > s2[i])
+		return 1;
+	else if (s1[i] < s2[i])
+		return -1;
+
+	return 0;
+}
+
+/* Do not link to strchr() from libc */
+char *_strchr(const char *string, int c)
+{
+	while (*string) {
+		if (*string == c)
+			return (char *)string;
+		string++;
+	}
+
+	if (*string == c)
+		return (char *)string;
+
+	return NULL;
+}
+
+/* Do not link to strrchr() from libc */
+char *_strrchr(const char * string, int c)
+{
+	/* use the asm strchr to do strrchr */
+	char* lastmatch;
+	char* result;
+
+	/* if char is never found then this will return 0 */
+	/* if char is found then this will return the last matched location
+	   before strchr returned 0 */
+
+	lastmatch = 0;
+	result = _strchr(string,c);
+
+	while ((int)result != 0) {
+		lastmatch=result;
+		result = _strchr(lastmatch+1,c);
+	}
+
+	return lastmatch;
+}
+
+/* Do not link to strtok() from libc */
+char *_strtok(char *strToken, const char *strDelimit)
+{
+	static char* start;
+	static char* end;
+
+	if (strToken != NULL)
+		start = strToken;
+	else {
+		if (*end == 0)
+			return 0;
+
+		start=end;
+	}
+
+	if(*start == 0)
+		return 0;
+
+	// Strip out any leading delimiters
+	while (_strchr(strDelimit, *start)) {
+		// If a character from the delimiting string
+		// then skip past it
+
+		start++;
+
+		if (*start == 0)
+			return 0;
+	}
+
+	if (*start == 0)
+		return 0;
+
+	end=start;
+
+	while (*end != 0) {
+		if (_strchr(strDelimit, *end)) {
+			// if we find a delimiting character
+			// before the end of the string, then
+			// terminate the token and move the end
+			// pointer to the next character
+			*end = 0;
+			end++;
+			return start;
+		}
+		end++;
+	}
+
+	// reached the end of the string before finding a delimiter
+	// so dont move on to the next character
+	return start;
+}
+
+/* Do not link to strstr() from libc */
+char *_strstr(const char *string, const char *substring)
+{
+	char* strpos;
+
+	if (string == 0)
+		return 0;
+
+	if (strlen(substring)==0)
+		return (char*)string;
+
+	strpos = (char*)string;
+
+	while (*strpos != 0) {
+		if (_strncmp(strpos, substring, strlen(substring)) == 0)
+			return strpos;
+
+		strpos++;
+	}
+
+	return 0;
+}
+
+/* Do not link to islower() from libc */
+inline int _islower(int c)
+{
+	if ((c < 'a') || (c > 'z'))
+		return 0;
+
+	// passed both criteria, so it
+	// is a lower case alpha char
+	return 1;
+}
+
+/* Do not link to toupper() from libc */
+inline int _toupper(int c)
+{
+	if (_islower(c))
+		c -= 32;
+
+	return c;
+}
+
+/* Do not link to memcmp() from libc */
+int _memcmp(const void *s1, const void *s2, unsigned int length)
+{
+	const char *a = s1;
+	const char *b = s2;
+
+	while (length--) {
+		if (*a++ != *b++)
+			return 1;
+	}
+
+	return 0;
+}
 
 /*----------------------------------------------------------------------------------------*/
 /* This function converts string to unsigned integer. Stops on illegal characters.        */
@@ -39,7 +230,6 @@ unsigned int _strtoui(const char* p)
 	return r;
 }
 
-
 /*----------------------------------------------------------------------------------------*/
 /* This function format g_ipconfig with ip, netmask, and gateway                          */
 /*----------------------------------------------------------------------------------------*/
@@ -47,20 +237,19 @@ void set_ipconfig(void)
 {
 	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
 	g_ipconfig_len = 0;
-	
+
 	// add ip to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_ip, 15);
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_ip, 16);
 	g_ipconfig_len += strlen(g_ps2_ip) + 1;
 
 	// add netmask to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_netmask, 15);
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_netmask, 16);
 	g_ipconfig_len += strlen(g_ps2_netmask) + 1;
 
 	// add gateway to g_ipconfig buf
-	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_gateway, 15);
+	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_gateway, 16);
 	g_ipconfig_len += strlen(g_ps2_gateway) + 1;
 }
-
 
 /*----------------------------------------------------------------------------------------*/
 /* This function retrieve a pattern in a buffer, using a mask                             */
@@ -71,7 +260,7 @@ u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 
 
 	len /= sizeof(u32);
 	bufsize /= sizeof(u32);
-	
+
 	for (i = 0; i < bufsize - len; i++) {
 		for (j = 0; j < len; j++) {
 			if ((buf[i + j] & mask[j]) != pattern[j])
@@ -84,11 +273,11 @@ u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 
 	return NULL;
 }
 
-
 /*----------------------------------------------------------------------------------------*/
 /* Copy 'size' bytes of 'eedata' from EE to 'iopptr' in IOP.                              */
 /*----------------------------------------------------------------------------------------*/
- void CopyToIop(void *eedata, unsigned int size, void *iopptr){
+void CopyToIop(void *eedata, unsigned int size, void *iopptr)
+{
 	SifDmaTransfer_t dmadata;
 	register int id;
 
@@ -117,7 +306,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 	// arrange modsize to next 16 bytes align
 	if (modsize % 0x10)
 		modsize = (modsize + 0x10) & 0xfffffff0;
-		
+
 	offset_in  = 0;
 	romdir_in  = (romdir_t*)ioprp_img->data_in;
 
@@ -125,7 +314,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 	while(strlen(romdir_in->fileName) > 0)
 	{ 
 		//scr_printf("%s:%d ", romdir_in->fileName, romdir_in->fileSize);
-		if (!strcmp(romdir_in->fileName, name))
+		if (!_strcmp(romdir_in->fileName, name))
 			break;
 
 		if ((romdir_in->fileSize % 0x10)==0)
@@ -135,7 +324,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 
 		romdir_in++;
 	}
-	
+
 	// if module found
 	if (offset_in) {
 		if ((romdir_in->fileSize % 0x10)==0)
@@ -144,7 +333,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 			next_mod_offset = offset_in + ((romdir_in->fileSize + 0x10) & 0xfffffff0);
 
 		bytes_to_move = ioprp_img->size_in - next_mod_offset;
-				
+
 		// and greater than one in IOPRP img
 		if (modsize >= romdir_in->fileSize) {
 			diff = modsize - romdir_in->fileSize;
@@ -152,7 +341,7 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 				if (bytes_to_move > 0) {
 					for (i = ioprp_img->size_in; i >= next_mod_offset; i--)
 						p[i + diff] = p[i];		
-												
+
 					ioprp_img->size_in += diff;
 				}
 			}
@@ -164,191 +353,27 @@ int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 				if (bytes_to_move > 0) {
 					for (i = 0; i < bytes_to_move; i++)
 						p[offset_in + modsize + i] = p[next_mod_offset + i];
-								
+
 					ioprp_img->size_in -= diff;
 				}
 			}	
 		}
-		
+
 		// finally replace module
 		DIntr();
 		ee_kmode_enter();
 		memcpy((void *)(ioprp_img->data_in+offset_in), modptr, modsize);
 		ee_kmode_exit();
 		EIntr();		
-		
+
 		// correct filesize in romdir
 		romdir_in->fileSize = modsize;
 	}
 
 	ioprp_img->size_out = ioprp_img->size_in;
-	
-	return 1;
-}
-
-/*----------------------------------------------------------------------------------------*/
-/* Place additionnal modules in a EELOADCNF type image.                                   */
-/*----------------------------------------------------------------------------------------*/
-/*int Patch_EELOADCNF_Img(ioprp_t *ioprp_img)
-{
-	int       offset_in, offset_out;
-	romdir_t *romdir_in, *romdir_out;
-	char *ptr;
-
-	offset_in  = 0;
-	offset_out = 0;
-
-	romdir_in  = (romdir_t*)ioprp_img->data_in;
-	romdir_out = (romdir_t*)ioprp_img->data_out;
-	memset(ioprp_img->data_out, 0, ioprp_img->size_in);
-
-	// First search for EXTINFO
-	while(strcmp(romdir_in->fileName, "EXTINFO")) {
-		if (!strcmp(romdir_in->fileName, "ROMDIR")) {
-			// copy ROMDIR to IOPRP out
-			memcpy((void*)ioprp_img->data_out+offset_out, (void*)ioprp_img->data_in+offset_in, romdir_in->fileSize);
-			// adjust ROMDIR size (room space for replacement modules)
-			romdir_out->fileSize += 0x20;			
-		}
-			
-		// arrange irx size to next 16 bytes multiple 
-		if ((romdir_in->fileSize % 0x10)==0)
-			offset_in += romdir_in->fileSize;
-		else
-			offset_in += (romdir_in->fileSize + 0x10) & 0xfffffff0;
-
-		if ((romdir_out->fileSize % 0x10)==0)
-			offset_out += romdir_out->fileSize;
-		else
-			offset_out += (romdir_out->fileSize + 0x10) & 0xfffffff0;
-			
-		romdir_in++;
-		romdir_out++;		
-	}
-		
-	u8 *p2 = (u8 *)ioprp_img->data_out;
-	u8 *p = (u8 *)ioprp_img->data_in;
-	
-	// adding room space before EXTINFO (in ROMDIR)
-	memcpy(&p2[offset_in+0x20], &p[offset_in], romdir_in->fileSize);
-	
-	// adding room space IN EXTINFO for both CDVDMAN/CDVDFSV
-	romdir_out->fileSize += 0x18 + 0x18;
-		
-	offset_in  = 0;
-	offset_out = 0;
-
-	romdir_in  = (romdir_t*)ioprp_img->data_in;
-	romdir_out = (romdir_t*)ioprp_img->data_out;
-	
-	while(strlen(romdir_in->fileName) > 0) {
-		// copying IOPBTCONF from EELOADCNF		
-		if (!strcmp(romdir_in->fileName, "IOPBTCONF")) {
-			memcpy((void*)ioprp_img->data_out+offset_out, (void*)ioprp_img->data_in+offset_in, romdir_in->fileSize);
-			
-			// correcting NCDVDMAN (used on some Slims) into CDVDMAN into IOPBTCONF
-			ptr = strstr(ioprp_img->data_in+offset_in, "NCDVDMAN");
-			if (ptr) {
-				char *ptr2 = strstr(ioprp_img->data_out+offset_out, "NCDVDMAN");
-				int sz = (int)((u32)(ioprp_img->data_in+offset_in+romdir_in->fileSize) - (u32)ptr - 1);
-				memcpy(&ptr2[0], &ptr[1], sz);
-				ptr2[sz] = 0;
-				romdir_out->fileSize--;
-			}
-			
-			// correcting XCDVDMAN into CDVDMAN into IOPBTCONF
-			ptr = strstr(ioprp_img->data_in+offset_in, "XCDVDMAN");
-			if (ptr) {
-				char *ptr2 = strstr(ioprp_img->data_out+offset_out, "XCDVDMAN");
-				int sz = (int)((u32)(ioprp_img->data_in+offset_in+romdir_in->fileSize) - (u32)ptr - 1);
-				memcpy(&ptr2[0], &ptr[1], sz);
-				ptr2[sz] = 0;
-				romdir_out->fileSize--;
-			}		
-			
-			// adding CDVDMAN & CDVDFSV: 0 size, they'll be patched later in this function
-			romdir_out++;
-			memcpy(romdir_out, "CDVDMAN\0\0\0\x18\0\0\0\0\0", 0x10);
-			romdir_out++;
-			memcpy(romdir_out, "CDVDFSV\0\0\0\x18\0\0\0\0\0", 0x10);			
-			break;
-		}
-		// modify EXTINFO for CDVDMAN/CDVDFSV
-		else if (!strcmp(romdir_in->fileName, "EXTINFO")) {
-			// without this, the replacement modules appended to the Mini Image fails to load
-			memcpy((void*)ioprp_img->data_out+offset_out+romdir_in->fileSize, "\0\0\x04\x01\x12\x04\x88\x19\x99\x99\0\x02\0\0\x08\x03""CDVDMAN\0", 0x18);
-			memcpy((void*)ioprp_img->data_out+offset_out+romdir_in->fileSize+0x18, "\0\0\x04\x01\x12\x04\x88\x19\x99\x99\0\x02\0\0\x08\x03""CDVDFSV\0", 0x18);
-		}		
-		
-		// arrange irx size to next 16 bytes multiple 
-		if ((romdir_in->fileSize % 0x10)==0)
-			offset_in += romdir_in->fileSize;
-		else
-			offset_in += (romdir_in->fileSize + 0x10) & 0xfffffff0;
-
-		if ((romdir_out->fileSize % 0x10)==0)
-			offset_out += romdir_out->fileSize;
-		else
-			offset_out += (romdir_out->fileSize + 0x10) & 0xfffffff0;
-			
-		romdir_in++;
-		romdir_out++;				
-	}	
-
-	ioprp_img->size_out = offset_out;
-
-	// now we can patch IMG
-	memcpy(ioprp_img->data_in, ioprp_img->data_out, ioprp_img->size_out);
-	ioprp_img->size_in = ioprp_img->size_out;
-		
-	offset_in  = 0;
-	offset_out = 0;
-
-	romdir_in  = (romdir_t*)ioprp_img->data_in;
-	romdir_out = (romdir_t*)ioprp_img->data_out;
-	
-	while(strlen(romdir_in->fileName) > 0) {
-		if (!strcmp(romdir_in->fileName, "CDVDMAN")){
-			DIntr(); // get back cdvdman drv from kernel ram		
-			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), cdvdman_irx, size_cdvdman_irx);
-			ee_kmode_exit();
-			EIntr();
-			romdir_out->fileSize = size_cdvdman_irx;
-		}
-		else if (!strcmp(romdir_in->fileName, "CDVDFSV")) {
-			DIntr(); // get back cdvdfsv drv from kernel ram		
-			ee_kmode_enter();
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), cdvdfsv_irx, size_cdvdfsv_irx);
-			romdir_out->fileSize = size_cdvdfsv_irx;
-			ee_kmode_exit();
-			EIntr();
-			
-		}
-		else if((strcmp(romdir_in->fileName, "ROMDIR")) && (strcmp(romdir_in->fileName, "IOPBTCONF"))) {
-			memcpy((void*)((u32)ioprp_img->data_out+offset_out), (void*)((u32)ioprp_img->data_in+offset_in), romdir_in->fileSize);
-		}
-		
-		// arrange irx size to next 16 bytes multiple 
-		if ((romdir_in->fileSize % 0x10)==0)
-			offset_in += romdir_in->fileSize;
-		else
-			offset_in += (romdir_in->fileSize + 0x10) & 0xfffffff0;
-
-		if ((romdir_out->fileSize % 0x10)==0)
-			offset_out += romdir_out->fileSize;
-		else
-			offset_out += (romdir_out->fileSize + 0x10) & 0xfffffff0;
-
-		romdir_in++;
-		romdir_out++;
-	}
-
-	ioprp_img->size_out = offset_out;
 
 	return 1;
 }
-*/
 
 /*----------------------------------------------------------------------------------------*/
 /* Build an EELOAD Config file				                                  */
@@ -362,21 +387,21 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile)
 	memset((void *)romdir_in, 0, 7 * sizeof(romdir_t));
 
 	// Build ROMDIR fs
-	strcpy(romdir_in->fileName, "RESET");
+	_strcpy(romdir_in->fileName, "RESET");
 	romdir_in->extinfo_size = 8;
 	romdir_in++;
 
-	strcpy(romdir_in->fileName, "ROMDIR");
+	_strcpy(romdir_in->fileName, "ROMDIR");
 	romdir_size = 7 * sizeof(romdir_t);
 	romdir_in->fileSize = romdir_size;
 	romdir_in++;
 
-	strcpy(romdir_in->fileName, "EXTINFO");
+	_strcpy(romdir_in->fileName, "EXTINFO");
 	extinfo_size = 8 + 8 + 24 + 24;
 	romdir_in->fileSize = extinfo_size;
 	romdir_in++;
 
-	strcpy(romdir_in->fileName, "IOPBTCONF");
+	_strcpy(romdir_in->fileName, "IOPBTCONF");
 	romdir_in->extinfo_size = 8;
 
 	// Fill EXTINFO
@@ -397,7 +422,7 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile)
 	memcpy(&ptr[0], iopbtconf_str0, strlen(iopbtconf_str0));
 	memcpy(&ptr[strlen(iopbtconf_str0)], iopbtconf_str1, strlen(iopbtconf_str1));
 	memcpy(&ptr[strlen(iopbtconf_str0)+strlen(iopbtconf_str1)], iopbtconf_str2, strlen(iopbtconf_str2));
-	
+
 	// Fill IOPBTCONF filesize
 	iopbtconf_size = strlen(iopbtconf_str0)+strlen(iopbtconf_str1)+strlen(iopbtconf_str2);
 	romdir_in->fileSize = iopbtconf_size;
@@ -408,7 +433,7 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile)
 	ptr += iopbtconf_size;
 
 	// Fill CDVDMAN
-	strcpy(romdir_in->fileName, "CDVDMAN");
+	_strcpy(romdir_in->fileName, "CDVDMAN");
 	romdir_in->extinfo_size = 24;
 	cdvdman_size = size_cdvdman_irx;
 	romdir_in->fileSize = cdvdman_size;
@@ -424,7 +449,7 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile)
 	ptr += cdvdman_size;
 
 	// Fill CDVDFSV
-	strcpy(romdir_in->fileName, "CDVDFSV");
+	_strcpy(romdir_in->fileName, "CDVDFSV");
 	romdir_in->extinfo_size = 24;
 	cdvdfsv_size = size_cdvdfsv_irx;
 	romdir_in->fileSize = cdvdfsv_size;
@@ -449,7 +474,7 @@ int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile)
 /*----------------------------------------------------------------------------------------*/
 /* XLoadfileCheck                                                                          */
 /*----------------------------------------------------------------------------------------*/
-int XLoadfileCheck(void)
+inline int XLoadfileCheck(void)
 {
 	register int fd;
 
@@ -465,7 +490,7 @@ int XLoadfileCheck(void)
 /*----------------------------------------------------------------------------------------*/
 /* NOP delay.                                                                             */
 /*----------------------------------------------------------------------------------------*/
- void delay(int count)
+inline void delay(int count)
 {
 	int i, ret;
 
@@ -475,11 +500,10 @@ int XLoadfileCheck(void)
 	}
 }
 
-
 /*----------------------------------------------------------------------------------------*/
 /* Apply SBV patchs.                                                                      */
 /*----------------------------------------------------------------------------------------*/
- void Sbv_Patch(void)
+inline void Sbv_Patch(void)
 {
 	sbv_patch_enable_lmb();
 	sbv_patch_disable_prefix_check();

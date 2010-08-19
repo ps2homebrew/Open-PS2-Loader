@@ -861,10 +861,9 @@ int mass_stor_warmup(mass_dev *dev)
 int mass_stor_configureDevice(void)
 {
 	// give the USB driver some time to detect the device
-	//i = 10000;
-	//while (wait_for_connect && (--i > 0))
-	//    DelayThread(100);
-	//wait_for_connect = 0;
+	register int i = 10000;
+	while (--i > 0)
+	    DelayThread(100);
 
 	XPRINTF("mass_driver: configuring devices... \n");
 

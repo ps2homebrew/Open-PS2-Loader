@@ -165,19 +165,18 @@ alt_loader.s:
 	echo "    * alternative Loader"
 	$(MAKE) -C loader clean
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader
+	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
 else
 ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) EESIO_DEBUG=1 -C loader
+	$(MAKE) EESIO_DEBUG=1 -C loader -f Makefile.alt
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader
+	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
 else
-	$(MAKE) -C loader
-endif
-endif
-endif
 	$(MAKE) -C loader -f Makefile.alt
+endif
+endif
+endif
 	bin2s loader/loader.elf asm/alt_loader.s alt_loader_elf
 
 elfldr.s:

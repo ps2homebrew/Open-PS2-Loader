@@ -244,7 +244,7 @@ _SifSetDma:
 	daddu	$a2, $sp, $zero
 
 #ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0170
+	lui	$v0, 0x0009
 	/* ori	$v0, $v0, 0x0000 */
 #else
 	lui	$v0, 0x000e
@@ -325,7 +325,7 @@ _Apply_Mode3:
 	daddu	$a0, $sp, $zero
 
 #ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0170
+	lui	$v0, 0x0009
 	/* ori	$v0, $v0, 0x0000 */
 #else
 	lui	$v0, 0x000e
@@ -442,7 +442,7 @@ Hook_ExecPS2:
 	daddu	$s4, $sp, $zero
 
 #ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0170
+	lui	$v0, 0x0009
 	/* ori	$v0, $v0, 0x0000 */
 #else
 	lui	$v0, 0x000e
@@ -499,7 +499,7 @@ Hook_CreateThread:
 	daddu	$a1, $sp, $zero
 
 #ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0170
+	lui	$v0, 0x0009
 	/* ori	$v0, $v0, 0x0000 */
 #else
 	lui	$v0, 0x000e

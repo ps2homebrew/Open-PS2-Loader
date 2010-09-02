@@ -359,6 +359,19 @@ static void guiShowIPConfig() {
 	}
 }
 
+int guiShowKeyboard(char* value, int maxLength) {
+	char tmp[maxLength];
+	strncpy(tmp, value, maxLength);
+
+	int result = diaShowKeyb(tmp, maxLength);
+	if (result) {
+		strncpy(value, tmp, maxLength);
+		value[maxLength - 1] = '\0';
+	}
+
+	return result;
+}
+
 int guiShowCompatConfig(int id, item_list_t *support) {
 	int dmaMode = -1, compatMode = 0;
 	char* startup = support->itemGetStartup(id);
@@ -395,14 +408,14 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			if (sysGetDiscID(hexDiscID) >= 0)
 				diaSetString(diaCompatConfig, COMPAT_GAMEID, hexDiscID);
 			else
-				guiMsgBox(_l(_STR_ERROR_LOADING_ID));
+				guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0);
 		}
 	} while (result == COMPAT_LOADFROMDISC);
 
 	if (result == COMPAT_REMOVE) {
 		removeConfigDiscID(startup);
 		support->itemSetCompatibility(id, 0, -1, 0);
-		guiMsgBox(_l(_STR_REMOVED_ALL_SETTINGS));
+		guiMsgBox(_l(_STR_REMOVED_ALL_SETTINGS), 0);
 	} else if (result > 0) { // okay pressed or other button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -518,7 +531,7 @@ static void guiHandleDeferredOps(void) {
 		
 		if (gNetworkStartup < 0) {
 			gNetworkStartup = 0;
-			guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR));
+			guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0);
 		}
 		
 		struct gui_update_list_t* td = gUpdateList;
@@ -864,39 +877,34 @@ static void guiMainHandleInput() {
 		int i;
 		for (i = 0; i < gTheme->displayedItems; ++i)
 			menuNextV();
-	}// home
-	if (getKeyOn(KEY_L2)) {
-		struct menu_item_t* cur = menuGetCurrent();
-		
-		cur->current = cur->submenu;
 	}
+
+	struct menu_item_t* cur = menuGetCurrent();
+	if (!cur)
+		return;
 	
-	// end
-	if (getKeyOn(KEY_R2)) {
-		struct menu_item_t* cur = menuGetCurrent();
-		
+	if(getKeyOn(KEY_START)) {
+		// reinit main menu - show/hide items valid in the active context
+		guiInitMainMenu();
+		screenHandlerTarget = &menuScreenHandler;
+	} else if (getKeyOn(KEY_L2)) { // home
+		cur->current = cur->submenu;
+	} else if (getKeyOn(KEY_R2)) { // end
 		if (!cur->current)
 			cur->current = cur->submenu;
 			
 		if (cur->current)
 			while (cur->current->next)
 				cur->current = cur->current->next;
-	}
-	
-	if(getKeyOn(KEY_CROSS)){
-		// handle via callback in the menuitem
-		menuItemExecute();
+	} else if(getKeyOn(KEY_CROSS)){
+		menuItemExecButton(cur->execCross);
 	} else if(getKeyOn(KEY_TRIANGLE)){
-		// handle via callback in the menuitem
-		menuItemAltExecute();
+		menuItemExecButton(cur->execTriangle);
+	} else if(getKeyOn(KEY_CIRCLE)){
+		menuItemExecButton(cur->execCircle);
+	} else if(getKeyOn(KEY_SQUARE)){
+		menuItemExecButton(cur->execSquare);
 	}
-	
-	if(getKeyOn(KEY_START)) {
-		// reinit main menu - show/hide items valid in the active context
-		guiInitMainMenu();
-		screenHandlerTarget = &menuScreenHandler;
-	}
-		
 }
 
 static void guiMenuRender() {
@@ -1131,7 +1139,7 @@ void guiUpdateScreenScale(void) {
 	fntSetAspectRatio(wideScreenScale, 1.0f);
 }
 
-void guiMsgBox(const char* text) {
+int guiMsgBox(const char* text, int addAccept) {
 	int terminate = 0;
 	while(!terminate) {
 		guiStartFrame();
@@ -1140,6 +1148,8 @@ void guiMsgBox(const char* text) {
 
 		if(getKeyOn(KEY_CIRCLE)) 
 			terminate = 1;
+		else if(getKeyOn(KEY_CROSS))
+					terminate = 2;
 		
 		guiShow();
 		
@@ -1150,9 +1160,13 @@ void guiMsgBox(const char* text) {
 		
 		fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
 		fntRenderString(500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
+		if (addAccept)
+			fntRenderString(70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
 
 		guiEndFrame();
 	}
+
+	return terminate - 1;
 }
 
 void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {

@@ -68,8 +68,10 @@ typedef struct {
 void clearIOModuleT(opl_io_module_t *mod) {
 	mod->subMenu = NULL;
 	mod->support = NULL;
-	mod->menuItem.altExecute = NULL;
-	mod->menuItem.execute = NULL;
+	mod->menuItem.execCross = NULL;
+	mod->menuItem.execCircle = NULL;
+	mod->menuItem.execSquare = NULL;
+	mod->menuItem.execTriangle = NULL;
 	mod->menuItem.hints = NULL;
 	mod->menuItem.icon_id = -1;
 	mod->menuItem.current = NULL;
@@ -98,10 +100,14 @@ static void initHints(struct menu_item_t* menuItem, int startMode) {
 		item_list_t *support = menuItem->userdata;
 		if (support->itemGetCompatibility)
 			menuAddHint(menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+		if (support->itemRename)
+			menuAddHint(menuItem, _STR_RENAME, CIRCLE_ICON);
+		if (support->itemDelete)
+			menuAddHint(menuItem, _STR_DELETE, SQUARE_ICON);
 	}
 }
 
-static void itemExec(struct menu_item_t *self, int id) {
+static void itemExecCross(struct menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (support) {
@@ -116,10 +122,10 @@ static void itemExec(struct menu_item_t *self, int id) {
 		}
 	}
 	else
-		guiMsgBox("NULL Support object. Please report");
+		guiMsgBox("NULL Support object. Please report", 0);
 }
 
-static void itemAltExec(struct menu_item_t *self, int id) {
+static void itemExecTriangle(struct menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (id < 0)
@@ -128,11 +134,49 @@ static void itemAltExec(struct menu_item_t *self, int id) {
 	if (support) {
 		if (support->itemGetCompatibility) {
 			if (guiShowCompatConfig(id, support) == COMPAT_TEST)
-				itemExec(self, id);
+				itemExecCross(self, id);
 		}
 	}
 	else
-		guiMsgBox("NULL Support object. Please report");
+		guiMsgBox("NULL Support object. Please report", 0);
+}
+
+static void itemExecSquare(struct menu_item_t *self, int id) {
+	item_list_t *support = self->userdata;
+
+	if (id < 0)
+		return;
+
+	if (support) {
+		if (support->itemDelete) {
+			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1)) {
+				support->itemDelete(id);
+				gFrameCounter = UPDATE_FRAME_COUNT;
+			}
+		}
+	}
+	else
+		guiMsgBox("NULL Support object. Please report", 0);
+}
+
+static void itemExecCircle(struct menu_item_t *self, int id) {
+	item_list_t *support = self->userdata;
+
+	if (id < 0)
+		return;
+
+	if (support) {
+		if (support->itemRename) {
+			char newName[support->maxNameLength];
+			strncpy(newName, self->current->item.text, support->maxNameLength);
+			if (guiShowKeyboard(newName, support->maxNameLength)) {
+				support->itemRename(id, newName);
+				gFrameCounter = UPDATE_FRAME_COUNT;
+			}
+		}
+	}
+	else
+		guiMsgBox("NULL Support object. Please report", 0);
 }
 
 static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
@@ -148,9 +192,11 @@ static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
 	item->menuItem.current = NULL;
 	item->menuItem.pagestart = NULL;
 
-	item->menuItem.altExecute = &itemAltExec;
 	item->menuItem.refresh = NULL;
-	item->menuItem.execute = &itemExec;
+	item->menuItem.execCross = &itemExecCross;
+	item->menuItem.execTriangle = &itemExecTriangle;
+	item->menuItem.execSquare = &itemExecSquare;
+	item->menuItem.execCircle = &itemExecCircle;
 
 	item->menuItem.hints = NULL;
 
@@ -367,9 +413,9 @@ int saveConfig() {
 	guiHandleDefferedIO(&lscstatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_saveConfig);
 	
 	if (lscret) {
-		guiMsgBox(_l(_STR_SETTINGS_SAVED));
+		guiMsgBox(_l(_STR_SETTINGS_SAVED), 0);
 	} else {
-		guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS));
+		guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0);
 	}
 	
 	return lscret;

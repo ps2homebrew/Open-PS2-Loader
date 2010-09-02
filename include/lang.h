@@ -66,7 +66,11 @@
 #define _STR_USER					61
 #define _STR_PASSWORD					62
 #define _STR_NOT_SET					63
-#define LANG_STR_COUNT 64
+#define _STR_X_ACCEPT					64
+#define _STR_DELETE_WARNING				65
+#define _STR_RENAME					66
+#define _STR_DELETE					67
+#define LANG_STR_COUNT 68
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

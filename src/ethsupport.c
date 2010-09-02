@@ -30,6 +30,7 @@ extern void *smbman_irx;
 extern int size_smbman_irx;
 
 static char *ethPrefix = NULL;
+static int ethForceUpdate = 0;
 static int ethULSizePrev = 0;
 static unsigned char ethModifiedCDPrev[8];
 static unsigned char ethModifiedDVDPrev[8];
@@ -123,18 +124,24 @@ item_list_t* ethGetObject(int initOnly) {
 
 static int ethNeedsUpdate(void) {
 	int result = 0;
+
+	if (ethForceUpdate) {
+		ethForceUpdate = 0;
+		return 1;
+	}
+
 	if (gNetworkStartup == 0) {
 		fio_stat_t stat;
 		char path[64];
 
-		snprintf(path, 64, "%sCD\\\\", ethPrefix);
+		snprintf(path, 64, "%sCD\\", ethPrefix);
 		fioGetstat(path, &stat);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedCDPrev, stat.mtime, 8);
 			result = 1;
 		}
 
-		snprintf(path, 64, "%sDVD\\\\", ethPrefix);
+		snprintf(path, 64, "%sDVD\\", ethPrefix);
 		fioGetstat(path, &stat);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedDVDPrev, stat.mtime, 8);
@@ -169,6 +176,45 @@ static char* ethGetGameName(int id) {
 
 static char* ethGetGameStartup(int id) {
 	return ethGames[id].startup;
+}
+
+static void ethDeleteGame(int id) {
+	char path[255];
+	base_game_info_t* game = &ethGames[id];
+
+	if (game->isISO) {
+		char *pathStr = "%sDVD\\%s.%s.iso";
+		if (game->media == 0x12)
+			pathStr = "%sCD\\%s.%s.iso";
+		snprintf(path, 255, pathStr, ethPrefix, game->startup, game->name);
+		fileXioRemove(path);
+	}
+	/*else {
+		char *pathStr = "%s%s.%02x";
+		int i = 0;
+		do {
+			sprintf(path, pathStr, ethPrefix, game->startup, i);
+			fileXioRemove(path);
+		} while(i < game->parts);
+	}*/
+
+	ethForceUpdate = 1;
+}
+
+static void ethRenameGame(int id, char* newName) {
+	char oldPath[255], newPath[255];
+	base_game_info_t* game = &ethGames[id];
+
+	if (game->isISO) {
+		char *pathStr = "%sDVD\\%s.%s.iso";
+		if (game->media == 0x12)
+			pathStr = "%sCD\\%s.%s.iso";
+		snprintf(oldPath, 255, pathStr, ethPrefix, game->startup, game->name);
+		snprintf(newPath, 255, pathStr, ethPrefix, game->startup, newName);
+		fileXioRename(oldPath, newPath);
+	}
+
+	ethForceUpdate = 1;
 }
 
 static int ethGetGameCompatibility(int id, int *dmaMode) {
@@ -309,7 +355,7 @@ int ethSMBDisconnect(void) {
 
 
 static item_list_t ethGameList = {
-		ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate, &ethUpdateGameList, &ethGetGameCount,
-		&ethGetGame, &ethGetGameName, &ethGetGameStartup, &ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame,
-		&ethGetArt, NULL, ETH_ICON
+		ETH_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
+		&ethGetGameCompatibility, &ethSetGameCompatibility,	&ethLaunchGame,	&ethGetArt, NULL, ETH_ICON
 };

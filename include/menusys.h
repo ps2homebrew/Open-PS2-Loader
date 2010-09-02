@@ -57,13 +57,15 @@ struct menu_item_t {
 	/// submenu, selection and page start (only used in static mode)
 	struct submenu_list_t *submenu, *current, *pagestart;
 	
-	/// execute a menu/submenu item (id is the submenu id as specified in AppendSubMenu)
-	void (*execute)(struct menu_item_t *self, int id);
-	
 	void (*refresh)(struct menu_item_t *self, short forceRefresh);
+
+	void (*execCross)(struct menu_item_t *self, int id);
 	
-	/// Alternate execution (can be used for item configuration for example)
-	void (*altExecute)(struct menu_item_t *self, int id);
+	void (*execTriangle)(struct menu_item_t *self, int id);
+
+	void (*execCircle)(struct menu_item_t *self, int id);
+	
+	void (*execSquare)(struct menu_item_t *self, int id);
 	
 	/// hint list
 	struct menu_hint_item_t *hints;
@@ -99,8 +101,7 @@ void menuNextV();
 void menuPrevV();
 struct menu_item_t* menuGetCurrent();
 GSTEXTURE* menuGetCurrentArt();
-void menuItemExecute();
-void menuItemAltExecute();
+void menuItemExecButton(void (*execActionButton)(struct menu_item_t *self, int id));
 
 // Sets the selected item if it is found in the menu list
 void menuSetSelectedItem(struct menu_item_t* item);

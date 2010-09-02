@@ -25,7 +25,7 @@ extern int size_ps2hdd_irx;
 extern void *ps2fs_irx;
 extern int size_ps2fs_irx;
 
-static int hddFirstStart;
+static int hddForceUpdate = 1;
 static char *hddPrefix = NULL;
 static int hddGameCount = 0;
 static hdl_games_list_t* hddGames;
@@ -90,7 +90,6 @@ static void hddLoadModules(void) {
 void hddInit(void) {
 	LOG("hddInit()\n");
 	hddPrefix = "pfs0:";
-	hddFirstStart = 1;
 	//hddGames = NULL;
 
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddLoadModules);
@@ -105,9 +104,8 @@ item_list_t* hddGetObject(int initOnly) {
 }
 
 static int hddNeedsUpdate(void) {
-	// only update once
-	if (hddFirstStart) {
-		hddFirstStart = 0;
+	if (hddForceUpdate) {
+		hddForceUpdate = 0;
 		return 1;
 	}
 	
@@ -137,6 +135,18 @@ static char* hddGetGameName(int id) {
 
 static char* hddGetGameStartup(int id) {
 	return hddGames->games[id].startup;
+}
+
+static void hddDeleteGame(int id) {
+	hddDeleteHDLGame(&hddGames->games[id]);
+	hddForceUpdate = 1;
+}
+
+static void hddRenameGame(int id, char* newName) {
+	hdl_game_info_t* game = &hddGames->games[id];
+	strcpy(game->name, newName);
+	hddSetHDLGameInfo(&hddGames->games[id]);
+	hddForceUpdate = 1;
 }
 
 static int hddGetGameCompatibility(int id, int *dmaMode) {
@@ -269,7 +279,7 @@ static void hddCleanUp(int exception) {
 }
 
 static item_list_t hddGameList = {
-		HDD_MODE, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList, &hddGetGameCount,
-		&hddGetGame, &hddGetGameName, &hddGetGameStartup, &hddGetGameCompatibility, &hddSetGameCompatibility, &hddLaunchGame,
-		&hddGetArt, &hddCleanUp, HDD_ICON
+		HDD_MODE, HDL_GAME_NAME_MAX + 1, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
+		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, HDD_ICON
 };

@@ -7,7 +7,9 @@
 #include <ioman.h>
 #include <loadcore.h>
 #include <ps2ip.h>
-//#include <stdio.h>
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 #include <sifman.h>
 #include <sysclib.h>
 #include <thbase.h>

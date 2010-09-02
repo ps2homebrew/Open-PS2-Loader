@@ -1,7 +1,7 @@
 /*
   Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review Open PS2 Loader README & LICENSE files for further details.
 */
 
 #include <stdio.h>
@@ -13,6 +13,7 @@
 #include "smb.h"
 #include "auth.h"
 #include "poll.h"
+#include "debug.h"
 
 #define SMB_MAGIC	0x424d53ff
 

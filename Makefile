@@ -319,7 +319,11 @@ smsmap.s:
 smbman.s:
 	echo "    * smbman.irx"
 	$(MAKE) -C modules/smbman clean
+ifeq ($(DEBUG),1)
+	$(MAKE) DEBUG=1 -C modules/smbman
+else
 	$(MAKE) -C modules/smbman
+endif
 	bin2s modules/smbman/smbman.irx asm/smbman.s smbman_irx
 
 discid.s:

@@ -1,13 +1,14 @@
 /*
   Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review Open PS2 Loader README & LICENSE files for further details.
 */
 
 #include <intrman.h>
 #include <ioman.h>
 #include <io_common.h>
 #include <sifman.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sysclib.h>
 #include <thbase.h>
@@ -19,6 +20,7 @@
 #include "smb_fio.h"
 #include "smb.h"
 #include "auth.h"
+#include "debug.h"
 
 int smbman_io_sema;
 
@@ -507,6 +509,8 @@ int smb_remove(iop_file_t *f, const char *filename)
 
 	smb_io_lock();
 
+	DPRINTF("smb_remove: filename=%s\n", filename);
+
 	r = smb_Delete(UID, TID, path);
 	if (r < 0)
    		r = -EIO;
@@ -746,6 +750,8 @@ int smb_rename(iop_file_t *f, const char *oldname, const char *newname)
 	char *newpath = prepare_path((char *)newname);
 
 	smb_io_lock();
+
+	DPRINTF("smb_rename: oldname=%s newname=%s\n", oldname, newname);
 
 	r = smb_Rename(UID, TID, oldpath, newpath);
 	if (r < 0)

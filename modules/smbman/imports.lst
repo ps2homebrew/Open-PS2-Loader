@@ -59,6 +59,8 @@ I_sprintf
 I_toupper
 sysclib_IMPORTS_end
 
-//stdio_IMPORTS_start
-//I_printf
-//stdio_IMPORTS_end
+#ifdef DEBUG
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+#endif

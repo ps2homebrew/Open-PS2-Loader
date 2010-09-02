@@ -1,7 +1,7 @@
 /*
   Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review Open PS2 Loader README & LICENSE files for further details.
 */
 
 #ifndef __SMB_FIO_H__

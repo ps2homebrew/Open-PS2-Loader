@@ -9,9 +9,8 @@
 # $Id: $
 
 IOP_BIN  = cdvdman.irx
-IOP_OBJS = cdvdman.o smsutils.o imports.o exports.o
+IOP_OBJS = cdvdman.o ioplib_util.o smsutils.o imports.o exports.o
 IOP_OBJS += dev9.o smb.o
-IOP_OBJS += dummy_irx.o
 IOP_LIBS =
 
 IOP_INCS +=
@@ -25,18 +24,9 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	$(MAKE) -C dummy_irx clean
-	rm -f $(IOP_BIN) $(IOP_OBJS) dummy_irx.s
+	rm -f $(IOP_BIN) $(IOP_OBJS)
 
 rebuild: clean all
-
-dummy_irx.s:
-	$(MAKE) -C dummy_irx
-	bin2s dummy_irx/dummy.irx dummy_irx.s dummy_irx
-
-run:
-	ps2client -t 1 execiop host:$(IOP_BIN)
-
 
 include $(PS2SDK)/Defs.make
 include Rules.make

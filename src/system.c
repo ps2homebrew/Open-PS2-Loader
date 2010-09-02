@@ -436,6 +436,8 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	DIntr();
 	ee_kmode_enter();
 
+	*(u32 *)0x80030000 = 0x80030100;
+
 	for (i = 0; i < IRX_NUM; i++) {
 		curIrxSize = irxptr_tab[i].irxsize;
 		if ((((u32)irxptr + curIrxSize) >= 0x80050000) && ((u32)irxptr < 0x80060000))
@@ -458,7 +460,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	memcpy((void *)(0x000bd000), &eeload_patches, size_eeload_patches);
 	FlushCache(0);
 	FlushCache(2);
-	void (*EELOAD_patch1)()=(void *)(0x000bd138);
+	void (*EELOAD_patch1)()=(void *)(0x000bd1b8);
 	void (*EELOAD_patch2)()=(void *)(0x000bd000);
 	EELOAD_patch1();
 	FlushCache(0);

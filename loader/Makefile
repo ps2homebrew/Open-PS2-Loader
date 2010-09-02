@@ -8,11 +8,11 @@
 # Review ps2sdk README & LICENSE files for further details.
 #
 # Standard Makefile
-# Loader section begin at 0x000e8000
+# Loader section begin at 0x000e7000
 # g_buf is located at 0x00088000
 
 EE_BIN = loader.elf
-EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o util.o patches.o padhook.o spu.o smbauth.o des.o md4.o loadmodulehook.o asm.o crt0.o
+EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o util.o patches.o padhook.o spu.o smbauth.o des.o md4.o asm.o crt0.o
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
 EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)

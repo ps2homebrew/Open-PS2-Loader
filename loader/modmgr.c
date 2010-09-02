@@ -144,17 +144,17 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 {
 	int n;
-	void *irx_tab = (void *)0x80030010;
 	irxptr_t irxptr_tab[IRX_NUM];
 
 	DIntr();
 	ee_kmode_enter();
-	
+
+	void *irx_tab = (void *)(*(u32 *)0x80030000);	
 	memcpy(&irxptr_tab[0], irx_tab, sizeof(irxptr_tab));
 
 	ee_kmode_exit();
 	EIntr();
-		
+
 	n = 0;
 	size_imgdrv_irx = irxptr_tab[n++].irxsize; 
 	size_eesync_irx = irxptr_tab[n++].irxsize; 	
@@ -166,7 +166,7 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	size_smsmap_irx = irxptr_tab[n++].irxsize;
 	size_udptty_irx = irxptr_tab[n++].irxsize;
 	size_ioptrap_irx = irxptr_tab[n++].irxsize;
-			
+
 	n = 0;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
 	eesync_irx = (void *)irxptr_tab[n++].irxaddr;

@@ -1,7 +1,7 @@
 /*
-  Copyright 2009, jimmikaelkael
+  Copyright 2009-2010, jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review Open PS2 Loader README & LICENSE files for further details.
 */
 
 #include "smsutils.h"
@@ -10,6 +10,7 @@
 #include "dev9.h"
 #include "smb.h"
 #include "atad.h"
+#include "ioplib_util.h"
 
 #include <loadcore.h>
 #include <stdio.h>
@@ -36,15 +37,6 @@
 #define MODNAME "dev9"
 IRX_ID(MODNAME, 2, 8);
 
-#ifdef USB_DRIVER
-static char skipmod_tab[] = "USBD.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";
-#endif
-#ifdef SMB_DRIVER
-static char skipmod_tab[] = "DEV9.IRX\nSMAP.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";
-#endif
-#ifdef HDD_DRIVER
-static char skipmod_tab[] = "DEV9.IRX\nATAD.IRX\nCDVDSTM.IRX\nSNMON.IRX\nDECI2.IRX";
-#endif
 
 //------------------ Patch Zone ----------------------
 #ifdef SMB_DRIVER
@@ -313,7 +305,6 @@ void cdvdman_cdinit();
 int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf);
 int cdvdman_readMechaconVersion(char *mname, u32 *stat);
 int cdvdman_readID(int mode, u8 *buf);
-int skipmod_check(const char *filename);
 FHANDLE *cdvdman_getfilefreeslot(void);
 void cdvdman_trimspaces(char* str);
 struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength);
@@ -598,9 +589,6 @@ static int sync_flag;
 static char cdvdman_dirname[256];
 static char cdvdman_filepath[256];
 static char cdvdman_curdir[256];
-
-static char skipmod_name[256];
-static char skipmod_modlist[256];
 
 // buffers
 #define CDVDMAN_BUF_SECTORS 	2
@@ -1032,74 +1020,37 @@ int cdSync_noblk(void)
 
 #endif // ALT_READ_CORE
 
+
 //--------------------------------------------------------------
 #ifdef USB_DRIVER
 void usbd_init(void)
 {
-	iop_library_table_t *libtable;
-	iop_library_t *libptr;
-	int i;
-	void **export_tab;
-	char usbd_modname[9] = "usbd\0\0\0\0";
-
-	// Get usbd lib ptr
-	libtable = GetLibraryEntryTable();
-	libptr = libtable->tail;
-	while (libptr != 0) {
-		for (i=0; i<8; i++) {
-			if (libptr->name[i] != usbd_modname[i])
-				break;
-		} 
-		if (i==8)
-			break;
-		libptr = libptr->prev;
-	}
-
-	// Get usbd export table	 
-	export_tab = (void **)(((struct irx_export_table *)libptr)->fptrs);
+	modinfo_t info;
+	getModInfo("usbd\0\0\0\0", &info);
 
 	// Set functions pointers here
-	pUsbRegisterDriver = export_tab[4];
-	pUsbGetDeviceStaticDescriptor = export_tab[6];
-	pUsbSetDevicePrivateData = export_tab[7];
-	pUsbOpenEndpoint = export_tab[9];
-	pUsbCloseEndpoint = export_tab[10];
-	pUsbTransfer = export_tab[11];
-	pUsbOpenEndpointAligned = export_tab[12];
+	pUsbRegisterDriver = info.exports[4];
+	pUsbGetDeviceStaticDescriptor = info.exports[6];
+	pUsbSetDevicePrivateData = info.exports[7];
+	pUsbOpenEndpoint = info.exports[9];
+	pUsbCloseEndpoint = info.exports[10];
+	pUsbTransfer = info.exports[11];
+	pUsbOpenEndpointAligned = info.exports[12];
 }
 #endif
 #ifdef SMB_DRIVER
 void ps2ip_init(void)
 {
-	iop_library_table_t *libtable;
-	iop_library_t *libptr;
-	int i;
-	void **export_tab;
-	char ps2ip_modname[9] = "ps2ip\0\0\0";
-
-	// Get usbd lib ptr
-	libtable = GetLibraryEntryTable();
-	libptr = libtable->tail;
-	while (libptr != 0) {
-		for (i=0; i<8; i++) {
-			if (libptr->name[i] != ps2ip_modname[i])
-				break;
-		} 
-		if (i==8)
-			break;
-		libptr = libptr->prev;
-	}
-
-	// Get usbd export table	 
-	export_tab = (void **)(((struct irx_export_table *)libptr)->fptrs);
+	modinfo_t info;
+	getModInfo("ps2ip\0\0\0", &info);
 
 	// Set functions pointers here
-	plwip_close = export_tab[6];
-	plwip_connect = export_tab[7];
-	plwip_recv = export_tab[9];
-	plwip_send =  export_tab[11];
-	plwip_socket =  export_tab[13];
-	pinet_addr =  export_tab[24];
+	plwip_close = info.exports[6];
+	plwip_connect = info.exports[7];
+	plwip_recv = info.exports[9];
+	plwip_send = info.exports[11];
+	plwip_socket = info.exports[13];
+	pinet_addr = info.exports[24];
 }
 #endif
 
@@ -2006,32 +1957,6 @@ int cdrom_deinit(iop_device_t *dev)
 }
 
 //-------------------------------------------------------------- 
-int skipmod_check(const char *filename)
-{
-	int i;
-	char *p;
-
-	for (i=0; i<strlen(filename); i++)
-		skipmod_name[i] = toupper(filename[i]);
-	skipmod_name[i] = 0;
-
-	strcpy(skipmod_modlist, skipmod_tab);
-
-	p = strtok(skipmod_modlist, "\n");
-
-	while (p) {
-		if (strlen(skipmod_name) >= strlen(p)) {
-			if (strstr(skipmod_name, p))
-				return 1;
-		}
-
-		p = strtok(NULL, "\n");
-	}
-
-	return 0;
-}
-
-//-------------------------------------------------------------- 
 FHANDLE *cdvdman_getfilefreeslot(void)
 {
 	register int i;
@@ -2073,13 +1998,10 @@ int cdrom_open(iop_file_t *f, char *filename, int mode)
 					f->mode = r;
 			}
 			fh->filesize = cdfile.size;
+			fh->lsn = cdfile.lsn;
 			fh->position = 0;
 			r = 0;
 
-			if (skipmod_check(filename))
-				fh->lsn = -1;
-			else
-				fh->lsn = cdfile.lsn;
 		}
 		else
 			r = -ENOENT;
@@ -2127,14 +2049,6 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 	if ((fh->position + size) > fh->filesize)
 		size = fh->filesize - fh->position;
 
-	if (fh->lsn == -1) {
-		u8 *p = (u8 *)&dummy_irx;
-		mips_memcpy(buf, &p[fh->position], size);
-		fh->position += size;
-		rpos = size;
-		goto ssema;
-	}
-
 	while (size) {
 		nbytes = CDVDMAN_FS_BUFSIZE;
 		if (size < nbytes)
@@ -2158,7 +2072,6 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 		fh->position += nbytes;
 	}
 
-ssema:
 	DPRINTF("cdrom_read ret=%d\n", (int)rpos);
 	SignalSema(cdrom_io_sema);
 
@@ -2935,7 +2848,10 @@ int _start(int argc, char **argv)
 	g_ISO_parts = 0x69; // just to shut off warning
 #endif
 
-    return MODULE_RESIDENT_END;
+	// hook MODLOAD's exports
+	hookMODLOAD();
+
+	return MODULE_RESIDENT_END;
 }
 
 //-------------------------------------------------------------------------

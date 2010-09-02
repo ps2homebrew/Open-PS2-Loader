@@ -295,7 +295,7 @@ void CopyToIop(void *eedata, unsigned int size, void *iopptr)
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Replace a module in a IOPRP image.                                                      */
+/* Replace a module in a IOPRP image.                                                     */
 /*----------------------------------------------------------------------------------------*/
 int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize)
 {

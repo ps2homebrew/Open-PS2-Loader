@@ -107,7 +107,8 @@ struct gui_update_t *guiOpCreate(gui_op_type_t type);
 void guiDestroyOp(struct gui_update_t *op);
 
 int guiShowCompatConfig(int id, item_list_t *support);
-void guiMsgBox(const char* text);
+int guiShowKeyboard(char* value, int maxLength);
+int guiMsgBox(const char* text, int addAccept);
 
 void guiUpdateScrollSpeed(void);
 void guiUpdateScreenScale(void);

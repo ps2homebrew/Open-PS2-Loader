@@ -27,7 +27,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"On",
 	"Off",
 	"Ok",
-	"Compatibility settings",
+	"Game settings",
 	"Remove all settings",
 	"Removed all keys for the game",
 	"Scrolling",
@@ -69,7 +69,11 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Share",
 	"User",
 	"Password",
-	"<not set>"
+	"<not set>",
+	"X Accept",
+	"Item will be permanently deleted, continue ?",
+	"Rename",
+	"Delete"
 };
 
 static int guiLangID = 0;

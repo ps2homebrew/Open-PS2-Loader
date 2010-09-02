@@ -138,6 +138,37 @@ static char* usbGetGameStartup(int id) {
 	return usbGames[id].startup;
 }
 
+static void usbDeleteGame(int id) {
+	char path[255];
+	base_game_info_t* game = &usbGames[id];
+
+	if (game->isISO) {
+		char *pathStr = "%sDVD/%s.%s.iso";
+		if (game->media == 0x12)
+			pathStr = "%sCD/%s.%s.iso";
+		snprintf(path, 255, pathStr, usbPrefix, game->startup, game->name);
+		fileXioRemove(path);
+	}
+
+	usbULSizePrev = -1;
+}
+
+static void usbRenameGame(int id, char* newName) {
+	char oldPath[255], newPath[255];
+	base_game_info_t* game = &usbGames[id];
+
+	if (game->isISO) {
+		char *pathStr = "%sDVD/%s.%s.iso";
+		if (game->media == 0x12)
+			pathStr = "%sCD/%s.%s.iso";
+		snprintf(oldPath, 255, pathStr, usbPrefix, game->startup, game->name);
+		snprintf(newPath, 255, pathStr, usbPrefix, game->startup, newName);
+		fileXioRename(oldPath, newPath);
+	}
+
+	usbULSizePrev = -1;
+}
+
 static int usbGetGameCompatibility(int id, int *dmaMode) {
 	return sbGetCompatibility(&usbGames[id], usbGameList.mode);
 }
@@ -204,7 +235,7 @@ static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static item_list_t usbGameList = {
-		USB_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate, &usbUpdateGameList, &usbGetGameCount,
-		&usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame,
-		&usbGetArt, NULL, USB_ICON
+		USB_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
+		&usbGetGameCompatibility, &usbSetGameCompatibility,	&usbLaunchGame,	&usbGetArt, NULL, USB_ICON
 };

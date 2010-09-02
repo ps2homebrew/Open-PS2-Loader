@@ -2,7 +2,7 @@ French
 	              BIENVENUE DANS OPEN PS2 LOADER. CODE PRINCIPAL FONDÉ SUR LE CODE SOURCE D'HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> LA PLUPART DU CODE DU COEUR DU LOADER EST DE JIMMIKAELKAEL. TOUTES LES AMÉLIORATIONS DU GUI SONT DE VOLCA. MERCI D'UTILISER NOTRE PROGRAMME ^^
 Open PS2 Loader %s
 Sauvegarder les changements
-O retour
+O Retour
 Réglages réseau
 <vide>
 Réglages sauvegardés...
@@ -19,7 +19,7 @@ Erreur de démarrage réseau
 Oui
 Non
 Ok
-Réglages de compatibilité
+Réglages du jeu
 Désactiver tous les réglages
 Tous modes désactivés
 Défilement
@@ -62,3 +62,7 @@ Partage
 Utilisateur
 Mot de passe
 <non défini>
+X Accepter
+L'élément sera définitivement supprimé
+Renommer
+Supprimer

@@ -34,7 +34,7 @@ static int screenWidth;
 static int screenHeight;
 
 // Utility stuff
-int diaShowKeyb(char* text, size_t maxLen) {
+int diaShowKeyb(char* text, int maxLen) {
 	int i, j, len=strlen(text), selkeyb=1;
 	int selchar=0, selcommand=-1;
 	char c[2]="\0\0";
@@ -87,8 +87,8 @@ int diaShowKeyb(char* text, size_t maxLen) {
 		fntRenderString(50, 120, ALIGN_NONE, text, inactivec);
 		
 		// separating line for simpler orientation
-		rmDrawLine(25, 135, 600, 135, gColWhite);
-		rmDrawLine(25, 136, 600, 136, gColWhite);
+		rmDrawLine(25, 138, 600, 138, gColWhite);
+		rmDrawLine(25, 139, 600, 139, gColWhite);
 
 		for (j = 0; j <= 40; j += 10) {
 			for (i = 0; i <= 9; i++) {

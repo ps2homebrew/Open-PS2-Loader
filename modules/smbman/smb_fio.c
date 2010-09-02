@@ -80,6 +80,7 @@ static ShareEntry_t ShareList __attribute__((aligned(64))); // Keep this aligned
 static u8 SearchBuf[4096] __attribute__((aligned(64)));
 static char smb_curdir[4096] __attribute__((aligned(64)));
 static char smb_curpath[4096] __attribute__((aligned(64)));
+static char smb_secpath[4096] __attribute__((aligned(64)));
 
 static int keepalive_mutex = -1;
 static int keepalive_inited = 0;
@@ -281,7 +282,7 @@ static FHANDLE *smbman_getfilefreeslot(void)
 }
 
 //-------------------------------------------------------------- 
-static char *prepare_path(char *path)
+static char *prepare_path(char *path, char *full_path, int max_path)
 {
 	register int i;
 
@@ -300,16 +301,16 @@ static char *prepare_path(char *path)
 	}
 
 	if (strlen(p) > 0) {
-		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1-strlen(p));
-		strcat(smb_curpath, "\\");
-		strcat(smb_curpath, p);
+		strncpy(full_path, smb_curdir, max_path-1-strlen(p));
+		strcat(full_path, "\\");
+		strcat(full_path, p);
 	}
 	else {
-		strncpy(smb_curpath, smb_curdir, sizeof(smb_curpath)-1);
-		strcat(smb_curpath, "\\");
+		strncpy(full_path, smb_curdir, max_path-1);
+		strcat(full_path, "\\");
 	}
 
-	return (char *)smb_curpath;
+	return (char *)full_path;
 }
 
 //-------------------------------------------------------------- 
@@ -325,7 +326,7 @@ int smb_open(iop_file_t *f, const char *filename, int mode, int flags)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)filename);
+	char *path = prepare_path((char *)filename, smb_curpath, 4096);
 
 	smb_io_lock();
 
@@ -505,7 +506,7 @@ int smb_remove(iop_file_t *f, const char *filename)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)filename);
+	char *path = prepare_path((char *)filename, smb_curpath, 4096);
 
 	smb_io_lock();
 
@@ -531,7 +532,7 @@ int smb_mkdir(iop_file_t *f, const char *dirname)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)dirname);
+	char *path = prepare_path((char *)dirname, smb_curpath, 4096);
 
 	smb_io_lock();
 
@@ -556,7 +557,7 @@ int smb_rmdir(iop_file_t *f, const char *dirname)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)dirname);
+	char *path = prepare_path((char *)dirname, smb_curpath, 4096);
 
 	smb_io_lock();
 
@@ -593,7 +594,7 @@ int smb_dopen(iop_file_t *f, const char *dirname)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)dirname);
+	char *path = prepare_path((char *)dirname, smb_curpath, 4096);
 
 	smb_io_lock();
 
@@ -705,7 +706,7 @@ int smb_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)filename);
+	char *path = prepare_path((char *)filename, smb_curpath, 4096);
 
 	smb_io_lock();
 
@@ -746,8 +747,8 @@ int smb_rename(iop_file_t *f, const char *oldname, const char *newname)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *oldpath = prepare_path((char *)oldname);
-	char *newpath = prepare_path((char *)newname);
+	char *oldpath = prepare_path((char *)oldname, smb_curpath, 4096);
+	char *newpath = prepare_path((char *)newname, smb_secpath, 4096);
 
 	smb_io_lock();
 
@@ -774,7 +775,7 @@ int smb_chdir(iop_file_t *f, const char *dirname)
 	if ((UID == -1) || (TID == -1))
 		return -EINVAL;
 
-	char *path = prepare_path((char *)dirname);
+	char *path = prepare_path((char *)dirname, smb_curpath, 4096);
 
 	smb_io_lock();
 

@@ -28,6 +28,8 @@ typedef struct
 {
 	int mode;
 
+	int maxNameLength;
+
 	int enabled;
 
 	/// update in progress indicator
@@ -57,6 +59,10 @@ typedef struct
 	char* (*itemGetName)(int id);
 
 	char* (*itemGetStartup)(int id);
+
+	void (*itemDelete)(int id);
+
+	void (*itemRename)(int id, char* newName);
 
 	int (*itemGetCompatibility)(int id, int *dmaMode);
 

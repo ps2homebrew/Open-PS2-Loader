@@ -378,31 +378,17 @@ struct menu_item_t* menuGetCurrent() {
 	return selected_item->item;
 }
 
-void menuItemExecute() {
-	if (selected_item && (selected_item->item->execute)) {
-		// selected submenu id. default -1 = no selection
-		int subid = -1;
-		
-		struct submenu_list_t *cur = selected_item->item->current;
-		
-		if (cur)
-			subid = cur->item.id;
-		
-		selected_item->item->execute(selected_item->item, subid);
-	}
-}
+void menuItemExecButton(void (*execActionButton)(struct menu_item_t *self, int id)) {
+	if (execActionButton) {
 
-void menuItemAltExecute() {
-	if (selected_item && (selected_item->item->altExecute)) {
 		// selected submenu id. default -1 = no selection
 		int subid = -1;
-		
+
 		struct submenu_list_t *cur = selected_item->item->current;
-		
 		if (cur)
 			subid = cur->item.id;
-		
-		selected_item->item->altExecute(selected_item->item, subid);
+
+		execActionButton(selected_item->item, subid);
 	}
 }
 

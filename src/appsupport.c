@@ -9,7 +9,7 @@
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 
-static int appFirstStart;
+static int appForceUpdate = 1;
 static int appItemCount = 0;
 
 static struct TConfigSet configApps;
@@ -29,7 +29,6 @@ static struct TConfigValue* appGetConfigValue(int id) {
 
 void appInit(void) {
 	LOG("appInit()\n");
-	appFirstStart = 1;
 	configApps.head = NULL;
 	configApps.tail = NULL;
 
@@ -43,9 +42,8 @@ item_list_t* appGetObject(int initOnly) {
 }
 
 static int appNeedsUpdate(void) {
-	// only update once
-	if (appFirstStart) {
-		appFirstStart = 0;
+	if (appForceUpdate) {
+		appForceUpdate = 0;
 		return 1;
 	}
 
@@ -53,6 +51,9 @@ static int appNeedsUpdate(void) {
 }
 
 static int appUpdateItemList(void) {
+	appItemCount = 0;
+	clearConfig(&configApps);
+
 	char path[255];
 	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
 	readConfig(&configApps, path);
@@ -79,6 +80,33 @@ static char* appGetItemName(int id) {
 static char* appGetItemStartup(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
 	return cur->val;
+}
+
+// TODO: doesn't work as configApps is being polled by the GUI, need to work on copy ...
+static void appDeleteItem(int id) {
+	struct TConfigValue* cur = appGetConfigValue(id);
+	fileXioRemove(cur->val);
+	cur->key[0] = '\0';
+
+	char path[255];
+	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
+	writeConfig(&configApps, path);
+
+	appForceUpdate = 1;
+}
+
+static void appRenameItem(int id, char* newName) {
+	struct TConfigValue* cur = appGetConfigValue(id);
+	char value[255];
+	strncpy(value, cur->val, 255);
+	configRemoveKey(&configApps, cur->key);
+	setConfigStr(&configApps, newName, value);
+
+	char path[255];
+	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
+	writeConfig(&configApps, path);
+
+	appForceUpdate = 1;
 }
 
 static void appLaunchItem(int id) {
@@ -122,6 +150,8 @@ static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static item_list_t appItemList = {
-		APP_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate, &appUpdateItemList, &appGetItemCount,
-		NULL, &appGetItemName, &appGetItemStartup, NULL, NULL, &appLaunchItem, &appGetArt, NULL, APP_ICON
+		APP_MODE, 32, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
+		//&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, NULL, NULL, NULL, NULL, &appLaunchItem,
+		&appGetArt, NULL, APP_ICON
 };

@@ -83,10 +83,10 @@ static char* appGetItemStartup(int id) {
 }
 
 // TODO: doesn't work as configApps is being polled by the GUI, need to work on copy ...
-static void appDeleteItem(int id) {
+/*static void appDeleteItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
 	fileXioRemove(cur->val);
-	cur->key[0] = '\0';
+	configRemoveKey(&configApps, cur->key);
 
 	char path[255];
 	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
@@ -107,7 +107,7 @@ static void appRenameItem(int id, char* newName) {
 	writeConfig(&configApps, path);
 
 	appForceUpdate = 1;
-}
+}*/
 
 static void appLaunchItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);

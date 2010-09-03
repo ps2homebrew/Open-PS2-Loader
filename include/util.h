@@ -28,5 +28,6 @@ inline int max(int a, int b);
 inline int min(int a, int b);
 int fromHex(char digit);
 char toHex(int digit);
+u32 crc32Str(const char *string);
 
 #endif

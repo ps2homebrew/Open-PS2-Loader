@@ -90,6 +90,7 @@ static void hddLoadModules(void) {
 void hddInit(void) {
 	LOG("hddInit()\n");
 	hddPrefix = "pfs0:";
+	hddForceUpdate = 1;
 	//hddGames = NULL;
 
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddLoadModules);

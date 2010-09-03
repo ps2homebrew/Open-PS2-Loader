@@ -30,7 +30,6 @@ extern void *smbman_irx;
 extern int size_smbman_irx;
 
 static char *ethPrefix = NULL;
-static int ethForceUpdate = 0;
 static int ethULSizePrev = 0;
 static unsigned char ethModifiedCDPrev[8];
 static unsigned char ethModifiedDVDPrev[8];
@@ -125,11 +124,6 @@ item_list_t* ethGetObject(int initOnly) {
 static int ethNeedsUpdate(void) {
 	int result = 0;
 
-	if (ethForceUpdate) {
-		ethForceUpdate = 0;
-		return 1;
-	}
-
 	if (gNetworkStartup == 0) {
 		fio_stat_t stat;
 		char path[64];
@@ -198,7 +192,7 @@ static void ethDeleteGame(int id) {
 		} while(i < game->parts);
 	}*/
 
-	ethForceUpdate = 1;
+	ethULSizePrev = -1;
 }
 
 static void ethRenameGame(int id, char* newName) {
@@ -214,7 +208,7 @@ static void ethRenameGame(int id, char* newName) {
 		fileXioRename(oldPath, newPath);
 	}
 
-	ethForceUpdate = 1;
+	ethULSizePrev = -1;
 }
 
 static int ethGetGameCompatibility(int id, int *dmaMode) {

@@ -106,7 +106,7 @@ item_list_t* usbGetObject(int initOnly) {
 }
 
 static int usbNeedsUpdate(void) {
-	if (usbULSizePrev == -1) // means we have not detected any usb device (yet)
+	if (usbULSizePrev == -1) // means we have not detected any usb device (yet), or no ul.cfg file present
 		return 1;
 
 	return sbIsSameSize(usbPrefix, usbULSizePrev);

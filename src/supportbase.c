@@ -222,3 +222,5 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 
 	return compatmask;
 }
+
+// sprintf(part_path, "%s\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);

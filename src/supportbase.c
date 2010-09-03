@@ -223,4 +223,90 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 	return compatmask;
 }
 
-// sprintf(part_path, "%s\\ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
+static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int gamecount, int excludeID) {
+	char path[64];
+	snprintf(path, 64, "%sul.cfg", prefix);
+
+	file_buffer_t* fileBuffer = openFileBuffer(path, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
+	if (fileBuffer) {
+		int i;
+		char buffer[0x40];
+		base_game_info_t* game;
+
+		memset(buffer, 0, 0x40);
+		buffer[32] = 0x75; // u
+		buffer[33] = 0x6C; // l
+		buffer[34] = 0x2E; // .
+		buffer[53] = 0x08; // just to be compatible with original ul.cfg
+
+		for (i = 0; i < gamecount; i++) {
+			game = &(*list)[i];
+
+			if (!game->isISO  && (i != excludeID)) {
+				memset(buffer, 0, BASE_GAME_NAME_MAX);
+				memset(&buffer[BASE_GAME_NAME_MAX + 3], 0, BASE_GAME_STARTUP_MAX);
+
+				memcpy(buffer, game->name, BASE_GAME_NAME_MAX);
+				memcpy(&buffer[BASE_GAME_NAME_MAX + 3], game->startup, BASE_GAME_STARTUP_MAX);
+				buffer[47] = game->parts;
+				buffer[48] = game->media;
+
+				writeFileBuffer(fileBuffer, buffer, 0x40);
+			}
+		}
+
+		closeFileBuffer(fileBuffer);
+	}
+}
+
+void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id) {
+	char path[255];
+	base_game_info_t* game = &(*list)[id];
+
+	if (game->isISO) {
+		if (game->media == 0x12)
+			snprintf(path, 255, "%sCD%s%s.%s.iso", prefix, sep, game->startup, game->name);
+		else
+			snprintf(path, 255, "%sDVD%s%s.%s.iso", prefix, sep, game->startup, game->name);
+		fileXioRemove(path);
+	} else {
+		char *pathStr = "%sul.%08X.%s.%02x";
+		unsigned int crc = USBA_crc32(game->name);
+		int i = 0;
+		do {
+			snprintf(path, 255, pathStr, prefix, crc, game->startup, i++);
+			fileXioRemove(path);
+		} while(i < game->parts);
+
+		sbRebuildULCfg(list, prefix, gamecount, id);
+	}
+}
+
+void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id, char* newname) {
+	char oldpath[255], newpath[255];
+	base_game_info_t* game = &(*list)[id];
+
+	if (game->isISO) {
+		if (game->media == 0x12) {
+			snprintf(oldpath, 255, "%sCD%s%s.%s.iso", prefix, sep, game->startup, game->name);
+			snprintf(newpath, 255, "%sCD%s%s.%s.iso", prefix, sep, game->startup, newname);
+		} else {
+			snprintf(oldpath, 255, "%sDVD%s%s.%s.iso", prefix, sep, game->startup, game->name);
+			snprintf(newpath, 255, "%sDVD%s%s.%s.iso", prefix, sep, game->startup, newname);
+		}
+		fileXioRename(oldpath, newpath);
+	} else {
+		char *pathStr = "%sul.%08X.%s.%02x";
+		unsigned int oldcrc = USBA_crc32(game->name);
+		unsigned int newcrc = USBA_crc32(newname);
+		int i = 0;
+		do {
+			snprintf(oldpath, 255, pathStr, prefix, oldcrc, game->startup, i);
+			snprintf(newpath, 255, pathStr, prefix, newcrc, game->startup, i++);
+			fileXioRename(oldpath, newpath);
+		} while(i < game->parts);
+
+		memcpy(game->name, newname, BASE_GAME_NAME_MAX);
+		sbRebuildULCfg(list, prefix, gamecount, -1);
+	}
+}

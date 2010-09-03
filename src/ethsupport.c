@@ -173,41 +173,12 @@ static char* ethGetGameStartup(int id) {
 }
 
 static void ethDeleteGame(int id) {
-	char path[255];
-	base_game_info_t* game = &ethGames[id];
-
-	if (game->isISO) {
-		char *pathStr = "%sDVD\\%s.%s.iso";
-		if (game->media == 0x12)
-			pathStr = "%sCD\\%s.%s.iso";
-		snprintf(path, 255, pathStr, ethPrefix, game->startup, game->name);
-		fileXioRemove(path);
-	}
-	/*else {
-		char *pathStr = "%s%s.%02x";
-		int i = 0;
-		do {
-			sprintf(path, pathStr, ethPrefix, game->startup, i);
-			fileXioRemove(path);
-		} while(i < game->parts);
-	}*/
-
+	sbDelete(&ethGames, ethPrefix, "\\", ethGameCount, id);
 	ethULSizePrev = -1;
 }
 
 static void ethRenameGame(int id, char* newName) {
-	char oldPath[255], newPath[255];
-	base_game_info_t* game = &ethGames[id];
-
-	if (game->isISO) {
-		char *pathStr = "%sDVD\\%s.%s.iso";
-		if (game->media == 0x12)
-			pathStr = "%sCD\\%s.%s.iso";
-		snprintf(oldPath, 255, pathStr, ethPrefix, game->startup, game->name);
-		snprintf(newPath, 255, pathStr, ethPrefix, game->startup, newName);
-		fileXioRename(oldPath, newPath);
-	}
-
+	sbRename(&ethGames, ethPrefix, "\\", ethGameCount, id, newName);
 	ethULSizePrev = -1;
 }
 

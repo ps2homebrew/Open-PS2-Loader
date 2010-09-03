@@ -43,9 +43,9 @@ extern int size_ioptrap_irx;
 int New_Reset_Iop(const char *arg, int flag)
 {
 	void   *rom_iop;
-	int     i, j, fd=0;
+	int     i, j, fd = 0;
 	ioprp_t ioprp_img;
-	char    ioprp_path[0x50];
+	char    ioprp_path[0x50] = "\0";
 	int eeloadcnf_reset = 0;		
 
 	DPRINTF("New_Reset_Iop start!\n");

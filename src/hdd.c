@@ -2,7 +2,7 @@
 #include "include/ioman.h"
 #include "include/hddsupport.h"
 
-#define TEST_WRITES
+//#define TEST_WRITES
 
 // APA Partition
 #define APA_MAGIC		0x00415041	// 'APA\0'
@@ -500,10 +500,8 @@ static int apaWritePartitionTable(apa_partition_table_t *table)
 
 		if (table->parts[i].modified) {
 			apa_header *part_hdr = &table->parts[i].header;
-#ifdef TEST_WRITES
 			LOG("writing 2 sectors at sector 0x%X\n", part_hdr->start);
-#else
-			apa_header *part_hdr = &table->parts[i].header;
+#ifndef TEST_WRITES
 			ret = hddWriteSectors(part_hdr->start, 2, (void *)part_hdr);
 			if (ret < 0)
 				return -10;
@@ -750,7 +748,8 @@ int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
 		return -4;
 
 	// just change game name and compat flags !!!
-	//strncpy(hdl_header->gamename, ginfo->name, 159);
+	strncpy(hdl_header->gamename, ginfo->name, 160);
+	hdl_header->gamename[159] = '\0';
 	//hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
 	hdl_header->ops2l_compat_flags = ginfo->ops2l_compat_flags;
 	hdl_header->dma_type = ginfo->dma_type;

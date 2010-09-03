@@ -139,31 +139,27 @@ static char* usbGetGameStartup(int id) {
 }
 
 static void usbDeleteGame(int id) {
-	char path[255];
-	base_game_info_t* game = &usbGames[id];
-
-	if (game->isISO) {
-		char *pathStr = "%sDVD/%s.%s.iso";
-		if (game->media == 0x12)
-			pathStr = "%sCD/%s.%s.iso";
-		snprintf(path, 255, pathStr, usbPrefix, game->startup, game->name);
-		fileXioRemove(path);
-	}
-
+	sbDelete(&usbGames, usbPrefix, "/", usbGameCount, id);
 	usbULSizePrev = -1;
 }
 
 static void usbRenameGame(int id, char* newName) {
-	char oldPath[255], newPath[255];
+	// TODO when/if Jimmi add rename functionnality to usbhdfs, then we should use the above method instead
+	//sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
+
+	// temporary duplicated code from sbRename
+	char oldpath[255], newpath[255];
 	base_game_info_t* game = &usbGames[id];
 
 	if (game->isISO) {
-		char *pathStr = "%sDVD/%s.%s.iso";
-		if (game->media == 0x12)
-			pathStr = "%sCD/%s.%s.iso";
-		snprintf(oldPath, 255, pathStr, usbPrefix, game->startup, game->name);
-		snprintf(newPath, 255, pathStr, usbPrefix, game->startup, newName);
-		fileXioRename(oldPath, newPath);
+		if (game->media == 0x12) {
+			snprintf(oldpath, 255, "%sCD%s%s.%s.iso", usbPrefix, "/", game->startup, game->name);
+			snprintf(newpath, 255, "%sCD%s%s.%s.iso", usbPrefix, "/", game->startup, newName);
+		} else {
+			snprintf(oldpath, 255, "%sDVD%s%s.%s.iso", usbPrefix, "/", game->startup, game->name);
+			snprintf(newpath, 255, "%sDVD%s%s.%s.iso", usbPrefix, "/", game->startup, newName);
+		}
+		fileXioRename(oldpath, newpath);
 	}
 
 	usbULSizePrev = -1;

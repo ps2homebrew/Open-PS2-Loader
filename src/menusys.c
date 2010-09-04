@@ -640,11 +640,11 @@ void menuDrawStatic() {
 			someTex = thmGetTexture(hint->icon_id);
 			if (someTex && someTex->Mem) {
 				rmDrawPixmap(someTex, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-				x += someTex->Width + 4;
+				x += someTex->Width;
 			}
 			
 			x += fntRenderString(x, y, ALIGN_NONE, _l(hint->text_id), gTheme->hintText.color);
-			x+= 16;
+			x+= 12;
 		}
 	}
 }

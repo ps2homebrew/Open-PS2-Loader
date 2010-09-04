@@ -73,7 +73,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"X Accept",
 	"Item will be permanently deleted, continue ?",
 	"Rename",
-	"Delete"
+	"Delete",
+	"Play"
 };
 
 static int guiLangID = 0;

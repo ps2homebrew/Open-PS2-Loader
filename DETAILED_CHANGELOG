@@ -8,6 +8,103 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev439 - update modload version check in MODLOAD hooking - Sat Sep 04 10:23:55 2010
+rev438 - added rename and delete functionality for UL format (ul.cfg) - Fri Sep 03 23:22:33 2010
+rev437 - only apply sorting, when autosort settings enabled - Fri Sep 03 20:43:36 2010
+rev436 - fix update of HDD game list after restarting modules (when leaving HDLD server) - Fri Sep 03 19:55:34 2010
+rev435 - enable HDD rename/delete - Fri Sep 03 09:57:04 2010
+rev434 - fix again for those games resetting IOP with null arg - Fri Sep 03 09:07:57 2010
+rev433 - Added "rename" and "delete" functionalities for games. - Thu Sep 02 23:07:32 2010
+rev432 - smbman: added debug prints ability - Thu Sep 02 19:01:13 2010
+rev431 - use MODLOAD hooking on IOP instead of patching LMB on EE - Thu Sep 02 16:07:15 2010
+rev430 - fix for alternative EE core build - Fri Aug 20 11:05:42 2010
+rev429 - fix: give some delay to ingame mass driver - Thu Aug 19 09:56:14 2010
+rev428 - EE core: get rid of libc dependency - Wed Aug 11 18:52:17 2010
+rev427 - IGR: use kernel's InitializeTLB instead of syscall - Sun Aug 08 20:52:36 2010
+rev426 - EE core: rewrote all syscall hooks in asm - Sat Aug 07 21:36:24 2010
+rev425 - EE core: a few tweaks to asm code - Thu Aug 05 22:28:01 2010
+rev424 - EE core: improved LoadExecPS2/SifSetDma hooks - Thu Aug 05 21:27:58 2010
+rev423 - update spanish language file - Thu Aug 05 19:53:32 2010
+rev422 - added Italian language file - Wed Aug 04 20:05:27 2010
+rev421 - EE core: a few tweaks to asm code - Tue Aug 03 20:35:24 2010
+rev420 - EE core: improve LoadExecPS2 hooking (fixes Tecmo Hit Parade SLPS_204.01) - Tue Aug 03 17:03:25 2010
+rev419 - crazyc: add MC dump ability to genvmc - Mon Aug 02 21:42:12 2010
+rev418 - fix for Star Ocean 3 - Till the End of Time (broken in r395) - Mon Aug 02 16:31:25 2010
+rev417 - fix for V-Rally 3 PAL (SLES_507.25) - Sat Jul 31 21:31:30 2010
+rev416 - fix for Shaun Palmer's Pro Snowboarder US (SLUS_201.99) - Sat Jul 31 17:37:41 2010
+rev415 - few i18n changes - Fri Jul 30 22:51:02 2010
+rev414 - clean-up in GUI strings (removed old entries, added missing values) - Thu Jul 29 21:30:45 2010
+rev413 - fix for NRA Gun Club (SLUS_214.32) - Mon Jul 26 20:26:00 2010
+rev412 - improvements to genvmc module - Mon Jul 26 14:19:49 2010
+rev411 - added genvmc IOP module - Sun Jul 25 17:22:56 2010
+rev410 - fix attempt for Jak X - Sat Jul 24 10:09:38 2010
+rev409 - fix for those games rebooting IOP with null arg (fixes Bloody Roar 3) - Fri Jul 23 17:39:26 2010
+rev408 - fix for GTA 3 a-spec over SMB - Fri Jul 23 13:39:36 2010
+rev407 - cdvdfsv: name module like orginal one - cdvd_ee_driver - Fri Jul 23 10:40:53 2010
+rev406 - EE core: fix for Quake III Revolution - Thu Jul 22 18:25:23 2010
+rev405 - fix for Jak 3 - Thu Jul 22 08:49:21 2010
+rev404 - fix for Full Spectrum Warrior - Wed Jul 21 21:44:41 2010
+rev403 - fix for those having SMB slowdown/freeze issue on some setups - Wed Jul 21 18:52:43 2010
+rev402 - cdvdman: fix lseek fileIO (fixes Shadow of Ganymede) - Tue Jul 20 20:16:31 2010
+rev401 - HDD core fix: init filesystem before to return disc type (fixes Xyanide Resurrection) - Tue Jul 20 16:08:45 2010
+rev400 - Added translation information for custom language - Tue Jul 20 15:29:15 2010
+rev399 - dlanor: fix for invisible cursor GUI glitch - Sun Jul 18 16:05:12 2010
+rev398 - fix for Viewtiful Joe - Sun Jul 18 15:58:03 2010
+rev397 - fix for EveryBody's Golf and other games - Sat Jul 17 17:26:26 2010
+rev396 - added feature to be able to disable sceSifStopModule/sceSifUnloadModule - Sat Jul 17 16:42:48 2010
+rev395 - hook SCE's SifLoadModuleBuffer to fake some modules to be loaded correctly through LoadModuleBuffer calls - Sat Jul 17 09:33:09 2010
+rev394 - fix for Kya: Dark Lineage PAL (SLES_514.73) - Thu Jul 15 15:06:51 2010
+rev393 - fix for V-Rally 3 US (SLUS_204.96) - Thu Jul 15 13:21:31 2010
+rev392 - fix for Kya: Dark Lineage US (SLUS_204.40) - Wed Jul 14 19:19:34 2010
+rev391 - changed the patches for Prince Of Persia: The Two Thrones - Wed Jul 14 19:15:35 2010
+rev390 - fix for Prince of Persia: The Two Thrones NTSC U (SLUS_212.87) - Tue Jul 13 12:35:52 2010
+rev389 - hdldsvr: use real HDD writes - Tue Jul 13 09:41:41 2010
+rev388 - udptty: redirect Kprintf output to tty - Mon Jul 12 20:50:43 2010
+rev387 - cdvdman: set cdstatus to CDVD_STAT_PAUSE in sceCdStStart/sceCdStResume - Sun Jul 11 16:42:07 2010
+rev386 - added EELOAD patches - Wed Jul 07 19:24:05 2010
+rev385 - fix for Suikoden IV (HDD) broken in r359 - Tue Jul 06 09:49:52 2010
+rev384 - fix for Prince of Persia: The Two Thrones PAL (SLES_537.77) - Mon Jul 05 19:01:47 2010
+rev383 - cdvdman: do not allocate IOP memory in cd callback handler (fixes Syphon Filter Logan's Shadow on HDD) - Sun Jul 04 18:30:17 2010
+rev382 - EE core: change stack pointer a bit earlier - Fri Jul 02 21:59:55 2010
+rev381 - EE core: use an intermediate stack during the IOP reset 'hook' code - Fri Jul 02 21:50:10 2010
+rev380 - use maximum priority for EE SMB password hashing thread - Fri Jul 02 19:30:42 2010
+rev379 - Fix for Suikoden V (in patch form) - Fri Jul 02 16:19:09 2010
+rev378 - fix for Max Payne EU version (SLES_503.25) - Thu Jul 01 21:08:36 2010
+rev377 - * make arrow icons customizable - Wed Jun 30 23:44:26 2010
+rev376 - PS3 fix 2: use XLOADFILE when building EELOADCNF - Wed Jun 30 21:47:52 2010
+rev375 - PS3 fix 1: reinstated cddev module use in EE core - Wed Jun 30 21:21:18 2010
+rev374 - * don't unmount pfs0 when we are launching an app that is on HDD - Wed Jun 30 21:00:04 2010
+rev373 - fix number 2 for Kingdom Hearts 2 gummi ship missions (should fix all regions) - Wed Jun 30 14:38:03 2010
+rev372 - fix for Kingdom Hearts 2 (SLUS_210.05) freeze on gummi ship missions - Wed Jun 30 11:01:15 2010
+rev371 - Apply Max Payne US patch on all 3 cores - Tue Jun 29 16:56:26 2010
+rev370 - SMSTCPIP: revert ARP_QUEUEING setting change (should fix broken Downhill Domination - SCUS_971.77 via SMB) - Tue Jun 29 16:45:45 2010
+rev369 - added compatibility mode 8 (should fix NFS Underground 2 - SLUS_210.65) - Mon Jun 28 19:39:40 2010
+rev368 - fix for the recent freezing using themes - Mon Jun 28 18:08:42 2010
+rev367 - changed smbauth & tcpip threads priorities (fixes Spiderman 3 and Genji) - Mon Jun 28 08:34:57 2010
+rev366 - link GUI SMB auth stuff to SMB core - Sun Jun 27 22:55:56 2010
+rev365 - * startup logo implementation, with a placeholder Logo - Sun Jun 27 20:41:48 2010
+rev364 - SMB core: do not perform password hashing if SMB server uses plaintext passwords - Sun Jun 27 19:38:17 2010
+rev363 - Max Payne US version (SLUS_202.30) fix for SMB use - Sun Jun 27 18:53:00 2010
+rev362 - EE core: added a ResetSPU() in LoadExecPS2 hook - Sun Jun 27 18:51:33 2010
+rev361 - added User Security Level support to SMB core - Sat Jun 26 22:04:12 2010
+rev360 - cdvdman: change back SceCdTrayReq traycheck return value - Sat Jun 26 09:38:33 2010
+rev359 - SMB core: save more IOP memory to increase compatibility - Fri Jun 25 10:36:55 2010
+rev358 - removed cddev module use from EE core, removed cddev - Wed Jun 23 13:31:22 2010
+rev357 - default to settings menu when no devices started or no config file found - Wed Jun 23 12:55:53 2010
+rev356 - * re-enable game "test" functionality (from compatibility settings) - Wed Jun 23 12:06:48 2010
+rev355 - use ICO fix (r346) only in compatibility mode 7 - Wed Jun 23 09:54:52 2010
+rev354 - smbman: do not rely on EndOfSearch but rather SearchCount field - Tue Jun 22 22:31:11 2010
+rev353 - remove uneeded stuff from ps2link module - Mon Jun 21 12:43:50 2010
+rev352 - EE core: remove InitializeUserMemory() patch when removing kernel hooks - Mon Jun 21 11:02:31 2010
+rev351 - fix: do no longer use sbv_patch_user_mem_clear() to be compatible with faulty DMS4 modchip - Sun Jun 20 19:46:58 2010
+rev350 - ps2link module: corrected Makefile - Sun Jun 20 19:00:52 2010
+rev349 - reload ps2link module on 'make debug' rule - Sat Jun 19 11:52:19 2010
+rev348 - fix: HDD gamelist was deallocated too early in HDD game launch process - Sat Jun 19 11:08:28 2010
+rev347 - * ISO support also "enabled" for USB (don't know what is the filesize limit, either 2Go or 4Go) - Fri Jun 18 22:36:12 2010
+rev346 - cdvdfsv: remove a 2KB of wasted IOP mem (fixes ICO - SCUS_971.59 via SMB) - Fri Jun 18 22:08:30 2010
+rev345 - SMSTCPIP: adjust PBUF_POOL_SIZE for ingame use (fixes again Disgaea SLUS_206.66 broken since r283) - Thu Jun 17 12:14:37 2010
+rev344 - added a new compatibilty mode: "reduce the buffers used by cdvdman/cdvdfsv" - Wed Jun 16 21:56:10 2010
+rev343 - added make_changelog.sh script and DETAILED_CHANGELOG file - Wed Jun 16 20:25:36 2010
 rev342 - cdvdman: check faulty filepath(more than one ';1') - fixes WWE Smackdown! Shut your mouth (SLUS_204.83) - Wed Jun 16 19:51:14 2010
 rev341 - use ioptrap module while debugging - Wed Jun 16 14:12:26 2010
 rev340 - fix for HDD games compat modes saving to another game when using sorted list - Mon Jun 14 20:30:37 2010

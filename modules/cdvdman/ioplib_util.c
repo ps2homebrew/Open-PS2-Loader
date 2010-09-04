@@ -207,7 +207,7 @@ void hookMODLOAD(void)
 	info.exports[10] = (void *)Hook_LoadModuleBuffer;
 
 	// check modload version
-	if (info.version > 0x104) {
+	if (info.version > 0x102) {
 
 		// hook modload's StopModule
 		StopModule = (void *)info.exports[20];

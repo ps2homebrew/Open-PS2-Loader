@@ -130,17 +130,17 @@ clean:
 	$(MAKE) -C modules/ioptrap clean
 	echo "    * ps2link.irx"
 	$(MAKE) -C modules/ps2link clean
-	echo "    * iso2opl"
+	echo "    * pc tools"
 	$(MAKE) -C pc clean
 
 rebuild: clean all
 
 pc_tools:
-	echo "Building iso2opl and opl2iso..."
+	echo "Building iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=0 -C pc
 
 pc_tools_win32:
-	echo "Building WIN32 iso2opl and opl2iso..."
+	echo "Building WIN32 iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=1 -C pc
 
 loader.s:

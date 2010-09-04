@@ -226,7 +226,7 @@ static void thmLoad(char* themePath) {
 	getElem(&themeConfig, newT, &newT->itemIcon, "item_icon", 1, 80, newT->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
 	getElem(&themeConfig, newT, &newT->itemCover, "item_cover", 1, 520, newT->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
 	getElem(&themeConfig, newT, &newT->itemText, "item_text", 1, 520, 370, ALIGN_CENTER, DIM_UNDEF, 20, 0);
-	getElem(&themeConfig, newT, &newT->hintText, "hint_text", 1, HINT_HEIGHT, -HINT_HEIGHT, ALIGN_NONE, DIM_INF, HINT_HEIGHT, 0);
+	getElem(&themeConfig, newT, &newT->hintText, "hint_text", 1, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_INF, HINT_HEIGHT, 0);
 	getElem(&themeConfig, newT, &newT->loadingIcon, "loading_icon", 1, -50, -50, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
 
 	if (getConfigInt(&themeConfig, "cover_blend_ulx", &intValue))

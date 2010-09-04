@@ -70,7 +70,8 @@
 #define _STR_DELETE_WARNING				65
 #define _STR_RENAME					66
 #define _STR_DELETE					67
-#define LANG_STR_COUNT 68
+#define _STR_PLAY					68
+#define LANG_STR_COUNT 69
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

@@ -257,15 +257,6 @@ pkoWriteMem(char *buf, int len)
     ret = pkoSendSifCmd(PKO_RPC_WRITEMEM, buf, len);
 };
 
-#ifdef SCREENSHOTS
-static void
-pkoScreenShot(char *buf, int len)
-{
-    int ret;
-    ret = pkoSendSifCmd(PKO_RPC_SCRSHOT, buf, len);
-};
-#endif
-
 //////////////////////////////////////////////////////////////////////////
 static void
 cmdListener(int sock)
@@ -337,11 +328,6 @@ cmdListener(int sock)
             case PKO_WRITE_MEM:
                 pkoWriteMem(recvbuf, len);
                 break;
-#ifdef SCREENSHOTS
-            case PKO_SCRSHOT_CMD:
-                pkoScreenShot(recvbuf, len);
-                break;
-#endif
             default:
                 dbgprintf("IOP cmd: Uknown cmd received\n");
                 break;

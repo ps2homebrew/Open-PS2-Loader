@@ -20,8 +20,8 @@
 #include "net_fio.h"
 #include "hostlink.h"
 
-#define ntohl(x) htonl(x)
-#define ntohs(x) htons(x)
+//#define ntohl(x) htonl(x)
+//#define ntohs(x) htons(x)
 
 unsigned int remote_pc_addr = 0xffffffff;
 

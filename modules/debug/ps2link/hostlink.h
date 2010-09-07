@@ -46,7 +46,6 @@
 #define PKO_GSEXEC_CMD 0xbabe020b
 #define PKO_WRITE_MEM 0xbabe020c
 #define PKO_IOPEXCEP_CMD 0xbabe020d
-#define PKO_SCRSHOT_CMD 0xbabe020e
 
 #define PKO_RPC_RESET 1
 #define PKO_RPC_EXECEE 2
@@ -60,7 +59,6 @@
 #define PKO_RPC_GSEXEC 10
 #define PKO_RPC_WRITEMEM 11
 #define PKO_RPC_IOPEXCEP 12
-#define PKO_RPC_SCRSHOT 13
 
 #define PKO_MAX_PATH 256
 
@@ -259,16 +257,6 @@ typedef struct
     unsigned short len;
     unsigned int regs[79];
 } __attribute__((packed)) pko_pkt_send_regs;
-
-typedef struct
-{
-    unsigned int cmd;
-    unsigned short len;
-    unsigned int base;
-    unsigned int width;
-    unsigned int height;
-    unsigned short psm;
-} __attribute__((packed)) pko_pkt_screenshot;
 
 #define PKO_MAX_WRITE_SEGMENT (1460 - sizeof(pko_pkt_write_req))
 #define PKO_MAX_READ_SEGMENT (1460 - sizeof(pko_pkt_read_rly))

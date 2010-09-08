@@ -138,6 +138,7 @@ static char* usbGetGameStartup(int id) {
 	return usbGames[id].startup;
 }
 
+#ifndef __CHILDPROOF
 static void usbDeleteGame(int id) {
 	sbDelete(&usbGames, usbPrefix, "/", usbGameCount, id);
 	usbULSizePrev = -1;
@@ -149,6 +150,7 @@ static void usbRenameGame(int id, char* newName) {
 
 	usbULSizePrev = -1;
 }
+#endif
 
 static int usbGetGameCompatibility(int id, int *dmaMode) {
 	return sbGetCompatibility(&usbGames[id], usbGameList.mode);
@@ -223,6 +225,10 @@ static void usbCleanUp(int exception) {
 
 static item_list_t usbGameList = {
 		USB_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+#ifdef __CHILDPROOF
+		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, NULL, NULL,
+#else
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
-		&usbGetGameCompatibility, &usbSetGameCompatibility,	&usbLaunchGame,	&usbGetArt, &usbCleanUp, USB_ICON
+#endif
+		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, USB_ICON
 };

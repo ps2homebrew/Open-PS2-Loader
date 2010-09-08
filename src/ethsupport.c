@@ -172,6 +172,7 @@ static char* ethGetGameStartup(int id) {
 	return ethGames[id].startup;
 }
 
+#ifndef __CHILDPROOF
 static void ethDeleteGame(int id) {
 	sbDelete(&ethGames, ethPrefix, "\\", ethGameCount, id);
 	ethULSizePrev = -1;
@@ -181,6 +182,7 @@ static void ethRenameGame(int id, char* newName) {
 	sbRename(&ethGames, ethPrefix, "\\", ethGameCount, id, newName);
 	ethULSizePrev = -1;
 }
+#endif
 
 static int ethGetGameCompatibility(int id, int *dmaMode) {
 	return sbGetCompatibility(&ethGames[id], ethGameList.mode);
@@ -325,6 +327,10 @@ int ethSMBDisconnect(void) {
 
 static item_list_t ethGameList = {
 		ETH_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+#ifdef __CHILDPROOF
+		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, NULL, NULL,
+#else
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-		&ethGetGameCompatibility, &ethSetGameCompatibility,	&ethLaunchGame,	&ethGetArt, &ethCleanUp, ETH_ICON
+#endif
+		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetArt, &ethCleanUp, ETH_ICON
 };

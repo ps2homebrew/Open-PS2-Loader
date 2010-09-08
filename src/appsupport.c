@@ -83,6 +83,7 @@ static char* appGetItemStartup(int id) {
 	return cur->val;
 }
 
+#ifndef __CHILDPROOF
 static void appDeleteItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
 	fileXioRemove(cur->val);
@@ -109,6 +110,7 @@ static void appRenameItem(int id, char* newName) {
 
 	appForceUpdate = 1;
 }
+#endif
 
 static void appLaunchItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
@@ -158,6 +160,10 @@ static void appCleanUp(int exception) {
 
 static item_list_t appItemList = {
 		APP_MODE, 32, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
+#ifdef __CHILDPROOF
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, NULL, NULL, NULL, NULL, &appLaunchItem,
+#else
 		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
+#endif
 		&appGetArt, &appCleanUp, APP_ICON
 };

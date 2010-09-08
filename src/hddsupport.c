@@ -138,6 +138,7 @@ static char* hddGetGameStartup(int id) {
 	return hddGames->games[id].startup;
 }
 
+#ifndef __CHILDPROOF
 static void hddDeleteGame(int id) {
 	hddDeleteHDLGame(&hddGames->games[id]);
 	hddForceUpdate = 1;
@@ -149,6 +150,7 @@ static void hddRenameGame(int id, char* newName) {
 	hddSetHDLGameInfo(&hddGames->games[id]);
 	hddForceUpdate = 1;
 }
+#endif
 
 static int hddGetGameCompatibility(int id, int *dmaMode) {
 	*dmaMode = 7; // defaulting to UDMA 4
@@ -281,6 +283,10 @@ static void hddCleanUp(int exception) {
 
 static item_list_t hddGameList = {
 		HDD_MODE, HDL_GAME_NAME_MAX + 1, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+#ifdef __CHILDPROOF
+		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameStartup, NULL, NULL, &hddGetGameCompatibility,
+#else
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
+#endif
 		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, HDD_ICON
 };

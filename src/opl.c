@@ -261,8 +261,10 @@ void menuExecHookFunc(int id) {
 }
 
 void menuFillHookFunc(struct submenu_list_t **menu) {
+#ifndef __CHILDPROOF
 	if (gHDDStartMode) // enabled at all?
 		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
+#endif
 }
 
 // ----------------------------------------------------------

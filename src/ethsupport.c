@@ -244,6 +244,12 @@ static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
+static void ethCleanUp(int exception) {
+	LOG("ethCleanUp()\n");
+
+	free(ethGames);
+}
+
 int ethSMBConnect(void) {
 	int ret;
 	smbLogOn_in_t logon;
@@ -317,10 +323,8 @@ int ethSMBDisconnect(void) {
 	return 0;	
 }
 
-
-
 static item_list_t ethGameList = {
 		ETH_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-		&ethGetGameCompatibility, &ethSetGameCompatibility,	&ethLaunchGame,	&ethGetArt, NULL, ETH_ICON
+		&ethGetGameCompatibility, &ethSetGameCompatibility,	&ethLaunchGame,	&ethGetArt, &ethCleanUp, ETH_ICON
 };

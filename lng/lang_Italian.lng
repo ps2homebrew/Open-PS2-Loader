@@ -1,3 +1,4 @@
+# translation by jimmikaelkael, updated by 0NullChAr0
 Italian
                WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^
 Open PS2 Loader %s
@@ -16,8 +17,8 @@ Applicazioni
 Tema
 Lingua
 Errore avvio Network
-Acceso
-Spento
+Attivato
+Disattivato
 OK
 Impostazioni compatibilita'
 Rimuovi tutte le impostazioni
@@ -62,3 +63,7 @@ Titolo
 Utente
 Parola d'ordine
 <non impostato>
+X Accetta
+L'oggetto sara' cancellato definitivamente, continuare?
+Rinomina
+Cancella

@@ -19,16 +19,17 @@ static item_list_t appItemList;
 
 static struct TConfigValue* appGetConfigValue(int id) {
 	struct TConfigValue* cur = configApps.head;
-	
+
 	while (id--) {
 		cur = cur->next;
 	}
-	
+
 	return cur;
 }
 
 void appInit(void) {
 	LOG("appInit()\n");
+	appForceUpdate = 1;
 	configApps.head = NULL;
 	configApps.tail = NULL;
 
@@ -82,11 +83,10 @@ static char* appGetItemStartup(int id) {
 	return cur->val;
 }
 
-// TODO: doesn't work as configApps is being polled by the GUI, need to work on copy ...
-/*static void appDeleteItem(int id) {
+static void appDeleteItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
 	fileXioRemove(cur->val);
-	configRemoveKey(&configApps, cur->key);
+	cur->key[0] = '\0';
 
 	char path[255];
 	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
@@ -97,6 +97,7 @@ static char* appGetItemStartup(int id) {
 
 static void appRenameItem(int id, char* newName) {
 	struct TConfigValue* cur = appGetConfigValue(id);
+
 	char value[255];
 	strncpy(value, cur->val, 255);
 	configRemoveKey(&configApps, cur->key);
@@ -107,7 +108,7 @@ static void appRenameItem(int id, char* newName) {
 	writeConfig(&configApps, path);
 
 	appForceUpdate = 1;
-}*/
+}
 
 static void appLaunchItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
@@ -149,9 +150,14 @@ static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 	return -1;
 }
 
+static void appCleanUp(int exception) {
+	LOG("appCleanUp()\n");
+
+	clearConfig(&configApps);
+}
+
 static item_list_t appItemList = {
 		APP_MODE, 32, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
-		//&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
-		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, NULL, NULL, NULL, NULL, &appLaunchItem,
-		&appGetArt, NULL, APP_ICON
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
+		&appGetArt, &appCleanUp, APP_ICON
 };

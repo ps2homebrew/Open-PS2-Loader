@@ -180,20 +180,22 @@ int configRemoveKey(struct TConfigSet* config, const char* key) {
 	
 	while (val) {
 		if (strncmp(val->key, key, 32) == 0) {
-			if (prev)
-				prev->next = val->next;
-			
-			if (val == config->head)
-				config->head = val->next;
-			
 			if (val == config->tail)
-				config->tail = val->next;
-			
-			free(val);
+				config->tail = prev;
+
+			val = val->next;
+			if (prev) {
+				free(prev->next);
+				prev->next = val;
+			}
+			else {
+				free(config->head);
+				config->head = val;
+			}
+		} else {
+			prev = val;
+			val = val->next;
 		}
-		
-		prev = val;
-		val = val->next;
 	}
 	
 	return 1;
@@ -311,8 +313,10 @@ int writeConfig(struct TConfigSet* config, char *fname) {
 		struct TConfigValue* cur = config->head;
 
 		while (cur) {
-			snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
-			writeFileBuffer(fileBuffer, line, strlen(line));
+			if (cur->key[0] != '\0') {
+				snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
+				writeFileBuffer(fileBuffer, line, strlen(line));
+			}
 
 			// and advance
 			cur = cur->next;

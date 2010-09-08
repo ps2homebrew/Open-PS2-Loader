@@ -138,9 +138,11 @@ static void guiInitMainMenu() {
 		submenuDestroy(&mainMenu);
 
 	// initialize the menu
-	submenuAppendItem(&mainMenu, DISC_ICON, "Theme", 1, _STR_SETTINGS);
-	submenuAppendItem(&mainMenu, DISC_ICON, "Network config", 3, _STR_IPCONFIG);
+#ifndef __CHILDPROOF
+	submenuAppendItem(&mainMenu, DISC_ICON, "Settings", 1, _STR_SETTINGS);
+	submenuAppendItem(&mainMenu, DISC_ICON, "Network settings", 3, _STR_IPCONFIG);
 	submenuAppendItem(&mainMenu, SAVE_ICON, "Save Changes", 7, _STR_SAVE_CHANGES);
+#endif
 	
 	// Callback to fill in other items
 	if (gMenuFillHook) // if found

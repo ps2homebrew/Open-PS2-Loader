@@ -72,7 +72,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_SPLITTER},
 	{UI_OK},
 	
-	// end of dialogue
+	// end of dialog
 	{UI_TERMINATOR}
 };
 
@@ -103,14 +103,17 @@ struct UIItem diaCompatConfig[] = {
 	
 	{UI_SPLITTER},
 	
-	{UI_OK}, {UI_SPACER}, {UI_BUTTON, COMPAT_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}}, 
-		 {UI_SPACER}, {UI_BUTTON, COMPAT_TEST, NULL, {.label = {"Test", -1}}},
+	{UI_OK},
+#ifndef __CHILDPROOF
+	{UI_SPACER}, {UI_BUTTON, COMPAT_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}},
+#endif
+	{UI_SPACER}, {UI_BUTTON, COMPAT_TEST, NULL, {.label = {"Test", -1}}},
 	
 	{UI_SPLITTER},
-	
+#ifndef __CHILDPROOF
 	{UI_BUTTON, COMPAT_REMOVE, NULL, {.label = {"", _STR_REMOVE_ALL_SETTINGS}}},
-	
-	// end of dialogue
+#endif
+	// end of dialog
 	{UI_TERMINATOR}
 };
 
@@ -141,12 +144,9 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, UICFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
-	
-	{UI_OK}, {UI_SPACER}, {UI_BUTTON, UICFG_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}}, 
-	
-	{UI_SPLITTER},
-	
-	// end of dialogue
+	{UI_OK},
+
+	// end of dialog
 	{UI_TERMINATOR}
 };
 

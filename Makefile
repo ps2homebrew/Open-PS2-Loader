@@ -2,6 +2,7 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
+CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
 FT_LIBDIR = $(FT_DIR)/objs
@@ -41,6 +42,9 @@ endif
 else
 EE_CFLAGS := -O2
 endif
+ifeq ($(CHILDPROOF),1)
+EE_CFLAGS += -D__CHILDPROOF
+endif
 
 all:
 	@mkdir -p obj
@@ -62,6 +66,9 @@ ifeq ($(DEBUG),0)
 	ps2-packer opl.elf OPNPS2LD.ELF > /dev/null
 endif
 
+childproof:
+	$(MAKE) CHILDPROOF=1 all
+	
 debug:
 	$(MAKE) DEBUG=1 all
 

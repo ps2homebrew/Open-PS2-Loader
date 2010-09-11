@@ -182,7 +182,7 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode, short s
 		hddSetHDLGameInfo(&hddGames->games[id]);
 }
 
-static void hddLaunchGame(int id) {
+static int hddLaunchGame(int id) {
 	shutdown(NO_EXCEPTION);
 
 	int i, size_irx = 0;
@@ -269,6 +269,8 @@ static void hddLaunchGame(int id) {
 	FlushCache(0);
 
 	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compat_flags, compat_flags & COMPAT_MODE_1);
+
+	return 1;
 }
 
 static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

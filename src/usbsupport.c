@@ -160,12 +160,29 @@ static void usbSetGameCompatibility(int id, int compatMode, int dmaMode, short s
 	sbSetCompatibility(&usbGames[id], usbGameList.mode, compatMode);
 }
 
-static void usbLaunchGame(int id) {
-	shutdown(NO_EXCEPTION);
-
-	int i, compatmask;
-	char isoname[32];
+static int usbLaunchGame(int id) {
+	int fd, r, index, i, compatmask;
+	char isoname[32], partname[64];
 	base_game_info_t* game = &usbGames[id];
+
+	fd = fioDopen(usbPrefix);
+	if (fd < 0)
+		return ERROR_FILE_INVALID;
+
+	if (gCheckUSBFragmentation)
+		for (i = 0; i < game->parts; i++) {
+			if (game->isISO)
+				sprintf(partname,"%s/%s.%s.iso", (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
+			else
+				sprintf(partname,"%s.%02x",isoname, i);
+
+			if (fioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
+				fioDclose(fd);
+				return ERROR_FRAGMENTED;
+			}
+		}
+
+	shutdown(NO_EXCEPTION);
 
 	if (gRememberLastPlayed) {
 		setConfigStr(&gConfig, "last_played", game->startup);
@@ -174,18 +191,7 @@ static void usbLaunchGame(int id) {
 
 	void *irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
-
-	int j, offset = 44;
-	char partname[64];
-	int fd, r;
-
-	fd = fioDopen(usbPrefix);
-	if (fd < 0) {
-		init_scr();
-		scr_clear();
-		scr_printf("\n\t Fatal error opening %s...\n", usbPrefix);
-		while(1);
-	}
+	int offset = 44;
 
 	r = fioIoctl(fd, 0xDEADC0DE, partname);
 	LOG("mass storage device sectorsize = %d\n", r);
@@ -195,17 +201,16 @@ static void usbLaunchGame(int id) {
 		irx_size = size_usb_4Ksectors_cdvdman_irx;
 	}
 
-	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &i);
+	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &index);
 
-	for (j = 0; j < game->parts; j++) {
+	for (i = 0; i < game->parts; i++) {
 		if (game->isISO)
 			sprintf(partname,"%s/%s.%s.iso", (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
 		else
-			sprintf(partname,"%s.%02x",isoname, j);
+			sprintf(partname,"%s.%02x",isoname, i);
 
-		LOG("partname: %s\n", partname);
 		r = fioIoctl(fd, 0xBEEFC0DE, partname);
-		memcpy((void*)((u32)&usb_cdvdman_irx + i + offset), &r, 4);
+		memcpy((void*)((u32)&usb_cdvdman_irx + index + offset), &r, 4);
 		offset += 4;
 	}
 
@@ -214,6 +219,8 @@ static void usbLaunchGame(int id) {
 	FlushCache(0);
 
 	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
+
+	return 1;
 }
 
 static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

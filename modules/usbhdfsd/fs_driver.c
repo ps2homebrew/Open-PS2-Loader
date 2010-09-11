@@ -47,6 +47,7 @@
 #define IOCTL_RENAME 0xFEEDC0DE  //dlanor: Ioctl request code => Rename
 #define IOCTL_GETCLUSTER 0xBEEFC0DE        //jimmikaelkael: Ioctl request code => get file start cluster
 #define IOCTL_GETDEVSECTORSIZE 0xDEADC0DE  //jimmikaelkael: Ioctl request code => get mass storage device sector size
+#define IOCTL_CHECKCHAIN 0xCAFEC0DE  //polo: Ioctl request code => Check cluster chain
 
 #define FLUSH_SECTORS		fat_flushSectors
 
@@ -771,6 +772,48 @@ unsigned int fs_getFileSector(iop_file_t *fd, char *name)
 }
 
 //---------------------------------------------------------------------------
+int fs_checkClusterChain(iop_file_t *fd, char *name)
+{
+	int chain_end = 0;
+	fat_driver* fatd;
+	fs_rec* rec = NULL;
+	int ret, chain_size;
+	unsigned int cluster = 0;
+
+	fatd = fat_getData(fd->unit);
+	if (fatd == NULL)
+		return 0;
+
+	rec = fs_findFreeFileSlot();
+	if (rec == NULL)
+		return 0;
+
+	ret = fat_getFileStartCluster(fatd, name, &cluster, &rec->fatdir);
+	if (ret < 0) {
+		rec->file_flag = -1;
+		return 0;
+	}
+
+	rec->file_flag = -1;
+
+	// Check cluster chain (write operation can cause dammage if file is fragmented)
+	while (chain_end == 0) {
+		chain_size = fat_getClusterChain(fatd, cluster, fatd->cbuf, MAX_DIR_CLUSTER, 1);
+
+		if(fatd->cbuf[0] != fatd->cbuf[chain_size-1] - (chain_size-1))
+			return 0;
+
+		if (chain_size == MAX_DIR_CLUSTER) {
+			cluster = fatd->cbuf[chain_size - 1];
+		} else {
+			chain_end = 1;
+		}
+	}
+
+	return 1;
+}
+
+//---------------------------------------------------------------------------
 int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
 {
 	fat_driver* fatd;
@@ -797,6 +840,9 @@ int fs_ioctl(iop_file_t *fd, unsigned long request, void *data)
 			break;
 		case IOCTL_GETDEVSECTORSIZE:
 			ret = mass_stor_sectorsize(fatd->dev);
+			break;
+		case IOCTL_CHECKCHAIN:
+			ret = fs_checkClusterChain(fd, (char *)data);
 			break;
 		default:
 			ret = fs_dummy();

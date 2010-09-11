@@ -75,7 +75,9 @@
 #define _STR_DANDROP					70
 #define _STR_CHECKUSBFRAG				71
 #define _STR_LASTPLAYED				72
-#define LANG_STR_COUNT 73
+#define _STR_ERR_FRAGMENTED				73
+#define _STR_ERR_FILE_INVALID				74
+#define LANG_STR_COUNT 75
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

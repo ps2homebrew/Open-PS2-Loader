@@ -78,7 +78,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Display settings",
 	"Enable Delete and Rename operations",
 	"Check USB game fragmentation",
-	"Remember last played game"
+	"Remember last played game",
+	"Error, the game is fragmented",
+	"Error, could not run the item"
 };
 
 static int guiLangID = 0;

@@ -192,9 +192,9 @@ static void ethSetGameCompatibility(int id, int compatMode, int dmaMode, short s
 	sbSetCompatibility(&ethGames[id], ethGameList.mode, compatMode);
 }
 
-static void ethLaunchGame(int id) {
+static int ethLaunchGame(int id) {
 	if (gNetworkStartup != 0)
-		return;
+		return ERROR_ETH_INIT;
 
 	shutdown(NO_EXCEPTION);
 
@@ -243,6 +243,8 @@ static void ethLaunchGame(int id) {
 	FlushCache(0);
 
 	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
+
+	return 1;
 }
 
 static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

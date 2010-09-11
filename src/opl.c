@@ -101,9 +101,9 @@ static void initHints(struct menu_item_t* menuItem, int startMode) {
 		item_list_t *support = menuItem->userdata;
 		if (support->itemGetCompatibility)
 			menuAddHint(menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
-		if (support->itemRename)
+		if (gEnableDandR && support->itemRename)
 			menuAddHint(menuItem, _STR_RENAME, CIRCLE_ICON);
-		if (support->itemDelete)
+		if (gEnableDandR && support->itemDelete)
 			menuAddHint(menuItem, _STR_DELETE, SQUARE_ICON);
 	}
 }
@@ -148,6 +148,9 @@ static void itemExecSquare(struct menu_item_t *self, int id) {
 	if (id < 0)
 		return;
 
+	if (!gEnableDandR)
+		return;
+
 	if (support) {
 		if (support->itemDelete) {
 			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1)) {
@@ -164,6 +167,9 @@ static void itemExecCircle(struct menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (id < 0)
+		return;
+
+	if (!gEnableDandR)
 		return;
 
 	if (support) {
@@ -319,6 +325,9 @@ void _loadConfig() {
 		getConfigInt(&gConfig, "autosort", &gAutosort);
 		getConfigInt(&gConfig, "default_device", &gDefaultDevice);
 		getConfigInt(&gConfig, "disable_debug", &gDisableDebug);
+		getConfigInt(&gConfig, "enable_delete_rename", &gEnableDandR);
+		getConfigInt(&gConfig, "check_usb_frag", &gCheckUSBFragmentation);
+		getConfigInt(&gConfig, "remember_last", &gRememberLastPlayed);
 		getConfigInt(&gConfig, "usb_mode", &gUSBStartMode);
 		getConfigInt(&gConfig, "hdd_mode", &gHDDStartMode);
 		getConfigInt(&gConfig, "eth_mode", &gETHStartMode);
@@ -360,6 +369,9 @@ void _saveConfig() {
 	setConfigInt(&gConfig, "autosort", gAutosort);
 	setConfigInt(&gConfig, "default_device", gDefaultDevice);
 	setConfigInt(&gConfig, "disable_debug", gDisableDebug);
+	setConfigInt(&gConfig, "enable_delete_rename", gEnableDandR);
+	setConfigInt(&gConfig, "check_usb_frag", gCheckUSBFragmentation);
+	setConfigInt(&gConfig, "remember_last", gRememberLastPlayed);
 	setConfigInt(&gConfig, "usb_mode", gUSBStartMode);
 	setConfigInt(&gConfig, "hdd_mode", gHDDStartMode);
 	setConfigInt(&gConfig, "eth_mode", gETHStartMode);
@@ -445,6 +457,10 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	// unlock, the rest is deferred
 	guiUnlock();
 	
+	char* temp = NULL;
+	if (gRememberLastPlayed)
+		getConfigStr(&gConfig, "last_played", &temp);
+
 	// read the new game list
 	struct gui_update_t *gup = NULL;
 	int count = mdl->support->itemUpdate();
@@ -462,7 +478,11 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 			gup->submenu.id = i;
 			gup->submenu.text = mdl->support->itemGetName(i);
 			gup->submenu.text_id = -1;
+			gup->submenu.selected = 0;
 			
+			if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0)
+				gup->submenu.selected = 1;
+
 			guiDeferUpdate(gup);
 		}
 	}
@@ -743,6 +763,9 @@ static void setDefaults(void) {
 	gAutosort = 0;
 	//Default disable debug colors
 	gDisableDebug = 0;
+	gEnableDandR = 0;
+	gRememberLastPlayed = 0;
+	gCheckUSBFragmentation = 0;
 	// disable art by default
 	gEnableArt = 0;
 	gWideScreen = 0;

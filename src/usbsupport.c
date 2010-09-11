@@ -144,12 +144,12 @@ static void usbDeleteGame(int id) {
 	usbULSizePrev = -1;
 }
 
-static void usbRenameGame(int id, char* newName) {
+/*static void usbRenameGame(int id, char* newName) {
 	// TODO when/if Jimmi add rename functionnality to usbhdfs, then we should use the above method
 	//sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
 
 	usbULSizePrev = -1;
-}
+}*/
 #endif
 
 static int usbGetGameCompatibility(int id, int *dmaMode) {
@@ -166,6 +166,11 @@ static void usbLaunchGame(int id) {
 	int i, compatmask;
 	char isoname[32];
 	base_game_info_t* game = &usbGames[id];
+
+	if (gRememberLastPlayed) {
+		setConfigStr(&gConfig, "last_played", game->startup);
+		_saveConfig();
+	}
 
 	void *irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
@@ -228,7 +233,7 @@ static item_list_t usbGameList = {
 #ifdef __CHILDPROOF
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, NULL, NULL,
 #else
-		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
+		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbDeleteGame, NULL,
 #endif
 		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, USB_ICON
 };

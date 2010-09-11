@@ -32,6 +32,7 @@ struct gui_update_t {
 			char *text;
 			int id;
 			int text_id;
+			int selected;
 		} submenu;
 		
 		struct {

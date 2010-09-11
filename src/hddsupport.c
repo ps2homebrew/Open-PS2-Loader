@@ -191,6 +191,11 @@ static void hddLaunchGame(int id) {
 
 	hdl_game_info_t* game = &hddGames->games[id];
 
+	if (gRememberLastPlayed) {
+		setConfigStr(&gConfig, "last_played", game->startup);
+		_saveConfig();
+	}
+
 	char gid[5];
 	getConfigDiscIDBinary(hddGames->games[id].startup, gid);
 

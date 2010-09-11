@@ -203,6 +203,11 @@ static void ethLaunchGame(int id) {
 	char isoname[32];
 	base_game_info_t* game = &ethGames[id];
 
+	if (gRememberLastPlayed) {
+		setConfigStr(&gConfig, "last_played", game->startup);
+		_saveConfig();
+	}
+
 	if (sysPcmciaCheck()) {
 		size_irx = size_smb_pcmcia_cdvdman_irx;
 		irx = &smb_pcmcia_cdvdman_irx;

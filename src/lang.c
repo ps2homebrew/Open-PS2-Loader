@@ -74,7 +74,11 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Item will be permanently deleted, continue ?",
 	"Rename",
 	"Delete",
-	"Play"
+	"Play",
+	"Display settings",
+	"Enable Delete and Rename operations",
+	"Check USB game fragmentation",
+	"Remember last played game"
 };
 
 static int guiLangID = 0;

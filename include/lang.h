@@ -71,7 +71,11 @@
 #define _STR_RENAME					66
 #define _STR_DELETE					67
 #define _STR_PLAY					68
-#define LANG_STR_COUNT 69
+#define _STR_GFX_SETTINGS				69
+#define _STR_DANDROP					70
+#define _STR_CHECKUSBFRAG				71
+#define _STR_LASTPLAYED				72
+#define LANG_STR_COUNT 73
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

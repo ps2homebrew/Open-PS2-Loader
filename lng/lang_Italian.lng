@@ -22,7 +22,7 @@ Disattivato
 OK
 Impostazioni compatibilita'
 Rimuovi tutte le impostazioni
-Rimuovi tutte le chiavi per il gioco
+Tutte le impostazioni del gioco sono state rimosse
 Scorrimento
 Lento
 Medio
@@ -49,7 +49,7 @@ Automatico
 Manuale
 Avvia HDL Server
 Avviamento HDL Server...
-Caricamento HDL Server... [O][X] Per Fermare
+Caricamento HDL Server... [O] Per Fermare
 Premi [X] per fermare HDL...
 Scaricamento HDL Server...
 Esci per
@@ -67,3 +67,4 @@ X Accetta
 L'oggetto sara' cancellato definitivamente, continuare?
 Rinomina
 Cancella
+Avvia

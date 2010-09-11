@@ -140,6 +140,7 @@ static void guiInitMainMenu() {
 	// initialize the menu
 #ifndef __CHILDPROOF
 	submenuAppendItem(&mainMenu, DISC_ICON, "Settings", 1, _STR_SETTINGS);
+	submenuAppendItem(&mainMenu, DISC_ICON, "Display Settings", 2, _STR_GFX_SETTINGS);
 	submenuAppendItem(&mainMenu, DISC_ICON, "Network settings", 3, _STR_IPCONFIG);
 	submenuAppendItem(&mainMenu, SAVE_ICON, "Save Changes", 7, _STR_SAVE_CHANGES);
 #endif
@@ -266,37 +267,59 @@ static void guiExecExit() {
 	}
 }
 
-static void guiShowUIConfig() {
+static void guiShowConfig() {
 	// configure the enumerations
-	const char* scrollSpeeds[] = {	_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL };
 	const char* exitTypes[] = { "Browser", "mc0:/BOOT/BOOT.ELF", "mc0:/APPS/BOOT.ELF", NULL };
 	const char* deviceNames[] = { _l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL };
 	const char* deviceModes[] = { _l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL };
 
+	diaSetEnum(diaConfig, CFG_EXITTO, exitTypes);
+	diaSetEnum(diaConfig, CFG_DEFDEVICE, deviceNames);
+	diaSetEnum(diaConfig, CFG_USBMODE, deviceModes);
+	diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
+	diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
+	diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
+
+	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
+	diaSetInt(diaConfig, CFG_EXITTO, gExitMode);
+	diaSetInt(diaConfig, CFG_DANDROP, gEnableDandR);
+	diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
+	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
+	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
+	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
+	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
+	diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
+	diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
+
+	int ret = diaExecuteDialog(diaConfig, 1);
+	if (ret) {
+		diaGetInt(diaConfig, CFG_EXITTO, &gExitMode);
+		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
+		diaGetInt(diaConfig, CFG_DANDROP, &gEnableDandR);
+		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
+		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
+		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
+		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
+		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
+		diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
+		diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
+	}
+}
+
+static void guiShowUIConfig() {
+	// configure the enumerations
+	const char* scrollSpeeds[] = {	_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL };
+
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
-	diaSetEnum(diaUIConfig, UICFG_EXITTO, exitTypes);
-	diaSetEnum(diaUIConfig, UICFG_DEFDEVICE, deviceNames);
-	diaSetEnum(diaUIConfig, UICFG_USBMODE, deviceModes);
-	diaSetEnum(diaUIConfig, UICFG_HDDMODE, deviceModes);
-	diaSetEnum(diaUIConfig, UICFG_ETHMODE, deviceModes);
-	diaSetEnum(diaUIConfig, UICFG_APPMODE, deviceModes);
 
-	// and the current values
 	diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
 	diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
 	diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
 	diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
 	diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
-	diaSetInt(diaUIConfig, UICFG_EXITTO, gExitMode);
-	diaSetInt(diaUIConfig, UICFG_DEFDEVICE, gDefaultDevice);
-	diaSetInt(diaUIConfig, UICFG_USBMODE, gUSBStartMode);
-	diaSetInt(diaUIConfig, UICFG_HDDMODE, gHDDStartMode);
-	diaSetInt(diaUIConfig, UICFG_ETHMODE, gETHStartMode);
-	diaSetInt(diaUIConfig, UICFG_APPMODE, gAPPStartMode);
 	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
-	diaSetInt(diaUIConfig, UICFG_DEBUG, gDisableDebug);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 
@@ -308,21 +331,11 @@ static void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_LANG, &langID);
 		diaGetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
 		diaGetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
-		diaGetInt(diaUIConfig, UICFG_EXITTO, &gExitMode);
-		diaGetInt(diaUIConfig, UICFG_DEFDEVICE, &gDefaultDevice);
-		diaGetInt(diaUIConfig, UICFG_USBMODE, &gUSBStartMode);
-		diaGetInt(diaUIConfig, UICFG_HDDMODE, &gHDDStartMode);
-		diaGetInt(diaUIConfig, UICFG_ETHMODE, &gETHStartMode);
-		diaGetInt(diaUIConfig, UICFG_APPMODE, &gAPPStartMode);
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
-		diaGetInt(diaUIConfig, UICFG_DEBUG, &gDisableDebug);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
 
 		applyConfig(themeID, langID);
-
-		if (ret == UICFG_SAVE)
-			saveConfig();
 	}
 }
 
@@ -466,6 +479,8 @@ int guiDeferUpdate(struct gui_update_t *op) {
 }
 
 static void guiHandleOp(struct gui_update_t* item) {
+	struct submenu_list_t* result = NULL;
+
 	switch (item->type) {
 		case GUI_INIT_DONE:
 			gInitComplete = 1;
@@ -476,17 +491,20 @@ static void guiHandleOp(struct gui_update_t* item) {
 			break;
 			
 		case GUI_OP_APPEND_MENU:
-			submenuAppendItem(item->menu.subMenu, 
-					  item->submenu.icon_id,
-					  item->submenu.text,
-					  item->submenu.id,
-					  item->submenu.text_id );
-			
+			result = submenuAppendItem(item->menu.subMenu,
+									   item->submenu.icon_id,
+									   item->submenu.text,
+									   item->submenu.id,
+									   item->submenu.text_id);
+
 			if (!item->menu.menu->submenu) {
 				item->menu.menu->submenu = *item->menu.subMenu;
 				item->menu.menu->current = *item->menu.subMenu;
 				item->menu.menu->pagestart = *item->menu.subMenu;
 			}
+
+			if (item->submenu.selected)
+				item->menu.menu->current = result;
 
 			break;
 			
@@ -505,7 +523,8 @@ static void guiHandleOp(struct gui_update_t* item) {
 		case GUI_OP_SORT:
 			submenuSort(item->menu.subMenu);
 			item->menu.menu->pagestart = NULL;
-			item->menu.menu->current = *item->menu.subMenu;
+			if (!item->menu.menu->current)
+				item->menu.menu->current = *item->menu.subMenu;
 			item->menu.menu->submenu = *item->menu.subMenu;
 			break;
 		
@@ -989,6 +1008,8 @@ static void guiMenuHandleInput() {
 		int id = mainMenuCurrent->item.id;
 		
 		if (id == 1) {
+			guiShowConfig();
+		} else if (id == 2) {
 			guiShowUIConfig();
 		} else if (id == 3) {
 			// ipconfig

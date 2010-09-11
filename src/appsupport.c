@@ -112,7 +112,7 @@ static void appRenameItem(int id, char* newName) {
 }
 #endif
 
-static void appLaunchItem(int id) {
+static int appLaunchItem(int id) {
 	struct TConfigValue* cur = appGetConfigValue(id);
 	int fd = fioOpen(cur->val, O_RDONLY);
 	if (fd >= 0) {
@@ -124,7 +124,11 @@ static void appLaunchItem(int id) {
 
 		shutdown(exception);
 		sysExecElf(cur->val, 0, NULL);
+
+		return 1;
 	}
+
+	return ERROR_FILE_INVALID;
 }
 
 static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

@@ -14,23 +14,28 @@
 #define UICFG_THEME 10
 #define UICFG_LANG 11
 #define UICFG_SCROLL 12
-#define UICFG_MENU 13
-#define UICFG_BGCOL 14
-#define UICFG_TXTCOL 15
-#define UICFG_EXITTO 16
-#define UICFG_DEFDEVICE 17
-#define UICFG_AUTOSORT 20
-#define UICFG_DEBUG 21
-#define UICFG_COVERART 22
-#define UICFG_WIDESCREEN 23
-#define UICFG_USBMODE 24
-#define UICFG_HDDMODE 25
-#define UICFG_ETHMODE 26
-#define UICFG_APPMODE 27
+#define UICFG_BGCOL 13
+#define UICFG_TXTCOL 14
+#define UICFG_AUTOSORT 15
+#define UICFG_COVERART 16
+#define UICFG_WIDESCREEN 17
+
+#define CFG_EXITTO 30
+#define CFG_DEFDEVICE 31
+#define CFG_DEBUG 32
+#define CFG_USBMODE 33
+#define CFG_HDDMODE 34
+#define CFG_ETHMODE 35
+#define CFG_APPMODE 36
+#define CFG_CHECKUSBFRAG 37
+#define CFG_LASTPLAYED 38
+#define CFG_DANDROP 39
+
 #define UICFG_SAVE 114
 
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
+extern struct UIItem diaConfig[];
 
 #endif

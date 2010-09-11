@@ -28,6 +28,7 @@
 #define USBLD_VERSION "0.7"
 
 int saveConfig();
+void _saveConfig();
 int loadConfig();
 void applyConfig(int themeID, int langID);
 void shutdown();
@@ -76,6 +77,12 @@ int gExitMode;
 int gDisableDebug;
 // Default device
 int gDefaultDevice;
+
+int gEnableDandR;
+
+int gCheckUSBFragmentation;
+
+int gRememberLastPlayed;
 
 int gCountIconsCache;
 int gCountCoversCache;

@@ -117,31 +117,46 @@ struct UIItem diaCompatConfig[] = {
 	{UI_TERMINATOR}
 };
 
-struct UIItem diaUIConfig[] = {
+struct UIItem diaConfig[] = {
 	{UI_LABEL, 111, NULL, {.label = {"", _STR_SETTINGS}}},
+	{UI_SPLITTER},
+
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_EXITTO}}}, {UI_SPACER}, {UI_ENUM, CFG_EXITTO, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_CHECKUSBFRAG}}}, {UI_SPACER}, {UI_BOOL, CFG_CHECKUSBFRAG, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+
+	{UI_SPLITTER},
+
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_USBMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_USBMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_HDDMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_HDDMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_ETHMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_ETHMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_APPMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_APPMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, CFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
+
+	{UI_SPLITTER},
+	{UI_OK},
+
+	// end of dialog
+	{UI_TERMINATOR}
+};
+
+struct UIItem diaUIConfig[] = {
+	{UI_LABEL, 111, NULL, {.label = {"", _STR_GFX_SETTINGS}}},
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, UICFG_THEME, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, UICFG_LANG,  NULL,{.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, UICFG_DEBUG, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_EXITTO}}}, {UI_SPACER}, {UI_ENUM, UICFG_EXITTO, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_BGCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, NULL, {.label = {"", _STR_TXTCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, NULL, {.colourvalue = {0, 0}}}, {UI_BREAK},
-	
-	{UI_SPLITTER},
-	
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_USBMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_USBMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_HDDMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_HDDMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_ETHMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_ETHMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_APPMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_APPMODE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, NULL, {.label = {"", _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, UICFG_DEFDEVICE, NULL, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	{UI_OK},

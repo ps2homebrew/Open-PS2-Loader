@@ -508,6 +508,9 @@ void menuDrawStatic() {
 	if (!selected_item) 
 		selected_item = menu;
 
+	if (!selected_item->item->current)
+		selected_item->item->current = selected_item->item->submenu;
+
 	struct submenu_list_t *cur = selected_item->item->current;
 	struct submenu_list_t *ps  = selected_item->item->pagestart;
 

@@ -497,11 +497,8 @@ static void guiHandleOp(struct gui_update_t* item) {
 									   item->submenu.id,
 									   item->submenu.text_id);
 
-			if (!item->menu.menu->submenu) {
+			if (!item->menu.menu->submenu)
 				item->menu.menu->submenu = *item->menu.subMenu;
-				item->menu.menu->current = *item->menu.subMenu;
-				item->menu.menu->pagestart = *item->menu.subMenu;
-			}
 
 			if (item->submenu.selected)
 				item->menu.menu->current = result;
@@ -523,8 +520,6 @@ static void guiHandleOp(struct gui_update_t* item) {
 		case GUI_OP_SORT:
 			submenuSort(item->menu.subMenu);
 			item->menu.menu->pagestart = NULL;
-			if (!item->menu.menu->current)
-				item->menu.menu->current = *item->menu.subMenu;
 			item->menu.menu->submenu = *item->menu.subMenu;
 			break;
 		

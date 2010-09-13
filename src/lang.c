@@ -74,7 +74,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Item will be permanently deleted, continue ?",
 	"Rename",
 	"Delete",
-	"Play",
+	"Run",
 	"Display settings",
 	"Enable Delete and Rename operations",
 	"Check USB game fragmentation",

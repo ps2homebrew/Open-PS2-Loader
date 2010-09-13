@@ -97,7 +97,7 @@ static void initHints(struct menu_item_t* menuItem, int startMode) {
 	if (startMode == 1)
 		menuAddHint(menuItem, _STR_START_DEVICE, CROSS_ICON);
 	else {
-		menuAddHint(menuItem, _STR_PLAY, CROSS_ICON);
+		menuAddHint(menuItem, _STR_RUN, CROSS_ICON);
 		item_list_t *support = menuItem->userdata;
 		if (support->itemGetCompatibility)
 			menuAddHint(menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);

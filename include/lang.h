@@ -70,7 +70,7 @@
 #define _STR_DELETE_WARNING				65
 #define _STR_RENAME					66
 #define _STR_DELETE					67
-#define _STR_PLAY					68
+#define _STR_RUN					68
 #define _STR_GFX_SETTINGS				69
 #define _STR_DANDROP					70
 #define _STR_CHECKUSBFRAG				71

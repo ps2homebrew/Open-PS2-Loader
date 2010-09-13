@@ -337,7 +337,9 @@ void thmInit() {
 	// initialize default internal
 	thmLoad(NULL);
 
-	thmAddElements(gBaseMCDir, "/");
+	char path[32];
+	sprintf(path, "%s/", gBaseMCDir);
+	thmAddElements(path, "/");
 }
 
 char* thmGetValue() {

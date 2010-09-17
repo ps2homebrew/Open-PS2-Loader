@@ -182,12 +182,12 @@ static int usbLaunchGame(int id) {
 			}
 		}
 
-	shutdown(NO_EXCEPTION);
-
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
+
+	shutdown(NO_EXCEPTION);
 
 	void *irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;

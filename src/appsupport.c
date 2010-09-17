@@ -12,13 +12,13 @@
 static int appForceUpdate = 1;
 static int appItemCount = 0;
 
-static struct TConfigSet configApps;
+static config_set_t *configApps;
 
 // forward declaration
 static item_list_t appItemList;
 
-static struct TConfigValue* appGetConfigValue(int id) {
-	struct TConfigValue* cur = configApps.head;
+static struct config_value_t* appGetConfigValue(int id) {
+	struct config_value_t* cur = configApps->head;
 
 	while (id--) {
 		cur = cur->next;
@@ -30,8 +30,10 @@ static struct TConfigValue* appGetConfigValue(int id) {
 void appInit(void) {
 	LOG("appInit()\n");
 	appForceUpdate = 1;
-	configApps.head = NULL;
-	configApps.tail = NULL;
+
+	char path[255];
+	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
+	configApps = configAlloc(0, NULL, path);
 
 	appItemList.enabled = 1;
 }
@@ -53,14 +55,11 @@ static int appNeedsUpdate(void) {
 
 static int appUpdateItemList(void) {
 	appItemCount = 0;
-	clearConfig(&configApps);
+	configClear(configApps);
+	configRead(configApps);
 
-	char path[255];
-	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
-	readConfig(&configApps, path);
-
-	if (configApps.head) {
-		struct TConfigValue* cur = configApps.head;
+	if (configApps->head) {
+		struct config_value_t* cur = configApps->head;
 		while (cur) {
 			cur = cur->next;
 			appItemCount++;
@@ -74,46 +73,40 @@ static int appGetItemCount(void) {
 }
 
 static char* appGetItemName(int id) {
-	struct TConfigValue* cur = appGetConfigValue(id);
+	struct config_value_t* cur = appGetConfigValue(id);
 	return cur->key;
 }
 
 static char* appGetItemStartup(int id) {
-	struct TConfigValue* cur = appGetConfigValue(id);
+	struct config_value_t* cur = appGetConfigValue(id);
 	return cur->val;
 }
 
 #ifndef __CHILDPROOF
 static void appDeleteItem(int id) {
-	struct TConfigValue* cur = appGetConfigValue(id);
+	struct config_value_t* cur = appGetConfigValue(id);
 	fileXioRemove(cur->val);
 	cur->key[0] = '\0';
-
-	char path[255];
-	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
-	writeConfig(&configApps, path);
+	configWrite(configApps);
 
 	appForceUpdate = 1;
 }
 
 static void appRenameItem(int id, char* newName) {
-	struct TConfigValue* cur = appGetConfigValue(id);
+	struct config_value_t* cur = appGetConfigValue(id);
 
 	char value[255];
 	strncpy(value, cur->val, 255);
-	configRemoveKey(&configApps, cur->key);
-	setConfigStr(&configApps, newName, value);
-
-	char path[255];
-	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
-	writeConfig(&configApps, path);
+	configRemoveKey(configApps, cur->key);
+	configSetStr(configApps, newName, value);
+	configWrite(configApps);
 
 	appForceUpdate = 1;
 }
 #endif
 
 static int appLaunchItem(int id) {
-	struct TConfigValue* cur = appGetConfigValue(id);
+	struct config_value_t* cur = appGetConfigValue(id);
 	int fd = fioOpen(cur->val, O_RDONLY);
 	if (fd >= 0) {
 		fioClose(fd);
@@ -159,7 +152,7 @@ static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 static void appCleanUp(int exception) {
 	LOG("appCleanUp()\n");
 
-	clearConfig(&configApps);
+	configFree(configApps);
 }
 
 static item_list_t appItemList = {

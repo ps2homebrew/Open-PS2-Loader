@@ -14,8 +14,6 @@ typedef struct
 } base_game_info_t;
 
 int sbIsSameSize(const char* prefix, int prevSize);
-int sbGetCompatibility(base_game_info_t* game, int mode);
-void sbSetCompatibility(base_game_info_t* game, int mode, int compatMode);
 void sbReadList(base_game_info_t **list, const char* prefix, const char* sep, int *fsize, int* gamecount);
 int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex);
 void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id);

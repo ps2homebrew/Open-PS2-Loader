@@ -33,10 +33,7 @@ int loadConfig();
 void applyConfig(int themeID, int langID);
 void shutdown();
 
-// global config
-struct TConfigSet gConfig;
-
-char* gBaseMCDir;
+char *gBaseMCDir;
 
 //// IP config
 

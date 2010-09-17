@@ -411,7 +411,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 
 	// Find out the current game ID
 	char hexid[32];
-	getConfigDiscID(startup, hexid);
+	configGetDiscID(startup, hexid);
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
 	// show dialog
@@ -428,10 +428,10 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 	} while (result == COMPAT_LOADFROMDISC);
 
 	if (result == COMPAT_REMOVE) {
-		removeConfigDiscID(startup);
-		support->itemSetCompatibility(id, 0, -1, 0);
-		guiMsgBox(_l(_STR_REMOVED_ALL_SETTINGS), 0);
-	} else if (result > 0) { // okay pressed or other button
+		configRemoveDiscID(startup);
+		support->itemSetCompatibility(id, 0, 0);
+		saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC);
+	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
 			int mdpart;
@@ -439,16 +439,17 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			compatMode |= (mdpart ? 1 : 0) << i;
 		}
 
-		dmaMode = 0;
-		diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
-		support->itemSetCompatibility(id, compatMode, dmaMode, result == COMPAT_SAVE);
+		if (dmaMode != -1)
+			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
+
+		support->itemSetCompatibility(id, compatMode, dmaMode);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')
-			setConfigDiscID(startup, hexid);
+			configSetDiscID(startup, hexid);
 
 		if (result == COMPAT_SAVE)
-			saveConfig();
+			saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC);
 	}
 
 	return result;
@@ -1025,7 +1026,8 @@ static void guiMenuHandleInput() {
 	}
 	
 	if(getKeyOn(KEY_START) || getKeyOn(KEY_CIRCLE)) {
-		screenHandlerTarget = &mainScreenHandler;
+		// TODO check if (menusys.menu)
+			screenHandlerTarget = &mainScreenHandler;
 	}
 		
 }

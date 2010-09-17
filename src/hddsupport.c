@@ -153,33 +153,11 @@ static void hddRenameGame(int id, char* newName) {
 #endif
 
 static int hddGetGameCompatibility(int id, int *dmaMode) {
-	*dmaMode = 7; // defaulting to UDMA 4
-
-	if(hddGames->games[id].dma_type == MDMA_MODE)
-		*dmaMode = hddGames->games[id].dma_mode;
-	else if(hddGames->games[id].dma_type == UDMA_MODE)
-		*dmaMode = hddGames->games[id].dma_mode + 3;
-
-	return hddGames->games[id].ops2l_compat_flags;
+	return configGetCompatibility(hddGames->games[id].startup, hddGameList.mode, dmaMode);
 }
 
-static void hddSetGameCompatibility(int id, int compatMode, int dmaMode, short save) {
-	if (dmaMode == -1)
-		dmaMode = 7;
-
-	if(dmaMode < 3) {
-		hddGames->games[id].dma_type = MDMA_MODE;
-		hddGames->games[id].dma_mode = dmaMode;
-	}
-	else {
-		hddGames->games[id].dma_type = UDMA_MODE;
-		hddGames->games[id].dma_mode = (dmaMode - 3);
-	}
-
-	hddGames->games[id].ops2l_compat_flags = (unsigned char) compatMode;
-
-	if (save)
-		hddSetHDLGameInfo(&hddGames->games[id]);
+static void hddSetGameCompatibility(int id, int compatMode, int dmaMode) {
+	configSetCompatibility(hddGames->games[id].startup, hddGameList.mode, compatMode, dmaMode);
 }
 
 static int hddLaunchGame(int id) {
@@ -192,19 +170,22 @@ static int hddLaunchGame(int id) {
 	hdl_game_info_t* game = &hddGames->games[id];
 
 	if (gRememberLastPlayed) {
-		setConfigStr(&gConfig, "last_played", game->startup);
+		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
 
 	char gid[5];
-	getConfigDiscIDBinary(hddGames->games[id].startup, gid);
+	configGetDiscIDBinary(hddGames->games[id].startup, gid);
 
-	if (game->dma_type == 0) {
-		game->dma_type = UDMA_MODE;
-		game->dma_mode = 4;
+	int dmaType = 0, dmaMode = 0, compatMode = 0;
+	compatMode = configGetCompatibility(hddGames->games[id].startup, hddGameList.mode, &dmaMode);
+	if(dmaMode < 3)
+		dmaType = 0x20;
+	else {
+		dmaType = 0x40;
+		dmaMode -= 3;
 	}
-
-	hddSetTransferMode(game->dma_type, game->dma_mode);
+	hddSetTransferMode(dmaType, dmaMode);
 
 	sprintf(filename,"%s",game->startup);
 
@@ -263,12 +244,11 @@ static int hddLaunchGame(int id) {
 		p++;
 	}
 
-	int compat_flags = game->ops2l_compat_flags;
 	hddFreeHDLGamelist(hddGames);
 
 	FlushCache(0);
 
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compat_flags, compat_flags & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode, compatMode & COMPAT_MODE_1);
 
 	return 1;
 }

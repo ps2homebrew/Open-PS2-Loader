@@ -283,111 +283,112 @@ void menuFillHookFunc(struct submenu_list_t **menu) {
 // ----------------------------------------------------------
 // ------------------ Configuration handling ----------------
 // ----------------------------------------------------------
+
 int lscstatus = 0;
 int lscret = 0;
 
+// void _loadConfig(int types) { TODO: call this method with one parameter, need to add a new IO operation ...
 void _loadConfig() {
-	readIPConfig();
-
-	clearConfig(&gConfig);
+	int types = CONFIG_ALL;
 	
-	char path[255];
-	snprintf(path, 255, "%s/conf_opl.cfg", gBaseMCDir);
-	int result = readConfig(&gConfig, path);
-	
-	int themeID = -1, langID = -1;
-	if (result) {
-		char *temp;
+	int result = configReadMulti(types);
 
-		getConfigInt(&gConfig, "icons_cache_count", &gCountIconsCache);
-		getConfigInt(&gConfig, "covers_cache_count", &gCountCoversCache);
-		getConfigInt(&gConfig, "bg_cache_count", &gCountBackgroundsCache);
-		getConfigInt(&gConfig, "scrolling", &gScrollSpeed);
-		getConfigColor(&gConfig, "bg_color", gDefaultBgColor);
-		getConfigColor(&gConfig, "text_color", gDefaultTextColor);
-		getConfigColor(&gConfig, "ui_text_color", gDefaultUITextColor);
-		getConfigColor(&gConfig, "sel_text_color", gDefaultSelTextColor);
-		getConfigInt(&gConfig, "exit_mode", &gExitMode);
-		getConfigInt(&gConfig, "enable_coverart", &gEnableArt);
-		getConfigInt(&gConfig, "wide_screen", &gWideScreen);
-
-		if (getConfigStr(&gConfig, "theme", &temp))
-			themeID = thmFindGuiID(temp);
-
-		if (getConfigStr(&gConfig, "language_text", &temp))
-			langID = lngFindGuiID(temp);
-
-		if (getConfigStr(&gConfig, "pc_ip", &temp))
-			sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
-
-		getConfigInt(&gConfig, "pc_port", &gPCPort);
+	if (types & CONFIG_OPL) {
+		int themeID = -1, langID = -1;
 		
-		if (getConfigStr(&gConfig, "pc_share", &temp))
-			strncpy(gPCShareName, temp, 32);
-		if (getConfigStr(&gConfig, "pc_user", &temp))
-			strncpy(gPCUserName, temp, 32);
-		if (getConfigStr(&gConfig, "pc_pass", &temp))
-			strncpy(gPCPassword, temp, 32);
-		
-		getConfigInt(&gConfig, "autosort", &gAutosort);
-		getConfigInt(&gConfig, "default_device", &gDefaultDevice);
-		getConfigInt(&gConfig, "disable_debug", &gDisableDebug);
-		getConfigInt(&gConfig, "enable_delete_rename", &gEnableDandR);
-		getConfigInt(&gConfig, "check_usb_frag", &gCheckUSBFragmentation);
-		getConfigInt(&gConfig, "remember_last", &gRememberLastPlayed);
-		getConfigInt(&gConfig, "usb_mode", &gUSBStartMode);
-		getConfigInt(&gConfig, "hdd_mode", &gHDDStartMode);
-		getConfigInt(&gConfig, "eth_mode", &gETHStartMode);
-		getConfigInt(&gConfig, "app_mode", &gAPPStartMode);
+		if (result) {
+			config_set_t *configOPL = configGetByType(CONFIG_OPL);
+			char *temp;
 
+			configGetInt(configOPL, "icons_cache_count", &gCountIconsCache);
+			configGetInt(configOPL, "covers_cache_count", &gCountCoversCache);
+			configGetInt(configOPL, "bg_cache_count", &gCountBackgroundsCache);
+			configGetInt(configOPL, "scrolling", &gScrollSpeed);
+			configGetColor(configOPL, "bg_color", gDefaultBgColor);
+			configGetColor(configOPL, "text_color", gDefaultTextColor);
+			configGetColor(configOPL, "ui_text_color", gDefaultUITextColor);
+			configGetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
+			configGetInt(configOPL, "exit_mode", &gExitMode);
+			configGetInt(configOPL, "enable_coverart", &gEnableArt);
+			configGetInt(configOPL, "wide_screen", &gWideScreen);
+
+			if (configGetStr(configOPL, "theme", &temp))
+				themeID = thmFindGuiID(temp);
+
+			if (configGetStr(configOPL, "language_text", &temp))
+				langID = lngFindGuiID(temp);
+
+			if (configGetStr(configOPL, "pc_ip", &temp))
+				sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
+
+			configGetInt(configOPL, "pc_port", &gPCPort);
+
+			if (configGetStr(configOPL, "pc_share", &temp))
+				strncpy(gPCShareName, temp, 32);
+			if (configGetStr(configOPL, "pc_user", &temp))
+				strncpy(gPCUserName, temp, 32);
+			if (configGetStr(configOPL, "pc_pass", &temp))
+				strncpy(gPCPassword, temp, 32);
+
+			configGetInt(configOPL, "autosort", &gAutosort);
+			configGetInt(configOPL, "default_device", &gDefaultDevice);
+			configGetInt(configOPL, "disable_debug", &gDisableDebug);
+			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
+			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
+			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
+			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
+			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
+			configGetInt(configOPL, "eth_mode", &gETHStartMode);
+			configGetInt(configOPL, "app_mode", &gAPPStartMode);
+		}
+		
+		applyConfig(themeID, langID);
 	}
-	
-	applyConfig(themeID, langID);
 
 	lscret = result;
 	lscstatus = 0;
 }
 
+// void _saveConfig(int types) { TODO: call this method with one parameter, need to add a new IO operation ...
 void _saveConfig() {
-	if (gIPConfigChanged)
-		writeIPConfig();
+	int types = CONFIG_ALL;
 
-	setConfigInt(&gConfig, "icons_cache_count", gCountIconsCache);
-	setConfigInt(&gConfig, "covers_cache_count", gCountCoversCache);
-	setConfigInt(&gConfig, "bg_cache_count", gCountBackgroundsCache);
-	setConfigInt(&gConfig, "scrolling", gScrollSpeed);
-	setConfigStr(&gConfig, "theme", thmGetValue());
-	setConfigStr(&gConfig, "language_text", lngGetValue());
-	setConfigColor(&gConfig, "bg_color", gDefaultBgColor);
-	setConfigColor(&gConfig, "text_color", gDefaultTextColor);
-	setConfigColor(&gConfig, "ui_text_color", gDefaultUITextColor);
-	setConfigColor(&gConfig, "sel_text_color", gDefaultSelTextColor);
-	setConfigInt(&gConfig, "exit_mode", gExitMode);
-	setConfigInt(&gConfig, "enable_coverart", gEnableArt);
-	setConfigInt(&gConfig, "wide_screen", gWideScreen);
+	if (types & CONFIG_OPL) {
+		config_set_t *configOPL = configGetByType(CONFIG_OPL);
+		configSetInt(configOPL, "icons_cache_count", gCountIconsCache);
+		configSetInt(configOPL, "covers_cache_count", gCountCoversCache);
+		configSetInt(configOPL, "bg_cache_count", gCountBackgroundsCache);
+		configSetInt(configOPL, "scrolling", gScrollSpeed);
+		configSetStr(configOPL, "theme", thmGetValue());
+		configSetStr(configOPL, "language_text", lngGetValue());
+		configSetColor(configOPL, "bg_color", gDefaultBgColor);
+		configSetColor(configOPL, "text_color", gDefaultTextColor);
+		configSetColor(configOPL, "ui_text_color", gDefaultUITextColor);
+		configSetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
+		configSetInt(configOPL, "exit_mode", gExitMode);
+		configSetInt(configOPL, "enable_coverart", gEnableArt);
+		configSetInt(configOPL, "wide_screen", gWideScreen);
 
-	char temp[255];
-	sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	setConfigStr(&gConfig, "pc_ip", temp);
-	setConfigInt(&gConfig, "pc_port", gPCPort);
-	setConfigStr(&gConfig, "pc_share", gPCShareName);
-	setConfigStr(&gConfig, "pc_user", gPCUserName);
-	setConfigStr(&gConfig, "pc_pass", gPCPassword);
-	setConfigInt(&gConfig, "autosort", gAutosort);
-	setConfigInt(&gConfig, "default_device", gDefaultDevice);
-	setConfigInt(&gConfig, "disable_debug", gDisableDebug);
-	setConfigInt(&gConfig, "enable_delete_rename", gEnableDandR);
-	setConfigInt(&gConfig, "check_usb_frag", gCheckUSBFragmentation);
-	setConfigInt(&gConfig, "remember_last", gRememberLastPlayed);
-	setConfigInt(&gConfig, "usb_mode", gUSBStartMode);
-	setConfigInt(&gConfig, "hdd_mode", gHDDStartMode);
-	setConfigInt(&gConfig, "eth_mode", gETHStartMode);
-	setConfigInt(&gConfig, "app_mode", gAPPStartMode);
-
-	snprintf(temp, 255, "%s/conf_opl.cfg", gBaseMCDir);
-	int result = writeConfig(&gConfig, temp);
+		char temp[255];
+		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+		configSetStr(configOPL, "pc_ip", temp);
+		configSetInt(configOPL, "pc_port", gPCPort);
+		configSetStr(configOPL, "pc_share", gPCShareName);
+		configSetStr(configOPL, "pc_user", gPCUserName);
+		configSetStr(configOPL, "pc_pass", gPCPassword);
+		configSetInt(configOPL, "autosort", gAutosort);
+		configSetInt(configOPL, "default_device", gDefaultDevice);
+		configSetInt(configOPL, "disable_debug", gDisableDebug);
+		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
+		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
+		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
+		configSetInt(configOPL, "usb_mode", gUSBStartMode);
+		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
+		configSetInt(configOPL, "eth_mode", gETHStartMode);
+		configSetInt(configOPL, "app_mode", gAPPStartMode);
+	}
 	
-	lscret = result;
+	lscret = configWriteMulti(types);
 	lscstatus = 0;
 }
 
@@ -419,7 +420,7 @@ void applyConfig(int themeID, int langID) {
 	initAllSupport(0);
 }
 
-int loadConfig() {
+int loadConfig(int types) {
 	lscstatus = 1;
 	lscret = 0;
 	
@@ -428,7 +429,7 @@ int loadConfig() {
 	return lscret;
 }
 
-int saveConfig() {
+int saveConfig(int types) {
 	lscstatus = 1;
 	lscret = 0;
 	
@@ -466,7 +467,7 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	
 	char* temp = NULL;
 	if (gRememberLastPlayed)
-		getConfigStr(&gConfig, "last_played", &temp);
+		configGetStr(configGetByType(CONFIG_OPL), "last_played", &temp);
 
 	// read the new game list
 	struct gui_update_t *gup = NULL;
@@ -720,7 +721,7 @@ void shutdown(int exception) {
 	lngEnd();
 	thmEnd();
 	rmEnd();
-	// clearConfig(gConfig);
+	configEnd();
 
 	deinitAllSupport(exception);
 }
@@ -735,9 +736,6 @@ static void setDefaults(void) {
 	clearIOModuleT(&list_support[HDD_MODE]);
 	clearIOModuleT(&list_support[APP_MODE]);
 	
-	gConfig.head = NULL;
-	gConfig.tail = NULL;
-
 	gBaseMCDir = "mc?:OPL";
 
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
@@ -810,6 +808,7 @@ static void init(void) {
 	setDefaults();
 
 	padInit(0);
+	configInit();
 	rmInit();
 	lngInit();
 	thmInit();

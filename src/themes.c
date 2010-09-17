@@ -87,7 +87,7 @@ static int thmLoadResource(int texId, char* themePath, short psm) {
 	return success;
 }
 
-static void getElem(struct TConfigSet* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
+static void getElem(config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
 		short enabled, int x, int y, short aligned, int w, int h, int defColor) {
 
 	int intValue;
@@ -98,11 +98,11 @@ static void getElem(struct TConfigSet* themeConfig, theme_t* theme, theme_elemen
 
 	elem->enabled = enabled;
 	snprintf(elemProp, 64, "%s_enabled", elem->name);
-	if (getConfigInt(themeConfig, elemProp, &intValue))
+	if (configGetInt(themeConfig, elemProp, &intValue))
 		elem->enabled = intValue;
 
 	snprintf(elemProp, 64, "%s_x", elem->name);
-	if (!getConfigInt(themeConfig, elemProp, &intValue))
+	if (!configGetInt(themeConfig, elemProp, &intValue))
 		intValue = x;
 	if (intValue < 0)
 		elem->posX = screenWidth + intValue;
@@ -110,7 +110,7 @@ static void getElem(struct TConfigSet* themeConfig, theme_t* theme, theme_elemen
 		elem->posX = intValue;
 
 	snprintf(elemProp, 64, "%s_y", elem->name);
-	if (!getConfigInt(themeConfig, elemProp, &intValue))
+	if (!configGetInt(themeConfig, elemProp, &intValue))
 		intValue = y;
 	if (intValue < 0)
 		elem->posY = ceil((screenHeight + intValue) * theme->usedHeight / screenHeight);
@@ -119,11 +119,11 @@ static void getElem(struct TConfigSet* themeConfig, theme_t* theme, theme_elemen
 
 	elem->aligned = aligned;
 	snprintf(elemProp, 64, "%s_aligned", elem->name);
-	if (getConfigInt(themeConfig, elemProp, &intValue))
+	if (configGetInt(themeConfig, elemProp, &intValue))
 		elem->aligned = intValue;
 
 	snprintf(elemProp, 64, "%s_width", elem->name);
-	if (!getConfigInt(themeConfig, elemProp, &intValue))
+	if (!configGetInt(themeConfig, elemProp, &intValue))
 		intValue = w;
 	elem->width = intValue;
 	if (intValue < 0) {
@@ -134,7 +134,7 @@ static void getElem(struct TConfigSet* themeConfig, theme_t* theme, theme_elemen
 	}
 
 	snprintf(elemProp, 64, "%s_height", elem->name);
-	if (!getConfigInt(themeConfig, elemProp, &intValue))
+	if (!configGetInt(themeConfig, elemProp, &intValue))
 		intValue = h;
 	elem->height = intValue;
 	if (intValue < 0) {
@@ -149,7 +149,7 @@ static void getElem(struct TConfigSet* themeConfig, theme_t* theme, theme_elemen
 	else
 		elem->color = theme->textColor;
 	snprintf(elemProp, 64, "%s_color", elem->name);
-	if (getConfigColor(themeConfig, elemProp, charColor))
+	if (configGetColor(themeConfig, elemProp, charColor))
 		elem->color = GS_SETREG_RGBA(charColor[0], charColor[1], charColor[2], 0xff);
 }
 
@@ -166,39 +166,38 @@ static void thmLoad(char* themePath) {
 	theme_t* newT = (theme_t*) malloc(sizeof(theme_t));
 	memset(newT, 0, sizeof(theme_t));
 
-	struct TConfigSet themeConfig;
-	themeConfig.head = NULL;
-	themeConfig.tail = NULL;
-
+	config_set_t* themeConfig = NULL;
 	if (themePath) {
 		char path[255];
 		snprintf(path, 255, "%sconf_theme.cfg", themePath);
-		readConfig(&themeConfig, path); // try to load the theme config file
-	}
+		themeConfig = configAlloc(0, NULL, path);
+		configRead(themeConfig); // try to load the theme config file
+	} else
+		themeConfig = configAlloc(0, NULL, NULL);
 
 	int intValue;
 	newT->useDefault = 1;
-	if (getConfigInt(&themeConfig, "use_default", &intValue))
+	if (configGetInt(themeConfig, "use_default", &intValue))
 		newT->useDefault = intValue;
 
 	newT->itemsListIcons = 0;
-	if (getConfigInt(&themeConfig, "items_list_icons", &intValue))
+	if (configGetInt(themeConfig, "items_list_icons", &intValue))
 		newT->itemsListIcons = intValue;
 
 	newT->usedHeight = 480;
-	if (getConfigInt(&themeConfig, "use_real_height", &intValue))
+	if (configGetInt(themeConfig, "use_real_height", &intValue))
 		if (intValue)
 			newT->usedHeight = screenHeight;
 
 	newT->displayedItems = (newT->usedHeight - (MENU_POS_V + HINT_HEIGHT)) / MENU_ITEM_HEIGHT;
-	if (getConfigInt(&themeConfig, "displayed_items", &intValue)) {
+	if (configGetInt(themeConfig, "displayed_items", &intValue)) {
 		if (intValue < newT->displayedItems)
 			newT->displayedItems = intValue;
 	}
 
 	newT->drawBackground = &guiDrawBGPicture;
 	newT->drawAltBackground = &guiDrawBGPlasma;
-	if (getConfigInt(&themeConfig, "background_mode", &intValue)) {
+	if (configGetInt(themeConfig, "background_mode", &intValue)) {
 		if (intValue == BG_MODE_COLOR)
 			newT->drawBackground = &guiDrawBGColor;
 		else if (intValue == BG_MODE_PLASMA)
@@ -208,45 +207,47 @@ static void thmLoad(char* themePath) {
 	}
 
 	setColors(newT);
-	getConfigColor(&themeConfig, "bg_color", newT->bgColor);
+	configGetColor(themeConfig, "bg_color", newT->bgColor);
 
 	unsigned char color[3];
-	if (getConfigColor(&themeConfig, "text_color", color))
+	if (configGetColor(themeConfig, "text_color", color))
 		newT->textColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0xff);
 
-	if (getConfigColor(&themeConfig, "ui_text_color", color))
+	if (configGetColor(themeConfig, "ui_text_color", color))
 		newT->uiTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0xff);
 
-	if (getConfigColor(&themeConfig, "sel_text_color", color))
+	if (configGetColor(themeConfig, "sel_text_color", color))
 		newT->selTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0xff);
 
-	getElem(&themeConfig, newT, &newT->menuIcon, "menu_icon", 1, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
-	getElem(&themeConfig, newT, &newT->menuText, "menu_text", 1, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, 0);
-	getElem(&themeConfig, newT, &newT->itemsList, "items_list", 1, 150, MENU_POS_V, ALIGN_NONE, DIM_INF, newT->displayedItems * MENU_ITEM_HEIGHT, 0);
-	getElem(&themeConfig, newT, &newT->itemIcon, "item_icon", 1, 80, newT->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
-	getElem(&themeConfig, newT, &newT->itemCover, "item_cover", 1, 520, newT->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
-	getElem(&themeConfig, newT, &newT->itemText, "item_text", 1, 520, 370, ALIGN_CENTER, DIM_UNDEF, 20, 0);
-	getElem(&themeConfig, newT, &newT->hintText, "hint_text", 1, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_INF, HINT_HEIGHT, 0);
-	getElem(&themeConfig, newT, &newT->loadingIcon, "loading_icon", 1, -50, -50, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
+	getElem(themeConfig, newT, &newT->menuIcon, "menu_icon", 1, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
+	getElem(themeConfig, newT, &newT->menuText, "menu_text", 1, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, 0);
+	getElem(themeConfig, newT, &newT->itemsList, "items_list", 1, 150, MENU_POS_V, ALIGN_NONE, DIM_INF, newT->displayedItems * MENU_ITEM_HEIGHT, 0);
+	getElem(themeConfig, newT, &newT->itemIcon, "item_icon", 1, 80, newT->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
+	getElem(themeConfig, newT, &newT->itemCover, "item_cover", 1, 520, newT->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
+	getElem(themeConfig, newT, &newT->itemText, "item_text", 1, 520, 370, ALIGN_CENTER, DIM_UNDEF, 20, 0);
+	getElem(themeConfig, newT, &newT->hintText, "hint_text", 1, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_INF, HINT_HEIGHT, 0);
+	getElem(themeConfig, newT, &newT->loadingIcon, "loading_icon", 1, -50, -50, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
 
-	if (getConfigInt(&themeConfig, "cover_blend_ulx", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_ulx", &intValue))
 		newT->coverBlend_ulx = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_uly", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_uly", &intValue))
 		newT->coverBlend_uly = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_urx", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_urx", &intValue))
 		newT->coverBlend_urx = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_ury", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_ury", &intValue))
 		newT->coverBlend_ury = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_blx", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_blx", &intValue))
 		newT->coverBlend_blx = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_bly", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_bly", &intValue))
 		newT->coverBlend_bly = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_brx", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_brx", &intValue))
 		newT->coverBlend_brx = intValue;
-	if (getConfigInt(&themeConfig, "cover_blend_bry", &intValue))
+	if (configGetInt(themeConfig, "cover_blend_bry", &intValue))
 		newT->coverBlend_bry = intValue;
 
 	newT->busyIconsCount = LOAD7_ICON - LOAD0_ICON + 1;
+
+	configFree(themeConfig);
 
 	/// Now swap theme and start loading textures
 	if (newT->usedHeight == screenHeight)
@@ -322,7 +323,7 @@ void thmAddElements(char* path, char* separator) {
 	thmRebuildGuiNames();
 
 	char* temp;
-	if (getConfigStr(&gConfig, "theme", &temp)) {
+	if (configGetStr(configGetByType(CONFIG_OPL), "theme", &temp)) {
 		LOG("Trying to set again theme: %s\n", temp);
 		thmSetGuiValue(thmFindGuiID(temp));
 	}

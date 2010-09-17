@@ -153,11 +153,11 @@ static void usbDeleteGame(int id) {
 #endif
 
 static int usbGetGameCompatibility(int id, int *dmaMode) {
-	return sbGetCompatibility(&usbGames[id], usbGameList.mode);
+	return configGetCompatibility(usbGames[id].startup, usbGameList.mode, NULL);
 }
 
-static void usbSetGameCompatibility(int id, int compatMode, int dmaMode, short save) {
-	sbSetCompatibility(&usbGames[id], usbGameList.mode, compatMode);
+static void usbSetGameCompatibility(int id, int compatMode, int dmaMode) {
+	configSetCompatibility(usbGames[id].startup, usbGameList.mode, compatMode, -1);
 }
 
 static int usbLaunchGame(int id) {
@@ -185,7 +185,7 @@ static int usbLaunchGame(int id) {
 	shutdown(NO_EXCEPTION);
 
 	if (gRememberLastPlayed) {
-		setConfigStr(&gConfig, "last_played", game->startup);
+		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
 

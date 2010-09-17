@@ -103,11 +103,10 @@ struct UIItem diaCompatConfig[] = {
 	
 	{UI_SPLITTER},
 	
-	{UI_OK},
 #ifndef __CHILDPROOF
-	{UI_SPACER}, {UI_BUTTON, COMPAT_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}},
+	{UI_BUTTON, COMPAT_SAVE, NULL, {.label = {"", _STR_SAVE_CHANGES}}}, {UI_SPACER},
 #endif
-	{UI_SPACER}, {UI_BUTTON, COMPAT_TEST, NULL, {.label = {"Test", -1}}},
+	{UI_BUTTON, COMPAT_TEST, NULL, {.label = {"Test", -1}}},
 	
 	{UI_SPLITTER},
 #ifndef __CHILDPROOF

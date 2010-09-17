@@ -25,26 +25,6 @@ int sbIsSameSize(const char* prefix, int prevSize) {
 	return size != prevSize;
 }
 
-int sbGetCompatibility(base_game_info_t* game, int mode) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_%d", game->startup, mode);
-
-	unsigned int compatMode;
-	if (!getConfigInt(&gConfig, gkey, &compatMode))
-		compatMode = 0;
-
-	return compatMode;
-}
-
-void sbSetCompatibility(base_game_info_t* game, int mode, int compatMode) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_%d", game->startup, mode);
-	if (compatMode == 0)
-		configRemoveKey(&gConfig, gkey);
-	else
-		setConfigInt(&gConfig, gkey, compatMode);
-}
-
 static int isValidIsoName(char *name)
 {
 	// SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
@@ -162,10 +142,10 @@ void sbReadList(base_game_info_t **list, const char* prefix, const char* sep, in
 int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
 	int i;
 
-	unsigned int compatmask = sbGetCompatibility(game, mode);
+	unsigned int compatmask = configGetCompatibility(game->startup, mode, NULL);
 
 	char gameid[5];
-	getConfigDiscIDBinary(game->startup, gameid);
+	configGetDiscIDBinary(game->startup, gameid);
 
 	if (game->isISO)
 		strcpy(isoname, game->startup);

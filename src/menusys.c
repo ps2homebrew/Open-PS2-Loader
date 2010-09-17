@@ -22,10 +22,6 @@ static icon_cache_t cov_cache;
 static icon_cache_t ico_cache;
 static icon_cache_t bg_cache;
 
-static int h_anim; // TODO: seems unused now ?
-static int v_anim;
-static int direc;
-
 static unsigned int inactiveFrames;
 
 // height of the hint bar at the bottom of the screen
@@ -301,15 +297,11 @@ void menuNextH() {
 		selected_item = menu;
 	}
 	
-	if(selected_item->next){
-		h_anim=200;
+	if(selected_item->next) {
 		selected_item = selected_item->next;
 		
 		if (!selected_item->item->current)
 			selected_item->item->current = selected_item->item->submenu;
-		
-		v_anim=100;
-		direc=3;
 	}
 }
 
@@ -318,15 +310,11 @@ void menuPrevH() {
 		selected_item = menu;
 	}
 	
-	if(selected_item->prev){
-		h_anim=0;
+	if(selected_item->prev) {
 		selected_item = selected_item->prev;
 		
 		if (!selected_item->item->current)
 			selected_item->item->current = selected_item->item->submenu;
-		
-		v_anim=100;
-		direc=1;
 	}
 }
 
@@ -336,12 +324,8 @@ void menuNextV() {
 	
 	struct submenu_list_t *cur = selected_item->item->current;
 	
-	if(cur && cur->next) {
+	if(cur && cur->next)
 		selected_item->item->current = cur->next;
-		
-		v_anim=200;
-		direc=2;
-	}
 }
 
 void menuPrevV() {
@@ -359,15 +343,11 @@ void menuPrevV() {
 				selected_item->item->pagestart = selected_item->item->pagestart->prev;	
 			}
 		}
-	} else {
+	} else
 		selected_item->item->pagestart = cur;
-	}
 	
 	if(cur && cur->prev) {
 		selected_item->item->current = cur->prev;
-			
-		v_anim=0;
-		direc=4;
 	}
 }
 
@@ -398,15 +378,9 @@ void menuSetSelectedItem(struct menu_item_t* item) {
 	while (itm) {
 		if (itm->item == item) {
 			selected_item = itm;
-			
-			h_anim = 100;
-			v_anim = 100;
-			direc = 0;
-			
 			return;
 		}
 			
-		
 		itm = itm->next;
 	}
 }

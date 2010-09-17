@@ -18,9 +18,6 @@
 #define COMPAT_MODE_7 		0x40
 #define COMPAT_MODE_8 		0x80
 
-#define MDMA_MODE		0x20
-#define UDMA_MODE		0x40
-
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 3
 
@@ -70,7 +67,7 @@ typedef struct
 
 	int (*itemGetCompatibility)(int id, int *dmaMode);
 
-	void (*itemSetCompatibility)(int id, int compatMode, int dmaMode, short save);
+	void (*itemSetCompatibility)(int id, int compatMode, int dmaMode);
 
 	int (*itemLaunch)(int id);
 	

@@ -161,8 +161,6 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode) {
 }
 
 static int hddLaunchGame(int id) {
-	shutdown(NO_EXCEPTION);
-
 	int i, size_irx = 0;
 	void** irx = NULL;
 	char filename[32];
@@ -173,6 +171,8 @@ static int hddLaunchGame(int id) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
+
+	shutdown(NO_EXCEPTION);
 
 	char gid[5];
 	configGetDiscIDBinary(hddGames->games[id].startup, gid);

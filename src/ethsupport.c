@@ -196,8 +196,6 @@ static int ethLaunchGame(int id) {
 	if (gNetworkStartup != 0)
 		return ERROR_ETH_INIT;
 
-	shutdown(NO_EXCEPTION);
-
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
 	char isoname[32];
@@ -207,6 +205,8 @@ static int ethLaunchGame(int id) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
+
+	shutdown(NO_EXCEPTION);
 
 	if (sysPcmciaCheck()) {
 		size_irx = size_smb_pcmcia_cdvdman_irx;

@@ -119,12 +119,15 @@ void configInit() {
 }
 
 void configEnd() {
-	int index = CONFIG_FILE_NUM;
-	while(index) {
-		configClear(&configFiles[index]);
-		free(&configFiles[--index].filename);
+	int index = 0;
+	while(index < CONFIG_FILE_NUM) {
+		config_set_t *configSet = &configFiles[index];
+
+		configClear(configSet);
+		free(configSet->filename);
+		configSet->filename = NULL;
+		index++;
 	}
-	free(configFiles);
 }
 
 config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName) {
@@ -148,13 +151,16 @@ void configFree(config_set_t *configSet) {
 	configClear(configSet);
 	free(configSet->filename);
 	free(configSet);
+	configSet = NULL;
 }
 
 config_set_t *configGetByType(int type) {
 	int index = 0;
 	while(index < CONFIG_FILE_NUM) {
-		if (configFiles[index].type == type)
-			return &configFiles[index];
+		config_set_t *configSet = &configFiles[index];
+
+		if (configSet->type == type)
+			return configSet;
 		index++;
 	}
 	return NULL;
@@ -469,7 +475,6 @@ int configWriteMulti(int types) {
 
 		if (configSet->type & types)
 			result += configWrite(configSet);
-
 		index++;
 	}
 

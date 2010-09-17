@@ -356,6 +356,7 @@ void thmSetGuiValue(int themeID) {
 		else
 			thmLoad(NULL);
 		guiThemeID = themeID;
+		configSetStr(configGetByType(CONFIG_OPL), "theme", thmGetValue());
 	}
 	else if (guiThemeID == 0)
 		setColors(gTheme);

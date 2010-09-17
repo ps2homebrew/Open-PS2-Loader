@@ -9,6 +9,13 @@
 #include "include/ioman.h"
 #include <string.h>
 
+#define CONFIG_INDEX_OPL		0
+#define CONFIG_INDEX_COMPAT		1
+#define CONFIG_INDEX_DNAS		2
+#define CONFIG_INDEX_VMC		3
+
+static config_set_t configFiles[CONFIG_FILE_NUM];
+
 static int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
 	color[0]=0;
@@ -57,15 +64,15 @@ static int splitAssignment(char* line, char* key, char* val) {
 	return (int) eqpos;
 }
 
-int configKeyValidate(const char* key) {
+static int configKeyValidate(const char* key) {
 	if (strlen(key) == 0)
 		return 0;
 	
 	return !strchr(key, '=');
 }
 
-static struct TConfigValue* allocConfigItem(const char* key, const char* val) {
-	struct TConfigValue* it = (struct TConfigValue*)malloc(sizeof(struct TConfigValue));
+static struct config_value_t* allocConfigItem(const char* key, const char* val) {
+	struct config_value_t* it = (struct config_value_t*) malloc(sizeof(struct config_value_t));
 	strncpy(it->key, key, 32);
 	it->key[min(strlen(key), 31)] = '\0';
 	strncpy(it->val, val, 255);
@@ -76,18 +83,18 @@ static struct TConfigValue* allocConfigItem(const char* key, const char* val) {
 }
 
 /// Low level key addition. Does not check for uniqueness.
-static void addConfigValue(struct TConfigSet* config, const char* key, const char* val) {
-	if (!config->tail) {
-		config->head = allocConfigItem(key, val);
-		config->tail = config->head;
+static void addConfigValue(config_set_t* configSet, const char* key, const char* val) {
+	if (!configSet->tail) {
+		configSet->head = allocConfigItem(key, val);
+		configSet->tail = configSet->head;
 	} else {
-		config->tail->next = allocConfigItem(key, val);
-		config->tail = config->tail->next;
+		configSet->tail->next = allocConfigItem(key, val);
+		configSet->tail = configSet->tail->next;
 	}
 }
 
-static struct TConfigValue* getConfigItemForName(struct TConfigSet* config, const char* name) {
-	struct TConfigValue* val = config->head;
+static struct config_value_t* getConfigItemForName(config_set_t* configSet, const char* name) {
+	struct config_value_t* val = configSet->head;
 	
 	while (val) {
 		if (strncmp(val->key, name, 32) == 0)
@@ -99,31 +106,86 @@ static struct TConfigValue* getConfigItemForName(struct TConfigSet* config, cons
 	return val;
 }
 
-// --------------------------------------------------------------------------------------
-// ------------------------------ Config getters and setters ----------------------------
-// --------------------------------------------------------------------------------------
-int setConfigStr(struct TConfigSet* config, const char* key, const char* value) {
+void configInit() {
+	char path[255];
+	snprintf(path, 255, "%s/conf_opl.cfg", gBaseMCDir);
+	configAlloc(CONFIG_OPL, &configFiles[CONFIG_INDEX_OPL], path);
+	snprintf(path, 255, "%s/conf_compatibility.cfg", gBaseMCDir);
+	configAlloc(CONFIG_COMPAT, &configFiles[CONFIG_INDEX_COMPAT], path);
+	snprintf(path, 255, "%s/conf_dnas.cfg", gBaseMCDir);
+	configAlloc(CONFIG_DNAS, &configFiles[CONFIG_INDEX_DNAS], path);
+	snprintf(path, 255, "%s/conf_vmc.cfg", gBaseMCDir);
+	configAlloc(CONFIG_VMC, &configFiles[CONFIG_INDEX_VMC], path);
+}
+
+void configEnd() {
+	int index = CONFIG_FILE_NUM;
+	while(index) {
+		configClear(&configFiles[index]);
+		free(&configFiles[--index].filename);
+	}
+	free(configFiles);
+}
+
+config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName) {
+	if (!configSet)
+		configSet = (config_set_t*) malloc(sizeof(config_set_t));
+
+	configSet->type = type;
+	configSet->head = NULL;
+	configSet->tail = NULL;
+	if (fileName) {
+		int length = strlen(fileName) + 1;
+		configSet->filename = (char*) malloc(length * sizeof(char));
+		memcpy(configSet->filename, fileName, length);
+	} else
+		configSet->filename = NULL;
+	configSet->modified = 0;
+	return configSet;
+}
+
+void configFree(config_set_t *configSet) {
+	configClear(configSet);
+	free(configSet->filename);
+	free(configSet);
+}
+
+config_set_t *configGetByType(int type) {
+	int index = 0;
+	while(index < CONFIG_FILE_NUM) {
+		if (configFiles[index].type == type)
+			return &configFiles[index];
+		index++;
+	}
+	return NULL;
+}
+
+int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 	if (!configKeyValidate(key))
 		return 0;
 	
-	struct TConfigValue *it = getConfigItemForName(config, key);
+	struct config_value_t *it = getConfigItemForName(configSet, key);
 	
 	if (it) {
-		strncpy(it->val, value, 255);
-		it->val[min(strlen(value), 254)] = '\0';
+		if (strncmp(it->val, value, 255) != 0) {
+			strncpy(it->val, value, 255);
+			it->val[min(strlen(value), 254)] = '\0';
+			configSet->modified = 1;
+		}
 	} else {
-		addConfigValue(config, key, value);
+		addConfigValue(configSet, key, value);
+		configSet->modified = 1;
 	}
 	
 	return 1;
 }
 
 // sets the value to point to the value str in the config. Do not overwrite - it will overwrite the string in config
-int getConfigStr(struct TConfigSet* config, const char* key, char** value) {
+int configGetStr(config_set_t* configSet, const char* key, char** value) {
 	if (!configKeyValidate(key))
 		return 0;
 	
-	struct TConfigValue *it = getConfigItemForName(config, key);
+	struct config_value_t *it = getConfigItemForName(configSet, key);
 	
 	if (it) {
 		*value = it->val;
@@ -132,18 +194,15 @@ int getConfigStr(struct TConfigSet* config, const char* key, char** value) {
 		return 0;
 }
 	
-int setConfigInt(struct TConfigSet* config, const char* key, const int value) {
+int configSetInt(config_set_t* configSet, const char* key, const int value) {
 	char tmp[12];
-	
 	snprintf(tmp, 12, "%d", value);
-	return setConfigStr(config, key, tmp);
+	return configSetStr(configSet, key, tmp);
 }
 
-int getConfigInt(struct TConfigSet* config, char* key, int* value) {
+int configGetInt(config_set_t* configSet, char* key, int* value) {
 	char *valref = NULL;
-	
-	if (getConfigStr(config, key, &valref)) {
-		// convert to int
+	if (configGetStr(configSet, key, &valref)) {
 		*value = atoi(valref);
 		return 1;
 	} else {
@@ -151,18 +210,15 @@ int getConfigInt(struct TConfigSet* config, char* key, int* value) {
 	}
 }
 
-int setConfigColor(struct TConfigSet* config, const char* key, unsigned char* color) {
+int configSetColor(config_set_t* configSet, const char* key, unsigned char* color) {
 	char tmp[8];
-	
 	snprintf(tmp, 8, "#%02X%02X%02X", color[0], color[1], color[2]);
-	return setConfigStr(config, key, tmp);
+	return configSetStr(configSet, key, tmp);
 }
 
-int getConfigColor(struct TConfigSet* config, const char* key, unsigned char* color) {
+int configGetColor(config_set_t* configSet, const char* key, unsigned char* color) {
 	char *valref = NULL;
-	
-	if (getConfigStr(config, key, &valref)) {
-		// convert to color
+	if (configGetStr(configSet, key, &valref)) {
 		strToColor(valref, color);
 		return 1;
 	} else {
@@ -170,18 +226,17 @@ int getConfigColor(struct TConfigSet* config, const char* key, unsigned char* co
 	}
 }
 
-int configRemoveKey(struct TConfigSet* config, const char* key) {
-	// remove config key from config set
+int configRemoveKey(config_set_t* configSet, const char* key) {
 	if (!configKeyValidate(key))
 		return 0;
 	
-	struct TConfigValue* val = config->head;
-	struct TConfigValue* prev = NULL;
+	struct config_value_t* val = configSet->head;
+	struct config_value_t* prev = NULL;
 	
 	while (val) {
 		if (strncmp(val->key, key, 32) == 0) {
-			if (val == config->tail)
-				config->tail = prev;
+			if (val == configSet->tail)
+				configSet->tail = prev;
 
 			val = val->next;
 			if (prev) {
@@ -189,9 +244,11 @@ int configRemoveKey(struct TConfigSet* config, const char* key) {
 				prev->next = val;
 			}
 			else {
-				free(config->head);
-				config->head = val;
+				free(configSet->head);
+				configSet->head = val;
 			}
+
+			configSet->modified = 1;
 		} else {
 			prev = val;
 			val = val->next;
@@ -201,7 +258,7 @@ int configRemoveKey(struct TConfigSet* config, const char* key) {
 	return 1;
 }
 
-void readIPConfig() {
+void configReadIP() {
 	int fd = openFile("mc?:SYS-CONF/IPCONFIG.DAT", O_RDONLY);
 	if (fd >= 0) {
 		char ipconfig[255];
@@ -217,7 +274,7 @@ void readIPConfig() {
 	return;
 }
 
-void writeIPConfig() {
+void configWriteIP() {
 	int fd = openFile("mc?:SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
 	if (fd >= 0) {
 		char ipconfig[255];
@@ -230,36 +287,36 @@ void writeIPConfig() {
 	}
 }
 
-void getConfigDiscID(char* startup, char* discID) {
+void configGetDiscID(char* startup, char* discID) {
 	char *valref = NULL;
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	if (getConfigStr(&gConfig, gkey, &valref))
+	if (configGetStr(&configFiles[CONFIG_INDEX_DNAS], gkey, &valref))
 		strncpy(discID, valref, 32);
 	else
 		discID[0] = '\0';
 }
 
-void setConfigDiscID(char* startup, const char *discID) {
+void configSetDiscID(char* startup, const char *discID) {
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	setConfigStr(&gConfig, gkey, discID);
+	configSetStr(&configFiles[CONFIG_INDEX_DNAS], gkey, discID);
 }
 
-void removeConfigDiscID(char* startup) {
+void configRemoveDiscID(char* startup) {
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	configRemoveKey(&gConfig, gkey);
+	configRemoveKey(&configFiles[CONFIG_INDEX_DNAS], gkey);
 }
 
 // dst has to have 5 bytes space
-void getConfigDiscIDBinary(char* startup, void* dst) {
+void configGetDiscIDBinary(char* startup, void* dst) {
 	memset(dst, 0, 5);
 
 	char *gid = NULL;
 	char gkey[255];
 	snprintf(gkey, 255, "%s_discID", startup);
-	if (getConfigStr(&gConfig, gkey, &gid)) {
+	if (configGetStr(&configFiles[CONFIG_INDEX_DNAS], gkey, &gid)) {
 		// convert from hex to binary
 		char* cdst = dst;
 		int p = 0;
@@ -279,10 +336,11 @@ void getConfigDiscIDBinary(char* startup, void* dst) {
 	}
 }
 
-int readConfig(struct TConfigSet* config, char *fname) {
-	file_buffer_t* fileBuffer = openFileBuffer(fname, O_RDONLY, 0, 4096);
+int configRead(config_set_t* configSet) {
+	configSet->modified = 0;
+	file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
 	if (!fileBuffer) {
-		LOG("No config. Exiting...\n");
+		LOG("No config %s. Exiting...\n", configSet->filename);
 		return 0;
 	}
 	
@@ -297,45 +355,123 @@ int readConfig(struct TConfigSet* config, char *fname) {
 		
 		if (splitAssignment(line, key, val)) {
 			// insert config value
-			setConfigStr(config, key, val);
+			configSetStr(configSet, key, val);
 		} else {
-			LOG("Malformed config file '%s' line %d: '%s'\n", fname, lineno, line);
+			LOG("Malformed config file '%s' line %d: '%s'\n", configSet->filename, lineno, line);
 		}
 	}
 	closeFileBuffer(fileBuffer);
 	return 1;
 }
 
-int writeConfig(struct TConfigSet* config, char *fname) {
-	file_buffer_t* fileBuffer = openFileBuffer(fname, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
-	if (fileBuffer) {
-		char line[512];
-		struct TConfigValue* cur = config->head;
+int configWrite(config_set_t* configSet) {
+	if (configSet->modified) {
+		file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
+		if (fileBuffer) {
+			char line[512];
+			struct config_value_t* cur = configSet->head;
 
-		while (cur) {
-			if (cur->key[0] != '\0') {
-				snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
-				writeFileBuffer(fileBuffer, line, strlen(line));
+			while (cur) {
+				if (cur->key[0] != '\0') {
+					snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
+					writeFileBuffer(fileBuffer, line, strlen(line));
+				}
+
+				// and advance
+				cur = cur->next;
 			}
 
-			// and advance
-			cur = cur->next;
+			closeFileBuffer(fileBuffer);
+			configSet->modified = 0;
+			return 1;
 		}
-
-		closeFileBuffer(fileBuffer);
-		return 1;
+		return 0;
 	}
-	return 0;
+	return 1;
 }
 
-void clearConfig(struct TConfigSet* config) {
-	while (config->head) {
-		struct TConfigValue* cur = config->head;
-		config->head = cur->next;
+void configClear(config_set_t* configSet) {
+	while (configSet->head) {
+		struct config_value_t* cur = configSet->head;
+		configSet->head = cur->next;
 		
 		free(cur);
 	}
 	
-	config->head = NULL;
-	config->tail = NULL;
+	configSet->head = NULL;
+	configSet->tail = NULL;
+	configSet->modified = 1;
+}
+
+int configGetCompatibility(char* startup, int mode, int *dmaMode) {
+	char gkey[255];
+	snprintf(gkey, 255, "%s_%d", startup, mode);
+
+	unsigned int compatMode;
+	if (!configGetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, &compatMode))
+		compatMode = 0;
+
+	if (dmaMode) {
+		*dmaMode = 7; // defaulting to UDMA 4
+		snprintf(gkey, 255, "%s_DMA", startup);
+		configGetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, dmaMode);
+	}
+
+	return compatMode;
+}
+
+void configSetCompatibility(char* startup, int mode, int compatMode, int dmaMode) {
+	char gkey[255];
+	snprintf(gkey, 255, "%s_%d", startup, mode);
+	if (compatMode == 0) // means we want to delete the setting
+		configRemoveKey(&configFiles[CONFIG_INDEX_COMPAT], gkey);
+	else
+		configSetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, compatMode);
+
+	if (dmaMode != -1) {
+		snprintf(gkey, 255, "%s_DMA", startup);
+		if (dmaMode == 7) // UDMA 4 is the default so don't save it (useless lines into the conf file)
+			configRemoveKey(&configFiles[CONFIG_INDEX_COMPAT], gkey);
+		else
+			configSetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, dmaMode);
+	}
+}
+
+int configReadMulti(int types) {
+	int result = 0;
+
+	if (CONFIG_OPL & types)
+		configReadIP();
+
+	int index = 0;
+	while(index < CONFIG_FILE_NUM) {
+		config_set_t *configSet = &configFiles[index];
+
+		if (configSet->type & types) {
+			configClear(configSet);
+			result += configRead(configSet);
+		}
+		index++;
+	}
+
+	return result;
+}
+
+int configWriteMulti(int types) {
+	int result = 0;
+
+	if ((CONFIG_OPL & types) && gIPConfigChanged)
+		configWriteIP();
+
+	int index = 0;
+	while(index < CONFIG_FILE_NUM) {
+		config_set_t *configSet = &configFiles[index];
+
+		if (configSet->type & types)
+			result += configWrite(configSet);
+
+		index++;
+	}
+
+	return result;
 }

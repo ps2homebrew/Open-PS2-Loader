@@ -185,11 +185,11 @@ static void ethRenameGame(int id, char* newName) {
 #endif
 
 static int ethGetGameCompatibility(int id, int *dmaMode) {
-	return sbGetCompatibility(&ethGames[id], ethGameList.mode);
+	return configGetCompatibility(ethGames[id].startup, ethGameList.mode, NULL);
 }
 
-static void ethSetGameCompatibility(int id, int compatMode, int dmaMode, short save) {
-	sbSetCompatibility(&ethGames[id], ethGameList.mode, compatMode);
+static void ethSetGameCompatibility(int id, int compatMode, int dmaMode) {
+	configSetCompatibility(ethGames[id].startup, ethGameList.mode, compatMode, -1);
 }
 
 static int ethLaunchGame(int id) {
@@ -204,7 +204,7 @@ static int ethLaunchGame(int id) {
 	base_game_info_t* game = &ethGames[id];
 
 	if (gRememberLastPlayed) {
-		setConfigStr(&gConfig, "last_played", game->startup);
+		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
 

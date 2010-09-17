@@ -90,7 +90,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		rmDrawLine(25, 138, 600, 138, gColWhite);
 		rmDrawLine(25, 139, 600, 139, gColWhite);
 
-		for (j = 0; j <= 40; j += 10) {
+		for (j = 0; j < 40; j += 10) {
 			for (i = 0; i <= 9; i++) {
 				c[0]=keyb[i + j];
 
@@ -348,11 +348,11 @@ static void diaDrawHint(const char* text) {
 	
 	fntCalcDimensions(text, &w, &h);
 	
-	x = screenWidth - w - 40;
+	x = screenWidth - w - 10;
 	y = gTheme->usedHeight - 40;
 	
 	// render hint on the lower side of the screen.
-	rmDrawRect(x, y, ALIGN_NONE, w+10, h+10, gColDarker);
+	rmDrawRect(x, y, ALIGN_NONE, DIM_INF, MENU_ITEM_HEIGHT + 10, gColDarker);
 	fntRenderString(x + 5, y + 5, ALIGN_NONE, text, gTheme->textColor);
 }
 

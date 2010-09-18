@@ -198,15 +198,13 @@ static int ethLaunchGame(int id) {
 
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
-	char isoname[32];
+	char isoname[32], filename[32];
 	base_game_info_t* game = &ethGames[id];
 
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
-
-	shutdown(NO_EXCEPTION);
 
 	if (sysPcmciaCheck()) {
 		size_irx = size_smb_pcmcia_cdvdman_irx;
@@ -229,9 +227,6 @@ static int ethLaunchGame(int id) {
 		}
 	}
 
-	// disconnect from the active SMB session
-	ethSMBDisconnect();
-
 	char config_str[255];
 	sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	memcpy((void*)((u32)irx + i), config_str, strlen(config_str) + 1);
@@ -240,9 +235,13 @@ static int ethLaunchGame(int id) {
 	memcpy((void*)((u32)irx + i + 56), gPCUserName, 32);
 	memcpy((void*)((u32)irx + i + 92), gPCPassword, 32);
 
+	sprintf(filename,"%s",game->startup);
+	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
+	// disconnect from the active SMB session
+	ethSMBDisconnect();
 	FlushCache(0);
 
-	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
 
 	return 1;
 }
@@ -254,9 +253,11 @@ static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static void ethCleanUp(int exception) {
-	LOG("ethCleanUp()\n");
+	if (ethGameList.enabled) {
+		LOG("ethCleanUp()\n");
 
-	free(ethGames);
+		free(ethGames);
+	}
 }
 
 int ethSMBConnect(void) {

@@ -223,13 +223,11 @@ static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
 }
 
 static void initSupport(item_list_t* itemList, int startMode, int mode, int force_reinit) {
-	LOG("initSupport startMode=%d mode=%d reinit=%d\n", startMode, mode, force_reinit);
 	if (!list_support[mode].support) {
 		itemList->uip = 1; // stop updates until we're done with init
 		list_support[mode].support = itemList;
 		initMenuForListSupport(&list_support[mode], startMode);
 		itemList->uip = 0;
-		LOG("initSupport !\n");
 	}
 
 	if (((force_reinit) && (startMode && list_support[mode].support->enabled)) \

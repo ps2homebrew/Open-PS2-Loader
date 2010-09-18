@@ -303,6 +303,8 @@ static void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
 		diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
 		diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
+
+		applyConfig(-1, -1);
 	}
 }
 
@@ -1026,7 +1028,7 @@ static void guiMenuHandleInput() {
 	}
 	
 	if(getKeyOn(KEY_START) || getKeyOn(KEY_CIRCLE)) {
-		// TODO check if (menusys.menu)
+		if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
 			screenHandlerTarget = &mainScreenHandler;
 	}
 		

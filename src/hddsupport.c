@@ -172,8 +172,6 @@ static int hddLaunchGame(int id) {
 		_saveConfig();
 	}
 
-	shutdown(NO_EXCEPTION);
-
 	char gid[5];
 	configGetDiscIDBinary(hddGames->games[id].startup, gid);
 
@@ -186,8 +184,6 @@ static int hddLaunchGame(int id) {
 		dmaMode -= 3;
 	}
 	hddSetTransferMode(dmaType, dmaMode);
-
-	sprintf(filename,"%s",game->startup);
 
 	if (sysPcmciaCheck()) {
 		size_irx = size_hdd_pcmcia_cdvdman_irx;
@@ -204,15 +200,15 @@ static int hddLaunchGame(int id) {
 		}
 	}
 
-	if (game->ops2l_compat_flags & COMPAT_MODE_2) {
+	if (compatMode & COMPAT_MODE_2) {
 		u32 alt_read_mode = 1;
 		memcpy((void*)((u32)irx+i+35),&alt_read_mode,1);
 	}
-	if (game->ops2l_compat_flags & COMPAT_MODE_5) {
+	if (compatMode & COMPAT_MODE_5) {
 		u32 no_dvddl = 1;
 		memcpy((void*)((u32)irx+i+36),&no_dvddl,4);
 	}
-	if (game->ops2l_compat_flags & COMPAT_MODE_4) {
+	if (compatMode & COMPAT_MODE_4) {
 		u32 no_pss = 1;
 		memcpy((void*)((u32)irx+i+40),&no_pss,4);
 	}
@@ -235,7 +231,7 @@ static int hddLaunchGame(int id) {
 	u32 *p = (u32 *)cdvdfsv_irx;
 	for (i = 0; i < (size_cdvdfsv_irx >> 2); i++) {
 		if (*p == 0xC0DEC0DE) {
-			if (game->ops2l_compat_flags & COMPAT_MODE_7)
+			if (compatMode & COMPAT_MODE_7)
 				*p = 1;
 			else
 				*p = 0;
@@ -244,8 +240,8 @@ static int hddLaunchGame(int id) {
 		p++;
 	}
 
-	hddFreeHDLGamelist(hddGames);
-
+	sprintf(filename,"%s",game->startup);
+	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
 	FlushCache(0);
 
 	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode, compatMode & COMPAT_MODE_1);
@@ -260,9 +256,11 @@ static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static void hddCleanUp(int exception) {
-	LOG("hddCleanUp()\n");
+	if (hddGameList.enabled) {
+		LOG("hddCleanUp()\n");
 
-	if (gHddStartup == 0) {
+		hddFreeHDLGamelist(hddGames);
+
 		if ((exception & UNMOUNT_EXCEPTION) == 0)
 			fileXioUmount(hddPrefix);
 	}

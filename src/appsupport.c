@@ -115,8 +115,10 @@ static int appLaunchItem(int id) {
 		if (strncmp(cur->val, "pfs0:", 5) == 0)
 			exception = UNMOUNT_EXCEPTION;
 
-		shutdown(exception);
-		sysExecElf(cur->val, 0, NULL);
+		char filename[255];
+		sprintf(filename,"%s",cur->val);
+		shutdown(exception); // CAREFUL: shutdown will call appCleanUp, so configApps/cur will be freed
+		sysExecElf(filename, 0, NULL);
 
 		return 1;
 	}
@@ -150,9 +152,11 @@ static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static void appCleanUp(int exception) {
-	LOG("appCleanUp()\n");
+	if (appItemList.enabled) {
+		LOG("appCleanUp()\n");
 
-	configFree(configApps);
+		configFree(configApps);
+	}
 }
 
 static item_list_t appItemList = {

@@ -55,4 +55,8 @@ int configWrite(config_set_t* configSet);
 int configWriteMulti(int types);
 void configClear(config_set_t* configSet);
 
+void configGetVMC(char* startup, char* vmc, int mode, int slot);
+void configSetVMC(char* startup, const char* vmc, int mode, int slot);
+void configRemoveVMC(char *startup, int mode, int slot);
+
 #endif

@@ -431,7 +431,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 
 	if (result == COMPAT_REMOVE) {
 		configRemoveDiscID(startup);
-		support->itemSetCompatibility(id, 0, 0);
+		support->itemSetCompatibility(id, 0, 7);
 		saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC);
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;

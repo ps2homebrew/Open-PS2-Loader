@@ -162,7 +162,7 @@ static void usbSetGameCompatibility(int id, int compatMode, int dmaMode) {
 
 static int usbLaunchGame(int id) {
 	int fd, r, index, i, compatmask;
-	char isoname[32], partname[64];
+	char isoname[32], partname[64], filename[32];
 	base_game_info_t* game = &usbGames[id];
 
 	fd = fioDopen(usbPrefix);
@@ -186,8 +186,6 @@ static int usbLaunchGame(int id) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
 		_saveConfig();
 	}
-
-	shutdown(NO_EXCEPTION);
 
 	void *irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
@@ -216,9 +214,11 @@ static int usbLaunchGame(int id) {
 
 	fioDclose(fd);
 
+	sprintf(filename,"%s",game->startup);
+	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
 	FlushCache(0);
 
-	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
 
 	return 1;
 }
@@ -230,9 +230,11 @@ static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 }
 
 static void usbCleanUp(int exception) {
-	LOG("usbCleanUp()\n");
+	if (usbGameList.enabled) {
+		LOG("usbCleanUp()\n");
 
-	free(usbGames);
+		free(usbGames);
+	}
 }
 
 static item_list_t usbGameList = {

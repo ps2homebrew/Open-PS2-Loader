@@ -343,10 +343,10 @@ void configGetDiscIDBinary(char* startup, void* dst) {
 }
 
 int configRead(config_set_t* configSet) {
-	configSet->modified = 0;
 	file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
 	if (!fileBuffer) {
 		LOG("No config %s. Exiting...\n", configSet->filename);
+		configSet->modified = 0;
 		return 0;
 	}
 	
@@ -367,6 +367,7 @@ int configRead(config_set_t* configSet) {
 		}
 	}
 	closeFileBuffer(fileBuffer);
+	configSet->modified = 0;
 	return 1;
 }
 

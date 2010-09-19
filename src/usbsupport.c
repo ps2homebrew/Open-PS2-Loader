@@ -184,7 +184,7 @@ static int usbLaunchGame(int id) {
 
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
-		_saveConfig();
+		saveConfig(CONFIG_OPL, 0);
 	}
 
 	void *irx = &usb_cdvdman_irx;

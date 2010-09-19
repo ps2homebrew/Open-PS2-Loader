@@ -203,7 +203,7 @@ static int ethLaunchGame(int id) {
 
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
-		_saveConfig();
+		saveConfig(CONFIG_OPL, 0);
 	}
 
 	if (sysPcmciaCheck()) {

@@ -27,9 +27,8 @@
 
 #define USBLD_VERSION "0.7"
 
-int saveConfig();
-void _saveConfig();
-int loadConfig();
+int loadConfig(int types);
+int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID);
 void shutdown();
 

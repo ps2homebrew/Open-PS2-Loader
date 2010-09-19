@@ -284,16 +284,13 @@ void menuFillHookFunc(struct submenu_list_t **menu) {
 // ------------------ Configuration handling ----------------
 // ----------------------------------------------------------
 
-int lscstatus = 0;
+int lscstatus = CONFIG_ALL;
 int lscret = 0;
 
-// void _loadConfig(int types) { TODO: call this method with one parameter, need to add a new IO operation ...
 void _loadConfig() {
-	int types = CONFIG_ALL;
-	
-	int result = configReadMulti(types);
+	int result = configReadMulti(lscstatus);
 
-	if (types & CONFIG_OPL) {
+	if (lscstatus & CONFIG_OPL) {
 		int themeID = -1, langID = -1;
 		
 		if (result) {
@@ -349,11 +346,8 @@ void _loadConfig() {
 	lscstatus = 0;
 }
 
-// void _saveConfig(int types) { TODO: call this method with one parameter, need to add a new IO operation ...
 void _saveConfig() {
-	int types = CONFIG_ALL;
-
-	if (types & CONFIG_OPL) {
+	if (lscstatus & CONFIG_OPL) {
 		config_set_t *configOPL = configGetByType(CONFIG_OPL);
 		configSetInt(configOPL, "icons_cache_count", gCountIconsCache);
 		configSetInt(configOPL, "covers_cache_count", gCountCoversCache);
@@ -388,7 +382,7 @@ void _saveConfig() {
 		configSetInt(configOPL, "app_mode", gAPPStartMode);
 	}
 	
-	lscret = configWriteMulti(types);
+	lscret = configWriteMulti(lscstatus);
 	lscstatus = 0;
 }
 
@@ -421,7 +415,7 @@ void applyConfig(int themeID, int langID) {
 }
 
 int loadConfig(int types) {
-	lscstatus = 1;
+	lscstatus = types;
 	lscret = 0;
 	
 	guiHandleDefferedIO(&lscstatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_loadConfig);
@@ -429,16 +423,17 @@ int loadConfig(int types) {
 	return lscret;
 }
 
-int saveConfig(int types) {
-	lscstatus = 1;
+int saveConfig(int types, int showUI) {
+	lscstatus = types;
 	lscret = 0;
 	
 	guiHandleDefferedIO(&lscstatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_saveConfig);
 	
-	if (lscret) {
-		guiMsgBox(_l(_STR_SETTINGS_SAVED), 0);
-	} else {
-		guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0);
+	if (showUI) {
+		if (lscret)
+			guiMsgBox(_l(_STR_SETTINGS_SAVED), 0);
+		else
+			guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0);
 	}
 	
 	return lscret;

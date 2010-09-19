@@ -432,7 +432,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 	if (result == COMPAT_REMOVE) {
 		configRemoveDiscID(startup);
 		support->itemSetCompatibility(id, 0, 7);
-		saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC);
+		saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC, 1);
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -451,7 +451,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			configSetDiscID(startup, hexid);
 
 		if (result == COMPAT_SAVE)
-			saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC);
+			saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC, 1);
 	}
 
 	return result;
@@ -1013,7 +1013,7 @@ static void guiMenuHandleInput() {
 			// ipconfig
 			guiShowIPConfig();
 		} else if (id == 7) { // TODO: (Volca) As Izdubar points out, there ought be MNU_ID_something instead of this cryptic numerals...
-			saveConfig();
+			saveConfig(CONFIG_OPL, 1);
 		} else if (id == 9) { // TODO: should we call opl.shutdown first ?
 			guiExecExit();
 		} else if (id == 11) { // TODO: should we call opl.shutdown first ?

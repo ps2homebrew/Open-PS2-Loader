@@ -276,7 +276,7 @@ static int vmc_mccopy(char *filename, int slot, int *progress, char *msg)
 		return -99;
 
 	memcpy(mcdi, cluster_buf, sizeof(MCDevInfo));
-	if (strncmp(mcdi->magic, SUPERBLOCK_MAGIC, sizeof(SUPERBLOCK_MAGIC)))
+	if (memcmp(mcdi->magic, SUPERBLOCK_MAGIC, 28))
 		return -100;
 
 	pagesblock = (BLOCKKB * 1024) / mcdi->pagesize;

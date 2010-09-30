@@ -94,49 +94,49 @@ clean:
 	echo "    * 10K kernel patches"
 	$(MAKE) -C kpatch_10K clean
 	echo "    * imgdrv.irx"
-	$(MAKE) -C modules/imgdrv clean
+	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
-	$(MAKE) -C modules/eesync clean
+	$(MAKE) -C modules/iopcore/eesync clean
 	echo "    * cdvdman.irx"
-	$(MAKE) -C modules/cdvdman -f Makefile.usb clean
-	$(MAKE) -C modules/cdvdman -f Makefile.usb.4Ksectors clean
-	$(MAKE) -C modules/cdvdman -f Makefile.smb clean
-	$(MAKE) -C modules/cdvdman -f Makefile.smb.pcmcia clean
-	$(MAKE) -C modules/cdvdman -f Makefile.hdd clean
-	$(MAKE) -C modules/cdvdman -f Makefile.hdd.pcmcia clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia clean
 	echo "    * cdvdfsv.irx"
-	$(MAKE) -C modules/cdvdfsv clean
+	$(MAKE) -C modules/iopcore/cdvdfsv clean
 	echo "    * cddev.irx"
-	$(MAKE) -C modules/cddev clean
+	$(MAKE) -C modules/iopcore/cddev clean
 	echo "    * usbhdfsd.irx"
-	$(MAKE) -C modules/usbhdfsd clean
+	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo "    * ps2dev9.irx"
 	$(MAKE) -C modules/dev9 clean
 	echo "    * SMSUTILS.irx"
-	$(MAKE) -C modules/SMSUTILS clean
+	$(MAKE) -C modules/network/SMSUTILS clean
 	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/SMSTCPIP -f Makefile clean
-	$(MAKE) -C modules/SMSTCPIP -f Makefile.ingame clean
+	$(MAKE) -C modules/network/SMSTCPIP -f Makefile clean
+	$(MAKE) -C modules/network/SMSTCPIP -f Makefile.ingame clean
 	echo "    * SMSMAP.irx"
-	$(MAKE) -C modules/SMSMAP clean
+	$(MAKE) -C modules/network/SMSMAP clean
 	echo "    * smbman.irx"
-	$(MAKE) -C modules/smbman clean
+	$(MAKE) -C modules/network/smbman clean
 	echo "    * discID.irx"
-	$(MAKE) -C modules/discID clean
+	$(MAKE) -C modules/cdvd/discID clean
 	echo "    * ps2atad.irx"
-	$(MAKE) -C modules/atad clean
+	$(MAKE) -C modules/hdd/atad clean
 	echo "    * ps2hdd.irx"
-	$(MAKE) -C modules/ps2hdd clean
+	$(MAKE) -C modules/hdd/ps2hdd clean
 	echo "    * genvmc.irx"
-	$(MAKE) -C modules/genvmc clean
+	$(MAKE) -C modules/vmc/genvmc clean
 	echo "    * hdldsvr.irx"
-	$(MAKE) -C modules/hdldsvr clean
+	$(MAKE) -C modules/hdd/hdldsvr clean
 	echo "    * udptty.irx"
-	$(MAKE) -C modules/udptty clean
+	$(MAKE) -C modules/debug/udptty clean
 	echo "    * ioptrap.irx"
-	$(MAKE) -C modules/ioptrap clean
+	$(MAKE) -C modules/debug/ioptrap clean
 	echo "    * ps2link.irx"
-	$(MAKE) -C modules/ps2link clean
+	$(MAKE) -C modules/debug/ps2link clean
 	echo "    * pc tools"
 	$(MAKE) -C pc clean
 
@@ -199,96 +199,96 @@ kpatch_10K.s:
 
 imgdrv.s:
 	echo "    * imgdrv.irx"
-	$(MAKE) -C modules/imgdrv
-	bin2s modules/imgdrv/imgdrv.irx asm/imgdrv.s imgdrv_irx
+	$(MAKE) -C modules/iopcore/imgdrv
+	bin2s modules/iopcore/imgdrv/imgdrv.irx asm/imgdrv.s imgdrv_irx
 
 eesync.s:
 	echo "    * eesync.irx"
-	$(MAKE) -C modules/eesync
-	bin2s modules/eesync/eesync.irx asm/eesync.s eesync_irx
+	$(MAKE) -C modules/iopcore/eesync
+	bin2s modules/iopcore/eesync/eesync.irx asm/eesync.s eesync_irx
 
 usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) USE_DEV9=1 -C modules/cdvdman -f Makefile.usb rebuild
+	$(MAKE) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.usb rebuild
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 else
-	$(MAKE) -C modules/cdvdman -f Makefile.usb rebuild
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 endif
 endif
-	bin2s modules/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
 
 usb_4Ksectors_cdvdman.s:
 	echo "    * usb_4Ksectors_cdvdman.irx"
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) USE_DEV9=1 -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+	$(MAKE) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 else
-	$(MAKE) -C modules/cdvdman -f Makefile.usb.4Ksectors rebuild
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 endif
 endif
-	bin2s modules/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
 
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.smb rebuild
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 else
-	$(MAKE) -C modules/cdvdman -f Makefile.smb rebuild
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 endif
-	bin2s modules/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
 
 smb_pcmcia_cdvdman.s:
 	echo "    * smb_pcmcia_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.smb.pcmcia rebuild
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
 else
-	$(MAKE) -C modules/cdvdman -f Makefile.smb.pcmcia rebuild
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
 endif
-	bin2s modules/cdvdman/cdvdman.irx asm/smb_pcmcia_cdvdman.s smb_pcmcia_cdvdman_irx
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/smb_pcmcia_cdvdman.s smb_pcmcia_cdvdman_irx
 
 hdd_cdvdman.s:
 	echo "    * hdd_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.hdd rebuild
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 else
-	$(MAKE) -C modules/cdvdman -f Makefile.hdd rebuild
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 endif
-	bin2s modules/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
 
 hdd_pcmcia_cdvdman.s:
 	echo "    * hdd_pcmcia_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/cdvdman -f Makefile.hdd.pcmcia rebuild
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
 else
-	$(MAKE) -C modules/cdvdman -f Makefile.hdd.pcmcia rebuild
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
 endif
-	bin2s modules/cdvdman/cdvdman.irx asm/hdd_pcmcia_cdvdman.s hdd_pcmcia_cdvdman_irx
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_pcmcia_cdvdman.s hdd_pcmcia_cdvdman_irx
 
 cdvdfsv.s:
 	echo "    * cdvdfsv.irx"
-	$(MAKE) -C modules/cdvdfsv
-	bin2s modules/cdvdfsv/cdvdfsv.irx asm/cdvdfsv.s cdvdfsv_irx
+	$(MAKE) -C modules/iopcore/cdvdfsv
+	bin2s modules/iopcore/cdvdfsv/cdvdfsv.irx asm/cdvdfsv.s cdvdfsv_irx
 
 cddev.s:
 	echo "    * cddev.irx"
-	$(MAKE) -C modules/cddev
-	bin2s modules/cddev/cddev.irx asm/cddev.s cddev_irx
+	$(MAKE) -C modules/iopcore/cddev
+	bin2s modules/iopcore/cddev/cddev.irx asm/cddev.s cddev_irx
 
 usbd_ps2.s:
 	bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd_ps2.s usbd_ps2_irx
 
 usbd_ps3.s:
-	bin2s modules/usbd/usbd.irx asm/usbd_ps3.s usbd_ps3_irx
+	bin2s modules/usb/usbd/usbd.irx asm/usbd_ps3.s usbd_ps3_irx
 
 usbhdfsd.s:
 	echo "    * usbhdfsd.irx"
-	$(MAKE) -C modules/usbhdfsd
-	bin2s modules/usbhdfsd/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
+	$(MAKE) -C modules/usb/usbhdfsd
+	bin2s modules/usb/usbhdfsd/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
 
 ps2dev9.s:
 	echo "    * ps2dev9.irx"
@@ -297,84 +297,84 @@ ps2dev9.s:
 
 smsutils.s:
 	echo "    * SMSUTILS.irx"
-	$(MAKE) -C modules/SMSUTILS
-	bin2s modules/SMSUTILS/SMSUTILS.irx asm/smsutils.s smsutils_irx
+	$(MAKE) -C modules/network/SMSUTILS
+	bin2s modules/network/SMSUTILS/SMSUTILS.irx asm/smsutils.s smsutils_irx
 
 smstcpip.s:
 	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/SMSTCPIP -f Makefile rebuild
-	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/smstcpip.s smstcpip_irx
+	$(MAKE) -C modules/network/SMSTCPIP -f Makefile rebuild
+	bin2s modules/network/SMSTCPIP/SMSTCPIP.irx asm/smstcpip.s smstcpip_irx
 
 ingame_smstcpip.s:
 	echo "    * in-game SMSTCPIP.irx"
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) -C modules/SMSTCPIP -f Makefile rebuild
+	$(MAKE) -C modules/network/SMSTCPIP -f Makefile rebuild
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) -C modules/SMSTCPIP -f Makefile rebuild
+	$(MAKE) -C modules/network/SMSTCPIP -f Makefile rebuild
 else
-	$(MAKE) -C modules/SMSTCPIP -f Makefile.ingame rebuild
+	$(MAKE) -C modules/network/SMSTCPIP -f Makefile.ingame rebuild
 endif
 endif
-	bin2s modules/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
+	bin2s modules/network/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
 smsmap.s:
 	echo "    * SMSMAP.irx"
-	$(MAKE) -C modules/SMSMAP
-	bin2s modules/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
+	$(MAKE) -C modules/network/SMSMAP
+	bin2s modules/network/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
 
 smbman.s:
 	echo "    * smbman.irx"
-	$(MAKE) -C modules/smbman clean
+	$(MAKE) -C modules/network/smbman clean
 ifeq ($(DEBUG),1)
-	$(MAKE) DEBUG=1 -C modules/smbman
+	$(MAKE) DEBUG=1 -C modules/network/smbman
 else
-	$(MAKE) -C modules/smbman
+	$(MAKE) -C modules/network/smbman
 endif
-	bin2s modules/smbman/smbman.irx asm/smbman.s smbman_irx
+	bin2s modules/network/smbman/smbman.irx asm/smbman.s smbman_irx
 
 discid.s:
 	echo "    * discID.irx"
-	$(MAKE) -C modules/discID
-	bin2s modules/discID/discID.irx asm/discid.s discid_irx
+	$(MAKE) -C modules/cdvd/discID
+	bin2s modules/cdvd/discID/discID.irx asm/discid.s discid_irx
 
 ps2atad.s:
 	echo "    * ps2atad.irx"
-	$(MAKE) -C modules/atad
-	bin2s modules/atad/ps2atad.irx asm/ps2atad.s ps2atad_irx
+	$(MAKE) -C modules/hdd/atad
+	bin2s modules/hdd/atad/ps2atad.irx asm/ps2atad.s ps2atad_irx
 
 poweroff.s:
 	bin2s $(PS2SDK)/iop/irx/poweroff.irx asm/poweroff.s poweroff_irx
 
 ps2hdd.s:
 	echo "    * ps2hdd.irx"
-	$(MAKE) -C modules/ps2hdd
-	bin2s modules/ps2hdd/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
+	$(MAKE) -C modules/hdd/ps2hdd
+	bin2s modules/hdd/ps2hdd/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
 
 genvmc.s:
 	echo "    * genvmc.irx"
-	$(MAKE) -C modules/genvmc
-	bin2s modules/genvmc/genvmc.irx asm/genvmc.s genvmc_irx
+	$(MAKE) -C modules/vmc/genvmc
+	bin2s modules/vmc/genvmc/genvmc.irx asm/genvmc.s genvmc_irx
 
 hdldsvr.s:
 	echo "    * hdldsvr.irx"
-	$(MAKE) -C modules/hdldsvr
-	bin2s modules/hdldsvr/hdldsvr.irx asm/hdldsvr.s hdldsvr_irx
+	$(MAKE) -C modules/hdd/hdldsvr
+	bin2s modules/hdd/hdldsvr/hdldsvr.irx asm/hdldsvr.s hdldsvr_irx
 
 udptty.s:
 	echo "    * udptty.irx"
-	$(MAKE) -C modules/udptty
-	bin2s modules/udptty/udptty.irx asm/udptty.s udptty_irx
+	$(MAKE) -C modules/debug/udptty
+	bin2s modules/debug/udptty/udptty.irx asm/udptty.s udptty_irx
 
 ioptrap.s:
 	echo "    * ioptrap.irx"
-	$(MAKE) -C modules/ioptrap
-	bin2s modules/ioptrap/ioptrap.irx asm/ioptrap.s ioptrap_irx
+	$(MAKE) -C modules/debug/ioptrap
+	bin2s modules/debug/ioptrap/ioptrap.irx asm/ioptrap.s ioptrap_irx
 
 ps2link.s:
 	echo "    * ps2link.irx"
-	$(MAKE) -C modules/ps2link
-	bin2s modules/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
+	$(MAKE) -C modules/debug/ps2link
+	bin2s modules/debug/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx

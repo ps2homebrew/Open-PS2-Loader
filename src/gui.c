@@ -291,7 +291,7 @@ static void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
 	diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
-	int ret = diaExecuteDialog(diaConfig, 1);
+	int ret = diaExecuteDialog(diaConfig, 1, NULL);
 	if (ret) {
 		diaGetInt(diaConfig, CFG_EXITTO, &gExitMode);
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
@@ -325,7 +325,7 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 
-	int ret = diaExecuteDialog(diaUIConfig, 1);
+	int ret = diaExecuteDialog(diaUIConfig, 1, NULL);
 	if (ret) {
 		int themeID = -1, langID = -1;
 		diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
@@ -357,7 +357,7 @@ static void guiShowIPConfig() {
 	diaSetString(diaIPConfig, 21, gPCPassword);
 
 	// show dialog
-	if (diaExecuteDialog(diaIPConfig, 1)) {
+	if (diaExecuteDialog(diaIPConfig, 1, NULL)) {
 		// Ok pressed, store values
 		for (i = 0; i < 4; ++i) {
 			diaGetInt(diaIPConfig, 2 + i, &ps2_ip[i]);
@@ -389,6 +389,182 @@ int guiShowKeyboard(char* value, int maxLength) {
 	return result;
 }
 
+#ifdef VMC
+typedef struct {		// size = 76
+	int  VMC_status;	// 0=available, 1=busy
+	int  VMC_error;
+	int  VMC_progress;
+	char VMC_msg[64];
+} statusVMCparam_t;
+
+#define OPERATION_CREATE	0
+#define OPERATION_CREATING	1
+#define OPERATION_ABORTING	2
+#define OPERATION_ENDING	3
+#define OPERATION_END		4
+
+static short vmc_refresh;
+static int vmc_operation;
+static statusVMCparam_t vmc_status;
+
+int guiVmcNameHandler(char* text, int maxLen) {
+	int result = diaShowKeyb(text, maxLen);
+
+	if (result)
+		vmc_refresh = 1;
+
+	return result;
+}
+
+static int guiRefreshVMCConfig(item_list_t *support, char* name) {
+	int size = support->itemCheckVMC(name, 0);
+
+	if (size != -1) {
+		diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 1);
+		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
+		diaSetLabel(diaVMC, VMC_BUTTON_DELETE, _l(_STR_DELETE));
+		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
+
+		if (size == 8)
+			diaSetInt(diaVMC, VMC_SIZE, 0);
+		else if (size == 16)
+			diaSetInt(diaVMC, VMC_SIZE, 1);
+		else if (size == 32)
+			diaSetInt(diaVMC, VMC_SIZE, 2);
+		else if (size == 64)
+			diaSetInt(diaVMC, VMC_SIZE, 3);
+		else {
+			diaSetInt(diaVMC, VMC_SIZE, 0);
+			diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_ERROR));
+		}
+	}
+	else {
+		diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 0);
+		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_CREATE));
+		diaSetLabel(diaVMC, VMC_BUTTON_DELETE, " ");
+		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_NEW));
+		diaSetInt(diaVMC, VMC_SIZE, 0);
+	}
+
+	return size;
+}
+
+static int guiVMCUpdater() {
+	if (vmc_refresh) {
+		vmc_refresh = 0;
+		return VMC_REFRESH;
+	}
+
+	if ((vmc_operation == OPERATION_CREATING) || (vmc_operation == OPERATION_ABORTING)) {
+		int result = fileXioDevctl("genvmc:", 0xC0DE0003, NULL, 0, (void*) &vmc_status, sizeof(vmc_status));
+		if (result == 0) {
+			diaSetLabel(diaVMC, VMC_STATUS, vmc_status.VMC_msg);
+			diaSetInt(diaVMC, VMC_PROGRESS, vmc_status.VMC_progress);
+
+			if (vmc_status.VMC_error != 0)
+				LOG("genvmc updater: %d\n", vmc_status.VMC_error);
+
+			if (vmc_status.VMC_status == 0x00) {
+				diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
+				vmc_operation = OPERATION_ENDING;
+				return VMC_BUTTON_CREATE;
+			}
+		}
+		else
+			LOG("status result: %d\n", result);
+	}
+
+	return 0;
+}
+
+static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slot, int validate) {
+	int result = validate ? VMC_BUTTON_CREATE : 0;
+	char vmc[32];
+
+	if (strlen(VMCName))
+		strncpy(vmc, VMCName, 32);
+	else {
+		if (validate)
+			return 1; // nothing to validate if no user input
+
+		char* startup = support->itemGetStartup(id);
+		snprintf(vmc, 32, "%s_%d", startup, slot);
+	}
+
+	vmc_refresh = 0;
+	vmc_operation = OPERATION_CREATE;
+	diaSetEnabled(diaVMC, VMC_NAME, 1);
+	diaSetEnabled(diaVMC, VMC_SIZE, 1);
+	diaSetInt(diaVMC, VMC_PROGRESS, 0);
+
+	const char* VMCSizes[] = { "8 Mo", "16 Mo", "32 Mo", "64 Mo", NULL };
+	diaSetEnum(diaVMC, VMC_SIZE, VMCSizes);
+	int size = guiRefreshVMCConfig(support, vmc);
+	diaSetString(diaVMC, VMC_NAME, vmc);
+
+	do {
+		if (result == VMC_BUTTON_CREATE) {
+			if (vmc_operation == OPERATION_CREATE) { // User start creation of VMC
+				int sizeUI;
+				diaGetInt(diaVMC, VMC_SIZE, &sizeUI);
+				if (sizeUI == 1)
+					sizeUI = 16;
+				else if (sizeUI == 2)
+					sizeUI = 32;
+				else if (sizeUI == 3)
+					sizeUI = 64;
+				else
+					sizeUI = 8;
+
+				if (sizeUI != size) {
+					support->itemCheckVMC(vmc, sizeUI);
+
+					diaSetEnabled(diaVMC, VMC_NAME, 0);
+					diaSetEnabled(diaVMC, VMC_SIZE, 0);
+					diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_ABORT));
+					vmc_operation = OPERATION_CREATING;
+				}
+				else
+					break;
+			}
+			else if (vmc_operation == OPERATION_ENDING) {
+				if (validate)
+					break; // directly close VMC config dialog
+
+				vmc_operation = OPERATION_END;
+			}
+			else if (vmc_operation == OPERATION_END) { // User closed creation dialog of VMC
+				break;
+			}
+			else if (vmc_operation == OPERATION_CREATING) { // User canceled creation of VMC
+				fileXioDevctl("genvmc:", 0xC0DE0002, NULL, 0, NULL, 0);
+				vmc_operation = OPERATION_ABORTING;
+				// TODO delete VMC ?
+			}
+		}
+		else if (result == VMC_BUTTON_DELETE) {
+			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1)) {
+				support->itemCheckVMC(vmc, -1);
+				diaSetString(diaVMC, VMC_NAME, "");
+				break;
+			}
+		}
+		else if (result == VMC_REFRESH) { // User changed the VMC name
+			diaGetString(diaVMC, VMC_NAME, vmc);
+			size = guiRefreshVMCConfig(support, vmc);
+		}
+
+		result = diaExecuteDialog(diaVMC, 0, &guiVMCUpdater);
+
+		if ((result == 0) && (vmc_operation == OPERATION_CREATE))
+			break;
+	} while (1);
+
+	return result;
+}
+
+#endif
+
 int guiShowCompatConfig(int id, item_list_t *support) {
 	int dmaMode = -1, compatMode = 0;
 	char* startup = support->itemGetStartup(id);
@@ -405,7 +581,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, 0);
 	}
 
-	diaSetLabel(diaCompatConfig, 110, support->itemGetName(id));
+	diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
 
 	int i, result;
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
@@ -416,9 +592,32 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 	configGetDiscID(startup, hexid);
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
+#ifdef VMC
+	int mode = support->mode;
+
+	char vmc1[32];
+	configGetVMC(startup, vmc1, mode, 0);
+	diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
+
+	char vmc2[32]; // required as diaSetLabel use pointer to value
+	configGetVMC(startup, vmc2, mode, 1);
+	diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
+#endif
+
 	// show dialog
 	do {
-		result = diaExecuteDialog(diaCompatConfig, 0);
+#ifdef VMC
+		if (strlen(vmc1))
+			diaSetLabel(diaCompatConfig, COMPAT_VMC1_ACTION, _l(_STR_RESET));
+		else
+			diaSetLabel(diaCompatConfig, COMPAT_VMC1_ACTION, _l(_STR_USE_GENERIC));
+		if (strlen(vmc2))
+			diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_RESET));
+		else
+			diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_USE_GENERIC));
+#endif
+
+		result = diaExecuteDialog(diaCompatConfig, 0, NULL);
 
 		if (result == COMPAT_LOADFROMDISC) {
 			char hexDiscID[15];
@@ -427,10 +626,33 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			else
 				guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0);
 		}
-	} while (result == COMPAT_LOADFROMDISC);
+#ifdef VMC
+		else if (result == COMPAT_VMC1_DEFINE) {
+			if(guiShowVMCConfig(id, support, vmc1, 0, 0))
+				diaGetString(diaVMC, VMC_NAME, vmc1);
+		} else if (result == COMPAT_VMC2_DEFINE) {
+			if(guiShowVMCConfig(id, support, vmc2, 1, 0))
+				diaGetString(diaVMC, VMC_NAME, vmc2);
+		} else if (result == COMPAT_VMC1_ACTION) {
+			if (strlen(vmc1))
+				vmc1[0] = '\0';
+			else
+				snprintf(vmc1, 32, "generic_%d", 0);
+		} else if (result == COMPAT_VMC2_ACTION) {
+			if (strlen(vmc2))
+				vmc2[0] = '\0';
+			else
+				snprintf(vmc2, 32, "generic_%d", 1);
+		}
+#endif
+	} while (result >= COMPAT_NOEXIT);
 
 	if (result == COMPAT_REMOVE) {
 		configRemoveDiscID(startup);
+#ifdef VMC
+		configRemoveVMC(startup, mode, 0);
+		configRemoveVMC(startup, mode, 1);
+#endif
 		support->itemSetCompatibility(id, 0, 7);
 		saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC, 1);
 	} else if (result > 0) { // test button pressed or save button
@@ -449,6 +671,12 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')
 			configSetDiscID(startup, hexid);
+#ifdef VMC
+		configSetVMC(startup, vmc1, mode, 0);
+		configSetVMC(startup, vmc2, mode, 1);
+		guiShowVMCConfig(id, support, vmc1, 0, 1);
+		guiShowVMCConfig(id, support, vmc2, 1, 1);
+#endif
 
 		if (result == COMPAT_SAVE)
 			saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC, 1);

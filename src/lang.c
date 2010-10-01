@@ -80,7 +80,32 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Check USB game fragmentation",
 	"Remember last played game",
 	"Error, the game is fragmented",
-	"Error, could not run the item"
+	"Error, could not run the item",
+	"Test",
+	"Leave empty for GUEST auth.",
+	"Load alt. core",
+	"Alternative data read method",
+	"Unhook Syscalls",
+	"0 PSS mode",
+	"Disable DVD-DL",
+	"Disable IGR",
+	"Reduced cdvdfsv buffer",
+	"Hide dev9 module",
+	"Alternate IGR combo",
+	"Changing the size will reformat the VMC",
+	"Create",
+	"Modify",
+	"Abort",
+	"Reset",
+	"Use generic",
+	"Configure VMC",
+	"Name",
+	"Size",
+	"Status",
+	"Progress",
+	"VMC file exist",
+	"Invalid VMC file, size is incorrect",
+	"VMC file need to be created"
 };
 
 static int guiLangID = 0;

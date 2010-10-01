@@ -582,7 +582,7 @@ void loadHdldSvr(void) {
 
 	int iplen = sysSetIPConfig(ipconfig);
 
-    	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
 	if (ret < 0)
 		return;
 

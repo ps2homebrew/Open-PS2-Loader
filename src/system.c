@@ -9,6 +9,21 @@
 #include "include/pad.h"
 #include "include/system.h"
 #include "include/ioman.h"
+#ifdef VMC
+#define GENVMC_STAT_AVAIL		0x00
+#define GENVMC_STAT_BUSY		0x01
+
+typedef struct {
+	char VMC_filename[1024];
+	int  VMC_size_mb;
+	int  VMC_blocksize;
+	int  VMC_thread_priority;
+	int  VMC_card_slot;
+} createVMCparam_t;
+
+extern void *genvmc_irx;
+extern int size_genvmc_irx;
+#endif
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
@@ -213,6 +228,9 @@ void sysReset(void) {
 	sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
 	sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
+#ifdef VMC
+	sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
+#endif
 
 	poweroffInit();
 }
@@ -670,3 +688,41 @@ void sysApplyKernelPatches(void) {
 	}
 }
 
+#ifdef VMC
+int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize) {
+	int size = -1;
+	char path[255];
+	snprintf(path, 255, "%sVMC%s%s.bin", prefix, sep, name);
+
+	if (createSize == -1)
+		fileXioRemove(path);
+	else {
+		int fd = fileXioOpen(path, O_RDONLY, 0666);
+		if (fd >= 0) {
+			size = fileXioLseek(fd, 0, SEEK_END);
+			if (size % 1048576) // invalid size, should be a an integer (8, 16, 32, 64, ...)
+				size = 0;
+			else
+				size /= 1048576;
+
+			fileXioClose(fd);
+			if (createSize && (createSize != size))
+				fileXioRemove(path);
+		}
+
+		if (createSize && (createSize != size)) {
+			// TODO temp code, shouldn't be needed ... but it doesn't work without for the moment ...
+			sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
+
+			createVMCparam_t createParam;
+			strcpy(createParam.VMC_filename, path);
+			createParam.VMC_size_mb = createSize;
+			createParam.VMC_blocksize = 16;
+			createParam.VMC_thread_priority = 0x0f;
+			createParam.VMC_card_slot = -1;
+			fileXioDevctl("genvmc:", 0xC0DE0001, (void*) &createParam, sizeof(createParam), NULL, 0);
+		}
+	}
+	return size;
+}
+#endif

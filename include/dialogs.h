@@ -2,40 +2,59 @@
 #define __DIALOGS_H
 
 #include "include/dia.h"
+#include "include/lang.h" // to avoid overlap
 
-#define COMPAT_SAVE 100
-#define COMPAT_TEST 101
-#define COMPAT_REMOVE 102
-#define COMPAT_LOADFROMDISC 104
-#define COMPAT_MODE_BASE 10
-#define COMPAT_GAMEID 50
-#define COMPAT_MODE_COUNT 8
+#define COMPAT_MODE_COUNT		8
 
-#define UICFG_THEME 10
-#define UICFG_LANG 11
-#define UICFG_SCROLL 12
-#define UICFG_BGCOL 13
-#define UICFG_TXTCOL 14
-#define UICFG_AUTOSORT 15
-#define UICFG_COVERART 16
-#define UICFG_WIDESCREEN 17
+#define COMPAT_GAME				100
+#define COMPAT_MODE_BASE		101
+#define COMPAT_GAMEID			102
+#define COMPAT_SAVE				103
+#define COMPAT_TEST				104
+#define COMPAT_REMOVE			105
+#define COMPAT_NOEXIT 			0x70000000
+#define COMPAT_LOADFROMDISC		(106 | COMPAT_NOEXIT)
+#ifdef VMC
+#define COMPAT_VMC1_ACTION		(107 | COMPAT_NOEXIT)
+#define COMPAT_VMC2_ACTION		(108 | COMPAT_NOEXIT)
+#define COMPAT_VMC1_DEFINE		(109 | COMPAT_NOEXIT)
+#define COMPAT_VMC2_DEFINE		(110 | COMPAT_NOEXIT)
 
-#define CFG_EXITTO 30
-#define CFG_DEFDEVICE 31
-#define CFG_DEBUG 32
-#define CFG_USBMODE 33
-#define CFG_HDDMODE 34
-#define CFG_ETHMODE 35
-#define CFG_APPMODE 36
-#define CFG_CHECKUSBFRAG 37
-#define CFG_LASTPLAYED 38
-#define CFG_DANDROP 39
+#define VMC_NAME				111
+#define VMC_SIZE				112
+#define VMC_BUTTON_CREATE		113
+#define VMC_BUTTON_DELETE		114
+#define VMC_STATUS				115
+#define VMC_PROGRESS			116
+#define VMC_REFRESH				117
+#endif
 
-#define UICFG_SAVE 114
+#define UICFG_THEME				10
+#define UICFG_LANG				11
+#define UICFG_SCROLL			12
+#define UICFG_BGCOL				13
+#define UICFG_TXTCOL			14
+#define UICFG_AUTOSORT			15
+#define UICFG_COVERART			16
+#define UICFG_WIDESCREEN		17
+
+#define CFG_EXITTO				30
+#define CFG_DEFDEVICE			31
+#define CFG_DEBUG				32
+#define CFG_USBMODE				33
+#define CFG_HDDMODE				34
+#define CFG_ETHMODE				35
+#define CFG_APPMODE				36
+#define CFG_CHECKUSBFRAG		37
+#define CFG_LASTPLAYED			38
+#define CFG_DANDROP				39
 
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
 extern struct UIItem diaConfig[];
+#ifdef VMC
+extern struct UIItem diaVMC[];
+#endif
 
 #endif

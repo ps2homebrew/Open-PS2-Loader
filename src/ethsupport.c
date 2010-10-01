@@ -260,6 +260,12 @@ static void ethCleanUp(int exception) {
 	}
 }
 
+#ifdef VMC
+static int ethCheckVMC(char* name, int createSize) {
+	return sysCheckVMC(ethPrefix, "\\", name, createSize);
+}
+#endif
+
 int ethSMBConnect(void) {
 	int ret;
 	smbLogOn_in_t logon;
@@ -278,7 +284,7 @@ int ethSMBConnect(void) {
 		strncpy(logon.User, gPCUserName, 32);
 		strncpy(passwd.password, gPCPassword, 32);
 		
-		ret = fileXioDevctl("smb:", SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes));
+		ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes));
 	
 		if (ret == 0) {
 			// hash generated okay, can use
@@ -294,7 +300,7 @@ int ethSMBConnect(void) {
 		logon.PasswordType = NO_PASSWORD;
 	}
 	
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
 	if (ret < 0)
 		return -2;
 
@@ -302,7 +308,7 @@ int ethSMBConnect(void) {
 	strcpy(echo.echo, "ALIVE ECHO TEST");
 	echo.len = strlen("ALIVE ECHO TEST");
 
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
 	if (ret < 0)
 		return -3;
 
@@ -310,7 +316,7 @@ int ethSMBConnect(void) {
 	strcpy(openshare.ShareName, gPCShareName);
 	openshare.PasswordType = NO_PASSWORD;
 
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
 	if (ret < 0)
 		return -4;
 
@@ -321,12 +327,12 @@ int ethSMBDisconnect(void) {
 	int ret;
 
 	// closing share
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
 	if (ret < 0)
 		return -1;
 
 	// logoff/close tcp connection from SMB server:
-	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
 	if (ret < 0)
 		return -2;
 
@@ -340,5 +346,9 @@ static item_list_t ethGameList = {
 #else
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
 #endif
+#ifdef VMC
+		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetArt, &ethCleanUp, &ethCheckVMC, ETH_ICON
+#else
 		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetArt, &ethCleanUp, ETH_ICON
+#endif
 };

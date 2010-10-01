@@ -77,7 +77,32 @@
 #define _STR_LASTPLAYED				72
 #define _STR_ERR_FRAGMENTED				73
 #define _STR_ERR_FILE_INVALID				74
-#define LANG_STR_COUNT 75
+#define _STR_TEST					75
+#define _STR_HINT_GUEST				76
+#define _STR_HINT_MODE1				77
+#define _STR_HINT_MODE2				78
+#define _STR_HINT_MODE3				79
+#define _STR_HINT_MODE4				80
+#define _STR_HINT_MODE5				81
+#define _STR_HINT_MODE6				82
+#define _STR_HINT_MODE7				83
+#define _STR_HINT_MODE8				84
+#define _STR_HINT_MODE9				85
+#define _STR_HINT_VMC_SIZE			86
+#define _STR_CREATE					87
+#define _STR_MODIFY					88
+#define _STR_ABORT					89
+#define _STR_RESET					90
+#define _STR_USE_GENERIC			91
+#define _STR_VMC_SCREEN				92
+#define _STR_VMC_NAME				93
+#define _STR_VMC_SIZE				94
+#define _STR_VMC_STATUS				95
+#define _STR_VMC_PROGRESS			96
+#define _STR_VMC_FILE_EXISTS		97
+#define _STR_VMC_FILE_ERROR			98
+#define _STR_VMC_FILE_NEW			99
+#define LANG_STR_COUNT 100
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

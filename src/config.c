@@ -486,7 +486,7 @@ int configWriteMulti(int types) {
 void configGetVMC(char* startup, char* vmc, int mode, int slot) {
 	char *valref = NULL;
 	char gkey[255];
-	snprintf(gkey, 255, "%s_%s_%d", startup, mode, slot);
+	snprintf(gkey, 255, "%s_%d_%d", startup, mode, slot);
 	if (configGetStr(&configFiles[CONFIG_INDEX_VMC], gkey, &valref))
 		strncpy(vmc, valref, 32);
 	else
@@ -499,13 +499,13 @@ void configSetVMC(char* startup, const char* vmc, int mode, int slot) {
 		configRemoveVMC(startup, mode, slot);
 		return;
 	}
-	snprintf(gkey, 255, "%s_%s_%d", startup, mode, slot);
+	snprintf(gkey, 255, "%s_%d_%d", startup, mode, slot);
 	configSetStr(&configFiles[CONFIG_INDEX_VMC], gkey, vmc);
 }
 
 void configRemoveVMC(char *startup, int mode, int slot) {
 	char gkey[255];
-	snprintf(gkey, 255, "%s_%s_%d", startup, mode, slot);
+	snprintf(gkey, 255, "%s_%d_%d", startup, mode, slot);
 	configRemoveKey(&configFiles[CONFIG_INDEX_VMC], gkey);
 }
 #endif

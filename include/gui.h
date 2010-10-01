@@ -138,4 +138,8 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 */
 void guiRenderTextScreen(const unsigned char* message);
 
+#ifdef VMC
+int guiVmcNameHandler(char* text, int maxLen);
+#endif
+
 #endif

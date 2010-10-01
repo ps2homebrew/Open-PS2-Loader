@@ -166,5 +166,9 @@ static item_list_t appItemList = {
 #else
 		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
 #endif
+#ifdef VMC
+		&appGetArt, &appCleanUp, NULL, APP_ICON
+#else
 		&appGetArt, &appCleanUp, APP_ICON
+#endif
 };

@@ -2,6 +2,7 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
+VMC = 1
 CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
@@ -44,6 +45,12 @@ EE_CFLAGS := -O2
 endif
 ifeq ($(CHILDPROOF),1)
 EE_CFLAGS += -D__CHILDPROOF
+endif
+ifeq ($(VMC),1)
+EE_CFLAGS += -DVMC
+VMC_FLAGS = VMC=1
+else
+VMC_FLAGS = VMC=0
 endif
 
 all:

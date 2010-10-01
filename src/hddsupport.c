@@ -1,6 +1,7 @@
 #include "sys/fcntl.h"
 #include "include/usbld.h"
 #include "include/lang.h"
+#include "include/supportbase.h"
 #include "include/hddsupport.h"
 #include "include/textures.h"
 #include "include/themes.h"
@@ -266,6 +267,12 @@ static void hddCleanUp(int exception) {
 	}
 }
 
+#ifdef VMC
+static int hddCheckVMC(char* name, int createSize) {
+	return sysCheckVMC(hddPrefix, "/", name, createSize);
+}
+#endif
+
 static item_list_t hddGameList = {
 		HDD_MODE, HDL_GAME_NAME_MAX + 1, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
@@ -273,5 +280,9 @@ static item_list_t hddGameList = {
 #else
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
 #endif
+#ifdef VMC
+		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, &hddCheckVMC, HDD_ICON
+#else
 		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, HDD_ICON
+#endif
 };

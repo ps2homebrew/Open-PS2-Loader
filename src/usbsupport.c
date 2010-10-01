@@ -237,6 +237,12 @@ static void usbCleanUp(int exception) {
 	}
 }
 
+#ifdef VMC
+static int usbCheckVMC(char* name, int createSize) {
+	return sysCheckVMC(usbPrefix, "/", name, createSize);
+}
+#endif
+
 static item_list_t usbGameList = {
 		USB_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
 #ifdef __CHILDPROOF
@@ -244,5 +250,9 @@ static item_list_t usbGameList = {
 #else
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbDeleteGame, NULL,
 #endif
+#ifdef VMC
+		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, &usbCheckVMC, USB_ICON
+#else
 		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, USB_ICON
+#endif
 };

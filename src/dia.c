@@ -329,7 +329,10 @@ static const char *diaGetLocalisedText(const char* def, int id) {
 
 /// returns true if the item is controllable (e.g. a value can be changed on it)
 static int diaIsControllable(struct UIItem *ui) {
-	return (ui->type >= UI_OK);
+	if (ui->type == UI_OK) // TODO strange ...
+		return 1;
+
+	return (ui->enabled && (ui->type > UI_OK));
 }
 
 /// returns true if the given item should be preceded with nextline
@@ -342,10 +345,11 @@ static int diaShouldBreakLineAfter(struct UIItem *ui) {
 	return (ui->type == UI_SPLITTER);
 }
 
-static void diaDrawHint(const char* text) {
+static void diaDrawHint(int text_id) {
 	int w, h;
 	int x, y;
 	
+	char* text = _l(text_id);
 	fntCalcDimensions(text, &w, &h);
 	
 	x = screenWidth - w - 10;
@@ -385,10 +389,13 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 		
 		case UI_BUTTON:	
 		case UI_LABEL: {
-				// width is text lenght in pixels...
+				// width is text length in pixels...
 				const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
+				if(txt && strlen(txt))
+					*w = fntRenderString(x, y, ALIGN_NONE, txt, txtcol);
+				else
+					*w = fntRenderString(x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
 				 
-				*w = fntRenderString(x, y, ALIGN_NONE, txt, txtcol);
 				break;
 			}
 		case UI_SPLITTER: {
@@ -540,8 +547,8 @@ static void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int
 		rc++;
 	}
 
-	if ((cur != NULL) && (!haveFocus) && (cur->hint != NULL)) {
-		diaDrawHint(cur->hint);
+	if ((cur != NULL) && (!haveFocus) && (cur->hintId != -1)) {
+		diaDrawHint(cur->hintId);
 	}
 	
 	// flip display
@@ -596,8 +603,13 @@ static int diaHandleInput(struct UIItem *item) {
 		char tmp[32];
 		strncpy(tmp, item->stringvalue.text, 32);
 
-		if (diaShowKeyb(tmp, 32))
-			strncpy(item->stringvalue.text, tmp, 32);
+		if (item->stringvalue.handler) {
+			if (item->stringvalue.handler(tmp, 32))
+				strncpy(item->stringvalue.text, tmp, 32);
+		} else {
+			if (diaShowKeyb(tmp, 32))
+				strncpy(item->stringvalue.text, tmp, 32);
+		}
 
 		return 0;
 	} else if (item->type == UI_ENUM) {
@@ -744,7 +756,7 @@ static void diaRestoreScrollSpeed(void) {
 	padRestoreSettings(diaPadSettings);
 }
 
-int diaExecuteDialog(struct UIItem *ui, short inMenu) {
+int diaExecuteDialog(struct UIItem *ui, short inMenu, int (*updater)(void)) {
 	rmGetScreenExtents(&screenWidth, &screenHeight);
 	
 	struct UIItem *cur = diaGetFirstControl(ui);
@@ -816,8 +828,8 @@ int diaExecuteDialog(struct UIItem *ui, short inMenu) {
 			
 			// circle breaks focus or exits with false result
 			if (getKeyOn(KEY_CIRCLE)) {
-					diaRestoreScrollSpeed();
-					return 0;
+				diaRestoreScrollSpeed();
+				return 0;
 			}
 			
 			// see what key events we have
@@ -835,6 +847,12 @@ int diaExecuteDialog(struct UIItem *ui, short inMenu) {
 				}
 			}
 		}
+
+		if (updater) {
+			int updResult = updater();
+			if (updResult)
+				return updResult;
+		}
 	}
 }
 
@@ -849,17 +867,38 @@ static struct UIItem* diaFindByID(struct UIItem* ui, int id) {
 	return NULL;
 }
 
+void diaSetEnabled(struct UIItem* ui, int id, int enabled) {
+	struct UIItem *item = diaFindByID(ui, id);
+
+	if (!item)
+		return;
+
+	item->enabled = enabled;
+}
+
+void diaSetTextHandler(struct UIItem* ui, int id, int (*handler)(char* text, int maxLen)) {
+	struct UIItem *item = diaFindByID(ui, id);
+
+	if (!item)
+		return;
+
+	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
+		item->stringvalue.handler = handler;
+	}
+}
+
 int diaGetInt(struct UIItem* ui, int id, int *value) {
 	struct UIItem *item = diaFindByID(ui, id);
 	
 	if (!item)
 		return 0;
 	
-	if ((item->type != UI_INT) && (item->type != UI_BOOL) && (item->type != UI_ENUM))
-		return 0;
+	if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
+		*value = item->intvalue.current;
+		return 1;
+	}
 	
-	*value = item->intvalue.current;
-	return 1;
+	return 0;
 }
 
 int diaSetInt(struct UIItem* ui, int id, int value) {
@@ -868,12 +907,13 @@ int diaSetInt(struct UIItem* ui, int id, int value) {
 	if (!item)
 		return 0;
 	
-	if ((item->type != UI_INT) && (item->type != UI_BOOL) && (item->type != UI_ENUM))
-		return 0;
+	if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
+		item->intvalue.def = value;
+		item->intvalue.current = value;
+		return 1;
+	}
 	
-	item->intvalue.def = value;
-	item->intvalue.current = value;
-	return 1;
+	return 0;
 }
 
 int diaGetString(struct UIItem* ui, int id, char *value) {
@@ -882,11 +922,12 @@ int diaGetString(struct UIItem* ui, int id, char *value) {
 	if (!item)
 		return 0;
 	
-	if ((item->type != UI_STRING) && (item->type != UI_PASSWORD))
-		return 0;
-	
-	strncpy(value, item->stringvalue.text, 32);
-	return 1;
+	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
+		strncpy(value, item->stringvalue.text, 32);
+		return 1;
+	}
+
+	return 0;
 }
 
 int diaSetString(struct UIItem* ui, int id, const char *text) {
@@ -895,12 +936,13 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 	if (!item)
 		return 0;
 	
-	if ((item->type != UI_STRING) && (item->type != UI_PASSWORD))
-		return 0;
+	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
+		strncpy(item->stringvalue.def, text, 32);
+		strncpy(item->stringvalue.text, text, 32);
+		return 1;
+	}
 	
-	strncpy(item->stringvalue.def, text, 32);
-	strncpy(item->stringvalue.text, text, 32);
-	return 1;
+	return 0;
 }
 
 int diaGetColor(struct UIItem* ui, int id, unsigned char *col) {
@@ -939,11 +981,12 @@ int diaSetLabel(struct UIItem* ui, int id, const char *text) {
 	if (!item)
 		return 0;
 	
-	if (item->type != UI_LABEL)
-		return 0;
+	if ((item->type == UI_LABEL) || (item->type == UI_BUTTON)) {
+		item->label.text = text;
+		return 1;
+	}
 	
-	item->label.text = text;
-	return 1;
+	return 0;
 }
 
 int diaSetEnum(struct UIItem* ui, int id, const char **enumvals) {

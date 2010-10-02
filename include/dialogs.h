@@ -2,7 +2,6 @@
 #define __DIALOGS_H
 
 #include "include/dia.h"
-#include "include/lang.h" // to avoid overlap
 
 #define COMPAT_MODE_COUNT		8
 

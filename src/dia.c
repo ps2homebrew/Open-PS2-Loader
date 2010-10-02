@@ -756,10 +756,26 @@ static void diaRestoreScrollSpeed(void) {
 	padRestoreSettings(diaPadSettings);
 }
 
-int diaExecuteDialog(struct UIItem *ui, short inMenu, int (*updater)(void)) {
+static struct UIItem* diaFindByID(struct UIItem* ui, int id) {
+	while (ui->type != UI_TERMINATOR) {
+		if (ui->id == id)
+			return ui;
+
+		ui++;
+	}
+
+	return NULL;
+}
+
+int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(void)) {
 	rmGetScreenExtents(&screenWidth, &screenHeight);
 	
-	struct UIItem *cur = diaGetFirstControl(ui);
+	struct UIItem *cur = NULL;
+	if (uiId != -1)
+		cur = diaFindByID(ui, uiId);
+
+	if (!cur)
+		cur = diaGetFirstControl(ui);
 	
 	// what? no controllable item? Exit!
 	if (cur == ui)
@@ -854,17 +870,6 @@ int diaExecuteDialog(struct UIItem *ui, short inMenu, int (*updater)(void)) {
 				return updResult;
 		}
 	}
-}
-
-static struct UIItem* diaFindByID(struct UIItem* ui, int id) {
-	while (ui->type != UI_TERMINATOR) {
-		if (ui->id == id)
-			return ui;
-			
-		ui++;
-	}
-	
-	return NULL;
 }
 
 void diaSetEnabled(struct UIItem* ui, int id, int enabled) {

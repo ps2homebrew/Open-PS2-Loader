@@ -876,17 +876,6 @@ void diaSetEnabled(struct UIItem* ui, int id, int enabled) {
 	item->enabled = enabled;
 }
 
-void diaSetTextHandler(struct UIItem* ui, int id, int (*handler)(char* text, int maxLen)) {
-	struct UIItem *item = diaFindByID(ui, id);
-
-	if (!item)
-		return;
-
-	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
-		item->stringvalue.handler = handler;
-	}
-}
-
 int diaGetInt(struct UIItem* ui, int id, int *value) {
 	struct UIItem *item = diaFindByID(ui, id);
 	

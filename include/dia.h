@@ -73,7 +73,6 @@ struct UIItem {
 int diaExecuteDialog(struct UIItem *ui, short inMenu, int (*updater)(void));
 int diaShowKeyb(char* text, int maxLen);
 void diaSetEnabled(struct UIItem* ui, int id, int enabled);
-void diaSetTextHandler(struct UIItem* ui, int id, int (*handler)(char* text, int maxLen));
 int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
 int diaGetString(struct UIItem* ui, int id, char *value);

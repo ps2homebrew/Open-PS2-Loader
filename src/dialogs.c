@@ -71,7 +71,7 @@ struct UIItem diaIPConfig[] = {
 	
 	//  ---- Ok ----
 	{UI_SPLITTER},
-	{UI_OK},
+	{UI_OK, 0, 1, -1, {.label = {NULL, _STR_OK}}},
 	
 	// end of dialog
 	{UI_TERMINATOR}
@@ -153,7 +153,7 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, CFG_DEFDEVICE, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 
 	{UI_SPLITTER},
-	{UI_OK},
+	{UI_OK, 0, 1, -1, {.label = {NULL, _STR_OK}}},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -176,7 +176,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_TXTCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, 1, -1, {.colourvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
-	{UI_OK},
+	{UI_OK, 0, 1, -1, {.label = {NULL, _STR_OK}}},
 
 	// end of dialog
 	{UI_TERMINATOR}

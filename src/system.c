@@ -10,9 +10,6 @@
 #include "include/system.h"
 #include "include/ioman.h"
 #ifdef VMC
-#define GENVMC_STAT_AVAIL		0x00
-#define GENVMC_STAT_BUSY		0x01
-
 typedef struct {
 	char VMC_filename[1024];
 	int  VMC_size_mb;

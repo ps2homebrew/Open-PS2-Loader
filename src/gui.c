@@ -291,7 +291,7 @@ static void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
 	diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
-	int ret = diaExecuteDialog(diaConfig, 1, NULL);
+	int ret = diaExecuteDialog(diaConfig, -1, 1, NULL);
 	if (ret) {
 		diaGetInt(diaConfig, CFG_EXITTO, &gExitMode);
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
@@ -325,7 +325,7 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 
-	int ret = diaExecuteDialog(diaUIConfig, 1, NULL);
+	int ret = diaExecuteDialog(diaUIConfig, -1, 1, NULL);
 	if (ret) {
 		int themeID = -1, langID = -1;
 		diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
@@ -357,7 +357,7 @@ static void guiShowIPConfig() {
 	diaSetString(diaIPConfig, 21, gPCPassword);
 
 	// show dialog
-	if (diaExecuteDialog(diaIPConfig, 1, NULL)) {
+	if (diaExecuteDialog(diaIPConfig, -1, 1, NULL)) {
 		// Ok pressed, store values
 		for (i = 0; i < 4; ++i) {
 			diaGetInt(diaIPConfig, 2 + i, &ps2_ip[i]);
@@ -554,7 +554,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 			size = guiRefreshVMCConfig(support, vmc);
 		}
 
-		result = diaExecuteDialog(diaVMC, 0, &guiVMCUpdater);
+		result = diaExecuteDialog(diaVMC, result, 0, &guiVMCUpdater);
 
 		if ((result == 0) && (vmc_operation == OPERATION_CREATE))
 			break;
@@ -583,7 +583,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 
 	diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
 
-	int i, result;
+	int i, result = -1;
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
@@ -617,7 +617,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_USE_GENERIC));
 #endif
 
-		result = diaExecuteDialog(diaCompatConfig, 0, NULL);
+		result = diaExecuteDialog(diaCompatConfig, result, 0, NULL);
 
 		if (result == COMPAT_LOADFROMDISC) {
 			char hexDiscID[15];

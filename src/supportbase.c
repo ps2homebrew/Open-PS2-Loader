@@ -45,7 +45,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 	fio_dirent_t record;
 
 	if ((fd = fioDopen(path)) > 0) {
-		while (fioDread(fd, &record) > 0)
+		while (fioDread(fd, &record) > 0) {
 			if ((size = isValidIsoName(record.name)) > 0) {
 				struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
 				
@@ -64,6 +64,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 
 				count++;
 			}
+		}
 		fioDclose(fd);
 	}
 

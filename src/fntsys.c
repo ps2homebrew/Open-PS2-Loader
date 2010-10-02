@@ -147,16 +147,16 @@ void fntLoad(void* buffer, int bufferSize, short clean) {
 	
 	gCharHeight = 16;
 	
-	// TODO: error = FT_Set_Char_Size(face, 0, gCharHeight*64, 300, 300);
-	error = FT_Set_Pixel_Sizes( face, 
-				    0, // pixel_width 
-				    gCharHeight ); // pixel_height
-	
+	error = FT_Set_Char_Size(face, 0, gCharHeight * 16, 300, 300);
+	/*error = FT_Set_Pixel_Sizes( face,
+		0, // pixel_width
+		gCharHeight ); // pixel_height*/
+
 	if ( error ) { 
 		// just report over the ps2link
 		LOG("Freetype: Error setting font pixel size with %x!\n", error);
 		// SleepThread();
-	} 
+	}
 }
 
 /** Terminates the font rendering system */

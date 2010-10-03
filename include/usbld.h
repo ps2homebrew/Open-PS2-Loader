@@ -25,7 +25,12 @@
 #include <debug.h>
 #include "config.h"
 
+#ifdef VMC
+#include <sys/fcntl.h>
+#define USBLD_VERSION "0.7 VMC"
+#else
 #define USBLD_VERSION "0.7"
+#endif
 
 int loadConfig(int types);
 int saveConfig(int types, int showUI);

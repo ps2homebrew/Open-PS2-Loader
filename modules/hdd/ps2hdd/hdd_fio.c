@@ -637,6 +637,12 @@ int hddIoctl2(iop_file_t *f, int req, void *argp, unsigned int arglen,
 		rv=((apa_subs *)(&fileSlot->start))[*(u32 *)argp].length;	// !HACK!
 		break;
 
+	case APA_IOCTL2_GETHEADER:
+		if(atadDmaTransfer(f->unit, bufp, fileSlot->start, sizeof(apa_header)/512, ATAD_MODE_READ))
+			rv=-EIO;
+		rv=sizeof(apa_header);
+		break;
+
 	case APA_IOCTL2_SET_PART_ERROR:
 		setPartErrorSector(f->unit, fileSlot->start); rv=0;
 		break;

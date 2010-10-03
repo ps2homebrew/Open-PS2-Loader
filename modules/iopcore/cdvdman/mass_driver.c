@@ -152,6 +152,24 @@ static cbw_packet cbw_read_sector = {
 	}
 };
 
+#ifdef VMC_DRIVER
+static cbw_packet cbw_write_sector = {
+	CBW_TAG,
+	-TAG_WRITE,
+	0,
+	0x00,
+	0,
+	12,
+	{ 0x2A,		    //write operation code
+		 0, 			//LUN/DPO/FUA/Reserved/Reldr
+		 0, 0 ,0 ,0 , 		//lba
+		 0 , 			//reserved
+		 0 ,0 , 		//Transfer length MSB
+		 0 ,0 ,0 		//reserved
+	}
+};
+#endif
+
 typedef struct _csw_packet
 {
 	unsigned int signature;
@@ -197,6 +215,16 @@ static UsbDriver driver;
 //volatile int wait_for_connect = 1;
 
 static int cb_sema;
+
+#ifdef VMC_DRIVER
+static int io_sema;
+
+#define WAITIOSEMA(x) WaitSema(x)
+#define SIGNALIOSEMA(x) SignalSema(x)
+#else
+#define WAITIOSEMA(x) 
+#define SIGNALIOSEMA(x)
+#endif
 
 typedef struct _usb_callback_data
 {
@@ -602,10 +630,61 @@ inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, i
 /* size should be a multiple of sector size */
 int mass_stor_readSector(unsigned int lba, int nsectors, unsigned char* buffer)
 {
+	int ret;
+
+	WAITIOSEMA(io_sema);
+
 	mass_dev* mass_device = &g_mass_device;
 
-	return cbw_scsi_read_sector(mass_device, lba, buffer, mass_device->sectorSize, nsectors);
+	ret = cbw_scsi_read_sector(mass_device, lba, buffer, mass_device->sectorSize, nsectors);
+
+	SIGNALIOSEMA(io_sema);
+
+	return ret;
 }
+
+#ifdef VMC_DRIVER
+int cbw_scsi_write_sector(mass_dev* dev, unsigned int lba, void* buffer, int sectorSize, int sectorCount)
+{
+	register int ret;
+	cbw_packet *cbw = &cbw_write_sector;
+
+	XPRINTF("mass_driver: cbw_scsi_write_sector\n");
+
+	cbw->dataTransferLength = sectorSize * sectorCount;
+	cbw->comData[2] = (lba & 0xFF000000) >> 24;		//lba 1 (MSB)
+	cbw->comData[3] = (lba & 0xFF0000) >> 16;		//lba 2
+	cbw->comData[4] = (lba & 0xFF00) >> 8;			//lba 3
+	cbw->comData[5] = (lba & 0xFF);				//lba 4 (LSB)
+	cbw->comData[7] = (sectorCount & 0xFF00) >> 8;		//Transfer length MSB
+	cbw->comData[8] = (sectorCount & 0xFF);			//Transfer length LSB
+
+	usb_bulk_command(dev, cbw);
+
+	ret = usb_bulk_transfer(dev->bulkEpO, buffer, sectorSize * sectorCount);
+	if (ret != 0)
+		XPRINTF("mass_driver: cbw_scsi_write_sector error from usb_bulk_transfer %d\n", ret);
+
+	ret = usb_bulk_manage_status(dev, -TAG_WRITE);
+
+	return ret;
+}
+
+int mass_stor_writeSector(unsigned int lba, int nsectors, unsigned char* buffer)
+{
+	int ret;
+
+	WAITIOSEMA(io_sema);
+
+	mass_dev* mass_device = &g_mass_device;
+
+	ret = cbw_scsi_write_sector(mass_device, lba, buffer, mass_device->sectorSize, nsectors);
+
+	SIGNALIOSEMA(io_sema);
+
+	return ret;
+}
+#endif
 
 /* test that endpoint is bulk endpoint and if so, update device info */
 static void usb_bulk_probeEndpoint(int devId, mass_dev* dev, UsbEndpointDescriptor* endpoint)
@@ -898,6 +977,14 @@ int mass_stor_init(void)
 	smp.option = 0;
 	smp.attr = 0;
 	cb_sema = CreateSema(&smp);
+
+#ifdef VMC_DRIVER
+	smp.initial = 1;
+	smp.max = 1;
+	smp.option = 0;
+	smp.attr = 1;
+	io_sema = CreateSema(&smp);
+#endif
 
 	driver.next 		= NULL;
 	driver.prev		= NULL;

@@ -25,6 +25,11 @@ int size_cdvdfsv_irx;
 void *cddev_irx;
 int size_cddev_irx;
 
+#ifdef VMC
+void *mcemu_irx;
+int size_mcemu_irx;
+#endif
+
 void *usbd_irx;
 int size_usbd_irx;
 
@@ -138,7 +143,11 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 	return 0;
 }
 
+#ifdef VMC
+#define IRX_NUM 11
+#else
 #define IRX_NUM 10
+#endif
 
 //-------------------------------------------------------------- 
 void GetIrxKernelRAM(void) // load needed modules from the kernel ram
@@ -162,10 +171,13 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	size_cdvdfsv_irx = irxptr_tab[n++].irxsize;
 	size_cddev_irx = irxptr_tab[n++].irxsize;
 	size_usbd_irx = irxptr_tab[n++].irxsize;
-	size_smstcpip_irx = irxptr_tab[n++].irxsize;
 	size_smsmap_irx = irxptr_tab[n++].irxsize;
 	size_udptty_irx = irxptr_tab[n++].irxsize;
 	size_ioptrap_irx = irxptr_tab[n++].irxsize;
+	size_smstcpip_irx = irxptr_tab[n++].irxsize;
+#ifdef VMC
+	size_mcemu_irx = irxptr_tab[n++].irxsize;
+#endif		
 
 	n = 0;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
@@ -174,10 +186,13 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	cdvdfsv_irx = (void *)irxptr_tab[n++].irxaddr;
 	cddev_irx = (void *)irxptr_tab[n++].irxaddr;
 	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
-	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
 	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
 	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
 	ioptrap_irx = (void *)irxptr_tab[n++].irxaddr;
+	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
+#ifdef VMC
+	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
+#endif
 }	
 
 // ------------------------------------------------------------------------

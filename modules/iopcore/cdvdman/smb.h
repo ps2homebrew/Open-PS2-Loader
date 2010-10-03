@@ -276,7 +276,9 @@ int rawTCP_GetSessionHeader(void); 	// Read Session Service header
 
 int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password); // process a Negociate Procotol message
 int smb_SessionSetupTreeConnect(char *share_name); 			// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
-int smb_OpenAndX(char *filename, u16 *FID); 				// process a Open AndX message
+int smb_OpenAndX(char *filename, u16 *FID, int Write); 					// process a Open AndX message
+int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes);
+int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes);
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
 int smb_Disconnect(void);
 

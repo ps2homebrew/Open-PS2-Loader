@@ -2,7 +2,7 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
-VMC = 1
+VMC = 0
 CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
@@ -25,6 +25,10 @@ LOADER_OBJS = obj/loader.o \
 		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o \
 		obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o
 
+ifeq ($(VMC),1)
+LOADER_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
+endif
+
 EE_BIN = opl.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
@@ -46,6 +50,13 @@ endif
 ifeq ($(CHILDPROOF),1)
 EE_CFLAGS += -D__CHILDPROOF
 endif
+ifeq ($(VMC),1)
+EE_CFLAGS += -DVMC
+VMC_FLAGS = VMC=1
+else
+VMC_FLAGS = VMC=0
+endif
+
 ifeq ($(VMC),1)
 EE_CFLAGS += -DVMC
 VMC_FLAGS = VMC=1
@@ -134,6 +145,14 @@ clean:
 	$(MAKE) -C modules/hdd/atad clean
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/hdd/ps2hdd clean
+ifeq ($(VMC),1)
+	echo "    * ps2fs.irx"
+	$(MAKE) -C modules/ps2fs clean
+	echo "    * mcemu.irx"
+	$(MAKE) -C modules/mcemu -f Makefile.usb clean
+	$(MAKE) -C modules/mcemu -f Makefile.hdd clean
+	$(MAKE) -C modules/mcemu -f Makefile.smb clean
+endif
 	echo "    * genvmc.irx"
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo "    * hdldsvr.irx"
@@ -161,15 +180,15 @@ loader.s:
 	echo "    * Loader"
 	$(MAKE) -C loader clean
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader
 else
 ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) EESIO_DEBUG=1 -C loader
+	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C loader
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader
 else
-	$(MAKE) -C loader
+	$(MAKE) $(VMC_FLAGS) -C loader
 endif
 endif
 endif
@@ -179,15 +198,15 @@ alt_loader.s:
 	echo "    * alternative Loader"
 	$(MAKE) -C loader clean
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
 else
 ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) EESIO_DEBUG=1 -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C loader -f Makefile.alt
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
 else
-	$(MAKE) -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) -C loader -f Makefile.alt
 endif
 endif
 endif
@@ -217,12 +236,12 @@ eesync.s:
 usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
+	$(MAKE) $(VMC_FLAGS) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 else
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 endif
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
@@ -230,12 +249,12 @@ endif
 usb_4Ksectors_cdvdman.s:
 	echo "    * usb_4Ksectors_cdvdman.irx"
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
+	$(MAKE) $(VMC_FLAGS) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 else
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 endif
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
@@ -243,36 +262,36 @@ endif
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb rebuild
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 else
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
 
 smb_pcmcia_cdvdman.s:
 	echo "    * smb_pcmcia_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
 else
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/smb_pcmcia_cdvdman.s smb_pcmcia_cdvdman_irx
 
 hdd_cdvdman.s:
 	echo "    * hdd_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 else
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
 
 hdd_pcmcia_cdvdman.s:
 	echo "    * hdd_pcmcia_cdvdman.irx"
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
 else
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_pcmcia_cdvdman.s hdd_pcmcia_cdvdman_irx
 
@@ -285,6 +304,33 @@ cddev.s:
 	echo "    * cddev.irx"
 	$(MAKE) -C modules/iopcore/cddev
 	bin2s modules/iopcore/cddev/cddev.irx asm/cddev.s cddev_irx
+
+usb_mcemu.s:
+	echo "    * usb_mcemu.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/mcemu -f Makefile.usb rebuild
+else
+	$(MAKE) -C modules/mcemu -f Makefile.usb rebuild
+endif
+	bin2s modules/mcemu/mcemu.irx asm/usb_mcemu.s usb_mcemu_irx
+
+hdd_mcemu.s:
+	echo "    * hdd_mcemu.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/mcemu -f Makefile.hdd rebuild
+else
+	$(MAKE) -C modules/mcemu -f Makefile.hdd rebuild
+endif
+	bin2s modules/mcemu/mcemu.irx asm/hdd_mcemu.s hdd_mcemu_irx
+
+smb_mcemu.s:
+	echo "    * smb_mcemu.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) IOPCORE_DEBUG=1 -C modules/mcemu -f Makefile.smb rebuild
+else
+	$(MAKE) -C modules/mcemu -f Makefile.smb rebuild
+endif
+	bin2s modules/mcemu/mcemu.irx asm/smb_mcemu.s smb_mcemu_irx
 
 usbd_ps2.s:
 	bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd_ps2.s usbd_ps2_irx
@@ -383,15 +429,16 @@ ps2link.s:
 	$(MAKE) -C modules/debug/ps2link
 	bin2s modules/debug/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
 
+ps2fs.s:
+	echo "    * ps2fs.irx"
+	$(MAKE) -C modules/ps2fs
+	bin2s modules/ps2fs/ps2fs.irx asm/ps2fs.s ps2fs_irx
+
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx
 
 filexio.s:
 	bin2s $(PS2SDK)/iop/irx/fileXio.irx asm/filexio.s filexio_irx
-
-ps2fs.s:
-	bin2s $(PS2SDK)/iop/irx/ps2fs.irx asm/ps2fs.s ps2fs_irx 
-
 
 load0.s:
 	bin2s gfx/load0.png asm/load0.s load0_png

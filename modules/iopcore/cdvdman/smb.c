@@ -2,7 +2,7 @@
   Copyright 2009, jimmikaelkael
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-*/
+   */
 
 #include <stdio.h>
 #include <sysclib.h>
@@ -13,6 +13,20 @@
 
 #include "smsutils.h"
 #include "smb.h"
+
+#ifdef VMC_DRIVER
+#include <thsemap.h>
+
+static int io_sema = -1;
+
+#define WAITIOSEMA(x) WaitSema(x)
+#define SIGNALIOSEMA(x) SignalSema(x)
+#define SMBWRITE 1
+#else
+#define WAITIOSEMA(x) 
+#define SIGNALIOSEMA(x)
+#define SMBWRITE 0
+#endif
 
 #define DMA_ADDR 		0x000cff00
 #define	UNCACHEDSEG(vaddr)	(0x20000000 | vaddr)
@@ -179,6 +193,24 @@ struct ReadAndXResponse_t {
 	u16	ByteCount;		// 61
 } __attribute__((packed));
 
+struct WriteAndXRequest_t {             // size = 63
+        struct SMBHeader_t smbH;        // 0
+        u8      smbWordcount;           // 36
+        u8      smbAndxCmd;             // 37
+        u8      smbAndxReserved;        // 38
+        u16     smbAndxOffset;          // 39
+        u16     FID;                    // 41
+        u32     OffsetLow;              // 43
+        u32     Reserved;               // 47
+        u16     WriteMode;              // 51
+        u16     Remaining;              // 53
+        u16     DataLengthHigh;         // 55
+        u16     DataLengthLow;          // 57
+        u16     DataOffset;             // 59
+        u32     OffsetHigh;             // 61
+        u16     ByteCount;              // 65
+} __attribute__((packed));
+
 typedef struct {
 	u32	MaxBufferSize;
 	u32	MaxMpxCount;
@@ -214,6 +246,19 @@ struct ReadAndXRequest_t smb_Read_Request = {
 	SMB_COM_NONE,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
+
+#ifdef VMC_DRIVER
+struct WriteAndXRequest_t smb_Write_Request = {
+	{	0,
+		SMB_MAGIC,
+		SMB_COM_WRITE_ANDX,
+		0, 0, 0, 0, "\0", 0, 0, 0, 0
+	},
+	12, 
+	SMB_COM_NONE,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+#endif
 
 static u16 UID, TID;
 static int main_socket;
@@ -308,7 +353,15 @@ int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, 
 	struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
 	register int length;
 	struct in_addr dst_addr;
+#ifdef VMC_DRIVER
+	iop_sema_t smp;
 
+	smp.initial = 1;
+	smp.max = 1;
+	smp.option = 0;
+	smp.attr = 1;
+	io_sema = CreateSema(&smp);
+#endif
 	dst_addr.s_addr = pinet_addr(SMBServerIP);
 
 	// Opening TCP session
@@ -521,10 +574,12 @@ lbl_sstc:
 }
 
 //-------------------------------------------------------------------------
-int smb_OpenAndX(char *filename, u16 *FID)
+int smb_OpenAndX(char *filename, u16 *FID, int Write)
 {
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
 	register int length;
+
+	WAITIOSEMA(io_sema);
 
 	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -536,7 +591,8 @@ int smb_OpenAndX(char *filename, u16 *FID)
 	OR->smbH.TID = TID;
 	OR->smbWordcount = 15;
 	OR->smbAndxCmd = SMB_COM_NONE;	// no ANDX command
-	OR->FileAttributes = EXT_ATTR_READONLY;
+	OR->AccessMask = (Write && (SMBWRITE)) ? 2 : 0;
+	OR->FileAttributes = (Write && (SMBWRITE)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
 	OR->CreateOptions = 1;
 	length = strlen(filename);
 	OR->ByteCount = length+1;
@@ -557,31 +613,100 @@ int smb_OpenAndX(char *filename, u16 *FID)
 
 	*FID = ORsp->FID;
 
-	// Prepare header of Read Request by advance
+	// Prepare header of Read/Write Request by advance
 	smb_Read_Request.smbH.UID = UID;
 	smb_Read_Request.smbH.TID = TID;
 
-	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
+#ifdef VMC_DRIVER
+	smb_Write_Request.smbH.UID = UID;
+	smb_Write_Request.smbH.TID = TID;
+#endif
 
-	mips_memcpy(RR, &smb_Read_Request.smbH.sessionHeader, sizeof(struct ReadAndXRequest_t));
+	SIGNALIOSEMA(io_sema);
 
 	return 1;
 }
 
 //-------------------------------------------------------------------------
-int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
+int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes)
 {	
-	register u32 sectors, offset, nbytes;
-	register u16 FID;
 	register int rcv_size, pkt_size;
-	u8 *p = (u8 *)buf;
 
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
 	struct ReadAndXResponse_t *RRsp = (struct ReadAndXResponse_t *)SMB_buf;
 
-	FID = (u16)p_part_start[part_num];
+	WAITIOSEMA(io_sema);
+
+	mips_memcpy(RR, &smb_Read_Request.smbH.sessionHeader, sizeof(struct ReadAndXRequest_t));
+
+	RR->smbH.sessionHeader = 0x3b000000;
+	RR->smbH.Flags = 0;
+	RR->FID = FID;
+	RR->OffsetLow = offsetlow;
+	RR->OffsetHigh = offsethigh;
+	RR->MaxCountLow = nbytes;
+	RR->MinCount = 0;
+	RR->ByteCount = 0;
+
+	plwip_send(main_socket, SMB_buf, 63, 0);
+receive:
+	rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
+
+	if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
+		goto receive;
+
+	// Handle fragmented packets
+	while (rcv_size < (rawTCP_GetSessionHeader() + 4)) {
+		pkt_size = plwip_recv(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf), 0); // - rcv_size
+		rcv_size += pkt_size;
+	}
+
+	mips_memcpy(readbuf, &SMB_buf[4 + RRsp->DataOffset], nbytes);
+
+	SIGNALIOSEMA(io_sema);
+
+	return 1;
+}
+
+#ifdef VMC_DRIVER
+//-------------------------------------------------------------------------
+int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes)
+{	
+	struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
+
+	WAITIOSEMA(io_sema);
+
+	mips_memcpy(WR, &smb_Write_Request.smbH.sessionHeader, sizeof(struct WriteAndXRequest_t));
+
+	WR->smbH.Flags = 0;
+	WR->FID = FID;
+	WR->WriteMode = 0x1;
+	WR->OffsetLow = offsetlow;
+	WR->OffsetHigh = offsethigh;
+	WR->Remaining = nbytes;
+	WR->DataLengthLow = nbytes;
+	WR->DataOffset = 0x3b;
+	WR->ByteCount = nbytes;
+
+	mips_memcpy((void *)(&SMB_buf[4 + WR->DataOffset]), writebuf, nbytes);
+
+	rawTCP_SetSessionHeader(59+nbytes);
+	GetSMBServerReply();
+
+	SIGNALIOSEMA(io_sema);
+
+	return 1;
+}
+#endif
+
+//-------------------------------------------------------------------------
+int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
+{	
+	register u32 sectors, offset, nbytes;
+	u8 *p = (u8 *)buf;
+
 	offset = lsn;
-		
+
 	while (nsectors > 0) {
 		sectors = nsectors;
 		if (sectors > MAX_SMB_SECTORS)
@@ -589,29 +714,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 
 		nbytes = sectors << 11;	
 
-		RR->smbH.sessionHeader = 0x3b000000;
-		RR->smbH.Flags = 0;
-		RR->FID = FID;
-		RR->OffsetLow = offset << 11;
-		RR->OffsetHigh = offset >> 21;
-		RR->MaxCountLow = nbytes;
-		RR->MinCount = 0;
-		RR->ByteCount = 0;
-
-		plwip_send(main_socket, SMB_buf, 63, 0);
-receive:
-		rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
-
-		if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
-			goto receive;
-
-		// Handle fragmented packets
-		while (rcv_size < (rawTCP_GetSessionHeader() + 4)) {
-			pkt_size = plwip_recv(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf), 0); // - rcv_size
-			rcv_size += pkt_size;
-		}
-
-		mips_memcpy(p, &SMB_buf[4 + RRsp->DataOffset], nbytes);
+ 		smb_ReadFile((u16)p_part_start[part_num], offset << 11, offset >> 21, p, nbytes);
 
 		p += nbytes;
 		offset += sectors;

@@ -205,8 +205,8 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 				}
 			} // else	Partition too big (10Gb Max)
 		}
+		fileXioClose(fd);
 	}
-	fileXioClose(fd);
 
 	for(i=0; i<2; i++) {
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
@@ -257,8 +257,8 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 					}
 				}
 			}
+			fileXioClose(fd);
 		}
-		fileXioClose(fd);
 		for (j=0; j<size_hdd_mcemu_irx; j++) {
 			if (((u32*)&hdd_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
 				if(hdd_vmc_infos.active) size_mcemu_irx = size_hdd_mcemu_irx;

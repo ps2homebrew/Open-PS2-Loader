@@ -228,8 +228,8 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 					fioDclose(fd1);
 				}
 			}
+			fioClose(fd);
 		}
-		fioClose(fd);
 		for (j=0; j<size_usb_mcemu_irx; j++) {
 			if (((u32*)&usb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
 				if(usb_vmc_infos.active) size_mcemu_irx = size_usb_mcemu_irx;

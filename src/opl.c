@@ -116,11 +116,11 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 			if (id >= 0) {
 				int result = support->itemLaunch(id);
 				if (result == ERROR_FRAGMENTED)
-					guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0);
+					guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
 				else if (result == ERROR_FILE_INVALID)
-					guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0);
+					guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 				else if (result == ERROR_ETH_INIT)
-					guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0);
+					guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
 			}
 		}
 		else { 
@@ -130,7 +130,7 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 		}
 	}
 	else
-		guiMsgBox("NULL Support object. Please report", 0);
+		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
 static void itemExecTriangle(struct menu_item_t *self, int id) {
@@ -146,7 +146,7 @@ static void itemExecTriangle(struct menu_item_t *self, int id) {
 		}
 	}
 	else
-		guiMsgBox("NULL Support object. Please report", 0);
+		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
 static void itemExecSquare(struct menu_item_t *self, int id) {
@@ -160,14 +160,14 @@ static void itemExecSquare(struct menu_item_t *self, int id) {
 
 	if (support) {
 		if (support->itemDelete) {
-			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1)) {
+			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
 				support->itemDelete(id);
 				gFrameCounter = UPDATE_FRAME_COUNT;
 			}
 		}
 	}
 	else
-		guiMsgBox("NULL Support object. Please report", 0);
+		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
 static void itemExecCircle(struct menu_item_t *self, int id) {
@@ -190,7 +190,7 @@ static void itemExecCircle(struct menu_item_t *self, int id) {
 		}
 	}
 	else
-		guiMsgBox("NULL Support object. Please report", 0);
+		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
 static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
@@ -431,9 +431,9 @@ int saveConfig(int types, int showUI) {
 	
 	if (showUI) {
 		if (lscret)
-			guiMsgBox(_l(_STR_SETTINGS_SAVED), 0);
+			guiMsgBox(_l(_STR_SETTINGS_SAVED), 0, NULL);
 		else
-			guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0);
+			guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0, NULL);
 	}
 	
 	return lscret;

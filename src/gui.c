@@ -421,10 +421,10 @@ int guiVmcNameHandler(char* text, int maxLen) {
 static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 	int size = support->itemCheckVMC(name, 0);
 
+
 	if (size != -1) {
-		diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 1);
+		diaVMC[22].type = UI_SPLITTER;
 		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
-		diaSetLabel(diaVMC, VMC_BUTTON_DELETE, _l(_STR_DELETE));
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
 
 		if (size == 8)
@@ -441,11 +441,17 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 		}
 	}
 	else {
-		diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 0);
+		diaVMC[22].type = UI_TERMINATOR;
 		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_CREATE));
-		diaSetLabel(diaVMC, VMC_BUTTON_DELETE, " ");
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_NEW));
 		diaSetInt(diaVMC, VMC_SIZE, 0);
+	}
+
+	if (gEnableDandR)
+		diaSetEnabled(diaVMC, VMC_SIZE, 1);
+	else {
+		diaSetEnabled(diaVMC, VMC_SIZE, 0);
+		diaVMC[22].type = UI_TERMINATOR;
 	}
 
 	return size;

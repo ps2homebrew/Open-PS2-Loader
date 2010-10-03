@@ -26,7 +26,7 @@
 #define APA_IOCTL2_GETSIZE				0x00006833	// for main(0)/subs(1+)
 #define APA_IOCTL2_SET_PART_ERROR		0x00006834	// set(sector of a apa header) that has a error :)
 #define APA_IOCTL2_GET_PART_ERROR		0x00006835	// get(sector of a apa header) that has a error
-
+#define APA_IOCTL2_GETHEADER			0x00006836	// get apa header
 
 // structs for IOCTL2 commands
 typedef struct

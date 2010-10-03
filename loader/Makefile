@@ -22,6 +22,9 @@ endif
 ifeq ($(LOAD_DEBUG_MODULES),1)
 EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 endif
+ifeq ($(VMC),1)
+EE_CFLAGS += -DVMC
+endif
 
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
 EE_LIBS += -lpatches

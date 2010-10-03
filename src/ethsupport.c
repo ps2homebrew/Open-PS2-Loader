@@ -29,6 +29,11 @@ extern int size_smsmap_irx;
 extern void *smbman_irx;
 extern int size_smbman_irx;
 
+#ifdef VMC
+extern void *smb_mcemu_irx;
+extern int size_smb_mcemu_irx;
+#endif
+
 static char *ethPrefix = NULL;
 static int ethULSizePrev = 0;
 static unsigned char ethModifiedCDPrev[8];
@@ -192,6 +197,73 @@ static void ethSetGameCompatibility(int id, int compatMode, int dmaMode) {
 	configSetCompatibility(ethGames[id].startup, ethGameList.mode, compatMode, -1);
 }
 
+#ifdef VMC
+static int ethPrepareMcemu(base_game_info_t* game) {
+	char vmc[2][32];
+	int i, j, fd, size_mcemu_irx = 0;
+	smb_vmc_infos_t smb_vmc_infos;
+	vmc_superblock_t vmc_superblock;
+	char vmc_path[64];
+	u32 vmc_size;
+
+	configGetVMC(game->startup, vmc[0], ETH_MODE, 0);
+	configSetVMC(game->startup, vmc[1], ETH_MODE, 1);
+	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
+
+	for(i=0; i<2; i++) {
+		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
+		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
+
+		snprintf(vmc_path, 64, "%s\\VMC\\%s.bin", ethPrefix, vmc[i]);
+
+		fd = fioOpen(vmc_path, O_RDONLY);
+
+		if (fd >= 0) {
+			LOG("%s open\n", vmc_path);
+
+			vmc_size = fioLseek(fd, 0, SEEK_END);
+			fioLseek(fd, 0, SEEK_SET);
+			fioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
+
+			LOG("file size : 0x%X\n", vmc_size);
+			LOG("Magic     : %s\n", vmc_superblock.magic);
+			LOG("Card type : %d\n", vmc_superblock.mc_type);
+
+			if(!strncmp(vmc_superblock.magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock.mc_type == 0x2) {
+				smb_vmc_infos.flags            = vmc_superblock.mc_flag & 0xFF;
+				smb_vmc_infos.flags           |= 0x100;
+				smb_vmc_infos.specs.page_size  = vmc_superblock.page_size;                                       
+				smb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;                                 
+				smb_vmc_infos.specs.card_size  = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
+
+				LOG("flags            : 0x%X\n", smb_vmc_infos.flags           );
+				LOG("specs.page_size  : 0x%X\n", smb_vmc_infos.specs.page_size );
+				LOG("specs.block_size : 0x%X\n", smb_vmc_infos.specs.block_size);
+				LOG("specs.card_size  : 0x%X\n", smb_vmc_infos.specs.card_size );
+
+				if(vmc_size == smb_vmc_infos.specs.card_size * smb_vmc_infos.specs.page_size) {
+					smb_vmc_infos.active = 1;
+					smb_vmc_infos.fid    = 0xFFFF;
+					snprintf(vmc_path, 64, "VMC\\%s.bin", vmc[i]);
+					strncpy(smb_vmc_infos.fname, vmc_path, 32);
+
+					LOG("%s is a valid Vmc file\n", smb_vmc_infos.fname );
+				}
+			}
+		}
+		fioClose(fd);
+		for (j=0; j<size_smb_mcemu_irx; j++) {
+			if (((u32*)&smb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
+				if(smb_vmc_infos.active) size_mcemu_irx = size_smb_mcemu_irx;
+				memcpy(&((u32*)&smb_mcemu_irx)[j], &smb_vmc_infos, sizeof(smb_vmc_infos_t));
+				break;
+			}
+		}
+	}
+	return size_mcemu_irx;
+}
+#endif
+
 static int ethLaunchGame(int id) {
 	if (gNetworkStartup != 0)
 		return ERROR_ETH_INIT;
@@ -227,6 +299,12 @@ static int ethLaunchGame(int id) {
 		}
 	}
 
+#ifdef VMC
+	int size_mcemu_irx = ethPrepareMcemu(game);
+#endif
+	// disconnect from the active SMB session
+	ethSMBDisconnect();
+
 	char config_str[255];
 	sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	memcpy((void*)((u32)irx + i), config_str, strlen(config_str) + 1);
@@ -241,7 +319,11 @@ static int ethLaunchGame(int id) {
 	ethSMBDisconnect();
 	FlushCache(0);
 
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
+#ifdef VMC
+	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, size_mcemu_irx, &smb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
+#else
+	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
+#endif
 
 	return 1;
 }

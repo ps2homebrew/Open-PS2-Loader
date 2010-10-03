@@ -52,6 +52,20 @@ extern int lba_48bit;
 
 static int ata_evflg = -1;
 
+#ifdef VMC_DRIVER
+#include <thsemap.h>
+
+static int io_sema = -1;
+
+#define WAITIOSEMA(x) WaitSema(x)
+#define SIGNALIOSEMA(x) SignalSema(x)
+#define ATAWRITE 1
+#else
+#define WAITIOSEMA(x) 
+#define SIGNALIOSEMA(x)
+#define ATAWRITE 0
+#endif
+
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
 
@@ -62,7 +76,7 @@ typedef struct _ata_cmd_info {
 } ata_cmd_info_t;
 
 static ata_cmd_info_t ata_cmd_table[] = {
-	{0xc8, 0x04}, {0xec, 0x02}, {0xa1, 0x02}, {0xb0, 0x07}, {0xef, 0x01}, {0x25, 0x04}, {0xca, 0x04}, {0xe3, 0x01}
+	{0xc8, 0x04}, {0xec, 0x02}, {0xa1, 0x02}, {0xb0, 0x07}, {0xef, 0x01}, {0x25, 0x04}, {0xca, 0x04}, {0xe3, 0x01}, {0x35, 0x04}
 };
 #define ATA_CMD_TABLE_SIZE	(sizeof ata_cmd_table/sizeof(ata_cmd_info_t))
 
@@ -109,6 +123,15 @@ int atad_start(void)
 
 	dev9RegisterIntrCb(1, ata_intr_cb);
 	dev9RegisterIntrCb(0, ata_intr_cb);
+
+#ifdef VMC_DRIVER
+	iop_sema_t smp;
+	smp.initial = 1;
+	smp.max = 1;
+	smp.option = 0;
+	smp.attr = 1;
+	io_sema = CreateSema(&smp);
+#endif
 
 	res = 0;
 	M_PRINTF("Driver loaded.\n");
@@ -261,7 +284,11 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector,
 			using_timeout = 1;
 			break;
 		case 4:
+#ifdef VMC_DRIVER
+			atad_cmd_state.dir = ((command != 0xc8) && (command != 0x25));
+#else
 			atad_cmd_state.dir = ATA_DIR_READ;
+#endif
 			using_timeout = 1;
 	}
 
@@ -486,6 +513,8 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 	u32 nbytes;
 	u16 sector, lcyl, hcyl, select, command, len;
 
+	WAITIOSEMA(io_sema);
+
 	while (nsectors) {
 		len = (nsectors > 256) ? 256 : nsectors;
 
@@ -501,26 +530,32 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 			sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | 0x40) & 0xffff;
-			command = ATA_C_READ_DMA_EXT;
+			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;
 		} else {
 			/* Setup for 28-bit LBA.  */
 			sector = lba & 0xff;
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
-			command = ATA_C_READ_DMA;
+			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_DMA : ATA_C_READ_DMA;
 		}
 
 		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
-					hcyl, select, command)) != 0)
+					hcyl, select, command)) != 0) {
+			SIGNALIOSEMA(io_sema);
 			return res;
-		if ((res = ata_io_finish()) != 0)
+		}
+		if ((res = ata_io_finish()) != 0) {
+			SIGNALIOSEMA(io_sema);
 			return res;
+		}
 
 		nbytes = len * 512;
 		(u8 *)buf += nbytes;
 		lba += len;
 		nsectors -= len;
 	}
+
+	SIGNALIOSEMA(io_sema);
 
 	return res;
 }

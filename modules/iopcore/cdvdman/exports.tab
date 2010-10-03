@@ -230,3 +230,26 @@ DECLARE_EXPORT_TABLE(smsutils, 1, 1)
 	DECLARE_EXPORT(mips_memcpy)
 	DECLARE_EXPORT(mips_memset)
 END_EXPORT_TABLE
+
+#ifdef VMC_DRIVER
+// opl io utils export table
+DECLARE_EXPORT_TABLE(oplutils, 1, 1)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(getModInfo)
+#ifdef USB_DRIVER
+	DECLARE_EXPORT(mass_stor_readSector)
+	DECLARE_EXPORT(mass_stor_writeSector)
+#endif
+#ifdef HDD_DRIVER
+	DECLARE_EXPORT(ata_device_dma_transfer)
+#endif
+#ifdef SMB_DRIVER
+	DECLARE_EXPORT(smb_OpenAndX)
+	DECLARE_EXPORT(smb_ReadFile)
+	DECLARE_EXPORT(smb_WriteFile)
+#endif
+END_EXPORT_TABLE
+#endif

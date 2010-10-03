@@ -16,6 +16,11 @@ extern int size_imgdrv_irx;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
+#ifdef VMC
+extern void *mcemu_irx;
+extern int size_mcemu_irx;
+#endif
+
 extern void *cdvdman_irx;
 extern int size_cdvdman_irx;
 
@@ -294,6 +299,12 @@ int New_Reset_Iop(const char *arg, int flag)
 		LoadIRXfromKernel(ioptrap_irx, size_ioptrap_irx, 0, NULL);
 #endif
 	}
+
+#ifdef VMC 
+	if ((iop_reboot_count >= 2) && size_mcemu_irx) {
+		LoadIRXfromKernel(mcemu_irx, size_mcemu_irx, 0, NULL);
+	}
+#endif
 
 	FlushCache(0);	
 

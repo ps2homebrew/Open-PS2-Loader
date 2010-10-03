@@ -412,9 +412,17 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 	*size_irx = size_cdvdfsv_irx;
 }
 
+#ifdef VMC
+#define IRX_NUM 11
+#else
 #define IRX_NUM 10
-
+#endif
+  
+#ifdef VMC
+static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
+#else
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
+#endif
 	void *irxtab = (void *)0x80030010;
 	void *irxptr = (void *)0x80030100;
 	irxptr_t irxptr_tab[IRX_NUM];
@@ -429,10 +437,13 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_cdvdfsv_irx;
 	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
-	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
 	irxptr_tab[n++].irxsize = size_smsmap_irx;
 	irxptr_tab[n++].irxsize = size_udptty_irx;
 	irxptr_tab[n++].irxsize = size_ioptrap_irx;
+	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
+#ifdef VMC
+	irxptr_tab[n++].irxsize = size_mcemu_irx;
+#endif
 
 	n = 0;
 	irxsrc[n++] = (void *)&imgdrv_irx;
@@ -441,10 +452,13 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = (void *)&cdvdfsv_irx;
 	irxsrc[n++] = (void *)&cddev_irx;
 	irxsrc[n++] = (void *)usbd_irx;
-	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
 	irxsrc[n++] = (void *)&smsmap_irx;
 	irxsrc[n++] = (void *)&udptty_irx;
 	irxsrc[n++] = (void *)&ioptrap_irx;
+	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
+#ifdef VMC
+	irxsrc[n++] = (void *)mcemu_irx; 
+#endif
 
 	irxsize = 0;
 
@@ -460,6 +474,12 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 		irxptr_tab[i].irxaddr = irxptr;
 
 		if (curIrxSize > 0) {
+			ee_kmode_exit();
+			EIntr();
+			LOG("irx addr start: %08x end: %08x\n", (int)irxptr_tab[i].irxaddr, (int)(irxptr_tab[i].irxaddr+curIrxSize));
+			DIntr();
+			ee_kmode_enter();
+
 			memcpy((void *)irxptr_tab[i].irxaddr, (void *)irxsrc[i], curIrxSize);
 
 			irxptr += curIrxSize;
@@ -483,7 +503,11 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	EELOAD_patch2();
 }
 
+#ifdef VMC
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int compatflags, int alt_ee_core) {
+#else
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int compatflags, int alt_ee_core) {
+#endif
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
 	elf_pheader_t *eph;
@@ -495,7 +519,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	sysSetIPConfig(ipconfig); // TODO only needed for ETH mode, and already done in ethsupport.ethLoadModules
 
+#ifdef VMC
+	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
+#else
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx);
+#endif
 
 	// NB: LOADER.ELF is embedded
 	if (alt_ee_core)

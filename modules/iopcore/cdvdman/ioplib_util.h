@@ -12,7 +12,7 @@ typedef struct {
 	void **exports;
 } modinfo_t;
 
-void getModInfo(u8 *modname, modinfo_t *info);
+int getModInfo(u8 *modname, modinfo_t *info);
 void hookMODLOAD(void);
 
 #endif /* IOPLIB_UTIL_H */

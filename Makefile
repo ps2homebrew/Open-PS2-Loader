@@ -2,7 +2,7 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
-VMC = 1
+VMC = 0
 CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12

@@ -216,14 +216,13 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 
 		snprintf(vmc_path, 64, "%s\\VMC\\%s.bin", ethPrefix, vmc[i]);
 
-		fd = fioOpen(vmc_path, O_RDONLY);
-
+		fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
 		if (fd >= 0) {
 			LOG("%s open\n", vmc_path);
 
-			vmc_size = fioLseek(fd, 0, SEEK_END);
-			fioLseek(fd, 0, SEEK_SET);
-			fioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
+			vmc_size = fileXioLseek(fd, 0, SEEK_END);
+			fileXioLseek(fd, 0, SEEK_SET);
+			fileXioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
 
 			LOG("file size : 0x%X\n", vmc_size);
 			LOG("Magic     : %s\n", vmc_superblock.magic);
@@ -250,8 +249,8 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 					LOG("%s is a valid Vmc file\n", smb_vmc_infos.fname );
 				}
 			}
+			fileXioClose(fd);
 		}
-		fioClose(fd);
 		for (j=0; j<size_smb_mcemu_irx; j++) {
 			if (((u32*)&smb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
 				if(smb_vmc_infos.active) size_mcemu_irx = size_smb_mcemu_irx;

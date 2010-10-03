@@ -499,7 +499,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 	diaSetEnabled(diaVMC, VMC_SIZE, 1);
 	diaSetInt(diaVMC, VMC_PROGRESS, 0);
 
-	const char* VMCSizes[] = { "8 Mo", "16 Mo", "32 Mo", "64 Mo", NULL };
+	const char* VMCSizes[] = { "8 Mb", "16 Mb", "32 Mb", "64 Mb", NULL };
 	diaSetEnum(diaVMC, VMC_SIZE, VMCSizes);
 	int size = guiRefreshVMCConfig(support, vmc);
 	diaSetString(diaVMC, VMC_NAME, vmc);

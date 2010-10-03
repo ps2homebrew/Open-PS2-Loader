@@ -70,7 +70,7 @@ static char *lmb_modulefake_list[] = {
 static int fakemod_flag = 0;
 
 //--------------------------------------------------------------
-void getModInfo(u8 *modname, modinfo_t *info)
+int getModInfo(u8 *modname, modinfo_t *info)
 {
 	iop_library_table_t *libtable;
 	iop_library_t *libptr;
@@ -88,8 +88,11 @@ void getModInfo(u8 *modname, modinfo_t *info)
 		libptr = libptr->prev;
 	}
 
+	if(!libptr) return 0;
+	
 	info->version = libptr->version;
 	info->exports = (void **)(((struct irx_export_table *)libptr)->fptrs); 
+	return 1;
 }
 
 //--------------------------------------------------------------

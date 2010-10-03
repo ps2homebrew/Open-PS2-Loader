@@ -26,10 +26,17 @@ extern int size_ps2hdd_irx;
 extern void *ps2fs_irx;
 extern int size_ps2fs_irx;
 
+#ifdef VMC
+extern void *hdd_mcemu_irx;
+extern int size_hdd_mcemu_irx;
+#endif
+
 static int hddForceUpdate = 1;
 static char *hddPrefix = NULL;
 static int hddGameCount = 0;
 static hdl_games_list_t* hddGames;
+
+const char *oplPart = "hdd0:+OPL";
 
 // forward declaration
 static item_list_t hddGameList;
@@ -74,10 +81,10 @@ static void hddLoadModules(void) {
 
 	LOG("hddLoadModules: modules loaded\n");
 
-	ret = fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
+	ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
 	if (ret < 0) {
 		fileXioUmount(hddPrefix);
-		fileXioMount(hddPrefix, "hdd0:+OPL", FIO_MT_RDONLY);
+		fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
 	}
 
 	gHddStartup = 0;
@@ -161,6 +168,109 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode) {
 	configSetCompatibility(hddGames->games[id].startup, hddGameList.mode, compatMode, dmaMode);
 }
 
+#ifdef VMC
+static int hddPrepareMcemu(hdl_game_info_t* game) {
+	char vmc[2][32];
+	char vmc_path[64];
+	pfs_inode_t pfs_inode;
+	apa_header part_hdr;
+	hdd_vmc_infos_t hdd_vmc_infos;
+	vmc_superblock_t vmc_superblock;
+	u32 vmc_size;
+	int i, j, fd, size_mcemu_irx = 0;
+
+	if(gHddStartup) return 0;  // if gHddStartup is nonzero, pfs0 wasn't able to be mounted
+
+	configGetVMC(game->startup, vmc[0], HDD_MODE, 0);
+	configGetVMC(game->startup, vmc[1], HDD_MODE, 1);
+
+	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
+
+	// virtual mc informations
+	memset(&hdd_vmc_infos, 0, sizeof(hdd_vmc_infos_t));
+
+	fd = fileXioOpen(oplPart, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
+	if(fd >= 0) {
+		if(fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
+			if(part_hdr.nsub <= 4) {
+				hdd_vmc_infos.parts[0].start = part_hdr.start;
+				hdd_vmc_infos.parts[0].length = part_hdr.length;
+				LOG("hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
+				LOG("hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
+				for(i = 0; i < part_hdr.nsub; i++) {
+					hdd_vmc_infos.parts[i+1].start = part_hdr.subs[i].start;
+					hdd_vmc_infos.parts[i+1].length = part_hdr.subs[i].length;
+					LOG("hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
+					LOG("hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
+				}
+			} // else	Partition too big (10Gb Max)
+		}
+	}
+	fileXioClose(fd);
+
+	for(i=0; i<2; i++) {
+		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
+		hdd_vmc_infos.active = 0;
+
+		snprintf(vmc_path, 64, "%sVMC/%s.bin", hddPrefix, vmc[i]);
+
+		fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
+
+		if (fd >= 0) {
+			LOG("%s open\n", vmc_path);
+
+			vmc_size = fileXioLseek(fd, 0, SEEK_END);
+			fileXioLseek(fd, 0, SEEK_SET);
+			fileXioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
+			fileXioLseek(fd, 0, SEEK_SET);
+
+			LOG("Vmc file size            : 0x%X\n", vmc_size);
+			LOG("vmc_superblock.Magic     : %s\n", vmc_superblock.magic);
+			LOG("vmc_superblock.Card type : %d\n", vmc_superblock.mc_type);
+
+			if(!strncmp(vmc_superblock.magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock.mc_type == 0x2) {
+				hdd_vmc_infos.flags            = vmc_superblock.mc_flag & 0xFF;
+				hdd_vmc_infos.flags           |= 0x100;
+				hdd_vmc_infos.specs.page_size  = vmc_superblock.page_size;                                       
+				hdd_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;                                 
+				hdd_vmc_infos.specs.card_size  = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
+
+				LOG("hdd_vmc_infos.flags            : 0x%X\n", hdd_vmc_infos.flags           );
+				LOG("hdd_vmc_infos.specs.page_size  : 0x%X\n", hdd_vmc_infos.specs.page_size );
+				LOG("hdd_vmc_infos.specs.block_size : 0x%X\n", hdd_vmc_infos.specs.block_size);
+				LOG("hdd_vmc_infos.specs.card_size  : 0x%X\n", hdd_vmc_infos.specs.card_size );
+
+				if(vmc_size == hdd_vmc_infos.specs.card_size * hdd_vmc_infos.specs.page_size) {
+					// Check vmc inode block chain (write operation can cause damage)
+					if(fileXioIoctl2(fd, PFS_IOCTL2_GET_INODE, NULL, 0, (void*)&pfs_inode, sizeof(pfs_inode_t)) == sizeof(pfs_inode_t)) {
+						if(pfs_inode.number_data <= 11) {
+							for(j = 0; j < pfs_inode.number_data-1; j++) {
+								hdd_vmc_infos.active = 1;
+								hdd_vmc_infos.blocks[j].number  = pfs_inode.data[j+1].number;
+								hdd_vmc_infos.blocks[j].subpart = pfs_inode.data[j+1].subpart;
+								hdd_vmc_infos.blocks[j].count   = pfs_inode.data[j+1].count;
+								LOG("hdd_vmc_infos.blocks[%d].number     : 0x%X\n", j, hdd_vmc_infos.blocks[j].number );
+								LOG("hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", j, hdd_vmc_infos.blocks[j].subpart);
+								LOG("hdd_vmc_infos.blocks[%d].count      : 0x%X\n", j, hdd_vmc_infos.blocks[j].count  );
+							}
+						} // else Vmc file too much fragmented
+					}
+				}
+			}
+		}
+		fileXioClose(fd);
+		for (j=0; j<size_hdd_mcemu_irx; j++) {
+			if (((u32*)&hdd_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
+				if(hdd_vmc_infos.active) size_mcemu_irx = size_hdd_mcemu_irx;
+				memcpy(&((u32*)&hdd_mcemu_irx)[j], &hdd_vmc_infos, sizeof(hdd_vmc_infos_t));
+				break;
+			}
+		}
+	}
+	return size_mcemu_irx;
+}
+#endif
+
 static int hddLaunchGame(int id) {
 	int i, size_irx = 0;
 	void** irx = NULL;
@@ -241,11 +351,22 @@ static int hddLaunchGame(int id) {
 		p++;
 	}
 
+#ifdef VMC
+	int size_mcemu_irx = hddPrepareMcemu(game);
+#endif
+ 
+	int compat_flags = game->ops2l_compat_flags;
+	hddFreeHDLGamelist(hddGames);
+
 	sprintf(filename,"%s",game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
 	FlushCache(0);
 
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode, compatMode & COMPAT_MODE_1);
+#ifdef VMC
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, compat_flags, compat_flags & COMPAT_MODE_1);
+#else
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compat_flags, compat_flags & COMPAT_MODE_1);
+#endif
 
 	return 1;
 }

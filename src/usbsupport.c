@@ -23,6 +23,11 @@ extern int size_usbd_ps3_irx;
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+#ifdef VMC
+extern void *usb_mcemu_irx;
+extern int size_usb_mcemu_irx;
+#endif
+
 void *usbd_irx;
 int size_usbd_irx;
 
@@ -160,6 +165,83 @@ static void usbSetGameCompatibility(int id, int compatMode, int dmaMode) {
 	configSetCompatibility(usbGames[id].startup, usbGameList.mode, compatMode, -1);
 }
 
+#ifdef VMC
+static int usbPrepareMcemu(base_game_info_t* game) {
+	char vmc[2][32];
+	u32 vmc_size;
+	int i, j, fd, fd1, size_mcemu_irx = 0;
+	char vmc_path[64];
+	usb_vmc_infos_t usb_vmc_infos;
+	vmc_superblock_t vmc_superblock;
+
+	configGetVMC(game->startup, vmc[0], USB_MODE, 0);
+	configGetVMC(game->startup, vmc[1], USB_MODE, 1);
+
+	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
+	// virtual mc informations
+
+	for(i=0; i<2; i++) {
+		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
+		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
+
+		snprintf(vmc_path, 64, "%sVMC/%s.bin", usbPrefix, vmc[i]);
+		fd = fioOpen(vmc_path, O_RDWR);
+
+		if (fd >= 0) {
+			LOG("%s open\n", vmc_path);
+
+			vmc_size = fioLseek(fd, 0, SEEK_END);
+			fioLseek(fd, 0, SEEK_SET);
+			fioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
+
+			LOG("file size : 0x%X\n", vmc_size);
+			LOG("Magic     : %s\n", vmc_superblock.magic);
+			LOG("Card type : %d\n", vmc_superblock.mc_type);
+
+			if(!strncmp(vmc_superblock.magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock.mc_type == 0x2) {
+				usb_vmc_infos.flags            = vmc_superblock.mc_flag & 0xFF;
+				usb_vmc_infos.flags           |= 0x100;
+				usb_vmc_infos.specs.page_size  = vmc_superblock.page_size;                                       
+				usb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;                                 
+				usb_vmc_infos.specs.card_size  = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
+
+				LOG("flags            : 0x%X\n", usb_vmc_infos.flags           );
+				LOG("specs.page_size  : 0x%X\n", usb_vmc_infos.specs.page_size );
+				LOG("specs.block_size : 0x%X\n", usb_vmc_infos.specs.block_size);
+				LOG("specs.card_size  : 0x%X\n", usb_vmc_infos.specs.card_size );
+
+				if(vmc_size == usb_vmc_infos.specs.card_size * usb_vmc_infos.specs.page_size) {
+					fd1 = fioDopen(usbPrefix);
+
+					if (fd1 >= 0) {
+						snprintf(vmc_path, 64, "VMC/%s.bin", vmc[i]);
+						// Check vmc cluster chain (write operation can cause dammage)
+						if(fioIoctl(fd1, 0xCAFEC0DE, vmc_path)) {
+							LOG("Cluster Chain OK\n");
+							if((j = fioIoctl(fd1, 0xBEEFC0DE, vmc_path)) != 0) {
+								usb_vmc_infos.active = 1;
+								usb_vmc_infos.start_sector = j;
+								LOG("Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
+							}
+						} // else Vmc file fragmented
+					}
+					fioDclose(fd1);
+				}
+			}
+		}
+		fioClose(fd);
+		for (j=0; j<size_usb_mcemu_irx; j++) {
+			if (((u32*)&usb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
+				if(usb_vmc_infos.active) size_mcemu_irx = size_usb_mcemu_irx;
+				memcpy(&((u32*)&usb_mcemu_irx)[j], &usb_vmc_infos, sizeof(usb_vmc_infos_t));
+				break;
+			}
+		}
+	}
+	return size_mcemu_irx;
+}
+#endif
+
 static int usbLaunchGame(int id) {
 	int fd, r, index, i, compatmask;
 	char isoname[32], partname[64], filename[32];
@@ -213,12 +295,19 @@ static int usbLaunchGame(int id) {
 	}
 
 	fioDclose(fd);
+#ifdef VMC
+	int size_mcemu_irx = usbPrepareMcemu(game);
+#endif
 
 	sprintf(filename,"%s",game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
 	FlushCache(0);
 
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
+#ifdef VMC
+	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
+#else
+	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
+#endif
 
 	return 1;
 }

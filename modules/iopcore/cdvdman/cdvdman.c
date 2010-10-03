@@ -96,6 +96,9 @@ struct irx_export_table _exp_dev9;
 #endif
 #endif
 struct irx_export_table _exp_smsutils;
+#ifdef VMC_DRIVER
+struct irx_export_table _exp_oplutils;
+#endif
 
 // PS2 CDVD hardware registers
 #define CDVDreg_NCOMMAND      (*(volatile unsigned char *)0xBF402004)
@@ -1104,7 +1107,7 @@ void fs_init(void)
 
 	// Open all parts files
 	do {
-		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i++]);
+		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i++], 0);
 		sprintf(tmp_str, "%s.%02x", g_ISO_name, i);
 
 	} while(i < g_ISO_parts);
@@ -2826,7 +2829,9 @@ int _start(int argc, char **argv)
 #endif
 #endif
 	RegisterLibraryEntries(&_exp_smsutils);
-
+#ifdef VMC_DRIVER
+	RegisterLibraryEntries(&_exp_oplutils);
+#endif
 	// create SCMD/searchfile semaphores
 	cdvdman_create_semaphores();
 

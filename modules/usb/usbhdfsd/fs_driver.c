@@ -799,7 +799,7 @@ int fs_checkClusterChain(iop_file_t *fd, char *name)
 	// Check cluster chain (write operation can cause dammage if file is fragmented)
 	while (chain_end == 0) {
 		chain_size = fat_getClusterChain(fatd, cluster, fatd->cbuf, MAX_DIR_CLUSTER, 1);
-
+		
 		if(fatd->cbuf[0] != fatd->cbuf[chain_size-1] - (chain_size-1))
 			return 0;
 

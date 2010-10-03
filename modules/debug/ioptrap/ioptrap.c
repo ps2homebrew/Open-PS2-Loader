@@ -69,6 +69,59 @@ exception_type_t dbg_setjmp() {
     return v;
 }
 
+// from ps2link
+
+/* Module info entry.  */
+typedef struct _smod_mod_info {
+	struct _smod_mod_info *next;
+	u8      *name;
+	u16     version;
+	u16     newflags;       /* For modload shipped with games.  */
+	u16     id;
+	u16     flags;          /* I believe this is where flags are kept for BIOS versions.  */
+	u32     entry;          /* _start */
+	u32     gp;
+	u32     text_start;
+	u32     text_size;
+	u32     data_size;
+	u32     bss_size;
+	u32     unused1;
+	u32     unused2;
+} smod_mod_info_t;
+
+
+smod_mod_info_t *smod_get_next_mod(smod_mod_info_t *cur_mod)
+{
+	/* If cur_mod is 0, return the head of the list (IOP address 0x800).  */
+	if (!cur_mod) {
+		return (smod_mod_info_t *)0x800;
+	} else {
+		if (!cur_mod->next)
+			return 0;
+		else
+			return cur_mod->next;
+	}
+	return 0;
+}
+
+char* ExceptionGetModuleName(u32 epc, u32* r_epc)
+{
+	smod_mod_info_t *mod_info = 0;
+
+	while((mod_info = smod_get_next_mod(mod_info)) != 0)
+	{
+		if((epc >= mod_info->text_start) && (epc <= (mod_info->text_start+mod_info->text_size)))
+		{
+			if(r_epc)
+				*r_epc = epc -  mod_info->text_start;
+
+			return mod_info->name;
+		}      
+	}
+
+	return 0;
+}
+
 #define JUMP_BUF_PC           0
 #define JUMP_BUF_SP           1
 #define JUMP_BUF_FP           2
@@ -98,7 +151,8 @@ trap_exception_handler_t get_exception_handler(exception_type_t type) {
 }
 
 void trap(exception_type_t type, struct exception_frame *ex) {
-    u32 i;
+    u32 i, r_addr;
+    char *module;
     if(dbg_jmp_buf_setup) {
         u32 *p = (u32*)dbg_jmp_buf;
 	/* simulate longjmp */
@@ -119,8 +173,12 @@ void trap(exception_type_t type, struct exception_frame *ex) {
     }
     TRAP_PRINTF("IOP Exception : %s\n", exception_type_name[type]);
     TRAP_PRINTF("EPC=%08x CAUSE=%08x SR=%08x BADVADDR=%08x DCIC=%08x\n", (int)ex->epc, (int)ex->cause, (int)ex->sr, (int)ex->badvaddr, (int)ex->dcic);
+    if((module = ExceptionGetModuleName(ex->epc, &r_addr)))
+	    TRAP_PRINTF("module %s at unreloc offset %08lX\n", module, r_addr);
+    if((module = ExceptionGetModuleName(ex->regs[31], &r_addr)))
+	    TRAP_PRINTF("ra module %s at unreloc offset %08lX\n", module, r_addr); 
     for(i = 0; i != 32; i += 4) {
-        TRAP_PRINTF("r[%02d]=%08x r[%02d]=%08x r[%02d]=%08x r[%02d]=%08x",
+        TRAP_PRINTF("r[%02d]=%08x r[%02d]=%08x r[%02d]=%08x r[%02d]=%08x\n",
                 (int)i, (int)ex->regs[i], (int)i+1, (int)ex->regs[i+1], (int)i+2, (int)ex->regs[i+2], (int)i+3, (int)ex->regs[i+3]);
     }
     

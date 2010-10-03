@@ -13,7 +13,6 @@
 #include "include/lang.h"
 #include "include/themes.h"
 #include "include/pad.h"
-#include "include/dialogs.h"
 #include "include/util.h"
 #include "include/config.h"
 #include "include/system.h"
@@ -80,6 +79,7 @@ typedef struct {
 	void (*handleInput)(void);
 	void (*renderScreen)(void);
 	void (*renderBackground)(void);
+	short inMenu;
 } gui_screen_handler_t;
 
 // forward decls.
@@ -98,13 +98,15 @@ static void guiMenuRender(void);
 static gui_screen_handler_t mainScreenHandler = {
 	&guiMainHandleInput,
 	&guiMainRender,
-	&guiMainBackground
+	&guiMainBackground,
+	0
 };
 
 static gui_screen_handler_t menuScreenHandler = {
 	&guiMenuHandleInput,
 	&guiMenuRender,
-	&guiMenuBackground
+	&guiMenuBackground,
+	1
 };
 
 static gui_screen_handler_t *screenHandler = &menuScreenHandler;
@@ -543,7 +545,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 			}
 		}
 		else if (result == VMC_BUTTON_DELETE) {
-			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1)) {
+			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, diaVMC)) {
 				support->itemCheckVMC(vmc, -1);
 				diaSetString(diaVMC, VMC_NAME, "");
 				break;
@@ -624,7 +626,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			if (sysGetDiscID(hexDiscID) >= 0)
 				diaSetString(diaCompatConfig, COMPAT_GAMEID, hexDiscID);
 			else
-				guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0);
+				guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0, NULL);
 		}
 #ifdef VMC
 		else if (result == COMPAT_VMC1_DEFINE) {
@@ -778,7 +780,7 @@ static void guiHandleDeferredOps(void) {
 		
 		if (gNetworkStartup < 0) {
 			gNetworkStartup = 0;
-			guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0);
+			guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
 		}
 		
 		struct gui_update_list_t* td = gUpdateList;
@@ -1389,7 +1391,7 @@ void guiUpdateScreenScale(void) {
 	fntSetAspectRatio(wideScreenScale, 1.0f);
 }
 
-int guiMsgBox(const char* text, int addAccept) {
+int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	int terminate = 0;
 	while(!terminate) {
 		guiStartFrame();
@@ -1399,9 +1401,12 @@ int guiMsgBox(const char* text, int addAccept) {
 		if(getKeyOn(KEY_CIRCLE)) 
 			terminate = 1;
 		else if(getKeyOn(KEY_CROSS))
-					terminate = 2;
+			terminate = 2;
 		
-		guiShow();
+		if (ui)
+			diaRenderUI(ui, screenHandler->inMenu, NULL, 0);
+		else
+			guiShow();
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 

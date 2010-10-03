@@ -329,10 +329,7 @@ static const char *diaGetLocalisedText(const char* def, int id) {
 
 /// returns true if the item is controllable (e.g. a value can be changed on it)
 static int diaIsControllable(struct UIItem *ui) {
-	if (ui->type == UI_OK) // TODO strange ...
-		return 1;
-
-	return (ui->enabled && (ui->type > UI_OK));
+	return (ui->enabled && (ui->type >= UI_OK));
 }
 
 /// returns true if the given item should be preceded with nextline
@@ -500,9 +497,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 }
 
 /// renders whole ui screen (for given dialog setup)
-static void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus) {
-	rmStartFrame();
-	
+void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus) {
 	if (inMenu)
 		gTheme->drawAltBackground();
 	else
@@ -550,9 +545,6 @@ static void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int
 	if ((cur != NULL) && (!haveFocus) && (cur->hintId != -1)) {
 		diaDrawHint(cur->hintId);
 	}
-	
-	// flip display
-	rmEndFrame();
 }
 
 /// sets the ui item value to the default again
@@ -792,7 +784,9 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(v
 	// okay, we have the first selectable item
 	// we can proceed with rendering etc. etc.
 	while (1) {
+		rmStartFrame();
 		diaRenderUI(ui, inMenu, cur, haveFocus);
+		rmEndFrame();
 		
 		readPads();
 		

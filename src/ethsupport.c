@@ -371,14 +371,19 @@ int ethSMBConnect(void) {
 			// hash generated okay, can use
 			memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
 			logon.PasswordType = HASHED_PASSWORD;
+			memcpy((void *)openshare.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+			openshare.PasswordType = HASHED_PASSWORD;
 		} else {
 			// failed hashing, failback to plaintext
 			strncpy(logon.Password, gPCPassword, 32);
 			logon.PasswordType = PLAINTEXT_PASSWORD;
+			strncpy(openshare.Password, gPCPassword, 32);
+			openshare.PasswordType = PLAINTEXT_PASSWORD;
 		}
 	} else {
-		strcpy(logon.User, "GUEST");
+		strncpy(logon.User, gPCUserName, 32);
 		logon.PasswordType = NO_PASSWORD;
+		openshare.PasswordType = NO_PASSWORD;
 	}
 	
 	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
@@ -395,7 +400,6 @@ int ethSMBConnect(void) {
 
 	// connect to the share
 	strcpy(openshare.ShareName, gPCShareName);
-	openshare.PasswordType = NO_PASSWORD;
 
 	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
 	if (ret < 0)

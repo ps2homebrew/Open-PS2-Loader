@@ -11,8 +11,8 @@ all:
 
 clean:
 	$(MAKE) -C ../../modules/dev9 clean
-	$(MAKE) -C ../../modules/SMSUTILS clean
-	$(MAKE) -C ../../modules/lanman clean
+	$(MAKE) -C ../../modules/network/SMSUTILS clean
+	$(MAKE) -C ../../modules/wip/lanman clean
 	rm -f *.elf *.o *.a *.s
 
 rebuild: clean all
@@ -25,12 +25,12 @@ ps2dev9.s:
 	bin2s ../../modules/dev9/ps2dev9.irx ps2dev9.s ps2dev9_irx
 
 smsutils.s:
-	$(MAKE) -C ../../modules/SMSUTILS
-	bin2s ../../modules/SMSUTILS/SMSUTILS.irx smsutils.s smsutils_irx
+	$(MAKE) -C ../../modules/network/SMSUTILS
+	bin2s ../../modules/network/SMSUTILS/SMSUTILS.irx smsutils.s smsutils_irx
 
 lanman.s:
-	$(MAKE) -C ../../modules/lanman
-	bin2s ../../modules/lanman/lanman.irx lanman.s lanman_irx
+	$(MAKE) -C ../../modules/wip/lanman
+	bin2s ../../modules/wip/lanman/lanman.irx lanman.s lanman_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx iomanx.s iomanx_irx

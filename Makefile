@@ -2,7 +2,8 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
-VMC = 0
+#use make VMC=1 to build with vmc
+#VMC = 0
 CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12

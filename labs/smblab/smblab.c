@@ -15,7 +15,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "smbman.h"
+#include "../../modules/network/smbman/smbman.h"
 
 #define	IP_ADDR "192.168.0.10"
 #define	NETMASK "255.255.255.0"

@@ -11,10 +11,10 @@ all:
 
 clean:
 	$(MAKE) -C ../../modules/dev9 clean
-	$(MAKE) -C ../../modules/SMSUTILS clean
-	$(MAKE) -C ../../modules/SMSTCPIP clean
-	$(MAKE) -C ../../modules/SMSMAP clean
-	$(MAKE) -C ../../modules/smbman clean
+	$(MAKE) -C ../../modules/network/SMSUTILS clean
+	$(MAKE) -C ../../modules/network/SMSTCPIP clean
+	$(MAKE) -C ../../modules/network/SMSMAP clean
+	$(MAKE) -C ../../modules/network/smbman clean
 	rm -f *.elf *.o *.a *.s
 
 rebuild: clean all
@@ -27,20 +27,20 @@ ps2dev9.s:
 	bin2s ../../modules/dev9/ps2dev9.irx ps2dev9.s ps2dev9_irx
 
 smsutils.s:
-	$(MAKE) -C ../../modules/SMSUTILS
-	bin2s ../../modules/SMSUTILS/SMSUTILS.irx smsutils.s smsutils_irx
+	$(MAKE) -C ../../modules/network/SMSUTILS
+	bin2s ../../modules/network/SMSUTILS/SMSUTILS.irx smsutils.s smsutils_irx
 
 smstcpip.s:
-	$(MAKE) -C ../../modules/SMSTCPIP
-	bin2s ../../modules/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
+	$(MAKE) -C ../../modules/network/SMSTCPIP
+	bin2s ../../modules/network/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
 		
 smsmap.s:
-	$(MAKE) -C ../../modules/SMSMAP
-	bin2s ../../modules/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx
+	$(MAKE) -C ../../modules/network/SMSMAP
+	bin2s ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx
 
 smbman.s:
-	$(MAKE) -C ../../modules/smbman
-	bin2s ../../modules/smbman/smbman.irx smbman.s smbman_irx
+	$(MAKE) -C ../../modules/network/smbman
+	bin2s ../../modules/network/smbman/smbman.irx smbman.s smbman_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx iomanx.s iomanx_irx

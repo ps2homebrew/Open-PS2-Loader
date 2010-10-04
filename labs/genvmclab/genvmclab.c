@@ -15,7 +15,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "../../modules/genvmc/genvmc.h"
+#include "../../modules/vmc/genvmc/genvmc.h"
 
 #define DPRINTF(args...)	printf(args); scr_printf(args);
 

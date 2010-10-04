@@ -17,6 +17,8 @@
 
 #include "../../modules/network/smbman/smbman.h"
 
+#define DPRINTF(args...)	printf(args); scr_printf(args);
+
 #define	IP_ADDR "192.168.0.10"
 #define	NETMASK "255.255.255.0"
 #define	GATEWAY "192.168.0.1"
@@ -33,6 +35,12 @@ extern void smsmap_irx;
 extern int  size_smsmap_irx;
 extern void smbman_irx;
 extern int  size_smbman_irx;
+extern void udptty_irx;
+extern int  size_udptty_irx;
+extern void ioptrap_irx;
+extern int  size_ioptrap_irx;
+extern void ps2link_irx;
+extern int  size_ps2link_irx;
 extern void iomanx_irx;
 extern int  size_iomanx_irx;
 extern void filexio_irx;
@@ -121,11 +129,11 @@ int main(int argc, char *argv[2])
 	
 	init_scr();
 	scr_clear();
-	scr_printf("\t smblab\n\n");
+	DPRINTF("smblab\n");
 	
 	SifInitRpc(0);
 
-	scr_printf("\t IOP Reset... ");
+	DPRINTF("IOP Reset... ");
 	
 	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF",0));
   	while(!SifIopSync());;
@@ -149,43 +157,55 @@ int main(int argc, char *argv[2])
 	SifLoadModule("rom0:MCMAN", 0, 0);
 	SifLoadModule("rom0:MCSERV", 0, 0);
 
-	scr_printf("OK\n");
+	DPRINTF("OK\n");
         	  
 	set_ipconfig();
 
-	scr_printf("\t loading iomanX... "); 
+	DPRINTF("loading iomanX... "); 
 	id = SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading fileXio... "); 
+	DPRINTF("loading fileXio... "); 
 	id = SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading poweroff... "); 
+	DPRINTF("loading poweroff... "); 
 	id = SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading ps2dev9... "); 
+	DPRINTF("loading ps2dev9... "); 
 	id = SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading smsutils... "); 
+	DPRINTF("loading smsutils... "); 
 	id = SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading smstcpip... "); 
+	DPRINTF("loading smstcpip... "); 
 	id = SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading smsmap... "); 
+	DPRINTF("loading smsmap... "); 
 	id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t loading smbman... "); 
+	DPRINTF("loading udptty... "); 
+	id = SifExecModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL, &ret);
+	DPRINTF("ret=%d\n", ret); 
+
+	DPRINTF("loading ioptrap... "); 
+	id = SifExecModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL, &ret);
+	DPRINTF("ret=%d\n", ret); 
+
+	DPRINTF("loading ps2link... "); 
+	id = SifExecModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL, &ret);
+	DPRINTF("ret=%d\n", ret); 
+
+	DPRINTF("loading smbman... "); 
 	id = SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
-	scr_printf("ret=%d\n", ret); 
+	DPRINTF("ret=%d\n", ret); 
 
-	scr_printf("\t modules load OK\n");
+	DPRINTF("modules load OK\n");
 
 	fileXioInit();
 
@@ -199,21 +219,21 @@ int main(int argc, char *argv[2])
 
 	strcpy(passwd.password, "mypassw");
 
-	scr_printf("\t GETPASSWORDHASHES... ");
+	DPRINTF("GETPASSWORDHASHES... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes));
 	if (ret == 0) {
-		scr_printf("OK\n");
-		scr_printf("\t LMhash   = 0x");
+		DPRINTF("OK\n");
+		DPRINTF("LMhash   = 0x");
 		for (i=0; i<16; i++)
-			scr_printf("%02X", passwdhashes.LMhash[i]);
-		scr_printf("\n");
-		scr_printf("\t NTLMhash = 0x");
+			DPRINTF("%02X", passwdhashes.LMhash[i]);
+		DPRINTF("\n");
+		DPRINTF("NTLMhash = 0x");
 		for (i=0; i<16; i++)
-			scr_printf("%02X", passwdhashes.NTLMhash[i]);
-		scr_printf("\n");
+			DPRINTF("%02X", passwdhashes.NTLMhash[i]);
+		DPRINTF("\n");
 	}
 	else
-		scr_printf("Error %d\n", ret);
+		DPRINTF("Error %d\n", ret);
 
 	// we now have 32 bytes of hash (16 bytes LM hash + 16 bytes NTLM hash)
 	// ----------------------------------------------------------------
@@ -238,12 +258,14 @@ int main(int argc, char *argv[2])
 	// or simply tell we're not sending password
 	//logon.PasswordType = NO_PASSWORD;
 
-	scr_printf("\t LOGON... ");
+	DPRINTF("LOGON... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
-	if (ret == 0)
-		scr_printf("OK ");
-	else
-		scr_printf("Error %d ", ret);
+	if (ret == 0) {
+		DPRINTF("OK ");
+	}
+	else {
+		DPRINTF("Error %d ", ret);
+	}
 
 
 	// ----------------------------------------------------------------
@@ -254,12 +276,14 @@ int main(int argc, char *argv[2])
 	strcpy(echo.echo, "ALIVE ECHO TEST");
 	echo.len = strlen("ALIVE ECHO TEST");
 
-	scr_printf(" ECHO... ");
+	DPRINTF(" ECHO... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
-	if (ret == 0)
-		scr_printf("OK\n");
-	else
-		scr_printf("Error %d\n", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
@@ -271,16 +295,17 @@ int main(int argc, char *argv[2])
 	getsharelist.EE_addr = (void *)&sharelist[0];
 	getsharelist.maxent = 128;
 
-	scr_printf("\t GETSHARELIST... ");
+	DPRINTF("GETSHARELIST... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_GETSHARELIST, (void *)&getsharelist, sizeof(getsharelist), NULL, 0);
 	if (ret >= 0) {
-		scr_printf("OK count = %d\n", ret);
+		DPRINTF("OK count = %d\n", ret);
 		for (i=0; i<ret; i++) {
-			scr_printf("\t\t - %s: %s\n", sharelist[i].ShareName, sharelist[i].ShareComment);
+			DPRINTF("\t\t - %s: %s\n", sharelist[i].ShareName, sharelist[i].ShareComment);
 		}
 	}
-	else
-		scr_printf("Error %d\n", ret);
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
@@ -299,12 +324,14 @@ int main(int argc, char *argv[2])
 	// or simply tell we're not sending password
 	//logon.PasswordType = NO_PASSWORD;
 
-	scr_printf("\t OPENSHARE... ");
+	DPRINTF("OPENSHARE... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
-	if (ret == 0)
-		scr_printf("OK\n");
-	else
-		scr_printf("Error %d\n", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
@@ -312,27 +339,28 @@ int main(int argc, char *argv[2])
 	// ----------------------------------------------------------------
 	smbQueryDiskInfo_out_t querydiskinfo;
 
-	scr_printf("\t QUERYDISKINFO... ");
+	DPRINTF("QUERYDISKINFO... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_QUERYDISKINFO, NULL, 0, (void *)&querydiskinfo, sizeof(querydiskinfo));
 	if (ret == 0) {
-		scr_printf("OK\n");
-		scr_printf("\t Total Units = %d, BlocksPerUnit = %d\n", querydiskinfo.TotalUnits, querydiskinfo.BlocksPerUnit);
-		scr_printf("\t BlockSize = %d, FreeUnits = %d\n", querydiskinfo.BlockSize, querydiskinfo.FreeUnits);
+		DPRINTF("OK\n");
+		DPRINTF("Total Units = %d, BlocksPerUnit = %d\n", querydiskinfo.TotalUnits, querydiskinfo.BlocksPerUnit);
+		DPRINTF("BlockSize = %d, FreeUnits = %d\n", querydiskinfo.BlockSize, querydiskinfo.FreeUnits);
 	}
-	else
-		scr_printf("Error %d\n", ret);
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// getstat test:
 	// ----------------------------------------------------------------
 
-	scr_printf("\t IO getstat... ");
+	DPRINTF("IO getstat... ");
 
 	iox_stat_t stats;
 	ret = fileXioGetStat("smb:\\", &stats);
 	if (ret == 0) {
-		scr_printf("OK\n");
+		DPRINTF("OK\n");
 
 		s64 smb_ctime, smb_atime, smb_mtime;
 		ps2time_t ctime, atime, mtime;
@@ -349,79 +377,90 @@ int main(int argc, char *argv[2])
 		hisize = hisize << 32;
 		s64 size = hisize | stats.size;
 
-		scr_printf("\t size = %ld, mode = %04x\n", size, stats.mode);
+		DPRINTF("size = %ld, mode = %04x\n", size, stats.mode);
 
-		scr_printf("\t ctime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+		DPRINTF("ctime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
 			ctime.year, ctime.month, ctime.day,
 			ctime.hour, ctime.min,   ctime.sec, ctime.unused);
-		scr_printf("\t atime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+		DPRINTF("atime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
 			atime.year, atime.month, atime.day,
 			atime.hour, atime.min,   atime.sec, atime.unused);
-		scr_printf("\t mtime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
+		DPRINTF("mtime = %04d.%02d.%02d %02d:%02d:%02d.%02d\n",
 			mtime.year, mtime.month, mtime.day,
 			mtime.hour, mtime.min,   mtime.sec, mtime.unused);
 	}
-	else
-		scr_printf("Error %d\n", ret);
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// create directory test:
 	// ----------------------------------------------------------------
-	scr_printf("\t IO mkdir... ");
+	DPRINTF("IO mkdir... ");
 	ret = mkdir("smb:\\created");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// rename file test:
 	// ----------------------------------------------------------------
 	/*
-	scr_printf("\t IO rename... ");
+	DPRINTF("IO rename... ");
 	ret = fileXioRename("smb:\\rename_me\\rename_me.txt", "smb:\\rename_me\\renamed.txt");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 	*/
 
 
 	// ----------------------------------------------------------------
 	// rename directory test:
 	// ----------------------------------------------------------------
-	scr_printf("IO rename... ");
+	DPRINTF("IO rename... ");
 	ret = fileXioRename("smb:\\created", "smb:\\renamed");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// delete file test:
 	// ----------------------------------------------------------------
 	/*
-	scr_printf("IO remove... ");
+	DPRINTF("IO remove... ");
 	ret = remove("smb:\\delete_me\\delete_me.txt");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 	*/
 
 
 	// ----------------------------------------------------------------
 	// delete directory test:
 	// ----------------------------------------------------------------
-	scr_printf("IO rmdir... ");
+	DPRINTF("IO rmdir... ");
 	ret = rmdir("smb:\\renamed");
-	if (ret == 0)
-		scr_printf("OK\n");
-	else
-		scr_printf("Error %d\n", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
@@ -433,22 +472,22 @@ int main(int argc, char *argv[2])
 		// 64bit filesize test
 		s64 filesize = fileXioLseek64(fd, 0, SEEK_END);
 		u8 *p = (u8 *)&filesize;
-		scr_printf("\t filesize = ");
+		DPRINTF("filesize = ");
 		for (i=0; i<8; i++) {
-			scr_printf("%02X ", p[i]);
+			DPRINTF("%02X ", p[i]);
 		}
-		scr_printf("\n");
+		DPRINTF("\n");
 
 		// 64bit offset read test
 		fileXioLseek64(fd, filesize - 2041, SEEK_SET);
 		u8 buf[16];
 		fileXioRead(fd, buf, 16);
 		p = (u8 *)buf;
-		scr_printf("\t read = ");
+		DPRINTF("read = ");
 		for (i=0; i<16; i++) {
-			scr_printf("%02X", p[i]);
+			DPRINTF("%02X", p[i]);
 		}
-		scr_printf("\n");
+		DPRINTF("\n");
 
 		// 64bit write test
 		//fileXioLseek64(fd, filesize - 16, SEEK_SET);
@@ -456,11 +495,11 @@ int main(int argc, char *argv[2])
 		//fileXioLseek64(fd, filesize - 16, SEEK_SET);
 		//fileXioRead(fd, buf, 16);
 		//p = (u8 *)buf;
-		//scr_printf("\t read = ");
+		//DPRINTF("read = ");
 		//for (i=0; i<16; i++) {
-		//	scr_printf("%02X", p[i]);
+		//	DPRINTF("%02X", p[i]);
 		//}
-		//scr_printf("\n");
+		//DPRINTF("\n");
 
 		fileXioClose(fd);
 	}
@@ -483,12 +522,14 @@ int main(int argc, char *argv[2])
 	// chdir test
 	// ----------------------------------------------------------------
 
-	scr_printf("\t IO chdir... ");
+	DPRINTF("IO chdir... ");
 	ret = fileXioChdir("smb:\\dossier");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
@@ -497,111 +538,122 @@ int main(int argc, char *argv[2])
 
 	iox_dirent_t dirent;
 
-	scr_printf("IO dopen... ");
+	DPRINTF("IO dopen... ");
 	fd = fileXioDopen("smb:\\");
 	if (fd >= 0) {
-		scr_printf("OK\n\t ");
+		DPRINTF("OK\n\t ");
 		ret = 1;
 		while (ret == 1) {
 			ret = fileXioDread(fd, &dirent);
 			if (ret == 1)
-				scr_printf("%s ", dirent.name);
+				DPRINTF("%s ", dirent.name);
 		}
 		fileXioDclose(fd);
-		scr_printf("\n");
+		DPRINTF("\n");
 	}
-	else
-		scr_printf("Error %d\n", ret);
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 	/*
 	// ----------------------------------------------------------------
 	// chdir test
 	// ----------------------------------------------------------------
 
-	scr_printf("\t IO chdir... ");
+	DPRINTF("IO chdir... ");
 	ret = fileXioChdir("smb:\\dossier2");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// dopen/dread/dclose test
 	// ----------------------------------------------------------------
 
-	scr_printf("IO dopen... ");
+	DPRINTF("IO dopen... ");
 	fd = fileXioDopen("smb:\\");
 	if (fd >= 0) {
-		scr_printf("OK\n\t ");
+		DPRINTF("OK\n\t ");
 		ret = 1;
 		while (ret == 1) {
 			ret = fileXioDread(fd, &dirent);
 			if (ret == 1)
-				scr_printf("%s ", dirent.name);
+				DPRINTF("%s ", dirent.name);
 		}
 		fileXioDclose(fd);
-		scr_printf("\n");
+		DPRINTF("\n");
 	}
-	else
-		scr_printf("Error %d\n", ret);
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// chdir test
 	// ----------------------------------------------------------------
 
-	scr_printf("\t IO chdir... ");
+	DPRINTF("IO chdir... ");
 	ret = fileXioChdir("smb:\\..");
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// dopen/dread/dclose test
 	// ----------------------------------------------------------------
 
-	scr_printf("IO dopen... ");
+	DPRINTF("IO dopen... ");
 	fd = fileXioDopen("smb:\\");
 	if (fd >= 0) {
-		scr_printf("OK\n\t ");
+		DPRINTF("OK\n\t ");
 		ret = 1;
 		while (ret == 1) {
 			ret = fileXioDread(fd, &dirent);
 			if (ret == 1)
-				scr_printf("%s ", dirent.name);
+				DPRINTF("%s ", dirent.name);
 		}
 		fileXioDclose(fd);
-		scr_printf("\n");
+		DPRINTF("\n");
 	}
-	else
-		scr_printf("Error %d\n", ret);
+	else {
+		DPRINTF("Error %d\n", ret);
+ 	}
 	*/
 
 	// ----------------------------------------------------------------
 	// how to close a share:
 	// ----------------------------------------------------------------
 
-	scr_printf("\t CLOSESHARE... ");
+	DPRINTF("CLOSESHARE... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
-	if (ret == 0)
-		scr_printf("OK\n");
-	else
-		scr_printf("Error %d\n", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
 	// ----------------------------------------------------------------
 	// how to LOGOFF from SMB server:
 	// ----------------------------------------------------------------
 
-	scr_printf("\t LOGOFF... ");
+	DPRINTF("LOGOFF... ");
 	ret = fileXioDevctl("smb:", SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
-	if (ret == 0)
-		scr_printf("OK  ");
-	else
-		scr_printf("Error %d  ", ret);
+	if (ret == 0) {
+		DPRINTF("OK\n");
+	}
+	else {
+		DPRINTF("Error %d\n", ret);
+	}
 
 
    	SleepThread();

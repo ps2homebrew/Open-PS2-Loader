@@ -177,7 +177,7 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 	hdd_vmc_infos_t hdd_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 	u32 vmc_size;
-	int i, j, fd, size_mcemu_irx = 0;
+	int i, j, fd, part_valid = 0, size_mcemu_irx = 0;
 
 	if(gHddStartup) return 0;  // if gHddStartup is nonzero, pfs0 wasn't able to be mounted
 
@@ -188,8 +188,9 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 
 	// virtual mc informations
 	memset(&hdd_vmc_infos, 0, sizeof(hdd_vmc_infos_t));
-
-	fd = fileXioOpen(oplPart, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
+	
+	fileXioUmount(hddPrefix);
+	fd = fileXioOpen(oplPart, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 	if(fd >= 0) {
 		if(fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
 			if(part_hdr.nsub <= 4) {
@@ -203,11 +204,16 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 					LOG("hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
 					LOG("hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
 				}
-			} // else	Partition too big (10Gb Max)
+				part_valid = 1;
+			}
+			
 		}
 		fileXioClose(fd);
 	}
 
+	if(!part_valid) return 0;
+
+	fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
 	for(i=0; i<2; i++) {
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 		hdd_vmc_infos.active = 0;

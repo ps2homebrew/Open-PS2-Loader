@@ -1,6 +1,6 @@
 
 EE_BIN = smblab.elf
-EE_OBJS = smblab.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o smbman.o iomanx.o filexio.o
+EE_OBJS = smblab.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o smbman.o iomanx.o filexio.o udptty.o ioptrap.o ps2link.o
 
 EE_LIBS = -lfileXio -lpatches -ldebug -lc -lkernel
 EE_CFLAGS = -g
@@ -15,6 +15,9 @@ clean:
 	$(MAKE) -C ../../modules/network/SMSTCPIP clean
 	$(MAKE) -C ../../modules/network/SMSMAP clean
 	$(MAKE) -C ../../modules/network/smbman clean
+	$(MAKE) -C ../../modules/debug/udptty clean
+	$(MAKE) -C ../../modules/debug/ioptrap clean
+	$(MAKE) -C ../../modules/debug/ps2link clean
 	rm -f *.elf *.o *.a *.s
 
 rebuild: clean all
@@ -41,6 +44,18 @@ smsmap.s:
 smbman.s:
 	$(MAKE) -C ../../modules/network/smbman
 	bin2s ../../modules/network/smbman/smbman.irx smbman.s smbman_irx
+
+udptty.s:
+	$(MAKE) -C ../../modules/debug/udptty
+	bin2s ../../modules/debug/udptty/udptty.irx udptty.s udptty_irx
+
+ioptrap.s:
+	$(MAKE) -C ../../modules/debug/ioptrap
+	bin2s ../../modules/debug/ioptrap/ioptrap.irx ioptrap.s ioptrap_irx
+
+ps2link.s:
+	$(MAKE) -C ../../modules/debug/ps2link
+	bin2s ../../modules/debug/ps2link/ps2link.irx ps2link.s ps2link_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx iomanx.s iomanx_irx

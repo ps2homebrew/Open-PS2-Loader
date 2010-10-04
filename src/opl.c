@@ -813,6 +813,8 @@ static void init(void) {
 	guiSetMenuFillHook(&menuFillHookFunc);
 	guiSetMenuExecHook(&menuExecHookFunc);
 	
+	startPads();
+
 	// try to restore config
 	_loadConfig();
 
@@ -820,8 +822,6 @@ static void init(void) {
 
 	// handler for deffered menu updates
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
-
-	startPads();
 }
 
 static void deferredInit(void) {

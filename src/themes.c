@@ -196,7 +196,6 @@ static void thmLoad(char* themePath) {
 	}
 
 	newT->drawBackground = &guiDrawBGPicture;
-	newT->drawAltBackground = &guiDrawBGPlasma;
 	if (configGetInt(themeConfig, "background_mode", &intValue)) {
 		if (intValue == BG_MODE_COLOR)
 			newT->drawBackground = &guiDrawBGColor;
@@ -204,6 +203,15 @@ static void thmLoad(char* themePath) {
 			newT->drawBackground = &guiDrawBGPlasma;
 		else if (intValue == BG_MODE_ART)
 			newT->drawBackground = &guiDrawBGArt;
+	}
+	newT->drawAltBackground = &guiDrawBGPlasma;
+	if (configGetInt(themeConfig, "background_alt_mode", &intValue)) {
+		if (intValue == BG_MODE_COLOR)
+			newT->drawAltBackground = &guiDrawBGColor;
+		else if (intValue == BG_MODE_PICTURE)
+			newT->drawAltBackground = &guiDrawBGPicture;
+		else if (intValue == BG_MODE_ART)
+			newT->drawAltBackground = &guiDrawBGArt;
 	}
 
 	setColors(newT);

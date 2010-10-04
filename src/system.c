@@ -214,12 +214,12 @@ void sysApplyFILEIOPatches(void)
 	u8 new_fioremove[16];
 	volatile u32 j_new_fioremove = 0x08000512;
 	volatile u32 j_rpc_handler_exit = 0x0800033a;
-	volatile u8 dummy = 0;
+	volatile u8 string_term = 0;
 
 	memset(&mod_info, 0, sizeof(mod_info));
 
 	int ret = smod_get_mod_by_name("FILEIO_service", &mod_info);
-	if (!ret)
+	if ((!ret) || (mod_info.version != 0x101))
 		return;
 
 	smem_read((void *)mod_info.text_start  + 0x0bb8, jal_fioremove, sizeof(jal_fioremove));
@@ -228,7 +228,7 @@ void sysApplyFILEIOPatches(void)
 	memcpy(&new_fioremove[0], jal_fioremove, sizeof(jal_fioremove));
 	j_rpc_handler_exit += ((u32)mod_info.text_start >> 2);
 	memcpy(&new_fioremove[8], (void *)&j_rpc_handler_exit, sizeof(j_rpc_handler_exit));	
-	smem_write((void *)mod_info.text_start + 0x1447, (void *)&dummy, sizeof(dummy));
+	smem_write((void *)mod_info.text_start + 0x1447, (void *)&string_term, sizeof(string_term));
 
 	smem_write((void *)mod_info.text_start + 0x1448, new_fioremove, sizeof(new_fioremove));
 

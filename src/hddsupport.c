@@ -360,18 +360,15 @@ static int hddLaunchGame(int id) {
 #ifdef VMC
 	int size_mcemu_irx = hddPrepareMcemu(game);
 #endif
- 
-	int compat_flags = game->ops2l_compat_flags;
-	hddFreeHDLGamelist(hddGames);
 
 	sprintf(filename,"%s",game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
 	FlushCache(0);
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, compat_flags, compat_flags & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, compatMode, compatMode & COMPAT_MODE_1);
 #else
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compat_flags, compat_flags & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode, compatMode & COMPAT_MODE_1);
 #endif
 
 	return 1;

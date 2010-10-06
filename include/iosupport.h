@@ -21,10 +21,6 @@
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 3
 
-#define ERROR_FRAGMENTED	-1
-#define ERROR_FILE_INVALID	-2
-#define ERROR_ETH_INIT		-3
-
 typedef struct
 {
 	int mode;
@@ -69,7 +65,7 @@ typedef struct
 
 	void (*itemSetCompatibility)(int id, int compatMode, int dmaMode);
 
-	int (*itemLaunch)(int id);
+	void (*itemLaunch)(int id);
 	
 	int (*itemGetArt)(char* name, GSTEXTURE* resultTex, const char* type, short psm);
 

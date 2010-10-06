@@ -1,5 +1,6 @@
 #include "include/usbld.h"
 #include "include/lang.h"
+#include "include/gui.h"
 #include "include/appsupport.h"
 #include "include/themes.h"
 #include "include/system.h"
@@ -105,7 +106,7 @@ static void appRenameItem(int id, char* newName) {
 }
 #endif
 
-static int appLaunchItem(int id) {
+static void appLaunchItem(int id) {
 	struct config_value_t* cur = appGetConfigValue(id);
 	int fd = fioOpen(cur->val, O_RDONLY);
 	if (fd >= 0) {
@@ -119,11 +120,9 @@ static int appLaunchItem(int id) {
 		sprintf(filename,"%s",cur->val);
 		shutdown(exception); // CAREFUL: shutdown will call appCleanUp, so configApps/cur will be freed
 		sysExecElf(filename, 0, NULL);
-
-		return 1;
 	}
-
-	return ERROR_FILE_INVALID;
+	else
+		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 }
 
 static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

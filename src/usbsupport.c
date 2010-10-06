@@ -1,5 +1,6 @@
 #include "include/usbld.h"
 #include "include/lang.h"
+#include "include/gui.h"
 #include "include/supportbase.h"
 #include "include/usbsupport.h"
 #include "include/util.h"
@@ -178,7 +179,6 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 	configGetVMC(game->startup, vmc[1], USB_MODE, 1);
 
 	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
-	// virtual mc informations
 
 	for(i=0; i<2; i++) {
 		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
@@ -188,6 +188,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 		fd = fioOpen(vmc_path, O_RDWR);
 
 		if (fd >= 0) {
+			size_mcemu_irx = -1;
 			LOG("%s open\n", vmc_path);
 
 			vmc_size = fioLseek(fd, 0, SEEK_END);
@@ -232,7 +233,8 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 		}
 		for (j=0; j<size_usb_mcemu_irx; j++) {
 			if (((u32*)&usb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
-				if(usb_vmc_infos.active) size_mcemu_irx = size_usb_mcemu_irx;
+				if(usb_vmc_infos.active)
+					size_mcemu_irx = size_usb_mcemu_irx;
 				memcpy(&((u32*)&usb_mcemu_irx)[j], &usb_vmc_infos, sizeof(usb_vmc_infos_t));
 				break;
 			}
@@ -242,14 +244,16 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 }
 #endif
 
-static int usbLaunchGame(int id) {
+static void usbLaunchGame(int id) {
 	int fd, r, index, i, compatmask;
 	char isoname[32], partname[64], filename[32];
 	base_game_info_t* game = &usbGames[id];
 
 	fd = fioDopen(usbPrefix);
-	if (fd < 0)
-		return ERROR_FILE_INVALID;
+	if (fd < 0) {
+		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
+		return;
+	}
 
 	if (gCheckUSBFragmentation)
 		for (i = 0; i < game->parts; i++) {
@@ -260,7 +264,8 @@ static int usbLaunchGame(int id) {
 
 			if (fioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
 				fioDclose(fd);
-				return ERROR_FRAGMENTED;
+				guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
+				return;
 			}
 		}
 
@@ -295,8 +300,15 @@ static int usbLaunchGame(int id) {
 	}
 
 	fioDclose(fd);
+
 #ifdef VMC
 	int size_mcemu_irx = usbPrepareMcemu(game);
+	if (size_mcemu_irx == -1) {
+		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
+			size_mcemu_irx = 0;
+		else
+			return;
+	}
 #endif
 
 	sprintf(filename,"%s",game->startup);
@@ -308,8 +320,6 @@ static int usbLaunchGame(int id) {
 #else
 	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
 #endif
-
-	return 1;
 }
 
 static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

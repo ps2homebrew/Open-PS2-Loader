@@ -208,7 +208,7 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 	u32 vmc_size;
 
 	configGetVMC(game->startup, vmc[0], ETH_MODE, 0);
-	configSetVMC(game->startup, vmc[1], ETH_MODE, 1);
+	configGetVMC(game->startup, vmc[1], ETH_MODE, 1);
 
 	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
 

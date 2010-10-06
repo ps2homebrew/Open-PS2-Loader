@@ -105,7 +105,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Progress",
 	"VMC file exist",
 	"Invalid VMC file, size is incorrect",
-	"VMC file need to be created"
+	"VMC file need to be created",
+	"Error with VMC file, continue with physical MC ?"
 };
 
 static int guiLangID = 0;

@@ -113,15 +113,8 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 
 	if (support) {
 		if (support->enabled) {
-			if (id >= 0) {
-				int result = support->itemLaunch(id);
-				if (result == ERROR_FRAGMENTED)
-					guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
-				else if (result == ERROR_FILE_INVALID)
-					guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
-				else if (result == ERROR_ETH_INIT)
-					guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
-			}
+			if (id >= 0)
+				support->itemLaunch(id);
 		}
 		else { 
 			support->itemInit();

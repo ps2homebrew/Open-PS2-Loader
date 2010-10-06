@@ -1,5 +1,6 @@
 #include "include/usbld.h"
 #include "include/lang.h"
+#include "include/gui.h"
 #include "include/supportbase.h"
 #include "include/ethsupport.h"
 #include "include/themes.h"
@@ -208,6 +209,7 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 
 	configGetVMC(game->startup, vmc[0], ETH_MODE, 0);
 	configSetVMC(game->startup, vmc[1], ETH_MODE, 1);
+
 	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
 
 	for(i=0; i<2; i++) {
@@ -218,6 +220,7 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 
 		fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
 		if (fd >= 0) {
+			size_mcemu_irx = -1;
 			LOG("%s open\n", vmc_path);
 
 			vmc_size = fileXioLseek(fd, 0, SEEK_END);
@@ -253,7 +256,8 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 		}
 		for (j=0; j<size_smb_mcemu_irx; j++) {
 			if (((u32*)&smb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
-				if(smb_vmc_infos.active) size_mcemu_irx = size_smb_mcemu_irx;
+				if(smb_vmc_infos.active)
+					size_mcemu_irx = size_smb_mcemu_irx;
 				memcpy(&((u32*)&smb_mcemu_irx)[j], &smb_vmc_infos, sizeof(smb_vmc_infos_t));
 				break;
 			}
@@ -263,9 +267,11 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 }
 #endif
 
-static int ethLaunchGame(int id) {
-	if (gNetworkStartup != 0)
-		return ERROR_ETH_INIT;
+static void ethLaunchGame(int id) {
+	if (gNetworkStartup != 0) {
+		guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
+		return;
+	}
 
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
@@ -300,6 +306,12 @@ static int ethLaunchGame(int id) {
 
 #ifdef VMC
 	int size_mcemu_irx = ethPrepareMcemu(game);
+	if (size_mcemu_irx == -1) {
+		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
+			size_mcemu_irx = 0;
+		else
+			return;
+	}
 #endif
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
@@ -323,8 +335,6 @@ static int ethLaunchGame(int id) {
 #else
 	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
 #endif
-
-	return 1;
 }
 
 static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

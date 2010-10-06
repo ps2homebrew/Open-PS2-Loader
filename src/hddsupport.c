@@ -1,6 +1,7 @@
 #include "sys/fcntl.h"
 #include "include/usbld.h"
 #include "include/lang.h"
+#include "include/gui.h"
 #include "include/supportbase.h"
 #include "include/hddsupport.h"
 #include "include/textures.h"
@@ -179,8 +180,6 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 	u32 vmc_size;
 	int i, j, fd, part_valid = 0, size_mcemu_irx = 0;
 
-	if(gHddStartup) return 0;  // if gHddStartup is nonzero, pfs0 wasn't able to be mounted
-
 	configGetVMC(game->startup, vmc[0], HDD_MODE, 0);
 	configGetVMC(game->startup, vmc[1], HDD_MODE, 1);
 
@@ -211,7 +210,7 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 		fileXioClose(fd);
 	}
 
-	if(!part_valid) return 0;
+	if(!part_valid) return -1;
 
 	fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
 	for(i=0; i<2; i++) {
@@ -223,6 +222,7 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 		fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 
 		if (fd >= 0) {
+			size_mcemu_irx = -1;
 			LOG("%s open\n", vmc_path);
 
 			vmc_size = fileXioLseek(fd, 0, SEEK_END);
@@ -267,7 +267,8 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 		}
 		for (j=0; j<size_hdd_mcemu_irx; j++) {
 			if (((u32*)&hdd_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
-				if(hdd_vmc_infos.active) size_mcemu_irx = size_hdd_mcemu_irx;
+				if(hdd_vmc_infos.active)
+					size_mcemu_irx = size_hdd_mcemu_irx;
 				memcpy(&((u32*)&hdd_mcemu_irx)[j], &hdd_vmc_infos, sizeof(hdd_vmc_infos_t));
 				break;
 			}
@@ -277,7 +278,7 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 }
 #endif
 
-static int hddLaunchGame(int id) {
+static void hddLaunchGame(int id) {
 	int i, size_irx = 0;
 	void** irx = NULL;
 	char filename[32];
@@ -359,6 +360,12 @@ static int hddLaunchGame(int id) {
 
 #ifdef VMC
 	int size_mcemu_irx = hddPrepareMcemu(game);
+	if (size_mcemu_irx == -1) {
+		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
+			size_mcemu_irx = 0;
+		else
+			return;
+	}
 #endif
 
 	sprintf(filename,"%s",game->startup);
@@ -370,8 +377,6 @@ static int hddLaunchGame(int id) {
 #else
 	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode, compatMode & COMPAT_MODE_1);
 #endif
-
-	return 1;
 }
 
 static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {

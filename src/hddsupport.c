@@ -173,11 +173,11 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode) {
 static int hddPrepareMcemu(hdl_game_info_t* game) {
 	char vmc[2][32];
 	char vmc_path[64];
+	u32 vmc_size;
 	pfs_inode_t pfs_inode;
 	apa_header part_hdr;
 	hdd_vmc_infos_t hdd_vmc_infos;
 	vmc_superblock_t vmc_superblock;
-	u32 vmc_size;
 	int i, j, fd, part_valid = 0, size_mcemu_irx = 0;
 
 	configGetVMC(game->startup, vmc[0], HDD_MODE, 0);
@@ -230,9 +230,9 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 			fileXioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
 			fileXioLseek(fd, 0, SEEK_SET);
 
-			LOG("Vmc file size            : 0x%X\n", vmc_size);
-			LOG("vmc_superblock.Magic     : %s\n", vmc_superblock.magic);
-			LOG("vmc_superblock.Card type : %d\n", vmc_superblock.mc_type);
+			LOG("File size            : 0x%X\n", vmc_size);
+			LOG("Magic     : %s\n", vmc_superblock.magic);
+			LOG("Card type : %d\n", vmc_superblock.mc_type);
 
 			if(!strncmp(vmc_superblock.magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock.mc_type == 0x2) {
 				hdd_vmc_infos.flags            = vmc_superblock.mc_flag & 0xFF;

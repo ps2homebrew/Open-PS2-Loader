@@ -169,9 +169,9 @@ static void usbSetGameCompatibility(int id, int compatMode, int dmaMode) {
 #ifdef VMC
 static int usbPrepareMcemu(base_game_info_t* game) {
 	char vmc[2][32];
-	u32 vmc_size;
-	int i, j, fd, fd1, size_mcemu_irx = 0;
 	char vmc_path[64];
+	u32 vmc_size;
+	int i, j, fd, size_mcemu_irx = 0;
 	usb_vmc_infos_t usb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 
@@ -185,8 +185,8 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 
 		snprintf(vmc_path, 64, "%sVMC/%s.bin", usbPrefix, vmc[i]);
-		fd = fioOpen(vmc_path, O_RDWR);
 
+		fd = fioOpen(vmc_path, O_RDWR);
 		if (fd >= 0) {
 			size_mcemu_irx = -1;
 			LOG("%s open\n", vmc_path);
@@ -195,7 +195,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 			fioLseek(fd, 0, SEEK_SET);
 			fioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
 
-			LOG("file size : 0x%X\n", vmc_size);
+			LOG("File size : 0x%X\n", vmc_size);
 			LOG("Magic     : %s\n", vmc_superblock.magic);
 			LOG("Card type : %d\n", vmc_superblock.mc_type);
 
@@ -212,7 +212,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 				LOG("specs.card_size  : 0x%X\n", usb_vmc_infos.specs.card_size );
 
 				if(vmc_size == usb_vmc_infos.specs.card_size * usb_vmc_infos.specs.page_size) {
-					fd1 = fioDopen(usbPrefix);
+					int fd1 = fioDopen(usbPrefix);
 
 					if (fd1 >= 0) {
 						snprintf(vmc_path, 64, "VMC/%s.bin", vmc[i]);

@@ -39,6 +39,12 @@ int ioRemoveRequests(int type);
 /** returns the count of pending requests */
 int ioGetPendingRequestCount(void);
 
+/** returns nonzero if there are any pending io requests */
+int ioHasPendingRequests(void);
+
+/** returns nonzero if the io thread is running */
+int ioIsRunning(void);
+
 /** Helper thread safe printf */
 int ioPrintf(const char* format, ...);
 

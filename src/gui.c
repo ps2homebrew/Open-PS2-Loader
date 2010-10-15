@@ -123,7 +123,7 @@ static struct submenu_list_t *mainMenuCurrent;
 // Helper perlin noise data
 #define PLASMA_H 32
 #define PLASMA_W 32
-#define PLASMA_ROWS_PER_FRAME 8
+#define PLASMA_ROWS_PER_FRAME 6
 #define FADE_SIZE 256
 
 static int pperm[512];
@@ -813,12 +813,13 @@ static void guiDrawBusy() {
 	}
 }
 
-static int wfadeout = 0x080;
+static int wfadeout = 0x0150;
 static void guiRenderGreeting() {
 	rmUnclip();
 	
-	
-	u64 mycolor = GS_SETREG_RGBA(0x60, 0x60, 0x60, wfadeout);
+	int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
+
+	u64 mycolor = GS_SETREG_RGBA(0x40, 0x40, 0x40, fade >> 1);
 	
 	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, mycolor);
@@ -831,7 +832,7 @@ static void guiRenderGreeting() {
 	GSTEXTURE* logo = thmGetTexture(LOGO_PICTURE);
 	
 	if (logo) {
-		mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, bfadeout);
+		mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, fade >> 1);
 		rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, mycolor);
 	}
 	
@@ -848,7 +849,7 @@ static float fade(float t) {
 
 // The same as mix, but with 8 (2*4) values mixed at once
 static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR* res) {
-	asm __volatile__ (
+	asm (
 		"lqc2	vf1, 0(%0)\n" // load the first vector
 		"lqc2	vf2, 0(%1)\n" // load the second vector
 		"lw	$2, 0(%2)\n" // load value from ptr to reg
@@ -969,7 +970,7 @@ static float guiCalcPerlin(float x, float y, float z) {
 	return nxyz; 
 }
 
-static float dir = 0.04;
+static float dir = 0.02;
 static float perz = -100;
 static int pery = 0;
 static unsigned char curbgColor[3] = {0,0,0};
@@ -1063,7 +1064,7 @@ static void guiDrawOverlays() {
 	// are there any pending operations?
 	rmSetTransposition(0,0);
 	
-	int pending = ioGetPendingRequestCount();
+	int pending = ioHasPendingRequests();
 
 	if (gInitComplete)
 		wfadeout--;
@@ -1332,7 +1333,8 @@ void guiMainLoop(void) {
 		guiReadPads();
 		
 		// handle inputs and render screen
-		guiShow();
+		if (wfadeout < 0x0FF)
+			guiShow();
 		
 		// Render overlaying gui thingies :)
 		guiDrawOverlays();

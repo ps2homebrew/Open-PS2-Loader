@@ -59,6 +59,7 @@ static ee_thread_t gIOThread;
 static ee_sema_t gQueueSema;
 
 static int isIOBlocked = 0;
+static int isIORunning = 0;
 static int alarmID = 0;
 static int stopIOTimer = 0;
 
@@ -147,9 +148,19 @@ static void ioWorkerThread(void) {
 		}
 	}
 	
+	// delete the pending requests
+	while (gReqList) {
+		struct io_request_t* req = gReqList;
+		gReqList = gReqList->next;
+		free(req); // TODO: Leak over here - we need a propper flag to free/not the user data
+	}
+	
 	// delete the semaphores
 	DeleteSema(gProcSemaId);
 	DeleteSema(gEndSemaId);
+	
+	isIORunning = 0;
+
 	ExitDeleteThread();
 }
 
@@ -200,6 +211,7 @@ void ioInit(void) {
 	gIOThread.stack        = thread_stack;
 	gIOThread.initial_priority = 30;
 
+	isIORunning = 1;
 	gIOThreadId = CreateThread(&gIOThread);
 	StartThread(gIOThreadId, NULL);
 	
@@ -283,18 +295,6 @@ void ioEnd(void) {
 	// termination requested flag
 	gIOTerminate = 1;
 	
-	WaitSema(gEndSemaId);
-	WaitSema(gProcSemaId);
-	
-	while (gReqList) {
-		struct io_request_t* req = gReqList;
-		gReqList = gReqList->next;
-		free(req); // TODO: Leak over here - we need a propper flag to free/not the user data
-	}
-	
-	SignalSema(gProcSemaId);
-	SignalSema(gEndSemaId);
-	
 	// wake up and wait for end
 	WakeupThread(gIOThreadId);
 	WakeupThread(gDispatcherThreadID);
@@ -313,6 +313,10 @@ int ioGetPendingRequestCount(void) {
 	}
 	
 	return count;
+}
+
+int ioHasPendingRequests(void) {
+	return gReqList != NULL ? 1 : 0;
 }
 
 
@@ -359,7 +363,7 @@ int ioBlockOps(int block) {
 		isIOBlocked = 1;
 		
 		// wait for all io to finish
-		while (ioGetPendingRequestCount()) {
+		while (ioHasPendingRequests()) {
 			// TODO: This is in seconds, so can be too coarse
 			sleep(1);
 		}

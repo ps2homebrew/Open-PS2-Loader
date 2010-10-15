@@ -1,7 +1,7 @@
 #ifndef __SUPPORT_BASE_H
 #define __SUPPORT_BASE_H
 
-#define BASE_GAME_NAME_MAX  		128
+#define BASE_GAME_NAME_MAX  		32
 #define BASE_GAME_STARTUP_MAX  		12
 
 typedef struct

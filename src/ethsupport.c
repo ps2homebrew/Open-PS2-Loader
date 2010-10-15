@@ -201,11 +201,11 @@ static void ethSetGameCompatibility(int id, int compatMode, int dmaMode) {
 #ifdef VMC
 static int ethPrepareMcemu(base_game_info_t* game) {
 	char vmc[2][32];
+	char vmc_path[64];
+	u32 vmc_size;
 	int i, j, fd, size_mcemu_irx = 0;
 	smb_vmc_infos_t smb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
-	char vmc_path[64];
-	u32 vmc_size;
 
 	configGetVMC(game->startup, vmc[0], ETH_MODE, 0);
 	configGetVMC(game->startup, vmc[1], ETH_MODE, 1);
@@ -227,7 +227,7 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 			fileXioLseek(fd, 0, SEEK_SET);
 			fileXioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
 
-			LOG("file size : 0x%X\n", vmc_size);
+			LOG("File size : 0x%X\n", vmc_size);
 			LOG("Magic     : %s\n", vmc_superblock.magic);
 			LOG("Card type : %d\n", vmc_superblock.mc_type);
 

@@ -54,7 +54,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 				
 				base_game_info_t *game = &(*glist)->gameinfo;
 
-				strncpy(game->name, &record.name[12], size);
+				strncpy(game->name, &record.name[BASE_GAME_STARTUP_MAX], size);
 				game->name[size] = '\0';
 				strncpy(game->startup, record.name, BASE_GAME_STARTUP_MAX - 1);
 				game->startup[BASE_GAME_STARTUP_MAX - 1] = '\0';

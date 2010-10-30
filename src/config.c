@@ -374,7 +374,7 @@ int configRead(config_set_t* configSet) {
 	}
 	closeFileBuffer(fileBuffer);
 	configSet->modified = 0;
-	return 1;
+	return configSet->type;
 }
 
 int configWrite(config_set_t* configSet) {
@@ -462,7 +462,7 @@ int configReadMulti(int types) {
 
 		if (configSet->type & types) {
 			configClear(configSet);
-			result += configRead(configSet);
+			result |= configRead(configSet);
 		}
 		index++;
 	}

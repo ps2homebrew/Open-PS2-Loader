@@ -280,13 +280,12 @@ static void menuFillHookFunc(struct submenu_list_t **menu) {
 static int lscstatus = CONFIG_ALL;
 static int lscret = 0;
 
-static int configTryAlternate(int types) {
+static int tryAlternateDevice(int types) {
 	char path[64];
 
 	// check USB
-	gUSBStartMode = 2;
-	initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, 0);
-	delay(10);
+	initSupport(usbGetObject(0), 2, USB_MODE, 0);
+	delay(20);
 	if (usbFindPartition(path, "conf_opl.cfg")) {
 		configEnd();
 		configInit(path);
@@ -294,8 +293,7 @@ static int configTryAlternate(int types) {
 	}
 
 	// check HDD
-	gHDDStartMode = 2;
-	initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, 0);
+	initSupport(hddGetObject(0), 2, HDD_MODE, 0);
 	delay(10);
 	snprintf(path, 64, "pfs0:conf_opl.cfg");
 	int fd = fioOpen(path, O_RDONLY);
@@ -315,8 +313,8 @@ static void _loadConfig() {
 	if (lscstatus & CONFIG_OPL) {
 		int themeID = -1, langID = -1;
 		
-		if (!result)
-			result = configTryAlternate(lscstatus);
+		if (!(result & CONFIG_OPL))
+			result = tryAlternateDevice(lscstatus);
 
 		if (result) {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);

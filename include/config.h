@@ -7,8 +7,10 @@
 #define CONFIG_COMPAT	0x02
 #define CONFIG_DNAS		0x04
 #define CONFIG_VMC		0x08
+#define CONFIG_LAST		0x10
+#define CONFIG_APPS		0x20
 
-#define CONFIG_FILE_NUM 4
+#define CONFIG_FILE_NUM 6
 
 struct config_value_t {
         char key[32];

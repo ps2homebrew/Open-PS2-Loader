@@ -44,7 +44,7 @@ int usbFindPartition(char *target, char *name) {
 	int i, fd;
 	char path[64];
 
-	for(i=0; i<5; i++){
+	for(i=0; i<5; i++) {
 		snprintf(path, 64, "mass%d:%s", i, name);
 		fd = fioOpen(path, O_RDONLY);
 

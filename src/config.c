@@ -13,6 +13,8 @@
 #define CONFIG_INDEX_COMPAT		1
 #define CONFIG_INDEX_DNAS		2
 #define CONFIG_INDEX_VMC		3
+#define CONFIG_INDEX_LAST		4
+#define CONFIG_INDEX_APPS		5
 
 static config_set_t configFiles[CONFIG_FILE_NUM];
 
@@ -116,6 +118,10 @@ void configInit(char *prefix) {
 	configAlloc(CONFIG_DNAS, &configFiles[CONFIG_INDEX_DNAS], path);
 	snprintf(path, 255, "%s/conf_vmc.cfg", prefix);
 	configAlloc(CONFIG_VMC, &configFiles[CONFIG_INDEX_VMC], path);
+	snprintf(path, 255, "%s/conf_last.cfg", prefix);
+	configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
+	snprintf(path, 255, "%s/conf_apps.cfg", prefix);
+	configAlloc(CONFIG_APPS, &configFiles[CONFIG_INDEX_APPS], path);
 }
 
 void configEnd() {

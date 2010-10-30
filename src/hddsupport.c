@@ -285,8 +285,8 @@ static void hddLaunchGame(int id) {
 	hdl_game_info_t* game = &hddGames->games[id];
 
 	if (gRememberLastPlayed) {
-		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
-		saveConfig(CONFIG_OPL, 0);
+		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
+		saveConfig(CONFIG_LAST, 0);
 	}
 
 	char gid[5];

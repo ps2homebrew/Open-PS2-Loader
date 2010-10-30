@@ -40,24 +40,24 @@ static base_game_info_t *usbGames;
 // forward declaration
 static item_list_t usbGameList;
 
-static int usbFindPartition(void) {
+int usbFindPartition(char *target, char *name) {
 	int i, fd;
 	char path[64];
 
 	for(i=0; i<5; i++){
-		snprintf(path, 64, "mass%d:ul.cfg", i);
+		snprintf(path, 64, "mass%d:%s", i, name);
 		fd = fioOpen(path, O_RDONLY);
 
 		if(fd >= 0) {
-			snprintf(usbPrefix, 8, "mass%d:", i);
+			snprintf(target, 8, "mass%d:", i);
 			fioClose(fd);
 			return 1;
 		}
 	}
 
 	// default to first partition (for themes, ...)
-	sprintf(usbPrefix, "mass0:");
-	return 1;
+	sprintf(target, "mass0:");
+	return 0;
 }
 
 static void usbLoadModules(void) {
@@ -88,7 +88,7 @@ static void usbLoadModules(void) {
 	LOG("usbLoadModules: modules loaded\n");
 
 	// update Themes
-	usbFindPartition();
+	usbFindPartition(usbPrefix, "ul.cfg");
 	char path[32];
 	sprintf(path, "%sTHM/", usbPrefix);
 	thmAddElements(path, "/");
@@ -119,12 +119,8 @@ static int usbNeedsUpdate(void) {
 }
 
 static int usbUpdateGameList(void) {
-	if (usbFindPartition())
-		sbReadList(&usbGames, usbPrefix, "/", &usbULSizePrev, &usbGameCount);
-	else {
-		usbGameCount = 0;
-		usbULSizePrev = -1;
-	}
+	usbFindPartition(usbPrefix, "ul.cfg");
+	sbReadList(&usbGames, usbPrefix, "/", &usbULSizePrev, &usbGameCount);
 	return usbGameCount;
 }
 

@@ -6,7 +6,6 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 
-#define MENU_POS_H 160
 #define MENU_POS_V 50
 #define HINT_HEIGHT 32
 

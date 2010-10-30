@@ -2,8 +2,8 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
-#use make VMC=1 to build with vmc
-VMC = 1
+#uncomment following line to build with vmc
+#VMC = 1
 CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
@@ -102,8 +102,8 @@ iopcore_debug:
 
 clean:
 	echo "Cleaning..."
-#	echo "    * Freetype..."
-#	$(MAKE) -C $(FT_DIR) distclean
+	echo "    * Freetype..."
+	$(MAKE) -C $(FT_DIR) distclean
 	echo "    * Interface"
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"
@@ -164,8 +164,8 @@ endif
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo "    * ps2link.irx"
 	$(MAKE) -C modules/debug/ps2link clean
-#	echo "    * pc tools"
-#	$(MAKE) -C pc clean
+	echo "    * pc tools"
+	$(MAKE) -C pc clean
 
 rebuild: clean all
 

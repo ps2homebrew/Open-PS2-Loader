@@ -32,9 +32,7 @@ void appInit(void) {
 	LOG("appInit()\n");
 	appForceUpdate = 1;
 
-	char path[255];
-	snprintf(path, 255, "%s/conf_apps.cfg", gBaseMCDir);
-	configApps = configAlloc(0, NULL, path);
+	configApps = configGetByType(CONFIG_APPS);
 
 	appItemList.enabled = 1;
 }
@@ -88,6 +86,7 @@ static void appDeleteItem(int id) {
 	struct config_value_t* cur = appGetConfigValue(id);
 	fileXioRemove(cur->val);
 	cur->key[0] = '\0';
+	configApps->modified = 1;
 	configWrite(configApps);
 
 	appForceUpdate = 1;
@@ -153,8 +152,6 @@ static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 static void appCleanUp(int exception) {
 	if (appItemList.enabled) {
 		LOG("appCleanUp()\n");
-
-		configFree(configApps);
 	}
 }
 

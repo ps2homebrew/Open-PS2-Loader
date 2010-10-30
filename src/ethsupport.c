@@ -279,8 +279,8 @@ static void ethLaunchGame(int id) {
 	base_game_info_t* game = &ethGames[id];
 
 	if (gRememberLastPlayed) {
-		configSetStr(configGetByType(CONFIG_OPL), "last_played", game->startup);
-		saveConfig(CONFIG_OPL, 0);
+		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
+		saveConfig(CONFIG_LAST, 0);
 	}
 
 	if (sysPcmciaCheck()) {

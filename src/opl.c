@@ -487,7 +487,7 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	
 	char* temp = NULL;
 	if (gRememberLastPlayed)
-		configGetStr(configGetByType(CONFIG_OPL), "last_played", &temp);
+		configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
 
 	// read the new game list
 	struct gui_update_t *gup = NULL;

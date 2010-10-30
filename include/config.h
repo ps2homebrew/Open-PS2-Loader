@@ -25,7 +25,7 @@ typedef struct {
 	int modified;
 } config_set_t;
 
-void configInit();
+void configInit(char *prefix);
 void configEnd();
 config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName);
 void configFree(config_set_t *configSet);

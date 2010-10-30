@@ -106,15 +106,15 @@ static struct config_value_t* getConfigItemForName(config_set_t* configSet, cons
 	return val;
 }
 
-void configInit() {
+void configInit(char *prefix) {
 	char path[255];
-	snprintf(path, 255, "%s/conf_opl.cfg", gBaseMCDir);
+	snprintf(path, 255, "%s/conf_opl.cfg", prefix);
 	configAlloc(CONFIG_OPL, &configFiles[CONFIG_INDEX_OPL], path);
-	snprintf(path, 255, "%s/conf_compatibility.cfg", gBaseMCDir);
+	snprintf(path, 255, "%s/conf_compatibility.cfg", prefix);
 	configAlloc(CONFIG_COMPAT, &configFiles[CONFIG_INDEX_COMPAT], path);
-	snprintf(path, 255, "%s/conf_dnas.cfg", gBaseMCDir);
+	snprintf(path, 255, "%s/conf_dnas.cfg", prefix);
 	configAlloc(CONFIG_DNAS, &configFiles[CONFIG_INDEX_DNAS], path);
-	snprintf(path, 255, "%s/conf_vmc.cfg", gBaseMCDir);
+	snprintf(path, 255, "%s/conf_vmc.cfg", prefix);
 	configAlloc(CONFIG_VMC, &configFiles[CONFIG_INDEX_VMC], path);
 }
 
@@ -345,7 +345,7 @@ void configGetDiscIDBinary(char* startup, void* dst) {
 int configRead(config_set_t* configSet) {
 	file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
 	if (!fileBuffer) {
-		LOG("No config %s. Exiting...\n", configSet->filename);
+		LOG("No config %s.\n", configSet->filename);
 		configSet->modified = 0;
 		return 0;
 	}

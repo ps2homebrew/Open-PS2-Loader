@@ -65,7 +65,7 @@ typedef struct {
 	struct submenu_list_t *subMenu;
 } opl_io_module_t;
 
-void clearIOModuleT(opl_io_module_t *mod) {
+static void clearIOModuleT(opl_io_module_t *mod) {
 	mod->subMenu = NULL;
 	mod->support = NULL;
 	mod->menuItem.execCross = NULL;
@@ -260,13 +260,13 @@ static void deinitAllSupport(int exception) {
 #define MENU_ID_START_ETH 103
 #define MENU_ID_START_APP 104
 
-void menuExecHookFunc(int id) {
+static void menuExecHookFunc(int id) {
 	if (id == MENU_ID_START_HDL) {
 		handleHdlSrv();
 	}        
 }
 
-void menuFillHookFunc(struct submenu_list_t **menu) {
+static void menuFillHookFunc(struct submenu_list_t **menu) {
 #ifndef __CHILDPROOF
 	if (gHDDStartMode) // enabled at all?
 		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
@@ -277,15 +277,47 @@ void menuFillHookFunc(struct submenu_list_t **menu) {
 // ------------------ Configuration handling ----------------
 // ----------------------------------------------------------
 
-int lscstatus = CONFIG_ALL;
-int lscret = 0;
+static int lscstatus = CONFIG_ALL;
+static int lscret = 0;
 
-void _loadConfig() {
+static int configTryAlternate(int types) {
+	char path[64];
+
+	// check USB
+	gUSBStartMode = 2;
+	initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, 0);
+	delay(10);
+	if (usbFindPartition(path, "conf_opl.cfg")) {
+		configEnd();
+		configInit(path);
+		return configReadMulti(types);
+	}
+
+	// check HDD
+	gHDDStartMode = 2;
+	initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, 0);
+	delay(10);
+	snprintf(path, 64, "pfs0:conf_opl.cfg");
+	int fd = fioOpen(path, O_RDONLY);
+	if(fd >= 0) {
+		fioClose(fd);
+		configEnd();
+		configInit("pfs0:");
+		return configReadMulti(types);
+	}
+
+	return 0;
+}
+
+static void _loadConfig() {
 	int result = configReadMulti(lscstatus);
 
 	if (lscstatus & CONFIG_OPL) {
 		int themeID = -1, langID = -1;
 		
+		if (!result)
+			result = configTryAlternate(lscstatus);
+
 		if (result) {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);
 			char *temp;
@@ -339,7 +371,7 @@ void _loadConfig() {
 	lscstatus = 0;
 }
 
-void _saveConfig() {
+static void _saveConfig() {
 	if (lscstatus & CONFIG_OPL) {
 		config_set_t *configOPL = configGetByType(CONFIG_OPL);
 		configSetInt(configOPL, "icons_cache_count", gCountIconsCache);
@@ -796,7 +828,7 @@ static void init(void) {
 	setDefaults();
 
 	padInit(0);
-	configInit();
+	configInit(gBaseMCDir);
 	rmInit();
 	lngInit();
 	thmInit();

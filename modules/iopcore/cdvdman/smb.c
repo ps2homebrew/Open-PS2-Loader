@@ -470,8 +470,8 @@ lbl_sstc:
 	if (CF == 2)
 		SSR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	SSR->smbWordcount = 13;
-	SSR->MaxBufferSize = (u16)server_specs.MaxBufferSize;
-	SSR->MaxMpxCount = ((u16)server_specs.MaxMpxCount >= 2) ? 2 : (u16)server_specs.MaxMpxCount;
+	SSR->MaxBufferSize = server_specs.MaxBufferSize > 65535 ? 65535 : (u16)server_specs.MaxBufferSize;
+	SSR->MaxMpxCount = server_specs.MaxMpxCount >= 2 ? 2 : (u16)server_specs.MaxMpxCount;
 	SSR->VCNumber = 1;
 	SSR->SessionKey = server_specs.SessionKey;
 	SSR->Capabilities = CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32;

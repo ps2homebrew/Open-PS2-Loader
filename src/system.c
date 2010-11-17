@@ -763,6 +763,22 @@ void sysApplyKernelPatches(void) {
 	}
 }
 
+int sysCheckMC(void) {
+	int dummy, ret;
+
+	mcGetInfo(0, 0, &dummy, &dummy, &dummy);
+	mcSync(0, NULL, &ret);
+
+	if( -1 == ret || 0 == ret) return 0;
+
+	mcGetInfo(1, 0, &dummy, &dummy, &dummy);
+	mcSync(0, NULL, &ret);
+
+	if( -1 == ret || 0 == ret ) return 1;
+
+	return -11;
+}
+
 #ifdef VMC
 int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize) {
 	int size = -1;

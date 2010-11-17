@@ -116,7 +116,7 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 			if (id >= 0)
 				support->itemLaunch(id);
 		}
-		else { 
+		else {
 			support->itemInit();
 			menuRemoveHints(self); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
 			initHints(self, 2);
@@ -282,29 +282,39 @@ static int lscret = 0;
 
 static int tryAlternateDevice(int types) {
 	char path[64];
+	int result = 0;
 
-	// check USB
 	initSupport(usbGetObject(0), 2, USB_MODE, 0);
-	delay(20);
-	if (usbFindPartition(path, "conf_opl.cfg")) {
-		configEnd();
-		configInit(path);
-		return configReadMulti(types);
-	}
-
-	// check HDD
 	initSupport(hddGetObject(0), 2, HDD_MODE, 0);
-	delay(10);
-	snprintf(path, 64, "pfs0:conf_opl.cfg");
-	int fd = fioOpen(path, O_RDONLY);
-	if(fd >= 0) {
-		fioClose(fd);
-		configEnd();
-		configInit("pfs0:");
-		return configReadMulti(types);
-	}
 
-	return 0;
+	do {
+		delay(10);
+
+		// check USB
+		if (usbFindPartition(path, "conf_opl.cfg")) {
+			configEnd();
+			configInit(path);
+			result = configReadMulti(types);
+		}
+
+		// check HDD
+		snprintf(path, 64, "pfs0:conf_opl.cfg");
+		int fd = fioOpen(path, O_RDONLY);
+		if(fd >= 0) {
+			fioClose(fd);
+			configEnd();
+			configInit("pfs0:");
+			result = configReadMulti(types);
+		}
+
+		// check if user abort config polling
+		readPads();
+		if(getKeyOn(KEY_CIRCLE) || getKeyOn(KEY_CROSS))
+			break;
+	}
+	while (!result);
+
+	return result;
 }
 
 static void _loadConfig() {
@@ -313,8 +323,11 @@ static void _loadConfig() {
 	if (lscstatus & CONFIG_OPL) {
 		int themeID = -1, langID = -1;
 		
-		if (!(result & CONFIG_OPL))
-			result = tryAlternateDevice(lscstatus);
+		if (!(result & CONFIG_OPL)) {
+			if (sysCheckMC() < 0) { // No MC inserted
+				result = tryAlternateDevice(lscstatus);
+			}
+		}
 
 		if (result) {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);

@@ -17,6 +17,7 @@
 #define CONFIG_INDEX_APPS		5
 
 static config_set_t configFiles[CONFIG_FILE_NUM];
+static char configPath[255] = "mc?:SYS-CONF/IPCONFIG.DAT";
 
 static int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
@@ -110,6 +111,12 @@ static struct config_value_t* getConfigItemForName(config_set_t* configSet, cons
 
 void configInit(char *prefix) {
 	char path[255];
+
+	if (prefix)
+		snprintf(configPath, 255, "%s/IPCONFIG.DAT", prefix);
+	else
+		prefix = gBaseMCDir;
+
 	snprintf(path, 255, "%s/conf_opl.cfg", prefix);
 	configAlloc(CONFIG_OPL, &configFiles[CONFIG_INDEX_OPL], path);
 	snprintf(path, 255, "%s/conf_compatibility.cfg", prefix);
@@ -271,7 +278,7 @@ int configRemoveKey(config_set_t* configSet, const char* key) {
 }
 
 void configReadIP() {
-	int fd = openFile("mc?:SYS-CONF/IPCONFIG.DAT", O_RDONLY);
+	int fd = openFile(configPath, O_RDONLY);
 	if (fd >= 0) {
 		char ipconfig[255];
 		int size = getFileSize(fd);
@@ -287,7 +294,7 @@ void configReadIP() {
 }
 
 void configWriteIP() {
-	int fd = openFile("mc?:SYS-CONF/IPCONFIG.DAT", O_WRONLY | O_CREAT);
+	int fd = openFile(configPath, O_WRONLY | O_CREAT);
 	if (fd >= 0) {
 		char ipconfig[255];
 		sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],

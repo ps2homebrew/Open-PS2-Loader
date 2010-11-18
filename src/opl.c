@@ -282,7 +282,6 @@ static int lscret = 0;
 
 static int tryAlternateDevice(int types) {
 	char path[64];
-	int result = 0;
 
 	initSupport(usbGetObject(0), 2, USB_MODE, 0);
 	initSupport(hddGetObject(0), 2, HDD_MODE, 0);
@@ -294,7 +293,7 @@ static int tryAlternateDevice(int types) {
 		if (usbFindPartition(path, "conf_opl.cfg")) {
 			configEnd();
 			configInit(path);
-			result = configReadMulti(types);
+			return configReadMulti(types);
 		}
 
 		// check HDD
@@ -304,17 +303,30 @@ static int tryAlternateDevice(int types) {
 			fioClose(fd);
 			configEnd();
 			configInit("pfs0:");
-			result = configReadMulti(types);
+			return configReadMulti(types);
 		}
 
 		// check if user abort config polling
 		readPads();
-		if(getKeyOn(KEY_CIRCLE) || getKeyOn(KEY_CROSS))
-			break;
-	}
-	while (!result);
+		if(getKeyOn(KEY_CIRCLE) || getKeyOn(KEY_CROSS)) {
+			// set config path to either mass or hdd, to prepare the saving of a new config
+			int fd = fioDopen("mass0:");
+			if (fd >= 0) {
+				fioDclose(fd);
+				configEnd();
+				configInit("mass0:");
+			}
+			else {
+				configEnd();
+				configInit("pfs0:");
+			}
 
-	return result;
+			break;
+		}
+	}
+	while (1);
+
+	return 0;
 }
 
 static void _loadConfig() {
@@ -839,7 +851,7 @@ static void init(void) {
 	setDefaults();
 
 	padInit(0);
-	configInit(gBaseMCDir);
+	configInit(NULL);
 	rmInit();
 	lngInit();
 	thmInit();

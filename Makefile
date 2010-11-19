@@ -2,8 +2,8 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
-#uncomment following line to build with vmc
-#VMC = 1
+#comment following line to build without vmc
+VMC = 1
 CHILDPROOF = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
@@ -16,7 +16,8 @@ FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.
 GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o obj/disc_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
-		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o
+		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o \
+		obj/icon_sys.o obj/icon_icn.o
 
 LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
@@ -534,9 +535,14 @@ R1_icon.s:
 R2_icon.s:
 	bin2s gfx/R2.png asm/R2_icon.s R2_png
 
-
 freesans.s:
 	bin2s thirdparty/FreeSans_basic_latin.ttf asm/freesans.s freesansfont_raw
+
+icon_sys.s:
+	bin2s gfx/icon.sys asm/icon_sys.s icon_sys
+	
+icon_icn.s:
+	bin2s gfx/opl.icn asm/icon_icn.s icon_icn	
   
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@

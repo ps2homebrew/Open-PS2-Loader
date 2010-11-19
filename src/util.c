@@ -11,6 +11,10 @@
 #include "malloc.h"
 #include "fileio.h"
 
+extern void *icon_sys;
+extern int size_icon_sys;
+extern void *icon_icn;
+extern int size_icon_icn;
 
 static int mcID = -1;
 
@@ -20,6 +24,22 @@ int getFileSize(int fd) {
 	return size;
 }
 
+static void writeMCIcon() {
+	void** buffer = &icon_icn;
+	file_buffer_t* fileBuffer = openFileBuffer("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC, 0, 0);
+	if (fileBuffer) {
+		writeFileBuffer(fileBuffer, (char *)buffer, size_icon_icn);
+		closeFileBuffer(fileBuffer);
+	}
+
+	buffer = &icon_sys;
+	fileBuffer = openFileBuffer("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC, 0, 0);
+	if (fileBuffer) {
+		writeFileBuffer(fileBuffer, (char *)buffer, size_icon_sys);
+		closeFileBuffer(fileBuffer);
+	}
+}
+
 static int checkMC() {
 	if (mcID == -1) {
 		int fd = fioDopen("mc0:OPL");
@@ -27,10 +47,14 @@ static int checkMC() {
 			fd = fioDopen("mc1:OPL");
 			if(fd < 0) {
 				// No base dir found on any MC, will create the folder
-				if (fioMkdir("mc0:OPL") >= 0)
+				if (fioMkdir("mc0:OPL") >= 0) {
 					mcID = 0x30;
-				else if (fioMkdir("mc1:OPL") >= 0)
+					writeMCIcon();
+				}
+				else if (fioMkdir("mc1:OPL") >= 0) {
 					mcID = 0x31;
+					writeMCIcon();
+				}
 			}
 			else {
 				fioDclose(fd);

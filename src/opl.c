@@ -379,7 +379,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "default_device", &gDefaultDevice);
 			configGetInt(configOPL, "disable_debug", &gDisableDebug);
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
-			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
+			//configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
 			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
 			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
@@ -422,7 +422,7 @@ static void _saveConfig() {
 		configSetInt(configOPL, "default_device", gDefaultDevice);
 		configSetInt(configOPL, "disable_debug", gDisableDebug);
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
-		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
+		//configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
 		configSetInt(configOPL, "usb_mode", gUSBStartMode);
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);

@@ -1,10 +1,13 @@
 #ifndef __SYSTEM_H
 #define __SYSTEM_H
 
+#define SYS_LOAD_MC_MODULES	0x01
+#define SYS_LOAD_PAD_MODULES	0x02
+
 void delay(int count);
 unsigned int USBA_crc32(char *string);
 int sysGetDiscID(char *discID);
-void sysReset(void);
+void sysReset(int modload_mask);
 void sysPowerOff(void);
 int sysPcmciaCheck(void);
 void sysGetCDVDFSV(void **data_irx, int *size_irx);

@@ -20,6 +20,12 @@
 
 #include "genvmc.h"
 
+#ifdef DEBUG
+#define DPRINTF(args...)	printf(args)
+#else
+#define DPRINTF(args...)	do { } while(0)
+#endif
+
 #define MODNAME "genvmc"
 IRX_ID(MODNAME, 1, 1);
 
@@ -611,6 +617,9 @@ exit:
 //-------------------------------------------------------------- 
 static int vmc_create(createVMCparam_t *param)
 {
+	DPRINTF("%s: vmc_create() filename=%s size_MB=%d blocksize=%d th_priority=0x%02x slot=%d\n", MODNAME, \
+		param->VMC_filename, param->VMC_size_mb, param->VMC_blocksize, param->VMC_thread_priority, param->VMC_card_slot);
+
 	register int r;
 	iop_thread_t thread_param;
 
@@ -636,6 +645,8 @@ static int vmc_create(createVMCparam_t *param)
 //-------------------------------------------------------------- 
 static int vmc_abort(void)
 {
+	DPRINTF("%s: vmc_abort()\n", MODNAME);
+
 	register int r;
 
 	if (genvmc_thid >= 0) {
@@ -719,6 +730,8 @@ int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 argl
 //-------------------------------------------------------------- 
 int _start(int argc, char** argv)
 {
+	DPRINTF("%s start!\n", MODNAME);
+
 	DelDrv("genvmc");
 
 	if (AddDrv((iop_device_t *)&genvmc_dev) < 0)

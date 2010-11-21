@@ -5,6 +5,7 @@
 
 #include <intrman.h>
 #include <ioman.h>
+#include "ioman_add.h"
 #ifdef DEBUG
 #include <stdio.h>
 #endif

@@ -185,6 +185,7 @@ static u8 cluster_buf[(BLOCKKB * 1024)+16] __attribute__((aligned(64)));
 static int genvmc_io_sema = -1;
 static int genvmc_thread_sema = -1;
 static int genvmc_abort_sema = -1;
+static int genvmc_abort_finished_sema = -1;
 
 static int genvmc_abort = 0;
 
@@ -635,9 +636,10 @@ static void VMC_create_thread(void *args)
 		genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
 		genvmc_stats.VMC_error = r;
 
-		if (r == -1000) {
+		if (r == -1000) { // user abort
 			remove(param->VMC_filename);
 			strcpy(genvmc_stats.VMC_msg, "VMC file creation aborted");
+			SignalSema(genvmc_abort_finished_sema);
 		}
 		else
 			strcpy(genvmc_stats.VMC_msg, "Failed to format VMC file");
@@ -686,13 +688,16 @@ static int vmc_create(createVMCparam_t *param)
 //-------------------------------------------------------------- 
 static int vmc_abort(void)
 {
+	WaitSema(genvmc_abort_sema);
+
 	DPRINTF("%s: vmc_abort()\n", MODNAME);
 
-	WaitSema(genvmc_abort_sema);
 	genvmc_abort = 1;
 	SignalSema(genvmc_abort_sema);
 
-	SignalSema(genvmc_thread_sema);
+	genvmc_abort_finished_sema = CreateMutex(IOP_MUTEX_LOCKED);
+	WaitSema(genvmc_abort_finished_sema);
+	DeleteSema(genvmc_abort_finished_sema);
 
 	return 0;
 }

@@ -408,7 +408,11 @@ ps2hdd.s:
 
 genvmc.s:
 	echo "    * genvmc.irx"
+ifeq ($(DEBUG),1)
+	$(MAKE) DEBUG=1 -C modules/vmc/genvmc
+else
 	$(MAKE) -C modules/vmc/genvmc
+endif
 	bin2s modules/vmc/genvmc/genvmc.irx asm/genvmc.s genvmc_irx
 
 hdldsvr.s:

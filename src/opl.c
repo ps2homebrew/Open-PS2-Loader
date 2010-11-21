@@ -623,10 +623,7 @@ void loadHdldSvr(void) {
 
 	unloadPads();
 
-	sysReset();
-
-	SifLoadModule("rom0:SIO2MAN", 0, NULL);
-	SifLoadModule("rom0:PADMAN", 0, NULL);
+	sysReset(SYS_LOAD_PAD_MODULES);
 
 	int iplen = sysSetIPConfig(ipconfig);
 
@@ -671,15 +668,11 @@ void loadHdldSvr(void) {
 void unloadHdldSvr(void) {
 	unloadPads();
 
-	sysReset();
+	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
 
 	LOG_INIT();
 	LOG_ENABLE();
 
-	SifLoadModule("rom0:SIO2MAN", 0, NULL);
-	SifLoadModule("rom0:MCMAN", 0, NULL);
-	SifLoadModule("rom0:MCSERV", 0, NULL);
-	SifLoadModule("rom0:PADMAN", 0, NULL);
 	mcInit(MC_TYPE_MC);
 
 	// reinit the input pads
@@ -735,14 +728,10 @@ static void handleHdlSrv() {
 // --------------------- Init/Deinit ------------------------
 // ----------------------------------------------------------
 static void reset(void) {
-	sysReset();
+	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
 	
 	SifInitRpc(0);
 
-	SifLoadModule("rom0:SIO2MAN",0,0);
-	SifLoadModule("rom0:MCMAN",0,0);
-	SifLoadModule("rom0:MCSERV",0,0);
-	SifLoadModule("rom0:PADMAN",0,0);
 	mcInit(MC_TYPE_MC);
 }
 

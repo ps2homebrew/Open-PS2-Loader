@@ -5,6 +5,7 @@ I_open
 I_lseek
 I_write
 I_close
+I_remove
 ioman_IMPORTS_end
 
 intrman_IMPORTS_start

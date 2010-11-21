@@ -65,4 +65,7 @@ typedef struct _iop_ext_device_ops {
 	
 } iop_ext_device_ops_t;
 
+int remove(const char *name);
+#define I_remove DECLARE_IMPORT(10, remove)
+
 #endif

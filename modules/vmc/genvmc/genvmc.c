@@ -184,8 +184,9 @@ static u8 cluster_buf[(BLOCKKB * 1024)+16] __attribute__((aligned(64)));
 
 static int genvmc_io_sema = -1;
 static int genvmc_thread_sema = -1;
-static int genvmc_thid = -1;
-static int genvmc_fh = -1;
+static int genvmc_abort_sema = -1;
+
+static int genvmc_abort = 0;
 
 static statusVMCparam_t genvmc_stats;
 
@@ -255,11 +256,21 @@ static int mc_writecluster(int fd, int cluster, void *buf, int dup)
 	register int r, size;
 	MCDevInfo *mcdi = (MCDevInfo *)&devinfo;
 
-	lseek(fd, cluster * mcdi->cluster_size, SEEK_SET);
-	size = mcdi->cluster_size * dup;
-	r = write(fd, buf, size);
-	if (r != size)
-		return -1;
+	WaitSema(genvmc_abort_sema);
+
+	if (genvmc_abort) {
+		SignalSema(genvmc_abort_sema);
+		return -2;
+	}
+	else {
+		lseek(fd, cluster * mcdi->cluster_size, SEEK_SET);
+		size = mcdi->cluster_size * dup;
+		r = write(fd, buf, size);
+		if (r != size)
+			return -1;
+	}
+
+	SignalSema(genvmc_abort_sema);
 
 	return 0;
 }
@@ -289,7 +300,7 @@ static int vmc_mccopy(char *filename, int slot, int *progress, char *msg)
 	clustersblock = pagesblock / mcdi->pages_per_cluster;
 	blocks = mcdi->clusters_per_card / clustersblock;
 
-	genvmc_fh = open(filename, O_RDWR|O_CREAT|O_TRUNC);
+	int genvmc_fh = open(filename, O_RDWR|O_CREAT|O_TRUNC);
 	if (genvmc_fh < 0)
 		return -101;
 
@@ -302,8 +313,12 @@ static int vmc_mccopy(char *filename, int slot, int *progress, char *msg)
 				goto exit;
 			}
 		}
-		if (mc_writecluster(genvmc_fh, i * clustersblock, cluster_buf, clustersblock) < 0) {
-			ret = -103;
+		ret = mc_writecluster(genvmc_fh, i * clustersblock, cluster_buf, clustersblock);
+		if (ret < 0) {
+			if (ret == -2) // it's user abort
+				ret = -1000;
+			else
+				ret = -103;
 			goto exit;
 		}
 	}
@@ -314,8 +329,12 @@ static int vmc_mccopy(char *filename, int slot, int *progress, char *msg)
 				goto exit;
 			}
 		}
-		if (mc_writecluster(genvmc_fh, i, cluster_buf, 1) < 0) {
-			ret = -103;
+		ret = mc_writecluster(genvmc_fh, i, cluster_buf, 1);
+		if (ret < 0) {
+			if (ret == -2) // it's user abort
+				ret = -1000;
+			else
+				ret = -103;
 			goto exit;
 		}
 	}
@@ -331,12 +350,12 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 {
 	register int i, r, b, ifc_index, fat_index;
 	register int ifc_length, fat_length, alloc_offset;
-	register int ret, j = 0, z = 0;
+	register int j = 0, z = 0;
 	int oldstate;
 	MCDevInfo *mcdi = (MCDevInfo *)&devinfo;
 
 	strcpy(msg, "Creating VMC file...");
-	genvmc_fh = open(filename, O_RDWR|O_CREAT|O_TRUNC);
+	int genvmc_fh = open(filename, O_RDWR|O_CREAT|O_TRUNC);
 	if (genvmc_fh < 0)
 		return -101;
 
@@ -368,7 +387,10 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 		*progress = i / (mcdi->clusters_per_card / 99);
 		r = mc_writecluster(genvmc_fh, i, cluster_buf, 16);
 		if (r < 0) {
-			r = -102;
+			if (r == -2) // it's user abort
+				r = -1000;
+			else
+				r = -102;
 			goto err_out;
 		}
 	}
@@ -426,7 +448,10 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 			CpuSuspendIntr(&oldstate);
 			FreeSysMemory(ifc_mem);
 			CpuResumeIntr(oldstate);
-			r = -105;
+			if (r == -2) // it's user abort
+				r = -1000;
+			else
+				r = -105;
 			goto err_out;
 		}
 	}
@@ -472,7 +497,10 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 
 		r = mc_writecluster(genvmc_fh, fat_index++, cluster_buf, 1);
 		if (r < 0) {
-			r = -107;
+			if (r == -2) // it's user abort
+				r = -1000;
+			else
+				r = -107;
 			goto err_out;
 		}
 	}
@@ -519,7 +547,10 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 	strcpy(msg, "Writing root directory cluster...");
 	r = mc_writecluster(genvmc_fh, mcdi->alloc_offset + mcdi->rootdir_cluster, cluster_buf, 1);
 	if (r < 0) {
-		r = -109;
+		if (r == -2) // it's user abort
+			r = -1000;
+		else
+			r = -109;
 		goto err_out;
 	}
 
@@ -532,14 +563,14 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 	memcpy(cluster_buf, (void *)mcdi, sizeof(MCDevInfo));
 	r = mc_writecluster(genvmc_fh, 0, cluster_buf, 1);
 	if (r < 0) {
-		r = -110;
+		if (r == -2) // it's user abort
+			r = -1000;
+		else
+			r = -110;
 		goto err_out;
 	}
 
-	r = close(genvmc_fh);
-	if (r < 0)
-		return -111;
-	genvmc_fh = -1;
+	close(genvmc_fh);
 
 	*progress = 100;
 
@@ -547,9 +578,7 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
 
 
 err_out:
-	ret = close(genvmc_fh);
-	if (!(ret < 0))
-		genvmc_fh = -1;
+	close(genvmc_fh);
 
 	return r;
 }
@@ -565,6 +594,7 @@ int genvmc_init(iop_device_t *dev)
 {
 	genvmc_io_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 	genvmc_thread_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
+	genvmc_abort_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 
 	return 0;
 }
@@ -574,6 +604,7 @@ int genvmc_deinit(iop_device_t *dev)
 {
 	DeleteSema(genvmc_io_sema);
 	DeleteSema(genvmc_thread_sema);
+	DeleteSema(genvmc_abort_sema);
 
 	return 0;
 }
@@ -585,6 +616,10 @@ static void VMC_create_thread(void *args)
 	createVMCparam_t *param = (createVMCparam_t *)args;
 
 	WaitSema(genvmc_thread_sema);
+
+	WaitSema(genvmc_abort_sema);
+	genvmc_abort = 0;
+	SignalSema(genvmc_abort_sema);
 
 	genvmc_stats.VMC_status = GENVMC_STAT_BUSY;
 	genvmc_stats.VMC_error = 0;
@@ -599,7 +634,14 @@ static void VMC_create_thread(void *args)
 	if (r < 0) {
 		genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
 		genvmc_stats.VMC_error = r;
-		strcpy(genvmc_stats.VMC_msg, "Failed to format VMC file");
+
+		if (r == -1000) {
+			remove(param->VMC_filename);
+			strcpy(genvmc_stats.VMC_msg, "VMC file creation aborted");
+		}
+		else
+			strcpy(genvmc_stats.VMC_msg, "Failed to format VMC file");
+
 		goto exit;
 	}
 
@@ -610,7 +652,6 @@ static void VMC_create_thread(void *args)
 
 exit:
 	SignalSema(genvmc_thread_sema);
-	genvmc_thid = -1;
 	ExitDeleteThread();
 }
 
@@ -620,7 +661,7 @@ static int vmc_create(createVMCparam_t *param)
 	DPRINTF("%s: vmc_create() filename=%s size_MB=%d blocksize=%d th_priority=0x%02x slot=%d\n", MODNAME, \
 		param->VMC_filename, param->VMC_size_mb, param->VMC_blocksize, param->VMC_thread_priority, param->VMC_card_slot);
 
-	register int r;
+	register int r, thid;
 	iop_thread_t thread_param;
 
 	thread_param.attr = TH_C;
@@ -630,12 +671,12 @@ static int vmc_create(createVMCparam_t *param)
 	thread_param.priority = (param->VMC_thread_priority < 0x0f) ? 0x0f : param->VMC_thread_priority;
 
 	// creating VMC create thread
-	genvmc_thid = CreateThread(&thread_param);
-	if (genvmc_thid < 0)
+	thid = CreateThread(&thread_param);
+	if (thid < 0)
 		return -1;
 
 	// starting VMC create thread
-	r = StartThread(genvmc_thid, (void *)param);
+	r = StartThread(thid, (void *)param);
 	if (r < 0)
 		return -2;
 
@@ -647,31 +688,11 @@ static int vmc_abort(void)
 {
 	DPRINTF("%s: vmc_abort()\n", MODNAME);
 
-	register int r;
+	WaitSema(genvmc_abort_sema);
+	genvmc_abort = 1;
+	SignalSema(genvmc_abort_sema);
 
-	if (genvmc_thid >= 0) {
-		// terminate VMC create thread
-		r = TerminateThread(genvmc_thid);
-		if (r < 0)
-			return -1;
-
-		// delete VMC create thread
-		r = DeleteThread(genvmc_thid);
-		if (r < 0)
-			return -2;
-
-		SignalSema(genvmc_thread_sema);
-		genvmc_thid = -1;
-
-		// try to close VMC file
-		if (genvmc_fh >= 0)
-			close(genvmc_fh);
-
-		// adjusting stats
-		genvmc_stats.VMC_status = GENVMC_STAT_AVAIL;
-		genvmc_stats.VMC_error = -201;
-		strcpy(genvmc_stats.VMC_msg, "Aborted...");
-	}
+	SignalSema(genvmc_thread_sema);
 
 	return 0;
 }

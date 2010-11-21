@@ -239,7 +239,7 @@ void sysApplyFILEIOPatches(void)
 	FlushCache(2);
 }
 
-void sysReset(void) {
+void sysReset(int modload_mask) {
 
 	SifInitRpc(0);
 	cdInit(CDVD_INIT_NOCHECK);
@@ -266,6 +266,16 @@ void sysReset(void) {
 	sbv_patch_enable_lmb();
 	sbv_patch_disable_prefix_check();
 	sysApplyFILEIOPatches();
+
+	SifLoadModule("rom0:SIO2MAN", 0, NULL);
+
+	if (modload_mask & SYS_LOAD_MC_MODULES) {
+		SifLoadModule("rom0:MCMAN", 0, NULL);
+		SifLoadModule("rom0:MCSERV", 0, NULL);
+	}
+	if (modload_mask & SYS_LOAD_PAD_MODULES) {
+		SifLoadModule("rom0:PADMAN", 0, NULL);
+	}
 
 	// clears modules list
 	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES*4);
@@ -802,9 +812,6 @@ int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize)
 		}
 
 		if (createSize && (createSize != size)) {
-			// TODO temp code, shouldn't be needed ... but it doesn't work without for the moment ...
-			sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
-
 			createVMCparam_t createParam;
 			strcpy(createParam.VMC_filename, path);
 			createParam.VMC_size_mb = createSize;

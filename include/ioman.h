@@ -60,6 +60,7 @@ int ioBlockOps(int block);
 #define PREINIT_LOG(...) printf(__VA_ARGS__)
 #define LOG(...) ioPrintf(__VA_ARGS__)
 #else
+#define PREINIT_LOG(...)
 #define LOG(...)
 #endif
 

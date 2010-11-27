@@ -865,15 +865,44 @@ static void deferredInit(void) {
 }
 
 // --------------------- Main --------------------
-int main(void)
+int main(int argc, char* argv[])
 {
 	LOG_INIT();
+	PREINIT_LOG("OPL GUI start!\n");
+
+	#ifdef __DEBUG
+	int use_early_debug = 0, exception_test = 0;
+	int i;
+	for (i=1; i<argc; i++) {
+		if (!(strcmp(argv[i], "-use-early-debug"))) {
+			use_early_debug = 1;
+			PREINIT_LOG("Using early debug.\n");
+		}
+		if (!(strcmp(argv[i], "-test-exception"))) {
+			exception_test = 1;
+			PREINIT_LOG("Exception test requested.\n");
+		}
+	}
+	#endif
 
 	// apply kernel patches
 	sysApplyKernelPatches();
 
 	// reset, load modules
 	reset();
+
+	#ifdef __DEBUG
+	if (use_early_debug) {
+		configReadIP();
+		debugSetActive();
+	}
+
+	if (exception_test) {
+		// EXCEPTION test !
+		u32 *p = (u32 *)0xDEADC0DE;
+		*p = 0xDEFACED;
+	}
+	#endif
 
 	init();
 
@@ -887,3 +916,4 @@ int main(void)
 	
 	return 0;
 }
+

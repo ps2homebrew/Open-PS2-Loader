@@ -657,3 +657,23 @@ void menuRemoveHints(struct menu_item_t *menu) {
 		free(hint);
 	}
 }
+
+void menuInitHints(struct menu_item_t* menu) {
+	menuRemoveHints(menu);
+
+	menuAddHint(menu, _STR_SETTINGS, START_ICON);
+	item_list_t *support = menu->userdata;
+	if (!support->enabled)
+		menuAddHint(menu, _STR_START_DEVICE, CROSS_ICON);
+	else {
+		menuAddHint(menu, _STR_RUN, CROSS_ICON);
+		if (support->itemGetCompatibility)
+			menuAddHint(menu, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+		if (gEnableDandR) {
+			if (support->itemRename)
+				menuAddHint(menu, _STR_RENAME, CIRCLE_ICON);
+			if (support->itemDelete)
+				menuAddHint(menu, _STR_DELETE, SQUARE_ICON);
+		}
+	}
+}

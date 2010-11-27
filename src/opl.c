@@ -91,23 +91,6 @@ static int gFrameCounter;
 
 static opl_io_module_t list_support[4];
 
-static void initHints(struct menu_item_t* menuItem, int startMode) {
-	menuAddHint(menuItem, _STR_SETTINGS, START_ICON);
-
-	if (startMode == 1)
-		menuAddHint(menuItem, _STR_START_DEVICE, CROSS_ICON);
-	else {
-		menuAddHint(menuItem, _STR_RUN, CROSS_ICON);
-		item_list_t *support = menuItem->userdata;
-		if (support->itemGetCompatibility)
-			menuAddHint(menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
-		if (gEnableDandR && support->itemRename)
-			menuAddHint(menuItem, _STR_RENAME, CIRCLE_ICON);
-		if (gEnableDandR && support->itemDelete)
-			menuAddHint(menuItem, _STR_DELETE, SQUARE_ICON);
-	}
-}
-
 static void itemExecCross(struct menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
@@ -118,8 +101,7 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 		}
 		else {
 			support->itemInit();
-			menuRemoveHints(self); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
-			initHints(self, 2);
+			menuInitHints(self); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
 		}
 	}
 	else
@@ -186,7 +168,7 @@ static void itemExecCircle(struct menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
+static void initMenuForListSupport(opl_io_module_t* item) {
 	item->menuItem.icon_id = item->support->iconId;
 	item->menuItem.text = NULL;
 	item->menuItem.text_id = item->support->textId;
@@ -206,8 +188,7 @@ static void initMenuForListSupport(opl_io_module_t* item, int startMode) {
 	item->menuItem.execCircle = &itemExecCircle;
 
 	item->menuItem.hints = NULL;
-
-	initHints(&item->menuItem, startMode);
+	menuInitHints(&item->menuItem);
 
 	struct gui_update_t *mc = guiOpCreate(GUI_OP_ADD_MENU);
 	mc->menu.menu = &item->menuItem;
@@ -219,7 +200,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 	if (!list_support[mode].support) {
 		itemList->uip = 1; // stop updates until we're done with init
 		list_support[mode].support = itemList;
-		initMenuForListSupport(&list_support[mode], startMode);
+		initMenuForListSupport(&list_support[mode]);
 		itemList->uip = 0;
 	}
 
@@ -228,6 +209,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		// stop updates until we're done with init of the device
 		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
+		menuInitHints(&list_support[mode].menuItem);
 		gFrameCounter = UPDATE_FRAME_COUNT;
 		list_support[mode].support->uip = 0;
 	}
@@ -460,6 +442,11 @@ void applyConfig(int themeID, int langID) {
 		gPCPort = 445;
 
 	initAllSupport(0);
+
+	menuInitHints(&list_support[USB_MODE].menuItem);
+	menuInitHints(&list_support[ETH_MODE].menuItem);
+	menuInitHints(&list_support[HDD_MODE].menuItem);
+	menuInitHints(&list_support[APP_MODE].menuItem);
 }
 
 int loadConfig(int types) {

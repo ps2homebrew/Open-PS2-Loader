@@ -111,5 +111,6 @@ void menuSetInactiveFrames(unsigned int frames);
 
 void menuAddHint(struct menu_item_t *menu, int text_id, int icon_id);
 void menuRemoveHints(struct menu_item_t *menu);
+void menuInitHints(struct menu_item_t* menu);
 
 #endif

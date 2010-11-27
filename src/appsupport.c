@@ -38,7 +38,7 @@ void appInit(void) {
 }
 
 item_list_t* appGetObject(int initOnly) {
-	if (initOnly && appItemList.mode == -1)
+	if (initOnly && !appItemList.enabled)
 		return NULL;
 	return &appItemList;
 }

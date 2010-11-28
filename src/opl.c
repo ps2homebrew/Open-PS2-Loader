@@ -265,48 +265,36 @@ static int lscret = 0;
 static int tryAlternateDevice(int types) {
 	char path[64];
 
-	initSupport(usbGetObject(0), 2, USB_MODE, 0);
-	initSupport(hddGetObject(0), 2, HDD_MODE, 0);
-
-	do {
-		delay(10);
-
-		// check USB
-		if (usbFindPartition(path, "conf_opl.cfg")) {
-			configEnd();
-			configInit(path);
-			return configReadMulti(types);
-		}
-
-		// check HDD
-		snprintf(path, 64, "pfs0:conf_opl.cfg");
-		int fd = fioOpen(path, O_RDONLY);
-		if(fd >= 0) {
-			fioClose(fd);
-			configEnd();
-			configInit("pfs0:");
-			return configReadMulti(types);
-		}
-
-		// check if user abort config polling
-		readPads();
-		if(getKeyOn(KEY_CIRCLE) || getKeyOn(KEY_CROSS)) {
-			// set config path to either mass or hdd, to prepare the saving of a new config
-			int fd = fioDopen("mass0:");
-			if (fd >= 0) {
-				fioDclose(fd);
-				configEnd();
-				configInit("mass0:");
-			}
-			else {
-				configEnd();
-				configInit("pfs0:");
-			}
-
-			break;
-		}
+	// check USB
+	usbLoadModules();
+	if (usbFindPartition(path, "conf_opl.cfg")) {
+		configEnd();
+		configInit(path);
+		return configReadMulti(types);
 	}
-	while (1);
+
+	// check HDD
+	hddLoadModules();
+	snprintf(path, 64, "pfs0:conf_opl.cfg");
+	int fd = fioOpen(path, O_RDONLY);
+	if(fd >= 0) {
+		fioClose(fd);
+		configEnd();
+		configInit("pfs0:");
+		return configReadMulti(types);
+	}
+
+	// set config path to either mass or hdd, to prepare the saving of a new config
+	fd = fioDopen("mass0:");
+	if (fd >= 0) {
+		fioDclose(fd);
+		configEnd();
+		configInit("mass0:");
+	}
+	else {
+		configEnd();
+		configInit("pfs0:");
+	}
 
 	return 0;
 }
@@ -323,7 +311,7 @@ static void _loadConfig() {
 			}
 		}
 
-		if (result) {
+		if (result & CONFIG_OPL) {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);
 			char *temp;
 
@@ -443,10 +431,14 @@ void applyConfig(int themeID, int langID) {
 
 	initAllSupport(0);
 
-	menuInitHints(&list_support[USB_MODE].menuItem);
-	menuInitHints(&list_support[ETH_MODE].menuItem);
-	menuInitHints(&list_support[HDD_MODE].menuItem);
-	menuInitHints(&list_support[APP_MODE].menuItem);
+	if (list_support[USB_MODE].support)
+		menuInitHints(&list_support[USB_MODE].menuItem);
+	if (list_support[ETH_MODE].support)
+		menuInitHints(&list_support[ETH_MODE].menuItem);
+	if (list_support[HDD_MODE].support)
+		menuInitHints(&list_support[HDD_MODE].menuItem);
+	if (list_support[APP_MODE].support)
+		menuInitHints(&list_support[APP_MODE].menuItem);
 }
 
 int loadConfig(int types) {

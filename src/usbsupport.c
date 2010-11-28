@@ -60,7 +60,18 @@ int usbFindPartition(char *target, char *name) {
 	return 0;
 }
 
-static void usbLoadModules(void) {
+static void usbInitModules(void) {
+
+	usbLoadModules();
+
+	// update Themes
+	usbFindPartition(usbPrefix, "ul.cfg");
+	char path[32];
+	sprintf(path, "%sTHM/", usbPrefix);
+	thmAddElements(path, "/");
+}
+
+void usbLoadModules(void) {
 	LOG("usbLoadModules()\n");
 	//first it search for custom usbd in MC?
 	usbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_usbd_irx);
@@ -86,12 +97,6 @@ static void usbLoadModules(void) {
 	delay(3);
 
 	LOG("usbLoadModules: modules loaded\n");
-
-	// update Themes
-	usbFindPartition(usbPrefix, "ul.cfg");
-	char path[32];
-	sprintf(path, "%sTHM/", usbPrefix);
-	thmAddElements(path, "/");
 }
 
 void usbInit(void) {
@@ -100,7 +105,7 @@ void usbInit(void) {
 	usbGameCount = 0;
 	usbGames = NULL;
 
-	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &usbLoadModules);
+	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &usbInitModules);
 
 	usbGameList.enabled = 1;
 }

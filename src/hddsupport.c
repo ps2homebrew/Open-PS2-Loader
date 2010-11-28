@@ -33,7 +33,7 @@ extern int size_hdd_mcemu_irx;
 #endif
 
 static int hddForceUpdate = 1;
-static char *hddPrefix = NULL;
+static char *hddPrefix = "pfs0:";
 static int hddGameCount = 0;
 static hdl_games_list_t* hddGames;
 
@@ -42,7 +42,17 @@ const char *oplPart = "hdd0:+OPL";
 // forward declaration
 static item_list_t hddGameList;
 
-static void hddLoadModules(void) {
+static void hddInitModules(void) {
+
+	hddLoadModules();
+
+	// update Themes
+	char path[32];
+	sprintf(path, "%sTHM/", hddPrefix);
+	thmAddElements(path, "/");
+}
+
+void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
@@ -89,19 +99,13 @@ static void hddLoadModules(void) {
 	}
 
 	gHddStartup = 0;
-
-	// update Themes
-	char path[32];
-	sprintf(path, "%sTHM/", hddPrefix);
-	thmAddElements(path, "/");
 }
 
 void hddInit(void) {
 	LOG("hddInit()\n");
-	hddPrefix = "pfs0:";
 	hddForceUpdate = 1;
 
-	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddLoadModules);
+	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddInitModules);
 
 	hddGameList.enabled = 1;
 }

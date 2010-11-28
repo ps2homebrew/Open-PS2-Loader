@@ -83,7 +83,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Error, could not run the item",
 	"Test",
 	"Leave empty for GUEST auth.",
-	"Load alt. core",
+	"Load alternate core",
 	"Alternative data read method",
 	"Unhook Syscalls",
 	"0 PSS mode",

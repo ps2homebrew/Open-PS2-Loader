@@ -73,3 +73,29 @@ Vérifier la fragmentation des jeux USB
 Se rappeler le dernier jeu
 Erreur, le jeu est fragmenté
 Erreur, impossible de lancer l'élement
+Test
+Laisser vide pour le mode Invité
+Charger le coeur alternatif
+Méthode de lecture alternative
+Désactiver Syscalls
+mode 0 PSS
+Désactiver DVD-DL
+Désactiver IGR
+Tampon cdvdfsv réduit
+Cacher le module dev9
+Utiliser le combo IGR alternatif
+Changer la taille de la VMC la reformatera
+Créer
+Modifier
+Annuler
+Réinitialiser
+Utiliser générique
+Configurer VMC
+Nom
+Taille
+Status
+Progression
+La VMC existe
+Fichier VMC incorrect, taille de VMC invalide
+La VMC doit être crée
+Erreur avec la VMC, continuer en utilisant la MC physique ?

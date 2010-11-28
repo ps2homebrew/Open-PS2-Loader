@@ -264,30 +264,36 @@ static int lscret = 0;
 
 static int tryAlternateDevice(int types) {
 	char path[64];
+	int value;
+	config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
 	// check USB
 	usbLoadModules();
 	if (usbFindPartition(path, "conf_opl.cfg")) {
 		configEnd();
 		configInit(path);
-		return configReadMulti(types);
+		value = configReadMulti(types);
+		configSetInt(configOPL, "usb_mode", 2);
+		return value;
 	}
 
 	// check HDD
 	hddLoadModules();
 	snprintf(path, 64, "pfs0:conf_opl.cfg");
-	int fd = fioOpen(path, O_RDONLY);
-	if(fd >= 0) {
-		fioClose(fd);
+	value = fioOpen(path, O_RDONLY);
+	if(value >= 0) {
+		fioClose(value);
 		configEnd();
 		configInit("pfs0:");
-		return configReadMulti(types);
+		value = configReadMulti(types);
+		configSetInt(configOPL, "hdd_mode", 2);
+		return value;
 	}
 
 	// set config path to either mass or hdd, to prepare the saving of a new config
-	fd = fioDopen("mass0:");
-	if (fd >= 0) {
-		fioDclose(fd);
+	value = fioDopen("mass0:");
+	if (value >= 0) {
+		fioDclose(value);
 		configEnd();
 		configInit("mass0:");
 	}

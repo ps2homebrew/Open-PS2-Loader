@@ -3,11 +3,12 @@
 #include "include/gui.h"
 #include "include/supportbase.h"
 #include "include/ethsupport.h"
+#include "include/util.h"
 #include "include/themes.h"
 #include "include/textures.h"
 #include "include/ioman.h"
-#include "include/smbman.h"
 #include "include/system.h"
+#include "include/smbman.h"
 
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
@@ -101,8 +102,13 @@ static void ethLoadModules(void) {
 
 	// update Themes
 	char path[32];
-	sprintf(path, "%s\\THM\\", ethPrefix);
+	sprintf(path, "%sTHM", ethPrefix);
 	thmAddElements(path, "\\");
+
+#ifdef VMC
+	sprintf(path, "%sVMC", ethPrefix);
+	checkCreateDir(path);
+#endif
 }
 
 void ethInit(void) {
@@ -134,14 +140,14 @@ static int ethNeedsUpdate(void) {
 		fio_stat_t stat;
 		char path[64];
 
-		snprintf(path, 64, "%sCD\\", ethPrefix);
+		snprintf(path, 64, "%sCD", ethPrefix);
 		fioGetstat(path, &stat);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedCDPrev, stat.mtime, 8);
 			result = 1;
 		}
 
-		snprintf(path, 64, "%sDVD\\", ethPrefix);
+		snprintf(path, 64, "%sDVD", ethPrefix);
 		fioGetstat(path, &stat);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedDVDPrev, stat.mtime, 8);
@@ -158,7 +164,7 @@ static int ethUpdateGameList(void) {
 	if (gNetworkStartup != 0)
 		return 0;
 	
-	sbReadList(&ethGames, ethPrefix, "\\", &ethULSizePrev, &ethGameCount);
+	sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
 	return ethGameCount;
 }
 
@@ -210,9 +216,10 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 	configGetVMC(game->startup, vmc[0], ETH_MODE, 0);
 	configGetVMC(game->startup, vmc[1], ETH_MODE, 1);
 
-	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
-
 	for(i=0; i<2; i++) {
+		if(!vmc[i][0]) // skip if empty
+			continue;
+
 		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 
@@ -339,7 +346,7 @@ static void ethLaunchGame(int id) {
 
 static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
 	char path[64];
-	sprintf(path, "%sART\\\\%s_%s", ethPrefix, name, type);
+	sprintf(path, "%sART\\%s_%s", ethPrefix, name, type);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 

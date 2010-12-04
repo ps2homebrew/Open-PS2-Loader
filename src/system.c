@@ -94,9 +94,6 @@ extern int size_smsutils_irx;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
-extern void eeload_patches;
-extern int size_eeload_patches;
-
 #define MAX_MODULES	32
 static void *g_sysLoadedModBuffer[MAX_MODULES];
 
@@ -472,6 +469,18 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 	*size_irx = size_cdvdfsv_irx;
 }
 
+static void restoreSyscallHandler(void)
+{
+	__asm__ __volatile__ (
+		"addiu 	$a0, $zero, 8\n\t"
+		"lui 	$a1, 0x8000\n\t"
+		"ori 	$a1, $a1, 0x0280\n\t"
+		"addiu 	$v1, $zero, 0x0e\n\t"
+		"syscall\n\t"
+		"nop\n\t"
+	);	
+}
+
 #ifdef VMC
 #define IRX_NUM 11
 #else
@@ -483,6 +492,9 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx, int size_
 #else
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
 #endif
+
+	restoreSyscallHandler();
+
 	void *irxtab = (void *)0x80030010;
 	void *irxptr = (void *)0x80030100;
 	irxptr_t irxptr_tab[IRX_NUM];
@@ -525,7 +537,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	DIntr();
 	ee_kmode_enter();
 
-	*(u32 *)0x80030000 = 0x80030100;
+	*(u32 *)0x80030000 = 0x80030010;
 
 	for (i = 0; i < IRX_NUM; i++) {
 		curIrxSize = irxptr_tab[i].irxsize;
@@ -551,16 +563,6 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 
 	ee_kmode_exit();
 	EIntr();
-
-	memcpy((void *)(0x000bd000), &eeload_patches, size_eeload_patches);
-	FlushCache(0);
-	FlushCache(2);
-	void (*EELOAD_patch1)()=(void *)(0x000bd1b8);
-	void (*EELOAD_patch2)()=(void *)(0x000bd000);
-	EELOAD_patch1();
-	FlushCache(0);
-	FlushCache(2);
-	EELOAD_patch2();
 }
 
 #ifdef VMC

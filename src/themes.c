@@ -61,9 +61,9 @@ static int thmReadEntry(int index, char* path, char* separator, char* name, unsi
 		memcpy(currTheme->name, name + 4, length);
 		currTheme->name[length - 1] = '\0';
 
-		length = strlen(path) + 1 + strlen(name) + 1;
+		length = strlen(path) + 1 + strlen(name) + 1 + 1;
 		currTheme->filePath = (char*) malloc(length * sizeof(char));
-		sprintf(currTheme->filePath, "%s%s%s", path, name, separator);
+		sprintf(currTheme->filePath, "%s%s%s%s", path, separator, name, separator);
 
 		LOG("Theme found: %s\n", currTheme->filePath);
 
@@ -345,9 +345,7 @@ void thmInit() {
 	// initialize default internal
 	thmLoad(NULL);
 
-	char path[32];
-	sprintf(path, "%s/", gBaseMCDir);
-	thmAddElements(path, "/");
+	thmAddElements(gBaseMCDir, "/");
 }
 
 char* thmGetValue() {

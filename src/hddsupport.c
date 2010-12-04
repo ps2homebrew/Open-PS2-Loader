@@ -4,8 +4,9 @@
 #include "include/gui.h"
 #include "include/supportbase.h"
 #include "include/hddsupport.h"
-#include "include/textures.h"
+#include "include/util.h"
 #include "include/themes.h"
+#include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
 
@@ -48,8 +49,13 @@ static void hddInitModules(void) {
 
 	// update Themes
 	char path[32];
-	sprintf(path, "%sTHM/", hddPrefix);
+	sprintf(path, "%sTHM", hddPrefix);
 	thmAddElements(path, "/");
+
+#ifdef VMC
+	sprintf(path, "%sVMC", hddPrefix);
+	checkCreateDir(path);
+#endif
 }
 
 void hddLoadModules(void) {
@@ -217,6 +223,9 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 
 	fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
 	for(i=0; i<2; i++) {
+		if(!vmc[i][0]) // skip if empty
+			continue;
+
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 		hdd_vmc_infos.active = 0;
 

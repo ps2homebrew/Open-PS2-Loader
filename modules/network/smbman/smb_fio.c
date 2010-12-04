@@ -566,7 +566,7 @@ int smb_rmdir(iop_file_t *f, const char *dirname)
    		r = -EIO;
 		goto io_unlock;
 	}
-	if (!info.IsDirectory) {
+	if (!(info.FileAttributes & EXT_ATTR_DIRECTORY)) {
 		r = -ENOTDIR;
 		goto io_unlock;
 	}
@@ -605,7 +605,7 @@ int smb_dopen(iop_file_t *f, const char *dirname)
 		goto io_unlock;
 	}
 
-	if (!info.IsDirectory) {
+	if (!(info.FileAttributes & EXT_ATTR_DIRECTORY)) {
    		r = -ENOTDIR;
 		goto io_unlock;
 	}
@@ -619,6 +619,8 @@ int smb_dopen(iop_file_t *f, const char *dirname)
 		fh->position = 0;
 
 		strncpy(fh->name, path, 255);
+		if (fh->name[strlen(fh->name)-1] != '\\')
+			strcat(fh->name, "\\");
 		strcat(fh->name, "*");
 
 		r = 0;	
@@ -798,7 +800,7 @@ int smb_chdir(iop_file_t *f, const char *dirname)
 			goto io_unlock;
 		}
 
-		if (!info.IsDirectory) {
+		if (!(info.FileAttributes & EXT_ATTR_DIRECTORY)) {
 	   		r = -ENOTDIR;
 			goto io_unlock;
 		}

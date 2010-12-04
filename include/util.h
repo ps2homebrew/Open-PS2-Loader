@@ -6,6 +6,7 @@
 int getFileSize(int fd);
 int openFile(char* path, int mode);
 void* readFile(char* path, int align, int* size);
+void checkCreateDir(char* path);
 int listDir(char* path, char* separator, int maxElem,
 		int (*readEntry)(int index, char *path, char* separator, char* name, unsigned int mode));
 

@@ -1126,13 +1126,13 @@ static void guiMainHandleInput() {
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
 	} else if(getKey(KEY_L1)) {
-		int i;
-		for (i = 0; i < gTheme->displayedItems; ++i)
-			menuPrevV();
+		menuPrevPage();
 	} else if(getKey(KEY_R1)){
-		int i;
-		for (i = 0; i < gTheme->displayedItems; ++i)
-			menuNextV();
+		menuNextPage();
+	} else if (getKeyOn(KEY_L2)) { // home
+		menuFirstPage();
+	} else if (getKeyOn(KEY_R2)) { // end
+		menuLastPage();
 	}
 
 	struct menu_item_t* cur = menuGetCurrent();
@@ -1143,15 +1143,6 @@ static void guiMainHandleInput() {
 		// reinit main menu - show/hide items valid in the active context
 		guiInitMainMenu();
 		screenHandlerTarget = &menuScreenHandler;
-	} else if (getKeyOn(KEY_L2)) { // home
-		cur->current = cur->submenu;
-	} else if (getKeyOn(KEY_R2)) { // end
-		if (!cur->current)
-			cur->current = cur->submenu;
-			
-		if (cur->current)
-			while (cur->current->next)
-				cur->current = cur->current->next;
 	} else if(getKeyOn(KEY_CROSS)){
 		menuItemExecButton(cur->execCross);
 	} else if(getKeyOn(KEY_TRIANGLE)){
@@ -1249,11 +1240,11 @@ static void guiMenuHandleInput() {
 		} else if (id == 3) {
 			// ipconfig
 			guiShowIPConfig();
-		} else if (id == 7) { // TODO: (Volca) As Izdubar points out, there ought be MNU_ID_something instead of this cryptic numerals...
+		} else if (id == 7) {
 			saveConfig(CONFIG_OPL, 1);
-		} else if (id == 9) { // TODO: should we call opl.shutdown first ?
+		} else if (id == 9) {
 			guiExecExit();
-		} else if (id == 11) { // TODO: should we call opl.shutdown first ?
+		} else if (id == 11) {
 			sysPowerOff();
 		} else {
 			if (gMenuExecHook)

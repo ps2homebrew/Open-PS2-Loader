@@ -22,7 +22,7 @@ GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/
 LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
-		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o eeload_patches/eeload_patches.o \
+		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o \
 		obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o

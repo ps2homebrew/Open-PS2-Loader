@@ -61,14 +61,18 @@ int usbFindPartition(char *target, char *name) {
 }
 
 static void usbInitModules(void) {
-
 	usbLoadModules();
 
 	// update Themes
 	usbFindPartition(usbPrefix, "ul.cfg");
 	char path[32];
-	sprintf(path, "%sTHM/", usbPrefix);
+	sprintf(path, "%sTHM", usbPrefix);
 	thmAddElements(path, "/");
+
+#ifdef VMC
+	sprintf(path, "%sVMC", usbPrefix);
+	checkCreateDir(path);
+#endif
 }
 
 void usbLoadModules(void) {
@@ -125,7 +129,7 @@ static int usbNeedsUpdate(void) {
 
 static int usbUpdateGameList(void) {
 	usbFindPartition(usbPrefix, "ul.cfg");
-	sbReadList(&usbGames, usbPrefix, "/", &usbULSizePrev, &usbGameCount);
+	sbReadList(&usbGames, usbPrefix, &usbULSizePrev, &usbGameCount);
 	return usbGameCount;
 }
 
@@ -179,9 +183,10 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 	configGetVMC(game->startup, vmc[0], USB_MODE, 0);
 	configGetVMC(game->startup, vmc[1], USB_MODE, 1);
 
-	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
-
 	for(i=0; i<2; i++) {
+		if(!vmc[i][0]) // skip if empty
+			continue;
+
 		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 

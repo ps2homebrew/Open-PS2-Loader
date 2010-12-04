@@ -1,45 +1,102 @@
+﻿# translation by Satrio Bahar
 Indonesian
                SELAMAT DATANG DI OPEN PS2 LOADER. KODE UTAMA BERDASARKAN SUMBER KODE DARI HD PROJECT <http://psx-scene.com> DI ADAPTASI UNTUK FORMAT USB ADVANCE DAN GUI UTAMA DIBUAT OLEH IFCARO <http://ps2dev.ifcaro.net> SEBAGIAN BESAR CORE DIBUAT OLEH JIMMIKAELKAEL. SEMUA PERBAIKAN GUI DIBUAT OLEH VOLCA. TERIMA KASIH TELAH MENGGUNAKAN PROGRAM KAMI ^^
 Open PS2 Loader %s
-Konfigurasi tema
-Konfigurasi IP
 Simpan perubahan
 O Kembali
-Gulung Lambat
-Gulung Normal
-Gulung Cepat
-Menu Dinamis
-Menu Statis
-Mengatur tema
 Konfigurasi jaringan
-Pilih bahasa
-Tidak ada data
-Belum tersedia
+<kosong>
 Pengaturan disimpan...
 Gagal menulis pengaturan!
 Keluar
 Pengaturan
-Game-Game USB
-Game-Game HDD
-Game-Game Jaringan
-Aplikasi
+Daftar game USB
+Daftar game HDD
+Daftar game jaringan
+Daftar Aplikasi
 Tema
 Bahasa
-Bahasa: Bahasa Indonesia
-Mulai Jaringan
-Memuat jaringan: %d
-Gagal memulai jaringan
-jaringan memulai otomatis
-On
-Off
+Kesalahan memulai jaringan
+Aktif
+Tidak aktif
 Oke
-Pengaturan kompatibilitas
+Pengaturan game
 Hapus semua pengaturan
-Hapus semua pengaturan gamee
+Hapus semua pengaturan game
 Perputaran
-Tipe menu
 Lambat
-Normal
+Sedang
 Cepat
-Statis
-Dinamis
+Menu pertama
+Baca dari piringan
+Silahkan tunggu
+Kesalahan saat memuat ID game
+Penyortiran otomatis
+Kesalahan memuat file bahasa
+Matikan warna debug
+Tidak ada kontrol dideteksi, Menunggu...
+Memungkinkan tampil sampul game
+Layar lebar
+Matikan PS2
+Memuat konfigurasi
+Menyimpan konfigurasi
+Memulai perangkat
+Pola memulai perangkat USB
+Pola memulai perangkat HDD
+Pola memulai perangkat ETH
+Pola memulai Aplikasi
+Otomatis
+Manual
+Memulai HDL Server
+HDL Server dimulai...
+HDL Server berjalan... Tekan [O] untuk berhenti
+Tekan [X] tuk mengakhiri HDL server
+HDL Server Unloading...
+Keluar ke
+Warna latar
+Warna tulisan
+IP
+Mask
+Gateway
+Port
+Share
+User
+Password
+<Tidak terpakai>
+X Setuju
+Item akan dihapus selamanya, Lanjutkan ?
+Ubah nama
+Hapus
+Main
+Pengaturan tampilan
+Memungkinkan operasi hapus dan ubah nama item
+Periksa fragmentasi game USB
+Ingat game yang terakhir dimainkan
+Kesalahan, Game terfragmentasi
+Kesalahan, Item tidak bisa jalan
+Coba
+Biarkan kosong untuk penulis TAMU
+Memuat alternatif inti
+Metode alternatif membaca data
+Lepaskan Syscalls
+0 PSS mode
+Matikan DVD_DL
+Matikan IGR
+Kurangi buffer cdvdfsv
+Sembunyikan modul Dev9
+IGR combo pengganti
+Rubah ukuran format kembali VMC
+Ciptakan
+Modifikasi
+Batalkan
+Ulangi
+Gunakan yang umum
+Konfigurasi VMC
+Nama
+Ukuran
+Status
+Kemajuan
+VMC ada
+VMC Cacat, ukuran yang salah
+VMC perlu diciptakan
+Kesalahan pada VMC, lanjutkan dengan MC fisik ?

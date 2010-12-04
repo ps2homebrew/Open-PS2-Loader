@@ -1,28 +1,102 @@
-German
-               WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
+# translation by the ps3-tools.de community  
+Deutsch
+               WILLKOMMEN BEIM OPEN PS2 LOADER. DER MAIN CODE BASIERT AUF DEM SOURCE CODE VOM HD PROJECT <http://psx-scene.com> ANGEPASST AUF DAS USB ADVANCE FORMAT UND ERSTEM GUI BY IFCARO <http://ps2dev.ifcaro.net> DER GRÖSSTE ANTEIL VOM LOADER CORE IST VON JIMMIKAELKAEL GESCHRIEBEN. ALLE VERBESSRUNGEN AN DEM GUI WURDEN VON VOLCA VORGENOMMEN. VIELEN DANK DAS DU UNSER PROGRAMM NUTZT ^^
 Open PS2 Loader %s
-Anderungen speichern
+Änderungen Speichern
 O Zurück
 Netzwerk Einstellungen
-Keine Items
-Einstellungen gespeichert...
-Fehler beim speichern der Einstellungen!
+<kein Wert>
+Änderungen gespeichert...
+Fehler beim speichern der Einstellungen
 Ausgang
 Einstellungen
 USB Spiele
 HDD Spiele
-Netzwerk Spiele
+Network Spiele
 Programme
 Theme
 Sprache
-Fehler beim starten des Netzwerks
+Fehler beim Starten des Netzwerkes
 An
 Aus
 Ok
-Kompatibilitäts Einstellungen
-Entferne alle Einstellungen
-Alle Einstellungen des Spiels entfernt
-Scrolling
+Spiele Einstellungen
+Verwerfe alle Einstellungen
+Entferne alle Einstellungen des Spiels
+Scrollen
 Langsam
-Normal
+Mittel
 Schnell
+Grundeinstellungen
+Von Disk laden
+Bitte warten
+Fehler beim Laden der Spiel ID
+Automatisches Scrollen
+Fehler beim Laden des Sprachfiles
+Debug Farben ausschalten
+Kein Controler gefunden, ich warte...
+Aktiviere Cover Art
+Wide Screen
+Ausschalten
+Konfiguration laden
+Konfiguration speichern
+Starte Gerät
+USB Geräte Start Modus
+Interne Festplatte Start Modus
+Netzwerk Start Modus
+Programm Start Modus
+Automatisch
+Anleitung
+Starte HDL Server
+HDL Server startet...
+HDL Server läuft... Drücke [O] um zu stoppen
+Druecke [X] um den HDL Server zu schließen
+HDL Server wird gestoppt...
+Verlassen zu
+Hintergrundfarbe
+Textfarbe
+IP Adresse
+Netzwerkmaske
+Gateway
+Port
+Share
+User
+Passwort
+<keine Eingabe>
+X Bestätigen
+Das Item wird endgültig gelöscht ! fortfahren ?
+Umbennnen
+Löschen
+Starten
+Display Einstellungen
+Löschen und umbennen aktivieren
+USB Spiel Fragmentierung überprüfen
+Zuletzt gespieltes Spiel merken
+Fehler ! Das Spiel ist fragmentiert
+Fehler ! kann das Item nicht starten
+Test
+Frei lassen für Gäste Modus.
+Alternativen Kern laden
+Alternativer Daten Lese Modus
+Syscalls entladen
+0 PSS mode
+Deaktiviere DVD-DL
+Deaktiviere IGR
+Verkleinere cdvdfsv buffer
+Verstecke dev9 Module
+Alternative IGR Combo
+Durch das Verändern der Größe wird die VMC erneut formatiert
+Erstellen
+Verändern
+Abbrechen
+Reset
+Benutze generic
+Konfiguriere VMC
+Name
+Größe
+Status
+Fortschritt
+VMC File vorhanden
+Defekter VMC File, die Größe ist falsch
+VMC File muss erstellt werden
+Fehler mit dem VMC File ? mit echter MC fortfahren ?

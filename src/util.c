@@ -140,6 +140,14 @@ void* readFile(char* path, int align, int* size) {
 	return buffer;
 }
 
+void checkCreateDir(char* dirPath) {
+	int fd = fioDopen(dirPath);
+	if (fd < 0)
+		fioMkdir(dirPath);
+	else
+		fioDclose(fd);
+}
+
 int listDir(char* path, char* separator, int maxElem,
 		int (*readEntry)(int index, char *path, char* separator, char* name, unsigned int mode)) {
 	int fdDir, index = 0;

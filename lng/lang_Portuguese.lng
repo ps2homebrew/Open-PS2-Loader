@@ -1,29 +1,102 @@
+# translation by cegazza <ceg85@bol.com.br>
 Portuguese
-               BEM-VINDO AO OPEN PS2 LOADER. CÓDIGO PRINCIPAL BASEADO NO CÓDIGO FONTE DO HD PROJECT <http://psx-scene.com> ADAPTAÇÃO PARA O FORMATO USB ADVANCE E INTERFACE GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> GRANDE PARTE DO NÚCLEO DO PROGRAMA É FEITO POR JIMMIKAELKAEL. TODOS INCREMENTOS DA INTERFACE GRÁFICA SÃO FEITOS POR VOLCA. OBRIGADO POR UTILIZAR NOSSO PROGRAMA ^^
+               BEM VINDO AO OPEN PS2 LOADER. CÓDIGO PRINCIPAL BASEADO NO CÓDIGO FONTE DO HD PROJECT <http://psx-scene.com> ADAPTADO AO FORMATO USB ADVANCE E INTERFACE GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> A MAIOR PARTE DO NÚCLEO DO CARREGADOR FOI FEITA POR JIMMIKAELKAEL. TODAS AS MELHORAS NA INTERFACE FORAM FEITAS POR VOLCA. OBRIGADO POR USAR NOSSO PROGRAMA.
 Open PS2 Loader %s
-Configuração de IP
-Salvar alterações
-O Voltar
+Salvar mudanças
+O Volta
 Configurar rede
-Sem Items
-Opções salvas...
-Erro guardando opções!
+<sem valores>
+Definições salvadas...
+Erro ao salvar definições!
 Sair
-Opções
-Jogos via USB
-Jogos via HDD
-Jogos via rede
+Definições
+Jogos por USB
+Jogos por HDD
+Jogos por Rede
 Aplicativos
-Tema
+Temas
 Idioma
 Erro ao iniciar rede
-Ligado
-Desligado
-Ok
-Opções de compatibilidade
-Remover todas configurações
-Todas entradas do jogo removidas
+Ativado
+Desativado
+Aceitar
+Definições do jogo
+Remover todas as definições
+Removidas todas as definições para o jogo
 Rolagem
 Lento
 Médio
 Rápido
+Menu padrão
+Carregar do disco
+Por favor espere
+Erro ao carregar a ID do jogo
+Ordenar automaticamente
+Erro ao carregar arquivo de idioma
+Desativar depuração de cores
+Controle não detectado, esperando...
+Habilitar arte de capas (Cover art)
+Wide screen
+Desligar PS2
+Carregando configurações
+Salvando configurações
+Iniciar dispositivo
+Modo de inicio para dispositivos USB
+Modo de inicio para dispositivos HDD
+Modo de inicio para dispositivos ETH
+Modo de inicio para Aplicativos
+Automático
+Manual
+Iniciar servidor HDL
+Servidor HDL iniciando...
+Servidor HDL conectado...Aperte [O] para parar
+Aperte[X] para fechar o servidor HDL
+Fechando servidor HDL
+Sair para
+Cor de fundo
+Cor de texto
+Endereço IP
+Máscara de sub rede
+Gateway padrão
+Porta
+Compartilhar
+Usuário
+Senha
+<não usado>
+X Confirmar
+O item será permanentemente apagado, continuar?
+Renomear
+Deletar
+Iniciar
+Definições de tela
+Habilitar operações Deletar e Renomear
+Checar fragmentação em jogos USB
+Lembrar último jogo jogado
+Erro, o jogo está fragmentado
+Erro, não foi possível iniciar o item
+Teste
+Deixar vazio para identificação como convidado (GUEST)
+Carregar núcleo alternativo
+Método alternativo de leitura de dados
+Desativar chamadas do sistema
+Pular videos PSS
+Desabilitar suporte à DVD-DL
+Desabilitar IGR
+Buffer cdvdfsv reduzido
+Esconder módulo dev9
+Combinação IGR alternativa
+Alterar o tamanho irá reformatar o VMC
+Criar
+Modificar
+Abortar
+Resetar
+Usar genérico
+Configurar VMC
+Nome
+Tamanho
+Estado
+Progresso
+Arquivo VMC já existe
+Arquivo VMC inválido, o tamanho está incorreto
+Arquivo VMC precisa ser criado
+Erro com arquivo VMC, continuar com MC físico?

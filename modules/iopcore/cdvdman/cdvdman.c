@@ -1090,9 +1090,12 @@ void fs_init(void)
 	// zero pad the string to be sure it does not overflow
 	g_pc_share[32] = '\0';
 
-	// Then open a session and a tree connect on the share resource
+	// open a session
+	smb_SessionSetupAndX();
+
+	// Then tree connect on the share resource
 	sprintf(tmp_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
-	smb_SessionSetupTreeConnect(tmp_str);
+	smb_TreeConnectAndX(tmp_str);
 
 	char *path_str = "%s.%02x";
 	char *game_name = NULL;

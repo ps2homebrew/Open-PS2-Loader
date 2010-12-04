@@ -331,7 +331,7 @@ void menuNextV() {
 void menuPrevV() {
 	if (!selected_item)
 		return;
-	
+
 	struct submenu_list_t *cur = selected_item->item->current;
 
 	// if the current item is on the page start, move the page start one page up before moving the item
@@ -339,15 +339,72 @@ void menuPrevV() {
 		if (selected_item->item->pagestart == cur) {
 			int itms = gTheme->displayedItems + 1; // +1 because the selection will move as well
 
-			while (--itms && selected_item->item->pagestart->prev) {
-				selected_item->item->pagestart = selected_item->item->pagestart->prev;	
-			}
+			while (--itms && selected_item->item->pagestart->prev)
+				selected_item->item->pagestart = selected_item->item->pagestart->prev;
 		}
 	} else
 		selected_item->item->pagestart = cur;
-	
+
 	if(cur && cur->prev) {
 		selected_item->item->current = cur->prev;
+	}
+}
+
+void menuNextPage() {
+	if (!selected_item)
+		return;
+
+	struct submenu_list_t *cur = selected_item->item->pagestart;
+
+	if (cur) {
+		int itms = gTheme->displayedItems + 1;
+		while (--itms && cur->next)
+			cur = cur->next;
+
+		selected_item->item->current = cur;
+	}
+}
+
+void menuPrevPage() {
+	if (!selected_item)
+		return;
+
+	struct submenu_list_t *cur = selected_item->item->pagestart;
+
+	if (cur) {
+		int itms = gTheme->displayedItems + 1;
+		while (--itms && cur->prev)
+			cur = cur->prev;
+
+		selected_item->item->current = cur;
+		selected_item->item->pagestart = cur;
+	}
+}
+
+void menuFirstPage() {
+	if (!selected_item)
+		return;
+
+	selected_item->item->current = selected_item->item->submenu;
+}
+
+void menuLastPage() {
+	if (!selected_item)
+		return;
+
+	struct submenu_list_t *cur = selected_item->item->current;
+
+	if (cur) {
+		while (cur->next)
+			cur = cur->next; // go to end
+
+		selected_item->item->current = cur;
+
+		int itms = gTheme->displayedItems;
+		while (--itms && cur->prev) // and move back to have a full page
+			cur = cur->prev;
+
+		selected_item->item->pagestart = cur;
 	}
 }
 

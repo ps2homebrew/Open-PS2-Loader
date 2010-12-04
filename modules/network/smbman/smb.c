@@ -338,7 +338,7 @@ struct NTCreateAndXRequest_t {
 	u32	ImpersonationLevel;	// 80
 	u8	SecurityFlags;		// 84
 	u16	ByteCount;		// 85
-	char	Name[0];		// 87
+	char	ByteField[0];		// 87
 } __attribute__((packed));
 
 struct NTCreateAndXResponse_t {		// size = 107
@@ -378,7 +378,7 @@ struct OpenAndXRequest_t {
 	u32	AllocationSize;		// 55
 	u32	reserved[2];		// 59
 	u16	ByteCount;		// 67
-	u8	Name[0];		// 69
+	u8	ByteField[0];		// 69
 } __attribute__((packed));
 
 struct OpenAndXResponse_t {
@@ -1173,20 +1173,22 @@ query:
 int smb_NTCreateAndX(int UID, int TID, char *filename, s64 *filesize, int mode)
 {
 	struct NTCreateAndXRequest_t *NTCR = (struct NTCreateAndXRequest_t *)SMB_buf;
-	register int r, length;
+	register int r, i, offset, length, CF;
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
 
 	NTCR->smbH.Magic = SMB_MAGIC;
 	NTCR->smbH.Cmd = SMB_COM_NT_CREATE_ANDX;
 	NTCR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
 	NTCR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		NTCR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	NTCR->smbH.UID = (u16)UID;
 	NTCR->smbH.TID = (u16)TID;
 	NTCR->smbWordcount = 24;
 	NTCR->smbAndxCmd = SMB_COM_NONE;	// no ANDX command
-	length = strlen(filename);
-	NTCR->NameLength = length;
 	NTCR->AccessMask = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? 0x2019f : 0x20089;
 	NTCR->FileAttributes = ((mode & O_RDWR) == O_RDWR || (mode & O_WRONLY)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
 	NTCR->ShareAccess = 0x01; // Share in read mode only
@@ -1200,10 +1202,24 @@ int smb_NTCreateAndX(int UID, int TID, char *filename, s64 *filesize, int mode)
 		NTCR->CreateDisposition = 0x05;
 	NTCR->ImpersonationLevel = 2;
 	NTCR->SecurityFlags = 0x03;
-	NTCR->ByteCount = length+1;
-	strcpy(NTCR->Name, filename);
 
-	rawTCP_SetSessionHeader(84+length);
+	offset = 0;
+	if (CF == 2)
+		offset++;				// pad needed only for unicode as aligment fix
+
+	length = strlen(filename);
+	for (i = 0; i < length; i++) {
+		NTCR->ByteField[offset] = filename[i];	// add filename
+		offset += CF;
+	}
+	offset += CF;
+
+	NTCR->NameLength = length;
+	if (CF == 2)
+		NTCR->NameLength = NTCR->NameLength << 1;
+	NTCR->ByteCount = offset;
+
+	rawTCP_SetSessionHeader(84+offset);
 	r = GetSMBServerReply();
 	if (r <= 0)
 		return -3;
@@ -1236,17 +1252,21 @@ int smb_OpenAndX(int UID, int TID, char *filename, s64 *filesize, int mode)
 	// NT SMB commands set.
 
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
-	register int r, length;
+	register int r, i, offset, CF;
 
 	if (server_specs.SupportsNTSMB)
 		return smb_NTCreateAndX(UID, TID, filename, filesize, mode);
 
 	memset(SMB_buf, 0, sizeof(SMB_buf));
 
+	CF = server_specs.StringsCF;
+
 	OR->smbH.Magic = SMB_MAGIC;
 	OR->smbH.Cmd = SMB_COM_OPEN_ANDX;
 	OR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
 	OR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		OR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	OR->smbH.UID = (u16)UID;
 	OR->smbH.TID = (u16)TID;
 	OR->smbWordcount = 15;
@@ -1259,11 +1279,20 @@ int smb_OpenAndX(int UID, int TID, char *filename, s64 *filesize, int mode)
 		OR->CreateOptions |= 0x02;
 	else
 		OR->CreateOptions |= 0x01;
-	length = strlen(filename);
-	OR->ByteCount = length+1;
-	strcpy((char *)OR->Name, filename);
-	
-	rawTCP_SetSessionHeader(66+length);
+
+	offset = 0;
+	if (CF == 2)
+		offset++;				// pad needed only for unicode as aligment fix
+
+	for (i = 0; i < strlen(filename); i++) {
+		OR->ByteField[offset] = filename[i];	// add filename
+		offset += CF;
+	}
+	offset += CF;
+
+	OR->ByteCount = offset;
+
+	rawTCP_SetSessionHeader(66+offset);
 	r = GetSMBServerReply();
 	if (r <= 0)
 		return -3;

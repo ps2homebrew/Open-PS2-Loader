@@ -1,0 +1,102 @@
+# translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
+Filipino
+               MALIGAYANG PAGGAMIT NG OPEN PS2 LOADER. MAIN CODE AY BASE SA SOURCE CODE NG HD PROJECT <http://psx-scene.com> ADAPTATION SA FORMAT NG USB ADVANCE AT PANGUNAHING GUI NI IFCARO <http://ps2dev.ifcaro.net> KARAMIHAN SA LOADER CORE AY GAWA NI JIMMIKAELKAEL. LAHAT NG PAGBABAGO SA GUI AY GAWA NI VOLCA. MARAMING SALAMAT SA PAGGAMIT NG AMING PROGRAM ^^
+Open PS2 Loader %s
+I-save ang mga pagbabago
+O Bumalik
+Network config
+<walang laman>
+Settings ay Nai-save...
+Error sa pagsulat ng Settings!
+Lamabas
+Settings
+Laro sa USB
+Laro sa HDD
+Laro sa Network
+Apps
+Tema
+Wika
+Error sa Pagsisimula ng Network
+On
+Off
+Ok
+Setting ng Game
+Tangalin lahat ng Settings
+Tangalin lahat ng keys para sa Laro
+Scrolling
+Mabagal
+Katamtaman
+Mabilis
+Default na menu
+Kunin galing sa disc
+Maghintay ng Sandali
+Error sa Pagkuha ng Game ID
+Automatikong Pagsasaayos
+Error sa pagload ng file para sa wika
+Huwag paganahin ang Debug Colors
+Walang napansing controller, naghihintay...
+Paganahin ang Cover Art
+Wide screen
+Patayin
+Niloload ang config
+sini-save config
+Simulan ang Aparato
+Mode para simulan ang USB Device
+Mode para simulan ang HDD Device
+Mode para simulan ang ETH Device
+Mode sa pagsisimula ng Application
+Auto
+Manual
+Simulan ang HDL Server
+HDL Server ay nagsisimula...
+HDL Server ay tumatakbo... Pindutin ang [O] para itigil
+pindutin ang [X] para patayin ang HDL server
+HDL Server ay tinatangal...
+Lamabas sa 
+Kulay ng Background
+Kulay ng Texto
+IP
+Mask
+Gateway
+Port
+Share
+User
+Password
+<hindi nakatakda>
+X Tangapin
+Item ay permanenteng buburahin, magpatuloy ?
+palitan ang pangalan
+Burahin
+Patakbuhin
+Setting ng Display
+Paganhin ang pagbubura at pagpapalit ng pangalan
+Alamin ang fragmentation ng Laro sa USB
+Alalahanin ang huling nalaro
+Error, ang laro ay fragmented
+Error, ang item ay hindi maitakbo
+Subukan
+Iwanang walang laman para sa GUEST auth.
+Load alternate core
+Kapalit na data read method
+Unhook Syscalls
+0 PSS mode
+Huwag paganahin ang DVD-DL
+Huwag paganahin ang IGR
+Bawasan ang cdvdfsv buffer
+Itago ang dev9 module
+Kapalit na IGR combo
+Pagpalit ng laki ay magrereformat ng VMC
+Gumawa
+Baguhin
+Iurong
+Reset
+Gumamit ng generic
+IConfigure ang VMC
+Pangalan
+Laki
+Katayuan
+Progreso
+Mayroon ng VMC file
+Maling VMC file, hindi tama ang laki
+Kailangang magawan ng VMC file
+Error sa VMC file, magpatuloy sa pisikal na MC ?

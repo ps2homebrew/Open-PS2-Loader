@@ -63,7 +63,7 @@ struct NegociateProtocolRequest_t {
 	u8	smbWordcount;		// 36
 	u16	ByteCount;		// 37
 	u8	DialectFormat;		// 39
-	char	DialectName[64];	// 40
+	char	DialectName[0];		// 40
 } __attribute__((packed));
 
 struct NegociateProtocolResponse_t {
@@ -99,7 +99,7 @@ struct SessionSetupAndXRequest_t {
 	u32	reserved;		// 55
 	u32	Capabilities;		// 59
 	u16	ByteCount;		// 63
-	u8	ByteField[1024];	// 65
+	u8	ByteField[0];		// 65
 } __attribute__((packed));
 
 struct SessionSetupAndXResponse_t {
@@ -110,18 +110,29 @@ struct SessionSetupAndXResponse_t {
 	u16	smbAndxOffset;		// 39
 	u16	Action;			// 41
 	u16	ByteCount;		// 43
-	u8	ByteField[1024];	// 45
+	u8	ByteField[0];		// 45
 } __attribute__((packed));
 
-struct TreeConnectRequest_t {
-	u8	smbWordcount;
-	u8	smbAndxCmd;
-	u8	smbAndxReserved;
-	u16	smbAndxOffset;
-	u16	Flags;
-	u16	PasswordLength;
-	u16	ByteCount;
-	u8	ByteField[1024];
+struct TreeConnectAndXRequest_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	Flags;			// 41
+	u16	PasswordLength;		// 43
+	u16	ByteCount;		// 45
+	u8	ByteField[0];		// 47
+} __attribute__((packed));
+
+struct TreeConnectAndXResponse_t {
+	struct SMBHeader_t smbH;	// 0
+	u8	smbWordcount;		// 36
+	u8	smbAndxCmd;		// 37
+	u8	smbAndxReserved;	// 38
+	u16	smbAndxOffset;		// 39
+	u16	OptionalSupport;	// 41
+	u16	ByteCount;		// 43
 } __attribute__((packed));
 
 struct OpenAndXRequest_t {
@@ -139,7 +150,7 @@ struct OpenAndXRequest_t {
 	u32	AllocationSize;		// 55
 	u32	reserved[2];		// 59
 	u16	ByteCount;		// 67
-	u8	Name[1024];		// 69
+	u8	ByteField[0];		// 69
 } __attribute__((packed));
 
 struct OpenAndXResponse_t {
@@ -451,14 +462,14 @@ negociate_retry:
 }
 
 //-------------------------------------------------------------------------
-int smb_SessionSetupTreeConnect(char *share_name)
+int smb_SessionSetupAndX(void)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
-	register int i, offset, ss_size, CF;
+	register int i, offset, CF;
 	int AuthType = NTLM_AUTH;
 	int password_len = 0;
 
-lbl_sstc:
+lbl_session_setup:
 	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
 	CF = server_specs.StringsCF;
@@ -470,6 +481,7 @@ lbl_sstc:
 	if (CF == 2)
 		SSR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	SSR->smbWordcount = 13;
+	SSR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
 	SSR->MaxBufferSize = server_specs.MaxBufferSize > 65535 ? 65535 : (u16)server_specs.MaxBufferSize;
 	SSR->MaxMpxCount = server_specs.MaxMpxCount >= 2 ? 2 : (u16)server_specs.MaxMpxCount;
 	SSR->VCNumber = 1;
@@ -511,13 +523,54 @@ lbl_sstc:
 
 	SSR->ByteCount = offset;
 
-	SSR->smbAndxCmd = SMB_COM_TREE_CONNECT_ANDX;
-	SSR->smbAndxOffset = 61 + offset;
-	ss_size = offset;
+	rawTCP_SetSessionHeader(61+offset);
+	GetSMBServerReply();
 
-	struct TreeConnectRequest_t *TCR = (struct TreeConnectRequest_t *)&SSR->ByteField[offset];
+	struct SessionSetupAndXResponse_t *SSRsp = (struct SessionSetupAndXResponse_t *)SMB_buf;
+
+	// check sanity of SMB header
+	if (SSRsp->smbH.Magic != SMB_MAGIC)
+		return -1;
+
+	// check there's no auth failure
+	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL)
+		&& ((SSRsp->smbH.Eclass | (SSRsp->smbH.Ecode << 16)) == STATUS_LOGON_FAILURE)
+		&& (AuthType == NTLM_AUTH)) {
+		AuthType = LM_AUTH;
+		goto lbl_session_setup;
+	}
+
+	// check there's no error (NT STATUS error type!)
+	if ((SSRsp->smbH.Eclass | SSRsp->smbH.Ecode) != STATUS_SUCCESS)
+		return -1000;
+
+	// keep UID
+	UID = SSRsp->smbH.UID;
+
+	return 1;
+}
+
+//-------------------------------------------------------------------------
+int smb_TreeConnectAndX(char *ShareName)
+{
+	struct TreeConnectAndXRequest_t *TCR = (struct TreeConnectAndXRequest_t *)SMB_buf;
+	register int i, offset, CF;
+	int AuthType = NTLM_AUTH;
+	int password_len = 0;
+
+	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
+
+	CF = server_specs.StringsCF;
+
+	TCR->smbH.Magic = SMB_MAGIC;
+	TCR->smbH.Cmd = SMB_COM_TREE_CONNECT_ANDX;
+	TCR->smbH.Flags = SMB_FLAGS_CASELESS_PATHNAMES;
+	TCR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
+	if (CF == 2)
+		TCR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
+	TCR->smbH.UID = UID;
 	TCR->smbWordcount = 4;
-	TCR->smbAndxCmd = SMB_COM_NONE;
+	TCR->smbAndxCmd = SMB_COM_NONE;		// no ANDX command
 
 	// Fill ByteField
 	offset = 0;
@@ -534,8 +587,8 @@ lbl_sstc:
 	if ((CF == 2) && (!(password_len & 1)))
 		offset += 1;				// pad needed only for unicode as aligment fix is password len is even
 
-	for (i = 0; i < strlen(share_name); i++) {
-		TCR->ByteField[offset] = share_name[i];	// add Share name
+	for (i = 0; i < strlen(ShareName); i++) {
+		TCR->ByteField[offset] = ShareName[i];	// add Share name
 		offset += CF;
 	}
 	offset += CF;					// null terminator
@@ -545,30 +598,21 @@ lbl_sstc:
 
 	TCR->ByteCount = offset;
 
-	rawTCP_SetSessionHeader(72+ss_size+offset);
+	rawTCP_SetSessionHeader(43+offset);
 	GetSMBServerReply();
 
-	struct SessionSetupAndXResponse_t *SSRsp = (struct SessionSetupAndXResponse_t *)SMB_buf;
+	struct TreeConnectAndXResponse_t *TCRsp = (struct TreeConnectAndXResponse_t *)SMB_buf;
 
 	// check sanity of SMB header
-	if (SSRsp->smbH.Magic != SMB_MAGIC)
+	if (TCRsp->smbH.Magic != SMB_MAGIC)
 		return -1;
 
-	// check there's no auth failure
-	if ((server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL)
-		&& ((SSRsp->smbH.Eclass | (SSRsp->smbH.Ecode << 16)) == STATUS_LOGON_FAILURE)
-		&& (AuthType == NTLM_AUTH)) {
-		AuthType = LM_AUTH;
-		goto lbl_sstc;
-	}
-
 	// check there's no error (NT STATUS error type!)
-	if ((SSRsp->smbH.Eclass | SSRsp->smbH.Ecode) != STATUS_SUCCESS)
+	if ((TCRsp->smbH.Eclass | TCRsp->smbH.Ecode) != STATUS_SUCCESS)
 		return -1000;
 
-	// keep UID & TID
-	UID = SSRsp->smbH.UID;
-	TID = SSRsp->smbH.TID;
+	// keep TID
+	TID = TCRsp->smbH.TID;
 
 	return 1;
 }
@@ -577,16 +621,20 @@ lbl_sstc:
 int smb_OpenAndX(char *filename, u16 *FID, int Write)
 {
 	struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
-	register int length;
+	register int i, offset, CF;
 
 	WAITIOSEMA(io_sema);
 
 	mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
+	CF = server_specs.StringsCF;
+
 	OR->smbH.Magic = SMB_MAGIC;
 	OR->smbH.Cmd = SMB_COM_OPEN_ANDX;
 	OR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
 	OR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
+	if (CF == 2)
+		OR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	OR->smbH.UID = UID;
 	OR->smbH.TID = TID;
 	OR->smbWordcount = 15;
@@ -594,11 +642,20 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 	OR->AccessMask = (Write && (SMBWRITE)) ? 2 : 0;
 	OR->FileAttributes = (Write && (SMBWRITE)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
 	OR->CreateOptions = 1;
-	length = strlen(filename);
-	OR->ByteCount = length+1;
-	strcpy((char *)OR->Name, filename);
 
-	rawTCP_SetSessionHeader(66+length);
+	offset = 0;
+	if (CF == 2)
+		offset++;				// pad needed only for unicode as aligment fix
+
+	for (i = 0; i < strlen(filename); i++) {
+		OR->ByteField[offset] = filename[i];	// add filename
+		offset += CF;
+	}
+	offset += CF;
+
+	OR->ByteCount = offset;
+
+	rawTCP_SetSessionHeader(66+offset);
 	GetSMBServerReply();
 
 	struct OpenAndXResponse_t *ORsp = (struct OpenAndXResponse_t *)SMB_buf;

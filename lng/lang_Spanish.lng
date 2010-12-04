@@ -1,6 +1,6 @@
 # translation by El_Patas <el_patas69@hotmail.com>
 Spanish
-               BIENVENIDO A OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DE HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DE USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
+               BIENVENIDO AL OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DEL HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DEL USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
 Open PS2 Loader %s
 Guardar cambios
 O Atrás
@@ -20,9 +20,9 @@ Error al iniciar red
 Activado
 Desactivado
 Aceptar
-Opciones de compatibilidad
-Borrar todas las opciones
-Opciones para el juego borradas
+Preferencias juego
+Borrar todas las preferencias
+Preferencias para el juego borradas
 Desplazamiento
 Lento
 Medio
@@ -49,8 +49,8 @@ Automático
 Manual
 Iniciar servidor HDL
 Iniciando servidor HDL...
-Servidor HDL conectado... [O][X] Para desconectar
-Pulsa [X] para cerrar HDL...
+Servidor HDL conectado... Pulsa [O] para desconectar
+Pulsa [X] para cerrar servidor HDL...
 Cerrando servidor HDL...
 Salida hacia
 Color de fondo 
@@ -63,3 +63,40 @@ Unidad o carpeta compartida
 Cuenta de usuario compartida
 Contraseña
 <sin definir>
+X Aceptar
+El objeto se borrará definitivamente, ¿continuar?
+Renombrar
+Borrar
+Iniciar
+Preferencias de pantalla
+Mostrar las operaciones de Borrar y Renombrar
+Comprobar fragmentación de juego USB
+Recordar último juego jugado
+Error, el juego está fragmentado
+Error, no se pudo iniciar el objeto
+Test
+Dejar vacío para autentificar como GUEST
+Cargar núcleo alternativo
+Método de lectura de datos alternativo
+Remover llamadas del sistema
+Saltar lectura archivos PSS
+Sin soporte DVD-DL
+Sin soporte IGR
+Buffer cdvdfsv reducido
+Ocultar módulo dev9
+Combinación de IGR alternativa
+Cambiar el tamaño reformateará la VMC
+Crear
+Modificar
+Abortar
+Reiniciar
+Usar genérica
+Configurar VMC
+Nombre
+Tamaño
+Estado
+Progreso
+Archivo VMC ya existe
+Archivo VMC inválido, el tamaño es incorrecto
+El archivo VMC debe ser creado
+Error con el archivo VMC, ¿continuar con la MC física?

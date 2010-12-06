@@ -137,7 +137,7 @@ static void ioWorkerThread(void) {
 			WaitSema(gEndSemaId);
 			
 			// can't be sure if the request was
-			gReqList = req->next; // TODO got a crash here when launching a game (probabyl due to shutdown()
+			gReqList = req->next;
 			free(req);
 						
 			if (!gReqList)

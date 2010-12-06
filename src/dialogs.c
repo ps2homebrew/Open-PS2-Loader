@@ -167,6 +167,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, UICFG_LANG,  1, -1,{.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_AUTOREFRESH}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOREFRESH, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	

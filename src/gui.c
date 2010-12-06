@@ -324,6 +324,7 @@ static void guiShowUIConfig() {
 	diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
 	diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
 	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
+	diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 
@@ -336,6 +337,7 @@ static void guiShowUIConfig() {
 		diaGetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
 		diaGetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
+		diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
 
@@ -1143,6 +1145,8 @@ static void guiMainHandleInput() {
 		// reinit main menu - show/hide items valid in the active context
 		guiInitMainMenu();
 		screenHandlerTarget = &menuScreenHandler;
+	} else if(getKeyOn(KEY_SELECT)){
+		cur->refresh(cur);
 	} else if(getKeyOn(KEY_CROSS)){
 		menuItemExecButton(cur->execCross);
 	} else if(getKeyOn(KEY_TRIANGLE)){

@@ -57,7 +57,7 @@ struct menu_item_t {
 	/// submenu, selection and page start (only used in static mode)
 	struct submenu_list_t *submenu, *current, *pagestart;
 	
-	void (*refresh)(struct menu_item_t *self, short forceRefresh);
+	void (*refresh)(struct menu_item_t *self);
 
 	void (*execCross)(struct menu_item_t *self, int id);
 	
@@ -109,7 +109,6 @@ void menuItemExecButton(void (*execActionButton)(struct menu_item_t *self, int i
 
 // Sets the selected item if it is found in the menu list
 void menuSetSelectedItem(struct menu_item_t* item);
-void submenuRefresh(short forceRefresh);
 
 void menuSetInactiveFrames(unsigned int frames);
 

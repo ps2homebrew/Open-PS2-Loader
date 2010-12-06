@@ -103,7 +103,8 @@
 #define _STR_VMC_FILE_ERROR			98
 #define _STR_VMC_FILE_NEW			99
 #define _STR_ERR_VMC_CONTINUE		100
-#define LANG_STR_COUNT 101
+#define _STR_AUTOREFRESH			101
+#define LANG_STR_COUNT 102
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

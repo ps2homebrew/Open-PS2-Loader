@@ -69,6 +69,7 @@ int gETHStartMode;
 int gAPPStartMode;
 /// Sort the game lists automatically
 int gAutosort;
+int gAutoRefresh;
 /// true if icons and covers Art should be displayed
 int gEnableArt;
 int gWideScreen;

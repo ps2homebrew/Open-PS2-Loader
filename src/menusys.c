@@ -442,15 +442,6 @@ void menuSetSelectedItem(struct menu_item_t* item) {
 	}
 }
 
-void submenuRefresh(short forceRefresh) {
-	if (selected_item && (selected_item->item->refresh)) {
-		/*if (forceRefresh)
-			resetCache();*/
-		
-		selected_item->item->refresh(selected_item->item, forceRefresh);
-	}
-}
-
 void submenuPixmapLoaded(icon_cache_t* cache, void *centry, int result) {
 	cache_entry_t *entry = (cache_entry_t *)centry;
 	

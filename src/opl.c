@@ -102,6 +102,8 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 		else {
 			support->itemInit();
 			menuInitHints(self); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
+			if (!gAutoRefresh)
+				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 		}
 	}
 	else
@@ -137,7 +139,10 @@ static void itemExecSquare(struct menu_item_t *self, int id) {
 		if (support->itemDelete) {
 			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
 				support->itemDelete(id);
-				gFrameCounter = UPDATE_FRAME_COUNT;
+				if (gAutoRefresh)
+					gFrameCounter = UPDATE_FRAME_COUNT;
+				else
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 			}
 		}
 	}
@@ -160,12 +165,22 @@ static void itemExecCircle(struct menu_item_t *self, int id) {
 			strncpy(newName, self->current->item.text, support->maxNameLength);
 			if (guiShowKeyboard(newName, support->maxNameLength)) {
 				support->itemRename(id, newName);
-				gFrameCounter = UPDATE_FRAME_COUNT;
+				if (gAutoRefresh)
+					gFrameCounter = UPDATE_FRAME_COUNT;
+				else
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 			}
 		}
 	}
 	else
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
+}
+
+static void itemExecRefresh(struct menu_item_t *self) {
+	item_list_t *support = self->userdata;
+
+	if (support && support->enabled)
+		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 }
 
 static void initMenuForListSupport(opl_io_module_t* item) {
@@ -181,7 +196,7 @@ static void initMenuForListSupport(opl_io_module_t* item) {
 	item->menuItem.current = NULL;
 	item->menuItem.pagestart = NULL;
 
-	item->menuItem.refresh = NULL;
+	item->menuItem.refresh = &itemExecRefresh;
 	item->menuItem.execCross = &itemExecCross;
 	item->menuItem.execTriangle = &itemExecTriangle;
 	item->menuItem.execSquare = &itemExecSquare;
@@ -210,8 +225,12 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
 		menuInitHints(&list_support[mode].menuItem);
-		gFrameCounter = UPDATE_FRAME_COUNT;
 		list_support[mode].support->uip = 0;
+
+		if (gAutoRefresh)
+			gFrameCounter = UPDATE_FRAME_COUNT;
+		else
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[mode]);
 	}
 }
 
@@ -253,6 +272,106 @@ static void menuFillHookFunc(struct submenu_list_t **menu) {
 	if (gHDDStartMode) // enabled at all?
 		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
 #endif
+}
+
+// ----------------------------------------------------------
+// ----------------------- Updaters -------------------------
+// ----------------------------------------------------------
+static void updateMenuFromGameList(opl_io_module_t* mdl) {
+	if (!mdl)
+		return;
+
+	if (!mdl->support)
+		return;
+
+	// lock - gui has to be unused here
+	guiLock();
+
+	submenuDestroy(&mdl->subMenu);
+	mdl->menuItem.submenu = NULL;
+	mdl->menuItem.current = NULL;
+	mdl->menuItem.pagestart = NULL;
+
+	// unlock, the rest is deferred
+	guiUnlock();
+
+	char* temp = NULL;
+	if (gRememberLastPlayed)
+		configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
+
+	// read the new game list
+	struct gui_update_t *gup = NULL;
+	int count = mdl->support->itemUpdate();
+	if (count) {
+		int i;
+
+		for (i = 0; i < count; ++i) {
+
+			gup = guiOpCreate(GUI_OP_APPEND_MENU);
+
+			gup->menu.menu = &mdl->menuItem;
+			gup->menu.subMenu = &mdl->subMenu;
+
+			gup->submenu.icon_id = DISC_ICON;
+			gup->submenu.id = i;
+			gup->submenu.text = mdl->support->itemGetName(i);
+			gup->submenu.text_id = -1;
+			gup->submenu.selected = 0;
+
+			if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0)
+				gup->submenu.selected = 1;
+
+			guiDeferUpdate(gup);
+		}
+	}
+
+	if (gAutosort) {
+		gup = guiOpCreate(GUI_OP_SORT);
+		gup->menu.menu = &mdl->menuItem;
+		gup->menu.subMenu = &mdl->subMenu;
+		guiDeferUpdate(gup);
+	}
+}
+
+static void menuDeferredUpdate(void* data) {
+	opl_io_module_t* mdl = data;
+
+	if (!mdl)
+		return;
+
+	if (!mdl->support)
+		return;
+
+	if (mdl->support->uip)
+		return;
+
+	// see if we have to update
+	if (mdl->support->itemNeedsUpdate()) {
+		mdl->support->uip = 1;
+
+		updateMenuFromGameList(mdl);
+
+		mdl->support->uip = 0;
+	}
+}
+
+static void menuUpdateHook() {
+	// if timer exceeds some threshold, schedule updates of the available input sources
+	gFrameCounter++;
+
+	if (gFrameCounter > UPDATE_FRAME_COUNT) {
+		gFrameCounter = 0;
+
+		// schedule updates of all the list handlers
+		if (list_support[USB_MODE].support && list_support[USB_MODE].support->enabled)
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[USB_MODE]);
+		if (list_support[ETH_MODE].support && list_support[ETH_MODE].support->enabled)
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[ETH_MODE]);
+		if (list_support[HDD_MODE].support && list_support[HDD_MODE].support->enabled)
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[HDD_MODE]);
+		if (list_support[APP_MODE].support && list_support[APP_MODE].support->enabled)
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[APP_MODE]);
+	}
 }
 
 // ----------------------------------------------------------
@@ -352,6 +471,7 @@ static void _loadConfig() {
 				strncpy(gPCPassword, temp, 32);
 
 			configGetInt(configOPL, "autosort", &gAutosort);
+			configGetInt(configOPL, "autorefresh", &gAutoRefresh);
 			configGetInt(configOPL, "default_device", &gDefaultDevice);
 			configGetInt(configOPL, "disable_debug", &gDisableDebug);
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
@@ -395,6 +515,7 @@ static void _saveConfig() {
 		configSetStr(configOPL, "pc_user", gPCUserName);
 		configSetStr(configOPL, "pc_pass", gPCPassword);
 		configSetInt(configOPL, "autosort", gAutosort);
+		configSetInt(configOPL, "autorefresh", gAutoRefresh);
 		configSetInt(configOPL, "default_device", gDefaultDevice);
 		configSetInt(configOPL, "disable_debug", gDisableDebug);
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
@@ -445,6 +566,11 @@ void applyConfig(int themeID, int langID) {
 		menuInitHints(&list_support[HDD_MODE].menuItem);
 	if (list_support[APP_MODE].support)
 		menuInitHints(&list_support[APP_MODE].menuItem);
+
+	if (gAutoRefresh)
+		guiSetFrameHook(&menuUpdateHook);
+	else
+		guiSetFrameHook(NULL);
 }
 
 int loadConfig(int types) {
@@ -470,106 +596,6 @@ int saveConfig(int types, int showUI) {
 	}
 	
 	return lscret;
-}
-
-// ----------------------------------------------------------
-// ----------------------- Updaters -------------------------
-// ----------------------------------------------------------
-static void updateMenuFromGameList(opl_io_module_t* mdl) {
-	if (!mdl)
-		return;
-	
-	if (!mdl->support)
-		return;
-	
-	// lock - gui has to be unused here
-	guiLock();
-	
-	submenuDestroy(&mdl->subMenu);
-	mdl->menuItem.submenu = NULL;
-	mdl->menuItem.current = NULL;
-	mdl->menuItem.pagestart = NULL;
-	
-	// unlock, the rest is deferred
-	guiUnlock();
-	
-	char* temp = NULL;
-	if (gRememberLastPlayed)
-		configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
-
-	// read the new game list
-	struct gui_update_t *gup = NULL;
-	int count = mdl->support->itemUpdate();
-	if (count) {
-		int i;
-
-		for (i = 0; i < count; ++i) {
-			
-			gup = guiOpCreate(GUI_OP_APPEND_MENU);
-			
-			gup->menu.menu = &mdl->menuItem;
-			gup->menu.subMenu = &mdl->subMenu;
-			
-			gup->submenu.icon_id = DISC_ICON;
-			gup->submenu.id = i;
-			gup->submenu.text = mdl->support->itemGetName(i);
-			gup->submenu.text_id = -1;
-			gup->submenu.selected = 0;
-			
-			if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0)
-				gup->submenu.selected = 1;
-
-			guiDeferUpdate(gup);
-		}
-	}
-	
-	if (gAutosort) {
-		gup = guiOpCreate(GUI_OP_SORT);
-		gup->menu.menu = &mdl->menuItem;
-		gup->menu.subMenu = &mdl->subMenu;
-		guiDeferUpdate(gup);
-	}
-}
-
-static void menuDeferredUpdate(void* data) {
-	opl_io_module_t* mdl = data;
-	
-	if (!mdl)
-		return;
-	
-	if (!mdl->support)
-		return;
-	
-	if (mdl->support->uip)
-		return;
-	
-	// see if we have to update
-	if (mdl->support->itemNeedsUpdate()) {
-		mdl->support->uip = 1;
-
-		updateMenuFromGameList(mdl);
-		
-		mdl->support->uip = 0;
-	}
-}
-
-static void menuUpdateHook() {
-	// if timer exceeds some threshold, schedule updates of the available input sources
-	gFrameCounter++;
-	
-	if (gFrameCounter > UPDATE_FRAME_COUNT) {
-		gFrameCounter = 0;
-		
-		// schedule updates of all the list handlers
-		if (list_support[USB_MODE].support && list_support[USB_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[USB_MODE]);
-		if (list_support[ETH_MODE].support && list_support[ETH_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[ETH_MODE]);
-		if (list_support[HDD_MODE].support && list_support[HDD_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[HDD_MODE]);
-		if (list_support[APP_MODE].support && list_support[APP_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[APP_MODE]);
-	}
 }
 
 // ----------------------------------------------------------
@@ -783,6 +809,7 @@ static void setDefaults(void) {
 	gDefaultDevice = APP_MODE;
 	// autosort defaults to zero
 	gAutosort = 0;
+	gAutoRefresh = 1;
 	//Default disable debug colors
 	gDisableDebug = 0;
 	gEnableDandR = 0;
@@ -837,13 +864,13 @@ static void init(void) {
 	
 	startPads();
 
+	// handler for deffered menu updates
+	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
+
 	// try to restore config
 	_loadConfig();
 
 	cacheInit();
-
-	// handler for deffered menu updates
-	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
 }
 
 static void deferredInit(void) {
@@ -851,9 +878,6 @@ static void deferredInit(void) {
 	// inform GUI main init part is over
 	struct gui_update_t *id = guiOpCreate(GUI_INIT_DONE);
 	guiDeferUpdate(id);
-
-	// update hook...
-	guiSetFrameHook(&menuUpdateHook);
 
 	if (list_support[gDefaultDevice].support) {
 		id = guiOpCreate(GUI_OP_SELECT_MENU);

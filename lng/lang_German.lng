@@ -31,7 +31,7 @@ Grundeinstellungen
 Von Disk laden
 Bitte warten
 Fehler beim Laden der Spiel ID
-Automatisches Scrollen
+Automatische Sortierung
 Fehler beim Laden des Sprachfiles
 Debug Farben ausschalten
 Kein Controler gefunden, ich warte...
@@ -100,3 +100,4 @@ VMC File vorhanden
 Defekter VMC File, die Größe ist falsch
 VMC File muss erstellt werden
 Fehler mit dem VMC File ? mit echter MC fortfahren ?
+Automatisch aktualisieren

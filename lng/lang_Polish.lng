@@ -2,7 +2,7 @@
 Polish
                WITAMY W PROGRAMIE OPEN PS2 LOADER. GŁÓWNY KOD OPARTY ZOSTAŁ NA KODZIE ŹRÓDŁOWYM HD PROJECT <http://psx-scene.com> IMPLEMENTACJE FORMATU USB ADVANCE I GUI PRZEZ IFCARO <http://ps2dev.ifcaro.net> WIĘKSZOŚĆ JĄDRA LOADERA WYKONANA PRZEZ JIMMIKAELKAEL. WSZYSTKIE ULEPSZENIA GUI WYKONANE PRZEZ VOLCA. DZIĘKUJEMY ZA SKORZYSTANIE Z NASZEJ APLIKACJI. ^^
 Open PS2 Loader %s
-"X" Zapisz zmiany
+Zapisz zmiany
 "O" Powrót
 Konfiguracja sieci
 <brak wartości>
@@ -100,3 +100,4 @@ Plik VMC już istnieje
 Niewłaściwy plik VMC, nieprawidłowy rozmiar
 Plik VMC musi zostać utworzony
 Błąd z plikiem VMC, kontynuować z fizyczną karta pamięci ?
+Automatyczne odswieżanie

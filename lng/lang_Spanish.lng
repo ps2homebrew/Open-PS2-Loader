@@ -64,7 +64,7 @@ Cuenta de usuario compartida
 Contraseña
 <sin definir>
 X Aceptar
-El objeto se borrará definitivamente, ¿continuar?
+El archivo se borrará definitivamente, ¿continuar?
 Renombrar
 Borrar
 Iniciar
@@ -100,3 +100,4 @@ Archivo VMC ya existe
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
 Error con el archivo VMC, ¿continuar con la MC física?
+Refresco automáticde la lista

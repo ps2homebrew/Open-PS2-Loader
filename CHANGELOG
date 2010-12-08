@@ -8,6 +8,31 @@
 
 Open PS2 Loader ChangeLog:
 
+Version 0.8
+-------------------------------------------------
+Core:
+    * secure authentication for the SMB module (to enable security and write access)
+    * new GUI, fully customizable elements
+    * various SMB tweaks (NBSS keep-alive, small ingame speed-up)
+    * improved NAS support for more devices (WD MyBook, Digitus NAS, ...)
+    * added an embedded HDLServer into OPL to install HDD games
+    * various debugging output option (to help debug failing games)
+    * add compatibility for new external USB HDD with 1k/2k/4k cluster file
+    * add full compatibility for old PS2 consoles (10k JAP)
+    * ISO format added for USB too (still there is the 4Gb file limit, which is not present on SMB)
+    * new compatibility modes
+    * childproof mode (settings are locked)
+    * alternate startup mode, for loading/saving configuration files from USB and HDD (no need for MC in this case)
+    * added new menu to launch external ELF applications
+    * added VMC (Virtual Memory Card) support
+    * improved general compatibility (many specific games now working for the first time)
+
+GUI:
+    * new multi-threaded and redesigned GUI
+    * support for Cover, Icon and Background Art
+    * skinnable interface using theme
+    * added "rename" and "delete" functionalities for games lists
+
 Version 0.7
 -------------------------------------------------
 - Improved network startups and various fixes

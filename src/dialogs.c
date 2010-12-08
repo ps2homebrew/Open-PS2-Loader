@@ -183,6 +183,33 @@ struct UIItem diaUIConfig[] = {
 	{UI_TERMINATOR}
 };
 
+struct UIItem diaAbout[] = {
+	{UI_LABEL, 1, 1, -1, {.label = {NULL, -1}}},
+	{UI_SPLITTER},
+
+	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_DEVS}}}, {UI_BREAK},
+
+	// trick due to the "dots" bug in space characters
+	{UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, {.label = {"A", -1}}}, {UI_BREAK},
+
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, {.label = {"crazyc", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, {.label = {"ifcaro", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, {.label = {"izdubar", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, {.label = {"jimmikaelkael", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, {.label = {"Polo35", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, {.label = {"volca", -1}}}, {UI_BREAK},
+
+	{UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, {.label = {"A", -1}}}, {UI_BREAK},
+
+	{UI_SPLITTER},
+	{UI_OK, 0, 1, -1, {.label = {NULL, _STR_OK}}},
+
+	// end of dialog
+	{UI_TERMINATOR}
+};
+
 #ifdef VMC
 struct UIItem diaVMC[] = {
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_VMC_SCREEN}}},

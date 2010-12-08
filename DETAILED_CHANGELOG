@@ -8,443 +8,506 @@
 
 Open PS2 Loader detailed ChangeLog:
 
-rev439 - update modload version check in MODLOAD hooking - Sat Sep 04 10:23:55 2010
-rev438 - added rename and delete functionality for UL format (ul.cfg) - Fri Sep 03 23:22:33 2010
-rev437 - only apply sorting, when autosort settings enabled - Fri Sep 03 20:43:36 2010
-rev436 - fix update of HDD game list after restarting modules (when leaving HDLD server) - Fri Sep 03 19:55:34 2010
-rev435 - enable HDD rename/delete - Fri Sep 03 09:57:04 2010
-rev434 - fix again for those games resetting IOP with null arg - Fri Sep 03 09:07:57 2010
-rev433 - Added "rename" and "delete" functionalities for games. - Thu Sep 02 23:07:32 2010
-rev432 - smbman: added debug prints ability - Thu Sep 02 19:01:13 2010
-rev431 - use MODLOAD hooking on IOP instead of patching LMB on EE - Thu Sep 02 16:07:15 2010
-rev430 - fix for alternative EE core build - Fri Aug 20 11:05:42 2010
-rev429 - fix: give some delay to ingame mass driver - Thu Aug 19 09:56:14 2010
-rev428 - EE core: get rid of libc dependency - Wed Aug 11 18:52:17 2010
-rev427 - IGR: use kernel's InitializeTLB instead of syscall - Sun Aug 08 20:52:36 2010
-rev426 - EE core: rewrote all syscall hooks in asm - Sat Aug 07 21:36:24 2010
-rev425 - EE core: a few tweaks to asm code - Thu Aug 05 22:28:01 2010
-rev424 - EE core: improved LoadExecPS2/SifSetDma hooks - Thu Aug 05 21:27:58 2010
-rev423 - update spanish language file - Thu Aug 05 19:53:32 2010
-rev422 - added Italian language file - Wed Aug 04 20:05:27 2010
-rev421 - EE core: a few tweaks to asm code - Tue Aug 03 20:35:24 2010
-rev420 - EE core: improve LoadExecPS2 hooking (fixes Tecmo Hit Parade SLPS_204.01) - Tue Aug 03 17:03:25 2010
-rev419 - crazyc: add MC dump ability to genvmc - Mon Aug 02 21:42:12 2010
-rev418 - fix for Star Ocean 3 - Till the End of Time (broken in r395) - Mon Aug 02 16:31:25 2010
-rev417 - fix for V-Rally 3 PAL (SLES_507.25) - Sat Jul 31 21:31:30 2010
-rev416 - fix for Shaun Palmer's Pro Snowboarder US (SLUS_201.99) - Sat Jul 31 17:37:41 2010
-rev415 - few i18n changes - Fri Jul 30 22:51:02 2010
-rev414 - clean-up in GUI strings (removed old entries, added missing values) - Thu Jul 29 21:30:45 2010
-rev413 - fix for NRA Gun Club (SLUS_214.32) - Mon Jul 26 20:26:00 2010
-rev412 - improvements to genvmc module - Mon Jul 26 14:19:49 2010
-rev411 - added genvmc IOP module - Sun Jul 25 17:22:56 2010
-rev410 - fix attempt for Jak X - Sat Jul 24 10:09:38 2010
-rev409 - fix for those games rebooting IOP with null arg (fixes Bloody Roar 3) - Fri Jul 23 17:39:26 2010
-rev408 - fix for GTA 3 a-spec over SMB - Fri Jul 23 13:39:36 2010
-rev407 - cdvdfsv: name module like orginal one - cdvd_ee_driver - Fri Jul 23 10:40:53 2010
-rev406 - EE core: fix for Quake III Revolution - Thu Jul 22 18:25:23 2010
-rev405 - fix for Jak 3 - Thu Jul 22 08:49:21 2010
-rev404 - fix for Full Spectrum Warrior - Wed Jul 21 21:44:41 2010
-rev403 - fix for those having SMB slowdown/freeze issue on some setups - Wed Jul 21 18:52:43 2010
-rev402 - cdvdman: fix lseek fileIO (fixes Shadow of Ganymede) - Tue Jul 20 20:16:31 2010
-rev401 - HDD core fix: init filesystem before to return disc type (fixes Xyanide Resurrection) - Tue Jul 20 16:08:45 2010
-rev400 - Added translation information for custom language - Tue Jul 20 15:29:15 2010
-rev399 - dlanor: fix for invisible cursor GUI glitch - Sun Jul 18 16:05:12 2010
-rev398 - fix for Viewtiful Joe - Sun Jul 18 15:58:03 2010
-rev397 - fix for EveryBody's Golf and other games - Sat Jul 17 17:26:26 2010
-rev396 - added feature to be able to disable sceSifStopModule/sceSifUnloadModule - Sat Jul 17 16:42:48 2010
-rev395 - hook SCE's SifLoadModuleBuffer to fake some modules to be loaded correctly through LoadModuleBuffer calls - Sat Jul 17 09:33:09 2010
-rev394 - fix for Kya: Dark Lineage PAL (SLES_514.73) - Thu Jul 15 15:06:51 2010
-rev393 - fix for V-Rally 3 US (SLUS_204.96) - Thu Jul 15 13:21:31 2010
-rev392 - fix for Kya: Dark Lineage US (SLUS_204.40) - Wed Jul 14 19:19:34 2010
-rev391 - changed the patches for Prince Of Persia: The Two Thrones - Wed Jul 14 19:15:35 2010
-rev390 - fix for Prince of Persia: The Two Thrones NTSC U (SLUS_212.87) - Tue Jul 13 12:35:52 2010
-rev389 - hdldsvr: use real HDD writes - Tue Jul 13 09:41:41 2010
-rev388 - udptty: redirect Kprintf output to tty - Mon Jul 12 20:50:43 2010
-rev387 - cdvdman: set cdstatus to CDVD_STAT_PAUSE in sceCdStStart/sceCdStResume - Sun Jul 11 16:42:07 2010
-rev386 - added EELOAD patches - Wed Jul 07 19:24:05 2010
-rev385 - fix for Suikoden IV (HDD) broken in r359 - Tue Jul 06 09:49:52 2010
-rev384 - fix for Prince of Persia: The Two Thrones PAL (SLES_537.77) - Mon Jul 05 19:01:47 2010
-rev383 - cdvdman: do not allocate IOP memory in cd callback handler (fixes Syphon Filter Logan's Shadow on HDD) - Sun Jul 04 18:30:17 2010
-rev382 - EE core: change stack pointer a bit earlier - Fri Jul 02 21:59:55 2010
-rev381 - EE core: use an intermediate stack during the IOP reset 'hook' code - Fri Jul 02 21:50:10 2010
-rev380 - use maximum priority for EE SMB password hashing thread - Fri Jul 02 19:30:42 2010
-rev379 - Fix for Suikoden V (in patch form) - Fri Jul 02 16:19:09 2010
-rev378 - fix for Max Payne EU version (SLES_503.25) - Thu Jul 01 21:08:36 2010
-rev377 - * make arrow icons customizable - Wed Jun 30 23:44:26 2010
-rev376 - PS3 fix 2: use XLOADFILE when building EELOADCNF - Wed Jun 30 21:47:52 2010
-rev375 - PS3 fix 1: reinstated cddev module use in EE core - Wed Jun 30 21:21:18 2010
-rev374 - * don't unmount pfs0 when we are launching an app that is on HDD - Wed Jun 30 21:00:04 2010
-rev373 - fix number 2 for Kingdom Hearts 2 gummi ship missions (should fix all regions) - Wed Jun 30 14:38:03 2010
-rev372 - fix for Kingdom Hearts 2 (SLUS_210.05) freeze on gummi ship missions - Wed Jun 30 11:01:15 2010
-rev371 - Apply Max Payne US patch on all 3 cores - Tue Jun 29 16:56:26 2010
-rev370 - SMSTCPIP: revert ARP_QUEUEING setting change (should fix broken Downhill Domination - SCUS_971.77 via SMB) - Tue Jun 29 16:45:45 2010
-rev369 - added compatibility mode 8 (should fix NFS Underground 2 - SLUS_210.65) - Mon Jun 28 19:39:40 2010
-rev368 - fix for the recent freezing using themes - Mon Jun 28 18:08:42 2010
-rev367 - changed smbauth & tcpip threads priorities (fixes Spiderman 3 and Genji) - Mon Jun 28 08:34:57 2010
-rev366 - link GUI SMB auth stuff to SMB core - Sun Jun 27 22:55:56 2010
-rev365 - * startup logo implementation, with a placeholder Logo - Sun Jun 27 20:41:48 2010
-rev364 - SMB core: do not perform password hashing if SMB server uses plaintext passwords - Sun Jun 27 19:38:17 2010
-rev363 - Max Payne US version (SLUS_202.30) fix for SMB use - Sun Jun 27 18:53:00 2010
-rev362 - EE core: added a ResetSPU() in LoadExecPS2 hook - Sun Jun 27 18:51:33 2010
-rev361 - added User Security Level support to SMB core - Sat Jun 26 22:04:12 2010
-rev360 - cdvdman: change back SceCdTrayReq traycheck return value - Sat Jun 26 09:38:33 2010
-rev359 - SMB core: save more IOP memory to increase compatibility - Fri Jun 25 10:36:55 2010
-rev358 - removed cddev module use from EE core, removed cddev - Wed Jun 23 13:31:22 2010
-rev357 - default to settings menu when no devices started or no config file found - Wed Jun 23 12:55:53 2010
-rev356 - * re-enable game "test" functionality (from compatibility settings) - Wed Jun 23 12:06:48 2010
-rev355 - use ICO fix (r346) only in compatibility mode 7 - Wed Jun 23 09:54:52 2010
-rev354 - smbman: do not rely on EndOfSearch but rather SearchCount field - Tue Jun 22 22:31:11 2010
-rev353 - remove uneeded stuff from ps2link module - Mon Jun 21 12:43:50 2010
-rev352 - EE core: remove InitializeUserMemory() patch when removing kernel hooks - Mon Jun 21 11:02:31 2010
-rev351 - fix: do no longer use sbv_patch_user_mem_clear() to be compatible with faulty DMS4 modchip - Sun Jun 20 19:46:58 2010
-rev350 - ps2link module: corrected Makefile - Sun Jun 20 19:00:52 2010
-rev349 - reload ps2link module on 'make debug' rule - Sat Jun 19 11:52:19 2010
-rev348 - fix: HDD gamelist was deallocated too early in HDD game launch process - Sat Jun 19 11:08:28 2010
-rev347 - * ISO support also "enabled" for USB (don't know what is the filesize limit, either 2Go or 4Go) - Fri Jun 18 22:36:12 2010
-rev346 - cdvdfsv: remove a 2KB of wasted IOP mem (fixes ICO - SCUS_971.59 via SMB) - Fri Jun 18 22:08:30 2010
-rev345 - SMSTCPIP: adjust PBUF_POOL_SIZE for ingame use (fixes again Disgaea SLUS_206.66 broken since r283) - Thu Jun 17 12:14:37 2010
-rev344 - added a new compatibilty mode: "reduce the buffers used by cdvdman/cdvdfsv" - Wed Jun 16 21:56:10 2010
-rev343 - added make_changelog.sh script and DETAILED_CHANGELOG file - Wed Jun 16 20:25:36 2010
-rev342 - cdvdman: check faulty filepath(more than one ';1') - fixes WWE Smackdown! Shut your mouth (SLUS_204.83) - Wed Jun 16 19:51:14 2010
-rev341 - use ioptrap module while debugging - Wed Jun 16 14:12:26 2010
-rev340 - fix for HDD games compat modes saving to another game when using sorted list - Mon Jun 14 20:30:37 2010
-rev339 - cdvdman fix: dread must return entry size (fixes Captain Tsubasa SLPS_256.91) - Sun Jun 13 17:37:48 2010
-rev338 - removed netlog module (now replaced by UDPtty) - Sun Jun 13 14:55:24 2010
-rev337 - make use of UDPtty for in-game debugging - Sun Jun 13 14:48:15 2010
-rev336 - 10K patch fix: only patch kernel if not already patched - Sat Jun 12 15:05:24 2010
-rev335 - fix for exiting kernel mode correctly while applying 10K patches - Sat Jun 12 13:03:30 2010
-rev334 - use more versatile code to get ROMVER info in 10K patches - Sat Jun 12 12:47:16 2010
-rev333 - remove debug from 10K patches - Fri Jun 11 23:42:36 2010
-rev332 - 10K fix 2: OPL now runs on original 10K kernel - Fri Jun 11 23:39:48 2010
-rev331 - loader: do a system restart in LoadExecPS2 hook as the real syscall does (reinitialize GS, INTC, TIMER, DMAC, VU0, VU1, VIF0, VIF1, GIF, IPU, FPU and ScratchPad - Wed Jun 09 21:13:38 2010
-rev330 - hdd.c: do not deallocate partion table when it's not allocated - Tue Jun 08 22:06:03 2010
-rev329 - free the HDL game list and HDD partition table in hddCleanup() - Tue Jun 08 20:07:04 2010
-rev328 - 10K fix 1: OPL now runs on patched 10K kernel - Tue Jun 08 12:07:01 2010
-rev327 - modified Disc ID stuff to no longer freeze on No disc/Invalid disc - Sun Jun 06 21:08:31 2010
-rev326 - fix to avoid warning on unused variable in hdd.c - Sun Jun 06 16:00:49 2010
-rev325 - modified and tested HDD deleting game code (real writes still deactivated) - Sun Jun 06 15:57:29 2010
-rev324 - use EE SIO debug in the loader - Sat Jun 05 14:53:15 2010
-rev323 - use EE SIO debug output in the GUI on 'make EESIO_debug' - Fri Jun 04 11:18:35 2010
-rev322 - cdvdman: be compatible with mass storage device having sector size of 4096 - Thu Jun 03 12:49:06 2010
-rev321 - usbhdfsd: added an ioctl to return mass storage device sectorsize - Thu Jun 03 11:26:33 2010
-rev320 - * Fix for issue #29 (dia.c tooltip display) - Wed Jun 02 19:40:33 2010
-rev319 - Put plasma speed back after the framerate optimization - Wed Jun 02 19:19:00 2010
-rev318 - cdvdman: be compatible with mass storage having sector size of 512, 1024, 2048 - Wed Jun 02 18:32:30 2010
-rev317 - * separate background rendering (Issue #31) - Wed Jun 02 18:29:25 2010
-rev316 - usbhdfsd: removed unused code in fs_getFileStartSector() - Wed Jun 02 16:42:36 2010
-rev315 - cdvdman: fix for my previous code tweak breaking compat with SMB games in ul format - Wed Jun 02 15:38:01 2010
-rev314 - cdvdman: code tweaking for opening ISO file(s) - Wed Jun 02 15:19:27 2010
-rev313 - cdvdman: optimized code size for plain ISO support in cdvdman_ReadSect() - Wed Jun 02 13:05:27 2010
-rev312 - fix for theme choosen not saving - Mon May 31 20:12:26 2010
-rev311 - use LOG() rather than printf() - Mon May 31 12:03:14 2010
-rev310 - fix for issue #23 - Sun May 30 19:36:35 2010
-rev309 - make use of udptty in debug version - Sun May 30 17:25:10 2010
-rev308 - added udptty module - Sat May 29 20:34:44 2010
-rev307 - forgot system.h, now added - Sat May 29 18:03:54 2010
-rev306 - added system.h and sysLoadModuleBuffer to able to check for modules already loaded - Sat May 29 17:57:43 2010
-rev305 - added lanman module & lanlab - Sat May 29 16:00:14 2010
-rev304 - moved smblab & hdldsvrlab to labs folder - Sat May 29 13:39:14 2010
-rev303 - small fix in game disc settings handling - Sat May 29 01:33:40 2010
-rev302 - * stop io timer while io is blocked (seems not to affect the hdl server transfer rate though :( ) - Fri May 28 18:14:10 2010
-rev301 - buffered write (for config file) - Fri May 28 16:54:37 2010
-rev300 - Fixing issue #21 - Thu May 27 19:44:24 2010
-rev299 - * Maybe a more resource friendly (but a bit awkward for now) hdld svr screen - Thu May 27 18:51:56 2010
-rev298 - smbman: reconnect, re-logon and re-open share on connection loss - Thu May 27 16:47:17 2010
-rev297 - smbman: removed connect/disconnect (now done by logon/logoff) - Thu May 27 15:13:17 2010
-rev296 - SMSMAP: do not wait forever for link established (wait around 10s otherwise fails to load) - Thu May 27 14:29:57 2010
-rev295 - added hdldsvrlab for testing purpose - Thu May 27 11:44:40 2010
-rev294 - fix for SMB "file open" in APPEND mode - Thu May 27 11:33:26 2010
-rev293 - Removing unzip, not used any more - Thu May 27 08:32:30 2010
-rev292 - fix for themes listing in SMB mode - Wed May 26 23:01:04 2010
-rev291 - Fix for missing Art in SMB mode - Wed May 26 22:27:36 2010
-rev290 - renamed hdl.c to hdd.c and hddFormat() to hddGetFormat() - Wed May 26 20:48:07 2010
-rev289 - * Fork merge: Porting back the GUI repository changes - Wed May 26 20:01:23 2010
-rev288 - added hddFormat, hddDeleteHDLGame (untested) - Tue May 25 08:35:24 2010
-rev287 - fix for LoadHdldsvr() and UnloadHdldSvr() - Sun May 23 17:25:33 2010
-rev286 - added UnloadHdldSvr() - Sun May 23 16:08:35 2010
-rev285 - added LoadHdldSvr() to GUI (currently never called) - Sun May 23 09:45:54 2010
-rev284 - hdldsvr: use real writes (the module is not loaded by the GUI) - Sat May 22 18:18:32 2010
-rev283 - hdldsvr: added CMD_WRIT & CMD_WRIS, completed UDP thread part (only fake writes) - Sat May 22 11:41:45 2010
-rev282 - hdldsvr: added CMD_FLSH & CMD_POWX - Fri May 21 10:51:18 2010
-rev281 - hdldsvr: a fix in interpreting/replying command result - Fri May 21 10:11:22 2010
-rev280 - hdldsvr: added CMD_STAT & CMD_READ (hdl_dump able to attach and list games) - Fri May 21 10:07:45 2010
-rev279 - added hdldsvr IOP module skeleton - Thu May 20 20:13:19 2010
-rev278 - added a specific SMSTCPIP for ingame use, and re-enabled UDP in the normal one - Thu May 20 19:57:09 2010
-rev277 - Anti-freeze fix for NBSS Session KeepAlive in smbman and ingame SMB core - Wed May 19 21:20:43 2010
-rev276 - make use of new smbman fileXio functions - Tue May 18 20:28:56 2010
-rev275 - applied SMB connection speedup to ingame SMB core - Tue May 18 12:43:54 2010
-rev274 - smbman: finished chdir implementation - Tue May 18 12:00:32 2010
-rev273 - smbman: implemented dopen/dread/dclose/chdir (chdir is not complete) - Mon May 17 22:16:40 2010
-rev272 - smbman: implemented FindFirst2, FindNext2 requests, different tweaks to make connection faster - Mon May 17 17:11:56 2010
-rev271 - smbman: fixed a killer buffer overflow while generating DES keys - Mon May 17 12:37:30 2010
-rev270 - smbman: added mkdir IO function, make LogOn not retrying forever - Sun May 16 19:03:49 2010
-rev269 - smbman: added Rename request and his rename IO function - Sun May 16 17:43:06 2010
-rev268 - smbman: added Delete Directory request and his rmdir IO function - Sun May 16 16:59:25 2010
-rev267 - smbman: added Delete request and his remove IO function - Sun May 16 16:35:31 2010
-rev266 - smbman: added poll() to not lock forever using lwip_recv - Sun May 16 14:01:51 2010
-rev265 - smbman: fix for closing previously created tcp connection before opening it (in the same module instance) - Sun May 16 13:36:20 2010
-rev264 - smbman: added timer to echo the SMB server every 3 sec while not doing IO - Sun May 16 13:21:34 2010
-rev263 - smbman: added QueryDiskInfo request and his devctl function - Sat May 15 17:15:58 2010
-rev262 - smbman: added file IO getstat support - Sat May 15 16:05:06 2010
-rev261 - smbman: a few tweaks to the packet structs - Fri May 14 14:04:09 2010
-rev260 - smbman: added QueryPathInformation Trans2 request - Fri May 14 13:32:58 2010
-rev259 - smbman: modified smb_ReadAndX and smb_WriteAndX to support large files (>4GB) - Fri May 14 10:17:05 2010
-rev258 - smbman: added generic lseek64 support (needs PS2SDK lseek64 fix to work) - Thu May 13 22:40:36 2010
-rev257 - smbman: reviewed devctl functions - Thu May 13 16:14:45 2010
-rev256 - smbman: reviewed AddPassword function - Thu May 13 11:48:13 2010
-rev255 - * added method for managing passwords, re-enable smb_NTCreateAndX, small fix when read only mode requested - Wed May 12 22:33:19 2010
-rev254 - added smblab to test smbman functions - Wed May 12 20:43:27 2010
-rev253 - smbman: finished smb_NetShareEnum(), added smb_Echo(), refined devctls - Wed May 12 17:52:40 2010
-rev252 - tagged r245 as release 0.7 - Tue May 11 20:56:56 2010
-rev251 - smbman: fixed fatal error for compiling in smb_NetShareEnum() - Tue May 11 20:53:03 2010
-rev250 - added a few commands to smbman (TreeDisconnect, LogOffAndX, NetShareEnum) - Tue May 11 20:48:45 2010
-rev249 - Porting back the opl2iso into the main repository - Sun May 09 19:17:26 2010
-rev248 - added write support to smbman - Sun May 09 17:06:37 2010
-rev247 - added NTLMv1 authentification ability to smbman - Sat May 08 22:49:44 2010
-rev246 - added user security level to smbman, currently supports plaintext/encrypted passwords and LanMan authentification - Sat May 08 18:59:02 2010
-rev245 - updated version number to 0.7 and changelog, credits - Tue May 04 17:13:11 2010
-rev244 - izdubar: fix for 18K - Tue May 04 16:37:28 2010
-rev243 - IGR2 Fix 5. - Tue Mar 30 11:53:11 2010
-rev242 - IGR2 Fix 4. - Tue Mar 23 13:27:19 2010
-rev241 - corrected polish translation by Berion - Mon Mar 15 10:06:28 2010
-rev240 - Added an embedded Elf loader to the GUI (actually used on Exit to Elf) - Sat Mar 13 20:29:29 2010
-rev239 - IGR2 fix 3. - Sat Mar 06 18:17:59 2010
-rev238 - Pad repeat pre-delay (double the repeat delay for now). - Thu Mar 04 19:09:04 2010
-rev237 - Renamed iso2usbld to iso2opl, fix for running iso2opl on Big Endian systems - Wed Mar 03 19:47:29 2010
-rev236 - IGR2 fix 2. - Tue Mar 02 23:55:57 2010
-rev235 - Gilgamesh88: fix read buffer double increment bug in smbman.c - Tue Mar 02 11:36:07 2010
-rev234 - IRG2 first fix. ;) - Mon Mar 01 23:48:20 2010
-rev233 - smbman, usbhdfsd: just cosmetics, fixed indents and leading/trailing whitespaces - Mon Mar 01 20:05:55 2010
-rev232 - eesync/imgdrv: just cosmetics - Mon Mar 01 11:31:27 2010
-rev231 - just cosmetics: fixed indents, removed leading/trailing whitespaces - Mon Mar 01 09:54:14 2010
-rev230 - Fix: be sure HDD is actually used and selected before storing - Mon Mar 01 08:53:18 2010
-rev229 - HDD settings only stored on save, not test (untested) - Mon Mar 01 08:34:45 2010
-rev228 - merging branches - Sun Feb 28 21:39:54 2010
-rev227 - Two more fixes by Izdubar - Sun Feb 28 21:39:13 2010
-rev226 - Rewrote completly IGR. - Sun Feb 28 21:30:38 2010
-rev225 - dev9: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 20:43:27 2010
-rev224 - cddev, discID: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 20:32:54 2010
-rev223 - cdvdfsv: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 20:18:56 2010
-rev222 - cdvdman: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 17:06:08 2010
-rev221 - A couple of fixes: - Fri Feb 26 08:58:19 2010
-rev220 - * this slipped through - default delay should be 7 - Thu Feb 25 18:53:06 2010
-rev219 - * Cummulative patch by gilgamesh - consistency improvements - Thu Feb 25 18:49:47 2010
-rev218 - New coloured icons by Gilgamesh88 - Thu Feb 25 18:46:47 2010
-rev217 - Added PCMCIA support (auto-detected, should work with 18K atm) - Mon Feb 22 09:10:51 2010
-rev216 - Fix again to the sed command in all modules Rules.make files causing 'unrecognized -mcpu=r3000 option' on some dev environments - Sun Feb 21 13:39:36 2010
-rev215 - Working IGR fix for NFS Underground2 this time. :D - Tue Feb 16 20:40:56 2010
-rev214 - Removed PS2ETH and GSKIT vars definition from Makefile - Tue Feb 16 20:16:19 2010
-rev213 - Corrected misuse of ps2-packer in Makefile, sorry for those who'll need to move it - Tue Feb 16 16:02:03 2010
-rev212 - IGR fix 2. - Tue Feb 16 15:24:30 2010
-rev211 - Modified sed in Rules.make files to fix unrecognized option -mcpu=r3000 when using fr_FR.UTF-8 as LANG env var on some Linux distro - Tue Feb 16 11:40:27 2010
-rev210 - Add "Disable Debug Colors" setting. - Mon Feb 15 19:45:22 2010
-rev209 - zipped theme support (very slow) - Sun Feb 14 22:38:46 2010
-rev208 - Fix a bug when setting compatibility in multiple device. - Sun Feb 14 20:50:03 2010
-rev207 - IGR fixs: - Sun Feb 14 12:36:19 2010
-rev206 - A fix for the pink freezes when using custom lang file - Fri Jan 29 17:30:57 2010
-rev205 - Adding the ability to load language localisation files - Thu Jan 28 19:04:00 2010
-rev204 - Optimization of scePadRead hooking time. - Tue Jan 26 18:32:04 2010
-rev203 - Revert to sbv patch use with igr too. - Sun Jan 24 19:12:07 2010
-rev202 - Revert to Sbv patches use for old game compatibility. - Sun Jan 24 10:20:58 2010
-rev201 - Add a poweroff combo trick. - Sat Jan 23 23:34:44 2010
-rev200 - Add compat mode 6 to disable IGR. ( In compatibility settings ) - Sat Jan 23 14:59:52 2010
-rev199 - Loader size optimization. - Sat Jan 23 14:41:15 2010
-rev198 - Sorry .s file don't want to be push. - Thu Jan 21 22:02:25 2010
-rev197 - Loader size optimization. - Thu Jan 21 21:08:09 2010
-rev196 - home & end for HDD games - Thu Jan 21 18:59:25 2010
-rev195 - some more pointer handling fixes - Thu Jan 21 17:24:15 2010
-rev194 - pagestart handling fixes - Thu Jan 21 17:17:07 2010
-rev193 - Merging branches - Thu Jan 21 15:21:42 2010
-rev192 - * Selection in static mode now not centered (HDLoader like) - Thu Jan 21 15:19:56 2010
-rev191 - SMSMAP: wait link status forever (hopefully it fixes freeze on 1 bug) - Thu Jan 21 14:58:32 2010
-rev190 - Fix sound loop bug when using in game reset. - Thu Jan 21 00:06:19 2010
-rev189 - In Game Reset first shot. ( Disabled for the moment ) - Tue Jan 19 23:16:15 2010
-rev188 - get rid of kernel mem usage for patches code and let it handled by the loader - Fri Jan 15 13:26:36 2010
-rev187 - Added some generic patching mode for some games - Thu Jan 14 14:31:08 2010
-rev186 - cosmetic changes again to patches table code - Wed Jan 13 20:26:43 2010
-rev185 - Added patch for Armored Core Nine Breaker NTSC US via USB - Wed Jan 13 16:53:31 2010
-rev184 - Added value check to the game patching process - Wed Jan 13 10:41:07 2010
-rev183 - Loader now uses game patches (actually Disgaea PAL USB/SMB fix) - Tue Jan 12 22:25:22 2010
-rev182 - Enabled game patches table before to launch the loader - Tue Jan 12 19:09:12 2010
-rev181 - Added game patches table code - Tue Jan 12 18:53:03 2010
-rev180 - Slower Dialog scrolling. Also a speed handling fix. - Tue Jan 12 18:32:17 2010
-rev179 - HDD autostart option added. - Tue Jan 12 17:50:00 2010
-rev178 - some cosmetic changes to PS3 network fix - Tue Jan 12 13:33:16 2010
-rev177 - fix to SMSMAP to be able to use network on PS3 - Tue Jan 12 12:45:43 2010
-rev176 - adjusted DMA modes implementation (functional now) - Sat Jan 09 13:43:03 2010
-rev175 - Added DMA mode in UI - Sat Jan 09 01:24:28 2010
-rev174 - v12/v13 HDD detect fix: information given by dlanor - Fri Jan 08 14:33:15 2010
-rev173 - modified and tested HDD write OK (for compat modes), still disabled - Thu Jan 07 11:51:47 2010
-rev172 - totally ignore native HDL compatibilty modes - Wed Jan 06 22:21:32 2010
-rev171 - fix for lack of file opened check in smbman - Wed Jan 06 21:27:09 2010
-rev170 - fix for modchip freezing (maybe not all modchips) - Wed Jan 06 20:28:31 2010
-rev169 - Untested: - Wed Jan 06 08:52:00 2010
-rev168 - fixing bug in hdd usage gui selection - Tue Jan 05 22:38:32 2010
-rev167 - a copy-paste warning fix - Tue Jan 05 22:13:53 2010
-rev166 - First shot of HDD integration into GUI. Compat modes very rough. Untested! - Tue Jan 05 20:42:05 2010
-rev165 - added dutch language - Tue Jan 05 17:13:56 2010
-rev164 - changes to redundant code in system.c, changes to HDD compat modes handling - Mon Jan 04 19:48:35 2010
-rev163 - changes for SOCOM 3 Online playing - Mon Jan 04 14:50:46 2010
-rev162 - added poweroff support (currently disabled) - Mon Jan 04 11:35:12 2010
-rev161 - updated CREDITS file - Sun Jan 03 18:48:26 2010
-rev160 - HDL code: fix potential overflow while changing game name - Sun Jan 03 15:59:19 2010
-rev159 - changes to HDL code (added ability to save compat flags and game name) - Sun Jan 03 15:44:10 2010
-rev158 - added ps2hdd module, adjusted code to support 48-bit LBA HDD and set Transfer Mode - Sun Jan 03 14:39:45 2010
-rev157 - added atad module - Sun Jan 03 11:16:39 2010
-rev156 - fix to cdvdman so that HDD core is able to detect network adapter - Sun Jan 03 11:04:27 2010
-rev155 - changes again to HDD code - Sat Jan 02 20:57:22 2010
-rev154 - changes to HDD code - Sat Jan 02 20:34:34 2010
-rev153 - added HDL layer to GUI (currently disabled) - Sat Jan 02 14:50:04 2010
-rev152 - Game ID GUI and injection implementation (for DNAS) - Sat Jan 02 12:40:45 2010
-rev151 - changes to hdl header struct - Fri Jan 01 20:18:19 2010
-rev150 - added code for internal HDD support (HDL format) to cdvdman - Fri Jan 01 15:42:27 2010
-rev149 - fixes to SMB code for NAS devices not supporting Unicode strings - Thu Dec 31 09:25:44 2009
-rev148 - fixed bug in cdvdfsv never returning CDVD_READY_READY state for blocking mode - Mon Dec 28 21:27:32 2009
-rev147 - changes to be able to use a valid disc ID on online games - Sun Dec 27 17:33:49 2009
-rev146 - Adding the ability to choose the default menu (USB, NET, HDD games). - Sun Dec 27 17:18:04 2009
-rev145 - Network startup forced to be synchronous (Solution for bug #16, hopefully) - Sun Dec 27 17:00:13 2009
-rev144 - Better randomization of the port value (And even more hacky). Improves network startup delays significantly here - Sun Dec 27 14:29:14 2009
-rev143 - tagged r142 to release 0.6 - Wed Dec 23 20:15:44 2009
-rev142 - Updated version number - Wed Dec 23 19:15:48 2009
-rev141 - Hacky SMB speedup: "Randomize" the source port value to avoid port reusal. - Wed Dec 23 13:20:55 2009
-rev140 - updated CHANGELOG/CREDTIS/README files - Wed Dec 23 10:45:48 2009
-rev139 - Added configurable exit button - Tue Dec 22 22:25:22 2009
-rev138 - Changed UI color controls - Tue Dec 22 19:47:30 2009
-rev137 - fixed long reconnection time (yellow screen) - Tue Dec 22 17:33:33 2009
-rev136 - Added support for multiple partitions - Tue Dec 22 16:54:22 2009
-rev135 - Fixing linux samba compatibility (White screen removal fix) - Tue Dec 22 14:16:20 2009
-rev134 - Changed modes text - Tue Dec 22 13:14:19 2009
-rev133 - changes to SMSUTILS so it doesn't use PS2SDKSRC env var to build - Mon Dec 21 18:52:28 2009
-rev132 - new core merging step3: adapted EE core to new IOP core - Mon Dec 21 16:51:23 2009
-rev131 - new core merging step2: added new modules - Mon Dec 21 15:36:12 2009
-rev130 - new core merging step1: deleted modules - Mon Dec 21 15:26:46 2009
-rev129 - Implemented sorting (via select) - Wed Dec 02 13:11:06 2009
-rev128 - Adding two new icons - Wed Dec 02 10:52:36 2009
-rev127 - tagged r126 to release 0.5 - Sun Nov 29 19:58:33 2009
-rev126 - * Added languages - Sun Nov 29 16:28:09 2009
-rev125 - Czech welcome message update - Mon Nov 23 16:46:23 2009
-rev124 - added ioctl cmd to usbhdfsd to retrieve physical file sector - Sun Nov 22 11:59:09 2009
-rev123 - added sifman module, currently unused - Sun Nov 15 20:10:27 2009
-rev122 - reduced buffers again in isofs/smbman - Sat Nov 14 16:54:05 2009
-rev121 - try to use IPCONFIG.DAT from mc in slot 2 - Fri Nov 13 18:55:53 2009
-rev120 - chaanged some modules rules.make to build properly on my Ubuntu environment - Fri Nov 13 17:10:40 2009
-rev119 - changes to lwipopts.h to reduce SMSTCPIP mem usage - Fri Nov 13 14:42:11 2009
-rev118 - reduced IOP mem usage for isofs/smbman modules - Fri Nov 13 09:43:26 2009
-rev117 - Correcting hints - Fri Nov 13 09:37:27 2009
-rev116 - Adding UI component hint feature. Hints on Compat settings now - Thu Nov 12 20:51:39 2009
-rev115 - enlighted mass driver mem usage for mode 2 - Thu Nov 12 20:31:08 2009
-rev114 - implemented mode 2: have lower mem usage in SMSTCPIP/smbman modules - Thu Nov 12 19:26:35 2009
-rev113 - Enabled SMSMAP/SMSTCPIP IOP modules - Thu Nov 12 16:08:21 2009
-rev112 - Fixed pink screen, and bugs in IOP reboot - Thu Nov 12 14:47:47 2009
-rev111 - reverted loader changes: stupid idea to choose g_buf address at runtime - Wed Nov 11 22:26:12 2009
-rev110 - added compat mode 1, inverted modes 4 & 5 - Wed Nov 11 21:28:57 2009
-rev109 - added compat mode 4 & 5 - Wed Nov 11 21:08:01 2009
-rev108 - added compat mode 3 - Wed Nov 11 20:47:49 2009
-rev107 - Moving the compat mask to third argument - Wed Nov 11 16:21:25 2009
-rev106 - FIX: Temporary fix - Second pink freeze for some games - This helps another bit - Wed Nov 11 15:50:07 2009
-rev105 - Virt. keyboard now uses button icons - Wed Nov 11 14:15:09 2009
-rev104 - FIX: This removes the freeze on second pink for some games (on my machine) - Wed Nov 11 10:54:19 2009
-rev103 - Renaming to lower case - caused Error opening with case sensitive linux filesystem - Wed Nov 11 10:14:12 2009
-rev102 - Adding select and start button icons by JNABK - Wed Nov 11 10:09:52 2009
-rev101 - FIX: Compat settings now seem to propagate well. Copy-paste introduced bug fixed - Wed Nov 11 09:51:39 2009
-rev100 - set IP changed flag to ensure IP settings get saved - Wed Nov 11 06:50:21 2009
-rev99 - Merging changes - Tue Nov 10 22:08:55 2009
-rev98 - * Pass in the compat settings in the same string - Tue Nov 10 22:07:31 2009
-rev97 - fix: saving config if SYS-CONF doesn't exists - Tue Nov 10 19:50:50 2009
-rev96 - Compat settings count now 5, propagation to loader.c implemented - Tue Nov 10 19:16:23 2009
-rev95 - changes to SMSTCPIP/include/lwipopts.h - Tue Nov 10 12:04:33 2009
-rev94 - added missing smap_opt.s, updated CREDITS file - Tue Nov 10 11:34:52 2009
-rev93 - add SMSMAP/SMSTCIP modules, currently not used - Tue Nov 10 11:23:26 2009
-rev92 - added stuff to build an alternate loader (suitable for Sonic Unleashed) - Tue Nov 10 10:25:24 2009
-rev91 - FIX: Config loading was removed. Putting it back - Tue Nov 10 09:07:25 2009
-rev90 - FIX: Error codes are <0, not <=0. This could affect loading if file handle had value 0 - Tue Nov 10 09:06:29 2009
-rev89 - reverted netlog loading accidentally committed - Mon Nov 09 20:32:32 2009
-rev88 - fix for freezing multi-elf games - Mon Nov 09 20:29:58 2009
-rev87 - Adding missing icons - Sun Nov 08 21:12:15 2009
-rev86 - FIX: Issue 10 (share name overflow) - Sun Nov 08 20:04:14 2009
-rev85 - Show icons at background in config dialogs - Sun Nov 08 02:29:23 2009
-rev84 - Changed name, updated spanish translation, and now info txt shows in selected language - Sun Nov 08 02:13:54 2009
-rev83 - added missing ioman_add header file for dev9 module - Fri Nov 06 21:02:33 2009
-rev82 - enlighted dev9 module and added dev9x device driver - Fri Nov 06 20:57:03 2009
-rev81 - renamed GetSyscall to GetSycallHandler and use syscallnr header - Fri Nov 06 16:25:36 2009
-rev80 - FIX: The remaining ip config fields renumbered. That should be it - Fri Nov 06 08:48:56 2009
-rev79 - Fix: IP config screen had all the settings moved by one (renumbered the dialog but not the value injection) - Fri Nov 06 08:09:20 2009
-rev78 - Fix for the recent error with media and parts reading. - Thu Nov 05 12:39:02 2009
-rev77 - reverting back isofs to rev71 - Wed Nov 04 18:12:29 2009
-rev76 - reverted cdvdman & isofs to rev70 - Wed Nov 04 17:18:48 2009
-rev75 - Reverting this (commit by accident) - Tue Nov 03 21:42:15 2009
-rev74 - * New compat mode ui (via triangle) - currently without function - Tue Nov 03 21:39:13 2009
-rev73 - added SIF and SIF RPC init calls to cdvdman - Tue Nov 03 18:50:05 2009
-rev72 - few changes to cdvdman and commented unneeded code in smbman - Tue Nov 03 18:34:03 2009
-rev71 - fix for those games opening files with other flag than O_RDONLY - Mon Nov 02 18:09:42 2009
-rev70 - fix: smaller elf at second make all - Mon Nov 02 13:28:11 2009
-rev69 - fix for some games freezing while searching for a non-existent file - Mon Nov 02 12:09:40 2009
-rev68 - Added ugly virtual keyboard - Sun Nov 01 23:21:19 2009
-rev67 - Merging changes - Sun Nov 01 20:25:52 2009
-rev66 - New data driven dialog code. Needs color, enum and string inputs to be complete. IP config rewritten to use it. - Sun Nov 01 20:25:10 2009
-rev65 - remove pink screen when a IOP reset hook has finished (set_reg_hook reaches 0) - Sun Nov 01 16:18:15 2009
-rev64 - fix for white screens: bad gamename crc32 calculation - Sun Nov 01 11:50:30 2009
-rev63 - Small file adressing fix - Sat Oct 31 19:06:23 2009
-rev62 - Merged changes - Sat Oct 31 12:22:29 2009
-rev61 - Some input system rewrites, scrolling after dialog fix, settings only saved on save settings subitem now - Sat Oct 31 12:18:09 2009
-rev60 - usbhdfsd: removed use of PS2SDKSRC env var - Sat Oct 31 12:08:12 2009
-rev59 - Network UI improvements: Port and autostart settings, network loading feedback - Sat Oct 31 09:11:53 2009
-rev58 - Config handling improved - now remembers the loaded config and stores to the same location - Sat Oct 31 07:09:53 2009
-rev57 - iso2usbld: only use long long and not __int64 - Fri Oct 30 22:50:27 2009
-rev56 - iso2usbld: added commented use of open/read/write/lsee64/close - Fri Oct 30 21:00:58 2009
-rev55 - build iso2usbld on make pc_tools - Fri Oct 30 11:37:17 2009
-rev54 - Adding the missing network icons, sorry everyone! - Fri Oct 30 08:05:09 2009
-rev53 - Adding network icons by JNABK - Thu Oct 29 20:25:46 2009
-rev52 - just corrected a comment - Thu Oct 29 17:02:08 2009
-rev51 - fix once again to avoid breaking compatibility - Thu Oct 29 16:58:07 2009
-rev50 - another fix to fake module load to avoid breaking compatibility - Thu Oct 29 14:07:59 2009
-rev49 - fix for faking some modules load correctly - Thu Oct 29 13:16:09 2009
-rev48 - fix for multi-elf games freezing on pink - Wed Oct 28 20:22:14 2009
-rev47 - fixes for iso2usbld to handle large ISO (>4Gb) - Wed Oct 28 18:29:11 2009
-rev46 - renamed PUBLIC share to PS2SMB - Wed Oct 28 16:48:15 2009
-rev45 - modified iso2usbld CFLAGS - Wed Oct 28 13:49:58 2009
-rev44 - create USBLD folder on mass if not existing - Wed Oct 28 12:34:45 2009
-rev43 - apply IP settings to loader/modules - Wed Oct 28 12:00:29 2009
-rev42 - Added IP configuration screen - Tue Oct 27 21:58:29 2009
-rev41 - different fixes, one very important for iso2usbld - Tue Oct 27 20:58:24 2009
-rev40 - Updated CHANGELOG, README and CREDITS - Tue Oct 27 16:13:35 2009
-rev39 - Added missing license headers - Mon Oct 26 20:27:06 2009
-rev38 - added support to network games trought SMB protocol - Mon Oct 26 18:52:16 2009
-rev37 - just acouple changes for isofs patch & cdvdman - Sat Oct 24 20:03:21 2009
-rev36 - allow isofs to handle up to 8 parts - Sat Oct 24 17:56:28 2009
-rev35 - added .hgtags - Sat Oct 24 16:14:24 2009
-rev34 - added missing readonly makefile for mass_driver - Sat Oct 24 16:12:02 2009
-rev33 - disabled write support for ingame mass_driver - Sat Oct 24 16:09:31 2009
-rev32 - added LICENSE, README, CREDITS and CHANGELOG - Fri Oct 23 10:20:06 2009
-rev31 - New_Iop_Reset: switched to reset with EELOADCNF - Thu Oct 22 20:27:52 2009
-rev30 - Now searchs for USBD.IRX in MC. If not exists load embedded usbd.irx for each platform - Sun Oct 18 20:26:50 2009
-rev29 - static mode now fit with JNABK templates also in PAL mode - Sun Oct 18 00:48:15 2009
-rev28 - Fix: Welcome text showing extra text - Sat Oct 17 22:54:56 2009
-rev27 - fix for PS3 with software emulation - Sat Oct 17 22:43:30 2009
-rev26 - Added spanish translation - Sat Oct 17 20:44:42 2009
-rev25 - Oops. These slipped through. Reverting - Sat Oct 17 16:32:20 2009
-rev24 - Adding save icon - Sat Oct 17 16:30:30 2009
-rev23 - Adding language support - Sat Oct 17 16:29:49 2009
-rev22 - * rewritten the config file handling (to use key=val lines) - Tue Oct 13 21:56:57 2009
-rev21 - * cleaning up the code a bit - all menu construction now in main, etc. - Tue Oct 13 17:55:35 2009
-rev20 - isofs: fixed bug in skipmod_check() - Tue Oct 06 08:52:56 2009
-rev19 - modified isofs: allow it to fake some module load from cdrom - Mon Oct 05 21:01:36 2009
-rev18 - fix for 8+3 elf's filename - Sun Oct 04 20:44:48 2009
-rev17 - Added messages of what is doing makefile - Sun Oct 04 20:43:49 2009
-rev16 - fix: cdvdman.c:1708: warning: unused variable `netlog_modname' - Sun Oct 04 19:38:27 2009
-rev15 - loader: modified Patch_Img into Patch_Mod using g_buf - Sun Oct 04 16:57:37 2009
-rev14 - loader now loads at e8000 and use g_buf at 88000 - Sun Oct 04 15:45:04 2009
-rev13 - modified cdvdman: added stream and other fixes - Sun Oct 04 15:31:56 2009
-rev12 - modified isofs to handle media type - Sun Oct 04 15:13:06 2009
-rev11 - moved IOP reset to LoadExecPS2 replacement - Sun Oct 04 14:56:59 2009
-rev10 - added debug over ethernet - Sun Oct 04 14:40:10 2009
-rev9 - Updated interface - Sun Oct 04 02:34:51 2009
-rev8 - Updated interface with dynamic menu - Fri Oct 02 18:40:33 2009
-rev7 - a few fixes so that it can compile - Tue Sep 29 09:39:20 2009
-rev6 - iso2usbld: fixes for linux build - Sun Sep 27 21:55:27 2009
-rev5 - iso2usbld: fixed those deprecated type casts - Sun Sep 27 21:20:14 2009
-rev4 - bugfix for iso2usbld - Sun Sep 27 19:00:50 2009
-rev3 - modified .hignore - Sun Sep 27 17:42:30 2009
-rev2 - added open usb loader sources - Sun Sep 27 17:36:34 2009
-rev1 - added iso2usbld - Sun Sep 27 16:28:14 2009
-rev0 - added .hgignore - Sun Sep 27 16:20:30 2009
+rev502 - languages updates - Tue Dec 07 11:29:46 2010 +0100
+rev501 - work around for the infinite refresh on some NAS device - Mon Dec 06 08:52:19 2010 +0100
+rev500 - a few fixes so that OPL can comply with some Digitus NAS (with the help of Thinner), removed obsoletes language files and added 'Filipino' language file - Sat Dec 04 18:53:39 2010 +0100
+rev499 - update for Turkish language - Sun Nov 28 19:31:10 2010 +0100
+rev498 - fix for english and french translation - Sun Nov 28 13:28:01 2010 +0100
+rev497 - small fixes - Sun Nov 28 01:29:24 2010 +0100
+rev496 - Thanks to jimmi's help and ideas, things should now be fixed for alternate device start (and traditional mode too). - Sun Nov 28 01:10:54 2010 +0100
+rev495 - added ability to use '-use-early-debug' arg (for using ps2client netdump) - Sat Nov 27 15:10:04 2010 +0100
+rev494 - * devices started in alternate mode now have valid hints - Sat Nov 27 01:05:50 2010 +0100
+rev493 - genvmc: wait progress message update before to return from vmc_abort() call - Sun Nov 21 17:26:46 2010 +0100
+rev492 - genvmc: fixed IOP freezing on vmc_abort() call - Sun Nov 21 16:52:36 2010 +0100
+rev491 - added debug prints to genvmc module - Sun Nov 21 15:25:00 2010 +0100
+rev490 - modified sysReset() to allow genvmc to load properly - Sun Nov 21 15:02:05 2010 +0100
+rev489 - * create an opl.icn into the OPL folder on MC, so the PS2 browser doesn't display it as corrupted data - Fri Nov 19 11:07:24 2010 +0100
+rev488 - * IPCONFIG.DAT file now loaded from the alternate device too - Fri Nov 19 00:24:13 2010 +0100
+rev487 - When no config for OPL is found: - Wed Nov 17 23:25:56 2010 +0100
+rev486 - Fix in samba code: server buffer size could be set to 0 due to the type casting - Wed Nov 10 20:27:28 2010 +0100
+rev485 - small fixes (USB delay, result return) - Sat Oct 30 20:22:45 2010 +0200
+rev484 - * Applications configuration file is read from alternate device too - Sat Oct 30 19:40:47 2010 +0200
+rev483 - Enable saving settings capability on USB or HDD. - Sat Oct 30 03:20:45 2010 +0200
+rev482 - small changes - Fri Oct 15 23:57:44 2010 +0200
+rev481 - * IO thread stabilization attempt (not sure if it helps, but it seems so) - Fri Oct 15 20:26:44 2010 +0200
+rev480 - small bug with VMC settings - Wed Oct 06 19:47:22 2010 +0200
+rev479 - add some error messages to warn user of various failing situations - Wed Oct 06 19:41:50 2010 +0200
+rev478 - fix compat flag problem on HDD due to merge - Tue Oct 05 15:32:05 2010 +0200
+rev477 - make alt background configurable too - Mon Oct 04 20:50:07 2010 +0200
+rev476 - Start the pads before loading the config, as we may have to set the scrolling speed. - Mon Oct 04 20:05:11 2010 +0200
+rev475 - few changes for SMB (in particular for device in "security share" mode - Mon Oct 04 19:11:24 2010 +0200
+rev474 - added FILEIO version check, to be sure - Mon Oct 04 17:23:39 2010 +0200
+rev473 - fix hdd partition check - Mon Oct 04 10:20:37 2010 -0500
+rev472 - patch for FILEIO remove rpc handler - Mon Oct 04 16:52:40 2010 +0200
+rev471 - updated smblab - Mon Oct 04 12:48:31 2010 +0200
+rev470 - reviewed labs so they can compile - Mon Oct 04 12:03:13 2010 +0200
+rev469 - only show VMC delete (and change size) button if "Rename/delete" operation are enabled in settings - Sun Oct 03 21:05:29 2010 +0200
+rev468 - fioXXX operations on SMB makes strange things - Sun Oct 03 16:37:42 2010 +0200
+rev467 - fioXXX operations on SMB make strange things ... - Sun Oct 03 16:37:08 2010 +0200
+rev466 - merge vmc fork - Sun Oct 03 08:03:17 2010 -0500
+rev465 - fix DNAS settings bug - Sun Oct 03 14:33:52 2010 +0200
+rev464 - fix for invalid background when rendering guiMsgBox (deletion warning of VMC items) - Sun Oct 03 11:35:49 2010 +0200
+rev463 - WARNING: uncertain change ! - Sun Oct 03 00:49:09 2010 +0200
+rev462 - remember last focused item when reseting dialog - Sun Oct 03 00:28:10 2010 +0200
+rev461 - I like to commit in two-phases ... - Sat Oct 02 11:21:02 2010 +0200
+rev460 - fix for OK buttons - Sat Oct 02 11:19:48 2010 +0200
+rev459 - Opps, disable VMC by default ... (as it is only GUI stuff, we don't want to confuse users ;)) - Sat Oct 02 00:38:50 2010 +0200
+rev458 - Added VMC GUI (first shot) - Fri Oct 01 23:38:07 2010 +0200
+rev457 - moved IOP modules to more explicit subfolders - Thu Sep 30 17:28:59 2010 +0200
+rev456 - added mcman module and genvmclab - Mon Sep 27 20:33:56 2010 +0200
+rev455 - save config files individually - Sun Sep 19 12:37:24 2010 +0200
+rev454 - prepare stuff for VMC - Sun Sep 19 00:52:26 2010 +0200
+rev453 - * removing settings for hdd was doing bad things - Sat Sep 18 23:04:37 2010 +0200
+rev452 - * shutdown routine was free-ing stuff still used into the launch method ... - Sat Sep 18 22:26:05 2010 +0200
+rev451 - more corrections - Sat Sep 18 00:40:21 2010 +0200
+rev450 - save config *before* shutting down the config files - Sat Sep 18 00:24:12 2010 +0200
+rev449 - fixed a few bugs: - Fri Sep 17 22:43:08 2010 +0200
+rev448 - * compatibility settings for HDD are now saved into the config files. - Fri Sep 17 21:35:50 2010 +0200
+rev447 - fixed broken themes on MC - Mon Sep 13 22:11:29 2010 +0200
+rev446 - should fix the invalid list positioning - Sun Sep 12 11:23:06 2010 +0200
+rev445 - added file fragmentation test for USB games, code from Polo35 (VMC branch) - Sat Sep 11 23:45:42 2010 +0200
+rev444 - splitted settings into "main settings" and "graphic settings" - Sat Sep 11 22:36:59 2010 +0200
+rev443 - added "childproof" mode: - Wed Sep 08 23:58:07 2010 +0200
+rev442 - add rename/delete functionality to Apps - Wed Sep 08 22:44:13 2010 +0200
+rev441 - added hint for "X Play" - Sat Sep 04 21:55:21 2010 +0200
+rev440 - added genvmc command-line tool for pc - Sat Sep 04 20:27:17 2010 +0200
+rev439 - update modload version check in MODLOAD hooking - Sat Sep 04 10:23:55 2010 +0200
+rev438 - added rename and delete functionality for UL format (ul.cfg) - Fri Sep 03 23:22:33 2010 +0200
+rev437 - only apply sorting, when autosort settings enabled - Fri Sep 03 20:43:36 2010 +0200
+rev436 - fix update of HDD game list after restarting modules (when leaving HDLD server) - Fri Sep 03 19:55:34 2010 +0200
+rev435 - enable HDD rename/delete - Fri Sep 03 09:57:04 2010 +0200
+rev434 - fix again for those games resetting IOP with null arg - Fri Sep 03 09:07:57 2010 +0200
+rev433 - Added "rename" and "delete" functionalities for games. - Thu Sep 02 23:07:32 2010 +0200
+rev432 - smbman: added debug prints ability - Thu Sep 02 19:01:13 2010 +0200
+rev431 - use MODLOAD hooking on IOP instead of patching LMB on EE - Thu Sep 02 16:07:15 2010 +0200
+rev430 - fix for alternative EE core build - Fri Aug 20 11:05:42 2010 +0200
+rev429 - fix: give some delay to ingame mass driver - Thu Aug 19 09:56:14 2010 +0200
+rev428 - EE core: get rid of libc dependency - Wed Aug 11 18:52:17 2010 +0200
+rev427 - IGR: use kernel's InitializeTLB instead of syscall - Sun Aug 08 20:52:36 2010 +0200
+rev426 - EE core: rewrote all syscall hooks in asm - Sat Aug 07 21:36:24 2010 +0200
+rev425 - EE core: a few tweaks to asm code - Thu Aug 05 22:28:01 2010 +0200
+rev424 - EE core: improved LoadExecPS2/SifSetDma hooks - Thu Aug 05 21:27:58 2010 +0200
+rev423 - update spanish language file - Thu Aug 05 19:53:32 2010 +0200
+rev422 - added Italian language file - Wed Aug 04 20:05:27 2010 +0200
+rev421 - EE core: a few tweaks to asm code - Tue Aug 03 20:35:24 2010 +0200
+rev420 - EE core: improve LoadExecPS2 hooking (fixes Tecmo Hit Parade SLPS_204.01) - Tue Aug 03 17:03:25 2010 +0200
+rev419 - crazyc: add MC dump ability to genvmc - Mon Aug 02 21:42:12 2010 +0200
+rev418 - fix for Star Ocean 3 - Till the End of Time (broken in r395) - Mon Aug 02 16:31:25 2010 +0200
+rev417 - fix for V-Rally 3 PAL (SLES_507.25) - Sat Jul 31 21:31:30 2010 +0200
+rev416 - fix for Shaun Palmer's Pro Snowboarder US (SLUS_201.99) - Sat Jul 31 17:37:41 2010 +0200
+rev415 - few i18n changes - Fri Jul 30 22:51:02 2010 +0200
+rev414 - clean-up in GUI strings (removed old entries, added missing values) - Thu Jul 29 21:30:45 2010 +0200
+rev413 - fix for NRA Gun Club (SLUS_214.32) - Mon Jul 26 20:26:00 2010 +0200
+rev412 - improvements to genvmc module - Mon Jul 26 14:19:49 2010 +0200
+rev411 - added genvmc IOP module - Sun Jul 25 17:22:56 2010 +0200
+rev410 - fix attempt for Jak X - Sat Jul 24 10:09:38 2010 +0200
+rev409 - fix for those games rebooting IOP with null arg (fixes Bloody Roar 3) - Fri Jul 23 17:39:26 2010 +0200
+rev408 - fix for GTA 3 a-spec over SMB - Fri Jul 23 13:39:36 2010 +0200
+rev407 - cdvdfsv: name module like orginal one - cdvd_ee_driver - Fri Jul 23 10:40:53 2010 +0200
+rev406 - EE core: fix for Quake III Revolution - Thu Jul 22 18:25:23 2010 +0200
+rev405 - fix for Jak 3 - Thu Jul 22 08:49:21 2010 +0200
+rev404 - fix for Full Spectrum Warrior - Wed Jul 21 21:44:41 2010 +0200
+rev403 - fix for those having SMB slowdown/freeze issue on some setups - Wed Jul 21 18:52:43 2010 +0200
+rev402 - cdvdman: fix lseek fileIO (fixes Shadow of Ganymede) - Tue Jul 20 20:16:31 2010 +0200
+rev401 - HDD core fix: init filesystem before to return disc type (fixes Xyanide Resurrection) - Tue Jul 20 16:08:45 2010 +0200
+rev400 - Added translation information for custom language - Tue Jul 20 15:29:15 2010 +0200
+rev399 - dlanor: fix for invisible cursor GUI glitch - Sun Jul 18 16:05:12 2010 +0200
+rev398 - fix for Viewtiful Joe - Sun Jul 18 15:58:03 2010 +0200
+rev397 - fix for EveryBody's Golf and other games - Sat Jul 17 17:26:26 2010 +0200
+rev396 - added feature to be able to disable sceSifStopModule/sceSifUnloadModule - Sat Jul 17 16:42:48 2010 +0200
+rev395 - hook SCE's SifLoadModuleBuffer to fake some modules to be loaded correctly through LoadModuleBuffer calls - Sat Jul 17 09:33:09 2010 +0200
+rev394 - fix for Kya: Dark Lineage PAL (SLES_514.73) - Thu Jul 15 15:06:51 2010 +0200
+rev393 - fix for V-Rally 3 US (SLUS_204.96) - Thu Jul 15 13:21:31 2010 +0200
+rev392 - fix for Kya: Dark Lineage US (SLUS_204.40) - Wed Jul 14 19:19:34 2010 +0200
+rev391 - changed the patches for Prince Of Persia: The Two Thrones - Wed Jul 14 19:15:35 2010 +0200
+rev390 - fix for Prince of Persia: The Two Thrones NTSC U (SLUS_212.87) - Tue Jul 13 12:35:52 2010 +0200
+rev389 - hdldsvr: use real HDD writes - Tue Jul 13 09:41:41 2010 +0200
+rev388 - udptty: redirect Kprintf output to tty - Mon Jul 12 20:50:43 2010 +0200
+rev387 - cdvdman: set cdstatus to CDVD_STAT_PAUSE in sceCdStStart/sceCdStResume - Sun Jul 11 16:42:07 2010 +0200
+rev386 - added EELOAD patches - Wed Jul 07 19:24:05 2010 +0200
+rev385 - fix for Suikoden IV (HDD) broken in r359 - Tue Jul 06 09:49:52 2010 +0200
+rev384 - fix for Prince of Persia: The Two Thrones PAL (SLES_537.77) - Mon Jul 05 19:01:47 2010 +0200
+rev383 - cdvdman: do not allocate IOP memory in cd callback handler (fixes Syphon Filter Logan's Shadow on HDD) - Sun Jul 04 18:30:17 2010 +0200
+rev382 - EE core: change stack pointer a bit earlier - Fri Jul 02 21:59:55 2010 +0200
+rev381 - EE core: use an intermediate stack during the IOP reset 'hook' code - Fri Jul 02 21:50:10 2010 +0200
+rev380 - use maximum priority for EE SMB password hashing thread - Fri Jul 02 19:30:42 2010 +0200
+rev379 - Fix for Suikoden V (in patch form) - Fri Jul 02 16:19:09 2010 +0200
+rev378 - fix for Max Payne EU version (SLES_503.25) - Thu Jul 01 21:08:36 2010 +0200
+rev377 - * make arrow icons customizable - Wed Jun 30 23:44:26 2010 +0200
+rev376 - PS3 fix 2: use XLOADFILE when building EELOADCNF - Wed Jun 30 21:47:52 2010 +0200
+rev375 - PS3 fix 1: reinstated cddev module use in EE core - Wed Jun 30 21:21:18 2010 +0200
+rev374 - * don't unmount pfs0 when we are launching an app that is on HDD - Wed Jun 30 21:00:04 2010 +0200
+rev373 - fix number 2 for Kingdom Hearts 2 gummi ship missions (should fix all regions) - Wed Jun 30 14:38:03 2010 +0200
+rev372 - fix for Kingdom Hearts 2 (SLUS_210.05) freeze on gummi ship missions - Wed Jun 30 11:01:15 2010 +0200
+rev371 - Apply Max Payne US patch on all 3 cores - Tue Jun 29 16:56:26 2010 +0200
+rev370 - SMSTCPIP: revert ARP_QUEUEING setting change (should fix broken Downhill Domination - SCUS_971.77 via SMB) - Tue Jun 29 16:45:45 2010 +0200
+rev369 - added compatibility mode 8 (should fix NFS Underground 2 - SLUS_210.65) - Mon Jun 28 19:39:40 2010 +0200
+rev368 - fix for the recent freezing using themes - Mon Jun 28 18:08:42 2010 +0200
+rev367 - changed smbauth & tcpip threads priorities (fixes Spiderman 3 and Genji) - Mon Jun 28 08:34:57 2010 +0200
+rev366 - link GUI SMB auth stuff to SMB core - Sun Jun 27 22:55:56 2010 +0200
+rev365 - * startup logo implementation, with a placeholder Logo - Sun Jun 27 20:41:48 2010 +0200
+rev364 - SMB core: do not perform password hashing if SMB server uses plaintext passwords - Sun Jun 27 19:38:17 2010 +0200
+rev363 - Max Payne US version (SLUS_202.30) fix for SMB use - Sun Jun 27 18:53:00 2010 +0200
+rev362 - EE core: added a ResetSPU() in LoadExecPS2 hook - Sun Jun 27 18:51:33 2010 +0200
+rev361 - added User Security Level support to SMB core - Sat Jun 26 22:04:12 2010 +0200
+rev360 - cdvdman: change back SceCdTrayReq traycheck return value - Sat Jun 26 09:38:33 2010 +0200
+rev359 - SMB core: save more IOP memory to increase compatibility - Fri Jun 25 10:36:55 2010 +0200
+rev358 - removed cddev module use from EE core, removed cddev - Wed Jun 23 13:31:22 2010 +0200
+rev357 - default to settings menu when no devices started or no config file found - Wed Jun 23 12:55:53 2010 +0200
+rev356 - * re-enable game "test" functionality (from compatibility settings) - Wed Jun 23 12:06:48 2010 +0200
+rev355 - use ICO fix (r346) only in compatibility mode 7 - Wed Jun 23 09:54:52 2010 +0200
+rev354 - smbman: do not rely on EndOfSearch but rather SearchCount field - Tue Jun 22 22:31:11 2010 +0200
+rev353 - remove uneeded stuff from ps2link module - Mon Jun 21 12:43:50 2010 +0200
+rev352 - EE core: remove InitializeUserMemory() patch when removing kernel hooks - Mon Jun 21 11:02:31 2010 +0200
+rev351 - fix: do no longer use sbv_patch_user_mem_clear() to be compatible with faulty DMS4 modchip - Sun Jun 20 19:46:58 2010 +0200
+rev350 - ps2link module: corrected Makefile - Sun Jun 20 19:00:52 2010 +0200
+rev349 - reload ps2link module on 'make debug' rule - Sat Jun 19 11:52:19 2010 +0200
+rev348 - fix: HDD gamelist was deallocated too early in HDD game launch process - Sat Jun 19 11:08:28 2010 +0200
+rev347 - * ISO support also "enabled" for USB (don't know what is the filesize limit, either 2Go or 4Go) - Fri Jun 18 22:36:12 2010 +0200
+rev346 - cdvdfsv: remove a 2KB of wasted IOP mem (fixes ICO - SCUS_971.59 via SMB) - Fri Jun 18 22:08:30 2010 +0200
+rev345 - SMSTCPIP: adjust PBUF_POOL_SIZE for ingame use (fixes again Disgaea SLUS_206.66 broken since r283) - Thu Jun 17 12:14:37 2010 +0200
+rev344 - added a new compatibilty mode: "reduce the buffers used by cdvdman/cdvdfsv" - Wed Jun 16 21:56:10 2010 +0200
+rev343 - added make_changelog.sh script and DETAILED_CHANGELOG file - Wed Jun 16 20:25:36 2010 +0200
+rev342 - cdvdman: check faulty filepath(more than one ';1') - fixes WWE Smackdown! Shut your mouth (SLUS_204.83) - Wed Jun 16 19:51:14 2010 +0200
+rev341 - use ioptrap module while debugging - Wed Jun 16 14:12:26 2010 +0200
+rev340 - fix for HDD games compat modes saving to another game when using sorted list - Mon Jun 14 20:30:37 2010 +0200
+rev339 - cdvdman fix: dread must return entry size (fixes Captain Tsubasa SLPS_256.91) - Sun Jun 13 17:37:48 2010 +0200
+rev338 - removed netlog module (now replaced by UDPtty) - Sun Jun 13 14:55:24 2010 +0200
+rev337 - make use of UDPtty for in-game debugging - Sun Jun 13 14:48:15 2010 +0200
+rev336 - 10K patch fix: only patch kernel if not already patched - Sat Jun 12 15:05:24 2010 +0200
+rev335 - fix for exiting kernel mode correctly while applying 10K patches - Sat Jun 12 13:03:30 2010 +0200
+rev334 - use more versatile code to get ROMVER info in 10K patches - Sat Jun 12 12:47:16 2010 +0200
+rev333 - remove debug from 10K patches - Fri Jun 11 23:42:36 2010 +0200
+rev332 - 10K fix 2: OPL now runs on original 10K kernel - Fri Jun 11 23:39:48 2010 +0200
+rev331 - loader: do a system restart in LoadExecPS2 hook as the real syscall does (reinitialize GS, INTC, TIMER, DMAC, VU0, VU1, VIF0, VIF1, GIF, IPU, FPU and ScratchPad - Wed Jun 09 21:13:38 2010 +0200
+rev330 - hdd.c: do not deallocate partion table when it's not allocated - Tue Jun 08 22:06:03 2010 +0200
+rev329 - free the HDL game list and HDD partition table in hddCleanup() - Tue Jun 08 20:07:04 2010 +0200
+rev328 - 10K fix 1: OPL now runs on patched 10K kernel - Tue Jun 08 12:07:01 2010 +0200
+rev327 - modified Disc ID stuff to no longer freeze on No disc/Invalid disc - Sun Jun 06 21:08:31 2010 +0200
+rev326 - fix to avoid warning on unused variable in hdd.c - Sun Jun 06 16:00:49 2010 +0200
+rev325 - modified and tested HDD deleting game code (real writes still deactivated) - Sun Jun 06 15:57:29 2010 +0200
+rev324 - use EE SIO debug in the loader - Sat Jun 05 14:53:15 2010 +0200
+rev323 - use EE SIO debug output in the GUI on 'make EESIO_debug' - Fri Jun 04 11:18:35 2010 +0200
+rev322 - cdvdman: be compatible with mass storage device having sector size of 4096 - Thu Jun 03 12:49:06 2010 +0200
+rev321 - usbhdfsd: added an ioctl to return mass storage device sectorsize - Thu Jun 03 11:26:33 2010 +0200
+rev320 - * Fix for issue #29 (dia.c tooltip display) - Wed Jun 02 19:40:33 2010 +0200
+rev319 - Put plasma speed back after the framerate optimization - Wed Jun 02 19:19:00 2010 +0200
+rev318 - cdvdman: be compatible with mass storage having sector size of 512, 1024, 2048 - Wed Jun 02 18:32:30 2010 +0200
+rev317 - * separate background rendering (Issue #31) - Wed Jun 02 18:29:25 2010 +0200
+rev316 - usbhdfsd: removed unused code in fs_getFileStartSector() - Wed Jun 02 16:42:36 2010 +0200
+rev315 - cdvdman: fix for my previous code tweak breaking compat with SMB games in ul format - Wed Jun 02 15:38:01 2010 +0200
+rev314 - cdvdman: code tweaking for opening ISO file(s) - Wed Jun 02 15:19:27 2010 +0200
+rev313 - cdvdman: optimized code size for plain ISO support in cdvdman_ReadSect() - Wed Jun 02 13:05:27 2010 +0200
+rev312 - fix for theme choosen not saving - Mon May 31 20:12:26 2010 +0200
+rev311 - use LOG() rather than printf() - Mon May 31 12:03:14 2010 +0200
+rev310 - fix for issue #23 - Sun May 30 19:36:35 2010 +0200
+rev309 - make use of udptty in debug version - Sun May 30 17:25:10 2010 +0200
+rev308 - added udptty module - Sat May 29 20:34:44 2010 +0200
+rev307 - forgot system.h, now added - Sat May 29 18:03:54 2010 +0200
+rev306 - added system.h and sysLoadModuleBuffer to able to check for modules already loaded - Sat May 29 17:57:43 2010 +0200
+rev305 - added lanman module & lanlab - Sat May 29 16:00:14 2010 +0200
+rev304 - moved smblab & hdldsvrlab to labs folder - Sat May 29 13:39:14 2010 +0200
+rev303 - small fix in game disc settings handling - Sat May 29 01:33:40 2010 +0200
+rev302 - * stop io timer while io is blocked (seems not to affect the hdl server transfer rate though :( ) - Fri May 28 18:14:10 2010 +0200
+rev301 - buffered write (for config file) - Fri May 28 16:54:37 2010 +0200
+rev300 - Fixing issue #21 - Thu May 27 19:44:24 2010 +0200
+rev299 - * Maybe a more resource friendly (but a bit awkward for now) hdld svr screen - Thu May 27 18:51:56 2010 +0200
+rev298 - smbman: reconnect, re-logon and re-open share on connection loss - Thu May 27 16:47:17 2010 +0200
+rev297 - smbman: removed connect/disconnect (now done by logon/logoff) - Thu May 27 15:13:17 2010 +0200
+rev296 - SMSMAP: do not wait forever for link established (wait around 10s otherwise fails to load) - Thu May 27 14:29:57 2010 +0200
+rev295 - added hdldsvrlab for testing purpose - Thu May 27 11:44:40 2010 +0200
+rev294 - fix for SMB "file open" in APPEND mode - Thu May 27 11:33:26 2010 +0200
+rev293 - Removing unzip, not used any more - Thu May 27 08:32:30 2010 +0200
+rev292 - fix for themes listing in SMB mode - Wed May 26 23:01:04 2010 +0200
+rev291 - Fix for missing Art in SMB mode - Wed May 26 22:27:36 2010 +0200
+rev290 - renamed hdl.c to hdd.c and hddFormat() to hddGetFormat() - Wed May 26 20:48:07 2010 +0200
+rev289 - * Fork merge: Porting back the GUI repository changes - Wed May 26 20:01:23 2010 +0200
+rev288 - added hddFormat, hddDeleteHDLGame (untested) - Tue May 25 08:35:24 2010 +0200
+rev287 - fix for LoadHdldsvr() and UnloadHdldSvr() - Sun May 23 17:25:33 2010 +0200
+rev286 - added UnloadHdldSvr() - Sun May 23 16:08:35 2010 +0200
+rev285 - added LoadHdldSvr() to GUI (currently never called) - Sun May 23 09:45:54 2010 +0200
+rev284 - hdldsvr: use real writes (the module is not loaded by the GUI) - Sat May 22 18:18:32 2010 +0200
+rev283 - hdldsvr: added CMD_WRIT & CMD_WRIS, completed UDP thread part (only fake writes) - Sat May 22 11:41:45 2010 +0200
+rev282 - hdldsvr: added CMD_FLSH & CMD_POWX - Fri May 21 10:51:18 2010 +0200
+rev281 - hdldsvr: a fix in interpreting/replying command result - Fri May 21 10:11:22 2010 +0200
+rev280 - hdldsvr: added CMD_STAT & CMD_READ (hdl_dump able to attach and list games) - Fri May 21 10:07:45 2010 +0200
+rev279 - added hdldsvr IOP module skeleton - Thu May 20 20:13:19 2010 +0200
+rev278 - added a specific SMSTCPIP for ingame use, and re-enabled UDP in the normal one - Thu May 20 19:57:09 2010 +0200
+rev277 - Anti-freeze fix for NBSS Session KeepAlive in smbman and ingame SMB core - Wed May 19 21:20:43 2010 +0200
+rev276 - make use of new smbman fileXio functions - Tue May 18 20:28:56 2010 +0200
+rev275 - applied SMB connection speedup to ingame SMB core - Tue May 18 12:43:54 2010 +0200
+rev274 - smbman: finished chdir implementation - Tue May 18 12:00:32 2010 +0200
+rev273 - smbman: implemented dopen/dread/dclose/chdir (chdir is not complete) - Mon May 17 22:16:40 2010 +0200
+rev272 - smbman: implemented FindFirst2, FindNext2 requests, different tweaks to make connection faster - Mon May 17 17:11:56 2010 +0200
+rev271 - smbman: fixed a killer buffer overflow while generating DES keys - Mon May 17 12:37:30 2010 +0200
+rev270 - smbman: added mkdir IO function, make LogOn not retrying forever - Sun May 16 19:03:49 2010 +0200
+rev269 - smbman: added Rename request and his rename IO function - Sun May 16 17:43:06 2010 +0200
+rev268 - smbman: added Delete Directory request and his rmdir IO function - Sun May 16 16:59:25 2010 +0200
+rev267 - smbman: added Delete request and his remove IO function - Sun May 16 16:35:31 2010 +0200
+rev266 - smbman: added poll() to not lock forever using lwip_recv - Sun May 16 14:01:51 2010 +0200
+rev265 - smbman: fix for closing previously created tcp connection before opening it (in the same module instance) - Sun May 16 13:36:20 2010 +0200
+rev264 - smbman: added timer to echo the SMB server every 3 sec while not doing IO - Sun May 16 13:21:34 2010 +0200
+rev263 - smbman: added QueryDiskInfo request and his devctl function - Sat May 15 17:15:58 2010 +0200
+rev262 - smbman: added file IO getstat support - Sat May 15 16:05:06 2010 +0200
+rev261 - smbman: a few tweaks to the packet structs - Fri May 14 14:04:09 2010 +0200
+rev260 - smbman: added QueryPathInformation Trans2 request - Fri May 14 13:32:58 2010 +0200
+rev259 - smbman: modified smb_ReadAndX and smb_WriteAndX to support large files (>4GB) - Fri May 14 10:17:05 2010 +0200
+rev258 - smbman: added generic lseek64 support (needs PS2SDK lseek64 fix to work) - Thu May 13 22:40:36 2010 +0200
+rev257 - smbman: reviewed devctl functions - Thu May 13 16:14:45 2010 +0200
+rev256 - smbman: reviewed AddPassword function - Thu May 13 11:48:13 2010 +0200
+rev255 - * added method for managing passwords, re-enable smb_NTCreateAndX, small fix when read only mode requested - Wed May 12 22:33:19 2010 +0200
+rev254 - added smblab to test smbman functions - Wed May 12 20:43:27 2010 +0200
+rev253 - smbman: finished smb_NetShareEnum(), added smb_Echo(), refined devctls - Wed May 12 17:52:40 2010 +0200
+rev252 - tagged r245 as release 0.7 - Tue May 11 20:56:56 2010 +0200
+rev251 - smbman: fixed fatal error for compiling in smb_NetShareEnum() - Tue May 11 20:53:03 2010 +0200
+rev250 - added a few commands to smbman (TreeDisconnect, LogOffAndX, NetShareEnum) - Tue May 11 20:48:45 2010 +0200
+rev249 - Porting back the opl2iso into the main repository - Sun May 09 19:17:26 2010 +0200
+rev248 - added write support to smbman - Sun May 09 17:06:37 2010 +0200
+rev247 - added NTLMv1 authentification ability to smbman - Sat May 08 22:49:44 2010 +0200
+rev246 - added user security level to smbman, currently supports plaintext/encrypted passwords and LanMan authentification - Sat May 08 18:59:02 2010 +0200
+rev245 - updated version number to 0.7 and changelog, credits - Tue May 04 17:13:11 2010 +0200
+rev244 - izdubar: fix for 18K - Tue May 04 16:37:28 2010 +0200
+rev243 - IGR2 Fix 5. - Tue Mar 30 11:53:11 2010 +0200
+rev242 - IGR2 Fix 4. - Tue Mar 23 13:27:19 2010 +0100
+rev241 - corrected polish translation by Berion - Mon Mar 15 10:06:28 2010 +0100
+rev240 - Added an embedded Elf loader to the GUI (actually used on Exit to Elf) - Sat Mar 13 20:29:29 2010 +0100
+rev239 - IGR2 fix 3. - Sat Mar 06 18:17:59 2010 +0100
+rev238 - Pad repeat pre-delay (double the repeat delay for now). - Thu Mar 04 19:09:04 2010 +0100
+rev237 - Renamed iso2usbld to iso2opl, fix for running iso2opl on Big Endian systems - Wed Mar 03 19:47:29 2010 +0100
+rev236 - IGR2 fix 2. - Tue Mar 02 23:55:57 2010 +0100
+rev235 - Gilgamesh88: fix read buffer double increment bug in smbman.c - Tue Mar 02 11:36:07 2010 +0100
+rev234 - IRG2 first fix. ;) - Mon Mar 01 23:48:20 2010 +0100
+rev233 - smbman, usbhdfsd: just cosmetics, fixed indents and leading/trailing whitespaces - Mon Mar 01 20:05:55 2010 +0100
+rev232 - eesync/imgdrv: just cosmetics - Mon Mar 01 11:31:27 2010 +0100
+rev231 - just cosmetics: fixed indents, removed leading/trailing whitespaces - Mon Mar 01 09:54:14 2010 +0100
+rev230 - Fix: be sure HDD is actually used and selected before storing - Mon Mar 01 08:53:18 2010 +0100
+rev229 - HDD settings only stored on save, not test (untested) - Mon Mar 01 08:34:45 2010 +0100
+rev228 - merging branches - Sun Feb 28 21:39:54 2010 +0100
+rev227 - Two more fixes by Izdubar - Sun Feb 28 21:39:13 2010 +0100
+rev226 - Rewrote completly IGR. - Sun Feb 28 21:30:38 2010 +0100
+rev225 - dev9: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 20:43:27 2010 +0100
+rev224 - cddev, discID: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 20:32:54 2010 +0100
+rev223 - cdvdfsv: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 20:18:56 2010 +0100
+rev222 - cdvdman: just cosmetics, fixed indents and leading/trailing whitespaces - Sun Feb 28 17:06:08 2010 +0100
+rev221 - A couple of fixes: - Fri Feb 26 08:58:19 2010 +0100
+rev220 - * this slipped through - default delay should be 7 - Thu Feb 25 18:53:06 2010 +0100
+rev219 - * Cummulative patch by gilgamesh - consistency improvements - Thu Feb 25 18:49:47 2010 +0100
+rev218 - New coloured icons by Gilgamesh88 - Thu Feb 25 18:46:47 2010 +0100
+rev217 - Added PCMCIA support (auto-detected, should work with 18K atm) - Mon Feb 22 09:10:51 2010 +0100
+rev216 - Fix again to the sed command in all modules Rules.make files causing 'unrecognized -mcpu=r3000 option' on some dev environments - Sun Feb 21 13:39:36 2010 +0100
+rev215 - Working IGR fix for NFS Underground2 this time. :D - Tue Feb 16 20:40:56 2010 +0100
+rev214 - Removed PS2ETH and GSKIT vars definition from Makefile - Tue Feb 16 20:16:19 2010 +0100
+rev213 - Corrected misuse of ps2-packer in Makefile, sorry for those who'll need to move it - Tue Feb 16 16:02:03 2010 +0100
+rev212 - IGR fix 2. - Tue Feb 16 15:24:30 2010 +0100
+rev211 - Modified sed in Rules.make files to fix unrecognized option -mcpu=r3000 when using fr_FR.UTF-8 as LANG env var on some Linux distro - Tue Feb 16 11:40:27 2010 +0100
+rev210 - Add "Disable Debug Colors" setting. - Mon Feb 15 19:45:22 2010 +0100
+rev209 - zipped theme support (very slow) - Sun Feb 14 22:38:46 2010 +0100
+rev208 - Fix a bug when setting compatibility in multiple device. - Sun Feb 14 20:50:03 2010 +0100
+rev207 - IGR fixs: - Sun Feb 14 12:36:19 2010 +0100
+rev206 - A fix for the pink freezes when using custom lang file - Fri Jan 29 17:30:57 2010 +0100
+rev205 - Adding the ability to load language localisation files - Thu Jan 28 19:04:00 2010 +0100
+rev204 - Optimization of scePadRead hooking time. - Tue Jan 26 18:32:04 2010 +0100
+rev203 - Revert to sbv patch use with igr too. - Sun Jan 24 19:12:07 2010 +0100
+rev202 - Revert to Sbv patches use for old game compatibility. - Sun Jan 24 10:20:58 2010 +0100
+rev201 - Add a poweroff combo trick. - Sat Jan 23 23:34:44 2010 +0100
+rev200 - Add compat mode 6 to disable IGR. ( In compatibility settings ) - Sat Jan 23 14:59:52 2010 +0100
+rev199 - Loader size optimization. - Sat Jan 23 14:41:15 2010 +0100
+rev198 - Sorry .s file don't want to be push. - Thu Jan 21 22:02:25 2010 +0100
+rev197 - Loader size optimization. - Thu Jan 21 21:08:09 2010 +0100
+rev196 - home & end for HDD games - Thu Jan 21 18:59:25 2010 +0100
+rev195 - some more pointer handling fixes - Thu Jan 21 17:24:15 2010 +0100
+rev194 - pagestart handling fixes - Thu Jan 21 17:17:07 2010 +0100
+rev193 - Merging branches - Thu Jan 21 15:21:42 2010 +0100
+rev192 - * Selection in static mode now not centered (HDLoader like) - Thu Jan 21 15:19:56 2010 +0100
+rev191 - SMSMAP: wait link status forever (hopefully it fixes freeze on 1 bug) - Thu Jan 21 14:58:32 2010 +0100
+rev190 - Fix sound loop bug when using in game reset. - Thu Jan 21 00:06:19 2010 +0100
+rev189 - In Game Reset first shot. ( Disabled for the moment ) - Tue Jan 19 23:16:15 2010 +0100
+rev188 - get rid of kernel mem usage for patches code and let it handled by the loader - Fri Jan 15 13:26:36 2010 +0100
+rev187 - Added some generic patching mode for some games - Thu Jan 14 14:31:08 2010 +0100
+rev186 - cosmetic changes again to patches table code - Wed Jan 13 20:26:43 2010 +0100
+rev185 - Added patch for Armored Core Nine Breaker NTSC US via USB - Wed Jan 13 16:53:31 2010 +0100
+rev184 - Added value check to the game patching process - Wed Jan 13 10:41:07 2010 +0100
+rev183 - Loader now uses game patches (actually Disgaea PAL USB/SMB fix) - Tue Jan 12 22:25:22 2010 +0100
+rev182 - Enabled game patches table before to launch the loader - Tue Jan 12 19:09:12 2010 +0100
+rev181 - Added game patches table code - Tue Jan 12 18:53:03 2010 +0100
+rev180 - Slower Dialog scrolling. Also a speed handling fix. - Tue Jan 12 18:32:17 2010 +0100
+rev179 - HDD autostart option added. - Tue Jan 12 17:50:00 2010 +0100
+rev178 - some cosmetic changes to PS3 network fix - Tue Jan 12 13:33:16 2010 +0100
+rev177 - fix to SMSMAP to be able to use network on PS3 - Tue Jan 12 12:45:43 2010 +0100
+rev176 - adjusted DMA modes implementation (functional now) - Sat Jan 09 13:43:03 2010 +0100
+rev175 - Added DMA mode in UI - Sat Jan 09 01:24:28 2010 +0100
+rev174 - v12/v13 HDD detect fix: information given by dlanor - Fri Jan 08 14:33:15 2010 +0100
+rev173 - modified and tested HDD write OK (for compat modes), still disabled - Thu Jan 07 11:51:47 2010 +0100
+rev172 - totally ignore native HDL compatibilty modes - Wed Jan 06 22:21:32 2010 +0100
+rev171 - fix for lack of file opened check in smbman - Wed Jan 06 21:27:09 2010 +0100
+rev170 - fix for modchip freezing (maybe not all modchips) - Wed Jan 06 20:28:31 2010 +0100
+rev169 - Untested: - Wed Jan 06 08:52:00 2010 +0100
+rev168 - fixing bug in hdd usage gui selection - Tue Jan 05 22:38:32 2010 +0100
+rev167 - a copy-paste warning fix - Tue Jan 05 22:13:53 2010 +0100
+rev166 - First shot of HDD integration into GUI. Compat modes very rough. Untested! - Tue Jan 05 20:42:05 2010 +0100
+rev165 - added dutch language - Tue Jan 05 17:13:56 2010 +0100
+rev164 - changes to redundant code in system.c, changes to HDD compat modes handling - Mon Jan 04 19:48:35 2010 +0100
+rev163 - changes for SOCOM 3 Online playing - Mon Jan 04 14:50:46 2010 +0100
+rev162 - added poweroff support (currently disabled) - Mon Jan 04 11:35:12 2010 +0100
+rev161 - updated CREDITS file - Sun Jan 03 18:48:26 2010 +0100
+rev160 - HDL code: fix potential overflow while changing game name - Sun Jan 03 15:59:19 2010 +0100
+rev159 - changes to HDL code (added ability to save compat flags and game name) - Sun Jan 03 15:44:10 2010 +0100
+rev158 - added ps2hdd module, adjusted code to support 48-bit LBA HDD and set Transfer Mode - Sun Jan 03 14:39:45 2010 +0100
+rev157 - added atad module - Sun Jan 03 11:16:39 2010 +0100
+rev156 - fix to cdvdman so that HDD core is able to detect network adapter - Sun Jan 03 11:04:27 2010 +0100
+rev155 - changes again to HDD code - Sat Jan 02 20:57:22 2010 +0100
+rev154 - changes to HDD code - Sat Jan 02 20:34:34 2010 +0100
+rev153 - added HDL layer to GUI (currently disabled) - Sat Jan 02 14:50:04 2010 +0100
+rev152 - Game ID GUI and injection implementation (for DNAS) - Sat Jan 02 12:40:45 2010 +0100
+rev151 - changes to hdl header struct - Fri Jan 01 20:18:19 2010 +0100
+rev150 - added code for internal HDD support (HDL format) to cdvdman - Fri Jan 01 15:42:27 2010 +0100
+rev149 - fixes to SMB code for NAS devices not supporting Unicode strings - Thu Dec 31 09:25:44 2009 +0100
+rev148 - fixed bug in cdvdfsv never returning CDVD_READY_READY state for blocking mode - Mon Dec 28 21:27:32 2009 +0100
+rev147 - changes to be able to use a valid disc ID on online games - Sun Dec 27 17:33:49 2009 +0100
+rev146 - Adding the ability to choose the default menu (USB, NET, HDD games). - Sun Dec 27 17:18:04 2009 +0100
+rev145 - Network startup forced to be synchronous (Solution for bug #16, hopefully) - Sun Dec 27 17:00:13 2009 +0100
+rev144 - Better randomization of the port value (And even more hacky). Improves network startup delays significantly here - Sun Dec 27 14:29:14 2009 +0100
+rev143 - tagged r142 to release 0.6 - Wed Dec 23 20:15:44 2009 +0100
+rev142 - Updated version number - Wed Dec 23 19:15:48 2009 +0100
+rev141 - Hacky SMB speedup: "Randomize" the source port value to avoid port reusal. - Wed Dec 23 13:20:55 2009 +0100
+rev140 - updated CHANGELOG/CREDTIS/README files - Wed Dec 23 10:45:48 2009 +0100
+rev139 - Added configurable exit button - Tue Dec 22 22:25:22 2009 +0100
+rev138 - Changed UI color controls - Tue Dec 22 19:47:30 2009 +0100
+rev137 - fixed long reconnection time (yellow screen) - Tue Dec 22 17:33:33 2009 +0100
+rev136 - Added support for multiple partitions - Tue Dec 22 16:54:22 2009 +0100
+rev135 - Fixing linux samba compatibility (White screen removal fix) - Tue Dec 22 14:16:20 2009 +0100
+rev134 - Changed modes text - Tue Dec 22 13:14:19 2009 +0100
+rev133 - changes to SMSUTILS so it doesn't use PS2SDKSRC env var to build - Mon Dec 21 18:52:28 2009 +0100
+rev132 - new core merging step3: adapted EE core to new IOP core - Mon Dec 21 16:51:23 2009 +0100
+rev131 - new core merging step2: added new modules - Mon Dec 21 15:36:12 2009 +0100
+rev130 - new core merging step1: deleted modules - Mon Dec 21 15:26:46 2009 +0100
+rev129 - Implemented sorting (via select) - Wed Dec 02 13:11:06 2009 +0100
+rev128 - Adding two new icons - Wed Dec 02 10:52:36 2009 +0100
+rev127 - tagged r126 to release 0.5 - Sun Nov 29 19:58:33 2009 +0100
+rev126 - * Added languages - Sun Nov 29 16:28:09 2009 +0100
+rev125 - Czech welcome message update - Mon Nov 23 16:46:23 2009 +0100
+rev124 - added ioctl cmd to usbhdfsd to retrieve physical file sector - Sun Nov 22 11:59:09 2009 +0100
+rev123 - added sifman module, currently unused - Sun Nov 15 20:10:27 2009 +0100
+rev122 - reduced buffers again in isofs/smbman - Sat Nov 14 16:54:05 2009 +0100
+rev121 - try to use IPCONFIG.DAT from mc in slot 2 - Fri Nov 13 18:55:53 2009 +0100
+rev120 - chaanged some modules rules.make to build properly on my Ubuntu environment - Fri Nov 13 17:10:40 2009 +0100
+rev119 - changes to lwipopts.h to reduce SMSTCPIP mem usage - Fri Nov 13 14:42:11 2009 +0100
+rev118 - reduced IOP mem usage for isofs/smbman modules - Fri Nov 13 09:43:26 2009 +0100
+rev117 - Correcting hints - Fri Nov 13 09:37:27 2009 +0100
+rev116 - Adding UI component hint feature. Hints on Compat settings now - Thu Nov 12 20:51:39 2009 +0100
+rev115 - enlighted mass driver mem usage for mode 2 - Thu Nov 12 20:31:08 2009 +0100
+rev114 - implemented mode 2: have lower mem usage in SMSTCPIP/smbman modules - Thu Nov 12 19:26:35 2009 +0100
+rev113 - Enabled SMSMAP/SMSTCPIP IOP modules - Thu Nov 12 16:08:21 2009 +0100
+rev112 - Fixed pink screen, and bugs in IOP reboot - Thu Nov 12 14:47:47 2009 +0100
+rev111 - reverted loader changes: stupid idea to choose g_buf address at runtime - Wed Nov 11 22:26:12 2009 +0100
+rev110 - added compat mode 1, inverted modes 4 & 5 - Wed Nov 11 21:28:57 2009 +0100
+rev109 - added compat mode 4 & 5 - Wed Nov 11 21:08:01 2009 +0100
+rev108 - added compat mode 3 - Wed Nov 11 20:47:49 2009 +0100
+rev107 - Moving the compat mask to third argument - Wed Nov 11 16:21:25 2009 +0100
+rev106 - FIX: Temporary fix - Second pink freeze for some games - This helps another bit - Wed Nov 11 15:50:07 2009 +0100
+rev105 - Virt. keyboard now uses button icons - Wed Nov 11 14:15:09 2009 +0100
+rev104 - FIX: This removes the freeze on second pink for some games (on my machine) - Wed Nov 11 10:54:19 2009 +0100
+rev103 - Renaming to lower case - caused Error opening with case sensitive linux filesystem - Wed Nov 11 10:14:12 2009 +0100
+rev102 - Adding select and start button icons by JNABK - Wed Nov 11 10:09:52 2009 +0100
+rev101 - FIX: Compat settings now seem to propagate well. Copy-paste introduced bug fixed - Wed Nov 11 09:51:39 2009 +0100
+rev100 - set IP changed flag to ensure IP settings get saved - Wed Nov 11 06:50:21 2009 +0100
+rev99 - Merging changes - Tue Nov 10 22:08:55 2009 +0100
+rev98 - * Pass in the compat settings in the same string - Tue Nov 10 22:07:31 2009 +0100
+rev97 - fix: saving config if SYS-CONF doesn't exists - Tue Nov 10 19:50:50 2009 +0100
+rev96 - Compat settings count now 5, propagation to loader.c implemented - Tue Nov 10 19:16:23 2009 +0100
+rev95 - changes to SMSTCPIP/include/lwipopts.h - Tue Nov 10 12:04:33 2009 +0100
+rev94 - added missing smap_opt.s, updated CREDITS file - Tue Nov 10 11:34:52 2009 +0100
+rev93 - add SMSMAP/SMSTCIP modules, currently not used - Tue Nov 10 11:23:26 2009 +0100
+rev92 - added stuff to build an alternate loader (suitable for Sonic Unleashed) - Tue Nov 10 10:25:24 2009 +0100
+rev91 - FIX: Config loading was removed. Putting it back - Tue Nov 10 09:07:25 2009 +0100
+rev90 - FIX: Error codes are <0, not <=0. This could affect loading if file handle had value 0 - Tue Nov 10 09:06:29 2009 +0100
+rev89 - reverted netlog loading accidentally committed - Mon Nov 09 20:32:32 2009 +0100
+rev88 - fix for freezing multi-elf games - Mon Nov 09 20:29:58 2009 +0100
+rev87 - Adding missing icons - Sun Nov 08 21:12:15 2009 +0100
+rev86 - FIX: Issue 10 (share name overflow) - Sun Nov 08 20:04:14 2009 +0100
+rev85 - Show icons at background in config dialogs - Sun Nov 08 02:29:23 2009 +0100
+rev84 - Changed name, updated spanish translation, and now info txt shows in selected language - Sun Nov 08 02:13:54 2009 +0100
+rev83 - added missing ioman_add header file for dev9 module - Fri Nov 06 21:02:33 2009 +0100
+rev82 - enlighted dev9 module and added dev9x device driver - Fri Nov 06 20:57:03 2009 +0100
+rev81 - renamed GetSyscall to GetSycallHandler and use syscallnr header - Fri Nov 06 16:25:36 2009 +0100
+rev80 - FIX: The remaining ip config fields renumbered. That should be it - Fri Nov 06 08:48:56 2009 +0100
+rev79 - Fix: IP config screen had all the settings moved by one (renumbered the dialog but not the value injection) - Fri Nov 06 08:09:20 2009 +0100
+rev78 - Fix for the recent error with media and parts reading. - Thu Nov 05 12:39:02 2009 +0100
+rev77 - reverting back isofs to rev71 - Wed Nov 04 18:12:29 2009 +0100
+rev76 - reverted cdvdman & isofs to rev70 - Wed Nov 04 17:18:48 2009 +0100
+rev75 - Reverting this (commit by accident) - Tue Nov 03 21:42:15 2009 +0100
+rev74 - * New compat mode ui (via triangle) - currently without function - Tue Nov 03 21:39:13 2009 +0100
+rev73 - added SIF and SIF RPC init calls to cdvdman - Tue Nov 03 18:50:05 2009 +0100
+rev72 - few changes to cdvdman and commented unneeded code in smbman - Tue Nov 03 18:34:03 2009 +0100
+rev71 - fix for those games opening files with other flag than O_RDONLY - Mon Nov 02 18:09:42 2009 +0100
+rev70 - fix: smaller elf at second make all - Mon Nov 02 13:28:11 2009 +0100
+rev69 - fix for some games freezing while searching for a non-existent file - Mon Nov 02 12:09:40 2009 +0100
+rev68 - Added ugly virtual keyboard - Sun Nov 01 23:21:19 2009 +0100
+rev67 - Merging changes - Sun Nov 01 20:25:52 2009 +0100
+rev66 - New data driven dialog code. Needs color, enum and string inputs to be complete. IP config rewritten to use it. - Sun Nov 01 20:25:10 2009 +0100
+rev65 - remove pink screen when a IOP reset hook has finished (set_reg_hook reaches 0) - Sun Nov 01 16:18:15 2009 +0100
+rev64 - fix for white screens: bad gamename crc32 calculation - Sun Nov 01 11:50:30 2009 +0100
+rev63 - Small file adressing fix - Sat Oct 31 19:06:23 2009 +0100
+rev62 - Merged changes - Sat Oct 31 12:22:29 2009 +0100
+rev61 - Some input system rewrites, scrolling after dialog fix, settings only saved on save settings subitem now - Sat Oct 31 12:18:09 2009 +0100
+rev60 - usbhdfsd: removed use of PS2SDKSRC env var - Sat Oct 31 12:08:12 2009 +0100
+rev59 - Network UI improvements: Port and autostart settings, network loading feedback - Sat Oct 31 09:11:53 2009 +0100
+rev58 - Config handling improved - now remembers the loaded config and stores to the same location - Sat Oct 31 07:09:53 2009 +0100
+rev57 - iso2usbld: only use long long and not __int64 - Fri Oct 30 22:50:27 2009 +0100
+rev56 - iso2usbld: added commented use of open/read/write/lsee64/close - Fri Oct 30 21:00:58 2009 +0100
+rev55 - build iso2usbld on make pc_tools - Fri Oct 30 11:37:17 2009 +0100
+rev54 - Adding the missing network icons, sorry everyone! - Fri Oct 30 08:05:09 2009 +0100
+rev53 - Adding network icons by JNABK - Thu Oct 29 20:25:46 2009 +0100
+rev52 - just corrected a comment - Thu Oct 29 17:02:08 2009 +0100
+rev51 - fix once again to avoid breaking compatibility - Thu Oct 29 16:58:07 2009 +0100
+rev50 - another fix to fake module load to avoid breaking compatibility - Thu Oct 29 14:07:59 2009 +0100
+rev49 - fix for faking some modules load correctly - Thu Oct 29 13:16:09 2009 +0100
+rev48 - fix for multi-elf games freezing on pink - Wed Oct 28 20:22:14 2009 +0100
+rev47 - fixes for iso2usbld to handle large ISO (>4Gb) - Wed Oct 28 18:29:11 2009 +0100
+rev46 - renamed PUBLIC share to PS2SMB - Wed Oct 28 16:48:15 2009 +0100
+rev45 - modified iso2usbld CFLAGS - Wed Oct 28 13:49:58 2009 +0100
+rev44 - create USBLD folder on mass if not existing - Wed Oct 28 12:34:45 2009 +0100
+rev43 - apply IP settings to loader/modules - Wed Oct 28 12:00:29 2009 +0100
+rev42 - Added IP configuration screen - Tue Oct 27 21:58:29 2009 +0100
+rev41 - different fixes, one very important for iso2usbld - Tue Oct 27 20:58:24 2009 +0100
+rev40 - Updated CHANGELOG, README and CREDITS - Tue Oct 27 16:13:35 2009 +0100
+rev39 - Added missing license headers - Mon Oct 26 20:27:06 2009 +0100
+rev38 - added support to network games trought SMB protocol - Mon Oct 26 18:52:16 2009 +0100
+rev37 - just acouple changes for isofs patch & cdvdman - Sat Oct 24 20:03:21 2009 +0200
+rev36 - allow isofs to handle up to 8 parts - Sat Oct 24 17:56:28 2009 +0200
+rev35 - added .hgtags - Sat Oct 24 16:14:24 2009 +0200
+rev34 - added missing readonly makefile for mass_driver - Sat Oct 24 16:12:02 2009 +0200
+rev33 - disabled write support for ingame mass_driver - Sat Oct 24 16:09:31 2009 +0200
+rev32 - added LICENSE, README, CREDITS and CHANGELOG - Fri Oct 23 10:20:06 2009 +0200
+rev31 - New_Iop_Reset: switched to reset with EELOADCNF - Thu Oct 22 20:27:52 2009 +0200
+rev30 - Now searchs for USBD.IRX in MC. If not exists load embedded usbd.irx for each platform - Sun Oct 18 20:26:50 2009 +0200
+rev29 - static mode now fit with JNABK templates also in PAL mode - Sun Oct 18 00:48:15 2009 +0200
+rev28 - Fix: Welcome text showing extra text - Sat Oct 17 22:54:56 2009 +0200
+rev27 - fix for PS3 with software emulation - Sat Oct 17 22:43:30 2009 +0200
+rev26 - Added spanish translation - Sat Oct 17 20:44:42 2009 +0200
+rev25 - Oops. These slipped through. Reverting - Sat Oct 17 16:32:20 2009 +0200
+rev24 - Adding save icon - Sat Oct 17 16:30:30 2009 +0200
+rev23 - Adding language support - Sat Oct 17 16:29:49 2009 +0200
+rev22 - * rewritten the config file handling (to use key=val lines) - Tue Oct 13 21:56:57 2009 +0200
+rev21 - * cleaning up the code a bit - all menu construction now in main, etc. - Tue Oct 13 17:55:35 2009 +0200
+rev20 - isofs: fixed bug in skipmod_check() - Tue Oct 06 08:52:56 2009 +0200
+rev19 - modified isofs: allow it to fake some module load from cdrom - Mon Oct 05 21:01:36 2009 +0200
+rev18 - fix for 8+3 elf's filename - Sun Oct 04 20:44:48 2009 +0200
+rev17 - Added messages of what is doing makefile - Sun Oct 04 20:43:49 2009 +0200
+rev16 - fix: cdvdman.c:1708: warning: unused variable `netlog_modname' - Sun Oct 04 19:38:27 2009 +0200
+rev15 - loader: modified Patch_Img into Patch_Mod using g_buf - Sun Oct 04 16:57:37 2009 +0200
+rev14 - loader now loads at e8000 and use g_buf at 88000 - Sun Oct 04 15:45:04 2009 +0200
+rev13 - modified cdvdman: added stream and other fixes - Sun Oct 04 15:31:56 2009 +0200
+rev12 - modified isofs to handle media type - Sun Oct 04 15:13:06 2009 +0200
+rev11 - moved IOP reset to LoadExecPS2 replacement - Sun Oct 04 14:56:59 2009 +0200
+rev10 - added debug over ethernet - Sun Oct 04 14:40:10 2009 +0200
+rev9 - Updated interface - Sun Oct 04 02:34:51 2009 +0200
+rev8 - Updated interface with dynamic menu - Fri Oct 02 18:40:33 2009 +0200
+rev7 - a few fixes so that it can compile - Tue Sep 29 09:39:20 2009 +0200
+rev6 - iso2usbld: fixes for linux build - Sun Sep 27 21:55:27 2009 +0200
+rev5 - iso2usbld: fixed those deprecated type casts - Sun Sep 27 21:20:14 2009 +0200
+rev4 - bugfix for iso2usbld - Sun Sep 27 19:00:50 2009 +0200
+rev3 - modified .hignore - Sun Sep 27 17:42:30 2009 +0200
+rev2 - added open usb loader sources - Sun Sep 27 17:36:34 2009 +0200
+rev1 - added iso2usbld - Sun Sep 27 16:28:14 2009 +0200
+rev0 - added .hgignore - Sun Sep 27 16:20:30 2009 +0200

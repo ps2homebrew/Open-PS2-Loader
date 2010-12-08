@@ -1,13 +1,13 @@
-# translation by loki7777
+# translation by Berion & Loki7777
 Polish
                WITAMY W PROGRAMIE OPEN PS2 LOADER. GŁÓWNY KOD OPARTY ZOSTAŁ NA KODZIE ŹRÓDŁOWYM HD PROJECT <http://psx-scene.com> IMPLEMENTACJE FORMATU USB ADVANCE I GUI PRZEZ IFCARO <http://ps2dev.ifcaro.net> WIĘKSZOŚĆ JĄDRA LOADERA WYKONANA PRZEZ JIMMIKAELKAEL. WSZYSTKIE ULEPSZENIA GUI WYKONANE PRZEZ VOLCA. DZIĘKUJEMY ZA SKORZYSTANIE Z NASZEJ APLIKACJI. ^^
 Open PS2 Loader %s
-Zapisz zmiany
+"X" Zapisz zmiany
 "O" Powrót
 Konfiguracja sieci
 <brak wartości>
 Ustawienia zostały zapisane...
-Błąd przy zapisywaniu ustawień!
+Wystąpił błąd podczas zapisywania ustawień!
 Wyjście
 Ustawienia
 Gry z USB
@@ -35,8 +35,8 @@ Automatyczne sortowanie
 Wystąpił błąd podczas wczytywania pliku językowego
 Wyłącz kolory Debug
 Nie wykryto podłączonego kontrolera, oczekiwanie...
-Włącz pokazywanie okładek (Cover Art)
-Szerokokątny ekran
+Włącz pokazywanie okładek
+Panoramiczny ekran
 Wyłącz zasilanie
 Wczytywanie ustawień
 Zapisywanie ustawień
@@ -49,8 +49,8 @@ Automatyczny
 Ręczny
 Uruchom serwer HDL
 Uruchamianie serwera HDL...
-Serwer HDL Uruchomiony... Wciśnij "O" by zatrzymać
-Wciśnij "X" aby zakończyć serwer HDL
+Serwer HDL Uruchomiony... Wciśnij "O" aby zatrzymać
+Wciśnij "X" aby zakończyć pracę serwera HDL
 Wyłączanie serwera HDL...
 Wyjście do
 Kolor tła
@@ -62,24 +62,24 @@ Port
 Udostępnij
 Użytkownik
 Hasło
-<nie wybrane>
+<nie ustawione>
 "X" Zatwierdź
-Wybrana gra będzie usunięta, kontynuować ?
+Wybrana gra zostanie usunięta, kontynuować?
 Zmień nazwę
 Usuń
 Uruchom
 Ustawienia ekranu
-Pozwól na usuwanie i zmianę nazwy
-Sprawdź fragmentację dysku USB
+Pozwól na usuwanie i zmiany nazw gier
+Sprawdź fragmentację gry na urządzeniu USB
 Zapamiętaj ostatnio uruchomioną grę
-Błąd: Gra jest zdefragmentowana
+Błąd: Gra jest pofragmentowana
 Błąd: Nie można uruchomić gry
 Test
 Zostaw puste dla autoryzacji konta GOŚĆ.
 Załaduj alternatywne jądro
 Alternatywny sposób odczytu danych
-Uwolnij Syscalls
-0 PSS mode
+Zwolnij Syscalls
+Tryb zastpowania PSS dummy
 Wyłącz obsługę DVD-DL
 Wyłącz IGR
 Zmniejsz bufor cdvdfsv
@@ -99,5 +99,5 @@ Postęp
 Plik VMC już istnieje
 Niewłaściwy plik VMC, nieprawidłowy rozmiar
 Plik VMC musi zostać utworzony
-Błąd z plikiem VMC, kontynuować z fizyczną karta pamięci ?
+Błąd z plikiem VMC, kontynuować z fizyczną kartą pamięci?
 Automatyczne odswieżanie

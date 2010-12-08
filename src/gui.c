@@ -151,6 +151,7 @@ static void guiInitMainMenu() {
 	if (gMenuFillHook) // if found
 		gMenuFillHook(&mainMenu);
 
+	submenuAppendItem(&mainMenu, EXIT_ICON, "About", 8, _STR_ABOUT);
 	submenuAppendItem(&mainMenu, EXIT_ICON, "Exit", 9, _STR_EXIT);
 	submenuAppendItem(&mainMenu, EXIT_ICON, "Power off", 11, _STR_POWEROFF);
 
@@ -251,6 +252,22 @@ void guiEndFrame(void) {
 #endif
 		
 	rmEndFrame();
+}
+
+static void guiShowAbout() {
+	char OPLVersion[64];
+	snprintf(OPLVersion, 64, _l(_STR_OUL_VER), USBLD_VERSION);
+
+#ifdef VMC
+	strcat(OPLVersion, " VMC");
+#endif
+#ifdef __CHILDPROOF
+	strcat(OPLVersion, " CHILDPROOF");
+#endif
+
+	diaSetLabel(diaAbout, 1, OPLVersion);
+
+	diaExecuteDialog(diaAbout, -1, 1, NULL);
 }
 
 static void guiExecExit() {
@@ -1246,6 +1263,8 @@ static void guiMenuHandleInput() {
 			guiShowIPConfig();
 		} else if (id == 7) {
 			saveConfig(CONFIG_OPL, 1);
+		} else if (id == 8) {
+			guiShowAbout();
 		} else if (id == 9) {
 			guiExecExit();
 		} else if (id == 11) {

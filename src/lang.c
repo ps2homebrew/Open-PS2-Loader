@@ -107,7 +107,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Invalid VMC file, size is incorrect",
 	"VMC file need to be created",
 	"Error with VMC file, continue with physical MC ?",
-	"Automatic refresh"
+	"Automatic refresh",
+	"About",
+	"Coders"
 };
 
 static int guiLangID = 0;

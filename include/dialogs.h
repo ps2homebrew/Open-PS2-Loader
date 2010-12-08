@@ -53,6 +53,7 @@ extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
 extern struct UIItem diaConfig[];
+extern struct UIItem diaAbout[];
 #ifdef VMC
 extern struct UIItem diaVMC[];
 #endif

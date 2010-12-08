@@ -2,7 +2,7 @@
 
 hgchangeset=`eval hg log | grep changeset: | sed -n 's/changeset: *//p' | sed -n 's/:[^.]*//p'`
 hg log | grep summary: | sed -n 's/summary: *//p' >rev_summary
-hg log | grep date: | sed -n 's/date: *//p' | sed -n 's/+[0-9]*//p' >rev_date
+hg log | grep date: | sed -n 's/date: *//p' >rev_date
 
 i=0
 changeset_array=$(echo $hgchangeset | tr " " "\n")

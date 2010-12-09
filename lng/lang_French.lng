@@ -1,3 +1,4 @@
+# translation by izdubar
 French
 	              BIENVENUE DANS OPEN PS2 LOADER. CODE PRINCIPAL FONDÉ SUR LE CODE SOURCE D'HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> LA PLUPART DU CODE DU COEUR DU LOADER EST DE JIMMIKAELKAEL. TOUTES LES AMÉLIORATIONS DU GUI SONT DE VOLCA. MERCI D'UTILISER NOTRE PROGRAMME ^^
 Open PS2 Loader %s
@@ -100,3 +101,5 @@ Fichier VMC incorrect, taille de VMC invalide
 La VMC doit être crée
 Erreur avec la VMC, continuer en utilisant la MC physique ?
 Rafraîchissement automatique
+À propos
+Développeurs

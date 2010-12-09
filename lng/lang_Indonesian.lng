@@ -1,4 +1,4 @@
-﻿# translation by Satrio Bahar
+# translation by Satrio Bahar
 Indonesian
                SELAMAT DATANG DI OPEN PS2 LOADER. KODE UTAMA BERDASARKAN SUMBER KODE DARI HD PROJECT <http://psx-scene.com> DI ADAPTASI UNTUK FORMAT USB ADVANCE DAN GUI UTAMA DIBUAT OLEH IFCARO <http://ps2dev.ifcaro.net> SEBAGIAN BESAR CORE DIBUAT OLEH JIMMIKAELKAEL. SEMUA PERBAIKAN GUI DIBUAT OLEH VOLCA. TERIMA KASIH TELAH MENGGUNAKAN PROGRAM KAMI ^^
 Open PS2 Loader %s
@@ -100,4 +100,6 @@ VMC ada
 VMC Cacat, ukuran yang salah
 VMC perlu diciptakan
 Kesalahan pada VMC, lanjutkan dengan MC fisik ?
-Otomatis refresh
+Otomatis segarkan
+Tentang
+Pengembang

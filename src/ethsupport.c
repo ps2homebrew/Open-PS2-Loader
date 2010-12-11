@@ -101,7 +101,7 @@ static void ethLoadModules(void) {
 	ethSMBConnect();
 
 	// update Themes
-	char path[32];
+	char path[255];
 	sprintf(path, "%sTHM", ethPrefix);
 	thmAddElements(path, "\\");
 
@@ -207,7 +207,7 @@ static void ethSetGameCompatibility(int id, int compatMode, int dmaMode) {
 #ifdef VMC
 static int ethPrepareMcemu(base_game_info_t* game) {
 	char vmc[2][32];
-	char vmc_path[64];
+	char vmc_path[255];
 	u32 vmc_size;
 	int i, j, fd, size_mcemu_irx = 0;
 	smb_vmc_infos_t smb_vmc_infos;
@@ -223,7 +223,7 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 
-		snprintf(vmc_path, 64, "%s\\VMC\\%s.bin", ethPrefix, vmc[i]);
+		snprintf(vmc_path, 255, "%s\\VMC\\%s.bin", ethPrefix, vmc[i]);
 
 		fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
 		if (fd >= 0) {
@@ -253,8 +253,8 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 				if(vmc_size == smb_vmc_infos.specs.card_size * smb_vmc_infos.specs.page_size) {
 					smb_vmc_infos.active = 1;
 					smb_vmc_infos.fid    = 0xFFFF;
-					snprintf(vmc_path, 64, "VMC\\%s.bin", vmc[i]);
-					strncpy(smb_vmc_infos.fname, vmc_path, 32);
+					snprintf(vmc_path, 255, "VMC\\%s.bin", vmc[i]);
+					strncpy(smb_vmc_infos.fname, vmc_path, 32); // maybe a too small size here ...
 
 					LOG("%s is a valid Vmc file\n", smb_vmc_infos.fname );
 				}

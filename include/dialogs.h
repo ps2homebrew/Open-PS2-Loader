@@ -48,6 +48,8 @@
 #define CFG_CHECKUSBFRAG		37
 #define CFG_LASTPLAYED			38
 #define CFG_DANDROP				39
+#define CFG_USBDELAY			40
+#define CFG_USBPREFIX			41
 
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];

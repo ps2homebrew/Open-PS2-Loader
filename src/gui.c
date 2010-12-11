@@ -302,7 +302,9 @@ static void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
 	diaSetInt(diaConfig, CFG_EXITTO, gExitMode);
 	diaSetInt(diaConfig, CFG_DANDROP, gEnableDandR);
-	diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
+	//diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
+	diaSetInt(diaConfig, CFG_USBDELAY, gUSBDelay);
+	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
@@ -315,7 +317,9 @@ static void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_EXITTO, &gExitMode);
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
 		diaGetInt(diaConfig, CFG_DANDROP, &gEnableDandR);
-		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
+		//diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
+		diaGetInt(diaConfig, CFG_USBDELAY, &gUSBDelay);
+		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
 		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);

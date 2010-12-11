@@ -106,7 +106,10 @@
 #define _STR_AUTOREFRESH			101
 #define _STR_ABOUT					102
 #define _STR_DEVS					103
-#define LANG_STR_COUNT 104
+#define _STR_USB_DELAY				104
+#define _STR_USB_PREFIX				105
+#define _STR_HINT_NEED_RESTART		106
+#define LANG_STR_COUNT 107
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

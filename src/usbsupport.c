@@ -32,7 +32,7 @@ extern int size_usb_mcemu_irx;
 void *usbd_irx;
 int size_usbd_irx;
 
-static char usbPrefix[8];
+static char usbPrefix[40];
 static int usbULSizePrev = 0;
 static int usbGameCount = 0;
 static base_game_info_t *usbGames;
@@ -42,21 +42,21 @@ static item_list_t usbGameList;
 
 int usbFindPartition(char *target, char *name) {
 	int i, fd;
-	char path[64];
+	char path[255];
 
 	for(i=0; i<5; i++) {
-		snprintf(path, 64, "mass%d:%s", i, name);
+		snprintf(path, 255, "mass%d:%s/%s", i, gUSBPrefix, name);
 		fd = fioOpen(path, O_RDONLY);
 
 		if(fd >= 0) {
-			snprintf(target, 8, "mass%d:", i);
+			snprintf(target, 255, "mass%d:%s/", i, gUSBPrefix);
 			fioClose(fd);
 			return 1;
 		}
 	}
 
 	// default to first partition (for themes, ...)
-	sprintf(target, "mass0:");
+	sprintf(target, "mass0:%s/", gUSBPrefix);
 	return 0;
 }
 
@@ -65,7 +65,7 @@ static void usbInitModules(void) {
 
 	// update Themes
 	usbFindPartition(usbPrefix, "ul.cfg");
-	char path[32];
+	char path[255];
 	sprintf(path, "%sTHM", usbPrefix);
 	thmAddElements(path, "/");
 
@@ -98,7 +98,7 @@ void usbLoadModules(void) {
 	sysLoadModuleBuffer(usbd_irx, size_usbd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 
-	delay(3);
+	delay(gUSBDelay);
 
 	LOG("usbLoadModules: modules loaded\n");
 }
@@ -174,7 +174,7 @@ static void usbSetGameCompatibility(int id, int compatMode, int dmaMode) {
 #ifdef VMC
 static int usbPrepareMcemu(base_game_info_t* game) {
 	char vmc[2][32];
-	char vmc_path[64];
+	char vmc_path[255];
 	u32 vmc_size;
 	int i, j, fd, size_mcemu_irx = 0;
 	usb_vmc_infos_t usb_vmc_infos;
@@ -190,7 +190,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 
-		snprintf(vmc_path, 64, "%sVMC/%s.bin", usbPrefix, vmc[i]);
+		snprintf(vmc_path, 255, "%sVMC/%s.bin", usbPrefix, vmc[i]);
 
 		fd = fioOpen(vmc_path, O_RDWR);
 		if (fd >= 0) {
@@ -221,7 +221,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 					int fd1 = fioDopen(usbPrefix);
 
 					if (fd1 >= 0) {
-						snprintf(vmc_path, 64, "VMC/%s.bin", vmc[i]);
+						snprintf(vmc_path, 255, "VMC/%s.bin", vmc[i]);
 						// Check vmc cluster chain (write operation can cause dammage)
 						if(fioIoctl(fd1, 0xCAFEC0DE, vmc_path)) {
 							LOG("Cluster Chain OK\n");
@@ -329,7 +329,7 @@ static void usbLaunchGame(int id) {
 }
 
 static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
-	char path[64];
+	char path[255];
 	sprintf(path, "%sART/%s_%s", usbPrefix, name, type);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }

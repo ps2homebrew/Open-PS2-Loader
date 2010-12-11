@@ -48,7 +48,7 @@ static void hddInitModules(void) {
 	hddLoadModules();
 
 	// update Themes
-	char path[32];
+	char path[255];
 	sprintf(path, "%sTHM", hddPrefix);
 	thmAddElements(path, "/");
 
@@ -181,7 +181,7 @@ static void hddSetGameCompatibility(int id, int compatMode, int dmaMode) {
 #ifdef VMC
 static int hddPrepareMcemu(hdl_game_info_t* game) {
 	char vmc[2][32];
-	char vmc_path[64];
+	char vmc_path[255];
 	u32 vmc_size;
 	pfs_inode_t pfs_inode;
 	apa_header part_hdr;
@@ -229,7 +229,7 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 		hdd_vmc_infos.active = 0;
 
-		snprintf(vmc_path, 64, "%sVMC/%s.bin", hddPrefix, vmc[i]);
+		snprintf(vmc_path, 255, "%sVMC/%s.bin", hddPrefix, vmc[i]);
 
 		fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 

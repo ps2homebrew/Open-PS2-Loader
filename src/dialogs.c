@@ -141,8 +141,13 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_ENUM, CFG_EXITTO, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
-	//{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_CHECKUSBFRAG}}}, {UI_SPACER}, {UI_BOOL, CFG_CHECKUSBFRAG, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
+
+	{UI_SPLITTER},
+
+	//{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_CHECKUSBFRAG}}}, {UI_SPACER}, {UI_BOOL, CFG_CHECKUSBFRAG, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_USB_DELAY}}}, {UI_SPACER}, {UI_INT, CFG_USBDELAY, 1, -1, {.intvalue = {3, 3, 0, 99}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_USB_PREFIX}}}, {UI_SPACER}, {UI_STRING, CFG_USBPREFIX, 1, _STR_HINT_NEED_RESTART, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 
 	{UI_SPLITTER},
 

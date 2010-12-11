@@ -40,7 +40,7 @@ int main(int argc, char **argv){
 		GameMode = ETH_MODE;
 	else if (!_strncmp(argv[0], "HDD_MODE", 8))
 		GameMode = HDD_MODE;
-	DPRINTF("Game Mode = %d\n", GameMode);	
+	DPRINTF("Game Mode = %d\n", GameMode);
 
 	if (!_strncmp(&argv[0][9], "0", 1))
 		ExitMode = OSDS_MODE;
@@ -48,16 +48,18 @@ int main(int argc, char **argv){
 		ExitMode = BOOT_MODE;
 	else if (!_strncmp(&argv[0][9], "2", 1))
 		ExitMode = APPS_MODE;
-	DPRINTF("Exit Mode = %d\n", ExitMode);	
+	DPRINTF("Exit Mode = %d\n", ExitMode);
 	
 	DisableDebug = 0;
-
 	if (!_strncmp(&argv[0][11], "1", 1)) {
 		DisableDebug = 1;
 		DPRINTF("Debug color screens enabled\n");
 	}
 
 	char *p = _strtok(&argv[0][13], " ");
+	USBDelay = _strtoui(p);
+	DPRINTF("USB Delay = %d\n", USBDelay);
+	p = _strtok(NULL, " ");
 	_strcpy(g_ps2_ip, p);
 	p = _strtok(NULL, " ");
 	_strcpy(g_ps2_netmask, p);

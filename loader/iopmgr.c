@@ -92,7 +92,7 @@ int New_Reset_Iop(const char *arg, int flag)
 
 		if (GameMode == USB_MODE) {
 			LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
-			delay(3);
+			delay(USBDelay);
 #ifdef __LOAD_DEBUG_MODULES
 			LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
 			LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
@@ -275,7 +275,7 @@ int New_Reset_Iop(const char *arg, int flag)
 	DPRINTF("Loading extra IOP modules...\n");
 	if (GameMode == USB_MODE) {
 		LoadIRXfromKernel(usbd_irx, size_usbd_irx, 0, NULL);
-		delay(3);
+		delay(USBDelay);
 #ifdef __LOAD_DEBUG_MODULES
 		LoadIRXfromKernel(smstcpip_irx, size_smstcpip_irx, 0, NULL);
 		LoadIRXfromKernel(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);

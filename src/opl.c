@@ -476,6 +476,9 @@ static void _loadConfig() {
 			configGetInt(configOPL, "disable_debug", &gDisableDebug);
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
 			//configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
+			configGetInt(configOPL, "usb_delay", &gUSBDelay);
+			if (configGetStr(configOPL, "usb_prefix", &temp))
+				strncpy(gUSBPrefix, temp, 32);
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
 			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
 			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
@@ -520,6 +523,8 @@ static void _saveConfig() {
 		configSetInt(configOPL, "disable_debug", gDisableDebug);
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
 		//configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
+		configSetInt(configOPL, "usb_delay", gUSBDelay);
+		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
 		configSetInt(configOPL, "usb_mode", gUSBStartMode);
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
@@ -815,6 +820,8 @@ static void setDefaults(void) {
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
 	gCheckUSBFragmentation = 0;
+	gUSBDelay = 3;
+	strncpy(gUSBPrefix, "", 32);
 	// disable art by default
 	gEnableArt = 0;
 	gWideScreen = 0;

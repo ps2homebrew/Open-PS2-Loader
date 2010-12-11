@@ -13,8 +13,8 @@ struct game_list_t {
 
 int sbIsSameSize(const char* prefix, int prevSize) {
 	int size = -1;
-	char path[64];
-	snprintf(path, 64, "%sul.cfg", prefix);
+	char path[255];
+	snprintf(path, 255, "%sul.cfg", prefix);
 
 	int fd = openFile(path, O_RDONLY);
 	if (fd >= 0) {
@@ -74,7 +74,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount) {
 	int fd, size, id = 0;
 	size_t count = 0;
-	char path[64];
+	char path[255];
 
 	free(*list);
 	*list = NULL;
@@ -85,16 +85,16 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	struct game_list_t *dlist_head = NULL;
 	
 	// count iso games in "cd" directory
-	snprintf(path, 64, "%sCD", prefix);
+	snprintf(path, 255, "%sCD", prefix);
 	count += scanForISO(path, 0x12, &dlist_head);
 
 	// count iso games in "dvd" directory
-	snprintf(path, 64, "%sDVD", prefix);
+	snprintf(path, 255, "%sDVD", prefix);
 	count += scanForISO(path, 0x14, &dlist_head);
         
         
 	// count and process games in ul.cfg
-	snprintf(path, 64, "%sul.cfg", prefix);
+	snprintf(path, 255, "%sul.cfg", prefix);
 	fd = openFile(path, O_RDONLY);
 	if(fd >= 0) {
 		char buffer[0x040];
@@ -205,8 +205,8 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 }
 
 static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int gamecount, int excludeID) {
-	char path[64];
-	snprintf(path, 64, "%sul.cfg", prefix);
+	char path[255];
+	snprintf(path, 255, "%sul.cfg", prefix);
 
 	file_buffer_t* fileBuffer = openFileBuffer(path, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
 	if (fileBuffer) {

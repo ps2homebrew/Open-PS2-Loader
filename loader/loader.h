@@ -97,6 +97,7 @@ int ExitMode;
 #define OSDS_MODE 0
 #define BOOT_MODE 1
 #define APPS_MODE 2
+int USBDelay;
 
 int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)

@@ -109,7 +109,10 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Error with VMC file, continue with physical MC ?",
 	"Automatic refresh",
 	"About",
-	"Coders"
+	"Coders",
+	"USB delay",
+	"USB prefix path",
+	"Restart will be required to apply the option"
 };
 
 static int guiLangID = 0;

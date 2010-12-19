@@ -37,7 +37,7 @@ extern int size_smb_mcemu_irx;
 #endif
 
 static char *ethPrefix = NULL;
-static int ethULSizePrev = 0;
+static int ethULSizePrev = -2;
 static unsigned char ethModifiedCDPrev[8];
 static unsigned char ethModifiedDVDPrev[8];
 static int ethGameCount = 0;
@@ -115,7 +115,7 @@ void ethInit(void) {
 	LOG("ethInit()\n");
 
 	ethPrefix = "smb0:";
-	ethULSizePrev = -1;
+	ethULSizePrev = -2;
 	memset(ethModifiedCDPrev, 0, 8);
 	memset(ethModifiedDVDPrev, 0, 8);
 	ethGameCount = 0;
@@ -138,23 +138,25 @@ static int ethNeedsUpdate(void) {
 
 	if (gNetworkStartup == 0) {
 		fio_stat_t stat;
-		char path[64];
+		char path[255];
 
-		snprintf(path, 64, "%sCD", ethPrefix);
-		fioGetstat(path, &stat);
+		sprintf(path, "%sCD", ethPrefix);
+		if (fioGetstat(path, &stat) != 0)
+			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedCDPrev, stat.mtime, 8);
 			result = 1;
 		}
 
-		snprintf(path, 64, "%sDVD", ethPrefix);
-		fioGetstat(path, &stat);
+		sprintf(path, "%sDVD", ethPrefix);
+		if (fioGetstat(path, &stat) != 0)
+			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedDVDPrev, stat.mtime, 8);
 			result = 1;
 		}
 
-		if (sbIsSameSize(ethPrefix, ethULSizePrev))
+		if (!sbIsSameSize(ethPrefix, ethULSizePrev))
 			result = 1;
 	}
 	return result;
@@ -163,7 +165,7 @@ static int ethNeedsUpdate(void) {
 static int ethUpdateGameList(void) {
 	if (gNetworkStartup != 0)
 		return 0;
-	
+
 	sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
 	return ethGameCount;
 }
@@ -180,6 +182,13 @@ static char* ethGetGameName(int id) {
 	return ethGames[id].name;
 }
 
+static int ethGetGameNameLength(int id) {
+	if (ethGames[id].isISO)
+		return ISO_GAME_NAME_MAX + 1;
+	else
+		return UL_GAME_NAME_MAX + 1;
+}
+
 static char* ethGetGameStartup(int id) {
 	return ethGames[id].startup;
 }
@@ -187,12 +196,12 @@ static char* ethGetGameStartup(int id) {
 #ifndef __CHILDPROOF
 static void ethDeleteGame(int id) {
 	sbDelete(&ethGames, ethPrefix, "\\", ethGameCount, id);
-	ethULSizePrev = -1;
+	ethULSizePrev = -2;
 }
 
 static void ethRenameGame(int id, char* newName) {
 	sbRename(&ethGames, ethPrefix, "\\", ethGameCount, id, newName);
-	ethULSizePrev = -1;
+	ethULSizePrev = -2;
 }
 #endif
 
@@ -338,14 +347,14 @@ static void ethLaunchGame(int id) {
 	FlushCache(0);
 
 #ifdef VMC
-	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, size_mcemu_irx, &smb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, size_mcemu_irx, &smb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
 #else
-	sysLaunchLoaderElf(game->startup, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
 #endif
 }
 
 static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
-	char path[64];
+	char path[255];
 	sprintf(path, "%sART\\%s_%s", ethPrefix, name, type);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
@@ -442,11 +451,11 @@ int ethSMBDisconnect(void) {
 }
 
 static item_list_t ethGameList = {
-		ETH_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 #ifdef __CHILDPROOF
-		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, NULL, NULL,
+		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
 #else
-		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
+		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
 #endif
 #ifdef VMC
 		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetArt, &ethCleanUp, &ethCheckVMC, ETH_ICON

@@ -291,7 +291,6 @@ void submenuSort(struct submenu_list_t** submenu) {
 	*submenu = head;
 }
 
-
 void menuNextH() {
 	if (!selected_item) {
 		selected_item = menu;

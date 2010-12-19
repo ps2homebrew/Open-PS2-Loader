@@ -76,6 +76,10 @@ static char* appGetItemName(int id) {
 	return cur->key;
 }
 
+static int appGetItemNameLength(int id) {
+	return 32;
+}
+
 static char* appGetItemStartup(int id) {
 	struct config_value_t* cur = appGetConfigValue(id);
 	return cur->val;
@@ -156,11 +160,11 @@ static void appCleanUp(int exception) {
 }
 
 static item_list_t appItemList = {
-		APP_MODE, 32, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
+		APP_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
 #ifdef __CHILDPROOF
-		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, NULL, NULL, NULL, NULL, &appLaunchItem,
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, NULL, NULL, NULL, NULL, &appLaunchItem,
 #else
-		&appGetItemCount, NULL, &appGetItemName, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
 #endif
 #ifdef VMC
 		&appGetArt, &appCleanUp, NULL, APP_ICON

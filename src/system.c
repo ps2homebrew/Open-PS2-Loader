@@ -112,7 +112,8 @@ static void *g_sysLoadedModBuffer[MAX_MODULES];
 #define DEV9_R_146E ((volatile u16*)0xBF80146E)
 #define DEV9_R_1474 ((volatile u16*)0xBF801474)
 
-#define	ROMSEG0(vaddr)	(0xbfc00000 | vaddr)
+#define	ROMSEG0(vaddr)	(0xbfc00000 | vaddr) 	// arghhh! avoid using this macro: some PS2 with modchips badly disabled seems 
+						// to not tolerate very well direct BIOS access!!!
 #define	KSEG0(vaddr)	(0x80000000 | vaddr)
 #define	JAL(addr)	(0x0c000000 | ((addr & 0x03ffffff) >> 2))
 
@@ -678,62 +679,14 @@ int sysExecElf(char *path, int argc, char **argv) {
 	return 0;
 }
 
-static void *getRomdirFS(void) {
-
-	register int i;
-	vu32 *p_rom0 = (vu32 *)ROMSEG0(0x00000000);
-
-	DIntr();
-	ee_kmode_enter();
-
-	// scan rom0:
-	for (i=0; i<0x400000; i+=4) {
-		// search for "RESET"
-		if ((*p_rom0++ == 0x45534552) && (*p_rom0 == 0x00000054))
-			break;
-	}
-
-	ee_kmode_exit();
-	EIntr();
-
-	return (void *)ROMSEG0(i);
-}
-
-static void *getROMfile(char *filename) {
-
-	register u32 offset = 0;
-	void *addr = NULL;
-	romdir_t *romdir_fs = (romdir_t *)getRomdirFS();
-
-	DIntr();
-	ee_kmode_enter();
-
-	while (strlen(romdir_fs->fileName) > 0) {
-
-		if (!strcmp(romdir_fs->fileName, filename)) {
-			addr = (void *)ROMSEG0(offset);
-			break;
-		}
-
-		// arrange size to next 16 bytes multiple 
-		if ((romdir_fs->fileSize % 0x10) == 0)
-			offset += romdir_fs->fileSize;
-		else
-			offset += (romdir_fs->fileSize + 0x10) & 0xfffffff0;
-
-		romdir_fs++;
-	}
-
-	ee_kmode_exit();
-	EIntr();
-
-	return addr;
-}
-
 void sysApplyKernelPatches(void) {
 
-	u8 *romver = (u8 *)getROMfile("ROMVER");
-	if (romver) {
+	u8 romver[16];
+
+	int fd = fioOpen("rom0:ROMVER", O_RDONLY);
+	if (fd >= 0) {
+		fioRead(fd, romver, sizeof(romver));
+		fioClose(fd);
 
 		// Check in rom0 for PS2 with Protokernel
 		DIntr();

@@ -152,6 +152,10 @@ static char* hddGetGameName(int id) {
 	return hddGames->games[id].name;
 }
 
+static int hddGetGameNameLength(int id) {
+	return HDL_GAME_NAME_MAX + 1;
+}
+
 static char* hddGetGameStartup(int id) {
 	return hddGames->games[id].startup;
 }
@@ -415,11 +419,11 @@ static int hddCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t hddGameList = {
-		HDD_MODE, HDL_GAME_NAME_MAX + 1, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		HDD_MODE, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
-		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameStartup, NULL, NULL, &hddGetGameCompatibility,
+		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL, &hddGetGameCompatibility,
 #else
-		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
+		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
 #endif
 #ifdef VMC
 		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, &hddCheckVMC, HDD_ICON

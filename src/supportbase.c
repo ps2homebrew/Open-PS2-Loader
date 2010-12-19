@@ -22,7 +22,7 @@ int sbIsSameSize(const char* prefix, int prevSize) {
 		fioClose(fd);
 	}
 
-	return size != prevSize;
+	return size == prevSize;
 }
 
 static int isValidIsoName(char *name)
@@ -33,7 +33,7 @@ static int isValidIsoName(char *name)
 	int size = strlen(name);
 	if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.') && (stricmp(&name[size - 4], ".iso") == 0)) {
 		size -= 16;
-		if (size <= BASE_GAME_NAME_MAX)
+		if (size <= ISO_GAME_NAME_MAX)
 			return size;
 	}
 
@@ -54,10 +54,10 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 				
 				base_game_info_t *game = &(*glist)->gameinfo;
 
-				strncpy(game->name, &record.name[BASE_GAME_STARTUP_MAX], size);
+				strncpy(game->name, &record.name[GAME_STARTUP_MAX], size);
 				game->name[size] = '\0';
-				strncpy(game->startup, record.name, BASE_GAME_STARTUP_MAX - 1);
-				game->startup[BASE_GAME_STARTUP_MAX - 1] = '\0';
+				strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
+				game->startup[GAME_STARTUP_MAX - 1] = '\0';
 				game->parts = 0x01;
 				game->media = type;
 				game->isISO = 1;
@@ -112,10 +112,10 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 				base_game_info_t *g = &(*list)[id++];
 
 				// to ensure no leaks happen, we copy manually and pad the strings
-				memcpy(g->name, buffer, BASE_GAME_NAME_MAX);
-				g->name[BASE_GAME_NAME_MAX] = '\0';
-				memcpy(g->startup, &buffer[BASE_GAME_NAME_MAX + 3], BASE_GAME_STARTUP_MAX);
-				g->startup[BASE_GAME_STARTUP_MAX] = '\0';
+				memcpy(g->name, buffer, UL_GAME_NAME_MAX);
+				g->name[UL_GAME_NAME_MAX] = '\0';
+				memcpy(g->startup, &buffer[UL_GAME_NAME_MAX + 3], GAME_STARTUP_MAX);
+				g->startup[GAME_STARTUP_MAX] = '\0';
 				memcpy(&g->parts, &buffer[47], 1);
 				memcpy(&g->media, &buffer[48], 1);
 				g->isISO = 0;
@@ -151,9 +151,9 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 	if (game->isISO)
 		strcpy(isoname, game->startup);
 	else {
-		char gamename[BASE_GAME_NAME_MAX + 1];
-		memset(gamename, 0, BASE_GAME_NAME_MAX + 1);
-		strncpy(gamename, game->name, BASE_GAME_NAME_MAX);
+		char gamename[UL_GAME_NAME_MAX + 1];
+		memset(gamename, 0, UL_GAME_NAME_MAX + 1);
+		strncpy(gamename, game->name, UL_GAME_NAME_MAX);
 		sprintf(isoname,"ul.%08X.%s", USBA_crc32(gamename), game->startup);
 	}
 
@@ -164,7 +164,7 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 	}
 
 	memcpy((void*)((u32)cdvdman_irx + i), isoname, strlen(isoname) + 1);
-	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1);
+	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1); // TODO long filename
 	memcpy((void*)((u32)cdvdman_irx + i + 34), &game->media, 1);
 	if (compatmask & COMPAT_MODE_2) {
 		u32 alt_read_mode = 1;
@@ -224,11 +224,11 @@ static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int game
 			game = &(*list)[i];
 
 			if (!game->isISO  && (i != excludeID)) {
-				memset(buffer, 0, BASE_GAME_NAME_MAX);
-				memset(&buffer[BASE_GAME_NAME_MAX + 3], 0, BASE_GAME_STARTUP_MAX);
+				memset(buffer, 0, UL_GAME_NAME_MAX);
+				memset(&buffer[UL_GAME_NAME_MAX + 3], 0, GAME_STARTUP_MAX);
 
-				memcpy(buffer, game->name, BASE_GAME_NAME_MAX);
-				memcpy(&buffer[BASE_GAME_NAME_MAX + 3], game->startup, BASE_GAME_STARTUP_MAX);
+				memcpy(buffer, game->name, UL_GAME_NAME_MAX);
+				memcpy(&buffer[UL_GAME_NAME_MAX + 3], game->startup, GAME_STARTUP_MAX);
 				buffer[47] = game->parts;
 				buffer[48] = game->media;
 
@@ -277,6 +277,9 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 		}
 		fileXioRename(oldpath, newpath);
 	} else {
+		memset(game->name, 0, UL_GAME_NAME_MAX);
+		memcpy(game->name, newname, UL_GAME_NAME_MAX);
+
 		char *pathStr = "%sul.%08X.%s.%02x";
 		unsigned int oldcrc = USBA_crc32(game->name);
 		unsigned int newcrc = USBA_crc32(newname);
@@ -287,7 +290,6 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 			fileXioRename(oldpath, newpath);
 		} while(i < game->parts);
 
-		memcpy(game->name, newname, BASE_GAME_NAME_MAX);
 		sbRebuildULCfg(list, prefix, gamecount, -1);
 	}
 }

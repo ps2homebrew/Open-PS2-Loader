@@ -25,8 +25,6 @@ typedef struct
 {
 	int mode;
 
-	int maxNameLength;
-
 	int enabled;
 
 	/// update in progress indicator
@@ -54,6 +52,8 @@ typedef struct
 	void* (*itemGet)(int id);
 
 	char* (*itemGetName)(int id);
+
+	int (*itemGetNameLength)(int id);
 
 	char* (*itemGetStartup)(int id);
 

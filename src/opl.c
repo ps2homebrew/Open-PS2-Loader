@@ -161,9 +161,10 @@ static void itemExecCircle(struct menu_item_t *self, int id) {
 
 	if (support) {
 		if (support->itemRename) {
-			char newName[support->maxNameLength];
-			strncpy(newName, self->current->item.text, support->maxNameLength);
-			if (guiShowKeyboard(newName, support->maxNameLength)) {
+			int nameLength = support->itemGetNameLength(id);
+			char newName[nameLength];
+			strncpy(newName, self->current->item.text, nameLength);
+			if (guiShowKeyboard(newName, nameLength)) {
 				support->itemRename(id, newName);
 				if (gAutoRefresh)
 					gFrameCounter = UPDATE_FRAME_COUNT;
@@ -398,7 +399,7 @@ static int tryAlternateDevice(int types) {
 
 	// check HDD
 	hddLoadModules();
-	snprintf(path, 64, "pfs0:conf_opl.cfg");
+	sprintf(path, "pfs0:conf_opl.cfg");
 	value = fioOpen(path, O_RDONLY);
 	if(value >= 0) {
 		fioClose(value);
@@ -475,7 +476,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "default_device", &gDefaultDevice);
 			configGetInt(configOPL, "disable_debug", &gDisableDebug);
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
-			//configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
+			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
 			configGetInt(configOPL, "usb_delay", &gUSBDelay);
 			if (configGetStr(configOPL, "usb_prefix", &temp))
 				strncpy(gUSBPrefix, temp, 32);
@@ -522,7 +523,7 @@ static void _saveConfig() {
 		configSetInt(configOPL, "default_device", gDefaultDevice);
 		configSetInt(configOPL, "disable_debug", gDisableDebug);
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
-		//configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
+		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
 		configSetInt(configOPL, "usb_delay", gUSBDelay);
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);

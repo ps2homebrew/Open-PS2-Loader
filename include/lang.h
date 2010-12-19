@@ -108,8 +108,7 @@
 #define _STR_DEVS					103
 #define _STR_USB_DELAY				104
 #define _STR_USB_PREFIX				105
-#define _STR_HINT_NEED_RESTART		106
-#define LANG_STR_COUNT 107
+#define LANG_STR_COUNT 106
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

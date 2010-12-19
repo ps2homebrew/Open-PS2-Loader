@@ -194,14 +194,14 @@ static void thmLoad(char* themePath) {
 			newT->displayedItems = intValue;
 	}
 
-	newT->drawBackground = &guiDrawBGPicture;
+	newT->drawBackground = &guiDrawBGArt;
 	if (configGetInt(themeConfig, "background_mode", &intValue)) {
 		if (intValue == BG_MODE_COLOR)
 			newT->drawBackground = &guiDrawBGColor;
+		else if (intValue == BG_MODE_PICTURE)
+			newT->drawBackground = &guiDrawBGPicture;
 		else if (intValue == BG_MODE_PLASMA)
 			newT->drawBackground = &guiDrawBGPlasma;
-		else if (intValue == BG_MODE_ART)
-			newT->drawBackground = &guiDrawBGArt;
 	}
 	newT->drawAltBackground = &guiDrawBGPlasma;
 	if (configGetInt(themeConfig, "background_alt_mode", &intValue)) {

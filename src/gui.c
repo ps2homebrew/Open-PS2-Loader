@@ -446,7 +446,6 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 
 
 	if (size != -1) {
-		diaVMC[22].type = UI_SPLITTER;
 		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
 
@@ -462,18 +461,22 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 			diaSetInt(diaVMC, VMC_SIZE, 0);
 			diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_ERROR));
 		}
+
+		if (gEnableDandR) {
+			diaSetEnabled(diaVMC, VMC_SIZE, 1);
+			diaVMC[22].type = UI_SPLITTER;
+		}
+		else {
+			diaSetEnabled(diaVMC, VMC_SIZE, 0);
+			diaVMC[22].type = UI_TERMINATOR;
+		}
 	}
 	else {
-		diaVMC[22].type = UI_TERMINATOR;
 		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_CREATE));
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_NEW));
-		diaSetInt(diaVMC, VMC_SIZE, 0);
-	}
 
-	if (gEnableDandR)
+		diaSetInt(diaVMC, VMC_SIZE, 0);
 		diaSetEnabled(diaVMC, VMC_SIZE, 1);
-	else {
-		diaSetEnabled(diaVMC, VMC_SIZE, 0);
 		diaVMC[22].type = UI_TERMINATOR;
 	}
 

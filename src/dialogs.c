@@ -231,7 +231,7 @@ struct UIItem diaVMC[] = {
 	{UI_SPLITTER},
 	{UI_BUTTON, VMC_BUTTON_CREATE, 1, -1, {.label = {NULL, -1}}},
 
-	{UI_SPLITTER},
+	{UI_SPLITTER}, // UIItem #22
 	{UI_BUTTON, VMC_BUTTON_DELETE, 1, -1, {.label = {NULL, _STR_DELETE}}},
 
 	// end of dialog

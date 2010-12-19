@@ -111,8 +111,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"About",
 	"Coders",
 	"USB delay",
-	"USB prefix path",
-	"Restart will be required to apply the option"
+	"USB prefix path"
 };
 
 static int guiLangID = 0;

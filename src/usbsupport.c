@@ -33,7 +33,9 @@ void *usbd_irx;
 int size_usbd_irx;
 
 static char usbPrefix[40];
-static int usbULSizePrev = 0;
+static int usbULSizePrev = -2;
+static unsigned char usbModifiedCDPrev[8];
+static unsigned char usbModifiedDVDPrev[8];
 static int usbGameCount = 0;
 static base_game_info_t *usbGames;
 
@@ -45,11 +47,11 @@ int usbFindPartition(char *target, char *name) {
 	char path[255];
 
 	for(i=0; i<5; i++) {
-		snprintf(path, 255, "mass%d:%s/%s", i, gUSBPrefix, name);
+		sprintf(path, "mass%d:%s/%s", i, gUSBPrefix, name);
 		fd = fioOpen(path, O_RDONLY);
 
 		if(fd >= 0) {
-			snprintf(target, 255, "mass%d:%s/", i, gUSBPrefix);
+			sprintf(target, "mass%d:%s/", i, gUSBPrefix);
 			fioClose(fd);
 			return 1;
 		}
@@ -105,7 +107,9 @@ void usbLoadModules(void) {
 
 void usbInit(void) {
 	LOG("usbInit()\n");
-	usbULSizePrev = -1;
+	usbULSizePrev = -2;
+	memset(usbModifiedCDPrev, 0, 8);
+	memset(usbModifiedDVDPrev, 0, 8);
 	usbGameCount = 0;
 	usbGames = NULL;
 
@@ -121,14 +125,35 @@ item_list_t* usbGetObject(int initOnly) {
 }
 
 static int usbNeedsUpdate(void) {
-	if (usbULSizePrev == -1) // means we have not detected any usb device (yet), or no ul.cfg file present
-		return 1;
+	int result = 0;
+	fio_stat_t stat;
+	char path[255];
 
-	return sbIsSameSize(usbPrefix, usbULSizePrev);
+	usbFindPartition(usbPrefix, "ul.cfg");
+
+	sprintf(path, "%sCD", usbPrefix);
+	if (fioGetstat(path, &stat) != 0)
+		memset(stat.mtime, 0, 8);
+	if (memcmp(usbModifiedCDPrev, stat.mtime, 8)) {
+		memcpy(usbModifiedCDPrev, stat.mtime, 8);
+		result = 1;
+	}
+
+	sprintf(path, "%sDVD", usbPrefix);
+	if (fioGetstat(path, &stat) != 0)
+		memset(stat.mtime, 0, 8);
+	if (memcmp(usbModifiedDVDPrev, stat.mtime, 8)) {
+		memcpy(usbModifiedDVDPrev, stat.mtime, 8);
+		result = 1;
+	}
+
+	if (!sbIsSameSize(usbPrefix, usbULSizePrev))
+		result = 1;
+
+	return result;
 }
 
 static int usbUpdateGameList(void) {
-	usbFindPartition(usbPrefix, "ul.cfg");
 	sbReadList(&usbGames, usbPrefix, &usbULSizePrev, &usbGameCount);
 	return usbGameCount;
 }
@@ -145,6 +170,13 @@ static char* usbGetGameName(int id) {
 	return usbGames[id].name;
 }
 
+static int usbGetGameNameLength(int id) {
+	if (usbGames[id].isISO)
+		return ISO_GAME_NAME_MAX + 1;
+	else
+		return UL_GAME_NAME_MAX + 1;
+}
+
 static char* usbGetGameStartup(int id) {
 	return usbGames[id].startup;
 }
@@ -152,14 +184,13 @@ static char* usbGetGameStartup(int id) {
 #ifndef __CHILDPROOF
 static void usbDeleteGame(int id) {
 	sbDelete(&usbGames, usbPrefix, "/", usbGameCount, id);
-	usbULSizePrev = -1;
+	usbULSizePrev = -2;
 }
 
 /*static void usbRenameGame(int id, char* newName) {
 	// TODO when/if Jimmi add rename functionnality to usbhdfs, then we should use the above method
 	//sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
-
-	usbULSizePrev = -1;
+	usbULSizePrev = -2;
 }*/
 #endif
 
@@ -190,7 +221,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
 		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
 
-		snprintf(vmc_path, 255, "%sVMC/%s.bin", usbPrefix, vmc[i]);
+		sprintf(vmc_path, "%sVMC/%s.bin", usbPrefix, vmc[i]);
 
 		fd = fioOpen(vmc_path, O_RDWR);
 		if (fd >= 0) {
@@ -221,7 +252,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 					int fd1 = fioDopen(usbPrefix);
 
 					if (fd1 >= 0) {
-						snprintf(vmc_path, 255, "VMC/%s.bin", vmc[i]);
+						sprintf(vmc_path, "%s/VMC/%s.bin", gUSBPrefix, vmc[i]);
 						// Check vmc cluster chain (write operation can cause dammage)
 						if(fioIoctl(fd1, 0xCAFEC0DE, vmc_path)) {
 							LOG("Cluster Chain OK\n");
@@ -252,7 +283,7 @@ static int usbPrepareMcemu(base_game_info_t* game) {
 
 static void usbLaunchGame(int id) {
 	int fd, r, index, i, compatmask;
-	char isoname[32], partname[64], filename[32];
+	char isoname[32], partname[255], filename[32];
 	base_game_info_t* game = &usbGames[id];
 
 	fd = fioDopen(usbPrefix);
@@ -261,12 +292,26 @@ static void usbLaunchGame(int id) {
 		return;
 	}
 
+	if (game->isISO)
+		sprintf(partname, "%s/%s/%s.%s.iso", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
+	else
+		sprintf(partname, "%s/%s.00", gUSBPrefix, isoname);
+	r = fioIoctl(fd, 0xDEADC0DE, partname);
+	LOG("mass storage device sectorsize = %d\n", r);
+
+	void *irx = &usb_cdvdman_irx;
+	int irx_size = size_usb_cdvdman_irx;
+	if (r == 4096) {
+		irx = &usb_4Ksectors_cdvdman_irx;
+		irx_size = size_usb_4Ksectors_cdvdman_irx;
+	}
+
+	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &index);
+
 	if (gCheckUSBFragmentation)
 		for (i = 0; i < game->parts; i++) {
-			if (game->isISO)
-				sprintf(partname,"%s/%s.%s.iso", (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
-			else
-				sprintf(partname,"%s.%02x",isoname, i);
+			if (!game->isISO)
+				sprintf(partname, "%s/%s.%02x", gUSBPrefix, isoname, i);
 
 			if (fioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
 				fioDclose(fd);
@@ -280,25 +325,10 @@ static void usbLaunchGame(int id) {
 		saveConfig(CONFIG_LAST, 0);
 	}
 
-	void *irx = &usb_cdvdman_irx;
-	int irx_size = size_usb_cdvdman_irx;
 	int offset = 44;
-
-	r = fioIoctl(fd, 0xDEADC0DE, partname);
-	LOG("mass storage device sectorsize = %d\n", r);
-
-	if (r == 4096) {
-		irx = &usb_4Ksectors_cdvdman_irx;
-		irx_size = size_usb_4Ksectors_cdvdman_irx;
-	}
-
-	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &index);
-
 	for (i = 0; i < game->parts; i++) {
-		if (game->isISO)
-			sprintf(partname,"%s/%s.%s.iso", (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
-		else
-			sprintf(partname,"%s.%02x",isoname, i);
+		if (!game->isISO)
+			sprintf(partname, "%s/%s.%02x", gUSBPrefix, isoname, i);
 
 		r = fioIoctl(fd, 0xBEEFC0DE, partname);
 		memcpy((void*)((u32)&usb_cdvdman_irx + index + offset), &r, 4);
@@ -322,9 +352,9 @@ static void usbLaunchGame(int id) {
 	FlushCache(0);
 
 #ifdef VMC
-	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
 #else
-	sysLaunchLoaderElf(game->startup, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
 #endif
 }
 
@@ -349,11 +379,11 @@ static int usbCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t usbGameList = {
-		USB_MODE, BASE_GAME_NAME_MAX + 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+		USB_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
 #ifdef __CHILDPROOF
-		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, NULL, NULL,
+		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
 #else
-		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameStartup, &usbDeleteGame, NULL,
+		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, NULL,
 #endif
 #ifdef VMC
 		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, &usbCheckVMC, USB_ICON

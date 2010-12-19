@@ -570,7 +570,6 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 			else if (vmc_operation == OPERATION_CREATING) { // User canceled creation of VMC
 				fileXioDevctl("genvmc:", 0xC0DE0002, NULL, 0, NULL, 0);
 				vmc_operation = OPERATION_ABORTING;
-				// TODO delete VMC ?
 			}
 		}
 		else if (result == VMC_BUTTON_DELETE) {
@@ -585,7 +584,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 			size = guiRefreshVMCConfig(support, vmc);
 		}
 
-		result = diaExecuteDialog(diaVMC, result, 0, &guiVMCUpdater);
+		result = diaExecuteDialog(diaVMC, result, 1, &guiVMCUpdater);
 
 		if ((result == 0) && (vmc_operation == OPERATION_CREATE))
 			break;
@@ -648,7 +647,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_USE_GENERIC));
 #endif
 
-		result = diaExecuteDialog(diaCompatConfig, result, 0, NULL);
+		result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
 		if (result == COMPAT_LOADFROMDISC) {
 			char hexDiscID[15];

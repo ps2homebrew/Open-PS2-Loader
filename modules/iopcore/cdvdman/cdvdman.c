@@ -70,7 +70,8 @@ static int g_part_start[ISO_MAX_PARTS] = {
 	0
 }; 
 
-static char g_DiskID[] = "B00BS";
+static char g_DiskID[] = "\0B00BS"; 	// the null byte is here to ensure the ISO name string 
+					// (stored in array above) is terminated when it's 64 bytes
 
 #ifdef SMB_DRIVER
 static char g_pc_ip[]="xxx.xxx.xxx.xxx";

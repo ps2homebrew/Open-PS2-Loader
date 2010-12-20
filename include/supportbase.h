@@ -2,7 +2,7 @@
 #define __SUPPORT_BASE_H
 
 #define UL_GAME_NAME_MAX	32
-#define ISO_GAME_NAME_MAX	32 // TODO stay at 32 for the moment, will be 64
+#define ISO_GAME_NAME_MAX	64
 #define GAME_STARTUP_MAX	12
 
 typedef struct

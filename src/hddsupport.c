@@ -347,15 +347,20 @@ static void hddLaunchGame(int id) {
 		memcpy((void*)((u32)irx+i+40),&no_pss,4);
 	}
 
-	// game id
-	memcpy((void*)((u32)irx+i+84), &gid, 5);
-
 	// patch 48bit flag
 	u8 flag_48bit = hddIs48bit() & 0xff;
 	memcpy((void*)((u32)irx+i+34), &flag_48bit, 1);
 
 	// patch start_sector
 	memcpy((void*)((u32)irx+i+44), &game->start_sector, 4);
+
+	for (i=0;i<size_irx;i++){
+		if(!strcmp((const char*)((u32)irx+i),"B00BS")){
+			break;
+		}
+	}
+	// game id
+	memcpy((void*)((u32)irx+i), &gid, 5);
 
 	// patches cdvdfsv
 	void *cdvdfsv_irx;

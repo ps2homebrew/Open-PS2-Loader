@@ -50,9 +50,15 @@ static char g_gamesetting_alt_read=0;
 static int g_gamesetting_disable_DVDDL=0;
 static int g_gamesetting_0_pss=0;
 
-#define ISO_MAX_PARTS	10
+#define ISO_MAX_PARTS	16
 static int g_part_start[ISO_MAX_PARTS] = {
 	0,	// is apa header LBA in HDD use, is Long filename in SMB+ISO
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
 	0,
 	0,
 	0,

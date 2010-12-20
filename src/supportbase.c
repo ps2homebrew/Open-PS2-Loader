@@ -179,10 +179,15 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 		memcpy((void*)((u32)cdvdman_irx + i + 40), &no_pss, 4);
 	}
 
-	// game id
-	memcpy((void*)((u32)cdvdman_irx + i + 84), &gameid, 5);
-
 	*patchindex = i;
+
+	for (i = 0; i < size_cdvdman; i++) {
+		if (!strcmp((const char*)((u32)cdvdman_irx + i),"B00BS")) {
+			break;
+		}
+	}
+	// game id
+	memcpy((void*)((u32)cdvdman_irx + i), &gameid, 5);
 
 	// patches cdvdfsv
 	void *cdvdfsv_irx;

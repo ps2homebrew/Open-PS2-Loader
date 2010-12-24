@@ -160,15 +160,24 @@ int New_Reset_Iop(const char *arg, int flag)
 			if(!DisableDebug)
 				GS_BGCOLOUR = 0x000080;
 
-			// some games like SOCOM3 uses faulty IOPRP path like "cdrom0:\RUN\IRX\DNAS300.IMGG;1"
-			// this part ensure it will not get stucked on red screen
-			char *p = _strrchr(ioprp_path, '.');
-			if (p) {
-				p[4] = ';';
-				p[5] = '1';
-				p[6] = 0;
+			register int retry_count = 0;
+			while (retry_count++ < 2) {
+				// some games like SOCOM3 uses faulty IOPRP path like "cdrom0:\RUN\IRX\DNAS300.IMGG;1"
+				// some games from Army Men series uses faulty IOPRP path like "cdrom0:\IRX\IOPRP205.IMG.IMG;1"
+				// this part ensure it will not get stucked on red screen
+				char *p;
+				if (retry_count == 1)
+					p = _strrchr(ioprp_path, '.');
+				else if (retry_count == 2)
+					p = _strchr(ioprp_path, '.');
 
-				fd = open(ioprp_path, O_RDONLY);
+				if (p) {
+					p[4] = ';';
+					p[5] = '1';
+					p[6] = 0;
+
+					fd = open(ioprp_path, O_RDONLY);
+				}
 			}
 
 			if (fd < 0)

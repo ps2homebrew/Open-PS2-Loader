@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[35] = {
+static patchlist_t patch_list[38] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -31,6 +31,9 @@ static patchlist_t patch_list[35] = {
 	{ "SLPS_203.45", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Phantom Brave NTSC J - disable cdvd timeout stuff
 	{ "SLPS_203.44", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Phantom Brave (limited edition) NTSC J - disable cdvd timeout stuff
 	{ "SLPS_731.08", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Phantom Brave: 2-shuume Hajime Mashita (PlayStation 2 the Best) NTSC J - disable cdvd timeout stuff
+	{ "SLUS_213.17", ALL_MODE, { 0xbabecafe, 0x00149210, 0x00000000 }}, // SFA anthology US
+	{ "SLES_540.85", ALL_MODE, { 0xbabecafe, 0x00148db0, 0x00000000 }}, // SFA anthology EUR
+	{ "SLPM_659.98", ALL_MODE, { 0xbabecafe, 0x00146fd0, 0x00000000 }}, // Vampire: Darkstakers collection JP
 	{ "SLUS_212.00", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
 	{ "SLES_538.19", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker PAL - skip failing case on binding a RPC server
 	{ "SLPS_254.08", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC J - skip failing case on binding a RPC server
@@ -190,6 +193,27 @@ static void generic_delayed_cdRead_patches(u32 patch_addr, u32 delay_cycles)
 	_sw(JAL((u32)delayed_cdRead), patch_addr);
 }
 
+
+static int (*capcom_lmb)(void *modpack_addr, int mod_index, int mod_argc, char **mod_argv);
+
+static void apply_capcom_protection_patch(void *modpack_addr, int mod_index, int mod_argc, char **mod_argv)
+{
+	u32 iop_addr = _lw((u32)modpack_addr + (mod_index << 3) + 8);
+	u32 opcode = 0x10000025;
+	smem_write((void *)(iop_addr+0x270), (void *)&opcode, sizeof(opcode));
+	FlushCache(0);
+	FlushCache(2);
+
+	capcom_lmb(modpack_addr, mod_index, mod_argc, mod_argv);
+}
+
+static void generic_capcom_protection_patches(u32 patch_addr)
+{
+	capcom_lmb = (void *)FNADDR(_lw(patch_addr));
+	_sw(JAL((u32)apply_capcom_protection_patch), patch_addr);
+}
+
+
 void apply_patches(void)
 {
 	patchlist_t *p = (patchlist_t *)&patch_list[0];
@@ -204,6 +228,8 @@ void apply_patches(void)
 				AC9B_generic_patches(); // Armored Core 9 Breaker USB generic patch
 			else if (p->patch.addr == 0xdeadbee2)
 				generic_delayed_cdRead_patches(p->patch.check, p->patch.val); // slow reads generic patch
+			else if (p->patch.addr == 0xbabecafe)
+				generic_capcom_protection_patches(p->patch.val); // Capcom anti cdvd emulator protection patch
 
 			// non-generic patches
 			else if (_lw(p->patch.addr) == p->patch.check)

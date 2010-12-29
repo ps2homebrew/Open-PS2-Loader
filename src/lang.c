@@ -111,7 +111,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"About",
 	"Coders",
 	"USB delay",
-	"USB prefix path"
+	"USB prefix path",
+	"Leave empty to exit to PS2Browser"
 };
 
 static int guiLangID = 0;

@@ -139,7 +139,7 @@ struct UIItem diaConfig[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_ENUM, CFG_EXITTO, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, _STR_HINT_EXITPATH, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 

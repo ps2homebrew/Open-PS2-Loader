@@ -266,6 +266,35 @@ _SifSetDma:
 	/* restore the original stack pointer */
 	daddu	$sp, $a2, $zero
 
+#ifdef LOAD_EECORE_DOWN
+	lui	$v0, 0x000b
+#else
+	lui	$v0, 0x0008
+	ori	$v0, $v0, 0x8000
+#endif
+1:	
+	sq	$zero, 0x0000($v0)
+	sq	$zero, 0x0010($v0)
+	sq	$zero, 0x0020($v0)
+	sq	$zero, 0x0030($v0)
+	addiu	$v0, $v0, 0x0040
+#ifdef LOAD_EECORE_DOWN
+	lui	$v1, 0x0010
+#else
+	lui	$v1, 0x000e
+	ori	$v1, $v1, 0x7000
+#endif
+	sltu	$v1, $v0, $v1
+	bne	$v1, $zero, 1b
+
+	/* FlushCache */
+	daddu	$a0, $zero, $zero
+	addiu	$v1, $zero, __NR_FlushCache
+	syscall
+	addiu	$a0, $zero, 2
+	addiu	$v1, $zero, __NR_FlushCache
+	syscall
+
 	jr	$ra
 	addiu	$v0, $zero, 1
 

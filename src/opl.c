@@ -449,7 +449,6 @@ static void _loadConfig() {
 			configGetColor(configOPL, "text_color", gDefaultTextColor);
 			configGetColor(configOPL, "ui_text_color", gDefaultUITextColor);
 			configGetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
-			configGetInt(configOPL, "exit_mode", &gExitMode);
 			configGetInt(configOPL, "enable_coverart", &gEnableArt);
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
 
@@ -470,6 +469,8 @@ static void _loadConfig() {
 				strncpy(gPCUserName, temp, 32);
 			if (configGetStr(configOPL, "pc_pass", &temp))
 				strncpy(gPCPassword, temp, 32);
+			if (configGetStr(configOPL, "exit_path", &temp))
+				strncpy(gExitPath, temp, 32);
 
 			configGetInt(configOPL, "autosort", &gAutosort);
 			configGetInt(configOPL, "autorefresh", &gAutoRefresh);
@@ -507,7 +508,6 @@ static void _saveConfig() {
 		configSetColor(configOPL, "text_color", gDefaultTextColor);
 		configSetColor(configOPL, "ui_text_color", gDefaultUITextColor);
 		configSetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
-		configSetInt(configOPL, "exit_mode", gExitMode);
 		configSetInt(configOPL, "enable_coverart", gEnableArt);
 		configSetInt(configOPL, "wide_screen", gWideScreen);
 
@@ -518,6 +518,7 @@ static void _saveConfig() {
 		configSetStr(configOPL, "pc_share", gPCShareName);
 		configSetStr(configOPL, "pc_user", gPCUserName);
 		configSetStr(configOPL, "pc_pass", gPCPassword);
+		configSetStr(configOPL, "exit_path", gExitPath);
 		configSetInt(configOPL, "autosort", gAutosort);
 		configSetInt(configOPL, "autorefresh", gAutoRefresh);
 		configSetInt(configOPL, "default_device", gDefaultDevice);
@@ -796,9 +797,9 @@ static void setDefaults(void) {
 	gPCPort = 445;
 	
 	// default values
-	strncpy(gPCShareName, "", 32);
+	strncpy(gPCShareName, "PS2SMB", 32);
 	strncpy(gPCUserName, "GUEST", 32);
-	strncpy(gPCPassword,  "", 32);
+	strncpy(gPCPassword, "", 32);
 	
 	// loading progress of the network and hdd. Value "6" should mean not started yet...
 	gNetworkStartup = 6;
@@ -806,11 +807,9 @@ static void setDefaults(void) {
 	
 	// no change to the ipconfig was done
 	gIPConfigChanged = 0;
-	// Default PC share name
-	strncpy(gPCShareName, "PS2SMB", 32);
 	gScrollSpeed = 1;
-	//Default exit mode
-	gExitMode = 0;
+	//Default exit path
+	strncpy(gExitPath, "", 32);
 	// default menu
 	gDefaultDevice = APP_MODE;
 	// autosort defaults to zero

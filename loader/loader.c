@@ -42,21 +42,20 @@ int main(int argc, char **argv){
 		GameMode = HDD_MODE;
 	DPRINTF("Game Mode = %d\n", GameMode);
 
-	if (!_strncmp(&argv[0][9], "0", 1))
-		ExitMode = OSDS_MODE;
-	else if (!_strncmp(&argv[0][9], "1", 1))
-		ExitMode = BOOT_MODE;
-	else if (!_strncmp(&argv[0][9], "2", 1))
-		ExitMode = APPS_MODE;
-	DPRINTF("Exit Mode = %d\n", ExitMode);
-	
 	DisableDebug = 0;
-	if (!_strncmp(&argv[0][11], "1", 1)) {
+	if (!_strncmp(&argv[0][9], "1", 1)) {
 		DisableDebug = 1;
 		DPRINTF("Debug color screens enabled\n");
 	}
 
-	char *p = _strtok(&argv[0][13], " ");
+	char *p = _strtok(&argv[0][11], " ");
+	if (!_strncmp(p, "Browser", 7))
+		ExitPath[0] = '\0';
+	else
+		_strcpy(ExitPath, p);
+	DPRINTF("Exit Path = (%s)\n", ExitPath);
+
+	p = _strtok(NULL, " ");
 	USBDelay = _strtoui(p);
 	DPRINTF("USB Delay = %d\n", USBDelay);
 	p = _strtok(NULL, " ");

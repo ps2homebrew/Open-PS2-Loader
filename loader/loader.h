@@ -93,10 +93,7 @@ int GameMode;
 #define ETH_MODE 	1
 #define HDD_MODE 	2
 
-int ExitMode;
-#define OSDS_MODE 0
-#define BOOT_MODE 1
-#define APPS_MODE 2
+char ExitPath[32];
 int USBDelay;
 
 int DisableDebug;

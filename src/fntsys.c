@@ -19,8 +19,6 @@ extern void* freesansfont_raw;
 extern int size_freesansfont_raw;
 
 // freetype vars
-static FT_Face face;
-static FT_GlyphSlot slot;
 static FT_Library font_library;
 
 static rm_quad_t quad;
@@ -42,51 +40,68 @@ typedef struct {
 	GSTEXTURE texture;
 }  fnt_glyph_cache_entry_t;
 
-/** GLYPH CACHE. Every glyph in the ASCII range is cached when first used
-* this means no additional memory aside from the one needed to render the
-* character set is used.
-*/
-static fnt_glyph_cache_entry_t **glyphCache;
-static int cacheMaxPageID;
+/** A whole font definition */
+typedef struct {
+    /** GLYPH CACHE. Every glyph in the ASCII range is cached when first used
+    * this means no additional memory aside from the one needed to render the
+    * character set is used.
+    */
+    fnt_glyph_cache_entry_t **glyphCache;
+
+    /// Maximal font cache page index
+    int cacheMaxPageID;
+
+    /// Font face
+    FT_Face face;
+
+    /// Nonzero if font is used
+    int isValid;
+
+    /// Nonzero for custom fonts
+    int isDefault;
+} font_t;
+
+/// Array of font definitions
+static font_t *fonts = NULL;
+/// Last valid font ID
+static int fontMaxID = -1;
+
 #define GLYPH_CACHE_PAGE_SIZE 256
 
-static int fntPrepareGlyphCachePage(int pageid) {
-	if (pageid > cacheMaxPageID) {
-		fnt_glyph_cache_entry_t **np = realloc(glyphCache, (pageid + 1) * sizeof(fnt_glyph_cache_entry_t *));
+static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
+        if (pageid > font->cacheMaxPageID) {
+                fnt_glyph_cache_entry_t **np = realloc(font->glyphCache, (pageid + 1) * sizeof(fnt_glyph_cache_entry_t *));
 		
 		if (!np)
 			return 0;
 		
-		glyphCache = np;
+                font->glyphCache = np;
 		
 		unsigned int page;
-		for (page = cacheMaxPageID + 1; page <= pageid; ++page)
-			glyphCache[page] = NULL;
+                for (page = font->cacheMaxPageID + 1; page <= pageid; ++page)
+                        font->glyphCache[page] = NULL;
 		
-		cacheMaxPageID = pageid;
+                font->cacheMaxPageID = pageid;
 	}
 	
 	// if it already was allocated, skip this
-	if (glyphCache[pageid])
+        if (font->glyphCache[pageid])
 		return 1;
 	
 	// allocate the page
-	glyphCache[pageid] = malloc(sizeof(fnt_glyph_cache_entry_t) * GLYPH_CACHE_PAGE_SIZE);
+        font->glyphCache[pageid] = malloc(sizeof(fnt_glyph_cache_entry_t) * GLYPH_CACHE_PAGE_SIZE);
 	
 	int i;
 	
 	for (i = 0; i < GLYPH_CACHE_PAGE_SIZE; ++i) {
-		glyphCache[pageid][i].isValid = 0;
-		glyphCache[pageid][i].glyphData = NULL; 
+                font->glyphCache[pageid][i].isValid = 0;
+                font->glyphCache[pageid][i].glyphData = NULL;
 	}
 	
 	return 1;
 }
 
 void fntInit(void) {
-	cacheMaxPageID = -1;
-	glyphCache = NULL;
-	
 	int error = FT_Init_FreeType( &font_library );
 
 	if ( error ) {
@@ -95,7 +110,11 @@ void fntInit(void) {
 		// SleepThread();
 	}
 
-	fntLoad(NULL, -1, 0);
+        fonts = NULL;
+        fontMaxID = -1;
+
+        // load the default font (will be id=0)
+        fntLoad(NULL, -1);
 }
 
 static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
@@ -110,34 +129,79 @@ static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
 	}
 }
 
-static void fntCacheFlush(void) {
+static void fntCacheFlush(font_t *fnt) {
 	int i;
 
 	// Release all the glyphs from the cache
-	for (i = 0; i <= cacheMaxPageID; ++i) {
-		if (glyphCache[i]) {
-			fntCacheFlushPage(glyphCache[i]);
-			free(glyphCache[i]);
-			glyphCache[i] = NULL;
+        for (i = 0; i <= fnt->cacheMaxPageID; ++i) {
+                if (fnt->glyphCache[i]) {
+                        fntCacheFlushPage(fnt->glyphCache[i]);
+                        free(fnt->glyphCache[i]);
+                        fnt->glyphCache[i] = NULL;
 		}
 	}
 	
-	free(glyphCache);
-	glyphCache = NULL;
-	cacheMaxPageID = -1;
+        free(fnt->glyphCache);
+        fnt->glyphCache = NULL;
+        fnt->cacheMaxPageID = -1;
 }
 
-void fntLoad(void* buffer, int bufferSize, short clean) {
-	if (clean)
-		fntCacheFlush();
+static void fntResetFontDef(font_t *fnt) {
+    fnt->glyphCache = NULL;
+    fnt->cacheMaxPageID = -1;
+    fnt->isValid = 0;
+    fnt->isDefault = 0;
+}
 
+static int fntNewFont() {
+    if (!fonts) {
+        fontMaxID = 0;
+        fonts = (font_t*)malloc(sizeof(font_t));
+
+        fntResetFontDef(&fonts[0]);
+
+        return fontMaxID;
+    }
+
+    int i;
+
+    // already some fonts loaded - search for free slot
+    for (i = 0; i <= fontMaxID; ++i) {
+        if (fonts[i].isValid == 0)
+            return i;
+    }
+
+    // have no font slots left, realloc the font array
+    ++fontMaxID;
+    font_t *nf = (font_t*)realloc(fonts, fontMaxID * sizeof(font_t));
+
+    if (!nf)
+        return -1;
+
+    fntResetFontDef(&nf[fontMaxID]);
+    fonts = nf;
+
+    return fontMaxID;
+}
+
+void fntDeleteFont(font_t *font) {
+    // free the glyph cache, unload the font
+    fntCacheFlush(font);
+
+    FT_Done_Face(font->face);
+
+    font->isValid = 0;
+}
+
+void fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 	if (!buffer) {
 		buffer = &freesansfont_raw;
 		bufferSize = size_freesansfont_raw;
+                fnt->isDefault = 1;
 	}
 
 	// load the font via memory handle
-	int error = FT_New_Memory_Face( font_library, (FT_Byte*) buffer,  bufferSize,  0,  &face );
+        int error = FT_New_Memory_Face( font_library, (FT_Byte*) buffer,  bufferSize,  0,  &fnt->face );
 	
 	if ( error ) { 
 		// just report over the ps2link
@@ -147,7 +211,7 @@ void fntLoad(void* buffer, int bufferSize, short clean) {
 	
 	gCharHeight = 16;
 	
-	error = FT_Set_Char_Size(face, 0, gCharHeight * 16, 300, 300);
+        error = FT_Set_Char_Size(fnt->face, 0, gCharHeight * 16, 300, 300);
 	/*error = FT_Set_Pixel_Sizes( face,
 		0, // pixel_width
 		gCharHeight ); // pixel_height*/
@@ -159,11 +223,33 @@ void fntLoad(void* buffer, int bufferSize, short clean) {
 	}
 }
 
+
+int fntLoad(void* buffer, int bufferSize) {
+        // we need a new slot in the font array
+        int fontID = fntNewFont();
+        font_t *fnt = &fonts[fontID];
+
+        fntLoadSlot(fnt, buffer, bufferSize);
+
+        return fontID;
+}
+
+void fntRelease(int id) {
+    if (id <= fontMaxID)
+        fntDeleteFont(&fonts[id]);
+}
+
 /** Terminates the font rendering system */
 void fntEnd(void) {
-	// release all the glyphs
-	fntCacheFlush();
-	
+        // release all the fonts
+        int id;
+        for (id = 0 ; id < fontMaxID; ++id)
+            fntDeleteFont(&fonts[id]);
+
+        free(fonts);
+        fonts = NULL;
+        fontMaxID = -1;
+
 	// deinit freetype system
 	FT_Done_FreeType( font_library );
 }
@@ -179,15 +265,15 @@ static void fntUpdateTexture(fnt_glyph_cache_entry_t* glyph) {
 }
 
 /** Internal method. Makes sure the bitmap data for particular character are pre-rendered to the glyph cache */
-static fnt_glyph_cache_entry_t* fntCacheGlyph(uint32_t gid) {
+static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 	// calc page id and in-page index from glyph id
 	int pageid = gid / GLYPH_CACHE_PAGE_SIZE;
 	int idx = gid % GLYPH_CACHE_PAGE_SIZE;
 	
-	if (!fntPrepareGlyphCachePage(pageid)) // failed to prepare the page...
+        if (!fntPrepareGlyphCachePage(fnt, pageid)) // failed to prepare the page...
 		return NULL;
 	
-	fnt_glyph_cache_entry_t *page = glyphCache[pageid];
+        fnt_glyph_cache_entry_t *page = fnt->glyphCache[pageid];
 	
 	if (!page) // safeguard
 		return NULL;
@@ -197,16 +283,16 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(uint32_t gid) {
 	if (glyph->isValid)
 		return glyph;
 
-	slot = face->glyph;
+        FT_GlyphSlot slot = fnt->face->glyph;
 	
 	// not cached but valid. Cache
 	glyph->isValid = 1;
 	
-	if (!face) {
+        if (!fnt->face) {
 		LOG("FNT: Face is NULL!\n");
 	}
 	
-	int error = FT_Load_Char( face, gid, FT_LOAD_RENDER ); 
+        int error = FT_Load_Char( fnt->face, gid, FT_LOAD_RENDER );
 	
 	if (error) {
 		LOG("FNT: Error loading glyph - %d\n", error);
@@ -215,13 +301,13 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(uint32_t gid) {
 	
 	// copy the data
 	int i, j = 0;
-	int pixelcount = slot->bitmap.width * slot->bitmap.rows;
+        int pixelcount = slot->bitmap.width * slot->bitmap.rows;
 	
 	// If we would know how to render grayscale (single channel) it could save memory
 	glyph->glyphData = malloc(pixelcount * 4);
 	
 	for (i = 0; i < pixelcount; ++i) {
-		char c = slot->bitmap.buffer[i];
+                char c = slot->bitmap.buffer[i];
 		
 		glyph->glyphData[j++] = c;
 		glyph->glyphData[j++] = c;
@@ -229,31 +315,36 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(uint32_t gid) {
 		glyph->glyphData[j++] = c;
 	}
 	
-	glyph->width = slot->bitmap.width;
-	glyph->height = slot->bitmap.rows;
-	glyph->shx = slot->advance.x;
-	glyph->shy = slot->advance.y;
-	glyph->ox  = slot->bitmap_left;
-	glyph->oy  = gCharHeight - slot->bitmap_top;
+        glyph->width = slot->bitmap.width;
+        glyph->height = slot->bitmap.rows;
+        glyph->shx = slot->advance.x;
+        glyph->shy = slot->advance.y;
+        glyph->ox  = slot->bitmap_left;
+        glyph->oy  = gCharHeight - slot->bitmap_top;
 	
 	// update the texture too...
-	fntUpdateTexture(glyph);
+        fntUpdateTexture(glyph);
 	
 	return glyph;
 }
 
 void fntSetAspectRatio(float aw, float ah) {
 	// flush cache - it will be invalid after the setting
-	fntCacheFlush();
+        int i;
+
+        for (i = 0; i <= fontMaxID; ++i)
+            fntCacheFlush(&fonts[i]);
 	
 	// set new aspect ratio (Is this correct, I wonder?)
 	// TODO: error = FT_Set_Char_Size(face, 0, gCharHeight*64, ah*300, aw*300);
 }
 
-int fntRenderString(int x, int y, short aligned, const unsigned char* string, u64 colour) {
+int fntRenderString(int font, int x, int y, short aligned, const unsigned char* string, u64 colour) {
+        font_t *fnt = &fonts[font];
+
 	if (aligned) {
 		int w = 0, h = 0;
-		fntCalcDimensions(string, &w, &h);
+                fntCalcDimensions(font, string, &w, &h);
 		x -= w >> 1;
 		y -= MENU_ITEM_HEIGHT >> 1;
 	}
@@ -274,7 +365,7 @@ int fntRenderString(int x, int y, short aligned, const unsigned char* string, u6
 		if (utf8Decode(&state, &codepoint, c)) // accumulate the codepoint value
 			continue;
 		
-		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(codepoint);
+                fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
 		
 		if (!glyph) {
 			//LOG("FNT: Glyph error, %x\n", c);
@@ -297,9 +388,11 @@ int fntRenderString(int x, int y, short aligned, const unsigned char* string, u6
 	return w;
 }
 
-void fntCalcDimensions(const unsigned char* str, int *w, int *h) {
+void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
 	*w = 0;
 	*h = 0;
+
+        font_t *fnt = &fonts[font];
 	
 	// backup the aspect ratio, restore 1:1 to have the font rendering clean
 	uint32_t codepoint;
@@ -314,9 +407,28 @@ void fntCalcDimensions(const unsigned char* str, int *w, int *h) {
 		
 		// Could just as well only get the glyph dimensions
 		// but it is probable the glyphs will be needed anyway
-		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(codepoint);
+                fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
 		
 		*w += glyph->shx / 64;
 		*h = glyph->height;
 	}
+}
+
+void fntReplace(int id, void* buffer, int bufferSize) {
+    font_t *fnt = &fonts[id];
+    fntDeleteFont(fnt);
+    fntLoadSlot(fnt, buffer, bufferSize);
+}
+
+void fntSetDefault(int id) {
+    font_t *fnt = &fonts[id];
+
+    // already default
+    if (fnt->isDefault)
+        return;
+
+    fntDeleteFont(fnt);
+    fntLoadSlot(fnt, NULL, -1);
+
+    fnt->isDefault = 1;
 }

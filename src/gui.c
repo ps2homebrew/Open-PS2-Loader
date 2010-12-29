@@ -1037,6 +1037,7 @@ void guiDrawBGArt() {
 void guiDrawBGPlasma() {
 	int x, y;
 
+
 	// transition the colors
 	curbgColor[0] += cdirection(curbgColor[0], gTheme->bgColor[0]);
 	curbgColor[1] += cdirection(curbgColor[1], gTheme->bgColor[1]);
@@ -1069,6 +1070,7 @@ void guiDrawBGPlasma() {
 
 			++buf;
 		}
+
 	}
 
 	pery = ymax;
@@ -1216,7 +1218,7 @@ static void guiMenuRender() {
 	
 	for (;it; it = it->next, cp++) {
 		text = submenuItemGetText(&it->item);
-		fntCalcDimensions(text, &w, &h);
+                fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
 		
 		fadeout = 0x080 - abs(sitem - cp) * 0x20;
 		
@@ -1228,7 +1230,7 @@ static void guiMenuRender() {
 			colour = gTheme->selTextColor;
 		
 		// render, advance
-		fntRenderString(x - (w >> 1), y, ALIGN_NONE, text, colour);
+                fntRenderString(FNT_DEFAULT, x - (w >> 1), y, ALIGN_NONE, text, colour);
 		
 		y += spacing;
 	}
@@ -1441,10 +1443,10 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 		
-		fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
-		fntRenderString(500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
+                fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
+                fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
 		if (addAccept)
-			fntRenderString(70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
+                        fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
 
 		guiEndFrame();
 	}
@@ -1464,7 +1466,7 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 		
-		fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
+                fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 		
 		// so the io status icon will be rendered
 		guiDrawOverlays();
@@ -1480,7 +1482,7 @@ void guiRenderTextScreen(const unsigned char* message) {
 	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 	
-	fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
+        fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 	
 	// so the io status icon will be rendered
 	guiDrawOverlays();

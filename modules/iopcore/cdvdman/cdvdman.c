@@ -340,7 +340,7 @@ int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc); 				// #
 // !!! ps2ip exports functions pointers !!!
 int (*plwip_close)(int s); 										// #6
 int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen); 					// #7
-int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);					// #9
+int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);	// #10
 int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags); 					// #11
 int (*plwip_socket)(int domain, int type, int protocol); 						// #13
 u32 (*pinet_addr)(const char *cp); 									// #24
@@ -1057,7 +1057,7 @@ void ps2ip_init(void)
 	// Set functions pointers here
 	plwip_close = info.exports[6];
 	plwip_connect = info.exports[7];
-	plwip_recv = info.exports[9];
+	plwip_recvfrom = info.exports[10];
 	plwip_send = info.exports[11];
 	plwip_socket = info.exports[13];
 	pinet_addr = info.exports[24];

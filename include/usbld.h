@@ -73,8 +73,8 @@ int gEnableArt;
 int gWideScreen;
 // 0,1,2 scrolling speed
 int gScrollSpeed;
-// Exit mode
-int gExitMode;
+// Exit path
+char gExitPath[32];
 // Disable Debug Colors
 int gDisableDebug;
 // Default device

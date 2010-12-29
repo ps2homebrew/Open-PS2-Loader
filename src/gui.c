@@ -271,28 +271,23 @@ static void guiShowAbout() {
 }
 
 static void guiExecExit() {
-	if(gExitMode==0) {
+	if(gExitPath[0] == '\0') {
 		__asm__ __volatile__(
 			"	li $3, 0x04;"
 			"	syscall;"
 			"	nop;"
 		);
-	} else if(gExitMode==1) {
+	} else {
 		shutdown();
-		sysExecElf("mc0:/BOOT/BOOT.ELF", 0, NULL);
-	} else if(gExitMode==2) {
-		shutdown();
-		sysExecElf("mc0:/APPS/BOOT.ELF", 0, NULL);
+		sysExecElf(gExitPath, 0, NULL);
 	}
 }
 
 static void guiShowConfig() {
 	// configure the enumerations
-	const char* exitTypes[] = { "Browser", "mc0:/BOOT/BOOT.ELF", "mc0:/APPS/BOOT.ELF", NULL };
 	const char* deviceNames[] = { _l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL };
 	const char* deviceModes[] = { _l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL };
 
-	diaSetEnum(diaConfig, CFG_EXITTO, exitTypes);
 	diaSetEnum(diaConfig, CFG_DEFDEVICE, deviceNames);
 	diaSetEnum(diaConfig, CFG_USBMODE, deviceModes);
 	diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
@@ -300,7 +295,7 @@ static void guiShowConfig() {
 	diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
 	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
-	diaSetInt(diaConfig, CFG_EXITTO, gExitMode);
+	diaSetString(diaConfig, CFG_EXITTO, gExitPath);
 	diaSetInt(diaConfig, CFG_DANDROP, gEnableDandR);
 	diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
 	diaSetInt(diaConfig, CFG_USBDELAY, gUSBDelay);
@@ -314,7 +309,7 @@ static void guiShowConfig() {
 
 	int ret = diaExecuteDialog(diaConfig, -1, 1, NULL);
 	if (ret) {
-		diaGetInt(diaConfig, CFG_EXITTO, &gExitMode);
+		diaGetString(diaConfig, CFG_EXITTO, gExitPath);
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
 		diaGetInt(diaConfig, CFG_DANDROP, &gEnableDandR);
 		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
@@ -1124,11 +1119,11 @@ static void guiDrawOverlays() {
 	else
 		snprintf(fps, 10, "---- FPS");
 	
-	fntRenderString(screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 	
 	snprintf(fps, 10, "%3d ms", time_render);
 	
-	fntRenderString(screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif
 }
 

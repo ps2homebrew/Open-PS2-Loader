@@ -127,11 +127,8 @@ static void t_loadElf(void)
 	LoadModule("rom0:SIO2MAN", 0, NULL);
 	LoadModule("rom0:MCMAN", 0, NULL);
 
-	// Load BOOT.ELF
-	if ( ExitMode == BOOT_MODE)
-		argv[0] = "mc0:/BOOT/BOOT.ELF";
-	else if ( ExitMode == APPS_MODE)
-		argv[0] = "mc0:/APPS/BOOT.ELF";
+	// Load exit ELF
+	argv[0] = ExitPath;
 
 	argv[1] = NULL;
 
@@ -268,7 +265,7 @@ static void IGR_Thread(void *arg)
 		FlushCache(2);
 
 		// Execute home loader
-		if ( ExitMode != OSDS_MODE)
+		if (ExitPath[0] != '\0')
 			ExecPS2(t_loadElf, &_gp, 0, NULL);
 
 		// Return to PS2 Browser

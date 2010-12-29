@@ -582,6 +582,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	sysSetIPConfig(ipconfig); // TODO only needed for ETH mode, and already done in ethsupport.ethLoadModules
 
+	if (gExitPath[0] == '\0')
+		strncpy(gExitPath, "Browser", 32);
+
 #ifdef VMC
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
@@ -619,7 +622,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	FlushCache(0);
 	FlushCache(2);
 
-	sprintf(config_str, "%s %d %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, gExitMode, gDisableDebug, gUSBDelay, \
+	sprintf(config_str, "%s %d %s %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, gDisableDebug, gExitPath, gUSBDelay, \
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
 		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);

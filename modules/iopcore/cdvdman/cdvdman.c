@@ -1859,7 +1859,7 @@ int sceCdReadDiskID(void *DiskID)
 	if (i == 5)
 		*((u16 *)DiskID) = (u16)0xadde;
 	else
-		mips_memcpy(DiskID, g_DiskID, 5);
+		mips_memcpy(DiskID, &g_DiskID[1], 5);
 
 	return 1;
 }

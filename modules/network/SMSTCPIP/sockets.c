@@ -343,17 +343,17 @@ lwip_listen(int s, int backlog)
 }
 
 int
-lwip_recvfrom(int s, void *mem, int len, unsigned int flags,
+lwip_recvfrom(int s, void *header, int hlen, void *payload, int plen, unsigned int flags,
         struct sockaddr *from, socklen_t *fromlen)
 {
   struct lwip_socket *sock;
   struct netbuf *buf;
-  u16_t buflen, copylen;
+  u16_t avail_len;
   struct ip_addr *addr;
   u16_t port;
 
 
-  LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_recvfrom(%d, %p, %d, 0x%x, ..)\n", s, mem, len, flags));
+  LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_recvfrom(%d, %p, %d, 0x%x, ..)\n", s, payload, plen, flags));
   sock = get_socket(s);
   if (!sock) {
     set_errno(EBADF);
@@ -385,19 +385,25 @@ lwip_recvfrom(int s, void *mem, int len, unsigned int flags,
     }
   }
 
-  buflen = netbuf_len(buf);
+  avail_len = netbuf_len(buf);
 
-  buflen -= sock->lastoffset;
-
-  if (len > buflen) {
-    copylen = buflen;
-  } else {
-    copylen = len;
-  }
+  avail_len -= sock->lastoffset;
 
   /* copy the contents of the received buffer into
      the supplied memory pointer mem */
-  netbuf_copy_partial(buf, mem, copylen, sock->lastoffset);
+  if (hlen) {
+    if (hlen > avail_len)
+      hlen = avail_len;
+
+    netbuf_copy_partial(buf, header, hlen, sock->lastoffset);
+    avail_len -= hlen;
+  }
+
+  if (plen > avail_len)
+    plen = avail_len;
+
+  netbuf_copy_partial(buf, payload, plen, sock->lastoffset + hlen);
+  avail_len -= plen;
 
   /* Check to see from where the data was. */
   if (from && fromlen) {
@@ -429,36 +435,34 @@ lwip_recvfrom(int s, void *mem, int len, unsigned int flags,
     ip_addr_debug_print(SOCKETS_DEBUG, addr);
     LWIP_DEBUGF(SOCKETS_DEBUG, (" port=%u len=%u\n", port, copylen));
 #endif
-
   }
 
   /* If this is a TCP socket, check if there is data left in the
      buffer. If so, it should be saved in the sock structure for next
      time around. */
-  if (netconn_type(sock->conn) == NETCONN_TCP && buflen - copylen > 0) {
+  if (netconn_type(sock->conn) == NETCONN_TCP && avail_len > 0) {
     sock->lastdata = buf;
-    sock->lastoffset += copylen;
+    sock->lastoffset += hlen + plen;
   } else {
     sock->lastdata = NULL;
     sock->lastoffset = 0;
     netbuf_delete(buf);
   }
 
-
   sock_set_errno(sock, 0);
-  return copylen;
+  return hlen + plen;
 }
 
 int
 lwip_read(int s, void *mem, int len)
 {
-  return lwip_recvfrom(s, mem, len, 0, NULL, NULL);
+  return lwip_recvfrom(s, NULL, 0, mem, len, 0, NULL, NULL);
 }
 
 int
 lwip_recv(int s, void *mem, int len, unsigned int flags)
 {
-  return lwip_recvfrom(s, mem, len, flags, NULL, NULL);
+  return lwip_recvfrom(s, NULL, 0, mem, len, flags, NULL, NULL);
 }
 
 int

@@ -164,7 +164,7 @@ int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman,
 	}
 
 	memcpy((void*)((u32)cdvdman_irx + i), isoname, strlen(isoname) + 1);
-	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1); // TODO long filename
+	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1);
 	memcpy((void*)((u32)cdvdman_irx + i + 34), &game->media, 1);
 	if (compatmask & COMPAT_MODE_2) {
 		u32 alt_read_mode = 1;

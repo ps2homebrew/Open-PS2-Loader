@@ -284,7 +284,6 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nb
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
 int smb_Disconnect(void);
 
-#define MAX_SMB_BUF 		4096 // must fit on u16 !!!
 #define MAX_SMB_SECTORS 	2
 
 #endif

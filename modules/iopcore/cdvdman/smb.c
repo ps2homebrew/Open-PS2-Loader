@@ -34,7 +34,7 @@ static int io_sema = -1;
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s); 						// #6
 extern int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen); 	// #7
-extern int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);	// #9
+extern int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);	// #10
 extern int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags); 	// #11
 extern int (*plwip_socket)(int domain, int type, int protocol); 		// #13
 extern u32 (*pinet_addr)(const char *cp); 					// #24
@@ -274,7 +274,7 @@ struct WriteAndXRequest_t smb_Write_Request = {
 static u16 UID, TID;
 static int main_socket;
 
-static u8 SMB_buf[MAX_SMB_BUF+1024] __attribute__((aligned(64)));
+static u8 SMB_buf[1024] __attribute__((aligned(64)));
 
 //-------------------------------------------------------------------------
 int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
@@ -337,7 +337,7 @@ int GetSMBServerReply(void)
 		return -1;
 
 receive:
-	rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
+	rcv_size = plwip_recvfrom(main_socket, NULL, 0, SMB_buf, sizeof(SMB_buf), 0, NULL, NULL);
 	if (rcv_size <= 0)
 		return -2;
 
@@ -348,7 +348,7 @@ receive:
 	totalpkt_size = rawTCP_GetSessionHeader() + 4;
 
 	while (rcv_size < totalpkt_size) {
-		pkt_size = plwip_recv(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 0);
+		pkt_size = plwip_recvfrom(main_socket, NULL, 0, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 0, NULL, NULL);
 		if (pkt_size <= 0)
 			return -2;
 		rcv_size += pkt_size;
@@ -690,7 +690,6 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbyt
 	register int rcv_size, pkt_size;
 
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
-	struct ReadAndXResponse_t *RRsp = (struct ReadAndXResponse_t *)SMB_buf;
 
 	WAITIOSEMA(io_sema);
 
@@ -707,18 +706,16 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbyt
 
 	plwip_send(main_socket, SMB_buf, 63, 0);
 receive:
-	rcv_size = plwip_recv(main_socket, SMB_buf, sizeof(SMB_buf), 0);
+	rcv_size = plwip_recvfrom(main_socket, SMB_buf, 63, readbuf, nbytes, 0, NULL, NULL);
 
 	if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
 		goto receive;
 
 	// Handle fragmented packets
 	while (rcv_size < (rawTCP_GetSessionHeader() + 4)) {
-		pkt_size = plwip_recv(main_socket, &SMB_buf[rcv_size], sizeof(SMB_buf), 0); // - rcv_size
+		pkt_size = plwip_recvfrom(main_socket, NULL, 0, &((u8 *)readbuf)[rcv_size - 63], nbytes, 0, NULL, NULL); // - rcv_size
 		rcv_size += pkt_size;
 	}
-
-	mips_memcpy(readbuf, &SMB_buf[4 + RRsp->DataOffset], nbytes);
 
 	SIGNALIOSEMA(io_sema);
 

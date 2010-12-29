@@ -171,10 +171,12 @@ static int lngLoadFromFile(char* path, char *name) {
 		LOG("#### Custom font path: %s\n", path);
 		
 		void* customFont = readFile(path, -1, &size);
-		if (customFont)
-			fntLoad(customFont, size, 1);
-		else
-			fntLoad(NULL, -1, 1);
+                if (customFont) {
+                        fntReplace(FNT_DEFAULT, customFont, size);
+                }
+                else {
+                        fntSetDefault(FNT_DEFAULT);
+                }
 
 		return 1;
 	}

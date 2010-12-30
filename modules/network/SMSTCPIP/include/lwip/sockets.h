@@ -226,7 +226,7 @@ int lwip_connect(int s, struct sockaddr *name, socklen_t namelen);
 int lwip_listen(int s, int backlog);
 int lwip_recv(int s, void *mem, int len, unsigned int flags);
 int lwip_read(int s, void *mem, int len);
-int lwip_recvfrom(int s, void *header, int hlen, void *payload, int plen, unsigned int flags,
+int lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsigned int flags,
       struct sockaddr *from, socklen_t *fromlen);
 int lwip_send(int s, void *dataptr, int size, unsigned int flags);
 int lwip_sendto(int s, void *dataptr, int size, unsigned int flags,

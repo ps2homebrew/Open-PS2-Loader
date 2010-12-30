@@ -687,7 +687,7 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 //-------------------------------------------------------------------------
 int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes)
 {	
-	register int rcv_size, pkt_size;
+	register int rcv_size, pkt_size, expected_size;
 
 	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
 
@@ -706,14 +706,15 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbyt
 
 	plwip_send(main_socket, SMB_buf, 63, 0);
 receive:
-	rcv_size = plwip_recvfrom(main_socket, SMB_buf, 63, readbuf, nbytes, 0, NULL, NULL);
+	rcv_size = plwip_recvfrom(main_socket, SMB_buf, 49, readbuf, nbytes, 0, NULL, NULL);
+	expected_size = rawTCP_GetSessionHeader() + 4;
 
 	if (SMB_buf[0] != 0)	// dropping NBSS Session Keep alive
 		goto receive;
 
 	// Handle fragmented packets
-	while (rcv_size < (rawTCP_GetSessionHeader() + 4)) {
-		pkt_size = plwip_recvfrom(main_socket, NULL, 0, &((u8 *)readbuf)[rcv_size - 63], nbytes, 0, NULL, NULL); // - rcv_size
+	while (rcv_size < expected_size) {
+		pkt_size = plwip_recvfrom(main_socket, NULL, 0, &((u8 *)readbuf)[rcv_size - SMB_buf[49] - 4], expected_size - rcv_size, 0, NULL, NULL); // - rcv_size
 		rcv_size += pkt_size;
 	}
 

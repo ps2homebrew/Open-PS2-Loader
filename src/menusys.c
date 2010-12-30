@@ -581,7 +581,7 @@ void menuDrawStatic() {
 			if (otherTex && otherTex->Mem)
 				rmDrawPixmap(otherTex, gTheme->menuText.posX + gTheme->menuText.width, gTheme->menuText.posY, gTheme->menuText.aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
 		}
-                fntRenderString(FNT_DEFAULT, gTheme->menuText.posX, gTheme->menuText.posY, gTheme->menuText.aligned, GetMenuItemText(selected_item->item), gTheme->menuText.color);
+                fntRenderString(gTheme->menuText.font, gTheme->menuText.posX, gTheme->menuText.posY, gTheme->menuText.aligned, GetMenuItemText(selected_item->item), gTheme->menuText.color);
 	}
 	
 	if (cur) {
@@ -609,7 +609,7 @@ void menuDrawStatic() {
 			else
 				color = gTheme->itemsList.color;
 
-                        fntRenderString(FNT_DEFAULT, itemsList->posX + stretchedSize, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, submenuItemGetText(&ps->item), color);
+                        fntRenderString(itemsList->font, itemsList->posX + stretchedSize, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, submenuItemGetText(&ps->item), color);
 		
 			ps = ps->next;
 			others++;
@@ -644,7 +644,7 @@ void menuDrawStatic() {
 		if (gTheme->itemText.enabled) {
 			if (selected_item->item->userdata && (cur->item.id != -1)) {
 				item_list_t *support = selected_item->item->userdata;
-                                fntRenderString(FNT_DEFAULT, gTheme->itemText.posX, gTheme->itemText.posY, gTheme->itemText.aligned, support->itemGetStartup(cur->item.id), gTheme->itemText.color);
+                                fntRenderString(gTheme->itemText.font, gTheme->itemText.posX, gTheme->itemText.posY, gTheme->itemText.aligned, support->itemGetStartup(cur->item.id), gTheme->itemText.color);
 			}
 		}
 	}
@@ -667,7 +667,7 @@ void menuDrawStatic() {
 				x += someTex->Width + 2;
 			}
 			
-                        x += fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(hint->text_id), gTheme->hintText.color);
+                        x += fntRenderString(gTheme->hintText.font, x, y, ALIGN_NONE, _l(hint->text_id), gTheme->hintText.color);
 			x+= 12;
 		}
 	}

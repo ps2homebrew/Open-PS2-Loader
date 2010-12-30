@@ -10,6 +10,7 @@
 #include "include/renderman.h"
 #include "include/ioman.h"
 #include "include/utf8.h"
+#include "include/util.h"
 
 #include <ft2build.h>
 
@@ -24,6 +25,9 @@ static FT_Library font_library;
 static rm_quad_t quad;
 
 static int gCharHeight;
+
+static s32 gFontSemaId;
+static ee_sema_t gFontSema;
 
 /** Single entry in the glyph cache */
 typedef struct {
@@ -59,12 +63,15 @@ typedef struct {
 
     /// Nonzero for custom fonts
     int isDefault;
+
+    /// Pointer to data, if allocation takeover was selected (will be freed)
+    void *dataPtr;
 } font_t;
 
+#define FNT_MAX_COUNT (16)
+
 /// Array of font definitions
-static font_t *fonts = NULL;
-/// Last valid font ID
-static int fontMaxID = -1;
+static font_t fonts[FNT_MAX_COUNT];
 
 #define GLYPH_CACHE_PAGE_SIZE 256
 
@@ -101,6 +108,14 @@ static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	return 1;
 }
 
+static void fntResetFontDef(font_t *fnt) {
+    fnt->glyphCache = NULL;
+    fnt->cacheMaxPageID = -1;
+    fnt->isValid = 0;
+    fnt->isDefault = 0;
+    fnt->dataPtr = NULL;
+}
+
 void fntInit(void) {
 	int error = FT_Init_FreeType( &font_library );
 
@@ -110,11 +125,17 @@ void fntInit(void) {
 		// SleepThread();
 	}
 
-        fonts = NULL;
-        fontMaxID = -1;
+        gFontSema.init_count = 1;
+        gFontSema.max_count = 1;
+        gFontSema.option = 0;
+        gFontSemaId = CreateSema(&gFontSema);
+
+        int i;
+        for (i = 0; i < FNT_MAX_COUNT; ++i)
+            fntResetFontDef(&fonts[i]);
 
         // load the default font (will be id=0)
-        fntLoad(NULL, -1);
+        fntLoad(NULL, -1, 0);
 }
 
 static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
@@ -146,54 +167,37 @@ static void fntCacheFlush(font_t *fnt) {
         fnt->cacheMaxPageID = -1;
 }
 
-static void fntResetFontDef(font_t *fnt) {
-    fnt->glyphCache = NULL;
-    fnt->cacheMaxPageID = -1;
-    fnt->isValid = 0;
-    fnt->isDefault = 0;
-}
-
 static int fntNewFont() {
-    if (!fonts) {
-        fontMaxID = 0;
-        fonts = (font_t*)malloc(sizeof(font_t));
-
-        fntResetFontDef(&fonts[0]);
-
-        return fontMaxID;
-    }
-
     int i;
-
-    // already some fonts loaded - search for free slot
-    for (i = 0; i <= fontMaxID; ++i) {
-        if (fonts[i].isValid == 0)
+    for (i = 0; i < FNT_MAX_COUNT; ++i) {
+        if (fonts[i].isValid == 0) {
+            fntResetFontDef(&fonts[i]);
             return i;
+        }
     }
 
-    // have no font slots left, realloc the font array
-    ++fontMaxID;
-    font_t *nf = (font_t*)realloc(fonts, fontMaxID * sizeof(font_t));
-
-    if (!nf)
-        return -1;
-
-    fntResetFontDef(&nf[fontMaxID]);
-    fonts = nf;
-
-    return fontMaxID;
+    return FNT_ERROR;
 }
 
 void fntDeleteFont(font_t *font) {
+    // skip already deleted fonts
+    if (!font->isValid)
+        return;
+
     // free the glyph cache, unload the font
     fntCacheFlush(font);
 
     FT_Done_Face(font->face);
 
+    if (font->dataPtr) {
+        free(font->dataPtr);
+        font->dataPtr = NULL;
+    }
+
     font->isValid = 0;
 }
 
-void fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
+int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 	if (!buffer) {
 		buffer = &freesansfont_raw;
 		bufferSize = size_freesansfont_raw;
@@ -207,6 +211,7 @@ void fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 		// just report over the ps2link
 		LOG("Freetype: Font loading failed with %x!\n", error);
 		// SleepThread();
+                return -1;
 	} 
 	
 	gCharHeight = 16;
@@ -220,22 +225,48 @@ void fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 		// just report over the ps2link
 		LOG("Freetype: Error setting font pixel size with %x!\n", error);
 		// SleepThread();
+                return -1;
 	}
+
+
+        fnt->isValid = 1;
+        return 0;
 }
 
 
-int fntLoad(void* buffer, int bufferSize) {
+int fntLoad(void* buffer, int bufferSize, int takeover) {
         // we need a new slot in the font array
         int fontID = fntNewFont();
+
+        if (fontID == FNT_ERROR)
+            return FNT_ERROR;
+
         font_t *fnt = &fonts[fontID];
 
-        fntLoadSlot(fnt, buffer, bufferSize);
+        if (fntLoadSlot(fnt, buffer, bufferSize) == FNT_ERROR)
+            return FNT_ERROR;
+
+        if (takeover)
+            fnt->dataPtr = buffer;
 
         return fontID;
 }
 
+int fntLoadFile(char* path) {
+    // load the buffer with font
+    int size = -1;
+    void* customFont = readFile(path, -1, &size);
+
+    if (!customFont)
+        return FNT_ERROR;
+
+    int fontID = fntLoad(customFont, size, 1);
+
+    return fontID;
+}
+
 void fntRelease(int id) {
-    if (id <= fontMaxID)
+    if (id < FNT_MAX_COUNT)
         fntDeleteFont(&fonts[id]);
 }
 
@@ -243,15 +274,13 @@ void fntRelease(int id) {
 void fntEnd(void) {
         // release all the fonts
         int id;
-        for (id = 0 ; id < fontMaxID; ++id)
+        for (id = 0 ; id < FNT_MAX_COUNT; ++id)
             fntDeleteFont(&fonts[id]);
-
-        free(fonts);
-        fonts = NULL;
-        fontMaxID = -1;
 
 	// deinit freetype system
 	FT_Done_FreeType( font_library );
+
+        DeleteSema(gFontSemaId);
 }
 
 /** Internal method. Updates texture part of glyph cache entry */
@@ -259,7 +288,7 @@ static void fntUpdateTexture(fnt_glyph_cache_entry_t* glyph) {
 	glyph->texture.Width = glyph->width;
 	glyph->texture.Height = glyph->height;
 	glyph->texture.PSM = GS_PSM_CT32;
-	glyph->texture.Filter = GS_FILTER_LINEAR;
+        glyph->texture.Filter = GS_FILTER_LINEAR;
 	glyph->texture.Mem = (u32*)glyph->glyphData;
 	glyph->texture.Vram = 0;
 }
@@ -300,21 +329,25 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 	}
 	
 	// copy the data
-	int i, j = 0;
+        int i = 0;
         int pixelcount = slot->bitmap.width * slot->bitmap.rows;
 	
 	// If we would know how to render grayscale (single channel) it could save memory
-	glyph->glyphData = malloc(pixelcount * 4);
-	
+        glyph->glyphData = memalign(128, pixelcount * 4);
+
+        // incrementing pointers should be cheaper than array indexing...
+        char *src = slot->bitmap.buffer;
+        char *data = glyph->glyphData;
+
 	for (i = 0; i < pixelcount; ++i) {
-                char c = slot->bitmap.buffer[i];
+                char c = *src++;
 		
-		glyph->glyphData[j++] = c;
-		glyph->glyphData[j++] = c;
-		glyph->glyphData[j++] = c;
-		glyph->glyphData[j++] = c;
+                *(data++) = c;
+                *(data++) = c;
+                *(data++) = c;
+                *(data++) = c;
 	}
-	
+
         glyph->width = slot->bitmap.width;
         glyph->height = slot->bitmap.rows;
         glyph->shx = slot->advance.x;
@@ -332,15 +365,20 @@ void fntSetAspectRatio(float aw, float ah) {
 	// flush cache - it will be invalid after the setting
         int i;
 
-        for (i = 0; i <= fontMaxID; ++i)
-            fntCacheFlush(&fonts[i]);
+        for (i = 0; i < FNT_MAX_COUNT; ++i) {
+            if (fonts[i].isValid)
+                fntCacheFlush(&fonts[i]);
+        }
 	
 	// set new aspect ratio (Is this correct, I wonder?)
 	// TODO: error = FT_Set_Char_Size(face, 0, gCharHeight*64, ah*300, aw*300);
 }
 
 int fntRenderString(int font, int x, int y, short aligned, const unsigned char* string, u64 colour) {
+        // wait for font lock to unlock
+        WaitSema(gFontSemaId);
         font_t *fnt = &fonts[font];
+        SignalSema(gFontSemaId);
 
 	if (aligned) {
 		int w = 0, h = 0;
@@ -414,10 +452,26 @@ void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
 	}
 }
 
-void fntReplace(int id, void* buffer, int bufferSize) {
+void fntReplace(int id, void* buffer, int bufferSize, int takeover) {
     font_t *fnt = &fonts[id];
-    fntDeleteFont(fnt);
-    fntLoadSlot(fnt, buffer, bufferSize);
+
+    font_t ndefault, old;
+    fntResetFontDef(&ndefault);
+    fntLoadSlot(&ndefault, buffer, bufferSize);
+
+    // copy over the new font definition
+    // we have to lock this phase, as the old font may still be used
+    WaitSema(gFontSemaId);
+    memcpy(&old, fnt, sizeof(font_t));
+    memcpy(fnt, &ndefault, sizeof(font_t));
+
+    if (takeover)
+        fnt->dataPtr = buffer;
+
+    SignalSema(gFontSemaId);
+
+    // delete the old font
+    fntDeleteFont(&old);
 }
 
 void fntSetDefault(int id) {
@@ -427,8 +481,19 @@ void fntSetDefault(int id) {
     if (fnt->isDefault)
         return;
 
-    fntDeleteFont(fnt);
-    fntLoadSlot(fnt, NULL, -1);
+    font_t ndefault, old;
+    fntResetFontDef(&ndefault);
+    fntLoadSlot(&ndefault, NULL, -1);
+    ndefault.isDefault = 1;
 
-    fnt->isDefault = 1;
+    // copy over the new font definition
+    // we have to lock this phase, as the old font may still be used
+    // Note: No check for concurrency is done here, which is kinda funky!
+    WaitSema(gFontSemaId);
+    memcpy(&old, fnt, sizeof(font_t));
+    memcpy(fnt, &ndefault, sizeof(font_t));
+    SignalSema(gFontSemaId);
+
+    // delete the old font
+    fntDeleteFont(&old);
 }

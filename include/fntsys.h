@@ -5,6 +5,8 @@
 
 /// default (built-in) font id
 #define FNT_DEFAULT (0)
+/// Value returned on errors
+#define FNT_ERROR (-1)
 
 /** Initializes the font subsystem */
 void fntInit(void);
@@ -15,11 +17,17 @@ void fntEnd(void);
 /** Loads a font
   * @param buffer The memory buffer containing the font
   * @param bufferSize Size of the buffer
-  * @return font slot id */
-int fntLoad(void* buffer, int bufferSize);
+  * @param takeover Set to nonzero
+  * @return font slot id (negative value means error happened) */
+int fntLoad(void* buffer, int bufferSize, int takeover);
+
+/** Loads a font from a file path
+  * @param path The path to the font file
+  * @return font slot id (negative value means error happened) */
+int fntLoadFile(char* path);
 
 /** Replaces the given font slot with the defined font */
-void fntReplace(int id, void* buffer, int bufferSize);
+void fntReplace(int id, void* buffer, int bufferSize, int takeover);
 
 /** Reloads the default font into the given font slot */
 void fntSetDefault(int id);

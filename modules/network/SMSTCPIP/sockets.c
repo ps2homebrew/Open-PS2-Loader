@@ -343,12 +343,12 @@ lwip_listen(int s, int backlog)
 }
 
 int
-lwip_recvfrom(int s, void *header, int hlen, void *payload, int plen, unsigned int flags,
+lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsigned int flags,
         struct sockaddr *from, socklen_t *fromlen)
 {
   struct lwip_socket *sock;
   struct netbuf *buf;
-  u16_t avail_len;
+  u16_t avail_len, copylen = 0;
   struct ip_addr *addr;
   u16_t port;
 
@@ -391,19 +391,27 @@ lwip_recvfrom(int s, void *header, int hlen, void *payload, int plen, unsigned i
 
   /* copy the contents of the received buffer into
      the supplied memory pointer mem */
-  if (hlen) {
-    if (hlen > avail_len)
-      hlen = avail_len;
-
-    netbuf_copy_partial(buf, header, hlen, sock->lastoffset);
-    avail_len -= hlen;
+  if (index) {
+    if (avail_len >= 63) { // header of READ ANDX RESPONSE is 63 + padding bytes, which are "0x00" thus useless
+      netbuf_copy_partial(buf, header, 63, sock->lastoffset);
+      index = ((u8_t*)header)[index] + 4;
+      copylen = index;
+      avail_len -= index;
+    } else {
+   	  netbuf_copy_partial(buf, header, avail_len, sock->lastoffset);
+      copylen = avail_len;
+   	  avail_len = 0;
+    }
   }
 
-  if (plen > avail_len)
-    plen = avail_len;
+  if (avail_len) {
+    if (plen > avail_len)
+      plen = avail_len;
 
-  netbuf_copy_partial(buf, payload, plen, sock->lastoffset + hlen);
-  avail_len -= plen;
+    netbuf_copy_partial(buf, payload, plen, sock->lastoffset + index);
+    copylen += plen;
+    avail_len -= plen;
+  }
 
   /* Check to see from where the data was. */
   if (from && fromlen) {
@@ -442,7 +450,7 @@ lwip_recvfrom(int s, void *header, int hlen, void *payload, int plen, unsigned i
      time around. */
   if (netconn_type(sock->conn) == NETCONN_TCP && avail_len > 0) {
     sock->lastdata = buf;
-    sock->lastoffset += hlen + plen;
+    sock->lastoffset += copylen;
   } else {
     sock->lastdata = NULL;
     sock->lastoffset = 0;
@@ -450,7 +458,7 @@ lwip_recvfrom(int s, void *header, int hlen, void *payload, int plen, unsigned i
   }
 
   sock_set_errno(sock, 0);
-  return hlen + plen;
+  return copylen;
 }
 
 int

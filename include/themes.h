@@ -4,6 +4,7 @@
 #include "include/textures.h"
 
 #define MAX_THEMES_FILES 32
+#define THM_MAX_FONTS 16
 
 typedef struct {
 	char* filePath;
@@ -19,6 +20,7 @@ typedef struct {
 	int width;
 	int height;
 	u64 color;
+        int font;
 } theme_element_t;
 
 typedef struct {
@@ -46,6 +48,7 @@ typedef struct {
 	int coverBlend_blx, coverBlend_bly, coverBlend_brx, coverBlend_bry;
 
 	GSTEXTURE textures[TEXTURES_COUNT];
+        int fonts[THM_MAX_FONTS]; //!< Storage of font handles for removal once not needed
 
 	void (*drawBackground)();
 	void (*drawAltBackground)();

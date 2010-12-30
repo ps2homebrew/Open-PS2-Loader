@@ -839,7 +839,7 @@ static void guiRenderGreeting() {
 	
 	int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
 
-	u64 mycolor = GS_SETREG_RGBA(0x40, 0x40, 0x40, fade >> 1);
+        u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
 	
 	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, mycolor);
@@ -1225,6 +1225,7 @@ static void guiMenuRender() {
 			colour = gTheme->selTextColor;
 		
 		// render, advance
+                // TODO: Theme support for main menu (font)
                 fntRenderString(FNT_DEFAULT, x - (w >> 1), y, ALIGN_NONE, text, colour);
 		
 		y += spacing;
@@ -1309,7 +1310,7 @@ static void guiShow() {
 		rmFlush();
 		
 		// render the old screen, transposed
-		rmSetTransposition(-transition, 0);
+                rmSetTransposition(-transition, 0);
 		screenHandler->renderScreen();
 		
 		// render new screen transposed again

@@ -173,7 +173,7 @@ static int lngLoadFromFile(char* path, char *name) {
 		
 		void* customFont = readFile(path, -1, &size);
                 if (customFont) {
-                        fntReplace(FNT_DEFAULT, customFont, size);
+                        fntReplace(FNT_DEFAULT, customFont, size, 1);
                 }
                 else {
                         fntSetDefault(FNT_DEFAULT);

@@ -1598,7 +1598,7 @@ int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
 //-------------------------------------------------------------------------
 int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err)
 {
-	sceCdRead(cdvdman_stat.Stlsn, sectors, buf, NULL);
+	sceCdRead0(cdvdman_stat.Stlsn, sectors, buf, NULL);
 	cdvdman_stat.Stlsn += sectors;
 
 	if (err)

@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[38] = {
+static patchlist_t patch_list[39] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -33,6 +33,7 @@ static patchlist_t patch_list[38] = {
 	{ "SLPS_731.08", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Phantom Brave: 2-shuume Hajime Mashita (PlayStation 2 the Best) NTSC J - disable cdvd timeout stuff
 	{ "SLUS_213.17", ALL_MODE, { 0xbabecafe, 0x00149210, 0x00000000 }}, // SFA anthology US
 	{ "SLES_540.85", ALL_MODE, { 0xbabecafe, 0x00148db0, 0x00000000 }}, // SFA anthology EUR
+	{ "SLPM_664.09", ALL_MODE, { 0xbabecafe, 0x00149210, 0x00000000 }}, // SFZ Generation JP
 	{ "SLPM_659.98", ALL_MODE, { 0xbabecafe, 0x00146fd0, 0x00000000 }}, // Vampire: Darkstakers collection JP
 	{ "SLUS_212.00", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
 	{ "SLES_538.19", USB_MODE, { 0xdeadbee1, 0x00000000, 0x00000000 }}, // Armored Core Nine Breaker PAL - skip failing case on binding a RPC server

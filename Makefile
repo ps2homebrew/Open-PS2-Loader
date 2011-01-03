@@ -25,7 +25,7 @@ LOADER_OBJS = obj/loader.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o \
-		obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o
+		obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o obj/hdpro_checker.o
 
 ifeq ($(VMC),1)
 LOADER_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
@@ -147,6 +147,8 @@ clean:
 	$(MAKE) -C modules/hdd/atad clean
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/hdd/ps2hdd clean
+	echo "    * hdpro_checker.irx"
+	$(MAKE) -C modules/hdd/hdpro_checker clean
 ifeq ($(VMC),1)
 	echo "    * ps2fs.irx"
 	$(MAKE) -C modules/ps2fs clean
@@ -405,6 +407,11 @@ ps2hdd.s:
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/hdd/ps2hdd
 	bin2s modules/hdd/ps2hdd/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
+
+hdpro_checker.s:
+	echo "    * hdpro_checker.irx"
+	$(MAKE) -C modules/hdd/hdpro_checker
+	bin2s modules/hdd/hdpro_checker/hdpro_checker.irx asm/hdpro_checker.s hdpro_checker_irx
 
 genvmc.s:
 	echo "    * genvmc.irx"

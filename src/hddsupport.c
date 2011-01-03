@@ -28,6 +28,9 @@ extern int size_ps2hdd_irx;
 extern void *ps2fs_irx;
 extern int size_ps2fs_irx;
 
+extern void *hdpro_checker_irx;
+extern int size_hdpro_checker_irx;
+
 #ifdef VMC
 extern void *hdd_mcemu_irx;
 extern int size_hdd_mcemu_irx;
@@ -58,11 +61,29 @@ static void hddInitModules(void) {
 #endif
 }
 
+static int hddCheckHDPro(void)
+{
+	int ret; 
+	SifExecModuleBuffer(&hdpro_checker_irx, size_hdpro_checker_irx, 0, NULL, &ret);
+
+	FlushCache(0);
+	FlushCache(2);
+
+	if (*(u32 *)0x200c0000 == 0xdeadfeed) {
+		LOG("hddCheckHDPro() HD Pro Kit connected!\n");
+		return 1;
+	}
+
+	return 0;
+}
+
 void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
 	LOG("hddLoadModules()\n");
+
+	hddCheckHDPro();
 
 	gHddStartup = 4;
 

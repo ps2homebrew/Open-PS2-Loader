@@ -41,7 +41,11 @@ static char *lm_modulefake_list[] = {
 #endif
 #ifdef HDD_DRIVER
 	"ATAD.IRX",
-#ifndef HDPRO
+#ifdef HDPRO
+#ifdef __IOPCORE_DEBUG
+	"DEV9.IRX",
+#endif
+#else
 	"DEV9.IRX",
 #endif
 	"CDVDSTM.IRX",
@@ -63,7 +67,11 @@ static char *lmb_modulefake_list[] = {
 #endif
 #ifdef HDD_DRIVER
 	"atad_driver",
-#ifndef HDPRO
+#ifdef HDPRO
+#ifdef __IOPCORE_DEBUG
+	"dev9",
+#endif
+#else
 	"dev9",
 #endif
 	"cdvd_st_driver",

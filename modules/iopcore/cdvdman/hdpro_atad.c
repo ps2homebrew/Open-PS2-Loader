@@ -24,9 +24,9 @@
 #include <atahw.h>
 
 
-#ifdef DEBUG
+#ifdef __IOPCORE_DEBUG
 #define M_PRINTF(format, args...)	\
-	printf(MODNAME ": " format, ## args)
+	printf(format, ## args)
 #else
 #define M_PRINTF(format, args...)	\
 	do {} while (0)

@@ -21,7 +21,8 @@ GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/
 
 LOADER_OBJS = obj/loader.o \
 		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
-		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
+		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
+		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/hdpro_checker.o obj/genvmc.o obj/hdldsvr.o \
@@ -124,6 +125,7 @@ clean:
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia clean
+	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
 	echo "    * cddev.irx"
@@ -300,6 +302,15 @@ else
 	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
 endif
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_pcmcia_cdvdman.s hdd_pcmcia_cdvdman_irx
+
+hdd_hdpro_cdvdman.s:
+	echo "    * hdd_hdpro_cdvdman.irx"
+ifeq ($(IOPCORE_DEBUG),1)
+	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
+else
+	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
+endif
+	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_hdpro_cdvdman.s hdd_hdpro_cdvdman_irx
 
 cdvdfsv.s:
 	echo "    * cdvdfsv.irx"

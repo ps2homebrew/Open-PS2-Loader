@@ -2824,10 +2824,14 @@ int _start(int argc, char **argv)
 	dev9_init();
 #endif
 #ifdef HDD_DRIVER
+#ifndef HD_PRO
 	RegisterLibraryEntries(&_exp_dev9);
+#endif
 	RegisterLibraryEntries(&_exp_atad);
 
+#ifndef HD_PRO
 	dev9_init();
+#endif
 	atad_start();
 
 	atad_inited = 1;

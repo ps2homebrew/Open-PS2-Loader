@@ -157,6 +157,7 @@ END_EXPORT_TABLE
 #endif
 
 #ifdef HDD_DRIVER
+#ifndef HD_PRO
 // dev9 export table
 DECLARE_EXPORT_TABLE(dev9, 1, 7)
 	DECLARE_EXPORT(dev9_init)
@@ -174,6 +175,7 @@ DECLARE_EXPORT_TABLE(dev9, 1, 7)
 	DECLARE_EXPORT(dev9RegisterPreDmaCb)
 	DECLARE_EXPORT(dev9RegisterPostDmaCb)
 END_EXPORT_TABLE
+#endif
 
 // atad export table
 DECLARE_EXPORT_TABLE(atad, 1, 3)

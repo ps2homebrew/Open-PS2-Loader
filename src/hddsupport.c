@@ -31,9 +31,6 @@ extern int size_hdpro_atad_irx;
 extern void *ps2hdd_irx;
 extern int size_ps2hdd_irx;
 
-extern void *hdpro_checker_irx;
-extern int size_hdpro_checker_irx;
-
 extern void *ps2fs_irx;
 extern int size_ps2fs_irx;
 
@@ -69,31 +66,55 @@ static void hddInitModules(void) {
 #endif
 }
 
+// HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
+// The pseudo ATA controller registers are accessed (input/ouput) by writing
+// an id to the main ATA controller
+#define HDPROreg_IO8	      (*(volatile unsigned char *)0xBFC00000) 
+#define CDVDreg_STATUS        (*(volatile unsigned char *)0xBF40200A) 
+
 static int hddCheckHDProKit(void)
 {
-	int ret; 
+	int ret = 0;
 
-	vu32 *pRes = (vu32 *)0x200c0000;
 	DIntr();
-	u32 val = *pRes;
+	ee_kmode_enter();
+	// HD Pro IO start commands sequence
+	HDPROreg_IO8 = 0x72;
+	CDVDreg_STATUS = 0;
+	HDPROreg_IO8 = 0x34;
+	CDVDreg_STATUS = 0;
+	HDPROreg_IO8 = 0x61;
+	CDVDreg_STATUS = 0;
+	u32 res = HDPROreg_IO8;
+	CDVDreg_STATUS = 0;
+	ee_kmode_exit();
 	EIntr();
-
-	SifExecModuleBuffer(&hdpro_checker_irx, size_hdpro_checker_irx, 0, NULL, &ret);
 
 	FlushCache(0);
 	FlushCache(2);
 
 	DIntr();
-	if (*pRes == 0xdeadfeed) {		
-		*pRes = val;
-		EIntr();
+	ee_kmode_enter();
 
-		LOG("hddCheckHDPro() HD Pro Kit connected!\n");
-		return 1;
+	// check result
+	if ((res & 0xff) == 0xe7) {
+		HDPROreg_IO8 = 0xe3;
+		CDVDreg_STATUS = 0;
+		// HD Pro IO finish commands sequence
+		HDPROreg_IO8 = 0xf3;
+		CDVDreg_STATUS = 0;
+		ret = 1;
 	}
+	ee_kmode_exit();
 	EIntr();
 
-	return 0;
+	FlushCache(0);
+	FlushCache(2);
+
+	if (ret)
+		LOG("hddCheckHDPro() HD Pro Kit detected!\n");
+
+	return ret;
 }
 
 void hddLoadModules(void) {

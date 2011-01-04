@@ -22,14 +22,17 @@ extern int size_ps2dev9_irx;
 extern void *ps2atad_irx;
 extern int size_ps2atad_irx;
 
+extern void *hdpro_atad_irx;
+extern int size_hdpro_atad_irx;
+
 extern void *ps2hdd_irx;
 extern int size_ps2hdd_irx;
 
-extern void *ps2fs_irx;
-extern int size_ps2fs_irx;
-
 extern void *hdpro_checker_irx;
 extern int size_hdpro_checker_irx;
+
+extern void *ps2fs_irx;
+extern int size_ps2fs_irx;
 
 #ifdef VMC
 extern void *hdd_mcemu_irx;
@@ -61,18 +64,29 @@ static void hddInitModules(void) {
 #endif
 }
 
-static int hddCheckHDPro(void)
+static int hddCheckHDProKit(void)
 {
 	int ret; 
+
+	vu32 *pRes = (vu32 *)0x200c0000;
+	DIntr();
+	u32 val = *pRes;
+	EIntr();
+
 	SifExecModuleBuffer(&hdpro_checker_irx, size_hdpro_checker_irx, 0, NULL, &ret);
 
 	FlushCache(0);
 	FlushCache(2);
 
-	if (*(u32 *)0x200c0000 == 0xdeadfeed) {
+	DIntr();
+	if (*pRes == 0xdeadfeed) {		
+		*pRes = val;
+		EIntr();
+
 		LOG("hddCheckHDPro() HD Pro Kit connected!\n");
 		return 1;
 	}
+	EIntr();
 
 	return 0;
 }
@@ -82,8 +96,6 @@ void hddLoadModules(void) {
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
 	LOG("hddLoadModules()\n");
-
-	hddCheckHDPro();
 
 	gHddStartup = 4;
 
@@ -95,7 +107,12 @@ void hddLoadModules(void) {
 
 	gHddStartup = 3;
 
-	ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+	// try to detect HD Pro Kit (not the connected HDD),
+	// if detected it loads the specific ATAD module
+	if (hddCheckHDProKit())
+		ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
+	else
+		ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
 	if (ret < 0) {
 		gHddStartup = -1;
 		return;

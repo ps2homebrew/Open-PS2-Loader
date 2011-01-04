@@ -16,6 +16,9 @@ extern int size_hdd_cdvdman_irx;
 extern void *hdd_pcmcia_cdvdman_irx;
 extern int size_hdd_pcmcia_cdvdman_irx;
 
+extern void *hdd_hdpro_cdvdman_irx;
+extern int size_hdd_hdpro_cdvdman_irx;
+
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
 
@@ -45,6 +48,8 @@ static int hddGameCount = 0;
 static hdl_games_list_t* hddGames;
 
 const char *oplPart = "hdd0:+OPL";
+
+static int hddHDProKitDetected = 0;
 
 // forward declaration
 static item_list_t hddGameList;
@@ -109,7 +114,8 @@ void hddLoadModules(void) {
 
 	// try to detect HD Pro Kit (not the connected HDD),
 	// if detected it loads the specific ATAD module
-	if (hddCheckHDProKit())
+	hddHDProKitDetected = hddCheckHDProKit();
+	if (hddHDProKitDetected)
 		ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
 	else
 		ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
@@ -357,7 +363,11 @@ static void hddLaunchGame(int id) {
 	}
 	hddSetTransferMode(dmaType, dmaMode);
 
-	if (sysPcmciaCheck()) {
+	if (hddHDProKitDetected) {
+		size_irx = size_hdd_hdpro_cdvdman_irx;
+		irx = &hdd_hdpro_cdvdman_irx;
+	}
+	else if (sysPcmciaCheck()) {
 		size_irx = size_hdd_pcmcia_cdvdman_irx;
 		irx = &hdd_pcmcia_cdvdman_irx;
 	}

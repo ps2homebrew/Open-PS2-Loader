@@ -24,8 +24,8 @@ LOADER_OBJS = obj/loader.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
-		obj/ps2atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o obj/udptty.o obj/iomanx.o obj/filexio.o \
-		obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o obj/hdpro_checker.o
+		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/hdpro_checker.o obj/genvmc.o obj/hdldsvr.o \
+		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
 
 ifeq ($(VMC),1)
 LOADER_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
@@ -145,6 +145,8 @@ clean:
 	$(MAKE) -C modules/cdvd/discID clean
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/hdd/atad clean
+	echo "    * hdpro_atad.irx"
+	$(MAKE) -C modules/hdd/hdpro_atad clean
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/hdd/ps2hdd clean
 	echo "    * hdpro_checker.irx"
@@ -399,6 +401,11 @@ ps2atad.s:
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/hdd/atad
 	bin2s modules/hdd/atad/ps2atad.irx asm/ps2atad.s ps2atad_irx
+
+hdpro_atad.s:
+	echo "    * hdpro_atad.irx"
+	$(MAKE) -C modules/hdd/hdpro_atad
+	bin2s modules/hdd/hdpro_atad/hdpro_atad.irx asm/hdpro_atad.s hdpro_atad_irx
 
 poweroff.s:
 	bin2s $(PS2SDK)/iop/irx/poweroff.irx asm/poweroff.s poweroff_irx

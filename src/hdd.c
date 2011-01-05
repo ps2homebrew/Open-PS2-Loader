@@ -95,6 +95,28 @@ int hddSetTransferMode(int type, int mode)
 }
 
 //-------------------------------------------------------------------------
+int hddSetIdleTimeout(int timeout)
+{
+	// From hdparm man:
+	// A value of zero means "timeouts  are  disabled":  the
+	// device will not automatically enter standby mode.  Values from 1
+	// to 240 specify multiples of 5 seconds, yielding timeouts from  5
+	// seconds to 20 minutes.  Values from 241 to 251 specify from 1 to
+	// 11 units of 30 minutes, yielding timeouts from 30 minutes to 5.5
+	// hours.   A  value  of  252  signifies a timeout of 21 minutes. A
+	// value of 253 sets a vendor-defined timeout period between 8  and
+	// 12  hours, and the value 254 is reserved.  255 is interpreted as
+	// 21 minutes plus 15 seconds.  Note that  some  older  drives  may
+	// have very different interpretations of these values.
+
+	u8 args[16];
+
+	*(u32 *)&args[0] = timeout & 0xff;
+
+	return fileXioDevctl("hdd0:", APA_DEVCTL_IDLE, args, 4, NULL, 0);
+}
+
+//-------------------------------------------------------------------------
 static int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize)
 {
 	u8 args[16];

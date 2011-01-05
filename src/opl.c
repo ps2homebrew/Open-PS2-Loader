@@ -477,6 +477,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "default_device", &gDefaultDevice);
 			configGetInt(configOPL, "disable_debug", &gDisableDebug);
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
+			configGetInt(configOPL, "hdd_spindown", &gHDDSpindown);
 			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
 			configGetInt(configOPL, "usb_delay", &gUSBDelay);
 			if (configGetStr(configOPL, "usb_prefix", &temp))
@@ -524,6 +525,7 @@ static void _saveConfig() {
 		configSetInt(configOPL, "default_device", gDefaultDevice);
 		configSetInt(configOPL, "disable_debug", gDisableDebug);
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
+		configSetInt(configOPL, "hdd_spindown", gHDDSpindown);
 		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
 		configSetInt(configOPL, "usb_delay", gUSBDelay);
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
@@ -805,6 +807,7 @@ static void setDefaults(void) {
 	gNetworkStartup = 6;
 	gHddStartup = 6;
 	
+	gHDDSpindown = 20;
 	// no change to the ipconfig was done
 	gIPConfigChanged = 0;
 	gScrollSpeed = 1;

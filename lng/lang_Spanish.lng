@@ -5,7 +5,7 @@ Open PS2 Loader %s
 Guardar cambios
 O Atrás
 Configurar red
-<No hay elementos>
+<Sin configurar>
 Configuración guardada...
 ¡Error al guardar la configuración!
 Salir
@@ -31,7 +31,7 @@ Menú por defecto
 Cargar del disco
 Espera por favor
 Error al cargar la ID del juego
-Lista de juegos ordenada por alfabeto
+Listas ordenadas por alfabeto
 Error al cargar archivo de idioma
 No mostrar los colores para depuración
 Mando no encontrado, esperando...
@@ -73,7 +73,7 @@ Mostrar las operaciones de Borrar y Renombrar
 Comprobar fragmentación de juego USB
 Recordar último juego jugado
 Error, el juego está fragmentado
-Error, no se pudo iniciar el objeto
+Error, no se pudo iniciar el archivo
 Test
 Dejar vacío para autentificar como GUEST
 Cargar núcleo alternativo
@@ -85,7 +85,7 @@ Sin soporte IGR
 Buffer cdvdfsv reducido
 Ocultar módulo dev9
 Combinación de IGR alternativa
-Cambiar el tamaño reformateará la VMC
+Cambiar el tamaño formateará la VMC
 Crear
 Modificar
 Abortar
@@ -96,10 +96,10 @@ Nombre
 Tamaño
 Estado
 Progreso
-Archivo VMC ya existe
+Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
 Error con el archivo VMC, ¿continuar con la MC física?
-Refresco automático de la lista
+Refresco automático de las listas
 Acerca del OPL
 Desarrolladores

@@ -77,7 +77,8 @@ static void Shutdown_Dev9()
 static void Go_Browser(void)
 {
 	// Shutdown Dev9 hardware
-	Shutdown_Dev9();
+	if (HDDSpindown)
+		Shutdown_Dev9();
 	
 	// FlushCache before exiting
 	FlushCache(0);

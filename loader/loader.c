@@ -58,6 +58,11 @@ int main(int argc, char **argv){
 	p = _strtok(NULL, " ");
 	USBDelay = _strtoui(p);
 	DPRINTF("USB Delay = %d\n", USBDelay);
+
+	p = _strtok(NULL, " ");
+	HDDSpindown = _strtoui(p);
+	DPRINTF("HDD Spindown = %d\n", HDDSpindown);
+
 	p = _strtok(NULL, " ");
 	_strcpy(g_ps2_ip, p);
 	p = _strtok(NULL, " ");

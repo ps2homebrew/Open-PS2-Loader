@@ -50,6 +50,7 @@
 #define CFG_DANDROP				39
 #define CFG_USBDELAY			40
 #define CFG_USBPREFIX			41
+#define CFG_HDDSPINDOWN			42
 
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];

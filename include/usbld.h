@@ -58,6 +58,7 @@ char gPCPassword[32];
 int gNetworkStartup;
 // true if the ip config should be saved as well
 int gIPConfigChanged;
+int gHDDSpindown;
 /// Indicates the hdd module loading sequence
 int gHddStartup;
 /// 0 = off, 1 = manual, 2 = auto

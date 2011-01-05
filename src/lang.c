@@ -112,7 +112,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Coders",
 	"USB delay",
 	"USB prefix path",
-	"Leave empty to exit to PS2Browser"
+	"Leave empty to exit to PS2Browser",
+	"Value in minute(s), 0 to disable spin down",
+	"Automatic HDD spin down"
 };
 
 static int guiLangID = 0;

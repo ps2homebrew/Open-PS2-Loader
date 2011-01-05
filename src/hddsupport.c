@@ -163,6 +163,8 @@ void hddLoadModules(void) {
 
 	LOG("hddLoadModules: modules loaded\n");
 
+	hddSetIdleTimeout(gHDDSpindown * 12); // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
+
 	ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
 	if (ret < 0) {
 		fileXioUmount(hddPrefix);
@@ -383,6 +385,7 @@ static void hddLaunchGame(int id) {
 		dmaMode -= 3;
 	}
 	hddSetTransferMode(dmaType, dmaMode);
+	hddSetIdleTimeout(gHDDSpindown * 12);
 
 	if (hddHDProKitDetected) {
 		size_irx = size_hdd_hdpro_cdvdman_irx;

@@ -47,7 +47,7 @@ IOP_LDFLAGS := $(LDFLAGS_TARGET) -nostdlib $(IOP_LDFLAGS)
 
 
 $(IOP_BIN) : $(IOP_OBJS)
-	$(IOP_CC) $(IOP_LDFLAGS) -o $(IOP_BIN) $(IOP_OBJS) $(IOP_LIBS)
+	$(IOP_CC) $(IOP_LDFLAGS) -o $(IOP_BIN) $(IOP_OBJS) $(IOP_LIBS) -Xlinker -Map -Xlinker cdvdman.map
 
 $(IOP_LIB) : $(IOP_OBJS)
 	$(IOP_AR) cru $(IOP_LIB) $(IOP_OBJS)

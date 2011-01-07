@@ -271,16 +271,11 @@ static void guiShowAbout() {
 }
 
 static void guiExecExit() {
-	if(gExitPath[0] == '\0') {
-		__asm__ __volatile__(
-			"	li $3, 0x04;"
-			"	syscall;"
-			"	nop;"
-		);
-	} else {
-		shutdown();
-		sysExecElf(gExitPath, 0, NULL);
-	}
+	__asm__ __volatile__(
+		"	li $3, 0x04;"
+		"	syscall;"
+		"	nop;"
+	);
 }
 
 static void guiShowConfig() {

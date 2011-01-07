@@ -59,7 +59,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"HDL Server Running... Press [O] to stop",
 	"Press [X] to terminate HDL server",
 	"HDL Server Unloading...",
-	"Exit to",
+	"IGR path",
 	"Background color",
 	"Text color",
 	"IP",
@@ -112,7 +112,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Coders",
 	"USB delay",
 	"USB prefix path",
-	"Leave empty to exit to PS2Browser",
+	"Leave empty to exit to Browser",
 	"Value in minute(s), 0 to disable spin down",
 	"Automatic HDD spin down"
 };

@@ -156,6 +156,8 @@ static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short p
 
 	if ( (listSupport = usbGetObject(1)) )
 		return listSupport->itemGetArt(name, resultTex, type, psm);
+
+	return -1;
 }
 
 static void appCleanUp(int exception) {

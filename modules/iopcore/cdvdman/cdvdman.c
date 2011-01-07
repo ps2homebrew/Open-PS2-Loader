@@ -1359,20 +1359,22 @@ int sceCdDiskReady(int mode)
 	DPRINTF("sceCdDiskReady %d\n", mode);
 	cdvdman_stat.err = CDVD_ERR_NO;
 
-	if (mode == 0) {
-		while (sceCdDiskReady(1) == CDVD_READY_NOTREADY)
-			DelayThread(5000);
-	}
+	if (fs_inited) {
+		if (mode == 0) {
+			while (sceCdDiskReady(1) == CDVD_READY_NOTREADY)
+				DelayThread(5000);
+		}
 
 #ifdef ALT_READ_CORE
-	if (!cdvdman_stat.cdNCmd) {
-		if (cdvdman_stat.cddiskready)
-			return CDVD_READY_READY;
-	}
+		if (!cdvdman_stat.cdNCmd) {
+			if (cdvdman_stat.cddiskready)
+				return CDVD_READY_READY;
+		}
 #else	
-	if (!sync_flag)
-		return CDVD_READY_READY;
+		if (!sync_flag)
+			return CDVD_READY_READY;
 #endif
+	}
 
 	return CDVD_READY_NOTREADY;
 }

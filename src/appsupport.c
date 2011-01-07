@@ -28,6 +28,18 @@ static struct config_value_t* appGetConfigValue(int id) {
 	return cur;
 }
 
+static char* appGetELFName(char* name) {
+	// Looking for the ELF name
+	char* pos = strrchr(name, '/');
+	if (!pos)
+		pos = strrchr(name, ':');
+	if (pos) {
+		return pos + 1;
+	}
+
+	return name;
+}
+
 void appInit(void) {
 	LOG("appInit()\n");
 	appForceUpdate = 1;
@@ -82,7 +94,7 @@ static int appGetItemNameLength(int id) {
 
 static char* appGetItemStartup(int id) {
 	struct config_value_t* cur = appGetConfigValue(id);
-	return cur->val;
+	return appGetELFName(cur->val);
 }
 
 #ifndef __CHILDPROOF
@@ -129,28 +141,21 @@ static void appLaunchItem(int id) {
 }
 
 static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
-	// Looking for the ELF name
-	char* pos = strrchr(name, '/');
-	if (!pos)
-		pos = strrchr(name, ':');
-	if (pos) {
-		// We search on ever devices from fatest to slowest (HDD > ETH > USB)
-		static item_list_t *listSupport = NULL;
-		if ( (listSupport = hddGetObject(1)) ) {
-			if (listSupport->itemGetArt(pos + 1, resultTex, type, psm) >= 0)
-				return 0;
-		}
-
-		if ( (listSupport = ethGetObject(1)) ) {
-			if (listSupport->itemGetArt(pos + 1, resultTex, type, psm) >= 0)
-				return 0;
-		}
-
-		if ( (listSupport = usbGetObject(1)) )
-			return listSupport->itemGetArt(pos + 1, resultTex, type, psm);
+	name = appGetELFName(name);
+	// We search on ever devices from fatest to slowest (HDD > ETH > USB)
+	static item_list_t *listSupport = NULL;
+	if ( (listSupport = hddGetObject(1)) ) {
+		if (listSupport->itemGetArt(name, resultTex, type, psm) >= 0)
+			return 0;
 	}
-	
-	return -1;
+
+	if ( (listSupport = ethGetObject(1)) ) {
+		if (listSupport->itemGetArt(name, resultTex, type, psm) >= 0)
+			return 0;
+	}
+
+	if ( (listSupport = usbGetObject(1)) )
+		return listSupport->itemGetArt(name, resultTex, type, psm);
 }
 
 static void appCleanUp(int exception) {

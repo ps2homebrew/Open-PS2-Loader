@@ -84,7 +84,11 @@ void ResetSPU()
 		
 		statx = U16_REGISTER(0x344 + (core * 1024));
 
-		while(*statx & 0x7FF);
+		int i;
+		for (i=0; i<=0xf00; i++) {
+			if (!(*statx & 0x7FF))
+				break;
+		}
 		
 		*SD_A_KOFF_HI(core)		= 0xFFFF;
 		*SD_A_KOFF_LO(core)		= 0xFFFF; // Should probably only be 0xFF

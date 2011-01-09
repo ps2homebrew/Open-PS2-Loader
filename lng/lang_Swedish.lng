@@ -1,0 +1,105 @@
+# translation by Ronald Andersson (aka: dlanor)
+Swedish
+               VÄLKOMMEN TILL OPEN PS2 LOADER. HUVUDKODEN GRUNDAS PÅ KÄLLKOD FRÅN HD PROJECT <http://psx-scene.com> ANPASSNING TILL USB ADVANCE FORMAT OCH URSPRUNGLIGT GUI AV IFCARO <http://ps2dev.ifcaro.net> MERPARTEN AV LADDARKÄRNAN ÄR GJORD AV JIMMIKAELKAEL. ALLA GUI-FÖRBÄTTRINGAR ÄR GJORDA AV VOLCA. TACK FÖR ATT DU ANVÄNDER VÅRT PROGRAM ^^
+Open PS2 Loader %s
+Spara ändringar
+O Tillbaks
+Nätverksinställningar
+<inga värden>
+Inställningar sparade...
+Fel vid skrivning av inställningar!
+Avsluta
+Inställningar
+Spel från USB
+Spel från HDD
+Spel från Nätverk
+Applikationer
+Tema
+Språk
+Fel vid start av Nätverk
+På
+Av
+Ok
+Spel-inställningar
+Nollställ alla val
+Tog bort alla spelets inställningar
+Radrullning
+Långsam
+Medium
+Snabb
+Grundmeny
+Ladda från skiva
+Var god vänta
+Fel vid laddning av spelets ID
+Automatisk sortering
+Fel vid laddning av språkfil
+Stäng av Debug-färger
+Ingen handkontroll funnen, väntar...
+Använd fodral-bilder
+Storbildsformat
+Stäng av
+Laddar inställningar
+Sparar inställningar
+Starta enhet
+Startmetod för USB
+Startmetod för HDD
+Startmetod för Nätverk
+Startmetod för Program
+Automatisk
+Manuell
+Starta HDL-Server
+HDL-Server Startar...
+HDL-Server Körande... Tryck [O] för att avbryta
+Tryck [X] för att avsluta HDL-server
+HDL-Server Avslutas...
+Vid avslut kör
+Bakgrundsfärg
+Textfärg
+IP-adress
+Nätmask
+Gateway
+Port
+Share
+Användarnamn
+Lösenord
+<ej satt>
+X Bekräfta
+Objektet blir permanent raderat! continue ?
+Döp om
+Radera
+Starta
+Inställningar för GUI-visning
+Aktivera kommandona "Döp om" och "Radera"
+Testa fragmentering av spel från USB
+Minns senast körda spel
+Fel ! spelet är fragmenterat
+Fel ! objektet kunde inte startas
+Test
+Lämna tomt för anonym fildelning
+Ladda alternativ kärna
+Alternativ metod för data-läsning
+Deaktivera Syscalls
+0 PSS mode
+Deaktivera DVD-DL
+Deaktivera IGR
+Reducerad cdvdfsv-buffert
+Göm dev9-modulen
+Alternativ IGR-kombination
+Storleksändring medför VMC-formatering
+Skapa
+Ändra
+Avbryt
+Välj bort
+Använd generisk
+Konfigurera VMC
+Namn
+Storlek
+Status
+Bearbetat
+VMC-fil finnes
+Ogiltig VMC-fil, storleken är fel
+VMC-fil behöver skapas
+VMC-fil felaktig ! Fortsätta med fysiskt MC ?
+Automatisk uppdatering
+Om OPL
+Utvecklare

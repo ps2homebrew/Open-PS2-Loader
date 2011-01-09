@@ -1,0 +1,20 @@
+DECLARE_EXPORT_TABLE(ioptrap, 1, 1)
+	DECLARE_EXPORT(_start)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(shutdown)
+	DECLARE_EXPORT(_retonly)
+	
+	DECLARE_EXPORT(get_exception_name)
+/*05*/	DECLARE_EXPORT(dbg_setjmp)
+	DECLARE_EXPORT(set_exception_handler)
+	DECLARE_EXPORT(get_exception_handler)
+	DECLARE_EXPORT(set_dba)
+	DECLARE_EXPORT(set_dbam)
+/*10*/	DECLARE_EXPORT(set_dcic)
+	DECLARE_EXPORT(get_dba)
+	DECLARE_EXPORT(get_dbam)
+	DECLARE_EXPORT(get_dcic)
+	
+END_EXPORT_TABLE
+
+void _retonly() {}

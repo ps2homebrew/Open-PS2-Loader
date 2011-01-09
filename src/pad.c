@@ -209,9 +209,9 @@ static int readPad(struct pad_data_t* pad)
 static int getKeyDelay(int id, int repeat) {
 	int delay = paddelay[id - 1];
 	
-	// if not in repeat, the delay is enlarged
+	// if not in repeat, the delay is doubled
 	if (!repeat)
-		delay *= 3;
+		delay += delay;
 	
 	return delay;
 }

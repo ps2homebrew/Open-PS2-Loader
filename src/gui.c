@@ -326,12 +326,10 @@ static void guiShowConfig() {
 static void guiShowUIConfig() {
 	// configure the enumerations
 	const char* scrollSpeeds[] = {	_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL };
-	const char* vmodeNames[] = {"AUTO", "PAL", "NTSC", NULL};
 
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
-	diaSetEnum(diaUIConfig, UICFG_VMODE, vmodeNames);
 
 	diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
 	diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
@@ -342,12 +340,6 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
-
-	int oldVmode = gVMode;
-	int oldVSync = gVSync;
-
-        diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
-        diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
 
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, NULL);
 	if (ret) {
@@ -361,31 +353,6 @@ static void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
-
-		diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
-                diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
-
-		// a hack - we don't want to set the vmode without
-		// a reason...
-		if (gVMode != oldVmode || gVSync != oldVSync) {
-			// reinit the graphics...
-			int screenHeight;
-
-			rmSetMode(gVSync, gVMode);
-
-			// Reload the screen extents
-			rmGetScreenExtents(&screenWidth, &screenHeight);
-			// TODO: This will probably confuse themes
-			thmReloadScreenExtents();
-
-			// also propagate to vmode cfg
-			config_set_t* configVMode = configGetByType(CONFIG_VMODE);
-
-			if (configVMode) {
-				configSetInt(configVMode, "vsync", gVSync);
-				configSetInt(configVMode, "vmode", gVMode);
-			}
-		}
 
 		applyConfig(themeID, langID);
 	}
@@ -1296,7 +1263,7 @@ static void guiMenuHandleInput() {
 			// ipconfig
 			guiShowIPConfig();
 		} else if (id == 7) {
-			saveConfig(CONFIG_OPL | CONFIG_VMODE, 1);
+			saveConfig(CONFIG_OPL, 1);
 		} else if (id == 8) {
 			guiShowAbout();
 		} else if (id == 9) {

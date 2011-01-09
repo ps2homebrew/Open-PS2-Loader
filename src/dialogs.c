@@ -178,18 +178,13 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_AUTOREFRESH}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOREFRESH, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_SPLITTER},
 	
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_BGCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, 1, -1, {.colourvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_TXTCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, 1, -1, {.colourvalue = {0, 0}}}, {UI_BREAK},
-
-	{UI_SPLITTER},
-
-	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_VMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_VMODE, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, {.label = {"V-Sync", -1}}}, {UI_SPACER}, {UI_BOOL, UICFG_VSYNC, 1, -1, {.intvalue = {1, 1}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, {.intvalue = {0, 0}}}, {UI_BREAK},
-
+	
 	{UI_SPLITTER},
 	{UI_OK, 0, 1, -1, {.label = {NULL, _STR_OK}}},
 

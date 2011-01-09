@@ -32,30 +32,6 @@ static struct rm_texture_list_t *uploadedTextures = NULL;
 static rm_clip_rect_t clipRect;
 
 static int order;
-static int vsync = 0;
-static enum rm_vmode vmode;
-// GSKit side detected vmode...
-static int defaultVMode = GS_MODE_PAL;
-
-#define NUM_RM_VMODES 3
-// RM Vmode -> GS Vmode conversion table
-static const int rm_mode_table[NUM_RM_VMODES] = {
-	-1,
-	GS_MODE_PAL,
-	GS_MODE_NTSC,
-};
-
-// inverse mode conversion table
-#define MAX_GS_MODE 15
-static int rm_gsmode_table[MAX_GS_MODE+1] = {
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-};
-
-static int rm_height_table[] = {
-	448,
-	512,
-	448
-};
 
 static float aspectWidth;
 static float aspectHeight;
@@ -179,13 +155,12 @@ int rmPrepareTexture(GSTEXTURE* txt) {
 	return rmUploadTexture(txt);
 }
 
-void rmDispatch(void) {
-    gsKit_queue_exec(gsGlobal);
+static void rmDispatchRenderQueue(void) {
+	gsKit_queue_exec(gsGlobal);
 }
 
-
 void rmFlush(void) {
-        rmDispatch();
+	rmDispatchRenderQueue();
 
 	// release all the uploaded textures
 	gsKit_vram_clear(gsGlobal);
@@ -230,8 +205,7 @@ void rmEndFrame(void) {
 
 	if(!gsGlobal->FirstFrame)
 	{
-                if (vsync)
-                    SleepThread();
+		SleepThread();
 		
 		if(gsGlobal->DoubleBuffering == GS_SETTING_ON)
 		{
@@ -248,26 +222,18 @@ void rmEndFrame(void) {
 }
 
 static int rmOnVSync(void) {
-	if (vsync)
-		iWakeupThread(guiThreadID);
-
+	iWakeupThread(guiThreadID);
 	return 0;
 }
 
-void rmInit(int vsyncon, enum rm_vmode vmodeset) {
-        gsGlobal = gsKit_init_global();
+void rmInit(void) {
+	gsGlobal = gsKit_init_global();
 
-	defaultVMode = gsGlobal->Mode;
-
-	int mde;
-	for (mde = 0; mde < NUM_RM_VMODES; ++mde) {
-		int gsmde = rm_mode_table[mde];
-		if (gsmde >= 0 && gsmde <= MAX_GS_MODE)
-			rm_gsmode_table[rm_mode_table[mde]] = mde;
-	}
-
-	// default height
-	rm_height_table[RM_VMODE_AUTO] = rm_height_table[gsGlobal->Mode];
+	gsGlobal->PSM = GS_PSM_CT24;
+	gsGlobal->PSMZ = GS_PSMZ_16S;
+	gsGlobal->ZBuffering = GS_SETTING_OFF;
+	gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
+	gsGlobal->DoubleBuffering = GS_SETTING_ON;
 
 	dmaKit_init(D_CTRL_RELE_OFF, D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC,
 		    D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
@@ -277,8 +243,12 @@ void rmInit(int vsyncon, enum rm_vmode vmodeset) {
 	dmaKit_chan_init(DMA_CHANNEL_FROMSPR);
 	dmaKit_chan_init(DMA_CHANNEL_TOSPR);
 
-	rmSetMode(vsyncon, vmodeset);
+	gsKit_init_screen(gsGlobal);
 
+	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
+
+	gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
+	
 	order = 0;
 
 	clipRect.used = 0;
@@ -291,50 +261,14 @@ void rmInit(int vsyncon, enum rm_vmode vmodeset) {
 
 	transX = 0.0f;
 	transY = 0.0f;
-
+	
+	// int callback_id = 
 	guiThreadID = GetThreadId();
 	gsKit_add_vsync_handler(&rmOnVSync);
-}
-
-void rmSetMode(int vsyncon, enum rm_vmode vmodeset) {
-	vsync = vsyncon;
-	vmode = vmodeset;
-
-	// VMode override...
-	if (vmode != RM_VMODE_AUTO) {
-		gsGlobal->Mode = rm_mode_table[vmode];
-	} else {
-		gsGlobal->Mode = defaultVMode;
-	}
-
-	gsGlobal->Height = 512; // whatever...
-
-	if (gsGlobal->Mode <= MAX_GS_MODE) {
-		// back to rm mode from gs mode
-		int rmmde = rm_gsmode_table[gsGlobal->Mode];
-
-		if (rmmde)
-			gsGlobal->Height = rm_height_table[rmmde];
-	}
-
-	gsGlobal->PSM = GS_PSM_CT24;
-	gsGlobal->PSMZ = GS_PSMZ_16S;
-	gsGlobal->ZBuffering = GS_SETTING_OFF;
-	gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
-	gsGlobal->DoubleBuffering = GS_SETTING_ON;
-
-	gsKit_init_screen(gsGlobal);
-
-	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
-
-	gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
-
+	
 	// reset the contents of the screen to avoid garbage being displayed
 	gsKit_clear(gsGlobal, gColBlack);
 	gsKit_sync_flip(gsGlobal);
-
-	LOG("New vmode: %d x %d\n", gsGlobal->Width, gsGlobal->Height);
-
 }
 
 void rmGetScreenExtents(int *w, int *h) {

@@ -9,9 +9,8 @@
 #define CONFIG_VMC		0x08
 #define CONFIG_LAST		0x10
 #define CONFIG_APPS		0x20
-#define CONFIG_VMODE	0x40
 
-#define CONFIG_FILE_NUM 7
+#define CONFIG_FILE_NUM 6
 
 struct config_value_t {
         char key[32];

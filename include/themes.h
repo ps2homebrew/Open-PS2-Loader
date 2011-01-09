@@ -16,8 +16,6 @@ typedef struct {
 	short enabled;
 	int posX;
 	int posY;
-	int posXOrig; //!< Before alignment to screen size
-	int posYOrig; //!< Before alignment to screen size
 	short aligned;
 	int width;
 	int height;
@@ -59,7 +57,6 @@ typedef struct {
 theme_t* gTheme;
 
 void thmInit();
-void thmReloadScreenExtents();
 void thmAddElements(char* path, char* separator);
 char* thmGetValue();
 GSTEXTURE* thmGetTexture(unsigned int id);

@@ -2414,8 +2414,14 @@ void cdvdman_trimspaces(char* str)
 		*p = 0;
 	}
 
-	while (!strcmp(&str[len-4], ";1;1")) {
-		str[len-2] = 0;	
+	while (!strcmp(&str[len-3], ";;1")) { // Tenchu: Wrath oh Heaven fix
+		str[len-2] = '1';
+		str[len-1] = 0;
+		len = strlen(str);		
+	}
+
+	while (!strcmp(&str[len-4], ";1;1")) { // SmackDown: shut your mouth fix
+		str[len-2] = 0;
 		len = strlen(str);
 	}
 }

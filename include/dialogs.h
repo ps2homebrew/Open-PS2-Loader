@@ -37,8 +37,6 @@
 #define UICFG_COVERART			16
 #define UICFG_WIDESCREEN		17
 #define UICFG_AUTOREFRESH		18
-#define UICFG_VMODE				19
-#define UICFG_VSYNC				20
 
 #define CFG_EXITTO				30
 #define CFG_DEFDEVICE			31

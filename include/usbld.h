@@ -72,9 +72,6 @@ int gAutoRefresh;
 /// true if icons and covers Art should be displayed
 int gEnableArt;
 int gWideScreen;
-int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
-int gVSync; // 0 - False, 1 - True
-
 // 0,1,2 scrolling speed
 int gScrollSpeed;
 // Exit path

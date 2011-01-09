@@ -331,16 +331,9 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 	// copy the data
         int i = 0;
         int pixelcount = slot->bitmap.width * slot->bitmap.rows;
-
-        // TODO: Doesn't help:
-		// the pixbuf target is a bit bigger for alignment purposes
-        // int pixelsOuter = 4 * (3 + pixelcount / 4);
-		int pixelsOuter = pixelcount;
-
-        // If we would know how to render grayscale (single channel) it could save memory
-        glyph->glyphData = memalign(128, pixelsOuter * 4);
-
-        memset(glyph->glyphData, 0, pixelsOuter);
+	
+	// If we would know how to render grayscale (single channel) it could save memory
+        glyph->glyphData = memalign(128, pixelcount * 4);
 
         // incrementing pointers should be cheaper than array indexing...
         char *src = slot->bitmap.buffer;
@@ -402,10 +395,6 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 	uint32_t codepoint;
 	uint32_t state = 0;
 	int w = 0;
-        FT_Bool use_kerning;
-        FT_UInt previous = 0;
-
-        use_kerning = FT_HAS_KERNING(fnt->face);
 	
 	// cache glyphs and render as we go
 	for (;*string; ++string) {
@@ -421,51 +410,31 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 			continue;
 		}
 
-                FT_UInt glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
-
-                // kerning
-                if ( use_kerning && previous && glyph_index ) {
-                    FT_Vector delta;
-                    FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta );
-                    x += delta.x >> 6;
-                }
-
 		rmSetupQuad(&glyph->texture, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, colour, &quad);
 		quad.ul.x += glyph->ox; quad.br.x += glyph->ox;
 		quad.ul.y += glyph->oy;	quad.br.y += glyph->oy;
 		rmDrawQuad(&quad);
 
-                int ofs = glyph->shx >> 6;
+		int ofs = glyph->shx / 64;
 		w += ofs;
 		x += ofs;
-                y += glyph->shy >> 6;
-                previous = glyph_index;
+		y += glyph->shy / 64;
 	}
 
 	// return to the prev. aspect ratio
 	rmSetAspectRatio(aw, ah);
-
-        // rmDispatch();
-
-        return w;
+	return w;
 }
 
 void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
 	*w = 0;
 	*h = 0;
 
-        WaitSema(gFontSemaId);
         font_t *fnt = &fonts[font];
-        SignalSema(gFontSemaId);
 	
 	// backup the aspect ratio, restore 1:1 to have the font rendering clean
 	uint32_t codepoint;
 	uint32_t state = 0;
-
-        FT_Bool use_kerning;
-        FT_UInt previous = 0;
-
-        use_kerning = FT_HAS_KERNING(fnt->face);
 	
 	// cache glyphs and render as we go
 	for (;*str; ++str) {
@@ -473,23 +442,13 @@ void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
 		
 		if (utf8Decode(&state, &codepoint, c)) // accumulate the codepoint value
 			continue;
-
-                // kerning
-                FT_UInt glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
-
-                if ( use_kerning && previous && glyph_index ) {
-                    FT_Vector delta;
-                    FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta );
-                    *w += delta.x >> 6;
-                }
-
+		
 		// Could just as well only get the glyph dimensions
 		// but it is probable the glyphs will be needed anyway
                 fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
 		
-                *w += glyph->shx >> 6;
+		*w += glyph->shx / 64;
 		*h = glyph->height;
-                previous = codepoint;
 	}
 }
 

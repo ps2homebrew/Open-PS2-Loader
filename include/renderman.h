@@ -28,17 +28,8 @@ const u64 gColDarker;
 const u64 gDefaultCol;
 const u64 gDefaultAlpha;
 
-enum rm_vmode {
-    RM_VMODE_AUTO = 0,
-    RM_VMODE_PAL,
-    RM_VMODE_NTSC
-} ;
-
 /** Initializes the rendering manager */
-void rmInit(int vsyncon, enum rm_vmode vmodeset);
-
-/** Sets a new screen mode */
-void rmSetMode(int vsyncon, enum rm_vmode vmodeset);
+void rmInit(void);
 
 void rmEnd(void);
 
@@ -53,9 +44,6 @@ int rmPrepareTexture(GSTEXTURE* txt);
 
 /** Flushes all rendering buffers - renders the gs queue, removes all textures from GS ram */
 void rmFlush(void);
-
-/** Issues immediate rendering of the accumulated operations */
-void rmDispatch(void);
 
 void rmDrawQuad(rm_quad_t* q);
 

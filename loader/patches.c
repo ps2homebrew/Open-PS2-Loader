@@ -20,7 +20,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[41] = {
+static patchlist_t patch_list[43] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -49,6 +49,8 @@ static patchlist_t patch_list[41] = {
 	{ "SLUS_212.87", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd15c }}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
 	{ "SLES_537.77", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
 	{ "SLES_537.77", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads
+	{ "SLUS_210.22", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x0060f42c }}, // Prince of Persia: Warrior Within NTSC U - slow down cdvd reads
+	{ "SLUS_210.22", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x0060f42c }}, // Prince of Persia: Warrior Within NTSC U - slow down cdvd reads
 	{ "SLES_528.22", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x0060f4dc }}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
 	{ "SLES_528.22", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x0060f4dc }}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
 	{ "SLUS_214.32", ALL_MODE, { 0xdeadbee2, 0x00080000, 0x002baf34 }}, // NRA Gun Club NTSC U

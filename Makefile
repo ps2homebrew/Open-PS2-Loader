@@ -102,10 +102,12 @@ eesio_debug:
 iopcore_debug:
 	$(MAKE) IOPCORE_DEBUG=1 DEBUG=1 all
 
-clean:
-	echo "Cleaning..."
+clean:  sclean
 	echo "    * Freetype..."
 	$(MAKE) -C $(FT_DIR) distclean
+
+sclean:
+	echo "Cleaning..."
 	echo "    * Interface"
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * Loader"

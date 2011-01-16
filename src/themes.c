@@ -96,6 +96,18 @@ static int thmLoadResource(int texId, char* themePath, short psm) {
 	return success;
 }
 
+static void repositionElem(theme_t* theme, theme_element_t* elem) {
+	if (elem->posXOrig < 0)
+		elem->posX = screenWidth + elem->posXOrig;
+	else
+		elem->posX = elem->posXOrig;
+
+	if (elem->posYOrig < 0)
+		elem->posY = ceil((screenHeight + elem->posYOrig) * theme->usedHeight / screenHeight);
+	else
+		elem->posY = elem->posYOrig;
+}
+
 static void getElem(config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
 		short enabled, int x, int y, short aligned, int w, int h, int defColor) {
 
@@ -113,18 +125,17 @@ static void getElem(config_set_t* themeConfig, theme_t* theme, theme_element_t* 
 	snprintf(elemProp, 64, "%s_x", elem->name);
 	if (!configGetInt(themeConfig, elemProp, &intValue))
 		intValue = x;
-	if (intValue < 0)
-		elem->posX = screenWidth + intValue;
-	else
-		elem->posX = intValue;
+
+	elem->posXOrig = intValue;
 
 	snprintf(elemProp, 64, "%s_y", elem->name);
 	if (!configGetInt(themeConfig, elemProp, &intValue))
 		intValue = y;
-	if (intValue < 0)
-		elem->posY = ceil((screenHeight + intValue) * theme->usedHeight / screenHeight);
-	else
-		elem->posY = intValue;
+
+	elem->posYOrig = intValue;
+
+	// reposition based on the screen size
+	repositionElem(theme, elem);
 
 	elem->aligned = aligned;
 	snprintf(elemProp, 64, "%s_aligned", elem->name);
@@ -376,8 +387,6 @@ static void thmLoad(char* themePath) {
 
 	// LOGO is hardcoded
 	thmLoadResource(LOGO_PICTURE, NULL, GS_PSM_CT24);
-	
-	// TODO: loadFont();
 }
 
 static void thmRebuildGuiNames() {
@@ -415,12 +424,39 @@ void thmInit() {
 	LOG("thmInit()\n");
 	gTheme = NULL;
 
-	rmGetScreenExtents(&screenWidth, &screenHeight);
+	thmReloadScreenExtents();
 
 	// initialize default internal
 	thmLoad(NULL);
 
 	thmAddElements(gBaseMCDir, "/");
+}
+
+static void thmReload() {
+	if (gTheme != NULL) {
+		if (gTheme->usedHeight == screenHeight)
+			rmResetShiftRatio();
+		else
+			rmSetShiftRatio((float) screenHeight / gTheme->usedHeight);
+
+
+		// reposition all the elemets
+		repositionElem(gTheme, &gTheme->menuIcon);
+		repositionElem(gTheme, &gTheme->menuText);
+		repositionElem(gTheme, &gTheme->itemsList);
+		repositionElem(gTheme, &gTheme->itemIcon);
+		repositionElem(gTheme, &gTheme->itemCover);
+		repositionElem(gTheme, &gTheme->itemText);
+		repositionElem(gTheme, &gTheme->hintText);
+		repositionElem(gTheme, &gTheme->loadingIcon);
+	}
+}
+
+void thmReloadScreenExtents(int refresh) {
+	rmGetScreenExtents(&screenWidth, &screenHeight);
+
+	// reload theme
+	thmReload();
 }
 
 char* thmGetValue() {
@@ -430,7 +466,11 @@ char* thmGetValue() {
 
 void thmSetGuiValue(int themeID) {
 	LOG("thmSetGuiValue() id=%d\n", themeID);
-	if (guiThemeID != themeID) {
+	if (guiThemeID != themeID || themeID < 0) {
+		// negative theme id means reload
+		if (themeID < 0)
+			themeID = guiThemeID;
+
 		if (themeID != 0)
 			thmLoad(themes[themeID - 1].filePath);
 		else

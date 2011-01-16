@@ -114,7 +114,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"USB prefix path",
 	"Leave empty to exit to Browser",
 	"Value in minute(s), 0 to disable spin down",
-	"Automatic HDD spin down"
+	"Automatic HDD spin down",
+	"Video mode"
 };
 
 static int guiLangID = 0;

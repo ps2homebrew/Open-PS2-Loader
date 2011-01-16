@@ -855,6 +855,25 @@ static void setDefaults(void) {
 	gDefaultUITextColor[2] = 0x040;
 
 	gFrameCounter = UPDATE_FRAME_COUNT;
+
+	gVMode = RM_VMODE_AUTO;
+	gVSync = 1;
+}
+
+void vmodeInit() {
+	config_set_t* configVMode = configGetByType(CONFIG_VMODE);
+
+	if (configVMode) {
+		if (configRead(configVMode) == CONFIG_VMODE) {
+			if (!configGetInt(configVMode, "vsync", &gVSync))
+				gVSync = 1;
+
+			if (!configGetInt(configVMode, "vmode", &gVMode))
+				gVMode = RM_VMODE_AUTO;
+		}
+	}
+
+rmInit(gVSync, gVMode);
 }
 
 static void init(void) {
@@ -863,7 +882,10 @@ static void init(void) {
 
 	padInit(0);
 	configInit(NULL);
-	rmInit();
+
+	// Loads the vmode config from MCs, then sets the vmode
+	vmodeInit();
+
 	lngInit();
 	thmInit();
 	guiInit();

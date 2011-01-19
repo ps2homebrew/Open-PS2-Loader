@@ -268,9 +268,12 @@ _SifSetDma:
 
 #ifdef LOAD_EECORE_DOWN
 	lui	$v0, 0x000b
+	lui	$v1, 0x000d
 #else
 	lui	$v0, 0x0008
 	ori	$v0, $v0, 0x8000
+	lui	$v1, 0x000e
+	ori	$v1, $v1, 0x7000
 #endif
 1:	
 	sq	$zero, 0x0000($v0)
@@ -278,14 +281,8 @@ _SifSetDma:
 	sq	$zero, 0x0020($v0)
 	sq	$zero, 0x0030($v0)
 	addiu	$v0, $v0, 0x0040
-#ifdef LOAD_EECORE_DOWN
-	lui	$v1, 0x0010
-#else
-	lui	$v1, 0x000e
-	ori	$v1, $v1, 0x7000
-#endif
-	sltu	$v1, $v0, $v1
-	bne	$v1, $zero, 1b
+	sltu	$a0, $v0, $v1
+	bne	$a0, $zero, 1b
 
 	/* FlushCache */
 	daddu	$a0, $zero, $zero

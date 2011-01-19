@@ -317,7 +317,7 @@ int cdvdman_readMechaconVersion(char *mname, u32 *stat);
 int cdvdman_readID(int mode, u8 *buf);
 FHANDLE *cdvdman_getfilefreeslot(void);
 void cdvdman_trimspaces(char* str);
-struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength);
+struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer);
 int cdvdman_findfile(cd_file_t *pcd_file, const char *name, int layer);
 int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
 int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
@@ -2427,7 +2427,7 @@ void cdvdman_trimspaces(char* str)
 }
 
 //-------------------------------------------------------------------------
-struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength)
+struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer)
 {
 	char *p = (char *)name;
 	char *slash;
@@ -2436,7 +2436,7 @@ struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength)
 	struct dirTocEntry *tocEntryPointer;
 
 lbl_startlocate:
-	DPRINTF("cdvdman_locatefile start locating\n");
+	DPRINTF("cdvdman_locatefile start locating, layer=%d\n", layer);
 
 	while (*p == '/')
 		p++;
@@ -2501,13 +2501,12 @@ lbl_startlocate:
 					p = &slash[1];
 
 					if (!g_gamesetting_disable_DVDDL) {
-						#ifdef HDD_DRIVER
-						if (tocEntryPointer->fileLBA > apaHeader.layer1_start)
-							tocLBA = apaHeader.layer1_start + tocEntryPointer->fileLBA;
-						#else
-						if (tocEntryPointer->fileLBA > cdvdman_layer1start)
-							tocLBA = cdvdman_layer1start + tocEntryPointer->fileLBA;
-						#endif
+						int on_dual;
+						u32 layer1_start;
+						sceCdReadDvdDualInfo(&on_dual, &layer1_start);
+
+						if (layer)
+							tocLBA += layer1_start;
 					}
 
 					goto lbl_startlocate;
@@ -2554,13 +2553,13 @@ int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 			return 0;
 		}
 
-		tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength);
+		tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength, layer);
 		if (tocEntryPointer == NULL) {
 			len = strlen(name);
 			if (len < 256) {
 				sprintf(cdvdman_filepath, "%s;1", name);
 				cdvdman_trimspaces(cdvdman_filepath);
-				tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength);
+				tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength, layer);
 				if (tocEntryPointer == NULL) {
 					SignalSema(cdvdman_searchfilesema);
 					return 0;

@@ -4,7 +4,8 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
-#include "loader.h"
+#include "ee_core.h"
+#include "util.h"
 
 #define ALL_MODE		-1
 

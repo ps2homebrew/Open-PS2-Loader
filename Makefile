@@ -19,8 +19,8 @@ GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/
 		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o \
 		obj/icon_sys.o obj/icon_icn.o
 
-LOADER_OBJS = obj/loader.o \
-		obj/alt_loader.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
+EECORE_OBJS = obj/ee_core.o \
+		obj/alt_ee_core.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
@@ -29,14 +29,14 @@ LOADER_OBJS = obj/loader.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
 
 ifeq ($(VMC),1)
-LOADER_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
+EECORE_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
 endif
 
 EE_BIN = opl.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(LOADER_OBJS)
+EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(EECORE_OBJS)
 
 EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
 #EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
@@ -110,8 +110,8 @@ sclean:
 	echo "Cleaning..."
 	echo "    * Interface"
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
-	echo "    * Loader"
-	$(MAKE) -C loader clean
+	echo "    * EE core"
+	$(MAKE) -C ee_core clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
 	echo "    * 10K kernel patches"
@@ -184,41 +184,41 @@ pc_tools_win32:
 	echo "Building WIN32 iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=1 -C pc
 
-loader.s:
-	echo "    * Loader"
-	$(MAKE) -C loader clean
+ee_core.s:
+	echo "    * EE core"
+	$(MAKE) -C ee_core clean
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core
 else
 ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C loader
+	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C ee_core
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core
 else
-	$(MAKE) $(VMC_FLAGS) -C loader
+	$(MAKE) $(VMC_FLAGS) -C ee_core
 endif
 endif
 endif
-	bin2s loader/loader.elf asm/loader.s loader_elf
+	bin2s ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
-alt_loader.s:
-	echo "    * alternative Loader"
-	$(MAKE) -C loader clean
+alt_ee_core.s:
+	echo "    * alternative EE core"
+	$(MAKE) -C ee_core clean
 ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core -f Makefile.alt
 else
 ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C ee_core -f Makefile.alt
 else
 ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core -f Makefile.alt
 else
-	$(MAKE) $(VMC_FLAGS) -C loader -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) -C ee_core -f Makefile.alt
 endif
 endif
 endif
-	bin2s loader/loader.elf asm/alt_loader.s alt_loader_elf
+	bin2s ee_core/ee_core.elf asm/alt_ee_core.s alt_eecore_elf
 
 elfldr.s:
 	echo "    * Elf Loader"

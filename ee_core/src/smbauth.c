@@ -4,14 +4,17 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
+#include "ee_core.h"
+#include "des.h"
+#include "md4.h"
+#include "util.h"
+
 #include <tamtypes.h>
 #include <kernel.h>
 #include <stdio.h>
 #include <sifcmd.h>
 #include <sifdma.h>
 #include <string.h>
-
-#include "loader.h"
 
 #define DMA_ADDR 		0x000cff00
 #define	UNCACHEDSEG(vaddr)	(0x20000000 | vaddr)

@@ -76,11 +76,11 @@ extern int size_ps2hdd_irx;
 extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
-extern void *loader_elf;
-extern int size_loader_elf;
+extern void *eecore_elf;
+extern int size_eecore_elf;
 
-extern void *alt_loader_elf;
-extern int size_alt_loader_elf;
+extern void *alt_eecore_elf;
+extern int size_alt_eecore_elf;
 
 extern void *elfldr_elf;
 extern int size_elfldr_elf;
@@ -593,9 +593,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	// NB: LOADER.ELF is embedded
 	if (alt_ee_core)
-		boot_elf = (u8 *)&alt_loader_elf;
+		boot_elf = (u8 *)&alt_eecore_elf;
 	else
-		boot_elf = (u8 *)&loader_elf;
+		boot_elf = (u8 *)&eecore_elf;
 	eh = (elf_header_t *)boot_elf;
 	if (_lw((u32)&eh->ident) != ELF_MAGIC)
 		while (1);

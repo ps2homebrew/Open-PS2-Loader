@@ -29,4 +29,16 @@ struct
  char      arg[0x50];
 } SifCmdResetData __attribute__((aligned(16)));
 
+typedef
+struct romdir
+{
+ char           fileName[10];
+ unsigned short extinfo_size;
+ int            fileSize;
+} romdir_t;
+
+int  New_Reset_Iop(const char *arg, int flag);
+int  Reset_Iop(const char *arg, int flag);
+int  Sync_Iop(void);
+
 #endif /* IOPMGR */

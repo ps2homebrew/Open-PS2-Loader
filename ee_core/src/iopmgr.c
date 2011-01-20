@@ -7,8 +7,12 @@
   Some parts of the code are taken from HD Project by Polo
 */
 
-#include "loader.h"
+#include "ee_core.h"
 #include "iopmgr.h"
+#include "modmgr.h"
+#include "util.h"
+#include "syshook.h"
+#include "smbauth.h"
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;

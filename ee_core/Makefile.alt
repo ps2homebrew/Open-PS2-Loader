@@ -11,10 +11,15 @@
 # Loader section begin at 0x00090000 instead of 0x000e7000
 # g_buf is located at 0x01700000 instead of 0x00088000
 
-EE_BIN = loader.elf
-EE_OBJS = loader.o syshook.o iopmgr.o modmgr.o util.o patches.o padhook.o spu.o smbauth.o des.o md4.o asm.o crt0.o
+EE_BIN = ee_core.elf
+EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o \
+	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/asm.o obj/crt0.o
+MAPFILE = alt_ee_core.map
 
-EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
+EE_SRC_DIR = src/
+EE_OBJS_DIR = obj/
+
+EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
 EE_CFLAGS = -DLOAD_EECORE_DOWN -D_EE -O2 -G0 -Wall $(EE_INCS)
 ifeq ($(EESIO_DEBUG),1) 
 EE_CFLAGS += -D__EESIO_DEBUG
@@ -35,25 +40,29 @@ endif
 
 EE_LIBS += -lkernel
 
-%.o : %.c
+
+all:
+	mkdir -p obj
+	$(MAKE) $(EE_BIN)
+
+clean:
+	rm -f $(EE_OBJS_DIR)*.* *.map *.bak *.elf
+
+clean_all:
+	rm -f $(EE_OBJS_DIR)*.* *.map *.bak *.elf
+
+
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
-%.o : %.S
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.S
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
-%.o : %.s
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
 $(EE_BIN) : $(EE_OBJS)
-	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker loader_alt.map
+	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker $(MAPFILE)
 
-
-all: $(EE_BIN)
-
-clean:
-	rm -f *.o *.a *.map *.bak *.elf
-
-clean_all:
-	rm -f *.o *.a *.map *.bak *.elf
 
 include $(PS2SDK)/samples/Makefile.pref

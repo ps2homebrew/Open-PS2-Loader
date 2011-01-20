@@ -7,7 +7,9 @@
   Some parts of the code are taken from HD Project by Polo
 */
 
-#include "loader.h"
+#include "ee_core.h"
+#include "iopmgr.h"
+#include "util.h"
 
 extern void *cdvdman_irx;
 extern int size_cdvdman_irx;

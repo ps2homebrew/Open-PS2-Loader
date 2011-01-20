@@ -7,8 +7,9 @@
   Some parts of the code are taken from HD Project by Polo
 */
 
-#include "loader.h"
+#include "ee_core.h"
 #include "modmgr.h"
+#include "util.h"
 
 void *imgdrv_irx;
 int size_imgdrv_irx;
@@ -53,6 +54,11 @@ int size_smbman_irx;
 
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
+
+typedef struct {
+	void *irxaddr;
+	int irxsize;
+} irxptr_t;
 
 /*----------------------------------------------------------------------------------------*/
 /* Init LOADFILE RPC.                                                                     */

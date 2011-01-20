@@ -16,8 +16,14 @@
   Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
 
-#include "loader.h"
+#include "ee_core.h"
+#include "iopmgr.h"
+#include "modmgr.h"
+#include "util.h"
+#include "spu.h"
 #include "padhook.h"
+#include "padpatterns.h"
+#include "syshook.h"
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)( int port, int slot, void *addr );

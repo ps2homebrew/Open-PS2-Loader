@@ -7,7 +7,10 @@
   Some parts of the code are taken from HD Project by Polo
 */
 
-#include "loader.h"
+#include "ee_core.h"
+#include "modmgr.h"
+#include "util.h"
+#include "syshook.h"
 
 static char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
 

@@ -11,7 +11,8 @@
   Copyright (c) 2004,2007 Lukasz Bruun <mail@lukasz.dk>
 */
 
-#include "loader.h"
+#include "ee_core.h"
+#include "util.h"
 
 
 // SPU2 Registers

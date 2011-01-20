@@ -43,29 +43,45 @@ EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(FT_DIR)/include
 
 ifeq ($(DEBUG),1) 
-EE_CFLAGS := -D__DEBUG -g
-ifeq ($(EESIO_DEBUG),1)
-EE_CFLAGS += -D__EESIO_DEBUG
-endif
+	EE_CFLAGS := -D__DEBUG -g
+	ifeq ($(EESIO_DEBUG),1)
+		EE_CFLAGS += -D__EESIO_DEBUG
+	endif
 else
-EE_CFLAGS := -O2
+	EE_CFLAGS := -O2
 endif
+
 ifeq ($(CHILDPROOF),1)
-EE_CFLAGS += -D__CHILDPROOF
-endif
-ifeq ($(VMC),1)
-EE_CFLAGS += -DVMC
-VMC_FLAGS = VMC=1
-else
-VMC_FLAGS = VMC=0
+	EE_CFLAGS += -D__CHILDPROOF
 endif
 
 ifeq ($(VMC),1)
-EE_CFLAGS += -DVMC
-VMC_FLAGS = VMC=1
+	EE_CFLAGS += -DVMC
+	VMC_FLAGS = VMC=1
 else
-VMC_FLAGS = VMC=0
+	VMC_FLAGS = VMC=0
 endif
+
+SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
+ifeq ($(DEBUG),1)
+	MOD_DEBUG_FLAGS = DEBUG=1
+endif
+ifeq ($(EESIO_DEBUG),1)
+	EECORE_DEBUG_FLAGS = EESIO_DEBUG=1
+endif
+ifeq ($(INGAME_DEBUG),1)
+	EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
+	CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
+	SMSTCPIP_INGAME_CFLAGS = 
+else
+	ifeq ($(IOPCORE_DEBUG),1)
+		EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
+		CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
+		MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
+		SMSTCPIP_INGAME_CFLAGS = 
+	endif
+endif
+
 
 all:
 	@mkdir -p obj
@@ -139,8 +155,7 @@ sclean:
 	echo "    * SMSUTILS.irx"
 	$(MAKE) -C modules/network/SMSUTILS clean
 	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/network/SMSTCPIP -f Makefile clean
-	$(MAKE) -C modules/network/SMSTCPIP -f Makefile.ingame clean
+	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/network/SMSMAP clean
 	echo "    * smbman.irx"
@@ -187,37 +202,13 @@ pc_tools_win32:
 ee_core.s:
 	echo "    * EE core"
 	$(MAKE) -C ee_core clean
-ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core
-else
-ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C ee_core
-else
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core
-else
-	$(MAKE) $(VMC_FLAGS) -C ee_core
-endif
-endif
-endif
+	$(MAKE) $(VMC_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
 	bin2s ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 alt_ee_core.s:
 	echo "    * alternative EE core"
 	$(MAKE) -C ee_core clean
-ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core -f Makefile.alt
-else
-ifeq ($(EESIO_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) EESIO_DEBUG=1 -C ee_core -f Makefile.alt
-else
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) LOAD_DEBUG_MODULES=1 -C ee_core -f Makefile.alt
-else
-	$(MAKE) $(VMC_FLAGS) -C ee_core -f Makefile.alt
-endif
-endif
-endif
+	$(MAKE) $(VMC_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core -f Makefile.alt
 	bin2s ee_core/ee_core.elf asm/alt_ee_core.s alt_eecore_elf
 
 elfldr.s:
@@ -243,73 +234,37 @@ eesync.s:
 
 usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
-ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
-else
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
-endif
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
 
 usb_4Ksectors_cdvdman.s:
 	echo "    * usb_4Ksectors_cdvdman.irx"
-ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) USE_DEV9=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
-else
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
-endif
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
 
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
 
 smb_pcmcia_cdvdman.s:
 	echo "    * smb_pcmcia_cdvdman.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb.pcmcia rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/smb_pcmcia_cdvdman.s smb_pcmcia_cdvdman_irx
 
 hdd_cdvdman.s:
 	echo "    * hdd_cdvdman.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
 
 hdd_pcmcia_cdvdman.s:
 	echo "    * hdd_pcmcia_cdvdman.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.pcmcia rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_pcmcia_cdvdman.s hdd_pcmcia_cdvdman_irx
 
 hdd_hdpro_cdvdman.s:
 	echo "    * hdd_hdpro_cdvdman.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) $(VMC_FLAGS) IOPCORE_DEBUG=1 -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
-else
-	$(MAKE) $(VMC_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
-endif
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
 	bin2s modules/iopcore/cdvdman/cdvdman.irx asm/hdd_hdpro_cdvdman.s hdd_hdpro_cdvdman_irx
 
 cdvdfsv.s:
@@ -324,29 +279,17 @@ cddev.s:
 
 usb_mcemu.s:
 	echo "    * usb_mcemu.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/mcemu -f Makefile.usb rebuild
-else
-	$(MAKE) -C modules/mcemu -f Makefile.usb rebuild
-endif
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.usb rebuild
 	bin2s modules/mcemu/mcemu.irx asm/usb_mcemu.s usb_mcemu_irx
 
 hdd_mcemu.s:
 	echo "    * hdd_mcemu.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/mcemu -f Makefile.hdd rebuild
-else
-	$(MAKE) -C modules/mcemu -f Makefile.hdd rebuild
-endif
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.hdd rebuild
 	bin2s modules/mcemu/mcemu.irx asm/hdd_mcemu.s hdd_mcemu_irx
 
 smb_mcemu.s:
 	echo "    * smb_mcemu.irx"
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) IOPCORE_DEBUG=1 -C modules/mcemu -f Makefile.smb rebuild
-else
-	$(MAKE) -C modules/mcemu -f Makefile.smb rebuild
-endif
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.smb rebuild
 	bin2s modules/mcemu/mcemu.irx asm/smb_mcemu.s smb_mcemu_irx
 
 usbd_ps2.s:
@@ -377,15 +320,7 @@ smstcpip.s:
 
 ingame_smstcpip.s:
 	echo "    * in-game SMSTCPIP.irx"
-ifeq ($(INGAME_DEBUG),1)
-	$(MAKE) -C modules/network/SMSTCPIP -f Makefile rebuild
-else
-ifeq ($(IOPCORE_DEBUG),1)
-	$(MAKE) -C modules/network/SMSTCPIP -f Makefile rebuild
-else
-	$(MAKE) -C modules/network/SMSTCPIP -f Makefile.ingame rebuild
-endif
-endif
+	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C modules/network/SMSTCPIP rebuild
 	bin2s modules/network/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
 smsmap.s:
@@ -395,12 +330,7 @@ smsmap.s:
 
 smbman.s:
 	echo "    * smbman.irx"
-	$(MAKE) -C modules/network/smbman clean
-ifeq ($(DEBUG),1)
-	$(MAKE) DEBUG=1 -C modules/network/smbman
-else
-	$(MAKE) -C modules/network/smbman
-endif
+	$(MAKE) $(MOD_DEBUG_FLAGS) -C modules/network/smbman
 	bin2s modules/network/smbman/smbman.irx asm/smbman.s smbman_irx
 
 discid.s:
@@ -428,11 +358,7 @@ ps2hdd.s:
 
 genvmc.s:
 	echo "    * genvmc.irx"
-ifeq ($(DEBUG),1)
-	$(MAKE) DEBUG=1 -C modules/vmc/genvmc
-else
-	$(MAKE) -C modules/vmc/genvmc
-endif
+	$(MAKE) $(MOD_DEBUG_FLAGS) -C modules/vmc/genvmc
 	bin2s modules/vmc/genvmc/genvmc.irx asm/genvmc.s genvmc_irx
 
 hdldsvr.s:
@@ -573,6 +499,7 @@ $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 
 $(EE_OBJS_DIR)%.o : %.s
 	$(EE_AS) $(EE_ASFLAGS) $(EE_ASM_DIR)$< -o $@
+
 
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal

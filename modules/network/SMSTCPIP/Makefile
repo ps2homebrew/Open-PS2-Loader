@@ -9,6 +9,10 @@ IOP_CFLAGS += -DLWIP_NOASSERT -Wall -fno-builtin-printf
 IOP_ASFLAGS +=
 IOP_LDFLAGS += -s
 
+ifeq ($(INGAME_DRIVER),1)
+IOP_CFLAGS += -DINGAME_DRIVER
+endif
+
 all: $(IOP_BIN)
 
 clean:

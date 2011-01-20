@@ -69,5 +69,24 @@ struct _lf_elf_load_arg {
  char secname[LF_ARG_MAX];
 } __attribute__((aligned (16)));
 
+typedef struct 
+{
+	u32 epc;
+	u32 gp;
+	u32 sp;
+	u32 dummy;  
+} t_ExecData;
+
+int  LoadFileInit();
+void LoadFileExit();
+int  LoadModule(const char *path, int arg_len, const char *args);
+int  LoadModuleAsync(const char *path, int arg_len, const char *args);
+void GetIrxKernelRAM(void);
+int  LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv);
+int  LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args);
+int  LoadElf(const char *path, t_ExecData *data);
+void ChangeModuleName(const char *name, const char *newname);
+void ListModules(void);
+
 #endif /* MODMGR */
 

@@ -7,8 +7,16 @@
   Some parts of the code are taken from HD Project by Polo
 */
 
-#include "loader.h"
+#include "ee_core.h"
+#include "asm.h"
 #include "iopmgr.h"
+#include "modmgr.h"
+#include "util.h"
+#include "spu.h"
+#include "patches.h"
+#include "padhook.h"
+#include "syshook.h"
+
 #include <syscallnr.h>
 #include <ee_regs.h>
 #include <ps2_reg_defs.h>

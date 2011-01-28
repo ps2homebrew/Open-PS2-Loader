@@ -470,7 +470,7 @@ void udp_server_thread(void *args)
 		while(1) {
 
 			// wait for packet
-			r = recvfrom(udp_socket, udp_buf, sizeof(udp_buf), 0, NULL, NULL);
+			r = lwip_recv(udp_socket, udp_buf, sizeof(udp_buf), 0);
 
 			// check to see if it's the command we're expecting
 			if ((r == sizeof (udp_packet_t)) && (pkt->command == gstats.command)) {

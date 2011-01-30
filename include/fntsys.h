@@ -27,7 +27,7 @@ int fntLoad(void* buffer, int bufferSize, int takeover);
 int fntLoadFile(char* path);
 
 /** Replaces the given font slot with the defined font */
-void fntReplace(int id, void* buffer, int bufferSize, int takeover);
+void fntReplace(int id, void* buffer, int bufferSize, int takeover, int asDefault);
 
 /** Reloads the default font into the given font slot */
 void fntSetDefault(int id);

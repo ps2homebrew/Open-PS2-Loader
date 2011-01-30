@@ -37,24 +37,24 @@ GSTEXTURE* thmGetTexture(unsigned int id) {
 static void thmFree(theme_t* theme) {
 	if (theme) {
 		GSTEXTURE* texture;
-                int id = 0;
+		int id = 0;
 
-                // free textures
-                for(; id < TEXTURES_COUNT; id++) {
-                        texture = &theme->textures[id];
+		// free textures
+		for(; id < TEXTURES_COUNT; id++) {
+			texture = &theme->textures[id];
 			if (texture->Mem != NULL) {
 				free(texture->Mem);
 				texture->Mem = NULL;
 			}
 		}
 
-                // free fonts
-                for (id = 0; id < THM_MAX_FONTS; ++id) {
-                    int fntid = theme->fonts[id];
+		// free fonts
+		for (id = 0; id < THM_MAX_FONTS; ++id) {
+			int fntid = theme->fonts[id];
 
-                    if (fntid != FNT_DEFAULT)
-                        fntRelease(fntid);
-                }
+			if (fntid != FNT_DEFAULT)
+				fntRelease(fntid);
+		}
 
 		free(theme);
 		theme = NULL;
@@ -172,14 +172,14 @@ static void getElem(config_set_t* themeConfig, theme_t* theme, theme_element_t* 
 	if (configGetColor(themeConfig, elemProp, charColor))
 		elem->color = GS_SETREG_RGBA(charColor[0], charColor[1], charColor[2], 0xff);
 
-        snprintf(elemProp, 64, "%s_font", elem->name);
-        if (!configGetInt(themeConfig, elemProp, &intValue))
-                intValue = -1;
+	snprintf(elemProp, 64, "%s_font", elem->name);
+	if (!configGetInt(themeConfig, elemProp, &intValue))
+		intValue = -1;
 
-        if (intValue >= 0 && intValue < THM_MAX_FONTS)
-            elem->font = theme->fonts[intValue];
-        else
-            elem->font = FNT_DEFAULT;
+	if (intValue >= 0 && intValue < THM_MAX_FONTS)
+		elem->font = theme->fonts[intValue];
+	else
+		elem->font = FNT_DEFAULT;
 }
 
 static void setColors(theme_t* theme) {
@@ -191,50 +191,47 @@ static void setColors(theme_t* theme) {
 
 static void thmLoadFonts(config_set_t* themeConfig, const char* themePath, theme_t* theme) {
     int fntID; // theme side font id, not the fntSys handle
-    for (fntID = -1; fntID < THM_MAX_FONTS; ++fntID) {
-            // does the font by the key exist?
-            char fntKey[16];
+	for (fntID = -1; fntID < THM_MAX_FONTS; ++fntID) {
+		// does the font by the key exist?
+		char fntKey[16];
 
-            // -1 is a placeholder for default font...
-            if (fntID >= 0) {
-                // Default font handle...
-                theme->fonts[fntID] = FNT_DEFAULT;
-                snprintf(fntKey, 16, "font%d", fntID);
-            }
-            else {
-                snprintf(fntKey, 16, "default_font");
-            }
+		// -1 is a placeholder for default font...
+		if (fntID >= 0) {
+			// Default font handle...
+			theme->fonts[fntID] = FNT_DEFAULT;
+			snprintf(fntKey, 16, "font%d", fntID);
+		} else {
+			snprintf(fntKey, 16, "default_font");
+		}
 
-            char *fntFile;
-            int cfgKeyOK = configGetStr(themeConfig, fntKey, &fntFile);
-            if (!cfgKeyOK && (fntID >= 0))
-                continue;
+		char *fntFile;
+		int cfgKeyOK = configGetStr(themeConfig, fntKey, &fntFile);
+		if (!cfgKeyOK && (fntID >= 0))
+			continue;
 
-            char fullPath[128];
+		char fullPath[128];
 
-            if (fntID < 0) {
-                // replace the default font
-                if (cfgKeyOK) {
-                        snprintf(fullPath, 128, "%s%s", themePath, fntFile);
+		if (fntID < 0) {
+			// replace the default font
+			if (cfgKeyOK) {
+				snprintf(fullPath, 128, "%s%s", themePath, fntFile);
 
-                        int size = -1;
-                        void* customFont = readFile(fullPath, -1, &size);
+				int size = -1;
+				void* customFont = readFile(fullPath, -1, &size);
 
-                        if (customFont)
-                            fntReplace(FNT_DEFAULT, customFont, size, 1);
-                }
-                else {
-                        fntSetDefault(FNT_DEFAULT);
-                }
-            } else {
-                snprintf(fullPath, 128, "%s%s", themePath, fntFile);
-                int fntHandle = fntLoadFile(fullPath);
+				if (customFont)
+					fntReplace(FNT_DEFAULT, customFont, size, 1, 0);
+			} else
+				fntSetDefault(FNT_DEFAULT);
+		} else {
+			snprintf(fullPath, 128, "%s%s", themePath, fntFile);
+			int fntHandle = fntLoadFile(fullPath);
 
-                // Do we have a valid font? Assign the font handle to the theme font slot
-                if (fntHandle != FNT_ERROR)
-                        theme->fonts[fntID] = fntHandle;
-            };
-    };
+			// Do we have a valid font? Assign the font handle to the theme font slot
+			if (fntHandle != FNT_ERROR)
+				theme->fonts[fntID] = fntHandle;
+		};
+	};
 }
 
 static void thmLoad(char* themePath) {
@@ -304,13 +301,13 @@ static void thmLoad(char* themePath) {
 	if (configGetColor(themeConfig, "sel_text_color", color))
 		newT->selTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0xff);
 
-        // before loading the element definitions, we have to have the fonts prepared
-        // for that, we load the fonts and a translation table
-        if (themePath)
-            thmLoadFonts(themeConfig, themePath, newT);
-        else
-            // reset the default font to be sure
-            fntSetDefault(FNT_DEFAULT);
+	// before loading the element definitions, we have to have the fonts prepared
+	// for that, we load the fonts and a translation table
+	if (themePath)
+		thmLoadFonts(themeConfig, themePath, newT);
+	else
+		// reset the default font to be sure
+		fntSetDefault(FNT_DEFAULT);
 
 	getElem(themeConfig, newT, &newT->menuIcon, "menu_icon", 1, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, 1);
 	getElem(themeConfig, newT, &newT->menuText, "menu_text", 1, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, 0);

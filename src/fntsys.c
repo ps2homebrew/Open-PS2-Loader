@@ -492,12 +492,13 @@ void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
 	}
 }
 
-void fntReplace(int id, void* buffer, int bufferSize, int takeover) {
+void fntReplace(int id, void* buffer, int bufferSize, int takeover, int asDefault) {
 	font_t *fnt = &fonts[id];
 
 	font_t ndefault, old;
 	fntResetFontDef(&ndefault);
 	fntLoadSlot(&ndefault, buffer, bufferSize);
+	ndefault.isDefault = asDefault;
 
 	// copy over the new font definition
 	// we have to lock this phase, as the old font may still be used
@@ -524,7 +525,6 @@ void fntSetDefault(int id) {
 	font_t ndefault, old;
 	fntResetFontDef(&ndefault);
 	fntLoadSlot(&ndefault, NULL, -1);
-	ndefault.isDefault = 1;
 
 	// copy over the new font definition
 	// we have to lock this phase, as the old font may still be used

@@ -348,8 +348,8 @@ static void guiShowUIConfig() {
 	int oldVmode = gVMode;
 	int oldVSync = gVSync;
 
-        diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
-        diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
+	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
+	diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
 
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, NULL);
 	if (ret) {
@@ -367,7 +367,7 @@ static void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
 
 		diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
-                diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
+		diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
 
 		// a hack - we don't want to set the vmode without
 		// a reason...
@@ -873,7 +873,7 @@ static void guiRenderGreeting() {
 	
 	int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
 
-        u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
+	u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
 	
 	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, mycolor);
@@ -1234,7 +1234,7 @@ static void guiMenuRender() {
 	for (; it; count++, it=it->next) {
 		if (it == mainMenuCurrent)
 			sitem = count;
-	};
+	}
 	
 	it = mainMenu;
 	
@@ -1247,7 +1247,7 @@ static void guiMenuRender() {
 	
 	for (;it; it = it->next, cp++) {
 		text = submenuItemGetText(&it->item);
-                fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
+		fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
 		
 		fadeout = 0x080 - abs(sitem - cp) * 0x20;
 		
@@ -1259,8 +1259,8 @@ static void guiMenuRender() {
 			colour = gTheme->selTextColor;
 		
 		// render, advance
-                // TODO: Theme support for main menu (font)
-                fntRenderString(FNT_DEFAULT, x - (w >> 1), y, ALIGN_NONE, text, colour);
+		// TODO: Theme support for main menu (font)
+		fntRenderString(FNT_DEFAULT, x - (w >> 1), y, ALIGN_NONE, text, colour);
 		
 		y += spacing;
 	}
@@ -1344,7 +1344,7 @@ static void guiShow() {
 		rmFlush();
 		
 		// render the old screen, transposed
-                rmSetTransposition(-transition, 0);
+		rmSetTransposition(-transition, 0);
 		screenHandler->renderScreen();
 		
 		// render new screen transposed again
@@ -1473,10 +1473,10 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 		
-                fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
-                fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
+		fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
 		if (addAccept)
-                        fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
+			fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
 
 		guiEndFrame();
 	}
@@ -1496,7 +1496,7 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 		
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 		
-                fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 		
 		// so the io status icon will be rendered
 		guiDrawOverlays();
@@ -1512,7 +1512,7 @@ void guiRenderTextScreen(const unsigned char* message) {
 	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 	
-        fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
+	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 	
 	// so the io status icon will be rendered
 	guiDrawOverlays();

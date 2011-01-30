@@ -177,12 +177,10 @@ static int lngLoadFromFile(char* path, char *name) {
 		LOG("#### Custom font path: %s\n", path);
 		
 		void* customFont = readFile(path, -1, &size);
-                if (customFont) {
-                        fntReplace(FNT_DEFAULT, customFont, size, 1);
-                }
-                else {
-                        fntSetDefault(FNT_DEFAULT);
-                }
+		if (customFont)
+			fntReplace(FNT_DEFAULT, customFont, size, 1, 1);  // consider fonts loaded through language as default, so they won't be reset-ed when changing themes
+		else
+			fntSetDefault(FNT_DEFAULT);
 
 		return 1;
 	}

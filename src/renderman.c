@@ -68,6 +68,7 @@ static float transY = 0;
 const u64 gColWhite = GS_SETREG_RGBA(0xFF,0xFF,0xFF,0x00);
 const u64 gColBlack = GS_SETREG_RGBA(0x00,0x00,0x00,0x00);
 const u64 gColDarker = GS_SETREG_RGBA(0x00,0x00,0x00,0x60);
+const u64 gColFocus = GS_SETREG_RGBA(0xFF,0xFF,0xFF,0x50);
 
 const u64 gDefaultCol = GS_SETREG_RGBA(0x80,0x80,0x80,0x80);
 const u64 gDefaultAlpha = GS_SETREG_ALPHA(0,1,0,1,0);

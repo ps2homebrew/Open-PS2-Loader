@@ -37,7 +37,8 @@ struct UIItem {
 	int id; // id of this item
 	short enabled;
 	int hintId; // shown if not NULL
-	
+	int fixedWidth;	// 0: no fixed width, >0: width in pixels, <0: width in %
+
 	union {
 		struct {
 			const char *text;
@@ -70,7 +71,7 @@ struct UIItem {
 };
 
 /// Dialog display
-int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(void));
+int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(int modified));
 void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus);
 int diaShowKeyb(char* text, int maxLen);
 void diaSetEnabled(struct UIItem* ui, int id, int enabled);

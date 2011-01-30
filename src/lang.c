@@ -76,7 +76,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Delete",
 	"Run",
 	"Display settings",
-	"Enable Delete and Rename operations",
+	"Enable Delete and Rename actions",
 	"Check USB game fragmentation",
 	"Remember last played game",
 	"Error, the game is fragmented",
@@ -115,7 +115,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Leave empty to exit to Browser",
 	"Value in minute(s), 0 to disable spin down",
 	"Automatic HDD spin down",
-	"Video mode"
+	"Video mode",
+	"Dialog color",
+	"Selected color",
 };
 
 static int guiLangID = 0;

@@ -14,8 +14,6 @@
 #include "include/themes.h"
 #include "include/util.h"
 
-// Row height in dialogues
-#define UI_ROW_HEIGHT 10
 // UI spacing of the dialogues (pixels between consecutive items)
 #define UI_SPACING_H 10
 #define UI_SPACING_V 2
@@ -34,47 +32,48 @@ static int screenWidth;
 static int screenHeight;
 
 // Utility stuff
+#define KEYB_MODE		2
+#define KEYB_WIDTH 		12
+#define KEYB_HEIGHT		4
+#define KEYB_ITEMS		(KEYB_WIDTH * KEYB_HEIGHT)
+
+static void diaDrawBoundingBox(int x, int y, int w, int h, int focus) {
+		float aw, ah;
+		rmGetAspectRatio(&aw, &ah);
+		rmResetAspectRatio();
+
+		if (focus)
+			rmDrawRect(x - 5, y, ALIGN_NONE, w + 10, h + 10, gTheme->selTextColor & gColFocus);
+		else
+			rmDrawRect(x - 5, y, ALIGN_NONE, w + 10, h + 10, gTheme->textColor & gColFocus);
+
+		rmSetAspectRatio(aw, ah);
+}
+
 int diaShowKeyb(char* text, int maxLen) {
-	int i, j, len=strlen(text), selkeyb=1;
-	int selchar=0, selcommand=-1;
-	char c[2]="\0\0";
-	char *keyb;
-	
-	char keyb1[40]={'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-				   'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-				   'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '\'',
-				   'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '?'};
+	int i, j, len = strlen(text), selkeyb = 0, w;
+	int selchar = 0, selcommand = -1;
+	char c[2] = "\0\0";
+	char keyb0[KEYB_ITEMS] = {
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
+		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
+		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\\',
+		'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '`', ':' };
 
-	char keyb2[40]={'!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
-				   'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
-				   'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', '"',
-				   'Z', 'X', 'C', 'V', 'B', 'N', 'M', '-', '_', '/'};
+	char keyb1[KEYB_ITEMS] = {
+		'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+',
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}',
+		'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '|',
+		'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '~', '.' };
+	char *keyb = keyb0;
 
-	// TODO: These need to be unicode or dropped entirelly
-	char keyb3[40]={'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', '[', ']',
-				   'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', ';', ':',
-				   'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'œ', '`', '¡',
-				   'ß', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', ',', '.', '¿'};
-
-	char keyb4[40]={'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', '<', '>',
-				   'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', '=', '+',
-				   'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Œ', '~', '"',
-				   'ß', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ÿ', '-', '_', '/'};
-	
-	char *commands[4]={"BACKSPACE", "SPACE", "ENTER", "MODE"};
-
-	GSTEXTURE *cmdicons[4];
-	
-	// TODO: Theme based color!
-	u64 inactivec = GS_SETREG_RGBA(0x080, 0x080, 0x080, 0x080);
-
+	char *commands[KEYB_HEIGHT] = {"BACKSPACE", "SPACE", "ENTER", "MODE"};
+	GSTEXTURE *cmdicons[KEYB_HEIGHT];
 	cmdicons[0] = thmGetTexture(SQUARE_ICON);
 	cmdicons[1] = thmGetTexture(TRIANGLE_ICON);
 	cmdicons[2] = thmGetTexture(START_ICON);
 	cmdicons[3] = thmGetTexture(SELECT_ICON);
 
-	keyb=keyb1;
-	
 	while(1) {
 		readPads();
 		
@@ -84,152 +83,121 @@ int diaShowKeyb(char* text, int maxLen) {
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
 		//Text
-		fntRenderString(FNT_DEFAULT, 50, 120, ALIGN_NONE, text, inactivec);
+		fntRenderString(FNT_DEFAULT, 50, 120, ALIGN_NONE, text, gTheme->textColor);
 		
 		// separating line for simpler orientation
-		rmDrawLine(25, 138, 600, 138, gColWhite);
-		rmDrawLine(25, 139, 600, 139, gColWhite);
+		rmDrawLine(25, 138, 615, 138, gColWhite);
+		rmDrawLine(25, 139, 615, 139, gColWhite);
 
-		for (j = 0; j < 40; j += 10) {
-			for (i = 0; i <= 9; i++) {
-				c[0]=keyb[i + j];
+		for (j = 0; j < KEYB_HEIGHT; j++) {
+			for (i = 0; i < KEYB_WIDTH; i++) {
+				c[0] = keyb[i + j * KEYB_WIDTH];
 
-				if ((i + j) == selchar) {
-					fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * j, ALIGN_NONE, c, gTheme->selTextColor);
-				} else {
-					fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * j, ALIGN_NONE, c, inactivec);
-				}
+				w = fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, c, gTheme->uiTextColor);
+				if ((i + j * KEYB_WIDTH) == selchar)
+					diaDrawBoundingBox(50 + i*32, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
 			}
 		}
 		
 		// Commands
-		for (i=0;i<=3;i++) {
-			rmDrawPixmap(cmdicons[i], 384, 170 + 30 * i, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+		for (i = 0; i < KEYB_HEIGHT; i++) {
+			rmDrawPixmap(cmdicons[i], 448, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
 			
-			if (i == selcommand) {
-				fntRenderString(FNT_DEFAULT, 425, 170 + 30 * i, ALIGN_NONE, commands[i], gTheme->selTextColor);
-			} else {
-				fntRenderString(FNT_DEFAULT, 425, 170 + 30 * i, ALIGN_NONE, commands[i], inactivec);
-			}
+			w = fntRenderString(FNT_DEFAULT, 489, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, commands[i], gTheme->uiTextColor);
+			if (i == selcommand)
+				diaDrawBoundingBox(489, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
 		}
 		
 		rmEndFrame();
 		
 		if (getKey(KEY_LEFT)) {
-			if (selchar>-1 && selchar>0 && (selchar!=10 && selchar!=20 && selchar!=30)) {
-				selchar--;
-			} else {
-				if (selchar>-1) {
-					selcommand=selchar/10;
-					selchar=-1;
-				} else {
-					selchar=selcommand*10+9;
-					selcommand=-1;
+			if (selchar > -1) {
+				if (selchar % KEYB_WIDTH)
+					selchar--;
+				else {
+					selcommand = selchar / KEYB_WIDTH;
+					selchar = -1;
 				}
+			} else {
+				selchar = (selcommand + 1) * KEYB_WIDTH - 1;
+				selcommand = -1;
 			}
 		} else if (getKey(KEY_RIGHT)) {
-			if (selchar>-1 && selchar<39 && (selchar!=9 && selchar!=19 && selchar!=29)) {
-				selchar++;
-			} else {
-				if (selchar>-1) {
-					selcommand=selchar/10;
-					selchar=-1;
-				} else {
-					selchar=selcommand*10;
-					selcommand=-1;
-					
+			if (selchar > -1) {
+				if ((selchar + 1) % KEYB_WIDTH)
+					selchar++;
+				else {
+					selcommand = selchar / KEYB_WIDTH;
+					selchar = -1;
 				}
+			} else {
+				selchar = selcommand * KEYB_WIDTH;
+				selcommand = -1;
 			}
 		} else if (getKey(KEY_UP)) {
-			if (selchar>-1) {
-				if (selchar>9) {
-					selchar-=10;
-				} else {
-					selchar+=30;
-				}
-			} else {
-				if (selcommand>0) {
-					selcommand--;
-				} else {
-					selcommand=3;
-				}
-			}
+			if (selchar > -1)
+				selchar = (selchar + KEYB_ITEMS - KEYB_WIDTH) % KEYB_ITEMS;
+			else
+				selcommand = (selcommand + KEYB_HEIGHT - 1) % KEYB_HEIGHT;
 		} else if (getKey(KEY_DOWN)) {
-			if (selchar>-1) {
-				if (selchar<30) {
-					selchar+=10;
-				} else {
-					selchar-=30;
-				}
-			} else {
-				if (selcommand<3) {
-					selcommand++;
-				} else {
-					selcommand=0;
-				}
-			}
+			if (selchar > -1)
+				selchar = (selchar + KEYB_WIDTH) % KEYB_ITEMS;
+			else
+				selcommand = (selcommand + 1) % KEYB_HEIGHT;
 		} else if (getKeyOn(KEY_CROSS)) {
-			if (len<(maxLen-1) && selchar>-1) {
+			if (len < (maxLen - 1) && selchar > -1) {
 				len++;
-				c[0]=keyb[selchar];
+				c[0] = keyb[selchar];
 				strcat(text,c);
-			} else if (selcommand==0) {
-				if (len>0) { // BACKSPACE
+			} else if (selcommand == 0) {
+				if (len > 0) { // BACKSPACE
 					len--;
-					text[len]=0;
+					text[len] = 0;
 				}		
-			} else if (selcommand==1) {
-				if (len<(maxLen-1)) { // SPACE
+			} else if (selcommand == 1) {
+				if (len < (maxLen - 1)) { // SPACE
 					len++;
-					c[0]=' ';
+					c[0] = ' ';
 					strcat(text,c);
 				}
-			} else if (selcommand==2) {
+			} else if (selcommand == 2) {
 				return 1; //ENTER
-			} else if (selcommand==3) {
-				if (selkeyb<4) { // MODE
-					selkeyb++;
-				} else {
-					selkeyb=1;
-				}
-				if (selkeyb==1) keyb=keyb1;
-				if (selkeyb==2) keyb=keyb2;
-				if (selkeyb==3) keyb=keyb3;
-				if (selkeyb==4) keyb=keyb4;
+			} else if (selcommand == 3) {
+				selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
+				if (selkeyb == 0)
+					keyb = keyb0;
+				if (selkeyb == 1)
+					keyb = keyb1;
 			}
 		} else if (getKey(KEY_SQUARE)) {
 			if (len>0) { // BACKSPACE
 				len--;
-				text[len]=0;
+				text[len] = 0;
 			}
 		} else if (getKey(KEY_TRIANGLE)) {
-			if (len<(maxLen-1) && selchar>-1) { // SPACE
+			if (len < (maxLen - 1) && selchar > -1) { // SPACE
 				len++;
-				c[0]=' ';
+				c[0] = ' ';
 				strcat(text,c);
 			}
 		} else if (getKeyOn(KEY_START)) {
 			return 1; //ENTER
 		} else if (getKeyOn(KEY_SELECT)) {
-			if (selkeyb<4) { // MODE
-				selkeyb++;
-			} else {
-				selkeyb=1;
-			}
-			if (selkeyb==1) keyb=keyb1;
-			if (selkeyb==2) keyb=keyb2;
-			if (selkeyb==3) keyb=keyb3;
-			if (selkeyb==4) keyb=keyb4;
+			selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
+			if (selkeyb == 0)
+				keyb = keyb0;
+			if (selkeyb == 1)
+				keyb = keyb1;
 		}
 		
-		if (getKey(KEY_CIRCLE)) break;
+		if (getKey(KEY_CIRCLE))
+			break;
 	}
 	
 	return 0;
 }
 
 static int colPadSettings[16];
-
 
 static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 	int selc = 0;
@@ -241,7 +209,6 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 	col[0] = *r; col[1] = *g; col[2] = *b;
 	setButtonDelay(KEY_LEFT, 1);
 	setButtonDelay(KEY_RIGHT, 1);
-
 
 	while(1) {
 		readPads();
@@ -360,8 +327,7 @@ static void diaDrawHint(int text_id) {
 /// renders an ui item (either selected or not)
 /// sets width and height of the render into the parameters
 static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h) {
-	// height fixed for now
-	*h = UI_ROW_HEIGHT;
+	*h = UI_SPACING_H;
 	
 	// all texts are rendered up from the given point!
 	u64 txtcol;
@@ -391,7 +357,6 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 		case UI_SPLITTER: {
 			// a line. Thanks to the font rendering, we need to shift up by one font line
 			*w = 0; // nothing to render at all
-			*h = UI_SPACING_H;
 			int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
 
 			// to ODD lines
@@ -405,7 +370,6 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 
 		case UI_BREAK:
 			*w = 0; // nothing to render at all
-			*h = UI_SPACING_H;
 			break;
 
 		case UI_SPACER: {
@@ -423,8 +387,6 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 
 		case UI_OK: {
 			const char *txt = _l(_STR_OK);
-
-			*h = UI_SPACING_H;
 			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
 			break;
 		}
@@ -490,18 +452,8 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 		}
 	}
 
-	if (selected) {
-		float aw, ah;
-		rmGetAspectRatio(&aw, &ah);
-		rmResetAspectRatio();
-
-		if (haveFocus)
-			rmDrawRect(x - 5, y, ALIGN_NONE, *w + 10, *h + 10, gTheme->selTextColor & gColFocus);
-		else
-			rmDrawRect(x - 5, y, ALIGN_NONE, *w + 10, *h + 10, gTheme->textColor & gColFocus);
-
-		rmSetAspectRatio(aw, ah);
-	}
+	if (selected)
+		diaDrawBoundingBox(x, y, *w, *h, haveFocus);
 
 	if (item->fixedWidth != 0) {
 		int newSize;

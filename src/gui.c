@@ -337,7 +337,9 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
 	diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
 	diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
+	diaSetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
 	diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
+	diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
 	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
 	diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
@@ -356,7 +358,9 @@ static void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
 		diaGetInt(diaUIConfig, UICFG_LANG, &langID);
 		diaGetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
+		diaGetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
 		diaGetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
+		diaGetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
 		diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
@@ -489,11 +493,11 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 
 		if (gEnableDandR) {
 			diaSetEnabled(diaVMC, VMC_SIZE, 1);
-			diaVMC[22].type = UI_SPLITTER;
+			diaVMC[20].type = UI_SPLITTER;
 		}
 		else {
 			diaSetEnabled(diaVMC, VMC_SIZE, 0);
-			diaVMC[22].type = UI_TERMINATOR;
+			diaVMC[20].type = UI_TERMINATOR;
 		}
 	}
 	else {
@@ -502,13 +506,13 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 
 		diaSetInt(diaVMC, VMC_SIZE, 0);
 		diaSetEnabled(diaVMC, VMC_SIZE, 1);
-		diaVMC[22].type = UI_TERMINATOR;
+		diaVMC[20].type = UI_TERMINATOR;
 	}
 
 	return size;
 }
 
-static int guiVMCUpdater() {
+static int guiVMCUpdater(int modified) {
 	if (vmc_refresh) {
 		vmc_refresh = 0;
 		return VMC_REFRESH;

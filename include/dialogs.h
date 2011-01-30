@@ -32,13 +32,15 @@
 #define UICFG_LANG				11
 #define UICFG_SCROLL			12
 #define UICFG_BGCOL				13
-#define UICFG_TXTCOL			14
-#define UICFG_AUTOSORT			15
-#define UICFG_COVERART			16
-#define UICFG_WIDESCREEN		17
-#define UICFG_AUTOREFRESH		18
-#define UICFG_VMODE				19
-#define UICFG_VSYNC				20
+#define UICFG_UICOL				14
+#define UICFG_TXTCOL			15
+#define UICFG_SELCOL			16
+#define UICFG_AUTOSORT			17
+#define UICFG_COVERART			18
+#define UICFG_WIDESCREEN		19
+#define UICFG_AUTOREFRESH		20
+#define UICFG_VMODE				21
+#define UICFG_VSYNC				22
 
 #define CFG_EXITTO				30
 #define CFG_DEFDEVICE			31

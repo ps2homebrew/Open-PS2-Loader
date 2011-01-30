@@ -25,6 +25,7 @@ typedef struct {
 const u64 gColWhite;
 const u64 gColBlack;
 const u64 gColDarker;
+const u64 gColFocus;
 const u64 gDefaultCol;
 const u64 gDefaultAlpha;
 

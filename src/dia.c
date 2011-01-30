@@ -84,7 +84,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
 		//Text
-                fntRenderString(FNT_DEFAULT, 50, 120, ALIGN_NONE, text, inactivec);
+		fntRenderString(FNT_DEFAULT, 50, 120, ALIGN_NONE, text, inactivec);
 		
 		// separating line for simpler orientation
 		rmDrawLine(25, 138, 600, 138, gColWhite);
@@ -94,10 +94,10 @@ int diaShowKeyb(char* text, int maxLen) {
 			for (i = 0; i <= 9; i++) {
 				c[0]=keyb[i + j];
 
-				if ((i + j)==selchar) {
-                                        fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * j, ALIGN_NONE, c, gTheme->selTextColor);
+				if ((i + j) == selchar) {
+					fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * j, ALIGN_NONE, c, gTheme->selTextColor);
 				} else {
-                                        fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * j, ALIGN_NONE, c, inactivec);
+					fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * j, ALIGN_NONE, c, inactivec);
 				}
 			}
 		}
@@ -107,9 +107,9 @@ int diaShowKeyb(char* text, int maxLen) {
 			rmDrawPixmap(cmdicons[i], 384, 170 + 30 * i, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
 			
 			if (i == selcommand) {
-                                fntRenderString(FNT_DEFAULT, 425, 170 + 30 * i, ALIGN_NONE, commands[i], gTheme->selTextColor);
+				fntRenderString(FNT_DEFAULT, 425, 170 + 30 * i, ALIGN_NONE, commands[i], gTheme->selTextColor);
 			} else {
-                                fntRenderString(FNT_DEFAULT, 425, 170 + 30 * i, ALIGN_NONE, commands[i], inactivec);
+				fntRenderString(FNT_DEFAULT, 425, 170 + 30 * i, ALIGN_NONE, commands[i], inactivec);
 			}
 		}
 		
@@ -253,7 +253,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 		
 		// "Color selection"
-                fntRenderString(FNT_DEFAULT, 50, 50, ALIGN_NONE, "Colour selection", GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+		fntRenderString(FNT_DEFAULT, 50, 50, ALIGN_NONE, "Colour selection", GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 
 		// 3 bars representing the colors...
 		size_t co;
@@ -273,7 +273,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 			else
 				rmDrawRect(x, y, ALIGN_NONE, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
 				
-                        rmDrawRect(x + 2, y + 2, ALIGN_NONE, 190.0f*(cc[co]*100/255)/100, 16, dcol);
+			rmDrawRect(x + 2, y + 2, ALIGN_NONE, 190.0f*(cc[co]*100/255)/100, 16, dcol);
 		}
 
 		// target color itself
@@ -287,25 +287,25 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 
 		rmEndFrame();
 		
-		if(getKey(KEY_LEFT)) {
+		if (getKey(KEY_LEFT)) {
 			if (col[selc] > 0)
 				col[selc]--;
-		}else if(getKey(KEY_RIGHT)) {
+		} else if (getKey(KEY_RIGHT)) {
 			if (col[selc] < 255)
 				col[selc]++;
-		}else if(getKey(KEY_UP)) {
+		} else if (getKey(KEY_UP)) {
 			if (selc > 0)
 				selc--;		
-		}else if(getKey(KEY_DOWN)) {
+		} else if (getKey(KEY_DOWN)) {
 			if (selc < 2)
 				selc++;		
-		}else if(getKeyOn(KEY_CROSS)) {
+		} else if (getKeyOn(KEY_CROSS)) {
 			*r = col[0];
 			*g = col[1];
 			*b = col[2];
 			ret = 1;
 			break;
-		}else if(getKeyOn(KEY_CIRCLE)) {
+		} else if (getKeyOn(KEY_CIRCLE)) {
 			ret = 0;
 			break;
 		}
@@ -347,14 +347,14 @@ static void diaDrawHint(int text_id) {
 	int x, y;
 	
 	char* text = _l(text_id);
-        fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
+	fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
 	
 	x = screenWidth - w - 10;
 	y = gTheme->usedHeight - 40;
 	
 	// render hint on the lower side of the screen.
 	rmDrawRect(x, y, ALIGN_NONE, DIM_INF, MENU_ITEM_HEIGHT + 10, gColDarker);
-        fntRenderString(FNT_DEFAULT, x + 5, y + 5, ALIGN_NONE, text, gTheme->textColor);
+	fntRenderString(FNT_DEFAULT, x + 5, y + 5, ALIGN_NONE, text, gTheme->textColor);
 }
 
 /// renders an ui item (either selected or not)
@@ -366,133 +366,151 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 	// all texts are rendered up from the given point!
 	u64 txtcol;
 	
-	if (selected) {
-		if (haveFocus) // a slightly different color for focus instead of selection
-			txtcol = gTheme->selTextColor;
-		else
-			txtcol = gTheme->textColor;
-			
-	} else {
-		if (diaIsControllable(item))
-			txtcol = gTheme->uiTextColor;
-		else
-			txtcol = gTheme->textColor;
-	}
-	
+	if (diaIsControllable(item))
+		txtcol = gTheme->uiTextColor;
+	else
+		txtcol = gTheme->textColor;
+
 	// let's see what do we have here?
 	switch (item->type) {
 		case UI_TERMINATOR:
 			return;
-		
+
 		case UI_BUTTON:	
 		case UI_LABEL: {
-				// width is text length in pixels...
-				const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
-				if(txt && strlen(txt))
-                                        *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
-				else
-                                        *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
-				 
-				break;
-			}
+			// width is text length in pixels...
+			const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
+			if(txt && strlen(txt))
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
+			else
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
+
+			break;
+		}
+
 		case UI_SPLITTER: {
-				// a line. Thanks to the font rendering, we need to shift up by one font line
-				*w = 0; // nothing to render at all
-				*h = UI_SPACING_H;
-				int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
-				
-				// to ODD lines
-				ypos &= ~1;
-				
-				// two lines for lesser eye strain :)
-				rmDrawLine(x, ypos    , x + UI_BREAK_LEN, ypos    , gColWhite);
-				rmDrawLine(x, ypos + 1, x + UI_BREAK_LEN, ypos + 1, gColWhite);
-				break;
-			}
+			// a line. Thanks to the font rendering, we need to shift up by one font line
+			*w = 0; // nothing to render at all
+			*h = UI_SPACING_H;
+			int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
+
+			// to ODD lines
+			ypos &= ~1;
+
+			// two lines for lesser eye strain :)
+			rmDrawLine(x, ypos    , x + UI_BREAK_LEN, ypos    , gColWhite);
+			rmDrawLine(x, ypos + 1, x + UI_BREAK_LEN, ypos + 1, gColWhite);
+			break;
+		}
+
 		case UI_BREAK:
 			*w = 0; // nothing to render at all
-			*h = 0;
+			*h = UI_SPACING_H;
 			break;
 
 		case UI_SPACER: {
-				// next column divisible by spacer
-				*w = (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
-		
-				if (*w < UI_SPACER_MINIMAL) {
-					x += *w + UI_SPACER_MINIMAL;
-					*w += (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
-				}
+			// next column divisible by spacer
+			*w = (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
 
-				*h = 0;
-				break;
+			if (*w < UI_SPACER_MINIMAL) {
+				x += *w + UI_SPACER_MINIMAL;
+				*w += (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
 			}
+
+			*h = 0;
+			break;
+		}
 
 		case UI_OK: {
-				const char *txt = _l(_STR_OK);
-				
-				*h = UI_SPACING_H;
-				
-                                *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
-				break;
-			}
+			const char *txt = _l(_STR_OK);
+
+			*h = UI_SPACING_H;
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
+			break;
+		}
 
 		case UI_INT: {
-				char tmp[10];
-				
-				snprintf(tmp, 10, "%d", item->intvalue.current);
-				
-                                *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tmp, txtcol);
-				
-				break;
-			}
+			char tmp[10];
+
+			snprintf(tmp, 10, "%d", item->intvalue.current);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tmp, txtcol);
+			break;
+		}
+
 		case UI_STRING: {
-       			if(strlen(item->stringvalue.text))
-                                        *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
-				else
-                                        *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
-				break;
-			}
+			if(strlen(item->stringvalue.text))
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
+			else
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
+			break;
+		}
+
 		case UI_PASSWORD: {
-				char stars[32];
-				int i;
-				
-				int len = min(strlen(item->stringvalue.text), 30);
-				for (i = 0; i < len; ++i)
-					stars[i] = '*';
-				
-				stars[i] = '\0';
-				
-                                *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, stars, txtcol);
-				break;
+			char stars[32];
+			int i;
+
+			int len = min(strlen(item->stringvalue.text), 30);
+			for (i = 0; i < len; ++i)
+				stars[i] = '*';
+
+			stars[i] = '\0';
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, stars, txtcol);
+			break;
 		}
+
 		case UI_BOOL: {
-				const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
-				
-                                *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txtval, txtcol);
-				break;
-			}
+			const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txtval, txtcol);
+			break;
+		}
+
 		case UI_ENUM: {
-				const char* tv = item->intvalue.enumvalues[item->intvalue.current];
+			const char* tv = item->intvalue.enumvalues[item->intvalue.current];
 
-				if (!tv)
-					tv = _l(_STR_NO_ITEMS);
+			if (!tv)
+				tv = _l(_STR_NO_ITEMS);
 
-                                *w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tv, txtcol);
-				break;
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tv, txtcol);
+			break;
 		}
+
 		case UI_COLOUR: {
-				u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
+			u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
 
-				if (selected)
-					rmDrawRect(x, y, ALIGN_NONE, 25, 15, gTheme->selTextColor);
-				else
-					rmDrawRect(x, y, ALIGN_NONE, 25, 15, gColDarker);
+			if (selected)
+				rmDrawRect(x, y + 4, ALIGN_NONE, 25, 15, gTheme->selTextColor);
+			else
+				rmDrawRect(x, y + 4, ALIGN_NONE, 25, 15, gColDarker);
 
-				rmDrawRect(x + 2, y + 2, ALIGN_NONE, 21, 11, dcol);
-				
-				*w = 15;
-				break;
+			rmDrawRect(x + 2, y + 6, ALIGN_NONE, 21, 11, dcol);
+
+			*w = 25;
+			*h = 15;
+			break;
 		}
+	}
+
+	if (selected) {
+		float aw, ah;
+		rmGetAspectRatio(&aw, &ah);
+		rmResetAspectRatio();
+
+		if (haveFocus)
+			rmDrawRect(x - 5, y, ALIGN_NONE, *w + 10, *h + 10, gTheme->selTextColor & gColFocus);
+		else
+			rmDrawRect(x - 5, y, ALIGN_NONE, *w + 10, *h + 10, gTheme->textColor & gColFocus);
+
+		rmSetAspectRatio(aw, ah);
+	}
+
+	if (item->fixedWidth != 0) {
+		int newSize;
+		if (item->fixedWidth < 0)
+			newSize = item->fixedWidth * screenWidth / -100;
+		else
+			newSize = item->fixedWidth;
+		if (*w < newSize)
+			*w = newSize;
 	}
 }
 
@@ -503,7 +521,6 @@ void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFo
 	else
 		gTheme->drawBackground();
 
-	// TODO: Sanitize these values
 	int x0 = 20;
 	int y0 = 20;
 	
@@ -518,7 +535,7 @@ void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFo
 			x = x0;
 			
 			if (hmax > 0)
-				y += hmax + UI_SPACING_H; 
+				y += hmax + UI_SPACING_H;
 			
 			hmax = 0;
 		}
@@ -563,7 +580,7 @@ static void diaResetValue(struct UIItem *item) {
 	}
 }
 
-static int diaHandleInput(struct UIItem *item) {
+static int diaHandleInput(struct UIItem *item, int *modified) {
 	// circle loses focus, sets old values first
 	if (getKeyOn(KEY_CIRCLE)) {
 		diaResetValue(item);
@@ -571,8 +588,10 @@ static int diaHandleInput(struct UIItem *item) {
 	}
 	
 	// cross loses focus without setting default
-	if (getKeyOn(KEY_CROSS))
+	if (getKeyOn(KEY_CROSS)) {
+		*modified = 0;
 		return 0;
+	}
 	
 	// UI item type dependant part:
 	if (item->type == UI_BOOL) {
@@ -587,10 +606,10 @@ static int diaHandleInput(struct UIItem *item) {
 		// up and down
 		if (getKey(KEY_UP) && (item->intvalue.current < item->intvalue.max))
 			item->intvalue.current++;
-		
-		if (getKey(KEY_DOWN) && (item->intvalue.current > item->intvalue.min))
+		else if (getKey(KEY_DOWN) && (item->intvalue.current > item->intvalue.min))
 			item->intvalue.current--;
-		
+		else
+			*modified = 0;
 	} else if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
 		char tmp[32];
 		strncpy(tmp, item->stringvalue.text, 32);
@@ -614,13 +633,12 @@ static int diaHandleInput(struct UIItem *item) {
 				return 0;
 		}
 
-		if (getKey(KEY_UP) && (cur > 0))
+		if (getKey(KEY_UP) && (item->intvalue.current > 0))
 			item->intvalue.current--;
-		
-		++cur;
-
-		if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[cur] != NULL))
-			item->intvalue.current = cur;
+		else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL))
+			item->intvalue.current++;
+		else
+			*modified = 0;
 	} else if (item->type == UI_COLOUR) {
 		unsigned char col[3];
 
@@ -633,6 +651,8 @@ static int diaHandleInput(struct UIItem *item) {
 			item->colourvalue.g = col[1];
 			item->colourvalue.b = col[2];
 		}
+		else
+			*modified = 0;
 
 		return 0;
 	}
@@ -759,7 +779,7 @@ static struct UIItem* diaFindByID(struct UIItem* ui, int id) {
 	return NULL;
 }
 
-int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(void)) {
+int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(int modified)) {
 	rmGetScreenExtents(&screenWidth, &screenHeight);
 	
 	struct UIItem *cur = NULL;
@@ -773,7 +793,7 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(v
 	if (cur == ui)
 		return -1;
 	
-	int haveFocus = 0;
+	int haveFocus = 0, modified;
 	
 	diaStoreScrollSpeed();
 	
@@ -791,13 +811,15 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(v
 		readPads();
 		
 		if (haveFocus) {
-			haveFocus = diaHandleInput(cur);
+			modified = 1;
+			haveFocus = diaHandleInput(cur, &modified);
 			
 			if (!haveFocus) {
 				setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
 				setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
 			}
 		} else {
+			modified = 0;
 			if (getKey(KEY_LEFT)) {
 				struct UIItem *newf = diaGetPrevControl(cur, ui);
 				
@@ -859,7 +881,7 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(v
 		}
 
 		if (updater) {
-			int updResult = updater();
+			int updResult = updater(modified);
 			if (updResult)
 				return updResult;
 		}

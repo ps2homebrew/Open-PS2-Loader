@@ -38,6 +38,7 @@ struct UIItem {
 	short enabled;
 	int hintId; // shown if not NULL
 	int fixedWidth;	// 0: no fixed width, >0: width in pixels, <0: width in %
+	int fixedHeight;
 
 	union {
 		struct {
@@ -81,6 +82,7 @@ int diaGetString(struct UIItem* ui, int id, char *value);
 int diaSetString(struct UIItem* ui, int id, const char *text);
 int diaGetColor(struct UIItem* ui, int id, unsigned char *col);
 int diaSetColor(struct UIItem* ui, int id, const unsigned char *col);
+//int diaSetU64Color(struct UIItem* ui, int id, u64 col); // TODO ohhh why can't I declare a u64 here ????
 // set label pointer into the label's text (must be valid while rendering dialog)
 int diaSetLabel(struct UIItem* ui, int id, const char *text);
 // sets the current enum value list for given control

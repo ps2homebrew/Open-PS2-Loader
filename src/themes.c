@@ -187,6 +187,10 @@ static void setColors(theme_t* theme) {
 	theme->textColor = GS_SETREG_RGBA(gDefaultTextColor[0], gDefaultTextColor[1], gDefaultTextColor[2], 0xff);
 	theme->uiTextColor = GS_SETREG_RGBA(gDefaultUITextColor[0], gDefaultUITextColor[1], gDefaultUITextColor[2], 0xff);
 	theme->selTextColor = GS_SETREG_RGBA(gDefaultSelTextColor[0], gDefaultSelTextColor[1], gDefaultSelTextColor[2], 0xff);
+	theme->menuText.color = theme->textColor;
+	theme->itemsList.color = theme->textColor;
+	theme->itemText.color = theme->textColor;
+	theme->hintText.color = theme->textColor;
 }
 
 static void thmLoadFonts(config_set_t* themeConfig, const char* themePath, theme_t* theme) {
@@ -262,6 +266,8 @@ static void thmLoad(char* themePath) {
 	if (configGetInt(themeConfig, "use_real_height", &intValue))
 		if (intValue)
 			newT->usedHeight = screenHeight;
+
+	LOG("thmLoad() usedHeight=%d\n", newT->usedHeight);
 
 	newT->displayedItems = (newT->usedHeight - (MENU_POS_V + HINT_HEIGHT)) / MENU_ITEM_HEIGHT;
 	if (configGetInt(themeConfig, "displayed_items", &intValue)) {
@@ -457,7 +463,7 @@ void thmReloadScreenExtents(int refresh) {
 }
 
 char* thmGetValue() {
-	LOG("thmGetValue() id=%d name=%s\n", guiThemeID, guiThemesNames[guiThemeID]);
+	//LOG("thmGetValue() id=%d name=%s\n", guiThemeID, guiThemesNames[guiThemeID]);
 	return guiThemesNames[guiThemeID];
 }
 
@@ -480,7 +486,7 @@ void thmSetGuiValue(int themeID) {
 }
 
 int thmGetGuiValue() {
-	LOG("thmGetGuiValue() id=%d\n", guiThemeID);
+	//LOG("thmGetGuiValue() id=%d\n", guiThemeID);
 	return guiThemeID;
 }
 

@@ -323,11 +323,56 @@ static void guiShowConfig() {
 	}
 }
 
+static int curTheme = -1;
+
+static int guiUIUpdater(int modified) {
+	if (modified) {
+		int temp;
+		diaGetInt(diaUIConfig, UICFG_THEME, &temp);
+		if (temp != curTheme) {
+			curTheme = temp;
+			if (temp == 0) {
+				diaUIConfig[28].type = UI_COLOUR; // Must be correctly set before doing the diaS/GetColor !!
+				diaUIConfig[32].type = UI_COLOUR;
+				diaUIConfig[36].type = UI_COLOUR;
+				diaUIConfig[40].type = UI_COLOUR;
+				diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
+				diaSetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
+				diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
+				diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
+			} else	if (temp == thmGetGuiValue()) {
+				diaUIConfig[28].type = UI_COLOUR;
+				diaUIConfig[32].type = UI_COLOUR;
+				diaUIConfig[36].type = UI_COLOUR;
+				diaUIConfig[40].type = UI_COLOUR;
+				diaSetColor(diaUIConfig, UICFG_BGCOL, gTheme->bgColor);
+				diaSetU64Color(diaUIConfig, UICFG_UICOL, gTheme->uiTextColor);
+				diaSetU64Color(diaUIConfig, UICFG_TXTCOL, gTheme->textColor);
+				diaSetU64Color(diaUIConfig, UICFG_SELCOL, gTheme->selTextColor);
+			} else {
+				diaUIConfig[28].type = UI_SPACER;
+				diaUIConfig[32].type = UI_SPACER;
+				diaUIConfig[36].type = UI_SPACER;
+				diaUIConfig[40].type = UI_SPACER;
+			}
+
+			temp = !temp;
+			diaSetEnabled(diaUIConfig, UICFG_BGCOL, temp);
+			diaSetEnabled(diaUIConfig, UICFG_UICOL, temp);
+			diaSetEnabled(diaUIConfig, UICFG_TXTCOL, temp);
+			diaSetEnabled(diaUIConfig, UICFG_SELCOL, temp);
+		}
+	}
+
+	return 0;
+}
+
 static void guiShowUIConfig() {
+	curTheme = -1;
+
 	// configure the enumerations
 	const char* scrollSpeeds[] = {	_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL };
 	const char* vmodeNames[] = {"AUTO", "PAL", "NTSC", NULL};
-
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
@@ -336,10 +381,7 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
 	diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
 	diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
-	diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
-	diaSetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
-	diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
-	diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
+	guiUIUpdater(1);
 	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
 	diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
@@ -347,20 +389,21 @@ static void guiShowUIConfig() {
 
 	int oldVmode = gVMode;
 	int oldVSync = gVSync;
-
 	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
 	diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
 
-	int ret = diaExecuteDialog(diaUIConfig, -1, 1, NULL);
+	int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
 	if (ret) {
 		int themeID = -1, langID = -1;
 		diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
-		diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
 		diaGetInt(diaUIConfig, UICFG_LANG, &langID);
-		diaGetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
-		diaGetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
-		diaGetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
-		diaGetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
+		diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
+		if (themeID == 0) {
+			diaGetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
+			diaGetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
+			diaGetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
+			diaGetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
+		}
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
 		diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);

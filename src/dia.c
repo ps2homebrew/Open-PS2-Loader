@@ -437,17 +437,12 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 		}
 
 		case UI_COLOUR: {
+			rmDrawRect(x, y + 3, ALIGN_NONE, 25, 17, txtcol);
 			u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
-
-			if (selected)
-				rmDrawRect(x, y + 4, ALIGN_NONE, 25, 15, gTheme->selTextColor);
-			else
-				rmDrawRect(x, y + 4, ALIGN_NONE, 25, 15, gColDarker);
-
-			rmDrawRect(x + 2, y + 6, ALIGN_NONE, 21, 11, dcol);
+			rmDrawRect(x + 2, y + 5, ALIGN_NONE, 21, 13, dcol);
 
 			*w = 25;
-			*h = 15;
+			*h = 17;
 			break;
 		}
 	}
@@ -463,6 +458,16 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			newSize = item->fixedWidth;
 		if (*w < newSize)
 			*w = newSize;
+	}
+
+	if (item->fixedHeight != 0) {
+		int newSize;
+		if (item->fixedHeight < 0)
+			newSize = item->fixedHeight * screenHeight / -100;
+		else
+			newSize = item->fixedHeight;
+		if (*h < newSize)
+			*h = newSize;
 	}
 }
 
@@ -592,18 +597,7 @@ static int diaHandleInput(struct UIItem *item, int *modified) {
 		else
 			*modified = 0;
 	} else if (item->type == UI_COLOUR) {
-		unsigned char col[3];
-
-		col[0] = item->colourvalue.r;
-		col[1] = item->colourvalue.g;
-		col[2] = item->colourvalue.b;
-
-		if (diaShowColSel(&col[0], &col[1], &col[2])) {
-			item->colourvalue.r = col[0];
-			item->colourvalue.g = col[1];
-			item->colourvalue.b = col[2];
-		}
-		else
+		if (!diaShowColSel(&item->colourvalue.r, &item->colourvalue.g, &item->colourvalue.b))
 			*modified = 0;
 
 		return 0;
@@ -934,6 +928,23 @@ int diaSetColor(struct UIItem* ui, int id, const unsigned char *col) {
 	item->colourvalue.r = col[0];
 	item->colourvalue.g = col[1];
 	item->colourvalue.b = col[2];
+	return 1;
+}
+
+int diaSetU64Color(struct UIItem* ui, int id, u64 col) {
+	struct UIItem *item = diaFindByID(ui, id);
+
+	if (!item)
+		return 0;
+
+	if (item->type != UI_COLOUR)
+		return 0;
+
+	item->colourvalue.r = col & 0xFF;
+	col >>= 8;
+	item->colourvalue.g = col & 0xFF;
+	col >>= 8;
+	item->colourvalue.b = col & 0xFF;
 	return 1;
 }
 

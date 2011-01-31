@@ -22,7 +22,7 @@ typedef struct {
 	int width;
 	int height;
 	u64 color;
-        int font;
+	int font;
 } theme_element_t;
 
 typedef struct {

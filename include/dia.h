@@ -1,6 +1,8 @@
 #ifndef __DIA_H
 #define __DIA_H
 
+#include "include/usbld.h"
+
 // UI dialog item definition
 typedef enum {
 	// terminates the definition of dialog. Mandatory
@@ -82,7 +84,7 @@ int diaGetString(struct UIItem* ui, int id, char *value);
 int diaSetString(struct UIItem* ui, int id, const char *text);
 int diaGetColor(struct UIItem* ui, int id, unsigned char *col);
 int diaSetColor(struct UIItem* ui, int id, const unsigned char *col);
-//int diaSetU64Color(struct UIItem* ui, int id, u64 col); // TODO ohhh why can't I declare a u64 here ????
+int diaSetU64Color(struct UIItem* ui, int id, u64 col);
 // set label pointer into the label's text (must be valid while rendering dialog)
 int diaSetLabel(struct UIItem* ui, int id, const char *text);
 // sets the current enum value list for given control

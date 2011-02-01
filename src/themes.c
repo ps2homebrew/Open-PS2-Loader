@@ -83,14 +83,14 @@ static int thmReadEntry(int index, char* path, char* separator, char* name, unsi
 }
 
 /* themePath must contains the leading separator (as it is dependent of the device, we can't know here) */
-static int thmLoadResource(int texId, char* themePath, short psm) {
+static int thmLoadResource(int texId, char* themePath, short psm, int useDefault) {
 	int success = -1;
 	GSTEXTURE* texture = &gTheme->textures[texId];
 
 	if (themePath != NULL)
 		success = texDiscoverLoad(texture, themePath, texId, psm); // only set success here
 
-	if ((success < 0) && gTheme->useDefault)
+	if ((success < 0) && useDefault)
 		texPngLoad(texture, NULL, texId, psm);  // we don't mind the result of "default"
 
 	return success;
@@ -365,7 +365,7 @@ static void thmLoad(char* themePath) {
 	char* path = themePath;
 	int customBusy = 0;
 	for (i = LOAD0_ICON; i <= LOAD7_ICON; i++) {
-		if (thmLoadResource(i, path, GS_PSM_CT32) >= 0)
+		if (thmLoadResource(i, path, GS_PSM_CT32, gTheme->useDefault) >= 0)
 			customBusy = 1;
 		else {
 			if (customBusy)
@@ -378,18 +378,18 @@ static void thmLoad(char* themePath) {
 
 	// Customizable icons
 	for (i = EXIT_ICON; i <= DOWN_ICON; i++)
-		thmLoadResource(i, themePath, GS_PSM_CT32);
+		thmLoadResource(i, themePath, GS_PSM_CT32, gTheme->useDefault);
 
 	// Not  customizable icons
 	for (i = L1_ICON; i <= START_ICON; i++)
-		thmLoadResource(i, NULL, GS_PSM_CT32);
+		thmLoadResource(i, NULL, GS_PSM_CT32, 1);
 
 	// Finish with background
-	thmLoadResource(COVER_OVERLAY, themePath, GS_PSM_CT32);
-	thmLoadResource(BACKGROUND_PICTURE, themePath, GS_PSM_CT24);
+	thmLoadResource(COVER_OVERLAY, themePath, GS_PSM_CT32, gTheme->useDefault);
+	thmLoadResource(BACKGROUND_PICTURE, themePath, GS_PSM_CT24, gTheme->useDefault);
 
 	// LOGO is hardcoded
-	thmLoadResource(LOGO_PICTURE, NULL, GS_PSM_CT24);
+	thmLoadResource(LOGO_PICTURE, NULL, GS_PSM_CT24, 1);
 }
 
 static void thmRebuildGuiNames() {

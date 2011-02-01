@@ -101,7 +101,8 @@ int diaShowKeyb(char* text, int maxLen) {
 		
 		// Commands
 		for (i = 0; i < KEYB_HEIGHT; i++) {
-			rmDrawPixmap(cmdicons[i], 448, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+			if (cmdicons[i])
+				rmDrawPixmap(cmdicons[i], 448, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
 			
 			w = fntRenderString(FNT_DEFAULT, 489, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, commands[i], gTheme->uiTextColor);
 			if (i == selcommand)

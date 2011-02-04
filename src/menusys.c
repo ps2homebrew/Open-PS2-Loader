@@ -488,10 +488,6 @@ static GSTEXTURE* getCachedTexture(icon_cache_t* cache, struct submenu_item_t* i
 		if (inactiveFrames < support->delay)
 			return dflt;
 
-		// does it provide Art ? no? return default pixmap
-		if (!support->itemGetArt) 
-			return dflt;
-		
 		// reference back to the pointer to cache entry
 		cache_entry_t **entryref = &item->cache_entry_ref[cache->userid];
 		
@@ -519,10 +515,170 @@ GSTEXTURE* menuGetCurrentArt() {
 	return NULL;
 }
 
-void menuDrawStatic() {
-	int icnt = gTheme->displayedItems;
-	int found = 0;
+/*void menuDrawImage(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	if (elem->userAttribute) {
+		// thmConfig->getAttributeValue(elem->userAttribute);
+		//
+	} else {
 
+	}
+
+	if (elem->cache) {
+
+	} else {
+
+	}
+}*/
+
+void menuDrawMenuIcon(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	GSTEXTURE* someTex = thmGetTexture(curMenu->item->icon_id);
+	if (someTex && someTex->Mem)
+		rmDrawPixmap(someTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->color);
+}
+
+void menuDrawMenuText(struct menu_list_t *curMenu, struct submenu_list_t *curItem, theme_element_t* elem) {
+	//// rendering ELEMENT "Menu Text"
+	GSTEXTURE* someTex = NULL, *otherTex = NULL;
+	if (elem->enabled) {
+		if (curMenu->prev)
+			someTex = thmGetTexture(LEFT_ICON);
+		else
+			someTex = NULL;
+		if (curMenu->next)
+			otherTex = thmGetTexture(RIGHT_ICON);
+
+		if (elem->aligned) {
+			int offset = elem->width >> 1;
+			if (someTex && someTex->Mem)
+				rmDrawPixmap(someTex, elem->posX - offset, elem->posY, elem->aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+			if (otherTex && otherTex->Mem)
+				rmDrawPixmap(otherTex, elem->posX + offset, elem->posY, elem->aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+		}
+		else {
+			if (someTex && someTex->Mem)
+				rmDrawPixmap(someTex, elem->posX - someTex->Width, elem->posY, elem->aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+			if (otherTex && otherTex->Mem)
+				rmDrawPixmap(otherTex, elem->posX + elem->width, elem->posY, elem->aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+		}
+		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, GetMenuItemText(curMenu->item), elem->color);
+	}
+}
+
+void menuDrawItemList(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	//// rendering ELEMENT "Item List"
+	if (curItem) {
+		int icnt = gTheme->displayedItems;
+		int found = 0;
+		struct submenu_list_t *ps  = curMenu->item->pagestart;
+
+		// verify the item is in visible range
+		while (icnt-- && ps) {
+			if (ps == curItem) {
+				found = 1;
+				break;
+			}
+			ps = ps->next;
+		}
+
+		// page not properly aligned?
+		if (!found)
+			curMenu->item->pagestart = curItem;
+
+		// reset to page start after cur. item visibility determination
+		ps  = curMenu->item->pagestart;
+
+		GSTEXTURE* someTex = NULL, *otherTex = NULL;
+		int stretchedSize = 0;
+		if (gTheme->itemsListIcons) {
+			stretchedSize = 20;
+			someTex = thmGetTexture(DISC_ICON);
+		}
+
+		int curpos = elem->posY;
+		int others = 0;
+		u64 color;
+		while (ps && (others < gTheme->displayedItems)) {
+			if (gTheme->itemsListIcons) {
+				otherTex = getCachedTexture(&ico_cache, &ps->item, someTex);
+				if (otherTex && otherTex->Mem)
+					rmDrawPixmap(otherTex, elem->posX, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, stretchedSize, stretchedSize, gDefaultCol);
+			}
+
+			if (ps == curItem)
+				color = gTheme->selTextColor;
+			else
+				color = elem->color;
+
+			fntRenderString(elem->font, elem->posX + stretchedSize, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, submenuItemGetText(&ps->item), color);
+
+			ps = ps->next;
+			others++;
+		}
+	}
+}
+
+void menuDrawItemCover(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	//// rendering ELEMENT "Item Cover"
+	if (curItem) {
+		GSTEXTURE* someTex = NULL, *otherTex = NULL;
+		otherTex = thmGetTexture(COVER_OVERLAY);
+		if (otherTex && otherTex->Mem) {
+			someTex = getCachedTexture(&cov_cache, &curItem->item, NULL);
+			if (someTex && someTex->Mem) {
+				rmDrawOverlayPixmap(otherTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->color,
+						someTex, gTheme->coverBlend_ulx, gTheme->coverBlend_uly, gTheme->coverBlend_urx, gTheme->coverBlend_ury,
+						gTheme->coverBlend_blx, gTheme->coverBlend_bly, gTheme->coverBlend_brx, gTheme->coverBlend_bry);
+			}
+		}
+		else {
+			someTex = getCachedTexture(&cov_cache, &curItem->item, NULL);
+			if (someTex && someTex->Mem)
+				rmDrawPixmap(someTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->color);
+		}
+	}
+}
+
+void menuDrawItemIcon(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	//// rendering ELEMENT "Item Icon"
+	if (curItem) {
+		GSTEXTURE* someTex = getCachedTexture(&ico_cache, &curItem->item, NULL);
+		if (someTex && someTex->Mem)
+			rmDrawPixmap(someTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->color);
+	}
+}
+
+void menuDrawItemText(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	//// rendering ELEMENT "Item Text"
+	if (curItem) {
+		if (curMenu->item->userdata && (curItem->item.id != -1)) {
+			item_list_t *support = curMenu->item->userdata;
+			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, support->itemGetStartup(curItem->item.id), elem->color);
+		}
+	}
+}
+
+void menuDrawMenuHint(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+	//// rendering ELEMENT "Hint Text"
+	struct menu_hint_item_t* hint = curMenu->item->hints;
+	if (hint) {
+		GSTEXTURE* someTex = NULL;
+		int x = elem->posX;
+		int y = elem->posY;
+
+		for (; hint; hint = hint->next) {
+			someTex = thmGetTexture(hint->icon_id);
+			if (someTex && someTex->Mem) {
+				rmDrawPixmap(someTex, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+				x += someTex->Width + 2;
+			}
+
+			x += fntRenderString(elem->font, x, y, ALIGN_NONE, _l(hint->text_id), elem->color);
+			x += 12;
+		}
+	}
+}
+
+void menuDrawStatic() {
 	if (!menu)
 		return;
 	
@@ -533,144 +689,34 @@ void menuDrawStatic() {
 		selected_item->item->current = selected_item->item->submenu;
 
 	struct submenu_list_t *cur = selected_item->item->current;
-	struct submenu_list_t *ps  = selected_item->item->pagestart;
-
-	// verify the item is in visible range
-	while (icnt-- && ps) {
-		if (ps == cur) {
-			found = 1;
-			break;
-		}
-		ps = ps->next;
-	}
-
-	// page not properly aligned?
-	if (!found)
-		selected_item->item->pagestart = cur;
-
-	// reset to page start after cur. item visibility determination
-	ps  = selected_item->item->pagestart;
 
 	//// rendering ELEMENT "Menu Icon"
-	GSTEXTURE* someTex = NULL, *otherTex = NULL;
-	if (gTheme->menuIcon.enabled) {
-		someTex = thmGetTexture(selected_item->item->icon_id);
-		if (someTex && someTex->Mem)
-			rmDrawPixmap(someTex, gTheme->menuIcon.posX, gTheme->menuIcon.posY, gTheme->menuIcon.aligned, gTheme->menuIcon.width, gTheme->menuIcon.height, gTheme->menuIcon.color);
-	}
+	if (gTheme->menuIcon.enabled)
+		menuDrawMenuIcon(selected_item, cur, &gTheme->menuIcon);
 
 	//// rendering ELEMENT "Menu Text"
-	if (gTheme->menuText.enabled) {
-		if (selected_item->prev)
-			someTex = thmGetTexture(LEFT_ICON);
-		else
-			someTex = NULL;
-		if (selected_item->next)
-			otherTex = thmGetTexture(RIGHT_ICON);
-
-		if (gTheme->menuText.aligned) {
-			int offset = gTheme->menuText.width >> 1;
-			if (someTex && someTex->Mem)
-				rmDrawPixmap(someTex, gTheme->menuText.posX - offset, gTheme->menuText.posY, gTheme->menuText.aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-			if (otherTex && otherTex->Mem)
-				rmDrawPixmap(otherTex, gTheme->menuText.posX + offset, gTheme->menuText.posY, gTheme->menuText.aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-		}
-		else {
-			if (someTex && someTex->Mem)
-				rmDrawPixmap(someTex, gTheme->menuText.posX - someTex->Width, gTheme->menuText.posY, gTheme->menuText.aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-			if (otherTex && otherTex->Mem)
-				rmDrawPixmap(otherTex, gTheme->menuText.posX + gTheme->menuText.width, gTheme->menuText.posY, gTheme->menuText.aligned, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-		}
-                fntRenderString(gTheme->menuText.font, gTheme->menuText.posX, gTheme->menuText.posY, gTheme->menuText.aligned, GetMenuItemText(selected_item->item), gTheme->menuText.color);
-	}
+	if (gTheme->menuText.enabled)
+		menuDrawMenuText(selected_item, cur, &gTheme->menuText);
 	
-	if (cur) {
-		//// rendering ELEMENT "Item List"
-		theme_element_t* itemsList = &gTheme->itemsList;
+	//// rendering ELEMENT "Item List"
+	if (gTheme->itemsList.enabled)
+		menuDrawItemList(selected_item, cur, &gTheme->itemsList);
 
-		int stretchedSize = 0;
-		if (gTheme->itemsListIcons) {
-			stretchedSize = 20;
-			someTex = thmGetTexture(DISC_ICON);
-		}
-	
-		int curpos = gTheme->itemsList.posY;
-		int others = 0;
-		u64 color;
-		while (ps && (others < gTheme->displayedItems)) {
-			if (gTheme->itemsListIcons) {
-				otherTex = getCachedTexture(&ico_cache, &ps->item, someTex);
-				if (otherTex && otherTex->Mem)
-					rmDrawPixmap(otherTex, itemsList->posX, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, stretchedSize, stretchedSize, gDefaultCol);
-			}
-		
-			if (ps == cur)
-				color = gTheme->selTextColor;
-			else
-				color = gTheme->itemsList.color;
+	//// rendering ELEMENT "Item Cover"
+	if (gTheme->itemCover.enabled)
+		menuDrawItemCover(selected_item, cur, &gTheme->itemCover);
 
-                        fntRenderString(itemsList->font, itemsList->posX + stretchedSize, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, submenuItemGetText(&ps->item), color);
-		
-			ps = ps->next;
-			others++;
-		}
+	//// rendering ELEMENT "Item Icon"
+	if (gTheme->itemIcon.enabled)
+		menuDrawItemIcon(selected_item, cur, &gTheme->itemIcon);
 
-		//// rendering ELEMENT "Item Cover"
-		if (gTheme->itemCover.enabled) {
-			otherTex = thmGetTexture(COVER_OVERLAY);
-			if (otherTex && otherTex->Mem) {
-				someTex = getCachedTexture(&cov_cache, &cur->item, NULL);
-				if (someTex && someTex->Mem) {
-					rmDrawOverlayPixmap(otherTex, gTheme->itemCover.posX, gTheme->itemCover.posY, gTheme->itemCover.aligned, gTheme->itemCover.width, gTheme->itemCover.height, gTheme->itemCover.color,
-							someTex, gTheme->coverBlend_ulx, gTheme->coverBlend_uly, gTheme->coverBlend_urx, gTheme->coverBlend_ury,
-							gTheme->coverBlend_blx, gTheme->coverBlend_bly, gTheme->coverBlend_brx, gTheme->coverBlend_bry);
-				}
-			}
-			else {
-				someTex = getCachedTexture(&cov_cache, &cur->item, NULL);
-				if (someTex && someTex->Mem)
-					rmDrawPixmap(someTex, gTheme->itemCover.posX, gTheme->itemCover.posY, gTheme->itemCover.aligned, gTheme->itemCover.width, gTheme->itemCover.height, gTheme->itemCover.color);
-			}
-		}
-
-		//// rendering ELEMENT "Item Icon"
-		if (gTheme->itemIcon.enabled) {
-			someTex = getCachedTexture(&ico_cache, &cur->item, NULL);
-			if (someTex && someTex->Mem)
-				rmDrawPixmap(someTex, gTheme->itemIcon.posX, gTheme->itemIcon.posY, gTheme->itemIcon.aligned, gTheme->itemIcon.width, gTheme->itemIcon.height, gTheme->itemIcon.color);
-		}
-
-		//// rendering ELEMENT "Item Text"
-		if (gTheme->itemText.enabled) {
-			if (selected_item->item->userdata && (cur->item.id != -1)) {
-				item_list_t *support = selected_item->item->userdata;
-                                fntRenderString(gTheme->itemText.font, gTheme->itemText.posX, gTheme->itemText.posY, gTheme->itemText.aligned, support->itemGetStartup(cur->item.id), gTheme->itemText.color);
-			}
-		}
-	}
+	//// rendering ELEMENT "Item Text"
+	if (gTheme->itemText.enabled)
+		menuDrawItemText(selected_item, cur, &gTheme->itemText);
 
 	//// rendering ELEMENT "Hint Text"
-	// single hint
-	struct menu_hint_item_t* hint = selected_item->item->hints;
-	
-	if (gTheme->hintText.enabled && hint) {
-		int x = gTheme->hintText.posX;
-		int y = gTheme->hintText.posY;
-		
-		// background
-		//rmDrawRect(x, y, ALIGN_NONE, gTheme->hintText.width, gTheme->hintText.height, gColDarker);
-	
-		for (; hint; hint = hint->next) {
-			someTex = thmGetTexture(hint->icon_id);
-			if (someTex && someTex->Mem) {
-				rmDrawPixmap(someTex, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-				x += someTex->Width + 2;
-			}
-			
-                        x += fntRenderString(gTheme->hintText.font, x, y, ALIGN_NONE, _l(hint->text_id), gTheme->hintText.color);
-			x+= 12;
-		}
-	}
+	if (gTheme->hintText.enabled)
+		menuDrawMenuHint(selected_item, cur, &gTheme->hintText);
 }
 
 void menuSetInactiveFrames(unsigned int frames) {

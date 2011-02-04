@@ -6,7 +6,7 @@
 #define _STR_WELCOME					  1
 #define _STR_OUL_VER					  2
 #define _STR_SAVE_CHANGES				  3
-#define _STR_O_BACK					 	  4
+#define _STR_O_BACK						  4
 #define _STR_IPCONFIG					  5
 #define _STR_NO_ITEMS					  6
 #define _STR_SETTINGS_SAVED				  7

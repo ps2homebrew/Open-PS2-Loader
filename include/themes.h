@@ -50,7 +50,7 @@ typedef struct {
 	int coverBlend_blx, coverBlend_bly, coverBlend_brx, coverBlend_bry;
 
 	GSTEXTURE textures[TEXTURES_COUNT];
-        int fonts[THM_MAX_FONTS]; //!< Storage of font handles for removal once not needed
+	int fonts[THM_MAX_FONTS]; //!< Storage of font handles for removal once not needed
 
 	void (*drawBackground)();
 	void (*drawAltBackground)();

@@ -217,7 +217,6 @@ static void cacheLoadArt(void* data) {
 		return;
 	
 	item_list_t* handler = req->list;
-
 	if (!handler || !req->entry || !req->entry->item)
 		return;
 	
@@ -232,14 +231,6 @@ static void cacheLoadArt(void* data) {
 	if ((req->id != req->item->id))
 		return;
 
-	if (!handler->itemGetArt)
-		return;
-	
-	if (!handler->itemGetStartup) {
-		LOG("IO: No item get startup %p!\n", handler);
-		return;
-	}
-	
 	// seems okay. we can proceed
 	GSTEXTURE* texture = &req->entry->texture;
 	if(texture->Mem != NULL) {

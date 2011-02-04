@@ -40,8 +40,6 @@ static ee_sema_t gQueueSema;
 
 static int gInactiveFrames;
 static int gFrameCounter;
-// incremental game id. if a new game is encountered it is incremented
-static int gCurGameID;
 
 static GSTEXTURE gBackgroundTex;
 
@@ -170,8 +168,6 @@ void guiInit(void) {
 
 	gUpdateList = NULL;
 	gUpdateEnd = NULL;
-	
-	gCurGameID = 1;
 	
 	gInactiveFrames = 0;
 	

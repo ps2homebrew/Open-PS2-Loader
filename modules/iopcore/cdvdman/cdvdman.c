@@ -626,6 +626,9 @@ typedef struct {
 cdvdman_partspecs_t cdvdman_partspecs;
 #endif
 
+#define CDVDMAN_MODULE_VERSION 0x225
+static int cdvdman_debug_print_flag = 0;
+
 //-------------------------------------------------------------------------
 #ifdef ALT_READ_CORE
 
@@ -1573,10 +1576,18 @@ int sceCdGetReadPos(void)
 //-------------------------------------------------------------------------
 int sceCdSC(int code, int *param)
 {
-	if (g_gamesetting_disable_DVDDL)
-		return 1;
+        DPRINTF("sceCdSC(0x%X, 0x%X)\n", code, param);
 
-	return 0x225;
+        if (code == 0xFFFFFFF7) {
+                return CDVDMAN_MODULE_VERSION;
+        }
+        else if (code == 0xFFFFFFF0) {
+                *param = (int)&cdvdman_debug_print_flag;
+                return 0xFF;
+        }
+
+        /* dummy result */
+        return 1;
 }
 
 //-------------------------------------------------------------------------

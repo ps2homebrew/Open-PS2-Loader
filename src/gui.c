@@ -70,8 +70,8 @@ struct gui_update_list_t {
 struct gui_update_list_t *gUpdateList;
 struct gui_update_list_t *gUpdateEnd;
 
-struct submenu_list_t *g_settings_submenu = NULL;
-struct submenu_list_t *g_games_submenu = NULL;
+submenu_list_t *g_settings_submenu = NULL;
+submenu_list_t *g_games_submenu = NULL;
 
 typedef struct {
 	void (*handleInput)(void);
@@ -114,9 +114,9 @@ static gui_screen_handler_t *screenHandlerTarget = NULL;
 static int transition = 0;
 
 // "main menu submenu"
-static struct submenu_list_t *mainMenu;
+static submenu_list_t *mainMenu;
 // active item in the main menu
-static struct submenu_list_t *mainMenuCurrent;
+static submenu_list_t *mainMenuCurrent;
 
 // Helper perlin noise data
 #define PLASMA_H 32
@@ -811,7 +811,7 @@ int guiDeferUpdate(struct gui_update_t *op) {
 }
 
 static void guiHandleOp(struct gui_update_t* item) {
-	struct submenu_list_t* result = NULL;
+	submenu_list_t* result = NULL;
 
 	switch (item->type) {
 		case GUI_INIT_DONE:
@@ -855,10 +855,6 @@ static void guiHandleOp(struct gui_update_t* item) {
 			item->menu.menu->submenu = *item->menu.subMenu;
 			break;
 		
-		case GUI_OP_PIXMAP_LOADED:
-			submenuPixmapLoaded(item->pixmap.cache, item->pixmap.entry, item->pixmap.result);
-			break;
-			
 		case GUI_OP_ADD_HINT:
 			// append the hint list in the menu item
 			menuAddHint(item->menu.menu, item->hint.text_id, item->hint.icon_id);
@@ -1230,7 +1226,7 @@ static void guiMainHandleInput() {
 		menuLastPage();
 	}
 
-	struct menu_item_t* cur = menuGetCurrent();
+	menu_item_t* cur = menuGetCurrent();
 	if (!cur)
 		return;
 	
@@ -1260,7 +1256,7 @@ static void guiMenuRender() {
 		mainMenuCurrent = mainMenu;
 	
 	// iterate few items behind, few items forward
-	struct submenu_list_t* it = mainMenu;
+	submenu_list_t* it = mainMenu;
 
 	// coordinate, etc
 	// we start at center
@@ -1414,8 +1410,7 @@ void guiMainLoop(void) {
 	while (!gTerminate) {
 		guiStartFrame();
 		
-		cacheNextFrame();
-		menuSetInactiveFrames(gInactiveFrames);
+		cacheNextFrame(gInactiveFrames);
 		
 		if (!screenHandler) 
 			screenHandler = &mainScreenHandler;

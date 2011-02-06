@@ -15,60 +15,26 @@
 #include "assert.h"
 
 // global menu variables
-static struct menu_list_t *menu;
-static struct menu_list_t *selected_item;
+static menu_list_t *menu;
+static menu_list_t *selected_item;
 
-static icon_cache_t cov_cache;
-static icon_cache_t ico_cache;
-static icon_cache_t bg_cache;
-
-static unsigned int inactiveFrames;
+static image_cache_t cov_cache;
+static image_cache_t ico_cache;
+static image_cache_t bg_cache;
 
 // height of the hint bar at the bottom of the screen
 #define HINT_HEIGHT 16
 
-#define PIXMAP_STATE_NOT_FOUND 0
-#define PIXMAP_STATE_CACHED 1
-#define PIXMAP_STATE_NOT_CACHED 2
-
 // -------------------------------------------------------------------------------------------
 // ---------------------------------------- Menu manipulation --------------------------------
 // -------------------------------------------------------------------------------------------
-static void onCacheItemRemoval(void *ccache, cache_entry_t *entry) {
-	icon_cache_t *cache = ccache;
-	
-	if (!cache || !entry || !entry->item)
-		return;
-		
-	// remove the cache entry reference
-	entry->item->cache_entry_ref[cache->userid] = NULL;
-	
-	// the prev. state was not "not found"
-	if (entry->item->pixmap_state[cache->userid] != PIXMAP_STATE_NOT_FOUND)
-		// move to - "to load" again
-		entry->item->pixmap_state[cache->userid] = PIXMAP_STATE_NOT_CACHED;
-}
-
-static void menuInitArtCache() {
-	cacheInitCache(&ico_cache, "ICO", gCountIconsCache);
-	cacheInitCache(&cov_cache, "COV", gCountCoversCache);
-	cacheInitCache(&bg_cache, "BG", gCountBackgroundsCache);
-	
-	ico_cache.userid = 0;
-	cov_cache.userid = 1;
-	bg_cache.userid = 2;
-
-	ico_cache.cacheItemRemoved = &onCacheItemRemoval;
-	cov_cache.cacheItemRemoved = &onCacheItemRemoval;
-	bg_cache.cacheItemRemoved = &onCacheItemRemoval;
-}
-
 void menuInit() {
 	menu = NULL;
 	selected_item = NULL;
-	inactiveFrames = 0;
 	
-	menuInitArtCache();
+	cacheInitCache(&ico_cache, 0, "ICO", gCountIconsCache);
+	cacheInitCache(&cov_cache, 1, "COV", gCountCoversCache);
+	cacheInitCache(&bg_cache, 2, "BG", gCountBackgroundsCache);
 }
 
 void menuEnd() {
@@ -77,10 +43,10 @@ void menuEnd() {
 	cacheDestroyCache(&bg_cache);
 	
 	// destroy menu
-	struct menu_list_t *cur = menu;
+	menu_list_t *cur = menu;
 	
 	while (cur) {
-		struct menu_list_t *td = cur;
+		menu_list_t *td = cur;
 		cur = cur->next;
 		
 		if (&td->item)
@@ -92,10 +58,10 @@ void menuEnd() {
 	}
 }
 
-static struct menu_list_t* AllocMenuItem(struct menu_item_t* item) {
-	struct menu_list_t* it;
+static menu_list_t* AllocMenuItem(menu_item_t* item) {
+	menu_list_t* it;
 	
-	it = malloc(sizeof(struct menu_list_t));
+	it = malloc(sizeof(menu_list_t));
 	
 	it->prev = NULL;
 	it->next = NULL;
@@ -104,7 +70,7 @@ static struct menu_list_t* AllocMenuItem(struct menu_item_t* item) {
 	return it;
 }
 
-void menuAppendItem(struct menu_item_t* item) {
+void menuAppendItem(menu_item_t* item) {
 	assert(item);
 	
 	if (menu == NULL) {
@@ -112,14 +78,14 @@ void menuAppendItem(struct menu_item_t* item) {
 		return;
 	}
 	
-	struct menu_list_t *cur = menu;
+	menu_list_t *cur = menu;
 	
 	// traverse till the end
 	while (cur->next)
 		cur = cur->next;
 	
 	// create new item
-	struct menu_list_t *newitem = AllocMenuItem(item);
+	menu_list_t *newitem = AllocMenuItem(item);
 	
 	// link
 	cur->next = newitem;
@@ -127,10 +93,10 @@ void menuAppendItem(struct menu_item_t* item) {
 }
 
 
-static struct submenu_list_t* AllocSubMenuItem(int icon_id, char *text, int id, int text_id) {
-	struct submenu_list_t* it;
+static submenu_list_t* AllocSubMenuItem(int icon_id, char *text, int id, int text_id) {
+	submenu_list_t* it;
 	
-	it = malloc(sizeof(struct submenu_list_t));
+	it = malloc(sizeof(submenu_list_t));
 	
 	it->prev = NULL;
 	it->next = NULL;
@@ -139,33 +105,31 @@ static struct submenu_list_t* AllocSubMenuItem(int icon_id, char *text, int id, 
 	it->item.text_id = text_id;
 	it->item.id = id;
 	
-	// not sure if we have icon or not yet
-	it->item.pixmap_state[0] = PIXMAP_STATE_NOT_CACHED;
-	it->item.pixmap_state[1] = PIXMAP_STATE_NOT_CACHED;
-	it->item.pixmap_state[2] = PIXMAP_STATE_NOT_CACHED;
-	
-	// and no cache entry yet
-	it->item.cache_entry_ref[0] = NULL;
-	it->item.cache_entry_ref[1] = NULL;
-	it->item.cache_entry_ref[2] = NULL;
+	// no cache entry yet
+	it->item.cache_id[0] = -1;
+	it->item.cache_id[1] = -1;
+	it->item.cache_id[2] = -1;
+	it->item.cache_uid[0] = -1;
+	it->item.cache_uid[1] = -1;
+	it->item.cache_uid[2] = -1;
 	
 	return it;
 }
 
-struct submenu_list_t* submenuAppendItem(struct submenu_list_t** submenu, int icon_id, char *text, int id, int text_id) {
+submenu_list_t* submenuAppendItem(submenu_list_t** submenu, int icon_id, char *text, int id, int text_id) {
 	if (*submenu == NULL) {
 		*submenu = AllocSubMenuItem(icon_id, text, id, text_id);
 		return *submenu; 
 	}
 	
-	struct submenu_list_t *cur = *submenu;
+	submenu_list_t *cur = *submenu;
 	
 	// traverse till the end
 	while (cur->next)
 		cur = cur->next;
 	
 	// create new item
-	struct submenu_list_t *newitem = AllocSubMenuItem(icon_id, text, id, text_id);
+	submenu_list_t *newitem = AllocSubMenuItem(icon_id, text, id, text_id);
 	
 	// link
 	cur->next = newitem;
@@ -174,21 +138,13 @@ struct submenu_list_t* submenuAppendItem(struct submenu_list_t** submenu, int ic
 	return newitem;
 }
 
-static void submenuDestroyItem(struct submenu_list_t* cur) {
-	cacheRemoveItem(&cov_cache, &cur->item);
-	cacheRemoveItem(&ico_cache, &cur->item);
-	cacheRemoveItem(&bg_cache, &cur->item);
-	
-	free(cur);
-}
-
-void submenuRemoveItem(struct submenu_list_t** submenu, int id) {
-	struct submenu_list_t* cur = *submenu;
-	struct submenu_list_t* prev = NULL;	
+void submenuRemoveItem(submenu_list_t** submenu, int id) {
+	submenu_list_t* cur = *submenu;
+	submenu_list_t* prev = NULL;
 	
 	while (cur) {
 		if (cur->item.id == id) {
-			struct submenu_list_t* next = cur->next;
+			submenu_list_t* next = cur->next;
 			
 			if (prev)
 				prev->next = cur->next;
@@ -196,8 +152,7 @@ void submenuRemoveItem(struct submenu_list_t** submenu, int id) {
 			if (*submenu == cur)
 				*submenu = next;
 			
-			// inform cache the item vanished, delete
-			submenuDestroyItem(cur);
+			free(cur);
 			
 			cur = next;
 		} else {
@@ -207,36 +162,36 @@ void submenuRemoveItem(struct submenu_list_t** submenu, int id) {
 	}
 }
 
-void submenuDestroy(struct submenu_list_t** submenu) {
+void submenuDestroy(submenu_list_t** submenu) {
 	// destroy sub menu
-	struct submenu_list_t *cur = *submenu;
+	submenu_list_t *cur = *submenu;
 	
 	while (cur) {
-		struct submenu_list_t *td = cur;
+		submenu_list_t *td = cur;
 		cur = cur->next;
 		
-		submenuDestroyItem(td);
+		free(td);
 	}
 	
 	*submenu = NULL;
 }
 
-static char *GetMenuItemText(struct menu_item_t* it) {
+static char *GetMenuItemText(menu_item_t* it) {
 	if (it->text_id >= 0)
 		return _l(it->text_id);
 	else
 		return it->text;
 }
 
-char *submenuItemGetText(struct submenu_item_t* it) {
+char *submenuItemGetText(submenu_item_t* it) {
 	if (it->text_id >= 0)
 		return _l(it->text_id);
 	else
 		return it->text;
 }
 
-static void swap(struct submenu_list_t* a, struct submenu_list_t* b) {
-	struct submenu_list_t *pa, *nb;
+static void swap(submenu_list_t* a, submenu_list_t* b) {
+	submenu_list_t *pa, *nb;
 	pa = a->prev;
 	nb = b->next;
 	
@@ -253,10 +208,10 @@ static void swap(struct submenu_list_t* a, struct submenu_list_t* b) {
 }
 
 // Sorts the given submenu by comparing the on-screen titles
-void submenuSort(struct submenu_list_t** submenu) {
+void submenuSort(submenu_list_t** submenu) {
 	// a simple bubblesort
 	// *submenu = mergeSort(*submenu);
-	struct submenu_list_t *head = *submenu;
+	submenu_list_t *head = *submenu;
 	int sorted = 0;
 	
 	if ((submenu == NULL) || (*submenu == NULL) || ((*submenu)->next == NULL))
@@ -265,10 +220,10 @@ void submenuSort(struct submenu_list_t** submenu) {
 	while (!sorted) {
 		sorted = 1;
 		
-		struct submenu_list_t *tip = head;
+		submenu_list_t *tip = head;
 		
 		while (tip->next) {
-			struct submenu_list_t *nxt = tip->next;
+			submenu_list_t *nxt = tip->next;
 			
 			char *txt1 = submenuItemGetText(&tip->item);
 			char *txt2 = submenuItemGetText(&nxt->item);
@@ -321,7 +276,7 @@ void menuNextV() {
 	if (!selected_item)
 		return;
 	
-	struct submenu_list_t *cur = selected_item->item->current;
+	submenu_list_t *cur = selected_item->item->current;
 	
 	if(cur && cur->next)
 		selected_item->item->current = cur->next;
@@ -331,7 +286,7 @@ void menuPrevV() {
 	if (!selected_item)
 		return;
 
-	struct submenu_list_t *cur = selected_item->item->current;
+	submenu_list_t *cur = selected_item->item->current;
 
 	// if the current item is on the page start, move the page start one page up before moving the item
 	if (selected_item->item->pagestart) {
@@ -353,7 +308,7 @@ void menuNextPage() {
 	if (!selected_item)
 		return;
 
-	struct submenu_list_t *cur = selected_item->item->pagestart;
+	submenu_list_t *cur = selected_item->item->pagestart;
 
 	if (cur) {
 		int itms = gTheme->displayedItems + 1;
@@ -368,7 +323,7 @@ void menuPrevPage() {
 	if (!selected_item)
 		return;
 
-	struct submenu_list_t *cur = selected_item->item->pagestart;
+	submenu_list_t *cur = selected_item->item->pagestart;
 
 	if (cur) {
 		int itms = gTheme->displayedItems + 1;
@@ -391,7 +346,7 @@ void menuLastPage() {
 	if (!selected_item)
 		return;
 
-	struct submenu_list_t *cur = selected_item->item->current;
+	submenu_list_t *cur = selected_item->item->current;
 
 	if (cur) {
 		while (cur->next)
@@ -407,20 +362,20 @@ void menuLastPage() {
 	}
 }
 
-struct menu_item_t* menuGetCurrent() {
+menu_item_t* menuGetCurrent() {
 	if (!selected_item)
 		return NULL;
 
 	return selected_item->item;
 }
 
-void menuItemExecButton(void (*execActionButton)(struct menu_item_t *self, int id)) {
+void menuItemExecButton(void (*execActionButton)(menu_item_t *self, int id)) {
 	if (execActionButton) {
 
 		// selected submenu id. default -1 = no selection
 		int subid = -1;
 
-		struct submenu_list_t *cur = selected_item->item->current;
+		submenu_list_t *cur = selected_item->item->current;
 		if (cur)
 			subid = cur->item.id;
 
@@ -428,8 +383,8 @@ void menuItemExecButton(void (*execActionButton)(struct menu_item_t *self, int i
 	}
 }
 
-void menuSetSelectedItem(struct menu_item_t* item) {
-	struct menu_list_t* itm = menu;
+void menuSetSelectedItem(menu_item_t* item) {
+	menu_list_t* itm = menu;
 	
 	while (itm) {
 		if (itm->item == item) {
@@ -441,65 +396,19 @@ void menuSetSelectedItem(struct menu_item_t* item) {
 	}
 }
 
-void submenuPixmapLoaded(icon_cache_t* cache, void *centry, int result) {
-	cache_entry_t *entry = (cache_entry_t *)centry;
-	
-	if (!entry)
-		return;
-	
-	if (!entry->item)
-		return;
-	
-	// we have to check if the cache didn't already reuse the entry
-	if (entry->item->cache_entry_ref[cache->userid] != entry)
-		return;
-	
-	// hmm seems okay, let's set it loaded (or not...)
-	entry->item->pixmap_state[cache->userid] = result ? PIXMAP_STATE_CACHED : PIXMAP_STATE_NOT_FOUND;
-	
-	// reuse the cache entry immediately if the pixmap could not be lodaded
-	if (!result)
-		cacheReleaseItem(cache, entry);
-}
-
-static GSTEXTURE* getCachedTexture(icon_cache_t* cache, struct submenu_item_t* item, GSTEXTURE* dflt) {
+static GSTEXTURE* getCachedTexture(image_cache_t* cache, submenu_item_t* item, GSTEXTURE* dflt) {
 	if (!gEnableArt)
 		return dflt;
 
-	// does the item have the icon at all? Nope?
-	if (item->pixmap_state[cache->userid] == PIXMAP_STATE_NOT_FOUND)
-		return dflt;
-	
-	// do we already have a cache entry? If so, return the cached entry
-	if (item->pixmap_state[cache->userid] == PIXMAP_STATE_CACHED) {
-		// inform we use this entry still - as it will be displayed!
-		cacheInformUsage(item->cache_entry_ref[cache->userid]);
-		return &item->cache_entry_ref[cache->userid]->texture;
-	}
-	
 	// Try to cache if possible
 	// Does the current menu have a support list, and is the item valid ?
 	if (selected_item->item->userdata && (item->id != -1)) {
 		// retrieve the support
 		item_list_t *support = selected_item->item->userdata;
-		
-		// not cached yet.
-		// under the cache pre-delay (to avoid filling cache while moving around)
-		if (inactiveFrames < support->delay)
-			return dflt;
 
-		// reference back to the pointer to cache entry
-		cache_entry_t **entryref = &item->cache_entry_ref[cache->userid];
-		
-		// no matter what happens, the item gets a cache entry assigned if cache has any space left
-		// obtain or schedule the retrieval of the pixmap
-		if (cacheGetEntry(cache, item, entryref, support)) {
-			// cache hit!
-			if (*entryref && (*entryref)->texture.Mem)  // but did it produce a valid entry?
-				return &(*entryref)->texture;
-		}
-		
-		// if we're here, the texture was not loaded yet or the cache is still full
+		GSTEXTURE* cacheTxt = cacheGetTexture(cache, support, &item->cache_id[cache->userId], &item->cache_uid[cache->userId], item->id);
+		if (cacheTxt && cacheTxt->Mem)  // but did it produce a valid entry?
+			return cacheTxt;
 	}
 	
 	return dflt;
@@ -509,13 +418,13 @@ GSTEXTURE* menuGetCurrentArt() {
 	if (!selected_item)
 		selected_item = menu;
 
-	struct submenu_list_t *cur = selected_item->item->current;
+	submenu_list_t *cur = selected_item->item->current;
 	if (cur)
 		return getCachedTexture(&bg_cache, &cur->item, NULL);
 	return NULL;
 }
 
-/*void menuDrawImage(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+/*void menuDrawImage(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	if (elem->userAttribute) {
 		// thmConfig->getAttributeValue(elem->userAttribute);
 		//
@@ -530,13 +439,13 @@ GSTEXTURE* menuGetCurrentArt() {
 	}
 }*/
 
-void menuDrawMenuIcon(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+void menuDrawMenuIcon(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	GSTEXTURE* someTex = thmGetTexture(curMenu->item->icon_id);
 	if (someTex && someTex->Mem)
 		rmDrawPixmap(someTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->color);
 }
 
-void menuDrawMenuText(struct menu_list_t *curMenu, struct submenu_list_t *curItem, theme_element_t* elem) {
+void menuDrawMenuText(menu_list_t *curMenu, submenu_list_t *curItem, theme_element_t* elem) {
 	//// rendering ELEMENT "Menu Text"
 	GSTEXTURE* someTex = NULL, *otherTex = NULL;
 	if (elem->enabled) {
@@ -564,12 +473,12 @@ void menuDrawMenuText(struct menu_list_t *curMenu, struct submenu_list_t *curIte
 	}
 }
 
-void menuDrawItemList(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+void menuDrawItemList(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	//// rendering ELEMENT "Item List"
 	if (curItem) {
 		int icnt = gTheme->displayedItems;
 		int found = 0;
-		struct submenu_list_t *ps  = curMenu->item->pagestart;
+		submenu_list_t *ps  = curMenu->item->pagestart;
 
 		// verify the item is in visible range
 		while (icnt-- && ps) {
@@ -617,7 +526,7 @@ void menuDrawItemList(struct menu_list_t* curMenu, struct submenu_list_t* curIte
 	}
 }
 
-void menuDrawItemCover(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+void menuDrawItemCover(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	//// rendering ELEMENT "Item Cover"
 	if (curItem) {
 		GSTEXTURE* someTex = NULL, *otherTex = NULL;
@@ -638,7 +547,7 @@ void menuDrawItemCover(struct menu_list_t* curMenu, struct submenu_list_t* curIt
 	}
 }
 
-void menuDrawItemIcon(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+void menuDrawItemIcon(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	//// rendering ELEMENT "Item Icon"
 	if (curItem) {
 		GSTEXTURE* someTex = getCachedTexture(&ico_cache, &curItem->item, NULL);
@@ -647,7 +556,7 @@ void menuDrawItemIcon(struct menu_list_t* curMenu, struct submenu_list_t* curIte
 	}
 }
 
-void menuDrawItemText(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+void menuDrawItemText(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	//// rendering ELEMENT "Item Text"
 	if (curItem) {
 		if (curMenu->item->userdata && (curItem->item.id != -1)) {
@@ -657,9 +566,9 @@ void menuDrawItemText(struct menu_list_t* curMenu, struct submenu_list_t* curIte
 	}
 }
 
-void menuDrawMenuHint(struct menu_list_t* curMenu, struct submenu_list_t* curItem, theme_element_t* elem) {
+void menuDrawMenuHint(menu_list_t* curMenu, submenu_list_t* curItem, theme_element_t* elem) {
 	//// rendering ELEMENT "Hint Text"
-	struct menu_hint_item_t* hint = curMenu->item->hints;
+	menu_hint_item_t* hint = curMenu->item->hints;
 	if (hint) {
 		GSTEXTURE* someTex = NULL;
 		int x = elem->posX;
@@ -688,7 +597,7 @@ void menuDrawStatic() {
 	if (!selected_item->item->current)
 		selected_item->item->current = selected_item->item->submenu;
 
-	struct submenu_list_t *cur = selected_item->item->current;
+	submenu_list_t *cur = selected_item->item->current;
 
 	//// rendering ELEMENT "Menu Icon"
 	if (gTheme->menuIcon.enabled)
@@ -719,20 +628,16 @@ void menuDrawStatic() {
 		menuDrawMenuHint(selected_item, cur, &gTheme->hintText);
 }
 
-void menuSetInactiveFrames(unsigned int frames) {
-	inactiveFrames = frames;
-}
-
-void menuAddHint(struct menu_item_t *menu, int text_id, int icon_id) {
+void menuAddHint(menu_item_t *menu, int text_id, int icon_id) {
 	// allocate a new hint item
-	struct menu_hint_item_t* hint = malloc(sizeof(struct menu_hint_item_t));
+	menu_hint_item_t* hint = malloc(sizeof(menu_hint_item_t));
 	
 	hint->text_id = text_id;
 	hint->icon_id = icon_id;
 	hint->next = NULL;
 	
 	if (menu->hints) {
-		struct menu_hint_item_t* top = menu->hints;
+		menu_hint_item_t* top = menu->hints;
 		
 		// rewind to end
 		for (; top->next; top = top->next);
@@ -743,15 +648,15 @@ void menuAddHint(struct menu_item_t *menu, int text_id, int icon_id) {
 	}
 }
 
-void menuRemoveHints(struct menu_item_t *menu) {
+void menuRemoveHints(menu_item_t *menu) {
 	while (menu->hints) {
-		struct menu_hint_item_t* hint = menu->hints;
+		menu_hint_item_t* hint = menu->hints;
 		menu->hints = hint->next;
 		free(hint);
 	}
 }
 
-void menuInitHints(struct menu_item_t* menu) {
+void menuInitHints(menu_item_t* menu) {
 	menuRemoveHints(menu);
 
 	menuAddHint(menu, _STR_SETTINGS, START_ICON);

@@ -59,10 +59,10 @@ typedef struct {
 	item_list_t *support;
 	
 	/// menu item used with this list support
-	struct menu_item_t menuItem;
+	menu_item_t menuItem;
 	
 	/// submenu list
-	struct submenu_list_t *subMenu;
+	submenu_list_t *subMenu;
 } opl_io_module_t;
 
 static void clearIOModuleT(opl_io_module_t *mod) {
@@ -91,7 +91,7 @@ static int gFrameCounter;
 
 static opl_io_module_t list_support[4];
 
-static void itemExecCross(struct menu_item_t *self, int id) {
+static void itemExecCross(menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (support) {
@@ -110,7 +110,7 @@ static void itemExecCross(struct menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecTriangle(struct menu_item_t *self, int id) {
+static void itemExecTriangle(menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (id < 0)
@@ -126,7 +126,7 @@ static void itemExecTriangle(struct menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecSquare(struct menu_item_t *self, int id) {
+static void itemExecSquare(menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (id < 0)
@@ -150,7 +150,7 @@ static void itemExecSquare(struct menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecCircle(struct menu_item_t *self, int id) {
+static void itemExecCircle(menu_item_t *self, int id) {
 	item_list_t *support = self->userdata;
 
 	if (id < 0)
@@ -177,7 +177,7 @@ static void itemExecCircle(struct menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecRefresh(struct menu_item_t *self) {
+static void itemExecRefresh(menu_item_t *self) {
 	item_list_t *support = self->userdata;
 
 	if (support && support->enabled)
@@ -268,7 +268,7 @@ static void menuExecHookFunc(int id) {
 	}        
 }
 
-static void menuFillHookFunc(struct submenu_list_t **menu) {
+static void menuFillHookFunc(submenu_list_t **menu) {
 #ifndef __CHILDPROOF
 	if (gHDDStartMode) // enabled at all?
 		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);

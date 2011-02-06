@@ -2,6 +2,7 @@
 #define __THEMES_H
 
 #include "include/textures.h"
+#include "include/texcache.h"
 
 #define MAX_THEMES_FILES 32
 #define THM_MAX_FONTS 16
@@ -23,6 +24,8 @@ typedef struct {
 	int height;
 	u64 color;
 	int font;
+
+	image_cache_t* cache;
 } theme_element_t;
 
 typedef struct {

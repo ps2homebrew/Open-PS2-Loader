@@ -5,6 +5,7 @@
 #include "include/usbld.h"
 #include "include/texcache.h"
 #include "include/dialogs.h"
+#include "include/menusys.h"
 
 typedef enum {
 	// Informs gui that init is over and main gui can be rendered
@@ -14,7 +15,6 @@ typedef enum {
 	GUI_OP_SELECT_MENU,
 	GUI_OP_CLEAR_SUBMENU,
 	GUI_OP_SORT,
-	GUI_OP_PIXMAP_LOADED,
 	GUI_OP_ADD_HINT
 }  gui_op_type_t;
 
@@ -23,8 +23,8 @@ struct gui_update_t {
 	gui_op_type_t type;
 	
 	struct {
-		struct menu_item_t *menu;
-		struct submenu_list_t **subMenu;
+		menu_item_t *menu;
+		submenu_list_t **subMenu;
 	} menu;
 	
 	union {
@@ -36,15 +36,6 @@ struct gui_update_t {
 			int selected;
 		} submenu;
 		
-		struct {
-			// operation sucesful? 1 yes, 0 no
-			int result;
-			// icon cache this sources from
-			icon_cache_t* cache;
-			// cache entry we're referencing here
-			void* entry;
-		} pixmap;
-		
 		struct { // hint for the given menu
 			int icon_id;
 			int text_id;
@@ -55,7 +46,7 @@ struct gui_update_t {
 typedef void (*gui_callback_t)(void);
 
 // called when filling the menu
-typedef void (*gui_menufill_callback_t)(struct submenu_list_t **menu);
+typedef void (*gui_menufill_callback_t)(submenu_list_t **menu);
 
 // called when a menuitem with unknown id is encountered
 typedef void (*gui_menuexec_callback_t)(int id);

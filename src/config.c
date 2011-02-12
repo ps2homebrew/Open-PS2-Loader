@@ -53,19 +53,50 @@ static int strToColor(const char *string, unsigned char *color) {
 	return 1;
 }
 
-static int splitAssignment(char* line, char* key, char* val) {
+/// true if given a whitespace character
+int isWS(char c) {
+	return c == ' ' || c == '\t';
+}
+
+static int splitAssignment(char* line, char* key, size_t keymax, char* val, size_t valmax) {
+	// skip whitespace
+	for (;isWS(*line); ++line);
+	
 	// find "=". 
 	// If found, the text before is key, after is val. 
 	// Otherwise malformed string is encountered
+	
 	char* eqpos = strchr(line, '=');
 	
 	if (eqpos) {
 		// copy the name and the value
-		strncpy(key, line, eqpos - line);
+		size_t keylen = min(keymax, eqpos - line);
+		
+		strncpy(key, line, keylen);
+		
 		eqpos++;
-		strcpy(val, eqpos);
+		
+		size_t vallen = min(keymax, strlen(line) - (eqpos - line));
+		strncpy(val, eqpos, vallen);
 	}
+	
 	return (int) eqpos;
+}
+
+static int parsePrefix(char* line, char* prefix) {
+	// find "=". 
+	// If found, the text before is key, after is val. 
+	// Otherwise malformed string is encountered
+	char* colpos = strchr(line, ':');
+	
+	if (colpos && colpos != line) {
+		// copy the name and the value
+		strncpy(prefix, line, colpos - line);
+		
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 static int configKeyValidate(const char* key) {
@@ -368,16 +399,38 @@ int configRead(config_set_t* configSet) {
 	
 	char* line;
 	unsigned int lineno = 0;
+	
+	char prefix[32];
+	memset(prefix, 0, sizeof(prefix));
+	
 	while (readFileBuffer(fileBuffer, &line)) {
 		lineno++;
 		
-		char key[255], val[255];
-		memset(key, 0, 255);
-		memset(val, 0, 255);
+		char key[32], val[255];
+		memset(key, 0, sizeof(key));
+		memset(val, 0, sizeof(val));
 		
-		if (splitAssignment(line, key, val)) {
+		if (splitAssignment(line, key, sizeof(key), val, sizeof(val))) {
+			/* if the line does not start with whitespace,
+			* the prefix ends and we have to reset it
+			*/
+			if (!isWS(line[0]))
+				memset(prefix, 0, sizeof(prefix));
+
 			// insert config value
-			configSetStr(configSet, key, val);
+			if (prefix[0]) {
+				// we have a prefix
+				char composedKey[66];
+				
+				snprintf(composedKey, 65, "%s_%s", prefix, key);
+				composedKey[65] = '\0';
+				
+				configSetStr(configSet, composedKey, val);
+			} else {
+				configSetStr(configSet, key, val);
+			}
+		} if (parsePrefix(line, prefix)) {
+			// prefix is set, that's about it
 		} else {
 			LOG("Malformed config file '%s' line %d: '%s'\n", configSet->filename, lineno, line);
 		}

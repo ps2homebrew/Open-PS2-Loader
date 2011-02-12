@@ -3,60 +3,97 @@
 
 #include "include/textures.h"
 #include "include/texcache.h"
+#include "include/menusys.h"
 
-#define MAX_THEMES_FILES 32
+#define THM_MAX_FILES 64
 #define THM_MAX_FONTS 16
 
 typedef struct {
-	char* filePath;
-	char* name;
-} theme_file_t;
+	int upperLeft_x;
+	int upperLeft_y;
+	int upperRight_x;
+	int upperRight_y;
+	int lowerLeft_x;
+	int lowerLeft_y;
+	int lowerRight_x;
+	int lowerRight_y;
+	GSTEXTURE texture;
+} image_overlay_t;
 
 typedef struct {
-	char* name;
-	short enabled;
+	image_cache_t* cache;
+	GSTEXTURE defaultTex; // an optional default texture when the cache fails
+	int* attributeUid;
+	int* attributeId;
+
+	char* attribute;
+
+	image_overlay_t* overlay; // an optional overlay
+} attribute_image_t;
+
+typedef struct {
+	image_cache_t* cache;
+	GSTEXTURE defaultTex; // an optional default texture when the cache fails
+
+	char* pattern;
+
+	image_overlay_t* overlay; // an optional overlay
+} game_image_t;
+
+typedef struct {
+	GSTEXTURE texture;
+
+	image_overlay_t* overlay; // an optional overlay
+} static_image_t;
+
+typedef struct {
+	int displayedItems;
+
+	char* decorator;
+	game_image_t* decoratorImage;
+} items_list_t;
+
+typedef struct theme_element {
+	int type;
 	int posX;
 	int posY;
-	int posXOrig; //!< Before alignment to screen size
-	int posYOrig; //!< Before alignment to screen size
 	short aligned;
 	int width;
 	int height;
 	u64 color;
 	int font;
 
-	image_cache_t* cache;
+	void* extended;
+
+	void (*drawElem)(struct menu_list* curMenu, struct submenu_list* curItem, struct theme_element* elem);
+	void (*endElem)(struct theme_element* elem);
+
+	struct theme_element* next;
 } theme_element_t;
 
 typedef struct {
+	char* filePath;
+	char* name;
+} theme_file_t;
+
+typedef struct theme {
 	int useDefault;
 	int usedHeight;
-	int displayedItems;
-	int itemsListIcons;
 
 	unsigned char bgColor[3];
 	u64 textColor;
 	u64 uiTextColor;
 	u64 selTextColor;
 
-	theme_element_t menuIcon;
-	theme_element_t menuText;
-	theme_element_t itemsList;
-	theme_element_t itemIcon;
-	theme_element_t itemCover;
-	theme_element_t itemText;
-	theme_element_t hintText;
-	theme_element_t loadingIcon;
-	int busyIconsCount;
+	theme_element_t* elems;
+	int gameCacheCount;
 
-	int coverBlend_ulx, coverBlend_uly, coverBlend_urx, coverBlend_ury;
-	int coverBlend_blx, coverBlend_bly, coverBlend_brx, coverBlend_bry;
+	theme_element_t* itemsList;
+	theme_element_t* loadingIcon;
+	int loadingIconCount;
 
 	GSTEXTURE textures[TEXTURES_COUNT];
 	int fonts[THM_MAX_FONTS]; //!< Storage of font handles for removal once not needed
-
-	void (*drawBackground)();
-	void (*drawAltBackground)();
 } theme_t;
 
 theme_t* gTheme;
@@ -69,7 +106,7 @@ GSTEXTURE* thmGetTexture(unsigned int id);
 void thmEnd();
 
 // Indices are shifted in GUI, as we add the internal default theme at 0
-void thmSetGuiValue(int themeGuiId);
+void thmSetGuiValue(int themeGuiId, int reload);
 int thmGetGuiValue();
 int thmFindGuiID(char* theme);
 char **thmGetGuiList();

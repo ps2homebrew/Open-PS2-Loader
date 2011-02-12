@@ -13,7 +13,7 @@ FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o
 
-GFX_OBJS =	obj/exit_icon.o obj/config_icon.o obj/save_icon.o obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o obj/disc_icon.o \
+GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
 		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o \
@@ -419,15 +419,6 @@ load7.s:
 logo.s:
 	bin2s gfx/logo.png asm/logo.s logo_png
 		
-exit_icon.s:
-	bin2s gfx/exit.png asm/exit_icon.s exit_png
-	
-config_icon.s:
-	bin2s gfx/config.png asm/config_icon.s config_png
-	
-save_icon.s:
-	bin2s gfx/save.png asm/save_icon.s save_png
-
 usb_icon.s:
 	bin2s gfx/usb.png asm/usb_icon.s usb_png
 	
@@ -440,9 +431,6 @@ eth_icon.s:
 app_icon.s:
 	bin2s gfx/app.png asm/app_icon.s app_png
   
-disc_icon.s:
-	bin2s gfx/disc.png asm/disc_icon.s disc_png
-	
 cross_icon.s:
 	bin2s gfx/cross.png asm/cross_icon.s cross_png
 

@@ -6,8 +6,8 @@
 #define DIM_INF			-1
 #define DIM_UNDEF		-2
 
-#define ALIGN_NONE		 0
-#define ALIGN_CENTER	 1
+#define ALIGN_NONE		0
+#define ALIGN_CENTER	1
 
 typedef struct {
 	float x, y;

@@ -1,7 +1,8 @@
 #ifndef __MENUSYS_H
 #define __MENUSYS_H
 
-#include "include/texcache.h"
+#include <gsToolkit.h>
+#include "include/config.h"
 
 /// a single submenu item
 typedef struct submenu_item {
@@ -17,8 +18,10 @@ typedef struct submenu_item {
 	/// item id
 	int id;
 	
-	int cache_id[3];
-	int cache_uid[3];
+	config_set_t* config;
+
+	int* cache_id;
+	int* cache_uid;
 } submenu_item_t;
 
 typedef struct submenu_list {
@@ -80,8 +83,9 @@ void submenuRemoveItem(submenu_list_t** submenu, int id);
 void submenuDestroy(submenu_list_t** submenu);
 void submenuSort(submenu_list_t** submenu);
 
-/// Get the text of the item (considers localised version of the string)
 char *submenuItemGetText(submenu_item_t* it);
+char *menuItemGetText(menu_item_t* it);
+void menuRefreshCache(menu_item_t *menu);
 
 void menuDrawStatic();
 
@@ -94,7 +98,6 @@ void menuPrevPage();
 void menuFirstPage();
 void menuLastPage();
 menu_item_t* menuGetCurrent();
-GSTEXTURE* menuGetCurrentArt();
 void menuItemExecButton(void (*execActionButton)(menu_item_t *self, int id));
 
 // Sets the selected item if it is found in the menu list

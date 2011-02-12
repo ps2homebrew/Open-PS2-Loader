@@ -34,7 +34,7 @@
 
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
-void applyConfig(int themeID, int langID);
+void applyConfig(int themeID, int langID, int newVMode, int newVSync);
 void shutdown();
 
 char *gBaseMCDir;
@@ -91,10 +91,6 @@ int gUSBDelay;
 char gUSBPrefix[32];
 
 int gRememberLastPlayed;
-
-int gCountIconsCache;
-int gCountCoversCache;
-int gCountBackgroundsCache;
 
 //// GUI
 

@@ -9,33 +9,27 @@
 #define LOAD5_ICON			 5
 #define LOAD6_ICON			 6
 #define LOAD7_ICON			 7
-#define EXIT_ICON			 8
-#define CONFIG_ICON			 9
-#define SAVE_ICON			10
-#define USB_ICON			11
-#define HDD_ICON			12
-#define ETH_ICON			13
-#define APP_ICON			14
-#define DISC_ICON			15
-#define LEFT_ICON			16
-#define RIGHT_ICON			17
-#define UP_ICON				18
-#define DOWN_ICON			19
-#define L1_ICON				20
-#define L2_ICON				21
-#define R1_ICON				22
-#define R2_ICON				23
-#define CROSS_ICON			24
-#define TRIANGLE_ICON		25
-#define CIRCLE_ICON			26
-#define SQUARE_ICON			27
-#define SELECT_ICON			28
-#define START_ICON			29
-#define COVER_OVERLAY		30
-#define BACKGROUND_PICTURE 31
-#define LOGO_PICTURE 32
+#define USB_ICON			 8
+#define HDD_ICON			 9
+#define ETH_ICON			10
+#define APP_ICON			11
+#define LEFT_ICON			12
+#define RIGHT_ICON			13
+#define UP_ICON				14
+#define DOWN_ICON			15
+#define L1_ICON				16
+#define L2_ICON				17
+#define R1_ICON				18
+#define R2_ICON				19
+#define CROSS_ICON			20
+#define TRIANGLE_ICON		21
+#define CIRCLE_ICON			22
+#define SQUARE_ICON			23
+#define SELECT_ICON			24
+#define START_ICON			25
+#define LOGO_PICTURE		26
 
-#define TEXTURES_COUNT 33
+#define TEXTURES_COUNT		27
 
 #define ERR_BAD_FILE      -1
 #define ERR_READ_STRUCT   -2
@@ -47,6 +41,7 @@
 
 int texPngLoad(GSTEXTURE *texture, char *path, int texId, short psm);
 int texJpgLoad(GSTEXTURE* texture, char* path, int texId, short psm);
+void texPrepare(GSTEXTURE* texture, short psm);
 int texDiscoverLoad(GSTEXTURE* texture, char* path, int texId, short psm);
 
 #endif

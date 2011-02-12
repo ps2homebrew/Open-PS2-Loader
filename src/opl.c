@@ -271,7 +271,7 @@ static void menuExecHookFunc(int id) {
 static void menuFillHookFunc(submenu_list_t **menu) {
 #ifndef __CHILDPROOF
 	if (gHDDStartMode) // enabled at all?
-		submenuAppendItem(menu, DISC_ICON, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
+		submenuAppendItem(menu, -1, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
 #endif
 }
 
@@ -313,7 +313,7 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 			gup->menu.menu = &mdl->menuItem;
 			gup->menu.subMenu = &mdl->subMenu;
 
-			gup->submenu.icon_id = DISC_ICON;
+			gup->submenu.icon_id = -1;
 			gup->submenu.id = i;
 			gup->submenu.text = mdl->support->itemGetName(i);
 			gup->submenu.text_id = -1;
@@ -441,9 +441,6 @@ static void _loadConfig() {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);
 			char *temp;
 
-			configGetInt(configOPL, "icons_cache_count", &gCountIconsCache);
-			configGetInt(configOPL, "covers_cache_count", &gCountCoversCache);
-			configGetInt(configOPL, "bg_cache_count", &gCountBackgroundsCache);
 			configGetInt(configOPL, "scrolling", &gScrollSpeed);
 			configGetColor(configOPL, "bg_color", gDefaultBgColor);
 			configGetColor(configOPL, "text_color", gDefaultTextColor);
@@ -489,7 +486,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "app_mode", &gAPPStartMode);
 		}
 		
-		applyConfig(themeID, langID);
+		applyConfig(themeID, langID, gVMode, gVSync);
 	}
 
 	lscret = result;
@@ -499,9 +496,6 @@ static void _loadConfig() {
 static void _saveConfig() {
 	if (lscstatus & CONFIG_OPL) {
 		config_set_t *configOPL = configGetByType(CONFIG_OPL);
-		configSetInt(configOPL, "icons_cache_count", gCountIconsCache);
-		configSetInt(configOPL, "covers_cache_count", gCountCoversCache);
-		configSetInt(configOPL, "bg_cache_count", gCountBackgroundsCache);
 		configSetInt(configOPL, "scrolling", gScrollSpeed);
 		configSetStr(configOPL, "theme", thmGetValue());
 		configSetStr(configOPL, "language_text", lngGetValue());
@@ -540,21 +534,36 @@ static void _saveConfig() {
 	lscstatus = 0;
 }
 
-void applyConfig(int themeID, int langID) {
+void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 	infotxt = _l(_STR_WELCOME);
 
 	if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
 		gDefaultDevice = APP_MODE;
 
-	if (gCountIconsCache < gTheme->displayedItems)	// if user want to cache less than displayed items
-		gTheme->itemsListIcons = 0;			// then disable itemslist icons, if not would load constantly
-
 	guiUpdateScrollSpeed();
 	guiUpdateScreenScale();
 
+	// we don't want to set the vmode without a reason...
+	int changed = (gVMode != newVMode || gVSync != newVSync);
+	if (changed) {
+		// reinit the graphics...
+		gVMode = newVMode;
+		gVSync = newVSync;
+		rmSetMode(gVSync, gVMode);
+
+		thmReloadScreenExtents();
+		guiReloadScreenExtents();
+
+		// also propagate to vmode cfg
+		config_set_t* configVMode = configGetByType(CONFIG_VMODE);
+		if (configVMode) {
+			configSetInt(configVMode, "vmode", newVMode);
+			configSetInt(configVMode, "vsync", newVSync);
+		}
+	}
+
 	// theme must be set after color, and lng after theme
-	if (themeID != -1)
-		thmSetGuiValue(themeID);
+	thmSetGuiValue(themeID, changed);
 	if (langID != -1)
 		lngSetGuiValue(langID);
 
@@ -567,14 +576,22 @@ void applyConfig(int themeID, int langID) {
 
 	initAllSupport(0);
 
-	if (list_support[USB_MODE].support)
+	if (list_support[USB_MODE].support) {
 		menuInitHints(&list_support[USB_MODE].menuItem);
-	if (list_support[ETH_MODE].support)
+		menuRefreshCache(&list_support[USB_MODE].menuItem);
+	}
+	if (list_support[ETH_MODE].support) {
 		menuInitHints(&list_support[ETH_MODE].menuItem);
-	if (list_support[HDD_MODE].support)
+		menuRefreshCache(&list_support[ETH_MODE].menuItem);
+	}
+	if (list_support[HDD_MODE].support) {
 		menuInitHints(&list_support[HDD_MODE].menuItem);
-	if (list_support[APP_MODE].support)
+		menuRefreshCache(&list_support[HDD_MODE].menuItem);
+	}
+	if (list_support[APP_MODE].support) {
 		menuInitHints(&list_support[APP_MODE].menuItem);
+		menuRefreshCache(&list_support[APP_MODE].menuItem);
+	} // TODO IZD
 
 	if (gAutoRefresh)
 		guiSetFrameHook(&menuUpdateHook);
@@ -833,10 +850,6 @@ static void setDefaults(void) {
 	gHDDStartMode = 0;
 	gETHStartMode = 0;
 	gAPPStartMode = 0;
-
-	gCountIconsCache = 40;
-	gCountCoversCache = 10;
-	gCountBackgroundsCache = 5;
 
 	gDefaultBgColor[0] = 0x028;
 	gDefaultBgColor[1] = 0x0c5;

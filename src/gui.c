@@ -76,13 +76,8 @@ submenu_list_t *g_games_submenu = NULL;
 typedef struct {
 	void (*handleInput)(void);
 	void (*renderScreen)(void);
-	void (*renderBackground)(void);
 	short inMenu;
 } gui_screen_handler_t;
-
-// forward decls.
-static void guiMainBackground(void);
-static void guiMenuBackground(void);
 
 // Main screen rendering/input
 static void guiMainHandleInput(void);
@@ -96,14 +91,12 @@ static void guiMenuRender(void);
 static gui_screen_handler_t mainScreenHandler = {
 	&guiMainHandleInput,
 	&guiMainRender,
-	&guiMainBackground,
 	0
 };
 
 static gui_screen_handler_t menuScreenHandler = {
 	&guiMenuHandleInput,
 	&guiMenuRender,
-	&guiMenuBackground,
 	1
 };
 
@@ -139,21 +132,26 @@ static void guiInitMainMenu() {
 
 	// initialize the menu
 #ifndef __CHILDPROOF
-	submenuAppendItem(&mainMenu, DISC_ICON, "Settings", 1, _STR_SETTINGS);
-	submenuAppendItem(&mainMenu, DISC_ICON, "Display Settings", 2, _STR_GFX_SETTINGS);
-	submenuAppendItem(&mainMenu, DISC_ICON, "Network settings", 3, _STR_IPCONFIG);
-	submenuAppendItem(&mainMenu, SAVE_ICON, "Save Changes", 7, _STR_SAVE_CHANGES);
+	submenuAppendItem(&mainMenu, -1, "Settings", 1, _STR_SETTINGS);
+	submenuAppendItem(&mainMenu, -1, "Display Settings", 2, _STR_GFX_SETTINGS);
+	submenuAppendItem(&mainMenu, -1, "Network settings", 3, _STR_IPCONFIG);
+	submenuAppendItem(&mainMenu, -1, "Save Changes", 7, _STR_SAVE_CHANGES);
 #endif
 	
 	// Callback to fill in other items
 	if (gMenuFillHook) // if found
 		gMenuFillHook(&mainMenu);
 
-	submenuAppendItem(&mainMenu, EXIT_ICON, "About", 8, _STR_ABOUT);
-	submenuAppendItem(&mainMenu, EXIT_ICON, "Exit", 9, _STR_EXIT);
-	submenuAppendItem(&mainMenu, EXIT_ICON, "Power off", 11, _STR_POWEROFF);
+	submenuAppendItem(&mainMenu, -1, "About", 8, _STR_ABOUT);
+	submenuAppendItem(&mainMenu, -1, "Exit", 9, _STR_EXIT);
+	submenuAppendItem(&mainMenu, -1, "Power off", 11, _STR_POWEROFF);
 
 	mainMenuCurrent = mainMenu;
+}
+
+void guiReloadScreenExtents() {
+	int screenHeight;
+	rmGetScreenExtents(&screenWidth, &screenHeight);
 }
 
 void guiInit(void) {
@@ -180,8 +178,7 @@ void guiInit(void) {
 	gSemaId = CreateSema(&gQueueSema);
 	gGUILockSemaId = CreateSema(&gQueueSema);
 	
-	int screenHeight;
-	rmGetScreenExtents(&screenWidth, &screenHeight);
+	guiReloadScreenExtents();
 	menuInit();
 	
 	guiInitMainMenu();
@@ -315,7 +312,7 @@ static void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
 		diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
-		applyConfig(-1, -1);
+		applyConfig(-1, -1, gVMode, gVSync);
 	}
 }
 
@@ -382,15 +379,12 @@ static void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
-
-	int oldVmode = gVMode;
-	int oldVSync = gVSync;
 	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
 	diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
 
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
 	if (ret) {
-		int themeID = -1, langID = -1;
+		int themeID = -1, langID = -1, newVMode = gVMode, newVSync = gVSync;
 		diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
 		diaGetInt(diaUIConfig, UICFG_LANG, &langID);
 		diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
@@ -404,33 +398,10 @@ static void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
+		diaGetInt(diaUIConfig, UICFG_VMODE, &newVMode);
+		diaGetInt(diaUIConfig, UICFG_VSYNC, &newVSync);
 
-		diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
-		diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
-
-		// a hack - we don't want to set the vmode without
-		// a reason...
-		if (gVMode != oldVmode || gVSync != oldVSync) {
-			// reinit the graphics...
-			int screenHeight;
-
-			rmSetMode(gVSync, gVMode);
-
-			// Reload the screen extents
-			rmGetScreenExtents(&screenWidth, &screenHeight);
-			// TODO: This will probably confuse themes
-			thmReloadScreenExtents();
-
-			// also propagate to vmode cfg
-			config_set_t* configVMode = configGetByType(CONFIG_VMODE);
-
-			if (configVMode) {
-				configSetInt(configVMode, "vsync", gVSync);
-				configSetInt(configVMode, "vmode", gVMode);
-			}
-		}
-
-		applyConfig(themeID, langID);
+		applyConfig(themeID, langID, newVMode, newVSync);
 	}
 }
 
@@ -465,7 +436,7 @@ static void guiShowIPConfig() {
 		diaGetString(diaIPConfig, 21, gPCPassword);
 		gIPConfigChanged = 1;
 
-		applyConfig(-1, -1);
+		applyConfig(-1, -1, gVMode, gVSync);
 	}
 }
 
@@ -893,11 +864,11 @@ static void guiHandleDeferredOps(void) {
 
 static int bfadeout = 0x0;
 static void guiDrawBusy() {
-	if (gTheme->loadingIcon.enabled) {
-		GSTEXTURE* texture = thmGetTexture(LOAD0_ICON + (gFrameCounter >> 1) % gTheme->busyIconsCount);
+	if (gTheme->loadingIcon) {
+		GSTEXTURE* texture = thmGetTexture(LOAD0_ICON + (gFrameCounter >> 1) % gTheme->loadingIconCount);
 		if (texture && texture->Mem) {
 			u64 mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, bfadeout);
-			rmDrawPixmap(texture, gTheme->loadingIcon.posX, gTheme->loadingIcon.posY, gTheme->loadingIcon.aligned, gTheme->loadingIcon.width, gTheme->loadingIcon.height, mycolor);
+			rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, mycolor);
 		}
 	}
 }
@@ -1073,34 +1044,8 @@ static int cdirection(unsigned char a, unsigned char b) {
 		return 1;
 }
 
-void guiDrawBGColor() {
-	u64 bgColor = GS_SETREG_RGBA(gTheme->bgColor[0], gTheme->bgColor[1], gTheme->bgColor[2], 0x080);
-	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, bgColor);
-}
-
-void guiDrawBGPicture() {
-	GSTEXTURE* backTex = thmGetTexture(BACKGROUND_PICTURE);
-	if (backTex && backTex->Mem) {
-		rmDrawPixmap(backTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
-
-	}
-	else
-		guiDrawBGPlasma();
-}
-
-void guiDrawBGArt() {
-	GSTEXTURE* someTex = menuGetCurrentArt();
-	if (someTex && someTex->Mem) {
-		rmDrawPixmap(someTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gTheme->itemCover.color);
-		rmFlush();
-	}
-	else
-		guiDrawBGPicture();
-}
-
 void guiDrawBGPlasma() {
 	int x, y;
-
 
 	// transition the colors
 	curbgColor[0] += cdirection(curbgColor[0], gTheme->bgColor[0]);
@@ -1141,20 +1086,8 @@ void guiDrawBGPlasma() {
 	rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
 }
 
-static void guiMainBackground(void) {
-	if (gInitComplete)
-		gTheme->drawBackground();
-}
-
-static void guiMenuBackground(void) {
-	if (gInitComplete)
-		gTheme->drawAltBackground();
-}
-
 static void guiDrawOverlays() {
 	// are there any pending operations?
-	rmSetTransposition(0,0);
-	
 	int pending = ioHasPendingRequests();
 
 	if (gInitComplete)
@@ -1248,6 +1181,8 @@ static void guiMainHandleInput() {
 }
 
 static void guiMenuRender() {
+	guiDrawBGPlasma();
+
 	if (!mainMenu)
 		return;
 	
@@ -1367,17 +1302,6 @@ static void guiShow() {
 	if (screenHandlerTarget) {
 		// advance the effect
 		
-		// render the old screen background, transposed
-		rmSetTransposition(-transition, 0);
-		screenHandler->renderBackground();
-		
-		// render new screen background transposed
-		rmSetTransposition(screenWidth - transition, 0);
-		screenHandlerTarget->renderBackground();
-		
-		// Flush the backgrounds here to free up VRAM
-		rmFlush();
-		
 		// render the old screen, transposed
 		rmSetTransposition(-transition, 0);
 		screenHandler->renderScreen();
@@ -1397,13 +1321,8 @@ static void guiShow() {
 			screenHandler = screenHandlerTarget;
 			screenHandlerTarget = NULL;
 		}
-	} else {
-		// reset transposition
-		rmSetTransposition(0,0);
-		// render with the set screen handler
-		screenHandler->renderBackground();
+	} else // render with the set screen handler
 		screenHandler->renderScreen();
-	}
 }
 
 void guiMainLoop(void) {
@@ -1411,9 +1330,6 @@ void guiMainLoop(void) {
 		guiStartFrame();
 		
 		cacheNextFrame(gInactiveFrames);
-		
-		if (!screenHandler) 
-			screenHandler = &mainScreenHandler;
 		
 		// Read the pad states to prepare for input processing in the screen handler
 		guiReadPads();

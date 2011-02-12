@@ -181,12 +181,12 @@ int rmPrepareTexture(GSTEXTURE* txt) {
 }
 
 void rmDispatch(void) {
-    gsKit_queue_exec(gsGlobal);
+	gsKit_queue_exec(gsGlobal);
 }
 
 
 void rmFlush(void) {
-        rmDispatch();
+	rmDispatch();
 
 	// release all the uploaded textures
 	gsKit_vram_clear(gsGlobal);
@@ -231,14 +231,14 @@ void rmEndFrame(void) {
 
 	if(!gsGlobal->FirstFrame)
 	{
-                if (vsync)
-                    SleepThread();
+		if (vsync)
+			SleepThread();
 		
 		if(gsGlobal->DoubleBuffering == GS_SETTING_ON)
 		{
 			GS_SET_DISPFB2( gsGlobal->ScreenBuffer[gsGlobal->ActiveBuffer & 1] / 8192,
 				gsGlobal->Width / 64, gsGlobal->PSM, 0, 0 );
-	 
+
 			gsGlobal->ActiveBuffer ^= 1;
 			gsGlobal->PrimContext ^= 1;
 		}
@@ -256,7 +256,7 @@ static int rmOnVSync(void) {
 }
 
 void rmInit(int vsyncon, enum rm_vmode vmodeset) {
-        gsGlobal = gsKit_init_global();
+	gsGlobal = gsKit_init_global();
 
 	defaultVMode = gsGlobal->Mode;
 
@@ -271,7 +271,7 @@ void rmInit(int vsyncon, enum rm_vmode vmodeset) {
 	rm_height_table[RM_VMODE_AUTO] = rm_height_table[gsGlobal->Mode];
 
 	dmaKit_init(D_CTRL_RELE_OFF, D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC,
-		    D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
+				D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
 
 	// Initialize the DMAC
 	dmaKit_chan_init(DMA_CHANNEL_GIF);
@@ -423,6 +423,7 @@ void rmDrawPixmap(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, u64
 
 void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w, int h, u64 color,
 		GSTEXTURE* inlay, int ulx, int uly, int urx, int ury, int blx, int bly, int brx, int bry) {
+
 	rm_quad_t quad;
 	rmSetupQuad(overlay, x, y, aligned, w, h, color, &quad);
 

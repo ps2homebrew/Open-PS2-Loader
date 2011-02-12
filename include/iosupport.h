@@ -1,6 +1,8 @@
 #ifndef __IOSUPPORT_H
 #define __IOSUPPORT_H
 
+#include "include/config.h"
+
 #define USB_MODE	0
 #define ETH_MODE	1
 #define HDD_MODE	2
@@ -67,7 +69,9 @@ typedef struct
 
 	void (*itemLaunch)(int id);
 	
-	int (*itemGetArt)(char* name, GSTEXTURE* resultTex, const char* type, short psm);
+	config_set_t* (*itemGetConfig)(int id);
+
+	int (*itemGetImage)(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm);
 
 	void (*itemCleanUp)(int exception);
 	

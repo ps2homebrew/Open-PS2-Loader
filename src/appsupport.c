@@ -140,22 +140,29 @@ static void appLaunchItem(int id) {
 		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 }
 
-static int appGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
-	name = appGetELFName(name);
+static config_set_t* appGetConfig(int id) {
+	config_set_t* config = configAlloc(0, NULL, NULL);
+	struct config_value_t* cur = appGetConfigValue(id);
+
+	return config;
+}
+
+static int appGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
+	value = appGetELFName(value);
 	// We search on ever devices from fatest to slowest (HDD > ETH > USB)
 	static item_list_t *listSupport = NULL;
 	if ( (listSupport = hddGetObject(1)) ) {
-		if (listSupport->itemGetArt(name, resultTex, type, psm) >= 0)
+		if (listSupport->itemGetImage(folder, addSep, value, suffix, resultTex, psm) >= 0)
 			return 0;
 	}
 
 	if ( (listSupport = ethGetObject(1)) ) {
-		if (listSupport->itemGetArt(name, resultTex, type, psm) >= 0)
+		if (listSupport->itemGetImage(folder, addSep, value, suffix, resultTex, psm) >= 0)
 			return 0;
 	}
 
 	if ( (listSupport = usbGetObject(1)) )
-		return listSupport->itemGetArt(name, resultTex, type, psm);
+		return listSupport->itemGetImage(folder, addSep, value, suffix, resultTex, psm);
 
 	return -1;
 }
@@ -174,8 +181,8 @@ static item_list_t appItemList = {
 		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
 #endif
 #ifdef VMC
-		&appGetArt, &appCleanUp, NULL, APP_ICON
+		&appGetConfig, &appGetImage, &appCleanUp, NULL, APP_ICON
 #else
-		&appGetArt, &appCleanUp, APP_ICON
+		&appGetConfig, &appGetImage, &appCleanUp, APP_ICON
 #endif
 };

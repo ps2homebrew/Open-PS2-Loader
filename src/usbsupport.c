@@ -358,9 +358,19 @@ static void usbLaunchGame(int id) {
 #endif
 }
 
-static int usbGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
+static config_set_t* usbGetConfig(int id) {
+	config_set_t* config = configAlloc(0, NULL, NULL);
+	base_game_info_t* game = &usbGames[id];
+
+	return config;
+}
+
+static int usbGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
 	char path[255];
-	sprintf(path, "%sART/%s_%s", usbPrefix, name, type);
+	if (addSep)
+		sprintf(path, "%s%s/%s_%s", usbPrefix, folder, value, suffix);
+	else
+		sprintf(path, "%s%s%s_%s", usbPrefix, folder, value, suffix);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
@@ -386,8 +396,8 @@ static item_list_t usbGameList = {
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, NULL,
 #endif
 #ifdef VMC
-		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, &usbCheckVMC, USB_ICON
+		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbCheckVMC, USB_ICON
 #else
-		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetArt, &usbCleanUp, USB_ICON
+		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, USB_ICON
 #endif
 };

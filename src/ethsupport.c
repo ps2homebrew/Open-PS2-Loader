@@ -353,9 +353,19 @@ static void ethLaunchGame(int id) {
 #endif
 }
 
-static int ethGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
+static config_set_t* ethGetConfig(int id) {
+	config_set_t* config = configAlloc(0, NULL, NULL);
+	base_game_info_t* game = &ethGames[id];
+
+	return config;
+}
+
+static int ethGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
 	char path[255];
-	sprintf(path, "%sART\\%s_%s", ethPrefix, name, type);
+	if (addSep)
+		sprintf(path, "%s%s\\%s_%s", ethPrefix, folder, value, suffix);
+	else
+		sprintf(path, "%s%s%s_%s", ethPrefix, folder, value, suffix);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
@@ -458,8 +468,8 @@ static item_list_t ethGameList = {
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
 #endif
 #ifdef VMC
-		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetArt, &ethCleanUp, &ethCheckVMC, ETH_ICON
+		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
 #else
-		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetArt, &ethCleanUp, ETH_ICON
+		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, ETH_ICON
 #endif
 };

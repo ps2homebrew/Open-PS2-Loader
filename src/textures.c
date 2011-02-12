@@ -13,14 +13,10 @@ extern void *load4_png;
 extern void *load5_png;
 extern void *load6_png;
 extern void *load7_png;
-extern void *exit_png;
-extern void *config_png;
-extern void *save_png;
 extern void *usb_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
-extern void *disc_png;
 
 extern void *cross_png;
 extern void *triangle_png;
@@ -58,14 +54,10 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 	{ LOAD5_ICON, "load5", &load5_png },
 	{ LOAD6_ICON, "load6", &load6_png },
 	{ LOAD7_ICON, "load7", &load7_png },
-	{ EXIT_ICON, "exit", &exit_png },
-	{ CONFIG_ICON, "config", &config_png },
-	{ SAVE_ICON, "save", &save_png },
 	{ USB_ICON, "usb", &usb_png },
 	{ HDD_ICON, "hdd", &hdd_png },
 	{ ETH_ICON, "eth", &eth_png },
 	{ APP_ICON, "app", &app_png },
-	{ DISC_ICON, "disc", &disc_png },
 	{ LEFT_ICON, "left", &left_png },
 	{ RIGHT_ICON, "right", &right_png },
 	{ UP_ICON, "up", &up_png },
@@ -80,8 +72,6 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 	{ SQUARE_ICON, "square", &square_png },
 	{ SELECT_ICON, "select", &select_png },
 	{ START_ICON, "start", &start_png },
-	{ COVER_OVERLAY, "cover_overlay", NULL },
-	{ BACKGROUND_PICTURE, "background", NULL },		// No default background
 	{ LOGO_PICTURE, "logo", &logo_png },
 };
 

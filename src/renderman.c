@@ -227,8 +227,13 @@ void rmStartFrame(void) {
 }
 
 void rmEndFrame(void) {
+	gsKit_set_finish(gsGlobal);
+	
 	rmFlush();
 
+	// Wait for draw ops to finish
+	gsKit_finish();
+	
 	if(!gsGlobal->FirstFrame)
 	{
 		if (vsync)

@@ -20,8 +20,8 @@ typedef struct {
 	item_list_t* list;
 	// only for comparison if the deferred action is still valid
 	int cacheUID;
-	// id of the item in the list
-	int itemId;
+	char* value;
+	char* suffix;
 } load_image_request_t;
 
 // Io handled action...
@@ -51,7 +51,7 @@ static void cacheLoadImage(void* data) {
 
 	LOG("cacheLoadImage(%d) - loading image for UID: %d\n", req->cache->userId, req->cacheUID);
 
-	if (handler->itemGetArt(handler->itemGetStartup(req->itemId), texture, req->cache->prefix, GS_PSM_CT24) < 0)
+	if (handler->itemGetImage(req->cache->prefix, req->cache->addSeparator, req->value, req->suffix, texture, GS_PSM_CT24) < 0)
 		req->entry->lastUsed = 0;
 	else
 		req->entry->lastUsed = frameID;
@@ -81,16 +81,20 @@ static void cacheClearItem(cache_entry_t* item, int freeTxt) {
 	item->UID = -1;
 }
 
-void cacheInitCache(image_cache_t* cache, int userId, const char* prefix, int count) {
+image_cache_t* cacheInitCache(int userId, char* prefix, int addSeparator, int count) {
+	image_cache_t* cache = (image_cache_t*) malloc(sizeof(image_cache_t));
 	cache->userId = userId;
 	cache->count = count;
 	cache->prefix = prefix;
+	cache->addSeparator = addSeparator;
 	cache->nextUID = 0;
 	cache->content = (cache_entry_t*) malloc(count * sizeof(cache_entry_t));
 
 	int i;
 	for (i = 0; i < count; ++i)
 		cacheClearItem(&cache->content[i], 0);
+
+	return cache;
 }
 
 void cacheDestroyCache(image_cache_t* cache) {
@@ -100,9 +104,10 @@ void cacheDestroyCache(image_cache_t* cache) {
 	}
 	
 	free(cache->content);
+	free(cache);
 }
 
-GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, int itemId) {
+GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, char* value, char* suffix) {
 	if (*cacheId == -2) {
 		//LOG("cacheGetTexture(%d) - texture is null for UID: %d itemId: %d\n", cache->userId, *UID, itemId);
 		return NULL;
@@ -112,7 +117,7 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 			if (entry->qr)
 				return NULL;
 			else if (entry->lastUsed == 0) {
-				LOG("cacheGetTexture(%d) - callback from cacheLoadImage, texture is null for UID: %d itemId: %d\n", cache->userId, *UID, itemId);
+				LOG("cacheGetTexture(%d) - callback from cacheLoadImage, texture is null for UID: %d item: %s\n", cache->userId, *UID, value);
 				*cacheId = -2;
 				return NULL;
 			} else {
@@ -120,7 +125,7 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 				return &entry->texture;
 			}
 		}
-		LOG("cacheGetTexture(%d) - outdated UID: %d was at slot: %d entryUID: %d itemId: %d\n", cache->userId, *UID, *cacheId, entry->UID, itemId);
+		LOG("cacheGetTexture(%d) - outdated UID: %d was at slot: %d entryUID: %d itemId: %s\n", cache->userId, *UID, *cacheId, entry->UID, value);
 
 		*cacheId = -1;
 	}
@@ -146,7 +151,8 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 		req->cache = cache;
 		req->entry = oldestEntry;
 		req->list = list;
-		req->itemId = itemId;
+		req->value = value;
+		req->suffix = suffix;
 		req->cacheUID = cache->nextUID;
 
 		cacheClearItem(oldestEntry, 1);
@@ -155,7 +161,7 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 
 		*UID = cache->nextUID++;
 
-		LOG("cacheGetTexture(%d) - new request for UID: %d at slot: %d itemId: %d\n", req->cache->userId, *UID, *cacheId, itemId);
+		LOG("cacheGetTexture(%d) - new request for UID: %d at slot: %d itemId: %s\n", req->cache->userId, *UID, *cacheId, value);
 
 		ioPutRequest(IO_MENU_LOAD_ART, req);
 	}

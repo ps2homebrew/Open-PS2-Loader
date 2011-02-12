@@ -51,6 +51,8 @@ typedef void (*gui_menufill_callback_t)(submenu_list_t **menu);
 // called when a menuitem with unknown id is encountered
 typedef void (*gui_menuexec_callback_t)(int id);
 
+void guiReloadScreenExtents();
+
 /** Initializes the GUI */
 void guiInit();
 
@@ -106,16 +108,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui);
 void guiUpdateScrollSpeed(void);
 void guiUpdateScreenScale(void);
 
-#define BG_MODE_PICTURE		0
-#define BG_MODE_PLASMA		1
-#define BG_MODE_COLOR		2
-#define BG_MODE_ART			3
-#define BG_MODE_GOURAUD		4
-
-void guiDrawBGPicture();
 void guiDrawBGPlasma();
-void guiDrawBGColor();
-void guiDrawBGArt();
 
 /** Renders the given string on screen for the given function until it's io finishes 
 * @note The ptr pointer is watched for it's value. The IO is considered finished when the value becomes zero. 

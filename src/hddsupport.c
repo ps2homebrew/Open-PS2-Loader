@@ -472,9 +472,19 @@ static void hddLaunchGame(int id) {
 #endif
 }
 
-static int hddGetArt(char* name, GSTEXTURE* resultTex, const char* type, short psm) {
-	char path[32];
-	sprintf(path, "%sART/%s_%s", hddPrefix, name, type);
+static config_set_t* hddGetConfig(int id) {
+	config_set_t* config = configAlloc(0, NULL, NULL);
+	hdl_game_info_t* game = &hddGames->games[id];
+
+	return config;
+}
+
+static int hddGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
+	char path[255];
+	if (addSep)
+		sprintf(path, "%s%s/%s_%s", hddPrefix, folder, value, suffix);
+	else
+		sprintf(path, "%s%s%s_%s", hddPrefix, folder, value, suffix);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
@@ -503,8 +513,8 @@ static item_list_t hddGameList = {
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
 #endif
 #ifdef VMC
-		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, &hddCheckVMC, HDD_ICON
+		&hddSetGameCompatibility, &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
 #else
-		&hddSetGameCompatibility, &hddLaunchGame, &hddGetArt, &hddCleanUp, HDD_ICON
+		&hddSetGameCompatibility, &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, HDD_ICON
 #endif
 };

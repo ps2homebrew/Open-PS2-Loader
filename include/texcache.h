@@ -8,7 +8,7 @@
 typedef struct {
 	GSTEXTURE texture;
 
-	// NULL not queued, otherwise queue request record TODO remove one of both
+	// NULL not queued, otherwise queue request record
 	void* qr;
 	
 	// frame counter the icon was used the last time - oldest get rewritten first in case new icon is requested and cache is full. negative numbers mean
@@ -28,7 +28,8 @@ typedef struct {
 	int count;
 	
 	/// directory prefix for this cache (if any)
-	const char* prefix;
+	char* prefix;
+	int addSeparator;
 
 	int nextUID;
 	
@@ -53,13 +54,12 @@ void cacheNextFrame(int inactives);
 * @param prefix a string prefix that gets prepended to the path when loading the pixmap
 * @param count the count of items to cache (negative value = use default)
 */
-void cacheInitCache(image_cache_t* cache, int userId, const char* prefix, int count);
+image_cache_t* cacheInitCache(int userId, char* prefix, int addSeparator, int count);
 
 /** Destroys a given cache (unallocates all memory stored there, disconnects the pixmaps from the usage points).
-* @todo Filter the io queue!
 */
 void cacheDestroyCache(image_cache_t* cache);
 
-GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, int itemId);
+GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, char* value, char* suffix);
 
 #endif

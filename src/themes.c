@@ -189,20 +189,21 @@ static theme_element_t* initAttributeImage(config_set_t* themeConfig, theme_t* t
 
 static void drawStaticImage(struct menu_list* curMenu, struct submenu_list* curItem, struct theme_element* elem) {
 	if (elem->extended) {
-		if (curItem) {
-			static_image_t* staticImage = (static_image_t*) elem->extended;
-			if (staticImage->texture.Mem) {
-				if (staticImage->overlay) {
-					image_overlay_t* overlay = (image_overlay_t*) staticImage->overlay;
-					rmDrawOverlayPixmap(&overlay->texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol,
-							&staticImage->texture, overlay->upperLeft_x, overlay->upperLeft_y, overlay->upperRight_x, overlay->upperRight_y,
-							overlay->lowerLeft_x, overlay->lowerLeft_y, overlay->lowerRight_x, overlay->lowerRight_y);
-				} else
-					rmDrawPixmap(&staticImage->texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol);
-			}
+		static_image_t* staticImage = (static_image_t*) elem->extended;
+		if (staticImage->texture.Mem) {
+			if (staticImage->overlay) {
+				image_overlay_t* overlay = (image_overlay_t*) staticImage->overlay;
+				rmDrawOverlayPixmap(&overlay->texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol,
+						&staticImage->texture, overlay->upperLeft_x, overlay->upperLeft_y, overlay->upperRight_x, overlay->upperRight_y,
+						overlay->lowerLeft_x, overlay->lowerLeft_y, overlay->lowerRight_x, overlay->lowerRight_y);
+			} else
+				rmDrawPixmap(&staticImage->texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol);
 		}
-	} else
-		// little tweak, StaticImage (without an extended field) is used to draw the Plasma
+		return;
+	}
+
+	// failover for background
+	if (elem->type == TYPE_BACKGROUND)
 		guiDrawBGPlasma();
 }
 
@@ -272,10 +273,9 @@ static void drawGameImage(struct menu_list* curMenu, struct submenu_list* curIte
 						overlay->lowerLeft_x, overlay->lowerLeft_y, overlay->lowerRight_x, overlay->lowerRight_y);
 			} else
 				rmDrawPixmap(imageTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol);
-			return;
-		}
-	}
-	if (elem->type == TYPE_BACKGROUND)
+		} else if (elem->type == TYPE_BACKGROUND)
+			guiDrawBGPlasma();
+	} else  if (elem->type == TYPE_BACKGROUND)
 		guiDrawBGPlasma();
 }
 

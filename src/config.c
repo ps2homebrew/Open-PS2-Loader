@@ -429,7 +429,7 @@ int configRead(config_set_t* configSet) {
 			} else {
 				configSetStr(configSet, key, val);
 			}
-		} if (parsePrefix(line, prefix)) {
+		} else if (parsePrefix(line, prefix)) {
 			// prefix is set, that's about it
 		} else {
 			LOG("Malformed config file '%s' line %d: '%s'\n", configSet->filename, lineno, line);

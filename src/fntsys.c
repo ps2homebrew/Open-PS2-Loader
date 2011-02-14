@@ -11,6 +11,7 @@
 #include "include/ioman.h"
 #include "include/utf8.h"
 #include "include/util.h"
+#include "include/atlas.h"
 
 #include <ft2build.h>
 
@@ -18,6 +19,13 @@
 
 extern void* freesansfont_raw;
 extern int size_freesansfont_raw;
+
+/// Maximal count of atlases per font
+#define ATLAS_MAX 4
+/// Atlas width in pixels
+#define ATLAS_WIDTH 128
+/// Atlas height in pixels
+#define ATLAS_HEIGHT 128
 
 // freetype vars
 static FT_Library font_library;
@@ -32,16 +40,19 @@ static ee_sema_t gFontSema;
 /** Single entry in the glyph cache */
 typedef struct {
 	int isValid;
-	// RGBA bitmap ready to be rendered
-	char *glyphData;
 	// size in pixels of the glyph
 	int width, height;
 	// offsetting of the glyph
 	int ox, oy;
 	// advancements in pixels after rendering this glyph
 	int shx, shy;
-	// Texture version of the same
-	GSTEXTURE texture;
+	
+	// atlas for which the allocation was done
+    atlas_t* atlas;
+
+	// atlas allocation position
+	struct atlas_allocation_t *allocation;
+
 } fnt_glyph_cache_entry_t;
 
 /** A whole font definition */
@@ -64,6 +75,9 @@ typedef struct {
 	/// Nonzero for custom fonts
 	int isDefault;
 
+	/// Texture atlases (default to NULL)
+	atlas_t *atlases[ATLAS_MAX];
+	
 	/// Pointer to data, if allocation takeover was selected (will be freed)
 	void *dataPtr;
 } font_t;
@@ -74,6 +88,8 @@ typedef struct {
 static font_t fonts[FNT_MAX_COUNT];
 
 #define GLYPH_CACHE_PAGE_SIZE 256
+
+#define GLYPH_PAGE_OK(font,page) ((pageid <= font->cacheMaxPageID) && (font->glyphCache[page]))
 
 static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	if (pageid > font->cacheMaxPageID) {
@@ -101,21 +117,29 @@ static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	int i;
 	for (i = 0; i < GLYPH_CACHE_PAGE_SIZE; ++i) {
 		font->glyphCache[pageid][i].isValid = 0;
-		font->glyphCache[pageid][i].glyphData = NULL;
+		font->glyphCache[pageid][i].atlas = NULL;
+		font->glyphCache[pageid][i].allocation = NULL;
 	}
 
 	return 1;
 }
 
 static void fntResetFontDef(font_t *fnt) {
+	LOG("fntResetFontDef\n");
 	fnt->glyphCache = NULL;
 	fnt->cacheMaxPageID = -1;
 	fnt->isValid = 0;
 	fnt->isDefault = 0;
+	
+	int aid;
+	for(aid = 0; aid < ATLAS_MAX; ++aid)
+		fnt->atlases[aid] = NULL;
+		
 	fnt->dataPtr = NULL;
 }
 
 void fntInit(void) {
+	LOG("fntInit\n");
 	int error = FT_Init_FreeType(&font_library);
 
 	if (error) {
@@ -130,6 +154,7 @@ void fntInit(void) {
 	gFontSemaId = CreateSema(&gFontSema);
 
 	int i;
+	
 	for (i = 0; i < FNT_MAX_COUNT; ++i)
 		fntResetFontDef(&fonts[i]);
 
@@ -138,18 +163,20 @@ void fntInit(void) {
 }
 
 static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
+	LOG("fntCacheFlushPage\n");
 	int i;
 
 	for (i = 0; i < GLYPH_CACHE_PAGE_SIZE; ++i, ++page) {
-		if (page->isValid) {
-			free(page->glyphData);
-			page->glyphData = NULL;
-			page->isValid = 0;
-		}
+		page->isValid = 0;
+		// we're not doing any atlasFree or such - atlas has to be rebuild
+		page->allocation = NULL;
+		page->atlas = NULL;
 	}
 }
 
 static void fntCacheFlush(font_t *fnt) {
+	LOG("fntCacheFlush\n");
+	
 	int i;
 
 	// Release all the glyphs from the cache
@@ -164,9 +191,17 @@ static void fntCacheFlush(font_t *fnt) {
 	free(fnt->glyphCache);
 	fnt->glyphCache = NULL;
 	fnt->cacheMaxPageID = -1;
+	
+	// free all atlasses too, they're invalid now anyway
+	int aid;
+	for(aid = 0; aid < ATLAS_MAX; ++aid) {
+		atlasFree(fnt->atlases[aid]);
+		fnt->atlases[aid] = NULL;
+	}
 }
 
 static int fntNewFont() {
+	LOG("fntNewFont\n");
 	int i;
 	for (i = 0; i < FNT_MAX_COUNT; ++i) {
 		if (fonts[i].isValid == 0) {
@@ -179,11 +214,13 @@ static int fntNewFont() {
 }
 
 void fntDeleteFont(font_t *font) {
+	LOG("fntDeleteFont\n");
+	
 	// skip already deleted fonts
 	if (!font->isValid)
 		return;
 
-	// free the glyph cache, unload the font
+	// free the glyph cache, atlases, unload the font
 	fntCacheFlush(font);
 
 	FT_Done_Face(font->face);
@@ -197,6 +234,8 @@ void fntDeleteFont(font_t *font) {
 }
 
 int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
+	LOG("fntLoadSlot\n");
+	
 	if (!buffer) {
 		buffer = &freesansfont_raw;
 		bufferSize = size_freesansfont_raw;
@@ -232,6 +271,8 @@ int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 }
 
 int fntLoad(void* buffer, int bufferSize, int takeover) {
+	LOG("fntLoad\n");
+	
 	// we need a new slot in the font array
 	int fontID = fntNewFont();
 
@@ -250,6 +291,7 @@ int fntLoad(void* buffer, int bufferSize, int takeover) {
 }
 
 int fntLoadFile(char* path) {
+	LOG("fntLoadFile\n");
 	// load the buffer with font
 	int size = -1;
 	void* customFont = readFile(path, -1, &size);
@@ -263,12 +305,14 @@ int fntLoadFile(char* path) {
 }
 
 void fntRelease(int id) {
+	LOG("fntRelease\n");
 	if (id < FNT_MAX_COUNT)
 		fntDeleteFont(&fonts[id]);
 }
 
 /** Terminates the font rendering system */
 void fntEnd(void) {
+	LOG("fntEnd\n");
 	// release all the fonts
 	int id;
 	for (id = 0; id < FNT_MAX_COUNT; ++id)
@@ -280,14 +324,39 @@ void fntEnd(void) {
 	DeleteSema(gFontSemaId);
 }
 
-/** Internal method. Updates texture part of glyph cache entry */
-static void fntUpdateTexture(fnt_glyph_cache_entry_t* glyph) {
-	glyph->texture.Width = glyph->width;
-	glyph->texture.Height = glyph->height;
-	glyph->texture.PSM = GS_PSM_CT32;
-	glyph->texture.Filter = GS_FILTER_LINEAR;
-	glyph->texture.Mem = (u32*) glyph->glyphData;
-	glyph->texture.Vram = 0;
+static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
+	FT_GlyphSlot slot = fnt->face->glyph;
+	
+ 	LOG("fntGlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
+	
+	if (slot->bitmap.width == 0 || slot->bitmap.rows == 0) {
+		// no bitmap glyph, just skip
+		return 1;
+	}
+	
+	int aid;
+	
+	for (aid = 0; aid < ATLAS_MAX; ++aid) {
+		LOG("  * Placing aid %d...\n", aid);
+		atlas_t **atl = &fnt->atlases[aid];
+		if (!*atl) { // atlas slot not yet used
+			LOG("  * aid %d is new...\n", aid);
+			*atl = atlasNew(ATLAS_WIDTH, ATLAS_HEIGHT);
+		}
+		
+		glyph->allocation = 
+			atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, GS_PSM_T8, slot->bitmap.buffer);
+			
+		if (glyph->allocation) {
+			LOG("  * found placement\n", aid);
+			glyph->atlas = *atl;
+			
+			return 1;
+		}
+	}
+	
+	LOG("  * ! no atlas free\n", aid);
+	return 0;
 }
 
 /** Internal method. Makes sure the bitmap data for particular character are pre-rendered to the glyph cache */
@@ -296,24 +365,24 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 	int pageid = gid / GLYPH_CACHE_PAGE_SIZE;
 	int idx = gid % GLYPH_CACHE_PAGE_SIZE;
 
-	if (!fntPrepareGlyphCachePage(fnt, pageid)) // failed to prepare the page...
-		return NULL;
+	// do not call on every char of every font rendering call
+	if (!GLYPH_PAGE_OK(fnt,pageid))
+		if (!fntPrepareGlyphCachePage(fnt, pageid)) // failed to prepare the page...
+			return NULL;
 
 	fnt_glyph_cache_entry_t *page = fnt->glyphCache[pageid];
 
+	/* Should never happen. 
 	if (!page) // safeguard
 		return NULL;
+	*/
 
 	fnt_glyph_cache_entry_t* glyph = &page[idx];
 
 	if (glyph->isValid)
 		return glyph;
 
-	FT_GlyphSlot slot = fnt->face->glyph;
-
 	// not cached but valid. Cache
-	glyph->isValid = 1;
-
 	if (!fnt->face) {
 		LOG("FNT: Face is NULL!\n");
 	}
@@ -322,36 +391,14 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 
 	if (error) {
 		LOG("FNT: Error loading glyph - %d\n", error);
-		return glyph;
+		return NULL;
 	}
 
-	// copy the data
-	int i = 0;
-	int pixelcount = slot->bitmap.width * slot->bitmap.rows;
+	// find atlas placement for the glyph
+	if  (!fntGlyphAtlasPlace(fnt, glyph))
+		return NULL;
 
-	// TODO: Doesn't help:
-	// the pixbuf target is a bit bigger for alignment purposes
-	// int pixelsOuter = 4 * (3 + pixelcount / 4);
-	int pixelsOuter = pixelcount;
-
-	// If we would know how to render grayscale (single channel) it could save memory
-	glyph->glyphData = memalign(128, pixelsOuter * 4);
-
-	memset(glyph->glyphData, 0, pixelsOuter);
-
-	// incrementing pointers should be cheaper than array indexing...
-	char *src = slot->bitmap.buffer;
-	char *data = glyph->glyphData;
-
-	for (i = 0; i < pixelcount; ++i) {
-		char c = *src++;
-
-		*(data++) = c;
-		*(data++) = c;
-		*(data++) = c;
-		*(data++) = c;
-	}
-
+	FT_GlyphSlot slot = fnt->face->glyph;
 	glyph->width = slot->bitmap.width;
 	glyph->height = slot->bitmap.rows;
 	glyph->shx = slot->advance.x;
@@ -359,13 +406,13 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 	glyph->ox = slot->bitmap_left;
 	glyph->oy = gCharHeight - slot->bitmap_top;
 
-	// update the texture too...
-	fntUpdateTexture(glyph);
+	glyph->isValid = 1;
 
 	return glyph;
 }
 
 void fntSetAspectRatio(float aw, float ah) {
+	LOG("fntSetAspectRatio\n");
 	// flush cache - it will be invalid after the setting
 	int i;
 
@@ -427,13 +474,41 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 			previous = glyph_index;
 		}
 
-		rmSetupQuad(&glyph->texture, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, colour, &quad);
-		quad.ul.x += glyph->ox;
-		quad.br.x += glyph->ox;
-		quad.ul.y += glyph->oy;
-		quad.br.y += glyph->oy;
-		rmDrawQuad(&quad);
-
+		
+		// only if glyph has atlas placement
+		if (glyph->allocation) {
+			/* TODO: Ineffective on many parts:
+			 * 1. Usage of floats for UV - fixed point should suffice (and is used internally by GS for UV)
+			 *
+			 * 2. GS_SETREG_TEX0 for every quad - why? gsKit should only set texture if demanded
+			 *    We should prepare a special fnt render method that would step over most of the
+			 *    performance problems under - begining with rmSetupQuad and continuing into gsKit
+			 *    - this method would handle the preparetion of the quads and GS upload itself,
+			 *    without the use of prim_quad_texture and rmSetupQuad...
+			 *    
+			 * 3. rmSetupQuad is cool for a few quads a frame, but glyphs are too many in numbers
+			 *    - seriously, all that branching for every letter is a bit much
+			 *
+			 * 4. We should use clut to keep the memory allocations sane - we're linear in the 32bit buffers
+			 *    anyway, no reason to waste like we do!
+			 */
+			rmSetupQuad(NULL, x, y, ALIGN_NONE, glyph->width, glyph->height, colour, &quad);
+			quad.ul.x += glyph->ox;
+			quad.br.x += glyph->ox;
+			quad.ul.y += glyph->oy;
+			quad.br.y += glyph->oy;
+			
+			// UV is our own, custom thing here
+			quad.txt = &glyph->atlas->surface;
+			quad.ul.u = glyph->allocation->x;
+			quad.ul.v = glyph->allocation->y;
+			
+			quad.br.u = glyph->allocation->x + glyph->width;
+			quad.br.v = glyph->allocation->y + glyph->height;
+			
+			rmDrawQuad(&quad);
+		}
+		
 		int ofs = glyph->shx >> 6;
 		w += ofs;
 		x += ofs;

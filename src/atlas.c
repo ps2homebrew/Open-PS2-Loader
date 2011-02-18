@@ -6,8 +6,6 @@
 
 #include <stdio.h>
 #include "include/atlas.h"
-#include <draw_types.h>
-
 
 static inline struct atlas_allocation_t *allocNew(int x, int y, size_t width, size_t height) {
 	struct atlas_allocation_t *al = (struct atlas_allocation_t *)malloc(sizeof(struct atlas_allocation_t));

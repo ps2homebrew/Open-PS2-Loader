@@ -19,9 +19,6 @@
 #include "include/system.h"
 #include "include/debug.h"
 
-// temp
-#define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
-
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
@@ -50,10 +47,6 @@
 
 extern void *usbd_irx;
 extern int size_usbd_irx;
-
-// forward decl
-static void handleHdlSrv();
-
 
 typedef struct {
 	item_list_t *support;
@@ -91,17 +84,17 @@ static int gFrameCounter;
 
 static opl_io_module_t list_support[4];
 
-static void itemExecCross(menu_item_t *self, int id) {
-	item_list_t *support = self->userdata;
+static void itemExecCross(struct menu_item *curMenu) {
+	item_list_t *support = curMenu->userdata;
 
 	if (support) {
 		if (support->enabled) {
-			if (id >= 0)
-				support->itemLaunch(id);
+			if (curMenu->current)
+				support->itemLaunch(curMenu->current->item.id);
 		}
 		else {
 			support->itemInit();
-			menuInitHints(self); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
+			menuInitHints(curMenu); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
 			if (!gAutoRefresh)
 				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 		}
@@ -110,35 +103,35 @@ static void itemExecCross(menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecTriangle(menu_item_t *self, int id) {
-	item_list_t *support = self->userdata;
-
-	if (id < 0)
+static void itemExecTriangle(struct menu_item *curMenu) {
+	if (!curMenu->current)
 		return;
+
+	item_list_t *support = curMenu->userdata;
 
 	if (support) {
 		if (support->itemGetCompatibility) {
-			if (guiShowCompatConfig(id, support) == COMPAT_TEST)
-				itemExecCross(self, id);
+			if (guiShowCompatConfig(curMenu->current->item.id, support) == COMPAT_TEST)
+				itemExecCross(curMenu);
 		}
 	}
 	else
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecSquare(menu_item_t *self, int id) {
-	item_list_t *support = self->userdata;
-
-	if (id < 0)
+static void itemExecSquare(struct menu_item *curMenu) {
+	if (!curMenu->current)
 		return;
 
 	if (!gEnableDandR)
 		return;
+
+	item_list_t *support = curMenu->userdata;
 
 	if (support) {
 		if (support->itemDelete) {
 			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
-				support->itemDelete(id);
+				support->itemDelete(curMenu->current->item.id);
 				if (gAutoRefresh)
 					gFrameCounter = UPDATE_FRAME_COUNT;
 				else
@@ -150,22 +143,22 @@ static void itemExecSquare(menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecCircle(menu_item_t *self, int id) {
-	item_list_t *support = self->userdata;
-
-	if (id < 0)
+static void itemExecCircle(struct menu_item *curMenu) {
+	if (!curMenu->current)
 		return;
 
 	if (!gEnableDandR)
 		return;
 
+	item_list_t *support = curMenu->userdata;
+
 	if (support) {
 		if (support->itemRename) {
-			int nameLength = support->itemGetNameLength(id);
+			int nameLength = support->itemGetNameLength(curMenu->current->item.id);
 			char newName[nameLength];
-			strncpy(newName, self->current->item.text, nameLength);
+			strncpy(newName, curMenu->current->item.text, nameLength);
 			if (guiShowKeyboard(newName, nameLength)) {
-				support->itemRename(id, newName);
+				support->itemRename(curMenu->current->item.id, newName);
 				if (gAutoRefresh)
 					gFrameCounter = UPDATE_FRAME_COUNT;
 				else
@@ -177,8 +170,8 @@ static void itemExecCircle(menu_item_t *self, int id) {
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecRefresh(menu_item_t *self) {
-	item_list_t *support = self->userdata;
+static void itemExecRefresh(struct menu_item *curMenu) {
+	item_list_t *support = curMenu->userdata;
 
 	if (support && support->enabled)
 		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
@@ -254,25 +247,6 @@ static void deinitAllSupport(int exception) {
 	moduleCleanup(&list_support[ETH_MODE], exception);
 	moduleCleanup(&list_support[HDD_MODE], exception);
 	moduleCleanup(&list_support[APP_MODE], exception);
-}
-
-#define MENU_ID_START_HDL 100
-#define MENU_ID_START_USB 101
-#define MENU_ID_START_HDD 102
-#define MENU_ID_START_ETH 103
-#define MENU_ID_START_APP 104
-
-static void menuExecHookFunc(int id) {
-	if (id == MENU_ID_START_HDL) {
-		handleHdlSrv();
-	}        
-}
-
-static void menuFillHookFunc(submenu_list_t **menu) {
-#ifndef __CHILDPROOF
-	if (gHDDStartMode) // enabled at all?
-		submenuAppendItem(menu, -1, "Start HDL Server", MENU_ID_START_HDL, _STR_STARTHDL);
-#endif
 }
 
 // ----------------------------------------------------------
@@ -446,6 +420,7 @@ static void _loadConfig() {
 			configGetColor(configOPL, "text_color", gDefaultTextColor);
 			configGetColor(configOPL, "ui_text_color", gDefaultUITextColor);
 			configGetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
+			configGetInt(configOPL, "use_info_screen", &gUseInfoScreen);
 			configGetInt(configOPL, "enable_coverart", &gEnableArt);
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
 
@@ -503,6 +478,7 @@ static void _saveConfig() {
 		configSetColor(configOPL, "text_color", gDefaultTextColor);
 		configSetColor(configOPL, "ui_text_color", gDefaultUITextColor);
 		configSetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
+		configSetInt(configOPL, "use_info_screen", gUseInfoScreen);
 		configSetInt(configOPL, "enable_coverart", gEnableArt);
 		configSetInt(configOPL, "wide_screen", gWideScreen);
 
@@ -726,7 +702,7 @@ void unloadHdldSvr(void) {
 	initAllSupport(1);
 }
 
-static void handleHdlSrv() {
+void handleHdlSrv() {
 	guiRenderTextScreen(_l(_STR_STARTINGHDL));
 	
 	// prepare for hdl, display screen with info
@@ -842,7 +818,7 @@ static void setDefaults(void) {
 	gCheckUSBFragmentation = 0;
 	gUSBDelay = 3;
 	strncpy(gUSBPrefix, "", 32);
-	// disable art by default
+	gUseInfoScreen = 0;
 	gEnableArt = 0;
 	gWideScreen = 0;
 
@@ -903,9 +879,6 @@ static void init(void) {
 	thmInit();
 	guiInit();
 	ioInit();
-	
-	guiSetMenuFillHook(&menuFillHookFunc);
-	guiSetMenuExecHook(&menuExecHookFunc);
 	
 	startPads();
 

@@ -9,6 +9,7 @@
 #define THM_MAX_FONTS 16
 
 typedef struct {
+	// optional, only for overlays
 	int upperLeft_x;
 	int upperLeft_y;
 	int upperRight_x;
@@ -17,40 +18,34 @@ typedef struct {
 	int lowerLeft_y;
 	int lowerRight_x;
 	int lowerRight_y;
-	GSTEXTURE texture;
-} image_overlay_t;
+
+	// basic texture information
+	char* name;
+	GSTEXTURE source;
+} image_texture_t;
 
 typedef struct {
+	// Attributes for: AttributeImage
+	int currentUid;
+	char currentName[32];
+
+	// Attributes  for: AttributeImage & GameImage
 	image_cache_t* cache;
-	GSTEXTURE defaultTex; // an optional default texture when the cache fails
-	int* attributeUid;
-	int* attributeId;
+	int cacheLinked;
 
-	char* attribute;
+	// Attributes for: AttributeImage & GameImage & StaticImage
+	image_texture_t* defaultTexture;
+	int defaultTextureLinked;
 
-	image_overlay_t* overlay; // an optional overlay
-} attribute_image_t;
-
-typedef struct {
-	image_cache_t* cache;
-	GSTEXTURE defaultTex; // an optional default texture when the cache fails
-
-	char* pattern;
-
-	image_overlay_t* overlay; // an optional overlay
-} game_image_t;
-
-typedef struct {
-	GSTEXTURE texture;
-
-	image_overlay_t* overlay; // an optional overlay
-} static_image_t;
+	image_texture_t* overlayTexture;
+	int overlayTextureLinked;
+} mutable_image_t;
 
 typedef struct {
 	int displayedItems;
 
 	char* decorator;
-	game_image_t* decoratorImage;
+	mutable_image_t* decoratorImage;
 } items_list_t;
 
 typedef struct theme_element {
@@ -65,11 +60,16 @@ typedef struct theme_element {
 
 	void* extended;
 
-	void (*drawElem)(struct menu_list* curMenu, struct submenu_list* curItem, struct theme_element* elem);
+	void (*drawElem)(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem);
 	void (*endElem)(struct theme_element* elem);
 
 	struct theme_element* next;
 } theme_element_t;
+
+typedef struct {
+	theme_element_t* first;
+	theme_element_t* last;
+} theme_elems_t;
 
 typedef struct {
 	char* filePath;
@@ -85,7 +85,9 @@ typedef struct theme {
 	u64 uiTextColor;
 	u64 selTextColor;
 
-	theme_element_t* elems;
+	theme_elems_t mainElems;
+	theme_elems_t infoElems;
+
 	int gameCacheCount;
 
 	theme_element_t* itemsList;

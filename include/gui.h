@@ -45,11 +45,14 @@ struct gui_update_t {
 
 typedef void (*gui_callback_t)(void);
 
-// called when filling the menu
-typedef void (*gui_menufill_callback_t)(submenu_list_t **menu);
+int guiInactiveFrames;
+int guiFrameId;
 
-// called when a menuitem with unknown id is encountered
-typedef void (*gui_menuexec_callback_t)(int id);
+#define GUI_SCREEN_MAIN		0
+#define GUI_SCREEN_MENU		1
+#define GUI_SCREEN_INFO		2
+
+void guiSwitchScreen(int target);
 
 void guiReloadScreenExtents();
 
@@ -70,12 +73,6 @@ void guiMainLoop();
 
 /** Hooks a single per-frame callback */
 void guiSetFrameHook(gui_callback_t cback);
-
-/** Hooks a single callback for main menu population */
-void guiSetMenuFillHook(gui_menufill_callback_t cback);
-
-/** Hooks a single callback for main menu execution - executed when invalid item is encountered */
-void guiSetMenuExecHook(gui_menuexec_callback_t cback);
 
 // Deffered update handling:
 /* Note:
@@ -109,6 +106,10 @@ void guiUpdateScrollSpeed(void);
 void guiUpdateScreenScale(void);
 
 void guiDrawBGPlasma();
+void guiShowAbout();
+void guiShowConfig();
+void guiShowUIConfig();
+void guiShowIPConfig();
 
 /** Renders the given string on screen for the given function until it's io finishes 
 * @note The ptr pointer is watched for it's value. The IO is considered finished when the value becomes zero. 

@@ -15,11 +15,9 @@ typedef struct submenu_item {
 	/// item description in localized form (used if value is not negative)
 	int text_id;
 	
-	/// item id
+	/// item id (MUST BE VALID, we assert it is != -1 to optimize rendering)
 	int id;
 	
-	config_set_t* config;
-
 	int* cache_id;
 	int* cache_uid;
 } submenu_item_t;
@@ -53,15 +51,15 @@ typedef struct menu_item {
 	/// submenu, selection and page start (only used in static mode)
 	struct submenu_list *submenu, *current, *pagestart;
 	
-	void (*refresh)(struct menu_item *self);
+	void (*refresh)(struct menu_item *curMenu);
 
-	void (*execCross)(struct menu_item *self, int id);
+	void (*execCross)(struct menu_item *curMenu);
 	
-	void (*execTriangle)(struct menu_item *self, int id);
+	void (*execTriangle)(struct menu_item *curMenu);
 
-	void (*execCircle)(struct menu_item *self, int id);
+	void (*execCircle)(struct menu_item *curMenu);
 	
-	void (*execSquare)(struct menu_item *self, int id);
+	void (*execSquare)(struct menu_item *curMenu);
 	
 	/// hint list
 	struct menu_hint_item *hints;
@@ -87,18 +85,12 @@ char *submenuItemGetText(submenu_item_t* it);
 char *menuItemGetText(menu_item_t* it);
 void menuRefreshCache(menu_item_t *menu);
 
-void menuDrawStatic();
-
-void menuNextH();
-void menuPrevH();
-void menuNextV();
-void menuPrevV();
-void menuNextPage();
-void menuPrevPage();
-void menuFirstPage();
-void menuLastPage();
-menu_item_t* menuGetCurrent();
-void menuItemExecButton(void (*execActionButton)(menu_item_t *self, int id));
+void menuRenderMain();
+void menuRenderMenu();
+void menuRenderInfo();
+void menuHandleInputMain();
+void menuHandleInputMenu();
+void menuHandleInputInfo();
 
 // Sets the selected item if it is found in the menu list
 void menuSetSelectedItem(menu_item_t *item);

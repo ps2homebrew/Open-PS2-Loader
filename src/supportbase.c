@@ -298,3 +298,20 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 		sbRebuildULCfg(list, prefix, gamecount, -1);
 	}
 }
+
+void sbPopulateConfig(base_game_info_t* game, config_set_t* config) {
+	if (game->isISO)
+		configSetStr(config, "#Format", "ISO");
+	else
+		configSetStr(config, "#Format", "UL");
+
+	if (game->media == 0x12)
+		configSetStr(config, "#Media", "CD");
+	else
+		configSetStr(config, "#Media", "DVD");
+
+	configSetStr(config, "#Name", game->name);
+	configSetStr(config, "#Startup", game->startup);
+	// TODO IZD add size
+	// TODO IZD load real config file
+}

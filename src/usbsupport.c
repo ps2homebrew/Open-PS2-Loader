@@ -361,16 +361,16 @@ static void usbLaunchGame(int id) {
 static config_set_t* usbGetConfig(int id) {
 	config_set_t* config = configAlloc(0, NULL, NULL);
 	base_game_info_t* game = &usbGames[id];
-
+	sbPopulateConfig(game, config);
 	return config;
 }
 
-static int usbGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
+static int usbGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
 	char path[255];
-	if (addSep)
+	if (isRelative)
 		sprintf(path, "%s%s/%s_%s", usbPrefix, folder, value, suffix);
 	else
-		sprintf(path, "%s%s%s_%s", usbPrefix, folder, value, suffix);
+		sprintf(path, "%s%s_%s", folder, value, suffix);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 

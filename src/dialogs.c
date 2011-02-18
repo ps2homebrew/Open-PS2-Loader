@@ -170,17 +170,18 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_AUTOREFRESH}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOREFRESH, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_USE_INFO_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_INFOPAGE, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 	
 	{UI_SPLITTER},
 	
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_TXTCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #28
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_TXTCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_TXTCOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #32
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_SELCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_SELCOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #32
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_SELCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_SELCOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #36
 	{UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_UICOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_UICOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #36
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_UICOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_UICOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #40
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_BGCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #40
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_BGCOLOR}}}, {UI_SPACER}, {UI_COLOUR, UICFG_BGCOL, 1, -1, -10, 17, {.colourvalue = {0, 0}}}, // UIItem #44
 	{UI_BREAK},
 
 	{UI_SPLITTER},

@@ -21,7 +21,7 @@
 #define COMPAT_MODE_8 		0x80
 
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
-#define MENU_MIN_INACTIVE_FRAMES 3
+#define MENU_MIN_INACTIVE_FRAMES 8
 
 typedef struct
 {
@@ -71,7 +71,7 @@ typedef struct
 	
 	config_set_t* (*itemGetConfig)(int id);
 
-	int (*itemGetImage)(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm);
+	int (*itemGetImage)(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm);
 
 	void (*itemCleanUp)(int exception);
 	

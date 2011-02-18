@@ -78,8 +78,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		readPads();
 		
 		rmStartFrame();
-		guiDrawBGPlasma(); // TODO IZD gTheme->drawAltBackground();
-		
+		guiDrawBGPlasma();
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
 		//Text
@@ -215,9 +214,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		readPads();
 		
 		rmStartFrame();
-	
-		guiDrawBGPlasma(); //gTheme->drawAltBackground();
-		
+		guiDrawBGPlasma();
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 		
 		// "Color selection"
@@ -474,10 +471,6 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 
 /// renders whole ui screen (for given dialog setup)
 void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus) {
-	/*if (inMenu)
-		gTheme->drawAltBackground();
-	else
-		gTheme->drawBackground();*/ // TODO IZD
 	guiDrawBGPlasma();
 
 	int x0 = 20;

@@ -29,7 +29,8 @@ typedef struct {
 	
 	/// directory prefix for this cache (if any)
 	char* prefix;
-	int addSeparator;
+	int isPrefixRelative;
+	char* suffix;
 
 	int nextUID;
 	
@@ -45,21 +46,14 @@ void cacheInit();
 */
 void cacheEnd();
 
-/** sets a new frame id (call once every frame!)
-*/
-void cacheNextFrame(int inactives);
-
 /** Initializes a single cache 
-* @param cache the cache to initialize
-* @param prefix a string prefix that gets prepended to the path when loading the pixmap
-* @param count the count of items to cache (negative value = use default)
 */
-image_cache_t* cacheInitCache(int userId, char* prefix, int addSeparator, int count);
+image_cache_t* cacheInitCache(int userId, char* prefix, int isPrefixRelative, char* suffix, int count);
 
 /** Destroys a given cache (unallocates all memory stored there, disconnects the pixmaps from the usage points).
 */
 void cacheDestroyCache(image_cache_t* cache);
 
-GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, char* value, char* suffix);
+GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, char* value);
 
 #endif

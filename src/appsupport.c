@@ -143,26 +143,28 @@ static void appLaunchItem(int id) {
 static config_set_t* appGetConfig(int id) {
 	config_set_t* config = configAlloc(0, NULL, NULL);
 	struct config_value_t* cur = appGetConfigValue(id);
-
+	configSetStr(config, "#Name", appGetELFName(cur->val));
+	configSetStr(config, "#LongName", cur->key);
+	configSetStr(config, "#Startup", cur->val);
 	return config;
 }
 
-static int appGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
+static int appGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
 	value = appGetELFName(value);
 	// We search on ever devices from fatest to slowest (HDD > ETH > USB)
 	static item_list_t *listSupport = NULL;
 	if ( (listSupport = hddGetObject(1)) ) {
-		if (listSupport->itemGetImage(folder, addSep, value, suffix, resultTex, psm) >= 0)
+		if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
 			return 0;
 	}
 
 	if ( (listSupport = ethGetObject(1)) ) {
-		if (listSupport->itemGetImage(folder, addSep, value, suffix, resultTex, psm) >= 0)
+		if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
 			return 0;
 	}
 
 	if ( (listSupport = usbGetObject(1)) )
-		return listSupport->itemGetImage(folder, addSep, value, suffix, resultTex, psm);
+		return listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm);
 
 	return -1;
 }

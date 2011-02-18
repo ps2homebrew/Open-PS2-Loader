@@ -8,6 +8,7 @@ void delay(int count);
 unsigned int USBA_crc32(char *string);
 int sysGetDiscID(char *discID);
 void sysReset(int modload_mask);
+void sysExecExit();
 void sysPowerOff(void);
 int sysPcmciaCheck(void);
 void sysGetCDVDFSV(void **data_irx, int *size_irx);

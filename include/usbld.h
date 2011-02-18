@@ -35,6 +35,7 @@
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID, int newVMode, int newVSync);
+void handleHdlSrv();
 void shutdown();
 
 char *gBaseMCDir;
@@ -66,10 +67,9 @@ int gUSBStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
-/// Sort the game lists automatically
 int gAutosort;
 int gAutoRefresh;
-/// true if icons and covers Art should be displayed
+int gUseInfoScreen;
 int gEnableArt;
 int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
@@ -91,8 +91,6 @@ int gUSBDelay;
 char gUSBPrefix[32];
 
 int gRememberLastPlayed;
-
-//// GUI
 
 char *infotxt;
 

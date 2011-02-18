@@ -475,16 +475,23 @@ static void hddLaunchGame(int id) {
 static config_set_t* hddGetConfig(int id) {
 	config_set_t* config = configAlloc(0, NULL, NULL);
 	hdl_game_info_t* game = &hddGames->games[id];
-
+	configSetStr(config, "#Format", "HDL");
+	/*if (game->disctype == 0x12)
+		configSetStr(config, "#Media", "CD");
+	else
+		configSetStr(config, "#Media", "DVD");*/ // TODO must ask Jimmi/Polo about the HDL header format
+	configSetStr(config, "#Name", game->name);
+	configSetStr(config, "#Startup", game->startup);
+	configSetInt(config, "#Size", game->total_size_in_kb / 1024);
 	return config;
 }
 
-static int hddGetImage(char* folder, int addSep, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
+static int hddGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
 	char path[255];
-	if (addSep)
+	if (isRelative)
 		sprintf(path, "%s%s/%s_%s", hddPrefix, folder, value, suffix);
 	else
-		sprintf(path, "%s%s%s_%s", hddPrefix, folder, value, suffix);
+		sprintf(path, "%s%s_%s", folder, value, suffix);
 	return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
@@ -506,7 +513,7 @@ static int hddCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t hddGameList = {
-		HDD_MODE, 0, 0, 0, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		HDD_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL, &hddGetGameCompatibility,
 #else

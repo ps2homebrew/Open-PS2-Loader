@@ -19,5 +19,6 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex);
 void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id);
 void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id, char* newname);
+void sbPopulateConfig(base_game_info_t* game, config_set_t* config);
 
 #endif

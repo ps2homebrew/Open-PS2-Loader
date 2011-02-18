@@ -41,6 +41,7 @@
 #define UICFG_AUTOREFRESH		20
 #define UICFG_VMODE				21
 #define UICFG_VSYNC				22
+#define UICFG_INFOPAGE			23
 
 #define CFG_EXITTO				30
 #define CFG_DEFDEVICE			31

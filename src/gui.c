@@ -1,8 +1,8 @@
 /*
-  Copyright 2010, Volca
-  Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
-*/
+ Copyright 2010, Volca
+ Licenced under Academic Free License version 3.0
+ Review OpenUsbLd README & LICENSE files for further details.
+ */
 
 #include "include/usbld.h"
 #include "include/gui.h"
@@ -20,28 +20,16 @@
 #include <stdlib.h>
 #include <libvux.h>
 
-#define MAX_GAME_HANDLERS 8
-
-// temp
-#define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
-
 static int gScheduledOps;
 static int gCompletedOps;
 static int gTerminate;
 static int gInitComplete;
 
 static gui_callback_t gFrameHook;
-static gui_menufill_callback_t gMenuFillHook;
-static gui_menuexec_callback_t gMenuExecHook;
 
 static s32 gSemaId;
 static s32 gGUILockSemaId;
 static ee_sema_t gQueueSema;
-
-static int gInactiveFrames;
-static int gFrameCounter;
-
-static GSTEXTURE gBackgroundTex;
 
 static int screenWidth;
 static float wideScreenScale;
@@ -70,46 +58,22 @@ struct gui_update_list_t {
 struct gui_update_list_t *gUpdateList;
 struct gui_update_list_t *gUpdateEnd;
 
-submenu_list_t *g_settings_submenu = NULL;
-submenu_list_t *g_games_submenu = NULL;
-
 typedef struct {
 	void (*handleInput)(void);
 	void (*renderScreen)(void);
 	short inMenu;
 } gui_screen_handler_t;
 
-// Main screen rendering/input
-static void guiMainHandleInput(void);
-static void guiMainRender(void);
+static gui_screen_handler_t screenHandlers[] = {{ &menuHandleInputMain, &menuRenderMain, 0 },
+												{ &menuHandleInputMenu, &menuRenderMenu, 1 },
+												{ &menuHandleInputInfo, &menuRenderInfo, 1 } };
 
-// Main menu rendering/input 
-static void guiMenuHandleInput(void);
-static void guiMenuRender(void);
-
-// default screen handler (main screen)
-static gui_screen_handler_t mainScreenHandler = {
-	&guiMainHandleInput,
-	&guiMainRender,
-	0
-};
-
-static gui_screen_handler_t menuScreenHandler = {
-	&guiMenuHandleInput,
-	&guiMenuRender,
-	1
-};
-
-static gui_screen_handler_t *screenHandler = &menuScreenHandler;
+// default screen handler (menu screen)
+static gui_screen_handler_t *screenHandler = &screenHandlers[GUI_SCREEN_MENU];
 
 // screen transition handling
 static gui_screen_handler_t *screenHandlerTarget = NULL;
 static int transition = 0;
-
-// "main menu submenu"
-static submenu_list_t *mainMenu;
-// active item in the main menu
-static submenu_list_t *mainMenuCurrent;
 
 // Helper perlin noise data
 #define PLASMA_H 32
@@ -117,37 +81,13 @@ static submenu_list_t *mainMenuCurrent;
 #define PLASMA_ROWS_PER_FRAME 6
 #define FADE_SIZE 256
 
+static GSTEXTURE gBackgroundTex;
 static int pperm[512];
 static float fadetbl[FADE_SIZE + 1];
 
-static VU_VECTOR pgrad3[12] = {
-	{1,1,0,1},{-1,1,0,1},{1,-1,0,1},{-1,-1,0,1}, 
-	{1,0,1,1},{-1,0,1,1},{1,0,-1,1},{-1,0,-1,1}, 
-	{0,1,1,1},{0,-1,1,1},{0,1,-1,1},{0,-1,-1,1}
-};
-
-static void guiInitMainMenu() {
-	if (mainMenu)
-		submenuDestroy(&mainMenu);
-
-	// initialize the menu
-#ifndef __CHILDPROOF
-	submenuAppendItem(&mainMenu, -1, "Settings", 1, _STR_SETTINGS);
-	submenuAppendItem(&mainMenu, -1, "Display Settings", 2, _STR_GFX_SETTINGS);
-	submenuAppendItem(&mainMenu, -1, "Network settings", 3, _STR_IPCONFIG);
-	submenuAppendItem(&mainMenu, -1, "Save Changes", 7, _STR_SAVE_CHANGES);
-#endif
-	
-	// Callback to fill in other items
-	if (gMenuFillHook) // if found
-		gMenuFillHook(&mainMenu);
-
-	submenuAppendItem(&mainMenu, -1, "About", 8, _STR_ABOUT);
-	submenuAppendItem(&mainMenu, -1, "Exit", 9, _STR_EXIT);
-	submenuAppendItem(&mainMenu, -1, "Power off", 11, _STR_POWEROFF);
-
-	mainMenuCurrent = mainMenu;
-}
+static VU_VECTOR pgrad3[12] = {{ 1, 1, 0, 1 }, { -1, 1, 0, 1 }, { 1, -1, 0, 1 }, { -1, -1, 0, 1 },
+								{ 1, 0, 1, 1 }, { -1, 0, 1, 1 }, { 1, 0, -1, 1 }, { -1, 0, -1, 1 },
+								{ 0, 1, 1, 1 },	{ 0, -1, 1, 1 }, { 0, 1, -1, 1 }, { 0, -1, -1, 1 } };
 
 void guiReloadScreenExtents() {
 	int screenHeight;
@@ -155,10 +95,10 @@ void guiReloadScreenExtents() {
 }
 
 void guiInit(void) {
-	gFrameCounter = 0;
+	guiFrameId = 0;
+	guiInactiveFrames = 0;
+
 	gFrameHook = NULL;
-	gMenuFillHook = NULL;
-	gMenuExecHook = NULL;
 	gTerminate = 0;
 	gInitComplete = 0;
 	gScheduledOps = 0;
@@ -166,23 +106,17 @@ void guiInit(void) {
 
 	gUpdateList = NULL;
 	gUpdateEnd = NULL;
-	
-	gInactiveFrames = 0;
-	
+
 	gQueueSema.init_count = 1;
 	gQueueSema.max_count = 1;
 	gQueueSema.option = 0;
-	
-	mainMenu = NULL;
-	
+
 	gSemaId = CreateSema(&gQueueSema);
 	gGUILockSemaId = CreateSema(&gQueueSema);
-	
+
 	guiReloadScreenExtents();
 	menuInit();
-	
-	guiInitMainMenu();
-	
+
 	// background texture - for perlin
 	gBackgroundTex.Width = PLASMA_W;
 	gBackgroundTex.Height = PLASMA_H;
@@ -190,29 +124,31 @@ void guiInit(void) {
 	gBackgroundTex.PSM = GS_PSM_CT32;
 	gBackgroundTex.Filter = GS_FILTER_LINEAR;
 	gBackgroundTex.Vram = 0;
-	
+
 	wideScreenScale = 1.0f;
-	
+
 	// Precalculate the values for the perlin noise plasma
 	int i;
 	for (i = 0; i < 256; ++i) {
 		pperm[i] = rand() % 256;
 		pperm[i + 256] = pperm[i];
 	}
-	
+
 	for (i = 0; i <= FADE_SIZE; ++i) {
-		float t = (float)(i) / FADE_SIZE;
-		
-		fadetbl[i] = t*t*t*(t*(t*6.0-15.0)+10.0); 
+		float t = (float) (i) / FADE_SIZE;
+
+		fadetbl[i] = t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 	}
-	
+
 	// Render single screen
 	guiShow();
 }
 
 void guiEnd() {
-	mainMenuCurrent = NULL;
-	submenuDestroy(&mainMenu);
+	if (gBackgroundTex.Mem)
+		free(gBackgroundTex.Mem);
+
+	menuEnd();
 }
 
 void guiLock(void) {
@@ -232,22 +168,22 @@ void guiStartFrame(void) {
 
 	guiLock();
 	rmStartFrame();
-	gFrameCounter++;
+	guiFrameId++;
 }
 
 void guiEndFrame(void) {
 	guiUnlock();
 	rmFlush();
-	
+
 #ifdef __DEBUG
 	u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
 	time_render = newtime - curtime;
 #endif
-		
+
 	rmEndFrame();
 }
 
-static void guiShowAbout() {
+void guiShowAbout() {
 	char OPLVersion[64];
 	snprintf(OPLVersion, 64, _l(_STR_OUL_VER), USBLD_VERSION);
 
@@ -263,15 +199,7 @@ static void guiShowAbout() {
 	diaExecuteDialog(diaAbout, -1, 1, NULL);
 }
 
-static void guiExecExit() {
-	__asm__ __volatile__(
-		"	li $3, 0x04;"
-		"	syscall;"
-		"	nop;"
-	);
-}
-
-static void guiShowConfig() {
+void guiShowConfig() {
 	// configure the enumerations
 	const char* deviceNames[] = { _l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL };
 	const char* deviceModes[] = { _l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL };
@@ -325,28 +253,28 @@ static int guiUIUpdater(int modified) {
 		if (temp != curTheme) {
 			curTheme = temp;
 			if (temp == 0) {
-				diaUIConfig[28].type = UI_COLOUR; // Must be correctly set before doing the diaS/GetColor !!
-				diaUIConfig[32].type = UI_COLOUR;
+				diaUIConfig[32].type = UI_COLOUR; // Must be correctly set before doing the diaS/GetColor !!
 				diaUIConfig[36].type = UI_COLOUR;
 				diaUIConfig[40].type = UI_COLOUR;
+				diaUIConfig[44].type = UI_COLOUR;
 				diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
 				diaSetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
 				diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
 				diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
-			} else	if (temp == thmGetGuiValue()) {
-				diaUIConfig[28].type = UI_COLOUR;
+			} else if (temp == thmGetGuiValue()) {
 				diaUIConfig[32].type = UI_COLOUR;
 				diaUIConfig[36].type = UI_COLOUR;
 				diaUIConfig[40].type = UI_COLOUR;
+				diaUIConfig[44].type = UI_COLOUR;
 				diaSetColor(diaUIConfig, UICFG_BGCOL, gTheme->bgColor);
 				diaSetU64Color(diaUIConfig, UICFG_UICOL, gTheme->uiTextColor);
 				diaSetU64Color(diaUIConfig, UICFG_TXTCOL, gTheme->textColor);
 				diaSetU64Color(diaUIConfig, UICFG_SELCOL, gTheme->selTextColor);
 			} else {
-				diaUIConfig[28].type = UI_SPACER;
 				diaUIConfig[32].type = UI_SPACER;
 				diaUIConfig[36].type = UI_SPACER;
 				diaUIConfig[40].type = UI_SPACER;
+				diaUIConfig[44].type = UI_SPACER;
 			}
 
 			temp = !temp;
@@ -360,15 +288,15 @@ static int guiUIUpdater(int modified) {
 	return 0;
 }
 
-static void guiShowUIConfig() {
+void guiShowUIConfig() {
 	curTheme = -1;
 
 	// configure the enumerations
-	const char* scrollSpeeds[] = {	_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL };
-	const char* vmodeNames[] = {"AUTO", "PAL", "NTSC", NULL};
+	const char* scrollSpeeds[] = { _l(_STR_SLOW), _l(_STR_MEDIUM),	_l(_STR_FAST), NULL };
+	const char* vmodeNames[] = { "AUTO", "PAL", "NTSC", NULL };
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
-	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
-	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
+	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **) thmGetGuiList());
+	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **) lngGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_VMODE, vmodeNames);
 
 	diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
@@ -377,6 +305,7 @@ static void guiShowUIConfig() {
 	guiUIUpdater(1);
 	diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
 	diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
+	diaSetInt(diaUIConfig, UICFG_INFOPAGE, gUseInfoScreen);
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
@@ -396,6 +325,7 @@ static void guiShowUIConfig() {
 		}
 		diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
 		diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
+		diaGetInt(diaUIConfig, UICFG_INFOPAGE, &gUseInfoScreen);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
 		diaGetInt(diaUIConfig, UICFG_VMODE, &newVMode);
@@ -405,7 +335,7 @@ static void guiShowUIConfig() {
 	}
 }
 
-static void guiShowIPConfig() {
+void guiShowIPConfig() {
 	size_t i;
 	// upload current values
 	for (i = 0; i < 4; ++i) {
@@ -454,12 +384,12 @@ int guiShowKeyboard(char* value, int maxLength) {
 }
 
 #ifdef VMC
-typedef struct {		// size = 76
-	int  VMC_status;	// 0=available, 1=busy
-	int  VMC_error;
-	int  VMC_progress;
+typedef struct { // size = 76
+	int VMC_status; // 0=available, 1=busy
+	int VMC_error;
+	int VMC_progress;
 	char VMC_msg[64];
-} statusVMCparam_t;
+}statusVMCparam_t;
 
 #define OPERATION_CREATE	0
 #define OPERATION_CREATING	1
@@ -475,7 +405,7 @@ int guiVmcNameHandler(char* text, int maxLen) {
 	int result = diaShowKeyb(text, maxLen);
 
 	if (result)
-		vmc_refresh = 1;
+	vmc_refresh = 1;
 
 	return result;
 }
@@ -483,19 +413,18 @@ int guiVmcNameHandler(char* text, int maxLen) {
 static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 	int size = support->itemCheckVMC(name, 0);
 
-
 	if (size != -1) {
 		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
 
 		if (size == 8)
-			diaSetInt(diaVMC, VMC_SIZE, 0);
+		diaSetInt(diaVMC, VMC_SIZE, 0);
 		else if (size == 16)
-			diaSetInt(diaVMC, VMC_SIZE, 1);
+		diaSetInt(diaVMC, VMC_SIZE, 1);
 		else if (size == 32)
-			diaSetInt(diaVMC, VMC_SIZE, 2);
+		diaSetInt(diaVMC, VMC_SIZE, 2);
 		else if (size == 64)
-			diaSetInt(diaVMC, VMC_SIZE, 3);
+		diaSetInt(diaVMC, VMC_SIZE, 3);
 		else {
 			diaSetInt(diaVMC, VMC_SIZE, 0);
 			diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_ERROR));
@@ -535,7 +464,7 @@ static int guiVMCUpdater(int modified) {
 			diaSetInt(diaVMC, VMC_PROGRESS, vmc_status.VMC_progress);
 
 			if (vmc_status.VMC_error != 0)
-				LOG("genvmc updater: %d\n", vmc_status.VMC_error);
+			LOG("genvmc updater: %d\n", vmc_status.VMC_error);
 
 			if (vmc_status.VMC_status == 0x00) {
 				diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
@@ -544,7 +473,7 @@ static int guiVMCUpdater(int modified) {
 			}
 		}
 		else
-			LOG("status result: %d\n", result);
+		LOG("status result: %d\n", result);
 	}
 
 	return 0;
@@ -555,10 +484,10 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 	char vmc[32];
 
 	if (strlen(VMCName))
-		strncpy(vmc, VMCName, 32);
+	strncpy(vmc, VMCName, 32);
 	else {
 		if (validate)
-			return 1; // nothing to validate if no user input
+		return 1; // nothing to validate if no user input
 
 		char* startup = support->itemGetStartup(id);
 		snprintf(vmc, 32, "%s_%d", startup, slot);
@@ -570,7 +499,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 	diaSetEnabled(diaVMC, VMC_SIZE, 1);
 	diaSetInt(diaVMC, VMC_PROGRESS, 0);
 
-	const char* VMCSizes[] = { "8 Mb", "16 Mb", "32 Mb", "64 Mb", NULL };
+	const char* VMCSizes[] = {"8 Mb", "16 Mb", "32 Mb", "64 Mb", NULL};
 	diaSetEnum(diaVMC, VMC_SIZE, VMCSizes);
 	int size = guiRefreshVMCConfig(support, vmc);
 	diaSetString(diaVMC, VMC_NAME, vmc);
@@ -581,13 +510,13 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 				int sizeUI;
 				diaGetInt(diaVMC, VMC_SIZE, &sizeUI);
 				if (sizeUI == 1)
-					sizeUI = 16;
+				sizeUI = 16;
 				else if (sizeUI == 2)
-					sizeUI = 32;
+				sizeUI = 32;
 				else if (sizeUI == 3)
-					sizeUI = 64;
+				sizeUI = 64;
 				else
-					sizeUI = 8;
+				sizeUI = 8;
 
 				if (sizeUI != size) {
 					support->itemCheckVMC(vmc, sizeUI);
@@ -598,11 +527,11 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 					vmc_operation = OPERATION_CREATING;
 				}
 				else
-					break;
+				break;
 			}
 			else if (vmc_operation == OPERATION_ENDING) {
 				if (validate)
-					break; // directly close VMC config dialog
+				break; // directly close VMC config dialog
 
 				vmc_operation = OPERATION_END;
 			}
@@ -629,8 +558,8 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 		result = diaExecuteDialog(diaVMC, result, 1, &guiVMCUpdater);
 
 		if ((result == 0) && (vmc_operation == OPERATION_CREATE))
-			break;
-	} while (1);
+		break;
+	}while (1);
 
 	return result;
 }
@@ -642,12 +571,11 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 	char* startup = support->itemGetStartup(id);
 	compatMode = support->itemGetCompatibility(id, &dmaMode);
 
-	if(dmaMode != -1) {
-		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0", "UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6", NULL };
+	if (dmaMode != -1) {
+		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6",	NULL };
 		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaModes);
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaMode);
-	}
-	else {
+	} else {
 		const char* dmaModes[] = { NULL };
 		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaModes);
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, 0);
@@ -726,7 +654,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 		configRemoveVMC(startup, mode, 1);
 #endif
 		support->itemSetCompatibility(id, 0, 7);
-		saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC, 1);
+		saveConfig(CONFIG_COMPAT | CONFIG_DNAS | CONFIG_VMC, 1);
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -751,7 +679,7 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 #endif
 
 		if (result == COMPAT_SAVE)
-			saveConfig(CONFIG_COMPAT|CONFIG_DNAS|CONFIG_VMC, 1);
+			saveConfig(CONFIG_COMPAT | CONFIG_DNAS | CONFIG_VMC, 1);
 	}
 
 	return result;
@@ -763,11 +691,11 @@ int guiGetOpCompleted(int opid) {
 
 int guiDeferUpdate(struct gui_update_t *op) {
 	WaitSema(gSemaId);
-	
-	struct gui_update_list_t* up = (struct gui_update_list_t*)malloc(sizeof(struct gui_update_list_t));
+
+	struct gui_update_list_t* up = (struct gui_update_list_t*) malloc(sizeof(struct gui_update_list_t));
 	up->item = op;
 	up->next = NULL;
-	
+
 	if (!gUpdateList) {
 		gUpdateList = up;
 		gUpdateEnd = gUpdateList;
@@ -785,87 +713,84 @@ static void guiHandleOp(struct gui_update_t* item) {
 	submenu_list_t* result = NULL;
 
 	switch (item->type) {
-		case GUI_INIT_DONE:
-			gInitComplete = 1;
-			break;
-			
-		case GUI_OP_ADD_MENU:
-			menuAppendItem(item->menu.menu);
-			break;
-			
-		case GUI_OP_APPEND_MENU:
-			result = submenuAppendItem(item->menu.subMenu,
-									   item->submenu.icon_id,
-									   item->submenu.text,
-									   item->submenu.id,
-									   item->submenu.text_id);
+	case GUI_INIT_DONE:
+		gInitComplete = 1;
+		break;
 
-			if (!item->menu.menu->submenu)
-				item->menu.menu->submenu = *item->menu.subMenu;
+	case GUI_OP_ADD_MENU:
+		menuAppendItem(item->menu.menu);
+		break;
 
-			if (item->submenu.selected)
-				item->menu.menu->current = result;
+	case GUI_OP_APPEND_MENU:
+		result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id,
+				item->submenu.text, item->submenu.id, item->submenu.text_id);
 
-			break;
-			
-		case GUI_OP_SELECT_MENU:
-			menuSetSelectedItem(item->menu.menu);
-			screenHandler = &mainScreenHandler;
-			break;
-			
-		case GUI_OP_CLEAR_SUBMENU:
-			submenuDestroy(item->menu.subMenu);
-			item->menu.menu->submenu = NULL;
-			item->menu.menu->current = NULL;
-			item->menu.menu->pagestart = NULL;
-			break;
-			
-		case GUI_OP_SORT:
-			submenuSort(item->menu.subMenu);
-			item->menu.menu->pagestart = NULL;
+		if (!item->menu.menu->submenu)
 			item->menu.menu->submenu = *item->menu.subMenu;
-			break;
-		
-		case GUI_OP_ADD_HINT:
-			// append the hint list in the menu item
-			menuAddHint(item->menu.menu, item->hint.text_id, item->hint.icon_id);
-			break;
-			
-		default:
-			LOG("GUI: ??? (%d)\n", item->type);
+
+		if (item->submenu.selected)
+			item->menu.menu->current = result;
+
+		break;
+
+	case GUI_OP_SELECT_MENU:
+		menuSetSelectedItem(item->menu.menu);
+		screenHandler = &screenHandlers[GUI_SCREEN_MAIN];
+		break;
+
+	case GUI_OP_CLEAR_SUBMENU:
+		submenuDestroy(item->menu.subMenu);
+		item->menu.menu->submenu = NULL;
+		item->menu.menu->current = NULL;
+		item->menu.menu->pagestart = NULL;
+		break;
+
+	case GUI_OP_SORT:
+		submenuSort(item->menu.subMenu);
+		item->menu.menu->pagestart = NULL;
+		item->menu.menu->submenu = *item->menu.subMenu;
+		break;
+
+	case GUI_OP_ADD_HINT:
+		// append the hint list in the menu item
+		menuAddHint(item->menu.menu, item->hint.text_id, item->hint.icon_id);
+		break;
+
+	default:
+		LOG("GUI: ??? (%d)\n", item->type);
 	}
 }
 
 static void guiHandleDeferredOps(void) {
 	// TODO: Fit into the given time interval, skip rest of operations of over limit
-	
+
 	while (gUpdateList) {
 		WaitSema(gSemaId);
-		
+
 		guiHandleOp(gUpdateList->item);
-		
+
 		if (gNetworkStartup < 0) {
 			gNetworkStartup = 0;
 			guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
 		}
-		
+
 		struct gui_update_list_t* td = gUpdateList;
 		gUpdateList = gUpdateList->next;
-		
+
 		free(td);
-		
+
 		gCompletedOps++;
-			
+
 		SignalSema(gSemaId);
 	}
-	
+
 	gUpdateEnd = NULL;
 }
 
 static int bfadeout = 0x0;
 static void guiDrawBusy() {
 	if (gTheme->loadingIcon) {
-		GSTEXTURE* texture = thmGetTexture(LOAD0_ICON + (gFrameCounter >> 1) % gTheme->loadingIconCount);
+		GSTEXTURE* texture = thmGetTexture(LOAD0_ICON + guiFrameId % gTheme->loadingIconCount);
 		if (texture && texture->Mem) {
 			u64 mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, bfadeout);
 			rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, mycolor);
@@ -875,82 +800,75 @@ static void guiDrawBusy() {
 
 static int wfadeout = 0x0150;
 static void guiRenderGreeting() {
-	rmUnclip();
-	
 	int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
-
 	u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
-	
-	
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, mycolor);
-	/*
-	char introtxt[255];
-	snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
-	fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
-	*/
-	
+	/* char introtxt[255];
+	 snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
+	 fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
+	 */
+
 	GSTEXTURE* logo = thmGetTexture(LOGO_PICTURE);
-	
 	if (logo) {
 		mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, fade >> 1);
 		rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, mycolor);
 	}
-	
+
 	return;
 }
 
 static float mix(float a, float b, float t) {
-	return (1.0-t)*a + t*b; 
-};
+	return (1.0 - t) * a + t * b;
+}
 
 static float fade(float t) {
-	return fadetbl[(int)(t*FADE_SIZE)];
-};
+	return fadetbl[(int) (t * FADE_SIZE)];
+}
 
 // The same as mix, but with 8 (2*4) values mixed at once
 static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR* res) {
 	asm (
-		"lqc2	vf1, 0(%0)\n" // load the first vector
-		"lqc2	vf2, 0(%1)\n" // load the second vector
-		"lw	$2, 0(%2)\n" // load value from ptr to reg
-		"qmtc2	$2, vf3\n" // load the mix value from reg to VU
-		"vaddw.x vf5, vf00, vf00\n" // vf5.x = 1
-		"vsub.x vf4x, vf5x, vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
-		"vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
-		"vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-		"sqc2	vf1, 0(%3)\n" // transfer the result in acc to the ee
-		: : "r" (a), "r" (b), "r" (&mix), "r" (res)
+			"lqc2	vf1, 0(%0)\n" // load the first vector
+			"lqc2	vf2, 0(%1)\n" // load the second vector
+			"lw	$2, 0(%2)\n" // load value from ptr to reg
+			"qmtc2	$2, vf3\n" // load the mix value from reg to VU
+			"vaddw.x vf5, vf00, vf00\n" // vf5.x = 1
+			"vsub.x vf4x, vf5x, vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
+			"vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
+			"vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
+			"sqc2	vf1, 0(%3)\n" // transfer the result in acc to the ee
+			: : "r" (a), "r" (b), "r" (&mix), "r" (res)
 	);
 }
 
 static float guiCalcPerlin(float x, float y, float z) {
 	// Taken from: http://people.opera.com/patrickl/experiments/canvas/plasma/perlin-noise-classical.js
 	// By Sean McCullough
-	
+
 	// Find unit grid cell containing point 
-	int X = floor(x); 
-	int Y = floor(y); 
-	int Z = floor(z); 
+	int X = floor(x);
+	int Y = floor(y);
+	int Z = floor(z);
 
 	// Get relative xyz coordinates of point within that cell 
-	x = x - X; 
-	y = y - Y; 
-	z = z - Z; 
+	x = x - X;
+	y = y - Y;
+	z = z - Z;
 
 	// Wrap the integer cells at 255 (smaller integer period can be introduced here) 
-	X = X & 255; 
-	Y = Y & 255; 
+	X = X & 255;
+	Y = Y & 255;
 	Z = Z & 255;
 
 	// Calculate a set of eight hashed gradient indices 
-	int gi000 = pperm[X+pperm[Y+pperm[Z]]] % 12; 
-	int gi001 = pperm[X+pperm[Y+pperm[Z+1]]] % 12; 
-	int gi010 = pperm[X+pperm[Y+1+pperm[Z]]] % 12; 
-	int gi011 = pperm[X+pperm[Y+1+pperm[Z+1]]] % 12; 
-	int gi100 = pperm[X+1+pperm[Y+pperm[Z]]] % 12; 
-	int gi101 = pperm[X+1+pperm[Y+pperm[Z+1]]] % 12; 
-	int gi110 = pperm[X+1+pperm[Y+1+pperm[Z]]] % 12; 
-	int gi111 = pperm[X+1+pperm[Y+1+pperm[Z+1]]] % 12; 
+	int gi000 = pperm[X + pperm[Y + pperm[Z]]] % 12;
+	int gi001 = pperm[X + pperm[Y + pperm[Z + 1]]] % 12;
+	int gi010 = pperm[X + pperm[Y + 1 + pperm[Z]]] % 12;
+	int gi011 = pperm[X + pperm[Y + 1 + pperm[Z + 1]]] % 12;
+	int gi100 = pperm[X + 1 + pperm[Y + pperm[Z]]] % 12;
+	int gi101 = pperm[X + 1 + pperm[Y + pperm[Z + 1]]] % 12;
+	int gi110 = pperm[X + 1 + pperm[Y + 1 + pperm[Z]]] % 12;
+	int gi111 = pperm[X + 1 + pperm[Y + 1 + pperm[Z + 1]]] % 12;
 
 	// The gradients of each corner are now: 
 	// g000 = grad3[gi000]; 
@@ -967,73 +885,72 @@ static float guiCalcPerlin(float x, float y, float z) {
 	vec.y = y;
 	vec.z = z;
 	vec.w = 1;
-	
+
 	VU_VECTOR a, b;
-	
+
 	// float n000 
-	a.x = Vu0DotProduct(&pgrad3[gi000], &vec); 
-	
+	a.x = Vu0DotProduct(&pgrad3[gi000], &vec);
+
 	vec.y -= 1;
-	
+
 	// float n010
-	a.z  = Vu0DotProduct(&pgrad3[gi010], &vec); 
-	
+	a.z = Vu0DotProduct(&pgrad3[gi010], &vec);
+
 	vec.x -= 1;
-	
+
 	//float n110 
-	b.z = Vu0DotProduct(&pgrad3[gi110], &vec); 
-	
+	b.z = Vu0DotProduct(&pgrad3[gi110], &vec);
+
 	vec.y += 1;
-	
+
 	// float n100 
-	b.x = Vu0DotProduct(&pgrad3[gi100], &vec); 
-	
+	b.x = Vu0DotProduct(&pgrad3[gi100], &vec);
+
 	vec.z -= 1;
-	
+
 	// float n101
-	b.y = Vu0DotProduct(&pgrad3[gi101], &vec); 
-	
+	b.y = Vu0DotProduct(&pgrad3[gi101], &vec);
+
 	vec.y -= 1;
-	
+
 	// float n111 
-	b.w = Vu0DotProduct(&pgrad3[gi111], &vec); 
-	
+	b.w = Vu0DotProduct(&pgrad3[gi111], &vec);
+
 	vec.x += 1;
-	
+
 	// float n011 
-	a.w = Vu0DotProduct(&pgrad3[gi011], &vec); 
-	
+	a.w = Vu0DotProduct(&pgrad3[gi011], &vec);
+
 	vec.y += 1;
-	
+
 	// float n001 
-	a.y = Vu0DotProduct(&pgrad3[gi001], &vec); 
-	
-	
+	a.y = Vu0DotProduct(&pgrad3[gi001], &vec);
+
 	// Compute the fade curve value for each of x, y, z 
 	float u = fade(x);
 	float v = fade(y);
 	float w = fade(z);
-	
+
 	// TODO: Low priority... This could be done on VU0 (xyzw for the first 4 mixes)
 	// The result in sw
 	// Interpolate along x the contributions from each of the corners 
 	VU_VECTOR rv;
 	VU0MixVec(&b, &a, u, &rv);
-	
+
 	// TODO: The VU0MixVec could as well mix the results (as follows) - might improve performance...
 	// Interpolate the four results along y 
-	float nxy0 = mix(rv.x, rv.z, v); 
+	float nxy0 = mix(rv.x, rv.z, v);
 	float nxy1 = mix(rv.y, rv.w, v);
 	// Interpolate the two last results along z 
-	float nxyz = mix(nxy0, nxy1, w); 
+	float nxyz = mix(nxy0, nxy1, w);
 
-	return nxyz; 
+	return nxyz;
 }
 
 static float dir = 0.02;
 static float perz = -100;
 static int pery = 0;
-static unsigned char curbgColor[3] = {0,0,0};
+static unsigned char curbgColor[3] = { 0, 0, 0 };
 
 static int cdirection(unsigned char a, unsigned char b) {
 	if (a == b)
@@ -1056,7 +973,7 @@ void guiDrawBGPlasma() {
 	if (pery >= PLASMA_H) {
 		pery = 0;
 		perz += dir;
-		
+
 		if (perz > 100.0f || perz < -100.0f)
 			dir = -dir;
 	}
@@ -1069,13 +986,13 @@ void guiDrawBGPlasma() {
 
 	for (y = pery; y < ymax; y++) {
 		for (x = 0; x < PLASMA_W; x++) {
-			u32 fper = guiCalcPerlin((float)(2*x) / PLASMA_W, (float)(2*y) / PLASMA_H, perz) * 0x080 + 0x080;
+			u32 fper = guiCalcPerlin((float) (2 * x) / PLASMA_W, (float) (2 * y) / PLASMA_H, perz) * 0x080 + 0x080;
 
 			*buf = GS_SETREG_RGBA(
-				(u32)(fper * curbgColor[0]) >> 8,
-				(u32)(fper * curbgColor[1]) >> 8,
-				(u32)(fper * curbgColor[2]) >> 8,
-				0x080);
+					(u32)(fper * curbgColor[0]) >> 8,
+					(u32)(fper * curbgColor[1]) >> 8,
+					(u32)(fper * curbgColor[2]) >> 8,
+					0x080);
 
 			++buf;
 		}
@@ -1092,7 +1009,7 @@ static void guiDrawOverlays() {
 
 	if (gInitComplete)
 		wfadeout--;
-	
+
 	if (!pending) {
 		if (bfadeout > 0x0)
 			bfadeout -= 0x08;
@@ -1108,247 +1025,88 @@ static void guiDrawOverlays() {
 	// is init still running?
 	if (wfadeout > 0)
 		guiRenderGreeting();
-	
+
 	if (bfadeout > 0)
 		guiDrawBusy();
-	
+
 #ifdef __DEBUG
 	// fps meter
 	char fps[10];
-	
+
 	if (time_since_last != 0)
 		snprintf(fps, 10, "%3.1f FPS", 1000.0f / (float) time_since_last);
 	else
 		snprintf(fps, 10, "---- FPS");
-	
+
 	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
-	
+
 	snprintf(fps, 10, "%3d ms", time_render);
-	
+
 	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif
 }
 
 static void guiReadPads() {
 	if (readPads())
-		gInactiveFrames = 0;
+		guiInactiveFrames = 0;
 	else
-		gInactiveFrames++;
+		guiInactiveFrames++;
 }
 
-static void guiMainRender() {
-	menuDrawStatic();
-}
-
-static void guiMainHandleInput() {
-	if(getKey(KEY_LEFT)){
-		menuPrevH();
-	} else if(getKey(KEY_RIGHT)){
-		menuNextH();
-	} else if(getKey(KEY_UP)) {
-		menuPrevV();
-	} else if(getKey(KEY_DOWN)){
-		menuNextV();
-	} else if(getKey(KEY_L1)) {
-		menuPrevPage();
-	} else if(getKey(KEY_R1)){
-		menuNextPage();
-	} else if (getKeyOn(KEY_L2)) { // home
-		menuFirstPage();
-	} else if (getKeyOn(KEY_R2)) { // end
-		menuLastPage();
-	}
-
-	menu_item_t* cur = menuGetCurrent();
-	if (!cur)
-		return;
-	
-	if(getKeyOn(KEY_START)) {
-		// reinit main menu - show/hide items valid in the active context
-		guiInitMainMenu();
-		screenHandlerTarget = &menuScreenHandler;
-	} else if(getKeyOn(KEY_SELECT)){
-		cur->refresh(cur);
-	} else if(getKeyOn(KEY_CROSS)){
-		menuItemExecButton(cur->execCross);
-	} else if(getKeyOn(KEY_TRIANGLE)){
-		menuItemExecButton(cur->execTriangle);
-	} else if(getKeyOn(KEY_CIRCLE)){
-		menuItemExecButton(cur->execCircle);
-	} else if(getKeyOn(KEY_SQUARE)){
-		menuItemExecButton(cur->execSquare);
-	}
-}
-
-static void guiMenuRender() {
-	guiDrawBGPlasma();
-
-	if (!mainMenu)
-		return;
-	
-	// draw the animated menu
-	if (!mainMenuCurrent)
-		mainMenuCurrent = mainMenu;
-	
-	// iterate few items behind, few items forward
-	submenu_list_t* it = mainMenu;
-
-	// coordinate, etc
-	// we start at center
-	int w, h;
-	
-	int spacing = 25;
-	int count = 0; int sitem = 0;
-	
-	// calculate the number of items
-	for (; it; count++, it=it->next) {
-		if (it == mainMenuCurrent)
-			sitem = count;
-	}
-	
-	it = mainMenu;
-	
-	const char* text = NULL;
-	int x = screenWidth >> 1;
-	int y = (gTheme->usedHeight >> 1) - (spacing * (count / 2));
-	
-	int fadeout = 0x080;
-	int cp = 0; // current position
-	
-	for (;it; it = it->next, cp++) {
-		text = submenuItemGetText(&it->item);
-		fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
-		
-		fadeout = 0x080 - abs(sitem - cp) * 0x20;
-		
-		if (fadeout < 0x20)
-			fadeout = 0x20;
-		
-		u64 colour = gTheme->textColor;
-		if (it == mainMenuCurrent)
-			colour = gTheme->selTextColor;
-		
-		// render, advance
-		// TODO: Theme support for main menu (font)
-		fntRenderString(FNT_DEFAULT, x - (w >> 1), y, ALIGN_NONE, text, colour);
-		
-		y += spacing;
-	}
-}
-
-static void guiMenuHandleInput() {
-	if (!mainMenu)
-		return;
-	
-	if (!mainMenuCurrent)
-		mainMenuCurrent = mainMenu;
-	
-	if (getKey(KEY_UP)) {
-		if (mainMenuCurrent->prev)
-			mainMenuCurrent = mainMenuCurrent->prev;
-		else	// rewind to the last item
-			while (mainMenuCurrent->next)
-				mainMenuCurrent = mainMenuCurrent->next;
-	}
-	
-	if (getKey(KEY_DOWN)) {
-		if (mainMenuCurrent->next)
-			mainMenuCurrent = mainMenuCurrent->next;
-		else
-			mainMenuCurrent = mainMenu;
-	}
-	
-	if (getKeyOn(KEY_CROSS)) {
-		// execute the item via looking at the id of it
-		int id = mainMenuCurrent->item.id;
-		
-		if (id == 1) {
-			guiShowConfig();
-		} else if (id == 2) {
-			guiShowUIConfig();
-		} else if (id == 3) {
-			// ipconfig
-			guiShowIPConfig();
-		} else if (id == 7) {
-			saveConfig(CONFIG_OPL | CONFIG_VMODE, 1);
-		} else if (id == 8) {
-			guiShowAbout();
-		} else if (id == 9) {
-			guiExecExit();
-		} else if (id == 11) {
-			sysPowerOff();
-		} else {
-			if (gMenuExecHook)
-				gMenuExecHook(id);
-		}
-		
-		// so the exit press wont propagate twice
-		guiReadPads();
-	}
-	
-	if(getKeyOn(KEY_START) || getKeyOn(KEY_CIRCLE)) {
-		if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
-			screenHandlerTarget = &mainScreenHandler;
-	}
-		
-}
-
-// renders the screen and handles inputs. Also handles screen transitions between
-// numerous screen handlers.
-// for now we only have left-to right screen transition
+// renders the screen and handles inputs. Also handles screen transitions between numerous
+// screen handlers. For now we only have left-to right screen transition
 static void guiShow() {
 	// is there a transmission effect going on or are
 	// we in a normal rendering state?
 	if (screenHandlerTarget) {
 		// advance the effect
-		
+
 		// render the old screen, transposed
 		rmSetTransposition(-transition, 0);
 		screenHandler->renderScreen();
-		
+
 		// render new screen transposed again
 		rmSetTransposition(screenWidth - transition, 0);
 		screenHandlerTarget->renderScreen();
-		
+
 		// reset transposition to zero
-		rmSetTransposition(0,0);
-		
+		rmSetTransposition(0, 0);
+
 		// move the transition indicator forward
 		transition += min(transition / 2, (screenWidth - transition) / 2) + 1;
-		
+
 		if (transition > screenWidth) {
 			transition = 0;
 			screenHandler = screenHandlerTarget;
 			screenHandlerTarget = NULL;
 		}
-	} else // render with the set screen handler
+	} else
+		// render with the set screen handler
 		screenHandler->renderScreen();
 }
 
 void guiMainLoop(void) {
 	while (!gTerminate) {
 		guiStartFrame();
-		
-		cacheNextFrame(gInactiveFrames);
-		
+
 		// Read the pad states to prepare for input processing in the screen handler
 		guiReadPads();
-		
+
 		// handle inputs and render screen
 		if (wfadeout < 0x0FF)
 			guiShow();
-		
+
 		// Render overlaying gui thingies :)
 		guiDrawOverlays();
-		
+
 		// handle deferred operations
 		guiHandleDeferredOps();
-		
+
 		if (gFrameHook)
 			gFrameHook();
-		
+
 		guiEndFrame();
-		
+
 		// if not transiting, handle input
 		// done here so we can use renderman if needed
 		if (!screenHandlerTarget && screenHandler)
@@ -1360,21 +1118,17 @@ void guiSetFrameHook(gui_callback_t cback) {
 	gFrameHook = cback;
 }
 
-void guiSetMenuFillHook(gui_menufill_callback_t cback) {
-	gMenuFillHook = cback;
-}
-
-void guiSetMenuExecHook(gui_menuexec_callback_t cback) {
-	gMenuExecHook = cback;
+void guiSwitchScreen(int target) {
+	screenHandlerTarget = &screenHandlers[target];
 }
 
 struct gui_update_t *guiOpCreate(gui_op_type_t type) {
-	struct gui_update_t *op = (struct gui_update_t *)malloc(sizeof(struct gui_update_t));
+	struct gui_update_t *op = (struct gui_update_t *) malloc(
+			sizeof(struct gui_update_t));
 	memset(op, 0, sizeof(struct gui_update_t));
 	op->type = type;
 	return op;
 }
-
 
 void guiUpdateScrollSpeed(void) {
 	// sanitize the settings
@@ -1403,30 +1157,33 @@ void guiUpdateScreenScale(void) {
 
 int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	int terminate = 0;
-	while(!terminate) {
+	while (!terminate) {
 		guiStartFrame();
-		
+
 		readPads();
 
-		if(getKeyOn(KEY_CIRCLE)) 
+		if (getKeyOn(KEY_CIRCLE))
 			terminate = 1;
-		else if(getKeyOn(KEY_CROSS))
+		else if (getKeyOn(KEY_CROSS))
 			terminate = 2;
-		
+
 		if (ui)
 			diaRenderUI(ui, screenHandler->inMenu, NULL, 0);
 		else
 			guiShow();
-		
+
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
 		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
-		
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
-		fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
+
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1,
+				ALIGN_CENTER, text, gTheme->textColor);
+		fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK),
+				gTheme->selTextColor);
 		if (addAccept)
-			fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
+			fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE,
+					_l(_STR_X_ACCEPT), gTheme->selTextColor);
 
 		guiEndFrame();
 	}
@@ -1434,38 +1191,41 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	return terminate - 1;
 }
 
-void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {
+void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type,
+		void *data) {
 	ioPutRequest(type, data);
-	
-	while(*ptr) {
+
+	while (*ptr) {
 		guiStartFrame();
-		
+
 		readPads();
-		
+
 		guiShow();
-		
+
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
-		
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
-		
+
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1,
+				ALIGN_CENTER, message, gTheme->textColor);
+
 		// so the io status icon will be rendered
 		guiDrawOverlays();
-		
+
 		guiEndFrame();
 	}
 }
 
 void guiRenderTextScreen(const unsigned char* message) {
 	guiStartFrame();
-	
+
 	guiShow();
-	
+
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
-	
-	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
-	
+
+	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1,
+			ALIGN_CENTER, message, gTheme->textColor);
+
 	// so the io status icon will be rendered
 	guiDrawOverlays();
-	
+
 	guiEndFrame();
 }

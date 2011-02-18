@@ -470,6 +470,14 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 	*size_irx = size_cdvdfsv_irx;
 }
 
+void sysExecExit() {
+	__asm__ __volatile__(
+			"	li $3, 0x04;"
+			"	syscall;"
+			"	nop;"
+	);
+}
+
 static void restoreSyscallHandler(void)
 {
 	__asm__ __volatile__ (

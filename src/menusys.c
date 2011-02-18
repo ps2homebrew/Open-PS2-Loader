@@ -11,11 +11,52 @@
 #include "include/fntsys.h"
 #include "include/lang.h"
 #include "include/themes.h"
+#include "include/pad.h"
+#include "include/gui.h"
+#include "include/system.h"
+#include "include/ioman.h"
 #include "assert.h"
 
+#define MENU_SETTINGS		0
+#define MENU_GFX_SETTINGS	1
+#define MENU_IP_CONFIG		2
+#define MENU_SAVE_CHANGES	3
+#define MENU_START_HDL		4
+#define MENU_ABOUT			5
+#define MENU_EXIT			6
+#define MENU_POWER_OFF		7
+
 // global menu variables
-static menu_list_t *menu;
-static menu_list_t *selected_item;
+static menu_list_t* menu;
+static menu_list_t* selected_item;
+
+static int itemIdConfig;
+static config_set_t* itemConfig;
+
+// "main menu submenu"
+static submenu_list_t* mainMenu;
+// active item in the main menu
+static submenu_list_t* mainMenuCurrent;
+
+static void menuInitMainMenu() {
+	if (mainMenu)
+		submenuDestroy(&mainMenu);
+
+	// initialize the menu
+#ifndef __CHILDPROOF
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_IP_CONFIG, _STR_IPCONFIG);
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
+	if (gHDDStartMode) // enabled at all?
+		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
+#endif
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_POWER_OFF, _STR_POWEROFF);
+
+	mainMenuCurrent = mainMenu;
+}
 
 // -------------------------------------------------------------------------------------------
 // ---------------------------------------- Menu manipulation --------------------------------
@@ -23,6 +64,11 @@ static menu_list_t *selected_item;
 void menuInit() {
 	menu = NULL;
 	selected_item = NULL;
+	itemIdConfig = -1;
+	itemConfig = NULL;
+	mainMenu = NULL;
+	mainMenuCurrent = NULL;
+	menuInitMainMenu();
 }
 
 void menuEnd() {
@@ -40,6 +86,11 @@ void menuEnd() {
 		
 		free(td);
 	}
+
+	submenuDestroy(&mainMenu);
+
+	if (itemConfig)
+		configFree(itemConfig);
 }
 
 static menu_list_t* AllocMenuItem(menu_item_t* item) {
@@ -88,7 +139,6 @@ static submenu_list_t* AllocSubMenuItem(int icon_id, char *text, int id, int tex
 	it->item.text = text;
 	it->item.text_id = text_id;
 	it->item.id = id;
-	it->item.config = NULL;
 	
 	// no cache entry yet
 	int size = gTheme->gameCacheCount * sizeof(int);
@@ -123,9 +173,6 @@ submenu_list_t* submenuAppendItem(submenu_list_t** submenu, int icon_id, char *t
 }
 
 static void submenuDestroyItem(submenu_list_t* submenu) {
-	if (submenu->item.config)
-		configFree(submenu->item.config);
-
 	free(submenu->item.cache_id);
 	free(submenu->item.cache_uid);
 
@@ -168,6 +215,54 @@ void submenuDestroy(submenu_list_t** submenu) {
 	}
 	
 	*submenu = NULL;
+}
+
+void menuAddHint(menu_item_t *menu, int text_id, int icon_id) {
+	// allocate a new hint item
+	menu_hint_item_t* hint = malloc(sizeof(menu_hint_item_t));
+
+	hint->text_id = text_id;
+	hint->icon_id = icon_id;
+	hint->next = NULL;
+
+	if (menu->hints) {
+		menu_hint_item_t* top = menu->hints;
+
+		// rewind to end
+		for (; top->next; top = top->next);
+
+		top->next = hint;
+	} else {
+		menu->hints = hint;
+	}
+}
+
+void menuRemoveHints(menu_item_t *menu) {
+	while (menu->hints) {
+		menu_hint_item_t* hint = menu->hints;
+		menu->hints = hint->next;
+		free(hint);
+	}
+}
+
+void menuInitHints(menu_item_t* menu) {
+	menuRemoveHints(menu);
+
+	menuAddHint(menu, _STR_SETTINGS, START_ICON);
+	item_list_t *support = menu->userdata;
+	if (!support->enabled)
+		menuAddHint(menu, _STR_START_DEVICE, CROSS_ICON);
+	else {
+		menuAddHint(menu, _STR_RUN, CROSS_ICON);
+		if (support->itemGetCompatibility)
+			menuAddHint(menu, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+		if (gEnableDandR) {
+			if (support->itemRename)
+				menuAddHint(menu, _STR_RENAME, CIRCLE_ICON);
+			if (support->itemDelete)
+				menuAddHint(menu, _STR_DELETE, SQUARE_ICON);
+		}
+	}
 }
 
 char *menuItemGetText(menu_item_t* it) {
@@ -240,7 +335,7 @@ void submenuSort(submenu_list_t** submenu) {
 	*submenu = head;
 }
 
-void menuNextH() {
+static void menuNextH() {
 	if (!selected_item) {
 		selected_item = menu;
 	}
@@ -253,7 +348,7 @@ void menuNextH() {
 	}
 }
 
-void menuPrevH() {
+static void menuPrevH() {
 	if (!selected_item) {
 		selected_item = menu;
 	}
@@ -266,7 +361,7 @@ void menuPrevH() {
 	}
 }
 
-void menuNextV() {
+static void menuNextV() {
 	if (!selected_item)
 		return;
 	
@@ -276,7 +371,7 @@ void menuNextV() {
 		selected_item->item->current = cur->next;
 }
 
-void menuPrevV() {
+static void menuPrevV() {
 	if (!selected_item)
 		return;
 
@@ -298,7 +393,7 @@ void menuPrevV() {
 	}
 }
 
-void menuNextPage() {
+static void menuNextPage() {
 	if (!selected_item)
 		return;
 
@@ -313,7 +408,7 @@ void menuNextPage() {
 	}
 }
 
-void menuPrevPage() {
+static void menuPrevPage() {
 	if (!selected_item)
 		return;
 
@@ -329,14 +424,14 @@ void menuPrevPage() {
 	}
 }
 
-void menuFirstPage() {
+static void menuFirstPage() {
 	if (!selected_item)
 		return;
 
 	selected_item->item->current = selected_item->item->submenu;
 }
 
-void menuLastPage() {
+static void menuLastPage() {
 	if (!selected_item)
 		return;
 
@@ -353,27 +448,6 @@ void menuLastPage() {
 			cur = cur->prev;
 
 		selected_item->item->pagestart = cur;
-	}
-}
-
-menu_item_t* menuGetCurrent() {
-	if (!selected_item)
-		return NULL;
-
-	return selected_item->item;
-}
-
-void menuItemExecButton(void (*execActionButton)(menu_item_t *self, int id)) {
-	if (execActionButton) {
-
-		// selected submenu id. default -1 = no selection
-		int subid = -1;
-
-		submenu_list_t *cur = selected_item->item->current;
-		if (cur)
-			subid = cur->item.id;
-
-		execActionButton(selected_item->item, subid);
 	}
 }
 
@@ -409,11 +483,96 @@ void menuRefreshCache(menu_item_t *menu) {
 	}
 }
 
-void menuDrawStatic() {
+void menuRenderMenu() {
+	guiDrawBGPlasma();
+
+	if (!mainMenu)
+		return;
+
+	// draw the animated menu
+	if (!mainMenuCurrent)
+		mainMenuCurrent = mainMenu;
+
+	submenu_list_t* it = mainMenu;
+
+	// calculate the number of items
+	int count = 0; int sitem = 0;
+	for (; it; count++, it=it->next) {
+		if (it == mainMenuCurrent)
+			sitem = count;
+	}
+
+	int spacing = 25;
+	int y = (gTheme->usedHeight >> 1) - (spacing * (count >> 1));
+	int cp = 0; // current position
+	for (it = mainMenu; it; it = it->next, cp++) {
+		// render, advance
+		// TODO: Theme support for main menu (font)
+		fntRenderString(FNT_DEFAULT, 320, y, ALIGN_CENTER, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
+
+		y += spacing;
+	}
+}
+
+void menuHandleInputMenu() {
+	if (!mainMenu)
+		return;
+
+	if (!mainMenuCurrent)
+		mainMenuCurrent = mainMenu;
+
+	if (getKey(KEY_UP)) {
+		if (mainMenuCurrent->prev)
+			mainMenuCurrent = mainMenuCurrent->prev;
+		else	// rewind to the last item
+			while (mainMenuCurrent->next)
+				mainMenuCurrent = mainMenuCurrent->next;
+	}
+
+	if (getKey(KEY_DOWN)) {
+		if (mainMenuCurrent->next)
+			mainMenuCurrent = mainMenuCurrent->next;
+		else
+			mainMenuCurrent = mainMenu;
+	}
+
+	if (getKeyOn(KEY_CROSS)) {
+		// execute the item via looking at the id of it
+		int id = mainMenuCurrent->item.id;
+
+		if (id == MENU_SETTINGS) {
+			guiShowConfig();
+		} else if (id == MENU_GFX_SETTINGS) {
+			guiShowUIConfig();
+		} else if (id == MENU_IP_CONFIG) {
+			guiShowIPConfig();
+		} else if (id == MENU_SAVE_CHANGES) {
+			saveConfig(CONFIG_OPL | CONFIG_VMODE, 1);
+		} else if (id == MENU_START_HDL) {
+			handleHdlSrv();
+		} else if (id == MENU_ABOUT) {
+			guiShowAbout();
+		} else if (id == MENU_EXIT) {
+			sysExecExit();
+		} else if (id == MENU_POWER_OFF) {
+			sysPowerOff();
+		}
+
+		// so the exit press wont propagate twice
+		readPads();
+	}
+
+	if(getKeyOn(KEY_START) || getKeyOn(KEY_CIRCLE)) {
+		if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
+			guiSwitchScreen(GUI_SCREEN_MAIN);
+	}
+}
+
+void menuRenderMain() {
 	if (!menu)
 		return;
-	
-	if (!selected_item) 
+
+	if (!selected_item)
 		selected_item = menu;
 
 	if (!selected_item->item->current)
@@ -421,59 +580,81 @@ void menuDrawStatic() {
 
 	submenu_list_t* cur = selected_item->item->current;
 
-	theme_element_t* elem = gTheme->elems;
+	theme_element_t* elem = gTheme->mainElems.first;
 	while (elem) {
 		if (elem->drawElem)
-			elem->drawElem(selected_item, cur, elem);
+			elem->drawElem(selected_item, cur, NULL, elem);
 
 		elem = elem->next;
 	}
 }
 
-void menuAddHint(menu_item_t *menu, int text_id, int icon_id) {
-	// allocate a new hint item
-	menu_hint_item_t* hint = malloc(sizeof(menu_hint_item_t));
-	
-	hint->text_id = text_id;
-	hint->icon_id = icon_id;
-	hint->next = NULL;
-	
-	if (menu->hints) {
-		menu_hint_item_t* top = menu->hints;
-		
-		// rewind to end
-		for (; top->next; top = top->next);
-		
-		top->next = hint;
-	} else {
-		menu->hints = hint;
+void menuHandleInputMain() {
+	if (!selected_item)
+		return;
+
+	if(getKey(KEY_LEFT)) {
+		menuPrevH();
+	} else if(getKey(KEY_RIGHT)) {
+		menuNextH();
+	} else if(getKey(KEY_UP)) {
+		menuPrevV();
+	} else if(getKey(KEY_DOWN)){
+		menuNextV();
+	} else if(getKeyOn(KEY_CROSS)) {
+		if (gUseInfoScreen && selected_item->item->current && gTheme->infoElems.first) {
+			if (selected_item->item->current->item.id != itemIdConfig) {
+				itemIdConfig = selected_item->item->current->item.id;
+
+				if (itemConfig)
+					configFree(itemConfig);
+
+				item_list_t *support = selected_item->item->userdata;
+				itemConfig = support->itemGetConfig(itemIdConfig);
+			}
+
+			guiSwitchScreen(GUI_SCREEN_INFO);
+		} else
+			selected_item->item->execCross(selected_item->item);
+	} else if(getKeyOn(KEY_TRIANGLE)) {
+		selected_item->item->execTriangle(selected_item->item);
+	} else if(getKeyOn(KEY_CIRCLE)) {
+		selected_item->item->execCircle(selected_item->item);
+	} else if(getKeyOn(KEY_SQUARE)) {
+		selected_item->item->execSquare(selected_item->item);
+	} else if(getKeyOn(KEY_START)) {
+		// reinit main menu - show/hide items valid in the active context
+		menuInitMainMenu();
+		guiSwitchScreen(GUI_SCREEN_MENU);
+	} else if(getKeyOn(KEY_SELECT)) {
+		selected_item->item->refresh(selected_item->item);
+	} else if(getKey(KEY_L1)) {
+		menuPrevPage();
+	} else if(getKey(KEY_R1)) {
+		menuNextPage();
+	} else if (getKeyOn(KEY_L2)) { // home
+		menuFirstPage();
+	} else if (getKeyOn(KEY_R2)) { // end
+		menuLastPage();
 	}
 }
 
-void menuRemoveHints(menu_item_t *menu) {
-	while (menu->hints) {
-		menu_hint_item_t* hint = menu->hints;
-		menu->hints = hint->next;
-		free(hint);
+void menuRenderInfo() {
+	submenu_list_t* cur = selected_item->item->current;
+
+	theme_element_t* elem = gTheme->infoElems.first;
+	while (elem) {
+		if (elem->drawElem)
+			elem->drawElem(selected_item, cur, itemConfig, elem);
+
+		elem = elem->next;
 	}
 }
 
-void menuInitHints(menu_item_t* menu) {
-	menuRemoveHints(menu);
-
-	menuAddHint(menu, _STR_SETTINGS, START_ICON);
-	item_list_t *support = menu->userdata;
-	if (!support->enabled)
-		menuAddHint(menu, _STR_START_DEVICE, CROSS_ICON);
-	else {
-		menuAddHint(menu, _STR_RUN, CROSS_ICON);
-		if (support->itemGetCompatibility)
-			menuAddHint(menu, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
-		if (gEnableDandR) {
-			if (support->itemRename)
-				menuAddHint(menu, _STR_RENAME, CIRCLE_ICON);
-			if (support->itemDelete)
-				menuAddHint(menu, _STR_DELETE, SQUARE_ICON);
-		}
+void menuHandleInputInfo() {
+	if(getKeyOn(KEY_CROSS)) {
+		selected_item->item->execCross(selected_item->item);
+	} else if(getKeyOn(KEY_CIRCLE)) {
+		guiSwitchScreen(GUI_SCREEN_MAIN);
 	}
 }

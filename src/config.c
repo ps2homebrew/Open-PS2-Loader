@@ -223,11 +223,13 @@ int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 		if (strncmp(it->val, value, 255) != 0) {
 			strncpy(it->val, value, 255);
 			it->val[min(strlen(value), 254)] = '\0';
-			configSet->modified = 1;
+			if (it->key[0] != '#')
+				configSet->modified = 1;
 		}
 	} else {
 		addConfigValue(configSet, key, value);
-		configSet->modified = 1;
+		if (key[0] != '#')
+			configSet->modified = 1;
 	}
 	
 	return 1;
@@ -288,6 +290,9 @@ int configRemoveKey(config_set_t* configSet, const char* key) {
 	
 	while (val) {
 		if (strncmp(val->key, key, 32) == 0) {
+			if (key[0] != '#')
+				configSet->modified = 1;
+
 			if (val == configSet->tail)
 				configSet->tail = prev;
 
@@ -300,8 +305,6 @@ int configRemoveKey(config_set_t* configSet, const char* key) {
 				free(configSet->head);
 				configSet->head = val;
 			}
-
-			configSet->modified = 1;
 		} else {
 			prev = val;
 			val = val->next;
@@ -448,7 +451,7 @@ int configWrite(config_set_t* configSet) {
 			struct config_value_t* cur = configSet->head;
 
 			while (cur) {
-				if (cur->key[0] != '\0') {
+				if ((cur->key[0] != '\0') && (cur->key[0] != '#')) {
 					snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
 					writeFileBuffer(fileBuffer, line, strlen(line));
 				}

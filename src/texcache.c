@@ -3,14 +3,6 @@
 #include "include/gui.h"
 #include "include/util.h"
 
-static int frameID = 0;
-static int inactiveFrames = 0;
-
-void cacheNextFrame(int inactives) {
-	++frameID;
-	inactiveFrames = inactives;
-}
-
 // io call to handle the loading of covers
 #define IO_MENU_LOAD_ART 5
 
@@ -21,7 +13,6 @@ typedef struct {
 	// only for comparison if the deferred action is still valid
 	int cacheUID;
 	char* value;
-	char* suffix;
 } load_image_request_t;
 
 // Io handled action...
@@ -37,10 +28,8 @@ static void cacheLoadImage(void* data) {
 		return;
 
 	// the cache entry was already reused!
-	if (/*(!req->entry->qr) || */(req->cacheUID != req->entry->UID)) {
-		LOG("cacheLoadImage(%d) - entry was re-used !! requested UID: %d entry UID: %d\n", req->cache->userId, req->cacheUID, req->entry->UID);
+	if (req->cacheUID != req->entry->UID)
 		return;
-	}
 
 	// seems okay. we can proceed
 	GSTEXTURE* texture = &req->entry->texture;
@@ -49,12 +38,10 @@ static void cacheLoadImage(void* data) {
 		texture->Mem = NULL;
 	}
 
-	LOG("cacheLoadImage(%d) - loading image for UID: %d\n", req->cache->userId, req->cacheUID);
-
-	if (handler->itemGetImage(req->cache->prefix, req->cache->addSeparator, req->value, req->suffix, texture, GS_PSM_CT24) < 0)
+	if (handler->itemGetImage(req->cache->prefix, req->cache->isPrefixRelative, req->value, req->cache->suffix, texture, GS_PSM_CT24) < 0)
 		req->entry->lastUsed = 0;
 	else
-		req->entry->lastUsed = frameID;
+		req->entry->lastUsed = guiFrameId;
 
 	req->entry->qr = NULL;
 
@@ -78,16 +65,21 @@ static void cacheClearItem(cache_entry_t* item, int freeTxt) {
 	item->texture.Vram = 0;
 	item->qr = NULL;
 	item->lastUsed = -1;
-	item->UID = -1;
+	item->UID = 0;
 }
 
-image_cache_t* cacheInitCache(int userId, char* prefix, int addSeparator, int count) {
+image_cache_t* cacheInitCache(int userId, char* prefix, int isPrefixRelative, char* suffix, int count) {
 	image_cache_t* cache = (image_cache_t*) malloc(sizeof(image_cache_t));
 	cache->userId = userId;
 	cache->count = count;
-	cache->prefix = prefix;
-	cache->addSeparator = addSeparator;
-	cache->nextUID = 0;
+	int length = strlen(prefix) + 1;
+	cache->prefix = (char*) malloc(length * sizeof(char));
+	memcpy(cache->prefix, prefix, length);
+	cache->isPrefixRelative = isPrefixRelative;
+	length = strlen(suffix) + 1;
+	cache->suffix = (char*) malloc(length * sizeof(char));
+	memcpy(cache->suffix, suffix, length);
+	cache->nextUID = 1;
 	cache->content = (cache_entry_t*) malloc(count * sizeof(cache_entry_t));
 
 	int i;
@@ -103,13 +95,14 @@ void cacheDestroyCache(image_cache_t* cache) {
 		cacheClearItem(&cache->content[i], 1);
 	}
 	
+	free(cache->prefix);
+	free(cache->suffix);
 	free(cache->content);
 	free(cache);
 }
 
-GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, char* value, char* suffix) {
+GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId, int* UID, char* value) {
 	if (*cacheId == -2) {
-		//LOG("cacheGetTexture(%d) - texture is null for UID: %d itemId: %d\n", cache->userId, *UID, itemId);
 		return NULL;
 	} else if (*cacheId != -1) {
 		cache_entry_t* entry = &cache->content[*cacheId];
@@ -117,25 +110,23 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 			if (entry->qr)
 				return NULL;
 			else if (entry->lastUsed == 0) {
-				LOG("cacheGetTexture(%d) - callback from cacheLoadImage, texture is null for UID: %d item: %s\n", cache->userId, *UID, value);
 				*cacheId = -2;
 				return NULL;
 			} else {
-				entry->lastUsed = frameID;
+				entry->lastUsed = guiFrameId;
 				return &entry->texture;
 			}
 		}
-		LOG("cacheGetTexture(%d) - outdated UID: %d was at slot: %d entryUID: %d itemId: %s\n", cache->userId, *UID, *cacheId, entry->UID, value);
 
 		*cacheId = -1;
 	}
 
 	// under the cache pre-delay (to avoid filling cache while moving around)
-	if (inactiveFrames < list->delay)
+	if (guiInactiveFrames < list->delay)
 		return NULL;
 
 	cache_entry_t *currEntry, *oldestEntry = NULL;
-	int i, rtime = frameID;
+	int i, rtime = guiFrameId;
 
 	for (i = 0; i < cache->count; i++) {
 		currEntry = &cache->content[i];
@@ -152,7 +143,6 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 		req->entry = oldestEntry;
 		req->list = list;
 		req->value = value;
-		req->suffix = suffix;
 		req->cacheUID = cache->nextUID;
 
 		cacheClearItem(oldestEntry, 1);
@@ -160,8 +150,6 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 		oldestEntry->UID = cache->nextUID;
 
 		*UID = cache->nextUID++;
-
-		LOG("cacheGetTexture(%d) - new request for UID: %d at slot: %d itemId: %s\n", req->cache->userId, *UID, *cacheId, value);
 
 		ioPutRequest(IO_MENU_LOAD_ART, req);
 	}

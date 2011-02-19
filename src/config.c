@@ -76,7 +76,7 @@ static int splitAssignment(char* line, char* key, size_t keymax, char* val, size
 		
 		eqpos++;
 		
-		size_t vallen = min(keymax, strlen(line) - (eqpos - line));
+		size_t vallen = min(valmax, strlen(line) - (eqpos - line));
 		strncpy(val, eqpos, vallen);
 	}
 	

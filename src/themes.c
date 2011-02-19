@@ -23,21 +23,23 @@ static theme_file_t themes[THM_MAX_FILES];
 static char **guiThemesNames = NULL;
 
 #define TYPE_ATTRIBUTE_TEXT		0
-#define TYPE_ATTRIBUTE_IMAGE	1
-#define TYPE_GAME_IMAGE			2
-#define TYPE_STATIC_IMAGE		3
-#define TYPE_BACKGROUND			4
-#define TYPE_MENU_ICON			5
-#define TYPE_MENU_TEXT			6
-#define	 TYPE_ITEMS_LIST		7
-#define	 TYPE_ITEM_ICON			8
-#define	 TYPE_ITEM_COVER		9
-#define TYPE_ITEM_TEXT			10
-#define TYPE_HINT_TEXT			11
-#define TYPE_LOADING_ICON		12
+#define TYPE_STATIC_TEXT		1
+#define TYPE_ATTRIBUTE_IMAGE	2
+#define TYPE_GAME_IMAGE			3
+#define TYPE_STATIC_IMAGE		4
+#define TYPE_BACKGROUND			5
+#define TYPE_MENU_ICON			6
+#define TYPE_MENU_TEXT			7
+#define	 TYPE_ITEMS_LIST		8
+#define	 TYPE_ITEM_ICON			9
+#define	 TYPE_ITEM_COVER		10
+#define TYPE_ITEM_TEXT			11
+#define TYPE_HINT_TEXT			12
+#define TYPE_LOADING_ICON		13
 
 static char *elementsType[] = {
 	"AttributeText",
+	"StaticText",
 	"AttributeImage",
 	"GameImage",
 	"StaticImage",
@@ -51,6 +53,30 @@ static char *elementsType[] = {
 	"HintText",
 	"LoadingIcon",
 };
+
+// StaticText ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static void drawStaticText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
+	fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, (char *) elem->extended, elem->color);
+}
+
+static void initStaticText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
+		char* value) {
+
+	char elemProp[64];
+
+	snprintf(elemProp, 64, "%s_value", name);
+	configGetStr(themeConfig, elemProp, &value);
+	if (value) {
+		int length = strlen(value) + 1;
+		elem->extended = (char*) malloc(length * sizeof(char));
+		memcpy(elem->extended, value, length);
+		// elem->endElem = &endBasic; does the job
+
+		elem->drawElem = &drawStaticText;
+	} else
+		LOG("elemStaticText %s: NO value, elem disabled !!\n", name);
+}
 
 // AttributeText ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -692,6 +718,9 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 			if (!strcmp(elementsType[TYPE_ATTRIBUTE_TEXT], type)) {
 				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
 				initAttributeText(themePath, themeConfig, theme, elem, name, NULL);
+			} else if (!strcmp(elementsType[TYPE_STATIC_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
+				initStaticText(themePath, themeConfig, theme, elem, name, NULL);
 			} else if (!strcmp(elementsType[TYPE_ATTRIBUTE_IMAGE], type)) {
 				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
 				initAttributeImage(themePath, themeConfig, theme, elem, name);

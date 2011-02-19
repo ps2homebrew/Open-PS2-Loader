@@ -509,7 +509,6 @@ void menuRenderMenu() {
 		// render, advance
 		// TODO: Theme support for main menu (font)
 		fntRenderString(FNT_DEFAULT, 320, y, ALIGN_CENTER, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
-
 		y += spacing;
 	}
 }
@@ -602,7 +601,7 @@ void menuHandleInputMain() {
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
 	} else if(getKeyOn(KEY_CROSS)) {
-		if (gUseInfoScreen && selected_item->item->current && gTheme->infoElems.first) {
+		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first) {
 			if (selected_item->item->current->item.id != itemIdConfig) {
 				itemIdConfig = selected_item->item->current->item.id;
 

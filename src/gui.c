@@ -139,9 +139,6 @@ void guiInit(void) {
 
 		fadetbl[i] = t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
 	}
-
-	// Render single screen
-	guiShow();
 }
 
 void guiEnd() {
@@ -418,13 +415,13 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
 
 		if (size == 8)
-		diaSetInt(diaVMC, VMC_SIZE, 0);
+			diaSetInt(diaVMC, VMC_SIZE, 0);
 		else if (size == 16)
-		diaSetInt(diaVMC, VMC_SIZE, 1);
+			diaSetInt(diaVMC, VMC_SIZE, 1);
 		else if (size == 32)
-		diaSetInt(diaVMC, VMC_SIZE, 2);
+			diaSetInt(diaVMC, VMC_SIZE, 2);
 		else if (size == 64)
-		diaSetInt(diaVMC, VMC_SIZE, 3);
+			diaSetInt(diaVMC, VMC_SIZE, 3);
 		else {
 			diaSetInt(diaVMC, VMC_SIZE, 0);
 			diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_ERROR));
@@ -464,7 +461,7 @@ static int guiVMCUpdater(int modified) {
 			diaSetInt(diaVMC, VMC_PROGRESS, vmc_status.VMC_progress);
 
 			if (vmc_status.VMC_error != 0)
-			LOG("genvmc updater: %d\n", vmc_status.VMC_error);
+				LOG("genvmc updater: %d\n", vmc_status.VMC_error);
 
 			if (vmc_status.VMC_status == 0x00) {
 				diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
@@ -473,7 +470,7 @@ static int guiVMCUpdater(int modified) {
 			}
 		}
 		else
-		LOG("status result: %d\n", result);
+			LOG("status result: %d\n", result);
 	}
 
 	return 0;
@@ -484,10 +481,10 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 	char vmc[32];
 
 	if (strlen(VMCName))
-	strncpy(vmc, VMCName, 32);
+		strncpy(vmc, VMCName, 32);
 	else {
 		if (validate)
-		return 1; // nothing to validate if no user input
+			return 1; // nothing to validate if no user input
 
 		char* startup = support->itemGetStartup(id);
 		snprintf(vmc, 32, "%s_%d", startup, slot);
@@ -527,11 +524,11 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 					vmc_operation = OPERATION_CREATING;
 				}
 				else
-				break;
+					break;
 			}
 			else if (vmc_operation == OPERATION_ENDING) {
 				if (validate)
-				break; // directly close VMC config dialog
+					break; // directly close VMC config dialog
 
 				vmc_operation = OPERATION_END;
 			}
@@ -558,8 +555,8 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 		result = diaExecuteDialog(diaVMC, result, 1, &guiVMCUpdater);
 
 		if ((result == 0) && (vmc_operation == OPERATION_CREATE))
-		break;
-	}while (1);
+			break;
+	} while (1);
 
 	return result;
 }
@@ -713,51 +710,51 @@ static void guiHandleOp(struct gui_update_t* item) {
 	submenu_list_t* result = NULL;
 
 	switch (item->type) {
-	case GUI_INIT_DONE:
-		gInitComplete = 1;
-		break;
+		case GUI_INIT_DONE:
+			gInitComplete = 1;
+			break;
 
-	case GUI_OP_ADD_MENU:
-		menuAppendItem(item->menu.menu);
-		break;
+		case GUI_OP_ADD_MENU:
+			menuAppendItem(item->menu.menu);
+			break;
 
-	case GUI_OP_APPEND_MENU:
-		result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id,
-				item->submenu.text, item->submenu.id, item->submenu.text_id);
+		case GUI_OP_APPEND_MENU:
+			result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id,
+					item->submenu.text, item->submenu.id, item->submenu.text_id);
 
-		if (!item->menu.menu->submenu)
+			if (!item->menu.menu->submenu)
+				item->menu.menu->submenu = *item->menu.subMenu;
+
+			if (item->submenu.selected)
+				item->menu.menu->current = result;
+
+			break;
+
+		case GUI_OP_SELECT_MENU:
+			menuSetSelectedItem(item->menu.menu);
+			screenHandler = &screenHandlers[GUI_SCREEN_MAIN];
+			break;
+
+		case GUI_OP_CLEAR_SUBMENU:
+			submenuDestroy(item->menu.subMenu);
+			item->menu.menu->submenu = NULL;
+			item->menu.menu->current = NULL;
+			item->menu.menu->pagestart = NULL;
+			break;
+
+		case GUI_OP_SORT:
+			submenuSort(item->menu.subMenu);
+			item->menu.menu->pagestart = NULL;
 			item->menu.menu->submenu = *item->menu.subMenu;
+			break;
 
-		if (item->submenu.selected)
-			item->menu.menu->current = result;
+		case GUI_OP_ADD_HINT:
+			// append the hint list in the menu item
+			menuAddHint(item->menu.menu, item->hint.text_id, item->hint.icon_id);
+			break;
 
-		break;
-
-	case GUI_OP_SELECT_MENU:
-		menuSetSelectedItem(item->menu.menu);
-		screenHandler = &screenHandlers[GUI_SCREEN_MAIN];
-		break;
-
-	case GUI_OP_CLEAR_SUBMENU:
-		submenuDestroy(item->menu.subMenu);
-		item->menu.menu->submenu = NULL;
-		item->menu.menu->current = NULL;
-		item->menu.menu->pagestart = NULL;
-		break;
-
-	case GUI_OP_SORT:
-		submenuSort(item->menu.subMenu);
-		item->menu.menu->pagestart = NULL;
-		item->menu.menu->submenu = *item->menu.subMenu;
-		break;
-
-	case GUI_OP_ADD_HINT:
-		// append the hint list in the menu item
-		menuAddHint(item->menu.menu, item->hint.text_id, item->hint.icon_id);
-		break;
-
-	default:
-		LOG("GUI: ??? (%d)\n", item->type);
+		default:
+			LOG("GUI: ??? (%d)\n", item->type);
 	}
 }
 
@@ -828,16 +825,16 @@ static float fade(float t) {
 // The same as mix, but with 8 (2*4) values mixed at once
 static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR* res) {
 	asm (
-			"lqc2	vf1, 0(%0)\n" // load the first vector
-			"lqc2	vf2, 0(%1)\n" // load the second vector
-			"lw	$2, 0(%2)\n" // load value from ptr to reg
-			"qmtc2	$2, vf3\n" // load the mix value from reg to VU
-			"vaddw.x vf5, vf00, vf00\n" // vf5.x = 1
-			"vsub.x vf4x, vf5x, vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
-			"vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
-			"vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-			"sqc2	vf1, 0(%3)\n" // transfer the result in acc to the ee
-			: : "r" (a), "r" (b), "r" (&mix), "r" (res)
+		"lqc2	vf1, 0(%0)\n" // load the first vector
+		"lqc2	vf2, 0(%1)\n" // load the second vector
+		"lw	$2, 0(%2)\n" // load value from ptr to reg
+		"qmtc2	$2, vf3\n" // load the mix value from reg to VU
+		"vaddw.x vf5, vf00, vf00\n" // vf5.x = 1
+		"vsub.x vf4x, vf5x, vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
+		"vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
+		"vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
+		"sqc2	vf1, 0(%3)\n" // transfer the result in acc to the ee
+		: : "r" (a), "r" (b), "r" (&mix), "r" (res)
 	);
 }
 
@@ -1018,8 +1015,6 @@ static void guiDrawOverlays() {
 	} else {
 		if (bfadeout < 0x080)
 			bfadeout += 0x20;
-		else
-			bfadeout += 0x0;
 	}
 
 	// is init still running?
@@ -1123,8 +1118,7 @@ void guiSwitchScreen(int target) {
 }
 
 struct gui_update_t *guiOpCreate(gui_op_type_t type) {
-	struct gui_update_t *op = (struct gui_update_t *) malloc(
-			sizeof(struct gui_update_t));
+	struct gui_update_t *op = (struct gui_update_t *) malloc(sizeof(struct gui_update_t));
 	memset(op, 0, sizeof(struct gui_update_t));
 	op->type = type;
 	return op;
@@ -1177,13 +1171,10 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1,
-				ALIGN_CENTER, text, gTheme->textColor);
-		fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK),
-				gTheme->selTextColor);
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
+		fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
 		if (addAccept)
-			fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE,
-					_l(_STR_X_ACCEPT), gTheme->selTextColor);
+			fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
 
 		guiEndFrame();
 	}
@@ -1191,8 +1182,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	return terminate - 1;
 }
 
-void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type,
-		void *data) {
+void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {
 	ioPutRequest(type, data);
 
 	while (*ptr) {
@@ -1204,8 +1194,7 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type,
 
 		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1,
-				ALIGN_CENTER, message, gTheme->textColor);
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 
 		// so the io status icon will be rendered
 		guiDrawOverlays();
@@ -1221,8 +1210,7 @@ void guiRenderTextScreen(const unsigned char* message) {
 
 	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
 
-	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1,
-			ALIGN_CENTER, message, gTheme->textColor);
+	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 
 	// so the io status icon will be rendered
 	guiDrawOverlays();

@@ -476,10 +476,10 @@ static config_set_t* hddGetConfig(int id) {
 	config_set_t* config = configAlloc(0, NULL, NULL);
 	hdl_game_info_t* game = &hddGames->games[id];
 	configSetStr(config, "#Format", "HDL");
-	/*if (game->disctype == 0x12)
+	if (game->disctype == 0x12)
 		configSetStr(config, "#Media", "CD");
 	else
-		configSetStr(config, "#Media", "DVD");*/ // TODO must ask Jimmi/Polo about the HDL header format
+		configSetStr(config, "#Media", "DVD");
 	configSetStr(config, "#Name", game->name);
 	configSetStr(config, "#Startup", game->startup);
 	configSetInt(config, "#Size", game->total_size_in_kb / 1024);

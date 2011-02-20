@@ -277,7 +277,8 @@ void menuRemoveHints(menu_item_t *menu) {
 	}
 }
 
-void menuInitHints(menu_item_t* menu) {
+void menuRefreshState(menu_item_t* menu, int themeChanged) {
+	// refresh Hints
 	menuRemoveHints(menu);
 
 	menuAddHint(menu, _STR_SETTINGS, START_ICON);
@@ -285,7 +286,10 @@ void menuInitHints(menu_item_t* menu) {
 	if (!support->enabled)
 		menuAddHint(menu, _STR_START_DEVICE, CROSS_ICON);
 	else {
-		menuAddHint(menu, _STR_RUN, CROSS_ICON);
+		if (gUseInfoScreen && gTheme->infoElems.first)
+			menuAddHint(menu, _STR_INFO, CROSS_ICON);
+		else
+			menuAddHint(menu, _STR_RUN, CROSS_ICON);
 		if (support->itemGetCompatibility)
 			menuAddHint(menu, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
 		if (gEnableDandR) {
@@ -294,6 +298,38 @@ void menuInitHints(menu_item_t* menu) {
 			if (support->itemDelete)
 				menuAddHint(menu, _STR_DELETE, SQUARE_ICON);
 		}
+	}
+
+	// refresh Cache
+	if (themeChanged) {
+		submenu_list_t *cur = menu->submenu;
+
+		while (cur) {
+			if (cur->item.cache_id)
+				free(cur->item.cache_id);
+			if(cur->item.cache_uid)
+				free(cur->item.cache_uid);
+
+			int size = gTheme->gameCacheCount * sizeof(int);
+			cur->item.cache_id = malloc(size);
+			memset(cur->item.cache_id, -1, size);
+			cur->item.cache_uid = malloc(size);
+			memset(cur->item.cache_uid, -1, size);
+
+			cur = cur->next;
+		}
+	}
+}
+
+static void menuRefreshConfig() { // may be replaced by menuRequestConfig
+	if (selected_item->item->current->item.id != itemIdConfig) {
+		itemIdConfig = selected_item->item->current->item.id;
+
+		if (itemConfig)
+			configFree(itemConfig);
+
+		item_list_t* list = (item_list_t*) selected_item->item->userdata;
+		itemConfig = list->itemGetConfig(itemIdConfig);
 	}
 }
 
@@ -493,37 +529,6 @@ void menuSetSelectedItem(menu_item_t* item) {
 		}
 			
 		itm = itm->next;
-	}
-}
-
-void menuRefreshCache(menu_item_t *menu) {
-	submenu_list_t *cur = menu->submenu;
-
-	while (cur) {
-		if (cur->item.cache_id)
-			free(cur->item.cache_id);
-		if(cur->item.cache_uid)
-			free(cur->item.cache_uid);
-
-		int size = gTheme->gameCacheCount * sizeof(int);
-		cur->item.cache_id = malloc(size);
-		memset(cur->item.cache_id, -1, size);
-		cur->item.cache_uid = malloc(size);
-		memset(cur->item.cache_uid, -1, size);
-
-		cur = cur->next;
-	}
-}
-
-static void menuRefreshConfig() {
-	if (selected_item->item->current->item.id != itemIdConfig) {
-		itemIdConfig = selected_item->item->current->item.id;
-
-		if (itemConfig)
-			configFree(itemConfig);
-
-		item_list_t* list = (item_list_t*) selected_item->item->userdata;
-		itemConfig = list->itemGetConfig(itemIdConfig);
 	}
 }
 

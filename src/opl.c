@@ -94,7 +94,7 @@ static void itemExecCross(struct menu_item *curMenu) {
 		}
 		else {
 			support->itemInit();
-			menuInitHints(curMenu); // This is okay since the itemExec is executed from menu (GUI) itself (no need to defer)
+			menuRefreshState(curMenu, 0);
 			if (!gAutoRefresh)
 				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 		}
@@ -197,7 +197,7 @@ static void initMenuForListSupport(opl_io_module_t* item) {
 	item->menuItem.execCircle = &itemExecCircle;
 
 	item->menuItem.hints = NULL;
-	menuInitHints(&item->menuItem);
+	menuRefreshState(&item->menuItem, 0);
 
 	struct gui_update_t *mc = guiOpCreate(GUI_OP_ADD_MENU);
 	mc->menu.menu = &item->menuItem;
@@ -218,7 +218,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		// stop updates until we're done with init of the device
 		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
-		menuInitHints(&list_support[mode].menuItem);
+		menuRefreshState(&list_support[mode].menuItem, 0);
 		list_support[mode].support->uip = 0;
 
 		if (gAutoRefresh)
@@ -539,7 +539,7 @@ void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 	}
 
 	// theme must be set after color, and lng after theme
-	thmSetGuiValue(themeID, changed);
+	changed = thmSetGuiValue(themeID, changed);
 	if (langID != -1)
 		lngSetGuiValue(langID);
 
@@ -552,22 +552,14 @@ void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 
 	initAllSupport(0);
 
-	if (list_support[USB_MODE].support) {
-		menuInitHints(&list_support[USB_MODE].menuItem);
-		menuRefreshCache(&list_support[USB_MODE].menuItem);
-	}
-	if (list_support[ETH_MODE].support) {
-		menuInitHints(&list_support[ETH_MODE].menuItem);
-		menuRefreshCache(&list_support[ETH_MODE].menuItem);
-	}
-	if (list_support[HDD_MODE].support) {
-		menuInitHints(&list_support[HDD_MODE].menuItem);
-		menuRefreshCache(&list_support[HDD_MODE].menuItem);
-	}
-	if (list_support[APP_MODE].support) {
-		menuInitHints(&list_support[APP_MODE].menuItem);
-		menuRefreshCache(&list_support[APP_MODE].menuItem);
-	} // TODO IZD
+	if (list_support[USB_MODE].support)
+		menuRefreshState(&list_support[USB_MODE].menuItem, changed);
+	if (list_support[ETH_MODE].support)
+		menuRefreshState(&list_support[ETH_MODE].menuItem, changed);
+	if (list_support[HDD_MODE].support)
+		menuRefreshState(&list_support[HDD_MODE].menuItem, changed);
+	if (list_support[APP_MODE].support)
+		menuRefreshState(&list_support[APP_MODE].menuItem, changed);
 
 	if (gAutoRefresh)
 		guiSetFrameHook(&menuUpdateHook);

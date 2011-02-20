@@ -1139,22 +1139,23 @@ char* thmGetValue() {
 	return guiThemesNames[guiThemeID];
 }
 
-void thmSetGuiValue(int themeID, int reload) {
+int thmSetGuiValue(int themeID, int reload) {
 	LOG("thmSetGuiValue() id=%d\n", themeID);
-	if (guiThemeID != themeID || reload) {
-		// negative theme id means reload
-		if (themeID < 0)
-			themeID = guiThemeID;
+	if (themeID != -1) {
+		if (guiThemeID != themeID || reload) {
+			if (themeID != 0)
+				thmLoad(themes[themeID - 1].filePath);
+			else
+				thmLoad(NULL);
 
-		if (themeID != 0)
-			thmLoad(themes[themeID - 1].filePath);
-		else
-			thmLoad(NULL);
-		guiThemeID = themeID;
-		configSetStr(configGetByType(CONFIG_OPL), "theme", thmGetValue());
+			guiThemeID = themeID;
+			configSetStr(configGetByType(CONFIG_OPL), "theme", thmGetValue());
+			return 1;
+		}
+		else if (guiThemeID == 0)
+			thmSetColors(gTheme);
 	}
-	else if (guiThemeID == 0)
-		thmSetColors(gTheme);
+	return 0;
 }
 
 int thmGetGuiValue() {

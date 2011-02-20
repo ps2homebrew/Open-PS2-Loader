@@ -114,7 +114,7 @@ GSTEXTURE* thmGetTexture(unsigned int id);
 void thmEnd();
 
 // Indices are shifted in GUI, as we add the internal default theme at 0
-void thmSetGuiValue(int themeGuiId, int reload);
+int thmSetGuiValue(int themeGuiId, int reload);
 int thmGetGuiValue();
 int thmFindGuiID(char* theme);
 char **thmGetGuiList();

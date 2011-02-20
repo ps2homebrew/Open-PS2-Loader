@@ -119,6 +119,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Dialog color",
 	"Selected color",
 	"Display info page",
+	"Info",
 };
 
 static int guiLangID = 0;

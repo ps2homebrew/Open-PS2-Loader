@@ -1000,6 +1000,18 @@ void guiDrawBGPlasma() {
 	rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
 }
 
+int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color) {
+	GSTEXTURE* iconTex = thmGetTexture(iconId);
+	if (iconTex && iconTex->Mem) {
+		rmDrawPixmap(iconTex, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+		x += iconTex->Width + 2;
+	}
+
+	x += fntRenderString(font, x, y, ALIGN_NONE, _l(textId), color);
+
+	return x;
+}
+
 static void guiDrawOverlays() {
 	// are there any pending operations?
 	int pending = ioHasPendingRequests();
@@ -1172,9 +1184,9 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
 		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
-		fntRenderString(FNT_DEFAULT, 500, 417, ALIGN_NONE, _l(_STR_O_BACK), gTheme->selTextColor);
+		guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, FNT_DEFAULT, 475, 417, gTheme->selTextColor);
 		if (addAccept)
-			fntRenderString(FNT_DEFAULT, 70, 417, ALIGN_NONE, _l(_STR_X_ACCEPT), gTheme->selTextColor);
+			guiDrawIconAndText(CROSS_ICON, _STR_X_ACCEPT, FNT_DEFAULT, 70, 417, gTheme->selTextColor);
 
 		guiEndFrame();
 	}

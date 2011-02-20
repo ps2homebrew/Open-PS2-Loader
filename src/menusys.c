@@ -26,6 +26,36 @@
 #define MENU_EXIT			6
 #define MENU_POWER_OFF		7
 
+// io call to handle the loading of config
+/*#define IO_MENU_LOAD_CONFIG 6
+
+typedef struct {
+	int itemId;
+	item_list_t* list;
+} load_config_request_t;
+
+// Io handled action...
+static void menuLoadConfig(void* data) {
+	load_config_request_t* req = data;
+
+	// already outdated
+	if (req->itemId != itemIdConfig)
+		return;
+
+	itemConfig = req->list->itemGetConfig(itemIdConfig);
+
+	free(req);
+}
+
+static void menuRequestConfig() {
+	if (selected_item->item->current->item.id != itemIdConfig) {
+		load_config_request_t* req = malloc(sizeof(load_config_request_t));
+		req->itemId = itemIdConfig;
+		req->list = selected_item->item->userdata;
+		ioPutRequest(IO_MENU_LOAD_CONFIG, req);
+	}
+}*/ // TODO IZD probably need to load config in deferred IO, but that requires mutual exclusion ... (on "config")
+
 // global menu variables
 static menu_list_t* menu;
 static menu_list_t* selected_item;
@@ -69,6 +99,8 @@ void menuInit() {
 	mainMenu = NULL;
 	mainMenuCurrent = NULL;
 	menuInitMainMenu();
+
+	//ioRegisterHandler(IO_MENU_LOAD_CONFIG, &menuLoadConfig);
 }
 
 void menuEnd() {
@@ -483,6 +515,18 @@ void menuRefreshCache(menu_item_t *menu) {
 	}
 }
 
+static void menuRefreshConfig() {
+	if (selected_item->item->current->item.id != itemIdConfig) {
+		itemIdConfig = selected_item->item->current->item.id;
+
+		if (itemConfig)
+			configFree(itemConfig);
+
+		item_list_t* list = (item_list_t*) selected_item->item->userdata;
+		itemConfig = list->itemGetConfig(itemIdConfig);
+	}
+}
+
 void menuRenderMenu() {
 	guiDrawBGPlasma();
 
@@ -602,15 +646,7 @@ void menuHandleInputMain() {
 		menuNextV();
 	} else if(getKeyOn(KEY_CROSS)) {
 		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first) {
-			if (selected_item->item->current->item.id != itemIdConfig) {
-				itemIdConfig = selected_item->item->current->item.id;
-
-				if (itemConfig)
-					configFree(itemConfig);
-
-				item_list_t *support = selected_item->item->userdata;
-				itemConfig = support->itemGetConfig(itemIdConfig);
-			}
+			menuRefreshConfig();
 
 			guiSwitchScreen(GUI_SCREEN_INFO);
 		} else
@@ -653,7 +689,25 @@ void menuRenderInfo() {
 void menuHandleInputInfo() {
 	if(getKeyOn(KEY_CROSS)) {
 		selected_item->item->execCross(selected_item->item);
+	} else if(getKey(KEY_UP)) {
+		menuPrevV();
+		menuRefreshConfig();
+	} else if(getKey(KEY_DOWN)){
+		menuNextV();
+		menuRefreshConfig();
 	} else if(getKeyOn(KEY_CIRCLE)) {
 		guiSwitchScreen(GUI_SCREEN_MAIN);
+	} else if(getKey(KEY_L1)) {
+		menuPrevPage();
+		menuRefreshConfig();
+	} else if(getKey(KEY_R1)) {
+		menuNextPage();
+		menuRefreshConfig();
+	} else if (getKeyOn(KEY_L2)) {
+		menuFirstPage();
+		menuRefreshConfig();
+	} else if (getKeyOn(KEY_R2)) {
+		menuLastPage();
+		menuRefreshConfig();
 	}
 }

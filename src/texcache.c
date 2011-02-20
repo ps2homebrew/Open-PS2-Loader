@@ -4,7 +4,7 @@
 #include "include/util.h"
 
 // io call to handle the loading of covers
-#define IO_MENU_LOAD_ART 5
+#define IO_CACHE_LOAD_ART 5
 
 typedef struct {
 	image_cache_t* cache;
@@ -49,7 +49,7 @@ static void cacheLoadImage(void* data) {
 }
 
 void cacheInit() {
-	ioRegisterHandler(IO_MENU_LOAD_ART, &cacheLoadImage);
+	ioRegisterHandler(IO_CACHE_LOAD_ART, &cacheLoadImage);
 }
 
 void cacheEnd() {
@@ -151,7 +151,7 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 
 		*UID = cache->nextUID++;
 
-		ioPutRequest(IO_MENU_LOAD_ART, req);
+		ioPutRequest(IO_CACHE_LOAD_ART, req);
 	}
 
 	return NULL;

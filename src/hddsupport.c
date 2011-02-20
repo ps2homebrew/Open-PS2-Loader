@@ -473,16 +473,22 @@ static void hddLaunchGame(int id) {
 }
 
 static config_set_t* hddGetConfig(int id) {
-	config_set_t* config = configAlloc(0, NULL, NULL);
+	char path[255];
 	hdl_game_info_t* game = &hddGames->games[id];
+
+	snprintf(path, 255, "%sCFG/%s.cfg", hddPrefix, game->startup);
+	config_set_t* config = configAlloc(0, NULL, path);
+	configRead(config);
+
+	configSetStr(config, "#Name", game->name);
+	configSetInt(config, "#Size", game->total_size_in_kb >> 10);
 	configSetStr(config, "#Format", "HDL");
 	if (game->disctype == 0x12)
 		configSetStr(config, "#Media", "CD");
 	else
 		configSetStr(config, "#Media", "DVD");
-	configSetStr(config, "#Name", game->name);
 	configSetStr(config, "#Startup", game->startup);
-	configSetInt(config, "#Size", game->total_size_in_kb / 1024);
+
 	return config;
 }
 

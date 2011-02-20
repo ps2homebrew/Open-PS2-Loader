@@ -432,9 +432,7 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 	SignalSema(gFontSemaId);
 
 	if (aligned) {
-		int w = 0, h = 0;
-		fntCalcDimensions(font, string, &w, &h);
-		x -= w >> 1;
+		x -= fntCalcDimensions(font, string) >> 1;
 		y -= MENU_ITEM_HEIGHT >> 1;
 	}
 
@@ -523,9 +521,8 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 	return w;
 }
 
-void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
-	*w = 0;
-	*h = 0;
+int fntCalcDimensions(int font, const unsigned char* str) {
+	int w = 0;
 
 	WaitSema(gFontSemaId);
 	font_t *fnt = &fonts[font];
@@ -556,15 +553,15 @@ void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h) {
 			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
 			if (glyph_index) {
 				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
-				*w += delta.x >> 6;
+				w += delta.x >> 6;
 			}
 			previous = glyph_index;
 		}
 
-		*w += glyph->shx >> 6;
-		if (glyph->height > *h)
-			*h = glyph->height;
+		w += glyph->shx >> 6;
 	}
+
+	return w;
 }
 
 void fntReplace(int id, void* buffer, int bufferSize, int takeover, int asDefault) {

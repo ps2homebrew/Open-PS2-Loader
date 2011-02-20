@@ -359,10 +359,7 @@ static void usbLaunchGame(int id) {
 }
 
 static config_set_t* usbGetConfig(int id) {
-	config_set_t* config = configAlloc(0, NULL, NULL);
-	base_game_info_t* game = &usbGames[id];
-	sbPopulateConfig(game, config);
-	return config;
+	return sbPopulateConfig(&usbGames[id], usbPrefix, "/");
 }
 
 static int usbGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {

@@ -43,11 +43,8 @@ void fntSetAspectRatio(float aw, float ah);
 * @return Width of the string rendered */
 int fntRenderString(int font, int x, int y, short aligned, const unsigned char* string, u64 colour);
 
-/** Calculates the dimensions of the given text string
-@param str The string to calculate dimensions for
-@param w the resulting width of the string
-@param h the resulting height of the string
-*/
-void fntCalcDimensions(int font, const unsigned char* str, int *w, int *h);
+/** Calculates the width of the given text string
+* We can't use the height for alignment, as the horizontal center would depends of the contained text itself */
+int fntCalcDimensions(int font, const unsigned char* str);
 
 #endif

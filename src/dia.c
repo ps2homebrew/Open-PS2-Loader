@@ -308,13 +308,11 @@ static int diaShouldBreakLineAfter(struct UIItem *ui) {
 }
 
 static void diaDrawHint(int text_id) {
-	int w, h;
 	int x, y;
 	
 	char* text = _l(text_id);
-	fntCalcDimensions(FNT_DEFAULT, text, &w, &h);
 	
-	x = screenWidth - w - 10;
+	x = screenWidth - fntCalcDimensions(FNT_DEFAULT, text) - 10;
 	y = gTheme->usedHeight - 40;
 	
 	// render hint on the lower side of the screen.

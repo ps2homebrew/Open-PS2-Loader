@@ -37,6 +37,10 @@ static char **guiThemesNames = NULL;
 #define TYPE_HINT_TEXT			12
 #define TYPE_LOADING_ICON		13
 
+#define DISPLAY_ALWAYS		0
+#define DISPLAY_DEFINED		1
+#define DISPLAY_NEVER		2
+
 static char *elementsType[] = {
 	"AttributeText",
 	"StaticText",
@@ -82,26 +86,65 @@ static void initStaticText(char* themePath, config_set_t* themeConfig, theme_t* 
 
 static void drawAttributeText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	if (config) {
+		attribute_text_t* attributeText = (attribute_text_t*) elem->extended;
 		char *temp;
-		if (configGetStr(config, (char *) elem->extended, &temp))
-			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, temp, elem->color);
+		char result[300];
+
+		if (configGetStr(config, attributeText->attribute, &temp)) {
+			if (attributeText->displayMode == DISPLAY_NEVER)
+				fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, temp, elem->color);
+			else {
+				snprintf(result, 300, "%s : %s", attributeText->alias, temp);
+				fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, result, elem->color);
+			}
+		}
+		else if (attributeText->displayMode == DISPLAY_ALWAYS) {
+			snprintf(result, 300, "%s :", attributeText->alias);
+			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, result, elem->color);
+		}
 	}
 }
 
+static void endAttributeText(theme_element_t* elem) {
+	attribute_text_t* attributeText = (attribute_text_t*) elem->extended;
+	free(attributeText->attribute);
+	free(attributeText->alias);
+
+	free(elem);
+}
+
 static void initAttributeText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
-		char* attribute) {
+		char* attribute, char* alias, int displayMode) {
 
 	char elemProp[64];
 
 	snprintf(elemProp, 64, "%s_attribute", name);
 	configGetStr(themeConfig, elemProp, &attribute);
 	if (attribute) {
-		LOG("elemAttributeText %s: got an attribute: %s\n", name, attribute);
+		attribute_text_t* attributeText = (attribute_text_t*) malloc(sizeof(attribute_text_t));
 
-		int length = strlen(attribute) + 1;
-		elem->extended = (char*) malloc(length * sizeof(char));
-		memcpy(elem->extended, attribute, length);
-		// elem->endElem = &endBasic; does the job
+		snprintf(elemProp, 64, "%s_display", name);
+		configGetInt(themeConfig, elemProp, &displayMode);
+		attributeText->displayMode = displayMode;
+
+		snprintf(elemProp, 64, "%s_title", name);
+		configGetStr(themeConfig, elemProp, &alias);
+		if (!alias) {
+			if (attribute[0] == '#')
+				alias = &attribute[1];
+			else
+				alias = attribute;
+		}
+		int length = strlen(alias) + 1;
+		attributeText->alias = (char*) malloc(length * sizeof(char));
+		memcpy(attributeText->alias, alias, length);
+
+		length = strlen(attribute) + 1;
+		attributeText->attribute = (char*) malloc(length * sizeof(char));
+		memcpy(attributeText->attribute, attribute, length);
+
+		elem->extended = attributeText;
+		elem->endElem = &endAttributeText;
 
 		elem->drawElem = &drawAttributeText;
 	} else
@@ -367,20 +410,20 @@ static void drawAttributeImage(struct menu_list* menu, struct submenu_list* item
 			}
 			int posZ = 0;
 			GSTEXTURE* texture = cacheGetTexture(attributeImage->cache, menu->item->userdata, &posZ, &attributeImage->currentUid, value);
-			if (!texture || !texture->Mem) {
-				if (attributeImage->defaultTexture)
-					texture = &attributeImage->defaultTexture->source;
-				else
-					return;
+			if (texture && texture->Mem) {
+				if (attributeImage->overlayTexture) {
+					rmDrawOverlayPixmap(&attributeImage->overlayTexture->source, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol,
+						texture, attributeImage->overlayTexture->upperLeft_x, attributeImage->overlayTexture->upperLeft_y, attributeImage->overlayTexture->upperRight_x, attributeImage->overlayTexture->upperRight_y,
+						attributeImage->overlayTexture->lowerLeft_x, attributeImage->overlayTexture->lowerLeft_y, attributeImage->overlayTexture->lowerRight_x, attributeImage->overlayTexture->lowerRight_y);
+				} else
+					rmDrawPixmap(texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol);
 			}
 
-			if (attributeImage->overlayTexture) {
-				rmDrawOverlayPixmap(&attributeImage->overlayTexture->source, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol,
-					texture, attributeImage->overlayTexture->upperLeft_x, attributeImage->overlayTexture->upperLeft_y, attributeImage->overlayTexture->upperRight_x, attributeImage->overlayTexture->upperRight_y,
-					attributeImage->overlayTexture->lowerLeft_x, attributeImage->overlayTexture->lowerLeft_y, attributeImage->overlayTexture->lowerRight_x, attributeImage->overlayTexture->lowerRight_y);
-			} else
-				rmDrawPixmap(texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol);
+			return;
 		}
+
+		if (attributeImage->defaultTexture)
+			rmDrawPixmap(&attributeImage->defaultTexture->source, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, gDefaultCol);
 	}
 }
 
@@ -567,11 +610,12 @@ static void drawItemsList(struct menu_list* menu, struct submenu_list* item, con
 
 			if (itemsList->decoratorImage) {
 				GSTEXTURE* itemIconTex = getGameImageTexture(itemsList->decoratorImage->cache, menu->item->userdata, &ps->item);
-				if (!itemIconTex || !itemIconTex->Mem) {
+				if (itemIconTex && itemIconTex->Mem)
+					rmDrawPixmap(itemIconTex, elem->posX, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, gDefaultCol);
+				else {
 					if (itemsList->decoratorImage->defaultTexture)
 						rmDrawPixmap(&itemsList->decoratorImage->defaultTexture->source, elem->posX, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, gDefaultCol);
-				} else
-					rmDrawPixmap(itemIconTex, elem->posX, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, gDefaultCol);
+				}
 				fntRenderString(elem->font, elem->posX + DECORATOR_SIZE, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, submenuItemGetText(&ps->item), color);
 			} else
 				fntRenderString(elem->font, elem->posX, curpos + others * MENU_ITEM_HEIGHT, ALIGN_NONE, submenuItemGetText(&ps->item), color);
@@ -602,12 +646,9 @@ static void initItemsList(char* themePath, config_set_t* themeConfig, theme_t* t
 	itemsList->decorator = NULL;
 	snprintf(elemProp, 64, "%s_decorator", name);
 	configGetStr(themeConfig, elemProp, &decorator);
-	if (decorator) {
-		LOG("elemItemsList %s: got a decorator: %s\n", name, decorator);
+	if (decorator)
+		itemsList->decorator = decorator; // Will be used later (thmValidate)
 
-		// Will be used later (thmValidate)
-		itemsList->decorator = decorator;
-	}
 	itemsList->decoratorImage = NULL;
 
 	elem->extended = itemsList;
@@ -626,18 +667,10 @@ static void drawItemText(struct menu_list* menu, struct submenu_list* item, conf
 static void drawHintText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	menu_hint_item_t* hint = menu->item->hints;
 	if (hint) {
-		GSTEXTURE* hintIconTex = NULL;
 		int x = elem->posX;
-		int y = elem->posY;
 
 		for (; hint; hint = hint->next) {
-			hintIconTex = thmGetTexture(hint->icon_id);
-			if (hintIconTex && hintIconTex->Mem) {
-				rmDrawPixmap(hintIconTex, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
-				x += hintIconTex->Width + 2;
-			}
-
-			x += fntRenderString(elem->font, x, y, ALIGN_NONE, _l(hint->text_id), elem->color);
+			x = guiDrawIconAndText(hint->icon_id, hint->text_id, elem->font, x, elem->posY, elem->color);
 			x += 12;
 		}
 	}
@@ -717,7 +750,7 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 		if (type) {
 			if (!strcmp(elementsType[TYPE_ATTRIBUTE_TEXT], type)) {
 				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
-				initAttributeText(themePath, themeConfig, theme, elem, name, NULL);
+				initAttributeText(themePath, themeConfig, theme, elem, name, NULL, NULL, DISPLAY_ALWAYS);
 			} else if (!strcmp(elementsType[TYPE_STATIC_TEXT], type)) {
 				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
 				initStaticText(themePath, themeConfig, theme, elem, name, NULL);

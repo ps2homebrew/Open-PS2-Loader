@@ -354,10 +354,7 @@ static void ethLaunchGame(int id) {
 }
 
 static config_set_t* ethGetConfig(int id) {
-	config_set_t* config = configAlloc(0, NULL, NULL);
-	base_game_info_t* game = &ethGames[id];
-	sbPopulateConfig(game, config);
-	return config;
+	return sbPopulateConfig(&ethGames[id], ethPrefix, "\\");
 }
 
 static int ethGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {

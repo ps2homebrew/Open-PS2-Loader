@@ -4,6 +4,7 @@
 #include "include/iosupport.h"
 #include "include/system.h"
 #include "include/supportbase.h"
+#include "include/ioman.h"
 
 /// internal linked list used to populate the list from directory listing
 struct game_list_t {
@@ -61,6 +62,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 				game->parts = 0x01;
 				game->media = type;
 				game->isISO = 1;
+				game->sizeMB = (record.stat.size >> 20) | (record.stat.hisize << 12);
 
 				count++;
 			}
@@ -119,6 +121,7 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 				memcpy(&g->parts, &buffer[47], 1);
 				memcpy(&g->media, &buffer[48], 1);
 				g->isISO = 0;
+				g->sizeMB = -1;
 				size -= 0x40;
 			}
 		}
@@ -299,7 +302,15 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 	}
 }
 
-void sbPopulateConfig(base_game_info_t* game, config_set_t* config) {
+config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep) {
+	char path[255];
+	snprintf(path, 255, "%sCFG%s%s.cfg", prefix, sep, game->startup);
+	config_set_t* config = configAlloc(0, NULL, path);
+	configRead(config);
+
+	configSetStr(config, "#Name", game->name);
+	if (game->sizeMB != -1)
+		configSetInt(config, "#Size", game->sizeMB);
 	if (game->isISO)
 		configSetStr(config, "#Format", "ISO");
 	else
@@ -310,8 +321,7 @@ void sbPopulateConfig(base_game_info_t* game, config_set_t* config) {
 	else
 		configSetStr(config, "#Media", "DVD");
 
-	configSetStr(config, "#Name", game->name);
 	configSetStr(config, "#Startup", game->startup);
-	// TODO IZD add size
-	// TODO IZD load real config file
+
+	return config;
 }

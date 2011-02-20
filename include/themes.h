@@ -42,6 +42,12 @@ typedef struct {
 } mutable_image_t;
 
 typedef struct {
+	int displayMode;
+	char* attribute;
+	char* alias;
+} attribute_text_t;
+
+typedef struct {
 	int displayedItems;
 
 	char* decorator;

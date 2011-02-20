@@ -83,7 +83,6 @@ void submenuSort(submenu_list_t** submenu);
 
 char *submenuItemGetText(submenu_item_t* it);
 char *menuItemGetText(menu_item_t* it);
-void menuRefreshCache(menu_item_t *menu);
 
 void menuRenderMain();
 void menuRenderMenu();
@@ -97,6 +96,7 @@ void menuSetSelectedItem(menu_item_t *item);
 
 void menuAddHint(menu_item_t *menu, int text_id, int icon_id);
 void menuRemoveHints(menu_item_t *menu);
-void menuInitHints(menu_item_t *menu);
+
+void menuRefreshState(menu_item_t *menu, int themeChanged);
 
 #endif

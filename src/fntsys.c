@@ -37,6 +37,8 @@ static int gCharHeight;
 static s32 gFontSemaId;
 static ee_sema_t gFontSema;
 
+static GSCLUT fontClut;
+
 /** Single entry in the glyph cache */
 typedef struct {
 	int isValid;
@@ -138,6 +140,28 @@ static void fntResetFontDef(font_t *fnt) {
 	fnt->dataPtr = NULL;
 }
 
+static void fntPrepareCLUT() {
+	fontClut.PSM = GS_PSM_T8;
+	fontClut.ClutPSM = GS_PSM_CT32;
+	fontClut.Clut = memalign(128, 256 * 4);
+	fontClut.VramClut = 0;
+	
+	// generate the clut table
+	size_t i;
+	u32 *clut = fontClut.Clut;
+	for (i = 0; i < 256; ++i) {
+		u8 alpha =  i > 0x080 ? 0x080 : i;
+		
+		*clut = alpha << 24 | i << 16 | i << 8 | i;
+		clut++; 
+	}
+}
+
+static void fntDestroyCLUT() {
+	free(fontClut.Clut);
+	fontClut.Clut = NULL;
+}
+
 void fntInit(void) {
 	LOG("fntInit\n");
 	int error = FT_Init_FreeType(&font_library);
@@ -147,6 +171,8 @@ void fntInit(void) {
 		LOG("Freetype init failed with %x!\n", error);
 		// SleepThread();
 	}
+
+	fntPrepareCLUT();
 
 	gFontSema.init_count = 1;
 	gFontSema.max_count = 1;
@@ -322,6 +348,17 @@ void fntEnd(void) {
 	FT_Done_FreeType(font_library);
 
 	DeleteSema(gFontSemaId);
+	
+	fntDestroyCLUT();
+}
+
+static atlas_t *fntNewAtlas() {
+	atlas_t *atl = atlasNew(ATLAS_WIDTH, ATLAS_HEIGHT, GS_PSM_T8);
+	
+	atl->surface.ClutPSM = GS_PSM_CT32;
+	atl->surface.Clut = (u32*)(&fontClut);
+
+	return atl;
 }
 
 static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
@@ -341,11 +378,11 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 		atlas_t **atl = &fnt->atlases[aid];
 		if (!*atl) { // atlas slot not yet used
 			LOG("  * aid %d is new...\n", aid);
-			*atl = atlasNew(ATLAS_WIDTH, ATLAS_HEIGHT);
+			*atl = fntNewAtlas();
 		}
 		
 		glyph->allocation = 
-			atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, GS_PSM_T8, slot->bitmap.buffer);
+			atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
 			
 		if (glyph->allocation) {
 			LOG("  * found placement\n", aid);

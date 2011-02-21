@@ -76,7 +76,7 @@ static inline struct atlas_allocation_t *allocPlace(struct atlas_allocation_t *a
 	return NULL;
 }
 
-atlas_t *atlasNew(size_t width, size_t height) {
+atlas_t *atlasNew(size_t width, size_t height, u8 psm) {
 	atlas_t *atlas = (atlas_t*)malloc(sizeof(atlas_t));
 	
 	atlas->allocation = allocNew(0, 0, width, height);
@@ -86,16 +86,18 @@ atlas_t *atlasNew(size_t width, size_t height) {
 	
 	atlas->surface.Filter = GS_FILTER_LINEAR;
 	
-	// TODO: Use specified pixel config, or T8/Clut only, 
-	/* 
-	 atlas->surface.ClutPSM = GS_PSM_CT32;
-	 */
-	atlas->surface.PSM = GS_PSM_CT32;
-	atlas->surface.Mem = (u32*) memalign(128, gsKit_texture_size(width, height, GS_PSM_CT32));
+	size_t txtsize = gsKit_texture_size(width, height, psm);
+	atlas->surface.PSM = psm;
+	atlas->surface.Mem = (u32*) memalign(128, txtsize);
 	atlas->surface.Vram = 0;
 	
+	// defaults to no clut
+	atlas->surface.ClutPSM = 0;
+	atlas->surface.Clut = NULL;
+	atlas->surface.VramClut = 0;
+	
 	// zero out the atlas surface
-	memset(atlas->surface.Mem, 0, width * height * 4);
+	memset(atlas->surface.Mem, 0x0, txtsize);
 	
 	return atlas;
 }
@@ -113,10 +115,42 @@ void atlasFree(atlas_t *atlas) {
 	free(atlas);
 }
 
-struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, size_t height, u8 psm, void *surface) {
-	if ((psm != GS_PSM_CT32) && (psm != GS_PSM_T8))
-		return NULL;
+static size_t pixelSize(u8 psm) {
+	switch (psm) {
+		case GS_PSM_CT32:  return 4;
+		case GS_PSM_CT24:  return 4;
+		case GS_PSM_CT16:  return 2;
+		case GS_PSM_CT16S: return 2;
+		case GS_PSM_T8:    return 1;
+		default:
+			return 0;
+	}
+}
+
+// copies the data into atlas
+static void atlasCopyData(atlas_t *atlas, struct atlas_allocation_t *al, size_t width, size_t height, const void *surface) {
+	int y;
+	size_t ps = pixelSize(atlas->surface.PSM);
 	
+	if (!ps)
+		return;
+	
+	const char *src = surface;
+	char *data = (char*)atlas->surface.Mem;
+
+	// advance the pointer to the atlas position start (first pixel)
+	data += ps * (al->y * atlas->allocation->w + al->x);
+	
+	size_t rowsize = width * ps;
+	
+	for (y = 0; y < height; ++y) {
+		memcpy(data, src, rowsize);
+		data += ps * atlas->allocation->w;
+		src  += ps * width;
+	}
+}
+
+struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, size_t height, const void *surface) {
 	if (!surface)
 		return NULL;
 	
@@ -125,38 +159,7 @@ struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, size_t heigh
 	if (!al)
 		return NULL;
 	
-	
-	int x, y;
-	
-	// copy data
-	if (psm == GS_PSM_CT32) {
-		u32 *src = (u32*)surface;
-		u32 *data = atlas->surface.Mem;
-		data += al->y * atlas->allocation->w + al->x;
-		
-		for (y = 0; y < height; ++y) {
-			memcpy(data, surface, width * 4);
-			data += atlas->allocation->w;
-			src += width;
-		}
-	} else if (psm == GS_PSM_T8) {
-		u8 *src = (u8*)surface;
-		u8 *data = (u8*)(atlas->surface.Mem + (al->y * atlas->allocation->w + al->x));
-		
-		for (y = 0; y < height; ++y) {
-			for (x = 0; x < width; ++x) {
-				char c = *src++;
-
-				(*data++) = c;
-				(*data++) = c;
-				(*data++) = c;
-				(*data++) = c;
-			}
-			
-			// to the next scanline start
-			data += 4 * (atlas->allocation->w - width);
-		}
-	}
+	atlasCopyData(atlas, al, width, height, surface);
 	
 	return al;
 }

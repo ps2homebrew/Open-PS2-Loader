@@ -16,12 +16,18 @@ typedef struct {
 	GSTEXTURE surface;
 } atlas_t;
 
-atlas_t *atlasNew(size_t width, size_t height);
+/** allocates a new atlas. Further settings should be set manually
+ * on the atlas_t::surface.
+  */
+atlas_t *atlasNew(size_t width, size_t height, u8 psm);
+
+/// Frees the atlas
 void atlasFree(atlas_t *atlas);
 
 /** Allocates a place in atlas for the given pixmap data.
  * Atlas expects 32bit pixels - all the time
  */
-struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, size_t height, u8 psm, void *surface);
+struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, 
+									  size_t height, const void *surface);
 
 #endif

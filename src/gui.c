@@ -115,7 +115,6 @@ void guiInit(void) {
 	gGUILockSemaId = CreateSema(&gQueueSema);
 
 	guiReloadScreenExtents();
-	menuInit();
 
 	// background texture - for perlin
 	gBackgroundTex.Width = PLASMA_W;
@@ -147,7 +146,8 @@ void guiEnd() {
 	if (gBackgroundTex.Mem)
 		free(gBackgroundTex.Mem);
 
-	menuEnd();
+	DeleteSema(gSemaId);
+	DeleteSema(gGUILockSemaId);
 }
 
 void guiLock(void) {

@@ -9,6 +9,15 @@
 #define ALIGN_NONE		0
 #define ALIGN_CENTER	1
 
+
+/// GSKit CLUT base struct. This should've been in gsKit from the start :)
+typedef struct {
+	u8  PSM;        ///< Pixel Storage Method (Color Format)
+	u8  ClutPSM;    ///< CLUT Pixel Storage Method (Color Format)
+	u32 *Clut;      ///< EE CLUT Memory Pointer
+	u32 VramClut;   ///< GS VRAM CLUT Memory Pointer
+} GSCLUT;
+
 typedef struct {
 	float x, y;
 	float u, v;
@@ -35,7 +44,10 @@ enum rm_vmode {
     RM_VMODE_NTSC
 } ;
 
-/** Initializes the rendering manager */
+/** Initializes the rendering manager 
+ * @param vsyncon 1 == vsync enabled, 0 == vsync disabled
+ * @param vmodeset Video mode
+ */
 void rmInit(int vsyncon, enum rm_vmode vmodeset);
 
 /** Sets a new screen mode */

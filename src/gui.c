@@ -124,6 +124,8 @@ void guiInit(void) {
 	gBackgroundTex.PSM = GS_PSM_CT32;
 	gBackgroundTex.Filter = GS_FILTER_LINEAR;
 	gBackgroundTex.Vram = 0;
+	gBackgroundTex.VramClut = 0;
+	gBackgroundTex.Clut = NULL;
 
 	wideScreenScale = 1.0f;
 

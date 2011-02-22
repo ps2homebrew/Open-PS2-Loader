@@ -1,0 +1,105 @@
+# translation by izdubar
+French
+	              BIENVENUE DANS OPEN PS2 LOADER. CODE PRINCIPAL FONDÉ SUR LE CODE SOURCE D'HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> LA PLUPART DU CODE DU COEUR DU LOADER EST DE JIMMIKAELKAEL. TOUTES LES AMÉLIORATIONS DU GUI SONT DE VOLCA. MERCI D'UTILISER NOTRE PROGRAMME ^^
+Open PS2 Loader %s
+Sauvegarder les changements
+O Retour
+Réglages réseau
+<vide>
+Réglages sauvegardés...
+Erreur à l'écriture des réglages!
+Sortir
+Réglages
+Jeux sur USB
+Jeux sur disque dur
+Jeux sur réseau
+Applications
+Thème
+Langue
+Erreur de démarrage réseau
+Oui
+Non
+Ok
+Réglages du jeu
+Désactiver tous les réglages
+Tous modes désactivés
+Défilement
+Lent
+Moyen
+Rapide
+Menu par défaut
+Lire du disque
+Patientez
+Erreur de chargement du Game ID
+Tri automatique
+Erreur de chargement du fichier de langue
+Désactiver les couleurs de debug
+Pas de controlleur détecté...
+Utiliser les Cover Art
+Écran large
+Éteindre
+Chargement de la configuration
+Sauvegarde de la configuration
+Démarrer le périphérique
+Démarrage mode USB
+Démarrage mode HDD
+Démarrage mode ETH
+Démarrage Applications
+Auto
+Manuel
+Démarrer le serveur HDL
+Démarrage du serveur HDL...
+Serveur HDL en fonction... Appuyer sur [O] pour l'arrêter
+Appuyer sur [X]
+Déchargement du serveur HDL...
+Quitter vers
+Couleur de fond
+Couleur de texte
+Adresse IP
+Masque
+Passerelle
+Port
+Partage
+Utilisateur
+Mot de passe
+<non défini>
+X Accepter
+L'élément sera définitivement supprimé
+Renommer
+Supprimer
+Démarrer
+Réglages graphique
+Activer les opérations Supprimer/Renommer
+Vérifier la fragmentation des jeux USB
+Se rappeler le dernier jeu
+Erreur, le jeu est fragmenté
+Erreur, impossible de lancer l'élement
+Test
+Laisser vide pour le mode Invité
+Charger le coeur alternatif
+Méthode de lecture alternative
+Désactiver Syscalls
+mode 0 PSS
+Désactiver DVD-DL
+Désactiver IGR
+Tampon cdvdfsv réduit
+Cacher le module dev9
+Utiliser le combo IGR alternatif
+Changer la taille de la VMC la reformatera
+Créer
+Modifier
+Annuler
+Réinitialiser
+Utiliser générique
+Configurer VMC
+Nom
+Taille
+Status
+Progression
+La VMC existe
+Fichier VMC incorrect, taille de VMC invalide
+La VMC doit être crée
+Erreur avec la VMC, continuer en utilisant la MC physique ?
+Rafraîchissement automatique
+À propos
+Développeurs

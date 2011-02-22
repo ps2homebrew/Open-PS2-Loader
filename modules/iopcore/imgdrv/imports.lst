@@ -1,0 +1,8 @@
+ioman_IMPORTS_start
+I_AddDrv
+/*I_DelDrv*/
+ioman_IMPORTS_end
+
+sysclib_IMPORTS_start
+I_memcpy
+sysclib_IMPORTS_end

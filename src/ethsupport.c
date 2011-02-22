@@ -103,7 +103,7 @@ static void ethLoadModules(void) {
 	// update Themes
 	char path[255];
 	sprintf(path, "%sTHM", ethPrefix);
-	thmAddElements(path, "\\");
+	thmAddElements(path, "\\", ethGameList.mode);
 
 #ifdef VMC
 	sprintf(path, "%sVMC", ethPrefix);

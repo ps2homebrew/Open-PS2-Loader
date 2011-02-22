@@ -76,6 +76,7 @@ void menuEnd();
 
 void menuAppendItem(menu_item_t* item);
 
+void submenuRebuildCache(submenu_list_t* submenu);
 submenu_list_t* submenuAppendItem(submenu_list_t** submenu, int icon_id, char *text, int id, int text_id);
 void submenuRemoveItem(submenu_list_t** submenu, int id);
 void submenuDestroy(submenu_list_t** submenu);
@@ -96,7 +97,5 @@ void menuSetSelectedItem(menu_item_t *item);
 
 void menuAddHint(menu_item_t *menu, int text_id, int icon_id);
 void menuRemoveHints(menu_item_t *menu);
-
-void menuRefreshState(menu_item_t *menu, int themeChanged);
 
 #endif

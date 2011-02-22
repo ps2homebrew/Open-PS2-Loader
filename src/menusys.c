@@ -53,12 +53,10 @@ typedef struct {
 static void menuLoadConfig(void* data) {
 	load_config_request_t* req = data;
 
-	// already outdated
-	if (req->itemId != selected_item->item->current->item.id)
+	WaitSema(menuSemaId);
+	if (itemConfig || (req->itemId != itemIdConfig))
 		return;
 
-	WaitSema(menuSemaId);
-	itemIdConfig = selected_item->item->current->item.id;
 	itemConfig = req->list->itemGetConfig(itemIdConfig);
 	SignalSema(menuSemaId);
 
@@ -67,8 +65,8 @@ static void menuLoadConfig(void* data) {
 
 static void menuRequestConfig() {
 	item_list_t* list = selected_item->item->userdata;
-	//if (guiInactiveFrames < list->delay)
-	//	return;
+	if (guiInactiveFrames < list->delay)
+		return;
 
 	WaitSema(menuSemaId);
 	if (itemIdConfig != selected_item->item->current->item.id) {
@@ -77,8 +75,10 @@ static void menuRequestConfig() {
 			itemConfig = NULL;
 		}
 
+		itemIdConfig = selected_item->item->current->item.id;
+
 		load_config_request_t* req = malloc(sizeof(load_config_request_t));
-		req->itemId = selected_item->item->current->item.id;
+		req->itemId = itemIdConfig;
 		req->list = list;
 		ioPutRequest(IO_MENU_LOAD_CONFIG, req);
 	}
@@ -185,11 +185,25 @@ void menuAppendItem(menu_item_t* item) {
 	newitem->prev = cur;
 }
 
+void submenuRebuildCache(submenu_list_t* submenu) {
+	while (submenu) {
+		if (submenu->item.cache_id)
+			free(submenu->item.cache_id);
+		if(submenu->item.cache_uid)
+			free(submenu->item.cache_uid);
 
-static submenu_list_t* AllocSubMenuItem(int icon_id, char *text, int id, int text_id) {
-	submenu_list_t* it;
-	
-	it = malloc(sizeof(submenu_list_t));
+		int size = gTheme->gameCacheCount * sizeof(int);
+		submenu->item.cache_id = malloc(size);
+		memset(submenu->item.cache_id, -1, size);
+		submenu->item.cache_uid = malloc(size);
+		memset(submenu->item.cache_uid, -1, size);
+
+		submenu = submenu->next;
+	}
+}
+
+static submenu_list_t* submenuAllocItem(int icon_id, char *text, int id, int text_id) {
+	submenu_list_t* it = (submenu_list_t*) malloc(sizeof(submenu_list_t));
 	
 	it->prev = NULL;
 	it->next = NULL;
@@ -197,20 +211,14 @@ static submenu_list_t* AllocSubMenuItem(int icon_id, char *text, int id, int tex
 	it->item.text = text;
 	it->item.text_id = text_id;
 	it->item.id = id;
-	
-	// no cache entry yet
-	int size = gTheme->gameCacheCount * sizeof(int);
-	it->item.cache_id = malloc(size);
-	memset(it->item.cache_id, -1, size);
-	it->item.cache_uid = malloc(size);
-	memset(it->item.cache_uid, -1, size);
+	submenuRebuildCache(it);
 	
 	return it;
 }
 
 submenu_list_t* submenuAppendItem(submenu_list_t** submenu, int icon_id, char *text, int id, int text_id) {
 	if (*submenu == NULL) {
-		*submenu = AllocSubMenuItem(icon_id, text, id, text_id);
+		*submenu = submenuAllocItem(icon_id, text, id, text_id);
 		return *submenu; 
 	}
 	
@@ -221,7 +229,7 @@ submenu_list_t* submenuAppendItem(submenu_list_t** submenu, int icon_id, char *t
 		cur = cur->next;
 	
 	// create new item
-	submenu_list_t *newitem = AllocSubMenuItem(icon_id, text, id, text_id);
+	submenu_list_t *newitem = submenuAllocItem(icon_id, text, id, text_id);
 	
 	// link
 	cur->next = newitem;
@@ -300,50 +308,6 @@ void menuRemoveHints(menu_item_t *menu) {
 		menu_hint_item_t* hint = menu->hints;
 		menu->hints = hint->next;
 		free(hint);
-	}
-}
-
-void menuRefreshState(menu_item_t* menu, int themeChanged) {
-	// refresh Hints
-	menuRemoveHints(menu);
-
-	menuAddHint(menu, _STR_SETTINGS, START_ICON);
-	item_list_t *support = menu->userdata;
-	if (!support->enabled)
-		menuAddHint(menu, _STR_START_DEVICE, CROSS_ICON);
-	else {
-		if (gUseInfoScreen && gTheme->infoElems.first)
-			menuAddHint(menu, _STR_INFO, CROSS_ICON);
-		else
-			menuAddHint(menu, _STR_RUN, CROSS_ICON);
-		if (support->itemGetCompatibility)
-			menuAddHint(menu, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
-		if (gEnableDandR) {
-			if (support->itemRename)
-				menuAddHint(menu, _STR_RENAME, CIRCLE_ICON);
-			if (support->itemDelete)
-				menuAddHint(menu, _STR_DELETE, SQUARE_ICON);
-		}
-	}
-
-	// refresh Cache
-	if (themeChanged) {
-		submenu_list_t *cur = menu->submenu;
-
-		while (cur) {
-			if (cur->item.cache_id)
-				free(cur->item.cache_id);
-			if(cur->item.cache_uid)
-				free(cur->item.cache_uid);
-
-			int size = gTheme->gameCacheCount * sizeof(int);
-			cur->item.cache_id = malloc(size);
-			memset(cur->item.cache_id, -1, size);
-			cur->item.cache_uid = malloc(size);
-			memset(cur->item.cache_uid, -1, size);
-
-			cur = cur->next;
-		}
 	}
 }
 
@@ -664,11 +628,9 @@ void menuHandleInputMain() {
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
 	} else if(getKeyOn(KEY_CROSS)) {
-		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first) {
-			menuRequestConfig();
-
+		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first)
 			guiSwitchScreen(GUI_SCREEN_INFO);
-		} else
+		else
 			selected_item->item->execCross(selected_item->item);
 	} else if(getKeyOn(KEY_TRIANGLE)) {
 		selected_item->item->execTriangle(selected_item->item);
@@ -696,6 +658,8 @@ void menuHandleInputMain() {
 void menuRenderInfo() {
 	submenu_list_t* cur = selected_item->item->current;
 
+	menuRequestConfig();
+
 	theme_element_t* elem = gTheme->infoElems.first;
 	while (elem) {
 		if (elem->drawElem)
@@ -710,23 +674,17 @@ void menuHandleInputInfo() {
 		selected_item->item->execCross(selected_item->item);
 	} else if(getKey(KEY_UP)) {
 		menuPrevV();
-		menuRequestConfig();
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
-		menuRequestConfig();
 	} else if(getKeyOn(KEY_CIRCLE)) {
 		guiSwitchScreen(GUI_SCREEN_MAIN);
 	} else if(getKey(KEY_L1)) {
 		menuPrevPage();
-		menuRequestConfig();
 	} else if(getKey(KEY_R1)) {
 		menuNextPage();
-		menuRequestConfig();
 	} else if (getKeyOn(KEY_L2)) {
 		menuFirstPage();
-		menuRequestConfig();
 	} else if (getKeyOn(KEY_R2)) {
 		menuLastPage();
-		menuRequestConfig();
 	}
 }

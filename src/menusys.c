@@ -54,10 +54,8 @@ static void menuLoadConfig(void* data) {
 	load_config_request_t* req = data;
 
 	WaitSema(menuSemaId);
-	if (itemConfig || (req->itemId != itemIdConfig))
-		return;
-
-	itemConfig = req->list->itemGetConfig(itemIdConfig);
+	if (!itemConfig && (req->itemId == itemIdConfig))
+		itemConfig = req->list->itemGetConfig(itemIdConfig);
 	SignalSema(menuSemaId);
 
 	free(req);

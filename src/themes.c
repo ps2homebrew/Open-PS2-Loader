@@ -749,10 +749,10 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 		configGetStr(themeConfig, elemProp, &type);
 		if (type) {
 			if (!strcmp(elementsType[TYPE_ATTRIBUTE_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, theme->textColor, FNT_DEFAULT);
 				initAttributeText(themePath, themeConfig, theme, elem, name, NULL, NULL, DISPLAY_ALWAYS);
 			} else if (!strcmp(elementsType[TYPE_STATIC_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, theme->textColor, FNT_DEFAULT);
 				initStaticText(themePath, themeConfig, theme, elem, name, NULL);
 			} else if (!strcmp(elementsType[TYPE_ATTRIBUTE_IMAGE], type)) {
 				elem = initBasic(themePath, themeConfig, theme, screenWidth, screenHeight, name, TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, gDefaultCol, FNT_DEFAULT);

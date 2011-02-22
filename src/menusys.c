@@ -26,36 +26,6 @@
 #define MENU_EXIT			6
 #define MENU_POWER_OFF		7
 
-// io call to handle the loading of config
-/*#define IO_MENU_LOAD_CONFIG 6
-
-typedef struct {
-	int itemId;
-	item_list_t* list;
-} load_config_request_t;
-
-// Io handled action...
-static void menuLoadConfig(void* data) {
-	load_config_request_t* req = data;
-
-	// already outdated
-	if (req->itemId != itemIdConfig)
-		return;
-
-	itemConfig = req->list->itemGetConfig(itemIdConfig);
-
-	free(req);
-}
-
-static void menuRequestConfig() {
-	if (selected_item->item->current->item.id != itemIdConfig) {
-		load_config_request_t* req = malloc(sizeof(load_config_request_t));
-		req->itemId = itemIdConfig;
-		req->list = selected_item->item->userdata;
-		ioPutRequest(IO_MENU_LOAD_CONFIG, req);
-	}
-}*/ // TODO IZD probably need to load config in deferred IO, but that requires mutual exclusion ... (on "config")
-
 // global menu variables
 static menu_list_t* menu;
 static menu_list_t* selected_item;
@@ -67,6 +37,53 @@ static config_set_t* itemConfig;
 static submenu_list_t* mainMenu;
 // active item in the main menu
 static submenu_list_t* mainMenuCurrent;
+
+// io call to handle the loading of config
+#define IO_MENU_LOAD_CONFIG 6
+
+static s32 menuSemaId;
+static ee_sema_t menuSema;
+
+typedef struct {
+	int itemId;
+	item_list_t* list;
+} load_config_request_t;
+
+// Io handled action...
+static void menuLoadConfig(void* data) {
+	load_config_request_t* req = data;
+
+	// already outdated
+	if (req->itemId != selected_item->item->current->item.id)
+		return;
+
+	WaitSema(menuSemaId);
+	itemIdConfig = selected_item->item->current->item.id;
+	itemConfig = req->list->itemGetConfig(itemIdConfig);
+	SignalSema(menuSemaId);
+
+	free(req);
+}
+
+static void menuRequestConfig() {
+	item_list_t* list = selected_item->item->userdata;
+	//if (guiInactiveFrames < list->delay)
+	//	return;
+
+	WaitSema(menuSemaId);
+	if (itemIdConfig != selected_item->item->current->item.id) {
+		if (itemConfig) {
+			configFree(itemConfig);
+			itemConfig = NULL;
+		}
+
+		load_config_request_t* req = malloc(sizeof(load_config_request_t));
+		req->itemId = selected_item->item->current->item.id;
+		req->list = list;
+		ioPutRequest(IO_MENU_LOAD_CONFIG, req);
+	}
+	SignalSema(menuSemaId);
+}
 
 static void menuInitMainMenu() {
 	if (mainMenu)
@@ -100,7 +117,12 @@ void menuInit() {
 	mainMenuCurrent = NULL;
 	menuInitMainMenu();
 
-	//ioRegisterHandler(IO_MENU_LOAD_CONFIG, &menuLoadConfig);
+	menuSema.init_count = 1;
+	menuSema.max_count = 1;
+	menuSema.option = 0;
+	menuSemaId = CreateSema(&menuSema);
+
+	ioRegisterHandler(IO_MENU_LOAD_CONFIG, &menuLoadConfig);
 }
 
 void menuEnd() {
@@ -121,8 +143,12 @@ void menuEnd() {
 
 	submenuDestroy(&mainMenu);
 
-	if (itemConfig)
+	if (itemConfig) {
 		configFree(itemConfig);
+		itemConfig = NULL;
+	}
+
+	DeleteSema(menuSemaId);
 }
 
 static menu_list_t* AllocMenuItem(menu_item_t* item) {
@@ -318,18 +344,6 @@ void menuRefreshState(menu_item_t* menu, int themeChanged) {
 
 			cur = cur->next;
 		}
-	}
-}
-
-static void menuRefreshConfig() { // may be replaced by menuRequestConfig
-	if (selected_item->item->current->item.id != itemIdConfig) {
-		itemIdConfig = selected_item->item->current->item.id;
-
-		if (itemConfig)
-			configFree(itemConfig);
-
-		item_list_t* list = (item_list_t*) selected_item->item->userdata;
-		itemConfig = list->itemGetConfig(itemIdConfig);
 	}
 }
 
@@ -651,7 +665,7 @@ void menuHandleInputMain() {
 		menuNextV();
 	} else if(getKeyOn(KEY_CROSS)) {
 		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first) {
-			menuRefreshConfig();
+			menuRequestConfig();
 
 			guiSwitchScreen(GUI_SCREEN_INFO);
 		} else
@@ -696,23 +710,23 @@ void menuHandleInputInfo() {
 		selected_item->item->execCross(selected_item->item);
 	} else if(getKey(KEY_UP)) {
 		menuPrevV();
-		menuRefreshConfig();
+		menuRequestConfig();
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
-		menuRefreshConfig();
+		menuRequestConfig();
 	} else if(getKeyOn(KEY_CIRCLE)) {
 		guiSwitchScreen(GUI_SCREEN_MAIN);
 	} else if(getKey(KEY_L1)) {
 		menuPrevPage();
-		menuRefreshConfig();
+		menuRequestConfig();
 	} else if(getKey(KEY_R1)) {
 		menuNextPage();
-		menuRefreshConfig();
+		menuRequestConfig();
 	} else if (getKeyOn(KEY_L2)) {
 		menuFirstPage();
-		menuRefreshConfig();
+		menuRequestConfig();
 	} else if (getKeyOn(KEY_R2)) {
 		menuLastPage();
-		menuRefreshConfig();
+		menuRequestConfig();
 	}
 }

@@ -82,6 +82,7 @@ static void texUpdate(GSTEXTURE* texture, int width, int height) {
 
 void texPrepare(GSTEXTURE* texture, short psm) {
 	texture->PSM = psm;
+	texture->ClutPSM = 0;
 	texture->Filter = GS_FILTER_LINEAR;
 	texture->Mem = NULL;
 	texture->Vram = 0;

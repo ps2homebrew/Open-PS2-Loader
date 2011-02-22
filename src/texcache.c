@@ -36,6 +36,7 @@ static void cacheLoadImage(void* data) {
 	if(texture->Mem != NULL) {
 		free(texture->Mem);
 		texture->Mem = NULL;
+		texture->ClutPSM = 0;
 		texture->Clut = NULL;
 		texture->Vram = 0;
 		texture->VramClut = 0;

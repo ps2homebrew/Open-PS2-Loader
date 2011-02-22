@@ -447,13 +447,17 @@ void rmDrawQuad(rm_quad_t* q) {
 	if (!rmPrepareTexture(q->txt)) // won't render if not ready!
 		return;
 
-	if (q->txt->PSM == GS_PSM_CT32 || q->txt->ClutPSM == GS_PSM_CT32)
+	if ((q->txt->PSM == GS_PSM_CT32) || 
+		(q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32))
+	{
 		gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
+	}
 	
 	gsKit_prim_sprite_texture(gsGlobal, q->txt, q->ul.x + transX, q->ul.y + transY, q->ul.u,
 		q->ul.v, q->br.x + transX, q->br.y + transY, q->br.u, q->br.v, order, q->color);
 	order++;
-	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+	
+	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);	
 }
 
 /** If txt is null, don't use DIM_UNDEF size ! */

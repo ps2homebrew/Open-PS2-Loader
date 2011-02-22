@@ -1,0 +1,67 @@
+-----------------------------------------------------------------------------
+
+  Copyright 2009, Ifcaro & jimmikaelkael
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+-----------------------------------------------------------------------------
+
+Introduction
+-----------------------------------------------------------------------------
+
+Open PS2 Loader is a 100% Open source game loader compatible with 
+USB Advance/Extreme game format. It's more compatible and it should work
+without ps2load or change DNASXXX.IMG tricks.
+
+Open PS2 Loader also is developed continuously and anyone can contribute 
+improvements to the project.
+
+The main objective is to support both the PS2 and the PS3 with backward 
+compatibility.
+
+There are compatibility lists in the project repository:
+	http://bitbucket.org/ifcaro/open-ps2-loader/wiki/USB-Compat
+	http://bitbucket.org/ifcaro/open-ps2-loader/wiki/SMB-Compat
+
+How to use
+-----------------------------------------------------------------------------
+
+First, you need an USB device compatible with PS2/PS3 formatted in FAT32
+(only if you want to load games from USB).
+For using games directly from USB, game parts file must be perfectly
+defragmented, either file by file, either by whole drive.
+You can use this great software, Power Defragmenter:
+http://my.opera.com/rejzor/blog/power-defragmenter-3-0-released
+
+For loading games by SMB protocol you need to share a folder called PS2SMB
+(it can be changed) make sure that it has permissions for anyone to access.
+The games have to be in USB Advance/Extreme format. There are some programs
+for converting games to this format. Open PS2 Loader includes an command line
+tool for that purpose called iso2usbld.
+
+Other utilities are: USBUtil 2.0, USB Extreme installer or USB Insane.
+
+In PS2 you can use any of the existing methods for loading an executable elf.
+
+In PS3 you need to have an original SwapMagic 3.6+ or 3.8 (at the moment
+there aren't any other option).
+
+The steps for loading Open PS2 Loader in a PS3 are:
+
+    1. Rename OpenPS2LD.ELF to SMBOOT0.ELF
+	2. Make a folder in root of USB device called SWAPMAGIC and copy 
+	   SMBOOT0.ELF to it.
+	3. Launch SwapMagic in PS3 and press UP+L1 then Open PS2 Loader should
+	   start.
+	   
+There are 4 forms for launching elfs in SwapMagic.
+
+SMBOOT0.ELF = UP + L1
+SMBOOT1.ELF = UP + L2
+SMBOOT2.ELF = UP + R1
+SMBOOT3.ELF = UP + R2
+
+Some notes for devs
+-----------------------------------------------------------------------------
+Open PS2 Loader needs latest version of GSKit and PS2SDK from 
+svn://svn.ps2dev.org/ps2/trunk/

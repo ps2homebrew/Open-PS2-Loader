@@ -1,0 +1,32 @@
+-----------------------------------------------------------------------------
+
+  Copyright 2009, Ifcaro & jimmikaelkael
+  Licenced under Academic Free License version 3.0
+  Review OpenPS2Loader README & LICENSE files for further details.
+  
+-----------------------------------------------------------------------------
+
+Main code is based on HD Project 1.081
+Copyright (C) 2006-2008 Polo <polo35580@hotmail.fr>
+
+Adaptation to USB Advance format and User interface
+Copyright (C) 2009 Ifcaro <taslokooo@gmail.com>
+
+Main Project developpers:
+Ifcaro, volca, jimmikaelkael, polo35, izdubar
+
+CDVDMAN, CDVDFSV, CDDEV, DISCID & SMBMAN modules by jimmikaelkael
+Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
+
+NETLOG module, and other contributions
+Copyright (C) 2009 misfire <misfire@xploderfreax.de>
+
+SMSUTILS, SMSMAP & SMSTCPIP modules by Eugene Plotnikov
+
+DEV9, ATAD modules and derived code used in cdvdman by Marcus R. Brown
+
+PS2HDD module has been taken from PS2SDK
+
+SMB code in Open PS2 Loader includes DES algorithm developed
+by Eric Young (eay@mincom.oz.au)
+

@@ -1,0 +1,105 @@
+# translation by El_Patas <el_patas69@hotmail.com>
+Spanish
+               BIENVENIDO AL OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DEL HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DEL USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
+Open PS2 Loader %s
+Guardar cambios
+O Atrás
+Configurar red
+<Sin configurar>
+Configuración guardada...
+¡Error al guardar la configuración!
+Salir
+Configuración
+Juegos por USB
+Juegos por HDD
+Juegos por RED
+Aplicaciones
+Estilo
+Idioma
+Error al iniciar red
+Activado
+Desactivado
+Aceptar
+Preferencias juego
+Borrar todas las preferencias
+Preferencias para el juego borradas
+Desplazamiento
+Lento
+Medio
+Rápido
+Menú por defecto
+Cargar del disco
+Espera por favor
+Error al cargar la ID del juego
+Listas ordenadas por alfabeto
+Error al cargar archivo de idioma
+No mostrar los colores para depuración
+Mando no encontrado, esperando...
+Carátulas, serigrafías y fondos
+Pantalla panorámica
+Apagar PS2
+Cargando configuración
+Guardando configuración
+Iniciar dispositivo
+Modo de inicio para dispositivo USB
+Modo de inicio para dispositivo HDD
+Modo de inicio para dispositivo ETH
+Modo de inicio para Aplicaciones
+Automático
+Manual
+Iniciar servidor HDL
+Iniciando servidor HDL...
+Servidor HDL conectado... Pulsa [O] para desconectar
+Pulsa [X] para cerrar servidor HDL...
+Cerrando servidor HDL...
+Salida hacia
+Color de fondo 
+Color de texto
+Dirección IP
+Máscara de subred
+Puerta de enlace predeterminada
+Puerto
+Unidad o carpeta compartida
+Cuenta de usuario compartida
+Contraseña
+<sin definir>
+X Aceptar
+El archivo se borrará definitivamente, ¿continuar?
+Renombrar
+Borrar
+Iniciar
+Preferencias de pantalla
+Mostrar las operaciones de Borrar y Renombrar
+Comprobar fragmentación de juego USB
+Recordar último juego jugado
+Error, el juego está fragmentado
+Error, no se pudo iniciar el archivo
+Test
+Dejar vacío para autentificar como GUEST
+Cargar núcleo alternativo
+Método de lectura de datos alternativo
+Remover llamadas del sistema
+Saltar lectura archivos PSS
+Sin soporte DVD-DL
+Sin soporte IGR
+Buffer cdvdfsv reducido
+Ocultar módulo dev9
+Combinación de IGR alternativa
+Cambiar el tamaño formateará la VMC
+Crear
+Modificar
+Abortar
+Reiniciar
+Usar genérica
+Configurar VMC
+Nombre
+Tamaño
+Estado
+Progreso
+Archivo VMC creado
+Archivo VMC inválido, el tamaño es incorrecto
+El archivo VMC debe ser creado
+Error con el archivo VMC, ¿continuar con la MC física?
+Refresco automático de las listas
+Acerca del OPL
+Desarrolladores

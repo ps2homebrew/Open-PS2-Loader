@@ -755,7 +755,6 @@ void shutdown(int exception) {
 	unloadPads();
 	ioEnd();
 	guiEnd();
-	menuEnd();
 	lngEnd();
 	thmEnd();
 	rmEnd();
@@ -872,7 +871,6 @@ static void init(void) {
 	thmInit();
 	guiInit();
 	ioInit();
-	menuInit();
 	
 	startPads();
 

@@ -1186,7 +1186,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
 		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
-		guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, FNT_DEFAULT, 475, 417, gTheme->selTextColor);
+		guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, FNT_DEFAULT, 500, 417, gTheme->selTextColor);
 		if (addAccept)
 			guiDrawIconAndText(CROSS_ICON, _STR_X_ACCEPT, FNT_DEFAULT, 70, 417, gTheme->selTextColor);
 

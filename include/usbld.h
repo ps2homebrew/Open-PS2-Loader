@@ -35,6 +35,7 @@
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID, int newVMode, int newVSync);
+void moduleUpdateMenu(int mode, int themeChanged);
 void handleHdlSrv();
 void shutdown();
 

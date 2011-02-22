@@ -84,6 +84,41 @@ static int gFrameCounter;
 
 static opl_io_module_t list_support[4];
 
+void moduleUpdateMenu(int mode, int themeChanged) {
+	if (mode == -1)
+		return;
+
+	opl_io_module_t* mod = &list_support[mode];
+
+	if (!mod->support)
+		return;
+
+	// refresh Hints
+	menuRemoveHints(&mod->menuItem);
+
+	menuAddHint(&mod->menuItem, _STR_SETTINGS, START_ICON);
+	if (!mod->support->enabled)
+		menuAddHint(&mod->menuItem, _STR_START_DEVICE, CROSS_ICON);
+	else {
+		if (gUseInfoScreen && gTheme->infoElems.first)
+			menuAddHint(&mod->menuItem, _STR_INFO, CROSS_ICON);
+		else
+			menuAddHint(&mod->menuItem, _STR_RUN, CROSS_ICON);
+		if (mod->support->itemGetCompatibility)
+			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+		if (gEnableDandR) {
+			if (mod->support->itemRename)
+				menuAddHint(&mod->menuItem, _STR_RENAME, CIRCLE_ICON);
+			if (mod->support->itemDelete)
+				menuAddHint(&mod->menuItem, _STR_DELETE, SQUARE_ICON);
+		}
+	}
+
+	// refresh Cache
+	if (themeChanged)
+		submenuRebuildCache(mod->subMenu);
+}
+
 static void itemExecCross(struct menu_item *curMenu) {
 	item_list_t *support = curMenu->userdata;
 
@@ -94,7 +129,7 @@ static void itemExecCross(struct menu_item *curMenu) {
 		}
 		else {
 			support->itemInit();
-			menuRefreshState(curMenu, 0);
+			moduleUpdateMenu(support->mode, 0);
 			if (!gAutoRefresh)
 				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 		}
@@ -177,7 +212,8 @@ static void itemExecRefresh(struct menu_item *curMenu) {
 		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 }
 
-static void initMenuForListSupport(opl_io_module_t* item) {
+static void initMenuForListSupport(int mode) {
+	opl_io_module_t* item = &list_support[mode];
 	item->menuItem.icon_id = item->support->iconId;
 	item->menuItem.text = NULL;
 	item->menuItem.text_id = item->support->textId;
@@ -197,7 +233,7 @@ static void initMenuForListSupport(opl_io_module_t* item) {
 	item->menuItem.execCircle = &itemExecCircle;
 
 	item->menuItem.hints = NULL;
-	menuRefreshState(&item->menuItem, 0);
+	moduleUpdateMenu(mode, 0);
 
 	struct gui_update_t *mc = guiOpCreate(GUI_OP_ADD_MENU);
 	mc->menu.menu = &item->menuItem;
@@ -209,7 +245,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 	if (!list_support[mode].support) {
 		itemList->uip = 1; // stop updates until we're done with init
 		list_support[mode].support = itemList;
-		initMenuForListSupport(&list_support[mode]);
+		initMenuForListSupport(mode);
 		itemList->uip = 0;
 	}
 
@@ -218,7 +254,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		// stop updates until we're done with init of the device
 		list_support[mode].support->uip = 1;
 		list_support[mode].support->itemInit();
-		menuRefreshState(&list_support[mode].menuItem, 0);
+		moduleUpdateMenu(mode, 0);
 		list_support[mode].support->uip = 0;
 
 		if (gAutoRefresh)
@@ -253,12 +289,6 @@ static void deinitAllSupport(int exception) {
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
 static void updateMenuFromGameList(opl_io_module_t* mdl) {
-	if (!mdl)
-		return;
-
-	if (!mdl->support)
-		return;
-
 	// lock - gui has to be unused here
 	guiLock();
 
@@ -310,9 +340,6 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 
 static void menuDeferredUpdate(void* data) {
 	opl_io_module_t* mdl = data;
-
-	if (!mdl)
-		return;
 
 	if (!mdl->support)
 		return;
@@ -552,14 +579,10 @@ void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 
 	initAllSupport(0);
 
-	if (list_support[USB_MODE].support)
-		menuRefreshState(&list_support[USB_MODE].menuItem, changed);
-	if (list_support[ETH_MODE].support)
-		menuRefreshState(&list_support[ETH_MODE].menuItem, changed);
-	if (list_support[HDD_MODE].support)
-		menuRefreshState(&list_support[HDD_MODE].menuItem, changed);
-	if (list_support[APP_MODE].support)
-		menuRefreshState(&list_support[APP_MODE].menuItem, changed);
+	moduleUpdateMenu(USB_MODE, changed);
+	moduleUpdateMenu(ETH_MODE, changed);
+	moduleUpdateMenu(HDD_MODE, changed);
+	moduleUpdateMenu(APP_MODE, changed);
 
 	if (gAutoRefresh)
 		guiSetFrameHook(&menuUpdateHook);
@@ -741,9 +764,6 @@ static void reset(void) {
 }
 
 static void moduleCleanup(opl_io_module_t* mod, int exception) {
-	if (!mod)
-		return;
-
 	if (!mod->support)
 		return;
 

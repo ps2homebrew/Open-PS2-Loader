@@ -58,7 +58,7 @@ static void hddInitModules(void) {
 	// update Themes
 	char path[255];
 	sprintf(path, "%sTHM", hddPrefix);
-	thmAddElements(path, "/");
+	thmAddElements(path, "/", hddGameList.mode);
 
 #ifdef VMC
 	sprintf(path, "%sVMC", hddPrefix);

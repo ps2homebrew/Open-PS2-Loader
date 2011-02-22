@@ -69,7 +69,7 @@ static void usbInitModules(void) {
 	usbFindPartition(usbPrefix, "ul.cfg");
 	char path[255];
 	sprintf(path, "%sTHM", usbPrefix);
-	thmAddElements(path, "/");
+	thmAddElements(path, "/", usbGameList.mode);
 
 #ifdef VMC
 	sprintf(path, "%sVMC", usbPrefix);

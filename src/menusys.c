@@ -209,6 +209,8 @@ static submenu_list_t* submenuAllocItem(int icon_id, char *text, int id, int tex
 	it->item.text = text;
 	it->item.text_id = text_id;
 	it->item.id = id;
+	it->item.cache_id = NULL;
+	it->item.cache_uid = NULL;
 	submenuRebuildCache(it);
 	
 	return it;

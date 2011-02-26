@@ -33,6 +33,7 @@ static ee_sema_t gQueueSema;
 
 static int screenWidth;
 static float wideScreenScale;
+static int screenHeight;
 
 // forward decl.
 static void guiShow();
@@ -73,7 +74,7 @@ static gui_screen_handler_t *screenHandler = &screenHandlers[GUI_SCREEN_MENU];
 
 // screen transition handling
 static gui_screen_handler_t *screenHandlerTarget = NULL;
-static int transition = 0;
+static int transIndex, transMax, transitionX, transitionY;
 
 // Helper perlin noise data
 #define PLASMA_H 32
@@ -90,7 +91,6 @@ static VU_VECTOR pgrad3[12] = {{ 1, 1, 0, 1 }, { -1, 1, 0, 1 }, { 1, -1, 0, 1 },
 								{ 0, 1, 1, 1 },	{ 0, -1, 1, 1 }, { 0, 1, -1, 1 }, { 0, -1, -1, 1 } };
 
 void guiReloadScreenExtents() {
-	int screenHeight;
 	rmGetScreenExtents(&screenWidth, &screenHeight);
 }
 
@@ -1071,21 +1071,22 @@ static void guiShow() {
 		// advance the effect
 
 		// render the old screen, transposed
-		rmSetTransposition(-transition, 0);
+		rmSetTransposition(transIndex * transitionX, transIndex * transitionY);
 		screenHandler->renderScreen();
 
 		// render new screen transposed again
-		rmSetTransposition(screenWidth - transition, 0);
+		rmSetTransposition((transIndex - transMax) * transitionX, (transIndex - transMax) * transitionY);
 		screenHandlerTarget->renderScreen();
 
 		// reset transposition to zero
 		rmSetTransposition(0, 0);
 
 		// move the transition indicator forward
-		transition += min(transition / 2, (screenWidth - transition) / 2) + 1;
+		transIndex += (min(transIndex, transMax - transIndex) >> 1) + 1;
 
-		if (transition > screenWidth) {
-			transition = 0;
+		if (transIndex > transMax) {
+			transitionX = 0;
+			transitionY = 0;
 			screenHandler = screenHandlerTarget;
 			screenHandlerTarget = NULL;
 		}
@@ -1127,7 +1128,22 @@ void guiSetFrameHook(gui_callback_t cback) {
 	gFrameHook = cback;
 }
 
-void guiSwitchScreen(int target) {
+void guiSwitchScreen(int target, int transition) {
+	if (transition == TRANSITION_LEFT) {
+		transitionX = 1;
+		transMax = screenWidth;
+	} else if (transition == TRANSITION_RIGHT) {
+		transitionX = -1;
+		transMax = screenWidth;
+	} else if (transition == TRANSITION_UP) {
+		transitionY = 1;
+		transMax = screenHeight;
+	} else if (transition == TRANSITION_DOWN) {
+		transitionY = -1;
+		transMax = screenHeight;
+	}
+	transIndex = 0;
+
 	screenHandlerTarget = &screenHandlers[target];
 }
 

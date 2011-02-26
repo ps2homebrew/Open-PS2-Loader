@@ -62,10 +62,6 @@ static void menuLoadConfig(void* data) {
 }
 
 static void menuRequestConfig() {
-	item_list_t* list = selected_item->item->userdata;
-	if (guiInactiveFrames < list->delay)
-		return;
-
 	WaitSema(menuSemaId);
 	if (itemIdConfig != selected_item->item->current->item.id) {
 		if (itemConfig) {
@@ -73,12 +69,15 @@ static void menuRequestConfig() {
 			itemConfig = NULL;
 		}
 
-		itemIdConfig = selected_item->item->current->item.id;
+		item_list_t* list = selected_item->item->userdata;
+		if (guiInactiveFrames >= list->delay) {
+			itemIdConfig = selected_item->item->current->item.id;
 
-		load_config_request_t* req = malloc(sizeof(load_config_request_t));
-		req->itemId = itemIdConfig;
-		req->list = list;
-		ioPutRequest(IO_MENU_LOAD_CONFIG, req);
+			load_config_request_t* req = malloc(sizeof(load_config_request_t));
+			req->itemId = itemIdConfig;
+			req->list = list;
+			ioPutRequest(IO_MENU_LOAD_CONFIG, req);
+		}
 	}
 	SignalSema(menuSemaId);
 }
@@ -590,7 +589,7 @@ void menuHandleInputMenu() {
 
 	if(getKeyOn(KEY_START) || getKeyOn(KEY_CIRCLE)) {
 		if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
-			guiSwitchScreen(GUI_SCREEN_MAIN);
+			guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_LEFT);
 	}
 }
 
@@ -629,7 +628,7 @@ void menuHandleInputMain() {
 		menuNextV();
 	} else if(getKeyOn(KEY_CROSS)) {
 		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first)
-			guiSwitchScreen(GUI_SCREEN_INFO);
+			guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
 		else
 			selected_item->item->execCross(selected_item->item);
 	} else if(getKeyOn(KEY_TRIANGLE)) {
@@ -641,7 +640,7 @@ void menuHandleInputMain() {
 	} else if(getKeyOn(KEY_START)) {
 		// reinit main menu - show/hide items valid in the active context
 		menuInitMainMenu();
-		guiSwitchScreen(GUI_SCREEN_MENU);
+		guiSwitchScreen(GUI_SCREEN_MENU, TRANSITION_RIGHT);
 	} else if(getKeyOn(KEY_SELECT)) {
 		selected_item->item->refresh(selected_item->item);
 	} else if(getKey(KEY_L1)) {
@@ -677,7 +676,7 @@ void menuHandleInputInfo() {
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
 	} else if(getKeyOn(KEY_CIRCLE)) {
-		guiSwitchScreen(GUI_SCREEN_MAIN);
+		guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
 	} else if(getKey(KEY_L1)) {
 		menuPrevPage();
 	} else if(getKey(KEY_R1)) {

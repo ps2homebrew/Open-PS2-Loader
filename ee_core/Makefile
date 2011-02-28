@@ -41,28 +41,30 @@ endif
 EE_LIBS += -lkernel
 
 
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
+	@mkdir -p obj
+	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
+
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.S
+	@mkdir -p obj
+	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
+
+$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
+	@mkdir -p obj
+	$(EE_AS) $(EE_ASFLAGS) $< -o $@
+
+$(EE_BIN) : $(EE_OBJS)
+	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker $(MAPFILE)
+
+
 all:
-	mkdir -p obj
-	$(MAKE) $(EE_BIN)
+	$(EE_BIN)
 
 clean:
 	rm -f $(EE_OBJS_DIR)*.* *.map *.bak *.elf
 
 clean_all:
 	rm -f $(EE_OBJS_DIR)*.* *.map *.bak *.elf
-
-
-$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
-	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
-
-$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.S
-	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
-
-$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
-	$(EE_AS) $(EE_ASFLAGS) $< -o $@
-
-$(EE_BIN) : $(EE_OBJS)
-	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker $(MAPFILE)
 
 
 include $(PS2SDK)/samples/Makefile.pref

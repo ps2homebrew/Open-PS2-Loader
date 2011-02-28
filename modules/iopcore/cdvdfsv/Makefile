@@ -9,7 +9,7 @@
 # $Id: $
 
 IOP_BIN = cdvdfsv.irx
-IOP_OBJS = cdvdfsv.o imports.o
+IOP_OBJS = cdvdfsv.o imports.o exports.o
 
 ifeq ($(DEBUG),1)
 DEBUG_FLAGS = -DDEBUG

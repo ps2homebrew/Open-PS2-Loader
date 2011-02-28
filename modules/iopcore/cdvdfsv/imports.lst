@@ -6,6 +6,7 @@ intrman_IMPORTS_end
 
 loadcore_IMPORTS_start
 I_FlushDcache
+I_RegisterLibraryEntries
 loadcore_IMPORTS_end
 
 sifcmd_IMPORTS_start
@@ -36,4 +37,6 @@ I_CreateThread
 I_StartThread
 I_GetThreadId
 I_SleepThread
+I_ReferThreadStatus
+I_ChangeThreadPriority
 thbase_IMPORTS_end

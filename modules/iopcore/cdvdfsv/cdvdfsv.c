@@ -359,11 +359,17 @@ static int g_reduced_iopmemusage = 0xC0DEC0DE;
 
 #define CDVDFSV_BUF_SECTORS		2
 
+int init_thread_id;
+int rpc0_thread_id, rpc1_thread_id, rpc2_thread_id;
+
+struct irx_export_table _exp_cdvdfsv;
+
 //-------------------------------------------------------------------------
 int _start(int argc, char** argv)
 {
 	iop_thread_t thread_param;
-	int thread_id;
+
+	RegisterLibraryEntries(&_exp_cdvdfsv);
 
 	FlushDcache();
 	CpuEnableIntr();
@@ -371,11 +377,11 @@ int _start(int argc, char** argv)
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 	thread_param.thread = (void *)init_thread;
-	thread_param.stacksize = 0x2000;
-	thread_param.priority = 0x51;
+	thread_param.stacksize = 0x800;
+	thread_param.priority = 0x50;
 
-	thread_id = CreateThread(&thread_param);
-	StartThread(thread_id, 0);
+	init_thread_id = CreateThread(&thread_param);
+	StartThread(init_thread_id, 0);
 
 	return MODULE_RESIDENT_END;
 }
@@ -399,7 +405,6 @@ void init_thread(void *args)
 void cdvdfsv_startrpcthreads(void)
 {
 	iop_thread_t thread_param;
-	int thread_id;
 
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
@@ -407,8 +412,8 @@ void cdvdfsv_startrpcthreads(void)
 	thread_param.stacksize = 0x1900;
 	thread_param.priority = 0x51;
 
-	thread_id = CreateThread(&thread_param);
-	StartThread(thread_id, 0);
+	rpc1_thread_id = CreateThread(&thread_param);
+	StartThread(rpc1_thread_id, 0);
 
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
@@ -416,19 +421,17 @@ void cdvdfsv_startrpcthreads(void)
 	thread_param.stacksize = 0x1900;
 	thread_param.priority = 0x51;
 
-	thread_id = CreateThread(&thread_param);
-	StartThread(thread_id, 0);
+	rpc2_thread_id = CreateThread(&thread_param);
+	StartThread(rpc2_thread_id, 0);
 
-	if (!g_reduced_iopmemusage) {
-		thread_param.attr = TH_C;
-		thread_param.option = 0;
-		thread_param.thread = (void *)cdvdfsv_rpc0_th;
-		thread_param.stacksize = 0x800;
-		thread_param.priority = 0x51;
+	thread_param.attr = TH_C;
+	thread_param.option = 0;
+	thread_param.thread = (void *)cdvdfsv_rpc0_th;
+	thread_param.stacksize = 0x800;
+	thread_param.priority = 0x51;
 
-		thread_id = CreateThread(&thread_param);
-		StartThread(thread_id, 0);
-	}
+	rpc0_thread_id = CreateThread(&thread_param);
+	StartThread(rpc0_thread_id, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -1142,6 +1145,29 @@ void cdvd_readee(void *buf)
 	}
 
 	*(int *)buf = 0;
+}
+
+//-------------------------------------------------------------------------
+int sceCdChangeThreadPriority(int priority)
+{
+	iop_thread_info_t th_info;
+
+	if ((u32)(priority - 9) < 0x73) {
+		if (priority == 9)
+			priority = 10;
+
+		ReferThreadStatus(0, &th_info);
+
+		ChangeThreadPriority(0, 0x08);
+		ChangeThreadPriority(init_thread_id, priority-1);
+		ChangeThreadPriority(rpc0_thread_id, priority);
+		ChangeThreadPriority(rpc2_thread_id, priority);
+		ChangeThreadPriority(rpc1_thread_id, priority);
+
+		return 0;
+	}
+ 
+	return -403;
 }
 
 //-------------------------------------------------------------------------

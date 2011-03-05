@@ -541,11 +541,16 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 	return x;
 }
 
-void fntRenderText(int font, int sx, int sy, size_t width, size_t height, const unsigned char* string, u64 colour) {
+void fntRenderText(int font, int sx, int sy, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
 	// wait for font lock to unlock
 	WaitSema(gFontSemaId);
 	font_t *fnt = &fonts[font];
 	SignalSema(gFontSemaId);
+
+	if (aligned) {
+		sx -= min(fntCalcDimensions(font, string), width) >> 1;
+		sy -= MENU_ITEM_HEIGHT >> 1;
+	}
 
 	rmApplyShiftRatio(&sy);
 

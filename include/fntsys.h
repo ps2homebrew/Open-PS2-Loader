@@ -44,7 +44,7 @@ void fntSetAspectRatio(float aw, float ah);
 int fntRenderString(int font, int x, int y, short aligned, const unsigned char* string, u64 colour);
 
 /** Renders a text with specified window dimensions */
-void fntRenderText(int font, int sx, int sy, size_t width, size_t height, const unsigned char* string, u64 colour);
+void fntRenderText(int font, int sx, int sy, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour);
 
 /** replaces spaces with newlines so that the text fits into the specified width.
   * @note A destrutive operation - modifies the given string!

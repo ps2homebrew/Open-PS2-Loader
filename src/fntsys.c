@@ -473,23 +473,17 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 		y -= MENU_ITEM_HEIGHT >> 1;
 	}
 
-	// backup the aspect ratio, restore 1:1 to have the font rendering clean
-	float aw, ah;
-	rmGetAspectRatio(&aw, &ah);
-	rmResetAspectRatio();
+	rmApplyShiftRatio(&y);
 
 	uint32_t codepoint;
 	uint32_t state = 0;
-	int w = 0, d;
 	FT_Bool use_kerning = FT_HAS_KERNING(fnt->face);
 	FT_UInt glyph_index, previous = 0;
 	FT_Vector delta;
 
 	// cache glyphs and render as we go
 	for (; *string; ++string) {
-		unsigned char c = *string;
-
-		if (utf8Decode(&state, &codepoint, c)) // accumulate the codepoint value
+		if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
 			continue;
 
 		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
@@ -502,13 +496,10 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
 			if (glyph_index) {
 				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
-				d = delta.x >> 6;
-				x += d;
-				w += d;
+				x += delta.x >> 6;
 			}
 			previous = glyph_index;
 		}
-
 		
 		// only if glyph has atlas placement
 		if (glyph->allocation) {
@@ -521,39 +512,33 @@ int fntRenderString(int font, int x, int y, short aligned, const unsigned char* 
 			 *    - this method would handle the preparetion of the quads and GS upload itself,
 			 *    without the use of prim_quad_texture and rmSetupQuad...
 			 *    
-			 * 3. rmSetupQuad is cool for a few quads a frame, but glyphs are too many in numbers
-			 *    - seriously, all that branching for every letter is a bit much
+			 * (3. rmSetupQuad is cool for a few quads a frame, but glyphs are too many in numbers
+			 *    - seriously, all that branching for every letter is a bit much)
 			 *
 			 * 4. We should use clut to keep the memory allocations sane - we're linear in the 32bit buffers
 			 *    anyway, no reason to waste like we do!
 			 */
-			rmSetupQuad(NULL, x, y, ALIGN_NONE, glyph->width, glyph->height, colour, &quad);
-			quad.ul.x += glyph->ox;
-			quad.br.x += glyph->ox;
-			quad.ul.y += glyph->oy;
-			quad.br.y += glyph->oy;
+			quad.color = colour;
+			quad.ul.x = x + glyph->ox;
+			quad.br.x = quad.ul.x + glyph->width;
+			quad.ul.y = y + glyph->oy;
+			quad.br.y = quad.ul.y + glyph->height;
 			
 			// UV is our own, custom thing here
 			quad.txt = &glyph->atlas->surface;
 			quad.ul.u = glyph->allocation->x;
+			quad.br.u = quad.ul.u + glyph->width;
 			quad.ul.v = glyph->allocation->y;
-			
-			quad.br.u = glyph->allocation->x + glyph->width;
-			quad.br.v = glyph->allocation->y + glyph->height;
+			quad.br.v = quad.ul.v + glyph->height;
 			
 			rmDrawQuad(&quad);
 		}
 		
-		int ofs = glyph->shx >> 6;
-		w += ofs;
-		x += ofs;
+		x += glyph->shx >> 6;
 		y += glyph->shy >> 6;
 	}
 
-	// return to the prev. aspect ratio
-	rmSetAspectRatio(aw, ah);
-
-	return w;
+	return x;
 }
 
 void fntRenderText(int font, int sx, int sy, size_t width, size_t height, const unsigned char* string, u64 colour) {
@@ -562,25 +547,19 @@ void fntRenderText(int font, int sx, int sy, size_t width, size_t height, const 
 	font_t *fnt = &fonts[font];
 	SignalSema(gFontSemaId);
 
+	rmApplyShiftRatio(&sy);
+
 	int x = sx;
 	int y = sy;
 	int xm = sx + width;
 	int ym = sy + height;
 	
-	// backup the aspect ratio, restore 1:1 to have the font rendering clean
-	float aw, ah;
-	rmGetAspectRatio(&aw, &ah);
-	rmResetAspectRatio();
-
 	uint32_t codepoint;
 	uint32_t state = 0;
-	int w = 0, d;
 	FT_Bool use_kerning = FT_HAS_KERNING(fnt->face);
 	FT_UInt glyph_index, previous = 0;
 	FT_Vector delta;
 
-	int hmax = 0;
-	
 	// Note: We need to change this so that we'll accumulate whole word before doing a layout with it
 	// for now this method breaks on any character - which is a bit ugly
 	
@@ -590,9 +569,7 @@ void fntRenderText(int font, int sx, int sy, size_t width, size_t height, const 
 	
 	// cache glyphs and render as we go
 	for (; *string; ++string) {
-		unsigned char c = *string;
-
-		if (utf8Decode(&state, &codepoint, c)) // accumulate the codepoint value
+		if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
 			continue;
 
 		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
@@ -604,57 +581,41 @@ void fntRenderText(int font, int sx, int sy, size_t width, size_t height, const 
 			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
 			if (glyph_index) {
 				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
-				d = delta.x >> 6;
-				x += d;
-				w += d;
+				x += delta.x >> 6;
 			}
 			previous = glyph_index;
 		}
 
-		// do we fit to xmax?
-		if ((x + glyph->width > xm) || (codepoint == '\n')) {
+		if (codepoint == '\n') {
 			x = sx;
-			// y += hmax + 5;
 			y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
-			hmax = 0;
-			
-			if (codepoint == '\n')
-				continue;
-			
-			if (y > ym) // stepped over ymax
-				break;
+			continue;
 		}
 		
-		if (glyph->height > hmax)
-			hmax = glyph->height;
-		
+		if ((x + glyph->width > xm) || (y > ym)) // stepped over the max
+			break;
+
 		// only if glyph has atlas placement
 		if (glyph->allocation) {
-			rmSetupQuad(NULL, x, y, ALIGN_NONE, glyph->width, glyph->height, colour, &quad);
-			quad.ul.x += glyph->ox;
-			quad.br.x += glyph->ox;
-			quad.ul.y += glyph->oy;
-			quad.br.y += glyph->oy;
+			quad.color = colour;
+			quad.ul.x = x + glyph->ox;
+			quad.br.x = quad.ul.x + glyph->width;
+			quad.ul.y = y + glyph->oy;
+			quad.br.y = quad.ul.y + glyph->height;
 			
 			// UV is our own, custom thing here
 			quad.txt = &glyph->atlas->surface;
 			quad.ul.u = glyph->allocation->x;
+			quad.br.u = quad.ul.u + glyph->width;
 			quad.ul.v = glyph->allocation->y;
-			
-			quad.br.u = glyph->allocation->x + glyph->width;
-			quad.br.v = glyph->allocation->y + glyph->height;
-			
+			quad.br.v = quad.ul.v + glyph->height;
+
 			rmDrawQuad(&quad);
 		}
 		
-		int ofs = glyph->shx >> 6;
-		w += ofs;
-		x += ofs;
+		x += glyph->shx >> 6;
 		y += glyph->shy >> 6;
 	}
-
-	// return to the prev. aspect ratio
-	rmSetAspectRatio(aw, ah);
 }
 
 void fntFitString(int font, unsigned char *string, size_t width) {

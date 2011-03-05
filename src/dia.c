@@ -38,20 +38,14 @@ static int screenHeight;
 #define KEYB_ITEMS		(KEYB_WIDTH * KEYB_HEIGHT)
 
 static void diaDrawBoundingBox(int x, int y, int w, int h, int focus) {
-		float aw, ah;
-		rmGetAspectRatio(&aw, &ah);
-		rmResetAspectRatio();
-
 		if (focus)
-			rmDrawRect(x - 5, y, ALIGN_NONE, w + 10, h + 10, gTheme->selTextColor & gColFocus);
+			rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->selTextColor & gColFocus);
 		else
-			rmDrawRect(x - 5, y, ALIGN_NONE, w + 10, h + 10, gTheme->textColor & gColFocus);
-
-		rmSetAspectRatio(aw, ah);
+			rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->textColor & gColFocus);
 }
 
 int diaShowKeyb(char* text, int maxLen) {
-	int i, j, len = strlen(text), selkeyb = 0, w;
+	int i, j, len = strlen(text), selkeyb = 0, x, w;
 	int selchar = 0, selcommand = -1;
 	char c[2] = "\0\0";
 	char keyb0[KEYB_ITEMS] = {
@@ -79,7 +73,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		
 		rmStartFrame();
 		guiDrawBGPlasma();
-		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
+		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 		//Text
 		fntRenderString(FNT_DEFAULT, 50, 120, ALIGN_NONE, text, gTheme->textColor);
@@ -92,20 +86,22 @@ int diaShowKeyb(char* text, int maxLen) {
 			for (i = 0; i < KEYB_WIDTH; i++) {
 				c[0] = keyb[i + j * KEYB_WIDTH];
 
-				w = fntRenderString(FNT_DEFAULT, 50 + i*32, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, c, gTheme->uiTextColor);
+				x = 50 + i * 32;
+				w = fntRenderString(FNT_DEFAULT, x, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, c, gTheme->uiTextColor) - x;
 				if ((i + j * KEYB_WIDTH) == selchar)
-					diaDrawBoundingBox(50 + i*32, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
+					diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
 			}
 		}
 		
 		// Commands
 		for (i = 0; i < KEYB_HEIGHT; i++) {
 			if (cmdicons[i])
-				rmDrawPixmap(cmdicons[i], 448, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+				rmDrawPixmap(cmdicons[i], 448, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
 			
-			w = fntRenderString(FNT_DEFAULT, 489, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, commands[i], gTheme->uiTextColor);
+			x = 489;
+			w = fntRenderString(FNT_DEFAULT, x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, commands[i], gTheme->uiTextColor) - x;
 			if (i == selcommand)
-				diaDrawBoundingBox(489, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
+				diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
 		}
 		
 		rmEndFrame();
@@ -215,7 +211,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		
 		rmStartFrame();
 		guiDrawBGPlasma();
-		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
+		rmDrawRect(0, 0,  screenWidth, screenHeight, gColDarker);
 		
 		// "Color selection"
 		fntRenderString(FNT_DEFAULT, 50, 50, ALIGN_NONE, "Colour selection", GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
@@ -234,11 +230,11 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 			u64 dcol = GS_SETREG_RGBA(cc[0], cc[1], cc[2], 0x80);
 
 			if (selc == co)
-				rmDrawRect(x, y, ALIGN_NONE, 200, 20, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
+				rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
 			else
-				rmDrawRect(x, y, ALIGN_NONE, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
+				rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
 				
-			rmDrawRect(x + 2, y + 2, ALIGN_NONE, 190.0f*(cc[co]*100/255)/100, 16, dcol);
+			rmDrawRect(x + 2, y + 2, 190.0f*(cc[co]*100/255)/100, 16, dcol);
 		}
 
 		// target color itself
@@ -247,8 +243,8 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		x = 300;
 		y = 75;
 		
-		rmDrawRect(x, y, ALIGN_NONE, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
-		rmDrawRect(x+5, y+5, ALIGN_NONE, 60, 60, dcol);
+		rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
+		rmDrawRect(x + 5, y + 5, 60, 60, dcol);
 
 		rmEndFrame();
 		
@@ -316,7 +312,7 @@ static void diaDrawHint(int text_id) {
 	y = gTheme->usedHeight - 40;
 	
 	// render hint on the lower side of the screen.
-	rmDrawRect(x, y, ALIGN_NONE, DIM_INF, MENU_ITEM_HEIGHT + 10, gColDarker);
+	rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
 	fntRenderString(FNT_DEFAULT, x + 5, y + 5, ALIGN_NONE, text, gTheme->textColor);
 }
 
@@ -343,9 +339,9 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			// width is text length in pixels...
 			const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
 			if(txt && strlen(txt))
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol) - x;
 			else
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol) - x;
 
 			break;
 		}
@@ -383,7 +379,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 
 		case UI_OK: {
 			const char *txt = _l(_STR_OK);
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txt, txtcol) - x;
 			break;
 		}
 
@@ -391,15 +387,15 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			char tmp[10];
 
 			snprintf(tmp, 10, "%d", item->intvalue.current);
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tmp, txtcol);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tmp, txtcol) - x;
 			break;
 		}
 
 		case UI_STRING: {
 			if(strlen(item->stringvalue.text))
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, item->stringvalue.text, txtcol);
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, item->stringvalue.text, txtcol) - x;
 			else
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol);
+				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, _l(_STR_NOT_SET), txtcol) - x;
 			break;
 		}
 
@@ -412,13 +408,13 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				stars[i] = '*';
 
 			stars[i] = '\0';
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, stars, txtcol);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, stars, txtcol) - x;
 			break;
 		}
 
 		case UI_BOOL: {
 			const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txtval, txtcol);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, txtval, txtcol) - x;
 			break;
 		}
 
@@ -428,14 +424,14 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			if (!tv)
 				tv = _l(_STR_NO_ITEMS);
 
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tv, txtcol);
+			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, tv, txtcol) - x;
 			break;
 		}
 
 		case UI_COLOUR: {
-			rmDrawRect(x, y + 3, ALIGN_NONE, 25, 17, txtcol);
+			rmDrawRect(x, y + 3, 25, 17, txtcol);
 			u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
-			rmDrawRect(x + 2, y + 5, ALIGN_NONE, 21, 13, dcol);
+			rmDrawRect(x + 2, y + 5, 21, 13, dcol);
 
 			*w = 25;
 			*h = 17;

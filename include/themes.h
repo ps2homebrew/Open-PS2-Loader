@@ -27,7 +27,8 @@ typedef struct {
 typedef struct {
 	// Attributes for: AttributeImage
 	int currentUid;
-	char currentName[32];
+	int currentItemId;
+	char* currentValue;
 
 	// Attributes  for: AttributeImage & GameImage
 	image_cache_t* cache;
@@ -42,10 +43,17 @@ typedef struct {
 } mutable_image_t;
 
 typedef struct {
-	int displayMode;
-	char* attribute;
+	// Attributes for: AttributeText & StaticText
+	char* value;
+	int sizingMode;
+
+	// Attributes for: AttributeText
 	char* alias;
-} attribute_text_t;
+	int displayMode;
+
+	int currentItemId;
+	char* currentValue;
+} mutable_text_t;
 
 typedef struct {
 	int displayedItems;
@@ -61,6 +69,7 @@ typedef struct theme_element {
 	short aligned;
 	int width;
 	int height;
+	short scaled;
 	u64 color;
 	int font;
 

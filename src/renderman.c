@@ -440,66 +440,46 @@ void rmEnd(void) {
 	rmFlush();
 }
 
-void rmDrawQuad(rm_quad_t* q) {
-	if (!rmClipQuad(q))
-		return;
-	
-	if (!rmPrepareTexture(q->txt)) // won't render if not ready!
-		return;
-
-	if ((q->txt->PSM == GS_PSM_CT32) || 
-		(q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32))
-	{
-		gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
-	}
-	
-	gsKit_prim_sprite_texture(gsGlobal, q->txt, q->ul.x + transX, q->ul.y + transY, q->ul.u,
-		q->ul.v, q->br.x + transX, q->br.y + transY, q->br.u, q->br.v, order, q->color);
-	order++;
-	
-	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);	
-}
-
-/** If txt is null, don't use DIM_UNDEF size ! */
-void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, u64 color, rm_quad_t* q) {
-	float drawX, drawY;
-	float drawW, drawH;
-
+/** If txt is null, don't use DIM_ADAPT size */
+void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, short scaled, u64 color, rm_quad_t* q) {
 	if (aligned) {
-		if (w != DIM_UNDEF)
-			drawW = aspectWidth * w;
-		else
-			drawW = aspectWidth * txt->Width;
-		drawX = x - drawW / 2;
-
-		if (h != DIM_UNDEF)
-			drawH = aspectHeight * h;
-		else
-			drawH = aspectHeight * txt->Height;
-		drawY = shiftY(y) - drawH / 2;
-	}
-	else {
+		float dim;
 		if (w == DIM_UNDEF)
-			drawW = aspectWidth * txt->Width;
-		else if (w == DIM_INF)
-			drawW = gsGlobal->Width - x;
-		else
-			drawW = aspectWidth * w;
-		drawX = x;
-
+			w = txt->Width;
 		if (h == DIM_UNDEF)
-			drawH = aspectHeight * txt->Height;
-		else if (h == DIM_INF)
-			drawH = gsGlobal->Height - y;
-		else
-			drawH = aspectHeight * h;
-		drawY = shiftY(y);
-	}
+			h = txt->Height;
 
-	q->ul.x = drawX;
-	q->ul.y = drawY;
-	q->br.x = drawX + drawW;
-	q->br.y = drawY + drawH;
+		if (scaled)
+			dim = aspectWidth * (w >> 1);
+		else
+			dim = w >> 1;
+		q->ul.x = x - dim;
+		q->br.x = x + dim;
+
+		if (scaled)
+			dim = aspectHeight * (h >> 1);
+		else
+			dim = h >> 1;
+		q->ul.y = shiftY(y) - dim;
+		q->br.y = shiftY(y) + dim;
+	} else {
+		if (w == DIM_UNDEF)
+			w = txt->Width;
+		if (h == DIM_UNDEF)
+			h = txt->Height;
+
+		q->ul.x = x;
+		if (scaled)
+			q->br.x = x + aspectWidth * w;
+		else
+			q->br.x = x + w;
+
+		q->ul.y = shiftY(y);
+		if (scaled)
+			q->br.y = shiftY(y) + aspectHeight * h;
+		else
+			q->br.y = shiftY(y) + h;
+	}
 
 	q->color = color;
 
@@ -512,17 +492,39 @@ void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, u64 
 	}
 }
 
-void rmDrawPixmap(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, u64 color) {
+void rmDrawQuad(rm_quad_t* q) { // NO scaling, NO shift, NO alignment
+	if (!rmClipQuad(q))
+		return;
+
+	if (!rmPrepareTexture(q->txt)) // won't render if not ready!
+		return;
+
+	if ((q->txt->PSM == GS_PSM_CT32) || (q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32))
+	{
+		gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
+	}
+
+	gsKit_prim_sprite_texture(gsGlobal,	q->txt,
+			q->ul.x + transX, q->ul.y + transY,
+			q->ul.u, q->ul.v,
+			q->br.x + transX, q->br.y + transY,
+			q->br.u, q->br.v, order, q->color);
+	order++;
+
+	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
+}
+
+void rmDrawPixmap(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, short scaled, u64 color) {
 	rm_quad_t quad;
-	rmSetupQuad(txt, x, y, aligned, w, h, color, &quad);
+	rmSetupQuad(txt, x, y, aligned, w, h, scaled, color, &quad);
 	rmDrawQuad(&quad);
 }
 
-void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w, int h, u64 color,
+void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w, int h, short scaled, u64 color,
 		GSTEXTURE* inlay, int ulx, int uly, int urx, int ury, int blx, int bly, int brx, int bry) {
 
 	rm_quad_t quad;
-	rmSetupQuad(overlay, x, y, aligned, w, h, color, &quad);
+	rmSetupQuad(overlay, x, y, aligned, w, h, scaled, color, &quad);
 
 	if (!rmPrepareTexture(inlay))
 		return;
@@ -540,45 +542,14 @@ void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w,
 	rmDrawQuad(&quad);
 }
 
-void rmDrawRect(int x, int y, short aligned, int w, int h, u64 color) {
-	// primitive clipping TODO: repair clipping ...
-	/*float x1 = x + w;
-	float y1 = y + h;
-	
-	if (clipRect.used) {
-		if (x > clipRect.x1)
-			return;
-		if (y > clipRect.y1)
-			return;
-		if (x1 < clipRect.x)
-			return;
-		if (y1 < clipRect.y)
-			return;
-		
-		if (x < clipRect.x)
-			x = clipRect.x;
-		
-		if (x1 > clipRect.x1)
-			x1 = clipRect.x1;
-		
-		if (y < clipRect.y)
-			y = clipRect.y;
-		
-		if (y1 > clipRect.y1)
-			y1 = clipRect.y1;
-	}*/
-
-	rm_quad_t quad;
-	rmSetupQuad(NULL, x, y, aligned, w, h, color, &quad);
-	
+void rmDrawRect(int x, int y, int w, int h, u64 color) {
 	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
-	gsKit_prim_quad(gsGlobal, quad.ul.x + transX, quad.ul.y + transY, quad.br.x + transX, quad.ul.y + transY, quad.ul.x + transX, quad.br.y + transY, quad.br.x + transX, quad.br.y + transY, order, quad.color);
+	gsKit_prim_quad(gsGlobal, x + transX, shiftY(y) + transY, x + w + transX, shiftY(y) + transY, x + transX, shiftY(y) + h + transY, x + w + transX, shiftY(y) + h + transY, order, color);
 	order++;
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0); 
 }
 
 void rmDrawLine(int x, int y, int x1, int y1, u64 color) {
-	// TODO: clipping. It is more complicated in this case
 	gsKit_prim_line(gsGlobal, x + transX, shiftY(y) + transY, x1 + transX, shiftY(y1) + transY, order, color);
 }
 
@@ -594,7 +565,7 @@ void rmClip(int x, int y, int w, int h) {
 		clipRect.y1 = gsGlobal->Height;
 	else
 		clipRect.y1 = y + h;
-	clipRect.used = 0; // TODO: 1;
+	clipRect.used = 0;
 }
 
 /** Sets cipping to none */
@@ -617,6 +588,11 @@ void rmGetAspectRatio(float *w, float *h) {
 	*h = aspectHeight;
 }
 
+void rmApplyAspectRatio(int* w, int* h) {
+	*w = *w * aspectWidth;
+	*h = *h * aspectHeight;
+}
+
 void rmSetShiftRatio(float shiftYRatio) {
 	shiftYVal = shiftYRatio;
 	shiftY = &shiftYFunc;
@@ -624,6 +600,10 @@ void rmSetShiftRatio(float shiftYRatio) {
 
 void rmResetShiftRatio() {
 	shiftY = &identityFunc;
+}
+
+void rmApplyShiftRatio(int* y) {
+	*y = shiftY(*y);
 }
 
 void rmSetTransposition(float x, float y) {

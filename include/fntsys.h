@@ -40,7 +40,7 @@ void fntRelease(int id);
 void fntSetAspectRatio(float aw, float ah);
 
 /** Renders a string
-* @return Width of the string rendered */
+* @return the new x position after drawing */
 int fntRenderString(int font, int x, int y, short aligned, const unsigned char* string, u64 colour);
 
 /** Renders a text with specified window dimensions */

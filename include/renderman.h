@@ -3,12 +3,13 @@
 
 #include <gsToolkit.h>
 
-#define DIM_INF			-1
-#define DIM_UNDEF		-2
+#define DIM_UNDEF		-1
 
 #define ALIGN_NONE		0
 #define ALIGN_CENTER	1
 
+#define SCALING_NONE	0
+#define SCALING_RATIO	1
 
 /// GSKit CLUT base struct. This should've been in gsKit from the start :)
 typedef struct {
@@ -72,16 +73,16 @@ void rmDispatch(void);
 
 void rmDrawQuad(rm_quad_t* q);
 
-void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, u64 color, rm_quad_t* q);
+void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, short scaled, u64 color, rm_quad_t* q);
 
 /** Queues a specified pixmap (tinted with colour) to be rendered on specified position */
-void rmDrawPixmap(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, u64 color);
+void rmDrawPixmap(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, short scaled, u64 color);
 
-void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w, int h, u64 color,
+void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w, int h, short scaled, u64 color,
 		GSTEXTURE* inlay, int ulx, int uly, int urx, int ury, int blx, int bly, int brx, int bry);
 
 /** Queues a opaque rectangle to be rendered */
-void rmDrawRect(int x, int y, short aligned, int w, int h, u64 color);
+void rmDrawRect(int x, int y, int w, int h, u64 color);
 
 /** Queues a single color line to be rendered */
 void rmDrawLine(int x, int y, int x1, int y1, u64 color);
@@ -108,9 +109,13 @@ void rmResetAspectRatio();
 /** gets the current aspect ratio */
 void rmGetAspectRatio(float *w, float *h);
 
+void rmApplyAspectRatio(int* w, int* h);
+
 void rmSetShiftRatio(float height);
 
 void rmResetShiftRatio();
+
+void rmApplyShiftRatio(int* y);
 
 /** sets the transposition coordiantes (all content is transposed with these values) */
 void rmSetTransposition(float x, float y);

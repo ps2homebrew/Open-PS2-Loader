@@ -792,7 +792,7 @@ static void guiDrawBusy() {
 		GSTEXTURE* texture = thmGetTexture(LOAD0_ICON + guiFrameId % gTheme->loadingIconCount);
 		if (texture && texture->Mem) {
 			u64 mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, bfadeout);
-			rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, mycolor);
+			rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, gTheme->loadingIcon->scaled, mycolor);
 		}
 	}
 }
@@ -801,7 +801,7 @@ static int wfadeout = 0x0150;
 static void guiRenderGreeting() {
 	int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
 	u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
-	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, mycolor);
+	rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 	/* char introtxt[255];
 	 snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
 	 fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
@@ -810,7 +810,7 @@ static void guiRenderGreeting() {
 	GSTEXTURE* logo = thmGetTexture(LOGO_PICTURE);
 	if (logo) {
 		mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, fade >> 1);
-		rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, mycolor);
+		rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, logo->Width, logo->Height, SCALING_RATIO, mycolor);
 	}
 
 	return;
@@ -999,17 +999,17 @@ void guiDrawBGPlasma() {
 	}
 
 	pery = ymax;
-	rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gDefaultCol);
+	rmDrawPixmap(&gBackgroundTex, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol);
 }
 
 int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color) {
 	GSTEXTURE* iconTex = thmGetTexture(iconId);
 	if (iconTex && iconTex->Mem) {
-		rmDrawPixmap(iconTex, x, y, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, gDefaultCol);
+		rmDrawPixmap(iconTex, x, y, ALIGN_NONE, iconTex->Width, iconTex->Height, SCALING_RATIO, gDefaultCol);
 		x += iconTex->Width + 2;
 	}
 
-	x += fntRenderString(font, x, y, ALIGN_NONE, _l(textId), color);
+	x = fntRenderString(font, x, y, ALIGN_NONE, _l(textId), color);
 
 	return x;
 }
@@ -1196,7 +1196,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		else
 			guiShow();
 
-		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
+		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
@@ -1222,7 +1222,7 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 
 		guiShow();
 
-		rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
+		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 
@@ -1238,7 +1238,7 @@ void guiRenderTextScreen(const unsigned char* message) {
 
 	guiShow();
 
-	rmDrawRect(0, 0, ALIGN_NONE, DIM_INF, DIM_INF, gColDarker);
+	rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 

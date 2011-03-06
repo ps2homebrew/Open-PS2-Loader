@@ -724,8 +724,10 @@ static void guiHandleOp(struct gui_update_t* item) {
 			result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id,
 					item->submenu.text, item->submenu.id, item->submenu.text_id);
 
-			if (!item->menu.menu->submenu)
+			if (!item->menu.menu->submenu) {
 				item->menu.menu->submenu = *item->menu.subMenu;
+				item->menu.menu->current = *item->menu.subMenu;
+			}
 
 			if (item->submenu.selected)
 				item->menu.menu->current = result;

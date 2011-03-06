@@ -481,7 +481,6 @@ static void menuLastPage() {
 		return;
 
 	submenu_list_t *cur = selected_item->item->current;
-
 	if (cur) {
 		while (cur->next)
 			cur = cur->next; // go to end
@@ -600,15 +599,10 @@ void menuRenderMain() {
 	if (!selected_item)
 		selected_item = menu;
 
-	if (!selected_item->item->current)
-		selected_item->item->current = selected_item->item->submenu;
-
-	submenu_list_t* cur = selected_item->item->current;
-
 	theme_element_t* elem = gTheme->mainElems.first;
 	while (elem) {
 		if (elem->drawElem)
-			elem->drawElem(selected_item, cur, NULL, elem);
+			elem->drawElem(selected_item, selected_item->item->current, NULL, elem);
 
 		elem = elem->next;
 	}
@@ -655,14 +649,12 @@ void menuHandleInputMain() {
 }
 
 void menuRenderInfo() {
-	submenu_list_t* cur = selected_item->item->current;
-
 	menuRequestConfig();
 
 	theme_element_t* elem = gTheme->infoElems.first;
 	while (elem) {
 		if (elem->drawElem)
-			elem->drawElem(selected_item, cur, itemConfig, elem);
+			elem->drawElem(selected_item, selected_item->item->current, itemConfig, elem);
 
 		elem = elem->next;
 	}

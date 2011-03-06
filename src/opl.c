@@ -821,14 +821,13 @@ static void setDefaults(void) {
 	strncpy(gExitPath, "", 32);
 	// default menu
 	gDefaultDevice = APP_MODE;
-	// autosort defaults to zero
-	gAutosort = 0;
+	gAutosort = 1;
 	gAutoRefresh = 1;
 	//Default disable debug colors
 	gDisableDebug = 0;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
-	gCheckUSBFragmentation = 0;
+	gCheckUSBFragmentation = 1;
 	gUSBDelay = 3;
 	strncpy(gUSBPrefix, "", 32);
 	gUseInfoScreen = 0;

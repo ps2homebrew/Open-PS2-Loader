@@ -47,18 +47,27 @@ int usbFindPartition(char *target, char *name) {
 	char path[255];
 
 	for(i=0; i<5; i++) {
-		sprintf(path, "mass%d:%s/%s", i, gUSBPrefix, name);
+		if (gUSBPrefix[0] != '\0')
+			sprintf(path, "mass%d:%s/%s", i, gUSBPrefix, name);
+		else
+			sprintf(path, "mass%d:%s", i, name);
 		fd = fioOpen(path, O_RDONLY);
 
 		if(fd >= 0) {
-			sprintf(target, "mass%d:%s/", i, gUSBPrefix);
+			if (gUSBPrefix[0] != '\0')
+				sprintf(target, "mass%d:%s/", i, gUSBPrefix);
+			else
+				sprintf(target, "mass%d:", i);
 			fioClose(fd);
 			return 1;
 		}
 	}
 
 	// default to first partition (for themes, ...)
-	sprintf(target, "mass0:%s/", gUSBPrefix);
+	if (gUSBPrefix[0] != '\0')
+		sprintf(target, "mass0:%s/", gUSBPrefix);
+	else
+		sprintf(target, "mass0:");
 	return 0;
 }
 

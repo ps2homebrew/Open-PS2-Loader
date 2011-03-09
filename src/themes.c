@@ -654,26 +654,7 @@ static void drawItemsList(struct menu_list* menu, struct submenu_list* item, con
 			posY -= elem->height >> 1;
 		}
 
-		int icnt = itemsList->displayedItems;
-		int found = 0;
 		submenu_list_t *ps  = menu->item->pagestart;
-
-		// verify the item is in visible range
-		while (icnt-- && ps) {
-			if (ps == item) {
-				found = 1;
-				break;
-			}
-			ps = ps->next;
-		}
-
-		// page not properly aligned?
-		if (!found)
-			menu->item->pagestart = item;
-
-		// reset to page start after cur. item visibility determination
-		ps  = menu->item->pagestart;
-
 		int others = 0;
 		u64 color;
 		while (ps && (others++ < itemsList->displayedItems)) {
@@ -690,7 +671,7 @@ static void drawItemsList(struct menu_list* menu, struct submenu_list* item, con
 					if (itemsList->decoratorImage->defaultTexture)
 						rmDrawPixmap(&itemsList->decoratorImage->defaultTexture->source, posX, posY, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
 				}
-				fntRenderText(elem->font, posX + DECORATOR_SIZE, ALIGN_NONE, posY, elem->width, elem->height, submenuItemGetText(&ps->item), color);
+				fntRenderText(elem->font, posX + DECORATOR_SIZE, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
 			} else
 				fntRenderText(elem->font, posX, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
 

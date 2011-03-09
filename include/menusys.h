@@ -51,6 +51,8 @@ typedef struct menu_item {
 	/// submenu, selection and page start (only used in static mode)
 	struct submenu_list *submenu, *current, *pagestart;
 	
+	short remindLast;
+
 	void (*refresh)(struct menu_item *curMenu);
 
 	void (*execCross)(struct menu_item *curMenu);

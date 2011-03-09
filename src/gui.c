@@ -724,13 +724,15 @@ static void guiHandleOp(struct gui_update_t* item) {
 			result = submenuAppendItem(item->menu.subMenu, item->submenu.icon_id,
 					item->submenu.text, item->submenu.id, item->submenu.text_id);
 
-			if (!item->menu.menu->submenu) {
-				item->menu.menu->submenu = *item->menu.subMenu;
-				item->menu.menu->current = *item->menu.subMenu;
-			}
-
-			if (item->submenu.selected)
+			if (!item->menu.menu->submenu) { // first subitem in list
+				item->menu.menu->submenu = result;
 				item->menu.menu->current = result;
+				item->menu.menu->pagestart = result;
+			} else if (item->submenu.selected) { // remember last game feat.
+				item->menu.menu->current = result;
+				item->menu.menu->pagestart = result;
+				item->menu.menu->remindLast = 1;
+			}
 
 			break;
 
@@ -748,8 +750,12 @@ static void guiHandleOp(struct gui_update_t* item) {
 
 		case GUI_OP_SORT:
 			submenuSort(item->menu.subMenu);
-			item->menu.menu->pagestart = NULL;
 			item->menu.menu->submenu = *item->menu.subMenu;
+
+			if (!item->menu.menu->remindLast)
+				item->menu.menu->current = item->menu.menu->submenu;
+
+			item->menu.menu->pagestart = item->menu.menu->current;
 			break;
 
 		case GUI_OP_ADD_HINT:

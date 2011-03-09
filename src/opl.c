@@ -70,6 +70,7 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 	mod->menuItem.current = NULL;
 	mod->menuItem.submenu = NULL;
 	mod->menuItem.pagestart = NULL;
+	mod->menuItem.remindLast = 0;
 	mod->menuItem.refresh = NULL;
 	mod->menuItem.text = NULL;
 	mod->menuItem.text_id = -1;
@@ -225,6 +226,7 @@ static void initMenuForListSupport(int mode) {
 	item->menuItem.submenu = NULL;
 	item->menuItem.current = NULL;
 	item->menuItem.pagestart = NULL;
+	item->menuItem.remindLast = 0;
 
 	item->menuItem.refresh = &itemExecRefresh;
 	item->menuItem.execCross = &itemExecCross;
@@ -233,6 +235,7 @@ static void initMenuForListSupport(int mode) {
 	item->menuItem.execCircle = &itemExecCircle;
 
 	item->menuItem.hints = NULL;
+
 	moduleUpdateMenu(mode, 0);
 
 	struct gui_update_t *mc = guiOpCreate(GUI_OP_ADD_MENU);
@@ -296,6 +299,7 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	mdl->menuItem.submenu = NULL;
 	mdl->menuItem.current = NULL;
 	mdl->menuItem.pagestart = NULL;
+	mdl->menuItem.remindLast = 0;
 
 	// unlock, the rest is deferred
 	guiUnlock();

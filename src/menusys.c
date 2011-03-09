@@ -165,6 +165,7 @@ void menuAppendItem(menu_item_t* item) {
 	
 	if (menu == NULL) {
 		menu = AllocMenuItem(item);
+		selected_item = menu;
 		return;
 	}
 	
@@ -381,67 +382,50 @@ void submenuSort(submenu_list_t** submenu) {
 }
 
 static void menuNextH() {
-	if (!selected_item) {
-		selected_item = menu;
-	}
-	
-	if(selected_item->next) {
+	if(selected_item->next)
 		selected_item = selected_item->next;
-		
-		if (!selected_item->item->current)
-			selected_item->item->current = selected_item->item->submenu;
-	}
 }
 
 static void menuPrevH() {
-	if (!selected_item) {
-		selected_item = menu;
-	}
-	
-	if(selected_item->prev) {
+	if(selected_item->prev)
 		selected_item = selected_item->prev;
-		
-		if (!selected_item->item->current)
-			selected_item->item->current = selected_item->item->submenu;
-	}
 }
 
 static void menuNextV() {
-	if (!selected_item)
-		return;
-	
 	submenu_list_t *cur = selected_item->item->current;
 	
-	if(cur && cur->next)
+	if(cur && cur->next) {
 		selected_item->item->current = cur->next;
+
+		// if the current item is beyond the page start, move the page start one page down
+		cur = selected_item->item->pagestart;
+		int itms = ((items_list_t*) gTheme->itemsList->extended)->displayedItems + 1;
+		while (--itms && cur)
+			if (selected_item->item->current == cur)
+				return;
+			else
+				cur = cur->next;
+
+		selected_item->item->pagestart = selected_item->item->current;
+	}
 }
 
 static void menuPrevV() {
-	if (!selected_item)
-		return;
-
 	submenu_list_t *cur = selected_item->item->current;
-
-	// if the current item is on the page start, move the page start one page up before moving the item
-	if (selected_item->item->pagestart) {
-		if (selected_item->item->pagestart == cur) {
-			int itms = ((items_list_t*) gTheme->itemsList->extended)->displayedItems + 1; // +1 because the selection will move as well
-
-			while (--itms && selected_item->item->pagestart->prev)
-				selected_item->item->pagestart = selected_item->item->pagestart->prev;
-		}
-	} else
-		selected_item->item->pagestart = cur;
 
 	if(cur && cur->prev) {
 		selected_item->item->current = cur->prev;
+
+		// if the current item is on the page start, move the page start one page up
+		if (selected_item->item->pagestart == cur) {
+			int itms = ((items_list_t*) gTheme->itemsList->extended)->displayedItems + 1; // +1 because the selection will move as well
+			while (--itms && selected_item->item->pagestart->prev)
+				selected_item->item->pagestart = selected_item->item->pagestart->prev;
+		}
 	}
 }
 
 static void menuNextPage() {
-	if (!selected_item)
-		return;
-
 	submenu_list_t *cur = selected_item->item->pagestart;
 
 	if (cur) {
@@ -450,13 +434,11 @@ static void menuNextPage() {
 			cur = cur->next;
 
 		selected_item->item->current = cur;
+		selected_item->item->pagestart = selected_item->item->current;
 	}
 }
 
 static void menuPrevPage() {
-	if (!selected_item)
-		return;
-
 	submenu_list_t *cur = selected_item->item->pagestart;
 
 	if (cur) {
@@ -465,21 +447,16 @@ static void menuPrevPage() {
 			cur = cur->prev;
 
 		selected_item->item->current = cur;
-		selected_item->item->pagestart = cur;
+		selected_item->item->pagestart = selected_item->item->current;
 	}
 }
 
 static void menuFirstPage() {
-	if (!selected_item)
-		return;
-
 	selected_item->item->current = selected_item->item->submenu;
+	selected_item->item->pagestart = selected_item->item->current;
 }
 
 static void menuLastPage() {
-	if (!selected_item)
-		return;
-
 	submenu_list_t *cur = selected_item->item->current;
 	if (cur) {
 		while (cur->next)
@@ -593,12 +570,7 @@ void menuHandleInputMenu() {
 }
 
 void menuRenderMain() {
-	if (!menu)
-		return;
-
-	if (!selected_item)
-		selected_item = menu;
-
+	// selected_item can't be NULL here as we only allow to switch to "Main" rendering when there is at least one device activated
 	theme_element_t* elem = gTheme->mainElems.first;
 	while (elem) {
 		if (elem->drawElem)
@@ -609,9 +581,6 @@ void menuRenderMain() {
 }
 
 void menuHandleInputMain() {
-	if (!selected_item)
-		return;
-
 	if(getKey(KEY_LEFT)) {
 		menuPrevH();
 	} else if(getKey(KEY_RIGHT)) {
@@ -649,6 +618,7 @@ void menuHandleInputMain() {
 }
 
 void menuRenderInfo() {
+	// selected_item->item->current can't be NULL here as we only allow to switch to "Info" rendering when there is at least one item
 	menuRequestConfig();
 
 	theme_element_t* elem = gTheme->infoElems.first;

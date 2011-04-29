@@ -246,6 +246,7 @@ typedef struct {
 	int Stbufmax;
 	int Stlsn;
 	int intr_ef;
+	int disc_type_reg;
 #ifdef ALT_READ_CORE
 	int cdNCmd;
 	int cddiskready;
@@ -628,6 +629,11 @@ cdvdman_partspecs_t cdvdman_partspecs;
 
 #define CDVDMAN_MODULE_VERSION 0x225
 static int cdvdman_debug_print_flag = 0;
+
+static int cdvdman_no_tray_model = 0;
+static int cdvdman_media_changed = 1;
+
+static int cdvdman_cur_disc_type = 0; /* real current disc type */
 
 //-------------------------------------------------------------------------
 #ifdef ALT_READ_CORE
@@ -1341,19 +1347,25 @@ int sceCdSync(int mode)
 }
 
 //-------------------------------------------------------------------------
-int sceCdGetDiskType(void)
+void cdvdman_initDiskType()
 {
-	cdvdman_stat.err = CDVD_ERR_NO;
+        cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef HDD_DRIVER
-	fs_init();
+        fs_init();
 
-	DPRINTF("sceCdGetdiskType=0x%x\n", (int)apaHeader.discType);
-	return apaHeader.discType;
+        cdvdman_cur_disc_type = (int)apaHeader.discType;
 #else
-	DPRINTF("sceCdGetdiskType=0x%x\n", (int)g_ISO_media);
-	return g_ISO_media;
+        cdvdman_cur_disc_type = (int)g_ISO_media;
 #endif
+	cdvdman_stat.disc_type_reg = cdvdman_cur_disc_type;
+        DPRINTF("DiskType=0x%x\n", cdvdman_cur_disc_type);
+}
+
+//-------------------------------------------------------------------------
+int sceCdGetDiskType(void)
+{
+        return 	cdvdman_stat.disc_type_reg;
 }
 
 //-------------------------------------------------------------------------
@@ -1385,14 +1397,45 @@ int sceCdDiskReady(int mode)
 //-------------------------------------------------------------------------
 int sceCdTrayReq(int mode, u32 *traycnt)
 {
-	DPRINTF("sceCdTrayReq\n");
+        DPRINTF("sceCdTrayReq(%d, 0x%X)\n", mode, traycnt);
 
-	cdvdman_stat.err = CDVD_ERR_NO;
-	
-	if (traycnt)
-		*traycnt = 0;
+        if (mode == CDVD_TRAY_CHECK) {
+        
+                if (traycnt)
+                        *traycnt = cdvdman_media_changed;
 
-	return 1;
+                cdvdman_media_changed = 0;
+
+                return 1;
+        }
+
+        if (cdvdman_no_tray_model == 1) {
+                return 1;
+        }
+
+        if (mode == CDVD_TRAY_OPEN) {
+                cdvdman_stat.status = CDVD_STAT_OPEN;
+                cdvdman_stat.disc_type_reg = 0;
+
+                DelayThread(11000);
+
+                cdvdman_stat.err = CDVD_ERR_OPENS; /* not sure about this error code */
+
+                return 1;
+        }
+        else if (mode == CDVD_TRAY_CLOSE) {
+                DelayThread(25000);
+
+                cdvdman_stat.status = CDVD_STAT_PAUSE; /* not sure if the status is right, may be - CDVD_STAT_SPIN */
+                cdvdman_stat.err = CDVD_ERR_NO; /* not sure if this error code is suitable here */
+                cdvdman_stat.disc_type_reg = cdvdman_cur_disc_type;
+
+                cdvdman_media_changed = 1;
+
+                return 1;
+        }
+
+        return 0;
 }
 
 //-------------------------------------------------------------------------
@@ -2895,6 +2938,9 @@ int _start(int argc, char **argv)
 
 	// hook MODLOAD's exports
 	hookMODLOAD();
+
+	// init disk type stuff
+	cdvdman_initDiskType();
 
 	return MODULE_RESIDENT_END;
 }

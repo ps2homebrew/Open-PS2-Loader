@@ -252,6 +252,8 @@ static int gShiftPos;
 static u8 _4K_buf[4096] __attribute__((aligned(64)));
 #endif
 
+extern unsigned int ReadPos;
+
 static void usb_callback(int resultCode, int bytes, void *arg)
 {
 	usb_callback_data* data = (usb_callback_data*) arg;
@@ -1033,6 +1035,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 		r += sectors;
 		p += nbytes;
 		nsectors -= sectors;
+		ReadPos+=sectors;
 	}
 
 	return 1;

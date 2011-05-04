@@ -633,7 +633,8 @@ static int cdvdman_debug_print_flag = 0;
 static int cdvdman_no_tray_model = 0;
 static int cdvdman_media_changed = 1;
 
-static int cdvdman_cur_disc_type = 0; /* real current disc type */
+static int cdvdman_cur_disc_type = 0;	/* real current disc type */
+unsigned int ReadPos = 0;		/* Current buffer offset in 2048-byte sectors. */
 
 //-------------------------------------------------------------------------
 #ifdef ALT_READ_CORE
@@ -1613,7 +1614,7 @@ int sceCdGetReadPos(void)
 {
 	DPRINTF("sceCdGetReadPos\n");
 
-	return 0;
+	return ReadPos;
 }
 
 //-------------------------------------------------------------------------
@@ -1815,7 +1816,9 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 			offset += nsectors << 11;
 			sectors -= nsectors;
 			lsn += nsectors;
+			ReadPos += nsectors;
 		}
+
 		#else
 		cdvdman_ReadSect(lsn, sectors, buf);
 		#endif
@@ -1824,6 +1827,8 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 
 		SignalSema(cdvdman_cdreadsema);
 	}
+
+	ReadPos = 0;	/* Reset the buffer offset indicator. */
 
 	return 1;
 }

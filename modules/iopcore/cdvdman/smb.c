@@ -276,6 +276,8 @@ static int main_socket;
 
 static u8 SMB_buf[1024] __attribute__((aligned(64)));
 
+extern unsigned int ReadPos;
+
 //-------------------------------------------------------------------------
 int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
 {
@@ -774,6 +776,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		p += nbytes;
 		offset += sectors;
 		nsectors -= sectors;
+		ReadPos += sectors;
 	}
 
 	return 1;

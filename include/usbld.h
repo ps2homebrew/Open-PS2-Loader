@@ -25,6 +25,7 @@
 #include <smod.h>
 #include <smem.h>
 #include <debug.h>
+#include <ps2smb.h>
 #include "config.h"
 #ifdef VMC
 #include <sys/fcntl.h>

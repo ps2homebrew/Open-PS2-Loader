@@ -14,7 +14,6 @@ clean:
 	$(MAKE) -C ../../modules/network/SMSUTILS clean
 	$(MAKE) -C ../../modules/network/SMSTCPIP clean
 	$(MAKE) -C ../../modules/network/SMSMAP clean
-	$(MAKE) -C ../../modules/network/smbman clean
 	$(MAKE) -C ../../modules/debug/udptty clean
 	$(MAKE) -C ../../modules/debug/ioptrap clean
 	$(MAKE) -C ../../modules/debug/ps2link clean
@@ -42,8 +41,7 @@ smsmap.s:
 	bin2s ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx
 
 smbman.s:
-	$(MAKE) -C ../../modules/network/smbman
-	bin2s ../../modules/network/smbman/smbman.irx smbman.s smbman_irx
+	bin2s $(PS2SDK)/iop/irx/smbman.irx smbman.s smbman_irx
 
 udptty.s:
 	$(MAKE) -C ../../modules/debug/udptty

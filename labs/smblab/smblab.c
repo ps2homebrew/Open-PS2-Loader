@@ -14,8 +14,7 @@
 #include <debug.h>
 #include <sys/time.h>
 #include <time.h>
-
-#include "../../modules/network/smbman/smbman.h"
+#include <ps2smb.h>
 
 #define DPRINTF(args...)	printf(args); scr_printf(args);
 

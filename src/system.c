@@ -188,55 +188,6 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 	return 0;
 }
 
-void sysApplyFILEIOPatches(void)
-{
-	// This patch is a fix for FILEIO on IOP:
-	// the handler of rpc_fioremove doesn't exit just after file is
-	// removed due to a bug, and chain with rpc_fiomkdir which have for
-	// effect to create a folder of the same name that the file deleted...
-	// We'll seach for FILEIO text section start and patch the rpc
-	// handler to jump to a subroutine to correct this.
-	// This subroutine is 16 bytes and written in a FILEIO string
-	// that have poor interest: "iop heap service (99/11/03)\n" will
-	// be cutted to "iop heap service"
-	// text + 0x1447: patch with 0 (1byte)
-	// text + 0x1448: patch with (16 bytes)
-	// text + 0x0bb8: patch with 0x0c000512(+text_start) (4bytes)
-	// 0x0c0001ce(+text_start) 	// jal fio_remove
-	// 0x00000000			// nop
-	// 0x0800033a(+text_start)	// j rpc_handler_exit
-	// 0x00000000			// nop
-
-	smod_mod_info_t mod_info;
-	u8 jal_fioremove[4];
-	u8 new_fioremove[16];
-	volatile u32 j_new_fioremove = 0x08000512;
-	volatile u32 j_rpc_handler_exit = 0x0800033a;
-	volatile u8 string_term = 0;
-
-	memset(&mod_info, 0, sizeof(mod_info));
-
-	int ret = smod_get_mod_by_name("FILEIO_service", &mod_info);
-	if ((!ret) || (mod_info.version != 0x101))
-		return;
-
-	smem_read((void *)mod_info.text_start  + 0x0bb8, jal_fioremove, sizeof(jal_fioremove));
-
-	memset(new_fioremove, 0, sizeof(new_fioremove));
-	memcpy(&new_fioremove[0], jal_fioremove, sizeof(jal_fioremove));
-	j_rpc_handler_exit += ((u32)mod_info.text_start >> 2);
-	memcpy(&new_fioremove[8], (void *)&j_rpc_handler_exit, sizeof(j_rpc_handler_exit));	
-	smem_write((void *)mod_info.text_start + 0x1447, (void *)&string_term, sizeof(string_term));
-
-	smem_write((void *)mod_info.text_start + 0x1448, new_fioremove, sizeof(new_fioremove));
-
-	j_new_fioremove +=  ((u32)mod_info.text_start >> 2);
-	smem_write((void *)mod_info.text_start + 0x0bb8, (void *)&j_new_fioremove, sizeof(j_new_fioremove));
-
-	FlushCache(0);
-	FlushCache(2);
-}
-
 void sysReset(int modload_mask) {
 
 	SifInitRpc(0);
@@ -263,7 +214,7 @@ void sysReset(int modload_mask) {
 	// apply sbv patches
 	sbv_patch_enable_lmb();
 	sbv_patch_disable_prefix_check();
-	sysApplyFILEIOPatches();
+	sbv_patch_fioremove();
 
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 
@@ -700,43 +651,13 @@ void sysApplyKernelPatches(void) {
 		fioClose(fd);
 
 		// Check in rom0 for PS2 with Protokernel
-		DIntr();
-		ee_kmode_enter();
-
 		if ((romver[0] == '0')
 		 && (romver[1] == '1')
 		 && (romver[2] == '0')
 		 && (romver[9] == '0')) {
 
-			// if protokernel is unpatched
-			if (_lw((u32)KSEG0(0x00002f88)) == 0x0c0015fa) {
-
-				// we copy the patching to its placement in kernel memory
-				u8 *elfptr = (u8 *)&kpatch_10K_elf;
-				elf_header_t *eh = (elf_header_t *)elfptr;
-				elf_pheader_t *eph = (elf_pheader_t *)&elfptr[eh->phoff];
-				int i;
-
-				for (i = 0; i < eh->phnum; i++) {
-					if (eph[i].type != ELF_PT_LOAD)
-						continue;
-
-					memcpy(eph[i].vaddr, (void *)&elfptr[eph[i].offset], eph[i].filesz);
-
-					if (eph[i].memsz > eph[i].filesz)
-						memset((void *)(eph[i].vaddr + eph[i].filesz), 0, eph[i].memsz - eph[i].filesz);
-				}
-
-				// insert a JAL to our kernel code into the ExecPS2 syscall
-				_sw(JAL(eh->entry), KSEG0(0x00002f88));
-			}
+			sbv_patch_protokernel();
 		}
-
-		ee_kmode_exit();
-		EIntr();
-
-		FlushCache(0);
-		FlushCache(2);
 	}
 }
 

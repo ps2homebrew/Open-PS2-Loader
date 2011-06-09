@@ -8,7 +8,6 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include "include/smbman.h"
 
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;

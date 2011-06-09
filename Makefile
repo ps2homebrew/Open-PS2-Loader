@@ -158,8 +158,6 @@ sclean:
 	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo "    * SMSMAP.irx"
 	$(MAKE) -C modules/network/SMSMAP clean
-	echo "    * smbman.irx"
-	$(MAKE) -C modules/network/smbman clean
 	echo "    * discID.irx"
 	$(MAKE) -C modules/cdvd/discID clean
 	echo "    * ps2atad.irx"
@@ -329,9 +327,7 @@ smsmap.s:
 	bin2s modules/network/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
 
 smbman.s:
-	echo "    * smbman.irx"
-	$(MAKE) $(MOD_DEBUG_FLAGS) -C modules/network/smbman
-	bin2s modules/network/smbman/smbman.irx asm/smbman.s smbman_irx
+	bin2s $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx
 
 discid.s:
 	echo "    * discID.irx"

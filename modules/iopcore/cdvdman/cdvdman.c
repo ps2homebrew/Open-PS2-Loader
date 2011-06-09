@@ -581,6 +581,7 @@ typedef struct {
 
 layer_info_t layer_info[2];
 
+static int cdvdman_cdinited = 0;
 cdvdman_status_t cdvdman_stat;
 static void *user_cb;
 
@@ -1184,14 +1185,6 @@ void fs_init(void)
 }
 
 //-------------------------------------------------------------------------
-void cdvdman_cdinit(void)
-{
-	DPRINTF("cdvdman_cdinit\n");
-
-	fs_init();
-}
-
-//-------------------------------------------------------------------------
 int sceCdInit(int init_mode)
 {
 	cdvdman_stat.err = CDVD_ERR_NO;
@@ -1203,8 +1196,9 @@ int sceCdInit(int init_mode)
 	cdvdman_waitsignalNCmdsema();
 	cdvdman_stat.cddiskready = CDVD_READY_READY;
 #else
-	cdvdman_cdinit();
+	fs_init();
 #endif
+	cdvdman_cdinited = 1;
 
 	return 1;
 }
@@ -1375,7 +1369,7 @@ int sceCdDiskReady(int mode)
 	DPRINTF("sceCdDiskReady %d\n", mode);
 	cdvdman_stat.err = CDVD_ERR_NO;
 
-	if (fs_inited) {
+	if (cdvdman_cdinited) {
 		if (mode == 0) {
 			while (sceCdDiskReady(1) == CDVD_READY_NOTREADY)
 				DelayThread(5000);

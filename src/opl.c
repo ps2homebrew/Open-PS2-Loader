@@ -415,16 +415,18 @@ static int tryAlternateDevice(int types) {
 		return value;
 	}
 
-	// set config path to either mass or hdd, to prepare the saving of a new config
-	value = fioDopen("mass0:");
-	if (value >= 0) {
-		fioDclose(value);
-		configEnd();
-		configInit("mass0:");
-	}
-	else {
-		configEnd();
-		configInit("pfs0:");
+	if (sysCheckMC() < 0) { // We don't want to get users into alternate mode for their very first of OPL (i.e no config file at all, but still want to save on MC)
+		// set config path to either mass or hdd, to prepare the saving of a new config
+		value = fioDopen("mass0:");
+		if (value >= 0) {
+			fioDclose(value);
+			configEnd();
+			configInit("mass0:");
+		}
+		else {
+			configEnd();
+			configInit("pfs0:");
+		}
 	}
 
 	return 0;
@@ -437,9 +439,7 @@ static void _loadConfig() {
 		int themeID = -1, langID = -1;
 		
 		if (!(result & CONFIG_OPL)) {
-			if (sysCheckMC() < 0) { // No MC inserted
-				result = tryAlternateDevice(lscstatus);
-			}
+			result = tryAlternateDevice(lscstatus);
 		}
 
 		if (result & CONFIG_OPL) {

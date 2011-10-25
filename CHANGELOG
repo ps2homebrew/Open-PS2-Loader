@@ -1,0 +1,104 @@
+-----------------------------------------------------------------------------
+
+  Copyright 2009, Ifcaro & jimmikaelkael
+  Licenced under Academic Free License version 3.0
+  Review OpenUsbLd README & LICENSE files for further details.
+  
+-----------------------------------------------------------------------------
+
+Open PS2 Loader ChangeLog:
+
+Version 0.8
+-------------------------------------------------
+Core:
+    * secure authentication for the SMB module (to enable security and write access)
+    * new GUI, fully customizable elements
+    * various SMB tweaks (NBSS keep-alive, small ingame speed-up)
+    * improved NAS support for more devices (WD MyBook, Digitus NAS, ...)
+    * added an embedded HDLServer into OPL to install HDD games
+    * various debugging output option (to help debug failing games)
+    * add compatibility for new external USB HDD with 1k/2k/4k cluster file
+    * add full compatibility for old PS2 consoles (10k JAP)
+    * ISO format added for USB too (still there is the 4Gb file limit, which is not present on SMB)
+    * new compatibility modes
+    * childproof mode (settings are locked)
+    * alternate startup mode, for loading/saving configuration files from USB and HDD (no need for MC in this case)
+    * added new menu to launch external ELF applications
+    * added VMC (Virtual Memory Card) support
+    * improved general compatibility (many specific games now working for the first time)
+
+GUI:
+    * new multi-threaded and redesigned GUI
+    * support for Cover, Icon and Background Art
+    * skinnable interface using theme
+    * added "rename" and "delete" functionalities for games lists
+
+Version 0.7
+-------------------------------------------------
+- Improved network startups and various fixes
+- Added internal HDD support (HDL format)
+- Added the ability to choose the default menu (USB, NET, HDD games)
+- Added the ability to use a valid disc ID for online games
+- Added a fix for modchip freezing (maybe not all modchips)
+- Many new game compatibility fixes
+- Added IGR (In Game Reset) with a disable  per game option
+- Added  Alphabetical Sorting
+- Changed  Settings categories
+- Added  page scrolling (R1/L1)
+- Added support for user language files
+- Network support added for PS3
+- Zipped Theme support
+- Added PCMCIA support for the 18K
+
+Version 0.6
+-------------------------------------------------
+- Switched to whole new IOP core
+- Changed some compatibility modes effect
+- Added compatibility for DVD9 layer1
+- Improved overall speed for both SMB/USB
+- Support for more embedded NAS devices
+- Support for multiple partitions
+
+Version 0.5
+-------------------------------------------------
+- Added compatibility modes
+- isofs/cdvdman now use disc type
+- cdvdman now has streams
+- Added game loading through network
+- Static interface available
+- Added language support
+- It works in PS3 with PS2 emulation by software 
+
+Version 0.41
+-------------------------------------------------
+- Added theme support
+- Now uses latest usb driver from svn 
+
+Version 0.4
+-------------------------------------------------
+- New interface
+- Core and drivers 100% open source 
+
+-------------------------------------------------------------------------
+
+Version 0.3
+-------------------------------------------------
+- Discontinued (open usb loader starts) 
+
+Version 0.2b
+-------------------------------------------------
+- It uses a embedded free USBD module.
+- Select video mode 
+
+Version 0.2
+-------------------------------------------------
+- Replace USB Advance's reset function for a reset using "rom0:UDNL rom0:EELOADCNF" as argument.
+- It works in PS3 with PS2 emulation by software 
+
+Version 0.1
+-------------------------------------------------
+- Replaces ExtraeModulo() function instead of run after that. 
+
+Version 0.0
+-------------------------------------------------
+- Initial version 

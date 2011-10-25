@@ -1,0 +1,105 @@
+# translation by Thinner & the ps3-tools.de community
+German
+               WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
+Open PS2 Loader %s
+Konfiguration speichern
+O Zurück
+Netzwerk-Konfiguration
+<kein Wert>
+Konfiguration gespeichert...
+Fehler beim Speichern der Konfiguration!
+Verlassen
+Konfiguration
+USB Spiele
+HDD Spiele
+LAN Spiele
+Programme
+Theme
+Sprache
+Fehler beim Starten des Netzwerks
+Ein
+Aus
+Ok
+Spiel-Einstellungen
+Alle Einstellungen entfernen
+Alle Einstellungen des Spiels entfernt.
+Scrolling
+Langsam
+Mittel
+Schnell
+Standardmenü
+Von Disk laden
+Bitte warten
+Fehler beim Laden der Spiel-ID
+Automatische Sortierung
+Fehler beim Laden der Sprachdatei
+Debugfarben deaktivieren
+Kein Controller gefunden, warte...
+Cover-Art einschalten
+Breitbild
+Ausschalten
+Konfiguration laden
+Konfiguration speichern
+Gerät starten
+USB Startmodus
+HDD Startmodus
+LAN Startmodus
+Programm Startmodus
+Automatisch
+Manuell
+HDL Server starten
+HDL Server wird gestartet...
+HDL Server läuft... Drücke [O] zum Beenden
+Drücke [X] um den HDL Server zu schließen
+HDL Server wird beendet...
+Verlassen zu
+Hintergrundfarbe
+Textfarbe
+IP-Adresse
+Netzwerkmaske
+Gateway
+Port
+Freigabe
+Benutzer
+Passwort
+<keine Eingabe>
+X Bestätigen
+Eintrag wird endgültig gelöscht, fortfahren?
+Umbenennen
+Löschen
+Starten
+Anzeige-Konfiguration
+Löschen/Umbenennen aktivieren
+USB-Fragmentierung überprüfen
+Zuletzt gespieltes Spiel merken
+Fehler! Das Spiel ist fragmentiert.
+Fehler! Der Eintrag konnte nicht gestartet werden.
+Test
+Leer lassen für Gast-Anmeldung
+Alternativen Kern laden
+Alternativer Datenlesemodus
+Syscalls entladen
+0 PSS Modus
+DVD-DL deaktivieren
+IGR deaktivieren
+Verkleinerter cdvdfsv Puffer
+dev9 Modul verbergen
+Alternative IGR Kombination
+VMC wird bei Größenänderung neu formatiert
+Erstellen
+Bearbeiten
+Abbrechen
+Zurücksetzen
+benutze generic
+VMC konfigurieren
+Name
+Größe
+Status
+Fortschritt
+VMC-Datei existiert
+Ungültige VMC-Datei, Größe ist inkorrekt
+VMC-Datei muss erstellt werden
+Fehlerhafte VMC-Datei, mit physischer MC fortfahren?
+Automatische Aktualisierung
+Über OPL
+Programmierer

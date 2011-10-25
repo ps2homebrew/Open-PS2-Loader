@@ -455,8 +455,8 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 
 	restoreSyscallHandler();
 
-	void *irxtab = (void *)0x80030010;
-	void *irxptr = (void *)0x80030100;
+	void *irxtab = (void *)0x80033010;
+	void *irxptr = (void *)0x80033100;
 	irxptr_t irxptr_tab[IRX_NUM];
 	void *irxsrc[IRX_NUM];
 	int i, n;
@@ -497,7 +497,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	DIntr();
 	ee_kmode_enter();
 
-	*(u32 *)0x80030000 = 0x80030010;
+	*(u32 *)0x80033000 = 0x80033010;
 
 	for (i = 0; i < IRX_NUM; i++) {
 		curIrxSize = irxptr_tab[i].irxsize;

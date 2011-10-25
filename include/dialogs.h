@@ -6,7 +6,6 @@
 #define COMPAT_MODE_COUNT		8
 
 #define COMPAT_MODE_BASE		200
-#define COMPAT_ALTSTARTUP		100
 #define COMPAT_GAME				101
 #define COMPAT_GAMEID			102
 #define COMPAT_SAVE				103

@@ -355,7 +355,7 @@ static u8 cdvdNcmds_rpcbuf[1024] __attribute__((aligned(16)));
 static u8 S596_rpcbuf[16] __attribute__((aligned(16)));
 static u8 curlsn_buf[16] __attribute__ ((aligned(64)));
 
-//static int g_reduced_iopmemusage = 0xC0DEC0DE;
+static int g_reduced_iopmemusage = 0xC0DEC0DE;
 
 #define CDVDFSV_BUF_SECTORS		2
 

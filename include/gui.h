@@ -103,7 +103,7 @@ struct gui_update_t *guiOpCreate(gui_op_type_t type);
 /** For completeness, the deffered operations are destroyed automatically */
 void guiDestroyOp(struct gui_update_t *op);
 
-int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet);
+int guiShowCompatConfig(int id, item_list_t *support);
 int guiShowKeyboard(char* value, int maxLength);
 int guiMsgBox(const char* text, int addAccept, struct UIItem *ui);
 
@@ -130,8 +130,6 @@ void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void 
 /** Renders a single frame with a specified message on the screen
 */
 void guiRenderTextScreen(const unsigned char* message);
-
-int guiAltStartupNameHandler(char* text, int maxLen);
 
 #ifdef VMC
 int guiVmcNameHandler(char* text, int maxLen);

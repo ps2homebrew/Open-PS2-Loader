@@ -164,7 +164,7 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 	DIntr();
 	ee_kmode_enter();
 
-	void *irx_tab = (void *)(*(u32 *)0x80030000);	
+	void *irx_tab = (void *)(*(u32 *)0x80033000);	
 	memcpy(&irxptr_tab[0], irx_tab, sizeof(irxptr_tab));
 
 	ee_kmode_exit();

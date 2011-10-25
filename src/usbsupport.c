@@ -80,9 +80,6 @@ static void usbInitModules(void) {
 	sprintf(path, "%sTHM", usbPrefix);
 	thmAddElements(path, "/", usbGameList.mode);
 
-	sprintf(path, "%sCFG", usbPrefix);
-	checkCreateDir(path);
-
 #ifdef VMC
 	sprintf(path, "%sVMC", usbPrefix);
 	checkCreateDir(path);
@@ -206,8 +203,16 @@ static void usbDeleteGame(int id) {
 }*/
 #endif
 
+static int usbGetGameCompatibility(int id, int *dmaMode) {
+	return configGetCompatibility(usbGames[id].startup, usbGameList.mode, NULL);
+}
+
+static void usbSetGameCompatibility(int id, int compatMode, int dmaMode) {
+	configSetCompatibility(usbGames[id].startup, usbGameList.mode, compatMode, -1);
+}
+
 #ifdef VMC
-static int usbPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
+static int usbPrepareMcemu(base_game_info_t* game) {
 	char vmc[2][32];
 	char vmc_path[255];
 	u32 vmc_size;
@@ -215,8 +220,8 @@ static int usbPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
 	usb_vmc_infos_t usb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 
-	configGetVMC(configSet, vmc[0], 0);
-	configGetVMC(configSet, vmc[1], 1);
+	configGetVMC(game->startup, vmc[0], USB_MODE, 0);
+	configGetVMC(game->startup, vmc[1], USB_MODE, 1);
 
 	for(i=0; i<2; i++) {
 		if(!vmc[i][0]) // skip if empty
@@ -285,7 +290,7 @@ static int usbPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
 }
 #endif
 
-static void usbLaunchGame(int id, config_set_t* configSet) {
+static void usbLaunchGame(int id) {
 	int fd, r, index, i, compatmask;
 	char isoname[32], partname[255], filename[32];
 	base_game_info_t* game = &usbGames[id];
@@ -310,7 +315,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		irx_size = size_usb_4Ksectors_cdvdman_irx;
 	}
 
-	compatmask = sbPrepare(game, configSet, isoname, irx_size, irx, &index);
+	compatmask = sbPrepare(game, usbGameList.mode, isoname, irx_size, irx, &index);
 
 	if (gCheckUSBFragmentation)
 		for (i = 0; i < game->parts; i++) {
@@ -342,7 +347,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	fioDclose(fd);
 
 #ifdef VMC
-	int size_mcemu_irx = usbPrepareMcemu(game, configSet);
+	int size_mcemu_irx = usbPrepareMcemu(game);
 	if (size_mcemu_irx == -1) {
 		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
 			size_mcemu_irx = 0;
@@ -351,11 +356,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	}
 #endif
 
-	char *altStartup = NULL;
-	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, 32);
-	else
-		sprintf(filename, "%s", game->startup);
+	sprintf(filename,"%s",game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
 	FlushCache(0);
 
@@ -394,15 +395,15 @@ static int usbCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t usbGameList = {
-		USB_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+		USB_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
 #ifdef __CHILDPROOF
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
 #else
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, NULL,
 #endif
 #ifdef VMC
-		&usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbCheckVMC, USB_ICON
+		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbCheckVMC, USB_ICON
 #else
-		&usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, USB_ICON
+		&usbGetGameCompatibility, &usbSetGameCompatibility, &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, USB_ICON
 #endif
 };

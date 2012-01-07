@@ -61,16 +61,16 @@ static void menuLoadConfig(void* data) {
 	free(req);
 }
 
-static void menuRequestConfig() {
+static void menuRequestConfig(int direct) {
 	WaitSema(menuSemaId);
 	if (itemIdConfig != selected_item->item->current->item.id) {
-		if (itemConfig) {
-			configFree(itemConfig);
-			itemConfig = NULL;
-		}
-
 		item_list_t* list = selected_item->item->userdata;
-		if (guiInactiveFrames >= list->delay) {
+		if (direct || guiInactiveFrames >= list->delay) {
+			if (itemConfig) {
+				configFree(itemConfig);
+				itemConfig = NULL;
+			}
+
 			itemIdConfig = selected_item->item->current->item.id;
 
 			load_config_request_t* req = malloc(sizeof(load_config_request_t));
@@ -80,6 +80,11 @@ static void menuRequestConfig() {
 		}
 	}
 	SignalSema(menuSemaId);
+}
+
+config_set_t* menuCheckConfig() {
+	menuRequestConfig(1);
+	return itemConfig;
 }
 
 static void menuInitMainMenu() {
@@ -619,7 +624,7 @@ void menuHandleInputMain() {
 
 void menuRenderInfo() {
 	// selected_item->item->current can't be NULL here as we only allow to switch to "Info" rendering when there is at least one item
-	menuRequestConfig();
+	menuRequestConfig(0);
 
 	theme_element_t* elem = gTheme->infoElems.first;
 	while (elem) {

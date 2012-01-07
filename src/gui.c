@@ -565,10 +565,9 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 
 #endif
 
-int guiShowCompatConfig(int id, item_list_t *support) {
+int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	int dmaMode = -1, compatMode = 0;
-	char* startup = support->itemGetStartup(id);
-	compatMode = support->itemGetCompatibility(id, &dmaMode);
+	compatMode = configGetCompatibility(configSet, &dmaMode);
 
 	if (dmaMode != -1) {
 		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6",	NULL };
@@ -588,18 +587,20 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 
 	// Find out the current game ID
 	char hexid[32];
-	configGetDiscID(startup, hexid);
+	configGetDiscID(configSet, hexid);
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
-#ifdef VMC
-	int mode = support->mode;
+	char altStartup[32];
+	configGetAltStartup(configSet, altStartup);
+	diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
+#ifdef VMC
 	char vmc1[32];
-	configGetVMC(startup, vmc1, mode, 0);
+	configGetVMC(configSet, vmc1, 0);
 	diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
 
 	char vmc2[32]; // required as diaSetLabel use pointer to value
-	configGetVMC(startup, vmc2, mode, 1);
+	configGetVMC(configSet, vmc2, 1);
 	diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
 #endif
 
@@ -647,13 +648,14 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 	} while (result >= COMPAT_NOEXIT);
 
 	if (result == COMPAT_REMOVE) {
-		configRemoveDiscID(startup);
+		configRemoveDiscID(configSet);
+		configRemoveAltStartup(configSet);
 #ifdef VMC
-		configRemoveVMC(startup, mode, 0);
-		configRemoveVMC(startup, mode, 1);
+		configRemoveVMC(configSet, 0);
+		configRemoveVMC(configSet, 1);
 #endif
-		support->itemSetCompatibility(id, 0, 7);
-		saveConfig(CONFIG_COMPAT | CONFIG_DNAS | CONFIG_VMC, 1);
+		configSetCompatibility(configSet, 0, 7);
+		configWrite(configSet); // TODO should use secured & threaded IO request
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -665,20 +667,27 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 		if (dmaMode != -1)
 			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
 
-		support->itemSetCompatibility(id, compatMode, dmaMode);
+		configSetCompatibility(configSet, compatMode, dmaMode);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')
-			configSetDiscID(startup, hexid);
+			configSetDiscID(configSet, hexid);
+
+		diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
+		if (altStartup[0] != '\0')
+			configSetAltStartup(configSet, altStartup);
+		else
+			configRemoveAltStartup(configSet);
+
 #ifdef VMC
-		configSetVMC(startup, vmc1, mode, 0);
-		configSetVMC(startup, vmc2, mode, 1);
+		configSetVMC(configSet, vmc1, 0);
+		configSetVMC(configSet, vmc2, 1);
 		guiShowVMCConfig(id, support, vmc1, 0, 1);
 		guiShowVMCConfig(id, support, vmc2, 1, 1);
 #endif
 
 		if (result == COMPAT_SAVE)
-			saveConfig(CONFIG_COMPAT | CONFIG_DNAS | CONFIG_VMC, 1);
+			configWrite(configSet); // TODO
 	}
 
 	return result;
@@ -1218,6 +1227,33 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	}
 
 	return terminate - 1;
+}
+
+config_set_t* guiWaitConfigBox(struct UIItem *ui) {
+	config_set_t* config;
+	while (1) {
+		config = menuCheckConfig();
+		if (config)
+			break;
+
+		guiStartFrame();
+
+		if (ui)
+			diaRenderUI(ui, screenHandler->inMenu, NULL, 0);
+		else
+			guiShow();
+
+		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+
+		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
+		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
+
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, _l(_STR_LOADING_SETTINGS), gTheme->textColor);
+
+		guiEndFrame();
+	}
+
+	return config;
 }
 
 void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {

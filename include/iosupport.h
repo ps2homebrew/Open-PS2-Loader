@@ -11,6 +11,9 @@
 #define NO_EXCEPTION		0x00
 #define UNMOUNT_EXCEPTION	0x01
 
+#define NO_COMPAT			0x00
+#define COMPAT				0x01
+
 #define COMPAT_MODE_1 		0x01
 #define COMPAT_MODE_2 		0x02
 #define COMPAT_MODE_3 		0x04
@@ -28,6 +31,8 @@ typedef struct
 	int mode;
 
 	int enabled;
+
+	int haveCompatibilityMode;
 
 	/// update in progress indicator
 	int uip;
@@ -63,11 +68,7 @@ typedef struct
 
 	void (*itemRename)(int id, char* newName);
 
-	int (*itemGetCompatibility)(int id, int *dmaMode);
-
-	void (*itemSetCompatibility)(int id, int compatMode, int dmaMode);
-
-	void (*itemLaunch)(int id);
+	void (*itemLaunch)(int id, config_set_t* configSet);
 	
 	config_set_t* (*itemGetConfig)(int id);
 

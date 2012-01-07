@@ -4,14 +4,23 @@
 #define CONFIG_ALL		0xFF
 
 #define CONFIG_OPL		0x01
-#define CONFIG_COMPAT	0x02
-#define CONFIG_DNAS		0x04
-#define CONFIG_VMC		0x08
-#define CONFIG_LAST		0x10
-#define CONFIG_APPS		0x20
-#define CONFIG_VMODE	0x40
+#define CONFIG_LAST		0x02
+#define CONFIG_APPS		0x04
+#define CONFIG_VMODE	0x08
 
-#define CONFIG_FILE_NUM 7
+#define CONFIG_FILE_NUM 4
+
+#define CONFIG_ITEM_NAME		"#Name"
+#define CONFIG_ITEM_LONGNAME	"#LongName"
+#define CONFIG_ITEM_SIZE		"#Size"
+#define CONFIG_ITEM_FORMAT		"#Format"
+#define CONFIG_ITEM_MEDIA		"#Media"
+#define CONFIG_ITEM_STARTUP		"#Startup"
+#define CONFIG_ITEM_ALTSTARTUP	"$AltStartup"
+#define CONFIG_ITEM_VMC			"$VMC"
+#define CONFIG_ITEM_COMPAT		"$Compatibility"
+#define CONFIG_ITEM_DMA			"$DMA"
+#define CONFIG_ITEM_DNAS		"$DNAS"
 
 struct config_value_t {
         char key[32];
@@ -44,13 +53,17 @@ int configRemoveKey(config_set_t* configSet, const char* key);
 void configReadIP();
 void configWriteIP();
 
-void configGetDiscID(char* startup, char* discID);
-void configSetDiscID(char* startup, const char *discID);
-void configRemoveDiscID(char* startup);
-void configGetDiscIDBinary(char* startup, void* dst);
+void configGetDiscID(config_set_t* configSet, char* discID);
+void configSetDiscID(config_set_t* configSet, const char *discID);
+void configRemoveDiscID(config_set_t* configSet);
+void configGetDiscIDBinary(config_set_t* configSet, void* dst);
 
-int configGetCompatibility(char* startup, int mode, int *dmaMode);
-void configSetCompatibility(char* startup, int mode, int compatMode, int dmaMode);
+int configGetCompatibility(config_set_t* configSet, int *dmaMode);
+void configSetCompatibility(config_set_t* configSet, int compatMode, int dmaMode);
+
+void configGetAltStartup(config_set_t* configSet, char* elfname);
+void configSetAltStartup(config_set_t* configSet, char *elfname);
+void configRemoveAltStartup(config_set_t* configSet);
 
 int configRead(config_set_t* configSet);
 int configReadMulti(int types);
@@ -59,9 +72,9 @@ int configWriteMulti(int types);
 void configClear(config_set_t* configSet);
 
 #ifdef VMC
-void configGetVMC(char* startup, char* vmc, int mode, int slot);
-void configSetVMC(char* startup, const char* vmc, int mode, int slot);
-void configRemoveVMC(char *startup, int mode, int slot);
+void configGetVMC(config_set_t* configSet, char* vmc, int slot);
+void configSetVMC(config_set_t* configSet, const char* vmc, int slot);
+void configRemoveVMC(config_set_t* configSet, int slot);
 #endif
 
 #endif

@@ -18,6 +18,7 @@
 #include "include/menusys.h"
 #include "include/system.h"
 #include "include/debug.h"
+#include "include/config.h"
 
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
@@ -105,7 +106,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 			menuAddHint(&mod->menuItem, _STR_INFO, CROSS_ICON);
 		else
 			menuAddHint(&mod->menuItem, _STR_RUN, CROSS_ICON);
-		if (mod->support->itemGetCompatibility)
+		if (mod->support->haveCompatibilityMode)
 			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
 		if (gEnableDandR) {
 			if (mod->support->itemRename)
@@ -125,8 +126,10 @@ static void itemExecCross(struct menu_item *curMenu) {
 
 	if (support) {
 		if (support->enabled) {
-			if (curMenu->current)
-				support->itemLaunch(curMenu->current->item.id);
+			if (curMenu->current) {
+				config_set_t* configSet = guiWaitConfigBox(NULL);
+				support->itemLaunch(curMenu->current->item.id, configSet);
+			}
 		}
 		else {
 			support->itemInit();
@@ -146,9 +149,10 @@ static void itemExecTriangle(struct menu_item *curMenu) {
 	item_list_t *support = curMenu->userdata;
 
 	if (support) {
-		if (support->itemGetCompatibility) {
-			if (guiShowCompatConfig(curMenu->current->item.id, support) == COMPAT_TEST)
-				itemExecCross(curMenu);
+		if (support->haveCompatibilityMode) {
+			config_set_t* configSet = guiWaitConfigBox(NULL);
+			if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
+				support->itemLaunch(curMenu->current->item.id, configSet);
 		}
 	}
 	else

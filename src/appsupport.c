@@ -121,7 +121,7 @@ static void appRenameItem(int id, char* newName) {
 }
 #endif
 
-static void appLaunchItem(int id) {
+static void appLaunchItem(int id, config_set_t* configSet) {
 	struct config_value_t* cur = appGetConfigValue(id);
 	int fd = fioOpen(cur->val, O_RDONLY);
 	if (fd >= 0) {
@@ -143,9 +143,9 @@ static void appLaunchItem(int id) {
 static config_set_t* appGetConfig(int id) {
 	config_set_t* config = configAlloc(0, NULL, NULL);
 	struct config_value_t* cur = appGetConfigValue(id);
-	configSetStr(config, "#Name", appGetELFName(cur->val));
-	configSetStr(config, "#LongName", cur->key);
-	configSetStr(config, "#Startup", cur->val);
+	configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
+	configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
+	configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
 	return config;
 }
 
@@ -176,11 +176,11 @@ static void appCleanUp(int exception) {
 }
 
 static item_list_t appItemList = {
-		APP_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
+		APP_MODE, 0, NO_COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
 #ifdef __CHILDPROOF
-		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, NULL, NULL, NULL, NULL, &appLaunchItem,
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, NULL, NULL, &appLaunchItem,
 #else
-		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, NULL, NULL, &appLaunchItem,
+		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
 #endif
 #ifdef VMC
 		&appGetConfig, &appGetImage, &appCleanUp, NULL, APP_ICON

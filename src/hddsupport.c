@@ -241,16 +241,8 @@ static void hddRenameGame(int id, char* newName) {
 }
 #endif
 
-static int hddGetGameCompatibility(int id, int *dmaMode) {
-	return configGetCompatibility(hddGames->games[id].startup, hddGameList.mode, dmaMode);
-}
-
-static void hddSetGameCompatibility(int id, int compatMode, int dmaMode) {
-	configSetCompatibility(hddGames->games[id].startup, hddGameList.mode, compatMode, dmaMode);
-}
-
 #ifdef VMC
-static int hddPrepareMcemu(hdl_game_info_t* game) {
+static int hddPrepareMcemu(hdl_game_info_t* game, config_set_t* configSet) {
 	char vmc[2][32];
 	char vmc_path[255];
 	u32 vmc_size;
@@ -260,8 +252,8 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 	vmc_superblock_t vmc_superblock;
 	int i, j, fd, part_valid = 0, size_mcemu_irx = 0;
 
-	configGetVMC(game->startup, vmc[0], HDD_MODE, 0);
-	configGetVMC(game->startup, vmc[1], HDD_MODE, 1);
+	configGetVMC(configSet, vmc[0], 0);
+	configGetVMC(configSet, vmc[1], 1);
 
 	if(!vmc[0][0] && !vmc[1][0]) return 0;  // skip if both empty
 
@@ -361,7 +353,7 @@ static int hddPrepareMcemu(hdl_game_info_t* game) {
 }
 #endif
 
-static void hddLaunchGame(int id) {
+static void hddLaunchGame(int id, config_set_t* configSet) {
 	int i, size_irx = 0;
 	void** irx = NULL;
 	char filename[32];
@@ -374,10 +366,10 @@ static void hddLaunchGame(int id) {
 	}
 
 	char gid[5];
-	configGetDiscIDBinary(hddGames->games[id].startup, gid);
+	configGetDiscIDBinary(configSet, gid);
 
 	int dmaType = 0, dmaMode = 0, compatMode = 0;
-	compatMode = configGetCompatibility(hddGames->games[id].startup, hddGameList.mode, &dmaMode);
+	compatMode = configGetCompatibility(configSet, &dmaMode);
 	if(dmaMode < 3)
 		dmaType = 0x20;
 	else {
@@ -452,7 +444,7 @@ static void hddLaunchGame(int id) {
 	}
 
 #ifdef VMC
-	int size_mcemu_irx = hddPrepareMcemu(game);
+	int size_mcemu_irx = hddPrepareMcemu(game, configSet);
 	if (size_mcemu_irx == -1) {
 		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
 			size_mcemu_irx = 0;
@@ -461,7 +453,11 @@ static void hddLaunchGame(int id) {
 	}
 #endif
 
-	sprintf(filename,"%s",game->startup);
+	char *altStartup = NULL;
+	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
+		strncpy(filename, altStartup, 32);
+	else
+		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
 	FlushCache(0);
 
@@ -480,14 +476,14 @@ static config_set_t* hddGetConfig(int id) {
 	config_set_t* config = configAlloc(0, NULL, path);
 	configRead(config);
 
-	configSetStr(config, "#Name", game->name);
-	configSetInt(config, "#Size", game->total_size_in_kb >> 10);
-	configSetStr(config, "#Format", "HDL");
+	configSetStr(config, CONFIG_ITEM_NAME, game->name);
+	configSetInt(config, CONFIG_ITEM_SIZE, game->total_size_in_kb >> 10);
+	configSetStr(config, CONFIG_ITEM_FORMAT, "HDL");
 	if (game->disctype == 0x12)
-		configSetStr(config, "#Media", "CD");
+		configSetStr(config, CONFIG_ITEM_MEDIA, "CD");
 	else
-		configSetStr(config, "#Media", "DVD");
-	configSetStr(config, "#Startup", game->startup);
+		configSetStr(config, CONFIG_ITEM_MEDIA, "DVD");
+	configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 
 	return config;
 }
@@ -519,15 +515,15 @@ static int hddCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t hddGameList = {
-		HDD_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		HDD_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
-		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL, &hddGetGameCompatibility,
+		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL,
 #else
-		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame, &hddGetGameCompatibility,
+		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
 #endif
 #ifdef VMC
-		&hddSetGameCompatibility, &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
+		&hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
 #else
-		&hddSetGameCompatibility, &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, HDD_ICON
+		&hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, HDD_ICON
 #endif
 };

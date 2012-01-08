@@ -80,6 +80,9 @@ static void usbInitModules(void) {
 	sprintf(path, "%sTHM", usbPrefix);
 	thmAddElements(path, "/", usbGameList.mode);
 
+	sprintf(path, "%sCFG", usbPrefix);
+	checkCreateDir(path);
+
 #ifdef VMC
 	sprintf(path, "%sVMC", usbPrefix);
 	checkCreateDir(path);

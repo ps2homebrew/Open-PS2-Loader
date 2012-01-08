@@ -111,7 +111,7 @@ struct UIItem diaCompatConfig[] = {
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_ALTSTARTUP}}}, {UI_SPACER}, {UI_STRING, COMPAT_ALTSTARTUP, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_ALTSTARTUP}}}, {UI_SPACER}, {UI_STRING, COMPAT_ALTSTARTUP, 1, -1, 0, 0, {.stringvalue = {"", "", &guiAltStartupNameHandler}}},
 
 	{UI_SPLITTER},
 	

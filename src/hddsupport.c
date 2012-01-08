@@ -369,7 +369,8 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	configGetDiscIDBinary(configSet, gid);
 
 	int dmaType = 0, dmaMode = 0, compatMode = 0;
-	compatMode = configGetCompatibility(configSet, &dmaMode);
+	configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
+	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
 	if(dmaMode < 3)
 		dmaType = 0x20;
 	else {
@@ -515,7 +516,7 @@ static int hddCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t hddGameList = {
-		HDD_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		HDD_MODE, 0, COMPAT_FULL, 0, MENU_MIN_INACTIVE_FRAMES, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL,
 #else

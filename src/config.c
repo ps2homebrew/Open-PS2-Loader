@@ -240,6 +240,14 @@ int configGetStr(config_set_t* configSet, const char* key, char** value) {
 		return 0;
 }
 
+void configGetStrCopy(config_set_t* configSet, const char* key, char* value) {
+	char *valref = NULL;
+	if (configGetStr(configSet, key, &valref))
+		strncpy(value, valref, 32);
+	else
+		value[0] = '\0';
+}
+
 int configSetInt(config_set_t* configSet, const char* key, const int value) {
 	char tmp[12];
 	snprintf(tmp, 12, "%d", value);
@@ -332,22 +340,6 @@ void configWriteIP() {
 		fioWrite(fd, ipconfig, strlen(ipconfig));
 		fioClose(fd);
 	}
-}
-
-void configGetDiscID(config_set_t* configSet, char* discID) {
-	char *valref = NULL;
-	if (configGetStr(configSet, CONFIG_ITEM_DNAS, &valref))
-		strncpy(discID, valref, 32);
-	else
-		discID[0] = '\0';
-}
-
-void configSetDiscID(config_set_t* configSet, const char *discID) {
-	configSetStr(configSet, CONFIG_ITEM_DNAS, discID);
-}
-
-void configRemoveDiscID(config_set_t* configSet) {
-	configRemoveKey(configSet, CONFIG_ITEM_DNAS);
 }
 
 // dst has to have 5 bytes space
@@ -463,55 +455,6 @@ void configClear(config_set_t* configSet) {
 	configSet->head = NULL;
 	configSet->tail = NULL;
 	configSet->modified = 1;
-}
-
-int configGetCompatibility(config_set_t* configSet, int *dmaMode) {
-	unsigned int compatMode;
-	if (!configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode))
-		compatMode = 0;
-
-	if (dmaMode) {
-		*dmaMode = 7; // defaulting to UDMA 4
-		configGetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
-	}
-
-	return compatMode;
-}
-
-void configSetCompatibility(config_set_t* configSet, int compatMode, int dmaMode) {
-	if (compatMode == 0) // means we want to delete the setting
-		configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
-	else
-		configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
-
-	if (dmaMode != -1) {
-		if (dmaMode == 7) // UDMA 4 is the default so don't save it (useless lines into the conf file)
-			configRemoveKey(configSet, CONFIG_ITEM_DMA);
-		else
-			configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
-	}
-}
-
-void configGetAltStartup(config_set_t* configSet, char* elfname) {
-	char *valref = NULL;
-	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &valref))
-		strncpy(elfname, valref, 32);
-	else
-		elfname[0] = '\0';
-}
-
-void configSetAltStartup(config_set_t* configSet, char *elfname) {
-	int i = 0;
-	for (; elfname[i]; i++) {
-		if (elfname[i] > 96 && elfname[i] < 123)
-			elfname[i] -= 32;
-	}
-
-	configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, elfname);
-}
-
-void configRemoveAltStartup(config_set_t* configSet) {
-	configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 }
 
 int configReadMulti(int types) {

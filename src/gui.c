@@ -566,10 +566,9 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 #endif
 
 int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
-	int dmaMode = -1, compatMode = 0;
-	compatMode = configGetCompatibility(configSet, &dmaMode);
-
-	if (dmaMode != -1) {
+	int dmaMode = 7; // defaulting to UDMA 4
+	if (support->haveCompatibilityMode == COMPAT_FULL) {
+		configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6",	NULL };
 		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaModes);
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaMode);
@@ -581,17 +580,19 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 
 	diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
 
+	int compatMode = 0;
+	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
 	int i, result = -1;
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
 	// Find out the current game ID
 	char hexid[32];
-	configGetDiscID(configSet, hexid);
+	configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid);
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
 	char altStartup[32];
-	configGetAltStartup(configSet, altStartup);
+	configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
 	diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
 #ifdef VMC
@@ -648,13 +649,14 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	} while (result >= COMPAT_NOEXIT);
 
 	if (result == COMPAT_REMOVE) {
-		configRemoveDiscID(configSet);
-		configRemoveAltStartup(configSet);
+		configRemoveKey(configSet, CONFIG_ITEM_DMA);
+		configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+		configRemoveKey(configSet, CONFIG_ITEM_DNAS);
+		configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 #ifdef VMC
 		configRemoveVMC(configSet, 0);
 		configRemoveVMC(configSet, 1);
 #endif
-		configSetCompatibility(configSet, 0, 7);
 		configWrite(configSet); // TODO should use secured & threaded IO request
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
@@ -664,20 +666,23 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			compatMode |= (mdpart ? 1 : 0) << i;
 		}
 
-		if (dmaMode != -1)
+		if (support->haveCompatibilityMode == COMPAT_FULL) {
 			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
+			if (dmaMode != 7)
+				configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
+		}
 
-		configSetCompatibility(configSet, compatMode, dmaMode);
+		configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')
-			configSetDiscID(configSet, hexid);
+			configSetStr(configSet, CONFIG_ITEM_DNAS, hexid);
 
 		diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 		if (altStartup[0] != '\0')
-			configSetAltStartup(configSet, altStartup);
+			configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
 		else
-			configRemoveAltStartup(configSet);
+			configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
 #ifdef VMC
 		configSetVMC(configSet, vmc1, 0);

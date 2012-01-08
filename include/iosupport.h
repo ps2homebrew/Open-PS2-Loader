@@ -11,8 +11,9 @@
 #define NO_EXCEPTION		0x00
 #define UNMOUNT_EXCEPTION	0x01
 
-#define NO_COMPAT			0x00
-#define COMPAT				0x01
+#define NO_COMPAT			0x00 // no compat support
+#define COMPAT				0x01 // default compatibility flags
+#define COMPAT_FULL			0x02 // default + DMA compat flags
 
 #define COMPAT_MODE_1 		0x01
 #define COMPAT_MODE_2 		0x02

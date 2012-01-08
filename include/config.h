@@ -44,6 +44,7 @@ void configFree(config_set_t *configSet);
 config_set_t *configGetByType(int type);
 int configSetStr(config_set_t* configSet, const char* key, const char* value);
 int configGetStr(config_set_t* configSet, const char* key, char** value);
+void configGetStrCopy(config_set_t* configSet, const char* key, char* value);
 int configSetInt(config_set_t* configSet, const char* key, const int value);
 int configGetInt(config_set_t* configSet, char* key, int* value);
 int configSetColor(config_set_t* configSet, const char* key, unsigned char* color);
@@ -52,18 +53,7 @@ int configRemoveKey(config_set_t* configSet, const char* key);
 
 void configReadIP();
 void configWriteIP();
-
-void configGetDiscID(config_set_t* configSet, char* discID);
-void configSetDiscID(config_set_t* configSet, const char *discID);
-void configRemoveDiscID(config_set_t* configSet);
 void configGetDiscIDBinary(config_set_t* configSet, void* dst);
-
-int configGetCompatibility(config_set_t* configSet, int *dmaMode);
-void configSetCompatibility(config_set_t* configSet, int compatMode, int dmaMode);
-
-void configGetAltStartup(config_set_t* configSet, char* elfname);
-void configSetAltStartup(config_set_t* configSet, char *elfname);
-void configRemoveAltStartup(config_set_t* configSet);
 
 int configRead(config_set_t* configSet);
 int configReadMulti(int types);

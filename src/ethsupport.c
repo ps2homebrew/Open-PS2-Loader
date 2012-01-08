@@ -104,6 +104,9 @@ static void ethLoadModules(void) {
 	sprintf(path, "%sTHM", ethPrefix);
 	thmAddElements(path, "\\", ethGameList.mode);
 
+	sprintf(path, "%sCFG", ethPrefix);
+	checkCreateDir(path);
+
 #ifdef VMC
 	sprintf(path, "%sVMC", ethPrefix);
 	checkCreateDir(path);

@@ -146,7 +146,8 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
 	int i;
 
-	unsigned int compatmask = configGetCompatibility(configSet, NULL);
+	unsigned int compatmask = 0;
+	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatmask);
 
 	char gameid[5];
 	configGetDiscIDBinary(configSet, gameid);

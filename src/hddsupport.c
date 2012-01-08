@@ -60,6 +60,9 @@ static void hddInitModules(void) {
 	sprintf(path, "%sTHM", hddPrefix);
 	thmAddElements(path, "/", hddGameList.mode);
 
+	sprintf(path, "%sCFG", hddPrefix);
+	checkCreateDir(path);
+
 #ifdef VMC
 	sprintf(path, "%sVMC", hddPrefix);
 	checkCreateDir(path);

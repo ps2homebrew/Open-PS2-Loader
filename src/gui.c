@@ -565,6 +565,20 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 
 #endif
 
+int guiAltStartupNameHandler(char* text, int maxLen) {
+	int i;
+
+	int result = diaShowKeyb(text, maxLen);
+	if (result) {
+		for (i = 0; text[i]; i++) {
+			if (text[i] > 96 && text[i] < 123)
+				text[i] -= 32;
+		}
+	}
+
+	return result;
+}
+
 int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	int dmaMode = 7; // defaulting to UDMA 4
 	if (support->haveCompatibilityMode == COMPAT_FULL) {

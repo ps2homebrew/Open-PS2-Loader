@@ -254,7 +254,7 @@ int configSetInt(config_set_t* configSet, const char* key, const int value) {
 	return configSetStr(configSet, key, tmp);
 }
 
-int configGetInt(config_set_t* configSet, char* key, int* value) {
+int configGetInt(config_set_t* configSet, const char* key, int* value) {
 	char *valref = NULL;
 	if (configGetStr(configSet, key, &valref)) {
 		*value = atoi(valref);
@@ -420,6 +420,10 @@ int configRead(config_set_t* configSet) {
 
 int configWrite(config_set_t* configSet) {
 	if (configSet->modified) {
+		// BUG in PFS: O_TRUNC doesn't work, so we remove the file and re-create it
+		if (strncmp(configSet->filename, "pfs0:", 5) == 0)
+			fioRemove(configSet->filename);
+
 		file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
 		if (fileBuffer) {
 			char line[512];

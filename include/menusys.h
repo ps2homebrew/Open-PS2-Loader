@@ -86,7 +86,8 @@ void submenuSort(submenu_list_t** submenu);
 
 char *submenuItemGetText(submenu_item_t* it);
 char *menuItemGetText(menu_item_t* it);
-config_set_t* menuCheckConfig();
+config_set_t* menuLoadConfig();
+void menuSaveConfig();
 
 void menuRenderMain();
 void menuRenderMenu();

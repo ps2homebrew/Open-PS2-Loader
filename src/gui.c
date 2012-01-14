@@ -671,7 +671,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		configRemoveVMC(configSet, 0);
 		configRemoveVMC(configSet, 1);
 #endif
-		configWrite(configSet); // TODO should use secured & threaded IO request
+		menuSaveConfig();
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -684,9 +684,14 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
 			if (dmaMode != 7)
 				configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
+			else
+				configRemoveKey(configSet, CONFIG_ITEM_DMA);
 		}
 
-		configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+		if (compatMode != 0)
+			configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')
@@ -706,7 +711,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 #endif
 
 		if (result == COMPAT_SAVE)
-			configWrite(configSet); // TODO
+			menuSaveConfig();
 	}
 
 	return result;
@@ -1248,52 +1253,11 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	return terminate - 1;
 }
 
-config_set_t* guiWaitConfigBox(struct UIItem *ui) {
-	config_set_t* config;
-	while (1) {
-		config = menuCheckConfig();
-		if (config)
-			break;
-
-		guiStartFrame();
-
-		if (ui)
-			diaRenderUI(ui, screenHandler->inMenu, NULL, 0);
-		else
-			guiShow();
-
-		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
-
-		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
-		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
-
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, _l(_STR_LOADING_SETTINGS), gTheme->textColor);
-
-		guiEndFrame();
-	}
-
-	return config;
-}
-
 void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {
 	ioPutRequest(type, data);
 
-	while (*ptr) {
-		guiStartFrame();
-
-		readPads();
-
-		guiShow();
-
-		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
-
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
-
-		// so the io status icon will be rendered
-		guiDrawOverlays();
-
-		guiEndFrame();
-	}
+	while (*ptr)
+		guiRenderTextScreen(message);
 }
 
 void guiRenderTextScreen(const unsigned char* message) {
@@ -1305,7 +1269,6 @@ void guiRenderTextScreen(const unsigned char* message) {
 
 	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 
-	// so the io status icon will be rendered
 	guiDrawOverlays();
 
 	guiEndFrame();

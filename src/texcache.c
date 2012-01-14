@@ -4,7 +4,7 @@
 #include "include/util.h"
 
 // io call to handle the loading of covers
-#define IO_CACHE_LOAD_ART 5
+#define IO_CACHE_LOAD_ART 3
 
 typedef struct {
 	image_cache_t* cache;

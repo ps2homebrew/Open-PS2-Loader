@@ -30,7 +30,8 @@
 static menu_list_t* menu;
 static menu_list_t* selected_item;
 
-static int itemIdConfig;
+static int actionStatus;
+static int itemConfigId;
 static config_set_t* itemConfig;
 
 // "main menu submenu"
@@ -38,53 +39,54 @@ static submenu_list_t* mainMenu;
 // active item in the main menu
 static submenu_list_t* mainMenuCurrent;
 
-// io call to handle the loading of config
-#define IO_MENU_LOAD_CONFIG 6
-
 static s32 menuSemaId;
 static ee_sema_t menuSema;
 
-typedef struct {
-	int itemId;
-	item_list_t* list;
-} load_config_request_t;
-
-// Io handled action...
-static void menuLoadConfig(void* data) {
-	load_config_request_t* req = data;
-
+static void _menuLoadConfig() {
 	WaitSema(menuSemaId);
-	if (!itemConfig && (req->itemId == itemIdConfig))
-		itemConfig = req->list->itemGetConfig(itemIdConfig);
-	SignalSema(menuSemaId);
-
-	free(req);
-}
-
-static void menuRequestConfig(int direct) {
-	WaitSema(menuSemaId);
-	if (itemIdConfig != selected_item->item->current->item.id) {
+	if (!itemConfig) {
 		item_list_t* list = selected_item->item->userdata;
-		if (direct || guiInactiveFrames >= list->delay) {
-			if (itemConfig) {
-				configFree(itemConfig);
-				itemConfig = NULL;
-			}
-
-			itemIdConfig = selected_item->item->current->item.id;
-
-			load_config_request_t* req = malloc(sizeof(load_config_request_t));
-			req->itemId = itemIdConfig;
-			req->list = list;
-			ioPutRequest(IO_MENU_LOAD_CONFIG, req);
-		}
+		itemConfig = list->itemGetConfig(itemConfigId);
 	}
+	actionStatus = 0;
 	SignalSema(menuSemaId);
 }
 
-config_set_t* menuCheckConfig() {
-	menuRequestConfig(1);
+static void _menuSaveConfig() {
+	WaitSema(menuSemaId);
+	configWrite(itemConfig);
+	itemConfigId = -1; // to invalidate cache and force reload
+	actionStatus = 0;
+	SignalSema(menuSemaId);
+}
+
+static void _menuRequestConfig() {
+	WaitSema(menuSemaId);
+	if (itemConfigId != selected_item->item->current->item.id) {
+		if (itemConfig) {
+			configFree(itemConfig);
+			itemConfig = NULL;
+		}
+		item_list_t* list = selected_item->item->userdata;
+		if (itemConfigId == -1 || guiInactiveFrames >= list->delay) {
+			itemConfigId = selected_item->item->current->item.id;
+			ioPutRequest(IO_CUSTOM_SIMPLEACTION, &_menuLoadConfig);
+		}
+	} else if (itemConfig)
+		actionStatus = 0;
+	SignalSema(menuSemaId);
+}
+
+config_set_t* menuLoadConfig() {
+	actionStatus = 1;
+	itemConfigId = -1;
+	guiHandleDefferedIO(&actionStatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuRequestConfig);
 	return itemConfig;
+}
+
+void menuSaveConfig() {
+	actionStatus = 1;
+	guiHandleDefferedIO(&actionStatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuSaveConfig);
 }
 
 static void menuInitMainMenu() {
@@ -113,7 +115,7 @@ static void menuInitMainMenu() {
 void menuInit() {
 	menu = NULL;
 	selected_item = NULL;
-	itemIdConfig = -1;
+	itemConfigId = -1;
 	itemConfig = NULL;
 	mainMenu = NULL;
 	mainMenuCurrent = NULL;
@@ -123,8 +125,6 @@ void menuInit() {
 	menuSema.max_count = 1;
 	menuSema.option = 0;
 	menuSemaId = CreateSema(&menuSema);
-
-	ioRegisterHandler(IO_MENU_LOAD_CONFIG, &menuLoadConfig);
 }
 
 void menuEnd() {
@@ -387,13 +387,17 @@ void submenuSort(submenu_list_t** submenu) {
 }
 
 static void menuNextH() {
-	if(selected_item->next)
+	if(selected_item->next) {
 		selected_item = selected_item->next;
+		itemConfigId = -1;
+	}
 }
 
 static void menuPrevH() {
-	if(selected_item->prev)
+	if(selected_item->prev) {
 		selected_item = selected_item->prev;
+		itemConfigId = -1;
+	}
 }
 
 static void menuNextV() {
@@ -624,8 +628,9 @@ void menuHandleInputMain() {
 
 void menuRenderInfo() {
 	// selected_item->item->current can't be NULL here as we only allow to switch to "Info" rendering when there is at least one item
-	menuRequestConfig(0);
+	_menuRequestConfig();
 
+	WaitSema(menuSemaId);
 	theme_element_t* elem = gTheme->infoElems.first;
 	while (elem) {
 		if (elem->drawElem)
@@ -633,6 +638,7 @@ void menuRenderInfo() {
 
 		elem = elem->next;
 	}
+	SignalSema(menuSemaId);
 }
 
 void menuHandleInputInfo() {

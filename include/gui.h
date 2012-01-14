@@ -106,7 +106,6 @@ void guiDestroyOp(struct gui_update_t *op);
 int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet);
 int guiShowKeyboard(char* value, int maxLength);
 int guiMsgBox(const char* text, int addAccept, struct UIItem *ui);
-config_set_t* guiWaitConfigBox(struct UIItem *ui);
 
 void guiUpdateScrollSpeed(void);
 void guiUpdateScreenScale(void);

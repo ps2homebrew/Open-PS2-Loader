@@ -18,6 +18,7 @@
 #include "include/menusys.h"
 #include "include/system.h"
 #include "include/debug.h"
+#include "include/config.h"
 
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
@@ -105,7 +106,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 			menuAddHint(&mod->menuItem, _STR_INFO, CROSS_ICON);
 		else
 			menuAddHint(&mod->menuItem, _STR_RUN, CROSS_ICON);
-		if (mod->support->itemGetCompatibility)
+		if (mod->support->haveCompatibilityMode)
 			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
 		if (gEnableDandR) {
 			if (mod->support->itemRename)
@@ -125,8 +126,10 @@ static void itemExecCross(struct menu_item *curMenu) {
 
 	if (support) {
 		if (support->enabled) {
-			if (curMenu->current)
-				support->itemLaunch(curMenu->current->item.id);
+			if (curMenu->current) {
+				config_set_t* configSet = menuLoadConfig();
+				support->itemLaunch(curMenu->current->item.id, configSet);
+			}
 		}
 		else {
 			support->itemInit();
@@ -146,9 +149,10 @@ static void itemExecTriangle(struct menu_item *curMenu) {
 	item_list_t *support = curMenu->userdata;
 
 	if (support) {
-		if (support->itemGetCompatibility) {
-			if (guiShowCompatConfig(curMenu->current->item.id, support) == COMPAT_TEST)
-				itemExecCross(curMenu);
+		if (support->haveCompatibilityMode) {
+			config_set_t* configSet = menuLoadConfig();
+			if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
+				support->itemLaunch(curMenu->current->item.id, configSet);
 		}
 	}
 	else
@@ -415,16 +419,18 @@ static int tryAlternateDevice(int types) {
 		return value;
 	}
 
-	// set config path to either mass or hdd, to prepare the saving of a new config
-	value = fioDopen("mass0:");
-	if (value >= 0) {
-		fioDclose(value);
-		configEnd();
-		configInit("mass0:");
-	}
-	else {
-		configEnd();
-		configInit("pfs0:");
+	if (sysCheckMC() < 0) { // We don't want to get users into alternate mode for their very first of OPL (i.e no config file at all, but still want to save on MC)
+		// set config path to either mass or hdd, to prepare the saving of a new config
+		value = fioDopen("mass0:");
+		if (value >= 0) {
+			fioDclose(value);
+			configEnd();
+			configInit("mass0:");
+		}
+		else {
+			configEnd();
+			configInit("pfs0:");
+		}
 	}
 
 	return 0;
@@ -437,9 +443,7 @@ static void _loadConfig() {
 		int themeID = -1, langID = -1;
 		
 		if (!(result & CONFIG_OPL)) {
-			if (sysCheckMC() < 0) { // No MC inserted
-				result = tryAlternateDevice(lscstatus);
-			}
+			result = tryAlternateDevice(lscstatus);
 		}
 
 		if (result & CONFIG_OPL) {

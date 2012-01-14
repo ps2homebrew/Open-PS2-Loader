@@ -132,3 +132,14 @@ Error with VMC file, continue with physical MC ?
 Automatic refresh
 About
 Coders
+USB delay
+USB prefix path
+Leave empty to exit to Browser
+Value in minute(s), 0 to disable spin down
+Automatic HDD spin down
+Video mode
+Dialog color
+Selected color
+Display info page
+Info
+Custom ELF

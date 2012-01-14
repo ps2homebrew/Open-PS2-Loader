@@ -127,7 +127,7 @@ static void itemExecCross(struct menu_item *curMenu) {
 	if (support) {
 		if (support->enabled) {
 			if (curMenu->current) {
-				config_set_t* configSet = guiWaitConfigBox(NULL);
+				config_set_t* configSet = menuLoadConfig();
 				support->itemLaunch(curMenu->current->item.id, configSet);
 			}
 		}
@@ -150,7 +150,7 @@ static void itemExecTriangle(struct menu_item *curMenu) {
 
 	if (support) {
 		if (support->haveCompatibilityMode) {
-			config_set_t* configSet = guiWaitConfigBox(NULL);
+			config_set_t* configSet = menuLoadConfig();
 			if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
 				support->itemLaunch(curMenu->current->item.id, configSet);
 		}

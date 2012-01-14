@@ -565,12 +565,24 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 
 #endif
 
-int guiShowCompatConfig(int id, item_list_t *support) {
-	int dmaMode = -1, compatMode = 0;
-	char* startup = support->itemGetStartup(id);
-	compatMode = support->itemGetCompatibility(id, &dmaMode);
+int guiAltStartupNameHandler(char* text, int maxLen) {
+	int i;
 
-	if (dmaMode != -1) {
+	int result = diaShowKeyb(text, maxLen);
+	if (result) {
+		for (i = 0; text[i]; i++) {
+			if (text[i] > 96 && text[i] < 123)
+				text[i] -= 32;
+		}
+	}
+
+	return result;
+}
+
+int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
+	int dmaMode = 7; // defaulting to UDMA 4
+	if (support->haveCompatibilityMode == COMPAT_FULL) {
+		configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6",	NULL };
 		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaModes);
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaMode);
@@ -582,24 +594,28 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 
 	diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
 
+	int compatMode = 0;
+	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
 	int i, result = -1;
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
 	// Find out the current game ID
 	char hexid[32];
-	configGetDiscID(startup, hexid);
+	configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid);
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
-#ifdef VMC
-	int mode = support->mode;
+	char altStartup[32];
+	configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
+	diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
+#ifdef VMC
 	char vmc1[32];
-	configGetVMC(startup, vmc1, mode, 0);
+	configGetVMC(configSet, vmc1, 0);
 	diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
 
 	char vmc2[32]; // required as diaSetLabel use pointer to value
-	configGetVMC(startup, vmc2, mode, 1);
+	configGetVMC(configSet, vmc2, 1);
 	diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
 #endif
 
@@ -647,13 +663,15 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 	} while (result >= COMPAT_NOEXIT);
 
 	if (result == COMPAT_REMOVE) {
-		configRemoveDiscID(startup);
+		configRemoveKey(configSet, CONFIG_ITEM_DMA);
+		configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+		configRemoveKey(configSet, CONFIG_ITEM_DNAS);
+		configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 #ifdef VMC
-		configRemoveVMC(startup, mode, 0);
-		configRemoveVMC(startup, mode, 1);
+		configRemoveVMC(configSet, 0);
+		configRemoveVMC(configSet, 1);
 #endif
-		support->itemSetCompatibility(id, 0, 7);
-		saveConfig(CONFIG_COMPAT | CONFIG_DNAS | CONFIG_VMC, 1);
+		menuSaveConfig();
 	} else if (result > 0) { // test button pressed or save button
 		compatMode = 0;
 		for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -662,23 +680,38 @@ int guiShowCompatConfig(int id, item_list_t *support) {
 			compatMode |= (mdpart ? 1 : 0) << i;
 		}
 
-		if (dmaMode != -1)
+		if (support->haveCompatibilityMode == COMPAT_FULL) {
 			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
+			if (dmaMode != 7)
+				configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
+			else
+				configRemoveKey(configSet, CONFIG_ITEM_DMA);
+		}
 
-		support->itemSetCompatibility(id, compatMode, dmaMode);
+		if (compatMode != 0)
+			configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')
-			configSetDiscID(startup, hexid);
+			configSetStr(configSet, CONFIG_ITEM_DNAS, hexid);
+
+		diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
+		if (altStartup[0] != '\0')
+			configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
+
 #ifdef VMC
-		configSetVMC(startup, vmc1, mode, 0);
-		configSetVMC(startup, vmc2, mode, 1);
+		configSetVMC(configSet, vmc1, 0);
+		configSetVMC(configSet, vmc2, 1);
 		guiShowVMCConfig(id, support, vmc1, 0, 1);
 		guiShowVMCConfig(id, support, vmc2, 1, 1);
 #endif
 
 		if (result == COMPAT_SAVE)
-			saveConfig(CONFIG_COMPAT | CONFIG_DNAS | CONFIG_VMC, 1);
+			menuSaveConfig();
 	}
 
 	return result;
@@ -1223,22 +1256,8 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {
 	ioPutRequest(type, data);
 
-	while (*ptr) {
-		guiStartFrame();
-
-		readPads();
-
-		guiShow();
-
-		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
-
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
-
-		// so the io status icon will be rendered
-		guiDrawOverlays();
-
-		guiEndFrame();
-	}
+	while (*ptr)
+		guiRenderTextScreen(message);
 }
 
 void guiRenderTextScreen(const unsigned char* message) {
@@ -1250,7 +1269,6 @@ void guiRenderTextScreen(const unsigned char* message) {
 
 	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
 
-	// so the io status icon will be rendered
 	guiDrawOverlays();
 
 	guiEndFrame();

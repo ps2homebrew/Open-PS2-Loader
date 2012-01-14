@@ -167,8 +167,8 @@ static void initStaticText(char* themePath, config_set_t* themeConfig, theme_t* 
 // AttributeText ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void drawAttributeText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
+	mutable_text_t* mutableText = (mutable_text_t*) elem->extended;
 	if (config) {
-		mutable_text_t* mutableText = (mutable_text_t*) elem->extended;
 		if (mutableText->currentItemId != item->item.id) {
 			// force refresh
 			mutableText->currentItemId = item->item.id;
@@ -192,9 +192,11 @@ static void drawAttributeText(struct menu_list* menu, struct submenu_list* item,
 				else
 					fntRenderText(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
 			}
-		} else if (mutableText->displayMode == DISPLAY_ALWAYS)
-			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, mutableText->alias, elem->color);
+			return;
+		}
 	}
+	if (mutableText->displayMode == DISPLAY_ALWAYS)
+		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, mutableText->alias, elem->color);
 }
 
 static void initAttributeText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
@@ -458,8 +460,8 @@ static void initGameImage(char* themePath, config_set_t* themeConfig, theme_t* t
 // AttributeImage ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void drawAttributeImage(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
+	mutable_image_t* attributeImage = (mutable_image_t*) elem->extended;
 	if (config) {
-		mutable_image_t* attributeImage = (mutable_image_t*) elem->extended;
 		if (attributeImage->currentItemId != item->item.id) {
 			// force refresh
 			attributeImage->currentUid = -1;
@@ -481,10 +483,9 @@ static void drawAttributeImage(struct menu_list* menu, struct submenu_list* item
 				return;
 			}
 		}
-
-		if (attributeImage->defaultTexture)
-			rmDrawPixmap(&attributeImage->defaultTexture->source, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 	}
+	if (attributeImage->defaultTexture)
+		rmDrawPixmap(&attributeImage->defaultTexture->source, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 }
 
 static void initAttributeImage(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name) {

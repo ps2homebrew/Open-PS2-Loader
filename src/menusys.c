@@ -518,8 +518,7 @@ void menuRenderMenu() {
 	int cp = 0; // current position
 	for (it = mainMenu; it; it = it->next, cp++) {
 		// render, advance
-		// TODO: Theme support for main menu (font)
-		fntRenderString(FNT_DEFAULT, 320, y, ALIGN_CENTER, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
+		fntRenderString(gTheme->itemsList->font, 320, y, ALIGN_CENTER, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
 		y += spacing;
 	}
 }
@@ -630,7 +629,7 @@ void menuRenderInfo() {
 	// selected_item->item->current can't be NULL here as we only allow to switch to "Info" rendering when there is at least one item
 	_menuRequestConfig();
 
-	WaitSema(menuSemaId);
+	//WaitSema(menuSemaId); If I'm not mistaking (assignment of itemConfig pointer is atomic), not needed
 	theme_element_t* elem = gTheme->infoElems.first;
 	while (elem) {
 		if (elem->drawElem)
@@ -638,7 +637,7 @@ void menuRenderInfo() {
 
 		elem = elem->next;
 	}
-	SignalSema(menuSemaId);
+	//SignalSema(menuSemaId);
 }
 
 void menuHandleInputInfo() {

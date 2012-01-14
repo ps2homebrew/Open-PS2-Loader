@@ -104,6 +104,9 @@ static void ethLoadModules(void) {
 	sprintf(path, "%sTHM", ethPrefix);
 	thmAddElements(path, "\\", ethGameList.mode);
 
+	sprintf(path, "%sCFG", ethPrefix);
+	checkCreateDir(path);
+
 #ifdef VMC
 	sprintf(path, "%sVMC", ethPrefix);
 	checkCreateDir(path);
@@ -204,16 +207,8 @@ static void ethRenameGame(int id, char* newName) {
 }
 #endif
 
-static int ethGetGameCompatibility(int id, int *dmaMode) {
-	return configGetCompatibility(ethGames[id].startup, ethGameList.mode, NULL);
-}
-
-static void ethSetGameCompatibility(int id, int compatMode, int dmaMode) {
-	configSetCompatibility(ethGames[id].startup, ethGameList.mode, compatMode, -1);
-}
-
 #ifdef VMC
-static int ethPrepareMcemu(base_game_info_t* game) {
+static int ethPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
 	char vmc[2][32];
 	char vmc_path[255];
 	u32 vmc_size;
@@ -221,8 +216,8 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 	smb_vmc_infos_t smb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 
-	configGetVMC(game->startup, vmc[0], ETH_MODE, 0);
-	configGetVMC(game->startup, vmc[1], ETH_MODE, 1);
+	configGetVMC(configSet, vmc[0], 0);
+	configGetVMC(configSet, vmc[1], 1);
 
 	for(i=0; i<2; i++) {
 		if(!vmc[i][0]) // skip if empty
@@ -282,7 +277,7 @@ static int ethPrepareMcemu(base_game_info_t* game) {
 }
 #endif
 
-static void ethLaunchGame(int id) {
+static void ethLaunchGame(int id, config_set_t* configSet) {
 	if (gNetworkStartup != 0) {
 		guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
 		return;
@@ -307,7 +302,7 @@ static void ethLaunchGame(int id) {
 		irx = &smb_cdvdman_irx;
 	}
 
-	compatmask = sbPrepare(game, ethGameList.mode, isoname, size_irx, irx, &i);
+	compatmask = sbPrepare(game, configSet, isoname, size_irx, irx, &i);
 
 	// For ISO we use the part table to store the "long" name (only for init)
 	if (game->isISO)
@@ -320,7 +315,7 @@ static void ethLaunchGame(int id) {
 	}
 
 #ifdef VMC
-	int size_mcemu_irx = ethPrepareMcemu(game);
+	int size_mcemu_irx = ethPrepareMcemu(game, configSet);
 	if (size_mcemu_irx == -1) {
 		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
 			size_mcemu_irx = 0;
@@ -328,8 +323,6 @@ static void ethLaunchGame(int id) {
 			return;
 	}
 #endif
-	// disconnect from the active SMB session
-	ethSMBDisconnect();
 
 	char config_str[255];
 	sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
@@ -339,10 +332,15 @@ static void ethLaunchGame(int id) {
 	memcpy((void*)((u32)irx + i + 56), gPCUserName, 32);
 	memcpy((void*)((u32)irx + i + 92), gPCPassword, 32);
 
-	sprintf(filename,"%s",game->startup);
-	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
+
+	char *altStartup = NULL;
+	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
+		strncpy(filename, altStartup, 32);
+	else
+		sprintf(filename, "%s", game->startup);
+	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
 	FlushCache(0);
 
 #ifdef VMC
@@ -457,15 +455,15 @@ int ethSMBDisconnect(void) {
 }
 
 static item_list_t ethGameList = {
-		ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		ETH_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 #ifdef __CHILDPROOF
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
 #else
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
 #endif
 #ifdef VMC
-		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
+		&ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
 #else
-		&ethGetGameCompatibility, &ethSetGameCompatibility, &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, ETH_ICON
+		&ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, ETH_ICON
 #endif
 };

@@ -10,12 +10,9 @@
 #include <string.h>
 
 #define CONFIG_INDEX_OPL		0
-#define CONFIG_INDEX_COMPAT		1
-#define CONFIG_INDEX_DNAS		2
-#define CONFIG_INDEX_VMC		3
-#define CONFIG_INDEX_LAST		4
-#define CONFIG_INDEX_APPS		5
-#define CONFIG_INDEX_VMODE		6
+#define CONFIG_INDEX_LAST		1
+#define CONFIG_INDEX_APPS		2
+#define CONFIG_INDEX_VMODE		3
 
 static config_set_t configFiles[CONFIG_FILE_NUM];
 static char configPath[255] = "mc?:SYS-CONF/IPCONFIG.DAT";
@@ -151,12 +148,6 @@ void configInit(char *prefix) {
 
 	snprintf(path, 255, "%s/conf_opl.cfg", prefix);
 	configAlloc(CONFIG_OPL, &configFiles[CONFIG_INDEX_OPL], path);
-	snprintf(path, 255, "%s/conf_compatibility.cfg", prefix);
-	configAlloc(CONFIG_COMPAT, &configFiles[CONFIG_INDEX_COMPAT], path);
-	snprintf(path, 255, "%s/conf_dnas.cfg", prefix);
-	configAlloc(CONFIG_DNAS, &configFiles[CONFIG_INDEX_DNAS], path);
-	snprintf(path, 255, "%s/conf_vmc.cfg", prefix);
-	configAlloc(CONFIG_VMC, &configFiles[CONFIG_INDEX_VMC], path);
 	snprintf(path, 255, "%s/conf_last.cfg", prefix);
 	configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
 	snprintf(path, 255, "%s/conf_apps.cfg", prefix);
@@ -248,14 +239,22 @@ int configGetStr(config_set_t* configSet, const char* key, char** value) {
 	} else
 		return 0;
 }
-	
+
+void configGetStrCopy(config_set_t* configSet, const char* key, char* value) {
+	char *valref = NULL;
+	if (configGetStr(configSet, key, &valref))
+		strncpy(value, valref, 32);
+	else
+		value[0] = '\0';
+}
+
 int configSetInt(config_set_t* configSet, const char* key, const int value) {
 	char tmp[12];
 	snprintf(tmp, 12, "%d", value);
 	return configSetStr(configSet, key, tmp);
 }
 
-int configGetInt(config_set_t* configSet, char* key, int* value) {
+int configGetInt(config_set_t* configSet, const char* key, int* value) {
 	char *valref = NULL;
 	if (configGetStr(configSet, key, &valref)) {
 		*value = atoi(valref);
@@ -343,36 +342,12 @@ void configWriteIP() {
 	}
 }
 
-void configGetDiscID(char* startup, char* discID) {
-	char *valref = NULL;
-	char gkey[255];
-	snprintf(gkey, 255, "%s_discID", startup);
-	if (configGetStr(&configFiles[CONFIG_INDEX_DNAS], gkey, &valref))
-		strncpy(discID, valref, 32);
-	else
-		discID[0] = '\0';
-}
-
-void configSetDiscID(char* startup, const char *discID) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_discID", startup);
-	configSetStr(&configFiles[CONFIG_INDEX_DNAS], gkey, discID);
-}
-
-void configRemoveDiscID(char* startup) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_discID", startup);
-	configRemoveKey(&configFiles[CONFIG_INDEX_DNAS], gkey);
-}
-
 // dst has to have 5 bytes space
-void configGetDiscIDBinary(char* startup, void* dst) {
+void configGetDiscIDBinary(config_set_t* configSet, void* dst) {
 	memset(dst, 0, 5);
 
 	char *gid = NULL;
-	char gkey[255];
-	snprintf(gkey, 255, "%s_discID", startup);
-	if (configGetStr(&configFiles[CONFIG_INDEX_DNAS], gkey, &gid)) {
+	if (configGetStr(configSet, CONFIG_ITEM_DNAS, &gid)) {
 		// convert from hex to binary
 		char* cdst = dst;
 		int p = 0;
@@ -445,11 +420,15 @@ int configRead(config_set_t* configSet) {
 
 int configWrite(config_set_t* configSet) {
 	if (configSet->modified) {
+		// BUG in PFS: O_TRUNC doesn't work, so we remove the file and re-create it
+		if (strncmp(configSet->filename, "pfs0:", 5) == 0)
+			fioRemove(configSet->filename);
+
 		file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
 		if (fileBuffer) {
 			char line[512];
-			struct config_value_t* cur = configSet->head;
 
+			struct config_value_t* cur = configSet->head;
 			while (cur) {
 				if ((cur->key[0] != '\0') && (cur->key[0] != '#')) {
 					snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
@@ -480,40 +459,6 @@ void configClear(config_set_t* configSet) {
 	configSet->head = NULL;
 	configSet->tail = NULL;
 	configSet->modified = 1;
-}
-
-int configGetCompatibility(char* startup, int mode, int *dmaMode) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_%d", startup, mode);
-
-	unsigned int compatMode;
-	if (!configGetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, &compatMode))
-		compatMode = 0;
-
-	if (dmaMode) {
-		*dmaMode = 7; // defaulting to UDMA 4
-		snprintf(gkey, 255, "%s_DMA", startup);
-		configGetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, dmaMode);
-	}
-
-	return compatMode;
-}
-
-void configSetCompatibility(char* startup, int mode, int compatMode, int dmaMode) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_%d", startup, mode);
-	if (compatMode == 0) // means we want to delete the setting
-		configRemoveKey(&configFiles[CONFIG_INDEX_COMPAT], gkey);
-	else
-		configSetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, compatMode);
-
-	if (dmaMode != -1) {
-		snprintf(gkey, 255, "%s_DMA", startup);
-		if (dmaMode == 7) // UDMA 4 is the default so don't save it (useless lines into the conf file)
-			configRemoveKey(&configFiles[CONFIG_INDEX_COMPAT], gkey);
-		else
-			configSetInt(&configFiles[CONFIG_INDEX_COMPAT], gkey, dmaMode);
-	}
 }
 
 int configReadMulti(int types) {
@@ -555,29 +500,29 @@ int configWriteMulti(int types) {
 }
 
 #ifdef VMC
-void configGetVMC(char* startup, char* vmc, int mode, int slot) {
+void configGetVMC(config_set_t* configSet, char* vmc, int slot) {
 	char *valref = NULL;
 	char gkey[255];
-	snprintf(gkey, 255, "%s_%d_%d", startup, mode, slot);
-	if (configGetStr(&configFiles[CONFIG_INDEX_VMC], gkey, &valref))
+	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
+	if (configGetStr(configSet, gkey, &valref))
 		strncpy(vmc, valref, 32);
 	else
 		vmc[0] = '\0';
 }
 
-void configSetVMC(char* startup, const char* vmc, int mode, int slot) {
+void configSetVMC(config_set_t* configSet, const char* vmc, int slot) {
 	char gkey[255];
 	if(vmc[0] == '\0') {
-		configRemoveVMC(startup, mode, slot);
+		configRemoveVMC(configSet, slot);
 		return;
 	}
-	snprintf(gkey, 255, "%s_%d_%d", startup, mode, slot);
-	configSetStr(&configFiles[CONFIG_INDEX_VMC], gkey, vmc);
+	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
+	configSetStr(configSet, gkey, vmc);
 }
 
-void configRemoveVMC(char *startup, int mode, int slot) {
+void configRemoveVMC(config_set_t* configSet, int slot) {
 	char gkey[255];
-	snprintf(gkey, 255, "%s_%d_%d", startup, mode, slot);
-	configRemoveKey(&configFiles[CONFIG_INDEX_VMC], gkey);
+	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
+	configRemoveKey(configSet, gkey);
 }
 #endif

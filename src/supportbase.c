@@ -143,13 +143,14 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	*gamecount = count;
 }
 
-int sbPrepare(base_game_info_t* game, int mode, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
+int sbPrepare(base_game_info_t* game, config_set_t* configSet, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
 	int i;
 
-	unsigned int compatmask = configGetCompatibility(game->startup, mode, NULL);
+	unsigned int compatmask = 0;
+	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatmask);
 
 	char gameid[5];
-	configGetDiscIDBinary(game->startup, gameid);
+	configGetDiscIDBinary(configSet, gameid);
 
 	if (game->isISO)
 		strcpy(isoname, game->startup);
@@ -308,20 +309,20 @@ config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const
 	config_set_t* config = configAlloc(0, NULL, path);
 	configRead(config);
 
-	configSetStr(config, "#Name", game->name);
+	configSetStr(config, CONFIG_ITEM_NAME, game->name);
 	if (game->sizeMB != -1)
-		configSetInt(config, "#Size", game->sizeMB);
+		configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 	if (game->isISO)
-		configSetStr(config, "#Format", "ISO");
+		configSetStr(config, CONFIG_ITEM_FORMAT, "ISO");
 	else
-		configSetStr(config, "#Format", "UL");
+		configSetStr(config, CONFIG_ITEM_FORMAT, "UL");
 
 	if (game->media == 0x12)
-		configSetStr(config, "#Media", "CD");
+		configSetStr(config, CONFIG_ITEM_MEDIA, "CD");
 	else
-		configSetStr(config, "#Media", "DVD");
+		configSetStr(config, CONFIG_ITEM_MEDIA, "DVD");
 
-	configSetStr(config, "#Startup", game->startup);
+	configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 
 	return config;
 }

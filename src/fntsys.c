@@ -30,9 +30,9 @@ extern int size_freesansfont_raw;
 // freetype vars
 static FT_Library font_library;
 
-static rm_quad_t quad;
-
 static int gCharHeight;
+static int screenWidth;
+static int screenHeight;
 
 static s32 gFontSemaId;
 static ee_sema_t gFontSema;
@@ -89,9 +89,20 @@ typedef struct {
 /// Array of font definitions
 static font_t fonts[FNT_MAX_COUNT];
 
+static rm_quad_t quad;
+static uint32_t codepoint, state;
+static fnt_glyph_cache_entry_t* glyph;
+static FT_Bool use_kerning;
+static FT_UInt glyph_index, previous;
+static FT_Vector delta;
+
 #define GLYPH_CACHE_PAGE_SIZE 256
 
 #define GLYPH_PAGE_OK(font,page) ((pageid <= font->cacheMaxPageID) && (font->glyphCache[page]))
+
+void fntReloadScreenExtents() {
+	rmGetScreenExtents(&screenWidth, &screenHeight);
+}
 
 static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	if (pageid > font->cacheMaxPageID) {
@@ -179,8 +190,9 @@ void fntInit(void) {
 	gFontSema.option = 0;
 	gFontSemaId = CreateSema(&gFontSema);
 
+	fntReloadScreenExtents();
+
 	int i;
-	
 	for (i = 0; i < FNT_MAX_COUNT; ++i)
 		fntResetFontDef(&fonts[i]);
 
@@ -462,166 +474,234 @@ void fntSetAspectRatio(float aw, float ah) {
 	// TODO: error = FT_Set_Char_Size(face, 0, gCharHeight*64, ah*300, aw*300);
 }
 
-int fntRenderString(int font, int x, int y, short aligned, const unsigned char* string, u64 colour) {
+static void fntRenderGlyph(fnt_glyph_cache_entry_t* glyph, int pen_x, int pen_y) {
+	// only if glyph has atlas placement
+	if (glyph->allocation) {
+		/* TODO: Ineffective on many parts:
+		 * 1. Usage of floats for UV - fixed point should suffice (and is used internally by GS for UV)
+		 *
+		 * 2. GS_SETREG_TEX0 for every quad - why? gsKit should only set texture if demanded
+		 *    We should prepare a special fnt render method that would step over most of the
+		 *    performance problems under - begining with rmSetupQuad and continuing into gsKit
+		 *    - this method would handle the preparetion of the quads and GS upload itself,
+		 *    without the use of prim_quad_texture and rmSetupQuad...
+		 *
+		 * 3. We should use clut to keep the memory allocations sane - we're linear in the 32bit buffers
+		 *    anyway, no reason to waste like we do!
+		 */
+		quad.ul.x = pen_x + glyph->ox;
+		quad.br.x = quad.ul.x + glyph->width;
+		quad.ul.y = pen_y + glyph->oy;
+		quad.br.y = quad.ul.y + glyph->height;
+
+		// UV is our own, custom thing here
+		quad.txt = &glyph->atlas->surface;
+		quad.ul.u = glyph->allocation->x;
+		quad.br.u = quad.ul.u + glyph->width;
+		quad.ul.v = glyph->allocation->y;
+		quad.br.v = quad.ul.v + glyph->height;
+
+		rmDrawQuad(&quad);
+	}
+}
+
+#ifndef __RTL
+int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
 	// wait for font lock to unlock
 	WaitSema(gFontSemaId);
 	font_t *fnt = &fonts[font];
 	SignalSema(gFontSemaId);
 
 	if (aligned) {
-		x -= fntCalcDimensions(font, string) >> 1;
+		if (width) {
+			x -= min(fntCalcDimensions(font, string), width) >> 1;
+		} else {
+			x -= fntCalcDimensions(font, string) >> 1;
+		}
 		y -= MENU_ITEM_HEIGHT >> 1;
 	}
 
 	rmApplyShiftRatio(&y);
+	quad.color = colour;
 
-	uint32_t codepoint;
-	uint32_t state = 0;
-	FT_Bool use_kerning = FT_HAS_KERNING(fnt->face);
-	FT_UInt glyph_index, previous = 0;
-	FT_Vector delta;
+	int pen_x = x;
+	int xmax = x + width;
+	int ymax = y + height;
+
+	use_kerning = FT_HAS_KERNING(fnt->face);
+	state = UTF8_ACCEPT;
+	previous = 0;
+
+	// Note: We need to change this so that we'll accumulate whole word before doing a layout with it
+	// for now this method breaks on any character - which is a bit ugly
+
+	// I don't want to do anything complicated though so I'd say
+	// we should instead have a dynamic layout routine that'll replace spaces with newlines as appropriate
+	// because that'll make the code run only once per N frames, not every frame
 
 	// cache glyphs and render as we go
 	for (; *string; ++string) {
 		if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
 			continue;
 
-		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
-		if (!glyph) {
+		glyph = fntCacheGlyph(fnt, codepoint);
+		if (!glyph)
 			continue;
-		}
 
 		// kerning
 		if (use_kerning && previous) {
 			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
 			if (glyph_index) {
 				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
-				x += delta.x >> 6;
+				pen_x += delta.x >> 6;
 			}
 			previous = glyph_index;
 		}
-		
-		// only if glyph has atlas placement
-		if (glyph->allocation) {
-			/* TODO: Ineffective on many parts:
-			 * 1. Usage of floats for UV - fixed point should suffice (and is used internally by GS for UV)
-			 *
-			 * 2. GS_SETREG_TEX0 for every quad - why? gsKit should only set texture if demanded
-			 *    We should prepare a special fnt render method that would step over most of the
-			 *    performance problems under - begining with rmSetupQuad and continuing into gsKit
-			 *    - this method would handle the preparetion of the quads and GS upload itself,
-			 *    without the use of prim_quad_texture and rmSetupQuad...
-			 *    
-			 * (3. rmSetupQuad is cool for a few quads a frame, but glyphs are too many in numbers
-			 *    - seriously, all that branching for every letter is a bit much)
-			 *
-			 * 4. We should use clut to keep the memory allocations sane - we're linear in the 32bit buffers
-			 *    anyway, no reason to waste like we do!
-			 */
-			quad.color = colour;
-			quad.ul.x = x + glyph->ox;
-			quad.br.x = quad.ul.x + glyph->width;
-			quad.ul.y = y + glyph->oy;
-			quad.br.y = quad.ul.y + glyph->height;
-			
-			// UV is our own, custom thing here
-			quad.txt = &glyph->atlas->surface;
-			quad.ul.u = glyph->allocation->x;
-			quad.br.u = quad.ul.u + glyph->width;
-			quad.ul.v = glyph->allocation->y;
-			quad.br.v = quad.ul.v + glyph->height;
-			
-			rmDrawQuad(&quad);
+
+		if (width) {
+			if (codepoint == '\n') {
+				pen_x = x;
+				y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
+				continue;
+			}
+
+			if (y > ymax) // stepped over the max
+				break;
+
+			if (pen_x + glyph->width > xmax) {
+				pen_x = xmax + 1; // to be sure no other cahr will be written (even not a smaller one just following)
+				continue;
+			}
 		}
-		
-		x += glyph->shx >> 6;
-		y += glyph->shy >> 6;
+
+		fntRenderGlyph(glyph, pen_x, y);
+		pen_x += glyph->shx >> 6;
 	}
 
-	return x;
+	return pen_x;
 }
 
-void fntRenderText(int font, int sx, int sy, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
+#else
+static void fntRenderSubRTL(font_t *fnt, const unsigned char* startRTL, const unsigned char* string, fnt_glyph_cache_entry_t* glyph, int x, int y) {
+	if (glyph) {
+		x -= glyph->shx >> 6;
+		fntRenderGlyph(glyph, x, y);
+	}
+
+	for (; startRTL != string; ++startRTL) {
+		if (utf8Decode(&state, &codepoint, *startRTL))
+			continue;
+
+		glyph = fntCacheGlyph(fnt, codepoint);
+		if (!glyph)
+			continue;
+
+		if (use_kerning && previous) {
+			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
+			if (glyph_index) {
+				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+				x -= delta.x >> 6;
+			}
+			previous = glyph_index;
+		}
+
+		x -= glyph->shx >> 6;
+		fntRenderGlyph(glyph, x, y);
+	}
+}
+
+int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
 	// wait for font lock to unlock
 	WaitSema(gFontSemaId);
 	font_t *fnt = &fonts[font];
 	SignalSema(gFontSemaId);
 
 	if (aligned) {
-		sx -= min(fntCalcDimensions(font, string), width) >> 1;
-		sy -= MENU_ITEM_HEIGHT >> 1;
+		if (width) {
+			x -= min(fntCalcDimensions(font, string), width) >> 1;
+		} else {
+			x -= fntCalcDimensions(font, string) >> 1;
+		}
+		y -= MENU_ITEM_HEIGHT >> 1;
 	}
 
-	rmApplyShiftRatio(&sy);
+	rmApplyShiftRatio(&y);
+	quad.color = colour;
 
-	int x = sx;
-	int y = sy;
-	int xm = sx + width;
-	int ym = sy + height;
-	
-	uint32_t codepoint;
-	uint32_t state = 0;
-	FT_Bool use_kerning = FT_HAS_KERNING(fnt->face);
-	FT_UInt glyph_index, previous = 0;
-	FT_Vector delta;
+	int pen_x = x;
+	int xmax = x + width;
+	int ymax = y + height;
 
-	// Note: We need to change this so that we'll accumulate whole word before doing a layout with it
-	// for now this method breaks on any character - which is a bit ugly
-	
-	// I don't want to do anything complicated though so I'd say
-	// we should instead have a dynamic layout routine that'll replace spaces with newlines as appropriate
-	// because that'll make the code run only once per N frames, not every frame
-	
+	use_kerning = FT_HAS_KERNING(fnt->face);
+	state = UTF8_ACCEPT;
+	previous = 0;
+
+	short inRTL = 0;
+	int delta_x, pen_xRTL = 0;
+	fnt_glyph_cache_entry_t* glyphRTL = NULL;
+	const unsigned char* startRTL = NULL;
+
 	// cache glyphs and render as we go
 	for (; *string; ++string) {
 		if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
 			continue;
 
-		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
+		glyph = fntCacheGlyph(fnt, codepoint);
 		if (!glyph)
 			continue;
-		
+
 		// kerning
+		delta_x = 0;
 		if (use_kerning && previous) {
 			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
 			if (glyph_index) {
 				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
-				x += delta.x >> 6;
+				delta_x = delta.x >> 6;
 			}
 			previous = glyph_index;
 		}
 
-		if (codepoint == '\n') {
-			x = sx;
-			y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
-			continue;
-		}
-		
-		if ((x + glyph->width > xm) || (y > ym)) // stepped over the max
-			break;
 
-		// only if glyph has atlas placement
-		if (glyph->allocation) {
-			quad.color = colour;
-			quad.ul.x = x + glyph->ox;
-			quad.br.x = quad.ul.x + glyph->width;
-			quad.ul.y = y + glyph->oy;
-			quad.br.y = quad.ul.y + glyph->height;
-			
-			// UV is our own, custom thing here
-			quad.txt = &glyph->atlas->surface;
-			quad.ul.u = glyph->allocation->x;
-			quad.br.u = quad.ul.u + glyph->width;
-			quad.ul.v = glyph->allocation->y;
-			quad.br.v = quad.ul.v + glyph->height;
+		/*if (width) {
+			if (codepoint == '\n') {
+				x = xori;
+				y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
+				continue;
+			}
 
-			rmDrawQuad(&quad);
+			if ((x + glyph_w > xmax) || (y > ymax)) // stepped over the max
+				break;
+		}*/
+
+		if (codepoint > 0xFF) {
+			if (!inRTL) {
+				inRTL = 1;
+				pen_xRTL = pen_x;
+				glyphRTL = glyph;
+				startRTL = string + 1;
+			}
+			pen_xRTL += delta_x + (glyph->shx >> 6);
+		} else {
+			if (inRTL) { // render RTL
+				inRTL = 0;
+				pen_x = pen_xRTL;
+				fntRenderSubRTL(fnt, startRTL, string, glyphRTL, pen_xRTL, y);
+			}
+
+			pen_x += delta_x;
+			fntRenderGlyph(glyph, pen_x, y);
+			pen_x += glyph->shx >> 6;
 		}
-		
-		x += glyph->shx >> 6;
-		y += glyph->shy >> 6;
 	}
+
+	if (inRTL) {
+		pen_x = pen_xRTL;
+		fntRenderSubRTL(fnt, startRTL, string, glyphRTL, pen_xRTL, y);
+	}
+
+	return pen_x;
 }
+#endif
 
 void fntFitString(int font, unsigned char *string, size_t width) {
 	size_t cw = 0;
@@ -685,24 +765,21 @@ int fntCalcDimensions(int font, const unsigned char* str) {
 	SignalSema(gFontSemaId);
 
 	uint32_t codepoint;
-	uint32_t state = 0;
+	uint32_t state = UTF8_ACCEPT;
 	FT_Bool use_kerning = FT_HAS_KERNING(fnt->face);
 	FT_UInt glyph_index, previous = 0;
 	FT_Vector delta;
 
 	// cache glyphs and render as we go
 	for (; *str; ++str) {
-		unsigned char c = *str;
-
-		if (utf8Decode(&state, &codepoint, c)) // accumulate the codepoint value
+		if (utf8Decode(&state, &codepoint, *str)) // accumulate the codepoint value
 			continue;
 
 		// Could just as well only get the glyph dimensions
 		// but it is probable the glyphs will be needed anyway
 		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
-		if (!glyph) {
+		if (!glyph)
 			continue;
-		}
 
 		// kerning
 		if (use_kerning && previous) {

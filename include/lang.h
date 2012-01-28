@@ -117,8 +117,9 @@
 #define _STR_USE_INFO_SCREEN			112
 #define _STR_INFO						113
 #define _STR_ALTSTARTUP					114
+#define _STR_COLOR_SELECTION			115
 
-#define LANG_STR_COUNT 115
+#define LANG_STR_COUNT 116
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

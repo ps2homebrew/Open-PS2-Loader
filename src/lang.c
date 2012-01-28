@@ -121,6 +121,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Display info page",
 	"Info",
 	"Custom ELF",
+	"Color selection",
 };
 
 static int guiLangID = 0;

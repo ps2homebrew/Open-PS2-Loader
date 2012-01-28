@@ -845,7 +845,7 @@ static void guiRenderGreeting() {
 	rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 	/* char introtxt[255];
 	 snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
-	 fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
+	 fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
 	 */
 
 	GSTEXTURE* logo = thmGetTexture(LOGO_PICTURE);
@@ -1050,7 +1050,7 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
 		x += iconTex->Width + 2;
 	}
 
-	x = fntRenderString(font, x, y, ALIGN_NONE, _l(textId), color);
+	x = fntRenderString(font, x, y, ALIGN_NONE, 0, 0, _l(textId), color);
 
 	return x;
 }
@@ -1088,11 +1088,11 @@ static void guiDrawOverlays() {
 	else
 		snprintf(fps, 10, "---- FPS");
 
-	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 
 	snprintf(fps, 10, "%3d ms", time_render);
 
-	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif
 }
 
@@ -1242,7 +1242,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
-		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, text, gTheme->textColor);
+		fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
 		guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, FNT_DEFAULT, 500, 417, gTheme->selTextColor);
 		if (addAccept)
 			guiDrawIconAndText(CROSS_ICON, _STR_X_ACCEPT, FNT_DEFAULT, 70, 417, gTheme->selTextColor);
@@ -1267,7 +1267,7 @@ void guiRenderTextScreen(const unsigned char* message) {
 
 	rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
-	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, message, gTheme->textColor);
+	fntRenderString(FNT_DEFAULT, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, message, gTheme->textColor);
 
 	guiDrawOverlays();
 

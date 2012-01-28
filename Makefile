@@ -5,6 +5,7 @@ EESIO_DEBUG = 0
 #comment following line to build without vmc
 VMC = 1
 CHILDPROOF = 0
+RTL = 0
 
 FT_DIR = thirdparty/freetype-2.3.12
 FT_LIBDIR = $(FT_DIR)/objs
@@ -49,6 +50,10 @@ ifeq ($(DEBUG),1)
 	endif
 else
 	EE_CFLAGS := -O2
+endif
+
+ifeq ($(RTL),1)
+	EE_CFLAGS += -D__RTL
 endif
 
 ifeq ($(CHILDPROOF),1)

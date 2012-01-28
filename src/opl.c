@@ -7,6 +7,7 @@
 #include "include/usbld.h"
 #include "include/ioman.h"
 #include "include/gui.h"
+#include "include/fntsys.h"
 #include "include/renderman.h"
 #include "include/lang.h"
 #include "include/themes.h"
@@ -564,6 +565,7 @@ void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 
 		thmReloadScreenExtents();
 		guiReloadScreenExtents();
+		fntReloadScreenExtents();
 
 		// also propagate to vmode cfg
 		config_set_t* configVMode = configGetByType(CONFIG_VMODE);

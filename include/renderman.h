@@ -93,12 +93,6 @@ void rmStartFrame(void);
 /** Ends the frame - last to call every frame */
 void rmEndFrame(void);
 
-/** Sets the clipping rectangle */
-void rmClip(int x, int y, int w, int h);
-
-/** Sets cipping to none */
-void rmUnclip(void);
-
 /** Sets the aspect ratio correction for the upcoming operations.
 * When set, it will treat all pixmap widths/heights (not positions) as scaled with the ratios provided */
 void rmSetAspectRatio(float width, float height);

@@ -144,9 +144,9 @@ static mutable_text_t* initMutableText(char* themePath, config_set_t* themeConfi
 static void drawStaticText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	mutable_text_t* mutableText = (mutable_text_t*) elem->extended;
 	if (mutableText->sizingMode == SIZING_NONE)
-		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, mutableText->value, elem->color);
+		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->value, elem->color);
 	else
-		fntRenderText(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->value, elem->color);
+		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->value, elem->color);
 }
 
 static void initStaticText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
@@ -181,22 +181,22 @@ static void drawAttributeText(struct menu_list* menu, struct submenu_list* item,
 		if (mutableText->currentValue) {
 			if (mutableText->displayMode == DISPLAY_NEVER)
 				if (mutableText->sizingMode == SIZING_NONE)
-					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, mutableText->currentValue, elem->color);
+					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->currentValue, elem->color);
 				else
-					fntRenderText(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
+					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
 			else {
 				char result[300];
 				snprintf(result, 300, "%s%s", mutableText->alias, mutableText->currentValue);
 				if (mutableText->sizingMode == SIZING_NONE)
-					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, result, elem->color);
+					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
 				else
-					fntRenderText(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
+					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
 			}
 			return;
 		}
 	}
 	if (mutableText->displayMode == DISPLAY_ALWAYS)
-		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, mutableText->alias, elem->color);
+		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->alias, elem->color);
 }
 
 static void initAttributeText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,
@@ -642,7 +642,7 @@ static void drawMenuText(struct menu_list* menu, struct submenu_list* item, conf
 		if (rightIconTex && rightIconTex->Mem)
 			rmDrawPixmap(rightIconTex, elem->posX + elem->width, elem->posY, elem->aligned, rightIconTex->Width, rightIconTex->Height, elem->scaled, gDefaultCol);
 	}
-	fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, menuItemGetText(menu->item), elem->color);
+	fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, menuItemGetText(menu->item), elem->color);
 }
 
 static void drawItemsList(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
@@ -672,9 +672,9 @@ static void drawItemsList(struct menu_list* menu, struct submenu_list* item, con
 					if (itemsList->decoratorImage->defaultTexture)
 						rmDrawPixmap(&itemsList->decoratorImage->defaultTexture->source, posX, posY, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
 				}
-				fntRenderText(elem->font, posX + DECORATOR_SIZE, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
+				fntRenderString(elem->font, posX + DECORATOR_SIZE, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
 			} else
-				fntRenderText(elem->font, posX, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
+				fntRenderString(elem->font, posX, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
 
 			posY += MENU_ITEM_HEIGHT;
 			ps = ps->next;
@@ -713,7 +713,7 @@ static void initItemsList(char* themePath, config_set_t* themeConfig, theme_t* t
 static void drawItemText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	if (item) {
 		item_list_t *support = menu->item->userdata;
-		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, support->itemGetStartup(item->item.id), elem->color);
+		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, support->itemGetStartup(item->item.id), elem->color);
 	}
 }
 

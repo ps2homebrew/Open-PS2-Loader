@@ -23,14 +23,7 @@ struct rm_texture_list_t {
 	struct rm_texture_list_t *next;
 };
 
-typedef struct {
-	int used;
-	int x, y, x1, y1;
-} rm_clip_rect_t;
-
 static struct rm_texture_list_t *uploadedTextures = NULL;
-
-static rm_clip_rect_t clipRect;
 
 static int order;
 static int vsync = 0;
@@ -62,7 +55,6 @@ static float aspectWidth;
 static float aspectHeight;
 
 // Transposition values - all rendering can be transposed (moved on screen) by these
-// this is a post-clipping operation
 static float transX = 0;
 static float transY = 0;
 
@@ -85,55 +77,6 @@ static float shiftYFunc(float posY) {
 static float identityFunc(float posY) {
 	return posY;
 }
-
-static int rmClipQuad(rm_quad_t* quad) {
-	if (!clipRect.used)
-		return 1;
-	
-	if (quad->ul.x > clipRect.x1)
-		return 0;
-	if (quad->ul.y > clipRect.y1)
-		return 0;
-	if (quad->br.x < clipRect.x)
-		return 0;
-	if (quad->br.y < clipRect.y)
-		return 0;
-	
-	float dx = quad->br.x - quad->ul.x;
-	float dy = quad->br.y - quad->ul.x;
-	float du = (quad->br.u - quad->ul.u) / dx;
-	float dv = (quad->br.v - quad->ul.v) / dy;
-	
-	if (quad->ul.x < clipRect.x) {
-		// clip
-		float d = clipRect.x - quad->ul.x;
-		quad->ul.x = clipRect.x;
-		quad->ul.u += d * du; 
-	}
-	
-	if (quad->ul.y < clipRect.y) {
-		// clip
-		float d = clipRect.y - quad->ul.y;
-		quad->ul.y = clipRect.y;
-		quad->ul.v += d * dv; 
-	}
-	
-	if (quad->br.x > clipRect.x1) {
-		// clip
-		float d = quad->br.x - clipRect.x1;
-		quad->br.x = clipRect.x1;
-		quad->br.u -= d * du; 
-	}
-	
-	if (quad->ul.y < clipRect.y) {
-		// clip
-		float d = quad->br.y - clipRect.y1;
-		quad->br.y = clipRect.y1;
-		quad->br.v -= d * dv; 
-	}
-	
-	return 1;
-};
 
 static void rmAppendUploadedTextures(GSTEXTURE *txt) {
 	struct rm_texture_list_t *entry = (struct rm_texture_list_t *)malloc(sizeof(struct rm_texture_list_t));
@@ -375,8 +318,6 @@ void rmInit(int vsyncon, enum rm_vmode vmodeset) {
 
 	order = 0;
 
-	clipRect.used = 0;
-	
 	aspectWidth = 1.0f;
 	aspectHeight = 1.0f;
 	
@@ -493,9 +434,6 @@ void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, shor
 }
 
 void rmDrawQuad(rm_quad_t* q) { // NO scaling, NO shift, NO alignment
-	if (!rmClipQuad(q))
-		return;
-
 	if (!rmPrepareTexture(q->txt)) // won't render if not ready!
 		return;
 
@@ -551,26 +489,6 @@ void rmDrawRect(int x, int y, int w, int h, u64 color) {
 
 void rmDrawLine(int x, int y, int x1, int y1, u64 color) {
 	gsKit_prim_line(gsGlobal, x + transX, shiftY(y) + transY, x1 + transX, shiftY(y1) + transY, order, color);
-}
-
-/** Sets the clipping rectangle */
-void rmClip(int x, int y, int w, int h) {
-	clipRect.x = x;
-	clipRect.y = y;
-	if (w == -1)
-		clipRect.x1 = gsGlobal->Width;
-	else
-		clipRect.x1 = x + w;
-	if (h == -1)
-		clipRect.y1 = gsGlobal->Height;
-	else
-		clipRect.y1 = y + h;
-	clipRect.used = 0;
-}
-
-/** Sets cipping to none */
-void rmUnclip(void) {
-	clipRect.used = 0;
 }
 
 void rmSetAspectRatio(float width, float height) {

@@ -189,6 +189,9 @@ void guiShowAbout() {
 #ifdef VMC
 	strcat(OPLVersion, " VMC");
 #endif
+#ifdef __RTL
+	strcat(OPLVersion, " RTL");
+#endif
 #ifdef __CHILDPROOF
 	strcat(OPLVersion, " CHILDPROOF");
 #endif

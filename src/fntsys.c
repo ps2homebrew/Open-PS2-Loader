@@ -629,8 +629,8 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 	quad.color = colour;
 
 	int pen_x = x;
-	int xmax = x + width;
-	int ymax = y + height;
+	/*int xmax = x + width;
+	int ymax = y + height;*/
 
 	use_kerning = FT_HAS_KERNING(fnt->face);
 	state = UTF8_ACCEPT;
@@ -680,18 +680,22 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 				glyphRTL = glyph;
 				startRTL = string + 1;
 			}
-			pen_xRTL += delta_x + (glyph->shx >> 6);
-		} else {
+		} else if ((codepoint > 96 && codepoint < 123) || (codepoint > 64 && codepoint < 91)) {
 			if (inRTL) { // render RTL
 				inRTL = 0;
 				pen_x = pen_xRTL;
 				fntRenderSubRTL(fnt, startRTL, string, glyphRTL, pen_xRTL, y);
 			}
+		}
 
+		if (inRTL) {
+			pen_xRTL += delta_x + (glyph->shx >> 6);
+		} else {
 			pen_x += delta_x;
 			fntRenderGlyph(glyph, pen_x, y);
 			pen_x += glyph->shx >> 6;
 		}
+
 	}
 
 	if (inRTL) {

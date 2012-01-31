@@ -31,8 +31,6 @@ extern int size_freesansfont_raw;
 static FT_Library font_library;
 
 static int gCharHeight;
-static int screenWidth;
-static int screenHeight;
 
 static s32 gFontSemaId;
 static ee_sema_t gFontSema;
@@ -99,10 +97,6 @@ static FT_Vector delta;
 #define GLYPH_CACHE_PAGE_SIZE 256
 
 #define GLYPH_PAGE_OK(font,page) ((pageid <= font->cacheMaxPageID) && (font->glyphCache[page]))
-
-void fntReloadScreenExtents() {
-	rmGetScreenExtents(&screenWidth, &screenHeight);
-}
 
 static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	if (pageid > font->cacheMaxPageID) {
@@ -189,8 +183,6 @@ void fntInit(void) {
 	gFontSema.max_count = 1;
 	gFontSema.option = 0;
 	gFontSemaId = CreateSema(&gFontSema);
-
-	fntReloadScreenExtents();
 
 	int i;
 	for (i = 0; i < FNT_MAX_COUNT; ++i)

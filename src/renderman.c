@@ -381,7 +381,7 @@ void rmEnd(void) {
 	rmFlush();
 }
 
-/** If txt is null, don't use DIM_ADAPT size */
+/** If txt is null, don't use DIM_UNDEF size */
 void rmSetupQuad(GSTEXTURE* txt, int x, int y, short aligned, int w, int h, short scaled, u64 color, rm_quad_t* q) {
 	if (aligned) {
 		float dim;

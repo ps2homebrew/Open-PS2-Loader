@@ -30,12 +30,13 @@ static char **guiThemesNames = NULL;
 #define TYPE_BACKGROUND			5
 #define TYPE_MENU_ICON			6
 #define TYPE_MENU_TEXT			7
-#define	 TYPE_ITEMS_LIST		8
-#define	 TYPE_ITEM_ICON			9
-#define	 TYPE_ITEM_COVER		10
+#define	TYPE_ITEMS_LIST			8
+#define	TYPE_ITEM_ICON			9
+#define	TYPE_ITEM_COVER			10
 #define TYPE_ITEM_TEXT			11
 #define TYPE_HINT_TEXT			12
-#define TYPE_LOADING_ICON		13
+#define TYPE_INFO_HINT_TEXT		13
+#define TYPE_LOADING_ICON		14
 
 #define DISPLAY_ALWAYS		0
 #define DISPLAY_DEFINED		1
@@ -59,6 +60,7 @@ static char *elementsType[] = {
 	"ItemCover",
 	"ItemText",
 	"HintText",
+	"InfoHintText",
 	"LoadingIcon",
 };
 
@@ -729,6 +731,13 @@ static void drawHintText(struct menu_list* menu, struct submenu_list* item, conf
 	}
 }
 
+static void drawInfoHintText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
+	int x = elem->posX;
+	x = guiDrawIconAndText(CROSS_ICON, _STR_RUN, elem->font, x, elem->posY, elem->color);
+	x += 12;
+	x = guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, elem->font, x, elem->posY, elem->color);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t* theme) {
@@ -844,6 +853,9 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 			} else if (!strcmp(elementsType[TYPE_HINT_TEXT], type)) {
 				elem = initBasic(themePath, themeConfig, theme, name, TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
 				elem->drawElem = &drawHintText;
+			} else if (!strcmp(elementsType[TYPE_INFO_HINT_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem->drawElem = &drawInfoHintText;
 			} else if (!strcmp(elementsType[TYPE_LOADING_ICON], type)) {
 				if (!theme->loadingIcon)
 					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, TYPE_LOADING_ICON, -50, -50, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);

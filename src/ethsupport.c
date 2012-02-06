@@ -45,57 +45,82 @@ static base_game_info_t *ethGames = NULL;
 // forward declaration
 static item_list_t ethGameList;
 
-static void ethLoadModules(void) {
-	int ret, ipconfiglen;
-	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+void ethSMBConnect(void) {
+	smbLogOn_in_t logon;
+	smbEcho_in_t echo;
+	smbOpenShare_in_t openshare;
 
-	LOG("ethLoadModules()\n");
+	// open tcp connection with the server / logon to SMB server
+	sprintf(logon.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	logon.serverPort = gPCPort;
 
-	ipconfiglen = sysSetIPConfig(ipconfig);
+	if (strlen(gPCPassword) > 0) {
+		smbGetPasswordHashes_in_t passwd;
+		smbGetPasswordHashes_out_t passwdhashes;
 
-	gNetworkStartup = 5;
+		// we'll try to generate hashed password first
+		strncpy(logon.User, gPCUserName, 32);
+		strncpy(passwd.password, gPCPassword, 32);
 
-	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-	if (ret < 0) {
-		gNetworkStartup = -1;
-		return;
+		if (fileXioDevctl(ethPrefix, SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes)) == 0) {
+			// hash generated okay, can use
+			memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+			logon.PasswordType = HASHED_PASSWORD;
+			memcpy((void *)openshare.Password, (void *)&passwdhashes, sizeof(passwdhashes));
+			openshare.PasswordType = HASHED_PASSWORD;
+		} else {
+			// failed hashing, failback to plaintext
+			strncpy(logon.Password, gPCPassword, 32);
+			logon.PasswordType = PLAINTEXT_PASSWORD;
+			strncpy(openshare.Password, gPCPassword, 32);
+			openshare.PasswordType = PLAINTEXT_PASSWORD;
+		}
+	} else {
+		strncpy(logon.User, gPCUserName, 32);
+		logon.PasswordType = NO_PASSWORD;
+		openshare.PasswordType = NO_PASSWORD;
 	}
 
-	gNetworkStartup = 4;
+	gNetworkStartup = ERROR_ETH_SMB_LOGON;
+	if (fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0) >= 0) {
+		gNetworkStartup = ERROR_ETH_SMB_ECHO;
 
-	ret = sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
-	if (ret < 0) {
-		gNetworkStartup = -1;
-		return;
+		// SMB server alive test
+		strcpy(echo.echo, "ALIVE ECHO TEST");
+		echo.len = strlen("ALIVE ECHO TEST");
+
+		if (fileXioDevctl(ethPrefix, SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0) >= 0) {
+			gNetworkStartup = ERROR_ETH_SMB_OPENSHARE;
+
+			// connect to the share
+			strcpy(openshare.ShareName, gPCShareName);
+
+			if (fileXioDevctl(ethPrefix, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0) >= 0) {
+
+				// everything is ok
+				gNetworkStartup = 0;
+			}
+		}
 	}
-	gNetworkStartup = 3;
+}
 
-	ret = sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL);
-	if (ret < 0) {
-		gNetworkStartup = -1;
-		return;
-	}
+int ethSMBDisconnect(void) {
+	int ret;
 
-	gNetworkStartup = 2;
+	// closing share
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
+	if (ret < 0)
+		return -1;
 
-	ret = sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig);
-	if (ret < 0) {
-		gNetworkStartup = -1;
-		return;
-	}
+	// logoff/close tcp connection from SMB server:
+	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
+	if (ret < 0)
+		return -2;
 
-	gNetworkStartup = 1;
+	return 0;
+}
 
-	ret = sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL);
-	if (ret < 0) {
-		gNetworkStartup = -1;
-		return;
-	}
-
-	gNetworkStartup = 0; // ok, all loaded
-
-	LOG("ethLoadModules: modules loaded\n");
-
+static void ethInitSMB(void) {
 	// connect
 	ethSMBConnect();
 
@@ -113,6 +138,36 @@ static void ethLoadModules(void) {
 #endif
 }
 
+static void ethLoadModules(void) {
+	int ipconfiglen;
+	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+
+	LOG("ethLoadModules()\n");
+
+	ipconfiglen = sysSetIPConfig(ipconfig);
+
+	gNetworkStartup = ERROR_ETH_MODULE_PS2DEV9_FAILURE;
+	if (sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL) >= 0) {
+		gNetworkStartup = ERROR_ETH_MODULE_SMSUTILS_FAILURE;
+		if (sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL) >= 0) {
+			gNetworkStartup = ERROR_ETH_MODULE_SMSTCPIP_FAILURE;
+			if (sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL) >= 0) {
+				gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
+				if (sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig) >= 0) {
+					gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
+					if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
+						LOG("ethLoadModules: modules loaded\n");
+						ethInitSMB();
+					}
+				}
+			}
+		}
+	}
+
+	if (gNetworkStartup != 0)
+		setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+}
+
 void ethInit(void) {
 	LOG("ethInit()\n");
 
@@ -122,7 +177,7 @@ void ethInit(void) {
 	memset(ethModifiedDVDPrev, 0, 8);
 	ethGameCount = 0;
 	ethGames = NULL;
-	gNetworkStartup = 6;
+	gNetworkStartup = ERROR_ETH_NOT_STARTED;
 	
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethLoadModules);
 
@@ -137,6 +192,12 @@ item_list_t* ethGetObject(int initOnly) {
 
 static int ethNeedsUpdate(void) {
 	int result = 0;
+
+	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
+		ethInitSMB();
+		if (gNetworkStartup != 0)
+			setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	}
 
 	if (gNetworkStartup == 0) {
 		fio_stat_t stat;
@@ -278,11 +339,6 @@ static int ethPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
 #endif
 
 static void ethLaunchGame(int id, config_set_t* configSet) {
-	if (gNetworkStartup != 0) {
-		guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
-		return;
-	}
-
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
 	char isoname[32], filename[32];
@@ -376,83 +432,6 @@ static int ethCheckVMC(char* name, int createSize) {
 	return sysCheckVMC(ethPrefix, "\\", name, createSize);
 }
 #endif
-
-int ethSMBConnect(void) {
-	int ret;
-	smbLogOn_in_t logon;
-	smbEcho_in_t echo;
-	smbOpenShare_in_t openshare;
-
-	// open tcp connection with the server / logon to SMB server
-	sprintf(logon.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	logon.serverPort = gPCPort;
-	
-	if (strlen(gPCPassword) > 0) {
-		smbGetPasswordHashes_in_t passwd;
-		smbGetPasswordHashes_out_t passwdhashes;
-		
-		// we'll try to generate hashed password first
-		strncpy(logon.User, gPCUserName, 32);
-		strncpy(passwd.password, gPCPassword, 32);
-		
-		ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes));
-	
-		if (ret == 0) {
-			// hash generated okay, can use
-			memcpy((void *)logon.Password, (void *)&passwdhashes, sizeof(passwdhashes));
-			logon.PasswordType = HASHED_PASSWORD;
-			memcpy((void *)openshare.Password, (void *)&passwdhashes, sizeof(passwdhashes));
-			openshare.PasswordType = HASHED_PASSWORD;
-		} else {
-			// failed hashing, failback to plaintext
-			strncpy(logon.Password, gPCPassword, 32);
-			logon.PasswordType = PLAINTEXT_PASSWORD;
-			strncpy(openshare.Password, gPCPassword, 32);
-			openshare.PasswordType = PLAINTEXT_PASSWORD;
-		}
-	} else {
-		strncpy(logon.User, gPCUserName, 32);
-		logon.PasswordType = NO_PASSWORD;
-		openshare.PasswordType = NO_PASSWORD;
-	}
-	
-	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0);
-	if (ret < 0)
-		return -2;
-
-	// SMB server alive test
-	strcpy(echo.echo, "ALIVE ECHO TEST");
-	echo.len = strlen("ALIVE ECHO TEST");
-
-	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0);
-	if (ret < 0)
-		return -3;
-
-	// connect to the share
-	strcpy(openshare.ShareName, gPCShareName);
-
-	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0);
-	if (ret < 0)
-		return -4;
-
-	return 0;	
-}
-
-int ethSMBDisconnect(void) {
-	int ret;
-
-	// closing share
-	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_CLOSESHARE, NULL, 0, NULL, 0);
-	if (ret < 0)
-		return -1;
-
-	// logoff/close tcp connection from SMB server:
-	ret = fileXioDevctl(ethPrefix, SMB_DEVCTL_LOGOFF, NULL, 0, NULL, 0);
-	if (ret < 0)
-		return -2;
-
-	return 0;	
-}
 
 static item_list_t ethGameList = {
 		ETH_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,

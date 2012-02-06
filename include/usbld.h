@@ -33,6 +33,7 @@
 
 #define USBLD_VERSION "0.8"
 
+void setErrorMessage(int strId, int error);
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID, int newVMode, int newVSync);

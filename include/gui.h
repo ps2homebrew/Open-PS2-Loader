@@ -73,6 +73,9 @@ void guiLock();
 /** Unlocks gui after direct gui data updates */
 void guiUnlock();
 
+/** invokes the intro loop */
+void guiIntroLoop();
+
 /** invokes the main loop */
 void guiMainLoop();
 
@@ -125,7 +128,7 @@ void guiShowIPConfig();
 * @param type the io operation type
 * @param data the data for the operation
 */
-void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data);
+void guiHandleDeferedIO(int *ptr, const unsigned char* message, int type, void *data);
 
 /** Renders a single frame with a specified message on the screen
 */

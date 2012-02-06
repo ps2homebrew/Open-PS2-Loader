@@ -23,7 +23,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Apps",
 	"Theme",
 	"Language",
-	"Network startup error",
+	"Network startup error: %d",
 	"On",
 	"Off",
 	"Ok",

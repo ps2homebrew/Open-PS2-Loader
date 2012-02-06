@@ -339,6 +339,7 @@ void configWriteIP() {
 	
 		fioWrite(fd, ipconfig, strlen(ipconfig));
 		fioClose(fd);
+		gIPConfigChanged = 0;
 	}
 }
 

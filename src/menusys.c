@@ -80,13 +80,13 @@ static void _menuRequestConfig() {
 config_set_t* menuLoadConfig() {
 	actionStatus = 1;
 	itemConfigId = -1;
-	guiHandleDefferedIO(&actionStatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuRequestConfig);
+	guiHandleDeferedIO(&actionStatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuRequestConfig);
 	return itemConfig;
 }
 
 void menuSaveConfig() {
 	actionStatus = 1;
-	guiHandleDefferedIO(&actionStatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuSaveConfig);
+	guiHandleDeferedIO(&actionStatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuSaveConfig);
 }
 
 static void menuInitMainMenu() {

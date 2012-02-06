@@ -812,11 +812,6 @@ static void guiHandleDeferredOps(void) {
 
 		guiHandleOp(gUpdateList->item);
 
-		if (gNetworkStartup < 0) {
-			gNetworkStartup = 0;
-			guiMsgBox(_l(_STR_NETWORK_STARTUP_ERROR), 0, NULL);
-		}
-
 		struct gui_update_list_t* td = gUpdateList;
 		gUpdateList = gUpdateList->next;
 
@@ -846,10 +841,6 @@ static void guiRenderGreeting() {
 	int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
 	u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
 	rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
-	/* char introtxt[255];
-	 snprintf(introtxt, 255, _l(_STR_OUL_VER), USBLD_VERSION);
-	 fntRenderString(screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, introtxt, GS_SETREG_RGBA(0x060, 0x060, 0x060, wfadeout));
-	 */
 
 	GSTEXTURE* logo = thmGetTexture(LOGO_PICTURE);
 	if (logo) {
@@ -1062,9 +1053,6 @@ static void guiDrawOverlays() {
 	// are there any pending operations?
 	int pending = ioHasPendingRequests();
 
-	if (gInitComplete)
-		wfadeout--;
-
 	if (!pending) {
 		if (bfadeout > 0x0)
 			bfadeout -= 0x08;
@@ -1075,27 +1063,19 @@ static void guiDrawOverlays() {
 			bfadeout += 0x20;
 	}
 
-	// is init still running?
-	if (wfadeout > 0)
-		guiRenderGreeting();
-
 	if (bfadeout > 0)
 		guiDrawBusy();
 
 #ifdef __DEBUG
 	// fps meter
-	char fps[10];
+	char fps[20];
 
 	if (time_since_last != 0)
-		snprintf(fps, 10, "%3.1f FPS", 1000.0f / (float) time_since_last);
+		snprintf(fps, 20, "%3d ms %3.1f FPS", time_render, 1000.0f / (float) time_since_last);
 	else
-		snprintf(fps, 10, "---- FPS");
+		snprintf(fps, 20, "%3d ms ----- FPS", time_render);
 
-	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 20, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
-
-	snprintf(fps, 10, "%3d ms", time_render);
-
-	fntRenderString(FNT_DEFAULT, screenWidth - 60, gTheme->usedHeight - 45, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	fntRenderString(FNT_DEFAULT, screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif
 }
 
@@ -1139,6 +1119,33 @@ static void guiShow() {
 		screenHandler->renderScreen();
 }
 
+void guiIntroLoop(void) {
+	int endIntro = 0;
+	while (!endIntro) {
+		guiStartFrame();
+
+		guiReadPads();
+
+		if (wfadeout < 0x0FF)
+			guiShow();
+
+		if (gInitComplete)
+			wfadeout--;
+
+		if (wfadeout > 0)
+			guiRenderGreeting();
+		else
+			endIntro = 1;
+
+		guiHandleDeferredOps();
+
+		guiEndFrame();
+
+		if (!screenHandlerTarget && screenHandler)
+			screenHandler->handleInput();
+	}
+}
+
 void guiMainLoop(void) {
 	while (!gTerminate) {
 		guiStartFrame();
@@ -1147,8 +1154,7 @@ void guiMainLoop(void) {
 		guiReadPads();
 
 		// handle inputs and render screen
-		if (wfadeout < 0x0FF)
-			guiShow();
+		guiShow();
 
 		// Render overlaying gui thingies :)
 		guiDrawOverlays();
@@ -1156,10 +1162,10 @@ void guiMainLoop(void) {
 		// handle deferred operations
 		guiHandleDeferredOps();
 
+		guiEndFrame();
+
 		if (gFrameHook)
 			gFrameHook();
-
-		guiEndFrame();
 
 		// if not transiting, handle input
 		// done here so we can use renderman if needed
@@ -1256,7 +1262,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 	return terminate - 1;
 }
 
-void guiHandleDefferedIO(int *ptr, const unsigned char* message, int type, void *data) {
+void guiHandleDeferedIO(int *ptr, const unsigned char* message, int type, void *data) {
 	ioPutRequest(type, data);
 
 	while (*ptr)

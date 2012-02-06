@@ -82,7 +82,9 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 static void moduleCleanup(opl_io_module_t* mod, int exception);
 
 // frame counter
-static int gFrameCounter;
+static int frameCounter;
+
+static char errorMessage[255];
 
 static opl_io_module_t list_support[4];
 
@@ -173,7 +175,7 @@ static void itemExecSquare(struct menu_item *curMenu) {
 			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
 				support->itemDelete(curMenu->current->item.id);
 				if (gAutoRefresh)
-					gFrameCounter = UPDATE_FRAME_COUNT;
+					frameCounter = UPDATE_FRAME_COUNT;
 				else
 					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 			}
@@ -200,7 +202,7 @@ static void itemExecCircle(struct menu_item *curMenu) {
 			if (guiShowKeyboard(newName, nameLength)) {
 				support->itemRename(curMenu->current->item.id, newName);
 				if (gAutoRefresh)
-					gFrameCounter = UPDATE_FRAME_COUNT;
+					frameCounter = UPDATE_FRAME_COUNT;
 				else
 					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
 			}
@@ -265,7 +267,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		list_support[mode].support->uip = 0;
 
 		if (gAutoRefresh)
-			gFrameCounter = UPDATE_FRAME_COUNT;
+			frameCounter = UPDATE_FRAME_COUNT;
 		else
 			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[mode]);
 	}
@@ -367,10 +369,10 @@ static void menuDeferredUpdate(void* data) {
 
 static void menuUpdateHook() {
 	// if timer exceeds some threshold, schedule updates of the available input sources
-	gFrameCounter++;
+	frameCounter++;
 
-	if (gFrameCounter > UPDATE_FRAME_COUNT) {
-		gFrameCounter = 0;
+	if (frameCounter > UPDATE_FRAME_COUNT) {
+		frameCounter = 0;
 
 		// schedule updates of all the list handlers
 		if (list_support[USB_MODE].support && list_support[USB_MODE].support->enabled)
@@ -382,6 +384,22 @@ static void menuUpdateHook() {
 		if (list_support[APP_MODE].support && list_support[APP_MODE].support->enabled)
 			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[APP_MODE]);
 	}
+}
+
+static void errorMessageHook() {
+	guiMsgBox(errorMessage, 0, NULL);
+
+	// reset the original frame hook
+	frameCounter = 0;
+	if (gAutoRefresh)
+		guiSetFrameHook(&menuUpdateHook);
+	else
+		guiSetFrameHook(NULL);
+}
+
+void setErrorMessage(int strId, int error) {
+	snprintf(errorMessage, 255, _l(strId), error);
+	guiSetFrameHook(&errorMessageHook);
 }
 
 // ----------------------------------------------------------
@@ -602,7 +620,7 @@ int loadConfig(int types) {
 	lscstatus = types;
 	lscret = 0;
 	
-	guiHandleDefferedIO(&lscstatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_loadConfig);
+	guiHandleDeferedIO(&lscstatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_loadConfig);
 	
 	return lscret;
 }
@@ -611,7 +629,7 @@ int saveConfig(int types, int showUI) {
 	lscstatus = types;
 	lscret = 0;
 	
-	guiHandleDefferedIO(&lscstatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_saveConfig);
+	guiHandleDeferedIO(&lscstatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_saveConfig);
 	
 	if (showUI) {
 		if (lscret)
@@ -808,30 +826,19 @@ static void setDefaults(void) {
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
 	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
-	
-	// SMB port on pc
 	gPCPort = 445;
-	
-	// default values
 	strncpy(gPCShareName, "PS2SMB", 32);
 	strncpy(gPCUserName, "GUEST", 32);
 	strncpy(gPCPassword, "", 32);
-	
-	// loading progress of the network and hdd. Value "6" should mean not started yet...
-	gNetworkStartup = 6;
+	gNetworkStartup = ERROR_ETH_NOT_STARTED;
 	gHddStartup = 6;
-	
 	gHDDSpindown = 20;
-	// no change to the ipconfig was done
 	gIPConfigChanged = 0;
 	gScrollSpeed = 1;
-	//Default exit path
 	strncpy(gExitPath, "", 32);
-	// default menu
 	gDefaultDevice = APP_MODE;
 	gAutosort = 1;
 	gAutoRefresh = 1;
-	//Default disable debug colors
 	gDisableDebug = 0;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
@@ -863,7 +870,7 @@ static void setDefaults(void) {
 	gDefaultUITextColor[1] = 0x080;
 	gDefaultUITextColor[2] = 0x040;
 
-	gFrameCounter = UPDATE_FRAME_COUNT;
+	frameCounter = UPDATE_FRAME_COUNT;
 
 	gVMode = RM_VMODE_AUTO;
 	gVSync = 1;
@@ -973,6 +980,7 @@ int main(int argc, char* argv[])
 	// queue deffered init which shuts down the intro screen later
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);
 	
+	guiIntroLoop();
 	guiMainLoop();
 	
 	return 0;

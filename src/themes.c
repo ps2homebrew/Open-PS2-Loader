@@ -726,7 +726,7 @@ static void drawHintText(struct menu_list* menu, struct submenu_list* item, conf
 
 		for (; hint; hint = hint->next) {
 			x = guiDrawIconAndText(hint->icon_id, hint->text_id, elem->font, x, elem->posY, elem->color);
-			x += 12;
+			x += elem->width;
 		}
 	}
 }
@@ -734,7 +734,7 @@ static void drawHintText(struct menu_list* menu, struct submenu_list* item, conf
 static void drawInfoHintText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	int x = elem->posX;
 	x = guiDrawIconAndText(CROSS_ICON, _STR_RUN, elem->font, x, elem->posY, elem->color);
-	x += 12;
+	x += elem->width;
 	x = guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, elem->font, x, elem->posY, elem->color);
 }
 
@@ -851,10 +851,10 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEM_TEXT, 520, 370, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
 				elem->drawElem = &drawItemText;
 			} else if (!strcmp(elementsType[TYPE_HINT_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
 				elem->drawElem = &drawHintText;
 			} else if (!strcmp(elementsType[TYPE_INFO_HINT_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
 				elem->drawElem = &drawInfoHintText;
 			} else if (!strcmp(elementsType[TYPE_LOADING_ICON], type)) {
 				if (!theme->loadingIcon)

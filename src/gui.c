@@ -16,6 +16,7 @@
 #include "include/util.h"
 #include "include/config.h"
 #include "include/system.h"
+#include "include/ethsupport.h"
 
 #include <stdlib.h>
 #include <libvux.h>
@@ -340,6 +341,7 @@ void guiShowUIConfig() {
 void guiShowIPConfig() {
 	size_t i;
 	// upload current values
+	// TODO disable elems
 	for (i = 0; i < 4; ++i) {
 		diaSetInt(diaIPConfig, 2 + i, ps2_ip[i]);
 		diaSetInt(diaIPConfig, 6 + i, ps2_netmask[i]);
@@ -352,9 +354,14 @@ void guiShowIPConfig() {
 	diaSetString(diaIPConfig, 20, gPCUserName);
 	diaSetString(diaIPConfig, 21, gPCPassword);
 
-	// show dialog
-	if (diaExecuteDialog(diaIPConfig, -1, 1, NULL)) {
-		// Ok pressed, store values
+	if (gNetworkStartup == 0)
+		diaIPConfig[64].type = UI_SPACER;
+	else
+		diaIPConfig[64].type = UI_TERMINATOR;
+
+	int result = diaExecuteDialog(diaIPConfig, -1, 1, NULL);
+	if (result) {
+		// Store values
 		for (i = 0; i < 4; ++i) {
 			diaGetInt(diaIPConfig, 2 + i, &ps2_ip[i]);
 			diaGetInt(diaIPConfig, 6 + i, &ps2_netmask[i]);
@@ -364,9 +371,15 @@ void guiShowIPConfig() {
 
 		diaGetInt(diaIPConfig, 18, &gPCPort);
 		diaGetString(diaIPConfig, 19, gPCShareName);
+		// has to be non-empty
+		if (strlen(gPCShareName) == 0)
+			strncpy(gPCShareName, "PS2SMB", 32);
 		diaGetString(diaIPConfig, 20, gPCUserName);
 		diaGetString(diaIPConfig, 21, gPCPassword);
 		gIPConfigChanged = 1;
+
+		if (result == NETCFG_RECONNECT)
+			gNetworkStartup = ERROR_ETH_SMB_LOGON;
 
 		applyConfig(-1, -1, gVMode, gVSync);
 	}

@@ -64,6 +64,10 @@ struct UIItem diaIPConfig[] = {
 	//  ---- Ok ----
 	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
 	
+	{UI_SPACER}, // UIItem #64
+
+	{UI_BUTTON, NETCFG_RECONNECT, 1, -1, 0, 0, {.label = {NULL, _STR_RECONNECT}}},
+
 	// end of dialog
 	{UI_TERMINATOR}
 };

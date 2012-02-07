@@ -278,7 +278,7 @@ static void initAllSupport(int force_reinit) {
 		initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
 
 	if (gETHStartMode)
-		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit);
+		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit||(gNetworkStartup >= ERROR_ETH_SMB_LOGON));
 
 	if (gHDDStartMode)
 		initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
@@ -595,13 +595,6 @@ void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 	changed = thmSetGuiValue(themeID, changed);
 	if (langID != -1)
 		lngSetGuiValue(langID);
-
-	// has to be non-empty
-	if (strlen(gPCShareName) == 0)
-		strncpy(gPCShareName, "PS2SMB", 32);
-
-	if (gPCPort < 0)
-		gPCPort = 445;
 
 	initAllSupport(0);
 

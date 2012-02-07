@@ -118,8 +118,9 @@
 #define _STR_INFO						113
 #define _STR_ALTSTARTUP					114
 #define _STR_COLOR_SELECTION			115
+#define _STR_RECONNECT					116
 
-#define LANG_STR_COUNT 116
+#define LANG_STR_COUNT 117
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

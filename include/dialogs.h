@@ -58,6 +58,8 @@
 #define CFG_USBPREFIX			41
 #define CFG_HDDSPINDOWN			42
 
+#define NETCFG_RECONNECT		43
+
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];

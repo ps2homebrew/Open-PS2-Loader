@@ -124,18 +124,21 @@ static void ethInitSMB(void) {
 	// connect
 	ethSMBConnect();
 
-	// update Themes
-	char path[255];
-	sprintf(path, "%sTHM", ethPrefix);
-	thmAddElements(path, "\\", ethGameList.mode);
+	if (gNetworkStartup == 0) {
+		// update Themes
+		char path[255];
+		sprintf(path, "%sTHM", ethPrefix);
+		thmAddElements(path, "\\", ethGameList.mode);
 
-	sprintf(path, "%sCFG", ethPrefix);
-	checkCreateDir(path);
+		sprintf(path, "%sCFG", ethPrefix);
+		checkCreateDir(path);
 
 #ifdef VMC
-	sprintf(path, "%sVMC", ethPrefix);
-	checkCreateDir(path);
+		sprintf(path, "%sVMC", ethPrefix);
+		checkCreateDir(path);
 #endif
+	} else
+		setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
 }
 
 static void ethLoadModules(void) {
@@ -158,30 +161,35 @@ static void ethLoadModules(void) {
 					if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
 						LOG("ethLoadModules: modules loaded\n");
 						ethInitSMB();
+						return;
 					}
 				}
 			}
 		}
 	}
 
-	if (gNetworkStartup != 0)
-		setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
 }
 
 void ethInit(void) {
 	LOG("ethInit()\n");
 
-	ethPrefix = "smb0:";
-	ethULSizePrev = -2;
-	memset(ethModifiedCDPrev, 0, 8);
-	memset(ethModifiedDVDPrev, 0, 8);
-	ethGameCount = 0;
-	ethGames = NULL;
-	gNetworkStartup = ERROR_ETH_NOT_STARTED;
-	
-	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethLoadModules);
+	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
+		ethULSizePrev = -2;
+		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethInitSMB);
+	} else {
+		ethPrefix = "smb0:";
+		ethULSizePrev = -2;
+		memset(ethModifiedCDPrev, 0, 8);
+		memset(ethModifiedDVDPrev, 0, 8);
+		ethGameCount = 0;
+		ethGames = NULL;
+		gNetworkStartup = ERROR_ETH_NOT_STARTED;
 
-	ethGameList.enabled = 1;
+		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethLoadModules);
+
+		ethGameList.enabled = 1;
+	}
 }
 
 item_list_t* ethGetObject(int initOnly) {
@@ -191,13 +199,8 @@ item_list_t* ethGetObject(int initOnly) {
 }
 
 static int ethNeedsUpdate(void) {
-	int result = 0;
-
-	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
-		ethInitSMB();
-		if (gNetworkStartup != 0)
-			setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
-	}
+	if (ethULSizePrev == -2)
+		return 1;
 
 	if (gNetworkStartup == 0) {
 		fio_stat_t stat;
@@ -208,7 +211,7 @@ static int ethNeedsUpdate(void) {
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedCDPrev, stat.mtime, 8);
-			result = 1;
+			return 1;
 		}
 
 		sprintf(path, "%sDVD", ethPrefix);
@@ -216,13 +219,14 @@ static int ethNeedsUpdate(void) {
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedDVDPrev, stat.mtime, 8);
-			result = 1;
+			return 1;
 		}
 
 		if (!sbIsSameSize(ethPrefix, ethULSizePrev))
-			result = 1;
+			return 1;
 	}
-	return result;
+
+	return 0;
 }
 
 static int ethUpdateGameList(void) {

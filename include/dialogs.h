@@ -59,6 +59,7 @@
 #define CFG_HDDSPINDOWN			42
 
 #define NETCFG_RECONNECT		43
+#define NETCFG_OK				44
 
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];

@@ -341,7 +341,6 @@ void guiShowUIConfig() {
 void guiShowIPConfig() {
 	size_t i;
 	// upload current values
-	// TODO disable elems
 	for (i = 0; i < 4; ++i) {
 		diaSetInt(diaIPConfig, 2 + i, ps2_ip[i]);
 		diaSetInt(diaIPConfig, 6 + i, ps2_netmask[i]);
@@ -354,10 +353,17 @@ void guiShowIPConfig() {
 	diaSetString(diaIPConfig, 20, gPCUserName);
 	diaSetString(diaIPConfig, 21, gPCPassword);
 
-	if (gNetworkStartup == 0)
+	if (gNetworkStartup == 0) {
+		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
 		diaIPConfig[64].type = UI_SPACER;
-	else
+	} else if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
+		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_RECONNECT));
 		diaIPConfig[64].type = UI_TERMINATOR;
+	} else {
+		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
+		diaIPConfig[64].type = UI_TERMINATOR;
+	}
+
 
 	int result = diaExecuteDialog(diaIPConfig, -1, 1, NULL);
 	if (result) {

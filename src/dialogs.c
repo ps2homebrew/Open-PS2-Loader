@@ -62,7 +62,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_SPLITTER},
 
 	//  ---- Ok ----
-	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+	{UI_BUTTON, NETCFG_OK, 1, -1, 0, 0, {.label = {NULL, -1}}},
 	
 	{UI_SPACER}, // UIItem #64
 

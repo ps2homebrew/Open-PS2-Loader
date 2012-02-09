@@ -39,20 +39,11 @@ const u64 gColFocus;
 const u64 gDefaultCol;
 const u64 gDefaultAlpha;
 
-enum rm_vmode {
-    RM_VMODE_AUTO = 0,
-    RM_VMODE_PAL,
-    RM_VMODE_NTSC
-} ;
-
-/** Initializes the rendering manager 
- * @param vsyncon 1 == vsync enabled, 0 == vsync disabled
- * @param vmodeset Video mode
- */
-void rmInit(int vsyncon, enum rm_vmode vmodeset);
+/** Initializes the rendering manager */
+void rmInit();
 
 /** Sets a new screen mode */
-void rmSetMode(int vsyncon, enum rm_vmode vmodeset);
+void rmSetMode();
 
 void rmEnd(void);
 

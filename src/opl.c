@@ -406,7 +406,7 @@ void setErrorMessage(int strId, int error) {
 // ------------------ Configuration handling ----------------
 // ----------------------------------------------------------
 
-static int lscstatus = CONFIG_ALL;
+static int lscstatus = CONFIG_OPL | CONFIG_APPS | CONFIG_LAST;
 static int lscret = 0;
 
 static int tryAlternateDevice(int types) {
@@ -514,7 +514,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "app_mode", &gAPPStartMode);
 		}
 		
-		applyConfig(themeID, langID, gVMode, gVSync);
+		applyConfig(themeID, langID, 0);
 	}
 
 	lscret = result;
@@ -563,7 +563,7 @@ static void _saveConfig() {
 	lscstatus = 0;
 }
 
-void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
+void applyConfig(int themeID, int langID, int changed) {
 	infotxt = _l(_STR_WELCOME);
 
 	if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
@@ -571,25 +571,6 @@ void applyConfig(int themeID, int langID, int newVMode, int newVSync) {
 
 	guiUpdateScrollSpeed();
 	guiUpdateScreenScale();
-
-	// we don't want to set the vmode without a reason...
-	int changed = (gVMode != newVMode || gVSync != newVSync);
-	if (changed) {
-		// reinit the graphics...
-		gVMode = newVMode;
-		gVSync = newVSync;
-		rmSetMode(gVSync, gVMode);
-
-		thmReloadScreenExtents();
-		guiReloadScreenExtents();
-
-		// also propagate to vmode cfg
-		config_set_t* configVMode = configGetByType(CONFIG_VMODE);
-		if (configVMode) {
-			configSetInt(configVMode, "vmode", newVMode);
-			configSetInt(configVMode, "vsync", newVSync);
-		}
-	}
 
 	// theme must be set after color, and lng after theme
 	changed = thmSetGuiValue(themeID, changed);
@@ -865,24 +846,8 @@ static void setDefaults(void) {
 
 	frameCounter = UPDATE_FRAME_COUNT;
 
-	gVMode = RM_VMODE_AUTO;
+	gVMode = 0;
 	gVSync = 1;
-}
-
-void vmodeInit() {
-	config_set_t* configVMode = configGetByType(CONFIG_VMODE);
-
-	if (configVMode) {
-		if (configRead(configVMode) == CONFIG_VMODE) {
-			if (!configGetInt(configVMode, "vsync", &gVSync))
-				gVSync = 1;
-
-			if (!configGetInt(configVMode, "vmode", &gVMode))
-				gVMode = RM_VMODE_AUTO;
-		}
-	}
-
-rmInit(gVSync, gVMode);
 }
 
 static void init(void) {
@@ -893,7 +858,7 @@ static void init(void) {
 	configInit(NULL);
 
 	// Loads the vmode config from MCs, then sets the vmode
-	vmodeInit();
+	rmInit();
 
 	lngInit();
 	thmInit();

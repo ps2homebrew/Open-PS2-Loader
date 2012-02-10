@@ -412,7 +412,6 @@ static int lscret = 0;
 static int tryAlternateDevice(int types) {
 	char path[64];
 	int value;
-	config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
 	// check USB
 	usbLoadModules();
@@ -420,6 +419,7 @@ static int tryAlternateDevice(int types) {
 		configEnd();
 		configInit(path);
 		value = configReadMulti(types);
+		config_set_t *configOPL = configGetByType(CONFIG_OPL);
 		configSetInt(configOPL, "usb_mode", 2);
 		return value;
 	}
@@ -433,11 +433,12 @@ static int tryAlternateDevice(int types) {
 		configEnd();
 		configInit("pfs0:");
 		value = configReadMulti(types);
+		config_set_t *configOPL = configGetByType(CONFIG_OPL);
 		configSetInt(configOPL, "hdd_mode", 2);
 		return value;
 	}
 
-	if (sysCheckMC() < 0) { // We don't want to get users into alternate mode for their very first of OPL (i.e no config file at all, but still want to save on MC)
+	if (sysCheckMC() < 0) { // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
 		// set config path to either mass or hdd, to prepare the saving of a new config
 		value = fioDopen("mass0:");
 		if (value >= 0) {

@@ -1202,13 +1202,13 @@ void guiMainLoop(void) {
 
 		guiEndFrame();
 
-		if (gFrameHook)
-			gFrameHook();
-
 		// if not transiting, handle input
 		// done here so we can use renderman if needed
 		if (!screenHandlerTarget && screenHandler)
 			screenHandler->handleInput();
+
+		if (gFrameHook)
+			gFrameHook();
 	}
 }
 

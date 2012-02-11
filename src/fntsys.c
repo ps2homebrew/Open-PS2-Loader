@@ -368,7 +368,7 @@ static atlas_t *fntNewAtlas() {
 static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 	FT_GlyphSlot slot = fnt->face->glyph;
 	
- 	LOG("fntGlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
+ 	//LOG("fntGlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
 	
 	if (slot->bitmap.width == 0 || slot->bitmap.rows == 0) {
 		// no bitmap glyph, just skip
@@ -378,10 +378,10 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 	int aid;
 	
 	for (aid = 0; aid < ATLAS_MAX; ++aid) {
-		LOG("  * Placing aid %d...\n", aid);
+		//LOG("  * Placing aid %d...\n", aid);
 		atlas_t **atl = &fnt->atlases[aid];
 		if (!*atl) { // atlas slot not yet used
-			LOG("  * aid %d is new...\n", aid);
+			//LOG("  * aid %d is new...\n", aid);
 			*atl = fntNewAtlas();
 		}
 		
@@ -389,7 +389,7 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 			atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
 			
 		if (glyph->allocation) {
-			LOG("  * found placement\n", aid);
+			//LOG("  * found placement\n", aid);
 			glyph->atlas = *atl;
 			
 			return 1;

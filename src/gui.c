@@ -243,7 +243,7 @@ void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
 		diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
-		applyConfig(-1, -1, 0);
+		applyConfig(-1, -1);
 	}
 }
 
@@ -316,7 +316,7 @@ void guiShowUIConfig() {
 
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
 	if (ret) {
-		int themeID = -1, langID = -1, newVMode = gVMode, newVSync = gVSync;
+		int themeID = -1, langID = -1;
 		diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
 		diaGetInt(diaUIConfig, UICFG_LANG, &langID);
 		diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
@@ -331,29 +331,10 @@ void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_INFOPAGE, &gUseInfoScreen);
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
-		diaGetInt(diaUIConfig, UICFG_VMODE, &newVMode);
-		diaGetInt(diaUIConfig, UICFG_VSYNC, &newVSync);
+		diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
+		diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
 
-		// we don't want to set the vmode without a reason...
-		int changed = (gVMode != newVMode || gVSync != newVSync);
-		if (changed) {
-			// reinit the graphics...
-			gVMode = newVMode;
-			gVSync = newVSync;
-			rmSetMode();
-
-			thmReloadScreenExtents();
-			guiReloadScreenExtents();
-
-			// also propagate to vmode cfg
-			config_set_t* configVMode = configGetByType(CONFIG_VMODE);
-			if (configVMode) {
-				configSetInt(configVMode, "vmode", gVMode);
-				configSetInt(configVMode, "vsync", gVSync);
-			}
-		}
-
-		applyConfig(themeID, langID, changed);
+		applyConfig(themeID, langID);
 	}
 }
 
@@ -406,7 +387,7 @@ void guiShowIPConfig() {
 		if (result == NETCFG_RECONNECT)
 			gNetworkStartup = ERROR_ETH_SMB_LOGON;
 
-		applyConfig(-1, -1, 0);
+		applyConfig(-1, -1);
 	}
 }
 

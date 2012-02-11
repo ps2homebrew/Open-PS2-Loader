@@ -9,7 +9,6 @@
 
 #include "include/renderman.h"
 #include "include/ioman.h"
-#include "include/config.h"
 #include "include/usbld.h"
 
 // Allocateable space in vram, as indicated in GsKit's code
@@ -28,14 +27,16 @@ struct rm_texture_list_t {
 static struct rm_texture_list_t *uploadedTextures = NULL;
 
 static int order;
+static int vsync = 1;
+static enum rm_vmode vmode = RM_VMODE_AUTO;
 
 #define NUM_RM_VMODES 3
 
 // RM Vmode -> GS Vmode conversion table
 static int rm_mode_table[NUM_RM_VMODES] = {
-	-1,				// Default
-	GS_MODE_PAL,	// PAL
-	GS_MODE_NTSC	// NTSC
+	-1,
+	GS_MODE_PAL,
+	GS_MODE_NTSC
 };
 
 static int rm_height_table[] = {
@@ -260,7 +261,7 @@ void rmEndFrame(void) {
 	
 	if(!gsGlobal->FirstFrame)
 	{
-		if (gVSync)
+		if (vsync)
 			SleepThread();
 		
 		if(gsGlobal->DoubleBuffering == GS_SETTING_ON)
@@ -278,7 +279,7 @@ void rmEndFrame(void) {
 }
 
 static int rmOnVSync(void) {
-	if (gVSync)
+	if (vsync)
 		iWakeupThread(guiThreadID);
 
 	return 0;
@@ -287,16 +288,8 @@ static int rmOnVSync(void) {
 void rmInit() {
 	gsGlobal = gsKit_init_global();
 	
-	rm_mode_table[0] = gsGlobal->Mode;
-	rm_height_table[0] = gsGlobal->Height;
-
-	config_set_t* configVMode = configGetByType(CONFIG_VMODE);
-	if (configVMode) {
-		if (configRead(configVMode) == CONFIG_VMODE) {
-			configGetInt(configVMode, "vsync", &gVSync);
-			configGetInt(configVMode, "vmode", &gVMode);
-		}
-	}
+	rm_mode_table[RM_VMODE_AUTO] = gsGlobal->Mode;
+	rm_height_table[RM_VMODE_AUTO] = gsGlobal->Height;
 
 	dmaKit_init(D_CTRL_RELE_OFF, D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC,
 				D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
@@ -306,7 +299,7 @@ void rmInit() {
 	dmaKit_chan_init(DMA_CHANNEL_FROMSPR);
 	dmaKit_chan_init(DMA_CHANNEL_TOSPR);
 
-	rmSetMode();
+	rmSetMode(1);
 
 	order = 0;
 
@@ -323,30 +316,38 @@ void rmInit() {
 	gsKit_add_vsync_handler(&rmOnVSync);
 }
 
-void rmSetMode() {
-	if (gVMode < 0 || gVMode >= NUM_RM_VMODES)
-		gVMode = 0;
+int rmSetMode(int force) {
+	if (gVMode < RM_VMODE_AUTO || gVMode >= NUM_RM_VMODES)
+		gVMode = RM_VMODE_AUTO;
 
-	gsGlobal->Mode = rm_mode_table[gVMode];
-	gsGlobal->Height = rm_height_table[gVMode];
+	// we don't want to set the vmode without a reason...
+	int changed = (vmode != gVMode || vsync != gVSync || force);
+	if (changed) {
+		vmode = gVMode;
+		vsync = gVSync;
 
-	gsGlobal->PSM = GS_PSM_CT24;
-	gsGlobal->PSMZ = GS_PSMZ_16S;
-	gsGlobal->ZBuffering = GS_SETTING_OFF;
-	gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
-	gsGlobal->DoubleBuffering = GS_SETTING_ON;
+		gsGlobal->Mode = rm_mode_table[vmode];
+		gsGlobal->Height = rm_height_table[vmode];
 
-	gsKit_init_screen(gsGlobal);
+		gsGlobal->PSM = GS_PSM_CT24;
+		gsGlobal->PSMZ = GS_PSMZ_16S;
+		gsGlobal->ZBuffering = GS_SETTING_OFF;
+		gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
+		gsGlobal->DoubleBuffering = GS_SETTING_ON;
 
-	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
+		gsKit_init_screen(gsGlobal);
 
-	gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
+		gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 
-	// reset the contents of the screen to avoid garbage being displayed
-	gsKit_clear(gsGlobal, gColBlack);
-	gsKit_sync_flip(gsGlobal);
+		gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
 
-	LOG("New vmode: %d x %d\n", gsGlobal->Width, gsGlobal->Height);
+		// reset the contents of the screen to avoid garbage being displayed
+		gsKit_clear(gsGlobal, gColBlack);
+		gsKit_sync_flip(gsGlobal);
+
+		LOG("New vmode: %d x %d\n", gsGlobal->Width, gsGlobal->Height);
+	}
+	return changed;
 }
 
 void rmGetScreenExtents(int *w, int *h) {

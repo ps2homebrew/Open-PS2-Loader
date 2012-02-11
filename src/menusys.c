@@ -556,7 +556,7 @@ void menuHandleInputMenu() {
 		} else if (id == MENU_IP_CONFIG) {
 			guiShowIPConfig();
 		} else if (id == MENU_SAVE_CHANGES) {
-			saveConfig(CONFIG_OPL | CONFIG_VMODE, 1);
+			saveConfig(CONFIG_OPL, 1);
 		} else if (id == MENU_START_HDL) {
 			handleHdlSrv();
 		} else if (id == MENU_ABOUT) {

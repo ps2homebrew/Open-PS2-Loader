@@ -39,11 +39,17 @@ const u64 gColFocus;
 const u64 gDefaultCol;
 const u64 gDefaultAlpha;
 
+enum rm_vmode {
+    RM_VMODE_AUTO = 0,
+    RM_VMODE_PAL,
+    RM_VMODE_NTSC
+};
+
 /** Initializes the rendering manager */
 void rmInit();
 
 /** Sets a new screen mode */
-void rmSetMode();
+int rmSetMode(int force);
 
 void rmEnd(void);
 

@@ -936,8 +936,8 @@ static void thmFree(theme_t* theme) {
 }
 
 static int thmReadEntry(int index, char* path, char* separator, char* name, unsigned int mode) {
-	LOG("thmReadEntry() path=%s sep=%s name=%s\n", path, separator, name);
 	if (FIO_SO_ISDIR(mode) && strstr(name, "thm_")) {
+		LOG("thmReadEntry() path=%s sep=%s name=%s\n", path, separator, name);
 		theme_file_t* currTheme = &themes[nThemes + index];
 
 		int length = strlen(name) - 4 + 1;

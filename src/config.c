@@ -12,7 +12,6 @@
 #define CONFIG_INDEX_OPL		0
 #define CONFIG_INDEX_LAST		1
 #define CONFIG_INDEX_APPS		2
-#define CONFIG_INDEX_VMODE		3
 
 static config_set_t configFiles[CONFIG_FILE_NUM];
 static char configPath[255] = "mc?:SYS-CONF/IPCONFIG.DAT";
@@ -152,8 +151,6 @@ void configInit(char *prefix) {
 	configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
 	snprintf(path, 255, "%s/conf_apps.cfg", prefix);
 	configAlloc(CONFIG_APPS, &configFiles[CONFIG_INDEX_APPS], path);
-	snprintf(path, 255, "%s/conf_vmode.cfg", prefix);
-	configAlloc(CONFIG_VMODE, &configFiles[CONFIG_INDEX_VMODE], path);
 }
 
 void configEnd() {

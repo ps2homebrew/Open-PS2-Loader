@@ -406,7 +406,7 @@ void setErrorMessage(int strId, int error) {
 // ------------------ Configuration handling ----------------
 // ----------------------------------------------------------
 
-static int lscstatus = CONFIG_OPL | CONFIG_APPS | CONFIG_LAST;
+static int lscstatus = CONFIG_ALL;
 static int lscret = 0;
 
 static int tryAlternateDevice(int types) {
@@ -477,6 +477,9 @@ static void _loadConfig() {
 			configGetInt(configOPL, "use_info_screen", &gUseInfoScreen);
 			configGetInt(configOPL, "enable_coverart", &gEnableArt);
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
+			configGetInt(configOPL, "vsync", &gVSync);
+			configGetInt(configOPL, "vmode", &gVMode);
+
 
 			if (configGetStr(configOPL, "theme", &temp))
 				themeID = thmFindGuiID(temp);
@@ -515,7 +518,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "app_mode", &gAPPStartMode);
 		}
 		
-		applyConfig(themeID, langID, 0);
+		applyConfig(themeID, langID);
 	}
 
 	lscret = result;
@@ -535,6 +538,8 @@ static void _saveConfig() {
 		configSetInt(configOPL, "use_info_screen", gUseInfoScreen);
 		configSetInt(configOPL, "enable_coverart", gEnableArt);
 		configSetInt(configOPL, "wide_screen", gWideScreen);
+		configSetInt(configOPL, "vmode", gVMode);
+		configSetInt(configOPL, "vsync", gVSync);
 
 		char temp[255];
 		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
@@ -564,7 +569,7 @@ static void _saveConfig() {
 	lscstatus = 0;
 }
 
-void applyConfig(int themeID, int langID, int changed) {
+void applyConfig(int themeID, int langID) {
 	infotxt = _l(_STR_WELCOME);
 
 	if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
@@ -572,6 +577,13 @@ void applyConfig(int themeID, int langID, int changed) {
 
 	guiUpdateScrollSpeed();
 	guiUpdateScreenScale();
+
+	int changed = rmSetMode(0);
+	if (changed) {
+		// reinit the graphics...
+		thmReloadScreenExtents();
+		guiReloadScreenExtents();
+	}
 
 	// theme must be set after color, and lng after theme
 	changed = thmSetGuiValue(themeID, changed);
@@ -847,7 +859,7 @@ static void setDefaults(void) {
 
 	frameCounter = UPDATE_FRAME_COUNT;
 
-	gVMode = 0;
+	gVMode = RM_VMODE_AUTO;
 	gVSync = 1;
 }
 
@@ -858,9 +870,7 @@ static void init(void) {
 	padInit(0);
 	configInit(NULL);
 
-	// Loads the vmode config from MCs, then sets the vmode
 	rmInit();
-
 	lngInit();
 	thmInit();
 	guiInit();

@@ -6,9 +6,8 @@
 #define CONFIG_OPL		0x01
 #define CONFIG_LAST		0x02
 #define CONFIG_APPS		0x04
-#define CONFIG_VMODE	0x08
 
-#define CONFIG_FILE_NUM 4
+#define CONFIG_FILE_NUM 3
 
 #define CONFIG_ITEM_NAME		"#Name"
 #define CONFIG_ITEM_LONGNAME	"#LongName"

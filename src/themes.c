@@ -1115,14 +1115,17 @@ static void thmLoad(char* themePath) {
 	else
 		rmSetShiftRatio((float) screenHeight / newT->usedHeight);
 	
-	gTheme = newT;
-	thmFree(curT);
-	
 	int i;
 	// default all to not loaded...
 	for (i = 0; i < TEXTURES_COUNT; i++) {
-		gTheme->textures[i].Mem = NULL;
+		newT->textures[i].Mem = NULL;
 	}
+
+	// LOGO, loaded here to avoid flickering during startup with device in AUTO + theme set
+	texPngLoad(&newT->textures[LOGO_PICTURE], NULL, LOGO_PICTURE, GS_PSM_CT24);
+
+	gTheme = newT;
+	thmFree(curT);
 
 	// First start with busy icon
 	char* path = themePath;
@@ -1146,9 +1149,6 @@ static void thmLoad(char* themePath) {
 	// Not  customizable icons
 	for (i = L1_ICON; i <= START_ICON; i++)
 		thmLoadResource(i, NULL, GS_PSM_CT32, 1);
-
-	// LOGO is hardcoded
-	thmLoadResource(LOGO_PICTURE, NULL, GS_PSM_CT24, 1);
 }
 
 static void thmRebuildGuiNames() {

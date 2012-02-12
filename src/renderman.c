@@ -34,15 +34,15 @@ static enum rm_vmode vmode = RM_VMODE_AUTO;
 
 // RM Vmode -> GS Vmode conversion table
 static int rm_mode_table[NUM_RM_VMODES] = {
-	-1,
-	GS_MODE_PAL,
-	GS_MODE_NTSC
+	-1,					// AUTO
+	GS_MODE_PAL,		// PAL
+	GS_MODE_NTSC		// NTSC
 };
 
 static int rm_height_table[] = {
-	-1,		// Default
+	-1,		// AUTO
 	512,	// PAL
-	448		// NTSC
+	448,	// NTSC
 };
 
 static float aspectWidth;
@@ -345,7 +345,7 @@ int rmSetMode(int force) {
 		gsKit_clear(gsGlobal, gColBlack);
 		gsKit_sync_flip(gsGlobal);
 
-		LOG("New vmode: %d x %d\n", gsGlobal->Width, gsGlobal->Height);
+		LOG("New vmode: %d, %d x %d\n", vmode, gsGlobal->Width, gsGlobal->Height);
 	}
 	return changed;
 }

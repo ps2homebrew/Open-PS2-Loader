@@ -272,81 +272,49 @@ static void ethRenameGame(int id, char* newName) {
 }
 #endif
 
-#ifdef VMC
-static int ethPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
-	char vmc[2][32];
-	char vmc_path[255];
-	u32 vmc_size;
-	int i, j, fd, size_mcemu_irx = 0;
-	smb_vmc_infos_t smb_vmc_infos;
-	vmc_superblock_t vmc_superblock;
-
-	configGetVMC(configSet, vmc[0], 0);
-	configGetVMC(configSet, vmc[1], 1);
-
-	for(i=0; i<2; i++) {
-		if(!vmc[i][0]) // skip if empty
-			continue;
-
-		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
-		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
-
-		snprintf(vmc_path, 255, "%s\\VMC\\%s.bin", ethPrefix, vmc[i]);
-
-		fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
-		if (fd >= 0) {
-			size_mcemu_irx = -1;
-			LOG("%s open\n", vmc_path);
-
-			vmc_size = fileXioLseek(fd, 0, SEEK_END);
-			fileXioLseek(fd, 0, SEEK_SET);
-			fileXioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
-
-			LOG("File size : 0x%X\n", vmc_size);
-			LOG("Magic     : %s\n", vmc_superblock.magic);
-			LOG("Card type : %d\n", vmc_superblock.mc_type);
-
-			if(!strncmp(vmc_superblock.magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock.mc_type == 0x2) {
-				smb_vmc_infos.flags            = vmc_superblock.mc_flag & 0xFF;
-				smb_vmc_infos.flags           |= 0x100;
-				smb_vmc_infos.specs.page_size  = vmc_superblock.page_size;                                       
-				smb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;                                 
-				smb_vmc_infos.specs.card_size  = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
-
-				LOG("flags            : 0x%X\n", smb_vmc_infos.flags           );
-				LOG("specs.page_size  : 0x%X\n", smb_vmc_infos.specs.page_size );
-				LOG("specs.block_size : 0x%X\n", smb_vmc_infos.specs.block_size);
-				LOG("specs.card_size  : 0x%X\n", smb_vmc_infos.specs.card_size );
-
-				if(vmc_size == smb_vmc_infos.specs.card_size * smb_vmc_infos.specs.page_size) {
-					smb_vmc_infos.active = 1;
-					smb_vmc_infos.fid    = 0xFFFF;
-					snprintf(vmc_path, 255, "VMC\\%s.bin", vmc[i]);
-					strncpy(smb_vmc_infos.fname, vmc_path, 32); // maybe a too small size here ...
-
-					LOG("%s is a valid Vmc file\n", smb_vmc_infos.fname );
-				}
-			}
-			fileXioClose(fd);
-		}
-		for (j=0; j<size_smb_mcemu_irx; j++) {
-			if (((u32*)&smb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
-				if(smb_vmc_infos.active)
-					size_mcemu_irx = size_smb_mcemu_irx;
-				memcpy(&((u32*)&smb_mcemu_irx)[j], &smb_vmc_infos, sizeof(smb_vmc_infos_t));
-				break;
-			}
-		}
-	}
-	return size_mcemu_irx;
-}
-#endif
-
 static void ethLaunchGame(int id, config_set_t* configSet) {
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
 	char isoname[32], filename[32];
 	base_game_info_t* game = &ethGames[id];
+
+#ifdef VMC
+	char vmc_name[32];
+	int vmc_id, size_mcemu_irx = 0;
+	smb_vmc_infos_t smb_vmc_infos;
+	vmc_superblock_t vmc_superblock;
+
+	for (vmc_id = 0; vmc_id < 2; vmc_id++) {
+		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
+		configGetVMC(configSet, vmc_name, vmc_id);
+		if (vmc_name[0]) {
+			if (sysCheckVMC(ethPrefix, "\\", vmc_name, 0, &vmc_superblock) > 0) {
+				smb_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
+				smb_vmc_infos.flags |= 0x100;
+				smb_vmc_infos.specs.page_size = vmc_superblock.page_size;
+				smb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;
+				smb_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
+				smb_vmc_infos.active = 1;
+				smb_vmc_infos.fid = 0xFFFF;
+				snprintf(smb_vmc_infos.fname, 64, "VMC\\%s.bin", vmc_name); // may still be too small size here ;) (should add 9)
+			} else {
+				char error[255];
+				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+				if (!guiMsgBox(error, 1, NULL))
+					return;
+			}
+		}
+
+		for (i = 0; i < size_smb_mcemu_irx; i++) {
+			if (((u32*)&smb_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
+				if (smb_vmc_infos.active)
+					size_mcemu_irx = size_smb_mcemu_irx;
+				memcpy(&((u32*)&smb_mcemu_irx)[i], &smb_vmc_infos, sizeof(smb_vmc_infos_t));
+				break;
+			}
+		}
+	}
+#endif
 
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
@@ -373,16 +341,6 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 			break;
 		}
 	}
-
-#ifdef VMC
-	int size_mcemu_irx = ethPrepareMcemu(game, configSet);
-	if (size_mcemu_irx == -1) {
-		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
-			size_mcemu_irx = 0;
-		else
-			return;
-	}
-#endif
 
 	char config_str[255];
 	sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
@@ -433,7 +391,7 @@ static void ethCleanUp(int exception) {
 
 #ifdef VMC
 static int ethCheckVMC(char* name, int createSize) {
-	return sysCheckVMC(ethPrefix, "\\", name, createSize);
+	return sysCheckVMC(ethPrefix, "\\", name, createSize, NULL);
 }
 #endif
 

@@ -7,7 +7,7 @@
 #include "include/mcemu.h"
 typedef struct {
 	int        active;    /* Activation flag */
-	char       fname[32]; /* File name (memorycard?.bin) */
+	char       fname[64]; /* File name (memorycard?.bin) */
 	u16        fid;       /* SMB File ID */
 	int        flags;     /* Card flag */
 	vmc_spec_t specs;     /* Card specifications */

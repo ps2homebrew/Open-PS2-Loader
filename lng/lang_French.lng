@@ -99,7 +99,7 @@ Progression
 La VMC existe
 Fichier VMC incorrect, taille de VMC invalide
 La VMC doit être crée
-Erreur avec la VMC, continuer en utilisant la MC physique ?
+Erreur sur VMC %s, continuer avec la MC physique (slot %d) ?
 Rafraîchissement automatique
 À propos
 Développeurs

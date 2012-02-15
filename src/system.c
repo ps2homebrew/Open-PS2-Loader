@@ -545,6 +545,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 		strncpy(gExitPath, "Browser", 32);
 
 #ifdef VMC
+	LOG("sysLaunchLoaderElf started with size_mcemu_irx = %d\n", size_mcemu_irx);
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx);
@@ -678,7 +679,8 @@ int sysCheckMC(void) {
 }
 
 #ifdef VMC
-int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize) {
+// createSize == -1 : delete, createSize == 0 : probing, createSize > 0 : creation
+int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize, vmc_superblock_t* vmc_superblock) {
 	int size = -1;
 	char path[255];
 	snprintf(path, 255, "%sVMC%s%s.bin", prefix, sep, name);
@@ -686,15 +688,37 @@ int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize)
 	if (createSize == -1)
 		fileXioRemove(path);
 	else {
-		int fd = fileXioOpen(path, O_RDONLY, 0666);
+		int fd = fileXioOpen(path, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 		if (fd >= 0) {
 			size = fileXioLseek(fd, 0, SEEK_END);
+
+			if (vmc_superblock) {
+				memset(vmc_superblock, 0, sizeof(vmc_superblock_t));
+				fileXioLseek(fd, 0, SEEK_SET);
+				fileXioRead(fd, (void*)vmc_superblock, sizeof(vmc_superblock_t));
+
+				LOG("File size  : 0x%X\n", size);
+				LOG("Magic      : %s\n", vmc_superblock->magic);
+				LOG("Card type  : %d\n", vmc_superblock->mc_type);
+				LOG("Flags      : 0x%X\n", (vmc_superblock->mc_flag & 0xFF) | 0x100);
+				LOG("Page_size  : 0x%X\n", vmc_superblock->page_size);
+				LOG("Block_size : 0x%X\n", vmc_superblock->pages_per_block);
+				LOG("Card_size  : 0x%X\n", vmc_superblock->pages_per_cluster * vmc_superblock->clusters_per_card);
+
+				if(!strncmp(vmc_superblock->magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock->mc_type == 0x2
+					&& size == vmc_superblock->pages_per_cluster * vmc_superblock->clusters_per_card * vmc_superblock->page_size) {
+					LOG("VMC file structure valid: %s\n", path);
+				} else
+					size = 0;
+			}
+
 			if (size % 1048576) // invalid size, should be a an integer (8, 16, 32, 64, ...)
 				size = 0;
 			else
 				size /= 1048576;
 
 			fileXioClose(fd);
+
 			if (createSize && (createSize != size))
 				fileXioRemove(path);
 		}

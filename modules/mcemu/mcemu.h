@@ -66,6 +66,7 @@ struct _Sio2Packet
 	u32   rdcount;
 } Sio2Packet;
 
+#ifdef HDD_DRIVER
 /* Apa partitions informations */
 typedef struct {
 	u32 start;
@@ -78,6 +79,7 @@ typedef struct {
 	u16 subpart;
 	u16 count;
 } pfs_blocks;
+#endif
 
 /* Memory Card Spec (do not change this structure) */
 typedef
@@ -104,7 +106,7 @@ struct _McImageSpec
 #endif
 
 #ifdef SMB_DRIVER
-	char       fname[32];  /* Vmc file name (memorycard?.bin) */
+	char       fname[64];  /* Vmc file name (memorycard?.bin) */
 	u16        fid;        /* SMB Vmc file id */
 #endif
 

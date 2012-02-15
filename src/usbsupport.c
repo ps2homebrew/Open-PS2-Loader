@@ -206,87 +206,8 @@ static void usbDeleteGame(int id) {
 }*/
 #endif
 
-#ifdef VMC
-static int usbPrepareMcemu(base_game_info_t* game, config_set_t* configSet) {
-	char vmc[2][32];
-	char vmc_path[255];
-	u32 vmc_size;
-	int i, j, fd, size_mcemu_irx = 0;
-	usb_vmc_infos_t usb_vmc_infos;
-	vmc_superblock_t vmc_superblock;
-
-	configGetVMC(configSet, vmc[0], 0);
-	configGetVMC(configSet, vmc[1], 1);
-
-	for(i=0; i<2; i++) {
-		if(!vmc[i][0]) // skip if empty
-			continue;
-
-		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
-		memset(&vmc_superblock, 0, sizeof(vmc_superblock_t));
-
-		sprintf(vmc_path, "%sVMC/%s.bin", usbPrefix, vmc[i]);
-
-		fd = fioOpen(vmc_path, O_RDWR);
-		if (fd >= 0) {
-			size_mcemu_irx = -1;
-			LOG("%s open\n", vmc_path);
-
-			vmc_size = fioLseek(fd, 0, SEEK_END);
-			fioLseek(fd, 0, SEEK_SET);
-			fioRead(fd, (void*)&vmc_superblock, sizeof(vmc_superblock_t));
-
-			LOG("File size : 0x%X\n", vmc_size);
-			LOG("Magic     : %s\n", vmc_superblock.magic);
-			LOG("Card type : %d\n", vmc_superblock.mc_type);
-
-			if(!strncmp(vmc_superblock.magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock.mc_type == 0x2) {
-				usb_vmc_infos.flags            = vmc_superblock.mc_flag & 0xFF;
-				usb_vmc_infos.flags           |= 0x100;
-				usb_vmc_infos.specs.page_size  = vmc_superblock.page_size;                                       
-				usb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;                                 
-				usb_vmc_infos.specs.card_size  = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
-
-				LOG("flags            : 0x%X\n", usb_vmc_infos.flags           );
-				LOG("specs.page_size  : 0x%X\n", usb_vmc_infos.specs.page_size );
-				LOG("specs.block_size : 0x%X\n", usb_vmc_infos.specs.block_size);
-				LOG("specs.card_size  : 0x%X\n", usb_vmc_infos.specs.card_size );
-
-				if(vmc_size == usb_vmc_infos.specs.card_size * usb_vmc_infos.specs.page_size) {
-					int fd1 = fioDopen(usbPrefix);
-
-					if (fd1 >= 0) {
-						sprintf(vmc_path, "%s/VMC/%s.bin", gUSBPrefix, vmc[i]);
-						// Check vmc cluster chain (write operation can cause dammage)
-						if(fioIoctl(fd1, 0xCAFEC0DE, vmc_path)) {
-							LOG("Cluster Chain OK\n");
-							if((j = fioIoctl(fd1, 0xBEEFC0DE, vmc_path)) != 0) {
-								usb_vmc_infos.active = 1;
-								usb_vmc_infos.start_sector = j;
-								LOG("Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
-							}
-						} // else Vmc file fragmented
-					}
-					fioDclose(fd1);
-				}
-			}
-			fioClose(fd);
-		}
-		for (j=0; j<size_usb_mcemu_irx; j++) {
-			if (((u32*)&usb_mcemu_irx)[j] == (0xC0DEFAC0 + i)) {
-				if(usb_vmc_infos.active)
-					size_mcemu_irx = size_usb_mcemu_irx;
-				memcpy(&((u32*)&usb_mcemu_irx)[j], &usb_vmc_infos, sizeof(usb_vmc_infos_t));
-				break;
-			}
-		}
-	}
-	return size_mcemu_irx;
-}
-#endif
-
 static void usbLaunchGame(int id, config_set_t* configSet) {
-	int fd, r, index, i, compatmask;
+	int i, fd, val, index, compatmask;
 	char isoname[32], partname[255], filename[32];
 	base_game_info_t* game = &usbGames[id];
 
@@ -296,16 +217,68 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		return;
 	}
 
+#ifdef VMC
+	char vmc_name[32], vmc_path[255];
+	int vmc_id, haveError = 0, size_mcemu_irx = 0;
+	usb_vmc_infos_t usb_vmc_infos;
+	vmc_superblock_t vmc_superblock;
+
+	for (vmc_id = 0; vmc_id < 2; vmc_id++) {
+		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
+		configGetVMC(configSet, vmc_name, vmc_id);
+		if (vmc_name[0]) {
+			haveError = 1;
+			if (sysCheckVMC(usbPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
+				usb_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
+				usb_vmc_infos.flags |= 0x100;
+				usb_vmc_infos.specs.page_size = vmc_superblock.page_size;
+				usb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;
+				usb_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
+
+				// Check vmc cluster chain (write operation can cause dammage)
+				sprintf(vmc_path, "%s/VMC/%s.bin", gUSBPrefix, vmc_name);
+				if (fioIoctl(fd, 0xCAFEC0DE, vmc_path)) {
+					LOG("Cluster Chain OK\n");
+					if ((i = fioIoctl(fd, 0xBEEFC0DE, vmc_path)) != 0) {
+						haveError = 0;
+						usb_vmc_infos.active = 1;
+						usb_vmc_infos.start_sector = i;
+						LOG("Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
+					}
+				}
+			}
+		}
+
+		if (haveError) {
+			char error[255];
+			snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+			if (!guiMsgBox(error, 1, NULL)) {
+				fioDclose(fd);
+				return;
+			}
+		}
+
+		for (i = 0; i < size_usb_mcemu_irx; i++) {
+			if (((u32*)&usb_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
+				if (usb_vmc_infos.active)
+					size_mcemu_irx = size_usb_mcemu_irx;
+				memcpy(&((u32*)&usb_mcemu_irx)[i], &usb_vmc_infos, sizeof(usb_vmc_infos_t));
+				break;
+			}
+		}
+	}
+#endif
+
 	if (game->isISO)
 		sprintf(partname, "%s/%s/%s.%s.iso", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
 	else
 		sprintf(partname, "%s/%s.00", gUSBPrefix, isoname);
-	r = fioIoctl(fd, 0xDEADC0DE, partname);
-	LOG("mass storage device sectorsize = %d\n", r);
 
-	void *irx = &usb_cdvdman_irx;
+	val = fioIoctl(fd, 0xDEADC0DE, partname);
+	LOG("mass storage device sectorsize = %d\n", val);
+	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
-	if (r == 4096) {
+	if (val == 4096) {
 		irx = &usb_4Ksectors_cdvdman_irx;
 		irx_size = size_usb_4Ksectors_cdvdman_irx;
 	}
@@ -334,22 +307,12 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		if (!game->isISO)
 			sprintf(partname, "%s/%s.%02x", gUSBPrefix, isoname, i);
 
-		r = fioIoctl(fd, 0xBEEFC0DE, partname);
-		memcpy((void*)((u32)&usb_cdvdman_irx + index + offset), &r, 4);
+		val = fioIoctl(fd, 0xBEEFC0DE, partname);
+		memcpy((void*)((u32)&usb_cdvdman_irx + index + offset), &val, 4);
 		offset += 4;
 	}
 
 	fioDclose(fd);
-
-#ifdef VMC
-	int size_mcemu_irx = usbPrepareMcemu(game, configSet);
-	if (size_mcemu_irx == -1) {
-		if (guiMsgBox(_l(_STR_ERR_VMC_CONTINUE), 1, NULL))
-			size_mcemu_irx = 0;
-		else
-			return;
-	}
-#endif
 
 	char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
@@ -389,7 +352,7 @@ static void usbCleanUp(int exception) {
 
 #ifdef VMC
 static int usbCheckVMC(char* name, int createSize) {
-	return sysCheckVMC(usbPrefix, "/", name, createSize);
+	return sysCheckVMC(usbPrefix, "/", name, createSize, NULL);
 }
 #endif
 

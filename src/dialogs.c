@@ -55,7 +55,7 @@ struct UIItem diaIPConfig[] = {
 	{UI_BREAK},
 	
 	//  ---- PC share name ----
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_SHARE}}}, {UI_SPACER}, {UI_STRING, 19, 1, -1, 0, 0, {.stringvalue = {"PS2SMB", "PS2SMB", NULL}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_SHARE}}}, {UI_SPACER}, {UI_STRING, 19, 1, _STR_HINT_SHARENAME, 0, 0, {.stringvalue = {"PS2SMB", "PS2SMB", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_USER}}}, {UI_SPACER}, {UI_STRING, 20, 1, -1, 0, 0, {.stringvalue = {"GUEST", "GUEST", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_PASSWORD}}}, {UI_SPACER}, {UI_PASSWORD, 21, 1, _STR_HINT_GUEST, 0, 0, {.stringvalue = {"", "", NULL}}},
 	

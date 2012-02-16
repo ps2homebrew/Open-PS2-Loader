@@ -342,6 +342,15 @@ void guiShowIPConfig() {
 	size_t i;
 	// upload current values
 	for (i = 0; i < 4; ++i) {
+		if (gNetworkStartup != ERROR_ETH_NOT_STARTED) {
+			diaSetEnabled(diaIPConfig, 2 + i, 0);
+			diaSetEnabled(diaIPConfig, 6 + i, 0);
+			diaSetEnabled(diaIPConfig, 10 + i, 0);
+		} else {
+			diaSetEnabled(diaIPConfig, 2 + i, 1);
+			diaSetEnabled(diaIPConfig, 6 + i, 1);
+			diaSetEnabled(diaIPConfig, 10 + i, 1);
+		}
 		diaSetInt(diaIPConfig, 2 + i, ps2_ip[i]);
 		diaSetInt(diaIPConfig, 6 + i, ps2_netmask[i]);
 		diaSetInt(diaIPConfig, 10 + i, ps2_gateway[i]);
@@ -377,9 +386,6 @@ void guiShowIPConfig() {
 
 		diaGetInt(diaIPConfig, 18, &gPCPort);
 		diaGetString(diaIPConfig, 19, gPCShareName);
-		// has to be non-empty
-		if (strlen(gPCShareName) == 0)
-			strncpy(gPCShareName, "PS2SMB", 32);
 		diaGetString(diaIPConfig, 20, gPCUserName);
 		diaGetString(diaIPConfig, 21, gPCPassword);
 		gIPConfigChanged = 1;

@@ -578,6 +578,11 @@ void applyConfig(int themeID, int langID) {
 	guiUpdateScrollSpeed();
 	guiUpdateScreenScale();
 
+	if (gAutoRefresh)
+		guiSetFrameHook(&menuUpdateHook);
+	else
+		guiSetFrameHook(NULL);
+
 	int changed = rmSetMode(0);
 	if (changed) {
 		// reinit the graphics...
@@ -596,11 +601,6 @@ void applyConfig(int themeID, int langID) {
 	moduleUpdateMenu(ETH_MODE, changed);
 	moduleUpdateMenu(HDD_MODE, changed);
 	moduleUpdateMenu(APP_MODE, changed);
-
-	if (gAutoRefresh)
-		guiSetFrameHook(&menuUpdateHook);
-	else
-		guiSetFrameHook(NULL);
 }
 
 int loadConfig(int types) {
@@ -814,7 +814,7 @@ static void setDefaults(void) {
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
 	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
 	gPCPort = 445;
-	strncpy(gPCShareName, "PS2SMB", 32);
+	strncpy(gPCShareName, "", 32);
 	strncpy(gPCUserName, "GUEST", 32);
 	strncpy(gPCPassword, "", 32);
 	gNetworkStartup = ERROR_ETH_NOT_STARTED;

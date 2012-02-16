@@ -92,13 +92,15 @@ void ethSMBConnect(void) {
 		if (fileXioDevctl(ethPrefix, SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0) >= 0) {
 			gNetworkStartup = ERROR_ETH_SMB_OPENSHARE;
 
-			// connect to the share
-			strcpy(openshare.ShareName, gPCShareName);
+			if (gPCShareName[0]) {
+				// connect to the share
+				strcpy(openshare.ShareName, gPCShareName);
 
-			if (fileXioDevctl(ethPrefix, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0) >= 0) {
+				if (fileXioDevctl(ethPrefix, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0) >= 0) {
 
-				// everything is ok
-				gNetworkStartup = 0;
+					// everything is ok
+					gNetworkStartup = 0;
+				}
 			}
 		}
 	}
@@ -176,6 +178,8 @@ void ethInit(void) {
 
 	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
 		ethULSizePrev = -2;
+		ethGameCount = 0;
+
 		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethInitSMB);
 	} else {
 		ethPrefix = "smb0:";
@@ -230,10 +234,36 @@ static int ethNeedsUpdate(void) {
 }
 
 static int ethUpdateGameList(void) {
-	if (gNetworkStartup != 0)
-		return 0;
+	if (gPCShareName[0]) {
+		if (gNetworkStartup != 0)
+			return 0;
 
-	sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
+		sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
+	} else {
+		int i, count;
+		ShareEntry_t sharelist[128] __attribute__((aligned(64)));
+		smbGetShareList_in_t getsharelist;
+		getsharelist.EE_addr = (void *)&sharelist[0];
+		getsharelist.maxent = 128;
+
+		count = fileXioDevctl(ethPrefix, SMB_DEVCTL_GETSHARELIST, (void *)&getsharelist, sizeof(getsharelist), NULL, 0);
+		if (count > 0) {
+			free(ethGames);
+			ethGames = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
+			for (i = 0; i < count; i++) {
+				LOG("Share found: %s\n", sharelist[i].ShareName);
+				base_game_info_t *g = &ethGames[i];
+				memcpy(g->name, sharelist[i].ShareName, ISO_GAME_NAME_MAX);
+				g->name[ISO_GAME_NAME_MAX] = '\0';
+				sprintf(g->startup, "SHARE");
+				g->parts = 0x00;
+				g->media = 0x00;
+				g->isISO = 0;
+				g->sizeMB = 0;
+			}
+			ethGameCount = count;
+		}
+	}
 	return ethGameCount;
 }
 

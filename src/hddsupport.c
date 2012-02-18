@@ -44,7 +44,7 @@ static char *hddPrefix = "pfs0:";
 static int hddGameCount = 0;
 static hdl_games_list_t* hddGames;
 
-const char *oplPart = "hdd0:+OPL";
+const char *oplPart = "hdd0:+OPEL";
 
 static int hddHDProKitDetected = 0;
 

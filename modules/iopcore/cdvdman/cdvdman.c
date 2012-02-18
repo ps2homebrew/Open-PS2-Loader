@@ -76,9 +76,10 @@ static char g_DiskID[] = "\0B00BS"; 	// the null byte is here to ensure the ISO 
 #ifdef SMB_DRIVER
 static char g_pc_ip[]="xxx.xxx.xxx.xxx";
 static int g_pc_port = 445; // &g_pc_ip + 16
-static char g_pc_share[36]="PS2SMB";
-static char g_smb_user[36]="GUEST";
-static char g_smb_password[36]="\0";
+static char g_pc_share[32]="PS2SMB";
+static char g_pc_prefix[32]="\0";
+static char g_smb_user[16]="GUEST";
+static char g_smb_password[16]="\0";
 #endif
 
 //----------------------------------------------------
@@ -1106,7 +1107,7 @@ void fs_init(void)
 	smb_NegociateProtocol(g_pc_ip, g_pc_port, g_smb_user, g_smb_password);
 
 	// zero pad the string to be sure it does not overflow
-	g_pc_share[32] = '\0';
+	g_pc_share[31] = '\0';
 
 	// open a session
 	smb_SessionSetupAndX();
@@ -1115,23 +1116,28 @@ void fs_init(void)
 	sprintf(tmp_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
 	smb_TreeConnectAndX(tmp_str);
 
-	char *path_str = "%s.%02x";
-	char *game_name = NULL;
-
+	char *path_str;
 	// if g_part_start[0] not zero, then it is a plain ISO
-	if (g_part_start[0] != 0) {
-		path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s.iso" : "DVD\\%s.%s.iso";
-		game_name = (char *)&g_part_start[0];
-	}
-
-	sprintf(tmp_str, path_str, g_ISO_name, game_name);
-
-	// Open all parts files
-	do {
+	if (g_part_start[0]) {
+		char *game_name = (char *)&g_part_start[0];
+		if (g_pc_prefix[0]) {
+			path_str = (g_ISO_media == 0x12) ? "%s\\CD\\%s.%s.iso" : "%s\\DVD\\%s.%s.iso";
+			sprintf(tmp_str, path_str, g_pc_prefix, g_ISO_name, game_name);
+		} else {
+			path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s.iso" : "DVD\\%s.%s.iso";
+			sprintf(tmp_str, path_str, g_ISO_name, game_name);
+		}
 		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i++], 0);
-		sprintf(tmp_str, "%s.%02x", g_ISO_name, i);
-
-	} while(i < g_ISO_parts);
+	} else {
+		// Open all parts files
+		for (i = 0; i < g_ISO_parts; i++) {
+			if (g_pc_prefix[0])
+				sprintf(tmp_str, "%s\\%s.%02x", g_pc_prefix, g_ISO_name, i);
+			else
+				sprintf(tmp_str, "%s.%02x", g_ISO_name, i);
+			smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i], 0);
+		}
+	}
 #endif
 
 #ifdef HDD_DRIVER

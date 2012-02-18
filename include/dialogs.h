@@ -56,10 +56,11 @@
 #define CFG_DANDROP				39
 #define CFG_USBDELAY			40
 #define CFG_USBPREFIX			41
-#define CFG_HDDSPINDOWN			42
+#define CFG_ETHPREFIX			42
+#define CFG_HDDSPINDOWN			43
 
-#define NETCFG_RECONNECT		43
-#define NETCFG_OK				44
+#define NETCFG_RECONNECT		44
+#define NETCFG_OK				45
 
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];

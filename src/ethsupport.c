@@ -253,8 +253,8 @@ static int ethUpdateGameList(void) {
 			for (i = 0; i < count; i++) {
 				LOG("Share found: %s\n", sharelist[i].ShareName);
 				base_game_info_t *g = &ethGames[i];
-				memcpy(g->name, sharelist[i].ShareName, ISO_GAME_NAME_MAX);
-				g->name[ISO_GAME_NAME_MAX] = '\0';
+				memcpy(g->name, sharelist[i].ShareName, 32);
+				g->name[31] = '\0';
 				sprintf(g->startup, "SHARE");
 				g->parts = 0x00;
 				g->media = 0x00;
@@ -307,6 +307,12 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	void** irx = NULL;
 	char isoname[32], filename[32];
 	base_game_info_t* game = &ethGames[id];
+
+	if (!gPCShareName[0]) {
+		memcpy(gPCShareName, game->name, 32);
+		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode);
+		return;
+	}
 
 #ifdef VMC
 	char vmc_name[32];

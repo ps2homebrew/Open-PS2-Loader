@@ -44,8 +44,6 @@
 
 #define UPDATE_FRAME_COUNT 250
 
-#define IO_MENU_UPDATE_DEFFERED 2
-
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
@@ -137,7 +135,7 @@ static void itemExecCross(struct menu_item *curMenu) {
 			support->itemInit();
 			moduleUpdateMenu(support->mode, 0);
 			if (!gAutoRefresh)
-				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
+				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 		}
 	}
 	else
@@ -177,7 +175,7 @@ static void itemExecSquare(struct menu_item *curMenu) {
 				if (gAutoRefresh)
 					frameCounter = UPDATE_FRAME_COUNT;
 				else
-					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 			}
 		}
 	}
@@ -204,7 +202,7 @@ static void itemExecCircle(struct menu_item *curMenu) {
 				if (gAutoRefresh)
 					frameCounter = UPDATE_FRAME_COUNT;
 				else
-					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 			}
 		}
 	}
@@ -216,60 +214,61 @@ static void itemExecRefresh(struct menu_item *curMenu) {
 	item_list_t *support = curMenu->userdata;
 
 	if (support && support->enabled)
-		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[support->mode]);
+		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 }
 
 static void initMenuForListSupport(int mode) {
-	opl_io_module_t* item = &list_support[mode];
-	item->menuItem.icon_id = item->support->iconId;
-	item->menuItem.text = NULL;
-	item->menuItem.text_id = item->support->textId;
+	opl_io_module_t* mod = &list_support[mode];
+	mod->menuItem.icon_id = mod->support->iconId;
+	mod->menuItem.text = NULL;
+	mod->menuItem.text_id = mod->support->textId;
 
-	item->menuItem.userdata = item->support;
+	mod->menuItem.userdata = mod->support;
 
-	item->subMenu = NULL;
+	mod->subMenu = NULL;
 
-	item->menuItem.submenu = NULL;
-	item->menuItem.current = NULL;
-	item->menuItem.pagestart = NULL;
-	item->menuItem.remindLast = 0;
+	mod->menuItem.submenu = NULL;
+	mod->menuItem.current = NULL;
+	mod->menuItem.pagestart = NULL;
+	mod->menuItem.remindLast = 0;
 
-	item->menuItem.refresh = &itemExecRefresh;
-	item->menuItem.execCross = &itemExecCross;
-	item->menuItem.execTriangle = &itemExecTriangle;
-	item->menuItem.execSquare = &itemExecSquare;
-	item->menuItem.execCircle = &itemExecCircle;
+	mod->menuItem.refresh = &itemExecRefresh;
+	mod->menuItem.execCross = &itemExecCross;
+	mod->menuItem.execTriangle = &itemExecTriangle;
+	mod->menuItem.execSquare = &itemExecSquare;
+	mod->menuItem.execCircle = &itemExecCircle;
 
-	item->menuItem.hints = NULL;
+	mod->menuItem.hints = NULL;
 
 	moduleUpdateMenu(mode, 0);
 
 	struct gui_update_t *mc = guiOpCreate(GUI_OP_ADD_MENU);
-	mc->menu.menu = &item->menuItem;
-	mc->menu.subMenu = &item->subMenu;
+	mc->menu.menu = &mod->menuItem;
+	mc->menu.subMenu = &mod->subMenu;
 	guiDeferUpdate(mc);
 }
 
 static void initSupport(item_list_t* itemList, int startMode, int mode, int force_reinit) {
-	if (!list_support[mode].support) {
+	opl_io_module_t* mod = &list_support[mode];
+	if (!mod->support) {
 		itemList->uip = 1; // stop updates until we're done with init
-		list_support[mode].support = itemList;
+		mod->support = itemList;
 		initMenuForListSupport(mode);
 		itemList->uip = 0;
 	}
 
-	if (((force_reinit) && (startMode && list_support[mode].support->enabled)) \
-	  || (startMode == 2 && !list_support[mode].support->enabled)) {
+	if (((force_reinit) && (startMode && mod->support->enabled)) \
+	  || (startMode == 2 && !mod->support->enabled)) {
 		// stop updates until we're done with init of the device
-		list_support[mode].support->uip = 1;
-		list_support[mode].support->itemInit();
+		mod->support->uip = 1;
+		mod->support->itemInit();
 		moduleUpdateMenu(mode, 0);
-		list_support[mode].support->uip = 0;
+		mod->support->uip = 0;
 
 		if (gAutoRefresh)
 			frameCounter = UPDATE_FRAME_COUNT;
 		else
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[mode]);
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mode);
 	}
 }
 
@@ -348,22 +347,21 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	}
 }
 
-static void menuDeferredUpdate(void* data) {
-	opl_io_module_t* mdl = data;
+void menuDeferredUpdate(void* data) {
+	int* mode = data;
 
-	if (!mdl->support)
+	opl_io_module_t* mod = &list_support[*mode];
+	if (!mod->support)
 		return;
 
-	if (mdl->support->uip)
+	if (mod->support->uip)
 		return;
 
 	// see if we have to update
-	if (mdl->support->itemNeedsUpdate()) {
-		mdl->support->uip = 1;
-
-		updateMenuFromGameList(mdl);
-
-		mdl->support->uip = 0;
+	if (mod->support->itemNeedsUpdate()) {
+		mod->support->uip = 1;
+		updateMenuFromGameList(mod);
+		mod->support->uip = 0;
 	}
 }
 
@@ -376,13 +374,13 @@ static void menuUpdateHook() {
 
 		// schedule updates of all the list handlers
 		if (list_support[USB_MODE].support && list_support[USB_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[USB_MODE]);
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[USB_MODE].support->mode);
 		if (list_support[ETH_MODE].support && list_support[ETH_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[ETH_MODE]);
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[ETH_MODE].support->mode);
 		if (list_support[HDD_MODE].support && list_support[HDD_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[HDD_MODE]);
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[HDD_MODE].support->mode);
 		if (list_support[APP_MODE].support && list_support[APP_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[APP_MODE]);
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[APP_MODE].support->mode);
 	}
 }
 

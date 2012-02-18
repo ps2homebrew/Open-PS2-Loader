@@ -220,6 +220,7 @@ void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
 	diaSetInt(diaConfig, CFG_USBDELAY, gUSBDelay);
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
+	diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
@@ -236,6 +237,7 @@ void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
 		diaGetInt(diaConfig, CFG_USBDELAY, &gUSBDelay);
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
+		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
 		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);

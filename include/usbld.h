@@ -33,10 +33,13 @@
 
 #define USBLD_VERSION "0.8"
 
+#define IO_MENU_UPDATE_DEFFERED 2
+
 void setErrorMessage(int strId, int error);
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID);
+void menuDeferredUpdate(void* data);
 void moduleUpdateMenu(int mode, int themeChanged);
 void handleHdlSrv();
 void shutdown();

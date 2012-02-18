@@ -430,8 +430,8 @@ negociate_retry:
 	server_specs.SessionKey = NPRsp->SessionKey;
 	mips_memcpy(&server_specs.EncryptionKey[0], &NPRsp->ByteField[0], NPRsp->KeyLength);
 	mips_memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->ByteField[NPRsp->KeyLength], 32);
-	mips_memcpy(&server_specs.Username[0], Username, 32);
-	mips_memcpy(&server_specs.Password[0], Password, 32);
+	mips_memcpy(&server_specs.Username[0], Username, 16);
+	mips_memcpy(&server_specs.Password[0], Password, 16);
 	server_specs.IOPaddr = (void *)&server_specs;
 	server_specs.HashedFlag = (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) ? 0 : -1;
 

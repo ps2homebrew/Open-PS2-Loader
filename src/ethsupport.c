@@ -35,7 +35,8 @@ extern void *smb_mcemu_irx;
 extern int size_smb_mcemu_irx;
 #endif
 
-static char *ethPrefix = NULL;
+static char ethPath[40];
+static char* ethPrefix;
 static int ethULSizePrev = -2;
 static unsigned char ethModifiedCDPrev[8];
 static unsigned char ethModifiedDVDPrev[8];
@@ -49,6 +50,11 @@ void ethSMBConnect(void) {
 	smbLogOn_in_t logon;
 	smbEcho_in_t echo;
 	smbOpenShare_in_t openshare;
+
+	if (gETHPrefix[0] != '\0')
+		sprintf(ethPath, "%s%s\\", ethPrefix, gETHPrefix);
+	else
+		sprintf(ethPath, ethPrefix);
 
 	// open tcp connection with the server / logon to SMB server
 	sprintf(logon.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
@@ -129,14 +135,14 @@ static void ethInitSMB(void) {
 	if (gNetworkStartup == 0) {
 		// update Themes
 		char path[255];
-		sprintf(path, "%sTHM", ethPrefix);
+		sprintf(path, "%sTHM", ethPath);
 		thmAddElements(path, "\\", ethGameList.mode);
 
-		sprintf(path, "%sCFG", ethPrefix);
+		sprintf(path, "%sCFG", ethPath);
 		checkCreateDir(path);
 
 #ifdef VMC
-		sprintf(path, "%sVMC", ethPrefix);
+		sprintf(path, "%sVMC", ethPath);
 		checkCreateDir(path);
 #endif
 	} else
@@ -210,7 +216,7 @@ static int ethNeedsUpdate(void) {
 		fio_stat_t stat;
 		char path[255];
 
-		sprintf(path, "%sCD", ethPrefix);
+		sprintf(path, "%sCD", ethPath);
 		if (fioGetstat(path, &stat) != 0)
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
@@ -218,7 +224,7 @@ static int ethNeedsUpdate(void) {
 			return 1;
 		}
 
-		sprintf(path, "%sDVD", ethPrefix);
+		sprintf(path, "%sDVD", ethPath);
 		if (fioGetstat(path, &stat) != 0)
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
@@ -226,7 +232,7 @@ static int ethNeedsUpdate(void) {
 			return 1;
 		}
 
-		if (!sbIsSameSize(ethPrefix, ethULSizePrev))
+		if (!sbIsSameSize(ethPath, ethULSizePrev))
 			return 1;
 	}
 
@@ -238,7 +244,7 @@ static int ethUpdateGameList(void) {
 		if (gNetworkStartup != 0)
 			return 0;
 
-		sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
+		sbReadList(&ethGames, ethPath, &ethULSizePrev, &ethGameCount);
 	} else {
 		int i, count;
 		ShareEntry_t sharelist[128] __attribute__((aligned(64)));
@@ -292,12 +298,12 @@ static char* ethGetGameStartup(int id) {
 
 #ifndef __CHILDPROOF
 static void ethDeleteGame(int id) {
-	sbDelete(&ethGames, ethPrefix, "\\", ethGameCount, id);
+	sbDelete(&ethGames, ethPath, "\\", ethGameCount, id);
 	ethULSizePrev = -2;
 }
 
 static void ethRenameGame(int id, char* newName) {
-	sbRename(&ethGames, ethPrefix, "\\", ethGameCount, id, newName);
+	sbRename(&ethGames, ethPath, "\\", ethGameCount, id, newName);
 	ethULSizePrev = -2;
 }
 #endif
@@ -310,7 +316,8 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	if (!gPCShareName[0]) {
 		memcpy(gPCShareName, game->name, 32);
-		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode);
+		//ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethInitSMB);
+		//ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode);
 		return;
 	}
 
@@ -324,7 +331,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
 		configGetVMC(configSet, vmc_name, vmc_id);
 		if (vmc_name[0]) {
-			if (sysCheckVMC(ethPrefix, "\\", vmc_name, 0, &vmc_superblock) > 0) {
+			if (sysCheckVMC(ethPath, "\\", vmc_name, 0, &vmc_superblock) > 0) {
 				smb_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
 				smb_vmc_infos.flags |= 0x100;
 				smb_vmc_infos.specs.page_size = vmc_superblock.page_size;
@@ -332,7 +339,10 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 				smb_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 				smb_vmc_infos.active = 1;
 				smb_vmc_infos.fid = 0xFFFF;
-				snprintf(smb_vmc_infos.fname, 64, "VMC\\%s.bin", vmc_name); // may still be too small size here ;) (should add 9)
+				if (gETHPrefix[0])
+					snprintf(smb_vmc_infos.fname, 64, "%s\\VMC\\%s.bin", gETHPrefix, vmc_name); // may still be too small size here ;) (should add 11 char !)
+				else
+					snprintf(smb_vmc_infos.fname, 64, "VMC\\%s.bin", vmc_name);
 			} else {
 				char error[255];
 				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
@@ -383,8 +393,9 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	memcpy((void*)((u32)irx + i), config_str, strlen(config_str) + 1);
 	memcpy((void*)((u32)irx + i + 16), &gPCPort, 4);
 	memcpy((void*)((u32)irx + i + 20), gPCShareName, 32);
-	memcpy((void*)((u32)irx + i + 56), gPCUserName, 32);
-	memcpy((void*)((u32)irx + i + 92), gPCPassword, 32);
+	memcpy((void*)((u32)irx + i + 52), gETHPrefix, 32);
+	memcpy((void*)((u32)irx + i + 84), gPCUserName, 16);
+	memcpy((void*)((u32)irx + i + 100), gPCPassword, 16);
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
@@ -405,13 +416,13 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 }
 
 static config_set_t* ethGetConfig(int id) {
-	return sbPopulateConfig(&ethGames[id], ethPrefix, "\\");
+	return sbPopulateConfig(&ethGames[id], ethPath, "\\");
 }
 
 static int ethGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
 	char path[255];
 	if (isRelative)
-		sprintf(path, "%s%s\\%s_%s", ethPrefix, folder, value, suffix);
+		sprintf(path, "%s%s\\%s_%s", ethPath, folder, value, suffix);
 	else
 		sprintf(path, "%s%s_%s", folder, value, suffix);
 	return texDiscoverLoad(resultTex, path, -1, psm);
@@ -427,7 +438,7 @@ static void ethCleanUp(int exception) {
 
 #ifdef VMC
 static int ethCheckVMC(char* name, int createSize) {
-	return sysCheckVMC(ethPrefix, "\\", name, createSize, NULL);
+	return sysCheckVMC(ethPath, "\\", name, createSize, NULL);
 }
 #endif
 

@@ -120,8 +120,9 @@
 #define _STR_COLOR_SELECTION			115
 #define _STR_RECONNECT					116
 #define _STR_HINT_SHARENAME				117
+#define _STR_ETH_PREFIX					118
 
-#define LANG_STR_COUNT 118
+#define LANG_STR_COUNT 119
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

@@ -351,9 +351,8 @@ unsigned int USBA_crc32(char *string) {
 }
 
 int sysGetDiscID(char *hexDiscID) {
-
 	cdInit(CDVD_INIT_NOCHECK);
-	LOG("cdvd RPC inited\n");
+	LOG("SYSTEM CDVD RPC inited\n");
 	if (cdStatus() == CDVD_STAT_OPEN) // If tray is open, error
 		return -1;
 		
@@ -362,7 +361,7 @@ int sysGetDiscID(char *hexDiscID) {
 		return -1;
 
 	cdDiskReady(0); 	
-	LOG("Disc drive is ready\n");
+	LOG("SYSTEM Disc drive is ready\n");
 	CdvdDiscType_t cdmode = cdGetDiscType();	// If tray is closed, get disk type
 	if (cdmode == CDVD_TYPE_NODISK)
 		return -1;
@@ -370,20 +369,19 @@ int sysGetDiscID(char *hexDiscID) {
 	if ((cdmode != CDVD_TYPE_PS2DVD) && (cdmode != CDVD_TYPE_PS2CD) && (cdmode != CDVD_TYPE_PS2CDDA)) {
 		cdStop();
 		cdSync(0);
-		LOG("Disc stopped\n");
-		LOG("Disc is not ps2 disc!\n");
+		LOG("SYSTEM Disc stopped, Disc is not ps2 disc!\n");
 		return -2;
 	}
 
 	cdStandby();
 	cdSync(0);
-	LOG("Disc standby\n");
+	LOG("SYSTEM Disc standby\n");
 
 	int fd = fioOpen("discID:", O_RDONLY);
 	if (fd < 0) {
 		cdStop();
 		cdSync(0);
-		LOG("Disc stopped\n");
+		LOG("SYSTEM Disc stopped\n");
 		return -3;
 	}
 
@@ -394,11 +392,11 @@ int sysGetDiscID(char *hexDiscID) {
 
 	cdStop();
 	cdSync(0);
-	LOG("Disc stopped\n");
+	LOG("SYSTEM Disc stopped\n");
 
 	// convert to hexadecimal string
 	snprintf(hexDiscID, 15, "%02X %02X %02X %02X %02X", discID[0], discID[1], discID[2], discID[3], discID[4]);
-	LOG("PS2 Disc ID = %s\n", hexDiscID);
+	LOG("SYSTEM PS2 Disc ID = %s\n", hexDiscID);
 
 	return 1;
 }
@@ -508,7 +506,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 		if (curIrxSize > 0) {
 			ee_kmode_exit();
 			EIntr();
-			LOG("irx addr start: %08x end: %08x\n", (int)irxptr_tab[i].irxaddr, (int)(irxptr_tab[i].irxaddr+curIrxSize));
+			LOG("SYSTEM IRX address start: %08x end: %08x\n", (int)irxptr_tab[i].irxaddr, (int)(irxptr_tab[i].irxaddr+curIrxSize));
 			DIntr();
 			ee_kmode_enter();
 
@@ -545,7 +543,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 		strncpy(gExitPath, "Browser", 32);
 
 #ifdef VMC
-	LOG("sysLaunchLoaderElf started with size_mcemu_irx = %d\n", size_mcemu_irx);
+	LOG("SYSTEM LaunchLoaderElf called with size_mcemu_irx = %d\n", size_mcemu_irx);
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx);
@@ -697,17 +695,17 @@ int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize,
 				fileXioLseek(fd, 0, SEEK_SET);
 				fileXioRead(fd, (void*)vmc_superblock, sizeof(vmc_superblock_t));
 
-				LOG("File size  : 0x%X\n", size);
-				LOG("Magic      : %s\n", vmc_superblock->magic);
-				LOG("Card type  : %d\n", vmc_superblock->mc_type);
-				LOG("Flags      : 0x%X\n", (vmc_superblock->mc_flag & 0xFF) | 0x100);
-				LOG("Page_size  : 0x%X\n", vmc_superblock->page_size);
-				LOG("Block_size : 0x%X\n", vmc_superblock->pages_per_block);
-				LOG("Card_size  : 0x%X\n", vmc_superblock->pages_per_cluster * vmc_superblock->clusters_per_card);
+				LOG("SYSTEM File size  : 0x%X\n", size);
+				LOG("SYSTEM Magic      : %s\n", vmc_superblock->magic);
+				LOG("SYSTEM Card type  : %d\n", vmc_superblock->mc_type);
+				LOG("SYSTEM Flags      : 0x%X\n", (vmc_superblock->mc_flag & 0xFF) | 0x100);
+				LOG("SYSTEM Page_size  : 0x%X\n", vmc_superblock->page_size);
+				LOG("SYSTEM Block_size : 0x%X\n", vmc_superblock->pages_per_block);
+				LOG("SYSTEM Card_size  : 0x%X\n", vmc_superblock->pages_per_cluster * vmc_superblock->clusters_per_card);
 
 				if(!strncmp(vmc_superblock->magic, "Sony PS2 Memory Card Format", 27) && vmc_superblock->mc_type == 0x2
 					&& size == vmc_superblock->pages_per_cluster * vmc_superblock->clusters_per_card * vmc_superblock->page_size) {
-					LOG("VMC file structure valid: %s\n", path);
+					LOG("SYSTEM VMC file structure valid: %s\n", path);
 				} else
 					size = 0;
 			}

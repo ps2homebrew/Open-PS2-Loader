@@ -41,7 +41,7 @@ static char* appGetELFName(char* name) {
 }
 
 void appInit(void) {
-	LOG("appInit()\n");
+	LOG("APPSUPPORT Init\n");
 	appForceUpdate = 1;
 
 	configApps = configGetByType(CONFIG_APPS);
@@ -171,7 +171,7 @@ static int appGetImage(char* folder, int isRelative, char* value, char* suffix, 
 
 static void appCleanUp(int exception) {
 	if (appItemList.enabled) {
-		LOG("appCleanUp()\n");
+		LOG("APPSUPPORT CleanUp\n");
 	}
 }
 

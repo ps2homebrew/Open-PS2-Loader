@@ -163,7 +163,7 @@ static void initStaticText(char* themePath, config_set_t* themeConfig, theme_t* 
 		elem->endElem = &endMutableText;
 		elem->drawElem = &drawStaticText;
 	} else
-		LOG("elemStaticText %s: NO value, elem disabled !!\n", name);
+		LOG("THEMES StaticText %s: NO value, elem disabled !!\n", name);
 }
 
 // AttributeText ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ static void initAttributeText(char* themePath, config_set_t* themeConfig, theme_
 		elem->endElem = &endMutableText;
 		elem->drawElem = &drawAttributeText;
 	} else
-		LOG("elemAttributeText %s: NO attribute, elem disabled !!\n", name);
+		LOG("THEMES AttributeText %s: NO attribute, elem disabled !!\n", name);
 }
 
 // Common functions for Image ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,19 +227,19 @@ static void findDuplicate(theme_element_t* first, char* cachePattern, char* defa
 			if (cachePattern && source->cache && !strcmp(cachePattern, source->cache->suffix)) {
 				target->cache = source->cache;
 				target->cacheLinked = 1;
-				LOG("Re-using a cache for pattern %s\n", cachePattern);
+				LOG("THEMES Re-using a cache for pattern %s\n", cachePattern);
 			}
 
 			if (defaultTexture && source->defaultTexture && !strcmp(defaultTexture, source->defaultTexture->name)) {
 				target->defaultTexture = source->defaultTexture;
 				target->defaultTextureLinked = 1;
-				LOG("Re-using the default texture for %s\n", defaultTexture);
+				LOG("THEMES Re-using the default texture for %s\n", defaultTexture);
 			}
 
 			if (overlayTexture && source->overlayTexture && !strcmp(overlayTexture, source->overlayTexture->name)) {
 				target->overlayTexture = source->overlayTexture;
 				target->overlayTextureLinked = 1;
-				LOG("Re-using the overlay texture for %s\n", overlayTexture);
+				LOG("THEMES Re-using the overlay texture for %s\n", overlayTexture);
 			}
 		}
 
@@ -343,13 +343,13 @@ static mutable_image_t* initMutableImage(char* themePath, config_set_t* themeCon
 	if (type == TYPE_ATTRIBUTE_IMAGE) {
 		snprintf(elemProp, 64, "%s_attribute", name);
 		configGetStr(themeConfig, elemProp, &cachePattern);
-		LOG("elemMutableImage %s: type: %d using cache pattern: %s\n", name, type, cachePattern);
+		LOG("THEMES MutableImage %s: type: %d using cache pattern: %s\n", name, type, cachePattern);
 	} else if ((type == TYPE_GAME_IMAGE) || type == (TYPE_BACKGROUND)) {
 		snprintf(elemProp, 64, "%s_pattern", name);
 		configGetStr(themeConfig, elemProp, &cachePattern);
 		snprintf(elemProp, 64, "%s_count", name);
 		configGetInt(themeConfig, elemProp, &cacheCount);
-		LOG("elemMutableImage %s: type: %d using cache pattern: %s\n", name, type, cachePattern);
+		LOG("THEMES MutableImage %s: type: %d using cache pattern: %s\n", name, type, cachePattern);
 	}
 
 	snprintf(elemProp, 64, "%s_default", name);
@@ -401,7 +401,7 @@ static void initStaticImage(char* themePath, config_set_t* themeConfig, theme_t*
 	if (mutableImage->defaultTexture)
 		elem->drawElem = &drawStaticImage;
 	else
-		LOG("elemStaticImage %s: NO image name, elem disabled !!\n", name);
+		LOG("THEMES StaticImage %s: NO image name, elem disabled !!\n", name);
 }
 
 // GameImage ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,7 +410,6 @@ static GSTEXTURE* getGameImageTexture(image_cache_t* cache, void* support, struc
 	if (gEnableArt) {
 		item_list_t * list = (item_list_t *) support;
 		char* startup = list->itemGetStartup(item->id);
-		//LOG("getGameCachedTex, prefix: %s addsep: %d value: %s suffix: %s\n", cache->prefix, cache->addSeparator, startup, suffix);
 		return cacheGetTexture(cache, list, &item->cache_id[cache->userId], &item->cache_uid[cache->userId], startup);
 	}
 
@@ -456,7 +455,7 @@ static void initGameImage(char* themePath, config_set_t* themeConfig, theme_t* t
 	if (mutableImage->cache)
 		elem->drawElem = &drawGameImage;
 	else
-		LOG("elemGameImage %s: NO pattern, elem disabled !!\n", name);
+		LOG("THEMES GameImage %s: NO pattern, elem disabled !!\n", name);
 }
 
 // AttributeImage ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,7 +497,7 @@ static void initAttributeImage(char* themePath, config_set_t* themeConfig, theme
 	if (mutableImage->cache)
 		elem->drawElem = &drawAttributeImage;
 	else
-		LOG("elemAttributeImage %s: NO attribute, elem disabled !!\n", name);
+		LOG("THEMES AttributeImage %s: NO attribute, elem disabled !!\n", name);
 }
 
 // BasicElement /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -696,7 +695,7 @@ static void initItemsList(char* themePath, config_set_t* themeConfig, theme_t* t
 		elem->height = theme->usedHeight - (MENU_POS_V + HINT_HEIGHT);
 
 	itemsList->displayedItems = elem->height / MENU_ITEM_HEIGHT;
-	LOG("elemItemsList %s: displaying %d elems, item height: %d\n", name, itemsList->displayedItems, elem->height);
+	LOG("THEMES ItemsList %s: displaying %d elems, item height: %d\n", name, itemsList->displayedItems, elem->height);
 
 	itemsList->decorator = NULL;
 	snprintf(elemProp, 64, "%s_decorator", name);
@@ -743,7 +742,7 @@ static void drawInfoHintText(struct menu_list* menu, struct submenu_list* item, 
 static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t* theme) {
 	// 1. check we have a valid Background elements
 	if ( !theme->mainElems.first || (theme->mainElems.first->type != TYPE_BACKGROUND) ) {
-		LOG("No valid background found for main, add default BG_ART\n");
+		LOG("THEMES No valid background found for main, add default BG_ART\n");
 		theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, FNT_DEFAULT);
 		if (themePath)
 			initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
@@ -755,7 +754,7 @@ static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t
 
 	if (theme->infoElems.first) {
 		if (theme->infoElems.first->type != TYPE_BACKGROUND) {
-			LOG("No valid background found for info, add default BG_ART\n");
+			LOG("THEMES No valid background found for info, add default BG_ART\n");
 			theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, FNT_DEFAULT);
 			if (themePath)
 				initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
@@ -788,7 +787,7 @@ static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t
 			itemsList->decorator = NULL;
 		}
 	} else {
-		LOG("No itemsList found, adding a default one\n");
+		LOG("THEMES No itemsList found, adding a default one\n");
 		theme->itemsList = initBasic(themePath, themeConfig, theme, "il", TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
 		initItemsList(themePath, themeConfig, theme, theme->itemsList, "il", NULL);
 		theme->itemsList->next = theme->mainElems.first->next; // Position the itemsList as second element (right after the Background)
@@ -937,7 +936,6 @@ static void thmFree(theme_t* theme) {
 
 static int thmReadEntry(int index, char* path, char* separator, char* name, unsigned int mode) {
 	if (FIO_SO_ISDIR(mode) && strstr(name, "thm_")) {
-		LOG("thmReadEntry() path=%s sep=%s name=%s\n", path, separator, name);
 		theme_file_t* currTheme = &themes[nThemes + index];
 
 		int length = strlen(name) - 4 + 1;
@@ -949,7 +947,7 @@ static int thmReadEntry(int index, char* path, char* separator, char* name, unsi
 		currTheme->filePath = (char*) malloc(length * sizeof(char));
 		sprintf(currTheme->filePath, "%s%s%s%s", path, separator, name, separator);
 
-		LOG("Theme found: %s\n", currTheme->filePath);
+		LOG("THEMES Theme found: %s\n", currTheme->filePath);
 
 		index++;
 	}
@@ -1029,7 +1027,7 @@ static void thmLoadFonts(config_set_t* themeConfig, const char* themePath, theme
 }
 
 static void thmLoad(char* themePath) {
-	LOG("thmLoad() path=%s\n", themePath);
+	LOG("THEMES Load theme path=%s\n", themePath);
 	theme_t* curT = gTheme;
 	theme_t* newT = (theme_t*) malloc(sizeof(theme_t));
 	memset(newT, 0, sizeof(theme_t));
@@ -1105,9 +1103,8 @@ static void thmLoad(char* themePath) {
 	validateGUIElems(themePath, themeConfig, newT);
 	configFree(themeConfig);
 
-	LOG("theme loaded, number of cache: %d\n", newT->gameCacheCount);
-
-	LOG("thmLoad() usedHeight=%d\n", newT->usedHeight);
+	LOG("THEMES Number of cache: %d\n", newT->gameCacheCount);
+	LOG("THEMES Used height: %d\n", newT->usedHeight);
 
 	/// Now swap theme and start loading textures
 	if (newT->usedHeight == screenHeight)
@@ -1170,21 +1167,19 @@ static void thmRebuildGuiNames() {
 }
 
 void thmAddElements(char* path, char* separator, int mode) {
-	LOG("thmAddElements() path=%s sep=%s\n", path, separator);
 	nThemes += listDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
-	LOG("thmAddElements() nThemes=%d\n", nThemes);
 	thmRebuildGuiNames();
 
 	char* temp;
 	if (configGetStr(configGetByType(CONFIG_OPL), "theme", &temp)) {
-		LOG("Trying to set again theme: %s\n", temp);
+		LOG("THEMES Trying to set again theme: %s\n", temp);
 		if (thmSetGuiValue(thmFindGuiID(temp), 0))
 			moduleUpdateMenu(mode, 1);
 	}
 }
 
 void thmInit() {
-	LOG("thmInit()\n");
+	LOG("THEMES Init\n");
 	gTheme = NULL;
 
 	thmReloadScreenExtents();
@@ -1200,12 +1195,10 @@ void thmReloadScreenExtents() {
 }
 
 char* thmGetValue() {
-	//LOG("thmGetValue() id=%d name=%s\n", guiThemeID, guiThemesNames[guiThemeID]);
 	return guiThemesNames[guiThemeID];
 }
 
 int thmSetGuiValue(int themeID, int reload) {
-	LOG("thmSetGuiValue() id=%d\n", themeID);
 	if (themeID != -1) {
 		if (guiThemeID != themeID || reload) {
 			if (themeID != 0)
@@ -1224,12 +1217,10 @@ int thmSetGuiValue(int themeID, int reload) {
 }
 
 int thmGetGuiValue() {
-	//LOG("thmGetGuiValue() id=%d\n", guiThemeID);
 	return guiThemeID;
 }
 
 int thmFindGuiID(char* theme) {
-	LOG("thmFindGuiID() theme=%s\n", theme);
 	if (theme) {
 		int i = 0;
 		for (; i < nThemes; i++) {

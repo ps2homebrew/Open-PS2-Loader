@@ -95,7 +95,7 @@ static int initializePad(struct pad_data_t* pad) {
 	// How many different modes can this device operate in?
 	// i.e. get # entrys in the modetable
 	modes = padInfoMode(pad->port, pad->slot, PAD_MODETABLE, -1);
-	LOG("PAD: The device has %d modes\n", modes);
+	LOG("PAD The device has %d modes: ", modes);
 
 	if (modes > 0) {
 		LOG("( ");
@@ -105,16 +105,16 @@ static int initializePad(struct pad_data_t* pad) {
 			LOG("%d ", tmp);
 		}
 	        
-	        LOG(")");
+	        LOG(")\n");
 	}
 
 	tmp = padInfoMode(pad->port, pad->slot, PAD_MODECURID, 0);
-	LOG("PAD: It is currently using mode %d\n", tmp);
+	LOG("PAD It is currently using mode %d\n", tmp);
 
 	// If modes == 0, this is not a Dual shock controller 
 	// (it has no actuator engines)
 	if (modes == 0) {
-		LOG("PAD: This is a digital controller?\n");
+		LOG("PAD This is a digital controller?\n");
 		return 1;
 	}
 
@@ -127,7 +127,7 @@ static int initializePad(struct pad_data_t* pad) {
 	} while (i < modes);
 	
 	if (i >= modes) {
-		LOG("PAD: This is no Dual Shock controller\n");
+		LOG("PAD This is no Dual Shock controller\n");
 		return 1;
 	}
 
@@ -135,26 +135,26 @@ static int initializePad(struct pad_data_t* pad) {
 	// This check should always pass if the Dual Shock test above passed
 	tmp = padInfoMode(pad->port, pad->slot, PAD_MODECUREXID, 0);
 	if (tmp == 0) {
-	        LOG("PAD: This is no Dual Shock controller??\n");
+	        LOG("PAD This is no Dual Shock controller??\n");
 	        return 1;
 	}
 
-	LOG("PAD: Enabling dual shock functions\n");
+	LOG("PAD Enabling dual shock functions\n");
 
 	// When using MMODE_LOCK, user cant change mode with Select button
 	padSetMainMode(pad->port, pad->slot, PAD_MMODE_DUALSHOCK, PAD_MMODE_LOCK);
 
 	waitPadReady(pad);
 	tmp = padInfoPressMode(pad->port, pad->slot);
-	LOG("PAD: infoPressMode: %d\n", tmp);
+	LOG("PAD infoPressMode: %d\n", tmp);
 
 	waitPadReady(pad);        
 	tmp = padEnterPressMode(pad->port, pad->slot);
-	LOG("PAD: enterPressMode: %d\n", tmp);
+	LOG("PAD enterPressMode: %d\n", tmp);
 
 	waitPadReady(pad);
 	pad->actuators = padInfoAct(pad->port, pad->slot, -1, 0);
-	LOG("PAD: # of actuators: %d\n", pad->actuators);
+	LOG("PAD # of actuators: %d\n", pad->actuators);
 
 	if (pad->actuators != 0) {
 		pad->actAlign[0] = 0;   // Enable small engine
@@ -166,9 +166,9 @@ static int initializePad(struct pad_data_t* pad) {
 
 		waitPadReady(pad);
 		tmp = padSetActAlign(pad->port, pad->slot, pad->actAlign);
-		LOG("PAD: padSetActAlign: %d\n", tmp);
+		LOG("PAD padSetActAlign: %d\n", tmp);
 	} else {
-		LOG("PAD: Did not find any actuators.\n");
+		LOG("PAD Did not find any actuators.\n");
 	}
 
 	waitPadReady(pad);

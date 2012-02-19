@@ -145,7 +145,7 @@ static void ethInitSMB(void) {
 		sprintf(path, "%sVMC", ethPath);
 		checkCreateDir(path);
 #endif
-	} else
+	} else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE))
 		setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
 }
 

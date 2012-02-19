@@ -219,7 +219,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 #ifdef VMC
 	char vmc_name[32], vmc_path[255];
-	int vmc_id, haveError = 0, size_mcemu_irx = 0;
+	int vmc_id, have_error = 0, size_mcemu_irx = 0;
 	usb_vmc_infos_t usb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 
@@ -227,7 +227,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
 		configGetVMC(configSet, vmc_name, vmc_id);
 		if (vmc_name[0]) {
-			haveError = 1;
+			have_error = 1;
 			if (sysCheckVMC(usbPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
 				usb_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
 				usb_vmc_infos.flags |= 0x100;
@@ -240,7 +240,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				if (fioIoctl(fd, 0xCAFEC0DE, vmc_path)) {
 					LOG("Cluster Chain OK\n");
 					if ((i = fioIoctl(fd, 0xBEEFC0DE, vmc_path)) != 0) {
-						haveError = 0;
+						have_error = 0;
 						usb_vmc_infos.active = 1;
 						usb_vmc_infos.start_sector = i;
 						LOG("Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
@@ -249,7 +249,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			}
 		}
 
-		if (haveError) {
+		if (have_error) {
 			char error[255];
 			snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
 			if (!guiMsgBox(error, 1, NULL)) {

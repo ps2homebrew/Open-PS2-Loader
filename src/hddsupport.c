@@ -252,90 +252,86 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 
 #ifdef VMC
 	apa_header part_hdr;
-	int fd, haveError = 1;
+	int fd, part_valid = 0, size_mcemu_irx = 0;
 	hdd_vmc_infos_t hdd_vmc_infos;
 	memset(&hdd_vmc_infos, 0, sizeof(hdd_vmc_infos_t));
 
 	fileXioUmount(hddPrefix);
 	fd = fileXioOpen(oplPart, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
-	if(fd >= 0) {
-		if(fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
-			if(part_hdr.nsub <= 4) {
+	if (fd >= 0) {
+		if (fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
+			if (part_hdr.nsub <= 4) {
 				hdd_vmc_infos.parts[0].start = part_hdr.start;
 				hdd_vmc_infos.parts[0].length = part_hdr.length;
 				LOG("hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
 				LOG("hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
-				for(i = 0; i < part_hdr.nsub; i++) {
+				for (i = 0; i < part_hdr.nsub; i++) {
 					hdd_vmc_infos.parts[i+1].start = part_hdr.subs[i].start;
 					hdd_vmc_infos.parts[i+1].length = part_hdr.subs[i].length;
 					LOG("hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
 					LOG("hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
 				}
-				haveError = 0;
+				part_valid = 1;
 			}
 
 		}
 		fileXioClose(fd);
 	}
-
-	if(haveError) {
-		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
-		return;
-	}
-
 	fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
 
-	char vmc_name[32], vmc_path[255];
-	int vmc_id, size_mcemu_irx = 0;
-	vmc_superblock_t vmc_superblock;
-	pfs_inode_t pfs_inode;
+	if (part_valid) {
+		char vmc_name[32], vmc_path[255];
+		int vmc_id, have_error = 0;
+		vmc_superblock_t vmc_superblock;
+		pfs_inode_t pfs_inode;
 
-	for (vmc_id = 0; vmc_id < 2; vmc_id++) {
-		configGetVMC(configSet, vmc_name, vmc_id);
-		if (vmc_name[0]) {
-			haveError = 1;
-			hdd_vmc_infos.active = 0;
-			if (sysCheckVMC(hddPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
-				hdd_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
-				hdd_vmc_infos.flags |= 0x100;
-				hdd_vmc_infos.specs.page_size = vmc_superblock.page_size;
-				hdd_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;
-				hdd_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
+		for (vmc_id = 0; vmc_id < 2; vmc_id++) {
+			configGetVMC(configSet, vmc_name, vmc_id);
+			if (vmc_name[0]) {
+				have_error = 1;
+				hdd_vmc_infos.active = 0;
+				if (sysCheckVMC(hddPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
+					hdd_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
+					hdd_vmc_infos.flags |= 0x100;
+					hdd_vmc_infos.specs.page_size = vmc_superblock.page_size;
+					hdd_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;
+					hdd_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
-				// Check vmc inode block chain (write operation can cause damage)
-				snprintf(vmc_path, 255, "%sVMC/%s.bin", hddPrefix, vmc_name);
-				fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
-				if(fileXioIoctl2(fd, PFS_IOCTL2_GET_INODE, NULL, 0, (void*)&pfs_inode, sizeof(pfs_inode_t)) == sizeof(pfs_inode_t)) {
-					if(pfs_inode.number_data <= 11) {
-						haveError = 0;
-						hdd_vmc_infos.active = 1;
-						for(i = 0; i < pfs_inode.number_data - 1; i++) {
-							hdd_vmc_infos.blocks[i].number = pfs_inode.data[i+1].number;
-							hdd_vmc_infos.blocks[i].subpart = pfs_inode.data[i+1].subpart;
-							hdd_vmc_infos.blocks[i].count = pfs_inode.data[i+1].count;
-							LOG("hdd_vmc_infos.blocks[%d].number     : 0x%X\n", i, hdd_vmc_infos.blocks[i].number);
-							LOG("hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
-							LOG("hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
-						}
-					} // else Vmc file too much fragmented
+					// Check vmc inode block chain (write operation can cause damage)
+					snprintf(vmc_path, 255, "%sVMC/%s.bin", hddPrefix, vmc_name);
+					fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
+					if (fileXioIoctl2(fd, PFS_IOCTL2_GET_INODE, NULL, 0, (void*)&pfs_inode, sizeof(pfs_inode_t)) == sizeof(pfs_inode_t)) {
+						if (pfs_inode.number_data <= 11) {
+							have_error = 0;
+							hdd_vmc_infos.active = 1;
+							for (i = 0; i < pfs_inode.number_data - 1; i++) {
+								hdd_vmc_infos.blocks[i].number = pfs_inode.data[i+1].number;
+								hdd_vmc_infos.blocks[i].subpart = pfs_inode.data[i+1].subpart;
+								hdd_vmc_infos.blocks[i].count = pfs_inode.data[i+1].count;
+								LOG("hdd_vmc_infos.blocks[%d].number     : 0x%X\n", i, hdd_vmc_infos.blocks[i].number);
+								LOG("hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
+								LOG("hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
+							}
+						} // else Vmc file too much fragmented
+					}
+					fileXioClose(fd);
 				}
-				fileXioClose(fd);
 			}
-		}
 
-		if (haveError) {
-			char error[255];
-			snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
-			if (!guiMsgBox(error, 1, NULL))
-				return;
-		}
+			if (have_error) {
+				char error[255];
+				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+				if (!guiMsgBox(error, 1, NULL))
+					return;
+			}
 
-		for (i = 0; i < size_hdd_mcemu_irx; i++) {
-			if (((u32*)&hdd_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
-				if (hdd_vmc_infos.active)
-					size_mcemu_irx = size_hdd_mcemu_irx;
-				memcpy(&((u32*)&hdd_mcemu_irx)[i], &hdd_vmc_infos, sizeof(hdd_vmc_infos_t));
-				break;
+			for (i = 0; i < size_hdd_mcemu_irx; i++) {
+				if (((u32*)&hdd_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
+					if (hdd_vmc_infos.active)
+						size_mcemu_irx = size_hdd_mcemu_irx;
+					memcpy(&((u32*)&hdd_mcemu_irx)[i], &hdd_vmc_infos, sizeof(hdd_vmc_infos_t));
+					break;
+				}
 			}
 		}
 	}

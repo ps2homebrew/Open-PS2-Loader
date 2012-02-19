@@ -268,7 +268,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		if (gAutoRefresh)
 			frameCounter = UPDATE_FRAME_COUNT;
 		else
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mode);
+			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
 	}
 }
 
@@ -354,8 +354,10 @@ void menuDeferredUpdate(void* data) {
 	if (!mod->support)
 		return;
 
-	if (mod->support->uip)
+	if (mod->support->uip) {
+		ioPutRequest(IO_MENU_UPDATE_DEFFERED, mode); // we are busy, so re-post refresh for later
 		return;
+	}
 
 	// see if we have to update
 	if (mod->support->itemNeedsUpdate()) {

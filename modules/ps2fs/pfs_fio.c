@@ -706,7 +706,11 @@ int pfsLseek(iop_file_t *f, unsigned long pos, int whence)
 
 s64 pfsLseek64(iop_file_t *f, s64 offset, int whence)
 {
-	pfs_file_slot_t *fileSlot = (pfs_file_slot_t *)f->privdata;
+	printf("ps2fs: Error: Operation currently unsupported.\n");
+
+	return -1;
+
+	/*pfs_file_slot_t *fileSlot = (pfs_file_slot_t *)f->privdata;
 	u64 rv;
 
 	rv=checkFileSlot(fileSlot);
@@ -715,7 +719,7 @@ s64 pfsLseek64(iop_file_t *f, s64 offset, int whence)
 		rv=_seek(fileSlot, offset, whence, f->mode);
 		SignalSema(pfsFioSema);
 	}
-	return rv;
+	return rv;*/
 }
 
 int _remove(pfs_mount_t *pfsMount, const char *path, int mode)
@@ -1273,7 +1277,7 @@ int pfsReadlink(iop_file_t *f, const char *path, char *buf, int buflen)
 	return checkForLastError(pfsMount, rv);
 }
 
-int fioUnsupported()
+int pfsUnsupported()
 {
 	printf("ps2fs: Error: Operation currently unsupported.\n");
 

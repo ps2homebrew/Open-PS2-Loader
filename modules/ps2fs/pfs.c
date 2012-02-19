@@ -41,10 +41,10 @@ iop_device_ops_t pfsOps = {
 	pfsSync,
 	pfsMount,
 	pfsUmount,
-	fioUnsupported /*pfsLseek64*/,
+	pfsLseek64,
 	pfsDevctl,
-	fioUnsupported /*pfsSymlink*/,
-	fioUnsupported /*pfsReadlink*/,
+	pfsUnsupported /*pfsSymlink*/,
+	pfsUnsupported /*pfsReadlink*/,
 	pfsIoctl2
 };
 

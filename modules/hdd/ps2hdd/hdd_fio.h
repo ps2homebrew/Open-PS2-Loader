@@ -124,6 +124,6 @@ int hddGetStat(iop_file_t *f, const char *name, iox_stat_t *stat);
 int hddReName(iop_file_t *f, const char *oldname, const char *newname);
 int hddDevctl(iop_file_t *f, const char *devname, int cmd, void *arg, unsigned int arglen, void *bufp, unsigned int buflen);
 
-int fioUnsupported(iop_file_t *f);
+int hddUnsupported(iop_file_t *f);
 
 #endif /* _HDD_FIO_H */

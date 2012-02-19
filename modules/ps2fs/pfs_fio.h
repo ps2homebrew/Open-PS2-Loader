@@ -35,22 +35,22 @@ pfs_blockinfo* getCurrentBlock(pfs_blockpos_t *blockpos);
 ///////////////////////////////////////////////////////////////////////////////
 //   Functions which hook into IOMAN
 
-int	pfsInit(iop_device_t *f);
-int	pfsDeinit(iop_device_t *f);
-int	pfsFormat(iop_file_t *, const char *dev, const char *blockdev, void *arg, size_t arglen);
-int	pfsOpen(iop_file_t *f, const char *name, int flags, int mode);
-int	pfsClose(iop_file_t *f);
-int	pfsRead(iop_file_t *f, void *buf, int size);
-int	pfsWrite(iop_file_t *f, void *buf, int size);
-int	pfsLseek(iop_file_t *f, unsigned long pos, int whence);
-int	pfsRemove(iop_file_t *f, const char *name);
-int	pfsMkdir(iop_file_t *f, const char *path, int mode);
-int	pfsRmdir(iop_file_t *f, const char *path);
-int	pfsDopen(iop_file_t *f, const char *name);
-int	pfsDclose(iop_file_t *f);
-int	pfsDread(iop_file_t *f, iox_dirent_t *buf);
-int	pfsGetstat(iop_file_t *f, const char *name, iox_stat_t *stat);
-int	pfsChstat(iop_file_t *f, const char *name, iox_stat_t *stat, unsigned int statmask);
+int pfsInit(iop_device_t *f);
+int pfsDeinit(iop_device_t *f);
+int pfsFormat(iop_file_t *, const char *dev, const char *blockdev, void *arg, size_t arglen);
+int pfsOpen(iop_file_t *f, const char *name, int flags, int mode);
+int pfsClose(iop_file_t *f);
+int pfsRead(iop_file_t *f, void *buf, int size);
+int pfsWrite(iop_file_t *f, void *buf, int size);
+int pfsLseek(iop_file_t *f, unsigned long pos, int whence);
+int pfsRemove(iop_file_t *f, const char *name);
+int pfsMkdir(iop_file_t *f, const char *path, int mode);
+int pfsRmdir(iop_file_t *f, const char *path);
+int pfsDopen(iop_file_t *f, const char *name);
+int pfsDclose(iop_file_t *f);
+int pfsDread(iop_file_t *f, iox_dirent_t *buf);
+int pfsGetstat(iop_file_t *f, const char *name, iox_stat_t *stat);
+int pfsChstat(iop_file_t *f, const char *name, iox_stat_t *stat, unsigned int statmask);
 int pfsRename(iop_file_t *f, const char *old, const char *new);
 int pfsChdir(iop_file_t *f, const char *name);
 int pfsSync(iop_file_t *f, const char *dev, int flag);
@@ -60,6 +60,6 @@ s64 pfsLseek64(iop_file_t *f, s64 offset, int whence);
 int pfsSymlink(iop_file_t *f, const char *old, const char *new);
 int pfsReadlink(iop_file_t *f, const char *path, char *buf, int buflen);
 
-int fioUnsupported();
+int pfsUnsupported();
 
 #endif /* _PFS_FIO_H */

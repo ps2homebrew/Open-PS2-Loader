@@ -829,4 +829,4 @@ int hddDevctl(iop_file_t *f, const char *devname, int cmd, void *arg,
 	return rv;
 }
 
-int fioUnsupported(iop_file_t *f){return -1;}
+int hddUnsupported(iop_file_t *f){return -1;}

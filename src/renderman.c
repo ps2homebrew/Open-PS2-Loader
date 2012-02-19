@@ -140,7 +140,7 @@ static int rmUploadClut(GSCLUT *clut) {
 		
 		if (size >= __VRAM_SIZE) {
 			// Only log this if the allocation is too large itself
-			LOG("RM: CLUT: Requested allocation is bigger than VRAM!\n"); 
+			LOG("RENDERMAN Requested clut allocation is bigger than VRAM!\n");
 			// We won't allocate this, it's too large
 			clut->VramClut = GSKIT_ALLOC_ERROR;
 			return 0;
@@ -179,7 +179,7 @@ static int rmUploadTexture(GSTEXTURE* txt) {
 		
 		if (size >= __VRAM_SIZE) {
 			// Only log this if the allocation is too large itself
-			LOG("RM: TXT: Requested allocation is bigger than VRAM!\n"); 
+			LOG("RENDERMAN Requested texture allocation is bigger than VRAM!\n");
 			// We won't allocate this, it's too large
 			txt->Vram = GSKIT_ALLOC_ERROR;
 			return 0;
@@ -345,7 +345,7 @@ int rmSetMode(int force) {
 		gsKit_clear(gsGlobal, gColBlack);
 		gsKit_sync_flip(gsGlobal);
 
-		LOG("New vmode: %d, %d x %d\n", vmode, gsGlobal->Width, gsGlobal->Height);
+		LOG("RENDERMAN New vmode: %d, %d x %d\n", vmode, gsGlobal->Width, gsGlobal->Height);
 	}
 	return changed;
 }

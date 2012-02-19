@@ -90,7 +90,7 @@ static void usbInitModules(void) {
 }
 
 void usbLoadModules(void) {
-	LOG("usbLoadModules()\n");
+	LOG("USBSUPPORT LoadModules\n");
 	//first it search for custom usbd in MC?
 	usbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_usbd_irx);
 	if (!usbd_irx) {
@@ -114,11 +114,11 @@ void usbLoadModules(void) {
 
 	delay(gUSBDelay);
 
-	LOG("usbLoadModules: modules loaded\n");
+	LOG("USBSUPPORT Modules loaded\n");
 }
 
 void usbInit(void) {
-	LOG("usbInit()\n");
+	LOG("USBSUPPORT Init\n");
 	usbULSizePrev = -2;
 	memset(usbModifiedCDPrev, 0, 8);
 	memset(usbModifiedDVDPrev, 0, 8);
@@ -238,12 +238,12 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				// Check vmc cluster chain (write operation can cause dammage)
 				sprintf(vmc_path, "%s/VMC/%s.bin", gUSBPrefix, vmc_name);
 				if (fioIoctl(fd, 0xCAFEC0DE, vmc_path)) {
-					LOG("Cluster Chain OK\n");
+					LOG("USBSUPPORT Cluster Chain OK\n");
 					if ((i = fioIoctl(fd, 0xBEEFC0DE, vmc_path)) != 0) {
 						have_error = 0;
 						usb_vmc_infos.active = 1;
 						usb_vmc_infos.start_sector = i;
-						LOG("Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
+						LOG("USBSUPPORT Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
 					}
 				}
 			}
@@ -275,7 +275,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		sprintf(partname, "%s/%s.00", gUSBPrefix, isoname);
 
 	val = fioIoctl(fd, 0xDEADC0DE, partname);
-	LOG("mass storage device sectorsize = %d\n", val);
+	LOG("USBSUPPORT Mass storage device sectorsize = %d\n", val);
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
 	if (val == 4096) {
@@ -344,7 +344,7 @@ static int usbGetImage(char* folder, int isRelative, char* value, char* suffix, 
 
 static void usbCleanUp(int exception) {
 	if (usbGameList.enabled) {
-		LOG("usbCleanUp()\n");
+		LOG("USBSUPPORT CleanUp\n");
 
 		free(usbGames);
 	}

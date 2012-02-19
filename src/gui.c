@@ -493,7 +493,7 @@ static int guiVMCUpdater(int modified) {
 			diaSetInt(diaVMC, VMC_PROGRESS, vmc_status.VMC_progress);
 
 			if (vmc_status.VMC_error != 0)
-				LOG("genvmc updater: %d\n", vmc_status.VMC_error);
+				LOG("GUI VMCUpdater: %d\n", vmc_status.VMC_error);
 
 			if (vmc_status.VMC_status == 0x00) {
 				diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
@@ -502,7 +502,7 @@ static int guiVMCUpdater(int modified) {
 			}
 		}
 		else
-			LOG("status result: %d\n", result);
+			LOG("GUI Status result: %d\n", result);
 	}
 
 	return 0;

@@ -368,7 +368,7 @@ void configGetDiscIDBinary(config_set_t* configSet, void* dst) {
 int configRead(config_set_t* configSet) {
 	file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
 	if (!fileBuffer) {
-		LOG("No config %s.\n", configSet->filename);
+		LOG("CONFIG No file %s.\n", configSet->filename);
 		configSet->modified = 0;
 		return 0;
 	}
@@ -408,7 +408,7 @@ int configRead(config_set_t* configSet) {
 		} else if (parsePrefix(line, prefix)) {
 			// prefix is set, that's about it
 		} else {
-			LOG("Malformed config file '%s' line %d: '%s'\n", configSet->filename, lineno, line);
+			LOG("CONFIG Malformed file '%s' line %d: '%s'\n", configSet->filename, lineno, line);
 		}
 	}
 	closeFileBuffer(fileBuffer);

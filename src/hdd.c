@@ -426,7 +426,7 @@ static int apaCheckPartitionTable(apa_partition_table_t *table)
 	if (apaCheckLinkedList(table, 0) < 0)
 		return -9; // bad links
 
-	LOG("apaCheckPartitionTable OK!\n");
+	LOG("HDD CheckPartitionTable OK!\n");
 
 	return 0;
 }
@@ -436,8 +436,6 @@ static int apaWritePartitionTable(apa_partition_table_t *table)
 {
 	register int ret, i;
 
-	LOG("apaWritePartitionTable\n");
-
 	ret = apaCheckPartitionTable(table);
 	if (ret < 0)
 		return ret;
@@ -446,7 +444,7 @@ static int apaWritePartitionTable(apa_partition_table_t *table)
 
 		if (table->parts[i].modified) {
 			apa_header *part_hdr = &table->parts[i].header;
-			LOG("writing 2 sectors at sector 0x%X\n", part_hdr->start);
+			LOG("HDD Writing 2 sectors at sector 0x%X\n", part_hdr->start);
 #ifndef TEST_WRITES
 			ret = hddWriteSectors(part_hdr->start, 2, (void *)part_hdr);
 			if (ret < 0)
@@ -486,7 +484,7 @@ static int apaDeletePartition(apa_partition_table_t *table, char *partname)
 	register int count = 1;
 	u32 pending_deletes[APA_MAXSUB];
 
-	LOG("apaDeletePartition %s\n", partname);
+	LOG("HDD DeletePartition %s\n", partname);
 
 	// retrieve part index
 	part_index = apaFindPartition(table, partname);
@@ -501,13 +499,13 @@ static int apaDeletePartition(apa_partition_table_t *table, char *partname)
 
 	// preserve a list of starting sectors of partitions to be deleted
 	pending_deletes[0] = part_hdr->start;
-	LOG("apaDeletePartition: found part at %d \n", part_hdr->start / 262144);
+	LOG("HDD Found part at %d \n", part_hdr->start / 262144);
 	for (i=0; i<part_hdr->nsub; i++) {
-		LOG("apaDeletePartition: found subpart at %d \n", part_hdr->subs[i].start / 262144);
+		LOG("HDD Found subpart at %d \n", part_hdr->subs[i].start / 262144);
 		pending_deletes[count++] = part_hdr->subs[i].start;
 	}
 
-	LOG("apaDeletePartition: number of subpartitions=%d count=%d\n", part_hdr->nsub, count);
+	LOG("HDD Number of subpartitions=%d count=%d\n", part_hdr->nsub, count);
 
 	// remove partitions from the double-linked list
 	i = 0;
@@ -527,7 +525,7 @@ static int apaDeletePartition(apa_partition_table_t *table, char *partname)
 			int part_num = table->parts[i].header.start / 262144; // 262144 sectors == 128M
 			int num_parts = table->parts[i].header.length / 262144;
 
-			LOG("apaDeletePartition: partition found! num_parts=%d part_num=%d\n", num_parts, part_num);
+			LOG("HDD Partition found! num_parts=%d part_num=%d\n", num_parts, part_num);
 
 			memmove((void *)&table->parts[i], (void *)&table->parts[i+1], sizeof(apa_partition_t) * (table->part_count-i-1));
 			table->part_count--;
@@ -714,7 +712,7 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 {
 	register int ret;
 
-	LOG("hddDeleteHDLGame() game name='%s'\n", ginfo->name);
+	LOG("HDD Delete game: '%s'\n", ginfo->name);
 
 	if (ptable == NULL)
 		return -1;
@@ -729,7 +727,7 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 
 	hddFlushCache();
 
-	LOG("hddDeleteHDLGame: '%s' deleted!\n", ginfo->name);
+	LOG("HDD Game: '%s' deleted!\n", ginfo->name);
 
 	return 0;
 }

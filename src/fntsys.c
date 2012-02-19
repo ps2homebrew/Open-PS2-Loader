@@ -132,7 +132,6 @@ static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 }
 
 static void fntResetFontDef(font_t *fnt) {
-	LOG("fntResetFontDef\n");
 	fnt->glyphCache = NULL;
 	fnt->cacheMaxPageID = -1;
 	fnt->isValid = 0;
@@ -168,12 +167,12 @@ static void fntDestroyCLUT() {
 }
 
 void fntInit(void) {
-	LOG("fntInit\n");
+	LOG("FNTSYS Init\n");
 	int error = FT_Init_FreeType(&font_library);
 
 	if (error) {
 		// just report over the ps2link
-		LOG("Freetype init failed with %x!\n", error);
+		LOG("FNTSYS Freetype init failed with %x!\n", error);
 		// SleepThread();
 	}
 
@@ -193,7 +192,6 @@ void fntInit(void) {
 }
 
 static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
-	LOG("fntCacheFlushPage\n");
 	int i;
 
 	for (i = 0; i < GLYPH_CACHE_PAGE_SIZE; ++i, ++page) {
@@ -205,8 +203,6 @@ static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
 }
 
 static void fntCacheFlush(font_t *fnt) {
-	LOG("fntCacheFlush\n");
-	
 	int i;
 
 	// Release all the glyphs from the cache
@@ -231,7 +227,6 @@ static void fntCacheFlush(font_t *fnt) {
 }
 
 static int fntNewFont() {
-	LOG("fntNewFont\n");
 	int i;
 	for (i = 0; i < FNT_MAX_COUNT; ++i) {
 		if (fonts[i].isValid == 0) {
@@ -244,8 +239,6 @@ static int fntNewFont() {
 }
 
 void fntDeleteFont(font_t *font) {
-	LOG("fntDeleteFont\n");
-	
 	// skip already deleted fonts
 	if (!font->isValid)
 		return;
@@ -264,8 +257,6 @@ void fntDeleteFont(font_t *font) {
 }
 
 int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
-	LOG("fntLoadSlot\n");
-	
 	if (!buffer) {
 		buffer = &freesansfont_raw;
 		bufferSize = size_freesansfont_raw;
@@ -277,7 +268,7 @@ int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 
 	if (error) {
 		// just report over the ps2link
-		LOG("Freetype: Font loading failed with %x!\n", error);
+		LOG("FNTSYS Freetype font loading failed with %x!\n", error);
 		// SleepThread();
 		return -1;
 	}
@@ -291,7 +282,7 @@ int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 
 	if (error) {
 		// just report over the ps2link
-		LOG("Freetype: Error setting font pixel size with %x!\n", error);
+		LOG("FNTSYS Freetype error setting font pixel size with %x!\n", error);
 		// SleepThread();
 		return -1;
 	}
@@ -301,8 +292,6 @@ int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
 }
 
 int fntLoad(void* buffer, int bufferSize, int takeover) {
-	LOG("fntLoad\n");
-	
 	// we need a new slot in the font array
 	int fontID = fntNewFont();
 
@@ -321,7 +310,7 @@ int fntLoad(void* buffer, int bufferSize, int takeover) {
 }
 
 int fntLoadFile(char* path) {
-	LOG("fntLoadFile\n");
+	LOG("FNTSYS LoadFile: %s\n", path);
 	// load the buffer with font
 	int size = -1;
 	void* customFont = readFile(path, -1, &size);
@@ -335,14 +324,13 @@ int fntLoadFile(char* path) {
 }
 
 void fntRelease(int id) {
-	LOG("fntRelease\n");
 	if (id < FNT_MAX_COUNT)
 		fntDeleteFont(&fonts[id]);
 }
 
 /** Terminates the font rendering system */
 void fntEnd(void) {
-	LOG("fntEnd\n");
+	LOG("FNTSYS End\n");
 	// release all the fonts
 	int id;
 	for (id = 0; id < FNT_MAX_COUNT; ++id)
@@ -368,7 +356,7 @@ static atlas_t *fntNewAtlas() {
 static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 	FT_GlyphSlot slot = fnt->face->glyph;
 	
- 	//LOG("fntGlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
+ 	//LOG("FNTSYS GlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
 	
 	if (slot->bitmap.width == 0 || slot->bitmap.rows == 0) {
 		// no bitmap glyph, just skip
@@ -378,10 +366,10 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 	int aid;
 	
 	for (aid = 0; aid < ATLAS_MAX; ++aid) {
-		//LOG("  * Placing aid %d...\n", aid);
+		//LOG("FNTSYS Placing aid %d...\n", aid);
 		atlas_t **atl = &fnt->atlases[aid];
 		if (!*atl) { // atlas slot not yet used
-			//LOG("  * aid %d is new...\n", aid);
+			//LOG("FNTSYS aid %d is new...\n", aid);
 			*atl = fntNewAtlas();
 		}
 		
@@ -389,14 +377,14 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 			atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
 			
 		if (glyph->allocation) {
-			//LOG("  * found placement\n", aid);
+			//LOG("FNTSYS Found placement\n", aid);
 			glyph->atlas = *atl;
 			
 			return 1;
 		}
 	}
 	
-	LOG("  * ! no atlas free\n", aid);
+	LOG("FNTSYS No atlas free\n", aid);
 	return 0;
 }
 
@@ -425,13 +413,13 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 
 	// not cached but valid. Cache
 	if (!fnt->face) {
-		LOG("FNT: Face is NULL!\n");
+		LOG("FNTSYS Face is NULL!\n");
 	}
 
 	int error = FT_Load_Char(fnt->face, gid, FT_LOAD_RENDER);
 
 	if (error) {
-		LOG("FNT: Error loading glyph - %d\n", error);
+		LOG("FNTSYS Error loading glyph - %d\n", error);
 		return NULL;
 	}
 
@@ -453,7 +441,6 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 }
 
 void fntSetAspectRatio(float aw, float ah) {
-	LOG("fntSetAspectRatio\n");
 	// flush cache - it will be invalid after the setting
 	int i;
 

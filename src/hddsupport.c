@@ -115,7 +115,7 @@ static int hddCheckHDProKit(void)
 	FlushCache(2);
 
 	if (ret)
-		LOG("hddCheckHDPro() HD Pro Kit detected!\n");
+		LOG("HDDSUPPORT HD Pro Kit detected!\n");
 
 	return ret;
 }
@@ -124,7 +124,7 @@ void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
-	LOG("hddLoadModules()\n");
+	LOG("HDDSUPPORT LoadModules\n");
 
 	gHddStartup = 4;
 
@@ -164,7 +164,7 @@ void hddLoadModules(void) {
 		return;
 	}
 
-	LOG("hddLoadModules: modules loaded\n");
+	LOG("HDDSUPPORT modules loaded\n");
 
 	hddSetIdleTimeout(gHDDSpindown * 12); // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
 
@@ -178,7 +178,7 @@ void hddLoadModules(void) {
 }
 
 void hddInit(void) {
-	LOG("hddInit()\n");
+	LOG("HDDSUPPORT Init\n");
 	hddForceUpdate = 1;
 
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddInitModules);
@@ -263,13 +263,13 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 			if (part_hdr.nsub <= 4) {
 				hdd_vmc_infos.parts[0].start = part_hdr.start;
 				hdd_vmc_infos.parts[0].length = part_hdr.length;
-				LOG("hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
-				LOG("hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
+				LOG("HDDSUPPORT hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
+				LOG("HDDSUPPORT hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
 				for (i = 0; i < part_hdr.nsub; i++) {
 					hdd_vmc_infos.parts[i+1].start = part_hdr.subs[i].start;
 					hdd_vmc_infos.parts[i+1].length = part_hdr.subs[i].length;
-					LOG("hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
-					LOG("hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
+					LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
+					LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
 				}
 				part_valid = 1;
 			}
@@ -308,9 +308,9 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 								hdd_vmc_infos.blocks[i].number = pfs_inode.data[i+1].number;
 								hdd_vmc_infos.blocks[i].subpart = pfs_inode.data[i+1].subpart;
 								hdd_vmc_infos.blocks[i].count = pfs_inode.data[i+1].count;
-								LOG("hdd_vmc_infos.blocks[%d].number     : 0x%X\n", i, hdd_vmc_infos.blocks[i].number);
-								LOG("hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
-								LOG("hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
+								LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].number     : 0x%X\n", i, hdd_vmc_infos.blocks[i].number);
+								LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
+								LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
 							}
 						} // else Vmc file too much fragmented
 					}
@@ -467,7 +467,7 @@ static int hddGetImage(char* folder, int isRelative, char* value, char* suffix, 
 
 static void hddCleanUp(int exception) {
 	if (hddGameList.enabled) {
-		LOG("hddCleanUp()\n");
+		LOG("HDDSUPPORT CleanUp\n");
 
 		hddFreeHDLGamelist(hddGames);
 

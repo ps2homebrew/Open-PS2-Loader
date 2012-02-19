@@ -165,14 +165,14 @@ static int lngLoadFromFile(char* path, char *name) {
 		}
 		closeFileBuffer(fileBuffer);
 		
-		LOG("LANG: #### Loaded %d entries\n", strId);
+		LOG("LANG Loaded %d entries\n", strId);
 
 		// remember how many entries were read from the file (for the free later)
 		nValidEntries = strId;
 
 		// if necessary complete lang with default internal
 		while (strId < LANG_STR_COUNT) {
-			LOG("LANG: #### Default entry added: %s\n", internalEnglish[strId]);
+			LOG("LANG Default entry added: %s\n", internalEnglish[strId]);
 			lang_strs[strId] = internalEnglish[strId];
 			strId++;
 		}
@@ -181,7 +181,7 @@ static int lngLoadFromFile(char* path, char *name) {
 		char path[255];
 		snprintf(path, 255, "%s/font_%s.ttf", gBaseMCDir, name);
 		
-		LOG("#### Custom font path: %s\n", path);
+		LOG("LANG Custom font path: %s\n", path);
 		
 		void* customFont = readFile(path, -1, &size);
 		if (customFont)

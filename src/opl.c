@@ -915,11 +915,11 @@ int main(int argc, char* argv[])
 	for (i=1; i<argc; i++) {
 		if (!(strcmp(argv[i], "-use-early-debug"))) {
 			use_early_debug = 1;
-			PREINIT_LOG("Using early debug.\n");
+			PREINIT_LOG("OPL Using early debug.\n");
 		}
 		if (!(strcmp(argv[i], "-test-exception"))) {
 			exception_test = 1;
-			PREINIT_LOG("Exception test requested.\n");
+			PREINIT_LOG("OPL Exception test requested.\n");
 		}
 	}
 	#endif

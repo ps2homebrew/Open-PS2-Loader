@@ -118,7 +118,7 @@ void* readFile(char* path, int align, int* size) {
 		unsigned int realSize = getFileSize(fd);
 
 		if ((*size > 0) && (*size != realSize)) {
-			LOG("Invalid filesize, expected: %d, got: %d\n", *size, realSize);
+			LOG("UTIL Invalid filesize, expected: %d, got: %d\n", *size, realSize);
 			fioClose(fd);
 			return NULL;
 		}
@@ -129,7 +129,7 @@ void* readFile(char* path, int align, int* size) {
 			buffer = malloc(realSize);
 
 		if (!buffer) {
-			LOG("readFile: Failed allocation of %d bytes", realSize);
+			LOG("UTIL ReadFile: Failed allocation of %d bytes", realSize);
 			*size = 0;
 		} else {
 			fioRead(fd, buffer, realSize);

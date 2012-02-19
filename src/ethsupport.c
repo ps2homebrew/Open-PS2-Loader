@@ -153,7 +153,7 @@ static void ethLoadModules(void) {
 	int ipconfiglen;
 	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 
-	LOG("ethLoadModules()\n");
+	LOG("ETHSUPPORT LoadModules\n");
 
 	ipconfiglen = sysSetIPConfig(ipconfig);
 
@@ -167,7 +167,7 @@ static void ethLoadModules(void) {
 				if (sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig) >= 0) {
 					gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
 					if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
-						LOG("ethLoadModules: modules loaded\n");
+						LOG("ETHSUPPORT Modules loaded\n");
 						ethInitSMB();
 						return;
 					}
@@ -180,7 +180,7 @@ static void ethLoadModules(void) {
 }
 
 void ethInit(void) {
-	LOG("ethInit()\n");
+	LOG("ETHSUPPORT Init\n");
 
 	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
 		ethULSizePrev = -2;
@@ -257,7 +257,7 @@ static int ethUpdateGameList(void) {
 			free(ethGames);
 			ethGames = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
 			for (i = 0; i < count; i++) {
-				LOG("Share found: %s\n", sharelist[i].ShareName);
+				LOG("ETHSUPPORT Share found: %s\n", sharelist[i].ShareName);
 				base_game_info_t *g = &ethGames[i];
 				memcpy(g->name, sharelist[i].ShareName, 32);
 				g->name[31] = '\0';
@@ -430,7 +430,7 @@ static int ethGetImage(char* folder, int isRelative, char* value, char* suffix, 
 
 static void ethCleanUp(int exception) {
 	if (ethGameList.enabled) {
-		LOG("ethCleanUp()\n");
+		LOG("ETHSUPPORT CleanUp\n");
 
 		free(ethGames);
 	}

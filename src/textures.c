@@ -173,7 +173,7 @@ static void texPngReadData(GSTEXTURE* texture, png_structp pngPtr, png_infop inf
 	
 	// failed allocation
 	if (!texture->Mem) {
-		LOG("texPngReadData: Failed to allocate %d bytes\n", size);
+		LOG("TEXTURES PngReadData: Failed to allocate %d bytes\n", size);
 		return;
 	}
 
@@ -307,7 +307,7 @@ int texJpgLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
 			
 			// failed allocation
 			if (!texture->Mem) {
-				LOG("texJpgLoad: Failed to allocate %d bytes\n", size);
+				LOG("TEXTURES JpgLoad: Failed to allocate %d bytes\n", size);
 			} else {
 				// okay
 				texUpdate(texture, jpg->width, jpg->height);

@@ -418,7 +418,7 @@ typedef struct { // size = 76
 	int VMC_error;
 	int VMC_progress;
 	char VMC_msg[64];
-}statusVMCparam_t;
+} statusVMCparam_t;
 
 #define OPERATION_CREATE	0
 #define OPERATION_CREATING	1
@@ -592,7 +592,6 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 
 	return result;
 }
-
 #endif
 
 int guiAltStartupNameHandler(char* text, int maxLen) {

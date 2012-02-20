@@ -116,6 +116,7 @@ typedef struct theme {
 theme_t* gTheme;
 
 void thmInit();
+void thmReinit(char* path);
 void thmReloadScreenExtents();
 void thmAddElements(char* path, char* separator, int mode);
 char* thmGetValue();

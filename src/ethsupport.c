@@ -180,14 +180,14 @@ static void ethLoadModules(void) {
 }
 
 void ethInit(void) {
-	LOG("ETHSUPPORT Init\n");
-
 	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
+		LOG("ETHSUPPORT Re-Init\n");
+		thmReinit(ethBase);
 		ethULSizePrev = -2;
 		ethGameCount = 0;
-
 		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethInitSMB);
 	} else {
+		LOG("ETHSUPPORT Init\n");
 		ethBase = "smb0:";
 		ethULSizePrev = -2;
 		memset(ethModifiedCDPrev, 0, 8);
@@ -195,9 +195,7 @@ void ethInit(void) {
 		ethGameCount = 0;
 		ethGames = NULL;
 		gNetworkStartup = ERROR_ETH_NOT_STARTED;
-
 		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethLoadModules);
-
 		ethGameList.enabled = 1;
 	}
 }
@@ -316,8 +314,11 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	if (!gPCShareName[0]) {
 		memcpy(gPCShareName, game->name, 32);
-		//ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethInitSMB);
-		//ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode);
+		ethULSizePrev = -2;
+		ethGameCount = 0;
+		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode); // clear the share list
+		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethInitSMB);
+		ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode); // reload the game list
 		return;
 	}
 

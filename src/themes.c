@@ -1190,6 +1190,28 @@ void thmInit() {
 	thmAddElements(gBaseMCDir, "/", -1);
 }
 
+void thmReinit(char* path) {
+	thmLoad(NULL);
+	guiThemeID = 0;
+
+	int i = 0;
+	while (i < nThemes) {
+		if (strncmp(themes[i].filePath, path, strlen(path)) == 0) {
+			LOG("THEMES Remove theme: %s\n", themes[i].filePath);
+			nThemes--;
+			free(themes[i].name);
+			themes[i].name = themes[nThemes].name;
+			themes[nThemes].name = NULL;
+			free(themes[i].filePath);
+			themes[i].filePath = themes[nThemes].filePath;
+			themes[nThemes].filePath = NULL;
+		} else
+			i++;
+	}
+
+	thmRebuildGuiNames();
+}
+
 void thmReloadScreenExtents() {
 	rmGetScreenExtents(&screenWidth, &screenHeight);
 }

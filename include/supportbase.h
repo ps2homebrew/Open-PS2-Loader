@@ -9,6 +9,7 @@ typedef struct
 {
 	char name[ISO_GAME_NAME_MAX + 1]; // MUST be the higher value from UL / ISO
 	char startup[GAME_STARTUP_MAX + 1];
+	char extension[5];
 	unsigned char parts;
 	unsigned char media;
 	unsigned short isISO;
@@ -17,7 +18,7 @@ typedef struct
 
 int sbIsSameSize(const char* prefix, int prevSize);
 void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount);
-int sbPrepare(base_game_info_t* game, config_set_t* configSet, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex);
+int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex);
 void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id);
 void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id, char* newname);
 config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep);

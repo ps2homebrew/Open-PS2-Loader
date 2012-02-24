@@ -208,7 +208,7 @@ static void usbDeleteGame(int id) {
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
 	int i, fd, val, index, compatmask;
-	char isoname[32], partname[255], filename[32];
+	char partname[255], filename[32];
 	base_game_info_t* game = &usbGames[id];
 
 	fd = fioDopen(usbPrefix);
@@ -269,27 +269,15 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	}
 #endif
 
-	if (game->isISO)
-		sprintf(partname, "%s/%s/%s.%s.iso", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name);
-	else
-		sprintf(partname, "%s/%s.00", gUSBPrefix, isoname);
-
-	val = fioIoctl(fd, 0xDEADC0DE, partname);
-	LOG("USBSUPPORT Mass storage device sectorsize = %d\n", val);
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
-	if (val == 4096) {
-		irx = &usb_4Ksectors_cdvdman_irx;
-		irx_size = size_usb_4Ksectors_cdvdman_irx;
-	}
+	for (i = 0; i < game->parts; i++) {
+		if (game->isISO)
+			sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+		else
+			sprintf(partname, "%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, i);
 
-	compatmask = sbPrepare(game, configSet, isoname, irx_size, irx, &index);
-
-	if (gCheckUSBFragmentation)
-		for (i = 0; i < game->parts; i++) {
-			if (!game->isISO)
-				sprintf(partname, "%s/%s.%02x", gUSBPrefix, isoname, i);
-
+		if (gCheckUSBFragmentation) {
 			if (fioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
 				fioDclose(fd);
 				guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
@@ -297,19 +285,23 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			}
 		}
 
+		if (i == 0) {
+			val = fioIoctl(fd, 0xDEADC0DE, partname);
+			LOG("USBSUPPORT Mass storage device sector size = %d\n", val);
+			if (val == 4096) {
+				irx = &usb_4Ksectors_cdvdman_irx;
+				irx_size = size_usb_4Ksectors_cdvdman_irx;
+			}
+			compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
+		}
+
+		val = fioIoctl(fd, 0xBEEFC0DE, partname);
+		memcpy((void*)((u32)irx + index + 44 + 4 * i), &val, 4);
+	}
+
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
 		saveConfig(CONFIG_LAST, 0);
-	}
-
-	int offset = 44;
-	for (i = 0; i < game->parts; i++) {
-		if (!game->isISO)
-			sprintf(partname, "%s/%s.%02x", gUSBPrefix, isoname, i);
-
-		val = fioIoctl(fd, 0xBEEFC0DE, partname);
-		memcpy((void*)((u32)&usb_cdvdman_irx + index + offset), &val, 4);
-		offset += 4;
 	}
 
 	fioDclose(fd);

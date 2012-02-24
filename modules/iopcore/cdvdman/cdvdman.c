@@ -1121,11 +1121,11 @@ void fs_init(void)
 	if (g_part_start[0]) {
 		char *game_name = (char *)&g_part_start[0];
 		if (g_pc_prefix[0]) {
-			path_str = (g_ISO_media == 0x12) ? "%s\\CD\\%s.%s.iso" : "%s\\DVD\\%s.%s.iso";
-			sprintf(tmp_str, path_str, g_pc_prefix, g_ISO_name, game_name);
+			path_str = (g_ISO_media == 0x12) ? "%s\\CD\\%s.%s%s" : "%s\\DVD\\%s.%s%s";
+			sprintf(tmp_str, path_str, g_pc_prefix, g_ISO_name + 5, game_name, g_ISO_name);
 		} else {
-			path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s.iso" : "DVD\\%s.%s.iso";
-			sprintf(tmp_str, path_str, g_ISO_name, game_name);
+			path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s%s" : "DVD\\%s.%s%s";
+			sprintf(tmp_str, path_str, g_ISO_name + 5, game_name, g_ISO_name);
 		}
 		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i++], 0);
 	} else {

@@ -207,7 +207,7 @@ static void usbDeleteGame(int id) {
 #endif
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
-	int i, fd, val, index, compatmask;
+	int i, fd, val, index, compatmask = 0;
 	char partname[255], filename[32];
 	base_game_info_t* game = &usbGames[id];
 

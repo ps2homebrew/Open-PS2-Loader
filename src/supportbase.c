@@ -59,6 +59,8 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 				game->name[size] = '\0';
 				strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
 				game->startup[GAME_STARTUP_MAX - 1] = '\0';
+				strncpy(game->extension, &record.name[GAME_STARTUP_MAX + size], 4);
+				game->extension[4] = '\0';
 				game->parts = 0x01;
 				game->media = type;
 				game->isISO = 1;
@@ -118,6 +120,7 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 				g->name[UL_GAME_NAME_MAX] = '\0';
 				memcpy(g->startup, &buffer[UL_GAME_NAME_MAX + 3], GAME_STARTUP_MAX);
 				g->startup[GAME_STARTUP_MAX] = '\0';
+				g->extension[0] = '\0';
 				memcpy(&g->parts, &buffer[47], 1);
 				memcpy(&g->media, &buffer[48], 1);
 				g->isISO = 0;
@@ -143,7 +146,7 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	*gamecount = count;
 }
 
-int sbPrepare(base_game_info_t* game, config_set_t* configSet, char* isoname, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
+int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
 	int i;
 
 	unsigned int compatmask = 0;
@@ -152,14 +155,6 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, char* isoname, in
 	char gameid[5];
 	configGetDiscIDBinary(configSet, gameid);
 
-	if (game->isISO)
-		strcpy(isoname, game->startup);
-	else {
-		char gamename[UL_GAME_NAME_MAX + 1];
-		memset(gamename, 0, UL_GAME_NAME_MAX + 1);
-		strncpy(gamename, game->name, UL_GAME_NAME_MAX);
-		sprintf(isoname,"ul.%08X.%s", USBA_crc32(gamename), game->startup);
-	}
 
 	for (i = 0; i < size_cdvdman; i++) {
 		if (!strcmp((const char*)((u32)cdvdman_irx + i),"######    GAMESETTINGS    ######")) {
@@ -167,7 +162,8 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, char* isoname, in
 		}
 	}
 
-	memcpy((void*)((u32)cdvdman_irx + i), isoname, strlen(isoname) + 1);
+	memcpy((void*)((u32)cdvdman_irx + i), game->extension, 5);
+	strcpy((void*)((u32)cdvdman_irx + i + 5), game->startup);
 	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1);
 	memcpy((void*)((u32)cdvdman_irx + i + 34), &game->media, 1);
 	if (compatmask & COMPAT_MODE_2) {
@@ -255,9 +251,9 @@ void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int 
 
 	if (game->isISO) {
 		if (game->media == 0x12)
-			snprintf(path, 255, "%sCD%s%s.%s.iso", prefix, sep, game->startup, game->name);
+			snprintf(path, 255, "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
 		else
-			snprintf(path, 255, "%sDVD%s%s.%s.iso", prefix, sep, game->startup, game->name);
+			snprintf(path, 255, "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
 		fileXioRemove(path);
 	} else {
 		char *pathStr = "%sul.%08X.%s.%02x";
@@ -278,11 +274,11 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 
 	if (game->isISO) {
 		if (game->media == 0x12) {
-			snprintf(oldpath, 255, "%sCD%s%s.%s.iso", prefix, sep, game->startup, game->name);
-			snprintf(newpath, 255, "%sCD%s%s.%s.iso", prefix, sep, game->startup, newname);
+			snprintf(oldpath, 255, "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			snprintf(newpath, 255, "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
 		} else {
-			snprintf(oldpath, 255, "%sDVD%s%s.%s.iso", prefix, sep, game->startup, game->name);
-			snprintf(newpath, 255, "%sDVD%s%s.%s.iso", prefix, sep, game->startup, newname);
+			snprintf(oldpath, 255, "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			snprintf(newpath, 255, "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
 		}
 		fileXioRename(oldpath, newpath);
 	} else {

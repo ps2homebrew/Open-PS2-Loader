@@ -260,6 +260,7 @@ static int ethUpdateGameList(void) {
 				memcpy(g->name, sharelist[i].ShareName, 32);
 				g->name[31] = '\0';
 				sprintf(g->startup, "SHARE");
+				g->extension[0] = '\0';
 				g->parts = 0x00;
 				g->media = 0x00;
 				g->isISO = 0;
@@ -309,7 +310,7 @@ static void ethRenameGame(int id, char* newName) {
 static void ethLaunchGame(int id, config_set_t* configSet) {
 	int i, compatmask, size_irx = 0;
 	void** irx = NULL;
-	char isoname[32], filename[32];
+	char filename[32];
 	base_game_info_t* game = &ethGames[id];
 
 	if (!gPCShareName[0]) {
@@ -377,7 +378,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		irx = &smb_cdvdman_irx;
 	}
 
-	compatmask = sbPrepare(game, configSet, isoname, size_irx, irx, &i);
+	compatmask = sbPrepare(game, configSet, size_irx, irx, &i);
 
 	// For ISO we use the part table to store the "long" name (only for init)
 	if (game->isISO)

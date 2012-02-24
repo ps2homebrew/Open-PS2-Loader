@@ -5,7 +5,7 @@
 #include "include/mcemu.h"
 #endif
 
-#define SYS_LOAD_MC_MODULES	0x01
+#define SYS_LOAD_MC_MODULES		0x01
 #define SYS_LOAD_PAD_MODULES	0x02
 
 void delay(int count);

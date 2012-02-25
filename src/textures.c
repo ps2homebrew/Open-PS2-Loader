@@ -66,12 +66,12 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 	{ TRIANGLE_ICON, "triangle", &triangle_png },
 	{ CIRCLE_ICON, "circle", &circle_png },
 	{ SQUARE_ICON, "square", &square_png },
+	{ SELECT_ICON, "select", &select_png },
+	{ START_ICON, "start", &start_png },
 	{ L1_ICON, "L1", &L1_png },
 	{ L2_ICON, "L2", &L2_png },
 	{ R1_ICON, "R1", &R1_png },
 	{ R2_ICON, "R2", &R2_png },
-	{ SELECT_ICON, "select", &select_png },
-	{ START_ICON, "start", &start_png },
 	{ LOGO_PICTURE, "logo", &logo_png },
 };
 

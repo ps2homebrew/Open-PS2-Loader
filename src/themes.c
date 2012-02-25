@@ -1140,11 +1140,11 @@ static void thmLoad(char* themePath) {
 	gTheme->loadingIconCount = i;
 
 	// Customizable icons
-	for (i = USB_ICON; i <= SQUARE_ICON; i++)
+	for (i = USB_ICON; i <= START_ICON; i++)
 		thmLoadResource(i, themePath, GS_PSM_CT32, gTheme->useDefault);
 
 	// Not  customizable icons
-	for (i = L1_ICON; i <= START_ICON; i++)
+	for (i = L1_ICON; i <= R2_ICON; i++)
 		thmLoadResource(i, NULL, GS_PSM_CT32, 1);
 }
 

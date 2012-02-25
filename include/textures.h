@@ -21,12 +21,12 @@
 #define TRIANGLE_ICON		17
 #define CIRCLE_ICON			18
 #define SQUARE_ICON			19
-#define L1_ICON				20
-#define L2_ICON				21
-#define R1_ICON				22
-#define R2_ICON				23
-#define SELECT_ICON			24
-#define START_ICON			25
+#define SELECT_ICON			20
+#define START_ICON			21
+#define L1_ICON				22
+#define L2_ICON				23
+#define R1_ICON				24
+#define R2_ICON				25
 #define LOGO_PICTURE		26
 
 #define TEXTURES_COUNT		27

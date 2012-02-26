@@ -381,8 +381,14 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	compatmask = sbPrepare(game, configSet, size_irx, irx, &i);
 
 	// For ISO we use the part table to store the "long" name (only for init)
-	if (game->isISO)
+	if (game->isISO) {
+		memcpy((void*)((u32)irx + i), game->extension, 5);
+		strcpy((void*)((u32)irx + i + 5), game->startup);
 		memcpy((void*)((u32)irx + i + 44), game->name, strlen(game->name) + 1);
+	} else {
+		sprintf(filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
+		memcpy((void*)((u32)irx + i), filename, strlen(filename) + 1);
+	}
 
 	for (i = 0; i < size_irx; i++) {
 		if (!strcmp((const char*)((u32)irx + i),"xxx.xxx.xxx.xxx")) {

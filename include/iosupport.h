@@ -15,14 +15,17 @@
 #define COMPAT				0x01 // default compatibility flags
 #define COMPAT_FULL			0x02 // default + DMA compat flags
 
-#define COMPAT_MODE_1 		0x01
-#define COMPAT_MODE_2 		0x02
-#define COMPAT_MODE_3 		0x04
-#define COMPAT_MODE_4 		0x08
-#define COMPAT_MODE_5 		0x10
-#define COMPAT_MODE_6 		0x20
-#define COMPAT_MODE_7 		0x40
-#define COMPAT_MODE_8 		0x80
+#define COMPAT_MODE_1 		 0x01 // Load alternate core
+#define COMPAT_MODE_2 		 0x02 // Alternative data read method
+#define COMPAT_MODE_3 		 0x04 // Unhook Syscalls
+#define COMPAT_MODE_4 		 0x08 // 0 PSS mode
+#define COMPAT_MODE_5 		 0x10 // Disable DVD-DL
+#define COMPAT_MODE_6 		 0x20 // Disable IGR
+#define COMPAT_MODE_7 		 0x40 // Reduced cdvdfsv buffer (UNUSED)
+#define COMPAT_MODE_8 		 0x80 // Hide dev9 module
+#define COMPAT_MODE_9		0x100 // Alternate IGR combo (UNUSED)
+
+#define COMPAT_MODE_COUNT		8
 
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 8

@@ -188,7 +188,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	memcpy((void*)((u32)cdvdman_irx + i), &gameid, 5);
 
 	// patches cdvdfsv
-	void *cdvdfsv_irx;
+	/*void *cdvdfsv_irx;
 	int size_cdvdfsv_irx;
 
 	sysGetCDVDFSV(&cdvdfsv_irx, &size_cdvdfsv_irx);
@@ -202,7 +202,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 			break;
 		}
 		p++;
-	}
+	}*/
 
 	return compatmask;
 }

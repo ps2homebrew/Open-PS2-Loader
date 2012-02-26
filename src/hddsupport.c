@@ -405,7 +405,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	memcpy((void*)((u32)irx+i), &gid, 5);
 
 	// patches cdvdfsv
-	void *cdvdfsv_irx;
+	/*void *cdvdfsv_irx;
 	int size_cdvdfsv_irx;
 
 	sysGetCDVDFSV(&cdvdfsv_irx, &size_cdvdfsv_irx);
@@ -419,7 +419,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 			break;
 		}
 		p++;
-	}
+	}*/
 
 	char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))

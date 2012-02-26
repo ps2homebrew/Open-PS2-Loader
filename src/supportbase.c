@@ -162,8 +162,6 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 		}
 	}
 
-	memcpy((void*)((u32)cdvdman_irx + i), game->extension, 5);
-	strcpy((void*)((u32)cdvdman_irx + i + 5), game->startup);
 	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1);
 	memcpy((void*)((u32)cdvdman_irx + i + 34), &game->media, 1);
 	if (compatmask & COMPAT_MODE_2) {

@@ -89,7 +89,7 @@ struct UIItem diaCompatConfig[] = {
 	
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_DMA, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 	
 	{UI_SPLITTER},
 	

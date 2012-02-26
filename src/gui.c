@@ -613,12 +613,12 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	if (support->haveCompatibilityMode == COMPAT_FULL) {
 		configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6",	NULL };
-		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaModes);
-		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaMode);
+		diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
+		diaSetInt(diaCompatConfig, COMPAT_DMA, dmaMode);
 	} else {
 		const char* dmaModes[] = { NULL };
-		diaSetEnum(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, dmaModes);
-		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, 0);
+		diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
+		diaSetInt(diaCompatConfig, COMPAT_DMA, 0);
 	}
 
 	diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
@@ -710,7 +710,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		}
 
 		if (support->haveCompatibilityMode == COMPAT_FULL) {
-			diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + COMPAT_MODE_COUNT, &dmaMode);
+			diaGetInt(diaCompatConfig, COMPAT_DMA, &dmaMode);
 			if (dmaMode != 7)
 				configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
 			else

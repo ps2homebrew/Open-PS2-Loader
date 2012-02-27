@@ -198,7 +198,10 @@ static void drawAttributeText(struct menu_list* menu, struct submenu_list* item,
 		}
 	}
 	if (mutableText->displayMode == DISPLAY_ALWAYS)
-		fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->alias, elem->color);
+		if (mutableText->sizingMode == SIZING_NONE)
+			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->alias, elem->color);
+		else
+			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->alias, elem->color);
 }
 
 static void initAttributeText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,

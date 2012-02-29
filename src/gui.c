@@ -298,7 +298,7 @@ void guiShowUIConfig() {
 
 	// configure the enumerations
 	const char* scrollSpeeds[] = { _l(_STR_SLOW), _l(_STR_MEDIUM),	_l(_STR_FAST), NULL };
-	const char* vmodeNames[] = { "AUTO", "PAL", "NTSC", NULL };
+	const char* vmodeNames[] = { _l(_STR_AUTO), "PAL", "NTSC", NULL };
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **) thmGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **) lngGetGuiList());

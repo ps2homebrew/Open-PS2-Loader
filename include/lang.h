@@ -121,8 +121,26 @@
 #define _STR_RECONNECT					116
 #define _STR_HINT_SHARENAME				117
 #define _STR_ETH_PREFIX					118
+#define _STR_BACKSPACE					119
+#define _STR_SPACE						120
+#define _STR_ENTER						121
+#define _STR_MODE						122
+#define _STR_VMC_SLOT1					123
+#define _STR_VMC_SLOT2					124
+#define _STR_GAME_ID					125
+#define _STR_DMA_MODE					126
+#define _STR_VSYNC						127
+#define _STR_MODE1						128
+#define _STR_MODE2						129
+#define _STR_MODE3						130
+#define _STR_MODE4						131
+#define _STR_MODE5						132
+#define _STR_MODE6						133
+#define _STR_MODE7						134
+#define _STR_MODE8						135
+#define _STR_MODE9						136
 
-#define LANG_STR_COUNT 119
+#define LANG_STR_COUNT 137
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

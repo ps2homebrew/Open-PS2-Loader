@@ -61,7 +61,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '~', '.' };
 	char *keyb = keyb0;
 
-	char *commands[KEYB_HEIGHT] = {"BACKSPACE", "SPACE", "ENTER", "MODE"};
+	char *commands[KEYB_HEIGHT] = {_l(_STR_BACKSPACE), _l(_STR_SPACE), _l(_STR_ENTER), _l(_STR_MODE)};
 	GSTEXTURE *cmdicons[KEYB_HEIGHT];
 	cmdicons[0] = thmGetTexture(SQUARE_ICON);
 	cmdicons[1] = thmGetTexture(TRIANGLE_ICON);
@@ -86,7 +86,7 @@ int diaShowKeyb(char* text, int maxLen) {
 			for (i = 0; i < KEYB_WIDTH; i++) {
 				c[0] = keyb[i + j * KEYB_WIDTH];
 
-				x = 50 + i * 32;
+				x = 50 + i * 31;
 				w = fntRenderString(FNT_DEFAULT, x, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, 0, 0, c, gTheme->uiTextColor) - x;
 				if ((i + j * KEYB_WIDTH) == selchar)
 					diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
@@ -96,9 +96,9 @@ int diaShowKeyb(char* text, int maxLen) {
 		// Commands
 		for (i = 0; i < KEYB_HEIGHT; i++) {
 			if (cmdicons[i])
-				rmDrawPixmap(cmdicons[i], 448, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
+				rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
 			
-			x = 489;
+			x = 477;
 			w = fntRenderString(FNT_DEFAULT, x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;
 			if (i == selcommand)
 				diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);

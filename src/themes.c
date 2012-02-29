@@ -181,12 +181,12 @@ static void drawAttributeText(struct menu_list* menu, struct submenu_list* item,
 			}
 		}
 		if (mutableText->currentValue) {
-			if (mutableText->displayMode == DISPLAY_NEVER)
+			if (mutableText->displayMode == DISPLAY_NEVER) {
 				if (mutableText->sizingMode == SIZING_NONE)
 					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->currentValue, elem->color);
 				else
 					fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
-			else {
+			} else {
 				char result[300];
 				snprintf(result, 300, "%s%s", mutableText->alias, mutableText->currentValue);
 				if (mutableText->sizingMode == SIZING_NONE)
@@ -197,11 +197,12 @@ static void drawAttributeText(struct menu_list* menu, struct submenu_list* item,
 			return;
 		}
 	}
-	if (mutableText->displayMode == DISPLAY_ALWAYS)
+	if (mutableText->displayMode == DISPLAY_ALWAYS) {
 		if (mutableText->sizingMode == SIZING_NONE)
 			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->alias, elem->color);
 		else
 			fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->alias, elem->color);
+	}
 }
 
 static void initAttributeText(char* themePath, config_set_t* themeConfig, theme_t* theme, theme_element_t* elem, char* name,

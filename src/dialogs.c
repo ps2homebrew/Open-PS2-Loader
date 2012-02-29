@@ -78,29 +78,29 @@ struct UIItem diaCompatConfig[] = {
 	
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 1", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 2", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 3", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 4", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 5", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 6", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 7", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Mode 8", -1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_BREAK},
 	
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"DMA Mode", -1}}}, {UI_SPACER}, {UI_ENUM, COMPAT_DMA, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_DMA_MODE}}}, {UI_SPACER}, {UI_ENUM, COMPAT_DMA, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 	
 	{UI_SPLITTER},
 	
 #ifdef VMC
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"VMC Slot 1", -1}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SLOT1}}}, {UI_SPACER},
 #ifndef __CHILDPROOF
 	{UI_BUTTON, COMPAT_VMC1_DEFINE, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_SPACER}, {UI_BUTTON, COMPAT_VMC1_ACTION, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_BREAK},
 #else
 	{UI_BUTTON, COMPAT_VMC1_DEFINE, 0, -1, 0, 0, {.label = {NULL, -1}}}, {UI_BREAK},
 #endif
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"VMC Slot 2", -1}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SLOT2}}}, {UI_SPACER},
 #ifndef __CHILDPROOF
 	{UI_BUTTON, COMPAT_VMC2_DEFINE, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_SPACER}, {UI_BUTTON, COMPAT_VMC2_ACTION, 1, -1, 0, 0, {.label = {NULL, -1}}},
 #else
@@ -110,7 +110,7 @@ struct UIItem diaCompatConfig[] = {
 	{UI_SPLITTER},
 #endif
 	
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {"Game ID", -1}}}, {UI_SPACER}, {UI_STRING, COMPAT_GAMEID, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GAME_ID}}}, {UI_SPACER}, {UI_STRING, COMPAT_GAMEID, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
 	{UI_SPACER}, {UI_BUTTON, COMPAT_LOADFROMDISC, 1, -1, 0, 0, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
 
 	{UI_SPLITTER},
@@ -196,7 +196,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_VMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_VMODE, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {"V-Sync", -1}}}, {UI_SPACER}, {UI_BOOL, UICFG_VSYNC, 1, -1, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_VSYNC}}}, {UI_SPACER}, {UI_BOOL, UICFG_VSYNC, 1, -1, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -20, 0, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 
 	{UI_SPLITTER},

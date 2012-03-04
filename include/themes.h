@@ -27,7 +27,7 @@ typedef struct {
 typedef struct {
 	// Attributes for: AttributeImage
 	int currentUid;
-	int currentItemId;
+	u32 currentConfigId;
 	char* currentValue;
 
 	// Attributes  for: AttributeImage & GameImage
@@ -51,7 +51,7 @@ typedef struct {
 	char* alias;
 	int displayMode;
 
-	int currentItemId;
+	u32 currentConfigId;
 	char* currentValue;
 } mutable_text_t;
 

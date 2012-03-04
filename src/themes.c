@@ -85,7 +85,7 @@ static mutable_text_t* initMutableText(char* themePath, config_set_t* themeConfi
 		char* value, char* alias, int displayMode, int sizingMode) {
 
 	mutable_text_t* mutableText = (mutable_text_t*) malloc(sizeof(mutable_text_t));
-	mutableText->currentItemId = -1;
+	mutableText->currentConfigId = 0;
 	mutableText->currentValue = NULL;
 	mutableText->alias = NULL;
 
@@ -171,9 +171,9 @@ static void initStaticText(char* themePath, config_set_t* themeConfig, theme_t* 
 static void drawAttributeText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	mutable_text_t* mutableText = (mutable_text_t*) elem->extended;
 	if (config) {
-		if (mutableText->currentItemId != item->item.id) {
+		if (mutableText->currentConfigId != config->uid) {
 			// force refresh
-			mutableText->currentItemId = item->item.id;
+			mutableText->currentConfigId = config->uid;
 			mutableText->currentValue = NULL;
 			if (configGetStr(config, mutableText->value, &mutableText->currentValue)) {
 				if (mutableText->sizingMode == SIZING_WRAP)
@@ -333,7 +333,7 @@ static mutable_image_t* initMutableImage(char* themePath, config_set_t* themeCon
 
 	mutable_image_t* mutableImage = (mutable_image_t*) malloc(sizeof(mutable_image_t));
 	mutableImage->currentUid = -1;
-	mutableImage->currentItemId = -1;
+	mutableImage->currentConfigId = 0;
 	mutableImage->currentValue = NULL;
 	mutableImage->cache = NULL;
 	mutableImage->cacheLinked = 0;
@@ -467,10 +467,10 @@ static void initGameImage(char* themePath, config_set_t* themeConfig, theme_t* t
 static void drawAttributeImage(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	mutable_image_t* attributeImage = (mutable_image_t*) elem->extended;
 	if (config) {
-		if (attributeImage->currentItemId != item->item.id) {
+		if (attributeImage->currentConfigId != config->uid) {
 			// force refresh
 			attributeImage->currentUid = -1;
-			attributeImage->currentItemId = item->item.id;
+			attributeImage->currentConfigId = config->uid;
 			attributeImage->currentValue = NULL;
 			configGetStr(config, attributeImage->cache->suffix, &attributeImage->currentValue);
 		}

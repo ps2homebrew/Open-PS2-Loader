@@ -35,6 +35,7 @@ typedef struct {
 	struct config_value_t *tail;
 	char *filename;
 	int modified;
+	u32 uid;
 } config_set_t;
 
 void configInit(char *prefix);

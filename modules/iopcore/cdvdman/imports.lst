@@ -75,6 +75,7 @@ I_DelayThread
 I_SetAlarm
 I_iSetAlarm
 I_CancelAlarm
+I_USec2SysClock
 thbase_IMPORTS_end
 
 thevent_IMPORTS_start

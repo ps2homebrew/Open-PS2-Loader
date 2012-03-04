@@ -139,8 +139,10 @@
 #define _STR_MODE7						134
 #define _STR_MODE8						135
 #define _STR_MODE9						136
+#define _STR_CDVDMAN_TIMER				137
+#define _STR_HINT_CDVDMAN_TIMER			138
 
-#define LANG_STR_COUNT 137
+#define LANG_STR_COUNT 139
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

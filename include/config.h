@@ -9,17 +9,18 @@
 
 #define CONFIG_FILE_NUM 3
 
-#define CONFIG_ITEM_NAME		"#Name"
-#define CONFIG_ITEM_LONGNAME	"#LongName"
-#define CONFIG_ITEM_SIZE		"#Size"
-#define CONFIG_ITEM_FORMAT		"#Format"
-#define CONFIG_ITEM_MEDIA		"#Media"
-#define CONFIG_ITEM_STARTUP		"#Startup"
-#define CONFIG_ITEM_ALTSTARTUP	"$AltStartup"
-#define CONFIG_ITEM_VMC			"$VMC"
-#define CONFIG_ITEM_COMPAT		"$Compatibility"
-#define CONFIG_ITEM_DMA			"$DMA"
-#define CONFIG_ITEM_DNAS		"$DNAS"
+#define CONFIG_ITEM_NAME			"#Name"
+#define CONFIG_ITEM_LONGNAME		"#LongName"
+#define CONFIG_ITEM_SIZE			"#Size"
+#define CONFIG_ITEM_FORMAT			"#Format"
+#define CONFIG_ITEM_MEDIA			"#Media"
+#define CONFIG_ITEM_STARTUP			"#Startup"
+#define CONFIG_ITEM_ALTSTARTUP		"$AltStartup"
+#define CONFIG_ITEM_VMC				"$VMC"
+#define CONFIG_ITEM_COMPAT			"$Compatibility"
+#define CONFIG_ITEM_DMA				"$DMA"
+#define CONFIG_ITEM_DNAS			"$DNAS"
+#define CONFIG_ITEM_CDVDMAN_TIMER	"$CallbackTimer"
 
 struct config_value_t {
         char key[32];

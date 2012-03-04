@@ -3,16 +3,16 @@ Spanish
                BIENVENIDO AL OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DEL HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DEL USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
 Open PS2 Loader %s
 Guardar cambios
-O Atrás
-Configurar red
+Atrás
+Ajustes de red
 <Sin configurar>
-Configuración guardada...
+Configuración guardada.
 ¡Error al guardar la configuración!
 Salir
 Configuración
 Juegos por USB
-Juegos por HDD
-Juegos por RED
+Juegos por Disco duro
+Juegos por Red
 Aplicaciones
 Estilo
 Idioma
@@ -20,9 +20,9 @@ Error al iniciar red: %d
 Activado
 Desactivado
 Aceptar
-Preferencias juego
-Borrar todas las preferencias
-Preferencias para el juego borradas
+Ajustes del juego
+Borrar todos los ajustes
+Ajustes del juego borrados
 Desplazamiento
 Lento
 Medio
@@ -30,29 +30,29 @@ Rápido
 Menú por defecto
 Cargar del disco
 Espera por favor
-Error al cargar la ID del juego
+Error al cargar el código ID del juego
 Listas ordenadas por alfabeto
-Error al cargar archivo de idioma
+Error al cargar el archivo de idioma
 No mostrar los colores para depuración
 Mando no encontrado, esperando...
 Carátulas, serigrafías y fondos
 Pantalla panorámica
 Apagar PS2
-Cargando configuración
-Guardando configuración
+Cargando configuración...
+Guardando configuración...
 Iniciar dispositivo
-Modo de inicio para dispositivo USB
-Modo de inicio para dispositivo HDD
-Modo de inicio para dispositivo ETH
+Modo de inicio para USB
+Modo de inicio para Disco duro
+Modo de inicio para Red
 Modo de inicio para Aplicaciones
 Automático
 Manual
-Iniciar servidor HDL
-Iniciando servidor HDL...
-Servidor HDL conectado... Pulsa [O] para desconectar
-Pulsa [X] para cerrar servidor HDL...
-Cerrando servidor HDL...
-Salida hacia
+Iniciar servidor HDLDump
+Iniciando servidor HDLDump...
+Servidor HDLDump conectado... Pulsa [O] para desconectar
+Pulsa [X] para cerrar servidor HDLDump...
+Cerrando servidor HDLDump...
+Salida del IGR
 Color de fondo 
 Color de texto
 Dirección IP
@@ -62,8 +62,8 @@ Puerto
 Unidad o carpeta compartida
 Cuenta de usuario compartida
 Contraseña
-<sin definir>
-X Aceptar
+<Sin definir>
+Aceptar
 El archivo se borrará definitivamente, ¿continuar?
 Renombrar
 Borrar
@@ -71,18 +71,18 @@ Iniciar
 Preferencias de pantalla
 Mostrar las operaciones de Borrar y Renombrar
 Comprobar fragmentación de juego USB
-Recordar último juego jugado
+Recordar último juego en uso
 Error, el juego está fragmentado
 Error, no se pudo iniciar el archivo
 Test
-Dejar vacío para autentificar como GUEST
+Dejar en blanco para autentificar como GUEST
 Cargar núcleo alternativo
 Método de lectura de datos alternativo
-Remover llamadas del sistema
-Saltar lectura archivos PSS
+Eliminar llamadas del sistema
+Omitir lectura de archivos PSS
 Sin soporte DVD-DL
 Sin soporte IGR
-Buffer cdvdfsv reducido
+No usado
 Ocultar módulo dev9
 Combinación de IGR alternativa
 Cambiar el tamaño formateará la VMC
@@ -99,7 +99,40 @@ Progreso
 Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
-Error con el archivo VMC, ¿continuar con la MC física?
+Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
 Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
+Tiempo de espera para inicio dispositivo USB
+Ruta predeterminada dispositivo USB
+Dejar en blanco para salida hacia el menú de PS2
+Valor en minutos, 0 para desactivar el paro automático
+Paro automático de la rotación del Disco duro
+Señal de vídeo
+Color de diálogos
+Color de selección
+Mostrar pantalla de información
+Info.
+Archivo ELF personalizado
+Seleccionar color
+Reconexión
+Dejar en blanco para mostrar todas las unidades o carpetas compartidas
+Ruta predeterminada conexión de red
+Retroceso
+Espacio
+Intro
+Modo
+Ranura VMC 1
+Ranura VMC 2
+ID del juego
+Modo DMA
+Sincronización vertical
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Modo 9

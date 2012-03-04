@@ -13,6 +13,7 @@
 #define CONFIG_INDEX_LAST		1
 #define CONFIG_INDEX_APPS		2
 
+static u32 currentUID = 0;
 static config_set_t configFiles[CONFIG_FILE_NUM];
 static char configPath[255] = "mc?:SYS-CONF/IPCONFIG.DAT";
 
@@ -169,6 +170,7 @@ config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName) {
 	if (!configSet)
 		configSet = (config_set_t*) malloc(sizeof(config_set_t));
 
+	configSet->uid = ++currentUID;
 	configSet->type = type;
 	configSet->head = NULL;
 	configSet->tail = NULL;

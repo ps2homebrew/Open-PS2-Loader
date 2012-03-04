@@ -346,8 +346,8 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	configGetDiscIDBinary(configSet, gid);
 
 	int dmaType = 0, dmaMode = 0, compatMode = 0;
-	configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
+	configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 	if(dmaMode < 3)
 		dmaType = 0x20;
 	else {
@@ -370,39 +370,48 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 		irx = &hdd_cdvdman_irx;
 	}
 
-	for (i=0;i<size_irx;i++){
-		if(!strcmp((const char*)((u32)irx+i),"######    GAMESETTINGS    ######")){
+	for (i = 0; i < size_irx; i++) {
+		if(!strcmp((const char*)((u32)irx + i), "######    GAMESETTINGS    ######")) {
 			break;
 		}
-	}
-
-	if (compatMode & COMPAT_MODE_2) {
-		u32 alt_read_mode = 1;
-		memcpy((void*)((u32)irx+i+35),&alt_read_mode,1);
-	}
-	if (compatMode & COMPAT_MODE_5) {
-		u32 no_dvddl = 1;
-		memcpy((void*)((u32)irx+i+36),&no_dvddl,4);
-	}
-	if (compatMode & COMPAT_MODE_4) {
-		u32 no_pss = 1;
-		memcpy((void*)((u32)irx+i+40),&no_pss,4);
 	}
 
 	// patch 48bit flag
 	u8 flag_48bit = hddIs48bit() & 0xff;
-	memcpy((void*)((u32)irx+i+34), &flag_48bit, 1);
+	memcpy((void*)((u32)irx + i + 34), &flag_48bit, 1);
+
+	if (compatMode & COMPAT_MODE_2) {
+		u32 alt_read_mode = 1;
+		memcpy((void*)((u32)irx + i + 35), &alt_read_mode, 1);
+	}
+
+	if (compatMode & COMPAT_MODE_5) {
+		u32 no_dvddl = 1;
+		memcpy((void*)((u32)irx + i + 36), &no_dvddl, 2);
+	}
+
+	if (compatMode & COMPAT_MODE_4) {
+		u32 no_pss = 1;
+		memcpy((void*)((u32)irx + i + 38), &no_pss, 2);
+	}
+
+	// patch cdvdman timer
+	int timer = 0;
+	if (configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer)) {
+		u32 cdvdmanTimer = timer * 250;
+		memcpy((void*)((u32)irx + i + 40), &cdvdmanTimer, 4);
+	}
 
 	// patch start_sector
-	memcpy((void*)((u32)irx+i+44), &game->start_sector, 4);
+	memcpy((void*)((u32)irx + i + 44), &game->start_sector, 4);
 
-	for (i=0;i<size_irx;i++){
-		if(!strcmp((const char*)((u32)irx+i),"B00BS")){
+	for (i=0;i<size_irx;i++) {
+		if(!strcmp((const char*)((u32)irx + i), "B00BS")) {
 			break;
 		}
 	}
 	// game id
-	memcpy((void*)((u32)irx+i), &gid, 5);
+	memcpy((void*)((u32)irx + i), &gid, 5);
 
 	// patches cdvdfsv
 	/*void *cdvdfsv_irx;

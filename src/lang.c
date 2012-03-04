@@ -142,7 +142,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Mode 6",
 	"Mode 7",
 	"Mode 8",
-	"Mode 9"
+	"Mode 9",
+	"Callback timer",
+	"Apply a delay to CDVD functions (0 is default)"
 };
 
 static int guiLangID = 0;

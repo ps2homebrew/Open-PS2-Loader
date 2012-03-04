@@ -136,3 +136,5 @@ Mode 6
 Mode 7
 Mode 8
 Mode 9
+Temporisation callback
+Applique un délai aux opérations du CDVD (0 par défaut)

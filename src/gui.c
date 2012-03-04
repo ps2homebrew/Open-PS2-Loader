@@ -629,6 +629,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
+	int timer = 0;
+	configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer);
+	diaSetInt(diaCompatConfig, COMPAT_CDVDMAN_TIMER, timer);
+
 	// Find out the current game ID
 	char hexid[32];
 	configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid);
@@ -721,6 +725,12 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+
+		diaGetInt(diaCompatConfig, COMPAT_CDVDMAN_TIMER, &timer);
+		if (timer != 0)
+			configSetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, timer);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_CDVDMAN_TIMER);
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 		if (hexid[0] != '\0')

@@ -252,45 +252,50 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 
 #ifdef VMC
 	apa_header part_hdr;
+	char vmc_name[2][32];
 	int fd, part_valid = 0, size_mcemu_irx = 0;
 	hdd_vmc_infos_t hdd_vmc_infos;
 	memset(&hdd_vmc_infos, 0, sizeof(hdd_vmc_infos_t));
 
-	fileXioUmount(hddPrefix);
-	fd = fileXioOpen(oplPart, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
-	if (fd >= 0) {
-		if (fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
-			if (part_hdr.nsub <= 4) {
-				hdd_vmc_infos.parts[0].start = part_hdr.start;
-				hdd_vmc_infos.parts[0].length = part_hdr.length;
-				LOG("HDDSUPPORT hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
-				LOG("HDDSUPPORT hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
-				for (i = 0; i < part_hdr.nsub; i++) {
-					hdd_vmc_infos.parts[i+1].start = part_hdr.subs[i].start;
-					hdd_vmc_infos.parts[i+1].length = part_hdr.subs[i].length;
-					LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
-					LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
-				}
-				part_valid = 1;
-			}
+	configGetVMC(configSet, vmc_name[0], 0);
+	configGetVMC(configSet, vmc_name[1], 1);
 
+	if(vmc_name[0][0] || vmc_name[1][0]) {
+		fileXioUmount(hddPrefix);
+		fd = fileXioOpen(oplPart, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
+		if (fd >= 0) {
+			if (fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
+				if (part_hdr.nsub <= 4) {
+					hdd_vmc_infos.parts[0].start = part_hdr.start;
+					hdd_vmc_infos.parts[0].length = part_hdr.length;
+					LOG("HDDSUPPORT hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
+					LOG("HDDSUPPORT hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
+					for (i = 0; i < part_hdr.nsub; i++) {
+						hdd_vmc_infos.parts[i+1].start = part_hdr.subs[i].start;
+						hdd_vmc_infos.parts[i+1].length = part_hdr.subs[i].length;
+						LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].start : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].start);
+						LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].length : 0x%X\n", i+1, hdd_vmc_infos.parts[i+1].length);
+					}
+					part_valid = 1;
+				}
+
+			}
+			fileXioClose(fd);
 		}
-		fileXioClose(fd);
+		fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
 	}
-	fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
 
 	if (part_valid) {
-		char vmc_name[32], vmc_path[255];
+		char vmc_path[255];
 		int vmc_id, have_error = 0;
 		vmc_superblock_t vmc_superblock;
 		pfs_inode_t pfs_inode;
 
 		for (vmc_id = 0; vmc_id < 2; vmc_id++) {
-			configGetVMC(configSet, vmc_name, vmc_id);
-			if (vmc_name[0]) {
+			if (vmc_name[vmc_id][0]) {
 				have_error = 1;
 				hdd_vmc_infos.active = 0;
-				if (sysCheckVMC(hddPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
+				if (sysCheckVMC(hddPrefix, "/", vmc_name[vmc_id], 0, &vmc_superblock) > 0) {
 					hdd_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
 					hdd_vmc_infos.flags |= 0x100;
 					hdd_vmc_infos.specs.page_size = vmc_superblock.page_size;
@@ -298,7 +303,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 					hdd_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
 					// Check vmc inode block chain (write operation can cause damage)
-					snprintf(vmc_path, 255, "%sVMC/%s.bin", hddPrefix, vmc_name);
+					snprintf(vmc_path, 255, "%sVMC/%s.bin", hddPrefix, vmc_name[vmc_id]);
 					fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 					if (fileXioIoctl2(fd, PFS_IOCTL2_GET_INODE, NULL, 0, (void*)&pfs_inode, sizeof(pfs_inode_t)) == sizeof(pfs_inode_t)) {
 						if (pfs_inode.number_data <= 11) {
@@ -320,7 +325,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 
 			if (have_error) {
 				char error[255];
-				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
 				if (!guiMsgBox(error, 1, NULL))
 					return;
 			}

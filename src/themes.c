@@ -1017,8 +1017,10 @@ static void thmLoadFonts(config_set_t* themeConfig, const char* themePath, theme
 
 				if (customFont)
 					fntReplace(FNT_DEFAULT, customFont, size, 1, 0);
-			} else
+			} else {
+				// TODO reload the language font file
 				fntSetDefault(FNT_DEFAULT);
+			}
 		} else {
 			snprintf(fullPath, 128, "%s%s", themePath, fntFile);
 			int fntHandle = fntLoadFile(fullPath);

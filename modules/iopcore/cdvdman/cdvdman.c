@@ -47,8 +47,9 @@ static char g_tag[] = "######    GAMESETTINGS    ######";
 static char g_ISO_parts=0x69;
 static char g_ISO_media=0x69;
 static char g_gamesetting_alt_read=0;
-static int g_gamesetting_disable_DVDDL=0;
-static int g_gamesetting_0_pss=0;
+static u16 g_gamesetting_disable_DVDDL=0;
+static u16 g_gamesetting_0_pss=0;
+static u32 g_gamesetting_timer=100;
 
 #define ISO_MAX_PARTS	16
 static int g_part_start[ISO_MAX_PARTS] = {
@@ -2747,8 +2748,7 @@ int cdvdman_cb_event(int reason)
 			*((u32 *)&ptr[0]) = (u32)user_cb;
 			*((u32 *)&ptr[4]) = reason;
 
-			sys_clock.lo = 100;
-			sys_clock.hi = 0;
+			USec2SysClock(g_gamesetting_timer, &sys_clock);
 
 			DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
 

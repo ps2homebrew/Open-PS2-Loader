@@ -163,18 +163,29 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	}
 
 	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1);
+
 	memcpy((void*)((u32)cdvdman_irx + i + 34), &game->media, 1);
+
 	if (compatmask & COMPAT_MODE_2) {
 		u32 alt_read_mode = 1;
 		memcpy((void*)((u32)cdvdman_irx + i + 35), &alt_read_mode, 1);
 	}
+
 	if (compatmask & COMPAT_MODE_5) {
 		u32 no_dvddl = 1;
-		memcpy((void*)((u32)cdvdman_irx + i + 36), &no_dvddl, 4);
+		memcpy((void*)((u32)cdvdman_irx + i + 36), &no_dvddl, 2);
 	}
+
 	if (compatmask & COMPAT_MODE_4) {
 		u32 no_pss = 1;
-		memcpy((void*)((u32)cdvdman_irx + i + 40), &no_pss, 4);
+		memcpy((void*)((u32)cdvdman_irx + i + 38), &no_pss, 2);
+	}
+
+	// patch cdvdman timer
+	int timer = 0;
+	if (configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer)) {
+		u32 cdvdmanTimer = timer * 250;
+		memcpy((void*)((u32)cdvdman_irx + i + 40), &cdvdmanTimer, 4);
 	}
 
 	*patchindex = i;

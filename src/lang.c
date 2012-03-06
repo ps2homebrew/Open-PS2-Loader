@@ -19,7 +19,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Settings",
 	"USB Games",
 	"HDD Games",
-	"Network Games",
+	"ETH Games",
 	"Apps",
 	"Theme",
 	"Language",

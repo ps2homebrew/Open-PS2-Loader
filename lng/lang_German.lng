@@ -3,16 +3,16 @@ German
                WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
 Open PS2 Loader %s
 Konfiguration speichern
-O Zurück
+Zurück
 Netzwerk-Konfiguration
 <kein Wert>
-Konfiguration gespeichert...
+Konfiguration gespeichert ...
 Fehler beim Speichern der Konfiguration!
 Verlassen
 Konfiguration
 USB Spiele
 HDD Spiele
-LAN Spiele
+ETH Spiele
 Programme
 Theme
 Sprache
@@ -33,8 +33,8 @@ Bitte warten
 Fehler beim Laden der Spiel-ID
 Automatische Sortierung
 Fehler beim Laden der Sprachdatei
-Debugfarben deaktivieren
-Kein Controller gefunden, warte...
+Debugfarben ausschalten
+Kein Controller gefunden, warte ...
 Cover-Art einschalten
 Breitbild
 Ausschalten
@@ -43,16 +43,16 @@ Konfiguration speichern
 Gerät starten
 USB Startmodus
 HDD Startmodus
-LAN Startmodus
-Programm Startmodus
+ETH Startmodus
+APP Startmodus
 Automatisch
 Manuell
 HDL Server starten
-HDL Server wird gestartet...
-HDL Server läuft... Drücke [O] zum Beenden
+HDL Server wird gestartet ...
+HDL Server läuft ... Drücke [O] zum Beenden
 Drücke [X] um den HDL Server zu schließen
-HDL Server wird beendet...
-Verlassen zu
+HDL Server wird beendet ...
+Beim Beenden starten
 Hintergrundfarbe
 Textfarbe
 IP-Adresse
@@ -63,7 +63,7 @@ Freigabe
 Benutzer
 Passwort
 <keine Eingabe>
-X Bestätigen
+Bestätigen
 Eintrag wird endgültig gelöscht, fortfahren?
 Umbenennen
 Löschen
@@ -75,7 +75,7 @@ Zuletzt gespieltes Spiel merken
 Fehler! Das Spiel ist fragmentiert.
 Fehler! Der Eintrag konnte nicht gestartet werden.
 Test
-Leer lassen für Gast-Anmeldung
+Frei lassen bei Gast-Anmeldung
 Alternativen Kern laden
 Alternativer Datenlesemodus
 Syscalls entladen
@@ -103,3 +103,38 @@ Fehlerhafte VMC-Datei, mit physischer MC fortfahren?
 Automatische Aktualisierung
 Über OPL
 Programmierer
+USB Verzögerung
+USB Pfad
+Frei lassen um in den Browser zurückzukehren
+Wert in Minuten, 0 um Abschalten zu verhindern
+Automatisches abschalten der HDD
+Videomodus
+Dialogfarbe
+Auswahlfarbe
+Spielinformation anzeigen
+Spielinformation
+Custom ELF
+Farbauswahl
+Neu verbinden
+Frei lassen um Freigabe zu wählen
+ETH Pfad
+Löschen
+Leertaste
+Eingabe
+Modus
+VMC Anschluß 1
+VMC Anschluß 2
+Spiel ID
+DMA Modus
+V-Sync
+Modus 1
+Modus 2
+Modus 3
+Modus 4
+Modus 5
+Modus 6
+Modus 7
+Modus 8
+Modus 9
+CDVD Verzögerung
+Verzögerung bei CDVD Funktionen (0 ist Vorgabe)

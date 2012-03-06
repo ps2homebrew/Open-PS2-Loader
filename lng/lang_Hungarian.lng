@@ -1,0 +1,105 @@
+# translation by JohnDoeHun <registerkuka@freemail.hu>
+Hungarian
+               ÜDVÖZÖL AZ OPEN PS2 LOADER. FŐ KÓD A HD PROJECT <http://psx-scene.com> FORRÁSKÓDJÁN ALAPUL AZ USB ADVANCE FORMÁTUM ÉS A KEZDŐ GUI IFCARO <http://ps2dev.ifcaro.net> NEVÉHEZ FŰZŐDIK A LOADER MAGJÁT NAGYRÉSZBEN JIMMIKAELKAEL KÉSZÍTETTE. A GUI FEJLESZTÉSEKET VOLCA KÉSZÍTETTE. KÖSZÖNJÜK, HOGY A PROGRAMUNKAT HASZNÁLOD ^^
+Open PS2 Loader %s
+Beállítások mentése
+O Vissza
+Hálózat beállítása
+<nincs érték>
+Beállítások elmentve...
+Hiba történt a beállítások mentése közben!
+Kilépés
+Beállítások
+USB játékok
+HDD játékok
+Hálózati játékok
+Alkalmazások
+Téma
+Nyelv
+Hálózati hiba
+Be
+Ki
+Ok
+Játék beállítások
+Összes beállítás törlése
+A játék összes beállítása törölve lett
+Görgetés
+Lassú
+Közepes
+Gyors
+Alapértelmezett menü
+Betöltés a lemezről
+Kérlek várj
+Nem sikerült betölteni a Game ID-t
+Automatikus rendezés
+Nem sikerült betölteni a nyelvfájlt
+Debug színek kikapcsolása
+Nem található az irányító, várj...
+Borító bekapcsolása
+Széles képernyő
+Kikapcsolás
+Beállítás betöltése
+Beállítás mentése
+Eszköz indítása
+USB indítási mód
+HDD indítási mód
+ETH indítási mód
+Alkalmazások indítási mód
+Automatikus
+Kézi
+HDL szerver indítása
+HDL szerver indítása folyamatban...
+A HDL szerver megy... Nyomd meg a [O]-t a megállításhoz
+Nyomd meg az [X]-t a HDL szerver befejezéséhez
+HDL szerver feltöltés folyamatban...
+Kilépés ide:
+Háttérszín
+Szöveg színe
+IP
+Mask
+Gateway
+Port
+Megosztás
+Felhasználónév
+Jelszó
+<nincs beállítva>
+X elfogadás
+Az adat véglegesen törölve lesz, folytatod?
+Átnevezés
+Törlés
+Futtatás
+Kinézet beállítása
+A törlés és az átnevezés engedélyezése
+USB játékok töredezettségének ellenőrzése
+Emlékezzen a legutóbb játszott játékra
+Hiba, a játék töredezett
+Hiba, nem sikerült indítani a fájlt
+Teszt
+Hagyd üresen, ha a GUEST a felhasználónév
+Alternatív mag betöltése
+Alternatív adat beolvasása
+Syscall kiakasztása
+0 PSS mód
+DVD-DL kikapcsolása
+IGR kikapcsolása
+Csökkentett cdvdfsv puffer
+dev9 modul elrejtése
+Alternatív IGR kombináció
+A méret megváltoztatása, újraformázza a VMC-t
+Készít
+Változtat
+Megszakít
+Reset
+Use generic
+VMC beállítása
+Név
+Méret
+Státusz
+Folyamat
+A VMC fájl már létezik
+Érvénytelen VMC fájl, nem megfelelő a méret
+El kell készíteni a VMC fájlt
+Hiba a VMC fájllal, folytatod a fizikai MC-vel?
+Automatikus frissítés
+Névjegy
+Kódolók

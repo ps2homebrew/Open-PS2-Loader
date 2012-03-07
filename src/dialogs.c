@@ -172,13 +172,13 @@ struct UIItem diaUIConfig[] = {
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, UICFG_THEME, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, UICFG_LANG, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_AUTOREFRESH}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOREFRESH, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_USE_INFO_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_INFOPAGE, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_THEME}}}, {UI_SPACER}, {UI_ENUM, UICFG_THEME, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_LANGUAGE}}}, {UI_SPACER}, {UI_ENUM, UICFG_LANG, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SCROLLING}}}, {UI_SPACER}, {UI_ENUM, UICFG_SCROLL, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_AUTOSORT}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOSORT, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_AUTOREFRESH}}}, {UI_SPACER}, {UI_BOOL, UICFG_AUTOREFRESH, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_COVERART}}}, {UI_SPACER}, {UI_BOOL, UICFG_COVERART, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_USE_INFO_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_INFOPAGE, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 	
 	{UI_SPLITTER},
 	
@@ -193,9 +193,9 @@ struct UIItem diaUIConfig[] = {
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_VMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_VMODE, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_VSYNC}}}, {UI_SPACER}, {UI_BOOL, UICFG_VSYNC, 1, -1, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_VMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_VMODE, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_VSYNC}}}, {UI_SPACER}, {UI_BOOL, UICFG_VSYNC, 1, -1, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 
 	{UI_SPLITTER},
 

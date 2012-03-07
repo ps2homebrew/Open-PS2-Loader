@@ -124,9 +124,8 @@ void usbInit(void) {
 	memset(usbModifiedDVDPrev, 0, 8);
 	usbGameCount = 0;
 	usbGames = NULL;
-
+	configGetInt(configGetByType(CONFIG_OPL), "usb_frames_delay", &usbGameList.delay);
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &usbInitModules);
-
 	usbGameList.enabled = 1;
 }
 

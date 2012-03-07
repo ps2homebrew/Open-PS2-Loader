@@ -43,9 +43,8 @@ static char* appGetELFName(char* name) {
 void appInit(void) {
 	LOG("APPSUPPORT Init\n");
 	appForceUpdate = 1;
-
+	configGetInt(configGetByType(CONFIG_OPL), "app_frames_delay", &appItemList.delay);
 	configApps = configGetByType(CONFIG_APPS);
-
 	appItemList.enabled = 1;
 }
 

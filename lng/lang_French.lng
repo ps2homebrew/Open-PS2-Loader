@@ -69,7 +69,7 @@ Renommer
 Supprimer
 Démarrer
 Réglages graphique
-Activer les opérations Supprimer/Renommer
+Activer les actions Supprimer/Renommer
 Vérifier la fragmentation des jeux USB
 Se rappeler le dernier jeu
 Erreur, le jeu est fragmenté
@@ -100,7 +100,7 @@ La VMC existe
 Fichier VMC incorrect, taille de VMC invalide
 La VMC doit être crée
 Erreur sur VMC %s, continuer avec la MC physique (carte %d) ?
-Rafraîchissement automatique
+Mise à jour automatique
 À propos
 Développeurs
 Délai USB
@@ -136,5 +136,5 @@ Mode 6
 Mode 7
 Mode 8
 Mode 9
-Temporisation callback
+Temporisation CDVD
 Applique un délai aux opérations du CDVD (0 par défaut)

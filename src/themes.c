@@ -347,13 +347,13 @@ static mutable_image_t* initMutableImage(char* themePath, config_set_t* themeCon
 	if (type == TYPE_ATTRIBUTE_IMAGE) {
 		snprintf(elemProp, 64, "%s_attribute", name);
 		configGetStr(themeConfig, elemProp, &cachePattern);
-		LOG("THEMES MutableImage %s: type: %d using cache pattern: %s\n", name, type, cachePattern);
+		LOG("THEMES MutableImage %s: type: %s using cache pattern: %s\n", name, elementsType[type], cachePattern);
 	} else if ((type == TYPE_GAME_IMAGE) || type == (TYPE_BACKGROUND)) {
 		snprintf(elemProp, 64, "%s_pattern", name);
 		configGetStr(themeConfig, elemProp, &cachePattern);
 		snprintf(elemProp, 64, "%s_count", name);
 		configGetInt(themeConfig, elemProp, &cacheCount);
-		LOG("THEMES MutableImage %s: type: %d using cache pattern: %s\n", name, type, cachePattern);
+		LOG("THEMES MutableImage %s: type: %s using cache pattern: %s count: %d\n", name, elementsType[type], cachePattern, cacheCount);
 	}
 
 	snprintf(elemProp, 64, "%s_default", name);
@@ -861,7 +861,7 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 				elem->drawElem = &drawInfoHintText;
 			} else if (!strcmp(elementsType[TYPE_LOADING_ICON], type)) {
 				if (!theme->loadingIcon)
-					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, TYPE_LOADING_ICON, -50, -50, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, TYPE_LOADING_ICON, -40, -60, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
 			}
 
 			if (elem) {

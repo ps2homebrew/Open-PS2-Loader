@@ -20,7 +20,7 @@ Fehler beim Starten des Netzwerks: %d
 Ein
 Aus
 Ok
-Spiel-Einstellungen
+Spieleinstellungen
 Alle Einstellungen entfernen
 Alle Einstellungen des Spiels entfernt.
 Scrolling
@@ -33,7 +33,7 @@ Bitte warten
 Fehler beim Laden der Spiel-ID
 Automatische Sortierung
 Fehler beim Laden der Sprachdatei
-Debugfarben ausschalten
+Keine Debugfarben
 Kein Controller gefunden, warte ...
 Cover-Art einschalten
 Breitbild
@@ -70,7 +70,7 @@ Löschen
 Starten
 Anzeige-Konfiguration
 Löschen/Umbenennen aktivieren
-USB-Fragmentierung überprüfen
+USB-Fragmentierung prüfen
 Zuletzt gespieltes Spiel merken
 Fehler! Das Spiel ist fragmentiert.
 Fehler! Der Eintrag konnte nicht gestartet werden.
@@ -97,9 +97,9 @@ Größe
 Status
 Fortschritt
 VMC-Datei existiert
-Ungültige VMC-Datei, Größe ist inkorrekt
+Ungültige VMC-Datei, Grösse ist inkorrekt
 VMC-Datei muss erstellt werden
-Fehlerhafte VMC-Datei, mit physischer MC fortfahren?
+Fehler mit VMC %s, mit echter Karte im Anschluß %d fortfahren?
 Automatische Aktualisierung
 Über OPL
 Programmierer

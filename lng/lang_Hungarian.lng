@@ -3,7 +3,7 @@ Hungarian
                ÜDVÖZÖL AZ OPEN PS2 LOADER. FŐ KÓD A HD PROJECT <http://psx-scene.com> FORRÁSKÓDJÁN ALAPUL AZ USB ADVANCE FORMÁTUM ÉS A KEZDŐ GUI IFCARO <http://ps2dev.ifcaro.net> NEVÉHEZ FŰZŐDIK A LOADER MAGJÁT NAGYRÉSZBEN JIMMIKAELKAEL KÉSZÍTETTE. A GUI FEJLESZTÉSEKET VOLCA KÉSZÍTETTE. KÖSZÖNJÜK, HOGY A PROGRAMUNKAT HASZNÁLOD ^^
 Open PS2 Loader %s
 Beállítások mentése
-O Vissza
+Vissza
 Hálózat beállítása
 <nincs érték>
 Beállítások elmentve...
@@ -12,11 +12,11 @@ Kilépés
 Beállítások
 USB játékok
 HDD játékok
-Hálózati játékok
+ETH játékok
 Alkalmazások
 Téma
 Nyelv
-Hálózati hiba
+Hálózati hiba: %d
 Be
 Ki
 Ok
@@ -49,10 +49,10 @@ Automatikus
 Kézi
 HDL szerver indítása
 HDL szerver indítása folyamatban...
-A HDL szerver megy... Nyomd meg a [O]-t a megállításhoz
+A HDL szerver fut... Nyomd meg a [O]-t a megállításhoz
 Nyomd meg az [X]-t a HDL szerver befejezéséhez
 HDL szerver feltöltés folyamatban...
-Kilépés ide:
+Kilépés ide
 Háttérszín
 Szöveg színe
 IP
@@ -63,7 +63,7 @@ Megosztás
 Felhasználónév
 Jelszó
 <nincs beállítva>
-X elfogadás
+Elfogadás
 Az adat véglegesen törölve lesz, folytatod?
 Átnevezés
 Törlés
@@ -82,7 +82,7 @@ Syscall kiakasztása
 0 PSS mód
 DVD-DL kikapcsolása
 IGR kikapcsolása
-Csökkentett cdvdfsv puffer
+Használaton kívül
 dev9 modul elrejtése
 Alternatív IGR kombináció
 A méret megváltoztatása, újraformázza a VMC-t
@@ -90,16 +90,51 @@ Készít
 Változtat
 Megszakít
 Reset
-Use generic
+Általános használata
 VMC beállítása
 Név
 Méret
 Státusz
 Folyamat
 A VMC fájl már létezik
-Érvénytelen VMC fájl, nem megfelelő a méret
+Érvénytelen a VMC fájl, nem megfelelő a méret
 El kell készíteni a VMC fájlt
-Hiba a VMC fájllal, folytatod a fizikai MC-vel?
+Hiba a VMC %s fájllal, folytatod a fizikai MC (hely %d)-vel?
 Automatikus frissítés
 Névjegy
 Kódolók
+USB késleltetés
+USB elérési útvonala
+Hagyd üresen ha a Browserbe akarsz kilépni
+Érték percben, 0 a leállítás kikapcsolása
+Automatikus HDD leállítás
+Videó mód
+Felirat színe
+Kiválasztott szín
+Információs oldal megjelenítése
+Információ
+Custom ELF
+Szín kijelölés
+Újracsatlakozás
+Hagyd szabadon a lista megosztáshoz
+ETH elérési útvonala
+Visszatörlés
+Szóköz
+Enter
+Mód
+VMC hely 1
+VMC hely 2
+Game ID
+DMA Mód
+V-Sync
+Mód 1
+Mód 2
+Mód 3
+Mód 4
+Mód 5
+Mód 6
+Mód 7
+Mód 8
+Mód 9
+Visszahívás időzítő
+A CDVD funkciók késleltetésének engedélyezése (0 az alapértelmezett)

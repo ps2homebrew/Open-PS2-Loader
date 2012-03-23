@@ -589,13 +589,12 @@ static theme_element_t* initBasic(char* themePath, config_set_t* themeConfig, th
 	else
 		elem->color = color;
 
+	elem->font = font;
 	snprintf(elemProp, 64, "%s_font", name);
-	if (configGetInt(themeConfig, elemProp, &intValue))
-		font = intValue;
-	if (font >= 0 && font < THM_MAX_FONTS)
-		elem->font = theme->fonts[font];
-	else
-		elem->font = FNT_DEFAULT;
+	if (configGetInt(themeConfig, elemProp, &intValue)) {
+		if (intValue > 0 && intValue < THM_MAX_FONTS)
+			elem->font = theme->fonts[intValue];
+	}
 
 	return elem;
 }
@@ -747,7 +746,7 @@ static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t
 	// 1. check we have a valid Background elements
 	if ( !theme->mainElems.first || (theme->mainElems.first->type != TYPE_BACKGROUND) ) {
 		LOG("THEMES No valid background found for main, add default BG_ART\n");
-		theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, FNT_DEFAULT);
+		theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
 		if (themePath)
 			initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
 		else
@@ -759,7 +758,7 @@ static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t
 	if (theme->infoElems.first) {
 		if (theme->infoElems.first->type != TYPE_BACKGROUND) {
 			LOG("THEMES No valid background found for info, add default BG_ART\n");
-			theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, FNT_DEFAULT);
+			theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
 			if (themePath)
 				initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
 			else
@@ -792,7 +791,7 @@ static void validateGUIElems(char* themePath, config_set_t* themeConfig, theme_t
 		}
 	} else {
 		LOG("THEMES No itemsList found, adding a default one\n");
-		theme->itemsList = initBasic(themePath, themeConfig, theme, "il", TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+		theme->itemsList = initBasic(themePath, themeConfig, theme, "il", TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 		initItemsList(themePath, themeConfig, theme, theme->itemsList, "il", NULL);
 		theme->itemsList->next = theme->mainElems.first->next; // Position the itemsList as second element (right after the Background)
 		theme->mainElems.first->next = theme->itemsList;
@@ -813,55 +812,55 @@ static int addGUIElem(char* themePath, config_set_t* themeConfig, theme_t* theme
 		configGetStr(themeConfig, elemProp, &type);
 		if (type) {
 			if (!strcmp(elementsType[TYPE_ATTRIBUTE_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				initAttributeText(themePath, themeConfig, theme, elem, name, NULL);
 			} else if (!strcmp(elementsType[TYPE_STATIC_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				initStaticText(themePath, themeConfig, theme, elem, name, NULL);
 			} else if (!strcmp(elementsType[TYPE_ATTRIBUTE_IMAGE], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initAttributeImage(themePath, themeConfig, theme, elem, name);
 			} else if (!strcmp(elementsType[TYPE_GAME_IMAGE], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initGameImage(themePath, themeConfig, theme, elem, name, NULL, 1, NULL, NULL);
 			} else if (!strcmp(elementsType[TYPE_STATIC_IMAGE], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_STATIC_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_STATIC_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initStaticImage(themePath, themeConfig, theme, elem, name, NULL);
 			} else if (!strcmp(elementsType[TYPE_BACKGROUND], type)) {
 				if (!elems->first) { // Background elem can only be the first one
-					elem = initBasic(themePath, themeConfig, theme, name, TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, FNT_DEFAULT);
+					elem = initBasic(themePath, themeConfig, theme, name, TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
 					initBackground(themePath, themeConfig, theme, elem, name, NULL, 1, NULL);
 				}
 			} else if (!strcmp(elementsType[TYPE_MENU_ICON], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_MENU_ICON, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_MENU_ICON, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				elem->drawElem = &drawMenuIcon;
 			} else if (!strcmp(elementsType[TYPE_MENU_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawMenuText;
 			} else if (!strcmp(elementsType[TYPE_ITEMS_LIST], type)) {
 				if (!theme->itemsList) {
-					elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+					elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 					initItemsList(themePath, themeConfig, theme, elem, name, NULL);
 					theme->itemsList = elem;
 				}
 			} else if (!strcmp(elementsType[TYPE_ITEM_ICON], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 80, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 80, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initGameImage(themePath, themeConfig, theme, elem, name, "ICO", 20, NULL, NULL);
 			} else if (!strcmp(elementsType[TYPE_ITEM_COVER], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 520, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 520, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initGameImage(themePath, themeConfig, theme, elem, name, "COV", 10, NULL, NULL);
 			} else if (!strcmp(elementsType[TYPE_ITEM_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEM_TEXT, 520, 370, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEM_TEXT, 520, 370, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawItemText;
 			} else if (!strcmp(elementsType[TYPE_HINT_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawHintText;
 			} else if (!strcmp(elementsType[TYPE_INFO_HINT_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, FNT_DEFAULT);
+				elem = initBasic(themePath, themeConfig, theme, name, TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawInfoHintText;
 			} else if (!strcmp(elementsType[TYPE_LOADING_ICON], type)) {
 				if (!theme->loadingIcon)
-					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, TYPE_LOADING_ICON, -40, -60, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, FNT_DEFAULT);
+					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, TYPE_LOADING_ICON, -40, -60, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 			}
 
 			if (elem) {
@@ -926,12 +925,8 @@ static void thmFree(theme_t* theme) {
 		}
 
 		// free fonts
-		for (id = 0; id < THM_MAX_FONTS; ++id) {
-			int fntid = theme->fonts[id];
-
-			if (fntid != FNT_DEFAULT)
-				fntRelease(fntid);
-		}
+		for (id = 0; id < THM_MAX_FONTS; ++id)
+			fntRelease(theme->fonts[id]);
 
 		free(theme);
 		theme = NULL;
@@ -987,49 +982,29 @@ static void thmSetColors(theme_t* theme) {
 
 static void thmLoadFonts(config_set_t* themeConfig, const char* themePath, theme_t* theme) {
     int fntID; // theme side font id, not the fntSys handle
-	for (fntID = -1; fntID < THM_MAX_FONTS; ++fntID) {
+	for (fntID = 0; fntID < THM_MAX_FONTS; ++fntID) {
 		// does the font by the key exist?
 		char fntKey[16];
 
-		// -1 is a placeholder for default font...
-		if (fntID >= 0) {
-			// Default font handle...
-			theme->fonts[fntID] = FNT_DEFAULT;
-			snprintf(fntKey, 16, "font%d", fntID);
-		} else {
+		if (fntID == 0) {
 			snprintf(fntKey, 16, "default_font");
+			theme->fonts[0] = FNT_DEFAULT;
+		} else {
+			snprintf(fntKey, 16, "font%d", fntID);
+			theme->fonts[fntID] = theme->fonts[0];
 		}
 
-		char *fntFile;
-		int cfgKeyOK = configGetStr(themeConfig, fntKey, &fntFile);
-		if (!cfgKeyOK && (fntID >= 0))
-			continue;
-
 		char fullPath[128];
-
-		if (fntID < 0) {
-			// replace the default font
-			if (cfgKeyOK) {
-				snprintf(fullPath, 128, "%s%s", themePath, fntFile);
-
-				int size = -1;
-				void* customFont = readFile(fullPath, -1, &size);
-
-				if (customFont)
-					fntReplace(FNT_DEFAULT, customFont, size, 1, 0);
-			} else {
-				// TODO reload the language font file
-				fntSetDefault(FNT_DEFAULT);
-			}
-		} else {
+		char *fntFile;
+		if (configGetStr(themeConfig, fntKey, &fntFile)) {
 			snprintf(fullPath, 128, "%s%s", themePath, fntFile);
 			int fntHandle = fntLoadFile(fullPath);
 
 			// Do we have a valid font? Assign the font handle to the theme font slot
 			if (fntHandle != FNT_ERROR)
 				theme->fonts[fntID] = fntHandle;
-		};
-	};
+		}
+	}
 }
 
 static void thmLoad(char* themePath) {
@@ -1061,9 +1036,6 @@ static void thmLoad(char* themePath) {
 		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_ITEM_TEXT], "_");
 		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_HINT_TEXT], "_");
 		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_LOADING_ICON], "_");
-
-		// reset the default font to be sure
-		fntSetDefault(FNT_DEFAULT);
 	} else {
 		char path[255];
 		snprintf(path, 255, "%sconf_theme.cfg", themePath);

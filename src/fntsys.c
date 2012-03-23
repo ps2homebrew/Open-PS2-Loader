@@ -30,7 +30,7 @@ extern int size_freesansfont_raw;
 // freetype vars
 static FT_Library font_library;
 
-static int gCharHeight;
+static int gCharHeight = 16;
 
 static s32 gFontSemaId;
 static ee_sema_t gFontSema;
@@ -72,9 +72,6 @@ typedef struct {
 	/// Nonzero if font is used
 	int isValid;
 
-	/// Nonzero for custom fonts
-	int isDefault;
-
 	/// Texture atlases (default to NULL)
 	atlas_t *atlases[ATLAS_MAX];
 	
@@ -97,6 +94,40 @@ static FT_Vector delta;
 #define GLYPH_CACHE_PAGE_SIZE 256
 
 #define GLYPH_PAGE_OK(font,page) ((pageid <= font->cacheMaxPageID) && (font->glyphCache[page]))
+
+static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
+	int i;
+
+	for (i = 0; i < GLYPH_CACHE_PAGE_SIZE; ++i, ++page) {
+		page->isValid = 0;
+		// we're not doing any atlasFree or such - atlas has to be rebuild
+		page->allocation = NULL;
+		page->atlas = NULL;
+	}
+}
+
+static void fntCacheFlush(font_t *font) {
+	// Release all the glyphs from the cache
+	int i;
+	for (i = 0; i <= font->cacheMaxPageID; ++i) {
+		if (font->glyphCache[i]) {
+			fntCacheFlushPage(font->glyphCache[i]);
+			free(font->glyphCache[i]);
+			font->glyphCache[i] = NULL;
+		}
+	}
+
+	free(font->glyphCache);
+	font->glyphCache = NULL;
+	font->cacheMaxPageID = -1;
+
+	// free all atlasses too, they're invalid now anyway
+	int aid;
+	for(aid = 0; aid < ATLAS_MAX; ++aid) {
+		atlasFree(font->atlases[aid]);
+		font->atlases[aid] = NULL;
+	}
+}
 
 static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	if (pageid > font->cacheMaxPageID) {
@@ -131,33 +162,20 @@ static int fntPrepareGlyphCachePage(font_t *font, int pageid) {
 	return 1;
 }
 
-static void fntResetFontDef(font_t *fnt) {
-	fnt->glyphCache = NULL;
-	fnt->cacheMaxPageID = -1;
-	fnt->isValid = 0;
-	fnt->isDefault = 0;
-	
-	int aid;
-	for(aid = 0; aid < ATLAS_MAX; ++aid)
-		fnt->atlases[aid] = NULL;
-		
-	fnt->dataPtr = NULL;
-}
-
 static void fntPrepareCLUT() {
 	fontClut.PSM = GS_PSM_T8;
 	fontClut.ClutPSM = GS_PSM_CT32;
 	fontClut.Clut = memalign(128, 256 * 4);
 	fontClut.VramClut = 0;
-	
+
 	// generate the clut table
 	size_t i;
 	u32 *clut = fontClut.Clut;
 	for (i = 0; i < 256; ++i) {
 		u8 alpha =  i > 0x080 ? 0x080 : i;
-		
+
 		*clut = alpha << 24 | i << 16 | i << 8 | i;
-		clut++; 
+		clut++;
 	}
 }
 
@@ -166,10 +184,79 @@ static void fntDestroyCLUT() {
 	fontClut.Clut = NULL;
 }
 
-void fntInit(void) {
+static void fntInitSlot(font_t *font) {
+	font->face = NULL;
+	font->glyphCache = NULL;
+	font->cacheMaxPageID = -1;
+	font->dataPtr = NULL;
+	font->isValid = 0;
+
+	int aid = 0;
+	for(; aid < ATLAS_MAX; ++aid)
+		font->atlases[aid] = NULL;
+}
+
+static void fntDeleteSlot(font_t *font) {
+	// free the glyph cache, atlases, unload the font
+	fntCacheFlush(font);
+
+	FT_Done_Face(font->face);
+	font->face = NULL;
+
+	if (font->dataPtr) {
+		free(font->dataPtr);
+		font->dataPtr = NULL;
+	}
+
+	font->isValid = 0;
+}
+
+void fntRelease(int id) {
+	if (id > FNT_DEFAULT && id < FNT_MAX_COUNT)
+		fntDeleteSlot(&fonts[id]);
+}
+
+static int fntLoadSlot(font_t *font, char* path) {
+	void* buffer = NULL;
+	int bufferSize = -1;
+
+	fntInitSlot(font);
+
+	if (path) {
+		buffer = readFile(path, -1, &bufferSize);
+		if (!buffer) {
+			LOG("FNTSYS Font file loading failed: %s\n", path);
+			return FNT_ERROR;
+		}
+		font->dataPtr = buffer;
+	} else {
+		buffer = &freesansfont_raw;
+		bufferSize = size_freesansfont_raw;
+	}
+
+	// load the font via memory handle
+	int error = FT_New_Memory_Face(font_library, (FT_Byte*) buffer, bufferSize, 0, &font->face);
+	if (error) {
+		LOG("FNTSYS Freetype font loading failed with %x!\n", error);
+		fntDeleteSlot(font);
+		return FNT_ERROR;
+	}
+
+	error = FT_Set_Char_Size(font->face, 0, gCharHeight * 16, 300, 300);
+	/*error = FT_Set_Pixel_Sizes( face, 0, // pixel_width gCharHeight ); // pixel_height */
+	if (error) {
+		LOG("FNTSYS Freetype error setting font pixel size with %x!\n", error);
+		fntDeleteSlot(font);
+		return FNT_ERROR;
+	}
+
+	font->isValid = 1;
+	return 0;
+}
+
+void fntInit() {
 	LOG("FNTSYS Init\n");
 	int error = FT_Init_FreeType(&font_library);
-
 	if (error) {
 		// just report over the ps2link
 		LOG("FNTSYS Freetype init failed with %x!\n", error);
@@ -183,158 +270,51 @@ void fntInit(void) {
 	gFontSema.option = 0;
 	gFontSemaId = CreateSema(&gFontSema);
 
-	int i;
-	for (i = 0; i < FNT_MAX_COUNT; ++i)
-		fntResetFontDef(&fonts[i]);
+	int i = 0;
+	for (; i < FNT_MAX_COUNT; ++i)
+		fntInitSlot(&fonts[i]);
 
-	// load the default font (will be id=0)
-	fntLoad(NULL, -1, 0);
+	fntLoadDefault(NULL);
 }
 
-static void fntCacheFlushPage(fnt_glyph_cache_entry_t *page) {
-	int i;
-
-	for (i = 0; i < GLYPH_CACHE_PAGE_SIZE; ++i, ++page) {
-		page->isValid = 0;
-		// we're not doing any atlasFree or such - atlas has to be rebuild
-		page->allocation = NULL;
-		page->atlas = NULL;
-	}
-}
-
-static void fntCacheFlush(font_t *fnt) {
-	int i;
-
-	// Release all the glyphs from the cache
-	for (i = 0; i <= fnt->cacheMaxPageID; ++i) {
-		if (fnt->glyphCache[i]) {
-			fntCacheFlushPage(fnt->glyphCache[i]);
-			free(fnt->glyphCache[i]);
-			fnt->glyphCache[i] = NULL;
-		}
-	}
-
-	free(fnt->glyphCache);
-	fnt->glyphCache = NULL;
-	fnt->cacheMaxPageID = -1;
-	
-	// free all atlasses too, they're invalid now anyway
-	int aid;
-	for(aid = 0; aid < ATLAS_MAX; ++aid) {
-		atlasFree(fnt->atlases[aid]);
-		fnt->atlases[aid] = NULL;
-	}
-}
-
-static int fntNewFont() {
-	int i;
-	for (i = 0; i < FNT_MAX_COUNT; ++i) {
-		if (fonts[i].isValid == 0) {
-			fntResetFontDef(&fonts[i]);
-			return i;
+int fntLoadFile(char* path) {
+	font_t *font;
+	int i = 1;
+	for (; i < FNT_MAX_COUNT; i++) {
+		font = &fonts[i];
+		if (!font->isValid) {
+			if (fntLoadSlot(font, path) != FNT_ERROR)
+				return i;
+			break;
 		}
 	}
 
 	return FNT_ERROR;
 }
 
-void fntDeleteFont(font_t *font) {
-	// skip already deleted fonts
-	if (!font->isValid)
-		return;
+void fntLoadDefault(char* path) {
+	font_t newFont, oldFont;
 
-	// free the glyph cache, atlases, unload the font
-	fntCacheFlush(font);
+	if (fntLoadSlot(&newFont, path) != FNT_ERROR) {
+		// copy over the new font definition
+		// we have to lock this phase, as the old font may still be used
+		// Note: No check for concurrency is done here, which is kinda funky!
+		WaitSema(gFontSemaId);
+		memcpy(&oldFont, &fonts[FNT_DEFAULT], sizeof(font_t));
+		memcpy(&fonts[FNT_DEFAULT], &newFont, sizeof(font_t));
+		SignalSema(gFontSemaId);
 
-	FT_Done_Face(font->face);
-
-	if (font->dataPtr) {
-		free(font->dataPtr);
-		font->dataPtr = NULL;
+		// delete the old font
+		fntDeleteSlot(&oldFont);
 	}
-
-	font->isValid = 0;
 }
 
-int fntLoadSlot(font_t *fnt, void* buffer, int bufferSize) {
-	if (!buffer) {
-		buffer = &freesansfont_raw;
-		bufferSize = size_freesansfont_raw;
-		fnt->isDefault = 1;
-	}
-
-	// load the font via memory handle
-	int error = FT_New_Memory_Face(font_library, (FT_Byte*) buffer, bufferSize, 0, &fnt->face);
-
-	if (error) {
-		// just report over the ps2link
-		LOG("FNTSYS Freetype font loading failed with %x!\n", error);
-		// SleepThread();
-		return -1;
-	}
-
-	gCharHeight = 16;
-
-	error = FT_Set_Char_Size(fnt->face, 0, gCharHeight * 16, 300, 300);
-	/*error = FT_Set_Pixel_Sizes( face,
-	 0, // pixel_width
-	 gCharHeight ); // pixel_height*/
-
-	if (error) {
-		// just report over the ps2link
-		LOG("FNTSYS Freetype error setting font pixel size with %x!\n", error);
-		// SleepThread();
-		return -1;
-	}
-
-	fnt->isValid = 1;
-	return 0;
-}
-
-int fntLoad(void* buffer, int bufferSize, int takeover) {
-	// we need a new slot in the font array
-	int fontID = fntNewFont();
-
-	if (fontID == FNT_ERROR)
-		return FNT_ERROR;
-
-	font_t *fnt = &fonts[fontID];
-
-	if (fntLoadSlot(fnt, buffer, bufferSize) == FNT_ERROR)
-		return FNT_ERROR;
-
-	if (takeover)
-		fnt->dataPtr = buffer;
-
-	return fontID;
-}
-
-int fntLoadFile(char* path) {
-	LOG("FNTSYS LoadFile: %s\n", path);
-	// load the buffer with font
-	int size = -1;
-	void* customFont = readFile(path, -1, &size);
-
-	if (!customFont)
-		return FNT_ERROR;
-
-	int fontID = fntLoad(customFont, size, 1);
-
-	return fontID;
-}
-
-void fntRelease(int id) {
-	if (id < FNT_MAX_COUNT)
-		fntDeleteFont(&fonts[id]);
-}
-
-/** Terminates the font rendering system */
-void fntEnd(void) {
+void fntEnd() {
 	LOG("FNTSYS End\n");
 	// release all the fonts
 	int id;
 	for (id = 0; id < FNT_MAX_COUNT; ++id)
-		fntDeleteFont(&fonts[id]);
+		fntDeleteSlot(&fonts[id]);
 
 	// deinit freetype system
 	FT_Done_FreeType(font_library);
@@ -353,8 +333,8 @@ static atlas_t *fntNewAtlas() {
 	return atl;
 }
 
-static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
-	FT_GlyphSlot slot = fnt->face->glyph;
+static int fntGlyphAtlasPlace(font_t *font, fnt_glyph_cache_entry_t* glyph) {
+	FT_GlyphSlot slot = font->face->glyph;
 	
  	//LOG("FNTSYS GlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
 	
@@ -363,19 +343,16 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 		return 1;
 	}
 	
-	int aid;
-	
-	for (aid = 0; aid < ATLAS_MAX; ++aid) {
+	int aid = 0;
+	for (; aid < ATLAS_MAX; aid++) {
 		//LOG("FNTSYS Placing aid %d...\n", aid);
-		atlas_t **atl = &fnt->atlases[aid];
+		atlas_t **atl = &font->atlases[aid];
 		if (!*atl) { // atlas slot not yet used
 			//LOG("FNTSYS aid %d is new...\n", aid);
 			*atl = fntNewAtlas();
 		}
 		
-		glyph->allocation = 
-			atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
-			
+		glyph->allocation =	atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
 		if (glyph->allocation) {
 			//LOG("FNTSYS Found placement\n", aid);
 			glyph->atlas = *atl;
@@ -389,45 +366,42 @@ static int fntGlyphAtlasPlace(font_t *fnt, fnt_glyph_cache_entry_t* glyph) {
 }
 
 /** Internal method. Makes sure the bitmap data for particular character are pre-rendered to the glyph cache */
-static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
+static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *font, uint32_t gid) {
 	// calc page id and in-page index from glyph id
 	int pageid = gid / GLYPH_CACHE_PAGE_SIZE;
 	int idx = gid % GLYPH_CACHE_PAGE_SIZE;
 
 	// do not call on every char of every font rendering call
-	if (!GLYPH_PAGE_OK(fnt,pageid))
-		if (!fntPrepareGlyphCachePage(fnt, pageid)) // failed to prepare the page...
+	if (!GLYPH_PAGE_OK(font, pageid))
+		if (!fntPrepareGlyphCachePage(font, pageid)) // failed to prepare the page...
 			return NULL;
 
-	fnt_glyph_cache_entry_t *page = fnt->glyphCache[pageid];
-
+	fnt_glyph_cache_entry_t *page = font->glyphCache[pageid];
 	/* Should never happen. 
 	if (!page) // safeguard
 		return NULL;
 	*/
 
 	fnt_glyph_cache_entry_t* glyph = &page[idx];
-
 	if (glyph->isValid)
 		return glyph;
 
 	// not cached but valid. Cache
-	if (!fnt->face) {
+	if (!font->face) {
 		LOG("FNTSYS Face is NULL!\n");
 	}
 
-	int error = FT_Load_Char(fnt->face, gid, FT_LOAD_RENDER);
-
+	int error = FT_Load_Char(font->face, gid, FT_LOAD_RENDER);
 	if (error) {
 		LOG("FNTSYS Error loading glyph - %d\n", error);
 		return NULL;
 	}
 
 	// find atlas placement for the glyph
-	if  (!fntGlyphAtlasPlace(fnt, glyph))
+	if  (!fntGlyphAtlasPlace(font, glyph))
 		return NULL;
 
-	FT_GlyphSlot slot = fnt->face->glyph;
+	FT_GlyphSlot slot = font->face->glyph;
 	glyph->width = slot->bitmap.width;
 	glyph->height = slot->bitmap.rows;
 	glyph->shx = slot->advance.x;
@@ -442,15 +416,14 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *fnt, uint32_t gid) {
 
 void fntSetAspectRatio(float aw, float ah) {
 	// flush cache - it will be invalid after the setting
-	int i;
-
-	for (i = 0; i < FNT_MAX_COUNT; ++i) {
+	int i = 0;
+	for (; i < FNT_MAX_COUNT; i++) {
 		if (fonts[i].isValid)
 			fntCacheFlush(&fonts[i]);
 	}
 
-	// set new aspect ratio (Is this correct, I wonder?)
-	// TODO: error = FT_Set_Char_Size(face, 0, gCharHeight*64, ah*300, aw*300);
+	// TODO: set new aspect ratio (Is this correct, I wonder?)
+	// error = FT_Set_Char_Size(face, 0, gCharHeight*64, ah*300, aw*300);
 }
 
 static void fntRenderGlyph(fnt_glyph_cache_entry_t* glyph, int pen_x, int pen_y) {
@@ -461,8 +434,8 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t* glyph, int pen_x, int pen_y)
 		 *
 		 * 2. GS_SETREG_TEX0 for every quad - why? gsKit should only set texture if demanded
 		 *    We should prepare a special fnt render method that would step over most of the
-		 *    performance problems under - begining with rmSetupQuad and continuing into gsKit
-		 *    - this method would handle the preparetion of the quads and GS upload itself,
+		 *    performance problems under - beginning with rmSetupQuad and continuing into gsKit
+		 *    - this method would handle the preparation of the quads and GS upload itself,
 		 *    without the use of prim_quad_texture and rmSetupQuad...
 		 *
 		 * 3. We should use clut to keep the memory allocations sane - we're linear in the 32bit buffers
@@ -485,17 +458,17 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t* glyph, int pen_x, int pen_y)
 }
 
 #ifndef __RTL
-int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
 	// wait for font lock to unlock
 	WaitSema(gFontSemaId);
-	font_t *fnt = &fonts[font];
+	font_t *font = &fonts[id];
 	SignalSema(gFontSemaId);
 
 	if (aligned) {
 		if (width) {
-			x -= min(fntCalcDimensions(font, string), width) >> 1;
+			x -= min(fntCalcDimensions(id, string), width) >> 1;
 		} else {
-			x -= fntCalcDimensions(font, string) >> 1;
+			x -= fntCalcDimensions(id, string) >> 1;
 		}
 		y -= MENU_ITEM_HEIGHT >> 1;
 	}
@@ -507,7 +480,7 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 	int xmax = x + width;
 	int ymax = y + height;
 
-	use_kerning = FT_HAS_KERNING(fnt->face);
+	use_kerning = FT_HAS_KERNING(font->face);
 	state = UTF8_ACCEPT;
 	previous = 0;
 
@@ -523,15 +496,15 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 		if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
 			continue;
 
-		glyph = fntCacheGlyph(fnt, codepoint);
+		glyph = fntCacheGlyph(font, codepoint);
 		if (!glyph)
 			continue;
 
 		// kerning
 		if (use_kerning && previous) {
-			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
+			glyph_index = FT_Get_Char_Index(font->face, codepoint);
 			if (glyph_index) {
-				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+				FT_Get_Kerning(font->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
 				pen_x += delta.x >> 6;
 			}
 			previous = glyph_index;
@@ -561,7 +534,7 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 }
 
 #else
-static void fntRenderSubRTL(font_t *fnt, const unsigned char* startRTL, const unsigned char* string, fnt_glyph_cache_entry_t* glyph, int x, int y) {
+static void fntRenderSubRTL(font_t *font, const unsigned char* startRTL, const unsigned char* string, fnt_glyph_cache_entry_t* glyph, int x, int y) {
 	if (glyph) {
 		x -= glyph->shx >> 6;
 		fntRenderGlyph(glyph, x, y);
@@ -571,14 +544,14 @@ static void fntRenderSubRTL(font_t *fnt, const unsigned char* startRTL, const un
 		if (utf8Decode(&state, &codepoint, *startRTL))
 			continue;
 
-		glyph = fntCacheGlyph(fnt, codepoint);
+		glyph = fntCacheGlyph(font, codepoint);
 		if (!glyph)
 			continue;
 
 		if (use_kerning && previous) {
-			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
+			glyph_index = FT_Get_Char_Index(font->face, codepoint);
 			if (glyph_index) {
-				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+				FT_Get_Kerning(font->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
 				x -= delta.x >> 6;
 			}
 			previous = glyph_index;
@@ -589,17 +562,17 @@ static void fntRenderSubRTL(font_t *fnt, const unsigned char* startRTL, const un
 	}
 }
 
-int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour) {
 	// wait for font lock to unlock
 	WaitSema(gFontSemaId);
-	font_t *fnt = &fonts[font];
+	font_t *font = &fonts[id];
 	SignalSema(gFontSemaId);
 
 	if (aligned) {
 		if (width) {
-			x -= min(fntCalcDimensions(font, string), width) >> 1;
+			x -= min(fntCalcDimensions(id, string), width) >> 1;
 		} else {
-			x -= fntCalcDimensions(font, string) >> 1;
+			x -= fntCalcDimensions(id, string) >> 1;
 		}
 		y -= MENU_ITEM_HEIGHT >> 1;
 	}
@@ -611,7 +584,7 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 	/*int xmax = x + width;
 	int ymax = y + height;*/
 
-	use_kerning = FT_HAS_KERNING(fnt->face);
+	use_kerning = FT_HAS_KERNING(font->face);
 	state = UTF8_ACCEPT;
 	previous = 0;
 
@@ -625,16 +598,16 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 		if (utf8Decode(&state, &codepoint, *string)) // accumulate the codepoint value
 			continue;
 
-		glyph = fntCacheGlyph(fnt, codepoint);
+		glyph = fntCacheGlyph(font, codepoint);
 		if (!glyph)
 			continue;
 
 		// kerning
 		delta_x = 0;
 		if (use_kerning && previous) {
-			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
+			glyph_index = FT_Get_Char_Index(font->face, codepoint);
 			if (glyph_index) {
-				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+				FT_Get_Kerning(font->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
 				delta_x = delta.x >> 6;
 			}
 			previous = glyph_index;
@@ -663,7 +636,7 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 			if (inRTL) { // render RTL
 				inRTL = 0;
 				pen_x = pen_xRTL;
-				fntRenderSubRTL(fnt, startRTL, string, glyphRTL, pen_xRTL, y);
+				fntRenderSubRTL(font, startRTL, string, glyphRTL, pen_xRTL, y);
 			}
 		}
 
@@ -679,17 +652,17 @@ int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t 
 
 	if (inRTL) {
 		pen_x = pen_xRTL;
-		fntRenderSubRTL(fnt, startRTL, string, glyphRTL, pen_xRTL, y);
+		fntRenderSubRTL(font, startRTL, string, glyphRTL, pen_xRTL, y);
 	}
 
 	return pen_x;
 }
 #endif
 
-void fntFitString(int font, unsigned char *string, size_t width) {
+void fntFitString(int id, unsigned char *string, size_t width) {
 	size_t cw = 0;
 	unsigned char *str = string;
-	size_t spacewidth = fntCalcDimensions(font, " ");
+	size_t spacewidth = fntCalcDimensions(id, " ");
 	unsigned char *psp = NULL;
 	
 	while (*str) {
@@ -714,7 +687,7 @@ void fntFitString(int font, unsigned char *string, size_t width) {
 		// Calc the font's width...
 		// NOTE: The word was terminated, so we're seeing a single word
 		// on that position
-		size_t ww = fntCalcDimensions(font, str);
+		size_t ww = fntCalcDimensions(id, str);
 		
 		if (cw + ww > width) {
 			if (psp) {
@@ -740,16 +713,16 @@ void fntFitString(int font, unsigned char *string, size_t width) {
 	}
 }
 
-int fntCalcDimensions(int font, const unsigned char* str) {
+int fntCalcDimensions(int id, const unsigned char* str) {
 	int w = 0;
 
 	WaitSema(gFontSemaId);
-	font_t *fnt = &fonts[font];
+	font_t *font = &fonts[id];
 	SignalSema(gFontSemaId);
 
 	uint32_t codepoint;
 	uint32_t state = UTF8_ACCEPT;
-	FT_Bool use_kerning = FT_HAS_KERNING(fnt->face);
+	FT_Bool use_kerning = FT_HAS_KERNING(font->face);
 	FT_UInt glyph_index, previous = 0;
 	FT_Vector delta;
 
@@ -760,15 +733,15 @@ int fntCalcDimensions(int font, const unsigned char* str) {
 
 		// Could just as well only get the glyph dimensions
 		// but it is probable the glyphs will be needed anyway
-		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(fnt, codepoint);
+		fnt_glyph_cache_entry_t* glyph = fntCacheGlyph(font, codepoint);
 		if (!glyph)
 			continue;
 
 		// kerning
 		if (use_kerning && previous) {
-			glyph_index = FT_Get_Char_Index(fnt->face, codepoint);
+			glyph_index = FT_Get_Char_Index(font->face, codepoint);
 			if (glyph_index) {
-				FT_Get_Kerning(fnt->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+				FT_Get_Kerning(font->face, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
 				w += delta.x >> 6;
 			}
 			previous = glyph_index;
@@ -778,50 +751,4 @@ int fntCalcDimensions(int font, const unsigned char* str) {
 	}
 
 	return w;
-}
-
-void fntReplace(int id, void* buffer, int bufferSize, int takeover, int asDefault) {
-	font_t *fnt = &fonts[id];
-
-	font_t ndefault, old;
-	fntResetFontDef(&ndefault);
-	fntLoadSlot(&ndefault, buffer, bufferSize);
-	ndefault.isDefault = asDefault;
-
-	// copy over the new font definition
-	// we have to lock this phase, as the old font may still be used
-	WaitSema(gFontSemaId);
-	memcpy(&old, fnt, sizeof(font_t));
-	memcpy(fnt, &ndefault, sizeof(font_t));
-
-	if (takeover)
-		fnt->dataPtr = buffer;
-
-	SignalSema(gFontSemaId);
-
-	// delete the old font
-	fntDeleteFont(&old);
-}
-
-void fntSetDefault(int id) {
-	font_t *fnt = &fonts[id];
-
-	// already default
-	if (fnt->isDefault)
-		return;
-
-	font_t ndefault, old;
-	fntResetFontDef(&ndefault);
-	fntLoadSlot(&ndefault, NULL, -1);
-
-	// copy over the new font definition
-	// we have to lock this phase, as the old font may still be used
-	// Note: No check for concurrency is done here, which is kinda funky!
-	WaitSema(gFontSemaId);
-	memcpy(&old, fnt, sizeof(font_t));
-	memcpy(fnt, &ndefault, sizeof(font_t));
-	SignalSema(gFontSemaId);
-
-	// delete the old font
-	fntDeleteFont(&old);
 }

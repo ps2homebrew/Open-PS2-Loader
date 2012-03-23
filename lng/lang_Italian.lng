@@ -3,7 +3,7 @@ Italian
                WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^
 Open PS2 Loader %s
 Salva cambiamenti
-O Indietro
+Indietro
 Configura Network
 <nessun valore>
 Impostazioni salvate...
@@ -16,10 +16,10 @@ Giochi Network
 Applicazioni
 Tema
 Lingua
-Errore avvio Network: %d
+Avvio Network Errore: %d
 Attivato
 Disattivato
-OK
+Ok
 Impostazioni Gioco
 Rimuovi tutte le impostazioni
 Tutte le impostazioni del gioco sono state rimosse
@@ -63,8 +63,8 @@ Titolo
 Utente
 Parola d'ordine
 <non impostato>
-X Accetta
-L'oggetto sara' cancellato definitivamente, continuare?
+Accetta
+L'oggetto sarà cancellato definitivamente, continuare ?
 Rinomina
 Cancella
 Avvia
@@ -72,20 +72,20 @@ Impostazioni Schermo
 Abilita operazioni di Elimina e Rinomina
 Controlla frammentazione Gioco USB
 Ricorda ultimo gioco Avviato
-Errore, il gioco e' frammentato
+Errore, il gioco è frammentato
 Errore, impossibile avviare l'oggetto
 Testa
 Lasciare vuoto per Autorizzazioni GUEST
 Carica Nucleo Alternativo
-Metodo lettura data alternativo
+Metodo lettura data Alternativo
 Sgancia chiamate Sistema
 PSS Disabilitati
 Disabilita DVD-DL
 Disabilita IGR
-Riduci buffer cdvdfsv
+Non utilizzato
 Nascondi modulo dev9
-Combo IGR alternato
-Cambiare le dimensioni della VMC
+Combo IGR Alternato
+Cambia le dimensioni della VMC
 Creare
 Modifica
 Annulla
@@ -96,10 +96,45 @@ Nome
 Dimensione
 Stato
 Progresso
-File VMC esiste
-File VMC invalido, la dimensione non e' corretta
-File VMC deve essere creato
-Errore con il File VMC, continuare con MC fisica ?
+File VMC esistente
+File VMC invalido, la dimensione non è corretta
+File VMC ancora da creare
+Errore con il File VMC %s, continuare con MC fisica (slot %d) ?
 Aggiornamento automatico
 Informazioni
 Sviluppatori
+Ritardo USB
+Prefisso Percorso USB
+Lasciare vuoto per uscire al Browser
+Valore in minuti, 0 per disabilitare spin down
+Spin down HDD automatico
+Modo Video
+Colore Dialogo
+Colore Selezionato
+Mostra pagina info
+Info
+ELF Personalizzato
+Colore Selezione
+Riconnetti
+Lasciare vuoto per la lista condivisioni
+Prefisso Percorso ETH
+Backspace
+Spazio
+Invio
+Modo
+VMC Slot 1
+VMC Slot 2
+ID Gioco
+Modo DMA
+V-Sync
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Modo 9
+Cronometro Chiamata
+Applica un ritardo alle funzioni CDVD (0 è Predefinito)

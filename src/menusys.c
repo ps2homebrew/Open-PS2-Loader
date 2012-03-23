@@ -518,7 +518,7 @@ void menuRenderMenu() {
 	int cp = 0; // current position
 	for (it = mainMenu; it; it = it->next, cp++) {
 		// render, advance
-		fntRenderString(gTheme->itemsList->font, 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
+		fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
 		y += spacing;
 	}
 }

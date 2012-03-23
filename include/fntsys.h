@@ -9,28 +9,18 @@
 #define FNT_ERROR (-1)
 
 /** Initializes the font subsystem */
-void fntInit(void);
+void fntInit();
 
 /** Terminates the font subsystem */
-void fntEnd(void);
-
-/** Loads a font
-  * @param buffer The memory buffer containing the font
-  * @param bufferSize Size of the buffer
-  * @param takeover Set to nonzero
-  * @return font slot id (negative value means error happened) */
-int fntLoad(void* buffer, int bufferSize, int takeover);
+void fntEnd();
 
 /** Loads a font from a file path
   * @param path The path to the font file
   * @return font slot id (negative value means error happened) */
 int fntLoadFile(char* path);
 
-/** Replaces the given font slot with the defined font */
-void fntReplace(int id, void* buffer, int bufferSize, int takeover, int asDefault);
-
-/** Reloads the default font into the given font slot */
-void fntSetDefault(int id);
+/** Reloads the default font */
+void fntLoadDefault(char* path);
 
 /** Releases a font slot */
 void fntRelease(int id);
@@ -40,15 +30,15 @@ void fntRelease(int id);
 void fntSetAspectRatio(float aw, float ah);
 
 /** Renders a text with specified window dimensions */
-int fntRenderString(int font, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour);
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour);
 
 /** replaces spaces with newlines so that the text fits into the specified width.
   * @note A destrutive operation - modifies the given string!
   */
-void fntFitString(int font, unsigned char *string, size_t width);
+void fntFitString(int id, unsigned char *string, size_t width);
 
 /** Calculates the width of the given text string
 * We can't use the height for alignment, as the horizontal center would depends of the contained text itself */
-int fntCalcDimensions(int font, const unsigned char* str);
+int fntCalcDimensions(int id, const unsigned char* str);
 
 #endif

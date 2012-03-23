@@ -197,17 +197,10 @@ static int lngLoadFromFile(char* path, char *name) {
 			strId++;
 		}
 
-		int size = -1;
 		char path[255];
 		snprintf(path, 255, "%s/font_%s.ttf", gBaseMCDir, name);
-		
 		LOG("LANG Custom font path: %s\n", path);
-		
-		void* customFont = readFile(path, -1, &size);
-		if (customFont)
-			fntReplace(FNT_DEFAULT, customFont, size, 1, 1);  // consider fonts loaded through language as default, so they won't be reset-ed when changing themes
-		else
-			fntSetDefault(FNT_DEFAULT);
+		fntLoadDefault(path);
 
 		return 1;
 	}

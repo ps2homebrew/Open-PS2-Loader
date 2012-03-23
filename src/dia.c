@@ -76,7 +76,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 		//Text
-		fntRenderString(FNT_DEFAULT, 50, 120, ALIGN_NONE, 0, 0, text, gTheme->textColor);
+		fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, text, gTheme->textColor);
 		
 		// separating line for simpler orientation
 		rmDrawLine(25, 138, 615, 138, gColWhite);
@@ -87,7 +87,7 @@ int diaShowKeyb(char* text, int maxLen) {
 				c[0] = keyb[i + j * KEYB_WIDTH];
 
 				x = 50 + i * 31;
-				w = fntRenderString(FNT_DEFAULT, x, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, 0, 0, c, gTheme->uiTextColor) - x;
+				w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, 0, 0, c, gTheme->uiTextColor) - x;
 				if ((i + j * KEYB_WIDTH) == selchar)
 					diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
 			}
@@ -99,7 +99,7 @@ int diaShowKeyb(char* text, int maxLen) {
 				rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
 			
 			x = 477;
-			w = fntRenderString(FNT_DEFAULT, x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;
+			w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;
 			if (i == selcommand)
 				diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
 		}
@@ -214,7 +214,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		rmDrawRect(0, 0,  screenWidth, screenHeight, gColDarker);
 		
 		// "Color selection"
-		fntRenderString(FNT_DEFAULT, 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+		fntRenderString(gTheme->fonts[0], 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 
 		// 3 bars representing the colors...
 		size_t co;
@@ -308,12 +308,12 @@ static void diaDrawHint(int text_id) {
 	
 	char* text = _l(text_id);
 	
-	x = screenWidth - fntCalcDimensions(FNT_DEFAULT, text) - 10;
+	x = screenWidth - fntCalcDimensions(gTheme->fonts[0], text) - 10;
 	y = gTheme->usedHeight - 40;
 	
 	// render hint on the lower side of the screen.
 	rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-	fntRenderString(FNT_DEFAULT, x + 5, y + 5, ALIGN_NONE, 0, 0, text, gTheme->textColor);
+	fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, text, gTheme->textColor);
 }
 
 /// renders an ui item (either selected or not)
@@ -339,9 +339,9 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			// width is text length in pixels...
 			const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
 			if(txt && strlen(txt))
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
+				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
 			else
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
+				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
 
 			break;
 		}
@@ -379,7 +379,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 
 		case UI_OK: {
 			const char *txt = _l(_STR_OK);
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
+			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
 			break;
 		}
 
@@ -387,15 +387,15 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			char tmp[10];
 
 			snprintf(tmp, 10, "%d", item->intvalue.current);
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, tmp, txtcol) - x;
+			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tmp, txtcol) - x;
 			break;
 		}
 
 		case UI_STRING: {
 			if(strlen(item->stringvalue.text))
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, item->stringvalue.text, txtcol) - x;
+				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, item->stringvalue.text, txtcol) - x;
 			else
-				*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
+				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
 			break;
 		}
 
@@ -408,13 +408,13 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 				stars[i] = '*';
 
 			stars[i] = '\0';
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
+			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
 			break;
 		}
 
 		case UI_BOOL: {
 			const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, txtval, txtcol) - x;
+			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txtval, txtcol) - x;
 			break;
 		}
 
@@ -424,7 +424,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			if (!tv)
 				tv = _l(_STR_NO_ITEMS);
 
-			*w = fntRenderString(FNT_DEFAULT, x, y, ALIGN_NONE, 0, 0, tv, txtcol) - x;
+			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tv, txtcol) - x;
 			break;
 		}
 

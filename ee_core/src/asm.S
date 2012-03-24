@@ -13,7 +13,7 @@
 #define MAX_ARGS 	15
 #define ARGBUF_SIZE 	580
 
-#define COMPAT_MODE_3 	0x40
+#define COMPAT_MODE_3 	0x04
 
 #define PADOPEN_HOOK  0
 

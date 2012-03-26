@@ -99,7 +99,7 @@ static void menuInitMainMenu() {
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_IP_CONFIG, _STR_IPCONFIG);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
-	if (gHDDStartMode) // enabled at all?
+	if (gHDDStartMode && gEnableDandR) // enabled at all?
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
 #endif
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);

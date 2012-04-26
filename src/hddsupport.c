@@ -349,7 +349,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	char gid[5];
 	configGetDiscIDBinary(configSet, gid);
 
-	int dmaType = 0, dmaMode = 0, compatMode = 0;
+	int dmaType = 0, dmaMode = 7, compatMode = 0;
 	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
 	configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 	if(dmaMode < 3)

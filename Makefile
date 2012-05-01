@@ -133,6 +133,7 @@ sclean:
 	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
 	echo "    * EE core"
 	$(MAKE) -C ee_core clean
+	$(MAKE) -C ee_core -f Makefile.alt clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
 	echo "    * 10K kernel patches"
@@ -210,7 +211,7 @@ ee_core.s:
 
 alt_ee_core.s:
 	echo "    * alternative EE core"
-	$(MAKE) -C ee_core clean
+	$(MAKE) -C ee_core -f Makefile.alt clean
 	$(MAKE) $(VMC_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core -f Makefile.alt
 	bin2s ee_core/ee_core.elf asm/alt_ee_core.s alt_eecore_elf
 

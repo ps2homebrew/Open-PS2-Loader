@@ -828,7 +828,7 @@ static void setDefaults(void) {
 	strncpy(gExitPath, "", 32);
 	gDefaultDevice = APP_MODE;
 	gAutosort = 1;
-	gAutoRefresh = 1;
+	gAutoRefresh = 0;
 	gDisableDebug = 0;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;

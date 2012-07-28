@@ -8,6 +8,145 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev641 - Updated CHANGELOG and DETAILED_CHANGELOG files
+rev640 - Disabling auto-refresh of game list by default, as it is causing bugs sometimes - Tue May 01 16:37:04 2012 +0200
+rev639 - mgh: fix for default HDD DMA mode, that wasn't correctly set - Thu Apr 26 22:46:24 2012 +0200
+rev638 - Suggestion from "mgh". - Mon Mar 26 22:40:28 2012 +0200
+rev637 - Fix a bug (in revision 426) which made "Mode 3 - Unhook Syscalls" un-effectivei ("Unhook Syscalls" was in fact activated by "Mode 7 - Reduced memory usage", which was setting both modes 3&7). - Sat Mar 24 22:08:24 2012 +0100
+rev636 - * fix for theme font handling (when switching back to the default theme, the language font wasn't re-applyied) - Sat Mar 24 00:21:03 2012 +0100
+rev635 - damn wide font ;) - Wed Mar 07 21:32:39 2012 +0100
+rev634 - Added hidden options to be able to define your own device delay before loading ART/config files. - Wed Mar 07 21:17:18 2012 +0100
+rev633 - layout adjustment - Wed Mar 07 20:54:36 2012 +0100
+rev632 - language files update - Tue Mar 06 19:31:33 2012 +0100
+rev631 - don't do HDD checks when no vmc configuref - Sun Mar 04 23:03:08 2012 +0100
+rev630 - fix for corrupted graphics when manipulating config files - Sun Mar 04 17:47:44 2012 +0100
+rev629 - SilverBull: apply a delay to CDVDMAN functions (initially for Shadow Heart 2) - Sun Mar 04 14:36:46 2012 +0100
+rev628 - adding i18n strings - Wed Feb 29 22:53:10 2012 +0100
+rev627 - Big up for Volca ... slowdown the busy icon - Mon Feb 27 21:18:00 2012 +0100
+rev626 - fix for wrapping artefact when display_mode=ALWAYS - Mon Feb 27 18:53:58 2012 +0100
+rev625 - remove useless code for compatibility mode 7 which is unused now. - Sun Feb 26 14:57:10 2012 +0100
+rev624 - fix for broken UL on ETH mode - Sun Feb 26 12:58:47 2012 +0100
+rev623 - make start/select button skinnable - Sat Feb 25 10:55:24 2012 +0100
+rev622 - make action buttons skinnable - Fri Feb 24 23:08:05 2012 +0100
+rev621 - small correction for gcc warning - Fri Feb 24 20:20:27 2012 +0100
+rev620 - * CRITICAL FIX for 4K disk. It was broken since the beginning for both UL and ISO (2 bugs, one when checking for the cluster size for UL, and one for UL/ISO when patching the usb_cdvdman_irx) - Fri Feb 24 19:59:26 2012 +0100
+rev619 - Finalize the "list share" feature. Now you can list the share, select one from the list and OPL will connect it and display the games. - Mon Feb 20 23:22:33 2012 +0100
+rev618 - * fix a refresh bug introduced lately - Sun Feb 19 17:44:06 2012 +0100
+rev617 - cosmetics again (prefixing every LOG by its location) - Sun Feb 19 16:32:35 2012 +0100
+rev616 - just some cosmetics - Sun Feb 19 15:46:15 2012 +0100
+rev615 - * don't display a share connection error when listing share - Sun Feb 19 14:28:36 2012 +0100
+rev614 - Hey Hominem ... don't commit shit you used for trying to reproduce some bug ;) - Sat Feb 18 11:43:45 2012 +0100
+rev613 - Adding ETHPrefix to fix the use of some box/NAS adding a sub path to the share - Sat Feb 18 11:16:58 2012 +0100
+rev612 - few changes to be able to refresh the menu from anywhere (should be used when selecting a share, after connecting to it, refresh the menu, but it doesn't work currently due to the info screen crashing ...) - Sat Feb 18 11:07:07 2012 +0100
+rev611 - * Add a feature to list network shares. Just let the sharename empty into network settings, and OPL will try to connect and list the shares (BUT then don't try to do anything with the share list, their are handled like games, but are not, so everything would crash) - Thu Feb 16 22:38:21 2012 +0100
+rev610 - * reverted some changes from rev500, finally crazyc was correct (when he skipped one vmc in error, but still wrote the structure in IRX but with flag as inactive) - Wed Feb 15 22:13:25 2012 +0100
+rev609 - load and use the internal LOGO before swapping theme (avoid flickering at startup) - Sun Feb 12 23:02:04 2012 +0100
+rev608 - NOTE: Concerning my comment in R606, I'm sorry Volca, the code wasn't "dangerous" and didn't write memory out of bounds (thanks to the check < MAX_GS_MODE) - Sat Feb 11 15:33:02 2012 +0100
+rev607 - fix small bug in alternate device mode, when loading config files - Fri Feb 10 18:41:41 2012 +0100
+rev606 - * fixed dangerous code (out of bounds memory writing in renderman) - Fri Feb 10 00:19:28 2012 +0100
+rev605 - clarify the gui - Wed Feb 08 21:18:17 2012 +0100
+rev604 - Some changes in the way the network is "reloaded". - Tue Feb 07 23:06:20 2012 +0100
+rev603 - * Minor GUI changes (deferred error message display, small optim for main loop) - Mon Feb 06 22:19:26 2012 +0100
+rev602 - Added "InfoHintText" element, to be able to put a small version of hints for the info screen. - Tue Jan 31 23:05:17 2012 +0100
+rev601 - Remove useless stuff (was thing for RTL transposition only, which will not be implemented after all as too complicated) - Tue Jan 31 22:18:03 2012 +0100
+rev600 - Fix for space and punctuation characters. These one are weak/neutral and should not change the current rendering direction. - Tue Jan 31 21:49:25 2012 +0100
+rev599 - Support for Right-to-Left scripting (Hebrew, Arabic, Syriac, Tifinar, ... languages) - Sat Jan 28 21:55:11 2012 +0100
+rev598 - merge (?) - Sat Jan 14 15:24:26 2012 +0100
+rev597 - Work around FOR PFS BUG with O_TRUNC - Sat Jan 14 15:19:09 2012 +0100
+rev596 - Polishing things, full IO for loading/saving of config files, factorization, ... - Sat Jan 14 11:25:39 2012 +0100
+rev595 - automatically create the CFG folder - Sun Jan 08 13:59:22 2012 +0100
+rev594 - remove duplicate methods / factorization (need to ensure compatibility mode among other don't have regression) - Sun Jan 08 01:40:40 2012 +0100
+rev593 - Configuration related to DNAS/VMC/DMA/COMPAT are now saved in single per game files on each media. - Sat Jan 07 23:38:56 2012 +0100
+rev592 - fixed the alternate device mode. - Fri Oct 14 10:20:26 2011 +0200
+rev591 - l_oliveira: fix for SCPH-10000 with Sony Kernel update - Tue Oct 25 20:33:55 2011 +0200
+rev590 - fix for Kingdom Hearts 2: Final Mix(SLPM_666.75) gummi missions freezing - Mon Jun 20 18:09:10 2011 +0200
+rev589 - fix cdinited flag for SSX on Tour (broken in r585) - Thu Jun 09 17:05:57 2011 +0200
+rev588 - update to comply with the latest PS2SDK - Thu Jun 09 16:52:44 2011 +0200
+rev587 - Fixed sceGetReadPos() to return the buffer offset in 2048-byte units (Updated dynamically). - Wed May 04 16:40:35 2011 +0800
+rev586 - Added new patch for Rugby League 2: World Cup Edition (PAL). - Sat Apr 30 22:29:07 2011 +0800
+rev585 - romz: added better cd tray emulation (fixes A2M games) - Fri Apr 29 17:48:50 2011 +0200
+rev584 - extracted code branching from ItemsList drawing and main drawing method - Wed Mar 09 23:39:07 2011 +0100
+rev583 - fix for the "alternate device mode" that was failing to re-read the configuration files from "mass" device - Sun Mar 06 01:42:13 2011 +0100
+rev582 - * use alignment for clipped/wrapped text - Sun Mar 06 00:05:42 2011 +0100
+rev581 - ItemsList can now use clipping too. As a result, the "items" option for ItemsList has been removed. Now to limit the number of items being displayed, specify a "height" value. - Sat Mar 05 22:10:20 2011 +0100
+rev580 - * caching of last attribute value (for AttributeText/Image element), to not search the config file every frame - Sat Mar 05 19:11:31 2011 +0100
+rev579 - cdvdfsv: implemented sceCdChangeThreadPriority export (as suggested by romz) - Mon Feb 28 10:32:09 2011 +0100
+rev578 - fix EE core makefiles (alt EE core broken in r546) - Mon Feb 28 09:56:24 2011 +0100
+rev577 - * minor addition to have more transitions - Sat Feb 26 21:27:05 2011 +0100
+rev576 - Probable fix for the previous random crash (rev 572) at startup - Wed Feb 23 11:03:52 2011 +0100
+rev575 - * fix problem with semaphore - Tue Feb 22 23:52:13 2011 +0100
+rev574 - Merged changes - Tue Feb 22 21:45:42 2011 +0100
+rev573 - * Added text block rendering function - Tue Feb 22 21:43:36 2011 +0100
+rev572 - * add a delay before loading per-game config file (same as Art, to not spam when navigating very fast) - Tue Feb 22 21:11:38 2011 +0100
+rev571 - Merged changes - Tue Feb 22 20:20:19 2011 +0100
+rev570 - * Fix for rendering problems caused by CLUT alpha setting change - Tue Feb 22 20:19:45 2011 +0100
+rev569 - use deferred IO to load config file (should be more safe, got sometimes corrupted file before) - Mon Feb 21 23:14:38 2011 +0100
+rev568 - * Font rendering now uses clut - Mon Feb 21 22:41:46 2011 +0100
+rev567 - * hints now display either "Info" or "Run" depending if the presentation page is available in the theme AND the option is enabled in settings - Mon Feb 21 00:25:03 2011 +0100
+rev566 - * add loading attributes from a per-game file - Sun Feb 20 22:48:39 2011 +0100
+rev565 - fix for config reading, "val" were truncated at 32 char (copy/paste typo) - Sat Feb 19 22:49:11 2011 +0100
+rev564 - * added new element type "StaticText" to display an hardcoded/static string to the screen - Sat Feb 19 01:33:36 2011 +0100
+rev563 - * added information page (new option to enable it or not) - Fri Feb 18 20:18:17 2011 +0100
+rev562 - First working version of the font atlasing. Probably still buggy so beware :D - Mon Feb 14 22:58:02 2011 +0100
+rev561 - small fixes - Sun Feb 13 01:43:02 2011 +0100
+rev560 - * Fix for rendering artifacts on disabled vsync (the reason was we didn't wait for GS to finish before ending the frame) - Sat Feb 12 18:04:35 2011 +0100
+rev559 - * Improvement for the config reader - it now handles python-like prefixes. Also added a safeguard for the max length of key and value in splitter - Sat Feb 12 16:22:24 2011 +0100
+rev558 - Erf first "merge" (I hope it works ...) - Sat Feb 12 11:56:55 2011 +0100
+rev557 - First step (almost) finished - Sat Feb 12 11:56:09 2011 +0100
+rev556 - step 2, loose coupling - Sun Feb 06 10:48:00 2011 +0100
+rev555 - first step of the theme/menu rendering rewrite - Fri Feb 04 14:19:11 2011 +0100
+rev554 - romz: fix for cdvdman's sceCdSC() - Sun Feb 06 17:39:33 2011 +0100
+rev553 - fix for "use_default=0" option in theme (entering the virtual keyboard was crashing, among other ...) - Tue Feb 01 08:42:07 2011 +0100
+rev552 - * fix a bug in color settings not applied to elements (needed to restart OPL, or cicle with another theme) - Mon Jan 31 21:51:58 2011 +0100
+rev551 - fix for language fonts being reset-ed when changing theme - Sun Jan 30 22:23:20 2011 +0100
+rev550 - re work of virtual keyboard (needed to remove the non-latin characters), added focus on current selected chars - Sun Jan 30 20:57:10 2011 +0100
+rev549 - * saved some place in game settings (to add future GSM settings) - Sun Jan 30 17:57:54 2011 +0100
+rev548 - fix for broken hdldsrv (since r517/r521) - Fri Jan 28 11:07:45 2011 +0100
+rev547 - just some cosmetics to the main Makefile - Thu Jan 20 16:56:51 2011 +0100
+rev546 - just some cosmetics for the EE core - Thu Jan 20 15:32:05 2011 +0100
+rev545 - fix (hopefully) for DVD9 games - Wed Jan 19 15:07:45 2011 +0100
+rev544 - fix for Sonic Unleashed (broken in r515) - Wed Jan 19 09:19:30 2011 +0100
+rev543 - Merged changes - Sun Jan 16 20:03:21 2011 +0100
+rev542 - * Mode setting (PAL/NTSC/Auto) - Sun Jan 16 19:51:10 2011 +0100
+rev541 - * Implemented kerning - Sun Jan 16 19:49:53 2011 +0100
+rev540 - * Longer first-press delay for pads - more comfy controls on max repeat speed - Sun Jan 16 19:28:44 2011 +0100
+rev539 - * Added sclean make target for make clean without Freetype - Sun Jan 16 19:23:58 2011 +0100
+rev538 - EP: fix for POPWW (SLUS_210.22) - Sun Jan 16 12:13:12 2011 +0100
+rev537 - fix for the HD Pro (doesn't support idle timeout) - Sun Jan 16 12:03:57 2011 +0100
+rev536 - fix for white screen freezing in 'Tenchu: Wrath of Heaven' - Sun Jan 09 17:49:56 2011 +0100
+rev535 - fix for the BSOD at game launch on some PS3 (added timeout on wait SPU reset) - Sat Jan 08 15:10:07 2011 +0100
+rev534 - fix for POPWW (SLES_528.22) over SMB, HDD - Sat Jan 08 09:29:46 2011 +0100
+rev533 - fix for SSX on Tour - Fri Jan 07 15:11:50 2011 +0100
+rev532 - small fixes - Fri Jan 07 13:52:39 2011 +0100
+rev531 - short ELF name in App list (looks better for most themes) - Fri Jan 07 13:12:02 2011 +0100
+rev530 - Added option to specify the HDD spin down time out. - Wed Jan 05 22:04:17 2011 +0100
+rev529 - implemented hddSetIdleTimeout() - Wed Jan 05 17:04:27 2011 +0100
+rev528 - removed hdpro_checker IOP module (HD Pro is now detected directly from EE) - Tue Jan 04 18:13:31 2011 +0100
+rev527 - changes to be able to debug IOP core with HD Pro - Tue Jan 04 13:33:33 2011 +0100
+rev526 - added in-game code for HD Pro - Tue Jan 04 12:16:56 2011 +0100
+rev525 - added hdpro_atad IOP module (HD Pro users should have their games listed) - Tue Jan 04 09:09:45 2011 +0100
+rev524 - added hdpro_checker IOP module (detect if HD Pro Kit is present) - Mon Jan 03 21:14:55 2011 +0100
+rev523 - fix for Street Fighter Zero Fighters Generation (SLPM_664.09) by lee4, reverted Capcom Classics Collection fix - Sat Jan 01 10:04:43 2011 +0100
+rev522 - Fix for Capcom Classics Collection - Thu Dec 30 19:36:30 2010 +0100
+rev521 - fix for broken SMB (by r517) on some setup - Thu Dec 30 19:09:57 2010 +0100
+rev520 - * Added theme support for multiple fonts (default_font, font0, font1... + _font=ID in the components) - Thu Dec 30 12:41:14 2010 +0100
+rev519 - configurable IGR path (limited to 32 characters) - Thu Dec 30 00:34:02 2010 +0100
+rev518 - fix for game ID system (broken in r513) - Wed Dec 29 21:10:54 2010 +0100
+rev517 - saved 4k of IOP mem in cdvdman/SMB, direct write to buffer - Wed Dec 29 20:44:02 2010 +0100
+rev516 - * Added support for multiple fonts (not used but there ;)) - Wed Dec 29 18:03:32 2010 +0100
+rev515 - fix for Capcom protected games (SFAA, VDC) - Wed Dec 29 15:28:31 2010 +0100
+rev514 - fix for games from 'Army Men' series - Fri Dec 24 16:56:55 2010 +0100
+rev513 - cdvdman: fix potential buffer overflow for long ISO filenames - Mon Dec 20 19:39:15 2010 +0100
+rev512 - enlarged cdvdman buffer for ISO name to 64 bytes - Mon Dec 20 17:07:51 2010 +0100
+rev511 - when creating a new VMC, the gEnableRenameDelete option should not be applied - Sun Dec 19 17:57:47 2010 +0100
+rev510 - * switch default background mode to "Art" - Sun Dec 19 17:27:55 2010 +0100
+rev509 - * fix USB fragmentation check of Game file parts (it should now works as expected) - Sun Dec 19 16:48:50 2010 +0100
+rev508 - fix for 10K patches freezing on some modchipped PS2 - Sun Dec 19 13:59:33 2010 +0100
+rev507 - * add configurable USB delay (3 is the default value currently used). If you have OPL stuck on yellow or orange screen (when using USB mode only), try increasing this value - Sat Dec 11 16:57:17 2010 +0100
+rev506 - fix for Super Dimensional Fortress Macross (SLPM_654.05) over HDD - Sat Dec 11 10:16:21 2010 +0100
+rev505 - final translations for release 0.8 - Thu Dec 09 20:37:29 2010 +0100
+rev504 - tagged r503 as release v0.8 - Wed Dec 08 12:58:24 2010 +0100
+rev503 - izdubar: added an About screen to the GUI - Wed Dec 08 12:56:57 2010 +0100
 rev502 - languages updates - Tue Dec 07 11:29:46 2010 +0100
 rev501 - work around for the infinite refresh on some NAS device - Mon Dec 06 08:52:19 2010 +0100
 rev500 - a few fixes so that OPL can comply with some Digitus NAS (with the help of Thinner), removed obsoletes language files and added 'Filipino' language file - Sat Dec 04 18:53:39 2010 +0100

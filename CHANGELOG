@@ -8,7 +8,45 @@
 
 Open PS2 Loader ChangeLog:
 
+Version 0.9
+rev641(Jul 2012)
+-------------------------------------------------
+Core:
+	* various fixes
+	* added configurable USB delay (increase this value to avoid stucking on yellow or orange screen when using USB mode)
+	* added delay to CDVDMAN functions (initially for Shadow Heart 2)
+	* compatibility mode 7 which is unused now (remove useless code)
+	* update to comply with the latest PS2SDK
+	* added better cd tray emulation (fixes A2M games)
+	* fix for DVD9 games
+	* added HD Pro support
+
+GUI:
+	* various fixes
+	* Disabled auto-refresh of game list by default
+	* layout adjustment
+	* added hidden options to be able to define your own device delay before loading ART/config files
+	* added skinnable start, select and action buttons
+	* language files update
+	* added "list share" feature: select one share from the list and connect it to display the games
+	* added ETH Prefix
+	* Support for Right-to-Left scripting (Hebrew, Arabic, Syriac, Tifinar, ... languages)
+	* automatically create the CFG folder
+	* Configuration related to DNAS/VMC/DMA/COMPAT are now saved in single per game files on each media
+	* added a delay before loading per-game config file (same as Art, to not spam when navigating very fast)
+	* hints now display either "Info" or "Run"
+	* added loading attributes from a per-game file
+	* added information page
+	* Mode setting (PAL/NTSC/Auto)
+	* Longer first-press delay for pads - more comfy controls on max repeat speed
+	* short ELF name in App list (looks better for most themes)
+	* Added option to specify the HDD spin down time out
+	* Added theme support for multiple fonts
+	* configurable IGR path (limited to 32 characters)
+	* switch default background mode to "Art"
+
 Version 0.8
+rev504 & rev503 (Wed 08 Dec 2010 01:20:28 PM)
 -------------------------------------------------
 Core:
     * secure authentication for the SMB module (to enable security and write access)
@@ -34,8 +72,8 @@ GUI:
     * added "rename" and "delete" functionalities for games lists
 
 Version 0.7
+(Tue 04 May 2010 05:07:04 PM)
 -------------------------------------------------
-- Improved network startups and various fixes
 - Added internal HDD support (HDL format)
 - Added the ability to choose the default menu (USB, NET, HDD games)
 - Added the ability to use a valid disc ID for online games
@@ -51,6 +89,7 @@ Version 0.7
 - Added PCMCIA support for the 18K
 
 Version 0.6
+(Wed 23 Dec 2009 07:24:20 PM)
 -------------------------------------------------
 - Switched to whole new IOP core
 - Changed some compatibility modes effect
@@ -60,6 +99,7 @@ Version 0.6
 - Support for multiple partitions
 
 Version 0.5
+(Sun 29 Nov 2009 03:51:00 PM)
 -------------------------------------------------
 - Added compatibility modes
 - isofs/cdvdman now use disc type

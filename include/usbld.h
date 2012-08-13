@@ -31,7 +31,7 @@
 #include <sys/fcntl.h>
 #endif
 
-#define USBLD_VERSION "0.8"
+#define USBLD_VERSION "0.9"
 
 #define IO_MENU_UPDATE_DEFFERED 2
 

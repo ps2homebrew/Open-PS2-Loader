@@ -49,11 +49,6 @@ zerobss:
    nop
 2:
 
-   # store eventual loader arguments (passed via a0)
-
-   la   $2, _loader_args
-   sw   $4, ($2)
-
 setupthread:
    # setup current thread
 
@@ -92,11 +87,10 @@ ctors:
 
    # call main
 
-   ei
-   jal   _getargs
-   nop
+   la   $2, _args
+   lw   $4, ($2)
    jal   main      # main(argc, argv)
-   nop
+   addiu   $5, $2, 4
 
    # call _exit
 
@@ -123,26 +117,8 @@ dtors:
    nop
 1:
 
-   # conditional exit (depending on if we got arguments through the loader or not)
-
    la   $2, _retval
    lw   $4, ($2)
-
-   la   $5, _loader_args
-   lw   $6, ($5)
-   beqz   $6, 1f
-   nop
-
-   # called from a loader, close thread
-
-   lw   $7, ($6)
-   sw   $0, ($7)   # clear thread id
-
-   addiu   $3, $0, 36
-   syscall         # ExitDeleteThread() (noreturn)
-1:
-
-   # not called from a loader, return to browser
 
    addiu   $3, $0, 4
    syscall         # Exit(retval) (noreturn)
@@ -155,36 +131,9 @@ _root:
    syscall         # ExitThread() (noreturn)
    .end   _root
 
-   .ent   _getargs
-_getargs:
-   # check normal arguments
-
-   la   $2, _args
-   lw   $3, ($2)
-   bnez   $3, 1f
-   nop
-
-   # check for arguments passed by a loader
-
-   la   $2, _loader_args
-   lw   $3, ($2)
-   beqzl   $3, 2f
-   addu   $4, $0, 0
-
-   addiu   $2, $3, 4
-1:
-   lw   $4, ($2)
-   addiu   $5, $2, 4
-2:
-   jr   $ra      # $4 = argc, $5 = argv
-   nop
-   .end   _getargs
-
    .bss
    .align   6
 _args:
    .space   4+16*4+256   # argc, 16 arguments, 256 bytes payload
-_loader_args:
-   .space   4      # pointer to loader arguments: thread id, argc, argv
 _retval:
    .space   4

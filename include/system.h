@@ -25,7 +25,6 @@ int sysExecElf(char *path, int argc, char **argv);
 int sysPS3Detect(void);
 int sysSetIPConfig(char* ipconfig);
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);
-void sysApplyKernelPatches(void);
 int sysCheckMC(void);
 #ifdef VMC
 int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize, vmc_superblock_t* vmc_superblock);

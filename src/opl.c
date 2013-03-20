@@ -926,9 +926,6 @@ int main(int argc, char* argv[])
 	}
 	#endif
 
-	// apply kernel patches
-	sysApplyKernelPatches();
-
 	// reset, load modules
 	reset();
 

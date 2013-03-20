@@ -21,7 +21,7 @@ GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/icon_sys.o obj/icon_icn.o
 
 EECORE_OBJS = obj/ee_core.o \
-		obj/alt_ee_core.o obj/elfldr.o obj/kpatch_10K.o obj/imgdrv.o obj/eesync.o \
+		obj/alt_ee_core.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
@@ -136,8 +136,6 @@ sclean:
 	$(MAKE) -C ee_core -f Makefile.alt clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
-	echo "    * 10K kernel patches"
-	$(MAKE) -C kpatch_10K clean
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
@@ -220,11 +218,6 @@ elfldr.s:
 	$(MAKE) -C elfldr clean
 	$(MAKE) -C elfldr
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
-
-kpatch_10K.s:
-	echo "    * 10K kernel patches"
-	$(MAKE) -C kpatch_10K
-	bin2s kpatch_10K/kpatch.elf asm/kpatch_10K.s kpatch_10K_elf
 
 imgdrv.s:
 	echo "    * imgdrv.irx"

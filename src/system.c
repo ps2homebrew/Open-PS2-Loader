@@ -85,9 +85,6 @@ extern int size_alt_eecore_elf;
 extern void *elfldr_elf;
 extern int size_elfldr_elf;
 
-extern void *kpatch_10K_elf;
-extern int size_kpatch_10K_elf;
-
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
@@ -638,26 +635,6 @@ int sysExecElf(char *path, int argc, char **argv) {
 	ExecPS2((void *)eh->entry, 0, argc+1, elf_argv);
 
 	return 0;
-}
-
-void sysApplyKernelPatches(void) {
-
-	u8 romver[16];
-
-	int fd = fioOpen("rom0:ROMVER", O_RDONLY);
-	if (fd >= 0) {
-		fioRead(fd, romver, sizeof(romver));
-		fioClose(fd);
-
-		// Check in rom0 for PS2 with Protokernel
-		if ((romver[0] == '0')
-		 && (romver[1] == '1')
-		 && (romver[2] == '0')
-		 && (romver[9] == '0')) {
-
-			sbv_patch_protokernel();
-		}
-	}
 }
 
 int sysCheckMC(void) {

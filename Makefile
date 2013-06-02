@@ -7,9 +7,6 @@ VMC = 1
 CHILDPROOF = 0
 RTL = 0
 
-FT_DIR = thirdparty/freetype-2.3.12
-FT_LIBDIR = $(FT_DIR)/objs
-
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
@@ -39,9 +36,9 @@ EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(EECORE_OBJS)
 
-EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
-#EE_LIBS = -L$(FT_LIBDIR) -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
-EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -I$(FT_DIR)/include
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
+#EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 ifeq ($(DEBUG),1) 
 	EE_CFLAGS := -D__DEBUG -g
@@ -91,10 +88,6 @@ endif
 all:
 	@mkdir -p obj
 	@mkdir -p asm
-
-	echo "Building Freetype..."
-	$(MAKE) -C $(FT_DIR) setup ps2 > /dev/null
-	$(MAKE) -C $(FT_DIR)
 	
 	echo "Building Open PS2 Loader..."
 	echo "    * Interface"
@@ -124,8 +117,6 @@ iopcore_debug:
 	$(MAKE) IOPCORE_DEBUG=1 DEBUG=1 all
 
 clean:  sclean
-	echo "    * Freetype..."
-	$(MAKE) -C $(FT_DIR) distclean
 
 sclean:
 	echo "Cleaning..."

@@ -1,7 +1,9 @@
 
 dmacman_IMPORTS_start
-I_dmac_set_dpcr2
-I_dmac_get_dpcr2
+I_dmac_enable
+I_dmac_transfer
+I_dmac_request
+I_dmac_ch_get_chcr
 dmacman_IMPORTS_end
 
 intrman_IMPORTS_start

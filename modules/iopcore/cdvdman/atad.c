@@ -23,8 +23,8 @@
 #include <thevent.h>
 #include <stdio.h>
 #include <sysclib.h>
-#include "dev9.h"
-#include "atad.h"
+#include <dev9.h>
+#include <atad.h>
 
 #include <speedregs.h>
 #include <atahw.h>
@@ -100,29 +100,50 @@ static u32 ata_alarm_cb(void *unused);
 
 static void ata_dma_set_dir(int dir);
 
+static void AtadPreDmaCb(int bcr, int dir){
+	USE_SPD_REGS;
+
+	SPD_REG16(SPD_R_XFR_CTRL)|=0x80;
+}
+
+static void AtadPostDmaCb(int bcr, int dir){
+	USE_SPD_REGS;
+
+	SPD_REG16(SPD_R_XFR_CTRL)&=~0x80;
+}
+
 int atad_start(void)
 {
+#ifdef DEV9_DEBUG
 	USE_SPD_REGS;
+#endif
 	iop_event_t event;
 	int res = 1;
 
 	M_PRINTF(BANNER, VERSION);
 
+#ifdef DEV9_DEBUG
 	if (!(SPD_REG16(SPD_R_REV_3) & SPD_CAPS_ATA) || !(SPD_REG16(SPD_R_REV_8) & 0x02)) {
 		M_PRINTF("HDD is not connected, exiting.\n");
 		goto out;
 	}
+#endif
 
 	event.attr = 0;
 	event.bits = 0;
-	if ((ata_evflg = CreateEventFlag(&event)) < 0) {
+	ata_evflg = CreateEventFlag(&event);
+#ifdef DEV9_DEBUG
+	if (ata_evflg < 0) {
 		M_PRINTF("Couldn't create event flag, exiting.\n");
 		res = 1;
 		goto out;
 	}
+#endif
 
 	dev9RegisterIntrCb(1, ata_intr_cb);
 	dev9RegisterIntrCb(0, ata_intr_cb);
+	dev9RegisterPreDmaCb(0, &AtadPreDmaCb);
+	dev9RegisterPostDmaCb(0, &AtadPostDmaCb);
 
 #ifdef VMC_DRIVER
 	iop_sema_t smp;
@@ -135,7 +156,9 @@ int atad_start(void)
 
 	res = 0;
 	M_PRINTF("Driver loaded.\n");
+#ifdef DEV9_DEBUG
 out:
+#endif
 	return res;
 }
 
@@ -219,11 +242,9 @@ static int ata_device_select(int device)
 }
 
 /* Export 6 */
-int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector,
-		u16 lcyl, u16 hcyl, u16 select, u16 command)
+int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command)
 {
 	USE_ATA_REGS;
-	USE_SPD_REGS;
 	iop_sys_clock_t cmd_timeout;
 	ata_cmd_info_t *cmd_table;
 	int i, res, type, cmd_table_size;
@@ -326,8 +347,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector,
 	ata_hwport->r_command = command & 0xff;
 
 	/* Turn on the LED.  */
-	SPD_REG8(SPD_R_PIO_DIR) = 1;
-	SPD_REG8(SPD_R_PIO_DATA) = 0;
+	dev9LEDCtl(1);
 
 	return 0;
 }
@@ -500,14 +520,13 @@ finish:
 	/* The command has completed (with an error or not), so clean things up.  */
 	CancelAlarm((void *)ata_alarm_cb, NULL);
 	/* Turn off the LED.  */
-	SPD_REG8(SPD_R_PIO_DIR) = 1;
-	SPD_REG8(SPD_R_PIO_DATA) = 1;
+	dev9LEDCtl(0);
 
 	return res;
 }
 
 /* Export 9 */
-int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int dir)
+int ata_device_dma_transfer(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
 {
 	int res = 0;
 	u32 nbytes;
@@ -575,5 +594,5 @@ static void ata_dma_set_dir(int dir)
 	val = SPD_REG16(SPD_R_IF_CTRL) & 1;
 	val |= (dir == 1) ? 0x4c : 0x4e;
 	SPD_REG16(SPD_R_IF_CTRL) = val;
-	SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x86;
+	SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6;
 }

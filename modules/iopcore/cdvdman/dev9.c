@@ -56,7 +56,6 @@ static int using_aif = 0;	/* 1 if using AIF on a T10K */
 
 static void (*p_dev9_intr_cb)(int flag) = NULL;
 static int dma_lock_sem = -1;	/* used to arbitrate DMA */
-static int dma_complete_sem = -1; /* signalled on DMA transfer completion.  */
 
 #ifdef PCMCIA
 static int pcic_cardtype;	/* Translated value of bits 0-1 of 0xbf801462 */
@@ -76,7 +75,6 @@ static dev9_shutdown_cb_t dev9_shutdown_cbs[16];
 static dev9_dma_cb_t dev9_predma_cbs[4], dev9_postdma_cbs[4];
 
 static int dev9_intr_dispatch(int flag);
-static int dev9_dma_intr(void *arg);
 
 static void smap_set_stat(int stat);
 static int read_eeprom_data(void);
@@ -234,15 +232,6 @@ static int dev9_intr_dispatch(int flag)
 	return 0;
 }
 
-/* Signal the end of a DMA transfer.  */
-static int dev9_dma_intr(void *arg)
-{
-	int sem = *(int *)arg;
-
-	iSignalSema(sem);
-	return 1;
-}
-
 static void smap_set_stat(int stat)
 {
 	if (dev9type == 0)
@@ -351,8 +340,7 @@ void dev9IntrDisable(int mask)
 int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 {
 	USE_SPD_REGS;
-	volatile iop_dmac_chan_t *dev9_chan = (iop_dmac_chan_t *)DEV9_DMAC_BASE;
-	int stat, res = 0, dmactrl;
+	int res = 0, dmactrl;
 
 	switch(ctrl){
 	case 0:
@@ -373,26 +361,17 @@ int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 	if ((res = WaitSema(dma_lock_sem)) < 0)
 		return res;
 
-	if (SPD_REG16(SPD_R_REV_1) < 17)
-		dmactrl = (dmactrl & 0x03) | 0x04;
-	else
-		dmactrl = (dmactrl & 0x01) | 0x06;
-	SPD_REG16(SPD_R_DMA_CTRL) = dmactrl;
+	SPD_REG16(SPD_R_DMA_CTRL) = (SPD_REG16(SPD_R_REV_1)<17)?(dmactrl&0x03)|0x04:(dmactrl&0x01)|0x06;
 
 	if (dev9_predma_cbs[ctrl])
 		dev9_predma_cbs[ctrl](bcr, dir);
 
-	EnableIntr(IOP_IRQ_DMA_DEV9);
-	dev9_chan->madr = (u32)buf;
-	dev9_chan->bcr  = bcr;
-	dev9_chan->chcr = DMAC_CHCR_30|DMAC_CHCR_TR|DMAC_CHCR_CO|
-		(dir & DMAC_CHCR_DR);
+	dmac_request(IOP_DMAC_8, buf, bcr&0xFFFF, bcr>>16, dir);
+	dmac_transfer(IOP_DMAC_8);
 
-	/* Wait for DMA to complete.  */
-	if ((res = WaitSema(dma_complete_sem)) >= 0)
-		res = 0;
-
-	DisableIntr(IOP_IRQ_DMA_DEV9, &stat);
+	/* Wait for DMA to complete. Do not use a semaphore as thread switching hurts throughput greatly.  */
+	while(dmac_ch_get_chcr(IOP_DMAC_8)&DMAC_CHCR_TR){}
+	res=0;
 
 	if (dev9_postdma_cbs[ctrl])
 		dev9_postdma_cbs[ctrl](bcr, dir);
@@ -504,20 +483,13 @@ int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb){
 
 static int smap_subsys_init(void)
 {
-	int i, stat, flags;
+	int i;
 
 	if ((dma_lock_sem = CreateMutex(IOP_MUTEX_UNLOCKED)) < 0)
 		return -1;
-	if ((dma_complete_sem = CreateMutex(IOP_MUTEX_LOCKED)) < 0)
-		return -1;
 
-	DisableIntr(IOP_IRQ_DMA_DEV9, &stat);
-	CpuSuspendIntr(&flags);
 	/* Enable the DEV9 DMAC channel.  */
-	ReleaseIntrHandler(IOP_IRQ_DMA_DEV9);
-	RegisterIntrHandler(IOP_IRQ_DMA_DEV9, 1, dev9_dma_intr, &dma_complete_sem);
-	dmac_set_dpcr2(dmac_get_dpcr2() | 0x80);
-	CpuResumeIntr(flags);
+	dmac_enable(IOP_DMAC_8);
 
 	/* Not quite sure what this enables yet.  */
 	smap_set_stat(0x103);
@@ -846,7 +818,6 @@ static int pcmcia_init(void)
 {
 	USE_DEV9_REGS;
 	int *mode;
-	int flags;
 	u16 cstc1, cstc2;
 
 	_sw(0x51011, SSBUS_R_1420);
@@ -890,10 +861,8 @@ static int pcmcia_init(void)
 	if (smap_subsys_init() != 0)
 		return 1;
 
-	CpuSuspendIntr(&flags);
-	RegisterIntrHandler(DEV9_INTR, 1, pcmcia_intr, NULL);
-	EnableIntr(DEV9_INTR);
-	CpuResumeIntr(flags);
+	RegisterIntrHandler(IOP_IRQ_DEV9, 1, pcmcia_intr, NULL);
+	EnableIntr(IOP_IRQ_DEV9);
 
 	DEV9_REG(DEV9_R_147E) = 0;
 	M_PRINTF("CXD9566 (PCMCIA type) initialized.\n");
@@ -944,7 +913,6 @@ static int expbay_intr(void *unused)
 static int expbay_init(void)
 {
 	USE_DEV9_REGS;
-	int flags;
 
 	_sw(0x51011, SSBUS_R_1420);
 	_sw(0xe01a3043, SSBUS_R_1418);
@@ -962,11 +930,9 @@ static int expbay_init(void)
 	if (smap_subsys_init() != 0)
 		return 1;
 
-	CpuSuspendIntr(&flags);
-	ReleaseIntrHandler(DEV9_INTR);
-	RegisterIntrHandler(DEV9_INTR, 1, expbay_intr, NULL);
-	EnableIntr(DEV9_INTR);
-	CpuResumeIntr(flags);
+	ReleaseIntrHandler(IOP_IRQ_DEV9);
+	RegisterIntrHandler(IOP_IRQ_DEV9, 1, expbay_intr, NULL);
+	EnableIntr(IOP_IRQ_DEV9);
 
 	DEV9_REG(DEV9_R_1466) = 0;
 	M_PRINTF("CXD9611 (Expansion Bay type) initialized.\n");

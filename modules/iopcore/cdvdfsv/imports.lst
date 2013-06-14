@@ -40,3 +40,9 @@ I_SleepThread
 I_ReferThreadStatus
 I_ChangeThreadPriority
 thbase_IMPORTS_end
+
+thevent_IMPORTS_start
+I_ClearEventFlag
+I_WaitEventFlag
+thevent_IMPORTS_end
+

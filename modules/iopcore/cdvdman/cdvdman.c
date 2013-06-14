@@ -110,6 +110,10 @@ struct irx_export_table _exp_oplutils;
 #endif
 
 // PS2 CDVD hardware registers
+#define CDL_DATA_RDY		0x01
+#define CDL_DATA_COMPLETE	0x02
+#define CDL_DATA_END		0x04
+
 #define CDVDreg_NCOMMAND      (*(volatile unsigned char *)0xBF402004)
 #define CDVDreg_READY         (*(volatile unsigned char *)0xBF402005)
 #define CDVDreg_NDATAIN       (*(volatile unsigned char *)0xBF402005)
@@ -1621,18 +1625,26 @@ int sceCdGetReadPos(void)
 //-------------------------------------------------------------------------
 int sceCdSC(int code, int *param)
 {
+	int result;
+
         DPRINTF("sceCdSC(0x%X, 0x%X)\n", code, param);
 
-        if (code == 0xFFFFFFF7) {
-                return CDVDMAN_MODULE_VERSION;
-        }
-        else if (code == 0xFFFFFFF0) {
-                *param = (int)&cdvdman_debug_print_flag;
-                return 0xFF;
+	switch(code){
+		case 0xFFFFFFF5:
+			result=cdvdman_stat.intr_ef;
+			break;
+		case 0xFFFFFFF7:
+			result=CDVDMAN_MODULE_VERSION;
+			break;
+		case 0xFFFFFFF0:
+			*param = (int)&cdvdman_debug_print_flag;
+			result=0xFF;
+			break;
+		default:
+			result=1;	// dummy result
         }
 
-        /* dummy result */
-        return 1;
+        return result;
 }
 
 //-------------------------------------------------------------------------
@@ -2880,6 +2892,29 @@ void cdvdman_get_part_specs(u32 lsn)
 #endif
 
 //-------------------------------------------------------------------------
+static int intrh_cdrom(void *common){
+	if(CDVDreg_PWOFF&CDL_DATA_RDY) CDVDreg_PWOFF=CDL_DATA_RDY;
+
+	if(CDVDreg_PWOFF&CDL_DATA_END){
+		CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
+		iSetEventFlag(cdvdman_stat.intr_ef, 0x14);	//Notify FILEIO and CDVDFSV of the power-off event.
+
+		//Call power-off callback here. OPL doesn't handle one, so do nothing.
+	}
+	else CDVDreg_PWOFF=CDL_DATA_COMPLETE;	//Acknowledge interrupt
+
+	return 1;
+}
+
+static inline void InstallIntrHandler(void){
+	RegisterIntrHandler(IOP_IRQ_CDVD, 1, &intrh_cdrom, NULL);
+	EnableIntr(IOP_IRQ_CDVD);
+
+	//Acknowledge hardware events (e.g. poweroff)
+	if(CDVDreg_PWOFF&CDL_DATA_END) CDVDreg_PWOFF=CDL_DATA_END;
+	if(CDVDreg_PWOFF&CDL_DATA_RDY) CDVDreg_PWOFF=CDL_DATA_RDY;
+}
+
 int _start(int argc, char **argv)
 {
 	// register exports
@@ -2931,6 +2966,7 @@ int _start(int argc, char **argv)
 #endif
 	// register cdrom device driver
 	cdvdman_initdev();
+	InstallIntrHandler();
 
 #ifndef SMB_DRIVER
 	g_tag[0] = 0; // just to shut off warning

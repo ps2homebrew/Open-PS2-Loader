@@ -10,6 +10,7 @@
 #include "smsutils.h"
 #include <sysmem.h>
 #include <thbase.h>
+#include <thevent.h>
 #include <thsemap.h>
 
 #endif

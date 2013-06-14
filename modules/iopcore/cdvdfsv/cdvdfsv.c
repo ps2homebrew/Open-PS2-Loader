@@ -12,6 +12,7 @@
 #include <sysmem.h>
 #include <sysclib.h>
 #include <thbase.h>
+#include <thevent.h>
 #include <thsemap.h>
 
 #include "smsutils.h"
@@ -87,6 +88,7 @@ int sceCdStatus(void); 							// #28
 int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out); 		// #29
 int sceCdPause(void);							// #38
 int sceCdBreak(void);							// #39
+int sceCdSC(int code, int *param);					// #50
 int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr); 		// #56
 int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err); 		// #57
 int sceCdStSeek(u32 lsn);						// #58
@@ -335,9 +337,6 @@ void *cdvdStsubcall_tab[10] = {
 
 cd_read_mode_t cdvdfsv_Stmode;
 static u8 *cdvdfsv_buf;
-
-u32 cbrpcS596_oldfno;
-u32 cbrpcS596_fno;
 
 SifRpcDataQueue_t rpc0_DQ __attribute__((aligned(16)));
 SifRpcDataQueue_t rpc1_DQ __attribute__((aligned(16)));
@@ -772,17 +771,16 @@ void *rpcNCmd_dummy(u32 fno, void *buf, int size)
 //-------------------------------------------------------------- 
 void *cbrpc_S596(u32 fno, void *buf, int size)
 {
-	if (fno != 1)
-		return (void *)NULL;
+	int cdvdman_intr_ef, dummy;
 
-	if (*(u32 *)buf == fno)
-		return (void *)&cbrpcS596_oldfno;
+	if(fno==1){
+		cdvdman_intr_ef=sceCdSC(0xFFFFFFF5, &dummy);
+		ClearEventFlag(cdvdman_intr_ef, ~4);
+		WaitEventFlag(cdvdman_intr_ef, 4, WEF_AND, NULL);
+	}
 
-	cbrpcS596_oldfno = cbrpcS596_fno;
-
-	cbrpcS596_fno = fno;
-
-	return (void *)&cbrpcS596_oldfno;
+	*(int*)buf=1;
+	return buf;
 }
 
 //-------------------------------------------------------------------------
@@ -1188,6 +1186,7 @@ DECLARE_IMPORT(28, sceCdStatus)
 DECLARE_IMPORT(29, sceCdApplySCmd)
 DECLARE_IMPORT(38, sceCdPause)
 DECLARE_IMPORT(39, sceCdBreak)
+DECLARE_IMPORT(50, sceCdSC)
 DECLARE_IMPORT(56, sceCdStInit)
 DECLARE_IMPORT(57, sceCdStRead)
 DECLARE_IMPORT(58, sceCdStSeek)

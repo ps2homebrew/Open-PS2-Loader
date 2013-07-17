@@ -20,7 +20,6 @@
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
-#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -80,22 +79,14 @@ static void Shutdown_Dev9()
 }
 
 // Return to PS2 Browser
-static void Go_Browser(void)
+static inline void Go_Browser(void)
 {
 	// Shutdown Dev9 hardware
 	if (HDDSpindown)
 		Shutdown_Dev9();
-	
-	// FlushCache before exiting
-	FlushCache(0);
-	FlushCache(2);
 
 	// Exit to PS2Browser
-	__asm__ __volatile__(
-		"	li $3, 0x04;"
-		"	syscall;"
-		"	nop;"
-	);
+	Exit(0);
 }
 
 // Load home ELF
@@ -114,16 +105,6 @@ static void t_loadElf(void)
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x000080; // Dark Red
 
-	// Reset IO Processor
-	while (!Reset_Iop("rom0:UDNL rom0:EELOADCNF", 0)) {;}
-	while (!Sync_Iop()){;}
-
-	if(!DisableDebug)
-		GS_BGCOLOUR = 0xFF80FF; // Pink
-
-	// Init RPC & CMD
-	SifInitRpc(0);
-
 	// Apply Sbv patches
 	Sbv_Patch();
 	
@@ -136,7 +117,6 @@ static void t_loadElf(void)
 
 	// Load exit ELF
 	argv[0] = ExitPath;
-
 	argv[1] = NULL;
 
 	ret = LoadElf(argv[0], &elf);
@@ -210,23 +190,11 @@ static void IGR_Thread(void *arg)
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x800000; // Dark Blue
 
+		// Reset IO Processor
+		while (!Reset_Iop(NULL, 0)) {;}
+
 		// Remove kernel hook
 		Remove_Kernel_Hooks();
-
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x008000; // Dark Green
-
-		// Reset Data Decompression Vector Unit 0 & 1
-		ResetEE(0x04);
-
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x800080; // Purple
-
-		// Reset SPU Sound processor
-		ResetSPU();
-
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x0000FF; // Red
 
 		// Check Translation Look-Aside Buffer
 		// Some game (GT4, GTA) modify memory map
@@ -236,9 +204,11 @@ static void IGR_Thread(void *arg)
 		// Init TLB
 		if(Cop0_Index != 0x26)
 		{
+			DI();
 			ee_kmode_enter();
 			InitializeTLB();
 			ee_kmode_exit();
+			EI();
 		}
 
 		// Check Performance Counter
@@ -262,10 +232,24 @@ static void IGR_Thread(void *arg)
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00FFFF; // Yellow
 
+		while (!Sync_Iop()){;}
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0xFF80FF; // Pink
+
+		// Init RPC & CMD
+		SifInitRpc(0);
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x008000; // Dark Green
+
+		// Reset SPU Sound processor
+		LoadModule("rom0:CLEARSPU", 0, NULL);
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x0000FF; // Red
+
 		// Exit services
-		fioExit();
 		LoadFileExit();
-		SifExitIopHeap();
 		SifExitRpc();
 
 		FlushCache(0);

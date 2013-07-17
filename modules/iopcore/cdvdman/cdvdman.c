@@ -1921,6 +1921,12 @@ int sceCdStSeekF(u32 lsn)
 }
 
 //-------------------------------------------------------------------------
+int sceCdPowerOff(int *stat)
+{
+	return cdvdman_sendSCmd(0x0F, NULL, 0, (unsigned char *)stat, 1);
+}
+
+//-------------------------------------------------------------------------
 int sceCdReadDiskID(void *DiskID)
 {
 	int i;
@@ -2896,7 +2902,8 @@ static int intrh_cdrom(void *common){
 	if(CDVDreg_PWOFF&CDL_DATA_RDY) CDVDreg_PWOFF=CDL_DATA_RDY;
 
 	if(CDVDreg_PWOFF&CDL_DATA_END){
-		CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
+	//Do not acknowledge the interrupt here. The EE-side IGR code will monitor and acknowledge it.
+//		CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
 		iSetEventFlag(cdvdman_stat.intr_ef, 0x14);	//Notify FILEIO and CDVDFSV of the power-off event.
 
 		//Call power-off callback here. OPL doesn't handle one, so do nothing.

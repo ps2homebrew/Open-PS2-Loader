@@ -99,6 +99,7 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode);	// #62
 int sceCdStPause(void);							// #67
 int sceCdStResume(void); 						// #68
 int sceCdMmode(int mode); 						// #75
+int sceCdPowerOff(int *stat); 						// #75
 int sceCdStSeekF(u32 lsn); 						// #77
 int sceCdReadDiskID(void *DiskID);					// #79
 int sceCdReadGUID(void *GUID);						// #80
@@ -567,7 +568,7 @@ void *rpcSCmd_cdabort(u32 fno, void *buf, int size)
 void *rpcSCmd_cdpoweroff(u32 fno, void *buf, int size)
 {	// CD Power Off RPC SCMD
 
-	*(int *)buf = 1;
+	*(int *)buf = sceCdPowerOff((int *)buf);
 	return buf;
 }
 
@@ -1196,6 +1197,7 @@ DECLARE_IMPORT(61, sceCdStStop)
 DECLARE_IMPORT(62, sceCdRead0)
 DECLARE_IMPORT(67, sceCdStPause)
 DECLARE_IMPORT(68, sceCdStResume)
+DECLARE_IMPORT(74, sceCdPowerOff)
 DECLARE_IMPORT(75, sceCdMmode)
 DECLARE_IMPORT(77, sceCdStSeekF)
 DECLARE_IMPORT(79, sceCdReadDiskID)

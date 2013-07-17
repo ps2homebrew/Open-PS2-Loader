@@ -13,7 +13,7 @@
 
 EE_BIN = ee_core.elf
 EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o \
-	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/asm.o obj/crt0.o
+	  obj/padhook.o obj/smbauth.o obj/des.o obj/md4.o obj/asm.o obj/crt0.o
 MAPFILE = ee_core.map
 
 EE_SRC_DIR = src/

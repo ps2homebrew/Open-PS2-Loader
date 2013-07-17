@@ -685,8 +685,6 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 	u16 sector, lcyl, hcyl, select, command, len;
 
 	while (nsectors) {
-		len = (nsectors > 256) ? 256 : nsectors;
-
 		ata_dma_set_dir(dir);
 
 		/* Variable lba is only 32 bits so no change for lcyl and hcyl.  */
@@ -695,6 +693,8 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 
 		if (lba_48bit[device]) {
 			/* Setup for 48-bit LBA.  */
+			len = (nsectors > 65536) ? 65536 : nsectors;
+
 			/* Combine bits 24-31 and bits 0-7 of lba into sector.  */
 			sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
 			/* 0x40 enables LBA.  */
@@ -702,6 +702,7 @@ int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int di
 			command = (dir == 1) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;
 		} else {
 			/* Setup for 28-bit LBA.  */
+			len = (nsectors > 256) ? 256 : nsectors;
 			sector = lba & 0xff;
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;

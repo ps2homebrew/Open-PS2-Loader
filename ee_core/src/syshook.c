@@ -12,6 +12,7 @@
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
+#include "spu.h"
 #include "patches.h"
 #include "padhook.h"
 #include "syshook.h"
@@ -319,6 +320,8 @@ void t_loadElf(void)
 	t_ExecData elf;
 
 	DPRINTF("t_loadElf()\n");
+
+	ResetSPU();
 
 	SifExitRpc();
 

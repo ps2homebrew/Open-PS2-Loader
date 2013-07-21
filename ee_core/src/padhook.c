@@ -20,6 +20,7 @@
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
+#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -243,17 +244,14 @@ static void IGR_Thread(void *arg)
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x008000; // Dark Green
 
-		// Reset SPU Sound processor
-		LoadModule("rom0:CLEARSPU", 0, NULL);
+		// Reset SPU
+		ResetSPU();
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x0000FF; // Red
 
 		// Exit services
 		LoadFileExit();
 		SifExitRpc();
-
-		FlushCache(0);
-		FlushCache(2);
 
 		// Execute home loader
 		if (ExitPath[0] != '\0')
@@ -271,22 +269,26 @@ static void IGR_Thread(void *arg)
 static int IGR_Intc_Handler(int cause)
 {
 	int i;
+	u8 pad_pos_state, pad_pos_frame, pad_pos_combo1, pad_pos_combo2;
 
-	// Write back the D-cache contents to update Pad Buffer
-	iSyncDCache(Pad_Data.pad_buf, Pad_Data.pad_buf + 256);
-	
+	// Copy values via the uncached segment, to bypass the cache.
+	pad_pos_state=((u8*)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_state];
+	pad_pos_frame=((u8*)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_frame];
+	pad_pos_combo1=((u8*)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_combo1];
+	pad_pos_combo2=((u8*)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_combo2];
+
 	// First check pad state
-	if ( ( (Pad_Data.libpad == IGR_LIBPAD_V1) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V1) ) ||
-			 ( (Pad_Data.libpad == IGR_LIBPAD_V2) && (Pad_Data.pad_buf[Pad_Data.pos_state] == IGR_PAD_STABLE_V2) ) )
+	if ( ( (Pad_Data.libpad == IGR_LIBPAD_V1) && (pad_pos_state == IGR_PAD_STABLE_V1) ) ||
+			 ( (Pad_Data.libpad == IGR_LIBPAD_V2) && (pad_pos_state == IGR_PAD_STABLE_V2) ) )
 	{
 		// Check if pad buffer is still alive with pad data frame counter
 		// If pad frame change save it, otherwise tell to syshook to re-install padOpen hook
 		if( Pad_Data.vb_count++ >= 10)
 		{
-			if(Pad_Data.pad_buf[Pad_Data.pos_frame] != Pad_Data.prev_frame)
+			if(pad_pos_frame != Pad_Data.prev_frame)
 			{
 				padOpen_hooked = 1;
-				Pad_Data.prev_frame = Pad_Data.pad_buf[Pad_Data.pos_frame];
+				Pad_Data.prev_frame = pad_pos_frame;
 			}
 			else
 			{
@@ -296,12 +298,12 @@ static int IGR_Intc_Handler(int cause)
 		}
 
 		// Combo R1 + L1 + R2 + L2
-		if ( Pad_Data.pad_buf[Pad_Data.pos_combo1] == IGR_COMBO_R1_L1_R2_L2 )
+		if ( pad_pos_combo1 == IGR_COMBO_R1_L1_R2_L2 )
 		{
 			// Combo Start + Select OR R3 + L3
-			if ( ( Pad_Data.pad_buf[Pad_Data.pos_combo2] == IGR_COMBO_START_SELECT ) || // Start + Select combo, so reset
-				   ( Pad_Data.pad_buf[Pad_Data.pos_combo2] == IGR_COMBO_R3_L3 ) )         // R3 + L3 combo, so poweroff
-				Pad_Data.combo_type = Pad_Data.pad_buf[Pad_Data.pos_combo2];
+			if ( ( pad_pos_combo2 == IGR_COMBO_START_SELECT ) || // Start + Select combo, so reset
+				   ( pad_pos_combo2 == IGR_COMBO_R3_L3 ) )         // R3 + L3 combo, so poweroff
+				Pad_Data.combo_type = pad_pos_combo2;
 		}
 	}
 
@@ -369,12 +371,6 @@ static int IGR_Intc_Handler(int cause)
 			}
 		}
 	}
-
-	// Exit handler
-	__asm__ __volatile__(
-		" sync.l;"
-		" ei;"
-	);
 
 	return 0;
 }

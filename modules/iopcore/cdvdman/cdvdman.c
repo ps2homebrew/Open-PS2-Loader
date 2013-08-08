@@ -345,6 +345,7 @@ int (*pUsbTransfer)(int id, void *data, u32 len, void *option, UsbCallbackProc c
 int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc); 				// #12
 
 // !!! ps2ip exports functions pointers !!!
+// Note: recvfrom() used here is not a standard recvfrom() function.
 int (*plwip_close)(int s); 										// #6
 int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen); 					// #7
 int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);	// #10
@@ -1148,7 +1149,7 @@ void fs_init(void)
 #ifdef HDD_DRIVER
 	DPRINTF("fs_init: apa header LBA = %d\n", g_part_start[0]);
 
-	int r = ata_device_dma_transfer(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
+	int r = ata_device_sector_io(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
 	if (r != 0)
 		DPRINTF("fs_init: failed to read apa header %d\n", r);
 
@@ -1822,7 +1823,7 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 				nsectors = sectors;
 
 			u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);
-			if (ata_device_dma_transfer(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
+			if (ata_device_sector_io(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
 				cdvdman_stat.err = CDVD_ERR_READ;
 				break;
 			}

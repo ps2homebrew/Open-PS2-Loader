@@ -152,7 +152,8 @@ sclean:
 	echo "    * SMSTCPIP.irx"
 	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo "    * SMSMAP.irx"
-	$(MAKE) -C modules/network/SMSMAP clean
+#	$(MAKE) -C modules/network/SMSMAP clean
+	$(MAKE) -C modules/network/smap clean
 	echo "    * discID.irx"
 	$(MAKE) -C modules/cdvd/discID clean
 	echo "    * ps2atad.irx"
@@ -313,8 +314,10 @@ ingame_smstcpip.s:
 
 smsmap.s:
 	echo "    * SMSMAP.irx"
-	$(MAKE) -C modules/network/SMSMAP
-	bin2s modules/network/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
+#	$(MAKE) -C modules/network/SMSMAP
+#	bin2s modules/network/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
+	$(MAKE) -C modules/network/smap
+	bin2s modules/network/smap/smap.irx asm/smsmap.s smsmap_irx
 
 smbman.s:
 	bin2s $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx

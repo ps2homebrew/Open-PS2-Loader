@@ -342,6 +342,9 @@ void guiShowUIConfig() {
 
 void guiShowIPConfig() {
 	size_t i;
+	const char *ethOpModes[]={_l(_STR_AUTO), _l(_STR_ETH_100MFDX), _l(_STR_ETH_100MHDX), _l(_STR_ETH_10MFDX), _l(_STR_ETH_10MHDX), NULL};
+	diaSetEnum(diaIPConfig, NETCFG_ETHOPMODE, ethOpModes);
+
 	// upload current values
 	for (i = 0; i < 4; ++i) {
 		if (gNetworkStartup != ERROR_ETH_NOT_STARTED) {
@@ -363,18 +366,19 @@ void guiShowIPConfig() {
 	diaSetString(diaIPConfig, 19, gPCShareName);
 	diaSetString(diaIPConfig, 20, gPCUserName);
 	diaSetString(diaIPConfig, 21, gPCPassword);
+	diaSetInt(diaIPConfig, NETCFG_ETHOPMODE, gETHOpMode);
 
+	//Update the spacer item between the OK and reconnect buttons (See dialogs.c).
 	if (gNetworkStartup == 0) {
 		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
-		diaIPConfig[64].type = UI_SPACER;
+		diaIPConfig[70].type = UI_SPACER;
 	} else if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
 		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_RECONNECT));
-		diaIPConfig[64].type = UI_TERMINATOR;
+		diaIPConfig[70].type = UI_TERMINATOR;
 	} else {
 		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
-		diaIPConfig[64].type = UI_TERMINATOR;
+		diaIPConfig[70].type = UI_TERMINATOR;
 	}
-
 
 	int result = diaExecuteDialog(diaIPConfig, -1, 1, NULL);
 	if (result) {
@@ -385,6 +389,7 @@ void guiShowIPConfig() {
 			diaGetInt(diaIPConfig, 10 + i, &ps2_gateway[i]);
 			diaGetInt(diaIPConfig, 14 + i, &pc_ip[i]);
 		}
+		diaGetInt(diaIPConfig, NETCFG_ETHOPMODE, &gETHOpMode);
 
 		diaGetInt(diaIPConfig, 18, &gPCPort);
 		diaGetString(diaIPConfig, 19, gPCShareName);

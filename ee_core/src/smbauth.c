@@ -17,9 +17,8 @@
 #include <string.h>
 
 #define DMA_ADDR 		0x000cff00
-#define	UNCACHEDSEG(vaddr)	(0x20000000 | vaddr)
 
-extern int _gp;
+extern void *_gp;
 
 /* EE DMAC registers.  */
 #define DMAC_COMM_STAT	0x1000e010
@@ -28,7 +27,7 @@ extern int _gp;
 #define STAT_SIF0	0x20
 
 static u8 thread_stack[0x800] __attribute__((aligned(16)));
-static unsigned int *sifDmaDataPtr = (unsigned int *)UNCACHEDSEG(DMA_ADDR);
+static unsigned int *sifDmaDataPtr = (unsigned int *)UNCACHED_SEG(DMA_ADDR);
 static int smbauth_thread_id;
 static int sif0_id = -1;
 
@@ -50,7 +49,7 @@ typedef struct {			// size = 156
 	void	*IOPaddr;
 } server_specs_t;
 
-static server_specs_t *server_specs = (void *)UNCACHEDSEG((DMA_ADDR + 0x40));
+static server_specs_t *server_specs = (void *)UNCACHED_SEG((DMA_ADDR + 0x40));
 
 #define SERVER_USE_PLAINTEXT_PASSWORD	0
 #define SERVER_USE_ENCRYPTED_PASSWORD	1

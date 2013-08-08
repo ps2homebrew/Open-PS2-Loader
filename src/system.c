@@ -302,6 +302,12 @@ int sysPS3Detect(void) {	//return 0=PS2 1=PS3-HARD 2=PS3-SOFT
 int sysSetIPConfig(char* ipconfig) {
 	int ipconfiglen;
 	char str[16];
+	const char *SmapLinkModeArgs[4]={
+		"0x100",
+		"0x080",
+		"0x040",
+		"0x020"
+	};
 
 	memset(ipconfig, 0, IPCONFIG_MAX_LEN);
 	ipconfiglen = 0;
@@ -320,6 +326,14 @@ int sysSetIPConfig(char* ipconfig) {
 	sprintf(str, "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 	strncpy(&ipconfig[ipconfiglen], str, 15);
 	ipconfiglen += strlen(str) + 1;
+
+	//Add Ethernet operation mode to g_ipconfig buf
+	if(gETHOpMode!=ETH_OP_MODE_AUTO){
+		strcpy(&ipconfig[ipconfiglen], "-no_auto");
+		ipconfiglen += 9;
+		strcpy(&ipconfig[ipconfiglen], SmapLinkModeArgs[gETHOpMode-1]);
+		ipconfiglen += strlen(SmapLinkModeArgs[gETHOpMode-1]) + 1;
+	}
 
 	return ipconfiglen;
 }
@@ -417,11 +431,7 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 }
 
 void sysExecExit() {
-	__asm__ __volatile__(
-			"	li $3, 0x04;"
-			"	syscall;"
-			"	nop;"
-	);
+	Exit(0);
 }
 
 static void restoreSyscallHandler(void)
@@ -532,9 +542,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	int i;
 	char *argv[3];
 	char config_str[255];
-	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+//	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 
-	sysSetIPConfig(ipconfig); // TODO only needed for ETH mode, and already done in ethsupport.ethLoadModules
+//	sysSetIPConfig(ipconfig); // TODO only needed for ETH mode, and already done in ethsupport.ethLoadModules
 
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", 32);
@@ -577,10 +587,10 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	FlushCache(0);
 	FlushCache(2);
 
-	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
+	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
-		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode);
 
 	char cmask[10];
 	snprintf(cmask, 10, "%d", compatflags);

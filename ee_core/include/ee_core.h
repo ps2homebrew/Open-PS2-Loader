@@ -37,12 +37,23 @@ extern int iop_reboot_count;
 
 extern int padOpen_hooked;
 
+enum ETH_OP_MODES{
+	ETH_OP_MODE_AUTO	= 0,
+	ETH_OP_MODE_100M_FDX,
+	ETH_OP_MODE_100M_HDX,
+	ETH_OP_MODE_10M_FDX,
+	ETH_OP_MODE_10M_HDX,
+
+	ETH_OP_MODE_COUNT
+};
+
 #define IPCONFIG_MAX_LEN	64
 char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
 int g_ipconfig_len;
 char g_ps2_ip[16];
 char g_ps2_netmask[16];
 char g_ps2_gateway[16];
+unsigned char g_ps2_ETHOpMode;
 u32 g_compat_mask;
 
 #define COMPAT_MODE_1 		0x01

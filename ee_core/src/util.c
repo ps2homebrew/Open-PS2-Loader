@@ -237,6 +237,13 @@ unsigned int _strtoui(const char* p)
 /*----------------------------------------------------------------------------------------*/
 void set_ipconfig(void)
 {
+	const char *SmapLinkModeArgs[4]={
+		"0x100",
+		"0x080",
+		"0x040",
+		"0x020"
+	};
+
 	memset(g_ipconfig, 0, IPCONFIG_MAX_LEN);
 	g_ipconfig_len = 0;
 
@@ -251,6 +258,14 @@ void set_ipconfig(void)
 	// add gateway to g_ipconfig buf
 	strncpy(&g_ipconfig[g_ipconfig_len], g_ps2_gateway, 16);
 	g_ipconfig_len += strlen(g_ps2_gateway) + 1;
+
+	//Add Ethernet operation mode to g_ipconfig buf
+	if(g_ps2_ETHOpMode!=ETH_OP_MODE_AUTO){
+		strncpy(&g_ipconfig[g_ipconfig_len], "-no_auto", 9);
+		g_ipconfig_len += 9;
+		strncpy(&g_ipconfig[g_ipconfig_len], SmapLinkModeArgs[g_ps2_ETHOpMode-1], 6);
+		g_ipconfig_len += 6;
+	}
 }
 
 /*----------------------------------------------------------------------------------------*/

@@ -2,147 +2,154 @@
 #define __LANG_H
 
 // list of localized string ids
-#define _STR_LOCALE						  0 // Localized language name
-#define _STR_WELCOME					  1
-#define _STR_OUL_VER					  2
-#define _STR_SAVE_CHANGES				  3
-#define _STR_O_BACK						  4
-#define _STR_IPCONFIG					  5
-#define _STR_NO_ITEMS					  6
-#define _STR_SETTINGS_SAVED				  7
-#define _STR_ERROR_SAVING_SETTINGS		  8
-#define _STR_EXIT						  9
-#define _STR_SETTINGS					 10
-#define _STR_USB_GAMES					 11
-#define _STR_HDD_GAMES					 12
-#define _STR_NET_GAMES					 13
-#define _STR_APPS						 14
-#define _STR_THEME						 15
-#define _STR_LANGUAGE					 16
-#define _STR_NETWORK_STARTUP_ERROR		 17
-#define _STR_ON							 18
-#define _STR_OFF						 19
-#define _STR_OK							 20
-#define _STR_COMPAT_SETTINGS			 21
-#define _STR_REMOVE_ALL_SETTINGS		 22
-#define _STR_REMOVED_ALL_SETTINGS		 23
-#define _STR_SCROLLING					 24
-#define _STR_SLOW						 25
-#define _STR_MEDIUM						 26
-#define _STR_FAST						 27
-#define _STR_DEFDEVICE					 28
-#define _STR_LOAD_FROM_DISC				 29
-#define _STR_PLEASE_WAIT				 30
-#define _STR_ERROR_LOADING_ID			 31
-#define _STR_AUTOSORT					 32
-#define _STR_ERR_LOADING_LANGFILE		 33
-#define _STR_DEBUG						 34
-#define _STR_NO_CONTROLLER				 35
-#define _STR_COVERART					 36
-#define _STR_WIDE_SCREEN				 37
-#define _STR_POWEROFF					 38
-#define _STR_LOADING_SETTINGS			 39
-#define _STR_SAVING_SETTINGS			 40
-#define _STR_START_DEVICE				 41
-#define _STR_USBMODE					 42
-#define _STR_HDDMODE					 43
-#define _STR_ETHMODE					 44
-#define _STR_APPMODE					 45
-#define _STR_AUTO						 46
-#define _STR_MANUAL						 47
-#define _STR_STARTHDL					 48
-#define _STR_STARTINGHDL				 49
-#define _STR_RUNNINGHDL					 50
-#define _STR_STOPHDL					 51
-#define _STR_UNLOADHDL					 52
-#define _STR_EXITTO						 53
-#define _STR_BGCOLOR					 54
-#define _STR_TXTCOLOR					 55
-#define _STR_IP							 56
-#define _STR_MASK						 57
-#define _STR_GATEWAY					 58
-#define _STR_PORT						 59
-#define _STR_SHARE						 60
-#define _STR_USER						 61
-#define _STR_PASSWORD					 62
-#define _STR_NOT_SET					 63
-#define _STR_X_ACCEPT					 64
-#define _STR_DELETE_WARNING				 65
-#define _STR_RENAME						 66
-#define _STR_DELETE						 67
-#define _STR_RUN						 68
-#define _STR_GFX_SETTINGS				 69
-#define _STR_DANDROP					 70
-#define _STR_CHECKUSBFRAG				 71
-#define _STR_LASTPLAYED					 72
-#define _STR_ERR_FRAGMENTED				 73
-#define _STR_ERR_FILE_INVALID			 74
-#define _STR_TEST						 75
-#define _STR_HINT_GUEST					 76
-#define _STR_HINT_MODE1					 77
-#define _STR_HINT_MODE2					 78
-#define _STR_HINT_MODE3					 79
-#define _STR_HINT_MODE4					 80
-#define _STR_HINT_MODE5					 81
-#define _STR_HINT_MODE6					 82
-#define _STR_HINT_MODE7					 83
-#define _STR_HINT_MODE8					 84
-#define _STR_HINT_MODE9					 85
-#define _STR_HINT_VMC_SIZE				 86
-#define _STR_CREATE						 87
-#define _STR_MODIFY						 88
-#define _STR_ABORT						 89
-#define _STR_RESET						 90
-#define _STR_USE_GENERIC				 91
-#define _STR_VMC_SCREEN					 92
-#define _STR_VMC_NAME					 93
-#define _STR_VMC_SIZE					 94
-#define _STR_VMC_STATUS					 95
-#define _STR_VMC_PROGRESS				 96
-#define _STR_VMC_FILE_EXISTS			 97
-#define _STR_VMC_FILE_ERROR				 98
-#define _STR_VMC_FILE_NEW				 99
-#define _STR_ERR_VMC_CONTINUE			100
-#define _STR_AUTOREFRESH				101
-#define _STR_ABOUT						102
-#define _STR_DEVS						103
-#define _STR_USB_DELAY					104
-#define _STR_USB_PREFIX					105
-#define _STR_HINT_EXITPATH				106
-#define _STR_HINT_SPINDOWN				107
-#define _STR_HDD_SPINDOWN				108
-#define _STR_VMODE						109
-#define _STR_UICOLOR					110
-#define _STR_SELCOLOR					111
-#define _STR_USE_INFO_SCREEN			112
-#define _STR_INFO						113
-#define _STR_ALTSTARTUP					114
-#define _STR_COLOR_SELECTION			115
-#define _STR_RECONNECT					116
-#define _STR_HINT_SHARENAME				117
-#define _STR_ETH_PREFIX					118
-#define _STR_BACKSPACE					119
-#define _STR_SPACE						120
-#define _STR_ENTER						121
-#define _STR_MODE						122
-#define _STR_VMC_SLOT1					123
-#define _STR_VMC_SLOT2					124
-#define _STR_GAME_ID					125
-#define _STR_DMA_MODE					126
-#define _STR_VSYNC						127
-#define _STR_MODE1						128
-#define _STR_MODE2						129
-#define _STR_MODE3						130
-#define _STR_MODE4						131
-#define _STR_MODE5						132
-#define _STR_MODE6						133
-#define _STR_MODE7						134
-#define _STR_MODE8						135
-#define _STR_MODE9						136
-#define _STR_CDVDMAN_TIMER				137
-#define _STR_HINT_CDVDMAN_TIMER			138
+enum _STR_IDS{
+	_STR_LOCALE			=  0, // Localized language name
+	_STR_WELCOME,
+	_STR_OUL_VER,
+	_STR_SAVE_CHANGES,
+	_STR_O_BACK,
+	_STR_IPCONFIG,
+	_STR_NO_ITEMS,
+	_STR_SETTINGS_SAVED,
+	_STR_ERROR_SAVING_SETTINGS,
+	_STR_EXIT,
+	_STR_SETTINGS,
+	_STR_USB_GAMES,
+	_STR_HDD_GAMES,
+	_STR_NET_GAMES,
+	_STR_APPS,
+	_STR_THEME,
+	_STR_LANGUAGE,
+	_STR_NETWORK_STARTUP_ERROR,
+	_STR_ON,
+	_STR_OFF,
+	_STR_OK,
+	_STR_COMPAT_SETTINGS,
+	_STR_REMOVE_ALL_SETTINGS,
+	_STR_REMOVED_ALL_SETTINGS,
+	_STR_SCROLLING,
+	_STR_SLOW,
+	_STR_MEDIUM,
+	_STR_FAST,
+	_STR_DEFDEVICE,
+	_STR_LOAD_FROM_DISC,
+	_STR_PLEASE_WAIT,
+	_STR_ERROR_LOADING_ID,
+	_STR_AUTOSORT,
+	_STR_ERR_LOADING_LANGFILE,
+	_STR_DEBUG,
+	_STR_NO_CONTROLLER,
+	_STR_COVERART,
+	_STR_WIDE_SCREEN,
+	_STR_POWEROFF,
+	_STR_LOADING_SETTINGS,
+	_STR_SAVING_SETTINGS,
+	_STR_START_DEVICE,
+	_STR_USBMODE,
+	_STR_HDDMODE,
+	_STR_ETHMODE,
+	_STR_APPMODE,
+	_STR_AUTO,
+	_STR_MANUAL,
+	_STR_STARTHDL,
+	_STR_STARTINGHDL,
+	_STR_RUNNINGHDL,
+	_STR_STOPHDL,
+	_STR_UNLOADHDL,
+	_STR_EXITTO,
+	_STR_BGCOLOR,
+	_STR_TXTCOLOR,
+	_STR_IP,
+	_STR_MASK,
+	_STR_GATEWAY,
+	_STR_PORT,
+	_STR_SHARE,
+	_STR_USER,
+	_STR_PASSWORD,
+	_STR_NOT_SET,
+	_STR_X_ACCEPT,
+	_STR_DELETE_WARNING,
+	_STR_RENAME,
+	_STR_DELETE,
+	_STR_RUN,
+	_STR_GFX_SETTINGS,
+	_STR_DANDROP,
+	_STR_CHECKUSBFRAG,
+	_STR_LASTPLAYED,
+	_STR_ERR_FRAGMENTED,
+	_STR_ERR_FILE_INVALID,
+	_STR_TEST,
+	_STR_HINT_GUEST,
+	_STR_HINT_MODE1,
+	_STR_HINT_MODE2,
+	_STR_HINT_MODE3,
+	_STR_HINT_MODE4,
+	_STR_HINT_MODE5,
+	_STR_HINT_MODE6,
+	_STR_HINT_MODE7,
+	_STR_HINT_MODE8,
+	_STR_HINT_MODE9,
+	_STR_HINT_VMC_SIZE,
+	_STR_CREATE,
+	_STR_MODIFY,
+	_STR_ABORT,
+	_STR_RESET,
+	_STR_USE_GENERIC,
+	_STR_VMC_SCREEN,
+	_STR_VMC_NAME,
+	_STR_VMC_SIZE,
+	_STR_VMC_STATUS,
+	_STR_VMC_PROGRESS,
+	_STR_VMC_FILE_EXISTS,
+	_STR_VMC_FILE_ERROR,
+	_STR_VMC_FILE_NEW,
+	_STR_ERR_VMC_CONTINUE,
+	_STR_AUTOREFRESH,
+	_STR_ABOUT,
+	_STR_DEVS,
+	_STR_USB_DELAY,
+	_STR_USB_PREFIX,
+	_STR_HINT_EXITPATH,
+	_STR_HINT_SPINDOWN,
+	_STR_HDD_SPINDOWN,
+	_STR_VMODE,
+	_STR_UICOLOR,
+	_STR_SELCOLOR,
+	_STR_USE_INFO_SCREEN,
+	_STR_INFO,
+	_STR_ALTSTARTUP,
+	_STR_COLOR_SELECTION,
+	_STR_RECONNECT,
+	_STR_HINT_SHARENAME,
+	_STR_ETH_PREFIX,
+	_STR_BACKSPACE,
+	_STR_SPACE,
+	_STR_ENTER,
+	_STR_MODE,
+	_STR_VMC_SLOT1,
+	_STR_VMC_SLOT2,
+	_STR_GAME_ID,
+	_STR_DMA_MODE,
+	_STR_VSYNC,
+	_STR_MODE1,
+	_STR_MODE2,
+	_STR_MODE3,
+	_STR_MODE4,
+	_STR_MODE5,
+	_STR_MODE6,
+	_STR_MODE7,
+	_STR_MODE8,
+	_STR_MODE9,
+	_STR_CDVDMAN_TIMER,
+	_STR_HINT_CDVDMAN_TIMER,
+	_STR_ETH_OPMODE,
+	_STR_ETH_100MFDX,
+	_STR_ETH_100MHDX,
+	_STR_ETH_10MFDX,
+	_STR_ETH_10MHDX,
 
-#define LANG_STR_COUNT 139
+	LANG_STR_COUNT
+};
 
 // Maximum external languages supported
 #define MAX_LANGUAGE_FILES 15

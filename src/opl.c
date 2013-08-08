@@ -487,6 +487,8 @@ static void _loadConfig() {
 			if (configGetStr(configOPL, "language_text", &temp))
 				langID = lngFindGuiID(temp);
 
+			configGetInt(configOPL, "eth_linkmode", &gETHOpMode);
+
 			if (configGetStr(configOPL, "pc_ip", &temp))
 				sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
 
@@ -543,6 +545,8 @@ static void _saveConfig() {
 		configSetInt(configOPL, "vmode", gVMode);
 		configSetInt(configOPL, "vsync", gVSync);
 
+
+		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
 		char temp[255];
 		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 		configSetStr(configOPL, "pc_ip", temp);
@@ -812,6 +816,7 @@ static void setDefaults(void) {
 	
 	gBaseMCDir = "mc?:OPL";
 
+	gETHOpMode=ETH_OP_MODE_AUTO;
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;

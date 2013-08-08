@@ -17,8 +17,8 @@ extern int size_smstcpip_irx;
 extern void *ingame_smstcpip_irx;
 extern int size_ingame_smstcpip_irx;
 
-extern void *smsmap_irx;
-extern int size_smsmap_irx;
+extern void *smap_irx;
+extern int size_smap_irx;
 
 extern void *udptty_irx;
 extern int size_udptty_irx;
@@ -51,7 +51,7 @@ int debugSetActive(void) {
 	if (ret < 0)
 		return -3;
 
-	ret = sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig);
+	ret = sysLoadModuleBuffer(&smap_irx, size_smap_irx, ipconfiglen, ipconfig);
 	if (ret < 0)
 		return -4;
 

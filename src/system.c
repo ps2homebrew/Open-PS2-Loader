@@ -43,8 +43,8 @@ extern int size_smstcpip_irx;
 extern void *ingame_smstcpip_irx;
 extern int size_ingame_smstcpip_irx;
 
-extern void *smsmap_irx;
-extern int size_smsmap_irx;
+extern void *smap_ingame_irx;
+extern int size_smap_ingame_irx;
 
 extern void *udptty_irx;
 extern int size_udptty_irx;
@@ -474,7 +474,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_cdvdfsv_irx;
 	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
-	irxptr_tab[n++].irxsize = size_smsmap_irx;
+	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
 	irxptr_tab[n++].irxsize = size_udptty_irx;
 	irxptr_tab[n++].irxsize = size_ioptrap_irx;
 	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
@@ -489,7 +489,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = (void *)&cdvdfsv_irx;
 	irxsrc[n++] = (void *)&cddev_irx;
 	irxsrc[n++] = (void *)usbd_irx;
-	irxsrc[n++] = (void *)&smsmap_irx;
+	irxsrc[n++] = (void *)&smap_ingame_irx;
 	irxsrc[n++] = (void *)&udptty_irx;
 	irxsrc[n++] = (void *)&ioptrap_irx;
 	irxsrc[n++] = (void *)&ingame_smstcpip_irx;

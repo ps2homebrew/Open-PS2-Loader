@@ -24,8 +24,8 @@ extern int size_smsutils_irx;
 extern void *smstcpip_irx;
 extern int size_smstcpip_irx;
 
-extern void *smsmap_irx;
-extern int size_smsmap_irx;
+extern void *smap_irx;
+extern int size_smap_irx;
 
 extern void *smbman_irx;
 extern int size_smbman_irx;
@@ -164,7 +164,7 @@ static void ethLoadModules(void) {
 			gNetworkStartup = ERROR_ETH_MODULE_SMSTCPIP_FAILURE;
 			if (sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL) >= 0) {
 				gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
-				if (sysLoadModuleBuffer(&smsmap_irx, size_smsmap_irx, ipconfiglen, ipconfig) >= 0) {
+				if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, ipconfiglen, ipconfig) >= 0) {
 					gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
 					if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
 						LOG("ETHSUPPORT Modules loaded\n");

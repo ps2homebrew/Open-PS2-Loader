@@ -22,7 +22,7 @@ EECORE_OBJS = obj/ee_core.o \
 		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
-		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smsmap.o obj/smbman.o obj/discid.o \
+		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
 
@@ -151,8 +151,7 @@ sclean:
 	$(MAKE) -C modules/network/SMSUTILS clean
 	echo "    * SMSTCPIP.irx"
 	$(MAKE) -C modules/network/SMSTCPIP clean
-	echo "    * SMSMAP.irx"
-#	$(MAKE) -C modules/network/SMSMAP clean
+	echo "    * SMAP.irx"
 	$(MAKE) -C modules/network/smap clean
 	echo "    * discID.irx"
 	$(MAKE) -C modules/cdvd/discID clean
@@ -312,12 +311,13 @@ ingame_smstcpip.s:
 	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C modules/network/SMSTCPIP rebuild
 	bin2s modules/network/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
-smsmap.s:
-	echo "    * SMSMAP.irx"
-#	$(MAKE) -C modules/network/SMSMAP
-#	bin2s modules/network/SMSMAP/SMSMAP.irx asm/smsmap.s smsmap_irx
+smap_ingame.s:
+	echo "    * SMAP.irx"
 	$(MAKE) -C modules/network/smap
-	bin2s modules/network/smap/smap.irx asm/smsmap.s smsmap_irx
+	bin2s modules/network/smap/smap.irx asm/smap_ingame.s smap_ingame_irx
+
+smap.s:
+	bin2s $(PS2DEV)/ps2eth/smap-new/ps2smap.irx asm/smap.s smap_irx
 
 smbman.s:
 	bin2s $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx

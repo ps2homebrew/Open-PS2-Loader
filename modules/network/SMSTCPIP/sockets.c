@@ -342,6 +342,7 @@ lwip_listen(int s, int backlog)
   return 0;
 }
 
+//Note: This function was modified so that the SMB header can be retrieved directly and the payload stored separately from it.
 int
 lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsigned int flags,
         struct sockaddr *from, socklen_t *fromlen)
@@ -392,7 +393,7 @@ lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsigned 
   /* copy the contents of the received buffer into
      the supplied memory pointer mem */
   if (index) {
-    if (avail_len >= 63) { // header of READ ANDX RESPONSE is 63 + padding bytes, which are "0x00" thus useless
+    if (avail_len >= 63) { // header of (SMB command) READ ANDX RESPONSE is 63 + padding bytes, which are "0x00" thus useless
       netbuf_copy_partial(buf, header, 63, sock->lastoffset);
       index = ((u8_t*)header)[index] + 4;
       copylen = index;

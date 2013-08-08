@@ -266,7 +266,7 @@ DECLARE_EXPORT_TABLE(oplutils, 1, 1)
 	DECLARE_EXPORT(mass_stor_writeSector)
 #endif
 #ifdef HDD_DRIVER
-	DECLARE_EXPORT(ata_device_dma_transfer)
+	DECLARE_EXPORT(ata_device_sector_io)
 #endif
 #ifdef SMB_DRIVER
 	DECLARE_EXPORT(smb_OpenAndX)

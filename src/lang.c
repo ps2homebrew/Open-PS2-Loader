@@ -144,7 +144,12 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Mode 8",
 	"Mode 9",
 	"Callback timer",
-	"Apply a delay to CDVD functions (0 is default)"
+	"Apply a delay to CDVD functions (0 is default)",
+	"Ethernet speed and duplex settings",
+	"100Mbit full-duplex",
+	"100Mbit half-duplex",
+	"10Mbit full-duplex",
+	"10Mbit half-duplex"
 };
 
 static int guiLangID = 0;

@@ -29,7 +29,6 @@ static int io_sema = -1;
 #endif
 
 #define DMA_ADDR 		0x000cff00
-#define	UNCACHEDSEG(vaddr)	(0x20000000 | vaddr)
 
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s); 						// #6
@@ -440,20 +439,19 @@ negociate_retry:
 	int oldstate, id;
 	int flag = 1;
 
-	dmat[0].dest = (void *)UNCACHEDSEG((DMA_ADDR + 0x40));
+	dmat[0].dest = (void *)(DMA_ADDR + 0x40);
 	dmat[0].size = sizeof(server_specs_t);
 	dmat[0].src = (void *)&server_specs;
 	dmat[0].attr = dmat[1].attr = SIF_DMA_INT_O;
-	dmat[1].dest = (void *)UNCACHEDSEG(DMA_ADDR);
+	dmat[1].dest = (void *)DMA_ADDR;
 	dmat[1].size = 4;
 	dmat[1].src = (void *)&flag;
 
-	id = 0;
-	while (!id) {
+	do{
 		CpuSuspendIntr(&oldstate);
-		id = sceSifSetDma(&dmat[0], 2);
+		id = sceSifSetDma(dmat, 2);
 		CpuResumeIntr(oldstate);
-	}
+	}while (!id);
 	while (sceSifDmaStat(id) >= 0);
 
 	// wait smbauth code on EE hashed the password

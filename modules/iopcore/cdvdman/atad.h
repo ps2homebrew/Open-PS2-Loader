@@ -7,34 +7,37 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: atad.h 629 2004-10-11 00:45:00Z mrbrown $
+# $Id$
 # ATA Device Driver definitions and imports.
 */
 
 #ifndef IOP_ATAD_H
 #define IOP_ATAD_H
 
-#include "types.h"
-#include "irx.h"
+#include <types.h>
+#include <irx.h>
 
-/* These are used with the dir parameter of ata_device_dma_transfer().  */
+/* These are used with the dir parameter of ata_device_sector_io().  */
 #define ATA_DIR_READ	0
 #define ATA_DIR_WRITE	1
+
+#define ATAD_XFER_MODE_PIO	0x08
+#define ATAD_XFER_MODE_MDMA	0x20
+#define ATAD_XFER_MODE_UDMA	0x40
 
 typedef struct _ata_devinfo {
 	int	exists;		/* Was successfully probed.  */
 	int	has_packet;	/* Supports the PACKET command set.  */
-	u32	total_sectors;	/* Total number of user sectors.  */
-	u32	security_status;/* Word 0x100 of the identify info.  */
+	unsigned int	total_sectors;	/* Total number of user sectors.  */
+	unsigned int	security_status;/* Word 0x100 of the identify info.  */
 } ata_devinfo_t;
 
 int atad_start(void);
 ata_devinfo_t * ata_get_devinfo(int device);
-int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector,
-		u16 lcyl, u16 hcyl, u16 select, u16 command);
+int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command);
 int ata_io_finish(void);
 int ata_get_error(void);
-int ata_device_dma_transfer(int device, void *buf, u32 lba, u32 nsectors, int dir);
+int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir);
 
 // APA Partition
 #define APA_MAGIC		0x00415041	// 'APA\0'

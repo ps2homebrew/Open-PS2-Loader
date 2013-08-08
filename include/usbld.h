@@ -50,9 +50,20 @@ char *gBaseMCDir;
 
 #define IPCONFIG_MAX_LEN	64
 
+enum ETH_OP_MODES{
+	ETH_OP_MODE_AUTO	= 0,
+	ETH_OP_MODE_100M_FDX,
+	ETH_OP_MODE_100M_HDX,
+	ETH_OP_MODE_10M_FDX,
+	ETH_OP_MODE_10M_HDX,
+
+	ETH_OP_MODE_COUNT
+};
+
 int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
+int gETHOpMode;	//See ETH_OP_MODES.
 int pc_ip[4];
 int gPCPort;
 char gPCShareName[32];

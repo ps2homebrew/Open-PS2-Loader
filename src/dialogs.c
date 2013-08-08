@@ -37,7 +37,10 @@ struct UIItem diaIPConfig[] = {
 	{UI_INT, 11, 1, -1, 0, 0, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, 1, -1, 0, 0, {.label = {".", -1}}},
 	{UI_INT, 12, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, 1, -1, 0, 0, {.label = {".", -1}}},
 	{UI_INT, 13, 1, -1, 0, 0, {.intvalue = {1, 1, 0, 255}}},
-	
+
+	{UI_BREAK}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_ETH_OPMODE}}}, {UI_SPACER}, {UI_ENUM, NETCFG_ETHOPMODE, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+
 	{UI_SPLITTER},
 	
 	//  ---- PC ----
@@ -64,7 +67,7 @@ struct UIItem diaIPConfig[] = {
 	//  ---- Ok ----
 	{UI_BUTTON, NETCFG_OK, 1, -1, 0, 0, {.label = {NULL, -1}}},
 	
-	{UI_SPACER}, // UIItem #64
+	{UI_SPACER}, // UIItem #70
 
 	{UI_BUTTON, NETCFG_RECONNECT, 1, -1, 0, 0, {.label = {NULL, _STR_RECONNECT}}},
 

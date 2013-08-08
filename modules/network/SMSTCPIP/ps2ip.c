@@ -16,12 +16,10 @@
 #include <intrman.h>
 #include <loadcore.h>
 #include <thbase.h>
-#include <vblank.h>
 #include <modload.h>
 #include <sysclib.h>
 #include <thevent.h>
 #include <thsemap.h>
-#include <libsd.h>
 #include <sysmem.h>
 
 #include "smsutils.h"
@@ -81,6 +79,7 @@ static int inline IsMessageBoxEmpty ( sys_mbox_t apMBox ) {
  return apMBox -> u16Last == apMBox -> u16First;
 }  /* end IsMessageBoxEmpty */
 
+#ifdef INGAME_DRIVER
 void PostInputMSG ( sys_mbox_t pMBox, void* pvMSG ) {
 
  pMBox -> apvMSG[ pMBox -> u16Last ] = pvMSG;
@@ -89,6 +88,7 @@ void PostInputMSG ( sys_mbox_t pMBox, void* pvMSG ) {
  if	( pMBox -> iWaitFetch > 0 ) iSignalSema ( pMBox -> Mail );
 
 }  /* end PostInputMSG */
+#endif
 
 int ps2ip_getconfig ( char* pszName, t_ip_info* pInfo ) {
 
@@ -206,6 +206,7 @@ static void InitTimer ( void ) {
 
 }  /* end InitTimer */
 
+#ifdef INGAME_DRIVER
 typedef struct InputMSG {
  struct pbuf*  pInput;
  struct netif* pNetIF;
@@ -289,6 +290,31 @@ err_t ps2ip_input ( struct pbuf* pInput, struct netif* pNetIF ) {
  return ERR_OK;
 
 }  /* end ps2ip_input */
+#else
+err_t ps2ip_input(struct pbuf* pInput, struct netif* pNetIF)
+{
+//	switch(htons(((struct eth_hdr*)(pInput->payload))->type))	// Don't know why, but using htons will cause this function to not work in the SMS LWIP stack.
+	switch(((struct eth_hdr*)(pInput -> payload))->type)
+	{
+	case	ETHTYPE_IP:
+		//IP-packet. Update ARP table, obtain first queued packet.
+		etharp_ip_input(pNetIF, pInput);
+		pbuf_header(pInput, (int)-sizeof(struct eth_hdr));
+		pNetIF->input(pInput, pNetIF);
+		break;
+	case	ETHTYPE_ARP:
+		//ARP-packet. Pass pInput to ARP module, get ARP reply or ARP queued packet.
+		//Pass to network layer.
+		etharp_arp_input(pNetIF, (struct eth_addr*)&pNetIF->hwaddr, pInput);
+		//Fall through: The SMS LWIP stack was modified, and etharp_arp_input does not free the PBUF on its own.
+	default:
+		//Unsupported ethernet packet-type. Free pInput.
+		pbuf_free(pInput);
+	}
+
+	return	ERR_OK;
+}
+#endif
 
 void ps2ip_Stub ( void ) {
 

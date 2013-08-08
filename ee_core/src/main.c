@@ -72,7 +72,8 @@ int main(int argc, char **argv){
 	_strcpy(g_ps2_netmask, p);
 	p = _strtok(NULL, " ");
 	_strcpy(g_ps2_gateway, p);
-	DPRINTF("IP=%s NM=%s GW=%s\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway);	
+	g_ps2_ETHOpMode=_strtoui(_strtok(NULL, " "));
+	DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 
 	// bitmask of the compat. settings
 	g_compat_mask = _strtoui(argv[2]);

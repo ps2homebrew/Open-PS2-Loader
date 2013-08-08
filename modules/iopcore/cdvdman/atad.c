@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: ps2atad.c 1455 2007-11-04 23:46:27Z roman_ps2dev $
+# $Id$
 # ATA device driver.
 # This module provides the low-level ATA support for hard disk drives.  It is
 # 100% compatible with its proprietary counterpart called atad.irx.
@@ -46,7 +46,7 @@ extern int netlog_inited;
 #endif
 
 #define BANNER "ATA device driver %s - Copyright (c) 2003 Marcus R. Brown\n"
-#define VERSION "v1.1"
+#define VERSION "v1.2"
 
 extern int lba_48bit;
 
@@ -76,12 +76,12 @@ typedef struct _ata_cmd_info {
 } ata_cmd_info_t;
 
 static ata_cmd_info_t ata_cmd_table[] = {
-	{0xc8, 0x04}, {0xec, 0x02}, {0xa1, 0x02}, {0xb0, 0x07}, {0xef, 0x01}, {0x25, 0x04}, {0xca, 0x04}, {0xe3, 0x01}, {0x35, 0x04}
+	{ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PKT_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x04}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x04}
 };
 #define ATA_CMD_TABLE_SIZE	(sizeof ata_cmd_table/sizeof(ata_cmd_info_t))
 
 static ata_cmd_info_t smart_cmd_table[] = {
-	{0xd8, 0x01}
+	{ATA_C_SMART_ENABLE, 0x01}
 };
 #define SMART_CMD_TABLE_SIZE	(sizeof smart_cmd_table/sizeof(ata_cmd_info_t))
 
@@ -89,14 +89,14 @@ static ata_cmd_info_t smart_cmd_table[] = {
 typedef struct _ata_cmd_state {
 	int	type;		/* The ata_cmd_info_t type field. */
 	void	*buf;
-	u32	blkcount;	/* The number of 512-byte blocks (sectors) to transfer.  */
+	unsigned int	blkcount;	/* The number of 512-byte blocks (sectors) to transfer.  */
 	int	dir;		/* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
 
 static int ata_intr_cb(int flag);
-static u32 ata_alarm_cb(void *unused);
+static unsigned int ata_alarm_cb(void *unused);
 
 static void ata_dma_set_dir(int dir);
 
@@ -172,14 +172,14 @@ static int ata_intr_cb(int flag)
 	return 1;
 }
 
-static u32 ata_alarm_cb(void *unused)
+static unsigned int ata_alarm_cb(void *unused)
 {
 	iSetEventFlag(ata_evflg, 0x01);
 	return 0;
 }
 
 /* Export 8 */
-int ata_get_error()
+int ata_get_error(void)
 {
 	USE_ATA_REGS;
 	return ata_hwport->r_error & 0xff;
@@ -242,14 +242,23 @@ static int ata_device_select(int device)
 }
 
 /* Export 6 */
+/*
+	28-bit LBA:
+		sector	(7:0)	-> LBA (7:0)
+		lcyl	(7:0)	-> LBA (15:8)
+		hcyl	(7:0)	-> LBA (23:16)
+		device	(3:0)	-> LBA (27:24)
+
+	48-bit LBA just involves writing the upper 24 bits in the format above into each respective register on the first write pass, before writing the lower 24 bits in the 2nd write pass. The LBA bits within the device field are not used in either write pass.
+*/
 int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command)
 {
 	USE_ATA_REGS;
 	iop_sys_clock_t cmd_timeout;
-	ata_cmd_info_t *cmd_table;
+	const ata_cmd_info_t *cmd_table;
 	int i, res, type, cmd_table_size;
 	int using_timeout, device = (select >> 4) & 1;
-	u8 searchcmd;
+	unsigned char searchcmd;
 
 	ClearEventFlag(ata_evflg, 0);
 
@@ -306,7 +315,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 			break;
 		case 4:
 #ifdef VMC_DRIVER
-			atad_cmd_state.dir = ((command != 0xc8) && (command != 0x25));
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
 #else
 			atad_cmd_state.dir = ATA_DIR_READ;
 #endif
@@ -317,7 +326,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 		cmd_timeout.lo = 0x41eb0000;
 		cmd_timeout.hi = 0;
 
-		if ((res = SetAlarm(&cmd_timeout, (void *)ata_alarm_cb, NULL)) < 0)
+		if ((res = SetAlarm(&cmd_timeout, &ata_alarm_cb, NULL)) < 0)
 			return res;
 	}
 
@@ -353,7 +362,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 }
 
 /* Do a PIO transfer, to or from the device.  */
-static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
+static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 {
 	USE_SPD_REGS;
 	SPD_REG8(SPD_R_PIO_DATA) = 0;
@@ -362,11 +371,10 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 	USE_ATA_REGS;
 	void *buf;
 	int i, type;
-	u16 status = ata_hwport->r_status & 0xff;
+	unsigned short int status = ata_hwport->r_status & 0xff;
 
 	if (status & ATA_STAT_ERR) {
-		M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n",
-				status, ata_get_error());
+		M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
 		return -503;
 	}
 
@@ -380,8 +388,8 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 		/* PIO data out */
 		buf = cmd_state->buf;
 		for (i = 0; i < 256; i++) {
-			ata_hwport->r_data = *(u16 *)buf;
-			cmd_state->buf = ++((u16 *)buf);
+			ata_hwport->r_data = *(unsigned short int *)buf;
+			cmd_state->buf = ++((unsigned short int *)buf);
 		}
 		if (cmd_state->type == 8) {
 			for (i = 0; i < 4; i++) {
@@ -393,8 +401,8 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 		/* PIO data in  */
 		buf = cmd_state->buf;
 		for (i = 0; i < 256; i++) {
-			*(u16 *)buf = ata_hwport->r_data;
-			cmd_state->buf = ++((u16 *)buf);
+			*(unsigned short int *)buf = ata_hwport->r_data;
+			cmd_state->buf = ++((unsigned short int *)buf);
 		}
 	}
 
@@ -402,13 +410,14 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 }
 
 /* Complete a DMA transfer, to or from the device.  */
-static int ata_dma_complete(void *buf, int blkcount, int dir)
+static inline int ata_dma_complete(void *buf, int blkcount, int dir)
 {
 	USE_ATA_REGS;
 	USE_SPD_REGS;
-	u32 bits, count, nbytes;
+	unsigned int count, nbytes;
+	u32 bits;
 	int i, res;
-	u16 dma_stat;
+	unsigned short int dma_stat;
 
 	while (blkcount) {
 		for (i = 0; i < 20; i++)
@@ -420,7 +429,7 @@ static int ata_dma_complete(void *buf, int blkcount, int dir)
 
 		dev9IntrEnable(SPD_INTR_ATA);
 		/* Wait for the previous transfer to complete or a timeout.  */
-		WaitEventFlag(ata_evflg, 0x03, 0x11, &bits);
+		WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR|WEF_OR, &bits);
 
 		if (bits & 0x01) {	/* Timeout.  */
 			M_PRINTF("Error: DMA timeout.\n");
@@ -430,11 +439,9 @@ static int ata_dma_complete(void *buf, int blkcount, int dir)
 		if (!(SPD_REG16(SPD_R_INTR_STAT) & 0x02)) {
 			if (ata_hwport->r_control & 0x01) {
 				M_PRINTF("Error: Command error while doing DMA.\n");
-				M_PRINTF("Error: Command error status 0x%02x, error 0x%02x.\n",
-						ata_hwport->r_status, ata_get_error());
+				M_PRINTF("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, ata_get_error());
 				#ifdef NETLOG_DEBUG
-					pNetlogSend("Error: Command error status 0x%02x, error 0x%02x.\n",
-						ata_hwport->r_status, ata_get_error());
+					pNetlogSend("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, ata_get_error());
 				#endif		
 				return -503;
 			} else {
@@ -459,17 +466,17 @@ next_transfer:
 }
 
 /* Export 7 */
-int ata_io_finish()
+int ata_io_finish(void)
 {
 	USE_SPD_REGS;
 	USE_ATA_REGS;
 	ata_cmd_state_t *cmd_state = &atad_cmd_state;
 	u32 bits;
 	int i, res = 0, type = cmd_state->type;
-	u16 stat;
+	unsigned short int stat;
 
 	if (type == 1 || type == 6) {	/* Non-data commands.  */
-		WaitEventFlag(ata_evflg, 0x03, 0x11, &bits);
+		WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR|WEF_OR, &bits);
 		if (bits & 0x01) {	/* Timeout.  */
 			M_PRINTF("Error: ATA timeout on a non-data command.\n");
 			return -502;
@@ -484,7 +491,7 @@ int ata_io_finish()
 				break;
 		if (!stat) {
 			dev9IntrEnable(SPD_INTR_ATA0);
-			WaitEventFlag(ata_evflg, 0x03, 0x11, &bits);
+			WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR|WEF_OR, &bits);
 			if (bits & 0x01) {
 				M_PRINTF("Error: ATA timeout on DMA completion.\n");
 				res = -502;
@@ -511,14 +518,13 @@ int ata_io_finish()
 	if (ata_hwport->r_status & ATA_STAT_BUSY)
 		res = ata_wait_busy(0x80);
 	if ((stat = ata_hwport->r_status) & ATA_STAT_ERR) {
-		M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n",
-				stat, ata_get_error());
+		M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", stat, ata_get_error());
 		res = -503;
 	}
 
 finish:
 	/* The command has completed (with an error or not), so clean things up.  */
-	CancelAlarm((void *)ata_alarm_cb, NULL);
+	CancelAlarm(&ata_alarm_cb, NULL);
 	/* Turn off the LED.  */
 	dev9LEDCtl(0);
 
@@ -526,15 +532,14 @@ finish:
 }
 
 /* Export 9 */
-int ata_device_dma_transfer(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
+int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
 {
 	int res = 0;
-	u32 nbytes;
-	u16 sector, lcyl, hcyl, select, command, len;
+	unsigned short int sector, lcyl, hcyl, select, command, len;
 
 	WAITIOSEMA(io_sema);
 
-	while (nsectors) {
+	while (nsectors > 0) {
 		ata_dma_set_dir(dir);
 
 		/* Variable lba is only 32 bits so no change for lcyl and hcyl.  */		
@@ -559,8 +564,7 @@ int ata_device_dma_transfer(int device, void *buf, unsigned int lba, unsigned in
 			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_DMA : ATA_C_READ_DMA;
 		}
 
-		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
-					hcyl, select, command)) != 0) {
+		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0) {
 			SIGNALIOSEMA(io_sema);
 			return res;
 		}
@@ -569,8 +573,7 @@ int ata_device_dma_transfer(int device, void *buf, unsigned int lba, unsigned in
 			return res;
 		}
 
-		nbytes = len * 512;
-		(u8 *)buf += nbytes;
+		(u8 *)buf += (len * 512);
 		lba += len;
 		nsectors -= len;
 	}
@@ -589,11 +592,11 @@ ata_devinfo_t * ata_get_devinfo(int device)
 static void ata_dma_set_dir(int dir)
 {
 	USE_SPD_REGS;
-	u16 val;
+	unsigned short int val;
 
 	SPD_REG16(0x38) = 3;
 	val = SPD_REG16(SPD_R_IF_CTRL) & 1;
-	val |= (dir == 1) ? 0x4c : 0x4e;
+	val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
 	SPD_REG16(SPD_R_IF_CTRL) = val;
 	SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6;
 }

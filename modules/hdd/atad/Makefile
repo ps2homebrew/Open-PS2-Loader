@@ -4,7 +4,7 @@ IOP_INCS +=
 IOP_CFLAGS  += -Wall -fno-builtin-printf
 IOP_LDFLAGS += -s
 
-IOP_OBJS = atad.o exports.o imports.o
+IOP_OBJS = ps2atad.o exports.o imports.o
 IOP_LIBS =
 
 all: $(IOP_BIN)

@@ -205,11 +205,16 @@ static void IGR_Thread(void *arg)
 		// Init TLB
 		if(Cop0_Index != 0x26)
 		{
-			DI();
-			ee_kmode_enter();
-			InitializeTLB();
-			ee_kmode_exit();
-			EI();
+			if(GetMemorySize()==0x02000000){
+				DI();
+				ee_kmode_enter();
+				InitializeTLB();
+				ee_kmode_exit();
+				EI();
+			}
+			else{
+				_InitTLB();
+			}
 		}
 
 		// Check Performance Counter

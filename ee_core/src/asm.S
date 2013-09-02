@@ -77,29 +77,34 @@ _LoadExecPS2:
 	daddu	$s1, $a1, $zero /* argc 	*/
 	daddu	$s2, $a2, $zero /* argv 	*/
 
+	lw	$v0, DisableDebug
+	bne	$v0, $zero, 1f
+	nop
+
 	/* dark blue BG color */
 	lui	$v0, 0x1200
 	ori	$v0, $v0, 0x00e0
 	lui	$v1, 0x0040
 	sd	$v1, 0x0000($v0)
 
+1:
 	/* disable Intr */
 	mfc0	$v1, EE_COP0_Status
 	lui	$v0, 0x0010
 	and	$v1, $v1, $v0
 	daddu	$a0, $zero, $zero
-	beq	$v1, $zero, 2f
+	beq	$v1, $zero, 3f
 	nop
-1:
+2:
 	di
 	sync.p
 	mfc0	$v1, EE_COP0_Status
 	nop	
 	and	$v1, $v1, $v0
 	nop
-	bne	$v1, $zero, 1b
+	bne	$v1, $zero, 2b
 	nop
-2:
+3:
 	/* entering Kernel mode */
 	mfc0	$v0, EE_COP0_Status
 	lui	$v1, 0xffff
@@ -148,9 +153,9 @@ _LoadExecPS2:
 	sw	$v0, 0x0000($v1)
 
 	/* copy args from main ELF to args buffer */
-	blez	$s4, 4f
+	blez	$s4, 5f
 	daddu	$s5, $zero, $zero /* counter */
-3:
+4:
 	/* get arg len and increment it */
 	daddu	$a0, $s2, $zero
 	sll	$v0, $s5, 2
@@ -180,9 +185,9 @@ _LoadExecPS2:
 	/* loop on every args */
 	addiu	$s5, $s5, 1
 	slt	$v1, $s5, $s4
-	bne	$v1, $zero, 3b
+	bne	$v1, $zero, 4b
 	nop
-4:
+5:
 	/* exiting Kernel mode */
 	mfc0	$v0, EE_COP0_Status
 	ori	$v0, $v0, 0x0010
@@ -421,6 +426,7 @@ Hook_SifSetReg:
 
 	lw	$v0, DisableDebug
 	bne	$v0, $zero, 2f
+	nop
 
 	/* black BG color */
 	lui	$v0, 0x1200

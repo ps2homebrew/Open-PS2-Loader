@@ -38,7 +38,7 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	rm -f $(IOP_BIN) $(IOP_OBJS)
+	rm -f $(IOP_BIN) $(IOP_OBJS) cdvdman.map
 
 rebuild: clean all
 

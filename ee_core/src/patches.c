@@ -46,7 +46,7 @@ static patchlist_t patch_list[45] = {
 	{ "SLES_542.34", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 IT
 	{ "SLES_542.35", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac60c }}, // Kingdom Hearts 2 ES
 	{ "SLPM_662.33", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001ac44c }}, // Kingdom Hearts 2 JPN
-	{ "SLPM_666.75", ALL_MODE, { 0xdeadbee2, 0x00100000, 0x001adf64 }}, // Kingdom Hearts 2 Final Mix JPN
+	{ "SLPM_666.75", ALL_MODE, { 0xdeadbee2, 0x00149210, 0x001adf64 }}, // Kingdom Hearts 2 Final Mix JPN
 	{ "SLUS_212.87", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x006cd15c }}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
 	{ "SLUS_212.87", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x006cd15c }}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
 	{ "SLES_537.77", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x006cd6dc }}, // Prince of Persia: The Two Thrones PAL - slow down cdvd reads

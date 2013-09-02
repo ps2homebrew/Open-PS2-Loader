@@ -29,97 +29,12 @@ extern int size_cddev_irx;
 int g_argc;
 char *g_argv[1 + MAX_ARGS];
 static char g_ElfPath[1024];
-static void *g_patchInitializeUserMem_addr;
-static u32 g_patchInitializeUserMem_val;
 
 int set_reg_hook;
 int set_reg_disabled;
 int iop_reboot_count = 0;
 
 int padOpen_hooked = 0;
-
-static u32 systemRestartpattern[] = {
-	0x00000000,		//	nop
-	0x0c000000,		//	jal	restartEE()
-	0x00000000,		//	nop
-	0x8fa30010,		//	lw	v1, $0010(sp)
-	0x0240302d,		//	daddu	a2, s2, zero
-	0x8fa50014,		//	lw	a1, $0014(sp)
-	0x8c67000c,		//	lw	a3, $000c(v1)
-	0x18e00009,		//	blez	a3, 2f
-	0x0000202d,		//	daddu	a0, zero, zero
-	0x00000000,		//	nop
-	0x8ca30000,		//	lw	v1, $0000(a1)
-	0x24840004,		//	addiu	a0, a0, $0004
-	0x24a50004,		//	addiu	a1, a1, $0004
-	0x0087102a,		//	slt	v0, a0, a3
-	0xacc30000		//	sw	v1, $0000(a2)
-};
-static u32 systemRestartpattern_mask[] = {
-	0xffffffff,
-	0xfc000000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff
-};
-
-static void (*systemRestart)(void);
-
-static u32 InitializeUserMempattern[] = {
-	0x27bdffe0,		//	addiu	sp, sp, $ffe0
-	0xffb00000,		//	sd	s0, $0000(sp)
-	0xffbf0010,		//	sd	ra, $0010(sp)
-	0x0c000000,		//	jal 	GetMemorySize
-	0x00000000,		//	daddu	s0, a0, zero	<-- some modchips are patching here, so we'll repatch
-	0x0040202d,		//	daddu	a0, v0, zero
-	0x0204102b,		//	sltu	v0, s0, a0
-	0x1040000a,		//	beq	v0, zero, 2f
-	0xdfbf0010,		//	ld	ra, $0010(sp)
-	0x700014a9,		//	por	v0, zero, zero
-	0x7e020000,		//	sq	v0, $0000(s0)
-	0x26100010,		//	addiu	s0, s0, $10
-	0x0204102b,		//	sltu	v0, s0, a0
-	0x00000000,		//	nop
-	0x00000000,		//	nop
-	0x1440fffa,		//	bne	v0, zero, 1b
-	0x700014a9		//	por	v0, zero, zero 
-/*
-	0xdfbf0010,		//	ld	ra, $0010(sp)
-	0xdfbf0000,		//	ld	s0, $0000(sp)
-	0x03e00008,		//	jr	ra
-	0x27bd0020		//	addiu	sp, sp, $0020
-*/
-};
-
-static u32 InitializeUserMempattern_mask[] = {
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xfc000000,
-	0x00000000,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff,
-	0xffffffff
-};
 
 static u32 InitializeTLBpattern[] = {
 	0x3c027000,		//	lui	v0, $7000
@@ -151,7 +66,6 @@ static u32 InitializeTLBpattern_mask[] = {
 };
 
 void (*InitializeTLB)(void);
-
 
 /*----------------------------------------------------------------------------------------*/
 /* This fonction is call when SifSetDma catch a reboot request.                           */
@@ -201,7 +115,7 @@ u32 Hook_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 */
 
 /*----------------------------------------------------------------------------------------*/
-/* This fonction unhook SifSetDma/SifSetReg sycalls		                          */
+/* This function unhook SifSetDma/SifSetReg sycalls		                          */
 /*----------------------------------------------------------------------------------------*/
 /*
 void Apply_Mode3(void)
@@ -213,7 +127,7 @@ void Apply_Mode3(void)
 
 
 /*----------------------------------------------------------------------------------------*/
-/* This fonction replace SifSetReg syscall in kernel.                                     */
+/* This function replace SifSetReg syscall in kernel.                                     */
 /*----------------------------------------------------------------------------------------*/
 /*
 int Hook_SifSetReg(u32 register_num, int register_value)
@@ -252,31 +166,16 @@ int Hook_SifSetReg(u32 register_num, int register_value)
 */
 
 // ------------------------------------------------------------------------
-static void init_systemRestart(void)
+static void init_initializeTLB(void)
 {
 	u32 *ptr;
 
+	if(GetMemorySize()!=0x02000000){
+		return;	//Consoles that don't have 32MB of EE RAM will have the _InitTLB() syscall, and Sony uses it under this condition anyway.
+	}
+
 	DIntr();
 	ee_kmode_enter();
-
-	// scan to find kernel InitializeUserMemory()
-	ptr = (u32 *)0x80001000;
-	ptr = find_pattern_with_mask(ptr, 0x7f000, InitializeUserMempattern, InitializeUserMempattern_mask, sizeof(InitializeUserMempattern));
-	if (!ptr)
-		goto err;
-	// keep original opcode address and value
-	g_patchInitializeUserMem_addr = (void *)&ptr[4];
-	g_patchInitializeUserMem_val = ptr[4];
-	// patch InitializeUserMemory() to avoid user mem to be cleared
-	_sw(0x3c100200, (u32)g_patchInitializeUserMem_addr); // it will exit at first s0/a0 comparison
-
-	// scan to find kernel systemRestart() function
-	ptr = (u32 *)0x80001000;
-	ptr = find_pattern_with_mask(ptr, 0x7f000, systemRestartpattern, systemRestartpattern_mask, sizeof(systemRestartpattern));
-	if (!ptr)
-		goto err;
-	// get systemRestart function pointer
-	systemRestart = (void *)(((ptr[1] & 0x03ffffff) << 2) | 0x80000000);
 
 	// scan to find kernel InitializeTLB() function
 	ptr = (u32 *)0x80001000;
@@ -289,28 +188,11 @@ static void init_systemRestart(void)
 	ee_kmode_exit();
 	EIntr();
 
-	FlushCache(0);
-
 	return;
 
 err:
 	GS_BGCOLOUR = 0x0000ff; // hangs on red screen
 	while (1) {;}
-}
-
-// ------------------------------------------------------------------------
-static void deinit_systemRestart(void)
-{
-	DIntr();
-	ee_kmode_enter();
-
-	// unpatch InitializeUserMemory()
-	_sw(g_patchInitializeUserMem_val, (u32)g_patchInitializeUserMem_addr);
-
-	ee_kmode_exit();
-	EIntr();
-
-	FlushCache(0);
 }
 
 // ------------------------------------------------------------------------
@@ -351,15 +233,6 @@ void t_loadElf(void)
 	}
 
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_ElfPath);
-
-	DPRINTF("t_loadElf: System Restart...\n");
-	DIntr();
-	ee_kmode_enter();
-	systemRestart();
-	while (!(*(vu32 *)R_EE_SBUS_SMFLAG & SBUS_CTRL_MSINT)) {;}
-	*(vu32 *)R_EE_SBUS_SMFLAG = SBUS_CTRL_MSINT;
-	ee_kmode_exit();
-	EIntr();
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x00ff00;
@@ -454,7 +327,7 @@ int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[])
 /*----------------------------------------------------------------------------------------*/
 void Install_Kernel_Hooks(void)
 {
-	init_systemRestart();
+	init_initializeTLB();
 
 	Old_SifSetDma  = GetSyscallHandler(__NR_SifSetDma);
 	SetSyscall(__NR_SifSetDma, &Hook_SifSetDma);
@@ -482,8 +355,6 @@ void Install_Kernel_Hooks(void)
 /*----------------------------------------------------------------------------------------*/
 void Remove_Kernel_Hooks(void)
 {
-	deinit_systemRestart();
-
 	SetSyscall(__NR_SifSetDma, Old_SifSetDma);
 	SetSyscall(__NR_SifSetReg, Old_SifSetReg);	
 	SetSyscall(__NR_LoadExecPS2, Old_LoadExecPS2);

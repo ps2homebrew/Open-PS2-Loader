@@ -75,12 +75,12 @@ typedef struct _ata_cmd_info {
 	u8	type;
 } ata_cmd_info_t;
 
-static ata_cmd_info_t ata_cmd_table[] = {
+static const ata_cmd_info_t ata_cmd_table[] = {
 	{ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PKT_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x04}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x04}
 };
 #define ATA_CMD_TABLE_SIZE	(sizeof ata_cmd_table/sizeof(ata_cmd_info_t))
 
-static ata_cmd_info_t smart_cmd_table[] = {
+static const ata_cmd_info_t smart_cmd_table[] = {
 	{ATA_C_SMART_ENABLE, 0x01}
 };
 #define SMART_CMD_TABLE_SIZE	(sizeof smart_cmd_table/sizeof(ata_cmd_info_t))

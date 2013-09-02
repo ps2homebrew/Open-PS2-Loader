@@ -186,23 +186,17 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 }
 
 void sysReset(int modload_mask) {
-
-	SifInitRpc(0);
-	cdInit(CDVD_INIT_NOCHECK);
-	cdInit(CDVD_INIT_EXIT);
-
-	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF",0));
-	while(!SifIopSync());
-
 	fioExit();
 	SifExitIopHeap();
 	SifLoadFileExit();
 	SifExitRpc();
-	SifExitCmd();
 
 	SifInitRpc(0);
-	FlushCache(0);
-	FlushCache(2);
+
+	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF", 0));
+	while(!SifIopSync());
+
+	SifInitRpc(0);
 
 	// init loadfile & iopheap services
 	SifLoadFileInit();
@@ -239,39 +233,7 @@ void sysReset(int modload_mask) {
 }
 
 void sysPowerOff(void) {
-	u16 dev9_hw_type;
-
-	DIntr();
-	ee_kmode_enter();
-
-	// Get dev9 hardware type
-	dev9_hw_type = *DEV9_R_146E & 0xf0;
-
-	// Shutdown Pcmcia
-	if ( dev9_hw_type == 0x20 )
-	{
-		*DEV9_R_146C = 0;
-		*DEV9_R_1474 = 0;
-	}
-	// Shutdown Expansion Bay
-	else if ( dev9_hw_type == 0x30 )
-	{
-		*DEV9_R_1466 = 1;
-		*DEV9_R_1464 = 0;
-		*DEV9_R_1460 = *DEV9_R_1464;
-		*DEV9_R_146C = *DEV9_R_146C & ~4;
-		*DEV9_R_1460 = *DEV9_R_146C & ~1;
-	}
-
-	//Wait a sec
-	delay(5);
-
-	// PowerOff PS2
-	*CDVD_R_SDIN = 0;
-	*CDVD_R_SCMD = 0xF;
-
-	ee_kmode_exit();
-	EIntr();
+	poweroffShutdown();
 }
 
 void delay(int count) {
@@ -431,19 +393,14 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 }
 
 void sysExecExit() {
+	if(gExitPath[0]!='\0') sysExecElf(gExitPath, 0, NULL);
+
 	Exit(0);
 }
 
 static void restoreSyscallHandler(void)
 {
-	__asm__ __volatile__ (
-		"addiu 	$a0, $zero, 8\n\t"
-		"lui 	$a1, 0x8000\n\t"
-		"ori 	$a1, $a1, 0x0280\n\t"
-		"addiu 	$v1, $zero, 0x0e\n\t"
-		"syscall\n\t"
-		"nop\n\t"
-	);	
+	SetVCommonHandler(8, (void*)0x80000280);
 }
 
 #ifdef VMC
@@ -542,9 +499,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	int i;
 	char *argv[3];
 	char config_str[255];
-//	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
-
-//	sysSetIPConfig(ipconfig); // TODO only needed for ETH mode, and already done in ethsupport.ethLoadModules
 
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", 32);
@@ -584,8 +538,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	fioExit();
 	SifInitRpc(0);
 	SifExitRpc();
-	FlushCache(0);
-	FlushCache(2);
 
 	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
@@ -597,6 +549,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	argv[0] = config_str;	
 	argv[1] = filename;
 	argv[2] = cmask;
+
+	FlushCache(0);
+	FlushCache(2);
 
 	ExecPS2((void *)eh->entry, 0, 3, argv);
 }

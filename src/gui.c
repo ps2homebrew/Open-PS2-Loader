@@ -617,7 +617,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	int dmaMode = 7; // defaulting to UDMA 4
 	if (support->haveCompatibilityMode == COMPAT_FULL) {
 		configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
-		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", "UDMA 5", "UDMA 6",	NULL };
+		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", NULL };
 		diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
 		diaSetInt(diaCompatConfig, COMPAT_DMA, dmaMode);
 	} else {

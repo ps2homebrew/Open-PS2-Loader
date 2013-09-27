@@ -50,6 +50,7 @@ void ethSMBConnect(void) {
 	smbLogOn_in_t logon;
 	smbEcho_in_t echo;
 	smbOpenShare_in_t openshare;
+	int result;
 
 	if (gETHPrefix[0] != '\0')
 		sprintf(ethPrefix, "%s%s\\", ethBase, gETHPrefix);
@@ -87,10 +88,7 @@ void ethSMBConnect(void) {
 		openshare.PasswordType = NO_PASSWORD;
 	}
 
-	gNetworkStartup = ERROR_ETH_SMB_LOGON;
-	if (fileXioDevctl(ethBase, SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0) >= 0) {
-		gNetworkStartup = ERROR_ETH_SMB_ECHO;
-
+	if ((result=fileXioDevctl(ethBase, SMB_DEVCTL_LOGON, (void *)&logon, sizeof(logon), NULL, 0) >= 0)) {
 		// SMB server alive test
 		strcpy(echo.echo, "ALIVE ECHO TEST");
 		echo.len = strlen("ALIVE ECHO TEST");
@@ -103,12 +101,17 @@ void ethSMBConnect(void) {
 				strcpy(openshare.ShareName, gPCShareName);
 
 				if (fileXioDevctl(ethBase, SMB_DEVCTL_OPENSHARE, (void *)&openshare, sizeof(openshare), NULL, 0) >= 0) {
-
 					// everything is ok
 					gNetworkStartup = 0;
 				}
 			}
 		}
+		else{
+			gNetworkStartup = ERROR_ETH_SMB_ECHO;
+		}
+	}
+	else{
+		gNetworkStartup = (result==-SMB_DEVCTL_LOGON_ERR_CONN)? ERROR_ETH_SMB_CONN : ERROR_ETH_SMB_LOGON;
 	}
 }
 
@@ -145,8 +148,21 @@ static void ethInitSMB(void) {
 		sprintf(path, "%sVMC", ethPrefix);
 		checkCreateDir(path);
 #endif
-	} else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE))
-		setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	} else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE)) {
+		switch(gNetworkStartup){
+			case ERROR_ETH_SMB_CONN:
+				setErrorMessage(_STR_NETWORK_STARTUP_ERROR_CONN, gNetworkStartup);
+				break;
+			case ERROR_ETH_SMB_LOGON:
+				setErrorMessage(_STR_NETWORK_STARTUP_ERROR_LOGON, gNetworkStartup);
+				break;
+			case ERROR_ETH_SMB_OPENSHARE:
+				setErrorMessage(_STR_NETWORK_STARTUP_ERROR_SHARE, gNetworkStartup);
+				break;
+			default:
+				setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+		}
+	}
 }
 
 static void ethLoadModules(void) {

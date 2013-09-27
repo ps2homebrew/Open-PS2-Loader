@@ -46,6 +46,9 @@ Apps
 Theme
 Language
 Network startup error: %d
+Cannot connect to SMB server: %d
+Cannot log into SMB server: %d
+Cannot open SMB share: %d
 On
 Off
 Ok
@@ -167,3 +170,4 @@ Mode 8
 Mode 9
 Callback timer
 Apply a delay to CDVD functions (0 is default)
+Ethernet speed and duplex settings

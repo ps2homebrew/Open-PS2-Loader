@@ -20,9 +20,10 @@ typedef struct {
 #define ERROR_ETH_MODULE_SMSTCPIP_FAILURE	202
 #define ERROR_ETH_MODULE_SMSMAP_FAILURE		203
 #define ERROR_ETH_MODULE_SMBMAN_FAILURE		204
-#define ERROR_ETH_SMB_LOGON					300
-#define ERROR_ETH_SMB_ECHO					301
-#define ERROR_ETH_SMB_OPENSHARE				302
+#define ERROR_ETH_SMB_CONN					300
+#define ERROR_ETH_SMB_LOGON					301
+#define ERROR_ETH_SMB_ECHO					302
+#define ERROR_ETH_SMB_OPENSHARE				303
 
 void ethInit();
 item_list_t* ethGetObject(int initOnly);

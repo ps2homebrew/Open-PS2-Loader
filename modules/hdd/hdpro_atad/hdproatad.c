@@ -64,13 +64,6 @@ IRX_ID(MODNAME, 1, 1);
 #define ATAreg_HCYL_WR		0xb2
 #define ATAreg_DATA_WR		0x12
 
-// HD Pro uses PIO commands for reading/writing from HDD
-#define ATA_C_READ_PIO		0x20
-#define ATA_C_READ_PIO_EXT	0x24
-#define ATA_C_WRITE_PIO		0x30
-#define ATA_C_WRITE_PIO_EXT	0x34
-
-
 typedef struct _ata_devinfo {
 	int		exists;			/* Was successfully probed.  		*/
 	int		has_packet;		/* Supports the PACKET command set.  	*/
@@ -81,7 +74,7 @@ typedef struct _ata_devinfo {
 static int ata_evflg = -1;
 
 /* Used for indicating 48-bit LBA support.  */
-static int lba_48bit[2] = {0, 0};
+static unsigned char lba_48bit[2] = {0, 0};
 
 /* Local device info kept for drives 0 and 1.  */
 static ata_devinfo_t atad_devinfo[2];
@@ -96,25 +89,71 @@ typedef struct _ata_cmd_info {
 	unsigned char type;
 } ata_cmd_info_t;
 
-static ata_cmd_info_t ata_cmd_table[] = {
-	{0,1},{3,1},{8,5},{0x20,2},{0x30,3},{0x24,2},{0x34,3},{0x32,8},{0x38,3},
-	{0x40,1},{0x70,1},{0x87,2},{0x8e,7},{0x90,6},{0x91,1},{0x92,3},{0xa1,2},
-	{0xb0,7},{0xc0,1},{0xc4,2},{0xc5,3},{0xc6,1},{0xc8,4},{0xca,4},{0xcd,3},
-	{0xda,1},{0xde,1},{0xdf,1},{0xe0,1},{0xe1,1},{0xe2,1},{0xe3,1},{0xe4,2},
-	{0xe5,1},{0xe6,1},{0xe7,1},{0xe8,3},{0xec,2},{0xed,1},{0xef,1},{0xf1,3},
-	{0xf2,3},{0xf3,1},{0xf4,3},{0xf5,1},{0xf6,3},{0xf8,1},{0xf9,1},{0x25,4},
-	{0x35,4},{0xea,1}
+static const ata_cmd_info_t ata_cmd_table[] = {
+	{ATA_C_NOP,1},
+	{ATA_C_CFA_REQUEST_EXTENDED_ERROR_CODE,1},
+	{ATA_C_DEVICE_RESET,5},
+	{ATA_C_READ_SECTOR,2},
+	{ATA_C_READ_SECTOR_EXT,0x83},
+	{ATA_C_READ_DMA_EXT,0x84},
+	{ATA_C_WRITE_SECTOR,3},
+	{ATA_C_WRITE_LONG,8},	//??? This seems to be WRITE_LONG, but the READ_LONG command isn't present (Why would ). Both are obsolete too.
+	{ATA_C_WRITE_SECTOR_EXT,0x83},
+	{ATA_C_WRITE_DMA_EXT,0x84},
+	{ATA_C_CFA_WRITE_SECTORS_WITHOUT_ERASE,3},
+	{ATA_C_READ_VERIFY_SECTOR,1},
+	{ATA_C_SEEK,1},
+	{ATA_C_CFA_TRANSLATE_SECTOR,2},
+	{ATA_C_SCE_SECURITY_CONTROL,7},
+	{ATA_C_EXECUTE_DEVICE_DIAGNOSTIC,6},
+	{ATA_C_INITIALIZE_DEVICE_PARAMETERS,1},
+	{ATA_C_DOWNLOAD_MICROCODE,3},
+	{ATA_C_IDENTIFY_PACKET_DEVICE,2},
+	{ATA_C_SMART,7},
+	{ATA_C_CFA_ERASE_SECTORS,1},
+	{ATA_C_READ_MULTIPLE,2},
+	{ATA_C_WRITE_MULTIPLE,3},
+	{ATA_C_SET_MULTIPLE_MODE,1},
+	{ATA_C_READ_DMA,4},
+	{ATA_C_WRITE_DMA,4},
+	{ATA_C_CFA_WRITE_MULTIPLE_WITHOUT_ERASE,3},
+	{ATA_C_GET_MEDIA_STATUS,1},
+	{ATA_C_MEDIA_LOCK,1},
+	{ATA_C_MEDIA_UNLOCK,1},
+	{ATA_C_STANDBY_IMMEDIATE,1},
+	{ATA_C_IDLE_IMMEDIATE,1},
+	{ATA_C_STANDBY,1},
+	{ATA_C_IDLE,1},
+	{ATA_C_READ_BUFFER,2},
+	{ATA_C_CHECK_POWER_MODE,1},
+	{ATA_C_SLEEP,1},
+	{ATA_C_FLUSH_CACHE,1},
+	{ATA_C_WRITE_BUFFER,3},
+	{ATA_C_FLUSH_CACHE_EXT,1},
+	{ATA_C_IDENTIFY_DEVICE,2},
+	{ATA_C_MEDIA_EJECT,1},
+	{ATA_C_SET_FEATURES,1},
+	{ATA_C_SECURITY_SET_PASSWORD,3},
+	{ATA_C_SECURITY_UNLOCK,3},
+	{ATA_C_SECURITY_ERASE_PREPARE,1},
+	{ATA_C_SECURITY_ERASE_UNIT,3},
+	{ATA_C_SECURITY_FREEZE_LOCK,1},
+	{ATA_C_SECURITY_DISABLE_PASSWORD,3},
+	{ATA_C_READ_NATIVE_MAX_ADDRESS,1},
+	{ATA_C_SET_MAX_ADDRESS,1}
 };
 #define ATA_CMD_TABLE_SIZE	(sizeof ata_cmd_table/sizeof(ata_cmd_info_t))
 
-static ata_cmd_info_t sec_ctrl_cmd_table[] = {
-	{0xec,2},{0xf3,1},{0xf4,1},{0xf5,1},{0xf1,3},{0xf2,3},{0x30,3},{0x20,2}
-};
-#define SEC_CTRL_CMD_TABLE_SIZE	(sizeof sec_ctrl_cmd_table/sizeof(ata_cmd_info_t))
-
-static ata_cmd_info_t smart_cmd_table[] = {
-	{0xd0,2},{0xd2,1},{0xd3,1},{0xd4,1},{0xd5,2},{0xd6,3},{0xd8,1},{0xd9,1},
-	{0xda,1}
+static const ata_cmd_info_t smart_cmd_table[] = {
+	{ATA_S_SMART_READ_DATA,2},
+	{ATA_S_SMART_ENABLE_DISABLE_AUTOSAVE,1},
+	{ATA_S_SMART_SAVE_ATTRIBUTE_VALUES,1},
+	{ATA_S_SMART_EXECUTE_OFF_LINE,1},
+	{ATA_S_SMART_READ_LOG,2},
+	{ATA_S_SMART_WRITE_LOG,3},
+	{ATA_S_SMART_ENABLE_OPERATIONS,1},
+	{ATA_S_SMART_DISABLE_OPERATIONS,1},
+	{ATA_S_SMART_RETURN_STATUS,1}
 };
 #define SMART_CMD_TABLE_SIZE	(sizeof smart_cmd_table/sizeof(ata_cmd_info_t))
 
@@ -404,7 +443,7 @@ static int ata_device_select(int device)
 int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command)
 {
 	iop_sys_clock_t cmd_timeout;
-	ata_cmd_info_t *cmd_table;
+	const ata_cmd_info_t *cmd_table;
 	int i, res, type, cmd_table_size;
 	int using_timeout, device = (select >> 4) & 1;
 	unsigned int searchcmd;
@@ -417,13 +456,9 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	if ((res = ata_device_select(device & 1)) != 0)
 		return res;
 
-	/* For the SCE and SMART commands, we need to search on the subcommand
+	/* For the SMART commands, we need to search on the subcommand
 	specified in the feature register.  */
-	if (command == ATA_C_SCE_SEC_CONTROL) {
-		cmd_table = sec_ctrl_cmd_table;
-		cmd_table_size = SEC_CTRL_CMD_TABLE_SIZE;
-		searchcmd = feature;
-	} else if (command == ATA_C_SMART) {
+	if (command == ATA_C_SMART) {
 		cmd_table = smart_cmd_table;
 		cmd_table_size = SMART_CMD_TABLE_SIZE;
 		searchcmd = feature;
@@ -441,7 +476,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 		}
 	}
 
-	if (!(atad_cmd_state.type = type))
+	if (!(atad_cmd_state.type = type & 0x7F))
 		return -506;
 
 	atad_cmd_state.buf = buf;
@@ -470,8 +505,11 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 			using_timeout = 1;
 			break;
 		case 4:
-			/* Modified to include ATA_C_READ_DMA_EXT.  */
-			atad_cmd_state.dir = ((command != ATA_C_READ_DMA) && (command != ATA_C_READ_DMA_EXT));
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
+			using_timeout = 1;
+			break;
+		case 0x84:	//48-bit LBA DMA commands.
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
 			using_timeout = 1;
 	}
 
@@ -495,15 +533,17 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	/* Finally!  We send off the ATA command with arguments.  */
 	hdpro_io_write(ATAreg_CONTROL_WR, (using_timeout == 0) << 1);
 
-	/* 48-bit LBA requires writing to the address registers twice,
-	   24 bits of the LBA address is written each time.
-	   Writing to registers twice does not affect 28-bit LBA since
-	   only the latest data stored in address registers is used.  */
-	hdpro_io_write(ATAreg_FEATURE_WR, (feature & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_NSECTOR_WR, (nsector & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_SECTOR_WR, (sector & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_LCYL_WR, (lcyl & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_HCYL_WR, (hcyl & 0xffff) >> 8);
+	if(type&0x80){	//For the sake of achieving  (greatly) improved performance, write the registers twice only if required!
+		/* 48-bit LBA requires writing to the address registers twice,
+		   24 bits of the LBA address is written each time.
+		   Writing to registers twice does not affect 28-bit LBA since
+		   only the latest data stored in address registers is used.  */
+		hdpro_io_write(ATAreg_FEATURE_WR, (feature & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_NSECTOR_WR, (nsector & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_SECTOR_WR, (sector & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_LCYL_WR, (lcyl & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_HCYL_WR, (hcyl & 0xffff) >> 8);
+	}
 
 	hdpro_io_write(ATAreg_FEATURE_WR, feature & 0xff);
 	hdpro_io_write(ATAreg_NSECTOR_WR, nsector & 0xff);
@@ -848,13 +888,13 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
 			sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | 0x40) & 0xffff;
-			command = (dir == 1) ? ATA_C_WRITE_PIO_EXT : ATA_C_READ_PIO_EXT;
+			command = (dir == 1) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
 		} else {
 			/* Setup for 28-bit LBA.  */
 			sector = lba & 0xff;
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
-			command = (dir == 1) ? ATA_C_WRITE_PIO : ATA_C_READ_PIO;
+			command = (dir == 1) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
 		}
 
 		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,

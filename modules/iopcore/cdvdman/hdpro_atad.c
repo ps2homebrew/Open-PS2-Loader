@@ -66,13 +66,6 @@
 #define ATAreg_HCYL_WR		0xb2
 #define ATAreg_DATA_WR		0x12
 
-// HD Pro uses PIO commands for reading/writing from HDD
-#define ATA_C_READ_PIO		0x20
-#define ATA_C_READ_PIO_EXT	0x24
-#define ATA_C_WRITE_PIO		0x30
-#define ATA_C_WRITE_PIO_EXT	0x34
-
-
 static int ata_evflg = -1;
 
 /* Used for indicating 48-bit LBA support.  */
@@ -101,14 +94,25 @@ typedef struct _ata_cmd_info {
 	unsigned char type;
 } ata_cmd_info_t;
 
-static ata_cmd_info_t ata_cmd_table[] = {
-	{0xc8, 0x04}, {0xec, 0x02}, {0xa1, 0x02}, {0xb0, 0x07}, {0xef, 0x01}, {0x25, 0x04}, {0xca, 0x04}, {0xe3, 0x01}, {0x35, 0x04},
-	{0x20, 0x02}, {0x30, 0x03}, {0x24, 0x02}, {0x34, 0x03}
+static const ata_cmd_info_t ata_cmd_table[] = {
+	{ATA_C_READ_DMA, 0x04},
+	{ATA_C_IDENTIFY_DEVICE, 0x02},
+	{ATA_C_IDENTIFY_PACKET_DEVICE, 0x02},	
+	{ATA_C_SMART, 0x07},
+	{ATA_C_SET_FEATURES, 0x01},
+	{ATA_C_READ_DMA_EXT, 0x04},
+	{ATA_C_WRITE_DMA, 0x04},
+	{ATA_C_IDLE, 0x01},
+	{ATA_C_WRITE_DMA_EXT, 0x04},
+	{ATA_C_READ_SECTOR, 0x02},
+	{ATA_C_READ_SECTOR_EXT, 0x02},
+	{ATA_C_WRITE_SECTOR, 0x03},
+	{ATA_C_WRITE_SECTOR_EXT, 0x03}
 };
 #define ATA_CMD_TABLE_SIZE	(sizeof ata_cmd_table/sizeof(ata_cmd_info_t))
 
-static ata_cmd_info_t smart_cmd_table[] = {
-	{0xd8, 0x01}
+static const ata_cmd_info_t smart_cmd_table[] = {
+	{ATA_S_SMART_ENABLE_OPERATIONS, 0x01}
 };
 #define SMART_CMD_TABLE_SIZE	(sizeof smart_cmd_table/sizeof(ata_cmd_info_t))
 
@@ -379,7 +383,7 @@ static int ata_device_select(int device)
 int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command)
 {
 	iop_sys_clock_t cmd_timeout;
-	ata_cmd_info_t *cmd_table;
+	const ata_cmd_info_t *cmd_table;
 	int i, res, type, cmd_table_size;
 	int using_timeout, device = (select >> 4) & 1;
 	unsigned int searchcmd;
@@ -409,7 +413,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 		}
 	}
 
-	if (!(atad_cmd_state.type = type))
+	if (!(atad_cmd_state.type = type & 0x7F))
 		return -506;
 
 	atad_cmd_state.buf = buf;
@@ -439,7 +443,15 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 			break;
 		case 4:
 #ifdef VMC_DRIVER
-			atad_cmd_state.dir = ((command != 0xc8) && (command != 0x25));
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
+#else
+			atad_cmd_state.dir = ATA_DIR_READ;
+#endif
+			using_timeout = 1;
+			break;
+		case 0x84:	//48-bit LBA DMA commands.
+#ifdef VMC_DRIVER
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
 #else
 			atad_cmd_state.dir = ATA_DIR_READ;
 #endif
@@ -466,15 +478,17 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	/* Finally!  We send off the ATA command with arguments.  */
 	hdpro_io_write(ATAreg_CONTROL_WR, (using_timeout == 0) << 1);
 
-	/* 48-bit LBA requires writing to the address registers twice,
-	   24 bits of the LBA address is written each time.
-	   Writing to registers twice does not affect 28-bit LBA since
-	   only the latest data stored in address registers is used.  */
-	hdpro_io_write(ATAreg_FEATURE_WR, (feature & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_NSECTOR_WR, (nsector & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_SECTOR_WR, (sector & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_LCYL_WR, (lcyl & 0xffff) >> 8);
-	hdpro_io_write(ATAreg_HCYL_WR, (hcyl & 0xffff) >> 8);
+	if(type&0x80){	//For the sake of achieving  (greatly) improved performance, write the registers twice only if required!
+		/* 48-bit LBA requires writing to the address registers twice,
+		   24 bits of the LBA address is written each time.
+		   Writing to registers twice does not affect 28-bit LBA since
+		   only the latest data stored in address registers is used.  */
+		hdpro_io_write(ATAreg_FEATURE_WR, (feature & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_NSECTOR_WR, (nsector & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_SECTOR_WR, (sector & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_LCYL_WR, (lcyl & 0xffff) >> 8);
+		hdpro_io_write(ATAreg_HCYL_WR, (hcyl & 0xffff) >> 8);
+	}
 
 	hdpro_io_write(ATAreg_FEATURE_WR, feature & 0xff);
 	hdpro_io_write(ATAreg_NSECTOR_WR, nsector & 0xff);
@@ -662,13 +676,13 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
 			sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | 0x40) & 0xffff;
-			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_PIO_EXT : ATA_C_READ_PIO_EXT;
+			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
 		} else {
 			/* Setup for 28-bit LBA.  */
 			sector = lba & 0xff;
 			/* 0x40 enables LBA.  */
 			select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
-			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_PIO : ATA_C_READ_PIO;
+			command = ((dir == 1)&&(ATAWRITE)) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
 		}
 
 		if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,

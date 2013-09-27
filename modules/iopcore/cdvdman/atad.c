@@ -76,12 +76,12 @@ typedef struct _ata_cmd_info {
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
-	{ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PKT_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x04}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x04}
+	{ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}
 };
 #define ATA_CMD_TABLE_SIZE	(sizeof ata_cmd_table/sizeof(ata_cmd_info_t))
 
 static const ata_cmd_info_t smart_cmd_table[] = {
-	{ATA_C_SMART_ENABLE, 0x01}
+	{ATA_S_SMART_ENABLE_OPERATIONS, 0x01}
 };
 #define SMART_CMD_TABLE_SIZE	(sizeof smart_cmd_table/sizeof(ata_cmd_info_t))
 
@@ -285,7 +285,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 		}
 	}
 
-	if (!(atad_cmd_state.type = type))
+	if (!(atad_cmd_state.type = type & 0x7F))
 		return -506;
 
 	atad_cmd_state.buf = buf;
@@ -315,7 +315,15 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 			break;
 		case 4:
 #ifdef VMC_DRIVER
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
+#else
+			atad_cmd_state.dir = ATA_DIR_READ;
+#endif
+			using_timeout = 1;
+			break;
+		case 0x84:	//48-bit LBA DMA commands.
+#ifdef VMC_DRIVER
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
 #else
 			atad_cmd_state.dir = ATA_DIR_READ;
 #endif
@@ -337,15 +345,17 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	/* Finally!  We send off the ATA command with arguments.  */
 	ata_hwport->r_control = (using_timeout == 0) << 1;
 
-	/* 48-bit LBA requires writing to the address registers twice,
-	   24 bits of the LBA address is written each time.
-	   Writing to registers twice does not affect 28-bit LBA since
-	   only the latest data stored in address registers is used.  */
-	ata_hwport->r_feature = (feature >> 8) & 0xff;
-	ata_hwport->r_nsector = (nsector >> 8) & 0xff;
-	ata_hwport->r_sector  = (sector >> 8) & 0xff;
-	ata_hwport->r_lcyl    = (lcyl >> 8) & 0xff;
-	ata_hwport->r_hcyl    = (hcyl >> 8) & 0xff;
+	if(type&0x80){	//For the sake of achieving (greatly) improved performance, write the registers twice only if required!
+		/* 48-bit LBA requires writing to the address registers twice,
+		   24 bits of the LBA address is written each time.
+		   Writing to registers twice does not affect 28-bit LBA since
+		   only the latest data stored in address registers is used.  */
+		ata_hwport->r_feature = (feature >> 8) & 0xff;
+		ata_hwport->r_nsector = (nsector >> 8) & 0xff;
+		ata_hwport->r_sector  = (sector >> 8) & 0xff;
+		ata_hwport->r_lcyl    = (lcyl >> 8) & 0xff;
+		ata_hwport->r_hcyl    = (hcyl >> 8) & 0xff;
+	}
 
 	ata_hwport->r_feature = feature & 0xff;
 	ata_hwport->r_nsector = nsector & 0xff;

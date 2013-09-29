@@ -308,26 +308,19 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 
 	/* Does this command need a timeout?  */
 	using_timeout = 0;
-	switch (type) {
+	switch (type & 0x7F) {
 		case 1:
 		case 6:
 			using_timeout = 1;
 			break;
 		case 4:
 #ifdef VMC_DRIVER
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
 #else
 			atad_cmd_state.dir = ATA_DIR_READ;
 #endif
 			using_timeout = 1;
 			break;
-		case 0x84:	//48-bit LBA DMA commands.
-#ifdef VMC_DRIVER
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
-#else
-			atad_cmd_state.dir = ATA_DIR_READ;
-#endif
-			using_timeout = 1;
 	}
 
 	if (using_timeout) {
@@ -339,7 +332,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	}
 
 	/* Enable the command completion interrupt.  */
-	if (type == 1)
+	if ((type & 0x7F) == 1)
 		dev9IntrEnable(SPD_INTR_ATA0);
 
 	/* Finally!  We send off the ATA command with arguments.  */

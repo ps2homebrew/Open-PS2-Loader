@@ -19,10 +19,10 @@
 #define t_shddInfo ata_devinfo_t
 
 #define atadInit ata_get_devinfo
-#define atadDmaTransfer ata_device_dma_transfer
-#define atadSceUnlock ata_device_sec_unlock
+#define atadDmaTransfer ata_device_sector_io
+#define atadSceUnlock ata_device_sce_sec_unlock
 #define atadIdle ata_device_idle
-#define atadSceIdentifyDrive ata_device_sce_security_init
+#define atadSceIdentifyDrive ata_device_sce_identify_drive
 #define atadGetStatus ata_device_smart_get_status
 #define atadUpdateAttrib ata_device_smart_save_attr
 #define atadFlushCache ata_device_flush_cache

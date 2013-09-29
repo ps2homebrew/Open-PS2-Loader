@@ -436,22 +436,14 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 
 	/* Does this command need a timeout?  */
 	using_timeout = 0;
-	switch (type) {
+	switch (type & 0x7F) {
 		case 1:
 		case 6:
 			using_timeout = 1;
 			break;
 		case 4:
 #ifdef VMC_DRIVER
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
-#else
-			atad_cmd_state.dir = ATA_DIR_READ;
-#endif
-			using_timeout = 1;
-			break;
-		case 0x84:	//48-bit LBA DMA commands.
-#ifdef VMC_DRIVER
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
 #else
 			atad_cmd_state.dir = ATA_DIR_READ;
 #endif

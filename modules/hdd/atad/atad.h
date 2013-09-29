@@ -53,16 +53,17 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
 #define I_ata_device_sector_io DECLARE_IMPORT(9, ata_device_sector_io)
 
 //DRM functions that were meant to keep users from sharing disks (and hence the contained content). Supported by only Sony-modified HDDs (e.g. the SCPH-20400).
-int ata_device_sec_set_password(int device, void *password);
-#define I_ata_device_sec_set_password DECLARE_IMPORT(10, ata_device_sec_set_password)
-int ata_device_sec_unlock(int device, void *password);
-#define I_ata_device_sec_unlock DECLARE_IMPORT(11, ata_device_sec_unlock)
-int ata_device_sec_erase(int device);
-#define I_ata_device_sec_erase DECLARE_IMPORT(12, ata_device_sec_erase)
+int ata_device_sce_sec_set_password(int device, void *password);
+#define I_ata_device_sce_sec_set_password DECLARE_IMPORT(10, ata_device_sce_sec_set_password)
+int ata_device_sce_sec_unlock(int device, void *password);
+#define I_ata_device_sce_sec_unlock DECLARE_IMPORT(11, ata_device_sce_sec_unlock)
+int ata_device_sce_sec_erase(int device);
+#define I_ata_device_sce_sec_erase DECLARE_IMPORT(12, ata_device_sce_sec_erase)
+
 int ata_device_idle(int device, int period);
 #define I_ata_device_idle DECLARE_IMPORT(13, ata_device_idle)
-int ata_device_sce_security_init(int device, void *data);
-#define I_ata_device_sce_security_init DECLARE_IMPORT(14, ata_device_sce_security_init)
+int ata_device_sce_identify_drive(int device, void *data);
+#define I_ata_device_sce_identify_drive DECLARE_IMPORT(14, ata_device_sce_identify_drive)
 int ata_device_smart_get_status(int device);
 #define I_ata_device_smart_get_status DECLARE_IMPORT(15, ata_device_smart_get_status)
 int ata_device_smart_save_attr(int device);

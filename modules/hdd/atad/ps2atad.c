@@ -68,6 +68,7 @@ static const ata_cmd_info_t ata_cmd_table[] = {
 	{ATA_C_WRITE_DMA_EXT,0x84},
 	{ATA_C_CFA_WRITE_SECTORS_WITHOUT_ERASE,3},
 	{ATA_C_READ_VERIFY_SECTOR,1},
+	{ATA_C_READ_VERIFY_SECTOR_EXT,0x81},
 	{ATA_C_SEEK,1},
 	{ATA_C_CFA_TRANSLATE_SECTOR,2},
 	{ATA_C_SCE_SECURITY_CONTROL,7},
@@ -362,18 +363,15 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 
 	/* Does this command need a timeout?  */
 	using_timeout = 0;
-	switch (type) {
+	switch (type & 0x7F) {
 		case 1:
 		case 6:
 			using_timeout = 1;
 			break;
 		case 4:
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
 			using_timeout = 1;
 			break;
-		case 0x84:	//48-bit LBA DMA commands.
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
-			using_timeout = 1;
 	}
 
 	if (using_timeout) {
@@ -389,7 +387,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	}
 
 	/* Enable the command completion interrupt.  */
-	if (type == 1)
+	if ((type & 0x7F) == 1)
 		dev9IntrEnable(SPD_INTR_ATA0);
 
 	/* Finally!  We send off the ATA command with arguments.  */
@@ -654,12 +652,11 @@ static int ata_device_pkt_identify(int device, void *info)
 }
 
 /* Export 14 */
-/* I assume 0xec is either init/identify.  */
-int ata_device_sce_security_init(int device, void *data)
+int ata_device_sce_identify_drive(int device, void *data)
 {
 	int res;
 
-	if(!(res = ata_io_start(data, 1, 0xec, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL))) res=ata_io_finish();
+	if(!(res = ata_io_start(data, 1, ATA_SCE_IDENTIFY_DRIVE, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL))) res=ata_io_finish();
 
 	return res;
 }
@@ -778,14 +775,14 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
 	return res;
 }
 
-static inline void ata_get_security_status(int device, ata_devinfo_t *devinfo, unsigned short int *param)
+static void ata_get_security_status(int device, ata_devinfo_t *devinfo, unsigned short int *param)
 {
 	if (ata_device_identify(device, param) == 0)
 		devinfo[device].security_status = param[ATA_ID_SECURITY_STATUS];
 }
 
 /* Export 10 */
-int ata_device_sec_set_password(int device, void *password)
+int ata_device_sce_sec_set_password(int device, void *password)
 {
 	ata_devinfo_t *devinfo = atad_devinfo;
 	unsigned short int *param = ata_param;
@@ -796,7 +793,7 @@ int ata_device_sec_set_password(int device, void *password)
 	memset(param, 0, 512);
 	memcpy(param + 1, password, 32);
 
-	res = ata_io_start(param, 1, ATA_C_SECURITY_SET_PASSWORD, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL);
+	res = ata_io_start(param, 1, ATA_SCE_SECURITY_SET_PASSWORD, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL);
 	if (res == 0)
 		res = ata_io_finish();
 
@@ -805,7 +802,7 @@ int ata_device_sec_set_password(int device, void *password)
 }
 
 /* Export 11 */
-int ata_device_sec_unlock(int device, void *password)
+int ata_device_sce_sec_unlock(int device, void *password)
 {
 	ata_devinfo_t *devinfo = atad_devinfo;
 	unsigned short int *param = ata_param;
@@ -816,7 +813,7 @@ int ata_device_sec_unlock(int device, void *password)
 	memset(param, 0, 512);
 	memcpy(param + 1, password, 32);
 
-	if ((res = ata_io_start(param, 1, ATA_C_SECURITY_UNLOCK, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL)) != 0)
+	if ((res = ata_io_start(param, 1, ATA_SCE_SECURITY_UNLOCK, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL)) != 0)
 		return res;
 	if ((res = ata_io_finish()) != 0)
 		return res;
@@ -830,7 +827,7 @@ int ata_device_sec_unlock(int device, void *password)
 }
 
 /* Export 12 */
-int ata_device_sec_erase(int device)
+int ata_device_sce_sec_erase(int device)
 {
 	ata_devinfo_t *devinfo = atad_devinfo;
 	unsigned short int *param = NULL;
@@ -839,12 +836,12 @@ int ata_device_sec_erase(int device)
 	if (!(devinfo[device].security_status & ATA_F_SEC_ENABLED) || !(devinfo[device].security_status & ATA_F_SEC_LOCKED)) return 0;
 
 	/* First send the mandatory ERASE PREPARE command.  */
-	if ((res = ata_io_start(NULL, 1, ATA_C_SECURITY_ERASE_PREPARE, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL)) != 0)
+	if ((res = ata_io_start(NULL, 1, ATA_SCE_SECURITY_ERASE_PREPARE, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL)) != 0)
 		goto finish;
 	if ((res = ata_io_finish()) != 0)
 		goto finish;
 
-	if ((res = ata_io_start(NULL, 1, ATA_C_SECURITY_ERASE_UNIT, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL)) == 0)
+	if ((res = ata_io_start(NULL, 1, ATA_SCE_SECURITY_ERASE_UNIT, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SCE_SECURITY_CONTROL)) == 0)
 		res = ata_io_finish();
 
 finish:
@@ -1058,4 +1055,3 @@ int ata_device_is_48bit(int device)
 {
 	return lba_48bit[device];
 }
-

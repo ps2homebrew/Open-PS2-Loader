@@ -21,7 +21,7 @@
 #define COMPAT_MODE_4 		 0x08 // 0 PSS mode
 #define COMPAT_MODE_5 		 0x10 // Disable DVD-DL
 #define COMPAT_MODE_6 		 0x20 // Disable IGR
-#define COMPAT_MODE_7 		 0x40 // Reduced cdvdfsv buffer (UNUSED)
+#define COMPAT_MODE_7 		 0x40 // Use IOP threading hack
 #define COMPAT_MODE_8 		 0x80 // Hide dev9 module
 #define COMPAT_MODE_9		0x100 // Alternate IGR combo (UNUSED)
 

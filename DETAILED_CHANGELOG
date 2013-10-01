@@ -8,7 +8,24 @@
 
 Open PS2 Loader detailed ChangeLog:
 
-rev641 - Updated CHANGELOG and DETAILED_CHANGELOG files
+rev658 - *Sync'ing HDD updates... again. - Sun Sep 29 19:22:24 2013 +0800
+rev657 - *Sync'ing the updates in the PS2SDK with the ATAD modules here: common/include/atahw.h was updated, and all ATAD modules are using the commands defined within atahw.h. - Fri Sep 27 18:22:17 2013 +0800
+rev656 - *Optimized CDVDMAN (Declared internal structures and functions as static). - Mon Sep 02 15:21:49 2013 +0800
+rev655 - The original files I modified couldn't be committed directly into the repository, so I had to check out a new copy of the repository and copy my changes over manually. - Thu Aug 08 14:22:12 2013 +0800
+rev654 - *Updated ATAD (Normal ATAD and the HDPro version) to be the same as the ones from the PS2SDK. - Thu Aug 08 14:12:32 2013 +0800
+rev653 - *Re-added SPU reset code. CLEARSPU shouldn't be used and I was wrong about that. - Sun Jul 21 12:12:43 2013 +0800
+rev652 - *Added sceCdPowerOff(). Games that power off the console should be able to do so now. - Wed Jul 17 15:08:08 2013 +0800
+rev651 - *Cleaned up IGR code. - Wed Jul 17 13:12:54 2013 +0800
+rev650 - Added power-off processing code. Games (mainly older one) that use it should no longer cause a deadlock. - Sat Jun 15 01:56:50 2013 +0800
+rev649 - *Updated all DEV9 and ATAD module code. - Sat Jun 15 01:26:36 2013 +0800
+rev648 - (AKuHAK): Updated OPL to support the updated LIBPNG port. - Sat Jun 15 00:52:08 2013 +0800
+rev647 - Removed the integrated FreeType copy. Please update your FreeType library (From ps2sdk-ports)! - Sun Jun 02 20:44:40 2013 +0800
+rev646 - *Removed the old Protokernel patch, since the PS2SDK now has a complete one. - Thu Mar 21 00:11:48 2013 +0800
+rev645 - *Removed the old Protokernel patch, since a full patch has been integrated into the PS2SDK. - Thu Mar 21 00:08:41 2013 +0800
+rev644 - Added tag 0.9.1 for changeset 2ebb9bb56c19 - Mon Aug 13 06:00:01 2012 -0300
+rev643 - Updated USBLD_VERSION to "0.9" - Mon Aug 13 05:57:32 2012 -0300
+rev642 - Added tag 0.9 for changeset 830d78f67941 - Sat Jul 28 10:35:29 2012 -0300
+rev641 - Updated CHANGELOG and DETAILED_CHANGELOG files - Sat Jul 28 10:35:22 2012 -0300
 rev640 - Disabling auto-refresh of game list by default, as it is causing bugs sometimes - Tue May 01 16:37:04 2012 +0200
 rev639 - mgh: fix for default HDD DMA mode, that wasn't correctly set - Thu Apr 26 22:46:24 2012 +0200
 rev638 - Suggestion from "mgh". - Mon Mar 26 22:40:28 2012 +0200

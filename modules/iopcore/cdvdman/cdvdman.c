@@ -48,10 +48,11 @@ static char g_ISO_name[] = "######    GAMESETTINGS    ######";
 #else
 static char g_tag[] = "######    GAMESETTINGS    ######";
 #endif
-static char g_ISO_parts=0x69;
-static char g_ISO_media=0x69;
-static char g_gamesetting_alt_read=0;
-static u16 g_gamesetting_disable_DVDDL=0;
+static u8 g_ISO_parts=0x69;
+static u8 g_ISO_media=0x69;
+static u8 g_gamesetting_alt_read=0;
+static u8 g_gamesetting_threading_hack=0;
+static u8 g_gamesetting_disable_DVDDL=0;
 static u16 g_gamesetting_0_pss=0;
 static u32 g_gamesetting_timer=100;
 
@@ -1839,7 +1840,9 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 			if (sectors < nsectors)
 				nsectors = sectors;
 
-			u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);
+			if(g_gamesetting_threading_hack) DelayThread(1);
+
+			u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);	
 			if (ata_device_sector_io(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
 				cdvdman_stat.err = CDVD_ERR_READ;
 				break;
@@ -2997,6 +3000,9 @@ int _start(int argc, char **argv)
 	if (g_ISO_media != 0x69)
 		lba_48bit = g_ISO_media;
 	g_ISO_parts = 0x69; // just to shut off warning
+#else
+	// just to shut off warning
+	if(g_gamesetting_threading_hack) g_gamesetting_threading_hack=1;
 #endif
 
 	// hook MODLOAD's exports

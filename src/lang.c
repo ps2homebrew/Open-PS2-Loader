@@ -92,7 +92,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"0 PSS mode",
 	"Disable DVD-DL",
 	"Disable IGR",
-	"Unused",
+	"Use IOP threading hack",
 	"Hide dev9 module",
 	"Alternate IGR combo",
 	"Changing the size will reformat the VMC",

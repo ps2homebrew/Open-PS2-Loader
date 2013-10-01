@@ -22,7 +22,7 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	-rm -f *.o *.irx
+	-rm -f *.o *.irx cdvdfsv.map
 
 include $(PS2SDK)/Defs.make
 include Rules.make

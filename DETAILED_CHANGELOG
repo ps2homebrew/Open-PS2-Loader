@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev659 - *Sync'ing the HDD module updates for the PSX. OPL should now run properly on the PSX. - Tue Oct 01 23:04:45 2013 +0800
 rev658 - *Sync'ing HDD updates... again. - Sun Sep 29 19:22:24 2013 +0800
 rev657 - *Sync'ing the updates in the PS2SDK with the ATAD modules here: common/include/atahw.h was updated, and all ATAD modules are using the commands defined within atahw.h. - Fri Sep 27 18:22:17 2013 +0800
 rev656 - *Optimized CDVDMAN (Declared internal structures and functions as static). - Mon Sep 02 15:21:49 2013 +0800

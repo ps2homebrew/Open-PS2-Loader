@@ -31,7 +31,7 @@
 #include <sys/fcntl.h>
 #endif
 
-#define USBLD_VERSION "0.9"
+#define USBLD_VERSION "0.9.2"
 
 #define IO_MENU_UPDATE_DEFFERED 2
 
@@ -91,6 +91,43 @@ int gEnableArt;
 int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
 int gVSync; // 0 - False, 1 - True
+
+// ------------------------------------------------------------------------------------------------------------------------
+
+#define GSM_VERSION "0.38"
+
+#define PS1_VMODE	1
+#define SDTV_VMODE	2
+#define HDTV_VMODE	3
+#define VGA_VMODE	4
+
+#define make_display_magic_number(dh, dw, magv, magh, dy, dx) \
+	(((u64)(dh)<<44) | ((u64)(dw)<<32) | ((u64)(magv)<<27) | \
+	((u64)(magh)<<23) | ((u64)(dy)<<12)   | ((u64)(dx)<<0)     )
+
+/// DTV 576 Progressive Scan (720x576)
+#define GS_MODE_DTV_576P  0x53
+
+/// DTV 1080 Progressive Scan (1920x1080)
+#define GS_MODE_DTV_1080P  0x54
+
+typedef struct predef_vmode_struct {
+	u8	category;
+	char desc[34];
+	u8	interlace;
+	u8	mode;
+	u8	ffmd;
+	u64	display;
+	u64	syncv;
+} predef_vmode_struct;
+
+int	gGSM; // 0 - Off, 1 - On
+int	gGSMVMode;  // See the related predef_vmode
+int	gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
+int	gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
+int	gGSMSkipVideos; // 0 - Off, 1 - On
+
+// ------------------------------------------------------------------------------------------------------------------------
 
 // 0,1,2 scrolling speed
 int gScrollSpeed;

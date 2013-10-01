@@ -480,6 +480,11 @@ static void _loadConfig() {
 			configGetInt(configOPL, "vsync", &gVSync);
 			configGetInt(configOPL, "vmode", &gVMode);
 
+			configGetInt(configOPL, "gsm", &gGSM);
+			configGetInt(configOPL, "gsmvmode", &gGSMVMode);
+			configGetInt(configOPL, "gsm_x_offset", &gGSMXOffset);
+			configGetInt(configOPL, "gsm_y_offset", &gGSMYOffset);
+			configGetInt(configOPL, "gsmskipvideos", &gGSMSkipVideos);
 
 			if (configGetStr(configOPL, "theme", &temp))
 				themeID = thmFindGuiID(temp);
@@ -545,6 +550,11 @@ static void _saveConfig() {
 		configSetInt(configOPL, "vmode", gVMode);
 		configSetInt(configOPL, "vsync", gVSync);
 
+		configSetInt(configOPL, "gsm", gGSM);
+		configSetInt(configOPL, "gsmvmode", gGSMVMode);
+		configSetInt(configOPL, "gsm_x_offset", gGSMXOffset);
+		configSetInt(configOPL, "gsm_y_offset", gGSMYOffset);
+		configSetInt(configOPL, "gsmskipvideos", gGSMSkipVideos);
 
 		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
 		char temp[255];
@@ -870,6 +880,12 @@ static void setDefaults(void) {
 
 	gVMode = RM_VMODE_AUTO;
 	gVSync = 1;
+
+	gGSM = 0;
+	gGSMVMode = 0;
+	gGSMXOffset = 0;
+	gGSMYOffset = 0;
+	gGSMSkipVideos = 0;
 }
 
 static void init(void) {
@@ -897,6 +913,58 @@ static void init(void) {
 	cacheInit();
 }
 
+/*---------------------------------------------------------*/
+/* Disable Graphics Synthesizer Mode Selector (a.k.a. GSM) */
+/*---------------------------------------------------------*/
+static inline void DeInitGSM(void)
+{
+	//Search for Syscall Table in ROM
+	u32 i;
+	u32 startaddr;
+	u32* ptr;
+	u32* addr;
+	startaddr = 0;
+	for (i = 0x1FF00000; i < 0x1FFFFFFF; i+= 4)
+	{
+		if ( *(u32*)(i + 0) == 0x40196800 )
+		{
+			if ( *(u32*)(i + 4) == 0x3C1A8001 )
+			{
+				startaddr = i - 8;
+				break;
+			}
+		}
+	}
+	ptr = (u32 *) (startaddr + 0x02F0);
+	addr = (u32*)((ptr[0] << 16) | (ptr[2] & 0xFFFF));
+	addr = (u32*)((u32)addr & 0x1fffffff);
+	addr = (u32*)((u32)addr + startaddr);
+
+	//The following two lines produce the same result. They are an opportunity to learn about "pointers" and "casting" in C language.
+	//PREINIT_LOG("ROM Pointer to SetGsCrt at 0x%X, SetGsCrt at 0x%X\n", ((u32)addr + 2*4), *(u32*)((u32)addr + 2*4));
+	PREINIT_LOG("ROM Pointer to SetGsCrt at 0x%X, SetGsCrt at 0x%X\n", (u32)&addr[2], (u32)addr[2]);
+
+	DI();
+	ee_kmode_enter();
+	
+	// Restore SetGsCrt (even when it isn't hooked)
+	SetSyscall(2, (void*)addr[2]);
+
+	// Remove all breakpoints (even when they aren't enabled)
+	__asm__ __volatile__ (
+	".set noreorder\n"
+	".set noat\n"
+	"li $k0, 0x8000\n"
+	"mtbpc $k0\n"			// All breakpoints off (BED = 1)
+	"sync.p\n"				// Await instruction completion
+	".set at\n"
+	".set reorder\n"
+	);
+
+	ee_kmode_exit();
+	EI();
+}
+
 static void deferredInit(void) {
 
 	// inform GUI main init part is over
@@ -915,6 +983,8 @@ int main(int argc, char* argv[])
 {
 	LOG_INIT();
 	PREINIT_LOG("OPL GUI start!\n");
+
+	DeInitGSM();
 
 	#ifdef __DEBUG
 	int use_early_debug = 0, exception_test = 0;

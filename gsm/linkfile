@@ -1,0 +1,7 @@
+SECTIONS {
+	.gsm_engine 0x00080000 : { 
+		*(.gsm_engine)
+		*(.rodata)
+		*(.bss)
+	}
+}

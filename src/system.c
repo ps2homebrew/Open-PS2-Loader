@@ -76,6 +76,11 @@ extern int size_ps2hdd_irx;
 extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
+#ifdef GSM
+extern void *gsm_elf;
+extern int size_gsm_elf;
+#endif
+
 extern void *eecore_elf;
 extern int size_eecore_elf;
 
@@ -487,6 +492,90 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	EIntr();
 }
 
+#ifdef GSM
+void InstallGSM(void) {
+	/* Installing GSM */
+	LOG("Installing GSM...\n");
+	u8 *boot_elf = NULL;
+	elf_header_t *eh;
+	elf_pheader_t *eph;
+	void *pdata;
+	int i;
+
+	// NB: GSM.ELF is embedded
+	boot_elf = (u8 *)&gsm_elf;
+	eh = (elf_header_t *)boot_elf;
+	if (_lw((u32)&eh->ident) != ELF_MAGIC)
+		while (1);
+	eph = (elf_pheader_t *)(boot_elf + eh->phoff);
+	// Scan through the ELF's program headers and copy them into RAM, then
+	// zero out any non-loaded regions.
+	for (i = 0; i < eh->phnum; i++) {
+		if (eph[i].type != ELF_PT_LOAD)
+			continue;
+		pdata = (void *)(boot_elf + eph[i].offset);
+		memcpy(eph[i].vaddr, pdata, eph[i].filesz);
+		if (eph[i].memsz > eph[i].filesz)
+			memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
+	}
+}
+
+void PrepareGSM(void) {
+	/* Preparing GSM */
+	LOG("Preparing GSM...\n");
+	// Pre-defined vmodes 
+	// Some of following vmodes gives BOSD and/or freezing, depending on the console BIOS version, TV/Monitor set, PS2 cable (composite, component, VGA, ...)
+	// Therefore there are many variables involved here that can lead us to success or faild depending on the circumstances above mentioned.
+	//
+	//	category	description								interlace			mode			 	ffmd	   	display							dh		dw		magv	magh	dy		dx		syncv
+	//	--------	-----------								---------			----			 	----		----------------------------	--		--		----	----	--		--		-----
+	static const predef_vmode_struct predef_vmode[30] = {
+		{  SDTV_VMODE,"NTSC                           ",	GS_INTERLACED,		GS_MODE_NTSC,		GS_FIELD,	(u64)make_display_magic_number(	 447,	2559,	0,		3,		 46,	700),	0x00C7800601A01801},
+		{  SDTV_VMODE,"NTSC Non Interlaced            ",	GS_INTERLACED,		GS_MODE_NTSC,		GS_FRAME,	(u64)make_display_magic_number(	 223,	2559,	0,		3,		 26,	700),	0x00C7800601A01802},
+		{  SDTV_VMODE,"PAL                            ",	GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	(u64)make_display_magic_number(	 511,	2559,	0,		3,		 70,	720),	0x00A9000502101401},
+		{  SDTV_VMODE,"PAL Non Interlaced             ",	GS_INTERLACED,		GS_MODE_PAL,		GS_FRAME,	(u64)make_display_magic_number(	 255,	2559,	0,		3,		 37,	720),	0x00A9000502101404},
+		{  SDTV_VMODE,"PAL @60Hz                      ",	GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	(u64)make_display_magic_number(	 447,	2559,	0,		3,		 46,	700),	0x00C7800601A01801},
+		{  SDTV_VMODE,"PAL @60Hz Non Interlaced       ",	GS_INTERLACED,		GS_MODE_PAL,		GS_FRAME,	(u64)make_display_magic_number(	 223,	2559,	0,		3,		 26,	700),	0x00C7800601A01802},
+		{  PS1_VMODE, "PS1 NTSC (HDTV 480p @60Hz)     ",	GS_NONINTERLACED,	GS_MODE_DTV_480P,	GS_FRAME,	(u64)make_display_magic_number(	 255,	2559,	0,		1,		 12,	736),	0x00C78C0001E00006},
+		{  PS1_VMODE, "PS1 PAL (HDTV 576p @50Hz)      ",	GS_NONINTERLACED,	GS_MODE_DTV_576P,	GS_FRAME,	(u64)make_display_magic_number(	 255,	2559,	0,		1,		 23,	756),	0x00A9000002700005},
+		{  HDTV_VMODE,"HDTV 480p @60Hz                ",	GS_NONINTERLACED,	GS_MODE_DTV_480P,	GS_FRAME, 	(u64)make_display_magic_number(	 479,	1279,	0,		1,		 51,	308),	0x00C78C0001E00006},
+		{  HDTV_VMODE,"HDTV 576p @50Hz                ",	GS_NONINTERLACED,	GS_MODE_DTV_576P,	GS_FRAME,	(u64)make_display_magic_number(	 575,	1279,	0,		1,		 64,	320),	0x00A9000002700005},
+		{  HDTV_VMODE,"HDTV 720p @60Hz                ",	GS_NONINTERLACED,	GS_MODE_DTV_720P,	GS_FRAME, 	(u64)make_display_magic_number(	 719,	1279,	1,		1,		 24,	302),	0x00AB400001400005},
+		{  HDTV_VMODE,"HDTV 1080i @60Hz               ",	GS_INTERLACED,		GS_MODE_DTV_1080I,	GS_FIELD, 	(u64)make_display_magic_number(	1079,	1919,	1,		2,		 48,	238),	0x0150E00201C00005},
+		{  HDTV_VMODE,"HDTV 1080i @60Hz Non Interlaced",	GS_INTERLACED,		GS_MODE_DTV_1080I,	GS_FRAME, 	(u64)make_display_magic_number(	1079,	1919,	0,		2,		 48,	238),	0x0150E00201C00005},
+		{  HDTV_VMODE,"HDTV 1080p @60Hz               ",	GS_NONINTERLACED,	GS_MODE_DTV_1080P,	GS_FRAME, 	(u64)make_display_magic_number(	1079,	1919,	1,		2,		 48,	238),	0x0150E00201C00005},
+		{  VGA_VMODE, "VGA 640x480p @60Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_60,	GS_FRAME, 	(u64)make_display_magic_number(	 479,	1279,	0,		1,		 54,	276),	0x004780000210000A},
+		{  VGA_VMODE, "VGA 640x960i @60Hz             ",	GS_INTERLACED,		GS_MODE_VGA_640_60,	GS_FIELD,	(u64)make_display_magic_number(	 959,	1279,	1,		1,		128,	291),	0x004F80000210000A},
+		{  VGA_VMODE, "VGA 640x480p @72Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_72, GS_FRAME,	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	330),	0x0067800001C00009},
+		{  VGA_VMODE, "VGA 640x480p @75Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_75, GS_FRAME, 	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	360),	0x0067800001000001},
+		{  VGA_VMODE, "VGA 640x480p @85Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_85, GS_FRAME,	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	260),	0x0067800001000001},
+		{  VGA_VMODE, "VGA 800x600p @56Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_800_56, GS_FRAME,	(u64)make_display_magic_number(  600,	1600,	0,		1,		 25,	450),	0x0049600001600001},
+		{  VGA_VMODE, "VGA 800x600p @60Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_800_60, GS_FRAME, 	(u64)make_display_magic_number(  600,	1600,	0,		1,		 25,	465),	0x0089600001700001},
+		{  VGA_VMODE, "VGA 800x600p @72Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_800_72, GS_FRAME,	(u64)make_display_magic_number(  600,	1600,	0,		1,		 25,	465),	0x00C9600001700025},
+		{  VGA_VMODE, "VGA 800x600p @75Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_800_75, GS_FRAME, 	(u64)make_display_magic_number(  600,	1600,	0,		1,		 25,	510),	0x0069600001500001},
+		{  VGA_VMODE, "VGA 800x600p @85Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_800_85, GS_FRAME,	(u64)make_display_magic_number(  600,	1600,	0,		1,		 15,	500),	0x0069600001B00001},
+		{  VGA_VMODE, "VGA 1024x768p @60Hz            ",	GS_NONINTERLACED,	GS_MODE_VGA_1024_60, GS_FRAME, 	(u64)make_display_magic_number(  768,	2048,	0,		2,		 30,	580),	0x00CC000001D00003},
+		{  VGA_VMODE, "VGA 1024x768p @70Hz            ",	GS_NONINTERLACED,	GS_MODE_VGA_1024_70, GS_FRAME,	(u64)make_display_magic_number(  768,	1024,	0,		0,		 30,	266),	0x00CC000001D00003},
+		{  VGA_VMODE, "VGA 1024x768p @75Hz            ",	GS_NONINTERLACED,	GS_MODE_VGA_1024_75, GS_FRAME, 	(u64)make_display_magic_number(  768,	1024,	0,		0,		 30,	260),	0x006C000001C00001},
+		{  VGA_VMODE, "VGA 1024x768p @85Hz            ",	GS_NONINTERLACED,	GS_MODE_VGA_1024_85, GS_FRAME,	(u64)make_display_magic_number(  768,	1024,	0,		0,		 30,	290),	0x006C000002400001},
+		{  VGA_VMODE, "VGA 1280x1024p @60Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_60, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001},
+		{  VGA_VMODE, "VGA 1280x1024p @75Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001}
+	}; //ends predef_vmode definition
+	#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
+	static void (*InitGSM)(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, int dx_offset, int dy_offset, u8 skip_videos) _GSM_ENGINE_ ;
+	InitGSM = (void *)*(volatile u32 *)(0x00080000);
+	InitGSM(predef_vmode[gGSMVMode].interlace, \
+					predef_vmode[gGSMVMode].mode, \
+					predef_vmode[gGSMVMode].ffmd, \
+					predef_vmode[gGSMVMode].display, \
+					predef_vmode[gGSMVMode].syncv, \
+					((predef_vmode[gGSMVMode].ffmd)<<1)|(predef_vmode[gGSMVMode].interlace), \
+					gGSMXOffset, \
+					gGSMYOffset, \
+					gGSMSkipVideos);
+}
+#endif
+
 #ifdef VMC
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int compatflags, int alt_ee_core) {
 #else
@@ -497,6 +586,12 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	elf_pheader_t *eph;
 	void *pdata;
 	int i;
+
+#ifdef GSM
+	if (gGSM)
+		InstallGSM();
+#endif
+
 	char *argv[3];
 	char config_str[255];
 
@@ -539,10 +634,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	SifInitRpc(0);
 	SifExitRpc();
 
-	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
+	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
-		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode);
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode, \
+		gGSM);
 
 	char cmask[10];
 	snprintf(cmask, 10, "%d", compatflags);
@@ -552,6 +648,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	FlushCache(0);
 	FlushCache(2);
+
+#ifdef GSM
+	if (gGSM)
+		PrepareGSM();
+#endif
 
 	ExecPS2((void *)eh->entry, 0, 3, argv);
 }
@@ -563,6 +664,12 @@ int sysExecElf(char *path, int argc, char **argv) {
 
 	void *pdata;
 	int i;
+
+#ifdef GSM
+	if (gGSM)
+		InstallGSM();
+#endif
+
 	char *elf_argv[1];
 
 	// NB: ELFLDR.ELF is embedded
@@ -596,6 +703,12 @@ int sysExecElf(char *path, int argc, char **argv) {
 	elf_argv[0] = path;
 	for (i=0; i<argc; i++)
 		elf_argv[i+1] = argv[i];
+
+#ifdef GSM
+	*(volatile u32 *)(0x0008000C) = gGSM?1:0; // GSM Enable/Disable Status
+	if (gGSM)
+		PrepareGSM();
+#endif
 
 	ExecPS2((void *)eh->entry, 0, argc+1, elf_argv);
 

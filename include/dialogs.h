@@ -45,6 +45,12 @@
 #define UICFG_VSYNC				22
 #define UICFG_INFOPAGE			23
 
+#define UICFG_GSM				24
+#define UICFG_GSMVMODE			25
+#define UICFG_GSMXOFFSET		26
+#define UICFG_GSMYOFFSET		27
+#define UICFG_GSMSKIPVIDEOS		28
+
 #define CFG_EXITTO				30
 #define CFG_DEFDEVICE			31
 #define CFG_DEBUG				32

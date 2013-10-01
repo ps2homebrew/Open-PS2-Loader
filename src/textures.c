@@ -36,7 +36,7 @@ extern void *R2_png;
 extern void *logo_png;
 
 // Not related to screen size, just to limit at some point
-static int maxWidth = 640;
+static int maxWidth = 720;
 static int maxHeight = 512;
 
 typedef struct {

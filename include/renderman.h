@@ -42,7 +42,10 @@ const u64 gDefaultAlpha;
 enum rm_vmode {
     RM_VMODE_AUTO = 0,
     RM_VMODE_PAL,
-    RM_VMODE_NTSC
+    RM_VMODE_NTSC,
+    RM_VMODE_DTV480P,
+    RM_VMODE_DTV576P,
+    RM_VMODE_VGA_640_60
 };
 
 /** Initializes the rendering manager */

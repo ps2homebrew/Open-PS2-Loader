@@ -233,6 +233,37 @@ unsigned int _strtoui(const char* p)
 }
 
 /*----------------------------------------------------------------------------------------*/
+/* This function converts string to signed integer. Stops on illegal characters.        */
+/* Put here because including atoi rises the size of loader.elf by another kilobyte       */
+/* and that causes some games to stop working.                                            */
+/*----------------------------------------------------------------------------------------*/
+
+int _strtoi(const char* p)
+{
+	int k = 1;
+	if (!p)
+		return 0;
+
+	int r = 0;
+
+	while (*p)
+	{
+		if (*p == '-')
+		{
+ 			k = -1;
+			p++;
+		}
+		else if ((*p < '0') || (*p > '9'))
+			return r;
+		r = r * 10 + (*p++ - '0');
+	}
+
+	r = r * k;
+
+	return r;
+}
+
+/*----------------------------------------------------------------------------------------*/
 /* This function format g_ipconfig with ip, netmask, and gateway                          */
 /*----------------------------------------------------------------------------------------*/
 void set_ipconfig(void)

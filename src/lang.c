@@ -152,7 +152,17 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"100Mbit full-duplex",
 	"100Mbit half-duplex",
 	"10Mbit full-duplex",
-	"10Mbit half-duplex"
+	"10Mbit half-duplex",
+	"GSM (Graphics Synthesizer Mode Selector)",
+	"Force a video mode",
+	"Video mode",
+	"Video mode to be forced",
+	"Horizontal Adjust",
+	"Sets Horizontal Offset",
+	"Vertical Adjust",
+	"Sets Vertical Offset",
+	"FMV skip",
+	"Skips Full Motion Videos",
 };
 
 static int guiLangID = 0;

@@ -1,0 +1,273 @@
+GSModeSelector releases (at psx-scene)
+
+GSModeSelector v0.38 (2013.03.26) by doctorxyz
+Core:
+- Implemented separate access trap handling for DISPLAY1 and DISPLAY2 registers
+
+GSModeSelector v0.37 (2013.01.20) by doctorxyz
+GUI:
+- 30 predef vmodes, including DTV 576P vmode for older PS2 models and the unpublished DTV 1080P one
+- Skip Videos Fix toggle
+- Optimized Exit options
+- C code housekeeping
+Core:
+- SetGsCrt replacement code for DTV 576P vmode (work even on older PS2 models - made possible by SP193 and reprep)
+- SetGsCrt replacement code for unpublished DTV 1080P vmode (made possible by SP193 and reprep)
+- Remove all breakpoints (even when they are not enabled) whenever SetGsCrt syscall is called, then re-enable GSHandler (GSM Data Address Write Breakpoint)
+- Skip Videos Fix (sceMpegIsEnd) code - basic method by nachbrenner - If enabled, On-The-Fly patcher applies it whenever SetGsCrt syscall is called 
+- Added SMODE1, SMODE2, SRFSH, SYNCH1, SYNCH2 and CSR definitions for future features
+- Disabled warning on building time if any statement expands to more than one machine instruction
+- ASM code cosmetics
+
+GSModeSelector v0.36b (2013.01.16) by doctorxyz
+- GUI can be bootable and relaunchable by FCMB E1 launch keys (due to DeInitGSM, New IOP reboot sequence, simplified Makefile, new Launcher based on uLE v4.42a, ...)
+
+GSModeSelector v0.36(2011.02.26) by doctorxyz and dlanor (compiled by doctorxyz)
+(This release was prepared by me having in mind both GSM standalone neeeded code improvements and future OPL integration)
+- Simplified OSD: buttons for video modes, SELECT for launch method, PAD for X and Y-axis offset and START to launch
+- In order to avoid gsKit issues, now GSM only is enabled only after selecting video mode, launch method and pressing START
+- Optimized C and ASM source code, many comments were rewritten
+- Fixed the access trap mask method to trap GS registers for all kernel segments
+- Implemented x-axis and y-axis offset inside core for better fine tuning on special cases
+- Always enabled: Automatic adaptation, DISPLAYx fix, SMODE2 fix and SYNCV fix
+- Main routines names changed from ModdedSetGsCrt to Hook_SetGsCrt and from DisplayHandler to GSHandler
+- Improved compatibility: Re-enable GSHandler whenever Hook_SetGsCrt is called 
+- Other improvements/adjustment I can't remember for now
+(some releases were skipped intentionally, they are used only on doctorxyz private development/testing)
+
+GSModeSelector v0.23x(2010.06.30) by doctorxyz and dlanor (compiled by dlanor)
+- Modified the access trap mask to trap GS registers for all kernel segments
+- Modified DisplayHandler to use kseg1 addresses for writing GS registers
+
+GSModeSelector v0.23v(2010.06.10) by doctorxyz and dlanor (compiled by dlanor)
+- Implemented two PAL60 modes, one interlaced and the other non-interlaced
+- Fixed a bug preventing exit mode "PS2 Browser" from being loaded from CNF file
+
+GSModeSelector v0.23u(2010.01.07) by doctorxyz and dlanor
+- Reimplemented same changes (appx) as for my v0.23t beta, which were reverted in doctorxyz's v0.23s3 beta
+- Changed drawing method for bottom border of GUI rectangle (still very imperfect)
+- Added Timer_delay() function to control gsKit call timing (1 ms resolution)
+- Added 'volatile' declaration specifier to even more variables handling vmodes.
+- Modified the new GUI text offsets to fit within the main GUI rectangle
+- Added timed 'simulation' of triple 'Down' press, to ensure proper screen update
+
+NB: The beta below was misdated. It was really released 2010.01.06
+
+GSModeSelector v0.23s3(2010.01.08) by doctorxyz and dlanor (compiled by doctorxyz)
+- Internal improvements:
+	- BSOD issue due to caching/timing: _sw and _lw macros changed to entire expression, preceded by 'volatile' keyword (to avoid caching)
+	- gsKit OSD issue: Special handling of 1080i/720p vmodes, wich demands more VRAM than others
+- OSD improvements:
+	- Idented a little bit for right (this avoid cutting of left characters on HDTV1080i vmodes)
+
+GSModeSelector v0.23t(2010.01.02) by doctorxyz and dlanor
+- Added a coloured border for the entire GUI screen
+- Corrected code indentation for large parts of the 'main' function (from OSD to PAD stuff)
+- Added outline rectangle to the screen edges in OSD section
+- Corrected MAGH/MAGV scaling (for GUI only) of various new vmodes
+- Removed duplicate vmodes differing only in MAGH (only affected GUI)
+- Removed duplicate vmodes differing only slightly in screen centering
+- The above eliminated a total of 11 vmodes, leaving 31 in the program
+- Corrected description of PS1 modes to show that those HDTV modes are only temporary, and will be changed to PAL or NTSC mode when the PS1 game starts, thus tricking the PS1 driver into enforcing PAL or NTSC mode, by first trying to enforce an HDTV mode. This means that it can be useful to set these modes even with a TV set that can not display HDTV modes, provided you can start the game 'blindly' (exit to uLE and use a shortcut button for "PS2Disc" command).
+- Changed NTSC and PAL display offsets (yet again) to be optimized for quality direct-video cables (SCART or Component) rather than the crappy composite cables. (Let the 'flame wars' begin...) Since this is a program intended for people who want improved viewing, optimizing for worst case cables makes no sense...
+
+GSModeSelector v0.23s2(2009.12.29)by doctorxyz and dlanor
+(I strongly recommends that you delete (or rename) your previous mc?:BOOT/GSM.CNF file)
+- OSD improvements:
+	- Splash Screen (based on DarkCrono666 & lee4 contributions, modified for libjpg compability). Note that it can be skiped at any time, just pressing any pad button.
+	- Switching among "Exit to" options available (necessary for the silent mode)
+	- Silent mode. Activated if [START] is pressed at Splash Screen. This enable the patcher without displaying GSM OSD, i.e. exiting from it in a quiet and fast way!
+	- safe-NTSC RGB color codes
+	- Layout rearrangement
+	- Added more messages into Status Bar
+- vmodes array list:
+	- Now with 40 predef ones (it was entirely remade)
+		- Based on many Ragnarok2040 contributions from the PCSX2 interpreter mode - values directly from the SetGsCrt syscall
+		- Some VGA vmodes variants with MAGH (Magnification in Horizontal) 
+		- Some previous vmodes were kept:
+			- VGA 640x960i@60Hz
+			- DVD 480pNTSC@60Hz
+			- DVD 576pPAL@50Hz
+			- DVD 480p@60Hz
+		- HDTV 1080i previous values for DX/DY were kept
+		- Added a new one (as requested by lee4 to make a his tests on it):
+			- NTSC-NI Full Buffer (lee4)
+	- Changed CNF version due to vmode array sequence rearrangement, and the fact that preferred "exit to" method is stored into it.
+	- Included safe-NTSC colors lee4's links on comments, for future reference and use
+- Internal improvements:
+	- Makefile was simpliflied (ps2-packer, libjpg, debug rigmarole wer gone)
+
+GSModeSelector v0.23s(2009.12.15)by doctorxyz and dlanor
+- OSD improvements:
+  - Added: Title Bar background, Status Bar background and messages (primary and limited, however)
+  - Rewriten CNF FILE OSD text and messages
+- Added NTSC/PAL NI Full/Half Buffer vmodes, to allow deeper NTSC testing (and PAL, why not?)
+  NI = Non-Interlaced, but not progressive. Are you curious about that? Me too... It is strange, but it is a fact!
+- Added some sprites (at first glance, it seems to be unuseful, but...)
+  NB: They will used in future to make dotted lines around the OSD edges and a centralized cross to help users on fine-tuning
+  I wasn't able all sprites, they gave me BSOD + freezing - again, this symptom doesn't occurs when running GSM from PS2Link.
+  It *seems* memory leak/heap memory overflow caused by gsKit primitives functions / functions that call it.  We should make deeper 
+  investigation on this issue, tracing all malloc/gsKit_heap_alloc ocurrencies
+- Internal arrangements:
+  - Added some extra colors vars
+  - At least, but not at least: Given proper credits to misfire for the GetSyscallVectorTableAddress function (based on one made by him).
+
+GSModeSelector v0.23r(2009.12.15)by doctorxyz and dlanor
+==>Hey, this the real v0.23r release ;-) <==
+v0.23r
+- Fixed BSOD/freezing issue reported on some consoles using the v0.23q release (it was caused by non-expected value from strtol(ROMVER_data,NULL,10))
+-Added the assembler directives 'noreorder' before and 'reorder' after DisplayHandler routine (whenever I discover potentialy dangerous code, I try to diminishes the chance of bad circumstantial side effects after compiler code rearrangement)
+-All predef vmode array has their dw and dh real values (which were taken/guessed from several docs) increased by 1, in order to conform them with previous versions of GSM. And those vmodes 479 rows heighted were changed to 448 rows
+- PS2Link now is invoked from the old standard path for mc("mc0:/BWLINUX/PS2LINK.ELF" )
+
+GSModeSelector v0.23q(2009.12.14)by doctorxyz and dlanor
+(appears v0.23r on OSD instead of v0.23q, due to my lack of attention. It doesn't work on some consoles)
+- Now with 29 vmodes*, among 4 categories: VGA/SDTV/HDTV/PS1
+- vmode activation only after [DOWN] button pressing**
+- Now the ROM Version is displayed
+- Changed exit messages contents, size, color and centralization
+- (Re)added the "Rez adaption formulas.txt" file into the docs subfolder***
+* Many descriptions were renamed. Some vmodes params were guessed, based on rule-of-three. the syncv parameter value was zeroed (due to a safety caution) whenever its "magical number" value was unknown
+**In order to reach all allowed vmodes implemented for each console version without passing a non-supported one(s) that would freeze/crash it (specially if on old console versions)
+BTW, only during the GSM initialization, a vmode is activated respecting the following precedence order:
+	- Force that vmode saved on CNF File Slot 0
+	- Force VGA vmode if user press [TRIANGLE]
+	- Force vmode automatically (according to the console region)
+***On previous releases, I had deleted it by mistake
+
+GSModeSelector v0.23p(2009.12.06)by doctorxyz and dlanor
+(For slim PSTwo users: Do not use this version, since it can be considered faulty, and definitely unsuitable for you)
+- Modified menu command handling to prevent single-button commands from blocking recognition of some button combos
+- Modified user_mode array command prompt, to include current slot content info showing the base vmode value of the current slot, or that the slot is unused. This is crucial to avoid loading some vmode that is incompatible to the current console. (Which can happen when an MC is moved between consoles of different models.)
+- Added status message showing success/failure of CNF save attempts (no more guessing)
+
+GSModeSelector v0.23o(2009.12.05)by doctorxyz and dlanor
+- Modified 'Makefile' of 'loader' subprogram for compatibility to latest PS2SDK
+- Modified ps2-packer invocation method (using same method as OPNPS2LD uses)
+- Removed redundant ps2-packer components from GSM source package
+- Removed comment marks that disabled vmodes not working on doctorxyz's PS2
+- Removed a duplicate entry from the predef_vmode array (failed commenting)
+
+GSModeSelector v0.23n(2009.12.04)by doctorxyz and dlanor
+- Implemented gsKit support on GSM OSD
+- Changed layout again, to simplify it by using of toggles
+- Text font color depends on the type of information
+- Implemented multimensional array to host the predef vmodes
+- makefile
+  - ps2-packer embeeded into it, in order to create both uncompressed and compressed ELF binaries (the stub folder must me into GSM one)
+  - libs and flags for memory dump purposes (researching into .dump or PS2Link exception screen)
+  - test uncompressed, make first a ps2 boot then starting this file into ps2, from PC file system (i.e., from host to ps2 via ps2client/ps2link/crossover network cable)
+  - line feature, that allows to know from the EPC (Exception Program Counter) address shown into PS2Link exception screen, which line of source code file is responsible for that.
+- added a lot of comments on source code
+- Two functions taken (and adopted) functions from FMCB sources: Setup_GS and Draw_Screen
+- Variadic macro approach used to create a printf-like function for gsKit
+- FONTM useful characters
+- Variables and functions renamed in order to better understand the code
+
+NB: Of course, I recognize a lot of clean up and improvement can be on code. It is good to know that GSM will be start on:
+- Last saved vmode on slot 00 from CNF file, if any was saved into it
+- VGA640@60Hz vmode if [TRIANGLE] is pressed first
+- automatic vmode (NTSC or PAL, i.e. according to the console region) if there are no CNF file yet, or there isn't MC inserted into console, or there is a file error
+
+GSModeSelector v0.23e (2009.11.07) by doctorxyz and dlanor
+-Some redundant 'sync' instructions were removed from DisplayHandler
+-Some "dsrl" opcodes were replaced by "srl" (makes no diff to our purposes)
+-DisplayHandler exit was changed to not modify user/kernel mode before "ERET".
+-Protection area for $k0+$k1 moved 32 bytes higher (to -0x10,-0x20)
+-Writes to any DISPLAYx register now patch both DISPLAY1 and DISPLAY2 each time
+-Address usage of KSEG functions now allows relocation with less restrictions
+
+GSModeSelector v0.23b (2009.10.25) by doctorxyz and dlanor
+-Fixed a bug displaying 'Active Settings' wrong after loading a user_mode slot
+-Changed ELF booting to search both MCs (and remain in GSM GUI if ELF missing)
+
+GSModeSelector v0.23a (2009.10.23) by doctorxyz and dlanor
+-Implemented XBRA vector bending for position independent ID check & unlinking
+-Changed layout again, to show 'Active Settings' and 'Current Presets' better
+-Extended the user_vmode array of the CNF file to allow 16 saved modes 0..15
+-Added predefined modes for PS1 PAL/NTSC switching
+
+NB: Unlike other predefined modes, choosing one of the PS1 modes will not set
+that mode as 'Active Settings' directly, but will instead only load the values
+to the 'Current Presets', requiring a 'D_Down' command to activate the settings.
+This is to allow values to be tweaked even on a TV unable to display the HDTV
+vmodes necessary as an intermediate step in enforcing PAL/NTSC for PS1 games.
+Note also that some games may have timing problems when run at unexpected speed.
+(Eg: 'Grandia' PAL will lose parts of synthesized speech when run in NTSC.)
+
+GSModeSelector v0.23 (2009.10.17) by doctorxyz and dlanor
+-Implemented branch delay slot handling for GS access trap
+-Added exit command for Dev1 boot (in addition to HDL and PS2Browser/FMCB)
+-Tweaked some vmode values and some patching methods
+
+GSModeSelector v0.22a (2009.10.05) by doctorxyz and dlanor
+-Reimplemented VGA 640x896
+-Added 'smode2' entry for user defined vmodes in CNF (backwards compatible)
+-Added SMODE2 and SYNCV register patching for DISPLAYx register writes (again)
+
+GSModeSelector v0.22 (2009.10.03) by doctorxyz and dlanor
+-Modified access trap methods to allow for more registers
+-Implemented separate access trap handling for SMODE2 and SYNCV registers
+-Implemented opcode recognition table for trap cause analysis
+-Added 'Source' variables for SMODE2 and SYNCV trapped register values
+-Modified asm methods again to further simplify maintenance and updates
+-Added makefile dependencies for macro and asm header files
+-Eliminated all redundant use of quadwords for doubleword variables
+-Added CNF file loading and saving (GSM.CNF loads automatically at launch)
+-Added proper PAL/NTSC init using rom0:ROMVER (works for slim models too)
+-Added 2 separate fixes for games & OSDSYS using interlace plus FFMD=1
+(one for interlaced forced vmodes and another for non-interlaced)
+Due to these fixes the OSDSYS/FMCB menu now works in all forced video modes
+-Implemented an array of eight user-definable vmodes, savable to CNF file
+-Added GUI menu commands to manipulate user-definable vmodes
+-Added GUI menu command to save CNF file
+
+GSModeSelector v0.21 (2009.09.28) (Merged changes of doctorxyz and dlanor)
+-SYNCV+SMODE2 register patching for improved vmode compatibility (Games in VGA)
+-Improved gamepad routines to better initialize hotplugged controllers
+-Changed joystick scaling to use L1/R1 combos for step size (more reliable)
+-Added GUI command to disable screen adaption (scale and centering)
+-Added GUI command to toggle SMODE2 value between 0x01 and 0x02
+-Modified asm methods again, to make updates of all asm code easier
+-Modified makefile to retain compiler temp files (better debug analysis)
+
+GSModeSelector v0.20 (2009.09.17) released by doctorxyz
+-Added more 2 on-the-fly settings (from PS2 Setup) into GSM OSD: screen type (4:3/fullscreen/16:9) and video Output (rgb_scart/component)
+
+GSModeSelector v0.19 (2009.09.13) released by dlanor
+-Revived this changelog (from GSTest) for the use of the unified project.
+-Reduced comments in my asm sections to less than 82 char width (needed for convenient updating)
+-Restored original variable names in my asm sections (needed for consistency)
+-Changed label numbering scheme for my asm sections (needed for modifications)
+-Modified screen centering for better adaption of PAL in NTSC and similar cases
+-Modified screen position for VGA480p72Hz and VGA480p75Hz to match my test results. But since these tests were made on an HDTV set with VGA input, the positioning might differ from that of a VGA monitor for PC use.
+-Modified syscall patching to allow relaunch of GSM GUI after activating GSM
+
+GSModeSelector v0.18 (2009.09.10) released by doctorxyz
+-This version unifies the GSModeSelector and GSTest branches into a single GSModeSelector project.
+
+GSTest v1.02 (2009.09.09) released by dlanor
+-Modified Makefile and source structures, so that edits to pad and timer sources will cause the project to be recompiled and relinked at 'make', which was not the case earlier.
+-Modified pad routines to allow use of joystick tilts as well
+-Added screen echo of some pad variables for debugging
+-Modified menu to account for new joystick usage (more button combos free to implement more resolutions)
+-Modified default settings for NTSC and PAL, so as to use the proper 448i and 512i settings for the visible pixel range, though the signal timing still makes an HDTV class these resolutions as 480i and 576i. Its just that the GS won't display so many pixel rows for those modes. (Unlike 480p and 576p...) This will help when using GSTest as an NTSC-PAL converter.
+-Corrected a bug in Adapt_Y.c where I accidentally used 'addu' instead of 'add', which caused an imbalance in the vertical screen centering.
+-Corrected the "Rez adaption formulas.txt" document, to reflect the real code.
+
+NB: Some more GSModeSelectors were released here, still without changelog
+
+GSTest v1.01 (2009.09.08) released by dlanor
+-Corrected a bug that prevented proper adaption of screen scale and centering.
+-Corrected DX/DY centering to forbid negative values (unsigned in regs)
+
+NB: Additional GSModeSelectors were released here, still without changelog
+
+GSTest v1.0 (2009.09.08) released by dlanor
+-Initial release
+
+NB: GSTest was a branch from the main project made by dlanor, and based on the sources of GSModeSelector. The GSTest branch did use a changelog, but isolated from GSModeSelector.
+
+NB: Early GSModeSelector versions before GSTest branch had no changelog
+But the project was first created by doctorxyz and released at psx-scene.com during August 2009.
+ 

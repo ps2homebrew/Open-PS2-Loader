@@ -277,6 +277,15 @@ void t_loadElf(void)
 		FlushCache(0);
 		FlushCache(2);
 
+		if(GSM) {
+			/* Enabling GSM */
+			DPRINTF("Enabling GSM...\n");
+			#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
+			static void (*EnableGSM)(void) _GSM_ENGINE_ ;
+			EnableGSM = (void *)*(volatile u32 *)(0x00080004);
+			EnableGSM();
+		}
+
 		DPRINTF("t_loadElf: executing...\n");
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
 	}

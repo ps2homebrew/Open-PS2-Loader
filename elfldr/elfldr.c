@@ -185,6 +185,14 @@ int main(int argc, char **argv)
 	ee_kmode_exit();
 	EI();
 
+	if(*(volatile u32 *)(0x0008000C)) {
+		/* Enabling GSM */
+		#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
+		static void (*EnableGSM)(void) _GSM_ENGINE_ ;
+		EnableGSM = (void *)*(volatile u32 *)(0x00080004);
+		EnableGSM();
+	}
+
 	ExecPS2(t_loadElf, NULL, 0, NULL);
 
 	GS_BGCOLOUR = 0xffffff; // white screen: error

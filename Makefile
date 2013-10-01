@@ -6,6 +6,8 @@ EESIO_DEBUG = 0
 VMC = 1
 CHILDPROOF = 0
 RTL = 0
+#change following line to "0" to build without GSM - DO NOT COMMENT!
+GSM = 1
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
@@ -26,15 +28,19 @@ EECORE_OBJS = obj/ee_core.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
 
+GSMCORE_OBJS = obj/gsm.o
+
 ifeq ($(VMC),1)
 EECORE_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
 endif
 
 EE_BIN = opl.elf
+EE_BIN_PKD = OPNPS2LD.ELF
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(EECORE_OBJS)
+MAPFILE = opl.map
 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
 #EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
@@ -45,8 +51,14 @@ ifeq ($(DEBUG),1)
 	ifeq ($(EESIO_DEBUG),1)
 		EE_CFLAGS += -D__EESIO_DEBUG
 	endif
+	EE_CFLAGS += -Xlinker -Map -Xlinker $(MAPFILE)
 else
 	EE_CFLAGS := -O2
+endif
+
+ifeq ($(GSM),1)
+EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(EECORE_OBJS) $(GSMCORE_OBJS)
+	EE_CFLAGS += -DGSM
 endif
 
 ifeq ($(RTL),1)
@@ -95,11 +107,14 @@ all:
 	
 ifeq ($(DEBUG),0)
 	echo "Stripping..."
-	ee-strip opl.elf
+	ee-strip $(EE_BIN)
 
 	echo "Compressing..."
-	ps2-packer opl.elf OPNPS2LD.ELF > /dev/null
+	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
 endif
+
+gsm:
+	$(MAKE) GSM=1 all
 
 childproof:
 	$(MAKE) CHILDPROOF=1 all
@@ -121,12 +136,16 @@ clean:  sclean
 sclean:
 	echo "Cleaning..."
 	echo "    * Interface"
-	rm -f $(EE_BIN) OPNPS2LD.ELF asm/*.* obj/*.*
+	rm -f -r $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "    * EE core"
 	$(MAKE) -C ee_core clean
 	$(MAKE) -C ee_core -f Makefile.alt clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
+ifeq ($(GSM),1)	
+	echo "    * GSM"
+	$(MAKE) -C gsm clean
+endif
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
@@ -209,6 +228,12 @@ elfldr.s:
 	$(MAKE) -C elfldr clean
 	$(MAKE) -C elfldr
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
+
+gsm.s:
+	echo "    * GSM"
+	$(MAKE) -C gsm clean
+	$(MAKE) -C gsm
+	bin2s gsm/gsm.elf asm/gsm.s gsm_elf
 
 imgdrv.s:
 	echo "    * imgdrv.irx"

@@ -30,19 +30,25 @@ static int order;
 static int vsync = 1;
 static enum rm_vmode vmode = RM_VMODE_AUTO;
 
-#define NUM_RM_VMODES 3
+#define NUM_RM_VMODES 6
 
 // RM Vmode -> GS Vmode conversion table
 static int rm_mode_table[NUM_RM_VMODES] = {
 	-1,					// AUTO
-	GS_MODE_PAL,		// PAL
-	GS_MODE_NTSC		// NTSC
+	GS_MODE_PAL,		// PAL@50Hz
+	GS_MODE_NTSC,		// NTSC@60Hz
+	GS_MODE_DTV_480P,	// DTV480P@60Hz
+	GS_MODE_DTV_576P,	// DTV576P@50Hz
+	GS_MODE_VGA_640_60	// VGA640x480@60Hz
 };
 
 static int rm_height_table[] = {
 	-1,		// AUTO
-	512,	// PAL
-	448,	// NTSC
+	512,	// PAL@50Hz
+	448,	// NTSC@60Hz
+	480,	// DTV480P@60Hz
+	512,	// DTV576P@50Hz
+	480		// VGA640x480@60Hz
 };
 
 static float aspectWidth;
@@ -329,13 +335,57 @@ int rmSetMode(int force) {
 		gsGlobal->Mode = rm_mode_table[vmode];
 		gsGlobal->Height = rm_height_table[vmode];
 
+		if (vmode == RM_VMODE_DTV480P || vmode == RM_VMODE_DTV576P || vmode == RM_VMODE_VGA_640_60) {
+			gsGlobal->Interlace = GS_NONINTERLACED;
+			gsGlobal->Field = GS_FRAME;
+		} else {
+			gsGlobal->Interlace = GS_INTERLACED;
+			gsGlobal->Field = GS_FIELD;
+		}
+		gsGlobal->Width = 640;
+
 		gsGlobal->PSM = GS_PSM_CT24;
 		gsGlobal->PSMZ = GS_PSMZ_16S;
 		gsGlobal->ZBuffering = GS_SETTING_OFF;
 		gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
 		gsGlobal->DoubleBuffering = GS_SETTING_ON;
 
+		if ((gsGlobal->Mode) == GS_MODE_DTV_576P) {	// Write X, Y, DW and DH positions for DTV576P (not covered by GSKit lib)
+			gsGlobal->StartX = 324;
+			gsGlobal->StartY = 72;
+			gsGlobal->DW = 1280;
+			gsGlobal->DH = 512;
+		}
+
 		gsKit_init_screen(gsGlobal);
+
+		if (vmode == RM_VMODE_DTV480P) { // Overwrite X, Y and DW GSKit params for DTV480P
+			gsGlobal->StartX = 312;
+			gsGlobal->StartY = 37;
+			gsGlobal->DW = 1280;
+		}
+		else if (vmode == RM_VMODE_VGA_640_60) { // Overwrite X, Y GSKit params for VGA_640_60
+			gsGlobal->StartX = 276;
+			gsGlobal->StartY = 42;
+		}
+
+		if ((vmode == RM_VMODE_DTV480P) || (vmode == RM_VMODE_VGA_640_60)) { 	// Commit settings for DTV480P and VGA_650_60
+			DIntr(); // disable interrupts
+			GS_SET_DISPLAY1(gsGlobal->StartX,	// X position in the display area (in VCK unit
+					gsGlobal->StartY,			// Y position in the display area (in Raster u
+					gsGlobal->MagH,				// Horizontal Magnification
+					gsGlobal->MagV,				// Vertical Magnification
+					gsGlobal->DW - 1,			// Display area width
+					gsGlobal->DH - 1);			// Display area height
+			GS_SET_DISPLAY2(gsGlobal->StartX,	// X position in the display area (in VCK units)
+					gsGlobal->StartY,			// Y position in the display area (in Raster units)
+					gsGlobal->MagH,				// Horizontal Magnification
+					gsGlobal->MagV,				// Vertical Magnification
+					gsGlobal->DW - 1,			// Display area width
+					gsGlobal->DH - 1);			// Display area height
+			__asm__("sync.l; sync.p;");
+			EIntr(); // enable interrupts
+		}
 
 		gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 

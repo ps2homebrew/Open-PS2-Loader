@@ -75,6 +75,10 @@ int main(int argc, char **argv){
 	g_ps2_ETHOpMode=_strtoui(_strtok(NULL, " "));
 	DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 
+	p = _strtok(NULL, " ");
+	GSM = _strtoi(p);
+	DPRINTF("GSM = %d\n", GSM);
+
 	// bitmask of the compat. settings
 	g_compat_mask = _strtoui(argv[2]);
 	DPRINTF("Compat Mask = 0x%02x\n", g_compat_mask);

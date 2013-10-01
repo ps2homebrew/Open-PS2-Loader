@@ -102,6 +102,7 @@ static const ata_cmd_info_t ata_cmd_table[] = {
 	{ATA_C_WRITE_DMA_EXT,0x84},
 	{ATA_C_CFA_WRITE_SECTORS_WITHOUT_ERASE,3},
 	{ATA_C_READ_VERIFY_SECTOR,1},
+	{ATA_C_READ_VERIFY_SECTOR_EXT,0x81},
 	{ATA_C_SEEK,1},
 	{ATA_C_CFA_TRANSLATE_SECTOR,2},
 	{ATA_C_SCE_SECURITY_CONTROL,7},
@@ -499,18 +500,15 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 
 	/* Does this command need a timeout?  */
 	using_timeout = 0;
-	switch (type) {
+	switch (type & 0x7F) {
 		case 1:
 		case 6:
 			using_timeout = 1;
 			break;
 		case 4:
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA);
+			atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
 			using_timeout = 1;
 			break;
-		case 0x84:	//48-bit LBA DMA commands.
-			atad_cmd_state.dir = (command != ATA_C_READ_DMA_EXT);
-			using_timeout = 1;
 	}
 
 	if (using_timeout) {

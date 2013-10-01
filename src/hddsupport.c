@@ -385,17 +385,22 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	memcpy((void*)((u32)irx + i + 34), &flag_48bit, 1);
 
 	if (compatMode & COMPAT_MODE_2) {
-		u32 alt_read_mode = 1;
+		u8 alt_read_mode = 1;
 		memcpy((void*)((u32)irx + i + 35), &alt_read_mode, 1);
 	}
 
+	if (compatMode & COMPAT_MODE_7) {
+		u8 use_threading_hack = 1;
+		memcpy((void*)((u32)irx + i + 36), &use_threading_hack, 1);
+	}
+
 	if (compatMode & COMPAT_MODE_5) {
-		u32 no_dvddl = 1;
-		memcpy((void*)((u32)irx + i + 36), &no_dvddl, 2);
+		u8 no_dvddl = 1;
+		memcpy((void*)((u32)irx + i + 37), &no_dvddl, 1);
 	}
 
 	if (compatMode & COMPAT_MODE_4) {
-		u32 no_pss = 1;
+		u16 no_pss = 1;
 		memcpy((void*)((u32)irx + i + 38), &no_pss, 2);
 	}
 
@@ -416,23 +421,6 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	}
 	// game id
 	memcpy((void*)((u32)irx + i), &gid, 5);
-
-	// patches cdvdfsv
-	/*void *cdvdfsv_irx;
-	int size_cdvdfsv_irx;
-
-	sysGetCDVDFSV(&cdvdfsv_irx, &size_cdvdfsv_irx);
-	u32 *p = (u32 *)cdvdfsv_irx;
-	for (i = 0; i < (size_cdvdfsv_irx >> 2); i++) {
-		if (*p == 0xC0DEC0DE) {
-			if (compatMode & COMPAT_MODE_7)
-				*p = 1;
-			else
-				*p = 0;
-			break;
-		}
-		p++;
-	}*/
 
 	char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))

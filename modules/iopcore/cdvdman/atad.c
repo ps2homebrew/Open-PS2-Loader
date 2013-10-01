@@ -338,7 +338,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	/* Finally!  We send off the ATA command with arguments.  */
 	ata_hwport->r_control = (using_timeout == 0) << 1;
 
-	if(type&0x80){	//For the sake of achieving (greatly) improved performance, write the registers twice only if required!
+	if(type&0x80){	//For the sake of achieving (greatly) improved performance, write the registers twice only if required! This is also required for compatibility with the buggy firmware of certain PSX units.
 		/* 48-bit LBA requires writing to the address registers twice,
 		   24 bits of the LBA address is written each time.
 		   Writing to registers twice does not affect 28-bit LBA since

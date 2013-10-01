@@ -44,6 +44,8 @@ static int ata_evflg = -1;
 /* Used for indicating 48-bit LBA support.  */
 static unsigned char lba_48bit[2] = {0, 0};
 
+static unsigned char Disable48bitLBA = 0;	//Please read the comments in _start().
+
 /* Local device info kept for drives 0 and 1.  */
 static ata_devinfo_t atad_devinfo[2];
 
@@ -64,7 +66,7 @@ static const ata_cmd_info_t ata_cmd_table[] = {
 	{ATA_C_READ_SECTOR,2},
 	{ATA_C_READ_DMA_EXT,0x84},
 	{ATA_C_WRITE_SECTOR,3},
-	{ATA_C_WRITE_LONG,8},	//??? This seems to be WRITE_LONG, but the READ_LONG command isn't present (Why would ). Both are obsolete too.
+	{ATA_C_WRITE_LONG,8},	//??? This seems to be WRITE_LONG, but the READ_LONG command isn't present (Why would Sony have only one of these two commands?). Both are obsolete too.
 	{ATA_C_WRITE_DMA_EXT,0x84},
 	{ATA_C_CFA_WRITE_SECTORS_WITHOUT_ERASE,3},
 	{ATA_C_READ_VERIFY_SECTOR,1},
@@ -181,6 +183,21 @@ int _start(int argc, char *argv[])
 		M_PRINTF("HDD is not connected, exiting.\n");
 		goto out;
 	}
+
+	/*
+		The PSX (Not the PlayStation or PSOne, but a PS2 with a DVR unit) has got an extra processor (Fujitsu MB91302A, aka the "DVRP") that seems to be emulating the console's PS2 ATA interface.
+		The stock disks of all PSX units are definitely 48-bit LBA compliant because of their capacities, but the DVRP's emulation seems to have a design problem:
+			1. It indicates that 48-bit LBA is supported.
+			2. The 48-bit LBA capacity fields show the true capacity of the disk.
+			3. Accesses to beyond the 28-bit LBA capacity (Which is 40.000GB by default) will result in I/O errors.
+			4. (For some PSX units like the DESR-7500): Double-writes to the ATA registers seem to cause the ATA interface to stall.
+
+		The problem is obviously in the DVRP's firmware, but we currently have no way to fix these bugs because the DVRP is even more heavily secured that the IOP.
+		In the eyes of Sony, there isn't a problem because none of their retail PlayStation 2 software ever supported 48-bit LBA.
+
+		The obvious workaround here would be to totally kill 48-bit LBA support when ATAD is loaded on a PSX.
+	*/
+	Disable48bitLBA = (SPD_REG16(SPD_R_REV_3) & SPD_CAPS_DVR)?1:0;
 
 	if ((res = RegisterLibraryEntries(&_exp_atad)) != 0) {
 		M_PRINTF("Library is already registered, exiting.\n");
@@ -379,7 +396,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 		cmd_timeout.hi = 0;
 
 		/* SECURITY ERASE UNIT needs a bit more time.  */
-		if (command == ATA_C_SCE_SECURITY_CONTROL && feature == ATA_C_SECURITY_ERASE_UNIT)
+		if (command == ATA_C_SCE_SECURITY_CONTROL && feature == ATA_SCE_SECURITY_ERASE_UNIT)
 			USec2SysClock(180000000, &cmd_timeout);
 
 		if ((res = SetAlarm(&cmd_timeout, &ata_alarm_cb, NULL)) < 0)
@@ -393,7 +410,7 @@ int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, u
 	/* Finally!  We send off the ATA command with arguments.  */
 	ata_hwport->r_control = (using_timeout == 0) << 1;
 
-	if(type&0x80){	//For the sake of achieving (greatly) improved performance, write the registers twice only if required!
+	if(type&0x80){	//For the sake of achieving (greatly) improved performance, write the registers twice only if required! This is also required for compatibility with the buggy firmware of certain PSX units.
 		/* 48-bit LBA requires writing to the address registers twice,
 		   24 bits of the LBA address is written each time.
 		   Writing to registers twice does not affect 28-bit LBA since
@@ -920,7 +937,7 @@ static int ata_init_devices(ata_devinfo_t *devinfo)
 		/* This section is to detect whether the HDD supports 48-bit LBA 
 		   (IDENITFY DEVICE bit 10 word 83) and get the total sectors from
 		   either words(61:60) for 28-bit or words(103:100) for 48-bit.  */
-		if (ata_param[ATA_ID_COMMAND_SETS_SUPPORTED] & 0x0400) {
+		if (!Disable48bitLBA && (ata_param[ATA_ID_COMMAND_SETS_SUPPORTED] & 0x0400)) {
 			lba_48bit[i] = 1;
 			/* I don't think anyone would use a >2TB HDD but just in case.  */
 			if (ata_param[ATA_ID_48BIT_SECTOTAL_HI]) {

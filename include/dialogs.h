@@ -45,21 +45,22 @@
 #define UICFG_VSYNC				22
 #define UICFG_INFOPAGE			23
 
-#define UICFG_GSM				24
-#define UICFG_GSMVMODE			25
-#define UICFG_GSMXOFFSET		26
-#define UICFG_GSMYOFFSET		27
-#define UICFG_GSMSKIPVIDEOS		28
+#define GSCFG_GSM				24
+#define GSCFG_GSMVMODE			25
+#define GSCFG_GSMXOFFSET		26
+#define GSCFG_GSMYOFFSET		27
+#define GSCFG_GSMSKIPVIDEOS		28
 
-#define CFG_EXITTO				30
-#define CFG_DEFDEVICE			31
-#define CFG_DEBUG				32
-#define CFG_USBMODE				33
-#define CFG_HDDMODE				34
-#define CFG_ETHMODE				35
-#define CFG_APPMODE				36
-#define CFG_CHECKUSBFRAG		37
-#define CFG_LASTPLAYED			38
+#define CFG_EXITTO				29
+#define CFG_DEFDEVICE			30
+#define CFG_DEBUG				31
+#define CFG_USBMODE				32
+#define CFG_HDDMODE				33
+#define CFG_ETHMODE				34
+#define CFG_APPMODE				35
+#define CFG_CHECKUSBFRAG		36
+#define CFG_LASTPLAYED			37
+#define CFG_SHOWGSM			38
 #define CFG_DANDROP				39
 #define CFG_USBDELAY			40
 #define CFG_USBPREFIX			41
@@ -73,6 +74,7 @@
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
+extern struct UIItem diaGSConfig[];
 extern struct UIItem diaConfig[];
 extern struct UIItem diaAbout[];
 #ifdef VMC

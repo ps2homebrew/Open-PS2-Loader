@@ -144,7 +144,8 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWGSM}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWGSM, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
 
 	{UI_SPLITTER},
 
@@ -201,16 +202,25 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 	{UI_BREAK},
 
-	// GSM Section
+	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSM}}}, {UI_SPACER}, {UI_BOOL, UICFG_GSM, 1, _STR_HINT_GSM, 0, 0, {.intvalue = {1, 1}}},
-	{UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSMVMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_GSMVMODE, 1, _STR_HINT_GSMVMODE, 0, 0, {.intvalue = {0, 0}}},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSMSKIPVIDEOS}}}, {UI_SPACER}, {UI_BOOL, UICFG_GSMSKIPVIDEOS, 1, _STR_HINT_GSMSKIPVIDEOS, 0, 0, {.intvalue = {1, 1}}},
- 	{UI_BREAK},
- 	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_XOFFSET}}}, {UI_SPACER}, {UI_INT, UICFG_GSMXOFFSET, 1, _STR_HINT_XOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_YOFFSET}}}, {UI_SPACER}, {UI_INT, UICFG_GSMYOFFSET, 1, _STR_HINT_YOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},
+	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
 
+	// end of dialog
+	{UI_TERMINATOR}
+};
+
+	// GSM Menu
+struct UIItem diaGSConfig[] = {
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
+
+	{UI_SPLITTER},
+
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSM}}}, {UI_SPACER}, {UI_BOOL, GSCFG_GSM, 1, _STR_HINT_GSM, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMVMODE}}}, {UI_SPACER}, {UI_ENUM, GSCFG_GSMVMODE, 1, _STR_HINT_GSMVMODE, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMSKIPVIDEOS}}}, {UI_SPACER}, {UI_BOOL, GSCFG_GSMSKIPVIDEOS, 1, _STR_HINT_GSMSKIPVIDEOS, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
+ 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_XOFFSET}}}, {UI_SPACER}, {UI_INT, GSCFG_GSMXOFFSET, 1, _STR_HINT_XOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_YOFFSET}}}, {UI_SPACER}, {UI_INT, GSCFG_GSMYOFFSET, 1, _STR_HINT_YOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},{UI_BREAK},
 	{UI_SPLITTER},
 
 	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -228,18 +238,12 @@ struct UIItem diaAbout[] = {
 
 	{UI_BREAK},
 
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"crazyc", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"dlanor", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"doctorxyz", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"hominem.te.esse", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"ifcaro", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"izdubar", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"jimmikaelkael", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"Polo35", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"reprep", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"SP193", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"volca", -1}}}, {UI_BREAK},
-    {UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"BatRastard", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"crazyc - dlanor - SP193", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"ifcaro - Polo35 - reprep", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"volca - BatRastard", -1}}}, {UI_BREAK},
+    	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"...and the anonymous ...", -1}}}, {UI_BREAK},
 	{UI_SPLITTER},
 
 	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},

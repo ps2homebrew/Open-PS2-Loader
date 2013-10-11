@@ -479,7 +479,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
 			configGetInt(configOPL, "vsync", &gVSync);
 			configGetInt(configOPL, "vmode", &gVMode);
-
+		
 			configGetInt(configOPL, "gsm", &gGSM);
 			configGetInt(configOPL, "gsmvmode", &gGSMVMode);
 			configGetInt(configOPL, "gsm_x_offset", &gGSMXOffset);
@@ -521,6 +521,7 @@ static void _loadConfig() {
 			if (configGetStr(configOPL, "eth_prefix", &temp))
 				strncpy(gETHPrefix, temp, 32);
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
+			configGetInt(configOPL, "reveal GSM on main menu", &gShowGSM);
 			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
 			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
 			configGetInt(configOPL, "eth_mode", &gETHStartMode);
@@ -576,6 +577,7 @@ static void _saveConfig() {
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
+		configSetInt(configOPL, "reveal GSM on main menu", gShowGSM);
 		configSetInt(configOPL, "usb_mode", gUSBStartMode);
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
@@ -847,6 +849,7 @@ static void setDefaults(void) {
 	gDisableDebug = 0;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
+	gShowGSM = 0;
 	gCheckUSBFragmentation = 1;
 	gUSBDelay = 3;
 	strncpy(gUSBPrefix, "", 32);

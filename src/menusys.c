@@ -22,9 +22,10 @@
 #define MENU_IP_CONFIG		2
 #define MENU_SAVE_CHANGES	3
 #define MENU_START_HDL		4
-#define MENU_ABOUT			5
-#define MENU_EXIT			6
-#define MENU_POWER_OFF		7
+#define MENU_GSM_SETTINGS	5
+#define MENU_ABOUT			6
+#define MENU_EXIT			7
+#define MENU_POWER_OFF		8
 
 // global menu variables
 static menu_list_t* menu;
@@ -101,6 +102,8 @@ static void menuInitMainMenu() {
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
 	if (gHDDStartMode && gEnableDandR) // enabled at all?
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
+	if (gShowGSM) // Reveals GSM Menu - Default is No
+		submenuAppendItem(&mainMenu, -1, NULL, MENU_GSM_SETTINGS, _STR_GSM_SETTINGS);
 #endif
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
@@ -553,6 +556,8 @@ void menuHandleInputMenu() {
 			guiShowConfig();
 		} else if (id == MENU_GFX_SETTINGS) {
 			guiShowUIConfig();
+		} else if (id == MENU_GSM_SETTINGS) {
+			guiShowGSConfig();
 		} else if (id == MENU_IP_CONFIG) {
 			guiShowIPConfig();
 		} else if (id == MENU_SAVE_CHANGES) {

@@ -226,6 +226,7 @@ void guiShowConfig() {
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 	diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
+	diaSetInt(diaConfig, CFG_SHOWGSM, gShowGSM);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
 	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
@@ -243,6 +244,7 @@ void guiShowConfig() {
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
+		diaGetInt(diaConfig, CFG_SHOWGSM, &gShowGSM);
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
 		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
 		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
@@ -303,23 +305,11 @@ void guiShowUIConfig() {
 	// configure the enumerations
 	const char* scrollSpeeds[] = { _l(_STR_SLOW), _l(_STR_MEDIUM),	_l(_STR_FAST), NULL };
 	const char* vmodeNames[] = { _l(_STR_AUTO), "PAL", "NTSC", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "VGA 640x480p @60Hz", NULL };
-	const char* gsmvmodeNames[] = \
-		{"NTSC","NTSC Non Interlaced", \
-		"PAL","PAL Non Interlaced","PAL @60Hz","PAL @60Hz Non Interlaced", \
-		"PS1 NTSC (HDTV 480p @60Hz)","PS1 PAL (HDTV 576p @50Hz)", \
-		"HDTV 480p @60Hz","HDTV 576p @50Hz","HDTV 720p @60Hz","HDTV 1080i @60Hz","HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", \
-		"VGA 640x480p @60Hz","VGA 640x960i @60Hz","VGA 640x480p @72Hz","VGA 640x480p @75Hz","VGA 640x480p @85Hz", \
-		"VGA 800x600p @56Hz","VGA 800x600p @60Hz","VGA 800x600p @72Hz","VGA 800x600p @75Hz","VGA 800x600p @85Hz", \
-		"VGA 1024x768p @60Hz","VGA 1024x768p @70Hz","VGA 1024x768p @75Hz","VGA 1024x768p @85Hz", \
-		"VGA 1280x1024p @60Hz","VGA 1280x1024p @75Hz", \
-		NULL };
-
+	
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **) thmGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **) lngGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_VMODE, vmodeNames);
-	diaSetEnum(diaUIConfig, UICFG_GSMVMODE, gsmvmodeNames);
-
 	diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
 	diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
 	diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
@@ -332,12 +322,6 @@ void guiShowUIConfig() {
 	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
 	diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
  
-	diaSetInt(diaUIConfig, UICFG_GSM, gGSM);
-	diaSetInt(diaUIConfig, UICFG_GSMVMODE, gGSMVMode);
-	diaSetInt(diaUIConfig, UICFG_GSMXOFFSET, gGSMXOffset);
-	diaSetInt(diaUIConfig, UICFG_GSMYOFFSET, gGSMYOffset);
-	diaSetInt(diaUIConfig, UICFG_GSMSKIPVIDEOS, gGSMSkipVideos);
-
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
 	if (ret) {
 		int themeID = -1, langID = -1;
@@ -358,13 +342,30 @@ void guiShowUIConfig() {
 		diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
  		diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
 
-		diaGetInt(diaUIConfig, UICFG_GSM, &gGSM);
-		diaGetInt(diaUIConfig, UICFG_GSMVMODE, &gGSMVMode);
-		diaGetInt(diaUIConfig, UICFG_GSMXOFFSET, &gGSMXOffset);
-		diaGetInt(diaUIConfig, UICFG_GSMYOFFSET, &gGSMYOffset);
-		diaGetInt(diaUIConfig, UICFG_GSMSKIPVIDEOS, &gGSMSkipVideos);
-
 		applyConfig(themeID, langID);
+	}
+}
+
+void guiShowGSConfig() {
+	// configure the enumerations
+	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", "PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", "VGA 640x480p @60Hz", "VGA 640x960i @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", "VGA 800x600p @56Hz", "VGA 800x600p @60Hz", "VGA 800x600p @72Hz", "VGA 800x600p @75Hz", "VGA 800x600p @85Hz", "VGA 1024x768p @60Hz", "VGA 1024x768p @70Hz", "VGA 1024x768p @75Hz", "VGA 1024x768p @85Hz", "VGA 1280x1024p @60Hz", "VGA 1280x1024p @75Hz", NULL };
+
+	diaSetEnum(diaGSConfig, GSCFG_GSMVMODE, gsmvmodeNames);
+	diaSetInt(diaGSConfig, GSCFG_GSM, gGSM);
+	diaSetInt(diaGSConfig, GSCFG_GSMVMODE, gGSMVMode);
+	diaSetInt(diaGSConfig, GSCFG_GSMXOFFSET, gGSMXOffset);
+	diaSetInt(diaGSConfig, GSCFG_GSMYOFFSET, gGSMYOffset);
+	diaSetInt(diaGSConfig, GSCFG_GSMSKIPVIDEOS, gGSMSkipVideos);
+	
+	int ret = diaExecuteDialog(diaGSConfig, -1, 1, NULL);
+	if (ret) {
+		diaGetInt(diaGSConfig, GSCFG_GSM, &gGSM);
+		diaGetInt(diaGSConfig, GSCFG_GSMVMODE, &gGSMVMode);
+		diaGetInt(diaGSConfig, GSCFG_GSMXOFFSET, &gGSMXOffset);
+		diaGetInt(diaGSConfig, GSCFG_GSMYOFFSET, &gGSMYOffset);
+		diaGetInt(diaGSConfig, GSCFG_GSMSKIPVIDEOS, &gGSMSkipVideos);
+
+		applyConfig(-1, -1);
 	}
 }
 

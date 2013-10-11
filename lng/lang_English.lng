@@ -104,6 +104,7 @@ Display settings
 Enable Delete and Rename actions
 Check USB game fragmentation
 Remember last played game
+Reveal GSM on Main Menu
 Error, the game is fragmented
 Error, could not run the item
 Test
@@ -171,3 +172,13 @@ Mode 9
 Callback timer
 Apply a delay to CDVD functions (0 is default)
 Ethernet speed and duplex settings
+GSM Settings
+Force a video mode
+Video mode
+Video mode to be forced
+Horizontal Adjust
+Sets Horizontal Offset
+Vertical Adjust
+Sets Vertical Offset
+FMV skip
+Skips Full Motion Videos

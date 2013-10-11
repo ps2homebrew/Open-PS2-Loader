@@ -121,7 +121,7 @@ typedef struct predef_vmode_struct {
 	u64	syncv;
 } predef_vmode_struct;
 
-int	gGSM; // 0 - Off, 1 - On
+int	gGSM; // Enables GSM - 0 for Off, 1 for On
 int	gGSMVMode;  // See the related predef_vmode
 int	gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
 int	gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
@@ -146,6 +146,8 @@ char gUSBPrefix[32];
 char gETHPrefix[32];
 
 int gRememberLastPlayed;
+
+int gShowGSM; // Toggle to reveal "GSM Settings" on Main Menu
 
 char *infotxt;
 

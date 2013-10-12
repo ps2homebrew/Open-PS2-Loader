@@ -1,140 +1,156 @@
 # translation by Thinner & the ps3-tools.de community
 German
-               WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
-Open PS2 Loader %s
-Konfiguration speichern
+               WELCOME TO OPEN PS2 Loader. MAIN CODE ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ANPASSUNG AN USB ADVANCE FORMAT UND ERSTE GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE BY JIMMIKAELKAEL IST beruhen. ALLE GUI Verbesserungen werden durch VULKAN MADE . Vielen Dank für den PROGRAM ^ ^
+Offene PS2 Loader % s
+Speichern Sie die Änderungen
 Zurück
-Netzwerk-Konfiguration
-<kein Wert>
-Konfiguration gespeichert ...
-Fehler beim Speichern der Konfiguration!
+Netzwerkkonf
+<kein values>
+Einstellungen gespeichert ...
+Fehler beim Schreiben der Einstellungen !
 Verlassen
-Konfiguration
+Einstellungen
 USB Spiele
 HDD Spiele
 ETH Spiele
-Programme
+Apps
 Theme
 Sprache
-Fehler beim Starten des Netzwerks: %d
-Ein
-Aus
+Netzwerk-Inbetriebnahme Fehler :% d
+Kann nicht auf SMB -Server zu verbinden :% d
+Kann nicht in SMB -Server anmelden :% d
+Kann nicht geöffnet werden SMB-Freigabe :% d
+Auf
+ausgeschaltet
 Ok
-Spieleinstellungen
-Alle Einstellungen entfernen
-Alle Einstellungen des Spiels entfernt.
+Spiel -Einstellungen
+Entfernen Sie alle Einstellungen
+Entfernt alle Schlüssel für das Spiel
 Scrolling
-Langsam
-Mittel
-Schnell
-Standardmenü
-Von Disk laden
+verlangsamen
+Medium
+Schnelle
+Standard -Menü
+Laden von Disk
 Bitte warten
-Fehler beim Laden der Spiel-ID
+Fehler beim Laden der Game ID
 Automatische Sortierung
 Fehler beim Laden der Sprachdatei
-Keine Debugfarben
-Kein Controller gefunden, warte ...
-Cover-Art einschalten
+Deaktivieren Sie Debug Colors
+Kein Controller erkannt , warten ...
+Aktivieren Cover Art
 Breitbild
-Ausschalten
-Konfiguration laden
-Konfiguration speichern
-Gerät starten
-USB Startmodus
-HDD Startmodus
-ETH Startmodus
-APP Startmodus
-Automatisch
-Manuell
-HDL Server starten
-HDL Server wird gestartet ...
-HDL Server läuft ... Drücke [O] zum Beenden
-Drücke [X] um den HDL Server zu schließen
-HDL Server wird beendet ...
-Beim Beenden starten
+Power off
+Lädt Config
+Speicherung Konfig
+starten Gerät
+USB-Gerät Startmodus
+HDD-Gerät Startmodus
+ETH Gerät Startmodus
+Anwendungen starten Modus
+Auto
+Handbuch
+Starten HDL Server
+HDL Server starten ...
+HDL Server laufen ... Drücken Sie [ O ] zu stoppen
+Drücken Sie [ X] zu beenden HDL -Server
+HDL Server Entladen ...
+Ausgang zum
 Hintergrundfarbe
-Textfarbe
-IP-Adresse
-Netzwerkmaske
-Gateway
-Port
-Freigabe
+Schriftfarbe
+IP
+Mask
+Gateway-
+Hafen
+Teilen
 Benutzer
-Passwort
-<keine Eingabe>
-Bestätigen
-Eintrag wird endgültig gelöscht, fortfahren?
-Umbenennen
-Löschen
-Starten
-Anzeige-Konfiguration
-Löschen/Umbenennen aktivieren
-USB-Fragmentierung prüfen
-Zuletzt gespieltes Spiel merken
-Fehler! Das Spiel ist fragmentiert.
-Fehler! Der Eintrag konnte nicht gestartet werden.
+Kennwort
+Geschlecht set>
+akzeptieren
+Artikel dauerhaft gelöscht werden , fortsetzen?
+Benennen
+löschen
+Führen
+Display-Einstellungen
+Aktivieren Sie Löschen und Umbenennen Aktionen
+Überprüfen Sie USB-Game -Fragmentierung
+Angemeldet zuletzt gespielte Spiel
+Reveal GSM im Hauptmenü
+Fehler , das Spiel ist fragmentiert
+Fehler konnte nicht ausgeführt werden das Element
 Test
-Frei lassen bei Gast-Anmeldung
-Alternativen Kern laden
-Alternativer Datenlesemodus
-Syscalls entladen
-0 PSS Modus
-DVD-DL deaktivieren
-IGR deaktivieren
-Verkleinerter cdvdfsv Puffer
-dev9 Modul verbergen
-Alternative IGR Kombination
-VMC wird bei Größenänderung neu formatiert
-Erstellen
-Bearbeiten
-Abbrechen
-Zurücksetzen
-benutze generic
-VMC konfigurieren
+Leer lassen für GUEST Auth.
+Legen alternate Kern
+Alternative Verfahren Daten lesen
+aushängen syscalls
+0 PSS -Modus
+Deaktivieren DVD -DL
+Deaktivieren IGR
+Verwenden IOP Threading hack
+Ausblenden DEV9 Modul
+Alternate IGR Combo
+Das Ändern der Größe formatieren die VMC
+schaffen
+Ändern
+Abort
+zurücksetzen
+Verwenden Sie generische
+Konfigurieren VMC
 Name
 Größe
 Status
 Fortschritt
-VMC-Datei existiert
-Ungültige VMC-Datei, Grösse ist inkorrekt
-VMC-Datei muss erstellt werden
-Fehler mit VMC %s, mit echter Karte im Anschluß %d fortfahren?
+VMC -Datei vorhanden
+Ungültige VMC -Datei , Größe ist nicht korrekt
+VMC -Datei erstellt werden müssen
+Fehler mit VMC % s , mit körperlichen MC ( Slot% d) fortsetzen?
 Automatische Aktualisierung
-Über OPL
-Programmierer
+über
+Coders
 USB Verzögerung
-USB Pfad
-Frei lassen um in den Browser zurückzukehren
-Wert in Minuten, 0 um Abschalten zu verhindern
-Automatisches abschalten der HDD
-Videomodus
-Dialogfarbe
-Auswahlfarbe
-Spielinformation anzeigen
-Spielinformation
-Custom ELF
+USB Präfix Pfad
+Leer lassen , um Browser beenden
+Value in Minute (n ), 0 bis Spin deaktivieren unten
+Automatische HDD Spin Down
+Video-Modus
+Dialog Farbe
+gewählte Farbe
+Info-Seite anzeigen
+Info
+Individuelle ELF
 Farbauswahl
-Neu verbinden
-Frei lassen um Freigabe zu wählen
-ETH Pfad
-Löschen
-Leertaste
-Eingabe
+Schließen
+Leer lassen , um Aktien Liste
+ETH Präfix Pfad
+Rücktaste
+Weltraum
+Geben Sie
 Modus
-VMC Anschluß 1
-VMC Anschluß 2
-Spiel ID
-DMA Modus
-V-Sync
-Modus 1
+VMC Slot 1
+VMC Slot 2
+Game ID
+DMA-Modus
+V- Sync
+Mode 1
 Modus 2
-Modus 3
-Modus 4
-Modus 5
-Modus 6
-Modus 7
-Modus 8
-Modus 9
-CDVD Verzögerung
-Verzögerung bei CDVD Funktionen (0 ist Vorgabe)
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Mode 9
+Rückruf -Timer
+Tragen Sie eine Verzögerung CDVD Funktionen (0 ist default)
+Ethernet-Geschwindigkeit und Duplex-Einstellungen
+GSM -Einstellungen
+GSM (0.38 )
+Erzwingen Sie eine Video-Modus
+Video-Modus
+Video-Modus gezwungen werden
+Horizontal Stellen
+Stellt Horizontal Offset
+Vertikal einstellen
+Legt Vertical Offset
+FMV überspringen
+Überspringt Full Motion Videos

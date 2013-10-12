@@ -1,105 +1,156 @@
 # translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
 Filipino
-               MALIGAYANG PAGGAMIT NG OPEN PS2 LOADER. MAIN CODE AY BASE SA SOURCE CODE NG HD PROJECT <http://psx-scene.com> ADAPTATION SA FORMAT NG USB ADVANCE AT PANGUNAHING GUI NI IFCARO <http://ps2dev.ifcaro.net> KARAMIHAN SA LOADER CORE AY GAWA NI JIMMIKAELKAEL. LAHAT NG PAGBABAGO SA GUI AY GAWA NI VOLCA. MARAMING SALAMAT SA PAGGAMIT NG AMING PROGRAM ^^
-Open PS2 Loader %s
+               Maligayang pagdating sa OPEN PS2 loader . PANGUNAHING CODE BATAY SA SOURCE CODE NG HD pagbagay proyekto <http://psx-scene.com> SA USB maaga FORMAT AT paunang GUI NG IFCARO <http://ps2dev.ifcaro.net> Karamihan sa loader Core AY GINAWA NG JIMMIKAELKAEL . LAHAT NG GUI pagpapabuti AY GINAWA NG VOLCA . Salamat para sa paggamit AMING PROGRAM ^ ^
+Buksan ang PS2 loader % s
 I-save ang mga pagbabago
-O Bumalik
-Network config
-<walang laman>
-Settings ay Nai-save...
-Error sa pagsulat ng Settings!
-Lamabas
-Settings
-Laro sa USB
-Laro sa HDD
-Laro sa Network
+likod
+network config
+<Walang values>
+Save ang mga setting ...
+Error sa pagsulat setting !
+lumabas
+Mga Setting
+USB Laro
+HDD Laro
+ETH Laro
 Apps
-Tema
-Wika
-Error sa Pagsisimula ng Network: %d
-On
-Off
-Ok
-Setting ng Game
-Tangalin lahat ng Settings
-Tangalin lahat ng keys para sa Laro
-Scrolling
+tema
+wika
+Network startup error: % d
+Hindi makakonekta sa SMB server: % d
+Hindi makapag-log in sa SMB server: % d
+Hindi mabuksan ang SMB ibahagi: % d
+sa
+mula sa
+ayos
+game setting
+Alisin ang lahat ng mga setting ng
+Inalis ang lahat ng mga pindutan para sa mga laro
+i-scroll
 Mabagal
-Katamtaman
-Mabilis
-Default na menu
-Kunin galing sa disc
-Maghintay ng Sandali
-Error sa Pagkuha ng Game ID
-Automatikong Pagsasaayos
-Error sa pagload ng file para sa wika
-Huwag paganahin ang Debug Colors
-Walang napansing controller, naghihintay...
+medium
+mabilis
+default na menu
+Mag-load mula sa disc
+Mangyaring maghintay
+Nagkaroon ng error habang naglo-load ang ID ng Laro
+Awtomatikong pag-uuri
+Error sa paglo-load ng file wika
+Huwag paganahin ang mga Kulay Debug
+Controller Walang natukoy na , naghihintay ...
 Paganahin ang Cover Art
-Wide screen
-Patayin
-Niloload ang config
-sini-save config
-Simulan ang Aparato
-Mode para simulan ang USB Device
-Mode para simulan ang HDD Device
-Mode para simulan ang ETH Device
-Mode sa pagsisimula ng Application
-Auto
-Manual
+Malapad na screen
+Power off
+Nilo-load ang config
+Sine-save ang config
+Simulan ang aparato
+USB device simula mode
+HDD device simula mode
+ETH aparato simula mode
+Mga application na simulan ang mode
+auto
+manwal
 Simulan ang HDL Server
-HDL Server ay nagsisimula...
-HDL Server ay tumatakbo... Pindutin ang [O] para itigil
-pindutin ang [X] para patayin ang HDL server
-HDL Server ay tinatangal...
-Lamabas sa 
-Kulay ng Background
-Kulay ng Texto
+HDL Server Nagsisimula ...
+HDL Server Pagpapatakbo ... Pindutin ang [ O ] para itigil
+Pindutin ang [ X ] upang wakasan ang HDL server
+HDL Server Pagbaba ng karga ...
+Lumabas sa
+kulay ng background
+kulay ng teksto
 IP
-Mask
-Gateway
-Port
-Share
-User
-Password
-<hindi nakatakda>
-X Tangapin
-Item ay permanenteng buburahin, magpatuloy ?
-palitan ang pangalan
-Burahin
-Patakbuhin
-Setting ng Display
-Paganhin ang pagbubura at pagpapalit ng pangalan
-Alamin ang fragmentation ng Laro sa USB
-Alalahanin ang huling nalaro
+mask
+gateway
+port
+magbahagi
+gumagamit
+password
+<Hindi set>
+tanggapin
+Item ay permanenteng tatanggalin , magpatuloy?
+bigyan ng ibang pangalan
+alisin
+tumakbo
+Ipakita ang mga setting
+Paganahin ang Tanggalin at Palitan ang pangalan ng pagkilos
+Suriin ang USB laro pagkapira-piraso
+Tandaan ang huling play ng laro
+Magbunyag ng GSM sa Main Menu
 Error, ang laro ay fragmented
-Error, ang item ay hindi maitakbo
-Subukan
-Iwanang walang laman para sa GUEST auth.
-Load alternate core
-Kapalit na data read method
-Unhook Syscalls
+Error, hindi maaaring tumakbo ang item
+pagsubok
+Iwanang walang laman para sa Guest auth .
+Mag-load ng kahaliling core
+Alternatibong data basahin pamamaraan
+alisin sa pagkakakawit Syscalls
 0 PSS mode
-Huwag paganahin ang DVD-DL
+Huwag paganahin ang DVD- DL
 Huwag paganahin ang IGR
-Bawasan ang cdvdfsv buffer
+Gamitin IOP threading magtadtad
 Itago ang dev9 module
-Kapalit na IGR combo
-Pagpalit ng laki ay magrereformat ng VMC
-Gumawa
-Baguhin
-Iurong
-Reset
-Gumamit ng generic
-IConfigure ang VMC
-Pangalan
-Laki
-Katayuan
-Progreso
-Mayroon ng VMC file
-Maling VMC file, hindi tama ang laki
-Kailangang magawan ng VMC file
-Error sa VMC file, magpatuloy sa pisikal na MC ?
-Awtomatikong i-refresh ang listahan
-Tungkol sa
-Mga Developers
+Kahaliling IGR combo
+Ang pagbabago ng laki ay i-reformat ang VMC
+lumikha
+baguhin
+may pagpapalaglag
+I-reset ang
+gumamit ng generic
+I-configure ang VMC
+pangalan
+laki
+katayuan
+pag-unlad
+VMC file umiiral
+Di-wastong VMC file , laki ay hindi tama
+VMC file na kailangan upang malikha
+Error sa VMC % s , magpatuloy sa pisikal na MC ( slot % d) ?
+Awtomatikong i-refresh
+tungkol sa
+Coders
+USB pagkaantala
+USB prefix landas
+Iwanang walang laman upang lumabas sa Browser
+Halaga sa (mga) minuto , 0 upang huwag paganahin iikot pababa
+Awtomatikong HDD paikutin pababa
+Video mode
+dialog ng kulay
+Piniling kulay
+Ipakita ang impormasyon ng pahina
+Impormasyon
+Custom duwende
+kulay ng seleksyon
+Muling kumonekta
+Iwanang walang laman upang ilista ang pagbabahagi
+ETH prefix landas
+Backspace
+puwang
+magpasok
+moda
+VMC Slot 1
+VMC Slot 2
+ID ng Laro
+DMA Mode
+V - sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Mode 9
+Callback timer
+Ilapat ang isang pagka-antala sa CDVD function (0 ang default)
+Ethernet bilis at duplex setting
+GSM Setting
+GSM ( 0.38 )
+Puwersahin ang isang video mode
+Video mode
+Video mode na pilit
+pahalang na Ayusin
+Itinatakda Pahalang Offset
+Ayusin ang Vertical
+Itinatakda Vertical Offset
+Laktawan ang FMV
+Skips Full Motion Video

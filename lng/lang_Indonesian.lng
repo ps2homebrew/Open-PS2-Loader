@@ -1,105 +1,156 @@
 # translation by Satrio Bahar
 Indonesian
-               SELAMAT DATANG DI OPEN PS2 LOADER. KODE UTAMA BERDASARKAN SUMBER KODE DARI HD PROJECT <http://psx-scene.com> DI ADAPTASI UNTUK FORMAT USB ADVANCE DAN GUI UTAMA DIBUAT OLEH IFCARO <http://ps2dev.ifcaro.net> SEBAGIAN BESAR CORE DIBUAT OLEH JIMMIKAELKAEL. SEMUA PERBAIKAN GUI DIBUAT OLEH VOLCA. TERIMA KASIH TELAH MENGGUNAKAN PROGRAM KAMI ^^
-Open PS2 Loader %s
+               SELAMAT DATANG OPEN PS2 LOADER . KODE MAIN BERDASARKAN SUMBER KODE HD PROYEK <http://psx-scene.com> ADAPTASI UNTUK USB ADVANCE DAN FORMAT GUI AWAL OLEH IFCARO <http://ps2dev.ifcaro.net> PALING LOADER INTI DIBUAT OLEH JIMMIKAELKAEL . SEMUA PENINGKATAN GUI YANG DIBUAT OLEH Volca . TERIMA KASIH UNTUK MENGGUNAKAN PROGRAM KAMI ^ ^
+Buka PS2 Loader % s
 Simpan perubahan
-O Kembali
-Konfigurasi jaringan
-<kosong>
-Pengaturan disimpan...
-Gagal menulis pengaturan!
-Keluar
+kembali
+konfigurasi jaringan
+<tidak values>
+Pengaturan disimpan ...
+Pengaturan kesalahan penulisan !
+keluar
 Pengaturan
-Daftar game USB
-Daftar game HDD
-Daftar game jaringan
-Daftar Aplikasi
-Tema
-Bahasa
-Kesalahan memulai jaringan: %d
-Aktif
-Tidak aktif
-Oke
-Pengaturan game
+Permainan USB
+HDD Game
+ETH Game
+aplikasi
+tema
+bahasa
+Jaringan startup error: % d
+Tidak dapat terhubung ke SMB Server : % d
+Tidak bisa login ke SMB server : % d
+Tidak dapat membuka berbagi SMB : % d
+di
+lepas
+ok
+pengaturan permainan
 Hapus semua pengaturan
-Hapus semua pengaturan game
-Perputaran
-Lambat
-Sedang
-Cepat
-Menu pertama
-Baca dari piringan
-Silahkan tunggu
-Kesalahan saat memuat ID game
-Penyortiran otomatis
+Dihapus semua kunci untuk permainan
+scrolling
+lambat
+medium
+cepat
+menu default
+Load dari disk
+Please wait
+Kesalahan saat memuat Game ID
+penyortiran otomatis
 Kesalahan memuat file bahasa
-Matikan warna debug
-Tidak ada kontrol dideteksi, Menunggu...
-Memungkinkan tampil sampul game
-Layar lebar
-Matikan PS2
-Memuat konfigurasi
+Nonaktifkan Debug Warna
+Kontroler ada terdeteksi , menunggu ...
+Aktifkan Sampul Art
+layar lebar
+matikan
+memuat config
 Menyimpan konfigurasi
-Memulai perangkat
-Pola memulai perangkat USB
-Pola memulai perangkat HDD
-Pola memulai perangkat ETH
-Pola memulai Aplikasi
-Otomatis
-Manual
-Memulai HDL Server
-HDL Server dimulai...
-HDL Server berjalan... Tekan [O] untuk berhenti
-Tekan [X] tuk mengakhiri HDL server
-HDL Server Unloading...
-Keluar ke
-Warna latar
-Warna tulisan
+Mulai perangkat
+USB perangkat modus mulai
+HDD perangkat modus mulai
+ETH perangkat modus mulai
+Aplikasi memulai modus
+mobil
+Pedoman
+Mulai HDL Server
+HDL Server Mulai ...
+HDL Server Menjalankan ... Tekan [ O ] untuk menghentikan
+Tekan [ X ] untuk mengakhiri Server HDL
+HDL Server Bongkar ...
+keluar untuk
+warna latar belakang
+warna teks
 IP
-Mask
-Gateway
-Port
-Share
-User
-Password
-<Tidak terpakai>
-X Setuju
-Item akan dihapus selamanya, Lanjutkan ?
-Ubah nama
+topeng
+pintu gerbang
+pelabuhan
+saham
+pemakai
+kata sandi
+<Bukan disetel>
+menerima
+Barang akan dihapus secara permanen , lanjutkan ?
+rename
 Hapus
-Main
-Pengaturan tampilan
-Memungkinkan operasi hapus dan ubah nama item
-Periksa fragmentasi game USB
-Ingat game yang terakhir dimainkan
-Kesalahan, Game terfragmentasi
-Kesalahan, Item tidak bisa jalan
-Coba
-Biarkan kosong untuk penulis TAMU
-Memuat alternatif inti
-Metode alternatif membaca data
-Lepaskan Syscalls
-0 PSS mode
-Matikan DVD_DL
-Matikan IGR
-Kurangi buffer cdvdfsv
-Sembunyikan modul Dev9
-IGR combo pengganti
-Rubah ukuran format kembali VMC
-Ciptakan
-Modifikasi
-Batalkan
-Ulangi
-Gunakan yang umum
+menjalankan
+pengaturan Tampilan
+Aktifkan Hapus dan Ubah nama tindakan
+Periksa USB permainan fragmentasi
+Ingat pertandingan terakhir dimainkan
+Mengungkapkan GSM pada Menu Utama
+Kesalahan , permainan terfragmentasi
+Kesalahan , tidak bisa menjalankan item
+uji
+Biarkan kosong untuk auth TAMU .
+Muat inti alternatif
+Data alternatif metode membaca
+melepas kaitan syscalls
+0 modus PSS
+Nonaktifkan DVD - DL
+Nonaktifkan IGR
+Gunakan TIO threading hack
+Sembunyikan Dev9 modul
+Alternatif IGR combo
+Mengubah ukuran akan memformat VMC
+menciptakan
+memodifikasi
+menggugurkan
+ulang
+Gunakan generik
 Konfigurasi VMC
-Nama
-Ukuran
-Status
-Kemajuan
-VMC ada
-VMC Cacat, ukuran yang salah
-VMC perlu diciptakan
-Kesalahan pada VMC, lanjutkan dengan MC fisik ?
-Otomatis segarkan
-Tentang
-Pengembang
+nama
+ukuran
+status
+kemajuan
+File VMC ada
+File VMC tidak valid , ukuran tidak benar
+File yang VMC perlu dibuat
+Kesalahan dengan VMC s % , lanjutkan dengan MC fisik ( Slot % d ) ?
+Refresh Otomatis
+tentang
+coders
+delay USB
+Jalur USB awalan
+Biarkan kosong untuk keluar ke Browser
+Nilai dalam menit ( s ) , 0 untuk menonaktifkan berputar ke bawah
+Otomatis HDD spin down
+modus video
+warna dialog
+warna yang dipilih
+Tampilan halaman info
+Info
+kustom ELF
+pemilihan warna
+Reconnect
+Biarkan kosong untuk mencatatkan sahamnya
+Path prefix ETH
+Backspace
+ruang
+masuk
+mode
+VMC Slot 1
+VMC Slot 2
+Game ID
+DMA mode
+V - Sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+modus 5
+Mode 6
+modus 7
+Mode 8
+modus 9
+callback Timer
+Terapkan penundaan untuk fungsi CDVD ( 0 merupakan default )
+Kecepatan Ethernet dan pengaturan dupleks
+Pengaturan GSM
+GSM ( 0.38 )
+Memaksa modus video
+modus video
+Modus video dipaksa
+Horizontal Sesuaikan
+Set Horizontal Offset
+Sesuaikan vertikal
+Set Vertical Offset
+FMV loncat
+Skips Kendali Motion Video

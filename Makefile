@@ -7,7 +7,7 @@ VMC = 1
 CHILDPROOF = 0
 RTL = 0
 #change following line to "0" to build without GSM - DO NOT COMMENT!
-GSM = 1
+GSM = 0
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \

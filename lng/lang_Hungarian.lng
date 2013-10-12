@@ -1,140 +1,156 @@
 # translation by JohnDoeHun <registerkuka@freemail.hu>
 Hungarian
-               ÜDVÖZÖL AZ OPEN PS2 LOADER. FŐ KÓD A HD PROJECT <http://psx-scene.com> FORRÁSKÓDJÁN ALAPUL AZ USB ADVANCE FORMÁTUM ÉS A KEZDŐ GUI IFCARO <http://ps2dev.ifcaro.net> NEVÉHEZ FŰZŐDIK A LOADER MAGJÁT NAGYRÉSZBEN JIMMIKAELKAEL KÉSZÍTETTE. A GUI FEJLESZTÉSEKET VOLCA KÉSZÍTETTE. KÖSZÖNJÜK, HOGY A PROGRAMUNKAT HASZNÁLOD ^^
-Open PS2 Loader %s
-Beállítások mentése
-Vissza
-Hálózat beállítása
-<nincs érték>
-Beállítások elmentve...
-Hiba történt a beállítások mentése közben!
-Kilépés
+               ÜDVÖZÖLJÜK OPEN PS2 rakodógép. Főkódot alapján forráskód HD PROJEKT <http://psx-scene.com> alkalmazkodás USB ADVANCE FORMAT ÉS ELSŐ GUI IFCARO <http://ps2dev.ifcaro.net> MOST rakodó CORE készül JIMMIKAELKAEL . MINDEN GUI fejlesztések MADE BY Volca . Köszönjük, hogy használta a programunk ^ ^
+Nyitott PS2 Loader % s
+változtatások mentése
+vissza
+Hálózati konfig
+<Nincs values>
+A beállítások mentése ...
+Hiba írás beállításokat!
+kijárat
 Beállítások
-USB játékok
-HDD játékok
-ETH játékok
-Alkalmazások
-Téma
-Nyelv
-Hálózati hiba: %d
-Be
-Ki
-Ok
-Játék beállítások
-Összes beállítás törlése
-A játék összes beállítása törölve lett
-Görgetés
-Lassú
-Közepes
-Gyors
-Alapértelmezett menü
-Betöltés a lemezről
-Kérlek várj
-Nem sikerült betölteni a Game ID-t
-Automatikus rendezés
-Nem sikerült betölteni a nyelvfájlt
-Debug színek kikapcsolása
-Nem található az irányító, várj...
-Borító bekapcsolása
-Széles képernyő
+USB Games
+HDD Játékok
+ETH Játékok
+Apps
+téma
+nyelv
+A hálózat üzembe helyezése hiba : % d
+Nem lehet csatlakozni a szerverre SMB : % d
+Nem tud bejelentkezni a SMB kiszolgáló : % d
+Nem lehet megnyitni az SMB megosztás: % d
+on
+le
+rendben
+játék beállítások
+Vegye ki az összes beállítást
+Eltávolítva minden gomb a játék
+görgetés
+lassú
+közepes
+gyors
+Alapértelmezett menüt
+Betöltése lemezről
+Kérjük, várjon
+Hiba betöltése Game ID
+Automatikus válogatás
+Hiba a nyelvi állomány betöltésekor
+Letiltása Debug színek
+Nem vezérlő észlelt , várakozás ...
+Engedélyezése Cover Art
+széles képernyő
 Kikapcsolás
-Beállítás betöltése
-Beállítás mentése
-Eszköz indítása
-USB indítási mód
-HDD indítási mód
-ETH indítási mód
+betöltése config
+config mentése
+Indítsa eszköz
+USB eszköz start mód
+HDD eszköz start mód
+ETH készülék start mód
 Alkalmazások indítási mód
-Automatikus
-Kézi
-HDL szerver indítása
-HDL szerver indítása folyamatban...
-A HDL szerver fut... Nyomd meg a [O]-t a megállításhoz
-Nyomd meg az [X]-t a HDL szerver befejezéséhez
-HDL szerver feltöltés folyamatban...
-Kilépés ide
+kocsi
+kézi
+Indítsa HDL Server
+HDL Server indítása ...
+HDL szerver fut ... Nyomja meg a [ O] leállításához
+Nyomja meg a [ X] megszüntetésére HDL szerverre
+HDL Server kirakása ...
+Kilépés
 Háttérszín
-Szöveg színe
+szöveg színe
 IP
-Mask
-Gateway
-Port
-Megosztás
-Felhasználónév
-Jelszó
-<nincs beállítva>
-Elfogadás
-Az adat véglegesen törölve lesz, folytatod?
-Átnevezés
-Törlés
-Futtatás
-Kinézet beállítása
-A törlés és az átnevezés engedélyezése
-USB játékok töredezettségének ellenőrzése
-Emlékezzen a legutóbb játszott játékra
-Hiba, a játék töredezett
-Hiba, nem sikerült indítani a fájlt
-Teszt
-Hagyd üresen, ha a GUEST a felhasználónév
-Alternatív mag betöltése
-Alternatív adat beolvasása
-Syscall kiakasztása
+maszk
+kapubejárat
+kikötő
+részvény
+használó
+jelszó
+<Nincs beállítva>
+elfogad
+Elem véglegesen törlésre kerül , folytatni?
+átnevezése
+töröl
+fut
+Kijelző beállítása
+Engedélyezze törlése és átnevezése akciók
+Ellenőrizze az USB- játék töredezettség
+Ne feledje, utoljára játszott játékot
+Reveal GSM a főmenüben
+Hiba a játék töredezett
+Hiba , nem tudott futni az elemet
+teszt
+Hagyja üresen a vendégek auth .
+Betöltése alternatív core
+Alternatív adatokat olvasni módszer
+kiakaszt rendszerhívások
 0 PSS mód
-DVD-DL kikapcsolása
-IGR kikapcsolása
-Használaton kívül
-dev9 modul elrejtése
-Alternatív IGR kombináció
-A méret megváltoztatása, újraformázza a VMC-t
-Készít
-Változtat
-Megszakít
-Reset
-Általános használata
-VMC beállítása
-Név
-Méret
-Státusz
-Folyamat
-A VMC fájl már létezik
-Érvénytelen a VMC fájl, nem megfelelő a méret
-El kell készíteni a VMC fájlt
-Hiba a VMC %s fájllal, folytatod a fizikai MC (hely %d)-vel?
+Letiltása DVD -DL
+letiltása IGR
+Használja IOP threading hack
+Elrejtése dev9 modul
+Alternatív IGR combo
+Megváltoztatása mérete formázni a VMC
+teremt
+módosít
+elvetél
+visszaállítása
+Használjon általános
+konfigurálása VMC
+név
+méret
+állapot
+haladás
+VMC fájl létezik
+Érvénytelen VMC fájl mérete nem megfelelő
+VMC fájlt kell létrehozni
+Hiba a VMC % s , folytassa a fizikai MC ( slot % d) ?
 Automatikus frissítés
-Névjegy
-Kódolók
+körülbelül
+Coders
 USB késleltetés
-USB elérési útvonala
-Hagyd üresen ha a Browserbe akarsz kilépni
-Érték percben, 0 a leállítás kikapcsolása
-Automatikus HDD leállítás
-Videó mód
-Felirat színe
-Kiválasztott szín
-Információs oldal megjelenítése
-Információ
-Custom ELF
-Szín kijelölés
-Újracsatlakozás
-Hagyd szabadon a lista megosztáshoz
-ETH elérési útvonala
-Visszatörlés
-Szóköz
-Enter
-Mód
-VMC hely 1
-VMC hely 2
-Game ID
-DMA Mód
-V-Sync
-Mód 1
-Mód 2
-Mód 3
-Mód 4
-Mód 5
-Mód 6
-Mód 7
-Mód 8
-Mód 9
+USB prefix utat
+Hagyja üresen a kilépéshez a Browser
+Érték perc (ek) , 0 letiltja a leállítás
+Automatikus HDD forgasd le
+Videó üzemmód
+Dialog szín
+kiválasztott szín
+Kijelző információs oldala
+Info
+Egyéni ELF
+szín kiválasztása
+Csatlakoztassa
+Hagyja üresen a listához részvények
+ETH prefix utat
+Backspace
+hely
+belép
+üzemmód
+VMC Slot 1
+VMC Slot 2
+játék ID
+DMA Mode
+V -Sync
+Mode 1
+Mode 2
+3. üzemmód
+Mode 4
+5. mód
+Mode 6
+Mode 7
+Mode 8.
+Mode 9
 Visszahívás időzítő
-A CDVD funkciók késleltetésének engedélyezése (0 az alapértelmezett)
+Vigyen fel egy késedelem cDVD funkciók (0 az alapértelmezett )
+Ethernet sebesség és duplex beállítások
+GSM Settings
+GSM ( 0,38 )
+Force videó mód
+Videó üzemmód
+Videó mód kénytelen
+vízszintes beállítása
+Megadja Vízszintes eltolás
+függőleges beállítása
+A függőleges eltolás
+FMV Átugrani
+Kihagyja Full Motion videók

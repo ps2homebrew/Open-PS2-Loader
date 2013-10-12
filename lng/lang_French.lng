@@ -1,132 +1,136 @@
 # translation by izdubar
 French
-               BIENVENUE DANS OPEN PS2 LOADER. CODE PRINCIPAL FONDÉ SUR LE CODE SOURCE D'HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> LA PLUPART DU CODE DU COEUR DU LOADER EST DE JIMMIKAELKAEL. TOUTES LES AMÉLIORATIONS DU GUI SONT DE VOLCA. MERCI D'UTILISER NOTRE PROGRAMME ^^
-Open PS2 Loader %s
-Sauvegarder les changements
+               Welcome to Open PS2 Loader. CODE principale basée sur le code source de la HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> PLUS DE CHARGEUR Core est DE JIMMIKAELKAEL . Toutes les améliorations GUI SONT DE VOLCA . MERCI POUR utilisant notre programme ^ ^
+Open PS2 Loader % s
+Enregistrer les modifications
 Retour
-Réglages réseau
-<vide>
-Réglages sauvegardés...
-Erreur à l'écriture des réglages!
-Sortir
-Réglages
-Jeux sur USB
-Jeux sur disque dur
-Jeux sur réseau
+Config réseau
+<aucun valeurs>
+Les paramètres enregistrés ...
+Paramètres d'écriture d'erreur !
+quitter
+réglages
+Jeux USB
+HDD Jeux
+ETH Jeux
 Applications
-Thème
-Langue
-Erreur de démarrage réseau: %d
-Oui
-Non
+thème
+langue
+Réseau d'erreur au démarrage :% d
+Impossible de se connecter au serveur SMB :% d
+Impossible de se connecter au serveur SMB :% d
+Impossible d'ouvrir le partage SMB :% d
+sur
+off
 Ok
-Réglages du jeu
-Désactiver tous les réglages
-Tous modes désactivés
-Défilement
-Lent
-Moyen
-Rapide
+Paramètres de jeu
+Supprimez tous les paramètres
+Suppression de toutes les clés pour le jeu
+défilement
+lent
+Medium
+rapide
 Menu par défaut
-Lire du disque
-Patientez
-Erreur de chargement du Game ID
-Tri automatique
-Erreur de chargement du fichier de langue
-Désactiver les couleurs de debug
-Pas de controlleur détecté...
-Utiliser les Cover Art
-Écran large
+Charger à partir du disque
+S'il vous plaît attendre
+Erreur lors du chargement de l'ID du jeu
+tri automatique
+Erreur lors du chargement du fichier de langue
+Désactiver le débogage Couleurs
+Aucun contrôleur détecté , dans l'attente ...
+Activer Couvrir Art
+grand écran
 Éteindre
-Chargement de la configuration
-Sauvegarde de la configuration
-Démarrer le périphérique
-Démarrage mode USB
-Démarrage mode HDD
-Démarrage mode ETH
-Démarrage Applications
+Chargement config
+Sauvegarde config
+dispositif de démarrage
+Le mode de démarrage de dispositif USB
+Mode de démarrage de l'appareil HDD
+Mode de démarrage de l'appareil ETH
+Applications mode de démarrage
 Auto
 Manuel
-Démarrer le serveur HDL
-Démarrage du serveur HDL...
-Serveur HDL en fonction... Appuyer sur [O] pour l'arrêter
-Appuyer sur [X]
-Déchargement du serveur HDL...
-Quitter vers
+Commencez HDL serveur
+HDL Server Démarrage ...
+HDL serveur exécutant ... Appuyez sur [ O ] pour arrêter
+Appuyez sur [ X ] pour mettre fin à de serveur de HDL
+HDL serveur déchargement ...
+Sortie sur
 Couleur de fond
-Couleur de texte
-Adresse IP
-Masque
-Passerelle
+Couleur du texte
+IP
+masque
+passerelle
 Port
-Partage
-Utilisateur
-Mot de passe
-<non défini>
-Accepter
-L'élément sera définitivement supprimé
-Renommer
-Supprimer
-Démarrer
-Réglages graphique
-Autoriser Supprimer/Renommer
-Vérifier la fragmentation des jeux USB
-Se rappeler le dernier jeu
-Erreur, le jeu est fragmenté
-Erreur, impossible de lancer l'élement
-Test
-Laisser vide pour le mode Invité
-Charger le coeur alternatif
-Méthode de lecture alternative
-Désactiver Syscalls
-mode 0 PSS
-Désactiver DVD-DL
-Désactiver IGR
-Inutilisé
-Cacher le module dev9
-Utiliser le combo IGR alternatif
-Changer la taille de la VMC la reformatera
-Créer
-Modifier
-Annuler
-Réinitialiser
-Utiliser générique
-Configurer VMC
-Nom
+Partager
+utilisateur
+mot de passe
+<not set>
+accepter
+L'article sera définitivement supprimé , continuer ?
+renommez
+supprimer
+exécuter
+paramètres d'affichage
+Activer le supprimer et renommer des actions
+Vérifiez la fragmentation de jeu USB
+Rappelez- dernier match joué
+Révéler GSM dans le menu principal
+Erreur , le jeu est fragmenté
+Erreur, ne pouvait pas courir le point
+test
+Laissez vide pour auth invité.
+Chargez autre noyau
+Données méthode alternative lus
+Décrocher Syscalls
+0 Mode PSS
+Désactiver DVD -DL
+désactiver IGR
+Utilisez IOP threading Hack
+Cachez module de DEV9
+Combo IGR suppléant
+Modification de la taille va reformater le MVC
+créer
+modifier
+abandonner
+réinitialiser
+Utilisez générique
+configurer MVC
+nom
 Taille
-Status
-Progression
-La VMC existe
-Fichier VMC incorrect, taille de VMC invalide
-La VMC doit être crée
-Erreur sur VMC %s, continuer avec la MC physique (carte %d) ?
-Mise à jour automatique
-À propos
-Développeurs
-Délai USB
-Préfixe USB
-Laisser vide pour quitter vers le Browser
-Valeur en minute(s), 0 pour désactiver l'arrêt automatique
-Arrêt HDD automatique
+statut
+Progress
+N'existe fichier MVC
+Invalide fichier MVC , la taille est incorrecte
+Besoin de fichier MVC être créé
+Erreur avec MVC % s, continuer avec MC physique ( emplacement% d) ?
+Actualisation automatique
+sur
+Coders
+retard USB
+Chemin du préfixe USB
+Laisser vide pour quitter le navigateur
+Valeur en minute ( s), 0 pour désactiver la rotation vers le bas
+Automatique disque dur ralentit
 Mode vidéo
 Couleur de dialogue
-Couleur sélection
-Afficher la page info
-Info
-ELF personnalisé
-Choix de la couleur
-Reconnection
-Laisser vide pour lister les partages
-Préfixe ETH
+couleur sélectionnée
+Afficher la page d'information
+Infos
+coutume ELF
+Le choix des couleurs
+Rebranchez
+Laissez vide pour lister les partages
+Chemin du préfixe ETH
 Retour arrière
-Espace
-Entrée
+espace
+Entrez
 Mode
-Carte VMC 1
-Carte VMC 2
-ID de jeu
-Mode DMA
-V-Sync
+MVC Slot 1
+MVC Slot 2
+ID du jeu
+DMA Mode
+V -Sync
 Mode 1
 Mode 2
 Mode 3
@@ -136,5 +140,17 @@ Mode 6
 Mode 7
 Mode 8
 Mode 9
-Temporisation CDVD
-Applique un délai aux opérations du CDVD (0 par défaut)
+Minuterie de rappel
+Appliquer un délai aux fonctions CDVD (0 est la valeur par défaut)
+Vitesse Ethernet et les paramètres duplex
+Réglages GSM
+GSM (0,38)
+Forcer un mode vidéo
+Mode vidéo
+Mode vidéo d'être forcé
+horizontal Réglez
+Définit décalage horizontal
+vertical Régler
+Définit décalage vertical
+FMV saut
+Saute Full Motion Vidéos

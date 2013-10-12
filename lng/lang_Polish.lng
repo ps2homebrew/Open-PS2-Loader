@@ -1,105 +1,156 @@
 # translation by Berion & Loki7777
 Polish
-               WITAMY W PROGRAMIE OPEN PS2 LOADER. GŁÓWNY KOD OPARTY ZOSTAŁ NA KODZIE ŹRÓDŁOWYM HD PROJECT <http://psx-scene.com> IMPLEMENTACJE FORMATU USB ADVANCE I GUI PRZEZ IFCARO <http://ps2dev.ifcaro.net> WIĘKSZOŚĆ JĄDRA LOADERA WYKONANA PRZEZ JIMMIKAELKAEL. WSZYSTKIE ULEPSZENIA GUI WYKONANE PRZEZ VOLCA. DZIĘKUJEMY ZA SKORZYSTANIE Z NASZEJ APLIKACJI. ^^
-Open PS2 Loader %s
-"X" Zapisz zmiany
-"O" Powrót
-Konfiguracja sieci
-<brak wartości>
-Ustawienia zostały zapisane...
-Wystąpił błąd podczas zapisywania ustawień!
+               WELCOME TO OPEN PS2 LOADER . MAIN kodu w oparciu o kod źródłowy HD <http://psx-scene.com> ADAPTACJI PROJEKTU sformatować USB ADVANCE i początkowe GUI IFCARO <http://ps2dev.ifcaro.net> MOST rdzenia Loader to MADE BY JIMMIKAELKAEL . WSZYSTKIE GUI IMPROVEMENTS są przez VOLCA . Dziękujemy za korzystanie z naszego programu ^ ^
+Otwórz PS2 Loader % s
+Zapisz zmiany
+z powrotem
+config Network
+<brak values>
+Ustawienia zapisane ...
+Błąd zapisu ustawień !
 Wyjście
 Ustawienia
-Gry z USB
-Gry z HDD
-Gry przez sieć
-Programy
-Skórki
-Język
-Błąd podczas uruchamiania sieci: %d
-Włączone
-Wyłączone
-Ok
-Ustawienia kompatybilności
+Gry USB
+HDD Games
+ETH Games
+Aplikacje
+motyw
+język
+Network startup error :% d
+Nie można połączyć się z serwerem SMB : % d
+Nie można zalogować się do serwera SMB : % d
+Nie można otworzyć akcji SMB :% d
+na
+od
+dobrze
+ustawienia gier
 Usuń wszystkie ustawienia
-Usunięto wszystkie klucze dla gry
-Przewijanie
-Powoli
-Normalnie
-Szybko
-Domyślne menu
-Uruchom z płyty
-Proszę czekać...
-Błąd podczas odczytywania Game ID
+Usunięto wszystkie klucze do gry
+przewijanie
+Zwolnij
+medium
+szybko
+Domyślnie menu
+Załaduj z dysku
+Proszę czekać
+Błąd podczas ładowania w grze ID
 Automatyczne sortowanie
-Wystąpił błąd podczas wczytywania pliku językowego
-Wyłącz kolory Debug
-Nie wykryto podłączonego kontrolera, oczekiwanie...
-Włącz pokazywanie okładek
-Panoramiczny ekran
-Wyłącz zasilanie
-Wczytywanie ustawień
-Zapisywanie ustawień
+Błąd ładowania pliku języka
+Wyłącz Kolory Debug
+No kontroler wykryty, czeka ...
+Włącz Cover Art
+Szeroki ekran
+Wyłącz
+Ładowanie config
+Zapisywanie config
 Uruchom urządzenie
-Tryb uruchamiania urządzeń USB
-Tryb uruchamiania dysku twardego
-Tryb uruchamiania sieci
-Tryb uruchamiania programów
-Automatyczny
-Ręczny
+Tryb rozruchu urządzenia USB
+Urządzenie HDD tryb startu
+Urządzenie ETH tryb startu
+Tryb uruchamiania aplikacji
+automatyczny
+ręczny
 Uruchom serwer HDL
-Uruchamianie serwera HDL...
-Serwer HDL Uruchomiony... Wciśnij "O" aby zatrzymać
-Wciśnij "X" aby zakończyć pracę serwera HDL
-Wyłączanie serwera HDL...
-Wyjście do
-Kolor tła
-Kolor tekstu
+Server HDL Uruchamianie ...
+Server HDL Uruchamianie ... Naciśnij klawisz [ O] , aby zatrzymać
+Naciśnij przycisk [ X] , aby zakończyć serwer HDL
+Server HDL Rozładunek ...
+Wyjście na
+kolor tła
+kolor tekstu
 IP
-Maska
+maska
 Brama
-Port
-Udostępnij
-Użytkownik
-Hasło
-<nie ustawione>
-"X" Zatwierdź
-Wybrana gra zostanie usunięta, kontynuować?
-Zmień nazwę
-Usuń
-Uruchom
-Ustawienia ekranu
-Pozwól na usuwanie i zmiany nazw gier
-Sprawdź fragmentację gry na urządzeniu USB
-Zapamiętaj ostatnio uruchomioną grę
-Błąd: Gra jest pofragmentowana
-Błąd: Nie można uruchomić gry
-Test
-Zostaw puste dla autoryzacji konta GOŚĆ.
+port
+udział
+użytkownik
+hasło
+<Nie ustawień>
+akceptować
+Przedmiot zostanie trwale usunięta , kontynuować?
+przemianować
+usunąć
+run
+ustawienia wyświetlacza
+Włącz Usuwanie i zmiana nazwy działania
+Sprawdź fragmentacji grę USB
+Zapamiętaj ostatnio grał grę
+Odkrywamy GSM na Main Menu
+Błąd ,gra jest rozdrobniony
+Błąd , nie można uruchomić opcję
+test
+Pozostaw puste dla auth gość.
 Załaduj alternatywne jądro
-Alternatywny sposób odczytu danych
-Zwolnij Syscalls
-Tryb zastpowania PSS dummy
-Wyłącz obsługę DVD-DL
+Alternatywne metody odczytu danych
+Odczep syscalli
+0 Tryb PSS
+Wyłącz DVD- DL
 Wyłącz IGR
-Zmniejsz bufor cdvdfsv
-Ukryj moduł dev9
-Alternatywna kombinacja IGR
-Zmiana rozmiaru wymusi ponowne formatowanie VMC
-Stwórz
-Modyfikuj
-Anuluj
-Resetuj
-Użyj domyślnych
-Konfiguruj VMC
-Nazwa
-Rozmiar
-Stan
-Postęp
-Plik VMC już istnieje
-Niewłaściwy plik VMC, nieprawidłowy rozmiar
-Plik VMC musi zostać utworzony
-Błąd z plikiem VMC, kontynuować z fizyczną kartą pamięci?
-Automatyczne odswieżanie
-O programie
-Autorzy
+Użyj IOP wątków siekać
+Ukryj dev9 modułu
+Zastępca combo IGR
+Zmiana rozmiaru będzie sformatowaćVMC
+utworzyć
+modyfikować
+poronić
+Resetowanie
+Użyj generic
+Skonfiguruj VMC
+nazwa
+rozmiar
+status
+postęp
+VMC plik istnieje
+Nieprawidłowy VMC pliku, rozmiar jest niepoprawny
+VMC pliku muszą być tworzone
+Błąd z VMC % s , nadal z fizycznym MC ( gniazdo % d) ?
+Automatyczne odświeżanie
+o
+Coders
+opóźnienie USB
+Path prefix USB
+Pozostaw puste , aby wyjść z przeglądarki
+Wartość w minutę ( s ) , 0 aby wyłączyć wirować
+Automatyczny HDD wirować
+tryb wideo
+kolor Dialog
+wybrany kolor
+Ostatnia aktualizacja informacji
+Info
+Niestandardowe ELF
+wybór kolorów
+Podłącz
+Pozostaw puste do listy akcji
+Path prefix ETH
+Backspace
+miejsce
+wpisać
+tryb
+Slot VMC 1
+Slot VMC 2
+ID gry
+Tryb DMA
+V- Sync
+mode 1
+mode 2
+Tryb 3
+Tryb 4
+Tryb 5
+Tryb 6
+Tryb 7
+Tryb 8
+Tryb 9
+zegar Callback
+Zastosuj opóźnienie do CDVD funkcji (0 jest domyślnie)
+Prędkość Ethernet i dupleksu
+Ustawienia GSM
+GSM ( 0.38 )
+Wymuszanie trybu wideo
+tryb wideo
+Tryb Video być zmuszony
+Regulacja w poziomie
+Ustawia Horizontal offset
+Regulacja w pionie
+Ustawia Przesunięcie pionowe
+FMV pomiń
+Pomija Full Motion Video

@@ -1,140 +1,156 @@
 # translation by 0NullChAr0
 Italian
-               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^
-Open PS2 Loader %s
-Salva cambiamenti
-Indietro
-Configura Network
-<nessun valore>
-Impostazioni salvate...
-Errore scrittura impostazioni!
-Esci
-Impostazioni
+               BENVENUTI AL APERTO PS2 Loader. Codice principale BASATI SU CODICE SORGENTE DI HD PROGETTO <http://psx-scene.com> ADATTAMENTO AI USB ADVANCE FORMATO E GUI INIZIALE DA IFCARO <http://ps2dev.ifcaro.net> PIÙ DI CARICATORE NUCLEO è fatta da JIMMIKAELKAEL . Tutti i miglioramenti GUI SONO REALIZZATI CON Volca . Grazie per aver utilizzato il nostro programma ^ ^
+Aperto PS2 Loader % s
+Salva le modifiche
+indietro
+configurazione rete
+<nessun values>
+Impostazioni salvate ...
+Impostazioni di scrittura di errore !
+uscire
+impostazioni
 Giochi USB
-Giochi HDD
-Giochi Network
-Applicazioni
-Tema
-Lingua
-Avvio Network Errore: %d
-Attivato
-Disattivato
-Ok
-Impostazioni Gioco
-Rimuovi tutte le impostazioni
-Tutte le impostazioni del gioco sono state rimosse
-Scorrimento
-Lento
-Medio
-Veloce
-Menu Predefinito
-Carica dal disco
-Per favore attendere
-Errore caricamento ID del Gioco
-Ordinamento Automatico
-Errore caricamento file linguaggio
-Disabilita Colori di Debug
-Nessun controller rilevato, attendere...
+Giochi di HDD
+ETH Giochi
+Apps
+argomento
+lingua
+Errore di rete di avvio : % d
+Impossibile connettersi al server SMB : % d
+Impossibile accedere al server SMB : % d
+Impossibile aprire la condivisione SMB : % d
+on
+spento
+ok
+impostazioni di gioco
+Rimuovere tutte le impostazioni
+Rimosso tutte le chiavi per il gioco
+scorrimento
+rallentare
+Media
+veloce
+menu di default
+Caricare da disco
+attendere prego
+Errore durante il caricamento del Game ID
+ordinamento automatico
+Errore nel caricamento del file di lingua
+Disattiva debug Colori
+Nessun controller rilevato , in attesa ...
 Abilita Cover Art
-Schermo ampio
-Spegni
-Caricamento Configurazioni
-Salvataggio Configurazioni
-Avvia Periferica
-Avviamento periferica USB
-Avviamento periferica HDD
-Avviamento periferica ETH
-Avviamento Applicazioni
-Automatico
+Wide screen
+Spegnimento
+Caricamento di config
+Salvataggio config
+dispositivo avviare
+Modalità di avvio del dispositivo USB
+Modalità di avvio dispositivo HDD
+Modalità di avvio dispositivo ETH
+Modalità Applicazioni iniziano
+Auto
 Manuale
-Avvia HDL Server
-Avviamento HDL Server...
-Caricamento HDL Server... [O] Per Fermare
-Premi [X] per fermare HDL...
-Scaricamento HDL Server...
-Esci per
-Colore dello Sfondo
-Colore del Testo
+Avviare HDL Server
+HDL Server Avvio ...
+HDL Server Esecuzione di ... Premere il tasto [ O ] per arrestare
+Premere [ X ] per interrompere server di HDL
+HDL Server scarico ...
+Uscita
+colore di sfondo
+colore del testo
 IP
-Maschera
-Ingresso
-Porta
-Titolo
-Utente
-Parola d'ordine
+maschera
+Gateway
+porto
+Condividi
+utente
+parola d'ordine
 <non impostato>
 Accetta
-L'oggetto sarà cancellato definitivamente, continuare ?
-Rinomina
+L'oggetto sarà cancellato in modo permanente , continuare ?
+rinominare
 Cancella
-Avvia
-Impostazioni Schermo
-Abilita operazioni di Elimina e Rinomina
-Controlla frammentazione Gioco USB
-Ricorda ultimo gioco Avviato
-Errore, il gioco è frammentato
-Errore, impossibile avviare l'oggetto
-Testa
-Lasciare vuoto per Autorizzazioni GUEST
-Carica Nucleo Alternativo
-Metodo lettura data Alternativo
-Sgancia chiamate Sistema
-PSS Disabilitati
-Disabilita DVD-DL
+Esegui
+impostazioni del display
+Abilita cancellare e rinominare le azioni
+Controllare gioco frammentazione USB
+Ricorda ultima partita giocata
+Rivela GSM sul menu principale
+Errore , il gioco è frammentato
+Errore, non poteva correre la voce
+prova
+Lasciare vuoto per auth GUEST .
+Caricare nucleo alternativo
+Dati alternativi leggono metodo
+Sganciare syscalls
+0 Modalità PSS
+Disabilitare DVD- DL
 Disabilita IGR
-Non utilizzato
-Nascondi modulo dev9
-Combo IGR Alternato
-Cambia le dimensioni della VMC
-Creare
+Utilizzare IOP threading mod
+Nascondere modulo Dev9
+Combo IGR alternativo
+Modifica delle dimensioni riformatta il VMC
+creare
 Modifica
-Annulla
-Resetta
-Usa generico
+Abort
+Ripristina
+uso generico
 Configura VMC
-Nome
+nome
 Dimensione
-Stato
-Progresso
-File VMC esistente
-File VMC invalido, la dimensione non è corretta
-File VMC ancora da creare
-Errore con il File VMC %s, continuare con MC fisica (slot %d) ?
-Aggiornamento automatico
-Informazioni
-Sviluppatori
-Ritardo USB
-Prefisso Percorso USB
-Lasciare vuoto per uscire al Browser
-Valore in minuti, 0 per disabilitare spin down
-Spin down HDD automatico
-Modo Video
-Colore Dialogo
-Colore Selezionato
-Mostra pagina info
+stato
+Progress
+File VMC esiste
+Invalid file di VMC , dimensione non è corretta
+Bisogno di file VMC da creare
+Errore con VMC % s , continuare con MC fisico ( slot% d ) ?
+aggiornamento automatico
+circa
+Coders
+ritardo USB
+Percorso prefisso USB
+Lasciare vuoto per uscire al browser
+Valore in minuto ( s ) , 0 per disabilitare la rotazione verso il basso
+Automatico HDD spin down
+modalità Video
+colore finestra
+colore selezionato
+Visualizzazione pagina info
 Info
-ELF Personalizzato
-Colore Selezione
-Riconnetti
-Lasciare vuoto per la lista condivisioni
-Prefisso Percorso ETH
+personalizzato ELF
+selezione di colore
+ricollegare
+Lasciare vuoto per elencare le azioni
+ETH percorso prefisso
 Backspace
-Spazio
-Invio
-Modo
+spazio
+Inserisci
+modalità
 VMC Slot 1
 VMC Slot 2
-ID Gioco
-Modo DMA
-V-Sync
-Modo 1
-Modo 2
-Modo 3
-Modo 4
-Modo 5
-Modo 6
-Modo 7
-Modo 8
-Modo 9
-Cronometro Chiamata
-Applica un ritardo alle funzioni CDVD (0 è Predefinito)
+game ID
+DMA Mode
+V -Sync
+modalità 1
+mode 2
+modalità 3
+modalità 4
+modo 5
+modo 6
+modo 7
+modo 8
+modalità di 9
+timer di richiamata
+Applicare un ritardo di funzioni CDVD (0 è il valore predefinito )
+Velocità Ethernet e le impostazioni duplex
+Impostazioni GSM
+GSM ( 0.38 )
+Forzare una modalità video
+modalità Video
+Modalità Video di essere costretti
+orizzontale Regolare
+Imposta Offset orizzontale
+verticale Regolare
+Imposta Vertical Offset
+FMV salto
+Salta le Full Motion Video

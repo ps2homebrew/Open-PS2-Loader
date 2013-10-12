@@ -1,105 +1,156 @@
 # translation by Ronald Andersson (aka: dlanor)
 Swedish
-               VÄLKOMMEN TILL OPEN PS2 LOADER. HUVUDKODEN GRUNDAS PÅ KÄLLKOD FRÅN HD PROJECT <http://psx-scene.com> ANPASSNING TILL USB ADVANCE FORMAT OCH URSPRUNGLIGT GUI AV IFCARO <http://ps2dev.ifcaro.net> MERPARTEN AV LADDARKÄRNAN ÄR GJORD AV JIMMIKAELKAEL. ALLA GUI-FÖRBÄTTRINGAR ÄR GJORDA AV VOLCA. TACK FÖR ATT DU ANVÄNDER VÅRT PROGRAM ^^
-Open PS2 Loader %s
+               VÄLKOMMEN TILL ÖPPET PS2 Loader. MAIN kod baserad på källkoden HD PROJEKT <http://psx-scene.com> ANPASSNING TILL USB ADVANCE FORMAT OCH FÖRSTA GUI BY IFCARO <http://ps2dev.ifcaro.net> MEST AV LOADER CORE görs av JIMMIKAELKAEL . ALLA GUI förbättringar sker BY VOLCA . Tack för att använda vårt program ^ ^
+Öppet PS2 Loader % s
 Spara ändringar
-O Tillbaks
-Nätverksinställningar
-<inga värden>
-Inställningar sparade...
-Fel vid skrivning av inställningar!
-Avsluta
+Tillbaka
+Nätverkskonfig
+<ingen values>
+Inställningar sparas ...
+Fel vid skrivning inställningar !
+Utgång
 Inställningar
-Spel från USB
-Spel från HDD
-Spel från Nätverk
-Applikationer
+USB- Spel
+HDD Spel
+ETH Spel
+appar
 Tema
 Språk
-Fel vid start av Nätverk: %d
+Nätverk startup error : % d
+Kan inte ansluta till SMB -server : % d
+Kan inte logga in SMB-server : % d
+Kan inte öppna SMB aktie : % d
 På
-Av
-Ok
-Spel-inställningar
-Nollställ alla val
-Tog bort alla spelets inställningar
-Radrullning
-Långsam
-Medium
+off
+OK
+inställningar för spel
+Ta bort alla inställningar
+Tog bort alla nycklar för spelet
+rulla
+Sakta
+medium
 Snabb
-Grundmeny
+grundmenyspråket
 Ladda från skiva
-Var god vänta
-Fel vid laddning av spelets ID
+vänta
+Fel vid laddning av Game ID
 Automatisk sortering
-Fel vid laddning av språkfil
-Stäng av Debug-färger
-Ingen handkontroll funnen, väntar...
-Använd fodral-bilder
-Storbildsformat
-Stäng av
-Laddar inställningar
-Sparar inställningar
-Starta enhet
-Startmetod för USB
-Startmetod för HDD
-Startmetod för Nätverk
-Startmetod för Program
-Automatisk
+Fel vid inläsning språkfilen
+Inaktivera Debug Färger
+Ingen styrenhet upptäcks , vänta ...
+Aktivera Cover Art
+Bredbild
+ström av
+Laddar config
+spara config
+starta enheten
+USB -enhet startläge
+HDD-enhet startläge
+ETH enhet startläge
+Ansökningar startläge
+Auto
 Manuell
-Starta HDL-Server
-HDL-Server Startar...
-HDL-Server Körande... Tryck [O] för att avbryta
-Tryck [X] för att avsluta HDL-server
-HDL-Server Avslutas...
-Vid avslut kör
-Bakgrundsfärg
-Textfärg
-IP-adress
-Nätmask
+Starta HDL Server
+HDL Server Startar ...
+HDL Server Running ... Tryck [ O ] för att stoppa
+Tryck på [ X ] för att avsluta HDL -server
+HDL Server Lossning ...
+Utgång till
+bakgrundsfärg
+textfärg
+IP
+mask
 Gateway
 Port
-Share
-Användarnamn
-Lösenord
-<ej satt>
-X Bekräfta
-Objektet blir permanent raderat! continue ?
-Döp om
-Radera
-Starta
-Inställningar för GUI-visning
-Aktivera kommandona "Döp om" och "Radera"
-Testa fragmentering av spel från USB
-Minns senast körda spel
-Fel ! spelet är fragmenterat
-Fel ! objektet kunde inte startas
+Dela
+Användare
+lösenord
+<Ej set>
+Acceptera
+Objektet ska tas bort permanent , fortsätta?
+Byt namn
+radera
+Kör
+visa inställningar
+Aktivera bort och Byt namn åtgärder
+Kontrollera USB- spel fragmentering
+Minns senast spelade spel
+Avslöja GSM på huvudmenyn
+Fel , är spelet fragmenterad
+Fel , kunde inte köra posten
 Test
-Lämna tomt för anonym fildelning
-Ladda alternativ kärna
-Alternativ metod för data-läsning
-Deaktivera Syscalls
-0 PSS mode
-Deaktivera DVD-DL
-Deaktivera IGR
-Reducerad cdvdfsv-buffert
-Göm dev9-modulen
-Alternativ IGR-kombination
-Storleksändring medför VMC-formatering
+Lämna tomt för GUEST auth .
+Ladda alternativa kärna
+Alternativa data som läses metod
+Haka Syscalls
+0 PSS -läge
+Inaktivera DVD - DL
+Inaktivera IGR
+Använd lOP gängning hacka
+Göm dev9 modul
+Alternativ IGR combo
+Ändra storleken kommer att formatera om VMC
 Skapa
-Ändra
-Avbryt
-Välj bort
-Använd generisk
+ändra
+Abort
+Återställ
+Använd generiska
 Konfigurera VMC
 Namn
 Storlek
 Status
-Bearbetat
-VMC-fil finnes
-Ogiltig VMC-fil, storleken är fel
-VMC-fil behöver skapas
-VMC-fil felaktig ! Fortsätta med fysiskt MC ?
+framsteg
+VMC fil existerar
+Ogiltig VMC -fil , är storleken felaktig
+VMC -filen måste skapas
+Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d ) ?
 Automatisk uppdatering
-Om OPL
-Utvecklare
+Om
+kodare
+USB- fördröjning
+USB prefix sökväg
+Lämna tomt för att avsluta till webbläsaren
+Värde i minut ( er ) , 0 för att inaktivera spinn ner
+Automatisk HDD spinn ner
+Videoläge
+Dialog färg
+Vald färg
+Visa info sida
+Info
+Custom ELF
+färgval
+Anslut
+Lämna tomt för att lista aktier
+ETH prefix sökväg
+Backsteg
+Space
+Enter
+läge
+VMC Slot 1
+VMC Slot 2
+spel-ID
+DMA Mode
+V - Sync
+mode 1
+mode 2
+läge 3
+mode 4
+läge 5
+läge 6
+läge 7
+mode 8
+läge 9
+återuppringning timer
+Applicera en försening till cDVD funktioner ( 0 är standard )
+Ethernet hastighet och duplex
+GSM-inställningar
+GSM ( 0,38 )
+Tvinga ett videoläge
+Videoläge
+Videoläge tvingas
+Horisontell Justera
+Ställer Horisontell offset
+Vertikal Justera
+Ställer Vertikal förskjutning
+FMV hoppa
+Hoppar Full Motion Video

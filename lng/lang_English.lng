@@ -173,6 +173,7 @@ Callback timer
 Apply a delay to CDVD functions (0 is default)
 Ethernet speed and duplex settings
 GSM Settings
+GSM (0.38)
 Force a video mode
 Video mode
 Video mode to be forced

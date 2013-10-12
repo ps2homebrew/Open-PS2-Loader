@@ -1,105 +1,156 @@
 # translation by cegazza <ceg85@bol.com.br>
 Portuguese
-               BEM VINDO AO OPEN PS2 LOADER. CÓDIGO PRINCIPAL BASEADO NO CÓDIGO FONTE DO HD PROJECT <http://psx-scene.com> ADAPTADO AO FORMATO USB ADVANCE E INTERFACE GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> A MAIOR PARTE DO NÚCLEO DO CARREGADOR FOI FEITA POR JIMMIKAELKAEL. TODAS AS MELHORAS NA INTERFACE FORAM FEITAS POR VOLCA. OBRIGADO POR USAR NOSSO PROGRAMA.
-Open PS2 Loader %s
-Salvar mudanças
-O Volta
-Configurar rede
-<sem valores>
-Definições salvadas...
-Erro ao salvar definições!
-Sair
-Definições
-Jogos por USB
-Jogos por HDD
-Jogos por Rede
-Aplicativos
-Temas
-Idioma
-Erro ao iniciar rede: %d
-Ativado
-Desativado
-Aceitar
-Definições do jogo
-Remover todas as definições
-Removidas todas as definições para o jogo
-Rolagem
-Lento
-Médio
-Rápido
-Menu padrão
-Carregar do disco
-Por favor espere
-Erro ao carregar a ID do jogo
-Ordenar automaticamente
-Erro ao carregar arquivo de idioma
-Desativar depuração de cores
-Controle não detectado, esperando...
-Habilitar arte de capas (Cover art)
-Wide screen
-Desligar PS2
-Carregando configurações
-Salvando configurações
-Iniciar dispositivo
-Modo de inicio para dispositivos USB
-Modo de inicio para dispositivos HDD
-Modo de inicio para dispositivos ETH
-Modo de inicio para Aplicativos
-Automático
-Manual
-Iniciar servidor HDL
-Servidor HDL iniciando...
-Servidor HDL conectado...Aperte [O] para parar
-Aperte[X] para fechar o servidor HDL
-Fechando servidor HDL
-Sair para
-Cor de fundo
-Cor de texto
-Endereço IP
-Máscara de sub rede
-Gateway padrão
-Porta
-Compartilhar
-Usuário
-Senha
-<não usado>
-X Confirmar
-O item será permanentemente apagado, continuar?
-Renomear
-Deletar
-Iniciar
-Definições de tela
-Habilitar operações Deletar e Renomear
-Checar fragmentação em jogos USB
-Lembrar último jogo jogado
-Erro, o jogo está fragmentado
-Erro, não foi possível iniciar o item
-Teste
-Deixar vazio para identificação como convidado (GUEST)
+               BEM-VINDO AO ABRIR PS2 Loader. Código principal com base na origem CÓDIGO DE HD PROJECT <http://psx-scene.com> ADAPTAÇÃO AO FORMATO ADVANCE USB E GUI inicial por IFCARO <http://ps2dev.ifcaro.net> MAIS DE CARREGADOR núcleo é feito POR JIMMIKAELKAEL . Todas as melhorias gráficas são feitas por VOLCA . Obrigado por usar o NOSSO PROGRAMA ^ ^
+Abra PS2 Carregador % s
+Salvar alterações
+de volta
+configuração de rede
+<no values>
+Configurações salvas ...
+Configurações de erro de escrita !
+sair
+configurações
+Jogos USB
+HDD Games
+ETH Jogos
+Apps
+tema
+linguagem
+Erro de inicialização de rede: % d
+Não é possível conectar ao servidor SMB: % d
+Não pode entrar no servidor SMB: % d
+Não é possível abrir compartilhamento SMB :% d
+em
+fora
+ok
+definições dos jogos
+Remover todas as configurações
+Removidas todas as chaves para o jogo
+rolagem
+devagar
+médio
+rápido
+menu padrão
+Carregar a partir do disco
+espere por favor
+Erro ao carregar o ID do jogo
+classificação automática
+Erro ao carregar o arquivo de idioma
+Desativar depuração Cores
+No controlador detectou , esperando ...
+Habilitar Cover Art
+wide screen
+desligar
+carregamento de configuração
+salvando configuração
+dispositivo começar
+Modo de início do dispositivo USB
+Modo de arranque dispositivo HDD
+Modo de arranque dispositivo ETH
+Aplicações modo de começar
+automático
+manual
+Comece HDL Servidor
+HDL Servidor Iniciando ...
+HDL servidor executando ... Pressione [ O] para parar
+[X] para terminar servidor HDL Imprensa
+HDL Servidor descarga ...
+sair para
+cor de fundo
+cor do texto
+IP
+máscara
+porta de entrada
+porto
+ação
+usuário
+senha
+<not set>
+aceitar
+O artigo será excluído permanentemente , continuar?
+rebatizar
+excluir
+correr
+definições do visor
+Ativar Excluir e Renomear ações
+Verifique fragmentação jogo USB
+Lembre-se o último jogo jogado
+Revelar GSM no Menu Principal
+Erro , o jogo é fragmentado
+Erro, não podia correr o item
+teste
+Deixe em branco para auth GUEST .
 Carregar núcleo alternativo
-Método alternativo de leitura de dados
-Desativar chamadas do sistema
-Pular videos PSS
-Desabilitar suporte à DVD-DL
-Desabilitar IGR
-Buffer cdvdfsv reduzido
-Esconder módulo dev9
-Combinação IGR alternativa
-Alterar o tamanho irá reformatar o VMC
-Criar
-Modificar
-Abortar
-Resetar
-Usar genérico
-Configurar VMC
-Nome
-Tamanho
-Estado
-Progresso
-Arquivo VMC já existe
-Arquivo VMC inválido, o tamanho está incorreto
-Arquivo VMC precisa ser criado
-Erro com arquivo VMC, continuar com MC físico?
-Atualização automática
-Sobre
-Desenvolvedores
+Dados alternativos ler método
+unhook Syscalls
+0 modo PSS
+Desativar DVD -DL
+desativar IGR
+Use IOP rosqueamento corte
+Ocultar Dev9 módulo
+Combinação IGR Alternate
+Alterar o tamanho vai reformatar o VMC
+criar
+modificar
+abortar
+restabelecer
+Use genérico
+configurar VMC
+nome
+tamanho
+estado
+progresso
+Vmc existir
+Inválido arquivo VMC , tamanho está incorreto
+Vmc precisam ser criados
+Erro com VMC % s , continue com MC física (slot % d) ?
+atualização automática
+sobre
+codificadores
+atraso USB
+Caminho prefixo USB
+Deixe em branco para sair do navegador
+O valor de minuto ( s) , 0 para desabilitar spin down
+Automatic HDD spin down
+modo de vídeo
+cor de diálogo
+cor selecionada
+Exibir a página de informações
+Informações
+personalizado ELF
+seleção de cor
+reconectar
+Deixe em branco para listar ações
+ETH caminho prefixo
+retrocesso
+espaço
+entrar
+modo
+VMC Slot 1
+VMC Slot 2
+jogo ID
+DMA Mode
+V -Sync
+modo 1
+modo 2
+modo 3
+modo 4
+modo 5
+modo 6
+modo 7
+modo 8
+modo 9
+temporizador callback
+Aplicar um atraso para as funções CDVD ( 0 é o padrão )
+Velocidade Ethernet e configurações duplex
+Configurações GSM
+GSM ( 0,38)
+Forçar um modo de vídeo
+modo de vídeo
+Modo de vídeo ser forçado
+Horizontal Ajuste
+Define Horizontal offset
+Vertical Ajuste
+Define Vertical offset
+FMV salto
+Ignora Full Motion Vídeos

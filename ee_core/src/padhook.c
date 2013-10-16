@@ -132,8 +132,7 @@ static void t_loadElf(void)
 
 		if(GSM) {
 			DPRINTF("Disabling GSM...\n");
-			#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
-			static void (*DisableGSM)(void) _GSM_ENGINE_ ;
+			void (*DisableGSM)(void);
 			DisableGSM = (void *)*(volatile u32 *)(0x00080008);
 			DisableGSM();
 		}

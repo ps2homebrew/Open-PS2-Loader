@@ -187,8 +187,7 @@ int main(int argc, char **argv)
 
 	if(*(volatile u32 *)(0x0008000C)) {
 		/* Enabling GSM */
-		#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
-		static void (*EnableGSM)(void) _GSM_ENGINE_ ;
+		void (*EnableGSM)(void);
 		EnableGSM = (void *)*(volatile u32 *)(0x00080004);
 		EnableGSM();
 	}

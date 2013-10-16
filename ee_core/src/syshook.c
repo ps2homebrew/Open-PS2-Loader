@@ -280,8 +280,7 @@ void t_loadElf(void)
 		if(GSM) {
 			/* Enabling GSM */
 			DPRINTF("Enabling GSM...\n");
-			#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
-			static void (*EnableGSM)(void) _GSM_ENGINE_ ;
+			void (*EnableGSM)(void);
 			EnableGSM = (void *)*(volatile u32 *)(0x00080004);
 			EnableGSM();
 		}

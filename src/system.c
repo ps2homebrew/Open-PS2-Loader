@@ -76,10 +76,8 @@ extern int size_ps2hdd_irx;
 extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
-#ifdef GSM
 extern void *gsm_elf;
 extern int size_gsm_elf;
-#endif
 
 extern void *eecore_elf;
 extern int size_eecore_elf;
@@ -492,7 +490,6 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	EIntr();
 }
 
-#ifdef GSM
 void InstallGSM(void) {
 	/* Installing GSM */
 	LOG("Installing GSM...\n");
@@ -561,8 +558,7 @@ void PrepareGSM(void) {
 		{  VGA_VMODE, "VGA 1280x1024p @60Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_60, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001},
 		{  VGA_VMODE, "VGA 1280x1024p @75Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001}
 	}; //ends predef_vmode definition
-	#define _GSM_ENGINE_ __attribute__((section(".gsm_engine")))		// Resident section
-	static void (*InitGSM)(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, int dx_offset, int dy_offset, u8 skip_videos) _GSM_ENGINE_ ;
+	void (*InitGSM)(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, int dx_offset, int dy_offset, u8 skip_videos);
 	InitGSM = (void *)*(volatile u32 *)(0x00080000);
 	InitGSM(predef_vmode[gGSMVMode].interlace, \
 					predef_vmode[gGSMVMode].mode, \
@@ -574,7 +570,6 @@ void PrepareGSM(void) {
 					gGSMYOffset, \
 					gGSMSkipVideos);
 }
-#endif
 
 #ifdef VMC
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int compatflags, int alt_ee_core) {
@@ -587,10 +582,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	void *pdata;
 	int i;
 
-#ifdef GSM
 	if (gGSM)
 		InstallGSM();
-#endif
 
 	char *argv[3];
 	char config_str[255];
@@ -649,10 +642,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	FlushCache(0);
 	FlushCache(2);
 
-#ifdef GSM
 	if (gGSM)
 		PrepareGSM();
-#endif
 
 	ExecPS2((void *)eh->entry, 0, 3, argv);
 }
@@ -665,10 +656,8 @@ int sysExecElf(char *path, int argc, char **argv) {
 	void *pdata;
 	int i;
 
-#ifdef GSM
 	if (gGSM)
 		InstallGSM();
-#endif
 
 	char *elf_argv[1];
 
@@ -704,11 +693,9 @@ int sysExecElf(char *path, int argc, char **argv) {
 	for (i=0; i<argc; i++)
 		elf_argv[i+1] = argv[i];
 
-#ifdef GSM
 	*(volatile u32 *)(0x0008000C) = gGSM?1:0; // GSM Enable/Disable Status
 	if (gGSM)
 		PrepareGSM();
-#endif
 
 	ExecPS2((void *)eh->entry, 0, argc+1, elf_argv);
 

@@ -521,7 +521,7 @@ static void _loadConfig() {
 			if (configGetStr(configOPL, "eth_prefix", &temp))
 				strncpy(gETHPrefix, temp, 32);
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
-			configGetInt(configOPL, "reveal GSM on main menu", &gShowGSM);
+			configGetInt(configOPL, "show_gsm", &gShowGSM);
 			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
 			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
 			configGetInt(configOPL, "eth_mode", &gETHStartMode);
@@ -577,7 +577,7 @@ static void _saveConfig() {
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
-		configSetInt(configOPL, "reveal GSM on main menu", gShowGSM);
+		configSetInt(configOPL, "show_gsm", gShowGSM);
 		configSetInt(configOPL, "usb_mode", gUSBStartMode);
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);

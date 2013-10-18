@@ -82,7 +82,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Enable Delete and Rename actions",
 	"Check USB game fragmentation",
 	"Remember last played game",
-	"Reveal GSM Settings on Main Menu",
+	"Show GSM on Main Menu",
 	"Error, the game is fragmented",
 	"Error, could not run the item",
 	"Test",

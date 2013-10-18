@@ -8,6 +8,13 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev666 - * Cleaned up GSM code - Wed Oct 16 17:05:23 2013 -0400
+rev665 - Added tag 0.9.2 for changeset 3eb5ac59e7a5 - Sat Oct 12 06:59:14 2013 -0400
+rev664 - (*) Refreshed language files - Sat Oct 12 06:57:49 2013 -0400
+rev663 - (*) Aaaand after a half-assed busted GUI staring me dead in the face for over - Fri Oct 11 17:49:17 2013 -0400
+rev662 - Updating CHANGELOG ahead of release - actual release revision can be - Wed Oct 02 11:29:13 2013 -0400
+rev661 - * Rebase complete - Tue Oct 01 16:43:01 2013 -0400
+rev660 - *Modified compatibility mode 7 to not affect sceCdStRead(), as the streaming functions are already underperforming. - Wed Oct 02 00:17:01 2013 +0800
 rev659 - *Sync'ing the HDD module updates for the PSX. OPL should now run properly on the PSX. - Tue Oct 01 23:04:45 2013 +0800
 rev658 - *Sync'ing HDD updates... again. - Sun Sep 29 19:22:24 2013 +0800
 rev657 - *Sync'ing the updates in the PS2SDK with the ATAD modules here: common/include/atahw.h was updated, and all ATAD modules are using the commands defined within atahw.h. - Fri Sep 27 18:22:17 2013 +0800

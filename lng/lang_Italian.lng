@@ -144,9 +144,9 @@ timer di richiamata
 Applicare un ritardo di funzioni CDVD (0 è il valore predefinito )
 Velocità Ethernet e le impostazioni duplex
 Impostazioni GSM
-GSM ( 0.38 )
-Forzare una modalità video
-modalità Video
+Abilita GSM
+Consente di forza GSM la modalità video selezionata di seguito
+Video Mode selezionato
 Modalità Video di essere costretti
 orizzontale Regolare
 Imposta Offset orizzontale

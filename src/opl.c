@@ -480,7 +480,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "vsync", &gVSync);
 			configGetInt(configOPL, "vmode", &gVMode);
 		
-			configGetInt(configOPL, "gsm", &gGSM);
+			configGetInt(configOPL, "enable_gsm", &gEnableGSM);
 			configGetInt(configOPL, "gsmvmode", &gGSMVMode);
 			configGetInt(configOPL, "gsm_x_offset", &gGSMXOffset);
 			configGetInt(configOPL, "gsm_y_offset", &gGSMYOffset);
@@ -551,7 +551,7 @@ static void _saveConfig() {
 		configSetInt(configOPL, "vmode", gVMode);
 		configSetInt(configOPL, "vsync", gVSync);
 
-		configSetInt(configOPL, "gsm", gGSM);
+		configSetInt(configOPL, "enable_gsm", gEnableGSM);
 		configSetInt(configOPL, "gsmvmode", gGSMVMode);
 		configSetInt(configOPL, "gsm_x_offset", gGSMXOffset);
 		configSetInt(configOPL, "gsm_y_offset", gGSMYOffset);
@@ -884,7 +884,7 @@ static void setDefaults(void) {
 	gVMode = RM_VMODE_AUTO;
 	gVSync = 1;
 
-	gGSM = 0;
+	gEnableGSM = 0;
 	gGSMVMode = 0;
 	gGSMXOffset = 0;
 	gGSMYOffset = 0;

@@ -279,10 +279,10 @@ void t_loadElf(void)
 
 		if(GSM) {
 			/* Enabling GSM */
-			DPRINTF("Enabling GSM...\n");
-			void (*EnableGSM)(void);
-			EnableGSM = (void *)*(volatile u32 *)(0x00080004);
-			EnableGSM();
+			DPRINTF("Starting GSM...\n");
+			void (*StartGSM)(void);
+			StartGSM = (void *)*(volatile u32 *)(0x00080004);
+			StartGSM();
 		}
 
 		DPRINTF("t_loadElf: executing...\n");

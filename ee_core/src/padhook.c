@@ -131,10 +131,10 @@ static void t_loadElf(void)
 		SifExitRpc();
 
 		if(GSM) {
-			DPRINTF("Disabling GSM...\n");
-			void (*DisableGSM)(void);
-			DisableGSM = (void *)*(volatile u32 *)(0x00080008);
-			DisableGSM();
+			DPRINTF("Stopping GSM...\n");
+			void (*StopGSM)(void);
+			StopGSM = (void *)*(volatile u32 *)(0x00080008);
+			StopGSM();
 		}
 
 		FlushCache(0);

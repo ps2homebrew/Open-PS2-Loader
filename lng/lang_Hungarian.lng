@@ -144,9 +144,9 @@ Visszahívás időzítő
 Vigyen fel egy késedelem cDVD funkciók (0 az alapértelmezett )
 Ethernet sebesség és duplex beállítások
 GSM Settings
-GSM ( 0,38 )
-Force videó mód
-Videó üzemmód
+engedélyezése GSM
+Lehetővé teszi, hogy GSM erő a kiválasztott videó mód alatt
+Kiválasztott Videó mód
 Videó mód kénytelen
 vízszintes beállítása
 Megadja Vízszintes eltolás

@@ -75,7 +75,7 @@ paramètres d'affichage
 Activer le supprimer et renommer des actions
 Vérifiez la fragmentation de jeu USB
 Rappelez- dernier match joué
-Révéler GSM dans le menu principal
+Afficher GSM dans le menu principal
 Erreur , le jeu est fragmenté
 Erreur, ne pouvait pas courir le point
 test
@@ -144,9 +144,9 @@ Minuterie de rappel
 Appliquer un délai aux fonctions CDVD (0 est la valeur par défaut)
 Vitesse Ethernet et les paramètres duplex
 Réglages GSM
-GSM (0,38)
-Forcer un mode vidéo
-Mode vidéo
+Activer GSM
+Permet de GSM vigueur le mode sélectionné la vidéo ci-dessous
+Mode vidéo sélectionné
 Mode vidéo d'être forcé
 horizontal Réglez
 Définit décalage horizontal

@@ -75,7 +75,7 @@ Ipakita ang mga setting
 Paganahin ang Tanggalin at Palitan ang pangalan ng pagkilos
 Suriin ang USB laro pagkapira-piraso
 Tandaan ang huling play ng laro
-Magbunyag ng GSM sa Main Menu
+Ipakita ang GSM sa Main Menu
 Error, ang laro ay fragmented
 Error, hindi maaaring tumakbo ang item
 pagsubok
@@ -144,9 +144,9 @@ Callback timer
 Ilapat ang isang pagka-antala sa CDVD function (0 ang default)
 Ethernet bilis at duplex setting
 GSM Setting
-GSM ( 0.38 )
-Puwersahin ang isang video mode
-Video mode
+paganahin ang GSM
+Hinahayaan GSM puwersa ng Mga Napiling Video Mode sa ibaba
+Napiling mga Video Mode
 Video mode na pilit
 pahalang na Ayusin
 Itinatakda Pahalang Offset

@@ -216,7 +216,7 @@ struct UIItem diaGSConfig[] = {
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSM}}}, {UI_SPACER}, {UI_BOOL, GSCFG_GSM, 1, _STR_HINT_GSM, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_ENABLEGSM}}}, {UI_SPACER}, {UI_BOOL, GSCFG_ENABLEGSM, 1, _STR_HINT_ENABLEGSM, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMVMODE}}}, {UI_SPACER}, {UI_ENUM, GSCFG_GSMVMODE, 1, _STR_HINT_GSMVMODE, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMSKIPVIDEOS}}}, {UI_SPACER}, {UI_BOOL, GSCFG_GSMSKIPVIDEOS, 1, _STR_HINT_GSMSKIPVIDEOS, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
  	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_XOFFSET}}}, {UI_SPACER}, {UI_INT, GSCFG_GSMXOFFSET, 1, _STR_HINT_XOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},{UI_BREAK},

@@ -57,10 +57,10 @@ GS_MODE_DTV_1080P=0x54
 InitGSM_Ptr:	.word InitGSM		# Pointer to InitGSM
 
 .globl EnableGSM_Ptr
-EnableGSM_Ptr:	.word EnableGSM		# Pointer to EnableGSM
+StartGSM_Ptr:	.word StartGSM		# Pointer to StartGSM
 
 .globl DisableGSM_Ptr
-DisableGSM_Ptr:	.word DisableGSM	# Pointer to DisableGSM
+StopGSM_Ptr:	.word StopGSM		# Pointer to StopGSM
 
 ##############
 # Main Status 

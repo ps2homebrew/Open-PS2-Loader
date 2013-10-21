@@ -144,9 +144,9 @@ temporizador callback
 Aplicar um atraso para as funções CDVD ( 0 é o padrão )
 Velocidade Ethernet e configurações duplex
 Configurações GSM
-GSM ( 0,38)
-Forçar um modo de vídeo
-modo de vídeo
+Ativar GSM
+Deixa vigor GSM Modo de vídeo selecionado abaixo
+Modo de vídeo selecionado
 Modo de vídeo ser forçado
 Horizontal Ajuste
 Define Horizontal offset

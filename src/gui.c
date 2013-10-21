@@ -351,7 +351,7 @@ void guiShowGSConfig() {
 	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", "PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", "VGA 640x480p @60Hz", "VGA 640x960i @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", "VGA 800x600p @56Hz", "VGA 800x600p @60Hz", "VGA 800x600p @72Hz", "VGA 800x600p @75Hz", "VGA 800x600p @85Hz", "VGA 1024x768p @60Hz", "VGA 1024x768p @70Hz", "VGA 1024x768p @75Hz", "VGA 1024x768p @85Hz", "VGA 1280x1024p @60Hz", "VGA 1280x1024p @75Hz", NULL };
 
 	diaSetEnum(diaGSConfig, GSCFG_GSMVMODE, gsmvmodeNames);
-	diaSetInt(diaGSConfig, GSCFG_GSM, gGSM);
+	diaSetInt(diaGSConfig, GSCFG_ENABLEGSM, gEnableGSM);
 	diaSetInt(diaGSConfig, GSCFG_GSMVMODE, gGSMVMode);
 	diaSetInt(diaGSConfig, GSCFG_GSMXOFFSET, gGSMXOffset);
 	diaSetInt(diaGSConfig, GSCFG_GSMYOFFSET, gGSMYOffset);
@@ -359,7 +359,7 @@ void guiShowGSConfig() {
 	
 	int ret = diaExecuteDialog(diaGSConfig, -1, 1, NULL);
 	if (ret) {
-		diaGetInt(diaGSConfig, GSCFG_GSM, &gGSM);
+		diaGetInt(diaGSConfig, GSCFG_ENABLEGSM, &gEnableGSM);
 		diaGetInt(diaGSConfig, GSCFG_GSMVMODE, &gGSMVMode);
 		diaGetInt(diaGSConfig, GSCFG_GSMXOFFSET, &gGSMXOffset);
 		diaGetInt(diaGSConfig, GSCFG_GSMYOFFSET, &gGSMYOffset);

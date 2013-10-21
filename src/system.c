@@ -585,7 +585,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	int i;
 
 #ifdef GSM
-	if (gGSM)
+	if (gEnableGSM)
 		InstallGSM();
 #endif
 	char *argv[3];
@@ -634,7 +634,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
 		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode, \
-		gGSM);
+		gEnableGSM);
 
 	char cmask[10];
 	snprintf(cmask, 10, "%d", compatflags);
@@ -646,7 +646,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	FlushCache(2);
 
 #ifdef GSM
-	if (gGSM)
+	if (gEnableGSM)
 		PrepareGSM();
 #endif
 
@@ -662,7 +662,7 @@ int sysExecElf(char *path, int argc, char **argv) {
 	int i;
 
 #ifdef GSM
-	if (gGSM)
+	if (gEnableGSM)
 		InstallGSM();
 #endif
 
@@ -701,8 +701,8 @@ int sysExecElf(char *path, int argc, char **argv) {
 		elf_argv[i+1] = argv[i];
 
 #ifdef GSM
-	*(volatile u32 *)(0x0008000C) = gGSM?1:0; // GSM Enable/Disable Status
-	if (gGSM)
+	*(volatile u32 *)(0x0008000C) = gEnableGSM?1:0; // GSM Enable/Disable Status
+	if (gEnableGSM)
 		PrepareGSM();
 #endif
 

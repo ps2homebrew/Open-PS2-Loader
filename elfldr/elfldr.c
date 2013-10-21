@@ -186,10 +186,10 @@ int main(int argc, char **argv)
 	EI();
 
 	if(*(volatile u32 *)(0x0008000C)) {
-		/* Enabling GSM */
-		void (*EnableGSM)(void);
-		EnableGSM = (void *)*(volatile u32 *)(0x00080004);
-		EnableGSM();
+		/* Starting GSM */
+		void (*StartGSM)(void);
+		StartGSM = (void *)*(volatile u32 *)(0x00080004);
+		StartGSM();
 	}
 
 	ExecPS2(t_loadElf, NULL, 0, NULL);

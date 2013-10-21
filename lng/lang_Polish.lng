@@ -144,9 +144,9 @@ zegar Callback
 Zastosuj opóźnienie do CDVD funkcji (0 jest domyślnie)
 Prędkość Ethernet i dupleksu
 Ustawienia GSM
-GSM ( 0.38 )
-Wymuszanie trybu wideo
-tryb wideo
+Włącz GSM
+Umożliwia GSM wymusić Wybrany Tryb wideo poniżej
+Wybrany tryb wideo
 Tryb Video być zmuszony
 Regulacja w poziomie
 Ustawia Horizontal offset

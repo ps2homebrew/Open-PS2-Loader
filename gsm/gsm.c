@@ -207,11 +207,11 @@ _GSM_ENGINE_ void InitGSM(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 sy
 	EnableInterrupts();
 }
 
-void EnableGSM(void) {
+void StartGSM(void) {
 	SetSyscall2(2, KSEG0(&Hook_SetGsCrt));
 }
 
-void DisableGSM(void) {
+void StopGSM(void) {
 	u32* ROMSyscallTableAddress;
 
 	// Needed for SetGsCrt Unhooking

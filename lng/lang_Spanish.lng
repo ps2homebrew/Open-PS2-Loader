@@ -144,9 +144,9 @@ temporizador de devolución de llamada
 Aplicar un retraso de funciones CDVD (0 es el valor predeterminado)
 Velocidad Ethernet y la configuración dúplex
 Ajustes GSM
-GSM ( 0,38 )
-Forzar un modo de vídeo
-modo de vídeo
+Habilitar GSM
+Deja la fuerza GSM el modo de vídeo seleccionado a continuación
+Modo de vídeo seleccionado
 Modo de vídeo para ser forzada
 Horizontal Ajuste
 Establece Desplazamiento horizontal

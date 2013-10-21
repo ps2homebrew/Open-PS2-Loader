@@ -45,7 +45,7 @@
 #define UICFG_VSYNC				22
 #define UICFG_INFOPAGE			23
 
-#define GSCFG_GSM				24
+#define GSCFG_ENABLEGSM				24
 #define GSCFG_GSMVMODE			25
 #define GSCFG_GSMXOFFSET		26
 #define GSCFG_GSMYOFFSET		27

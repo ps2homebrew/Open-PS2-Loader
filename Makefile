@@ -7,7 +7,7 @@ VMC = 1
 CHILDPROOF = 0
 RTL = 0
 #change following line to "0" to build without GSM - DO NOT COMMENT!
-GSM = 0
+GSM = 1
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
@@ -27,8 +27,6 @@ EECORE_OBJS = obj/ee_core.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
-
-GSMCORE_OBJS = obj/gsm.o
 
 ifeq ($(VMC),1)
 EECORE_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
@@ -56,9 +54,15 @@ else
 	EE_CFLAGS := -O2
 endif
 
+ifeq ($(CHILDPROOF),0)
 ifeq ($(GSM),1)
-EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(EECORE_OBJS) $(GSMCORE_OBJS)
 	EE_CFLAGS += -DGSM
+	GSM_FLAGS = GSM=1
+else
+	GSM_FLAGS = GSM=0
+endif
+else
+	GSM_FLAGS = GSM=0
 endif
 
 ifeq ($(RTL),1)
@@ -113,9 +117,6 @@ ifeq ($(DEBUG),0)
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
 endif
 
-gsm:
-	$(MAKE) GSM=1 all
-
 childproof:
 	$(MAKE) CHILDPROOF=1 all
 	
@@ -142,10 +143,6 @@ sclean:
 	$(MAKE) -C ee_core -f Makefile.alt clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
-ifeq ($(GSM),1)	
-	echo "    * GSM"
-	$(MAKE) -C gsm clean
-endif
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
@@ -214,13 +211,13 @@ pc_tools_win32:
 ee_core.s:
 	echo "    * EE core"
 	$(MAKE) -C ee_core clean
-	$(MAKE) $(VMC_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
+	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
 	bin2s ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 alt_ee_core.s:
 	echo "    * alternative EE core"
 	$(MAKE) -C ee_core -f Makefile.alt clean
-	$(MAKE) $(VMC_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core -f Makefile.alt
+	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core -f Makefile.alt
 	bin2s ee_core/ee_core.elf asm/alt_ee_core.s alt_eecore_elf
 
 elfldr.s:
@@ -228,12 +225,6 @@ elfldr.s:
 	$(MAKE) -C elfldr clean
 	$(MAKE) -C elfldr
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
-
-gsm.s:
-	echo "    * GSM"
-	$(MAKE) -C gsm clean
-	$(MAKE) -C gsm
-	bin2s gsm/gsm.elf asm/gsm.s gsm_elf
 
 imgdrv.s:
 	echo "    * imgdrv.irx"

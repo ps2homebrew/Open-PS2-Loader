@@ -17,15 +17,19 @@
 #include "include/ioman.h"
 #include "assert.h"
 
-#define MENU_SETTINGS		0
-#define MENU_GFX_SETTINGS	1
-#define MENU_IP_CONFIG		2
-#define MENU_SAVE_CHANGES	3
-#define MENU_START_HDL		4
-#define MENU_GSM_SETTINGS	5
-#define MENU_ABOUT			6
-#define MENU_EXIT			7
-#define MENU_POWER_OFF		8
+enum MENU_IDs{
+	MENU_SETTINGS		= 0,
+	MENU_GFX_SETTINGS,
+	MENU_IP_CONFIG,
+	MENU_SAVE_CHANGES,
+	MENU_START_HDL,
+#ifdef GSM
+	MENU_GSM_SETTINGS,
+#endif
+	MENU_ABOUT,
+	MENU_EXIT,
+	MENU_POWER_OFF
+};
 
 // global menu variables
 static menu_list_t* menu;
@@ -90,7 +94,7 @@ void menuSaveConfig() {
 	guiHandleDeferedIO(&actionStatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuSaveConfig);
 }
 
-static void menuInitMainMenu() {
+static void menuInitMainMenu(void) {
 	if (mainMenu)
 		submenuDestroy(&mainMenu);
 
@@ -102,14 +106,20 @@ static void menuInitMainMenu() {
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
 	if (gHDDStartMode && gEnableDandR) // enabled at all?
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
+#ifdef GSM
 	if (gShowGSM) // Reveals GSM Menu - Default is No
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_GSM_SETTINGS, _STR_GSM_SETTINGS);
+#endif
 #endif
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_POWER_OFF, _STR_POWEROFF);
 
 	mainMenuCurrent = mainMenu;
+}
+
+void menuReinitMainMenu(void){
+	menuInitMainMenu();
 }
 
 // -------------------------------------------------------------------------------------------
@@ -556,8 +566,10 @@ void menuHandleInputMenu() {
 			guiShowConfig();
 		} else if (id == MENU_GFX_SETTINGS) {
 			guiShowUIConfig();
+#ifdef GSM
 		} else if (id == MENU_GSM_SETTINGS) {
 			guiShowGSConfig();
+#endif
 		} else if (id == MENU_IP_CONFIG) {
 			guiShowIPConfig();
 		} else if (id == MENU_SAVE_CHANGES) {

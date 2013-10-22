@@ -24,6 +24,9 @@
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
+#ifdef GSM
+#include "gsm_api.h"
+#endif
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)( int port, int slot, void *addr );
@@ -130,13 +133,6 @@ static void t_loadElf(void)
 		SifExitIopHeap();
 		SifExitRpc();
 
-		if(GSM) {
-			DPRINTF("Stopping GSM...\n");
-			void (*StopGSM)(void);
-			StopGSM = (void *)*(volatile u32 *)(0x00080008);
-			StopGSM();
-		}
-
 		FlushCache(0);
 		FlushCache(2);
 
@@ -241,6 +237,14 @@ static void IGR_Thread(void *arg)
 				" sync.p;"
 			);
 		}
+
+#ifdef GSM
+		if(EnableGSMOp)
+		{
+			DPRINTF("Stopping GSM...\n");
+			DisableGSM();
+		}
+#endif
 
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00FFFF; // Yellow

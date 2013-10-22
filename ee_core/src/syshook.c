@@ -277,14 +277,6 @@ void t_loadElf(void)
 		FlushCache(0);
 		FlushCache(2);
 
-		if(GSM) {
-			/* Enabling GSM */
-			DPRINTF("Starting GSM...\n");
-			void (*StartGSM)(void);
-			StartGSM = (void *)*(volatile u32 *)(0x00080004);
-			StartGSM();
-		}
-
 		DPRINTF("t_loadElf: executing...\n");
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);
 	}

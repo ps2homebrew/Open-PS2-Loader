@@ -76,9 +76,6 @@ extern int size_ps2hdd_irx;
 extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
-extern void *gsm_elf;
-extern int size_gsm_elf;
-
 extern void *eecore_elf;
 extern int size_eecore_elf;
 
@@ -491,34 +488,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 }
 
 #ifdef GSM
-void InstallGSM(void) {
-	/* Installing GSM */
-	LOG("Installing GSM...\n");
-	u8 *boot_elf = NULL;
-	elf_header_t *eh;
-	elf_pheader_t *eph;
-	void *pdata;
-	int i;
-
-	// NB: GSM.ELF is embedded
-	boot_elf = (u8 *)&gsm_elf;
-	eh = (elf_header_t *)boot_elf;
-	if (_lw((u32)&eh->ident) != ELF_MAGIC)
-		while (1);
-	eph = (elf_pheader_t *)(boot_elf + eh->phoff);
-	// Scan through the ELF's program headers and copy them into RAM, then
-	// zero out any non-loaded regions.
-	for (i = 0; i < eh->phnum; i++) {
-		if (eph[i].type != ELF_PT_LOAD)
-			continue;
-		pdata = (void *)(boot_elf + eph[i].offset);
-		memcpy(eph[i].vaddr, pdata, eph[i].filesz);
-		if (eph[i].memsz > eph[i].filesz)
-			memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
-	}
-}
-
-void PrepareGSM(void) {
+static void PrepareGSM(char *cmdline) {
 	/* Preparing GSM */
 	LOG("Preparing GSM...\n");
 	// Pre-defined vmodes 
@@ -559,17 +529,15 @@ void PrepareGSM(void) {
 		{  VGA_VMODE, "VGA 1280x1024p @60Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_60, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001},
 		{  VGA_VMODE, "VGA 1280x1024p @75Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001}
 	}; //ends predef_vmode definition
-	void (*InitGSM)(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, int dx_offset, int dy_offset, u8 skip_videos);
-	InitGSM = (void *)*(volatile u32 *)(0x00080000);
-	InitGSM(predef_vmode[gGSMVMode].interlace, \
+
+	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[gGSMVMode].interlace, \
 					predef_vmode[gGSMVMode].mode, \
 					predef_vmode[gGSMVMode].ffmd, \
 					predef_vmode[gGSMVMode].display, \
 					predef_vmode[gGSMVMode].syncv, \
 					((predef_vmode[gGSMVMode].ffmd)<<1)|(predef_vmode[gGSMVMode].interlace), \
 					gGSMXOffset, \
-					gGSMYOffset, \
-					gGSMSkipVideos);
+					gGSMYOffset);
 }
 #endif
 
@@ -583,13 +551,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	elf_pheader_t *eph;
 	void *pdata;
 	int i;
-
-#ifdef GSM
-	if (gEnableGSM)
-		InstallGSM();
-#endif
 	char *argv[3];
 	char config_str[255];
+#ifdef GSM
+	char gsm_config_str[256];
+#endif
 
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", 32);
@@ -630,42 +596,48 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	SifInitRpc(0);
 	SifExitRpc();
 
+#ifdef GSM
 	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
 		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode, \
 		gEnableGSM);
 
+	if (gEnableGSM)
+		PrepareGSM(gsm_config_str);
+#else
+	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
+		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode);
+#endif
+
+
 	char cmask[10];
 	snprintf(cmask, 10, "%d", compatflags);
 	argv[0] = config_str;	
 	argv[1] = filename;
 	argv[2] = cmask;
+#ifdef GSM
+	argv[3] = gsm_config_str;
+#endif
 
 	FlushCache(0);
 	FlushCache(2);
 
 #ifdef GSM
-	if (gEnableGSM)
-		PrepareGSM();
-#endif
-
+	ExecPS2((void *)eh->entry, 0, 4, argv);
+#else
 	ExecPS2((void *)eh->entry, 0, 3, argv);
+#endif
 }
 
 int sysExecElf(char *path, int argc, char **argv) {
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
 	elf_pheader_t *eph;
-
 	void *pdata;
 	int i;
-
-#ifdef GSM
-	if (gEnableGSM)
-		InstallGSM();
-#endif
-
 	char *elf_argv[1];
 
 	// NB: ELFLDR.ELF is embedded
@@ -693,18 +665,13 @@ int sysExecElf(char *path, int argc, char **argv) {
 	fioExit();
 	SifInitRpc(0);
 	SifExitRpc();
-	FlushCache(0);
-	FlushCache(2);
 
 	elf_argv[0] = path;
 	for (i=0; i<argc; i++)
 		elf_argv[i+1] = argv[i];
 
-#ifdef GSM
-	*(volatile u32 *)(0x0008000C) = gEnableGSM?1:0; // GSM Enable/Disable Status
-	if (gEnableGSM)
-		PrepareGSM();
-#endif
+	FlushCache(0);
+	FlushCache(2);
 
 	ExecPS2((void *)eh->entry, 0, argc+1, elf_argv);
 

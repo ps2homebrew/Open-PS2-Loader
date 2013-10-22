@@ -299,7 +299,7 @@ static int guiUIUpdater(int modified) {
 	return 0;
 }
 
-void guiShowUIConfig() {
+void guiShowUIConfig(void) {
 	curTheme = -1;
 
 	// configure the enumerations
@@ -346,7 +346,8 @@ void guiShowUIConfig() {
 	}
 }
 
-void guiShowGSConfig() {
+#ifdef GSM
+void guiShowGSConfig(void) {
 	// configure the enumerations
 	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", "PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", "VGA 640x480p @60Hz", "VGA 640x960i @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", "VGA 800x600p @56Hz", "VGA 800x600p @60Hz", "VGA 800x600p @72Hz", "VGA 800x600p @75Hz", "VGA 800x600p @85Hz", "VGA 1024x768p @60Hz", "VGA 1024x768p @70Hz", "VGA 1024x768p @75Hz", "VGA 1024x768p @85Hz", "VGA 1280x1024p @60Hz", "VGA 1280x1024p @75Hz", NULL };
 
@@ -368,8 +369,9 @@ void guiShowGSConfig() {
 		applyConfig(-1, -1);
 	}
 }
+#endif
 
-void guiShowIPConfig() {
+void guiShowIPConfig(void) {
 	size_t i;
 	const char *ethOpModes[]={_l(_STR_AUTO), _l(_STR_ETH_100MFDX), _l(_STR_ETH_100MHDX), _l(_STR_ETH_10MFDX), _l(_STR_ETH_10MHDX), NULL};
 	diaSetEnum(diaIPConfig, NETCFG_ETHOPMODE, ethOpModes);

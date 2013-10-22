@@ -264,6 +264,29 @@ int _strtoi(const char* p)
 }
 
 /*----------------------------------------------------------------------------------------*/
+/* This function converts string to unsigned long integer. Stops on illegal characters.   */
+/* Put here because including atoi rises the size of loader.elf by another kilobyte       */
+/* and that causes some games to stop working.                                            */
+/*----------------------------------------------------------------------------------------*/
+unsigned long int _strtoul(const char* p)
+{
+	if (!p)
+		return 0;
+
+	unsigned long int r = 0;
+
+	while (*p)
+	{
+		if ((*p < '0') || (*p > '9'))
+			return r;
+
+		r = r * 10 + (*p++ - '0');
+	}
+
+	return r;
+}
+
+/*----------------------------------------------------------------------------------------*/
 /* This function format g_ipconfig with ip, netmask, and gateway                          */
 /*----------------------------------------------------------------------------------------*/
 void set_ipconfig(void)

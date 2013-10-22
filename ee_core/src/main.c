@@ -11,6 +11,9 @@
 #include "modmgr.h"
 #include "util.h"
 #include "syshook.h"
+#ifdef GSM
+#include "gsm_api.h"
+#endif
 
 static char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
 
@@ -75,9 +78,27 @@ int main(int argc, char **argv){
 	g_ps2_ETHOpMode=_strtoui(_strtok(NULL, " "));
 	DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 
-	p = _strtok(NULL, " ");
-	GSM = _strtoi(p);
-	DPRINTF("GSM = %d\n", GSM);
+#ifdef GSM
+	EnableGSMOp = _strtoi(_strtok(NULL, " "));
+	DPRINTF("GSM = %s\n", EnableGSMOp==0?"Disabled":"Enabled");
+
+	if(EnableGSMOp){
+		int interlace, mode, ffmd, dx_offset, dy_offset;
+		u64 display, syncv, smode2;
+
+		interlace=_strtoi(_strtok(argv[3], " "));
+		mode=_strtoi(_strtok(NULL, " "));
+		ffmd=_strtoi(_strtok(NULL, " "));
+		display=_strtoul(_strtok(NULL, " "));
+		syncv=_strtoul(_strtok(NULL, " "));
+		smode2=_strtoui(_strtok(NULL, " "));
+		dx_offset=_strtoi(_strtok(NULL, " "));
+		dy_offset=_strtoi(_strtok(NULL, " "));
+
+		UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset);
+		EnableGSM();
+	}
+#endif
 
 	// bitmask of the compat. settings
 	g_compat_mask = _strtoui(argv[2]);

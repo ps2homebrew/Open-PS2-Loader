@@ -145,7 +145,9 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+#ifdef GSM
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWGSM}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWGSM, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+#endif
 
 	{UI_SPLITTER},
 
@@ -210,6 +212,7 @@ struct UIItem diaUIConfig[] = {
 	{UI_TERMINATOR}
 };
 
+#ifdef GSM
 	// GSM Menu
 struct UIItem diaGSConfig[] = {
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
@@ -228,6 +231,7 @@ struct UIItem diaGSConfig[] = {
 	// end of dialog
 	{UI_TERMINATOR}
 };
+#endif
 
 struct UIItem diaAbout[] = {
 	{UI_LABEL, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},

@@ -74,7 +74,7 @@ int GameMode;
 char ExitPath[32];
 int USBDelay;
 int HDDSpindown;
-int GSM;
+int EnableGSMOp;
 
 int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)

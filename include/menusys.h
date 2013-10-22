@@ -75,6 +75,7 @@ typedef struct menu_list {
 
 void menuInit();
 void menuEnd();
+void menuReinitMainMenu(void);
 
 void menuAppendItem(menu_item_t* item);
 

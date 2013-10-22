@@ -12,6 +12,7 @@
 # g_buf is located at 0x00088000
 
 EE_BIN = ee_core.elf
+GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
 EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o \
 	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/asm.o obj/crt0.o
 MAPFILE = ee_core.map
@@ -29,6 +30,10 @@ EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 endif
 ifeq ($(VMC),1)
 EE_CFLAGS += -DVMC
+endif
+ifeq ($(GSM),1)
+EE_OBJS += $(GSMCORE_EE_OBJS)
+EE_CFLAGS += -DGSM
 endif
 
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s

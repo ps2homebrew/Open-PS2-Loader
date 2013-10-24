@@ -40,9 +40,8 @@
 #define SD_S_NON_LO(core)   SD_S_REG((core), 0x06)
 #define SD_CORE_ATTR(core)  SD_S_REG((core), 0x1A)
 
-
 // Reset SPU sound processor
-void ResetSPU()
+void ResetSPU(void)
 {
 	u32 core;
 	volatile u16 *statx;

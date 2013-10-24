@@ -10,6 +10,6 @@
 #ifndef SPU_H
 #define SPU_H
 
-void ResetSPU();
+void ResetSPU(void);
 
 #endif /* SPU */

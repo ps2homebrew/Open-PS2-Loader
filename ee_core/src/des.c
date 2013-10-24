@@ -49,10 +49,10 @@
  * [including the GNU Public Licence.]
  */
 
-#define c2l(c,l)	(l =((unsigned long)(*((c)++))), \
-			 l|=((unsigned long)(*((c)++)))<< 8, \
-			 l|=((unsigned long)(*((c)++)))<<16, \
-			 l|=((unsigned long)(*((c)++)))<<24)
+#define c2l(c,l)	(l =((unsigned int)(*((c)++))), \
+			 l|=((unsigned int)(*((c)++)))<< 8, \
+			 l|=((unsigned int)(*((c)++)))<<16, \
+			 l|=((unsigned int)(*((c)++)))<<24)
 
 #define l2c(l,c)	(*((c)++)=(unsigned char)(((l)    )&0xff), \
 			 *((c)++)=(unsigned char)(((l)>> 8)&0xff), \
@@ -64,7 +64,7 @@
 	(a)=(a)^(t)^(t>>(16-(n))))
 
 
-static unsigned long des_SPtrans[8][64]={
+static const unsigned int des_SPtrans[8][64]={
 /* nibble 0 */
 {
 0x00820200, 0x00020000, 0x80800000, 0x80820200,
@@ -217,7 +217,7 @@ static unsigned long des_SPtrans[8][64]={
 0x00000020, 0x08208000, 0x00208020, 0x00000000,
 0x08000000, 0x08200020, 0x00008000, 0x00208020
 }};
-static unsigned long des_skb[8][64]={
+static const unsigned int des_skb[8][64]={
 /* for C bits (numbered as per FIPS 46) 1 2 3 4 5 6 */
 {
 0x00000000,0x00000010,0x20000000,0x20000010,
@@ -461,16 +461,16 @@ static unsigned char DES_Keys[128] __attribute__((aligned(64)));
  */
 static unsigned char *DES_createkeys(unsigned char *key)
 {
-	unsigned long c, d, t, s;
+	unsigned int c, d, t, s;
  	unsigned char *in;
-	unsigned long *k;
+	unsigned int *k;
 	unsigned char k8[8];
 	int i;
 	static unsigned char shifts[16] = { 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 };
 
 	key7TOkey8(key, k8);
 
-	k = (unsigned long *)DES_Keys;
+	k = (unsigned int *)DES_Keys;
 	in = (unsigned char *)k8;
 
 	c2l(in, c);
@@ -525,15 +525,15 @@ static unsigned char *DES_createkeys(unsigned char *key)
 
 unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *cipher)
 {
-	unsigned long l, r, t, u;
+	unsigned int l, r, t, u;
 	int i;
-	unsigned long *s;
+	unsigned int *s;
 	unsigned char *keys;
 
 	keys = DES_createkeys(key);
 
-	c2l(message, l); /* get endian free long from input block */
-	c2l(message, r); /* get endian free long from input block */
+	c2l(message, l); /* get endian free int from input block */
+	c2l(message, r); /* get endian free int from input block */
 
 	/* do IP */
 	PERM_OP(r,l,t, 4,0x0f0f0f0f);
@@ -554,11 +554,7 @@ unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *ci
 	r = (l << 1) | (l >> 31); 
 	l = t;
 
-	/* clear the top bits on machines with 8byte longs */
-	l &= 0xffffffff;
-	r &= 0xffffffff;
-
-	s = (unsigned long *)keys;
+	s = (unsigned int *)keys;
 	/* I don't know if it is worth the effort of loop unrolling the
 	 * inner loop */
 	for (i=0; i<32; i+=4) {
@@ -567,9 +563,6 @@ unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *ci
 	}
 	l = (l >> 1) | (l << 31);
 	r = (r >> 1) | (r << 31);
-	/* clear the top bits on machines with 8byte longs */
-	l &= 0xffffffff;
-	r &= 0xffffffff;
 
 	/* swap l and r
 	 * we will not do the swap so just remember they are
@@ -582,8 +575,8 @@ unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *ci
 	PERM_OP(l,r,t,16,0x0000ffff);
 	PERM_OP(r,l,t, 4,0x0f0f0f0f);
 
-	l2c(l, cipher); /* get endian free long from input block */
-	l2c(r, cipher); /* get endian free long from input block */
+	l2c(l, cipher); /* get endian free int from input block */
+	l2c(r, cipher); /* get endian free int from input block */
 
 	return (unsigned char *)cipher;
 }

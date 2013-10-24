@@ -97,23 +97,6 @@ static void *g_sysLoadedModBuffer[MAX_MODULES];
 #define ELF_MAGIC		0x464c457f
 #define ELF_PT_LOAD		1
 
-// CDVD Registers
-#define CDVD_R_SCMD ((volatile u8*)0xBF402016)
-#define CDVD_R_SDIN ((volatile u8*)0xBF402017)
-
-// DEV9 Registers
-#define DEV9_R_1460 ((volatile u16*)0xBF801460)
-#define DEV9_R_1464 ((volatile u16*)0xBF801464)
-#define DEV9_R_1466 ((volatile u16*)0xBF801466)
-#define DEV9_R_146C ((volatile u16*)0xBF80146C)
-#define DEV9_R_146E ((volatile u16*)0xBF80146E)
-#define DEV9_R_1474 ((volatile u16*)0xBF801474)
-
-#define	ROMSEG0(vaddr)	(0xbfc00000 | vaddr) 	// arghhh! avoid using this macro: some PS2 with modchips badly disabled seems 
-						// to not tolerate very well direct BIOS access!!!
-#define	KSEG0(vaddr)	(0x80000000 | vaddr)
-#define	JAL(addr)	(0x0c000000 | ((addr & 0x03ffffff) >> 2))
-
 typedef struct {
 	u8	ident[16];	// struct definition for ELF object header
 	u16	type;
@@ -193,7 +176,7 @@ void sysReset(int modload_mask) {
 
 	SifInitRpc(0);
 
-	while(!SifIopReset("rom0:UDNL rom0:EELOADCNF", 0));
+	while(!SifIopReset(NULL, 0));
 	while(!SifIopSync());
 
 	SifInitRpc(0);
@@ -393,7 +376,7 @@ void sysGetCDVDFSV(void **data_irx, int *size_irx)
 }
 
 void sysExecExit() {
-	if(gExitPath[0]!='\0') sysExecElf(gExitPath, 0, NULL);
+	if(gExitPath[0]!='\0') sysExecElf(gExitPath);
 
 	Exit(0);
 }
@@ -632,7 +615,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 }
 
-int sysExecElf(char *path, int argc, char **argv) {
+int sysExecElf(char *path) {
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
 	elf_pheader_t *eph;
@@ -667,13 +650,11 @@ int sysExecElf(char *path, int argc, char **argv) {
 	SifExitRpc();
 
 	elf_argv[0] = path;
-	for (i=0; i<argc; i++)
-		elf_argv[i+1] = argv[i];
 
 	FlushCache(0);
 	FlushCache(2);
 
-	ExecPS2((void *)eh->entry, 0, argc+1, elf_argv);
+	ExecPS2((void *)eh->entry, 0, 1, elf_argv);
 
 	return 0;
 }

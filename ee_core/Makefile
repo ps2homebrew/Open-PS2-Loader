@@ -14,7 +14,7 @@
 EE_BIN = ee_core.elf
 GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
 EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o \
-	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/asm.o obj/crt0.o
+	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/tlb.o obj/asm.o obj/crt0.o
 MAPFILE = ee_core.map
 
 EE_SRC_DIR = src/

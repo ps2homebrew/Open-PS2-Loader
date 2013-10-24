@@ -21,7 +21,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #else
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int compatflags, int alt_ee_core);
 #endif
-int sysExecElf(char *path, int argc, char **argv);
+int sysExecElf(char *path);
 int sysPS3Detect(void);
 int sysSetIPConfig(char* ipconfig);
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);

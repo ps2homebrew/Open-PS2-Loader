@@ -79,6 +79,4 @@ int EnableGSMOp;
 int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
 
-extern void (*InitializeTLB)(void);
-
 #endif

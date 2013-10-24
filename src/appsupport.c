@@ -133,7 +133,7 @@ static void appLaunchItem(int id, config_set_t* configSet) {
 		char filename[255];
 		sprintf(filename,"%s",cur->val);
 		shutdown(exception); // CAREFUL: shutdown will call appCleanUp, so configApps/cur will be freed
-		sysExecElf(filename, 0, NULL);
+		sysExecElf(filename);
 	}
 	else
 		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);

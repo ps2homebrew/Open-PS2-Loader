@@ -151,7 +151,6 @@ static u32 AC9Bpattern_mask[] = {
 static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
 static u32 g_delay_cycles;
 
-
 static void NIS_generic_patches(void)
 {
 	u32 *ptr;
@@ -201,16 +200,14 @@ static void generic_delayed_cdRead_patches(u32 patch_addr, u32 delay_cycles)
 	_sw(JAL((u32)delayed_cdRead), patch_addr);
 }
 
-
 static int (*capcom_lmb)(void *modpack_addr, int mod_index, int mod_argc, char **mod_argv);
 
 static void apply_capcom_protection_patch(void *modpack_addr, int mod_index, int mod_argc, char **mod_argv)
 {
 	u32 iop_addr = _lw((u32)modpack_addr + (mod_index << 3) + 8);
 	u32 opcode = 0x10000025;
+	SyncDCache((void*)opcode, (void *)((unsigned int)&opcode + sizeof(opcode)));	//Can this be replaced with a write to the uncached segment? I don't understand why the D-cache is a problem when dealing with this EE->IOP RAM window since it uses memcpy(), so I'll leave it with SyncDCache() as usual.
 	smem_write((void *)(iop_addr+0x270), (void *)&opcode, sizeof(opcode));
-	FlushCache(0);
-	FlushCache(2);
 
 	capcom_lmb(modpack_addr, mod_index, mod_argc, mod_argv);
 }
@@ -220,7 +217,6 @@ static void generic_capcom_protection_patches(u32 patch_addr)
 	capcom_lmb = (void *)FNADDR(_lw(patch_addr));
 	_sw(JAL((u32)apply_capcom_protection_patch), patch_addr);
 }
-
 
 void apply_patches(void)
 {

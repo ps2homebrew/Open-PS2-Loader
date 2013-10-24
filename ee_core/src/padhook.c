@@ -24,6 +24,7 @@
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
+#include "tlb.h"
 #ifdef GSM
 #include "gsm_api.h"
 #endif
@@ -208,16 +209,7 @@ static void IGR_Thread(void *arg)
 		// Init TLB
 		if(Cop0_Index != 0x26)
 		{
-			if(GetMemorySize()==0x02000000){
-				DI();
-				ee_kmode_enter();
-				InitializeTLB();
-				ee_kmode_exit();
-				EI();
-			}
-			else{
-				_InitTLB();
-			}
+			InitializeTLB();
 		}
 
 		// Check Performance Counter

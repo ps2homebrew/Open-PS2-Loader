@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev671 - *Replaced the TLB reinitialization mechanism with a built-in one. No more patching/hooking onto the EE kernel for that! Done partly for compatibility with the PSX. - Thu Oct 24 15:13:40 2013 +0800
 rev670 - * Hey Bat! Try not to commit non-default changes to Makefiles next time, will - Tue Oct 22 14:06:16 2013 -0400
 rev669 - * MASSIVE UPDATE - Consider deleting and re-cloning your local repos if - Tue Oct 22 13:55:08 2013 -0400
 rev668 - * Massive changes to GSM function calls - some of which were so similar that - Mon Oct 21 17:29:56 2013 -0400

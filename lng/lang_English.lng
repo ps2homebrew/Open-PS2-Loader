@@ -172,6 +172,10 @@ Mode 9
 Callback timer
 Apply a delay to CDVD functions (0 is default)
 Ethernet speed and duplex settings
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 GSM Settings
 Enable GSM
 Lets GSM force the Selected Video Mode below

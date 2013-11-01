@@ -1,156 +1,160 @@
 # translation by Grey Wolf
 Turkish
-               AÇIK PS2 YÜKLEYİCİ HOŞGELDİNİZ . ANA KOD USB ​​ADVANCE BİÇİM VE YÜKLEYİCİ CORE EN JIMMIKAELKAEL TARAFINDAN YAPILAN IS IFCARO <http://ps2dev.ifcaro.net> İLE İLK GUI İÇİN HD PROJE <http://psx-scene.com> UYUM KAYNAK KODU DAYALI . TÜM GUI GELİŞMELER Volca TARAFINDAN YAPILMAKTADIR . BİZİM PROGRAMI KULLANARAK İÇİN TEŞEKKÜRLER ^ ^
-Açık PS2 Loader % s
-değişiklikleri kaydet
-geri
-ağ yapılandırma
-<no değerler>
-Ayarlar kaydedildi ...
-Hata yazma ayarları !
+               OPEN PS2 LOADER A HOŞ GELDİNİZ. ANA KOD HD PROJECT KAYNAK KODUNDAN OLUŞTURULMUŞTUR <http://psx-scene.com> USB ADVANCE PROGRAMINA UYUM VE TEMEL ARAYÜZ IFCARO TARAFINDAN GELİŞTİRİLMİŞTİR <http://ps2dev.ifcaro.net> NEREDEYSE TÜM ÇEKİRDEK JIMMIKAELKAEL TARAFINDAN GELİŞTİRİLMİŞTİR. TUM ARAYÜZ İYİLEŞTİRMELERİ VOLCA TARAFINDAN GERÇEKLEŞTİRİLMİŞTİR. PROGRAMIMIZI KULLANDIĞINIZ İÇİN TEŞEKKÜR EDERİZ ^^
+Open PS2 Loader %s
+Değişiklikleri kaydet
+Geri
+Ağ yapılandırma
+<değer yok>
+Ayarlar kaydedildi...
+Ayarlar yazılırken hata oluştu!
 Çıkış
 Ayarlar
 USB Oyunları
 HDD Oyunları
-ETH Oyunları
+AĞ Oyunları
 Uygulamalar
-tema
-dil
-Ağ başlatma hatası : % d
-SMB sunucusuna bağlanamıyor : % d
-SMB sunucusuna giriş yapamıyorum : % d
-SMB paylaşım açılamıyor : % d
-üzerinde
-kapalı
+Tema
+Dil
+Ağ başlatma hatası: %d
+SMB sunucusuna bağlanılamıyor: %d
+SMB sunucusuna girilemiyor: %d
+SMB paylaşımı açılamıyor: %d
+Açık
+Kapalı
 Tamam
-oyun ayarları
-Tüm ayarları kaldırın
-Oyun için tüm tuşlar kaldırıldı
-kaydırma
-yavaş
-orta
-hızlı
-varsayılan menü
-Diskten yükleyin
+Oyun ayarları
+Tüm ayarları kaldır
+Oyun için kayıtlı tüm anahtarlar kaldırıldı
+Kaydırma
+Yavaş
+Orta
+Hızlı
+Varsayılan menü
+Diskten yükle
 Lütfen bekleyin
-HataOyun ID yüklenirken
-otomatik sıralama
-Dil dosyası yükleme hatası
-Debug Renkler devre dışı
-Hiçbir kontrol bekliyor , tespit ...
-Sanat Kapak etkinleştirin
-geniş ekran
-güç kapalı
-yapılandırma yükleme
-yapılandırma tasarrufu
-cihaz Başlangıç
-USB aygıtı başlatma modunu
-HDD cihazı başlatma modunu
-ETH cihaz başlatma modunu
-Uygulamalar başlangıç ​​modu
-oto
-manuel
-HDL Sunucu Başlangıç
-HDL Sunucu başlatılıyor ...
-HDL Server çalıştıran ... Basın [ O] durdurmak için
-Basın [ X ] sonlandırmak için HDL sunucu
-HDL Sunucu Boşaltma ...
-çıkmak
-arka plan rengi
-metin rengi
+Oyun ID'si yüklenirken hata oluştu
+Otomatik sıralama
+Dil dosyası yüklenirken hata oluştu
+Hata ayıklama renklerini kapat
+Oyun kolu algılanmadı, bekleniyor...
+Kapak Resimlerini etkinleştir
+Geniş ekran
+Kapat
+Yapılandırma yükleniyor
+Yapılandırma kaydediliyor
+Cihazı başlat
+USB cihazı başlama modu
+HDD cihazı başlama modu
+AĞ cihazı başlama modu
+Uygulamalar başlama modu
+Otomatik
+El ile
+HDL Sunucusunu Başlat
+HDL Sunucusu Başlatılıyor...
+HDL Sunucusu Çalışıyor... Durdurmak için [O]a basın
+HDL Sunucusunu kapatmak için [X]e basın
+HDL Sunucusu Kapatılıyor...
+IGR yolu
+Arkaplan rengi
+Metin rengi
 IP
-maske
-geçit
-liman
-pay
-kullanıcı
-parola
+Ağ maskesi
+Ağ geçidi
+Port
+Paylaşım
+Kullanıcı
+Şifre
 <ayarlanmadı>
-kabul etmek
-Öğe kalıcı olarak devam silinir ?
-yeni ad vermek
-silmek
-çalıştırmak
-Ekran ayarları
-Sil etkinleştirin ve eylemleri yeniden adlandırma
-USB oyun parçalanma kontrol edin
-Son oynanan oyun hatırla
-Ana Menü GSM Reveal
-Hata , oyun parçalanır
-Hata , madde çalışmaz olabilir
-test
-MİSAFİR kimlik doğrulama için boş bırakın .
-Alternatif çekirdek Yük
-Alternatif veri yöntemi okuma
-unhook syscalls
+Kabul et
+Nesne kalıcı olarak silinecek, devam edilsin mi ?
+Yeniden adlandır
+Sil
+Çalıştır
+Görüntü ayarları
+Sil ve Yeniden adlandırı etkinleştir
+USByi oyun parçalanması için denetle
+Son oynanan oyunu hatırla
+Ana menüde GSMi göster
+Hata, oyun parçalanmış
+Hata, nesne çalıştırılamıyor
+Dene
+MİSAFİR giriş için boş bırakın.
+Alternatif çekirdeği yükle
+Alternatif veri okuma metodu
+Sis çağrılarını çöz
 0 PSS modu
-DVD - DL devre dışı bırakın
-IGR devre dışı
-GİB diş kesmek kullanın
-Dev9 modülü gizle
-Alternatif IGR combo
-Boyutunu değiştirmeVMC yeniden biçimlendirmek olacaktır
-oluşturmak
-değiştirmek
-iptal etmek
-ayarlamak
-genel kullanın
-VMC yapılandırma
-ad
-boyut
-durum
-ilerleme
+DVD-DL i etkisizleştir
+IGR i etkisizleştir
+IOP işlem sırasını hackle
+Dev9 modulünü sakla
+Alternatif IGR kombinasyonu
+Boyutu değiştirmek VMC nin biçimlendirilmesine neden olur
+Oluştur
+Düzenle
+Vazgeç
+Resetle
+Normali kullan
+VMC Yapılandırma
+İsim
+Boyut
+Durum
+İlerleme
 VMC dosyası var
-Geçersiz VMC dosyası , boyutu doğru değil
-VMC dosyası oluşturulması gerekir
-VMC % s Hata , fiziksel MC ( yuva % d ) ile devam ?
-otomatik yenileme
-hakkında
-Coders
-USB gecikme
-USB önek yolu
-Tarayıcı çıkmak için boş bırakın
-Spin aşağı devre dışı bırakmak için dakika ( s ) , 0 olarak değer
-Otomatik HDD aşağı doğru döndürün
-Video modu
-iletişim renk
-seçilen renk
-Bilgi sayfasını görüntüleme
-bilgi
-özel ELF
-renk seçimi
-yeniden
-Hisse Listeye boş bırakın
-ETH önek yolu
-geri tuşu
-alan
-girmek
-moda
-VMC Yuva 1
-VMC Yuva 2
-oyun ID
-DMA Mode
-V - Sync
-mod 1
-mod 2
-mod 3
-mod 4
-mod 5
-mod 6
-mod 7
-mod 8
-mod 9
-Geri arama zamanlayıcı
-CDVD işlevlerine bir gecikme uygulayın ( 0 varsayılan )
-Ethernet hızı ve dupleks ayarları
+Geçersiz VMC dosyası, boyut hatalı
+VMC dosyası oluşturulmak zorunda
+VMC dosyası hatalı, fiziksel HK ile devam edilsin mi ?
+Otomatik yenileme
+Hakkında
+Geliştiriciler
+USB gecikmesi
+USB yolu
+Browsera çıkmak için boş bırakın
+Değer dakika(lar)ı belirtir. Yavaşlamayı etkisizleştirmek için 0
+Otomatik HDD yavaşlaması
+Görüntü modu
+Etkileşim rengi
+Seçili rengi
+Bilgi sayfasını göster
+Bilgi
+Kişisel ELF
+Renk seçimi
+Tekrar bağlan
+Paylaşımları listelemk için boş bırakın
+AĞ yolu
+Sil
+Boşluk
+Giriş
+Mod
+VMC Slotu 1
+VMC Slotu 2
+Oyun IDsi
+DMA modu
+V-Senk
+Mod 1
+Mod 2
+Mod 3
+Mod 4
+Mod 5
+Mod 6
+Mod 7
+Mod 8
+Mod 9
+Çağrı zamanlayıcısı
+CDVD fonksiyonlarını geciktirir (varsayılan 0)
+Eternet hızı ve duplex ayarları
+100Mbit tam-duplex
+100Mbit yarı-duplex
+10Mbit tam-duplex
+10Mbit yarı-duplex
 GSM Ayarları
-GSM etkinleştirin
-GSM gücü aşağıdaki Seçilen Video Modu sağlar
-Seçilen Video Modu
-Zorunda olmak Video modu
-ayarlayın yatay
-Ofset Yatay Setleri
-ayarlayın dikey
-Ofset Dikey Setleri
+GSMi etkinleştir
+GSMin alttaki görüntü modlarını zorlamasını sağlar
+Seçili görüntü modu
+Zorlanacak görüntü modu
+Yatay düzeltme
+Yatay sınırları ayarlar
+Dikey düzeltme
+Dikey sınırları ayarlar
 FMV atlama
-Atlar Full Motion Video
+Oyun içi vidyoları atlar

@@ -143,9 +143,13 @@ Tryb 9
 zegar Callback
 Zastosuj opóźnienie do CDVD funkcji (0 jest domyślnie)
 Prędkość Ethernet i dupleksu
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 Ustawienia GSM
 Włącz GSM
-Umożliwia GSM wymusić Wybrany Tryb wideo poniżej
+Umożliwia GSM wymusić Wybrany Tryb wideo
 Wybrany tryb wideo
 Tryb Video być zmuszony
 Regulacja w poziomie

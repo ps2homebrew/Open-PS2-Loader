@@ -143,9 +143,13 @@ Mode 9
 Visszahívás időzítő
 Vigyen fel egy késedelem cDVD funkciók (0 az alapértelmezett )
 Ethernet sebesség és duplex beállítások
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 GSM Settings
 engedélyezése GSM
-Lehetővé teszi, hogy GSM erő a kiválasztott videó mód alatt
+Lehetővé teszi, hogy GSM erő a kiválasztott videó mód
 Kiválasztott Videó mód
 Videó mód kénytelen
 vízszintes beállítása

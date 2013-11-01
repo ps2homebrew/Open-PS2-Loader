@@ -143,14 +143,19 @@ Mode 9
 Callback timer
 Ilapat ang isang pagka-antala sa CDVD function (0 ang default)
 Ethernet bilis at duplex setting
-GSM Setting
-paganahin ang GSM
-Hinahayaan GSM puwersa ng Mga Napiling Video Mode sa ibaba
-Napiling mga Video Mode
-Video mode na pilit
-pahalang na Ayusin
-Itinatakda Pahalang Offset
-Ayusin ang Vertical
-Itinatakda Vertical Offset
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Mga Setting
+paganahin GSM
+Hinahayaan GSM puwersa na Mga Napiling Mode na Video na
+Napiling mga na Video na Mode
+Na Video mode sa na pinilit
+pahalang Isaayos
+Itinatakda Pahalang na Offset ng
+Isaayos ang Patayong
+Itinatakda ang Patayong Offset ng
 Laktawan ang FMV
+Skips Buong Paggalaw na Video
 Skips Full Motion Video

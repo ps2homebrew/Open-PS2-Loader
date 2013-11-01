@@ -1,136 +1,137 @@
-# translation by izdubar
+#
+# traduction par shaolinassassin <http://psx-scene.com/forums/members/shaolinassassin/>
 French
-               Welcome to Open PS2 Loader. CODE principale basée sur le code source de la HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET GUI INITIAL PAR IFCARO <http://ps2dev.ifcaro.net> PLUS DE CHARGEUR Core est DE JIMMIKAELKAEL . Toutes les améliorations GUI SONT DE VOLCA . MERCI POUR utilisant notre programme ^ ^
-Open PS2 Loader % s
-Enregistrer les modifications
+               BIENVENUE SOUS OPEN PS2 LOADER. CODE BASE SUR LE CODE SOURCE DE HD PROJECT <http://psx-scene.com> ADAPTATION AU FORMAT USB ADVANCE ET INTERFACE DE CONTROLE ORIGINALE PAR IFCARO<http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. INTERFACE DE CONTROLE ACTUELLE PAR VOLCA. MERCI D�UTILISER CE PROGRAMME ^^
+Open PS2 Loader %s
+Sauvegarder les modifications
 Retour
-Config réseau
-<aucun valeurs>
-Les paramètres enregistrés ...
-Paramètres d'écriture d'erreur !
-quitter
-réglages
-Jeux USB
-HDD Jeux
-ETH Jeux
+Configuration réseau
+<vide>
+Configuration sauvegardée...
+Echec de la sauvegarde de la configuration!
+Quitter Open PS2 Loader
+Configuration
+Jeux sur périph. USB
+Jeux sur disque dur
+Jeux sur réseau
 Applications
-thème
-langue
-Réseau d'erreur au démarrage :% d
-Impossible de se connecter au serveur SMB :% d
-Impossible de se connecter au serveur SMB :% d
-Impossible d'ouvrir le partage SMB :% d
-sur
-off
+Thème
+Langue
+Erreur de démarrage du réseau: %d
+Impossible de se connecter au serveur SMB
+Impossible de s'identifier auprès du serveur SMB
+Impossible d'ouvrir le dossier SMB 
+Activé
+Désactivé
 Ok
-Paramètres de jeu
-Supprimez tous les paramètres
-Suppression de toutes les clés pour le jeu
-défilement
-lent
-Medium
-rapide
-Menu par défaut
-Charger à partir du disque
-S'il vous plaît attendre
+Réglages du jeu
+Réinitialiser tous les réglages
+Réglages du jeu supprimés
+Vitesse de défilement
+Lente
+Moyenne
+Rapide
+Menu au démarrage
+Charger depuis le jeu
+Veuillez patienter
 Erreur lors du chargement de l'ID du jeu
-tri automatique
+Classement alphabétique
 Erreur lors du chargement du fichier de langue
-Désactiver le débogage Couleurs
-Aucun contrôleur détecté , dans l'attente ...
-Activer Couvrir Art
-grand écran
-Éteindre
-Chargement config
-Sauvegarde config
-dispositif de démarrage
-Le mode de démarrage de dispositif USB
-Mode de démarrage de l'appareil HDD
-Mode de démarrage de l'appareil ETH
-Applications mode de démarrage
-Auto
+Désactiver l'écran de débug
+Manette déconnectée, en attente...
+Visualiser les jaquettes des jeux
+Plein écran
+Eteindre la PS2
+Chargement de la configuration
+Sauvegarde de la configuration
+Démarrer le dispositif
+Mode de démarrage du périph. USB
+Mode de démarrage du disque dur
+Mode de démarrage du réseau
+Mode de démarrage des applications
+Automatique
 Manuel
-Commencez HDL serveur
-HDL Server Démarrage ...
-HDL serveur exécutant ... Appuyez sur [ O ] pour arrêter
-Appuyez sur [ X ] pour mettre fin à de serveur de HDL
-HDL serveur déchargement ...
-Sortie sur
-Couleur de fond
+Démarrer le serveur HDL
+Démarrage du serveur HDL...
+Serveur HDL en service... Appuyer sur [O] pour le déconnecter
+Appuyer sur [X] pour fermer le serveur HDL
+Fermeture du serveur HDL...
+Quitter le jeu (IGR) vers...
+Couleur d'arrière-plan
 Couleur du texte
-IP
-masque
-passerelle
+Adresse IP
+Masque de sous-réseau
+Passerelle par défaut
 Port
-Partager
-utilisateur
-mot de passe
-<not set>
-accepter
-L'article sera définitivement supprimé , continuer ?
-renommez
-supprimer
-exécuter
-paramètres d'affichage
-Activer le supprimer et renommer des actions
-Vérifiez la fragmentation de jeu USB
-Rappelez- dernier match joué
-Afficher GSM dans le menu principal
-Erreur , le jeu est fragmenté
-Erreur, ne pouvait pas courir le point
-test
-Laissez vide pour auth invité.
-Chargez autre noyau
-Données méthode alternative lus
-Décrocher Syscalls
-0 Mode PSS
-Désactiver DVD -DL
-désactiver IGR
-Utilisez IOP threading Hack
-Cachez module de DEV9
-Combo IGR suppléant
-Modification de la taille va reformater le MVC
-créer
-modifier
-abandonner
-réinitialiser
-Utilisez générique
-configurer MVC
-nom
+Partage
+Utilisateur
+Mot de passe
+<non défini>
+Valider
+L élément sera définitivement supprimé, continuer ?
+Renommer
+Supprimer
+Démarrer
+Configuration de l'affichage
+Activer les options supprimer/renommer
+Vérifier si le jeu est fragmenté (USB)
+Se souvenir du dernier jeu 
+Afficher GSM dans le menu de configuration
+Le jeu est fragmenté, impossible de continuer
+Impossible de lancer le fichier
+Tester le jeu avec les nouveaux réglages
+Laisser vide pour le mode INVITE
+Charger le coeur alternatif
+Méthode alternative de lecture
+Désactiver Syscalls
+Passer les cinématiques
+Désactiver le support du DVD-DL
+Désactiver l'option IGR (In-Game-Reset)
+Hack IOP (HDD seulement)
+Cacher le module dev9
+IGR (In-Game-Reset) alternatif
+Changer la taille de la VCM la formatera 
+Créer
+Modifier
+Abandonner
+Réinitialiser
+Utiliser générique
+Configurer la VCM
+Nom
 Taille
-statut
-Progress
-N'existe fichier MVC
-Invalide fichier MVC , la taille est incorrecte
-Besoin de fichier MVC être créé
-Erreur avec MVC % s, continuer avec MC physique ( emplacement% d) ?
-Actualisation automatique
-sur
-Coders
-retard USB
-Chemin du préfixe USB
-Laisser vide pour quitter le navigateur
-Valeur en minute ( s), 0 pour désactiver la rotation vers le bas
-Automatique disque dur ralentit
+Statut
+Progression
+La VCM existe déjá
+Fichier VCM non valide, taille incorrecte
+La VCM doit d abord être créée
+Erreur sur la VCM %s, continuer sur la CM physique (slot %d) ?
+Rafraîchissement automatique
+Crédits
+Développeurs
+Délai de démarrage du périphérique USB
+Préfixe du chemin du périphérique USB
+Laisser vide pour quitter OPL vers le navigateur PS2
+En minute(s), 0 pour désactiver l'arrêt automatique
+Arrêt automatique du disque dur
 Mode vidéo
-Couleur de dialogue
-couleur sélectionnée
-Afficher la page d'information
-Infos
-coutume ELF
-Le choix des couleurs
-Rebranchez
-Laissez vide pour lister les partages
-Chemin du préfixe ETH
-Retour arrière
-espace
-Entrez
+Couleur des options
+Couleur de sélection
+Afficher les informations
+Informations
+Custom ELF
+Sélection des couleurs
+Reconnecter
+Laisser vide pour afficher les dossiers partagés
+Préfixe du chemin du réseau
+Retour
+Espace
+Entrer
 Mode
-MVC Slot 1
-MVC Slot 2
+VCM Slot 1
+VCM Slot 2
 ID du jeu
-DMA Mode
-V -Sync
+Mode DMA choisi
+V-Sync (synchronisation verticale)
 Mode 1
 Mode 2
 Mode 3
@@ -140,17 +141,20 @@ Mode 6
 Mode 7
 Mode 8
 Mode 9
-Minuterie de rappel
-Appliquer un délai aux fonctions CDVD (0 est la valeur par défaut)
-Vitesse Ethernet et les paramètres duplex
-Réglages GSM
+Minuteur de rappel
+Appliquer un délai aux fonctions CDVD (valeur 0 par défaut)
+Sélection de la vitesse réseau
+100 Mo full-duplex
+100 Mo half-duplex
+10 Mo full-duplex
+10 Mo half-duplex
+Paramètres de GSM
 Activer GSM
-Permet de GSM vigueur le mode sélectionné la vidéo ci-dessous
+Laisser GSM forcer le mode vidéo ci-dessous
 Mode vidéo sélectionné
-Mode vidéo d'être forcé
-horizontal Réglez
-Définit décalage horizontal
-vertical Régler
-Définit décalage vertical
-FMV saut
-Saute Full Motion Vidéos
+Mode vidéo à forcer
+Décalage horizontal
+Régler le décalage horizontal de l'image
+Décalage vertical
+Régler le décalage vertical de l'image
+Passer les cinématiques 

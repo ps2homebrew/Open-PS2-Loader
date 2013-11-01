@@ -1,156 +1,160 @@
-# translation by cegazza <ceg85@bol.com.br>
+# translation by Gilbert 
 Portuguese
                BEM-VINDO AO ABRIR PS2 Loader. C√≥digo principal com base na origem C√ìDIGO DE HD PROJECT <http://psx-scene.com> ADAPTA√á√ÉO AO FORMATO ADVANCE USB E GUI inicial por IFCARO <http://ps2dev.ifcaro.net> MAIS DE CARREGADOR n√∫cleo √© feito POR JIMMIKAELKAEL . Todas as melhorias gr√°ficas s√£o feitas por VOLCA . Obrigado por usar o NOSSO PROGRAMA ^ ^
-Abra PS2 Carregador % s
-Salvar altera√ß√µes
-de volta
-configura√ß√£o de rede
-<no values>
-Configura√ß√µes salvas ...
-Configura√ß√µes de erro de escrita !
-sair
-configura√ß√µes
-Jogos USB
-HDD Games
-ETH Jogos
-Apps
-tema
-linguagem
-Erro de inicializa√ß√£o de rede: % d
-N√£o √© poss√≠vel conectar ao servidor SMB: % d
-N√£o pode entrar no servidor SMB: % d
-N√£o √© poss√≠vel abrir compartilhamento SMB :% d
-em
-fora
-ok
-defini√ß√µes dos jogos
-Remover todas as configura√ß√µes
-Removidas todas as chaves para o jogo
-rolagem
-devagar
-m√©dio
-r√°pido
-menu padr√£o
-Carregar a partir do disco
-espere por favor
-Erro ao carregar o ID do jogo
-classifica√ß√£o autom√°tica
-Erro ao carregar o arquivo de idioma
-Desativar depura√ß√£o Cores
-No controlador detectou , esperando ...
-Habilitar Cover Art
-wide screen
-desligar
-carregamento de configura√ß√£o
-salvando configura√ß√£o
-dispositivo come√ßar
-Modo de in√≠cio do dispositivo USB
-Modo de arranque dispositivo HDD
-Modo de arranque dispositivo ETH
-Aplica√ß√µes modo de come√ßar
-autom√°tico
-manual
-Comece HDL Servidor
-HDL Servidor Iniciando ...
-HDL servidor executando ... Pressione [ O] para parar
-[X] para terminar servidor HDL Imprensa
-HDL Servidor descarga ...
-sair para
-cor de fundo
-cor do texto
-IP
-m√°scara
-porta de entrada
-porto
-a√ß√£o
-usu√°rio
-senha
-<not set>
-aceitar
-O artigo ser√° exclu√≠do permanentemente , continuar?
-rebatizar
-excluir
-correr
-defini√ß√µes do visor
-Ativar Excluir e Renomear a√ß√µes
-Verifique fragmenta√ß√£o jogo USB
-Lembre-se o √∫ltimo jogo jogado
-Revelar GSM no Menu Principal
-Erro , o jogo √© fragmentado
-Erro, n√£o podia correr o item
-teste
-Deixe em branco para auth GUEST .
-Carregar n√∫cleo alternativo
-Dados alternativos ler m√©todo
-unhook Syscalls
-0 modo PSS
-Desativar DVD -DL
-desativar IGR
-Use IOP rosqueamento corte
-Ocultar Dev9 m√≥dulo
-Combina√ß√£o IGR Alternate
-Alterar o tamanho vai reformatar o VMC
-criar
-modificar
-abortar
-restabelecer
-Use gen√©rico
-configurar VMC
-nome
-tamanho
-estado
-progresso
-Vmc existir
-Inv√°lido arquivo VMC , tamanho est√° incorreto
-Vmc precisam ser criados
-Erro com VMC % s , continue com MC f√≠sica (slot % d) ?
-atualiza√ß√£o autom√°tica
-sobre
-codificadores
-atraso USB
-Caminho prefixo USB
-Deixe em branco para sair do navegador
-O valor de minuto ( s) , 0 para desabilitar spin down
-Automatic HDD spin down
-modo de v√≠deo
-cor de di√°logo
-cor selecionada
-Exibir a p√°gina de informa√ß√µes
-Informa√ß√µes
-personalizado ELF
-sele√ß√£o de cor
-reconectar
-Deixe em branco para listar a√ß√µes
-ETH caminho prefixo
-retrocesso
-espa√ßo
-entrar
-modo
+Open PS2 Loader %s
+Salvar mudanÁas
+Voltar
+ConfiguraÁıes de Rede
+<sem valores>
+ConfiguraÁıes salvas
+Erro ao salvar configuraÁıes!
+Sair
+ConfiguraÁıes Gerais
+Jogos por USB
+Jogos por HDD 
+Jogos por Rede
+Aplicativos
+Temas
+Idioma
+Erro ao iniciar rede: %d
+N„o foi possÌvel conectar com o servidor SMB: %d 
+N„o foi possÌvel efetuar login com o servidor SMB: %d 
+N„o foi possÌvel abrir o compartilhamento SMB: %d 
+Ativado
+Desativado
+Aceitar
+Ajustes do jogo
+Remover todos os ajustes
+Removidos todos os ajustes para o jogo
+Rolagem
+Lento
+MÈdio
+R·pido
+Menu padr„o
+Carregar do disco
+Por favor espere
+Erro ao carregar ID do jogo
+Ordenar automaticamente
+Erro ao carregar arquivo de idioma
+Desativar depuraÁ„o de cores
+Controle n„o detectado, esperando...
+Habilitar Arte de Capas 
+Tela Panor‚mica
+Desligar PS2
+Carregando configuraÁıes
+Salvando configuraÁıes...
+Iniciar dispositivo
+Modo de inicio para Dispositivo USB
+Modo de inicio para Dispositivo HDD
+Modo de inicio para Dispositivo Rede
+Modo de inicio para Aplicativos
+Autom·tico
+Manual
+Iniciar servidor HDL
+Servidor HDL iniciando...
+Servidor HDL conectado... Aperte [O] para parar
+Aperte [X] para fechar o servidor HDL
+Fechando servidor HDL
+Definir saÌda do OPL/IGR
+Cor de fundo
+Cor do texto
+EndereÁo IP
+M·scara de sub-rede
+Gateway padr„o
+Porta
+Compartilhar
+Usu·rio
+Senha
+<n„o usado>
+Confirmar
+O item ser· PERMANENTEMENTE apagado!Continuar?
+Renomear
+Deletar
+Iniciar
+ConfiguraÁıes de Tela
+Ativar funÁ„o Deletar/Renomear
+Checar fragmentaÁ„o em jogos USB
+Lembrar ˙ltimo jogo executado
+Exibir GSM no menu principal
+Erro, o jogo est· fragmentado!
+Erro, n„o foi possÌvel iniciar o item
+Testar
+Deixar vazio para autorizaÁ„o como convidado (GUEST)
+Carregar n˙cleo alternativo
+MÈtodo alternativo de leitura de dados
+Desativar chamadas do sistema
+Pular videos PSS
+Desabilitar suporte DVD-DL
+Desabilitar IGR
+Usar modificaÁ„o IOP
+Esconder mÛdulo dev9
+CombinaÁ„o IGR alternativa
+Alterar o tamanho (Ir· reformatar o VMC!)
+Criar
+Modificar
+Abortar
+Resetar
+Usar genÈrico
+Configurar VMC
+Nome
+Tamanho
+Estado
+Progresso
+Arquivo VMC j· existe
+Arquivo VMC inv·lido, o tamanho est· incorreto
+Arquivo VMC precisa ser criado!
+Erro com arquivo VMC, continuar com MC fÌsico?
+AtualizaÁ„o autom·tica
+CrÈditos
+Desenvolvedores
+Tempo de atraso USB
+Prefixo de caminho USB
+Deixar vazio para sair p/ o Browser
+Valor em minuto(s), 0 p/ desativar
+Desligamento autom·tico do HDD
+Modo de vÌdeo
+Cor do di·logo
+Cor selecionada
+Mostrar P·gina de InformaÁ„o 
+Info
+ELF customizado
+SeleÁ„o de Cor
+Reconectar
+Deixar vazio para listar compartilhamentos
+Prefixo de caminho ETH
+Retroceder
+EspaÁo
+Aceitar
+Modo
 VMC Slot 1
 VMC Slot 2
-jogo ID
-DMA Mode
-V -Sync
-modo 1
-modo 2
-modo 3
-modo 4
-modo 5
-modo 6
-modo 7
-modo 8
-modo 9
-temporizador callback
-Aplicar um atraso para as fun√ß√µes CDVD ( 0 √© o padr√£o )
-Velocidade Ethernet e configura√ß√µes duplex
-Configura√ß√µes GSM
-Ativar GSM
-Deixa vigor GSM Modo de v√≠deo selecionado abaixo
-Modo de v√≠deo selecionado
-Modo de v√≠deo ser for√ßado
-Horizontal Ajuste
-Define Horizontal offset
-Vertical Ajuste
-Define Vertical offset
-FMV salto
-Ignora Full Motion V√≠deos
+ID do Jogo
+Modo DMA
+SincronizaÁ„o do vÌdeo 
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Modo 9
+Callback Timer
+Aplicar atraso para as funÁıes CDVD (0 È o padr„o)
+Velocidade Ethernet e sistema Duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Ajustes do GSM
+Habilitar o GSM
+Permitir que o GSM ative o modo de vÌdeo escolhido
+Modo de vÌdeo selecionado
+Modo de vÌdeo a ser ativado
+Ajuste horizontal
+Definir compensaÁ„o horizontal
+Ajuste vertical
+Definir compensaÁ„o vertical
+Pular FMV
+Pular vÌdeos

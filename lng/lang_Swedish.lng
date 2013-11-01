@@ -143,9 +143,13 @@ läge 9
 återuppringning timer
 Applicera en försening till cDVD funktioner ( 0 är standard )
 Ethernet hastighet och duplex
+100Mbit full duplex
+100Mbit halv duplex
+10Mbit full duplex
+10Mbit halv duplex
 GSM-inställningar
 Aktivera GSM
-Låter GSM kraft Valda videoläge nedan
+Låter GSM kraft Valda videoläge
 Valt Videoläge
 Videoläge tvingas
 Horisontell Justera
@@ -153,4 +157,4 @@ Ställer Horisontell offset
 Vertikal Justera
 Ställer Vertikal förskjutning
 FMV hoppa
-Hoppar Full Motion Video
+Tippvagnar Full Motion Video

@@ -143,9 +143,13 @@ modalità di 9
 timer di richiamata
 Applicare un ritardo di funzioni CDVD (0 è il valore predefinito )
 Velocità Ethernet e le impostazioni duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 Impostazioni GSM
 Abilita GSM
-Consente di forza GSM la modalità video selezionata di seguito
+Consente di forza GSM la modalità video selezionata
 Video Mode selezionato
 Modalità Video di essere costretti
 orizzontale Regolare

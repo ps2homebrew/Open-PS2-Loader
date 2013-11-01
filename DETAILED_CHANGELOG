@@ -8,6 +8,10 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev675 - Reverting the change in the previous commit. - Fri Nov 01 20:32:26 2013 +0800
+rev674 - Fix for the workaround for the Chinese SATA network adaptor: I forgot that the register is 16-bit, which means that the adaptor probably reports 0xFFFF as its version number. - Fri Nov 01 17:43:16 2013 +0800
+rev673 - *Ported over the workaround for Chinese SATA network adaptors (See the PS2SDK update for today). - Fri Nov 01 13:47:59 2013 +0800
+rev672 - * Rev672 tapped for release - updated changelogs. - Fri Oct 25 17:52:49 2013 -0400
 rev671 - *Replaced the TLB reinitialization mechanism with a built-in one. No more patching/hooking onto the EE kernel for that! Done partly for compatibility with the PSX. - Thu Oct 24 15:13:40 2013 +0800
 rev670 - * Hey Bat! Try not to commit non-default changes to Makefiles next time, will - Tue Oct 22 14:06:16 2013 -0400
 rev669 - * MASSIVE UPDATE - Consider deleting and re-cloning your local repos if - Tue Oct 22 13:55:08 2013 -0400

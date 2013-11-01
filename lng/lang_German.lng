@@ -1,156 +1,158 @@
-# translation by Thinner & the ps3-tools.de community
+# German Translation by Yorda
 German
-               WELCOME TO OPEN PS2 Loader. MAIN CODE ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ANPASSUNG AN USB ADVANCE FORMAT UND ERSTE GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE BY JIMMIKAELKAEL IST beruhen. ALLE GUI Verbesserungen werden durch VULKAN MADE . Vielen Dank für den PROGRAM ^ ^
-Offene PS2 Loader % s
-Speichern Sie die Änderungen
+               WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
+Open PS2 Loader %s
+Änderungen speichern
 Zurück
-Netzwerkkonf
-<kein values>
-Einstellungen gespeichert ...
-Fehler beim Schreiben der Einstellungen !
+Netzwerk Konfiguration
+<keine Werte>
+Einstellungen gespeichert...
 Verlassen
 Einstellungen
-USB Spiele
-HDD Spiele
-ETH Spiele
-Apps
-Theme
+USB-Spiele
+HDD-Spiele
+ETH-Spiele
+Anwendungen
+Design
 Sprache
-Netzwerk-Inbetriebnahme Fehler :% d
-Kann nicht auf SMB -Server zu verbinden :% d
-Kann nicht in SMB -Server anmelden :% d
-Kann nicht geöffnet werden SMB-Freigabe :% d
-Auf
-ausgeschaltet
-Ok
-Spiel -Einstellungen
-Entfernen Sie alle Einstellungen
-Entfernt alle Schlüssel für das Spiel
-Scrolling
-verlangsamen
-Medium
-Schnelle
-Standard -Menü
-Laden von Disk
+Fehler beim Starten des Netzwerks: %d
+Kann nicht mit SMB Server verbunden werden: %d
+Kann sich nicht beim SMB Server anmelden: %d
+SMB Freigabe kann nicht geöffnet werden: %d
+Ein
+Aus
+OK
+Spiele Einstellungen
+Entferne alle Einstellungen
+Entferne alle keys für das Spiel
+Scrollen
+Langsam
+Mittel
+Schnell
+Standard Einstellungen
+Lade von Disk
 Bitte warten
-Fehler beim Laden der Game ID
+Fehler beim laden der Spiel-ID
 Automatische Sortierung
-Fehler beim Laden der Sprachdatei
-Deaktivieren Sie Debug Colors
-Kein Controller erkannt , warten ...
-Aktivieren Cover Art
+Fehler beim laden der Sprach-Datei
+Deaktiviere Debug-Farben
+Kein Controller erkannt, warte...
+Aktiviere Cover Bilder
 Breitbild
-Power off
-Lädt Config
-Speicherung Konfig
-starten Gerät
-USB-Gerät Startmodus
-HDD-Gerät Startmodus
-ETH Gerät Startmodus
-Anwendungen starten Modus
-Auto
-Handbuch
-Starten HDL Server
-HDL Server starten ...
-HDL Server laufen ... Drücken Sie [ O ] zu stoppen
-Drücken Sie [ X] zu beenden HDL -Server
-HDL Server Entladen ...
-Ausgang zum
-Hintergrundfarbe
-Schriftfarbe
+Ausschalten
+Lade Konfiguration
+Speichere Konfiguration
+Gerät starten
+USB-Gerät Start Modus
+HDD-Gerät Start Modus
+ETH-Gerät Start Modus
+Anwendung Start Modus
+Automatisch
+Manuell
+Starte HDL Server
+HDL Server starten...
+HDL Server läuft... Drücke [O] zum anhalten
+Drücke [X] um HDL Server zu beenden
+HDL Server ausladen...
+Verlassen nach
+Hintergrund-Farbe
+Text-Farbe
 IP
-Mask
-Gateway-
-Hafen
-Teilen
-Benutzer
-Kennwort
-Geschlecht set>
-akzeptieren
-Artikel dauerhaft gelöscht werden , fortsetzen?
-Benennen
-löschen
-Führen
-Display-Einstellungen
-Aktivieren Sie Löschen und Umbenennen Aktionen
-Überprüfen Sie USB-Game -Fragmentierung
-Angemeldet zuletzt gespielte Spiel
-Reveal GSM im Hauptmenü
-Fehler , das Spiel ist fragmentiert
-Fehler konnte nicht ausgeführt werden das Element
+Netzmaske
+Gateway
+Port
+Freigabe
+Benutzername
+Passwort
+<nicht eingestellt>
+Annehmen
+Objekt wird permanent gelöscht, weiterfahren?
+Umbenennen
+Löschen
+Ausführen
+Bildschirm Einstellungen
+Aktiviere Löschen- und Umbenennen-Aktionen
+Überprüfe USB-Spiel Fragmentierung
+Erinnere an zuletzt gespieltes Spiel
+Zeige GSM im Hauptmenü an
+Fehler, das Spiel ist fragmentiert
+Fehler, Objekt kann nicht ausgeführt werden
 Test
-Leer lassen für GUEST Auth.
-Legen alternate Kern
-Alternative Verfahren Daten lesen
-aushängen syscalls
-0 PSS -Modus
-Deaktivieren DVD -DL
-Deaktivieren IGR
-Verwenden IOP Threading hack
-Ausblenden DEV9 Modul
-Alternate IGR Combo
-Das Ändern der Größe formatieren die VMC
-schaffen
-Ändern
-Abort
-zurücksetzen
-Verwenden Sie generische
-Konfigurieren VMC
+Leer lassen für Anmeldung als GAST
+Lade alternativen Kern
+Alternative Datenlese-Methode
+Systemaufrufe abhängen
+0 PSS Modus
+Deaktiviere DVD-DL
+Deaktiviere IGR
+Nutze IOP threading Hack
+Verstecke dev9 Modul
+Alterniere IGR Combo
+Die Änderung der Grösse wird die VMC erneut formatieren
+Erstellen
+Modifizieren
+Abrechen
+Neustarten
+Nutze gewöhnlich
+Konfiguriere VMC
 Name
-Größe
+Grösse
 Status
 Fortschritt
-VMC -Datei vorhanden
-Ungültige VMC -Datei , Größe ist nicht korrekt
-VMC -Datei erstellt werden müssen
-Fehler mit VMC % s , mit körperlichen MC ( Slot% d) fortsetzen?
-Automatische Aktualisierung
-über
-Coders
+VMC Datei besteht
+Ungültige VMC Datei, Grösse ist falsch
+Fehler mit VMC %s, fahre fort mit physischer MC (Stecklatz %d) ?
+Automatisch aktualisieren
+Über
+Programmierer
 USB Verzögerung
 USB Präfix Pfad
-Leer lassen , um Browser beenden
-Value in Minute (n ), 0 bis Spin deaktivieren unten
-Automatische HDD Spin Down
-Video-Modus
+Leer lassen um zum Browser zurückzukehren
+Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
+Automatische Abschaltung der Festplatte
+Video Modus
 Dialog Farbe
-gewählte Farbe
-Info-Seite anzeigen
+Ausgewählte Farbe
+Info Seite anzeigen
 Info
-Individuelle ELF
+Benutzerdefinierte ELF
 Farbauswahl
-Schließen
-Leer lassen , um Aktien Liste
+Verbindung wiederherstellen
+Leerlassen um Freigaben aufzulisten
 ETH Präfix Pfad
-Rücktaste
-Weltraum
-Geben Sie
+Backspace
+Space
+Enter
 Modus
-VMC Slot 1
-VMC Slot 2
-Game ID
-DMA-Modus
-V- Sync
-Mode 1
+VMC Steckplatz 1
+VMC Steckplatz 2
+Spiel ID
+DMA Modus
+V-Sync
+Modus 1
 Modus 2
-Mode 3
-Mode 4
-Mode 5
-Mode 6
-Mode 7
-Mode 8
-Mode 9
-Rückruf -Timer
-Tragen Sie eine Verzögerung CDVD Funktionen (0 ist default)
-Ethernet-Geschwindigkeit und Duplex-Einstellungen
-GSM -Einstellungen
-Aktivieren GSM
-Lets GSM Kraft des gewählten Video-Modus unter
-Ausgewählte Video -Modus
-Video-Modus gezwungen werden
-Horizontal Stellen
-Stellt Horizontal Offset
-Vertikal einstellen
-Legt Vertical Offset
-FMV überspringen
-Überspringt Full Motion Videos
+Modus 3
+Modus 4
+Modus 5
+Modus 6
+Modus 7
+Modus 8
+Modus 9
+Timer zurückrufen
+Verzögerung an den CDVD Funktionen anwenden
+Ethernet-Geschwindigkeit und duplex Einstellungen
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Einstellungen
+Aktiviere GSM
+Lässt GSM den gewählten Video-Modus erzwingen
+Ausgewählter Video Modus
+Video Modus der erzwingt werden soll
+Horizontale Einstellung
+Stellt den horizontalen Versatz ein
+Vertikale Einstellung
+Stellt den vertikalen Versatz ein
+Video-Sequenzen überspringen
+Überspringt Video-Sequenz

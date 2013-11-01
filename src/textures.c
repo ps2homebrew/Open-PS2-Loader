@@ -203,7 +203,6 @@ int texPngLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
 		if (file == NULL)
 			return ERR_BAD_FILE;
 
-		readData = file;
 		readFunction = NULL;	//Use default reading function.
 	}
 	else {
@@ -226,7 +225,9 @@ int texPngLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
 	if(setjmp(png_jmpbuf(pngPtr)))
 		return texPngEnd(pngPtr, infoPtr, file, ERR_SET_JMP);
 
-	png_set_read_fn(pngPtr, readData, readFunction);
+	if(readFunction!=NULL) png_set_read_fn(pngPtr, readData, readFunction);
+	else png_init_io(pngPtr, file);
+
 	unsigned int sigRead = 0;
 	png_set_sig_bytes(pngPtr, sigRead);
 	png_read_info(pngPtr, infoPtr);

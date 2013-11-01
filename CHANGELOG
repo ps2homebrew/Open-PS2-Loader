@@ -16,20 +16,21 @@ CORE:
 * Merged OPL/OPLGSM codebase
 * GSM Core 0.36.R - don't worry; 0.38 will be coming back better than ever!
 * GSM Core no longer supports 576p, 1080p, Skip FMVs - this is temporary. 
-* GSM Core is now IGR and CodeBreaker/PS2rd compatible! (See Note 1)
+* GSM Core is now IGR and CodeBreaker/PS2rd compatible!
 * GSM no longer included in Childproof builds.
 * Unified Makefile builds from single source tree via "GSM=0/1" argument (ala VMC/No VMC)
-* Protokernel support now part of PS2SDK toolchain
 * The integrated LibFreeType was removed, upgraded, and moved into the PS2SDK
 * Upgraded LIBPNG, ATAD, HDPro, and DEV9 Module Code
-* Added power-off processing code for older games - they should power off console now. 
+* Added code for the power-off RPC, for older games. They should be compatible now.
+* Added power-off processing code. Games should be able to power-off the console now.
 * Optimzed CDVDMAN and CDVDFSV
-* Support for PSX DESR-5x00 and 7x00 units
+* Support for PSX (DVR) units
 * Built-in TLB reinitialization mechanism - no more EECORE hooking and patching. 
-* Modified Mode 7 to "IOP Threading Hack" 
-* Replaced SMAP driver
-* Modified SMSTCPIP 
-* Ported a version of ETH Mode types from doctorxyz's OPLGSM
+* Added compatibility mode 7 - "IOP Threading Hack".
+* Replaced SMAP driver.
+* Modified SMSTCPIP.
+* Ported a version of ETH Mode types from doctorxyz's OPLGSM.
+* Retired the built-in kernel update for Protokernel consoles (SCPH-10000 and SCPH-15000).
 
 GUI: 
 
@@ -50,8 +51,6 @@ COMPATIBILITY:
 	* Baldar's Gate Series (HDD)
 	* Champions of Norrath (HDD)
 	* New Mode 7 fixes stuttering with games such as DDR and Pop'N Music (HDD ONLY!) 
-
-//**NOTE 1**// - //An IGR from OPLGSM to OPL (and vice versa) has produced BSODs in our initial tests. We're looking into this quirk. In the mean time, consider power-cycling the PS2 before switching between GSM and non-GSM builds, or populate your IGR Path specifically with a GSM-build - our tests show when GSM is enabled and still resident, an IGR directly to a GSM-build rarely produces the BSOD (likewise with Vanilla OPL IGR'ing directly to Vanilla OPL) ...//
 
 ==== Version 0.9 ====
 
@@ -152,8 +151,6 @@ GUI:
 ==== Version 0.4 ====
 * New interface
 * Core and drivers 100% open source
-
----- 
 
 ==== Version 0.3 ====
 * Discontinued (open usb loader starts)

@@ -143,9 +143,13 @@ modus 9
 callback Timer
 Terapkan penundaan untuk fungsi CDVD ( 0 merupakan default )
 Kecepatan Ethernet dan pengaturan dupleks
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 Pengaturan GSM
 Aktifkan GSM
-Mari kekuatan GSM Mode Video Dipilih bawah
+Mari kekuatan GSM Mode Video Terpilih
 Dipilih Video Mode
 Modus video dipaksa
 Horizontal Sesuaikan

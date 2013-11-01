@@ -197,7 +197,7 @@ int _start(int argc, char *argv[])
 
 		The obvious workaround here would be to totally kill 48-bit LBA support when ATAD is loaded on a PSX.
 	*/
-	Disable48bitLBA = ((SPD_REG16(SPD_R_REV_3) & SPD_CAPS_DVR) && (SPD_REG16(SPD_R_REV_1) != 0xFFFF))?1:0;	//The check for revision 0xFFFF is for working around the problem that the Chinese SATA network adaptor has: it reports 0xFF for a lot of fields (including the capabilities field), which unfortunately triggers off the workaround for the PSX.
+	Disable48bitLBA = ((SPD_REG16(SPD_R_REV_3) & SPD_CAPS_DVR) && (SPD_REG16(SPD_R_REV_1) != 0xFF))?1:0;	//The check for revision 0xFF is to workaround the problem that the Chinese SATA network adaptor has: it reports 0xFF for a lot of fields (including the capabilities field), which unfortunately triggers off the workaround for the PSX. It reports 0xFF as its revision too, which can be used to identify it.
 
 	if ((res = RegisterLibraryEntries(&_exp_atad)) != 0) {
 		M_PRINTF("Library is already registered, exiting.\n");

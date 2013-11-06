@@ -8,8 +8,9 @@
 #include "include/ioman.h"
 #include <io_common.h>
 #include <string.h>
-#include "malloc.h"
-#include "fileio.h"
+#include <malloc.h>
+#include <fileio.h>
+#include <osd_config.h>
 
 extern void *icon_sys;
 extern int size_icon_sys;
@@ -148,8 +149,8 @@ void checkCreateDir(char* dirPath) {
 		fioDclose(fd);
 }
 
-int listDir(char* path, char* separator, int maxElem,
-		int (*readEntry)(int index, char *path, char* separator, char* name, unsigned int mode)) {
+int listDir(char* path, const char* separator, int maxElem,
+		int (*readEntry)(int index, const char *path, const char* separator, const char* name, unsigned int mode)) {
 	int fdDir, index = 0;
 	if (checkFile(path, O_RDONLY)) {
 		fio_dirent_t record;
@@ -338,4 +339,63 @@ int fromHex(char digit) {
 static const char htab[16] = "0123456789ABCDEF";
 char toHex(int digit) {
 	return htab[digit & 0x0F];
+}
+
+enum CONSOLE_REGIONS{
+	CONSOLE_REGION_INVALID	= -1,
+	CONSOLE_REGION_JAPAN	= 0,
+	CONSOLE_REGION_USA,	//USA and HK/SG.
+	CONSOLE_REGION_EUROPE,
+	CONSOLE_REGION_CHINA,
+
+	CONSOLE_REGION_COUNT
+};
+
+static short int ConsoleRegion=CONSOLE_REGION_INVALID;
+static char SystemDataFolderPath[]="BRDATA-SYSTEM";
+static char SystemFolderLetter='R';
+
+static void UpdateSystemPaths(void){
+	char regions[CONSOLE_REGION_COUNT]={'I', 'A', 'E', 'C'};
+
+	SystemFolderLetter=regions[ConsoleRegion];
+	SystemDataFolderPath[1]=SystemFolderLetter;
+}
+
+int InitConsoleRegionData(void){
+	int result;
+	char romver[16];
+
+	if((result=ConsoleRegion)<0){
+		GetRomName(romver);
+
+		switch(romver[4]){
+			case 'C':
+				ConsoleRegion=CONSOLE_REGION_CHINA;
+				break;
+			case 'E':
+				ConsoleRegion=CONSOLE_REGION_EUROPE;
+				break;
+			case 'H':
+			case 'A':
+				ConsoleRegion=CONSOLE_REGION_USA;
+				break;
+			case 'J':
+				ConsoleRegion=CONSOLE_REGION_JAPAN;
+		}
+
+		result=ConsoleRegion;
+
+		UpdateSystemPaths();
+	}
+
+	return result;
+}
+
+const char *GetSystemDataPath(void){
+	return SystemDataFolderPath;
+}
+
+char GetSystemFolderLetter(void){
+	return SystemFolderLetter;
 }

@@ -226,7 +226,7 @@ int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 }
 
 // sets the value to point to the value str in the config. Do not overwrite - it will overwrite the string in config
-int configGetStr(config_set_t* configSet, const char* key, char** value) {
+int configGetStr(config_set_t* configSet, const char* key, const char** value) {
 	if (!configKeyValidate(key))
 		return 0;
 	
@@ -240,7 +240,7 @@ int configGetStr(config_set_t* configSet, const char* key, char** value) {
 }
 
 void configGetStrCopy(config_set_t* configSet, const char* key, char* value) {
-	char *valref = NULL;
+	const char *valref = NULL;
 	if (configGetStr(configSet, key, &valref))
 		strncpy(value, valref, 32);
 	else
@@ -254,7 +254,7 @@ int configSetInt(config_set_t* configSet, const char* key, const int value) {
 }
 
 int configGetInt(config_set_t* configSet, const char* key, int* value) {
-	char *valref = NULL;
+	const char *valref = NULL;
 	if (configGetStr(configSet, key, &valref)) {
 		*value = atoi(valref);
 		return 1;
@@ -270,7 +270,7 @@ int configSetColor(config_set_t* configSet, const char* key, unsigned char* colo
 }
 
 int configGetColor(config_set_t* configSet, const char* key, unsigned char* color) {
-	char *valref = NULL;
+	const char *valref = NULL;
 	if (configGetStr(configSet, key, &valref)) {
 		strToColor(valref, color);
 		return 1;
@@ -346,7 +346,7 @@ void configWriteIP() {
 void configGetDiscIDBinary(config_set_t* configSet, void* dst) {
 	memset(dst, 0, 5);
 
-	char *gid = NULL;
+	const char *gid = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_DNAS, &gid)) {
 		// convert from hex to binary
 		char* cdst = dst;
@@ -501,7 +501,7 @@ int configWriteMulti(int types) {
 
 #ifdef VMC
 void configGetVMC(config_set_t* configSet, char* vmc, int slot) {
-	char *valref = NULL;
+	const char *valref = NULL;
 	char gkey[255];
 	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
 	if (configGetStr(configSet, gkey, &valref))

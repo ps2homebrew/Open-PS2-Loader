@@ -91,7 +91,7 @@ void texPrepare(GSTEXTURE* texture, short psm) {
 	//gsKit_setup_tbw(texture); already done in gsKit_texture_upload
 }
 
-int texDiscoverLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
+int texDiscoverLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 	int rc = texPngLoad(texture, path, texId, psm);
 	/*
 	if (rc < 0) {
@@ -183,7 +183,7 @@ static void texPngReadData(GSTEXTURE* texture, png_structp pngPtr, png_infop inf
 	png_read_end(pngPtr, NULL);
 }
 
-int texPngLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
+int texPngLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 	texPrepare(texture, psm);
 	png_structp pngPtr = NULL;
 	png_infop infoPtr = NULL;
@@ -199,7 +199,7 @@ int texPngLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
 		else
 			snprintf(filePath, 255, "%s.png", path);
 
-		file = fopen(filePath, "r");
+		file = fopen(filePath, "rb");
 		if (file == NULL)
 			return ERR_BAD_FILE;
 
@@ -278,17 +278,17 @@ int texPngLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
 /// JPG SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
 
 
-int texJpgLoad(GSTEXTURE* texture, char* path, int texId, short psm) {
+int texJpgLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 	texPrepare(texture, GS_PSM_CT24);
 	int result = ERR_BAD_FILE;
 	jpgData *jpg = NULL;
-	char filePath[255];
+	char filePath[256];
 
 	if (texId != -1)
-		snprintf(filePath, 255, "%s%s.jpg", path, internalDefault[texId].name);
+		snprintf(filePath, sizeof(filePath), "%s%s.jpg", path, internalDefault[texId].name);
 	else
-		snprintf(filePath, 255, "%s.jpg", path);
-	FILE* file = fopen(filePath, "r");
+		snprintf(filePath, sizeof(filePath), "%s.jpg", path);
+	FILE* file = fopen(filePath, "rb");
 	if (file) {
 		jpg = jpgOpenFILE(file, JPG_NORMAL);
 		if (jpg != NULL) {

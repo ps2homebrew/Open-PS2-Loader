@@ -44,7 +44,7 @@ config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName);
 void configFree(config_set_t *configSet);
 config_set_t *configGetByType(int type);
 int configSetStr(config_set_t* configSet, const char* key, const char* value);
-int configGetStr(config_set_t* configSet, const char* key, char** value);
+int configGetStr(config_set_t* configSet, const char* key, const char** value);
 void configGetStrCopy(config_set_t* configSet, const char* key, char* value);
 int configSetInt(config_set_t* configSet, const char* key, const int value);
 int configGetInt(config_set_t* configSet, const char* key, int* value);

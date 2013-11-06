@@ -58,7 +58,7 @@ typedef struct {
 typedef struct {
 	int displayedItems;
 
-	char* decorator;
+	const char* decorator;
 	mutable_image_t* decoratorImage;
 } items_list_t;
 
@@ -115,18 +115,18 @@ typedef struct theme {
 
 theme_t* gTheme;
 
-void thmInit();
-void thmReinit(char* path);
-void thmReloadScreenExtents();
-void thmAddElements(char* path, char* separator, int mode);
-char* thmGetValue();
+void thmInit(void);
+void thmReinit(const char* path);
+void thmReloadScreenExtents(void);
+void thmAddElements(char* path, const char* separator, int mode);
+const char* thmGetValue(void);
 GSTEXTURE* thmGetTexture(unsigned int id);
-void thmEnd();
+void thmEnd(void);
 
 // Indices are shifted in GUI, as we add the internal default theme at 0
 int thmSetGuiValue(int themeGuiId, int reload);
-int thmGetGuiValue();
-int thmFindGuiID(char* theme);
-char **thmGetGuiList();
+int thmGetGuiValue(void);
+int thmFindGuiID(const char* theme);
+const char **thmGetGuiList(void);
 
 #endif

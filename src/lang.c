@@ -180,7 +180,7 @@ char *_l(unsigned int id) {
 	return lang_strs[id];
 }
 
-static void lngFreeFromFile() {
+static void lngFreeFromFile(void) {
 	if (guiLangID == 0)
 		return;
 
@@ -227,11 +227,11 @@ static int lngLoadFromFile(char* path, char *name) {
 	return 0;
 }
 
-char* lngGetValue() {
+char* lngGetValue(void) {
 	return guiLangNames[guiLangID];
 }
 
-static int lngReadEntry(int index, char* path, char* separator, char* name, unsigned int mode) {
+static int lngReadEntry(int index, const char* path, const char* separator, const char* name, unsigned int mode) {
 	if (!FIO_SO_ISDIR(mode)) {
 		if(strstr(name, ".lng") || strstr(name, ".LNG")) {
 
@@ -262,7 +262,7 @@ static int lngReadEntry(int index, char* path, char* separator, char* name, unsi
 	return index;
 }
 
-void lngInit() {
+void lngInit(void) {
 	fntInit();
 
 	nLanguages = listDir(gBaseMCDir, "/", MAX_LANGUAGE_FILES, &lngReadEntry);
@@ -281,7 +281,7 @@ void lngInit() {
 	guiLangNames[nLanguages + 1] = NULL;
 }
 
-void lngEnd() {
+void lngEnd(void) {
 	lngFreeFromFile();
 
 	int i = 0;
@@ -313,11 +313,11 @@ void lngSetGuiValue(int langID) {
 	}
 }
 
-int lngGetGuiValue() {
+int lngGetGuiValue(void) {
 	return guiLangID;
 }
 
-int lngFindGuiID(char* lang) {
+int lngFindGuiID(const char* lang) {
 	if (lang) {
 		int i = 0;
 		for (; i < nLanguages; i++) {
@@ -328,6 +328,6 @@ int lngFindGuiID(char* lang) {
 	return 0;
 }
 
-char **lngGetGuiList() {
+char **lngGetGuiList(void) {
 	return guiLangNames;
 }

@@ -226,7 +226,9 @@ void guiShowConfig() {
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 	diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
+#ifdef GSM
 	diaSetInt(diaConfig, CFG_SHOWGSM, gShowGSM);
+#endif
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
 	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
@@ -244,7 +246,9 @@ void guiShowConfig() {
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
+#ifdef GSM
 		diaGetInt(diaConfig, CFG_SHOWGSM, &gShowGSM);
+#endif
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
 		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
 		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);

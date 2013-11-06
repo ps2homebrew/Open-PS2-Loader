@@ -7,8 +7,8 @@ int getFileSize(int fd);
 int openFile(char* path, int mode);
 void* readFile(char* path, int align, int* size);
 void checkCreateDir(char* path);
-int listDir(char* path, char* separator, int maxElem,
-		int (*readEntry)(int index, char *path, char* separator, char* name, unsigned int mode));
+int listDir(char* path, const char* separator, int maxElem,
+		int (*readEntry)(int index, const char *path, const char* separator, const char* name, unsigned int mode));
 
 typedef struct {
 	int fd;
@@ -29,5 +29,9 @@ inline int max(int a, int b);
 inline int min(int a, int b);
 int fromHex(char digit);
 char toHex(int digit);
+
+int InitConsoleRegionData(void);
+const char *GetSystemDataPath(void);
+char GetSystemFolderLetter(void);
 
 #endif

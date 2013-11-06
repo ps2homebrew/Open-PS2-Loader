@@ -94,6 +94,13 @@ int gVSync; // 0 - False, 1 - True
 
 // ------------------------------------------------------------------------------------------------------------------------
 
+/// DTV 576 Progressive Scan (720x576)
+#define GS_MODE_DTV_576P  0x53
+
+/// DTV 1080 Progressive Scan (1920x1080)
+#define GS_MODE_DTV_1080P  0x54
+
+#ifdef GSM
 #define GSM_VERSION "0.36.R"
 
 #define PS1_VMODE	1
@@ -104,12 +111,6 @@ int gVSync; // 0 - False, 1 - True
 #define make_display_magic_number(dh, dw, magv, magh, dy, dx) \
 	(((u64)(dh)<<44) | ((u64)(dw)<<32) | ((u64)(magv)<<27) | \
 	((u64)(magh)<<23) | ((u64)(dy)<<12)   | ((u64)(dx)<<0)     )
-
-/// DTV 576 Progressive Scan (720x576)
-#define GS_MODE_DTV_576P  0x53
-
-/// DTV 1080 Progressive Scan (1920x1080)
-#define GS_MODE_DTV_1080P  0x54
 
 typedef struct predef_vmode_struct {
 	u8	category;
@@ -126,6 +127,7 @@ int	gGSMVMode;  // See the related predef_vmode
 int	gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
 int	gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
 int	gGSMSkipVideos; // 0 - Off, 1 - On
+#endif
 
 // ------------------------------------------------------------------------------------------------------------------------
 
@@ -147,7 +149,9 @@ char gETHPrefix[32];
 
 int gRememberLastPlayed;
 
+#ifdef GSM
 int gShowGSM; // Toggle to reveal "GSM Settings" on Main Menu
+#endif
 
 char *infotxt;
 

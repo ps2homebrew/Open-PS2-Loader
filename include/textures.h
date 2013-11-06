@@ -39,9 +39,9 @@
 #define ERR_MISSING_ALPHA -6
 #define ERR_BAD_DEPTH     -7
 
-int texPngLoad(GSTEXTURE *texture, char *path, int texId, short psm);
-int texJpgLoad(GSTEXTURE* texture, char* path, int texId, short psm);
+int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
+int texJpgLoad(GSTEXTURE* texture, const char* path, int texId, short psm);
 void texPrepare(GSTEXTURE* texture, short psm);
-int texDiscoverLoad(GSTEXTURE* texture, char* path, int texId, short psm);
+int texDiscoverLoad(GSTEXTURE* texture, const char* path, int texId, short psm);
 
 #endif

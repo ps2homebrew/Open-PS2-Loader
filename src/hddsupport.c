@@ -422,7 +422,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	// game id
 	memcpy((void*)((u32)irx + i), &gid, 5);
 
-	char *altStartup = NULL;
+	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
 		strncpy(filename, altStartup, 32);
 	else

@@ -177,14 +177,14 @@ typedef struct {
 	char* name;
 } language_t;
 
-void lngInit();
-char* lngGetValue();
-void lngEnd();
+void lngInit(void);
+char* lngGetValue(void);
+void lngEnd(void);
 
 // Indices are shifted in GUI, as we add the internal english language at 0
 void lngSetGuiValue(int langGuiId);
-int lngGetGuiValue();
-int lngFindGuiID(char* lang);
-char **lngGetGuiList();
+int lngGetGuiValue(void);
+int lngFindGuiID(const char* lang);
+char **lngGetGuiList(void);
 
 #endif

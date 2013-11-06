@@ -9,6 +9,7 @@
 #include "include/pad.h"
 #include "include/system.h"
 #include "include/ioman.h"
+#include "include/OSDHistory.h"
 #ifdef VMC
 typedef struct {
 	char VMC_filename[1024];
@@ -539,6 +540,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #ifdef GSM
 	char gsm_config_str[256];
 #endif
+
+	//AddHistoryRecordUsingFullPath(filename); BUG: added history records are invalid (No filename entered and the record seems to be duplicated everywhere).
 
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", 32);

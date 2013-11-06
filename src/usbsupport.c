@@ -305,7 +305,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 	fioDclose(fd);
 
-	char *altStartup = NULL;
+	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
 		strncpy(filename, altStartup, 32);
 	else

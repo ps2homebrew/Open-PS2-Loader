@@ -425,7 +425,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
 
-	char *altStartup = NULL;
+	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
 		strncpy(filename, altStartup, 32);
 	else

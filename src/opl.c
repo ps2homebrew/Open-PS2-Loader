@@ -19,6 +19,7 @@
 #include "include/system.h"
 #include "include/debug.h"
 #include "include/config.h"
+#include "include/util.h"
 
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
@@ -309,7 +310,7 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	// unlock, the rest is deferred
 	guiUnlock();
 
-	char* temp = NULL;
+	const char* temp = NULL;
 	if (gRememberLastPlayed)
 		configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
 
@@ -467,7 +468,7 @@ static void _loadConfig() {
 
 		if (result & CONFIG_OPL) {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);
-			char *temp;
+			const char *temp;
 
 			configGetInt(configOPL, "scrolling", &gScrollSpeed);
 			configGetColor(configOPL, "bg_color", gDefaultBgColor);
@@ -480,11 +481,13 @@ static void _loadConfig() {
 			configGetInt(configOPL, "vsync", &gVSync);
 			configGetInt(configOPL, "vmode", &gVMode);
 
+#ifdef GSM
 			configGetInt(configOPL, "enable_gsm", &gEnableGSM);
 			configGetInt(configOPL, "gsmvmode", &gGSMVMode);
 			configGetInt(configOPL, "gsm_x_offset", &gGSMXOffset);
 			configGetInt(configOPL, "gsm_y_offset", &gGSMYOffset);
 			configGetInt(configOPL, "gsmskipvideos", &gGSMSkipVideos);
+#endif
 
 			if (configGetStr(configOPL, "theme", &temp))
 				themeID = thmFindGuiID(temp);
@@ -521,7 +524,9 @@ static void _loadConfig() {
 			if (configGetStr(configOPL, "eth_prefix", &temp))
 				strncpy(gETHPrefix, temp, 32);
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
+#ifdef GSM
 			configGetInt(configOPL, "show_gsm", &gShowGSM);
+#endif
 			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
 			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
 			configGetInt(configOPL, "eth_mode", &gETHStartMode);
@@ -551,11 +556,13 @@ static void _saveConfig() {
 		configSetInt(configOPL, "vmode", gVMode);
 		configSetInt(configOPL, "vsync", gVSync);
 
+#ifdef GSM
 		configSetInt(configOPL, "enable_gsm", gEnableGSM);
 		configSetInt(configOPL, "gsmvmode", gGSMVMode);
 		configSetInt(configOPL, "gsm_x_offset", gGSMXOffset);
 		configSetInt(configOPL, "gsm_y_offset", gGSMYOffset);
 		configSetInt(configOPL, "gsmskipvideos", gGSMSkipVideos);
+#endif
 
 		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
 		char temp[255];
@@ -577,7 +584,9 @@ static void _saveConfig() {
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
+#ifdef GSM
 		configSetInt(configOPL, "show_gsm", gShowGSM);
+#endif
 		configSetInt(configOPL, "usb_mode", gUSBStartMode);
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
@@ -851,7 +860,9 @@ static void setDefaults(void) {
 	gDisableDebug = 0;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
+#ifdef GSM
 	gShowGSM = 0;
+#endif
 	gCheckUSBFragmentation = 1;
 	gUSBDelay = 3;
 	strncpy(gUSBPrefix, "", 32);
@@ -886,11 +897,13 @@ static void setDefaults(void) {
 	gVMode = RM_VMODE_AUTO;
 	gVSync = 1;
 
+#ifdef GSM
 	gEnableGSM = 0;
 	gGSMVMode = 0;
 	gGSMXOffset = 0;
 	gGSMYOffset = 0;
 	gGSMSkipVideos = 0;
+#endif
 }
 
 static void init(void) {
@@ -911,6 +924,8 @@ static void init(void) {
 
 	// handler for deffered menu updates
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
+
+	InitConsoleRegionData();
 
 	// try to restore config
 	_loadConfig();

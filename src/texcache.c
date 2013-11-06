@@ -74,7 +74,7 @@ static void cacheClearItem(cache_entry_t* item, int freeTxt) {
 	item->UID = 0;
 }
 
-image_cache_t* cacheInitCache(int userId, char* prefix, int isPrefixRelative, char* suffix, int count) {
+image_cache_t* cacheInitCache(int userId, const char* prefix, int isPrefixRelative, const char* suffix, int count) {
 	image_cache_t* cache = (image_cache_t*) malloc(sizeof(image_cache_t));
 	cache->userId = userId;
 	cache->count = count;

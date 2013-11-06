@@ -9,7 +9,7 @@ RTL = 0
 #change following line to "0" to build without GSM - DO NOT COMMENT!
 GSM = 0
 
-FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
+FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
 
@@ -18,6 +18,8 @@ GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
 		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o \
 		obj/icon_sys.o obj/icon_icn.o
+
+MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
 EECORE_OBJS = obj/ee_core.o \
 		obj/alt_ee_core.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
@@ -37,7 +39,7 @@ EE_BIN_PKD = OPNPS2LD.ELF
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(EECORE_OBJS)
+EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS)
 MAPFILE = opl.map
 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
@@ -486,7 +488,13 @@ icon_sys.s:
 	
 icon_icn.s:
 	bin2s gfx/opl.icn asm/icon_icn.s icon_icn	
-  
+
+icon_sys_A.s:
+	bin2s misc/icon_A.sys asm/icon_sys_A.s icon_sys_A
+
+icon_sys_J.s:
+	bin2s misc/icon_J.sys asm/icon_sys_J.s icon_sys_J
+
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 

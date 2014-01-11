@@ -18,7 +18,6 @@
 #include <sysmem.h>
 #include <thbase.h>
 #include <thsemap.h>
-#include <iopmgr.h>
 #include <dmacman.h>
 
 #include "mcemu_utils.h"

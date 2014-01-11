@@ -169,10 +169,8 @@ int _start(int argc, char **argv)
 	M_PRINTF(BANNER, VERSION);
 
 #ifdef CHECK_LOADED
-	iop_library_table_t *libtable;
 	iop_library_t *libptr;	
-	libtable = GetLibraryEntryTable();
-	libptr = libtable->tail;
+	libptr = GetLoadcoreInternalData()->let_next;
 	while ((libptr != 0))
 	{
 		int i;

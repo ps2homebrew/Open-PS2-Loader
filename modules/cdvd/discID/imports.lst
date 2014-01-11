@@ -1,0 +1,16 @@
+ioman_IMPORTS_start
+I_AddDrv
+I_DelDrv
+ioman_IMPORTS_end
+
+thsemap_IMPORTS_start
+I_CreateSema
+I_WaitSema
+I_SignalSema
+I_DeleteSema
+thsemap_IMPORTS_end
+
+sysclib_IMPORTS_start
+I_memset
+I_memcpy
+sysclib_IMPORTS_end

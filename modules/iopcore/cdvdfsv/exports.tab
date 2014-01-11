@@ -1,0 +1,16 @@
+void _retonly(void) {}
+
+int _dummy(void) {
+	return 0;
+}
+
+// cdvdfsv export table
+DECLARE_EXPORT_TABLE(cdvdfsv, 1, 1)
+	DECLARE_EXPORT(_start)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_dummy)
+	DECLARE_EXPORT(sceCdChangeThreadPriority)
+END_EXPORT_TABLE
+

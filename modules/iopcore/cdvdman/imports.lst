@@ -43,7 +43,7 @@ loadcore_IMPORTS_start
 I_FlushDcache
 I_FlushIcache
 I_RegisterLibraryEntries
-I_GetLibraryEntryTable
+I_GetLoadcoreInternalData
 I_QueryBootMode
 loadcore_IMPORTS_end
 

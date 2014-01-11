@@ -20,7 +20,7 @@ I_RegisterLibraryEntries
 I_QueryBootMode
 #endif
 #ifdef CHECK_LOADED
-I_GetLibraryEntryTable
+I_GetLoadcoreInternalData
 #endif
 loadcore_IMPORTS_end
 

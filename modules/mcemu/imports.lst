@@ -9,7 +9,7 @@ I_QueryIntrContext
 intrman_IMPORTS_end
 
 loadcore_IMPORTS_start
-I_GetLibraryEntryTable
+I_GetLoadcoreInternalData
 I_QueryLibraryEntryTable
 I_FlushIcache
 I_FlushDcache

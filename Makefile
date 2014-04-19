@@ -21,11 +21,11 @@ GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 
 MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
-EECORE_OBJS = obj/ee_core.o \
-		obj/alt_ee_core.o obj/elfldr.o obj/imgdrv.o obj/eesync.o \
-		obj/usb_cdvdman.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
+EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
+		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
+		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
-		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o obj/cddev.o \
+		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
@@ -51,7 +51,7 @@ ifeq ($(DEBUG),1)
 	ifeq ($(EESIO_DEBUG),1)
 		EE_CFLAGS += -D__EESIO_DEBUG
 	endif
-	EE_CFLAGS += -Xlinker -Map -Xlinker $(MAPFILE)
+	EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
 else
 	EE_CFLAGS := -O2
 endif
@@ -142,9 +142,10 @@ sclean:
 	rm -f -r $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "    * EE core"
 	$(MAKE) -C ee_core clean
-	$(MAKE) -C ee_core -f Makefile.alt clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
+	echo "    * udnl.irx"
+	$(MAKE) -C modules/iopcore/udnl clean
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
@@ -159,8 +160,6 @@ sclean:
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
-	echo "    * cddev.irx"
-	$(MAKE) -C modules/iopcore/cddev clean
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo "    * ps2dev9.irx"
@@ -216,17 +215,16 @@ ee_core.s:
 	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
 	bin2s ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
-alt_ee_core.s:
-	echo "    * alternative EE core"
-	$(MAKE) -C ee_core -f Makefile.alt clean
-	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core -f Makefile.alt
-	bin2s ee_core/ee_core.elf asm/alt_ee_core.s alt_eecore_elf
-
 elfldr.s:
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
 	$(MAKE) -C elfldr
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
+
+udnl.s:
+	echo "    * udnl.irx"
+	$(MAKE) -C modules/iopcore/udnl
+	bin2s modules/iopcore/udnl/udnl.irx asm/udnl.s udnl_irx
 
 imgdrv.s:
 	echo "    * imgdrv.irx"
@@ -277,11 +275,6 @@ cdvdfsv.s:
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/iopcore/cdvdfsv
 	bin2s modules/iopcore/cdvdfsv/cdvdfsv.irx asm/cdvdfsv.s cdvdfsv_irx
-
-cddev.s:
-	echo "    * cddev.irx"
-	$(MAKE) -C modules/iopcore/cddev
-	bin2s modules/iopcore/cddev/cddev.irx asm/cddev.s cddev_irx
 
 usb_mcemu.s:
 	echo "    * usb_mcemu.irx"
@@ -494,6 +487,9 @@ icon_sys_A.s:
 
 icon_sys_J.s:
 	bin2s misc/icon_J.sys asm/icon_sys_J.s icon_sys_J
+
+IOPRP_img.s:
+	bin2s modules/iopcore/IOPRP.img asm/IOPRP_img.s IOPRP_img
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@

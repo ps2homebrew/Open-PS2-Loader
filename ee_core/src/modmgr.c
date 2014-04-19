@@ -3,7 +3,7 @@
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from HD Project by Polo
 */
 
@@ -11,20 +11,14 @@
 #include "modmgr.h"
 #include "util.h"
 
+void *ioprp_img;
+int size_ioprp_img;
+
+void *udnl_irx;
+int size_udnl_irx;
+
 void *imgdrv_irx;
 int size_imgdrv_irx;
-
-void *eesync_irx;
-int size_eesync_irx;
-
-void *cdvdman_irx;
-int size_cdvdman_irx;
-
-void *cdvdfsv_irx;
-int size_cdvdfsv_irx;
-
-void *cddev_irx;
-int size_cddev_irx;
 
 #ifdef VMC
 void *mcemu_irx;
@@ -49,15 +43,12 @@ int size_udptty_irx;
 void *ioptrap_irx;
 int size_ioptrap_irx;
 
-void *smbman_irx;
-int size_smbman_irx;
-
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
 
 typedef struct {
 	void *irxaddr;
-	int irxsize;
+	unsigned int irxsize;
 } irxptr_t;
 
 /*----------------------------------------------------------------------------------------*/
@@ -81,7 +72,6 @@ int LoadFileInit()
 	return 0;
 }
 
-
 /*----------------------------------------------------------------------------------------*/
 /* DeInit LOADFILE RPC.                                                                   */
 /*----------------------------------------------------------------------------------------*/
@@ -90,7 +80,6 @@ void LoadFileExit()
 	_lf_init = 0;
 	memset(&_lf_cd, 0, sizeof(_lf_cd));
 }
-
 
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path with waiting.                                             */
@@ -120,7 +109,6 @@ int LoadModule(const char *path, int arg_len, const char *args)
 	return arg.p.result;
 }
 
-
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path without waiting.                                          */
 /*----------------------------------------------------------------------------------------*/
@@ -149,48 +137,29 @@ int LoadModuleAsync(const char *path, int arg_len, const char *args)
 	return 0;
 }
 
-#ifdef VMC
-#define IRX_NUM 11
-#else
-#define IRX_NUM 10
-#endif
-
-//-------------------------------------------------------------- 
-void GetIrxKernelRAM(void) // load needed modules from the kernel ram
+//--------------------------------------------------------------
+void InitModulePointers(void)
 {
 	int n;
-	irxptr_t irxptr_tab[IRX_NUM];
-
-	DIntr();
-	ee_kmode_enter();
-
-	void *irx_tab = (void *)(*(u32 *)0x80033000);	
-	memcpy(&irxptr_tab[0], irx_tab, sizeof(irxptr_tab));
-
-	ee_kmode_exit();
-	EIntr();
+	irxptr_t *irxptr_tab = *(irxptr_t **)0x00088000;
 
 	n = 0;
-	size_imgdrv_irx = irxptr_tab[n++].irxsize; 
-	size_eesync_irx = irxptr_tab[n++].irxsize; 	
-	size_cdvdman_irx = irxptr_tab[n++].irxsize;
-	size_cdvdfsv_irx = irxptr_tab[n++].irxsize;
-	size_cddev_irx = irxptr_tab[n++].irxsize;
-	size_usbd_irx = irxptr_tab[n++].irxsize;
-	size_smsmap_irx = irxptr_tab[n++].irxsize;
-	size_udptty_irx = irxptr_tab[n++].irxsize;
-	size_ioptrap_irx = irxptr_tab[n++].irxsize;
-	size_smstcpip_irx = irxptr_tab[n++].irxsize;
+	size_ioprp_img = irxptr_tab[n++].irxsize;	//EESYNC: 1.4K, CDVDMAN: ~30K, CDVDFSV: 9.1.K
+	size_udnl_irx = irxptr_tab[n++].irxsize;	//7.4K
+	size_imgdrv_irx = irxptr_tab[n++].irxsize;	//1.2K
+	size_usbd_irx = irxptr_tab[n++].irxsize;	//23.6K
+	size_smsmap_irx = irxptr_tab[n++].irxsize;	//8.4K
+	size_udptty_irx = irxptr_tab[n++].irxsize;	//3.5K
+	size_ioptrap_irx = irxptr_tab[n++].irxsize;	//4.5K
+	size_smstcpip_irx = irxptr_tab[n++].irxsize;	//62.9
 #ifdef VMC
 	size_mcemu_irx = irxptr_tab[n++].irxsize;
-#endif		
+#endif
 
 	n = 0;
+	ioprp_img = (void *)irxptr_tab[n++].irxaddr;
+	udnl_irx = (void *)irxptr_tab[n++].irxaddr;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
-	eesync_irx = (void *)irxptr_tab[n++].irxaddr;
-	cdvdman_irx = (void *)irxptr_tab[n++].irxaddr;
-	cdvdfsv_irx = (void *)irxptr_tab[n++].irxaddr;
-	cddev_irx = (void *)irxptr_tab[n++].irxaddr;
 	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
 	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
 	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
@@ -199,24 +168,10 @@ void GetIrxKernelRAM(void) // load needed modules from the kernel ram
 #ifdef VMC
 	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
 #endif
-}	
-
-// ------------------------------------------------------------------------
-int LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv)
-{	
-	DIntr();
-	ee_kmode_enter();
-	
-	memcpy(g_buf, irxkernelmem, irxsize);
-	
-	ee_kmode_exit();
-	EIntr();
-		
-	return LoadMemModule(g_buf, irxsize, arglen, argv);
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Load an irx module from a EE buffer.                                                   */
+/* Load an irx module from an EE buffer.                                                  */
 /*----------------------------------------------------------------------------------------*/
 int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args)
 {
@@ -238,7 +193,8 @@ int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *a
 	sifdma.size = modsize;
 	sifdma.attr = 0;
 
-	SifWriteBackDCache(modptr, modsize);
+	//All IOP modules should have already been written back to RAM by the FlushCache() calls within the GUI and the CRT.
+	//SifWriteBackDCache(modptr, modsize);
 
 	do
 	{
@@ -262,13 +218,13 @@ int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *a
 	if (SifCallRpc(&_lf_cd, LF_F_MOD_BUF_LOAD, 0, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
 		return -E_SIF_RPC_CALL;
 
-	SifFreeIopHeap(iopmem); 
+	SifFreeIopHeap(iopmem);
 
 	return arg.p.result;
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Load an elf file from EE buffer.                                                       */
+/* Load an ELF file from the specified path.                                              */
 /*----------------------------------------------------------------------------------------*/
 int LoadElf(const char *path, t_ExecData *data)
 {
@@ -299,30 +255,31 @@ int LoadElf(const char *path, t_ExecData *data)
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* Find and change a module name.                                                         */
+/* Find and change a module's name.                                                       */
 /*----------------------------------------------------------------------------------------*/
 void ChangeModuleName(const char *name, const char *newname)
 {
 	u8 search_name[60];
 	smod_mod_info_t info;
+	int len;
 
-	if (!smod_get_next_mod(0, &info))
+	if (!smod_get_next_mod(NULL, &info))
 		return;
 
-	int len = strlen(name);
+	len = strlen(name);
 
 	do {
 		smem_read(info.name, search_name, sizeof(search_name));
 
 		if (!_memcmp(search_name, name, len)) {
 			strncpy(search_name, newname, sizeof(search_name));
-			search_name[sizeof(search_name)-1] = 0;
-			smem_write(info.name, search_name, strlen(search_name));
+			search_name[sizeof(search_name)-1] = '\0';
+			len=strlen(search_name);
+			SyncDCache(search_name, search_name+len);
+			smem_write(info.name, search_name, len);
 			break;
 		}
 	} while (smod_get_next_mod(&info, &info));
-
-	FlushCache(0);
 }
 
 /*----------------------------------------------------------------------------------------*/
@@ -345,4 +302,3 @@ void ListModules(void)
 	} while (smod_get_next_mod(&info, &info));
 }
 #endif
-

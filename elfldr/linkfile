@@ -96,7 +96,7 @@ SECTIONS {
 
 	/* Symbols needed by crt0.s.  */
 	PROVIDE(_heap_size = -1);
-	PROVIDE(_stack = 0x00080000);
+	PROVIDE(_stack = _end);
 	PROVIDE(_stack_size = 0x2000);
 }
 

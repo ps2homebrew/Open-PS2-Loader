@@ -133,11 +133,9 @@ static int InitTLB32MB(void){
 			"sync.p\n" ::"r"(NumTlbEntries));
 
 	if(TLBInfo.NumExtendedTLBEntries>0){
-		for(TLBEntry=TLBInfo.extendedTLB,TlbEndIndex=TLBInfo.NumExtendedTLBEntries+i; i<TlbEndIndex; i++,TLBEntry++){
+		for(TLBEntry=TLBInfo.extendedTLB,TlbEndIndex=TLBInfo.NumExtendedTLBEntries+i; i<TlbEndIndex; i++,TLBEntry++,NumTlbEntries++){
 			SetTLBEntry(i, TLBEntry->PageMask, TLBEntry->EntryHi, TLBEntry->EntryLo0, TLBEntry->EntryLo1);
 		}
-
-		NumTlbEntries=i;
 	}
 
 	for(value=0xE0000000+(NumTlbEntries<<13); i<0x30; i++,value+=0x2000){

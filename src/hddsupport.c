@@ -389,19 +389,14 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 		memcpy((void*)((u32)irx + i + 35), &alt_read_mode, 1);
 	}
 
-	if (compatMode & COMPAT_MODE_7) {
-		u8 use_threading_hack = 1;
-		memcpy((void*)((u32)irx + i + 36), &use_threading_hack, 1);
-	}
-
 	if (compatMode & COMPAT_MODE_5) {
 		u8 no_dvddl = 1;
-		memcpy((void*)((u32)irx + i + 37), &no_dvddl, 1);
+		memcpy((void*)((u32)irx + i + 36), &no_dvddl, 1);
 	}
 
 	if (compatMode & COMPAT_MODE_4) {
-		u16 no_pss = 1;
-		memcpy((void*)((u32)irx + i + 38), &no_pss, 2);
+		u8 no_pss = 1;
+		memcpy((void*)((u32)irx + i + 37), &no_pss, 1);
 	}
 
 	// patch cdvdman timer
@@ -428,12 +423,11 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	else
 		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
-	FlushCache(0);
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, compatMode, compatMode & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, compatMode);
 #else
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode, compatMode & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode);
 #endif
 }
 

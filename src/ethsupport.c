@@ -167,7 +167,7 @@ static void ethInitSMB(void) {
 
 static void ethLoadModules(void) {
 	int ipconfiglen;
-	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+	char ipconfig[IPCONFIG_MAX_LEN];
 
 	LOG("ETHSUPPORT LoadModules\n");
 
@@ -262,7 +262,7 @@ static int ethUpdateGameList(void) {
 		sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
 	} else {
 		int i, count;
-		ShareEntry_t sharelist[128] __attribute__((aligned(64)));
+		ShareEntry_t sharelist[128];
 		smbGetShareList_in_t getsharelist;
 		getsharelist.EE_addr = (void *)&sharelist[0];
 		getsharelist.maxent = 128;
@@ -431,12 +431,11 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	else
 		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
-	FlushCache(0);
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, size_mcemu_irx, &smb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, size_mcemu_irx, &smb_mcemu_irx, compatmask);
 #else
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, compatmask);
 #endif
 }
 

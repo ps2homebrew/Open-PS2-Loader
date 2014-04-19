@@ -15,11 +15,10 @@ void sysReset(int modload_mask);
 void sysExecExit();
 void sysPowerOff(void);
 int sysPcmciaCheck(void);
-void sysGetCDVDFSV(void **data_irx, int *size_irx);
 #ifdef VMC
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int compatflags, int alt_ee_core);
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, unsigned int compatflags);
 #else
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int compatflags, int alt_ee_core);
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, unsigned int compatflags);
 #endif
 int sysExecElf(char *path);
 int sysPS3Detect(void);

@@ -29,8 +29,6 @@
 #define DINIT()			do { } while(0)
 #endif
 
-u8 *g_buf;
-
 extern int set_reg_hook;
 extern int set_reg_disabled;
 extern int iop_reboot_count;
@@ -48,7 +46,7 @@ enum ETH_OP_MODES{
 };
 
 #define IPCONFIG_MAX_LEN	64
-char g_ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+char g_ipconfig[IPCONFIG_MAX_LEN];
 int g_ipconfig_len;
 char g_ps2_ip[16];
 char g_ps2_netmask[16];

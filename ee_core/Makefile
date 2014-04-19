@@ -8,8 +8,6 @@
 # Review ps2sdk README & LICENSE files for further details.
 #
 # Standard Makefile
-# Loader section begin at 0x000e7000
-# g_buf is located at 0x00088000
 
 EE_BIN = ee_core.elf
 GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
@@ -21,7 +19,7 @@ EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
-EE_CFLAGS = -D_EE -O2 -G0 -Wall $(EE_INCS)
+EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
 ifeq ($(EESIO_DEBUG),1) 
 EE_CFLAGS += -D__EESIO_DEBUG
 endif
@@ -36,7 +34,7 @@ EE_OBJS += $(GSMCORE_EE_OBJS)
 EE_CFLAGS += -DGSM
 endif
 
-EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
+EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
 EE_LIBS += -lpatches
 
 ifeq ($(EESIO_DEBUG),1) 
@@ -59,8 +57,7 @@ $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
 $(EE_BIN) : $(EE_OBJS)
-	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker $(MAPFILE)
-
+	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS)
 
 all:
 	$(EE_BIN)

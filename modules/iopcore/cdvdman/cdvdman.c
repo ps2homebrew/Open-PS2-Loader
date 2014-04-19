@@ -38,7 +38,7 @@
 #define MODNAME "dev9"
 IRX_ID(MODNAME, 2, 8);
 #else
-#define MODNAME "cdvdman"
+#define MODNAME "cdvd_driver"
 IRX_ID(MODNAME, 1, 1);
 #endif
 
@@ -46,18 +46,18 @@ IRX_ID(MODNAME, 1, 1);
 #ifdef SMB_DRIVER
 static char g_ISO_name[] = "######    GAMESETTINGS    ######";
 #else
-static char g_tag[] = "######    GAMESETTINGS    ######";
+static char g_tag[] __attribute__((unused)) = "######    GAMESETTINGS    ######";
 #endif
-static u8 g_ISO_parts=0x69;
-static u8 g_ISO_media=0x69;
-static u8 g_gamesetting_alt_read=0;
-static u8 g_gamesetting_threading_hack=0;
-static u8 g_gamesetting_disable_DVDDL=0;
-static u16 g_gamesetting_0_pss=0;
-static u32 g_gamesetting_timer=100;
+static u8 g_ISO_parts __attribute__((unused)) = 0x69;
+static u8 g_ISO_media = 0x69;
+static u8 g_gamesetting_alt_read = 0;
+static u8 g_gamesetting_disable_DVDDL = 0;
+static u8 g_gamesetting_0_pss = 0;
+static u8 padding[2] __attribute__((unused));
+static u32 g_gamesetting_timer = 100;
 
 #define ISO_MAX_PARTS	16
-static int g_part_start[ISO_MAX_PARTS] = {
+static unsigned int g_part_start[ISO_MAX_PARTS] = {
 	0,	// is apa header LBA in HDD use, is Long filename in SMB+ISO
 	0,
 	0,
@@ -90,7 +90,7 @@ static char g_smb_password[16]="\0";
 
 //----------------------------------------------------
 
-int *p_part_start = &g_part_start[0];
+unsigned int *p_part_start = &g_part_start[0];
 
 extern void *dummy_irx;
 extern int size_dummy_irx;
@@ -383,21 +383,21 @@ u32 (*pinet_addr)(const char *cp); 									// #24
 #define CIOCSTREAMSTAT		0x630F
 
 // driver ops protypes
-int cdrom_dummy(void);
-int cdrom_init(iop_device_t *dev);
-int cdrom_deinit(iop_device_t *dev);
-int cdrom_open(iop_file_t *f, char *filename, int mode);
-int cdrom_close(iop_file_t *f);
-int cdrom_read(iop_file_t *f, void *buf, u32 size);
-int cdrom_lseek(iop_file_t *f, u32 offset, int where);
-int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat);
-int cdrom_dopen(iop_file_t *f, char *dirname);
-int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
-int cdrom_dclose(iop_file_t *f);
-int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
-s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where);
-int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
-int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
+static int cdrom_dummy(void);
+static int cdrom_init(iop_device_t *dev);
+static int cdrom_deinit(iop_device_t *dev);
+static int cdrom_open(iop_file_t *f, char *filename, int mode);
+static int cdrom_close(iop_file_t *f);
+static int cdrom_read(iop_file_t *f, void *buf, u32 size);
+static int cdrom_lseek(iop_file_t *f, u32 offset, int where);
+static int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat);
+static int cdrom_dopen(iop_file_t *f, char *dirname);
+static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
+static int cdrom_dclose(iop_file_t *f);
+static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
+static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where);
+static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
+static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
 
 // driver ops func tab
 static void *cdrom_ops[27] = {
@@ -441,25 +441,25 @@ static iop_ext_device_t cdrom_dev = {
 
 // devctl funcs
 int (*devctl_fn)(void *args, void *buf);
-int devctl_dummy(void *args, void *buf);
-int devctl_dummy2(void *args, void *buf);
-int devctl_retonly(void *args, void *buf);
-int devctl_cdreadclock(void *args, void *buf);
-int devctl_cdreadGUID(void *args, void *buf);
-int devctl_cdreadDiskID(void *args, void *buf);
-int devctl_cdgetdisktype(void *args, void *buf);
-int devctl_cdgeterror(void *args, void *buf);
-int devctl_cdtrayreq(void *args, void *buf);
-int devctl_cdstatus(void *args, void *buf);
-int devctl_cddiskready(void *args, void *buf);
-int devctl_cdreadModelID(void *args, void *buf);
-int devctl_cdStinit(void *args, void *buf);
-int devctl_cdabort(void *args, void *buf);
-int devctl_cdstandby(void *args, void *buf);
-int devctl_cdstop(void *args, void *buf);
-int devctl_cdpause(void *args, void *buf);
-int devctl_cdgettoc(void *args, void *buf);
-int devctl_intref(void *args, void *buf);
+static int devctl_dummy(void *args, void *buf);
+static int devctl_dummy2(void *args, void *buf);
+static int devctl_retonly(void *args, void *buf);
+static int devctl_cdreadclock(void *args, void *buf);
+static int devctl_cdreadGUID(void *args, void *buf);
+static int devctl_cdreadDiskID(void *args, void *buf);
+static int devctl_cdgetdisktype(void *args, void *buf);
+static int devctl_cdgeterror(void *args, void *buf);
+static int devctl_cdtrayreq(void *args, void *buf);
+static int devctl_cdstatus(void *args, void *buf);
+static int devctl_cddiskready(void *args, void *buf);
+static int devctl_cdreadModelID(void *args, void *buf);
+static int devctl_cdStinit(void *args, void *buf);
+static int devctl_cdabort(void *args, void *buf);
+static int devctl_cdstandby(void *args, void *buf);
+static int devctl_cdstop(void *args, void *buf);
+static int devctl_cdpause(void *args, void *buf);
+static int devctl_cdgettoc(void *args, void *buf);
+static int devctl_intref(void *args, void *buf);
 
 // devctl funcs array
 static void *devctl_tab[134] = {
@@ -632,11 +632,11 @@ static char cdvdman_curdir[256];
 
 // buffers
 #define CDVDMAN_BUF_SECTORS 	2
-static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS*2048] __attribute__((aligned(64)));
+static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS*2048];
 
-#define CDVDMAN_FS_SECTORS	2
+#define CDVDMAN_FS_SECTORS	6	//Keep this in-sync with CDVDFSV_BUF_SECTORS in CDVDFSV.
 #define CDVDMAN_FS_BUFSIZE	CDVDMAN_FS_SECTORS * 2048
-static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE + 2*2048] __attribute__((aligned(64)));
+static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE + 2*2048];
 
 static int fs_inited = 0;
 
@@ -652,14 +652,11 @@ typedef struct {
 } cdvdman_partspecs_t;
 
 static cdvdman_partspecs_t cdvdman_partspecs;
-
-static int isSceCdRead = 0;	//For compatibility mode 7: Don't delay streaming reads because it's already slow enough.
 #endif
 
 #define CDVDMAN_MODULE_VERSION 0x225
 static int cdvdman_debug_print_flag = 0;
 
-static int cdvdman_no_tray_model = 0;
 static int cdvdman_media_changed = 1;
 
 static int cdvdman_cur_disc_type = 0;	/* real current disc type */
@@ -1114,13 +1111,11 @@ static void fs_init(void)
 	// initialize usbd exports
 	usbd_init();
 
-	FlushDcache();
-	
 	// initialize the mass driver
 	mass_stor_init();
 
 	// configure mass device
-	while (mass_stor_configureDevice() <= 0);
+	while (mass_stor_configureDevice() <= 0) DelayThread(200);
 #endif
 
 #ifdef SMB_DRIVER
@@ -1222,7 +1217,6 @@ int sceCdInit(int init_mode)
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef ALT_READ_CORE
-	g_gamesetting_alt_read = 0; //to shut off warning
 	cdvdman_stat.cddiskready = CDVD_READY_NOTREADY;
 	cdvdman_sendNCmd(NCMD_INIT, NULL, 0);
 	cdvdman_waitsignalNCmdsema();
@@ -1287,13 +1281,7 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 	}
 	else {
 		sync_flag = 1;
-#ifdef HDD_DRIVER
-		isSceCdRead = 1;
-#endif
 		sceCdRead0(lsn, sectors, buf, mode);
-#ifdef HDD_DRIVER
-		isSceCdRead = 0;
-#endif
 
 		cdvdman_stat.status = CDVD_STAT_PAUSE;
 
@@ -1438,10 +1426,6 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 
                 cdvdman_media_changed = 0;
 
-                return 1;
-        }
-
-        if (cdvdman_no_tray_model == 1) {
                 return 1;
         }
 
@@ -1649,6 +1633,12 @@ int sceCdGetReadPos(void)
 }
 
 //-------------------------------------------------------------------------
+void *sceGetFsvRbuf(void)
+{
+	return cdvdman_fs_buf;
+}
+
+//-------------------------------------------------------------------------
 int sceCdSC(int code, int *param)
 {
 	int result;
@@ -1658,6 +1648,15 @@ int sceCdSC(int code, int *param)
 	switch(code){
 		case 0xFFFFFFF5:
 			result=cdvdman_stat.intr_ef;
+			break;
+		case 0xFFFFFFF6:
+			if (*param)
+			{
+				WaitSema(cdrom_io_sema);
+			}
+			else SignalSema(cdrom_io_sema);
+
+			result = *param;	//EE N-command code.
 			break;
 		case 0xFFFFFFF7:
 			result=CDVDMAN_MODULE_VERSION;
@@ -1694,9 +1693,6 @@ int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
 //-------------------------------------------------------------------------
 int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err)
 {
-#ifdef HDD_DRIVER
-	isSceCdRead = 0;
-#endif
 	sceCdRead0(cdvdman_stat.StreamingData.lsn, sectors, buf, NULL);
 	cdvdman_stat.StreamingData.lsn += sectors;
 
@@ -1794,11 +1790,52 @@ static int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf)
 #endif
 
 //-------------------------------------------------------------------------
+static int cdvdman_read(unsigned int lsn, unsigned int sectors, void *buf, cd_read_mode_t *mode){
+	DPRINTF("sceCdRead0 lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
+
+	cdvdman_stat.err = CDVD_ERR_NO;
+
+	#ifdef HDD_DRIVER
+	u32 offset = 0;
+	while (sectors) {
+		if (!((lsn >= cdvdman_partspecs.part_offset) && (lsn < (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)))))
+			cdvdman_get_part_specs(lsn);
+
+		if (cdvdman_stat.err != CDVD_ERR_NO)
+			break;
+
+		u32 nsectors = (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)) - lsn;
+		if (sectors < nsectors)
+			nsectors = sectors;
+
+		u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);	
+		if (ata_device_sector_io(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
+			cdvdman_stat.err = CDVD_ERR_READ;
+			break;
+		}
+		offset += nsectors << 11;
+		sectors -= nsectors;
+		lsn += nsectors;
+		ReadPos += nsectors << 11;
+	}
+
+	#else
+	cdvdman_ReadSect(lsn, sectors, buf);
+	#endif
+
+	DPRINTF("sceCdRead0 ret=%d\n", r);
+
+	return(cdvdman_stat.err==CDVD_ERR_NO?0:1);
+}
+
 int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 {
-	register int r;
+	if (QueryIntrContext()) {
+		DPRINTF("sceCdRead0 exiting (Intr context)...\n");
+		return 0;
+	}
 
-	r = QueryIntrContext();
+	WaitSema(cdvdman_cdreadsema);
 
 	if ((u32)(buf) & 3) {
 		WaitSema(cdvdman_searchfilesema);
@@ -1813,7 +1850,7 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 
 			DPRINTF("sceCdRead0 lsn=%d rpos=%d nsectors=%d buf=%08x\n", (int)lsn, (int)rpos, (int)nsectors, (int)buf);
 
-			sceCdRead0(rpos, nsectors, cdvdman_buf, mode);
+			cdvdman_read(rpos, nsectors, cdvdman_buf, mode);
 
 			rpos += nsectors;
 			sectors -= nsectors;
@@ -1823,56 +1860,15 @@ int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 
 			buf = (void *)(buf + nbytes);
 		}
+
 		SignalSema(cdvdman_searchfilesema);
 	}
 	else {
-		if (r) {
-			DPRINTF("sceCdRead0 exiting (Intr context)...\n");
-			return 0;
-		}
-
-		WaitSema(cdvdman_cdreadsema);
-
-		DPRINTF("sceCdRead0 lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
-
-		cdvdman_stat.err = CDVD_ERR_NO;
-
-		#ifdef HDD_DRIVER
-		u32 offset = 0;
-		while (sectors) {
-			if (!((lsn >= cdvdman_partspecs.part_offset) && (lsn < (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)))))
-				cdvdman_get_part_specs(lsn);
-
-			if (cdvdman_stat.err != CDVD_ERR_NO)
-				break;
-
-			u32 nsectors = (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)) - lsn;
-			if (sectors < nsectors)
-				nsectors = sectors;
-
-			if(isSceCdRead && g_gamesetting_threading_hack) DelayThread(1);
-
-			u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);	
-			if (ata_device_sector_io(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
-				cdvdman_stat.err = CDVD_ERR_READ;
-				break;
-			}
-			offset += nsectors << 11;
-			sectors -= nsectors;
-			lsn += nsectors;
-			ReadPos += nsectors;
-		}
-
-		#else
-		cdvdman_ReadSect(lsn, sectors, buf);
-		#endif
-
-		DPRINTF("sceCdRead0 ret=%d\n", r);
-
-		SignalSema(cdvdman_cdreadsema);
+		cdvdman_read(lsn, sectors, buf, mode);
 	}
 
 	ReadPos = 0;	/* Reset the buffer offset indicator. */
+	SignalSema(cdvdman_cdreadsema);
 
 	return 1;
 }
@@ -2041,15 +2037,17 @@ int sceCdReadModelID(void *ModelID)
 }
 
 //--------------------------------------------------------------
-int cdrom_dummy(void)
+static int cdrom_dummy(void)
 {
 	return -EPERM;
 }
 
 //--------------------------------------------------------------
-int cdrom_init(iop_device_t *dev)
+static int cdrom_init(iop_device_t *dev)
 {
 	iop_sema_t smp;
+
+	DPRINTF("cdrom_init\n");
 
 	smp.initial = 1;
 	smp.max = 1;
@@ -2065,17 +2063,16 @@ int cdrom_init(iop_device_t *dev)
 
 	cdvdman_searchfilesema = CreateSema(&smp);
 
-	DPRINTF("cdrom_init\n");
-
 	return 0;
 }
 
 //--------------------------------------------------------------
-int cdrom_deinit(iop_device_t *dev)
+static int cdrom_deinit(iop_device_t *dev)
 {
-	DeleteSema(cdrom_io_sema);
-
 	DPRINTF("cdrom_deinit\n");
+
+	DeleteSema(cdrom_io_sema);
+	DeleteSema(cdvdman_searchfilesema);
 
 	return 0;
 }
@@ -2096,7 +2093,7 @@ static FHANDLE *cdvdman_getfilefreeslot(void)
 }
 
 //--------------------------------------------------------------
-int cdrom_open(iop_file_t *f, char *filename, int mode)
+static int cdrom_open(iop_file_t *f, char *filename, int mode)
 {
 	register int r = 0;
 	FHANDLE *fh;
@@ -2141,7 +2138,7 @@ int cdrom_open(iop_file_t *f, char *filename, int mode)
 }
 
 //--------------------------------------------------------------
-int cdrom_close(iop_file_t *f)
+static int cdrom_close(iop_file_t *f)
 {
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 
@@ -2158,7 +2155,7 @@ int cdrom_close(iop_file_t *f)
 }
 
 //--------------------------------------------------------------
-int cdrom_read(iop_file_t *f, void *buf, u32 size)
+static int cdrom_read(iop_file_t *f, void *buf, u32 size)
 {
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 	register int rpos, sectorpos;
@@ -2203,7 +2200,7 @@ int cdrom_read(iop_file_t *f, void *buf, u32 size)
 }
 
 //--------------------------------------------------------------
-int cdrom_lseek(iop_file_t *f, u32 offset, int where)
+static int cdrom_lseek(iop_file_t *f, u32 offset, int where)
 {
 	register int r;
 	FHANDLE *fh = (FHANDLE *)f->privdata;
@@ -2247,19 +2244,19 @@ ssema:
 }
 
 //--------------------------------------------------------------
-int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat)
+static int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat)
 {
 	return sceCdLayerSearchFile((cdl_file_t *)&stat->attr, filename, f->unit) - 1;
 }
 
 //--------------------------------------------------------------
-int cdrom_dopen(iop_file_t *f, char *dirname)
+static int cdrom_dopen(iop_file_t *f, char *dirname)
 {
 	return cdrom_open(f, dirname, 8);
 }
 
 //--------------------------------------------------------------
-int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
+static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 {
 	register int r = 0;
 	register u32 mode;
@@ -2299,13 +2296,13 @@ int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 }
 
 //--------------------------------------------------------------
-int cdrom_dclose(iop_file_t *f)
+static int cdrom_dclose(iop_file_t *f)
 {
 	return cdrom_close(f);
 }
 
 //--------------------------------------------------------------
-int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
+static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 {
 	register int r = 0;
 
@@ -2320,14 +2317,14 @@ int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 }
 
 //--------------------------------------------------------------
-s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where)
+static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where)
 {
 	DPRINTF("cdrom_lseek64 where=%d\n", (int)where);
 	return (s64)cdrom_lseek(f, (u32)pos, where);
 }
 
 //--------------------------------------------------------------
-int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
+static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
 {
 	register int r = 0;
 
@@ -2348,7 +2345,7 @@ int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 
 }
 
 //--------------------------------------------------------------
-int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
+static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
 {
 	register int r;
 
@@ -2370,25 +2367,25 @@ int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 argle
 }
 
 //-------------------------------------------------------------------------
-int devctl_dummy(void *args, void *buf)
+static int devctl_dummy(void *args, void *buf)
 {
 	return -EIO;
 }
 
 //-------------------------------------------------------------------------
-int devctl_dummy2(void *args, void *buf)
+static int devctl_dummy2(void *args, void *buf)
 {
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_retonly(void *args, void *buf)
+static int devctl_retonly(void *args, void *buf)
 {
 	return 1;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdreadclock(void *args, void *buf)
+static int devctl_cdreadclock(void *args, void *buf)
 {
 	sceCdReadClock((cd_clock_t *)buf);
 	return 0;
@@ -2402,42 +2399,42 @@ int devctl_cdreadGUID(void *args, void *buf)
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdreadDiskID(void *args, void *buf)
+static int devctl_cdreadDiskID(void *args, void *buf)
 {
 	sceCdReadDiskID(buf);
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdgetdisktype(void *args, void *buf)
+static int devctl_cdgetdisktype(void *args, void *buf)
 {
 	*(int *)buf = sceCdGetDiskType();
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdgeterror(void *args, void *buf)
+static int devctl_cdgeterror(void *args, void *buf)
 {
 	*(int *)buf = sceCdGetError();
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdtrayreq(void *args, void *buf)
+static int devctl_cdtrayreq(void *args, void *buf)
 {
 	sceCdTrayReq(*(int *)args, (u32 *)args);
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdstatus(void *args, void *buf)
+static int devctl_cdstatus(void *args, void *buf)
 {
 	*(int *)buf = sceCdStatus();
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cddiskready(void *args, void *buf)
+static int devctl_cddiskready(void *args, void *buf)
 {
 	*(int *)buf = sceCdDiskReady(*(int *)args);
 	return 0;
@@ -2451,7 +2448,7 @@ int devctl_cdreadModelID(void *args, void *buf)
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdStinit(void *args, void *buf)
+static int devctl_cdStinit(void *args, void *buf)
 {
 	u8 *p = (u8 *)buf;
 	u32 bufmax  = *(u32 *)&p[0];
@@ -2477,28 +2474,28 @@ int devctl_cdstandby(void *args, void *buf)
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdstop(void *args, void *buf)
+static int devctl_cdstop(void *args, void *buf)
 {
 	sceCdStop();
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdpause(void *args, void *buf)
+static int devctl_cdpause(void *args, void *buf)
 {
 	sceCdPause();
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_cdgettoc(void *args, void *buf)
+static int devctl_cdgettoc(void *args, void *buf)
 {
 	sceCdGetToc(buf);
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-int devctl_intref(void *args, void *buf)
+static int devctl_intref(void *args, void *buf)
 {
 	*(int *)buf = cdvdman_stat.intr_ef;
 	return cdvdman_stat.intr_ef;
@@ -2636,9 +2633,9 @@ lbl_startlocate:
 //-------------------------------------------------------------------------
 static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 {
-	register int len;
 	register u32 lsn;
 	struct dirTocEntry *tocEntryPointer;
+	char *p;
 
 	if ((!pcdfile) || (!name))
 		return 0;
@@ -2647,7 +2644,13 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 
 	DPRINTF("cdvdman_findfile %s layer%d\n", name, layer);
 
-	strncpy(cdvdman_filepath, name, 256);
+	strncpy(cdvdman_filepath, name, sizeof(cdvdman_filepath)-1);
+	cdvdman_filepath[sizeof(cdvdman_filepath)-1]='\0';
+	if((p=strrchr(cdvdman_filepath, '.'))!=NULL){
+		if(strlen(name)<sizeof(cdvdman_filepath)-3){
+			strcpy(p+4, ";1");	//Insert ";1" + 1 NULL after the extension, in case the filename is malformed.
+		}
+	}
 
 	cdvdman_trimspaces(cdvdman_filepath);
 
@@ -2664,20 +2667,8 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 
 		tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength, layer);
 		if (tocEntryPointer == NULL) {
-			len = strlen(name);
-			if (len < 256) {
-				sprintf(cdvdman_filepath, "%s;1", name);
-				cdvdman_trimspaces(cdvdman_filepath);
-				tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength, layer);
-				if (tocEntryPointer == NULL) {
-					SignalSema(cdvdman_searchfilesema);
-					return 0;
-				}
-			}
-			if (len == 0) {
-				SignalSema(cdvdman_searchfilesema);
-				return 0;
-			}
+			SignalSema(cdvdman_searchfilesema);
+			return 0;
 		}
 
 		lsn = tocEntryPointer->fileLBA;
@@ -2780,18 +2771,14 @@ retry:
 }
 
 //--------------------------------------------------------------
-static u8 cb_args[8] __attribute__((aligned(16)));
 static int cdvdman_cb_event(int reason)
 {
+	static u8 cb_args[8];
 	iop_sys_clock_t sys_clock;
-	int oldstate;
 	u8 *ptr;
 
 	if (user_cb) {
-		CpuSuspendIntr(&oldstate);
-		//ptr = AllocSysMemory(ALLOC_FIRST, 8, NULL);
 		ptr = (u8 *)cb_args;
-		CpuResumeIntr(oldstate);
 
 		if (ptr) {
 			*((u32 *)&ptr[0]) = (u32)user_cb;
@@ -3003,16 +2990,9 @@ int _start(int argc, char **argv)
 	cdvdman_initdev();
 	InstallIntrHandler();
 
-#ifndef SMB_DRIVER
-	g_tag[0] = 0; // just to shut off warning
-#endif
 #ifdef HDD_DRIVER
 	if (g_ISO_media != 0x69)
 		lba_48bit = g_ISO_media;
-	g_ISO_parts = 0x69; // just to shut off warning
-#else
-	// just to shut off warning
-	if(g_gamesetting_threading_hack) g_gamesetting_threading_hack=1;
 #endif
 
 	// hook MODLOAD's exports

@@ -16,7 +16,7 @@
 #include "mass_common.h"
 #include "mass_stor.h"
 
-extern int *p_part_start;
+extern unsigned int *p_part_start;
 
 #define getBI32(__buf) ((((u8 *) (__buf))[3] << 0) | (((u8 *) (__buf))[2] << 8) | (((u8 *) (__buf))[1] << 16) | (((u8 *) (__buf))[0] << 24))
 
@@ -249,7 +249,7 @@ static struct MSStoDSS_t gMSStoDSS[4] = {
 
 static int gShiftPos;
 #else
-static u8 _4K_buf[4096] __attribute__((aligned(64)));
+static u8 _4K_buf[4096];
 #endif
 
 extern unsigned int ReadPos;
@@ -941,11 +941,6 @@ int mass_stor_warmup(mass_dev *dev)
 
 int mass_stor_configureDevice(void)
 {
-	// give the USB driver some time to detect the device
-	register int i = 10000;
-	while (--i > 0)
-	    DelayThread(100);
-
 	XPRINTF("mass_driver: configuring devices... \n");
 
 	mass_dev *dev = &g_mass_device;
@@ -959,6 +954,7 @@ int mass_stor_configureDevice(void)
 		if (ret < 0) {
 			XPRINTF("mass_driver: Error - failed to warmup device %d\n", dev->devId);
 			mass_stor_release(dev);
+			return -1;
 		}
 
 		return 1;
@@ -1035,7 +1031,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 		r += sectors;
 		p += nbytes;
 		nsectors -= sectors;
-		ReadPos+=sectors;
+		ReadPos += nbytes;
 	}
 
 	return 1;

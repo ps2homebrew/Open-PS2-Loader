@@ -12,13 +12,6 @@
 
 #include <tamtypes.h>
 
-typedef struct ioprp {
-	void        *data_in;
-	void        *data_out;
-	unsigned int size_in;
-	unsigned int size_out;
-} ioprp_t;
-
 inline void _strcpy(char *dst, const char *src);
 inline void _strcat(char *dst, const char *src);
 int _strncmp(const char *s1, const char *s2, int length);
@@ -36,10 +29,6 @@ unsigned long int _strtoul(const char* p);
 void set_ipconfig(void);
 u32 *find_pattern_with_mask(u32 *buf, u32 bufsize, u32 *pattern, u32 *mask, u32 len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
-int Patch_Mod(ioprp_t *ioprp_img, const char *name, void *modptr, int modsize);
-int Build_EELOADCNF_Img(ioprp_t *ioprp_img, int have_xloadfile);
-inline int XLoadfileCheck(void);
 inline void delay(int count);
-inline void Sbv_Patch(void);
 
 #endif /* UTIL */

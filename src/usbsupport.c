@@ -311,12 +311,11 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	else
 		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
-	FlushCache(0);
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, compatmask);
 #else
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, compatmask, compatmask & COMPAT_MODE_1);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, compatmask);
 #endif
 }
 

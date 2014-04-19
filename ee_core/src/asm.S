@@ -4,7 +4,7 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 
   The goal of the code in this file is to force syscall hooks to use
-  an alternate stack when they need to use stack.  
+  an alternate stack when they need to use stack.
 */
 
 #include <ee_cop0_defs.h>
@@ -18,10 +18,11 @@
 #define PADOPEN_HOOK  0
 
 
+	.equ EE_CORE_STACK, 0x000D0000
+
 	.set push
 	.set noreorder
 	.set noat
-
 
 /**************************************************************************
  *
@@ -99,7 +100,7 @@ _LoadExecPS2:
 	di
 	sync.p
 	mfc0	$v1, EE_COP0_Status
-	nop	
+	nop
 	and	$v1, $v1, $v0
 	nop
 	bne	$v1, $zero, 2b
@@ -197,14 +198,6 @@ _LoadExecPS2:
 	/* enable Intr */
 	ei
 
-	/* FlushCache */
-	daddu	$a0, $zero, $zero
-	addiu	$v1, $zero, __NR_FlushCache
-	syscall
-	addiu	$a0, $zero, 2
-	addiu	$v1, $zero, __NR_FlushCache
-	syscall
-
 	/* change stack pointer to top of user memory */
 	lui	$v0, 0x0200
 	daddu	$sp, $v0, $zero
@@ -248,15 +241,8 @@ _SifSetDma:
 	/* save original stack pointer */
 	daddu	$a2, $sp, $zero
 
-#ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0009
-	/* ori	$v0, $v0, 0x0000 */
-#else
-	lui	$v0, 0x000e
-	ori	$v0, $v0, 0x7000
-#endif
 	/* change the stack pointer */
-	daddu	$sp, $v0, $zero
+	la	$sp, EE_CORE_STACK
 
 	/* call New_SifSetDma, preserving ra and a2 registers values */
 	addiu	$sp, $sp, -0x10
@@ -264,38 +250,12 @@ _SifSetDma:
 	jal	New_SifSetDma
 	sd	$a2, 0x0008($sp)
 
-	/* restore a2 and ra registers */ 
+	/* restore a2 and ra registers */
 	ld	$a2, 0x0008($sp)
 	ld	$ra, 0x0000($sp)
 
 	/* restore the original stack pointer */
 	daddu	$sp, $a2, $zero
-
-#ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x000b
-	lui	$v1, 0x000d
-#else
-	lui	$v0, 0x0008
-	ori	$v0, $v0, 0x8000
-	lui	$v1, 0x000e
-	ori	$v1, $v1, 0x7000
-#endif
-1:	
-	sq	$zero, 0x0000($v0)
-	sq	$zero, 0x0010($v0)
-	sq	$zero, 0x0020($v0)
-	sq	$zero, 0x0030($v0)
-	addiu	$v0, $v0, 0x0040
-	sltu	$a0, $v0, $v1
-	bne	$a0, $zero, 1b
-
-	/* FlushCache */
-	daddu	$a0, $zero, $zero
-	addiu	$v1, $zero, __NR_FlushCache
-	syscall
-	addiu	$a0, $zero, 2
-	addiu	$v1, $zero, __NR_FlushCache
-	syscall
 
 	jr	$ra
 	addiu	$v0, $zero, 1
@@ -355,15 +315,8 @@ _Apply_Mode3:
 	/* save original stack pointer */
 	daddu	$a0, $sp, $zero
 
-#ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0009
-	/* ori	$v0, $v0, 0x0000 */
-#else
-	lui	$v0, 0x000e
-	ori	$v0, $v0, 0x7000
-#endif
 	/* change the stack pointer */
-	daddu	$sp, $v0, $zero
+	la	$sp, EE_CORE_STACK
 
 	/* preserving ra and a0 registers values */
 	addiu	$sp, $sp, -0x10
@@ -390,7 +343,7 @@ _Apply_Mode3:
 	addiu	$v1, $zero, __NR_FlushCache
 	syscall
 
-	/* restore a0 and ra registers */ 
+	/* restore a0 and ra registers */
 	ld	$a0, 0x0008($sp)
 	ld	$ra, 0x0000($sp)
 
@@ -431,7 +384,7 @@ Hook_SifSetReg:
 	/* black BG color */
 	lui	$v0, 0x1200
 	ori	$v0, $v0, 0x00e0
-	sd	$zero, 0x0000($v0)	
+	sd	$zero, 0x0000($v0)
 2:
 	/* check compat mode 3 is enabled */
 	lw	$v0, g_compat_mask
@@ -473,16 +426,8 @@ Hook_ExecPS2:
 	/* save original stack pointer */
 	daddu	$s4, $sp, $zero
 
-#ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0009
-	/* ori	$v0, $v0, 0x0000 */
-#else
-	lui	$v0, 0x000e
-	ori	$v0, $v0, 0x7000
-#endif
-
-	/* change stack pointer */
-	daddu	$sp, $v0, $zero
+	/* change the stack pointer */
+	la	$sp, EE_CORE_STACK
 
 	/* call Install_PadOpen_Hook */
 	lui	$a0, 0x0010
@@ -530,15 +475,8 @@ Hook_CreateThread:
 	/* save original stack pointer */
 	daddu	$a1, $sp, $zero
 
-#ifdef LOAD_EECORE_DOWN
-	lui	$v0, 0x0009
-	/* ori	$v0, $v0, 0x0000 */
-#else
-	lui	$v0, 0x000e
-	ori	$v0, $v0, 0x7000
-#endif
 	/* change the stack pointer */
-	daddu	$sp, $v0, $zero
+	la	$sp, EE_CORE_STACK
 
 	/* preserves ra, a1 and a0 registers values */
 	addiu	$sp, $sp, -0x20
@@ -582,4 +520,3 @@ g_argbuf:
 
 
 	.set pop
-

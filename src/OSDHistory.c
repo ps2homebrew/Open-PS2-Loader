@@ -204,10 +204,14 @@ static void GetBootFilename(const char *bootpath, char *filename){	//Does OPL ha
 			break;
 		}
 	}
+
+	if(i==0){	//The boot path contains only the filename.
+		strcpy(filename, bootpath);
+	}
 }
 
 int AddHistoryRecordUsingFullPath(const char *path){
-	char filename[256];
+	char filename[17];
 
 	GetBootFilename(path, filename);
 	return AddHistoryRecord(filename);

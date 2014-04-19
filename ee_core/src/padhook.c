@@ -16,6 +16,7 @@
   Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
 
+#include <iopcontrol.h>
 #include "ee_core.h"
 #include "iopmgr.h"
 #include "modmgr.h"
@@ -111,7 +112,7 @@ static void t_loadElf(void)
 		GS_BGCOLOUR = 0x000080; // Dark Red
 
 	// Apply Sbv patches
-	Sbv_Patch();
+	sbv_patch_disable_prefix_check();
 	
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xFF8000; // Blue sky
@@ -189,7 +190,6 @@ static void IGR_Thread(void *arg)
 			GS_BGCOLOUR = 0xFFFFFF; // White
 
 		// Re-Init RPC & CMD
-		SifExitRpc();
 		SifInitRpc(0);
 
 		if(!DisableDebug)
@@ -198,7 +198,7 @@ static void IGR_Thread(void *arg)
 		// Reset IO Processor
 		while (!Reset_Iop(NULL, 0)) {;}
 
-		// Remove kernel hook
+		// Remove kernel hooks
 		Remove_Kernel_Hooks();
 
 		// Check Translation Look-Aside Buffer
@@ -241,7 +241,7 @@ static void IGR_Thread(void *arg)
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00FFFF; // Yellow
 
-		while (!Sync_Iop()){;}
+		while (!SifIopSync()){;}
 
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0xFF80FF; // Pink
@@ -362,22 +362,20 @@ static int IGR_Intc_Handler(int cause)
 		iDisableIntc(kINTC_TIMER1      );
 
 		// Loop for each threads
-		for(i = 3; i < 256; i++)
+		for(i = 1; i < 256; i++)
 		{
-			if(i == IGR_Thread_ID )
-			{
-				DPRINTF("IGR: trying to wake IGR thread...\n");
-				// WakeUp IGR thread
-				iWakeupThread(IGR_Thread_ID);
-				iChangeThreadPriority( i, 0 );
-			}
-			else
+			if(i != IGR_Thread_ID )
 			{
 				// Suspend all threads
 				iSuspendThread( i );
 				iChangeThreadPriority( i, 127 );
 			}
 		}
+
+		DPRINTF("IGR: trying to wake IGR thread...\n");
+		iChangeThreadPriority( IGR_Thread_ID, 0 );
+		// WakeUp IGR thread
+		iWakeupThread(IGR_Thread_ID);
 	}
 
 	return 0;

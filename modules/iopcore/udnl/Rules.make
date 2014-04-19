@@ -7,17 +7,17 @@
 # Review ps2sdk README & LICENSE files for further details.
 
 
-IOP_CC_VERSION := $(shell $(IOP_CC) -v 2>&1 | sed -n 's/^.*versi[^ ]*n.* //p')
+IOP_CC_VERSION := $(shell $(IOP_CC) -v 2>&1 | sed -n 's/^.*version //p')
 
 ASFLAGS_TARGET = -mcpu=r3000
 
-ifeq ($(IOP_CC_VERSION),3.2.2)
+#ifeq ($(IOP_CC_VERSION),3.2.2)
 CFLAGS_TARGET  = -miop
 ASFLAGS_TARGET = -march=r3000
 LDFLAGS_TARGET = -miop
-endif
+#endif
 
-IOP_INCS := $(IOP_INCS) -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include -Iinclude
+IOP_INCS := $(IOP_INCS) -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include 
 
 IOP_CFLAGS  := $(CFLAGS_TARGET) -O2 -G0 -c $(IOP_INCS) $(IOP_CFLAGS)
 IOP_ASFLAGS := $(ASFLAGS_TARGET) -EL -G0 $(IOP_ASFLAGS)

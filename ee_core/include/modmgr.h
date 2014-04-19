@@ -81,12 +81,12 @@ int  LoadFileInit();
 void LoadFileExit();
 int  LoadModule(const char *path, int arg_len, const char *args);
 int  LoadModuleAsync(const char *path, int arg_len, const char *args);
-void GetIrxKernelRAM(void);
-int  LoadIRXfromKernel(void *irxkernelmem, int irxsize, int arglen, char *argv);
+void InitModulePointers(void);
 int  LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args);
 int  LoadElf(const char *path, t_ExecData *data);
 void ChangeModuleName(const char *name, const char *newname);
+#ifdef __EESIO_DEBUG
 void ListModules(void);
+#endif
 
 #endif /* MODMGR */
-

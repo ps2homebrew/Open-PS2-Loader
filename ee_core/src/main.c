@@ -15,21 +15,13 @@
 #include "gsm_api.h"
 #endif
 
-static char ElfPath[255]; // it should be here to avoid it to be wiped by the clear user mem
-
 int main(int argc, char **argv){
+	char ElfPath[32];
 
 	DINIT();
 	DPRINTF("OPL EE core start!\n");
 
 	SifInitRpc(0);
-
-#ifdef LOAD_EECORE_DOWN
-	g_buf = (u8 *)0x01700000;
-#else
-	g_buf = (u8 *)0x00088000;
-#endif
-	DPRINTF("g_buf at 0x%08x\n", (int)g_buf);
 
 	argv[1][11]=0x00; // fix for 8+3 filename.
 
@@ -106,8 +98,8 @@ int main(int argc, char **argv){
 
 	set_ipconfig();
 
-	DPRINTF("Get back IOP modules from Kernel RAM...\n");	
-	GetIrxKernelRAM();
+	DPRINTF("Initializing module pointers...\n");	
+	InitModulePointers();
 
 	/* installing kernel hooks */
 	DPRINTF("Installing Kernel Hooks...\n");
@@ -115,6 +107,8 @@ int main(int argc, char **argv){
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xff0000; 
+
+	SifExitRpc();
 
 	DPRINTF("Executing '%s'...\n", ElfPath);
 	LoadExecPS2(ElfPath, 0, NULL);	

@@ -453,8 +453,6 @@ static unsigned char *key7TOkey8(unsigned char *key7, unsigned char *key8)
 	return (unsigned char *)key8;
 }
 
-static unsigned char DES_Keys[128] __attribute__((aligned(64)));
-
 /*
  * des_create_keys: take 64bit user key (key) as input and outputs
  * 16 48bit keys (keys)
@@ -466,6 +464,7 @@ static unsigned char *DES_createkeys(unsigned char *key)
 	unsigned int *k;
 	unsigned char k8[8];
 	int i;
+	static unsigned char DES_Keys[128];
 	static unsigned char shifts[16] = { 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 };
 
 	key7TOkey8(key, k8);

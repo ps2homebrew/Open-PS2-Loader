@@ -10,35 +10,16 @@
 #ifndef IOPMGR_H
 #define IOPMGR_H
 
-typedef
-struct
-{
-   u32 psize;
-   u32 daddr;
-   int fcode;
-   u32 unknown;
- 
-} SifCmdHdr;
+#define RESET_ARG_MAX	79
 
-typedef
-struct
-{
- SifCmdHdr chdr;
- int       size;
- int       flag;
- char      arg[0x50];
-} SifCmdResetData __attribute__((aligned(16)));
+struct _iop_reset_pkt {
+	struct t_SifCmdHeader header;
+	int	arglen;
+	int	mode;
+	char	arg[RESET_ARG_MAX + 1];
+} ALIGNED(16);
 
-typedef
-struct romdir
-{
- char           fileName[10];
- unsigned short extinfo_size;
- int            fileSize;
-} romdir_t;
-
-int  New_Reset_Iop(const char *arg, int flag);
+int  New_Reset_Iop(const char *arg, int arglen);
 int  Reset_Iop(const char *arg, int flag);
-int  Sync_Iop(void);
 
 #endif /* IOPMGR */

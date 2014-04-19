@@ -23,12 +23,12 @@ static int io_sema = -1;
 #define SIGNALIOSEMA(x) SignalSema(x)
 #define SMBWRITE 1
 #else
-#define WAITIOSEMA(x) 
+#define WAITIOSEMA(x)
 #define SIGNALIOSEMA(x)
 #define SMBWRITE 0
 #endif
 
-#define DMA_ADDR 		0x000cff00
+#define DMA_ADDR 		0x000b3f00
 
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s); 						// #6
@@ -237,7 +237,7 @@ typedef struct {
 	void	*IOPaddr;
 } server_specs_t;
 
-static server_specs_t server_specs __attribute__((aligned(64))); // this must still on this alignment, as it's used for DMA
+static server_specs_t server_specs;
 
 #define SERVER_SHARE_SECURITY_LEVEL	0
 #define SERVER_USER_SECURITY_LEVEL	1
@@ -252,7 +252,7 @@ struct ReadAndXRequest_t smb_Read_Request = {
 		SMB_COM_READ_ANDX,
 		0, 0, 0, 0, "\0", 0, 0, 0, 0
 	},
-	12, 
+	12,
 	SMB_COM_NONE,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -264,7 +264,7 @@ struct WriteAndXRequest_t smb_Write_Request = {
 		SMB_COM_WRITE_ANDX,
 		0, 0, 0, 0, "\0", 0, 0, 0, 0
 	},
-	12, 
+	12,
 	SMB_COM_NONE,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -273,7 +273,7 @@ struct WriteAndXRequest_t smb_Write_Request = {
 static u16 UID, TID;
 static int main_socket;
 
-static u8 SMB_buf[1024] __attribute__((aligned(64)));
+static u8 SMB_buf[1024];
 
 extern unsigned int ReadPos;
 
@@ -404,7 +404,7 @@ negociate_retry:
 	// check there's no error
 	if (NPRsp->smbH.Eclass != STATUS_SUCCESS)
 		goto negociate_retry;
-		
+
 	if (NPRsp->smbWordcount != 17)
 		goto negociate_retry;
 
@@ -439,7 +439,7 @@ negociate_retry:
 	int oldstate, id;
 	int flag = 1;
 
-	dmat[0].dest = (void *)(DMA_ADDR + 0x40);
+	dmat[0].dest = (void *)(DMA_ADDR + 0x10);
 	dmat[0].size = sizeof(server_specs_t);
 	dmat[0].src = (void *)&server_specs;
 	dmat[0].attr = dmat[1].attr = SIF_DMA_INT_O;
@@ -774,7 +774,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		p += nbytes;
 		offset += sectors;
 		nsectors -= sectors;
-		ReadPos += sectors;
+		ReadPos += nbytes;
 	}
 
 	return 1;

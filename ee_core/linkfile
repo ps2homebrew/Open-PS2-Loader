@@ -9,13 +9,12 @@
 	Review ps2sdk README & LICENSE files for further details.
 	
 	Standard linkfile
-	Loader section begin at 0x000e7000
 */
 
 ENTRY(_start);
 
 SECTIONS {
-	.text 0x000e7000: {
+	.text 0x000B4000: {
 		_ftext = . ;
 		*(.text)
 		*(.text.*)
@@ -97,6 +96,6 @@ SECTIONS {
 
 	/* Symbols needed by crt0.s.  */
 	PROVIDE(_heap_size = -1);
-	PROVIDE(_stack = -1);
-	PROVIDE(_stack_size = 128 * 1024);
+	PROVIDE(_stack = _end);
+	PROVIDE(_stack_size = 0x2000);
 }

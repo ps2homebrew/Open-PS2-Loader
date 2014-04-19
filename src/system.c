@@ -1,7 +1,7 @@
 /*
   Copyright 2009, Ifcaro
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "include/usbld.h"
@@ -9,6 +9,7 @@
 #include "include/pad.h"
 #include "include/system.h"
 #include "include/ioman.h"
+#include "include/ioprp.h"
 #include "include/OSDHistory.h"
 #ifdef VMC
 typedef struct {
@@ -23,17 +24,14 @@ extern void *genvmc_irx;
 extern int size_genvmc_irx;
 #endif
 
+extern void *udnl_irx;
+extern int size_udnl_irx;
+
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
 
-extern void *eesync_irx;
-extern int size_eesync_irx;
-
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
-
-extern void *cddev_irx;
-extern int size_cddev_irx;
 
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
@@ -52,9 +50,6 @@ extern int size_udptty_irx;
 
 extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
-
-extern void *smbman_irx;
-extern int size_smbman_irx;
 
 extern void *discid_irx;
 extern int size_discid_irx;
@@ -80,17 +75,14 @@ extern int size_hdldsvr_irx;
 extern void *eecore_elf;
 extern int size_eecore_elf;
 
-extern void *alt_eecore_elf;
-extern int size_alt_eecore_elf;
-
 extern void *elfldr_elf;
 extern int size_elfldr_elf;
 
-extern void *smsutils_irx;
-extern int size_smsutils_irx;
-
 extern void *usbd_irx;
 extern int size_usbd_irx;
+
+extern unsigned char IOPRP_img[];
+extern unsigned int size_IOPRP_img;
 
 #define MAX_MODULES	32
 static void *g_sysLoadedModBuffer[MAX_MODULES];
@@ -128,7 +120,7 @@ typedef struct {
 
 typedef struct {
 	void *irxaddr;
-	int irxsize;
+	unsigned int irxsize;
 } irxptr_t;
 
 typedef struct {
@@ -312,12 +304,12 @@ int sysGetDiscID(char *hexDiscID) {
 	LOG("SYSTEM CDVD RPC inited\n");
 	if (cdStatus() == CDVD_STAT_OPEN) // If tray is open, error
 		return -1;
-		
+
 	while (cdGetDiscType() == CDVD_TYPE_DETECT) {;}	// Trick : if tray is open before startup it detects it as closed...
 	if (cdGetDiscType() == CDVD_TYPE_NODISK)
 		return -1;
 
-	cdDiskReady(0); 	
+	cdDiskReady(0);
 	LOG("SYSTEM Disc drive is ready\n");
 	CdvdDiscType_t cdmode = cdGetDiscType();	// If tray is closed, get disk type
 	if (cdmode == CDVD_TYPE_NODISK)
@@ -370,50 +362,39 @@ int sysPcmciaCheck(void) {
 	return 0;	// ExpBay
 }
 
-void sysGetCDVDFSV(void **data_irx, int *size_irx)
-{
-	*data_irx = (void *)&cdvdfsv_irx;
-	*size_irx = size_cdvdfsv_irx;
-}
-
 void sysExecExit() {
 	if(gExitPath[0]!='\0') sysExecElf(gExitPath);
 
 	Exit(0);
 }
 
-static void restoreSyscallHandler(void)
-{
-	SetVCommonHandler(8, (void*)0x80000280);
-}
-
 #ifdef VMC
-#define IRX_NUM 11
+#define IRX_NUM 9
 #else
-#define IRX_NUM 10
+#define IRX_NUM 8
 #endif
-  
+
 #ifdef VMC
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
 #else
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
 #endif
-
-	restoreSyscallHandler();
-
-	void *irxtab = (void *)0x80033010;
-	void *irxptr = (void *)0x80033100;
-	irxptr_t irxptr_tab[IRX_NUM];
+	irxptr_t *irxptr_tab;
 	void *irxsrc[IRX_NUM];
+	void *irxptr;
 	int i, n;
-	u32 irxsize, curIrxSize;
+	unsigned int irxsize, curIrxSize;
+	void *ioprp_image;
+	unsigned int size_ioprp_image;
+
+	irxptr_tab=(irxptr_t*)0x00088004;
+	ioprp_image=malloc(size_IOPRP_img+size_cdvdman_irx+size_cdvdfsv_irx+256);
+	size_ioprp_image=patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
 
 	n = 0;
+	irxptr_tab[n++].irxsize = size_ioprp_image;
+	irxptr_tab[n++].irxsize = size_udnl_irx;
 	irxptr_tab[n++].irxsize = size_imgdrv_irx;
-	irxptr_tab[n++].irxsize = size_eesync_irx;
-	irxptr_tab[n++].irxsize = size_cdvdman_irx;
-	irxptr_tab[n++].irxsize = size_cdvdfsv_irx;
-	irxptr_tab[n++].irxsize = size_cddev_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
 	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
 	irxptr_tab[n++].irxsize = size_udptty_irx;
@@ -424,58 +405,45 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 #endif
 
 	n = 0;
+	irxsrc[n++] = ioprp_image;
+	irxsrc[n++] = (void *)&udnl_irx;
 	irxsrc[n++] = (void *)&imgdrv_irx;
-	irxsrc[n++] = (void *)&eesync_irx;
-	irxsrc[n++] = (void *)cdvdman_irx;
-	irxsrc[n++] = (void *)&cdvdfsv_irx;
-	irxsrc[n++] = (void *)&cddev_irx;
-	irxsrc[n++] = (void *)usbd_irx;
+	irxsrc[n++] = usbd_irx;
 	irxsrc[n++] = (void *)&smap_ingame_irx;
 	irxsrc[n++] = (void *)&udptty_irx;
 	irxsrc[n++] = (void *)&ioptrap_irx;
 	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
 #ifdef VMC
-	irxsrc[n++] = (void *)mcemu_irx; 
+	irxsrc[n++] = (void *)mcemu_irx;
 #endif
 
 	irxsize = 0;
 
-	DIntr();
-	ee_kmode_enter();
-
-	*(u32 *)0x80033000 = 0x80033010;
+	*(irxptr_t**)0x00088000 = irxptr_tab;
+	irxptr = (void *)((((unsigned int)irxptr_tab+sizeof(irxptr_t)*IRX_NUM)+0xF)&~0xF);
 
 	for (i = 0; i < IRX_NUM; i++) {
 		curIrxSize = irxptr_tab[i].irxsize;
-		if ((((u32)irxptr + curIrxSize) >= 0x80050000) && ((u32)irxptr < 0x80060000))
-			irxptr = (void *)0x80060000;
 		irxptr_tab[i].irxaddr = irxptr;
 
 		if (curIrxSize > 0) {
-			ee_kmode_exit();
-			EIntr();
 			LOG("SYSTEM IRX address start: %08x end: %08x\n", (int)irxptr_tab[i].irxaddr, (int)(irxptr_tab[i].irxaddr+curIrxSize));
-			DIntr();
-			ee_kmode_enter();
 
 			memcpy((void *)irxptr_tab[i].irxaddr, (void *)irxsrc[i], curIrxSize);
 
-			irxptr += curIrxSize;
+			irxptr += ((curIrxSize+0xF)&~0xF);
 			irxsize += curIrxSize;
 		}
 	}
 
-	memcpy((void *)irxtab, (void *)&irxptr_tab[0], sizeof(irxptr_tab));
-
-	ee_kmode_exit();
-	EIntr();
+	free(ioprp_image);
 }
 
 #ifdef GSM
 static void PrepareGSM(char *cmdline) {
 	/* Preparing GSM */
 	LOG("Preparing GSM...\n");
-	// Pre-defined vmodes 
+	// Pre-defined vmodes
 	// Some of following vmodes gives BOSD and/or freezing, depending on the console BIOS version, TV/Monitor set, PS2 cable (composite, component, VGA, ...)
 	// Therefore there are many variables involved here that can lead us to success or faild depending on the circumstances above mentioned.
 	//
@@ -526,9 +494,9 @@ static void PrepareGSM(char *cmdline) {
 #endif
 
 #ifdef VMC
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int compatflags, int alt_ee_core) {
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, unsigned int compatflags) {
 #else
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int compatflags, int alt_ee_core) {
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, unsigned int compatflags) {
 #endif
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
@@ -541,10 +509,12 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	char gsm_config_str[256];
 #endif
 
-	//AddHistoryRecordUsingFullPath(filename); BUG: added history records are invalid (No filename entered and the record seems to be duplicated everywhere).
+	AddHistoryRecordUsingFullPath(filename);
 
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", 32);
+
+	memset((void*)0x00082000, 0, 0x00100000-0x00082000);
 
 #ifdef VMC
 	LOG("SYSTEM LaunchLoaderElf called with size_mcemu_irx = %d\n", size_mcemu_irx);
@@ -554,10 +524,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
 	// NB: LOADER.ELF is embedded
-	if (alt_ee_core)
-		boot_elf = (u8 *)&alt_eecore_elf;
-	else
-		boot_elf = (u8 *)&eecore_elf;
+	boot_elf = (u8 *)&eecore_elf;
 	eh = (elf_header_t *)boot_elf;
 	if (_lw((u32)&eh->ident) != ELF_MAGIC)
 		while (1);
@@ -601,7 +568,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	char cmask[10];
 	snprintf(cmask, 10, "%d", compatflags);
-	argv[0] = config_str;	
+	argv[0] = config_str;
 	argv[1] = filename;
 	argv[2] = cmask;
 #ifdef GSM

@@ -16,7 +16,7 @@
 #include <sifdma.h>
 #include <string.h>
 
-#define DMA_ADDR 		0x000cff00
+#define DMA_ADDR 		0x000b3f00
 
 extern void *_gp;
 
@@ -26,12 +26,10 @@ extern void *_gp;
 #define CHCR_STR	0x100
 #define STAT_SIF0	0x20
 
-static u8 thread_stack[0x800] __attribute__((aligned(16)));
+static u8 thread_stack[0x400] __attribute__((aligned(64)));
 static unsigned int *sifDmaDataPtr = (unsigned int *)UNCACHED_SEG(DMA_ADDR);
 static int smbauth_thread_id;
 static int sif0_id = -1;
-
-static u8 passwd_buf[512] __attribute__((aligned(64)));
 
 typedef struct {			// size = 156
 	u32	MaxBufferSize;
@@ -49,11 +47,10 @@ typedef struct {			// size = 156
 	void	*IOPaddr;
 } server_specs_t;
 
-static server_specs_t *server_specs = (void *)UNCACHED_SEG((DMA_ADDR + 0x40));
+static server_specs_t *server_specs = (void *)UNCACHED_SEG((DMA_ADDR + 0x10));
 
 #define SERVER_USE_PLAINTEXT_PASSWORD	0
 #define SERVER_USE_ENCRYPTED_PASSWORD	1
-
 
 /*
  * LM_Password_Hash: this function create a LM password hash from a given password
@@ -89,6 +86,7 @@ static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned c
  */
 static unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *cipher)
 {
+	u8 passwd_buf[512];
 	int i, j;
 
 	memset(passwd_buf, 0, sizeof(passwd_buf));
@@ -218,12 +216,6 @@ int _SifDmaIntrHandler()
 		iWakeupThread(smbauth_thread_id);
 	}
 
-	/* exit handler */
-	__asm__ __volatile__(
-		" sync;"
-		" ei;"
-	);
-
 	return 0;
 }
 
@@ -258,7 +250,6 @@ void start_smbauth_thread(void)
 	}
 
 	/* install our DMA interrupt handler */
-	FlushCache(0);
 	*sifDmaDataPtr = 0;
 
 	if (_lw(DMAC_COMM_STAT)  & STAT_SIF0)
@@ -270,4 +261,3 @@ void start_smbauth_thread(void)
 	sif0_id = AddDmacHandler(5, _SifDmaIntrHandler, 0);
 	EnableDmac(5);
 }
-

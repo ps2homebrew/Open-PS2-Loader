@@ -378,6 +378,12 @@ static int IGR_Intc_Handler(int cause)
 		iWakeupThread(IGR_Thread_ID);
 	}
 
+	/* exit handler */
+	__asm__ __volatile__(
+		" sync;"
+		" ei;"
+	);
+
 	return 0;
 }
 

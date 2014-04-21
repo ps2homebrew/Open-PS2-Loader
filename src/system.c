@@ -81,6 +81,14 @@ extern int size_elfldr_elf;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
+#ifdef __DECI2_DEBUG
+extern void *drvtif_irx;
+extern int size_drvtif_irx;
+
+extern void *tifinet_irx;
+extern int size_tifinet_irx;
+#endif
+
 extern unsigned char IOPRP_img[];
 extern unsigned int size_IOPRP_img;
 
@@ -374,6 +382,9 @@ void sysExecExit() {
 #define IRX_NUM 8
 #endif
 
+extern void *smap_irx;
+extern int size_smap_irx;
+
 #ifdef VMC
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
 #else
@@ -397,8 +408,13 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_imgdrv_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
 	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
+#ifdef __DECI2_DEBUG
+	irxptr_tab[n++].irxsize = size_drvtif_irx;
+	irxptr_tab[n++].irxsize = size_tifinet_irx;
+#else
 	irxptr_tab[n++].irxsize = size_udptty_irx;
 	irxptr_tab[n++].irxsize = size_ioptrap_irx;
+#endif
 	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
 #ifdef VMC
 	irxptr_tab[n++].irxsize = size_mcemu_irx;
@@ -410,8 +426,13 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = (void *)&imgdrv_irx;
 	irxsrc[n++] = usbd_irx;
 	irxsrc[n++] = (void *)&smap_ingame_irx;
+#ifdef __DECI2_DEBUG
+	irxsrc[n++] = (void *)&drvtif_irx;
+	irxsrc[n++] = (void *)&tifinet_irx;
+#else
 	irxsrc[n++] = (void *)&udptty_irx;
 	irxsrc[n++] = (void *)&ioptrap_irx;
+#endif
 	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
 #ifdef VMC
 	irxsrc[n++] = (void *)mcemu_irx;
@@ -428,6 +449,9 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 
 		if (curIrxSize > 0) {
 			LOG("SYSTEM IRX address start: %08x end: %08x\n", (int)irxptr_tab[i].irxaddr, (int)(irxptr_tab[i].irxaddr+curIrxSize));
+			if(irxptr+curIrxSize>=(void*)0x000B3F00){	//Sanity check.
+				asm volatile("break\n");
+			}
 
 			memcpy((void *)irxptr_tab[i].irxaddr, (void *)irxsrc[i], curIrxSize);
 

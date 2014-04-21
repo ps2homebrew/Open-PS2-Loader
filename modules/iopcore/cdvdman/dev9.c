@@ -332,11 +332,6 @@ void dev9IntrDisable(int mask)
 }
 
 /* Export 5 */
-/* This differs from the "official" dev9 in that it puts the calling thread to
-   sleep when doing the actual DMA transfer.  I'm not sure why SCEI didn't do
-   this in dev9.irx, when they do it in PS2Linux's dmarelay.irx.  Anyway,
-   since this no longer blocks, it should speed up anything else on the IOP
-   when HDD or SMAP are doing DMA.  */
 int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 {
 	USE_SPD_REGS;

@@ -48,6 +48,7 @@
 	.extern Old_SifSetDma
 	.extern Old_SifSetReg
 	.extern padOpen_hooked
+	.extern disable_padOpen_hook
 	.extern Old_ExecPS2
 	.extern Old_CreateThread
 
@@ -72,6 +73,10 @@
  */
 	.ent	_LoadExecPS2
 _LoadExecPS2:
+	/* Set disable_padOpen_hook */
+	la	$v1, disable_padOpen_hook
+	addiu	$v0, $zero, 1
+	sw	$v0, 0x0000($v1)
 
 	/* save args, not needed to preserve sX/ra registers values as we won't return */
 	daddu	$s0, $a0, $zero /* ELF path 	*/
@@ -455,9 +460,15 @@ Hook_ExecPS2:
  */
 	.ent	Hook_CreateThread
 Hook_CreateThread:
+	/* check disable_padOpen_hook != 0 */
+	la	$v1, disable_padOpen_hook
+	lw	$v0, 0x0000($v1)
+	bne	$v0, $zero, 2f
+	nop
 
 	/* check padOpen_hooked == 0 */
-	lw	$v0, padOpen_hooked
+	la	$v1, padOpen_hooked
+	lw	$v0, 0x0000($v1)
 	bne	$v0, $zero, 2f
 
 	/* check thread_param->initial_priority == 0 */

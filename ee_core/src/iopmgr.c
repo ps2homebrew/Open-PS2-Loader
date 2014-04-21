@@ -19,6 +19,9 @@
 extern void *ioprp_img;
 extern int size_ioprp_img;
 
+extern void *udnl_irx;
+extern int size_udnl_irx;
+
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
 
@@ -36,11 +39,19 @@ extern int size_smstcpip_irx;
 extern void *smsmap_irx;
 extern int size_smsmap_irx;
 
+#ifdef __DECI2_DEBUG
+extern void *drvtif_irx;
+extern int size_drvtif_irx;
+
+extern void *tifinet_irx;
+extern int size_tifinet_irx;
+#else
 extern void *udptty_irx;
 extern int size_udptty_irx;
 
 extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
+#endif
 
 extern int _iop_reboot_count;
 
@@ -79,7 +90,7 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 	ee_kmode_exit();
 	EIntr(); */
 
-	LoadModuleAsync("rom0:UDNL", CommandLen, command);
+	LoadMemModuleAsync(udnl_irx, size_udnl_irx, CommandLen, command);
 
 	DIntr();
 	ee_kmode_enter();
@@ -115,8 +126,13 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 		LoadMemModule(smstcpip_irx, size_smstcpip_irx, 0, NULL);
 		LoadMemModule(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
 	}
+#ifdef __DECI2_DEBUG
+	LoadMemModule(drvtif_irx, size_drvtif_irx, 0, NULL);
+	LoadMemModule(tifinet_irx, size_tifinet_irx, 0, NULL);
+#else
 	LoadMemModule(udptty_irx, size_udptty_irx, 0, NULL);
 	LoadMemModule(ioptrap_irx, size_ioptrap_irx, 0, NULL);
+#endif
 #endif
 }
 

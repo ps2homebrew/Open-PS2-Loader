@@ -31,6 +31,7 @@ int set_reg_disabled;
 int iop_reboot_count = 0;
 
 int padOpen_hooked = 0;
+int disable_padOpen_hook = 1;
 
 /*----------------------------------------------------------------------------------------*/
 /* This function is called when SifSetDma catches a reboot request.                       */
@@ -43,8 +44,12 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 
 	struct _iop_reset_pkt *reset_pkt = (struct _iop_reset_pkt*)sdd->src;
 
+	disable_padOpen_hook = 1;
+
 	// does IOP reset
 	New_Reset_Iop(reset_pkt->arg, reset_pkt->arglen);
+
+	disable_padOpen_hook = 0;
 
 	return 1;
 }
@@ -111,6 +116,8 @@ void t_loadElf(void)
 		SifExitIopHeap();
 		LoadFileExit();
 		SifExitRpc();
+
+		disable_padOpen_hook = 0;
 
 		DPRINTF("t_loadElf: executing...\n");
 		ExecPS2((void*)elf.epc, (void*)elf.gp, g_argc, g_argv);

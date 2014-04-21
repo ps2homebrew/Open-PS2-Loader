@@ -2,6 +2,8 @@
 
 DEBUG = 0
 EESIO_DEBUG = 0
+INGAME_DEBUG = 0
+DECI2_DEBUG = 0
 #comment following line to build without vmc
 VMC = 1
 CHILDPROOF = 0
@@ -43,7 +45,6 @@ EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS)
 MAPFILE = opl.map
 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
-#EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -ldebug -lpoweroff -lfileXio -lpatches -lpad -lm -lmc -lfreetype
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 ifeq ($(DEBUG),1) 
@@ -93,6 +94,13 @@ ifeq ($(INGAME_DEBUG),1)
 	EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
 	CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
 	SMSTCPIP_INGAME_CFLAGS = 
+
+	ifeq ($(DECI2_DEBUG),1)
+		EECORE_DEBUG_FLAGS += DECI2_DEBUG=1
+		EE_CFLAGS += -D__DECI2_DEBUG
+		EECORE_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
+		UDNL_CFLAGS = DECI2_DEBUG=1
+	endif
 else
 	ifeq ($(IOPCORE_DEBUG),1)
 		EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
@@ -223,7 +231,7 @@ elfldr.s:
 
 udnl.s:
 	echo "    * udnl.irx"
-	$(MAKE) -C modules/iopcore/udnl
+	$(MAKE) $(UDNL_CFLAGS) -C modules/iopcore/udnl
 	bin2s modules/iopcore/udnl/udnl.irx asm/udnl.s udnl_irx
 
 imgdrv.s:
@@ -490,6 +498,12 @@ icon_sys_J.s:
 
 IOPRP_img.s:
 	bin2s modules/iopcore/IOPRP.img asm/IOPRP_img.s IOPRP_img
+
+drvtif_irx.s:
+	bin2s modules/debug/drvtif.irx asm/drvtif_irx.s drvtif_irx
+
+tifinet_irx.s:
+	bin2s modules/debug/tifinet.irx asm/tifinet_irx.s tifinet_irx
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@

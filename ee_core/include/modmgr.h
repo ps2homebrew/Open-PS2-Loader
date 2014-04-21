@@ -80,8 +80,8 @@ typedef struct
 int  LoadFileInit();
 void LoadFileExit();
 int  LoadModule(const char *path, int arg_len, const char *args);
-int  LoadModuleAsync(const char *path, int arg_len, const char *args);
 void InitModulePointers(void);
+int LoadMemModuleAsync(void *modptr, unsigned int modsize, int arg_len, const char *args);
 int  LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args);
 int  LoadElf(const char *path, t_ExecData *data);
 void ChangeModuleName(const char *name, const char *newname);

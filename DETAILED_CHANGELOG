@@ -8,6 +8,10 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev679 - Changed the EE core and updated some modules. - Sat Apr 19 13:52:29 2014 +0800
+rev678 - Updated OPL to be fully compatible (compiles without the deprecated warnings) with the HEAD revision of the PS2SDK. - Sat Jan 11 20:27:05 2014 +0800
+rev677 - *Changed the configGetString function to return a const value, since the configuration keys are not to be changed without configSetStr(), except for two lines within themes.c. This is to safeguard against accidental configuration corruption/overwriting. - Wed Nov 06 13:16:17 2013 +0800
+rev676 - * Updating LNG files - Ethernet modes (among other things) were missing. - Fri Nov 01 12:42:36 2013 -0400
 rev675 - Reverting the change in the previous commit. - Fri Nov 01 20:32:26 2013 +0800
 rev674 - Fix for the workaround for the Chinese SATA network adaptor: I forgot that the register is 16-bit, which means that the adaptor probably reports 0xFFFF as its version number. - Fri Nov 01 17:43:16 2013 +0800
 rev673 - *Ported over the workaround for Chinese SATA network adaptors (See the PS2SDK update for today). - Fri Nov 01 13:47:59 2013 +0800

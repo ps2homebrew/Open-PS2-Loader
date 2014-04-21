@@ -216,6 +216,12 @@ int _SifDmaIntrHandler()
 		iWakeupThread(smbauth_thread_id);
 	}
 
+	/* exit handler */
+	__asm__ __volatile__(
+		" sync;"
+		" ei;"
+	);
+
 	return 0;
 }
 

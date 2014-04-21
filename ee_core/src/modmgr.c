@@ -37,11 +37,19 @@ int size_smstcpip_irx;
 void *smsmap_irx;
 int size_smsmap_irx;
 
+#ifdef __DECI2_DEBUG
+void *drvtif_irx;
+int size_drvtif_irx;
+
+void *tifinet_irx;
+int size_tifinet_irx;
+#else
 void *udptty_irx;
 int size_udptty_irx;
 
 void *ioptrap_irx;
 int size_ioptrap_irx;
+#endif
 
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
@@ -112,68 +120,7 @@ int LoadModule(const char *path, int arg_len, const char *args)
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path without waiting.                                          */
 /*----------------------------------------------------------------------------------------*/
-int LoadModuleAsync(const char *path, int arg_len, const char *args)
-{
-	struct _lf_module_load_arg arg;
-
-	if (LoadFileInit() < 0)
-		return -E_LIB_API_INIT;
-
-	memset(&arg, 0, sizeof arg);
-
-	strncpy(arg.path, path, LF_PATH_MAX - 1);
-	arg.path[LF_PATH_MAX - 1] = 0;
-
-	if ((args) && (arg_len))
-	{
-		arg.p.arg_len = arg_len > LF_ARG_MAX ? LF_ARG_MAX : arg_len;
-		memcpy(arg.args, args, arg.p.arg_len);
-	}
-	else arg.p.arg_len = 0;
-
-	if (SifCallRpc(&_lf_cd, LF_F_MOD_LOAD, SIF_RPC_M_NOWAIT, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
-		return -E_SIF_RPC_CALL;
-
-	return 0;
-}
-
-//--------------------------------------------------------------
-void InitModulePointers(void)
-{
-	int n;
-	irxptr_t *irxptr_tab = *(irxptr_t **)0x00088000;
-
-	n = 0;
-	size_ioprp_img = irxptr_tab[n++].irxsize;	//EESYNC: 1.4K, CDVDMAN: ~30K, CDVDFSV: 9.1.K
-	size_udnl_irx = irxptr_tab[n++].irxsize;	//7.4K
-	size_imgdrv_irx = irxptr_tab[n++].irxsize;	//1.2K
-	size_usbd_irx = irxptr_tab[n++].irxsize;	//23.6K
-	size_smsmap_irx = irxptr_tab[n++].irxsize;	//8.4K
-	size_udptty_irx = irxptr_tab[n++].irxsize;	//3.5K
-	size_ioptrap_irx = irxptr_tab[n++].irxsize;	//4.5K
-	size_smstcpip_irx = irxptr_tab[n++].irxsize;	//62.9
-#ifdef VMC
-	size_mcemu_irx = irxptr_tab[n++].irxsize;
-#endif
-
-	n = 0;
-	ioprp_img = (void *)irxptr_tab[n++].irxaddr;
-	udnl_irx = (void *)irxptr_tab[n++].irxaddr;
-	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
-	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
-	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
-	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
-	ioptrap_irx = (void *)irxptr_tab[n++].irxaddr;
-	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
-#ifdef VMC
-	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
-#endif
-}
-
-/*----------------------------------------------------------------------------------------*/
-/* Load an irx module from an EE buffer.                                                  */
-/*----------------------------------------------------------------------------------------*/
-int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args)
+static int _LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, const char *args)
 {
 	SifDmaTransfer_t sifdma;
 	void            *iopmem;
@@ -215,12 +162,68 @@ int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *a
 	}
 	else arg.q.arg_len = 0;
 
-	if (SifCallRpc(&_lf_cd, LF_F_MOD_BUF_LOAD, 0, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
+	if (SifCallRpc(&_lf_cd, LF_F_MOD_BUF_LOAD, mode, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
 		return -E_SIF_RPC_CALL;
 
-	SifFreeIopHeap(iopmem);
+	if(!(mode&SIF_RPC_M_NOWAIT)) SifFreeIopHeap(iopmem);
 
 	return arg.p.result;
+}
+
+int LoadMemModuleAsync(void *modptr, unsigned int modsize, int arg_len, const char *args)
+{
+	return _LoadMemModule(SIF_RPC_M_NOWAIT, modptr, modsize, arg_len, args);
+}
+
+//--------------------------------------------------------------
+void InitModulePointers(void)
+{
+	int n;
+	irxptr_t *irxptr_tab = *(irxptr_t **)0x00088000;
+
+	n = 0;
+	size_ioprp_img = irxptr_tab[n++].irxsize;	//EESYNC: 1.4K, CDVDMAN: ~30K, CDVDFSV: 9.1.K
+	size_udnl_irx = irxptr_tab[n++].irxsize;	//7.4K
+	size_imgdrv_irx = irxptr_tab[n++].irxsize;	//1.2K
+	size_usbd_irx = irxptr_tab[n++].irxsize;	//23.6K
+	size_smsmap_irx = irxptr_tab[n++].irxsize;	//8.4K
+#ifdef __DECI2_DEBUG
+	size_drvtif_irx = irxptr_tab[n++].irxsize;
+	size_tifinet_irx = irxptr_tab[n++].irxsize;
+#else
+	size_udptty_irx = irxptr_tab[n++].irxsize;	//3.5K
+	size_ioptrap_irx = irxptr_tab[n++].irxsize;	//4.5K
+#endif
+	size_smstcpip_irx = irxptr_tab[n++].irxsize;	//62.9
+#ifdef VMC
+	size_mcemu_irx = irxptr_tab[n++].irxsize;
+#endif
+
+	n = 0;
+	ioprp_img = (void *)irxptr_tab[n++].irxaddr;
+	udnl_irx = (void *)irxptr_tab[n++].irxaddr;
+	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
+	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
+	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
+#ifdef __DECI2_DEBUG
+	drvtif_irx = (void *)irxptr_tab[n++].irxaddr;
+	tifinet_irx = (void *)irxptr_tab[n++].irxaddr;
+#else
+	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
+	ioptrap_irx = (void *)irxptr_tab[n++].irxaddr;
+#endif
+	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
+#ifdef VMC
+	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
+#endif
+}
+
+/*----------------------------------------------------------------------------------------*/
+/* Load an irx module from an EE buffer.                                                  */
+/*----------------------------------------------------------------------------------------*/
+int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args)
+{
+	return _LoadMemModule(0, modptr, modsize, arg_len, args);
 }
 
 /*----------------------------------------------------------------------------------------*/

@@ -42,6 +42,9 @@ extern int size_smstcpip_irx;
 extern void *ingame_smstcpip_irx;
 extern int size_ingame_smstcpip_irx;
 
+extern void *smap_irx;
+extern int size_smap_irx;
+
 extern void *smap_ingame_irx;
 extern int size_smap_ingame_irx;
 
@@ -382,9 +385,6 @@ void sysExecExit() {
 #define IRX_NUM 8
 #endif
 
-extern void *smap_irx;
-extern int size_smap_irx;
-
 #ifdef VMC
 static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
 #else
@@ -403,15 +403,16 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	size_ioprp_image=patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
 
 	n = 0;
-	irxptr_tab[n++].irxsize = size_ioprp_image;
 	irxptr_tab[n++].irxsize = size_udnl_irx;
+	irxptr_tab[n++].irxsize = size_ioprp_image;
 	irxptr_tab[n++].irxsize = size_imgdrv_irx;
 	irxptr_tab[n++].irxsize = size_usbd_irx;
-	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
-#ifdef __DECI2_DEBUG
+#ifdef __DECI2_DEBUG	//FIXME: I don't know why, but the ingame SMAP driver cannot be used with the DECI2 modules. Perhaps that old bug with the network stack become unresponsive gets triggered? Until this is solved, use the normal SMAP driver.
+	irxptr_tab[n++].irxsize = size_smap_irx;
 	irxptr_tab[n++].irxsize = size_drvtif_irx;
 	irxptr_tab[n++].irxsize = size_tifinet_irx;
 #else
+	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
 	irxptr_tab[n++].irxsize = size_udptty_irx;
 	irxptr_tab[n++].irxsize = size_ioptrap_irx;
 #endif
@@ -421,15 +422,16 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 #endif
 
 	n = 0;
-	irxsrc[n++] = ioprp_image;
 	irxsrc[n++] = (void *)&udnl_irx;
+	irxsrc[n++] = ioprp_image;
 	irxsrc[n++] = (void *)&imgdrv_irx;
 	irxsrc[n++] = usbd_irx;
-	irxsrc[n++] = (void *)&smap_ingame_irx;
 #ifdef __DECI2_DEBUG
+	irxsrc[n++] = (void *)&smap_irx;
 	irxsrc[n++] = (void *)&drvtif_irx;
 	irxsrc[n++] = (void *)&tifinet_irx;
 #else
+	irxsrc[n++] = (void *)&smap_ingame_irx;
 	irxsrc[n++] = (void *)&udptty_irx;
 	irxsrc[n++] = (void *)&ioptrap_irx;
 #endif
@@ -443,17 +445,31 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	*(irxptr_t**)0x00088000 = irxptr_tab;
 	irxptr = (void *)((((unsigned int)irxptr_tab+sizeof(irxptr_t)*IRX_NUM)+0xF)&~0xF);
 
+#ifdef __DECI2_DEBUG
+	//For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
+	irxptr_tab[0].irxaddr=(void*)0x00033000;
+	LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr_tab[0].irxaddr, irxptr_tab[0].irxaddr+irxptr_tab[0].irxsize);
+	DI();
+	ee_kmode_enter();
+	memcpy((void*)(0x80000000|(unsigned int)irxptr_tab[0].irxaddr), irxsrc[0], irxptr_tab[0].irxsize);
+	ee_kmode_exit();
+	EI();
+
+	for (i = 1; i< IRX_NUM; i++) {
+#else
 	for (i = 0; i < IRX_NUM; i++) {
+#endif
 		curIrxSize = irxptr_tab[i].irxsize;
 		irxptr_tab[i].irxaddr = irxptr;
 
 		if (curIrxSize > 0) {
-			LOG("SYSTEM IRX address start: %08x end: %08x\n", (int)irxptr_tab[i].irxaddr, (int)(irxptr_tab[i].irxaddr+curIrxSize));
+			LOG("SYSTEM IRX address start: %p end: %p\n", irxptr_tab[i].irxaddr, irxptr_tab[i].irxaddr+curIrxSize);
 			if(irxptr+curIrxSize>=(void*)0x000B3F00){	//Sanity check.
+				LOG("*** OVERFLOW DETECTED. HALTED.\n");
 				asm volatile("break\n");
 			}
 
-			memcpy((void *)irxptr_tab[i].irxaddr, (void *)irxsrc[i], curIrxSize);
+			memcpy(irxptr_tab[i].irxaddr, irxsrc[i], curIrxSize);
 
 			irxptr += ((curIrxSize+0xF)&~0xF);
 			irxsize += curIrxSize;
@@ -517,6 +533,51 @@ static void PrepareGSM(char *cmdline) {
 }
 #endif
 
+#ifdef __DECI2_DEBUG
+/*
+	Look for the start of the EE DECI2 manager initialization function.
+
+	The stock EE kernel has no reset function, but the EE kernel is most likely already primed to self-destruct and in need of a good reset.
+	What happens is that the OSD initializes the EE DECI2 TTY protocol at startup, but the EE DECI2 manager is never aware that the OSDSYS ever loads other programs.
+
+	As a result, the EE kernel crashes immediately when the EE TTY gets used (when the IOP side of DECI2 comes up), when it invokes whatever that exists at the OSD's old ETTY handler's location. :(
+*/
+static int ResetDECI2(void){
+	int result;
+	unsigned int i, *ptr;
+	void (*pDeci2ManagerInit)(void);
+	static const unsigned int Deci2ManagerInitPattern[]={
+		0x3c02bf80,	//lui v0, $bf80
+		0x3c04bfc0,	//lui a0, $bfc0
+		0x34423800,	//ori v0, v0, $3800
+		0x34840102	//ori a0, a0, $0102
+	};
+
+	DI();
+	ee_kmode_enter();
+
+	result=-1;
+	ptr=(void*)0x80000000;
+	for(i=0; i<0x20000/4; i++){
+		if(	ptr[i+0]==Deci2ManagerInitPattern[0] &&
+			ptr[i+1]==Deci2ManagerInitPattern[1] &&
+			ptr[i+2]==Deci2ManagerInitPattern[2] &&
+			ptr[i+3]==Deci2ManagerInitPattern[3]
+			){
+			pDeci2ManagerInit=(void*)&ptr[i-14];
+			pDeci2ManagerInit();
+			result=0;
+			break;
+		}
+	}
+
+	ee_kmode_exit();
+	EI();
+
+	return result;
+}
+#endif
+
 #ifdef VMC
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, unsigned int compatflags) {
 #else
@@ -545,6 +606,10 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
 	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx);
+#endif
+
+#ifdef __DECI2_DEBUG
+	ResetDECI2();
 #endif
 
 	// NB: LOADER.ELF is embedded

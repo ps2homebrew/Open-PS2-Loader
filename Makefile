@@ -1,5 +1,6 @@
 .SILENT:
 
+#For debugging with DECI2 (EE only), enable DEBUG, INGAME_DEBUG and DECI2_DEBUG.
 DEBUG = 0
 EESIO_DEBUG = 0
 INGAME_DEBUG = 0
@@ -141,6 +142,9 @@ eesio_debug:
 
 iopcore_debug:
 	$(MAKE) IOPCORE_DEBUG=1 DEBUG=1 all
+
+deci2_debug:
+	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
 
 clean:  sclean
 

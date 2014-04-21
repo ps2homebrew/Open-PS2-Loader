@@ -1823,8 +1823,6 @@ static int cdvdman_read(unsigned int lsn, unsigned int sectors, void *buf, cd_re
 	cdvdman_ReadSect(lsn, sectors, buf);
 	#endif
 
-	DPRINTF("sceCdRead0 ret=%d\n", r);
-
 	return(cdvdman_stat.err==CDVD_ERR_NO?0:1);
 }
 

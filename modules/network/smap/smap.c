@@ -294,14 +294,17 @@ static unsigned int LinkCheckTimerCB(struct SmapDriverData *SmapDrivPrivData){
 }
 
 static int Dev9IntrCb(int flag){
+	USE_SPD_REGS;
 	volatile u8* smap_regbase;
 
 	SaveGP();
 
 	smap_regbase=SmapDriverData.smap_regbase;
 
-	SMAP_REG16(SMAP_R_INTR_CLR)=SMAP_INTR_RXEND;
-	HandleRxIntr(&SmapDriverData);
+	while((SPD_REG16(SPD_R_INTR_STAT)&SMAP_INTR_RXEND)!=0){
+		SMAP_REG16(SMAP_R_INTR_CLR)=SMAP_INTR_RXEND;
+		HandleRxIntr(&SmapDriverData);
+	}
 
 	RestoreGP();
 
@@ -566,4 +569,3 @@ int SMAPGetMACAddress(unsigned char *buffer){
 
 	return 0;
 }
-

@@ -182,26 +182,26 @@ void InitModulePointers(void)
 	irxptr_t *irxptr_tab = *(irxptr_t **)0x00088000;
 
 	n = 0;
-	size_ioprp_img = irxptr_tab[n++].irxsize;	//EESYNC: 1.4K, CDVDMAN: ~30K, CDVDFSV: 9.1.K
-	size_udnl_irx = irxptr_tab[n++].irxsize;	//7.4K
-	size_imgdrv_irx = irxptr_tab[n++].irxsize;	//1.2K
-	size_usbd_irx = irxptr_tab[n++].irxsize;	//23.6K
-	size_smsmap_irx = irxptr_tab[n++].irxsize;	//8.4K
+	size_udnl_irx = irxptr_tab[n++].irxsize;
+	size_ioprp_img = irxptr_tab[n++].irxsize;
+	size_imgdrv_irx = irxptr_tab[n++].irxsize;
+	size_usbd_irx = irxptr_tab[n++].irxsize;
+	size_smsmap_irx = irxptr_tab[n++].irxsize;
 #ifdef __DECI2_DEBUG
 	size_drvtif_irx = irxptr_tab[n++].irxsize;
 	size_tifinet_irx = irxptr_tab[n++].irxsize;
 #else
-	size_udptty_irx = irxptr_tab[n++].irxsize;	//3.5K
-	size_ioptrap_irx = irxptr_tab[n++].irxsize;	//4.5K
+	size_udptty_irx = irxptr_tab[n++].irxsize;
+	size_ioptrap_irx = irxptr_tab[n++].irxsize;
 #endif
-	size_smstcpip_irx = irxptr_tab[n++].irxsize;	//62.9
+	size_smstcpip_irx = irxptr_tab[n++].irxsize;
 #ifdef VMC
 	size_mcemu_irx = irxptr_tab[n++].irxsize;
 #endif
 
 	n = 0;
+	udnl_irx = (void*)irxptr_tab[n++].irxaddr;
 	ioprp_img = (void *)irxptr_tab[n++].irxaddr;
-	udnl_irx = (void *)irxptr_tab[n++].irxaddr;
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
 	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
 	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;

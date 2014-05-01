@@ -21,7 +21,7 @@ typedef struct {
 	game_patch_t patch;
 } patchlist_t;
 
-static patchlist_t patch_list[45] = {
+static patchlist_t patch_list[] = {
 	{ "SLES_524.58", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
 	{ "SLUS_206.66", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness NTSC U - disable cdvd timeout stuff
 	{ "SLPS_202.51", USB_MODE, { 0xdeadbee0, 0x00000000, 0x00000000 }}, // Makai Senki Disgaea NTSC J - disable cdvd timeout stuff
@@ -56,7 +56,7 @@ static patchlist_t patch_list[45] = {
 	{ "SLES_528.22", ETH_MODE, { 0xdeadbee2, 0x000c0000, 0x0060f4dc }}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
 	{ "SLES_528.22", HDD_MODE, { 0xdeadbee2, 0x00040000, 0x0060f4dc }}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
 	{ "SLUS_214.32", ALL_MODE, { 0xdeadbee2, 0x00080000, 0x002baf34 }}, // NRA Gun Club NTSC U
-	{ "SLPM_654.05", HDD_MODE, { 0xdeadbee2, 0x00200000, 0x00249b84 }}, // Super Dimensional Fortress Macross JPN
+	{ "SLPM_654.05", HDD_MODE, { 0x00065405, 0x00200000, 0x00249b84 }}, // Super Dimensional Fortress Macross JPN
 	/*
 	{ "SCES_525.82", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // EveryBody's Golf PAL
 	{ "SCUS_974.01", ALL_MODE, { 0xdeadbee3, 0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! NTSC U
@@ -145,8 +145,9 @@ static u32 AC9Bpattern_mask[] = {
 	0xffffffff
 };
 
-#define	JAL(addr)	(0x0c000000 | ((addr & 0x03ffffff) >> 2))
-#define	FNADDR(jal)	((jal & 0x03ffffff) << 2)
+#define JAL(addr)	(0x0c000000 | (((addr) & 0x03ffffff) >> 2))
+#define JMP(addr)	(0x08000000 | (0x3ffffff&((addr)>>2)))
+#define FNADDR(jal)	(((jal) & 0x03ffffff) << 2)
 
 static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
 static u32 g_delay_cycles;
@@ -218,6 +219,23 @@ static void generic_capcom_protection_patches(u32 patch_addr)
 	_sw(JAL((u32)apply_capcom_protection_patch), patch_addr);
 }
 
+static void Invoke_CRSGUI_Start(void){
+	int (*pCRSGUI_Start)(int arg1, int arg2)=(void*)0x003054b0;
+
+	pCRSGUI_Start(*(int*)0x0078f79c, 0);
+}
+
+static void SDF_Macross_patch(void){
+	/*	Choujikuu Yousai Macross appears to have a rather large problem with it: it appears to use its GUI before initialization is completed.
+		I did not attempt to figure out whether it's really a timing problem (whereby this happens before initialization is completed by another thread... if there is one),
+		or if its normal functionality was the result of pure luck that SEGA had.
+
+		The problems that it has are quite evident when this game is run within PCSX2. I still do not know why DECI2 does not detect the TLB exception when it
+		dereferences NULL pointers, but it might have something to do with the game accessing the debug registers (PCSX2's logs indicate that). */
+
+	_sw(JMP((unsigned int)&Invoke_CRSGUI_Start), 0x001f8520);
+}
+
 void apply_patches(void)
 {
 	patchlist_t *p = (patchlist_t *)&patch_list[0];
@@ -232,6 +250,8 @@ void apply_patches(void)
 				AC9B_generic_patches(); // Armored Core 9 Breaker USB generic patch
 			else if (p->patch.addr == 0xdeadbee2)
 				generic_delayed_cdRead_patches(p->patch.check, p->patch.val); // slow reads generic patch
+			else if (p->patch.addr == 0x00065405)
+				SDF_Macross_patch();
 			else if (p->patch.addr == 0xbabecafe)
 				generic_capcom_protection_patches(p->patch.val); // Capcom anti cdvd emulator protection patch
 

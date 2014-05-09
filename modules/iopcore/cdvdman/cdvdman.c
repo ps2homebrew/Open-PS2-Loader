@@ -11,6 +11,7 @@
 #include "smb.h"
 #include "atad.h"
 #include "ioplib_util.h"
+#include "cdvdman.h"
 
 #include <loadcore.h>
 #include <stdio.h>
@@ -114,88 +115,6 @@ struct irx_export_table _exp_smsutils;
 struct irx_export_table _exp_oplutils;
 #endif
 
-// PS2 CDVD hardware registers
-#define CDL_DATA_RDY		0x01
-#define CDL_DATA_COMPLETE	0x02
-#define CDL_DATA_END		0x04
-
-#define CDVDreg_NCOMMAND      (*(volatile unsigned char *)0xBF402004)
-#define CDVDreg_READY         (*(volatile unsigned char *)0xBF402005)
-#define CDVDreg_NDATAIN       (*(volatile unsigned char *)0xBF402005)
-#define CDVDreg_ERROR         (*(volatile unsigned char *)0xBF402006)
-#define CDVDreg_HOWTO         (*(volatile unsigned char *)0xBF402006)
-#define CDVDreg_ABORT         (*(volatile unsigned char *)0xBF402007)
-#define CDVDreg_PWOFF         (*(volatile unsigned char *)0xBF402008)
-#define CDVDreg_9             (*(volatile unsigned char *)0xBF402008)
-#define CDVDreg_STATUS        (*(volatile unsigned char *)0xBF40200A)
-#define CDVDreg_B             (*(volatile unsigned char *)0xBF40200B)
-#define CDVDreg_C             (*(volatile unsigned char *)0xBF40200C)
-#define CDVDreg_D             (*(volatile unsigned char *)0xBF40200D)
-#define CDVDreg_E             (*(volatile unsigned char *)0xBF40200E)
-#define CDVDreg_TYPE          (*(volatile unsigned char *)0xBF40200F)
-#define CDVDreg_13            (*(volatile unsigned char *)0xBF402013)
-#define CDVDreg_SCOMMAND      (*(volatile unsigned char *)0xBF402016)
-#define CDVDreg_SDATAIN       (*(volatile unsigned char *)0xBF402017)
-#define CDVDreg_SDATAOUT      (*(volatile unsigned char *)0xBF402018)
-#define CDVDreg_KEYSTATE      (*(volatile unsigned char *)0xBF402038)
-#define CDVDreg_KEYXOR        (*(volatile unsigned char *)0xBF402039)
-#define CDVDreg_DEC           (*(volatile unsigned char *)0xBF40203A)
-
-// user cb CDVD events
-#define SCECdFuncRead         1
-#define SCECdFuncReadCDDA     2
-#define SCECdFuncGetToc       3
-#define SCECdFuncSeek         4
-#define SCECdFuncStandby      5
-#define SCECdFuncStop         6
-#define SCECdFuncPause        7
-#define SCECdFuncBreak        8
-
-// Modes for cdInit()
-#define CDVD_INIT_INIT		0x00		// init cd system and wait till commands can be issued
-#define CDVD_INIT_NOCHECK	0x01		// init cd system
-#define CDVD_INIT_EXIT		0x05		// de-init system
-
-// CDVD stats
-#define CDVD_STAT_STOP		0x00		// disc has stopped spinning
-#define CDVD_STAT_OPEN		0x01		// tray is open
-#define CDVD_STAT_SPIN		0x02		// disc is spinning
-#define CDVD_STAT_READ		0x06		// reading from disc
-#define CDVD_STAT_PAUSE		0x0A		// disc is paused
-#define CDVD_STAT_SEEK		0x12		// disc is seeking
-#define CDVD_STAT_ERROR		0x20		// error occurred
-
-// cdTrayReq() values
-#define CDVD_TRAY_OPEN		0		// Tray Open
-#define CDVD_TRAY_CLOSE		1		// Tray Close
-#define CDVD_TRAY_CHECK		2		// Tray Check
-
-// sceCdDiskReady() values
-#define CDVD_READY_READY	0x02
-#define CDVD_READY_NOTREADY	0x06
-
-#define CdSpinMax		0
-#define CdSpinNom		1
-#define CdSpinStm		0
-
-// cdGetError() return values
-#define CDVD_ERR_FAIL		-1		// error in cdGetError()
-#define CDVD_ERR_NO		0x00		// no error occurred
-#define CDVD_ERR_ABRT		0x01		// command was aborted due to cdBreak() call
-#define CDVD_ERR_CMD		0x10		// unsupported command
-#define CDVD_ERR_OPENS		0x11		// tray is open
-#define CDVD_ERR_NODISC		0x12		// no disk inserted
-#define CDVD_ERR_NORDY		0x13		// drive is busy processing another command
-#define CDVD_ERR_CUD		0x14		// command unsupported for disc currently in drive
-#define CDVD_ERR_IPI		0x20		// sector address error
-#define CDVD_ERR_ILI		0x21		// num sectors error
-#define CDVD_ERR_PRM		0x22		// command parameter error
-#define CDVD_ERR_READ		0x30		// error while reading
-#define CDVD_ERR_TRMOPN		0x31		// tray was opened
-#define CDVD_ERR_EOM		0x32		// outermost error
-#define CDVD_ERR_READCF		0xFD		// error setting command
-#define CDVD_ERR_READCFR  	0xFE		// error setting command
-
 struct dirTocEntry {
 	short	length;
 	u32	fileLBA;			// 2
@@ -209,46 +128,6 @@ struct dirTocEntry {
 	u8	filenameLength;			// 32
 	char	filename[128];			// 33
 } __attribute__((packed));
-
-typedef struct {
-	u8 stat;
-	u8 second;
-	u8 minute;
-	u8 hour;
-	u8 week;
-	u8 day;
-	u8 month;
-	u8 year;
-} cd_clock_t;
-
-typedef struct {
-	u32	lsn;
-	u32	size;
-	char	name[16];
-	u8	date[8];
-} cd_file_t;
-
-typedef struct {
-	u32	lsn;
-	u32	size;
-	char	name[16];
-	u8	date[8];
-	u32	flag;
-} cdl_file_t;
-
-typedef struct {
-	u8 minute;
-	u8 second;
-	u8 sector;
-	u8 track;
-} cd_location_t;
-
-typedef struct {
-	u8 trycount;
-	u8 spindlctrl;
-	u8 datapattern;
-	u8 pad;
-} cd_read_mode_t;
 
 struct cdvdman_StreamingData{
 	unsigned int lsn;
@@ -279,49 +158,6 @@ typedef struct {
 	u32 filesize;
 	u32 position;
 } FHANDLE;
-
-// exported functions prototypes
-int sceCdInit(int init_mode);							// #4
-int sceCdStandby(void);								// #5
-int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode); 		// #6
-int sceCdSeek(u32 lsn);								// #7
-int sceCdGetError(void); 							// #8
-int sceCdGetToc(void *toc); 							// #9
-int sceCdSearchFile(cd_file_t *fp, const char *name); 				// #10
-int sceCdSync(int mode); 							// #11
-int sceCdGetDiskType(void);							// #12
-int sceCdDiskReady(int mode); 							// #13
-int sceCdTrayReq(int mode, u32 *traycnt); 					// #14
-int sceCdStop(void); 								// #15
-int sceCdPosToInt(cd_location_t *p); 						// #16
-cd_location_t *sceCdIntToPos(int i, cd_location_t *p);				// #17
-int sceCdRI(char *buf, int *stat); 						// #22
-int sceCdReadClock(cd_clock_t *rtc); 						// #24
-int sceCdStatus(void); 								// #28
-int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out); 			// #29
-int *sceCdCallback(void *func); 						// #37
-int sceCdPause(void);								// #38
-int sceCdBreak(void);								// #39
-int sceCdReadCdda(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode);	// #40
-int sceCdGetReadPos(void); 							// #44
-int sceCdSC(int code, int *param);						// #50
-int sceCdRC(cd_clock_t *rtc);		 					// #51
-int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr); 			// #56
-int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err); 			// #57
-int sceCdStSeek(u32 lsn);							// #58
-int sceCdStStart(u32 lsn, cd_read_mode_t *mode);				// #59
-int sceCdStStat(void); 								// #60
-int sceCdStStop(void);								// #61
-int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode);		// #62
-int sceCdRM(char *m, u32 *stat);						// #64
-int sceCdStPause(void);								// #67
-int sceCdStResume(void); 							// #68
-int sceCdStSeekF(u32 lsn); 							// #77
-int sceCdReadDiskID(void *DiskID);						// #79
-int sceCdReadGUID(void *GUID);							// #80
-int sceCdReadModelID(void *ModelID);						// #82
-int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); 			// #83
-int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer);		// #84
 
 // internal functions prototypes
 #ifdef USB_DRIVER
@@ -634,7 +470,6 @@ static char cdvdman_curdir[256];
 #define CDVDMAN_BUF_SECTORS 	2
 static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS*2048];
 
-#define CDVDMAN_FS_SECTORS	6	//Keep this in-sync with CDVDFSV_BUF_SECTORS in CDVDFSV.
 #define CDVDMAN_FS_BUFSIZE	CDVDMAN_FS_SECTORS * 2048
 static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE + 2*2048];
 

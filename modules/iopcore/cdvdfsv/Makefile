@@ -15,7 +15,7 @@ ifeq ($(DEBUG),1)
 DEBUG_FLAGS = -DDEBUG
 endif
 
-IOP_INCS += -I$(PS2SDK)/iop/include
+IOP_INCS += -I../common -I$(PS2SDK)/iop/include
 IOP_CFLAGS += -Wall -fno-builtin $(DEBUG_FLAGS)
 IOP_LDFLAGS += -s
 

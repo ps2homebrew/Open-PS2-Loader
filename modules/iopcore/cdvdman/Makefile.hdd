@@ -13,7 +13,7 @@ IOP_OBJS = cdvdman.o ioplib_util.o smsutils.o imports.o exports.o
 IOP_OBJS += dev9.o atad.o
 IOP_LIBS =
 
-IOP_INCS +=
+IOP_INCS += -I../common
 IOP_CFLAGS += -Wall -fno-builtin-printf
 IOP_CFLAGS += -DHDD_DRIVER
 ifeq ($(IOPCORE_DEBUG),1)

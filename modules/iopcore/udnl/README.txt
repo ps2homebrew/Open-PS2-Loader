@@ -62,5 +62,6 @@ Known bugs and limitations:
 	This means that when the list of modules within IOPBTCONF is parsed from IOPRP image #2, modules will only be selected from IOPRP image #2 and later. When the UDNL module finds the "!include" statement and parses through the boot ROM IOPBTCONF file (since no further images after IOPRP image #2 has one), only modules from IOPRP image #3 and the boot ROM will be selected.
 
 #1 only applies to the Sony UDNL module, as it doesn't reset the relative module pointer. This clone has that bug fixed.
+#2 only applies to the Sony boot ROM UDNL module, as it does not copy the embedded IOPRP image into its allocated buffer. It does not work well either, as the region that the embedded IOPRP image exists in does not get reserved.
 #3 only applies to the Sony UDNL module. This clone has that check totally commented out.
 #5 only applies to the Sony boot ROM UDNL modules. This clone has a modified system that works similarly to how the DVD player UDNL modules do, but retains the full extended functionality of a boot ROM UDNL module.

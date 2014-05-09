@@ -9,105 +9,16 @@
 #include <stdio.h>
 #include <sifcmd.h>
 #include <sifman.h>
-#include <sysmem.h>
 #include <sysclib.h>
 #include <thbase.h>
 #include <thevent.h>
 #include <thsemap.h>
 
+#include "cdvdman.h"
 #include "smsutils.h"
 
 #define MODNAME "cdvd_ee_driver"
 IRX_ID(MODNAME, 2, 2);
-
-typedef struct {
-	u8 stat;
-	u8 second;
-	u8 minute;
-	u8 hour;
-	u8 week;
-	u8 day;
-	u8 month;
-	u8 year;
-} cd_clock_t;
-
-typedef struct {
-	u32	lsn;
-	u32	size;
-	char	name[16];
-	u8	date[8];
-} cd_file_t;
-
-typedef struct {
-	u32	lsn;
-	u32	size;
-	char	name[16];
-	u8	date[8];
-	u32	flag;
-} cdl_file_t;
-
-typedef struct {
-	u8	trycount;
-	u8	spindlctrl;
-	u8	datapattern;
-	u8	pad;
-} cd_read_mode_t;
-
-// cdGetError() return values
-#define CDVD_ERR_FAIL		-1		// error in cdGetError()
-#define CDVD_ERR_NO		0x00		// no error occurred
-#define CDVD_ERR_ABRT		0x01		// command was aborted due to cdBreak() call
-#define CDVD_ERR_CMD		0x10		// unsupported command
-#define CDVD_ERR_OPENS		0x11		// tray is open
-#define CDVD_ERR_NODISC		0x12		// no disk inserted
-#define CDVD_ERR_NORDY		0x13		// drive is busy processing another command
-#define CDVD_ERR_CUD		0x14		// command unsupported for disc currently in drive
-#define CDVD_ERR_IPI		0x20		// sector address error
-#define CDVD_ERR_ILI		0x21		// num sectors error
-#define CDVD_ERR_PRM		0x22		// command parameter error
-#define CDVD_ERR_READ		0x30		// error while reading
-#define CDVD_ERR_TRMOPN		0x31		// tray was opened
-#define CDVD_ERR_EOM		0x32		// outermost error
-#define CDVD_ERR_READCF		0xFD		// error setting command
-#define CDVD_ERR_READCFR  	0xFE		// error setting command
-
-// cdvdman imports
-int sceCdInit(int init_mode);						// #4
-int sceCdStandby(void);							// #5
-int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode); 	// #6
-int sceCdSeek(u32 lsn);							// #7
-int sceCdGetError(void); 						// #8
-int sceCdSearchFile(cd_file_t *fp, const char *name); 			// #10
-int sceCdSync(int mode); 						// #11
-int sceCdGetDiskType(void);						// #12
-int sceCdDiskReady(int mode); 						// #13
-int sceCdTrayReq(int mode, u32 *traycnt); 				// #14
-int sceCdStop(void); 							// #15
-int sceCdReadClock(cd_clock_t *rtc); 					// #24
-int sceCdStatus(void); 							// #28
-int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out); 		// #29
-int sceCdPause(void);							// #38
-int sceCdBreak(void);							// #39
-void *sceGetFsvRbuf(void);						// #47
-int sceCdSC(int code, int *param);					// #50
-int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr); 		// #56
-int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err); 		// #57
-int sceCdStSeek(u32 lsn);						// #58
-int sceCdStStart(u32 lsn, cd_read_mode_t *mode);			// #59
-int sceCdStStat(void); 							// #60
-int sceCdStStop(void);							// #61
-int sceCdRead0(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode);	// #62
-int sceCdStPause(void);							// #67
-int sceCdStResume(void); 						// #68
-int sceCdMmode(int mode); 						// #75
-int sceCdPowerOff(int *stat); 						// #75
-int sceCdStSeekF(u32 lsn); 						// #77
-int sceCdReadDiskID(void *DiskID);					// #79
-int sceCdReadGUID(void *GUID);						// #80
-int sceCdSetTimeout(int param, int timeout);				// #81
-int sceCdReadModelID(void *ModelID);					// #82
-int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); 		// #83
-int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer);	// #84
 
 typedef struct {
 	int	func_ret;
@@ -356,7 +267,7 @@ static u8 cdvdNcmds_rpcbuf[1024];
 static u8 S596_rpcbuf[16];
 static u8 curlsn_buf[16];
 
-#define CDVDFSV_BUF_SECTORS		8	//Keep this in-sync with CDVDMAN_FS_SECTORS in CDVDMAN. cdvdman_fs_buf in CDVDMAN must be equal to this size.
+#define CDVDFSV_BUF_SECTORS		(CDVDMAN_FS_SECTORS+1)	//CDVDFSV will use CDVDFSV_BUF_SECTORS+1 sectors of space. Remember that the actual size of the buffer within CDVDMAN is CDVDMAN_FS_SECTORS+2.
 
 static int init_thread_id;
 static int rpc0_thread_id, rpc1_thread_id, rpc2_thread_id;
@@ -1175,43 +1086,3 @@ int sceCdChangeThreadPriority(int priority)
 
 	return -403;
 }
-
-//-------------------------------------------------------------------------
-DECLARE_IMPORT_TABLE(cdvdman, 1, 1)
-DECLARE_IMPORT(4, sceCdInit)
-DECLARE_IMPORT(5, sceCdStandby)
-DECLARE_IMPORT(6, sceCdRead)
-DECLARE_IMPORT(7, sceCdSeek)
-DECLARE_IMPORT(8, sceCdGetError)
-DECLARE_IMPORT(10, sceCdSearchFile)
-DECLARE_IMPORT(11, sceCdSync)
-DECLARE_IMPORT(12, sceCdGetDiskType)
-DECLARE_IMPORT(13, sceCdDiskReady)
-DECLARE_IMPORT(14, sceCdTrayReq)
-DECLARE_IMPORT(15, sceCdStop)
-DECLARE_IMPORT(24, sceCdReadClock)
-DECLARE_IMPORT(28, sceCdStatus)
-DECLARE_IMPORT(29, sceCdApplySCmd)
-DECLARE_IMPORT(38, sceCdPause)
-DECLARE_IMPORT(39, sceCdBreak)
-DECLARE_IMPORT(47, sceGetFsvRbuf)
-DECLARE_IMPORT(50, sceCdSC)
-DECLARE_IMPORT(56, sceCdStInit)
-DECLARE_IMPORT(57, sceCdStRead)
-DECLARE_IMPORT(58, sceCdStSeek)
-DECLARE_IMPORT(59, sceCdStStart)
-DECLARE_IMPORT(60, sceCdStStat)
-DECLARE_IMPORT(61, sceCdStStop)
-DECLARE_IMPORT(62, sceCdRead0)
-DECLARE_IMPORT(67, sceCdStPause)
-DECLARE_IMPORT(68, sceCdStResume)
-DECLARE_IMPORT(74, sceCdPowerOff)
-DECLARE_IMPORT(75, sceCdMmode)
-DECLARE_IMPORT(77, sceCdStSeekF)
-DECLARE_IMPORT(79, sceCdReadDiskID)
-DECLARE_IMPORT(80, sceCdReadGUID)
-DECLARE_IMPORT(81, sceCdSetTimeout)
-DECLARE_IMPORT(82, sceCdReadModelID)
-DECLARE_IMPORT(83, sceCdReadDvdDualInfo)
-DECLARE_IMPORT(84, sceCdLayerSearchFile)
-END_IMPORT_TABLE

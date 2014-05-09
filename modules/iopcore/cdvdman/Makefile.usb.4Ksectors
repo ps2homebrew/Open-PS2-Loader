@@ -20,7 +20,7 @@ endif
 endif
 IOP_LIBS =
 
-IOP_INCS +=
+IOP_INCS += -I../common
 IOP_CFLAGS += -Wall -fno-builtin-printf
 IOP_CFLAGS += -DUSB_DRIVER -D_4K_SECTORS
 ifeq ($(USE_DEV9),1)

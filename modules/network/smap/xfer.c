@@ -48,21 +48,21 @@ static inline int CopyFromFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, i
 	if((result=length/128)>0){
 		OldDMACtrl=SPD_REG16(SPD_R_DMA_CTRL);
 
-		while(dmac_ch_get_chcr(IOP_DMAC_8)&DMAC_CHCR_TR){}
+		while(dmac_ch_get_chcr(IOP_DMAC_DEV9)&DMAC_CHCR_TR){}
 
 		SPD_REG16(SPD_R_DMA_CTRL) = 7;	//SPEED revision 17 (ES2) and above only.
 
 		SMAP_REG16(SMAP_R_RXFIFO_SIZE)=result;
 		SMAP_REG8(SMAP_R_RXFIFO_CTRL)=SMAP_RXFIFO_DMAEN;
 
-		dmac_request(IOP_DMAC_8, buffer, 0x20, result, DMAC_TO_MEM);
-		dmac_transfer(IOP_DMAC_8);
+		dmac_request(IOP_DMAC_DEV9, buffer, 0x20, result, DMAC_TO_MEM);
+		dmac_transfer(IOP_DMAC_DEV9);
 
 		result*=128;
 
 		/* Wait for DMA to complete. Do not use a semaphore as thread switching hurts throughput greatly.  */
-		while(dmac_ch_get_chcr(IOP_DMAC_8)&DMAC_CHCR_TR){}
-		while(SMAP_REG8(SMAP_R_RXFIFO_CTRL )&SMAP_RXFIFO_DMAEN){};
+		while(dmac_ch_get_chcr(IOP_DMAC_DEV9)&DMAC_CHCR_TR){}
+		while(SMAP_REG8(SMAP_R_RXFIFO_CTRL)&SMAP_RXFIFO_DMAEN){};
 
 		SPD_REG16(SPD_R_DMA_CTRL)=OldDMACtrl;
 	}

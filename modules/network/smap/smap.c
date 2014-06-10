@@ -492,6 +492,7 @@ int smap_init(int argc, char *argv[]){
 		DelayThread(1000);
 	}
 
+	SMAP_REG8(SMAP_R_BD_MODE) = 0;
 	for(i=0; i<SMAP_BD_MAX_ENTRY; i++){
 		tx_bd[i].ctrl_stat=0;
 		tx_bd[i].reserved=0;

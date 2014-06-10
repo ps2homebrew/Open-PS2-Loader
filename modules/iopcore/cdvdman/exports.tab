@@ -139,7 +139,7 @@ END_EXPORT_TABLE
 #ifdef SMB_DRIVER
 // dev9 export table
 DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9_init)
+	DECLARE_EXPORT(dev9d_init)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_ret0)
 	DECLARE_EXPORT(_retonly)
@@ -161,7 +161,7 @@ END_EXPORT_TABLE
 #ifdef __IOPCORE_DEBUG
 // dev9 export table
 DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9_init)
+	DECLARE_EXPORT(dev9d_init)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_ret0)
 	DECLARE_EXPORT(_retonly)
@@ -180,7 +180,7 @@ END_EXPORT_TABLE
 #else
 // dev9 export table
 DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9_init)
+	DECLARE_EXPORT(dev9d_init)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_ret0)
 	DECLARE_EXPORT(_retonly)
@@ -225,7 +225,7 @@ END_EXPORT_TABLE
 #ifdef __USE_DEV9
 // dev9 export table
 DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9_init)
+	DECLARE_EXPORT(dev9d_init)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_ret0)
 	DECLARE_EXPORT(_retonly)

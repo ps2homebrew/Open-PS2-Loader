@@ -1,4 +1,3 @@
-
 loadcore_IMPORTS_start
 I_RegisterLibraryEntries
 loadcore_IMPORTS_end
@@ -32,6 +31,4 @@ I_dev9DmaTransfer
 I_dev9IntrEnable
 I_dev9IntrDisable
 I_dev9LEDCtl
-I_dev9RegisterPreDmaCb
-I_dev9RegisterPostDmaCb
 dev9_IMPORTS_end

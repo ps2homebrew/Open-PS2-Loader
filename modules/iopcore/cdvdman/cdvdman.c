@@ -2777,7 +2777,7 @@ int _start(int argc, char **argv)
 	RegisterLibraryEntries(&_exp_cdvdstm);
 #ifdef SMB_DRIVER
 	RegisterLibraryEntries(&_exp_dev9);
-	dev9_init();
+	dev9d_init();
 #endif
 #ifdef HDD_DRIVER
 #ifdef HD_PRO
@@ -2791,10 +2791,10 @@ int _start(int argc, char **argv)
 
 #ifdef HD_PRO
 #ifdef __IOPCORE_DEBUG
-	dev9_init();
+	dev9d_init();
 #endif
 #else
-	dev9_init();
+	dev9d_init();
 #endif
 	atad_start();
 
@@ -2803,7 +2803,7 @@ int _start(int argc, char **argv)
 #ifdef USB_DRIVER
 #ifdef __USE_DEV9
 	RegisterLibraryEntries(&_exp_dev9);
-	dev9_init();
+	dev9d_init();
 #endif
 #endif
 	RegisterLibraryEntries(&_exp_smsutils);

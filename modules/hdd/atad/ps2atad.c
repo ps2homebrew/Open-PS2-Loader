@@ -151,7 +151,7 @@ static ata_cmd_state_t atad_cmd_state;
 static int ata_intr_cb(int flag);
 static unsigned int ata_alarm_cb(void *unused);
 
-static void ata_dma_set_dir(int dir);
+static void ata_set_dir(int dir);
 
 static void ata_pio_mode(int mode);
 static void ata_multiword_dma_mode(int mode);
@@ -159,7 +159,12 @@ static void ata_ultra_dma_mode(int mode);
 
 struct irx_export_table _exp_atad;
 
-static void AtadPreDmaCb(int bcr, int dir){
+/*	In a modern ATAD.IRX module, the DMA ENabled bit should be set and unset from the pre and post DMA callbacks.
+	However, some of the clone adaptors don't support this properly. Since some users out there cannot tell the difference
+	between such a clone adaptor and a genuine Sony adaptor, it's probably just best to go with the design of the older ATAD modules.
+
+	Older ATAD modules have this bit set within ata_set_dir() instead.	*/
+/* static void AtadPreDmaCb(int bcr, int dir){
 	USE_SPD_REGS;
 
 	SPD_REG16(SPD_R_XFR_CTRL)|=0x80;
@@ -169,7 +174,7 @@ static void AtadPostDmaCb(int bcr, int dir){
 	USE_SPD_REGS;
 
 	SPD_REG16(SPD_R_XFR_CTRL)&=~0x80;
-}
+} */
 
 int _start(int argc, char *argv[])
 {
@@ -212,10 +217,11 @@ int _start(int argc, char *argv[])
 		goto out;
 	}
 
-	dev9RegisterIntrCb(1, ata_intr_cb);
-	dev9RegisterIntrCb(0, ata_intr_cb);
-	dev9RegisterPreDmaCb(0, &AtadPreDmaCb);
-	dev9RegisterPostDmaCb(0, &AtadPostDmaCb);
+	dev9RegisterIntrCb(1, &ata_intr_cb);
+	dev9RegisterIntrCb(0, &ata_intr_cb);
+	//Read the comment above about these callbacks.
+/*	dev9RegisterPreDmaCb(0, &AtadPreDmaCb);
+	dev9RegisterPostDmaCb(0, &AtadPostDmaCb);	*/
 
 	res = 0;
 	M_PRINTF("Driver loaded.\n");
@@ -223,7 +229,7 @@ out:
 	return res;
 }
 
-int shutdown() { return 0; }
+int _exit(void) { return 0; }
 
 static int ata_intr_cb(int flag)
 {
@@ -755,7 +761,7 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
 	unsigned short int sector, lcyl, hcyl, select, command, len;
 
 	while (nsectors > 0) {
-		ata_dma_set_dir(dir);
+		ata_set_dir(dir);
 
 		/* Variable lba is only 32 bits so no change for lcyl and hcyl.  */
 		lcyl = (lba >> 8) & 0xff;
@@ -913,6 +919,8 @@ static int ata_init_devices(ata_devinfo_t *devinfo)
 	else
 		devinfo[1].exists = 0;
 
+	ata_pio_mode(0);
+
 	for (i = 0; i < 2; i++) {
 		if (!devinfo[i].exists)
 			continue;
@@ -974,7 +982,7 @@ ata_devinfo_t * ata_get_devinfo(int device)
 	return &atad_devinfo[device];
 }
 
-static void ata_dma_set_dir(int dir)
+static void ata_set_dir(int dir)
 {
 	USE_SPD_REGS;
 	unsigned short int val;
@@ -983,7 +991,7 @@ static void ata_dma_set_dir(int dir)
 	val = SPD_REG16(SPD_R_IF_CTRL) & 1;
 	val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
 	SPD_REG16(SPD_R_IF_CTRL) = val;
-	SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6;
+	SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x86;	//In a modern ATAD module, the DMA EN bit (0x80) is set and cleared from the pre and post DMA callbacks instead. Read the comment above about this.
 }
 
 static void ata_pio_mode(int mode)

@@ -21,7 +21,7 @@ typedef int (*dev9_intr_cb_t)(int flag);
 typedef void (*dev9_shutdown_cb_t)(void);
 typedef void (*dev9_dma_cb_t)(int bcr, int dir);
 
-int dev9_init(void);
+int dev9d_init(void);
 void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb); 		// #4
 int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir);	// #5
 void dev9Shutdown(void); 					// #6

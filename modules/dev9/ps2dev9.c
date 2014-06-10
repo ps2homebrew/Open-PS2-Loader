@@ -30,6 +30,7 @@
 #include "ioman_add.h"
 #endif
 
+#include <aifregs.h>
 #include <dev9regs.h>
 #include <speedregs.h>
 #include <smapregs.h>
@@ -85,17 +86,17 @@ static int dev9_intr_dispatch(int flag);
 static void dev9x_on_shutdown(void*);
 #endif
 
-static void smap_set_stat(int stat);
+static void dev9_set_stat(int stat);
 static int read_eeprom_data(void);
 
-static int smap_device_probe(void);
-static int smap_device_reset(void);
-static int smap_subsys_init(void);
-static int smap_device_init(void);
+static int dev9_device_probe(void);
+static int dev9_device_reset(void);
+static int dev9_init(void);
+static int speed_device_init(void);
 
 #ifdef PCMCIA
 static void pcmcia_set_stat(int stat);
-static int pcic_ssbus_mode(int voltage);
+static int pcic_ssbus_mode(int mode);
 static int pcmcia_device_probe(void);
 static int pcmcia_device_reset(void);
 static int card_find_manfid(u32 manfid);
@@ -110,8 +111,8 @@ static int expbay_init(void);
 struct irx_export_table _exp_dev9;
 
 #ifdef DEV9X_DEV
-int dev9x_dummy() { return 0; }
-int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
+static int dev9x_dummy(void) { return 0; }
+static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
 {
 	if (cmd == 0x4401)
 		return dev9type;
@@ -120,7 +121,7 @@ int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int argle
 }
 
 /* driver ops func tab */
-void *dev9x_ops[27] = {
+static void *dev9x_ops[27] = {
 	(void*)dev9x_dummy,
 	(void*)dev9x_dummy,
 	(void*)dev9x_dummy,
@@ -222,7 +223,7 @@ int _start(int argc, char **argv)
 	return 0;
 }
 
-int __attribute__((unused)) shutdown() { return 0; }
+int _exit(void) { return 0; }
 
 /* Export 4 */
 void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb)
@@ -266,7 +267,7 @@ static int dev9_intr_dispatch(int flag)
 	return 0;
 }
 
-static void smap_set_stat(int stat)
+static void dev9_set_stat(int stat)
 {
 	if (dev9type == 0)
 #ifdef PCMCIA
@@ -278,7 +279,7 @@ static void smap_set_stat(int stat)
 		expbay_set_stat(stat);
 }
 
-static int smap_device_probe()
+static int dev9_device_probe(void)
 {
 	if (dev9type == 0)
 #ifdef PCMCIA
@@ -292,7 +293,7 @@ static int smap_device_probe()
 	return -1;
 }
 
-static int smap_device_reset()
+static int dev9_device_reset(void)
 {
 	if (dev9type == 0)
 #ifdef PCMCIA
@@ -307,7 +308,7 @@ static int smap_device_reset()
 }
 
 /* Export 6 */
-void dev9Shutdown()
+void dev9Shutdown(void)
 {
 	int idx;
 	USE_DEV9_REGS;
@@ -383,11 +384,11 @@ int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 	if (dev9_predma_cbs[ctrl])
 		dev9_predma_cbs[ctrl](bcr, dir);
 
-	dmac_request(IOP_DMAC_8, buf, bcr&0xFFFF, bcr>>16, dir);
-	dmac_transfer(IOP_DMAC_8);
+	dmac_request(IOP_DMAC_DEV9, buf, bcr&0xFFFF, bcr>>16, dir);
+	dmac_transfer(IOP_DMAC_DEV9);
 
 	/* Wait for DMA to complete. Do not use a semaphore as thread switching hurts throughput greatly.  */
-	while(dmac_ch_get_chcr(IOP_DMAC_8)&DMAC_CHCR_TR){}
+	while(dmac_ch_get_chcr(IOP_DMAC_DEV9)&DMAC_CHCR_TR){}
 	res = 0;
 
 	if (dev9_postdma_cbs[ctrl])
@@ -397,7 +398,7 @@ int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 	return res;
 }
 
-static int read_eeprom_data()
+static int read_eeprom_data(void)
 {
 	USE_SPD_REGS;
 	int i, j, res = -2;
@@ -498,7 +499,7 @@ int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb){
 	return -1;
 }
 
-static int smap_subsys_init(void)
+static int dev9_init(void)
 {
 	int i;
 
@@ -506,10 +507,10 @@ static int smap_subsys_init(void)
 		return -1;
 
 	/* Enable the DEV9 DMAC channel.  */
-	dmac_enable(IOP_DMAC_8);
+	dmac_enable(IOP_DMAC_DEV9);
 
 	/* Not quite sure what this enables yet.  */
-	smap_set_stat(0x103);
+	dev9_set_stat(0x103);
 
 	/* Disable all device interrupts.  */
 	dev9IntrDisable(0xffff);
@@ -532,7 +533,157 @@ static int smap_subsys_init(void)
 	return 0;
 }
 
-static int smap_device_init(void)
+static int dev9_smap_read_phy(volatile u8 *emac3_regbase, unsigned int address, unsigned int *data){
+	unsigned int i, PHYRegisterValue;
+	int result;
+
+	PHYRegisterValue=(address&SMAP_E3_PHY_REG_ADDR_MSK)|SMAP_E3_PHY_READ|((SMAP_DsPHYTER_ADDRESS&SMAP_E3_PHY_ADDR_MSK)<<SMAP_E3_PHY_ADDR_BITSFT);
+
+	i=0;
+	result=0;
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_STA_CTRL, PHYRegisterValue);
+
+	do{
+		if(SMAP_EMAC3_GET(SMAP_R_EMAC3_STA_CTRL)&SMAP_E3_PHY_OP_COMP){
+			if(SMAP_EMAC3_GET(SMAP_R_EMAC3_STA_CTRL)&SMAP_E3_PHY_OP_COMP){
+				if((result=SMAP_EMAC3_GET(SMAP_R_EMAC3_STA_CTRL))&SMAP_E3_PHY_OP_COMP){
+					result>>=SMAP_E3_PHY_DATA_BITSFT;
+					break;
+				}
+			}
+		}
+
+		DelayThread(1000);
+		i++;
+	}while(i<100);
+
+	if(i>=100){
+		return 1;
+	}else{
+		*data = result;
+		return 0;
+	}
+}
+
+static int dev9_smap_write_phy(volatile u8 *emac3_regbase, unsigned char address, unsigned short int value){
+	unsigned int i, PHYRegisterValue;
+
+	PHYRegisterValue=(address&SMAP_E3_PHY_REG_ADDR_MSK)|SMAP_E3_PHY_WRITE|((SMAP_DsPHYTER_ADDRESS&SMAP_E3_PHY_ADDR_MSK)<<SMAP_E3_PHY_ADDR_BITSFT);
+	PHYRegisterValue|=((unsigned int)value)<<SMAP_E3_PHY_DATA_BITSFT;
+
+	i=0;
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_STA_CTRL, PHYRegisterValue);
+
+	for(; !(SMAP_EMAC3_GET(SMAP_R_EMAC3_STA_CTRL)&SMAP_E3_PHY_OP_COMP); i++){
+		DelayThread(1000);
+		if(i>=100) break;
+	}
+
+	return((i>=100)?1:0);
+}
+
+static int dev9_smap_init(void)
+{
+	unsigned int value;
+	USE_SPD_REGS;
+	USE_SMAP_REGS;
+	USE_SMAP_EMAC3_REGS;
+	USE_SMAP_TX_BD;
+	USE_SMAP_RX_BD;
+	int i;
+
+	//Do not perform SMAP initialization if the SPEED device does not have such an interface. Also, skip it if the Chinese SATA network adaptor is detected.
+	if ((!(SPD_REG16(SPD_R_REV_3)&SPD_CAPS_SMAP)) || (SPD_REG16(SPD_R_REV_1) == 0xFF)) return 0;
+
+	SMAP_REG8(SMAP_R_TXFIFO_CTRL) = SMAP_TXFIFO_RESET;
+	for(i = 9; SMAP_REG8(SMAP_R_TXFIFO_CTRL)&SMAP_TXFIFO_RESET; i--)
+	{
+		if (i <= 0) return 1;
+		DelayThread(1000);
+	}
+
+	SMAP_REG8(SMAP_R_RXFIFO_CTRL) = SMAP_RXFIFO_RESET;
+	for(i = 9; SMAP_REG8(SMAP_R_RXFIFO_CTRL)&SMAP_RXFIFO_RESET; i--)
+	{
+		if (i <= 0) return 1;
+		DelayThread(1000);
+	}
+
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_MODE0, SMAP_E3_SOFT_RESET);
+	for (i = 9; SMAP_EMAC3_GET(SMAP_R_EMAC3_MODE0)&SMAP_E3_SOFT_RESET; i--)
+	{
+		if (i <= 0) return 3;
+		DelayThread(1000);
+	}
+
+	if (SPD_REG16(SPD_R_REV_1) >= 0x11) SMAP_REG8(SMAP_R_BD_MODE) = SMAP_BD_SWAP;
+
+	for(i = 0; i < SMAP_BD_MAX_ENTRY; i++)
+	{
+		tx_bd[i].ctrl_stat = 0;
+		tx_bd[i].reserved = 0;
+		tx_bd[i].length = 0;
+		tx_bd[i].pointer = 0;
+	}
+
+	for(i = 0; i < SMAP_BD_MAX_ENTRY; i++)
+	{
+		rx_bd[i].ctrl_stat = 0x80;	//SMAP_BD_RX_EMPTY
+		rx_bd[i].reserved = 0;
+		rx_bd[i].length = 0;
+		rx_bd[i].pointer = 0;
+	}
+
+	SMAP_REG16(SMAP_R_INTR_CLR) = SMAP_INTR_BITMSK;
+	if (SPD_REG16(SPD_R_REV_1) < 0x11) SPD_REG8(0x100) = 1;
+
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_MODE1, SMAP_E3_FDX_ENABLE|SMAP_E3_IGNORE_SQE|SMAP_E3_MEDIA_100M|SMAP_E3_RXFIFO_2K|SMAP_E3_TXFIFO_1K|SMAP_E3_TXREQ0_MULTI|SMAP_E3_TXREQ1_SINGLE);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_TxMODE1, 7<<SMAP_E3_TX_LOW_REQ_BITSFT | 0xF<<SMAP_E3_TX_URG_REQ_BITSFT);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_RxMODE, SMAP_E3_RX_RX_RUNT_FRAME|SMAP_E3_RX_RX_FCS_ERR|SMAP_E3_RX_RX_TOO_LONG_ERR|SMAP_E3_RX_RX_IN_RANGE_ERR|SMAP_E3_RX_PROP_PF|SMAP_E3_RX_PROMISC);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_INTR_STAT, SMAP_E3_INTR_TX_ERR_0|SMAP_E3_INTR_SQE_ERR_0|SMAP_E3_INTR_DEAD_0);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_INTR_ENABLE, SMAP_E3_INTR_TX_ERR_0|SMAP_E3_INTR_SQE_ERR_0|SMAP_E3_INTR_DEAD_0);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_ADDR_HI, 0);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_ADDR_LO, 0);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_PAUSE_TIMER, 0xFFFF);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_INTER_FRAME_GAP, 4);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_TX_THRESHOLD, 0xC<<SMAP_E3_TX_THRESHLD_BITSFT);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_RX_WATERMARK, 0x8<<SMAP_E3_RX_LO_WATER_BITSFT|0x40<<SMAP_E3_RX_HI_WATER_BITSFT);
+
+	dev9_smap_write_phy(emac3_regbase, SMAP_DsPHYTER_BMCR, SMAP_PHY_BMCR_RST);
+	for (i = 9;; i--)
+	{
+		if (dev9_smap_read_phy(emac3_regbase, SMAP_DsPHYTER_BMCR, &value)) return 4;
+		if (!(value & SMAP_PHY_BMCR_RST)) break;
+		if (i <= 0) return 5;
+	}
+
+	dev9_smap_write_phy(emac3_regbase, SMAP_DsPHYTER_BMCR, SMAP_PHY_BMCR_LPBK|SMAP_PHY_BMCR_100M|SMAP_PHY_BMCR_DUPM);
+	DelayThread(10000);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_MODE0, SMAP_E3_TXMAC_ENABLE|SMAP_E3_RXMAC_ENABLE);
+	value = SMAP_REG16(SMAP_R_TXFIFO_WR_PTR) + SMAP_TX_BASE;
+
+	for(i=0; i<0x5EA; i+=4) SMAP_REG32(SMAP_R_TXFIFO_DATA) = i;
+
+	tx_bd[0].length = 0xEA05;
+	tx_bd[0].pointer = (value >> 8) | (value << 8);
+	SMAP_REG8(SMAP_R_TXFIFO_FRAME_INC) = 0;
+	tx_bd[0].ctrl_stat = 0x83;	//SMAP_BD_TX_READY|SMAP_BD_TX_GENFCS|SMAP_BD_TX_GENPAD
+
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_TxMODE0, SMAP_E3_TX_GNP_0);
+	for (i = 9;; i--)
+	{
+		value = SPD_REG16(SPD_R_INTR_STAT);
+
+		if ((value & (SMAP_INTR_RXEND|SMAP_INTR_TXEND|SMAP_INTR_TXDNV)) == (SMAP_INTR_RXEND|SMAP_INTR_TXEND|SMAP_INTR_TXDNV)) break;
+		if (i <= 0) return 6;
+		DelayThread(1000);
+	}
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_MODE0, SMAP_E3_SOFT_RESET);
+
+	return 0;
+}
+
+static int speed_device_init(void)
 {
 #ifdef DEBUG
 	USE_SPD_REGS;
@@ -540,34 +691,49 @@ static int smap_device_init(void)
 	int idx;
 	u16 spdrev;
 #endif
+	int res, InitCount;
 
 	eeprom_data[0] = 0;
 
-	if (smap_device_probe() < 0) {
-		M_PRINTF("PC card or expansion device isn't connected.\n");
-		return -1;
-	}
-
-	smap_device_reset();
-
-#ifdef PCMCIA
-	int res;
-
-	/* Locate the SPEED Lite chip and get the bus ready for the
-	   PCMCIA device.  */
-	if (dev9type == 0) {
-		if ((res = card_find_manfid(0xf15300)))
-			M_PRINTF("SPEED Lite not found.\n");
-
-		if (!res && (res = pcic_ssbus_mode(5)))
-			M_PRINTF("Unable to change SSBUS mode.\n");
-
-		if (res) {
-			dev9Shutdown();
+	for(InitCount=0; InitCount<8; InitCount++){
+		if (dev9_device_probe() < 0) {
+			M_PRINTF("PC card or expansion device isn't connected.\n");
 			return -1;
 		}
-	}
+
+		dev9_device_reset();
+
+#ifdef PCMCIA
+		/* Locate the SPEED Lite chip and get the bus ready for the
+		   PCMCIA device.  */
+		if (dev9type == 0) {
+			if ((res = card_find_manfid(0xf15300)))
+				M_PRINTF("SPEED Lite not found.\n");
+
+			if (!res && (res = pcic_ssbus_mode(5)))
+				M_PRINTF("Unable to change SSBUS mode.\n");
+
+			if (res) {
+				dev9Shutdown();
+				return -1;
+			}
+		}
 #endif
+
+		if((res = dev9_smap_init()) == 0){
+			break;
+		}
+
+		dev9Shutdown();
+		DelayThread(4500000);
+	}
+
+	if (res) {
+#ifdef DEBUG
+		M_PRINTF("SMAP initialization failed: %d\n", res);
+#endif
+		eeprom_data[0] = -1;
+	}
 
 #ifdef DEBUG
 	/* Print out the SPEED chip revision.  */
@@ -585,7 +751,7 @@ static int smap_device_init(void)
 }
 
 #ifdef PCMCIA
-static int pcic_get_cardtype()
+static int pcic_get_cardtype(void)
 {
 	USE_DEV9_REGS;
 	u16 val = DEV9_REG(DEV9_R_1462) & 0x03;
@@ -598,7 +764,7 @@ static int pcic_get_cardtype()
 	return 0;
 }
 
-static int pcic_get_voltage()
+static int pcic_get_voltage(void)
 {
 	USE_DEV9_REGS;
 	u16 val = DEV9_REG(DEV9_R_1462) & 0x0c;
@@ -663,26 +829,26 @@ static void pcmcia_set_stat(int stat)
 	DEV9_REG(DEV9_R_1476) = val & 0xff;
 }
 
-static int pcic_ssbus_mode(int voltage)
+static int pcic_ssbus_mode(int mode)
 {
 	USE_DEV9_REGS;
 	USE_SPD_REGS;
 	u16 stat = DEV9_REG(DEV9_R_1474) & 7;
 
-	if (voltage != 3 && voltage != 5)
+	if (mode != 3 && mode != 5)
 		return -1;
 
 	DEV9_REG(DEV9_R_1460) = 2;
 	if (stat)
 		return -1;
 
-	if (voltage == 3) {
+	if (mode == 3) {
 		DEV9_REG(DEV9_R_1474) = 1;
 		DEV9_REG(DEV9_R_1460) = 1;
 		SPD_REG8(0x20) = 1;
-		DEV9_REG(DEV9_R_1474) = voltage;
-	} else if (voltage == 5) {
-		DEV9_REG(DEV9_R_1474) = voltage;
+		DEV9_REG(DEV9_R_1474) = mode;
+	} else if (mode == 5) {
+		DEV9_REG(DEV9_R_1474) = mode;
 		DEV9_REG(DEV9_R_1460) = 1;
 		SPD_REG8(0x20) = 1;
 		DEV9_REG(DEV9_R_1474) = 7;
@@ -694,7 +860,7 @@ static int pcic_ssbus_mode(int voltage)
 	return 0;
 }
 
-static int pcmcia_device_probe()
+static int pcmcia_device_probe(void)
 {
 #ifdef DEBUG
 	const char *pcic_ct_names[] = { "No", "16-bit", "CardBus" };
@@ -795,6 +961,7 @@ error:
 
 static int pcmcia_intr(void *unused)
 {
+	USE_AIF_REGS;
 	USE_DEV9_REGS;
 	u16 cstc1, cstc2;
 
@@ -802,8 +969,8 @@ static int pcmcia_intr(void *unused)
 	cstc2 = DEV9_REG(DEV9_R_1466);
 
 	if (using_aif) {
-		if (_lh(0xb4000004) & 0x04)
-			_sh(0x04, 0xb4000004);
+		if (aif_regs[AIF_INTSR] & AIF_INTR_PCMCIA)
+			aif_regs[AIF_INTCL] = AIF_INTR_PCMCIA;
 		else
 			return 0;		/* Unknown interrupt.  */
 	}
@@ -834,6 +1001,7 @@ static int pcmcia_intr(void *unused)
 static int pcmcia_init(void)
 {
 	USE_DEV9_REGS;
+	USE_AIF_REGS;
 	int *mode;
 	u16 cstc1, cstc2;
 
@@ -844,11 +1012,13 @@ static int pcmcia_init(void)
 	/* If we are a T10K, then we go through AIF.  */
 	if ((mode = QueryBootMode(6)) != NULL) {
 		if ((*(u16 *)mode & 0xfe) == 0x60) {
-			if (_lh(0xb4000000) == 0xa1) {
-				_sh(4, 0xb4000006);
+			M_PRINTF("T10K detected.\n");
+
+			if (aif_regs[AIF_IDENT] == 0xa1) {
+				aif_regs[AIF_INTEN] = AIF_INTR_PCMCIA;
 				using_aif = 1;
 			} else {
-				M_PRINTF("T10k detected, but AIF not detected.\n");
+				M_PRINTF("AIF not detected.\n");
 				return 1;
 			}
 		}
@@ -869,16 +1039,16 @@ static int pcmcia_init(void)
 		pcic_voltage = pcic_get_voltage();
 		pcic_cardtype = pcic_get_cardtype();
 
-		if (smap_device_init() != 0)
+		if (speed_device_init() != 0)
 			return 1;
 	} else {
 		_sw(0xe01a3043, SSBUS_R_1418);
 	}
 
-	if (smap_subsys_init() != 0)
+	if (dev9_init() != 0)
 		return 1;
 
-	RegisterIntrHandler(IOP_IRQ_DEV9, 1, pcmcia_intr, NULL);
+	RegisterIntrHandler(IOP_IRQ_DEV9, 1, &pcmcia_intr, NULL);
 	EnableIntr(IOP_IRQ_DEV9);
 
 	DEV9_REG(DEV9_R_147E) = 0;
@@ -893,7 +1063,7 @@ static void expbay_set_stat(int stat)
 	DEV9_REG(DEV9_R_1464) = stat & 0x3f;
 }
 
-static int expbay_device_probe()
+static int expbay_device_probe(void)
 {
 	USE_DEV9_REGS;
 	return (DEV9_REG(DEV9_R_1462) & 0x01) ? -1 : 0;
@@ -940,11 +1110,11 @@ static int expbay_init(void)
 		DEV9_REG(DEV9_R_1464) = 0;
 		DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1464);
 
-		if (smap_device_init() != 0)
+		if (speed_device_init() != 0)
 			return 1;
 	}
 
-	if (smap_subsys_init() != 0)
+	if (dev9_init() != 0)
 		return 1;
 
 	RegisterIntrHandler(IOP_IRQ_DEV9, 1, expbay_intr, NULL);

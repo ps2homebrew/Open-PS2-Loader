@@ -1,7 +1,7 @@
 DECLARE_EXPORT_TABLE(dev9, 1, 1)
 	DECLARE_EXPORT(_start)
 	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(shutdown)
+	DECLARE_EXPORT(_exit)
 	DECLARE_EXPORT(_retonly)
 
 	/* 4 */

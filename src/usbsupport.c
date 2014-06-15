@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
@@ -44,7 +44,7 @@ static item_list_t usbGameList;
 
 int usbFindPartition(char *target, char *name) {
 	int i, fd;
-	char path[255];
+	char path[256];
 
 	for(i=0; i<5; i++) {
 		if (gUSBPrefix[0] != '\0')
@@ -76,7 +76,7 @@ static void usbInitModules(void) {
 
 	// update Themes
 	usbFindPartition(usbPrefix, "ul.cfg");
-	char path[255];
+	char path[256];
 	sprintf(path, "%sTHM", usbPrefix);
 	thmAddElements(path, "/", usbGameList.mode);
 
@@ -138,7 +138,7 @@ item_list_t* usbGetObject(int initOnly) {
 static int usbNeedsUpdate(void) {
 	int result = 0;
 	fio_stat_t stat;
-	char path[255];
+	char path[256];
 
 	usbFindPartition(usbPrefix, "ul.cfg");
 
@@ -207,7 +207,7 @@ static void usbDeleteGame(int id) {
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
 	int i, fd, val, index, compatmask = 0;
-	char partname[255], filename[32];
+	char partname[256], filename[32];
 	base_game_info_t* game = &usbGames[id];
 
 	fd = fioDopen(usbPrefix);
@@ -217,14 +217,14 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	}
 
 #ifdef VMC
-	char vmc_name[32], vmc_path[255];
+	char vmc_name[32], vmc_path[256];
 	int vmc_id, have_error = 0, size_mcemu_irx = 0;
 	usb_vmc_infos_t usb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 
 	for (vmc_id = 0; vmc_id < 2; vmc_id++) {
 		memset(&usb_vmc_infos, 0, sizeof(usb_vmc_infos_t));
-		configGetVMC(configSet, vmc_name, vmc_id);
+		configGetVMC(configSet, vmc_name, sizeof(vmc_name), vmc_id);
 		if (vmc_name[0]) {
 			have_error = 1;
 			if (sysCheckVMC(usbPrefix, "/", vmc_name, 0, &vmc_superblock) > 0) {
@@ -249,8 +249,8 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		}
 
 		if (have_error) {
-			char error[255];
-			snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+			char error[256];
+			snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
 			if (!guiMsgBox(error, 1, NULL)) {
 				fioDclose(fd);
 				return;
@@ -307,7 +307,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, 32);
+		strncpy(filename, altStartup, sizeof(filename));
 	else
 		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
@@ -324,7 +324,7 @@ static config_set_t* usbGetConfig(int id) {
 }
 
 static int usbGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
-	char path[255];
+	char path[256];
 	if (isRelative)
 		sprintf(path, "%s%s/%s_%s", usbPrefix, folder, value, suffix);
 	else

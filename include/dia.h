@@ -1,7 +1,7 @@
 #ifndef __DIA_H
 #define __DIA_H
 
-#include "include/usbld.h"
+#include "include/opl.h"
 
 // UI dialog item definition
 typedef enum {
@@ -80,7 +80,7 @@ int diaShowKeyb(char* text, int maxLen);
 void diaSetEnabled(struct UIItem* ui, int id, int enabled);
 int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
-int diaGetString(struct UIItem* ui, int id, char *value);
+int diaGetString(struct UIItem* ui, int id, char *value, int length);
 int diaSetString(struct UIItem* ui, int id, const char *text);
 int diaGetColor(struct UIItem* ui, int id, unsigned char *col);
 int diaSetColor(struct UIItem* ui, int id, const unsigned char *col);

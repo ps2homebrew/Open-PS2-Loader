@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/ioman.h"
 #include "include/hddsupport.h"
 
@@ -572,7 +572,7 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 		memcpy(ginfo->partition_name, header->id, APA_IDMAX);
 		ginfo->partition_name[APA_IDMAX] = 0;
 		strncpy(ginfo->name, hdl_header->gamename, HDL_GAME_NAME_MAX);
-		strncpy(ginfo->startup, hdl_header->startup, 12);
+		strncpy(ginfo->startup, hdl_header->startup, sizeof(ginfo->startup)-1);
 		ginfo->hdl_compat_flags = hdl_header->hdl_compat_flags;
 		ginfo->ops2l_compat_flags = hdl_header->ops2l_compat_flags;
 		ginfo->dma_type = hdl_header->dma_type;
@@ -692,8 +692,8 @@ int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
 		return -4;
 
 	// just change game name and compat flags !!!
-	strncpy(hdl_header->gamename, ginfo->name, 160);
-	hdl_header->gamename[159] = '\0';
+	strncpy(hdl_header->gamename, ginfo->name, sizeof(hdl_header->gamename));
+	hdl_header->gamename[sizeof(hdl_header->gamename)-1] = '\0';
 	//hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
 	hdl_header->ops2l_compat_flags = ginfo->ops2l_compat_flags;
 	hdl_header->dma_type = ginfo->dma_type;

@@ -4,7 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/pad.h"
 #include "include/ioman.h"
 #include <libpad.h>

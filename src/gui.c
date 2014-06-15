@@ -4,7 +4,7 @@
  Review OpenUsbLd README & LICENSE files for further details.
  */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/gui.h"
 #include "include/renderman.h"
 #include "include/menusys.h"
@@ -185,7 +185,7 @@ void guiEndFrame(void) {
 
 void guiShowAbout() {
 	char OPLVersion[64];
-	snprintf(OPLVersion, 64, _l(_STR_OUL_VER), USBLD_VERSION);
+	snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OUL_VER), USBLD_VERSION);
 
 #ifdef VMC
 	strcat(OPLVersion, " VMC");
@@ -237,14 +237,14 @@ void guiShowConfig() {
 
 	int ret = diaExecuteDialog(diaConfig, -1, 1, NULL);
 	if (ret) {
-		diaGetString(diaConfig, CFG_EXITTO, gExitPath);
+		diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
 		diaGetInt(diaConfig, CFG_DANDROP, &gEnableDandR);
 		diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
 		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
 		diaGetInt(diaConfig, CFG_USBDELAY, &gUSBDelay);
-		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
-		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
+		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
+		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 #ifdef GSM
 		diaGetInt(diaConfig, CFG_SHOWGSM, &gShowGSM);
@@ -427,9 +427,9 @@ void guiShowIPConfig(void) {
 		diaGetInt(diaIPConfig, NETCFG_ETHOPMODE, &gETHOpMode);
 
 		diaGetInt(diaIPConfig, 18, &gPCPort);
-		diaGetString(diaIPConfig, 19, gPCShareName);
-		diaGetString(diaIPConfig, 20, gPCUserName);
-		diaGetString(diaIPConfig, 21, gPCPassword);
+		diaGetString(diaIPConfig, 19, gPCShareName, sizeof(gPCShareName));
+		diaGetString(diaIPConfig, 20, gPCUserName, sizeof(gPCUserName));
+		diaGetString(diaIPConfig, 21, gPCPassword, sizeof(gPCPassword));
 		gIPConfigChanged = 1;
 
 		if (result == NETCFG_RECONNECT)
@@ -553,13 +553,13 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 	char vmc[32];
 
 	if (strlen(VMCName))
-		strncpy(vmc, VMCName, 32);
+		strncpy(vmc, VMCName, sizeof(vmc));
 	else {
 		if (validate)
 			return 1; // nothing to validate if no user input
 
 		char* startup = support->itemGetStartup(id);
-		snprintf(vmc, 32, "%s_%d", startup, slot);
+		snprintf(vmc, sizeof(vmc), "%s_%d", startup, slot);
 	}
 
 	vmc_refresh = 0;
@@ -620,7 +620,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 			}
 		}
 		else if (result == VMC_REFRESH) { // User changed the VMC name
-			diaGetString(diaVMC, VMC_NAME, vmc);
+			diaGetString(diaVMC, VMC_NAME, vmc, sizeof(vmc));
 			size = guiRefreshVMCConfig(support, vmc);
 		}
 
@@ -675,20 +675,20 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 
 	// Find out the current game ID
 	char hexid[32];
-	configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid);
+	configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));
 	diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
 	char altStartup[32];
-	configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
+	configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
 	diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
 #ifdef VMC
 	char vmc1[32];
-	configGetVMC(configSet, vmc1, 0);
+	configGetVMC(configSet, vmc1, sizeof(vmc1), 0);
 	diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
 
 	char vmc2[32]; // required as diaSetLabel use pointer to value
-	configGetVMC(configSet, vmc2, 1);
+	configGetVMC(configSet, vmc2, sizeof(vmc2), 1);
 	diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
 #endif
 
@@ -717,20 +717,20 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 #ifdef VMC
 		else if (result == COMPAT_VMC1_DEFINE) {
 			if(guiShowVMCConfig(id, support, vmc1, 0, 0))
-				diaGetString(diaVMC, VMC_NAME, vmc1);
+				diaGetString(diaVMC, VMC_NAME, vmc1, sizeof(vmc1));
 		} else if (result == COMPAT_VMC2_DEFINE) {
 			if(guiShowVMCConfig(id, support, vmc2, 1, 0))
-				diaGetString(diaVMC, VMC_NAME, vmc2);
+				diaGetString(diaVMC, VMC_NAME, vmc2, sizeof(vmc2));
 		} else if (result == COMPAT_VMC1_ACTION) {
 			if (strlen(vmc1))
 				vmc1[0] = '\0';
 			else
-				snprintf(vmc1, 32, "generic_%d", 0);
+				snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
 		} else if (result == COMPAT_VMC2_ACTION) {
 			if (strlen(vmc2))
 				vmc2[0] = '\0';
 			else
-				snprintf(vmc2, 32, "generic_%d", 1);
+				snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
 		}
 #endif
 	} while (result >= COMPAT_NOEXIT);
@@ -772,11 +772,11 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_CDVDMAN_TIMER);
 
-		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid);
+		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
 		if (hexid[0] != '\0')
 			configSetStr(configSet, CONFIG_ITEM_DNAS, hexid);
 
-		diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
+		diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup, sizeof(altStartup));
 		if (altStartup[0] != '\0')
 			configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
 		else
@@ -1147,9 +1147,9 @@ static void guiDrawOverlays() {
 	char fps[20];
 
 	if (time_since_last != 0)
-		snprintf(fps, 20, "%3d ms %3.1f FPS", time_render, 1000.0f / (float) time_since_last);
+		snprintf(fps, sizeof(fps), "%3d ms %3.1f FPS", time_render, 1000.0f / (float) time_since_last);
 	else
-		snprintf(fps, 20, "%3d ms ----- FPS", time_render);
+		snprintf(fps, sizeof(fps), "%3d ms ----- FPS", time_render);
 
 	fntRenderString(gTheme->fonts[0], screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif

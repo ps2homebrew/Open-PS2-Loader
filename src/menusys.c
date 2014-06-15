@@ -6,7 +6,7 @@
 
 #include "include/menusys.h"
 #include "include/iosupport.h"
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/renderman.h"
 #include "include/fntsys.h"
 #include "include/lang.h"
@@ -15,7 +15,7 @@
 #include "include/gui.h"
 #include "include/system.h"
 #include "include/ioman.h"
-#include "assert.h"
+#include <assert.h>
 
 enum MENU_IDs{
 	MENU_SETTINGS		= 0,

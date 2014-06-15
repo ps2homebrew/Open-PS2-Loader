@@ -1,5 +1,5 @@
 #include "sys/fcntl.h"
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
@@ -56,7 +56,7 @@ static void hddInitModules(void) {
 	hddLoadModules();
 
 	// update Themes
-	char path[255];
+	char path[256];
 	sprintf(path, "%sTHM", hddPrefix);
 	thmAddElements(path, "/", hddGameList.mode);
 
@@ -256,8 +256,8 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	hdd_vmc_infos_t hdd_vmc_infos;
 	memset(&hdd_vmc_infos, 0, sizeof(hdd_vmc_infos_t));
 
-	configGetVMC(configSet, vmc_name[0], 0);
-	configGetVMC(configSet, vmc_name[1], 1);
+	configGetVMC(configSet, vmc_name[0], sizeof(vmc_name[0]), 0);
+	configGetVMC(configSet, vmc_name[1], sizeof(vmc_name[1]), 1);
 
 	if(vmc_name[0][0] || vmc_name[1][0]) {
 		fileXioUmount(hddPrefix);
@@ -285,7 +285,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	}
 
 	if (part_valid) {
-		char vmc_path[255];
+		char vmc_path[256];
 		int vmc_id, have_error = 0;
 		vmc_superblock_t vmc_superblock;
 		pfs_inode_t pfs_inode;
@@ -302,7 +302,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 					hdd_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
 					// Check vmc inode block chain (write operation can cause damage)
-					snprintf(vmc_path, 255, "%sVMC/%s.bin", hddPrefix, vmc_name[vmc_id]);
+					snprintf(vmc_path, sizeof(vmc_path), "%sVMC/%s.bin", hddPrefix, vmc_name[vmc_id]);
 					fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 					if (fileXioIoctl2(fd, PFS_IOCTL2_GET_INODE, NULL, 0, (void*)&pfs_inode, sizeof(pfs_inode_t)) == sizeof(pfs_inode_t)) {
 						if (pfs_inode.number_data <= 11) {
@@ -323,8 +323,8 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 			}
 
 			if (have_error) {
-				char error[255];
-				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
+				char error[256];
+				snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
 				if (!guiMsgBox(error, 1, NULL))
 					return;
 			}
@@ -419,7 +419,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, 32);
+		strncpy(filename, altStartup, sizeof(filename));
 	else
 		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
@@ -432,10 +432,10 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 }
 
 static config_set_t* hddGetConfig(int id) {
-	char path[255];
+	char path[256];
 	hdl_game_info_t* game = &hddGames->games[id];
 
-	snprintf(path, 255, "%sCFG/%s.cfg", hddPrefix, game->startup);
+	snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
 	config_set_t* config = configAlloc(0, NULL, path);
 	configRead(config);
 
@@ -452,7 +452,7 @@ static config_set_t* hddGetConfig(int id) {
 }
 
 static int hddGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
-	char path[255];
+	char path[256];
 	if (isRelative)
 		sprintf(path, "%s%s/%s_%s", hddPrefix, folder, value, suffix);
 	else

@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/textures.h"
 #include "include/util.h"
 #include "include/ioman.h"
@@ -193,11 +193,11 @@ int texPngLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 	void **PngFileBufferPtr;
 
 	if (path) {
-		char filePath[255];
+		char filePath[256];
 		if (texId != -1)
-			snprintf(filePath, 255, "%s%s.png", path, internalDefault[texId].name);
+			snprintf(filePath, sizeof(filePath), "%s%s.png", path, internalDefault[texId].name);
 		else
-			snprintf(filePath, 255, "%s.png", path);
+			snprintf(filePath, sizeof(filePath), "%s.png", path);
 
 		file = fopen(filePath, "rb");
 		if (file == NULL)

@@ -86,7 +86,7 @@ static int checkFile(char* path, int mode) {
 
 		// in create mode, we check that the directory exist, or create it
 		if (mode & O_CREAT) {
-			char dirPath[255];
+			char dirPath[256];
 			char* pos = strrchr(path, '/');
 			if (pos) {
 				memcpy(dirPath, path, pos - path);

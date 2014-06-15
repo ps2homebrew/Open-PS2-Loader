@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/appsupport.h"
@@ -110,8 +110,8 @@ static void appDeleteItem(int id) {
 static void appRenameItem(int id, char* newName) {
 	struct config_value_t* cur = appGetConfigValue(id);
 
-	char value[255];
-	strncpy(value, cur->val, 255);
+	char value[256];
+	strncpy(value, cur->val, sizeof(value));
 	configRemoveKey(configApps, cur->key);
 	configSetStr(configApps, newName, value);
 	configWrite(configApps);
@@ -130,7 +130,7 @@ static void appLaunchItem(int id, config_set_t* configSet) {
 		if (strncmp(cur->val, "pfs0:", 5) == 0)
 			exception = UNMOUNT_EXCEPTION;
 
-		char filename[255];
+		char filename[256];
 		sprintf(filename,"%s",cur->val);
 		shutdown(exception); // CAREFUL: shutdown will call appCleanUp, so configApps/cur will be freed
 		sysExecElf(filename);

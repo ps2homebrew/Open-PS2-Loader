@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/lang.h"
 #include "include/util.h"
 #include "include/iosupport.h"
@@ -14,8 +14,8 @@ struct game_list_t {
 
 int sbIsSameSize(const char* prefix, int prevSize) {
 	int size = -1;
-	char path[255];
-	snprintf(path, 255, "%sul.cfg", prefix);
+	char path[256];
+	snprintf(path, sizeof(path), "%sul.cfg", prefix);
 
 	int fd = openFile(path, O_RDONLY);
 	if (fd >= 0) {
@@ -59,8 +59,8 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 				game->name[size] = '\0';
 				strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
 				game->startup[GAME_STARTUP_MAX - 1] = '\0';
-				strncpy(game->extension, &record.name[GAME_STARTUP_MAX + size], 4);
-				game->extension[4] = '\0';
+				strncpy(game->extension, &record.name[GAME_STARTUP_MAX + size], sizeof(game->extension));
+				game->extension[sizeof(game->extension)-1] = '\0';
 				game->parts = 0x01;
 				game->media = type;
 				game->isISO = 1;
@@ -78,7 +78,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount) {
 	int fd, size, id = 0;
 	size_t count = 0;
-	char path[255];
+	char path[256];
 
 	free(*list);
 	*list = NULL;
@@ -89,16 +89,16 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	struct game_list_t *dlist_head = NULL;
 	
 	// count iso games in "cd" directory
-	snprintf(path, 255, "%sCD", prefix);
+	snprintf(path, sizeof(path), "%sCD", prefix);
 	count += scanForISO(path, 0x12, &dlist_head);
 
 	// count iso games in "dvd" directory
-	snprintf(path, 255, "%sDVD", prefix);
+	snprintf(path, sizeof(path), "%sDVD", prefix);
 	count += scanForISO(path, 0x14, &dlist_head);
         
         
 	// count and process games in ul.cfg
-	snprintf(path, 255, "%sul.cfg", prefix);
+	snprintf(path, sizeof(path), "%sul.cfg", prefix);
 	fd = openFile(path, O_RDONLY);
 	if(fd >= 0) {
 		char buffer[0x040];
@@ -202,8 +202,8 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 }
 
 static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int gamecount, int excludeID) {
-	char path[255];
-	snprintf(path, 255, "%sul.cfg", prefix);
+	char path[256];
+	snprintf(path, sizeof(path), "%sul.cfg", prefix);
 
 	file_buffer_t* fileBuffer = openFileBuffer(path, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
 	if (fileBuffer) {
@@ -238,21 +238,21 @@ static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int game
 }
 
 void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id) {
-	char path[255];
+	char path[256];
 	base_game_info_t* game = &(*list)[id];
 
 	if (game->isISO) {
 		if (game->media == 0x12)
-			snprintf(path, 255, "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			snprintf(path, sizeof(path), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
 		else
-			snprintf(path, 255, "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			snprintf(path, sizeof(path), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
 		fileXioRemove(path);
 	} else {
 		char *pathStr = "%sul.%08X.%s.%02x";
 		unsigned int crc = USBA_crc32(game->name);
 		int i = 0;
 		do {
-			snprintf(path, 255, pathStr, prefix, crc, game->startup, i++);
+			snprintf(path, sizeof(path), pathStr, prefix, crc, game->startup, i++);
 			fileXioRemove(path);
 		} while(i < game->parts);
 
@@ -261,16 +261,16 @@ void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int 
 }
 
 void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id, char* newname) {
-	char oldpath[255], newpath[255];
+	char oldpath[256], newpath[256];
 	base_game_info_t* game = &(*list)[id];
 
 	if (game->isISO) {
 		if (game->media == 0x12) {
-			snprintf(oldpath, 255, "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-			snprintf(newpath, 255, "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
+			snprintf(oldpath, sizeof(oldpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			snprintf(newpath, sizeof(newpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
 		} else {
-			snprintf(oldpath, 255, "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-			snprintf(newpath, 255, "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
+			snprintf(oldpath, sizeof(oldpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			snprintf(newpath, sizeof(newpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
 		}
 		fileXioRename(oldpath, newpath);
 	} else {
@@ -282,8 +282,8 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 		unsigned int newcrc = USBA_crc32(newname);
 		int i = 0;
 		do {
-			snprintf(oldpath, 255, pathStr, prefix, oldcrc, game->startup, i);
-			snprintf(newpath, 255, pathStr, prefix, newcrc, game->startup, i++);
+			snprintf(oldpath, sizeof(oldpath), pathStr, prefix, oldcrc, game->startup, i);
+			snprintf(newpath, sizeof(newpath), pathStr, prefix, newcrc, game->startup, i++);
 			fileXioRename(oldpath, newpath);
 		} while(i < game->parts);
 
@@ -292,23 +292,17 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 }
 
 config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep) {
-	char path[255];
-	snprintf(path, 255, "%sCFG%s%s.cfg", prefix, sep, game->startup);
+	char path[256];
+	snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
 	config_set_t* config = configAlloc(0, NULL, path);
 	configRead(config);
 
 	configSetStr(config, CONFIG_ITEM_NAME, game->name);
 	if (game->sizeMB != -1)
 		configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
-	if (game->isISO)
-		configSetStr(config, CONFIG_ITEM_FORMAT, "ISO");
-	else
-		configSetStr(config, CONFIG_ITEM_FORMAT, "UL");
 
-	if (game->media == 0x12)
-		configSetStr(config, CONFIG_ITEM_MEDIA, "CD");
-	else
-		configSetStr(config, CONFIG_ITEM_MEDIA, "DVD");
+	configSetStr(config, CONFIG_ITEM_FORMAT, game->isISO ? "ISO" : "UL");
+	configSetStr(config, CONFIG_ITEM_MEDIA, game->media == 0x12 ? "CD" : "DVD");
 
 	configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 

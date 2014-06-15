@@ -5,7 +5,7 @@
  */
 
 #include "include/integers.h"
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/fntsys.h"
 #include "include/renderman.h"
 #include "include/ioman.h"

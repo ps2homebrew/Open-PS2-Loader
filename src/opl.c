@@ -4,7 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/ioman.h"
 #include "include/gui.h"
 #include "include/renderman.h"
@@ -83,7 +83,7 @@ static void moduleCleanup(opl_io_module_t* mod, int exception);
 // frame counter
 static int frameCounter;
 
-static char errorMessage[255];
+static char errorMessage[256];
 
 static opl_io_module_t list_support[4];
 
@@ -399,7 +399,7 @@ static void errorMessageHook() {
 }
 
 void setErrorMessage(int strId, int error) {
-	snprintf(errorMessage, 255, _l(strId), error);
+	snprintf(errorMessage, sizeof(errorMessage), _l(strId), error);
 	guiSetFrameHook(&errorMessageHook);
 }
 
@@ -502,14 +502,10 @@ static void _loadConfig() {
 
 			configGetInt(configOPL, "pc_port", &gPCPort);
 
-			if (configGetStr(configOPL, "pc_share", &temp))
-				strncpy(gPCShareName, temp, 32);
-			if (configGetStr(configOPL, "pc_user", &temp))
-				strncpy(gPCUserName, temp, 32);
-			if (configGetStr(configOPL, "pc_pass", &temp))
-				strncpy(gPCPassword, temp, 32);
-			if (configGetStr(configOPL, "exit_path", &temp))
-				strncpy(gExitPath, temp, 32);
+			configGetStrCopy(configOPL, "pc_share", gPCShareName, sizeof(gPCShareName));
+			configGetStrCopy(configOPL, "pc_user", gPCUserName, sizeof(gPCUserName));
+			configGetStrCopy(configOPL, "pc_pass", gPCPassword, sizeof(gPCPassword));
+			configGetStrCopy(configOPL, "exit_path", gExitPath, sizeof(gExitPath));
 
 			configGetInt(configOPL, "autosort", &gAutosort);
 			configGetInt(configOPL, "autorefresh", &gAutoRefresh);
@@ -519,10 +515,8 @@ static void _loadConfig() {
 			configGetInt(configOPL, "hdd_spindown", &gHDDSpindown);
 			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
 			configGetInt(configOPL, "usb_delay", &gUSBDelay);
-			if (configGetStr(configOPL, "usb_prefix", &temp))
-				strncpy(gUSBPrefix, temp, 32);
-			if (configGetStr(configOPL, "eth_prefix", &temp))
-				strncpy(gETHPrefix, temp, 32);
+			configGetStrCopy(configOPL, "usb_prefix", gUSBPrefix, sizeof(gUSBPrefix));
+			configGetStrCopy(configOPL, "eth_prefix", gETHPrefix, sizeof(gETHPrefix));
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
 #ifdef GSM
 			configGetInt(configOPL, "show_gsm", &gShowGSM);
@@ -565,7 +559,7 @@ static void _saveConfig() {
 #endif
 
 		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
-		char temp[255];
+		char temp[256];
 		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 		configSetStr(configOPL, "pc_ip", temp);
 		configSetInt(configOPL, "pc_port", gPCPort);
@@ -845,19 +839,19 @@ static void setDefaults(void) {
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
 	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
 	gPCPort = 445;
-	strncpy(gPCShareName, "", 32);
-	strncpy(gPCUserName, "GUEST", 32);
-	strncpy(gPCPassword, "", 32);
+	gPCShareName[0] = '\0';
+	gPCUserName[0] = '\0';
+	gPCPassword[0] = '\0';
 	gNetworkStartup = ERROR_ETH_NOT_STARTED;
 	gHddStartup = 6;
 	gHDDSpindown = 20;
 	gIPConfigChanged = 0;
 	gScrollSpeed = 1;
-	strncpy(gExitPath, "", 32);
+	gExitPath[0] = '\0';
 	gDefaultDevice = APP_MODE;
 	gAutosort = 1;
 	gAutoRefresh = 0;
-	gDisableDebug = 0;
+	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
 #ifdef GSM
@@ -865,8 +859,8 @@ static void setDefaults(void) {
 #endif
 	gCheckUSBFragmentation = 1;
 	gUSBDelay = 3;
-	strncpy(gUSBPrefix, "", 32);
-	strncpy(gETHPrefix, "", 32);
+	gUSBPrefix[0] = '\0';
+	gETHPrefix[0] = '\0';
 	gUseInfoScreen = 0;
 	gEnableArt = 0;
 	gWideScreen = 0;

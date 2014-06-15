@@ -4,7 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/util.h"
 #include "include/ioman.h"
 #include <string.h>
@@ -15,7 +15,7 @@
 
 static u32 currentUID = 0;
 static config_set_t configFiles[CONFIG_FILE_NUM];
-static char configPath[255] = "mc?:SYS-CONF/IPCONFIG.DAT";
+static char configPath[256] = "mc?:SYS-CONF/IPCONFIG.DAT";
 
 static int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
@@ -105,10 +105,10 @@ static int configKeyValidate(const char* key) {
 
 static struct config_value_t* allocConfigItem(const char* key, const char* val) {
 	struct config_value_t* it = (struct config_value_t*) malloc(sizeof(struct config_value_t));
-	strncpy(it->key, key, 32);
-	it->key[min(strlen(key), 31)] = '\0';
-	strncpy(it->val, val, 255);
-	it->val[min(strlen(val), 254)] = '\0';
+	strncpy(it->key, key, sizeof(it->key));
+	it->key[sizeof(it->key)-1] = '\0';
+	strncpy(it->val, val, sizeof(it->val));
+	it->val[sizeof(it->val)-1] = '\0';
 	it->next = NULL;
 	
 	return it;
@@ -129,7 +129,7 @@ static struct config_value_t* getConfigItemForName(config_set_t* configSet, cons
 	struct config_value_t* val = configSet->head;
 	
 	while (val) {
-		if (strncmp(val->key, name, 32) == 0)
+		if (strncmp(val->key, name, sizeof(val->key)) == 0)
 			break;
 		
 		val = val->next;
@@ -139,18 +139,18 @@ static struct config_value_t* getConfigItemForName(config_set_t* configSet, cons
 }
 
 void configInit(char *prefix) {
-	char path[255];
+	char path[256];
 
 	if (prefix)
-		snprintf(configPath, 255, "%s/IPCONFIG.DAT", prefix);
+		snprintf(configPath, sizeof(configPath), "%s/IPCONFIG.DAT", prefix);
 	else
 		prefix = gBaseMCDir;
 
-	snprintf(path, 255, "%s/conf_opl.cfg", prefix);
+	snprintf(path, sizeof(path), "%s/conf_opl.cfg", prefix);
 	configAlloc(CONFIG_OPL, &configFiles[CONFIG_INDEX_OPL], path);
-	snprintf(path, 255, "%s/conf_last.cfg", prefix);
+	snprintf(path, sizeof(path), "%s/conf_last.cfg", prefix);
 	configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
-	snprintf(path, 255, "%s/conf_apps.cfg", prefix);
+	snprintf(path, sizeof(path), "%s/conf_apps.cfg", prefix);
 	configAlloc(CONFIG_APPS, &configFiles[CONFIG_INDEX_APPS], path);
 }
 
@@ -210,9 +210,9 @@ int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 	struct config_value_t *it = getConfigItemForName(configSet, key);
 	
 	if (it) {
-		if (strncmp(it->val, value, 255) != 0) {
-			strncpy(it->val, value, 255);
-			it->val[min(strlen(value), 254)] = '\0';
+		if (strncmp(it->val, value, sizeof(it->val)) != 0) {
+			strncpy(it->val, value, sizeof(it->val));
+			it->val[sizeof(it->val)-1] = '\0';
 			if (it->key[0] != '#')
 				configSet->modified = 1;
 		}
@@ -239,17 +239,17 @@ int configGetStr(config_set_t* configSet, const char* key, const char** value) {
 		return 0;
 }
 
-void configGetStrCopy(config_set_t* configSet, const char* key, char* value) {
+void configGetStrCopy(config_set_t* configSet, const char* key, char* value, int length) {
 	const char *valref = NULL;
 	if (configGetStr(configSet, key, &valref))
-		strncpy(value, valref, 32);
+		strncpy(value, valref, length);
 	else
 		value[0] = '\0';
 }
 
 int configSetInt(config_set_t* configSet, const char* key, const int value) {
 	char tmp[12];
-	snprintf(tmp, 12, "%d", value);
+	snprintf(tmp, sizeof(tmp), "%d", value);
 	return configSetStr(configSet, key, tmp);
 }
 
@@ -265,7 +265,7 @@ int configGetInt(config_set_t* configSet, const char* key, int* value) {
 
 int configSetColor(config_set_t* configSet, const char* key, unsigned char* color) {
 	char tmp[8];
-	snprintf(tmp, 8, "#%02X%02X%02X", color[0], color[1], color[2]);
+	snprintf(tmp, sizeof(tmp), "#%02X%02X%02X", color[0], color[1], color[2]);
 	return configSetStr(configSet, key, tmp);
 }
 
@@ -287,7 +287,7 @@ int configRemoveKey(config_set_t* configSet, const char* key) {
 	struct config_value_t* prev = NULL;
 	
 	while (val) {
-		if (strncmp(val->key, key, 32) == 0) {
+		if (strncmp(val->key, key, sizeof(val->key)) == 0) {
 			if (key[0] != '#')
 				configSet->modified = 1;
 
@@ -315,7 +315,7 @@ int configRemoveKey(config_set_t* configSet, const char* key) {
 void configReadIP() {
 	int fd = openFile(configPath, O_RDONLY);
 	if (fd >= 0) {
-		char ipconfig[255];
+		char ipconfig[256];
 		int size = getFileSize(fd);
 		fioRead(fd, &ipconfig, size);
 		fioClose(fd);
@@ -331,7 +331,7 @@ void configReadIP() {
 void configWriteIP() {
 	int fd = openFile(configPath, O_WRONLY | O_CREAT);
 	if (fd >= 0) {
-		char ipconfig[255];
+		char ipconfig[256];
 		sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
 			ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
 			ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
@@ -384,7 +384,7 @@ int configRead(config_set_t* configSet) {
 	while (readFileBuffer(fileBuffer, &line)) {
 		lineno++;
 		
-		char key[32], val[255];
+		char key[32], val[256];
 		memset(key, 0, sizeof(key));
 		memset(val, 0, sizeof(val));
 		
@@ -400,8 +400,8 @@ int configRead(config_set_t* configSet) {
 				// we have a prefix
 				char composedKey[66];
 				
-				snprintf(composedKey, 65, "%s_%s", prefix, key);
-				composedKey[65] = '\0';
+				snprintf(composedKey, sizeof(composedKey), "%s_%s", prefix, key);
+				composedKey[sizeof(composedKey)-1] = '\0';
 				
 				configSetStr(configSet, composedKey, val);
 			} else {
@@ -431,7 +431,7 @@ int configWrite(config_set_t* configSet) {
 			struct config_value_t* cur = configSet->head;
 			while (cur) {
 				if ((cur->key[0] != '\0') && (cur->key[0] != '#')) {
-					snprintf(line, 512, "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
+					snprintf(line, sizeof(line), "%s=%s\r\n", cur->key, cur->val); // add windows CR+LF (0x0D 0x0A)
 					writeFileBuffer(fileBuffer, line, strlen(line));
 				}
 
@@ -500,29 +500,25 @@ int configWriteMulti(int types) {
 }
 
 #ifdef VMC
-void configGetVMC(config_set_t* configSet, char* vmc, int slot) {
-	const char *valref = NULL;
-	char gkey[255];
-	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
-	if (configGetStr(configSet, gkey, &valref))
-		strncpy(vmc, valref, 32);
-	else
-		vmc[0] = '\0';
+void configGetVMC(config_set_t* configSet, char* vmc, int length, int slot) {
+	char gkey[256];
+	snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
+	configGetStrCopy(configSet, gkey, vmc, length);
 }
 
 void configSetVMC(config_set_t* configSet, const char* vmc, int slot) {
-	char gkey[255];
+	char gkey[256];
 	if(vmc[0] == '\0') {
 		configRemoveVMC(configSet, slot);
 		return;
 	}
-	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
+	snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
 	configSetStr(configSet, gkey, vmc);
 }
 
 void configRemoveVMC(config_set_t* configSet, int slot) {
-	char gkey[255];
-	snprintf(gkey, 255, "%s_%d", CONFIG_ITEM_VMC, slot);
+	char gkey[256];
+	snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
 	configRemoveKey(configSet, gkey);
 }
 #endif

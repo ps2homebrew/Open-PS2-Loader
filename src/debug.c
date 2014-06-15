@@ -4,7 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/system.h"
 #include "include/ioman.h"
 
@@ -32,10 +32,9 @@ extern int size_ps2link_irx;
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
-
 int debugSetActive(void) {
 	int ret, ipconfiglen;
-	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+	char ipconfig[IPCONFIG_MAX_LEN];
 
 	ipconfiglen = sysSetIPConfig(ipconfig);
 
@@ -69,4 +68,3 @@ int debugSetActive(void) {
 
 	return 0;
 }
-

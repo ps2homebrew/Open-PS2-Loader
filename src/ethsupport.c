@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
@@ -66,8 +66,8 @@ void ethSMBConnect(void) {
 		smbGetPasswordHashes_out_t passwdhashes;
 
 		// we'll try to generate hashed password first
-		strncpy(logon.User, gPCUserName, 32);
-		strncpy(passwd.password, gPCPassword, 32);
+		strncpy(logon.User, gPCUserName, sizeof(logon.User));
+		strncpy(passwd.password, gPCPassword, sizeof(passwd.password));
 
 		if (fileXioDevctl(ethBase, SMB_DEVCTL_GETPASSWORDHASHES, (void *)&passwd, sizeof(passwd), (void *)&passwdhashes, sizeof(passwdhashes)) == 0) {
 			// hash generated okay, can use
@@ -77,13 +77,13 @@ void ethSMBConnect(void) {
 			openshare.PasswordType = HASHED_PASSWORD;
 		} else {
 			// failed hashing, failback to plaintext
-			strncpy(logon.Password, gPCPassword, 32);
+			strncpy(logon.Password, gPCPassword, sizeof(logon.Password));
 			logon.PasswordType = PLAINTEXT_PASSWORD;
-			strncpy(openshare.Password, gPCPassword, 32);
+			strncpy(openshare.Password, gPCPassword, sizeof(openshare.Password));
 			openshare.PasswordType = PLAINTEXT_PASSWORD;
 		}
 	} else {
-		strncpy(logon.User, gPCUserName, 32);
+		strncpy(logon.User, gPCUserName, sizeof(logon.User));
 		logon.PasswordType = NO_PASSWORD;
 		openshare.PasswordType = NO_PASSWORD;
 	}
@@ -137,7 +137,7 @@ static void ethInitSMB(void) {
 
 	if (gNetworkStartup == 0) {
 		// update Themes
-		char path[255];
+		char path[256];
 		sprintf(path, "%sTHM", ethPrefix);
 		thmAddElements(path, "\\", ethGameList.mode);
 
@@ -229,7 +229,7 @@ static int ethNeedsUpdate(void) {
 
 	if (gNetworkStartup == 0) {
 		fio_stat_t stat;
-		char path[255];
+		char path[256];
 
 		sprintf(path, "%sCD", ethPrefix);
 		if (fioGetstat(path, &stat) != 0)
@@ -348,7 +348,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	for (vmc_id = 0; vmc_id < 2; vmc_id++) {
 		memset(&smb_vmc_infos, 0, sizeof(smb_vmc_infos_t));
-		configGetVMC(configSet, vmc_name, vmc_id);
+		configGetVMC(configSet, vmc_name, sizeof(vmc_name), vmc_id);
 		if (vmc_name[0]) {
 			if (sysCheckVMC(ethPrefix, "\\", vmc_name, 0, &vmc_superblock) > 0) {
 				smb_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
@@ -359,12 +359,12 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 				smb_vmc_infos.active = 1;
 				smb_vmc_infos.fid = 0xFFFF;
 				if (gETHPrefix[0])
-					snprintf(smb_vmc_infos.fname, 64, "%s\\VMC\\%s.bin", gETHPrefix, vmc_name); // may still be too small size here ;) (should add 11 char !)
+					snprintf(smb_vmc_infos.fname, sizeof(smb_vmc_infos.fname), "%s\\VMC\\%s.bin", gETHPrefix, vmc_name); // may still be too small size here ;) (should add 11 char !)
 				else
-					snprintf(smb_vmc_infos.fname, 64, "VMC\\%s.bin", vmc_name);
+					snprintf(smb_vmc_infos.fname, sizeof(smb_vmc_infos.fname), "VMC\\%s.bin", vmc_name);
 			} else {
-				char error[255];
-				snprintf(error, 255, _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+				char error[256];
+				snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
 				if (!guiMsgBox(error, 1, NULL))
 					return;
 			}
@@ -413,7 +413,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		}
 	}
 
-	char config_str[255];
+	char config_str[256];
 	sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	memcpy((void*)((u32)irx + i), config_str, strlen(config_str) + 1);
 	memcpy((void*)((u32)irx + i + 16), &gPCPort, 4);
@@ -427,7 +427,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, 32);
+		strncpy(filename, altStartup, sizeof(filename));
 	else
 		sprintf(filename, "%s", game->startup);
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
@@ -444,7 +444,7 @@ static config_set_t* ethGetConfig(int id) {
 }
 
 static int ethGetImage(char* folder, int isRelative, char* value, char* suffix, GSTEXTURE* resultTex, short psm) {
-	char path[255];
+	char path[256];
 	if (isRelative)
 		sprintf(path, "%s%s\\%s_%s", ethPrefix, folder, value, suffix);
 	else

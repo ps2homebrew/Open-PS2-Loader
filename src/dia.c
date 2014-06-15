@@ -4,7 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.  
 */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/dia.h"
 #include "include/gui.h"
 #include "include/lang.h"
@@ -386,7 +386,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 		case UI_INT: {
 			char tmp[10];
 
-			snprintf(tmp, 10, "%d", item->intvalue.current);
+			snprintf(tmp, sizeof(tmp), "%d", item->intvalue.current);
 			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tmp, txtcol) - x;
 			break;
 		}
@@ -403,7 +403,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 			char stars[32];
 			int i;
 
-			int len = min(strlen(item->stringvalue.text), 30);
+			int len = min(strlen(item->stringvalue.text), sizeof(stars)-1);
 			for (i = 0; i < len; ++i)
 				stars[i] = '*';
 
@@ -519,7 +519,7 @@ static void diaResetValue(struct UIItem *item) {
 			return;
 		case UI_STRING:
 		case UI_PASSWORD:
-			strncpy(item->stringvalue.text, item->stringvalue.def, 32);
+			strncpy(item->stringvalue.text, item->stringvalue.def, sizeof(item->stringvalue.text));
 			return;
 		default:
 			return;
@@ -558,14 +558,14 @@ static int diaHandleInput(struct UIItem *item, int *modified) {
 			*modified = 0;
 	} else if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
 		char tmp[32];
-		strncpy(tmp, item->stringvalue.text, 32);
+		strncpy(tmp, item->stringvalue.text, sizeof(tmp));
 
 		if (item->stringvalue.handler) {
-			if (item->stringvalue.handler(tmp, 32))
-				strncpy(item->stringvalue.text, tmp, 32);
+			if (item->stringvalue.handler(tmp, sizeof(tmp)))
+				strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
 		} else {
-			if (diaShowKeyb(tmp, 32))
-				strncpy(item->stringvalue.text, tmp, 32);
+			if (diaShowKeyb(tmp, sizeof(tmp)))
+				strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
 		}
 
 		return 0;
@@ -861,14 +861,14 @@ int diaSetInt(struct UIItem* ui, int id, int value) {
 	return 0;
 }
 
-int diaGetString(struct UIItem* ui, int id, char *value) {
+int diaGetString(struct UIItem* ui, int id, char *value, int length) {
 	struct UIItem *item = diaFindByID(ui, id);
 	
 	if (!item)
 		return 0;
 	
 	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
-		strncpy(value, item->stringvalue.text, 32);
+		strncpy(value, item->stringvalue.text, length);
 		return 1;
 	}
 
@@ -882,8 +882,8 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 		return 0;
 	
 	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
-		strncpy(item->stringvalue.def, text, 32);
-		strncpy(item->stringvalue.text, text, 32);
+		strncpy(item->stringvalue.def, text, sizeof(item->stringvalue.def));
+		strncpy(item->stringvalue.text, text, sizeof(item->stringvalue.text));
 		return 1;
 	}
 	

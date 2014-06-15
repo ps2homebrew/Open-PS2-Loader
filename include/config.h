@@ -22,9 +22,12 @@
 #define CONFIG_ITEM_DNAS			"$DNAS"
 #define CONFIG_ITEM_CDVDMAN_TIMER	"$CallbackTimer"
 
+#define CONFIG_KEY_NAME_LEN	32
+#define CONFIG_KEY_VALUE_LEN	256
+
 struct config_value_t {
-        char key[32];
-        char val[255];
+        char key[CONFIG_KEY_NAME_LEN];
+        char val[CONFIG_KEY_VALUE_LEN];
 
         struct config_value_t *next;
 };
@@ -45,7 +48,7 @@ void configFree(config_set_t *configSet);
 config_set_t *configGetByType(int type);
 int configSetStr(config_set_t* configSet, const char* key, const char* value);
 int configGetStr(config_set_t* configSet, const char* key, const char** value);
-void configGetStrCopy(config_set_t* configSet, const char* key, char* value);
+void configGetStrCopy(config_set_t* configSet, const char* key, char* value, int length);
 int configSetInt(config_set_t* configSet, const char* key, const int value);
 int configGetInt(config_set_t* configSet, const char* key, int* value);
 int configSetColor(config_set_t* configSet, const char* key, unsigned char* color);
@@ -63,7 +66,7 @@ int configWriteMulti(int types);
 void configClear(config_set_t* configSet);
 
 #ifdef VMC
-void configGetVMC(config_set_t* configSet, char* vmc, int slot);
+void configGetVMC(config_set_t* configSet, char* vmc, int length, int slot);
 void configSetVMC(config_set_t* configSet, const char* vmc, int slot);
 void configRemoveVMC(config_set_t* configSet, int slot);
 #endif

@@ -4,7 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/util.h"
 #include "include/pad.h"
 #include "include/system.h"
@@ -589,7 +589,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	void *pdata;
 	int i;
 	char *argv[3];
-	char config_str[255];
+	char config_str[256];
 #ifdef GSM
 	char gsm_config_str[256];
 #endif
@@ -597,7 +597,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	AddHistoryRecordUsingFullPath(filename);
 
 	if (gExitPath[0] == '\0')
-		strncpy(gExitPath, "Browser", 32);
+		strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
 	memset((void*)0x00082000, 0, 0x00100000-0x00082000);
 
@@ -656,7 +656,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 
 	char cmask[10];
-	snprintf(cmask, 10, "%d", compatflags);
+	snprintf(cmask, sizeof(cmask), "%d", compatflags);
 	argv[0] = config_str;
 	argv[1] = filename;
 	argv[2] = cmask;
@@ -738,8 +738,8 @@ int sysCheckMC(void) {
 // createSize == -1 : delete, createSize == 0 : probing, createSize > 0 : creation
 int sysCheckVMC(const char* prefix, const char* sep, char* name, int createSize, vmc_superblock_t* vmc_superblock) {
 	int size = -1;
-	char path[255];
-	snprintf(path, 255, "%sVMC%s%s.bin", prefix, sep, name);
+	char path[256];
+	snprintf(path, sizeof(path), "%sVMC%s%s.bin", prefix, sep, name);
 
 	if (createSize == -1)
 		fileXioRemove(path);

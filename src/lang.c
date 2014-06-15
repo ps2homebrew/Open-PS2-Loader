@@ -1,4 +1,4 @@
-#include "include/usbld.h"
+#include "include/opl.h"
 #include "include/lang.h"
 #include "include/util.h"
 #include "include/fntsys.h"
@@ -217,8 +217,8 @@ static int lngLoadFromFile(char* path, char *name) {
 			strId++;
 		}
 
-		char path[255];
-		snprintf(path, 255, "%s/font_%s.ttf", gBaseMCDir, name);
+		char path[256];
+		snprintf(path, sizeof(path), "%s/font_%s.ttf", gBaseMCDir, name);
 		LOG("LANG Custom font path: %s\n", path);
 		fntLoadDefault(path);
 

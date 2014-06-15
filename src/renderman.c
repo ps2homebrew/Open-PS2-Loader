@@ -9,7 +9,7 @@
 
 #include "include/renderman.h"
 #include "include/ioman.h"
-#include "include/usbld.h"
+#include "include/opl.h"
 
 // Allocateable space in vram, as indicated in GsKit's code
 #define __VRAM_SIZE 4194304

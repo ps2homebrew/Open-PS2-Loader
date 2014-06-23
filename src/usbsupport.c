@@ -8,6 +8,9 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
+#ifdef CHEAT
+#include "include/cheatman.h"
+#endif
 
 extern void *usb_cdvdman_irx;
 extern int size_usb_cdvdman_irx;
@@ -86,6 +89,11 @@ static void usbInitModules(void) {
 #ifdef VMC
 	sprintf(path, "%sVMC", usbPrefix);
 	checkCreateDir(path);
+#endif
+
+#ifdef CHEAT
+		sprintf(path, "%sCHT", usbPrefix);
+		checkCreateDir(path);
 #endif
 }
 
@@ -298,6 +306,25 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		memcpy((void*)((u32)irx + index + 44 + 4 * i), &val, 4);
 	}
 
+#ifdef CHEAT
+	if (gEnableCheat) {
+		char cheatfile[32];
+		snprintf(cheatfile, 255, "%sCHT/%s.cht", usbPrefix, game->startup);
+		LOG("Loading Cheat File %s\n", cheatfile);
+		if (load_cheats(cheatfile) < 0) {
+				guiMsgBox("Error: failed to load Cheat File", 0, NULL);
+				LOG("Error: failed to load cheats\n");
+		} else {
+			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
+				LOG("Cheats found\n");
+			} else {
+				guiMsgBox("No cheats found", 0, NULL);
+				LOG("No cheats found\n");
+			}
+		}
+	}
+#endif
+
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
 		saveConfig(CONFIG_LAST, 0);
@@ -313,10 +340,11 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, compatmask);
+#define VMC_TEMP4	size_mcemu_irx, &usb_mcemu_irx,
 #else
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, compatmask);
+#define VMC_TEMP4	
 #endif
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, VMC_TEMP4 compatmask);
 }
 
 static config_set_t* usbGetConfig(int id) {

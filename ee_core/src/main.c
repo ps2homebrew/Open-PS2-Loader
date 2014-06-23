@@ -14,6 +14,9 @@
 #ifdef GSM
 #include "gsm_api.h"
 #endif
+#ifdef CHEAT
+#include "cheat_api.h"
+#endif
 
 int main(int argc, char **argv){
 	char ElfPath[32];
@@ -23,30 +26,23 @@ int main(int argc, char **argv){
 
 	SifInitRpc(0);
 
-	argv[1][11]=0x00; // fix for 8+3 filename.
+	int i = 0;
 
-	_strcpy(ElfPath, "cdrom0:\\");
-	_strcat(ElfPath, argv[1]);
-	_strcat(ElfPath, ";1");
-	_strcpy(GameID, argv[1]);
-	DPRINTF("Elf path = '%s'\n", ElfPath);
-	DPRINTF("Game ID = '%s'\n", GameID);
-
-	if (!_strncmp(argv[0], "USB_MODE", 8))
+	if (!_strncmp(argv[i], "USB_MODE", 8))
 		GameMode = USB_MODE;
-	else if (!_strncmp(argv[0], "ETH_MODE", 8))
+	else if (!_strncmp(argv[i], "ETH_MODE", 8))
 		GameMode = ETH_MODE;
-	else if (!_strncmp(argv[0], "HDD_MODE", 8))
+	else if (!_strncmp(argv[i], "HDD_MODE", 8))
 		GameMode = HDD_MODE;
 	DPRINTF("Game Mode = %d\n", GameMode);
 
 	DisableDebug = 0;
-	if (!_strncmp(&argv[0][9], "1", 1)) {
+	if (!_strncmp(&argv[i][9], "1", 1)) {
 		DisableDebug = 1;
 		DPRINTF("Debug color screens enabled\n");
 	}
 
-	char *p = _strtok(&argv[0][11], " ");
+	char *p = _strtok(&argv[i][11], " ");
 	if (!_strncmp(p, "Browser", 7))
 		ExitPath[0] = '\0';
 	else
@@ -70,15 +66,46 @@ int main(int argc, char **argv){
 	g_ps2_ETHOpMode=_strtoui(_strtok(NULL, " "));
 	DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 
+#ifdef CHEAT
+	EnableCheatOp = _strtoi(_strtok(NULL, " "));
+	DPRINTF("PS2RD Cheat Engine = %s\n", EnableCheatOp==0?"Disabled":"Enabled");
+#endif
+
 #ifdef GSM
 	EnableGSMOp = _strtoi(_strtok(NULL, " "));
 	DPRINTF("GSM = %s\n", EnableGSMOp==0?"Disabled":"Enabled");
+#endif
 
+	i++;
+
+	argv[i][11]=0x00; // fix for 8+3 filename.
+	_strcpy(ElfPath, "cdrom0:\\");
+	_strcat(ElfPath, argv[i]);
+	_strcat(ElfPath, ";1");
+	_strcpy(GameID, argv[i]);
+	DPRINTF("Elf path = '%s'\n", ElfPath);
+	DPRINTF("Game ID = '%s'\n", GameID);
+
+	i++;
+
+	// bitmask of the compat. settings
+	g_compat_mask = _strtoui(argv[i]);
+	DPRINTF("Compat Mask = 0x%02x\n", g_compat_mask);
+
+	i++;
+
+#ifdef CHEAT
+	if(EnableCheatOp){
+		EnableCheats();
+	}
+#endif
+
+#ifdef GSM
 	if(EnableGSMOp){
 		int interlace, mode, ffmd, dx_offset, dy_offset;
 		u64 display, syncv, smode2;
 
-		interlace=_strtoi(_strtok(argv[3], " "));
+		interlace=_strtoi(_strtok(argv[i], " "));
 		mode=_strtoi(_strtok(NULL, " "));
 		ffmd=_strtoi(_strtok(NULL, " "));
 		display=_strtoul(_strtok(NULL, " "));
@@ -92,10 +119,6 @@ int main(int argc, char **argv){
 	}
 #endif
 
-	// bitmask of the compat. settings
-	g_compat_mask = _strtoui(argv[2]);
-	DPRINTF("Compat Mask = 0x%02x\n", g_compat_mask);
-
 	set_ipconfig();
 
 	DPRINTF("Initializing module pointers...\n");	
@@ -106,7 +129,7 @@ int main(int argc, char **argv){
 	Install_Kernel_Hooks();
 
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0xff0000; 
+		GS_BGCOLOUR = 0xff0000;	//Blue
 
 	SifExitRpc();
 
@@ -114,7 +137,7 @@ int main(int argc, char **argv){
 	LoadExecPS2(ElfPath, 0, NULL);	
 
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0x0000ff;
+		GS_BGCOLOUR = 0x0000ff;	//Red
 	DPRINTF("LoadExecPS2 failed!\n");
 
 	SleepThread();

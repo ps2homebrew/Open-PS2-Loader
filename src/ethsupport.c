@@ -8,6 +8,9 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
+#ifdef CHEAT
+#include "include/cheatman.h"
+#endif
 
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
@@ -146,6 +149,11 @@ static void ethInitSMB(void) {
 
 #ifdef VMC
 		sprintf(path, "%sVMC", ethPrefix);
+		checkCreateDir(path);
+#endif
+
+#ifdef CHEAT
+		sprintf(path, "%sCHT", ethPrefix);
 		checkCreateDir(path);
 #endif
 	} else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE)) {
@@ -381,6 +389,25 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	}
 #endif
 
+#ifdef CHEAT
+	if (gEnableCheat) {
+		char cheatfile[32];
+		snprintf(cheatfile, 255, "%sCHT/%s.cht", ethPrefix, game->startup);
+		LOG("Loading Cheat File %s\n", cheatfile);
+		if (load_cheats(cheatfile) < 0) {
+				guiMsgBox("Error: failed to load Cheat File", 0, NULL);
+				LOG("Error: failed to load cheats\n");
+		} else {
+			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
+				LOG("Cheats found\n");
+			} else {
+				guiMsgBox("No cheats found", 0, NULL);
+				LOG("No cheats found\n");
+			}
+		}
+	}
+#endif
+
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
 		saveConfig(CONFIG_LAST, 0);
@@ -433,10 +460,11 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, size_mcemu_irx, &smb_mcemu_irx, compatmask);
+#define VMC_TEMP2	size_mcemu_irx,&smb_mcemu_irx,
 #else
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, compatmask);
+#define VMC_TEMP2	
 #endif
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, VMC_TEMP2 compatmask);
 }
 
 static config_set_t* ethGetConfig(int id) {

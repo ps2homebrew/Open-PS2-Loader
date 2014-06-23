@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev687 - Fixed the theme bug and improved code: - Sun Jun 15 18:52:00 2014 +0800
 rev686 - Sync'ing with the PS2SDK commit for today: the main point behind this commit is the rollback of the use of the pre and post-DMA callbacks within DEV9, for compatibility with a certain clone adaptor. - Tue Jun 10 21:47:33 2014 +0800
 rev685 - Merged in psx_core/open-ps2-loader/psx_core/the-most-accurate-and-correct-translatio-1384761167035 (pull request #6) - Sun Jun 01 19:35:01 2014 +0800
 rev684 - The most accurate and correct translation from english to russian by RA1n. (lang_Russian.lng edited online with Bitbucket) - Mon Nov 18 07:52:59 2013 +0000

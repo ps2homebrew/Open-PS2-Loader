@@ -92,7 +92,7 @@ int AddHistoryRecord(const char *name){
 	struct HistoryEntry HistoryEntries[MAX_HISTORY_ENTRIES], *NewEntry, OldHistoryEntry;
 	int i, value, LeastUsedRecord, LeastUsedRecordLaunchCount, LeastUsedRecordTimestamp, result;
 	unsigned char BlankSlotList[MAX_HISTORY_ENTRIES], NumBlankSlots, IsNewRecord;
-	CdvdClock_t time;
+	sceCdCLOCK time;
 	char SystemRegionLetter;
 	char path[32];
 
@@ -184,8 +184,8 @@ int AddHistoryRecord(const char *name){
 		NewEntry->LaunchCount=1;
 		NewEntry->bitmask=1;
 		NewEntry->ShiftAmount=0;
-		cdReadClock(&time);
-		NewEntry->DateStamp=OSD_HISTORY_SET_DATE(btoi(time.year), btoi(time.month), btoi(time.day));
+		sceCdReadClock(&time);
+		NewEntry->DateStamp=OSD_HISTORY_SET_DATE(btoi(time.year), btoi(time.month&0x7F), btoi(time.day));
 	}
 
 	return SaveHistoryFile(path, HistoryEntries);

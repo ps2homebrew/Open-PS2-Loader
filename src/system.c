@@ -311,36 +311,36 @@ unsigned int USBA_crc32(char *string) {
 }
 
 int sysGetDiscID(char *hexDiscID) {
-	cdInit(CDVD_INIT_NOCHECK);
+	sceCdInit(SCECdINoD);
 	LOG("SYSTEM CDVD RPC inited\n");
-	if (cdStatus() == CDVD_STAT_OPEN) // If tray is open, error
+	if (sceCdStatus() == SCECdErOPENS) // If tray is open, error
 		return -1;
 
-	while (cdGetDiscType() == CDVD_TYPE_DETECT) {;}	// Trick : if tray is open before startup it detects it as closed...
-	if (cdGetDiscType() == CDVD_TYPE_NODISK)
+	while (sceCdGetDiskType() == SCECdDETCT) {;}	// Trick : if tray is open before startup it detects it as closed...
+	if (sceCdGetDiskType() == SCECdNODISC)
 		return -1;
 
-	cdDiskReady(0);
+	sceCdDiskReady(0);
 	LOG("SYSTEM Disc drive is ready\n");
-	CdvdDiscType_t cdmode = cdGetDiscType();	// If tray is closed, get disk type
-	if (cdmode == CDVD_TYPE_NODISK)
+	int cdmode = sceCdGetDiskType();	// If tray is closed, get disk type
+	if (cdmode == SCECdNODISC)
 		return -1;
 
-	if ((cdmode != CDVD_TYPE_PS2DVD) && (cdmode != CDVD_TYPE_PS2CD) && (cdmode != CDVD_TYPE_PS2CDDA)) {
-		cdStop();
-		cdSync(0);
+	if ((cdmode != SCECdPS2DVD) && (cdmode != SCECdPS2CD) && (cdmode != SCECdPS2CDDA)) {
+		sceCdStop();
+		sceCdSync(0);
 		LOG("SYSTEM Disc stopped, Disc is not ps2 disc!\n");
 		return -2;
 	}
 
-	cdStandby();
-	cdSync(0);
+	sceCdStandby();
+	sceCdSync(0);
 	LOG("SYSTEM Disc standby\n");
 
 	int fd = fioOpen("discID:", O_RDONLY);
 	if (fd < 0) {
-		cdStop();
-		cdSync(0);
+		sceCdStop();
+		sceCdSync(0);
 		LOG("SYSTEM Disc stopped\n");
 		return -3;
 	}
@@ -350,8 +350,8 @@ int sysGetDiscID(char *hexDiscID) {
 	fioRead(fd, discID, 5);
 	fioClose(fd);
 
-	cdStop();
-	cdSync(0);
+	sceCdStop();
+	sceCdSync(0);
 	LOG("SYSTEM Disc stopped\n");
 
 	// convert to hexadecimal string

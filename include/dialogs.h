@@ -71,10 +71,16 @@
 #define NETCFG_OK			45
 #define NETCFG_ETHOPMODE		46
 
+#define CFG_SHOWCHEAT			47
+#define CHEATCFG_ENABLECHEAT		48
+#define CHEATCFG_CHEATMODE			49
+
 extern struct UIItem diaIPConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
 extern struct UIItem diaGSConfig[];
+extern struct UIItem diaCheatConfig[];
+
 extern struct UIItem diaConfig[];
 extern struct UIItem diaAbout[];
 #ifdef VMC

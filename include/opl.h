@@ -129,6 +129,19 @@ int	gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative pos
 int	gGSMSkipVideos; // 0 - Off, 1 - On
 #endif
 
+#ifdef CHEAT
+#define CHEAT_VERSION "0.5.3.65.g774d1"
+
+#define MAX_HOOKS	5
+#define MAX_CODES	100
+#define MAX_CHEATLIST	(MAX_HOOKS*2+MAX_CODES*2)
+
+int	gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
+int	gCheatMode;  // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
+
+int gCheatList;	//Store hooks/codes addr+val pairs
+#endif
+
 // ------------------------------------------------------------------------------------------------------------------------
 
 // 0,1,2 scrolling speed
@@ -151,6 +164,10 @@ int gRememberLastPlayed;
 
 #ifdef GSM
 int gShowGSM; // Toggle to reveal "GSM Settings" on Main Menu
+#endif
+
+#ifdef CHEAT
+int gShowCheat; // Toggle to reveal "Cheat Settings" on Main Menu
 #endif
 
 char *infotxt;

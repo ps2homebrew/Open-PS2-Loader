@@ -29,6 +29,9 @@
 #ifdef GSM
 #include "gsm_api.h"
 #endif
+#ifdef CHEAT
+#include "cheat_api.h"
+#endif
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)( int port, int slot, void *addr );
@@ -235,11 +238,23 @@ static void IGR_Thread(void *arg)
 		{
 			DPRINTF("Stopping GSM...\n");
 			DisableGSM();
+			if(!DisableDebug)
+				GS_BGCOLOUR = 0x00FF00; // Green
 		}
 #endif
 
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00FFFF; // Yellow
+
+#ifdef CHEAT
+		if(EnableCheatOp)
+		{
+			DPRINTF("Stopping PS2RD Cheat Engine...\n");
+			DisableCheats();
+			if(!DisableDebug)
+				GS_BGCOLOUR = 0xFF0000; // Blue
+		}
+#endif
 
 		while (!SifIopSync()){;}
 
@@ -506,7 +521,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 		{
 			// Purple while PadOpen pattern search
 			if(!DisableDebug)
-				GS_BGCOLOUR = 0x800080;
+				GS_BGCOLOUR = 0x800080;		//Purple
 
 			mem_size = mem_end - (u32)ptr;
 
@@ -519,7 +534,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 				
 				// Green while PadOpen patches
 				if(!DisableDebug)
-				 	GS_BGCOLOUR = 0x008000;
+				 	GS_BGCOLOUR = 0x008000;	//Dark green
 
 				// Save original PadOpen function
 				if (padopen_patterns[i].version == IGR_LIBPAD_V1)
@@ -634,9 +649,9 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 		}
 	}
 
-	// Black, done
+	// Done
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0x000000;
+		GS_BGCOLOUR = 0x000000;	//Black
 
 	return patched;
 }

@@ -13,8 +13,8 @@ I_ata_device_set_transfer_mode
 atad_IMPORTS_end
 
 cdvdman_IMPORTS_start
+DECLARE_IMPORT(0x16, CdReadIlinkID)
 I_sceCdReadClock
-I_sceCdRI
 cdvdman_IMPORTS_end
 
 dev9_IMPORTS_start

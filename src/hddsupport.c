@@ -9,6 +9,9 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
+#ifdef CHEAT
+#include "include/cheatman.h"
+#endif
 
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
@@ -66,6 +69,11 @@ static void hddInitModules(void) {
 #ifdef VMC
 	sprintf(path, "%sVMC", hddPrefix);
 	checkCreateDir(path);
+#endif
+
+#ifdef CHEAT
+		sprintf(path, "%sCHT", hddPrefix);
+		checkCreateDir(path);
 #endif
 }
 
@@ -341,6 +349,25 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	}
 #endif
 
+#ifdef CHEAT
+	if (gEnableCheat) {
+		char cheatfile[32];
+		snprintf(cheatfile, 255, "%sCHT/%s.cht", hddPrefix, game->startup);
+		LOG("Loading Cheat File %s\n", cheatfile);
+		if (load_cheats(cheatfile) < 0) {
+				guiMsgBox("Error: failed to load Cheat File", 0, NULL);
+				LOG("Error: failed to load cheats\n");
+		} else {
+			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
+				LOG("Cheats found\n");
+			} else {
+				guiMsgBox("No cheats found", 0, NULL);
+				LOG("No cheats found\n");
+			}
+		}
+	}
+#endif
+
 	if (gRememberLastPlayed) {
 		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
 		saveConfig(CONFIG_LAST, 0);
@@ -425,10 +452,11 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
 
 #ifdef VMC
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, compatMode);
+#define VMC_TEMP3	size_mcemu_irx, &hdd_mcemu_irx,
 #else
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, compatMode);
+#define VMC_TEMP3	
 #endif
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 compatMode);
 }
 
 static config_set_t* hddGetConfig(int id) {

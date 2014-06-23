@@ -8,14 +8,17 @@
 # Review ps2sdk README & LICENSE files for further details.
 #
 # Alternative Makefile
-# Loader section begin at 0x00090000 instead of 0x000e7000
-# g_buf is located at 0x01700000 instead of 0x00088000
+# Loader section begin at 0x00090000
+# g_buf is located at 0x01700000
 
 EE_BIN = ee_core.elf
+
 GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
+CHEATCORE_EE_OBJS = obj/cheat_engine.o obj/cheat_api.o
+
 EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o \
 	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/tlb.o obj/asm.o obj/crt0.o
-MAPFILE = alt_ee_core.map
+MAPFILE = ee_core_alt.map
 
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
@@ -34,6 +37,11 @@ endif
 ifeq ($(GSM),1)
 EE_OBJS += $(GSMCORE_EE_OBJS)
 EE_CFLAGS += -DGSM
+endif
+
+ifeq ($(CHEAT),1)
+EE_OBJS += $(CHEATCORE_EE_OBJS)
+EE_CFLAGS += -DCHEAT
 endif
 
 EE_LDFLAGS = -nostartfiles -Tlinkfile.alt -L$(PS2SDK)/ee/lib -L$(PS2SDK)/sbv/lib -s
@@ -61,15 +69,14 @@ $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
 $(EE_BIN) : $(EE_OBJS)
 	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker $(MAPFILE)
 
-
 all:
 	$(EE_BIN)
 
 clean:
-	rm -f $(EE_OBJS_DIR)*.* $(EE_BIN) $(MAPFILE)
+	rm -f -r $(EE_OBJS_DIR) $(EE_BIN) $(MAPFILE)
 
 clean_all:
-	rm -f $(EE_OBJS_DIR)*.* $(EE_BIN) $(MAPFILE)
+	rm -f -r $(EE_OBJS_DIR) $(EE_BIN) $(MAPFILE)
 
 
 include $(PS2SDK)/samples/Makefile.pref

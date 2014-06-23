@@ -311,36 +311,36 @@ unsigned int USBA_crc32(char *string) {
 }
 
 int sysGetDiscID(char *hexDiscID) {
-	sceCdInit(SCECdINoD);
+	cdInit(CDVD_INIT_NOCHECK);
 	LOG("SYSTEM CDVD RPC inited\n");
-	if (sceCdStatus() == SCECdErOPENS) // If tray is open, error
+	if (cdStatus() == CDVD_STAT_OPEN) // If tray is open, error
 		return -1;
 
-	while (sceCdGetDiskType() == SCECdDETCT) {;}	// Trick : if tray is open before startup it detects it as closed...
-	if (sceCdGetDiskType() == SCECdNODISC)
+	while (cdGetDiscType() == CDVD_TYPE_DETECT) {;}	// Trick : if tray is open before startup it detects it as closed...
+	if (cdGetDiscType() == CDVD_TYPE_NODISK)
 		return -1;
 
-	sceCdDiskReady(0);
+	cdDiskReady(0);
 	LOG("SYSTEM Disc drive is ready\n");
-	int cdmode = sceCdGetDiskType();	// If tray is closed, get disk type
-	if (cdmode == SCECdNODISC)
+	CdvdDiscType_t cdmode = cdGetDiscType();	// If tray is closed, get disk type
+	if (cdmode == CDVD_TYPE_NODISK)
 		return -1;
 
-	if ((cdmode != SCECdPS2DVD) && (cdmode != SCECdPS2CD) && (cdmode != SCECdPS2CDDA)) {
-		sceCdStop();
-		sceCdSync(0);
+	if ((cdmode != CDVD_TYPE_PS2DVD) && (cdmode != CDVD_TYPE_PS2CD) && (cdmode != CDVD_TYPE_PS2CDDA)) {
+		cdStop();
+		cdSync(0);
 		LOG("SYSTEM Disc stopped, Disc is not ps2 disc!\n");
 		return -2;
 	}
 
-	sceCdStandby();
-	sceCdSync(0);
+	cdStandby();
+	cdSync(0);
 	LOG("SYSTEM Disc standby\n");
 
 	int fd = fioOpen("discID:", O_RDONLY);
 	if (fd < 0) {
-		sceCdStop();
-		sceCdSync(0);
+		cdStop();
+		cdSync(0);
 		LOG("SYSTEM Disc stopped\n");
 		return -3;
 	}
@@ -350,8 +350,8 @@ int sysGetDiscID(char *hexDiscID) {
 	fioRead(fd, discID, 5);
 	fioClose(fd);
 
-	sceCdStop();
-	sceCdSync(0);
+	cdStop();
+	cdSync(0);
 	LOG("SYSTEM Disc stopped\n");
 
 	// convert to hexadecimal string
@@ -579,16 +579,27 @@ static int ResetDECI2(void){
 #endif
 
 #ifdef VMC
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, unsigned int compatflags) {
+#define VMC_TEMP1	int size_mcemu_irx, void **mcemu_irx,
 #else
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, unsigned int compatflags) {
+#define VMC_TEMP1	
 #endif
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 unsigned int compatflags) {
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
 	elf_pheader_t *eph;
 	void *pdata;
 	int i;
-	char *argv[3];
+#ifdef GSM
+#define GSM_TEMP3	1
+#else
+#define GSM_TEMP3	0
+#endif
+#ifdef CHEAT
+#define CHEAT_TEMP3	1
+#else
+#define CHEAT_TEMP3	0
+#endif
+	char *argv[3+GSM_TEMP3+CHEAT_TEMP3];
 	char config_str[256];
 #ifdef GSM
 	char gsm_config_str[256];
@@ -638,40 +649,51 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	SifInitRpc(0);
 	SifExitRpc();
 
-#ifdef GSM
-	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
-		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
-		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
-		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode, \
-		gEnableGSM);
-
-	if (gEnableGSM)
-		PrepareGSM(gsm_config_str);
+#ifdef CHEAT
+#define CHEAT_TEMP1	" %d"
+#define CHEAT_TEMP2	,gEnableCheat
 #else
-	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d", mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
-		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
-		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
-		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], gETHOpMode);
+#define CHEAT_TEMP1
+#define CHEAT_TEMP2
 #endif
 
+#ifdef GSM
+#define GSM_TEMP1	" %d"
+#define GSM_TEMP2	,gEnableGSM
+#else
+#define GSM_TEMP1
+#define GSM_TEMP2
+#endif
+
+	i = 0;
+	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d" CHEAT_TEMP1 GSM_TEMP1, \
+		mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
+		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
+		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
+		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], \
+		gETHOpMode \
+		CHEAT_TEMP2 GSM_TEMP2);
+	argv[i] = config_str;
+	i++;
+
+	argv[i] = filename;
+	i++;
 
 	char cmask[10];
-	snprintf(cmask, sizeof(cmask), "%d", compatflags);
-	argv[0] = config_str;
-	argv[1] = filename;
-	argv[2] = cmask;
+	snprintf(cmask, 10, "%d", compatflags);
+	argv[i] = cmask;
+	i++;
+
 #ifdef GSM
-	argv[3] = gsm_config_str;
+	PrepareGSM(gsm_config_str);
+	argv[i] = gsm_config_str;
+	i++;
 #endif
 
 	FlushCache(0);
 	FlushCache(2);
 
-#ifdef GSM
-	ExecPS2((void *)eh->entry, 0, 4, argv);
-#else
-	ExecPS2((void *)eh->entry, 0, 3, argv);
-#endif
+	ExecPS2((void *)eh->entry, 0, i, argv);
 }
 
 int sysExecElf(char *path) {

@@ -251,7 +251,7 @@ void start_smbauth_thread(void)
 	ret = StartThread(smbauth_thread_id, NULL);
 	if (ret < 0) {
 		DPRINTF("EE Core: failed to start smbauth thread...\n");
-		GS_BGCOLOUR = 0x008080;
+		GS_BGCOLOUR = 0x008080;	//Olive Green
 		SleepThread();
 	}
 

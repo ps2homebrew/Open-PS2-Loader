@@ -188,9 +188,9 @@ static void Remove_GSHandler(void)
 	FlushCache(2);
 }
 
-/*--------------------------------------------*/
-/* Disable Graphics Synthesizer Mode Selector */
-/*--------------------------------------------*/
+/*-------------------------------------------*/
+/* Enable Graphics Synthesizer Mode Selector */
+/*-------------------------------------------*/
 void EnableGSM(void)
 {
 	// Install Hook SetGsCrt

@@ -1,20 +1,36 @@
 .SILENT:
 
-#For debugging with DECI2 (EE only), enable DEBUG, INGAME_DEBUG and DECI2_DEBUG.
+# SP193:
+# For debugging with DECI2 (EE only), enable DEBUG, INGAME_DEBUG and DECI2_DEBUG.
+#
+# Doctorxyz:
+# How do I debug?
+# I enable DEBUG and INGAME_DEBUG, turn on SCPH-70012 with FMCB autobooting into ps2link 1.52
+# (high load + screenshot capable version), with a USB Device inserted on console
+# with OPL games inside PS2SMB root folder, and call OPL from PC via ETH with following command line:
+# ps2client -h 192.168.1.10 execee host:opl.elf -use-early-debug
+# (this approach allows me to see the useful OPL's LOG messages)
+#
 DEBUG = 0
 EESIO_DEBUG = 0
 INGAME_DEBUG = 0
 DECI2_DEBUG = 0
 #comment following line to build without vmc
 VMC = 1
+
 CHILDPROOF = 0
 RTL = 0
+
 #change following line to "0" to build without GSM - DO NOT COMMENT!
-GSM = 0
+GSM = 1
+
+#change following line to "0" to build without PS2RD Cheat Engine - DO NOT COMMENT!
+CHEAT = 1
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o \
+		obj/cheatman.o
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
@@ -59,14 +75,23 @@ else
 endif
 
 ifeq ($(CHILDPROOF),0)
+
 ifeq ($(GSM),1)
 	EE_CFLAGS += -DGSM
 	GSM_FLAGS = GSM=1
 else
 	GSM_FLAGS = GSM=0
 endif
+ifeq ($(CHEAT),1)
+	EE_CFLAGS += -DCHEAT
+	CHEAT_FLAGS = CHEAT=1
+else
+	CHEAT_FLAGS = CHEAT=0
+endif
+
 else
 	GSM_FLAGS = GSM=0
+	CHEAT_FLAGS = CHEAT=0
 endif
 
 ifeq ($(RTL),1)
@@ -223,13 +248,11 @@ pc_tools_win32:
 
 ee_core.s:
 	echo "    * EE core"
-	$(MAKE) -C ee_core clean
-	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
+	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
 	bin2s ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 elfldr.s:
 	echo "    * Elf Loader"
-	$(MAKE) -C elfldr clean
 	$(MAKE) -C elfldr
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
 

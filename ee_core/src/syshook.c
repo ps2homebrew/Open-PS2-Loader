@@ -78,7 +78,7 @@ void t_loadElf(void)
 	DPRINTF("t_loadElf: elf path = '%s'\n", g_argv[0]);
 
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0x00ff00;
+		GS_BGCOLOUR = 0x00ff00;	//Green
 
 	DPRINTF("t_loadElf: cleaning user memory...");
 
@@ -125,8 +125,9 @@ void t_loadElf(void)
 
 	DPRINTF(" failed\n");
 
+	//Error
 	if(!DisableDebug)
-		GS_BGCOLOUR = 0xffffff; // white screen: error
+		GS_BGCOLOUR = 0xffffff; //White
 	SleepThread();
 }
 

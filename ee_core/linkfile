@@ -9,6 +9,7 @@
 	Review ps2sdk README & LICENSE files for further details.
 	
 	Standard linkfile
+	Loader section begin at 0x000b4000
 */
 
 ENTRY(_start);

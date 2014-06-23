@@ -119,7 +119,10 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
 void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
+
 void guiShowGSConfig();
+void guiShowCheatConfig();
+
 void guiShowIPConfig();
 
 /** Renders the given string on screen for the given function until it's io finishes 

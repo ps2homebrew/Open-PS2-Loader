@@ -489,6 +489,11 @@ static void _loadConfig() {
 			configGetInt(configOPL, "gsmskipvideos", &gGSMSkipVideos);
 #endif
 
+#ifdef CHEAT
+			configGetInt(configOPL, "enable_cheat", &gEnableCheat);
+			configGetInt(configOPL, "cheatmode", &gCheatMode);
+#endif
+
 			if (configGetStr(configOPL, "theme", &temp))
 				themeID = thmFindGuiID(temp);
 
@@ -520,6 +525,9 @@ static void _loadConfig() {
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
 #ifdef GSM
 			configGetInt(configOPL, "show_gsm", &gShowGSM);
+#endif
+#ifdef CHEAT
+			configGetInt(configOPL, "show_cheat", &gShowCheat);
 #endif
 			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
 			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
@@ -558,6 +566,11 @@ static void _saveConfig() {
 		configSetInt(configOPL, "gsmskipvideos", gGSMSkipVideos);
 #endif
 
+#ifdef CHEAT
+		configSetInt(configOPL, "enable_cheat", gEnableCheat);
+		configSetInt(configOPL, "cheatmode", gCheatMode);
+#endif
+
 		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
 		char temp[256];
 		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
@@ -580,6 +593,9 @@ static void _saveConfig() {
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
 #ifdef GSM
 		configSetInt(configOPL, "show_gsm", gShowGSM);
+#endif
+#ifdef CHEAT
+		configSetInt(configOPL, "show_cheat", gShowCheat);
 #endif
 		configSetInt(configOPL, "usb_mode", gUSBStartMode);
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
@@ -857,6 +873,9 @@ static void setDefaults(void) {
 #ifdef GSM
 	gShowGSM = 0;
 #endif
+#ifdef CHEAT
+	gShowCheat = 0;
+#endif
 	gCheckUSBFragmentation = 1;
 	gUSBDelay = 3;
 	gUSBPrefix[0] = '\0';
@@ -897,6 +916,16 @@ static void setDefaults(void) {
 	gGSMXOffset = 0;
 	gGSMYOffset = 0;
 	gGSMSkipVideos = 0;
+#endif
+
+#ifdef CHEAT
+	gEnableCheat = 0;
+	gCheatMode = 0;
+	
+	gCheatList = 0x00080000;
+	_sw(0, gCheatList);
+	_sw(0, gCheatList+4);
+
 #endif
 }
 

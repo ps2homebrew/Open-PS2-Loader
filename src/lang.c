@@ -165,6 +165,14 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Sets Vertical Offset",
 	"FMV skip",
 	"Skips Full Motion Videos",
+	"Show PS2RD Cheat Engine on Main Menu",
+	"Cheat Settings",
+	"Enable PS2RD Cheat Engine",
+	"Lets PS2RD Cheat Engine patch your games",
+	"PS2RD Cheat Engine Mode",
+	"Auto-select or Select game cheats",
+	"Auto-select cheats",
+	"Select game cheats (TBD)",
 };
 
 static int guiLangID = 0;

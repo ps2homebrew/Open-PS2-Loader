@@ -148,6 +148,9 @@ struct UIItem diaConfig[] = {
 #ifdef GSM
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWGSM}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWGSM, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
 #endif
+#ifdef CHEAT
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWCHEAT}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWCHEAT, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+#endif
 
 	{UI_SPLITTER},
 
@@ -233,6 +236,24 @@ struct UIItem diaGSConfig[] = {
 };
 #endif
 
+#ifdef CHEAT
+	// Cheat Menu
+struct UIItem diaCheatConfig[] = {
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
+
+	{UI_SPLITTER},
+
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_ENABLECHEAT}}}, {UI_SPACER}, {UI_BOOL, CHEATCFG_ENABLECHEAT, 1, _STR_HINT_ENABLECHEAT, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_CHEATMODE}}}, {UI_SPACER}, {UI_ENUM, CHEATCFG_CHEATMODE, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+	{UI_SPLITTER},
+
+	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+
+	// end of dialog
+	{UI_TERMINATOR}
+};
+#endif
+
 struct UIItem diaAbout[] = {
 	{UI_LABEL, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
 
@@ -242,12 +263,11 @@ struct UIItem diaAbout[] = {
 
 	{UI_BREAK},
 
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"crazyc - dlanor - SP193", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"ifcaro - Polo35 - reprep", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"volca - BatRastard", -1}}}, {UI_BREAK},
-    	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"...and the anonymous ...", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"Bat Rastard - crazyc - dlanor", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael - misfire", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}}, {UI_BREAK},
+    {UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"...and the anonymous ...", -1}}}, {UI_BREAK},
 	{UI_SPLITTER},
 
 	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},

@@ -73,8 +73,13 @@ char ExitPath[32];
 int USBDelay;
 int HDDSpindown;
 int EnableGSMOp;
+int EnableCheatOp;
 
 int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
+
+#ifdef CHEAT
+int gCheatList;	//Store hooks/codes addr+val pairs
+#endif
 
 #endif

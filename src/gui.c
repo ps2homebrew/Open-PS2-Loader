@@ -197,8 +197,12 @@ void guiShowAbout() {
 	strcat(OPLVersion, " CHILDPROOF");
 #endif
 #ifdef GSM
-	strcat(OPLVersion, " + GSM ");
+	strcat(OPLVersion, " GSM ");
 	strcat(OPLVersion, GSM_VERSION);
+#endif
+#ifdef CHEAT
+	strcat(OPLVersion, " PS2RD Cheat Engine ");
+	strcat(OPLVersion, CHEAT_VERSION);
 #endif
 
 	diaSetLabel(diaAbout, 1, OPLVersion);
@@ -229,6 +233,9 @@ void guiShowConfig() {
 #ifdef GSM
 	diaSetInt(diaConfig, CFG_SHOWGSM, gShowGSM);
 #endif
+#ifdef CHEAT
+	diaSetInt(diaConfig, CFG_SHOWCHEAT, gShowCheat);
+#endif
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
 	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
@@ -248,6 +255,9 @@ void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 #ifdef GSM
 		diaGetInt(diaConfig, CFG_SHOWGSM, &gShowGSM);
+#endif
+#ifdef CHEAT
+		diaGetInt(diaConfig, CFG_SHOWCHEAT, &gShowCheat);
 #endif
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
 		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
@@ -369,6 +379,25 @@ void guiShowGSConfig(void) {
 		diaGetInt(diaGSConfig, GSCFG_GSMXOFFSET, &gGSMXOffset);
 		diaGetInt(diaGSConfig, GSCFG_GSMYOFFSET, &gGSMYOffset);
 		diaGetInt(diaGSConfig, GSCFG_GSMSKIPVIDEOS, &gGSMSkipVideos);
+
+		applyConfig(-1, -1);
+	}
+}
+#endif
+
+#ifdef CHEAT
+void guiShowCheatConfig(void) {
+	// configure the enumerations
+	const char* cheatmodeNames[] = { _l(_STR_CHEATMODEAUTO), _l(_STR_CHEATMODESELECT), NULL };
+
+	diaSetEnum(diaCheatConfig, CHEATCFG_CHEATMODE, cheatmodeNames);
+	diaSetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, gEnableCheat);
+	diaSetInt(diaCheatConfig, CHEATCFG_CHEATMODE, gCheatMode);
+	
+	int ret = diaExecuteDialog(diaCheatConfig, -1, 1, NULL);
+	if (ret) {
+		diaGetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, &gEnableCheat);
+		diaGetInt(diaCheatConfig, CHEATCFG_CHEATMODE, &gCheatMode);
 
 		applyConfig(-1, -1);
 	}

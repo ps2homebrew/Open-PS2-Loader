@@ -15,11 +15,14 @@ void sysReset(int modload_mask);
 void sysExecExit();
 void sysPowerOff(void);
 int sysPcmciaCheck(void);
+
 #ifdef VMC
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, unsigned int compatflags);
+#define VMC_TEMP0	int size_mcemu_irx, void **mcemu_irx,
 #else
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, unsigned int compatflags);
+#define VMC_TEMP0	
 #endif
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP0 unsigned int compatflags);
+
 int sysExecElf(char *path);
 int sysPS3Detect(void);
 int sysSetIPConfig(char* ipconfig);

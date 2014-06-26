@@ -726,10 +726,10 @@ void setSfnDate(fat_direntry_sfn* dsfn, int mode) {
     sec = 0;
 #else
 	//ps2 specific routine to get time and date
-	cd_clock_t	cdtime;
+	sceCdCLOCK	cdtime;
 	s32		tmp;
 
-	if(CdReadClock(&cdtime)!=0 && cdtime.stat==0)
+	if(sceCdReadClock(&cdtime)!=0 && cdtime.stat==0)
 	{
 
 		tmp=cdtime.second>>4;
@@ -740,12 +740,11 @@ void setSfnDate(fat_direntry_sfn* dsfn, int mode) {
 
 		tmp=cdtime.hour>>4;
 		hour=(((tmp<<2)+tmp)<<1)+(cdtime.hour&0x0F);
-		//hour= (hour + 4 + 12) % 24; // TEMP FIX (need to deal with timezones?)
 
 		tmp=cdtime.day>>4;
 		day=(((tmp<<2)+tmp)<<1)+(cdtime.day&0x0F);
 
-		tmp=cdtime.month>>4;
+		tmp=(cdtime.month>>4)&0x7F;
 		month=(((tmp<<2)+tmp)<<1)+(cdtime.month&0x0F);
 
 		tmp=cdtime.year>>4;

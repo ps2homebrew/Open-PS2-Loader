@@ -13,7 +13,8 @@
 #define MAX_ARGS 	15
 #define ARGBUF_SIZE 	580
 
-#define COMPAT_MODE_3 	0x04
+#define COMPAT_MODE_3 	0x04 // Unhook Syscalls
+#define COMPAT_MODE_6 	0x20 // Disable IGR
 
 #define PADOPEN_HOOK  0
 
@@ -427,6 +428,13 @@ Hook_ExecPS2:
 	lui	$v0, 0x0010
 	sltu	$v0, $s0, $v0
 	bne	$v0, $zero, 1f
+	nop
+
+	/* check compat mode 6 is disabled */
+	lw	$v0, g_compat_mask
+	andi	$v0, $v0, COMPAT_MODE_6
+	bne	$v0, $zero, 1f
+	nop
 
 	/* save original stack pointer */
 	daddu	$s4, $sp, $zero

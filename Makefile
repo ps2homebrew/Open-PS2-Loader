@@ -15,25 +15,22 @@ DEBUG = 0
 EESIO_DEBUG = 0
 INGAME_DEBUG = 0
 DECI2_DEBUG = 0
-#comment following line to build without vmc
-VMC = 1
+
+#change following line to "0" to build without VMC - DO NOT COMMENT!
+VMC = 0
 
 CHILDPROOF = 0
 RTL = 0
 
 #change following line to "0" to build without GSM - DO NOT COMMENT!
-GSM = 1
+GSM = 0
 
 #change following line to "0" to build without PS2RD Cheat Engine - DO NOT COMMENT!
-CHEAT = 1
+CHEAT = 0
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
-
-ifeq ($(CHEAT),1)
-FRONTEND_OBJS += obj/cheatman.o 
-endif
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
@@ -51,10 +48,6 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
-
-ifeq ($(VMC),1)
-EECORE_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
-endif
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
@@ -86,6 +79,7 @@ else
 	GSM_FLAGS = GSM=0
 endif
 ifeq ($(CHEAT),1)
+	FRONTEND_OBJS += obj/cheatman.o 
 	EE_CFLAGS += -DCHEAT
 	CHEAT_FLAGS = CHEAT=1
 else
@@ -93,6 +87,7 @@ else
 endif
 
 else
+	EE_CFLAGS += -D__CHILDPROOF
 	GSM_FLAGS = GSM=0
 	CHEAT_FLAGS = CHEAT=0
 endif
@@ -101,11 +96,8 @@ ifeq ($(RTL),1)
 	EE_CFLAGS += -D__RTL
 endif
 
-ifeq ($(CHILDPROOF),1)
-	EE_CFLAGS += -D__CHILDPROOF
-endif
-
 ifeq ($(VMC),1)
+	EECORE_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
 	EE_CFLAGS += -DVMC
 	VMC_FLAGS = VMC=1
 else

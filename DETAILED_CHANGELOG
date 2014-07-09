@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev691 - EE Core - Only Install PadOpen Hook if IGR is enabled - Fri Jul 04 08:47:43 2014 -0300
+rev690 - Merged doctorxyz's commit with mine. - Thu Jun 26 19:13:48 2014 +0800
 rev689 - OPL+PS2RD Cheat Engine Integration - Mon Jun 23 08:20:53 2014 -0300
 rev688 - Updated OPL to compile with the new PS2SDK. - Mon Jun 23 18:39:24 2014 +0800
 rev687 - Fixed the theme bug and improved code: - Sun Jun 15 18:52:00 2014 +0800

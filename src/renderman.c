@@ -472,9 +472,9 @@ void rmDrawQuad(rm_quad_t* q) { // NO scaling, NO shift, NO alignment
 
 	gsKit_prim_sprite_texture(gsGlobal,	q->txt,
 			q->ul.x + transX, q->ul.y + transY,
-			q->ul.u, q->ul.v,
+			q->ul.u+0.5f, q->ul.v+0.5f,
 			q->br.x + transX, q->br.y + transY,
-			q->br.u, q->br.v, order, q->color);
+			q->br.u+0.5f, q->br.v+0.5f, order, q->color);
 	order++;
 
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);

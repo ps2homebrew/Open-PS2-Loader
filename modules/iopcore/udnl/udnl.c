@@ -18,6 +18,7 @@
 #endif
 
 #define FULL_UDNL	1	//Comment out to build a UDNL module that updates the IOP with only its payload.
+#define MAX_MODULES	256
 
 #define alloca(size) __builtin_alloca(size)	//The homebrew PS2SDK lacks alloca.h.
 
@@ -68,7 +69,7 @@ end_func1:
 	0x08 - Updater command line (Only for when boot mode = 2).
 	0x0C - Pointer to the entry point of the first module.
 	0x10 - Result from QueryMemSize() - 0x00200000
-	0x1C - pointer to the buffer (Size: Size of images + 0x400 + sizeof(struct ResetData) bytes)
+	0x1C - pointer to the buffer (Size: Size of images + MAX_MODULES*sizeof(void*) + sizeof(struct ResetData) bytes)
 */
 
 struct ResetData{
@@ -834,7 +835,7 @@ int _start(int argc, char *argv[]){
 	ImageDataBuffer=alloca(ImageDataTotalSize);
 	memset(ImageDataBuffer, 0, ImageDataTotalSize);
 
-	TotalSize=0x400 + sizeof(struct ResetData) + ((size_IOPRP_img+0xF)&~0xF);	//Unlike the ROM UDNL module, allocate space for the embedded IOPRP image as well like the DVD player UDNL module does.
+	TotalSize=MAX_MODULES*sizeof(void*) + sizeof(struct ResetData) + ((size_IOPRP_img+0xF)&~0xF);	//Unlike the ROM UDNL module, allocate space for the embedded IOPRP image as well like the DVD player UDNL module does.
 
 #ifdef FULL_UDNL
 	i=1;
@@ -884,7 +885,7 @@ int _start(int argc, char *argv[]){
 	ResetData=buffer;
 	memset(ResetData, 0, sizeof(struct ResetData));
 	ResetData->ModData=(void *)buffer+sizeof(struct ResetData);
-	IoprpBuffer=(void *)((unsigned int)buffer+0x400+sizeof(struct ResetData));
+	IoprpBuffer=(void *)((unsigned int)buffer+MAX_MODULES*sizeof(void*)+sizeof(struct ResetData));
 	ResetData->IOPRPBuffer=(void *)((unsigned int)IoprpBuffer&0x1FFFFF00);
 	ResetData->MemSize=QueryMemSize()>>20;
 	ResetData->BootMode=3;

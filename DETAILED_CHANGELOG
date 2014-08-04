@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev694 - SP193: FreeType fix - Sat Jul 12 16:07:03 2014 -0300
 rev693 - More Makefile fixes - In order to CHILDPROOF, RTL, GSM and CHEAT switches work properly - Wed Jul 09 19:37:45 2014 -0300
 rev692 - Makefile fix to build without PS2RD Cheat Engine (CHEAT = 0) - Wed Jul 09 15:43:00 2014 -0300
 rev691 - EE Core - Only Install PadOpen Hook if IGR is enabled - Fri Jul 04 08:47:43 2014 -0300

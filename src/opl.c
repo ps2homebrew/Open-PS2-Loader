@@ -754,7 +754,11 @@ void unloadHdldSvr(void) {
 	LOG_INIT();
 	LOG_ENABLE();
 
+#ifdef _DTL_T10000
+	mcInit(MC_TYPE_XMC);
+#else
 	mcInit(MC_TYPE_MC);
+#endif
 
 	// reinit the input pads
 	padInit(0);
@@ -813,7 +817,11 @@ static void reset(void) {
 	
 	SifInitRpc(0);
 
+#ifdef _DTL_T10000
+	mcInit(MC_TYPE_XMC);
+#else
 	mcInit(MC_TYPE_MC);
+#endif
 }
 
 static void moduleCleanup(opl_io_module_t* mod, int exception) {

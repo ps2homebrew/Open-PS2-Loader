@@ -15,6 +15,7 @@ DEBUG = 0
 EESIO_DEBUG = 0
 INGAME_DEBUG = 0
 DECI2_DEBUG = 0
+DTL_T10000 = 0
 
 #change following line to "0" to build without VMC - DO NOT COMMENT!
 VMC = 0
@@ -57,7 +58,7 @@ EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS)
 MAPFILE = opl.map
 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -lpad -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 ifeq ($(DEBUG),1) 
@@ -68,6 +69,14 @@ ifeq ($(DEBUG),1)
 	EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
 else
 	EE_CFLAGS := -O2
+endif
+
+ifeq ($(DTL_T10000),1)
+	EE_CFLAGS += -D_DTL_T10000
+	EECORE_OBJS += obj/sio2man.o obj/padman.o obj/mcman.o obj/mcserv.o
+	EE_LIBS += -lpadx
+else
+	EE_LIBS += -lpad
 endif
 
 ifeq ($(CHILDPROOF),0)
@@ -120,7 +129,7 @@ ifeq ($(INGAME_DEBUG),1)
 		EECORE_DEBUG_FLAGS += DECI2_DEBUG=1
 		EE_CFLAGS += -D__DECI2_DEBUG
 		EECORE_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
-		UDNL_CFLAGS = DECI2_DEBUG=1
+		DECI2_DEBUG=1
 	endif
 else
 	ifeq ($(IOPCORE_DEBUG),1)
@@ -176,8 +185,13 @@ sclean:
 	$(MAKE) -C ee_core clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
+ifeq ($(DTL_T10000),1)
+	echo "    * udnl-t300.irx"
+	$(MAKE) -C modules/iopcore/udnl-t300 clean
+else
 	echo "    * udnl.irx"
 	$(MAKE) -C modules/iopcore/udnl clean
+endif
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
@@ -252,9 +266,15 @@ elfldr.s:
 	bin2s elfldr/elfldr.elf asm/elfldr.s elfldr_elf
 
 udnl.s:
+ifeq ($(DTL_T10000),1)
+	echo "    * udnl-t300.irx"
+	$(MAKE) -C modules/iopcore/udnl-t300
+	bin2s modules/iopcore/udnl-t300/udnl.irx asm/udnl.s udnl_irx
+else
 	echo "    * udnl.irx"
-	$(MAKE) $(UDNL_CFLAGS) -C modules/iopcore/udnl
+	$(MAKE) -C modules/iopcore/udnl
 	bin2s modules/iopcore/udnl/udnl.irx asm/udnl.s udnl_irx
+endif
 
 imgdrv.s:
 	echo "    * imgdrv.irx"
@@ -421,6 +441,18 @@ iomanx.s:
 
 filexio.s:
 	bin2s $(PS2SDK)/iop/irx/fileXio.irx asm/filexio.s filexio_irx
+
+sio2man.s:
+	bin2s $(PS2SDK)/iop/irx/freesio2.irx asm/sio2man.s sio2man_irx
+
+padman.s:
+	bin2s $(PS2SDK)/iop/irx/freepad.irx asm/padman.s padman_irx
+
+mcman.s:
+	bin2s $(PS2SDK)/iop/irx/mcman.irx asm/mcman.s mcman_irx
+
+mcserv.s:
+	bin2s $(PS2SDK)/iop/irx/mcserv.irx asm/mcserv.s mcserv_irx
 
 load0.s:
 	bin2s gfx/load0.png asm/load0.s load0_png

@@ -72,6 +72,20 @@ extern int size_ps2atad_irx;
 extern void *ps2hdd_irx;
 extern int size_ps2hdd_irx;
 
+#ifdef _DTL_T10000
+extern void *sio2man_irx;
+extern int size_sio2man_irx;
+
+extern void *padman_irx;
+extern int size_padman_irx;
+
+extern void *mcman_irx;
+extern int size_mcman_irx;
+
+extern void *mcserv_irx;
+extern int size_mcserv_irx;
+#endif
+
 extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
@@ -180,7 +194,11 @@ void sysReset(int modload_mask) {
 
 	SifInitRpc(0);
 
+#ifdef _DTL_T10000
+	while(!SifIopReset("rom0:UDNL", 0));
+#else
 	while(!SifIopReset(NULL, 0));
+#endif
 	while(!SifIopSync());
 
 	SifInitRpc(0);
@@ -195,6 +213,17 @@ void sysReset(int modload_mask) {
 	sbv_patch_disable_prefix_check();
 	sbv_patch_fioremove();
 
+#ifdef _DTL_T10000
+	SifExecModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL, NULL);
+
+	if (modload_mask & SYS_LOAD_MC_MODULES) {
+		SifExecModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL, NULL);
+		SifExecModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL, NULL);
+	}
+	if (modload_mask & SYS_LOAD_PAD_MODULES) {
+		SifExecModuleBuffer(&padman_irx, size_padman_irx, 0, NULL, NULL);
+	}
+#else
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 
 	if (modload_mask & SYS_LOAD_MC_MODULES) {
@@ -204,6 +233,7 @@ void sysReset(int modload_mask) {
 	if (modload_mask & SYS_LOAD_PAD_MODULES) {
 		SifLoadModule("rom0:PADMAN", 0, NULL);
 	}
+#endif
 
 	// clears modules list
 	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES*4);
@@ -463,10 +493,10 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 
 		if (curIrxSize > 0) {
 			LOG("SYSTEM IRX address start: %p end: %p\n", irxptr_tab[i].irxaddr, irxptr_tab[i].irxaddr+curIrxSize);
-			if(irxptr+curIrxSize>=(void*)0x000B3F00){	//Sanity check.
+		/*	if(irxptr+curIrxSize>=(void*)0x000B3F00){	//Sanity check.
 				LOG("*** OVERFLOW DETECTED. HALTED.\n");
 				asm volatile("break\n");
-			}
+			} */
 
 			memcpy(irxptr_tab[i].irxaddr, irxsrc[i], curIrxSize);
 

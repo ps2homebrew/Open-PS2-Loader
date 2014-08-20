@@ -203,7 +203,7 @@ struct ReadAndXResponse_t {
 	u16	ByteCount;		// 61
 } __attribute__((packed));
 
-struct WriteAndXRequest_t {             // size = 63
+struct WriteAndXRequest_t {             // size = 67
         struct SMBHeader_t smbH;        // 0
         u8      smbWordcount;           // 36
         u8      smbAndxCmd;             // 37
@@ -246,8 +246,8 @@ static server_specs_t server_specs;
 #define LM_AUTH 	0
 #define NTLM_AUTH 	1
 
-struct ReadAndXRequest_t smb_Read_Request = {
-	{	0,
+static struct ReadAndXRequest_t smb_Read_Request = {
+	{	0x3b000000,
 		SMB_MAGIC,
 		SMB_COM_READ_ANDX,
 		0, 0, 0, 0, "\0", 0, 0, 0, 0
@@ -258,15 +258,15 @@ struct ReadAndXRequest_t smb_Read_Request = {
 };
 
 #ifdef VMC_DRIVER
-struct WriteAndXRequest_t smb_Write_Request = {
+static const struct WriteAndXRequest_t smb_Write_Request = {
 	{	0,
 		SMB_MAGIC,
 		SMB_COM_WRITE_ANDX,
 		0, 0, 0, 0, "\0", 0, 0, 0, 0
 	},
-	12,
+	14,
 	SMB_COM_NONE,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0x01, 0, 0, 0, 0x3f, 0	//DataOffset = 0x3f, WriteMode = 1
 };
 #endif
 
@@ -427,10 +427,10 @@ negociate_retry:
 	server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
 	server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
 	server_specs.SessionKey = NPRsp->SessionKey;
-	mips_memcpy(&server_specs.EncryptionKey[0], &NPRsp->ByteField[0], NPRsp->KeyLength);
-	mips_memcpy(&server_specs.PrimaryDomainServerName[0], &NPRsp->ByteField[NPRsp->KeyLength], 32);
-	mips_memcpy(&server_specs.Username[0], Username, 16);
-	mips_memcpy(&server_specs.Password[0], Password, 16);
+	mips_memcpy(server_specs.EncryptionKey, &NPRsp->ByteField[0], NPRsp->KeyLength);
+	mips_memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], 32);
+	mips_memcpy(server_specs.Username, Username, 16);
+	mips_memcpy(server_specs.Password, Password, 16);
 	server_specs.IOPaddr = (void *)&server_specs;
 	server_specs.HashedFlag = (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) ? 0 : -1;
 
@@ -523,7 +523,7 @@ lbl_session_setup:
 
 	SSR->ByteCount = offset;
 
-	rawTCP_SetSessionHeader(61+offset);
+	rawTCP_SetSessionHeader(sizeof(struct SessionSetupAndXRequest_t)-4+offset);
 	GetSMBServerReply();
 
 	struct SessionSetupAndXResponse_t *SSRsp = (struct SessionSetupAndXResponse_t *)SMB_buf;
@@ -598,7 +598,7 @@ int smb_TreeConnectAndX(char *ShareName)
 
 	TCR->ByteCount = offset;
 
-	rawTCP_SetSessionHeader(43+offset);
+	rawTCP_SetSessionHeader(sizeof(struct TreeConnectAndXRequest_t)-4+offset);
 	GetSMBServerReply();
 
 	struct TreeConnectAndXResponse_t *TCRsp = (struct TreeConnectAndXResponse_t *)SMB_buf;
@@ -686,26 +686,21 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 
 //-------------------------------------------------------------------------
 int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes)
-{	
+{
 	register int rcv_size, pkt_size, expected_size;
 
-	struct ReadAndXRequest_t *RR = (struct ReadAndXRequest_t *)SMB_buf;
+	struct ReadAndXRequest_t *RR = &smb_Read_Request;
 
 	WAITIOSEMA(io_sema);
 
-	mips_memcpy(RR, &smb_Read_Request.smbH.sessionHeader, sizeof(struct ReadAndXRequest_t));
-
-	RR->smbH.sessionHeader = 0x3b000000;
-	RR->smbH.Flags = 0;
 	RR->FID = FID;
 	RR->OffsetLow = offsetlow;
 	RR->OffsetHigh = offsethigh;
 	RR->MaxCountLow = nbytes;
-	RR->MinCount = 0;
-	RR->ByteCount = 0;
 
-	plwip_send(main_socket, SMB_buf, 63, 0);
+	plwip_send(main_socket, RR, sizeof(struct ReadAndXRequest_t), 0);
 receive:
+	//offset 49 is the offset of the DataOffset field within the ReadAndXResponse structure.
 	rcv_size = plwip_recvfrom(main_socket, SMB_buf, 49, readbuf, nbytes, 0, NULL, NULL);
 	expected_size = rawTCP_GetSessionHeader() + 4;
 
@@ -726,26 +721,24 @@ receive:
 #ifdef VMC_DRIVER
 //-------------------------------------------------------------------------
 int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes)
-{	
+{
 	struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
 
 	WAITIOSEMA(io_sema);
 
-	mips_memcpy(WR, &smb_Write_Request.smbH.sessionHeader, sizeof(struct WriteAndXRequest_t));
+	mips_memcpy(WR, &smb_Write_Request, sizeof(struct WriteAndXRequest_t));
 
-	WR->smbH.Flags = 0;
 	WR->FID = FID;
-	WR->WriteMode = 0x1;
 	WR->OffsetLow = offsetlow;
 	WR->OffsetHigh = offsethigh;
 	WR->Remaining = nbytes;
 	WR->DataLengthLow = nbytes;
-	WR->DataOffset = 0x3b;
 	WR->ByteCount = nbytes;
 
+	//DataOffset points to the location of the data within the buffer, from right after sessionHeader, which Microsoft doesn't consider as being part of the SMB header.
 	mips_memcpy((void *)(&SMB_buf[4 + WR->DataOffset]), writebuf, nbytes);
 
-	rawTCP_SetSessionHeader(59+nbytes);
+	rawTCP_SetSessionHeader(sizeof(struct WriteAndXRequest_t)-4+nbytes);
 	GetSMBServerReply();
 
 	SIGNALIOSEMA(io_sema);
@@ -756,7 +749,7 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nb
 
 //-------------------------------------------------------------------------
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
-{	
+{
 	register u32 sectors, offset, nbytes;
 	u8 *p = (u8 *)buf;
 
@@ -767,7 +760,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		if (sectors > MAX_SMB_SECTORS)
 			sectors = MAX_SMB_SECTORS;
 
-		nbytes = sectors << 11;	
+		nbytes = sectors << 11;
 
  		smb_ReadFile((u16)p_part_start[part_num], offset << 11, offset >> 21, p, nbytes);
 

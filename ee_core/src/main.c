@@ -50,10 +50,6 @@ int main(int argc, char **argv){
 	DPRINTF("Exit Path = (%s)\n", ExitPath);
 
 	p = _strtok(NULL, " ");
-	USBDelay = _strtoui(p);
-	DPRINTF("USB Delay = %d\n", USBDelay);
-
-	p = _strtok(NULL, " ");
 	HDDSpindown = _strtoui(p);
 	DPRINTF("HDD Spindown = %d\n", HDDSpindown);
 

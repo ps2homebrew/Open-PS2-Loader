@@ -226,7 +226,6 @@ void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_DANDROP, gEnableDandR);
 	diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
 	diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
-	diaSetInt(diaConfig, CFG_USBDELAY, gUSBDelay);
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 	diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
@@ -249,7 +248,6 @@ void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_DANDROP, &gEnableDandR);
 		diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
 		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
-		diaGetInt(diaConfig, CFG_USBDELAY, &gUSBDelay);
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);

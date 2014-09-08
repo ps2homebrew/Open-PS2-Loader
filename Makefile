@@ -45,7 +45,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
-		obj/cdvdfsv.o obj/usbd_ps2.o obj/usbd_ps3.o obj/usbhdfsd.o \
+		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
@@ -341,11 +341,8 @@ smb_mcemu.s:
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.smb rebuild
 	bin2s modules/mcemu/mcemu.irx asm/smb_mcemu.s smb_mcemu_irx
 
-usbd_ps2.s:
-	bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd_ps2.s usbd_ps2_irx
-
-usbd_ps3.s:
-	bin2s modules/usb/usbd/usbd.irx asm/usbd_ps3.s usbd_ps3_irx
+usbd.s:
+	bin2s $(PS2SDK)/iop/irx/usbd.irx asm/usbd.s usbd_irx
 
 usbhdfsd.s:
 	echo "    * usbhdfsd.irx"

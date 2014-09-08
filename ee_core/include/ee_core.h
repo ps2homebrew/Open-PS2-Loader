@@ -70,7 +70,6 @@ int GameMode;
 #define HDD_MODE 	2
 
 char ExitPath[32];
-int USBDelay;
 int HDDSpindown;
 int EnableGSMOp;
 int EnableCheatOp;

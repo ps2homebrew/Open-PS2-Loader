@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev696 - in-game SMB fixes and enhancements: - Wed Aug 20 22:47:26 2014 +0800
 rev695 - Added an option for DTL-T100dded an option for DTL-T10000 support, since this unit can have a different set of IOP modules in its flash ROM. - Mon Aug 04 13:07:19 2014 +0800
 rev694 - SP193: FreeType fix - Sat Jul 12 16:07:03 2014 -0300
 rev693 - More Makefile fixes - In order to CHILDPROOF, RTL, GSM and CHEAT switches work properly - Wed Jul 09 19:37:45 2014 -0300

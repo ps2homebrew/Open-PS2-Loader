@@ -18,11 +18,8 @@ extern int size_usb_cdvdman_irx;
 extern void *usb_4Ksectors_cdvdman_irx;
 extern int size_usb_4Ksectors_cdvdman_irx;
 
-extern void *usbd_ps2_irx;
-extern int size_usbd_ps2_irx;
-
-extern void *usbd_ps3_irx;
-extern int size_usbd_ps3_irx;
+extern void *usbd_irx;
+extern int size_usbd_irx;
 
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
@@ -32,8 +29,8 @@ extern void *usb_mcemu_irx;
 extern int size_usb_mcemu_irx;
 #endif
 
-void *usbd_irx;
-int size_usbd_irx;
+void *pusbd_irx;
+int size_pusbd_irx;
 
 static char usbPrefix[40];
 static int usbULSizePrev = -2;
@@ -100,27 +97,20 @@ static void usbInitModules(void) {
 void usbLoadModules(void) {
 	LOG("USBSUPPORT LoadModules\n");
 	//first it search for custom usbd in MC?
-	usbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_usbd_irx);
-	if (!usbd_irx) {
-		usbd_irx = readFile("mc?:BADATA-SYSTEM/USBD.IRX", -1, &size_usbd_irx);
-		if (!usbd_irx) {
-			usbd_irx = readFile("mc?:BIDATA-SYSTEM/USBD.IRX", -1, &size_usbd_irx);
-			if (!usbd_irx) { // If don't exist it uses embedded
-				if (sysPS3Detect() == 0) {
-					usbd_irx = (void *) &usbd_ps2_irx;
-					size_usbd_irx = size_usbd_ps2_irx;
-				} else {
-					usbd_irx = (void *) &usbd_ps3_irx;
-					size_usbd_irx = size_usbd_ps3_irx;
-				}
+	pusbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
+	if (!pusbd_irx) {
+		pusbd_irx = readFile("mc?:BADATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
+		if (!pusbd_irx) {
+			pusbd_irx = readFile("mc?:BIDATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
+			if (!pusbd_irx) { // If don't exist it uses embedded
+				pusbd_irx = (void *) &usbd_irx;
+				size_pusbd_irx = size_usbd_irx;
 			}
 		}
 	}
 
-	sysLoadModuleBuffer(usbd_irx, size_usbd_irx, 0, NULL);
+	sysLoadModuleBuffer(pusbd_irx, size_pusbd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
-
-	delay(gUSBDelay);
 
 	LOG("USBSUPPORT Modules loaded\n");
 }

@@ -45,8 +45,8 @@
 
 #define UPDATE_FRAME_COUNT 250
 
-extern void *usbd_irx;
-extern int size_usbd_irx;
+extern void *pusbd_irx;
+extern int size_pusbd_irx;
 
 typedef struct {
 	item_list_t *support;
@@ -519,7 +519,6 @@ static void _loadConfig() {
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
 			configGetInt(configOPL, "hdd_spindown", &gHDDSpindown);
 			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
-			configGetInt(configOPL, "usb_delay", &gUSBDelay);
 			configGetStrCopy(configOPL, "usb_prefix", gUSBPrefix, sizeof(gUSBPrefix));
 			configGetStrCopy(configOPL, "eth_prefix", gETHPrefix, sizeof(gETHPrefix));
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
@@ -587,7 +586,6 @@ static void _saveConfig() {
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
 		configSetInt(configOPL, "hdd_spindown", gHDDSpindown);
 		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
-		configSetInt(configOPL, "usb_delay", gUSBDelay);
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
@@ -847,8 +845,8 @@ void shutdown(int exception) {
 
 
 static void setDefaults(void) {
-	usbd_irx = NULL;
-	size_usbd_irx = 0;
+	pusbd_irx = NULL;
+	size_pusbd_irx = 0;
 
 	clearIOModuleT(&list_support[USB_MODE]);
 	clearIOModuleT(&list_support[ETH_MODE]);
@@ -885,7 +883,6 @@ static void setDefaults(void) {
 	gShowCheat = 0;
 #endif
 	gCheckUSBFragmentation = 1;
-	gUSBDelay = 3;
 	gUSBPrefix[0] = '\0';
 	gETHPrefix[0] = '\0';
 	gUseInfoScreen = 0;

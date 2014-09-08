@@ -95,8 +95,8 @@ extern int size_eecore_elf;
 extern void *elfldr_elf;
 extern int size_elfldr_elf;
 
-extern void *usbd_irx;
-extern int size_usbd_irx;
+extern void *pusbd_irx;
+extern int size_pusbd_irx;
 
 #ifdef __DECI2_DEBUG
 extern void *drvtif_irx;
@@ -252,31 +252,6 @@ void sysReset(int modload_mask) {
 
 void sysPowerOff(void) {
 	poweroffShutdown();
-}
-
-void delay(int count) {
-	int i;
-	int ret;
-	for (i  = 0; i < count; i++) {
-	        ret = 0x01000000;
-		while(ret--) asm("nop\nnop\nnop\nnop");
-	}
-}
-
-int sysPS3Detect(void) {	//return 0=PS2 1=PS3-HARD 2=PS3-SOFT
-	int i, size = -1;
-	void* buffer = readFile("rom0:XPARAM2", -1, &size);
-	if (buffer) {
-		for (i = 0; i < size; i++)
-			if (!strcmp((const char*) ((u32) buffer + i), "SCPS_110.01")) {
-				free(buffer);
-				return 2;
-			}
-
-		free(buffer);
-		return 1;
-	}
-	return 0;
 }
 
 int sysSetIPConfig(char* ipconfig) {
@@ -435,7 +410,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_udnl_irx;
 	irxptr_tab[n++].irxsize = size_ioprp_image;
 	irxptr_tab[n++].irxsize = size_imgdrv_irx;
-	irxptr_tab[n++].irxsize = size_usbd_irx;
+	irxptr_tab[n++].irxsize = size_pusbd_irx;
 #ifdef __DECI2_DEBUG	//FIXME: I don't know why, but the ingame SMAP driver cannot be used with the DECI2 modules. Perhaps that old bug with the network stack become unresponsive gets triggered? Until this is solved, use the normal SMAP driver.
 	irxptr_tab[n++].irxsize = size_smap_irx;
 	irxptr_tab[n++].irxsize = size_drvtif_irx;
@@ -454,7 +429,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = (void *)&udnl_irx;
 	irxsrc[n++] = ioprp_image;
 	irxsrc[n++] = (void *)&imgdrv_irx;
-	irxsrc[n++] = usbd_irx;
+	irxsrc[n++] = pusbd_irx;
 #ifdef __DECI2_DEBUG
 	irxsrc[n++] = (void *)&smap_irx;
 	irxsrc[n++] = (void *)&drvtif_irx;
@@ -695,8 +670,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
 	i = 0;
-	sprintf(config_str, "%s %d %s %d %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d" CHEAT_TEMP1 GSM_TEMP1, \
-		mode_str, gDisableDebug, gExitPath, gUSBDelay, gHDDSpindown, \
+	sprintf(config_str, "%s %d %s %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d" CHEAT_TEMP1 GSM_TEMP1, \
+		mode_str, gDisableDebug, gExitPath, gHDDSpindown, \
 		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
 		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
 		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], \

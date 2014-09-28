@@ -2352,17 +2352,6 @@ static void cdvdman_trimspaces(char* str)
 			break;
 		*p = 0;
 	}
-
-	while (!strcmp(&str[len-3], ";;1")) { // Tenchu: Wrath oh Heaven fix
-		str[len-2] = '1';
-		str[len-1] = 0;
-		len = strlen(str);
-	}
-
-	while (!strcmp(&str[len-4], ";1;1")) { // SmackDown: shut your mouth fix
-		str[len-2] = 0;
-		len = strlen(str);
-	}
 }
 
 //-------------------------------------------------------------------------
@@ -2386,7 +2375,7 @@ lbl_startlocate:
 	slash = strchr(p, '/');
 
 	// if the path doesn't contain a '/' then look for a '\'
-    if (!slash)
+	if (!slash)
 		slash = strchr (p, '\\');
 
 	len = (u32)slash - (u32)p;
@@ -2466,9 +2455,10 @@ lbl_startlocate:
 //-------------------------------------------------------------------------
 static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 {
-	register u32 lsn;
-	struct dirTocEntry *tocEntryPointer;
 	char *p;
+	int i;
+	u32 lsn;
+	struct dirTocEntry *tocEntryPointer;
 
 	if ((!pcdfile) || (!name))
 		return 0;
@@ -2477,11 +2467,17 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 
 	DPRINTF("cdvdman_findfile %s layer%d\n", name, layer);
 
-	strncpy(cdvdman_filepath, name, sizeof(cdvdman_filepath)-1);
-	cdvdman_filepath[sizeof(cdvdman_filepath)-1]='\0';
+	strncpy(cdvdman_filepath, name, sizeof(cdvdman_filepath));
+	//Correct filenames (for files), if necessary.
 	if((p=strrchr(cdvdman_filepath, '.'))!=NULL){
-		if(strlen(name)<sizeof(cdvdman_filepath)-3){
-			strcpy(p+4, ";1");	//Insert ";1" + 1 NULL after the extension, in case the filename is malformed.
+		for(i=0,p++; i<3 && (*p!='\0'); i++,p++){
+			if(p[0]==';') break;
+		}
+
+		if(p-cdvdman_filepath+3<sizeof(cdvdman_filepath)){
+			p[0]=';';
+			p[1]='1';
+			p[2]='\0';
 		}
 	}
 

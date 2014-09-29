@@ -9,24 +9,17 @@
 #ifndef IOP_IRX_IMPORTS_H
 #define IOP_IRX_IMPORTS_H
 
-#include "irx.h"
+#include <irx.h>
 
 /* Please keep these in alphabetical order!  */
-#include "cdvdman.h"
-#include "dmacman.h"
-#include "intrman.h"
-#include "ioman.h"
-#include "libsd.h"
-#include "loadcore.h"
-#include "sifcmd.h"
-#include "stdio.h"
-#include "sysclib.h"
-#include "sysmem.h"
-#include "thbase.h"
-#include "thevent.h"
-#include "thmsgbx.h"
-#include "thsemap.h"
-#include "usbd.h"
-#include "vblank.h"
+#include <cdvdman.h>
+#include <intrman.h>
+#include <ioman.h>
+#include <stdio.h>
+#include <sysclib.h>
+#include <sysmem.h>
+#include <thevent.h>
+#include <thsemap.h>
+#include <usbd.h>
 
 #endif /* IOP_IRX_IMPORTS_H */

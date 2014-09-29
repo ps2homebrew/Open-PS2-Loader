@@ -24,8 +24,8 @@ int mass_stor_init(void);
 int mass_stor_disconnect(int devId);
 int mass_stor_connect(int devId);
 int mass_stor_probe(int devId);
-int mass_stor_readSector(unsigned int lba, int nsectors, unsigned char* buffer);
-int mass_stor_writeSector(unsigned int lba, int nsectors, unsigned char* buffer);
+int mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char* buffer);
+int mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char* buffer);
 int mass_stor_configureDevice(void);
 int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
 

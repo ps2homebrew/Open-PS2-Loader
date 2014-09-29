@@ -15,18 +15,18 @@ struct _mass_dev
 	int status;
 	int interfaceNumber;	//interface number
 	int interfaceAlt;	//interface alternate setting
-	unsigned sectorSize; // = 512; // store size of sector from usb mass
-	unsigned maxLBA;
+	unsigned int sectorSize; // = 512; // store size of sector from usb mass
+	unsigned int maxLBA;
 	cache_set* cache;
 };
 
 int InitUSB(void);
-int mass_stor_sectorsize(mass_dev *dev);
 int mass_stor_disconnect(int devId);
 int mass_stor_connect(int devId);
 int mass_stor_probe(int devId);
-int mass_stor_readSector(mass_dev* mass_device, unsigned int sector, unsigned char* buffer, int size);
-int mass_stor_writeSector(mass_dev* mass_device, unsigned int sector, unsigned char* buffer, int size);
+int mass_stor_readSector(mass_dev* mass_device, unsigned int sector, unsigned char* buffer, unsigned short int count);
+int mass_stor_writeSector(mass_dev* mass_device, unsigned int sector, const unsigned char* buffer, unsigned short int count);
 int mass_stor_configureNextDevice(void);
+int mass_stor_sectorsize(mass_dev *dev);
 
 #endif

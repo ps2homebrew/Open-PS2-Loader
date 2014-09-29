@@ -45,7 +45,7 @@ typedef struct _fat_raw_bpb {
 	unsigned char driveNumber;	//physical drive number - 80h or 81h
 	unsigned char reserved;		//Current head (not used for this but WinNT stores two flags here).
 	unsigned char signature;	//Signature (must be 28h or 29h to be recognised by NT).
-	unsigned char serialNumber[4]; //The serial number, the serial number is stored in reverse 
+	unsigned char serialNumber[4]; //The serial number, the serial number is stored in reverse
 					//order and is the hex representation of the bytes stored here
 	unsigned char volumeLabel[11];	//Volume label
 	unsigned char fatId[8];		//File system ID. "FAT12", "FAT16" or "FAT  "
@@ -82,7 +82,7 @@ typedef struct _fat32_raw_bpb {
 	unsigned char pdn;		//Physical drive number (BIOS system ie 80h is first HDD, 00h is first FDD)
 	unsigned char reserved2;	//Reserved
 	unsigned char signature;	//Signature (must be 28h or 29h to be recognised by NT)
-	unsigned char serialNumber[4]; //The serial number, the serial number is stored in reverse 
+	unsigned char serialNumber[4]; //The serial number, the serial number is stored in reverse
 					//order and is the hex representation of the bytes stored here
 	unsigned char volumeLabel[11];	//Volume label
 	unsigned char fatId[8];		//File system ID. "FAT12", "FAT16" or "FAT  "
@@ -114,7 +114,7 @@ typedef struct _fat_direntry_sfn {
    Each LFN directory entry holds 13 characters of the complete LFN using 16-bit Unicode characters.
 */
 typedef struct _fat_direntry_lfn {
-	unsigned char entrySeq;		//Bits 0-5 give the LFN part number, bit 6 is set if this is the last entry for the file.	
+	unsigned char entrySeq;		//Bits 0-5 give the LFN part number, bit 6 is set if this is the last entry for the file.
 	unsigned char name1[10];	//1st 5 letters of LFN entry.
 	unsigned char rshv;		//?? 0Fh (RSHV attributes set)
 
@@ -136,7 +136,7 @@ typedef struct _fat_direntry_summary {
 	unsigned char name[FAT_MAX_NAME];//Long name (zero terminated)
 	unsigned char sname[13];	//Short name (zero terminated)
 	unsigned int  size;		//file size, 0 for directory
-	unsigned int  cluster;		//file start cluster 
+	unsigned int  cluster;		//file start cluster
 } fat_direntry_summary;
 
 //---------------------------------------------------------------------------
@@ -147,7 +147,7 @@ static USBHD_INLINE unsigned int fat_cluster2sector(fat_bpb* partBpb, unsigned i
 
 unsigned int fat_getClusterRecord12(unsigned char* buf, int type);
 int      fat_getDirentry(unsigned char fatType, fat_direntry* dir_entry, fat_direntry_summary* dir );
-int      fat_getDirentrySectorData(fat_driver* fatd, unsigned int* startCluster, unsigned int* startSector, int* dirSector);
+int      fat_getDirentrySectorData(fat_driver* fatd, unsigned int* startCluster, unsigned int* startSector, unsigned int* dirSector);
 void     fat_invalidateLastChainResult(fat_driver* fatd);
 void     fat_getClusterAtFilePos(fat_driver* fatd, fat_dir* fatDir, unsigned int filePos, unsigned int* cluster, unsigned int* clusterPos);
 

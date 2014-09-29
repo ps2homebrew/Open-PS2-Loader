@@ -6,6 +6,8 @@
 typedef unsigned char u8;
 #else
 #define USBHD_INLINE inline
+void *malloc(int size);
+void free(void *ptr);
 #endif
 
 struct _cache_set;

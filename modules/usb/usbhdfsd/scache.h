@@ -11,4 +11,4 @@ int  scache_flushSectors(cache_set* cache);
 
 void scache_getStat(cache_set* cache, unsigned int* access, unsigned int* hits);
 
-#endif 
+#endif

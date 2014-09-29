@@ -579,38 +579,42 @@ inline int cbw_scsi_read_capacity(mass_dev* dev, void *buffer, int size)
 	cbw->dataTransferLength = size;		//READ_CAPACITY_REPLY_LENGTH
 
 	ret = 1;
-	retryCount = 6;
-	while (ret != 0 && retryCount > 0) {
+	for (retryCount = 6; ret != 0 && retryCount > 0; retryCount--) {
 		usb_bulk_command(dev, cbw);
 
 		ret = usb_bulk_transfer(dev->bulkEpI, buffer, size);
-		if (ret != 0)
-			XPRINTF("mass_driver: cbw_scsi_read_capacity error from usb_bulk_transfer %d\n", ret);
+		if (ret != USB_RC_OK) {
+			/*
+				HACK HACK HACK !!!
+				according to usb doc we should allways
+				attempt to read the CSW packet. But in some cases
+				reading of CSW packet just freeze ps2....:-(
 
-		//HACK HACK HACK !!!
-		//according to usb doc we should allways
-		//attempt to read the CSW packet. But in some cases
-		//reading of CSW packet just freeze ps2....:-(
-		if (ret == USB_RC_STALL) {
-			XPRINTF("mass_driver: call reset recovery ...\n");
-			usb_bulk_reset(dev, 1);
-		} else {
-			ret = usb_bulk_manage_status(dev, -TAG_READ_CAPACITY);
+				SP193 2014/08/30: It seems to be because the bulk-in endpoint was already STALLED during the data transport phase.
+				Refer to page 20, section 6.7.2: the actual solution is to clear the HALT feature of the bulk-in endpoint.
+				By right, the driver should have a lot more error handling code than this module currently has... but then the PS2 needs better performance.
+			*/
+
+			XPRINTF("USBHDFSD: cbw_scsi_read_capacity error from usb_bulk_transfer %d\n", ret);
+			if(ret == USB_RC_STALL){
+				usb_bulk_clear_halt(dev, 0); // Clear the stall condition for bulk in
+				continue;
+			}
 		}
-		retryCount--;
-	}
 
+		ret = usb_bulk_manage_status(dev, -TAG_READ_CAPACITY);
+	}
 	return ret;
 }
 
-inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, int sectorSize, int sectorCount)
+inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, unsigned short int sectorCount)
 {
 	register int ret;
 	cbw_packet *cbw = &cbw_read_sector;
 
 	XPRINTF("mass_driver: cbw_scsi_read_sector\n");
 
-	cbw->dataTransferLength = sectorSize * sectorCount;
+	cbw->dataTransferLength = dev->sectorSize * sectorCount;
 	cbw->comData[2] = (lba & 0xFF000000) >> 24;		//lba 1 (MSB)
 	cbw->comData[3] = (lba & 0xFF0000) >> 16;		//lba 2
 	cbw->comData[4] = (lba & 0xFF00) >> 8;			//lba 3
@@ -620,7 +624,7 @@ inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, i
 
 	usb_bulk_command(dev, cbw);
 
-	ret = usb_bulk_transfer(dev->bulkEpI, buffer, sectorSize * sectorCount);
+	ret = usb_bulk_transfer(dev->bulkEpI, buffer, dev->sectorSize * sectorCount);
 	if (ret != 0)
 		XPRINTF("mass_driver: cbw_scsi_read_sector error from usb_bulk_transfer %d\n", ret);
 
@@ -630,7 +634,7 @@ inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, i
 }
 
 /* size should be a multiple of sector size */
-int mass_stor_readSector(unsigned int lba, int nsectors, unsigned char* buffer)
+int mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char* buffer)
 {
 	int ret;
 
@@ -638,7 +642,7 @@ int mass_stor_readSector(unsigned int lba, int nsectors, unsigned char* buffer)
 
 	mass_dev* mass_device = &g_mass_device;
 
-	ret = cbw_scsi_read_sector(mass_device, lba, buffer, mass_device->sectorSize, nsectors);
+	ret = cbw_scsi_read_sector(mass_device, lba, buffer, nsectors);
 
 	SIGNALIOSEMA(io_sema);
 
@@ -646,14 +650,14 @@ int mass_stor_readSector(unsigned int lba, int nsectors, unsigned char* buffer)
 }
 
 #ifdef VMC_DRIVER
-int cbw_scsi_write_sector(mass_dev* dev, unsigned int lba, void* buffer, int sectorSize, int sectorCount)
+int cbw_scsi_write_sector(mass_dev* dev, unsigned int lba, const void* buffer, unsigned short int sectorCount)
 {
 	register int ret;
 	cbw_packet *cbw = &cbw_write_sector;
 
 	XPRINTF("mass_driver: cbw_scsi_write_sector\n");
 
-	cbw->dataTransferLength = sectorSize * sectorCount;
+	cbw->dataTransferLength = dev->sectorSize * sectorCount;
 	cbw->comData[2] = (lba & 0xFF000000) >> 24;		//lba 1 (MSB)
 	cbw->comData[3] = (lba & 0xFF0000) >> 16;		//lba 2
 	cbw->comData[4] = (lba & 0xFF00) >> 8;			//lba 3
@@ -663,7 +667,7 @@ int cbw_scsi_write_sector(mass_dev* dev, unsigned int lba, void* buffer, int sec
 
 	usb_bulk_command(dev, cbw);
 
-	ret = usb_bulk_transfer(dev->bulkEpO, buffer, sectorSize * sectorCount);
+	ret = usb_bulk_transfer(dev->bulkEpO, (void*)buffer, dev->sectorSize * sectorCount);
 	if (ret != 0)
 		XPRINTF("mass_driver: cbw_scsi_write_sector error from usb_bulk_transfer %d\n", ret);
 
@@ -672,7 +676,7 @@ int cbw_scsi_write_sector(mass_dev* dev, unsigned int lba, void* buffer, int sec
 	return ret;
 }
 
-int mass_stor_writeSector(unsigned int lba, int nsectors, unsigned char* buffer)
+int mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char* buffer)
 {
 	int ret;
 
@@ -680,7 +684,7 @@ int mass_stor_writeSector(unsigned int lba, int nsectors, unsigned char* buffer)
 
 	mass_dev* mass_device = &g_mass_device;
 
-	ret = cbw_scsi_write_sector(mass_device, lba, buffer, mass_device->sectorSize, nsectors);
+	ret = cbw_scsi_write_sector(mass_device, lba, buffer, nsectors);
 
 	SIGNALIOSEMA(io_sema);
 
@@ -813,7 +817,7 @@ int mass_stor_connect(int devId)
 	}
 
 	/* we do NOT have enough bulk endpoints */
-	if (dev->bulkEpI < 0  /* || dev->bulkEpO < 0 */ ) { /* the bulkOut is not needed now */
+	if (dev->bulkEpI < 0 || dev->bulkEpO < 0) {
 		if (dev->bulkEpI >= 0) {
 			pUsbCloseEndpoint(dev->bulkEpI);
 		}

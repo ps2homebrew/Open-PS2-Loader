@@ -167,6 +167,7 @@ static void usbd_init(void);
 static void ps2ip_init(void);
 #endif
 static void fs_init(void);
+static void cdvdman_init(void);
 #ifdef ALT_READ_CORE
 static void cdvdman_cdinit();
 static int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf);
@@ -1047,20 +1048,27 @@ static void fs_init(void)
 }
 
 //-------------------------------------------------------------------------
-int sceCdInit(int init_mode)
+static void cdvdman_init(void)
 {
-	cdvdman_stat.err = CDVD_ERR_NO;
+	if(!cdvdman_cdinited)
+	{
+		cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef ALT_READ_CORE
-	cdvdman_stat.cddiskready = CDVD_READY_NOTREADY;
-	cdvdman_sendNCmd(NCMD_INIT, NULL, 0);
-	cdvdman_waitsignalNCmdsema();
-	cdvdman_stat.cddiskready = CDVD_READY_READY;
+		cdvdman_stat.cddiskready = CDVD_READY_NOTREADY;
+		cdvdman_sendNCmd(NCMD_INIT, NULL, 0);
+		cdvdman_waitsignalNCmdsema();
+		cdvdman_stat.cddiskready = CDVD_READY_READY;
 #else
-	fs_init();
+		fs_init();
 #endif
-	cdvdman_cdinited = 1;
+		cdvdman_cdinited = 1;
+	}
+}
 
+int sceCdInit(int init_mode)
+{
+	cdvdman_init();
 	return 1;
 }
 
@@ -1203,16 +1211,16 @@ int sceCdSync(int mode)
 }
 
 //-------------------------------------------------------------------------
-static void cdvdman_initDiskType()
+static void cdvdman_initDiskType(void)
 {
-        cdvdman_stat.err = CDVD_ERR_NO;
+	cdvdman_stat.err = CDVD_ERR_NO;
 
 #ifdef HDD_DRIVER
-        fs_init();
+	fs_init();
 
-        cdvdman_cur_disc_type = (int)apaHeader.discType;
+	cdvdman_cur_disc_type = (int)apaHeader.discType;
 #else
-        cdvdman_cur_disc_type = (int)g_ISO_media;
+	cdvdman_cur_disc_type = (int)g_ISO_media;
 #endif
 	cdvdman_stat.disc_type_reg = cdvdman_cur_disc_type;
         DPRINTF("DiskType=0x%x\n", cdvdman_cur_disc_type);
@@ -1221,7 +1229,7 @@ static void cdvdman_initDiskType()
 //-------------------------------------------------------------------------
 int sceCdGetDiskType(void)
 {
-        return 	cdvdman_stat.disc_type_reg;
+	return 	cdvdman_stat.disc_type_reg;
 }
 
 //-------------------------------------------------------------------------
@@ -1245,6 +1253,8 @@ int sceCdDiskReady(int mode)
 		if (!sync_flag)
 			return CDVD_READY_READY;
 #endif
+	}else{
+		printf("Missing init. Not ready.\n");
 	}
 
 	return CDVD_READY_NOTREADY;
@@ -1253,7 +1263,7 @@ int sceCdDiskReady(int mode)
 //-------------------------------------------------------------------------
 int sceCdTrayReq(int mode, u32 *traycnt)
 {
-        DPRINTF("sceCdTrayReq(%d, 0x%X)\n", mode, traycnt);
+        DPRINTF("sceCdTrayReq(%d, 0x%lX)\n", mode, *traycnt);
 
         if (mode == CDVD_TRAY_CHECK) {
                 if (traycnt)
@@ -1478,7 +1488,7 @@ int sceCdSC(int code, int *param)
 {
 	int result;
 
-        DPRINTF("sceCdSC(0x%X, 0x%X)\n", code, param);
+        DPRINTF("sceCdSC(0x%X, 0x%X)\n", code, *param);
 
 	switch(code){
 		case 0xFFFFFFF5:
@@ -1937,7 +1947,7 @@ static int cdrom_open(iop_file_t *f, char *filename, int mode)
 
 	WaitSema(cdrom_io_sema);
 
-	fs_init();
+	cdvdman_init();
 
 	DPRINTF("cdrom_open %s mode=%d\n", filename, mode);
 

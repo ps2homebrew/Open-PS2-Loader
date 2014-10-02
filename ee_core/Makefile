@@ -16,7 +16,7 @@ EE_BIN = ee_core.elf
 GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
 CHEATCORE_EE_OBJS = obj/cheat_engine.o obj/cheat_api.o
 
-EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o \
+EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o obj/patches_asm.o \
 	  obj/padhook.o obj/spu.o obj/smbauth.o obj/des.o obj/md4.o obj/tlb.o obj/asm.o obj/crt0.o
 MAPFILE = ee_core.map
 

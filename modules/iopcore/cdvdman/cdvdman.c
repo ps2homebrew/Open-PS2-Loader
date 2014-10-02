@@ -498,6 +498,8 @@ static int cdvdman_media_changed = 1;
 static int cdvdman_cur_disc_type = 0;	/* real current disc type */
 unsigned int ReadPos = 0;		/* Current buffer offset in 2048-byte sectors. */
 
+static iop_sys_clock_t gCdvdCallback_SysClock;
+
 //-------------------------------------------------------------------------
 #ifdef ALT_READ_CORE
 
@@ -607,7 +609,7 @@ static NCmdMbx_t *cdvdman_setNCmdMbx(void)
 
 		for (i = (NCMD_NUMBER-2); i >= 0; i--) {
 			pmbx->next = (NCmdMbx_t *)(pmbx + 1);
-			pmbx++; 
+			pmbx++;
 		}
 
 		cdvdman_pMbxnext = cdvdman_pMbxbuf;
@@ -1054,6 +1056,8 @@ static void cdvdman_init(void)
 	{
 		cdvdman_stat.err = CDVD_ERR_NO;
 
+		USec2SysClock(g_gamesetting_timer, &gCdvdCallback_SysClock);
+
 #ifdef ALT_READ_CORE
 		cdvdman_stat.cddiskready = CDVD_READY_NOTREADY;
 		cdvdman_sendNCmd(NCMD_INIT, NULL, 0);
@@ -1253,8 +1257,6 @@ int sceCdDiskReady(int mode)
 		if (!sync_flag)
 			return CDVD_READY_READY;
 #endif
-	}else{
-		printf("Missing init. Not ready.\n");
 	}
 
 	return CDVD_READY_NOTREADY;
@@ -1741,7 +1743,7 @@ int sceCdRM(char *m, u32 *stat)
 	u8 wrbuf[16];
 
 	*stat = 0;
-	r = cdvdman_readMechaconVersion(rdbuf, stat); 
+	r = cdvdman_readMechaconVersion(rdbuf, stat);
 	if ((r == 1) && (0x104FE < (rdbuf[3] | (rdbuf[2] << 8) | (rdbuf[1] << 16)))) {
 
 		mips_memcpy(&m[0], "M_NAME_UNKNOWN\0\0", 16);
@@ -2610,48 +2612,37 @@ retry:
 }
 
 //--------------------------------------------------------------
+struct cdvdman_cb_data{
+	void (*user_cb)(int reason);
+	int reason;
+};
+
 static int cdvdman_cb_event(int reason)
 {
-	static u8 cb_args[8];
-	iop_sys_clock_t sys_clock;
-	u8 *ptr;
+	static struct cdvdman_cb_data cb_data;
 
 	if (user_cb) {
-		ptr = (u8 *)cb_args;
 
-		if (ptr) {
-			*((u32 *)&ptr[0]) = (u32)user_cb;
-			*((u32 *)&ptr[4]) = reason;
+		cb_data.user_cb = user_cb;
+		cb_data.reason = reason;
 
-			USec2SysClock(g_gamesetting_timer, &sys_clock);
+		DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
 
-			DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
-
-			if (QueryIntrContext())
-				iSetAlarm(&sys_clock, event_alarm_cb, ptr);
-			else
-				SetAlarm(&sys_clock, event_alarm_cb, ptr);
-		}
+		if (QueryIntrContext())
+			iSetAlarm(&gCdvdCallback_SysClock, &event_alarm_cb, &cb_data);
+		else
+			SetAlarm(&gCdvdCallback_SysClock, &event_alarm_cb, &cb_data);
 	}
 
 	return 1;
 }
 
 //-------------------------------------------------------------------------
-static void (*cbfunc)(int reason);
-
 static unsigned int event_alarm_cb(void *args)
 {
-	register int reason;
-	u8 *ptr = (u8 *)args;
+	struct cdvdman_cb_data *cb_data=args;
 
-	cbfunc = (void *)*((u32 *)&ptr[0]);
-	reason = *((u32 *)&ptr[4]);
-
-	//FreeSysMemory(args);
-
-	cbfunc(reason);
-
+	cb_data->user_cb(cb_data->reason);
 	return 0;
 }
 

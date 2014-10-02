@@ -1,7 +1,7 @@
 /*
   Copyright 2009, Ifcaro, jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "ee_core.h"
@@ -92,6 +92,7 @@ static patchlist_t patch_list[] = {
 	{ "SLUS_201.99", ALL_MODE, { 0x0012a6d0, 0x24020001, 0x0c045e0a }}, // Shaun Palmer's Pro Snowboarder NTSC U
 	{ "SLUS_201.99", ALL_MODE, { 0x0013c55c, 0x10000012, 0x04400012 }}, // Shaun Palmer's Pro Snowboarder NTSC U
 	{ "SLES_553.46", ALL_MODE, { 0x0035414C, 0x2402FFFF, 0x0C0EE74E }}, // Rugby League 2: World Cup Edition PAL
+	{ "SLPS_250.26", ALL_MODE, { 0x0021e808, 0x00000000, 0x00000000 }}, // Super Robot Wars IMPACT
 	{ NULL,                 0, { 0x00000000, 0x00000000, 0x00000000 }}  // terminater
 };
 
@@ -236,6 +237,36 @@ static void SDF_Macross_patch(void){
 	_sw(JMP((unsigned int)&Invoke_CRSGUI_Start), 0x001f8520);
 }
 
+extern void SRWI_IncrementCntrlFlag(void);
+
+static void SRWI_IMPACT_patches(void){
+	//Phase 1	- Replace all segments of code that increment cntrl_flag with a multithread-safe implementation.
+	//In cdvCallBack()
+	_sw(JAL((unsigned int)&SRWI_IncrementCntrlFlag), 0x0021e840);
+	_sw(0x00000000, 0x0021e84c);
+	_sw(0x00000000, 0x0021e854);
+	//In cdvMain()
+	_sw(0x00000000, 0x00220ac8);
+	_sw(JAL((unsigned int)&SRWI_IncrementCntrlFlag), 0x00220ad0);
+	_sw(0x00000000, 0x00220ad8);
+	_sw(JAL((unsigned int)&SRWI_IncrementCntrlFlag), 0x00220b20);
+	_sw(0x00000000, 0x00220b28);
+	_sw(0x00000000, 0x00220b30);
+	_sw(JAL((unsigned int)&SRWI_IncrementCntrlFlag), 0x00220ba0);
+	_sw(0x00000000, 0x00220ba8);
+
+	/* Phase 2
+		sceCdError() will be polled continuously until it succeeds in retrieving the CD/DVD drive status.
+		However, the callback thread has a higher priority than the main thread
+		and this might result in a freeze because the main thread wouldn't ever release the libcdvd semaphore, and so calls to sceCdError() by the callback thread wouldn't succeed.
+		This problem occurs more frequently than the one addressed above.
+
+		Since the PlayStation 2 EE uses non-preemptive multitasking, we can solve this problem by lowering the callback thread's priority th below the main thread.
+		The problem is solved because the main thread can then interrupt the callback thread until it has completed its tasks.	*/
+	//In cdvCallBack()
+	_sw(0x24040060, 0x0021e944);	//addiu $a0, $zero, 0x60 (Set the CD/DVD callback thread's priority to 0x60)
+}
+
 void apply_patches(void)
 {
 	patchlist_t *p = (patchlist_t *)&patch_list[0];
@@ -254,7 +285,8 @@ void apply_patches(void)
 				SDF_Macross_patch();
 			else if (p->patch.addr == 0xbabecafe)
 				generic_capcom_protection_patches(p->patch.val); // Capcom anti cdvd emulator protection patch
-
+			else if (p->patch.addr == 0x0021e808)
+				SRWI_IMPACT_patches();
 			// non-generic patches
 			else if (_lw(p->patch.addr) == p->patch.check)
 				_sw(p->patch.val, p->patch.addr);

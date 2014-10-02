@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev700 - Fixed CDVDMAN initialization. Fixes: SSX World Tour and the Harry Potter series. - Tue Sep 30 08:54:16 2014 +0800
+rev699 - Updated USBHDFSD to support disks >1TB and <=2TB (Sync'ed with PS2SDK update). - Tue Sep 30 01:01:15 2014 +0800
 rev698 - Corrected path handling, which was broken in commit e5e85f0. - Sun Sep 28 09:44:28 2014 +0800
 rev697 - Fixes and updates: - Mon Sep 08 20:36:57 2014 +0800
 rev696 - in-game SMB fixes and enhancements: - Wed Aug 20 22:47:26 2014 +0800

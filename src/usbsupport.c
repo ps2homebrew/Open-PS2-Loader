@@ -11,6 +11,7 @@
 #ifdef CHEAT
 #include "include/cheatman.h"
 #endif
+#include "modules/iopcore/common/cdvd_config.h"
 
 extern void *usb_cdvdman_irx;
 extern int size_usb_cdvdman_irx;
@@ -196,17 +197,17 @@ static void usbDeleteGame(int id) {
 	usbULSizePrev = -2;
 }
 
-/*static void usbRenameGame(int id, char* newName) {
-	// TODO when/if Jimmi add rename functionnality to usbhdfs, then we should use the above method
-	//sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
+static void usbRenameGame(int id, char* newName) {
+	sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
 	usbULSizePrev = -2;
-}*/
+}
 #endif
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
 	int i, fd, val, index, compatmask = 0;
 	char partname[256], filename[32];
 	base_game_info_t* game = &usbGames[id];
+	struct cdvdman_settings_usb *settings;
 
 	fd = fioDopen(usbPrefix);
 	if (fd < 0) {
@@ -268,7 +269,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
-	for (i = 0; i < game->parts; i++) {
+	for (i = 0, settings = NULL; i < game->parts; i++) {
 		if (game->isISO)
 			sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
 		else
@@ -290,10 +291,10 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				irx_size = size_usb_4Ksectors_cdvdman_irx;
 			}
 			compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
+			settings = (struct cdvdman_settings_usb*)((u8*)irx+index);
 		}
 
-		val = fioIoctl(fd, 0xBEEFC0DE, partname);
-		memcpy((void*)((u32)irx + index + 44 + 4 * i), &val, 4);
+		settings->LBAs[i] = fioIoctl(fd, 0xBEEFC0DE, partname);
 	}
 
 #ifdef CHEAT
@@ -369,7 +370,7 @@ static item_list_t usbGameList = {
 #ifdef __CHILDPROOF
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
 #else
-		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, NULL,
+		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
 #endif
 #ifdef VMC
 		&usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbCheckVMC, USB_ICON

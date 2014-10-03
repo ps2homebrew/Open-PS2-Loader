@@ -16,8 +16,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <io_common.h>
-#include <ioman.h>
+#include <iomanX.h>
 
 #ifdef WIN32
 #include <malloc.h>
@@ -77,16 +76,16 @@ typedef struct _fs_dir {
 #define MAX_FILES 16
 static fs_rec fsRec[MAX_FILES]; //file info record
 
-static void fillStat(fio_stat_t *stat, const fat_dir *fatdir)
+static void fillStat(iox_stat_t *stat, const fat_dir *fatdir)
 {
-	stat->mode = FIO_SO_IROTH | FIO_SO_IXOTH;
+	stat->mode = FIO_S_IROTH | FIO_S_IXOTH;
 	if (fatdir->attr & FAT_ATTR_DIRECTORY) {
-		stat->mode |= FIO_SO_IFDIR;
+		stat->mode |= FIO_S_IFDIR;
 	} else {
-		stat->mode |= FIO_SO_IFREG;
+		stat->mode |= FIO_S_IFREG;
 	}
 	if (!(fatdir->attr & FAT_ATTR_READONLY)) {
-		stat->mode |= FIO_SO_IWOTH;
+		stat->mode |= FIO_S_IWOTH;
 	}
 
 	stat->size = fatdir->size;
@@ -215,7 +214,7 @@ static int fs_init(iop_device_t *driver)
 }
 
 //---------------------------------------------------------------------------
-static int fs_open(iop_file_t* fd, const char *name, int mode) {
+static int fs_open(iop_file_t* fd, const char *name, int mode, int permissions) {
 	fat_driver* fatd;
 	fs_rec* rec, *rec2;
 	int ret;
@@ -515,7 +514,7 @@ static int fs_remove(iop_file_t *fd, const char *name) {
 }
 
 //---------------------------------------------------------------------------
-static int fs_mkdir(iop_file_t *fd, const char *name) {
+static int fs_mkdir(iop_file_t *fd, const char *name, int permissions) {
 	fat_driver* fatd;
 	int ret;
 	int sfnOffset;
@@ -616,7 +615,7 @@ static int fs_dclose(iop_file_t *fd)
 }
 
 //---------------------------------------------------------------------------
-static int fs_dread(iop_file_t *fd, fio_dirent_t *buffer)
+static int fs_dread(iop_file_t *fd, iox_dirent_t *buffer)
 {
 	fat_driver* fatd;
 	int ret;
@@ -645,7 +644,7 @@ static int fs_dread(iop_file_t *fd, fio_dirent_t *buffer)
 	ret = rec->status;
 	if (rec->status >= 0)
 	{
-		memset(buffer, 0, sizeof(fio_dirent_t));
+		memset(buffer, 0, sizeof(iox_dirent_t));
 		fillStat(&buffer->stat, &rec->current_fatdir);
 		strcpy(buffer->name, rec->current_fatdir.name);
 	}
@@ -658,7 +657,7 @@ static int fs_dread(iop_file_t *fd, fio_dirent_t *buffer)
 }
 
 //---------------------------------------------------------------------------
-static int fs_getstat(iop_file_t *fd, const char *name, fio_stat_t *stat)
+static int fs_getstat(iop_file_t *fd, const char *name, iox_stat_t *stat)
 {
 	fat_driver* fatd;
 	int ret;
@@ -679,7 +678,7 @@ static int fs_getstat(iop_file_t *fd, const char *name, fio_stat_t *stat)
 		return ret;
 	}
 
-	memset(stat, 0, sizeof(fio_stat_t));
+	memset(stat, 0, sizeof(iox_stat_t));
 	fillStat(stat, &fatdir);
 
 	_fs_unlock();
@@ -782,6 +781,46 @@ int fs_ioctl(iop_file_t *fd, u32 request, void *data)
 	return ret;
 }
 
+int fs_rename(iop_file_t *fd, const char *path, const char *newpath)
+{
+	fat_dir fatdir;
+	fat_driver* fatd;
+	fs_rec* rec = NULL;
+	unsigned int cluster;
+	struct fs_dirent* dirent = (struct fs_dirent *) fd->privdata;
+	int ret;
+
+	if (dirent == NULL)
+		return -EBADF;
+
+	_fs_lock();
+
+	fatd = fat_getData(fd->unit);
+	if (fatd == NULL) { _fs_unlock(); return -ENODEV; }
+
+	//find the file
+	cluster = 0; //allways start from root
+	XPRINTF("USBHDFSD: Calling fat_getFileStartCluster from fs_rename\n");
+	ret = fat_getFileStartCluster(fatd, path, &cluster, &fatdir);
+	if (ret < 0 && ret != -ENOENT) {
+		_fs_unlock();
+		return ret;
+	}else{
+		//File exists. Check if the file is already open
+		rec = fs_findFileSlotByCluster(fatdir.startCluster);
+		if (rec != NULL) {
+			_fs_unlock();
+			return -EACCES;
+		}
+	}
+
+	ret = fat_renameFile(fatd, &fatdir, newpath);
+	FLUSH_SECTORS(fatd);
+
+	_fs_unlock();
+	return ret;
+}
+
 #ifndef WIN32
 static iop_device_ops_t fs_functarray={
 	&fs_init,
@@ -800,11 +839,21 @@ static iop_device_ops_t fs_functarray={
 	&fs_dclose,
 	&fs_dread,
 	&fs_getstat,
+	(void*)&fs_dummy,
+	&fs_rename,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
+	(void*)&fs_dummy,
 	(void*)&fs_dummy
 };
 static iop_device_t fs_driver={
 	"mass",
-	IOP_DT_FS,
+	IOP_DT_FS|IOP_DT_FSEXT,
 	2,
 	"USB mass storage driver",
 	&fs_functarray

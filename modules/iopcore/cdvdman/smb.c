@@ -13,6 +13,7 @@
 
 #include "smsutils.h"
 #include "smb.h"
+#include "cdvd_config.h"
 
 #ifdef VMC_DRIVER
 #include <thsemap.h>
@@ -38,7 +39,7 @@ extern int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags); 	/
 extern int (*plwip_socket)(int domain, int type, int protocol); 		// #13
 extern u32 (*pinet_addr)(const char *cp); 					// #24
 
-extern int *p_part_start;
+extern struct cdvdman_settings_smb cdvdman_settings;
 
 #define SMB_MAGIC	0x424d53ff
 
@@ -762,7 +763,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 
 		nbytes = sectors << 11;
 
- 		smb_ReadFile((u16)p_part_start[part_num], offset << 11, offset >> 21, p, nbytes);
+ 		smb_ReadFile(cdvdman_settings.files.FIDs[part_num], offset << 11, offset >> 21, p, nbytes);
 
 		p += nbytes;
 		offset += sectors;

@@ -12,6 +12,7 @@
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"
+#include "cdvd_config.h"
 
 #include <loadcore.h>
 #include <stdio.h>
@@ -44,58 +45,54 @@ IRX_ID(MODNAME, 1, 1);
 #endif
 
 //------------------ Patch Zone ----------------------
-#ifdef SMB_DRIVER
-static char g_ISO_name[] = "######    GAMESETTINGS    ######";
-#else
-static char g_tag[] __attribute__((unused)) = "######    GAMESETTINGS    ######";
-#endif
-static u8 g_ISO_parts __attribute__((unused)) = 0x69;
-static u8 g_ISO_media = 0x69;
-static u8 g_gamesetting_alt_read = 0;
-static u8 g_gamesetting_disable_DVDDL = 0;
-static u8 g_gamesetting_0_pss = 0;
-static u8 padding[2] __attribute__((unused));
-static u32 g_gamesetting_timer = 100;
-
-#define ISO_MAX_PARTS	16
-static unsigned int g_part_start[ISO_MAX_PARTS] = {
-	0,	// is apa header LBA in HDD use, is Long filename in SMB+ISO
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0
+#ifdef HDD_DRIVER
+static struct cdvdman_settings_hdd cdvdman_settings={
+	{
+		0x69, 0x69,
+		0x1234,
+		0x39393939,
+		"B00BS"
+	},
+	0x12345678
 };
-
-static char g_DiskID[] = "\0B00BS"; 	// the null byte is here to ensure the ISO name string
-					// (stored in array above) is terminated when it's 64 bytes
-
-#ifdef SMB_DRIVER
-static char g_pc_ip[]="xxx.xxx.xxx.xxx";
-static int g_pc_port = 445; // &g_pc_ip + 16
-static char g_pc_share[32]="PS2SMB";
-static char g_pc_prefix[32]="\0";
-static char g_smb_user[16]="GUEST";
-static char g_smb_password[16]="\0";
+#elif SMB_DRIVER
+struct cdvdman_settings_smb cdvdman_settings={
+	{
+		0x69, 0x69,
+		0x1234,
+		0x39393939,
+		"B00BS"
+	},
+	{192,168,0,10},
+	0x8510,
+	"PS2SMB",
+	"",
+	"GUEST",
+	"",
+	"######  GAMETITLE SMB  ######",
+	0,
+	{
+		{
+			"EXTEN",
+			"SLPM_550.52",
+		}
+	}
+};
+#elif USB_DRIVER
+struct cdvdman_settings_usb cdvdman_settings={
+	{
+		0x69, 0x69,
+		0x1234,
+		0x39393939,
+		"B00BS"
+	},
+	{1,2,3,4,5,6,7,8,9,10}
+};
+#else
+	#error Unknown driver type. Please check the Makefile.
 #endif
 
 //----------------------------------------------------
-
-unsigned int *p_part_start = &g_part_start[0];
-
-extern void *dummy_irx;
-extern int size_dummy_irx;
-
 struct irx_export_table _exp_cdvdman;
 struct irx_export_table _exp_cdvdstm;
 #ifdef SMB_DRIVER
@@ -958,51 +955,46 @@ static void fs_init(void)
 
 #ifdef SMB_DRIVER
 	register int i = 0;
-	char tmp_str[255];
+	char tmp_str[256], ip_address[16];
 
 	ps2ip_init();
 
 	// Open the Connection with SMB server
-	smb_NegociateProtocol(g_pc_ip, g_pc_port, g_smb_user, g_smb_password);
-
-	// zero pad the string to be sure it does not overflow
-	g_pc_share[31] = '\0';
+	sprintf(ip_address, "%u.%u.%u.%u", cdvdman_settings.pc_ip[0], cdvdman_settings.pc_ip[1], cdvdman_settings.pc_ip[2], cdvdman_settings.pc_ip[3]);
+	smb_NegociateProtocol(ip_address, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password);
 
 	// open a session
 	smb_SessionSetupAndX();
 
 	// Then tree connect on the share resource
-	sprintf(tmp_str, "\\\\%s\\%s", g_pc_ip, g_pc_share);
+	sprintf(tmp_str, "\\\\%s\\%s", ip_address, cdvdman_settings.pc_share);
 	smb_TreeConnectAndX(tmp_str);
 
-	char *path_str;
-	// if g_part_start[0] not zero, then it is a plain ISO
-	if (g_part_start[0]) {
-		char *game_name = (char *)&g_part_start[0];
-		if (g_pc_prefix[0]) {
-			path_str = (g_ISO_media == 0x12) ? "%s\\CD\\%s.%s%s" : "%s\\DVD\\%s.%s%s";
-			sprintf(tmp_str, path_str, g_pc_prefix, g_ISO_name + 5, game_name, g_ISO_name);
+	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
+		if (cdvdman_settings.pc_prefix[0]) {
+			sprintf(tmp_str, "%s\\%s\\%s.%s%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.iso.startup, cdvdman_settings.files.iso.title, cdvdman_settings.files.iso.extension);
 		} else {
-			path_str = (g_ISO_media == 0x12) ? "CD\\%s.%s%s" : "DVD\\%s.%s%s";
-			sprintf(tmp_str, path_str, g_ISO_name + 5, game_name, g_ISO_name);
+			sprintf(tmp_str, "%s\\%s.%s%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.iso.startup, cdvdman_settings.files.iso.title, cdvdman_settings.files.iso.extension);
 		}
-		smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i++], 0);
+
+		smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i++], 0);
 	} else {
 		// Open all parts files
-		for (i = 0; i < g_ISO_parts; i++) {
-			if (g_pc_prefix[0])
-				sprintf(tmp_str, "%s\\%s.%02x", g_pc_prefix, g_ISO_name, i);
+		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
+			if (cdvdman_settings.pc_prefix[0])
+				sprintf(tmp_str, "%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.filename, i);
 			else
-				sprintf(tmp_str, "%s.%02x", g_ISO_name, i);
-			smb_OpenAndX(tmp_str, (u16 *)&g_part_start[i], 0);
+				sprintf(tmp_str, "%s.%02x", cdvdman_settings.filename, i);
+
+			smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i], 0);
 		}
 	}
 #endif
 
 #ifdef HDD_DRIVER
-	DPRINTF("fs_init: apa header LBA = %d\n", g_part_start[0]);
+	DPRINTF("fs_init: apa header LBA = %d\n", cdvdman_settings.lba_start);
 
-	int r = ata_device_sector_io(0, &apaHeader, g_part_start[0], 2, ATA_DIR_READ);
+	int r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ);
 	if (r != 0)
 		DPRINTF("fs_init: failed to read apa header %d\n", r);
 
@@ -1023,7 +1015,7 @@ static void fs_init(void)
 	layer_info[0].rootDirtocLength = tocEntryPointer->length;
 
 	// DVD DL support
-	if (!g_gamesetting_disable_DVDDL) {
+	if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
 		#ifdef HDD_DRIVER
 		int on_dual;
 		u32 layer1_start;
@@ -1056,7 +1048,7 @@ static void cdvdman_init(void)
 	{
 		cdvdman_stat.err = CDVD_ERR_NO;
 
-		USec2SysClock(g_gamesetting_timer, &gCdvdCallback_SysClock);
+		USec2SysClock(cdvdman_settings.common.cb_timer, &gCdvdCallback_SysClock);
 
 #ifdef ALT_READ_CORE
 		cdvdman_stat.cddiskready = CDVD_READY_NOTREADY;
@@ -1109,7 +1101,7 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 	cdvdman_sendNCmd(NCMD_READ, (void *)wdbuf, 12);
 #else
 	cdvdman_stat.status = CDVD_STAT_READ;
-	if ((QueryIntrContext()) || (g_gamesetting_alt_read == 0)) {
+	if (QueryIntrContext() || (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_ALT_READ))) {
 		if (sync_flag == 1) {
 			DPRINTF("sceCdRead: exiting (sync_flag)...\n");
 			return 0;
@@ -1224,7 +1216,7 @@ static void cdvdman_initDiskType(void)
 
 	cdvdman_cur_disc_type = (int)apaHeader.discType;
 #else
-	cdvdman_cur_disc_type = (int)g_ISO_media;
+	cdvdman_cur_disc_type = (int)cdvdman_settings.common.media;
 #endif
 	cdvdman_stat.disc_type_reg = cdvdman_cur_disc_type;
         DPRINTF("DiskType=0x%x\n", cdvdman_cur_disc_type);
@@ -1601,12 +1593,12 @@ static int cdvdman_ReadSect(u32 lsn, u32 nsectors, void *buf)
 	u8 *p = (u8 *)buf;
 
 	lbound = 0;
-	ubound = (g_ISO_parts > 1) ? 0x80000 : 0xFFFFFFFF;
+	ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
 	offslsn = lsn;
 	r = nlsn = 0;
 	sectors_to_read = nsectors;
 
-	for (i=0; i<g_ISO_parts; i++, lbound=ubound, ubound+=0x80000, offslsn-=0x80000) {
+	for (i=0; i<cdvdman_settings.common.NumParts; i++, lbound=ubound, ubound+=0x80000, offslsn-=0x80000) {
 
 		if (lsn>=lbound && lsn<ubound){
 			if ((lsn + nsectors) > (ubound-1)) {
@@ -1811,7 +1803,7 @@ int sceCdReadDiskID(void *DiskID)
 	if (i == 5)
 		*((u16 *)DiskID) = (u16)0xadde;
 	else
-		mips_memcpy(DiskID, &g_DiskID[1], 5);
+		mips_memcpy(DiskID, &cdvdman_settings.common.DiscID[1], 5);
 
 	return 1;
 }
@@ -1819,7 +1811,7 @@ int sceCdReadDiskID(void *DiskID)
 //-------------------------------------------------------------------------
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 {
-	if (g_gamesetting_disable_DVDDL) {
+	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL) {
 		*layer1_start = 0;
 		*on_dual = 1;
 	}
@@ -1959,7 +1951,7 @@ static int cdrom_open(iop_file_t *f, char *filename, int mode)
 		if (r) {
 			f->privdata = fh;
 			fh->f = f;
-			if (!g_gamesetting_disable_DVDDL) {
+			if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
 				if (f->mode == 0)
 					f->mode = r;
 			}
@@ -2440,7 +2432,7 @@ lbl_startlocate:
 					tocLength = tocEntryPointer->fileSize;
 					p = &slash[1];
 
-					if (!g_gamesetting_disable_DVDDL) {
+					if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
 						int on_dual;
 						u32 layer1_start;
 						sceCdReadDvdDualInfo(&on_dual, &layer1_start);
@@ -2497,7 +2489,7 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 
 	DPRINTF("cdvdman_findfile cdvdman_filepath=%s\n", cdvdman_filepath);
 
-	if (g_gamesetting_disable_DVDDL)
+	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)
 		layer = 0;
 
 	if (layer < 2) {
@@ -2519,7 +2511,7 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 		}
 
 		pcdfile->lsn = lsn;
-		if ((g_gamesetting_0_pss) && \
+		if ((cdvdman_settings.common.flags&IOPCORE_COMPAT_0_PSS) && \
 			((!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".PSS", 4)) || \
 			(!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".pss", 4))))
 			pcdfile->size = 0;
@@ -2747,8 +2739,8 @@ static int intrh_cdrom(void *common){
 	if(CDVDreg_PWOFF&CDL_DATA_RDY) CDVDreg_PWOFF=CDL_DATA_RDY;
 
 	if(CDVDreg_PWOFF&CDL_DATA_END){
-	//Do not acknowledge the interrupt here. The EE-side IGR code will monitor and acknowledge it.
-//		CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
+		//If IGR is enabled: Do not acknowledge the interrupt here. The EE-side IGR code will monitor and acknowledge it.
+		if(cdvdman_settings.common.flags&IOPCORE_ENABLE_POFF) CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
 		iSetEventFlag(cdvdman_stat.intr_ef, 0x14);	//Notify FILEIO and CDVDFSV of the power-off event.
 
 		//Call power-off callback here. OPL doesn't handle one, so do nothing.
@@ -2821,8 +2813,8 @@ int _start(int argc, char **argv)
 	InstallIntrHandler();
 
 #ifdef HDD_DRIVER
-	if (g_ISO_media != 0x69)
-		lba_48bit = g_ISO_media;
+	if (cdvdman_settings.common.media != 0x69)
+		lba_48bit = cdvdman_settings.common.media;
 #endif
 
 	// hook MODLOAD's exports

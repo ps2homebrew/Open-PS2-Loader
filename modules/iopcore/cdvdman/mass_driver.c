@@ -15,8 +15,9 @@
 #include "mass_debug.h"
 #include "mass_common.h"
 #include "mass_stor.h"
+#include "cdvd_config.h"
 
-extern unsigned int *p_part_start;
+extern struct cdvdman_settings_usb cdvdman_settings;
 
 #define getBI32(__buf) ((((u8 *) (__buf))[3] << 0) | (((u8 *) (__buf))[2] << 8) | (((u8 *) (__buf))[1] << 16) | (((u8 *) (__buf))[0] << 24))
 
@@ -212,8 +213,6 @@ typedef struct _read_capacity_data
 
 static UsbDriver driver;
 
-//volatile int wait_for_connect = 1;
-
 static int cb_sema;
 
 #ifdef VMC_DRIVER
@@ -236,8 +235,8 @@ static mass_dev g_mass_device;
 
 #ifndef _4K_SECTORS
 struct MSStoDSS_t {
-	int massSectorSize;
-	int shiftPos;
+	short int massSectorSize;
+	short int shiftPos;
 };
 
 static struct MSStoDSS_t gMSStoDSS[4] = {
@@ -777,8 +776,6 @@ int mass_stor_connect(int devId)
 	UsbEndpointDescriptor *endpoint;
 	mass_dev* dev;
 
-	//wait_for_connect = 0;
-
 	XPRINTF("mass_driver: connect: devId=%i\n", devId);
 	dev = &g_mass_device;
 
@@ -1020,15 +1017,15 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 		nbytes = sectors << 11;	
 
 #ifndef _4K_SECTORS
-		mass_stor_readSector(p_part_start[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);
+		mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);
 #else
 		if (sectors == 1) {
-			mass_stor_readSector(p_part_start[part_num] + (lsn >> 1), 1, _4K_buf);
+			mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn >> 1), 1, _4K_buf);
 			mips_memcpy(p, _4K_buf, nbytes);
 
 		}
 		else {
-			mass_stor_readSector(p_part_start[part_num] + (lsn >> 1), 1, p);
+			mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn >> 1), 1, p);
 		}
 #endif
 		lsn += sectors;

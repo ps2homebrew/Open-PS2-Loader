@@ -5,6 +5,7 @@
 #include "include/system.h"
 #include "include/supportbase.h"
 #include "include/ioman.h"
+#include "modules/iopcore/common/cdvd_config.h"
 
 /// internal linked list used to populate the list from directory listing
 struct game_list_t {
@@ -148,6 +149,13 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
 	int i;
+	static const struct cdvdman_settings_common cdvdman_settings_common_sample={
+		0x69, 0x69,
+		0x1234,
+		0x39393939,
+		"B00BS"
+	};
+	struct cdvdman_settings_common *settings;
 
 	unsigned int compatmask = 0;
 	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatmask);
@@ -155,48 +163,47 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	char gameid[5];
 	configGetDiscIDBinary(configSet, gameid);
 
-
-	for (i = 0; i < size_cdvdman; i++) {
-		if (!strcmp((const char*)((u32)cdvdman_irx + i),"######    GAMESETTINGS    ######")) {
+	for (i = 0, settings = NULL; i < size_cdvdman; i+=4) {
+		if (!memcmp((void*)((u8*)cdvdman_irx + i), &cdvdman_settings_common_sample, sizeof(cdvdman_settings_common_sample))) {
+			settings=(struct cdvdman_settings_common*)((u8*)cdvdman_irx + i);
 			break;
 		}
 	}
+	if (settings == NULL) return -1;
 
-	memcpy((void*)((u32)cdvdman_irx + i + 33), &game->parts, 1);
-
-	memcpy((void*)((u32)cdvdman_irx + i + 34), &game->media, 1);
+	if(game != NULL){
+		settings->NumParts = game->parts;
+		settings->media = game->media;
+	}
+	settings->flags = 0;
 
 	if (compatmask & COMPAT_MODE_2) {
-		u8 alt_read_mode = 1;
-		memcpy((void*)((u32)cdvdman_irx + i + 35), &alt_read_mode, 1);
-	}
-
-	if (compatmask & COMPAT_MODE_5) {
-		u8 no_dvddl = 1;
-		memcpy((void*)((u32)cdvdman_irx + i + 36), &no_dvddl, 1);
+		settings->flags |= IOPCORE_COMPAT_ALT_READ;
 	}
 
 	if (compatmask & COMPAT_MODE_4) {
-		u8 no_pss = 1;
-		memcpy((void*)((u32)cdvdman_irx + i + 37), &no_pss, 1);
+		settings->flags |= IOPCORE_COMPAT_0_PSS;
+	}
+
+	if (compatmask & COMPAT_MODE_5) {
+		settings->flags |= IOPCORE_COMPAT_DISABLE_DVDDL;
+	}
+
+	if (compatmask & COMPAT_MODE_6) {
+		settings->flags |= IOPCORE_ENABLE_POFF;
 	}
 
 	// patch cdvdman timer
 	int timer = 0;
 	if (configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer)) {
 		u32 cdvdmanTimer = timer * 250;
-		memcpy((void*)((u32)cdvdman_irx + i + 40), &cdvdmanTimer, 4);
+		settings->cb_timer = cdvdmanTimer;
 	}
 
 	*patchindex = i;
 
-	for (i = 0; i < size_cdvdman; i++) {
-		if (!strcmp((const char*)((u32)cdvdman_irx + i),"B00BS")) {
-			break;
-		}
-	}
 	// game id
-	memcpy((void*)((u32)cdvdman_irx + i), &gameid, 5);
+	memcpy(settings->DiscID, &gameid, 5);
 
 	return compatmask;
 }

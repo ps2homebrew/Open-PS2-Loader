@@ -11,6 +11,7 @@
 #ifdef CHEAT
 #include "include/cheatman.h"
 #endif
+#include "modules/iopcore/common/cdvd_config.h"
 
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
@@ -337,6 +338,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	void** irx = NULL;
 	char filename[32];
 	base_game_info_t* game = &ethGames[id];
+	struct cdvdman_settings_smb *settings;
 
 	if (!gPCShareName[0]) {
 		memcpy(gPCShareName, game->name, 32);
@@ -423,31 +425,36 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	}
 
 	compatmask = sbPrepare(game, configSet, size_irx, irx, &i);
+	settings = (struct cdvdman_settings_smb *)((u8*)irx+i);
 
 	// For ISO we use the part table to store the "long" name (only for init)
 	if (game->isISO) {
-		memcpy((void*)((u32)irx + i), game->extension, 5);
-		strcpy((void*)((u32)irx + i + 5), game->startup);
-		memcpy((void*)((u32)irx + i + 44), game->name, strlen(game->name) + 1);
+		strcpy(settings->files.iso.extension, game->extension);
+		strcpy(settings->files.iso.startup, game->startup);
+		strncpy(settings->files.iso.title, game->name, strlen(game->name) + 1);
+		settings->files.iso.title[sizeof(settings->files.iso.title)-1] = '\0';
 	} else {
 		sprintf(filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
-		memcpy((void*)((u32)irx + i), filename, strlen(filename) + 1);
+		strncpy(settings->filename, filename, strlen(filename) + 1);
+		settings->filename[sizeof(settings->filename)-1] = '\0';
+		settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
 	}
 
-	for (i = 0; i < size_irx; i++) {
-		if (!strcmp((const char*)((u32)irx + i),"xxx.xxx.xxx.xxx")) {
-			break;
-		}
-	}
+	//TODO: OPL uses integers to store the IP address, which causes this need for conversion.
+	settings->pc_ip[0]=pc_ip[0];
+	settings->pc_ip[1]=pc_ip[1];
+	settings->pc_ip[2]=pc_ip[2];
+	settings->pc_ip[3]=pc_ip[3];
 
-	char config_str[256];
-	sprintf(config_str, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	memcpy((void*)((u32)irx + i), config_str, strlen(config_str) + 1);
-	memcpy((void*)((u32)irx + i + 16), &gPCPort, 4);
-	memcpy((void*)((u32)irx + i + 20), gPCShareName, 32);
-	memcpy((void*)((u32)irx + i + 52), gETHPrefix, 32);
-	memcpy((void*)((u32)irx + i + 84), gPCUserName, 16);
-	memcpy((void*)((u32)irx + i + 100), gPCPassword, 16);
+	settings->pc_port=gPCPort;
+	strncpy(settings->pc_share, gPCShareName, sizeof(settings->pc_share)-1);
+	settings->pc_share[sizeof(settings->pc_share)-1] = '\0';
+	strncpy(settings->pc_prefix, gETHPrefix, sizeof(settings->pc_prefix)-1);
+	settings->pc_prefix[sizeof(settings->pc_prefix)-1] = '\0';
+	strncpy(settings->smb_user, gPCUserName, sizeof(settings->smb_user)-1);
+	settings->smb_user[sizeof(settings->smb_user)-1] = '\0';
+	strncpy(settings->smb_password, gPCPassword, sizeof(settings->smb_password)-1);
+	settings->smb_password[sizeof(settings->smb_password)-1] = '\0';
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();

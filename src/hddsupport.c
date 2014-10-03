@@ -12,6 +12,7 @@
 #ifdef CHEAT
 #include "include/cheatman.h"
 #endif
+#include "modules/iopcore/common/cdvd_config.h"
 
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
@@ -256,6 +257,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	void** irx = NULL;
 	char filename[32];
 	hdl_game_info_t* game = &hddGames->games[id];
+	struct cdvdman_settings_hdd *settings;
 
 #ifdef VMC
 	apa_header part_hdr;
@@ -401,48 +403,14 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 		irx = &hdd_cdvdman_irx;
 	}
 
-	for (i = 0; i < size_irx; i++) {
-		if(!strcmp((const char*)((u32)irx + i), "######    GAMESETTINGS    ######")) {
-			break;
-		}
-	}
+	sbPrepare(NULL, configSet, size_irx, irx, &i);
+	settings = (struct cdvdman_settings_hdd*)((u8*)irx+i);
 
 	// patch 48bit flag
-	u8 flag_48bit = hddIs48bit() & 0xff;
-	memcpy((void*)((u32)irx + i + 34), &flag_48bit, 1);
-
-	if (compatMode & COMPAT_MODE_2) {
-		u8 alt_read_mode = 1;
-		memcpy((void*)((u32)irx + i + 35), &alt_read_mode, 1);
-	}
-
-	if (compatMode & COMPAT_MODE_5) {
-		u8 no_dvddl = 1;
-		memcpy((void*)((u32)irx + i + 36), &no_dvddl, 1);
-	}
-
-	if (compatMode & COMPAT_MODE_4) {
-		u8 no_pss = 1;
-		memcpy((void*)((u32)irx + i + 37), &no_pss, 1);
-	}
-
-	// patch cdvdman timer
-	int timer = 0;
-	if (configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer)) {
-		u32 cdvdmanTimer = timer * 250;
-		memcpy((void*)((u32)irx + i + 40), &cdvdmanTimer, 4);
-	}
+	settings->common.media = hddIs48bit() & 0xff;
 
 	// patch start_sector
-	memcpy((void*)((u32)irx + i + 44), &game->start_sector, 4);
-
-	for (i=0;i<size_irx;i++) {
-		if(!strcmp((const char*)((u32)irx + i), "B00BS")) {
-			break;
-		}
-	}
-	// game id
-	memcpy((void*)((u32)irx + i), &gid, 5);
+	settings->lba_start = game->start_sector;
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
@@ -454,7 +422,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 #ifdef VMC
 #define VMC_TEMP3	size_mcemu_irx, &hdd_mcemu_irx,
 #else
-#define VMC_TEMP3	
+#define VMC_TEMP3
 #endif
 	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 compatMode);
 }
@@ -470,10 +438,7 @@ static config_set_t* hddGetConfig(int id) {
 	configSetStr(config, CONFIG_ITEM_NAME, game->name);
 	configSetInt(config, CONFIG_ITEM_SIZE, game->total_size_in_kb >> 10);
 	configSetStr(config, CONFIG_ITEM_FORMAT, "HDL");
-	if (game->disctype == 0x12)
-		configSetStr(config, CONFIG_ITEM_MEDIA, "CD");
-	else
-		configSetStr(config, CONFIG_ITEM_MEDIA, "DVD");
+	configSetStr(config, CONFIG_ITEM_MEDIA, game->disctype == 0x12 ? "CD" : "DVD");
 	configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 
 	return config;

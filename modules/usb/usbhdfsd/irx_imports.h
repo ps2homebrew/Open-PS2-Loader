@@ -14,7 +14,7 @@
 /* Please keep these in alphabetical order!  */
 #include <cdvdman.h>
 #include <intrman.h>
-#include <ioman.h>
+#include <iomanX.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include <sysmem.h>

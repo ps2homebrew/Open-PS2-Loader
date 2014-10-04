@@ -15,10 +15,9 @@ extern void * _gp;
 
 static int gIOTerminate = 0;
 
-#define THREAD_STACK_SIZE   (8 * 1024) 
+#define THREAD_STACK_SIZE   (8 * 1024)
 
-static u8          disp_stack[THREAD_STACK_SIZE] ALIGNED(16); 
-static u8          thread_stack[THREAD_STACK_SIZE] ALIGNED(16); 
+static u8          thread_stack[THREAD_STACK_SIZE] ALIGNED(16);
 
 struct io_request_t {
 	int  type;
@@ -37,16 +36,10 @@ static struct io_request_t *gReqEnd;
 
 static struct io_handler_t gRequestHandlers[MAX_IO_HANDLERS];
 
-
-static void ioThreadDispatcher ( void* apParam );
-static void ioAlarmFunc(s32 id, u16 time, void *arg);
-
 static int gHandlerCount;
 
 // id of the processing thread
 static s32 gIOThreadId;
-// id of the thread that handles thread switching
-static s32 gDispatcherThreadID;
 
 // lock for tip processing
 static s32 gProcSemaId;
@@ -60,8 +53,6 @@ static ee_sema_t gQueueSema;
 
 static int isIOBlocked = 0;
 static int isIORunning = 0;
-static int alarmID = 0;
-static int stopIOTimer = 0;
 
 int ioRegisterHandler(int type, io_request_handler_t handler) {
 	WaitSema(gProcSemaId);
@@ -114,7 +105,7 @@ static void ioProcessRequest(struct io_request_t* req) {
 		hlr(data);
 }
 
-static void ioWorkerThread(void) {
+static void ioWorkerThread(void *arg) {
 	while (!gIOTerminate) {
 		SleepThread();
 
@@ -176,10 +167,9 @@ void ioInit(void) {
 	gHandlerCount = 0;
 	gReqList = NULL;
 	gReqEnd = NULL;
-	
-	gDispatcherThreadID = 0;
+
 	gIOThreadId = 0;
-	
+
 	gQueueSema.init_count = 1;
 	gQueueSema.max_count = 1;
 	gQueueSema.option = 0;
@@ -187,35 +177,20 @@ void ioInit(void) {
 	gProcSemaId = CreateSema(&gQueueSema);
 	gEndSemaId = CreateSema(&gQueueSema);
 	gIOPrintfSemaId = CreateSema(&gQueueSema);
-	
-	ChangeThreadPriority (  GetThreadId (), 29 );
 
 	// default custom simple action handler
 	ioRegisterHandler(IO_CUSTOM_SIMPLEACTION, &ioSimpleActionHandler);
-	
-	memset(&gIOThread, 0, sizeof(gIOThread));
-	
-	gIOThread.func         = (void *)ioThreadDispatcher;
-	gIOThread.stack        = disp_stack;
-	gIOThread.stack_size   = THREAD_STACK_SIZE;
-	gIOThread.gp_reg       = &_gp;
-	gIOThread.initial_priority = 0;
-	
-	alarmID = SetAlarm( 625, &ioAlarmFunc, NULL); 
-	
-	// this one manages the thread switching in alarm intervals
-	gDispatcherThreadID = CreateThread(&gIOThread);
-	StartThread(gDispatcherThreadID, NULL);
 
-	gIOThread.func         = (void *)ioWorkerThread;
-	gIOThread.stack        = thread_stack;
+	gIOThread.attr		= 0;
+	gIOThread.stack_size	= THREAD_STACK_SIZE;
+	gIOThread.gp_reg	= &_gp;
+	gIOThread.func		= &ioWorkerThread;
+	gIOThread.stack		= thread_stack;
 	gIOThread.initial_priority = 30;
 
 	isIORunning = 1;
 	gIOThreadId = CreateThread(&gIOThread);
 	StartThread(gIOThreadId, NULL);
-	
-	ChangeThreadPriority (  GetThreadId (), 30 );
 }
 
 int ioPutRequest(int type, void* data) {
@@ -297,10 +272,6 @@ void ioEnd(void) {
 	
 	// wake up and wait for end
 	WakeupThread(gIOThreadId);
-	WakeupThread(gDispatcherThreadID);
-	
-	// Cancel the thread dispatcher alarm (TODO: Is this correct?)
-	ReleaseAlarm(alarmID);
 }
 
 int ioGetPendingRequestCount(void) {
@@ -318,24 +289,6 @@ int ioGetPendingRequestCount(void) {
 int ioHasPendingRequests(void) {
 	return gReqList != NULL ? 1 : 0;
 }
-
-
-// From PS2DEV.ORG - Thread dispatcher
-static void ioThreadDispatcher ( void* apParam ) {
-	while ( ! gIOTerminate ) { 
-		SleepThread (); 
-	}  /* end while */ 
-	
-	ExitDeleteThread();
-}  /* end dispatcher */ 
-
-static void ioAlarmFunc(s32 id, u16 time, void *arg) {
-        if (!gIOTerminate && !stopIOTimer) {
-		iWakeupThread ( gDispatcherThreadID ); 
-		iRotateThreadReadyQueue ( 30 ); 
-		alarmID = iSetAlarm ( 625, &ioAlarmFunc, NULL ); 
-	}
-} 
 
 #ifdef __EESIO_DEBUG
 static char tbuf[2048];
@@ -369,16 +322,10 @@ int ioBlockOps(int block) {
 		}
 		
 		// now all io should be blocked
-		// stop the timer as well...
-		stopIOTimer = 1;
-		ReleaseAlarm(alarmID);
 	} else if (!block && isIOBlocked) {
+		WakeupThread(gIOThreadId);
 		isIOBlocked = 0;
-		stopIOTimer = 0;
-		// create the alarm again
-		alarmID = SetAlarm( 625, &ioAlarmFunc, NULL); 
 	}
-	
 
 	return IO_OK;
 }

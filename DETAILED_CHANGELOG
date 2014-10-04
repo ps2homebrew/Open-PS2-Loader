@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev702 - Rewritten the patching system and how parameters are passed to IOPCORE, for maintainability. - Sat Oct 04 03:45:38 2014 +0800
+rev701 - Added a patch for Super Robot Wars IMPACT, and optimized CDVDMAN's callback functionality. - Fri Oct 03 05:35:49 2014 +0800
 rev700 - Fixed CDVDMAN initialization. Fixes: SSX World Tour and the Harry Potter series. - Tue Sep 30 08:54:16 2014 +0800
 rev699 - Updated USBHDFSD to support disks >1TB and <=2TB (Sync'ed with PS2SDK update). - Tue Sep 30 01:01:15 2014 +0800
 rev698 - Corrected path handling, which was broken in commit e5e85f0. - Sun Sep 28 09:44:28 2014 +0800

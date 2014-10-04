@@ -152,8 +152,8 @@ typedef struct {
 typedef struct {
 	iop_file_t *f;
 	u32 lsn;
-	u32 filesize;
-	u32 position;
+	unsigned int filesize;
+	unsigned int position;
 } FHANDLE;
 
 // internal functions prototypes
@@ -220,48 +220,48 @@ u32 (*pinet_addr)(const char *cp); 									// #24
 static int cdrom_dummy(void);
 static int cdrom_init(iop_device_t *dev);
 static int cdrom_deinit(iop_device_t *dev);
-static int cdrom_open(iop_file_t *f, char *filename, int mode);
+static int cdrom_open(iop_file_t *f, const char *filename, int mode);
 static int cdrom_close(iop_file_t *f);
-static int cdrom_read(iop_file_t *f, void *buf, u32 size);
+static int cdrom_read(iop_file_t *f, void *buf, int size);
 static int cdrom_lseek(iop_file_t *f, u32 offset, int where);
-static int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat);
-static int cdrom_dopen(iop_file_t *f, char *dirname);
+static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat);
+static int cdrom_dopen(iop_file_t *f, const char *dirname);
 static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
 static int cdrom_dclose(iop_file_t *f);
 static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
 static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where);
 static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
-static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
+static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen);
 
 // driver ops func tab
-static void *cdrom_ops[27] = {
-	(void*)cdrom_init,
-	(void*)cdrom_deinit,
-	(void*)cdrom_dummy,
-	(void*)cdrom_open,
-	(void*)cdrom_close,
-	(void*)cdrom_read,
-	(void*)cdrom_dummy,
-	(void*)cdrom_lseek,
-	(void*)cdrom_ioctl,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dopen,
-	(void*)cdrom_dclose,
-	(void*)cdrom_dread,
-	(void*)cdrom_getstat,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_lseek64,
-	(void*)cdrom_devctl,
-	(void*)cdrom_dummy,
-	(void*)cdrom_dummy,
-	(void*)cdrom_ioctl2
+static struct _iop_ext_device_ops cdrom_ops = {
+	&cdrom_init,
+	&cdrom_deinit,
+	(void*)&cdrom_dummy,
+	&cdrom_open,
+	&cdrom_close,
+	&cdrom_read,
+	(void*)&cdrom_dummy,
+	&cdrom_lseek,
+	&cdrom_ioctl,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	&cdrom_dopen,
+	&cdrom_dclose,
+	&cdrom_dread,
+	&cdrom_getstat,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	&cdrom_lseek64,
+	(void*)&cdrom_devctl,
+	(void*)&cdrom_dummy,
+	(void*)&cdrom_dummy,
+	&cdrom_ioctl2
 };
 
 // driver descriptor
@@ -270,167 +270,7 @@ static iop_ext_device_t cdrom_dev = {
 	IOP_DT_FS | IOP_DT_FSEXT,
 	1,
 	"CD-ROM ",
-	(struct _iop_ext_device_ops *)&cdrom_ops
-};
-
-// devctl funcs
-int (*devctl_fn)(void *args, void *buf);
-static int devctl_dummy(void *args, void *buf);
-static int devctl_dummy2(void *args, void *buf);
-static int devctl_retonly(void *args, void *buf);
-static int devctl_cdreadclock(void *args, void *buf);
-static int devctl_cdreadGUID(void *args, void *buf);
-static int devctl_cdreadDiskID(void *args, void *buf);
-static int devctl_cdgetdisktype(void *args, void *buf);
-static int devctl_cdgeterror(void *args, void *buf);
-static int devctl_cdtrayreq(void *args, void *buf);
-static int devctl_cdstatus(void *args, void *buf);
-static int devctl_cddiskready(void *args, void *buf);
-static int devctl_cdreadModelID(void *args, void *buf);
-static int devctl_cdStinit(void *args, void *buf);
-static int devctl_cdabort(void *args, void *buf);
-static int devctl_cdstandby(void *args, void *buf);
-static int devctl_cdstop(void *args, void *buf);
-static int devctl_cdpause(void *args, void *buf);
-static int devctl_cdgettoc(void *args, void *buf);
-static int devctl_intref(void *args, void *buf);
-
-// devctl funcs array
-static void *devctl_tab[134] = {
-    (void *)devctl_cdreadclock,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_cdreadGUID,
-	(void *)devctl_cdreadDiskID,
-	(void *)devctl_cdgetdisktype,
-	(void *)devctl_cdgeterror,
-	(void *)devctl_cdtrayreq,
-	(void *)devctl_cdstatus,
-	(void *)devctl_retonly,
-	(void *)devctl_retonly,
-	(void *)devctl_cddiskready,
-	(void *)devctl_cdreadModelID,
-	(void *)devctl_cdStinit,
-	(void *)devctl_cdabort,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy2,
-	(void *)devctl_dummy2,
-	(void *)devctl_dummy2,
-	(void *)devctl_dummy,
-	(void *)devctl_cdstandby,
-	(void *)devctl_cdstop,
-	(void *)devctl_cdpause,
-	(void *)devctl_cdgettoc,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy2,
-	(void *)devctl_dummy2,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_dummy,
-	(void *)devctl_intref
+	&cdrom_ops
 };
 
 #define MAX_FDHANDLES 		64
@@ -448,7 +288,7 @@ cdvdman_status_t cdvdman_stat;
 static void *user_cb;
 
 #ifndef HDD_DRIVER
-static int cdvdman_layer1start = 0;
+static u32 cdvdman_layer1start = 0;
 #endif
 
 static int cdrom_io_sema;
@@ -496,17 +336,24 @@ static int cdvdman_cur_disc_type = 0;	/* real current disc type */
 unsigned int ReadPos = 0;		/* Current buffer offset in 2048-byte sectors. */
 
 static iop_sys_clock_t gCdvdCallback_SysClock;
+#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+static int POFFThreadID;
+#endif
 
 //-------------------------------------------------------------------------
 #ifdef ALT_READ_CORE
 
-#define NCMD_INIT 		0x00
-#define NCMD_READ 		0x01
-#define NCMD_READCDDA 		0x02
-#define NCMD_SEEK 		0x03
-#define NCMD_STANDBY 		0x04
-#define NCMD_STOP 		0x05
-#define NCMD_PAUSE 		0x06
+enum NCMD_CMD{
+	NCMD_INIT	= 0x00,
+	NCMD_READ,
+	NCMD_READCDDA,
+	NCMD_SEEK,
+	NCMD_STANDBY,
+	NCMD_STOP,
+	NCMD_PAUSE,
+
+	NCMD_COUNT
+};
 
 static int cdvdman_NCmdlocksema;
 static int cdvdman_NCmdsema;
@@ -556,40 +403,6 @@ static void NCmd_cdPause(void *ndata);
 static int (*cdSync_fn)(void);
 static int cdSync_blk(void);
 static int cdSync_noblk(void);
-static int cdSync_dummy(void);
-
-// NCmd funcs array
-static void *NCmd_tab[7] = {
-    (void *)NCmd_cdInit,
-    (void *)NCmd_cdRead,
-    (void *)NCmd_cdReadCDDA,
-    (void *)NCmd_cdSeek,
-    (void *)NCmd_cdStandby,
-    (void *)NCmd_cdStop,
-    (void *)NCmd_cdPause
-};
-
-// cdSync funcs array
-static void *cdSync_tab[18] = {
-    (void *)cdSync_blk,
-    (void *)cdSync_noblk,
-    (void *)cdSync_dummy,
-    (void *)cdSync_blk,
-    (void *)cdSync_dummy,
-    (void *)cdSync_blk,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_dummy,
-    (void *)cdSync_blk,
-    (void *)cdSync_noblk
-};
 
 //--------------------------------------------------------------
 static NCmdMbx_t *cdvdman_setNCmdMbx(void)
@@ -769,7 +582,7 @@ static void cdvdman_startNCmdthread(void)
 	cdvdman_NCmdsemacount = 0;
 
 	thread_param.thread = (void *)cdvdman_NCmdthread;
- 	thread_param.stacksize = 0x2000;
+ 	thread_param.stacksize = 0x400;
 	thread_param.priority = 0x01;
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
@@ -781,12 +594,28 @@ static void cdvdman_startNCmdthread(void)
 //--------------------------------------------------------------
 static void cdvdman_NCmdCall(u8 ncmd, void *ndata)
 {
-	if ((u32)(ncmd >= 7))
-		return;
-
-	NCmd_fn = NCmd_tab[ncmd];
-
-	NCmd_fn(ndata);
+	switch(ncmd){
+		case NCMD_INIT:
+			NCmd_cdInit();
+			break;
+		case NCMD_READ:
+			NCmd_cdRead();
+			break;
+		case NCMD_READCDDA:
+			cdReadCDDA();
+			break;
+		case NCMD_SEEK:
+			NCmd_cdSeek();
+			break;
+		case NCMD_STANDBY:
+			NCmd_cdStandby();
+			break;
+		case NCMD_STOP:
+			NCmd_cdStop();
+		case NCMD_PAUSE:
+			NCmd_cdPause();
+			break;
+	}
 }
 
 //--------------------------------------------------------------
@@ -884,12 +713,6 @@ static int cdSync_blk(void)
 {
 	cdvdman_waitsignalNCmdsema();
 
-	return 0;
-}
-
-//--------------------------------------------------------------
-static int cdSync_dummy(void)
-{
 	return 0;
 }
 
@@ -1042,8 +865,22 @@ static void fs_init(void)
 }
 
 //-------------------------------------------------------------------------
+#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+static void cdvdman_poff_thread(void *arg){
+	int stat;
+
+	SleepThread();
+	dev9Shutdown();
+	sceCdPowerOff(&stat);
+}
+#endif
+
 static void cdvdman_init(void)
 {
+#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+	iop_thread_t ThreadData;
+#endif
+
 	if(!cdvdman_cdinited)
 	{
 		cdvdman_stat.err = CDVD_ERR_NO;
@@ -1058,6 +895,17 @@ static void cdvdman_init(void)
 #else
 		fs_init();
 #endif
+
+#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+		if(cdvdman_settings.common.flags&IOPCORE_ENABLE_POFF){
+			ThreadData.attr=TH_C;
+			ThreadData.priority=1;
+			ThreadData.stacksize=0x400;
+			ThreadData.thread=&cdvdman_poff_thread;
+			StartThread(POFFThreadID=CreateThread(&ThreadData), NULL);
+		}
+#endif
+
 		cdvdman_cdinited = 1;
 	}
 }
@@ -1186,12 +1034,18 @@ int sceCdSync(int mode)
 	DPRINTF("sceCdSync %d sync flag = %d\n", mode, sync_flag);
 
 #ifdef ALT_READ_CORE
-	if (mode >= 18)
-		return cdSync_dummy();
+	int result;
 
-	cdSync_fn = cdSync_tab[mode];
+	switch(mode){
+		case 1:
+		case 17:
+			result = cdSync_noblk();
+			break;
+		default:
+			result = cdSync_blk();
+	}
 
-	return cdSync_fn();
+	return result;
 #else
 	if (!sync_flag)
 		return 0;
@@ -1930,7 +1784,7 @@ static FHANDLE *cdvdman_getfilefreeslot(void)
 }
 
 //--------------------------------------------------------------
-static int cdrom_open(iop_file_t *f, char *filename, int mode)
+static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 {
 	register int r = 0;
 	FHANDLE *fh;
@@ -1992,7 +1846,7 @@ static int cdrom_close(iop_file_t *f)
 }
 
 //--------------------------------------------------------------
-static int cdrom_read(iop_file_t *f, void *buf, u32 size)
+static int cdrom_read(iop_file_t *f, void *buf, int size)
 {
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 	register int rpos, sectorpos;
@@ -2000,7 +1854,7 @@ static int cdrom_read(iop_file_t *f, void *buf, u32 size)
 
 	WaitSema(cdrom_io_sema);
 
-	DPRINTF("cdrom_read size=%d file_position=%d\n", (int)size, (int)fh->position);
+	DPRINTF("cdrom_read size=%d file_position=%d\n", size, fh->position);
 
 	rpos = 0;
 
@@ -2044,7 +1898,7 @@ static int cdrom_lseek(iop_file_t *f, u32 offset, int where)
 
 	WaitSema(cdrom_io_sema);
 
-	DPRINTF("cdrom_lseek offset=%d where=%d\n", (int)offset, (int)where);
+	DPRINTF("cdrom_lseek offset=%ld where=%d\n", offset, where);
 
 	switch (where) {
 		case SEEK_CUR:
@@ -2081,13 +1935,13 @@ ssema:
 }
 
 //--------------------------------------------------------------
-static int cdrom_getstat(iop_file_t *f, char *filename, iox_stat_t *stat)
+static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 {
 	return sceCdLayerSearchFile((cdl_file_t *)&stat->attr, filename, f->unit) - 1;
 }
 
 //--------------------------------------------------------------
-static int cdrom_dopen(iop_file_t *f, char *dirname)
+static int cdrom_dopen(iop_file_t *f, const char *dirname)
 {
 	return cdrom_open(f, dirname, 8);
 }
@@ -2102,7 +1956,7 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 
 	WaitSema(cdrom_io_sema);
 
-	DPRINTF("cdrom_dread fh->lsn=%d\n", (int)fh->lsn);
+	DPRINTF("cdrom_dread fh->lsn=%lu\n", fh->lsn);
 
 	sceCdRead0(fh->lsn, 1, cdvdman_fs_buf, NULL);
 
@@ -2161,20 +2015,25 @@ static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where)
 }
 
 //--------------------------------------------------------------
-static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
+static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen)
 {
-	register int r = 0;
+	int r = 0;
 
 	WaitSema(cdrom_io_sema);
 
-	if (cmd == CIOCSTREAMPAUSE)
-		sceCdStPause();
-	else if (cmd == CIOCSTREAMRESUME)
-		sceCdStResume();
-	else if (cmd == CIOCSTREAMSTAT)
-		r = sceCdStStat();
-	else
-		r = -EINVAL;
+	switch(cmd){
+		case CIOCSTREAMPAUSE:
+			sceCdStPause();
+			break;
+		case CIOCSTREAMRESUME:
+			sceCdStResume();
+			break;
+		case CIOCSTREAMSTAT:
+			r = sceCdStStat();
+			break;
+		default:
+			r = -EINVAL;
+	}
 
 	SignalSema(cdrom_io_sema);
 
@@ -2184,158 +2043,83 @@ static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, u32 arglen, void *bu
 //--------------------------------------------------------------
 static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
 {
-	register int r;
+	int result;
 
 	if (!name)
 		return -ENOENT;
 
 	WaitSema(cdrom_io_sema);
 
-	cmd -= CDIOC_CMDBASE;
-	if (cmd > 133)
-		return devctl_dummy(args, buf);
-
-	devctl_fn = devctl_tab[cmd];
-	r = devctl_fn(args, buf);
+	result = 0;
+	switch(cmd){
+		case CDIOC_READCLOCK:
+			sceCdReadClock((cd_clock_t *)buf);
+			break;
+		case CDIOC_READGUID:
+			sceCdReadGUID(buf);
+			break;
+		case CDIOC_READDISKGUID:
+			sceCdReadDiskID(buf);
+			break;
+		case CDIOC_GETDISKTYPE:
+			*(int*)buf = sceCdGetDiskType();
+			break;
+		case CDIOC_GETERROR:
+			*(int *)buf = sceCdGetError();
+			break;
+		case CDIOC_TRAYREQ:
+			sceCdTrayReq(*(int *)args, (u32 *)buf);
+			break;
+		case CDIOC_STATUS:
+			*(int *)buf = sceCdStatus();
+			break;
+		case CDIOC_POWEROFF:
+		case CDIOC_MMODE:
+			result = 1;
+			break;
+		case CDIOC_DISKRDY:
+			*(int *)buf = sceCdDiskReady(*(int *)args);
+			break;
+		case CDIOC_READMODELID:
+			sceCdReadModelID(buf);
+			break;
+		case CDIOC_STREAMINIT:
+			sceCdStInit(((u32*)args)[0], ((u32*)args)[1], (void *)((u32*)args)[2]);
+			break;
+		case CDIOC_BREAK:
+			sceCdBreak();
+			break;
+		case CDIOC_SPINNOM:
+		case CDIOC_SPINSTM:
+		case CDIOC_TRYCNT:
+		case CDIOC_READDVDDUALINFO:
+		case CDIOC_INIT:
+			result = 0;
+			break;
+		case CDIOC_STANDBY:
+			sceCdStandby();
+			break;
+		case CDIOC_STOP:
+			sceCdStop();
+			break;
+		case CDIOC_PAUSE:
+			sceCdPause();
+			break;
+		case CDIOC_GETTOC:
+			sceCdGetToc(buf);
+			break;
+		case CDIOC_GETINTREVENTFLG:
+			*(int *)buf = cdvdman_stat.intr_ef;
+			result = cdvdman_stat.intr_ef;
+			break;
+		default:
+			result = -EIO;
+			break;
+	}
 
 	SignalSema(cdrom_io_sema);
 
-	return r;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_dummy(void *args, void *buf)
-{
-	return -EIO;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_dummy2(void *args, void *buf)
-{
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_retonly(void *args, void *buf)
-{
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdreadclock(void *args, void *buf)
-{
-	sceCdReadClock((cd_clock_t *)buf);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-int devctl_cdreadGUID(void *args, void *buf)
-{
-	sceCdReadGUID(buf);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdreadDiskID(void *args, void *buf)
-{
-	sceCdReadDiskID(buf);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdgetdisktype(void *args, void *buf)
-{
-	*(int *)buf = sceCdGetDiskType();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdgeterror(void *args, void *buf)
-{
-	*(int *)buf = sceCdGetError();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdtrayreq(void *args, void *buf)
-{
-	sceCdTrayReq(*(int *)args, (u32 *)args);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdstatus(void *args, void *buf)
-{
-	*(int *)buf = sceCdStatus();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cddiskready(void *args, void *buf)
-{
-	*(int *)buf = sceCdDiskReady(*(int *)args);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-int devctl_cdreadModelID(void *args, void *buf)
-{
-	sceCdReadModelID(buf);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdStinit(void *args, void *buf)
-{
-	u8 *p = (u8 *)buf;
-	u32 bufmax  = *(u32 *)&p[0];
-	u32 bankmax = *(u32 *)&p[4];
-	u32 iopbuf  = *(u32 *)&p[8];
-
-	sceCdStInit(bufmax, bankmax, (void *)iopbuf);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-int devctl_cdabort(void *args, void *buf)
-{
-	sceCdBreak();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-int devctl_cdstandby(void *args, void *buf)
-{
-	sceCdStandby();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdstop(void *args, void *buf)
-{
-	sceCdStop();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdpause(void *args, void *buf)
-{
-	sceCdPause();
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_cdgettoc(void *args, void *buf)
-{
-	sceCdGetToc(buf);
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int devctl_intref(void *args, void *buf)
-{
-	*(int *)buf = cdvdman_stat.intr_ef;
-	return cdvdman_stat.intr_ef;
+	return result;
 }
 
 //-------------------------------------------------------------------------
@@ -2664,7 +2448,7 @@ static void cdvdman_startThreads(void)
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 	thread_param.thread = &cdvdman_cdread_Thread;
-	thread_param.stacksize = 0x2000;
+	thread_param.stacksize = 0x400;
 	thread_param.priority = 0x0f;
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
@@ -2740,10 +2524,18 @@ static int intrh_cdrom(void *common){
 
 	if(CDVDreg_PWOFF&CDL_DATA_END){
 		//If IGR is enabled: Do not acknowledge the interrupt here. The EE-side IGR code will monitor and acknowledge it.
-		if(cdvdman_settings.common.flags&IOPCORE_ENABLE_POFF) CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
+		if(cdvdman_settings.common.flags&IOPCORE_ENABLE_POFF){
+			CDVDreg_PWOFF=CDL_DATA_END;	//Acknowldge power-off request.
+		}
 		iSetEventFlag(cdvdman_stat.intr_ef, 0x14);	//Notify FILEIO and CDVDFSV of the power-off event.
 
 		//Call power-off callback here. OPL doesn't handle one, so do nothing.
+#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+		if(cdvdman_settings.common.flags&IOPCORE_ENABLE_POFF){
+			//If IGR is disabled, switch off the console.
+			iWakeupThread(POFFThreadID);
+		}
+#endif
 	}
 	else CDVDreg_PWOFF=CDL_DATA_COMPLETE;	//Acknowledge interrupt
 

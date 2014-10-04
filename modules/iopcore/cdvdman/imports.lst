@@ -78,6 +78,8 @@ I_SetAlarm
 I_iSetAlarm
 I_CancelAlarm
 I_USec2SysClock
+I_SleepThread
+I_iWakeupThread
 thbase_IMPORTS_end
 
 thevent_IMPORTS_start

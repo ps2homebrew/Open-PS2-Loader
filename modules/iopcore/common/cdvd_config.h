@@ -22,7 +22,7 @@ struct cdvdman_settings_hdd{
 
 struct cdvdman_settings_smb{
 	struct cdvdman_settings_common common;
-	u8 pc_ip[4];
+	s8 pc_ip[16];
 	u16 pc_port;
 	s8 pc_share[33];
 	s8 pc_prefix[33];

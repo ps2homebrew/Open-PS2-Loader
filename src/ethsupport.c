@@ -62,7 +62,7 @@ void ethSMBConnect(void) {
 		sprintf(ethPrefix, ethBase);
 
 	// open tcp connection with the server / logon to SMB server
-	sprintf(logon.serverIP, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	sprintf(logon.serverIP, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	logon.serverPort = gPCPort;
 
 	if (strlen(gPCPassword) > 0) {
@@ -431,30 +431,19 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	if (game->isISO) {
 		strcpy(settings->files.iso.extension, game->extension);
 		strcpy(settings->files.iso.startup, game->startup);
-		strncpy(settings->files.iso.title, game->name, strlen(game->name) + 1);
-		settings->files.iso.title[sizeof(settings->files.iso.title)-1] = '\0';
+		strcpy(settings->files.iso.title, game->name);
 	} else {
 		sprintf(filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
-		strncpy(settings->filename, filename, strlen(filename) + 1);
-		settings->filename[sizeof(settings->filename)-1] = '\0';
+		strcpy(settings->filename, filename);
 		settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
 	}
 
-	//TODO: OPL uses integers to store the IP address, which causes this need for conversion.
-	settings->pc_ip[0]=pc_ip[0];
-	settings->pc_ip[1]=pc_ip[1];
-	settings->pc_ip[2]=pc_ip[2];
-	settings->pc_ip[3]=pc_ip[3];
-
+	sprintf(settings->pc_ip, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 	settings->pc_port=gPCPort;
-	strncpy(settings->pc_share, gPCShareName, sizeof(settings->pc_share)-1);
-	settings->pc_share[sizeof(settings->pc_share)-1] = '\0';
-	strncpy(settings->pc_prefix, gETHPrefix, sizeof(settings->pc_prefix)-1);
-	settings->pc_prefix[sizeof(settings->pc_prefix)-1] = '\0';
-	strncpy(settings->smb_user, gPCUserName, sizeof(settings->smb_user)-1);
-	settings->smb_user[sizeof(settings->smb_user)-1] = '\0';
-	strncpy(settings->smb_password, gPCPassword, sizeof(settings->smb_password)-1);
-	settings->smb_password[sizeof(settings->smb_password)-1] = '\0';
+	strcpy(settings->pc_share, gPCShareName);
+	strcpy(settings->pc_prefix, gETHPrefix);
+	strcpy(settings->smb_user, gPCUserName);
+	strcpy(settings->smb_password, gPCPassword);
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
@@ -469,7 +458,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 #ifdef VMC
 #define VMC_TEMP2	size_mcemu_irx,&smb_mcemu_irx,
 #else
-#define VMC_TEMP2	
+#define VMC_TEMP2
 #endif
 	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, VMC_TEMP2 compatmask);
 }

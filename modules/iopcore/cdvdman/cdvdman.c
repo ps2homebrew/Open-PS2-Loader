@@ -63,7 +63,7 @@ struct cdvdman_settings_smb cdvdman_settings={
 		0x39393939,
 		"B00BS"
 	},
-	{192,168,0,10},
+	"192.168.0.10",
 	0x8510,
 	"PS2SMB",
 	"",
@@ -778,19 +778,18 @@ static void fs_init(void)
 
 #ifdef SMB_DRIVER
 	register int i = 0;
-	char tmp_str[256], ip_address[16];
+	char tmp_str[256];
 
 	ps2ip_init();
 
 	// Open the Connection with SMB server
-	sprintf(ip_address, "%u.%u.%u.%u", cdvdman_settings.pc_ip[0], cdvdman_settings.pc_ip[1], cdvdman_settings.pc_ip[2], cdvdman_settings.pc_ip[3]);
-	smb_NegociateProtocol(ip_address, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password);
+	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password);
 
 	// open a session
 	smb_SessionSetupAndX();
 
 	// Then tree connect on the share resource
-	sprintf(tmp_str, "\\\\%s\\%s", ip_address, cdvdman_settings.pc_share);
+	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.pc_ip, cdvdman_settings.pc_share);
 	smb_TreeConnectAndX(tmp_str);
 
 	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
@@ -815,7 +814,7 @@ static void fs_init(void)
 #endif
 
 #ifdef HDD_DRIVER
-	DPRINTF("fs_init: apa header LBA = %d\n", cdvdman_settings.lba_start);
+	DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
 
 	int r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ);
 	if (r != 0)
@@ -1247,7 +1246,7 @@ int *sceCdCallback(void *func)
 	int oldstate;
 	void *old_cb;
 
-	DPRINTF("sceCdCallback %08x\n", (int)func);
+	DPRINTF("sceCdCallback %p\n", func);
 
 	old_cb = user_cb;
 
@@ -1657,7 +1656,7 @@ int sceCdReadDiskID(void *DiskID)
 	if (i == 5)
 		*((u16 *)DiskID) = (u16)0xadde;
 	else
-		mips_memcpy(DiskID, &cdvdman_settings.common.DiscID[1], 5);
+		mips_memcpy(DiskID, cdvdman_settings.common.DiscID, 5);
 
 	return 1;
 }

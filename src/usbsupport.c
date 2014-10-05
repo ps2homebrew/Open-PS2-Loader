@@ -333,7 +333,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 #ifdef VMC
 #define VMC_TEMP4	size_mcemu_irx, &usb_mcemu_irx,
 #else
-#define VMC_TEMP4	
+#define VMC_TEMP4
 #endif
 	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, VMC_TEMP4 compatmask);
 }

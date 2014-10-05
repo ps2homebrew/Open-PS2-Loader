@@ -50,10 +50,10 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 		while (fioDread(fd, &record) > 0) {
 			if ((size = isValidIsoName(record.name)) > 0) {
 				struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
-				
+
 				next->next = *glist;
 				*glist = next;
-				
+
 				base_game_info_t *game = &(*glist)->gameinfo;
 
 				strncpy(game->name, &record.name[GAME_STARTUP_MAX], size);
@@ -88,7 +88,7 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 
 	// temporary storage for the game names
 	struct game_list_t *dlist_head = NULL;
-	
+
 	// count iso games in "cd" directory
 	snprintf(path, sizeof(path), "%sCD", prefix);
 	count += scanForISO(path, 0x12, &dlist_head);
@@ -96,8 +96,7 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	// count iso games in "dvd" directory
 	snprintf(path, sizeof(path), "%sDVD", prefix);
 	count += scanForISO(path, 0x14, &dlist_head);
-        
-        
+
 	// count and process games in ul.cfg
 	snprintf(path, sizeof(path), "%sul.cfg", prefix);
 	fd = openFile(path, O_RDONLY);
@@ -133,17 +132,17 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	}
 	else if (count > 0)
 		*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
-        
+
 	// copy the dlist into the list
 	while ((id < count) && dlist_head) {
 		// copy one game, advance
 		struct game_list_t *cur = dlist_head;
 		dlist_head = dlist_head->next;
-		
+
 		memcpy(&(*list)[id++], &cur->gameinfo, sizeof(base_game_info_t));
 		free(cur);
 	}
-        
+
 	*gamecount = count;
 }
 
@@ -195,15 +194,16 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 
 	// patch cdvdman timer
 	int timer = 0;
+	u32 cdvdmanTimer = 0;
 	if (configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer)) {
-		u32 cdvdmanTimer = timer * 250;
-		settings->cb_timer = cdvdmanTimer;
+		cdvdmanTimer = timer * 250;
 	}
+	settings->cb_timer = cdvdmanTimer;
 
 	*patchindex = i;
 
 	// game id
-	memcpy(settings->DiscID, &gameid, 5);
+	memcpy(settings->DiscID, gameid, 5);
 
 	return compatmask;
 }

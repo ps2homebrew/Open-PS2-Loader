@@ -113,7 +113,7 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 
 	DPRINTF("Loading extra IOP modules...\n");
 	if (GameMode == USB_MODE) {
-		LoadMemModule(usbd_irx, size_usbd_irx, 0, NULL);
+		LoadMemModule(usbd_irx, size_usbd_irx, 11, "thpri=15,16");
 	}
 	else if (GameMode == ETH_MODE) {
 		LoadMemModule(smstcpip_irx, size_smstcpip_irx, 0, NULL);

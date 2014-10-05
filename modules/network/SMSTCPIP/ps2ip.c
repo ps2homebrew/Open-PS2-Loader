@@ -36,6 +36,7 @@
 #include "arch/sys_arch.h"
 
 #define	SYS_MBOX_SIZE 64
+#define	SYS_THREAD_PRIO_BASE TCPIP_THREAD_PRIO
 
 struct sys_mbox_msg {
  struct sys_mbox_msg* pNext;
@@ -197,7 +198,7 @@ static void TimerThread ( void* apArg ) {
 
 static void InitTimer ( void ) {
 
- iop_thread_t lThread = { TH_C, 0, TimerThread, 0x800, 0x22 };
+ iop_thread_t lThread = { TH_C, 0, TimerThread, 0x800, SYS_THREAD_PRIO_BASE };
  int          lTID    = CreateThread ( &lThread );
 
  if ( lTID < 0 ) ExitDeleteThread ();
@@ -363,8 +364,6 @@ int _start ( int argc,char** argv ) {
  return MODULE_RESIDENT_END; 
 
 }  /* end _start */
-
-#define	SYS_THREAD_PRIO_BASE 0x22
 
 sys_thread_t sys_thread_new (
               void ( *pFunction )(  void* ),void* pvArg,int iPrio

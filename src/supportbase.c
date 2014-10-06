@@ -71,14 +71,16 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 			}
 		}
 		fioDclose(fd);
+	}else{
+		count = fd;
 	}
 
 	return count;
 }
 
-void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount) {
-	int fd, size, id = 0;
-	size_t count = 0;
+int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount) {
+	int fd, size, id = 0, result;
+	int count;
 	char path[256];
 
 	free(*list);
@@ -91,11 +93,13 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 
 	// count iso games in "cd" directory
 	snprintf(path, sizeof(path), "%sCD", prefix);
-	count += scanForISO(path, 0x12, &dlist_head);
+	count = scanForISO(path, 0x12, &dlist_head);
 
 	// count iso games in "dvd" directory
 	snprintf(path, sizeof(path), "%sDVD", prefix);
-	count += scanForISO(path, 0x14, &dlist_head);
+	if((result = scanForISO(path, 0x14, &dlist_head)) >= 0){
+		count = count<0?result:count+result;
+	}
 
 	// count and process games in ul.cfg
 	snprintf(path, sizeof(path), "%sul.cfg", prefix);
@@ -103,6 +107,7 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 	if(fd >= 0) {
 		char buffer[0x040];
 
+		if(count < 0) count = 0;
 		size = getFileSize(fd);
 		*fsize = size;
 		count += size / 0x040;
@@ -130,8 +135,9 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 		}
 		fioClose(fd);
 	}
-	else if (count > 0)
+	else if (count > 0){
 		*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
+	}
 
 	// copy the dlist into the list
 	while ((id < count) && dlist_head) {
@@ -143,7 +149,9 @@ void sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* ga
 		free(cur);
 	}
 
-	*gamecount = count;
+	if(count > 0) *gamecount = count;
+
+	return count;
 }
 
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex) {

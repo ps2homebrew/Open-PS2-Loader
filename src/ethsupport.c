@@ -264,11 +264,15 @@ static int ethNeedsUpdate(void) {
 }
 
 static int ethUpdateGameList(void) {
+	int result;
+
 	if (gPCShareName[0]) {
 		if (gNetworkStartup != 0)
 			return 0;
 
-		sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount);
+		if((result = sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount)) < 0){
+			setErrorMessage(_STR_NETWORK_GAMES_LIST_ERROR, ERROR_ETH_SMB_LISTGAMES);
+		}
 	} else {
 		int i, count;
 		ShareEntry_t sharelist[128];
@@ -293,6 +297,8 @@ static int ethUpdateGameList(void) {
 				g->sizeMB = 0;
 			}
 			ethGameCount = count;
+		}else if(count < 0){
+			setErrorMessage(_STR_NETWORK_SHARE_LIST_ERROR, ERROR_ETH_SMB_LISTSHARES);
 		}
 	}
 	return ethGameCount;

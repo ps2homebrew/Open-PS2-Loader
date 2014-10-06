@@ -27,7 +27,6 @@ struct rm_texture_list_t {
 static struct rm_texture_list_t *uploadedTextures = NULL;
 
 static int order;
-static int vsync = 1;
 static enum rm_vmode vmode = RM_VMODE_AUTO;
 
 #define NUM_RM_VMODES 6
@@ -267,8 +266,7 @@ void rmEndFrame(void) {
 	
 	if(!gsGlobal->FirstFrame)
 	{
-		if (vsync)
-			SleepThread();
+		SleepThread();
 		
 		if(gsGlobal->DoubleBuffering == GS_SETTING_ON)
 		{
@@ -285,8 +283,7 @@ void rmEndFrame(void) {
 }
 
 static int rmOnVSync(void) {
-	if (vsync)
-		iWakeupThread(guiThreadID);
+	iWakeupThread(guiThreadID);
 
 	return 0;
 }
@@ -302,8 +299,6 @@ void rmInit() {
 
 	// Initialize the DMAC
 	dmaKit_chan_init(DMA_CHANNEL_GIF);
-	dmaKit_chan_init(DMA_CHANNEL_FROMSPR);
-	dmaKit_chan_init(DMA_CHANNEL_TOSPR);
 
 	rmSetMode(1);
 
@@ -327,10 +322,9 @@ int rmSetMode(int force) {
 		gVMode = RM_VMODE_AUTO;
 
 	// we don't want to set the vmode without a reason...
-	int changed = (vmode != gVMode || vsync != gVSync || force);
+	int changed = (vmode != gVMode || force);
 	if (changed) {
 		vmode = gVMode;
-		vsync = gVSync;
 
 		gsGlobal->Mode = rm_mode_table[vmode];
 		gsGlobal->Height = rm_height_table[vmode];

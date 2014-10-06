@@ -202,7 +202,6 @@ struct UIItem diaUIConfig[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_VMODE}}}, {UI_SPACER}, {UI_ENUM, UICFG_VMODE, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_VSYNC}}}, {UI_SPACER}, {UI_BOOL, UICFG_VSYNC, 1, -1, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER}, {UI_BOOL, UICFG_WIDESCREEN, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 	{UI_BREAK},
 

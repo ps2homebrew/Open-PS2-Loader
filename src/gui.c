@@ -332,7 +332,6 @@ void guiShowUIConfig(void) {
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
-	diaSetInt(diaUIConfig, UICFG_VSYNC, gVSync);
  
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
 	if (ret) {
@@ -352,7 +351,6 @@ void guiShowUIConfig(void) {
 		diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
 		diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
 		diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
- 		diaGetInt(diaUIConfig, UICFG_VSYNC, &gVSync);
 
 		applyConfig(themeID, langID);
 	}

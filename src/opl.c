@@ -478,7 +478,6 @@ static void _loadConfig() {
 			configGetInt(configOPL, "use_info_screen", &gUseInfoScreen);
 			configGetInt(configOPL, "enable_coverart", &gEnableArt);
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
-			configGetInt(configOPL, "vsync", &gVSync);
 			configGetInt(configOPL, "vmode", &gVMode);
 
 #ifdef GSM
@@ -555,7 +554,6 @@ static void _saveConfig() {
 		configSetInt(configOPL, "enable_coverart", gEnableArt);
 		configSetInt(configOPL, "wide_screen", gWideScreen);
 		configSetInt(configOPL, "vmode", gVMode);
-		configSetInt(configOPL, "vsync", gVSync);
 
 #ifdef GSM
 		configSetInt(configOPL, "enable_gsm", gEnableGSM);
@@ -913,7 +911,6 @@ static void setDefaults(void) {
 	frameCounter = UPDATE_FRAME_COUNT;
 
 	gVMode = RM_VMODE_AUTO;
-	gVSync = 1;
 
 #ifdef GSM
 	gEnableGSM = 0;

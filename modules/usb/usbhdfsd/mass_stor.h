@@ -3,20 +3,19 @@
 
 struct _mass_dev
 {
-	int controlEp;		//config endpoint id
-	int bulkEpI;		//in endpoint id
-	unsigned char bulkEpIAddr; // in endpoint address
-	int bulkEpO;		//out endpoint id
-	unsigned char bulkEpOAddr; // out endpoint address
-	int packetSzI;		//packet size in
-	int packetSzO;		//packet size out
-	int devId;		//device id
-	int configId;	//configuration id
-	int status;
-	int interfaceNumber;	//interface number
-	int interfaceAlt;	//interface alternate setting
-	unsigned int sectorSize; // = 512; // store size of sector from usb mass
+	int controlEp;			//config endpoint id
+	int bulkEpI;			//in endpoint id
+	int bulkEpO;			//out endpoint id
+	unsigned short int packetSzI;	//packet size in
+	unsigned short int packetSzO;	//packet size out
+	int devId;			//device id
+	unsigned char configId;		//configuration id
+	unsigned char status;
+	unsigned char interfaceNumber;	//interface number
+	unsigned char interfaceAlt;	//interface alternate setting
+	unsigned int sectorSize;	// = 512; // store size of sector from usb mass
 	unsigned int maxLBA;
+	int ioSema;
 	cache_set* cache;
 };
 

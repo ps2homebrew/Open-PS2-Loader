@@ -208,9 +208,6 @@ int (*plwip_socket)(int domain, int type, int protocol); 						// #13
 u32 (*pinet_addr)(const char *cp); 									// #24
 #endif
 
-// for "cdrom" devctl
-#define CDIOC_CMDBASE		0x430C
-
 // for "cdrom" ioctl2
 #define CIOCSTREAMPAUSE		0x630D
 #define CIOCSTREAMRESUME	0x630E

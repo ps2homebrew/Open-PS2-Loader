@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev706 - Improved on the reliability of USB support, added more error messages for SMB and removed VSYNC mode: - Tue Oct 07 01:57:13 2014 +0800
+rev705 - Fix for Crash Bandicoot: The Wrath of Cortex. - Mon Oct 06 00:00:36 2014 +0800
 rev704 - Fixes: - Sun Oct 05 08:31:44 2014 +0800
 rev703 - Fixes and optimizations: - Sat Oct 04 09:39:20 2014 +0800
 rev702 - Rewritten the patching system and how parameters are passed to IOPCORE, for maintainability. - Sat Oct 04 03:45:38 2014 +0800

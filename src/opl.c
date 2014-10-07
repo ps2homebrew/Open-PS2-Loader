@@ -1,7 +1,7 @@
 /*
   Copyright 2009, Volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "include/opl.h"
@@ -50,10 +50,10 @@ extern int size_pusbd_irx;
 
 typedef struct {
 	item_list_t *support;
-	
+
 	/// menu item used with this list support
 	menu_item_t menuItem;
-	
+
 	/// submenu list
 	submenu_list_t *subMenu;
 } opl_io_module_t;
@@ -461,7 +461,7 @@ static void _loadConfig() {
 
 	if (lscstatus & CONFIG_OPL) {
 		int themeID = -1, langID = -1;
-		
+
 		if (!(result & CONFIG_OPL)) {
 			result = tryAlternateDevice(lscstatus);
 		}
@@ -532,7 +532,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "eth_mode", &gETHStartMode);
 			configGetInt(configOPL, "app_mode", &gAPPStartMode);
 		}
-		
+
 		applyConfig(themeID, langID);
 	}
 
@@ -598,7 +598,7 @@ static void _saveConfig() {
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
 		configSetInt(configOPL, "app_mode", gAPPStartMode);
 	}
-	
+
 	lscret = configWriteMulti(lscstatus);
 	lscstatus = 0;
 }
@@ -642,25 +642,25 @@ void applyConfig(int themeID, int langID) {
 int loadConfig(int types) {
 	lscstatus = types;
 	lscret = 0;
-	
+
 	guiHandleDeferedIO(&lscstatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_loadConfig);
-	
+
 	return lscret;
 }
 
 int saveConfig(int types, int showUI) {
 	lscstatus = types;
 	lscret = 0;
-	
+
 	guiHandleDeferedIO(&lscstatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_saveConfig);
-	
+
 	if (showUI) {
 		if (lscret)
 			guiMsgBox(_l(_STR_SETTINGS_SAVED), 0, NULL);
 		else
 			guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0, NULL);
 	}
-	
+
 	return lscret;
 }
 
@@ -738,7 +738,7 @@ void loadHdldSvr(void) {
 	ret = 0;
 	while (!ret)
 		ret = startPads();
-		
+
 	// now ready to display some status
 }
 
@@ -758,7 +758,7 @@ void unloadHdldSvr(void) {
 
 	// reinit the input pads
 	padInit(0);
-	
+
 	int ret = 0;
 	while (!ret)
 		ret = startPads();
@@ -772,35 +772,35 @@ void unloadHdldSvr(void) {
 
 void handleHdlSrv() {
 	guiRenderTextScreen(_l(_STR_STARTINGHDL));
-	
+
 	// prepare for hdl, display screen with info
 	loadHdldSvr();
-	
+
 	int terminate = 0;
-	
+
 	while (1) {
 		if (terminate != 0)
 			guiRenderTextScreen(_l(_STR_STOPHDL));
 		else
 			guiRenderTextScreen(_l(_STR_RUNNINGHDL));
-	
+
 		sleep(2);
-		
+
 		readPads();
-		
+
 		if(getKeyOn(KEY_CIRCLE) && terminate == 0) {
 			terminate++;
 		} else if(getKeyOn(KEY_CROSS) && terminate == 1) {
 			terminate++;
-		} else if (terminate > 0) 
+		} else if (terminate > 0)
 			terminate--;
-		
+
 		if (terminate >= 2)
 			break;
 	}
-	
+
 	guiRenderTextScreen(_l(_STR_UNLOADHDL));
-	
+
 	// restore normal functionality again
 	unloadHdldSvr();
 }
@@ -810,7 +810,7 @@ void handleHdlSrv() {
 // ----------------------------------------------------------
 static void reset(void) {
 	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
-	
+
 	SifInitRpc(0);
 
 #ifdef _DTL_T10000
@@ -850,7 +850,7 @@ static void setDefaults(void) {
 	clearIOModuleT(&list_support[ETH_MODE]);
 	clearIOModuleT(&list_support[HDD_MODE]);
 	clearIOModuleT(&list_support[APP_MODE]);
-	
+
 	gBaseMCDir = "mc?:OPL";
 
 	gETHOpMode=ETH_OP_MODE_AUTO;
@@ -923,7 +923,7 @@ static void setDefaults(void) {
 #ifdef CHEAT
 	gEnableCheat = 0;
 	gCheatMode = 0;
-	
+
 	gCheatList = 0x00080000;
 	_sw(0, gCheatList);
 	_sw(0, gCheatList+4);
@@ -944,7 +944,7 @@ static void init(void) {
 	guiInit();
 	ioInit();
 	menuInit();
-	
+
 	startPads();
 
 	// handler for deffered menu updates
@@ -1015,10 +1015,10 @@ int main(int argc, char* argv[])
 
 	// queue deffered init which shuts down the intro screen later
 	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredInit);
-	
+
 	guiIntroLoop();
 	guiMainLoop();
-	
+
 	return 0;
 }
 

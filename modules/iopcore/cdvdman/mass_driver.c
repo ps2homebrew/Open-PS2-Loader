@@ -108,7 +108,7 @@ static int io_sema;
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
 #else
-#define WAITIOSEMA(x) 
+#define WAITIOSEMA(x)
 #define SIGNALIOSEMA(x)
 #endif
 
@@ -130,7 +130,7 @@ static struct MSStoDSS_t gMSStoDSS[4] = {
 	{ 512 ,  2 },
 	{ 1024,  1 },
 	{ 2048,  0 },
-	{ 4096, -1 },	
+	{ 4096, -1 },
 };
 
 static int gShiftPos;
@@ -556,7 +556,7 @@ static inline int cbw_scsi_inquiry(mass_dev* dev, void *buffer, int size)
 			if(rcode == USB_RC_OK && result == 0) return 0;
 		}
 	}
- 
+
 	return -EIO;
 }
 
@@ -774,9 +774,9 @@ int mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const u
 	WAITIOSEMA(io_sema);
 
 	for(retries = USB_IO_MAX_RETRIES; retries > 0; retries--){
-		if(cbw_scsi_write_sector(&g_mass_device, lba, buffer, nsector) == 0){
+		if(cbw_scsi_write_sector(&g_mass_device, lba, buffer, nsectors) == 0){
 			SIGNALIOSEMA(io_sema);
-			return nsector;
+			return nsectors;
 		}
 	}
 
@@ -813,7 +813,7 @@ int mass_stor_probe(int devId)
 	XPRINTF("USBHDFSD: probe: devId=%i\n", devId);
 
 	mass_dev* mass_device = &g_mass_device;
-    
+
 	/* only one device supported */
 	if ((mass_device != NULL) && (mass_device->status & DEVICE_DETECTED))
 	{
@@ -1114,7 +1114,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 		if (sectors > 2)
 			sectors = 2;
 
-		nbytes = sectors << 11;	
+		nbytes = sectors << 11;
 
 #ifndef _4K_SECTORS
 		mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);

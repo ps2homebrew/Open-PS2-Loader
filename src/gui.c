@@ -317,7 +317,7 @@ void guiShowUIConfig(void) {
 	// configure the enumerations
 	const char* scrollSpeeds[] = { _l(_STR_SLOW), _l(_STR_MEDIUM),	_l(_STR_FAST), NULL };
 	const char* vmodeNames[] = { _l(_STR_AUTO), "PAL", "NTSC", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "VGA 640x480p @60Hz", NULL };
-	
+
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **) thmGetGuiList());
 	diaSetEnum(diaUIConfig, UICFG_LANG, (const char **) lngGetGuiList());
@@ -332,7 +332,7 @@ void guiShowUIConfig(void) {
 	diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
 	diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
 	diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
- 
+
 	int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
 	if (ret) {
 		int themeID = -1, langID = -1;
@@ -367,7 +367,7 @@ void guiShowGSConfig(void) {
 	diaSetInt(diaGSConfig, GSCFG_GSMXOFFSET, gGSMXOffset);
 	diaSetInt(diaGSConfig, GSCFG_GSMYOFFSET, gGSMYOffset);
 	diaSetInt(diaGSConfig, GSCFG_GSMSKIPVIDEOS, gGSMSkipVideos);
-	
+
 	int ret = diaExecuteDialog(diaGSConfig, -1, 1, NULL);
 	if (ret) {
 		diaGetInt(diaGSConfig, GSCFG_ENABLEGSM, &gEnableGSM);
@@ -980,12 +980,12 @@ static float guiCalcPerlin(float x, float y, float z) {
 	// Taken from: http://people.opera.com/patrickl/experiments/canvas/plasma/perlin-noise-classical.js
 	// By Sean McCullough
 
-	// Find unit grid cell containing point 
+	// Find unit grid cell containing point
 	int X = floor(x);
 	int Y = floor(y);
 	int Z = floor(z);
 
-	// Get relative xyz coordinates of point within that cell 
+	// Get relative xyz coordinates of point within that cell
 	x = x - X;
 	y = y - Y;
 	z = z - Z;
@@ -995,7 +995,7 @@ static float guiCalcPerlin(float x, float y, float z) {
 	Y = Y & 255;
 	Z = Z & 255;
 
-	// Calculate a set of eight hashed gradient indices 
+	// Calculate a set of eight hashed gradient indices
 	int gi000 = pperm[X + pperm[Y + pperm[Z]]] % 12;
 	int gi001 = pperm[X + pperm[Y + pperm[Z + 1]]] % 12;
 	int gi010 = pperm[X + pperm[Y + 1 + pperm[Z]]] % 12;
@@ -1005,16 +1005,16 @@ static float guiCalcPerlin(float x, float y, float z) {
 	int gi110 = pperm[X + 1 + pperm[Y + 1 + pperm[Z]]] % 12;
 	int gi111 = pperm[X + 1 + pperm[Y + 1 + pperm[Z + 1]]] % 12;
 
-	// The gradients of each corner are now: 
-	// g000 = grad3[gi000]; 
-	// g001 = grad3[gi001]; 
-	// g010 = grad3[gi010]; 
-	// g011 = grad3[gi011]; 
-	// g100 = grad3[gi100]; 
-	// g101 = grad3[gi101]; 
-	// g110 = grad3[gi110]; 
-	// g111 = grad3[gi111]; 
-	// Calculate noise contributions from each of the eight corners 
+	// The gradients of each corner are now:
+	// g000 = grad3[gi000];
+	// g001 = grad3[gi001];
+	// g010 = grad3[gi010];
+	// g011 = grad3[gi011];
+	// g100 = grad3[gi100];
+	// g101 = grad3[gi101];
+	// g110 = grad3[gi110];
+	// g111 = grad3[gi111];
+	// Calculate noise contributions from each of the eight corners
 	VU_VECTOR vec;
 	vec.x = x;
 	vec.y = y;
@@ -1023,7 +1023,7 @@ static float guiCalcPerlin(float x, float y, float z) {
 
 	VU_VECTOR a, b;
 
-	// float n000 
+	// float n000
 	a.x = Vu0DotProduct(&pgrad3[gi000], &vec);
 
 	vec.y -= 1;
@@ -1033,12 +1033,12 @@ static float guiCalcPerlin(float x, float y, float z) {
 
 	vec.x -= 1;
 
-	//float n110 
+	//float n110
 	b.z = Vu0DotProduct(&pgrad3[gi110], &vec);
 
 	vec.y += 1;
 
-	// float n100 
+	// float n100
 	b.x = Vu0DotProduct(&pgrad3[gi100], &vec);
 
 	vec.z -= 1;
@@ -1048,35 +1048,35 @@ static float guiCalcPerlin(float x, float y, float z) {
 
 	vec.y -= 1;
 
-	// float n111 
+	// float n111
 	b.w = Vu0DotProduct(&pgrad3[gi111], &vec);
 
 	vec.x += 1;
 
-	// float n011 
+	// float n011
 	a.w = Vu0DotProduct(&pgrad3[gi011], &vec);
 
 	vec.y += 1;
 
-	// float n001 
+	// float n001
 	a.y = Vu0DotProduct(&pgrad3[gi001], &vec);
 
-	// Compute the fade curve value for each of x, y, z 
+	// Compute the fade curve value for each of x, y, z
 	float u = fade(x);
 	float v = fade(y);
 	float w = fade(z);
 
 	// TODO: Low priority... This could be done on VU0 (xyzw for the first 4 mixes)
 	// The result in sw
-	// Interpolate along x the contributions from each of the corners 
+	// Interpolate along x the contributions from each of the corners
 	VU_VECTOR rv;
 	VU0MixVec(&b, &a, u, &rv);
 
 	// TODO: The VU0MixVec could as well mix the results (as follows) - might improve performance...
-	// Interpolate the four results along y 
+	// Interpolate the four results along y
 	float nxy0 = mix(rv.x, rv.z, v);
 	float nxy1 = mix(rv.y, rv.w, v);
-	// Interpolate the two last results along z 
+	// Interpolate the two last results along z
 	float nxyz = mix(nxy0, nxy1, w);
 
 	return nxyz;
@@ -1231,7 +1231,7 @@ void guiIntroLoop(void) {
 			guiShow();
 
 		if (gInitComplete)
-			wfadeout--;
+			wfadeout-=2;
 
 		if (wfadeout > 0)
 			guiRenderGreeting();

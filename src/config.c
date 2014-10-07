@@ -1,7 +1,7 @@
 /*
   Copyright 2009, Ifcaro & volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "include/opl.h"
@@ -25,7 +25,7 @@ static int strToColor(const char *string, unsigned char *color) {
 
 	if (!string || !*string) return 0;
 	if (string[0]!='#') return 0;
-	
+
 	string++;
 
 	while (*string) {
@@ -43,10 +43,10 @@ static int strToColor(const char *string, unsigned char *color) {
 		}else{
 			cnt++;
 		}
-		
+
 		string++;
 	}
-	
+
 	return 1;
 }
 
@@ -58,38 +58,38 @@ int isWS(char c) {
 static int splitAssignment(char* line, char* key, size_t keymax, char* val, size_t valmax) {
 	// skip whitespace
 	for (;isWS(*line); ++line);
-	
-	// find "=". 
-	// If found, the text before is key, after is val. 
+
+	// find "=".
+	// If found, the text before is key, after is val.
 	// Otherwise malformed string is encountered
-	
+
 	char* eqpos = strchr(line, '=');
-	
+
 	if (eqpos) {
 		// copy the name and the value
 		size_t keylen = min(keymax, eqpos - line);
-		
+
 		strncpy(key, line, keylen);
-		
+
 		eqpos++;
-		
+
 		size_t vallen = min(valmax, strlen(line) - (eqpos - line));
 		strncpy(val, eqpos, vallen);
 	}
-	
+
 	return (int) eqpos;
 }
 
 static int parsePrefix(char* line, char* prefix) {
-	// find "=". 
-	// If found, the text before is key, after is val. 
+	// find "=".
+	// If found, the text before is key, after is val.
 	// Otherwise malformed string is encountered
 	char* colpos = strchr(line, ':');
-	
+
 	if (colpos && colpos != line) {
 		// copy the name and the value
 		strncpy(prefix, line, colpos - line);
-		
+
 		return 1;
 	} else {
 		return 0;
@@ -99,7 +99,7 @@ static int parsePrefix(char* line, char* prefix) {
 static int configKeyValidate(const char* key) {
 	if (strlen(key) == 0)
 		return 0;
-	
+
 	return !strchr(key, '=');
 }
 
@@ -110,7 +110,7 @@ static struct config_value_t* allocConfigItem(const char* key, const char* val) 
 	strncpy(it->val, val, sizeof(it->val));
 	it->val[sizeof(it->val)-1] = '\0';
 	it->next = NULL;
-	
+
 	return it;
 }
 
@@ -127,14 +127,14 @@ static void addConfigValue(config_set_t* configSet, const char* key, const char*
 
 static struct config_value_t* getConfigItemForName(config_set_t* configSet, const char* name) {
 	struct config_value_t* val = configSet->head;
-	
+
 	while (val) {
 		if (strncmp(val->key, name, sizeof(val->key)) == 0)
 			break;
-		
+
 		val = val->next;
 	}
-	
+
 	return val;
 }
 
@@ -206,9 +206,9 @@ config_set_t *configGetByType(int type) {
 int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 	if (!configKeyValidate(key))
 		return 0;
-	
+
 	struct config_value_t *it = getConfigItemForName(configSet, key);
-	
+
 	if (it) {
 		if (strncmp(it->val, value, sizeof(it->val)) != 0) {
 			strncpy(it->val, value, sizeof(it->val));
@@ -221,7 +221,7 @@ int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 		if (key[0] != '#')
 			configSet->modified = 1;
 	}
-	
+
 	return 1;
 }
 
@@ -229,9 +229,9 @@ int configSetStr(config_set_t* configSet, const char* key, const char* value) {
 int configGetStr(config_set_t* configSet, const char* key, const char** value) {
 	if (!configKeyValidate(key))
 		return 0;
-	
+
 	struct config_value_t *it = getConfigItemForName(configSet, key);
-	
+
 	if (it) {
 		*value = it->val;
 		return 1;
@@ -282,10 +282,10 @@ int configGetColor(config_set_t* configSet, const char* key, unsigned char* colo
 int configRemoveKey(config_set_t* configSet, const char* key) {
 	if (!configKeyValidate(key))
 		return 0;
-	
+
 	struct config_value_t* val = configSet->head;
 	struct config_value_t* prev = NULL;
-	
+
 	while (val) {
 		if (strncmp(val->key, key, sizeof(val->key)) == 0) {
 			if (key[0] != '#')
@@ -308,7 +308,7 @@ int configRemoveKey(config_set_t* configSet, const char* key) {
 			val = val->next;
 		}
 	}
-	
+
 	return 1;
 }
 
@@ -319,12 +319,12 @@ void configReadIP() {
 		int size = getFileSize(fd);
 		fioRead(fd, &ipconfig, size);
 		fioClose(fd);
-	
+
 		sscanf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3],
 			&ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],
 			&ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
 	}
-	
+
 	return;
 }
 
@@ -335,7 +335,7 @@ void configWriteIP() {
 		sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
 			ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
 			ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
-	
+
 		fioWrite(fd, ipconfig, strlen(ipconfig));
 		fioClose(fd);
 		gIPConfigChanged = 0;
@@ -374,20 +374,20 @@ int configRead(config_set_t* configSet) {
 		configSet->modified = 0;
 		return 0;
 	}
-	
+
 	char* line;
 	unsigned int lineno = 0;
-	
+
 	char prefix[32];
 	memset(prefix, 0, sizeof(prefix));
-	
+
 	while (readFileBuffer(fileBuffer, &line)) {
 		lineno++;
-		
+
 		char key[32], val[256];
 		memset(key, 0, sizeof(key));
 		memset(val, 0, sizeof(val));
-		
+
 		if (splitAssignment(line, key, sizeof(key), val, sizeof(val))) {
 			/* if the line does not start with whitespace,
 			* the prefix ends and we have to reset it
@@ -399,10 +399,10 @@ int configRead(config_set_t* configSet) {
 			if (prefix[0]) {
 				// we have a prefix
 				char composedKey[66];
-				
+
 				snprintf(composedKey, sizeof(composedKey), "%s_%s", prefix, key);
 				composedKey[sizeof(composedKey)-1] = '\0';
-				
+
 				configSetStr(configSet, composedKey, val);
 			} else {
 				configSetStr(configSet, key, val);
@@ -452,10 +452,10 @@ void configClear(config_set_t* configSet) {
 	while (configSet->head) {
 		struct config_value_t* cur = configSet->head;
 		configSet->head = cur->next;
-		
+
 		free(cur);
 	}
-	
+
 	configSet->head = NULL;
 	configSet->tail = NULL;
 	configSet->modified = 1;

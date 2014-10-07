@@ -15,6 +15,8 @@ shares, and USB while also maintaining compatibility with USB Advance/Extreme
 format. It's now the most compatible homebrew loader and it should work 
 without ps2load or change DNASXXX.IMG tricks. 
 
+All PlayStation 2 models, including the SCPH-10000, SCPH-15000, SCPH-18000 and PSX (DVR unit) units are supported.
+
 OPL is also developed continuously - anyone can contribute improvements to 
 the project due to its open source nature.
 
@@ -39,7 +41,7 @@ USB modes ...
 ---
 USB
 ---
-USB HDD units up to 2TB are supported. For best effects, please use a USB HDD unit instead of a USB flash disk, as the latter is known to have slightly worse access times.
+USB disks up to 2TB are supported. For best effects, please use a USB HDD unit instead of a USB flash disk, as the latter is known to have slightly worse access times.
 
 Game files on USB devices must be perfectly defragmented and disc images larger than 4GB must be split to avoid the 4GB
 limitation of the FAT32 file system. We recommend the Auslogics Disk Defragmenter 
@@ -61,7 +63,7 @@ EXT3/4 file system.
 ----
 HDD
 ----
-For PS2, 48-bit LBA internal HDDs up to 2TB are supported. They have to be 
+For PS2, 48-bit LBA HDD units up to 2TB are supported. They have to be 
 formatted with either WINHIIP or uLaunch. From there, use uLaunch to make a 
 partition (rec. minumum of 2GB) named "OPL". If OPL detects this partition 
 at start up, it'll automatically create the above directory structure. Use

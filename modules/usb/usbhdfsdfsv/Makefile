@@ -8,20 +8,13 @@
 #
 # $Id: $
 
-IOP_BIN  = usbhdfsd.irx
-IOP_OBJS = usb_driver.o fs_driver.o part_driver.o fat_driver.o scache.o usbhdfsd.o imports.o exports.o
+IOP_BIN  = usbhdfsdfsv.irx
+IOP_OBJS = main.o imports.o
 IOP_LIBS =
 
 IOP_INCS +=
 IOP_CFLAGS  += -Wall -fno-builtin-printf
 IOP_LDFLAGS += -s
-
-WRITE_SUPPORT=1
-
-ifeq ($(WRITE_SUPPORT),1)
-IOP_CFLAGS += -DWRITE_SUPPORT
-IOP_OBJS += fat_write.o
-endif
 
 all: $(IOP_BIN)
 

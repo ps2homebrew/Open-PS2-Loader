@@ -30,12 +30,13 @@
 #include <sysmem.h>
 #endif
 
-#include "usbhdfsd.h"
+#include <usbhdfsd.h>
+#include "usbhdfsd_add.h"
 #include "usbhd_common.h"
-#include "mass_stor.h"
 #include "fat_driver.h"
 #include "fat_write.h"
 #include "fat.h"
+#include "mass_stor.h"
 
 //#define DEBUG  //comment out this line when not debugging
 
@@ -686,6 +687,7 @@ static int fs_getstat(iop_file_t *fd, const char *name, iox_stat_t *stat)
 }
 
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 static unsigned int fs_getFileSector(iop_file_t *fd, const char *name)
 {
 	fat_driver* fatd;
@@ -760,7 +762,7 @@ int fs_ioctl(iop_file_t *fd, u32 request, void *data)
 	if (fatd == NULL) { _fs_unlock(); return -ENODEV; }
 
 	switch (request) {
-		case USBHDFSD_IOCTL_RENAME:
+		case USBMASS_IOCTL_RENAME:
 			ret = fat_renameFile(fatd, &dirent->fatdir, data);	//No need to re-cast since this inner structure is a common one.
 			FLUSH_SECTORS(fatd);
 			break;
@@ -851,6 +853,7 @@ static iop_device_ops_t fs_functarray={
 	(void*)&fs_dummy,
 	(void*)&fs_dummy
 };
+
 static iop_device_t fs_driver={
 	"mass",
 	IOP_DT_FS|IOP_DT_FSEXT,

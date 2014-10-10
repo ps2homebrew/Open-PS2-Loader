@@ -13,6 +13,7 @@
 //#define DEBUG  //comment out this line when not debugging
 
 #include "mass_debug.h"
+#include <usbhdfsd.h>
 #include "usbhd_common.h"
 #include "mass_stor.h"
 #include "scache.h"
@@ -42,12 +43,8 @@
 #define USB_BLK_EP_IN		0
 #define USB_BLK_EP_OUT		1
 
-#define USB_XFER_MAX_RETRIES	16
-#define USB_IO_MAX_RETRIES	32
-
-#define DEVICE_DETECTED		0x01
-#define DEVICE_CONFIGURED	0x02
-#define DEVICE_ERROR		0x80
+#define USB_XFER_MAX_RETRIES	8
+#define USB_IO_MAX_RETRIES	16
 
 #define CBW_TAG 0x43425355
 #define CSW_TAG 0x53425355
@@ -106,7 +103,7 @@ typedef struct _usb_callback_data {
 	int returnSize;
 } usb_callback_data;
 
-#define NUM_DEVICES 5
+#define NUM_DEVICES 2
 static mass_dev g_mass_device[NUM_DEVICES];
 
 static void mass_stor_release(mass_dev *dev);
@@ -216,7 +213,7 @@ static void usb_bulk_reset(mass_dev* dev, int mode) {
 	}
 	if(ret != USB_RC_OK){
 		XPRINTF("USBHDFSD: Error - sending reset %d to device %d.\n", ret, dev->devId);
-		dev->status |= DEVICE_ERROR;
+		dev->status |= USBMASS_DEV_STAT_ERR;
 	}
 }
 
@@ -251,9 +248,6 @@ static int usb_bulk_status(mass_dev* dev, csw_packet* csw, unsigned int tag) {
 		XPRINTF("USBHDFSD: bulk csw result: %d, csw.status: %i\n", ret, csw->status);
 #endif
 	}
-	if (ret != USB_RC_OK) {
-		printf("USBHDFSD: Error - sending bulk status %d\n", ret);
-	}
 
 	return ret;
 }
@@ -275,7 +269,7 @@ static int usb_bulk_manage_status(mass_dev* dev, unsigned int tag) {
 	if (ret != USB_RC_OK) { /* STALL bulk in  -OR- Bulk error */
 		usb_bulk_clear_halt(dev, USB_BLK_EP_IN); /* clear the stall condition for bulk in */
 
-		XPRINTF("USBHDFSD: usb_bulk_manage_status stall ...\n");
+		XPRINTF("USBHDFSD: usb_bulk_manage_status error %d ...\n", ret);
 		ret = usb_bulk_status(dev, &csw, tag); /* Attempt to read CSW from bulk in endpoint */
 	}
 
@@ -329,7 +323,7 @@ static int usb_bulk_command(mass_dev* dev, cbw_packet* packet ) {
 	int ret;
 	usb_callback_data cb_data;
 
-	if(dev->status & DEVICE_ERROR){
+	if(dev->status & USBMASS_DEV_STAT_ERR){
 		printf("USBHDFSD: Rejecting I/O to offline device %d.\n", dev->devId);
 		return -1;
 	}
@@ -525,7 +519,7 @@ static inline int cbw_scsi_inquiry(mass_dev* dev, void *buffer, int size)
 			if(rcode == USB_RC_OK && result == 0) return 0;
 		}
 	}
- 
+
 	return -EIO;
 }
 
@@ -722,11 +716,13 @@ static mass_dev* mass_stor_findDevice(int devId, int create)
 		if (g_mass_device[i].devId == devId)
 		{
 			XPRINTF("USBHDFSD: mass_stor_findDevice exists %i\n", i);
-			return &g_mass_device[i];
+			dev = &g_mass_device[i];
+			break;
 		}
 		else if (create && dev == NULL && g_mass_device[i].devId == -1)
 		{
 			dev = &g_mass_device[i];
+			break;
 		}
 	}
 	return dev;
@@ -768,14 +764,12 @@ static void usb_bulk_probeEndpoint(int devId, mass_dev* dev, UsbEndpointDescript
 		/* out transfer */
 		if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && dev->bulkEpO < 0) {
 			dev->bulkEpO = UsbOpenEndpointAligned(devId, endpoint);
-			dev->packetSzO = (unsigned short int)endpoint->wMaxPacketSizeHB<<8 | endpoint->wMaxPacketSizeLB;
-			XPRINTF("USBHDFSD: register Output endpoint id =%i addr=%02X packetSize=%i\n", dev->bulkEpO, endpoint->bEndpointAddress, dev->packetSzO);
+			XPRINTF("USBHDFSD: register Output endpoint id =%i addr=%02X packetSize=%i\n", dev->bulkEpO, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB<<8 | endpoint->wMaxPacketSizeLB);
 		} else
 		/* in transfer */
 		if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && dev->bulkEpI < 0) {
 			dev->bulkEpI = UsbOpenEndpointAligned(devId, endpoint);
-			dev->packetSzI = (unsigned short int)endpoint->wMaxPacketSizeHB<<8 | endpoint->wMaxPacketSizeLB;
-			XPRINTF("USBHDFSD: register Input endpoint id =%i addr=%02X packetSize=%i\n", dev->bulkEpI, endpoint->bEndpointAddress, dev->packetSzI);
+			XPRINTF("USBHDFSD: register Input endpoint id =%i addr=%02X packetSize=%i\n", dev->bulkEpI, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB<<8 | endpoint->wMaxPacketSizeLB);
 		}
 	}
 }
@@ -789,9 +783,9 @@ int mass_stor_probe(int devId)
 	XPRINTF("USBHDFSD: probe: devId=%i\n", devId);
 
 	mass_dev* mass_device = mass_stor_findDevice(devId, 0);
-    
+
 	/* only one device supported */
-	if ((mass_device != NULL) && (mass_device->status & DEVICE_DETECTED))
+	if ((mass_device != NULL) && (mass_device->status & USBMASS_DEV_STAT_CONN))
 	{
 		printf("USBHDFSD: Error - only one mass storage device allowed ! \n");
 		return 0;
@@ -908,8 +902,10 @@ int mass_stor_connect(int devId)
 	/*store current configuration id - can't call set_configuration here */
 	dev->devId = devId;
 	dev->configId = config->bConfigurationValue;
-	dev->status = DEVICE_DETECTED;
+	dev->status = USBMASS_DEV_STAT_CONN;
 	XPRINTF("USBHDFSD: connect ok: epI=%i, epO=%i \n", dev->bulkEpI, dev->bulkEpO);
+
+	if(dev->callback != NULL) dev->callback(USBMASS_DEV_EV_CONN);
 
 	return 0;
 }
@@ -944,7 +940,7 @@ int mass_stor_disconnect(int devId) {
 		return 0;
 	}
 
-	if ((dev->status & DEVICE_DETECTED) && devId == dev->devId)
+	if (dev->status & USBMASS_DEV_STAT_CONN)
 	{
 		mass_stor_release(dev);
 		part_disconnect(dev);
@@ -953,7 +949,10 @@ int mass_stor_disconnect(int devId) {
 		dev->devId = -1;
 
 		DeleteSema(dev->ioSema);
+
+		if(dev->callback != NULL) dev->callback(USBMASS_DEV_EV_DISCONN);
 	}
+
 	return 0;
 }
 
@@ -965,7 +964,7 @@ static int mass_stor_warmup(mass_dev *dev) {
 
 	XPRINTF("USBHDFSD: mass_stor_warmup\n");
 
-	if (!(dev->status & DEVICE_DETECTED)) {
+	if (!(dev->status & USBMASS_DEV_STAT_CONN)) {
 		printf("USBHDFSD: Error - no mass storage device found!\n");
 		return -1;
 	}
@@ -1027,12 +1026,12 @@ int mass_stor_configureNextDevice(void)
 	for (i = 0; i < NUM_DEVICES; ++i)
 	{
 		mass_dev *dev = &g_mass_device[i];
-		if (dev->devId != -1 && (dev->status & DEVICE_DETECTED) && !(dev->status & DEVICE_CONFIGURED))
+		if (dev->devId != -1 && (dev->status & USBMASS_DEV_STAT_CONN) && !(dev->status & USBMASS_DEV_STAT_CONF))
 		{
 			int ret;
 			usb_set_configuration(dev, dev->configId);
 			usb_set_interface(dev, dev->interfaceNumber, dev->interfaceAlt);
-			dev->status |= DEVICE_CONFIGURED;
+			dev->status |= USBMASS_DEV_STAT_CONF;
 
 			ret = mass_stor_warmup(dev);
 			if (ret < 0)
@@ -1052,19 +1051,6 @@ int mass_stor_configureNextDevice(void)
 		}
 	}
 	return 0;
-}
-
-int mass_stor_sectorsize(mass_dev *dev)
-{
-	XPRINTF("USBHDFSD: mass_stor_sectorsize\n");
-
-	if (!(dev->status & DEVICE_DETECTED)) {
-		printf("USBHDFSD: Error - no mass storage device found!\n");
-
-		return -1;
-	}
-
-	return dev->sectorSize;
 }
 
 int InitUSB(void)
@@ -1090,4 +1076,47 @@ int InitUSB(void)
 	}
 
 	return(0);
+}
+
+int mass_stor_sectorsize(mass_dev *dev)
+{
+	XPRINTF("USBHDFSD: mass_stor_sectorsize\n");
+
+	if (!(dev->status & USBMASS_DEV_STAT_CONN)) {
+		printf("USBHDFSD: Error - no mass storage device found!\n");
+
+		return -1;
+	}
+
+	return dev->sectorSize;
+}
+
+int UsbMassGetDeviceInfo(int device, UsbMassDeviceInfo_t *info)
+{
+	int result;
+	mass_dev *pDev;
+
+	if(device >=0 && device < NUM_DEVICES){
+		pDev = &g_mass_device[device];
+
+		info->status = pDev->status;
+		info->SectorSize = pDev->sectorSize;
+		info->MaxLBA = pDev->maxLBA;
+
+		result = 0;
+	} else result = -ENODEV;
+
+	return result;
+}
+
+int UsbMassRegisterCallback(int device, usbmass_cb_t callback)
+{
+	int result;
+
+	if(device >=0 && device < NUM_DEVICES){
+		g_mass_device[device].callback = callback;
+		result = 0;
+	} else result = -ENODEV;
+
+	return result;
 }

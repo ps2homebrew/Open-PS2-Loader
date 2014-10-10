@@ -259,7 +259,7 @@ static struct ReadAndXRequest_t smb_Read_Request = {
 };
 
 #ifdef VMC_DRIVER
-static const struct WriteAndXRequest_t smb_Write_Request = {
+static struct WriteAndXRequest_t smb_Write_Request = {
 	{	0,
 		SMB_MAGIC,
 		SMB_COM_WRITE_ANDX,

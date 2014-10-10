@@ -43,7 +43,7 @@
 #endif
 #endif
 
-#define UPDATE_FRAME_COUNT 250
+static void RefreshAllLists(void);
 
 extern void *pusbd_irx;
 extern int size_pusbd_irx;
@@ -81,7 +81,7 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 static void moduleCleanup(opl_io_module_t* mod, int exception);
 
 // frame counter
-static int frameCounter;
+static unsigned int frameCounter;
 
 static char errorMessage[256];
 
@@ -174,7 +174,7 @@ static void itemExecSquare(struct menu_item *curMenu) {
 			if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
 				support->itemDelete(curMenu->current->item.id);
 				if (gAutoRefresh)
-					frameCounter = UPDATE_FRAME_COUNT;
+					RefreshAllLists();
 				else
 					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 			}
@@ -201,7 +201,7 @@ static void itemExecCircle(struct menu_item *curMenu) {
 			if (guiShowKeyboard(newName, nameLength)) {
 				support->itemRename(curMenu->current->item.id, newName);
 				if (gAutoRefresh)
-					frameCounter = UPDATE_FRAME_COUNT;
+					RefreshAllLists();
 				else
 					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 			}
@@ -267,7 +267,7 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 		mod->support->uip = 0;
 
 		if (gAutoRefresh)
-			frameCounter = UPDATE_FRAME_COUNT;
+			RefreshAllLists();
 		else
 			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
 	}
@@ -368,22 +368,29 @@ void menuDeferredUpdate(void* data) {
 	}
 }
 
+static void RefreshAllLists(void) {
+	int i;
+
+	// schedule updates of all the list handlers
+	for(i=0; i<MODE_COUNT; i++){
+		if (list_support[i].support && list_support[i].support->enabled)
+				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
+	}
+
+	frameCounter = 0;
+}
+
 static void menuUpdateHook() {
+	int i;
+
 	// if timer exceeds some threshold, schedule updates of the available input sources
 	frameCounter++;
 
-	if (frameCounter > UPDATE_FRAME_COUNT) {
-		frameCounter = 0;
-
-		// schedule updates of all the list handlers
-		if (list_support[USB_MODE].support && list_support[USB_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[USB_MODE].support->mode);
-		if (list_support[ETH_MODE].support && list_support[ETH_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[ETH_MODE].support->mode);
-		if (list_support[HDD_MODE].support && list_support[HDD_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[HDD_MODE].support->mode);
-		if (list_support[APP_MODE].support && list_support[APP_MODE].support->enabled)
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[APP_MODE].support->mode);
+	// schedule updates of all the list handlers
+	for(i=0; i<MODE_COUNT; i++){
+		if (list_support[i].support && list_support[i].support->enabled
+			&& ((list_support[i].support->updateDelay>0) & (frameCounter % list_support[i].support->updateDelay == 0)))
+				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
 	}
 }
 
@@ -870,7 +877,7 @@ static void setDefaults(void) {
 	gExitPath[0] = '\0';
 	gDefaultDevice = APP_MODE;
 	gAutosort = 1;
-	gAutoRefresh = 0;
+	gAutoRefresh = 1;
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
@@ -908,7 +915,7 @@ static void setDefaults(void) {
 	gDefaultUITextColor[1] = 0x080;
 	gDefaultUITextColor[2] = 0x040;
 
-	frameCounter = UPDATE_FRAME_COUNT;
+	frameCounter = 0;
 
 	gVMode = RM_VMODE_AUTO;
 

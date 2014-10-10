@@ -1161,7 +1161,7 @@ static void guiDrawOverlays() {
 			bfadeout = 0x0;
 	} else {
 		if (bfadeout < 0x080)
-			bfadeout += 0x20;
+			bfadeout += 0x08;
 	}
 
 	if (bfadeout > 0)

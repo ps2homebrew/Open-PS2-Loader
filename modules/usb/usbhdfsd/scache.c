@@ -26,6 +26,7 @@
 
 //#define SCACHE_RECORD_STATS	1
 
+#include <usbhdfsd.h>
 #include "usbhd_common.h"
 #include "mass_stor.h"
 
@@ -304,7 +305,6 @@ cache_set* scache_init(mass_dev* dev, int sectSize)
 	XPRINTF("scache init! \n");
 	cache->dev = dev;
 
-	XPRINTF("sectorSize: 0x%x\n", cache->sectorSize);
 	cache->sectorBuf = (unsigned char*) malloc(BLOCK_SIZE * CACHE_SIZE);
 	if (cache->sectorBuf == NULL) {
 		printf("Sector cache: can't alloate memory of size:%d \n", BLOCK_SIZE * CACHE_SIZE);

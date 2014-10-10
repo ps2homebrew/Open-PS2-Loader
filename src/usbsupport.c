@@ -25,6 +25,9 @@ extern int size_usbd_irx;
 extern void *usbhdfsd_irx;
 extern int size_usbhdfsd_irx;
 
+extern void *usbhdfsdfsv_irx;
+extern int size_usbhdfsdfsv_irx;
+
 #ifdef VMC
 extern void *usb_mcemu_irx;
 extern int size_usb_mcemu_irx;
@@ -72,6 +75,8 @@ int usbFindPartition(char *target, char *name) {
 	return 0;
 }
 
+#define USBHDFSDFSV_FUNCNUM(x)	(('U'<<8)|(x))
+
 static void usbInitModules(void) {
 	usbLoadModules();
 
@@ -95,6 +100,12 @@ static void usbInitModules(void) {
 #endif
 }
 
+static unsigned int UsbGeneration = 0;
+
+static void usbEventHandler(void *packet, void *opt){
+	UsbGeneration++;
+}
+
 void usbLoadModules(void) {
 	LOG("USBSUPPORT LoadModules\n");
 	//first it search for custom usbd in MC?
@@ -112,6 +123,9 @@ void usbLoadModules(void) {
 
 	sysLoadModuleBuffer(pusbd_irx, size_pusbd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
+	sysLoadModuleBuffer(&usbhdfsdfsv_irx, size_usbhdfsdfsv_irx, 0, NULL);
+
+	SifAddCmdHandler(12, &usbEventHandler, NULL);
 
 	LOG("USBSUPPORT Modules loaded\n");
 }
@@ -135,9 +149,13 @@ item_list_t* usbGetObject(int initOnly) {
 }
 
 static int usbNeedsUpdate(void) {
+	static unsigned int OldGeneration = 0;
 	int result = 0;
 	fio_stat_t stat;
 	char path[256];
+
+	if(OldGeneration == UsbGeneration) return 0;
+	OldGeneration = UsbGeneration;
 
 	usbFindPartition(usbPrefix, "ul.cfg");
 
@@ -366,7 +384,7 @@ static int usbCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t usbGameList = {
-		USB_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+		USB_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
 #ifdef __CHILDPROOF
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
 #else

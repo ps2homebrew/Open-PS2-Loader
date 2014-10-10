@@ -3,6 +3,8 @@
 
 #include "include/iosupport.h"
 
+#define USB_MODE_UPDATE_DELAY	60
+
 #ifdef VMC
 #include "include/mcemu.h"
 typedef struct

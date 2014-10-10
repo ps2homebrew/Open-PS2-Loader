@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include <usbhdfsd.h>
 #include "usbhd_common.h"
 #include "scache.h"
 #include "part_driver.h"

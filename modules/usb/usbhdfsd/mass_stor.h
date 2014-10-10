@@ -6,8 +6,6 @@ struct _mass_dev
 	int controlEp;			//config endpoint id
 	int bulkEpI;			//in endpoint id
 	int bulkEpO;			//out endpoint id
-	unsigned short int packetSzI;	//packet size in
-	unsigned short int packetSzO;	//packet size out
 	int devId;			//device id
 	unsigned char configId;		//configuration id
 	unsigned char status;
@@ -17,6 +15,7 @@ struct _mass_dev
 	unsigned int maxLBA;
 	int ioSema;
 	cache_set* cache;
+	usbmass_cb_t callback;
 };
 
 int InitUSB(void);

@@ -297,10 +297,6 @@ static int cdvdman_lockreadsema;
 static int sync_flag;
 #endif
 
-static char cdvdman_dirname[256];
-static char cdvdman_filepath[256];
-static char cdvdman_curdir[256];
-
 // buffers
 #define CDVDMAN_BUF_SECTORS 	2
 static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS*2048];
@@ -1973,7 +1969,7 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 
 	dirent->stat.mode = mode;
 	dirent->stat.size = tocEntryPointer->fileSize;
-	strncpy(dirent->name, tocEntryPointer->filename, 256);
+	strncpy(dirent->name, tocEntryPointer->filename, sizeof(dirent->name));
 
 	DPRINTF("cdrom_dread r=%d mode=%04x name=%s\n", r, (int)mode, dirent->name);
 
@@ -2141,9 +2137,10 @@ static void cdvdman_trimspaces(char* str)
 //-------------------------------------------------------------------------
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer)
 {
-	char *p = (char *)name;
+	char cdvdman_dirname[40];	// Maximum 30 characters, the '.', the ";" and the version number (1 - 32767)
+	char *p = (char *)name, *p_tmp;
 	char *slash;
-	int r, len, filename_len;
+	int r, len, filename_len, i;
 	int tocPos;
 	struct dirTocEntry *tocEntryPointer;
 
@@ -2167,7 +2164,7 @@ lbl_startlocate:
 	// if a slash was found
 	if (slash != NULL) {
 
-		if (len >= 256)
+		if (len >= sizeof(cdvdman_dirname))
 			return NULL;
 
 		// copy the path into main 'dir' var
@@ -2175,10 +2172,23 @@ lbl_startlocate:
 		cdvdman_dirname[len] = 0;
 	}
 	else {
-		if (strlen(p) >= 256)
+		if (strlen(p) >= sizeof(cdvdman_dirname))
 			return NULL;
 
 		strcpy(cdvdman_dirname, p);
+
+		//Correct filenames (for files), if necessary.
+		if((p_tmp=strchr(cdvdman_dirname, '.'))!=NULL){
+			for(i=0,p_tmp++; i<3 && (*p_tmp!='\0'); i++,p_tmp++){
+				if(p_tmp[0]==';') break;
+			}
+
+			if(p_tmp-cdvdman_dirname+3<sizeof(cdvdman_dirname)){
+				p_tmp[0]=';';
+				p_tmp[1]='1';
+				p_tmp[2]='\0';
+			}
+		}
 	}
 
 	while (tocLength > 0)	{
@@ -2197,12 +2207,14 @@ lbl_startlocate:
 
 			filename_len = tocEntryPointer->filenameLength;
 			if (filename_len) {
-				strncpy(cdvdman_curdir, tocEntryPointer->filename, 256); // copy filename
+#ifdef __IOPCORE_DEBUG
+				char cdvdman_curdir[sizeof(cdvdman_dirname)];
+				strncpy(cdvdman_curdir, tocEntryPointer->filename, sizeof(cdvdman_curdir)); // copy filename
 				cdvdman_curdir[filename_len] = 0;
-
 				DPRINTF("cdvdman_locatefile strcmp %s %s\n", cdvdman_dirname, cdvdman_curdir);
+#endif
 
-				r = strcmp(cdvdman_dirname, cdvdman_curdir);
+				r = strcmp(cdvdman_dirname, tocEntryPointer->filename);
 				if ((!r) && (!slash)) { // we searched a file so it's found
 					DPRINTF("cdvdman_locatefile found file! LBA=%d size=%d\n", (int)tocEntryPointer->fileLBA, (int)tocEntryPointer->fileSize);
 					return tocEntryPointer;
@@ -2239,8 +2251,7 @@ lbl_startlocate:
 //-------------------------------------------------------------------------
 static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 {
-	char *p;
-	int i;
+	static char cdvdman_filepath[256];
 	u32 lsn;
 	struct dirTocEntry *tocEntryPointer;
 
@@ -2252,19 +2263,7 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	DPRINTF("cdvdman_findfile %s layer%d\n", name, layer);
 
 	strncpy(cdvdman_filepath, name, sizeof(cdvdman_filepath));
-	//Correct filenames (for files), if necessary.
-	if((p=strrchr(cdvdman_filepath, '.'))!=NULL){
-		for(i=0,p++; i<3 && (*p!='\0'); i++,p++){
-			if(p[0]==';') break;
-		}
-
-		if(p-cdvdman_filepath+3<sizeof(cdvdman_filepath)){
-			p[0]=';';
-			p[1]='1';
-			p[2]='\0';
-		}
-	}
-
+	cdvdman_filepath[sizeof(cdvdman_filepath)-1] = '\0';
 	cdvdman_trimspaces(cdvdman_filepath);
 
 	DPRINTF("cdvdman_findfile cdvdman_filepath=%s\n", cdvdman_filepath);

@@ -3,10 +3,14 @@
 
 #include "include/config.h"
 
-#define USB_MODE	0
-#define ETH_MODE	1
-#define HDD_MODE	2
-#define APP_MODE	3
+enum IO_MODES{
+	USB_MODE	= 0,
+	ETH_MODE,
+	HDD_MODE,
+	APP_MODE,
+
+	MODE_COUNT
+};
 
 #define NO_EXCEPTION		0x00
 #define UNMOUNT_EXCEPTION	0x01
@@ -15,13 +19,13 @@
 #define COMPAT				0x01 // default compatibility flags
 #define COMPAT_FULL			0x02 // default + DMA compat flags
 
-#define COMPAT_MODE_1 		 0x01 // Load alternate core
+#define COMPAT_MODE_1 		 0x01 // Unused
 #define COMPAT_MODE_2 		 0x02 // Alternative data read method
 #define COMPAT_MODE_3 		 0x04 // Unhook Syscalls
 #define COMPAT_MODE_4 		 0x08 // 0 PSS mode
 #define COMPAT_MODE_5 		 0x10 // Disable DVD-DL
 #define COMPAT_MODE_6 		 0x20 // Disable IGR
-#define COMPAT_MODE_7 		 0x40 // Use IOP threading hack
+#define COMPAT_MODE_7 		 0x40 // Unused
 #define COMPAT_MODE_8 		 0x80 // Hide dev9 module
 #define COMPAT_MODE_9		0x100 // Alternate IGR combo (UNUSED)
 
@@ -43,6 +47,9 @@ typedef struct
 
 	/// max inactive frame delay
 	int delay;
+
+	/// Amount of frame to wait, before refreshing this menu's list. Setting an invalid value (<=0) means no automatic refresh.
+	int updateDelay;
 
 	/// item description
 	char* text;

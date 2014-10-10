@@ -3,6 +3,8 @@
 
 #include "include/iosupport.h"
 
+#define HDD_MODE_UPDATE_DELAY	-1
+
 #define PS2PART_IDMAX			32
 #define HDL_GAME_NAME_MAX  		64
 

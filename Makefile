@@ -45,7 +45,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
-		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o \
+		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
@@ -208,6 +208,8 @@ endif
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usb/usbhdfsd clean
+	echo "    * usbhdfsdfsv.irx"
+	$(MAKE) -C modules/usb/usbhdfsdfsv clean
 	echo "    * ps2dev9.irx"
 	$(MAKE) -C modules/dev9 clean
 	echo "    * SMSUTILS.irx"
@@ -348,6 +350,11 @@ usbhdfsd.s:
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usb/usbhdfsd
 	bin2s modules/usb/usbhdfsd/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
+
+usbhdfsdfsv.s:
+	echo "    * usbhdfsdfsv.irx"
+	$(MAKE) -C modules/usb/usbhdfsdfsv
+	bin2s modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx asm/usbhdfsdfsv.s usbhdfsdfsv_irx
 
 ps2dev9.s:
 	echo "    * ps2dev9.irx"

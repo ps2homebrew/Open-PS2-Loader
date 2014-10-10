@@ -1,0 +1,7 @@
+usbmass_IMPORTS_start
+I_UsbMassRegisterCallback
+usbmass_IMPORTS_end
+
+sifcmd_IMPORTS_start
+I_sceSifSendCmd
+sifcmd_IMPORTS_end

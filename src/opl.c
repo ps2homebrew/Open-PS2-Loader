@@ -278,7 +278,7 @@ static void initAllSupport(int force_reinit) {
 		initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
 
 	if (gETHStartMode)
-		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit||(gNetworkStartup >= ERROR_ETH_SMB_LOGON));
+		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit||(gNetworkStartup >= ERROR_ETH_SMB_CONN));
 
 	if (gHDDStartMode)
 		initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
@@ -380,6 +380,8 @@ static void RefreshAllLists(void) {
 	frameCounter = 0;
 }
 
+#define MENU_GENERAL_UPDATE_DELAY	60
+
 static void menuUpdateHook() {
 	int i;
 
@@ -387,10 +389,22 @@ static void menuUpdateHook() {
 	frameCounter++;
 
 	// schedule updates of all the list handlers
-	for(i=0; i<MODE_COUNT; i++){
-		if (list_support[i].support && list_support[i].support->enabled
-			&& ((list_support[i].support->updateDelay>0) & (frameCounter % list_support[i].support->updateDelay == 0)))
-				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
+	if(gAutoRefresh) {
+		for(i=0; i<MODE_COUNT; i++){
+			if ((list_support[i].support && list_support[i].support->enabled)
+				&& ((list_support[i].support->updateDelay>0) && (frameCounter % list_support[i].support->updateDelay == 0))
+				)
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
+		}
+	}
+
+	// Schedule updates of all list handlers that are to run every frame, regardless of whether auto refresh is active or not.
+	if(frameCounter % MENU_GENERAL_UPDATE_DELAY == 0) {
+		for(i=0; i<MODE_COUNT; i++){
+			if ((list_support[i].support && list_support[i].support->enabled)
+				&& (list_support[i].support->updateDelay==0))
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
+		}
 	}
 }
 
@@ -399,10 +413,7 @@ static void errorMessageHook() {
 
 	// reset the original frame hook
 	frameCounter = 0;
-	if (gAutoRefresh)
-		guiSetFrameHook(&menuUpdateHook);
-	else
-		guiSetFrameHook(NULL);
+	guiSetFrameHook(&menuUpdateHook);
 }
 
 void setErrorMessage(int strId, int error) {
@@ -619,10 +630,7 @@ void applyConfig(int themeID, int langID) {
 	guiUpdateScrollSpeed();
 	guiUpdateScreenScale();
 
-	if (gAutoRefresh)
-		guiSetFrameHook(&menuUpdateHook);
-	else
-		guiSetFrameHook(NULL);
+	guiSetFrameHook(&menuUpdateHook);
 
 	int changed = rmSetMode(0);
 	if (changed) {
@@ -877,7 +885,7 @@ static void setDefaults(void) {
 	gExitPath[0] = '\0';
 	gDefaultDevice = APP_MODE;
 	gAutosort = 1;
-	gAutoRefresh = 1;
+	gAutoRefresh = 0;
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;

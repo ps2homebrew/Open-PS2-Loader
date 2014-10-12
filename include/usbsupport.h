@@ -3,7 +3,7 @@
 
 #include "include/iosupport.h"
 
-#define USB_MODE_UPDATE_DELAY	60
+#define USB_MODE_UPDATE_DELAY	0
 
 #ifdef VMC
 #include "include/mcemu.h"

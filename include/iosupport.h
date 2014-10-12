@@ -48,7 +48,8 @@ typedef struct
 	/// max inactive frame delay
 	int delay;
 
-	/// Amount of frame to wait, before refreshing this menu's list. Setting an invalid value (<=0) means no automatic refresh.
+	/// Amount of frame to wait, before refreshing this menu's list. Setting an invalid value (<0) means no automatic refresh.
+	/// 0 = General refresh, which means that it will be refreshed ever MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
 	int updateDelay;
 
 	/// item description

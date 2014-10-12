@@ -50,7 +50,7 @@ static base_game_info_t *ethGames = NULL;
 // forward declaration
 static item_list_t ethGameList;
 
-void ethSMBConnect(void) {
+static void ethSMBConnect(void) {
 	smbLogOn_in_t logon;
 	smbEcho_in_t echo;
 	smbOpenShare_in_t openshare;
@@ -119,7 +119,7 @@ void ethSMBConnect(void) {
 	}
 }
 
-int ethSMBDisconnect(void) {
+static int ethSMBDisconnect(void) {
 	int ret;
 
 	// closing share
@@ -205,7 +205,7 @@ static void ethLoadModules(void) {
 }
 
 void ethInit(void) {
-	if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
+	if (gNetworkStartup >= ERROR_ETH_SMB_CONN) {
 		LOG("ETHSUPPORT Re-Init\n");
 		thmReinit(ethBase);
 		ethULSizePrev = -2;

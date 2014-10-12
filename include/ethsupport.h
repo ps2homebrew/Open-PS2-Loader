@@ -3,7 +3,7 @@
 
 #include "include/iosupport.h"
 
-#define ETH_MODE_UPDATE_DELAY	360
+#define ETH_MODE_UPDATE_DELAY	300
 
 #ifdef VMC
 #include "include/mcemu.h"

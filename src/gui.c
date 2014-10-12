@@ -432,7 +432,7 @@ void guiShowIPConfig(void) {
 	if (gNetworkStartup == 0) {
 		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
 		diaIPConfig[70].type = UI_SPACER;
-	} else if (gNetworkStartup >= ERROR_ETH_SMB_LOGON) {
+	} else if (gNetworkStartup >= ERROR_ETH_SMB_CONN) {
 		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_RECONNECT));
 		diaIPConfig[70].type = UI_TERMINATOR;
 	} else {
@@ -457,7 +457,7 @@ void guiShowIPConfig(void) {
 		diaGetString(diaIPConfig, 21, gPCPassword, sizeof(gPCPassword));
 		gIPConfigChanged = 1;
 
-		if (result == NETCFG_RECONNECT)
+		if (result == NETCFG_RECONNECT && gNetworkStartup < ERROR_ETH_SMB_CONN)
 			gNetworkStartup = ERROR_ETH_SMB_LOGON;
 
 		applyConfig(-1, -1);

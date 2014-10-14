@@ -28,4 +28,4 @@ run:
 
 
 include $(PS2SDK)/Defs.make
-include Rules.make
+include ../../Rules.make

@@ -54,9 +54,6 @@ extern int size_udptty_irx;
 extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
 
-extern void *discid_irx;
-extern int size_discid_irx;
-
 extern void *iomanx_irx;
 extern int size_iomanx_irx;
 
@@ -239,7 +236,6 @@ void sysReset(int modload_mask) {
 	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES*4);
 
 	// load modules
-	sysLoadModuleBuffer(&discid_irx, size_discid_irx, 0, NULL);
 	sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
 	sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
@@ -317,6 +313,8 @@ unsigned int USBA_crc32(char *string) {
 }
 
 int sysGetDiscID(char *hexDiscID) {
+	u8 key[16];
+
 	if (sceCdStatus() == SCECdErOPENS) // If tray is open, error
 		return -1;
 
@@ -341,26 +339,22 @@ int sysGetDiscID(char *hexDiscID) {
 	sceCdSync(0);
 	LOG("SYSTEM Disc standby\n");
 
-	int fd = fioOpen("discID:", O_RDONLY);
-	if (fd < 0) {
+	if(sceCdReadKey(0, 0, 0x4b, key) == 0){
+		LOG("SYSTEM Cannot read CD/DVD key.\n");
 		sceCdStop();
 		sceCdSync(0);
 		LOG("SYSTEM Disc stopped\n");
 		return -3;
 	}
 
-	unsigned char discID[5];
-	memset(discID, 0, 5);
-	fioRead(fd, discID, 5);
-	fioClose(fd);
-
 	sceCdStop();
-	sceCdSync(0);
-	LOG("SYSTEM Disc stopped\n");
 
 	// convert to hexadecimal string
-	snprintf(hexDiscID, 15, "%02X %02X %02X %02X %02X", discID[0], discID[1], discID[2], discID[3], discID[4]);
+	snprintf(hexDiscID, 15, "%02X %02X %02X %02X %02X", key[10], key[11], key[12], key[13], key[14]);
 	LOG("SYSTEM PS2 Disc ID = %s\n", hexDiscID);
+
+	sceCdSync(0);
+	LOG("SYSTEM Disc stopped\n");
 
 	return 1;
 }

@@ -46,7 +46,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
 		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o obj/smb_pcmcia_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_pcmcia_cdvdman.o obj/hdd_hdpro_cdvdman.o \
 		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o \
-		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o obj/discid.o \
+		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
 		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
 
@@ -218,17 +218,15 @@ endif
 	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo "    * SMAP.irx"
 	$(MAKE) -C modules/network/smap clean
-	echo "    * discID.irx"
-	$(MAKE) -C modules/cdvd/discID clean
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/hdd/atad clean
 	echo "    * hdpro_atad.irx"
 	$(MAKE) -C modules/hdd/hdpro_atad clean
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/hdd/ps2hdd clean
-ifeq ($(VMC),1)
 	echo "    * ps2fs.irx"
 	$(MAKE) -C modules/ps2fs clean
+ifeq ($(VMC),1)
 	echo "    * mcemu.irx"
 	$(MAKE) -C modules/mcemu -f Makefile.usb clean
 	$(MAKE) -C modules/mcemu -f Makefile.hdd clean
@@ -386,11 +384,6 @@ smap.s:
 
 smbman.s:
 	bin2s $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx
-
-discid.s:
-	echo "    * discID.irx"
-	$(MAKE) -C modules/cdvd/discID
-	bin2s modules/cdvd/discID/discID.irx asm/discid.s discid_irx
 
 ps2atad.s:
 	echo "    * ps2atad.irx"

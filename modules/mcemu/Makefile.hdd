@@ -18,14 +18,14 @@ endif
 IOP_CFLAGS  += -Wall -fno-builtin
 IOP_CFLAGS += -DHDD_DRIVER
 IOP_LDFLAGS += -s
-IOP_INCS += -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include
+IOP_INCS +=
 
 all: $(IOP_BIN)
 
 rebuild: clean all
 
 clean:
-	-rm -f *.o *.bak *.irx
+	-rm -f $(IOP_OBJS) $(IOP_BIN)
 
 include $(PS2SDK)/Defs.make
-include Rules.make
+include ../Rules.make

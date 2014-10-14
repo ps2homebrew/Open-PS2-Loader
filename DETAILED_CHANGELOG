@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev711 - Changed auto-refresh behaviour and fixed the SMB reconnect option: - Sun Oct 12 23:13:38 2014 +0800
 rev710 - Updated the GUI to have device-dependent refresh rates and moved some of the static buffers in CDVDMAN onto the stack. - Fri Oct 10 23:19:40 2014 +0800
 rev709 - README edited online with Bitbucket - Tue Oct 07 09:20:45 2014 +0000
 rev708 - README edited online with Bitbucket - Tue Oct 07 09:18:40 2014 +0000

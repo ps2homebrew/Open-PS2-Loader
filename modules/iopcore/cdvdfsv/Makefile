@@ -15,7 +15,7 @@ ifeq ($(DEBUG),1)
 DEBUG_FLAGS = -DDEBUG
 endif
 
-IOP_INCS += -I../common -I$(PS2SDK)/iop/include
+IOP_INCS += -I../common
 IOP_CFLAGS += -Wall -fno-builtin $(DEBUG_FLAGS)
 IOP_LDFLAGS += -s
 
@@ -25,4 +25,4 @@ clean:
 	-rm -f *.o *.irx cdvdfsv.map
 
 include $(PS2SDK)/Defs.make
-include Rules.make
+include ../../Rules.make

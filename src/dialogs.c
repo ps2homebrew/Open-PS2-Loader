@@ -91,6 +91,12 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	
 	{UI_BREAK},
+
+// Note: Per-Game GSM uses a UI_BUTTON to open up the menu. An #ifdef should keep it
+// out of Childproof and Non-GSM builds. --Bat--
+#ifdef GSM
+	{UI_BUTTON, COMPAT_GSCONFIG, 1, -1, 0, 0, {.label = {NULL, _STR_GSCONFIG}}}, {UI_BREAK},
+#endif
 	
 	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_CDVDMAN_TIMER}}}, {UI_SPACER}, {UI_INT, COMPAT_CDVDMAN_TIMER, 1, _STR_HINT_CDVDMAN_TIMER, 0, 0, {.intvalue = {0, 0, 0, 255}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}}, {UI_SPACER}, {UI_ENUM, COMPAT_DMA, 1, -1, 0, 0, {.intvalue = {0, 0}}},
@@ -145,9 +151,6 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
-#ifdef GSM
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWGSM}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWGSM, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
-#endif
 #ifdef CHEAT
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWCHEAT}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWCHEAT, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
 #endif
@@ -214,17 +217,18 @@ struct UIItem diaUIConfig[] = {
 };
 
 #ifdef GSM
-	// GSM Menu
+	// Per-Game GSM Settings Menu (--Bat--)
 struct UIItem diaGSConfig[] = {
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
-
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}}, {UI_SPACER},
+	{UI_LABEL, COMPAT_GAME, 1, -1, 0, 0, {.label = {"<Game Label>", -1}}},
+	
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_ENABLEGSM}}}, {UI_SPACER}, {UI_BOOL, GSCFG_ENABLEGSM, 1, _STR_HINT_ENABLEGSM, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMVMODE}}}, {UI_SPACER}, {UI_ENUM, GSCFG_GSMVMODE, 1, _STR_HINT_GSMVMODE, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMSKIPVIDEOS}}}, {UI_SPACER}, {UI_BOOL, GSCFG_GSMSKIPVIDEOS, 1, _STR_HINT_GSMSKIPVIDEOS, 0, 0, {.intvalue = {1, 1}}},{UI_BREAK},
- 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_XOFFSET}}}, {UI_SPACER}, {UI_INT, GSCFG_GSMXOFFSET, 1, _STR_HINT_XOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},{UI_BREAK},
-	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_YOFFSET}}}, {UI_SPACER}, {UI_INT, GSCFG_GSMYOFFSET, 1, _STR_HINT_YOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_ENABLEGSM}}}, {UI_SPACER}, {UI_BOOL, COMPAT_ENABLEGSM, 1, _STR_HINT_ENABLEGSM, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMVMODE}}}, {UI_SPACER}, {UI_ENUM, COMPAT_GSMVMODE, 1, _STR_HINT_GSMVMODE, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_XOFFSET}}}, {UI_SPACER}, {UI_INT, COMPAT_GSMXOFFSET, 1, _STR_HINT_XOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_YOFFSET}}}, {UI_SPACER}, {UI_INT, COMPAT_GSMYOFFSET, 1, _STR_HINT_YOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_GSMSKIPVIDEOS}}}, {UI_SPACER}, {UI_BOOL, COMPAT_GSMSKIPVIDEOS, 1, _STR_HINT_GSMSKIPVIDEOS, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
 	{UI_SPLITTER},
 
 	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},

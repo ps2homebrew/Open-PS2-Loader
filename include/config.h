@@ -21,6 +21,16 @@
 #define CONFIG_ITEM_DMA				"$DMA"
 #define CONFIG_ITEM_DNAS			"$DNAS"
 #define CONFIG_ITEM_CDVDMAN_TIMER	"$CallbackTimer"
+ 
+//Note: The following is needed for Per-Game GSM. I need further carification 
+//	on how to rid ourselves with the 'EnableGSM' GUI toggle. That function 
+//      should be dictated by a "None" option in the enums ... -Bat-
+ 
+#define CONFIG_ITEM_ENABLEGSM		"$EnableGSM"
+#define CONFIG_ITEM_GSMVMODE		"$GSMVMode"
+#define CONFIG_ITEM_GSMXOFFSET		"$GSMXOffset"
+#define CONFIG_ITEM_GSMYOFFSET		"$GSMYOffset"
+#define CONFIG_ITEM_GSMSKIPVIDEOS	"$GSMSkipVideos"
 
 #define CONFIG_KEY_NAME_LEN	32
 #define CONFIG_KEY_VALUE_LEN	256

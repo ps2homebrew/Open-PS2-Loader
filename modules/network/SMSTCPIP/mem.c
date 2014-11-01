@@ -46,7 +46,7 @@
 
 #include "lwip/stats.h"
 
-#include <intrman.h>
+#include <thsemap.h>
 #include <sysclib.h>
 
 #include "smsutils.h"
@@ -79,6 +79,8 @@ static u8_t ramblock[MEM_SIZE + sizeof(struct mem) + MEM_ALIGNMENT];
 
 
 static struct mem *lfree;   /* pointer to the lowest free block */
+
+static sys_sem_t mem_sem;
 
 static void
 plug_holes(struct mem *mem)
@@ -131,6 +133,8 @@ mem_init(void)
   ram_end->next = MEM_SIZE;
   ram_end->prev = MEM_SIZE;
 
+  mem_sem = sys_sem_new(1);
+
   lfree = (struct mem *)ram;
 
 #if MEM_STATS
@@ -148,8 +152,7 @@ mem_free(void *rmem)
     return;
   }
 
-  SYS_ARCH_DECL_PROTECT(old_level);
-  SYS_ARCH_PROTECT(old_level);
+  sys_sem_wait(mem_sem);
 
   LWIP_ASSERT("mem_free: legal memory", (u8_t *)rmem >= (u8_t *)ram &&
     (u8_t *)rmem < (u8_t *)ram_end);
@@ -159,7 +162,7 @@ mem_free(void *rmem)
 #if MEM_STATS
     ++lwip_stats.mem.err;
 #endif /* MEM_STATS */
-    SYS_ARCH_UNPROTECT(old_level);
+    sys_sem_signal(mem_sem);
     return;
   }
   mem = (struct mem *)((u8_t *)rmem - SIZEOF_STRUCT_MEM);
@@ -177,7 +180,7 @@ mem_free(void *rmem)
   
 #endif /* MEM_STATS */
   plug_holes(mem);
-  SYS_ARCH_UNPROTECT(old_level);
+  sys_sem_signal(mem_sem);
 }
 void *
 mem_reallocm(void *rmem, mem_size_t newsize)
@@ -208,9 +211,8 @@ mem_realloc(void *rmem, mem_size_t newsize)
   if (newsize > MEM_SIZE) {
     return NULL;
   }
-
-  SYS_ARCH_DECL_PROTECT(old_level);
-  SYS_ARCH_PROTECT(old_level);
+  
+  sys_sem_wait(mem_sem);
   
   LWIP_ASSERT("mem_realloc: legal memory", (u8_t *)rmem >= (u8_t *)ram &&
    (u8_t *)rmem < (u8_t *)ram_end);
@@ -241,7 +243,7 @@ mem_realloc(void *rmem, mem_size_t newsize)
 
     plug_holes(mem2);
   }
-  SYS_ARCH_UNPROTECT(old_level);
+  sys_sem_signal(mem_sem);  
   return rmem;
 }
 void *
@@ -264,8 +266,7 @@ mem_malloc(mem_size_t size)
     return NULL;
   }
   
-  SYS_ARCH_DECL_PROTECT(old_level);
-  SYS_ARCH_PROTECT(old_level);
+  sys_sem_wait(mem_sem);
 
   for (ptr = (u8_t *)lfree - ram; ptr < MEM_SIZE; ptr = ((struct mem *)&ram[ptr])->next) {
     mem = (struct mem *)&ram[ptr];
@@ -301,7 +302,7 @@ mem_malloc(mem_size_t size)
         }
         LWIP_ASSERT("mem_malloc: !lfree->used", !lfree->used);
       }
-      SYS_ARCH_UNPROTECT(old_level);
+      sys_sem_signal(mem_sem);
 
 		LWIP_ASSERT("mem_malloc: allocated memory not above ram_end.",
        (u32_t)mem + SIZEOF_STRUCT_MEM + size <= (u32_t)ram_end);
@@ -314,6 +315,6 @@ mem_malloc(mem_size_t size)
 #if MEM_STATS
   ++lwip_stats.mem.err;
 #endif /* MEM_STATS */  
-  SYS_ARCH_UNPROTECT(old_level);
+  sys_sem_signal(mem_sem);
   return NULL;
 }

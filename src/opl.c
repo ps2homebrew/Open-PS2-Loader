@@ -498,13 +498,6 @@ static void _loadConfig() {
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
 			configGetInt(configOPL, "vmode", &gVMode);
 
-#ifdef GSM
-			configGetInt(configOPL, "enable_gsm", &gEnableGSM);
-			configGetInt(configOPL, "gsmvmode", &gGSMVMode);
-			configGetInt(configOPL, "gsm_x_offset", &gGSMXOffset);
-			configGetInt(configOPL, "gsm_y_offset", &gGSMYOffset);
-			configGetInt(configOPL, "gsmskipvideos", &gGSMSkipVideos);
-#endif
 
 #ifdef CHEAT
 			configGetInt(configOPL, "enable_cheat", &gEnableCheat);
@@ -539,9 +532,6 @@ static void _loadConfig() {
 			configGetStrCopy(configOPL, "usb_prefix", gUSBPrefix, sizeof(gUSBPrefix));
 			configGetStrCopy(configOPL, "eth_prefix", gETHPrefix, sizeof(gETHPrefix));
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
-#ifdef GSM
-			configGetInt(configOPL, "show_gsm", &gShowGSM);
-#endif
 #ifdef CHEAT
 			configGetInt(configOPL, "show_cheat", &gShowCheat);
 #endif
@@ -573,13 +563,6 @@ static void _saveConfig() {
 		configSetInt(configOPL, "wide_screen", gWideScreen);
 		configSetInt(configOPL, "vmode", gVMode);
 
-#ifdef GSM
-		configSetInt(configOPL, "enable_gsm", gEnableGSM);
-		configSetInt(configOPL, "gsmvmode", gGSMVMode);
-		configSetInt(configOPL, "gsm_x_offset", gGSMXOffset);
-		configSetInt(configOPL, "gsm_y_offset", gGSMYOffset);
-		configSetInt(configOPL, "gsmskipvideos", gGSMSkipVideos);
-#endif
 
 #ifdef CHEAT
 		configSetInt(configOPL, "enable_cheat", gEnableCheat);
@@ -605,9 +588,6 @@ static void _saveConfig() {
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
-#ifdef GSM
-		configSetInt(configOPL, "show_gsm", gShowGSM);
-#endif
 #ifdef CHEAT
 		configSetInt(configOPL, "show_cheat", gShowCheat);
 #endif
@@ -889,9 +869,6 @@ static void setDefaults(void) {
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
-#ifdef GSM
-	gShowGSM = 0;
-#endif
 #ifdef CHEAT
 	gShowCheat = 0;
 #endif
@@ -927,14 +904,6 @@ static void setDefaults(void) {
 
 	gVMode = RM_VMODE_AUTO;
 
-#ifdef GSM
-	gEnableGSM = 0;
-	gGSMVMode = 0;
-	gGSMXOffset = 0;
-	gGSMYOffset = 0;
-	gGSMSkipVideos = 0;
-#endif
-
 #ifdef CHEAT
 	gEnableCheat = 0;
 	gCheatMode = 0;
@@ -964,12 +933,13 @@ static void init(void) {
 
 	// handler for deffered menu updates
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
-	cacheInit();
 
 	InitConsoleRegionData();
 
 	// try to restore config
 	_loadConfig();
+
+	cacheInit();
 }
 
 static void deferredInit(void) {
@@ -990,8 +960,6 @@ int main(int argc, char* argv[])
 {
 	LOG_INIT();
 	PREINIT_LOG("OPL GUI start!\n");
-
-	ChangeThreadPriority(GetThreadId(), 31);
 
 	#ifdef __DEBUG
 	int use_early_debug = 0, exception_test = 0;

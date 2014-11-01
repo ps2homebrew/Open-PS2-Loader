@@ -29,7 +29,7 @@
 /* Max number of hooks in hook list */
 .equ MAX_HOOKS,5
 /* Max number of codes in code list */
-.equ MAX_CODES,250
+.equ MAX_CODES,100
 
 	.text
 

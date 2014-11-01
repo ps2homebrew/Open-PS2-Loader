@@ -198,11 +198,6 @@ static void IGR_Thread(void *arg)
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x800000; // Dark Blue
 
-		// Reset SPU
-		ResetSPU();
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x0000FF; // Red
-
 		// Reset IO Processor
 		while (!Reset_Iop(NULL, 0)) {;}
 
@@ -271,6 +266,11 @@ static void IGR_Thread(void *arg)
 
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x008000; // Dark Green
+
+		// Reset SPU
+		ResetSPU();
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x0000FF; // Red
 
 		// Exit services
 		LoadFileExit();

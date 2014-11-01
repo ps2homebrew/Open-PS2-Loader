@@ -4,7 +4,7 @@ IOP_OBJS = ps2ip.o inet.o ip.o ip_addr.o ip_frag.o etharp.o tcp_in.o tcp_out.o \
 	icmp.o pbuf.o exports.o imports.o
 IOP_LIBS =
 
-IOP_INCS += -Iinclude -I../../iopcore/common
+IOP_INCS += -Iinclude
 IOP_CFLAGS += -DLWIP_NOASSERT -Wall -fno-builtin-printf
 IOP_ASFLAGS +=
 IOP_LDFLAGS += -s

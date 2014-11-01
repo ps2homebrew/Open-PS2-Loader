@@ -584,9 +584,7 @@ pbuf_free(struct pbuf *p)
         memp_free(MEMP_PBUF, p);
       /* p->flags == PBUF_FLAG_RAM */
       } else {
-	SYS_ARCH_UNPROTECT(old_level);
         mem_free(p);
-	SYS_ARCH_PROTECT(old_level);
       }
       count++;
       /* proceed to next pbuf */

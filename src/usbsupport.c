@@ -95,8 +95,8 @@ static void usbInitModules(void) {
 #endif
 
 #ifdef CHEAT
-		sprintf(path, "%sCHT", usbPrefix);
-		checkCreateDir(path);
+	sprintf(path, "%sCHT", usbPrefix);
+	checkCreateDir(path);
 #endif
 }
 

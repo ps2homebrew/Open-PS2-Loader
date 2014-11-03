@@ -15,7 +15,7 @@ extern void * _gp;
 
 static int gIOTerminate = 0;
 
-#define THREAD_STACK_SIZE   (8 * 1024)
+#define THREAD_STACK_SIZE   (96 * 1024)
 
 static u8          thread_stack[THREAD_STACK_SIZE] ALIGNED(16);
 

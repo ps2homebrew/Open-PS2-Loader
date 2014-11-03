@@ -330,21 +330,21 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 					}
 					fileXioClose(fd);
 				}
-			}
 
-			if (have_error) {
-				char error[256];
-				snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
-				if (!guiMsgBox(error, 1, NULL))
-					return;
-			}
+				if (have_error) {
+					char error[256];
+					snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
+					if (!guiMsgBox(error, 1, NULL))
+						return;
+				}
 
-			for (i = 0; i < size_hdd_mcemu_irx; i++) {
-				if (((u32*)&hdd_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
-					if (hdd_vmc_infos.active)
-						size_mcemu_irx = size_hdd_mcemu_irx;
-					memcpy(&((u32*)&hdd_mcemu_irx)[i], &hdd_vmc_infos, sizeof(hdd_vmc_infos_t));
-					break;
+				for (i = 0; i < size_hdd_mcemu_irx; i++) {
+					if (((u32*)&hdd_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
+						if (hdd_vmc_infos.active)
+							size_mcemu_irx = size_hdd_mcemu_irx;
+						memcpy(&((u32*)&hdd_mcemu_irx)[i], &hdd_vmc_infos, sizeof(hdd_vmc_infos_t));
+						break;
+					}
 				}
 			}
 		}

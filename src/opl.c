@@ -964,13 +964,12 @@ static void init(void) {
 
 	// handler for deffered menu updates
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
+	cacheInit();
 
 	InitConsoleRegionData();
 
 	// try to restore config
 	_loadConfig();
-
-	cacheInit();
 }
 
 static void deferredInit(void) {
@@ -991,6 +990,8 @@ int main(int argc, char* argv[])
 {
 	LOG_INIT();
 	PREINIT_LOG("OPL GUI start!\n");
+
+	ChangeThreadPriority(GetThreadId(), 31);
 
 	#ifdef __DEBUG
 	int use_early_debug = 0, exception_test = 0;

@@ -492,10 +492,10 @@ void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w,
 	if (inlay->PSM == GS_PSM_CT32)
 		gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
 
-	gsKit_prim_quad_texture(gsGlobal, inlay, quad.ul.x + transX + aspectWidth * ulx, quad.ul.y + transY + uly, 0, 0,
-			quad.ul.x + transX + aspectWidth * urx, quad.ul.y + transY + ury, inlay->Width, 0,
-			quad.ul.x + transX + aspectWidth * blx, quad.ul.y + transY + bly, 0, inlay->Height,
-			quad.ul.x + transX + aspectWidth * brx, quad.ul.y + transY + bry, inlay->Width, inlay->Height, order, gDefaultCol);
+	gsKit_prim_quad_texture(gsGlobal, inlay, quad.ul.x + transX + aspectWidth * ulx, quad.ul.y + transY + uly, 0.5f, 0.5f,
+			quad.ul.x + transX + aspectWidth * urx, quad.ul.y + transY + ury, inlay->Width + 0.5f, 0.5f,
+			quad.ul.x + transX + aspectWidth * blx, quad.ul.y + transY + bly, 0.5f, inlay->Height + 0.5f,
+			quad.ul.x + transX + aspectWidth * brx, quad.ul.y + transY + bry, inlay->Width + 0.5f, inlay->Height + 0.5f, order, gDefaultCol);
 	order++;
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 

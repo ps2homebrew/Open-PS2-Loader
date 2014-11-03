@@ -229,9 +229,6 @@ void guiShowConfig() {
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 	diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
-#ifdef GSM
-	diaSetInt(diaConfig, CFG_SHOWGSM, gShowGSM);
-#endif
 #ifdef CHEAT
 	diaSetInt(diaConfig, CFG_SHOWCHEAT, gShowCheat);
 #endif
@@ -251,9 +248,6 @@ void guiShowConfig() {
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
-#ifdef GSM
-		diaGetInt(diaConfig, CFG_SHOWGSM, &gShowGSM);
-#endif
 #ifdef CHEAT
 		diaGetInt(diaConfig, CFG_SHOWCHEAT, &gShowCheat);
 #endif
@@ -316,7 +310,8 @@ void guiShowUIConfig(void) {
 
 	// configure the enumerations
 	const char* scrollSpeeds[] = { _l(_STR_SLOW), _l(_STR_MEDIUM),	_l(_STR_FAST), NULL };
-	const char* vmodeNames[] = { _l(_STR_AUTO), "PAL", "NTSC", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "VGA 640x480p @60Hz", NULL };
+	const char* vmodeNames[] = { _l(_STR_AUTO), "PAL", "NTSC", "HDTV 480p @60Hz", "HDTV 576p @50Hz", \
+	"VGA 640x480p @60Hz", NULL };
 
 	diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
 	diaSetEnum(diaUIConfig, UICFG_THEME, (const char **) thmGetGuiList());
@@ -359,22 +354,33 @@ void guiShowUIConfig(void) {
 #ifdef GSM
 void guiShowGSConfig(void) {
 	// configure the enumerations
-	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", "PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", "HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", "VGA 640x480p @60Hz", "VGA 640x960i @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", "VGA 800x600p @56Hz", "VGA 800x600p @60Hz", "VGA 800x600p @72Hz", "VGA 800x600p @75Hz", "VGA 800x600p @85Hz", "VGA 1024x768p @60Hz", "VGA 1024x768p @70Hz", "VGA 1024x768p @75Hz", "VGA 1024x768p @85Hz", "VGA 1280x1024p @60Hz", "VGA 1280x1024p @75Hz", NULL };
-
-	diaSetEnum(diaGSConfig, GSCFG_GSMVMODE, gsmvmodeNames);
-	diaSetInt(diaGSConfig, GSCFG_ENABLEGSM, gEnableGSM);
-	diaSetInt(diaGSConfig, GSCFG_GSMVMODE, gGSMVMode);
-	diaSetInt(diaGSConfig, GSCFG_GSMXOFFSET, gGSMXOffset);
-	diaSetInt(diaGSConfig, GSCFG_GSMYOFFSET, gGSMYOffset);
-	diaSetInt(diaGSConfig, GSCFG_GSMSKIPVIDEOS, gGSMSkipVideos);
-
+	
+	// NOTE: Can we do away with the "Enable GSM" GUI function entirely?!? The enabled/disabled 
+	// state of GSM would be better served with a simple "None" variable amongst these enums ... ;) (--Bat--)
+	//
+	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", \
+	"PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", \
+	"HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", \
+	"VGA 640x480p @60Hz", "VGA 640x960i @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", \
+	"VGA 800x600p @56Hz", "VGA 800x600p @60Hz", "VGA 800x600p @72Hz", "VGA 800x600p @75Hz", "VGA 800x600p @85Hz", \
+	"VGA 1024x768p @60Hz", "VGA 1024x768p @70Hz", "VGA 1024x768p @75Hz", "VGA 1024x768p @85Hz", \
+	"VGA 1280x1024p @60Hz", "VGA 1280x1024p @75Hz", NULL };
+	
+	// Conversion to 'COMPAT' complete. Might need some clean up though! (--Bat--)
+	diaSetEnum(diaGSConfig, COMPAT_GSMVMODE, gsmvmodeNames);
+	diaSetInt(diaGSConfig, COMPAT_ENABLEGSM, EnableGSM);
+	diaSetInt(diaGSConfig, COMPAT_GSMVMODE, GSMVMode);
+	diaSetInt(diaGSConfig, COMPAT_GSMXOFFSET, GSMXOffset);
+	diaSetInt(diaGSConfig, COMPAT_GSMYOFFSET, GSMYOffset);
+	diaSetInt(diaGSConfig, COMPAT_GSMSKIPVIDEOS, GSMSkipVideos);
+	
 	int ret = diaExecuteDialog(diaGSConfig, -1, 1, NULL);
 	if (ret) {
-		diaGetInt(diaGSConfig, GSCFG_ENABLEGSM, &gEnableGSM);
-		diaGetInt(diaGSConfig, GSCFG_GSMVMODE, &gGSMVMode);
-		diaGetInt(diaGSConfig, GSCFG_GSMXOFFSET, &gGSMXOffset);
-		diaGetInt(diaGSConfig, GSCFG_GSMYOFFSET, &gGSMYOffset);
-		diaGetInt(diaGSConfig, GSCFG_GSMSKIPVIDEOS, &gGSMSkipVideos);
+		diaGetInt(diaGSConfig, COMPAT_ENABLEGSM, &EnableGSM);
+		diaGetInt(diaGSConfig, COMPAT_GSMVMODE, &GSMVMode);
+		diaGetInt(diaGSConfig, COMPAT_GSMXOFFSET, &GSMXOffset);
+		diaGetInt(diaGSConfig, COMPAT_GSMYOFFSET, &GSMYOffset);
+		diaGetInt(diaGSConfig, COMPAT_GSMSKIPVIDEOS, &GSMSkipVideos);
 
 		applyConfig(-1, -1);
 	}
@@ -694,6 +700,32 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
+// Begin Per-Game GSM Integration --Bat--
+#ifdef GSM
+
+	int EnableGSM = 0;
+	configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
+	diaSetInt(diaCompatConfig, COMPAT_ENABLEGSM, EnableGSM);
+
+	int GSMVMode = 0;
+	configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &GSMVMode);
+	diaSetInt(diaCompatConfig, COMPAT_GSMVMODE, GSMVMode);
+
+	int GSMXOffset = 0;
+	configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
+	diaSetInt(diaCompatConfig, COMPAT_GSMXOFFSET, GSMXOffset);
+
+	int GSMYOffset = 0;
+	configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
+	diaSetInt(diaCompatConfig, COMPAT_GSMYOFFSET, GSMYOffset);
+
+	int GSMSkipVideos = 0;
+	configGetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, &GSMSkipVideos);
+	diaSetInt(diaCompatConfig, COMPAT_GSMSKIPVIDEOS, GSMSkipVideos);
+
+// End Of Per-Game GSM Integration --Bat--
+#endif
+
 	int timer = 0;
 	configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer);
 	diaSetInt(diaCompatConfig, COMPAT_CDVDMAN_TIMER, timer);
@@ -732,6 +764,11 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 
 		result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
+#ifdef GSM
+		if (result == COMPAT_GSCONFIG) {
+			guiShowGSConfig();
+		}
+#endif
 		if (result == COMPAT_LOADFROMDISC) {
 			char hexDiscID[15];
 			if (sysGetDiscID(hexDiscID) >= 0)
@@ -765,6 +802,13 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 		configRemoveKey(configSet, CONFIG_ITEM_DNAS);
 		configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
+#ifdef GSM
+		configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
+		configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
+		configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
+		configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+		configRemoveKey(configSet, CONFIG_ITEM_GSMSKIPVIDEOS);
+#endif
 #ifdef VMC
 		configRemoveVMC(configSet, 0);
 		configRemoveVMC(configSet, 1);
@@ -796,6 +840,38 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configSetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, timer);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_CDVDMAN_TIMER);
+
+#ifdef GSM
+		diaGetInt(diaCompatConfig, COMPAT_ENABLEGSM, &EnableGSM);
+		if (EnableGSM != 0)
+			configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
+			
+		diaGetInt(diaCompatConfig, COMPAT_GSMVMODE, &GSMVMode);
+		if (GSMVMode != 0)
+			configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
+
+		diaGetInt(diaCompatConfig, COMPAT_GSMXOFFSET, &GSMXOffset);
+		if (GSMXOffset != 0)
+			configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET); 
+
+		diaGetInt(diaCompatConfig, COMPAT_GSMYOFFSET, &GSMYOffset);
+		if (GSMYOffset != 0)
+			configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
+		else
+			configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+
+		diaGetInt(diaCompatConfig, COMPAT_GSMSKIPVIDEOS, &GSMSkipVideos);
+		if (GSMSkipVideos != 0)
+			configSetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, GSMSkipVideos);
+		else
+				configRemoveKey(configSet, CONFIG_ITEM_GSMSKIPVIDEOS);
+#endif
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
 		if (hexid[0] != '\0')

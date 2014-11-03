@@ -23,9 +23,6 @@ enum MENU_IDs{
 	MENU_IP_CONFIG,
 	MENU_SAVE_CHANGES,
 	MENU_START_HDL,
-#ifdef GSM
-	MENU_GSM_SETTINGS,
-#endif
 #ifdef CHEAT
 	MENU_CHEAT_SETTINGS,
 #endif
@@ -109,10 +106,6 @@ static void menuInitMainMenu(void) {
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
 	if (gHDDStartMode && gEnableDandR) // enabled at all?
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
-#ifdef GSM
-	if (gShowGSM) // Reveals GSM Menu - Default is No
-		submenuAppendItem(&mainMenu, -1, NULL, MENU_GSM_SETTINGS, _STR_GSM_SETTINGS);
-#endif
 #ifdef CHEAT
 	if (gShowCheat) // Reveals PS2RD Cheat Engine Menu - Default is No
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
@@ -573,10 +566,6 @@ void menuHandleInputMenu() {
 			guiShowConfig();
 		} else if (id == MENU_GFX_SETTINGS) {
 			guiShowUIConfig();
-#ifdef GSM
-		} else if (id == MENU_GSM_SETTINGS) {
-			guiShowGSConfig();
-#endif
 #ifdef CHEAT
 		} else if (id == MENU_CHEAT_SETTINGS) {
 			guiShowCheatConfig();

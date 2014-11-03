@@ -73,8 +73,8 @@ static void hddInitModules(void) {
 #endif
 
 #ifdef CHEAT
-		sprintf(path, "%sCHT", hddPrefix);
-		checkCreateDir(path);
+	sprintf(path, "%sCHT", hddPrefix);
+	checkCreateDir(path);
 #endif
 }
 

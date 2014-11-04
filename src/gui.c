@@ -705,23 +705,23 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 
 	int EnableGSM = 0;
 	configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
-	diaSetInt(diaCompatConfig, COMPAT_ENABLEGSM, EnableGSM);
+	diaSetInt(diaGSConfig, COMPAT_ENABLEGSM, EnableGSM);
 
 	int GSMVMode = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &GSMVMode);
-	diaSetInt(diaCompatConfig, COMPAT_GSMVMODE, GSMVMode);
+	diaSetInt(diaGSConfig, COMPAT_GSMVMODE, GSMVMode);
 
 	int GSMXOffset = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
-	diaSetInt(diaCompatConfig, COMPAT_GSMXOFFSET, GSMXOffset);
+	diaSetInt(diaGSConfig, COMPAT_GSMXOFFSET, GSMXOffset);
 
 	int GSMYOffset = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
-	diaSetInt(diaCompatConfig, COMPAT_GSMYOFFSET, GSMYOffset);
+	diaSetInt(diaGSConfig, COMPAT_GSMYOFFSET, GSMYOffset);
 
 	int GSMSkipVideos = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, &GSMSkipVideos);
-	diaSetInt(diaCompatConfig, COMPAT_GSMSKIPVIDEOS, GSMSkipVideos);
+	diaSetInt(diaGSConfig, COMPAT_GSMSKIPVIDEOS, GSMSkipVideos);
 
 // End Of Per-Game GSM Integration --Bat--
 #endif
@@ -842,35 +842,35 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configRemoveKey(configSet, CONFIG_ITEM_CDVDMAN_TIMER);
 
 #ifdef GSM
-		diaGetInt(diaCompatConfig, COMPAT_ENABLEGSM, &EnableGSM);
+		diaGetInt(diaGSConfig, COMPAT_ENABLEGSM, &EnableGSM);
 		if (EnableGSM != 0)
 			configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
 			
-		diaGetInt(diaCompatConfig, COMPAT_GSMVMODE, &GSMVMode);
+		diaGetInt(diaGSConfig, COMPAT_GSMVMODE, &GSMVMode);
 		if (GSMVMode != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
 
-		diaGetInt(diaCompatConfig, COMPAT_GSMXOFFSET, &GSMXOffset);
+		diaGetInt(diaGSConfig, COMPAT_GSMXOFFSET, &GSMXOffset);
 		if (GSMXOffset != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET); 
 
-		diaGetInt(diaCompatConfig, COMPAT_GSMYOFFSET, &GSMYOffset);
+		diaGetInt(diaGSConfig, COMPAT_GSMYOFFSET, &GSMYOffset);
 		if (GSMYOffset != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
 
-		diaGetInt(diaCompatConfig, COMPAT_GSMSKIPVIDEOS, &GSMSkipVideos);
+		diaGetInt(diaGSConfig, COMPAT_GSMSKIPVIDEOS, &GSMSkipVideos);
 		if (GSMSkipVideos != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, GSMSkipVideos);
 		else
-				configRemoveKey(configSet, CONFIG_ITEM_GSMSKIPVIDEOS);
+			configRemoveKey(configSet, CONFIG_ITEM_GSMSKIPVIDEOS);
 #endif
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));

@@ -520,14 +520,14 @@ static void PrepareGSM(char *cmdline) {
 		{  VGA_VMODE, "VGA 1280x1024p @75Hz           ",	GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	(u64)make_display_magic_number(  1024,	1280,	1,		1,		 40,	350),	0x0070000002600001}
 	}; //ends predef_vmode definition
 
-	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[GSMVMode].interlace, \
-					predef_vmode[GSMVMode].mode, \
-					predef_vmode[GSMVMode].ffmd, \
-					predef_vmode[GSMVMode].display, \
-					predef_vmode[GSMVMode].syncv, \
-					((predef_vmode[GSMVMode].ffmd)<<1)|(predef_vmode[GSMVMode].interlace), \
-					GSMXOffset, \
-					GSMYOffset);
+	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[gGSMVMode].interlace, \
+					predef_vmode[gGSMVMode].mode, \
+					predef_vmode[gGSMVMode].ffmd, \
+					predef_vmode[gGSMVMode].display, \
+					predef_vmode[gGSMVMode].syncv, \
+					((predef_vmode[gGSMVMode].ffmd)<<1)|(predef_vmode[gGSMVMode].interlace), \
+					gGSMXOffset, \
+					gGSMYOffset);
 }
 #endif
 
@@ -657,7 +657,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 #ifdef GSM
 #define GSM_TEMP1	" %d"
-#define GSM_TEMP2	,EnableGSM
+#define GSM_TEMP2	,gEnableGSM
 #else
 #define GSM_TEMP1
 #define GSM_TEMP2

@@ -199,6 +199,16 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	if (compatmask & COMPAT_MODE_6) {
 		settings->flags |= IOPCORE_ENABLE_POFF;
 	}
+	
+	gEnableGSM = 0;
+	if (configGetInt(configSet, COMPAT_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
+	//Load the rest of the per-game GSM configuration, only if GSM is enabled.
+		configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
+		configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
+		configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
+		configGetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, &gGSMSkipVideos);
+	
+	}
 
 	// patch cdvdman timer
 	int timer = 0;

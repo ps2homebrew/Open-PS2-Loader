@@ -201,7 +201,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	}
 	
 	gEnableGSM = 0;
-	if (configGetInt(configSet, COMPAT_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
+	if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
 	//Load the rest of the per-game GSM configuration, only if GSM is enabled.
 		configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
 		configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);

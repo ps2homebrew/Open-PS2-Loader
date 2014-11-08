@@ -18,13 +18,13 @@ DECI2_DEBUG = 0
 DTL_T10000 = 0
 
 #change following line to "0" to build without VMC - DO NOT COMMENT!
-VMC = 1
+VMC = 0
 
 CHILDPROOF = 0
 RTL = 0
 
 #change following line to "0" to build without GSM - DO NOT COMMENT!
-GSM = 1
+GSM = 0
 
 #change following line to "0" to build without PS2RD Cheat Engine - DO NOT COMMENT!
 CHEAT = 0

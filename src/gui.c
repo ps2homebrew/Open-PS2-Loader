@@ -368,8 +368,10 @@ void guiShowGSConfig(void) {
 	
 	// Conversion to 'COMPAT' complete. Might need some clean up though! (--Bat--)
 	diaSetEnum(diaGSConfig, COMPAT_GSMVMODE, gsmvmodeNames);
-	
-}
+	diaExecuteDialog(diaGSConfig, -1, 1, NULL);
+
+	}
+
 #endif
 
 #ifdef CHEAT

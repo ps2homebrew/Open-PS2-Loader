@@ -132,7 +132,7 @@ int	gGSMSkipVideos; // 0 - Off, 1 - On
 #define CHEAT_VERSION "0.5.3.65.g774d1"
 
 #define MAX_HOOKS	5
-#define MAX_CODES	100
+#define MAX_CODES	250
 #define MAX_CHEATLIST	(MAX_HOOKS*2+MAX_CODES*2)
 
 int	gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On

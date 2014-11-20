@@ -178,14 +178,14 @@ Ethernet speed and duplex settings
 10Mbit half-duplex
 GSM Settings
 Enable GSM
-Lets GSM force the Selected Video Mode below
-Selected Video Mode
-Video mode to be forced
-Horizontal Adjust
-Sets Horizontal Offset
-Vertical Adjust
-Sets Vertical Offset
-FMV skip
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
 Skips Full Motion Videos
 Show PS2RD Cheat Engine on Main Menu
 Cheat Settings

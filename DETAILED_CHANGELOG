@@ -8,6 +8,23 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev728 - (*) Hey Bat, try not to break non-GSM builds of OPL next time, willya?!? *LOL* - Mon Nov 10 13:09:00 2014 -0500
+rev727 - (*) Decided to let the new logo escape the asylum. Those who want to classic - Mon Nov 10 04:42:25 2014 -0500
+rev726 - Close branch ps2rd-max-codes-250. - Sun Nov 09 21:17:20 2014 +0000
+rev725 - Sync-Merged with ifcaro/open-ps2-loader - Sun Nov 09 16:11:59 2014 -0500
+rev724 - Merged in Aced14/open-ps2-loader/ps2rd-max-codes-250 (pull request #11) - Sun Nov 09 19:16:08 2014 +0800
+rev723 - Increased ps2rd's cheat line limit (MAX_CODES) to 250. - Sun Nov 09 04:25:05 2014 -0500
+rev722 - (*) Per-Game GSM is COMPLETE! Repository frozen for now. Thanks to SP193 for - Sat Nov 08 16:25:46 2014 -0500
+rev721 - (*) Whoops! - Sat Nov 08 10:30:24 2014 -0500
+rev720 - (*) Went to far re-globalizing GSM - Fri Nov 07 22:05:32 2014 -0500
+rev719 - (*) Re-globalized GSM - Wed Nov 05 19:51:47 2014 -0500
+rev718 - (*) Per-Game GSM Complete (I think). There were two solutions to the issue. I - Mon Nov 03 23:31:15 2014 -0500
+rev717 - Merged ifcaro/open-ps2-loader into default - Mon Nov 03 15:34:49 2014 -0500
+rev716 - Improved IGR stability (E P), fixed MC slot 1 use when a VMC is mounted as the 2nd slot (E P), fixed art drawing, fixed poor game list loading performance and brought forward texture cache initialization. - Mon Nov 03 21:35:05 2014 +0800
+rev715 - Added tag 0.9.3 for changeset 1fbd6857681b - Sat Nov 01 10:26:48 2014 -0400
+rev714 - (*) Per-Game GSM (In One Commit) - couldn't make sense of the shit I had - Sat Nov 01 10:26:12 2014 -0400
+rev713 - Close branch psx_core/the-most-accurate-and-correct-translatio-1384761167035. - Fri Oct 17 21:06:39 2014 +0000
+rev712 - Replaced all obsolete Makefile rule files with a common file and integrated the discID module into the EE side. - Tue Oct 14 22:29:01 2014 +0800
 rev711 - Changed auto-refresh behaviour and fixed the SMB reconnect option: - Sun Oct 12 23:13:38 2014 +0800
 rev710 - Updated the GUI to have device-dependent refresh rates and moved some of the static buffers in CDVDMAN onto the stack. - Fri Oct 10 23:19:40 2014 +0800
 rev709 - README edited online with Bitbucket - Tue Oct 07 09:20:45 2014 +0000

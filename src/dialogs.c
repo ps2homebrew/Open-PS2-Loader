@@ -82,15 +82,15 @@ struct UIItem diaCompatConfig[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER}, {UI_BREAK},
 	
-	{UI_BREAK},
+	{UI_SPLITTER},
 
 // Note: Per-Game GSM uses a UI_BUTTON to open up the menu. An #ifdef should keep it
 // out of Childproof and Non-GSM builds. --Bat--

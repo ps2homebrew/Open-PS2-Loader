@@ -671,7 +671,7 @@ static inline void cdvdSt_read(void *buf)
 		else
 			nsectors = St->sectors;
 
-		r = sceCdStRead(nsectors, cdvdfsv_buf, 0, &err);
+		if((r = sceCdStRead(nsectors, cdvdfsv_buf, 0, &err)) < 1) break;
 
 		sysmemSendEE(cdvdfsv_buf, ee_addr, r << 11);
 
@@ -680,7 +680,7 @@ static inline void cdvdSt_read(void *buf)
 		St->sectors -= r;
 	}
 
-	*(int *)buf = rpos;
+	*(int *)buf = (rpos & 0xFFFF) | (err << 16);
 }
 
 //-------------------------------------------------------------------------

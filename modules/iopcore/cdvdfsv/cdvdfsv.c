@@ -496,7 +496,8 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
 			cdvd_Stsubcmdcall(buf);
 			break;
 		case CDVDFSV_NCMD_IOPMREAD:
-			sceCdRead0(((RpcCdvd_t *)buf)->lsn, ((RpcCdvd_t *)buf)->sectors, ((RpcCdvd_t *)buf)->buf, NULL);
+			sceCdRead(((RpcCdvd_t *)buf)->lsn, ((RpcCdvd_t *)buf)->sectors, ((RpcCdvd_t *)buf)->buf, NULL);
+			sceCdSync(0);
 			*(int *)buf = 1;
 			break;
 		case CDVDFSV_NCMD_DISKRDY:
@@ -703,10 +704,12 @@ static inline void cdvd_readchain(void *buf)
 				nsectors = tsectors;
 
 			if ((u32)ch->buf & 1) { // IOP addr
-				sceCdRead0(lsn, nsectors, (void *)addr, NULL);
+				sceCdRead(lsn, nsectors, (void *)addr, NULL);
+				sceCdSync(0);
 			}
 			else {			// EE addr
-				sceCdRead0(lsn, nsectors, cdvdfsv_buf, NULL);
+				sceCdRead(lsn, nsectors, cdvdfsv_buf, NULL);
+				sceCdSync(0);
 				sysmemSendEE(cdvdfsv_buf, (void *)addr, nsectors << 11);
 			}
 
@@ -812,7 +815,8 @@ static inline void cdvd_readee(void *buf)
 				temp = nsectors;
 			}
 
-			sceCdRead0(r->lsn, temp, (void *)fsvRbuf, NULL);
+			sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL);
+			sceCdSync(0);
 
 			size_64b = nsectors * sector_size;
 			size_64bb = size_64b;

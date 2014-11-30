@@ -669,9 +669,9 @@ static inline void cdvdSt_read(void *buf)
 
 		r = sceCdStRead(nsectors, cdvdfsv_buf, 0, &err);
 
-		sysmemSendEE(cdvdfsv_buf, ee_addr, nsectors << 11);
+		sysmemSendEE(cdvdfsv_buf, ee_addr, r << 11);
 
-		ee_addr += nsectors << 11;
+		ee_addr += r << 11;
 		rpos += r;
 		St->sectors -= r;
 	}

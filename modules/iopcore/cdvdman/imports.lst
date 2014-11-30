@@ -1,13 +1,3 @@
-
-#ifdef ALT_READ_CORE
-thmsgbx_IMPORTS_start
-I_SendMbx
-I_iSendMbx
-I_CreateMbx
-I_ReceiveMbx
-thmsgbx_IMPORTS_end
-#endif
-
 ioman_IMPORTS_start
 I_AddDrv
 I_DelDrv
@@ -79,20 +69,22 @@ I_iSetAlarm
 I_CancelAlarm
 I_USec2SysClock
 I_SleepThread
+I_WakeupThread
 I_iWakeupThread
 thbase_IMPORTS_end
 
 thevent_IMPORTS_start
 I_CreateEventFlag
 I_ClearEventFlag
+I_iClearEventFlag
+I_SetEventFlag
 I_iSetEventFlag
 I_WaitEventFlag
+I_ReferEventFlagStatus
+I_iReferEventFlagStatus
 thevent_IMPORTS_end
 
 sifman_IMPORTS_start
 I_sceSifSetDma
 I_sceSifDmaStat
-I_sceSifSetDmaIntrHandler
-I_sceSifResetDmaIntrHandler
 sifman_IMPORTS_end
-

@@ -23,7 +23,6 @@ I_sceCdStSeek
 I_sceCdStStart
 I_sceCdStStat
 I_sceCdStStop
-I_sceCdRead0
 I_sceCdStPause
 I_sceCdStResume
 I_sceCdPowerOff

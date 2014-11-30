@@ -587,14 +587,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 //Must be called from a thread context, with interrupts disabled.
 static int cdvdman_common_lock(int IntrContext)
 {
-	iop_event_info_t evfInfo;
-
-	if(IntrContext)
-		iReferEventFlagStatus(cdvdman_stat.intr_ef, &evfInfo);
-	else
-		ReferEventFlagStatus(cdvdman_stat.intr_ef, &evfInfo);
-
-	if(!(evfInfo.currBits & 1))
+	if(sync_flag)
 		return 0;
 
 	if (IntrContext)

@@ -80,8 +80,6 @@ I_iClearEventFlag
 I_SetEventFlag
 I_iSetEventFlag
 I_WaitEventFlag
-I_ReferEventFlagStatus
-I_iReferEventFlagStatus
 thevent_IMPORTS_end
 
 sifman_IMPORTS_start

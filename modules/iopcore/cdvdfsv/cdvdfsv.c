@@ -128,6 +128,7 @@ static inline void cdvd_Stsubcmdcall(void *buf);
 static inline void cdvdSt_read(void *buf);
 static inline void cdvd_readchain(void *buf);
 static inline void cdvd_readee(void *buf);
+int sceCdChangeThreadPriority(int priority);
 
 enum CDVDFSV_SCMD{
 	CDVDFSV_SCMD_READCLOCK	= 0x01,
@@ -229,7 +230,7 @@ static void cdvdfsv_startrpcthreads(void)
 	iop_thread_t thread_param;
 
 	thread_param.attr = TH_C;
-	thread_param.option = 0;
+	thread_param.option=0xABCD8001;
 	thread_param.thread = (void *)cdvdfsv_rpc1_th;
 	thread_param.stacksize = 0x1900;
 	thread_param.priority = 0x51;
@@ -238,7 +239,7 @@ static void cdvdfsv_startrpcthreads(void)
 	StartThread(rpc1_thread_id, NULL);
 
 	thread_param.attr = TH_C;
-	thread_param.option = 0;
+	thread_param.option=0xABCD8002;
 	thread_param.thread = (void *)cdvdfsv_rpc2_th;
 	thread_param.stacksize = 0x1900;
 	thread_param.priority = 0x51;
@@ -247,7 +248,7 @@ static void cdvdfsv_startrpcthreads(void)
 	StartThread(rpc2_thread_id, NULL);
 
 	thread_param.attr = TH_C;
-	thread_param.option = 0;
+	thread_param.option=0xABCD8000;
 	thread_param.thread = (void *)cdvdfsv_rpc0_th;
 	thread_param.stacksize = 0x800;
 	thread_param.priority = 0x51;
@@ -408,6 +409,9 @@ static void *cbrpc_cdvdScmds(int fno, void *buf, int size)
 			break;
 		case CDVDFSV_SCMD_MMODE:
 			*(int *)buf = sceCdMmode(*(int *)buf);
+			break;
+		case CDVDFSV_SCMD_THREADPRIO:
+			*(int *)buf = sceCdChangeThreadPriority(*(int *)buf);
 			break;
 		case CDVDFSV_SCMD_READGUID:
 			rpcSCmd_cdreadGUID(buf);
@@ -858,15 +862,10 @@ static inline void cdvd_readee(void *buf)
 //-------------------------------------------------------------------------
 int sceCdChangeThreadPriority(int priority)
 {
-	iop_thread_info_t th_info;
-
 	if ((u32)(priority - 9) < 0x73) {
 		if (priority == 9)
 			priority = 10;
 
-		ReferThreadStatus(0, &th_info);
-
-		ChangeThreadPriority(0, 0x08);
 		ChangeThreadPriority(rpc0_thread_id, priority);
 		ChangeThreadPriority(rpc2_thread_id, priority);
 		ChangeThreadPriority(rpc1_thread_id, priority);

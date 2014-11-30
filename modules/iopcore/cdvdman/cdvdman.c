@@ -12,6 +12,7 @@
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"
+#include "internal.h"
 #include "cdvd_config.h"
 
 #include <loadcore.h>
@@ -23,7 +24,6 @@
 #include <intrman.h>
 #include <ioman.h>
 #include <thsemap.h>
-#include <thmsgbx.h>
 #include <errno.h>
 #include <io_common.h>
 #include <usbd.h>
@@ -125,23 +125,6 @@ struct dirTocEntry {
 	u8	filenameLength;			// 32
 	char	filename[128];			// 33
 } __attribute__((packed));
-
-struct cdvdman_StreamingData{
-	unsigned int lsn;
-	unsigned int bufmax;
-	int stat;
-};
-
-typedef struct {
-	int err;
-	int status;
-	struct cdvdman_StreamingData StreamingData;
-	int intr_ef;
-	int disc_type_reg;
-	u32 cdread_lba;
-	u32 cdread_sectors;
-	void *cdread_buf;
-} cdvdman_status_t;
 
 typedef struct {
 	iop_file_t *f;
@@ -283,11 +266,13 @@ static u32 cdvdman_layer1start = 0;
 #endif
 
 static int cdrom_io_sema;
-static int cdvdman_cdreadsema;
+static int cdvdman_scmdsema;
 static int cdvdman_searchfilesema;
 
 static int cdvdman_ReadingThreadID;
 static int sync_flag;
+
+static StmCallback_t Stm0Callback = NULL;
 
 // buffers
 #define CDVDMAN_BUF_SECTORS 	2
@@ -495,6 +480,7 @@ static void cdvdman_init(void)
 #if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
 		if(cdvdman_settings.common.flags&IOPCORE_ENABLE_POFF){
 			ThreadData.attr=TH_C;
+			ThreadData.option=0xABCD0001;
 			ThreadData.priority=1;
 			ThreadData.stacksize=0x400;
 			ThreadData.thread=&cdvdman_poff_thread;
@@ -516,7 +502,7 @@ int sceCdInit(int init_mode)
 int sceCdStandby(void)
 {
 	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.status = CDVD_STAT_SPIN;
+	cdvdman_stat.status = CDVD_STAT_PAUSE;
 
 	cdvdman_cb_event(SCECdFuncStandby);
 
@@ -562,8 +548,6 @@ static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *bu
 
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
-	WaitSema(cdvdman_cdreadsema);
-
 	if ((u32)(buf) & 3) {
 		WaitSema(cdvdman_searchfilesema);
 
@@ -593,13 +577,13 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 	}
 
 	ReadPos = 0;	/* Reset the buffer offset indicator. */
-	SignalSema(cdvdman_cdreadsema);
 
 	cdvdman_stat.status = CDVD_STAT_PAUSE;
 
 	return 1;
 }
 
+//Must be called from a thread context, with interrupts disabled.
 static int cdvdman_common_lock(int IntrContext)
 {
 	iop_event_info_t evfInfo;
@@ -1903,10 +1887,10 @@ static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_s
 	u8 *p;
 	u8 rdbuf[64];
 
-	WaitSema(cdvdman_cdreadsema);
+	WaitSema(cdvdman_scmdsema);
 
 	if (CDVDreg_SDATAIN & 0x80) {
-		SignalSema(cdvdman_cdreadsema);
+		SignalSema(cdvdman_scmdsema);
 		return 0;
 	}
 
@@ -1942,7 +1926,7 @@ static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_s
 
 	mips_memcpy((void *)out, (void *)rdbuf, out_size);
 
-	SignalSema(cdvdman_cdreadsema);
+	SignalSema(cdvdman_scmdsema);
 
 	return 1;
 }
@@ -2012,6 +1996,11 @@ static void cdvdman_cdread_Thread(void *args)
 		sync_flag = 0;
 		SetEventFlag(cdvdman_stat.intr_ef, 9);
 
+		/* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
+			The original is run from the interrupt handler, but we want it to run
+			from a threaded environment because it's easier to protect critical regions. */
+		if(Stm0Callback != NULL) Stm0Callback();
+
 		cdvdman_cb_event(SCECdFuncRead);
 	}
 }
@@ -2028,7 +2017,7 @@ static void cdvdman_startThreads(void)
 	thread_param.stacksize = 0x400;
 	thread_param.priority = 0x0f;
 	thread_param.attr = TH_C;
-	thread_param.option = 0;
+	thread_param.option=0xABCD0000;
 
 	cdvdman_ReadingThreadID = CreateThread(&thread_param);
 	StartThread(cdvdman_ReadingThreadID, NULL);
@@ -2044,7 +2033,7 @@ static void cdvdman_create_semaphores(void)
 	smp.attr = 0;
 	smp.option = 0;
 
-	cdvdman_cdreadsema = CreateSema(&smp);
+	cdvdman_scmdsema = CreateSema(&smp);
 }
 
 //-------------------------------------------------------------------------
@@ -2178,6 +2167,12 @@ int _start(int argc, char **argv)
 	cdvdman_initDiskType();
 
 	return MODULE_RESIDENT_END;
+}
+
+//-------------------------------------------------------------------------
+void SetStm0Callback(StmCallback_t callback)
+{
+	Stm0Callback = callback;
 }
 
 //-------------------------------------------------------------------------

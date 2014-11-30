@@ -1314,43 +1314,61 @@ static int cdrom_close(iop_file_t *f)
 static int cdrom_read(iop_file_t *f, void *buf, int size)
 {
 	FHANDLE *fh = (FHANDLE *)f->privdata;
-	register int rpos, sectorpos;
-	register u32 nsectors, nbytes;
+	unsigned int offset, nsectors, nbytes;
+	int rpos;
 
 	WaitSema(cdrom_io_sema);
 
 	DPRINTF("cdrom_read size=%d file_position=%d\n", size, fh->position);
 
-	rpos = 0;
-
 	if ((fh->position + size) > fh->filesize)
 		size = fh->filesize - fh->position;
 
-	while (size) {
-		nbytes = CDVDMAN_FS_BUFSIZE;
-		if (size < nbytes)
-			nbytes = size;
+	rpos = 0;
+	if(size > 0){
+		//Phase 1: read data until the offset of the file is nicely aligned to a 2048-byte boundary.
+		if((offset = fh->position % 2048) != 0){
+			nbytes = 2048 - offset;
+			if(size < nbytes) nbytes = size;
+			sceCdRead(fh->lsn + ((fh->position & -2048) / 2048), 1, cdvdman_fs_buf, NULL);
 
-		nsectors = nbytes >> 11;
-		sectorpos = fh->position & 2047;
+			fh->position += nbytes;
+			size -= nbytes;
+			rpos += nbytes;
 
-		if (sectorpos)
-			nsectors++;
+			sceCdSync(0);
+			mips_memcpy(buf, &cdvdman_fs_buf[offset], nbytes);
+			buf += nbytes;
+		}
 
-		if (nbytes & 2047)
-			nsectors++;
+		//Phase 2: read the data to the middle of the buffer, in units of 2048.
+		if((nsectors = size/2048)>0){
+			nbytes = nsectors * 2048;
 
-		sceCdRead(fh->lsn + ((fh->position & -2048) >> 11), nsectors, cdvdman_fs_buf, NULL);
-		sceCdSync(0);
-		mips_memcpy(buf, &cdvdman_fs_buf[sectorpos], nbytes);
+			sceCdRead(fh->lsn + (fh->position / 2048), nsectors, buf, NULL);
 
-		rpos += nbytes;
-		buf += nbytes;
-		size -= nbytes;
-		fh->position += nbytes;
+			buf += nbytes;
+			size -= nbytes;
+			fh->position += nbytes;
+			rpos += nbytes;
+
+			sceCdSync(0);
+		}
+
+		//Phase 3: read any remaining data that isn't divisible by 2048.
+		if((nbytes = size) > 0){
+			sceCdRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf, NULL);
+
+			size -= nbytes;
+			fh->position += nbytes;
+			rpos += nbytes;
+
+			sceCdSync(0);
+			mips_memcpy(buf, cdvdman_fs_buf, nbytes);
+		}
 	}
 
-	DPRINTF("cdrom_read ret=%d\n", (int)rpos);
+	DPRINTF("cdrom_read ret=%d\n", rpos);
 	SignalSema(cdrom_io_sema);
 
 	return rpos;

@@ -156,7 +156,6 @@ static void cdvdman_startThreads(void);
 static void cdvdman_create_semaphores(void);
 static void cdvdman_initdev(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
-static int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf);
 #ifdef HDD_DRIVER
 static void cdvdman_get_part_specs(u32 lsn);
 #else
@@ -548,6 +547,8 @@ static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *bu
 
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
+	cdvdman_stat.status = CDVD_STAT_READ;
+
 	if ((u32)(buf) & 3) {
 		WaitSema(cdvdman_searchfilesema);
 
@@ -606,7 +607,7 @@ static int cdvdman_common_lock(int IntrContext)
 	return 1;
 }
 
-static int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
+int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
 {
 	int IsIntrContext, OldState;
 
@@ -668,7 +669,6 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 
 	DPRINTF("sceCdRead lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
 
-	cdvdman_stat.status = CDVD_STAT_READ;
 	if ((!(cdvdman_settings.common.flags&IOPCORE_COMPAT_ALT_READ)) || QueryIntrContext()) {
 		result = cdvdman_AsyncRead(lsn, sectors, buf);
 	}
@@ -1012,72 +1012,6 @@ int sceCdRC(cd_clock_t *rtc)
 }
 
 //-------------------------------------------------------------------------
-int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
-{
-	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.StreamingData.stat = 0;
-	cdvdman_stat.StreamingData.bufmax = bufmax;
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStRead(u32 sectors, void *buf, u32 mode, u32 *err)
-{
-	sceCdRead(cdvdman_stat.StreamingData.lsn, sectors, buf, NULL);
-	sceCdSync(0);
-	cdvdman_stat.StreamingData.lsn += sectors;
-
-	if (err)
-		*err = sceCdGetError();
-
-	return sectors;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStSeek(u32 lsn)
-{
-	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.StreamingData.lsn = lsn;
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStStart(u32 lsn, cd_read_mode_t *mode)
-{
-	if (mode->datapattern)
-		cdvdman_stat.err = CDVD_ERR_READ;
-	else {
-		cdvdman_stat.err = CDVD_ERR_NO;
-		cdvdman_stat.StreamingData.lsn = lsn;
-		cdvdman_stat.StreamingData.stat = 0;
-		cdvdman_stat.status = CDVD_STAT_PAUSE;
-	}
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStStat(void)
-{
-	if (cdvdman_stat.StreamingData.stat == 1)
-		return 0;
-
-	return cdvdman_stat.StreamingData.bufmax;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStStop(void)
-{
-	cdvdman_stat.StreamingData.stat = 1;
-	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.status = CDVD_STAT_PAUSE;
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
 #ifndef HDD_DRIVER
 static int cdvdman_DevReadSect(u32 lsn, u32 nsectors, void *buf)
 {
@@ -1165,32 +1099,6 @@ int sceCdRM(char *m, u32 *stat)
 		*stat |= rdbuf[0];
 		mips_memcpy(&m[8], &rdbuf[1], 8);
 	}
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStPause(void)
-{
-	cdvdman_stat.err = CDVD_ERR_NO;
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStResume(void)
-{
-	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.status = CDVD_STAT_PAUSE;
-
-	return 1;
-}
-
-//-------------------------------------------------------------------------
-int sceCdStSeekF(u32 lsn)
-{
-	cdvdman_stat.err = CDVD_ERR_NO;
-	cdvdman_stat.StreamingData.lsn = lsn;
 
 	return 1;
 }

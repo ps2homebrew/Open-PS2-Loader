@@ -286,7 +286,7 @@ static int cdrom_io_sema;
 static int cdvdman_cdreadsema;
 static int cdvdman_searchfilesema;
 
-static int cdvdman_lockreadsema;
+static int cdvdman_ReadingThreadID;
 static int sync_flag;
 
 // buffers
@@ -562,11 +562,6 @@ static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *bu
 
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
-	if (QueryIntrContext()) {
-		DPRINTF("cdvdman_read exiting (Intr context)...\n");
-		return 0;
-	}
-
 	WaitSema(cdvdman_cdreadsema);
 
 	if ((u32)(buf) & 3) {
@@ -605,22 +600,79 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 	return 1;
 }
 
+static int cdvdman_common_lock(int IntrContext)
+{
+	iop_event_info_t evfInfo;
+
+	if(IntrContext)
+		iReferEventFlagStatus(cdvdman_stat.intr_ef, &evfInfo);
+	else
+		ReferEventFlagStatus(cdvdman_stat.intr_ef, &evfInfo);
+
+	if(!(evfInfo.currBits & 1))
+		return 0;
+
+	if (IntrContext)
+		iClearEventFlag(cdvdman_stat.intr_ef, ~1);
+	else
+		ClearEventFlag(cdvdman_stat.intr_ef, ~1);
+
+	sync_flag = 1;
+
+	return 1;
+}
+
 static int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
 {
-	if (sync_flag == 1) {
+	int IsIntrContext, OldState;
+
+	IsIntrContext=QueryIntrContext();
+
+	CpuSuspendIntr(&OldState);
+
+	if(!cdvdman_common_lock(IsIntrContext))
+	{
+		CpuResumeIntr(OldState);
 		DPRINTF("sceCdRead: exiting (sync_flag)...\n");
 		return 0;
 	}
 
-	sync_flag = 1;
 	cdvdman_stat.cdread_lba = lsn;
 	cdvdman_stat.cdread_sectors = sectors;
 	cdvdman_stat.cdread_buf = buf;
 
-	if (QueryIntrContext())
-		iSignalSema(cdvdman_lockreadsema);
+	CpuResumeIntr(OldState);
+
+	if (IsIntrContext)
+		iWakeupThread(cdvdman_ReadingThreadID);
 	else
-		SignalSema(cdvdman_lockreadsema);
+		WakeupThread(cdvdman_ReadingThreadID);
+
+	return 1;
+}
+
+static int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf)
+{
+	int IsIntrContext, OldState;
+
+	IsIntrContext=QueryIntrContext();
+
+	CpuSuspendIntr(&OldState);
+
+	if(!cdvdman_common_lock(IsIntrContext))
+	{
+		CpuResumeIntr(OldState);
+		DPRINTF("sceCdRead: exiting (sync_flag)...\n");
+		return 0;
+	}
+
+	CpuResumeIntr(OldState);
+
+	cdvdman_read(lsn, sectors, buf);
+
+	cdvdman_cb_event(SCECdFuncRead);
+	sync_flag = 0;
+	SetEventFlag(cdvdman_stat.intr_ef, 9);
 
 	return 1;
 }
@@ -628,21 +680,19 @@ static int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
 //-------------------------------------------------------------------------
 int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 {
+	int result;
+
 	DPRINTF("sceCdRead lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
 
 	cdvdman_stat.status = CDVD_STAT_READ;
-	if (QueryIntrContext() || (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_ALT_READ))) {
-		cdvdman_AsyncRead(lsn, sectors, buf);
+	if ((!(cdvdman_settings.common.flags&IOPCORE_COMPAT_ALT_READ)) || QueryIntrContext()) {
+		result = cdvdman_AsyncRead(lsn, sectors, buf);
 	}
 	else {
-		sync_flag = 1;
-		cdvdman_read(lsn, sectors, buf);
-
-		cdvdman_cb_event(SCECdFuncRead);
-		sync_flag = 0;
+		 result = cdvdman_SyncRead(lsn, sectors, buf);
 	}
 
-	return 1;
+	return result;
 }
 
 //-------------------------------------------------------------------------
@@ -695,7 +745,7 @@ int sceCdSync(int mode)
 		return 1;
 
 	while (sync_flag)
-		DelayThread(5000);
+		WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 
 	return 0;
 }
@@ -730,8 +780,8 @@ int sceCdDiskReady(int mode)
 
 	if (cdvdman_cdinited) {
 		if (mode == 0) {
-			while (sceCdDiskReady(1) == CDVD_READY_NOTREADY)
-				DelayThread(5000);
+			while (sync_flag)
+				WaitEventFlag(cdvdman_stat.intr_ef, 1, WEF_AND, NULL);
 		}
 
 		if (!sync_flag)
@@ -1955,11 +2005,12 @@ static unsigned int event_alarm_cb(void *args)
 static void cdvdman_cdread_Thread(void *args)
 {
 	while (1) {
-		WaitSema(cdvdman_lockreadsema);
+		SleepThread();
 
 		cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.cdread_buf);
 
 		sync_flag = 0;
+		SetEventFlag(cdvdman_stat.intr_ef, 9);
 
 		cdvdman_cb_event(SCECdFuncRead);
 	}
@@ -1969,7 +2020,6 @@ static void cdvdman_cdread_Thread(void *args)
 static void cdvdman_startThreads(void)
 {
 	iop_thread_t thread_param;
-	register int thid;
 
 	cdvdman_stat.status = CDVD_STAT_PAUSE;
 	cdvdman_stat.err = CDVD_ERR_NO;
@@ -1980,8 +2030,8 @@ static void cdvdman_startThreads(void)
 	thread_param.attr = TH_C;
 	thread_param.option = 0;
 
-	thid = CreateThread(&thread_param);
-	StartThread(thid, NULL);
+	cdvdman_ReadingThreadID = CreateThread(&thread_param);
+	StartThread(cdvdman_ReadingThreadID, NULL);
 }
 
 //-------------------------------------------------------------------------
@@ -1995,13 +2045,6 @@ static void cdvdman_create_semaphores(void)
 	smp.option = 0;
 
 	cdvdman_cdreadsema = CreateSema(&smp);
-
-	smp.initial = 0;
-	smp.max = 1;
-	smp.attr = 0;
-	smp.option = 0;
-
-	cdvdman_lockreadsema = CreateSema(&smp);
 }
 
 //-------------------------------------------------------------------------
@@ -2009,12 +2052,11 @@ static void cdvdman_initdev(void)
 {
 	iop_event_t event;
 
-	event.attr = 2;
+	event.attr = 2;	//EA_MULTI
 	event.option = 0;
-	event.bits = 0;
+	event.bits = 1;
 
 	cdvdman_stat.intr_ef = CreateEventFlag(&event);
-	ClearEventFlag(cdvdman_stat.intr_ef, 0);
 
 	DelDrv("cdrom");
 	AddDrv((iop_device_t *)&cdrom_dev);

@@ -2,8 +2,6 @@
 #include "include/ioman.h"
 #include "include/hddsupport.h"
 
-//#define TEST_WRITES
-
 typedef struct				// size = 1024
 {
 	u32	checksum;		// HDL uses 0xdeadfeed magic here
@@ -24,45 +22,28 @@ typedef struct				// size = 1024
 	} part_specs[65];
 } hdl_apa_header;
 
+#define HDL_GAME_DATA_OFFSET	0x100000	// Sector 0x800 in the user data area.
+#define HDL_FS_MAGIC		0x1337
+
 //
 // DEVCTL commands
 //
-#define APA_DEVCTL_MAX_SECTORS		0x00004801	// max partition size(in sectors)
 #define APA_DEVCTL_TOTAL_SECTORS	0x00004802
 #define APA_DEVCTL_IDLE			0x00004803
-#define APA_DEVCTL_FLUSH_CACHE		0x00004804
-#define APA_DEVCTL_SWAP_TMP		0x00004805
 #define APA_DEVCTL_DEV9_SHUTDOWN	0x00004806
 #define APA_DEVCTL_STATUS		0x00004807
 #define APA_DEVCTL_FORMAT		0x00004808
 #define APA_DEVCTL_SMART_STAT		0x00004809
-#define APA_DEVCTL_GETTIME		0x00006832
-#define APA_DEVCTL_SET_OSDMBR		0x00006833// arg = hddSetOsdMBR_t
-#define APA_DEVCTL_GET_SECTOR_ERROR	0x00006834
-#define APA_DEVCTL_GET_ERROR_PART_NAME	0x00006835// bufp = namebuffer[0x20]
 #define APA_DEVCTL_ATA_READ		0x00006836// arg  = hddAtaTransfer_t
 #define APA_DEVCTL_ATA_WRITE		0x00006837// arg  = hddAtaTransfer_t
-#define APA_DEVCTL_SCE_IDENTIFY_DRIVE	0x00006838// bufp = buffer for atadSceIdentifyDrive 
 #define APA_DEVCTL_IS_48BIT		0x00006840
 #define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
-
-static apa_partition_table_t *ptable = NULL;
-
-// chunks_map
-#define	MAP_AVAIL	'.'
-#define	MAP_MAIN	'M'
-#define	MAP_SUB		's'
-#define	MAP_COLL	'x'
-#define	MAP_ALLOC	'*'
-
-static u8 hdd_buf[16384];
 
 //-------------------------------------------------------------------------
 int hddCheck(void)
 {
-	register int ret;
+	int ret;
 
-	fileXioInit();
 	ret = fileXioDevctl("hdd0:", APA_DEVCTL_STATUS, NULL, 0, NULL, 0);
 
 	if ((ret >= 3) || (ret < 0))
@@ -117,41 +98,36 @@ int hddSetIdleTimeout(int timeout)
 }
 
 //-------------------------------------------------------------------------
-static int hddReadSectors(u32 lba, u32 nsectors, void *buf, int bufsize)
+static int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 {
 	u8 args[16];
 
 	*(u32 *)&args[0] = lba;
 	*(u32 *)&args[4] = nsectors;
 
-	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, buf, bufsize) != 0)
+	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, buf, nsectors * 512) != 0)
 		return -1;
 
 	return 0;
 }
 
 //-------------------------------------------------------------------------
-static int hddWriteSectors(u32 lba, u32 nsectors, void *buf)
+static int hddWriteSectors(u32 lba, u32 nsectors, const void *buf)
 {
+	static u8 WriteBuffer[1088] ALIGNED(64);
 	int argsz;
-	u8 *args = (u8 *)hdd_buf;
+	u8 *args = (u8 *)WriteBuffer;
 
 	*(u32 *)&args[0] = lba;
 	*(u32 *)&args[4] = nsectors;
-	memcpy(&args[8], buf, nsectors << 9);
+	memcpy(&args[8], buf, nsectors * 512);
 
-	argsz = 8 + (nsectors << 9);
+	argsz = 8 + (nsectors * 512);
 
 	if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_WRITE, args, argsz, NULL, 0) != 0)
 		return -1;
 
 	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int hddFlushCache(void)
-{
-	return fileXioDevctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -161,416 +137,25 @@ int hddGetFormat(void)
 }
 
 //-------------------------------------------------------------------------
-static int apaCheckSum(apa_header *header)
+static unsigned char IOBuffer[1024] ALIGNED(64);
+
+struct GameDataEntry{
+	u32 lba, size;
+	struct GameDataEntry *next;
+	char id[APA_IDMAX];
+};
+
+static int hddGetHDLGameInfo(struct GameDataEntry *game, hdl_game_info_t *ginfo)
 {
-	u32 *ptr=(u32 *)header;
-	u32 sum=0;
-	int i;
+	int ret;
 
-	for(i=1; i < 256; i++)
-		sum+=ptr[i];
-	return sum;
-}
-
-//-------------------------------------------------------------------------
-static int apaAddPartition(apa_partition_table_t *table, apa_header *header, int existing)
-{
-	register u32 nbytes;
-
-	if (table->part_count == table->part_alloc_) {
-
-		// grow buffer of 16 parts
-		nbytes = (table->part_alloc_ + 16) * sizeof(apa_partition_t);
-		apa_partition_t *parts = malloc(nbytes);
-		if(parts != NULL) {
-
-			memset(parts, 0, nbytes);
-
-			// copy existing parts
-			if (table->parts != NULL)
-				memcpy(parts, table->parts, table->part_count * sizeof(apa_partition_t));
-
-			// free old parts mem
-			free(table->parts);
-			table->parts = parts;
-			table->part_alloc_ += 16;
-		}
-		else 
-			return -2;
-	}
-
-	// copy the part to its buffer
-	memcpy(&table->parts[table->part_count].header, header, sizeof(apa_header));
-	table->parts[table->part_count].existing = existing;
-	table->parts[table->part_count].modified = !existing;
-	table->parts[table->part_count].linked = 1;
-	table->part_count++;
-
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static void apaFreePartitionTable(apa_partition_table_t *table)
-{
-	register int i;
-
-	if (table != NULL) {
-		for (i=0; i<table->part_count; i++) {
-			if (table->parts)
-				free(table->parts);
-		}
-
-		if (table->chunks_map)
-			free(table->chunks_map);
-	}
-}
-
-//-------------------------------------------------------------------------
-static int apaSetPartitionTableStats(apa_partition_table_t *table)
-{
-	register int i;
-	char *chunks_map;
-
-	table->total_chunks = table->device_size_in_mb / 128;
-	chunks_map = malloc(table->total_chunks);
-	if (chunks_map == NULL)
-		return -1;
-
-	*chunks_map = MAP_AVAIL;
-	for (i=0; i<table->total_chunks; i++)
-		chunks_map[i] = MAP_AVAIL;
-
-	// build occupided/available space map
-	table->allocated_chunks = 0;
-	table->free_chunks = table->total_chunks;
-	for (i=0; i<table->part_count; i++) {
-		apa_header *part_hdr = (apa_header *)&table->parts[i].header;
-		int part_num = part_hdr->start / ((128 * 1024 * 1024) / 512);
-		int num_parts = part_hdr->length / ((128 * 1024 * 1024) / 512);
-
-		// "alloc" num_parts starting at part_num
-		while (num_parts) {
-			if (chunks_map[part_num] == MAP_AVAIL)
-				chunks_map[part_num] = (part_hdr->main == 0 ? MAP_MAIN : MAP_SUB);
-			else
-				chunks_map[part_num] = MAP_COLL; // collision
-			part_num++;
-			num_parts--;
-			table->allocated_chunks++;
-			table->free_chunks--;
-		}
-	}
-
-	if (table->chunks_map)
-		free(table->chunks_map);
-
-	table->chunks_map = (u8 *)chunks_map;
-
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int apaReadPartitionTable(apa_partition_table_t **table)
-{
-	register u32 nsectors, lba;
-	register int ret;
-
-	// get number of sectors on device
-	nsectors = hddGetTotalSectors();
-
-	// if not already done allocate space for the partition table
-	if (*table == NULL) {
-		*table = malloc(sizeof(apa_partition_table_t));
-		if (*table == NULL) {
-			return -2;
-		}
-	}
-	else // if partition table was already allocated, Free all 
-		apaFreePartitionTable(*table);
-
-	// clear the partition table
-	memset(*table, 0, sizeof(apa_partition_table_t));
-
-	// read the partition table
-	lba = 0;
-	do {
-		apa_header apaHeader;
-		// read partition header
-		ret = hddReadSectors(lba, sizeof(apa_header) >> 9, &apaHeader, sizeof(apa_header));
-		if (ret == 0) {
-			// check checksum & header magic
-			if ((apaCheckSum(&apaHeader) == apaHeader.checksum) && (apaHeader.magic == APA_MAGIC)) {
-				if (apaHeader.start < nsectors) {
-					//if ((apaHeader.flags == 0) && (apaHeader.type == 0x1337))
-						ret = apaAddPartition(*table, &apaHeader, 1);
-					if (ret == 0)
-						lba = apaHeader.next;
-				}
-				else {
-					ret = 7; 	// data behind end-of-HDD
-					break;
-				}
-			}
-			else ret = 1;
-		}
-
-		if ((*table)->part_count > 10000)
-			ret = 7;
-
-	} while (ret == 0 && lba != 0);
-
-	if (ret == 0) {
-		(*table)->device_size_in_mb = nsectors >> 11;
-		ret = apaSetPartitionTableStats(*table);
-	}
-	else {
-		apaFreePartitionTable(*table);
-		ret = 20000 + (*table)->part_count;
-	}
-
-	return ret;	
-}
-
-//-------------------------------------------------------------------------
-static int apaCheckLinkedList(apa_partition_table_t *table, int flag)
-
-{
-	register int i;
-
-	for (i=0; i<table->part_count; i++) {
-		apa_partition_t *prev = (apa_partition_t *)&table->parts[(i > 0 ? i - 1 : table->part_count - 1)];
-		apa_partition_t *curr = (apa_partition_t *)&table->parts[i];
-		apa_partition_t *next = (apa_partition_t *)&table->parts[(i + 1 < table->part_count ? i + 1 : 0)];
-
-		if (curr->header.prev != prev->header.start) {
-			if (!flag)
-				return -1;
-			else {
-				curr->modified = 1;
-				curr->header.prev = prev->header.start;
-			}
-		}
-		if (curr->header.next != next->header.start) {
-			if (!flag)
-				return -1;
-			else {
-				curr->modified = 1;
-				curr->header.next = next->header.start;
-			}
-		}
-		if ((flag) && (curr->modified))
-			curr->header.checksum = apaCheckSum(&curr->header);
-	}
-
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int apaCheckPartitionTable(apa_partition_table_t *table)
-{
-	register int i, j, k;
-
-	u32 total_sectors = table->device_size_in_mb * 1024 * 2;
-
-	for (i=0; i<table->part_count; i++) {
-		apa_header *part_hdr = &table->parts[i].header;
-
-		// check checksum
-		if (part_hdr->checksum != apaCheckSum(part_hdr))
-			return -1;
-
-		// check for data behind end of HDD
-		if (!((part_hdr->start < total_sectors) && (part_hdr->start + part_hdr->length <= total_sectors)))
-			return -2;
-
-		// check partition length is multiple of 128 MB
-		if ((part_hdr->length % ((128 * 1024 * 1024) / 512)) != 0)
-			return -3;
-
-		// check partition start is multiple of partion length
-		if ((part_hdr->start % part_hdr->length) != 0)
-			return -4;
-
-		// check all subs partitions
-		if ((part_hdr->main == 0) && (part_hdr->flags == 0) && (part_hdr->start != 0)) {
-			int count = 0;
-
-			for (j=0; j<table->part_count; j++) {
-				apa_header *part2_hdr = &table->parts[j].header;
-				if (part2_hdr->main == part_hdr->start) { // sub-partition of current main partition
-					int found;
-					if (part2_hdr->flags != APA_FLAG_SUB)
-						return -5;
-
-					found = 0;
-					for (k=0; k<part_hdr->nsub; k++) {
-						if (part_hdr->subs[k].start == part2_hdr->start) { // in list
-							if (part_hdr->subs[k].length != part2_hdr->length)
-								return -6;
-							found = 1;
-							break;
-						}
-					}
-					if (!found)
-						return -7; // not found in the list
-
-					count++;
-				}
-			}
-			if (count != part_hdr->nsub)
-				return -8; // wrong number of sub-partitions
-		}
-	}
-
-	// verify double-linked list
-	if (apaCheckLinkedList(table, 0) < 0)
-		return -9; // bad links
-
-	LOG("HDD CheckPartitionTable OK!\n");
-
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int apaWritePartitionTable(apa_partition_table_t *table)
-{
-	register int ret, i;
-
-	ret = apaCheckPartitionTable(table);
-	if (ret < 0)
-		return ret;
-
-	for (i=0; i<table->part_count; i++) {
-
-		if (table->parts[i].modified) {
-			apa_header *part_hdr = &table->parts[i].header;
-			LOG("HDD Writing 2 sectors at sector 0x%X\n", part_hdr->start);
-#ifndef TEST_WRITES
-			ret = hddWriteSectors(part_hdr->start, 2, (void *)part_hdr);
-			if (ret < 0)
-				return -10;
-#endif
-		}
-	}
-
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int apaFindPartition(apa_partition_table_t *table, char *partname)
-{
-	register int ret, i;
-
-	ret = -1;
-
-	for (i=0; i<table->part_count; i++) {
-
-		apa_header *part_hdr = &table->parts[i].header;
-
-		// if part found, return its index
-		if ((part_hdr->main == 0) && (!strcmp(part_hdr->id, partname))) {
-			ret = i;
-			break;
-		}
-	}
-
-	return ret;
-}
-
-//-------------------------------------------------------------------------
-static int apaDeletePartition(apa_partition_table_t *table, char *partname)
-{
-	register int i, part_index;
-	register int count = 1;
-	u32 pending_deletes[APA_MAXSUB];
-
-	LOG("HDD DeletePartition %s\n", partname);
-
-	// retrieve part index
-	part_index = apaFindPartition(table, partname);
-	if (part_index < 0)
-		return -1;
-     
-	apa_header *part_hdr = &table->parts[part_index].header;
-
-	// Do not delete system partitions
-	if (part_hdr->type == 1)
-		return -2;
-
-	// preserve a list of starting sectors of partitions to be deleted
-	pending_deletes[0] = part_hdr->start;
-	LOG("HDD Found part at %d \n", part_hdr->start / 262144);
-	for (i=0; i<part_hdr->nsub; i++) {
-		LOG("HDD Found subpart at %d \n", part_hdr->subs[i].start / 262144);
-		pending_deletes[count++] = part_hdr->subs[i].start;
-	}
-
-	LOG("HDD Number of subpartitions=%d count=%d\n", part_hdr->nsub, count);
-
-	// remove partitions from the double-linked list
-	i = 0;
-	while (i<table->part_count) {
-		int j;
-		int found = 0;
-
-		for (j=0; j<count; j++) {
-			if (table->parts[i].header.start == pending_deletes[j]) {
-				found = 1;
-				break;
-			}
-		}
-
-		if (found) {
-			// remove this partition
-			int part_num = table->parts[i].header.start / 262144; // 262144 sectors == 128M
-			int num_parts = table->parts[i].header.length / 262144;
-
-			LOG("HDD Partition found! num_parts=%d part_num=%d\n", num_parts, part_num);
-
-			memmove((void *)&table->parts[i], (void *)&table->parts[i+1], sizeof(apa_partition_t) * (table->part_count-i-1));
-			table->part_count--;
-
-			// "free" num_parts starting at part_num
-			while (num_parts) {
-				table->chunks_map[part_num] = MAP_AVAIL;
-				part_num++;
-				num_parts--;
-				table->allocated_chunks--;
-				table->free_chunks++;
-			}
-		}
-		else
-			i++;
-	}
-
-	apaCheckLinkedList(table, 1);
-
-	return 0;
-}
-
-//-------------------------------------------------------------------------
-static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
-{
-	u32 i, size;
-	const u32 offset = 0x101000;
-	char buf[1024];
-	register int ret;
-
-	u32 start_sector = header->start + offset / 512;
-
-	ret = hddReadSectors(start_sector, 2, buf, 2 * 512);
+	ret = hddReadSectors(game->lba, 2, IOBuffer);
 	if (ret == 0) {
 
-		hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
+		hdl_apa_header *hdl_header = (hdl_apa_header *)IOBuffer;
 
-		// calculate total size
-		size = header->length;
-
-		for (i = 0; i < header->nsub; i++)
-			size += header->subs[i].length;
-
-		memcpy(ginfo->partition_name, header->id, APA_IDMAX);
-		ginfo->partition_name[APA_IDMAX] = 0;
+		strncpy(ginfo->partition_name, game->id, APA_IDMAX);
+		ginfo->partition_name[APA_IDMAX] = '\0';
 		strncpy(ginfo->name, hdl_header->gamename, HDL_GAME_NAME_MAX);
 		strncpy(ginfo->startup, hdl_header->startup, sizeof(ginfo->startup)-1);
 		ginfo->hdl_compat_flags = hdl_header->hdl_compat_flags;
@@ -579,8 +164,8 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 		ginfo->dma_mode = hdl_header->dma_mode;
 		ginfo->layer_break = hdl_header->layer1_start;
 		ginfo->disctype = hdl_header->discType;
-		ginfo->start_sector = start_sector;
-		ginfo->total_size_in_kb = size / 2;
+		ginfo->start_sector = game->lba;
+		ginfo->total_size_in_kb = game->size / 2;	//size * 2048 / 1024 = 0.5x
 	}
 	else ret = -1;
 
@@ -588,108 +173,116 @@ static int hddGetHDLGameInfo(apa_header *header, hdl_game_info_t *ginfo)
 }
 
 //-------------------------------------------------------------------------
-int hddGetHDLGamelist(hdl_games_list_t **game_list)
+static struct GameDataEntry *GetGameListRecord(struct GameDataEntry *head, const char *partition)
 {
-	register int ret;
+	struct GameDataEntry *current;
 
-	ret = apaReadPartitionTable(&ptable);
-	if (ret == 0) {
+	for(current = head; current != NULL; current = current->next)
+	{
+		if(!strncmp(current->id, partition, APA_IDMAX)){
+			return current;
+		}
+	}
 
-		u32 i, count = 0;
-		void *tmp;
+	return NULL;
+}
 
-		if (*game_list != NULL) {
-			for (i = 0; i < (*game_list)->count; i++) {
-				if ((*game_list)->games != NULL)
-					free((*game_list)->games);
+int hddGetHDLGamelist(hdl_games_list_t *game_list)
+{
+	struct GameDataEntry *head, *current, *next, *pGameEntry;
+	unsigned int count, i;
+	iox_dirent_t dirent;
+	int fd, ret;
+
+	ret = 0;
+	if((fd = fileXioDopen("hdd0:")) >= 0)
+	{
+		head = current = NULL;
+		count = 0;
+		while(fileXioDread(fd, &dirent)>0)
+		{
+			if(dirent.stat.mode==HDL_FS_MAGIC)
+			{
+				if((pGameEntry = GetGameListRecord(head, dirent.name)) == NULL)
+				{
+					if(head == NULL)
+					{
+						current = head = malloc(sizeof(struct GameDataEntry));
+					}else{
+						current = current->next =  malloc(sizeof(struct GameDataEntry));
+					}
+
+					if(current == NULL) break;
+
+					strncpy(current->id, dirent.name, APA_IDMAX);
+					count++;
+					current->next = NULL;
+					current->size = 0;
+					current->lba = 0;
+					pGameEntry = current;
+				}
+
+				if(!(dirent.stat.attr&APA_FLAG_SUB)){
+					// Note: The APA specification states that there is a 4KB area used for storing the partition's information, before the extended attribute area.
+					pGameEntry->lba = dirent.stat.private_5 + (HDL_GAME_DATA_OFFSET+4096)/512;
+				}
+
+				pGameEntry->size += (dirent.stat.hisize << 21) | (dirent.stat.size >> 11);	//size in bytes / 2048
 			}
 		}
 
-		for (i = 0; i < ptable->part_count; i++)
-			count += ((ptable->parts[i].header.flags == 0) && (ptable->parts[i].header.type == 0x1337));
+		fileXioDclose(fd);
 
-		tmp = malloc(sizeof(hdl_game_info_t) * count);
-		if (tmp != NULL) {
-
-			memset(tmp, 0, sizeof(hdl_game_info_t) * count);
-			*game_list = malloc(sizeof(hdl_games_list_t));
-			if (*game_list != NULL) {
-
-				u32 index = 0;
-				memset(*game_list, 0, sizeof(hdl_games_list_t));
-				(*game_list)->count = count;
-				(*game_list)->games = tmp;
-				(*game_list)->total_chunks = ptable->total_chunks;
-				(*game_list)->free_chunks = ptable->free_chunks;
-
-				for (i = 0; ((ret == 0) && (i < ptable->part_count)); i++) {
-					apa_header *header = &ptable->parts[i].header;
-					if ((header->flags == 0) && (header->type == 0x1337))
-						ret = hddGetHDLGameInfo(header, (*game_list)->games + index++);
+		if(head != NULL)
+		{
+			if((game_list->games = malloc(sizeof(hdl_game_info_t) * count)) != NULL)
+			{
+				for(i = 0, current = head; i < count; i++, current = current->next)
+				{
+					if((ret = hddGetHDLGameInfo(current, &game_list->games[i])) != 0) break;
 				}
 
-				if (ret != 0)
-					free(*game_list);
-			} else
-				ret = -2;
+				if(ret)
+				{
+					free(game_list->games);
+					game_list->games = NULL;
+				}else{
+					game_list->count = count;
+				}
+			}else{
+				ret = ENOMEM;
+			}
 
-			if (ret != 0)
-				free(tmp);
-
-		} else ret = -2;
+			for(current = head; current != NULL; current = next)
+			{
+				next = current->next;
+				free(current);
+			}
+		}
+	}else{
+		ret = fd;
 	}
 
 	return ret;
 }
 
 //-------------------------------------------------------------------------
-int hddFreeHDLGamelist(hdl_games_list_t *game_list)
+void hddFreeHDLGamelist(hdl_games_list_t *game_list)
 {
-	register int i;
-
-	apaFreePartitionTable(ptable);
-
-	if (game_list != NULL) {
-		for (i = 0; i < game_list->count; i++) {
-			if (game_list->games != NULL)
-				free(game_list->games);
-		}
-
-		free(game_list);
+	if(game_list->games != NULL)
+	{
+		free(game_list->games);
+		game_list->games = NULL;
 	}
-
-	return 0;
 }
 
 //-------------------------------------------------------------------------
 int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
 {
-	const u32 offset = 0x101000;
-	char buf[1024];
-	int part_index;
+	if (hddReadSectors(ginfo->start_sector, 2, IOBuffer) != 0)
+		return -EIO;
 
-	if (ptable == NULL)
-		return -1;
-
-	// retrieve part index
-	part_index = apaFindPartition(ptable, ginfo->partition_name);
-	if (part_index < 0)
-		return -1;
-
-	apa_header *header = &ptable->parts[part_index].header;
-	if (header == NULL)
-		return -2;
-
-	u32 start_sector = header->start + offset / 512;
-
-	if (hddReadSectors(start_sector, 2, buf, 2 * 512) != 0)
-		return -3;
-
-	hdl_apa_header *hdl_header = (hdl_apa_header *)buf;
-
-	// checking deadfeed magic & PS2 game magic
-	if (hdl_header->checksum != 0xdeadfeed)
-		return -4;
+	hdl_apa_header *hdl_header = (hdl_apa_header *)IOBuffer;
 
 	// just change game name and compat flags !!!
 	strncpy(hdl_header->gamename, ginfo->name, sizeof(hdl_header->gamename));
@@ -699,10 +292,8 @@ int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
 	hdl_header->dma_type = ginfo->dma_type;
 	hdl_header->dma_mode = ginfo->dma_mode;
 
-	if (hddWriteSectors(start_sector, 2, buf) != 0)
-		return -5;
-
-	hddFlushCache();
+	if (hddWriteSectors(ginfo->start_sector, 2, IOBuffer) != 0)
+		return -EIO;
 
  	return 0;
 }
@@ -710,25 +301,12 @@ int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
 //-------------------------------------------------------------------------
 int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 {
-	register int ret;
+	char path[38];
 
 	LOG("HDD Delete game: '%s'\n", ginfo->name);
 
-	if (ptable == NULL)
-		return -1;
+	sprintf(path, "hdd0:%s", ginfo->partition_name);
 
-	ret = apaDeletePartition(ptable, ginfo->partition_name);
-	if (ret < 0)
-		return -2;
-
-	ret = apaWritePartitionTable(ptable);
-	if (ret < 0)
-		return -3;
-
-	hddFlushCache();
-
-	LOG("HDD Game: '%s' deleted!\n", ginfo->name);
-
-	return 0;
+	return fileXioRemove(path);
 }
 

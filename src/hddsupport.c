@@ -46,7 +46,7 @@ extern int size_hdd_mcemu_irx;
 static int hddForceUpdate = 1;
 static char *hddPrefix = "pfs0:";
 static int hddGameCount = 0;
-static hdl_games_list_t* hddGames;
+static hdl_games_list_t hddGames;
 
 const char *oplPart = "hdd0:+OPL";
 
@@ -214,7 +214,7 @@ static int hddUpdateGameList(void) {
 	if (ret != 0)
 		hddGameCount = 0;
 	else
-		hddGameCount = hddGames->count;
+		hddGameCount = hddGames.count;
 	return hddGameCount;
 }
 
@@ -223,11 +223,11 @@ static int hddGetGameCount(void) {
 }
 
 static void* hddGetGame(int id) {
-	return (void*) &hddGames->games[id];
+	return (void*) &hddGames.games[id];
 }
 
 static char* hddGetGameName(int id) {
-	return hddGames->games[id].name;
+	return hddGames.games[id].name;
 }
 
 static int hddGetGameNameLength(int id) {
@@ -235,19 +235,19 @@ static int hddGetGameNameLength(int id) {
 }
 
 static char* hddGetGameStartup(int id) {
-	return hddGames->games[id].startup;
+	return hddGames.games[id].startup;
 }
 
 #ifndef __CHILDPROOF
 static void hddDeleteGame(int id) {
-	hddDeleteHDLGame(&hddGames->games[id]);
+	hddDeleteHDLGame(&hddGames.games[id]);
 	hddForceUpdate = 1;
 }
 
 static void hddRenameGame(int id, char* newName) {
-	hdl_game_info_t* game = &hddGames->games[id];
+	hdl_game_info_t* game = &hddGames.games[id];
 	strcpy(game->name, newName);
-	hddSetHDLGameInfo(&hddGames->games[id]);
+	hddSetHDLGameInfo(&hddGames.games[id]);
 	hddForceUpdate = 1;
 }
 #endif
@@ -256,7 +256,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	int i, size_irx = 0;
 	void** irx = NULL;
 	char filename[32];
-	hdl_game_info_t* game = &hddGames->games[id];
+	hdl_game_info_t* game = &hddGames.games[id];
 	struct cdvdman_settings_hdd *settings;
 
 #ifdef VMC
@@ -429,7 +429,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 
 static config_set_t* hddGetConfig(int id) {
 	char path[256];
-	hdl_game_info_t* game = &hddGames->games[id];
+	hdl_game_info_t* game = &hddGames.games[id];
 
 	snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
 	config_set_t* config = configAlloc(0, NULL, path);
@@ -457,7 +457,7 @@ static void hddCleanUp(int exception) {
 	if (hddGameList.enabled) {
 		LOG("HDDSUPPORT CleanUp\n");
 
-		hddFreeHDLGamelist(hddGames);
+		hddFreeHDLGamelist(&hddGames);
 
 		if ((exception & UNMOUNT_EXCEPTION) == 0)
 			fileXioUmount(hddPrefix);

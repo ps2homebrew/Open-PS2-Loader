@@ -37,8 +37,6 @@ typedef struct
 {
 	u32 		count;
 	hdl_game_info_t *games;
-	u32 		total_chunks;
-  	u32 		free_chunks;
 } hdl_games_list_t;
 
 typedef struct {
@@ -159,8 +157,8 @@ u32 hddGetTotalSectors(void);
 int hddIs48bit(void);
 int hddSetTransferMode(int type, int mode);
 int hddSetIdleTimeout(int timeout);
-int hddGetHDLGamelist(hdl_games_list_t **game_list);
-int hddFreeHDLGamelist(hdl_games_list_t *game_list);
+int hddGetHDLGamelist(hdl_games_list_t *game_list);
+void hddFreeHDLGamelist(hdl_games_list_t *game_list);
 int hddSetHDLGameInfo(hdl_game_info_t *ginfo);
 int hddDeleteHDLGame(hdl_game_info_t *ginfo);
 

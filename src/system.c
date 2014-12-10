@@ -243,6 +243,7 @@ void sysReset(int modload_mask) {
 	sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 #endif
 
+	fileXioInit();
 	poweroffInit();
 }
 
@@ -362,7 +363,6 @@ int sysGetDiscID(char *hexDiscID) {
 int sysPcmciaCheck(void) {
 	int ret;
 
-	fileXioInit();
 	ret = fileXioDevctl("dev9x0:", 0x4401, NULL, 0, NULL, 0);
 
 	if (ret == 0) 	// PCMCIA

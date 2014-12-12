@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: pfs_fioctl.c 577 2004-09-14 14:41:46Z pixel $
+# $Id$
 # PFS ioctl and devctl related routines
 */
 
@@ -201,12 +201,12 @@ pfs_aentry_t *getAentry(pfs_cache_t *clink, char *key, char *value, int mode)
 	{
 		if(aentry->aLen & 3)
 			printf("ps2fs: Error: attrib-entry allocated length/4 != 0\n");
-		if(aentry->aLen < ((aentry->kLen+aentry->vLen+7) & ~3)) 
+		if(aentry->aLen < ((aentry->kLen+aentry->vLen+7) & ~3))
 		{
 			printf("ps2fs: Panic: attrib-entry is too small\n");
 			return NULL;
 		}
-		if((u32)end < (u32)aentry+aentry->aLen) 
+		if((u32)end < (u32)aentry+aentry->aLen)
 			printf("ps2fs: Error: attrib-emtru too big\n");
 
 		switch(mode)
@@ -218,7 +218,7 @@ pfs_aentry_t *getAentry(pfs_cache_t *clink, char *key, char *value, int mode)
 			break;
 
 		case 1:// add
-			if(aentry->kLen==0) 
+			if(aentry->kLen==0)
 			{
 				if(aentry->aLen>=fullsize)
 					return aentry;
@@ -228,11 +228,11 @@ pfs_aentry_t *getAentry(pfs_cache_t *clink, char *key, char *value, int mode)
 			return aentry;
 
 		default:// delete
-			if(kLen==aentry->kLen) 
+			if(kLen==aentry->kLen)
 			{
-				if(memcmp(key, aentry->str, kLen)==0) 
+				if(memcmp(key, aentry->str, kLen)==0)
 				{
-					if(aentryLast!=NULL) 
+					if(aentryLast!=NULL)
 					{
 						aentryLast->aLen+=aentry->aLen;
 						return aentry;
@@ -342,7 +342,7 @@ int ioctl2Alloc(pfs_cache_t *clink, int msize, int mode)
 	val=((msize-1 + zsize) & (-zsize)) / zsize;
 
 	if(mode==0)
-		if (((clink->u.inode->number_blocks-clink->u.inode->number_segdesg) *(u64)zsize) 
+		if (((clink->u.inode->number_blocks-clink->u.inode->number_segdesg) *(u64)zsize)
 			>= (clink->u.inode->size + msize))
 			return 0;
 
@@ -385,7 +385,7 @@ void ioctl2Free(pfs_cache_t *pfree)
 	{
 		if(fixIndex(i) == 0)
 		{
-			if ((clink = blockGetNextSegment(clink, &result)) == 0)	
+			if ((clink = blockGetNextSegment(clink, &result)) == 0)
 				return;
 
 			nextsegdesc++;
@@ -420,7 +420,7 @@ void ioctl2Free(pfs_cache_t *pfree)
 	{
 		if (fixIndex(i) == 0)
 		{
-			if((clink = blockGetNextSegment(clink, &result)) == 0)	
+			if((clink = blockGetNextSegment(clink, &result)) == 0)
 				return;
 		}
 		bi = &clink->u.inode->data[fixIndex(i++)];

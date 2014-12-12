@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: hdd_fio.h 1511 2009-01-15 09:11:30Z radad $
+# $Id$
 */
 
 #ifndef _HDD_FIO_H
@@ -26,7 +26,7 @@
 #define APA_IOCTL2_GETSIZE				0x00006833	// for main(0)/subs(1+)
 #define APA_IOCTL2_SET_PART_ERROR		0x00006834	// set(sector of a apa header) that has a error :)
 #define APA_IOCTL2_GET_PART_ERROR		0x00006835	// get(sector of a apa header) that has a error
-#define APA_IOCTL2_GETHEADER			0x00006836	// get apa header
+
 
 // structs for IOCTL2 commands
 typedef struct
@@ -52,14 +52,14 @@ typedef struct
 #define APA_DEVCTL_SMART_STAT		0x00004809
 //#define APA_DEVCTL_FREE_SECTORS	0x0000480A// REMOVED! is not true free...
 
-#define APA_DEVCTL_GETTIME				0x00006832 
+#define APA_DEVCTL_GETTIME				0x00006832
 #define APA_DEVCTL_SET_OSDMBR			0x00006833// arg = hddSetOsdMBR_t
 #define APA_DEVCTL_GET_SECTOR_ERROR		0x00006834
 #define APA_DEVCTL_GET_ERROR_PART_NAME	0x00006835// bufp = namebuffer[0x20]
-#define APA_DEVCTL_ATA_READ				0x00006836// arg  = hddAtaTransfer_t 
-#define APA_DEVCTL_ATA_WRITE			0x00006837// arg  = hddAtaTransfer_t 
-#define APA_DEVCTL_SCE_IDENTIFY_DRIVE	0x00006838// bufp = buffer for atadSceIdentifyDrive 
-//#define APA_DEVCTL_FREE_SECTORS2		0x00006839 
+#define APA_DEVCTL_ATA_READ				0x00006836// arg  = hddAtaTransfer_t
+#define APA_DEVCTL_ATA_WRITE			0x00006837// arg  = hddAtaTransfer_t
+#define APA_DEVCTL_SCE_IDENTIFY_DRIVE	0x00006838// bufp = buffer for atadSceIdentifyDrive
+//#define APA_DEVCTL_FREE_SECTORS2		0x00006839
 #define APA_DEVCTL_IS_48BIT				0x00006840
 #define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
 #define APA_DEVCTL_ATA_IOP_WRITE	0x00006842
@@ -71,7 +71,7 @@ typedef struct
 	u32 lba;
 	u32 size;
 	u8 data[0];
-} hddAtaTransfer_t; 
+} hddAtaTransfer_t;
 
 typedef struct
 {
@@ -124,6 +124,6 @@ int hddGetStat(iop_file_t *f, const char *name, iox_stat_t *stat);
 int hddReName(iop_file_t *f, const char *oldname, const char *newname);
 int hddDevctl(iop_file_t *f, const char *devname, int cmd, void *arg, unsigned int arglen, void *bufp, unsigned int buflen);
 
-int hddUnsupported(iop_file_t *f);
+int fioUnsupported(iop_file_t *f);
 
 #endif /* _HDD_FIO_H */

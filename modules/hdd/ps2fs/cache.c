@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: cache.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # PFS metadata cache manipulation routines
 */
 
@@ -117,7 +117,7 @@ void cacheFlushAllDirty(pfs_mount_t *pfsMount)
 }
 
 pfs_cache_t *cacheAlloc(pfs_mount_t *pfsMount, u16 sub, u32 scale,
-					int flags, int *result) 
+					int flags, int *result)
 {
 	pfs_cache_t *allocated;
 
@@ -226,7 +226,7 @@ void cacheMarkClean(pfs_mount_t *pfsMount, u32 subpart, u32 sectorStart, u32 sec
 
 	for(i=1; i< numBuffers+1;i++){
 		if(cacheBuf[i].pfsMount==pfsMount && cacheBuf[i].sub==subpart) {
-			if(cacheBuf[i].sector >= sectorStart && cacheBuf[i].sector < sectorEnd) 
+			if(cacheBuf[i].sector >= sectorStart && cacheBuf[i].sector < sectorEnd)
 				cacheBuf[i].flags&=~CACHE_FLAG_DIRTY;
 		}
 	}

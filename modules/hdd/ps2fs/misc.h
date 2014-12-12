@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: misc.h 577 2004-09-14 14:41:46Z pixel $
+# $Id$
 */
 
 #ifndef _MISC_H
@@ -32,7 +32,7 @@
 typedef struct
 {
 	u32		sub;		// main(0)/subs(1+) to read/write
-	u32		sector;		// 
+	u32		sector;		//
 	u32		size;		// in sectors
 	u32		mode;		// IOCTL2_TMODE_*
 	void	*buffer;	//

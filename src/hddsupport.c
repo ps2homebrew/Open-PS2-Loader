@@ -45,7 +45,6 @@ extern int size_hdd_mcemu_irx;
 
 static int hddForceUpdate = 1;
 static char *hddPrefix = "pfs0:";
-static int hddGameCount = 0;
 static hdl_games_list_t hddGames;
 
 const char *oplPart = "hdd0:+OPL";
@@ -129,6 +128,26 @@ static int hddCheckHDProKit(void)
 	return ret;
 }
 
+//Taken from libhdd:
+#define PFS_ZONE_SIZE	8192
+#define PFS_FRAGMENT	0x00000000
+
+static int CreateOPLPartition(const char *oplPart, const char *mountpoint) {
+	int formatArg[3] = { PFS_ZONE_SIZE, 0x2d66, PFS_FRAGMENT };
+	int fd, result;
+	char cmd[43];
+
+	sprintf(cmd, "%s,128M", oplPart);
+	if((fd = fileXioOpen(cmd, O_CREAT|O_TRUNC|O_RDWR, 0644)) >=0) {
+		fileXioClose(fd);
+		result = fileXioFormat(mountpoint, oplPart, (const char *)&formatArg, sizeof(formatArg));
+	}else{
+		result = fd;
+	}
+
+	return result;
+}
+
 void hddLoadModules(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
@@ -178,9 +197,10 @@ void hddLoadModules(void) {
 	hddSetIdleTimeout(gHDDSpindown * 12); // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
 
 	ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
-	if (ret < 0) {
-		fileXioUmount(hddPrefix);
-		fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
+	if (ret == -ENOENT) {
+		//Attempt to create the partition.
+		if((CreateOPLPartition(oplPart, hddPrefix)) >= 0)
+			fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
 	}
 
 	gHddStartup = 0;
@@ -210,16 +230,11 @@ static int hddNeedsUpdate(void) {
 }
 
 static int hddUpdateGameList(void) {
-	int ret = hddGetHDLGamelist(&hddGames);
-	if (ret != 0)
-		hddGameCount = 0;
-	else
-		hddGameCount = hddGames.count;
-	return hddGameCount;
+	return(hddGetHDLGamelist(&hddGames) == 0 ? hddGames.count : 0);
 }
 
 static int hddGetGameCount(void) {
-	return hddGameCount;
+	return hddGames.count;
 }
 
 static void* hddGetGame(int id) {

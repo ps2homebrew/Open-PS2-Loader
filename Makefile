@@ -225,7 +225,7 @@ endif
 	echo "    * ps2hdd.irx"
 	$(MAKE) -C modules/hdd/ps2hdd clean
 	echo "    * ps2fs.irx"
-	$(MAKE) -C modules/ps2fs clean
+	$(MAKE) -C modules/hdd/ps2fs clean
 ifeq ($(VMC),1)
 	echo "    * mcemu.irx"
 	$(MAKE) -C modules/mcemu -f Makefile.usb clean
@@ -430,8 +430,8 @@ ps2link.s:
 
 ps2fs.s:
 	echo "    * ps2fs.irx"
-	$(MAKE) -C modules/ps2fs
-	bin2s modules/ps2fs/ps2fs.irx asm/ps2fs.s ps2fs_irx
+	$(MAKE) -C modules/hdd/ps2fs
+	bin2s modules/hdd/ps2fs/ps2fs.irx asm/ps2fs.s ps2fs_irx
 
 iomanx.s:
 	bin2s $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx

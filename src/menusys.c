@@ -58,11 +58,15 @@ static void _menuLoadConfig() {
 }
 
 static void _menuSaveConfig() {
+	int result;
+
 	WaitSema(menuSemaId);
-	configWrite(itemConfig);
+	result = configWrite(itemConfig);
 	itemConfigId = -1; // to invalidate cache and force reload
 	actionStatus = 0;
 	SignalSema(menuSemaId);
+
+	if(!result) setErrorMessage(_STR_ERROR_SAVING_SETTINGS);
 }
 
 static void _menuRequestConfig() {
@@ -646,7 +650,7 @@ void menuRenderInfo() {
 	// selected_item->item->current can't be NULL here as we only allow to switch to "Info" rendering when there is at least one item
 	_menuRequestConfig();
 
-	//WaitSema(menuSemaId); If I'm not mistaking (assignment of itemConfig pointer is atomic), not needed
+	WaitSema(menuSemaId);
 	theme_element_t* elem = gTheme->infoElems.first;
 	while (elem) {
 		if (elem->drawElem)
@@ -654,7 +658,7 @@ void menuRenderInfo() {
 
 		elem = elem->next;
 	}
-	//SignalSema(menuSemaId);
+	SignalSema(menuSemaId);
 }
 
 void menuHandleInputInfo() {

@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: pfs_fio.c 1491 2009-01-04 23:46:22Z oopo $
+# $Id$
 # PFS I/O manager related routines
 */
 
@@ -197,7 +197,7 @@ int	openFile(pfs_mount_t *pfsMount, pfs_file_slot_t *freeSlot, const char *filen
 					cached->flags |= CACHE_FLAG_DIRTY;
 					cacheAdd(cached);
 				}
-				if ((result!=result2))
+				if (result2 == 0)
 				{
 					fileInode->u.inode->size = 0;
 					fileInode->u.inode->attr &= ~FIO_ATTR_CLOSED; //~0x80==0xFF7F
@@ -706,11 +706,7 @@ int pfsLseek(iop_file_t *f, unsigned long pos, int whence)
 
 s64 pfsLseek64(iop_file_t *f, s64 offset, int whence)
 {
-	printf("ps2fs: Error: Operation currently unsupported.\n");
-
-	return -1;
-
-	/*pfs_file_slot_t *fileSlot = (pfs_file_slot_t *)f->privdata;
+	pfs_file_slot_t *fileSlot = (pfs_file_slot_t *)f->privdata;
 	u64 rv;
 
 	rv=checkFileSlot(fileSlot);
@@ -719,7 +715,7 @@ s64 pfsLseek64(iop_file_t *f, s64 offset, int whence)
 		rv=_seek(fileSlot, offset, whence, f->mode);
 		SignalSema(pfsFioSema);
 	}
-	return rv;*/
+	return rv;
 }
 
 int _remove(pfs_mount_t *pfsMount, const char *path, int mode)
@@ -1175,7 +1171,7 @@ int pfsMount(iop_file_t *f, const char *fsname, const char *devname, int flag, v
 
 	WaitSema(pfsFioSema);
 
-	fd = open(devname, (flag & O_RDONLY) ? O_RDONLY : O_RDWR, 0644); // ps2hdd.irx fd
+	fd = open(devname, (flag & FIO_MT_RDONLY) ? O_RDONLY : O_RDWR, 0644); // ps2hdd.irx fd
 	if(fd < 0)
 		rv = fd;
 	else {
@@ -1277,7 +1273,7 @@ int pfsReadlink(iop_file_t *f, const char *path, char *buf, int buflen)
 	return checkForLastError(pfsMount, rv);
 }
 
-int pfsUnsupported()
+int fioUnsupported()
 {
 	printf("ps2fs: Error: Operation currently unsupported.\n");
 

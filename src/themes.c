@@ -723,7 +723,7 @@ static void drawInfoHintText(struct menu_list* menu, struct submenu_list* item, 
 	int x = elem->posX;
 	x = guiDrawIconAndText(CROSS_ICON, _STR_RUN, elem->font, x, elem->posY, elem->color);
 	x += elem->width;
-	x = guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, elem->font, x, elem->posY, elem->color);
+	x = guiDrawIconAndText(CIRCLE_ICON, _STR_BACK, elem->font, x, elem->posY, elem->color);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

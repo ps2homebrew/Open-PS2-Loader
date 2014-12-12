@@ -35,7 +35,8 @@
 
 #define IO_MENU_UPDATE_DEFFERED 2
 
-void setErrorMessage(int strId, int error);
+void setErrorMessage(int strId);
+void setErrorMessageWithCode(int strId, int error);
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID);

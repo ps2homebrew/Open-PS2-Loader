@@ -36,6 +36,7 @@ static int screenHeight;
 #define KEYB_WIDTH 		12
 #define KEYB_HEIGHT		4
 #define KEYB_ITEMS		(KEYB_WIDTH * KEYB_HEIGHT)
+#define KEYB_CMDS		5
 
 static void diaDrawBoundingBox(int x, int y, int w, int h, int focus) {
 		if (focus)
@@ -61,12 +62,13 @@ int diaShowKeyb(char* text, int maxLen) {
 		'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '~', '.' };
 	char *keyb = keyb0;
 
-	char *commands[KEYB_HEIGHT] = {_l(_STR_BACKSPACE), _l(_STR_SPACE), _l(_STR_ENTER), _l(_STR_MODE)};
-	GSTEXTURE *cmdicons[KEYB_HEIGHT];
+	char *commands[KEYB_CMDS] = {_l(_STR_BACKSPACE), _l(_STR_SPACE), _l(_STR_ENTER), _l(_STR_MODE), _l(_STR_CANCEL)};
+	GSTEXTURE *cmdicons[KEYB_CMDS];
 	cmdicons[0] = thmGetTexture(SQUARE_ICON);
 	cmdicons[1] = thmGetTexture(TRIANGLE_ICON);
 	cmdicons[2] = thmGetTexture(START_ICON);
 	cmdicons[3] = thmGetTexture(SELECT_ICON);
+	cmdicons[4] = thmGetTexture(CIRCLE_ICON);
 
 	while(1) {
 		readPads();
@@ -94,7 +96,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		}
 		
 		// Commands
-		for (i = 0; i < KEYB_HEIGHT; i++) {
+		for (i = 0; i < KEYB_CMDS; i++) {
 			if (cmdicons[i])
 				rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
 			

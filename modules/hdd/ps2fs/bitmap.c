@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: bitmap.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # PFS bitmap manipulation routines
 */
 
@@ -19,7 +19,7 @@ u32 bitsPerBitmapChunk = 8192; // number of bitmap bits in each bitmap data chun
 u32 free_bitmap[16]={4, 3, 3, 2, 3, 2, 2, 1, 3, 2, 2, 1, 2, 1, 1, 0};
 
 void bitmapSetupInfo(pfs_mount_t *pfsMount, t_bitmapInfo *info, u32 subpart, u32 number)
-{ 
+{
 	u32 size;
 
 	size = pfsMount->blockDev->getSize(pfsMount->fd, subpart) >> pfsMount->sector_scale;
@@ -91,7 +91,7 @@ int bitmapAllocateAdditionalZones(pfs_mount_t *pfsMount, pfs_blockinfo *bi, u32 
 	if (65535-bi->count < count)
 		count=65535-bi->count;
 
-	// Loop over each bitmap chunk (each is 1024 bytes in size) until either we have allocated 
+	// Loop over each bitmap chunk (each is 1024 bytes in size) until either we have allocated
 	// the requested amount of blocks, or until we have run out of space on the current partition
 	while ((((info.partitionRemainder==0) && (info.chunk < info.partitionChunks  )) ||
 	        ((info.partitionRemainder!=0) && (info.chunk < info.partitionChunks+1))) && count)
@@ -170,7 +170,7 @@ int bitmapAllocZones(pfs_mount_t *pfsMount, pfs_blockinfo *bi, u32 amount)
 		if(bitmap==0)
 			return 0;
 
-		bitmapEnd=bitmap->u.bitmap + 
+		bitmapEnd=bitmap->u.bitmap +
 			(info.chunk == info.partitionChunks ? info.partitionRemainder / 32 : metaSize / 4);
 
 		for (bitmapWord=bitmap->u.bitmap + info.index; bitmapWord < bitmapEnd; info.bit=0, bitmapWord++)
@@ -278,7 +278,7 @@ void bitmapFreeBlockSegment(pfs_mount_t *pfsMount, pfs_blockinfo *bi)
 }
 
 // Returns the number of free zones for the partition 'sub'
-int calcFreeZones(pfs_mount_t *pfsMount, int sub) 
+int calcFreeZones(pfs_mount_t *pfsMount, int sub)
 {
 	int result;
 	t_bitmapInfo info;
@@ -339,7 +339,7 @@ void bitmapShow(pfs_mount_t *pfsMount)
 				bitcnt=info.partitionRemainder;
 
 			printf("ps2fs: Zone show: pn %ld, bn %ld, bitcnt %ld\n", pn, info.chunk, bitcnt);
-			
+
 			for(i=0; (i < (1<<blockSize)) && ((i * 512) < (bitcnt / 8)); i++)
 				printBitmap(clink->u.bitmap+128*i);
 
@@ -351,7 +351,7 @@ void bitmapShow(pfs_mount_t *pfsMount)
 
 // Free's all blocks allocated to an inode
 void bitmapFreeInodeBlocks(pfs_cache_t *clink)
-{	
+{
 	pfs_mount_t *pfsMount=clink->pfsMount;
 	u32 i;
 
@@ -369,7 +369,7 @@ void bitmapFreeInodeBlocks(pfs_cache_t *clink)
 		}
 
 		bitmapFreeBlockSegment(pfsMount, bi);
-		cacheMarkClean(pfsMount, (u16)bi->subpart,  bi->number << pfsMount->inode_scale, 
+		cacheMarkClean(pfsMount, (u16)bi->subpart,  bi->number << pfsMount->inode_scale,
 			(bi->number + bi->count) << pfsMount->inode_scale);
 	}
 	cacheAdd(clink);

@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: hdd.h 1421 2007-07-07 01:56:53Z radad $
+# $Id$
 # Main APA Header file
 */
 
@@ -32,8 +32,6 @@
 #include <thsemap.h>
 #include <intrman.h>
 #include <cdvdman.h>
-
-#include "helper.h"// for old atad, dev9 names need..
 
 #define DEBUG_LEVEL1
 //#define DEBUG_LEVEL2
@@ -100,6 +98,7 @@ typedef struct {	// for a hack :P
 #define APA_TYPE_MBR		0x0001		// Master Boot Record
 #define APA_TYPE_EXT2SWAP	0x0082
 #define APA_TYPE_EXT2		0x0083
+#define APA_TYPE_REISER		0x0088
 #define APA_TYPE_PFS		0x0100
 #define APA_TYPE_CFS		0x0101
 
@@ -111,21 +110,21 @@ typedef struct
 	u32		magic;				// APA_MAGIC
 	u32		next;
 	u32 	prev;
-	char	id[APA_IDMAX];		// 16
-	char	rpwd[APA_PASSMAX];	// 48
-	char	fpwd[APA_PASSMAX];  // 56
-	u32		start;				// 64
-	u32		length;				// 68
-	u16		type;				// 72
-	u16		flags;				// 74
-	u32		nsub;				// 76
-	ps2time	created;			// 80
-	u32		main;				// 88
-	u32		number;				// 92
-	u32		modver;				// 96
-	u32		pading1[7];			// 100
-	char	pading2[128];		// 128
-	struct {					// 256
+	char	id[APA_IDMAX];
+	char	rpwd[APA_PASSMAX];
+	char	fpwd[APA_PASSMAX];
+	u32		start;
+	u32		length;
+	u16		type;
+	u16		flags;
+	u32		nsub;
+	ps2time	created;
+	u32		main;
+	u32		number;
+	u32		modver;
+	u32		pading1[7];
+	char	pading2[128];
+	struct {
 		char 	magic[32];
 		u32 	version;
 		u32		nsector;
@@ -158,12 +157,10 @@ typedef struct
 	u16			nsub;
 	u16			type;
 	char		id[APA_IDMAX];
-	u32			start;			// <--- TODO move to subs ..., has not been moved to risk e of fucking it up ;)
-	u32			length;
-	struct {					// Sub-partition data
+	struct {					// Partition data (0 = main partition, 1+ = sub-partition)
 		u32		start;			// Sector address
 		u32		length;			// Sector count
-	} subs[APA_MAXSUB];
+	} parts[APA_MAXSUB+1];
 } hdd_file_slot_t;
 
 

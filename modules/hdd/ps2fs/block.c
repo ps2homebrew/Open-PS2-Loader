@@ -7,10 +7,10 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: block.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # PFS block/zone related routines
 */
- 
+
 #include "pfs.h"
 
 // Sets 'blockpos' to point to the next block segment for the inode (and moves onto the
@@ -20,7 +20,7 @@ int blockSeekNextSegment(pfs_cache_t *clink, pfs_blockpos_t *blockpos)
 	pfs_cache_t *nextSegment;
 	int result=0;
 
-	if (blockpos->byte_offset)   
+	if (blockpos->byte_offset)
 	{
 		printf("ps2fs: Panic: This is a bug!\n");
 		return -1;
@@ -130,7 +130,7 @@ int blockAllocNewSegment(pfs_cache_t *clink, pfs_blockpos_t *blockpos, u32 block
 		memset(clink2->u.inode, 0, sizeof(pfs_inode));
 		clink2->u.inode->magic=PFS_SEGI_MAGIC;
 
-		memcpy(&clink2->u.inode->inode_block, &clink->u.inode->inode_block, sizeof(pfs_blockinfo)); 
+		memcpy(&clink2->u.inode->inode_block, &clink->u.inode->inode_block, sizeof(pfs_blockinfo));
 		memcpy(&clink2->u.inode->last_segment, &blockpos->inode->u.inode->data[0], sizeof(pfs_blockinfo));
 		memcpy(&clink2->u.inode->data[0], &bi, sizeof(pfs_blockinfo));
 

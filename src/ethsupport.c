@@ -160,16 +160,16 @@ static void ethInitSMB(void) {
 	} else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE)) {
 		switch(gNetworkStartup){
 			case ERROR_ETH_SMB_CONN:
-				setErrorMessage(_STR_NETWORK_STARTUP_ERROR_CONN, gNetworkStartup);
+				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_CONN, gNetworkStartup);
 				break;
 			case ERROR_ETH_SMB_LOGON:
-				setErrorMessage(_STR_NETWORK_STARTUP_ERROR_LOGON, gNetworkStartup);
+				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_LOGON, gNetworkStartup);
 				break;
 			case ERROR_ETH_SMB_OPENSHARE:
-				setErrorMessage(_STR_NETWORK_STARTUP_ERROR_SHARE, gNetworkStartup);
+				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_SHARE, gNetworkStartup);
 				break;
 			default:
-				setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
 		}
 	}
 }
@@ -201,7 +201,7 @@ static void ethLoadModules(void) {
 		}
 	}
 
-	setErrorMessage(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
 }
 
 void ethInit(void) {
@@ -271,7 +271,7 @@ static int ethUpdateGameList(void) {
 
 	if (gPCShareName[0]) {
 		if((result = sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount)) < 0){
-			setErrorMessage(_STR_NETWORK_GAMES_LIST_ERROR, ERROR_ETH_SMB_LISTGAMES);
+			setErrorMessageWithCode(_STR_NETWORK_GAMES_LIST_ERROR, ERROR_ETH_SMB_LISTGAMES);
 		}
 	} else {
 		int i, count;
@@ -298,7 +298,7 @@ static int ethUpdateGameList(void) {
 			}
 			ethGameCount = count;
 		}else if(count < 0){
-			setErrorMessage(_STR_NETWORK_SHARE_LIST_ERROR, ERROR_ETH_SMB_LISTSHARES);
+			setErrorMessageWithCode(_STR_NETWORK_SHARE_LIST_ERROR, ERROR_ETH_SMB_LISTSHARES);
 		}
 	}
 	return ethGameCount;

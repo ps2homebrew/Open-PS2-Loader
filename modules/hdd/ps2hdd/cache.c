@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: cache.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # APA cache manipulation routines
 */
 

@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: hdd.c 1511 2009-01-15 09:11:30Z radad $
+# $Id$
 # Start Up routines
 */
 
@@ -24,24 +24,24 @@ iop_device_ops_t hddOps={
 	hddRead,
 	hddWrite,
 	hddLseek,
-	(void*)hddUnsupported,
+	(void*)fioUnsupported,
 	hddRemove,
-	(void*)hddUnsupported,
-	(void*)hddUnsupported,
+	(void*)fioUnsupported,
+	(void*)fioUnsupported,
 	hddDopen,
 	hddClose,
 	hddDread,
 	hddGetStat,
-	(void*)hddUnsupported,
+	(void*)fioUnsupported,
 	hddReName,
-	(void*)hddUnsupported,
-	(void*)hddUnsupported,
-	(void*)hddUnsupported,
-	(void*)hddUnsupported,
-	(void*)hddUnsupported,
+	(void*)fioUnsupported,
+	(void*)fioUnsupported,
+	(void*)fioUnsupported,
+	(void*)fioUnsupported,
+	(void*)fioUnsupported,
 	hddDevctl,
-	(void*)hddUnsupported,
-	(void*)hddUnsupported,
+	(void*)fioUnsupported,
+	(void*)fioUnsupported,
 	hddIoctl2,
 };
 iop_device_t hddFioDev={
@@ -60,8 +60,8 @@ hdd_device_t hddDeviceBuf[2]={
 
 char mbrMagic[0x20]={
 	0x2B, 0x17, 0x16, 0x01, 0x58, 0x3B, 0x17, 0x15,
-	0x08, 0x0D, 0x0C, 0x1D, 0x0A, 0x58, 0x3D, 0x16, 
-	0x0C, 0x1D, 0x0A, 0x0C, 0x19, 0x11, 0x16, 0x15, 
+	0x08, 0x0D, 0x0C, 0x1D, 0x0A, 0x58, 0x3D, 0x16,
+	0x0C, 0x1D, 0x0A, 0x0C, 0x19, 0x11, 0x16, 0x15,
 	0x1D, 0x16, 0x0C, 0x58, 0x31, 0x16, 0x1B, 0x56
 };
 
@@ -84,7 +84,7 @@ int unlockDrive(u32 device)
 	u8 id[32];
 	int rv;
 	if((rv=getIlinkID(id))==0)
-		return atadSceUnlock(device, id);
+		return ata_device_sce_sec_unlock(device, id);
 	return rv;
 }
 
@@ -94,7 +94,7 @@ int _start(int argc, char **argv)
 	char	*input;
 	int		cacheSize=3;
 	ps2time tm;
-	t_shddInfo *hddInfo;
+	ata_devinfo_t *hddInfo;
 
 	printStartup();
 	// decode MBR Magic
@@ -109,7 +109,7 @@ int _start(int argc, char **argv)
 	argc--; argv++;
 	while(argc)
 	{
-		if(argv[0][0] != '-') 
+		if(argv[0][0] != '-')
 			break;
 		if(strcmp("-o", argv[0])==0){
 			argc--; argv++;
@@ -136,7 +136,7 @@ int _start(int argc, char **argv)
 		tm.hour, tm.min, tm.sec, tm.month, tm.day, tm.year);
 	for(i=0;i < 2;i++)
 	{
-		if(!(hddInfo=atadInit((u16)i))){
+		if(!(hddInfo=ata_get_devinfo(i))){
 			printf("ps2hdd: Error: ata initialization failed.\n");
 			return 0;
 		}

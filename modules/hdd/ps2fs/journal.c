@@ -7,10 +7,10 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: journal.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # PFS metadata journal related routines
 */
- 
+
 #include "pfs.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ int journalFlush(pfs_mount_t *pfsMount)
 }
 
 int journalResetore(pfs_mount_t *pfsMount)
-{ 
+{
 	int rv;
 	int result;
 	pfs_cache_t *clink;
@@ -105,7 +105,7 @@ int journalResetore(pfs_mount_t *pfsMount)
 	rv = pfsMount->blockDev->transfer(pfsMount->fd, &journalBuf, 0,
 		(pfsMount->log.number << pfsMount->sector_scale), 2, IOCTL2_TMODE_READ);
 
-	if(rv || (journalBuf.magic != PFS_JOUNRNAL_MAGIC) || 
+	if(rv || (journalBuf.magic != PFS_JOUNRNAL_MAGIC) ||
 		(journalBuf.checksum != (u16)journalCheckSum(&journalBuf)))
 		{
 			printf("ps2fs: Error: cannot read log/invalid log\n");
@@ -127,7 +127,7 @@ int journalResetore(pfs_mount_t *pfsMount)
 		printf("ps2fs: Log overwrite %d:%08lx\n", journalBuf.log[i].sub, journalBuf.log[i].sector);
 
 		// Read data in from log section on disk into cache buffer
-		rv = pfsMount->blockDev->transfer(pfsMount->fd, clink->u.data, 0, 
+		rv = pfsMount->blockDev->transfer(pfsMount->fd, clink->u.data, 0,
 			(pfsMount->log.number << pfsMount->sector_scale) + journalBuf.log[i].logSector, 2,
 			IOCTL2_TMODE_READ);
 
@@ -138,5 +138,5 @@ int journalResetore(pfs_mount_t *pfsMount)
 	}
 
 	cacheAdd(clink);
-	return journalReset(pfsMount); 
+	return journalReset(pfsMount);
 }

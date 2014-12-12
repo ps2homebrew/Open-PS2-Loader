@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: pfs_types.h 577 2004-09-14 14:41:46Z pixel $
+# $Id$
 */
 
 #ifndef _PFS_TYPES_H
@@ -32,8 +32,8 @@
 // jounrnal/log
 typedef struct {
 	u32 magic;			// =PFS_JOUNRNAL_MAGIC
-	u16 num;			// 
-	u16 checksum;		// 
+	u16 num;			//
+	u16 checksum;		//
 	struct{
 		u32 sector;		// block/sector for partition
 		u16 sub;		// main(0)/sub(+1) partition
@@ -58,56 +58,56 @@ typedef struct {
 
 // Block number/count pair (used in inodes)
 typedef struct {
-    u32 number;		// 
-    u16 subpart;	// 
-    u16 count;		// 
+    u32 number;		//
+    u16 subpart;	//
+    u16 count;		//
 } pfs_blockinfo;
 
 // Date/time descriptor
 typedef struct {
-    u8 unused;	// 
-    u8 sec;		// 
-    u8 min;		// 
-    u8 hour;	// 
-    u8 day;		// 
-    u8 month;	// 
-    u16 year;	// 
+    u8 unused;	//
+    u8 sec;		//
+    u8 min;		//
+    u8 hour;	//
+    u8 day;		//
+    u8 month;	//
+    u16 year;	//
 } pfs_datetime;
 
 // Superblock structure
 typedef struct {
-    u32 magic;			// 
-	u32 version;		// 
-    u32 unknown1;		// 
-	u32 fsckStat;		// 
-    u32 zone_size;		// 
+    u32 magic;			//
+	u32 version;		//
+    u32 unknown1;		//
+	u32 fsckStat;		//
+    u32 zone_size;		//
     u32 num_subs;		// number of subs attached to filesystem
 	pfs_blockinfo log;	// block info for metadata log
 	pfs_blockinfo root;	// block info for root directory
 } pfs_super_block;
 
-// Inode structure  
+// Inode structure
 typedef struct {
 	u32 checksum;				// Sum of all other words in the inode
-	u32 magic;					// 
+	u32 magic;					//
 	pfs_blockinfo inode_block;	// start block of inode
 	pfs_blockinfo next_segment;	// next segment descriptor inode
 	pfs_blockinfo last_segment;	// last segment descriptor inode
-	pfs_blockinfo unused;		// 
-	pfs_blockinfo data[114];	// 
+	pfs_blockinfo unused;		//
+	pfs_blockinfo data[114];	//
 	u16 mode;					// file mode
 	u16 attr;					// file attributes
-	u16 uid;					// 
-	u16 gid;					// 
-	pfs_datetime atime;			// 
-	pfs_datetime ctime;			// 
-	pfs_datetime mtime;			// 
-	u64 size;					// 
+	u16 uid;					//
+	u16 gid;					//
+	pfs_datetime atime;			//
+	pfs_datetime ctime;			//
+	pfs_datetime mtime;			//
+	u64 size;					//
 	u32 number_blocks;			// number of blocks/zones used by file
 	u32 number_data;			// number of used entries in data array
 	u32 number_segdesg;			// number of "indirect blocks"/next segment descriptor's
 	u32 subpart;				// subpart of inode
-	u32 reserved[4];			// 
+	u32 reserved[4];			//
 } pfs_inode;
 
 #endif /* _PFS_TYPES_H */

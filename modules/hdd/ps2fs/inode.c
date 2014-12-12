@@ -7,10 +7,10 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: inode.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # PFS inode manipulation routines
 */
- 
+
 #include "pfs.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ pfs_cache_t *inodeGetFileInDir(pfs_cache_t *dirInode, char *path, int *result)
 	u32	size;
 	pfs_cache_t *clink;
 
-	if (path[0]==0)		
+	if (path[0]==0)
 		return cacheUsedAdd(dirInode);
 
 	// If we're in the root dir, dont do anything for ".."
@@ -88,7 +88,7 @@ pfs_cache_t *inodeGetFileInDir(pfs_cache_t *dirInode, char *path, int *result)
 }
 
 int inodeSync(pfs_blockpos_t *blockpos, u64 size, u32 used_segments)
-{ 
+{
 	int result=0;
 	u32 i;
 	u16 count;
@@ -173,7 +173,7 @@ void inodeFill(pfs_cache_t *ci, pfs_blockinfo *bi, u16 mode, u16 uid, u16 gid)
 		val=1;
 	}
 	ci->u.inode->number_data=ci->u.inode->number_blocks=val;
-	
+
 
 	getPs2Time(&ci->u.inode->ctime);
 	memcpy(&ci->u.inode->atime, &ci->u.inode->ctime, sizeof(pfs_datetime));
@@ -220,7 +220,7 @@ pfs_cache_t* inodeGetParent(pfs_mount_t *pfsMount, pfs_cache_t *clink, const cha
 //		dprintf("ps2fs: Got root dir inode!\n");
 //		inodePrint(clink->u.inode);
 
-	} 
+	}
 	else if (clink==NULL)
 	{
 
@@ -310,7 +310,7 @@ int inodeRemove(pfs_cache_t *parent, pfs_cache_t *inode, char *path)
 	return rv;
 }
 
-pfs_cache_t *inodeCreateNewFile(pfs_cache_t *clink, u16 mode, u16 uid, u16 gid, int *result) 
+pfs_cache_t *inodeCreateNewFile(pfs_cache_t *clink, u16 mode, u16 uid, u16 gid, int *result)
 {
 	pfs_blockinfo a, b;
 

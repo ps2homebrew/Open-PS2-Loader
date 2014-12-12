@@ -194,6 +194,8 @@ int hddGetHDLGamelist(hdl_games_list_t *game_list)
 	iox_dirent_t dirent;
 	int fd, ret;
 
+	hddFreeHDLGamelist(game_list);
+
 	ret = 0;
 	if((fd = fileXioDopen("hdd0:")) >= 0)
 	{
@@ -273,6 +275,7 @@ void hddFreeHDLGamelist(hdl_games_list_t *game_list)
 	{
 		free(game_list->games);
 		game_list->games = NULL;
+		game_list->count = 0;
 	}
 }
 

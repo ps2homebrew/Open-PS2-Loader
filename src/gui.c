@@ -366,8 +366,7 @@ void guiShowGSConfig(void) {
 	// Conversion to 'COMPAT' complete. Might need some clean up though! (--Bat--)
 	diaSetEnum(diaGSConfig, COMPAT_GSMVMODE, gsmvmodeNames);
 	diaExecuteDialog(diaGSConfig, -1, 1, NULL);
-
-	}
+}
 
 #endif
 
@@ -384,8 +383,6 @@ void guiShowCheatConfig(void) {
 	if (ret) {
 		diaGetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, &gEnableCheat);
 		diaGetInt(diaCheatConfig, CHEATCFG_CHEATMODE, &gCheatMode);
-
-		applyConfig(-1, -1);
 	}
 }
 #endif
@@ -1413,7 +1410,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
 		fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
-		guiDrawIconAndText(CIRCLE_ICON, _STR_O_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+		guiDrawIconAndText(CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 		if (addAccept)
 			guiDrawIconAndText(CROSS_ICON, _STR_X_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
 

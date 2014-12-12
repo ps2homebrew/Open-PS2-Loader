@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: misc.c 1370 2007-01-17 02:28:14Z jbit $
+# $Id$
 # Miscellaneous routines
 */
 
@@ -30,25 +30,18 @@ void *allocMem(int size)
 int getPs2Time(ps2time *tm)
 {
 	sceCdCLOCK	cdtime;
-	s32		tmp;
 	ps2time timeBuf={
-		0, 0x0D, 0x0E, 0x0A, 0x0D, 1, 2003// used if can not get time... 
+		0, 0x0D, 0x0E, 0x0A, 0x0D, 1, 2003// used if can not get time...
 	};
 
 	if(sceCdReadClock(&cdtime)!=0 && cdtime.stat==0)
 	{
-		tmp=cdtime.second>>4;
-		timeBuf.sec=(u32)(((tmp<<2)+tmp)<<1)+(cdtime.second&0x0F);
-		tmp=cdtime.minute>>4;
-		timeBuf.min=(((tmp<<2)+tmp)<<1)+(cdtime.minute&0x0F);
-		tmp=cdtime.hour>>4;
-		timeBuf.hour=(((tmp<<2)+tmp)<<1)+(cdtime.hour&0x0F);
-		tmp=cdtime.day>>4;
-		timeBuf.day=(((tmp<<2)+tmp)<<1)+(cdtime.day&0x0F);
-		tmp=(cdtime.month>>4)&0x7F;
-		timeBuf.month=(((tmp<<2)+tmp)<<1)+(cdtime.month&0x0F);
-		tmp=cdtime.year>>4;
-		timeBuf.year=(((tmp<<2)+tmp)<<1)+(cdtime.year&0xF)+2000;
+		timeBuf.sec=btoi(cdtime.second);
+		timeBuf.min=btoi(cdtime.minute);
+		timeBuf.hour=btoi(cdtime.hour);
+		timeBuf.day=btoi(cdtime.day);
+		timeBuf.month=btoi(cdtime.month & 0x7F);
+		timeBuf.year=btoi(cdtime.year)+2000;
 	}
 	memcpy(tm, &timeBuf, sizeof(ps2time));
 	return 0;
@@ -67,12 +60,10 @@ int getIlinkID(u8 *idbuf)
 
 	memset(idbuf, 0, 32);
 
-	// v12/v13 EELOADCNF fix: do not check iLinkID
-	//if(sceCdRI(idbuf, &err))
-	//	if(err==0)
-	//		return 0;
-	//dprintf1("ps2hdd: Error: cannot get ilink id\n");
-	//return -EIO;
-	sceCdRI(idbuf, &err);
+	if(sceCdRI(idbuf, &err))
+		if (err)
+			dprintf1("ps2hdd: Error when reading ilink id\n");
+
+	// Return all ok for compatibility
 	return 0;
 }

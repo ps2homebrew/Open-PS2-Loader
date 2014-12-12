@@ -380,7 +380,7 @@ int InitConsoleRegionData(void){
 			case 'A':
 				ConsoleRegion=CONSOLE_REGION_USA;
 				break;
-			case 'J':
+			default:	//For Japanese and unidentified consoles.
 				ConsoleRegion=CONSOLE_REGION_JAPAN;
 		}
 

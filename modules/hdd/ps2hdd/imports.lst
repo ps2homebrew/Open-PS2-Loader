@@ -51,7 +51,6 @@ I_strncmp
 I_strncpy
 I_strrchr
 I_strtol
-//I_sprintf// not use but :P
 sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start

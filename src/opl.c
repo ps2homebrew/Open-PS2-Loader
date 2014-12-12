@@ -78,6 +78,7 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 }
 
 // forward decl
+static void clearMenuGameList(opl_io_module_t* mdl);
 static void moduleCleanup(opl_io_module_t* mod, int exception);
 
 // frame counter
@@ -107,8 +108,12 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 			menuAddHint(&mod->menuItem, _STR_INFO, CROSS_ICON);
 		else
 			menuAddHint(&mod->menuItem, _STR_RUN, CROSS_ICON);
+
 		if (mod->support->haveCompatibilityMode)
 			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+
+		menuAddHint(&mod->menuItem, _STR_REFRESH, SELECT_ICON);
+
 		if (gEnableDandR) {
 			if (mod->support->itemRename)
 				menuAddHint(&mod->menuItem, _STR_RENAME, CIRCLE_ICON);
@@ -249,6 +254,22 @@ static void initMenuForListSupport(int mode) {
 	guiDeferUpdate(mc);
 }
 
+static void clearMenuGameList(opl_io_module_t* mdl) {
+	if(mdl->subMenu != NULL) {
+		// lock - gui has to be unused here
+		guiLock();
+
+		submenuDestroy(&mdl->subMenu);
+		mdl->menuItem.submenu = NULL;
+		mdl->menuItem.current = NULL;
+		mdl->menuItem.pagestart = NULL;
+		mdl->menuItem.remindLast = 0;
+
+		// unlock
+		guiUnlock();
+	}
+}
+
 static void initSupport(item_list_t* itemList, int startMode, int mode, int force_reinit) {
 	opl_io_module_t* mod = &list_support[mode];
 	if (!mod->support) {
@@ -298,17 +319,7 @@ static void deinitAllSupport(int exception) {
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
 static void updateMenuFromGameList(opl_io_module_t* mdl) {
-	// lock - gui has to be unused here
-	guiLock();
-
-	submenuDestroy(&mdl->subMenu);
-	mdl->menuItem.submenu = NULL;
-	mdl->menuItem.current = NULL;
-	mdl->menuItem.pagestart = NULL;
-	mdl->menuItem.remindLast = 0;
-
-	// unlock, the rest is deferred
-	guiUnlock();
+	clearMenuGameList(mdl);
 
 	const char* temp = NULL;
 	if (gRememberLastPlayed)
@@ -416,8 +427,13 @@ static void errorMessageHook() {
 	guiSetFrameHook(&menuUpdateHook);
 }
 
-void setErrorMessage(int strId, int error) {
+void setErrorMessageWithCode(int strId, int error) {
 	snprintf(errorMessage, sizeof(errorMessage), _l(strId), error);
+	guiSetFrameHook(&errorMessageHook);
+}
+
+void setErrorMessage(int strId) {
+	snprintf(errorMessage, sizeof(errorMessage), _l(strId));
 	guiSetFrameHook(&errorMessageHook);
 }
 
@@ -686,7 +702,7 @@ extern int size_hdldsvr_irx;
 void loadHdldSvr(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
-	char ipconfig[IPCONFIG_MAX_LEN] __attribute__((aligned(64)));
+	char ipconfig[IPCONFIG_MAX_LEN];
 
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
@@ -771,7 +787,9 @@ void handleHdlSrv() {
 	// prepare for hdl, display screen with info
 	loadHdldSvr();
 
-	int terminate = 0;
+	guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
+
+/*	int terminate = 0;
 
 	while (1) {
 		if (terminate != 0)
@@ -792,7 +810,7 @@ void handleHdlSrv() {
 
 		if (terminate >= 2)
 			break;
-	}
+	} */
 
 	guiRenderTextScreen(_l(_STR_UNLOADHDL));
 
@@ -821,6 +839,8 @@ static void moduleCleanup(opl_io_module_t* mod, int exception) {
 
 	if (mod->support->itemCleanUp)
 		mod->support->itemCleanUp(exception);
+
+	clearMenuGameList(mod);
 }
 
 void shutdown(int exception) {

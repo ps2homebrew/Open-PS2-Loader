@@ -7,27 +7,27 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: pfs.h 1421 2007-07-07 01:56:53Z radad $
+# $Id$
 */
 
 #ifndef _PFS_H
 #define _PFS_H
 
-#include <types.h>
-#include <defs.h>
-#include <irx.h>
-#include <loadcore.h>
-#include <poweroff.h>
-#include <sysmem.h>
-#include <stdio.h>
-#include <sysclib.h>
-#include <errno.h>
-#include <sys/fcntl.h>
-#include <sys/stat.h>
-#include <iomanX.h>
-#include <thsemap.h>
-#include <intrman.h>
-#include <cdvdman.h>
+#include "types.h"
+#include "defs.h"
+#include "irx.h"
+#include "loadcore.h"
+#include "poweroff.h"
+#include "sysmem.h"
+#include "stdio.h"
+#include "sysclib.h"
+#include "errno.h"
+#include "sys/fcntl.h"
+#include "sys/stat.h"
+#include "iomanX.h"
+#include "thsemap.h"
+#include "intrman.h"
+#include "cdvdman.h"
 
 #include "pfs_types.h"
 
@@ -48,44 +48,44 @@ typedef void (*deviceSetPartError_p)(int fd);
 typedef int/*0 only :P*/ (*deviceFlushCache_p)(int fd);
 
 typedef struct {
-	char					*devName;			// 
-	deviceTransfer_p		transfer;			// 
-	deviceGetSubNumber_p	getSubNumber;		// 
-	deviceGetSize_p			getSize;			// 
+	char					*devName;			//
+	deviceTransfer_p		transfer;			//
+	deviceGetSubNumber_p	getSubNumber;		//
+	deviceGetSize_p			getSize;			//
 	deviceSetPartError_p	setPartitionError;	// set open partition as haveing a error
-	deviceFlushCache_p		flushCache;			// 
+	deviceFlushCache_p		flushCache;			//
 
 } block_device;
 
 
 typedef struct {
 	block_device *blockDev;		// call table for hdd(hddCallTable)
-	int fd;						// 
+	int fd;						//
 	u32 flags;					// rename to attr ones checked
 	u32 total_sector;			// number of sectors in the filesystem
 	u32 zfree;					// zone free
-	u32 sector_scale;			// 
-	u32 inode_scale;			// 
+	u32 sector_scale;			//
+	u32 inode_scale;			//
 	u32 zsize;					// zone size
 	u32 num_subs;				// number of sub partitions in the filesystem
 	pfs_blockinfo root_dir;		// block info for root directory
 	pfs_blockinfo log;			// block info for the log
 	pfs_blockinfo current_dir;	// block info for current directory
 	u32 lastError;				// 0 if no error :)
-	u16 uid;					// 
-	u16 gid;					// 
+	u16 uid;					//
+	u16 gid;					//
 	u32 free_zone[65];			// free zones in each partition (1 main + 64 possible subs)
 } pfs_mount_t;
 
 typedef struct pfs_cache_s {
-	struct pfs_cache_s *next;	// 
-	struct pfs_cache_s *prev;	// 
-	u16 flags;					// 
-	u16 nused;					// 
-	pfs_mount_t *pfsMount;		// 
+	struct pfs_cache_s *next;	//
+	struct pfs_cache_s *prev;	//
+	u16 flags;					//
+	u16 nused;					//
+	pfs_mount_t *pfsMount;		//
 	u32 sub;					// main(0)/sub(+1) partition
 	u32 sector;					// block/sector for partition
-	union{						// 
+	union{						//
 		void *data;
 		pfs_inode *inode;
 		pfs_aentry_t *aentry;
@@ -95,20 +95,20 @@ typedef struct pfs_cache_s {
 	} u;
 } pfs_cache_t;
 
-typedef struct 
+typedef struct
 {
-	u16 dirty;	// 
+	u16 dirty;	//
 	u16 sub;	// Sub/main partition
 	u32 sector;	// Sector
 } pfs_restsInfo_t;
 
-typedef struct 
+typedef struct
 {
-	char key[256];	
+	char key[256];
 	char value[256];
 } pfs_ioctl2attr_t;
 
-typedef struct 
+typedef struct
 {
 	pfs_cache_t *inode;
 	u32 block_segment;		// index into data array in inode structure for current zone segment
@@ -117,12 +117,12 @@ typedef struct
 } pfs_blockpos_t;
 
 typedef struct {
-	iop_file_t *fd;				// 
-	pfs_cache_t *clink;			// 
+	iop_file_t *fd;				//
+	pfs_cache_t *clink;			//
 	u32 aentryOffset;			// used for read offset
-	u64 position;				// 
+	u64 position;				//
 	pfs_blockpos_t block_pos;	// current position into file
-	pfs_restsInfo_t restsInfo;	// 
+	pfs_restsInfo_t restsInfo;	//
 	u8 restsBuffer[512];		// used for reading mis-aligned/remainder data
 } pfs_file_slot_t;
 
@@ -200,7 +200,7 @@ extern int pfsDebug;
 ///////////////////////////////////////////////////////////////////////////////
 //   Debug stuff
 
-#define DEBUG_CALL_LOG	
+#define DEBUG_CALL_LOG
 #define DEBUG_VERBOSE_LOG
 
 #ifdef DEBUG_VERBOSE_LOG

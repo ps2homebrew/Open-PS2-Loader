@@ -7,14 +7,14 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: super.c 911 2005-03-14 21:02:17Z oopo $
+# $Id$
 # PFS superblock manipulation routines
 */
- 
+
 #include "pfs.h"
 
 int checkZoneSize(u32 zone_size)
-{ 
+{
 	if((zone_size & (zone_size - 1)) || (zone_size < (2 * 1024)) || (zone_size > (128 * 1024)))
 	{
 		printf("ps2fs: Error: Invalid zone size\n");
@@ -89,7 +89,7 @@ int formatSub(block_device *blockDev, int fd, u32 sub, u32 reserved, u32 scale, 
 }
 
 // Formats a partition and all sub-partitions with PFS
-int _format(block_device *blockDev, int fd, int zonesize, int fragment) 
+int _format(block_device *blockDev, int fd, int zonesize, int fragment)
 {
 	int result, result2;
 	pfs_cache_t *clink, *cache;
@@ -145,7 +145,7 @@ int _format(block_device *blockDev, int fd, int zonesize, int fragment)
 			if((result = result2) >= 0)
 			{
 				for (i=0; i < subnumber+1; i++)
-					if((result=formatSub(blockDev, fd, i, i ? 1 : (0x2000 >> scale) + 
+					if((result=formatSub(blockDev, fd, i, i ? 1 : (0x2000 >> scale) +
 											sb->log.count*8, scale, fragment))<0)
 						break;
 
@@ -163,7 +163,7 @@ int _format(block_device *blockDev, int fd, int zonesize, int fragment)
 // Formats sub partitions which are added to the main partition after it is initially
 // formatted with PFS
 int updateSuperBlock(pfs_mount_t *pfsMount, pfs_super_block *superblock, u32 sub)
-{ 
+{
 	u32 scale;
 	u32 i;
 	u32 count;
@@ -185,7 +185,7 @@ int updateSuperBlock(pfs_mount_t *pfsMount, pfs_super_block *superblock, u32 sub
 	rv = pfsMount->blockDev->transfer(pfsMount->fd, superblock, 0, PFS_SUPER_SECTOR, 1, IOCTL2_TMODE_WRITE);
 	if(!rv)
 		rv = pfsMount->blockDev->transfer(pfsMount->fd, superblock, 0, PFS_SUPER_BACKUP_SECTOR, 1, IOCTL2_TMODE_WRITE);
-		
+
 	pfsMount->blockDev->flushCache(pfsMount->fd);
 
 	return rv;
@@ -207,7 +207,7 @@ int mountSuperBlock(pfs_mount_t *pfsMount)
 	clink = cacheAllocClean(&result);
 	if(!clink)
 		return result;
-	
+
 	superblock = clink->u.superblock;
 
 	// Read the suprerblock from the main partition
@@ -270,7 +270,7 @@ int mountSuperBlock(pfs_mount_t *pfsMount)
 		pfsMount->zfree += free;
 	}
 
-error:		
+error:
 	cacheAdd(clink);
 	return result;
 }

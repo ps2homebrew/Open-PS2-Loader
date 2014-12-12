@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: apa.c 1158 2005-06-13 22:31:13Z oopo $
+# $Id$
 # Main APA related routines
 */
 
@@ -17,8 +17,8 @@ void apaSaveError(u32 device, void *buffer, u32 lba, u32 err_lba)
 {
 	memset(buffer, 0, 512);
 	*(u32 *)buffer=err_lba;
-	atadDmaTransfer(device, buffer, lba, 1, ATAD_MODE_WRITE);
-	atadFlushCache(device);
+	ata_device_sector_io(device, buffer, lba, 1, ATA_DIR_WRITE);
+	ata_device_flush_cache(device);
 }
 
 void setPartErrorSector(u32 device, u32 lba)
@@ -37,7 +37,7 @@ int getPartErrorSector(u32 device, u32 lba, int *lba_out)
 	if(!(clink=cacheGetFree()))
 		return -ENOMEM;
 
-	if(atadDmaTransfer(device, clink->header, lba, 1, ATAD_MODE_READ))
+	if(ata_device_sector_io(device, clink->header, lba, 1, ATA_DIR_READ))
 		return -EIO;
 
 	if(lba_out)
@@ -61,8 +61,8 @@ int getPartErrorName(u32 device, char *name)
 
 	while(clink)
 	{
-		if(clink->header->type!=APA_TYPE_FREE && 
-			!(clink->header->flags & CACHE_FLAG_DIRTY) && 
+		if(clink->header->type!=APA_TYPE_FREE &&
+			!(clink->header->flags & CACHE_FLAG_DIRTY) &&
 			clink->header->start==lba) {
 				if(name) {
 					strncpy(name, clink->header->id, APA_IDMAX - 1);
@@ -266,7 +266,7 @@ int apaOpen(u32 device, hdd_file_slot_t *fileSlot, input_param *params, int mode
 	apa_cache		*clink;
 	apa_cache		*clink2;
 	u32				sector=0;
-	
+
 
 	// walk all looking for any empty blocks & look for partition
 	clink=cacheGetHeader(device, 0, 0, &rv);
@@ -294,17 +294,17 @@ int apaOpen(u32 device, hdd_file_slot_t *fileSlot, input_param *params, int mode
 				sector=clink->header->start;
 				clink2=cacheGetFree();
 				memset(clink2->header, 0, sizeof(apa_header));
-				atadDmaTransfer(device, clink2->header, sector+8     , 2, ATAD_MODE_WRITE);
-				atadDmaTransfer(device, clink2->header, sector+0x2000, 2, ATAD_MODE_WRITE);
+				ata_device_sector_io(device, clink2->header, sector+8     , 2, ATA_DIR_WRITE);
+				ata_device_sector_io(device, clink2->header, sector+0x2000, 2, ATA_DIR_WRITE);
 				cacheAdd(clink2);
 			}
 		}
 	}
 	if(clink==NULL)
 		return rv;
-	fileSlot->start=clink->header->start;
-	fileSlot->length=clink->header->length;
-	memcpy(&fileSlot->subs, &clink->header->subs, APA_MAXSUB*sizeof(apa_subs));
+	fileSlot->parts[0].start=clink->header->start;
+	fileSlot->parts[0].length=clink->header->length;
+	memcpy(&fileSlot->parts[1], &clink->header->subs, APA_MAXSUB*sizeof(apa_subs));
 	fileSlot->type=clink->header->type;
 	fileSlot->nsub=clink->header->nsub;
 	memcpy(&fileSlot->id, &clink->header->id, APA_IDMAX);
@@ -557,7 +557,7 @@ int apaCheckSum(apa_header *header)
 
 int apaReadHeader(u32 device, apa_header *header, u32 lba)
 {
-	if(atadDmaTransfer(device, header, lba, 2, ATAD_MODE_READ)!=0)
+	if(ata_device_sector_io(device, header, lba, 2, ATA_DIR_READ)!=0)
 		return -EIO;
 	if(header->magic!=APA_MAGIC)
 		return -EIO;
@@ -576,7 +576,7 @@ int apaReadHeader(u32 device, apa_header *header, u32 lba)
 
 int apaWriteHeader(u32 device, apa_header *header, u32 lba)
 {
-	if(atadDmaTransfer(device, header, lba, 2, ATAD_MODE_WRITE))
+	if(ata_device_sector_io(device, header, lba, 2, ATA_DIR_WRITE))
 		return -EIO;
 	return 0;
 }
@@ -594,7 +594,7 @@ int apaGetFormat(u32 device, int *format)
 	if((rv=apaReadHeader(device, clink->header, 0))==0)
 	{
 		*format=clink->header->mbr.version;
-		if(atadDmaTransfer(device, clink->header, APA_SECTOR_SECTOR_ERROR, 2, ATAD_MODE_READ))
+		if(ata_device_sector_io(device, clink->header, APA_SECTOR_SECTOR_ERROR, 2, ATA_DIR_READ))
 			rv=-EIO; // return -EIO;
 		if(rv==0){
 			pDW=(u32 *)clink->header;

@@ -7,10 +7,10 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: dir.c 1158 2005-06-13 22:31:13Z oopo $
+# $Id$
 # PFS directory parsing routines
 */
- 
+
 #include "pfs.h"
 
 // Gets a dir entry from the inode specified by clink
@@ -58,7 +58,7 @@ pfs_cache_t *getDentry(pfs_cache_t *clink, char *path, pfs_dentry **dentry, u32 
 			for (d2=(pfs_dentry*)((int)d+512); d < d2; (int)d+=aLen)
 			{
 				aLen=(d->aLen & 0xFFF);
-				
+
 				if (aLen & 3){
 					printf("ps2fs: Error: dir-entry allocated length/4 != 0\n");
 					goto _exit;
@@ -105,7 +105,7 @@ _exit:		cacheAdd(dentCache);
 }
 
 pfs_cache_t *getDentriesChunk(pfs_blockpos_t *position, int *result)
-{	
+{
 	pfs_blockinfo *bi;
 	pfs_mount_t *pfsMount=position->inode->pfsMount;
 
@@ -127,7 +127,7 @@ int getNextDentry(pfs_cache_t *clink, pfs_blockpos_t *blockpos, u32 *position, c
 	while((len == 0) && (*position < clink->u.inode->size))
 	{
 
-		if (!(dcache=getDentriesChunk(blockpos, &result)))	
+		if (!(dcache=getDentriesChunk(blockpos, &result)))
 		{
 			dprintf("ps2fs: couldnt get dentries chunk for dread!\n");
 			break;
@@ -168,7 +168,7 @@ pfs_cache_t *getDentriesAtPos(pfs_cache_t *clink, u64 position, int *offset, int
 	return r;
 }
 
-pfs_cache_t *fillInDentry(pfs_cache_t *clink, pfs_dentry *dentry, char *path1, pfs_blockinfo *bi, u32 len, u16 mode) 
+pfs_cache_t *fillInDentry(pfs_cache_t *clink, pfs_dentry *dentry, char *path1, pfs_blockinfo *bi, u32 len, u16 mode)
 {
 	dentry->inode=bi->number;
 	dentry->sub=bi->subpart;
@@ -230,7 +230,7 @@ pfs_cache_t *dirRemoveEntry(pfs_cache_t *clink, char *path)
 				else{
 					dnext->pLen=dnext->inode=0;
 
-					if ((clink->u.inode->size) && 
+					if ((clink->u.inode->size) &&
 					    (0>=dnext) && ((dnext==0) ||//strange?!?;
 					    (size+(dnext->aLen & 0xFFF)>=clink->u.inode->size))) {
 							clink->u.inode->size -= dnext->aLen & 0xFFF;
@@ -269,7 +269,7 @@ void fillSelfAndParentDentries(pfs_cache_t *clink, pfs_blockinfo *self, pfs_bloc
 	dentry->sub=self->subpart;
 	dentry->pLen=1;
 	dentry->aLen=12 | FIO_S_IFDIR;
-	
+
 	(u32)dentry+=12;
 
 	dentry->inode=parent->number;

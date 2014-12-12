@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: pfs_fioctl.h 577 2004-09-14 14:41:46Z pixel $
+# $Id$
 */
 
 #ifndef _PFS_FIOCTL_H
@@ -53,6 +53,7 @@ int ioctl2AttrAdd(pfs_cache_t *clink, pfs_ioctl2attr_t *attr);
 int ioctl2AttrDelete(pfs_cache_t *clink, void *arg);
 int ioctl2AttrLoopUp(pfs_cache_t *clink, char *key, char *value);
 int ioctl2AttrRead(pfs_cache_t *clink, pfs_ioctl2attr_t *attr, u32 *unkbuf);
+int ioctl2_0x7032(pfs_cache_t *clink);
 
 int ioctl2Alloc(pfs_cache_t *clink, int msize, int mode);
 void ioctl2Free(pfs_cache_t *pfree);

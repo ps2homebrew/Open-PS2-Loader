@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: journal.c 577 2004-09-14 14:41:46Z pixel $
+# $Id$
 # APA journal related routines
 */
 
@@ -19,11 +19,11 @@ apa_journal_t journalBuf;
 
 int journalFlush(u32 device)
 {// this write any thing that in are journal buffer :)
-	if(atadFlushCache(device))
+	if(ata_device_flush_cache(device))
 		return -EIO;
-	if(atadDmaTransfer(device, &journalBuf, APA_SECTOR_APAL, 1, ATAD_MODE_WRITE))
+	if(ata_device_sector_io(device, &journalBuf, APA_SECTOR_APAL, 1, ATA_DIR_WRITE))
 		return -EIO;
-	if(atadFlushCache(device))
+	if(ata_device_flush_cache(device))
 		return -EIO;
 	return 0;
 }
@@ -38,8 +38,8 @@ int journalReset(u32 device)
 int journalWrite(apa_cache *clink)
 {
 	clink->header->checksum=journalCheckSum(clink->header);
-	if(atadDmaTransfer(clink->device, clink->header, 
-		(journalBuf.num << 1)+APA_SECTOR_APAL_HEADERS, 2, ATAD_MODE_WRITE))
+	if(ata_device_sector_io(clink->device, clink->header,
+		(journalBuf.num << 1)+APA_SECTOR_APAL_HEADERS, 2, ATA_DIR_WRITE))
 			return -EIO;
 	journalBuf.sectors[journalBuf.num]=clink->sector;
 	journalBuf.num++;
@@ -53,7 +53,7 @@ int journalResetore(u32 device)
 	apa_cache *clink;
 
 	dprintf1("ps2hdd: checking log...\n");
-	if(atadDmaTransfer(device, &journalBuf, APA_SECTOR_APAL, sizeof(apa_journal_t)/512, ATAD_MODE_READ)){
+	if(ata_device_sector_io(device, &journalBuf, APA_SECTOR_APAL, sizeof(apa_journal_t)/512, ATA_DIR_READ)){
 		journalReset(device);
 		return -EIO;
 	}
@@ -64,9 +64,9 @@ int journalResetore(u32 device)
 		clink=cacheGetFree();
 		for(i=0, sector=APA_SECTOR_APAL_HEADERS;i<journalBuf.num;i++, sector+=2)
 		{
-			if(atadDmaTransfer(device, clink->header, sector, 2, ATAD_MODE_READ))
+			if(ata_device_sector_io(device, clink->header, sector, 2, ATA_DIR_READ))
 				break;
-			if(atadDmaTransfer(device, clink->header, journalBuf.sectors[i], 2, ATAD_MODE_WRITE))
+			if(ata_device_sector_io(device, clink->header, journalBuf.sectors[i], 2, ATA_DIR_WRITE))
 				break;
 		}
 		cacheAdd(clink);

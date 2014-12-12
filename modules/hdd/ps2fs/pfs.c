@@ -7,7 +7,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: pfs.c 1491 2009-01-04 23:46:22Z oopo $
+# $Id$
 # PFS startup and misc code
 */
 
@@ -41,10 +41,10 @@ iop_device_ops_t pfsOps = {
 	pfsSync,
 	pfsMount,
 	pfsUmount,
-	pfsLseek64,
+	(void*)fioUnsupported /*pfsLseek64*/,
 	pfsDevctl,
-	pfsUnsupported /*pfsSymlink*/,
-	pfsUnsupported /*pfsReadlink*/,
+	fioUnsupported /*pfsSymlink*/,
+	fioUnsupported /*pfsReadlink*/,
 	pfsIoctl2
 };
 

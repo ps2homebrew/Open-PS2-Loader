@@ -657,6 +657,12 @@ int hddIoctl2(iop_file_t *f, int req, void *argp, unsigned int arglen,
 		}
 		break;
 
+	case APA_IOCTL2_GETHEADER:
+		if(ata_device_sector_io(f->unit, bufp, fileSlot->parts[0].start, sizeof(apa_header)/512, ATA_DIR_READ))
+			rv=-EIO;
+		rv=sizeof(apa_header);
+		break;
+
 	default:
 		rv=-EINVAL;
 		break;

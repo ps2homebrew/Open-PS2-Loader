@@ -116,6 +116,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Automatic refresh",
 	"About",
 	"Coders",
+	"Quality Assurance",
 	"USB delay",
 	"USB prefix path",
 	"Leave empty to exit to Browser",

@@ -265,12 +265,20 @@ struct UIItem diaAbout[] = {
 
 	{UI_BREAK},
 
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"Bat Rastard - crazyc - dlanor", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"BatRastard - Jay-Jay - crazyc - dlanor", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael - misfire", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}}, {UI_BREAK},
-    {UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"...and the anonymous ...", -1}}}, {UI_BREAK},
-	{UI_SPLITTER},
+    	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"... and the anonymous ...", -1}}}, {UI_BREAK},
+	{UI_SPLITTER}, {UI_BREAK},
+
+	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_QANDA}}}, {UI_BREAK},
+
+	{UI_BREAK},
+
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"RandQalan - yoshi314 - E P", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"LocalH - lee4 - danielB", -1}}}, {UI_BREAK},
+	{UI_SPLITTER}, {UI_BREAK},
 
 	{UI_OK, 0, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
 

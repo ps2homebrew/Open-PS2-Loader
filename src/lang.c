@@ -7,7 +7,6 @@
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
 	"English (internal)",
-	"               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^",
 	"Open PS2 Loader %s",
 	"Save changes",
 	"Back",
@@ -117,7 +116,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"About",
 	"Coders",
 	"Quality Assurance",
-	"USB delay",
 	"USB prefix path",
 	"Leave empty to exit to Browser",
 	"Value in minute(s), 0 to disable spin down",

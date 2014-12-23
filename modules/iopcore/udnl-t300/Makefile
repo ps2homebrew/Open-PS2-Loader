@@ -11,7 +11,7 @@ clean:
 	rm -f $(IOP_BIN) $(IOP_OBJS) IOPRP_img.c
 
 IOPRP_img.c:
-	bin2c IOPRP.img IOPRP_img.c IOPRP_img
+	$(BIN2C) IOPRP.img IOPRP_img.c IOPRP_img
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

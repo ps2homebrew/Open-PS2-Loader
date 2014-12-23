@@ -23,6 +23,10 @@ IOP_CFLAGS  := -D_IOP -fno-builtin -O2 -G0 $(IOP_INCS) $(IOP_CFLAGS)
 IOP_ASFLAGS := $(ASFLAGS_TARGET) -EL -G0 $(IOP_ASFLAGS)
 IOP_LDFLAGS := -nostdlib $(IOP_LDFLAGS)
 
+BIN2C = $(PS2SDK)/bin/bin2c
+BIN2S = $(PS2SDK)/bin/bin2s
+BIN2O = $(PS2SDK)/bin/bin2o
+
 # Externally defined variables: IOP_BIN, IOP_OBJS, IOP_LIB
 
 %.o : %.c

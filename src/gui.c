@@ -185,7 +185,7 @@ void guiEndFrame(void) {
 
 void guiShowAbout() {
 	char OPLVersion[64];
-	snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OUL_VER), USBLD_VERSION);
+	snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
 
 #ifdef VMC
 	strcat(OPLVersion, " VMC");

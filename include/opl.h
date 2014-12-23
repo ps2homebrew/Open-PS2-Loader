@@ -31,7 +31,7 @@
 #include <sys/fcntl.h>
 #endif
 
-#define USBLD_VERSION "0.9.3"
+#define OPL_VERSION "0.9.3"
 
 #define IO_MENU_UPDATE_DEFFERED 2
 
@@ -164,8 +164,6 @@ int gRememberLastPlayed;
 #ifdef CHEAT
 int gShowCheat; // Toggle to reveal "Cheat Settings" on Main Menu
 #endif
-
-char *infotxt;
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

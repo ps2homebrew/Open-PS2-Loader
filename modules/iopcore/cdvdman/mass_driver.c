@@ -126,14 +126,21 @@ struct MSStoDSS_t {
 	short int shiftPos;
 };
 
-static struct MSStoDSS_t gMSStoDSS[4] = {
-	{ 512 ,  2 },
-	{ 1024,  1 },
-	{ 2048,  0 },
-	{ 4096, -1 },
+enum MASS_SECTOR_SIZE{
+	MASS_SECTOR_SIZE_512 = 0,
+	MASS_SECTOR_SIZE_1024,
+	MASS_SECTOR_SIZE_2048,
+
+	MASS_SECTOR_SIZE_COUNT
 };
 
-static int gShiftPos;
+static struct MSStoDSS_t gMSStoDSS[MASS_SECTOR_SIZE_COUNT] = {
+	{ 512 ,  2 },
+	{ 1024,  1 },
+	{ 2048,  0 }	//Anything larger will require more complicated code due to alignment requirements.
+};
+
+static short int gShiftPos;
 #else
 static u8 _4K_buf[4096];
 #endif
@@ -1031,7 +1038,7 @@ static int mass_stor_warmup(mass_dev *dev) {
 	XPRINTF("USBHDFSD: sectorSize %u maxLBA %u\n", dev->sectorSize, dev->maxLBA);
 
 #ifndef _4K_SECTORS
-	for (stat=0; stat<4; stat++) {
+	for (stat=0; stat<MASS_SECTOR_SIZE_COUNT; stat++) {
 		if (dev->sectorSize == gMSStoDSS[stat].massSectorSize) {
 			gShiftPos = gMSStoDSS[stat].shiftPos;
 			break;

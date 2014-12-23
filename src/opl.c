@@ -618,8 +618,6 @@ static void _saveConfig() {
 }
 
 void applyConfig(int themeID, int langID) {
-	infotxt = _l(_STR_WELCOME);
-
 	if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
 		gDefaultDevice = APP_MODE;
 

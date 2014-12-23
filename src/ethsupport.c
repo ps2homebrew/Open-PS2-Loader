@@ -16,9 +16,6 @@
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
 
-extern void *smb_pcmcia_cdvdman_irx;
-extern int size_smb_pcmcia_cdvdman_irx;
-
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
 
@@ -421,16 +418,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		saveConfig(CONFIG_LAST, 0);
 	}
 
-	if (sysPcmciaCheck()) {
-		size_irx = size_smb_pcmcia_cdvdman_irx;
-		irx = &smb_pcmcia_cdvdman_irx;
-	}
-	else {
-		size_irx = size_smb_cdvdman_irx;
-		irx = &smb_cdvdman_irx;
-	}
-
-	compatmask = sbPrepare(game, configSet, size_irx, irx, &i);
+	compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
 	settings = (struct cdvdman_settings_smb *)((u8*)irx+i);
 
 	// For ISO we use the part table to store the "long" name (only for init)

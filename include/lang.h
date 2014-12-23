@@ -4,8 +4,7 @@
 // list of localized string ids
 enum _STR_IDS{
 	_STR_LOCALE			=  0, // Localized language name
-	_STR_WELCOME,
-	_STR_OUL_VER,
+	_STR_OPL_VER,
 	_STR_SAVE_CHANGES,
 	_STR_BACK,
 	_STR_IPCONFIG,
@@ -114,7 +113,6 @@ enum _STR_IDS{
 	_STR_ABOUT,
 	_STR_DEVS,
 	_STR_QANDA,
-	_STR_USB_DELAY,
 	_STR_USB_PREFIX,
 	_STR_HINT_EXITPATH,
 	_STR_HINT_SPINDOWN,

@@ -8,6 +8,49 @@
 
 === Changelog ===
 
+==== Version 0.9.3 ====
+CORE:
+
+* New RDB-based DECI Debugging System.
+* Refactored and optimized CDVDMAN and CDVDFSV.
+* New CDVDMAN streaming mechanism for better streaming performance.
+* Kinder, gentler, and hopefully better IGR mechanism
+* Added support for the DTL-T10000, for debugging.
+* Updated USB drivers - support drives greater than 1TB but less than 2TB in capacity, plus better reliability.
+* Eliminated the need for user-configurable delays in USB support.
+* Slimlined and fixed SMB support.
+* VMC Fix - Slot2 should no longer clone Slot1 and vice versa
+* Removed obsolete Compatibility Modes and needless GSM video modes.
+* New PS2RD Cheat Engine port by Doctorxyz.
+* Per-Game GSM Support.
+* Support for PC CARD consoles merged into general DEV9 support.
+* Refactored compatibility mode handling for maintainability.
+* New super-slim EE core, making mode 1 (Alt EE core) obsolete.
+* Added a workaround for some clone network adaptors.
+* Mode 7 "IOP threading hack" removed, as the new streaming mechanism has taken care of all related issues.
+* Improved reading performance of the cdrom device.
+* Improved reliability of some CDVDMAN functions, for more consistent behaviour.
+
+GUI:
+
+* Refreshing of the HDD game list is unsupported because it's non-PnP.
+* The USB device will now only be accessed if connected.
+* GSM moved to Game Options menu since its a Per-Game option now.
+* Infamous "Blockhead Grande" theme bug SQUARSHED!
+* New device dependent Auto-Refreshing system, for better responsiveness.
+* New Logo by Jay-Jay.
+* Improved error reporting of SMB mode.
+* GUI initialization advanced, so that the user will not have to stare at a black screen for extended periods of time.
+* Added missing icon hints.
+* Fixed the problem with the HDLDump server being difficult to shut down.
+* Fixed HDD corruption caused by deleting a game from the HDD unit.
+
+GAME FIXES & COMPATIBILITY IMPROVEMENTS:
+* New patch: Choujikuu Yousai Macross
+* New patch: Super Robot Wars IMPACT
+* Drive state of sceCdStandby has been changed to PAUSE: Check iTV
+* New streaming mechanism for better playability: Various BEMANI games
+
 ==== Version 0.9.2 ====
 rev672
 

@@ -51,17 +51,10 @@ extern int atad_inited;
 #define SSBUS_R_1420		0xbf801420
 
 static int dev9type = -1;	/* 0 for PCMCIA, 1 for expansion bay */
-#ifdef PCMCIA
 static int using_aif = 0;	/* 1 if using AIF on a T10K */
-#endif
 
 static void (*p_dev9_intr_cb)(int flag) = NULL;
 static int dma_lock_sem = -1;	/* used to arbitrate DMA */
-
-#ifdef PCMCIA
-static int pcic_cardtype;	/* Translated value of bits 0-1 of 0xbf801462 */
-static int pcic_voltage;	/* Translated value of bits 2-3 of 0xbf801462 */
-#endif
 
 static s16 eeprom_data[5];	/* 2-byte EEPROM status (0/-1 = invalid, 1 = valid),
 				   6-byte MAC address,
@@ -80,24 +73,15 @@ static int dev9_intr_dispatch(int flag);
 static void dev9_set_stat(int stat);
 static int read_eeprom_data(void);
 
-static int dev9_device_probe(void);
-static int smap_device_reset(void);
 static int dev9_init(void);
-static int speed_device_init(void);
 
-#ifdef PCMCIA
 static void pcmcia_set_stat(int stat);
-static int pcic_ssbus_mode(int mode);
+#ifdef DEBUG
 static int pcmcia_device_probe(void);
-static int pcmcia_device_reset(void);
-static int card_find_manfid(u32 manfid);
-static int pcmcia_init(void);
-#else
-static void expbay_set_stat(int stat);
-static int expbay_device_probe(void);
-static int expbay_device_reset(void);
-static int expbay_init(void);
 #endif
+static int pcmcia_init(void);
+static void expbay_set_stat(int stat);
+static int expbay_init(void);
 
 static int dev9x_dummy(void) { return 0; }
 static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
@@ -162,18 +146,10 @@ int dev9d_init(void)
 	dev9hw = DEV9_REG(DEV9_R_REV) & 0xf0;
 	if (dev9hw == 0x20) {		/* CXD9566 (PCMCIA) */
 		dev9type = 0;
-#ifdef PCMCIA
 		res = pcmcia_init();
-#else
-		return 1;
-#endif
 	} else if (dev9hw == 0x30) {	/* CXD9611 (Expansion Bay) */
 		dev9type = 1;
-#ifndef PCMCIA
 		res = expbay_init();
-#else
-		return 1;
-#endif
 	}
 
 	if (res)
@@ -189,6 +165,7 @@ int dev9d_init(void)
 void dev9RegisterIntrCb(int intr, dev9_intr_cb_t cb)
 {
 #ifdef HDD_DRIVER
+	//Don't let anything else change the HDD interrupt handlers.
 	if (intr < 2) {
 		if (atad_inited)
 			return;
@@ -236,51 +213,9 @@ static int dev9_intr_dispatch(int flag)
 static void dev9_set_stat(int stat)
 {
 	if (dev9type == 0)
-#ifdef PCMCIA
 		pcmcia_set_stat(stat);
-#else
-		return;
-#endif
 	else if (dev9type == 1)
-#ifndef PCMCIA
 		expbay_set_stat(stat);
-#else
-		return;
-#endif
-}
-
-static int dev9_device_probe(void)
-{
-	if (dev9type == 0)
-#ifdef PCMCIA
-		return pcmcia_device_probe();
-#else
-		return -1;
-#endif
-	else if (dev9type == 1)
-#ifndef PCMCIA
-		return expbay_device_probe();
-#else
-		return -1;
-#endif
-	return -1;
-}
-
-static int smap_device_reset(void)
-{
-	if (dev9type == 0)
-#ifdef PCMCIA
-		return pcmcia_device_reset();
-#else
-		return -1;
-#endif
-	else if (dev9type == 1)
-#ifndef PCMCIA
-		return expbay_device_reset();
-#else
-		return -1;
-#endif
-	return -1;
 }
 
 /* Export 6 */
@@ -294,18 +229,14 @@ void dev9Shutdown(void)
 			dev9_shutdown_cbs[idx]();
 
 	if (dev9type == 0) {	/* PCMCIA */
-#ifdef PCMCIA
 		DEV9_REG(DEV9_R_POWER) = 0;
 		DEV9_REG(DEV9_R_1474) = 0;
-#endif
 	} else if (dev9type == 1) {
-#ifndef PCMCIA
 		DEV9_REG(DEV9_R_1466) = 1;
 		DEV9_REG(DEV9_R_1464) = 0;
 		DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1464);
 		DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~4;
 		DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~1;
-#endif
 	}
 	DelayThread(1000000);
 }
@@ -511,59 +442,7 @@ static int dev9_init(void)
 	return 0;
 }
 
-static int speed_device_init(void)
-{
-#ifdef DEV9_DEBUG
-	USE_SPD_REGS;
-	const char *spdnames[] = { "(unknown)", "TS", "ES1", "ES2" };
-	int idx;
-	u16 spdrev;	
-#endif
-
-	eeprom_data[0] = 0;
-
-	if (dev9_device_probe() < 0) {
-		M_PRINTF("PC card or expansion device isn't connected.\n");
-		return -1;
-	}
-
-	smap_device_reset();
-	
-#ifdef PCMCIA
-	int res;
-
-	/* Locate the SPEED Lite chip and get the bus ready for the
-	   PCMCIA device.  */
-	if (dev9type == 0) {
-		if ((res = card_find_manfid(0xf15300)))
-			M_PRINTF("SPEED Lite not found.\n");
-
-		if (!res && (res = pcic_ssbus_mode(5)))
-			M_PRINTF("Unable to change SSBUS mode.\n");
-
-		if (res) {
-			dev9Shutdown();
-			return -1;
-		}
-	}
-#endif
-
-#ifdef DEV9_DEBUG
-	/* Print out the SPEED chip revision.  */
-	spdrev = SPD_REG16(SPD_R_REV_1);
-	idx    = (spdrev & 0xffff) - 14;
-	if (spdrev == 9)
-		idx = 1;	/* TS */
-	else if (spdrev < 9 || (spdrev < 16 || spdrev > 17))
-		idx = 0;	/* Unknown revision */
-
-	M_PRINTF("SPEED chip '%s', revision 0x%0X\n", spdnames[idx], spdrev);
-#endif
-
-	return 0;
-}
-
-#ifdef PCMCIA
+#ifdef DEBUG
 static int pcic_get_cardtype(void)
 {
 	USE_DEV9_REGS;
@@ -590,31 +469,7 @@ static int pcic_get_voltage(void)
 		return 2;
 	return 0;
 }
-
-static int pcic_power(int voltage, int flag)
-{
-	USE_DEV9_REGS;
-	u16 cstc1, cstc2;
-	u16 val = (voltage == 1) << 2;
-
-	DEV9_REG(DEV9_R_POWER) = 0;
-
-	if (voltage == 2)
-		val |= 0x08;
-	if (flag == 1)
-		val |= 0x10;
-
-	DEV9_REG(DEV9_R_POWER) = val;
-	DelayThread(22000);
-
-	if (DEV9_REG(DEV9_R_1462) & 0x100)
-		return 0;
-
-	DEV9_REG(DEV9_R_POWER) = 0;
-	DEV9_REG(DEV9_R_1464) = cstc1 = DEV9_REG(DEV9_R_1464);
-	DEV9_REG(DEV9_R_1466) = cstc2 = DEV9_REG(DEV9_R_1466);
-	return -1;
-}
+#endif
 
 static void pcmcia_set_stat(int stat)
 {
@@ -642,43 +497,13 @@ static void pcmcia_set_stat(int stat)
 	DEV9_REG(DEV9_R_1476) = val & 0xff;
 }
 
-static int pcic_ssbus_mode(int mode)
-{
-	USE_DEV9_REGS;
-	USE_SPD_REGS;
-	u16 stat = DEV9_REG(DEV9_R_1474) & 7;
-
-	if (mode != 3 && mode != 5)
-		return -1;
-
-	DEV9_REG(DEV9_R_1460) = 2;
-	if (stat)
-		return -1;
-
-	if (mode == 3) {
-		DEV9_REG(DEV9_R_1474) = 1;
-		DEV9_REG(DEV9_R_1460) = 1;
-		SPD_REG8(0x20) = 1;
-		DEV9_REG(DEV9_R_1474) = mode;
-	} else if (mode == 5) {
-		DEV9_REG(DEV9_R_1474) = mode;
-		DEV9_REG(DEV9_R_1460) = 1;
-		SPD_REG8(0x20) = 1;
-		DEV9_REG(DEV9_R_1474) = 7;
-	}
-	_sw(0xe01a3043, SSBUS_R_1418);
-
-	DelayThread(5000);
-	DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~1;
-	return 0;
-}
-
+#ifdef DEBUG
 static int pcmcia_device_probe(void)
 {
-#ifdef DEBUG
 	const char *pcic_ct_names[] = { "No", "16-bit", "CardBus" };
-#endif
 	int voltage;
+	int pcic_cardtype;	/* Translated value of bits 0-1 of 0xbf801462 */
+	int pcic_voltage;	/* Translated value of bits 2-3 of 0xbf801462 */
 
 	pcic_voltage = pcic_get_voltage();
 	pcic_cardtype = pcic_get_cardtype();
@@ -692,85 +517,7 @@ static int pcmcia_device_probe(void)
 
 	return 0;
 }
-
-static int pcmcia_device_reset(void)
-{
-	USE_DEV9_REGS;
-	u16 cstc1, cstc2;
-
-	/* The card must be 16-bit (type 2?) */
-	if (pcic_cardtype != 1)
-		return -1;
-
-	DEV9_REG(DEV9_R_147E) = 1;
-	if (pcic_power(pcic_voltage, 1) < 0)
-		return -1;
-
-	DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) | 0x02;
-	DelayThread(500000);
-
-	DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) | 0x01;
-	DEV9_REG(DEV9_R_1464) = cstc1 = DEV9_REG(DEV9_R_1464);
-	DEV9_REG(DEV9_R_1466) = cstc2 = DEV9_REG(DEV9_R_1466);
-	return 0;
-}
-
-static int card_find_manfid(u32 manfid)
-{
-	USE_DEV9_REGS;
-	USE_SPD_REGS;
-	u32 spdaddr, spdend, next, tuple;
-	u8 hdr, ofs;
-
-	DEV9_REG(DEV9_R_1460) = 2;
-	_sw(0x1a00bb, SSBUS_R_1418);
-
-	/* Scan the card for the MANFID tuple.  */
-	spdaddr = 0;
-	spdend =  0x1000;
-	/* I hate this code, and it hates me.  */
-	while (spdaddr < spdend) {
-		hdr = SPD_REG8(spdaddr) & 0xff;
-		spdaddr += 2;
-		if (!hdr)
-			continue;
-		if (hdr == 0xff)
-			break;
-		if (spdaddr >= spdend)
-			goto error;
-
-		ofs = SPD_REG8(spdaddr) & 0xff;
-		spdaddr += 2;
-		if (ofs == 0xff)
-			break;
-
-		next = spdaddr + (ofs * 2);
-		if (next >= spdend)
-			goto error;
-
-		if (hdr == 0x20) {
-			if ((spdaddr + 8) >= spdend)
-				goto error;
-
-			tuple = (SPD_REG8(spdaddr + 2) << 24)|
-				(SPD_REG8(spdaddr) << 16)|
-				(SPD_REG8(spdaddr + 6) << 8)|
-				 SPD_REG8(spdaddr + 4);
-			if (manfid == tuple)
-				return 0;
-			M_PRINTF("MANFID 0x%08lx doesn't match expected 0x%08lx\n",
-					tuple, manfid);
-			return -1;
-		}
-		spdaddr = next;
-	}
-
-	M_PRINTF("MANFID 0x%08lx not found.\n", manfid);
-	return -1;
-error:
-	M_PRINTF("Invalid tuples at offset 0x%08lx.\n", spdaddr - SPD_REGBASE);
-	return -1;
-}
+#endif
 
 static int pcmcia_intr(void *unused)
 {
@@ -799,7 +546,9 @@ static int pcmcia_intr(void *unused)
 		DEV9_REG(DEV9_R_POWER) = 0;	
 		DEV9_REG(DEV9_R_1474) = 0;
 
+#ifdef DEBUG
 		pcmcia_device_probe();
+#endif
 	}
 	if (cstc1 & 0x80 || cstc2 & 0x80) {
 		if (p_dev9_intr_cb)
@@ -816,7 +565,6 @@ static int pcmcia_init(void)
 	USE_DEV9_REGS;
 	USE_AIF_REGS;
 	int *mode;
-	u16 cstc1, cstc2;
 
 	_sw(0x51011, SSBUS_R_1420);
 	_sw(0x1a00bb, SSBUS_R_1418);
@@ -837,26 +585,8 @@ static int pcmcia_init(void)
 		}
 	}
 
-	if (DEV9_REG(DEV9_R_POWER) == 0) {
-		DEV9_REG(DEV9_R_POWER) = 0;
-		DEV9_REG(DEV9_R_147E) = 1;
-		DEV9_REG(DEV9_R_1460) = 0;
-		DEV9_REG(DEV9_R_1474) = 0;
-		DEV9_REG(DEV9_R_1464) = cstc1 = DEV9_REG(DEV9_R_1464);
-		DEV9_REG(DEV9_R_1466) = cstc2 = DEV9_REG(DEV9_R_1466);
-		DEV9_REG(DEV9_R_1468) = 0x10;
-		DEV9_REG(DEV9_R_146A) = 0x90;
-		DEV9_REG(DEV9_R_147C) = 1;
-		DEV9_REG(DEV9_R_147A) = DEV9_REG(DEV9_R_147C);
-
-		pcic_voltage = pcic_get_voltage();
-		pcic_cardtype = pcic_get_cardtype();
-
-		if (speed_device_init() != 0)
-			return 1;
-	} else {
-		_sw(0xe01a3043, SSBUS_R_1418);
-	}
+	//The DEV9 interface and SPEED should be already initialized.
+	_sw(0xe01a3043, SSBUS_R_1418);
 
 	if (dev9_init() != 0)
 		return 1;
@@ -868,34 +598,11 @@ static int pcmcia_init(void)
 	M_PRINTF("CXD9566 (PCMCIA type) initialized.\n");
 	return 0;
 }
-#else
 
 static void expbay_set_stat(int stat)
 {
 	USE_DEV9_REGS;
 	DEV9_REG(DEV9_R_1464) = stat & 0x3f;
-}
-
-static int expbay_device_probe(void)
-{
-	USE_DEV9_REGS;
-	return (DEV9_REG(DEV9_R_1462) & 0x01) ? -1 : 0;
-}
-
-static int expbay_device_reset(void)
-{
-	USE_DEV9_REGS;
-
-	if (expbay_device_probe() < 0)
-		return -1;
-
-	DEV9_REG(DEV9_R_POWER) = (DEV9_REG(DEV9_R_POWER) & ~1) | 0x04;	/* power on */
-	DelayThread(500000);
-
-	DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1460) | 0x01;
-	DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) | 0x01;
-	DelayThread(500000);
-	return 0;
 }
 
 static int expbay_intr(void *unused)
@@ -918,14 +625,7 @@ static int expbay_init(void)
 	_sw(0xe01a3043, SSBUS_R_1418);
 	_sw(0xef1a3043, SSBUS_R_141c);
 
-	if ((DEV9_REG(DEV9_R_POWER) & 0x04) == 0) { /* if not already powered */
-		DEV9_REG(DEV9_R_1466) = 1;
-		DEV9_REG(DEV9_R_1464) = 0;
-		DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1464);
-
-		if (speed_device_init() != 0)
-			return 1;
-	}
+	//The DEV9 interface and SPEED should be already initialized.
 
 	if (dev9_init() != 0)
 		return 1;
@@ -938,5 +638,3 @@ static int expbay_init(void)
 	M_PRINTF("CXD9611 (Expansion Bay type) initialized.\n");
 	return 0;
 }
-#endif
-

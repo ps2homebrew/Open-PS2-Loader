@@ -8,6 +8,17 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev744 - (*) Our "About" menu now has a "Quality Assurance" section, officially showing - Thu Dec 18 13:35:27 2014 -0500
+rev743 - Re-added the GET HEADER IOCTL2 function, to the APA driver. Updated the English translation template. - Sat Dec 13 14:52:32 2014 +0800
+rev742 - Sync'ing with the HDD and PFS driver updates from PS2SDK, fixed freezing when the HDLDump server is closed and the games list is reopened, completed TODOs in ioman.c, removed workaround from config.c, added missing UI hints and changed the region-handling code to default to Japan. - Sat Dec 13 00:38:24 2014 +0800
+rev741 - Removed tag 0.9.3 - Fri Dec 12 16:06:42 2014 +0800
+rev740 - Removed tag 0.9.3 - Fri Dec 12 16:06:37 2014 +0800
+rev739 - Removed tag 0.9.3 - Fri Dec 12 16:06:36 2014 +0800
+rev738 - Removed tag 0.9.3 - Fri Dec 12 16:06:36 2014 +0800
+rev737 - Removed tag 0.9.3 - Fri Dec 12 16:06:35 2014 +0800
+rev736 - Removed tag 0.9.3 - Fri Dec 12 16:06:34 2014 +0800
+rev735 - Removed tag 0.9.3 - Fri Dec 12 16:06:07 2014 +0800
+rev734 - Rewrote HDD support to use the PS2 APA driver instead of HDLDump's code. - Wed Dec 10 22:37:03 2014 +0800
 rev733 - Dumbed-down the locking mechanism to use only sync_flag, as the use of the event flag APIs will still not totally protect against simultaneous access from an interrupt handler (It'll probably only fully work if the whole code was run from a syscall, but even SCE never did that). - Sun Nov 30 16:02:34 2014 +0800
 rev732 - Modified cdrom_read() to minimize the number of copy processes. - Sun Nov 30 15:57:45 2014 +0800
 rev731 - Added a fully streaming system. - Sun Nov 30 15:55:35 2014 +0800

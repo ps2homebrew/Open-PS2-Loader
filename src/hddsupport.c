@@ -17,9 +17,6 @@
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
 
-extern void *hdd_pcmcia_cdvdman_irx;
-extern int size_hdd_pcmcia_cdvdman_irx;
-
 extern void *hdd_hdpro_cdvdman_irx;
 extern int size_hdd_hdpro_cdvdman_irx;
 
@@ -408,10 +405,6 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	if (hddHDProKitDetected) {
 		size_irx = size_hdd_hdpro_cdvdman_irx;
 		irx = &hdd_hdpro_cdvdman_irx;
-	}
-	else if (sysPcmciaCheck()) {
-		size_irx = size_hdd_pcmcia_cdvdman_irx;
-		irx = &hdd_pcmcia_cdvdman_irx;
 	}
 	else {
 		size_irx = size_hdd_cdvdman_irx;

@@ -1,0 +1,160 @@
+# translation by Berion & Loki7777
+Polish
+               WELCOME TO OPEN PS2 LOADER . MAIN kodu w oparciu o kod źródłowy HD <http://psx-scene.com> ADAPTACJI PROJEKTU sformatować USB ADVANCE i początkowe GUI IFCARO <http://ps2dev.ifcaro.net> MOST rdzenia Loader to MADE BY JIMMIKAELKAEL . WSZYSTKIE GUI IMPROVEMENTS są przez VOLCA . Dziękujemy za korzystanie z naszego programu ^ ^
+Otwórz PS2 Loader % s
+Zapisz zmiany
+z powrotem
+config Network
+<brak values>
+Ustawienia zapisane ...
+Błąd zapisu ustawień !
+Wyjście
+Ustawienia
+Gry USB
+HDD Games
+ETH Games
+Aplikacje
+motyw
+język
+Network startup error :% d
+Nie można połączyć się z serwerem SMB : % d
+Nie można zalogować się do serwera SMB : % d
+Nie można otworzyć akcji SMB :% d
+na
+od
+dobrze
+ustawienia gier
+Usuń wszystkie ustawienia
+Usunięto wszystkie klucze do gry
+przewijanie
+Zwolnij
+medium
+szybko
+Domyślnie menu
+Załaduj z dysku
+Proszę czekać
+Błąd podczas ładowania w grze ID
+Automatyczne sortowanie
+Błąd ładowania pliku języka
+Wyłącz Kolory Debug
+No kontroler wykryty, czeka ...
+Włącz Cover Art
+Szeroki ekran
+Wyłącz
+Ładowanie config
+Zapisywanie config
+Uruchom urządzenie
+Tryb rozruchu urządzenia USB
+Urządzenie HDD tryb startu
+Urządzenie ETH tryb startu
+Tryb uruchamiania aplikacji
+automatyczny
+ręczny
+Uruchom serwer HDL
+Server HDL Uruchamianie ...
+Server HDL Uruchamianie ... Naciśnij klawisz [ O] , aby zatrzymać
+Naciśnij przycisk [ X] , aby zakończyć serwer HDL
+Server HDL Rozładunek ...
+Wyjście na
+kolor tła
+kolor tekstu
+IP
+maska
+Brama
+port
+udział
+użytkownik
+hasło
+<Nie ustawień>
+akceptować
+Przedmiot zostanie trwale usunięta , kontynuować?
+przemianować
+usunąć
+run
+ustawienia wyświetlacza
+Włącz Usuwanie i zmiana nazwy działania
+Sprawdź fragmentacji grę USB
+Zapamiętaj ostatnio grał grę
+Odkrywamy GSM na Main Menu
+Błąd ,gra jest rozdrobniony
+Błąd , nie można uruchomić opcję
+test
+Pozostaw puste dla auth gość.
+Załaduj alternatywne jądro
+Alternatywne metody odczytu danych
+Odczep syscalli
+0 Tryb PSS
+Wyłącz DVD- DL
+Wyłącz IGR
+Użyj IOP wątków siekać
+Ukryj dev9 modułu
+Zastępca combo IGR
+Zmiana rozmiaru będzie sformatowaćVMC
+utworzyć
+modyfikować
+poronić
+Resetowanie
+Użyj generic
+Skonfiguruj VMC
+nazwa
+rozmiar
+status
+postęp
+VMC plik istnieje
+Nieprawidłowy VMC pliku, rozmiar jest niepoprawny
+VMC pliku muszą być tworzone
+Błąd z VMC % s , nadal z fizycznym MC ( gniazdo % d) ?
+Automatyczne odświeżanie
+o
+Coders
+opóźnienie USB
+Path prefix USB
+Pozostaw puste , aby wyjść z przeglądarki
+Wartość w minutę ( s ) , 0 aby wyłączyć wirować
+Automatyczny HDD wirować
+tryb wideo
+kolor Dialog
+wybrany kolor
+Ostatnia aktualizacja informacji
+Info
+Niestandardowe ELF
+wybór kolorów
+Podłącz
+Pozostaw puste do listy akcji
+Path prefix ETH
+Backspace
+miejsce
+wpisać
+tryb
+Slot VMC 1
+Slot VMC 2
+ID gry
+Tryb DMA
+V- Sync
+mode 1
+mode 2
+Tryb 3
+Tryb 4
+Tryb 5
+Tryb 6
+Tryb 7
+Tryb 8
+Tryb 9
+zegar Callback
+Zastosuj opóźnienie do CDVD funkcji (0 jest domyślnie)
+Prędkość Ethernet i dupleksu
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Ustawienia GSM
+Włącz GSM
+Umożliwia GSM wymusić Wybrany Tryb wideo
+Wybrany tryb wideo
+Tryb Video być zmuszony
+Regulacja w poziomie
+Ustawia Horizontal offset
+Regulacja w pionie
+Ustawia Przesunięcie pionowe
+FMV pomiń
+Pomija Full Motion Video

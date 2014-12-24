@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev745 - Updated changelog files, removed unused UI strings, updated UI string labels, replaced the hardcoded use of tools within Makefiles with variables like $BIN2S, merged support for the CXD9566R into general DEV9 support, and removed power-on code from in-game DEV9 driver. - Tue Dec 23 23:35:00 2014 +0800
 rev744 - (*) Our "About" menu now has a "Quality Assurance" section, officially showing - Thu Dec 18 13:35:27 2014 -0500
 rev743 - Re-added the GET HEADER IOCTL2 function, to the APA driver. Updated the English translation template. - Sat Dec 13 14:52:32 2014 +0800
 rev742 - Sync'ing with the HDD and PFS driver updates from PS2SDK, fixed freezing when the HDLDump server is closed and the games list is reopened, completed TODOs in ioman.c, removed workaround from config.c, added missing UI hints and changed the region-handling code to default to Japan. - Sat Dec 13 00:38:24 2014 +0800

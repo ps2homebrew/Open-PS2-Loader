@@ -1412,7 +1412,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
 		guiDrawIconAndText(CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 		if (addAccept)
-			guiDrawIconAndText(CROSS_ICON, _STR_X_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
+			guiDrawIconAndText(CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
 
 		guiEndFrame();
 	}

@@ -139,7 +139,7 @@ int	gGSMSkipVideos; // 0 - Off, 1 - On
 int	gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
 int	gCheatMode;  // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
 
-int gCheatList;	//Store hooks/codes addr+val pairs
+int gCheatList[MAX_CHEATLIST];	//Store hooks/codes addr+val pairs
 #endif
 
 // ------------------------------------------------------------------------------------------------------------------------

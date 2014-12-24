@@ -231,9 +231,9 @@ int parse_buf(const char *buf)
 			/* Parser */
 			code = parse_line(line, linenumber);
 			if (!((code.addr == 0) && (code.val == 0))) {
-				_sw(code.addr, gCheatList + i*4);
+				gCheatList[i*4] = code.addr;
 				i++;
-				_sw(code.val, gCheatList + i*4);
+				gCheatList[i*4] = code.val;
 				i++;
 			}
 		}
@@ -241,9 +241,9 @@ int parse_buf(const char *buf)
 		buf += len + 1;
 	}
 	
-	_sw(0, gCheatList + i*4);
+	gCheatList[i*4] = 0;
 	i++;
-	_sw(0, gCheatList + i*4);
+	gCheatList[i*4] = 0;
 	i++;
 
 	return 0;

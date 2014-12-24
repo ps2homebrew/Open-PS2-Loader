@@ -926,10 +926,7 @@ static void setDefaults(void) {
 	gEnableCheat = 0;
 	gCheatMode = 0;
 
-	gCheatList = 0x00080000;
-	_sw(0, gCheatList);
-	_sw(0, gCheatList+4);
-
+	memset(gCheatList, 0, sizeof(gCheatList));
 #endif
 }
 

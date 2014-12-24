@@ -96,7 +96,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Disable IGR",
 	"Unused",
 	"Hide dev9 module",
-	"Alternate IGR combo",
 	"Changing the size will reformat the VMC",
 	"Create",
 	"Modify",
@@ -147,7 +146,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Mode 6",
 	"Mode 7",
 	"Mode 8",
-	"Mode 9",
 	"Configure GSM",
 	"Callback timer",
 	"Apply a delay to CDVD functions (0 is default)",
@@ -175,6 +173,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Auto-select or Select game cheats",
 	"Auto-select cheats",
 	"Select game cheats (TBD)",
+	"Error: failed to load Cheat File",
+	"No cheats found",
 };
 
 static int guiLangID = 0;

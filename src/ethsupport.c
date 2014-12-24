@@ -399,13 +399,13 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		snprintf(cheatfile, 255, "%sCHT/%s.cht", ethPrefix, game->startup);
 		LOG("Loading Cheat File %s\n", cheatfile);
 		if (load_cheats(cheatfile) < 0) {
-				guiMsgBox("Error: failed to load Cheat File", 0, NULL);
+				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
 				LOG("Error: failed to load cheats\n");
 		} else {
-			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
+			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
 				LOG("Cheats found\n");
 			} else {
-				guiMsgBox("No cheats found", 0, NULL);
+				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
 				LOG("No cheats found\n");
 			}
 		}

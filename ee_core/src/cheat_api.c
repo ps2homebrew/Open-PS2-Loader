@@ -38,15 +38,12 @@ void SetupCheats()
 	j = 0;
 	k = 0;
 	nextCodeCanBeHook = 1;
-	
-	gCheatList = 0x00080000;
 
 	while (i<MAX_CHEATLIST) {
 		
-		code.addr = _lw((gCheatList+(i*4)));
-		code.val = _lw((gCheatList+(i*4)+4));
-		i++;
-		i++;
+		code.addr = gCheatList[i*4];
+		code.val = gCheatList[i*4+1];
+		i+=2;
 
 		if ((code.addr == 0) && (code.val == 0)) break; 
 

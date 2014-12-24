@@ -324,7 +324,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
 				LOG("Error: failed to load cheats\n");
 		} else {
-			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
+			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
 				LOG("Cheats found\n");
 			} else {
 				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);

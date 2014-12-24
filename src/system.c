@@ -636,8 +636,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	SifExitRpc();
 
 #ifdef CHEAT
-#define CHEAT_TEMP1	" %d"
-#define CHEAT_TEMP2	,gEnableCheat
+#define CHEAT_TEMP1	" %p"
+#define CHEAT_TEMP2	,gEnableCheat?gCheatList:NULL
 #else
 #define CHEAT_TEMP1
 #define CHEAT_TEMP2

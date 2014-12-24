@@ -63,7 +63,7 @@ int main(int argc, char **argv){
 	DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 
 #ifdef CHEAT
-	EnableCheatOp = (gCheatList = _strtoui(_strtok(NULL, " "))) != NULL;
+	EnableCheatOp = (gCheatList = (void*)_strtoui(_strtok(NULL, " "))) != NULL;
 	DPRINTF("PS2RD Cheat Engine = %s\n", EnableCheatOp==0?"Disabled":"Enabled");
 #endif
 

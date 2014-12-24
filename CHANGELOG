@@ -36,10 +36,11 @@ GUI:
 * Refreshing of the HDD game list is unsupported because it's non-PnP.
 * The USB device will now only be accessed if connected.
 * GSM moved to Game Options menu since its a Per-Game option now.
-* Infamous "Blockhead Grande" theme bug SQUARSHED!
+* Infamous "Blockhead Grande" theme bug SQUARSHED! (Themes should now get loaded correctly, regardless of display settings).
 * New device dependent Auto-Refreshing system, for better responsiveness.
 * New Logo by Jay-Jay.
 * Improved error reporting of SMB mode.
+* Failures to save per-game compatibility settings will now be reported.
 * GUI initialization advanced, so that the user will not have to stare at a black screen for extended periods of time.
 * Added missing icon hints.
 * Fixed the problem with the HDLDump server being difficult to shut down.

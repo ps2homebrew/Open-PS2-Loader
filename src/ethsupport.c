@@ -337,8 +337,7 @@ static void ethRenameGame(int id, char* newName) {
 #endif
 
 static void ethLaunchGame(int id, config_set_t* configSet) {
-	int i, compatmask, size_irx = 0;
-	void** irx = NULL;
+	int i, compatmask;
 	char filename[32];
 	base_game_info_t* game = &ethGames[id];
 	struct cdvdman_settings_smb *settings;
@@ -419,7 +418,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	}
 
 	compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
-	settings = (struct cdvdman_settings_smb *)((u8*)irx+i);
+	settings = (struct cdvdman_settings_smb *)((u8*)(&smb_cdvdman_irx)+i);
 
 	// For ISO we use the part table to store the "long" name (only for init)
 	if (game->isISO) {
@@ -454,7 +453,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 #else
 #define VMC_TEMP2
 #endif
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_irx, irx, VMC_TEMP2 compatmask);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, VMC_TEMP2 compatmask);
 }
 
 static config_set_t* ethGetConfig(int id) {

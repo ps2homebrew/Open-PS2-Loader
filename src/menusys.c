@@ -1,7 +1,7 @@
 /*
   Copyright 2009, Ifcaro & volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review OpenUsbLd README & LICENSE files for further details.  
 */
 
 #include "include/menusys.h"
@@ -147,16 +147,16 @@ void menuInit() {
 void menuEnd() {
 	// destroy menu
 	menu_list_t *cur = menu;
-
+	
 	while (cur) {
 		menu_list_t *td = cur;
 		cur = cur->next;
-
+		
 		if (&td->item)
 			submenuDestroy(&td->item->submenu);
-
+		
 		menuRemoveHints(td->item);
-
+		
 		free(td);
 	}
 
@@ -172,34 +172,34 @@ void menuEnd() {
 
 static menu_list_t* AllocMenuItem(menu_item_t* item) {
 	menu_list_t* it;
-
+	
 	it = malloc(sizeof(menu_list_t));
-
+	
 	it->prev = NULL;
 	it->next = NULL;
 	it->item = item;
-
+	
 	return it;
 }
 
 void menuAppendItem(menu_item_t* item) {
 	assert(item);
-
+	
 	if (menu == NULL) {
 		menu = AllocMenuItem(item);
 		selected_item = menu;
 		return;
 	}
-
+	
 	menu_list_t *cur = menu;
-
+	
 	// traverse till the end
 	while (cur->next)
 		cur = cur->next;
-
+	
 	// create new item
 	menu_list_t *newitem = AllocMenuItem(item);
-
+	
 	// link
 	cur->next = newitem;
 	newitem->prev = cur;
@@ -224,7 +224,7 @@ void submenuRebuildCache(submenu_list_t* submenu) {
 
 static submenu_list_t* submenuAllocItem(int icon_id, char *text, int id, int text_id) {
 	submenu_list_t* it = (submenu_list_t*) malloc(sizeof(submenu_list_t));
-
+	
 	it->prev = NULL;
 	it->next = NULL;
 	it->item.icon_id = icon_id;
@@ -234,29 +234,29 @@ static submenu_list_t* submenuAllocItem(int icon_id, char *text, int id, int tex
 	it->item.cache_id = NULL;
 	it->item.cache_uid = NULL;
 	submenuRebuildCache(it);
-
+	
 	return it;
 }
 
 submenu_list_t* submenuAppendItem(submenu_list_t** submenu, int icon_id, char *text, int id, int text_id) {
 	if (*submenu == NULL) {
 		*submenu = submenuAllocItem(icon_id, text, id, text_id);
-		return *submenu;
+		return *submenu; 
 	}
-
+	
 	submenu_list_t *cur = *submenu;
-
+	
 	// traverse till the end
 	while (cur->next)
 		cur = cur->next;
-
+	
 	// create new item
 	submenu_list_t *newitem = submenuAllocItem(icon_id, text, id, text_id);
-
+	
 	// link
 	cur->next = newitem;
 	newitem->prev = cur;
-
+	
 	return newitem;
 }
 
@@ -270,19 +270,19 @@ static void submenuDestroyItem(submenu_list_t* submenu) {
 void submenuRemoveItem(submenu_list_t** submenu, int id) {
 	submenu_list_t* cur = *submenu;
 	submenu_list_t* prev = NULL;
-
+	
 	while (cur) {
 		if (cur->item.id == id) {
 			submenu_list_t* next = cur->next;
-
+			
 			if (prev)
 				prev->next = cur->next;
-
+			
 			if (*submenu == cur)
 				*submenu = next;
-
+			
 			submenuDestroyItem(cur);
-
+			
 			cur = next;
 		} else {
 			prev = cur;
@@ -294,14 +294,14 @@ void submenuRemoveItem(submenu_list_t** submenu, int id) {
 void submenuDestroy(submenu_list_t** submenu) {
 	// destroy sub menu
 	submenu_list_t *cur = *submenu;
-
+	
 	while (cur) {
 		submenu_list_t *td = cur;
 		cur = cur->next;
-
+		
 		submenuDestroyItem(td);
 	}
-
+	
 	*submenu = NULL;
 }
 
@@ -351,15 +351,15 @@ static void swap(submenu_list_t* a, submenu_list_t* b) {
 	submenu_list_t *pa, *nb;
 	pa = a->prev;
 	nb = b->next;
-
+	
 	a->next = nb;
 	b->prev = pa;
 	b->next = a;
 	a->prev = b;
-
+	
 	if (pa)
 		pa->next = b;
-
+	
 	if (nb)
 		nb->prev = a;
 }
@@ -370,36 +370,36 @@ void submenuSort(submenu_list_t** submenu) {
 	// *submenu = mergeSort(*submenu);
 	submenu_list_t *head = *submenu;
 	int sorted = 0;
-
+	
 	if ((submenu == NULL) || (*submenu == NULL) || ((*submenu)->next == NULL))
 		return;
-
+	
 	while (!sorted) {
 		sorted = 1;
-
+		
 		submenu_list_t *tip = head;
-
+		
 		while (tip->next) {
 			submenu_list_t *nxt = tip->next;
-
+			
 			char *txt1 = submenuItemGetText(&tip->item);
 			char *txt2 = submenuItemGetText(&nxt->item);
-
+			
 			int cmp = stricmp(txt1, txt2);
-
+			
 			if (cmp > 0) {
 				swap(tip, nxt);
-
-				if (tip == head)
+				
+				if (tip == head) 
 					head = nxt;
-
+				
 				sorted = 0;
 			} else {
 				tip = tip->next;
 			}
 		}
 	}
-
+	
 	*submenu = head;
 }
 
@@ -419,7 +419,7 @@ static void menuPrevH() {
 
 static void menuNextV() {
 	submenu_list_t *cur = selected_item->item->current;
-
+	
 	if(cur && cur->next) {
 		selected_item->item->current = cur->next;
 
@@ -500,13 +500,13 @@ static void menuLastPage() {
 
 void menuSetSelectedItem(menu_item_t* item) {
 	menu_list_t* itm = menu;
-
+	
 	while (itm) {
 		if (itm->item == item) {
 			selected_item = itm;
 			return;
 		}
-
+			
 		itm = itm->next;
 	}
 }

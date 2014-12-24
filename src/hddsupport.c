@@ -20,6 +20,9 @@ extern int size_hdd_cdvdman_irx;
 extern void *hdd_hdpro_cdvdman_irx;
 extern int size_hdd_hdpro_cdvdman_irx;
 
+extern void *ps2dev9_irx;
+extern int size_ps2dev9_irx;
+
 extern void *ps2atad_irx;
 extern int size_ps2atad_irx;
 
@@ -74,8 +77,8 @@ static void hddInitModules(void) {
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
 // The pseudo ATA controller registers are accessed (input/ouput) by writing
 // an id to the main ATA controller
-#define HDPROreg_IO8	      (*(volatile unsigned char *)0xBFC00000)
-#define CDVDreg_STATUS        (*(volatile unsigned char *)0xBF40200A)
+#define HDPROreg_IO8	      (*(volatile unsigned char *)0xBFC00000) 
+#define CDVDreg_STATUS        (*(volatile unsigned char *)0xBF40200A) 
 
 static int hddCheckHDProKit(void)
 {
@@ -147,6 +150,14 @@ void hddLoadModules(void) {
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
 	LOG("HDDSUPPORT LoadModules\n");
+
+	gHddStartup = 4;
+
+	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	if (ret < 0) {
+		gHddStartup = -1;
+		return;
+	}
 
 	gHddStartup = 3;
 
@@ -355,16 +366,16 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 #ifdef CHEAT
 	if (gEnableCheat) {
 		char cheatfile[32];
-		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", hddPrefix, game->startup);
+		snprintf(cheatfile, 255, "%sCHT/%s.cht", hddPrefix, game->startup);
 		LOG("Loading Cheat File %s\n", cheatfile);
 		if (load_cheats(cheatfile) < 0) {
-				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
+				guiMsgBox("Error: failed to load Cheat File", 0, NULL);
 				LOG("Error: failed to load cheats\n");
 		} else {
-			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
+			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
 				LOG("Cheats found\n");
 			} else {
-				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
+				guiMsgBox("No cheats found", 0, NULL);
 				LOG("No cheats found\n");
 			}
 		}

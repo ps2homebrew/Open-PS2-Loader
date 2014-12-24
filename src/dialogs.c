@@ -220,7 +220,8 @@ struct UIItem diaUIConfig[] = {
 	// Per-Game GSM Settings Menu (--Bat--)
 struct UIItem diaGSConfig[] = {
 	{UI_LABEL, 0, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}}, {UI_SPACER},
-		
+	{UI_LABEL, COMPAT_GAME, 1, -1, 0, 0, {.label = {"<Game Label>", -1}}},
+	
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, -1, -45, 0, {.label = {NULL, _STR_ENABLEGSM}}}, {UI_SPACER}, {UI_BOOL, COMPAT_ENABLEGSM, 1, _STR_HINT_ENABLEGSM, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
@@ -275,7 +276,7 @@ struct UIItem diaAbout[] = {
 
 	{UI_BREAK},
 
-	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"RandQalan - yoshi314 - EP", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"RandQalan - yoshi314 - E P", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, -1, 0, 15, {.label = {"LocalH - lee4 - danielB", -1}}}, {UI_BREAK},
 	{UI_SPLITTER}, {UI_BREAK},
 

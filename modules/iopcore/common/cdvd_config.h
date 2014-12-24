@@ -22,21 +22,25 @@ struct cdvdman_settings_hdd{
 
 struct cdvdman_settings_smb{
 	struct cdvdman_settings_common common;
-	u32 layer1_start;
 	s8 pc_ip[16];
 	u16 pc_port;
 	s8 pc_share[33];
 	s8 pc_prefix[33];
 	s8 smb_user[17];
 	s8 smb_password[17];
+	s8 filename[65];
+	u8 padding;
 	union{
-		s8 filename[80];
+		struct{
+			s8 extension[5];
+			s8 startup[12];
+			s8 title[65];
+		}iso;
 		u16 FIDs[ISO_MAX_PARTS];
 	}files;
 };
 
 struct cdvdman_settings_usb{
 	struct cdvdman_settings_common common;
-	u32 layer1_start;
 	u32 LBAs[ISO_MAX_PARTS];
 };

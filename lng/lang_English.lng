@@ -29,6 +29,7 @@
 #
 # Put here the English name of your language (will be displayed into OPL Settings menu) using standard latin characters
 English
+               WELCOME TO OPEN PS2 LOADER. MAIN CODE BASED ON SOURCE CODE OF HD PROJECT <http://psx-scene.com> ADAPTATION TO USB ADVANCE FORMAT AND INITIAL GUI BY IFCARO <http://ps2dev.ifcaro.net> MOST OF LOADER CORE IS MADE BY JIMMIKAELKAEL. ALL THE GUI IMPROVEMENTS ARE MADE BY VOLCA. THANKS FOR USING OUR PROGRAM ^^
 Open PS2 Loader %s
 Save changes
 Back
@@ -118,6 +119,7 @@ Disable DVD-DL
 Disable IGR
 Unused
 Hide dev9 module
+Alternate IGR combo
 Changing the size will reformat the VMC
 Create
 Modify
@@ -168,6 +170,7 @@ Mode 5
 Mode 6
 Mode 7
 Mode 8
+Mode 9
 Configure GSM
 Callback timer
 Apply a delay to CDVD functions (0 is default)
@@ -195,5 +198,3 @@ PS2RD Cheat Engine Mode
 Auto-select or Select game cheats
 Auto-select cheats
 Select game cheats (TBD)
-Error: failed to load Cheat File
-No cheats found

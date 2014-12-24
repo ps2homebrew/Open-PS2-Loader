@@ -33,8 +33,8 @@ extern void *usb_mcemu_irx;
 extern int size_usb_mcemu_irx;
 #endif
 
-void *pusbd_irx = NULL;
-int size_pusbd_irx = 0;
+void *pusbd_irx;
+int size_pusbd_irx;
 
 static char usbPrefix[40];
 static int usbULSizePrev = -2;
@@ -77,6 +77,29 @@ int usbFindPartition(char *target, char *name) {
 
 #define USBHDFSDFSV_FUNCNUM(x)	(('U'<<8)|(x))
 
+static void usbInitModules(void) {
+	usbLoadModules();
+
+	// update Themes
+	usbFindPartition(usbPrefix, "ul.cfg");
+	char path[256];
+	sprintf(path, "%sTHM", usbPrefix);
+	thmAddElements(path, "/", usbGameList.mode);
+
+	sprintf(path, "%sCFG", usbPrefix);
+	checkCreateDir(path);
+
+#ifdef VMC
+	sprintf(path, "%sVMC", usbPrefix);
+	checkCreateDir(path);
+#endif
+
+#ifdef CHEAT
+	sprintf(path, "%sCHT", usbPrefix);
+	checkCreateDir(path);
+#endif
+}
+
 static unsigned int UsbGeneration = 0;
 
 static void usbEventHandler(void *packet, void *opt){
@@ -85,7 +108,7 @@ static void usbEventHandler(void *packet, void *opt){
 
 void usbLoadModules(void) {
 	LOG("USBSUPPORT LoadModules\n");
-	//first search for a custom usbd module in MC?
+	//first it search for custom usbd in MC?
 	pusbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
 	if (!pusbd_irx) {
 		pusbd_irx = readFile("mc?:BADATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
@@ -101,6 +124,7 @@ void usbLoadModules(void) {
 	sysLoadModuleBuffer(pusbd_irx, size_pusbd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsdfsv_irx, size_usbhdfsdfsv_irx, 0, NULL);
+
 	SifAddCmdHandler(12, &usbEventHandler, NULL);
 
 	LOG("USBSUPPORT Modules loaded\n");
@@ -114,6 +138,7 @@ void usbInit(void) {
 	usbGameCount = 0;
 	usbGames = NULL;
 	configGetInt(configGetByType(CONFIG_OPL), "usb_frames_delay", &usbGameList.delay);
+	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &usbInitModules);
 	usbGameList.enabled = 1;
 }
 
@@ -124,11 +149,10 @@ item_list_t* usbGetObject(int initOnly) {
 }
 
 static int usbNeedsUpdate(void) {
-	char path[256];
 	static unsigned int OldGeneration = 0;
-	static unsigned char ThemesLoaded = 0;
 	int result = 0;
 	fio_stat_t stat;
+	char path[256];
 
 	if(OldGeneration == UsbGeneration) return 0;
 	OldGeneration = UsbGeneration;
@@ -154,26 +178,6 @@ static int usbNeedsUpdate(void) {
 	if (!sbIsSameSize(usbPrefix, usbULSizePrev))
 		result = 1;
 
-	// update Themes
-	if(!ThemesLoaded)
-	{
-		sprintf(path, "%sTHM", usbPrefix);
-		if(thmAddElements(path, "/", usbGameList.mode) > 0) ThemesLoaded = 1;
-	}
-
-	sprintf(path, "%sCFG", usbPrefix);
-	checkCreateDir(path);
-
-#ifdef VMC
-	sprintf(path, "%sVMC", usbPrefix);
-	checkCreateDir(path);
-#endif
-
-#ifdef CHEAT
-	sprintf(path, "%sCHT", usbPrefix);
-	checkCreateDir(path);
-#endif
-
 	return result;
 }
 
@@ -195,7 +199,7 @@ static char* usbGetGameName(int id) {
 }
 
 static int usbGetGameNameLength(int id) {
-	if (usbGames[id].format != GAME_FORMAT_USBLD)
+	if (usbGames[id].isISO)
 		return ISO_GAME_NAME_MAX + 1;
 	else
 		return UL_GAME_NAME_MAX + 1;
@@ -222,8 +226,6 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	char partname[256], filename[32];
 	base_game_info_t* game = &usbGames[id];
 	struct cdvdman_settings_usb *settings;
-	u32 layer1_start, layer1_offset;
-	unsigned short int layer1_part;
 
 	fd = fioDopen(usbPrefix);
 	if (fd < 0) {
@@ -286,7 +288,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
 	for (i = 0, settings = NULL; i < game->parts; i++) {
-		if (game->format != GAME_FORMAT_USBLD)
+		if (game->isISO)
 			sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
 		else
 			sprintf(partname, "%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, i);
@@ -313,50 +315,19 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		settings->LBAs[i] = fioIoctl(fd, 0xBEEFC0DE, partname);
 	}
 
-	//Initialize layer 1 information.
-	switch(game->format) {
-		case GAME_FORMAT_USBLD:
-			sprintf(partname, "mass:%s/ul.%08X.%s.00", gUSBPrefix, USBA_crc32(game->name), game->startup);
-			break;
-		default:	//Raw ISO9660 disc image; one part.
-			sprintf(partname, "mass:%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
-	}
-
-	layer1_start = sbGetISO9660MaxLBA(partname);
-
-	switch(game->format) {
-		case GAME_FORMAT_USBLD:
-			layer1_part = layer1_start / 0x80000;
-			layer1_offset = layer1_start % 0x80000;
-			sprintf(partname, "mass:%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, layer1_part);
-			break;
-		default:	//Raw ISO9660 disc image; one part.
-			layer1_part = 0;
-			layer1_offset = layer1_start;
-	}
-
-	if(sbProbeISO9660(partname, game, layer1_offset) != 0)
-	{
-		layer1_start = 0;
-		LOG("DVD detected.\n");
-	} else {
-		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset - 16);
-	}
-	settings->layer1_start = layer1_start - 16;
-
 #ifdef CHEAT
 	if (gEnableCheat) {
 		char cheatfile[32];
-		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", usbPrefix, game->startup);
+		snprintf(cheatfile, 255, "%sCHT/%s.cht", usbPrefix, game->startup);
 		LOG("Loading Cheat File %s\n", cheatfile);
 		if (load_cheats(cheatfile) < 0) {
-				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
+				guiMsgBox("Error: failed to load Cheat File", 0, NULL);
 				LOG("Error: failed to load cheats\n");
 		} else {
-			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
+			if (!((_lw(gCheatList) == 0) && (_lw(gCheatList+4) == 0))) {
 				LOG("Cheats found\n");
 			} else {
-				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
+				guiMsgBox("No cheats found", 0, NULL);
 				LOG("No cheats found\n");
 			}
 		}

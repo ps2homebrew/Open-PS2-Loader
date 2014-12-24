@@ -318,7 +318,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 #ifdef CHEAT
 	if (gEnableCheat) {
 		char cheatfile[32];
-		snprintf(cheatfile, 255, "%sCHT/%s.cht", usbPrefix, game->startup);
+		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.CHT", usbPrefix, game->startup);
 		LOG("Loading Cheat File %s\n", cheatfile);
 		if (load_cheats(cheatfile) < 0) {
 				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);

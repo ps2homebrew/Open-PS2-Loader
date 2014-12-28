@@ -366,7 +366,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 #ifdef CHEAT
 	if (gEnableCheat) {
 		char cheatfile[32];
-		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.CHT", hddPrefix, game->startup);
+		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", hddPrefix, game->startup);
 		LOG("Loading Cheat File %s\n", cheatfile);
 		if (load_cheats(cheatfile) < 0) {
 				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);

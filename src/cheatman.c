@@ -231,19 +231,19 @@ int parse_buf(const char *buf)
 			/* Parser */
 			code = parse_line(line, linenumber);
 			if (!((code.addr == 0) && (code.val == 0))) {
-				gCheatList[i*4] = code.addr;
+				gCheatList[i] = code.addr;
 				i++;
-				gCheatList[i*4] = code.val;
+				gCheatList[i] = code.val;
 				i++;
 			}
 		}
 		linenumber++;
 		buf += len + 1;
 	}
-	
-	gCheatList[i*4] = 0;
+
+	gCheatList[i] = 0;
 	i++;
-	gCheatList[i*4] = 0;
+	gCheatList[i] = 0;
 	i++;
 
 	return 0;

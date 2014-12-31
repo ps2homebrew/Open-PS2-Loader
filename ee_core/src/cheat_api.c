@@ -40,12 +40,12 @@ void SetupCheats()
 	nextCodeCanBeHook = 1;
 
 	while (i<MAX_CHEATLIST) {
-		
-		code.addr = gCheatList[i*4];
-		code.val = gCheatList[i*4+1];
+
+		code.addr = gCheatList[i];
+		code.val = gCheatList[i+1];
 		i+=2;
 
-		if ((code.addr == 0) && (code.val == 0)) break; 
+		if ((code.addr == 0) && (code.val == 0)) break;
 
 		if (((code.addr & 0xfe000000) == 0x90000000) && nextCodeCanBeHook == 1)
 		{
@@ -60,7 +60,7 @@ void SetupCheats()
 			k++;
 			codelist[k] = code.val;
 			k++;
-		}	
+		}
 		// Discard any false positives from being possible hooks
 		if ((code.addr & 0xf0000000) == 0x40000000 || 0x30000000)
 		{

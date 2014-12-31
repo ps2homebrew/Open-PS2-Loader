@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev748 - Fixed cheats support. - Thu Dec 25 00:18:17 2014 +0800
+rev747 - Removed unused compatibility mode 9 strings, added missing cheats status/error messages, updated art assets and modified the cheats engine to not use memory at 0x00080000 directly. - Thu Dec 25 00:01:21 2014 +0800
 rev746 - Fixed SMB support and updated changelog. - Wed Dec 24 10:06:56 2014 +0800
 rev745 - Updated changelog files, removed unused UI strings, updated UI string labels, replaced the hardcoded use of tools within Makefiles with variables like $BIN2S, merged support for the CXD9566R into general DEV9 support, and removed power-on code from in-game DEV9 driver. - Tue Dec 23 23:35:00 2014 +0800
 rev744 - (*) Our "About" menu now has a "Quality Assurance" section, officially showing - Thu Dec 18 13:35:27 2014 -0500

@@ -350,9 +350,11 @@ static void ethRenameGame(int id, char* newName) {
 
 static void ethLaunchGame(int id, config_set_t* configSet) {
 	int i, compatmask;
-	char filename[32];
+	char filename[32], partname[256];
 	base_game_info_t* game = &ethGames[id];
 	struct cdvdman_settings_smb *settings;
+	u32 layer1_start, layer1_offset;
+	unsigned short int layer1_part;
 
 	if (!gPCShareName[0]) {
 		memcpy(gPCShareName, game->name, 32);
@@ -450,6 +452,37 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	strcpy(settings->pc_prefix, gETHPrefix);
 	strcpy(settings->smb_user, gPCUserName);
 	strcpy(settings->smb_password, gPCPassword);
+
+	//Initialize layer 1 information.
+	layer1_offset = layer1_start = 0;
+	layer1_part = 0;
+	switch(game->format) {
+		case GAME_FORMAT_USBLD:
+			sprintf(partname, "%s.00", settings->files.filename);
+			break;
+		default:	//Raw ISO9660 disc image; one part.
+			strcpy(partname, settings->files.filename);
+	}
+
+	layer1_start = sbGetISO9660MaxLBA(partname);
+
+	switch(game->format) {
+		case GAME_FORMAT_USBLD:
+			layer1_part = layer1_start / 0x80000;
+			layer1_offset = layer1_start % 0x80000;
+			sprintf(partname, "%s.%02x", settings->files.filename, layer1_part);
+			break;
+		default:	//Raw ISO9660 disc image; one part.
+			layer1_part = 0;
+			layer1_offset = layer1_start;
+	}
+
+	LOG("layer 1 @ part %u sector %lu", layer1_part, layer1_offset);
+
+	if(sbProbeISO9660(partname, game, layer1_offset) != 0) {
+		layer1_start = 0;
+		settings->layer1_start = layer1_start;
+	}
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();

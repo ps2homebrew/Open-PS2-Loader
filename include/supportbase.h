@@ -29,4 +29,8 @@ void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int 
 void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id, char* newname);
 config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep);
 
+//ISO9660 filesystem management functions.
+u32 sbGetISO9660MaxLBA(const char *path);
+int sbProbeISO9660(const char *path, base_game_info_t* game, u32 layer1_offset);
+
 #endif

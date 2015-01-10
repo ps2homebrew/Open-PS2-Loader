@@ -1129,8 +1129,11 @@ static void thmRebuildGuiNames(void) {
 	guiThemesNames[nThemes + 1] = NULL;
 }
 
-void thmAddElements(char* path, const char* separator, int mode) {
-	nThemes += listDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
+int thmAddElements(char* path, const char* separator, int mode) {
+	int result;
+
+	result = listDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
+	nThemes += result;
 	thmRebuildGuiNames();
 
 	const char* temp;
@@ -1139,6 +1142,8 @@ void thmAddElements(char* path, const char* separator, int mode) {
 		if (thmSetGuiValue(thmFindGuiID(temp), 0))
 			moduleUpdateMenu(mode, 1);
 	}
+
+	return result;
 }
 
 void thmInit(void) {

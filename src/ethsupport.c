@@ -171,7 +171,7 @@ static void ethInitSMB(void) {
 	}
 }
 
-static void ethLoadModules(void) {
+int ethLoadModules(void) {
 	int ipconfiglen;
 	char ipconfig[IPCONFIG_MAX_LEN];
 
@@ -187,18 +187,30 @@ static void ethLoadModules(void) {
 			if (sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL) >= 0) {
 				gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
 				if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, ipconfiglen, ipconfig) >= 0) {
-					gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
-					if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
-						LOG("ETHSUPPORT Modules loaded\n");
-						ethInitSMB();
-						return;
-					}
+					LOG("ETHSUPPORT Modules loaded\n");
+					return 0;
 				}
 			}
 		}
 	}
 
 	setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	return -1;
+}
+
+static void smbLoadModules(void) {
+	LOG("SMBSUPPORT LoadModules\n");
+
+	if(ethLoadModules() == 0) {
+		gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
+		if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
+			LOG("SMBSUPPORT Modules loaded\n");
+			ethInitSMB();
+			return;
+		}
+
+		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	}
 }
 
 void ethInit(void) {
@@ -218,7 +230,7 @@ void ethInit(void) {
 		ethGames = NULL;
 		configGetInt(configGetByType(CONFIG_OPL), "eth_frames_delay", &ethGameList.delay);
 		gNetworkStartup = ERROR_ETH_NOT_STARTED;
-		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &ethLoadModules);
+		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &smbLoadModules);
 		ethGameList.enabled = 1;
 	}
 }
@@ -290,7 +302,7 @@ static int ethUpdateGameList(void) {
 				g->extension[0] = '\0';
 				g->parts = 0x00;
 				g->media = 0x00;
-				g->isISO = 0;
+				g->format = GAME_FORMAT_USBLD;
 				g->sizeMB = 0;
 			}
 			ethGameCount = count;
@@ -314,7 +326,7 @@ static char* ethGetGameName(int id) {
 }
 
 static int ethGetGameNameLength(int id) {
-	if (ethGames[id].isISO)
+	if (ethGames[id].format != GAME_FORMAT_USBLD)
 		return ISO_GAME_NAME_MAX + 1;
 	else
 		return UL_GAME_NAME_MAX + 1;
@@ -420,15 +432,16 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
 	settings = (struct cdvdman_settings_smb *)((u8*)(&smb_cdvdman_irx)+i);
 
-	// For ISO we use the part table to store the "long" name (only for init)
-	if (game->isISO) {
-		strcpy(settings->files.iso.extension, game->extension);
-		strcpy(settings->files.iso.startup, game->startup);
-		strcpy(settings->files.iso.title, game->name);
-	} else {
-		sprintf(filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
-		strcpy(settings->filename, filename);
-		settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
+	switch(game->format) {
+		case GAME_FORMAT_OLD_ISO:
+			sprintf(settings->files.filename, "%s.%s%s", game->startup, game->name, game->extension);
+			break;
+		case GAME_FORMAT_ISO:
+			sprintf(settings->files.filename, "%s%s", game->name, game->extension);
+			break;
+		default:	//Default to USBLD.
+			sprintf(settings->files.filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
+			settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
 	}
 
 	sprintf(settings->pc_ip, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);

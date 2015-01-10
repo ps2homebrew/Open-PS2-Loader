@@ -77,29 +77,6 @@ int usbFindPartition(char *target, char *name) {
 
 #define USBHDFSDFSV_FUNCNUM(x)	(('U'<<8)|(x))
 
-static void usbInitModules(void) {
-	usbLoadModules();
-
-	// update Themes
-	usbFindPartition(usbPrefix, "ul.cfg");
-	char path[256];
-	sprintf(path, "%sTHM", usbPrefix);
-	thmAddElements(path, "/", usbGameList.mode);
-
-	sprintf(path, "%sCFG", usbPrefix);
-	checkCreateDir(path);
-
-#ifdef VMC
-	sprintf(path, "%sVMC", usbPrefix);
-	checkCreateDir(path);
-#endif
-
-#ifdef CHEAT
-	sprintf(path, "%sCHT", usbPrefix);
-	checkCreateDir(path);
-#endif
-}
-
 static unsigned int UsbGeneration = 0;
 
 static void usbEventHandler(void *packet, void *opt){
@@ -108,7 +85,7 @@ static void usbEventHandler(void *packet, void *opt){
 
 void usbLoadModules(void) {
 	LOG("USBSUPPORT LoadModules\n");
-	//first it search for custom usbd in MC?
+	//first search for a custom usbd module in MC?
 	pusbd_irx = readFile("mc?:BEDATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
 	if (!pusbd_irx) {
 		pusbd_irx = readFile("mc?:BADATA-SYSTEM/USBD.IRX", -1, &size_pusbd_irx);
@@ -124,7 +101,6 @@ void usbLoadModules(void) {
 	sysLoadModuleBuffer(pusbd_irx, size_pusbd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsdfsv_irx, size_usbhdfsdfsv_irx, 0, NULL);
-
 	SifAddCmdHandler(12, &usbEventHandler, NULL);
 
 	LOG("USBSUPPORT Modules loaded\n");
@@ -138,7 +114,6 @@ void usbInit(void) {
 	usbGameCount = 0;
 	usbGames = NULL;
 	configGetInt(configGetByType(CONFIG_OPL), "usb_frames_delay", &usbGameList.delay);
-	ioPutRequest(IO_CUSTOM_SIMPLEACTION, &usbInitModules);
 	usbGameList.enabled = 1;
 }
 
@@ -149,10 +124,11 @@ item_list_t* usbGetObject(int initOnly) {
 }
 
 static int usbNeedsUpdate(void) {
+	char path[256];
 	static unsigned int OldGeneration = 0;
+	static unsigned char ThemesLoaded = 0;
 	int result = 0;
 	fio_stat_t stat;
-	char path[256];
 
 	if(OldGeneration == UsbGeneration) return 0;
 	OldGeneration = UsbGeneration;
@@ -178,6 +154,26 @@ static int usbNeedsUpdate(void) {
 	if (!sbIsSameSize(usbPrefix, usbULSizePrev))
 		result = 1;
 
+	// update Themes
+	if(!ThemesLoaded)
+	{
+		sprintf(path, "%sTHM", usbPrefix);
+		if(thmAddElements(path, "/", usbGameList.mode) > 0) ThemesLoaded = 1;
+	}
+
+	sprintf(path, "%sCFG", usbPrefix);
+	checkCreateDir(path);
+
+#ifdef VMC
+	sprintf(path, "%sVMC", usbPrefix);
+	checkCreateDir(path);
+#endif
+
+#ifdef CHEAT
+	sprintf(path, "%sCHT", usbPrefix);
+	checkCreateDir(path);
+#endif
+
 	return result;
 }
 
@@ -199,7 +195,7 @@ static char* usbGetGameName(int id) {
 }
 
 static int usbGetGameNameLength(int id) {
-	if (usbGames[id].isISO)
+	if (usbGames[id].format != GAME_FORMAT_USBLD)
 		return ISO_GAME_NAME_MAX + 1;
 	else
 		return UL_GAME_NAME_MAX + 1;
@@ -288,7 +284,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
 	for (i = 0, settings = NULL; i < game->parts; i++) {
-		if (game->isISO)
+		if (game->format != GAME_FORMAT_USBLD)
 			sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
 		else
 			sprintf(partname, "%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, i);

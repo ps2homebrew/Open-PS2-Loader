@@ -28,14 +28,8 @@ struct cdvdman_settings_smb{
 	s8 pc_prefix[33];
 	s8 smb_user[17];
 	s8 smb_password[17];
-	s8 filename[65];
-	u8 padding;
 	union{
-		struct{
-			s8 extension[5];
-			s8 startup[12];
-			s8 title[65];
-		}iso;
+		s8 filename[80];
 		u16 FIDs[ISO_MAX_PARTS];
 	}files;
 };

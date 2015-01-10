@@ -63,6 +63,7 @@ struct cdvdman_settings_smb cdvdman_settings={
 		0x39393939,
 		"B00BS"
 	},
+	0x00000000,
 	"192.168.0.10",
 	0x8510,
 	"PS2SMB",
@@ -81,6 +82,7 @@ struct cdvdman_settings_usb cdvdman_settings={
 		0x39393939,
 		"B00BS"
 	},
+	0x00000000,
 	{1,2,3,4,5,6,7,8,9,10}
 };
 #else
@@ -255,10 +257,6 @@ static int cdvdman_cdinited = 0;
 cdvdman_status_t cdvdman_stat;
 static void *user_cb;
 
-#ifndef HDD_DRIVER
-static u32 cdvdman_layer1start = 0;
-#endif
-
 static int cdrom_io_sema;
 static int cdvdman_scmdsema;
 static int cdvdman_searchfilesema;
@@ -419,7 +417,6 @@ static void fs_init(void)
 
 	// DVD DL support
 	if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
-		#ifdef HDD_DRIVER
 		int on_dual;
 		u32 layer1_start;
 		sceCdReadDvdDualInfo(&on_dual, &layer1_start);
@@ -430,17 +427,6 @@ static void fs_init(void)
 			layer_info[1].rootDirtocLBA = layer1_start + tocEntryPointer->fileLBA;
 			layer_info[1].rootDirtocLength = tocEntryPointer->length;
 		}
-		#else
-		u32 volSize = (*((u32 *)&cdvdman_buf[0x50]));
-		sceCdRead(volSize, 1, cdvdman_buf, NULL);
-		sceCdSync(0);
-		if ((cdvdman_buf[0x00] == 1) && (!strncmp(&cdvdman_buf[0x01], "CD001", 5))) {
-			cdvdman_layer1start = volSize - 16;
-			tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
-			layer_info[1].rootDirtocLBA = cdvdman_layer1start + tocEntryPointer->fileLBA;
-			layer_info[1].rootDirtocLength = tocEntryPointer->length;
-		}
-		#endif
 	}
 
 	fs_inited = 1;
@@ -1127,8 +1113,8 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 		*layer1_start = apaHeader.layer1_start;
 		*on_dual = (apaHeader.layer1_start > 0) ? 1 : 0;
 		#else
-		*layer1_start = cdvdman_layer1start;
-		*on_dual = (cdvdman_layer1start > 0) ? 1 : 0;
+		*layer1_start = cdvdman_settings.layer1_start;
+		*on_dual = (cdvdman_settings.layer1_start > 0) ? 1 : 0;
 		#endif
 	}
 
@@ -1250,29 +1236,33 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 
 	cdvdman_init();
 
-	DPRINTF("cdrom_open %s mode=%d\n", filename, mode);
+	DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
 
-	fh = cdvdman_getfilefreeslot();
-	if (fh) {
-		r = cdvdman_findfile(&cdfile, filename, f->unit);
-		if (r) {
-			f->privdata = fh;
-			fh->f = f;
-			if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
-				if (f->mode == 0)
-					f->mode = r;
+	if (f->unit < 2) {
+		fh = cdvdman_getfilefreeslot();
+		if (fh) {
+			r = cdvdman_findfile(&cdfile, filename, f->unit);
+			if (r) {
+				f->privdata = fh;
+				fh->f = f;
+				if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
+					if (f->mode == 0)
+						f->mode = r;
+				}
+				fh->filesize = cdfile.size;
+				fh->lsn = cdfile.lsn;
+				fh->position = 0;
+				r = 0;
+
 			}
-			fh->filesize = cdfile.size;
-			fh->lsn = cdfile.lsn;
-			fh->position = 0;
-			r = 0;
-
+			else
+				r = -ENOENT;
 		}
 		else
-			r = -ENOENT;
+			r = -EMFILE;
 	}
 	else
-		r = -EMFILE;
+		r = -ENOENT;
 
 	DPRINTF("cdrom_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
 
@@ -1736,9 +1726,12 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	static char cdvdman_filepath[256];
 	u32 lsn;
 	struct dirTocEntry *tocEntryPointer;
+	layer_info_t *pLayerInfo;
 
 	if ((!pcdfile) || (!name))
 		return 0;
+
+	pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0];	//SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
 
 	WaitSema(cdvdman_searchfilesema);
 
@@ -1753,38 +1746,32 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)
 		layer = 0;
 
-	if (layer < 2) {
-		if (layer_info[layer].rootDirtocLBA == 0) {
-			SignalSema(cdvdman_searchfilesema);
-			return 0;
-		}
-
-		tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, layer_info[layer].rootDirtocLBA, layer_info[layer].rootDirtocLength, layer);
-		if (tocEntryPointer == NULL) {
-			SignalSema(cdvdman_searchfilesema);
-			return 0;
-		}
-
-		lsn = tocEntryPointer->fileLBA;
-		if (layer) {
-			sceCdReadDvdDualInfo((int *)&pcdfile->lsn, &pcdfile->size);
-			lsn += pcdfile->size;
-		}
-
-		pcdfile->lsn = lsn;
-		if ((cdvdman_settings.common.flags&IOPCORE_COMPAT_0_PSS) && \
-			((!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".PSS", 4)) || \
-			(!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".pss", 4))))
-			pcdfile->size = 0;
-		else
-			pcdfile->size = tocEntryPointer->fileSize;
-
-		strcpy(pcdfile->name, strrchr(name, '\\')+1);
-	}
-	else {
+	if (pLayerInfo->rootDirtocLBA == 0) {
 		SignalSema(cdvdman_searchfilesema);
 		return 0;
 	}
+
+	tocEntryPointer = cdvdman_locatefile(cdvdman_filepath, pLayerInfo->rootDirtocLBA, pLayerInfo->rootDirtocLength, layer);
+	if (tocEntryPointer == NULL) {
+		SignalSema(cdvdman_searchfilesema);
+		return 0;
+	}
+
+	lsn = tocEntryPointer->fileLBA;
+	if (layer) {
+		sceCdReadDvdDualInfo((int *)&pcdfile->lsn, &pcdfile->size);
+		lsn += pcdfile->size;
+	}
+
+	pcdfile->lsn = lsn;
+	if ((cdvdman_settings.common.flags&IOPCORE_COMPAT_0_PSS) && \
+		((!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".PSS", 4)) || \
+		(!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".pss", 4))))
+		pcdfile->size = 0;
+	else
+		pcdfile->size = tocEntryPointer->fileSize;
+
+	strcpy(pcdfile->name, strrchr(name, '\\')+1);
 
 	DPRINTF("cdvdman_findfile found %s\n", name);
 

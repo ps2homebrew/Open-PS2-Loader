@@ -80,14 +80,14 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
 			{
 				strncpy(filename, p+8, maxlength);	/* Skip the device name part of the path ("cdrom0:\"). */
 				filename[maxlength]='\0';
-			//	printf("Startup EXEC path: %s\n", filename);
+				LOG("Startup EXEC path: %s\n", filename);
 				result = 0;
 			}else{
-			//	printf("BOOT 2 errror: Unsupported boot device.\n");
+				LOG("BOOT 2 errror: Unsupported boot device.\n");
 				result=-EINVAL;
 			}
 		}else{
-		//	printf("BOOT 2 line not found.\n");
+			LOG("BOOT 2 line not found.\n");
 			result = -EINVAL;
 		}
 	}
@@ -237,6 +237,43 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 	if(count > 0) *gamecount = count;
 
 	return count;
+}
+
+u32 sbGetISO9660MaxLBA(const char *path) {
+	u32 maxLBA;
+	FILE *file;
+
+	if((file = fopen(path, "rb")) != NULL) {
+		fseek(file, 16*2048+80, SEEK_SET);
+		if(fread(&maxLBA, sizeof(maxLBA), 1, file) != 1)
+			maxLBA = 0;
+		fclose(file);
+	}else{
+		maxLBA = 0;
+	}
+
+	return maxLBA;
+}
+
+int sbProbeISO9660(const char *path, base_game_info_t* game, u32 layer1_offset) {
+	int result;
+	FILE *file;
+	char buffer[5];
+
+	result = -1;
+	if(game->media == 0x14) {	//Only DVDs can have multiple layers.
+		if((file = fopen(path, "rb")) != NULL) {
+			if(fseek(file, layer1_offset * 2048, SEEK_SET) == 0) {
+				if((fread(buffer, 1, sizeof(buffer), file) == sizeof(buffer)) &&
+					((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
+					result = 0;
+				}
+			}
+			fclose(file);
+		}
+	}
+
+	return result;
 }
 
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex) {

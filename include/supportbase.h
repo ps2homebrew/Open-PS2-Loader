@@ -5,6 +5,12 @@
 #define ISO_GAME_NAME_MAX	64
 #define GAME_STARTUP_MAX	12
 
+enum GAME_FORMAT{
+	GAME_FORMAT_USBLD	= 0,
+	GAME_FORMAT_OLD_ISO,
+	GAME_FORMAT_ISO,
+};
+
 typedef struct
 {
 	char name[ISO_GAME_NAME_MAX + 1]; // MUST be the higher value from UL / ISO
@@ -12,7 +18,7 @@ typedef struct
 	char extension[5];
 	unsigned char parts;
 	unsigned char media;
-	unsigned short isISO;
+	unsigned short format;
 	int sizeMB;
 } base_game_info_t;
 

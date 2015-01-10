@@ -118,7 +118,7 @@ theme_t* gTheme;
 void thmInit(void);
 void thmReinit(const char* path);
 void thmReloadScreenExtents(void);
-void thmAddElements(char* path, const char* separator, int mode);
+int thmAddElements(char* path, const char* separator, int mode);
 const char* thmGetValue(void);
 GSTEXTURE* thmGetTexture(unsigned int id);
 void thmEnd(void);

@@ -458,7 +458,7 @@ int hddDread(iop_file_t *f, iox_dirent_t *dirent)
 int hddReName(iop_file_t *f, const char *oldname, const char *newname)
 {
 	int i, rv;
-	apa_cache	*clink, *clink2;
+	apa_cache *clink;
 	char tmpBuf[APA_IDMAX];
 
 	if(f->unit >= 2 || hddDeviceBuf[f->unit].status!=0)
@@ -497,23 +497,11 @@ int hddReName(iop_file_t *f, const char *oldname, const char *newname)
 		return -ENOENT;
 	}
 
-	// do the renaming. Update all sub-partitions too.
+	// do the renaming :) note: subs have no names!!
 	memset(clink->header->id, 0, APA_IDMAX);		// all cmp are done with memcmp!
 	strncpy(clink->header->id, newname, APA_IDMAX - 1);
 	clink->header->id[APA_IDMAX - 1] = '\0';
 	clink->flags|=CACHE_FLAG_DIRTY;
-
-	for(i=clink->header->nsub-1;i>=0;i--)
-	{
-		if((clink2=cacheGetHeader(f->unit, clink->header->subs[i].start, 0, &rv))){
-			memset(clink2->header->id, 0, APA_IDMAX);		// all cmp are done with memcmp!
-			strncpy(clink2->header->id, newname, APA_IDMAX - 1);
-			clink2->header->id[APA_IDMAX - 1] = '\0';
-			clink2->flags|=CACHE_FLAG_DIRTY;
-			cacheFlushAllDirty(f->unit);
-			cacheAdd(clink2);
-		}
-	}
 
 	cacheFlushAllDirty(f->unit);
 	cacheAdd(clink);

@@ -69,13 +69,8 @@ struct cdvdman_settings_smb cdvdman_settings={
 	"",
 	"GUEST",
 	"",
-	"######  GAMETITLE SMB  ######",
-	0,
 	{
-		{
-			"EXTEN",
-			"SLPM_550.52",
-		}
+		"######  FILENAME  ######"
 	}
 };
 #elif USB_DRIVER
@@ -379,9 +374,9 @@ static void fs_init(void)
 
 	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
 		if (cdvdman_settings.pc_prefix[0]) {
-			sprintf(tmp_str, "%s\\%s\\%s.%s%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.iso.startup, cdvdman_settings.files.iso.title, cdvdman_settings.files.iso.extension);
+			sprintf(tmp_str, "%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
 		} else {
-			sprintf(tmp_str, "%s\\%s.%s%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.iso.startup, cdvdman_settings.files.iso.title, cdvdman_settings.files.iso.extension);
+			sprintf(tmp_str, "%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
 		}
 
 		smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i++], 0);
@@ -389,9 +384,9 @@ static void fs_init(void)
 		// Open all parts files
 		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
 			if (cdvdman_settings.pc_prefix[0])
-				sprintf(tmp_str, "%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.filename, i);
+				sprintf(tmp_str, "%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.files.filename, i);
 			else
-				sprintf(tmp_str, "%s.%02x", cdvdman_settings.filename, i);
+				sprintf(tmp_str, "%s.%02x", cdvdman_settings.files.filename, i);
 
 			smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i], 0);
 		}

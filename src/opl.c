@@ -26,9 +26,6 @@
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
 
-// for sleep()
-#include <unistd.h>
-
 #ifdef __EESIO_DEBUG
 #include <sio.h>
 #define LOG_INIT()		sio_init(38400, 0, 0, 0, 0)
@@ -80,6 +77,7 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 // forward decl
 static void clearMenuGameList(opl_io_module_t* mdl);
 static void moduleCleanup(opl_io_module_t* mod, int exception);
+static void reset(void);
 
 // frame counter
 static unsigned int frameCounter;
@@ -449,7 +447,6 @@ static int tryAlternateDevice(int types) {
 	int value;
 
 	// check USB
-	usbLoadModules();
 	if (usbFindPartition(path, "conf_opl.cfg")) {
 		configEnd();
 		configInit(path);
@@ -700,7 +697,6 @@ extern int size_hdldsvr_irx;
 void loadHdldSvr(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
-	char ipconfig[IPCONFIG_MAX_LEN];
 
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
@@ -709,23 +705,9 @@ void loadHdldSvr(void) {
 
 	unloadPads();
 
-	sysReset(SYS_LOAD_PAD_MODULES);
+	sysReset(0);
 
-	int iplen = sysSetIPConfig(ipconfig);
-
-	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-	if (ret < 0)
-		return;
-
-	ret = sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
-	if (ret < 0)
-		return;
-
-	ret = sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL);
-	if (ret < 0)
-		return;
-
-	ret = sysLoadModuleBuffer(&smap_irx, size_smap_irx, iplen, ipconfig);
+	ret = ethLoadModules();
 	if (ret < 0)
 		return;
 
@@ -754,16 +736,10 @@ void loadHdldSvr(void) {
 void unloadHdldSvr(void) {
 	unloadPads();
 
-	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
+	reset();
 
 	LOG_INIT();
 	LOG_ENABLE();
-
-#ifdef _DTL_T10000
-	mcInit(MC_TYPE_XMC);
-#else
-	mcInit(MC_TYPE_MC);
-#endif
 
 	// reinit the input pads
 	padInit(0);
@@ -780,39 +756,14 @@ void unloadHdldSvr(void) {
 }
 
 void handleHdlSrv() {
-	guiRenderTextScreen(_l(_STR_STARTINGHDL));
-
 	// prepare for hdl, display screen with info
+	guiRenderTextScreen(_l(_STR_STARTINGHDL));
 	loadHdldSvr();
 
 	guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
 
-/*	int terminate = 0;
-
-	while (1) {
-		if (terminate != 0)
-			guiRenderTextScreen(_l(_STR_STOPHDL));
-		else
-			guiRenderTextScreen(_l(_STR_RUNNINGHDL));
-
-		sleep(2);
-
-		readPads();
-
-		if(getKeyOn(KEY_CIRCLE) && terminate == 0) {
-			terminate++;
-		} else if(getKeyOn(KEY_CROSS) && terminate == 1) {
-			terminate++;
-		} else if (terminate > 0)
-			terminate--;
-
-		if (terminate >= 2)
-			break;
-	} */
-
-	guiRenderTextScreen(_l(_STR_UNLOADHDL));
-
 	// restore normal functionality again
+	guiRenderTextScreen(_l(_STR_UNLOADHDL));
 	unloadHdldSvr();
 }
 
@@ -820,9 +771,7 @@ void handleHdlSrv() {
 // --------------------- Init/Deinit ------------------------
 // ----------------------------------------------------------
 static void reset(void) {
-	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
-
-	SifInitRpc(0);
+	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_USB_MODULES | SYS_LOAD_ISOFS_MODULE);
 
 #ifdef _DTL_T10000
 	mcInit(MC_TYPE_XMC);
@@ -1021,4 +970,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-

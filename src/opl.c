@@ -805,9 +805,6 @@ void shutdown(int exception) {
 
 
 static void setDefaults(void) {
-	pusbd_irx = NULL;
-	size_pusbd_irx = 0;
-
 	clearIOModuleT(&list_support[USB_MODE]);
 	clearIOModuleT(&list_support[ETH_MODE]);
 	clearIOModuleT(&list_support[HDD_MODE]);

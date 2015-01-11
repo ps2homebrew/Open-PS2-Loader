@@ -1254,6 +1254,7 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 				fh->position = 0;
 				r = 0;
 
+				DPRINTF("cdrom_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
 			}
 			else
 				r = -ENOENT;
@@ -1263,8 +1264,6 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 	}
 	else
 		r = -ENOENT;
-
-	DPRINTF("cdrom_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
 
 	SignalSema(cdrom_io_sema);
 

@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev755 - Prototype attempt at fixing DVD-DL support within PS2ESDL for USB and SMB modes. - Sat Jan 10 23:08:56 2015 +0800
 rev754 - Fixed UI freezing while user cycles through the games list, rolled back changes to the rename() function of the APA driver, integer values in the UI can now wrap around, changed module loading for better performance, fixed theme loading from USB devices, users no longer have to name their ISO images in a specific format and removed debugging code from regular OPL builds. - Sat Jan 10 13:47:04 2015 +0800
 rev753 - Aaand the Scheisse-Kopf Award goes to yours truly. For having convinced a sick - Sun Dec 28 07:57:58 2014 -0500
 rev752 - Removed broken game label in GSM screen; removed developer comments. - Wed Dec 24 12:28:28 2014 -0500

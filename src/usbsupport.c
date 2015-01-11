@@ -33,8 +33,8 @@ extern void *usb_mcemu_irx;
 extern int size_usb_mcemu_irx;
 #endif
 
-void *pusbd_irx;
-int size_pusbd_irx;
+void *pusbd_irx = NULL;
+int size_pusbd_irx = 0;
 
 static char usbPrefix[40];
 static int usbULSizePrev = -2;
@@ -285,8 +285,6 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
-	layer1_offset = layer1_start = 0;
-	layer1_part = 0;
 	for (i = 0, settings = NULL; i < game->parts; i++) {
 		if (game->format != GAME_FORMAT_USBLD)
 			sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
@@ -302,20 +300,6 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		}
 
 		if (i == 0) {
-			layer1_start = sbGetISO9660MaxLBA(partname);
-
-			switch(game->format) {
-				case GAME_FORMAT_USBLD:
-					layer1_part = layer1_start / 0x80000;
-					layer1_offset = layer1_start % 0x80000;
-					break;
-				default:	//Raw ISO9660 disc image; one part.
-					layer1_part = 0;
-					layer1_offset = layer1_start;
-			}
-
-			LOG("layer 1 @ part %u sector %lu", layer1_part, layer1_offset);
-
 			val = fioIoctl(fd, 0xDEADC0DE, partname);
 			LOG("USBSUPPORT Mass storage device sector size = %d\n", val);
 			if (val == 4096) {
@@ -327,14 +311,37 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		}
 
 		settings->LBAs[i] = fioIoctl(fd, 0xBEEFC0DE, partname);
-
-		if(i == layer1_part) {
-			if(sbProbeISO9660(partname, game, layer1_offset) != 0) {
-				layer1_start = 0;
-				settings->layer1_start = layer1_start;
-			}
-		}
 	}
+
+	//Initialize layer 1 information.
+	layer1_offset = layer1_start = 0;
+	layer1_part = 0;
+	switch(game->format) {
+		case GAME_FORMAT_USBLD:
+			sprintf(partname, "mass:%s/ul.%08X.%s.00", gUSBPrefix, USBA_crc32(game->name), game->startup);
+			break;
+		default:	//Raw ISO9660 disc image; one part.
+			sprintf(partname, "mass:%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+	}
+
+	layer1_start = sbGetISO9660MaxLBA(partname);
+
+	switch(game->format) {
+		case GAME_FORMAT_USBLD:
+			layer1_part = layer1_start / 0x80000;
+			layer1_offset = layer1_start % 0x80000;
+			sprintf(partname, "mass:%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, layer1_part);
+			break;
+		default:	//Raw ISO9660 disc image; one part.
+			layer1_part = 0;
+			layer1_offset = layer1_start;
+	}
+
+	LOG("layer 1 @ part %u sector %lu\n", layer1_part, layer1_offset);
+
+	if(sbProbeISO9660(partname, game, layer1_offset) != 0)
+		layer1_start = 0;
+	settings->layer1_start = layer1_start;
 
 #ifdef CHEAT
 	if (gEnableCheat) {

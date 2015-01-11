@@ -458,10 +458,10 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	layer1_part = 0;
 	switch(game->format) {
 		case GAME_FORMAT_USBLD:
-			sprintf(partname, "%s.00", settings->files.filename);
+			sprintf(partname, "%s%s.00", ethPrefix, settings->files.filename);
 			break;
 		default:	//Raw ISO9660 disc image; one part.
-			strcpy(partname, settings->files.filename);
+			sprintf(partname, "%s%s\\%s", ethPrefix, game->media == 0x12?"CD":"DVD", settings->files.filename);
 	}
 
 	layer1_start = sbGetISO9660MaxLBA(partname);
@@ -470,19 +470,18 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		case GAME_FORMAT_USBLD:
 			layer1_part = layer1_start / 0x80000;
 			layer1_offset = layer1_start % 0x80000;
-			sprintf(partname, "%s.%02x", settings->files.filename, layer1_part);
+			sprintf(partname, "%s%s.%02x", ethPrefix, settings->files.filename, layer1_part);
 			break;
 		default:	//Raw ISO9660 disc image; one part.
 			layer1_part = 0;
 			layer1_offset = layer1_start;
 	}
 
-	LOG("layer 1 @ part %u sector %lu", layer1_part, layer1_offset);
+	LOG("layer 1 @ part %u sector %lu\n", layer1_part, layer1_offset);
 
-	if(sbProbeISO9660(partname, game, layer1_offset) != 0) {
+	if(sbProbeISO9660(partname, game, layer1_offset) != 0)
 		layer1_start = 0;
-		settings->layer1_start = layer1_start;
-	}
+	settings->layer1_start = layer1_start;
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();

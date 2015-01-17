@@ -286,10 +286,16 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
 	for (i = 0, settings = NULL; i < game->parts; i++) {
-		if (game->format != GAME_FORMAT_USBLD)
-			sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
-		else
-			sprintf(partname, "%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, i);
+		switch (game->format) {
+			case GAME_FORMAT_ISO:
+				sprintf(partname, "%s/%s/%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
+				break;
+			case GAME_FORMAT_OLD_ISO:
+				sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+				break;
+			default:	//USBExtreme format.
+				sprintf(partname, "%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, i);
+		}
 
 		if (gCheckUSBFragmentation) {
 			if (fioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
@@ -315,11 +321,14 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 	//Initialize layer 1 information.
 	switch(game->format) {
-		case GAME_FORMAT_USBLD:
-			sprintf(partname, "mass:%s/ul.%08X.%s.00", gUSBPrefix, USBA_crc32(game->name), game->startup);
+		case GAME_FORMAT_ISO:
+			sprintf(partname, "mass:%s/%s/%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
 			break;
-		default:	//Raw ISO9660 disc image; one part.
+		case GAME_FORMAT_OLD_ISO:
 			sprintf(partname, "mass:%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+			break;
+		default:	//USBExtreme format.
+			sprintf(partname, "mass:%s/ul.%08X.%s.00", gUSBPrefix, USBA_crc32(game->name), game->startup);
 	}
 
 	layer1_start = sbGetISO9660MaxLBA(partname);
@@ -340,9 +349,10 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		layer1_start = 0;
 		LOG("DVD detected.\n");
 	} else {
-		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset - 16);
+		layer1_start -= 16;
+		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset);
 	}
-	settings->layer1_start = layer1_start - 16;
+	settings->layer1_start = layer1_start;
 
 #ifdef CHEAT
 	if (gEnableCheat) {

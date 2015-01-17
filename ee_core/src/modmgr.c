@@ -37,6 +37,7 @@ int size_smstcpip_irx;
 void *smsmap_irx;
 int size_smsmap_irx;
 
+#ifdef __LOAD_DEBUG_MODULES
 #ifdef __DECI2_DEBUG
 void *drvtif_irx;
 int size_drvtif_irx;
@@ -49,6 +50,7 @@ int size_udptty_irx;
 
 void *ioptrap_irx;
 int size_ioptrap_irx;
+#endif
 #endif
 
 static SifRpcClientData_t _lf_cd;
@@ -187,6 +189,11 @@ void InitModulePointers(void)
 	size_imgdrv_irx = irxptr_tab[n++].irxsize;
 	size_usbd_irx = irxptr_tab[n++].irxsize;
 	size_smsmap_irx = irxptr_tab[n++].irxsize;
+	size_smstcpip_irx = irxptr_tab[n++].irxsize;
+#ifdef VMC
+	size_mcemu_irx = irxptr_tab[n++].irxsize;
+#endif
+#ifdef __LOAD_DEBUG_MODULES
 #ifdef __DECI2_DEBUG
 	size_drvtif_irx = irxptr_tab[n++].irxsize;
 	size_tifinet_irx = irxptr_tab[n++].irxsize;
@@ -194,9 +201,6 @@ void InitModulePointers(void)
 	size_udptty_irx = irxptr_tab[n++].irxsize;
 	size_ioptrap_irx = irxptr_tab[n++].irxsize;
 #endif
-	size_smstcpip_irx = irxptr_tab[n++].irxsize;
-#ifdef VMC
-	size_mcemu_irx = irxptr_tab[n++].irxsize;
 #endif
 
 	n = 0;
@@ -205,6 +209,11 @@ void InitModulePointers(void)
 	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
 	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
 	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
+	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
+#ifdef VMC
+	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
+#endif
+#ifdef __LOAD_DEBUG_MODULES
 #ifdef __DECI2_DEBUG
 	drvtif_irx = (void *)irxptr_tab[n++].irxaddr;
 	tifinet_irx = (void *)irxptr_tab[n++].irxaddr;
@@ -212,9 +221,6 @@ void InitModulePointers(void)
 	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
 	ioptrap_irx = (void *)irxptr_tab[n++].irxaddr;
 #endif
-	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
-#ifdef VMC
-	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
 #endif
 }
 

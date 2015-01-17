@@ -29,9 +29,9 @@ GSM = 0
 #change following line to "0" to build without PS2RD Cheat Engine - DO NOT COMMENT!
 CHEAT = 0
 
-FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
+FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/isofs.o
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
@@ -48,7 +48,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
 		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
-		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
+		obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
@@ -67,6 +67,7 @@ BIN2O = $(PS2SDK)/bin/bin2o
 
 ifeq ($(DEBUG),1) 
 	EE_CFLAGS := -D__DEBUG -g
+	EE_OBJS += obj/debug.o obj/udptty.o obj/ioptrap.o obj/ps2link.o
 	ifeq ($(EESIO_DEBUG),1)
 		EE_CFLAGS += -D__EESIO_DEBUG
 	endif
@@ -128,6 +129,7 @@ ifeq ($(INGAME_DEBUG),1)
 	EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
 	CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
 	SMSTCPIP_INGAME_CFLAGS = 
+	EE_CFLAGS += -D__INGAME_DEBUG
 
 	ifeq ($(DECI2_DEBUG),1)
 		EECORE_DEBUG_FLAGS += DECI2_DEBUG=1
@@ -137,6 +139,7 @@ ifeq ($(INGAME_DEBUG),1)
 	endif
 else
 	ifeq ($(IOPCORE_DEBUG),1)
+		EE_CFLAGS += -D__INGAME_DEBUG
 		EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
 		CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
 		MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
@@ -208,6 +211,8 @@ endif
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
+	echo "    * isofs.irx"
+	$(MAKE) -C modules/isofs clean
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo "    * usbhdfsdfsv.irx"
@@ -238,12 +243,14 @@ endif
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo "    * hdldsvr.irx"
 	$(MAKE) -C modules/hdd/hdldsvr clean
+ifeq ($(DEBUG),1)
 	echo "    * udptty.irx"
 	$(MAKE) -C modules/debug/udptty clean
 	echo "    * ioptrap.irx"
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo "    * ps2link.irx"
 	$(MAKE) -C modules/debug/ps2link clean
+endif
 	echo "    * pc tools"
 	$(MAKE) -C pc clean
 
@@ -332,6 +339,11 @@ smb_mcemu.s:
 	echo "    * smb_mcemu.irx"
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.smb rebuild
 	$(BIN2S) modules/mcemu/mcemu.irx asm/smb_mcemu.s smb_mcemu_irx
+
+isofs.s:
+	echo "    * isofs.irx"
+	$(MAKE) -C modules/isofs
+	$(BIN2S) modules/isofs/isofs.irx asm/isofs.s isofs_irx
 
 usbd.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/usbd.irx asm/usbd.s usbd_irx

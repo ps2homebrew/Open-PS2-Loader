@@ -1,7 +1,7 @@
 /*
   Copyright 2009-2010 volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "include/opl.h"
@@ -72,14 +72,14 @@ int diaShowKeyb(char* text, int maxLen) {
 
 	while(1) {
 		readPads();
-		
+
 		rmStartFrame();
 		guiDrawBGPlasma();
 		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 		//Text
 		fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, text, gTheme->textColor);
-		
+
 		// separating line for simpler orientation
 		rmDrawLine(25, 138, 615, 138, gColWhite);
 		rmDrawLine(25, 139, 615, 139, gColWhite);
@@ -94,20 +94,20 @@ int diaShowKeyb(char* text, int maxLen) {
 					diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
 			}
 		}
-		
+
 		// Commands
 		for (i = 0; i < KEYB_CMDS; i++) {
 			if (cmdicons[i])
 				rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
-			
+
 			x = 477;
 			w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;
 			if (i == selcommand)
 				diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
 		}
-		
+
 		rmEndFrame();
-		
+
 		if (getKey(KEY_LEFT)) {
 			if (selchar > -1) {
 				if (selchar % KEYB_WIDTH)
@@ -151,7 +151,7 @@ int diaShowKeyb(char* text, int maxLen) {
 				if (len > 0) { // BACKSPACE
 					len--;
 					text[len] = 0;
-				}		
+				}
 			} else if (selcommand == 1) {
 				if (len < (maxLen - 1)) { // SPACE
 					len++;
@@ -187,11 +187,12 @@ int diaShowKeyb(char* text, int maxLen) {
 			if (selkeyb == 1)
 				keyb = keyb1;
 		}
-		
+
 		if (getKey(KEY_CIRCLE))
 			break;
 	}
-	
+
+
 	return 0;
 }
 
@@ -210,22 +211,22 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 
 	while(1) {
 		readPads();
-		
+
 		rmStartFrame();
 		guiDrawBGPlasma();
 		rmDrawRect(0, 0,  screenWidth, screenHeight, gColDarker);
-		
+
 		// "Color selection"
 		fntRenderString(gTheme->fonts[0], 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 
 		// 3 bars representing the colors...
 		size_t co;
 		int x, y;
-		
+
 		for (co = 0; co < 3; ++co) {
 			unsigned char cc[3] = {0,0,0};
 			cc[co] = col[co];
-			
+
 			x = 75;
 			y = 75 + co * 25;
 
@@ -235,21 +236,21 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 				rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
 			else
 				rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
-				
+
 			rmDrawRect(x + 2, y + 2, 190.0f*(cc[co]*100/255)/100, 16, dcol);
 		}
 
 		// target color itself
 		u64 dcol = GS_SETREG_RGBA(col[0],col[1],col[2], 0x80);
-		
+
 		x = 300;
 		y = 75;
-		
+
 		rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
 		rmDrawRect(x + 5, y + 5, 60, 60, dcol);
 
 		rmEndFrame();
-		
+
 		if (getKey(KEY_LEFT)) {
 			if (col[selc] > 0)
 				col[selc]--;
@@ -258,10 +259,10 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 				col[selc]++;
 		} else if (getKey(KEY_UP)) {
 			if (selc > 0)
-				selc--;		
+				selc--;
 		} else if (getKey(KEY_DOWN)) {
 			if (selc < 2)
-				selc++;		
+				selc++;
 		} else if (getKeyOn(KEY_CROSS)) {
 			*r = col[0];
 			*g = col[1];
@@ -286,7 +287,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 static const char *diaGetLocalisedText(const char* def, int id) {
 	if (id >= 0)
 		return _l(id);
-	
+
 	return def;
 }
 
@@ -307,12 +308,12 @@ static int diaShouldBreakLineAfter(struct UIItem *ui) {
 
 static void diaDrawHint(int text_id) {
 	int x, y;
-	
+
 	char* text = _l(text_id);
-	
+
 	x = screenWidth - fntCalcDimensions(gTheme->fonts[0], text) - 10;
 	y = gTheme->usedHeight - 40;
-	
+
 	// render hint on the lower side of the screen.
 	rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
 	fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, text, gTheme->textColor);
@@ -322,10 +323,10 @@ static void diaDrawHint(int text_id) {
 /// sets width and height of the render into the parameters
 static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h) {
 	*h = UI_SPACING_H;
-	
+
 	// all texts are rendered up from the given point!
 	u64 txtcol;
-	
+
 	if (diaIsControllable(item))
 		txtcol = gTheme->uiTextColor;
 	else
@@ -336,7 +337,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 		case UI_TERMINATOR:
 			return;
 
-		case UI_BUTTON:	
+		case UI_BUTTON:
 		case UI_LABEL: {
 			// width is text length in pixels...
 			const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
@@ -471,39 +472,39 @@ void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFo
 
 	int x0 = 20;
 	int y0 = 20;
-	
+
 	// render all items
 	struct UIItem *rc = ui;
 	int x = x0, y = y0, hmax = 0;
-	
+
 	while (rc->type != UI_TERMINATOR) {
 		int w = 0, h = 0;
 
 		if (diaShouldBreakLine(rc)) {
 			x = x0;
-			
+
 			if (hmax > 0)
 				y += hmax + UI_SPACING_H;
-			
+
 			hmax = 0;
 		}
-		
+
 		diaRenderItem(x, y, rc, rc == cur, haveFocus, &w, &h);
-		
+
 		if (w > 0)
 			x += w + UI_SPACING_V;
-		
+
 		hmax = (h > hmax) ? h : hmax;
-		
+
 		if (diaShouldBreakLineAfter(rc)) {
 			x = x0;
-			
+
 			if (hmax > 0)
-				y += hmax + UI_SPACING_H; 
-			
+				y += hmax + UI_SPACING_H;
+
 			hmax = 0;
 		}
-		
+
 		rc++;
 	}
 
@@ -534,13 +535,13 @@ static int diaHandleInput(struct UIItem *item, int *modified) {
 		diaResetValue(item);
 		return 0;
 	}
-	
+
 	// cross loses focus without setting default
 	if (getKeyOn(KEY_CROSS)) {
 		*modified = 0;
 		return 0;
 	}
-	
+
 	// UI item type dependant part:
 	if (item->type == UI_BOOL) {
 		// a trick. Set new value, lose focus
@@ -552,10 +553,20 @@ static int diaHandleInput(struct UIItem *item, int *modified) {
 		setButtonDelay(KEY_DOWN, DIA_INT_SET_SPEED);
 
 		// up and down
-		if (getKey(KEY_UP) && (item->intvalue.current < item->intvalue.max))
-			item->intvalue.current++;
-		else if (getKey(KEY_DOWN) && (item->intvalue.current > item->intvalue.min))
-			item->intvalue.current--;
+		if (getKey(KEY_UP))
+		{
+			if (item->intvalue.current < item->intvalue.max)
+				item->intvalue.current++;
+			else
+				item->intvalue.current = 0;
+		}
+		else if (getKey(KEY_DOWN))
+		{
+			if (item->intvalue.current > item->intvalue.min)
+				item->intvalue.current--;
+			else
+				item->intvalue.current = item->intvalue.max;
+		}
 		else
 			*modified = 0;
 	} else if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
@@ -593,105 +604,105 @@ static int diaHandleInput(struct UIItem *item, int *modified) {
 
 		return 0;
 	}
-	
+
 	return 1;
 }
 
 static struct UIItem *diaGetFirstControl(struct UIItem *ui) {
 	struct UIItem *cur = ui;
-	
+
 	while (!diaIsControllable(cur)) {
 		if (cur->type == UI_TERMINATOR)
-			return ui; 
-		
+			return ui;
+
 		cur++;
 	}
-	
+
 	return cur;
 }
 
 static struct UIItem *diaGetLastControl(struct UIItem *ui) {
 	struct UIItem *last = diaGetFirstControl(ui);
 	struct UIItem *cur = last;
-	
+
 	while (cur->type != UI_TERMINATOR) {
 		cur++;
-		
+
 		if (diaIsControllable(cur))
 			last = cur;
 	}
-	
+
 	return last;
 }
 
 static struct UIItem *diaGetNextControl(struct UIItem *cur, struct UIItem* dflt) {
 	while (cur->type != UI_TERMINATOR) {
 		cur++;
-		
+
 		if (diaIsControllable(cur))
 			return cur;
 	}
-	
+
 	return dflt;
 }
 
 static struct UIItem *diaGetPrevControl(struct UIItem* cur, struct UIItem *ui) {
 	struct UIItem *newf = cur;
-	
+
 	while (newf != ui) {
 		newf--;
-		
+
 		if (diaIsControllable(newf))
 			return newf;
 	}
-	
+
 	return cur;
 }
 
 /// finds first control on previous line...
 static struct UIItem *diaGetPrevLine(struct UIItem* cur, struct UIItem *ui) {
 	struct UIItem *newf = cur;
-	
+
 	int lb = 0;
 	int hadCtrl = 0; // had the scanned line any control?
-	
+
 	while (newf != ui) {
 		newf--;
-		
+
 		if ((lb > 0) && (diaIsControllable(newf)))
 			hadCtrl = 1;
-		
+
 		if (diaShouldBreakLine(newf)) {// is this a line break?
 			if (hadCtrl || lb == 0) {
 				lb++;
 				hadCtrl = 0;
 			}
 		}
-		
+
 		// twice the break? find first control
-		if (lb == 2) 
+		if (lb == 2)
 			return diaGetFirstControl(newf);
 	}
-	
+
 	return cur;
 }
 
 static struct UIItem *diaGetNextLine(struct UIItem* cur, struct UIItem *ui) {
 	struct UIItem *newf = cur;
-	
+
 	int lb = 0;
-	
+
 	while (newf->type != UI_TERMINATOR) {
 		newf++;
-		
+
 		if (diaShouldBreakLine(newf)) {// is this a line break?
 				lb++;
 		}
-		
+
 		if (lb == 1)
 			return diaGetNextControl(newf, cur);
 	}
-	
+
 	return cur;
 }
 
@@ -718,22 +729,22 @@ static struct UIItem* diaFindByID(struct UIItem* ui, int id) {
 
 int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(int modified)) {
 	rmGetScreenExtents(&screenWidth, &screenHeight);
-	
+
 	struct UIItem *cur = NULL;
 	if (uiId != -1)
 		cur = diaFindByID(ui, uiId);
 
 	if (!cur)
 		cur = diaGetFirstControl(ui);
-	
+
 	// what? no controllable item? Exit!
 	if (cur == ui)
 		return -1;
-	
+
 	int haveFocus = 0, modified;
-	
+
 	diaStoreScrollSpeed();
-	
+
 	// slower controls for dialogs
 	setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
 	setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
@@ -744,13 +755,13 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 		rmStartFrame();
 		diaRenderUI(ui, inMenu, cur, haveFocus);
 		rmEndFrame();
-		
+
 		readPads();
-		
+
 		if (haveFocus) {
 			modified = 1;
 			haveFocus = diaHandleInput(cur, &modified);
-			
+
 			if (!haveFocus) {
 				setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
 				setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
@@ -759,52 +770,52 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 			modified = 0;
 			if (getKey(KEY_LEFT)) {
 				struct UIItem *newf = diaGetPrevControl(cur, ui);
-				
+
 				if (newf == cur)
 					cur = diaGetLastControl(ui);
-				else 
+				else
 					cur = newf;
 			}
-			
+
 			if (getKey(KEY_RIGHT)) {
 				struct UIItem *newf = diaGetNextControl(cur, cur);
-				
+
 				if (newf == cur)
 					cur = diaGetFirstControl(ui);
-				else 
+				else
 					cur = newf;
 			}
-			
+
 			if(getKey(KEY_UP)) {
 				// find
 				struct UIItem *newf = diaGetPrevLine(cur, ui);
-				
+
 				if (newf == cur)
 					cur = diaGetLastControl(ui);
-				else 
+				else
 					cur = newf;
 			}
-			
+
 			if(getKey(KEY_DOWN)) {
 				// find
 				struct UIItem *newf = diaGetNextLine(cur, ui);
-				
+
 				if (newf == cur)
 					cur = diaGetFirstControl(ui);
-				else 
+				else
 					cur = newf;
 			}
-			
+
 			// circle breaks focus or exits with false result
 			if (getKeyOn(KEY_CIRCLE)) {
 				diaRestoreScrollSpeed();
 				return 0;
 			}
-			
+
 			// see what key events we have
 			if (getKeyOn(KEY_CROSS)) {
 				haveFocus = 1;
-				
+
 				if (cur->type == UI_BUTTON) {
 					diaRestoreScrollSpeed();
 					return cur->id;
@@ -836,39 +847,39 @@ void diaSetEnabled(struct UIItem* ui, int id, int enabled) {
 
 int diaGetInt(struct UIItem* ui, int id, int *value) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
 		*value = item->intvalue.current;
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 int diaSetInt(struct UIItem* ui, int id, int value) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
 		item->intvalue.def = value;
 		item->intvalue.current = value;
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 int diaGetString(struct UIItem* ui, int id, char *value, int length) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
 		strncpy(value, item->stringvalue.text, length);
 		return 1;
@@ -879,25 +890,25 @@ int diaGetString(struct UIItem* ui, int id, char *value, int length) {
 
 int diaSetString(struct UIItem* ui, int id, const char *text) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
 		strncpy(item->stringvalue.def, text, sizeof(item->stringvalue.def));
 		strncpy(item->stringvalue.text, text, sizeof(item->stringvalue.text));
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 int diaGetColor(struct UIItem* ui, int id, unsigned char *col) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if (item->type != UI_COLOUR)
 		return 0;
 
@@ -909,10 +920,10 @@ int diaGetColor(struct UIItem* ui, int id, unsigned char *col) {
 
 int diaSetColor(struct UIItem* ui, int id, const unsigned char *col) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if (item->type != UI_COLOUR)
 		return 0;
 
@@ -941,27 +952,28 @@ int diaSetU64Color(struct UIItem* ui, int id, u64 col) {
 
 int diaSetLabel(struct UIItem* ui, int id, const char *text) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if ((item->type == UI_LABEL) || (item->type == UI_BUTTON)) {
 		item->label.text = text;
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 int diaSetEnum(struct UIItem* ui, int id, const char **enumvals) {
 	struct UIItem *item = diaFindByID(ui, id);
-	
+
 	if (!item)
 		return 0;
-	
+
 	if (item->type != UI_ENUM)
 		return 0;
-	
+
 	item->intvalue.enumvalues = enumvals;
 	return 1;
 }
+

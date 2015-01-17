@@ -39,6 +39,7 @@ extern int size_smstcpip_irx;
 extern void *smsmap_irx;
 extern int size_smsmap_irx;
 
+#ifdef __LOAD_DEBUG_MODULES
 #ifdef __DECI2_DEBUG
 extern void *drvtif_irx;
 extern int size_drvtif_irx;
@@ -51,6 +52,7 @@ extern int size_udptty_irx;
 
 extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
+#endif
 #endif
 
 extern int _iop_reboot_count;

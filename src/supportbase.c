@@ -7,6 +7,8 @@
 #include "include/ioman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
+#include <sys/fcntl.h>
+
 /// internal linked list used to populate the list from directory listing
 struct game_list_t {
 	base_game_info_t gameinfo;
@@ -27,44 +29,127 @@ int sbIsSameSize(const char* prefix, int prevSize) {
 	return size == prevSize;
 }
 
-static int isValidIsoName(char *name)
+//0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
+static int isValidIsoName(char *name, int *pSize)
 {
-	// SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
+	// Old ISO image naming format: SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
 
 	// Minimum is 17 char, GameID (11) + "." (1) + filename (1 min.) + ".iso" (4)
 	int size = strlen(name);
-	if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.') && (stricmp(&name[size - 4], ".iso") == 0)) {
-		size -= 16;
-		if (size <= ISO_GAME_NAME_MAX)
-			return size;
+	if(stricmp(&name[size - 4], ".iso") == 0)
+	{
+		if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.') && (size - 16 <= ISO_GAME_NAME_MAX)) {
+			*pSize = size - 16;
+			return GAME_FORMAT_OLD_ISO;
+		}else if(size >= 5) {
+			*pSize = size - 4;
+			return GAME_FORMAT_ISO;
+		}
 	}
 
 	return 0;
 }
 
+static inline int GetStartupExecName(const char *path, char *filename, int maxlength)
+{
+	char *SystemCNF, *NextLine, *p;
+	int result, size;
+	FILE *file;
+
+	if((file = fopen(path, "r")) != NULL)
+	{
+		fseek(file, 0, SEEK_END);
+		size=ftell(file);
+		rewind(file);
+		SystemCNF=malloc(size+1);
+		fread(SystemCNF, 1, size, file);
+		fclose(file);
+		SystemCNF[size]='\0';
+
+		NextLine=strtok(SystemCNF, "\n\r");
+		while((NextLine!=NULL) && (strncmp(NextLine, "BOOT2", 5)!=0))
+		{
+			NextLine=strtok(NULL, "\n\r");
+		}
+
+		free(SystemCNF);
+
+		if(NextLine!=NULL && strcmp(strtok(NextLine, " ="), "BOOT2")==0)
+		{
+			if((p = strtok(NULL, " =")) != NULL && strncmp(p, "cdrom0:\\", 8)==0)
+			{
+				strncpy(filename, p+8, maxlength);	/* Skip the device name part of the path ("cdrom0:\"). */
+				filename[maxlength]='\0';
+				LOG("Startup EXEC path: %s\n", filename);
+				result = 0;
+			}else{
+				LOG("BOOT 2 errror: Unsupported boot device.\n");
+				result=-EINVAL;
+			}
+		}else{
+			LOG("BOOT 2 line not found.\n");
+			result = -EINVAL;
+		}
+	}
+	else result = -ENOENT;
+
+	return result;
+}
+
 static int scanForISO(char* path, char type, struct game_list_t** glist) {
-	int fd, size, count = 0;
+	int fd, size, count = 0, format, MountFD;
+	char fullpath[256], startup[GAME_STARTUP_MAX];
 	fio_dirent_t record;
 
 	if ((fd = fioDopen(path)) > 0) {
 		while (fioDread(fd, &record) > 0) {
-			if ((size = isValidIsoName(record.name)) > 0) {
-				struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
+			if ((format = isValidIsoName(record.name, &size)) > 0) {
+				base_game_info_t *game;
 
-				next->next = *glist;
-				*glist = next;
+				if(format == GAME_FORMAT_OLD_ISO)
+				{
+					struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
 
-				base_game_info_t *game = &(*glist)->gameinfo;
+					next->next = *glist;
+					*glist = next;
 
-				strncpy(game->name, &record.name[GAME_STARTUP_MAX], size);
-				game->name[size] = '\0';
-				strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
-				game->startup[GAME_STARTUP_MAX - 1] = '\0';
-				strncpy(game->extension, &record.name[GAME_STARTUP_MAX + size], sizeof(game->extension));
-				game->extension[sizeof(game->extension)-1] = '\0';
+					game = &(*glist)->gameinfo;
+
+					strncpy(game->name, &record.name[GAME_STARTUP_MAX], size);
+					game->name[size] = '\0';
+					strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
+					game->startup[GAME_STARTUP_MAX - 1] = '\0';
+					strncpy(game->extension, &record.name[GAME_STARTUP_MAX + size], sizeof(game->extension));
+					game->extension[sizeof(game->extension)-1] = '\0';
+
+				}else{
+					sprintf(fullpath, "%s/%s", path, record.name);
+					if((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0 && GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0)
+					{
+						struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
+
+						next->next = *glist;
+						*glist = next;
+
+						game = &(*glist)->gameinfo;
+
+						strcpy(game->startup, startup);
+
+						strncpy(game->name, record.name, size);
+						game->name[size] = '\0';
+
+						strncpy(game->extension, &record.name[size], sizeof(game->extension));
+						game->extension[sizeof(game->extension)-1] = '\0';
+
+						fileXioUmount("iso:");
+					}else{
+						continue;
+					}
+				}
+
 				game->parts = 0x01;
 				game->media = type;
-				game->isISO = 1;
+				game->format = format;
 				game->sizeMB = (record.stat.size >> 20) | (record.stat.hisize << 12);
 
 				count++;
@@ -128,7 +213,7 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 				g->extension[0] = '\0';
 				memcpy(&g->parts, &buffer[47], 1);
 				memcpy(&g->media, &buffer[48], 1);
-				g->isISO = 0;
+				g->format = GAME_FORMAT_USBLD;
 				g->sizeMB = -1;
 				size -= 0x40;
 			}
@@ -152,6 +237,63 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 	if(count > 0) *gamecount = count;
 
 	return count;
+}
+
+u32 sbGetISO9660MaxLBA(const char *path) {
+	u32 maxLBA;
+	FILE *file;
+
+	if((file = fopen(path, "rb")) != NULL) {
+		fseek(file, 16*2048+80, SEEK_SET);
+		if(fread(&maxLBA, sizeof(maxLBA), 1, file) != 1)
+			maxLBA = 0;
+		fclose(file);
+	}else{
+		maxLBA = 0;
+	}
+
+	return maxLBA;
+}
+
+int sbProbeISO9660(const char *path, base_game_info_t* game, u32 layer1_offset) {
+	int result;
+	FILE *file;
+	char buffer[6];
+
+	result = -1;
+	if(game->media == 0x14) {	//Only DVDs can have multiple layers.
+		if((file = fopen(path, "rb")) != NULL) {
+			if(fseek(file, layer1_offset * 2048, SEEK_SET) == 0) {
+				if((fread(buffer, 1, sizeof(buffer), file) == sizeof(buffer)) &&
+					((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
+					result = 0;
+				}
+			}
+			fclose(file);
+		}
+	}
+
+	return result;
+}
+
+int sbProbeISO9660_64(const char *path, base_game_info_t* game, u32 layer1_offset) {
+	int result, fd;
+	char buffer[6];
+
+	result = -1;
+	if(game->media == 0x14) {	//Only DVDs can have multiple layers.
+		if((fd = fileXioOpen(path, O_RDONLY, 0666)) >= 0) {
+			if(fileXioLseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
+				if((fileXioRead(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
+					((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
+					result = 0;
+				}
+			}
+			fileXioClose(fd);
+		}else result = fd;
+	}
+
+	return result;
 }
 
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
@@ -247,7 +389,7 @@ static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int game
 		for (i = 0; i < gamecount; i++) {
 			game = &(*list)[i];
 
-			if (!game->isISO  && (i != excludeID)) {
+			if (game->format == GAME_FORMAT_USBLD  && (i != excludeID)) {
 				memset(buffer, 0, UL_GAME_NAME_MAX);
 				memset(&buffer[UL_GAME_NAME_MAX + 3], 0, GAME_STARTUP_MAX);
 
@@ -268,7 +410,7 @@ void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int 
 	char path[256];
 	base_game_info_t* game = &(*list)[id];
 
-	if (game->isISO) {
+	if (game->format != GAME_FORMAT_USBLD) {
 		if (game->media == 0x12)
 			snprintf(path, sizeof(path), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
 		else
@@ -291,7 +433,7 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 	char oldpath[256], newpath[256];
 	base_game_info_t* game = &(*list)[id];
 
-	if (game->isISO) {
+	if (game->format != GAME_FORMAT_USBLD) {
 		if (game->media == 0x12) {
 			snprintf(oldpath, sizeof(oldpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
 			snprintf(newpath, sizeof(newpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
@@ -328,7 +470,7 @@ config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const
 	if (game->sizeMB != -1)
 		configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 
-	configSetStr(config, CONFIG_ITEM_FORMAT, game->isISO ? "ISO" : "UL");
+	configSetStr(config, CONFIG_ITEM_FORMAT, game->format != GAME_FORMAT_USBLD ? "ISO" : "UL");
 	configSetStr(config, CONFIG_ITEM_MEDIA, game->media == 0x12 ? "CD" : "DVD");
 
 	configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);

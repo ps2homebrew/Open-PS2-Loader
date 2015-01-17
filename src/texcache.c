@@ -144,11 +144,12 @@ GSTEXTURE* cacheGetTexture(image_cache_t* cache, item_list_t* list, int* cacheId
 	}
 
 	if (oldestEntry) {
-		load_image_request_t* req = malloc(sizeof(load_image_request_t));
+		load_image_request_t* req = malloc(sizeof(load_image_request_t) + strlen(value) + 1);
 		req->cache = cache;
 		req->entry = oldestEntry;
 		req->list = list;
-		req->value = value;
+		req->value = (char*)req + sizeof(load_image_request_t);
+		strcpy(req->value, value);
 		req->cacheUID = cache->nextUID;
 
 		cacheClearItem(oldestEntry, 1);

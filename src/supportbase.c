@@ -258,7 +258,7 @@ u32 sbGetISO9660MaxLBA(const char *path) {
 int sbProbeISO9660(const char *path, base_game_info_t* game, u32 layer1_offset) {
 	int result;
 	FILE *file;
-	char buffer[5];
+	char buffer[6];
 
 	result = -1;
 	if(game->media == 0x14) {	//Only DVDs can have multiple layers.
@@ -271,6 +271,26 @@ int sbProbeISO9660(const char *path, base_game_info_t* game, u32 layer1_offset) 
 			}
 			fclose(file);
 		}
+	}
+
+	return result;
+}
+
+int sbProbeISO9660_64(const char *path, base_game_info_t* game, u32 layer1_offset) {
+	int result, fd;
+	char buffer[6];
+
+	result = -1;
+	if(game->media == 0x14) {	//Only DVDs can have multiple layers.
+		if((fd = fileXioOpen(path, O_RDONLY, 0666)) >= 0) {
+			if(fileXioLseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
+				if((fileXioRead(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
+					((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
+					result = 0;
+				}
+			}
+			fileXioClose(fd);
+		}else result = fd;
 	}
 
 	return result;

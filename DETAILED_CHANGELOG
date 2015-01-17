@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev756 - Fixed USBD module loading, DVD9 detection, one printf string in CDVDMAN (potential use of uninitialized pointer)  and EP's name in the credits. - Sun Jan 11 14:22:16 2015 +0800
 rev755 - Prototype attempt at fixing DVD-DL support within PS2ESDL for USB and SMB modes. - Sat Jan 10 23:08:56 2015 +0800
 rev754 - Fixed UI freezing while user cycles through the games list, rolled back changes to the rename() function of the APA driver, integer values in the UI can now wrap around, changed module loading for better performance, fixed theme loading from USB devices, users no longer have to name their ISO images in a specific format and removed debugging code from regular OPL builds. - Sat Jan 10 13:47:04 2015 +0800
 rev753 - Aaand the Scheisse-Kopf Award goes to yours truly. For having convinced a sick - Sun Dec 28 07:57:58 2014 -0500

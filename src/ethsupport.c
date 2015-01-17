@@ -441,7 +441,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		case GAME_FORMAT_ISO:
 			sprintf(settings->files.filename, "%s%s", game->name, game->extension);
 			break;
-		default:	//Default to USBLD.
+		default:	//USBExtreme format.
 			sprintf(settings->files.filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
 			settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
 	}
@@ -480,9 +480,10 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		layer1_start = 0;
 		LOG("DVD detected.\n");
 	} else {
-		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset - 16);
+		layer1_start -= 16;
+		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset);
 	}
-	settings->layer1_start = layer1_start - 16;
+	settings->layer1_start = layer1_start;
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();

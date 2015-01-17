@@ -454,8 +454,6 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	strcpy(settings->smb_password, gPCPassword);
 
 	//Initialize layer 1 information.
-	layer1_offset = layer1_start = 0;
-	layer1_part = 0;
 	switch(game->format) {
 		case GAME_FORMAT_USBLD:
 			sprintf(partname, "%s%s.00", ethPrefix, settings->files.filename);
@@ -477,11 +475,14 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 			layer1_offset = layer1_start;
 	}
 
-	LOG("layer 1 @ part %u sector %lu\n", layer1_part, layer1_offset);
-
-	if(sbProbeISO9660(partname, game, layer1_offset) != 0)
+	if(sbProbeISO9660_64(partname, game, layer1_offset) != 0)
+	{
 		layer1_start = 0;
-	settings->layer1_start = layer1_start;
+		LOG("DVD detected.\n");
+	} else {
+		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset - 16);
+	}
+	settings->layer1_start = layer1_start - 16;
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();

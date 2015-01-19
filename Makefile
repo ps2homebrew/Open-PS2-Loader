@@ -29,14 +29,14 @@ GSM = 0
 #change following line to "0" to build without PS2RD Cheat Engine - DO NOT COMMENT!
 CHEAT = 0
 
-FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
+FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/debug.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/isofs.o
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
-		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/bg_overlay.o obj/freesans.o \
+		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o \
 		obj/icon_sys.o obj/icon_icn.o
 
 MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
@@ -48,7 +48,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
 		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o \
 		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o \
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
-		obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
+		obj/udptty.o obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o obj/ioptrap.o obj/ps2link.o 
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
@@ -67,7 +67,6 @@ BIN2O = $(PS2SDK)/bin/bin2o
 
 ifeq ($(DEBUG),1) 
 	EE_CFLAGS := -D__DEBUG -g
-	EE_OBJS += obj/debug.o obj/udptty.o obj/ioptrap.o obj/ps2link.o
 	ifeq ($(EESIO_DEBUG),1)
 		EE_CFLAGS += -D__EESIO_DEBUG
 	endif
@@ -129,7 +128,6 @@ ifeq ($(INGAME_DEBUG),1)
 	EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
 	CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
 	SMSTCPIP_INGAME_CFLAGS = 
-	EE_CFLAGS += -D__INGAME_DEBUG
 
 	ifeq ($(DECI2_DEBUG),1)
 		EECORE_DEBUG_FLAGS += DECI2_DEBUG=1
@@ -139,7 +137,6 @@ ifeq ($(INGAME_DEBUG),1)
 	endif
 else
 	ifeq ($(IOPCORE_DEBUG),1)
-		EE_CFLAGS += -D__INGAME_DEBUG
 		EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
 		CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
 		MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
@@ -211,8 +208,6 @@ endif
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
 	echo "    * cdvdfsv.irx"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
-	echo "    * isofs.irx"
-	$(MAKE) -C modules/isofs clean
 	echo "    * usbhdfsd.irx"
 	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo "    * usbhdfsdfsv.irx"
@@ -243,14 +238,12 @@ endif
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo "    * hdldsvr.irx"
 	$(MAKE) -C modules/hdd/hdldsvr clean
-ifeq ($(DEBUG),1)
 	echo "    * udptty.irx"
 	$(MAKE) -C modules/debug/udptty clean
 	echo "    * ioptrap.irx"
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo "    * ps2link.irx"
 	$(MAKE) -C modules/debug/ps2link clean
-endif
 	echo "    * pc tools"
 	$(MAKE) -C pc clean
 
@@ -339,11 +332,6 @@ smb_mcemu.s:
 	echo "    * smb_mcemu.irx"
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.smb rebuild
 	$(BIN2S) modules/mcemu/mcemu.irx asm/smb_mcemu.s smb_mcemu_irx
-
-isofs.s:
-	echo "    * isofs.irx"
-	$(MAKE) -C modules/isofs
-	$(BIN2S) modules/isofs/isofs.irx asm/isofs.s isofs_irx
 
 usbd.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/usbd.irx asm/usbd.s usbd_irx
@@ -478,25 +466,22 @@ load6.s:
 
 load7.s:
 	$(BIN2S) gfx/load7.png asm/load7.s load7_png
-
+	
 logo.s:
 	$(BIN2S) gfx/logo.png asm/logo.s logo_png
-
-bg_overlay.s:
-	$(BIN2S) gfx/bg_overlay.png asm/bg_overlay.s bg_overlay_png
-
+		
 usb_icon.s:
 	$(BIN2S) gfx/usb.png asm/usb_icon.s usb_png
-
+	
 hdd_icon.s:
 	$(BIN2S) gfx/hdd.png asm/hdd_icon.s hdd_png
-
+	
 eth_icon.s:
 	$(BIN2S) gfx/eth.png asm/eth_icon.s eth_png
-
+		
 app_icon.s:
 	$(BIN2S) gfx/app.png asm/app_icon.s app_png
-
+  
 cross_icon.s:
 	$(BIN2S) gfx/cross.png asm/cross_icon.s cross_png
 

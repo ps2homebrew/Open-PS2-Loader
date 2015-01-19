@@ -34,7 +34,6 @@ extern void *R1_png;
 extern void *R2_png;
 
 extern void *logo_png;
-extern void *bg_overlay_png;
 
 // Not related to screen size, just to limit at some point
 static int maxWidth = 720;
@@ -74,21 +73,7 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 	{ R1_ICON, "R1", &R1_png },
 	{ R2_ICON, "R2", &R2_png },
 	{ LOGO_PICTURE, "logo", &logo_png },
-	{ BG_OVERLAY, "bg_overlay", &bg_overlay_png },
 };
-
-int texLookupInternalTexId(const char *name) {
-	int i, result;
-
-	for(result = -1,i = 0; i < TEXTURES_COUNT; i++) {
-		if(!strcmp(name, internalDefault[i].name)) {
-			result = internalDefault[i].id;
-			break;
-		}
-	}
-
-	return result;
-}
 
 static void texUpdate(GSTEXTURE* texture, int width, int height) {
 	texture->Width =  width;
@@ -108,6 +93,14 @@ void texPrepare(GSTEXTURE* texture, short psm) {
 
 int texDiscoverLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 	int rc = texPngLoad(texture, path, texId, psm);
+	/*
+	if (rc < 0) {
+		init_scr();
+        	scr_clear();
+	        scr_printf("PNG EXIT CODE: %d\n", rc);
+	        sleep(20);
+        }
+        */
 	if (rc >= 0)
 		return 0;
 	else if (psm == GS_PSM_CT24)
@@ -167,7 +160,7 @@ static void texPngReadData(GSTEXTURE* texture, png_structp pngPtr, png_infop inf
 	int row, rowBytes = png_get_rowbytes(pngPtr, infoPtr);
 	size_t size = gsKit_texture_size_ee(texture->Width, texture->Height, texture->PSM);
 	texture->Mem = memalign(128, size);
-
+	
 	// failed allocation
 	if (!texture->Mem) {
 		LOG("TEXTURES PngReadData: Failed to allocate %d bytes\n", size);
@@ -304,14 +297,14 @@ int texJpgLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 
 			size_t size = gsKit_texture_size_ee(jpg->width, jpg->height, psm);
 			texture->Mem = memalign(128, size);
-
+			
 			// failed allocation
 			if (!texture->Mem) {
 				LOG("TEXTURES JpgLoad: Failed to allocate %d bytes\n", size);
 			} else {
 				// okay
 				texUpdate(texture, jpg->width, jpg->height);
-
+			
 				jpgReadImage(jpg, (void*) texture->Mem);
 				result = 0;
 			}

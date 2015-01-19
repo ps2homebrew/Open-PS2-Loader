@@ -8,29 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
-rev770 - Increased buffer size for path parsing to 32-bytes to handle slightly-malformed paths like how SCE does, fixed broken debug printf() statement, removed unnecessary checks that should be only used for debugging (as SCE doesn't perform them), added an additional backslash to SMB paths for compatibility with some SMB servers and changed the ELF-loading error screen (white) to be always shown regardless of the debug enabled/disabled setting. - Thu Jan 22 21:39:00 2015 +0800
-rev769 - Changed cdrom_open() to set f->mode to O_RDONLY for games that fail to specify O_RDONLY, re-adjusted the path-sanitizing code to function from only cdrom_open() in order to not affect cdrom_dopen(), and corrected non-compliant behaviour of (in-game) SMB support. - Tue Jan 20 20:13:51 2015 +0800
-rev768 - Fixed DVD-DL parameter passing for USB and SMB modes, fixed ISO filename handling (ISO file name without the startup file name) in USB mode. - Sat Jan 17 18:30:20 2015 +0800
-rev767 - Merged ifcaro/open-ps2-loader into default - Fri Jan 16 23:29:57 2015 -0800
-rev766 - update logo.png in gfx folder - Tue Jan 13 01:39:53 2015 -0800
-rev765 - made new gfx icons, removed logo.old, change default theme background color. - Fri Jan 02 13:28:22 2015 -0800
-rev764 - add missing logo.old to gfx folder - Wed Dec 31 14:32:48 2014 -0800
-rev763 - clean up old gfx files - Wed Dec 31 14:16:10 2014 -0800
-rev762 - Merged ifcaro/open-ps2-loader into default - Wed Dec 31 14:02:07 2014 -0800
-rev761 - Merged ifcaro/open-ps2-loader into default - Wed Dec 24 08:33:10 2014 -0800
-rev760 - delete logo.old_old file from gfx folder - Wed Dec 24 03:17:31 2014 -0800
-rev759 - update gfx artwork - Wed Dec 24 02:55:10 2014 -0800
-rev758 - Replaced the path-sanitizing code with something closer to the SCE-original, and fixed cdrom_dread() to NULL-terminate the filename. - Sat Jan 17 12:22:24 2015 +0800
-rev757 - Fixed DVD-DL detection over SMB for images >4GB, fixed DVD-DL handling for USB and SMB, updated OPL to support the new GCC 3.2.3 toolchain. - Sat Jan 17 12:17:15 2015 +0800
-rev756 - Fixed USBD module loading, DVD9 detection, one printf string in CDVDMAN (potential use of uninitialized pointer)  and EP's name in the credits. - Sun Jan 11 14:22:16 2015 +0800
-rev755 - Prototype attempt at fixing DVD-DL support within PS2ESDL for USB and SMB modes. - Sat Jan 10 23:08:56 2015 +0800
-rev754 - Fixed UI freezing while user cycles through the games list, rolled back changes to the rename() function of the APA driver, integer values in the UI can now wrap around, changed module loading for better performance, fixed theme loading from USB devices, users no longer have to name their ISO images in a specific format and removed debugging code from regular OPL builds. - Sat Jan 10 13:47:04 2015 +0800
-rev753 - Aaand the Scheisse-Kopf Award goes to yours truly. For having convinced a sick - Sun Dec 28 07:57:58 2014 -0500
-rev752 - Removed broken game label in GSM screen; removed developer comments. - Wed Dec 24 12:28:28 2014 -0500
-rev751 - Fixed cheats support again, renamed the extension to .CHT from .cht (to be uniform with the naming convention of other OPL-related files), and corrected boundary-limiting when printing the path to the cheat record file in all modes. - Thu Dec 25 00:57:51 2014 +0800
-rev750 - Fixed cheats support. - Thu Dec 25 00:18:17 2014 +0800
-rev749 - Close branch psx_core/the-most-accurate-and-correct-translatio-1384761167035. - Wed Dec 24 16:15:07 2014 +0000
-rev748 - Close branch ps2rd-max-codes-250. - Wed Dec 24 16:15:04 2014 +0000
+rev748 - Fixed cheats support. - Thu Dec 25 00:18:17 2014 +0800
 rev747 - Removed unused compatibility mode 9 strings, added missing cheats status/error messages, updated art assets and modified the cheats engine to not use memory at 0x00080000 directly. - Thu Dec 25 00:01:21 2014 +0800
 rev746 - Fixed SMB support and updated changelog. - Wed Dec 24 10:06:56 2014 +0800
 rev745 - Updated changelog files, removed unused UI strings, updated UI string labels, replaced the hardcoded use of tools within Makefiles with variables like $BIN2S, merged support for the CXD9566R into general DEV9 support, and removed power-on code from in-game DEV9 driver. - Tue Dec 23 23:35:00 2014 +0800

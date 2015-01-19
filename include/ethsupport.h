@@ -29,8 +29,7 @@ typedef struct {
 #define ERROR_ETH_SMB_LISTSHARES		304
 #define ERROR_ETH_SMB_LISTGAMES			305
 
-void ethInit(void);
-int ethLoadModules(void);
+void ethInit();
 item_list_t* ethGetObject(int initOnly);
 
 #endif

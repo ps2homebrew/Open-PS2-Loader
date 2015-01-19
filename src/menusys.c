@@ -562,7 +562,7 @@ void menuHandleInputMenu() {
 			mainMenuCurrent = mainMenu;
 	}
 
-	if (getKeyOn(gSelectButton)) {
+	if (getKeyOn(KEY_CROSS)) {
 		// execute the item via looking at the id of it
 		int id = mainMenuCurrent->item.id;
 
@@ -592,7 +592,7 @@ void menuHandleInputMenu() {
 		readPads();
 	}
 
-	if(getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
+	if(getKeyOn(KEY_START) || getKeyOn(KEY_CIRCLE)) {
 		if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
 			guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_LEFT);
 	}
@@ -619,17 +619,14 @@ void menuHandleInputMain() {
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
 	} else if(getKeyOn(KEY_CROSS)) {
-		if (gSelectButton == KEY_CROSS && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
+		if (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first)
 			guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
 		else
 			selected_item->item->execCross(selected_item->item);
 	} else if(getKeyOn(KEY_TRIANGLE)) {
 		selected_item->item->execTriangle(selected_item->item);
 	} else if(getKeyOn(KEY_CIRCLE)) {
-		if (gSelectButton == KEY_CIRCLE && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-			guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
-		else
-			selected_item->item->execCircle(selected_item->item);
+		selected_item->item->execCircle(selected_item->item);
 	} else if(getKeyOn(KEY_SQUARE)) {
 		selected_item->item->execSquare(selected_item->item);
 	} else if(getKeyOn(KEY_START)) {
@@ -666,19 +663,13 @@ void menuRenderInfo() {
 
 void menuHandleInputInfo() {
 	if(getKeyOn(KEY_CROSS)) {
-		if(gSelectButton == KEY_CIRCLE)
-			guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
-		else
-			selected_item->item->execCross(selected_item->item);
+		selected_item->item->execCross(selected_item->item);
 	} else if(getKey(KEY_UP)) {
 		menuPrevV();
 	} else if(getKey(KEY_DOWN)){
 		menuNextV();
 	} else if(getKeyOn(KEY_CIRCLE)) {
-		if(gSelectButton == KEY_CROSS)
-			guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
-		else
-			selected_item->item->execCircle(selected_item->item);
+		guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
 	} else if(getKey(KEY_L1)) {
 		menuPrevPage();
 	} else if(getKey(KEY_R1)) {

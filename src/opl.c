@@ -26,6 +26,9 @@
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
 
+// for sleep()
+#include <unistd.h>
+
 #ifdef __EESIO_DEBUG
 #include <sio.h>
 #define LOG_INIT()		sio_init(38400, 0, 0, 0, 0)
@@ -77,7 +80,6 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 // forward decl
 static void clearMenuGameList(opl_io_module_t* mdl);
 static void moduleCleanup(opl_io_module_t* mod, int exception);
-static void reset(void);
 
 // frame counter
 static unsigned int frameCounter;
@@ -100,13 +102,12 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 
 	menuAddHint(&mod->menuItem, _STR_SETTINGS, START_ICON);
 	if (!mod->support->enabled)
-		menuAddHint(&mod->menuItem, _STR_START_DEVICE, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
+		menuAddHint(&mod->menuItem, _STR_START_DEVICE, CROSS_ICON);
 	else {
-		if (gUseInfoScreen && gTheme->infoElems.first) {
-			menuAddHint(&mod->menuItem, _STR_INFO, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
-		} else {
-			menuAddHint(&mod->menuItem, _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
-		}
+		if (gUseInfoScreen && gTheme->infoElems.first)
+			menuAddHint(&mod->menuItem, _STR_INFO, CROSS_ICON);
+		else
+			menuAddHint(&mod->menuItem, _STR_RUN, CROSS_ICON);
 
 		if (mod->support->haveCompatibilityMode)
 			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
@@ -115,7 +116,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 
 		if (gEnableDandR) {
 			if (mod->support->itemRename)
-				menuAddHint(&mod->menuItem, _STR_RENAME, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
+				menuAddHint(&mod->menuItem, _STR_RENAME, CIRCLE_ICON);
 			if (mod->support->itemDelete)
 				menuAddHint(&mod->menuItem, _STR_DELETE, SQUARE_ICON);
 		}
@@ -126,7 +127,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 		submenuRebuildCache(mod->subMenu);
 }
 
-static void itemExecSelect(struct menu_item *curMenu) {
+static void itemExecCross(struct menu_item *curMenu) {
 	item_list_t *support = curMenu->userdata;
 
 	if (support) {
@@ -145,40 +146,6 @@ static void itemExecSelect(struct menu_item *curMenu) {
 	}
 	else
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
-}
-
-static void itemExecCancel(struct menu_item *curMenu) {
-	if (!curMenu->current)
-		return;
-
-	if (!gEnableDandR)
-		return;
-
-	item_list_t *support = curMenu->userdata;
-
-	if (support) {
-		if (support->itemRename) {
-			int nameLength = support->itemGetNameLength(curMenu->current->item.id);
-			char newName[nameLength];
-			strncpy(newName, curMenu->current->item.text, nameLength);
-			if (guiShowKeyboard(newName, nameLength)) {
-				support->itemRename(curMenu->current->item.id, newName);
-				if (gAutoRefresh)
-					RefreshAllLists();
-				else
-					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-			}
-		}
-	}
-	else
-		guiMsgBox("NULL Support object. Please report", 0, NULL);
-}
-
-static void itemExecCross(struct menu_item *curMenu) {
-	if(gSelectButton == KEY_CROSS)
-		itemExecSelect(curMenu);
-	else
-		itemExecCancel(curMenu);
 }
 
 static void itemExecTriangle(struct menu_item *curMenu) {
@@ -223,10 +190,30 @@ static void itemExecSquare(struct menu_item *curMenu) {
 }
 
 static void itemExecCircle(struct menu_item *curMenu) {
-	if(gSelectButton == KEY_CIRCLE)
-		itemExecSelect(curMenu);
+	if (!curMenu->current)
+		return;
+
+	if (!gEnableDandR)
+		return;
+
+	item_list_t *support = curMenu->userdata;
+
+	if (support) {
+		if (support->itemRename) {
+			int nameLength = support->itemGetNameLength(curMenu->current->item.id);
+			char newName[nameLength];
+			strncpy(newName, curMenu->current->item.text, nameLength);
+			if (guiShowKeyboard(newName, nameLength)) {
+				support->itemRename(curMenu->current->item.id, newName);
+				if (gAutoRefresh)
+					RefreshAllLists();
+				else
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+			}
+		}
+	}
 	else
-		itemExecCancel(curMenu);
+		guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
 static void itemExecRefresh(struct menu_item *curMenu) {
@@ -462,6 +449,7 @@ static int tryAlternateDevice(int types) {
 	int value;
 
 	// check USB
+	usbLoadModules();
 	if (usbFindPartition(path, "conf_opl.cfg")) {
 		configEnd();
 		configInit(path);
@@ -503,7 +491,6 @@ static int tryAlternateDevice(int types) {
 }
 
 static void _loadConfig() {
-	int value;
 	int result = configReadMulti(lscstatus);
 
 	if (lscstatus & CONFIG_OPL) {
@@ -550,9 +537,6 @@ static void _loadConfig() {
 			configGetStrCopy(configOPL, "pc_user", gPCUserName, sizeof(gPCUserName));
 			configGetStrCopy(configOPL, "pc_pass", gPCPassword, sizeof(gPCPassword));
 			configGetStrCopy(configOPL, "exit_path", gExitPath, sizeof(gExitPath));
-
-			if(configGetInt(configOPL, "swap_select_btn", &value))
-				gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 
 			configGetInt(configOPL, "autosort", &gAutosort);
 			configGetInt(configOPL, "autorefresh", &gAutoRefresh);
@@ -627,8 +611,6 @@ static void _saveConfig() {
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
 		configSetInt(configOPL, "app_mode", gAPPStartMode);
-
-		configSetInt(configOPL, "swap_select_btn", gSelectButton == KEY_CIRCLE ? 0 : 1);
 	}
 
 	lscret = configWriteMulti(lscstatus);
@@ -718,6 +700,7 @@ extern int size_hdldsvr_irx;
 void loadHdldSvr(void) {
 	int ret;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
+	char ipconfig[IPCONFIG_MAX_LEN];
 
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
@@ -726,9 +709,23 @@ void loadHdldSvr(void) {
 
 	unloadPads();
 
-	sysReset(0);
+	sysReset(SYS_LOAD_PAD_MODULES);
 
-	ret = ethLoadModules();
+	int iplen = sysSetIPConfig(ipconfig);
+
+	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	if (ret < 0)
+		return;
+
+	ret = sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
+	if (ret < 0)
+		return;
+
+	ret = sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL);
+	if (ret < 0)
+		return;
+
+	ret = sysLoadModuleBuffer(&smap_irx, size_smap_irx, iplen, ipconfig);
 	if (ret < 0)
 		return;
 
@@ -757,10 +754,16 @@ void loadHdldSvr(void) {
 void unloadHdldSvr(void) {
 	unloadPads();
 
-	reset();
+	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
 
 	LOG_INIT();
 	LOG_ENABLE();
+
+#ifdef _DTL_T10000
+	mcInit(MC_TYPE_XMC);
+#else
+	mcInit(MC_TYPE_MC);
+#endif
 
 	// reinit the input pads
 	padInit(0);
@@ -777,14 +780,39 @@ void unloadHdldSvr(void) {
 }
 
 void handleHdlSrv() {
-	// prepare for hdl, display screen with info
 	guiRenderTextScreen(_l(_STR_STARTINGHDL));
+
+	// prepare for hdl, display screen with info
 	loadHdldSvr();
 
 	guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
 
-	// restore normal functionality again
+/*	int terminate = 0;
+
+	while (1) {
+		if (terminate != 0)
+			guiRenderTextScreen(_l(_STR_STOPHDL));
+		else
+			guiRenderTextScreen(_l(_STR_RUNNINGHDL));
+
+		sleep(2);
+
+		readPads();
+
+		if(getKeyOn(KEY_CIRCLE) && terminate == 0) {
+			terminate++;
+		} else if(getKeyOn(KEY_CROSS) && terminate == 1) {
+			terminate++;
+		} else if (terminate > 0)
+			terminate--;
+
+		if (terminate >= 2)
+			break;
+	} */
+
 	guiRenderTextScreen(_l(_STR_UNLOADHDL));
+
+	// restore normal functionality again
 	unloadHdldSvr();
 }
 
@@ -792,7 +820,9 @@ void handleHdlSrv() {
 // --------------------- Init/Deinit ------------------------
 // ----------------------------------------------------------
 static void reset(void) {
-	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_USB_MODULES | SYS_LOAD_ISOFS_MODULE);
+	sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_PAD_MODULES);
+
+	SifInitRpc(0);
 
 #ifdef _DTL_T10000
 	mcInit(MC_TYPE_XMC);
@@ -826,6 +856,9 @@ void shutdown(int exception) {
 
 
 static void setDefaults(void) {
+	pusbd_irx = NULL;
+	size_pusbd_irx = 0;
+
 	clearIOModuleT(&list_support[USB_MODE]);
 	clearIOModuleT(&list_support[ETH_MODE]);
 	clearIOModuleT(&list_support[HDD_MODE]);
@@ -854,7 +887,6 @@ static void setDefaults(void) {
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
-	gSelectButton = KEY_CIRCLE;	//Default to Japan.
 #ifdef CHEAT
 	gShowCheat = 0;
 #endif
@@ -918,7 +950,7 @@ static void init(void) {
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
 	cacheInit();
 
-	gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
+	InitConsoleRegionData();
 
 	// try to restore config
 	_loadConfig();
@@ -989,3 +1021,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+

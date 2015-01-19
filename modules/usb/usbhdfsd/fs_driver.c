@@ -343,7 +343,7 @@ static int fs_close(iop_file_t* fd) {
 }
 
 //---------------------------------------------------------------------------
-static int fs_lseek(iop_file_t* fd, int offset, int whence) {
+static int fs_lseek(iop_file_t* fd, unsigned long offset, int whence) {
 	fat_driver* fatd;
 	fs_rec* rec = (fs_rec*)fd->privdata;
 

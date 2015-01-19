@@ -251,7 +251,7 @@ static struct ReadAndXRequest_t smb_Read_Request = {
 	{	0x3b000000,
 		SMB_MAGIC,
 		SMB_COM_READ_ANDX,
-		0, 0, 0, SMB_FLAGS2_32BIT_STATUS, "\0", 0, 0, 0, 0
+		0, 0, 0, 0, "\0", 0, 0, 0, 0
 	},
 	12,
 	SMB_COM_NONE,
@@ -263,7 +263,7 @@ static struct WriteAndXRequest_t smb_Write_Request = {
 	{	0,
 		SMB_MAGIC,
 		SMB_COM_WRITE_ANDX,
-		0, 0, 0, SMB_FLAGS2_32BIT_STATUS, "\0", 0, 0, 0, 0
+		0, 0, 0, 0, "\0", 0, 0, 0, 0
 	},
 	14,
 	SMB_COM_NONE,
@@ -360,7 +360,7 @@ receive:
 }
 
 //-------------------------------------------------------------------------
-int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities)
+int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password)
 {
 	char *dialect = "NT LM 0.12";
 	struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
@@ -409,7 +409,6 @@ negociate_retry:
 	if (NPRsp->smbWordcount != 17)
 		goto negociate_retry;
 
-	*capabilities = NPRsp->Capabilities & (CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32);
 	if (NPRsp->Capabilities & SERVER_CAP_UNICODE)
 		server_specs.StringsCF = 2;
 	else
@@ -464,7 +463,7 @@ negociate_retry:
 }
 
 //-------------------------------------------------------------------------
-int smb_SessionSetupAndX(u32 capabilities)
+int smb_SessionSetupAndX(void)
 {
 	struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
 	register int i, offset, CF;
@@ -488,7 +487,7 @@ lbl_session_setup:
 	SSR->MaxMpxCount = server_specs.MaxMpxCount >= 2 ? 2 : (u16)server_specs.MaxMpxCount;
 	SSR->VCNumber = 1;
 	SSR->SessionKey = server_specs.SessionKey;
-	SSR->Capabilities = capabilities;
+	SSR->Capabilities = CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32;
 
 	// Fill ByteField
 	offset = 0;
@@ -633,8 +632,8 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 
 	OR->smbH.Magic = SMB_MAGIC;
 	OR->smbH.Cmd = SMB_COM_OPEN_ANDX;
-	OR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES;
-	OR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
+	OR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES; //| SMB_FLAGS_CASELESS_PATHNAMES;
+	OR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
 	if (CF == 2)
 		OR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
 	OR->smbH.UID = UID;

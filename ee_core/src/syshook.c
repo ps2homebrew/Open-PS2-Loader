@@ -126,7 +126,8 @@ void t_loadElf(void)
 	DPRINTF(" failed\n");
 
 	//Error
-	GS_BGCOLOUR = 0xffffff; //White	- shouldn't happen.
+	if(!DisableDebug)
+		GS_BGCOLOUR = 0xffffff; //White
 	SleepThread();
 }
 

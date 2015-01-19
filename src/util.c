@@ -341,18 +341,28 @@ char toHex(int digit) {
 	return htab[digit & 0x0F];
 }
 
+enum CONSOLE_REGIONS{
+	CONSOLE_REGION_INVALID	= -1,
+	CONSOLE_REGION_JAPAN	= 0,
+	CONSOLE_REGION_USA,	//USA and HK/SG.
+	CONSOLE_REGION_EUROPE,
+	CONSOLE_REGION_CHINA,
+
+	CONSOLE_REGION_COUNT
+};
+
 static short int ConsoleRegion=CONSOLE_REGION_INVALID;
 static char SystemDataFolderPath[]="BRDATA-SYSTEM";
 static char SystemFolderLetter='R';
 
-static void UpdateSystemPaths(void) {
+static void UpdateSystemPaths(void){
 	char regions[CONSOLE_REGION_COUNT]={'I', 'A', 'E', 'C'};
 
 	SystemFolderLetter=regions[ConsoleRegion];
 	SystemDataFolderPath[1]=SystemFolderLetter;
 }
 
-int InitConsoleRegionData(void) {
+int InitConsoleRegionData(void){
 	int result;
 	char romver[16];
 
@@ -382,14 +392,10 @@ int InitConsoleRegionData(void) {
 	return result;
 }
 
-const char *GetSystemDataPath(void) {
+const char *GetSystemDataPath(void){
 	return SystemDataFolderPath;
 }
 
-char GetSystemFolderLetter(void) {
+char GetSystemFolderLetter(void){
 	return SystemFolderLetter;
-}
-
-int GetSystemRegion(void) {
-	return ConsoleRegion;
 }

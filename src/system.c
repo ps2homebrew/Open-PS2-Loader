@@ -10,6 +10,7 @@
 #include "include/system.h"
 #include "include/ioman.h"
 #include "include/ioprp.h"
+#include "include/usbsupport.h"
 #include "include/OSDHistory.h"
 #ifdef VMC
 typedef struct {
@@ -33,6 +34,9 @@ extern int size_imgdrv_irx;
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
 
+extern void *isofs_irx;
+extern int size_isofs_irx;
+
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
 
@@ -47,12 +51,6 @@ extern int size_smap_irx;
 
 extern void *smap_ingame_irx;
 extern int size_smap_ingame_irx;
-
-extern void *udptty_irx;
-extern int size_udptty_irx;
-
-extern void *ioptrap_irx;
-extern int size_ioptrap_irx;
 
 extern void *iomanx_irx;
 extern int size_iomanx_irx;
@@ -94,6 +92,14 @@ extern int size_elfldr_elf;
 
 extern void *pusbd_irx;
 extern int size_pusbd_irx;
+
+#ifdef __INGAME_DEBUG
+extern void *udptty_irx;
+extern int size_udptty_irx;
+
+extern void *ioptrap_irx;
+extern int size_ioptrap_irx;
+#endif
 
 #ifdef __DECI2_DEBUG
 extern void *drvtif_irx;
@@ -217,9 +223,9 @@ void sysReset(int modload_mask) {
 		SifExecModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL, NULL);
 		SifExecModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL, NULL);
 	}
-	if (modload_mask & SYS_LOAD_PAD_MODULES) {
-		SifExecModuleBuffer(&padman_irx, size_padman_irx, 0, NULL, NULL);
-	}
+
+	SifExecModuleBuffer(&padman_irx, size_padman_irx, 0, NULL, NULL);
+
 #else
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 
@@ -227,9 +233,8 @@ void sysReset(int modload_mask) {
 		SifLoadModule("rom0:MCMAN", 0, NULL);
 		SifLoadModule("rom0:MCSERV", 0, NULL);
 	}
-	if (modload_mask & SYS_LOAD_PAD_MODULES) {
-		SifLoadModule("rom0:PADMAN", 0, NULL);
-	}
+
+	SifLoadModule("rom0:PADMAN", 0, NULL);
 #endif
 
 	// clears modules list
@@ -239,6 +244,15 @@ void sysReset(int modload_mask) {
 	sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
 	sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
+	sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+
+	if (modload_mask & SYS_LOAD_USB_MODULES) {
+		usbLoadModules();
+	}
+	if (modload_mask & SYS_LOAD_ISOFS_MODULE) {
+		sysLoadModuleBuffer(&isofs_irx, size_isofs_irx, 0, NULL);
+	}
+
 #ifdef VMC
 	sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 #endif
@@ -360,17 +374,6 @@ int sysGetDiscID(char *hexDiscID) {
 	return 1;
 }
 
-int sysPcmciaCheck(void) {
-	int ret;
-
-	ret = fileXioDevctl("dev9x0:", 0x4401, NULL, 0, NULL, 0);
-
-	if (ret == 0) 	// PCMCIA
-		return 1;
-
-	return 0;	// ExpBay
-}
-
 void sysExecExit() {
 	if(gExitPath[0]!='\0') sysExecElf(gExitPath);
 
@@ -407,16 +410,21 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_pusbd_irx;
 #ifdef __DECI2_DEBUG	//FIXME: I don't know why, but the ingame SMAP driver cannot be used with the DECI2 modules. Perhaps that old bug with the network stack become unresponsive gets triggered? Until this is solved, use the normal SMAP driver.
 	irxptr_tab[n++].irxsize = size_smap_irx;
-	irxptr_tab[n++].irxsize = size_drvtif_irx;
-	irxptr_tab[n++].irxsize = size_tifinet_irx;
 #else
 	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
-	irxptr_tab[n++].irxsize = size_udptty_irx;
-	irxptr_tab[n++].irxsize = size_ioptrap_irx;
 #endif
 	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
 #ifdef VMC
 	irxptr_tab[n++].irxsize = size_mcemu_irx;
+#endif
+#ifdef __INGAME_DEBUG
+#ifdef __DECI2_DEBUG
+	irxptr_tab[n++].irxsize = size_drvtif_irx;
+	irxptr_tab[n++].irxsize = size_tifinet_irx;
+#else
+	irxptr_tab[n++].irxsize = size_udptty_irx;
+	irxptr_tab[n++].irxsize = size_ioptrap_irx;
+#endif
 #endif
 
 	n = 0;
@@ -426,16 +434,22 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = pusbd_irx;
 #ifdef __DECI2_DEBUG
 	irxsrc[n++] = (void *)&smap_irx;
-	irxsrc[n++] = (void *)&drvtif_irx;
-	irxsrc[n++] = (void *)&tifinet_irx;
 #else
 	irxsrc[n++] = (void *)&smap_ingame_irx;
-	irxsrc[n++] = (void *)&udptty_irx;
-	irxsrc[n++] = (void *)&ioptrap_irx;
 #endif
 	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
 #ifdef VMC
 	irxsrc[n++] = (void *)mcemu_irx;
+#endif
+#ifdef __INGAME_DEBUG
+#ifdef __DECI2_DEBUG
+	irxsrc[n++] = (void *)&drvtif_irx;
+	irxsrc[n++] = (void *)&tifinet_irx;
+#else
+
+	irxsrc[n++] = (void *)&udptty_irx;
+	irxsrc[n++] = (void *)&ioptrap_irx;
+#endif
 #endif
 
 	irxsize = 0;
@@ -567,7 +581,7 @@ static int ResetDECI2(void){
 #ifdef VMC
 #define VMC_TEMP1	int size_mcemu_irx, void **mcemu_irx,
 #else
-#define VMC_TEMP1	
+#define VMC_TEMP1
 #endif
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 unsigned int compatflags) {
 	u8 *boot_elf = NULL;

@@ -1,7 +1,7 @@
 /*
   Copyright 2010, Volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include <stdio.h>
@@ -106,12 +106,12 @@ static int rmClutSize(GSCLUT *clut, u32 *size, u32 *w, u32 *h) {
 		default:
 			return 0;
 	};
-	
+
 	switch(clut->ClutPSM) {
-		case GS_PSM_CT32:  
+		case GS_PSM_CT32:
 			*size = (*w) * (*h) * 4;
 			break;
-		case GS_PSM_CT24:  
+		case GS_PSM_CT24:
 			*size = (*w) * (*h) * 4;
 			break;
 		case GS_PSM_CT16:
@@ -123,26 +123,25 @@ static int rmClutSize(GSCLUT *clut, u32 *size, u32 *w, u32 *h) {
 		default:
 			return 0;
 	}
-	
+
 	return 1;
 }
 
 static int rmUploadClut(GSCLUT *clut) {
 	if (clut->VramClut && clut->VramClut != GSKIT_ALLOC_ERROR) // already uploaded
 		return 1;
-	
+
 	u32 size;
 	u32 w, h;
-	
+
 	if (!rmClutSize(clut, &size, &w, &h))
 		return 0;
-	
+
 	size = (-GS_VRAM_BLOCKSIZE_256)&(size+GS_VRAM_BLOCKSIZE_256-1);
 
 	// too large to fit VRAM with the currently allocated space?
 	if(gsGlobal->CurrentPointer + size >= __VRAM_SIZE)
 	{
-		
 		if (size >= __VRAM_SIZE) {
 			// Only log this if the allocation is too large itself
 			LOG("RENDERMAN Requested clut allocation is bigger than VRAM!\n");
@@ -150,16 +149,17 @@ static int rmUploadClut(GSCLUT *clut) {
 			clut->VramClut = GSKIT_ALLOC_ERROR;
 			return 0;
 		}
-		
+
 		rmFlush();
 	}
-	
+
 	clut->VramClut = gsGlobal->CurrentPointer;
 	gsGlobal->CurrentPointer += size;
 
 	rmAppendUploadedCLUTs(clut);
-	
-	gsKit_texture_send(clut->Clut, w,  h, clut->VramClut, clut->ClutPSM, 1, GS_CLUT_PALLETE);
+
+	SyncDCache(clut->Clut, (u8*)(clut->Clut)+size);
+	gsKit_texture_send_inline(gsGlobal, clut->Clut, w, h, clut->VramClut, clut->ClutPSM, 1,  GS_CLUT_PALLETE);
 	return 1;
 }
 
@@ -169,11 +169,11 @@ static int rmUploadTexture(GSTEXTURE* txt) {
 		// upload CLUT first
 		if (!rmUploadClut((GSCLUT *)txt->Clut))
 			return 0;
-		
+
 		// copy the new VramClut
 		txt->VramClut = ((GSCLUT*)txt->Clut)->VramClut;
 	}
-	
+
 	u32 size = gsKit_texture_size(txt->Width, txt->Height, txt->PSM);
 	// alignment of the allocation
 	size = (-GS_VRAM_BLOCKSIZE_256)&(size+GS_VRAM_BLOCKSIZE_256-1);
@@ -181,7 +181,6 @@ static int rmUploadTexture(GSTEXTURE* txt) {
 	// too large to fit VRAM with the currently allocated space?
 	if(gsGlobal->CurrentPointer + size >= __VRAM_SIZE)
 	{
-		
 		if (size >= __VRAM_SIZE) {
 			// Only log this if the allocation is too large itself
 			LOG("RENDERMAN Requested texture allocation is bigger than VRAM!\n");
@@ -196,24 +195,25 @@ static int rmUploadTexture(GSTEXTURE* txt) {
 		if (txt->Clut) {
 			if (!rmUploadClut((GSCLUT *)txt->Clut))
 				return 0;
-			
+
 			txt->VramClut = ((GSCLUT*)txt->Clut)->VramClut;
 		}
-		
+
 		// only could fit CLUT but not the pixmap with it!
 		if(gsGlobal->CurrentPointer + size >= __VRAM_SIZE)
 			return 0;
 	}
-	
+
 	txt->Vram = gsGlobal->CurrentPointer;
 	gsGlobal->CurrentPointer += size;
 
 	rmAppendUploadedTextures(txt);
-	
+
 	// We can't do gsKit_texture_upload since it'd assume txt->Clut is the CLUT table directly
 	// whereas we're using it as a pointer to our structure containg clut data
 	gsKit_setup_tbw(txt);
-	gsKit_texture_send(txt->Mem, txt->Width, txt->Height, txt->Vram, txt->PSM, txt->TBW, txt->Clut ? GS_CLUT_TEXTURE : GS_CLUT_NONE);
+	SyncDCache(txt->Mem, (u8*)(txt->Mem)+size);
+	gsKit_texture_send_inline(gsGlobal, txt->Mem, txt->Width, txt->Height, txt->Vram, txt->PSM, txt->TBW,  txt->Clut ? GS_CLUT_TEXTURE : GS_CLUT_NONE);
 
 	return 1;
 }
@@ -221,7 +221,7 @@ static int rmUploadTexture(GSTEXTURE* txt) {
 int rmPrepareTexture(GSTEXTURE* txt) {
 	if (txt->Vram && txt->Vram != GSKIT_ALLOC_ERROR) // already uploaded
 		return 1;
-	
+
 	return rmUploadTexture(txt);
 }
 
@@ -235,17 +235,17 @@ void rmFlush(void) {
 
 	// release all the uploaded textures
 	gsKit_vram_clear(gsGlobal);
-	
+
 	while (uploadedTextures) {
 		// free clut and txt if those are filled in
 		if (uploadedTextures->txt) {
 			uploadedTextures->txt->Vram = 0;
 			uploadedTextures->txt->VramClut = 0;
 		}
-		
+
 		if (uploadedTextures->clut)
 			uploadedTextures->clut->VramClut = 0;
-		
+
 		struct rm_texture_list_t *entry = uploadedTextures;
 		uploadedTextures = uploadedTextures->next;
 		free(entry);
@@ -258,16 +258,16 @@ void rmStartFrame(void) {
 
 void rmEndFrame(void) {
 	gsKit_set_finish(gsGlobal);
-	
+
 	rmFlush();
 
 	// Wait for draw ops to finish
 	gsKit_finish();
-	
+
 	if(!gsGlobal->FirstFrame)
 	{
 		SleepThread();
-		
+
 		if(gsGlobal->DoubleBuffering == GS_SETTING_ON)
 		{
 			GS_SET_DISPFB2( gsGlobal->ScreenBuffer[gsGlobal->ActiveBuffer & 1] / 8192,
@@ -279,7 +279,7 @@ void rmEndFrame(void) {
 
 	}
 
-	gsKit_setactive(gsGlobal);	
+	gsKit_setactive(gsGlobal);
 }
 
 static int rmOnVSync(void) {
@@ -290,7 +290,7 @@ static int rmOnVSync(void) {
 
 void rmInit() {
 	gsGlobal = gsKit_init_global();
-	
+
 	rm_mode_table[RM_VMODE_AUTO] = gsGlobal->Mode;
 	rm_height_table[RM_VMODE_AUTO] = gsGlobal->Height;
 
@@ -306,7 +306,7 @@ void rmInit() {
 
 	aspectWidth = 1.0f;
 	aspectHeight = 1.0f;
-	
+
 	shiftYVal = 1.0f;
 	shiftY = &shiftYFunc;
 
@@ -506,7 +506,7 @@ void rmDrawRect(int x, int y, int w, int h, u64 color) {
 	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0,1,0,1,0), 0);
 	gsKit_prim_quad(gsGlobal, x + transX, shiftY(y) + transY, x + w + transX, shiftY(y) + transY, x + transX, shiftY(y) + h + transY, x + w + transX, shiftY(y) + h + transY, order, color);
 	order++;
-	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0); 
+	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 }
 
 void rmDrawLine(int x, int y, int x1, int y1, u64 color) {

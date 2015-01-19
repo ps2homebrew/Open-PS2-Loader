@@ -93,14 +93,6 @@ void texPrepare(GSTEXTURE* texture, short psm) {
 
 int texDiscoverLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 	int rc = texPngLoad(texture, path, texId, psm);
-	/*
-	if (rc < 0) {
-		init_scr();
-        	scr_clear();
-	        scr_printf("PNG EXIT CODE: %d\n", rc);
-	        sleep(20);
-        }
-        */
 	if (rc >= 0)
 		return 0;
 	else if (psm == GS_PSM_CT24)
@@ -160,7 +152,7 @@ static void texPngReadData(GSTEXTURE* texture, png_structp pngPtr, png_infop inf
 	int row, rowBytes = png_get_rowbytes(pngPtr, infoPtr);
 	size_t size = gsKit_texture_size_ee(texture->Width, texture->Height, texture->PSM);
 	texture->Mem = memalign(128, size);
-	
+
 	// failed allocation
 	if (!texture->Mem) {
 		LOG("TEXTURES PngReadData: Failed to allocate %d bytes\n", size);
@@ -297,14 +289,14 @@ int texJpgLoad(GSTEXTURE* texture, const char* path, int texId, short psm) {
 
 			size_t size = gsKit_texture_size_ee(jpg->width, jpg->height, psm);
 			texture->Mem = memalign(128, size);
-			
+
 			// failed allocation
 			if (!texture->Mem) {
 				LOG("TEXTURES JpgLoad: Failed to allocate %d bytes\n", size);
 			} else {
 				// okay
 				texUpdate(texture, jpg->width, jpg->height);
-			
+
 				jpgReadImage(jpg, (void*) texture->Mem);
 				result = 0;
 			}

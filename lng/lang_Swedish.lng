@@ -1,0 +1,160 @@
+# translation by Ronald Andersson (aka: dlanor)
+Swedish
+               VÄLKOMMEN TILL ÖPPET PS2 Loader. MAIN kod baserad på källkoden HD PROJEKT <http://psx-scene.com> ANPASSNING TILL USB ADVANCE FORMAT OCH FÖRSTA GUI BY IFCARO <http://ps2dev.ifcaro.net> MEST AV LOADER CORE görs av JIMMIKAELKAEL . ALLA GUI förbättringar sker BY VOLCA . Tack för att använda vårt program ^ ^
+Öppet PS2 Loader % s
+Spara ändringar
+Tillbaka
+Nätverkskonfig
+<ingen values>
+Inställningar sparas ...
+Fel vid skrivning inställningar !
+Utgång
+Inställningar
+USB- Spel
+HDD Spel
+ETH Spel
+appar
+Tema
+Språk
+Nätverk startup error : % d
+Kan inte ansluta till SMB -server : % d
+Kan inte logga in SMB-server : % d
+Kan inte öppna SMB aktie : % d
+På
+off
+OK
+inställningar för spel
+Ta bort alla inställningar
+Tog bort alla nycklar för spelet
+rulla
+Sakta
+medium
+Snabb
+grundmenyspråket
+Ladda från skiva
+vänta
+Fel vid laddning av Game ID
+Automatisk sortering
+Fel vid inläsning språkfilen
+Inaktivera Debug Färger
+Ingen styrenhet upptäcks , vänta ...
+Aktivera Cover Art
+Bredbild
+ström av
+Laddar config
+spara config
+starta enheten
+USB -enhet startläge
+HDD-enhet startläge
+ETH enhet startläge
+Ansökningar startläge
+Auto
+Manuell
+Starta HDL Server
+HDL Server Startar ...
+HDL Server Running ... Tryck [ O ] för att stoppa
+Tryck på [ X ] för att avsluta HDL -server
+HDL Server Lossning ...
+Utgång till
+bakgrundsfärg
+textfärg
+IP
+mask
+Gateway
+Port
+Dela
+Användare
+lösenord
+<Ej set>
+Acceptera
+Objektet ska tas bort permanent , fortsätta?
+Byt namn
+radera
+Kör
+visa inställningar
+Aktivera bort och Byt namn åtgärder
+Kontrollera USB- spel fragmentering
+Minns senast spelade spel
+Avslöja GSM på huvudmenyn
+Fel , är spelet fragmenterad
+Fel , kunde inte köra posten
+Test
+Lämna tomt för GUEST auth .
+Ladda alternativa kärna
+Alternativa data som läses metod
+Haka Syscalls
+0 PSS -läge
+Inaktivera DVD - DL
+Inaktivera IGR
+Använd lOP gängning hacka
+Göm dev9 modul
+Alternativ IGR combo
+Ändra storleken kommer att formatera om VMC
+Skapa
+ändra
+Abort
+Återställ
+Använd generiska
+Konfigurera VMC
+Namn
+Storlek
+Status
+framsteg
+VMC fil existerar
+Ogiltig VMC -fil , är storleken felaktig
+VMC -filen måste skapas
+Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d ) ?
+Automatisk uppdatering
+Om
+kodare
+USB- fördröjning
+USB prefix sökväg
+Lämna tomt för att avsluta till webbläsaren
+Värde i minut ( er ) , 0 för att inaktivera spinn ner
+Automatisk HDD spinn ner
+Videoläge
+Dialog färg
+Vald färg
+Visa info sida
+Info
+Custom ELF
+färgval
+Anslut
+Lämna tomt för att lista aktier
+ETH prefix sökväg
+Backsteg
+Space
+Enter
+läge
+VMC Slot 1
+VMC Slot 2
+spel-ID
+DMA Mode
+V - Sync
+mode 1
+mode 2
+läge 3
+mode 4
+läge 5
+läge 6
+läge 7
+mode 8
+läge 9
+återuppringning timer
+Applicera en försening till cDVD funktioner ( 0 är standard )
+Ethernet hastighet och duplex
+100Mbit full duplex
+100Mbit halv duplex
+10Mbit full duplex
+10Mbit halv duplex
+GSM-inställningar
+Aktivera GSM
+Låter GSM kraft Valda videoläge
+Valt Videoläge
+Videoläge tvingas
+Horisontell Justera
+Ställer Horisontell offset
+Vertikal Justera
+Ställer Vertikal förskjutning
+FMV hoppa
+Tippvagnar Full Motion Video

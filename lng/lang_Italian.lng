@@ -1,0 +1,160 @@
+# translation by 0NullChAr0
+Italian
+               BENVENUTI AL APERTO PS2 Loader. Codice principale BASATI SU CODICE SORGENTE DI HD PROGETTO <http://psx-scene.com> ADATTAMENTO AI USB ADVANCE FORMATO E GUI INIZIALE DA IFCARO <http://ps2dev.ifcaro.net> PIÙ DI CARICATORE NUCLEO è fatta da JIMMIKAELKAEL . Tutti i miglioramenti GUI SONO REALIZZATI CON Volca . Grazie per aver utilizzato il nostro programma ^ ^
+Aperto PS2 Loader % s
+Salva le modifiche
+indietro
+configurazione rete
+<nessun values>
+Impostazioni salvate ...
+Impostazioni di scrittura di errore !
+uscire
+impostazioni
+Giochi USB
+Giochi di HDD
+ETH Giochi
+Apps
+argomento
+lingua
+Errore di rete di avvio : % d
+Impossibile connettersi al server SMB : % d
+Impossibile accedere al server SMB : % d
+Impossibile aprire la condivisione SMB : % d
+on
+spento
+ok
+impostazioni di gioco
+Rimuovere tutte le impostazioni
+Rimosso tutte le chiavi per il gioco
+scorrimento
+rallentare
+Media
+veloce
+menu di default
+Caricare da disco
+attendere prego
+Errore durante il caricamento del Game ID
+ordinamento automatico
+Errore nel caricamento del file di lingua
+Disattiva debug Colori
+Nessun controller rilevato , in attesa ...
+Abilita Cover Art
+Wide screen
+Spegnimento
+Caricamento di config
+Salvataggio config
+dispositivo avviare
+Modalità di avvio del dispositivo USB
+Modalità di avvio dispositivo HDD
+Modalità di avvio dispositivo ETH
+Modalità Applicazioni iniziano
+Auto
+Manuale
+Avviare HDL Server
+HDL Server Avvio ...
+HDL Server Esecuzione di ... Premere il tasto [ O ] per arrestare
+Premere [ X ] per interrompere server di HDL
+HDL Server scarico ...
+Uscita
+colore di sfondo
+colore del testo
+IP
+maschera
+Gateway
+porto
+Condividi
+utente
+parola d'ordine
+<non impostato>
+Accetta
+L'oggetto sarà cancellato in modo permanente , continuare ?
+rinominare
+Cancella
+Esegui
+impostazioni del display
+Abilita cancellare e rinominare le azioni
+Controllare gioco frammentazione USB
+Ricorda ultima partita giocata
+Rivela GSM sul menu principale
+Errore , il gioco è frammentato
+Errore, non poteva correre la voce
+prova
+Lasciare vuoto per auth GUEST .
+Caricare nucleo alternativo
+Dati alternativi leggono metodo
+Sganciare syscalls
+0 Modalità PSS
+Disabilitare DVD- DL
+Disabilita IGR
+Utilizzare IOP threading mod
+Nascondere modulo Dev9
+Combo IGR alternativo
+Modifica delle dimensioni riformatta il VMC
+creare
+Modifica
+Abort
+Ripristina
+uso generico
+Configura VMC
+nome
+Dimensione
+stato
+Progress
+File VMC esiste
+Invalid file di VMC , dimensione non è corretta
+Bisogno di file VMC da creare
+Errore con VMC % s , continuare con MC fisico ( slot% d ) ?
+aggiornamento automatico
+circa
+Coders
+ritardo USB
+Percorso prefisso USB
+Lasciare vuoto per uscire al browser
+Valore in minuto ( s ) , 0 per disabilitare la rotazione verso il basso
+Automatico HDD spin down
+modalità Video
+colore finestra
+colore selezionato
+Visualizzazione pagina info
+Info
+personalizzato ELF
+selezione di colore
+ricollegare
+Lasciare vuoto per elencare le azioni
+ETH percorso prefisso
+Backspace
+spazio
+Inserisci
+modalità
+VMC Slot 1
+VMC Slot 2
+game ID
+DMA Mode
+V -Sync
+modalità 1
+mode 2
+modalità 3
+modalità 4
+modo 5
+modo 6
+modo 7
+modo 8
+modalità di 9
+timer di richiamata
+Applicare un ritardo di funzioni CDVD (0 è il valore predefinito )
+Velocità Ethernet e le impostazioni duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Impostazioni GSM
+Abilita GSM
+Consente di forza GSM la modalità video selezionata
+Video Mode selezionato
+Modalità Video di essere costretti
+orizzontale Regolare
+Imposta Offset orizzontale
+verticale Regolare
+Imposta Vertical Offset
+FMV salto
+Salta le Full Motion Video

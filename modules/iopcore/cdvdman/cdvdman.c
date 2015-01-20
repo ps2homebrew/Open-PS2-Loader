@@ -355,16 +355,17 @@ static void fs_init(void)
 #endif
 
 #ifdef SMB_DRIVER
-	register int i = 0;
+	int i = 0;
+	u32 capabilities;
 	char tmp_str[256];
 
 	ps2ip_init();
 
 	// Open the Connection with SMB server
-	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password);
+	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &capabilities);
 
 	// open a session
-	smb_SessionSetupAndX();
+	smb_SessionSetupAndX(capabilities);
 
 	// Then tree connect on the share resource
 	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.pc_ip, cdvdman_settings.pc_share);
@@ -1223,20 +1224,15 @@ static FHANDLE *cdvdman_getfilefreeslot(void)
 }
 
 //--------------------------------------------------------------
-static int cdrom_open(iop_file_t *f, const char *filename, int mode)
+static int cdvdman_open(iop_file_t *f, const char *filename, int mode)
 {
-	register int r = 0;
+	int r = 0;
 	FHANDLE *fh;
 	cd_file_t cdfile;
-
-	if (!filename)
-		return -ENOENT;
 
 	WaitSema(cdrom_io_sema);
 
 	cdvdman_init();
-
-	DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
 
 	if (f->unit < 2) {
 		fh = cdvdman_getfilefreeslot();
@@ -1245,16 +1241,12 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 			if (r) {
 				f->privdata = fh;
 				fh->f = f;
-				if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
-					if (f->mode == 0)
-						f->mode = r;
-				}
 				fh->filesize = cdfile.size;
 				fh->lsn = cdfile.lsn;
 				fh->position = 0;
 				r = 0;
 
-				DPRINTF("cdrom_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
+				DPRINTF("open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
 			}
 			else
 				r = -ENOENT;
@@ -1270,6 +1262,30 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 	return r;
 }
 
+static int cdrom_open(iop_file_t *f, const char *filename, int mode)
+{
+	int result, len;
+	char path_buffer[128];
+
+	DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
+
+	len = strlen(filename);
+	strcpy(path_buffer, filename);
+
+	//Correct filenames (for files), if necessary.
+	if((len >= 3) && (path_buffer[len-1] != '1' || path_buffer[len-2] != ';'))
+	{
+		path_buffer[len]	= ';';
+		path_buffer[len+1]	= '1';
+		path_buffer[len+2]	= '\0';
+	}
+
+	if((result = cdvdman_open(f, path_buffer, mode)) >= 0)
+		f->mode = O_RDONLY;
+
+	return result;
+}
+
 //--------------------------------------------------------------
 static int cdrom_close(iop_file_t *f)
 {
@@ -1279,8 +1295,8 @@ static int cdrom_close(iop_file_t *f)
 
 	DPRINTF("cdrom_close\n");
 
-	if (fh)
-		mips_memset(fh, 0, sizeof(FHANDLE));
+	mips_memset(fh, 0, sizeof(FHANDLE));
+	f->mode = 0;
 
 	SignalSema(cdrom_io_sema);
 
@@ -1404,7 +1420,9 @@ static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 //--------------------------------------------------------------
 static int cdrom_dopen(iop_file_t *f, const char *dirname)
 {
-	return cdrom_open(f, dirname, 8);
+	DPRINTF("cdrom_dopen %s layer %d\n", filename, f->unit);
+
+	return cdvdman_open(f, dirname, 8);
 }
 
 //--------------------------------------------------------------
@@ -1508,9 +1526,6 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
 {
 	int result;
 
-	if (!name)
-		return -ENOENT;
-
 	WaitSema(cdrom_io_sema);
 
 	result = 0;
@@ -1608,8 +1623,7 @@ static void cdvdman_trimspaces(char* str)
 //-------------------------------------------------------------------------
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer)
 {
-	char cdvdman_dirname[17];	// Same as below, but give space for 2 additional characters, in case the filename needs the version number appended to it.
-	char cdvdman_curdir[15];	// Maximum 14 characters: the filename (8) + '.' + extension (3) + ';' + '1'.
+	char cdvdman_dirname[15], cdvdman_curdir[15];	// Maximum 14 characters: the filename (8) + '.' + extension (3) + ';' + '1'.
 	char *p = (char *)name;
 	char *slash;
 	int r, len, filename_len;
@@ -1636,7 +1650,7 @@ lbl_startlocate:
 	// if a slash was found
 	if (slash != NULL) {
 
-		if (len >= sizeof(cdvdman_dirname) - 2)
+		if (len >= sizeof(cdvdman_dirname))
 			return NULL;
 
 		// copy the path into main 'dir' var
@@ -1646,18 +1660,10 @@ lbl_startlocate:
 	else {
 		len = strlen(p);
 
-		if (len >= sizeof(cdvdman_dirname) - 2)
+		if (len >= sizeof(cdvdman_dirname))
 			return NULL;
 
 		strcpy(cdvdman_dirname, p);
-
-		//Correct filenames (for files), if necessary.
-		if((len >= 3) && (cdvdman_dirname[len-1] != '1' || cdvdman_dirname[len-2] != ';'))
-		{
-			cdvdman_dirname[len]	= ';';
-			cdvdman_dirname[len+1]	= '1';
-			cdvdman_dirname[len+2]	= '\0';
-		}
 	}
 
 	while (tocLength > 0)	{

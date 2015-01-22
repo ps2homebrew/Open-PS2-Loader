@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev769 - Changed cdrom_open() to set f->mode to O_RDONLY for games that fail to specify O_RDONLY, re-adjusted the path-sanitizing code to function from only cdrom_open() in order to not affect cdrom_dopen(), and corrected non-compliant behaviour of (in-game) SMB support. - Tue Jan 20 20:13:51 2015 +0800
 rev768 - Fixed DVD-DL parameter passing for USB and SMB modes, fixed ISO filename handling (ISO file name without the startup file name) in USB mode. - Sat Jan 17 18:30:20 2015 +0800
 rev767 - Merged ifcaro/open-ps2-loader into default - Fri Jan 16 23:29:57 2015 -0800
 rev766 - update logo.png in gfx folder - Tue Jan 13 01:39:53 2015 -0800

@@ -373,9 +373,9 @@ static void fs_init(void)
 
 	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
 		if (cdvdman_settings.pc_prefix[0]) {
-			sprintf(tmp_str, "%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
+			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
 		} else {
-			sprintf(tmp_str, "%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
+			sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
 		}
 
 		smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i++], 0);
@@ -383,9 +383,9 @@ static void fs_init(void)
 		// Open all parts files
 		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
 			if (cdvdman_settings.pc_prefix[0])
-				sprintf(tmp_str, "%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.files.filename, i);
+				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.files.filename, i);
 			else
-				sprintf(tmp_str, "%s.%02x", cdvdman_settings.files.filename, i);
+				sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.files.filename, i);
 
 			smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i], 0);
 		}
@@ -1265,23 +1265,23 @@ static int cdvdman_open(iop_file_t *f, const char *filename, int mode)
 static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 {
 	int result, len;
-	char path_buffer[128];
+	char path_buffer[128];	//Original buffer size in the SCE CDVDMAN module.
 
 	DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
 
 	len = strlen(filename);
-	strcpy(path_buffer, filename);
+	strcpy(path_buffer, filename);	//SCE does not perform bounds-checking.
 
 	//Correct filenames (for files), if necessary.
-	if((len >= 3) && (path_buffer[len-1] != '1' || path_buffer[len-2] != ';'))
-	{
+	if((len >= 3) && (path_buffer[len-1] != '1' || path_buffer[len-2] != ';'))	//SCE does this too, hence assuming that the version suffix will be either totally there or absent. The only version supported is 1.
+	{	//Instead of using strcat like the original, append the version suffix manually for efficiency.
 		path_buffer[len]	= ';';
 		path_buffer[len+1]	= '1';
 		path_buffer[len+2]	= '\0';
 	}
 
 	if((result = cdvdman_open(f, path_buffer, mode)) >= 0)
-		f->mode = O_RDONLY;
+		f->mode = O_RDONLY;	//SCE fixes the open flags to O_RDONLY for open().
 
 	return result;
 }
@@ -1296,7 +1296,7 @@ static int cdrom_close(iop_file_t *f)
 	DPRINTF("cdrom_close\n");
 
 	mips_memset(fh, 0, sizeof(FHANDLE));
-	f->mode = 0;
+	f->mode = 0;	//SCE invalidates FDs by clearing the open flags.
 
 	SignalSema(cdrom_io_sema);
 
@@ -1420,7 +1420,7 @@ static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 //--------------------------------------------------------------
 static int cdrom_dopen(iop_file_t *f, const char *dirname)
 {
-	DPRINTF("cdrom_dopen %s layer %d\n", filename, f->unit);
+	DPRINTF("cdrom_dopen %s layer %d\n", dirname, f->unit);
 
 	return cdvdman_open(f, dirname, 8);
 }
@@ -1623,7 +1623,12 @@ static void cdvdman_trimspaces(char* str)
 //-------------------------------------------------------------------------
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer)
 {
-	char cdvdman_dirname[15], cdvdman_curdir[15];	// Maximum 14 characters: the filename (8) + '.' + extension (3) + ';' + '1'.
+	char cdvdman_dirname[32];	/* Like below, but follow the original SCE limitation of 32-characters.
+						Some games specify filenames like "\\FILEFILE.EXT;1", which result in a length longer than just 14.
+						SCE does not perform bounds-checking on this buffer.	*/
+	char cdvdman_curdir[15];	/* Maximum 14 characters: the filename (8) + '.' + extension (3) + ';' + '1'.
+						Unlike the SCE original which used a 32-character buffer,
+						we'll assume that ISO9660 disc images are all _strictly_ compliant with ISO9660 level 1.	*/
 	char *p = (char *)name;
 	char *slash;
 	int r, len, filename_len;
@@ -1649,19 +1654,28 @@ lbl_startlocate:
 
 	// if a slash was found
 	if (slash != NULL) {
-
+#ifdef __IOPCORE_DEBUG
 		if (len >= sizeof(cdvdman_dirname))
-			return NULL;
+		{
+			DPRINTF("cdvdman_locatefile: segment too long: (%d chars) \"%s\"\n", len, p);
+			asm volatile("break\n");
+		}
+#endif
 
 		// copy the path into main 'dir' var
 		strncpy(cdvdman_dirname, p, len);
 		cdvdman_dirname[len] = 0;
 	}
 	else {
+#ifdef __IOPCORE_DEBUG
 		len = strlen(p);
 
 		if (len >= sizeof(cdvdman_dirname))
-			return NULL;
+		{
+			DPRINTF("cdvdman_locatefile: filename too long: (%d chars) \"%s\"\n", len, p);
+			asm volatile("break\n");
+		}
+#endif
 
 		strcpy(cdvdman_dirname, p);
 	}
@@ -1731,9 +1745,6 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	u32 lsn;
 	struct dirTocEntry *tocEntryPointer;
 	layer_info_t *pLayerInfo;
-
-	if ((!pcdfile) || (!name))
-		return 0;
 
 	pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0];	//SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
 

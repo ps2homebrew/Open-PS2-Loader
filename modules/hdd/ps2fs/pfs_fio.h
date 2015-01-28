@@ -42,7 +42,7 @@ int	pfsOpen(iop_file_t *f, const char *name, int flags, int mode);
 int	pfsClose(iop_file_t *f);
 int	pfsRead(iop_file_t *f, void *buf, int size);
 int	pfsWrite(iop_file_t *f, void *buf, int size);
-int	pfsLseek(iop_file_t *f, unsigned long pos, int whence);
+int	pfsLseek(iop_file_t *f, int pos, int whence);
 int	pfsRemove(iop_file_t *f, const char *name);
 int	pfsMkdir(iop_file_t *f, const char *path, int mode);
 int	pfsRmdir(iop_file_t *f, const char *path);

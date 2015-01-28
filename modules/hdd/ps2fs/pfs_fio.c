@@ -690,7 +690,7 @@ s64 _seek(pfs_file_slot_t *fileSlot, s64 offset, int whence, int mode)
 	return newPos;
 }
 
-int pfsLseek(iop_file_t *f, unsigned long pos, int whence)
+int pfsLseek(iop_file_t *f, int pos, int whence)
 {
 	pfs_file_slot_t *fileSlot = (pfs_file_slot_t*)f->privdata;
 	int result = checkFileSlot(fileSlot);

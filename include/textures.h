@@ -29,6 +29,7 @@ enum INTERNAL_TEXTURE{
 	R1_ICON,
 	R2_ICON,
 	LOGO_PICTURE,
+	BG_OVERLAY,
 
 	TEXTURES_COUNT
 };
@@ -41,6 +42,7 @@ enum INTERNAL_TEXTURE{
 #define ERR_MISSING_ALPHA -6
 #define ERR_BAD_DEPTH     -7
 
+int texLookupInternalTexId(const char *name);
 int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
 int texJpgLoad(GSTEXTURE* texture, const char* path, int texId, short psm);
 void texPrepare(GSTEXTURE* texture, short psm);

@@ -333,13 +333,13 @@ int sysGetDiscID(char *hexDiscID) {
 	if (sceCdStatus() == SCECdErOPENS) // If tray is open, error
 		return -1;
 
-	while (sceCdGetDiskType() == SCECdDETCT) {;}	// Trick : if tray is open before startup it detects it as closed...
+	while (sceCdGetDiskType() == SCECdDETCT) {;}
 	if (sceCdGetDiskType() == SCECdNODISC)
 		return -1;
 
 	sceCdDiskReady(0);
 	LOG("SYSTEM Disc drive is ready\n");
-	int cdmode = sceCdGetDiskType();	// If tray is closed, get disk type
+	int cdmode = sceCdGetDiskType();
 	if (cdmode == SCECdNODISC)
 		return -1;
 
@@ -350,10 +350,11 @@ int sysGetDiscID(char *hexDiscID) {
 		return -2;
 	}
 
+	LOG("SYSTEM Disc standby\n");
 	sceCdStandby();
 	sceCdSync(0);
-	LOG("SYSTEM Disc standby\n");
 
+	LOG("SYSTEM Disc read key\n");
 	if(sceCdReadKey(0, 0, 0x4b, key) == 0){
 		LOG("SYSTEM Cannot read CD/DVD key.\n");
 		sceCdStop();

@@ -34,6 +34,7 @@ extern void *R1_png;
 extern void *R2_png;
 
 extern void *logo_png;
+extern void *bg_overlay_png;
 
 // Not related to screen size, just to limit at some point
 static int maxWidth = 720;
@@ -73,7 +74,21 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 	{ R1_ICON, "R1", &R1_png },
 	{ R2_ICON, "R2", &R2_png },
 	{ LOGO_PICTURE, "logo", &logo_png },
+	{ BG_OVERLAY, "bg_overlay", &bg_overlay_png },
 };
+
+int texLookupInternalTexId(const char *name) {
+	int i, result;
+
+	for(result = -1,i = 0; i < TEXTURES_COUNT; i++) {
+		if(!strcmp(name, internalDefault[i].name)) {
+			result = internalDefault[i].id;
+			break;
+		}
+	}
+
+	return result;
+}
 
 static void texUpdate(GSTEXTURE* texture, int width, int height) {
 	texture->Width =  width;

@@ -36,7 +36,7 @@ FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHist
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
-		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/freesans.o \
+		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/bg_overlay.o obj/freesans.o \
 		obj/icon_sys.o obj/icon_icn.o
 
 MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
@@ -478,22 +478,25 @@ load6.s:
 
 load7.s:
 	$(BIN2S) gfx/load7.png asm/load7.s load7_png
-	
+
 logo.s:
 	$(BIN2S) gfx/logo.png asm/logo.s logo_png
-		
+
+bg_overlay.s:
+	$(BIN2S) gfx/bg_overlay.png asm/bg_overlay.s bg_overlay_png
+
 usb_icon.s:
 	$(BIN2S) gfx/usb.png asm/usb_icon.s usb_png
-	
+
 hdd_icon.s:
 	$(BIN2S) gfx/hdd.png asm/hdd_icon.s hdd_png
-	
+
 eth_icon.s:
 	$(BIN2S) gfx/eth.png asm/eth_icon.s eth_png
-		
+
 app_icon.s:
 	$(BIN2S) gfx/app.png asm/app_icon.s app_png
-  
+
 cross_icon.s:
 	$(BIN2S) gfx/cross.png asm/cross_icon.s cross_png
 

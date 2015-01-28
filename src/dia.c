@@ -68,7 +68,7 @@ int diaShowKeyb(char* text, int maxLen) {
 	cmdicons[1] = thmGetTexture(TRIANGLE_ICON);
 	cmdicons[2] = thmGetTexture(START_ICON);
 	cmdicons[3] = thmGetTexture(SELECT_ICON);
-	cmdicons[4] = thmGetTexture(CIRCLE_ICON);
+	cmdicons[4] = thmGetTexture(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
 
 	while(1) {
 		readPads();
@@ -142,7 +142,7 @@ int diaShowKeyb(char* text, int maxLen) {
 				selchar = (selchar + KEYB_WIDTH) % KEYB_ITEMS;
 			else
 				selcommand = (selcommand + 1) % KEYB_HEIGHT;
-		} else if (getKeyOn(KEY_CROSS)) {
+		} else if (getKeyOn(gSelectButton)) {
 			if (len < (maxLen - 1) && selchar > -1) {
 				len++;
 				c[0] = keyb[selchar];
@@ -188,7 +188,7 @@ int diaShowKeyb(char* text, int maxLen) {
 				keyb = keyb1;
 		}
 
-		if (getKey(KEY_CIRCLE))
+		if (getKey(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE))
 			break;
 	}
 
@@ -249,6 +249,9 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
 		rmDrawRect(x + 5, y + 5, 60, 60, dcol);
 
+		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_OK, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
+		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+
 		rmEndFrame();
 
 		if (getKey(KEY_LEFT)) {
@@ -263,13 +266,13 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 		} else if (getKey(KEY_DOWN)) {
 			if (selc < 2)
 				selc++;
-		} else if (getKeyOn(KEY_CROSS)) {
+		} else if (getKeyOn(gSelectButton)) {
 			*r = col[0];
 			*g = col[1];
 			*b = col[2];
 			ret = 1;
 			break;
-		} else if (getKeyOn(KEY_CIRCLE)) {
+		} else if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
 			ret = 0;
 			break;
 		}
@@ -511,6 +514,9 @@ void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFo
 	if ((cur != NULL) && (!haveFocus) && (cur->hintId != -1)) {
 		diaDrawHint(cur->hintId);
 	}
+
+	guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_SELECT, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
+	guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 }
 
 /// sets the ui item value to the default again
@@ -531,13 +537,13 @@ static void diaResetValue(struct UIItem *item) {
 
 static int diaHandleInput(struct UIItem *item, int *modified) {
 	// circle loses focus, sets old values first
-	if (getKeyOn(KEY_CIRCLE)) {
+	if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
 		diaResetValue(item);
 		return 0;
 	}
 
 	// cross loses focus without setting default
-	if (getKeyOn(KEY_CROSS)) {
+	if (getKeyOn(gSelectButton)) {
 		*modified = 0;
 		return 0;
 	}
@@ -807,13 +813,13 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 			}
 
 			// circle breaks focus or exits with false result
-			if (getKeyOn(KEY_CIRCLE)) {
+			if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
 				diaRestoreScrollSpeed();
 				return 0;
 			}
 
 			// see what key events we have
-			if (getKeyOn(KEY_CROSS)) {
+			if (getKeyOn(gSelectButton)) {
 				haveFocus = 1;
 
 				if (cur->type == UI_BUTTON) {

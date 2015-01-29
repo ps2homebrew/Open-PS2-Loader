@@ -2203,7 +2203,7 @@ int fat_writeFile(fat_driver* fatd, fat_dir* fatDir, int* updateClusterIndices, 
 
 				/*	SP193: By right, the sector's content should be retained if it has already been allocated and is going to be partially written-to.
 					Since this function wasn't designed to be able to tell allocated sectors from unallocated sectors, assume that all partial writes are to allocated sectors. */
-				if(bufSize != mass_device->sectorSize)
+				if((bufSize - dataSkip) != mass_device->sectorSize)
 					ret = READ_SECTOR(fatd->dev, startSector + j, sbuf);
 				else
 					ret = ALLOC_SECTOR(fatd->dev, startSector + j, sbuf);

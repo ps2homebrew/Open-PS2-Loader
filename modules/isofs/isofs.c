@@ -420,7 +420,7 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
 	return rpos;
 }
 
-static int IsofsLseek(iop_file_t *f, unsigned long offset, int where)
+static int IsofsLseek(iop_file_t *f, int offset, int where)
 {
 	int r;
 	FHANDLE *fh = (FHANDLE *)f->privdata;

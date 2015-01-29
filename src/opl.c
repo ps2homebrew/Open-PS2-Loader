@@ -100,12 +100,13 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 
 	menuAddHint(&mod->menuItem, _STR_SETTINGS, START_ICON);
 	if (!mod->support->enabled)
-		menuAddHint(&mod->menuItem, _STR_START_DEVICE, CROSS_ICON);
+		menuAddHint(&mod->menuItem, _STR_START_DEVICE, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
 	else {
-		if (gUseInfoScreen && gTheme->infoElems.first)
-			menuAddHint(&mod->menuItem, _STR_INFO, CROSS_ICON);
-		else
-			menuAddHint(&mod->menuItem, _STR_RUN, CROSS_ICON);
+		if (gUseInfoScreen && gTheme->infoElems.first) {
+			menuAddHint(&mod->menuItem, _STR_INFO, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
+		} else {
+			menuAddHint(&mod->menuItem, _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
+		}
 
 		if (mod->support->haveCompatibilityMode)
 			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
@@ -114,7 +115,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 
 		if (gEnableDandR) {
 			if (mod->support->itemRename)
-				menuAddHint(&mod->menuItem, _STR_RENAME, CIRCLE_ICON);
+				menuAddHint(&mod->menuItem, _STR_RENAME, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
 			if (mod->support->itemDelete)
 				menuAddHint(&mod->menuItem, _STR_DELETE, SQUARE_ICON);
 		}
@@ -125,7 +126,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 		submenuRebuildCache(mod->subMenu);
 }
 
-static void itemExecCross(struct menu_item *curMenu) {
+static void itemExecSelect(struct menu_item *curMenu) {
 	item_list_t *support = curMenu->userdata;
 
 	if (support) {
@@ -144,6 +145,40 @@ static void itemExecCross(struct menu_item *curMenu) {
 	}
 	else
 		guiMsgBox("NULL Support object. Please report", 0, NULL);
+}
+
+static void itemExecCancel(struct menu_item *curMenu) {
+	if (!curMenu->current)
+		return;
+
+	if (!gEnableDandR)
+		return;
+
+	item_list_t *support = curMenu->userdata;
+
+	if (support) {
+		if (support->itemRename) {
+			int nameLength = support->itemGetNameLength(curMenu->current->item.id);
+			char newName[nameLength];
+			strncpy(newName, curMenu->current->item.text, nameLength);
+			if (guiShowKeyboard(newName, nameLength)) {
+				support->itemRename(curMenu->current->item.id, newName);
+				if (gAutoRefresh)
+					RefreshAllLists();
+				else
+					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+			}
+		}
+	}
+	else
+		guiMsgBox("NULL Support object. Please report", 0, NULL);
+}
+
+static void itemExecCross(struct menu_item *curMenu) {
+	if(gSelectButton == KEY_CROSS)
+		itemExecSelect(curMenu);
+	else
+		itemExecCancel(curMenu);
 }
 
 static void itemExecTriangle(struct menu_item *curMenu) {
@@ -188,30 +223,10 @@ static void itemExecSquare(struct menu_item *curMenu) {
 }
 
 static void itemExecCircle(struct menu_item *curMenu) {
-	if (!curMenu->current)
-		return;
-
-	if (!gEnableDandR)
-		return;
-
-	item_list_t *support = curMenu->userdata;
-
-	if (support) {
-		if (support->itemRename) {
-			int nameLength = support->itemGetNameLength(curMenu->current->item.id);
-			char newName[nameLength];
-			strncpy(newName, curMenu->current->item.text, nameLength);
-			if (guiShowKeyboard(newName, nameLength)) {
-				support->itemRename(curMenu->current->item.id, newName);
-				if (gAutoRefresh)
-					RefreshAllLists();
-				else
-					ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-			}
-		}
-	}
+	if(gSelectButton == KEY_CIRCLE)
+		itemExecSelect(curMenu);
 	else
-		guiMsgBox("NULL Support object. Please report", 0, NULL);
+		itemExecCancel(curMenu);
 }
 
 static void itemExecRefresh(struct menu_item *curMenu) {
@@ -488,6 +503,7 @@ static int tryAlternateDevice(int types) {
 }
 
 static void _loadConfig() {
+	int value;
 	int result = configReadMulti(lscstatus);
 
 	if (lscstatus & CONFIG_OPL) {
@@ -534,6 +550,9 @@ static void _loadConfig() {
 			configGetStrCopy(configOPL, "pc_user", gPCUserName, sizeof(gPCUserName));
 			configGetStrCopy(configOPL, "pc_pass", gPCPassword, sizeof(gPCPassword));
 			configGetStrCopy(configOPL, "exit_path", gExitPath, sizeof(gExitPath));
+
+			if(configGetInt(configOPL, "swap_select_btn", &value))
+				gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 
 			configGetInt(configOPL, "autosort", &gAutosort);
 			configGetInt(configOPL, "autorefresh", &gAutoRefresh);
@@ -608,6 +627,8 @@ static void _saveConfig() {
 		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
 		configSetInt(configOPL, "app_mode", gAPPStartMode);
+
+		configSetInt(configOPL, "swap_select_btn", gSelectButton == KEY_CIRCLE ? 0 : 1);
 	}
 
 	lscret = configWriteMulti(lscstatus);
@@ -833,6 +854,7 @@ static void setDefaults(void) {
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
+	gSelectButton = KEY_CIRCLE;	//Default to Japan.
 #ifdef CHEAT
 	gShowCheat = 0;
 #endif
@@ -896,7 +918,7 @@ static void init(void) {
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
 	cacheInit();
 
-	InitConsoleRegionData();
+	gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
 
 	// try to restore config
 	_loadConfig();

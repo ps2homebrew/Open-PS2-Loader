@@ -322,7 +322,7 @@ int hddWrite(iop_file_t *f, void *buf, int size)
 	return fioDataTransfer(f, buf, size, ATA_DIR_WRITE);
 }
 
-int hddLseek(iop_file_t *f, unsigned long post, int whence)
+int hddLseek(iop_file_t *f, int post, int whence)
 {
 	int 	rv=0;
 	hdd_file_slot_t *fileSlot;

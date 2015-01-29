@@ -211,10 +211,14 @@ void guiShowAbout() {
 }
 
 void guiShowConfig() {
+	int value;
+
 	// configure the enumerations
+	const char* selectButtons[] = { _l(_STR_CIRCLE), _l(_STR_CROSS), NULL };
 	const char* deviceNames[] = { _l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL };
 	const char* deviceModes[] = { _l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL };
 
+	diaSetEnum(diaConfig, CFG_SELECTBUTTON, selectButtons);
 	diaSetEnum(diaConfig, CFG_DEFDEVICE, deviceNames);
 	diaSetEnum(diaConfig, CFG_USBMODE, deviceModes);
 	diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
@@ -232,6 +236,7 @@ void guiShowConfig() {
 #ifdef CHEAT
 	diaSetInt(diaConfig, CFG_SHOWCHEAT, gShowCheat);
 #endif
+	diaSetInt(diaConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
 	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
@@ -251,6 +256,10 @@ void guiShowConfig() {
 #ifdef CHEAT
 		diaGetInt(diaConfig, CFG_SHOWCHEAT, &gShowCheat);
 #endif
+		if(diaGetInt(diaConfig, CFG_SELECTBUTTON, &value))
+			gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
+		else
+			gSelectButton = KEY_CIRCLE;
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
 		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
 		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
@@ -1389,9 +1398,9 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 
 		readPads();
 
-		if (getKeyOn(KEY_CIRCLE))
+		if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE))
 			terminate = 1;
-		else if (getKeyOn(KEY_CROSS))
+		else if (getKeyOn(gSelectButton))
 			terminate = 2;
 
 		if (ui)
@@ -1405,7 +1414,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
 		fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
-		guiDrawIconAndText(CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 		if (addAccept)
 			guiDrawIconAndText(CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
 

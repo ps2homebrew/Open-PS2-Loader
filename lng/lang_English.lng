@@ -52,8 +52,12 @@ Language
 %d: Cannot list games
 On
 Off
-Ok
+OK
+Select
 Cancel
+Circle
+Cross
+Games list
 Game settings
 Remove all settings
 Removed all keys for the game
@@ -97,6 +101,9 @@ Share
 User
 Password
 <not set>
+IP address type
+Static
+Dynamic (DHCP)
 Accept
 Item will be permanently deleted, continue ?
 Rename
@@ -106,6 +113,7 @@ Display settings
 Enable Delete and Rename actions
 Check USB game fragmentation
 Remember last played game
+Select button
 Error, the game is fragmented
 Error, could not run the item
 Test
@@ -194,6 +202,6 @@ Lets PS2RD Cheat Engine patch your games
 PS2RD Cheat Engine Mode
 Auto-select or Select game cheats
 Auto-select cheats
-Select game cheats (TBD)
+Select game cheats
 Error: failed to load Cheat File
 No cheats found

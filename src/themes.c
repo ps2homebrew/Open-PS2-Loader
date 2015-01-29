@@ -7,6 +7,7 @@
 #include "include/ioman.h"
 #include "include/fntsys.h"
 #include "include/lang.h"
+#include "include/pad.h"
 
 #define MENU_POS_V 50
 #define HINT_HEIGHT 32
@@ -22,21 +23,25 @@ static int nThemes = 0;
 static theme_file_t themes[THM_MAX_FILES];
 static const char **guiThemesNames = NULL;
 
-#define TYPE_ATTRIBUTE_TEXT		0
-#define TYPE_STATIC_TEXT		1
-#define TYPE_ATTRIBUTE_IMAGE	2
-#define TYPE_GAME_IMAGE			3
-#define TYPE_STATIC_IMAGE		4
-#define TYPE_BACKGROUND			5
-#define TYPE_MENU_ICON			6
-#define TYPE_MENU_TEXT			7
-#define	TYPE_ITEMS_LIST			8
-#define	TYPE_ITEM_ICON			9
-#define	TYPE_ITEM_COVER			10
-#define TYPE_ITEM_TEXT			11
-#define TYPE_HINT_TEXT			12
-#define TYPE_INFO_HINT_TEXT		13
-#define TYPE_LOADING_ICON		14
+enum ELEM_ATTRIBUTE_TYPE{
+	ELEM_TYPE_ATTRIBUTE_TEXT	= 0,
+	ELEM_TYPE_STATIC_TEXT,
+	ELEM_TYPE_ATTRIBUTE_IMAGE,
+	ELEM_TYPE_GAME_IMAGE,
+	ELEM_TYPE_STATIC_IMAGE,
+	ELEM_TYPE_BACKGROUND,	//A static image can be specified as the background. Otherwise, the plasma background will be drawn.
+	ELEM_TYPE_MENU_ICON,
+	ELEM_TYPE_MENU_TEXT,
+	ELEM_TYPE_ITEMS_LIST,
+	ELEM_TYPE_ITEM_ICON,
+	ELEM_TYPE_ITEM_COVER,
+	ELEM_TYPE_ITEM_TEXT,
+	ELEM_TYPE_HINT_TEXT,
+	ELEM_TYPE_INFO_HINT_TEXT,
+	ELEM_TYPE_LOADING_ICON,
+
+	ELEM_TYPE_COUNT
+};
 
 #define DISPLAY_ALWAYS		0
 #define DISPLAY_DEFINED		1
@@ -46,7 +51,7 @@ static const char **guiThemesNames = NULL;
 #define SIZING_CLIP			0
 #define SIZING_WRAP			1
 
-static const char *elementsType[] = {
+static const char *elementsType[ELEM_TYPE_COUNT] = {
 	"AttributeText",
 	"StaticText",
 	"AttributeImage",
@@ -116,7 +121,7 @@ static mutable_text_t* initMutableText(const char* themePath, config_set_t* them
 		sizingMode = SIZING_NONE;
 	mutableText->sizingMode = sizingMode;
 
-	if (type == TYPE_ATTRIBUTE_TEXT) {
+	if (type == ELEM_TYPE_ATTRIBUTE_TEXT) {
 		snprintf(elemProp, sizeof(elemProp), "%s_title", name);
 		configGetStr(themeConfig, elemProp, &alias);
 		if (!alias) {
@@ -156,7 +161,7 @@ static void initStaticText(const char* themePath, config_set_t* themeConfig, the
 	snprintf(elemProp, sizeof(elemProp), "%s_value", name);
 	configGetStr(themeConfig, elemProp, &value);
 	if (value) {
-		elem->extended = initMutableText(themePath, themeConfig, theme, name, TYPE_STATIC_TEXT, elem, value, NULL, DISPLAY_ALWAYS, SIZING_NONE);
+		elem->extended = initMutableText(themePath, themeConfig, theme, name, ELEM_TYPE_STATIC_TEXT, elem, value, NULL, DISPLAY_ALWAYS, SIZING_NONE);
 		elem->endElem = &endMutableText;
 		elem->drawElem = &drawStaticText;
 	} else
@@ -209,7 +214,7 @@ static void initAttributeText(const char* themePath, config_set_t* themeConfig, 
 	snprintf(elemProp, sizeof(elemProp), "%s_attribute", name);
 	configGetStr(themeConfig, elemProp, &attribute);
 	if (attribute) {
-		elem->extended = initMutableText(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_TEXT, elem, attribute, NULL, DISPLAY_ALWAYS, SIZING_NONE);
+		elem->extended = initMutableText(themePath, themeConfig, theme, name, ELEM_TYPE_ATTRIBUTE_TEXT, elem, attribute, NULL, DISPLAY_ALWAYS, SIZING_NONE);
 		elem->endElem = &endMutableText;
 		elem->drawElem = &drawAttributeText;
 	} else
@@ -221,7 +226,7 @@ static void initAttributeText(const char* themePath, config_set_t* themeConfig, 
 static void findDuplicate(theme_element_t* first, const char* cachePattern, const char* defaultTexture, const char* overlayTexture, mutable_image_t* target) {
 	theme_element_t* elem = first;
 	while (elem) {
-		if ((elem->type == TYPE_STATIC_IMAGE) || (elem->type == TYPE_ATTRIBUTE_IMAGE) || (elem->type == TYPE_GAME_IMAGE) || (elem->type == TYPE_BACKGROUND)) {
+		if ((elem->type == ELEM_TYPE_STATIC_IMAGE) || (elem->type == ELEM_TYPE_ATTRIBUTE_IMAGE) || (elem->type == ELEM_TYPE_GAME_IMAGE) || (elem->type == ELEM_TYPE_BACKGROUND)) {
 			mutable_image_t* source = (mutable_image_t*) elem->extended;
 
 			if (cachePattern && source->cache && !strcmp(cachePattern, source->cache->suffix)) {
@@ -259,13 +264,14 @@ static void freeImageTexture(image_texture_t* texture) {
 }
 
 static image_texture_t* initImageTexture(const char* themePath, config_set_t* themeConfig, const char* name, const char* imgName, int isOverlay) {
+	int psm = isOverlay ? GS_PSM_CT32 : GS_PSM_CT24;
 	image_texture_t* texture = (image_texture_t*) malloc(sizeof(image_texture_t));
-	texPrepare(&texture->source, isOverlay ? GS_PSM_CT32 : GS_PSM_CT24);
+	texPrepare(&texture->source, psm);
 	texture->name = NULL;
 
 	char path[256];
 	snprintf(path, sizeof(path), "%s%s", themePath, imgName);
-	if (texDiscoverLoad(&texture->source, path, -1, isOverlay ? GS_PSM_CT32 : GS_PSM_CT24) >= 0) {
+	if (texDiscoverLoad(&texture->source, path, -1, psm) >= 0) {
 		int length = strlen(imgName) + 1;
 		texture->name = (char*) malloc(length * sizeof(char));
 		memcpy(texture->name, imgName, length);
@@ -306,6 +312,24 @@ static image_texture_t* initImageTexture(const char* themePath, config_set_t* th
 	return texture;
 }
 
+static image_texture_t* initImageInternalTexture(config_set_t* themeConfig, const char* name) {
+	image_texture_t* texture = (image_texture_t*) malloc(sizeof(image_texture_t));
+	texPrepare(&texture->source, GS_PSM_CT24);
+	texture->name = NULL;
+	int result;
+
+	if((result = texLookupInternalTexId(name)) >= 0) {
+		result = texDiscoverLoad(&texture->source, NULL, result, GS_PSM_CT24);
+	}
+
+	if (result < 0) {
+		freeImageTexture(texture);
+		texture = NULL;
+	}
+
+	return texture;
+}
+
 static void endMutableImage(struct theme_element* elem) {
 	mutable_image_t* mutableImage = (mutable_image_t*) elem->extended;
 	if (mutableImage) {
@@ -338,11 +362,11 @@ static mutable_image_t* initMutableImage(const char* themePath, config_set_t* th
 
 	char elemProp[64];
 
-	if (type == TYPE_ATTRIBUTE_IMAGE) {
+	if (type == ELEM_TYPE_ATTRIBUTE_IMAGE) {
 		snprintf(elemProp, sizeof(elemProp), "%s_attribute", name);
 		configGetStr(themeConfig, elemProp, &cachePattern);
 		LOG("THEMES MutableImage %s: type: %s using cache pattern: %s\n", name, elementsType[type], cachePattern);
-	} else if ((type == TYPE_GAME_IMAGE) || type == (TYPE_BACKGROUND)) {
+	} else if ((type == ELEM_TYPE_GAME_IMAGE) || type == (ELEM_TYPE_BACKGROUND)) {
 		snprintf(elemProp, sizeof(elemProp), "%s_pattern", name);
 		configGetStr(themeConfig, elemProp, &cachePattern);
 		snprintf(elemProp, sizeof(elemProp), "%s_count", name);
@@ -353,7 +377,7 @@ static mutable_image_t* initMutableImage(const char* themePath, config_set_t* th
 	snprintf(elemProp, sizeof(elemProp), "%s_default", name);
 	configGetStr(themeConfig, elemProp, &defaultTexture);
 
-	if (type != TYPE_BACKGROUND) {
+	if (type != ELEM_TYPE_BACKGROUND) {
 		snprintf(elemProp, sizeof(elemProp), "%s_overlay", name);
 		configGetStr(themeConfig, elemProp, &overlayTexture);
 	}
@@ -362,7 +386,7 @@ static mutable_image_t* initMutableImage(const char* themePath, config_set_t* th
 	findDuplicate(theme->infoElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
 
 	if (cachePattern && !mutableImage->cache) {
-		if (type == TYPE_ATTRIBUTE_IMAGE)
+		if (type == ELEM_TYPE_ATTRIBUTE_IMAGE)
 			mutableImage->cache = cacheInitCache(-1, themePath, 0, cachePattern, 1);
 		else
 			mutableImage->cache = cacheInitCache(theme->gameCacheCount++, "ART", 1, cachePattern, cacheCount);
@@ -373,6 +397,9 @@ static mutable_image_t* initMutableImage(const char* themePath, config_set_t* th
 
 	if (overlayTexture && !mutableImage->overlayTexture)
 		mutableImage->overlayTexture = initImageTexture(themePath, themeConfig, name, overlayTexture, 1);
+
+	if(!mutableImage->defaultTexture && !mutableImage->overlayTexture)
+		mutableImage->defaultTexture = initImageInternalTexture(themeConfig, name);
 
 	return mutableImage;
 }
@@ -420,7 +447,7 @@ static void drawGameImage(struct menu_list* menu, struct submenu_list* item, con
 			if (gameImage->defaultTexture)
 				texture = &gameImage->defaultTexture->source;
 			else {
-				if (elem->type == TYPE_BACKGROUND)
+				if (elem->type == ELEM_TYPE_BACKGROUND)
 					guiDrawBGPlasma();
 				return;
 			}
@@ -433,7 +460,7 @@ static void drawGameImage(struct menu_list* menu, struct submenu_list* item, con
 		} else
 			rmDrawPixmap(texture, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 
-	} else if (elem->type == TYPE_BACKGROUND) {
+	} else if (elem->type == ELEM_TYPE_BACKGROUND) {
 		if (gameImage->defaultTexture)
 			rmDrawPixmap(&gameImage->defaultTexture->source, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 		else
@@ -588,7 +615,6 @@ static theme_element_t* initBasic(const char* themePath, config_set_t* themeConf
 }
 
 // Internal elements ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 static void drawBackground(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	guiDrawBGPlasma();
 }
@@ -604,6 +630,7 @@ static void initBackground(const char* themePath, config_set_t* themeConfig, the
 		elem->drawElem = &drawStaticImage;
 	else
 		elem->drawElem = &drawBackground;
+	
 }
 
 static void drawMenuIcon(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
@@ -721,18 +748,18 @@ static void drawHintText(struct menu_list* menu, struct submenu_list* item, conf
 
 static void drawInfoHintText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	int x = elem->posX;
-	x = guiDrawIconAndText(CROSS_ICON, _STR_RUN, elem->font, x, elem->posY, elem->color);
+	x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_RUN, elem->font, x, elem->posY, elem->color);
 	x += elem->width;
-	x = guiDrawIconAndText(CIRCLE_ICON, _STR_BACK, elem->font, x, elem->posY, elem->color);
+	x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, elem->font, x, elem->posY, elem->color);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void validateGUIElems(const char* themePath, config_set_t* themeConfig, theme_t* theme) {
 	// 1. check we have a valid Background elements
-	if ( !theme->mainElems.first || (theme->mainElems.first->type != TYPE_BACKGROUND) ) {
+	if ( !theme->mainElems.first || (theme->mainElems.first->type != ELEM_TYPE_BACKGROUND) ) {
 		LOG("THEMES No valid background found for main, add default BG_ART\n");
-		theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
+		theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
 		if (themePath)
 			initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
 		else
@@ -742,9 +769,9 @@ static void validateGUIElems(const char* themePath, config_set_t* themeConfig, t
 	}
 
 	if (theme->infoElems.first) {
-		if (theme->infoElems.first->type != TYPE_BACKGROUND) {
+		if (theme->infoElems.first->type != ELEM_TYPE_BACKGROUND) {
 			LOG("THEMES No valid background found for info, add default BG_ART\n");
-			theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
+			theme_element_t* backgroundElem = initBasic(themePath, themeConfig, theme, "bg", ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
 			if (themePath)
 				initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
 			else
@@ -761,7 +788,7 @@ static void validateGUIElems(const char* themePath, config_set_t* themeConfig, t
 			// Second pass to find the decorator
 			theme_element_t* decoratorElem = theme->mainElems.first;
 			while (decoratorElem) {
-				if (decoratorElem->type == TYPE_GAME_IMAGE) {
+				if (decoratorElem->type == ELEM_TYPE_GAME_IMAGE) {
 					mutable_image_t* gameImage = (mutable_image_t*) decoratorElem->extended;
 					if (!strcmp(itemsList->decorator, gameImage->cache->suffix)) {
 						// if user want to cache less than displayed items, then disable itemslist icons, if not would load constantly
@@ -777,7 +804,7 @@ static void validateGUIElems(const char* themePath, config_set_t* themeConfig, t
 		}
 	} else {
 		LOG("THEMES No itemsList found, adding a default one\n");
-		theme->itemsList = initBasic(themePath, themeConfig, theme, "il", TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+		theme->itemsList = initBasic(themePath, themeConfig, theme, "il", ELEM_TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 		initItemsList(themePath, themeConfig, theme, theme->itemsList, "il", NULL);
 		theme->itemsList->next = theme->mainElems.first->next; // Position the itemsList as second element (right after the Background)
 		theme->mainElems.first->next = theme->itemsList;
@@ -796,56 +823,56 @@ static int addGUIElem(const char* themePath, config_set_t* themeConfig, theme_t*
 		snprintf(elemProp, sizeof(elemProp), "%s_type", name);
 		configGetStr(themeConfig, elemProp, &type);
 		if (type) {
-			if (!strcmp(elementsType[TYPE_ATTRIBUTE_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+			if (!strcmp(elementsType[ELEM_TYPE_ATTRIBUTE_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ATTRIBUTE_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				initAttributeText(themePath, themeConfig, theme, elem, name);
-			} else if (!strcmp(elementsType[TYPE_STATIC_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_STATIC_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_STATIC_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				initStaticText(themePath, themeConfig, theme, elem, name);
-			} else if (!strcmp(elementsType[TYPE_ATTRIBUTE_IMAGE], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_ATTRIBUTE_IMAGE], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ATTRIBUTE_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initAttributeImage(themePath, themeConfig, theme, elem, name);
-			} else if (!strcmp(elementsType[TYPE_GAME_IMAGE], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_GAME_IMAGE], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initGameImage(themePath, themeConfig, theme, elem, name, NULL, 1, NULL, NULL);
-			} else if (!strcmp(elementsType[TYPE_STATIC_IMAGE], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_STATIC_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_STATIC_IMAGE], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_STATIC_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initStaticImage(themePath, themeConfig, theme, elem, name, NULL);
-			} else if (!strcmp(elementsType[TYPE_BACKGROUND], type)) {
+			} else if (!strcmp(elementsType[ELEM_TYPE_BACKGROUND], type)) {
 				if (!elems->first) { // Background elem can only be the first one
-					elem = initBasic(themePath, themeConfig, theme, name, TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
+					elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
 					initBackground(themePath, themeConfig, theme, elem, name, NULL, 1, NULL);
 				}
-			} else if (!strcmp(elementsType[TYPE_MENU_ICON], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_MENU_ICON, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_MENU_ICON], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_ICON, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				elem->drawElem = &drawMenuIcon;
-			} else if (!strcmp(elementsType[TYPE_MENU_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_MENU_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawMenuText;
-			} else if (!strcmp(elementsType[TYPE_ITEMS_LIST], type)) {
+			} else if (!strcmp(elementsType[ELEM_TYPE_ITEMS_LIST], type)) {
 				if (!theme->itemsList) {
-					elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+					elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 					initItemsList(themePath, themeConfig, theme, elem, name, NULL);
 					theme->itemsList = elem;
 				}
-			} else if (!strcmp(elementsType[TYPE_ITEM_ICON], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 80, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_ITEM_ICON], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 80, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initGameImage(themePath, themeConfig, theme, elem, name, "ICO", 20, NULL, NULL);
-			} else if (!strcmp(elementsType[TYPE_ITEM_COVER], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_GAME_IMAGE, 520, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_ITEM_COVER], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 520, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 				initGameImage(themePath, themeConfig, theme, elem, name, "COV", 10, NULL, NULL);
-			} else if (!strcmp(elementsType[TYPE_ITEM_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_ITEM_TEXT, 520, 370, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_ITEM_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEM_TEXT, 520, 370, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawItemText;
-			} else if (!strcmp(elementsType[TYPE_HINT_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_HINT_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawHintText;
-			} else if (!strcmp(elementsType[TYPE_INFO_HINT_TEXT], type)) {
-				elem = initBasic(themePath, themeConfig, theme, name, TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+			} else if (!strcmp(elementsType[ELEM_TYPE_INFO_HINT_TEXT], type)) {
+				elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
 				elem->drawElem = &drawInfoHintText;
-			} else if (!strcmp(elementsType[TYPE_LOADING_ICON], type)) {
+			} else if (!strcmp(elementsType[ELEM_TYPE_LOADING_ICON], type)) {
 				if (!theme->loadingIcon)
-					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, TYPE_LOADING_ICON, -40, -60, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+					theme->loadingIcon = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_LOADING_ICON, -40, -60, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
 			}
 
 			if (elem) {
@@ -1013,14 +1040,19 @@ static void thmLoad(const char* themePath) {
 	config_set_t* themeConfig = NULL;
 	if (!themePath) {
 		themeConfig = configAlloc(0, NULL, NULL);
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_MENU_ICON], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_MENU_TEXT], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_ITEMS_LIST], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_ITEM_ICON], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_ITEM_COVER], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_ITEM_TEXT], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_HINT_TEXT], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[TYPE_LOADING_ICON], "_");
+		configSetInt(themeConfig, "bg_overlay_aligned", ALIGN_NONE);
+		configSetInt(themeConfig, "bg_overlay_scaled", SCALING_NONE);
+		configSetInt(themeConfig, "bg_overlay_width", DIM_UNDEF);
+		configSetInt(themeConfig, "bg_overlay_height", DIM_UNDEF);
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_STATIC_IMAGE], "bg_overlay");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_ICON], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_TEXT], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEMS_LIST], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_ICON], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_COVER], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_TEXT], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_HINT_TEXT], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_LOADING_ICON], "_");
 	} else {
 		char path[256];
 		snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);

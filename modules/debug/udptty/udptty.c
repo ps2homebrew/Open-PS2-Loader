@@ -79,8 +79,6 @@ static iop_device_t tty_device = {
 #ifdef KPRTTY
 #define PRNT_IO_BEGIN		0x200
 #define PRNT_IO_END		0x201
-#define EA_SINGLE		0x00
-#define EA_MULTI		0x02
 
 typedef struct _KprArg {
 	int eflag;

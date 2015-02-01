@@ -45,7 +45,7 @@ static int rm_height_table[] = {
 	-1,		// AUTO
 	512,	// PAL@50Hz
 	448,	// NTSC@60Hz
-	480,	// DTV480P@60Hz
+	448,	// DTV480P@60Hz
 	512,	// DTV576P@50Hz
 	480		// VGA640x480@60Hz
 };
@@ -355,8 +355,9 @@ int rmSetMode(int force) {
 
 		if (vmode == RM_VMODE_DTV480P) { // Overwrite X, Y and DW GSKit params for DTV480P
 			gsGlobal->StartX = 312;
-			gsGlobal->StartY = 37;
+			gsGlobal->StartY = 37 + (480-448)/2;
 			gsGlobal->DW = 1280;
+			gsGlobal->DH = 448;
 		}
 		else if (vmode == RM_VMODE_VGA_640_60) { // Overwrite X, Y GSKit params for VGA_640_60
 			gsGlobal->StartX = 276;

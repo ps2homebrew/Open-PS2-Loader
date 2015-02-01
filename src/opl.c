@@ -102,11 +102,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 	if (!mod->support->enabled)
 		menuAddHint(&mod->menuItem, _STR_START_DEVICE, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
 	else {
-		if (gUseInfoScreen && gTheme->infoElems.first) {
-			menuAddHint(&mod->menuItem, _STR_INFO, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
-		} else {
-			menuAddHint(&mod->menuItem, _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
-		}
+		menuAddHint(&mod->menuItem, (gUseInfoScreen && gTheme->infoElems.first) ? _STR_INFO : _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
 
 		if (mod->support->haveCompatibilityMode)
 			menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);

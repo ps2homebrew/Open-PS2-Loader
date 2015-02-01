@@ -8,6 +8,17 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev781 - upload new background image - Wed Jan 28 23:09:41 2015 -0800
+rev780 - Merged ifcaro/open-ps2-loader into default - Wed Jan 28 22:59:46 2015 -0800
+rev779 - remove background image to be able to sync with ifcaro repo - Wed Jan 28 22:59:06 2015 -0800
+rev778 - upload new background image - Wed Jan 28 22:35:58 2015 -0800
+rev777 - replace old background image - Wed Jan 28 22:31:55 2015 -0800
+rev776 - include bg_overlay.png background image - Tue Jan 27 23:35:32 2015 -0800
+rev775 - Merged ifcaro/open-ps2-loader into default - Sat Jan 24 03:21:25 2015 -0800
+rev774 - Merged ifcaro/open-ps2-loader into default - Tue Jan 20 15:12:41 2015 -0800
+rev773 - update opl.icn made it smaller in size with help from sav3r and updated icon load png files to match new modified opl logo key - Mon Jan 19 01:39:50 2015 -0800
+rev772 - made opl.icn smaller in size with help from sav3r and updated load png files to math new OPL logo key - Mon Jan 19 01:32:13 2015 -0800
+rev771 - Updated to compile w/o warnings on new PS2SDK revision, modified GUI to support loading of embedded resources for the internal theme, added menu hints, added an option for changing the select button. - Wed Jan 28 23:18:46 2015 +0800
 rev770 - Increased buffer size for path parsing to 32-bytes to handle slightly-malformed paths like how SCE does, fixed broken debug printf() statement, removed unnecessary checks that should be only used for debugging (as SCE doesn't perform them), added an additional backslash to SMB paths for compatibility with some SMB servers and changed the ELF-loading error screen (white) to be always shown regardless of the debug enabled/disabled setting. - Thu Jan 22 21:39:00 2015 +0800
 rev769 - Changed cdrom_open() to set f->mode to O_RDONLY for games that fail to specify O_RDONLY, re-adjusted the path-sanitizing code to function from only cdrom_open() in order to not affect cdrom_dopen(), and corrected non-compliant behaviour of (in-game) SMB support. - Tue Jan 20 20:13:51 2015 +0800
 rev768 - Fixed DVD-DL parameter passing for USB and SMB modes, fixed ISO filename handling (ISO file name without the startup file name) in USB mode. - Sat Jan 17 18:30:20 2015 +0800

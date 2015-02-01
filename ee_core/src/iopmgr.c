@@ -66,7 +66,10 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 		start_smbauth_thread();
 
 	if(arglen>0){
-		_strcpy(command, args);
+		strncpy(command, args, arglen);
+		command[arglen] = '\0';	/* In a normal IOP reset process, the IOP reset command line will be NULL-terminated properly somewhere.
+						Since we're now taking things into our own hands, NULL terminate it here.
+						Some games like SOCOM3 will use a command line that isn't NULL terminated, resulting in things like "cdrom0:\RUN\IRX\DNAS300.IMGG;1" */
 		_strcpy(&command[arglen+1], "img0:");
 		CommandLen=arglen+6;
 	}

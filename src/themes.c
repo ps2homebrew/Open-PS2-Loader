@@ -1039,20 +1039,21 @@ static void thmLoad(const char* themePath) {
 
 	config_set_t* themeConfig = NULL;
 	if (!themePath) {
+		//No theme specified. Prepare and load the default theme.
 		themeConfig = configAlloc(0, NULL, NULL);
 		configSetInt(themeConfig, "bg_overlay_aligned", ALIGN_NONE);
 		configSetInt(themeConfig, "bg_overlay_scaled", SCALING_NONE);
-		configSetInt(themeConfig, "bg_overlay_width", DIM_UNDEF);
-		configSetInt(themeConfig, "bg_overlay_height", DIM_UNDEF);
+		configSetStr(themeConfig, "bg_overlay_width", "DIM_INF");
+		configSetStr(themeConfig, "bg_overlay_height", "DIM_INF");
 		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_STATIC_IMAGE], "bg_overlay");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_ICON], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_TEXT], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEMS_LIST], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_ICON], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_COVER], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_TEXT], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_HINT_TEXT], "_");
-		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_LOADING_ICON], "_");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_ICON], "category_icon");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_TEXT], "category_label");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEMS_LIST], "game_list");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_ICON], "disc_icon");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_COVER], "game_cover");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_TEXT], "game_id");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_HINT_TEXT], "hint_text");
+		addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_LOADING_ICON], "loading_icon");
 	} else {
 		char path[256];
 		snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);

@@ -1262,23 +1262,32 @@ static int cdvdman_open(iop_file_t *f, const char *filename, int mode)
 	return r;
 }
 
+static int cdrom_purifyPath(char *path)
+{
+	int len;
+
+	len = strlen(path);
+	if((len >= 3) && (path[len-1] != '1' || path[len-2] != ';'))	//SCE does this too, hence assuming that the version suffix will be either totally there or absent. The only version supported is 1.
+	{	//Instead of using strcat like the original, append the version suffix manually for efficiency.
+		path[len]	= ';';
+		path[len+1]	= '1';
+		path[len+2]	= '\0';
+
+		return 0;
+	}
+
+	return 1;
+}
+
 static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 {
-	int result, len;
+	int result;
 	char path_buffer[128];	//Original buffer size in the SCE CDVDMAN module.
 
 	DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
 
-	len = strlen(filename);
 	strcpy(path_buffer, filename);	//SCE does not perform bounds-checking.
-
-	//Correct filenames (for files), if necessary.
-	if((len >= 3) && (path_buffer[len-1] != '1' || path_buffer[len-2] != ';'))	//SCE does this too, hence assuming that the version suffix will be either totally there or absent. The only version supported is 1.
-	{	//Instead of using strcat like the original, append the version suffix manually for efficiency.
-		path_buffer[len]	= ';';
-		path_buffer[len+1]	= '1';
-		path_buffer[len+2]	= '\0';
-	}
+	cdrom_purifyPath(path_buffer);
 
 	if((result = cdvdman_open(f, path_buffer, mode)) >= 0)
 		f->mode = O_RDONLY;	//SCE fixes the open flags to O_RDONLY for open().
@@ -1414,7 +1423,14 @@ ssema:
 //--------------------------------------------------------------
 static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 {
-	return sceCdLayerSearchFile((cdl_file_t *)&stat->attr, filename, f->unit) - 1;
+	char path_buffer[128];	//Original buffer size in the SCE CDVDMAN module.
+
+	DPRINTF("cdrom_getstat %s layer %d\n", filename, f->unit);
+
+	strcpy(path_buffer, filename);	//SCE does not perform bounds-checking.
+	cdrom_purifyPath(path_buffer);	//Unlike the SCE original, purify the path right away.
+
+	return sceCdLayerSearchFile((cdl_file_t *)&stat->attr, path_buffer, f->unit) - 1;
 }
 
 //--------------------------------------------------------------

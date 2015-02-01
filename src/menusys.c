@@ -538,6 +538,8 @@ void menuRenderMenu() {
 		fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
 		y += spacing;
 	}
+
+	guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_GAMES_LIST, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 }
 
 void menuHandleInputMenu() {

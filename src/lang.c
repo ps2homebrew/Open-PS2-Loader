@@ -96,7 +96,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Error, could not run the item",
 	"Test",
 	"Leave empty for GUEST auth.",
-	"Unused",
+	"Accurate reads",
 	"Alternative data read method",
 	"Unhook Syscalls",
 	"0 PSS mode",

@@ -326,6 +326,10 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	}
 	settings->flags = 0;
 
+	if (compatmask & COMPAT_MODE_1) {
+		settings->flags |= IOPCORE_COMPAT_ACCU_READS;
+	}
+
 	if (compatmask & COMPAT_MODE_2) {
 		settings->flags |= IOPCORE_COMPAT_ALT_READ;
 	}

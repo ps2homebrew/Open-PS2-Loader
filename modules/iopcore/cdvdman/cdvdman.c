@@ -491,6 +491,13 @@ int sceCdStandby(void)
 }
 
 //-------------------------------------------------------------------------
+#ifdef HDD_DRIVER
+static unsigned int cdvdemu_read_end_cb(void *arg){
+	iSetEventFlag(cdvdman_stat.intr_ef, 0x1000);
+	return 0;
+}
+#endif
+
 static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *buf){
 	DPRINTF("cdvdman_read lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
 
@@ -509,15 +516,37 @@ static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *bu
 		if (sectors < nsectors)
 			nsectors = sectors;
 
+		if (cdvdman_settings.common.flags&IOPCORE_COMPAT_ACCU_READS)
+		{
+			//Limit transfers to a maximum length of 8, with a restricted transfer rate.
+			iop_sys_clock_t TargetTime;
+
+			if (nsectors > 8)
+				nsectors = 8;
+
+			TargetTime.hi = 0;
+			TargetTime.lo = 21600 * nsectors; // approximately 666us required per sector at 3000KB/s, so 36*600 ticks per sector with a 36MHz clock.
+			ClearEventFlag(cdvdman_stat.intr_ef, ~0x1000);
+			SetAlarm(&TargetTime, &cdvdemu_read_end_cb, NULL);
+		}
+
 		u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);	
 		if (ata_device_sector_io(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
 			cdvdman_stat.err = CDVD_ERR_READ;
+			if (cdvdman_settings.common.flags&IOPCORE_COMPAT_ACCU_READS)
+				CancelAlarm(&cdvdemu_read_end_cb, NULL);
 			break;
 		}
 		offset += nsectors << 11;
 		sectors -= nsectors;
 		lsn += nsectors;
 		ReadPos += nsectors << 11;
+
+		if (cdvdman_settings.common.flags&IOPCORE_COMPAT_ACCU_READS)
+		{
+			//Sleep until the required amount of time has been spent.
+			WaitEventFlag(cdvdman_stat.intr_ef, 0x1000, WEF_AND, NULL);
+		}
 	}
 
 	#else
@@ -1186,12 +1215,6 @@ static int cdrom_init(iop_device_t *dev)
 	smp.option = 0;
 
 	cdrom_io_sema = CreateSema(&smp);
-
-	smp.initial = 1;
-	smp.max = 1;
-	smp.attr = 1;
-	smp.option = 0;
-
 	cdvdman_searchfilesema = CreateSema(&smp);
 
 	return 0;
@@ -1931,9 +1954,10 @@ static void cdvdman_cdread_Thread(void *args)
 		/* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
 			The original is run from the interrupt handler, but we want it to run
 			from a threaded environment because it's easier to protect critical regions. */
-		if(Stm0Callback != NULL) Stm0Callback();
-
-		cdvdman_cb_event(SCECdFuncRead);
+		if(Stm0Callback != NULL)
+			Stm0Callback();
+		else
+			cdvdman_cb_event(SCECdFuncRead);	//Only runs if streaming is not in action.
 	}
 }
 

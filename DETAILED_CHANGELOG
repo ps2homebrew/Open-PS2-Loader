@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev782 - Fixed IOP resets with command lines that are not NULL-terminated (e.g. SOCOM games), added path-purification for cdrom_getstat(), "untweaked" the TCP/IP stack for GUI mode (better performance), fixed screen rendering (screen cut-off) under 480P mode, fixed default-theme scaling, added/fixed missing/incorrect UI hints. - Sun Feb 01 21:22:41 2015 +0800
 rev781 - upload new background image - Wed Jan 28 23:09:41 2015 -0800
 rev780 - Merged ifcaro/open-ps2-loader into default - Wed Jan 28 22:59:46 2015 -0800
 rev779 - remove background image to be able to sync with ifcaro repo - Wed Jan 28 22:59:06 2015 -0800

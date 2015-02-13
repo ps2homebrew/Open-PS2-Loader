@@ -17,9 +17,7 @@
 #include "irx.h"
 
 /* Please keep these in alphabetical order!  */
-#include <ioman.h>
 #include <sifman.h>
-#include <sysmem.h>
 #include <loadcore.h>
 #include "loadcore_add.h"
 

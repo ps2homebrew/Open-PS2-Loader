@@ -9,10 +9,10 @@
 # $Id: Makefile 577 2004-09-14 14:41:46Z pixel $
 
 IOP_BIN  = eesync.irx
-IOP_OBJS = eesync.o imports.o exports.o
+IOP_OBJS = eesync.o imports.o
 
 IOP_INCS +=
-IOP_CFLAGS += -Wall -fno-builtin
+IOP_CFLAGS += -Os -Wall -fno-builtin
 IOP_LDFLAGS += -s
 
 all: $(IOP_BIN)

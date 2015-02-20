@@ -163,7 +163,7 @@ void Install_Kernel_Hooks(void)
 void Remove_Kernel_Hooks(void)
 {
 	SetSyscall(__NR_SifSetDma, Old_SifSetDma);
-	SetSyscall(__NR_SifSetReg, Old_SifSetReg);	
+	SetSyscall(__NR_SifSetReg, Old_SifSetReg);
 	SetSyscall(__NR_LoadExecPS2, Old_LoadExecPS2);
 
 	// If IGR is enabled unhook ExecPS2 & CreateThread syscalls

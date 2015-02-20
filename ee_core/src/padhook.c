@@ -1,6 +1,6 @@
 /*
   padhook.c Open PS2 Loader In Game Reset
- 
+
   Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
@@ -57,13 +57,13 @@ extern void *_gp;
 static void Shutdown_Dev9()
 {
 	u16 dev9_hw_type;
-	
+
 	DIntr();
 	ee_kmode_enter();
 
 	// Get dev9 hardware type
 	dev9_hw_type = *DEV9_R_146E & 0xf0;
-	
+
 	// Shutdown Pcmcia
 	if ( dev9_hw_type == 0x20 )
 	{
@@ -82,7 +82,7 @@ static void Shutdown_Dev9()
 
 	//Wait a sec
 	delay(5);
-	
+
 	ee_kmode_exit();
 	EIntr();
 }
@@ -116,7 +116,7 @@ static void t_loadElf(void)
 
 	// Apply Sbv patches
 	sbv_patch_disable_prefix_check();
-	
+
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0xFF8000; // Blue sky
 
@@ -129,7 +129,7 @@ static void t_loadElf(void)
 	argv[1] = NULL;
 
 	ret = LoadElf(argv[0], &elf);
-	
+
 	if (!ret && elf.epc) {
 
 		// Exit services
@@ -185,7 +185,7 @@ static void IGR_Thread(void *arg)
 	SleepThread();
 
 	DPRINTF("IGR thread woken up!\n");
-	
+
 	// If Pad Combo is Start + Select then Return to Home
 	if(Pad_Data.combo_type == IGR_COMBO_START_SELECT)
 	{
@@ -331,7 +331,7 @@ static int IGR_Intc_Handler(int cause)
 	}
 
 	ee_kmode_enter();
-	
+
 	// Check power button press
 	if ( (*CDVD_R_NDIN & 0x20) && (*CDVD_R_POFF & 0x04) )
 	{
@@ -366,7 +366,7 @@ static int IGR_Intc_Handler(int cause)
 	{
 		// Disable Interrupts
 		iDisableIntc(kINTC_GS          );
-		iDisableIntc(kINTC_VBLANK_START); 
+		iDisableIntc(kINTC_VBLANK_START);
 		iDisableIntc(kINTC_VBLANK_END  );
 		iDisableIntc(kINTC_VIF0        );
 		iDisableIntc(kINTC_VIF1        );
@@ -449,7 +449,7 @@ static void Install_IGR(void *addr, int libpad)
 static int Hook_scePadPortOpen( int port, int slot, void* addr )
 {
 	int ret;
-	
+
 	// Make sure scePadPortOpen function is still available
 	if(port == 0 && slot == 0) {
 		DPRINTF("IGR: Hook_scePadPortOpen - padOpen hooking check...\n");
@@ -527,7 +527,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 			{
 				DPRINTF("IGR: found padopen pattern%d at 0x%08x mode=%d\n", i, (int)ptr, mode);
 				found = 1;
-				
+
 				// Green while PadOpen patches
 				if(!DisableDebug)
 				 	GS_BGCOLOUR = 0x008000;	//Dark green

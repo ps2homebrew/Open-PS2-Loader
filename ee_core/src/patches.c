@@ -28,6 +28,8 @@ typedef struct {
 #define PATCH_GENERIC_SLOW_READS	0xDEADBEE2
 #define PATCH_SDF_MACROSS		0x00065405
 #define PATCH_SRW_IMPACT		0x0021e808
+#define PATCH_RNC_UYA			0x00398498
+#define PATCH_ZOMBIE_ZONE		0xEEE62525
 
 static const patchlist_t patch_list[] = {
 	{ "SLES_524.58", USB_MODE, { PATCH_GENERIC_NIS,		0x00000000, 0x00000000 }}, // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -65,32 +67,6 @@ static const patchlist_t patch_list[] = {
 	{ "SLES_528.22", HDD_MODE, { PATCH_GENERIC_SLOW_READS,	0x00040000, 0x0060f4dc }}, // Prince of Persia: Warrior Within PAL - slow down cdvd reads
 	{ "SLUS_214.32", ALL_MODE, { PATCH_GENERIC_SLOW_READS,	0x00080000, 0x002baf34 }}, // NRA Gun Club NTSC U
 	{ "SLPM_654.05", HDD_MODE, { PATCH_SDF_MACROSS,		0x00200000, 0x00249b84 }}, // Super Dimensional Fortress Macross JPN
-	/*
-	{ "SCES_525.82", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // EveryBody's Golf PAL
-	{ "SCUS_974.01", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! NTSC U
-	{ "SCUS_975.15", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Hot Shots Golf FORE! (GH) NTSC U
-	{ "SCUS_976.10", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Hot Shots Tennis NTSC U
-	{ "SLUS_209.51", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Viewtiful Joe NTSC U
-	{ "SLES_526.78", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Viewtiful Joe PAL
-	{ "SLPM_656.99", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Viewtiful Joe NTSC J
-	{ "SCUS_973.30", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Jak 3 US
-	{ "SCUS_975.16", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Jak 3 US (GH)
-	{ "SCES_524.60", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Jak 3 PAL
-	{ "SCKA_200.40", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Jak 3 NTSC K
-	{ "SCUS_974.29", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Jak X NTSC U
-	{ "SCES_532.86", ALL_MODE, { 0xdeadbee3,		0x00000000, 0x00000000 }}, // Jak X PAL
-	{ "SLES_820.28", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET PAL Disc1
-	{ "SLES_820.29", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET PAL Disc2
-	{ "SLUS_204.88", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-U Disc1
-	{ "SLUS_208.91", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-U Disc2
-	{ "SCPS_550.19", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-J
-	{ "SLPM_664.78", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-J (Ultimate Hits) Disc1
-	{ "SLPM_664.79", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-J (Ultimate Hits) Disc2
-	{ "SLPM_652.09", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-J (Limited Edition)
-	{ "SLPM_654.38", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-J (Director's Cut) Disc1
-	{ "SLPM_654.39", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-J (Director's Cut) Disc2
-	{ "SCAJ_200.70", ALL_MODE, { PATCH_GENERIC_CAPCOM,	0x00000000, 0x00000000 }}, // SOTET NTSC-? (Director's Cut)
-	*/
 	{ "SLUS_202.30", ALL_MODE, { 0x00132d14,		0x10000018, 0x0c046744 }}, // Max Payne NTSC U - skip IOP reset before to exec demo elfs
 	{ "SLES_503.25", ALL_MODE, { 0x00132ce4,		0x10000018, 0x0c046744 }}, // Max Payne PAL - skip IOP reset before to exec demo elfs
 	{ "SLUS_204.40", ALL_MODE, { 0x0021bb00,		0x03e00008, 0x27bdff90 }}, // Kya: Dark Lineage NTSC U - disable game debug prints
@@ -101,6 +77,12 @@ static const patchlist_t patch_list[] = {
 	{ "SLUS_201.99", ALL_MODE, { 0x0013c55c,		0x10000012, 0x04400012 }}, // Shaun Palmer's Pro Snowboarder NTSC U
 	{ "SLES_553.46", ALL_MODE, { 0x0035414C,		0x2402FFFF, 0x0C0EE74E }}, // Rugby League 2: World Cup Edition PAL
 	{ "SLPS_251.04", ALL_MODE, { PATCH_SRW_IMPACT,		0x00000000, 0x00000000 }}, // Super Robot Wars IMPACT
+	{ "SCUS_973.53", ALL_MODE, { PATCH_RNC_UYA,		0x0084c645, 0x00000000 }}, // Ratchet and Clank: Up Your Arsenal
+	{ "SCES_524.56", ALL_MODE, { PATCH_RNC_UYA,		0x0084c726, 0x00000000 }}, // Ratchet and Clank: Up Your Arsenal
+	{ "SLES_533.98", ALL_MODE, { PATCH_ZOMBIE_ZONE,		0x001b2c08, 0x00000000 }}, // Zombie Zone
+	{ "SLES_544.61", ALL_MODE, { PATCH_ZOMBIE_ZONE,		0x001b3e20, 0x00000000 }}, // Zombie Hunters
+	{ "SLPM_625.25", ALL_MODE, { PATCH_ZOMBIE_ZONE,		0x001b1dc0, 0x00000000 }}, // Simple 2000 Series Vol. 61: The Oneechanbara
+	{ "SLPM_626.38", ALL_MODE, { PATCH_ZOMBIE_ZONE,		0x001b355c, 0x00000000 }}, // Simple 2000 Series Vol. 80: The Oneechanpuruu
 	{ NULL,                 0, { 0x00000000,		0x00000000, 0x00000000 }}  // terminater
 };
 
@@ -212,7 +194,7 @@ static void apply_capcom_protection_patch(void *modpack_addr, int mod_index, int
 {
 	u32 iop_addr = _lw((u32)modpack_addr + (mod_index << 3) + 8);
 	u32 opcode = 0x10000025;
-	SyncDCache((void*)opcode, (void *)((unsigned int)&opcode + sizeof(opcode)));	//Can this be replaced with a write to the uncached segment? I don't understand why the D-cache is a problem when dealing with this EE->IOP RAM window since it uses memcpy(), so I'll leave it with SyncDCache() as usual.
+	SyncDCache((void*)opcode, (void *)((unsigned int)&opcode + sizeof(opcode)));
 	smem_write((void *)(iop_addr+0x270), (void *)&opcode, sizeof(opcode));
 
 	capcom_lmb(modpack_addr, mod_index, mod_argc, mod_argv);
@@ -271,6 +253,93 @@ static void SRWI_IMPACT_patches(void){
 	_sw(0x24040060, 0x0021e944);	//addiu $a0, $zero, 0x60 (Set the CD/DVD callback thread's priority to 0x60)
 }
 
+void RnC3_AlwaysAllocMem(void);
+
+static void RnC3_UYA_patches(void *address)
+{
+	unsigned int word1,word2;
+
+	/*	Preserve the pointer to the allocated IOP RAM.
+		This game's main executable is obfuscated and/or compressed in some way,
+		but thankfully the segment that needs to be patched is just offset by 1 byte.
+
+		It contains an IOP module that seems to load other modules (iop_stash_daemon),
+		which unfortunately seems to be the heart of its anti-emulator protection system.
+		It (and the EE-side code) appears to be playing around with a pointer to IOP RAM,
+		based on the modules that are loaded.
+
+		Right before this IOP module is loaded with a custom LoadModuleBuffer function, the game will allocate a large buffer on the IOP.
+		This buffer is then used for loading iop_stash_daemon, which also uses it to load other modules before freeing it.
+		Unfortunately, the developers appear to have hardcoded the pointer, rather than using the return value of sceAllocSysMemory().
+
+		This module will also check for the presence of bit 29 in the pointer. If it's absent, then the code will not allocate memory and the game will freeze after the first cutscene in Veldin.
+		Like with crazyc's original patch, this branch here will have to be adjusted:
+			beqz $s7, 0x13
+		... to be:
+			beqz $s7, 0x01
+
+		iop_stash_daemon will play with the pointer in the following ways, based on each module it finds:
+			1. if it's a module with no name (first 4 characters are 0s), left-shift once.
+			2. if it's a module beginning with "Deci", left-shift once.
+			3. if it's a module beginning with "cdvd", right-shift once.
+
+		For us, it's about preserving the pointer to the allocated buffer and to adjust it accordingly:
+			For TOOL units, there are 6 DECI2 modules and 2 libcdvd modules. Therefore the pointer should be right-shifted by 4.
+			For retail units, there are 2 libcdvd modules. Therefore the pointer should be left-shifted by 2.	*/
+
+	word1 = JAL((unsigned int)&RnC3_AlwaysAllocMem);
+	switch(GameMode)
+	{
+		case HDD_MODE:
+			//For HDD mode, the CDVDMAN module has its name as "dev9", so adjust the shifting accordingly.
+		//	word2 = 0x00021943;	//sra $v1, $v0, 5	For DTL-T10000.
+			word2 = 0x00021840;	//sll $v1, $v0, 1	For retail sets.
+			break;
+		default:
+		//	word2 = 0x00021903;	//sra $v1, $v0, 4	For DTL-T10000.
+			word2 = 0x00021880;	//sll $v1, $v0, 2	For retail sets.
+	}
+
+	memcpy(address, &word1, 4);
+	memcpy((u8*)address+8, &word2, 4);
+}
+
+static void (*pZZscePadEnd)(void);
+static void (*pZZInitIOP)(void);
+
+static void ZombieZone_preIOPInit(void)
+{
+	pZZscePadEnd();
+	pZZInitIOP();
+}
+
+static void ZombieZone_patches(unsigned int address)
+{
+	static const unsigned int ZZpattern[] = {
+		0x2403000f,	//addiu v1, zero, $000f
+		0x24500000,	//addiu s0, v0, xxxx
+		0x3c040000,	//lui a0, xxxx
+		0xffbf0020,	//sd ra, $0020(sp)
+	};
+	static const unsigned int ZZpattern_mask[] = {
+		0xffffffff,
+		0xffff0000,
+		0xffff0000,
+		0xffffffff
+	};
+	u32 *ptr;
+
+	//Locate scePadEnd().
+	ptr = find_pattern_with_mask((u32 *)0x1c0000, 0x01f00000, ZZpattern, ZZpattern_mask, sizeof(ZZpattern));
+	if (ptr)
+	{
+		pZZInitIOP = (void *)FNADDR(_lw(address));
+		pZZscePadEnd = (void*)(ptr-3);
+
+		_sw(JAL((unsigned int)&ZombieZone_preIOPInit), address);
+	}
+}
+
 void apply_patches(void)
 {
 	const patchlist_t *p;
@@ -296,6 +365,12 @@ void apply_patches(void)
 					break;
 				case PATCH_SRW_IMPACT:
 					SRWI_IMPACT_patches();
+					break;
+				case PATCH_RNC_UYA:
+					RnC3_UYA_patches((unsigned int *)p->patch.val);
+					break;
+				case PATCH_ZOMBIE_ZONE:
+					ZombieZone_patches(p->patch.val);
 					break;
 				default:	// Single-value patches
 					if (_lw(p->patch.addr) == p->patch.check)

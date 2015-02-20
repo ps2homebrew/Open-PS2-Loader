@@ -167,7 +167,7 @@ int New_Reset_Iop(const char *arg, int arglen)
 		GS_BGCOLOUR = 0x00A5FF;	//Orange
 
 	if(arglen>0){
-		if (GameMode == ETH_MODE){ 
+		if (GameMode == ETH_MODE){
 			//Workaround for SMB mode's inability to communicate with the EE during the 2nd IOP reset, presumably because the SIF cannot be used after some of the SMFLAG bits are set.
 			//By accessing cdrom0 here, CDVDMAN will initialize itself here instead of during the IOP reset. Everything works properly then.
 			fioInit();

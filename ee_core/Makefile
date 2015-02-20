@@ -8,8 +8,6 @@
 # Review ps2sdk README & LICENSE files for further details.
 #
 # Standard Makefile
-# Loader section begin at 0x000b4000
-# g_buf is located at 0x00088000
 
 EE_BIN = ee_core.elf
 

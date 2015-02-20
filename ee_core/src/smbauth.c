@@ -109,7 +109,7 @@ static unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned 
 	unsigned char P21[21];
 	unsigned char K[7];
 	int i;
- 
+
 	/* padd the LM password hash with 5 nul bytes */
 	memcpy(&P21[0], LMpasswordhash, 16);
 	memset(&P21[16], 0, 5);
@@ -118,7 +118,7 @@ static unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned 
 	for (i=0; i<3; i++) {
 
 		/* get the 7bytes key */
-		memcpy(K, &P21[i*7], 7);		
+		memcpy(K, &P21[i*7], 7);
 
 		/* encrypt each the challenge with the keys */
 		DES(K, chal, &cipher[i*8]);
@@ -190,7 +190,6 @@ static int _smbauth_thread(void *args)
 	id = 0;
 	while (!id)
 		id = SifSetDma(&dmat, 1);
-	while (SifDmaStat(id) >= 0);
 
 	/* remove our DMA interupt handler */
 	RemoveDmacHandler(5, sif0_id);
@@ -217,10 +216,7 @@ int _SifDmaIntrHandler()
 	}
 
 	/* exit handler */
-	__asm__ __volatile__(
-		" sync;"
-		" ei;"
-	);
+	ExitHandler();
 
 	return 0;
 }

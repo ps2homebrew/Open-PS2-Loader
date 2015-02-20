@@ -231,7 +231,7 @@ RepeatAutoNegoProcess:
 		DEBUG_PRINTF("smap: PHY chip: DP83846A%d\n", RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_REV_MSK);
 
 		if(!EnableAutoNegotiation){
-			if(RegDump[SMAP_DsPHYTER_BMCR]&(SMAP_PHY_BMCR_DUPM|SMAP_PHY_BMCR_100M)){	/* if SMAP_DsPHYTER_BMCR&0x2100 */
+			if((RegDump[SMAP_DsPHYTER_BMCR]&(SMAP_PHY_BMCR_DUPM|SMAP_PHY_BMCR_100M)) == 0){	/* if SMAP_DsPHYTER_BMCR&0x2100 */
 				_smap_write_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_10BTSCR, 0x104);
 			}
 		}
@@ -243,7 +243,7 @@ RepeatAutoNegoProcess:
 
 		if((RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_REV_MSK)==0){	/* SMAP_DsPHYTER_PHYIDR2 */
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, 0x13, 1);
-			_smap_write_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_PHYCTRL, 0x1819);
+			_smap_write_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_PHYCTRL, 0x1898);
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, 0x1F, 0);
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, 0x1D, 0x5040);
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, 0x1E, 0x8C);

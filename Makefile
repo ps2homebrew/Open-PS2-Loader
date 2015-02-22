@@ -31,7 +31,7 @@ CHEAT = 0
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/isofs.o
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
@@ -41,24 +41,25 @@ GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 
 MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
-EECORE_OBJS = obj/ee_core.o obj/ioprp.o \
+IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
+		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
+		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smap.o obj/isofs.o obj/nbns.o
+
+EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o \
-		obj/hdd_cdvdman.o obj/hdd_hdpro_cdvdman.o \
-		obj/cdvdfsv.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o \
-		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/ingame_smstcpip.o obj/smap.o obj/smap_ingame.o obj/smbman.o \
-		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
-		obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/util.o
+		obj/hdd_cdvdman.o obj/hdd_hdpro_cdvdman.o obj/cdvdfsv.o \
+		obj/ingame_smstcpip.o obj/smap_ingame.o obj/smbman.o
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS)
+EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 MAPFILE = opl.map
 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnbns
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 BIN2C = $(PS2SDK)/bin/bin2c
@@ -78,7 +79,8 @@ endif
 
 ifeq ($(DTL_T10000),1)
 	EE_CFLAGS += -D_DTL_T10000
-	EECORE_OBJS += obj/sio2man.o obj/padman.o obj/mcman.o obj/mcserv.o
+	EECORE_EXTRA_FLAGS += DTL_T10000=1
+	IOP_OBJS += obj/sio2man.o obj/padman.o obj/mcman.o obj/mcserv.o
 	EE_LIBS += -lpadx
 else
 	EE_LIBS += -lpad
@@ -111,7 +113,7 @@ ifeq ($(RTL),1)
 endif
 
 ifeq ($(VMC),1)
-	EECORE_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
+	IOP_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
 	EE_CFLAGS += -DVMC
 	VMC_FLAGS = VMC=1
 else
@@ -123,24 +125,24 @@ ifeq ($(DEBUG),1)
 	MOD_DEBUG_FLAGS = DEBUG=1
 endif
 ifeq ($(EESIO_DEBUG),1)
-	EECORE_DEBUG_FLAGS = EESIO_DEBUG=1
+	EECORE_EXTRA_FLAGS = EESIO_DEBUG=1
 endif
 ifeq ($(INGAME_DEBUG),1)
-	EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
+	EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
 	CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
 	SMSTCPIP_INGAME_CFLAGS = 
 	EE_CFLAGS += -D__INGAME_DEBUG
 
 	ifeq ($(DECI2_DEBUG),1)
-		EECORE_DEBUG_FLAGS += DECI2_DEBUG=1
+		EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
 		EE_CFLAGS += -D__DECI2_DEBUG
-		EECORE_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
+		IOP_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
 		DECI2_DEBUG=1
 	endif
 else
 	ifeq ($(IOPCORE_DEBUG),1)
 		EE_CFLAGS += -D__INGAME_DEBUG
-		EECORE_DEBUG_FLAGS = LOAD_DEBUG_MODULES=1
+		EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
 		CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
 		MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
 		SMSTCPIP_INGAME_CFLAGS = 
@@ -225,6 +227,8 @@ endif
 	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo "    * SMAP.irx"
 	$(MAKE) -C modules/network/smap clean
+	echo "    * nbns.irx"
+	$(MAKE) -C modules/network/nbns clean
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/hdd/atad clean
 	echo "    * hdpro_atad.irx"
@@ -266,7 +270,7 @@ pc_tools_win32:
 
 ee_core.s:
 	echo "    * EE core"
-	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_DEBUG_FLAGS) -C ee_core
+	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
 	$(BIN2S) ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 elfldr.s:
@@ -379,11 +383,12 @@ ingame_smstcpip.s:
 	$(BIN2S) modules/network/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
 smap_ingame.s:
-	echo "    * SMAP.irx"
+	echo "    * SMAP-ingame.irx"
 	$(MAKE) -C modules/network/smap
 	$(BIN2S) modules/network/smap/smap.irx asm/smap_ingame.s smap_ingame_irx
 
 smap.s:
+	echo "    * SMAP.irx"
 	$(BIN2S) $(PS2DEV)/ps2eth/smap-new/ps2smap.irx asm/smap.s smap_irx
 
 smbman.s:
@@ -431,6 +436,11 @@ ps2link.s:
 	echo "    * ps2link.irx"
 	$(MAKE) -C modules/debug/ps2link
 	$(BIN2S) modules/debug/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
+
+nbns.s:
+	echo "    * nbns.irx"
+	$(MAKE) -C modules/network/nbns
+	$(BIN2S) modules/network/nbns/nbns.irx asm/nbns.s nbns_irx
 
 ps2fs.s:
 	echo "    * ps2fs.irx"

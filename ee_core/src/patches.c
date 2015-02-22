@@ -292,12 +292,18 @@ static void RnC3_UYA_patches(void *address)
 	{
 		case HDD_MODE:
 			//For HDD mode, the CDVDMAN module has its name as "dev9", so adjust the shifting accordingly.
-		//	word2 = 0x00021943;	//sra $v1, $v0, 5	For DTL-T10000.
+#ifdef _DTL_T10000
+			word2 = 0x00021943;	//sra $v1, $v0, 5	For DTL-T10000.
+#else
 			word2 = 0x00021840;	//sll $v1, $v0, 1	For retail sets.
+#endif
 			break;
 		default:
-		//	word2 = 0x00021903;	//sra $v1, $v0, 4	For DTL-T10000.
+#ifdef _DTL_T10000
+			word2 = 0x00021903;	//sra $v1, $v0, 4	For DTL-T10000.
+#else
 			word2 = 0x00021880;	//sll $v1, $v0, 2	For retail sets.
+#endif
 	}
 
 	memcpy(address, &word1, 4);

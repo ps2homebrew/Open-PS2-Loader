@@ -537,6 +537,9 @@ static void _loadConfig() {
 
 			configGetInt(configOPL, "eth_linkmode", &gETHOpMode);
 
+			configGetInt(configOPL, "pc_share_use_nbns", &gPCShareAddressIsNetBIOS);
+			configGetStrCopy(configOPL, "pc_share_nb_addr", gPCShareNBAddress, sizeof(gPCShareNBAddress));
+
 			if (configGetStr(configOPL, "pc_ip", &temp))
 				sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
 
@@ -598,6 +601,8 @@ static void _saveConfig() {
 #endif
 
 		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
+		configSetInt(configOPL, "pc_share_use_nbns", gPCShareAddressIsNetBIOS);
+		configSetStr(configOPL, "pc_share_nb_addr", gPCShareNBAddress);
 		char temp[256];
 		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
 		configSetStr(configOPL, "pc_ip", temp);
@@ -829,7 +834,9 @@ static void setDefaults(void) {
 
 	gBaseMCDir = "mc?:OPL";
 
-	gETHOpMode=ETH_OP_MODE_AUTO;
+	gETHOpMode = ETH_OP_MODE_AUTO;
+	gPCShareAddressIsNetBIOS = 0;
+	gPCShareNBAddress[0] = '\0';
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
@@ -841,7 +848,7 @@ static void setDefaults(void) {
 	gNetworkStartup = ERROR_ETH_NOT_STARTED;
 	gHddStartup = 6;
 	gHDDSpindown = 20;
-	gIPConfigChanged = 0;
+	gNetConfigChanged = 0;
 	gScrollSpeed = 1;
 	gExitPath[0] = '\0';
 	gDefaultDevice = APP_MODE;

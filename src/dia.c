@@ -44,10 +44,10 @@ static void diaDrawBoundingBox(int x, int y, int w, int h, int focus) {
 			rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->textColor & gColFocus);
 }
 
-int diaShowKeyb(char* text, int maxLen) {
+int diaShowKeyb(char* text, int maxLen, int hide_text) {
 	int i, j, len = strlen(text), selkeyb = 0, x, w;
 	int selchar = 0, selcommand = -1;
-	char c[2] = "\0\0";
+	char c[2] = "\0\0", *mask_buffer;
 	char keyb0[KEYB_ITEMS] = {
 		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
 		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
@@ -68,6 +68,15 @@ int diaShowKeyb(char* text, int maxLen) {
 	cmdicons[2] = thmGetTexture(START_ICON);
 	cmdicons[3] = thmGetTexture(SELECT_ICON);
 
+	if(hide_text) {
+		if((mask_buffer = malloc(maxLen)) != NULL) {
+			memset(mask_buffer, '*', len);
+			mask_buffer[len] = '\0';
+		}
+	} else {
+		mask_buffer = NULL;
+	}
+
 	while(1) {
 		readPads();
 
@@ -76,7 +85,7 @@ int diaShowKeyb(char* text, int maxLen) {
 		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
 		//Text
-		fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, text, gTheme->textColor);
+		fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
 
 		// separating line for simpler orientation
 		rmDrawLine(25, 138, 615, 138, gColWhite);
@@ -144,6 +153,11 @@ int diaShowKeyb(char* text, int maxLen) {
 				selcommand = (selcommand + 1) % KEYB_HEIGHT;
 		} else if (getKeyOn(gSelectButton)) {
 			if (len < (maxLen - 1) && selchar > -1) {
+				if (mask_buffer != NULL) {
+					mask_buffer[len] = '*';
+					mask_buffer[len+1] = '\0';
+				}
+
 				len++;
 				c[0] = keyb[selchar];
 				strcat(text,c);
@@ -151,14 +165,23 @@ int diaShowKeyb(char* text, int maxLen) {
 				if (len > 0) { // BACKSPACE
 					len--;
 					text[len] = 0;
+					if (mask_buffer != NULL)
+						mask_buffer[len] = '\0';
 				}
 			} else if (selcommand == 1) {
 				if (len < (maxLen - 1)) { // SPACE
+					if (mask_buffer != NULL) {
+						mask_buffer[len] = '*';
+						mask_buffer[len+1] = '\0';
+					}
+
 					len++;
 					c[0] = ' ';
 					strcat(text,c);
 				}
 			} else if (selcommand == 2) {
+				if(mask_buffer != NULL)
+					free(mask_buffer);
 				return 1; //ENTER
 			} else if (selcommand == 3) {
 				selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
@@ -171,14 +194,23 @@ int diaShowKeyb(char* text, int maxLen) {
 			if (len>0) { // BACKSPACE
 				len--;
 				text[len] = 0;
+				if (mask_buffer != NULL)
+					mask_buffer[len] = '\0';
 			}
 		} else if (getKey(KEY_TRIANGLE)) {
 			if (len < (maxLen - 1) && selchar > -1) { // SPACE
+				if (mask_buffer != NULL) {
+					mask_buffer[len] = '*';
+					mask_buffer[len+1] = '\0';
+				}
+
 				len++;
 				c[0] = ' ';
 				strcat(text,c);
 			}
 		} else if (getKeyOn(KEY_START)) {
+			if(mask_buffer != NULL)
+				free(mask_buffer);
 			return 1; //ENTER
 		} else if (getKeyOn(KEY_SELECT)) {
 			selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
@@ -192,6 +224,9 @@ int diaShowKeyb(char* text, int maxLen) {
 			break;
 	}
 
+
+	if(mask_buffer != NULL)
+		free(mask_buffer);
 
 	return 0;
 }
@@ -296,7 +331,7 @@ static const char *diaGetLocalisedText(const char* def, int id) {
 
 /// returns true if the item is controllable (e.g. a value can be changed on it)
 static int diaIsControllable(struct UIItem *ui) {
-	return (ui->enabled && (ui->type >= UI_OK));
+	return (ui->enabled && ui->visible && (ui->type >= UI_OK));
 }
 
 /// returns true if the given item should be preceded with nextline
@@ -325,6 +360,10 @@ static void diaDrawHint(int text_id) {
 /// renders an ui item (either selected or not)
 /// sets width and height of the render into the parameters
 static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h) {
+	// Don't draw controllable items that are not visible.
+	if (!item->visible && item->type >= UI_LABEL)
+		return;
+
 	*h = UI_SPACING_H;
 
 	// all texts are rendered up from the given point!
@@ -583,7 +622,7 @@ static int diaHandleInput(struct UIItem *item, int *modified) {
 			if (item->stringvalue.handler(tmp, sizeof(tmp)))
 				strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
 		} else {
-			if (diaShowKeyb(tmp, sizeof(tmp)))
+			if (diaShowKeyb(tmp, sizeof(tmp), item->type == UI_PASSWORD))
 				strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
 		}
 
@@ -849,6 +888,24 @@ void diaSetEnabled(struct UIItem* ui, int id, int enabled) {
 		return;
 
 	item->enabled = enabled;
+}
+
+void diaSetVisible(struct UIItem* ui, int id, int visible) {
+	struct UIItem *item = diaFindByID(ui, id);
+
+	if (!item)
+		return;
+
+	item->visible = visible;
+}
+
+void diaSetItemType(struct UIItem* ui, int id, UIItemType type) {
+	struct UIItem *item = diaFindByID(ui, id);
+
+	if (!item)
+		return;
+
+	item->type = type;
 }
 
 int diaGetInt(struct UIItem* ui, int id, int *value) {

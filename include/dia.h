@@ -7,14 +7,14 @@
 typedef enum {
 	// terminates the definition of dialog. Mandatory
 	UI_TERMINATOR,
-	// A string label
-	UI_LABEL,
 	// Break to next line
 	UI_BREAK,
 	// Break to next line, draw line splitter
 	UI_SPLITTER,
 	// A spacer of a few pixels
 	UI_SPACER,
+	// A string label
+	UI_LABEL,
 	// Ok button
 	UI_OK, // Just a shortcut for BUTTON with OK label and id 1!
 	// Universal button (display's label, returns id on X)
@@ -37,10 +37,11 @@ typedef enum {
 struct UIItem {
 	UIItemType type;
 	int id; // id of this item
-	short enabled;
-	int hintId; // shown if not NULL
-	int fixedWidth;	// 0: no fixed width, >0: width in pixels, <0: width in %
-	int fixedHeight;
+	unsigned char enabled;
+	unsigned char visible;
+	short int hintId; // shown if not NULL
+	short int fixedWidth;	// 0: no fixed width, >0: width in pixels, <0: width in %
+	short int fixedHeight;
 
 	union {
 		struct {
@@ -76,8 +77,10 @@ struct UIItem {
 /// Dialog display
 int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(int modified));
 void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus);
-int diaShowKeyb(char* text, int maxLen);
+int diaShowKeyb(char* text, int maxLen, int hide_text);
 void diaSetEnabled(struct UIItem* ui, int id, int enabled);
+void diaSetVisible(struct UIItem* ui, int id, int visible);
+void diaSetItemType(struct UIItem* ui, int id, UIItemType type);
 int diaGetInt(struct UIItem* ui, int id, int *value);
 int diaSetInt(struct UIItem* ui, int id, int value);
 int diaGetString(struct UIItem* ui, int id, char *value, int length);

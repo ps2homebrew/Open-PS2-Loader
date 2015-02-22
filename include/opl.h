@@ -31,7 +31,7 @@
 #include <sys/fcntl.h>
 #endif
 
-#define OPL_VERSION "0.9.3"
+#define OPL_VERSION "0.9.3 WIP"
 
 #define IO_MENU_UPDATE_DEFFERED 2
 
@@ -65,6 +65,8 @@ int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
 int gETHOpMode;	//See ETH_OP_MODES.
+int gPCShareAddressIsNetBIOS;
+char gPCShareNBAddress[17];
 int pc_ip[4];
 int gPCPort;
 char gPCShareName[32];
@@ -76,7 +78,7 @@ char gPCPassword[32];
 // describes what is happening in the network startup thread (>0 means loading, <0 means error)...
 int gNetworkStartup;
 // true if the ip config should be saved as well
-int gIPConfigChanged;
+int gNetConfigChanged;
 int gHDDSpindown;
 /// Indicates the hdd module loading sequence
 int gHddStartup;

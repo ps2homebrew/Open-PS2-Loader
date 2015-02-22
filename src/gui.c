@@ -279,30 +279,34 @@ static int guiUIUpdater(int modified) {
 		if (temp != curTheme) {
 			curTheme = temp;
 			if (temp == 0) {
-				diaUIConfig[32].type = UI_COLOUR; // Must be correctly set before doing the diaS/GetColor !!
-				diaUIConfig[36].type = UI_COLOUR;
-				diaUIConfig[40].type = UI_COLOUR;
-				diaUIConfig[44].type = UI_COLOUR;
+				//Display the default theme's colours.
+				diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_COLOUR);	// Must be correctly set before doing the diaS/GetColor !!
+				diaSetItemType(diaUIConfig, UICFG_UICOL, UI_COLOUR);
+				diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_COLOUR);
+				diaSetItemType(diaUIConfig, UICFG_SELCOL, UI_COLOUR);
 				diaSetColor(diaUIConfig, UICFG_BGCOL, gDefaultBgColor);
 				diaSetColor(diaUIConfig, UICFG_UICOL, gDefaultUITextColor);
 				diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
 				diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
 			} else if (temp == thmGetGuiValue()) {
-				diaUIConfig[32].type = UI_COLOUR;
-				diaUIConfig[36].type = UI_COLOUR;
-				diaUIConfig[40].type = UI_COLOUR;
-				diaUIConfig[44].type = UI_COLOUR;
+				//Display the current theme's colours.
+				diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_COLOUR);
+				diaSetItemType(diaUIConfig, UICFG_UICOL, UI_COLOUR);
+				diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_COLOUR);
+				diaSetItemType(diaUIConfig, UICFG_SELCOL, UI_COLOUR);
 				diaSetColor(diaUIConfig, UICFG_BGCOL, gTheme->bgColor);
 				diaSetU64Color(diaUIConfig, UICFG_UICOL, gTheme->uiTextColor);
 				diaSetU64Color(diaUIConfig, UICFG_TXTCOL, gTheme->textColor);
 				diaSetU64Color(diaUIConfig, UICFG_SELCOL, gTheme->selTextColor);
 			} else {
-				diaUIConfig[32].type = UI_SPACER;
-				diaUIConfig[36].type = UI_SPACER;
-				diaUIConfig[40].type = UI_SPACER;
-				diaUIConfig[44].type = UI_SPACER;
+				//When another theme is highlighted in the list, its colours are not known. Don't show any colours.
+				diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_SPACER);
+				diaSetItemType(diaUIConfig, UICFG_UICOL, UI_SPACER);
+				diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_SPACER);
+				diaSetItemType(diaUIConfig, UICFG_SELCOL, UI_SPACER);
 			}
 
+			//The user cannot adjust the current theme's colours.
 			temp = !temp;
 			diaSetEnabled(diaUIConfig, UICFG_BGCOL, temp);
 			diaSetEnabled(diaUIConfig, UICFG_UICOL, temp);
@@ -391,62 +395,84 @@ void guiShowCheatConfig(void) {
 }
 #endif
 
-void guiShowIPConfig(void) {
-	size_t i;
-	const char *ethOpModes[]={_l(_STR_AUTO), _l(_STR_ETH_100MFDX), _l(_STR_ETH_100MHDX), _l(_STR_ETH_10MFDX), _l(_STR_ETH_10MHDX), NULL};
-	diaSetEnum(diaIPConfig, NETCFG_ETHOPMODE, ethOpModes);
+static int netConfigUpdater(int modified) {
+	int isNetBIOS, i;
 
-	// upload current values
-	for (i = 0; i < 4; ++i) {
-		if (gNetworkStartup != ERROR_ETH_NOT_STARTED) {
-			diaSetEnabled(diaIPConfig, 2 + i, 0);
-			diaSetEnabled(diaIPConfig, 6 + i, 0);
-			diaSetEnabled(diaIPConfig, 10 + i, 0);
-		} else {
-			diaSetEnabled(diaIPConfig, 2 + i, 1);
-			diaSetEnabled(diaIPConfig, 6 + i, 1);
-			diaSetEnabled(diaIPConfig, 10 + i, 1);
-		}
-		diaSetInt(diaIPConfig, 2 + i, ps2_ip[i]);
-		diaSetInt(diaIPConfig, 6 + i, ps2_netmask[i]);
-		diaSetInt(diaIPConfig, 10 + i, ps2_gateway[i]);
-		diaSetInt(diaIPConfig, 14 + i, pc_ip[i]);
+	if(modified) {
+		diaGetInt(diaNetConfig, NETCFG_SHARE_ADDR_TYPE, &isNetBIOS);
+		diaSetVisible(diaNetConfig, NETCFG_SHARE_NB_ADDR, isNetBIOS);
+
+		for (i = 0; i < 4; i++)
+			diaSetVisible(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, !isNetBIOS);
+
+		for (i = 0; i < 3; i++)
+			diaSetVisible(diaNetConfig, NETCFG_SHARE_IP_ADDR_DOT_0 + i, !isNetBIOS);
 	}
 
-	diaSetInt(diaIPConfig, 18, gPCPort);
-	diaSetString(diaIPConfig, 19, gPCShareName);
-	diaSetString(diaIPConfig, 20, gPCUserName);
-	diaSetString(diaIPConfig, 21, gPCPassword);
-	diaSetInt(diaIPConfig, NETCFG_ETHOPMODE, gETHOpMode);
+	return 0;
+}
+
+void guiShowNetConfig(void) {
+	size_t i;
+	const char *ethOpModes[]={_l(_STR_AUTO), _l(_STR_ETH_100MFDX), _l(_STR_ETH_100MHDX), _l(_STR_ETH_10MFDX), _l(_STR_ETH_10MHDX), NULL};
+	const char *addrConfModes[]={_l(_STR_ADDR_TYPE_IP), _l(_STR_ADDR_TYPE_NETBIOS), NULL};
+	diaSetEnum(diaNetConfig, NETCFG_SHARE_ADDR_TYPE, addrConfModes);
+	diaSetEnum(diaNetConfig, NETCFG_ETHOPMODE, ethOpModes);
+
+	// upload current values
+	diaSetInt(diaNetConfig, NETCFG_SHARE_ADDR_TYPE, gPCShareAddressIsNetBIOS);
+	diaSetVisible(diaNetConfig, NETCFG_SHARE_NB_ADDR, gPCShareAddressIsNetBIOS);
+	diaSetInt(diaNetConfig, NETCFG_SHARE_NB_ADDR, gPCShareAddressIsNetBIOS);
+	diaSetString(diaNetConfig, NETCFG_SHARE_NB_ADDR, gPCShareNBAddress);
+
+	for (i = 0; i < 4; ++i) {
+		diaSetVisible(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, !gPCShareAddressIsNetBIOS);
+		diaSetInt(diaNetConfig, NETCFG_PS2_IP_ADDR_0 + i, ps2_ip[i]);
+		diaSetInt(diaNetConfig, NETCFG_PS2_NETMASK_0 + i, ps2_netmask[i]);
+		diaSetInt(diaNetConfig, NETCFG_PS2_GATEWAY_0 + i, ps2_gateway[i]);
+		diaSetInt(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, pc_ip[i]);
+	}
+
+	for (i = 0; i < 3; ++i)
+		diaSetVisible(diaNetConfig, NETCFG_SHARE_IP_ADDR_DOT_0 + i, !gPCShareAddressIsNetBIOS);
+
+	diaSetInt(diaNetConfig, NETCFG_SHARE_PORT, gPCPort);
+	diaSetString(diaNetConfig, NETCFG_SHARE_NAME, gPCShareName);
+	diaSetString(diaNetConfig, NETCFG_SHARE_USERNAME, gPCUserName);
+	diaSetString(diaNetConfig, NETCFG_SHARE_PASSWORD, gPCPassword);
+	diaSetInt(diaNetConfig, NETCFG_ETHOPMODE, gETHOpMode);
 
 	//Update the spacer item between the OK and reconnect buttons (See dialogs.c).
 	if (gNetworkStartup == 0) {
-		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
-		diaIPConfig[70].type = UI_SPACER;
+		diaSetLabel(diaNetConfig, NETCFG_OK, _l(_STR_OK));
+		diaSetVisible(diaNetConfig, NETCFG_RECONNECT, 1);
 	} else if (gNetworkStartup >= ERROR_ETH_SMB_CONN) {
-		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_RECONNECT));
-		diaIPConfig[70].type = UI_TERMINATOR;
+		diaSetLabel(diaNetConfig, NETCFG_OK, _l(_STR_RECONNECT));
+		diaSetVisible(diaNetConfig, NETCFG_RECONNECT, 0);
 	} else {
-		diaSetLabel(diaIPConfig, NETCFG_OK, _l(_STR_OK));
-		diaIPConfig[70].type = UI_TERMINATOR;
+		diaSetLabel(diaNetConfig, NETCFG_OK, _l(_STR_OK));
+		diaSetVisible(diaNetConfig, NETCFG_RECONNECT, 0);
 	}
 
-	int result = diaExecuteDialog(diaIPConfig, -1, 1, NULL);
+	int result = diaExecuteDialog(diaNetConfig, -1, 1, &netConfigUpdater);
 	if (result) {
 		// Store values
-		for (i = 0; i < 4; ++i) {
-			diaGetInt(diaIPConfig, 2 + i, &ps2_ip[i]);
-			diaGetInt(diaIPConfig, 6 + i, &ps2_netmask[i]);
-			diaGetInt(diaIPConfig, 10 + i, &ps2_gateway[i]);
-			diaGetInt(diaIPConfig, 14 + i, &pc_ip[i]);
-		}
-		diaGetInt(diaIPConfig, NETCFG_ETHOPMODE, &gETHOpMode);
+		diaGetInt(diaNetConfig, NETCFG_SHARE_ADDR_TYPE, &gPCShareAddressIsNetBIOS);
+		diaGetString(diaNetConfig, NETCFG_SHARE_NB_ADDR, gPCShareNBAddress, sizeof(gPCShareNBAddress));
 
-		diaGetInt(diaIPConfig, 18, &gPCPort);
-		diaGetString(diaIPConfig, 19, gPCShareName, sizeof(gPCShareName));
-		diaGetString(diaIPConfig, 20, gPCUserName, sizeof(gPCUserName));
-		diaGetString(diaIPConfig, 21, gPCPassword, sizeof(gPCPassword));
-		gIPConfigChanged = 1;
+		for (i = 0; i < 4; ++i) {
+			diaGetInt(diaNetConfig, NETCFG_PS2_IP_ADDR_0 + i, &ps2_ip[i]);
+			diaGetInt(diaNetConfig, NETCFG_PS2_NETMASK_0 + i, &ps2_netmask[i]);
+			diaGetInt(diaNetConfig, NETCFG_PS2_GATEWAY_0 + i, &ps2_gateway[i]);
+			diaGetInt(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, &pc_ip[i]);
+		}
+		diaGetInt(diaNetConfig, NETCFG_ETHOPMODE, &gETHOpMode);
+
+		diaGetInt(diaNetConfig, NETCFG_SHARE_PORT, &gPCPort);
+		diaGetString(diaNetConfig, NETCFG_SHARE_NAME, gPCShareName, sizeof(gPCShareName));
+		diaGetString(diaNetConfig, NETCFG_SHARE_USERNAME, gPCUserName, sizeof(gPCUserName));
+		diaGetString(diaNetConfig, NETCFG_SHARE_PASSWORD, gPCPassword, sizeof(gPCPassword));
+		gNetConfigChanged = 1;
 
 		if (result == NETCFG_RECONNECT && gNetworkStartup < ERROR_ETH_SMB_CONN)
 			gNetworkStartup = ERROR_ETH_SMB_LOGON;
@@ -459,7 +485,7 @@ int guiShowKeyboard(char* value, int maxLength) {
 	char tmp[maxLength];
 	strncpy(tmp, value, maxLength);
 
-	int result = diaShowKeyb(tmp, maxLength);
+	int result = diaShowKeyb(tmp, maxLength, 0);
 	if (result) {
 		strncpy(value, tmp, maxLength);
 		value[maxLength - 1] = '\0';
@@ -487,7 +513,7 @@ static int vmc_operation;
 static statusVMCparam_t vmc_status;
 
 int guiVmcNameHandler(char* text, int maxLen) {
-	int result = diaShowKeyb(text, maxLen);
+	int result = diaShowKeyb(text, maxLen, 0);
 
 	if (result)
 	vmc_refresh = 1;
@@ -499,7 +525,6 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 	int size = support->itemCheckVMC(name, 0);
 
 	if (size != -1) {
-		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
 		diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
 
 		if (size == 8)
@@ -517,11 +542,13 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 
 		if (gEnableDandR) {
 			diaSetEnabled(diaVMC, VMC_SIZE, 1);
-			diaVMC[20].type = UI_SPLITTER;
+			diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
+			diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 1);
 		}
 		else {
 			diaSetEnabled(diaVMC, VMC_SIZE, 0);
-			diaVMC[20].type = UI_TERMINATOR;
+			diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
+			diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 0);
 		}
 	}
 	else {
@@ -530,7 +557,7 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 
 		diaSetInt(diaVMC, VMC_SIZE, 0);
 		diaSetEnabled(diaVMC, VMC_SIZE, 1);
-		diaVMC[20].type = UI_TERMINATOR;
+		diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 0);
 	}
 
 	return size;
@@ -653,7 +680,7 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 int guiAltStartupNameHandler(char* text, int maxLen) {
 	int i;
 
-	int result = diaShowKeyb(text, maxLen);
+	int result = diaShowKeyb(text, maxLen, 0);
 	if (result) {
 		for (i = 0; text[i]; i++) {
 			if (text[i] > 96 && text[i] < 123)
@@ -1299,6 +1326,8 @@ void guiIntroLoop(void) {
 		else
 			endIntro = 1;
 
+		guiDrawOverlays();
+
 		guiHandleDeferredOps();
 
 		guiEndFrame();
@@ -1416,7 +1445,7 @@ int guiMsgBox(const char* text, int addAccept, struct UIItem *ui) {
 		fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
 		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 		if (addAccept)
-			guiDrawIconAndText(CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
+			guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
 
 		guiEndFrame();
 	}

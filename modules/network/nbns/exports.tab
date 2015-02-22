@@ -1,0 +1,9 @@
+void _funcret(){};
+
+DECLARE_EXPORT_TABLE(nbnsman, 1, 1)
+	DECLARE_EXPORT(_start)
+	DECLARE_EXPORT(_exit)
+	DECLARE_EXPORT(_funcret)
+	DECLARE_EXPORT(_funcret)
+	DECLARE_EXPORT(nbnsFindName)
+END_EXPORT_TABLE

@@ -13,6 +13,8 @@
 #endif
 #include "modules/iopcore/common/cdvd_config.h"
 
+#include "include/nbns.h"
+
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
 
@@ -31,6 +33,9 @@ extern int size_smap_irx;
 extern void *smbman_irx;
 extern int size_smbman_irx;
 
+extern void *nbns_irx;
+extern int size_nbns_irx;
+
 #ifdef VMC
 extern void *smb_mcemu_irx;
 extern int size_smb_mcemu_irx;
@@ -48,6 +53,7 @@ static base_game_info_t *ethGames = NULL;
 static item_list_t ethGameList;
 
 static void ethSMBConnect(void) {
+	unsigned char share_ip_address[4];
 	smbLogOn_in_t logon;
 	smbEcho_in_t echo;
 	smbOpenShare_in_t openshare;
@@ -59,7 +65,17 @@ static void ethSMBConnect(void) {
 		sprintf(ethPrefix, ethBase);
 
 	// open tcp connection with the server / logon to SMB server
-	sprintf(logon.serverIP, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	if(gPCShareAddressIsNetBIOS) {
+		if(nbnsFindName(gPCShareNBAddress, share_ip_address) != 0) {
+			gNetworkStartup = ERROR_ETH_SMB_CONN;
+			return;
+		}
+
+		sprintf(logon.serverIP, "%u.%u.%u.%u", share_ip_address[0], share_ip_address[1], share_ip_address[2], share_ip_address[3]);
+	} else {
+		sprintf(logon.serverIP, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	}
+
 	logon.serverPort = gPCPort;
 
 	if (strlen(gPCPassword) > 0) {
@@ -93,6 +109,14 @@ static void ethSMBConnect(void) {
 		// SMB server alive test
 		strcpy(echo.echo, "ALIVE ECHO TEST");
 		echo.len = strlen("ALIVE ECHO TEST");
+
+		if (gPCShareAddressIsNetBIOS) {
+			// Since the SMB server can be connected to, update the IP address.
+			pc_ip[0] = share_ip_address[0];
+			pc_ip[1] = share_ip_address[1];
+			pc_ip[2] = share_ip_address[2];
+			pc_ip[3] = share_ip_address[3];
+		}
 
 		if (fileXioDevctl(ethBase, SMB_DEVCTL_ECHO, (void *)&echo, sizeof(echo), NULL, 0) >= 0) {
 			gNetworkStartup = ERROR_ETH_SMB_OPENSHARE;
@@ -204,6 +228,9 @@ static void smbLoadModules(void) {
 	if(ethLoadModules() == 0) {
 		gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
 		if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
+			sysLoadModuleBuffer(&nbns_irx, size_nbns_irx, 0, NULL);
+			nbnsInit();
+
 			LOG("SMBSUPPORT Modules loaded\n");
 			ethInitSMB();
 			return;
@@ -487,6 +514,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
+	nbnsDeinit();
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))

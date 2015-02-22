@@ -338,7 +338,7 @@ void configWriteIP() {
 
 		fioWrite(fd, ipconfig, strlen(ipconfig));
 		fioClose(fd);
-		gIPConfigChanged = 0;
+		gNetConfigChanged = 0;
 	}
 }
 
@@ -480,7 +480,7 @@ int configReadMulti(int types) {
 int configWriteMulti(int types) {
 	int result = 0;
 
-	if ((CONFIG_OPL & types) && gIPConfigChanged)
+	if ((CONFIG_OPL & types) && gNetConfigChanged)
 		configWriteIP();
 
 	int index = 0;

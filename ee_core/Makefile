@@ -26,6 +26,9 @@ EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
 ifeq ($(EESIO_DEBUG),1) 
 EE_CFLAGS += -D__EESIO_DEBUG
 endif
+ifeq ($(DTL_T10000),1)
+	EE_CFLAGS += -D_DTL_T10000
+endif
 ifeq ($(LOAD_DEBUG_MODULES),1)
 EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 	ifeq ($(DECI2_DEBUG),1)

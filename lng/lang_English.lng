@@ -93,7 +93,8 @@ HDL Server Unloading...
 Exit to
 Background color
 Text color
-IP
+IP address
+Address
 Mask
 Gateway
 Port
@@ -101,9 +102,9 @@ Share
 User
 Password
 <not set>
-IP address type
-Static
-Dynamic (DHCP)
+Address type
+IP
+NetBIOS
 Accept
 Item will be permanently deleted, continue ?
 Rename

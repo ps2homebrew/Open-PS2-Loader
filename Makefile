@@ -43,7 +43,7 @@ MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
 IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
-		obj/ps2dev9.o obj/smsutils.o obj/smstcpip.o obj/smap.o obj/isofs.o obj/nbns.o
+		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns.o
 
 EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
@@ -138,6 +138,8 @@ ifeq ($(INGAME_DEBUG),1)
 		EE_CFLAGS += -D__DECI2_DEBUG
 		IOP_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
 		DECI2_DEBUG=1
+	else
+		IOP_OBJS += obj/udptty-ingame.o
 	endif
 else
 	ifeq ($(IOPCORE_DEBUG),1)
@@ -146,6 +148,7 @@ else
 		CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
 		MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
 		SMSTCPIP_INGAME_CFLAGS = 
+		IOP_OBJS += obj/udptty-ingame.o
 	endif
 endif
 
@@ -250,6 +253,8 @@ endif
 ifeq ($(DEBUG),1)
 	echo "    * udptty.irx"
 	$(MAKE) -C modules/debug/udptty clean
+	echo "    * udptty-ingame.irx"
+	$(MAKE) -C modules/debug/udptty-ingame clean
 	echo "    * ioptrap.irx"
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo "    * ps2link.irx"
@@ -372,10 +377,8 @@ smsutils.s:
 	$(MAKE) -C modules/network/SMSUTILS
 	$(BIN2S) modules/network/SMSUTILS/SMSUTILS.irx asm/smsutils.s smsutils_irx
 
-smstcpip.s:
-	echo "    * SMSTCPIP.irx"
-	$(MAKE) -C modules/network/SMSTCPIP -f Makefile rebuild
-	$(BIN2S) modules/network/SMSTCPIP/SMSTCPIP.irx asm/smstcpip.s smstcpip_irx
+ps2ip.s:
+	$(BIN2S) $(PS2SDK)/iop/irx/ps2ip.irx asm/ps2ip.s ps2ip_irx
 
 ingame_smstcpip.s:
 	echo "    * in-game SMSTCPIP.irx"
@@ -388,8 +391,7 @@ smap_ingame.s:
 	$(BIN2S) modules/network/smap/smap.irx asm/smap_ingame.s smap_ingame_irx
 
 smap.s:
-	echo "    * SMAP.irx"
-	$(BIN2S) $(PS2DEV)/ps2eth/smap-new/ps2smap.irx asm/smap.s smap_irx
+	$(BIN2S) $(PS2DEV)/ps2eth/smap/ps2smap.irx asm/smap.s smap_irx
 
 smbman.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx
@@ -426,6 +428,11 @@ udptty.s:
 	echo "    * udptty.irx"
 	$(MAKE) -C modules/debug/udptty
 	$(BIN2S) modules/debug/udptty/udptty.irx asm/udptty.s udptty_irx
+
+udptty-ingame.s:
+	echo "    * udptty-ingame.irx"
+	$(MAKE) -C modules/debug/udptty-ingame
+	$(BIN2S) modules/debug/udptty-ingame/udptty.irx asm/udptty-ingame.s udptty_ingame_irx
 
 ioptrap.s:
 	echo "    * ioptrap.irx"

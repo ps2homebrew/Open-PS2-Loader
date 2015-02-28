@@ -15,7 +15,7 @@
 #include <smapregs.h>
 #include <speedregs.h>
 
-#include <ps2ip.h>
+#include "smstcpip.h"
 
 #include "main.h"
 

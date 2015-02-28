@@ -94,8 +94,8 @@ extern void *pusbd_irx;
 extern int size_pusbd_irx;
 
 #ifdef __INGAME_DEBUG
-extern void *udptty_irx;
-extern int size_udptty_irx;
+extern void *udptty_ingame_irx;
+extern int size_udptty_ingame_irx;
 
 extern void *ioptrap_irx;
 extern int size_ioptrap_irx;
@@ -423,7 +423,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxptr_tab[n++].irxsize = size_drvtif_irx;
 	irxptr_tab[n++].irxsize = size_tifinet_irx;
 #else
-	irxptr_tab[n++].irxsize = size_udptty_irx;
+	irxptr_tab[n++].irxsize = size_udptty_ingame_irx;
 	irxptr_tab[n++].irxsize = size_ioptrap_irx;
 #endif
 #endif
@@ -448,7 +448,7 @@ static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send
 	irxsrc[n++] = (void *)&tifinet_irx;
 #else
 
-	irxsrc[n++] = (void *)&udptty_irx;
+	irxsrc[n++] = (void *)&udptty_ingame_irx;
 	irxsrc[n++] = (void *)&ioptrap_irx;
 #endif
 #endif

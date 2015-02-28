@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev786 - Added support for the NBNS protocol, added functions for changing the visibility and type of UI elements without hardcoding the element's index number, changed the keyboard to hide passwords, and adjusted language string and some function names. - Sun Feb 22 16:24:52 2015 +0800
 rev785 - Added patches for Oneechanbara, Ratchet and Clank: Up Your Arsenal and updated SMAP. - Fri Feb 20 13:44:46 2015 +0800
 rev784 - Removed space-filler code in EESYNC, which is found only in some EESYNC versions, presumed to make up for the lesser space taken up by a Debug SECRMAN module. The export table has been removed too, as no module ever links with it. - Fri Feb 13 15:28:26 2015 +0800
 rev783 - New compatibility mode 1 (accurate reads) and the user callback will no longer be called during streaming (incorrect behaviour). - Fri Feb 13 15:23:56 2015 +0800

@@ -537,6 +537,7 @@ static void _loadConfig() {
 
 			configGetInt(configOPL, "eth_linkmode", &gETHOpMode);
 
+			configGetInt(configOPL, "ps2_ip_use_dhcp", &ps2_ip_use_dhcp);
 			configGetInt(configOPL, "pc_share_use_nbns", &gPCShareAddressIsNetBIOS);
 			configGetStrCopy(configOPL, "pc_share_nb_addr", gPCShareNBAddress, sizeof(gPCShareNBAddress));
 
@@ -601,6 +602,7 @@ static void _saveConfig() {
 #endif
 
 		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
+		configSetInt(configOPL, "ps2_ip_use_dhcp", ps2_ip_use_dhcp);
 		configSetInt(configOPL, "pc_share_use_nbns", gPCShareAddressIsNetBIOS);
 		configSetStr(configOPL, "pc_share_nb_addr", gPCShareNBAddress);
 		char temp[256];
@@ -812,7 +814,7 @@ static void moduleCleanup(opl_io_module_t* mod, int exception) {
 	clearMenuGameList(mod);
 }
 
-void shutdown(int exception) {
+void deinit(int exception) {
 	unloadPads();
 	ioEnd();
 	guiEnd();
@@ -834,6 +836,7 @@ static void setDefaults(void) {
 
 	gBaseMCDir = "mc?:OPL";
 
+	ps2_ip_use_dhcp = 0;
 	gETHOpMode = ETH_OP_MODE_AUTO;
 	gPCShareAddressIsNetBIOS = 0;
 	gPCShareNBAddress[0] = '\0';

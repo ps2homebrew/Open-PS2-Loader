@@ -50,6 +50,7 @@ Language
 %d: Cannot open SMB share
 %d: Cannot list SMB shares
 %d: Cannot list games
+%d: Unable to get IP address from DHCP server
 On
 Off
 OK
@@ -93,6 +94,9 @@ HDL Server Unloading...
 Exit to
 Background color
 Text color
+IP address type
+Static
+DHCP
 IP address
 Address
 Mask

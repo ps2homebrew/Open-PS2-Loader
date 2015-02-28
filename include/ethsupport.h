@@ -17,6 +17,7 @@ typedef struct {
 #endif
 
 #define ERROR_ETH_NOT_STARTED			100
+#define ERROR_ETH_LINK_FAIL			101
 #define ERROR_ETH_MODULE_PS2DEV9_FAILURE	200
 #define ERROR_ETH_MODULE_SMSUTILS_FAILURE	201
 #define ERROR_ETH_MODULE_SMSTCPIP_FAILURE	202
@@ -28,9 +29,17 @@ typedef struct {
 #define ERROR_ETH_SMB_OPENSHARE			303
 #define ERROR_ETH_SMB_LISTSHARES		304
 #define ERROR_ETH_SMB_LISTGAMES			305
+#define ERROR_ETH_DHCP_FAIL			310
 
 void ethInit(void);
 int ethLoadModules(void);
+int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway);
+int ethWaitValidNetIFLinkState(void);
+int ethWaitValidDHCPState(void);
+int ethApplyNetIFConfig(void);
+int ethGetNetIFLinkStatus(void);
+int ethApplyIPConfig(void);
+int ethGetDHCPStatus(void);
 item_list_t* ethGetObject(int initOnly);
 
 #endif

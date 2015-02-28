@@ -385,7 +385,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		strncpy(filename, altStartup, sizeof(filename));
 	else
 		sprintf(filename, "%s", game->startup);
-	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call usbCleanUp, so usbGames/game will be freed
+	deinit(NO_EXCEPTION); // CAREFUL: deinit will call usbCleanUp, so usbGames/game will be freed
 
 #ifdef VMC
 #define VMC_TEMP4	size_mcemu_irx, &usb_mcemu_irx,

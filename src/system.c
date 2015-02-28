@@ -5,6 +5,7 @@
 */
 
 #include "include/opl.h"
+#include "include/ethsupport.h"
 #include "include/util.h"
 #include "include/pad.h"
 #include "include/system.h"
@@ -263,45 +264,6 @@ void sysReset(int modload_mask) {
 
 void sysPowerOff(void) {
 	poweroffShutdown();
-}
-
-int sysSetIPConfig(char* ipconfig) {
-	int ipconfiglen;
-	char str[16];
-	const char *SmapLinkModeArgs[4]={
-		"0x100",
-		"0x080",
-		"0x040",
-		"0x020"
-	};
-
-	memset(ipconfig, 0, IPCONFIG_MAX_LEN);
-	ipconfiglen = 0;
-
-	// add ip to g_ipconfig buf
-	sprintf(str, "%d.%d.%d.%d", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
-	strncpy(&ipconfig[ipconfiglen], str, 15);
-	ipconfiglen += strlen(str) + 1;
-
-	// add netmask to g_ipconfig buf
-	sprintf(str, "%d.%d.%d.%d", ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
-	strncpy(&ipconfig[ipconfiglen], str, 15);
-	ipconfiglen += strlen(str) + 1;
-
-	// add gateway to g_ipconfig buf
-	sprintf(str, "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
-	strncpy(&ipconfig[ipconfiglen], str, 15);
-	ipconfiglen += strlen(str) + 1;
-
-	//Add Ethernet operation mode to g_ipconfig buf
-	if(gETHOpMode!=ETH_OP_MODE_AUTO){
-		strcpy(&ipconfig[ipconfiglen], "-no_auto");
-		ipconfiglen += 9;
-		strcpy(&ipconfig[ipconfiglen], SmapLinkModeArgs[gETHOpMode-1]);
-		ipconfiglen += strlen(SmapLinkModeArgs[gETHOpMode-1]) + 1;
-	}
-
-	return ipconfiglen;
 }
 
 static unsigned int crctab[0x400];
@@ -585,6 +547,7 @@ static int ResetDECI2(void){
 #define VMC_TEMP1
 #endif
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 unsigned int compatflags) {
+	u8 local_ip_address[4], local_netmask[4], local_gateway[4];
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
 	elf_pheader_t *eph;
@@ -606,6 +569,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	char gsm_config_str[256];
 #endif
 
+	ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
 	AddHistoryRecordUsingFullPath(filename);
 
 	if (gExitPath[0] == '\0')
@@ -667,11 +631,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
 	i = 0;
-	sprintf(config_str, "%s %d %s %d %d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d %d" CHEAT_TEMP1 GSM_TEMP1, \
+	sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_TEMP1 GSM_TEMP1, \
 		mode_str, gDisableDebug, gExitPath, gHDDSpindown, \
-		ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], \
-		ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3], \
-		ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3], \
+		local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3], \
+		local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3], \
+		local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3], \
 		gETHOpMode \
 		CHEAT_TEMP2 GSM_TEMP2);
 	argv[i] = config_str;

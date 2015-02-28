@@ -43,7 +43,8 @@ MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
 IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
-		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns.o
+		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns.o	\
+		obj/netman.o obj/dns.o obj/ps2ips.o
 
 EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
@@ -59,7 +60,7 @@ EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 MAPFILE = opl.map
 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnbns
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnbns -lnetman -lps2ipc
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
 
 BIN2C = $(PS2SDK)/bin/bin2c
@@ -228,8 +229,8 @@ endif
 	$(MAKE) -C modules/network/SMSUTILS clean
 	echo "    * SMSTCPIP.irx"
 	$(MAKE) -C modules/network/SMSTCPIP clean
-	echo "    * SMAP.irx"
-	$(MAKE) -C modules/network/smap clean
+	echo "    * in-game SMAP.irx"
+	$(MAKE) -C modules/network/smap-ingame clean
 	echo "    * nbns.irx"
 	$(MAKE) -C modules/network/nbns clean
 	echo "    * ps2atad.irx"
@@ -378,7 +379,7 @@ smsutils.s:
 	$(BIN2S) modules/network/SMSUTILS/SMSUTILS.irx asm/smsutils.s smsutils_irx
 
 ps2ip.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/ps2ip.irx asm/ps2ip.s ps2ip_irx
+	$(BIN2S) $(PS2SDK)/iop/irx/ps2ip-nm.irx asm/ps2ip.s ps2ip_irx
 
 ingame_smstcpip.s:
 	echo "    * in-game SMSTCPIP.irx"
@@ -386,12 +387,21 @@ ingame_smstcpip.s:
 	$(BIN2S) modules/network/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
 smap_ingame.s:
-	echo "    * SMAP-ingame.irx"
-	$(MAKE) -C modules/network/smap
-	$(BIN2S) modules/network/smap/smap.irx asm/smap_ingame.s smap_ingame_irx
+	echo "    * in-game SMAP.irx"
+	$(MAKE) -C modules/network/smap-ingame
+	$(BIN2S) modules/network/smap-ingame/smap.irx asm/smap_ingame.s smap_ingame_irx
 
 smap.s:
-	$(BIN2S) $(PS2DEV)/ps2eth/smap/ps2smap.irx asm/smap.s smap_irx
+	$(BIN2S) $(PS2SDK)/iop/irx/smap.irx asm/smap.s smap_irx
+
+netman.s:
+	$(BIN2S) $(PS2SDK)/iop/irx/netman.irx asm/netman.s netman_irx
+
+dns.s:
+	$(BIN2S) $(PS2SDK)/iop/irx/dns.irx asm/dns.s dns_irx
+
+ps2ips.s:
+	$(BIN2S) $(PS2SDK)/iop/irx/ps2ips.irx asm/ps2ips.s ps2ips_irx
 
 smbman.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx

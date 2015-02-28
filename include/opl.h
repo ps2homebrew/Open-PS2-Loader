@@ -14,6 +14,8 @@
 #include <libcdvd.h>
 #include <libpad.h>
 #include <libmc.h>
+#include <netman.h>
+#include <ps2ip.h>
 #include <debug.h>
 #include <gsKit.h>
 #include <dmaKit.h>
@@ -43,7 +45,7 @@ void applyConfig(int themeID, int langID);
 void menuDeferredUpdate(void* data);
 void moduleUpdateMenu(int mode, int themeChanged);
 void handleHdlSrv();
-void shutdown();
+void deinit();
 
 char *gBaseMCDir;
 
@@ -61,6 +63,7 @@ enum ETH_OP_MODES{
 	ETH_OP_MODE_COUNT
 };
 
+int ps2_ip_use_dhcp;
 int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];

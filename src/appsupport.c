@@ -132,7 +132,7 @@ static void appLaunchItem(int id, config_set_t* configSet) {
 
 		char filename[256];
 		sprintf(filename,"%s",cur->val);
-		shutdown(exception); // CAREFUL: shutdown will call appCleanUp, so configApps/cur will be freed
+		deinit(exception); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
 		sysExecElf(filename);
 	}
 	else

@@ -23,7 +23,6 @@ void sysPowerOff(void);
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP0 unsigned int compatflags);
 
 int sysExecElf(char *path);
-int sysSetIPConfig(char* ipconfig);
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);
 int sysCheckMC(void);
 #ifdef VMC

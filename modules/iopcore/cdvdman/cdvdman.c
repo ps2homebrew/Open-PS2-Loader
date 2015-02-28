@@ -27,7 +27,9 @@
 #include <errno.h>
 #include <io_common.h>
 #include <usbd.h>
-#include <ps2ip.h>
+#ifdef SMB_DRIVER
+#include "smstcpip.h"
+#endif
 #include "ioman_add.h"
 
 #ifdef __IOPCORE_DEBUG

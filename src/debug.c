@@ -1,7 +1,7 @@
 /*
   Copyright 2010, jimmikaelakel
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "include/opl.h"
@@ -11,11 +11,8 @@
 extern void *ps2dev9_irx;
 extern int size_ps2dev9_irx;
 
-extern void *smstcpip_irx;
-extern int size_smstcpip_irx;
-
-extern void *ingame_smstcpip_irx;
-extern int size_ingame_smstcpip_irx;
+extern void *ps2ip_irx;
+extern int size_ps2ip_irx;
 
 extern void *smap_irx;
 extern int size_smap_irx;
@@ -46,7 +43,7 @@ int debugSetActive(void) {
 	if (ret < 0)
 		return -2;
 
-	ret = sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL);
+	ret = sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL);
 	if (ret < 0)
 		return -3;
 

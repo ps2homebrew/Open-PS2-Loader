@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <sysclib.h>
-#include <ps2ip.h>
+#include "smstcpip.h"
 #include <thbase.h>
 #include <intrman.h>
 #include <sifman.h>

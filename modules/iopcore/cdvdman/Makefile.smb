@@ -13,7 +13,7 @@ IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o imports.o exports.o
 IOP_OBJS += dev9.o smb.o
 IOP_LIBS =
 
-IOP_INCS += -I../common
+IOP_INCS += -I../common -I../../network/common
 IOP_CFLAGS += -Wall -fno-builtin-printf
 IOP_CFLAGS += -DSMB_DRIVER
 ifeq ($(IOPCORE_DEBUG),1)

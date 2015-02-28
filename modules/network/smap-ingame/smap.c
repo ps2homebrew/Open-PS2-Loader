@@ -349,7 +349,10 @@ int SMAPStart(void){
 		emac3_regbase=SmapDriverData.emac3_regbase;
 
 		dev9IntrEnable(DEV9_SMAP_INTR_MASK);
-		if((result=InitPHY(&SmapDriverData))==0 && !SmapDriverData.NetDevStopFlag){
+
+		//Initialize the PHY, only if there's no valid link status. It should have already been previously initialized successfully by the previous instance of SMAP.
+		result = (!(_smap_read_phy(emac3_regbase, SMAP_DsPHYTER_BMSR)&SMAP_PHY_BMSR_LINK)) ? InitPHY(&SmapDriverData): 0;
+		if(result==0 && !SmapDriverData.NetDevStopFlag){
 			SMAP_EMAC3_SET(SMAP_R_EMAC3_MODE0, SMAP_E3_TXMAC_ENABLE|SMAP_E3_RXMAC_ENABLE);
 			DelayThread(10000);
 			SmapDriverData.SmapIsInitialized=1;

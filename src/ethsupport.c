@@ -36,6 +36,15 @@ extern int size_smbman_irx;
 extern void *nbns_irx;
 extern int size_nbns_irx;
 
+extern void *netman_irx;
+extern int size_netman_irx;
+
+extern void *dns_irx;
+extern int size_dns_irx;
+
+extern void *ps2ips_irx;
+extern int size_ps2ips_irx;
+
 #ifdef VMC
 extern void *smb_mcemu_irx;
 extern int size_smb_mcemu_irx;
@@ -156,7 +165,63 @@ static int ethSMBDisconnect(void) {
 	return 0;
 }
 
+static void EthStatusCheckCb(s32 alarm_id, u16 time, void *common) {
+	iWakeupThread(*(int*)common);
+}
+
+static int WaitValidNetState(int (*checkingFunction)(void)){
+	int ThreadID, retry_cycles;
+
+	// Wait for a valid network status;
+	ThreadID = GetThreadId();
+	for(retry_cycles = 0; checkingFunction() == 0; retry_cycles++) {
+		//TODO: The HSYNC rate will vary according to the active video mode. Get the video mode from renderman.
+		SetAlarm(200*16, &EthStatusCheckCb, &ThreadID);
+		SleepThread();
+
+		if(retry_cycles >= 30*5){	//30s = 30*5*200ms
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+int ethWaitValidNetIFLinkState(void) {
+	return WaitValidNetState(&ethGetNetIFLinkStatus);
+}
+
+int ethWaitValidDHCPState(void) {
+	return WaitValidNetState(&ethGetDHCPStatus);
+}
+
 static void ethInitSMB(void) {
+	if(ethWaitValidNetIFLinkState() != 0) {
+		gNetworkStartup = ERROR_ETH_LINK_FAIL;
+		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+		LOG("ETH: Unable to get valid link status.\n");
+		return;
+	}
+
+	ethApplyNetIFConfig();
+
+	if(ethWaitValidNetIFLinkState() != 0) {
+		gNetworkStartup = ERROR_ETH_LINK_FAIL;
+		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+		LOG("ETH: Unable to get valid link status.\n");
+		return;
+	}
+
+	ethApplyIPConfig();
+
+	//Wait for DHCP to complete.
+	if(ps2_ip_use_dhcp && (ethWaitValidDHCPState() != 0)) {
+		gNetworkStartup = ERROR_ETH_DHCP_FAIL;
+		setErrorMessageWithCode(_STR_NETWORK_ERROR_DHCP_FAIL, gNetworkStartup);
+		LOG("ETH: Unable to get valid IP address via DHCP.\n");
+		return;
+	}
+
 	// connect
 	ethSMBConnect();
 
@@ -196,21 +261,24 @@ static void ethInitSMB(void) {
 }
 
 int ethLoadModules(void) {
-	int ipconfiglen;
-	char ipconfig[IPCONFIG_MAX_LEN];
-
 	LOG("ETHSUPPORT LoadModules\n");
-
-	ipconfiglen = sysSetIPConfig(ipconfig);
 
 	gNetworkStartup = ERROR_ETH_MODULE_PS2DEV9_FAILURE;
 	if (sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL) >= 0) {
 		gNetworkStartup = ERROR_ETH_MODULE_SMSUTILS_FAILURE;
+
+		sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL);
+		NetManInit();
+
 		if (sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL) >= 0) {
-			gNetworkStartup = ERROR_ETH_MODULE_SMSTCPIP_FAILURE;
-			if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
-				gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
-				if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, ipconfiglen, ipconfig) >= 0) {
+			gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
+			if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
+				gNetworkStartup = ERROR_ETH_MODULE_SMSTCPIP_FAILURE;
+				if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
+					sysLoadModuleBuffer(&dns_irx, size_dns_irx, 0, NULL);
+					sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
+					ps2ip_init();
+
 					LOG("ETHSUPPORT Modules loaded\n");
 					return 0;
 				}
@@ -515,13 +583,14 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
 	nbnsDeinit();
+	NetManDeinit();
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
 		strncpy(filename, altStartup, sizeof(filename));
 	else
 		sprintf(filename, "%s", game->startup);
-	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call ethCleanUp, so ethGames/game will be freed
+	deinit(NO_EXCEPTION); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
 #ifdef VMC
 #define VMC_TEMP2	size_mcemu_irx,&smb_mcemu_irx,
@@ -571,3 +640,114 @@ static item_list_t ethGameList = {
 		&ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, ETH_ICON
 #endif
 };
+
+int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway) {
+	t_ip_info ip_info;
+	int result;
+
+	if((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
+		ip_address[0] = ip4_addr1((struct ip_addr*)&ip_info.ipaddr);
+		ip_address[1] = ip4_addr2((struct ip_addr*)&ip_info.ipaddr);
+		ip_address[2] = ip4_addr3((struct ip_addr*)&ip_info.ipaddr);
+		ip_address[3] = ip4_addr4((struct ip_addr*)&ip_info.ipaddr);
+
+		netmask[0] = ip4_addr1((struct ip_addr*)&ip_info.netmask);
+		netmask[1] = ip4_addr2((struct ip_addr*)&ip_info.netmask);
+		netmask[2] = ip4_addr3((struct ip_addr*)&ip_info.netmask);
+		netmask[3] = ip4_addr4((struct ip_addr*)&ip_info.netmask);
+
+		gateway[0] = ip4_addr1((struct ip_addr*)&ip_info.gw);
+		gateway[1] = ip4_addr2((struct ip_addr*)&ip_info.gw);
+		gateway[2] = ip4_addr3((struct ip_addr*)&ip_info.gw);
+		gateway[3] = ip4_addr4((struct ip_addr*)&ip_info.gw);
+	}else{
+		memset(ip_address, 0, 4);
+		memset(netmask, 0, 4);
+		memset(gateway, 0, 4);
+	}
+
+	return result;
+}
+
+int ethApplyNetIFConfig(void) {
+	int mode, result;
+	static int CurrentMode = NETMAN_NETIF_ETH_LINK_MODE_AUTO;
+
+	switch(gETHOpMode){
+		case ETH_OP_MODE_100M_FDX:
+			mode = NETMAN_NETIF_ETH_LINK_MODE_100M_FDX;
+			break;
+		case ETH_OP_MODE_100M_HDX:
+			mode = NETMAN_NETIF_ETH_LINK_MODE_100M_HDX;
+			break;
+		case ETH_OP_MODE_10M_FDX:
+			mode = NETMAN_NETIF_ETH_LINK_MODE_10M_FDX;
+			break;
+		case ETH_OP_MODE_10M_HDX:
+			mode = NETMAN_NETIF_ETH_LINK_MODE_10M_HDX;
+			break;
+		default:
+			mode = NETMAN_NETIF_ETH_LINK_MODE_AUTO;
+	}
+
+	if(CurrentMode != mode){
+		if((result = NetManIoctl(NETMAN_NETIF_IOCTL_ETH_SET_LINK_MODE, &mode, sizeof(mode), NULL, 0)) == 0)
+			CurrentMode = mode;
+	}else
+		result = 0;
+
+	return result;
+}
+
+int ethGetNetIFLinkStatus(void) {
+	return(NetManIoctl(NETMAN_NETIF_IOCTL_GET_LINK_STATUS, NULL, 0, NULL, 0) == NETMAN_NETIF_ETH_LINK_STATE_UP);
+}
+
+int ethApplyIPConfig(void) {
+	t_ip_info ip_info;
+	struct ip_addr ipaddr, netmask, gw;
+	int result;
+
+	if((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
+		IP4_ADDR(&ipaddr, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
+		IP4_ADDR(&netmask, ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
+		IP4_ADDR(&gw, ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+
+		//Check if it's the same. Otherwise, apply the new configuration.
+		if((ps2_ip_use_dhcp != ip_info.dhcp_enabled) ||
+			!ip_addr_cmp(&ipaddr, (struct ip_addr*)&ip_info.ipaddr)	||
+			!ip_addr_cmp(&netmask, (struct ip_addr*)&ip_info.netmask)	||
+			!ip_addr_cmp(&gw, (struct ip_addr*)&ip_info.gw)) {
+				if(ps2_ip_use_dhcp){
+					IP4_ADDR((struct ip_addr*)&ip_info.ipaddr, 169, 254, 0, 1);
+					IP4_ADDR((struct ip_addr*)&ip_info.netmask, 255, 255, 0, 0);
+					IP4_ADDR((struct ip_addr*)&ip_info.gw, 0, 0, 0, 0);
+
+					ip_info.dhcp_enabled = 1;
+				}else{
+					ip_addr_set((struct ip_addr*)&ip_info.ipaddr, &ipaddr);
+					ip_addr_set((struct ip_addr*)&ip_info.netmask, &netmask);
+					ip_addr_set((struct ip_addr*)&ip_info.gw, &gw);
+
+					ip_info.dhcp_enabled = 0;
+				}
+
+				result = ps2ip_setconfig(&ip_info);
+		}else result = 0;
+	}
+
+	return result;
+}
+
+int ethGetDHCPStatus(void) {
+	t_ip_info ip_info;
+	int result;
+
+	if((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
+		if(ip_info.dhcp_enabled){
+			result = (ip_info.dhcp_status == DHCP_BOUND);
+		}else result = -1;
+	}
+
+	return result;
+}

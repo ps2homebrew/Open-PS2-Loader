@@ -14,6 +14,9 @@ struct UIItem diaNetConfig[] = {
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
 
+	// ---- IP address type ----
+	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_IP_ADDRESS_TYPE}}}, {UI_SPACER}, {UI_ENUM, NETCFG_PS2_IP_ADDR_TYPE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+
 	// ---- IP address ----
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_IP_ADDRESS}}}, {UI_SPACER},
 
@@ -43,8 +46,8 @@ struct UIItem diaNetConfig[] = {
 
 	{UI_SPLITTER},
 
-	//  ---- PC ----
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- PC -", -1}}}, {UI_BREAK},
+	//  ---- SMB Server ----
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- SMB Server -", -1}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ADDRESS_TYPE}}}, {UI_SPACER},
 	{UI_ENUM, NETCFG_SHARE_ADDR_TYPE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
@@ -61,7 +64,7 @@ struct UIItem diaNetConfig[] = {
 
 	{UI_BREAK},
 
-	//  ---- PC share name ----
+	//  ---- SMB share name ----
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_SHARE}}}, {UI_SPACER}, {UI_STRING, NETCFG_SHARE_NAME, 1, 1, _STR_HINT_SHARENAME, 0, 0, {.stringvalue = {"PS2SMB", "PS2SMB", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_USER}}}, {UI_SPACER}, {UI_STRING, NETCFG_SHARE_USERNAME, 1, 1, -1, 0, 0, {.stringvalue = {"GUEST", "GUEST", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_PASSWORD}}}, {UI_SPACER}, {UI_PASSWORD, NETCFG_SHARE_PASSWORD, 1, 1, _STR_HINT_GUEST, 0, 0, {.stringvalue = {"", "", NULL}}},

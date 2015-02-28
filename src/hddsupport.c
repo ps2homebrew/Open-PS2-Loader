@@ -414,7 +414,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 		strncpy(filename, altStartup, sizeof(filename));
 	else
 		sprintf(filename, "%s", game->startup);
-	shutdown(NO_EXCEPTION); // CAREFUL: shutdown will call hddCleanUp, so hddGames/game will be freed
+	deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
 #ifdef VMC
 #define VMC_TEMP3	size_mcemu_irx, &hdd_mcemu_irx,

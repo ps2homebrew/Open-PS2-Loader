@@ -11,13 +11,13 @@
 #include "smsutils.h"
 #include <intrman.h>
 
-#include <ps2ip.h>
+#include "smstcpip.h"
 
 #include "main.h"
 
 #define dbgprintf(args...) DEBUG_PRINTF(args)
 
-IRX_ID("smap_driver", 2, 0);
+IRX_ID("smap_driver", 2, 1);
 
 #define	IFNAME0	's'
 #define	IFNAME1	'm'

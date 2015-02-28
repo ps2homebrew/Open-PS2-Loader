@@ -24,8 +24,8 @@ extern int size_ps2dev9_irx;
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
-extern void *smstcpip_irx;
-extern int size_smstcpip_irx;
+extern void *ps2ip_irx;
+extern int size_ps2ip_irx;
 
 extern void *smap_irx;
 extern int size_smap_irx;
@@ -208,7 +208,7 @@ int ethLoadModules(void) {
 		gNetworkStartup = ERROR_ETH_MODULE_SMSUTILS_FAILURE;
 		if (sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL) >= 0) {
 			gNetworkStartup = ERROR_ETH_MODULE_SMSTCPIP_FAILURE;
-			if (sysLoadModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL) >= 0) {
+			if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
 				gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
 				if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, ipconfiglen, ipconfig) >= 0) {
 					LOG("ETHSUPPORT Modules loaded\n");

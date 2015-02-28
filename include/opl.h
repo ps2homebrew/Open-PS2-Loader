@@ -15,7 +15,7 @@
 #include <libpad.h>
 #include <libmc.h>
 #include <netman.h>
-#include <ps2ip.h>
+#include <ps2ips.h>
 #include <debug.h>
 #include <gsKit.h>
 #include <dmaKit.h>

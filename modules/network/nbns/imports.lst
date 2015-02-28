@@ -16,6 +16,7 @@ I_lwip_send
 I_lwip_sendto
 I_lwip_recv
 I_lwip_close
+I_lwip_shutdown
 ps2ip_IMPORTS_end
 
 sifcmd_IMPORTS_start

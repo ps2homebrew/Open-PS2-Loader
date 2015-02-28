@@ -281,16 +281,15 @@ void nbnsDeinit(void)
 
 	if(nbnsSocket >= 0)
 	{
-	//	shutdown(nbnsSocket, SHUT_RDWR);
-	//	closesocket(nbnsSocket);
-		lwip_close(nbnsSocket);
+		shutdown(nbnsSocket, SHUT_RDWR);
+		closesocket(nbnsSocket);
 		nbnsSocket = -1;
 	}
 
 	if(nbnsReceiveThreadID > 0)
 	{
 		//Wait for the receive thread to terminate.
-		while(ReferThreadStatus(nbnsReceiveThreadID, &ThreadInfo) == 0 && ThreadInfo.info[2] != 0x10)
+		while(ReferThreadStatus(nbnsReceiveThreadID, &ThreadInfo) == 0 && ThreadInfo.status != THS_DORMANT)
 			DelayThread(1000);
 		DeleteThread(nbnsReceiveThreadID);
 		nbnsReceiveThreadID = -1;

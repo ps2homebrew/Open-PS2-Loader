@@ -5,13 +5,13 @@
 
 #include <irx.h>
 
-IRX_ID("usbhdfsd_for_EE", 1, 0);
+IRX_ID("usbhdfsd_for_EE", 1, 1);
 
 static void usbmass_cb(int cause)
 {
 	static SifCmdHeader_t EventCmdData;
 
-	EventCmdData.unknown = cause;
+	EventCmdData.opt = cause;
 	sceSifSendCmd(12, &EventCmdData, sizeof(EventCmdData), NULL, NULL, 0);
 }
 

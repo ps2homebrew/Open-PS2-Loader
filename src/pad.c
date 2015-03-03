@@ -1,7 +1,7 @@
 /*
   Copyright 2009, Ifcaro, Volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include "include/opl.h"
@@ -73,12 +73,12 @@ static const int keyToPad[17] = {
  */
 static int waitPadReady(struct pad_data_t* pad) {
 	int state;
-	
+
 	// busy wait for the pad to get ready
 	do {
 		state = padGetState(pad->port, pad->slot);
 	} while((state != PAD_STATE_STABLE) && (state != PAD_STATE_FINDCTP1) && (state != PAD_STATE_DISCONN));
-    	
+
 	return state;
 };
 
@@ -86,12 +86,12 @@ static int initializePad(struct pad_data_t* pad) {
 	int tmp;
 	int modes;
 	int i;
-	
+
 	// is there any device connected to that port?
 	if (waitPadReady(pad) == PAD_STATE_DISCONN) {
 		return 1; // nope, don't waste your time here!
 	}
-	
+
 	// How many different modes can this device operate in?
 	// i.e. get # entrys in the modetable
 	modes = padInfoMode(pad->port, pad->slot, PAD_MODETABLE, -1);
@@ -99,19 +99,19 @@ static int initializePad(struct pad_data_t* pad) {
 
 	if (modes > 0) {
 		LOG("( ");
-		
+
 		for (i = 0; i < modes; i++) {
 			tmp = padInfoMode(pad->port, pad->slot, PAD_MODETABLE, i);
 			LOG("%d ", tmp);
 		}
-	        
+
 	        LOG(")\n");
 	}
 
 	tmp = padInfoMode(pad->port, pad->slot, PAD_MODECURID, 0);
 	LOG("PAD It is currently using mode %d\n", tmp);
 
-	// If modes == 0, this is not a Dual shock controller 
+	// If modes == 0, this is not a Dual shock controller
 	// (it has no actuator engines)
 	if (modes == 0) {
 		LOG("PAD This is a digital controller?\n");
@@ -125,7 +125,7 @@ static int initializePad(struct pad_data_t* pad) {
 			break;
 		i++;
 	} while (i < modes);
-	
+
 	if (i >= modes) {
 		LOG("PAD This is no Dual Shock controller\n");
 		return 1;
@@ -148,7 +148,7 @@ static int initializePad(struct pad_data_t* pad) {
 	tmp = padInfoPressMode(pad->port, pad->slot);
 	LOG("PAD infoPressMode: %d\n", tmp);
 
-	waitPadReady(pad);        
+	waitPadReady(pad);
 	tmp = padEnterPressMode(pad->port, pad->slot);
 	LOG("PAD enterPressMode: %d\n", tmp);
 
@@ -181,11 +181,11 @@ static int readPad(struct pad_data_t* pad)
 	int rcode = 0;
 
 	int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
-            
+
         if (ret != 0)
 	{
-		u32 newpdata = 0xffff ^ pad->buttons.btns; 
-		
+		u32 newpdata = 0xffff ^ pad->buttons.btns;
+
 		if (newpdata != 0x0) // something
 			rcode = 1;
 		else
@@ -193,7 +193,7 @@ static int readPad(struct pad_data_t* pad)
 
 		pad->oldpaddata = pad->paddata;
 		pad->paddata = newpdata;
-		
+
 		// merge into the global vars
 		paddata |= pad->paddata;
 	}
@@ -208,11 +208,11 @@ static int readPad(struct pad_data_t* pad)
 */
 static int getKeyDelay(int id, int repeat) {
 	int delay = paddelay[id - 1];
-	
+
 	// if not in repeat, the delay is enlarged
 	if (!repeat)
 		delay *= 3;
-	
+
 	return delay;
 }
 
@@ -221,25 +221,25 @@ int readPads() {
 	int i;
 	oldpaddata = paddata;
 	paddata = 0;
-	
+
 	// in ms.
 	u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
 	time_since_last = newtime - curtime;
 	curtime = newtime;
-	
+
 	int rslt = 0;
-	
+
 	for (i = 0; i < pad_count; ++i) {
 		rslt |= readPad(&pad_data[i]);
 	}
-	
+
 	for (i = 0; i < 16; ++i) {
 		if (getKeyPressed(i + 1))
 			delaycnt[i] -= time_since_last;
 		else
 			delaycnt[i] = getKeyDelay(i + 1, 0);
 	}
-	
+
 	return rslt;
 }
 
@@ -252,7 +252,7 @@ int getKey(int id) {
 		return 0;
 
 	int kid = id - 1;
-	
+
 	// either the button was not pressed this frame, then reset counter and return
 	// or it was, then handle the repetition
 	if (getKeyOn(id)) {
@@ -267,7 +267,7 @@ int getKey(int id) {
 		delaycnt[kid] = getKeyDelay(id, 1);
 		return 1;
 	}
-	
+
 	return 0;
 }
 
@@ -278,10 +278,10 @@ int getKey(int id) {
 int getKeyOn(int id) {
 	if ( (id<=0) || (id>=17) )
 		return 0;
-	
+
 	// old v.s. new pad data
 	int keyid = keyToPad[id];
-	
+
 	return (paddata & keyid) && (!(oldpaddata & keyid));
 }
 
@@ -292,10 +292,10 @@ int getKeyOn(int id) {
 int getKeyOff(int id) {
 	if ( (id<=0) || (id>=17) )
 		return 0;
-	
+
 	// old v.s. new pad data
 	int keyid = keyToPad[id];
-	
+
 	return (!(paddata & keyid)) && (oldpaddata & keyid);
 }
 
@@ -306,7 +306,7 @@ int getKeyOff(int id) {
 int getKeyPressed(int id) {
 	// old v.s. new pad data
 	int keyid = keyToPad[id];
-	
+
 	return (paddata & keyid);
 }
 
@@ -317,18 +317,18 @@ int getKeyPressed(int id) {
 void setButtonDelay(int button, int btndelay) {
 	if ( (button<=0) || (button>=17) )
 		return;
-	
+
 	paddelay[button-1] = btndelay;
 }
 
 int getButtonDelay(int button) {
 	if ( (button<=0) || (button>=17) )
 		return 0;
-	
+
 	return paddelay[button-1];
 }
 
-/** Unloads a single pad. 
+/** Unloads a single pad.
 * @see unloadPads */
 static void unloadPad(struct pad_data_t* pad) {
 	padPortClose(pad->port, pad->slot);
@@ -337,21 +337,21 @@ static void unloadPad(struct pad_data_t* pad) {
 /** Unloads all pads. Use to terminate the usage of the pads. */
 void unloadPads() {
 	int i;
-	
+
 	for (i = 0; i < pad_count; ++i)
 		unloadPad(&pad_data[i]);
-	
-	padReset();
+
+	padEnd();
 }
 
 /** Tries to start a single pad.
-* @param pad The pad data holding structure 
+* @param pad The pad data holding structure
 * @return 0 Error, != 0 Ok */
 static int startPad(struct pad_data_t* pad) {
 	if(padPortOpen(pad->port, pad->slot, pad->padBuf) == 0) {
 		return 0;
 	}
-	
+
 	if(!initializePad(pad)) {
 	        return 0;
 	}
@@ -360,7 +360,7 @@ static int startPad(struct pad_data_t* pad) {
 	return 1;
 }
 
-/** Starts all pads. 
+/** Starts all pads.
 * @return Count of dual shock compatible pads. 0 if none present. */
 int startPads() {
 	// scan for pads that exist... at least one has to be present
@@ -370,37 +370,37 @@ int startPads() {
 
 	int port; // 0 -> Connector 1, 1 -> Connector 2
 	int slot; // Always zero if not using multitap
-		
+
 	for (port = 0; port < maxports; ++port) {
 		int maxslots = padGetSlotMax(port);
-		
+
 		for (slot = 0; slot < maxslots; ++slot) {
-		
+
 			struct pad_data_t* cpad = &pad_data[pad_count];
-			
+
 			cpad->port = port;
 			cpad->slot = slot;
-			
+
 			if (startPad(cpad))
 				++pad_count;
 		}
-		
+
 		if (pad_count >= MAX_PADS)
 			break; // enough already!
 	}
-	
+
 	int n;
 	for(n=0; n<16; ++n) {
 		delaycnt[n]=DEFAULT_PAD_DELAY;
 		paddelay[n]=DEFAULT_PAD_DELAY;
 	}
-	
+
 	return pad_count;
 }
 
 void padStoreSettings(int* buffer) {
 	int i;
-	
+
 	for (i = 0; i < 16; i++)
 		buffer[i] = paddelay[i];
 }
@@ -408,8 +408,7 @@ void padStoreSettings(int* buffer) {
 
 void padRestoreSettings(int* buffer) {
 	int i;
-	
+
 	for (i = 0; i < 16; i++)
 		paddelay[i] = buffer[i];
 }
-

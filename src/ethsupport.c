@@ -18,9 +18,6 @@
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
 
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
-
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
@@ -261,19 +258,18 @@ static void ethInitSMB(void) {
 }
 
 int ethLoadModules(void) {
+	static unsigned char loaded = 0;
+
 	LOG("ETHSUPPORT LoadModules\n");
 
-	gNetworkStartup = ERROR_ETH_MODULE_PS2DEV9_FAILURE;
-	if (sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL) >= 0) {
-		gNetworkStartup = ERROR_ETH_MODULE_SMSUTILS_FAILURE;
+	if(!loaded) {
+		loaded = 1;
 
 		sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL);
 		NetManInit();
 
 		if (sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL) >= 0) {
-			gNetworkStartup = ERROR_ETH_MODULE_SMSMAP_FAILURE;
 			if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
-				gNetworkStartup = ERROR_ETH_MODULE_SMSTCPIP_FAILURE;
 				if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
 					sysLoadModuleBuffer(&dns_irx, size_dns_irx, 0, NULL);
 					sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
@@ -284,10 +280,11 @@ int ethLoadModules(void) {
 				}
 			}
 		}
+
+		return -1;
 	}
 
-	setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
-	return -1;
+	return 0;
 }
 
 static void smbLoadModules(void) {
@@ -305,6 +302,9 @@ static void smbLoadModules(void) {
 		}
 
 		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	}else{
+		gNetworkStartup = ERROR_ETH_MODULE_NETIF_FAILURE;
+		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_NETIF, gNetworkStartup);
 	}
 }
 
@@ -582,8 +582,6 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
-	nbnsDeinit();
-	NetManDeinit();
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
@@ -614,11 +612,14 @@ static int ethGetImage(char* folder, int isRelative, char* value, char* suffix, 
 }
 
 static void ethCleanUp(int exception) {
-	if (ethGameList.enabled) {
-		LOG("ETHSUPPORT CleanUp\n");
+	LOG("ETHSUPPORT CleanUp\n");
 
+	if (ethGameList.enabled) {
 		free(ethGames);
 	}
+
+	nbnsDeinit();
+	NetManDeinit();
 }
 
 #ifdef VMC
@@ -714,10 +715,10 @@ int ethApplyIPConfig(void) {
 		IP4_ADDR(&gw, ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
 
 		//Check if it's the same. Otherwise, apply the new configuration.
-		if((ps2_ip_use_dhcp != ip_info.dhcp_enabled) ||
-			!ip_addr_cmp(&ipaddr, (struct ip_addr*)&ip_info.ipaddr)	||
+		if((ps2_ip_use_dhcp != ip_info.dhcp_enabled) || (!ps2_ip_use_dhcp &&
+			(!ip_addr_cmp(&ipaddr, (struct ip_addr*)&ip_info.ipaddr)	||
 			!ip_addr_cmp(&netmask, (struct ip_addr*)&ip_info.netmask)	||
-			!ip_addr_cmp(&gw, (struct ip_addr*)&ip_info.gw)) {
+			!ip_addr_cmp(&gw, (struct ip_addr*)&ip_info.gw)))) {
 				if(ps2_ip_use_dhcp){
 					IP4_ADDR((struct ip_addr*)&ip_info.ipaddr, 169, 254, 0, 1);
 					IP4_ADDR((struct ip_addr*)&ip_info.netmask, 255, 255, 0, 0);
@@ -745,7 +746,7 @@ int ethGetDHCPStatus(void) {
 
 	if((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
 		if(ip_info.dhcp_enabled){
-			result = (ip_info.dhcp_status == DHCP_BOUND);
+			result = (ip_info.dhcp_status == DHCP_BOUND || (ip_info.dhcp_status == DHCP_OFF));
 		}else result = -1;
 	}
 

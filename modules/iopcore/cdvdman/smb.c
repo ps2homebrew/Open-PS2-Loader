@@ -29,7 +29,7 @@ static int io_sema = -1;
 #define SMBWRITE 0
 #endif
 
-#define DMA_ADDR 		0x000b3f00
+#define DMA_ADDR 		0x00099F00
 
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s); 						// #6

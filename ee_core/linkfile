@@ -14,7 +14,7 @@
 ENTRY(_start);
 
 SECTIONS {
-	.text 0x000B4000: {
+	.text 0x00088000: {
 		_ftext = . ;
 		*(.text)
 		*(.text.*)
@@ -97,5 +97,5 @@ SECTIONS {
 	/* Symbols needed by crt0.s.  */
 	PROVIDE(_heap_size = -1);
 	PROVIDE(_stack = _end);
-	PROVIDE(_stack_size = 0x2000);
+	PROVIDE(_stack_size = 0x0009A000 - _end);
 }

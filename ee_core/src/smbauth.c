@@ -16,7 +16,7 @@
 #include <sifdma.h>
 #include <string.h>
 
-#define DMA_ADDR 		0x000b3f00
+#define DMA_ADDR 		0x00099F00
 
 extern void *_gp;
 

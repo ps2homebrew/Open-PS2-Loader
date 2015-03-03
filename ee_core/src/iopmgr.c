@@ -16,50 +16,11 @@
 #include "syshook.h"
 #include "smbauth.h"
 
-extern void *ioprp_img;
-extern int size_ioprp_img;
-
-extern void *udnl_irx;
-extern int size_udnl_irx;
-
-extern void *imgdrv_irx;
-extern int size_imgdrv_irx;
-
-extern void *usbd_irx;
-extern int size_usbd_irx;
-
-#ifdef VMC
-extern void *mcemu_irx;
-extern int size_mcemu_irx;
-#endif
-
-extern void *smstcpip_irx;
-extern int size_smstcpip_irx;
-
-extern void *smsmap_irx;
-extern int size_smsmap_irx;
-
-#ifdef __LOAD_DEBUG_MODULES
-#ifdef __DECI2_DEBUG
-extern void *drvtif_irx;
-extern int size_drvtif_irx;
-
-extern void *tifinet_irx;
-extern int size_tifinet_irx;
-#else
-extern void *udptty_irx;
-extern int size_udptty_irx;
-
-extern void *ioptrap_irx;
-extern int size_ioptrap_irx;
-#endif
-#endif
-
 extern int _iop_reboot_count;
 
-static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const char *args, unsigned int arglen){
-	void *pIOP_buffer;
-	unsigned int length_rounded, CommandLen;
+static void ResetIopSpecial(const char *args, unsigned int arglen){
+	void *pIOP_buffer, *IOPRP_img, *imgdrv_irx;
+	unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
 	char command[RESET_ARG_MAX+1];
 
 	if (GameMode == ETH_MODE)
@@ -78,6 +39,9 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 		CommandLen=5;
 	}
 
+	GetOPLModInfo(OPL_MODULE_ID_IOPRP, &IOPRP_img, &size_IOPRP_img);
+	GetOPLModInfo(OPL_MODULE_ID_IMGDRV, &imgdrv_irx, &size_imgdrv_irx);
+
 	length_rounded=(size_IOPRP_img+0xF)&~0xF;
 	pIOP_buffer=SifAllocIopHeap(length_rounded);
 
@@ -86,7 +50,7 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 	*(void**)(UNCACHED_SEG(&((unsigned char*)imgdrv_irx)[0x180])) = pIOP_buffer;
 	*(u32*)(UNCACHED_SEG(&((unsigned char*)imgdrv_irx)[0x184])) = size_IOPRP_img;
 
-	LoadMemModule(imgdrv_irx, size_imgdrv_irx, 0, NULL);
+	LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
 
 	//See the comment below in Reset_Iop() regarding this flag.
 /*	DIntr();
@@ -95,7 +59,7 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 	ee_kmode_exit();
 	EIntr(); */
 
-	LoadMemModuleAsync(udnl_irx, size_udnl_irx, CommandLen, command);
+	LoadOPLModule(OPL_MODULE_ID_UDNL, SIF_RPC_M_NOWAIT, CommandLen, command);
 
 	DIntr();
 	ee_kmode_enter();
@@ -118,24 +82,24 @@ static void ResetIopBuffer(void *IOPRP_img, unsigned int size_IOPRP_img, const c
 
 	DPRINTF("Loading extra IOP modules...\n");
 	if (GameMode == USB_MODE) {
-		LoadMemModule(usbd_irx, size_usbd_irx, 11, "thpri=15,16");
+		LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=15,16");
 	}
 	else if (GameMode == ETH_MODE) {
-		LoadMemModule(smstcpip_irx, size_smstcpip_irx, 0, NULL);
-		LoadMemModule(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+		LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
+		LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
 	}
 
 #ifdef __LOAD_DEBUG_MODULES
 	if(GameMode != ETH_MODE) {
-		LoadMemModule(smstcpip_irx, size_smstcpip_irx, 0, NULL);
-		LoadMemModule(smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig);
+		LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
+		LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
 	}
 #ifdef __DECI2_DEBUG
-	LoadMemModule(drvtif_irx, size_drvtif_irx, 0, NULL);
-	LoadMemModule(tifinet_irx, size_tifinet_irx, 0, NULL);
+	LoadOPLModule(OPL_MODULE_ID_DRVTIF, 0, 0, NULL);
+	LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
 #else
-	LoadMemModule(udptty_irx, size_udptty_irx, 0, NULL);
-	LoadMemModule(ioptrap_irx, size_ioptrap_irx, 0, NULL);
+	LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
+	LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
 #endif
 #endif
 }
@@ -162,7 +126,7 @@ int New_Reset_Iop(const char *arg, int arglen)
 	LoadFileInit();
 	sbv_patch_enable_lmb();
 
-	ResetIopBuffer(ioprp_img, size_ioprp_img, NULL, 0);
+	ResetIopSpecial(NULL, 0);
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x00A5FF;	//Orange
 
@@ -175,14 +139,14 @@ int New_Reset_Iop(const char *arg, int arglen)
 			fioExit();
 		}
 
-		ResetIopBuffer(ioprp_img, size_ioprp_img, &arg[10], arglen-10);
+		ResetIopSpecial(&arg[10], arglen-10);
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00FFFF;	//Yellow
 	}
 
 #ifdef VMC
-	if ((iop_reboot_count >= 2) && size_mcemu_irx) {
-		LoadMemModule(mcemu_irx, size_mcemu_irx, 0, NULL);
+	if (iop_reboot_count >= 2) {
+		LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL);
 	}
 #endif
 

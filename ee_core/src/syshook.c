@@ -83,7 +83,7 @@ void t_loadElf(void)
 	DPRINTF("t_loadElf: cleaning user memory...");
 
 	// wipe user memory
-	for (i = 0x000D0000; i < 0x02000000; i += 64) {
+	for (i = 0x000D0000; i < GetMemorySize(); i += 64) {//0x02000000; i += 64) {
 		__asm__ __volatile__ (
 			"\tsq $0, 0(%0) \n"
 			"\tsq $0, 16(%0) \n"

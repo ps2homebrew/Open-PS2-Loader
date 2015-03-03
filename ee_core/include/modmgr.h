@@ -77,12 +77,37 @@ typedef struct
 	u32 dummy;  
 } t_ExecData;
 
+enum OPL_MODULE_ID{
+	//Basic modules
+	OPL_MODULE_ID_UDNL	= 1,
+	OPL_MODULE_ID_IOPRP,
+	OPL_MODULE_ID_IMGDRV,
+
+	//USB mode modules
+	OPL_MODULE_ID_USBD,
+
+	//SMB mode modules
+	OPL_MODULE_ID_SMSTCPIP,
+	OPL_MODULE_ID_SMAP,
+
+	//VMC module
+	OPL_MODULE_ID_MCEMU,
+
+	//Debugging modules
+	OPL_MODULE_ID_UDPTTY,
+	OPL_MODULE_ID_IOPTRAP,
+	OPL_MODULE_ID_DRVTIF,
+	OPL_MODULE_ID_TIFINET,
+
+	OPL_MODULE_ID_COUNT
+};
+
 int  LoadFileInit();
 void LoadFileExit();
-int  LoadModule(const char *path, int arg_len, const char *args);
-void InitModulePointers(void);
-int LoadMemModuleAsync(void *modptr, unsigned int modsize, int arg_len, const char *args);
-int  LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args);
+int LoadModule(const char *path, int arg_len, const char *args);
+int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, const char *args);
+int GetOPLModInfo(int id, void **pointer, unsigned int *size);
+int LoadOPLModule(int id, int mode, int arg_len, const char *args);
 int  LoadElf(const char *path, t_ExecData *data);
 void ChangeModuleName(const char *name, const char *newname);
 #ifdef __EESIO_DEBUG

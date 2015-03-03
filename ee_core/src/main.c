@@ -117,9 +117,6 @@ int main(int argc, char **argv){
 
 	set_ipconfig();
 
-	DPRINTF("Initializing module pointers...\n");	
-	InitModulePointers();
-
 	/* installing kernel hooks */
 	DPRINTF("Installing Kernel Hooks...\n");
 	Install_Kernel_Hooks();

@@ -23,6 +23,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Theme",
 	"Language",
 	"%d: Network startup error",
+	"%d: No network adaptor detected",
 	"%d: Cannot connect to SMB server",
 	"%d: Cannot log into SMB server",
 	"%d: Cannot open SMB share",

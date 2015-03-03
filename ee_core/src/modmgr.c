@@ -11,55 +11,21 @@
 #include "modmgr.h"
 #include "util.h"
 
-void *ioprp_img;
-int size_ioprp_img;
-
-void *udnl_irx;
-int size_udnl_irx;
-
-void *imgdrv_irx;
-int size_imgdrv_irx;
-
-#ifdef VMC
-void *mcemu_irx;
-int size_mcemu_irx;
-#endif
-
-void *usbd_irx;
-int size_usbd_irx;
-
-void *ps2dev9_irx;
-int size_ps2dev9_irx;
-
-void *smstcpip_irx;
-int size_smstcpip_irx;
-
-void *smsmap_irx;
-int size_smsmap_irx;
-
-#ifdef __LOAD_DEBUG_MODULES
-#ifdef __DECI2_DEBUG
-void *drvtif_irx;
-int size_drvtif_irx;
-
-void *tifinet_irx;
-int size_tifinet_irx;
-#else
-void *udptty_irx;
-int size_udptty_irx;
-
-void *ioptrap_irx;
-int size_ioptrap_irx;
-#endif
-#endif
-
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
 
+#define GET_OPL_MOD_ID(x) ((x) >> 24)
+#define GET_OPL_MOD_SIZE(x) ((x) & 0x00FFFFFF)
+
 typedef struct {
-	void *irxaddr;
-	unsigned int irxsize;
+	void *ptr;
+	unsigned int info;	//Upper 8 bits = module ID
 } irxptr_t;
+
+typedef struct {
+	irxptr_t *modules;
+	int count;
+} irxtab_t;
 
 /*----------------------------------------------------------------------------------------*/
 /* Init LOADFILE RPC.                                                                     */
@@ -90,6 +56,7 @@ void LoadFileExit()
 	_lf_init = 0;
 	memset(&_lf_cd, 0, sizeof(_lf_cd));
 }
+
 
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path with waiting.                                             */
@@ -122,7 +89,7 @@ int LoadModule(const char *path, int arg_len, const char *args)
 /*----------------------------------------------------------------------------------------*/
 /* Load an irx module from path without waiting.                                          */
 /*----------------------------------------------------------------------------------------*/
-static int _LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, const char *args)
+int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, const char *args)
 {
 	SifDmaTransfer_t sifdma;
 	void            *iopmem;
@@ -172,64 +139,39 @@ static int _LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_
 	return arg.p.result;
 }
 
-int LoadMemModuleAsync(void *modptr, unsigned int modsize, int arg_len, const char *args)
+int GetOPLModInfo(int id, void **pointer, unsigned int *size)
 {
-	return _LoadMemModule(SIF_RPC_M_NOWAIT, modptr, modsize, arg_len, args);
+	int i, result;
+	irxtab_t *irxtable = (irxtab_t*)0x0009A000;
+
+	for(i = 0,result = -1; i < irxtable->count; i++)
+	{
+		if(GET_OPL_MOD_ID(irxtable->modules[i].info) == id)
+		{
+			*pointer = irxtable->modules[i].ptr;
+			*size = GET_OPL_MOD_SIZE(irxtable->modules[i].info);
+			result = 0;
+			break;
+		}
+	}
+
+	return result;
+
 }
 
-//--------------------------------------------------------------
-void InitModulePointers(void)
+int LoadOPLModule(int id, int mode, int arg_len, const char *args)
 {
-	int n;
-	irxptr_t *irxptr_tab = *(irxptr_t **)0x00088000;
+	int result;
+	void *pointer;
+	unsigned int size;
 
-	n = 0;
-	size_udnl_irx = irxptr_tab[n++].irxsize;
-	size_ioprp_img = irxptr_tab[n++].irxsize;
-	size_imgdrv_irx = irxptr_tab[n++].irxsize;
-	size_usbd_irx = irxptr_tab[n++].irxsize;
-	size_smsmap_irx = irxptr_tab[n++].irxsize;
-	size_smstcpip_irx = irxptr_tab[n++].irxsize;
-#ifdef VMC
-	size_mcemu_irx = irxptr_tab[n++].irxsize;
-#endif
-#ifdef __LOAD_DEBUG_MODULES
-#ifdef __DECI2_DEBUG
-	size_drvtif_irx = irxptr_tab[n++].irxsize;
-	size_tifinet_irx = irxptr_tab[n++].irxsize;
-#else
-	size_udptty_irx = irxptr_tab[n++].irxsize;
-	size_ioptrap_irx = irxptr_tab[n++].irxsize;
-#endif
-#endif
+	if((result = GetOPLModInfo(id, &pointer, &size)) == 0)
+	{
+		if(size > 0)
+			result = LoadMemModule(mode, pointer, size, arg_len, args);
+	}
 
-	n = 0;
-	udnl_irx = (void*)irxptr_tab[n++].irxaddr;
-	ioprp_img = (void *)irxptr_tab[n++].irxaddr;
-	imgdrv_irx = (void *)irxptr_tab[n++].irxaddr;
-	usbd_irx = (void *)irxptr_tab[n++].irxaddr;
-	smsmap_irx = (void *)irxptr_tab[n++].irxaddr;
-	smstcpip_irx = (void *)irxptr_tab[n++].irxaddr;
-#ifdef VMC
-	mcemu_irx = (void *)irxptr_tab[n++].irxaddr;
-#endif
-#ifdef __LOAD_DEBUG_MODULES
-#ifdef __DECI2_DEBUG
-	drvtif_irx = (void *)irxptr_tab[n++].irxaddr;
-	tifinet_irx = (void *)irxptr_tab[n++].irxaddr;
-#else
-	udptty_irx = (void *)irxptr_tab[n++].irxaddr;
-	ioptrap_irx = (void *)irxptr_tab[n++].irxaddr;
-#endif
-#endif
-}
-
-/*----------------------------------------------------------------------------------------*/
-/* Load an irx module from an EE buffer.                                                  */
-/*----------------------------------------------------------------------------------------*/
-int LoadMemModule(void *modptr, unsigned int modsize, int arg_len, const char *args)
-{
-	return _LoadMemModule(0, modptr, modsize, arg_len, args);
+	return result;
 }
 
 /*----------------------------------------------------------------------------------------*/

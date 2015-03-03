@@ -42,37 +42,9 @@ extern int size_smsutils_irx;
 int debugSetActive(void) {
 	int ret;
 
-	ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+	ret = ethLoadModules();
 	if (ret < 0)
 		return -1;
-
-	ret = sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL);
-	if (ret < 0)
-		return -2;
-
-	NetManInit();
-
-	ret = sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
-	if (ret < 0)
-		return -3;
-
-	ret = sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL);
-	if (ret < 0)
-		return -4;
-
-	ret = sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL);
-	if (ret < 0)
-		return -5;
-
-	ret = sysLoadModuleBuffer(&dns_irx, size_dns_irx, 0, NULL);
-	if (ret < 0)
-		return -6;
-
-	ret = sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
-	if (ret < 0)
-		return -7;
-
-	ps2ip_init();
 
 	ethWaitValidNetIFLinkState();
 	ethApplyNetIFConfig();

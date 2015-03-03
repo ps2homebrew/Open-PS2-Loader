@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev789 - Updated to work with the new update to the PS2SDK (mainly with the renaming of the EE PS2IP over SIF RPC library, ps2ip, to ps2ips). - Sat Feb 28 21:32:31 2015 +0800
 rev788 - Changed OPL to use NETMAN and PS2IPS for full control over the network subsystem, SMAP (re-)initialization will no longer be done whenever unnecessary (valid link state = not needed) and renamed "smap" to become "smap-ingame". - Sat Feb 28 15:58:29 2015 +0800
 rev787 - Updated to support the new PS2SDK PS2IP module (LWIP v1.4.1) and updated PS2ETH SMAP driver, while yet maintaining support for the (in-game) SMSTCPIP stack which was based on an ancient version of LWIP. - Sat Feb 28 14:38:40 2015 +0800
 rev786 - Added support for the NBNS protocol, added functions for changing the visibility and type of UI elements without hardcoding the element's index number, changed the keyboard to hide passwords, and adjusted language string and some function names. - Sun Feb 22 16:24:52 2015 +0800

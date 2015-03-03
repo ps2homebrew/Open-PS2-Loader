@@ -147,10 +147,44 @@ typedef struct {
 	u32	align;
 } elf_pheader_t;
 
+#define GET_OPL_MOD_ID(x) ((x) >> 24)
+#define SET_OPL_MOD_ID(x) ((x) << 24)
+#define GET_OPL_MOD_SIZE(x) ((x) & 0x00FFFFFF)
+
+enum OPL_MODULE_ID{
+	//Basic modules
+	OPL_MODULE_ID_UDNL	= 1,
+	OPL_MODULE_ID_IOPRP,
+	OPL_MODULE_ID_IMGDRV,
+
+	//USB mode modules
+	OPL_MODULE_ID_USBD,
+
+	//SMB mode modules
+	OPL_MODULE_ID_SMSTCPIP,
+	OPL_MODULE_ID_SMAP,
+
+	//VMC module
+	OPL_MODULE_ID_MCEMU,
+
+	//Debugging modules
+	OPL_MODULE_ID_UDPTTY,
+	OPL_MODULE_ID_IOPTRAP,
+	OPL_MODULE_ID_DRVTIF,
+	OPL_MODULE_ID_TIFINET,
+
+	OPL_MODULE_ID_COUNT
+};
+
 typedef struct {
-	void *irxaddr;
-	unsigned int irxsize;
+	void *ptr;
+	unsigned int info;	//Upper 8 bits = module ID
 } irxptr_t;
+
+typedef struct {
+	irxptr_t *modules;
+	int count;
+} irxtab_t;
 
 typedef struct {
 	char fileName[10];
@@ -343,111 +377,127 @@ void sysExecExit() {
 	Exit(0);
 }
 
-#ifdef VMC
-#define IRX_NUM 9
-#else
-#define IRX_NUM 8
-#endif
+//Module bits
+#define CORE_IRX_USB	0x01
+#define CORE_IRX_ETH	0x02
+#define CORE_IRX_SMB	0x04
+#define CORE_IRX_HDD	0x08
+#define CORE_IRX_VMC	0x10
+#define CORE_IRX_DEBUG	0x20
+#define CORE_IRX_DECI2	0x40
 
 #ifdef VMC
-static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
+static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
 #else
-static void sendIrxKernelRAM(int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
+static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
 #endif
+	irxtab_t *irxtable;
 	irxptr_t *irxptr_tab;
-	void *irxsrc[IRX_NUM];
 	void *irxptr;
-	int i, n;
-	unsigned int irxsize, curIrxSize;
+	int i, modcount;
+	unsigned int curIrxSize;
 	void *ioprp_image;
 	unsigned int size_ioprp_image;
 
-	irxptr_tab=(irxptr_t*)0x00088004;
-	ioprp_image=malloc(size_IOPRP_img+size_cdvdman_irx+size_cdvdfsv_irx+256);
-	size_ioprp_image=patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
+	irxtable = (irxtab_t*)0x0009A000;
+	irxptr_tab = (irxptr_t*)((unsigned char*)irxtable+sizeof(irxtab_t));
+	ioprp_image = malloc(size_IOPRP_img+size_cdvdman_irx+size_cdvdfsv_irx+256);
+	size_ioprp_image = patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
 
-	n = 0;
-	irxptr_tab[n++].irxsize = size_udnl_irx;
-	irxptr_tab[n++].irxsize = size_ioprp_image;
-	irxptr_tab[n++].irxsize = size_imgdrv_irx;
-	irxptr_tab[n++].irxsize = size_pusbd_irx;
+	modcount = 0;
+	//Basic modules
+	irxptr_tab[modcount].info	= size_udnl_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDNL);
+	irxptr_tab[modcount++].ptr	= (void *)&udnl_irx;
+	irxptr_tab[modcount].info	= size_ioprp_image | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPRP);
+	irxptr_tab[modcount++].ptr	= ioprp_image;
+	irxptr_tab[modcount].info	= size_imgdrv_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IMGDRV);
+	irxptr_tab[modcount++].ptr	= (void *)&imgdrv_irx;
+
+	if(modules & CORE_IRX_USB)
+	{
+		irxptr_tab[modcount].info	= size_pusbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
+		irxptr_tab[modcount++].ptr	= pusbd_irx;
+	}
+	if(modules & CORE_IRX_ETH)
+	{
 #ifdef __DECI2_DEBUG	//FIXME: I don't know why, but the ingame SMAP driver cannot be used with the DECI2 modules. Perhaps that old bug with the network stack become unresponsive gets triggered? Until this is solved, use the normal SMAP driver.
-	irxptr_tab[n++].irxsize = size_smap_irx;
+		irxptr_tab[modcount].info	= size_smap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);
+		irxptr_tab[modcount++].ptr	= (void *)&smap_irx;
 #else
-	irxptr_tab[n++].irxsize = size_smap_ingame_irx;
+		irxptr_tab[modcount].info	= size_smap_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);
+		irxptr_tab[modcount++].ptr	= (void *)&smap_ingame_irx;
 #endif
-	irxptr_tab[n++].irxsize = size_ingame_smstcpip_irx;
+		irxptr_tab[modcount].info	= size_ingame_smstcpip_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMSTCPIP);
+		irxptr_tab[modcount++].ptr	= (void *)&ingame_smstcpip_irx;
+	}
 #ifdef VMC
-	irxptr_tab[n++].irxsize = size_mcemu_irx;
+	if(modules & CORE_IRX_VMC)
+	{
+		irxptr_tab[modcount].info	= size_mcemu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_MCEMU);
+		irxptr_tab[modcount++].ptr	= (void *)mcemu_irx;
+	}
 #endif
+
 #ifdef __INGAME_DEBUG
 #ifdef __DECI2_DEBUG
-	irxptr_tab[n++].irxsize = size_drvtif_irx;
-	irxptr_tab[n++].irxsize = size_tifinet_irx;
+	if(modules & CORE_IRX_DECI2)
+	{
+		irxptr_tab[modcount].info	= size_drvtif_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
+		irxptr_tab[modcount++].ptr	= (void *)&drvtif_irx;
+		irxptr_tab[modcount].info	= size_tifinet_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
+		irxptr_tab[modcount++].ptr	= (void *)&tifinet_irx;
+	}
 #else
-	irxptr_tab[n++].irxsize = size_udptty_ingame_irx;
-	irxptr_tab[n++].irxsize = size_ioptrap_irx;
+	if(modules & CORE_IRX_DEBUG)
+	{
+		irxptr_tab[modcount].info	= size_udptty_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDPTTY);
+		irxptr_tab[modcount++].ptr	=(void *)&udptty_ingame_irx;
+		irxptr_tab[modcount].info	= size_ioptrap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPTRAP);
+		irxptr_tab[modcount++].ptr	= (void *)&ioptrap_irx;
+	}
 #endif
 #endif
 
-	n = 0;
-	irxsrc[n++] = (void *)&udnl_irx;
-	irxsrc[n++] = ioprp_image;
-	irxsrc[n++] = (void *)&imgdrv_irx;
-	irxsrc[n++] = pusbd_irx;
-#ifdef __DECI2_DEBUG
-	irxsrc[n++] = (void *)&smap_irx;
-#else
-	irxsrc[n++] = (void *)&smap_ingame_irx;
-#endif
-	irxsrc[n++] = (void *)&ingame_smstcpip_irx;
-#ifdef VMC
-	irxsrc[n++] = (void *)mcemu_irx;
-#endif
-#ifdef __INGAME_DEBUG
-#ifdef __DECI2_DEBUG
-	irxsrc[n++] = (void *)&drvtif_irx;
-	irxsrc[n++] = (void *)&tifinet_irx;
-#else
-
-	irxsrc[n++] = (void *)&udptty_ingame_irx;
-	irxsrc[n++] = (void *)&ioptrap_irx;
-#endif
-#endif
-
-	irxsize = 0;
-
-	*(irxptr_t**)0x00088000 = irxptr_tab;
-	irxptr = (void *)((((unsigned int)irxptr_tab+sizeof(irxptr_t)*IRX_NUM)+0xF)&~0xF);
+	irxtable->modules = irxptr_tab;
+	irxtable->count = modcount;
 
 #ifdef __DECI2_DEBUG
 	//For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
-	irxptr_tab[0].irxaddr=(void*)0x00033000;
-	LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr_tab[0].irxaddr, irxptr_tab[0].irxaddr+irxptr_tab[0].irxsize);
+	irxptr = (void*)0x00033000;
+	LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr+GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
 	DI();
 	ee_kmode_enter();
-	memcpy((void*)(0x80000000|(unsigned int)irxptr_tab[0].irxaddr), irxsrc[0], irxptr_tab[0].irxsize);
+	memcpy((void*)(0x80000000|(unsigned int)irxptr), irxptr_tab[OPL_MODULE_ID_UDNL].ptr, GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
 	ee_kmode_exit();
 	EI();
 
-	for (i = 1; i< IRX_NUM; i++) {
-#else
-	for (i = 0; i < IRX_NUM; i++) {
+	irxptr_tab[OPL_MODULE_ID_UDNL].ptr = irxptr;
 #endif
-		curIrxSize = irxptr_tab[i].irxsize;
-		irxptr_tab[i].irxaddr = irxptr;
+
+	irxptr = (void *)((((unsigned int)irxptr_tab+sizeof(irxptr_t)*modcount)+0xF)&~0xF);
+
+#ifdef __DECI2_DEBUG
+	for (i = 1; i< modcount; i++) {
+#else
+	for (i = 0; i < modcount; i++) {
+#endif
+		curIrxSize = GET_OPL_MOD_SIZE(irxptr_tab[i].info);
 
 		if (curIrxSize > 0) {
-			LOG("SYSTEM IRX address start: %p end: %p\n", irxptr_tab[i].irxaddr, irxptr_tab[i].irxaddr+curIrxSize);
-		/*	if(irxptr+curIrxSize>=(void*)0x000B3F00){	//Sanity check.
+			LOG("SYSTEM IRX %u address start: %p end: %p\n", GET_OPL_MOD_ID(irxptr_tab[i].info), irxptr, irxptr+curIrxSize);
+#ifdef __DEBUG
+			if(irxptr+curIrxSize>=(void*)0x000D0000){	//Sanity check.
 				LOG("*** OVERFLOW DETECTED. HALTED.\n");
 				asm volatile("break\n");
-			} */
+			}
+#endif
 
-			memcpy(irxptr_tab[i].irxaddr, irxsrc[i], curIrxSize);
+			memcpy(irxptr, irxptr_tab[i].ptr, curIrxSize);
 
+			irxptr_tab[i].ptr = irxptr;
 			irxptr += ((curIrxSize+0xF)&~0xF);
-			irxsize += curIrxSize;
+		}else{
+			irxptr_tab[i].ptr = NULL;
 		}
 	}
 
@@ -547,6 +597,7 @@ static int ResetDECI2(void){
 #define VMC_TEMP1
 #endif
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 unsigned int compatflags) {
+	unsigned int modules;
 	u8 local_ip_address[4], local_netmask[4], local_gateway[4];
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
@@ -577,11 +628,25 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	memset((void*)0x00082000, 0, 0x00100000-0x00082000);
 
+	if(!strcmp(mode_str, "USB_MODE"))
+		modules = CORE_IRX_USB;
+	else if(!strcmp(mode_str, "ETH_MODE"))
+		modules = CORE_IRX_ETH | CORE_IRX_SMB;
+	else
+		modules = CORE_IRX_HDD;
+
+#ifdef __DECI2_DEBUG
+	modules |= CORE_IRX_DECI2 | CORE_IRX_ETH;
+#elif defined(__INGAME_DEBUG)
+	modules |= CORE_IRX_DEBUG | CORE_IRX_ETH;
+#endif
+
 #ifdef VMC
+	modules |= CORE_IRX_VMC;
 	LOG("SYSTEM LaunchLoaderElf called with size_mcemu_irx = %d\n", size_mcemu_irx);
-	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
+	sendIrxKernelRAM(modules, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
-	sendIrxKernelRAM(size_cdvdman_irx, cdvdman_irx);
+	sendIrxKernelRAM(modules, size_cdvdman_irx, cdvdman_irx);
 #endif
 
 #ifdef __DECI2_DEBUG
@@ -608,11 +673,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 		if (eph[i].memsz > eph[i].filesz)
 			memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
 	}
-
-	// Let's go.
-	fioExit();
-	SifInitRpc(0);
-	SifExitRpc();
 
 #ifdef CHEAT
 #define CHEAT_TEMP1	" %u"
@@ -654,6 +714,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	argv[i] = gsm_config_str;
 	i++;
 #endif
+
+	// Let's go.
+	fioExit();
+	SifInitRpc(0);
+	SifExitRpc();
 
 	FlushCache(0);
 	FlushCache(2);

@@ -18,7 +18,7 @@
 
    .extern   _heap_size
    .extern   _stack
-   .extern   _stack_size   
+   .extern   _stack_size
 
    .set   noat
    .set   noreorder
@@ -86,7 +86,7 @@ ctors:
 1:
 
    # call main
-
+   ei
    la   $2, _args
    lw   $4, ($2)
    jal   main      # main(argc, argv)

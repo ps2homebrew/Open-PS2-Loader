@@ -1260,6 +1260,8 @@ static int cdvdman_open(iop_file_t *f, const char *filename, int mode)
 	cdvdman_init();
 
 	if (f->unit < 2) {
+		sceCdDiskReady(0);
+
 		fh = cdvdman_getfilefreeslot();
 		if (fh) {
 			r = cdvdman_findfile(&cdfile, filename, f->unit);
@@ -1311,7 +1313,7 @@ static int cdrom_open(iop_file_t *f, const char *filename, int mode)
 
 	DPRINTF("cdrom_open %s mode=%d layer %d\n", filename, mode, f->unit);
 
-	strcpy(path_buffer, filename);	//SCE does not perform bounds-checking.
+	strncpy(path_buffer, filename, sizeof(path_buffer));
 	cdrom_purifyPath(path_buffer);
 
 	if((result = cdvdman_open(f, path_buffer, mode)) >= 0)
@@ -1351,13 +1353,15 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 	if ((fh->position + size) > fh->filesize)
 		size = fh->filesize - fh->position;
 
+	sceCdDiskReady(0);
+
 	rpos = 0;
 	if(size > 0){
 		//Phase 1: read data until the offset of the file is nicely aligned to a 2048-byte boundary.
 		if((offset = fh->position % 2048) != 0){
 			nbytes = 2048 - offset;
 			if(size < nbytes) nbytes = size;
-			sceCdRead(fh->lsn + ((fh->position & -2048) / 2048), 1, cdvdman_fs_buf, NULL);
+			while(sceCdRead(fh->lsn + ((fh->position & -2048) / 2048), 1, cdvdman_fs_buf, NULL) == 0) DelayThread(10000);
 
 			fh->position += nbytes;
 			size -= nbytes;
@@ -1372,7 +1376,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 		if((nsectors = size/2048)>0){
 			nbytes = nsectors * 2048;
 
-			sceCdRead(fh->lsn + (fh->position / 2048), nsectors, buf, NULL);
+			while(sceCdRead(fh->lsn + (fh->position / 2048), nsectors, buf, NULL) == 0) DelayThread(10000);
 
 			buf += nbytes;
 			size -= nbytes;
@@ -1384,7 +1388,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 
 		//Phase 3: read any remaining data that isn't divisible by 2048.
 		if((nbytes = size) > 0){
-			sceCdRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf, NULL);
+			while(sceCdRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf, NULL) == 0) DelayThread(10000);
 
 			size -= nbytes;
 			fh->position += nbytes;
@@ -1452,9 +1456,10 @@ static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
 
 	DPRINTF("cdrom_getstat %s layer %d\n", filename, f->unit);
 
-	strcpy(path_buffer, filename);	//SCE does not perform bounds-checking.
+	strncpy(path_buffer, filename, sizeof(path_buffer));
 	cdrom_purifyPath(path_buffer);	//Unlike the SCE original, purify the path right away.
 
+	sceCdDiskReady(0);
 	return sceCdLayerSearchFile((cdl_file_t *)&stat->attr, path_buffer, f->unit) - 1;
 }
 
@@ -1478,28 +1483,31 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 
 	DPRINTF("cdrom_dread fh->lsn=%lu\n", fh->lsn);
 
-	sceCdRead(fh->lsn, 1, cdvdman_fs_buf, NULL);
-	sceCdSync(0);
+	sceCdDiskReady(0);
+	if((r = sceCdRead(fh->lsn, 1, cdvdman_fs_buf, NULL)) == 1)
+	{
+		sceCdSync(0);
 
-	do {
-		r = 0;
-		tocEntryPointer = (struct dirTocEntry *)&cdvdman_fs_buf[fh->position];
-		if (tocEntryPointer->length == 0)
-			break;
+		do {
+			r = 0;
+			tocEntryPointer = (struct dirTocEntry *)&cdvdman_fs_buf[fh->position];
+			if (tocEntryPointer->length == 0)
+				break;
 
-		fh->position += tocEntryPointer->length;
-		r = 1;
+			fh->position += tocEntryPointer->length;
+			r = 1;
+		}
+		while (tocEntryPointer->filenameLength == 1);
+
+		mode = 0x2124;
+		if (tocEntryPointer->fileProperties & 2)
+			mode = 0x116d;
+
+		dirent->stat.mode = mode;
+		dirent->stat.size = tocEntryPointer->fileSize;
+		strncpy(dirent->name, tocEntryPointer->filename, tocEntryPointer->filenameLength);
+			dirent->name[tocEntryPointer->filenameLength] = '\0';
 	}
-	while (tocEntryPointer->filenameLength == 1);
-
-	mode = 0x2124;
-	if (tocEntryPointer->fileProperties & 2)
-		mode = 0x116d;
-
-	dirent->stat.mode = mode;
-	dirent->stat.size = tocEntryPointer->fileSize;
-	strncpy(dirent->name, tocEntryPointer->filename, tocEntryPointer->filenameLength);
-	dirent->name[tocEntryPointer->filenameLength] = '\0';
 
 	DPRINTF("cdrom_dread r=%d mode=%04x name=%s\n", r, (int)mode, dirent->name);
 
@@ -1722,7 +1730,8 @@ lbl_startlocate:
 	}
 
 	while (tocLength > 0)	{
-		sceCdRead(tocLBA, 1, cdvdman_buf, NULL);
+		if(sceCdRead(tocLBA, 1, cdvdman_buf, NULL) == 0)
+			return NULL;
 		sceCdSync(0);
 		DPRINTF("cdvdman_locatefile tocLBA read done\n");
 

@@ -104,6 +104,7 @@ typedef struct { // size = 144
 } cdvdfsv_readee_t;
 
 // internal prototypes
+static void init_thread(void *args);
 static void cdvdfsv_startrpcthreads(void);
 static void cdvdfsv_rpc0_th(void *args);
 static void cdvdfsv_rpc1_th(void *args);
@@ -211,17 +212,30 @@ struct irx_export_table _exp_cdvdfsv;
 //-------------------------------------------------------------------------
 int _start(int argc, char* argv[])
 {
+	iop_thread_t thread_param;
+
 	RegisterLibraryEntries(&_exp_cdvdfsv);
 
-	if (!sceSifCheckInit())
-		sceSifInit();
+	thread_param.attr = TH_C;
+	thread_param.option = 0;
+	thread_param.thread = &init_thread;
+	thread_param.stacksize = 0x800;
+	thread_param.priority = 0x50;
 
+	StartThread(CreateThread(&thread_param), NULL);
+
+	return MODULE_RESIDENT_END;
+}
+
+//-------------------------------------------------------------------------
+static void init_thread(void *args)
+{
 	sceSifInitRpc(0);
 
 	cdvdfsv_buf = sceGetFsvRbuf();
 	cdvdfsv_startrpcthreads();
 
-	return MODULE_RESIDENT_END;
+	ExitDeleteThread();
 }
 
 //-------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev790 - Updated to support the new PS2SDK revision, changed module management so that only the necessary modules will remain resident in-game, changed unloadPad() to call padEnd() instead of padReset() in order to actually stop the PADMAN RPC service, re-added the "ei" instruction to crt0, fixed the logic that determines whether the IP address config has been changed (When DHCP is enabled, re-arranged the EE core so that modules (0x0009A000) will now be stored after the EE core (0x00088000). - Tue Mar 03 21:35:40 2015 +0800
 rev789 - Updated to work with the new update to the PS2SDK (mainly with the renaming of the EE PS2IP over SIF RPC library, ps2ip, to ps2ips). - Sat Feb 28 21:32:31 2015 +0800
 rev788 - Changed OPL to use NETMAN and PS2IPS for full control over the network subsystem, SMAP (re-)initialization will no longer be done whenever unnecessary (valid link state = not needed) and renamed "smap" to become "smap-ingame". - Sat Feb 28 15:58:29 2015 +0800
 rev787 - Updated to support the new PS2SDK PS2IP module (LWIP v1.4.1) and updated PS2ETH SMAP driver, while yet maintaining support for the (in-game) SMSTCPIP stack which was based on an ancient version of LWIP. - Sat Feb 28 14:38:40 2015 +0800

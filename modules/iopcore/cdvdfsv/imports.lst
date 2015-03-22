@@ -57,8 +57,6 @@ sifcmd_IMPORTS_end
 sifman_IMPORTS_start
 I_sceSifSetDma
 I_sceSifDmaStat
-I_sceSifCheckInit
-I_sceSifInit
 sifman_IMPORTS_end
 
 smsutils_IMPORTS_start
@@ -69,9 +67,8 @@ smsutils_IMPORTS_end
 thbase_IMPORTS_start
 I_CreateThread
 I_StartThread
+I_ExitDeleteThread
 I_GetThreadId
-I_SleepThread
-I_ReferThreadStatus
 I_ChangeThreadPriority
 thbase_IMPORTS_end
 

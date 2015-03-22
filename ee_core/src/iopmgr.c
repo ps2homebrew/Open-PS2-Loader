@@ -52,20 +52,19 @@ static void ResetIopSpecial(const char *args, unsigned int arglen){
 
 	LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
 
-	//See the comment below in Reset_Iop() regarding this flag.
-/*	DIntr();
+	DIntr();
 	ee_kmode_enter();
-	Old_SifSetReg(SIF_REG_SMFLAG, 0x40000);
+	Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
 	ee_kmode_exit();
-	EIntr(); */
+	EIntr();
 
 	LoadOPLModule(OPL_MODULE_ID_UDNL, SIF_RPC_M_NOWAIT, CommandLen, command);
 
 	DIntr();
 	ee_kmode_enter();
-	Old_SifSetReg(SIF_REG_SMFLAG, 0x30000);
-	Old_SifSetReg(0x80000002, 0);
-	Old_SifSetReg(0x80000000, 0);
+	Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT|SIF_STAT_CMDINIT);
+	Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
+	Old_SifSetReg(SIF_SYSREG_SUBADDR, 0);
 	ee_kmode_exit();
 	EIntr();
 
@@ -185,7 +184,7 @@ int Reset_Iop(const char *arg, int mode)
 	memset(&reset_pkt, 0, sizeof reset_pkt);
 
 	reset_pkt.header.size = sizeof reset_pkt;
-	reset_pkt.header.cid  = 0x80000003;
+	reset_pkt.header.cid  = SIF_CMD_RESET_CMD;
 
 	reset_pkt.mode = mode;
 	if (arg != NULL) {
@@ -196,16 +195,14 @@ int Reset_Iop(const char *arg, int mode)
 	}
 
 	dmat.src  = &reset_pkt;
-	dmat.dest = (void *)SifGetReg(0x80000000);
+	dmat.dest = (void *)SifGetReg(SIF_SYSREG_SUBADDR);
 	dmat.size = sizeof(reset_pkt);
-	dmat.attr = 0x40 | SIF_DMA_INT_O;
+	dmat.attr = SIF_DMA_ERT | SIF_DMA_INT_O;
 	SifWriteBackDCache(&reset_pkt, sizeof(reset_pkt));
 
 	DIntr();
 	ee_kmode_enter();
-	/*	Don't acknowledge this flag here. Sony had changed where this flag is acknowledged after a certain point, which might result in the SIF crashing terribly in some games upon the next IOP reset. :(
-		The SIF implementation in every SDK version will be happy if this flag is not acknowledged here because the flag's state will be taken care of by the game's sceSifIopReset() function, and again when its sceSifIopSync() function runs. */
-//	Old_SifSetReg(SIF_REG_SMFLAG, 0x40000);
+	Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_BOOTEND);
 
 	if (!Old_SifSetDma(&dmat, 1)){
 		ee_kmode_exit();
@@ -213,9 +210,9 @@ int Reset_Iop(const char *arg, int mode)
 		return 0;
 	}
 
-	Old_SifSetReg(SIF_REG_SMFLAG, 0x30000);
-	Old_SifSetReg(0x80000002, 0);
-	Old_SifSetReg(0x80000000, 0);
+	Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT|SIF_STAT_CMDINIT);
+	Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
+	Old_SifSetReg(SIF_SYSREG_SUBADDR, 0);
 	ee_kmode_exit();
 	EIntr();
 

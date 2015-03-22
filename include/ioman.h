@@ -31,7 +31,7 @@ int ioRegisterHandler(int type, io_request_handler_t handler);
 * @note The data are not freed! */
 int ioPutRequest(int type, void* data);
 
-/** removes all requests of a given type from the queue 
+/** removes all requests of a given type from the queue
 * @param type the type of the requests to remove
 * @return the count of the requests removed */
 int ioRemoveRequests(int type);
@@ -50,7 +50,7 @@ int ioPrintf(const char* format, ...);
 
 /** Helper function. Will flush the io operation list
  (wait for all io ops requested to end) and then
- issue a blocking flag that will mean no io 
+ issue a blocking flag that will mean no io
  operation will get in.
  @param block If nonzero, will issue blocking, otherwise it will unblock
 */

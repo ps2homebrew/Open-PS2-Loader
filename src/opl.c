@@ -62,6 +62,7 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 	mod->menuItem.execCircle = NULL;
 	mod->menuItem.execSquare = NULL;
 	mod->menuItem.execTriangle = NULL;
+	mod->menuItem.visible = 0;
 	mod->menuItem.hints = NULL;
 	mod->menuItem.icon_id = -1;
 	mod->menuItem.current = NULL;
@@ -247,6 +248,7 @@ static void initMenuForListSupport(int mode) {
 	mod->menuItem.pagestart = NULL;
 	mod->menuItem.remindLast = 0;
 
+	mod->menuItem.visible = mod->support->allowManualStart;
 	mod->menuItem.refresh = &itemExecRefresh;
 	mod->menuItem.execCross = &itemExecCross;
 	mod->menuItem.execTriangle = &itemExecTriangle;
@@ -281,40 +283,36 @@ static void clearMenuGameList(opl_io_module_t* mdl) {
 
 static void initSupport(item_list_t* itemList, int startMode, int mode, int force_reinit) {
 	opl_io_module_t* mod = &list_support[mode];
-	if (!mod->support) {
-		itemList->uip = 1; // stop updates until we're done with init
-		mod->support = itemList;
-		initMenuForListSupport(mode);
-		itemList->uip = 0;
-	}
 
-	if (((force_reinit) && (startMode && mod->support->enabled)) \
-	  || (startMode == 2 && !mod->support->enabled)) {
-		// stop updates until we're done with init of the device
-		mod->support->uip = 1;
-		mod->support->itemInit();
-		moduleUpdateMenu(mode, 0);
-		mod->support->uip = 0;
+	if(startMode) {
+		if (!mod->support) {
+			itemList->uip = 1; // stop updates until we're done with init
+			mod->support = itemList;
+			initMenuForListSupport(mode);
+			itemList->uip = 0;
+		}
 
-		if (gAutoRefresh)
-			RefreshAllLists();
-		else
-			ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
+		if (((force_reinit) && (startMode && mod->support->enabled)) \
+		  || (startMode == START_MODE_AUTO && !mod->support->enabled)) {
+			// stop updates until we're done with init of the device
+			mod->support->uip = 1;
+			mod->support->itemInit();
+			moduleUpdateMenu(mode, 0);
+			mod->support->uip = 0;
+
+			if (gAutoRefresh)
+				RefreshAllLists();
+			else
+				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
+		}
 	}
 }
 
 static void initAllSupport(int force_reinit) {
-	if (gUSBStartMode)
-		initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
-
-	if (gETHStartMode)
-		initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit||(gNetworkStartup >= ERROR_ETH_SMB_CONN));
-
-	if (gHDDStartMode)
-		initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
-
-	if (gAPPStartMode)
-		initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
+	initSupport(usbGetObject(0), START_MODE_AUTO, USB_MODE, force_reinit);
+	initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit||(gNetworkStartup >= ERROR_ETH_SMB_CONN));
+	initSupport(hddGetObject(0), START_MODE_AUTO, HDD_MODE, force_reinit);
+	initSupport(appGetObject(0), START_MODE_AUTO, APP_MODE, force_reinit);
 }
 
 static void deinitAllSupport(int exception) {
@@ -327,6 +325,13 @@ static void deinitAllSupport(int exception) {
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
+static void selectMenuItem(menu_item_t *item) {
+	struct gui_update_t *id;
+	id = guiOpCreate(GUI_OP_SELECT_MENU);
+	id->menu.menu = item;
+	guiDeferUpdate(id);
+}
+
 static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	clearMenuGameList(mdl);
 
@@ -337,8 +342,10 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	// read the new game list
 	struct gui_update_t *gup = NULL;
 	int count = mdl->support->itemUpdate();
-	if (count) {
+	if (count > 0) {
 		int i;
+
+		mdl->menuItem.visible = 1;
 
 		for (i = 0; i < count; ++i) {
 
@@ -358,6 +365,10 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 
 			guiDeferUpdate(gup);
 		}
+
+		selectMenuItem(&mdl->menuItem);	//Get the menu to display this sub-menu, which was updated.
+	}else{
+		mdl->menuItem.visible = mdl->support->allowManualStart ? 1 : 0;
 	}
 
 	if (gAutosort) {
@@ -376,7 +387,7 @@ void menuDeferredUpdate(void* data) {
 		return;
 
 	if (mod->support->uip) {
-		ioPutRequest(IO_MENU_UPDATE_DEFFERED, mode); // we are busy, so re-post refresh for later
+		// we are already refreshing, so drop this request.
 		return;
 	}
 
@@ -567,10 +578,7 @@ static void _loadConfig() {
 #ifdef CHEAT
 			configGetInt(configOPL, "show_cheat", &gShowCheat);
 #endif
-			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
-			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
 			configGetInt(configOPL, "eth_mode", &gETHStartMode);
-			configGetInt(configOPL, "app_mode", &gAPPStartMode);
 		}
 
 		applyConfig(themeID, langID);
@@ -626,10 +634,7 @@ static void _saveConfig() {
 #ifdef CHEAT
 		configSetInt(configOPL, "show_cheat", gShowCheat);
 #endif
-		configSetInt(configOPL, "usb_mode", gUSBStartMode);
-		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
-		configSetInt(configOPL, "app_mode", gAPPStartMode);
 
 		configSetInt(configOPL, "swap_select_btn", gSelectButton == KEY_CIRCLE ? 0 : 1);
 	}
@@ -836,9 +841,9 @@ static void setDefaults(void) {
 
 	gBaseMCDir = "mc?:OPL";
 
-	ps2_ip_use_dhcp = 0;
+	ps2_ip_use_dhcp = 1;
 	gETHOpMode = ETH_OP_MODE_AUTO;
-	gPCShareAddressIsNetBIOS = 0;
+	gPCShareAddressIsNetBIOS = 1;
 	gPCShareNBAddress[0] = '\0';
 	ps2_ip[0] = 192; ps2_ip[1] = 168; ps2_ip[2] =  0; ps2_ip[3] =  10;
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
@@ -849,7 +854,6 @@ static void setDefaults(void) {
 	gPCUserName[0] = '\0';
 	gPCPassword[0] = '\0';
 	gNetworkStartup = ERROR_ETH_NOT_STARTED;
-	gHddStartup = 6;
 	gHDDSpindown = 20;
 	gNetConfigChanged = 0;
 	gScrollSpeed = 1;
@@ -871,10 +875,7 @@ static void setDefaults(void) {
 	gEnableArt = 0;
 	gWideScreen = 0;
 
-	gUSBStartMode = 0;
-	gHDDStartMode = 0;
-	gETHStartMode = 0;
-	gAPPStartMode = 0;
+	gETHStartMode = START_MODE_DISABLED;
 
 	gDefaultBgColor[0] = 0x030;
 	gDefaultBgColor[1] = 0x030;
@@ -937,9 +938,7 @@ static void deferredInit(void) {
 	guiDeferUpdate(id);
 
 	if (list_support[gDefaultDevice].support) {
-		id = guiOpCreate(GUI_OP_SELECT_MENU);
-		id->menu.menu = &list_support[gDefaultDevice].menuItem;
-		guiDeferUpdate(id);
+		selectMenuItem(&list_support[gDefaultDevice].menuItem);
 	}
 }
 

@@ -11,7 +11,8 @@ IRX_ID(MODNAME, 0x01, 0x01);
 
 static int PostResetCallback(int* arg1, int arg2)
 {
-	sceSifSetSMFlag(0x40000);
+	sceSifSetSMFlag(SIF_STAT_BOOTEND);
+
 	return 0;
 }
 

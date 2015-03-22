@@ -220,10 +220,7 @@ void guiShowConfig() {
 
 	diaSetEnum(diaConfig, CFG_SELECTBUTTON, selectButtons);
 	diaSetEnum(diaConfig, CFG_DEFDEVICE, deviceNames);
-	diaSetEnum(diaConfig, CFG_USBMODE, deviceModes);
-	diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
 	diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
-	diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
 	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
 	diaSetString(diaConfig, CFG_EXITTO, gExitPath);
@@ -238,10 +235,7 @@ void guiShowConfig() {
 #endif
 	diaSetInt(diaConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
-	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
-	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
 	diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
-	diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
 	int ret = diaExecuteDialog(diaConfig, -1, 1, NULL);
 	if (ret) {
@@ -261,10 +255,7 @@ void guiShowConfig() {
 		else
 			gSelectButton = KEY_CIRCLE;
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
-		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
-		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
 		diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
-		diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
 		applyConfig(-1, -1);
 	}
@@ -371,7 +362,7 @@ void guiShowGSConfig(void) {
 	"PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", \
 	"HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", \
 	"VGA 640x480p @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", NULL };
-	
+
 	diaSetEnum(diaGSConfig, COMPAT_GSMVMODE, gsmvmodeNames);
 	diaExecuteDialog(diaGSConfig, -1, 1, NULL);
 }
@@ -386,7 +377,7 @@ void guiShowCheatConfig(void) {
 	diaSetEnum(diaCheatConfig, CHEATCFG_CHEATMODE, cheatmodeNames);
 	diaSetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, gEnableCheat);
 	diaSetInt(diaCheatConfig, CHEATCFG_CHEATMODE, gCheatMode);
-	
+
 	int ret = diaExecuteDialog(diaCheatConfig, -1, 1, NULL);
 	if (ret) {
 		diaGetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, &gEnableCheat);
@@ -396,9 +387,11 @@ void guiShowCheatConfig(void) {
 #endif
 
 static int netConfigUpdater(int modified) {
-	int isNetBIOS, isDHCPEnabled, i;
+	int showAdvancedOptions, isNetBIOS, isDHCPEnabled, i;
 
 	if(modified) {
+		diaGetInt(diaNetConfig, NETCFG_SHOW_ADVANCED_OPTS, &showAdvancedOptions);
+
 		diaGetInt(diaNetConfig, NETCFG_PS2_IP_ADDR_TYPE, &isDHCPEnabled);
 		diaGetInt(diaNetConfig, NETCFG_SHARE_ADDR_TYPE, &isNetBIOS);
 		diaSetVisible(diaNetConfig, NETCFG_SHARE_NB_ADDR, isNetBIOS);
@@ -413,6 +406,9 @@ static int netConfigUpdater(int modified) {
 
 		for (i = 0; i < 3; i++)
 			diaSetVisible(diaNetConfig, NETCFG_SHARE_IP_ADDR_DOT_0 + i, !isNetBIOS);
+
+		diaSetEnabled(diaNetConfig, NETCFG_SHARE_PORT, showAdvancedOptions);
+		diaSetEnabled(diaNetConfig, NETCFG_ETHOPMODE, showAdvancedOptions);
 	}
 
 	return 0;
@@ -428,6 +424,10 @@ void guiShowNetConfig(void) {
 	diaSetEnum(diaNetConfig, NETCFG_ETHOPMODE, ethOpModes);
 
 	// upload current values
+	diaSetInt(diaNetConfig, NETCFG_SHOW_ADVANCED_OPTS, 0);
+	diaSetEnabled(diaNetConfig, NETCFG_ETHOPMODE, 0);
+	diaSetEnabled(diaNetConfig, NETCFG_SHARE_PORT, 0);
+
 	diaSetInt(diaNetConfig, NETCFG_PS2_IP_ADDR_TYPE, ps2_ip_use_dhcp);
 	diaSetInt(diaNetConfig, NETCFG_SHARE_ADDR_TYPE, gPCShareAddressIsNetBIOS);
 	diaSetVisible(diaNetConfig, NETCFG_SHARE_NB_ADDR, gPCShareAddressIsNetBIOS);
@@ -873,7 +873,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
-			
+
 		diaGetInt(diaGSConfig, COMPAT_GSMVMODE, &GSMVMode);
 		if (GSMVMode != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
@@ -884,7 +884,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		if (GSMXOffset != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
 		else
-			configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET); 
+			configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
 
 		diaGetInt(diaGSConfig, COMPAT_GSMYOFFSET, &GSMYOffset);
 		if (GSMYOffset != 0)
@@ -977,7 +977,6 @@ static void guiHandleOp(struct gui_update_t* item) {
 
 		case GUI_OP_SELECT_MENU:
 			menuSetSelectedItem(item->menu.menu);
-			screenHandler = &screenHandlers[GUI_SCREEN_MAIN];
 			break;
 
 		case GUI_OP_CLEAR_SUBMENU:
@@ -1008,7 +1007,6 @@ static void guiHandleOp(struct gui_update_t* item) {
 }
 
 static void guiHandleDeferredOps(void) {
-	// TODO: Fit into the given time interval, skip rest of operations of over limit
 
 	while (gUpdateList) {
 		WaitSema(gSemaId);
@@ -1384,22 +1382,24 @@ void guiSetFrameHook(gui_callback_t cback) {
 }
 
 void guiSwitchScreen(int target, int transition) {
-	if (transition == TRANSITION_LEFT) {
-		transitionX = 1;
-		transMax = screenWidth;
-	} else if (transition == TRANSITION_RIGHT) {
-		transitionX = -1;
-		transMax = screenWidth;
-	} else if (transition == TRANSITION_UP) {
-		transitionY = 1;
-		transMax = screenHeight;
-	} else if (transition == TRANSITION_DOWN) {
-		transitionY = -1;
-		transMax = screenHeight;
-	}
-	transIndex = 0;
+	if(screenHandler != &screenHandlers[target]) {
+		if (transition == TRANSITION_LEFT) {
+			transitionX = 1;
+			transMax = screenWidth;
+		} else if (transition == TRANSITION_RIGHT) {
+			transitionX = -1;
+			transMax = screenWidth;
+		} else if (transition == TRANSITION_UP) {
+			transitionY = 1;
+			transMax = screenHeight;
+		} else if (transition == TRANSITION_DOWN) {
+			transitionY = -1;
+			transMax = screenHeight;
+		}
+		transIndex = 0;
 
-	screenHandlerTarget = &screenHandlers[target];
+		screenHandlerTarget = &screenHandlers[target];
+	}
 }
 
 struct gui_update_t *guiOpCreate(gui_op_type_t type) {

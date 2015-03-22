@@ -114,4 +114,7 @@ void rmApplyShiftRatio(int* y);
 /** sets the transposition coordiantes (all content is transposed with these values) */
 void rmSetTransposition(float x, float y);
 
+//Returns H-sync frequency in KHz
+unsigned char rmGetHsync(void);
+
 #endif

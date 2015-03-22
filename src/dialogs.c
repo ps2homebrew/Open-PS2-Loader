@@ -11,6 +11,10 @@ struct UIItem diaNetConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NETCONFIG}}},
 
 	{UI_SPLITTER},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SHOW_ADVANCED_OPTS}}}, {UI_SPACER}, {UI_SPACER}, {UI_BOOL, NETCFG_SHOW_ADVANCED_OPTS, 1, 1, -1, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ETH_OPMODE}}}, {UI_SPACER}, {UI_ENUM, NETCFG_ETHOPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+
+	{UI_BREAK}, 
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
 
@@ -39,10 +43,7 @@ struct UIItem diaNetConfig[] = {
 	{UI_INT, NETCFG_PS2_GATEWAY_0, 1, 1, -1, 0, 0, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {".", -1}}},
 	{UI_INT, NETCFG_PS2_GATEWAY_1, 1, 1, -1, 0, 0, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {".", -1}}},
 	{UI_INT, NETCFG_PS2_GATEWAY_2, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 255}}}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {".", -1}}},
-	{UI_INT, NETCFG_PS2_GATEWAY_3, 1, 1, -1, 0, 0, {.intvalue = {1, 1, 0, 255}}},
-
-	{UI_BREAK}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ETH_OPMODE}}}, {UI_SPACER}, {UI_ENUM, NETCFG_ETHOPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_INT, NETCFG_PS2_GATEWAY_3, 1, 1, -1, 0, 0, {.intvalue = {1, 1, 0, 255}}}, {UI_BREAK},
 
 	{UI_SPLITTER},
 
@@ -170,10 +171,7 @@ struct UIItem diaConfig[] = {
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_USBMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_USBMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_HDDMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_HDDMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_ETHMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_ETHMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_APPMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 
 	{UI_SPLITTER},

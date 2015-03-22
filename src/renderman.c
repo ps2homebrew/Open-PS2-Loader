@@ -32,22 +32,19 @@ static enum rm_vmode vmode = RM_VMODE_AUTO;
 #define NUM_RM_VMODES 6
 
 // RM Vmode -> GS Vmode conversion table
-static int rm_mode_table[NUM_RM_VMODES] = {
-	-1,					// AUTO
-	GS_MODE_PAL,		// PAL@50Hz
-	GS_MODE_NTSC,		// NTSC@60Hz
-	GS_MODE_DTV_480P,	// DTV480P@60Hz
-	GS_MODE_DTV_576P,	// DTV576P@50Hz
-	GS_MODE_VGA_640_60	// VGA640x480@60Hz
+struct rm_mode{
+	char mode;
+	char hsync;	//In KHz
+	short int height;
 };
 
-static int rm_height_table[] = {
-	-1,		// AUTO
-	512,	// PAL@50Hz
-	448,	// NTSC@60Hz
-	448,	// DTV480P@60Hz
-	512,	// DTV576P@50Hz
-	480		// VGA640x480@60Hz
+static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
+	{-1,16,-1},			// AUTO
+	{GS_MODE_PAL, 16, 512},		// PAL@50Hz
+	{GS_MODE_NTSC, 16, 448},	// NTSC@60Hz
+	{GS_MODE_DTV_480P, 31, 448},	// DTV480P@60Hz
+	{GS_MODE_DTV_576P, 31, 512},	// DTV576P@50Hz
+	{GS_MODE_VGA_640_60, 31, 480},	// VGA640x480@60Hz
 };
 
 static float aspectWidth;
@@ -291,8 +288,8 @@ static int rmOnVSync(void) {
 void rmInit() {
 	gsGlobal = gsKit_init_global();
 
-	rm_mode_table[RM_VMODE_AUTO] = gsGlobal->Mode;
-	rm_height_table[RM_VMODE_AUTO] = gsGlobal->Height;
+	rm_mode_table[RM_VMODE_AUTO].mode = gsGlobal->Mode;
+	rm_mode_table[RM_VMODE_AUTO].height = gsGlobal->Height;
 
 	dmaKit_init(D_CTRL_RELE_OFF, D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC,
 				D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
@@ -326,8 +323,8 @@ int rmSetMode(int force) {
 	if (changed) {
 		vmode = gVMode;
 
-		gsGlobal->Mode = rm_mode_table[vmode];
-		gsGlobal->Height = rm_height_table[vmode];
+		gsGlobal->Mode = rm_mode_table[vmode].mode;
+		gsGlobal->Height = rm_mode_table[vmode].height;
 
 		if (vmode == RM_VMODE_DTV480P || vmode == RM_VMODE_DTV576P || vmode == RM_VMODE_VGA_640_60) {
 			gsGlobal->Interlace = GS_NONINTERLACED;
@@ -551,3 +548,8 @@ void rmSetTransposition(float x, float y) {
 	transX = x;
 	transY = y;
 }
+
+unsigned char rmGetHsync(void) {
+	return rm_mode_table[vmode].hsync;
+}
+

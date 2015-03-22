@@ -423,7 +423,7 @@ static int usbCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t usbGameList = {
-		USB_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+		USB_MODE, 0, COMPAT, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
 #ifdef __CHILDPROOF
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
 #else

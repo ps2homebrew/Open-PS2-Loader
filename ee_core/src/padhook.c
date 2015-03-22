@@ -87,17 +87,6 @@ static void Shutdown_Dev9()
 	EIntr();
 }
 
-// Return to PS2 Browser
-static inline void Go_Browser(void)
-{
-	// Shutdown Dev9 hardware
-	if (HDDSpindown)
-		Shutdown_Dev9();
-
-	// Exit to PS2Browser
-	Exit(0);
-}
-
 // Load home ELF
 static void t_loadElf(void)
 {
@@ -155,7 +144,7 @@ static void t_loadElf(void)
 	}
 
 	// Return to PS2 Browser
-	Go_Browser();
+	Exit(0);
 }
 
 // Poweroff PlayStation 2
@@ -273,7 +262,6 @@ static void IGR_Thread(void *arg)
 			GS_BGCOLOUR = 0x008000; // Dark Green
 
 		// Exit services
-		LoadFileExit();
 		SifExitRpc();
 
 		// Execute home loader
@@ -281,7 +269,7 @@ static void IGR_Thread(void *arg)
 			ExecPS2(t_loadElf, &_gp, 0, NULL);
 
 		// Return to PS2 Browser
-		Go_Browser();
+		Exit(0);
 	}
 
 	// If combo is R3 + L3 or Reset failed, Poweroff PS2

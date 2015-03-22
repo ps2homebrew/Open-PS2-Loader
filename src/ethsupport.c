@@ -4,6 +4,7 @@
 #include "include/supportbase.h"
 #include "include/ethsupport.h"
 #include "include/util.h"
+#include "include/renderman.h"
 #include "include/themes.h"
 #include "include/textures.h"
 #include "include/ioman.h"
@@ -53,6 +54,7 @@ static int ethULSizePrev = -2;
 static unsigned char ethModifiedCDPrev[8];
 static unsigned char ethModifiedDVDPrev[8];
 static int ethGameCount = 0;
+static unsigned char ethModulesLoaded = 0;
 static base_game_info_t *ethGames = NULL;
 
 // forward declaration
@@ -172,11 +174,10 @@ static int WaitValidNetState(int (*checkingFunction)(void)){
 	// Wait for a valid network status;
 	ThreadID = GetThreadId();
 	for(retry_cycles = 0; checkingFunction() == 0; retry_cycles++) {
-		//TODO: The HSYNC rate will vary according to the active video mode. Get the video mode from renderman.
-		SetAlarm(200*16, &EthStatusCheckCb, &ThreadID);
+		SetAlarm(200 * rmGetHsync(), &EthStatusCheckCb, &ThreadID);
 		SleepThread();
 
-		if(retry_cycles >= 30*5){	//30s = 30*5*200ms
+		if(retry_cycles >= 30 * 5){	//30s = 30*5*200ms
 			return -1;
 		}
 	}
@@ -258,12 +259,10 @@ static void ethInitSMB(void) {
 }
 
 int ethLoadModules(void) {
-	static unsigned char loaded = 0;
-
 	LOG("ETHSUPPORT LoadModules\n");
 
-	if(!loaded) {
-		loaded = 1;
+	if(!ethModulesLoaded) {
+		ethModulesLoaded = 1;
 
 		sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL);
 		NetManInit();
@@ -620,6 +619,7 @@ static void ethCleanUp(int exception) {
 
 	nbnsDeinit();
 	NetManDeinit();
+	ethModulesLoaded = 0;
 }
 
 #ifdef VMC
@@ -629,7 +629,7 @@ static int ethCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t ethGameList = {
-		ETH_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		ETH_MODE, 0, COMPAT, 1, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 #ifdef __CHILDPROOF
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
 #else

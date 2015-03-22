@@ -18,15 +18,15 @@ typedef enum {
 	GUI_OP_ADD_HINT
 }  gui_op_type_t;
 
-/** a single GUI update in a package form */ 
+/** a single GUI update in a package form */
 struct gui_update_t {
 	gui_op_type_t type;
-	
+
 	struct {
 		menu_item_t *menu;
 		submenu_list_t **subMenu;
 	} menu;
-	
+
 	union {
 		struct {
 			int icon_id;
@@ -35,7 +35,7 @@ struct gui_update_t {
 			int text_id;
 			int selected;
 		} submenu;
-		
+
 		struct { // hint for the given menu
 			int icon_id;
 			int text_id;
@@ -85,7 +85,7 @@ void guiSetFrameHook(gui_callback_t cback);
 // Deffered update handling:
 /* Note:
 All the GUI operation requests can be deffered to the proper time
-when rendering is not going on. This allows us, for example, to schedule 
+when rendering is not going on. This allows us, for example, to schedule
 updates of the menu from another thread without stalls.
 */
 

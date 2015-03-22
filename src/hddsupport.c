@@ -37,13 +37,14 @@ extern void *hdd_mcemu_irx;
 extern int size_hdd_mcemu_irx;
 #endif
 
-static int hddForceUpdate = 1;
+static unsigned char hddForceUpdate = 1;
+static unsigned char hddHDProKitDetected = 0;
+static unsigned char hddModulesLoaded = 0;
+
 static char *hddPrefix = "pfs0:";
 static hdl_games_list_t hddGames;
 
 const char *oplPart = "hdd0:+OPL";
-
-static int hddHDProKitDetected = 0;
 
 // forward declaration
 static item_list_t hddGameList;
@@ -92,14 +93,6 @@ static int hddCheckHDProKit(void)
 	CDVDreg_STATUS = 0;
 	u32 res = HDPROreg_IO8;
 	CDVDreg_STATUS = 0;
-	ee_kmode_exit();
-	EIntr();
-
-	FlushCache(0);
-	FlushCache(2);
-
-	DIntr();
-	ee_kmode_enter();
 
 	// check result
 	if ((res & 0xff) == 0xe7) {
@@ -112,9 +105,6 @@ static int hddCheckHDProKit(void)
 	}
 	ee_kmode_exit();
 	EIntr();
-
-	FlushCache(0);
-	FlushCache(2);
 
 	if (ret)
 		LOG("HDDSUPPORT HD Pro Kit detected!\n");
@@ -148,48 +138,41 @@ void hddLoadModules(void) {
 
 	LOG("HDDSUPPORT LoadModules\n");
 
-	gHddStartup = 3;
+	if(!hddModulesLoaded) {
+		hddModulesLoaded = 1;
 
-	// try to detect HD Pro Kit (not the connected HDD),
-	// if detected it loads the specific ATAD module
-	hddHDProKitDetected = hddCheckHDProKit();
-	if (hddHDProKitDetected)
-		ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
-	else
-		ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
-	if (ret < 0) {
-		gHddStartup = -1;
-		return;
+		// try to detect HD Pro Kit (not the connected HDD),
+		// if detected it loads the specific ATAD module
+		hddHDProKitDetected = hddCheckHDProKit();
+		if (hddHDProKitDetected)
+			ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
+		else
+			ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+		if (ret < 0) {
+			return;
+		}
+
+		ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
+		if (ret < 0) {
+			return;
+		}
+
+		ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
+		if (ret < 0) {
+			return;
+		}
+
+		LOG("HDDSUPPORT modules loaded\n");
+
+		hddSetIdleTimeout(gHDDSpindown * 12); // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
+
+		ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
+		if (ret == -ENOENT) {
+			//Attempt to create the partition.
+			if((CreateOPLPartition(oplPart, hddPrefix)) >= 0)
+				fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
+		}
 	}
-
-	gHddStartup = 2;
-
-	ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
-	if (ret < 0) {
-		gHddStartup = -1;
-		return;
-	}
-
-	gHddStartup = 1;
-
-	ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
-	if (ret < 0) {
-		gHddStartup = -1;
-		return;
-	}
-
-	LOG("HDDSUPPORT modules loaded\n");
-
-	hddSetIdleTimeout(gHDDSpindown * 12); // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
-
-	ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
-	if (ret == -ENOENT) {
-		//Attempt to create the partition.
-		if((CreateOPLPartition(oplPart, hddPrefix)) >= 0)
-			fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
-	}
-
-	gHddStartup = 0;
 }
 
 void hddInit(void) {
@@ -211,7 +194,7 @@ static int hddNeedsUpdate(void) {
 		hddForceUpdate = 0;
 		return 1;
 	}
-	
+
 	return 0;
 }
 
@@ -451,14 +434,16 @@ static int hddGetImage(char* folder, int isRelative, char* value, char* suffix, 
 }
 
 static void hddCleanUp(int exception) {
-	if (hddGameList.enabled) {
-		LOG("HDDSUPPORT CleanUp\n");
+	LOG("HDDSUPPORT CleanUp\n");
 
+	if (hddGameList.enabled) {
 		hddFreeHDLGamelist(&hddGames);
 
 		if ((exception & UNMOUNT_EXCEPTION) == 0)
 			fileXioUmount(hddPrefix);
 	}
+
+	hddModulesLoaded = 0;
 }
 
 #ifdef VMC
@@ -468,7 +453,7 @@ static int hddCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t hddGameList = {
-		HDD_MODE, 0, COMPAT_FULL, 0, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		HDD_MODE, 0, COMPAT_FULL, 0, 0, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL,
 #else

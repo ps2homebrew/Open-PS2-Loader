@@ -630,7 +630,6 @@ static void initBackground(const char* themePath, config_set_t* themeConfig, the
 		elem->drawElem = &drawStaticImage;
 	else
 		elem->drawElem = &drawBackground;
-	
 }
 
 static void drawMenuIcon(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
@@ -639,11 +638,39 @@ static void drawMenuIcon(struct menu_list* menu, struct submenu_list* item, conf
 		rmDrawPixmap(menuIconTex, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, elem->scaled, gDefaultCol);
 }
 
+static int hasPrevVisibleItem(struct menu_list* menu) {
+	struct menu_list* pMenu;
+	int result;
+
+	for(result = 0, pMenu = menu->prev; pMenu != NULL; pMenu = pMenu->prev){
+		if(pMenu->item->visible) {
+			result = 1;
+			break;
+		}
+	}
+
+	return result;
+}
+
+static int hasNextVisibleItem(struct menu_list* menu) {
+	struct menu_list* pMenu;
+	int result;
+
+	for(result = 0, pMenu = menu->next; pMenu != NULL; pMenu = pMenu->next){
+		if(pMenu->item->visible) {
+			result = 1;
+			break;
+		}
+	}
+
+	return result;
+}
+
 static void drawMenuText(struct menu_list* menu, struct submenu_list* item, config_set_t* config, struct theme_element* elem) {
 	GSTEXTURE* leftIconTex = NULL, *rightIconTex = NULL;
-	if (menu->prev)
+	if (hasPrevVisibleItem(menu))
 		leftIconTex = thmGetTexture(LEFT_ICON);
-	if (menu->next)
+	if (hasNextVisibleItem(menu))
 		rightIconTex = thmGetTexture(RIGHT_ICON);
 
 	if (elem->aligned) {

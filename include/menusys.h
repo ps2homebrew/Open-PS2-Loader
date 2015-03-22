@@ -8,30 +8,30 @@
 typedef struct submenu_item {
 	/// Icon used for rendering of this item
 	int icon_id;
-	
+
 	/// item description
 	char *text;
-	
+
 	/// item description in localized form (used if value is not negative)
 	int text_id;
-	
+
 	/// item id (MUST BE VALID, we assert it is != -1 to optimize rendering)
 	int id;
-	
+
 	int* cache_id;
 	int* cache_uid;
 } submenu_item_t;
 
 typedef struct submenu_list {
 	struct submenu_item item;
-	
+
 	struct submenu_list *prev, *next;
 } submenu_list_t;
 
 typedef struct menu_hint_item {
 	int icon_id;
 	int text_id;
-	
+
 	struct menu_hint_item *next;
 } menu_hint_item_t;
 
@@ -39,37 +39,39 @@ typedef struct menu_hint_item {
 typedef struct menu_item {
 	/// Icon used for rendering of this item
 	int icon_id;
-	
+
+	int visible;
+
 	/// item description
 	char *text;
-	
+
 	/// item description in localised form (used if value is not negative)
 	int text_id;
-	
+
 	void *userdata;
-	
+
 	/// submenu, selection and page start (only used in static mode)
 	struct submenu_list *submenu, *current, *pagestart;
-	
+
 	short remindLast;
 
 	void (*refresh)(struct menu_item *curMenu);
 
 	void (*execCross)(struct menu_item *curMenu);
-	
+
 	void (*execTriangle)(struct menu_item *curMenu);
 
 	void (*execCircle)(struct menu_item *curMenu);
-	
+
 	void (*execSquare)(struct menu_item *curMenu);
-	
+
 	/// hint list
 	struct menu_hint_item *hints;
 } menu_item_t;
 
 typedef struct menu_list {
 	struct menu_item *item;
-	
+
 	struct menu_list *prev, *next;
 } menu_list_t;
 

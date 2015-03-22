@@ -3,7 +3,7 @@
 
 #include "include/iosupport.h"
 
-#define USB_MODE_UPDATE_DELAY	0
+#define USB_MODE_UPDATE_DELAY	MENU_UPD_DELAY_GENREFRESH
 
 #ifdef VMC
 #include "include/mcemu.h"

@@ -129,6 +129,8 @@ static inline void cdvd_Stsubcmdcall(void *buf);
 static inline void cdvdSt_read(void *buf);
 static inline void cdvd_readchain(void *buf);
 static inline void cdvd_readee(void *buf);
+static inline void cdvd_readiopm(void *buf);
+static void sysmemSendEE(void *buf, void *EE_addr, int size);
 int sceCdChangeThreadPriority(int priority);
 
 enum CDVDFSV_SCMD{
@@ -201,7 +203,6 @@ static u8 cdvdScmds_rpcbuf[1024];
 static u8 cdsearchfile_rpcbuf[304];
 static u8 cdvdNcmds_rpcbuf[1024];
 static u8 S596_rpcbuf[16];
-static u8 curlsn_buf[16];
 
 #define CDVDFSV_BUF_SECTORS	(CDVDMAN_FS_SECTORS+1)	//CDVDFSV will use CDVDFSV_BUF_SECTORS+1 sectors of space. Remember that the actual size of the buffer within CDVDMAN is CDVDMAN_FS_SECTORS+2.
 
@@ -487,7 +488,7 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
 {	// CD NCMD RPC callback
 	int sc_param;
 
-	sceCdSC(0xFFFFFFF6, &fno);
+	sceCdSC(CDSC_IO_SEMA, &fno);
 
 	switch(fno){
 		case CDVDFSV_NCMD_CDREAD:
@@ -514,9 +515,7 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
 			cdvd_Stsubcmdcall(buf);
 			break;
 		case CDVDFSV_NCMD_IOPMREAD:
-			sceCdRead(((RpcCdvd_t *)buf)->lsn, ((RpcCdvd_t *)buf)->sectors, ((RpcCdvd_t *)buf)->buf, NULL);
-			sceCdSync(0);
-			*(int *)buf = 1;
+			cdvd_readiopm(buf);
 			break;
 		case CDVDFSV_NCMD_DISKRDY:
 			*(int *)buf = sceCdDiskReady(0);
@@ -536,7 +535,7 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
 	}
 
 	sc_param=0;
-	sceCdSC(0xFFFFFFF6, &sc_param);
+	sceCdSC(CDSC_IO_SEMA, &sc_param);
 
 	return buf;
 }
@@ -546,8 +545,8 @@ static void *cbrpc_S596(int fno, void *buf, int size)
 {
 	int cdvdman_intr_ef, dummy;
 
-	if(fno==1){
-		cdvdman_intr_ef=sceCdSC(0xFFFFFFF5, &dummy);
+	if(fno == 1){
+		cdvdman_intr_ef=sceCdSC(CDSC_GET_INTRFLAG, &dummy);
 		ClearEventFlag(cdvdman_intr_ef, ~4);
 		WaitEventFlag(cdvdman_intr_ef, 4, WEF_AND, NULL);
 	}
@@ -560,14 +559,13 @@ static void *cbrpc_S596(int fno, void *buf, int size)
 static void *cbrpc_cdsearchfile(int fno, void *buf, int size)
 {	// CD Search File RPC callback
 
-	SifDmaTransfer_t dmat;
-	int r, oldstate;
+	int r;
 	void *ee_addr;
 	char *p;
 	SearchFilePkt_t *pkt = (SearchFilePkt_t *)buf;
 	SearchFilePkt2_t *pkt2 = (SearchFilePkt2_t *)buf;
 	SearchFilePktl_t *pktl = (SearchFilePktl_t *)buf;
-	int pktsize = 0;
+	int pktsize;
 
 	if (size == sizeof(SearchFilePkt2_t)) {
 		ee_addr = (void *)pkt2->dest; 		// Search File: Called from Not Dual_layer Version
@@ -592,15 +590,7 @@ static void *cbrpc_cdsearchfile(int fno, void *buf, int size)
 		}
 	}
 
-	dmat.dest = (void *)ee_addr;
-	dmat.size = pktsize;
-	dmat.src = (void *)buf;
-	dmat.attr = 0;
-
-	CpuSuspendIntr(&oldstate);
-	while (!sceSifSetDma(&dmat, 1));
-	CpuResumeIntr(oldstate);
-	//while (sceSifDmaStat >= 0);
+	sysmemSendEE(buf, ee_addr, pktsize);
 
 	*(int *)buf = r;
 
@@ -652,20 +642,16 @@ static void sysmemSendEE(void *buf, void *EE_addr, int size)
 	SifDmaTransfer_t dmat;
 	int oldstate, id;
 
-	size += 3;
-	size &= 0xfffffffc;
-
 	dmat.dest = (void *)EE_addr;
 	dmat.size = size;
 	dmat.src = (void *)buf;
 	dmat.attr = 0;
 
-	id = 0;
-	while (!id) {
+	do {
 		CpuSuspendIntr(&oldstate);
 		id = sceSifSetDma(&dmat, 1);
 		CpuResumeIntr(oldstate);
-	}
+	} while(!id);
 
 	while (sceSifDmaStat(id) >= 0);
 }
@@ -680,10 +666,7 @@ static inline void cdvdSt_read(void *buf)
 	void *ee_addr = (void *)St->buf;
 
 	while (St->sectors > 0) {
-		if (St->sectors > CDVDFSV_BUF_SECTORS)
-			nsectors = CDVDFSV_BUF_SECTORS;
-		else
-			nsectors = St->sectors;
+		nsectors = (St->sectors > CDVDFSV_BUF_SECTORS) ? CDVDFSV_BUF_SECTORS : St->sectors;
 
 		if((r = sceCdStRead(nsectors, cdvdfsv_buf, 0, &err)) < 1) break;
 
@@ -700,12 +683,12 @@ static inline void cdvdSt_read(void *buf)
 //-------------------------------------------------------------------------
 static inline void cdvd_readchain(void *buf)
 {
-	int i;
-	u32 nsectors, tsectors, lsn, addr;
+	int i, fsverror;
+	u32 nsectors, tsectors, lsn, addr, readpos;
 
 	RpcCdvdchain_t *ch = (RpcCdvdchain_t *)buf;
 
-	for (i=0; i<64; i++) {
+	for (i = 0,readpos = 0; i < 64; i++,ch++) {
 
 		if ((ch->lsn == -1) || (ch->sectors == -1) || ((u32)ch->buf == -1))
 			break;
@@ -714,38 +697,54 @@ static inline void cdvd_readchain(void *buf)
 		tsectors = ch->sectors;
 		addr = (u32)ch->buf & 0xfffffffc;
 
-		while (tsectors != 0) {
+		if ((u32)ch->buf & 1) { // IOP addr
+			if(sceCdRead(lsn, tsectors, (void *)addr, NULL) == 0) {
+				if(sceCdGetError() == CDVD_ERR_NO) {
+					fsverror = CDVD_ERR_READCFR;
+					sceCdSC(CDSC_SET_ERROR, &fsverror);
+				}
 
-			if (tsectors > CDVDFSV_BUF_SECTORS)
-				nsectors = CDVDFSV_BUF_SECTORS;
-			else
-				nsectors = tsectors;
-
-			if ((u32)ch->buf & 1) { // IOP addr
-				sceCdRead(lsn, nsectors, (void *)addr, NULL);
-				sceCdSync(0);
+				*(int *)buf = 0;
+				return;
 			}
-			else {			// EE addr
-				sceCdRead(lsn, nsectors, cdvdfsv_buf, NULL);
+			sceCdSync(0);
+
+			readpos += tsectors * 2048;
+		}
+		else {			// EE addr
+			while (tsectors > 0) {
+				nsectors = (tsectors > CDVDFSV_BUF_SECTORS) ? CDVDFSV_BUF_SECTORS : tsectors;
+
+				if(sceCdRead(lsn, nsectors, cdvdfsv_buf, NULL) == 0) {
+					if(sceCdGetError() == CDVD_ERR_NO) {
+						fsverror = CDVD_ERR_READCF;
+						sceCdSC(CDSC_SET_ERROR, &fsverror);
+					}
+
+					*(int *)buf = 0;
+					return;
+				}
 				sceCdSync(0);
 				sysmemSendEE(cdvdfsv_buf, (void *)addr, nsectors << 11);
+
+				lsn += nsectors;
+				tsectors -= nsectors;
+				addr += nsectors << 11;
+				readpos += nsectors << 11;
 			}
-
-			lsn += nsectors;
-			tsectors -= nsectors;
-			addr += nsectors << 11;
 		}
-		ch++;
-	}
 
-	*(int *)buf = 1;
+		//The pointer to the read position variable within EE RAM is stored at ((RpcCdvdchain_t *)buf)[65].sectors.
+		sysmemSendEE(&readpos, (void*)((RpcCdvdchain_t *)buf)[65].sectors, sizeof(readpos));
+	}
 }
 
 //--------------------------------------------------------------
 static inline void cdvd_readee(void *buf)
-{	// Read Disc datas to EE mem buffer
+{	// Read Disc data to EE mem buffer
+	u8 curlsn_buf[16];
 	u32 nbytes, nsectors, sectors_to_read, size_64b, size_64bb, bytesent, temp;
-	int sector_size, flag_64b;
+	int sector_size, flag_64b, fsverror;
 	void *fsvRbuf = (void *)cdvdfsv_buf;
 	void *eeaddr_64b, *eeaddr2_64b;
 	cdvdfsv_readee_t readee;
@@ -773,8 +772,7 @@ static inline void cdvd_readee(void *buf)
 	sectors_to_read = r->sectors;
 	bytesent = 0;
 
-	if (r->eeaddr2)
-		mips_memset((void *)curlsn_buf, 0, 16);
+	mips_memset((void *)curlsn_buf, 0, 16);
 
 	readee.pdst1 = (void *)r->buf;
 	eeaddr_64b = (void *)(((u32)r->buf + 0x3f) & 0xffffffc0); // get the next 64-bytes aligned address
@@ -805,16 +803,12 @@ static inline void cdvd_readee(void *buf)
 	while (1) {
 		do {
 			if ((sectors_to_read == 0) || (sceCdGetError() == CDVD_ERR_ABRT)) {
+				sysmemSendEE((void *)&readee, (void *)r->eeaddr1, sizeof(cdvdfsv_readee_t));
 
-				if (r->eeaddr1)
-					sysmemSendEE((void *)&readee, (void *)r->eeaddr1, sizeof(cdvdfsv_readee_t));
+				*((u32 *)&curlsn_buf[0]) = nbytes;
+				sysmemSendEE((void *)curlsn_buf, (void *)r->eeaddr2, 16);
 
-				if (r->eeaddr2) {
-					*((u32 *)&curlsn_buf[0]) = nbytes;
-					sysmemSendEE((void *)curlsn_buf, (void *)r->eeaddr2, 16);
-				}
-
-				*(int *)buf = 1;
+				*(int *)buf = nbytes;
 				return;
 			}
 
@@ -833,7 +827,17 @@ static inline void cdvd_readee(void *buf)
 				temp = nsectors;
 			}
 
-			sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL);
+			if(sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL) == 0)
+			{
+				if(sceCdGetError() == CDVD_ERR_NO)
+				{
+					fsverror = CDVD_ERR_READCF;
+					sceCdSC(CDSC_SET_ERROR, &fsverror);
+				}
+
+				*(int *)buf = bytesent;
+				return;
+			}
 			sceCdSync(0);
 
 			size_64b = nsectors * sector_size;
@@ -852,14 +856,8 @@ static inline void cdvd_readee(void *buf)
 				bytesent += size_64bb;
 			}
 
-			if (r->eeaddr2) {
-				temp = bytesent;
-				if (temp < 0)
-					temp += 2047;
-				temp = temp >> 11;
-				*((u32 *)&curlsn_buf[0]) = temp;
-				sysmemSendEE((void *)curlsn_buf, (void *)r->eeaddr2, 16);
-			}
+			*((u32 *)&curlsn_buf[0]) = bytesent;
+			sysmemSendEE((void *)curlsn_buf, (void *)r->eeaddr2, 16);
 
 			sectors_to_read -= nsectors;
 			r->lsn += nsectors;
@@ -870,7 +868,30 @@ static inline void cdvd_readee(void *buf)
 		mips_memcpy((void *)readee.buf2, (void *)(fsvRbuf + size_64b - readee.b2len), readee.b2len);
 	}
 
-	*(int *)buf = 0;
+	*(int *)buf = bytesent;
+}
+
+static inline void cdvd_readiopm(void *buf)
+{
+	int r, fsverror;
+	u32 readpos;
+
+	r = sceCdRead(((RpcCdvd_t *)buf)->lsn, ((RpcCdvd_t *)buf)->sectors, ((RpcCdvd_t *)buf)->buf, NULL);
+	while(sceCdSync(1))
+	{
+		readpos = sceCdGetReadPos();
+		sysmemSendEE(&readpos, ((RpcCdvd_t *)buf)->eeaddr2, sizeof(readpos));
+		DelayThread(8000);
+	}
+
+	if(r == 0)
+	{
+		if(sceCdGetError() == CDVD_ERR_NO)
+		{
+			fsverror = CDVD_ERR_READCFR;
+			sceCdSC(CDSC_SET_ERROR, &fsverror);
+		}
+	}
 }
 
 //-------------------------------------------------------------------------

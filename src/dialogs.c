@@ -171,7 +171,10 @@ struct UIItem diaConfig[] = {
 
 	{UI_SPLITTER},
 
+	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_USBMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_USBMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_HDDMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_HDDMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_ETHMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_ETHMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_APPMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 
 	{UI_SPLITTER},

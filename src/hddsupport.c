@@ -453,7 +453,7 @@ static int hddCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t hddGameList = {
-		HDD_MODE, 0, COMPAT_FULL, 0, 0, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+		HDD_MODE, 0, COMPAT_FULL, 0, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
 #ifdef __CHILDPROOF
 		&hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL,
 #else

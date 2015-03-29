@@ -40,8 +40,6 @@ typedef struct menu_item {
 	/// Icon used for rendering of this item
 	int icon_id;
 
-	int visible;
-
 	/// item description
 	char *text;
 

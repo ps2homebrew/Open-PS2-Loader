@@ -62,7 +62,6 @@ static void clearIOModuleT(opl_io_module_t *mod) {
 	mod->menuItem.execCircle = NULL;
 	mod->menuItem.execSquare = NULL;
 	mod->menuItem.execTriangle = NULL;
-	mod->menuItem.visible = 0;
 	mod->menuItem.hints = NULL;
 	mod->menuItem.icon_id = -1;
 	mod->menuItem.current = NULL;
@@ -248,7 +247,6 @@ static void initMenuForListSupport(int mode) {
 	mod->menuItem.pagestart = NULL;
 	mod->menuItem.remindLast = 0;
 
-	mod->menuItem.visible = mod->support->allowManualStart;
 	mod->menuItem.refresh = &itemExecRefresh;
 	mod->menuItem.execCross = &itemExecCross;
 	mod->menuItem.execTriangle = &itemExecTriangle;
@@ -309,10 +307,10 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 }
 
 static void initAllSupport(int force_reinit) {
-	initSupport(usbGetObject(0), START_MODE_AUTO, USB_MODE, force_reinit);
+	initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
 	initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit||(gNetworkStartup >= ERROR_ETH_SMB_CONN));
-	initSupport(hddGetObject(0), START_MODE_AUTO, HDD_MODE, force_reinit);
-	initSupport(appGetObject(0), START_MODE_AUTO, APP_MODE, force_reinit);
+	initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
+	initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
 }
 
 static void deinitAllSupport(int exception) {
@@ -325,13 +323,6 @@ static void deinitAllSupport(int exception) {
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
-static void selectMenuItem(menu_item_t *item) {
-	struct gui_update_t *id;
-	id = guiOpCreate(GUI_OP_SELECT_MENU);
-	id->menu.menu = item;
-	guiDeferUpdate(id);
-}
-
 static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	clearMenuGameList(mdl);
 
@@ -344,8 +335,6 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 	int count = mdl->support->itemUpdate();
 	if (count > 0) {
 		int i;
-
-		mdl->menuItem.visible = 1;
 
 		for (i = 0; i < count; ++i) {
 
@@ -365,10 +354,6 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 
 			guiDeferUpdate(gup);
 		}
-
-		selectMenuItem(&mdl->menuItem);	//Get the menu to display this sub-menu, which was updated.
-	}else{
-		mdl->menuItem.visible = mdl->support->allowManualStart ? 1 : 0;
 	}
 
 	if (gAutosort) {
@@ -578,7 +563,10 @@ static void _loadConfig() {
 #ifdef CHEAT
 			configGetInt(configOPL, "show_cheat", &gShowCheat);
 #endif
+			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
+			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
 			configGetInt(configOPL, "eth_mode", &gETHStartMode);
+			configGetInt(configOPL, "app_mode", &gAPPStartMode);
 		}
 
 		applyConfig(themeID, langID);
@@ -634,7 +622,10 @@ static void _saveConfig() {
 #ifdef CHEAT
 		configSetInt(configOPL, "show_cheat", gShowCheat);
 #endif
+		configSetInt(configOPL, "usb_mode", gUSBStartMode);
+		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
 		configSetInt(configOPL, "eth_mode", gETHStartMode);
+		configSetInt(configOPL, "app_mode", gAPPStartMode);
 
 		configSetInt(configOPL, "swap_select_btn", gSelectButton == KEY_CIRCLE ? 0 : 1);
 	}
@@ -875,7 +866,10 @@ static void setDefaults(void) {
 	gEnableArt = 0;
 	gWideScreen = 0;
 
+	gUSBStartMode = START_MODE_DISABLED;
+	gHDDStartMode = START_MODE_DISABLED;
 	gETHStartMode = START_MODE_DISABLED;
+	gAPPStartMode = START_MODE_DISABLED;
 
 	gDefaultBgColor[0] = 0x030;
 	gDefaultBgColor[1] = 0x030;
@@ -938,7 +932,9 @@ static void deferredInit(void) {
 	guiDeferUpdate(id);
 
 	if (list_support[gDefaultDevice].support) {
-		selectMenuItem(&list_support[gDefaultDevice].menuItem);
+		id = guiOpCreate(GUI_OP_SELECT_MENU);
+		id->menu.menu = &list_support[gDefaultDevice].menuItem;
+		guiDeferUpdate(id);
 	}
 }
 

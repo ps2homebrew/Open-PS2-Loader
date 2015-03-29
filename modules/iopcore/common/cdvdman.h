@@ -156,6 +156,13 @@ enum CDIOC_CODE{
 // DMA/reading alignment correction buffer. Used by CDVDMAN and CDVDFSV.
 #define CDVDMAN_FS_SECTORS	6	//The size of the actual buffer within CDVDMAN is CDVDMAN_FS_SECTORS+2.
 
+//Codes for use with sceCdSC()
+#define CDSC_GET_DEBUG_STATUS	0xFFFFFFF0	//Get debug status flag.
+#define CDSC_GET_INTRFLAG	0xFFFFFFF5	//Get interrupt flag.
+#define CDSC_IO_SEMA		0xFFFFFFF6	//Wait (param != 0) or signal (param == 0) high-level I/O semaphore.
+#define CDSC_GET_VERSION	0xFFFFFFF7	//Get CDVDMAN version.
+#define CDSC_SET_ERROR		0xFFFFFFFE	//Used by CDVDFSV and CDVDSTM to set the error code (Typically READCF*).
+
 // exported functions prototypes
 #define cdvdman_IMPORTS_start DECLARE_IMPORT_TABLE(cdvdman, 1, 1)
 #define cdvdman_IMPORTS_end END_IMPORT_TABLE

@@ -983,10 +983,10 @@ int sceCdSC(int code, int *param)
         DPRINTF("sceCdSC(0x%X, 0x%X)\n", code, *param);
 
 	switch(code){
-		case 0xFFFFFFF5:
+		case CDSC_GET_INTRFLAG:
 			result=cdvdman_stat.intr_ef;
 			break;
-		case 0xFFFFFFF6:
+		case CDSC_IO_SEMA:
 			if (*param)
 			{
 				WaitSema(cdrom_io_sema);
@@ -995,15 +995,18 @@ int sceCdSC(int code, int *param)
 
 			result = *param;	//EE N-command code.
 			break;
-		case 0xFFFFFFF7:
-			result=CDVDMAN_MODULE_VERSION;
+		case CDSC_GET_VERSION:
+			result = CDVDMAN_MODULE_VERSION;
 			break;
-		case 0xFFFFFFF0:
+		case CDSC_GET_DEBUG_STATUS:
 			*param = (int)&cdvdman_debug_print_flag;
-			result=0xFF;
+			result = 0xFF;
+			break;
+		case CDSC_SET_ERROR:
+			result = cdvdman_stat.err = *param;
 			break;
 		default:
-			result=1;	// dummy result
+			result = 1;	// dummy result
         }
 
         return result;

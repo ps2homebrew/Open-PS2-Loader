@@ -3,7 +3,7 @@
 
 #include "include/iosupport.h"
 
-#define APP_MODE_UPDATE_DELAY	MENU_UPD_DELAY_GENREFRESH
+#define APP_MODE_UPDATE_DELAY	240
 
 void appInit();
 item_list_t* appGetObject(int initOnly);

@@ -220,7 +220,10 @@ void guiShowConfig() {
 
 	diaSetEnum(diaConfig, CFG_SELECTBUTTON, selectButtons);
 	diaSetEnum(diaConfig, CFG_DEFDEVICE, deviceNames);
+	diaSetEnum(diaConfig, CFG_USBMODE, deviceModes);
+	diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
 	diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
+	diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
 	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
 	diaSetString(diaConfig, CFG_EXITTO, gExitPath);
@@ -235,7 +238,10 @@ void guiShowConfig() {
 #endif
 	diaSetInt(diaConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
+	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
+	diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
 	diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
+	diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
 	int ret = diaExecuteDialog(diaConfig, -1, 1, NULL);
 	if (ret) {
@@ -255,7 +261,10 @@ void guiShowConfig() {
 		else
 			gSelectButton = KEY_CIRCLE;
 		diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
+		diaGetInt(diaConfig, CFG_USBMODE, &gUSBStartMode);
+		diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
 		diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
+		diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
 		applyConfig(-1, -1);
 	}
@@ -977,6 +986,7 @@ static void guiHandleOp(struct gui_update_t* item) {
 
 		case GUI_OP_SELECT_MENU:
 			menuSetSelectedItem(item->menu.menu);
+			screenHandler = &screenHandlers[GUI_SCREEN_MAIN];
 			break;
 
 		case GUI_OP_CLEAR_SUBMENU:
@@ -1382,24 +1392,22 @@ void guiSetFrameHook(gui_callback_t cback) {
 }
 
 void guiSwitchScreen(int target, int transition) {
-	if(screenHandler != &screenHandlers[target]) {
-		if (transition == TRANSITION_LEFT) {
-			transitionX = 1;
-			transMax = screenWidth;
-		} else if (transition == TRANSITION_RIGHT) {
-			transitionX = -1;
-			transMax = screenWidth;
-		} else if (transition == TRANSITION_UP) {
-			transitionY = 1;
-			transMax = screenHeight;
-		} else if (transition == TRANSITION_DOWN) {
-			transitionY = -1;
-			transMax = screenHeight;
-		}
-		transIndex = 0;
-
-		screenHandlerTarget = &screenHandlers[target];
+	if (transition == TRANSITION_LEFT) {
+		transitionX = 1;
+		transMax = screenWidth;
+	} else if (transition == TRANSITION_RIGHT) {
+		transitionX = -1;
+		transMax = screenWidth;
+	} else if (transition == TRANSITION_UP) {
+		transitionY = 1;
+		transMax = screenHeight;
+	} else if (transition == TRANSITION_DOWN) {
+		transitionY = -1;
+		transMax = screenHeight;
 	}
+	transIndex = 0;
+
+	screenHandlerTarget = &screenHandlers[target];
 }
 
 struct gui_update_t *guiOpCreate(gui_op_type_t type) {

@@ -83,8 +83,12 @@ int gNetworkStartup;
 // true if the ip config should be saved as well
 int gNetConfigChanged;
 int gHDDSpindown;
-/// 0 = off, 1 = manual, 2 = auto
+/// Refer to enum START_MODE within iosupport.h
+int gUSBStartMode;
+int gHDDStartMode;
 int gETHStartMode;
+int gAPPStartMode;
+
 int gAutosort;
 int gAutoRefresh;
 int gUseInfoScreen;

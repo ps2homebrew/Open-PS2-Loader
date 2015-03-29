@@ -50,8 +50,6 @@ typedef struct
 
 	char haveCompatibilityMode;
 
-	char allowManualStart;
-
 	/// update in progress indicator
 	char uip;
 

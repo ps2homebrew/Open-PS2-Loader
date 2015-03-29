@@ -64,7 +64,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen){
 	ee_kmode_enter();
 	Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT|SIF_STAT_CMDINIT);
 	Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
-	Old_SifSetReg(SIF_SYSREG_SUBADDR, 0);
+	Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
 	ee_kmode_exit();
 	EIntr();
 
@@ -179,7 +179,17 @@ int Reset_Iop(const char *arg, int mode)
 
 	_iop_reboot_count++; // increment reboot counter to allow RPC clients to detect unbinding!
 
-	SifStopDma();
+/*	SifStopDma();		For the sake of IGR (Which uses this function), don't disable SIF0 (IOP -> EE)
+				because some games will be still spamming DMA transfers across SIF0 when IGR is invoked.
+				SCE documents that DMA transfers should be stopped before IOP resets, but has neglected
+				to explain the effects of not doing so.
+				So far, it seems like the SIF (at least SIF0) will stop functioning properly.
+
+				2 commits before this one, OPL appears to have worked around this problem by preventing
+				the SIF BOOTEND flag from being set,
+				which allowed SifInitCmd() to run ASAP (Even before the IOP finishes rebooting.
+				That caused SifSetDChain() to be run ASAP, which re-enables SIF0.
+				I don't find that a good workaround because it may result in a timing problem.	*/
 
 	memset(&reset_pkt, 0, sizeof reset_pkt);
 
@@ -212,7 +222,7 @@ int Reset_Iop(const char *arg, int mode)
 
 	Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT|SIF_STAT_CMDINIT);
 	Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
-	Old_SifSetReg(SIF_SYSREG_SUBADDR, 0);
+	Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
 	ee_kmode_exit();
 	EIntr();
 

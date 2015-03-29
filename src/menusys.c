@@ -47,9 +47,6 @@ static submenu_list_t* mainMenuCurrent;
 static s32 menuSemaId;
 static ee_sema_t menuSema;
 
-static void SwitchToMainMenu(void);
-static int NumMainItemsToDisplay(void);
-
 static void _menuLoadConfig() {
 	WaitSema(menuSemaId);
 	if (!itemConfig) {
@@ -111,7 +108,7 @@ static void menuInitMainMenu(void) {
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
-	if (gEnableDandR) // enabled at all?
+	if (gHDDStartMode && gEnableDandR) // enabled at all?
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
 #ifdef CHEAT
 	if (gShowCheat) // Reveals PS2RD Cheat Engine Menu - Default is No
@@ -406,38 +403,18 @@ void submenuSort(submenu_list_t** submenu) {
 	*submenu = head;
 }
 
-static int menuNextH() {
-	menu_list_t *nextItem;
-
-	nextItem = selected_item->next;
-	while(nextItem != NULL) {
-		if(nextItem->item->visible) {
-			selected_item = nextItem;
-			itemConfigId = -1;
-			break;
-		}
-
-		nextItem = nextItem->next;
+static void menuNextH() {
+	if(selected_item->next != NULL) {
+		selected_item = selected_item->next;
+		itemConfigId = -1;
 	}
-
-	return(nextItem != NULL ? 0 : -1);
 }
 
-static int menuPrevH() {
-	menu_list_t *prevItem;
-
-	prevItem = selected_item->prev;
-	while(prevItem != NULL) {
-		if(prevItem->item->visible) {
-			selected_item = prevItem;
-			itemConfigId = -1;
-			break;
-		}
-
-		prevItem = prevItem->prev;
+static void menuPrevH() {
+	if(selected_item->prev != NULL) {
+		selected_item = selected_item->prev;
+		itemConfigId = -1;
 	}
-
-	return(prevItem != NULL ? 0 : -1);
 }
 
 static void menuNextV() {
@@ -525,7 +502,7 @@ void menuSetSelectedItem(menu_item_t* item) {
 	menu_list_t* itm = menu;
 
 	while (itm) {
-		if (itm->item == item && itm->item->visible) {
+		if (itm->item == item) {
 			selected_item = itm;
 			return;
 		}
@@ -563,18 +540,6 @@ void menuRenderMenu() {
 	}
 
 	guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_GAMES_LIST, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
-}
-
-static int NumMainItemsToDisplay(void) {
-	menu_list_t *pMenu;
-	int result;
-
-	for(result = 0, pMenu = menu; pMenu != NULL; pMenu = pMenu->next) {
-		if(pMenu->item->visible)
-			result++;
-	}
-
-	return result;
 }
 
 void menuHandleInputMenu() {
@@ -633,7 +598,7 @@ void menuHandleInputMenu() {
 
 	if(getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
 		//Check if there is anything to show the user, at all.
-		if (NumMainItemsToDisplay()>0)
+		if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
 			guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_LEFT);
 	}
 }
@@ -649,21 +614,7 @@ void menuRenderMain() {
 	}
 }
 
-static void SwitchToMainMenu(void) {
-	// reinit main menu - show/hide items valid in the active context
-	menuInitMainMenu();
-	guiSwitchScreen(GUI_SCREEN_MENU, TRANSITION_RIGHT);
-}
-
 void menuHandleInputMain() {
-	if(!selected_item->item->visible) {
-		//attempt to find a visible item.
-		if(menuNextH() && menuPrevH()) {
-			SwitchToMainMenu();
-			return;
-		}
-	}
-
 	if(getKey(KEY_LEFT)) {
 		menuPrevH();
 	} else if(getKey(KEY_RIGHT)) {
@@ -687,7 +638,9 @@ void menuHandleInputMain() {
 	} else if(getKeyOn(KEY_SQUARE)) {
 		selected_item->item->execSquare(selected_item->item);
 	} else if(getKeyOn(KEY_START)) {
-		SwitchToMainMenu();
+		// reinit main menu - show/hide items valid in the active context
+		menuInitMainMenu();
+		guiSwitchScreen(GUI_SCREEN_MENU, TRANSITION_RIGHT);
 	} else if(getKeyOn(KEY_SELECT)) {
 		selected_item->item->refresh(selected_item->item);
 	} else if(getKey(KEY_L1)) {

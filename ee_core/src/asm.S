@@ -19,7 +19,7 @@
 #define PADOPEN_HOOK  0
 
 
-	.equ EE_CORE_STACK, 0x00099F00
+	.equ EE_CORE_STACK, 0x00097000
 
 	.set push
 	.set noreorder

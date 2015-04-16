@@ -11,10 +11,10 @@
 
 #include "ee_core.h"
 #include "iopmgr.h"
+#include "modules.h"
 #include "modmgr.h"
 #include "util.h"
 #include "syshook.h"
-#include "smbauth.h"
 
 extern int _iop_reboot_count;
 
@@ -22,9 +22,6 @@ static void ResetIopSpecial(const char *args, unsigned int arglen){
 	void *pIOP_buffer, *IOPRP_img, *imgdrv_irx;
 	unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
 	char command[RESET_ARG_MAX+1];
-
-	if (GameMode == ETH_MODE)
-		start_smbauth_thread();
 
 	if(arglen>0){
 		strncpy(command, args, arglen);
@@ -86,6 +83,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen){
 	else if (GameMode == ETH_MODE) {
 		LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
 		LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
+		LoadOPLModule(OPL_MODULE_ID_SMBINIT, 0, 0, NULL);
 	}
 
 #ifdef __LOAD_DEBUG_MODULES
@@ -130,14 +128,6 @@ int New_Reset_Iop(const char *arg, int arglen)
 		GS_BGCOLOUR = 0x00A5FF;	//Orange
 
 	if(arglen>0){
-		if (GameMode == ETH_MODE){
-			//Workaround for SMB mode's inability to communicate with the EE during the 2nd IOP reset, presumably because the SIF cannot be used after some of the SMFLAG bits are set.
-			//By accessing cdrom0 here, CDVDMAN will initialize itself here instead of during the IOP reset. Everything works properly then.
-			fioInit();
-			fioOpen("cdrom0:\\sce_dev5;1", O_RDONLY);
-			fioExit();
-		}
-
 		ResetIopSpecial(&arg[10], arglen-10);
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x00FFFF;	//Yellow

@@ -530,13 +530,13 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 
 	switch(game->format) {
 		case GAME_FORMAT_OLD_ISO:
-			sprintf(settings->files.filename, "%s.%s%s", game->startup, game->name, game->extension);
+			sprintf(settings->filename, "%s.%s%s", game->startup, game->name, game->extension);
 			break;
 		case GAME_FORMAT_ISO:
-			sprintf(settings->files.filename, "%s%s", game->name, game->extension);
+			sprintf(settings->filename, "%s%s", game->name, game->extension);
 			break;
 		default:	//USBExtreme format.
-			sprintf(settings->files.filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
+			sprintf(settings->filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
 			settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
 	}
 
@@ -550,10 +550,10 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	//Initialize layer 1 information.
 	switch(game->format) {
 		case GAME_FORMAT_USBLD:
-			sprintf(partname, "%s%s.00", ethPrefix, settings->files.filename);
+			sprintf(partname, "%s%s.00", ethPrefix, settings->filename);
 			break;
 		default:	//Raw ISO9660 disc image; one part.
-			sprintf(partname, "%s%s\\%s", ethPrefix, game->media == 0x12?"CD":"DVD", settings->files.filename);
+			sprintf(partname, "%s%s\\%s", ethPrefix, game->media == 0x12?"CD":"DVD", settings->filename);
 	}
 
 	layer1_start = sbGetISO9660MaxLBA(partname);
@@ -562,7 +562,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		case GAME_FORMAT_USBLD:
 			layer1_part = layer1_start / 0x80000;
 			layer1_offset = layer1_start % 0x80000;
-			sprintf(partname, "%s%s.%02x", ethPrefix, settings->files.filename, layer1_part);
+			sprintf(partname, "%s%s.%02x", ethPrefix, settings->filename, layer1_part);
 			break;
 		default:	//Raw ISO9660 disc image; one part.
 			layer1_part = 0;

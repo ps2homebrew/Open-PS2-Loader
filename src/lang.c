@@ -109,7 +109,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Alternative data read method",
 	"Unhook Syscalls",
 	"0 PSS mode",
-	"Disable DVD-DL",
+	"Emulate DVD-DL",
 	"Disable IGR",
 	"Unused",
 	"Hide dev9 module",

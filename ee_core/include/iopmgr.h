@@ -19,6 +19,8 @@ struct _iop_reset_pkt {
 	char	arg[RESET_ARG_MAX + 1];
 } ALIGNED(16);
 
+void InitSIF0(void);
+void SyncSIF0(void);
 int  New_Reset_Iop(const char *arg, int arglen);
 int  Reset_Iop(const char *arg, int flag);
 

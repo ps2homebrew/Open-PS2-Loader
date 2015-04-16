@@ -4,50 +4,13 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
-#include "ee_core.h"
+#include <tamtypes.h>
+#include <sysclib.h>
+
+#include "oplsmb.h"
+#include "smbauth.h"
 #include "des.h"
 #include "md4.h"
-#include "util.h"
-
-#include <tamtypes.h>
-#include <kernel.h>
-#include <stdio.h>
-#include <sifcmd.h>
-#include <sifdma.h>
-#include <string.h>
-
-#define DMA_ADDR 		0x00099F00
-
-extern void *_gp;
-
-/* EE DMAC registers.  */
-#define DMAC_COMM_STAT	0x1000e010
-#define DMAC_SIF0_CHCR	0x1000c000
-#define CHCR_STR	0x100
-#define STAT_SIF0	0x20
-
-static u8 thread_stack[0x400] __attribute__((aligned(64)));
-static unsigned int *sifDmaDataPtr = (unsigned int *)UNCACHED_SEG(DMA_ADDR);
-static int smbauth_thread_id;
-static int sif0_id = -1;
-
-typedef struct {			// size = 156
-	u32	MaxBufferSize;
-	u32	MaxMpxCount;
-	u32	SessionKey;
-	u32	StringsCF;
-	u8	PrimaryDomainServerName[32];
-	u8	EncryptionKey[8];
-	int	SecurityMode;		// 0 = share level, 1 = user level
-	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
-	char	Username[36];
-	u8	Password[48];		// either PlainText, either hashed
-	int	PasswordLen;
-	int	HashedFlag;
-	void	*IOPaddr;
-} server_specs_t;
-
-static server_specs_t *server_specs = (void *)UNCACHED_SEG((DMA_ADDR + 0x10));
 
 #define SERVER_USE_PLAINTEXT_PASSWORD	0
 #define SERVER_USE_ENCRYPTED_PASSWORD	1
@@ -67,7 +30,7 @@ static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned c
 
 	/* turn the password to uppercase */
 	for (i=0; i<14; i++) {
-		tmp_pass[i] = _toupper(tmp_pass[i]);
+		tmp_pass[i] = toupper(tmp_pass[i]);
 	}
 
 	/* get 2 7bytes keys from password */
@@ -109,7 +72,7 @@ static unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned 
 	unsigned char P21[21];
 	unsigned char K[7];
 	int i;
-
+ 
 	/* padd the LM password hash with 5 nul bytes */
 	memcpy(&P21[0], LMpasswordhash, 16);
 	memset(&P21[16], 0, 5);
@@ -118,7 +81,7 @@ static unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned 
 	for (i=0; i<3; i++) {
 
 		/* get the 7bytes key */
-		memcpy(K, &P21[i*7], 7);
+		memcpy(K, &P21[i*7], 7);		
 
 		/* encrypt each the challenge with the keys */
 		DES(K, chal, &cipher[i*8]);
@@ -158,20 +121,7 @@ static void GenerateLMHashes(char *Password, int PasswordType, u8 *EncryptionKey
 	}
 }
 
-/*
- * _smbauth_thread: main SMB authentification thread
- */
-static int _smbauth_thread(void *args)
-{
-	SifDmaTransfer_t dmat;
-	int id;
-
-	/* the thread sleep down until it's awaken up by our DMA interrupt handler */
-	SleepThread();
-
-	DPRINTF("smbauth thread woken up !!!\n");
-
-	server_specs_t *ss = (server_specs_t *)server_specs;
+void SmbInitHashPassword(server_specs_t *ss){
 	if (ss->HashedFlag == 0) {
 		/* generate the LM and NTLM hash then fill Password buffer with both hashes */
 		if (strlen(ss->Password) > 0)
@@ -180,86 +130,4 @@ static int _smbauth_thread(void *args)
 
 	/* used to notify cdvdman that password are now hashed */
 	ss->HashedFlag = 1;
-
-	/* we send back server_specs_t to IOP */
-	dmat.dest = (void *)ss->IOPaddr;
-	dmat.size = sizeof(server_specs_t);
-	dmat.src = (void *)server_specs;
-	dmat.attr = SIF_DMA_INT_O;
-
-	id = 0;
-	while (!id)
-		id = SifSetDma(&dmat, 1);
-
-	/* remove our DMA interupt handler */
-	RemoveDmacHandler(5, sif0_id);
-
-	/* terminate SMB auth thread */
-	ExitDeleteThread();
-	return 0;
-}
-
-/*
- * _SifDmaIntrHandler: our DMA interrupt handler
- */
-int _SifDmaIntrHandler()
-{
-	int flag;
-
-	flag = *sifDmaDataPtr;
-	iSifSetDChain();
-
-	if (flag) {
-		*sifDmaDataPtr = 0;
-		/* Wake Up our SMB auth thread */
-		iWakeupThread(smbauth_thread_id);
-	}
-
-	/* exit handler */
-	ExitHandler();
-
-	return 0;
-}
-
-/*
- * start_smbauth_thread: used to start the EE SMB auth thread
- */
-void start_smbauth_thread(void)
-{
-	int ret;
-	ee_thread_t thread;
-
-	thread.func = _smbauth_thread;
-	thread.stack = thread_stack;
-	thread.stack_size = sizeof(thread_stack);
-	thread.gp_reg = &_gp;
-	thread.initial_priority = 1;
-
-	/* let's create the thread */
-	smbauth_thread_id = CreateThread(&thread);
-	if (smbauth_thread_id < 0) {
-		DPRINTF("EE Core: failed to create smbauth thread...\n");
-		GS_BGCOLOUR = 0x008080;
-		SleepThread();
-	}
-
-	/* start it */
-	ret = StartThread(smbauth_thread_id, NULL);
-	if (ret < 0) {
-		DPRINTF("EE Core: failed to start smbauth thread...\n");
-		GS_BGCOLOUR = 0x008080;	//Olive Green
-		SleepThread();
-	}
-
-	/* install our DMA interrupt handler */
-	*sifDmaDataPtr = 0;
-
-	if (_lw(DMAC_COMM_STAT)  & STAT_SIF0)
-		_sw(STAT_SIF0, DMAC_COMM_STAT);
-
-	if (!(_lw(DMAC_SIF0_CHCR) & CHCR_STR))
-		SifSetDChain();
-
-	sif0_id = AddDmacHandler(5, _SifDmaIntrHandler, 0);
-	EnableDmac(5);
 }

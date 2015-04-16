@@ -146,7 +146,7 @@ static void FreeNameRecord(struct NBNSNameRecord *record)
 	CpuResumeIntr(OldState);
 }
 
-static struct NBNSNameRecord *lookupName(const char *name)
+static struct NBNSNameRecord *lookupName(const char *name, unsigned short int uid)
 {
 	int i;
 	struct NBNSNameRecord *result;
@@ -155,7 +155,7 @@ static struct NBNSNameRecord *lookupName(const char *name)
 
 	for(i = 0; i < MAX_NAME_RECORDS; i++)
 	{
-		if((NameRecords[i].status & NBNS_NAME_RECORD_ALLOCATED) && strcmp(NameRecords[i].name, name) == 0)
+		if((NameRecords[i].status & NBNS_NAME_RECORD_ALLOCATED) && (strcmp(NameRecords[i].name, name) == 0) && (uid == NameRecords[i].uid))
 		{
 			result = &NameRecords[i];
 			break;
@@ -183,7 +183,7 @@ static void nbnsReceiveThread(void *arg)
 				header = (struct NbHeader*)frame;
 				code = BSWAP16(header->code);
 
-			//	printf("R: %d, opcode: 0x%x, rcode: 0x%x, flags: 0x%x\n", NB_GET_R(code), NB_GET_OPCODE(code), NB_GET_RCODE(code), NB_GET_MN_FLAGS(code));
+			//	printf("R: %d, opcode: 0x%x, rcode: 0x%x, tcode: 0x%04x, flags: 0x%x\n", NB_GET_R(code), NB_GET_OPCODE(code), NB_GET_RCODE(code), BSWAP16(header->TransactionID), NB_GET_MN_FLAGS(code));
 
 				switch(NB_GET_OPCODE(code))
 				{
@@ -196,7 +196,7 @@ static void nbnsReceiveThread(void *arg)
 								result = decode_name(&frame[sizeof(struct NbHeader)], decoded_name);
 								decoded_name[result] = '\0';
 
-								if((record = lookupName(decoded_name)) != NULL && (record->status & NBNS_NAME_RECORD_INIT))
+								if((record = lookupName(decoded_name, BSWAP16(header->TransactionID))) != NULL && (record->status & NBNS_NAME_RECORD_INIT))
 								{
 									if(!(record->status & NBNS_NAME_RECORD_VALID))
 									{
@@ -329,7 +329,8 @@ int nbnsFindName(const char *name, unsigned char *ip_address)
 
 		header = (struct NbHeader*) frame;
 		trailer = (struct NbQuestionTrailer*)(frame + sizeof(struct NbHeader) + sizeof(question_name) + 2);
-		header->TransactionID = BSWAP16(checksum | ((unsigned short int)uid << 8));
+		record->uid = checksum | ((unsigned short int)uid << 8);
+		header->TransactionID = BSWAP16(record->uid);
 		uid++;
 		header->code = BSWAP16(NB_CODE(NB_OPCODE(0, NB_OPCODE_TYPE_QUERY), NB_MN_FLAGS(0, 0, 1, 0, 1), 0));
 		header->QDCount = BSWAP16(1);

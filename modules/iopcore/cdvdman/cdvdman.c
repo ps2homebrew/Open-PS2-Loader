@@ -8,7 +8,11 @@
 #include "mass_common.h"
 #include "mass_stor.h"
 #include "dev9.h"
+#ifdef SMB_DRIVER
+#include "oplsmb.h"
 #include "smb.h"
+#include "smstcpip.h"
+#endif
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"
@@ -27,9 +31,6 @@
 #include <errno.h>
 #include <io_common.h>
 #include <usbd.h>
-#ifdef SMB_DRIVER
-#include "smstcpip.h"
-#endif
 #include "ioman_add.h"
 
 #ifdef __IOPCORE_DEBUG
@@ -66,14 +67,16 @@ struct cdvdman_settings_smb cdvdman_settings={
 		"B00BS"
 	},
 	0x00000000,
-	"192.168.0.10",
-	0x8510,
-	"PS2SMB",
-	"",
-	"GUEST",
-	"",
+	"######  FILENAME  ######",
 	{
-		"######  FILENAME  ######"
+		{
+			"192.168.0.10",
+			0x8510,
+			"PS2SMB",
+			"",
+			"GUEST",
+			""
+		}
 	}
 };
 #elif USB_DRIVER
@@ -322,6 +325,8 @@ static void usbd_init(void)
 }
 #endif
 #ifdef SMB_DRIVER
+static u32 ServerCapabilities;
+
 static void ps2ip_init(void)
 {
 	modinfo_t info;
@@ -334,6 +339,12 @@ static void ps2ip_init(void)
 	plwip_send = info.exports[11];
 	plwip_socket = info.exports[13];
 	pinet_addr = info.exports[24];
+}
+
+void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback)
+{
+	ps2ip_init();
+	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &ServerCapabilities, hash_callback);
 }
 #endif
 
@@ -358,16 +369,10 @@ static void fs_init(void)
 
 #ifdef SMB_DRIVER
 	int i = 0;
-	u32 capabilities;
 	char tmp_str[256];
 
-	ps2ip_init();
-
-	// Open the Connection with SMB server
-	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &capabilities);
-
 	// open a session
-	smb_SessionSetupAndX(capabilities);
+	smb_SessionSetupAndX(ServerCapabilities);
 
 	// Then tree connect on the share resource
 	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.pc_ip, cdvdman_settings.pc_share);
@@ -375,21 +380,21 @@ static void fs_init(void)
 
 	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
 		if (cdvdman_settings.pc_prefix[0]) {
-			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
+			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
 		} else {
-			sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.files.filename);
+			sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
 		}
 
-		smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i++], 0);
+		smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
 	} else {
 		// Open all parts files
 		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
 			if (cdvdman_settings.pc_prefix[0])
-				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.files.filename, i);
+				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.filename, i);
 			else
-				sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.files.filename, i);
+				sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
 
-			smb_OpenAndX(tmp_str, &cdvdman_settings.files.FIDs[i], 0);
+			smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
 		}
 	}
 #endif
@@ -419,7 +424,7 @@ static void fs_init(void)
 	layer_info[0].rootDirtocLength = tocEntryPointer->length;
 
 	// DVD DL support
-	if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
+	if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_EMU_DVDDL)) {
 		int on_dual;
 		u32 layer1_start;
 		sceCdReadDvdDualInfo(&on_dual, &layer1_start);
@@ -1139,7 +1144,8 @@ int sceCdReadDiskID(void *DiskID)
 //-------------------------------------------------------------------------
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 {
-	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL) {
+	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_EMU_DVDDL) {
+		//Make layer 1 point to layer 0.
 		*layer1_start = 0;
 		*on_dual = 1;
 	}
@@ -1178,7 +1184,7 @@ int cdvdman_readID(int mode, u8 *buf)
 	if (mode == 0) { // GUID
 		u32 *GUID0 = (u32 *)&buf[0];
 		u32 *GUID1 = (u32 *)&buf[4];
-		*GUID0 = lbuf[0] | 0x08004600;
+		*GUID0 = lbuf[0] | 0x08004600;	//Replace the MODEL ID segment with the SCE OUI, to get the console's IEEE1394 EUI-64.
 		*GUID1 = *(u32 *)&lbuf[4];
 	}
 	else { // ModelID
@@ -1767,7 +1773,7 @@ lbl_startlocate:
 					tocLength = tocEntryPointer->fileSize;
 					p = &slash[1];
 
-					if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)) {
+					if (!(cdvdman_settings.common.flags&IOPCORE_COMPAT_EMU_DVDDL)) {
 						int on_dual;
 						u32 layer1_start;
 						sceCdReadDvdDualInfo(&on_dual, &layer1_start);
@@ -1799,6 +1805,8 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	struct dirTocEntry *tocEntryPointer;
 	layer_info_t *pLayerInfo;
 
+	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_EMU_DVDDL)
+		layer = 0;
 	pLayerInfo = (layer != 0) ? &layer_info[1] : &layer_info[0];	//SCE CDVDMAN simply treats a non-zero value as a signal for the 2nd layer.
 
 	WaitSema(cdvdman_searchfilesema);
@@ -1810,9 +1818,6 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	cdvdman_trimspaces(cdvdman_filepath);
 
 	DPRINTF("cdvdman_findfile cdvdman_filepath=%s\n", cdvdman_filepath);
-
-	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_DISABLE_DVDDL)
-		layer = 0;
 
 	if (pLayerInfo->rootDirtocLBA == 0) {
 		SignalSema(cdvdman_searchfilesema);

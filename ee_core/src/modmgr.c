@@ -8,24 +8,12 @@
 */
 
 #include "ee_core.h"
+#include "modules.h"
 #include "modmgr.h"
 #include "util.h"
 
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
-
-#define GET_OPL_MOD_ID(x) ((x) >> 24)
-#define GET_OPL_MOD_SIZE(x) ((x) & 0x00FFFFFF)
-
-typedef struct {
-	void *ptr;
-	unsigned int info;	//Upper 8 bits = module ID
-} irxptr_t;
-
-typedef struct {
-	irxptr_t *modules;
-	int count;
-} irxtab_t;
 
 /*----------------------------------------------------------------------------------------*/
 /* Init LOADFILE RPC.                                                                     */
@@ -142,7 +130,7 @@ int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, con
 int GetOPLModInfo(int id, void **pointer, unsigned int *size)
 {
 	int i, result;
-	irxtab_t *irxtable = (irxtab_t*)0x0009A000;
+	irxtab_t *irxtable = (irxtab_t*)OPL_MOD_STORAGE;
 
 	for(i = 0,result = -1; i < irxtable->count; i++)
 	{

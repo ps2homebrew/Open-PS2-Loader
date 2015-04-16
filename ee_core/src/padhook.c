@@ -122,7 +122,6 @@ static void t_loadElf(void)
 	if (!ret && elf.epc) {
 
 		// Exit services
-		fioExit();
 		LoadFileExit();
 		SifExitIopHeap();
 		SifExitRpc();

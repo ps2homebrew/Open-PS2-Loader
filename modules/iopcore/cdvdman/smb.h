@@ -274,7 +274,7 @@ typedef struct _smb_time {
 int rawTCP_SetSessionHeader(u32 size);  // Write Session Service header
 int rawTCP_GetSessionHeader(void); 	// Read Session Service header
 
-int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities); // process a Negociate Procotol message
+int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback); // process a Negociate Procotol message
 int smb_SessionSetupTreeConnect(char *share_name);
 int smb_SessionSetupAndX(u32 capabilities);	// process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_TreeConnectAndX(char *ShareName);

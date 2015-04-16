@@ -12,6 +12,7 @@
 #include <sifman.h>
 
 #include "smsutils.h"
+#include "oplsmb.h"
 #include "smb.h"
 #include "cdvd_config.h"
 
@@ -222,22 +223,6 @@ struct WriteAndXRequest_t {             // size = 67
         u16     ByteCount;              // 65
 } __attribute__((packed));
 
-typedef struct {
-	u32	MaxBufferSize;
-	u32	MaxMpxCount;
-	u32	SessionKey;
-	u32	StringsCF;
-	u8	PrimaryDomainServerName[32];
-	u8	EncryptionKey[8];
-	int	SecurityMode;		// 0 = share level, 1 = user level
-	int	PasswordType;		// 0 = PlainText passwords, 1 = use challenge/response
-	char	Username[36];
-	u8	Password[48];		// either PlainText, either hashed
-	int	PasswordLen;
-	int	HashedFlag;
-	void	*IOPaddr;
-} server_specs_t;
-
 static server_specs_t server_specs;
 
 #define SERVER_SHARE_SECURITY_LEVEL	0
@@ -360,7 +345,7 @@ receive:
 }
 
 //-------------------------------------------------------------------------
-int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities)
+int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback)
 {
 	char *dialect = "NT LM 0.12";
 	struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
@@ -436,29 +421,7 @@ negociate_retry:
 	server_specs.IOPaddr = (void *)&server_specs;
 	server_specs.HashedFlag = (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) ? 0 : -1;
 
-	// doing DMA to EE with server_specs
-	SifDmaTransfer_t dmat[2];
-	int oldstate, id;
-	int flag = 1;
-
-	dmat[0].dest = (void *)(DMA_ADDR + 0x10);
-	dmat[0].size = sizeof(server_specs_t);
-	dmat[0].src = (void *)&server_specs;
-	dmat[0].attr = dmat[1].attr = SIF_DMA_INT_O;
-	dmat[1].dest = (void *)DMA_ADDR;
-	dmat[1].size = 4;
-	dmat[1].src = (void *)&flag;
-
-	do{
-		CpuSuspendIntr(&oldstate);
-		id = sceSifSetDma(dmat, 2);
-		CpuResumeIntr(oldstate);
-	}while (!id);
-	while (sceSifDmaStat(id) >= 0);
-
-	// wait smbauth code on EE hashed the password
-	while (!(server_specs.HashedFlag == 1))
-		DelayThread(2000);
+	hash_callback(&server_specs);
 
 	return 1;
 }
@@ -764,7 +727,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 
 		nbytes = sectors << 11;
 
- 		smb_ReadFile(cdvdman_settings.files.FIDs[part_num], offset << 11, offset >> 21, p, nbytes);
+ 		smb_ReadFile(cdvdman_settings.FIDs[part_num], offset << 11, offset >> 21, p, nbytes);
 
 		p += nbytes;
 		offset += sectors;

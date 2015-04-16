@@ -272,6 +272,7 @@ DECLARE_EXPORT_TABLE(oplutils, 1, 1)
 	DECLARE_EXPORT(smb_OpenAndX)
 	DECLARE_EXPORT(smb_ReadFile)
 	DECLARE_EXPORT(smb_WriteFile)
+	DECLARE_EXPORT(smb_NegotiateProt)
 #endif
 END_EXPORT_TABLE
 #endif

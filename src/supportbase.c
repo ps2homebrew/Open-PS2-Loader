@@ -339,7 +339,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	}
 
 	if (compatmask & COMPAT_MODE_5) {
-		settings->flags |= IOPCORE_COMPAT_DISABLE_DVDDL;
+		settings->flags |= IOPCORE_COMPAT_EMU_DVDDL;
 	}
 
 	if (compatmask & COMPAT_MODE_6) {

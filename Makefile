@@ -31,7 +31,7 @@ CHEAT = 0
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
@@ -43,14 +43,14 @@ MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
 IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
-		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns.o	\
+		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns-iop.o	\
 		obj/netman.o obj/dns.o obj/ps2ips.o
 
 EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_hdpro_cdvdman.o obj/cdvdfsv.o \
-		obj/ingame_smstcpip.o obj/smap_ingame.o obj/smbman.o
+		obj/ingame_smstcpip.o obj/smap_ingame.o obj/smbman.o obj/smbinit.o
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
@@ -60,8 +60,8 @@ EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 MAPFILE = opl.map
 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnbns -lnetman -lps2ips
-EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Iinclude
 
 BIN2C = $(PS2SDK)/bin/bin2c
 BIN2S = $(PS2SDK)/bin/bin2s
@@ -231,6 +231,8 @@ endif
 	$(MAKE) -C modules/network/SMSTCPIP clean
 	echo "    * in-game SMAP.irx"
 	$(MAKE) -C modules/network/smap-ingame clean
+	echo "    * smbinit.irx"
+	$(MAKE) -C modules/network/smbinit clean
 	echo "    * nbns.irx"
 	$(MAKE) -C modules/network/nbns clean
 	echo "    * ps2atad.irx"
@@ -406,6 +408,11 @@ ps2ips.s:
 smbman.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx
 
+smbinit.s:
+	echo "    * smbinit.irx"
+	$(MAKE) -C modules/network/smbinit
+	$(BIN2S) modules/network/smbinit/smbinit.irx asm/smbinit.s smbinit_irx
+
 ps2atad.s:
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/hdd/atad
@@ -454,10 +461,10 @@ ps2link.s:
 	$(MAKE) -C modules/debug/ps2link
 	$(BIN2S) modules/debug/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
 
-nbns.s:
+nbns-iop.s:
 	echo "    * nbns.irx"
 	$(MAKE) -C modules/network/nbns
-	$(BIN2S) modules/network/nbns/nbns.irx asm/nbns.s nbns_irx
+	$(BIN2S) modules/network/nbns/nbns.irx asm/nbns-iop.s nbns_irx
 
 ps2fs.s:
 	echo "    * ps2fs.irx"

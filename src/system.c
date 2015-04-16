@@ -13,6 +13,7 @@
 #include "include/ioprp.h"
 #include "include/usbsupport.h"
 #include "include/OSDHistory.h"
+#include "../ee_core/include/modules.h"
 #ifdef VMC
 typedef struct {
 	char VMC_filename[1024];
@@ -52,6 +53,9 @@ extern int size_smap_irx;
 
 extern void *smap_ingame_irx;
 extern int size_smap_ingame_irx;
+
+extern void *smbinit_irx;
+extern int size_smbinit_irx;
 
 extern void *iomanx_irx;
 extern int size_iomanx_irx;
@@ -146,45 +150,6 @@ typedef struct {
 	u32	flags;
 	u32	align;
 } elf_pheader_t;
-
-#define GET_OPL_MOD_ID(x) ((x) >> 24)
-#define SET_OPL_MOD_ID(x) ((x) << 24)
-#define GET_OPL_MOD_SIZE(x) ((x) & 0x00FFFFFF)
-
-enum OPL_MODULE_ID{
-	//Basic modules
-	OPL_MODULE_ID_UDNL	= 1,
-	OPL_MODULE_ID_IOPRP,
-	OPL_MODULE_ID_IMGDRV,
-
-	//USB mode modules
-	OPL_MODULE_ID_USBD,
-
-	//SMB mode modules
-	OPL_MODULE_ID_SMSTCPIP,
-	OPL_MODULE_ID_SMAP,
-
-	//VMC module
-	OPL_MODULE_ID_MCEMU,
-
-	//Debugging modules
-	OPL_MODULE_ID_UDPTTY,
-	OPL_MODULE_ID_IOPTRAP,
-	OPL_MODULE_ID_DRVTIF,
-	OPL_MODULE_ID_TIFINET,
-
-	OPL_MODULE_ID_COUNT
-};
-
-typedef struct {
-	void *ptr;
-	unsigned int info;	//Upper 8 bits = module ID
-} irxptr_t;
-
-typedef struct {
-	irxptr_t *modules;
-	int count;
-} irxtab_t;
 
 typedef struct {
 	char fileName[10];
@@ -399,7 +364,7 @@ static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **
 	void *ioprp_image;
 	unsigned int size_ioprp_image;
 
-	irxtable = (irxtab_t*)0x0009A000;
+	irxtable = (irxtab_t*)OPL_MOD_STORAGE;
 	irxptr_tab = (irxptr_t*)((unsigned char*)irxtable+sizeof(irxtab_t));
 	ioprp_image = malloc(size_IOPRP_img+size_cdvdman_irx+size_cdvdfsv_irx+256);
 	size_ioprp_image = patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
@@ -429,6 +394,8 @@ static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **
 #endif
 		irxptr_tab[modcount].info	= size_ingame_smstcpip_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMSTCPIP);
 		irxptr_tab[modcount++].ptr	= (void *)&ingame_smstcpip_irx;
+		irxptr_tab[modcount].info	= size_smbinit_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMBINIT);
+		irxptr_tab[modcount++].ptr	= (void *)&smbinit_irx;
 	}
 #ifdef VMC
 	if(modules & CORE_IRX_VMC)

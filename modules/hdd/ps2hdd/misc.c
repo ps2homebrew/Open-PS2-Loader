@@ -40,7 +40,7 @@ int getPs2Time(ps2time *tm)
 		timeBuf.min=btoi(cdtime.minute);
 		timeBuf.hour=btoi(cdtime.hour);
 		timeBuf.day=btoi(cdtime.day);
-		timeBuf.month=btoi(cdtime.month & 0x7F);
+		timeBuf.month=btoi(cdtime.month & 0x7F);	//The old CDVDMAN sceCdReadClock() function does not automatically file off the highest bit.
 		timeBuf.year=btoi(cdtime.year)+2000;
 	}
 	memcpy(tm, &timeBuf, sizeof(ps2time));

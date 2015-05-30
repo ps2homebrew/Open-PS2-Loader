@@ -3,7 +3,7 @@
 
 #define DIR_CHAIN_SIZE 32
 
-#define FAT_MAX_NAME 128
+#define FAT_MAX_NAME 256
 
 //attributes (bits:5-Archive 4-Directory 3-Volume Label 2-System 1-Hidden 0-Read Only)
 #define FAT_ATTR_READONLY     0x01

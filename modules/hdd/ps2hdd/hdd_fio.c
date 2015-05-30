@@ -271,7 +271,7 @@ int hddRemove(iop_file_t *f, const char *name)
 	return SignalSema(fioSema);
 }
 
-int hddOpen(iop_file_t *f, const char *name, int mode, int other_mode)
+int hddOpen(iop_file_t *f, const char *name, int flags, int mode)
 {
 	int			rv;
 	input_param	params;
@@ -287,7 +287,7 @@ int hddOpen(iop_file_t *f, const char *name, int mode, int other_mode)
 	WaitSema(fioSema);
 	if((rv=getFileSlot(&params, &fileSlot))==0) {
 		if(!(f->mode & O_DIROPEN)) {
-			if((rv=apaOpen(f->unit, fileSlot, &params, mode))==0){
+			if((rv=apaOpen(f->unit, fileSlot, &params, flags))==0){
 				fileSlot->f=f;
 				f->privdata=fileSlot;
 			}

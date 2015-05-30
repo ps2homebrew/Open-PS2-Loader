@@ -142,7 +142,6 @@ int New_Reset_Iop(const char *arg, int arglen)
 	if (g_compat_mask & COMPAT_MODE_8)
 		ChangeModuleName("dev9", "cdvdman");
 
-
 	DPRINTF("Exiting services...\n");
 	SifExitIopHeap();
 	LoadFileExit();

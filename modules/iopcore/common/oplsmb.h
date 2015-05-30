@@ -16,17 +16,8 @@ typedef struct {			// size = 156
 
 typedef void (*OplSmbPwHashFunc_t)(server_specs_t *ss);
 
-#define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE( oplutils, 1, 1 )
-#define oplutils_IMPORTS_end END_IMPORT_TABLE
-
-int smb_OpenAndX(char *filename, u16 *FID, int Write);
-#define I_smb_OpenAndX DECLARE_IMPORT(5, smb_OpenAndX)
-
-int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes);
-#define I_smb_ReadFile DECLARE_IMPORT(6, smb_ReadFile)
-
-int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes);
-#define I_smb_WriteFile DECLARE_IMPORT(7, smb_WriteFile)
+#define oplsmb_IMPORTS_start DECLARE_IMPORT_TABLE( oplsmb, 1, 1 )
+#define oplsmb_IMPORTS_end END_IMPORT_TABLE
 
 void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback);
-#define I_smb_NegotiateProt DECLARE_IMPORT(8, smb_NegotiateProt)
+#define I_smb_NegotiateProt DECLARE_IMPORT(4, smb_NegotiateProt)

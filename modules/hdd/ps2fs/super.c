@@ -146,7 +146,7 @@ int _format(block_device *blockDev, int fd, int zonesize, int fragment)
 			{
 				for (i=0; i < subnumber+1; i++)
 					if((result=formatSub(blockDev, fd, i, i ? 1 : (0x2000 >> scale) +
-											sb->log.count*8, scale, fragment))<0)
+											sb->log.count + 3, scale, fragment))<0)
 						break;
 
 				if((result == 0) && ((result = blockDev->transfer(fd, sb, 0, PFS_SUPER_BACKUP_SECTOR, 1, 1))==0))

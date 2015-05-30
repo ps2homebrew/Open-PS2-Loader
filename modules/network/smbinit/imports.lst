@@ -6,6 +6,6 @@ I_toupper
 I_strlen
 sysclib_IMPORTS_end
 
-oplutils_IMPORTS_start
+oplsmb_IMPORTS_start
 I_smb_NegotiateProt
-oplutils_IMPORTS_end
+oplsmb_IMPORTS_end

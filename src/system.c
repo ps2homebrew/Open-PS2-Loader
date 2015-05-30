@@ -438,7 +438,7 @@ static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **
 	ee_kmode_exit();
 	EI();
 
-	irxptr_tab[OPL_MODULE_ID_UDNL].ptr = irxptr;
+	irxptr_tab[0].ptr = irxptr;	//UDNL is the first module.
 #endif
 
 	irxptr = (void *)((((unsigned int)irxptr_tab+sizeof(irxptr_t)*modcount)+0xF)&~0xF);

@@ -196,7 +196,7 @@ int ethWaitValidDHCPState(void) {
 static void ethInitSMB(void) {
 	if(ethWaitValidNetIFLinkState() != 0) {
 		gNetworkStartup = ERROR_ETH_LINK_FAIL;
-		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+		setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
 		LOG("ETH: Unable to get valid link status.\n");
 		return;
 	}
@@ -205,7 +205,7 @@ static void ethInitSMB(void) {
 
 	if(ethWaitValidNetIFLinkState() != 0) {
 		gNetworkStartup = ERROR_ETH_LINK_FAIL;
-		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+		setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
 		LOG("ETH: Unable to get valid link status.\n");
 		return;
 	}

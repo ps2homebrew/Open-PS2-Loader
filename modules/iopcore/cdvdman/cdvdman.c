@@ -99,6 +99,7 @@ struct irx_export_table _exp_cdvdman;
 struct irx_export_table _exp_cdvdstm;
 #ifdef SMB_DRIVER
 struct irx_export_table _exp_dev9;
+struct irx_export_table _exp_oplsmb;
 #endif
 #ifdef HDD_DRIVER
 struct irx_export_table _exp_dev9;
@@ -1516,9 +1517,10 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 		dirent->stat.size = tocEntryPointer->fileSize;
 		strncpy(dirent->name, tocEntryPointer->filename, tocEntryPointer->filenameLength);
 			dirent->name[tocEntryPointer->filenameLength] = '\0';
-	}
 
-	DPRINTF("cdrom_dread r=%d mode=%04x name=%s\n", r, (int)mode, dirent->name);
+		DPRINTF("cdrom_dread r=%d mode=%04x name=%s\n", r, (int)mode, dirent->name);
+	}else
+		DPRINTF("cdrom_dread r=%d\n", r);
 
 	SignalSema(cdrom_io_sema);
 
@@ -2089,6 +2091,8 @@ int _start(int argc, char **argv)
 #ifdef SMB_DRIVER
 	RegisterLibraryEntries(&_exp_dev9);
 	dev9d_init();
+
+	RegisterLibraryEntries(&_exp_oplsmb);
 #endif
 #ifdef HDD_DRIVER
 #ifdef HD_PRO

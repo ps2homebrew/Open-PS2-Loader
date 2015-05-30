@@ -342,6 +342,7 @@ int fat_getDirentry(unsigned char fatType, fat_direntry* dir_entry, fat_direntry
 	int i, j;
 	unsigned int offset;
 	unsigned char cont;
+	u16 character;
 
 	//detect last entry - all zeros (slight modification by radad)
 	if (dir_entry->sfn.name[0] == 0) {
@@ -361,31 +362,40 @@ int fat_getDirentry(unsigned char fatType, fat_direntry* dir_entry, fat_direntry
 		//name - 1st part
 		cont = 1;
 		for (i = 0; i < 10 && cont; i+=2) {
-			if (dir_entry->lfn.name1[i]==0 && dir_entry->lfn.name1[i+1] == 0) {
+			character = dir_entry->lfn.name1[i] | (dir_entry->lfn.name1[i+1] << 8);
+
+			if (character == 0 || offset >= FAT_MAX_NAME) {
 				dir->name[offset] = 0; //terminate
 				cont = 0; //stop
 			} else {
-				dir->name[offset] = dir_entry->lfn.name1[i];
+				// Handle non-ASCII characters
+				dir->name[offset] = character < 128 ? dir_entry->lfn.name1[i] : '?';
 				offset++;
 			}
 		}
 		//name - 2nd part
 		for (i = 0; i < 12 && cont; i+=2) {
-			if (dir_entry->lfn.name2[i]==0 && dir_entry->lfn.name2[i+1] == 0) {
+			character = dir_entry->lfn.name2[i] | (dir_entry->lfn.name2[i+1] << 8);
+
+			if (character == 0 || offset >= FAT_MAX_NAME) {
 				dir->name[offset] = 0; //terminate
 				cont = 0; //stop
 			} else {
-				dir->name[offset] = dir_entry->lfn.name2[i];
+				// Handle non-ASCII characters
+				dir->name[offset] = character < 128 ? dir_entry->lfn.name2[i] : '?';
 				offset++;
 			}
 		}
 		//name - 3rd part
 		for (i = 0; i < 4 && cont; i+=2) {
-			if (dir_entry->lfn.name3[i]==0 && dir_entry->lfn.name3[i+1] == 0) {
+			character = dir_entry->lfn.name3[i] | (dir_entry->lfn.name3[i+1] << 8);
+
+			if (character == 0 || offset >= FAT_MAX_NAME) {
 				dir->name[offset] = 0; //terminate
 				cont = 0; //stop
 			} else {
-				dir->name[offset] = dir_entry->lfn.name3[i];
+				// Handle non-ASCII characters
+				dir->name[offset] = character < 128 ? dir_entry->lfn.name3[i] : '?';
 				offset++;
 			}
 		}
@@ -396,7 +406,7 @@ int fat_getDirentry(unsigned char fatType, fat_direntry* dir_entry, fat_direntry
 	} else {
 		//short filename
 		//copy name
-		for (i = 0; i < 8 && dir_entry->sfn.name[i]!= 32; i++) {
+		for (i = 0; i < 8 && dir_entry->sfn.name[i]!= ' '; i++) {
 			dir->sname[i] = dir_entry->sfn.name[i];
 			// NT—adaption for LaunchELF
 			if (dir_entry->sfn.reservedNT & 0x08 &&
@@ -404,7 +414,7 @@ int fat_getDirentry(unsigned char fatType, fat_direntry* dir_entry, fat_direntry
 				dir->sname[i] += 0x20;	//Force standard letters in name to lower case
 			}
 		}
-		for (j=0; j < 3 && dir_entry->sfn.ext[j] != 32; j++) {
+		for (j=0; j < 3 && dir_entry->sfn.ext[j] != ' '; j++) {
 			if (j == 0) {
 				dir->sname[i] = '.';
 				i++;
@@ -654,7 +664,7 @@ static int fat_getDirentryStartCluster(fat_driver* fatd, unsigned char* dirName,
 // otherwise the start cluster should be correct cluster of directory
 // to search directory - set fatDir as NULL
 int fat_getFileStartCluster(fat_driver* fatd, const unsigned char* fname, unsigned int* startCluster, fat_dir* fatDir) {
-	unsigned char tmpName[257];
+	unsigned char tmpName[FAT_MAX_NAME+1];
 	unsigned int i, offset;
 	unsigned char cont;
 	int ret;
@@ -703,7 +713,7 @@ int fat_getFileStartCluster(fat_driver* fatd, const unsigned char* fname, unsign
 		}
 		XPRINTF("USBHDFSD: file's startCluster found. Name=%s, cluster=%u \n", fname, *startCluster);
 	}
-	XPRINTF("USBHDFSD: Exiting from fat_getFileStartCluster with a file\n");
+	XPRINTF("USBHDFSD: Exiting from fat_getFileStartCluster with no error.\n");
 	return 1;
 }
 

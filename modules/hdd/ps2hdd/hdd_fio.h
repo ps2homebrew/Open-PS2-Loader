@@ -111,7 +111,7 @@ int devctlSwapTemp(u32 device, char *argp);
 int hddInit(iop_device_t *f);
 int hddDeinit(iop_device_t *f);
 int hddFormat(iop_file_t *f, const char *dev, const char *blockdev, void *arg, size_t arglen);
-int hddOpen(iop_file_t *f, const char *name, int mode, int other_mode);
+int hddOpen(iop_file_t *f, const char *name, int flags, int mode);
 int hddClose(iop_file_t *f);
 int hddRead(iop_file_t *f, void *buf, int size);
 int hddWrite(iop_file_t *f, void *buf, int size);

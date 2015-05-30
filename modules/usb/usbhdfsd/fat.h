@@ -20,7 +20,7 @@
 #define FAT16 0x10
 #define FAT32 0x20
 
-#define FAT_MAX_PATH 1024
+#define FAT_MAX_PATH 260
 
 /* bios parameter block - bpb - fat12, fat16  */
 typedef struct _fat_raw_bpb {

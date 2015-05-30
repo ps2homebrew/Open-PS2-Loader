@@ -854,14 +854,14 @@ static int createShortNameMask(unsigned char* lname, unsigned char* sname) {
 
 	fit = 0;
 	//clean short name by putting space
-	for (i = 0; i < 11; i++)  sname[i] = 32;
+	for (i = 0; i < 11; i++)  sname[i] = ' ';
 	XPRINTF("USBHDFSD: Clear short name ='%s'\n", sname);
 
 	//detect number of dots and space characters in the long name
 	j = 0;
 	for (i = 0; lname[i] != 0; i++) {
 		if (lname[i] == '.') j++; else
-		if (lname[i] == 32 ) j+=2;
+		if (lname[i] == ' ' ) j+=2;
 	}
 	//long name contains no dot or one dot and no space char
 	if (j <= 1) fit++;
@@ -871,7 +871,7 @@ static int createShortNameMask(unsigned char* lname, unsigned char* sname) {
 	for (i = 0; lname[i] !=0 && lname[i] != '.' && i < 8; i++) {
 		sname[i] = toUpperChar(lname[i]);
 		//short name must not contain spaces - replace space by underscore
-		if (sname[i] == 32) sname[i]='_';
+		if (sname[i] == ' ') sname[i]='_';
 	}
 	//check wether last char is '.' and the name is shorter than 8
 	if (lname[i] == '.' || lname[i] == 0) {
@@ -907,7 +907,7 @@ static int createShortNameMask(unsigned char* lname, unsigned char* sname) {
 	//one of the check failed - the short name have to be 'sequenced'
 	//do not allow spaces in the short name
 	for (i = 0; i < 8;i++) {
-		if (sname[i] == 32) sname[i] = '_';
+		if (sname[i] == ' ') sname[i] = '_';
 	}
 	return 1;
 }
@@ -1860,11 +1860,10 @@ int fat_createFile(fat_driver* fatd, const unsigned char* fname, char directory,
 	int ret;
 	unsigned int startCluster;
 	unsigned int directoryCluster;
-	unsigned char path[FAT_MAX_PATH];
-	unsigned char lname[FAT_MAX_NAME];
+	unsigned char lname[FAT_MAX_NAME], pathToDirent[FAT_MAX_PATH];
 	fat_dir fatdir;
 
-	ret = separatePathAndName(fname, path, lname);
+	ret = separatePathAndName(fname, pathToDirent, lname);
 	if(	(ret < 0)               //if name invalid to separation routine
 		||(	(lname[0] == 0)       //or name is empty string
 			||(	(lname[0]=='.')
@@ -1884,7 +1883,7 @@ int fat_createFile(fat_driver* fatd, const unsigned char* fname, char directory,
 	XPRINTF("USBHDFSD: Calling fat_getFileStartCluster from fat_createFile\n");
 	//get start cluster of the last sub-directory of the path
 	startCluster = 0;
-	ret = fat_getFileStartCluster(fatd, path, &startCluster, &fatdir);
+	ret = fat_getFileStartCluster(fatd, pathToDirent, &startCluster, &fatdir);
 	if (ret < 0) {
 		XPRINTF("USBHDFSD: E: directory not found! \n");
 		return ret;
@@ -1895,7 +1894,7 @@ int fat_createFile(fat_driver* fatd, const unsigned char* fname, char directory,
 		return -ENOENT;
 	}
 
-	XPRINTF("USBHDFSD: directory=%s name=%s cluster=%u \n", path, lname, startCluster);
+	XPRINTF("USBHDFSD: directory=%s name=%s cluster=%u \n", pathToDirent, lname, startCluster);
 
 	if (fatdir.attr & FAT_ATTR_READONLY)
 		return -EACCES;
@@ -1936,11 +1935,10 @@ int fat_deleteFile(fat_driver* fatd, const unsigned char* fname, char directory)
 	int ret;
 	unsigned int startCluster;
 	unsigned int directoryCluster;
-	unsigned char path[FAT_MAX_PATH];
-	unsigned char lname[FAT_MAX_NAME];
+	unsigned char lname[FAT_MAX_NAME], pathToDirent[FAT_MAX_PATH];
 	fat_dir fatdir;
 
-	ret = separatePathAndName(fname, path, lname);
+	ret = separatePathAndName(fname, pathToDirent, lname);
 	if(	(ret < 0)               //if name invalid to separation routine
 		||(	(lname[0] == 0)       //or name is empty string
 			||(	(lname[0]=='.')
@@ -1960,7 +1958,7 @@ int fat_deleteFile(fat_driver* fatd, const unsigned char* fname, char directory)
 	XPRINTF("USBHDFSD: Calling fat_getFileStartCluster from fat_deleteFile\n");
 	//get start cluster of the last sub-directory of the path
 	startCluster = 0;
-	ret = fat_getFileStartCluster(fatd, path, &startCluster, &fatdir);
+	ret = fat_getFileStartCluster(fatd, pathToDirent, &startCluster, &fatdir);
 	if (ret < 0) {
 		XPRINTF("USBHDFSD: E: directory not found! \n");
 		return ret;
@@ -1971,7 +1969,7 @@ int fat_deleteFile(fat_driver* fatd, const unsigned char* fname, char directory)
 		return -ENOENT;
 	}
 
-	XPRINTF("USBHDFSD: directory=%s name=%s cluster=%u \n", path, lname, startCluster);
+	XPRINTF("USBHDFSD: directory=%s name=%s cluster=%u \n", pathToDirent, lname, startCluster);
 
 	if (fatdir.attr & FAT_ATTR_READONLY) {
 		XPRINTF("USBHDFSD: E: directory read only! \n");
@@ -1994,25 +1992,24 @@ int fat_deleteFile(fat_driver* fatd, const unsigned char* fname, char directory)
 //---------------------------------------------------------------------------
 //Create a new record that points to the file/directory, before deleting the original one.
 
-int fat_renameFile(fat_driver* fatd, fat_dir *fatdir, const char* dPName) {
+int fat_renameFile(fat_driver* fatd, fat_dir *fatdir, const char* fname) {
 	int ret;
 	unsigned int sDirCluster;
 	unsigned int dDirCluster, dParentDirCluster;
-	unsigned char dPath[FAT_MAX_PATH];
-	unsigned char dLongName[FAT_MAX_NAME];
+	unsigned char lname[FAT_MAX_NAME], pathToDirent[FAT_MAX_PATH];
 	unsigned int sfnSector, sfnOffset, new_sfnSector, new_sfnOffset;
 	int directory;
 	unsigned char sname[12]; //short name 8+3 + terminator
 	unsigned char* sbuf = NULL;
 	fat_direntry_sfn OriginalSFN;
 
-	ret = separatePathAndName(dPName, dPath, dLongName);
+	ret = separatePathAndName(fname, pathToDirent, lname);
 	if(	(ret < 0)               //if name invalid to separation routine
-		||(	(dLongName[0] == 0)       //or name is empty string
-			||(	(dLongName[0]=='.')
-				&&(	(dLongName[1]==0)     //or name is single period
-					||(	(dLongName[1]=='.')
-						&&(dLongName[2]==0)   //or name is two periods
+		||(	(lname[0] == 0)       //or name is empty string
+			||(	(lname[0]=='.')
+				&&(	(lname[1]==0)     //or name is single period
+					||(	(lname[1]=='.')
+						&&(lname[2]==0)   //or name is two periods
 						)
 					)
 				)
@@ -2028,7 +2025,7 @@ int fat_renameFile(fat_driver* fatd, fat_dir *fatdir, const char* dPName) {
 	dDirCluster = 0;
 	XPRINTF("USBHDFSD: Calling fat_getFileStartCluster from fat_renameFile\n");
 
-	ret = fat_getFileStartCluster(fatd, dPath, &dDirCluster, NULL);
+	ret = fat_getFileStartCluster(fatd, pathToDirent, &dDirCluster, NULL);
 	if (ret < 0) {
 		XPRINTF("USBHDFSD: E: destination directory not found! \n");
 		return ret;
@@ -2036,7 +2033,7 @@ int fat_renameFile(fat_driver* fatd, fat_dir *fatdir, const char* dPName) {
 	dParentDirCluster = dDirCluster; //Backup dDirCluster, as every call to fat_filleDirentryInfo will update it to point to the scanned file's first cluster.
 
 	sname[0] = 0;
-	ret = fat_fillDirentryInfo(fatd, dLongName, sname, -1, &dDirCluster, &new_sfnSector, &new_sfnOffset);
+	ret = fat_fillDirentryInfo(fatd, lname, sname, -1, &dDirCluster, &new_sfnSector, &new_sfnOffset);
 	if (ret == 0) {
 		XPRINTF("USBHDFSD: E: file already exists!\n");
 		return -EEXIST;
@@ -2060,7 +2057,7 @@ int fat_renameFile(fat_driver* fatd, fat_dir *fatdir, const char* dPName) {
 	directory = ((fat_direntry_sfn*) (sbuf + sfnOffset))->attr & FAT_ATTR_DIRECTORY;
 
 	//Insert a new record.
-	if((ret = fat_modifyDirSpace(fatd, dLongName, directory, 0, &dDirCluster, &sfnSector, &sfnOffset, &OriginalSFN)) < 0){
+	if((ret = fat_modifyDirSpace(fatd, lname, directory, 0, &dDirCluster, &sfnSector, &sfnOffset, &OriginalSFN)) < 0){
 		XPRINTF("USBHDFSD: E: fat_modifyDirSpace failed! %d\n", ret);
 		return ret;
 	}
@@ -2082,7 +2079,7 @@ int fat_renameFile(fat_driver* fatd, fat_dir *fatdir, const char* dPName) {
 	}
 
 	fatdir->parentDirCluster = dParentDirCluster;
-	strcpy(fatdir->name, dLongName);
+	strcpy(fatdir->name, lname);
 
 	return 0;
 } //ends fat_renameFile

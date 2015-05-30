@@ -345,7 +345,7 @@ static inline void rpcSCmd_cdtrayreq(void *buf)
 	r->result = sceCdTrayReq(*((int *)buf), &r->param1);
 }
 
-//-------------------------------------------------------------- 
+//--------------------------------------------------------------
 static inline void rpcSCmd_cdapplySCmd(void *buf)
 {	// CD ApplySCMD RPC SCMD
 

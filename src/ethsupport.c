@@ -174,12 +174,11 @@ static int WaitValidNetState(int (*checkingFunction)(void)){
 	// Wait for a valid network status;
 	ThreadID = GetThreadId();
 	for(retry_cycles = 0; checkingFunction() == 0; retry_cycles++) {
-		SetAlarm(200 * rmGetHsync(), &EthStatusCheckCb, &ThreadID);
+		SetAlarm(1000 * rmGetHsync(), &EthStatusCheckCb, &ThreadID);
 		SleepThread();
 
-		if(retry_cycles >= 30 * 5){	//30s = 30*5*200ms
+		if(retry_cycles >= 30)	//30s = 30*1000ms
 			return -1;
-		}
 	}
 
 	return 0;
@@ -194,15 +193,16 @@ int ethWaitValidDHCPState(void) {
 }
 
 static void ethInitSMB(void) {
-	if(ethWaitValidNetIFLinkState() != 0) {
-		gNetworkStartup = ERROR_ETH_LINK_FAIL;
-		setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
-		LOG("ETH: Unable to get valid link status.\n");
-		return;
-	}
+	do{
+		if(ethWaitValidNetIFLinkState() != 0) {
+			gNetworkStartup = ERROR_ETH_LINK_FAIL;
+			setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
+			LOG("ETH: Unable to get valid link status.\n");
+			return;
+		}
+	} while(ethApplyNetIFConfig() != 0);
 
-	ethApplyNetIFConfig();
-
+	//Before the network configuration is applied, wait for a valid link status.
 	if(ethWaitValidNetIFLinkState() != 0) {
 		gNetworkStartup = ERROR_ETH_LINK_FAIL;
 		setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
@@ -212,7 +212,7 @@ static void ethInitSMB(void) {
 
 	ethApplyIPConfig();
 
-	//Wait for DHCP to complete.
+	//Wait for DHCP to initialize, if DHCP is enabled.
 	if(ps2_ip_use_dhcp && (ethWaitValidDHCPState() != 0)) {
 		gNetworkStartup = ERROR_ETH_DHCP_FAIL;
 		setErrorMessageWithCode(_STR_NETWORK_ERROR_DHCP_FAIL, gNetworkStartup);
@@ -269,6 +269,10 @@ int ethLoadModules(void) {
 
 		if (sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL) >= 0) {
 			if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
+				//Before the network stack is loaded, attempt to set the link settings in order to avoid needing double-initialization of the IF.
+				//But do not fail here because there is currently no way to re-start initialization.
+				ethApplyNetIFConfig();
+
 				if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
 					sysLoadModuleBuffer(&dns_irx, size_dns_irx, 0, NULL);
 					sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
@@ -692,7 +696,7 @@ int ethApplyNetIFConfig(void) {
 	}
 
 	if(CurrentMode != mode){
-		if((result = NetManIoctl(NETMAN_NETIF_IOCTL_ETH_SET_LINK_MODE, &mode, sizeof(mode), NULL, 0)) == 0)
+		if((result = NetManSetLinkMode(mode)) == 0)
 			CurrentMode = mode;
 	}else
 		result = 0;

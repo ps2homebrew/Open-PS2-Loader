@@ -148,10 +148,12 @@ static void FreeNameRecord(struct NBNSNameRecord *record)
 
 static struct NBNSNameRecord *lookupName(const char *name, unsigned short int uid)
 {
-	int i;
+	int i, OldState;
 	struct NBNSNameRecord *result;
 
 	result = NULL;
+
+	CpuSuspendIntr(&OldState);
 
 	for(i = 0; i < MAX_NAME_RECORDS; i++)
 	{
@@ -161,6 +163,8 @@ static struct NBNSNameRecord *lookupName(const char *name, unsigned short int ui
 			break;
 		}
 	}
+
+	CpuResumeIntr(OldState);
 
 	return result;
 }
@@ -323,6 +327,7 @@ int nbnsFindName(const char *name, unsigned char *ip_address)
 		CpuSuspendIntr(&OldState);
 		record->status |= NBNS_NAME_RECORD_INIT;
 		CpuResumeIntr(OldState);
+		record->thid = GetThreadId();
 		frame[sizeof(struct NbHeader)] = 32;
 		checksum = encode_name(name, &frame[sizeof(struct NbHeader)]);
 		frame[sizeof(struct NbHeader) + 33] = 0x00;
@@ -352,19 +357,18 @@ int nbnsFindName(const char *name, unsigned char *ip_address)
 
 			if(sendto(nbnsSocket, frame, TotalLength, 0, (struct sockaddr*)&service, sizeof(service)) == TotalLength)
 			{
-				record->thid = GetThreadId();
-				clock.lo = 27000000;	//250ms * 3 = 750ms of 36MHz clock ticks
+				clock.lo = 27600000;	//250ms * 3 = 750ms of 36.8MHz clock ticks
 				clock.hi = 0;
 				SetAlarm(&clock, &nbnsQueryNameTimeout, record);
 				SleepThread();
 				CancelAlarm(&nbnsQueryNameTimeout, record);
-				CpuSuspendIntr(&OldState);
-				record->status &= ~NBNS_NAME_RECORD_INIT;
-				CpuResumeIntr(OldState);
 
 				if(record->status & NBNS_NAME_RECORD_VALID)
 				{
 					memcpy(ip_address, record->address, sizeof(record->address));
+					CpuSuspendIntr(&OldState);
+					record->status &= ~NBNS_NAME_RECORD_INIT;
+					CpuResumeIntr(OldState);
 					result = 0;
 					break;
 				}else{

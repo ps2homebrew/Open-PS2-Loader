@@ -30,6 +30,8 @@
 #include "ioman_add.h"
 #endif
 
+//#define INIT_SMAP	1	//Disabled to avoid breaking compatibility with clone/compatible adaptors.
+
 #include <aifregs.h>
 #include <dev9regs.h>
 #include <speedregs.h>
@@ -533,6 +535,7 @@ static int dev9_init(void)
 	return 0;
 }
 
+#ifdef INIT_SMAP
 static int dev9_smap_read_phy(volatile u8 *emac3_regbase, unsigned int address, unsigned int *data){
 	unsigned int i, PHYRegisterValue;
 	int result;
@@ -592,8 +595,8 @@ static int dev9_smap_init(void)
 	USE_SMAP_RX_BD;
 	int i;
 
-	//Do not perform SMAP initialization if the SPEED device does not have such an interface. Also, skip it if the Chinese SATA network adaptor is detected.
-	if ((!(SPD_REG16(SPD_R_REV_3)&SPD_CAPS_SMAP)) || (SPD_REG16(SPD_R_REV_1) == 0xFF)) return 0;
+	//Do not perform SMAP initialization if the SPEED device does not have such an interface.
+	if (!(SPD_REG16(SPD_R_REV_3)&SPD_CAPS_SMAP)) return 0;
 
 	SMAP_REG8(SMAP_R_TXFIFO_CTRL) = SMAP_TXFIFO_RESET;
 	for(i = 9; SMAP_REG8(SMAP_R_TXFIFO_CTRL)&SMAP_TXFIFO_RESET; i--)
@@ -682,6 +685,7 @@ static int dev9_smap_init(void)
 
 	return 0;
 }
+#endif
 
 static int speed_device_init(void)
 {
@@ -691,11 +695,16 @@ static int speed_device_init(void)
 	int idx;
 	u16 spdrev;
 #endif
-	int res, InitCount;
+	int res;
+#ifdef INIT_SMAP
+	int InitCount;
+#endif
 
 	eeprom_data[0] = 0;
 
+#ifdef INIT_SMAP
 	for(InitCount=0; InitCount<8; InitCount++){
+#endif
 		if (dev9_device_probe() < 0) {
 			M_PRINTF("PC card or expansion device isn't connected.\n");
 			return -1;
@@ -720,6 +729,7 @@ static int speed_device_init(void)
 		}
 #endif
 
+#ifdef INIT_SMAP
 		if((res = dev9_smap_init()) == 0){
 			break;
 		}
@@ -734,6 +744,7 @@ static int speed_device_init(void)
 #endif
 		eeprom_data[0] = -1;
 	}
+#endif
 
 #ifdef DEBUG
 	/* Print out the SPEED chip revision.  */

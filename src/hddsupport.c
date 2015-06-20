@@ -14,6 +14,8 @@
 #endif
 #include "modules/iopcore/common/cdvd_config.h"
 
+#include <hdd-ioctl.h>
+
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
 
@@ -149,16 +151,31 @@ void hddLoadModules(void) {
 		else
 			ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
 		if (ret < 0) {
+			LOG("HDD: No HardDisk Drive detected.\n");
+			setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_IF_NOT_DETECTED);
 			return;
 		}
 
 		ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
 		if (ret < 0) {
+			LOG("HDD: HardDisk Drive not formatted (HDD).\n");
+			setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_MODULE_HDD_FAILURE);
+			return;
+		}
+
+		//Check if a HDD unit is connected
+		ret = fileXioDevctl("hdd0:", HDDCTL_STATUS, NULL, 0, NULL, 0);
+		if((ret >= 3) || (ret < 0))
+		{
+			LOG("HDD: No HardDisk Drive detected.\n");
+			setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_NOT_DETECTED);
 			return;
 		}
 
 		ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
 		if (ret < 0) {
+			LOG("HDD: HardDisk Drive not formatted (PFS).\n");
+			setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_MODULE_PFS_FAILURE);
 			return;
 		}
 

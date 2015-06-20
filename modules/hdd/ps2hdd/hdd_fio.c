@@ -216,7 +216,7 @@ int hddFormat(iop_file_t *f, const char *dev, const char *blockdev, void *arg, s
 		return rv;
 
 	// set up mbr :)
-	if((clink=cacheGetHeader(f->unit, 0, 1, &rv))){
+	if((clink=cacheGetHeader(f->unit, 0, THEADER_MODE_WRITE, &rv))){
 		apa_header *header=clink->header;
 		memset(header, 0, sizeof(apa_header));
 		header->magic=APA_MAGIC;
@@ -267,8 +267,10 @@ int hddRemove(iop_file_t *f, const char *name)
 		return rv;
 
 	WaitSema(fioSema);
-	apaRemove(f->unit, params.id);
-	return SignalSema(fioSema);
+	rv = apaRemove(f->unit, params.id);
+	SignalSema(fioSema);
+
+	return rv;
 }
 
 int hddOpen(iop_file_t *f, const char *name, int flags, int mode)
@@ -428,12 +430,12 @@ int hddDread(iop_file_t *f, iox_dirent_t *dirent)
 		return 0;// end :)
 
 	WaitSema(fioSema);
-	if((clink=cacheGetHeader(f->unit, fileSlot->parts[0].start, 0, &rv)) &&
+	if((clink=cacheGetHeader(f->unit, fileSlot->parts[0].start, THEADER_MODE_READ, &rv)) &&
 		clink->header->length)
 	{
 		if(clink->header->flags & APA_FLAG_SUB) {
 			// if sub get id from main header...
-			apa_cache *cmain=cacheGetHeader(f->unit, clink->header->main, 0, &rv);
+			apa_cache *cmain=cacheGetHeader(f->unit, clink->header->main, THEADER_MODE_READ, &rv);
 			if(cmain!=NULL){
 				rv=strlen(cmain->header->id);
 				strcpy(dirent->name, cmain->header->id);
@@ -540,7 +542,7 @@ int ioctl2AddSub(hdd_file_slot_t *fileSlot, char *argp)
 
 	// walk all looking for any empty blocks
 	memset(&emptyBlocks, 0, sizeof(emptyBlocks));
-	clink=cacheGetHeader(device, 0, 0, &rv);
+	clink=cacheGetHeader(device, 0, THEADER_MODE_READ, &rv);
 	while(clink){
 		sector=clink->sector;
 		addEmptyBlock(clink->header, emptyBlocks);
@@ -555,7 +557,7 @@ int ioctl2AddSub(hdd_file_slot_t *fileSlot, char *argp)
 	sector=clink->header->start;
 	length=clink->header->length;
 	cacheAdd(clink);
-	if(!(clink=cacheGetHeader(device, fileSlot->parts[0].start, 0, &rv)))
+	if(!(clink=cacheGetHeader(device, fileSlot->parts[0].start, THEADER_MODE_READ, &rv)))
 		return rv;
 
 	clink->header->subs[clink->header->nsub].start=sector;
@@ -583,11 +585,11 @@ int ioctl2DeleteLastSub(hdd_file_slot_t *fileSlot)
 	if(fileSlot->nsub==0)
 		return -ENOENT;
 
-	if(!(mainPart=cacheGetHeader(device, fileSlot->parts[0].start, 0, &rv)))
+	if(!(mainPart=cacheGetHeader(device, fileSlot->parts[0].start, THEADER_MODE_READ, &rv)))
 		return rv;
 
 	if((subPart=cacheGetHeader(device,
-		mainPart->header->subs[mainPart->header->nsub-1].start, 0, &rv))) {
+		mainPart->header->subs[mainPart->header->nsub-1].start, THEADER_MODE_READ, &rv))) {
 		fileSlot->nsub--;
 		mainPart->header->nsub--;
 		mainPart->flags|=CACHE_FLAG_DIRTY;
@@ -704,7 +706,7 @@ int devctlSetOsdMBR(u32 device, hddSetOsdMBR_t *mbrInfo)
 	int rv;
 	apa_cache *clink;
 
-	if(!(clink=cacheGetHeader(device, APA_SECTOR_MBR, 0, &rv)))
+	if(!(clink=cacheGetHeader(device, APA_SECTOR_MBR, THEADER_MODE_READ, &rv)))
 		return rv;
 
 	dprintf1("ps2hdd: mbr start: %ld\n"
@@ -764,11 +766,9 @@ int hddDevctl(iop_file_t *f, const char *devname, int cmd, void *arg,
 		rv=hddDeviceBuf[f->unit].format;
 		break;
 
-	// removed dos not work the way you like... use hddlib ;)
-	//case APA_DEVCTL_FREE_SECTORS:
-	//case APA_DEVCTL_FREE_SECTORS2:
-	//	rv=apaGetFreeSectors(f->unit, bufp);
-	//	break;
+	case APA_DEVCTL_FREE_SECTORS:
+		rv=apaGetFreeSectors(f->unit, bufp, hddDeviceBuf);
+		break;
 
 	// cmd set 2 :)
 	case APA_DEVCTL_GETTIME:

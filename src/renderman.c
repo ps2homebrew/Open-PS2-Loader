@@ -466,7 +466,7 @@ void rmDrawQuad(rm_quad_t* q) { // NO scaling, NO shift, NO alignment
 			q->ul.x + transX, q->ul.y + transY,
 			q->ul.u+0.5f, q->ul.v+0.5f,
 			q->br.x + transX, q->br.y + transY,
-			q->br.u+0.5f, q->br.v+0.5f, order, q->color);
+			q->br.u-0.375f, q->br.v+0.375f, order, q->color);
 	order++;
 
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
@@ -491,9 +491,9 @@ void rmDrawOverlayPixmap(GSTEXTURE* overlay, int x, int y, short aligned, int w,
 		gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
 
 	gsKit_prim_quad_texture(gsGlobal, inlay, quad.ul.x + transX + aspectWidth * ulx, quad.ul.y + transY + uly, 0.5f, 0.5f,
-			quad.ul.x + transX + aspectWidth * urx, quad.ul.y + transY + ury, inlay->Width + 0.5f, 0.5f,
-			quad.ul.x + transX + aspectWidth * blx, quad.ul.y + transY + bly, 0.5f, inlay->Height + 0.5f,
-			quad.ul.x + transX + aspectWidth * brx, quad.ul.y + transY + bry, inlay->Width + 0.5f, inlay->Height + 0.5f, order, gDefaultCol);
+			quad.ul.x + transX + aspectWidth * urx, quad.ul.y + transY + ury, inlay->Width - 0.375f, 0.5f,
+			quad.ul.x + transX + aspectWidth * blx, quad.ul.y + transY + bly, 0.5f, inlay->Height - 0.375f,
+			quad.ul.x + transX + aspectWidth * brx, quad.ul.y + transY + bry, inlay->Width - 0.375f, inlay->Height - 0.375f, order, gDefaultCol);
 	order++;
 	gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 

@@ -16,18 +16,6 @@ typedef struct {
 } smb_vmc_infos_t;
 #endif
 
-#define ERROR_ETH_NOT_STARTED			100
-#define ERROR_ETH_MODULE_NETIF_FAILURE		200
-#define ERROR_ETH_MODULE_SMBMAN_FAILURE		201
-#define ERROR_ETH_SMB_CONN			300
-#define ERROR_ETH_SMB_LOGON			301
-#define ERROR_ETH_SMB_ECHO			302
-#define ERROR_ETH_SMB_OPENSHARE			303
-#define ERROR_ETH_SMB_LISTSHARES		304
-#define ERROR_ETH_SMB_LISTGAMES			305
-#define ERROR_ETH_LINK_FAIL			310
-#define ERROR_ETH_DHCP_FAIL			311
-
 void ethInit(void);
 int ethLoadModules(void);
 int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway);

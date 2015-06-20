@@ -90,7 +90,7 @@ apa_cache *apaFillHeader(u32 device, input_param *params, int start, int next,
 {	// used for makeing a new partition
 	apa_cache *clink;
 
-	if(!(clink=cacheGetHeader(device, start, 1, err)))
+	if(!(clink=cacheGetHeader(device, start, THEADER_MODE_WRITE, err)))
 		return NULL;
 	memset(clink->header, 0, sizeof(apa_header));
 	clink->header->magic=APA_MAGIC;
@@ -124,10 +124,10 @@ apa_cache *apaInsertPartition(u32 device, input_param *params, u32 sector, int *
 	apa_cache *clink_this;
 	apa_cache *clink_next;
 
-	if((clink_this=cacheGetHeader(device, sector, 0, err))==0)
+	if((clink_this=cacheGetHeader(device, sector, THEADER_MODE_READ, err))==0)
 		return 0;
 	while(clink_this->header->length!=params->size) {
-		if((clink_next=cacheGetHeader(device, clink_this->header->next, 0, err))==NULL) { // get next
+		if((clink_next=cacheGetHeader(device, clink_this->header->next, THEADER_MODE_READ, err))==NULL) { // get next
 			cacheAdd(clink_this);
 			return 0;
 		}
@@ -154,7 +154,7 @@ apa_cache *apaFindPartition(u32 device, char *id, int *err)
 {
 	apa_cache *clink;
 
-	clink=cacheGetHeader(device, 0, 0, err);
+	clink=cacheGetHeader(device, 0, THEADER_MODE_READ, err);
 	while(clink)
 	{
 		if(!(clink->header->flags & APA_FLAG_SUB)) {
@@ -207,7 +207,7 @@ apa_cache *apaAddPartitionHere(u32 device, input_param *params, u32 *emptyBlocks
 		if((1 << i) >= params->size && emptyBlocks[i]!=0)
 			return apaInsertPartition(device, params, emptyBlocks[i], err);
 	}
-	clink_this=cacheGetHeader(device, sector, 0, err);
+	clink_this=cacheGetHeader(device, sector, THEADER_MODE_READ, err);
 	header=clink_this->header;
 	part_end=header->start+header->length;
 	some_size=(part_end%params->size);
@@ -220,7 +220,7 @@ apa_cache *apaAddPartitionHere(u32 device, input_param *params, u32 *emptyBlocks
 		return NULL;
 	}
 
-	if((clink_next=cacheGetHeader(device, 0, 0, err))==NULL){
+	if((clink_next=cacheGetHeader(device, 0, THEADER_MODE_READ, err))==NULL){
 		cacheAdd(clink_this);
 		return NULL;
 	}
@@ -269,7 +269,7 @@ int apaOpen(u32 device, hdd_file_slot_t *fileSlot, input_param *params, int mode
 
 
 	// walk all looking for any empty blocks & look for partition
-	clink=cacheGetHeader(device, 0, 0, &rv);
+	clink=cacheGetHeader(device, 0, THEADER_MODE_READ, &rv);
 	memset(&emptyBlocks, 0, sizeof(emptyBlocks));
 	while(clink)
 	{
@@ -345,7 +345,7 @@ int apaRemove(u32 device, char *id)
 	cacheFlushAllDirty(device);
 	for(i=nsub-1;i!=-1;i--)
 	{
-		if((clink2=cacheGetHeader(device, clink->header->subs[i].start, 0, &rv))){
+		if((clink2=cacheGetHeader(device, clink->header->subs[i].start, THEADER_MODE_READ, &rv))){
 			if((rv=apaDelete(clink2))){
 				cacheAdd(clink);
 				return rv;
@@ -365,7 +365,7 @@ apa_cache *apaRemovePartition(u32 device, u32 start, u32 next, u32 prev,
 	apa_cache *clink;
 	u32 err;
 
-	if((clink=cacheGetHeader(device, start, 1, (int *)&err))==NULL)
+	if((clink=cacheGetHeader(device, start, THEADER_MODE_WRITE, (int *)&err))==NULL)
 		return NULL;
 	memset(clink->header, 0, sizeof(apa_header));
 	clink->header->magic=APA_MAGIC;
@@ -413,7 +413,7 @@ apa_cache *apaDeleteFixPrev(apa_cache *clink, int *err)
 
 
 	while(header->start) {
-		if(!(clink2=cacheGetHeader(device, header->prev, 0, err))) {
+		if(!(clink2=cacheGetHeader(device, header->prev, THEADER_MODE_READ, err))) {
 			cacheAdd(clink);
 			return NULL;
 		}
@@ -432,7 +432,7 @@ apa_cache *apaDeleteFixPrev(apa_cache *clink, int *err)
 		clink=clink2;
 	}
 	if(length!=saved_length) {
-		if(!(clink2=cacheGetHeader(device, saved_next, 0, err))) {
+		if(!(clink2=cacheGetHeader(device, saved_next, THEADER_MODE_READ, err))) {
 			cacheAdd(clink);
 			return NULL;
 		}
@@ -461,7 +461,7 @@ apa_cache *apaDeleteFixNext(apa_cache *clink, int *err)
 
 	while(lnext!=0)
 	{
-		if(!(clink1=cacheGetHeader(device, lnext, 0, err))) {
+		if(!(clink1=cacheGetHeader(device, lnext, THEADER_MODE_READ, err))) {
 			cacheAdd(clink);
 			return 0;
 		}
@@ -480,7 +480,7 @@ apa_cache *apaDeleteFixNext(apa_cache *clink, int *err)
 		lnext=header->next;
 	}
 	if(length!=saved_length) {
-		if(!(clink2=cacheGetHeader(device, lnext, 0, err))) {
+		if(!(clink2=cacheGetHeader(device, lnext, THEADER_MODE_READ, err))) {
 			cacheAdd(clink);
 			return NULL;
 		}
@@ -510,14 +510,14 @@ int apaDelete(apa_cache *clink)
 	}
 
 	if(clink->header->next==0) {
-		if((clink_mbr=cacheGetHeader(device, 0, 0, &rv))==NULL)
+		if((clink_mbr=cacheGetHeader(device, 0, THEADER_MODE_READ, &rv))==NULL)
 		{
 			cacheAdd(clink);
 			return rv;
 		}
 		do {
 			cacheAdd(clink);
-			if((clink=cacheGetHeader(clink->device, clink->header->prev, 0, &rv))==NULL)
+			if((clink=cacheGetHeader(clink->device, clink->header->prev, THEADER_MODE_READ, &rv))==NULL)
 				return 0;
 			clink->header->next=0;
 			clink->flags|=CACHE_FLAG_DIRTY;
@@ -635,7 +635,7 @@ apa_cache *apaGetNextHeader(apa_cache *clink, int *err)
 	if(!clink->header->next)
 		return NULL;
 
-	if(!(clink=cacheGetHeader(clink->device, clink->header->next, 0, err)))
+	if(!(clink=cacheGetHeader(clink->device, clink->header->next, THEADER_MODE_READ, err)))
 		return NULL;
 
 	if(start!=clink->header->prev) {
@@ -646,4 +646,56 @@ apa_cache *apaGetNextHeader(apa_cache *clink, int *err)
 	}
 	return clink;
 
+}
+
+static void hddCalculateFreeSpace(u32 *free, u32 sectors)
+{
+	if(0x1FFFFF < sectors)
+	{
+		*free += sectors;
+		return;
+	}
+
+	if((*free & sectors) == 0)
+	{
+		*free |= sectors;
+		return;
+	}
+
+	for(sectors >>= 1; 0x3FFFF < sectors; sectors >>= 1)
+		*free |= sectors;
+}
+
+int apaGetFreeSectors(u32 device, u32 *free, hdd_device_t *deviceinfo)
+{
+	u32 sectors, partMax;
+	int rv;
+	apa_cache *clink;
+
+	sectors = 0;
+	if((clink = cacheGetHeader(device, 0, THEADER_MODE_READ, &rv)) != NULL)
+	{
+		do{
+			if(clink->header->type == 0)
+				hddCalculateFreeSpace(free, clink->header->length);
+			sectors += clink->header->length;
+		}while((clink = apaGetNextHeader(clink, &rv)) != NULL);
+	}
+
+	if(rv == 0)
+	{
+		for(partMax = deviceinfo[device].partitionMaxSize; 0x0003FFFF < partMax; partMax >>= 1)
+		{
+			if((sectors % deviceinfo[device].partitionMaxSize == 0) && (sectors + deviceinfo[device].partitionMaxSize < deviceinfo[device].totalLBA))
+			{
+				hddCalculateFreeSpace(free, deviceinfo[device].partitionMaxSize);
+				sectors += deviceinfo[device].partitionMaxSize;
+				break;
+			}
+		}
+
+		dprintf1("ps2hdd: total = %08lx sectors, installable = %08lx sectors.\n", sectors, *free);
+	}
+
+	return rv;
 }

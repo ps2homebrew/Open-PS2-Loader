@@ -40,6 +40,6 @@ int apaWriteHeader(u32 device, apa_header *header, u32 lba);
 int apaGetFormat(u32 device, int *format);
 int apaGetPartitionMax(int totalLBA);
 apa_cache *apaGetNextHeader(apa_cache *clink, int *err);
-//int apaGetFreeSectors(u32 device, u32 *free, hdd_hddDeviceBuf *deviceinfo);
+int apaGetFreeSectors(u32 device, u32 *free, hdd_device_t *deviceinfo);
 
 #endif /* _APA_H */

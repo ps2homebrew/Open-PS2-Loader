@@ -25,6 +25,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Language",
 	"The system will be powered off.",
 	"Exit OPL?",
+	"%d: HardDisk Drive not detected",
+	"%d: HardDisk Drive not formatted",
 	"%d: Network startup error",
 	"%d: No network adaptor detected",
 	"%d: Cannot connect to SMB server",

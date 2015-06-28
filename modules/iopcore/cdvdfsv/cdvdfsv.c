@@ -660,21 +660,12 @@ static void sysmemSendEE(void *buf, void *EE_addr, int size)
 static inline void cdvdSt_read(void *buf)
 {
 	RpcCdvdStream_t *St = (RpcCdvdStream_t *)buf;
-	u32 nsectors, err;
-	int r;
-	int rpos = 0;
-	void *ee_addr = (void *)St->buf;
+	u32 err;
+	int r, rpos, remaining;
+	void *ee_addr;
 
-	while (St->sectors > 0) {
-		nsectors = (St->sectors > CDVDFSV_BUF_SECTORS) ? CDVDFSV_BUF_SECTORS : St->sectors;
-
-		if((r = sceCdStRead(nsectors, cdvdfsv_buf, 0, &err)) < 1) break;
-
-		sysmemSendEE(cdvdfsv_buf, ee_addr, r << 11);
-
-		ee_addr += r << 11;
-		rpos += r;
-		St->sectors -= r;
+	for (rpos = 0, ee_addr = St->buf, remaining = St->sectors; remaining > 0; ee_addr += r << 11, rpos += r, remaining -= r) {
+		if((r = sceCdStRead(remaining, (void*)((u32)ee_addr | 0x80000000), 0, &err)) < 1) break;
 	}
 
 	*(int *)buf = (rpos & 0xFFFF) | (err << 16);

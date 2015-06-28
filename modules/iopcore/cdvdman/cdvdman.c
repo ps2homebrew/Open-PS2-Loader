@@ -264,6 +264,7 @@ cdvdman_status_t cdvdman_stat;
 static void *user_cb;
 
 static int cdrom_io_sema;
+static int cdrom_rthread_sema;
 static int cdvdman_scmdsema;
 static int cdvdman_searchfilesema;
 
@@ -641,9 +642,9 @@ int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
 	CpuResumeIntr(OldState);
 
 	if (IsIntrContext)
-		iWakeupThread(cdvdman_ReadingThreadID);
+		iSignalSema(cdrom_rthread_sema);
 	else
-		WakeupThread(cdvdman_ReadingThreadID);
+		SignalSema(cdrom_rthread_sema);
 
 	return 1;
 }
@@ -1965,7 +1966,7 @@ static unsigned int event_alarm_cb(void *args)
 static void cdvdman_cdread_Thread(void *args)
 {
 	while (1) {
-		SleepThread();
+		WaitSema(cdrom_rthread_sema);
 
 		cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.cdread_buf);
 
@@ -2011,6 +2012,8 @@ static void cdvdman_create_semaphores(void)
 	smp.option = 0;
 
 	cdvdman_scmdsema = CreateSema(&smp);
+	smp.initial = 0;
+	cdrom_rthread_sema = CreateSema(&smp);
 }
 
 //-------------------------------------------------------------------------

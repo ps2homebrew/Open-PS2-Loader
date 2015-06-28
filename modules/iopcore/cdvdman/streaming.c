@@ -5,6 +5,7 @@
 #include "internal.h"
 
 #include <stdio.h>
+#include <sifman.h>
 #include <sysclib.h>
 #include <sysmem.h>
 #include <thbase.h>
@@ -12,7 +13,7 @@
 #include <intrman.h>
 #include <errno.h>
 
-#if 0
+#ifdef __IOPCORE_DEBUG
 #define DPRINTF(args...) printf(args)
 #define iDPRINTF(args...) Kprintf(args)
 #else
@@ -33,7 +34,6 @@ static unsigned int StmScheduleCb(void *arg){
 
 static void StmCallback(void){
 	int OldState;
-	iop_sys_clock_t StmScheduleClock;
 
 	CpuSuspendIntr(&OldState);
 	cdvdman_stat.StreamingData.Stlsn += cdvdman_stat.StreamingData.StBanksize;
@@ -45,10 +45,7 @@ static void StmCallback(void){
 
 	DPRINTF("StmCallback: %08lx, wr: %u, rd: %u, streamed: %u\n", cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StWritePtr, cdvdman_stat.StreamingData.StReadPtr, cdvdman_stat.StreamingData.StStreamed);
 
-	//As a thread cannot wake itself up, set a callback.
-	StmScheduleClock.lo = 0;
-	StmScheduleClock.hi = 0;
-	SetAlarm(&StmScheduleClock, &StmScheduleCb, &cdvdman_stat.StreamingData);
+	StStartFillStreamBuffer();
 }
 
 static void StReset(void){
@@ -63,6 +60,12 @@ static int StFillStreamBuffer(void){
 	int result, OldState;
 	void *ptr;
 
+	/*	NOTE:	When this function is called by the timer callback (when a fill request is rescheduled),
+			this critical section here might not be protected properly because CpuSuspendIntr only prevents thread-switching (hardware interrupts are disabled differently).
+			SCEI used a similar design, but their implementation uses a bitmap to mark the filled/empty banks instead
+			(which is probably immune to race conditions, but we are interested in saving memory).
+			I don't think that there will be a problem because the important critical section (AllocBank) is probably far enough beneath this mechanism.
+			If deemed necessary, please replace the rescheduling mechanism with one that is thread-based.	*/
 	CpuSuspendIntr(&OldState);
 
 	if(cdvdman_stat.StreamingData.StIsReading){
@@ -146,6 +149,73 @@ static int AllocBank(void **pointer){
 	return result;
 }
 
+static int ReadSectorsEE(int maxcount, void *buffer){
+	int OldState, result, dmat_id, dmat_count;
+	unsigned short int SectorsToCopy, rdptr;
+	SifDmaTransfer_t dmat[2];
+	void *ptr;
+
+//	DPRINTF("ReadSectors EE: wr: %u, rd: %u, streamed: %u\n", cdvdman_stat.StreamingData.StWritePtr, cdvdman_stat.StreamingData.StReadPtr, cdvdman_stat.StreamingData.StStreamed);
+
+	result = 0;
+	ptr = buffer;
+	dmat_count = 0;
+	dmat_id = 0;
+
+	CpuSuspendIntr(&OldState);
+	rdptr = cdvdman_stat.StreamingData.StReadPtr;
+
+	//When Wr <= Rd, the buffer is either full or empty. Check StStreamed.
+	if(cdvdman_stat.StreamingData.StWritePtr<=rdptr && cdvdman_stat.StreamingData.StStreamed>0){
+		SectorsToCopy = cdvdman_stat.StreamingData.StBufmax - rdptr;
+		if(SectorsToCopy > maxcount) SectorsToCopy = maxcount;
+		if(SectorsToCopy > 0){
+			dmat[0].src = cdvdman_stat.StreamingData.StIOP_bufaddr + rdptr*2048;
+			dmat[0].dest = buffer;
+			dmat[0].size = SectorsToCopy*2048;
+			dmat[0].attr = 0;
+			dmat_count = 1;
+			ptr += SectorsToCopy*2048;
+			rdptr += SectorsToCopy;
+			if(rdptr>=cdvdman_stat.StreamingData.StBufmax) rdptr = 0;
+			result += SectorsToCopy;
+		}
+	}
+	//When Rd < Wr, there are sectors in the buffer.
+	if(result<maxcount && rdptr<cdvdman_stat.StreamingData.StWritePtr){
+		SectorsToCopy = cdvdman_stat.StreamingData.StWritePtr-rdptr;
+		if(SectorsToCopy > maxcount-result) SectorsToCopy = maxcount-result;
+		if(SectorsToCopy > 0){
+			dmat[dmat_count].src = cdvdman_stat.StreamingData.StIOP_bufaddr + rdptr*2048;
+			dmat[dmat_count].dest = ptr;
+			dmat[dmat_count].size = SectorsToCopy*2048;
+			dmat[dmat_count].attr = 0;
+			dmat_count++;
+			rdptr += SectorsToCopy;
+			if(rdptr>=cdvdman_stat.StreamingData.StBufmax) rdptr = 0;
+			result += SectorsToCopy;
+		}
+	}
+
+	if(dmat_count > 0)
+		while((dmat_id = sceSifSetDma(dmat, dmat_count)) == 0){};
+
+	CpuResumeIntr(OldState);
+
+	if(dmat_count > 0)	//Only if there is data to copy
+	{
+		while(sceSifDmaStat(dmat_id) >= 0){};
+
+		//Finally, update variables.
+		CpuSuspendIntr(&OldState);
+		cdvdman_stat.StreamingData.StReadPtr = rdptr;
+		cdvdman_stat.StreamingData.StStreamed -= result;
+		CpuResumeIntr(OldState);
+	}
+
+	return result;
+}
+
 static int ReadSectors(int maxcount, void *buffer){
 	int OldState, result;
 	unsigned short int SectorsToCopy;
@@ -154,9 +224,10 @@ static int ReadSectors(int maxcount, void *buffer){
 //	DPRINTF("ReadSectors: wr: %u, rd: %u, streamed: %u\n", cdvdman_stat.StreamingData.StWritePtr, cdvdman_stat.StreamingData.StReadPtr, cdvdman_stat.StreamingData.StStreamed);
 
 	result = 0;
-	ptr=buffer;
+	ptr = buffer;
 	CpuSuspendIntr(&OldState);
 
+	//When Wr <= Rd, the buffer is either full or empty. Check StStreamed.
 	if(cdvdman_stat.StreamingData.StWritePtr<=cdvdman_stat.StreamingData.StReadPtr && cdvdman_stat.StreamingData.StStreamed>0){
 		SectorsToCopy = cdvdman_stat.StreamingData.StBufmax - cdvdman_stat.StreamingData.StReadPtr;
 		if(SectorsToCopy > maxcount) SectorsToCopy = maxcount;
@@ -169,6 +240,7 @@ static int ReadSectors(int maxcount, void *buffer){
 			result += SectorsToCopy;
 		}
 	}
+	//When Rd < Wr, there are sectors in the buffer.
 	if(result<maxcount && cdvdman_stat.StreamingData.StReadPtr<cdvdman_stat.StreamingData.StWritePtr){
 		SectorsToCopy = cdvdman_stat.StreamingData.StWritePtr-cdvdman_stat.StreamingData.StReadPtr;
 		if(SectorsToCopy > maxcount-result) SectorsToCopy = maxcount-result;
@@ -305,13 +377,16 @@ int sceCdStRead(u32 sectors, void *buffer, u32 mode, u32 *error){
 	cdvdman_stat.err = CDVD_ERR_NO;
 	if(cdvdman_stat.StreamingData.StStat){
 		SetEventFlag(cdvdman_stat.intr_ef, 8);
-		for(SectorsToRead=sectors,result=0,SectorsRead=0,ptr=buffer; result < sectors; SectorsToRead = sectors - SectorsRead,ptr += SectorsRead*2048){
+		for(SectorsToRead=sectors,result=0,SectorsRead=0,ptr=(void*)((u32)buffer&~0x80000000); result < sectors; SectorsToRead -= SectorsRead,ptr += SectorsRead*2048){
 			WaitEventFlag(cdvdman_stat.intr_ef, 8, WEF_AND, NULL);
-
-//			DPRINTF("Sectors: %u:%p, mode: %lu", SectorsToRead, ptr, mode);
-			SectorsRead=ReadSectors(SectorsToRead, ptr);
-//			DPRINTF(", Read: %u\n", SectorsRead);
 			ClearEventFlag(cdvdman_stat.intr_ef, ~8);
+
+	//		DPRINTF("Sectors: %u:%p, mode: %lu", SectorsToRead, ptr, mode);
+			if((u32)buffer & 0x80000000)
+				SectorsRead=ReadSectorsEE(SectorsToRead, ptr);
+			else
+				SectorsRead=ReadSectors(SectorsToRead, ptr);
+	//		DPRINTF(", Read: %u\n", SectorsRead);
 
 			if(SectorsRead == 0) DPRINTF("StRead: buffer underrun. %u/%lu read.\n", result, sectors);
 

@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev798 - Fixes: Added check for streaming status into CDVDMAN streaming system (for games that read after starting streaming), fixed broken CDVDMAN debug build, changed ambiguous debug strings in CDVDMAN, fixed length checking of ISO filenames and improved on error-handling code in supportbase.c. - Sat Jul 11 03:17:13 2015 +0800
 rev797 - Fixed and enhanced streaming support: - Sun Jun 28 18:18:52 2015 +0800
 rev796 - Consolidated error codes, added error codes for HDD mode, sync'ed with updates to HDD and PFS from PS2SDK, added workaround for clone/compatible network adaptors and corrected UV coordinates for texture-drawing. - Sat Jun 20 20:06:02 2015 +0800
 rev795 - Fixed NBNS support (unable to resolve NB names after first attempt), revised timeout clock value and adjusted code to prevent some other race-conditions from occuring, adjusted SMB support initialization code to always retry until the link mode can be set successfully, changed link mode setting and DHCP completion-checking intervals to 1 second (reduce strain on IOP), link mode will now be set once at initialization before the TCP/IP stack is initialized (avoid double-initializing the SMAP). Updated to support the new PS2SDK revision. - Tue Jun 16 21:50:14 2015 +0800

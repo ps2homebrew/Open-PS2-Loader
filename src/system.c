@@ -190,7 +190,7 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 }
 
 void sysReset(int modload_mask) {
-	fioExit();
+	fileXioExit();
 	SifExitIopHeap();
 	SifLoadFileExit();
 	SifExitRpc();
@@ -214,7 +214,13 @@ void sysReset(int modload_mask) {
 	// apply sbv patches
 	sbv_patch_enable_lmb();
 	sbv_patch_disable_prefix_check();
-	sbv_patch_fioremove();
+
+	// clears modules list
+	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES * 4);
+
+	// load modules
+	sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
+	sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 
 #ifdef _DTL_T10000
 	SifExecModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL, NULL);
@@ -237,12 +243,6 @@ void sysReset(int modload_mask) {
 	SifLoadModule("rom0:PADMAN", 0, NULL);
 #endif
 
-	// clears modules list
-	memset((void *)&g_sysLoadedModBuffer[0], 0, MAX_MODULES*4);
-
-	// load modules
-	sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
-	sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 	sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
 
@@ -683,7 +683,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
 	// Let's go.
-	fioExit();
+	fileXioExit();
 	SifInitRpc(0);
 	SifExitRpc();
 
@@ -723,7 +723,7 @@ int sysExecElf(char *path) {
 	}
 
 	// Let's go.
-	fioExit();
+	fileXioExit();
 	SifInitRpc(0);
 	SifExitRpc();
 

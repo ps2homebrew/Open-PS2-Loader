@@ -71,7 +71,7 @@ static void _menuSaveConfig() {
 
 static void _menuRequestConfig() {
 	WaitSema(menuSemaId);
-	if (itemConfigId != selected_item->item->current->item.id) {
+	if (selected_item->item->current != NULL && itemConfigId != selected_item->item->current->item.id) {
 		if (itemConfig) {
 			configFree(itemConfig);
 			itemConfig = NULL;

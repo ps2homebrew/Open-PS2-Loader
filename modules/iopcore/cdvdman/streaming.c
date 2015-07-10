@@ -35,13 +35,17 @@ static unsigned int StmScheduleCb(void *arg){
 static void StmCallback(void){
 	int OldState;
 
-	CpuSuspendIntr(&OldState);
-	cdvdman_stat.StreamingData.Stlsn += cdvdman_stat.StreamingData.StBanksize;
-	cdvdman_stat.StreamingData.StStreamed += cdvdman_stat.StreamingData.StBanksize;
-	cdvdman_stat.StreamingData.StWritePtr += cdvdman_stat.StreamingData.StBanksize;
-	if(cdvdman_stat.StreamingData.StWritePtr >= cdvdman_stat.StreamingData.StBufmax) cdvdman_stat.StreamingData.StWritePtr = 0;
-	cdvdman_stat.StreamingData.StIsReading = 0;
-	CpuResumeIntr(OldState);
+	//Only update parameters if the streaming system was reading. Otherwise, this callback might have been triggered by the game reading data (BUG!)
+	if(cdvdman_stat.StreamingData.StIsReading)
+	{
+		CpuSuspendIntr(&OldState);
+		cdvdman_stat.StreamingData.Stlsn += cdvdman_stat.StreamingData.StBanksize;
+		cdvdman_stat.StreamingData.StStreamed += cdvdman_stat.StreamingData.StBanksize;
+		cdvdman_stat.StreamingData.StWritePtr += cdvdman_stat.StreamingData.StBanksize;
+		if(cdvdman_stat.StreamingData.StWritePtr >= cdvdman_stat.StreamingData.StBufmax) cdvdman_stat.StreamingData.StWritePtr = 0;
+		cdvdman_stat.StreamingData.StIsReading = 0;
+		CpuResumeIntr(OldState);
+	}
 
 	DPRINTF("StmCallback: %08lx, wr: %u, rd: %u, streamed: %u\n", cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StWritePtr, cdvdman_stat.StreamingData.StReadPtr, cdvdman_stat.StreamingData.StStreamed);
 

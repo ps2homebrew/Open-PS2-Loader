@@ -631,7 +631,7 @@ int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf)
 	if(!cdvdman_common_lock(IsIntrContext))
 	{
 		CpuResumeIntr(OldState);
-		DPRINTF("sceCdRead: exiting (sync_flag)...\n");
+		DPRINTF("cdvdman_AsyncRead: exiting (sync_flag)...\n");
 		return 0;
 	}
 
@@ -660,7 +660,7 @@ static int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf)
 	if(!cdvdman_common_lock(IsIntrContext))
 	{
 		CpuResumeIntr(OldState);
-		DPRINTF("sceCdRead: exiting (sync_flag)...\n");
+		DPRINTF("cdvdman_SyncRead: exiting (sync_flag)...\n");
 		return 0;
 	}
 

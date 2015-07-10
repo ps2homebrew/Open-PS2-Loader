@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev797 - Fixed and enhanced streaming support: - Sun Jun 28 18:18:52 2015 +0800
+rev796 - Consolidated error codes, added error codes for HDD mode, sync'ed with updates to HDD and PFS from PS2SDK, added workaround for clone/compatible network adaptors and corrected UV coordinates for texture-drawing. - Sat Jun 20 20:06:02 2015 +0800
 rev795 - Fixed NBNS support (unable to resolve NB names after first attempt), revised timeout clock value and adjusted code to prevent some other race-conditions from occuring, adjusted SMB support initialization code to always retry until the link mode can be set successfully, changed link mode setting and DHCP completion-checking intervals to 1 second (reduce strain on IOP), link mode will now be set once at initialization before the TCP/IP stack is initialized (avoid double-initializing the SMAP). Updated to support the new PS2SDK revision. - Tue Jun 16 21:50:14 2015 +0800
 rev794 - Fixed SMB intialization when built within VMC support, by moving the SMB initialization function into the "oplsmb" export table. - Sat May 30 13:02:35 2015 +0800
 rev793 - Moved SMB authentication code into a SMBINIT IOP module, so that SMB code can be modular and won't be part of the EE core itself. Fixed support for the USBLD format under SMB mode, renamed mode 5 to "Emulate DVD-DL", fixed filesystem selection within cdvdman_findfile() for mode 5, fixed NBNS support to check against the transaction ID as specified in the RFCs, changed the EE-side libnbns library into a normal C file for simplicity, and lowered the module storage region so that the occupied region will be as low as possible since SMB authentication code is now in an IOP module. - Thu Apr 16 21:59:05 2015 +0800

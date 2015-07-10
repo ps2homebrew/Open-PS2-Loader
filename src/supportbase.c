@@ -30,7 +30,7 @@ int sbIsSameSize(const char* prefix, int prevSize) {
 }
 
 //0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
-static int isValidIsoName(char *name, int *pSize)
+static int isValidIsoName(char *name, int *pNameLen)
 {
 	// Old ISO image naming format: SCUS_XXX.XX.ABCDEFGHIJKLMNOP.iso
 
@@ -38,11 +38,11 @@ static int isValidIsoName(char *name, int *pSize)
 	int size = strlen(name);
 	if(stricmp(&name[size - 4], ".iso") == 0)
 	{
-		if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.') && (size - 16 <= ISO_GAME_NAME_MAX)) {
-			*pSize = size - 16;
+		if ((size >= 17) && (name[4] == '_') && (name[8] == '.') && (name[11] == '.')) {
+			*pNameLen = size - 16;
 			return GAME_FORMAT_OLD_ISO;
 		}else if(size >= 5) {
-			*pSize = size - 4;
+			*pNameLen = size - 4;
 			return GAME_FORMAT_ISO;
 		}
 	}
@@ -59,36 +59,40 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
 	if((file = fopen(path, "r")) != NULL)
 	{
 		fseek(file, 0, SEEK_END);
-		size=ftell(file);
+		size = ftell(file);
 		rewind(file);
-		SystemCNF=malloc(size+1);
-		fread(SystemCNF, 1, size, file);
-		fclose(file);
-		SystemCNF[size]='\0';
-
-		NextLine=strtok(SystemCNF, "\n\r");
-		while((NextLine!=NULL) && (strncmp(NextLine, "BOOT2", 5)!=0))
+		if((SystemCNF = malloc(size + 1)) != NULL)
 		{
-			NextLine=strtok(NULL, "\n\r");
-		}
+			fread(SystemCNF, 1, size, file);
+			fclose(file);
+			SystemCNF[size]='\0';
 
-		free(SystemCNF);
-
-		if(NextLine!=NULL && strcmp(strtok(NextLine, " ="), "BOOT2")==0)
-		{
-			if((p = strtok(NULL, " =")) != NULL && strncmp(p, "cdrom0:\\", 8)==0)
+			NextLine = strtok(SystemCNF, "\n\r");
+			while((NextLine != NULL) && (strncmp(NextLine, "BOOT2", 5)!=0))
 			{
-				strncpy(filename, p+8, maxlength);	/* Skip the device name part of the path ("cdrom0:\"). */
-				filename[maxlength]='\0';
-				LOG("Startup EXEC path: %s\n", filename);
-				result = 0;
+				NextLine = strtok(NULL, "\n\r");
+			}
+
+			free(SystemCNF);
+
+			if(NextLine != NULL && strcmp(strtok(NextLine, " ="), "BOOT2") == 0)
+			{
+				if((p = strtok(NULL, " =")) != NULL && strncmp(p, "cdrom0:\\", 8)==0)
+				{
+					strncpy(filename, p+8, maxlength);	/* Skip the device name part of the path ("cdrom0:\"). */
+					filename[maxlength]='\0';
+					LOG("Startup EXEC path: %s\n", filename);
+					result = 0;
+				}else{
+					LOG("BOOT 2 errror: Unsupported boot device.\n");
+					result = -EINVAL;
+				}
 			}else{
-				LOG("BOOT 2 errror: Unsupported boot device.\n");
-				result=-EINVAL;
+				LOG("BOOT 2 line not found.\n");
+				result = -EINVAL;
 			}
 		}else{
-			LOG("BOOT 2 line not found.\n");
-			result = -EINVAL;
+			result = -ENOMEM;
 		}
 	}
 	else result = -ENOENT;
@@ -97,57 +101,77 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
 }
 
 static int scanForISO(char* path, char type, struct game_list_t** glist) {
-	int fd, size, count = 0, format, MountFD;
+	int fd, NameLen, count = 0, format, MountFD;
 	char fullpath[256], startup[GAME_STARTUP_MAX];
 	fio_dirent_t record;
 
 	if ((fd = fioDopen(path)) > 0) {
 		while (fioDread(fd, &record) > 0) {
-			if ((format = isValidIsoName(record.name, &size)) > 0) {
+			if ((format = isValidIsoName(record.name, &NameLen)) > 0) {
 				base_game_info_t *game;
+
+				if(NameLen > ISO_GAME_NAME_MAX) continue;	//Skip files that cannot be supported properly.
 
 				if(format == GAME_FORMAT_OLD_ISO)
 				{
 					struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
 
-					next->next = *glist;
-					*glist = next;
-
-					game = &(*glist)->gameinfo;
-
-					strncpy(game->name, &record.name[GAME_STARTUP_MAX], size);
-					game->name[size] = '\0';
-					strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
-					game->startup[GAME_STARTUP_MAX - 1] = '\0';
-					strncpy(game->extension, &record.name[GAME_STARTUP_MAX + size], sizeof(game->extension));
-					game->extension[sizeof(game->extension)-1] = '\0';
-
-				}else{
-					sprintf(fullpath, "%s/%s", path, record.name);
-					if((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0 && GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0)
+					if(next != NULL)
 					{
-						struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
-
 						next->next = *glist;
 						*glist = next;
 
 						game = &(*glist)->gameinfo;
 
-						strcpy(game->startup, startup);
+						strncpy(game->name, &record.name[GAME_STARTUP_MAX], NameLen);
+						game->name[NameLen] = '\0';
+						strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
+						game->startup[GAME_STARTUP_MAX - 1] = '\0';
+						strncpy(game->extension, &record.name[GAME_STARTUP_MAX + NameLen], sizeof(game->extension));
+						game->extension[sizeof(game->extension) - 1] = '\0';
+					}else{
+						//Out of memory.
+						break;
+					}
+				}else{
+					sprintf(fullpath, "%s/%s", path, record.name);
+					if((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0)
+					{
+						if(GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0)
+						{
+							struct game_list_t *next = (struct game_list_t*)malloc(sizeof(struct game_list_t));
 
-						strncpy(game->name, record.name, size);
-						game->name[size] = '\0';
+							if(next != NULL)
+							{
+								next->next = *glist;
+								*glist = next;
 
-						strncpy(game->extension, &record.name[size], sizeof(game->extension));
-						game->extension[sizeof(game->extension)-1] = '\0';
+								game = &(*glist)->gameinfo;
+
+								strcpy(game->startup, startup);
+								strncpy(game->name, record.name, NameLen);
+								game->name[NameLen] = '\0';
+								strncpy(game->extension, &record.name[NameLen], sizeof(game->extension));
+								game->extension[sizeof(game->extension) - 1] = '\0';
+							}else{
+								//Out of memory.
+								fileXioUmount("iso:");
+								break;
+							}
+						}else{
+							//Unable to parse SYSTEM.CNF.
+							fileXioUmount("iso:");
+							continue;
+						}
 
 						fileXioUmount("iso:");
 					}else{
+						//Unable to mount game.
 						continue;
 					}
 				}
 
-				game->parts = 0x01;
+				game->parts = 1;
 				game->media = type;
 				game->format = format;
 				game->sizeMB = (record.stat.size >> 20) | (record.stat.hisize << 12);
@@ -198,24 +222,24 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 		count += size / 0x040;
 
 		if (count > 0) {
-			*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
+			if((*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count)) != NULL) {
+				while (size > 0) {
+					fioRead(fd, buffer, 0x40);
 
-			while (size > 0) {
-				fioRead(fd, buffer, 0x40);
+					base_game_info_t *g = &(*list)[id++];
 
-				base_game_info_t *g = &(*list)[id++];
-
-				// to ensure no leaks happen, we copy manually and pad the strings
-				memcpy(g->name, buffer, UL_GAME_NAME_MAX);
-				g->name[UL_GAME_NAME_MAX] = '\0';
-				memcpy(g->startup, &buffer[UL_GAME_NAME_MAX + 3], GAME_STARTUP_MAX);
-				g->startup[GAME_STARTUP_MAX] = '\0';
-				g->extension[0] = '\0';
-				memcpy(&g->parts, &buffer[47], 1);
-				memcpy(&g->media, &buffer[48], 1);
-				g->format = GAME_FORMAT_USBLD;
-				g->sizeMB = -1;
-				size -= 0x40;
+					// to ensure no leaks happen, we copy manually and pad the strings
+					memcpy(g->name, buffer, UL_GAME_NAME_MAX);
+					g->name[UL_GAME_NAME_MAX] = '\0';
+					memcpy(g->startup, &buffer[UL_GAME_NAME_MAX + 3], GAME_STARTUP_MAX);
+					g->startup[GAME_STARTUP_MAX] = '\0';
+					g->extension[0] = '\0';
+					memcpy(&g->parts, &buffer[47], 1);
+					memcpy(&g->media, &buffer[48], 1);
+					g->format = GAME_FORMAT_USBLD;
+					g->sizeMB = -1;
+					size -= 0x40;
+				}
 			}
 		}
 		fioClose(fd);
@@ -224,15 +248,18 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 		*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);
 	}
 
-	// copy the dlist into the list
-	while ((id < count) && dlist_head) {
-		// copy one game, advance
-		struct game_list_t *cur = dlist_head;
-		dlist_head = dlist_head->next;
+	if(*list != NULL) {
+		// copy the dlist into the list
+		while ((id < count) && dlist_head) {
+			// copy one game, advance
+			struct game_list_t *cur = dlist_head;
+			dlist_head = dlist_head->next;
 
-		memcpy(&(*list)[id++], &cur->gameinfo, sizeof(base_game_info_t));
-		free(cur);
-	}
+			memcpy(&(*list)[id++], &cur->gameinfo, sizeof(base_game_info_t));
+			free(cur);
+		}
+	}else
+		count = 0;
 
 	if(count > 0) *gamecount = count;
 

@@ -122,9 +122,9 @@ static void appRenameItem(int id, char* newName) {
 
 static void appLaunchItem(int id, config_set_t* configSet) {
 	struct config_value_t* cur = appGetConfigValue(id);
-	int fd = fioOpen(cur->val, O_RDONLY);
+	int fd = fileXioOpen(cur->val, O_RDONLY, 0666);
 	if (fd >= 0) {
-		fioClose(fd);
+		fileXioClose(fd);
 
 		int exception = NO_EXCEPTION;
 		if (strncmp(cur->val, "pfs0:", 5) == 0)

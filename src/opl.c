@@ -466,9 +466,9 @@ static int tryAlternateDevice(int types) {
 	// check HDD
 	hddLoadModules();
 	sprintf(path, "pfs0:conf_opl.cfg");
-	value = fioOpen(path, O_RDONLY);
+	value = fileXioOpen(path, O_RDONLY, 0666);
 	if(value >= 0) {
-		fioClose(value);
+		fileXioClose(value);
 		configEnd();
 		configInit("pfs0:");
 		value = configReadMulti(types);
@@ -479,9 +479,9 @@ static int tryAlternateDevice(int types) {
 
 	if (sysCheckMC() < 0) { // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
 		// set config path to either mass or hdd, to prepare the saving of a new config
-		value = fioDopen("mass0:");
+		value = fileXioDopen("mass0:");
 		if (value >= 0) {
-			fioDclose(value);
+			fileXioDclose(value);
 			configEnd();
 			configInit("mass0:");
 		}

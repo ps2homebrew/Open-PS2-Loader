@@ -9,7 +9,7 @@
 #include <io_common.h>
 #include <string.h>
 #include <malloc.h>
-#include <fileio.h>
+#include <fileXio_rpc.h>
 #include <osd_config.h>
 
 extern void *icon_sys;
@@ -20,8 +20,8 @@ extern int size_icon_icn;
 static int mcID = -1;
 
 int getFileSize(int fd) {
-	int size = fioLseek(fd, 0, SEEK_END);
-	fioLseek(fd, 0, SEEK_SET);
+	int size = fileXioLseek(fd, 0, SEEK_END);
+	fileXioLseek(fd, 0, SEEK_SET);
 	return size;
 }
 
@@ -43,27 +43,27 @@ static void writeMCIcon() {
 
 static int checkMC() {
 	if (mcID == -1) {
-		int fd = fioDopen("mc0:OPL");
+		int fd = fileXioDopen("mc0:OPL");
 		if(fd < 0) {
-			fd = fioDopen("mc1:OPL");
+			fd = fileXioDopen("mc1:OPL");
 			if(fd < 0) {
 				// No base dir found on any MC, will create the folder
-				if (fioMkdir("mc0:OPL") >= 0) {
+				if (fileXioMkdir("mc0:OPL", 0777) >= 0) {
 					mcID = 0x30;
 					writeMCIcon();
 				}
-				else if (fioMkdir("mc1:OPL") >= 0) {
+				else if (fileXioMkdir("mc1:OPL", 0777) >= 0) {
 					mcID = 0x31;
 					writeMCIcon();
 				}
 			}
 			else {
-				fioDclose(fd);
+				fileXioDclose(fd);
 				mcID = 0x31;
 			}
 		}
 		else {
-			fioDclose(fd);
+			fileXioDclose(fd);
 			mcID = 0x30;
 		}
 	}
@@ -91,13 +91,13 @@ static int checkFile(char* path, int mode) {
 			if (pos) {
 				memcpy(dirPath, path, pos - path);
 				dirPath[pos - path] = '\0';
-				int fd = fioDopen(dirPath);
+				int fd = fileXioDopen(dirPath);
 				if (fd < 0) {
-					if (fioMkdir(dirPath) < 0)
+					if (fileXioMkdir(dirPath, 0777) < 0)
 						return 0;
 				}
 				else
-					fioDclose(fd);
+					fileXioDclose(fd);
 			}
 		}
 	}
@@ -106,7 +106,7 @@ static int checkFile(char* path, int mode) {
 
 int openFile(char* path, int mode) {
 	if (checkFile(path, mode))
-		return fioOpen(path, mode);
+		return fileXioOpen(path, mode, 0666);
 	else
 		return -1;
 }
@@ -120,7 +120,7 @@ void* readFile(char* path, int align, int* size) {
 
 		if ((*size > 0) && (*size != realSize)) {
 			LOG("UTIL Invalid filesize, expected: %d, got: %d\n", *size, realSize);
-			fioClose(fd);
+			fileXioClose(fd);
 			return NULL;
 		}
 
@@ -133,8 +133,8 @@ void* readFile(char* path, int align, int* size) {
 			LOG("UTIL ReadFile: Failed allocation of %d bytes", realSize);
 			*size = 0;
 		} else {
-			fioRead(fd, buffer, realSize);
-			fioClose(fd);
+			fileXioRead(fd, buffer, realSize);
+			fileXioClose(fd);
 			*size = realSize;
 		}
 	}
@@ -142,25 +142,21 @@ void* readFile(char* path, int align, int* size) {
 }
 
 void checkCreateDir(char* dirPath) {
-	int fd = fioDopen(dirPath);
-	if (fd < 0)
-		fioMkdir(dirPath);
-	else
-		fioDclose(fd);
+	fileXioMkdir(dirPath, 0777);
 }
 
 int listDir(char* path, const char* separator, int maxElem,
 		int (*readEntry)(int index, const char *path, const char* separator, const char* name, unsigned int mode)) {
 	int fdDir, index = 0;
 	if (checkFile(path, O_RDONLY)) {
-		fio_dirent_t record;
+		iox_dirent_t record;
 
-		fdDir = fioDopen(path);
+		fdDir = fileXioDopen(path);
 		if (fdDir > 0) {
-			while (index < maxElem && fioDread(fdDir, &record) > 0)
+			while (index < maxElem && fileXioDread(fdDir, &record) > 0)
 				index = readEntry(index, path, separator, record.name, record.stat.mode);
 
-			fioDclose(fdDir);
+			fileXioDclose(fdDir);
 		}
 	}
 	return index;
@@ -216,7 +212,7 @@ int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 				// Load as many characters necessary to fill the buffer
 				length = fileBuffer->size - lineSize - 1;
 				//LOG("##### Asking for %d characters to complete buffer\n", length);
-				read = fioRead(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
+				read = fileXioRead(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
 				fileBuffer->buffer[lineSize + read] = '\0';
 
 				// Search again (from the lastly added chars only), the result will be "analyzed" in next if
@@ -229,7 +225,7 @@ int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 				// If buffer not full it means we are at EOF
 				if (fileBuffer->size != lineSize + 1) {
 					//LOG("##### Reached EOF\n");
-					fioClose(fileBuffer->fd);
+					fileXioClose(fileBuffer->fd);
 					fileBuffer->fd = -1;
 				}
 			}
@@ -283,14 +279,14 @@ void writeFileBuffer(file_buffer_t* fileBuffer, char* inBuf, int size) {
 	//LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
 	if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
 		//LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
-		fioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+		fileXioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
 		fileBuffer->lastPtr = fileBuffer->buffer;
 		fileBuffer->available = 0;
 	}
 
 	if (size > fileBuffer->size) {
 		//LOG("writeFileBuffer direct write: %d\n", size);
-		fioWrite(fileBuffer->fd, inBuf, size);
+		fileXioWrite(fileBuffer->fd, inBuf, size);
 	}
 	else {
 		memcpy(fileBuffer->lastPtr, inBuf, size);
@@ -305,9 +301,9 @@ void closeFileBuffer(file_buffer_t* fileBuffer) {
 	if (fileBuffer->fd >= 0) {
 		if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
 			//LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
-			fioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+			fileXioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
 		}
-		fioClose(fileBuffer->fd);
+		fileXioClose(fileBuffer->fd);
 	}
 	free(fileBuffer->buffer);
 	free(fileBuffer);

@@ -23,7 +23,7 @@ int sbIsSameSize(const char* prefix, int prevSize) {
 	int fd = openFile(path, O_RDONLY);
 	if (fd >= 0) {
 		size = getFileSize(fd);
-		fioClose(fd);
+		fileXioClose(fd);
 	}
 
 	return size == prevSize;
@@ -68,7 +68,7 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
 			SystemCNF[size]='\0';
 
 			NextLine = strtok(SystemCNF, "\n\r");
-			while((NextLine != NULL) && (strncmp(NextLine, "BOOT2", 5)!=0))
+			while((NextLine != NULL) && (strncmp(NextLine, "BOOT2", 5) != 0))
 			{
 				NextLine = strtok(NULL, "\n\r");
 			}
@@ -103,10 +103,10 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
 static int scanForISO(char* path, char type, struct game_list_t** glist) {
 	int fd, NameLen, count = 0, format, MountFD;
 	char fullpath[256], startup[GAME_STARTUP_MAX];
-	fio_dirent_t record;
+	iox_dirent_t record;
 
-	if ((fd = fioDopen(path)) > 0) {
-		while (fioDread(fd, &record) > 0) {
+	if ((fd = fileXioDopen(path)) > 0) {
+		while (fileXioDread(fd, &record) > 0) {
 			if ((format = isValidIsoName(record.name, &NameLen)) > 0) {
 				base_game_info_t *game;
 
@@ -179,7 +179,7 @@ static int scanForISO(char* path, char type, struct game_list_t** glist) {
 				count++;
 			}
 		}
-		fioDclose(fd);
+		fileXioDclose(fd);
 	}else{
 		count = fd;
 	}
@@ -224,7 +224,7 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 		if (count > 0) {
 			if((*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count)) != NULL) {
 				while (size > 0) {
-					fioRead(fd, buffer, 0x40);
+					fileXioRead(fd, buffer, 0x40);
 
 					base_game_info_t *g = &(*list)[id++];
 
@@ -242,7 +242,7 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 				}
 			}
 		}
-		fioClose(fd);
+		fileXioClose(fd);
 	}
 	else if (count > 0){
 		*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count);

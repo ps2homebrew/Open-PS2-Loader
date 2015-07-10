@@ -344,11 +344,11 @@ static int ethNeedsUpdate(void) {
 		return 1;
 
 	if (gNetworkStartup == 0) {
-		fio_stat_t stat;
+		iox_stat_t stat;
 		char path[256];
 
 		sprintf(path, "%sCD", ethPrefix);
-		if (fioGetstat(path, &stat) != 0)
+		if (fileXioGetStat(path, &stat) != 0)
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedCDPrev, stat.mtime, 8);
@@ -356,7 +356,7 @@ static int ethNeedsUpdate(void) {
 		}
 
 		sprintf(path, "%sDVD", ethPrefix);
-		if (fioGetstat(path, &stat) != 0)
+		if (fileXioGetStat(path, &stat) != 0)
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedDVDPrev, stat.mtime, 8);

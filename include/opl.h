@@ -4,7 +4,6 @@
 #include <tamtypes.h>
 #include <kernel.h>
 #include <sifrpc.h>
-#include <fileio.h>
 #include <iopcontrol.h>
 #include <iopheap.h>
 #include <string.h>

@@ -55,14 +55,14 @@ int usbFindPartition(char *target, char *name) {
 			sprintf(path, "mass%d:%s/%s", i, gUSBPrefix, name);
 		else
 			sprintf(path, "mass%d:%s", i, name);
-		fd = fioOpen(path, O_RDONLY);
+		fd = fileXioOpen(path, O_RDONLY, 0666);
 
 		if(fd >= 0) {
 			if (gUSBPrefix[0] != '\0')
 				sprintf(target, "mass%d:%s/", i, gUSBPrefix);
 			else
 				sprintf(target, "mass%d:", i);
-			fioClose(fd);
+			fileXioClose(fd);
 			return 1;
 		}
 	}
@@ -128,7 +128,7 @@ static int usbNeedsUpdate(void) {
 	static unsigned int OldGeneration = 0;
 	static unsigned char ThemesLoaded = 0;
 	int result = 0;
-	fio_stat_t stat;
+	iox_stat_t stat;
 
 	if(OldGeneration == UsbGeneration) return 0;
 	OldGeneration = UsbGeneration;
@@ -136,7 +136,7 @@ static int usbNeedsUpdate(void) {
 	usbFindPartition(usbPrefix, "ul.cfg");
 
 	sprintf(path, "%sCD", usbPrefix);
-	if (fioGetstat(path, &stat) != 0)
+	if (fileXioGetStat(path, &stat) != 0)
 		memset(stat.mtime, 0, 8);
 	if (memcmp(usbModifiedCDPrev, stat.mtime, 8)) {
 		memcpy(usbModifiedCDPrev, stat.mtime, 8);
@@ -144,7 +144,7 @@ static int usbNeedsUpdate(void) {
 	}
 
 	sprintf(path, "%sDVD", usbPrefix);
-	if (fioGetstat(path, &stat) != 0)
+	if (fileXioGetStat(path, &stat) != 0)
 		memset(stat.mtime, 0, 8);
 	if (memcmp(usbModifiedDVDPrev, stat.mtime, 8)) {
 		memcpy(usbModifiedDVDPrev, stat.mtime, 8);
@@ -225,7 +225,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	u32 layer1_start, layer1_offset;
 	unsigned short int layer1_part;
 
-	fd = fioDopen(usbPrefix);
+	fd = fileXioDopen(usbPrefix);
 	if (fd < 0) {
 		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 		return;
@@ -251,9 +251,9 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 				// Check vmc cluster chain (write operation can cause dammage)
 				sprintf(vmc_path, "%s/VMC/%s.bin", gUSBPrefix, vmc_name);
-				if (fioIoctl(fd, 0xCAFEC0DE, vmc_path)) {
+				if (fileXioIoctl(fd, 0xCAFEC0DE, vmc_path)) {
 					LOG("USBSUPPORT Cluster Chain OK\n");
-					if ((i = fioIoctl(fd, 0xBEEFC0DE, vmc_path)) != 0) {
+					if ((i = fileXioIoctl(fd, 0xBEEFC0DE, vmc_path)) != 0) {
 						have_error = 0;
 						usb_vmc_infos.active = 1;
 						usb_vmc_infos.start_sector = i;
@@ -267,7 +267,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			char error[256];
 			snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
 			if (!guiMsgBox(error, 1, NULL)) {
-				fioDclose(fd);
+				fileXioDclose(fd);
 				return;
 			}
 		}
@@ -298,15 +298,15 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		}
 
 		if (gCheckUSBFragmentation) {
-			if (fioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
-				fioDclose(fd);
+			if (fileXioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
+				fileXioDclose(fd);
 				guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
 				return;
 			}
 		}
 
 		if (i == 0) {
-			val = fioIoctl(fd, 0xDEADC0DE, partname);
+			val = fileXioIoctl(fd, 0xDEADC0DE, partname);
 			LOG("USBSUPPORT Mass storage device sector size = %d\n", val);
 			if (val == 4096) {
 				irx = &usb_4Ksectors_cdvdman_irx;
@@ -316,7 +316,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			settings = (struct cdvdman_settings_usb*)((u8*)irx+index);
 		}
 
-		settings->LBAs[i] = fioIoctl(fd, 0xBEEFC0DE, partname);
+		settings->LBAs[i] = fileXioIoctl(fd, 0xBEEFC0DE, partname);
 	}
 
 	//Initialize layer 1 information.
@@ -378,7 +378,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		saveConfig(CONFIG_LAST, 0);
 	}
 
-	fioDclose(fd);
+	fileXioDclose(fd);
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))

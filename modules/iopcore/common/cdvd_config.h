@@ -12,6 +12,7 @@ struct cdvdman_settings_common{
 	u8 media;
 	u16 flags;
 	u32 cb_timer;
+	u32 layer1_start;
 	u8 DiscID[5];
 	u8 padding[3];
 };
@@ -23,7 +24,6 @@ struct cdvdman_settings_hdd{
 
 struct cdvdman_settings_smb{
 	struct cdvdman_settings_common common;
-	u32 layer1_start;
 	s8 filename[80];
 	union{
 		struct{
@@ -40,6 +40,5 @@ struct cdvdman_settings_smb{
 
 struct cdvdman_settings_usb{
 	struct cdvdman_settings_common common;
-	u32 layer1_start;
 	u32 LBAs[ISO_MAX_PARTS];
 };

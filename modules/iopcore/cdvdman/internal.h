@@ -1,3 +1,11 @@
+#ifdef __IOPCORE_DEBUG
+#define DPRINTF(args...) printf(args)
+#define iDPRINTF(args...) Kprintf(args)
+#else
+#define DPRINTF(args...)
+#define iDPRINTF(args...)
+#endif
+
 struct SteamingData{
 	unsigned short int StBufmax;
 	unsigned short int StBankmax;

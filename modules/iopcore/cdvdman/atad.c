@@ -48,7 +48,7 @@ extern int netlog_inited;
 #define BANNER "ATA device driver %s - Copyright (c) 2003 Marcus R. Brown\n"
 #define VERSION "v1.2"
 
-extern int lba_48bit;
+extern char lba_48bit;
 
 static int ata_evflg = -1;
 

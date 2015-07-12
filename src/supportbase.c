@@ -329,6 +329,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
+		0x00000000,
 		"B00BS"
 	};
 	struct cdvdman_settings_common *settings;

@@ -1,33 +1,44 @@
 .SILENT:
 
-# SP193:
-# For debugging with DECI2 (EE only), enable DEBUG, INGAME_DEBUG and DECI2_DEBUG.
-#
-# Doctorxyz:
-# How do I debug?
-# I enable DEBUG and INGAME_DEBUG, turn on SCPH-70012 with FMCB autobooting into ps2link 1.52
-# (high load + screenshot capable version), with a USB Device inserted on console
-# with OPL games inside PS2SMB root folder, and call OPL from PC via ETH with following command line:
-# ps2client -h 192.168.1.10 execee host:opl.elf -use-early-debug
-# (this approach allows me to see the useful OPL's LOG messages)
-#
+# How to DEBUG?
+# Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
+# Debug modes:
+#	debug		-	UI-side debug mode (UDPTTY)
+#	iopcore_debug	-	UI-side + iopcore debug mode (UDPTTY).
+#	ingame_debug	-	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
+#	eesio_debug	-	UI-side + eecore debug mode (EE SIO)
+#	deci2_debug	-	UI-side + in-game DECI2 debug mode (EE-side only).
+
+# I want to build a CHILDPROOF edition! How do I do that?
+# Type "make childproof" to build one.
+# Non-childproof features like GSM will not be available.
+
+# ======== START OF CONFIGURABLE SECTION ========
+# You can adjust the variables in this section to meet your needs.
+# To enable a feature, set its variable's value to 1. To disable, change it to 0.
+# Do not COMMENT out the variables!!
+
+#Enables/disables Virtual Memory Card (VMC) support
+VMC = 0
+
+#Enables/disables Right-To-Left (RTL) language support
+RTL = 0
+
+#Enables/disables Graphics Synthesizer Mode (GSM) selector
+GSM = 0
+
+#Enables/disables the cheat engine (PS2RD)
+CHEAT = 0
+
+#Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
+DTL_T10000 = 0
+
+# ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
 DEBUG = 0
 EESIO_DEBUG = 0
 INGAME_DEBUG = 0
 DECI2_DEBUG = 0
-DTL_T10000 = 0
-
-#change following line to "0" to build without VMC - DO NOT COMMENT!
-VMC = 0
-
 CHILDPROOF = 0
-RTL = 0
-
-#change following line to "0" to build without GSM - DO NOT COMMENT!
-GSM = 0
-
-#change following line to "0" to build without PS2RD Cheat Engine - DO NOT COMMENT!
-CHEAT = 0
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
@@ -169,9 +180,6 @@ ifeq ($(DEBUG),0)
 	echo "Compressing..."
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
 endif
-
-childproof:
-	$(MAKE) CHILDPROOF=1 all
 	
 debug:
 	$(MAKE) DEBUG=1 all
@@ -198,13 +206,10 @@ sclean:
 	$(MAKE) -C ee_core clean
 	echo "    * Elf Loader"
 	$(MAKE) -C elfldr clean
-ifeq ($(DTL_T10000),1)
 	echo "    * udnl-t300.irx"
 	$(MAKE) -C modules/iopcore/udnl-t300 clean
-else
 	echo "    * udnl.irx"
 	$(MAKE) -C modules/iopcore/udnl clean
-endif
 	echo "    * imgdrv.irx"
 	$(MAKE) -C modules/iopcore/imgdrv clean
 	echo "    * eesync.irx"
@@ -243,17 +248,14 @@ endif
 	$(MAKE) -C modules/hdd/ps2hdd clean
 	echo "    * ps2fs.irx"
 	$(MAKE) -C modules/hdd/ps2fs clean
-ifeq ($(VMC),1)
 	echo "    * mcemu.irx"
 	$(MAKE) -C modules/mcemu -f Makefile.usb clean
 	$(MAKE) -C modules/mcemu -f Makefile.hdd clean
 	$(MAKE) -C modules/mcemu -f Makefile.smb clean
-endif
 	echo "    * genvmc.irx"
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo "    * hdldsvr.irx"
 	$(MAKE) -C modules/hdd/hdldsvr clean
-ifeq ($(DEBUG),1)
 	echo "    * udptty.irx"
 	$(MAKE) -C modules/debug/udptty clean
 	echo "    * udptty-ingame.irx"
@@ -262,7 +264,6 @@ ifeq ($(DEBUG),1)
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo "    * ps2link.irx"
 	$(MAKE) -C modules/debug/ps2link clean
-endif
 	echo "    * pc tools"
 	$(MAKE) -C pc clean
 

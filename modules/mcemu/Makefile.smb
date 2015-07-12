@@ -9,7 +9,7 @@
 # $Id: Makefile 1 2007-05-08 16:56:27Z polo $
 
 IOP_BIN  = mcemu.irx
-IOP_OBJS = mcemu.o mcemu_io.o mcemu_sys.o mcemu_var.o mcemu_rpc.o imports.o
+IOP_OBJS = mcemu.o mcemu_io.o mcemu_sys.o mcemu_var.o mcemu_rpc.o device-smb.o imports.o
 
 ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -DDEBUG

@@ -179,32 +179,6 @@ void CalculateECC(u8 *buf, void *chk)
 //------------------------------
 //endfunc 
 //---------------------------------------------------------------------------
-#ifdef HDD_DRIVER
-/* Return ata sector corresponding to page number in vmc file */
-u32 Mcpage_to_Apasector(int mc_num, u32 mc_page)
-{
-	register int i;
-	register u32 sector_to_read, lbound, ubound;
-	
-	lbound         = 0;
-	ubound         = 0;
-	sector_to_read = 0;
-
-	for(i = 0; i < 10; i++)
-	{
-		lbound=ubound;
-		ubound+=vmcSpec[mc_num].blocks[i].count;
-
-		if((mc_page >= (lbound << 4)) && (mc_page < (ubound << 4)))
-			sector_to_read = vmcSpec[mc_num].parts[vmcSpec[mc_num].blocks[i].subpart].start + (vmcSpec[mc_num].blocks[i].number << 4) + (mc_page - (lbound << 4));
-	}
-	
-	return sector_to_read;
-}
-//------------------------------
-//endfunc 
-//---------------------------------------------------------------------------
-#endif
 //---------------------------------------------------------------------------
 // End of file: mcsiosys.c
 //---------------------------------------------------------------------------

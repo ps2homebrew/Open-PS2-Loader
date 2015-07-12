@@ -69,7 +69,7 @@
 static int ata_evflg = -1;
 
 /* Used for indicating 48-bit LBA support.  */
-extern int lba_48bit;
+extern char lba_48bit;
 
 #ifdef VMC_DRIVER
 #include <thsemap.h>

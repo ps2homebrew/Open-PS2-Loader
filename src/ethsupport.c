@@ -340,8 +340,12 @@ item_list_t* ethGetObject(int initOnly) {
 }
 
 static int ethNeedsUpdate(void) {
+	int result;
+
+	result = 0;
+
 	if (ethULSizePrev == -2)
-		return 1;
+		result = 1;
 
 	if (gNetworkStartup == 0) {
 		iox_stat_t stat;
@@ -352,7 +356,7 @@ static int ethNeedsUpdate(void) {
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedCDPrev, stat.mtime, 8);
-			return 1;
+			result = 1;
 		}
 
 		sprintf(path, "%sDVD", ethPrefix);
@@ -360,14 +364,14 @@ static int ethNeedsUpdate(void) {
 			memset(stat.mtime, 0, 8);
 		if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
 			memcpy(ethModifiedDVDPrev, stat.mtime, 8);
-			return 1;
+			result = 1;
 		}
 
 		if (!sbIsSameSize(ethPrefix, ethULSizePrev))
-			return 1;
+			result = 1;
 	}
 
-	return 0;
+	return result;
 }
 
 static int ethUpdateGameList(void) {
@@ -581,7 +585,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 		layer1_start -= 16;
 		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset);
 	}
-	settings->layer1_start = layer1_start;
+	settings->common.layer1_start = layer1_start;
 
 	// disconnect from the active SMB session
 	ethSMBDisconnect();

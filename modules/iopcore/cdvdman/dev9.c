@@ -29,7 +29,7 @@
 #include "ioman_add.h"
 
 #ifdef HDD_DRIVER
-extern int atad_inited;
+extern char atad_inited;
 #endif
 
 #ifdef DEV9_DEBUG

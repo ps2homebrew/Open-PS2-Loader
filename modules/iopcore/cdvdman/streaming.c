@@ -13,14 +13,6 @@
 #include <intrman.h>
 #include <errno.h>
 
-#ifdef __IOPCORE_DEBUG
-#define DPRINTF(args...) printf(args)
-#define iDPRINTF(args...) Kprintf(args)
-#else
-#define DPRINTF(args...)
-#define iDPRINTF(args...)
-#endif
-
 extern cdvdman_status_t cdvdman_stat;
 
 static int AllocBank(void **pointer);

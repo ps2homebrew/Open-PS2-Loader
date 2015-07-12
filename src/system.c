@@ -588,7 +588,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
 	ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
+#ifndef __DEBUG
 	AddHistoryRecordUsingFullPath(filename);
+#endif
 
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", sizeof(gExitPath));

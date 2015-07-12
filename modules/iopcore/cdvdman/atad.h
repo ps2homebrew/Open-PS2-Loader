@@ -57,6 +57,14 @@ typedef struct {
 	u16	year;
 } ps2time;
 
+typedef struct {
+	u32 part_offset; 	// in MB
+	u32 data_start; 	// in sectors
+	u32 part_size; 		// in KB
+} hdl_partspecs_t;
+
+#define HDL_NUM_PART_SPECS	65
+
 typedef struct				// size = 1024
 {
 	u32	checksum;		// HDL uses 0xdeadfeed magic here
@@ -68,11 +76,7 @@ typedef struct				// size = 1024
 	u32	layer1_start;
 	u32	discType;
 	int	num_partitions;
-	struct {
-		u32	part_offset;	// in MB
-		u32	data_start;	// in sectors
-		u32	part_size;	// in KB
-	} part_specs[65];
+	hdl_partspecs_t part_specs[HDL_NUM_PART_SPECS];
 } hdl_apa_header;
 
 #endif /* IOP_ATAD_H */

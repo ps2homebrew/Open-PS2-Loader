@@ -8,16 +8,14 @@
 #include "mass_common.h"
 #include "mass_stor.h"
 #include "dev9.h"
-#ifdef SMB_DRIVER
 #include "oplsmb.h"
 #include "smb.h"
-#include "smstcpip.h"
-#endif
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"
 #include "internal.h"
 #include "cdvd_config.h"
+#include "device.h"
 
 #include <loadcore.h>
 #include <stdio.h>
@@ -33,12 +31,10 @@
 #include <usbd.h>
 #include "ioman_add.h"
 
-#ifdef __IOPCORE_DEBUG
-#define DPRINTF(args...)	printf(args)
-#else
-#define DPRINTF(args...)	do { } while(0)
-#endif
-
+/*	Some modules (e.g. SMAP) will check for dev9 and its version number.
+	In the interest of maintaining network support of games in HDD mode,
+	the module ID of CDVDMAN is changed to DEV9.
+	SMB mode will never support network support in games, as the SMAP interface cannot be shared.	*/
 #ifdef HDD_DRIVER
 #define MODNAME "dev9"
 IRX_ID(MODNAME, 2, 8);
@@ -49,11 +45,12 @@ IRX_ID(MODNAME, 1, 1);
 
 //------------------ Patch Zone ----------------------
 #ifdef HDD_DRIVER
-static struct cdvdman_settings_hdd cdvdman_settings={
+struct cdvdman_settings_hdd cdvdman_settings={
 	{
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
+		0x00000000,
 		"B00BS"
 	},
 	0x12345678
@@ -64,9 +61,9 @@ struct cdvdman_settings_smb cdvdman_settings={
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
+		0x00000000,
 		"B00BS"
 	},
-	0x00000000,
 	"######  FILENAME  ######",
 	{
 		{
@@ -85,9 +82,9 @@ struct cdvdman_settings_usb cdvdman_settings={
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
+		0x00000000,
 		"B00BS"
 	},
-	0x00000000,
 	{1,2,3,4,5,6,7,8,9,10}
 };
 #else
@@ -97,19 +94,6 @@ struct cdvdman_settings_usb cdvdman_settings={
 //----------------------------------------------------
 struct irx_export_table _exp_cdvdman;
 struct irx_export_table _exp_cdvdstm;
-#ifdef SMB_DRIVER
-struct irx_export_table _exp_dev9;
-struct irx_export_table _exp_oplsmb;
-#endif
-#ifdef HDD_DRIVER
-struct irx_export_table _exp_dev9;
-struct irx_export_table _exp_atad;
-#endif
-#ifdef USB_DRIVER
-#ifdef __USE_DEV9
-struct irx_export_table _exp_dev9;
-#endif
-#endif
 struct irx_export_table _exp_smsutils;
 #ifdef VMC_DRIVER
 struct irx_export_table _exp_oplutils;
@@ -137,12 +121,6 @@ typedef struct {
 } FHANDLE;
 
 // internal functions prototypes
-#ifdef USB_DRIVER
-static void usbd_init(void);
-#endif
-#ifdef SMB_DRIVER
-static void ps2ip_init(void);
-#endif
 static void fs_init(void);
 static void cdvdman_init(void);
 static int cdvdman_readMechaconVersion(char *mname, u32 *stat);
@@ -159,33 +137,6 @@ static void cdvdman_startThreads(void);
 static void cdvdman_create_semaphores(void);
 static void cdvdman_initdev(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
-#ifdef HDD_DRIVER
-static void cdvdman_get_part_specs(u32 lsn);
-#else
-static int cdvdman_DevReadSect(u32 lsn, u32 nsectors, void *buf);
-#endif
-
-#ifdef USB_DRIVER
-// !!! usbd exports functions pointers !!!
-int (*pUsbRegisterDriver)(UsbDriver *driver); 								// #4
-void *(*pUsbGetDeviceStaticDescriptor)(int devId, void *data, u8 type); 				// #6
-int (*pUsbSetDevicePrivateData)(int devId, void *data); 						// #7
-int (*pUsbOpenEndpoint)(int devId, UsbEndpointDescriptor *desc); 					// #9
-int (*pUsbCloseEndpoint)(int id); 									// #10
-int (*pUsbTransfer)(int id, void *data, u32 len, void *option, UsbCallbackProc callback, void *cbArg); 	// #11
-int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc); 				// #12
-#endif
-
-#ifdef SMB_DRIVER
-// !!! ps2ip exports functions pointers !!!
-// Note: recvfrom() used here is not a standard recvfrom() function.
-int (*plwip_close)(int s); 										// #6
-int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen); 					// #7
-int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);	// #10
-int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags); 					// #11
-int (*plwip_socket)(int domain, int type, int protocol); 						// #13
-u32 (*pinet_addr)(const char *cp); 									// #24
-#endif
 
 // for "cdrom" ioctl2
 #define CIOCSTREAMPAUSE		0x630D
@@ -259,7 +210,6 @@ typedef struct {
 
 static layer_info_t layer_info[2];
 
-static int cdvdman_cdinited = 0;
 cdvdman_status_t cdvdman_stat;
 static void *user_cb;
 
@@ -267,9 +217,7 @@ static int cdrom_io_sema;
 static int cdrom_rthread_sema;
 static int cdvdman_scmdsema;
 static int cdvdman_searchfilesema;
-
 static int cdvdman_ReadingThreadID;
-static int sync_flag;
 
 static StmCallback_t Stm0Callback = NULL;
 
@@ -280,74 +228,18 @@ static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS*2048];
 #define CDVDMAN_FS_BUFSIZE	CDVDMAN_FS_SECTORS * 2048
 static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE + 2*2048];
 
-static int fs_inited = 0;
-
-#ifdef HDD_DRIVER
-int lba_48bit = 0;
-int atad_inited = 0;
-static hdl_apa_header apaHeader;
-
-typedef struct {
-	u32 part_offset; 	// in MB
-	u32 data_start; 	// in sectors
-	u32 part_size; 		// in KB
-} cdvdman_partspecs_t;
-
-static cdvdman_partspecs_t cdvdman_partspecs;
-#endif
-
 #define CDVDMAN_MODULE_VERSION 0x225
 static int cdvdman_debug_print_flag = 0;
 
-static int cdvdman_media_changed = 1;
-
-static int cdvdman_cur_disc_type = 0;	/* real current disc type */
+static unsigned char fs_inited = 0;
+static unsigned char cdvdman_media_changed = 1;
+static unsigned char sync_flag;
+static unsigned char cdvdman_cdinited = 0;
 unsigned int ReadPos = 0;		/* Current buffer offset in 2048-byte sectors. */
 
 static iop_sys_clock_t gCdvdCallback_SysClock;
 #if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
 static int POFFThreadID;
-#endif
-
-//--------------------------------------------------------------
-#ifdef USB_DRIVER
-static void usbd_init(void)
-{
-	modinfo_t info;
-	getModInfo("usbd\0\0\0\0", &info);
-
-	// Set functions pointers here
-	pUsbRegisterDriver = info.exports[4];
-	pUsbGetDeviceStaticDescriptor = info.exports[6];
-	pUsbSetDevicePrivateData = info.exports[7];
-	pUsbOpenEndpoint = info.exports[9];
-	pUsbCloseEndpoint = info.exports[10];
-	pUsbTransfer = info.exports[11];
-	pUsbOpenEndpointAligned = info.exports[12];
-}
-#endif
-#ifdef SMB_DRIVER
-static u32 ServerCapabilities;
-
-static void ps2ip_init(void)
-{
-	modinfo_t info;
-	getModInfo("ps2ip\0\0\0", &info);
-
-	// Set functions pointers here
-	plwip_close = info.exports[6];
-	plwip_connect = info.exports[7];
-	plwip_recvfrom = info.exports[10];
-	plwip_send = info.exports[11];
-	plwip_socket = info.exports[13];
-	pinet_addr = info.exports[24];
-}
-
-void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback)
-{
-	ps2ip_init();
-	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &ServerCapabilities, hash_callback);
-}
 #endif
 
 //--------------------------------------------------------------
@@ -358,62 +250,7 @@ static void fs_init(void)
 
 	DPRINTF("fs_init\n");
 
-#ifdef USB_DRIVER
-	// initialize usbd exports
-	usbd_init();
-
-	// initialize the mass driver
-	mass_stor_init();
-
-	// configure mass device
-	while (mass_stor_configureDevice() <= 0) DelayThread(200);
-#endif
-
-#ifdef SMB_DRIVER
-	int i = 0;
-	char tmp_str[256];
-
-	// open a session
-	smb_SessionSetupAndX(ServerCapabilities);
-
-	// Then tree connect on the share resource
-	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.pc_ip, cdvdman_settings.pc_share);
-	smb_TreeConnectAndX(tmp_str);
-
-	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
-		if (cdvdman_settings.pc_prefix[0]) {
-			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
-		} else {
-			sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
-		}
-
-		smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
-	} else {
-		// Open all parts files
-		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
-			if (cdvdman_settings.pc_prefix[0])
-				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.filename, i);
-			else
-				sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
-
-			smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
-		}
-	}
-#endif
-
-#ifdef HDD_DRIVER
-	DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
-
-	int r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ);
-	if (r != 0)
-		DPRINTF("fs_init: failed to read apa header %d\n", r);
-
-	// checking HDL's deadfeed magic
-	if (apaHeader.checksum != 0xdeadfeed)
-		DPRINTF("fs_init: failed to find deadfeed magic\n");
-
-	mips_memcpy(&cdvdman_partspecs, &apaHeader.part_specs[0], sizeof(cdvdman_partspecs));
-#endif
+	DeviceFSInit();
 
 	mips_memset(&cdvdman_fdhandles[0], 0, MAX_FDHANDLES * sizeof(FHANDLE));
 
@@ -500,56 +337,51 @@ int sceCdStandby(void)
 }
 
 //-------------------------------------------------------------------------
-#ifdef HDD_DRIVER
 static unsigned int cdvdemu_read_end_cb(void *arg){
 	iSetEventFlag(cdvdman_stat.intr_ef, 0x1000);
 	return 0;
 }
-#endif
 
-static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *buf){
-	DPRINTF("cdvdman_read lsn=%d sectors=%d buf=%08x\n", (int)lsn, (int)sectors, (int)buf);
+static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
+{
+	unsigned int SectorsToRead, remaining;
+	void *ptr;
+
+	DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
 	cdvdman_stat.err = CDVD_ERR_NO;
 
-	#ifdef HDD_DRIVER
-	u32 offset = 0;
-	while (sectors) {
-		if (!((lsn >= cdvdman_partspecs.part_offset) && (lsn < (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)))))
-			cdvdman_get_part_specs(lsn);
-
+	for (ptr = buf,remaining = sectors; remaining > 0; ) {
 		if (cdvdman_stat.err != CDVD_ERR_NO)
 			break;
 
-		u32 nsectors = (cdvdman_partspecs.part_offset + (cdvdman_partspecs.part_size >> 11)) - lsn;
-		if (sectors < nsectors)
-			nsectors = sectors;
+		SectorsToRead = remaining;
 
-		if (cdvdman_settings.common.flags&IOPCORE_COMPAT_ACCU_READS)
+		if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS)
 		{
 			//Limit transfers to a maximum length of 8, with a restricted transfer rate.
 			iop_sys_clock_t TargetTime;
 
-			if (nsectors > 8)
-				nsectors = 8;
+			if (SectorsToRead > 8)
+				SectorsToRead = 8;
 
 			TargetTime.hi = 0;
-			TargetTime.lo = 21600 * nsectors; // approximately 666us required per sector at 3000KB/s, so 36*600 ticks per sector with a 36MHz clock.
+			TargetTime.lo = 21600 * SectorsToRead; // approximately 666us required per sector at 3000KB/s, so 36*600 ticks per sector with a 36MHz clock.
 			ClearEventFlag(cdvdman_stat.intr_ef, ~0x1000);
 			SetAlarm(&TargetTime, &cdvdemu_read_end_cb, NULL);
 		}
 
-		u32 lba = cdvdman_partspecs.data_start + ((lsn - cdvdman_partspecs.part_offset) << 2);	
-		if (ata_device_sector_io(0, (void *)(buf + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
+		if (DeviceReadSectors(lsn, ptr, SectorsToRead) != 0)
+		{
 			cdvdman_stat.err = CDVD_ERR_READ;
 			if (cdvdman_settings.common.flags&IOPCORE_COMPAT_ACCU_READS)
 				CancelAlarm(&cdvdemu_read_end_cb, NULL);
 			break;
 		}
-		offset += nsectors << 11;
-		sectors -= nsectors;
-		lsn += nsectors;
-		ReadPos += nsectors << 11;
+		ptr += SectorsToRead << 11;
+		remaining -= SectorsToRead;
+		lsn += SectorsToRead;
+		ReadPos += SectorsToRead << 11;
 
 		if (cdvdman_settings.common.flags&IOPCORE_COMPAT_ACCU_READS)
 		{
@@ -558,11 +390,7 @@ static int cdvdman_read_sectors(unsigned int lsn, unsigned int sectors, void *bu
 		}
 	}
 
-	#else
-	cdvdman_DevReadSect(lsn, sectors, buf);
-	#endif
-
-	return(cdvdman_stat.err==CDVD_ERR_NO?0:1);
+	return(cdvdman_stat.err == CDVD_ERR_NO ? 0 : 1);
 }
 
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
@@ -570,6 +398,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 	cdvdman_stat.status = CDVD_STAT_READ;
 
 	if ((u32)(buf) & 3) {
+		//For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
 		WaitSema(cdvdman_searchfilesema);
 
 		u32 nsectors, nbytes;
@@ -752,15 +581,8 @@ static void cdvdman_initDiskType(void)
 {
 	cdvdman_stat.err = CDVD_ERR_NO;
 
-#ifdef HDD_DRIVER
-	fs_init();
-
-	cdvdman_cur_disc_type = (int)apaHeader.discType;
-#else
-	cdvdman_cur_disc_type = (int)cdvdman_settings.common.media;
-#endif
-	cdvdman_stat.disc_type_reg = cdvdman_cur_disc_type;
-        DPRINTF("DiskType=0x%x\n", cdvdman_cur_disc_type);
+	cdvdman_stat.disc_type_reg = (int)cdvdman_settings.common.media;
+        DPRINTF("DiskType=0x%x\n", cdvdman_settings.common.media);
 }
 
 //-------------------------------------------------------------------------
@@ -817,7 +639,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 
                 cdvdman_stat.status = CDVD_STAT_PAUSE; /* not sure if the status is right, may be - CDVD_STAT_SPIN */
                 cdvdman_stat.err = CDVD_ERR_NO; /* not sure if this error code is suitable here */
-                cdvdman_stat.disc_type_reg = cdvdman_cur_disc_type;
+                cdvdman_stat.disc_type_reg = (int)cdvdman_settings.common.media;
 
                 cdvdman_media_changed = 1;
 
@@ -1028,50 +850,6 @@ int sceCdRC(cd_clock_t *rtc)
 }
 
 //-------------------------------------------------------------------------
-#ifndef HDD_DRIVER
-static int cdvdman_DevReadSect(u32 lsn, u32 nsectors, void *buf)
-{
-	register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
-	register int i, esc_flag = 0;
-	u8 *p = (u8 *)buf;
-
-	lbound = 0;
-	ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
-	offslsn = lsn;
-	r = nlsn = 0;
-	sectors_to_read = nsectors;
-
-	for (i=0; i<cdvdman_settings.common.NumParts; i++, lbound=ubound, ubound+=0x80000, offslsn-=0x80000) {
-
-		if (lsn>=lbound && lsn<ubound){
-			if ((lsn + nsectors) > (ubound-1)) {
-				sectors_to_read = ubound - lsn;
-				nsectors -= sectors_to_read;
-				nlsn = ubound;
-			}
-			else
-				esc_flag = 1;
-
-#ifdef USB_DRIVER
-			mass_stor_ReadCD(offslsn, sectors_to_read, &p[r], i);
-#endif
-#ifdef SMB_DRIVER
-			smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
-#endif
-			r += sectors_to_read << 11;
-			sectors_to_read = nsectors;
-			lsn = nlsn;
-		}
-
-		if (esc_flag)
-			break;
-	}
-
-	return 1;
-}
-#endif
-
-//-------------------------------------------------------------------------
 static int cdvdman_readMechaconVersion(char *mname, u32 *stat)
 {
 	u8 rdbuf[16];
@@ -1152,13 +930,8 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 		*on_dual = 1;
 	}
 	else {
-		#ifdef HDD_DRIVER
-		*layer1_start = apaHeader.layer1_start;
-		*on_dual = (apaHeader.layer1_start > 0) ? 1 : 0;
-		#else
-		*layer1_start = cdvdman_settings.layer1_start;
-		*on_dual = (cdvdman_settings.layer1_start > 0) ? 1 : 0;
-		#endif
+		*layer1_start = cdvdman_settings.common.layer1_start;
+		*on_dual = (cdvdman_settings.common.layer1_start > 0) ? 1 : 0;
 	}
 
 	return 1;
@@ -2032,28 +1805,6 @@ static void cdvdman_initdev(void)
 }
 
 //-------------------------------------------------------------------------
-#ifdef HDD_DRIVER
-static void cdvdman_get_part_specs(u32 lsn)
-{
-	register int i;
-	cdvdman_partspecs_t *ps = (cdvdman_partspecs_t *)&apaHeader.part_specs[0];
-
-	for (i = 0; i < apaHeader.num_partitions; i++) {
-		if (lsn >= ps->part_offset) {
-			if (lsn < (ps->part_offset + (ps->part_size >> 11))) {
-				mips_memcpy(&cdvdman_partspecs, ps, sizeof(cdvdman_partspecs));
-				break;
-			}
-		}
-		ps++;
-	}
-
-	if (i >= apaHeader.num_partitions)
-		cdvdman_stat.err = CDVD_ERR_READ;
-}
-#endif
-
-//-------------------------------------------------------------------------
 static int intrh_cdrom(void *common){
 	if(CDVDreg_PWOFF&CDL_DATA_RDY) CDVDreg_PWOFF=CDL_DATA_RDY;
 
@@ -2091,43 +1842,14 @@ int _start(int argc, char **argv)
 	// register exports
 	RegisterLibraryEntries(&_exp_cdvdman);
 	RegisterLibraryEntries(&_exp_cdvdstm);
-#ifdef SMB_DRIVER
-	RegisterLibraryEntries(&_exp_dev9);
-	dev9d_init();
 
-	RegisterLibraryEntries(&_exp_oplsmb);
-#endif
-#ifdef HDD_DRIVER
-#ifdef HD_PRO
-#ifdef __IOPCORE_DEBUG
-	RegisterLibraryEntries(&_exp_dev9);
-#endif
-#else
-	RegisterLibraryEntries(&_exp_dev9);
-#endif
-	RegisterLibraryEntries(&_exp_atad);
-
-#ifdef HD_PRO
-#ifdef __IOPCORE_DEBUG
-	dev9d_init();
-#endif
-#else
-	dev9d_init();
-#endif
-	atad_start();
-
-	atad_inited = 1;
-#endif
-#ifdef USB_DRIVER
-#ifdef __USE_DEV9
-	RegisterLibraryEntries(&_exp_dev9);
-	dev9d_init();
-#endif
-#endif
 	RegisterLibraryEntries(&_exp_smsutils);
+	DeviceInit();
+
 #ifdef VMC_DRIVER
 	RegisterLibraryEntries(&_exp_oplutils);
 #endif
+
 	// create SCMD/searchfile semaphores
 	cdvdman_create_semaphores();
 
@@ -2137,10 +1859,6 @@ int _start(int argc, char **argv)
 	// register cdrom device driver
 	cdvdman_initdev();
 	InstallIntrHandler();
-
-#ifdef HDD_DRIVER
-	lba_48bit = cdvdman_settings.common.media;
-#endif
 
 	// hook MODLOAD's exports
 	hookMODLOAD();
@@ -2160,9 +1878,7 @@ void SetStm0Callback(StmCallback_t callback)
 //-------------------------------------------------------------------------
 int _shutdown(void)
 {
-#ifdef SMB_DRIVER
-	smb_Disconnect();
-#endif
+	DeviceDeinit();
 
 	return 0;
 }

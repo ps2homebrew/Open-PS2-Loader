@@ -22,7 +22,7 @@ I_mass_stor_readSector
 I_mass_stor_writeSector
 #endif
 #ifdef HDD_DRIVER
-I_ata_device_dma_transfer
+I_ata_device_sector_io
 #endif
 #ifdef SMB_DRIVER
 I_smb_OpenAndX

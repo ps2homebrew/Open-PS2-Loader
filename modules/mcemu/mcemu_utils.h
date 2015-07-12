@@ -50,8 +50,8 @@ int mass_stor_writeSector(unsigned int lba, int nsectors, unsigned char* buffer)
 #define ATA_DIR_READ	0
 #define ATA_DIR_WRITE	1
 
-int ata_device_dma_transfer( unsigned int unit, void *buf,  unsigned int lba,  unsigned int sectors, int dir);
-#define I_ata_device_dma_transfer DECLARE_IMPORT(5, ata_device_dma_transfer)
+int ata_device_sector_io( unsigned int unit, void *buf,  unsigned int lba,  unsigned int sectors, int dir);
+#define I_ata_device_sector_io DECLARE_IMPORT(5, ata_device_sector_io)
 
 #endif
 

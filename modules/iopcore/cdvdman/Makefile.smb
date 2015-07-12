@@ -9,7 +9,7 @@
 # $Id: $
 
 IOP_BIN  = cdvdman.irx
-IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o imports.o exports.o
+IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o device-smb.o imports.o exports.o
 IOP_OBJS += dev9.o smb.o
 IOP_LIBS =
 

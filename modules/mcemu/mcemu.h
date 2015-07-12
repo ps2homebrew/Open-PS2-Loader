@@ -21,6 +21,7 @@
 #include <dmacman.h>
 
 #include "mcemu_utils.h"
+#include "device.h"
 
 #define MODNAME "mcemu"
 
@@ -158,10 +159,6 @@ int      MceWrite(MemoryCard *mcd, void *buf, u32 size);
 /* mcemu_io.c */
 
 int      mc_configure(MemoryCard *mcs);
-int      mc_read(int mc_num, void *buf, u32 page_num);
-int      mc_write(int mc_num, void *buf, u32 page_num);
-
-
 
 /* mcemu_rpc.c */
 
@@ -190,10 +187,6 @@ int      _SysFree(void *area);
 int      GetInt(void *ptr);
 u32      CalculateEDC(u8 *buf, u32 size);
 void     CalculateECC(u8 *buf, void *chk);
-
-#ifdef HDD_DRIVER
-u32      Mcpage_to_Apasector(int mc_num, u32 mc_page);
-#endif
 
 /* mcemu_var.c */
 

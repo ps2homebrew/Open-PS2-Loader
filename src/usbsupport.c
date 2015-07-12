@@ -352,7 +352,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		layer1_start -= 16;
 		LOG("DVD-DL layer 1 @ part %u sector 0x%lx.\n", layer1_part, layer1_offset);
 	}
-	settings->layer1_start = layer1_start;
+	settings->common.layer1_start = layer1_start;
 
 #ifdef CHEAT
 	if (gEnableCheat) {

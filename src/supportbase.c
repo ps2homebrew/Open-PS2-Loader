@@ -6,6 +6,9 @@
 #include "include/supportbase.h"
 #include "include/ioman.h"
 #include "modules/iopcore/common/cdvd_config.h"
+#ifdef GSM
+#include "include/pggsm.h"
+#endif
 
 #include <sys/fcntl.h>
 
@@ -377,7 +380,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 #ifdef GSM
 	gEnableGSM = 0;
 	if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
-	//Load the rest of the per-game GSM configuration, only if GSM is enabled.
+		//Load the rest of the per-game GSM configuration, only if GSM is enabled.
 		configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
 		configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
 		configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
@@ -494,7 +497,11 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 
 config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep) {
 	char path[256];
+#if OPL_IS_DEV_BUILD
+	snprintf(path, sizeof(path), "%sCFG-DEV%s%s.cfg", prefix, sep, game->startup);
+#else
 	snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
+#endif
 	config_set_t* config = configAlloc(0, NULL, path);
 	configRead(config);
 
@@ -508,4 +515,41 @@ config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const
 	configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 
 	return config;
+}
+
+void sbCreateFolders(const char *path, int createDiscImgFolders) {
+	// update Themes
+	char fullpath[256];
+
+#if OPL_IS_DEV_BUILD
+	sprintf(fullpath, "%sCFG-DEV", path);
+#else
+	sprintf(fullpath, "%sCFG", path);
+#endif
+	fileXioMkdir(fullpath, 0777);
+
+	sprintf(fullpath, "%sTHM", path);
+	fileXioMkdir(fullpath, 0777);
+
+	sprintf(fullpath, "%sART", path);
+	fileXioMkdir(fullpath, 0777);
+
+	if(createDiscImgFolders)
+	{
+		sprintf(fullpath, "%sCD", path);
+		fileXioMkdir(fullpath, 0777);
+
+		sprintf(fullpath, "%sDVD", path);
+		fileXioMkdir(fullpath, 0777);
+	}
+
+#ifdef VMC
+	sprintf(fullpath, "%sVMC", path);
+	fileXioMkdir(fullpath, 0777);
+#endif
+
+#ifdef CHEAT
+	sprintf(fullpath, "%sCHT", path);
+	fileXioMkdir(fullpath, 0777);
+#endif
 }

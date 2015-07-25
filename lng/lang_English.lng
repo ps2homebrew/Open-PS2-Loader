@@ -1,33 +1,25 @@
 ###################################################################################################
-# This file is a template for translators. This file format must be UTF8                          #
+# This file is a template for translators. This file's encoding must be UTF8.                     #
 #                                                                                                 #
-# Translate every line, keep the same order, don't add empty lines.                               #
-#                                                                                                 # 
-# This file (lang_english.lng) might be incomplete, to be sure you translate                      #
-# the correct sentences, please refer instead to the source file:                                 #
+# Translate every line, keeping the same order. Don't add empty lines.                            #
+# Any missing lines will be substituted with the english defaults from lang.c.                    #
 #                                                                                                 #
-# OPL/src/lang.c                                                                                  #
-# or                                                                                              #
-# http://bitbucket.org/volca/open-ps2-loader/src/tip/src/lang.c                                   #
+# Important: if your language require some custom glyphs, you should provide a corresponding      #
+# TTF font file too. By default, OPL only comes with the "basic latin" font built-in.             #
 #                                                                                                 #
-# Any missing line translated will use the default english value from lang.c.                     #
+# Once the translation is complete, you can submit it to the development team.                    #
 #                                                                                                 #
-# Important: If your language require some custom glyphs you should provide a corresponding       #
-# TTF font file too, as by default OPL only come with "basic latin" codepage.                     #
-#                                                                                                 #
-# Once the translation is complete, you can submit it to the dev team.                            #
-#                                                                                                 #
-# To use your custom language into OPL, simply copy your file into your mc?:/OPL folder.          #
+# To use your custom language with OPL, simply copy your file into your mc?:/OPL folder.          #
 # (File must start with the "lang_" prefix and have the ".lng" extension)                         #
 #                                                                                                 #
-# Last note, don't put too much comments in your file, it will waste space and loading time.      #
-# One single comment line on top "name <yourmail@address.com>" should be enough                   #
+# Finaly, don't put too many comments in your file, it will waste space and increases loading     #
+# time. One single comment line on top (e.g. "name <yourmail@address.com>") should be enough.     #
 #                                                                                                 #
 # Thanks for your work.                                                                           #
 #                                                                                                 #
 ###################################################################################################
 #
-# Put here the English name of your language (will be displayed into OPL Settings menu) using standard latin characters
+# Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
 English
 Open PS2 Loader %s
 Save changes
@@ -65,7 +57,7 @@ Select
 Cancel
 Circle
 Cross
-Games list
+Games List
 Game settings
 Remove all settings
 Removed all keys for the game
@@ -97,8 +89,9 @@ Manual
 Start HDL Server
 HDL Server Starting...
 HDL Server Running...
+Failed to start HDL Server.
 HDL Server Unloading...
-Exit to
+IGR path
 Background color
 Text color
 IP address type
@@ -108,6 +101,7 @@ IP address
 Address
 Mask
 Gateway
+DNS Server
 Port
 Share
 User
@@ -117,7 +111,7 @@ Address type
 IP
 NetBIOS
 Accept
-Item will be permanently deleted, continue ?
+Item will be permanently deleted, continue?
 Rename
 Delete
 Run

@@ -11,9 +11,6 @@
 #define IO_ERR_INVALID_HANDLER -4
 #define IO_ERR_IO_BLOCKED -5
 
-// handler for parameter-less actions
-#define IO_CUSTOM_SIMPLEACTION 1
-
 typedef void (*io_request_handler_t)(void* request);
 
 typedef void (*io_simpleaction_t)(void);

@@ -40,18 +40,11 @@ extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
 int debugSetActive(void) {
+#ifndef _DTL_T10000
 	int ret;
 
-	ret = ethLoadModules();
-	if (ret < 0)
+	if((ret = ethLoadInitModules()) != 0)
 		return -1;
-
-	ethWaitValidNetIFLinkState();
-	ethApplyNetIFConfig();
-	ethWaitValidNetIFLinkState();
-
-	ethApplyIPConfig();
-	if(ps2_ip_use_dhcp) ethWaitValidDHCPState();
 
 	ret = sysLoadModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL);
 	if (ret < 0)
@@ -64,6 +57,7 @@ int debugSetActive(void) {
 	ret = sysLoadModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL);
 	if (ret < 0)
 		return -10;
+#endif
 
 	return 0;
 }

@@ -55,7 +55,7 @@ MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
 		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns-iop.o	\
-		obj/netman.o obj/dns.o obj/ps2ips.o
+		obj/netman.o obj/ps2ips.o
 
 EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
@@ -72,7 +72,7 @@ EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 MAPFILE = opl.map
 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
-EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Iinclude
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/network/common -Iinclude
 
 BIN2C = $(PS2SDK)/bin/bin2c
 BIN2S = $(PS2SDK)/bin/bin2s
@@ -195,6 +195,9 @@ iopcore_debug:
 
 deci2_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
+
+childproof:
+	$(MAKE) CHILDPROOF=1 all
 
 clean:  sclean
 
@@ -399,9 +402,6 @@ smap.s:
 
 netman.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/netman.irx asm/netman.s netman_irx
-
-dns.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/dns.irx asm/dns.s dns_irx
 
 ps2ips.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/ps2ips.irx asm/ps2ips.s ps2ips_irx

@@ -141,10 +141,6 @@ void* readFile(char* path, int align, int* size) {
 	return buffer;
 }
 
-void checkCreateDir(char* dirPath) {
-	fileXioMkdir(dirPath, 0777);
-}
-
 int listDir(char* path, const char* separator, int maxElem,
 		int (*readEntry)(int index, const char *path, const char* separator, const char* name, unsigned int mode)) {
 	int fdDir, index = 0;
@@ -180,6 +176,25 @@ file_buffer_t* openFileBuffer(char* fpath, int mode, short allocResult, unsigned
 		fileBuffer->fd = fd;
 		fileBuffer->mode = mode;
 	}
+
+	return fileBuffer;
+}
+
+/* size will be the maximum line size possible */
+file_buffer_t* openFileBufferBuffer(short allocResult, const void *buffer, unsigned int size) {
+	file_buffer_t* fileBuffer = NULL;
+
+	fileBuffer = (file_buffer_t*) malloc(sizeof(file_buffer_t));
+	fileBuffer->size = size;
+	fileBuffer->available = size;
+	fileBuffer->buffer = (char*) malloc((size + 1) * sizeof(char));
+	fileBuffer->lastPtr = fileBuffer->buffer;	//O_RDONLY, but with the data in the buffer.
+	fileBuffer->allocResult = allocResult;
+	fileBuffer->fd = -1;
+	fileBuffer->mode = O_RDONLY;
+
+	memcpy(fileBuffer->buffer, buffer, size);
+	fileBuffer->buffer[size] = '\0';
 
 	return fileBuffer;
 }

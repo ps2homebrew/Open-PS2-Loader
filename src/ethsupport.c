@@ -37,9 +37,6 @@ extern int size_nbns_irx;
 extern void *netman_irx;
 extern int size_netman_irx;
 
-extern void *dns_irx;
-extern int size_dns_irx;
-
 extern void *ps2ips_irx;
 extern int size_ps2ips_irx;
 
@@ -59,6 +56,25 @@ static base_game_info_t *ethGames = NULL;
 
 // forward declaration
 static item_list_t ethGameList;
+static int ethGetNetIFLinkStatus(void);
+
+static int ethInitSemaID = -1;
+
+static int ethInitSema(void) {
+	ee_sema_t SemaData;
+
+	if(ethInitSemaID < 0)
+	{
+		// Wait for a valid network status;
+		SemaData.option = SemaData.attr = 0;
+		SemaData.init_count = 1;
+		SemaData.max_count = 1;
+		if((ethInitSemaID = CreateSema(&SemaData)) < 0)
+			return ethInitSemaID;
+	}
+
+	return 0;
+}
 
 static void ethSMBConnect(void) {
 	unsigned char share_ip_address[4];
@@ -165,22 +181,32 @@ static int ethSMBDisconnect(void) {
 }
 
 static void EthStatusCheckCb(s32 alarm_id, u16 time, void *common) {
-	iWakeupThread(*(int*)common);
+	iSignalSema(*(int*)common);
 }
 
 static int WaitValidNetState(int (*checkingFunction)(void)){
-	int ThreadID, retry_cycles;
+	int SemaID, retry_cycles;
+	ee_sema_t SemaData;
 
 	// Wait for a valid network status;
-	ThreadID = GetThreadId();
+	SemaData.option = SemaData.attr = 0;
+	SemaData.init_count = 0;
+	SemaData.max_count = 1;
+	if((SemaID = CreateSema(&SemaData)) < 0)
+		return SemaID;
+
 	for(retry_cycles = 0; checkingFunction() == 0; retry_cycles++) {
-		SetAlarm(1000 * rmGetHsync(), &EthStatusCheckCb, &ThreadID);
-		SleepThread();
+		SetAlarm(1000 * rmGetHsync(), &EthStatusCheckCb, &SemaID);
+		WaitSema(SemaID);
 
 		if(retry_cycles >= 30)	//30s = 30*1000ms
+		{
+			DeleteSema(SemaID);
 			return -1;
+		}
 	}
 
+	DeleteSema(SemaID);
 	return 0;
 }
 
@@ -192,22 +218,20 @@ int ethWaitValidDHCPState(void) {
 	return WaitValidNetState(&ethGetDHCPStatus);
 }
 
-static void ethInitSMB(void) {
+static int ethInitApplyConfig(void) {
+	LOG("ETHSUPPORT ApplyConfig\n");
+
 	do{
 		if(ethWaitValidNetIFLinkState() != 0) {
 			gNetworkStartup = ERROR_ETH_LINK_FAIL;
-			setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
-			LOG("ETH: Unable to get valid link status.\n");
-			return;
+			return ERROR_ETH_LINK_FAIL;
 		}
 	} while(ethApplyNetIFConfig() != 0);
 
 	//Before the network configuration is applied, wait for a valid link status.
 	if(ethWaitValidNetIFLinkState() != 0) {
 		gNetworkStartup = ERROR_ETH_LINK_FAIL;
-		setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
-		LOG("ETH: Unable to get valid link status.\n");
-		return;
+		return ERROR_ETH_LINK_FAIL;
 	}
 
 	ethApplyIPConfig();
@@ -215,8 +239,22 @@ static void ethInitSMB(void) {
 	//Wait for DHCP to initialize, if DHCP is enabled.
 	if(ps2_ip_use_dhcp && (ethWaitValidDHCPState() != 0)) {
 		gNetworkStartup = ERROR_ETH_DHCP_FAIL;
-		setErrorMessageWithCode(_STR_NETWORK_ERROR_DHCP_FAIL, gNetworkStartup);
-		LOG("ETH: Unable to get valid IP address via DHCP.\n");
+		return ERROR_ETH_DHCP_FAIL;
+	}
+
+	return 0;
+}
+
+static void ethInitSMB(void) {
+	int ret;
+
+	WaitSema(ethInitSemaID);
+	ret = ethInitApplyConfig();
+	SignalSema(ethInitSemaID);
+
+	if(ret != 0)
+	{
+		ethDisplayErrorStatus();
 		return;
 	}
 
@@ -229,36 +267,13 @@ static void ethInitSMB(void) {
 		sprintf(path, "%sTHM", ethPrefix);
 		thmAddElements(path, "\\", ethGameList.mode);
 
-		sprintf(path, "%sCFG", ethPrefix);
-		checkCreateDir(path);
-
-#ifdef VMC
-		sprintf(path, "%sVMC", ethPrefix);
-		checkCreateDir(path);
-#endif
-
-#ifdef CHEAT
-		sprintf(path, "%sCHT", ethPrefix);
-		checkCreateDir(path);
-#endif
+		sbCreateFolders(ethPrefix, 1);
 	} else if (gPCShareName[0] || !(gNetworkStartup >= ERROR_ETH_SMB_OPENSHARE)) {
-		switch(gNetworkStartup){
-			case ERROR_ETH_SMB_CONN:
-				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_CONN, gNetworkStartup);
-				break;
-			case ERROR_ETH_SMB_LOGON:
-				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_LOGON, gNetworkStartup);
-				break;
-			case ERROR_ETH_SMB_OPENSHARE:
-				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_SHARE, gNetworkStartup);
-				break;
-			default:
-				setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
-		}
+		ethDisplayErrorStatus();
 	}
 }
 
-int ethLoadModules(void) {
+static int ethLoadModules(void) {
 	LOG("ETHSUPPORT LoadModules\n");
 
 	if(!ethModulesLoaded) {
@@ -274,7 +289,6 @@ int ethLoadModules(void) {
 				ethApplyNetIFConfig();
 
 				if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
-					sysLoadModuleBuffer(&dns_irx, size_dns_irx, 0, NULL);
 					sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
 					ps2ip_init();
 
@@ -284,16 +298,92 @@ int ethLoadModules(void) {
 			}
 		}
 
+		gNetworkStartup = ERROR_ETH_MODULE_NETIF_FAILURE;
 		return -1;
 	}
 
 	return 0;
 }
 
+void ethDeinitModules(void) {
+	if(ethInitSemaID >=0)
+		WaitSema(ethInitSemaID);
+
+	nbnsDeinit();
+	NetManDeinit();
+	ethModulesLoaded = 0;
+	gNetworkStartup = ERROR_ETH_NOT_STARTED;
+
+	if(ethInitSemaID >=0)
+	{
+		DeleteSema(ethInitSemaID);
+		ethInitSemaID = -1;
+	}
+}
+
+int ethLoadInitModules(void) {
+	int ret;
+
+	if((ret = ethInitSema()) < 0)
+		return ret;
+
+	WaitSema(ethInitSemaID);
+
+	if((ret = ethLoadModules()) == 0)
+	{
+		ret = ethInitApplyConfig();
+	}
+
+	SignalSema(ethInitSemaID);
+
+	return ret;
+}
+
+void ethDisplayErrorStatus(void) {
+	switch(gNetworkStartup) {
+		case 0:	//No error
+			break;
+		case ERROR_ETH_MODULE_NETIF_FAILURE:
+			setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_NETIF, gNetworkStartup);
+			break;
+		case ERROR_ETH_SMB_CONN:
+			setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_CONN, gNetworkStartup);
+			break;
+		case ERROR_ETH_SMB_LOGON:
+			setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_LOGON, gNetworkStartup);
+			break;
+		case ERROR_ETH_SMB_OPENSHARE:
+			setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_SHARE, gNetworkStartup);
+			break;
+		case ERROR_ETH_SMB_LISTSHARES:
+			setErrorMessageWithCode(_STR_NETWORK_SHARE_LIST_ERROR, gNetworkStartup);
+			break;
+		case ERROR_ETH_SMB_LISTGAMES:
+			setErrorMessageWithCode(_STR_NETWORK_GAMES_LIST_ERROR, gNetworkStartup);
+			break;
+		case ERROR_ETH_LINK_FAIL:
+			LOG("ETH: Unable to get valid link status.\n");
+			setErrorMessageWithCode(_STR_NETWORK_ERROR_LINK_FAIL, gNetworkStartup);
+			break;
+		case ERROR_ETH_DHCP_FAIL:
+			LOG("ETH: Unable to get valid IP address via DHCP.\n");
+			setErrorMessageWithCode(_STR_NETWORK_ERROR_DHCP_FAIL, gNetworkStartup);
+			break;
+		default:
+			setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
+	}
+}
+
 static void smbLoadModules(void) {
+	int ret;
+
 	LOG("SMBSUPPORT LoadModules\n");
 
-	if(ethLoadModules() == 0) {
+	WaitSema(ethInitSemaID);
+	ret = ethLoadModules();
+	SignalSema(ethInitSemaID);
+
+	if(ret == 0) {
 		gNetworkStartup = ERROR_ETH_MODULE_SMBMAN_FAILURE;
 		if (sysLoadModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL) >= 0) {
 			sysLoadModuleBuffer(&nbns_irx, size_nbns_irx, 0, NULL);
@@ -303,15 +393,15 @@ static void smbLoadModules(void) {
 			ethInitSMB();
 			return;
 		}
-
-		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR, gNetworkStartup);
-	}else{
-		gNetworkStartup = ERROR_ETH_MODULE_NETIF_FAILURE;
-		setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_NETIF, gNetworkStartup);
 	}
+
+	ethDisplayErrorStatus();
 }
 
 void ethInit(void) {
+	if(ethInitSema() < 0)
+		return;
+
 	if (gNetworkStartup >= ERROR_ETH_SMB_CONN) {
 		LOG("ETHSUPPORT Re-Init\n");
 		thmReinit(ethBase);
@@ -382,7 +472,8 @@ static int ethUpdateGameList(void) {
 
 	if (gPCShareName[0]) {
 		if((result = sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount)) < 0){
-			setErrorMessageWithCode(_STR_NETWORK_GAMES_LIST_ERROR, ERROR_ETH_SMB_LISTGAMES);
+			gNetworkStartup = ERROR_ETH_SMB_LISTGAMES;
+			ethDisplayErrorStatus();
 		}
 	} else {
 		int i, count;
@@ -409,7 +500,8 @@ static int ethUpdateGameList(void) {
 			}
 			ethGameCount = count;
 		}else if(count < 0){
-			setErrorMessageWithCode(_STR_NETWORK_SHARE_LIST_ERROR, ERROR_ETH_SMB_LISTSHARES);
+			gNetworkStartup = ERROR_ETH_SMB_LISTSHARES;
+			ethDisplayErrorStatus();
 		}
 	}
 	return ethGameCount;
@@ -625,9 +717,7 @@ static void ethCleanUp(int exception) {
 		free(ethGames);
 	}
 
-	nbnsDeinit();
-	NetManDeinit();
-	ethModulesLoaded = 0;
+	ethDeinitModules();
 }
 
 #ifdef VMC
@@ -708,29 +798,33 @@ int ethApplyNetIFConfig(void) {
 	return result;
 }
 
-int ethGetNetIFLinkStatus(void) {
+static int ethGetNetIFLinkStatus(void) {
 	return(NetManIoctl(NETMAN_NETIF_IOCTL_GET_LINK_STATUS, NULL, 0, NULL, 0) == NETMAN_NETIF_ETH_LINK_STATE_UP);
 }
 
 int ethApplyIPConfig(void) {
 	t_ip_info ip_info;
-	struct ip_addr ipaddr, netmask, gw;
+	struct ip_addr ipaddr, netmask, gw, dns, dns_curr;
 	int result;
 
 	if((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
 		IP4_ADDR(&ipaddr, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
 		IP4_ADDR(&netmask, ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
 		IP4_ADDR(&gw, ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+		IP4_ADDR(&dns, ps2_dns[0], ps2_dns[1], ps2_dns[2], ps2_dns[3]);
+		dns_curr = dns_getserver(0);
 
 		//Check if it's the same. Otherwise, apply the new configuration.
 		if((ps2_ip_use_dhcp != ip_info.dhcp_enabled) || (!ps2_ip_use_dhcp &&
 			(!ip_addr_cmp(&ipaddr, (struct ip_addr*)&ip_info.ipaddr)	||
 			!ip_addr_cmp(&netmask, (struct ip_addr*)&ip_info.netmask)	||
-			!ip_addr_cmp(&gw, (struct ip_addr*)&ip_info.gw)))) {
+			!ip_addr_cmp(&gw, (struct ip_addr*)&ip_info.gw)			||
+			!ip_addr_cmp(&dns, &dns_curr)))) {
 				if(ps2_ip_use_dhcp){
 					IP4_ADDR((struct ip_addr*)&ip_info.ipaddr, 169, 254, 0, 1);
 					IP4_ADDR((struct ip_addr*)&ip_info.netmask, 255, 255, 0, 0);
 					IP4_ADDR((struct ip_addr*)&ip_info.gw, 0, 0, 0, 0);
+					IP4_ADDR(&dns, 0, 0, 0, 0);
 
 					ip_info.dhcp_enabled = 1;
 				}else{
@@ -741,6 +835,7 @@ int ethApplyIPConfig(void) {
 					ip_info.dhcp_enabled = 0;
 				}
 
+				dns_setserver(0, &dns);
 				result = ps2ip_setconfig(&ip_info);
 		}else result = 0;
 	}

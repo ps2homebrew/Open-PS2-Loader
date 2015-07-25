@@ -161,18 +161,7 @@ static int usbNeedsUpdate(void) {
 		if(thmAddElements(path, "/", usbGameList.mode) > 0) ThemesLoaded = 1;
 	}
 
-	sprintf(path, "%sCFG", usbPrefix);
-	checkCreateDir(path);
-
-#ifdef VMC
-	sprintf(path, "%sVMC", usbPrefix);
-	checkCreateDir(path);
-#endif
-
-#ifdef CHEAT
-	sprintf(path, "%sCHT", usbPrefix);
-	checkCreateDir(path);
-#endif
+	sbCreateFolders(usbPrefix, 1);
 
 	return result;
 }

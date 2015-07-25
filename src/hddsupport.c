@@ -60,18 +60,7 @@ static void hddInitModules(void) {
 	sprintf(path, "%sTHM", hddPrefix);
 	thmAddElements(path, "/", hddGameList.mode);
 
-	sprintf(path, "%sCFG", hddPrefix);
-	checkCreateDir(path);
-
-#ifdef VMC
-	sprintf(path, "%sVMC", hddPrefix);
-	checkCreateDir(path);
-#endif
-
-#ifdef CHEAT
-	sprintf(path, "%sCHT", hddPrefix);
-	checkCreateDir(path);
-#endif
+	sbCreateFolders(hddPrefix, 0);
 }
 
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
@@ -428,7 +417,11 @@ static config_set_t* hddGetConfig(int id) {
 	char path[256];
 	hdl_game_info_t* game = &hddGames.games[id];
 
+#ifdef OPL_IS_DEV_BUILD
+	snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", hddPrefix, game->startup);
+#else
 	snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
+#endif
 	config_set_t* config = configAlloc(0, NULL, path);
 	configRead(config);
 

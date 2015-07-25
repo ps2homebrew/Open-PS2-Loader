@@ -3,6 +3,12 @@
 
 #include <gsToolkit.h>
 
+/// DTV 576 Progressive Scan (720x576)
+#define GS_MODE_DTV_576P  0x53
+
+/// DTV 1080 Progressive Scan (1920x1080)
+#define GS_MODE_DTV_1080P  0x54
+
 #define DIM_UNDEF		-1
 
 #define ALIGN_NONE		0

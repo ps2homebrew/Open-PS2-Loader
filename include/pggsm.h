@@ -1,46 +1,8 @@
-/* Header For Per-Game GSM - INCOMPLETE!
+// Header For Per-Game GSM -Bat-
 
 #ifndef __PGGSM_H
 #define __PGGSM_H
 
-#include <tamtypes.h>
-#include <kernel.h>
-#include <sifrpc.h>
-#include <fileio.h>
-#include <iopcontrol.h>
-#include <iopheap.h>
-#include <string.h>
-#include <loadfile.h>
-#include <stdio.h>
-#include <sbv_patches.h>
-#include <libcdvd.h>
-#include <libpad.h>
-#include <libmc.h>
-#include <debug.h>
-#include <gsKit.h>
-#include <dmaKit.h>
-#include <gsToolkit.h>
-#include <malloc.h>
-#include <math.h>
-#include <libpwroff.h>
-#include <fileXio_rpc.h>
-#include <smod.h>
-#include <smem.h>
-#include <debug.h>
-#include <ps2smb.h>
-#include "config.h"
-#include "opl.h"
-#ifdef VMC
-#include <sys/fcntl.h>
-#endif
-
-/// DTV 576 Progressive Scan (720x576)
-#define GS_MODE_DTV_576P  0x53
-
-/// DTV 1080 Progressive Scan (1920x1080)
-#define GS_MODE_DTV_1080P  0x54
-
-#ifdef GSM
 #define GSM_VERSION "0.36.R"
 
 #define PS1_VMODE	1
@@ -69,4 +31,3 @@ int	gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative pos
 int	gGSMSkipVideos; // 0 - Off, 1 - On
 
 #endif
-*/ 

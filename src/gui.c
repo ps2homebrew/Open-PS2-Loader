@@ -17,6 +17,9 @@
 #include "include/config.h"
 #include "include/system.h"
 #include "include/ethsupport.h"
+#ifdef GSM
+#include "include/pggsm.h"
+#endif
 
 #include <stdlib.h>
 #include <libvux.h>
@@ -365,15 +368,33 @@ void guiShowUIConfig(void) {
 }
 
 #ifdef GSM
-void guiShowGSConfig(void) {
+static void guiSetGSMSettingsState(void) {
+	int isGSMEnabled;
+
+	diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &isGSMEnabled);
+	diaSetEnabled(diaGSConfig, GSMCFG_GSMVMODE, isGSMEnabled);
+	diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, isGSMEnabled);
+	diaSetEnabled(diaGSConfig, GSMCFG_GSMYOFFSET, isGSMEnabled);
+	diaSetEnabled(diaGSConfig, GSMCFG_GSMSKIPVIDEOS, isGSMEnabled);
+}
+
+static int guiGSMUpdater(int modified) {
+	if (modified) {
+		guiSetGSMSettingsState();
+	}
+
+	return 0;
+}
+
+static void guiShowGSConfig(void) {
 	// configure the enumerations
 	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", \
 	"PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", \
 	"HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", \
 	"VGA 640x480p @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", NULL };
 
-	diaSetEnum(diaGSConfig, COMPAT_GSMVMODE, gsmvmodeNames);
-	diaExecuteDialog(diaGSConfig, -1, 1, NULL);
+	diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);
+	diaExecuteDialog(diaGSConfig, -1, 1, &guiGSMUpdater);
 }
 
 #endif
@@ -411,6 +432,7 @@ static int netConfigUpdater(int modified) {
 			diaSetEnabled(diaNetConfig, NETCFG_PS2_IP_ADDR_0 + i, !isDHCPEnabled);
 			diaSetEnabled(diaNetConfig, NETCFG_PS2_NETMASK_0 + i, !isDHCPEnabled);
 			diaSetEnabled(diaNetConfig, NETCFG_PS2_GATEWAY_0 + i, !isDHCPEnabled);
+			diaSetEnabled(diaNetConfig, NETCFG_PS2_DNS_0 + i, !isDHCPEnabled);
 		}
 
 		for (i = 0; i < 3; i++)
@@ -447,11 +469,13 @@ void guiShowNetConfig(void) {
 		diaSetEnabled(diaNetConfig, NETCFG_PS2_IP_ADDR_0 + i, !ps2_ip_use_dhcp);
 		diaSetEnabled(diaNetConfig, NETCFG_PS2_NETMASK_0 + i, !ps2_ip_use_dhcp);
 		diaSetEnabled(diaNetConfig, NETCFG_PS2_GATEWAY_0 + i, !ps2_ip_use_dhcp);
+		diaSetEnabled(diaNetConfig, NETCFG_PS2_DNS_0 + i, !ps2_ip_use_dhcp);
 
 		diaSetVisible(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, !gPCShareAddressIsNetBIOS);
 		diaSetInt(diaNetConfig, NETCFG_PS2_IP_ADDR_0 + i, ps2_ip[i]);
 		diaSetInt(diaNetConfig, NETCFG_PS2_NETMASK_0 + i, ps2_netmask[i]);
 		diaSetInt(diaNetConfig, NETCFG_PS2_GATEWAY_0 + i, ps2_gateway[i]);
+		diaSetInt(diaNetConfig, NETCFG_PS2_DNS_0 + i, ps2_dns[i]);
 		diaSetInt(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, pc_ip[i]);
 	}
 
@@ -487,6 +511,7 @@ void guiShowNetConfig(void) {
 			diaGetInt(diaNetConfig, NETCFG_PS2_IP_ADDR_0 + i, &ps2_ip[i]);
 			diaGetInt(diaNetConfig, NETCFG_PS2_NETMASK_0 + i, &ps2_netmask[i]);
 			diaGetInt(diaNetConfig, NETCFG_PS2_GATEWAY_0 + i, &ps2_gateway[i]);
+			diaGetInt(diaNetConfig, NETCFG_PS2_DNS_0 + i, &ps2_dns[i]);
 			diaGetInt(diaNetConfig, NETCFG_SHARE_IP_ADDR_0 + i, &pc_ip[i]);
 		}
 		diaGetInt(diaNetConfig, NETCFG_ETHOPMODE, &gETHOpMode);
@@ -715,6 +740,8 @@ int guiAltStartupNameHandler(char* text, int maxLen) {
 }
 
 int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
+	int result;
+
 	int dmaMode = 7; // defaulting to UDMA 4
 	if (support->haveCompatibilityMode == COMPAT_FULL) {
 		configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
@@ -731,7 +758,8 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 
 	int compatMode = 0;
 	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
-	int i, result = -1;
+	int i;
+	result = -1;
 	for (i = 0; i < COMPAT_MODE_COUNT; ++i)
 		diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
@@ -740,23 +768,25 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 
 	int EnableGSM = 0;
 	configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
-	diaSetInt(diaGSConfig, COMPAT_ENABLEGSM, EnableGSM);
+	diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
 
 	int GSMVMode = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &GSMVMode);
-	diaSetInt(diaGSConfig, COMPAT_GSMVMODE, GSMVMode);
+	diaSetInt(diaGSConfig, GSMCFG_GSMVMODE, GSMVMode);
 
 	int GSMXOffset = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
-	diaSetInt(diaGSConfig, COMPAT_GSMXOFFSET, GSMXOffset);
+	diaSetInt(diaGSConfig, GSMCFG_GSMXOFFSET, GSMXOffset);
 
 	int GSMYOffset = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
-	diaSetInt(diaGSConfig, COMPAT_GSMYOFFSET, GSMYOffset);
+	diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
 
 	int GSMSkipVideos = 0;
 	configGetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, &GSMSkipVideos);
-	diaSetInt(diaGSConfig, COMPAT_GSMSKIPVIDEOS, GSMSkipVideos);
+	diaSetInt(diaGSConfig, GSMCFG_GSMSKIPVIDEOS, GSMSkipVideos);
+
+	guiSetGSMSettingsState();
 
 // End Of Per-Game GSM Integration --Bat--
 #endif
@@ -800,7 +830,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
 #ifdef GSM
-		if (result == COMPAT_GSCONFIG) {
+		if (result == GSMCFG_GSCONFIG_ID) {
 			guiShowGSConfig();
 		}
 #endif
@@ -877,31 +907,31 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configRemoveKey(configSet, CONFIG_ITEM_CDVDMAN_TIMER);
 
 #ifdef GSM
-		diaGetInt(diaGSConfig, COMPAT_ENABLEGSM, &EnableGSM);
+		diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
 		if (EnableGSM != 0)
 			configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
 
-		diaGetInt(diaGSConfig, COMPAT_GSMVMODE, &GSMVMode);
+		diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &GSMVMode);
 		if (GSMVMode != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
 
-		diaGetInt(diaGSConfig, COMPAT_GSMXOFFSET, &GSMXOffset);
+		diaGetInt(diaGSConfig, GSMCFG_GSMXOFFSET, &GSMXOffset);
 		if (GSMXOffset != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
 
-		diaGetInt(diaGSConfig, COMPAT_GSMYOFFSET, &GSMYOffset);
+		diaGetInt(diaGSConfig, GSMCFG_GSMYOFFSET, &GSMYOffset);
 		if (GSMYOffset != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
 
-		diaGetInt(diaGSConfig, COMPAT_GSMSKIPVIDEOS, &GSMSkipVideos);
+		diaGetInt(diaGSConfig, GSMCFG_GSMSKIPVIDEOS, &GSMSkipVideos);
 		if (GSMSkipVideos != 0)
 			configSetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, GSMSkipVideos);
 		else

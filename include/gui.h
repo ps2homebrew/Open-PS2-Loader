@@ -120,7 +120,6 @@ void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
 
-void guiShowGSConfig();
 void guiShowCheatConfig();
 
 void guiShowNetConfig();

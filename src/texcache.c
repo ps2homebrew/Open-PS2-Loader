@@ -1,10 +1,8 @@
+#include "include/opl.h"
 #include "include/texcache.h"
 #include "include/ioman.h"
 #include "include/gui.h"
 #include "include/util.h"
-
-// io call to handle the loading of covers
-#define IO_CACHE_LOAD_ART 3
 
 typedef struct {
 	image_cache_t* cache;

@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev800 - Fixed SMB auto-refresh (CD, DVD and USBExtreme lists checked one-by-one) and refactored code in CDVDMAN and MCEMU for better coherency (USB, SMB and HDD-split up into individual files, for as much as possible). - Sun Jul 12 20:40:11 2015 +0800
+rev799 - BUGFIX: Replaced all calls (and related macros) to the FILEIO RPC service with FILEXIO. OPL is intermittently unstable when listing games, as the rom0:FILEIO module does not suspend interrupts before the DMA transfers for the dread() and getstat() functions (SONY BUGBUG!!). - Sat Jul 11 03:25:55 2015 +0800
 rev798 - Fixes: Added check for streaming status into CDVDMAN streaming system (for games that read after starting streaming), fixed broken CDVDMAN debug build, changed ambiguous debug strings in CDVDMAN, fixed length checking of ISO filenames and improved on error-handling code in supportbase.c. - Sat Jul 11 03:17:13 2015 +0800
 rev797 - Fixed and enhanced streaming support: - Sun Jun 28 18:18:52 2015 +0800
 rev796 - Consolidated error codes, added error codes for HDD mode, sync'ed with updates to HDD and PFS from PS2SDK, added workaround for clone/compatible network adaptors and corrected UV coordinates for texture-drawing. - Sat Jun 20 20:06:02 2015 +0800

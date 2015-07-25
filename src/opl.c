@@ -42,9 +42,6 @@
 
 static void RefreshAllLists(void);
 
-extern void *pusbd_irx;
-extern int size_pusbd_irx;
-
 typedef struct {
 	item_list_t *support;
 
@@ -424,12 +421,15 @@ static void menuUpdateHook() {
 	}
 }
 
-static void errorMessageHook() {
-	guiMsgBox(errorMessage, 0, NULL);
-
+static void clearErrorMessage(void) {
 	// reset the original frame hook
 	frameCounter = 0;
 	guiSetFrameHook(&menuUpdateHook);
+}
+
+static void errorMessageHook() {
+	guiMsgBox(errorMessage, 0, NULL);
+	clearErrorMessage();
 }
 
 void setErrorMessageWithCode(int strId, int error) {
@@ -714,46 +714,50 @@ extern int size_ps2hdd_irx;
 extern void *hdldsvr_irx;
 extern int size_hdldsvr_irx;
 
-void loadHdldSvr(void) {
-	int ret;
+static int loadHdldSvr(void) {
+	int ret, padStatus;
 	static char hddarg[] = "-o" "\0" "4" "\0" "-n" "\0" "20";
 
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
 
 	deinitAllSupport(NO_EXCEPTION);
+	clearErrorMessage();	/*	At this point, an error might have been displayed (since background tasks were completed).
+					Clear it, otherwise it will get displayed after the server is closed.	*/
 
 	unloadPads();
-
 	sysReset(0);
 
-	ret = ethLoadModules();
-	if (ret < 0)
-		return;
-
-	ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
-	if (ret < 0)
-		return;
-
-	ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
-	if (ret < 0)
-		return;
-
-	ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
-	if (ret < 0)
-		return;
+	ret = ethLoadInitModules();
+	if (ret == 0)
+	{
+		ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+		if (ret >= 0)
+		{
+			ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
+			if (ret >= 0)
+			{
+				ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
+				if (ret >= 0)
+					ret = 0;
+			}
+		}
+	}
 
 	padInit(0);
 
 	// init all pads
-	ret = 0;
-	while (!ret)
-		ret = startPads();
+	padStatus = 0;
+	while (!padStatus)
+		padStatus = startPads();
 
 	// now ready to display some status
+
+	return ret;
 }
 
-void unloadHdldSvr(void) {
+static void unloadHdldSvr(void) {
+	ethDeinitModules();
 	unloadPads();
 
 	reset();
@@ -778,9 +782,10 @@ void unloadHdldSvr(void) {
 void handleHdlSrv() {
 	// prepare for hdl, display screen with info
 	guiRenderTextScreen(_l(_STR_STARTINGHDL));
-	loadHdldSvr();
-
-	guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
+	if(loadHdldSvr() == 0)
+		guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
+	else
+		guiMsgBox(_l(_STR_STARTFAILHDL), 0, NULL);
 
 	// restore normal functionality again
 	guiRenderTextScreen(_l(_STR_UNLOADHDL));
@@ -840,6 +845,7 @@ static void setDefaults(void) {
 	ps2_netmask[0] = 255; ps2_netmask[1] = 255; ps2_netmask[2] =  255; ps2_netmask[3] =  0;
 	ps2_gateway[0] = 192; ps2_gateway[1] = 168; ps2_gateway[2] = 0; ps2_gateway[3] = 1;
 	pc_ip[0] = 192;pc_ip[1] = 168; pc_ip[2] = 0; pc_ip[3] = 2;
+	ps2_dns[0] = 192; ps2_dns[1] = 168; ps2_dns[2] = 0; ps2_dns[3] = 1;
 	gPCPort = 445;
 	gPCShareName[0] = '\0';
 	gPCUserName[0] = '\0';

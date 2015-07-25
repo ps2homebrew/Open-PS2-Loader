@@ -6,7 +6,6 @@
 int getFileSize(int fd);
 int openFile(char* path, int mode);
 void* readFile(char* path, int align, int* size);
-void checkCreateDir(char* path);
 int listDir(char* path, const char* separator, int maxElem,
 		int (*readEntry)(int index, const char *path, const char* separator, const char* name, unsigned int mode));
 
@@ -20,6 +19,7 @@ typedef struct {
 	short allocResult;
 } file_buffer_t;
 
+file_buffer_t* openFileBufferBuffer(short allocResult, const void *buffer, unsigned int size);
 file_buffer_t* openFileBuffer(char* fpath, int mode, short allocResult, unsigned int size);
 int readFileBuffer(file_buffer_t* readContext, char** outBuf);
 void writeFileBuffer(file_buffer_t* fileBuffer, char* inBuf, int size);

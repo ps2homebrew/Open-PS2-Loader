@@ -16,13 +16,14 @@ typedef struct {
 } smb_vmc_infos_t;
 #endif
 
-void ethInit(void);
-int ethLoadModules(void);
+void ethInit(void);			//Full initialization (Start ETH + SMB and apply configuration). GUI must be already initialized, used by GUI to start SMB mode.
+void ethDeinitModules(void);		//Module-only deinitialization, without the GUI's knowledge (for specific reasons, otherwise unused).
+int ethLoadInitModules(void);		//Initializes Ethernet and applies configuration.
+void ethDisplayErrorStatus(void);	//Displays the current error status (if any). GUI must be already initialized.
 int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway);
 int ethWaitValidNetIFLinkState(void);
 int ethWaitValidDHCPState(void);
 int ethApplyNetIFConfig(void);
-int ethGetNetIFLinkStatus(void);
 int ethApplyIPConfig(void);
 int ethGetDHCPStatus(void);
 item_list_t* ethGetObject(int initOnly);

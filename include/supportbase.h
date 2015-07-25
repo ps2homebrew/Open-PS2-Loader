@@ -28,6 +28,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id);
 void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id, char* newname);
 config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep);
+void sbCreateFolders(const char *path, int createDiscImgFolders);
 
 //ISO9660 filesystem management functions.
 u32 sbGetISO9660MaxLBA(const char *path);

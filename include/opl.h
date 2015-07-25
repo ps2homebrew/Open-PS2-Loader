@@ -21,6 +21,7 @@
 #include <gsToolkit.h>
 #include <malloc.h>
 #include <math.h>
+#include <osd_config.h>
 #include <libpwroff.h>
 #include <fileXio_rpc.h>
 #include <smod.h>
@@ -32,9 +33,13 @@
 #include <sys/fcntl.h>
 #endif
 
-#define OPL_VERSION "0.9.3 WIP"
+#define OPL_VERSION		"0.9.3 WIP"
+#define OPL_IS_DEV_BUILD	1		//Define if this build is a development build.
 
-#define IO_MENU_UPDATE_DEFFERED 2
+//IO type IDs
+#define IO_CUSTOM_SIMPLEACTION			1	// handler for parameter-less actions
+#define IO_MENU_UPDATE_DEFFERED			2
+#define IO_CACHE_LOAD_ART			3	// io call to handle the loading of covers
 
 void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
@@ -66,6 +71,7 @@ int ps2_ip_use_dhcp;
 int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
+int ps2_dns[4];
 int gETHOpMode;	//See ETH_OP_MODES.
 int gPCShareAddressIsNetBIOS;
 char gPCShareNBAddress[17];
@@ -97,41 +103,6 @@ int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
 int gSelectButton;
 
 // ------------------------------------------------------------------------------------------------------------------------
-
-/// DTV 576 Progressive Scan (720x576)
-#define GS_MODE_DTV_576P  0x53
-
-/// DTV 1080 Progressive Scan (1920x1080)
-#define GS_MODE_DTV_1080P  0x54
-
-#ifdef GSM
-#define GSM_VERSION "0.36.R"
-
-#define PS1_VMODE	1
-#define SDTV_VMODE	2
-#define HDTV_VMODE	3
-#define VGA_VMODE	4
-
-#define make_display_magic_number(dh, dw, magv, magh, dy, dx) \
-	(((u64)(dh)<<44) | ((u64)(dw)<<32) | ((u64)(magv)<<27) | \
-	((u64)(magh)<<23) | ((u64)(dy)<<12)   | ((u64)(dx)<<0)     )
-
-typedef struct predef_vmode_struct {
-	u8	category;
-	char desc[34];
-	u8	interlace;
-	u8	mode;
-	u8	ffmd;
-	u64	display;
-	u64	syncv;
-} predef_vmode_struct;
-
-int	gEnableGSM; // Enables GSM - 0 for Off, 1 for On
-int	gGSMVMode;  // See the related predef_vmode
-int	gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
-int	gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
-int	gGSMSkipVideos; // 0 - Off, 1 - On
-#endif
 
 #ifdef CHEAT
 #define CHEAT_VERSION "0.5.3.65.g774d1"

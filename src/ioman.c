@@ -1,3 +1,4 @@
+#include "include/opl.h"
 #include "include/ioman.h"
 #include <kernel.h>
 #include <string.h>
@@ -109,17 +110,16 @@ static void ioWorkerThread(void *arg) {
 	while (!gIOTerminate) {
 		SleepThread();
 
-		// no processing when io is blocked
-		if (isIOBlocked)
-			continue;
-
 		// if term requested exit immediately from the loop
 		if (gIOTerminate)
 			break;
 
 		// do we have a request in the queue?
+		WaitSema(gProcSemaId);
 		while (gReqList) {
-			WaitSema(gProcSemaId);
+			// if term requested exit immediately from the loop
+			if (gIOTerminate)
+				break;
 
 			struct io_request_t* req = gReqList;
 			ioProcessRequest(req);
@@ -135,8 +135,8 @@ static void ioWorkerThread(void *arg) {
 				gReqEnd = NULL;
 
 			SignalSema(gEndSemaId);
-			SignalSema(gProcSemaId);
 		}
+		SignalSema(gProcSemaId);
 	}
 
 	// delete the pending requests
@@ -278,9 +278,13 @@ int ioGetPendingRequestCount(void) {
 
 	struct io_request_t* req = gReqList;
 
+	WaitSema(gProcSemaId);
+
 	while (req) {
 		count++; req = req->next;
 	}
+
+	SignalSema(gProcSemaId);
 
 	return count;
 }
@@ -328,7 +332,6 @@ int ioBlockOps(int block) {
 
 		// now all io should be blocked
 	} else if (!block && isIOBlocked) {
-		WakeupThread(gIOThreadId);
 		isIOBlocked = 0;
 	}
 

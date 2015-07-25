@@ -13,6 +13,7 @@
 #include "include/ioprp.h"
 #include "include/usbsupport.h"
 #include "include/OSDHistory.h"
+#include "include/renderman.h"
 #include "../ee_core/include/modules.h"
 #ifdef VMC
 typedef struct {
@@ -25,6 +26,9 @@ typedef struct {
 
 extern void *genvmc_irx;
 extern int size_genvmc_irx;
+#endif
+#ifdef GSM
+#include "include/pggsm.h"
 #endif
 
 extern void *udnl_irx;

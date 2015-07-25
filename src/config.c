@@ -188,7 +188,6 @@ void configFree(config_set_t *configSet) {
 	configClear(configSet);
 	free(configSet->filename);
 	free(configSet);
-	configSet = NULL;
 }
 
 config_set_t *configGetByType(int type) {
@@ -367,24 +366,17 @@ void configGetDiscIDBinary(config_set_t* configSet, void* dst) {
 	}
 }
 
-int configRead(config_set_t* configSet) {
-	file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
-	if (!fileBuffer) {
-		LOG("CONFIG No file %s.\n", configSet->filename);
-		configSet->modified = 0;
-		return 0;
-	}
-
+static int configReadFileBuffer(file_buffer_t* fileBuffer, config_set_t* configSet) {
 	char* line;
 	unsigned int lineno = 0;
 
-	char prefix[32];
+	char prefix[CONFIG_KEY_NAME_LEN];
 	memset(prefix, 0, sizeof(prefix));
 
 	while (readFileBuffer(fileBuffer, &line)) {
 		lineno++;
 
-		char key[32], val[256];
+		char key[CONFIG_KEY_NAME_LEN], val[CONFIG_KEY_VALUE_LEN];
 		memset(key, 0, sizeof(key));
 		memset(val, 0, sizeof(val));
 
@@ -398,11 +390,9 @@ int configRead(config_set_t* configSet) {
 			// insert config value
 			if (prefix[0]) {
 				// we have a prefix
-				char composedKey[66];
+				char composedKey[CONFIG_KEY_NAME_LEN];
 
 				snprintf(composedKey, sizeof(composedKey), "%s_%s", prefix, key);
-				composedKey[sizeof(composedKey)-1] = '\0';
-
 				configSetStr(configSet, composedKey, val);
 			} else {
 				configSetStr(configSet, key, val);
@@ -413,9 +403,37 @@ int configRead(config_set_t* configSet) {
 			LOG("CONFIG Malformed file '%s' line %d: '%s'\n", configSet->filename, lineno, line);
 		}
 	}
-	closeFileBuffer(fileBuffer);
 	configSet->modified = 0;
 	return configSet->type;
+}
+
+int configReadBuffer(config_set_t* configSet, const void *buffer, int size) {
+	int ret;
+	file_buffer_t* fileBuffer = openFileBufferBuffer(0, buffer, size);
+	if (!fileBuffer) {
+		configSet->modified = 0;
+		return 0;
+	}
+
+	ret = configReadFileBuffer(fileBuffer, configSet);
+
+	closeFileBuffer(fileBuffer);
+	return ret;
+}
+
+int configRead(config_set_t* configSet) {
+	int ret;
+	file_buffer_t* fileBuffer = openFileBuffer(configSet->filename, O_RDONLY, 0, 4096);
+	if (!fileBuffer) {
+		LOG("CONFIG No file %s.\n", configSet->filename);
+		configSet->modified = 0;
+		return 0;
+	}
+
+	ret = configReadFileBuffer(fileBuffer, configSet);
+
+	closeFileBuffer(fileBuffer);
+	return ret;
 }
 
 int configWrite(config_set_t* configSet) {
@@ -497,13 +515,13 @@ int configWriteMulti(int types) {
 
 #ifdef VMC
 void configGetVMC(config_set_t* configSet, char* vmc, int length, int slot) {
-	char gkey[256];
+	char gkey[CONFIG_KEY_NAME_LEN];
 	snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
 	configGetStrCopy(configSet, gkey, vmc, length);
 }
 
 void configSetVMC(config_set_t* configSet, const char* vmc, int slot) {
-	char gkey[256];
+	char gkey[CONFIG_KEY_NAME_LEN];
 	if(vmc[0] == '\0') {
 		configRemoveVMC(configSet, slot);
 		return;
@@ -513,7 +531,7 @@ void configSetVMC(config_set_t* configSet, const char* vmc, int slot) {
 }
 
 void configRemoveVMC(config_set_t* configSet, int slot) {
-	char gkey[256];
+	char gkey[CONFIG_KEY_NAME_LEN];
 	snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
 	configRemoveKey(configSet, gkey);
 }

@@ -60,16 +60,11 @@ static int ethGetNetIFLinkStatus(void);
 
 static int ethInitSemaID = -1;
 
+//Initializes locking semaphore for network support (not for just SMB support, but for the network subsystem).
 static int ethInitSema(void) {
-	ee_sema_t SemaData;
-
 	if(ethInitSemaID < 0)
 	{
-		// Wait for a valid network status;
-		SemaData.option = SemaData.attr = 0;
-		SemaData.init_count = 1;
-		SemaData.max_count = 1;
-		if((ethInitSemaID = CreateSema(&SemaData)) < 0)
+		if((ethInitSemaID = sbCreateSemaphore()) < 0)
 			return ethInitSemaID;
 	}
 
@@ -279,10 +274,10 @@ static int ethLoadModules(void) {
 	if(!ethModulesLoaded) {
 		ethModulesLoaded = 1;
 
-		sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL);
-		NetManInit();
+		if (sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL) >= 0) {
+			NetManInit();
 
-		if (sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL) >= 0) {
+			sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
 			if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
 				//Before the network stack is loaded, attempt to set the link settings in order to avoid needing double-initialization of the IF.
 				//But do not fail here because there is currently no way to re-start initialization.
@@ -711,9 +706,9 @@ static int ethGetImage(char* folder, int isRelative, char* value, char* suffix, 
 }
 
 static void ethCleanUp(int exception) {
-	LOG("ETHSUPPORT CleanUp\n");
-
 	if (ethGameList.enabled) {
+		LOG("ETHSUPPORT CleanUp\n");
+
 		free(ethGames);
 	}
 
@@ -727,7 +722,7 @@ static int ethCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t ethGameList = {
-		ETH_MODE, 0, COMPAT, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		ETH_MODE, 0, COMPAT, -1, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 #ifdef __CHILDPROOF
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
 #else

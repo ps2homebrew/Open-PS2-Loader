@@ -1,6 +1,5 @@
 EE_BIN = elfldr.elf
 EE_OBJS = elfldr.o crt0.o
-EE_CFLAGS = -DIOP_RESET
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
 EE_CFLAGS := -D_EE -O2 -mgpopt -G8192 -Wall $(EE_INCS)

@@ -23,6 +23,7 @@ typedef struct
 } base_game_info_t;
 
 int sbIsSameSize(const char* prefix, int prevSize);
+int sbCreateSemaphore(void);
 int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount);
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex);
 void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int gamecount, int id);

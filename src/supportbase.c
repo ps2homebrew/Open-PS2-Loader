@@ -32,6 +32,16 @@ int sbIsSameSize(const char* prefix, int prevSize) {
 	return size == prevSize;
 }
 
+int sbCreateSemaphore(void)
+{
+	ee_sema_t sema;
+
+	sema.option = sema.attr = 0;
+	sema.init_count = 1;
+	sema.max_count = 1;
+	return CreateSema(&sema);
+}
+
 //0 = Not ISO disc image, GAME_FORMAT_OLD_ISO = legacy ISO disc image (filename follows old naming requirement), GAME_FORMAT_ISO = plain ISO image.
 static int isValidIsoName(char *name, int *pNameLen)
 {

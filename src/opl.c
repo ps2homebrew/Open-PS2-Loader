@@ -21,6 +21,7 @@
 #include "include/config.h"
 #include "include/util.h"
 
+#include "include/supportbase.h"
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
@@ -280,20 +281,21 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 	opl_io_module_t* mod = &list_support[mode];
 
 	if(startMode) {
+		if(itemList->semaID < 0)
+		{
+			if((itemList->semaID = sbCreateSemaphore()) < 0)
+				return;
+		}
+
 		if (!mod->support) {
-			itemList->uip = 1; // stop updates until we're done with init
 			mod->support = itemList;
 			initMenuForListSupport(mode);
-			itemList->uip = 0;
 		}
 
 		if (((force_reinit) && (startMode && mod->support->enabled)) \
 		  || (startMode == START_MODE_AUTO && !mod->support->enabled)) {
-			// stop updates until we're done with init of the device
-			mod->support->uip = 1;
 			mod->support->itemInit();
 			moduleUpdateMenu(mode, 0);
-			mod->support->uip = 0;
 
 			if (gAutoRefresh)
 				RefreshAllLists();
@@ -362,23 +364,20 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 }
 
 void menuDeferredUpdate(void* data) {
-	int* mode = data;
+	short int* mode = data;
 
 	opl_io_module_t* mod = &list_support[*mode];
 	if (!mod->support)
 		return;
 
-	if (mod->support->uip) {
-		// we are already refreshing, so drop this request.
-		return;
-	}
+	WaitSema(mod->support->semaID);
 
 	// see if we have to update
 	if (mod->support->itemNeedsUpdate()) {
-		mod->support->uip = 1;
 		updateMenuFromGameList(mod);
-		mod->support->uip = 0;
 	}
+
+	SignalSema(mod->support->semaID);
 }
 
 static void RefreshAllLists(void) {
@@ -518,7 +517,6 @@ static void _loadConfig() {
 			configGetInt(configOPL, "enable_coverart", &gEnableArt);
 			configGetInt(configOPL, "wide_screen", &gWideScreen);
 			configGetInt(configOPL, "vmode", &gVMode);
-
 
 #ifdef CHEAT
 			configGetInt(configOPL, "enable_cheat", &gEnableCheat);
@@ -720,6 +718,7 @@ static int loadHdldSvr(void) {
 
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
+	guiClearDeferredOps();
 
 	deinitAllSupport(NO_EXCEPTION);
 	clearErrorMessage();	/*	At this point, an error might have been displayed (since background tasks were completed).
@@ -809,10 +808,15 @@ static void moduleCleanup(opl_io_module_t* mod, int exception) {
 	if (!mod->support)
 		return;
 
+	WaitSema(mod->support->semaID);
+
 	if (mod->support->itemCleanUp)
 		mod->support->itemCleanUp(exception);
 
 	clearMenuGameList(mod);
+
+	DeleteSema(mod->support->semaID);
+	mod->support->semaID = -1;
 }
 
 void deinit(int exception) {
@@ -827,7 +831,6 @@ void deinit(int exception) {
 
 	deinitAllSupport(exception);
 }
-
 
 static void setDefaults(void) {
 	clearIOModuleT(&list_support[USB_MODE]);

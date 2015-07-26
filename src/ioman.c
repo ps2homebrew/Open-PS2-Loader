@@ -323,7 +323,7 @@ int ioBlockOps(int block) {
 
 		ThreadID=GetThreadId();
 		ReferThreadStatus(ThreadID, &status);
-		ChangeThreadPriority(ThreadID, 31);
+		ChangeThreadPriority(ThreadID, 90);
 
 		// wait for all io to finish
 		while (ioHasPendingRequests()) {};

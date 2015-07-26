@@ -100,6 +100,8 @@ int guiGetOpCompleted(int opid);
 */
 int guiDeferUpdate(struct gui_update_t *op);
 
+void guiClearDeferredOps(void);
+
 /** Allocates a new deffered operation */
 struct gui_update_t *guiOpCreate(gui_op_type_t type);
 

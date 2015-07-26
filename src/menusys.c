@@ -606,11 +606,16 @@ void menuHandleInputMenu() {
 void menuRenderMain() {
 	// selected_item can't be NULL here as we only allow to switch to "Main" rendering when there is at least one device activated
 	theme_element_t* elem = gTheme->mainElems.first;
-	while (elem) {
-		if (elem->drawElem)
-			elem->drawElem(selected_item, selected_item->item->current, NULL, elem);
+	item_list_t* list = selected_item->item->userdata;
 
-		elem = elem->next;
+	if (PollSema(list->semaID) == list->semaID) {
+		while (elem) {
+			if (elem->drawElem)
+				elem->drawElem(selected_item, selected_item->item->current, NULL, elem);
+
+			elem = elem->next;
+		}
+		SignalSema(list->semaID);
 	}
 }
 
@@ -660,11 +665,15 @@ void menuRenderInfo() {
 
 	WaitSema(menuSemaId);
 	theme_element_t* elem = gTheme->infoElems.first;
-	while (elem) {
-		if (elem->drawElem)
-			elem->drawElem(selected_item, selected_item->item->current, itemConfig, elem);
+	item_list_t* list = selected_item->item->userdata;
+	if (PollSema(list->semaID) == list->semaID) {
+		while (elem) {
+			if (elem->drawElem)
+				elem->drawElem(selected_item, selected_item->item->current, itemConfig, elem);
 
-		elem = elem->next;
+			elem = elem->next;
+		}
+		SignalSema(list->semaID);
 	}
 	SignalSema(menuSemaId);
 }

@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
 	SifLoadFileExit();
 
 	if (result==0 && exd.epc!=0) {
-#ifdef RESET_IOP
 		//Final IOP reset, to fill the IOP with the default modules.
 		while(!SifIopReset(NULL, 0)){};
 
@@ -73,8 +72,6 @@ int main(int argc, char *argv[])
 		SifLoadModule("rom0:MCMAN", 0, NULL);
 		SifLoadModule("rom0:MCSERV", 0, NULL);
 		SifLoadFileExit();
-
-#endif
 		SifExitRpc();
 
 		ExecPS2((void*)exd.epc, (void*)exd.gp, argc, argv);

@@ -690,7 +690,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	// Let's go.
 	fileXioExit();
-	SifInitRpc(0);
 	SifExitRpc();
 
 	FlushCache(0);
@@ -730,7 +729,6 @@ int sysExecElf(char *path) {
 
 	// Let's go.
 	fileXioExit();
-	SifInitRpc(0);
 	SifExitRpc();
 
 	elf_argv[0] = path;

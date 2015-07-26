@@ -72,14 +72,14 @@ enum ERROR_CODE{
 
 typedef struct
 {
-	int mode;
+	short int mode;
 
 	char enabled;
 
 	char haveCompatibilityMode;
 
-	/// update in progress indicator
-	char uip;
+	/// access-control semaphore
+	int semaID;
 
 	/// max inactive frame delay
 	int delay;

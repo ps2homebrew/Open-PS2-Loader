@@ -1048,8 +1048,8 @@ static void guiHandleOp(struct gui_update_t* item) {
 
 static void guiHandleDeferredOps(void) {
 
+	WaitSema(gSemaId);
 	while (gUpdateList) {
-		WaitSema(gSemaId);
 
 		guiHandleOp(gUpdateList->item);
 
@@ -1059,11 +1059,15 @@ static void guiHandleDeferredOps(void) {
 		free(td);
 
 		gCompletedOps++;
-
-		SignalSema(gSemaId);
 	}
+	SignalSema(gSemaId);
 
 	gUpdateEnd = NULL;
+}
+
+void guiClearDeferredOps(void) {
+	//Currently this clears deferred operations by executing them.
+	guiHandleDeferredOps();
 }
 
 static int bfadeout = 0x0;

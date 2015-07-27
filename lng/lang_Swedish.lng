@@ -1,160 +1,195 @@
-# translation by Ronald Andersson (aka: dlanor)
+# translation by Ronald Andersson (aka: dlanor) and Flaya
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Swedish
-               VÄLKOMMEN TILL ÖPPET PS2 Loader. MAIN kod baserad på källkoden HD PROJEKT <http://psx-scene.com> ANPASSNING TILL USB ADVANCE FORMAT OCH FÖRSTA GUI BY IFCARO <http://ps2dev.ifcaro.net> MEST AV LOADER CORE görs av JIMMIKAELKAEL . ALLA GUI förbättringar sker BY VOLCA . Tack för att använda vårt program ^ ^
-Öppet PS2 Loader % s
+Open PS2 Loader %s
 Spara ändringar
 Tillbaka
 Nätverkskonfig
-<ingen values>
-Inställningar sparas ...
-Fel vid skrivning inställningar !
-Utgång
-Inställningar
-USB- Spel
+Avancerad Konfig
+<Inga värden>
+Inställningar sparade...
+Fel vid skrivning av inställningar!
+Avsluta
+Inställning
+USB Spel
 HDD Spel
 ETH Spel
-appar
+Appar
 Tema
 Språk
-Nätverk startup error : % d
-Kan inte ansluta till SMB -server : % d
-Kan inte logga in SMB-server : % d
-Kan inte öppna SMB aktie : % d
+Systemet stängs av.
+Avsluta OPL?
+%d: Ingen Hårddisk hittad
+%d: Hårddisken ej formatterad
+%d: Nätverk startup error
+%d: Ingen nätverksadapter funnen
+%d: Kan inte ansluta till SMB-server
+%d: Kan inte logga in på SMB-server
+%d: Kan inte öppna SMB-mapp
+%d: Kan inte lista SMB-mappar
+%d: Kan inte lista spel
+%d: DHCP servern är otillgänglig
+%d: Ingen nätverksanslutning
 På
-off
+Av
 OK
-inställningar för spel
+Välj
+Avbryt
+Cirkel
+Kryss
+Spel-lista
+Spelinst.
 Ta bort alla inställningar
 Tog bort alla nycklar för spelet
-rulla
+Bläddra
 Sakta
-medium
+Medel
 Snabb
-grundmenyspråket
+Grundmeny
 Ladda från skiva
-vänta
+Vänta
 Fel vid laddning av Game ID
 Automatisk sortering
-Fel vid inläsning språkfilen
+Fel vid inläsning av språkfilen
 Inaktivera Debug Färger
-Ingen styrenhet upptäcks , vänta ...
-Aktivera Cover Art
+Ingen kontroll upptäcks , vänta ...
+Aktivera Omslag
 Bredbild
-ström av
-Laddar config
-spara config
-starta enheten
-USB -enhet startläge
-HDD-enhet startläge
+Stäng av
+Ladda config
+Spara config
+Starta enheten
+Uppdatera
+USB enhet startläge
+HDD enhet startläge
 ETH enhet startläge
-Ansökningar startläge
+Appar startläge
 Auto
 Manuell
 Starta HDL Server
 HDL Server Startar ...
-HDL Server Running ... Tryck [ O ] för att stoppa
-Tryck på [ X ] för att avsluta HDL -server
-HDL Server Lossning ...
+HDL Server Running...
+Kan inte starta HDL server.
+HDL Server Stängs...
 Utgång till
-bakgrundsfärg
-textfärg
+Bakgrundsfärg
+Textfärg
+IP Address typ
+Statisk
+DHCP
 IP
-mask
+Address
+Mask
 Gateway
+DNS Server
 Port
-Dela
+Delning
 Användare
-lösenord
-<Ej set>
+Lösenord
+<Ej angett>
+Address typ
+IP
+NetBIOS
 Acceptera
 Objektet ska tas bort permanent , fortsätta?
 Byt namn
-radera
+Radera
 Kör
-visa inställningar
-Aktivera bort och Byt namn åtgärder
-Kontrollera USB- spel fragmentering
-Minns senast spelade spel
-Avslöja GSM på huvudmenyn
+Inställningar Skärm
+Aktivera ta bort och Byt namn åtgärder
+Kontrollera USB spel fragmentering
+Kom ihåg senast spelade spel
+Välj knapp
 Fel , är spelet fragmenterad
 Fel , kunde inte köra posten
 Test
-Lämna tomt för GUEST auth .
-Ladda alternativa kärna
-Alternativa data som läses metod
-Haka Syscalls
-0 PSS -läge
-Inaktivera DVD - DL
+Lämna tomt för Gäst konto.
+Korrekt läsning
+Alternativa data metod
+Släpp Syscalls
+0 PSS läge
+Emulera DVD-DL
 Inaktivera IGR
-Använd lOP gängning hacka
+Oanvänd
 Göm dev9 modul
-Alternativ IGR combo
 Ändra storleken kommer att formatera om VMC
 Skapa
-ändra
-Abort
+Ändra
+Avbryt
 Återställ
 Använd generiska
 Konfigurera VMC
 Namn
 Storlek
 Status
-framsteg
+Framsteg
 VMC fil existerar
-Ogiltig VMC -fil , är storleken felaktig
-VMC -filen måste skapas
+Ogiltig VMC fil, felaktig storlek
+VMC filen måste skapas
 Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d ) ?
 Automatisk uppdatering
 Om
-kodare
-USB- fördröjning
+Kodare
+Kvalitetstestare
 USB prefix sökväg
-Lämna tomt för att avsluta till webbläsaren
-Värde i minut ( er ) , 0 för att inaktivera spinn ner
-Automatisk HDD spinn ner
+Lämna tomt för att avsluta till utforskaren
+Värde i minut (er), 0 för att inaktivera nerspinn
+Automatisk HDD nerspinn
 Videoläge
 Dialog färg
 Vald färg
 Visa info sida
 Info
 Custom ELF
-färgval
-Anslut
-Lämna tomt för att lista aktier
+Färgval
+Återanslut
+Lämna tomt för att lista delning
 ETH prefix sökväg
 Backsteg
-Space
+Mellanslag
 Enter
-läge
+Läge
 VMC Slot 1
 VMC Slot 2
-spel-ID
-DMA Mode
+Spel-ID
+DMA Läge
 V - Sync
-mode 1
-mode 2
-läge 3
-mode 4
-läge 5
-läge 6
-läge 7
-mode 8
-läge 9
-återuppringning timer
+Läge 1
+Läge 2
+Läge 3
+Läge 4
+Läge 5
+Läge 6
+Läge 7
+Läge 8
+Konfigurera GSM
+Återkallnings timer
 Applicera en försening till cDVD funktioner ( 0 är standard )
 Ethernet hastighet och duplex
 100Mbit full duplex
 100Mbit halv duplex
 10Mbit full duplex
 10Mbit halv duplex
-GSM-inställningar
+GSM inställningar
 Aktivera GSM
-Låter GSM kraft Valda videoläge
-Valt Videoläge
+GSM PÅ eller AV
+Vidoeläge
 Videoläge tvingas
-Horisontell Justera
+Horisontell position
 Ställer Horisontell offset
-Vertikal Justera
+Vertikal position
 Ställer Vertikal förskjutning
-FMV hoppa
-Tippvagnar Full Motion Video
+Skippa FMV
+Skippar Full Motion Video
+Visa PS2RD Fusk Meny på Huvudmeny
+Inställningar Fusk
+Aktivera PS2RD Fusk Motor
+Tillåter PS2RD patcha dina spel
+PS2RD Fusk Motor Läge
+Autovälj eller Välj spel fusk
+Autovälj Fusk
+Välj Fusk
+Fel: kunde inte ladda Fuskfilen
+Inga fusk funna

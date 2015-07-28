@@ -113,8 +113,7 @@ typedef struct _usb_callback_data {
 } usb_callback_data;
 
 static mass_dev g_mass_device;
-static fat_dir fatDirs[ISO_MAX_PARTS];
-extern unsigned int ReadPos;
+static fat_dir *fatDirs;
 
 static void mass_stor_release(mass_dev *dev);
 
@@ -904,6 +903,7 @@ static inline void initFileSystem(void)
 
 	CpuSuspendIntr(&OldState);
 	pointsBuffer = AllocSysMemory(ALLOC_FIRST, (int)cdvdman_settings.common.NumParts * maxChainPoints * sizeof(fat_dir_chain_record), NULL);
+	fatDirs = AllocSysMemory(ALLOC_FIRST, (int)cdvdman_settings.common.NumParts * sizeof(fat_dir), NULL);
 	CpuResumeIntr(OldState);
 
 	for(i = 0; i < cdvdman_settings.common.NumParts; i++)
@@ -1024,24 +1024,5 @@ int mass_stor_init(void)
 
 int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
-	register int r = 0;
-	register u32 sectors, nbytes;
-	u8 *p = (u8 *)buf;
-
-	while (nsectors > 0) {
-		sectors = nsectors;
-		if (sectors > 8)
-			sectors = 8;
-
-		nbytes = sectors << 11;
-		fat_fileIO(&fatDirs[part_num], part_num, FAT_IO_MODE_READ, lsn << 11, p, nbytes);
-
-		lsn += sectors;
-		r += sectors;
-		p += nbytes;
-		nsectors -= sectors;
-		ReadPos += nbytes;
-	}
-
-	return 1;
+	return(fat_fileIO(&fatDirs[part_num], part_num, FAT_IO_MODE_READ, lsn << 11, buf, nsectors << 11) == nsectors << 11 ? 1 : 0);
 }

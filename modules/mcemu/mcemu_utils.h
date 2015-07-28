@@ -38,7 +38,7 @@ int getModInfo(u8 *modname, modinfo_t *info);
 #include "mass_common.h"
 #include "fat.h"
 
-void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size, unsigned int maxPoints, fat_dir_chain_record *chainPointsBuf);
+void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size, unsigned int numChainPoints, fat_dir_chain_record *chainPointsBuf);
 #define I_fat_setFatDirChain DECLARE_IMPORT(5, fat_setFatDirChain)
 
 int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, unsigned int filePos, unsigned char* buffer, unsigned int size);

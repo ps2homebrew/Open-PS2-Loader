@@ -1,10 +1,13 @@
-# German Translation by Yorda
+# German Translation by Yorda; extra lines added by Jay-Jay
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 German
-               WILLKOMMEN BEIM OPEN PS2 LOADER. DAS HAUPTPROGRAMM BASIERT AUF DEM QUELLCODE DES HD PROJEKTS <http://psx-scene.com> PORTIERUNG IN DAS USB ADVANCE FORMAT UND STANDARD GUI BY IFCARO <http://ps2dev.ifcaro.net> DAS MEISTE DES LOADER PROGRAMMS IST VON JIMMIKAELKAEL PROGRAMMIERT. ALLE GUI ERWEITERUNGEN WURDEN VON VOLCA ERSTELLT. DANKE FÜR DAS BENUTZEN UNSERES PROGRAMMS ^^
 Open PS2 Loader %s
 Änderungen speichern
 Zurück
 Netzwerk Konfiguration
+Advanced options
 <keine Werte>
 Einstellungen gespeichert...
 Verlassen
@@ -15,13 +18,28 @@ ETH-Spiele
 Anwendungen
 Design
 Sprache
-Fehler beim Starten des Netzwerks: %d
-Kann nicht mit SMB Server verbunden werden: %d
-Kann sich nicht beim SMB Server anmelden: %d
-SMB Freigabe kann nicht geöffnet werden: %d
+Language
+The system will be powered off.
+Exit OPL?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Fehler beim Starten des Netzwerks
+%d: No network adaptor detected
+%d: Kann nicht mit SMB Server verbunden werden
+%d: Kann sich nicht beim SMB Server anmelden
+%d: SMB Freigabe kann nicht geöffnet werden
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
 Ein
 Aus
 OK
+Select
+Cancel
+Circle
+Cross
+Games List
 Spiele Einstellungen
 Entferne alle Einstellungen
 Entferne alle keys für das Spiel
@@ -43,28 +61,37 @@ Ausschalten
 Lade Konfiguration
 Speichere Konfiguration
 Gerät starten
+Refresh
 USB-Gerät Start Modus
 HDD-Gerät Start Modus
 ETH-Gerät Start Modus
 Anwendung Start Modus
 Automatisch
 Manuell
-Starte HDL Server
-HDL Server starten...
-HDL Server läuft... Drücke [O] zum anhalten
-Drücke [X] um HDL Server zu beenden
-HDL Server ausladen...
+Start HDL Server
+HDL Server Starting...
+HDL Server Running...
+Failed to start HDL Server.
+HDL Server Unloading...
 Verlassen nach
 Hintergrund-Farbe
 Text-Farbe
-IP
+IP address type
+Static
+DHCP
+IP address
+Address
 Netzmaske
 Gateway
+DNS Server
 Port
 Freigabe
 Benutzername
 Passwort
 <nicht eingestellt>
+Address type
+IP
+NetBIOS
 Annehmen
 Objekt wird permanent gelöscht, weiterfahren?
 Umbenennen
@@ -83,11 +110,10 @@ Lade alternativen Kern
 Alternative Datenlese-Methode
 Systemaufrufe abhängen
 0 PSS Modus
-Deaktiviere DVD-DL
+Emulate DVD-DL
 Deaktiviere IGR
-Nutze IOP threading Hack
+Unused
 Verstecke dev9 Modul
-Alterniere IGR Combo
 Die Änderung der Grösse wird die VMC erneut formatieren
 Erstellen
 Modifizieren
@@ -101,11 +127,12 @@ Status
 Fortschritt
 VMC Datei besteht
 Ungültige VMC Datei, Grösse ist falsch
+VMC file need to be created
 Fehler mit VMC %s, fahre fort mit physischer MC (Stecklatz %d) ?
 Automatisch aktualisieren
 Über
 Programmierer
-USB Verzögerung
+Quality Assurance
 USB Präfix Pfad
 Leer lassen um zum Browser zurückzukehren
 Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
@@ -137,8 +164,8 @@ Modus 5
 Modus 6
 Modus 7
 Modus 8
-Modus 9
-Timer zurückrufen
+Configure GSM
+Callback timer
 Verzögerung an den CDVD Funktionen anwenden
 Ethernet-Geschwindigkeit und duplex Einstellungen
 100Mbit full-duplex
@@ -147,12 +174,22 @@ Ethernet-Geschwindigkeit und duplex Einstellungen
 10Mbit half-duplex
 GSM Einstellungen
 Aktiviere GSM
-Lässt GSM den gewählten Video-Modus erzwingen
-Ausgewählter Video Modus
-Video Modus der erzwingt werden soll
-Horizontale Einstellung
-Stellt den horizontalen Versatz ein
-Vertikale Einstellung
-Stellt den vertikalen Versatz ein
-Video-Sequenzen überspringen
-Überspringt Video-Sequenz
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Show PS2RD Cheat Engine on Main Menu
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found

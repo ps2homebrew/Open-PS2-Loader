@@ -7,10 +7,19 @@
 
 #ifdef VMC
 #include "include/mcemu.h"
+#include "mass_common.h"
+#include "fat.h"
+
+typedef struct fat_file_info{
+	u32 cluster;
+	u32 size;
+} fat_info;
+
 typedef struct
 {
 	int        active;       /* Activation flag */
-	u32        start_sector; /* Start sector of vmc file */
+	fat_info   file;
+	fat_dir    fatDir;
 	int        flags;        /* Card flag */
 	vmc_spec_t specs;        /* Card specifications */
 } usb_vmc_infos_t;

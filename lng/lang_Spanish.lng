@@ -1,46 +1,29 @@
-# translation by darkgarba, El Patas, and Jay-Jay
-# Last update: 07/25/2015. 
-# Working with OPL_801_DB. 
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# translation by darkgarba and El Patas
 Spanish
+               BIENVENIDO AL OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DEL HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DEL USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
 Open PS2 Loader %s
 Guardar cambios
 Volver
 Configuracion de red
-Opciones Avanzadas
 <sin valores>
 Configuracion guardada...
 Error escribiendo configuracion!
 Salir
-Ajustes
+Opciones
 Juegos USB
 Juegos HDD
 Juegos ETH
 Aplicaciones
 Tema
 Idioma
-El sistema se apagará.
-Salir OPL?
-%d: Disco Duro no detectado
-%d: Disco Duro no formateado
-%d: Error iniciacion de red
-%d: Sin adaptador de red detectado
-%d: No se puede conectar a servidor SMB
-%d: No se puede loguear en servidor SMB
-%d: No se puede abrir carpeta SMB
-%d: No se puede listar carpeta SMB 
-%d: No se puede listar los juegos
-%d: DHCP servidor no disponible
-%d: No hay conexión a la red
+Error iniciacion de red: %d
+No se puede conectar a servidor SMB: %d
+No se puede loguear en servidor SMB: %d
+No se puede abrir carpeta SMB: %d
 Encendido
 Apagado
 OK
-Elegir
-Cancelar
-Círculo
-Cruz
-Lista de Juegos
-Opciones
+Opcion de juegos
 Quitar configuracion
 Quitar todos los botones para el juego
 Movimiento
@@ -53,15 +36,14 @@ Por favor espere
 Error cargando ID del juego
 Ordenar automaticamente
 Error cargando archivo de idioma
-Deshabilitar colores debug
-No se detecto controlador, esperando...
-Habilitar Caratulas
-Pantalla Panoramica
+Quitar colores debug
+No se detecto joystick, esperando...
+Habilitar caratulas
+Pantalla panoramica
 Apagar
 Cargando configuracion
 Guardando configuracion
 Inicializar dispositivo
-Actualizar
 Modo inicio dispositivo USB
 Modo inicio dispositivo HDD
 Modo inicio dispositivo ETH
@@ -70,28 +52,20 @@ Automatico
 Manual
 Inicializar Servidor HDL
 Inicializando Servidor HDL ...
-Servicor HDL Iniciado...
-Error al iniciar el servidor HDL.
-HDL Servidor Descargando...
-Ruta IGR
+Servicor HDL Iniciado ... Pulse [O] para detenerlo
+Pulse [X] para cancelar servicor HDL
+Deteniendo servidor HDL ...
+Salir a
 Color de fondo
 Color de texto
-Tipo de dirección IP
-Estático
-DHCP
-Dirección IP
-Dirección
+IP
 Mascara de red
 Gateway
-Servidor DNS
 Puerto
 Carpeta compartida
 Usuario
 Contraseña
 <ninguna>
-Tipo de dirección
-IP
-NetBIOS
 Aceptar
 El objeto sera eliminado, continuar ?
 Renombrar
@@ -101,19 +75,20 @@ Opciones de pantalla
 Activar borrado y renombrado
 Chequear fragmentacion USB
 Recordar ultimo juego cargado
-Seleccione el Botón
+Activar GMS en menu principal
 Error, el juego esta fragmentado
 Error, no se pudo inicializar
 Prueba
 Dejalo vacio para iniciar como invitado
-Lee precisa
+Cargar modulo alternativo
 Lectura de datos alternativa
 Deshabilitar llamadas de sistema
 Modo 0 PSS
-Emular DVD-DL
+Deshabilitar DVD-DL
 Deshabilitar IGR
-No usado
+Usar hack IOP
 Esconder modulo dev9
+Combo alternativo IGR
 Si cambias el tamaño se formateara VMC
 Crear
 Modificar
@@ -132,16 +107,16 @@ Error con VMC %s, continuar con la MC(slot %d) ?
 Recargar automaticamente
 Creditos
 Programadores
-Garantía de Calidad
+Retraso USB
 Prefijo ruta USB
 Dejalo vacio para salir al explorador
-Valor en minuto(s), 0 para deshabilitar detencion
+Valor en minutos, 0 para deshabilitar detencion HD
 Detencion automatica de HD
 Modo video
 Color dialogo
 Color seleccionado
 Enseñar pantalla informacion
-Info
+Informacion
 ELF customizado
 Seleccion de color
 Reconectar
@@ -149,7 +124,7 @@ Dejalo vacio para listar carpetas compartidas
 Prefijo ruta ETH
 Borrar
 Espacio
-Entrar
+Intro
 Modo
 VMC Slot 1
 VMC Slot 2
@@ -164,32 +139,22 @@ Modo 5
 Modo 6
 Modo 7
 Modo 8
-Configuración GSM
+Modo 9
 Llamada a reloj
 Aplicar retraso a funcion CDVD (0 es por defecto)
-Modo de enlace Ethernet
+Opciones de velocidad ethernet y duplex
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-Opciones GSM
-Activar GSM
-Activar o desactivar GSM
-VMODO
-Modo de visualización personalizado forzado.
-H-POS
-Ajuste Horizontal
-V-POS
-Ajuste Vertical
+Opciones GMS
+Activar GMS
+Dejar que GMS fuerce el modo de video
+Modo video seleccionado
+Modo video al que forzar
+Ajuste horizontal
+Ajusta offset horizontal
+Ajuste vertical
+Ajusta offset vertical
 Saltar FMV
-Salta las Escenas FMV
-Mostrar PS2RD Cheat Engine en el menú principal
-Ajustes Cheat
-Activar PS2RD Cheat Engine
-Deja parchar PS2RD Cheat Engine los juegos
-PS2RD Cheat Engine Modo
-De selección automática o seleccionar Cheats del juego
-Selección automática cheats
-Seleccionar juego cheats
-Error: no se pudo cargar Cheat Archivo
-No hay Cheats encontrados
+Salta las escenas FMV

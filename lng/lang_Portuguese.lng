@@ -1,161 +1,136 @@
-# translation by Gilbert and danielb 
-# Last update: 07/25/2015. 
-# Working with OPL_801_DB. 
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# translation by Gilbert 
 Portuguese
+               BEM-VINDO AO ABRIR PS2 Loader. C√≥digo principal com base na origem C√ìDIGO DE HD PROJECT <http://psx-scene.com> ADAPTA√á√ÉO AO FORMATO ADVANCE USB E GUI inicial por IFCARO <http://ps2dev.ifcaro.net> MAIS DE CARREGADOR n√∫cleo √© feito POR JIMMIKAELKAEL . Todas as melhorias gr√°ficas s√£o feitas por VOLCA . Obrigado por usar o NOSSO PROGRAMA ^ ^
 Open PS2 Loader %s
-Salvar mudan√ßas
+Salvar mudanÁas
 Voltar
-Configura√ß√µes de Rede
-Op√ß√µes avan√ßadas
+ConfiguraÁıes de Rede
 <sem valores>
-Configura√ß√µes salvas
-Erro ao salvar configura√ß√µes!
+ConfiguraÁıes salvas
+Erro ao salvar configuraÁıes!
 Sair
-Config.
+ConfiguraÁıes Gerais
 Jogos por USB
 Jogos por HDD 
 Jogos por Rede
 Aplicativos
 Temas
 Idioma
-O sistema ir√° desligar.
-Sair do OPL?
-%d: Disco Rigido n√£o detetado
-%d: Disco Rigido n√£o formatado
-%d: Erro ao iniciar rede 
-%d: Adaptador de Rede n√£o detetado
-%d: N√£o foi poss√≠vel ligar ao servidor SMB  
-%d: N√£o foi poss√≠vel efetuar login com o servidor SMB 
-%d: N√£o foi poss√≠vel abrir o compartilhamento SMB 
-%d: Impossivel listar partilhas SMB
-%d: Impossivel listar jogos
-%d: Servidor DHCP indisponivel
-%d: Sem liga√ß√£o de rede
+Erro ao iniciar rede: %d
+N„o foi possÌvel conectar com o servidor SMB: %d 
+N„o foi possÌvel efetuar login com o servidor SMB: %d 
+N„o foi possÌvel abrir o compartilhamento SMB: %d 
 Ativado
 Desativado
 Aceitar
-Eleger
-Cancelar
-Circulo
-Cruz
-Lista de Jogos
-Aj. do jogo
+Ajustes do jogo
 Remover todos os ajustes
 Removidos todos os ajustes para o jogo
 Rolagem
 Lento
-M√©dio
-R√°pido
-Menu padr√£o
+MÈdio
+R·pido
+Menu padr„o
 Carregar do disco
 Por favor espere
 Erro ao carregar ID do jogo
 Ordenar automaticamente
 Erro ao carregar arquivo de idioma
-Desativar depura√ß√£o de cores
-Controle n√£o detectado, esperando...
+Desativar depuraÁ„o de cores
+Controle n„o detectado, esperando...
 Habilitar Arte de Capas 
-Tela Panor√¢mica
+Tela Panor‚mica
 Desligar PS2
-Carregando configura√ß√µes
-Salvando configura√ß√µes...
+Carregando configuraÁıes
+Salvando configuraÁıes...
 Iniciar dispositivo
-Atualizar
 Modo de inicio para Dispositivo USB
 Modo de inicio para Dispositivo HDD
 Modo de inicio para Dispositivo Rede
 Modo de inicio para Aplicativos
-Autom√°tico
+Autom·tico
 Manual
 Iniciar servidor HDL
 Servidor HDL iniciando...
-Servidor HDL executando...
-Erro a iniciar o servidor de HDL Dump.
-Servidor HDL a fechar...
-Definir sa√≠da do IGR
+Servidor HDL conectado... Aperte [O] para parar
+Aperte [X] para fechar o servidor HDL
+Fechando servidor HDL
+Definir saÌda do OPL/IGR
 Cor de fundo
 Cor do texto
-Endere√ßo IP
-Est√°tico
-DHCP
-Endere√ßo IP
-Endere√ßo
-M√°scara de sub-rede
-Gateway padr√£o
-Servidor de DNS
+EndereÁo IP
+M·scara de sub-rede
+Gateway padr„o
 Porta
 Compartilhar
-Usu√°rio
+Usu·rio
 Senha
-<n√£o usado>
-Tipo de Endere√ßo
-IP
-NetBIOS
+<n„o usado>
 Confirmar
-O item ser√° PERMANENTEMENTE apagado! Continuar?
+O item ser· PERMANENTEMENTE apagado!Continuar?
 Renomear
 Deletar
 Iniciar
-Configura√ß√µes de Tela
-Ativar fun√ß√£o Deletar/Renomear
-Checar fragmenta√ß√£o em jogos USB
-Lembrar √∫ltimo jogo executado
-Bot√£o de Sele√ß√£o
-Erro, o jogo est√° fragmentado!
-Erro, n√£o foi poss√≠vel iniciar o item
+ConfiguraÁıes de Tela
+Ativar funÁ„o Deletar/Renomear
+Checar fragmentaÁ„o em jogos USB
+Lembrar ˙ltimo jogo executado
+Exibir GSM no menu principal
+Erro, o jogo est· fragmentado!
+Erro, n„o foi possÌvel iniciar o item
 Testar
-Deixar vazio para autoriza√ß√£o como convidado (GUEST)
-Carregar n√∫cleo alternativo
-M√©todo alternativo de leitura de dados
+Deixar vazio para autorizaÁ„o como convidado (GUEST)
+Carregar n˙cleo alternativo
+MÈtodo alternativo de leitura de dados
 Desativar chamadas do sistema
 Pular videos PSS
-Emular DVD-DL
+Desabilitar suporte DVD-DL
 Desabilitar IGR
-N√£o usado
-Esconder m√≥dulo dev9
-Alterar o tamanho (Ir√° reformatar o VMC!)
+Usar modificaÁ„o IOP
+Esconder mÛdulo dev9
+CombinaÁ„o IGR alternativa
+Alterar o tamanho (Ir· reformatar o VMC!)
 Criar
 Modificar
 Abortar
 Resetar
-Usar gen√©rico
+Usar genÈrico
 Configurar VMC
 Nome
 Tamanho
 Estado
 Progresso
-Arquivo VMC j√° existe
-Arquivo VMC inv√°lido, o tamanho est√° incorreto
+Arquivo VMC j· existe
+Arquivo VMC inv·lido, o tamanho est· incorreto
 Arquivo VMC precisa ser criado!
-Erro com arquivo VMC, continuar com MC f√≠sico?
-Atualiza√ß√£o autom√°tica
-Cr√©ditos
+Erro com arquivo VMC, continuar com MC fÌsico?
+AtualizaÁ„o autom·tica
+CrÈditos
 Desenvolvedores
-Controlo de qualidade
+Tempo de atraso USB
 Prefixo de caminho USB
 Deixar vazio para sair p/ o Browser
 Valor em minuto(s), 0 p/ desativar
-Desligamento autom√°tico do HDD
-Modo de v√≠deo
-Cor do di√°logo
+Desligamento autom·tico do HDD
+Modo de vÌdeo
+Cor do di·logo
 Cor selecionada
-Mostrar P√°gina de Informa√ß√£o 
+Mostrar P·gina de InformaÁ„o 
 Info
 ELF customizado
-Sele√ß√£o de Cor
+SeleÁ„o de Cor
 Reconectar
-Deixar vazio para listar partilhas
+Deixar vazio para listar compartilhamentos
 Prefixo de caminho ETH
 Retroceder
-Espa√ßo
+EspaÁo
 Aceitar
 Modo
 VMC Slot 1
 VMC Slot 2
 ID do Jogo
 Modo DMA
-Sincroniza√ß√£o do v√≠deo 
+SincronizaÁ„o do vÌdeo 
 Modo 1
 Modo 2
 Modo 3
@@ -164,32 +139,22 @@ Modo 5
 Modo 6
 Modo 7
 Modo 8
-Configurar GSM
+Modo 9
 Callback Timer
-Aplicar atraso para as fun√ß√µes CDVD (0 √© o padr√£o)
+Aplicar atraso para as funÁıes CDVD (0 È o padr„o)
 Velocidade Ethernet e sistema Duplex
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-Op√ß√µes do GSM
-Ativar o GSM
-Permitir que o GSM ative o modo de v√≠deo escolhido
-Modo de v√≠deo selecionado
-Modo de v√≠deo a ser ativado
+Ajustes do GSM
+Habilitar o GSM
+Permitir que o GSM ative o modo de vÌdeo escolhido
+Modo de vÌdeo selecionado
+Modo de vÌdeo a ser ativado
 Ajuste horizontal
-Definir compensa√ß√£o horizontal
+Definir compensaÁ„o horizontal
 Ajuste vertical
-Definir compensa√ß√£o vertical
+Definir compensaÁ„o vertical
 Pular FMV
-Pular v√≠deos
-Mostrar PS2RD Cheat Engine no Menu Principal
-Op√ß√µes de Cheat
-Ativar PS2RD Cheat Engine
-Permite PS2RD Cheat Engine injetar c√≥digo nos jogos.
-Modo da PS2RD Cheat Engine
-Auto-Selecionar ou Selecionar cheats de jogo
-Auto-Selecionar cheats
-Selecionar cheats do jogo
-Erro: falha ao abrir o ficheiro de Cheat
-Nenhum Cheat encontrado
+Pular vÌdeos

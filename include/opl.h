@@ -130,7 +130,6 @@ int gDefaultDevice;
 
 int gEnableDandR;
 
-int gCheckUSBFragmentation;
 char gUSBPrefix[32];
 char gETHPrefix[32];
 

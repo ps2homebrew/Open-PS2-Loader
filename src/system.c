@@ -616,9 +616,10 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 #ifdef VMC
 	modules |= CORE_IRX_VMC;
-	LOG("SYSTEM LaunchLoaderElf called with size_mcemu_irx = %d\n", size_mcemu_irx);
+	LOG("SYSTEM LaunchLoaderElf loading modules with size_mcemu_irx = %d\n", size_mcemu_irx);
 	sendIrxKernelRAM(modules, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
+	LOG("SYSTEM LaunchLoaderElf loading modules\n");
 	sendIrxKernelRAM(modules, size_cdvdman_irx, cdvdman_irx);
 #endif
 

@@ -1,46 +1,29 @@
-# translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>; extra lines added by Jay-Jay
-# Last update: 07/25/2015. 
-# Working with OPL_801_DB. 
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
 Filipino
-Open PS2 Loader %s
+               Maligayang pagdating sa OPEN PS2 loader . PANGUNAHING CODE BATAY SA SOURCE CODE NG HD pagbagay proyekto <http://psx-scene.com> SA USB maaga FORMAT AT paunang GUI NG IFCARO <http://ps2dev.ifcaro.net> Karamihan sa loader Core AY GINAWA NG JIMMIKAELKAEL . LAHAT NG GUI pagpapabuti AY GINAWA NG VOLCA . Salamat para sa paggamit AMING PROGRAM ^ ^
+Buksan ang PS2 loader % s
 I-save ang mga pagbabago
-Likod
-Network Config
-Advanced options
+likod
+network config
 <Walang values>
-Save ang mga setting...
+Save ang mga setting ...
 Error sa pagsulat setting !
-Lumabas
-Settings
+lumabas
+Mga Setting
 USB Laro
 HDD Laro
 ETH Laro
 Apps
 tema
 wika
-The system will be powered off.
-Exit OPL?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
-%d: Network startup error 
-%d: No network adaptor detected
-%d: Hindi makakonekta sa SMB server
-%d: Hindi makapag-log in sa SMB server
-%d: Hindi mabuksan ang SMB ibahagi
-%d: Cannot list SMB shares
-%d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
-Sa
-Mula sa
-Ayos
-Select
-Cancel
-Circle
-Cross
-Games List
-Game settings
+Network startup error: % d
+Hindi makakonekta sa SMB server: % d
+Hindi makapag-log in sa SMB server: % d
+Hindi mabuksan ang SMB ibahagi: % d
+sa
+mula sa
+ayos
+game setting
 Alisin ang lahat ng mga setting ng
 Inalis ang lahat ng mga pindutan para sa mga laro
 i-scroll
@@ -54,51 +37,42 @@ Nagkaroon ng error habang naglo-load ang ID ng Laro
 Awtomatikong pag-uuri
 Error sa paglo-load ng file wika
 Huwag paganahin ang mga Kulay Debug
-Controller Walang natukoy na , naghihintay...
+Controller Walang natukoy na , naghihintay ...
 Paganahin ang Cover Art
 Malapad na screen
 Power off
 Nilo-load ang config
 Sine-save ang config
 Simulan ang aparato
-Refresh
 USB device simula mode
 HDD device simula mode
 ETH aparato simula mode
 Mga application na simulan ang mode
 auto
 manwal
-Start HDL Server
-HDL Server Starting...
-HDL Server Running...
-Failed to start HDL Server.
-HDL Server Unloading...
+Simulan ang HDL Server
+HDL Server Nagsisimula ...
+HDL Server Pagpapatakbo ... Pindutin ang [ O ] para itigil
+Pindutin ang [ X ] upang wakasan ang HDL server
+HDL Server Pagbaba ng karga ...
 Lumabas sa
 kulay ng background
 kulay ng teksto
-IP address type
-Static
-DHCP
-IP address
-Address
-Mask
-Gateway
-DNS Server
-Port
+IP
+mask
+gateway
+port
 magbahagi
 gumagamit
-Password
+password
 <Hindi set>
-Address type
-IP
-NetBIOS
 tanggapin
-Item ay permanenteng tatanggalin, magpatuloy?
-Rename
-Alisin
-Tumakbo
+Item ay permanenteng tatanggalin , magpatuloy?
+bigyan ng ibang pangalan
+alisin
+tumakbo
 Ipakita ang mga setting
-Enable Delete and Rename actions
+Paganahin ang Tanggalin at Palitan ang pangalan ng pagkilos
 Suriin ang USB laro pagkapira-piraso
 Tandaan ang huling play ng laro
 Ipakita ang GSM sa Main Menu
@@ -106,33 +80,34 @@ Error, ang laro ay fragmented
 Error, hindi maaaring tumakbo ang item
 pagsubok
 Iwanang walang laman para sa Guest auth .
-Accurate reads
+Mag-load ng kahaliling core
 Alternatibong data basahin pamamaraan
 alisin sa pagkakakawit Syscalls
 0 PSS mode
-Emulate DVD-DL
-Disable IGR
-Unused
-Hide dev9 module
+Huwag paganahin ang DVD- DL
+Huwag paganahin ang IGR
+Gamitin IOP threading magtadtad
+Itago ang dev9 module
+Kahaliling IGR combo
 Ang pagbabago ng laki ay i-reformat ang VMC
-Lumikha
-Baguhin
-May pagpapalaglag
+lumikha
+baguhin
+may pagpapalaglag
 I-reset ang
 gumamit ng generic
 I-configure ang VMC
-Pangalan
-Laki
+pangalan
+laki
 katayuan
 pag-unlad
 VMC file umiiral
 Di-wastong VMC file , laki ay hindi tama
 VMC file na kailangan upang malikha
-Error sa VMC %s , magpatuloy sa pisikal na MC ( slot %d) ?
+Error sa VMC % s , magpatuloy sa pisikal na MC ( slot % d) ?
 Awtomatikong i-refresh
 tungkol sa
 Coders
-Quality Assurance
+USB pagkaantala
 USB prefix landas
 Iwanang walang laman upang lumabas sa Browser
 Halaga sa (mga) minuto , 0 upang huwag paganahin iikot pababa
@@ -141,21 +116,21 @@ Video mode
 dialog ng kulay
 Piniling kulay
 Ipakita ang impormasyon ng pahina
-Impo
-Custom ELF
+Impormasyon
+Custom duwende
 kulay ng seleksyon
 Muling kumonekta
 Iwanang walang laman upang ilista ang pagbabahagi
 ETH prefix landas
 Backspace
-Puwang
-Magpasok
-Moda
+puwang
+magpasok
+moda
 VMC Slot 1
 VMC Slot 2
 ID ng Laro
 DMA Mode
-V-Sync
+V - sync
 Mode 1
 Mode 2
 Mode 3
@@ -164,7 +139,7 @@ Mode 5
 Mode 6
 Mode 7
 Mode 8
-Configure GSM
+Mode 9
 Callback timer
 Ilapat ang isang pagka-antala sa CDVD function (0 ang default)
 Ethernet bilis at duplex setting
@@ -174,22 +149,13 @@ Ethernet bilis at duplex setting
 10Mbit half-duplex
 GSM Mga Setting
 paganahin GSM
-Toggles GSM ON or OFF
-VMODE
-Forced Custom Display Mode
-H-POS
-Horizontal Adjustment
-V-POS
-Vertical Adjustment
-FMV Skip
-Skips Full Motion Videos
-Show PS2RD Cheat Engine on Main Menu
-Cheat Settings
-Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
-PS2RD Cheat Engine Mode
-Auto-select or Select game cheats
-Auto-select cheats
-Select game cheats
-Error: failed to load Cheat File
-No cheats found
+Hinahayaan GSM puwersa na Mga Napiling Mode na Video na
+Napiling mga na Video na Mode
+Na Video mode sa na pinilit
+pahalang Isaayos
+Itinatakda Pahalang na Offset ng
+Isaayos ang Patayong
+Itinatakda ang Patayong Offset ng
+Laktawan ang FMV
+Skips Buong Paggalaw na Video
+Skips Full Motion Video

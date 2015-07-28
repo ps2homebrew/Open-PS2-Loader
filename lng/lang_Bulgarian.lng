@@ -1,28 +1,46 @@
-# translation by vsub
+# translation by vsub / added missing lines by Jay-Jay
+# Last update: 07/28/2015. 
+# Updated for OPL_803_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Bulgarian
-               WELCOME TO OPEN LOADER PS2 . ОСНОВНА код, базиран на изходния код на HD PROJECT АДАПТАЦИЯ <http://psx-scene.com> и премина USB FORMAT и първоначалната GUI BY IFCARO <http://ps2dev.ifcaro.net> ПОВЕЧЕТО CORE LOADER е направена от JIMMIKAELKAEL . ВСИЧКИ графичните подобрения са направени от VOLCA . Плащането се осъществява чрез нашата програма ^ ^
-Open PS2 Loader % S
+Open PS2 Loader %s
 Запазване на промените
 обратно
 Network довереник
+Advanced options
 <No values>
-Настройките са запазени ...
-Грешка настройките за писане !
+Настройките са запазени...
+Грешка настройките за писане!
 изход
 Настройки
+Mеню
 USB Games
 HDD Games
 ETH Games
 Apps
 тема
 език
-Network стартиране грешка: % г
-Не може да свържете към SMB сървър % г
-Не мога да вляза в сървър SMB: % г
-Не мога да отворя SMB дял: % г
+The system will be powered off.
+Exit OPL?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Network startup error
+%d: No network adaptor detected
+%d: Cannot connect to SMB server
+%d: Cannot log into SMB server
+%d: Cannot open SMB share
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
 на
 от
 добре
+Select
+Cancel
+Circle
+Cross
+Games List
 настройки на играта
 Премахни всички настройки
 Премахнати всички бутони за игра
@@ -44,28 +62,37 @@ Default меню
 Зареждане на довереник
 запазване на конфигурационния
 Започнете устройство
+Refresh
 USB режим устройството началото
 HDD режим устройството началото
 ETH режим устройството началото
 Приложения започне режим
 автомобил
 наръчник
-Започнете Сървър HDL
-HDL Сървър започне ...
-HDL сървъра, изпълняващ ... Натиснете [ O ], за да спрете
-Натиснете [ X] да прекрати HDL сървъра
-HDL Сървър разтоварни ...
+Start HDL Server
+HDL Server Starting...
+HDL Server Running...
+Failed to start HDL Server.
+HDL Server Unloading...
 Излез
 цвят на фона
 цвят на текста
-IP
+IP address type
+Static
+DHCP
+IP address
+Address
 маска
 вход
+DNS Server
 порт
 дял
 потребител
 парола
-<Not set>
+<not set>
+Address type
+IP
+NetBIOS
 приемам
 Позиция ще бъдат окончателно изтрити , продължи ?
 преименувам
@@ -73,22 +100,19 @@ IP
 тичам
 настройки на дисплея
 Активирайте Изтриване и преименуване действия
-Проверете USB фрагментация игра
 Запомни Последно играна игра
 Покажи GSM на Main Menu
-Грешка , играта е разпокъсана
-Грешка , не могат да работят на позиция
+Грешка, не могат да работят на позиция
 тест
-Оставете празно за GUEST AUTH .
+Оставете празно за GUEST auth.
 Заредете заместник ядро
 Алтернативни данни чете метод
 Откачете Syscalls
 0 PSS режим
-Изключване на DVD- DL
+Emulate DVD-DL
 Изключване на IGR
-Използвайте ВОН вдяване хак
+Unused
 Скрий dev9 модул
-Алтернативен IGR комбо
 Промяна на размера ще преформатиране на VMC
 създавам
 Промяна
@@ -103,11 +127,11 @@ IP
 VMC файл съществува
 Невалиден VMC файл , размерът е неправилно
 VMC файл трябва да бъдат създадени
-Грешка с VMC % S , продължи с физическото MC ( слот % г) ?
+Грешка с VMC %s, продължи с физическото MC (слот %d)?
 Автоматично опресняване
 около
 Coders
-USB закъснение
+Quality Assurance
 USB префикс пътя
 Оставете празно , за да излезете да Browser
 Стойност в минута (и) , 0 до забраните за спиране въртенето
@@ -133,16 +157,15 @@ DMA Mode
 V- Sync
 режим 1
 режим 2
-Mode 3
-Mode 4
-Mode 5
-Mode 6
-Mode 7
-Mode 8
-Mode 9
-обр. таймер
-Нанесете незабавно да CDVD функции ( 0 е по подразбиране)
-Ethernet скоростта и настройки за дуплекс
+режим 3
+режим 4
+режим 5
+режим 6
+режим 7
+режим 8
+Configure GSM
+Callback timer
+Нанесете незабавно да CDVD функции (0 е по подразбиране)
 Ethernet скоростта и настройки за дуплекс
 100Mbit пълен дуплекс
 100Mbit полу-дуплекс
@@ -150,12 +173,22 @@ Ethernet скоростта и настройки за дуплекс
 10Mbit полу-дуплекс
 GSM Настройки на
 Активирайте GSM
-Позволява GSM сила от избрания режим видеото
-Избрани Видео режима
-Видео режим, за да бъдат принудени
-Хоризонтална Регулирайте
-Задава Хоризонтално отместване
-Вертикална Регулирайте
-Задава на вертикалното отместване
-FMV пропуснете
-Прескача Пълен Видео за движение
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Show PS2RD Cheat Engine on Main Menu
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found

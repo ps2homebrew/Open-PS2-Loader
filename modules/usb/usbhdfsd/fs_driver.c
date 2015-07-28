@@ -687,65 +687,6 @@ static int fs_getstat(iop_file_t *fd, const char *name, iox_stat_t *stat)
 }
 
 //---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-static unsigned int fs_getFileSector(iop_file_t *fd, const char *name)
-{
-	fat_driver* fatd;
-	int ret;
-	unsigned int cluster = 0;
-	fat_dir fatDir;
-
-	fatd = fat_getData(fd->unit);
-	if (fatd == NULL)
-		return 0;
-
-	ret = fat_getFileStartCluster(fatd, name, &cluster, &fatDir);
-	if (ret < 0)
-		return 0;
-
-	return fat_cluster2sector(&fatd->partBpb, cluster);
-}
-
-static int fs_checkClusterChain(iop_file_t *fd, char *name)
-{
-	int chain_end = 0;
-	fat_driver* fatd;
-	fs_rec* rec = NULL;
-	int ret, chain_size;
-	unsigned int cluster = 0;
-
-	fatd = fat_getData(fd->unit);
-	if (fatd == NULL)
-		return 0;
-
-	rec = fs_findFreeFileSlot();
-	if (rec == NULL)
-		return 0;
-
-	ret = fat_getFileStartCluster(fatd, name, &cluster, &rec->dirent.fatdir);
-	if (ret < 0) {
-		rec->dirent.file_flag = -1;
-		return 0;
-	}
-
-	rec->dirent.file_flag = -1;
-
-	// Check cluster chain (write operation can cause damage if file is fragmented)
-	while (chain_end == 0) {
-		chain_size = fat_getClusterChain(fatd, cluster, fatd->cbuf, MAX_DIR_CLUSTER, 1);
-		
-		if(fatd->cbuf[0] != fatd->cbuf[chain_size-1] - (chain_size-1))
-			return 0;
-
-		if (chain_size == MAX_DIR_CLUSTER) {
-			cluster = fatd->cbuf[chain_size - 1];
-		} else {
-			chain_end = 1;
-		}
-	}
-
-	return 1;
-}
 
 int fs_ioctl(iop_file_t *fd, u32 request, void *data)
 {
@@ -766,14 +707,29 @@ int fs_ioctl(iop_file_t *fd, u32 request, void *data)
 			ret = fat_renameFile(fatd, &dirent->fatdir, data);	//No need to re-cast since this inner structure is a common one.
 			FLUSH_SECTORS(fatd);
 			break;
+		case USBHDFSD_IOCTL_GETSECTOR:
+			ret = fat_cluster2sector(&fatd->partBpb, ((fs_rec *)fd->privdata)->dirent.fatdir.chain[0].cluster);
+			break;
 		case USBHDFSD_IOCTL_GETCLUSTER:
-			ret = fs_getFileSector(fd, (char *)data);
+			ret = dirent->fatdir.startCluster;
+			break;
+		case USBHDFSD_IOCTL_GETSIZE:
+			ret = dirent->fatdir.size;
+			break;
+		case USBHDFSD_IOCTL_GETFATSTART:
+			ret = fatd->partBpb.partStart + fatd->partBpb.resSectors;
+			break;
+		case USBHDFSD_IOCTL_GETDATASTART:
+			ret = fatd->partBpb.dataStart;
+			break;
+		case USBHDFSD_IOCTL_GETCLUSTERSIZE:
+			ret = fatd->partBpb.clusterSize;
 			break;
 		case USBHDFSD_IOCTL_GETDEVSECTORSIZE:
 			ret = mass_stor_sectorsize(fatd->dev);
 			break;
 		case USBHDFSD_IOCTL_CHECKCHAIN:
-			ret = fs_checkClusterChain(fd, (char *)data);
+			ret = fat_CheckChain(fatd, &((fs_dir *)fd->privdata)->dirent.fatdir);
 			break;
 		default:
 			ret = fs_dummy();

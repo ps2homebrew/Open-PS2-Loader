@@ -66,6 +66,13 @@ struct _Sio2Packet
 	u32   rdcount;
 } Sio2Packet;
 
+#ifdef USB_DRIVER
+struct fat_file{
+	u32 cluster;
+	u32 size;
+};
+#endif
+
 #ifdef HDD_DRIVER
 /* Apa partitions informations */
 typedef struct {
@@ -97,7 +104,8 @@ struct _McImageSpec
 	int        active;     /* Activation flag */
 
 #ifdef USB_DRIVER
-	u32        stsec;      /* Vmc file start sector */
+	struct fat_file file;
+	fat_dir         fatDir;
 #endif
 
 #ifdef HDD_DRIVER

@@ -915,6 +915,42 @@ int fat_getFirstDirentry(fat_driver* fatd, const unsigned char* dirName, fat_dir
 }
 
 //---------------------------------------------------------------------------
+int fat_CheckChain(fat_driver* fatd, fat_dir* fatDir){
+	int i;
+	int chainSize;
+	int nextChain;
+
+	unsigned int fileCluster;
+	unsigned int clusterPos;
+
+	int clusterChainStart;
+
+	fat_getClusterAtFilePos(fatd, fatDir, 0, &fileCluster, &clusterPos);
+
+	if (fileCluster < 2) return 1;
+
+	nextChain = 1;
+	clusterChainStart = 1;
+
+	while (nextChain) {
+		chainSize = fat_getClusterChain(fatd, fileCluster, fatd->cbuf, MAX_DIR_CLUSTER, clusterChainStart);
+		clusterChainStart = 0;
+		if (chainSize >= MAX_DIR_CLUSTER) { //the chain is full, but more chain parts exist
+			fileCluster = fatd->cbuf[MAX_DIR_CLUSTER - 1];
+		}else { //chain fits in the chain buffer completely - no next chain needed
+			nextChain = 0;
+		}
+
+		//process the cluster chain (fatd->cbuf) and skip leading clusters if needed
+		for (i = 0; i < (chainSize-1); i++) {
+			if((fatd->cbuf[i]+1)!=fatd->cbuf[i+1]) return 0;
+		}
+	}
+
+	return 1;
+}
+
+//---------------------------------------------------------------------------
 int fat_mount(mass_dev* dev, unsigned int start, unsigned int count)
 {
 	fat_driver* fatd = NULL;

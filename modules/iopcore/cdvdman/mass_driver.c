@@ -4,7 +4,10 @@
  */
 
 #include <errno.h>
+#include <intrman.h>
 #include <sysclib.h>
+#include <sysmem.h>
+#include <thbase.h>
 #include <thsemap.h>
 #include <stdio.h>
 #include <usbd.h>
@@ -16,6 +19,7 @@
 #include "mass_debug.h"
 #include "mass_common.h"
 #include "mass_stor.h"
+#include "fat.h"
 #include "cdvd_config.h"
 
 extern struct cdvdman_settings_usb cdvdman_settings;
@@ -102,16 +106,6 @@ typedef struct _read_capacity_data {
 
 static UsbDriver driver;
 
-#ifdef VMC_DRIVER
-static int io_sema;
-
-#define WAITIOSEMA(x) WaitSema(x)
-#define SIGNALIOSEMA(x) SignalSema(x)
-#else
-#define WAITIOSEMA(x)
-#define SIGNALIOSEMA(x)
-#endif
-
 typedef struct _usb_callback_data {
 	int semh;
 	int returnCode;
@@ -119,32 +113,7 @@ typedef struct _usb_callback_data {
 } usb_callback_data;
 
 static mass_dev g_mass_device;
-
-#ifndef _4K_SECTORS
-struct MSStoDSS_t {
-	short int massSectorSize;
-	short int shiftPos;
-};
-
-enum MASS_SECTOR_SIZE{
-	MASS_SECTOR_SIZE_512 = 0,
-	MASS_SECTOR_SIZE_1024,
-	MASS_SECTOR_SIZE_2048,
-
-	MASS_SECTOR_SIZE_COUNT
-};
-
-static struct MSStoDSS_t gMSStoDSS[MASS_SECTOR_SIZE_COUNT] = {
-	{ 512 ,  2 },
-	{ 1024,  1 },
-	{ 2048,  0 }	//Anything larger will require more complicated code due to alignment requirements.
-};
-
-static short int gShiftPos;
-#else
-static u8 _4K_buf[4096];
-#endif
-
+static fat_dir fatDirs[ISO_MAX_PARTS];
 extern unsigned int ReadPos;
 
 static void mass_stor_release(mass_dev *dev);
@@ -650,7 +619,7 @@ static inline int cbw_scsi_read_capacity(mass_dev* dev, void *buffer, int size)
 	return -EIO;
 }
 
-static inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* buffer, unsigned short int sectorCount)
+static void cbw_scsi_sector_io(mass_dev* dev, short int dir, unsigned int lba, void* buffer, unsigned short int sectorCount)
 {
 	int rcode, result;
 	static cbw_packet cbw={
@@ -677,7 +646,18 @@ static inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* bu
 			0,		// reserved
 		}
 	};
-	XPRINTF("USBHDFSD: cbw_scsi_read_sector - 0x%08x %p 0x%04x\n", lba, buffer, sectorCount);
+	XPRINTF("USBHDFSD: cbw_scsi_sector_io (%s) - 0x%08x %p 0x%04x\n", dir == USB_BLK_EP_IN ? "READ" : "WRITE", lba, buffer, sectorCount);
+
+	if(dir == USB_BLK_EP_IN)
+	{	//READ operation
+		cbw.tag = -TAG_READ;
+		cbw.flags = 0x80;
+		cbw.comData[0] = 0x28;	//Operation code
+	}else{	//WRITE operation
+		cbw.tag = -TAG_WRITE;
+		cbw.flags = 0;
+		cbw.comData[0] = 0x2A;	//Operation code
+	}
 
 	cbw.dataTransferLength = dev->sectorSize * sectorCount;
 
@@ -689,107 +669,29 @@ static inline int cbw_scsi_read_sector(mass_dev* dev, unsigned int lba, void* bu
 	cbw.comData[7] = (sectorCount & 0xFF00) >> 8;	//Transfer length MSB
 	cbw.comData[8] = (sectorCount & 0xFF);		//Transfer length LSB
 
-	result = -EIO;
-	if(usb_bulk_command(dev, &cbw) == USB_RC_OK){
-		rcode = usb_bulk_transfer(dev, USB_BLK_EP_IN, buffer, dev->sectorSize * sectorCount);
-		result = usb_bulk_manage_status(dev, -TAG_READ);
+	do{
+		result = -EIO;
+		if(usb_bulk_command(dev, &cbw) == USB_RC_OK){
+			rcode = usb_bulk_transfer(dev, dir, buffer, dev->sectorSize * sectorCount);
+			result = usb_bulk_manage_status(dev, cbw.tag);
 
-		if(rcode != USB_RC_OK) result = -EIO;
-	}
+			if(rcode != USB_RC_OK) result = -EIO;
+		}
 
-	return result;
+		if(result == 0) break;
+		DelayThread(2000);
+	}while(result != 0);
 }
 
-/* size should be a multiple of sector size */
-int mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char* buffer)
+void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char* buffer)
 {
-	//assert(size % mass_device->sectorSize == 0);
-	//assert(sector <= mass_device->maxLBA);
-	int retries;
-
-	WAITIOSEMA(io_sema);
-
-	for(retries = USB_IO_MAX_RETRIES; retries > 0; retries--){
-		if(cbw_scsi_read_sector(&g_mass_device, lba, buffer, nsectors) == 0){
-			SIGNALIOSEMA(io_sema);
-			return nsectors;
-		}
-	}
-
-	SIGNALIOSEMA(io_sema);
-	return -EIO;
+	cbw_scsi_sector_io(&g_mass_device, USB_BLK_EP_IN, lba, buffer, nsectors);
 }
 
 #ifdef VMC_DRIVER
-static inline int cbw_scsi_write_sector(mass_dev* dev, unsigned int lba, const void* buffer, unsigned short int sectorCount)
+void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char* buffer)
 {
-	int rcode, result;
-	static cbw_packet cbw={
-		CBW_TAG, 		// cbw.signature
-		-TAG_WRITE,		// cbw.tag
-		0,			// cbw.dataTransferLength
-		0,			// cbw.flags
-		0,			// cbw.lun
-		12,			// cbw.comLength
-
-		/* scsi command packet */
-		{
-			0x2A,		//write operation code
-			0,		//LUN/DPO/FUA/Reserved/Reldr
-			0,		//lba 1 (MSB)
-			0,		//lba 2
-			0,		//lba 3
-			0,		//lba 4 (LSB)
-			0,		//Reserved
-			0,		//Transfer length MSB
-			0,		//Transfer length LSB
-			0,		//reserved
-			0,		//reserved
-			0,		//reserved
-		}
-	};
-	XPRINTF("USBHDFSD: cbw_scsi_write_sector - 0x%08x %p 0x%04x\n", lba, buffer, sectorCount);
-
-	cbw.dataTransferLength = dev->sectorSize * sectorCount;
-
-	//scsi command packet
-	cbw.comData[2] = (lba & 0xFF000000) >> 24;	//lba 1 (MSB)
-	cbw.comData[3] = (lba & 0xFF0000) >> 16;	//lba 2
-	cbw.comData[4] = (lba & 0xFF00) >> 8;		//lba 3
-	cbw.comData[5] = (lba & 0xFF);			//lba 4 (LSB)
-	cbw.comData[7] = (sectorCount & 0xFF00) >> 8;	//Transfer length MSB
-	cbw.comData[8] = (sectorCount & 0xFF);		//Transfer length LSB
-
-	result = -EIO;
-	if(usb_bulk_command(dev, &cbw) == USB_RC_OK){
-		rcode = usb_bulk_transfer(dev, USB_BLK_EP_OUT, (void*)buffer, dev->sectorSize * sectorCount);
-		result = usb_bulk_manage_status(dev, -TAG_WRITE);
-
-		if(rcode != USB_RC_OK) result = -EIO;
-	}
-
-	return result;
-}
-
-/* size should be a multiple of sector size */
-int mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char* buffer)
-{
-	//assert(size % mass_device->sectorSize == 0);
-	//assert(sector <= mass_device->maxLBA);
-	int retries;
-
-	WAITIOSEMA(io_sema);
-
-	for(retries = USB_IO_MAX_RETRIES; retries > 0; retries--){
-		if(cbw_scsi_write_sector(&g_mass_device, lba, buffer, nsectors) == 0){
-			SIGNALIOSEMA(io_sema);
-			return nsectors;
-		}
-	}
-
-	SIGNALIOSEMA(io_sema);
-
-	return -EIO;
+	cbw_scsi_sector_io(&g_mass_device, USB_BLK_EP_OUT, lba, (void*)buffer, nsectors);
 }
 #endif
 
@@ -961,6 +863,8 @@ static void mass_stor_release(mass_dev *dev)
 	dev->bulkEpO = -1;
 	dev->controlEp = -1;
 	dev->status = 0;
+
+	fat_deinit();
 }
 
 int mass_stor_disconnect(int devId) {
@@ -977,6 +881,33 @@ int mass_stor_disconnect(int devId) {
 		DeleteSema(dev->ioSema);
 	}
 	return 0;
+}
+
+static inline void initFileSystem(void)
+{
+	fat_dir_chain_record *pointsBuffer;
+	int i, maxChainPoints, parts;
+	int OldState;
+
+	fat_init(&g_mass_device);
+
+	if(cdvdman_settings.common.NumParts == 1)
+	{
+		parts = cdvdman_settings.files[0].size / 1000000000;	//Determine the number of parts that the single disc image is worth.
+		if(parts < 1) parts = 1;
+		maxChainPoints = OPL_DIR_CHAIN_SIZE * parts;
+		XPRINTF("FAT: parts %u(%u) maxpoints %u\n", cdvdman_settings.common.NumParts, parts, maxChainPoints);
+	}else{
+		maxChainPoints = OPL_DIR_CHAIN_SIZE;
+		XPRINTF("FAT: parts %u maxpoints %u\n", cdvdman_settings.common.NumParts, maxChainPoints);
+	}
+
+	CpuSuspendIntr(&OldState);
+	pointsBuffer = AllocSysMemory(ALLOC_FIRST, (int)cdvdman_settings.common.NumParts * maxChainPoints * sizeof(fat_dir_chain_record), NULL);
+	CpuResumeIntr(OldState);
+
+	for(i = 0; i < cdvdman_settings.common.NumParts; i++)
+		fat_setFatDirChain(&fatDirs[i], cdvdman_settings.files[i].cluster, cdvdman_settings.files[i].size, maxChainPoints, &pointsBuffer[i * maxChainPoints]);
 }
 
 static int mass_stor_warmup(mass_dev *dev) {
@@ -1037,14 +968,7 @@ static int mass_stor_warmup(mass_dev *dev) {
 	dev->maxLBA     = getBI32(&rcd.last_lba);
 	XPRINTF("USBHDFSD: sectorSize %u maxLBA %u\n", dev->sectorSize, dev->maxLBA);
 
-#ifndef _4K_SECTORS
-	for (stat=0; stat<MASS_SECTOR_SIZE_COUNT; stat++) {
-		if (dev->sectorSize == gMSStoDSS[stat].massSectorSize) {
-			gShiftPos = gMSStoDSS[stat].shiftPos;
-			break;
-		}
-	}
-#endif
+	initFileSystem();
 
 	return 0;
 }
@@ -1077,20 +1001,9 @@ int mass_stor_configureDevice(void)
 
 int mass_stor_init(void)
 {
-#ifdef VMC_DRIVER
-	iop_sema_t smp;
-#endif
 	register int ret;
 
 	g_mass_device.devId = -1;
-
-#ifdef VMC_DRIVER
-	smp.initial = 1;
-	smp.max = 1;
-	smp.option = 0;
-	smp.attr = 1;
-	io_sema = CreateSema(&smp);
-#endif
 
 	driver.next 		= NULL;
 	driver.prev		= NULL;
@@ -1109,7 +1022,6 @@ int mass_stor_init(void)
 	return 0;
 }
 
-//-------------------------------------------------------------------------
 int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
 	register int r = 0;
@@ -1118,23 +1030,12 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 
 	while (nsectors > 0) {
 		sectors = nsectors;
-		if (sectors > 2)
-			sectors = 2;
+		if (sectors > 8)
+			sectors = 8;
 
 		nbytes = sectors << 11;
+		fat_fileIO(&fatDirs[part_num], part_num, FAT_IO_MODE_READ, lsn << 11, p, nbytes);
 
-#ifndef _4K_SECTORS
-		mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn << gShiftPos), sectors << gShiftPos, p);
-#else
-		if (sectors == 1) {
-			mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn >> 1), 1, _4K_buf);
-			mips_memcpy(p, _4K_buf, nbytes);
-
-		}
-		else {
-			mass_stor_readSector(cdvdman_settings.LBAs[part_num] + (lsn >> 1), 1, p);
-		}
-#endif
 		lsn += sectors;
 		r += sectors;
 		p += nbytes;

@@ -262,8 +262,8 @@ DECLARE_EXPORT_TABLE(oplutils, 1, 1)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(getModInfo)
 #ifdef USB_DRIVER
-	DECLARE_EXPORT(mass_stor_readSector)
-	DECLARE_EXPORT(mass_stor_writeSector)
+	DECLARE_EXPORT(fat_setFatDirChain)
+	DECLARE_EXPORT(fat_fileIO)
 #endif
 #ifdef HDD_DRIVER
 	DECLARE_EXPORT(ata_device_sector_io)

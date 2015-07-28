@@ -13,11 +13,18 @@
 #endif
 #include "modules/iopcore/common/cdvd_config.h"
 
+//TODO: move into a common header file, to be shared with the USBHDFSD module.
+#define USBHDFSD_IOCTL_GETSECTOR	0x1000	//jimmikaelkael: Ioctl request code => get file start sector
+#define USBHDFSD_IOCTL_GETCLUSTER	0x1001	//jimmikaelkael: Ioctl request code => get file start cluster
+#define USBHDFSD_IOCTL_GETSIZE		0x1002	//jimmikaelkael: Ioctl request code => get file size
+#define USBHDFSD_IOCTL_GETDEVSECTORSIZE	0x1003	//jimmikaelkael: Ioctl request code => get mass storage device sector size
+#define USBHDFSD_IOCTL_GETFATSTART	0x1004
+#define USBHDFSD_IOCTL_GETDATASTART	0x1005
+#define USBHDFSD_IOCTL_GETCLUSTERSIZE	0x1006
+#define USBHDFSD_IOCTL_CHECKCHAIN	0x1100	//polo: Ioctl request code => Check cluster chain
+
 extern void *usb_cdvdman_irx;
 extern int size_usb_cdvdman_irx;
-
-extern void *usb_4Ksectors_cdvdman_irx;
-extern int size_usb_4Ksectors_cdvdman_irx;
 
 extern void *usbd_irx;
 extern int size_usbd_irx;
@@ -207,18 +214,15 @@ static void usbRenameGame(int id, char* newName) {
 #endif
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
-	int i, fd, val, index, compatmask = 0;
+	int i, fd, index, compatmask = 0;
+#ifdef VMC
+	unsigned int start, size;
+#endif
 	char partname[256], filename[32];
 	base_game_info_t* game = &usbGames[id];
 	struct cdvdman_settings_usb *settings;
 	u32 layer1_start, layer1_offset;
 	unsigned short int layer1_part;
-
-	fd = fileXioDopen(usbPrefix);
-	if (fd < 0) {
-		guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
-		return;
-	}
 
 #ifdef VMC
 	char vmc_name[32], vmc_path[256];
@@ -239,15 +243,21 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				usb_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
 				// Check vmc cluster chain (write operation can cause dammage)
-				sprintf(vmc_path, "%s/VMC/%s.bin", gUSBPrefix, vmc_name);
-				if (fileXioIoctl(fd, 0xCAFEC0DE, vmc_path)) {
-					LOG("USBSUPPORT Cluster Chain OK\n");
-					if ((i = fileXioIoctl(fd, 0xBEEFC0DE, vmc_path)) != 0) {
-						have_error = 0;
-						usb_vmc_infos.active = 1;
-						usb_vmc_infos.start_sector = i;
-						LOG("USBSUPPORT Start Sector: 0x%X\n", usb_vmc_infos.start_sector);
+				sprintf(vmc_path, "%s%s/VMC/%s.bin", usbPrefix, gUSBPrefix, vmc_name);
+
+				fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
+				if (fd >= 0) {
+					if ((start = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, vmc_path)) != 0) {
+						if ((size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, vmc_path)) != 0) {
+							have_error = 0;
+							usb_vmc_infos.active = 1;
+							usb_vmc_infos.file.cluster = start;
+							usb_vmc_infos.file.size = size;
+							LOG("USBSUPPORT VMC: 0x%X (%u)\n", start, size);
+						}
 					}
+
+					fileXioClose(fd);
 				}
 			}
 		}
@@ -256,7 +266,6 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			char error[256];
 			snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
 			if (!guiMsgBox(error, 1, NULL)) {
-				fileXioDclose(fd);
 				return;
 			}
 		}
@@ -277,35 +286,29 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	for (i = 0, settings = NULL; i < game->parts; i++) {
 		switch (game->format) {
 			case GAME_FORMAT_ISO:
-				sprintf(partname, "%s/%s/%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
+				sprintf(partname, "%s%s/%s/%s%s", usbPrefix, gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
 				break;
 			case GAME_FORMAT_OLD_ISO:
-				sprintf(partname, "%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+				sprintf(partname, "%s%s/%s/%s.%s%s", usbPrefix, gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
 				break;
 			default:	//USBExtreme format.
-				sprintf(partname, "%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, i);
+				sprintf(partname, "%s%s/ul.%08X.%s.%02x", usbPrefix, gUSBPrefix, USBA_crc32(game->name), game->startup, i);
 		}
 
-		if (gCheckUSBFragmentation) {
-			if (fileXioIoctl(fd, 0xCAFEC0DE, partname) == 0) {
-				fileXioDclose(fd);
-				guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
-				return;
+		fd = fileXioOpen(partname, O_RDONLY, 0666);
+		if (fd >= 0) {
+			if (i == 0) {
+				compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
+				settings = (struct cdvdman_settings_usb*)((u8*)irx+index);
+				settings->fatStart = fileXioIoctl(fd, USBHDFSD_IOCTL_GETFATSTART, partname);
+				settings->dataStart = fileXioIoctl(fd, USBHDFSD_IOCTL_GETDATASTART, partname);
+				settings->clusterSize = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTERSIZE, partname);
 			}
-		}
 
-		if (i == 0) {
-			val = fileXioIoctl(fd, 0xDEADC0DE, partname);
-			LOG("USBSUPPORT Mass storage device sector size = %d\n", val);
-			if (val == 4096) {
-				irx = &usb_4Ksectors_cdvdman_irx;
-				irx_size = size_usb_4Ksectors_cdvdman_irx;
-			}
-			compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
-			settings = (struct cdvdman_settings_usb*)((u8*)irx+index);
+			settings->files[i].cluster = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, partname);
+			settings->files[i].size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSIZE, partname);
+			fileXioClose(fd);
 		}
-
-		settings->LBAs[i] = fileXioIoctl(fd, 0xBEEFC0DE, partname);
 	}
 
 	//Initialize layer 1 information.
@@ -366,8 +369,6 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
 		saveConfig(CONFIG_LAST, 0);
 	}
-
-	fileXioDclose(fd);
 
 	const char *altStartup = NULL;
 	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))

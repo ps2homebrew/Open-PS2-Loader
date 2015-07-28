@@ -50,6 +50,7 @@ I_strncpy
 I_strtok
 I_toupper
 I_sprintf
+I_memcpy
 sysclib_IMPORTS_end
 
 thsemap_IMPORTS_start

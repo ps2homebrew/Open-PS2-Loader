@@ -35,11 +35,14 @@ int getModInfo(u8 *modname, modinfo_t *info);
 /* MASS Transfer Imports */
 #ifdef USB_DRIVER
 
-int mass_stor_readSector(unsigned int lba, int nsectors, unsigned char* buffer);
-#define I_mass_stor_readSector DECLARE_IMPORT(5, mass_stor_readSector)
+#include "mass_common.h"
+#include "fat.h"
 
-int mass_stor_writeSector(unsigned int lba, int nsectors, unsigned char* buffer);
-#define I_mass_stor_writeSector DECLARE_IMPORT(6, mass_stor_writeSector)
+void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size, unsigned int maxPoints, fat_dir_chain_record *chainPointsBuf);
+#define I_fat_setFatDirChain DECLARE_IMPORT(5, fat_setFatDirChain)
+
+int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, unsigned int filePos, unsigned char* buffer, unsigned int size);
+#define I_fat_fileIO DECLARE_IMPORT(6, fat_fileIO)
 
 #endif
 

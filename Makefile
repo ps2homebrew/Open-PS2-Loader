@@ -59,7 +59,7 @@ IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/
 
 EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
-		obj/usb_cdvdman.o obj/IOPRP_img.o obj/usb_4Ksectors_cdvdman.o obj/smb_cdvdman.o \
+		obj/usb_cdvdman.o obj/IOPRP_img.o obj/smb_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_hdpro_cdvdman.o obj/cdvdfsv.o \
 		obj/ingame_smstcpip.o obj/smap_ingame.o obj/smbman.o obj/smbinit.o
 
@@ -72,7 +72,7 @@ EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 MAPFILE = opl.map
 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
-EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/network/common -Iinclude
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Iinclude
 
 BIN2C = $(PS2SDK)/bin/bin2c
 BIN2S = $(PS2SDK)/bin/bin2s
@@ -219,7 +219,6 @@ sclean:
 	$(MAKE) -C modules/iopcore/eesync clean
 	echo "    * cdvdman.irx"
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb clean
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
@@ -315,11 +314,6 @@ usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
 	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
-
-usb_4Ksectors_cdvdman.s:
-	echo "    * usb_4Ksectors_cdvdman.irx"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb.4Ksectors rebuild
-	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/usb_4Ksectors_cdvdman.s usb_4Ksectors_cdvdman_irx
 
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"

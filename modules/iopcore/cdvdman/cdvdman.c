@@ -85,7 +85,6 @@ struct cdvdman_settings_usb cdvdman_settings={
 		0x00000000,
 		"B00BS"
 	},
-	{1,2,3,4,5,6,7,8,9,10}
 };
 #else
 	#error Unknown driver type. Please check the Makefile.
@@ -1765,7 +1764,7 @@ static void cdvdman_startThreads(void)
 	cdvdman_stat.err = CDVD_ERR_NO;
 
 	thread_param.thread = &cdvdman_cdread_Thread;
-	thread_param.stacksize = 0x400;
+	thread_param.stacksize = 0x440;
 	thread_param.priority = 0x0f;
 	thread_param.attr = TH_C;
 	thread_param.option=0xABCD0000;

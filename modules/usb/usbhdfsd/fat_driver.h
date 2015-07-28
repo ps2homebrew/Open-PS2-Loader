@@ -100,5 +100,7 @@ fat_driver * fat_getData(int device);
 int      fat_getFileStartCluster(fat_driver* fatd, const unsigned char* fname, unsigned int* startCluster, fat_dir* fatDir);
 int      fat_getClusterChain(fat_driver* fatd, unsigned int cluster, unsigned int* buf, unsigned int bufSize, int startFlag);
 
+int fat_CheckChain(fat_driver* fatd, fat_dir* fatDir);
+
 #endif
 

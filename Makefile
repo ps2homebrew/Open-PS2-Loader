@@ -19,16 +19,16 @@
 # Do not COMMENT out the variables!!
 
 #Enables/disables Virtual Memory Card (VMC) support
-VMC = 1
+VMC = 0
 
 #Enables/disables Right-To-Left (RTL) language support
 RTL = 0
 
 #Enables/disables Graphics Synthesizer Mode (GSM) selector
-GSM = 1
+GSM = 0
 
 #Enables/disables the cheat engine (PS2RD)
-CHEAT = 1
+CHEAT = 0
 
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 = 0

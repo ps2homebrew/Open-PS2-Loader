@@ -33,8 +33,8 @@ Voulez-vous quitter OPL?
 %d : erreur, impossible d'établir la liste des jeux
 %d : erreur, serveur DHCP indisponible
 %d : erreur, connexion réseau inexistante
-Oui
-Non
+Activé
+Inactif
 Valider
 Valider
 Annuler

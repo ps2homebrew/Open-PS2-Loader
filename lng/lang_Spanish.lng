@@ -1,0 +1,160 @@
+# translation by darkgarba and El Patas
+Spanish
+               BIENVENIDO AL OPEN PS2 LOADER. EL CÓDIGO PRINCIPAL ESTA BASADO EN EL DEL HD PROJECT <http://psx-scene.com> ADAPTADO AL FORMATO DEL USB ADVANCE E INTERFAZ GRÁFICA INICIAL POR IFCARO <http://ps2dev.ifcaro.net> LA MAYOR PARTE DEL NÚCLEO DEL CARGADOR ES REALIZADA POR JIMMIKAELKAEL. TODAS LAS MEJORAS EN LA INTERFAZ SON REALIZADAS POR VOLCA. GRACIAS POR USAR NUESTRO PROGRAMA ^^
+Open PS2 Loader %s
+Guardar cambios
+Volver
+Configuracion de red
+<sin valores>
+Configuracion guardada...
+Error escribiendo configuracion!
+Salir
+Opciones
+Juegos USB
+Juegos HDD
+Juegos ETH
+Aplicaciones
+Tema
+Idioma
+Error iniciacion de red: %d
+No se puede conectar a servidor SMB: %d
+No se puede loguear en servidor SMB: %d
+No se puede abrir carpeta SMB: %d
+Encendido
+Apagado
+OK
+Opcion de juegos
+Quitar configuracion
+Quitar todos los botones para el juego
+Movimiento
+Lento
+Normal
+Rapido
+Menu por defecto
+Cargar de disco
+Por favor espere
+Error cargando ID del juego
+Ordenar automaticamente
+Error cargando archivo de idioma
+Quitar colores debug
+No se detecto joystick, esperando...
+Habilitar caratulas
+Pantalla panoramica
+Apagar
+Cargando configuracion
+Guardando configuracion
+Inicializar dispositivo
+Modo inicio dispositivo USB
+Modo inicio dispositivo HDD
+Modo inicio dispositivo ETH
+Modo inicio de aplicaciones
+Automatico
+Manual
+Inicializar Servidor HDL
+Inicializando Servidor HDL ...
+Servicor HDL Iniciado ... Pulse [O] para detenerlo
+Pulse [X] para cancelar servicor HDL
+Deteniendo servidor HDL ...
+Salir a
+Color de fondo
+Color de texto
+IP
+Mascara de red
+Gateway
+Puerto
+Carpeta compartida
+Usuario
+Contraseña
+<ninguna>
+Aceptar
+El objeto sera eliminado, continuar ?
+Renombrar
+Borrar
+Iniciar
+Opciones de pantalla
+Activar borrado y renombrado
+Chequear fragmentacion USB
+Recordar ultimo juego cargado
+Activar GMS en menu principal
+Error, el juego esta fragmentado
+Error, no se pudo inicializar
+Prueba
+Dejalo vacio para iniciar como invitado
+Cargar modulo alternativo
+Lectura de datos alternativa
+Deshabilitar llamadas de sistema
+Modo 0 PSS
+Deshabilitar DVD-DL
+Deshabilitar IGR
+Usar hack IOP
+Esconder modulo dev9
+Combo alternativo IGR
+Si cambias el tamaño se formateara VMC
+Crear
+Modificar
+Cancelar
+Resetear
+Usar generica
+Configurar VMC
+Nombre
+Medida
+Estado
+Progreso
+Archivo VMC existe
+Archivo VMC invalido, la medida es incorrecta
+El archivo VMC necesita ser creado
+Error con VMC %s, continuar con la MC(slot %d) ?
+Recargar automaticamente
+Creditos
+Programadores
+Retraso USB
+Prefijo ruta USB
+Dejalo vacio para salir al explorador
+Valor en minutos, 0 para deshabilitar detencion HD
+Detencion automatica de HD
+Modo video
+Color dialogo
+Color seleccionado
+Enseñar pantalla informacion
+Informacion
+ELF customizado
+Seleccion de color
+Reconectar
+Dejalo vacio para listar carpetas compartidas
+Prefijo ruta ETH
+Borrar
+Espacio
+Intro
+Modo
+VMC Slot 1
+VMC Slot 2
+ID Juego
+Modo DMA
+Sincronizacion Video
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Modo 9
+Llamada a reloj
+Aplicar retraso a funcion CDVD (0 es por defecto)
+Opciones de velocidad ethernet y duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Opciones GMS
+Activar GMS
+Dejar que GMS fuerce el modo de video
+Modo video seleccionado
+Modo video al que forzar
+Ajuste horizontal
+Ajusta offset horizontal
+Ajuste vertical
+Ajusta offset vertical
+Saltar FMV
+Salta las escenas FMV

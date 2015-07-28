@@ -234,7 +234,7 @@ static unsigned char fs_inited = 0;
 static unsigned char cdvdman_media_changed = 1;
 static unsigned char sync_flag;
 static unsigned char cdvdman_cdinited = 0;
-unsigned int ReadPos = 0;		/* Current buffer offset in 2048-byte sectors. */
+static unsigned int ReadPos = 0;	/* Current buffer offset in 2048-byte sectors. */
 
 static iop_sys_clock_t gCdvdCallback_SysClock;
 #if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)

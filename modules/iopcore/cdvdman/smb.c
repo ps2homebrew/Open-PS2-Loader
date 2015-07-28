@@ -30,8 +30,6 @@ static int io_sema = -1;
 #define SMBWRITE 0
 #endif
 
-#define DMA_ADDR 		0x00099F00
-
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s); 						// #6
 extern int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen); 	// #7
@@ -260,8 +258,6 @@ static u16 UID, TID;
 static int main_socket;
 
 static u8 SMB_buf[1024];
-
-extern unsigned int ReadPos;
 
 //-------------------------------------------------------------------------
 int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
@@ -732,7 +728,6 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 		p += nbytes;
 		offset += sectors;
 		nsectors -= sectors;
-		ReadPos += nbytes;
 	}
 
 	return 1;

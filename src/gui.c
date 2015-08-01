@@ -828,7 +828,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
 #ifdef GSM
-		if (result == GSMCFG_GSCONFIG_ID) {
+		if (result == COMPAT_GSMCONFIG) {
 			guiShowGSConfig();
 		}
 #endif

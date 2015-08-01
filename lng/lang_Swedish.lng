@@ -1,6 +1,6 @@
-# translation by Ronald Andersson (aka: dlanor) and Flaya
-# Last update: 07/25/2015. 
-# Working with OPL_801_DB. 
+# translation by Ronald Andersson (aka: dlanor) and Flaya / supervised by Jay-Jay
+# Last update: 07/28/2015. 
+# Updated for OPL_803_DB. 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Swedish
 Open PS2 Loader %s
@@ -13,6 +13,7 @@ Inställningar sparade...
 Fel vid skrivning av inställningar!
 Avsluta
 Inställning
+Meny
 USB Spel
 HDD Spel
 ETH Spel
@@ -99,10 +100,8 @@ Radera
 Kör
 Inställningar Skärm
 Aktivera ta bort och Byt namn åtgärder
-Kontrollera USB spel fragmentering
 Kom ihåg senast spelade spel
 Välj knapp
-Fel , är spelet fragmenterad
 Fel , kunde inte köra posten
 Test
 Lämna tomt för Gäst konto.

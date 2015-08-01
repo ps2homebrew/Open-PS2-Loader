@@ -17,6 +17,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Error writing settings!",
 	"Exit",
 	"Settings",
+	"Menu",
 	"USB Games",
 	"HDD Games",
 	"ETH Games",

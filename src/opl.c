@@ -96,7 +96,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 	// refresh Hints
 	menuRemoveHints(&mod->menuItem);
 
-	menuAddHint(&mod->menuItem, _STR_SETTINGS, START_ICON);
+	menuAddHint(&mod->menuItem, _STR_MENU, START_ICON);
 	if (!mod->support->enabled)
 		menuAddHint(&mod->menuItem, _STR_START_DEVICE, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
 	else {

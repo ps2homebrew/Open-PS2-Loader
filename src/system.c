@@ -155,6 +155,12 @@ typedef struct {
 	u32	align;
 } elf_pheader_t;
 
+typedef struct {
+	char fileName[10];
+	u16  extinfoSize;
+	int  fileSize;
+} romdir_t;
+
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 
 	int i, id, ret, index = 0;
@@ -350,17 +356,19 @@ void sysExecExit() {
 #define CORE_IRX_DECI2	0x40
 
 #ifdef VMC
-static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
+static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx) { // Send IOP modules that core must use to Kernel RAM
 #else
-static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
+static void sendIrxKernelRAM(unsigned int modules, int size_cdvdman_irx, void **cdvdman_irx) { // Send IOP modules that core must use to Kernel RAM
 #endif
 	irxtab_t *irxtable;
 	irxptr_t *irxptr_tab;
-	void *irxptr, *ioprp_image;
+	void *irxptr;
 	int i, modcount;
-	unsigned int curIrxSize, size_ioprp_image, total_size;
+	unsigned int curIrxSize;
+	void *ioprp_image;
+	unsigned int size_ioprp_image;
 
-	irxtable = (irxtab_t*)ModuleStorage;
+	irxtable = (irxtab_t*)OPL_MOD_STORAGE;
 	irxptr_tab = (irxptr_t*)((unsigned char*)irxtable+sizeof(irxtab_t));
 	ioprp_image = malloc(size_IOPRP_img+size_cdvdman_irx+size_cdvdfsv_irx+256);
 	size_ioprp_image = patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
@@ -426,7 +434,6 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
 
 #ifdef __DECI2_DEBUG
 	//For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
-	//total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
 	irxptr = (void*)0x00033000;
 	LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr+GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
 	DI();
@@ -438,7 +445,6 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
 	irxptr_tab[0].ptr = irxptr;	//UDNL is the first module.
 #endif
 
-	total_size = (sizeof(irxtab_t)+sizeof(irxptr_t)*modcount+0xF)&~0xF;
 	irxptr = (void *)((((unsigned int)irxptr_tab+sizeof(irxptr_t)*modcount)+0xF)&~0xF);
 
 #ifdef __DECI2_DEBUG
@@ -450,21 +456,23 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
 
 		if (curIrxSize > 0) {
 			LOG("SYSTEM IRX %u address start: %p end: %p\n", GET_OPL_MOD_ID(irxptr_tab[i].info), irxptr, irxptr+curIrxSize);
+#ifdef __DEBUG
+			if(irxptr+curIrxSize>=(void*)0x000D0000){	//Sanity check.
+				LOG("*** OVERFLOW DETECTED. HALTED.\n");
+				asm volatile("break\n");
+			}
+#endif
+
 			memcpy(irxptr, irxptr_tab[i].ptr, curIrxSize);
 
 			irxptr_tab[i].ptr = irxptr;
 			irxptr += ((curIrxSize+0xF)&~0xF);
-			total_size += ((curIrxSize+0xF)&~0xF);
 		}else{
 			irxptr_tab[i].ptr = NULL;
 		}
 	}
 
 	free(ioprp_image);
-
-	LOG("SYSTEM IRX STORAGE %p - %p\n", ModuleStorage, (u8*)ModuleStorage + total_size);
-
-	return total_size;
 }
 
 #ifdef GSM
@@ -496,7 +504,6 @@ static void PrepareGSM(char *cmdline) {
 		{  VGA_VMODE, "VGA 640x480p @72Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_72, GS_FRAME,	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	330),	0x0067800001C00009},
 		{  VGA_VMODE, "VGA 640x480p @75Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_75, GS_FRAME, 	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	360),	0x0067800001000001},
 		{  VGA_VMODE, "VGA 640x480p @85Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_85, GS_FRAME,	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	260),	0x0067800001000001},
-		{  VGA_VMODE, "VGA 640x480i @60Hz             ",	GS_INTERLACED,		GS_MODE_VGA_640_60,	GS_FIELD, 	(u64)make_display_magic_number(	 959,	1279,	1,		1,		128,	291),	0x004F80000210000A}
 		}; //ends predef_vmode definition
 
 	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[gGSMVMode].interlace, \
@@ -561,8 +568,7 @@ static int ResetDECI2(void){
 #define VMC_TEMP1
 #endif
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 unsigned int compatflags) {
-	unsigned int modules, ModuleStorageSize;
-	void *ModuleStorage;
+	unsigned int modules;
 	u8 local_ip_address[4], local_netmask[4], local_gateway[4];
 	u8 *boot_elf = NULL;
 	elf_header_t *eh;
@@ -579,8 +585,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #else
 #define CHEAT_TEMP3	0
 #endif
-	char *argv[4+GSM_TEMP3+CHEAT_TEMP3];
-	char ModStorageConfig[32];
+	char *argv[3+GSM_TEMP3+CHEAT_TEMP3];
 	char config_str[256];
 #ifdef GSM
 	char gsm_config_str[256];
@@ -594,7 +599,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	if (gExitPath[0] == '\0')
 		strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
-	//Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
 	memset((void*)0x00082000, 0, 0x00100000-0x00082000);
 
 	if(!strcmp(mode_str, "USB_MODE"))
@@ -603,8 +607,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 		modules = CORE_IRX_ETH | CORE_IRX_SMB;
 	else
 		modules = CORE_IRX_HDD;
-
-	ModuleStorage = (void*)((compatflags & COMPAT_MODE_7) ? OPL_MOD_STORAGE_HI : OPL_MOD_STORAGE);
 
 #ifdef __DECI2_DEBUG
 	modules |= CORE_IRX_DECI2 | CORE_IRX_ETH;
@@ -615,12 +617,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #ifdef VMC
 	modules |= CORE_IRX_VMC;
 	LOG("SYSTEM LaunchLoaderElf loading modules with size_mcemu_irx = %d\n", size_mcemu_irx);
-	ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) &~ 0x3F;
+	sendIrxKernelRAM(modules, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx);
 #else
 	LOG("SYSTEM LaunchLoaderElf loading modules\n");
-	ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx) + 0x3F) &~ 0x3F;
+	sendIrxKernelRAM(modules, size_cdvdman_irx, cdvdman_irx);
 #endif
-	sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorage + ModuleStorageSize);
 
 #ifdef __DECI2_DEBUG
 	ResetDECI2();
@@ -629,6 +630,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	// NB: LOADER.ELF is embedded
 	boot_elf = (u8 *)&eecore_elf;
 	eh = (elf_header_t *)boot_elf;
+	if (_lw((u32)&eh->ident) != ELF_MAGIC)
+		while (1);
+
 	eph = (elf_pheader_t *)(boot_elf + eh->phoff);
 
 	// Scan through the ELF's program headers and copy them into RAM, then
@@ -669,9 +673,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 		gETHOpMode \
 		CHEAT_TEMP2 GSM_TEMP2);
 	argv[i] = config_str;
-	i++;
-
-	argv[i] = ModStorageConfig;
 	i++;
 
 	argv[i] = filename;

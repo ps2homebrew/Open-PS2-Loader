@@ -129,7 +129,7 @@ Unhook Syscalls
 0 PSS mode
 Emulate DVD-DL
 Disable IGR
-High module storage
+Unused
 Hide dev9 module
 Changing the size will reformat the VMC
 Create
@@ -182,6 +182,8 @@ Mode 6
 Mode 7
 Mode 8
 Configure GSM
+Callback timer
+Apply a delay to CDVD functions (0 is default)
 Ethernet link mode
 100Mbit full-duplex
 100Mbit half-duplex

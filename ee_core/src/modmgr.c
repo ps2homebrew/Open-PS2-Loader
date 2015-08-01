@@ -14,7 +14,6 @@
 
 static SifRpcClientData_t _lf_cd;
 static int _lf_init  = 0;
-extern void *ModStorageStart;
 
 /*----------------------------------------------------------------------------------------*/
 /* Init LOADFILE RPC.                                                                     */
@@ -131,7 +130,7 @@ int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, con
 int GetOPLModInfo(int id, void **pointer, unsigned int *size)
 {
 	int i, result;
-	irxtab_t *irxtable = (irxtab_t*)ModStorageStart;
+	irxtab_t *irxtable = (irxtab_t*)OPL_MOD_STORAGE;
 
 	for(i = 0,result = -1; i < irxtable->count; i++)
 	{

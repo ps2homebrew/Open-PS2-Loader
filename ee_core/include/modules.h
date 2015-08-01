@@ -34,6 +34,8 @@ typedef struct {
 	int count;
 } irxtab_t;
 
+#define OPL_MOD_STORAGE	0x00097000	//Address of the module storage region
+
 //Macros for working with module information.
 #define GET_OPL_MOD_ID(x) ((x) >> 24)
 #define SET_OPL_MOD_ID(x) ((x) << 24)

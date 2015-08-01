@@ -1,22 +1,7 @@
-//we don't need most of this... just standard headers
-#include <types.h>
 #include <stdio.h>
 #include <sysclib.h>
-#include <thbase.h>
-#include <thsemap.h>
-#include <intrman.h>
-#include <sysmem.h>
-#include <sifman.h>
-#include <sifcmd.h>
-#include <sifrpc.h>
 #include <loadcore.h>
-#include <sys/stat.h>
-#include <sys/fcntl.h>
 #include <ioman.h>
-#include <kerr.h>
-
-/*#define MODNAME "imgdrv"
-IRX_ID(MODNAME, 0x01, 0x00);*/
 
 unsigned int ioprpimg = 0xDEC1DEC1;
 int ioprpsiz = 0xDEC2DEC2;
@@ -26,7 +11,7 @@ int dummy_fs()
 	return 0;
 }
 
-int lseek_fs(iop_file_t* fd, unsigned long offset, int whence)
+int lseek_fs(iop_file_t* fd, int offset, int whence)
 {
 	if (whence == SEEK_END)
 	{

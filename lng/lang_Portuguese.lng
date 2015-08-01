@@ -1,6 +1,6 @@
-# translation by Gilbert and danielb / supervised by Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
+# translation by Gilbert and danielb 
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese
 Open PS2 Loader %s
@@ -12,8 +12,7 @@ Opções avançadas
 Configurações salvas
 Erro ao salvar configurações!
 Sair
-Configurações
-Menu
+Config.
 Jogos por USB
 Jogos por HDD 
 Jogos por Rede
@@ -33,8 +32,8 @@ Sair do OPL?
 %d: Impossivel listar jogos
 %d: Servidor DHCP indisponivel
 %d: Sem ligação de rede
-Ati
-Des
+Ativado
+Desativado
 Aceitar
 Eleger
 Cancelar
@@ -100,8 +99,10 @@ Deletar
 Iniciar
 Configurações de Tela
 Ativar função Deletar/Renomear
+Checar fragmentação em jogos USB
 Lembrar último jogo executado
 Botão de Seleção
+Erro, o jogo está fragmentado!
 Erro, não foi possível iniciar o item
 Testar
 Deixar vazio para autorização como convidado (GUEST)

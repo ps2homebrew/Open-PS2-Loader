@@ -1,38 +1,26 @@
-# translation by andre95d / supervised by Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# translation by andre95d
 Italian
 Open PS2 Loader %s
 Salva modifiche
 Indietro
 Configurazione rete
-Advanced options
 <nessun valore>
 Impostazioni salvate...
 Errore scrittura impostazioni!
 Esci
 Impostazioni
-Menu
 Giochi USB
 Giochi HDD
 Giochi ETH
 Apps
 Tema
 Lingua
-The system will be powered off.
-Exit OPL?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
-%d: Network startup error
-%d: No network adaptor detected
-%d: Cannot connect to SMB server
-%d: Cannot log into SMB server
-%d: Cannot open SMB share
-%d: Cannot list SMB shares
-%d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
+Errore di avvio rete: %d
+Impossibile connettersi al server SMB: %d
+Impossibile accedere al server SMB: %d
+Impossibile aprire la condivisione SMB: %d
+Impossibile elencare le condivisioni SMB: %d
+Impossibile elencare i giochi: %d
 On
 Off
 OK
@@ -73,18 +61,13 @@ Avviare server HDL
 Avvio server in corso...
 Server HDL in esecuzione...
 Server HDL in chiusura...
-HDL Server Unloading...
 Esci su
 Colore di sfondo
 Colore testo
-IP address type
-Static
-DHCP
-IP address
-Address
+Indirizzo IP
+Indirizzo
 Maschera
 Gateway
-DNS Server
 Porta
 Condivisione
 Utente
@@ -100,8 +83,10 @@ Cancella
 Esegui
 Impostazioni display
 Abilita azioni di rinomina e cancella
+Controlla frammentazione gioco USB
 Ricorda ultimo titolo giocato
 Seleziona tasto
+Errore, il gioco è frammentato.
 Errore, impossibile avviare il titolo.
 Test
 Lasciare vuoto per autenticazione GUEST
@@ -131,7 +116,7 @@ Errore VMC %s, continuare con MC fisica (slot %d)?
 Aggiornamento automatico
 About
 Coders
-Quality Assurance
+Testers
 Percorso prefisso USB
 Lasciare vuoto per uscire al browser
 Valore in minuto(i), 0 per disabilitare lo spin down

@@ -76,6 +76,7 @@ static const patchlist_t patch_list[] = {
 	{ "SLUS_201.99", ALL_MODE, { 0x0012a6d0,		0x24020001, 0x0c045e0a }}, // Shaun Palmer's Pro Snowboarder NTSC U
 	{ "SLUS_201.99", ALL_MODE, { 0x0013c55c,		0x10000012, 0x04400012 }}, // Shaun Palmer's Pro Snowboarder NTSC U
 	{ "SLES_553.46", ALL_MODE, { 0x0035414C,		0x2402FFFF, 0x0C0EE74E }}, // Rugby League 2: World Cup Edition PAL
+	{ "SLPS_251.03", ALL_MODE, { PATCH_SRW_IMPACT,		0x00000000, 0x00000000 }}, // Super Robot Wars IMPACT Limited Edition
 	{ "SLPS_251.04", ALL_MODE, { PATCH_SRW_IMPACT,		0x00000000, 0x00000000 }}, // Super Robot Wars IMPACT
 	{ "SCUS_973.53", ALL_MODE, { PATCH_RNC_UYA,		0x0084c645, 0x00000000 }}, // Ratchet and Clank: Up Your Arsenal
 	{ "SCES_524.56", ALL_MODE, { PATCH_RNC_UYA,		0x0084c726, 0x00000000 }}, // Ratchet and Clank: Up Your Arsenal

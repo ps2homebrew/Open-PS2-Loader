@@ -1,6 +1,6 @@
-# Translated by jimmysmith / supervised by Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
+# Translated by jimmysmith
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Czech
 Open PS2 Loader %s
@@ -13,7 +13,6 @@ Nastavení uloženo...
 Chyba při ukládání nastavení!
 Ukončit
 Nastavení
-Menu
 USB Hry
 HDD Hry
 ETH Hry
@@ -33,8 +32,8 @@ Ukončit OPL?
 %d: Nelze zobrazit seznam her
 %d: DHCP server nenalezen
 %d: Žádné síťové připojení
-Zap
-Vyp
+Zapnuto
+Vypnuto
 OK
 Vybrat
 Zrušit
@@ -100,8 +99,10 @@ Smazat
 Spustit
 Nastavení obrazovky
 Povolit operace smazání a přejmenování
+Zkontrolovat USB fragmentaci pro hru
 Pamatovat posledně hranou hru
 Tlačítko Select
+Chyba, hra je fragmentování
 Chyba, nemůžu spustit hru
 Test
 Nechte prázdné pro přihlášení GUEST účtu

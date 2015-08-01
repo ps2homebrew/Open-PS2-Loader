@@ -3,7 +3,7 @@
 #                                                                                                 #
 # Translate every line, keeping the same order. Don't add empty lines.                            #
 # Any missing lines will be substituted with the english defaults from lang.c.                    #
-#                                                                                                 #
+#                                                                                                 # 
 # Important: if your language require some custom glyphs, you should provide a corresponding      #
 # TTF font file too. By default, OPL only comes with the "basic latin" font built-in.             #
 #                                                                                                 #
@@ -31,7 +31,6 @@ Settings saved...
 Error writing settings!
 Exit
 Settings
-Menu
 USB Games
 HDD Games
 ETH Games

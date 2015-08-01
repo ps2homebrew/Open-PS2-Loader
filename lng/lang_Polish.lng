@@ -1,46 +1,28 @@
-# translation by Berion & Loki7777 / supervised by Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# translation by Berion & Loki7777
 Polish
-Open PS2 Loader %s
+               WELCOME TO OPEN PS2 LOADER . MAIN kodu w oparciu o kod źródłowy HD <http://psx-scene.com> ADAPTACJI PROJEKTU sformatować USB ADVANCE i początkowe GUI IFCARO <http://ps2dev.ifcaro.net> MOST rdzenia Loader to MADE BY JIMMIKAELKAEL . WSZYSTKIE GUI IMPROVEMENTS są przez VOLCA . Dziękujemy za korzystanie z naszego programu ^ ^
+Otwórz PS2 Loader % s
 Zapisz zmiany
 z powrotem
 config Network
-Advanced options
 <brak values>
 Ustawienia zapisane ...
-Błąd zapisu ustawień!
+Błąd zapisu ustawień !
 Wyjście
 Ustawienia
-Menu
 Gry USB
 HDD Games
 ETH Games
 Aplikacje
 motyw
 język
-The system will be powered off.
-Exit OPL?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
-%d: Network startup error
-%d: No network adaptor detected
-%d: Cannot connect to SMB server
-%d: Cannot log into SMB server
-%d: Cannot open SMB share
-%d: Cannot list SMB shares
-%d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
+Network startup error :% d
+Nie można połączyć się z serwerem SMB : % d
+Nie można zalogować się do serwera SMB : % d
+Nie można otworzyć akcji SMB :% d
 na
 od
 dobrze
-Select
-Cancel
-Circle
-Cross
-Games List
 ustawienia gier
 Usuń wszystkie ustawienia
 Usunięto wszystkie klucze do gry
@@ -62,37 +44,28 @@ Wyłącz
 Ładowanie config
 Zapisywanie config
 Uruchom urządzenie
-Refresh
 Tryb rozruchu urządzenia USB
 Urządzenie HDD tryb startu
 Urządzenie ETH tryb startu
 Tryb uruchamiania aplikacji
 automatyczny
 ręczny
-Start HDL Server
-HDL Server Starting...
-HDL Server Running...
-Failed to start HDL Server.
-HDL Server Unloading...
+Uruchom serwer HDL
+Server HDL Uruchamianie ...
+Server HDL Uruchamianie ... Naciśnij klawisz [ O] , aby zatrzymać
+Naciśnij przycisk [ X] , aby zakończyć serwer HDL
+Server HDL Rozładunek ...
 Wyjście na
 kolor tła
 kolor tekstu
-IP address type
-Static
-DHCP
-IP address
-Address
+IP
 maska
 Brama
-DNS Server
 port
 udział
 użytkownik
 hasło
 <Nie ustawień>
-Address type
-IP
-NetBIOS
 akceptować
 Przedmiot zostanie trwale usunięta , kontynuować?
 przemianować
@@ -100,20 +73,23 @@ usunąć
 run
 ustawienia wyświetlacza
 Włącz Usuwanie i zmiana nazwy działania
+Sprawdź fragmentacji grę USB
 Zapamiętaj ostatnio grał grę
 Odkrywamy GSM na Main Menu
-Błąd, nie można uruchomić opcję
+Błąd ,gra jest rozdrobniony
+Błąd , nie można uruchomić opcję
 test
 Pozostaw puste dla auth gość.
 Załaduj alternatywne jądro
 Alternatywne metody odczytu danych
 Odczep syscalli
 0 Tryb PSS
-Emulate DVD-DL
+Wyłącz DVD- DL
 Wyłącz IGR
-Unused
+Użyj IOP wątków siekać
 Ukryj dev9 modułu
-Zmiana rozmiaru będzie sformatować VMC
+Zastępca combo IGR
+Zmiana rozmiaru będzie sformatowaćVMC
 utworzyć
 modyfikować
 poronić
@@ -129,12 +105,12 @@ Nieprawidłowy VMC pliku, rozmiar jest niepoprawny
 VMC pliku muszą być tworzone
 Błąd z VMC % s , nadal z fizycznym MC ( gniazdo % d) ?
 Automatyczne odświeżanie
-About
+o
 Coders
-Quality Assurance
+opóźnienie USB
 Path prefix USB
 Pozostaw puste , aby wyjść z przeglądarki
-Wartość w minutę (s), 0 aby wyłączyć wirować
+Wartość w minutę ( s ) , 0 aby wyłączyć wirować
 Automatyczny HDD wirować
 tryb wideo
 kolor Dialog
@@ -155,16 +131,16 @@ Slot VMC 2
 ID gry
 Tryb DMA
 V- Sync
-Tryb 1
-Tryb 2
+mode 1
+mode 2
 Tryb 3
 Tryb 4
 Tryb 5
 Tryb 6
 Tryb 7
 Tryb 8
-Configure GSM
-Callback timer
+Tryb 9
+zegar Callback
 Zastosuj opóźnienie do CDVD funkcji (0 jest domyślnie)
 Prędkość Ethernet i dupleksu
 100Mbit full-duplex
@@ -173,22 +149,12 @@ Prędkość Ethernet i dupleksu
 10Mbit half-duplex
 Ustawienia GSM
 Włącz GSM
-Toggles GSM ON or OFF
-VMODE
-Forced Custom Display Mode
-H-POS
-Horizontal Adjustment
-V-POS
-Vertical Adjustment
-FMV Skip
-Skips Full Motion Videos
-Show PS2RD Cheat Engine on Main Menu
-Cheat Settings
-Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
-PS2RD Cheat Engine Mode
-Auto-select or Select game cheats
-Auto-select cheats
-Select game cheats
-Error: failed to load Cheat File
-No cheats found
+Umożliwia GSM wymusić Wybrany Tryb wideo
+Wybrany tryb wideo
+Tryb Video być zmuszony
+Regulacja w poziomie
+Ustawia Horizontal offset
+Regulacja w pionie
+Ustawia Przesunięcie pionowe
+FMV pomiń
+Pomija Full Motion Video

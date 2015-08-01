@@ -1,6 +1,6 @@
 # translation by darkgarba, El Patas, and Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
 Open PS2 Loader %s
@@ -12,8 +12,7 @@ Opciones Avanzadas
 Configuracion guardada...
 Error escribiendo configuracion!
 Salir
-Configuracion
-Menú
+Ajustes
 Juegos USB
 Juegos HDD
 Juegos ETH
@@ -33,8 +32,8 @@ Salir OPL?
 %d: No se puede listar los juegos
 %d: DHCP servidor no disponible
 %d: No hay conexión a la red
-Sí
-No
+Encendido
+Apagado
 OK
 Elegir
 Cancelar
@@ -100,8 +99,10 @@ Borrar
 Iniciar
 Opciones de pantalla
 Activar borrado y renombrado
+Chequear fragmentacion USB
 Recordar ultimo juego cargado
 Seleccione el Botón
+Error, el juego esta fragmentado
 Error, no se pudo inicializar
 Prueba
 Dejalo vacio para iniciar como invitado

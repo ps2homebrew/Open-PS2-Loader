@@ -149,7 +149,7 @@ static int cdrom_deinit(iop_device_t *dev);
 static int cdrom_open(iop_file_t *f, const char *filename, int mode);
 static int cdrom_close(iop_file_t *f);
 static int cdrom_read(iop_file_t *f, void *buf, int size);
-static int cdrom_lseek(iop_file_t *f, u32 offset, int where);
+static int cdrom_lseek(iop_file_t *f, int offset, int where);
 static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat);
 static int cdrom_dopen(iop_file_t *f, const char *dirname);
 static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
@@ -1189,7 +1189,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 }
 
 //--------------------------------------------------------------
-static int cdrom_lseek(iop_file_t *f, u32 offset, int where)
+static int cdrom_lseek(iop_file_t *f, int offset, int where)
 {
 	register int r;
 	FHANDLE *fh = (FHANDLE *)f->privdata;
@@ -1325,7 +1325,7 @@ static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where)
 {
 	DPRINTF("cdrom_lseek64 where=%d\n", (int)where);
-	return (s64)cdrom_lseek(f, (u32)pos, where);
+	return (s64)cdrom_lseek(f, (int)pos, where);
 }
 
 //--------------------------------------------------------------

@@ -213,7 +213,6 @@ RepeatAutoNegoProcess:
 
 	DEBUG_PRINTF("smap: PHY: %04x %04x %04x %04x %04x %04x\n", RegDump[SMAP_DsPHYTER_BMCR], RegDump[SMAP_DsPHYTER_BMSR], RegDump[SMAP_DsPHYTER_PHYIDR1], RegDump[SMAP_DsPHYTER_PHYIDR2], RegDump[SMAP_DsPHYTER_ANAR], RegDump[SMAP_DsPHYTER_ANLPAR]);
 
-	/* if SMAP_DsPHYTER_PHYIDR1 == SMAP_PHY_IDR1_VAL && SMAP_DsPHYTER_PHYIDR2 == SMAP_PHY_IDR2_VAL */
 	if(RegDump[SMAP_DsPHYTER_PHYIDR1]==SMAP_PHY_IDR1_VAL && (RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_MSK)==SMAP_PHY_IDR2_VAL){
 		if(EnableAutoNegotiation){
 			_smap_read_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_FCSCR);
@@ -228,20 +227,20 @@ RepeatAutoNegoProcess:
 			}
 		}
 
-		DEBUG_PRINTF("smap: PHY chip: DP83846A%d\n", RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_REV_MSK);
+		DEBUG_PRINTF("smap: PHY chip: DP83846A%d\n", (RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_REV_MSK)+1);
 
 		if(!EnableAutoNegotiation){
-			if((RegDump[SMAP_DsPHYTER_BMCR]&(SMAP_PHY_BMCR_DUPM|SMAP_PHY_BMCR_100M)) == 0){	/* if SMAP_DsPHYTER_BMCR&0x2100 */
+			if((RegDump[SMAP_DsPHYTER_BMCR]&(SMAP_PHY_BMCR_DUPM|SMAP_PHY_BMCR_100M)) == 0){
 				_smap_write_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_10BTSCR, 0x104);
 			}
 		}
 		else{
-			if((RegDump[SMAP_DsPHYTER_ANAR]&0x1E0)==0x20){	/* SMAP_DsPHYTER_ANAR */
+			if((RegDump[SMAP_DsPHYTER_ANAR]&0x1E0)==0x20){
 				_smap_write_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_10BTSCR, 0x104);
 			}
 		}
 
-		if((RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_REV_MSK)==0){	/* SMAP_DsPHYTER_PHYIDR2 */
+		if((RegDump[SMAP_DsPHYTER_PHYIDR2]&SMAP_PHY_IDR2_REV_MSK)==0){
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, 0x13, 1);
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, SMAP_DsPHYTER_PHYCTRL, 0x1898);
 			_smap_write_phy(SmapDrivPrivData->emac3_regbase, 0x1F, 0);
@@ -537,7 +536,7 @@ int smap_init(int argc, char *argv[]){
 	mac_address=mac_address<<16|eeprom_data[2]>>8|eeprom_data[2]<<8;
 	SMAP_EMAC3_SET(SMAP_R_EMAC3_ADDR_LO, mac_address);
 
-	SMAP_EMAC3_SET(SMAP_R_EMAC3_PAUSE_TIMER, 0xFFFF);	/* SMAP_R_EMAC3_PAUSE_TIMER=0xFFFF0000 */
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_PAUSE_TIMER, 0xFFFF);
 
 	SMAP_EMAC3_SET(SMAP_R_EMAC3_GROUP_HASH1, 0);
 	SMAP_EMAC3_SET(SMAP_R_EMAC3_GROUP_HASH2, 0);
@@ -545,8 +544,8 @@ int smap_init(int argc, char *argv[]){
 	SMAP_EMAC3_SET(SMAP_R_EMAC3_GROUP_HASH4, 0);
 
 	SMAP_EMAC3_SET(SMAP_R_EMAC3_INTER_FRAME_GAP, 4);
-	SMAP_EMAC3_SET(SMAP_R_EMAC3_TX_THRESHOLD, 0xC<<SMAP_E3_TX_THRESHLD_BITSFT);
-	SMAP_EMAC3_SET(SMAP_R_EMAC3_RX_WATERMARK, 0x8<<SMAP_E3_RX_LO_WATER_BITSFT|0x40<<SMAP_E3_RX_HI_WATER_BITSFT);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_TX_THRESHOLD, 12<<SMAP_E3_TX_THRESHLD_BITSFT);
+	SMAP_EMAC3_SET(SMAP_R_EMAC3_RX_WATERMARK, 16<<SMAP_E3_RX_LO_WATER_BITSFT|128<<SMAP_E3_RX_HI_WATER_BITSFT);
 
 	dev9RegisterIntrCb(5, &Dev9IntrCb);		/* RXEND */
 

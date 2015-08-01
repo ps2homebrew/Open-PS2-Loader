@@ -41,7 +41,7 @@ typedef struct _iop_ext_device_ops {
 	int	(*close)(iop_file_t *);
 	int	(*read)(iop_file_t *, void *, int);
 	int	(*write)(iop_file_t *, void *, int);
-	int	(*lseek)(iop_file_t *, unsigned long, int);
+	int	(*lseek)(iop_file_t *, int, int);
 	int	(*ioctl)(iop_file_t *, unsigned long, void *);
 	int	(*remove)(iop_file_t *, const char *);
 	int	(*mkdir)(iop_file_t *, const char *);

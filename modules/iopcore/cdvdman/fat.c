@@ -17,6 +17,8 @@ extern struct cdvdman_settings_usb cdvdman_settings;
 static fat_driver gFatd;
 static u8 *gSbuf;
 
+#define FAT_END_OF_CHAIN	0x00004000
+
 #ifdef VMC_DRIVER
 static int io_sema;
 
@@ -27,12 +29,12 @@ static int io_sema;
 #define SIGNALIOSEMA(x)
 #endif
 
-static int fat_getClusterChain(fat_driver* fatd, unsigned int cluster, unsigned int* buf, unsigned int bufSize, int startFlag);
+static int fat_getClusterChain(fat_driver* fatd, unsigned int cluster, unsigned int* buf, int startFlag);
 
 //Set chain info (cluster/offset) cache
 void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size, unsigned int numChainPoints, fat_dir_chain_record *chainPointsBuf) {
 	unsigned int index, clusterChainStart, fileCluster, fileSize;
-	int i, j, chainSize;
+	int i, j, chainSize, chainSizeResult;
 	unsigned short int blockSize;
 	unsigned char nextChain;
 
@@ -58,14 +60,16 @@ void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size
 	gFatd.FilePartNum = 0;
 
 	while (nextChain) {
-		if((chainSize = fat_getClusterChain(&gFatd, fileCluster, gFatd.cbuf, MAX_DIR_CLUSTER, 1)) >=0){
-			if (chainSize >= MAX_DIR_CLUSTER) { //the chain is full, but more chain parts exist
-				fileCluster = gFatd.cbuf[MAX_DIR_CLUSTER - 1];
+		if((chainSizeResult = fat_getClusterChain(&gFatd, fileCluster, gFatd.cbuf, 1)) >=0){
+			chainSize = chainSizeResult & ~FAT_END_OF_CHAIN;
+
+			if (!(chainSizeResult & FAT_END_OF_CHAIN)) { //the chain is full, but more chain parts exist
+				fileCluster = gFatd.cbuf[chainSize - 1];
 			}else { //chain fits in the chain buffer completely - no next chain exist
 				nextChain = 0;
 			}
 		}else{
-			XPRINTF("USBHDFSD: fat_setFatDirChain(): fat_getClusterChain() failed: %d\n", chainSize);
+			XPRINTF("USBHDFSD: fat_setFatDirChain(): fat_getClusterChain() failed: %d\n", chainSizeResult);
 			SIGNALIOSEMA(io_sema);
 			return;
 		}
@@ -124,11 +128,13 @@ void fat_deinit(void){
 }
 
 //for fat32
-static inline int fat_getClusterChain32(fat_driver* fatd, unsigned int cluster, unsigned int* buf, unsigned int bufSize, int startFlag) {
-	unsigned int i, indexCount, fatSector, lastFatSector;
+static inline int fat_getClusterChain32(fat_driver* fatd, unsigned int cluster, unsigned int* buf, int startFlag) {
+	unsigned int indexCount, fatSector, lastFatSector, FatSectorCount;
+	int i;
 	unsigned char cont;
 
 	cont = 1;
+	FatSectorCount = 0;
 	indexCount = fatd->partBpb.sectorSize / 4; //FAT16->2, FAT32->4
 	lastFatSector = -1;
 	i = 0;
@@ -136,14 +142,19 @@ static inline int fat_getClusterChain32(fat_driver* fatd, unsigned int cluster, 
 		buf[i] = cluster; //store first cluster
 		i++;
 	}
-	while(i < bufSize && cont) {
+	while(i < MAX_DIR_CLUSTER && cont) {
 		fatSector = cluster / indexCount;
 		if (lastFatSector !=  fatSector) {
+			if(FatSectorCount > MAX_FRAG_FAT_SECTORS)
+				break;
+
 			mass_stor_readSector(fatd->partBpb.fatStart + fatSector, 1, gSbuf);
 			lastFatSector = fatSector;
+			FatSectorCount++;
 		}
 		cluster = getI32(gSbuf + ((cluster % indexCount) * 4));
 		if ((cluster & 0xFFFFFFF) >= 0xFFFFFF8) {
+			i |= FAT_END_OF_CHAIN;
 			cont = 0; //continue = false
 		} else {
 			buf[i] = cluster & 0xFFFFFFF;
@@ -154,13 +165,13 @@ static inline int fat_getClusterChain32(fat_driver* fatd, unsigned int cluster, 
 }
 
 //---------------------------------------------------------------------------
-static int fat_getClusterChain(fat_driver* fatd, unsigned int cluster, unsigned int* buf, unsigned int bufSize, int startFlag) {
+static int fat_getClusterChain(fat_driver* fatd, unsigned int cluster, unsigned int* buf, int startFlag) {
 	//This operation is a fairly time-consuming operation. Avoid having to re-read the cluster chain if possible.
 	if (cluster == fatd->lastChainCluster) {
 		return fatd->lastChainResult;
 	}
 
-	fatd->lastChainResult = fat_getClusterChain32(fatd, cluster, buf, bufSize, startFlag);
+	fatd->lastChainResult = fat_getClusterChain32(fatd, cluster, buf, startFlag);
 	fatd->lastChainCluster = cluster;
 	return fatd->lastChainResult;
 }
@@ -184,7 +195,7 @@ static inline void fat_getClusterAtFilePos(fat_driver* fatd, fat_dir* fatDir, un
 
 //---------------------------------------------------------------------------
 int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, unsigned int filePos, unsigned char* buffer, unsigned int size) {
-	int chainSize;
+	int chainSize, chainSizeResult;
 	unsigned int startSector, clusterChainStart, bufSize, sectorSkip, clusterSkip, blockSize;
 	unsigned short int i, j;
 	unsigned char nextChain, blockSizeSectors;
@@ -204,7 +215,7 @@ int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, uns
 					 to get to the sector where offset <filePos> is located in.	*/
 
 	//Avoid seeking, if possible.
-	if((part_num == gFatd.FilePartNum)  && (filePos >= gFatd.lastCBufClusterOffset * blockSize) && (filePos  < (gFatd.lastCBufClusterOffset + gFatd.lastCBufCount) * blockSize)){
+	if((part_num == gFatd.FilePartNum)  && (filePos >= gFatd.lastCBufClusterOffset * blockSize) && (filePos  < (gFatd.lastCBufClusterOffset + (gFatd.lastCBufCount & ~FAT_END_OF_CHAIN)) * blockSize)){
 		//Totally within the cluster buffer. Data can be reused.
 		fileCluster = gFatd.lastCBufCluster;
 		clusterPos = gFatd.lastCBufClusterOffset * blockSize;
@@ -227,25 +238,26 @@ int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, uns
 
 	while (nextChain && size > 0 ) {
 		//Check if the data is within range of the data currently in the cluster buffer (cbuf).
-		if(fileCluster == gFatd.lastCBufCluster && (clusterSkip < gFatd.lastCBufCount)) {
-			chainSize = gFatd.lastCBufCount;
+		chainSize = (chainSizeResult = gFatd.lastCBufCount) & ~FAT_END_OF_CHAIN;
+		if(fileCluster == gFatd.lastCBufCluster && (clusterSkip < chainSize)) {
 			clusterChainStart = 0;
-			if (chainSize >= MAX_DIR_CLUSTER) { //the chain is full, but more chain parts exist
-				fileCluster = gFatd.cbuf[MAX_DIR_CLUSTER - 1];
+			if (!(chainSizeResult & FAT_END_OF_CHAIN)) { //the chain is full, but more chain parts exist
+				fileCluster = gFatd.cbuf[chainSize - 1];
 			}else { //chain fits in the chain buffer completely - no next chain needed
 				nextChain = 0;
 			}
 		}else{
 			//Keep skipping clusters until the clusters to be read/written to are within range.
 			while(1){
-				if((chainSize = fat_getClusterChain(&gFatd, fileCluster, gFatd.cbuf, MAX_DIR_CLUSTER, clusterChainStart))<0){
+				if((chainSizeResult = fat_getClusterChain(&gFatd, fileCluster, gFatd.cbuf, clusterChainStart))<0){
 					SIGNALIOSEMA(io_sema);
-					return chainSize;
+					return chainSizeResult;
 				}
+				chainSize = chainSizeResult & ~FAT_END_OF_CHAIN;
 
 				clusterChainStart = 0;
-				if (chainSize >= MAX_DIR_CLUSTER) { //the chain is full, but more chain parts exist
-					fileCluster = gFatd.cbuf[MAX_DIR_CLUSTER - 1];
+				if (!(chainSizeResult & FAT_END_OF_CHAIN)) { //the chain is full, but more chain parts exist
+					fileCluster = gFatd.cbuf[chainSize - 1];
 				}else { //chain fits in the chain buffer completely - no next chain needed
 					nextChain = 0;
 				}
@@ -253,14 +265,14 @@ int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, uns
 				if (clusterSkip < MAX_DIR_CLUSTER)
 					break;
 
-				clusterPos += MAX_DIR_CLUSTER * blockSize;
-				clusterSkip -= MAX_DIR_CLUSTER;
+				clusterPos += (unsigned int)chainSize * blockSize;
+				clusterSkip -= chainSize;
 			}
 
 			//Record information on the cluster chain data in cbuf, so that it can be reused.
 			gFatd.lastCBufCluster = gFatd.cbuf[0];
 			gFatd.lastCBufClusterOffset = clusterPos / blockSize;
-			gFatd.lastCBufCount = chainSize;
+			gFatd.lastCBufCount = chainSizeResult;
 		}
 
 		//process the cluster chain (gFatd.cbuf) and skip leading clusters if needed

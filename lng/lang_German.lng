@@ -1,6 +1,6 @@
 # German Translation by Yorda; extra lines added by Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 German
 Open PS2 Loader %s
@@ -10,16 +10,15 @@ Netzwerk Konfiguration
 Advanced options
 <keine Werte>
 Einstellungen gespeichert...
-Fehler beim Schreiben der Einstellungen!
 Verlassen
 Einstellungen
-Menü
 USB-Spiele
 HDD-Spiele
 ETH-Spiele
 Anwendungen
 Design
 Sprache
+Language
 The system will be powered off.
 Exit OPL?
 %d: HardDisk Drive not detected
@@ -41,7 +40,7 @@ Cancel
 Circle
 Cross
 Games List
-Einstell.
+Spiele Einstellungen
 Entferne alle Einstellungen
 Entferne alle keys für das Spiel
 Scrollen
@@ -100,8 +99,10 @@ Löschen
 Ausführen
 Bildschirm Einstellungen
 Aktiviere Löschen- und Umbenennen-Aktionen
+Überprüfe USB-Spiel Fragmentierung
 Erinnere an zuletzt gespieltes Spiel
 Zeige GSM im Hauptmenü an
+Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
 Test
 Leer lassen für Anmeldung als GAST

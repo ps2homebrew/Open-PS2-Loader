@@ -1,5 +1,8 @@
-#define MAX_DIR_CLUSTER		64	//64 * 32KB clusters (typically used for >=32GB devices) = a healthy 2MB range.
-#define OPL_DIR_CHAIN_SIZE	32
+#define MAX_DIR_CLUSTER		128	//Number of clusters to record, whenever the FAT chain is referenced (One typical 512-byte sector = 128 = 512/4).
+/* Performance will be bad on a heavily-fragmented disk because of the number of FAT sectors to be read,
+	so limit the number of FAT sectors that will be scanned through in an attempt to prevent performance from being affected too much.	*/
+#define MAX_FRAG_FAT_SECTORS	1
+#define OPL_DIR_CHAIN_SIZE	128	//Number of points to record, along a file's FAT chain (for quicker seeking).
 #define FAT_IO_BLOCK_SIZE	4096	//Maximum size for USB transfers
 
 #define FAT_IO_MODE_READ	0

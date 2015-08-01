@@ -1,0 +1,194 @@
+# translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>; extra lines added by Jay-Jay
+# Last update: 08/01/2015. 
+# Updated for OPL_811_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+Filipino
+Open PS2 Loader %s
+I-save ang mga pagbabago
+Likod
+Network Config
+Advanced options
+<Walang values>
+Save ang mga setting...
+Error sa pagsulat setting !
+Lumabas
+Settings
+Menu
+USB Laro
+HDD Laro
+ETH Laro
+Apps
+tema
+wika
+The system will be powered off.
+Exit OPL?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Network startup error 
+%d: No network adaptor detected
+%d: Hindi makakonekta sa SMB server
+%d: Hindi makapag-log in sa SMB server
+%d: Hindi mabuksan ang SMB ibahagi
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
+Sa
+Mula sa
+Ayos
+Select
+Cancel
+Circle
+Cross
+Games List
+Game settings
+Alisin ang lahat ng mga setting ng
+Inalis ang lahat ng mga pindutan para sa mga laro
+i-scroll
+Mabagal
+medium
+mabilis
+default na menu
+Mag-load mula sa disc
+Mangyaring maghintay
+Nagkaroon ng error habang naglo-load ang ID ng Laro
+Awtomatikong pag-uuri
+Error sa paglo-load ng file wika
+Huwag paganahin ang mga Kulay Debug
+Controller Walang natukoy na , naghihintay...
+Paganahin ang Cover Art
+Malapad na screen
+Power off
+Nilo-load ang config
+Sine-save ang config
+Simulan ang aparato
+Refresh
+USB device simula mode
+HDD device simula mode
+ETH aparato simula mode
+Mga application na simulan ang mode
+auto
+manwal
+Start HDL Server
+HDL Server Starting...
+HDL Server Running...
+Failed to start HDL Server.
+HDL Server Unloading...
+Lumabas sa
+kulay ng background
+kulay ng teksto
+IP address type
+Static
+DHCP
+IP address
+Address
+Mask
+Gateway
+DNS Server
+Port
+magbahagi
+gumagamit
+Password
+<Hindi set>
+Address type
+IP
+NetBIOS
+tanggapin
+Item ay permanenteng tatanggalin, magpatuloy?
+Rename
+Alisin
+Tumakbo
+Ipakita ang mga setting
+Enable Delete and Rename actions
+Tandaan ang huling play ng laro
+Ipakita ang GSM sa Main Menu
+Error, hindi maaaring tumakbo ang item
+pagsubok
+Iwanang walang laman para sa Guest auth .
+Accurate reads
+Alternatibong data basahin pamamaraan
+alisin sa pagkakakawit Syscalls
+0 PSS mode
+Emulate DVD-DL
+Disable IGR
+Unused
+Hide dev9 module
+Ang pagbabago ng laki ay i-reformat ang VMC
+Lumikha
+Baguhin
+May pagpapalaglag
+I-reset ang
+gumamit ng generic
+I-configure ang VMC
+Pangalan
+Laki
+katayuan
+pag-unlad
+VMC file umiiral
+Di-wastong VMC file , laki ay hindi tama
+VMC file na kailangan upang malikha
+Error sa VMC %s , magpatuloy sa pisikal na MC ( slot %d) ?
+Awtomatikong i-refresh
+tungkol sa
+Coders
+Quality Assurance
+USB prefix landas
+Iwanang walang laman upang lumabas sa Browser
+Halaga sa (mga) minuto , 0 upang huwag paganahin iikot pababa
+Awtomatikong HDD paikutin pababa
+Video mode
+dialog ng kulay
+Piniling kulay
+Ipakita ang impormasyon ng pahina
+Impo
+Custom ELF
+kulay ng seleksyon
+Muling kumonekta
+Iwanang walang laman upang ilista ang pagbabahagi
+ETH prefix landas
+Backspace
+Puwang
+Magpasok
+Moda
+VMC Slot 1
+VMC Slot 2
+ID ng Laro
+DMA Mode
+V-Sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Configure GSM
+Callback timer
+Ilapat ang isang pagka-antala sa CDVD function (0 ang default)
+Ethernet bilis at duplex setting
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Mga Setting
+paganahin GSM
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Show PS2RD Cheat Engine on Main Menu
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found

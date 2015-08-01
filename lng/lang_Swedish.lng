@@ -1,0 +1,194 @@
+# translation by Ronald Andersson (aka: dlanor) and Flaya / supervised by Jay-Jay
+# Last update: 08/01/2015. 
+# Updated for OPL_811_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+Swedish
+Open PS2 Loader %s
+Spara ändringar
+Tillbaka
+Nätverkskonfig
+Avancerad Konfig
+<Inga värden>
+Inställningar sparade...
+Fel vid skrivning av inställningar!
+Avsluta
+Inställning
+Meny
+USB Spel
+HDD Spel
+ETH Spel
+Appar
+Tema
+Språk
+Systemet stängs av.
+Avsluta OPL?
+%d: Ingen Hårddisk hittad
+%d: Hårddisken ej formatterad
+%d: Nätverk startup error
+%d: Ingen nätverksadapter funnen
+%d: Kan inte ansluta till SMB-server
+%d: Kan inte logga in på SMB-server
+%d: Kan inte öppna SMB-mapp
+%d: Kan inte lista SMB-mappar
+%d: Kan inte lista spel
+%d: DHCP servern är otillgänglig
+%d: Ingen nätverksanslutning
+På
+Av
+OK
+Välj
+Avbryt
+Cirkel
+Kryss
+Spel-lista
+Spelinst.
+Ta bort alla inställningar
+Tog bort alla nycklar för spelet
+Bläddra
+Sakta
+Medel
+Snabb
+Grundmeny
+Ladda från skiva
+Vänta
+Fel vid laddning av Game ID
+Automatisk sortering
+Fel vid inläsning av språkfilen
+Inaktivera Debug Färger
+Ingen kontroll upptäcks , vänta ...
+Aktivera Omslag
+Bredbild
+Stäng av
+Ladda config
+Spara config
+Starta enheten
+Uppdatera
+USB enhet startläge
+HDD enhet startläge
+ETH enhet startläge
+Appar startläge
+Auto
+Manuell
+Starta HDL Server
+HDL Server Startar ...
+HDL Server Running...
+Kan inte starta HDL server.
+HDL Server Stängs...
+Utgång till
+Bakgrundsfärg
+Textfärg
+IP Address typ
+Statisk
+DHCP
+IP
+Address
+Mask
+Gateway
+DNS Server
+Port
+Delning
+Användare
+Lösenord
+<Ej angett>
+Address typ
+IP
+NetBIOS
+Acceptera
+Objektet ska tas bort permanent , fortsätta?
+Byt namn
+Radera
+Kör
+Inställningar Skärm
+Aktivera ta bort och Byt namn åtgärder
+Kom ihåg senast spelade spel
+Välj knapp
+Fel , kunde inte köra posten
+Test
+Lämna tomt för Gäst konto.
+Korrekt läsning
+Alternativa data metod
+Släpp Syscalls
+0 PSS läge
+Emulera DVD-DL
+Inaktivera IGR
+Oanvänd
+Göm dev9 modul
+Ändra storleken kommer att formatera om VMC
+Skapa
+Ändra
+Avbryt
+Återställ
+Använd generiska
+Konfigurera VMC
+Namn
+Storlek
+Status
+Framsteg
+VMC fil existerar
+Ogiltig VMC fil, felaktig storlek
+VMC filen måste skapas
+Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d ) ?
+Automatisk uppdatering
+Om
+Kodare
+Kvalitetstestare
+USB prefix sökväg
+Lämna tomt för att avsluta till utforskaren
+Värde i minut (er), 0 för att inaktivera nerspinn
+Automatisk HDD nerspinn
+Videoläge
+Dialog färg
+Vald färg
+Visa info sida
+Info
+Custom ELF
+Färgval
+Återanslut
+Lämna tomt för att lista delning
+ETH prefix sökväg
+Backsteg
+Mellanslag
+Enter
+Läge
+VMC Slot 1
+VMC Slot 2
+Spel-ID
+DMA Läge
+V - Sync
+Läge 1
+Läge 2
+Läge 3
+Läge 4
+Läge 5
+Läge 6
+Läge 7
+Läge 8
+Konfigurera GSM
+Återkallnings timer
+Applicera en försening till cDVD funktioner ( 0 är standard )
+Ethernet hastighet och duplex
+100Mbit full duplex
+100Mbit halv duplex
+10Mbit full duplex
+10Mbit halv duplex
+GSM inställningar
+Aktivera GSM
+GSM PÅ eller AV
+Vidoeläge
+Videoläge tvingas
+Horisontell position
+Ställer Horisontell offset
+Vertikal position
+Ställer Vertikal förskjutning
+Skippa FMV
+Skippar Full Motion Video
+Visa PS2RD Fusk Meny på Huvudmeny
+Inställningar Fusk
+Aktivera PS2RD Fusk Motor
+Tillåter PS2RD patcha dina spel
+PS2RD Fusk Motor Läge
+Autovälj eller Välj spel fusk
+Autovälj Fusk
+Välj Fusk
+Fel: kunde inte ladda Fuskfilen
+Inga fusk funna

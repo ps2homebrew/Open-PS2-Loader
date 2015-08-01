@@ -1,0 +1,194 @@
+# translation by darkgarba, El Patas, and Jay-Jay
+# Last update: 08/01/2015. 
+# Updated for OPL_811_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+Spanish
+Open PS2 Loader %s
+Guardar cambios
+Volver
+Configuracion de red
+Opciones Avanzadas
+<sin valores>
+Configuracion guardada...
+Error escribiendo configuracion!
+Salir
+Configuracion
+Menú
+Juegos USB
+Juegos HDD
+Juegos ETH
+Aplicaciones
+Tema
+Idioma
+El sistema se apagará.
+Salir OPL?
+%d: Disco Duro no detectado
+%d: Disco Duro no formateado
+%d: Error iniciacion de red
+%d: Sin adaptador de red detectado
+%d: No se puede conectar a servidor SMB
+%d: No se puede loguear en servidor SMB
+%d: No se puede abrir carpeta SMB
+%d: No se puede listar carpeta SMB 
+%d: No se puede listar los juegos
+%d: DHCP servidor no disponible
+%d: No hay conexión a la red
+Sí
+No
+OK
+Elegir
+Cancelar
+Círculo
+Cruz
+Lista de Juegos
+Opciones
+Quitar configuracion
+Quitar todos los botones para el juego
+Movimiento
+Lento
+Normal
+Rapido
+Menu por defecto
+Cargar de disco
+Por favor espere
+Error cargando ID del juego
+Ordenar automaticamente
+Error cargando archivo de idioma
+Deshabilitar colores debug
+No se detecto controlador, esperando...
+Habilitar Caratulas
+Pantalla Panoramica
+Apagar
+Cargando configuracion
+Guardando configuracion
+Inicializar dispositivo
+Actualizar
+Modo inicio dispositivo USB
+Modo inicio dispositivo HDD
+Modo inicio dispositivo ETH
+Modo inicio de aplicaciones
+Automatico
+Manual
+Inicializar Servidor HDL
+Inicializando Servidor HDL ...
+Servicor HDL Iniciado...
+Error al iniciar el servidor HDL.
+HDL Servidor Descargando...
+Ruta IGR
+Color de fondo
+Color de texto
+Tipo de dirección IP
+Estático
+DHCP
+Dirección IP
+Dirección
+Mascara de red
+Gateway
+Servidor DNS
+Puerto
+Carpeta compartida
+Usuario
+Contraseña
+<ninguna>
+Tipo de dirección
+IP
+NetBIOS
+Aceptar
+El objeto sera eliminado, continuar ?
+Renombrar
+Borrar
+Iniciar
+Opciones de pantalla
+Activar borrado y renombrado
+Recordar ultimo juego cargado
+Seleccione el Botón
+Error, no se pudo inicializar
+Prueba
+Dejalo vacio para iniciar como invitado
+Lee precisa
+Lectura de datos alternativa
+Deshabilitar llamadas de sistema
+Modo 0 PSS
+Emular DVD-DL
+Deshabilitar IGR
+No usado
+Esconder modulo dev9
+Si cambias el tamaño se formateara VMC
+Crear
+Modificar
+Cancelar
+Resetear
+Usar generica
+Configurar VMC
+Nombre
+Medida
+Estado
+Progreso
+Archivo VMC existe
+Archivo VMC invalido, la medida es incorrecta
+El archivo VMC necesita ser creado
+Error con VMC %s, continuar con la MC(slot %d) ?
+Recargar automaticamente
+Creditos
+Programadores
+Garantía de Calidad
+Prefijo ruta USB
+Dejalo vacio para salir al explorador
+Valor en minuto(s), 0 para deshabilitar detencion
+Detencion automatica de HD
+Modo video
+Color dialogo
+Color seleccionado
+Enseñar pantalla informacion
+Info
+ELF customizado
+Seleccion de color
+Reconectar
+Dejalo vacio para listar carpetas compartidas
+Prefijo ruta ETH
+Borrar
+Espacio
+Entrar
+Modo
+VMC Slot 1
+VMC Slot 2
+ID Juego
+Modo DMA
+Sincronizacion Video
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Configuración GSM
+Llamada a reloj
+Aplicar retraso a funcion CDVD (0 es por defecto)
+Modo de enlace Ethernet
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Opciones GSM
+Activar GSM
+Activar o desactivar GSM
+VMODO
+Modo de visualización personalizado forzado.
+H-POS
+Ajuste Horizontal
+V-POS
+Ajuste Vertical
+Saltar FMV
+Salta las Escenas FMV
+Mostrar PS2RD Cheat Engine en el menú principal
+Ajustes Cheat
+Activar PS2RD Cheat Engine
+Deja parchar PS2RD Cheat Engine los juegos
+PS2RD Cheat Engine Modo
+De selección automática o seleccionar Cheats del juego
+Selección automática cheats
+Seleccionar juego cheats
+Error: no se pudo cargar Cheat Archivo
+No hay Cheats encontrados

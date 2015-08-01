@@ -1,0 +1,195 @@
+# translation by shaolinassassin; extra lines added by Jay-Jay 
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+French
+Open PS2 Loader %s
+Sauvegarder les modifications
+Retour
+Configuration réseau
+Advanced options
+<vide>
+Configuration sauvegardée...
+Echec de la sauvegarde de la configuration!
+Quitter Open PS2 Loader
+Config.
+Jeux sur périph. USB
+Jeux sur disque dur
+Jeux sur réseau
+Applications
+Thème
+Langue
+The system will be powered off.
+Exit OPL?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Erreur de démarrage du réseau
+%d: No network adaptor detected
+%d: Impossible de se connecter au serveur SMB
+%d: Impossible de s'identifier auprès du serveur SMB
+%d: Impossible d'ouvrir le dossier SMB 
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
+Activé
+Désactivé
+Ok
+Select
+Cancel
+Circle
+Cross
+Games List
+Rég. du jeu
+Réinitialiser tous les réglages
+Réglages du jeu supprimés
+Vitesse de défilement
+Lente
+Moyenne
+Rapide
+Menu au démarrage
+Charger depuis le jeu
+Veuillez patienter
+Erreur lors du chargement de l'ID du jeu
+Classement alphabétique
+Erreur lors du chargement du fichier de langue
+Désactiver l'écran de débug
+Manette déconnectée, en attente...
+Visualiser les jaquettes des jeux
+Plein écran
+Eteindre la PS2
+Chargement de la configuration
+Sauvegarde de la configuration
+Démarrer le dispositif
+Refresh
+Mode de démarrage du périph. USB
+Mode de démarrage du disque dur
+Mode de démarrage du réseau
+Mode de démarrage des applications
+Automatique
+Manuel
+Démarrer le serveur HDL
+Démarrage du serveur HDL...
+HDL Server Running...
+Failed to start HDL Server.
+HDL Server Unloading...
+Quitter le jeu (IGR) vers...
+Couleur d'arrière-plan
+Couleur du texte
+IP address type
+Static
+DHCP
+IP address
+Address
+Masque de sous-réseau
+Passerelle par défaut
+DNS Server
+Port
+Partage
+Utilisateur
+Mot de passe
+<non défini>
+Address type
+IP
+NetBIOS
+Valider
+L élément sera définitivement supprimé, continuer ?
+Renommer
+Supprimer
+Démarrer
+Configuration de l'affichage
+Activer les options supprimer/renommer
+Vérifier si le jeu est fragmenté (USB)
+Se souvenir du dernier jeu 
+Afficher GSM dans le menu de configuration
+Le jeu est fragmenté, impossible de continuer
+Impossible de lancer le fichier
+Tester le jeu avec les nouveaux réglages
+Laisser vide pour le mode INVITE
+Charger le coeur alternatif
+Méthode alternative de lecture
+Désactiver Syscalls
+Passer les cinématiques
+Emulate DVD-DL
+Désactiver l'option IGR (In-Game-Reset)
+Unused
+Cacher le module dev9
+Changer la taille de la VCM la formatera 
+Créer
+Modifier
+Abandonner
+Réinitialiser
+Utiliser générique
+Configurer la VCM
+Nom
+Taille
+Statut
+Progression
+La VCM existe déjá
+Fichier VCM non valide, taille incorrecte
+La VCM doit d abord être créée
+Erreur sur la VCM %s, continuer sur la CM physique (slot %d) ?
+Rafraîchissement automatique
+Crédits
+Développeurs
+Quality Assurance
+Préfixe du chemin du périphérique USB
+Laisser vide pour quitter OPL vers le navigateur PS2
+En minute(s), 0 pour désactiver l'arrêt automatique
+Arrêt automatique du disque dur
+Mode vidéo
+Couleur des options
+Couleur de sélection
+Afficher les informations
+Info
+Custom ELF
+Sélection des couleurs
+Reconnecter
+Laisser vide pour afficher les dossiers partagés
+Préfixe du chemin du réseau
+Retour
+Espace
+Entrer
+Mode
+VCM Slot 1
+VCM Slot 2
+ID du jeu
+Mode DMA choisi
+V-Sync (synchronisation verticale)
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Configure GSM
+Callback timer
+Appliquer un délai aux fonctions CDVD (valeur 0 par défaut)
+Sélection de la vitesse réseau
+100 Mo full-duplex
+100 Mo half-duplex
+10 Mo full-duplex
+10 Mo half-duplex
+Paramètres de GSM
+Activer GSM
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Show PS2RD Cheat Engine on Main Menu
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found

@@ -1,0 +1,46 @@
+dmacman_IMPORTS_start
+I_dmac_request
+I_dmac_transfer
+I_dmac_ch_get_chcr
+dmacman_IMPORTS_end
+
+thbase_IMPORTS_start
+I_DelayThread
+I_SetAlarm
+I_USec2SysClock
+thbase_IMPORTS_end
+
+smsutils_IMPORTS_start
+I_mips_memcpy
+smsutils_IMPORTS_end
+
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+
+sysclib_IMPORTS_start
+//I_memcpy
+I_strcmp
+I_bzero
+sysclib_IMPORTS_end
+
+ps2ip_IMPORTS_start
+ I_pbuf_alloc
+ I_pbuf_free
+ I_netif_add
+ I_netif_set_default
+ I_ps2ip_input
+ I_etharp_output
+ I_inet_addr
+ I_tcpip_input
+ps2ip_IMPORTS_end
+
+dev9_IMPORTS_start
+I_dev9IntrEnable
+I_dev9IntrDisable
+I_dev9RegisterIntrCb
+I_dev9RegisterPreDmaCb
+I_dev9RegisterPostDmaCb
+I_dev9DmaTransfer
+I_dev9GetEEPROM
+dev9_IMPORTS_end

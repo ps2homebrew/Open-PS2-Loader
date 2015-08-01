@@ -1,0 +1,195 @@
+# German Translation by Yorda; extra lines added by Jay-Jay
+# Last update: 07/25/2015. 
+# Working with OPL_801_DB. 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+German
+Open PS2 Loader %s
+Änderungen speichern
+Zurück
+Netzwerk Konfiguration
+Advanced options
+<keine Werte>
+Einstellungen gespeichert...
+Verlassen
+Einstellungen
+USB-Spiele
+HDD-Spiele
+ETH-Spiele
+Anwendungen
+Design
+Sprache
+Language
+The system will be powered off.
+Exit OPL?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Fehler beim Starten des Netzwerks
+%d: No network adaptor detected
+%d: Kann nicht mit SMB Server verbunden werden
+%d: Kann sich nicht beim SMB Server anmelden
+%d: SMB Freigabe kann nicht geöffnet werden
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
+Ein
+Aus
+OK
+Select
+Cancel
+Circle
+Cross
+Games List
+Spiele Einstellungen
+Entferne alle Einstellungen
+Entferne alle keys für das Spiel
+Scrollen
+Langsam
+Mittel
+Schnell
+Standard Einstellungen
+Lade von Disk
+Bitte warten
+Fehler beim laden der Spiel-ID
+Automatische Sortierung
+Fehler beim laden der Sprach-Datei
+Deaktiviere Debug-Farben
+Kein Controller erkannt, warte...
+Aktiviere Cover Bilder
+Breitbild
+Ausschalten
+Lade Konfiguration
+Speichere Konfiguration
+Gerät starten
+Refresh
+USB-Gerät Start Modus
+HDD-Gerät Start Modus
+ETH-Gerät Start Modus
+Anwendung Start Modus
+Automatisch
+Manuell
+Start HDL Server
+HDL Server Starting...
+HDL Server Running...
+Failed to start HDL Server.
+HDL Server Unloading...
+Verlassen nach
+Hintergrund-Farbe
+Text-Farbe
+IP address type
+Static
+DHCP
+IP address
+Address
+Netzmaske
+Gateway
+DNS Server
+Port
+Freigabe
+Benutzername
+Passwort
+<nicht eingestellt>
+Address type
+IP
+NetBIOS
+Annehmen
+Objekt wird permanent gelöscht, weiterfahren?
+Umbenennen
+Löschen
+Ausführen
+Bildschirm Einstellungen
+Aktiviere Löschen- und Umbenennen-Aktionen
+Überprüfe USB-Spiel Fragmentierung
+Erinnere an zuletzt gespieltes Spiel
+Zeige GSM im Hauptmenü an
+Fehler, das Spiel ist fragmentiert
+Fehler, Objekt kann nicht ausgeführt werden
+Test
+Leer lassen für Anmeldung als GAST
+Lade alternativen Kern
+Alternative Datenlese-Methode
+Systemaufrufe abhängen
+0 PSS Modus
+Emulate DVD-DL
+Deaktiviere IGR
+Unused
+Verstecke dev9 Modul
+Die Änderung der Grösse wird die VMC erneut formatieren
+Erstellen
+Modifizieren
+Abrechen
+Neustarten
+Nutze gewöhnlich
+Konfiguriere VMC
+Name
+Grösse
+Status
+Fortschritt
+VMC Datei besteht
+Ungültige VMC Datei, Grösse ist falsch
+VMC file need to be created
+Fehler mit VMC %s, fahre fort mit physischer MC (Stecklatz %d) ?
+Automatisch aktualisieren
+Über
+Programmierer
+Quality Assurance
+USB Präfix Pfad
+Leer lassen um zum Browser zurückzukehren
+Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
+Automatische Abschaltung der Festplatte
+Video Modus
+Dialog Farbe
+Ausgewählte Farbe
+Info Seite anzeigen
+Info
+Benutzerdefinierte ELF
+Farbauswahl
+Verbindung wiederherstellen
+Leerlassen um Freigaben aufzulisten
+ETH Präfix Pfad
+Backspace
+Space
+Enter
+Modus
+VMC Steckplatz 1
+VMC Steckplatz 2
+Spiel ID
+DMA Modus
+V-Sync
+Modus 1
+Modus 2
+Modus 3
+Modus 4
+Modus 5
+Modus 6
+Modus 7
+Modus 8
+Configure GSM
+Callback timer
+Verzögerung an den CDVD Funktionen anwenden
+Ethernet-Geschwindigkeit und duplex Einstellungen
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Einstellungen
+Aktiviere GSM
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Show PS2RD Cheat Engine on Main Menu
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found

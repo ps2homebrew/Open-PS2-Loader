@@ -1,0 +1,11 @@
+sysclib_IMPORTS_start
+I_strncpy
+I_memcpy
+I_memset
+I_toupper
+I_strlen
+sysclib_IMPORTS_end
+
+oplsmb_IMPORTS_start
+I_smb_NegotiateProt
+oplsmb_IMPORTS_end

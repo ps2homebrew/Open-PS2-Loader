@@ -11,7 +11,6 @@ struct cdvdman_settings_common{
 	u8 NumParts;
 	u8 media;
 	u16 flags;
-	u32 cb_timer;
 	u32 layer1_start;
 	u8 DiscID[5];
 	u8 padding[3];

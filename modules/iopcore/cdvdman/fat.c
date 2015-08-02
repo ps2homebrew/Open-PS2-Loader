@@ -34,9 +34,8 @@ static int fat_getClusterChain(fat_driver* fatd, unsigned int cluster, unsigned 
 
 //Set chain info (cluster/offset) cache
 void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size, unsigned int numChainPoints, fat_dir_chain_record *chainPointsBuf) {
-	unsigned int index, clusterChainStart, fileCluster, fileSize;
+	unsigned int index, clusterChainStart, fileCluster, fileSize, blockSize;
 	int i, j, chainSize, chainSizeResult;
-	unsigned short int blockSize;
 	unsigned char nextChain;
 
 	XPRINTF("USBHDFSD: reading cluster chain  \n");
@@ -78,7 +77,7 @@ void fat_setFatDirChain(fat_dir* fatDir, unsigned int cluster, unsigned int size
 		//process the cluster chain (gFatd.cbuf)
 		for (i = clusterChainStart; i < chainSize; i++) {
 			fileSize += (gFatd.partBpb.clusterSize * gFatd.partBpb.sectorSize);
-			while (fileSize >= (j * (unsigned int)blockSize) && j < fatDir->numPoints) {
+			while (fileSize >= (j * blockSize) && j < fatDir->numPoints) {
 				fatDir->points[j].cluster = gFatd.cbuf[i];
 				fatDir->points[j].index = index;
 				j++;

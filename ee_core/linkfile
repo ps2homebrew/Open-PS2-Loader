@@ -91,11 +91,11 @@ SECTIONS {
 	}
 	_end_bss = .;
 
-	_end = . ;
-	PROVIDE(end = .);
-
 	/* Symbols needed by crt0.s.  */
 	PROVIDE(_heap_size = -1);
-	PROVIDE(_stack = _end);
-	PROVIDE(_stack_size = 0x00097000 - _end);	/* Any remaining space up to the module storage region, is available for the stack. */
+	PROVIDE(_stack = .);
+	PROVIDE(_stack_size = 0x00097000 - _stack);	/* Any remaining space up to the module storage region, is available for the stack. */
+
+	_end = _stack + _stack_size ;
+	PROVIDE(end = _end);
 }

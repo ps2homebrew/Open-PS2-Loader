@@ -789,10 +789,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 // End Of Per-Game GSM Integration --Bat--
 #endif
 
-	int timer = 0;
-	configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer);
-	diaSetInt(diaCompatConfig, COMPAT_CDVDMAN_TIMER, timer);
-
 	// Find out the current game ID
 	char hexid[32];
 	configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));
@@ -897,12 +893,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
-
-		diaGetInt(diaCompatConfig, COMPAT_CDVDMAN_TIMER, &timer);
-		if (timer != 0)
-			configSetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, timer);
-		else
-			configRemoveKey(configSet, CONFIG_ITEM_CDVDMAN_TIMER);
 
 #ifdef GSM
 		diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);

@@ -112,7 +112,6 @@ struct UIItem diaCompatConfig[] = {
 	{UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSCONFIG}}}, {UI_BREAK},
 #endif
 
-	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_CDVDMAN_TIMER}}}, {UI_SPACER}, {UI_INT, COMPAT_CDVDMAN_TIMER, 1, 1, _STR_HINT_CDVDMAN_TIMER, 0, 0, {.intvalue = {0, 0, 0, 255}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}}, {UI_SPACER}, {UI_ENUM, COMPAT_DMA, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 
 	{UI_SPLITTER},

@@ -1144,7 +1144,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 		if((offset = fh->position % 2048) != 0){
 			nbytes = 2048 - offset;
 			if(size < nbytes) nbytes = size;
-			while(sceCdRead(fh->lsn + ((fh->position & -2048) / 2048), 1, cdvdman_fs_buf, NULL) == 0) DelayThread(10000);
+			while(sceCdRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf, NULL) == 0) DelayThread(10000);
 
 			fh->position += nbytes;
 			size -= nbytes;

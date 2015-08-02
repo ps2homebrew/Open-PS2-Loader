@@ -342,7 +342,6 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
-		0x00000000,
 		"B00BS"
 	};
 	struct cdvdman_settings_common *settings;
@@ -398,14 +397,6 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 
 	}
 #endif
-
-	// patch cdvdman timer
-	int timer = 0;
-	u32 cdvdmanTimer = 0;
-	if (configGetInt(configSet, CONFIG_ITEM_CDVDMAN_TIMER, &timer)) {
-		cdvdmanTimer = timer * 250;
-	}
-	settings->cb_timer = cdvdmanTimer;
 
 	*patchindex = i;
 

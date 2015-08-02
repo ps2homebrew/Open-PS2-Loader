@@ -88,7 +88,7 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
 
 			free(SystemCNF);
 
-			if(NextLine != NULL && strcmp(strtok(NextLine, " ="), "BOOT2") == 0)
+			if(NextLine != NULL && strcmp(strtok(NextLine, "\t ="), "BOOT2") == 0)
 			{
 				if((p = strtok(NULL, " =")) != NULL && strncmp(p, "cdrom0:\\", 8)==0)
 				{
@@ -456,10 +456,17 @@ void sbDelete(base_game_info_t **list, const char* prefix, const char* sep, int 
 	base_game_info_t* game = &(*list)[id];
 
 	if (game->format != GAME_FORMAT_USBLD) {
-		if (game->media == 0x12)
-			snprintf(path, sizeof(path), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-		else
-			snprintf(path, sizeof(path), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+		if (game->format != GAME_FORMAT_OLD_ISO) {
+			if (game->media == 0x12)
+				snprintf(path, sizeof(path), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+			else
+				snprintf(path, sizeof(path), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+		} else {
+			if (game->media == 0x12)
+				snprintf(path, sizeof(path), "%sCD%s%s%s", prefix, sep, game->name, game->extension);
+			else
+				snprintf(path, sizeof(path), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
+		}
 		fileXioRemove(path);
 	} else {
 		char *pathStr = "%sul.%08X.%s.%02x";
@@ -479,12 +486,22 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 	base_game_info_t* game = &(*list)[id];
 
 	if (game->format != GAME_FORMAT_USBLD) {
-		if (game->media == 0x12) {
-			snprintf(oldpath, sizeof(oldpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-			snprintf(newpath, sizeof(newpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
+		if (game->format == GAME_FORMAT_OLD_ISO) {
+			if (game->media == 0x12) {
+				snprintf(oldpath, sizeof(oldpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+				snprintf(newpath, sizeof(newpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
+			} else {
+				snprintf(oldpath, sizeof(oldpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
+				snprintf(newpath, sizeof(newpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
+			}
 		} else {
-			snprintf(oldpath, sizeof(oldpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-			snprintf(newpath, sizeof(newpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
+			if (game->media == 0x12) {
+				snprintf(oldpath, sizeof(oldpath), "%sCD%s%s%s", prefix, sep, game->name, game->extension);
+				snprintf(newpath, sizeof(newpath), "%sCD%s%s%s", prefix, sep, newname, game->extension);
+			} else {
+				snprintf(oldpath, sizeof(oldpath), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
+				snprintf(newpath, sizeof(newpath), "%sDVD%s%s%s", prefix, sep, newname, game->extension);
+			}
 		}
 		fileXioRename(oldpath, newpath);
 	} else {

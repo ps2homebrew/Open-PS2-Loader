@@ -9,6 +9,7 @@
 #include "mass_debug.h"
 #include "mass_common.h"
 #include "mass_stor.h"
+#include "smsutils.h"
 #include "fat.h"
 #include "cdvd_config.h"
 
@@ -298,7 +299,7 @@ int fat_fileIO(fat_dir* fatDir, unsigned short int part_num, short int mode, uns
 					else
 						mass_stor_writeSector(startSector + j, 1, gSbuf);
 #endif
-					memcpy(buffer + bufferPos, gSbuf, bufSize);
+					mips_memcpy(buffer + bufferPos, gSbuf, bufSize);
 				} else {
 					if(mode == FAT_IO_MODE_READ)
 						mass_stor_readSector(startSector + j, blockSizeSectors, buffer+bufferPos);

@@ -50,7 +50,6 @@ struct cdvdman_settings_hdd cdvdman_settings={
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
-		0x00000000,
 		"B00BS"
 	},
 	0x12345678
@@ -61,7 +60,6 @@ struct cdvdman_settings_smb cdvdman_settings={
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
-		0x00000000,
 		"B00BS"
 	},
 	"######  FILENAME  ######",
@@ -82,7 +80,6 @@ struct cdvdman_settings_usb cdvdman_settings={
 		0x69, 0x69,
 		0x1234,
 		0x39393939,
-		0x00000000,
 		"B00BS"
 	},
 };
@@ -236,7 +233,6 @@ static unsigned char sync_flag;
 static unsigned char cdvdman_cdinited = 0;
 static unsigned int ReadPos = 0;	/* Current buffer offset in 2048-byte sectors. */
 
-static iop_sys_clock_t gCdvdCallback_SysClock;
 #if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
 static int POFFThreadID;
 #endif
@@ -298,8 +294,6 @@ static void cdvdman_init(void)
 	if(!cdvdman_cdinited)
 	{
 		cdvdman_stat.err = CDVD_ERR_NO;
-
-		USec2SysClock(cdvdman_settings.common.cb_timer, &gCdvdCallback_SysClock);
 
 		fs_init();
 
@@ -1708,8 +1702,17 @@ struct cdvdman_cb_data{
 static int cdvdman_cb_event(int reason)
 {
 	static struct cdvdman_cb_data cb_data;
+	iop_sys_clock_t SysClock;
 
 	if (user_cb) {
+		if((reason != SCECdFuncRead) && (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS))
+		{
+			SysClock.lo = 50 * 250 * 36800;
+			SysClock.hi = 0;
+		}else{
+			SysClock.lo = 0;
+			SysClock.hi = 0;
+		}
 
 		cb_data.user_cb = user_cb;
 		cb_data.reason = reason;
@@ -1717,9 +1720,9 @@ static int cdvdman_cb_event(int reason)
 		DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
 
 		if (QueryIntrContext())
-			iSetAlarm(&gCdvdCallback_SysClock, &event_alarm_cb, &cb_data);
+			iSetAlarm(&SysClock, &event_alarm_cb, &cb_data);
 		else
-			SetAlarm(&gCdvdCallback_SysClock, &event_alarm_cb, &cb_data);
+			SetAlarm(&SysClock, &event_alarm_cb, &cb_data);
 	}
 
 	return 1;

@@ -1,6 +1,6 @@
-# translation by vsub / added missing lines by Jay-Jay
-# Last update: 07/28/2015. 
-# Updated for OPL_803_DB. 
+# translation by vsub / supervised by Jay-Jay
+# Last update: 08/01/2015. 
+# Updated for OPL_811_DB. 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Bulgarian
 Open PS2 Loader %s
@@ -13,12 +13,12 @@ Advanced options
 Грешка настройките за писане!
 изход
 Настройки
-Mеню
+Меню
 USB Games
 HDD Games
 ETH Games
 Apps
-тема
+Тема
 език
 The system will be powered off.
 Exit OPL?
@@ -41,7 +41,7 @@ Cancel
 Circle
 Cross
 Games List
-настройки на играта
+Конфиг.
 Премахни всички настройки
 Премахнати всички бутони за игра
 Scrolling

@@ -137,7 +137,7 @@ static int usbNeedsUpdate(void) {
 	int result = 0;
 	iox_stat_t stat;
 
-	if(OldGeneration == UsbGeneration) return 0;
+	if(usbULSizePrev != -2 && OldGeneration == UsbGeneration) return 0;
 	OldGeneration = UsbGeneration;
 
 	usbFindPartition(usbPrefix, "ul.cfg");
@@ -242,13 +242,12 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				usb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;
 				usb_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
-				// Check vmc cluster chain (write operation can cause dammage)
 				sprintf(vmc_path, "%s%s/VMC/%s.bin", usbPrefix, gUSBPrefix, vmc_name);
 
 				fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
 				if (fd >= 0) {
 					if ((start = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, vmc_path)) != 0) {
-						if ((size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, vmc_path)) != 0) {
+						if ((size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSIZE, vmc_path)) != 0) {
 							have_error = 0;
 							usb_vmc_infos.active = 1;
 							usb_vmc_infos.file.cluster = start;

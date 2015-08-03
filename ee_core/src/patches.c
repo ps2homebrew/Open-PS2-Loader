@@ -94,7 +94,7 @@ static const patchlist_t patch_list[] = {
 static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
 static unsigned int g_delay_cycles;
 
-// Nippon Ichi Sofwtare games generic patch to disable cdvd timeout
+// Nippon Ichi Software games generic patch to disable cdvd timeout
 static void NIS_generic_patches(void)
 {
 	static const u32 NIScdtimeoutpattern[] = {

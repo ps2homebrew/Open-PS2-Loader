@@ -18,9 +18,6 @@
 
 #define PADOPEN_HOOK  0
 
-
-	.equ EE_CORE_STACK, 0x00097000
-
 	.set push
 	.set noreorder
 	.set noat
@@ -32,6 +29,8 @@
  **************************************************************************/
 
 	.text
+
+	.extern _end
 
 	/* libkernel */
 	.extern memset
@@ -248,7 +247,7 @@ _SifSetDma:
 	daddu	$a2, $sp, $zero
 
 	/* change the stack pointer */
-	la	$sp, EE_CORE_STACK
+	la	$sp, _end
 
 	/* call New_SifSetDma, preserving ra and a2 registers values */
 	addiu	$sp, $sp, -0x10
@@ -322,7 +321,7 @@ _Apply_Mode3:
 	daddu	$a0, $sp, $zero
 
 	/* change the stack pointer */
-	la	$sp, EE_CORE_STACK
+	la	$sp, _end
 
 	/* preserving ra and a0 registers values */
 	addiu	$sp, $sp, -0x10
@@ -440,7 +439,7 @@ Hook_ExecPS2:
 	daddu	$s4, $sp, $zero
 
 	/* change the stack pointer */
-	la	$sp, EE_CORE_STACK
+	la	$sp, _end
 
 	/* call Install_PadOpen_Hook */
 	lui	$a0, 0x0010
@@ -495,7 +494,7 @@ Hook_CreateThread:
 	daddu	$a1, $sp, $zero
 
 	/* change the stack pointer */
-	la	$sp, EE_CORE_STACK
+	la	$sp, _end
 
 	/* preserves ra, a1 and a0 registers values */
 	addiu	$sp, $sp, -0x20

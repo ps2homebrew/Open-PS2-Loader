@@ -18,6 +18,8 @@
 #include "cheat_api.h"
 #endif
 
+void *ModStorageStart, *ModStorageEnd;
+
 int main(int argc, char **argv){
 	char ElfPath[32];
 
@@ -72,6 +74,10 @@ int main(int argc, char **argv){
 	DPRINTF("GSM = %s\n", EnableGSMOp==0?"Disabled":"Enabled");
 #endif
 
+	i++;
+
+	ModStorageStart = (void*)_strtoui(_strtok(argv[i], " "));
+	ModStorageEnd = (void*)_strtoui(_strtok(NULL, " "));
 	i++;
 
 	argv[i][11]=0x00; // fix for 8+3 filename.

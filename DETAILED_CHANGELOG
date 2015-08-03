@@ -8,6 +8,12 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev812 - Fixed VMC size parameter for USB support, simplified LSN calculation for the first phase of cdrom_read() since integer division will truncate anyway, changed stray memcpy() call in fat.c to mips_memcpy(), fixed (updated) the delete and rename functions within supportbase, and fixed updating of the game list under USB mode after an item has been deleted/renamed. - Mon Aug 03 01:13:56 2015 +0800
+rev811 - Merged in Jay-Jay/open-ps2-loader (pull request #23) - Sun Aug 02 03:39:44 2015 +0800
+rev810 - Update more LNG files. - Tue Jul 28 13:29:14 2015 -0700
+rev809 - restored Makefile changes to default from last pushed commit, sorry - Tue Jul 28 09:13:12 2015 -0700
+rev808 - added a new word to LNG SRC files so it can be used to replace the word SETTINGS in the footer of main page so it can abbreviated in the LNG files without affecting the same full word in other areas; updated LNG files to include new changes in recent commits; French LNG updated 100% translated. - Tue Jul 28 09:08:30 2015 -0700
+rev807 - Imported fixes for SMAP (wrong watermark value) and IOMAN (incorrect declaration for lseek) stuff, fixed GSM extension's "ok" button, added patch entry for SRW IMPACT LE, removed NBNS's Rules.make file in favour of the common one, and adjusted in-game FAT driver's parameters and strategy to improve seeking performance. - Sun Aug 02 03:38:49 2015 +0800
 rev806 - Merged in Jay-Jay/open-ps2-loader (pull request #22) - Tue Jul 28 20:11:29 2015 +0800
 rev805 - Updating some LNG files. - Mon Jul 27 01:46:03 2015 -0700
 rev804 - Added missing files from previous commit, removed leftover SMB DMA address definition (disused since long ago) and removed leftover code that updated ReadPos (is now updated by CDVDMAN itself, not by the individual drivers). - Tue Jul 28 15:39:25 2015 +0800

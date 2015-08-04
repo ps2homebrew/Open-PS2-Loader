@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev813 - Merged the CallBack Timer setting into Accurate Reads compat mode (applies to everything other than reads), new compat mode (High module storage @ 0x01C00000), EE core linkfile adjusted to have the stack before _end for better manageability, EE core will now always reset stack pointer to _end, and fixed blockSize within fat.c overflowing (resulted in extremely poor performance). - Mon Aug 03 03:31:02 2015 +0800
 rev812 - Fixed VMC size parameter for USB support, simplified LSN calculation for the first phase of cdrom_read() since integer division will truncate anyway, changed stray memcpy() call in fat.c to mips_memcpy(), fixed (updated) the delete and rename functions within supportbase, and fixed updating of the game list under USB mode after an item has been deleted/renamed. - Mon Aug 03 01:13:56 2015 +0800
 rev811 - Merged in Jay-Jay/open-ps2-loader (pull request #23) - Sun Aug 02 03:39:44 2015 +0800
 rev810 - Update more LNG files. - Tue Jul 28 13:29:14 2015 -0700

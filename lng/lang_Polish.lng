@@ -1,6 +1,6 @@
 # translation by Berion & Loki7777 / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Polish
 Open PS2 Loader %s
@@ -41,7 +41,7 @@ Cancel
 Circle
 Cross
 Games List
-ustawienia gier
+ustawienia
 Usuń wszystkie ustawienia
 Usunięto wszystkie klucze do gry
 przewijanie
@@ -62,7 +62,7 @@ Wyłącz
 Ładowanie config
 Zapisywanie config
 Uruchom urządzenie
-Refresh
+Nastawić
 Tryb rozruchu urządzenia USB
 Urządzenie HDD tryb startu
 Urządzenie ETH tryb startu
@@ -95,7 +95,7 @@ IP
 NetBIOS
 akceptować
 Przedmiot zostanie trwale usunięta , kontynuować?
-przemianować
+nazwy
 usunąć
 run
 ustawienia wyświetlacza
@@ -111,7 +111,7 @@ Odczep syscalli
 0 Tryb PSS
 Emulate DVD-DL
 Wyłącz IGR
-Unused
+High module storage
 Ukryj dev9 modułu
 Zmiana rozmiaru będzie sformatować VMC
 utworzyć
@@ -164,8 +164,6 @@ Tryb 6
 Tryb 7
 Tryb 8
 Configure GSM
-Callback timer
-Zastosuj opóźnienie do CDVD funkcji (0 jest domyślnie)
 Prędkość Ethernet i dupleksu
 100Mbit full-duplex
 100Mbit half-duplex

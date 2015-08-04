@@ -1,6 +1,6 @@
 # Translated by jimmysmith / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Czech
 Open PS2 Loader %s
@@ -111,7 +111,7 @@ Unhook Syscalls
 0 PSS mód
 Emulovat DVD-DL
 Vypnout IGR
-Nepoužito
+Vyšší adresa modulu
 Skrýt modul dev9
 Změna velikosti přeformátuje VMC
 Vytvořit
@@ -164,8 +164,6 @@ Mód 6
 Mód 7
 Mód 8
 Konfigurovat GSM
-Callback timer
-Použít zpoždění pro CDVD funkce (0 je výchozí)
 Ethernet link mód
 100Mbit full-duplex
 100Mbit half-duplex

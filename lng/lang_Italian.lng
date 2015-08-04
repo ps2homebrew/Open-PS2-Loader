@@ -1,6 +1,6 @@
 # translation by andre95d / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Italian
 Open PS2 Loader %s
@@ -41,7 +41,7 @@ Cancel
 Cerchio
 X
 Lista dei giochi
-Impostazioni di gioco
+Impost.
 Rimuovi tutte le impostazioni
 Rimosse tutte le chiavi per il gioco
 Scorrimento
@@ -111,7 +111,7 @@ Unhook syscalls
 0 PSS mode
 Disabilita DVD-DL
 Disabilita IGR
-Inutilizzato
+High module storage
 Nascondi modulo dev9
 Modificare la dimensione riformatterà la VMC.
 Crea
@@ -164,8 +164,6 @@ Modalità 6
 Modalità 7
 Modalità 8
 Configura GSM
-Callback timer
-Applica ritardo alle funzioni CDVD (Default:0)
 Velocità Ethernet e le impostazioni duplex
 100Mbit full-duplex
 100Mbit half-duplex

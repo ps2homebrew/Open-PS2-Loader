@@ -1,6 +1,6 @@
 # translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>; extra lines added by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Filipino
 Open PS2 Loader %s
@@ -111,7 +111,7 @@ alisin sa pagkakakawit Syscalls
 0 PSS mode
 Emulate DVD-DL
 Disable IGR
-Unused
+High module storage
 Hide dev9 module
 Ang pagbabago ng laki ay i-reformat ang VMC
 Lumikha
@@ -164,8 +164,6 @@ Mode 6
 Mode 7
 Mode 8
 Configure GSM
-Callback timer
-Ilapat ang isang pagka-antala sa CDVD function (0 ang default)
 Ethernet bilis at duplex setting
 100Mbit full-duplex
 100Mbit half-duplex

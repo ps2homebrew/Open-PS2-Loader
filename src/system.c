@@ -496,6 +496,7 @@ static void PrepareGSM(char *cmdline) {
 		{  VGA_VMODE, "VGA 640x480p @72Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_72, GS_FRAME,	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	330),	0x0067800001C00009},
 		{  VGA_VMODE, "VGA 640x480p @75Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_75, GS_FRAME, 	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	360),	0x0067800001000001},
 		{  VGA_VMODE, "VGA 640x480p @85Hz             ",	GS_NONINTERLACED,	GS_MODE_VGA_640_85, GS_FRAME,	(u64)make_display_magic_number(  480,	1280,	0,		1,		 18,	260),	0x0067800001000001},
+		{  VGA_VMODE, "VGA 640x480i @60Hz             ",	GS_INTERLACED,		GS_MODE_VGA_640_60,	GS_FIELD, 	(u64)make_display_magic_number(	 959,	1279,	1,		1,		128,	291),	0x004F80000210000A}
 		}; //ends predef_vmode definition
 
 	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[gGSMVMode].interlace, \

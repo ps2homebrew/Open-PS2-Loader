@@ -1,6 +1,6 @@
 # translation by Ronald Andersson (aka: dlanor) and Flaya / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Swedish
 Open PS2 Loader %s
@@ -111,7 +111,7 @@ Släpp Syscalls
 0 PSS läge
 Emulera DVD-DL
 Inaktivera IGR
-Oanvänd
+Högmoduls-lagring
 Göm dev9 modul
 Ändra storleken kommer att formatera om VMC
 Skapa
@@ -164,8 +164,6 @@ Läge 6
 Läge 7
 Läge 8
 Konfigurera GSM
-Återkallnings timer
-Applicera en försening till cDVD funktioner ( 0 är standard )
 Ethernet hastighet och duplex
 100Mbit full duplex
 100Mbit halv duplex

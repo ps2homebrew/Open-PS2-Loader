@@ -1,6 +1,6 @@
 # translation by darkgarba, El Patas, and Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
 Open PS2 Loader %s
@@ -111,8 +111,8 @@ Deshabilitar llamadas de sistema
 Modo 0 PSS
 Emular DVD-DL
 Deshabilitar IGR
-No usado
-Esconder modulo dev9
+Almacenamiento de alta módulo
+Esconder módulo dev9
 Si cambias el tamaño se formateara VMC
 Crear
 Modificar
@@ -164,8 +164,6 @@ Modo 6
 Modo 7
 Modo 8
 Configuración GSM
-Llamada a reloj
-Aplicar retraso a funcion CDVD (0 es por defecto)
 Modo de enlace Ethernet
 100Mbit full-duplex
 100Mbit half-duplex

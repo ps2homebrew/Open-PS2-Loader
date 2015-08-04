@@ -1,6 +1,6 @@
 # translation by Gilbert and danielb / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese
 Open PS2 Loader %s
@@ -111,7 +111,7 @@ Desativar chamadas do sistema
 Pular videos PSS
 Emular DVD-DL
 Desabilitar IGR
-Não usado
+Armazenamento elevado do módulo
 Esconder módulo dev9
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
@@ -164,8 +164,6 @@ Modo 6
 Modo 7
 Modo 8
 Configurar GSM
-Callback Timer
-Aplicar atraso para as funções CDVD (0 é o padrão)
 Velocidade Ethernet e sistema Duplex
 100Mbit full-duplex
 100Mbit half-duplex

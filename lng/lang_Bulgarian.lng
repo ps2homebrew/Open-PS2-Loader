@@ -1,6 +1,6 @@
 # translation by vsub / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Bulgarian
 Open PS2 Loader %s
@@ -111,7 +111,7 @@ NetBIOS
 0 PSS режим
 Emulate DVD-DL
 Изключване на IGR
-Unused
+High module storage
 Скрий dev9 модул
 Промяна на размера ще преформатиране на VMC
 създавам
@@ -164,8 +164,6 @@ V- Sync
 режим 7
 режим 8
 Configure GSM
-Callback timer
-Нанесете незабавно да CDVD функции (0 е по подразбиране)
 Ethernet скоростта и настройки за дуплекс
 100Mbit пълен дуплекс
 100Mbit полу-дуплекс

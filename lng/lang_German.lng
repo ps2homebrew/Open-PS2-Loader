@@ -1,6 +1,6 @@
 # German Translation by Yorda; extra lines added by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 German
 Open PS2 Loader %s
@@ -111,7 +111,7 @@ Systemaufrufe abhängen
 0 PSS Modus
 Emulate DVD-DL
 Deaktiviere IGR
-Unused
+High module storage
 Verstecke dev9 Modul
 Die Änderung der Grösse wird die VMC erneut formatieren
 Erstellen
@@ -164,8 +164,6 @@ Modus 6
 Modus 7
 Modus 8
 Configure GSM
-Callback timer
-Verzögerung an den CDVD Funktionen anwenden
 Ethernet-Geschwindigkeit und duplex Einstellungen
 100Mbit full-duplex
 100Mbit half-duplex

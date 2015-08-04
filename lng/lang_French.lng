@@ -1,10 +1,10 @@
 # Translation by ShaolinAssassin with  AlGollan84's help / supervised by Jay-Jay
-# Last update: 08/01/2015. 
-# Updated for OPL_811_DB. 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Français
 Open PS2 Loader %s
-Sauvegarder les réglages
+Sauvegarder la configuration
 Retour
 Configuration du réseau
 Réglages avancés
@@ -54,7 +54,7 @@ Veuillez patienter
 Erreur lors du chargement de l'ID du jeu
 Tri alphabétique 
 Erreur lors du chargement du fichier de langue
-Pas d'écran de debug
+Passer l'écran de debug
 Veuillez connecter une manette PS2 Dualshock…
 Jaquettes et images 
 Plein écran
@@ -78,8 +78,8 @@ Sortie via IGR
 Couleur d'arrière-plan
 Couleur du texte
 Type d'adresse IP
-Adresse statique
-Protocole IP Dynamique
+Adresse IP statique
+Adresse IP dynamique
 Adresse IP
 Adresse
 Masque de sous-réseau
@@ -94,25 +94,25 @@ Type d'adresse
 IP
 NetBIOS
 Valider
-L'élément sera définitivement supprimé, voulez-vous continuer ?
+L'item sera définitivement supprimé, voulez-vous continuer ?
 Renommer
-Supp.
+Suppr.
 Lancer
 Configuration de l'affichage
 Options supprimer/renommer
 Dernier jeu joué en surbrillance
 Touche de validation
-Impossible de lancer le fichier
+Impossible d'exécuter l'item
 Tester le jeu avec les nouveaux réglages
-Laisser le champ vide pour s'identifier en tant qu invité
-Simule la vitesse de lecture du CD/DVD (uniquement pour HDD)
+Laisser le champ vide pour s'identifier en tant qu'invité
+Simuler la vitesse de lecture du CD/DVD (uniquement pour HDD)
 Lecture synchrone des données
-Purge OPL de la mémoire après lancement du jeu
-Passe les vidéos au format PSS
-Emule le support double-couche pour les jeux rippés en DVD5
-Désactive l'option IGR (In-Game-Reset)
-[Mode non utilisé]
-Renomme le module dev9 en cdvdman
+Purger OPL de la mémoire après lancement du jeu
+Passer les vidéos au format PSS
+Emuler le support double-couche pour les jeux rippés en DVD5
+Désactiver l'option IGR (In-Game-Reset)
+Charger le module de stockage d'OPL à une adresse plus élevée
+Renommer le module dev9 en cdvdman
 Changer la taille de la carte mémoire virtuelle la formatera
 Créer
 Modifier
@@ -127,7 +127,7 @@ Progression
 La carte mémoire virtuelle existe déjà
 Fichier carte mémoire virtuelle non valide, taille incorrecte
 La carte mémoire virtuelle doit d'abord être créée
-Une erreur est survenue sur la carte mémoire virtuelle %s. Continuer sur la CM physique (slot %d) ?
+Une erreur est survenue sur la carte mémoire virtuelle %s. Continuer sur la CM physique %d ?
 Actualisation automatique
 Crédits
 Développeurs
@@ -139,9 +139,9 @@ Arrêt automatique du disque dur
 Mode vidéo
 Couleur des options
 Couleur de sélection
-Page d'informations du jeu
+Page d'informations
 Infos
-Custom ELF
+Chemin du nvel ELF de lancement (pr iso mod)
 Sélection des couleurs
 Reconnecter
 Laisser le champ <non renseigné> pour lister les dossiers partagés
@@ -164,16 +164,14 @@ Mode 6
 Mode 7
 Mode 8
 Configurer GSM
-Délai de rappel aux fonctions CD/DVD
-Valeur 0 par défaut
-Vitesse de la connexion 
+Vitesse ethernet
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
 Réglages de GSM
 GSM
-Activer/désactiver GSM
+Activer/Désactiver GSM
 Mode vidéo à forcer
 NTSC/PAL/60Hz/PS1/HDTV/VGA
 Ajustement horizontal de l'écran
@@ -185,7 +183,7 @@ Avance rapide
 PS2RD dans le menu
 Configuration de PS2RD
 PS2RD
-Activer/désactiver PS2RD
+Activer/Désactiver PS2RD
 Mode d'activation des codes triche
 Automatique/Manuel
 Automatique

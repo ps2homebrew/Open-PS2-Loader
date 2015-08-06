@@ -389,7 +389,7 @@ static void guiShowGSConfig(void) {
 	const char* gsmvmodeNames[] = { "NTSC", "NTSC Non Interlaced", "PAL", "PAL Non Interlaced", "PAL @60Hz", \
 	"PAL @60Hz Non Interlaced", "PS1 NTSC (HDTV 480p @60Hz)", "PS1 PAL (HDTV 576p @50Hz)", "HDTV 480p @60Hz", \
 	"HDTV 576p @50Hz", "HDTV 720p @60Hz", "HDTV 1080i @60Hz", "HDTV 1080i @60Hz Non Interlaced", "HDTV 1080p @60Hz", \
-	"VGA 640x480p @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", NULL };
+	"VGA 640x480p @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", "VGA 640x480i @60Hz", NULL };
 
 	diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);
 	diaExecuteDialog(diaGSConfig, -1, 1, &guiGSMUpdater);

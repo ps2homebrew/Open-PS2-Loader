@@ -1,0 +1,192 @@
+# translation by fawzi saeed bakrama / supervised by Jay-Jay
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+Arabic
+Open PS2 Loader %s
+حفظ التغييرات
+إلى الوراء
+شبكة التكوين
+Advanced options
+<no values>
+الإعدادات المحفوظة ...
+إعدادات الكتابة خطأ !
+خروج
+إعدادات
+Menu
+ألعاب USB
+ألعاب HDD
+ألعاب ETH
+تطبيقات
+موضوع
+لغة
+The system will be powered off.
+Exit OPL?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Network startup error
+%d: No network adaptor detected
+%d: Cannot connect to SMB server
+%d: Cannot log into SMB server
+%d: Cannot open SMB share
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
+على
+بعيدا
+حسنا
+Select
+Cancel
+Circle
+Cross
+Games List
+إعدادات اللعبة
+إزالة كافة إعدادات
+إزالة كافة مفاتيح اللعبة
+التمرير
+بطيء
+متوسط
+سريع
+القائمة الافتراضية
+تحميل من القرص
+يرجى الانتظار
+خطأ أثناء تحميل لعبة ID
+الفرز الآلي
+خطأ في تحميل ملف اللغة
+تعطيل تصحيح الألوان
+الكشف عن أية وحدة تحكم ، والانتظار ...
+تمكين تغطية الفن
+شاشة واسعة
+خارج السلطة
+تحميل التكوين
+توفير التكوين
+بدء الجهاز
+Refresh
+USB وضع البداية الجهاز
+HDD وضع البداية الجهاز
+ETH وضع البداية الجهاز
+تطبيقات بدء وضع
+السيارات
+كتيب
+بدء خادم HDL
+خادم HDL ابتداء
+HDL خادم يقوم بتشغيل
+Failed to start HDL Server.
+خادم HDL تفريغ
+الخروج إلى
+لون الخلفية
+لون النص
+نوع عنوان IP
+Static
+DHCP
+IP address
+Address
+قناع
+بوابة
+DNS Server
+ميناء
+حصة
+المستخدم
+كلمة السر
+<not set>
+Address type
+IP
+NetBIOS
+قبول
+سيتم حذف العنصر بشكل دائم ، المتابعة؟
+إعادة تسمية
+حذف
+شغل
+عرض إعدادات
+تمكين حذف وإعادة تسمية تطبيقات
+تذكر آخر مباراة لعبت
+Select button
+خطأ ، لا يمكن تشغيل هذا البند
+اختبار
+ترك فارغة لل مصادقة الذهبي .
+تحميل الأساسية بديل
+البيانات البديلة قراءة طريقة
+نزع من الخطاف Syscalls
+0 وضع PSS
+Emulate DVD-DL
+تعطيل IGR
+High module storage
+إخفاء dev9 حدة
+سيؤدي تغيير حجم إعادة تهيئة VMC
+خلق
+عدل
+إحباط
+إعادة تعيين
+استخدام الجنيسة
+تكوين VMC
+اسم
+حجم
+حالة
+تقدم
+ملف VMC موجودة
+ملف غير صالح VMC ، وحجم غير صحيح
+ملف VMC تحتاج إلى إنشاء
+Error with VMC %s, continue with physical MC (slot %d) ?
+التحديث التلقائي
+حول
+المبرمجون
+Quality Assurance
+مسار بادئة USB
+ترك فارغة للخروج إلى متصفح
+القيمة في الدقيقة ( ق)، 0 لتعطيل تدور باستمرار
+التلقائي HDD تدور باستمرار
+وضع الفيديو
+لون الحوار
+اللون المحدد
+عرض صفحة معلومات عن
+معلومات
+العرف ELF
+اختيار اللون
+إعادة الاتصال
+ترك فارغة ل إدراج أسهمها
+مسار بادئة ETH
+Backspace
+الفضاء
+دخول
+طريقة
+VMC الشريحه 1
+VMC فتحة 2
+ID اللعبة
+DMA الوضع
+V -مزامنة
+وضع 1
+وضع 2
+وضع 3
+وضع 4
+وضع 5
+وضع 6
+وضع 7
+وضع 8
+Configure GSM
+سرعة إيثرنت و إعدادات الطباعة على الوجهين
+100Mbit ثنائية الاتجاه
+100Mbit نصف مزدوج
+10Mbit ثنائية الاتجاه
+10Mbit نصف مزدوج
+إعدادات GSM
+تمكين GSM
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Show PS2RD Cheat Engine on Main Menu
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found

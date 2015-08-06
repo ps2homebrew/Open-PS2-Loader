@@ -1,0 +1,192 @@
+# translation by Colossus / supervised by Jay-Jay 
+# Last update: 08/02/2015 
+# Updated for OPL_813_DB 
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+Brazilian Portuguese
+Open PS2 Loader %s
+Salvar configurações
+Voltar
+Configurações de Rede
+Opções avançadas
+<sem valores>
+Configurações salvas
+Erro ao salvar configurações!
+Sair
+Configurações Gerais
+Menu
+Jogos por USB
+Jogos por HDD 
+Jogos por Rede
+Aplicativos
+Tema
+Idioma
+O console irá desligar.
+Sair do OPL?
+%d: Disco Rígido não detectado
+%d: Disco Rígido não formatado
+%d: Erro ao iniciar rede 
+%d: Adaptador de Rede não detectado
+%d: Não foi possível conectar no servidor SMB  
+%d: Não foi possível efetuar login no servidor SMB 
+%d: Não foi possível abrir o compartilhamento SMB 
+%d: Impossível listar compartilhamentos SMB
+%d: Impossível listar jogos
+%d: Servidor DHCP indisponível
+%d: Sem conexão de rede
+Ati
+Des
+Confirmar
+Eleger
+Cancelar
+Bolinha
+Xis
+Lista de Jogos
+Aj. do jogo
+Apagar configurações
+As configurações do jogo foram apagadas
+Velocidade de rolagem
+Lenta
+Média
+Rápida
+Menu padrão
+Carregar do disco
+Por favor espere
+Erro ao carregar ID do jogo
+Organizar alfabeticamente
+Erro ao carregar arquivo de idioma
+Desativar depuração de cores
+Controle não detectado, esperando...
+Habilitar Arte de Capas
+Tela Panorâmica
+Desligar PS2
+Carregando configurações
+Salvando configurações...
+Iniciar dispositivo
+Atualizar
+Modo de inicio para Dispositivo USB
+Modo de inicio para HDD
+Modo de inicio para Rede SMB
+Modo de inicio para Aplicativos
+Automático
+Manual
+Iniciar Servidor HDL
+Servidor HDL está iniciando...
+Servidor HDL está sendo executado...
+Falha ao iniciar Servidor HDL.
+Servidor HDL está sendo encerrado...
+Definir saída do IGR
+Cor de fundo
+Cor do texto
+Tipo de Endereço IP
+Estático
+DHCP
+Endereço IP
+Endereço
+Máscara de sub-rede
+Gateway padrão
+Servidor DNS
+Porta
+Compartilhamento
+Usuário
+Senha
+<não usado>
+Tipo de Endereço
+IP
+NetBIOS
+Confirmar
+O item será PERMANENTEMENTE apagado! Continuar?
+Renomear
+Apagar
+Iniciar
+Configurações de Tela
+Ativar função Apagar/Renomear
+Lembrar último jogo jogado
+Botão de Seleção
+Erro, não foi possível iniciar o item
+Testar
+Deixar vazio para autorização como convidado (GUEST)
+Carregar núcleo alternativo
+Método alternativo de leitura de dados
+Desativar chamadas do sistema
+Pular vídeos PSS
+Emular DVD-DL
+Desativar IGR
+Armazenamento elevado do módulo
+Esconder módulo dev9
+Alterar o tamanho (Irá reformatar o VMC!)
+Criar
+Modificar
+Cancelar
+Resetar
+Usar genérico
+Configurar VMC
+Nome
+Tamanho
+Estado
+Progresso
+Arquivo VMC já existe
+Arquivo VMC inválido, o tamanho está incorreto
+Arquivo VMC precisa ser criado!
+Erro com arquivo VMC, continuar com Memory Card físico?
+Atualização automática
+Sobre
+Desenvolvedores
+Controle de qualidade
+Prefixo de caminho USB
+Deixar vazio sai p/ o Navegador
+Valor em minuto(s), 0 p/ desativar
+Desligamento automático do HDD
+Modo de vídeo
+Cor do diálogo
+Cor selecionada
+Mostrar Página de Informação 
+Info
+ELF customizado
+Seleção de Cor
+Reconectar
+Deixar vazio para listar compartilhamentos
+Prefixo de caminho ETH
+Apagar
+Espaço
+Aceitar
+Modo
+VMC Slot 1
+VMC Slot 2
+ID do Jogo
+Modo DMA
+Sincronização do vídeo 
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Configurar GSM
+Velocidade Ethernet e sistema duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Opções do GSM
+Ativar GSM
+Permitir que o GSM ative o modo de vídeo escolhido
+Modo de vídeo selecionado
+Modo de vídeo a ser ativado
+Ajuste horizontal
+Definir compensação horizontal
+Ajuste vertical
+Definir compensação vertical
+Pular FMV
+Pular vídeos
+Mostrar PS2RD Cheat Engine no Menu Principal
+Opções de Cheats
+Ativar PS2RD Cheat Engine
+Permitir que PS2RD Cheat Engine injete códigos nos jogos.
+Modo do PS2RD Cheat Engine
+Auto selecionar ou Selecionar cheats do jogo
+Auto selecionar cheats
+Selecionar cheats do jogo
+Erro: falha ao abrir o arquivo de Cheat
+Nenhum Cheat encontrado

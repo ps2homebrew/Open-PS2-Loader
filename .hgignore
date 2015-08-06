@@ -1,0 +1,13 @@
+syntax: glob
+
+*.o
+*.s
+*.elf
+*.ELF
+*.erl
+*.irx
+*.exe
+*.map
+libfreetype.a
+
+pc/iso2usbld/bin/iso2usbld

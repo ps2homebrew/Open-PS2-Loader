@@ -1,0 +1,101 @@
+/*
+	Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
+	Copyright 2006-2008 Polo
+	Licenced under Academic Free License version 3.0
+	Review OPNPS2LD README & LICENSE files for further details.
+	
+	Copyright 2001-2004, ps2dev - http://www.ps2dev.org
+	Licenced under Academic Free License version 2.0
+	Review ps2sdk README & LICENSE files for further details.
+	
+	Standard linkfile
+*/
+
+ENTRY(_start);
+
+SECTIONS {
+	.text 0x00088000: {
+		_ftext = . ;
+		*(.text)
+		*(.text.*)
+		*(.gnu.linkonce.t*)
+		KEEP(*(.init))
+		KEEP(*(.fini))
+		QUAD(0)
+	}
+
+	PROVIDE(_etext = .);
+	PROVIDE(etext = .);
+
+	.reginfo : { *(.reginfo) }
+
+	/* Global/static constructors and deconstructors. */
+	.ctors ALIGN(16): {
+		KEEP(*crtbegin*.o(.ctors))
+		KEEP(*(EXCLUDE_FILE(*crtend*.o) .ctors))
+		KEEP(*(SORT(.ctors.*)))
+		KEEP(*(.ctors))
+	}
+	.dtors ALIGN(16): {
+		KEEP(*crtbegin*.o(.dtors))
+		KEEP(*(EXCLUDE_FILE(*crtend*.o) .dtors))
+		KEEP(*(SORT(.dtors.*)))
+		KEEP(*(.dtors))
+	}
+
+	/* Static data.  */
+	.rodata ALIGN(128): {
+		*(.rodata)
+		*(.rodata.*)
+		*(.gnu.linkonce.r*)
+	}
+
+	.data ALIGN(128): {
+		_fdata = . ;
+		*(.data)
+		*(.data.*)
+		*(.gnu.linkonce.d*)
+		SORT(CONSTRUCTORS)
+	}
+
+	.rdata ALIGN(128): { *(.rdata) }
+	.gcc_except_table ALIGN(128): { *(.gcc_except_table) }
+
+	_gp = ALIGN(128) + 0x7ff0;
+	.lit4 ALIGN(128): { *(.lit4) }
+	.lit8 ALIGN(128): { *(.lit8) }
+
+	.sdata ALIGN(128): {
+		*(.sdata)
+		*(.sdata.*)
+		*(.gnu.linkonce.s*)
+	}
+
+	_edata = .;
+	PROVIDE(edata = .);
+
+	/* Uninitialized data.  */
+	.sbss ALIGN(128) : {
+		_fbss = . ;
+		*(.sbss)
+		*(.sbss.*)
+		*(.gnu.linkonce.sb*)
+		*(.scommon)
+	}
+
+	.bss ALIGN(128) : {
+		*(.bss)
+		*(.bss.*)
+		*(.gnu.linkonce.b*)
+		*(COMMON)
+	}
+	_end_bss = .;
+
+	/* Symbols needed by crt0.s.  */
+	PROVIDE(_heap_size = -1);
+	PROVIDE(_stack = .);
+	PROVIDE(_stack_size = 0x00097000 - _stack);	/* Any remaining space up to the module storage region, is available for the stack. */
+
+	_end = _stack + _stack_size ;
+	PROVIDE(end = _end);
+}

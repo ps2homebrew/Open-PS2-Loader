@@ -1,0 +1,45 @@
+DECLARE_EXPORT_TABLE(ps2ip,1,3)
+	DECLARE_EXPORT(_start)
+	DECLARE_EXPORT(ps2ip_Stub)
+	DECLARE_EXPORT(ps2ip_ShutDown)
+	DECLARE_EXPORT(ps2ip_Stub)
+
+	DECLARE_EXPORT(lwip_accept)
+	DECLARE_EXPORT(lwip_bind)			//5
+	DECLARE_EXPORT(lwip_close)
+	DECLARE_EXPORT(lwip_connect)
+	DECLARE_EXPORT(lwip_listen)
+	DECLARE_EXPORT(lwip_recv)
+	DECLARE_EXPORT(lwip_recvfrom)		//10
+	DECLARE_EXPORT(lwip_send)
+	DECLARE_EXPORT(lwip_sendto)
+	DECLARE_EXPORT(lwip_socket)
+	DECLARE_EXPORT(lwip_select)
+	DECLARE_EXPORT(lwip_ioctl)			//15
+	DECLARE_EXPORT(lwip_getpeername)
+	DECLARE_EXPORT(lwip_getsockname)
+	DECLARE_EXPORT(lwip_getsockopt)
+	DECLARE_EXPORT(lwip_setsockopt)
+	DECLARE_EXPORT(ps2ip_setconfig)		//20
+	DECLARE_EXPORT(ps2ip_getconfig)
+	DECLARE_EXPORT(ps2ip_input)
+	DECLARE_EXPORT(etharp_output)
+	DECLARE_EXPORT(inet_addr)
+	DECLARE_EXPORT(tcpip_input)			//25
+	DECLARE_EXPORT(netif_add)
+	DECLARE_EXPORT(netif_find)
+	DECLARE_EXPORT(netif_set_default)
+	DECLARE_EXPORT(netif_set_ipaddr)
+	DECLARE_EXPORT(netif_set_netmask)	//30
+	DECLARE_EXPORT(netif_set_gw)
+	DECLARE_EXPORT(ps2ip_Stub)
+	DECLARE_EXPORT(pbuf_alloc)
+	DECLARE_EXPORT(pbuf_realloc)
+	DECLARE_EXPORT(pbuf_header)			//35
+	DECLARE_EXPORT(pbuf_ref)
+	DECLARE_EXPORT(ps2ip_Stub)
+	DECLARE_EXPORT(pbuf_free)
+	DECLARE_EXPORT(pbuf_clen)
+	DECLARE_EXPORT(pbuf_chain)			//40
+	DECLARE_EXPORT(pbuf_take)
+END_EXPORT_TABLE

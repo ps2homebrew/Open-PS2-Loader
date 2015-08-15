@@ -281,12 +281,6 @@ static void initSupport(item_list_t* itemList, int startMode, int mode, int forc
 	opl_io_module_t* mod = &list_support[mode];
 
 	if(startMode) {
-		if(itemList->semaID < 0)
-		{
-			if((itemList->semaID = sbCreateSemaphore()) < 0)
-				return;
-		}
-
 		if (!mod->support) {
 			mod->support = itemList;
 			initMenuForListSupport(mode);
@@ -323,6 +317,7 @@ static void deinitAllSupport(int exception) {
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
 static void updateMenuFromGameList(opl_io_module_t* mdl) {
+	guiExecDeferredOps();
 	clearMenuGameList(mdl);
 
 	const char* temp = NULL;
@@ -370,14 +365,10 @@ void menuDeferredUpdate(void* data) {
 	if (!mod->support)
 		return;
 
-	WaitSema(mod->support->semaID);
-
 	// see if we have to update
 	if (mod->support->itemNeedsUpdate()) {
 		updateMenuFromGameList(mod);
 	}
-
-	SignalSema(mod->support->semaID);
 }
 
 static void RefreshAllLists(void) {
@@ -716,7 +707,7 @@ static int loadHdldSvr(void) {
 
 	// block all io ops, wait for the ones still running to finish
 	ioBlockOps(1);
-	guiClearDeferredOps();
+	guiExecDeferredOps();
 
 	deinitAllSupport(NO_EXCEPTION);
 	clearErrorMessage();	/*	At this point, an error might have been displayed (since background tasks were completed).
@@ -806,15 +797,10 @@ static void moduleCleanup(opl_io_module_t* mod, int exception) {
 	if (!mod->support)
 		return;
 
-	WaitSema(mod->support->semaID);
-
 	if (mod->support->itemCleanUp)
 		mod->support->itemCleanUp(exception);
 
 	clearMenuGameList(mod);
-
-	DeleteSema(mod->support->semaID);
-	mod->support->semaID = -1;
 }
 
 void deinit(int exception) {

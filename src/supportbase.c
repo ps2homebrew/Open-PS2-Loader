@@ -336,14 +336,15 @@ int sbProbeISO9660_64(const char *path, base_game_info_t* game, u32 layer1_offse
 	return result;
 }
 
+static const struct cdvdman_settings_common cdvdman_settings_common_sample={
+	0x69, 0x69,
+	0x1234,
+	0x39393939,
+	"B00BS"
+};
+
 int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman, void** cdvdman_irx, int* patchindex) {
 	int i;
-	static const struct cdvdman_settings_common cdvdman_settings_common_sample={
-		0x69, 0x69,
-		0x1234,
-		0x39393939,
-		"B00BS"
-	};
 	struct cdvdman_settings_common *settings;
 
 	unsigned int compatmask = 0;
@@ -358,7 +359,10 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 			break;
 		}
 	}
-	if (settings == NULL) return -1;
+	if (settings == NULL) {
+		LOG("sbPrepare: unable to locate patch zone.\n");
+		return -1;
+	}
 
 	if(game != NULL){
 		settings->NumParts = game->parts;
@@ -404,6 +408,10 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	memcpy(settings->DiscID, gameid, 5);
 
 	return compatmask;
+}
+
+void sbUnprepare(void *pCommon) {
+	memcpy(pCommon, &cdvdman_settings_common_sample, sizeof(struct cdvdman_settings_common));
 }
 
 static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int gamecount, int excludeID) {

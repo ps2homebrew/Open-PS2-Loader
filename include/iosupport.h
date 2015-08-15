@@ -81,9 +81,6 @@ typedef struct
 
 	char haveCompatibilityMode;
 
-	/// access-control semaphore
-	int semaID;
-
 	/// max inactive frame delay
 	int delay;
 

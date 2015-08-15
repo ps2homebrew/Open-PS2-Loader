@@ -296,6 +296,12 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			settings->files[i].cluster = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, partname);
 			settings->files[i].size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSIZE, partname);
 			fileXioClose(fd);
+		} else {
+			//Unable to open part of the game. Do not continue.
+			if(settings != NULL)
+				sbUnprepare(&settings->common);
+			guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
+			return;
 		}
 	}
 
@@ -401,7 +407,7 @@ static int usbCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t usbGameList = {
-		USB_MODE, 0, COMPAT, -1, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
+		USB_MODE, 0, COMPAT, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
 #ifdef __CHILDPROOF
 		&usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
 #else

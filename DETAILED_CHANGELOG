@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev821 - Updated to support the new PS2SDK changes (SIF CMD buffer set, USBHDFSDV SIF CMD ID changed to 0), USBHDFSD IOCTL codes consolidated into usb-ioctl.h, standardized which "prefix" buffer to use within usbsupport.c (was unable to access game files when a prefix is set, due to the path getting incorrectly generated), removed cdrom_lseek64 as it is not implemented in the SONY CDVDMAN, changed cdrom_dclose to become cdrom_close since close() and dclose() are the same here and SONY does it that way too, simplified cdrom_lseek to be more tolerant to errors like the SONY original, adjusted CBT to apply to reading operations as well, adjusted CBT to be 5000us, adjusted speed limit for Accurate Reads to 2800KB/s (timed to the 36.864MHz IOP clock). - Sat Aug 15 12:59:47 2015 +0800
 rev820 - update lang Arabic; new lang Portuguese-Brazilian. - Wed Aug 05 21:05:54 2015 -0700
 rev819 - updated lang Arabic 90% translated; new lang Portuguese-Brazilian 100% translated. - Wed Aug 05 20:51:23 2015 -0700
 rev818 - Merged ifcaro/open-ps2-loader into default - Mon Aug 03 22:15:17 2015 -0700

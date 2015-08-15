@@ -175,7 +175,7 @@ static void appCleanUp(int exception) {
 }
 
 static item_list_t appItemList = {
-		APP_MODE, 0, NO_COMPAT, -1, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
+		APP_MODE, 0, NO_COMPAT, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, &appInit, &appNeedsUpdate,	&appUpdateItemList,
 #ifdef __CHILDPROOF
 		&appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, NULL, NULL, &appLaunchItem,
 #else

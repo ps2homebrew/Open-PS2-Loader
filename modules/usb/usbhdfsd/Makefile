@@ -12,7 +12,7 @@ IOP_BIN  = usbhdfsd.irx
 IOP_OBJS = usb_driver.o fs_driver.o part_driver.o fat_driver.o scache.o usbhdfsd.o imports.o exports.o
 IOP_LIBS =
 
-IOP_INCS +=
+IOP_INCS += -I../../../include/
 IOP_CFLAGS  += -Wall -fno-builtin-printf
 IOP_LDFLAGS += -s
 

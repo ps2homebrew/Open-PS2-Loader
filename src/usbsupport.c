@@ -2,6 +2,7 @@
 #include "include/lang.h"
 #include "include/gui.h"
 #include "include/supportbase.h"
+#include "include/usb-ioctl.h"
 #include "include/usbsupport.h"
 #include "include/util.h"
 #include "include/themes.h"
@@ -12,16 +13,6 @@
 #include "include/cheatman.h"
 #endif
 #include "modules/iopcore/common/cdvd_config.h"
-
-//TODO: move into a common header file, to be shared with the USBHDFSD module.
-#define USBHDFSD_IOCTL_GETSECTOR	0x1000	//jimmikaelkael: Ioctl request code => get file start sector
-#define USBHDFSD_IOCTL_GETCLUSTER	0x1001	//jimmikaelkael: Ioctl request code => get file start cluster
-#define USBHDFSD_IOCTL_GETSIZE		0x1002	//jimmikaelkael: Ioctl request code => get file size
-#define USBHDFSD_IOCTL_GETDEVSECTORSIZE	0x1003	//jimmikaelkael: Ioctl request code => get mass storage device sector size
-#define USBHDFSD_IOCTL_GETFATSTART	0x1004
-#define USBHDFSD_IOCTL_GETDATASTART	0x1005
-#define USBHDFSD_IOCTL_GETCLUSTERSIZE	0x1006
-#define USBHDFSD_IOCTL_CHECKCHAIN	0x1100	//polo: Ioctl request code => Check cluster chain
 
 extern void *usb_cdvdman_irx;
 extern int size_usb_cdvdman_irx;
@@ -43,7 +34,7 @@ extern int size_usb_mcemu_irx;
 void *pusbd_irx = NULL;
 int size_pusbd_irx = 0;
 
-static char usbPrefix[40];
+static char usbPrefix[40];	//Contains the full path to the folder where all the games are.
 static int usbULSizePrev = -2;
 static unsigned char usbModifiedCDPrev[8];
 static unsigned char usbModifiedDVDPrev[8];
@@ -53,6 +44,7 @@ static base_game_info_t *usbGames;
 // forward declaration
 static item_list_t usbGameList;
 
+//Identifies the partition that the specified file is stored on and generates a full path to it.
 int usbFindPartition(char *target, char *name) {
 	int i, fd;
 	char path[256];
@@ -108,7 +100,7 @@ void usbLoadModules(void) {
 	sysLoadModuleBuffer(pusbd_irx, size_pusbd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsd_irx, size_usbhdfsd_irx, 0, NULL);
 	sysLoadModuleBuffer(&usbhdfsdfsv_irx, size_usbhdfsdfsv_irx, 0, NULL);
-	SifAddCmdHandler(12, &usbEventHandler, NULL);
+	SifAddCmdHandler(0, &usbEventHandler, NULL);
 
 	LOG("USBSUPPORT Modules loaded\n");
 }
@@ -191,10 +183,7 @@ static char* usbGetGameName(int id) {
 }
 
 static int usbGetGameNameLength(int id) {
-	if (usbGames[id].format != GAME_FORMAT_USBLD)
-		return ISO_GAME_NAME_MAX + 1;
-	else
-		return UL_GAME_NAME_MAX + 1;
+	return((usbGames[id].format != GAME_FORMAT_USBLD) ? ISO_GAME_NAME_MAX + 1 : UL_GAME_NAME_MAX + 1);
 }
 
 static char* usbGetGameStartup(int id) {
@@ -242,7 +231,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				usb_vmc_infos.specs.block_size = vmc_superblock.pages_per_block;
 				usb_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
-				sprintf(vmc_path, "%s%s/VMC/%s.bin", usbPrefix, gUSBPrefix, vmc_name);
+				sprintf(vmc_path, "%sVMC/%s.bin", usbPrefix, vmc_name);
 
 				fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
 				if (fd >= 0) {
@@ -285,13 +274,13 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	for (i = 0, settings = NULL; i < game->parts; i++) {
 		switch (game->format) {
 			case GAME_FORMAT_ISO:
-				sprintf(partname, "%s%s/%s/%s%s", usbPrefix, gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
+				sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
 				break;
 			case GAME_FORMAT_OLD_ISO:
-				sprintf(partname, "%s%s/%s/%s.%s%s", usbPrefix, gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+				sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
 				break;
 			default:	//USBExtreme format.
-				sprintf(partname, "%s%s/ul.%08X.%s.%02x", usbPrefix, gUSBPrefix, USBA_crc32(game->name), game->startup, i);
+				sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, i);
 		}
 
 		fd = fileXioOpen(partname, O_RDONLY, 0666);
@@ -313,13 +302,13 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	//Initialize layer 1 information.
 	switch(game->format) {
 		case GAME_FORMAT_ISO:
-			sprintf(partname, "mass:%s/%s/%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
+			sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
 			break;
 		case GAME_FORMAT_OLD_ISO:
-			sprintf(partname, "mass:%s/%s/%s.%s%s", gUSBPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+			sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
 			break;
 		default:	//USBExtreme format.
-			sprintf(partname, "mass:%s/ul.%08X.%s.00", gUSBPrefix, USBA_crc32(game->name), game->startup);
+			sprintf(partname, "%sul.%08X.%s.00", usbPrefix, USBA_crc32(game->name), game->startup);
 	}
 
 	layer1_start = sbGetISO9660MaxLBA(partname);
@@ -328,7 +317,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		case GAME_FORMAT_USBLD:
 			layer1_part = layer1_start / 0x80000;
 			layer1_offset = layer1_start % 0x80000;
-			sprintf(partname, "mass:%s/ul.%08X.%s.%02x", gUSBPrefix, USBA_crc32(game->name), game->startup, layer1_part);
+			sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, layer1_part);
 			break;
 		default:	//Raw ISO9660 disc image; one part.
 			layer1_part = 0;

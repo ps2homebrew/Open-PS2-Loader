@@ -31,7 +31,7 @@
 #endif
 
 #include <usbhdfsd.h>
-#include "usbhdfsd_add.h"
+#include "usb-ioctl.h"
 #include "usbhd_common.h"
 #include "fat_driver.h"
 #include "fat_write.h"

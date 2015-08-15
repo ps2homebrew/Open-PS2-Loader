@@ -141,6 +141,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 
 // driver ops protypes
 static int cdrom_dummy(void);
+static s64 cdrom_dummy64(void);
 static int cdrom_init(iop_device_t *dev);
 static int cdrom_deinit(iop_device_t *dev);
 static int cdrom_open(iop_file_t *f, const char *filename, int mode);
@@ -150,9 +151,7 @@ static int cdrom_lseek(iop_file_t *f, int offset, int where);
 static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat);
 static int cdrom_dopen(iop_file_t *f, const char *dirname);
 static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent);
-static int cdrom_dclose(iop_file_t *f);
 static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args);
-static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where);
 static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
 static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen);
 
@@ -171,7 +170,7 @@ static struct _iop_ext_device_ops cdrom_ops = {
 	(void*)&cdrom_dummy,
 	(void*)&cdrom_dummy,
 	&cdrom_dopen,
-	&cdrom_dclose,
+	&cdrom_close,	//dclose -> close
 	&cdrom_dread,
 	&cdrom_getstat,
 	(void*)&cdrom_dummy,
@@ -180,7 +179,7 @@ static struct _iop_ext_device_ops cdrom_ops = {
 	(void*)&cdrom_dummy,
 	(void*)&cdrom_dummy,
 	(void*)&cdrom_dummy,
-	&cdrom_lseek64,
+	(void*)&cdrom_dummy64,
 	(void*)&cdrom_devctl,
 	(void*)&cdrom_dummy,
 	(void*)&cdrom_dummy,
@@ -216,6 +215,7 @@ static int cdvdman_searchfilesema;
 static int cdvdman_ReadingThreadID;
 
 static StmCallback_t Stm0Callback = NULL;
+static iop_sys_clock_t gCallbackSysClock;
 
 // buffers
 #define CDVDMAN_BUF_SECTORS 	2
@@ -359,7 +359,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 				SectorsToRead = 8;
 
 			TargetTime.hi = 0;
-			TargetTime.lo = 21600 * SectorsToRead; // approximately 666us required per sector at 3000KB/s, so 36*600 ticks per sector with a 36MHz clock.
+			TargetTime.lo = 26321 * SectorsToRead; // approximately 2KB/2800KB/s = 714us required per 2048-byte data sector at 2800KB/s, so 714 * 36.864 = 26321 ticks per sector with a 36.864MHz clock.
 			ClearEventFlag(cdvdman_stat.intr_ef, ~0x1000);
 			SetAlarm(&TargetTime, &cdvdemu_read_end_cb, NULL);
 		}
@@ -655,8 +655,7 @@ int sceCdStop(void)
 
 //-------------------------------------------------------------------------
 int sceCdPosToInt(cd_location_t *p)
-{	// TODO: Improve with logical ops only
-
+{
 	register int result;
 
 	result = ((u32)p->minute >> 16) *  10 + ((u32)p->minute & 0xF);
@@ -671,8 +670,7 @@ int sceCdPosToInt(cd_location_t *p)
 
 //-------------------------------------------------------------------------
 cd_location_t *sceCdIntToPos(int i, cd_location_t *p)
-{	// TODO: Improve with logical ops only
-
+{
 	register int sc, se, mi;
 
 	i += 150;
@@ -981,6 +979,11 @@ static int cdrom_dummy(void)
 	return -EPERM;
 }
 
+static s64 cdrom_dummy64(void)
+{
+	return -EPERM;
+}
+
 //--------------------------------------------------------------
 static int cdrom_init(iop_device_t *dev)
 {
@@ -1185,7 +1188,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
 //--------------------------------------------------------------
 static int cdrom_lseek(iop_file_t *f, int offset, int where)
 {
-	register int r;
+	int r;
 	FHANDLE *fh = (FHANDLE *)f->privdata;
 
 	WaitSema(cdrom_io_sema);
@@ -1194,33 +1197,22 @@ static int cdrom_lseek(iop_file_t *f, int offset, int where)
 
 	switch (where) {
 		case SEEK_CUR:
-			r = fh->position + offset;
-			if (r > fh->filesize) {
-				r = -EINVAL;
-				goto ssema;
-			}
+			r = fh->position += offset;
 			break;
 		case SEEK_SET:
-			r = offset;
-			if (fh->filesize < offset) {
-				r = -EINVAL;
-				goto ssema;
-			}
+			r = fh->position = offset;
 			break;
 		case SEEK_END:
-			r = fh->filesize - offset;
+			r = fh->position = fh->filesize - offset;
 			break;
 		default:
-			r = -EINVAL;
-			goto ssema;
+			r = fh->position;
 	}
 
-	fh->position = r;
 	if (fh->position > fh->filesize)
-		fh->position = fh->filesize;
+		r = fh->position = fh->filesize;
 
-ssema:
-	DPRINTF("cdrom_lseek file offset=%d\n", (int)fh->position);
+	DPRINTF("cdrom_lseek file offset=%d\n", fh->position);
 	SignalSema(cdrom_io_sema);
 
 	return r;
@@ -1295,12 +1287,6 @@ static int cdrom_dread(iop_file_t *f, iox_dirent_t *dirent)
 }
 
 //--------------------------------------------------------------
-static int cdrom_dclose(iop_file_t *f)
-{
-	return cdrom_close(f);
-}
-
-//--------------------------------------------------------------
 static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 {
 	register int r = 0;
@@ -1313,13 +1299,6 @@ static int cdrom_ioctl(iop_file_t *f, u32 cmd, void *args)
 	SignalSema(cdrom_io_sema);
 
 	return r;
-}
-
-//--------------------------------------------------------------
-static s64 cdrom_lseek64(iop_file_t *f, s64 pos, int where)
-{
-	DPRINTF("cdrom_lseek64 where=%d\n", (int)where);
-	return (s64)cdrom_lseek(f, (int)pos, where);
 }
 
 //--------------------------------------------------------------
@@ -1702,27 +1681,17 @@ struct cdvdman_cb_data{
 static int cdvdman_cb_event(int reason)
 {
 	static struct cdvdman_cb_data cb_data;
-	iop_sys_clock_t SysClock;
 
 	if (user_cb) {
-		if((reason != SCECdFuncRead) && (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS))
-		{
-			SysClock.lo = 50 * 250 * 36800;
-			SysClock.hi = 0;
-		}else{
-			SysClock.lo = 0;
-			SysClock.hi = 0;
-		}
-
 		cb_data.user_cb = user_cb;
 		cb_data.reason = reason;
 
 		DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
 
 		if (QueryIntrContext())
-			iSetAlarm(&SysClock, &event_alarm_cb, &cb_data);
+			iSetAlarm(&gCallbackSysClock, &event_alarm_cb, &cb_data);
 		else
-			SetAlarm(&SysClock, &event_alarm_cb, &cb_data);
+			SetAlarm(&gCallbackSysClock, &event_alarm_cb, &cb_data);
 	}
 
 	return 1;
@@ -1796,7 +1765,7 @@ static void cdvdman_initdev(void)
 {
 	iop_event_t event;
 
-	event.attr = 2;	//EA_MULTI
+	event.attr = EA_MULTI;
 	event.option = 0;
 	event.bits = 1;
 
@@ -1851,6 +1820,9 @@ int _start(int argc, char **argv)
 #ifdef VMC_DRIVER
 	RegisterLibraryEntries(&_exp_oplutils);
 #endif
+
+	// Setup the callback timer.
+	USec2SysClock((cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS) ? 5000 : 0, &gCallbackSysClock);
 
 	// create SCMD/searchfile semaphores
 	cdvdman_create_semaphores();

@@ -187,6 +187,9 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 	return 0;
 }
 
+#define OPL_SIF_CMD_BUFF_SIZE	1
+static SifCmdHandlerData_t OplSifCmdbuffer[OPL_SIF_CMD_BUFF_SIZE];
+
 void sysReset(int modload_mask) {
 	fileXioExit();
 	SifExitIopHeap();
@@ -203,6 +206,7 @@ void sysReset(int modload_mask) {
 	while(!SifIopSync());
 
 	SifInitRpc(0);
+	SifSetCmdBuffer(OplSifCmdbuffer, OPL_SIF_CMD_BUFF_SIZE);
 	sceCdInit(SCECdINoD);
 
 	// init loadfile & iopheap services

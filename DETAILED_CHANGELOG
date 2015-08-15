@@ -8,6 +8,13 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev820 - update lang Arabic; new lang Portuguese-Brazilian. - Wed Aug 05 21:05:54 2015 -0700
+rev819 - updated lang Arabic 90% translated; new lang Portuguese-Brazilian 100% translated. - Wed Aug 05 20:51:23 2015 -0700
+rev818 - Merged ifcaro/open-ps2-loader into default - Mon Aug 03 22:15:17 2015 -0700
+rev817 - Update LNG files to support OPL r813 changes, removed obsolete LNG files that need an overhaul. - Mon Aug 03 18:29:26 2015 -0700
+rev816 - Merged ifcaro/open-ps2-loader into default - Sun Aug 02 20:14:16 2015 -0700
+rev815 - Update LNG files credits and dates for OPL r811. - Sat Aug 01 16:37:38 2015 -0700
+rev814 - Re-added 'VGA 640x480i @60Hz' again GSM vmode for better game compatibility (avoid BSOD/freezing/no signal on certain games and VGA monitors) - Mon Aug 03 22:40:45 2015 -0400
 rev813 - Merged the CallBack Timer setting into Accurate Reads compat mode (applies to everything other than reads), new compat mode (High module storage @ 0x01C00000), EE core linkfile adjusted to have the stack before _end for better manageability, EE core will now always reset stack pointer to _end, and fixed blockSize within fat.c overflowing (resulted in extremely poor performance). - Mon Aug 03 03:31:02 2015 +0800
 rev812 - Fixed VMC size parameter for USB support, simplified LSN calculation for the first phase of cdrom_read() since integer division will truncate anyway, changed stray memcpy() call in fat.c to mips_memcpy(), fixed (updated) the delete and rename functions within supportbase, and fixed updating of the game list under USB mode after an item has been deleted/renamed. - Mon Aug 03 01:13:56 2015 +0800
 rev811 - Merged in Jay-Jay/open-ps2-loader (pull request #23) - Sun Aug 02 03:39:44 2015 +0800

@@ -722,7 +722,7 @@ static int ethCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t ethGameList = {
-		ETH_MODE, 0, COMPAT, -1, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		ETH_MODE, 0, COMPAT, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 #ifdef __CHILDPROOF
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
 #else

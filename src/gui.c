@@ -1053,8 +1053,8 @@ static void guiHandleDeferredOps(void) {
 	gUpdateEnd = NULL;
 }
 
-void guiClearDeferredOps(void) {
-	//Currently this clears deferred operations by executing them.
+void guiExecDeferredOps(void) {
+	//Clears deferred operations list by executing them.
 	guiHandleDeferredOps();
 }
 

@@ -9,6 +9,10 @@
 
 #define CONFIG_FILE_NUM 3
 
+#define CONFIG_SOURCE_DEFAULT	0
+#define CONFIG_SOURCE_USER	1
+#define CONFIG_SOURCE_DLOAD	2	//Downloaded from the network
+
 #define CONFIG_ITEM_NAME			"#Name"
 #define CONFIG_ITEM_LONGNAME		"#LongName"
 #define CONFIG_ITEM_SIZE			"#Size"
@@ -20,7 +24,7 @@
 #define CONFIG_ITEM_COMPAT			"$Compatibility"
 #define CONFIG_ITEM_DMA				"$DMA"
 #define CONFIG_ITEM_DNAS			"$DNAS"
-#define CONFIG_ITEM_CDVDMAN_TIMER	"$CallbackTimer"
+#define CONFIG_ITEM_CONFIGSOURCE	"$ConfigSource"
 
 //Note: The following is for Per-Game GSM. -Bat-
 
@@ -62,6 +66,7 @@ int configGetInt(config_set_t* configSet, const char* key, int* value);
 int configSetColor(config_set_t* configSet, const char* key, unsigned char* color);
 int configGetColor(config_set_t* configSet, const char* key, unsigned char* color);
 int configRemoveKey(config_set_t* configSet, const char* key);
+void configMerge(config_set_t* dest, const config_set_t *source);
 
 void configReadIP();
 void configWriteIP();
@@ -72,6 +77,7 @@ int configReadBuffer(config_set_t* configSet, const void *buffer, int size);
 int configReadMulti(int types);
 int configWrite(config_set_t* configSet);
 int configWriteMulti(int types);
+int configGetStat(config_set_t* configSet, iox_stat_t *stat);
 void configClear(config_set_t* configSet);
 
 #ifdef VMC

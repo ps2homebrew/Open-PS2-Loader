@@ -49,9 +49,9 @@ enum ERROR_CODE{
 #define NO_EXCEPTION		0x00
 #define UNMOUNT_EXCEPTION	0x01
 
-#define NO_COMPAT			0x00 // no compat support
-#define COMPAT				0x01 // default compatibility flags
-#define COMPAT_FULL			0x02 // default + DMA compat flags
+#define MODE_FLAG_NO_COMPAT	0x01 // no compat support
+#define MODE_FLAG_COMPAT_DMA	0x02 // Supports DMA compat flags
+#define MODE_FLAG_NO_UPDATE	0x04 // Network update not supported.
 
 #define COMPAT_MODE_1 		 0x01 // Accurate Reads
 #define COMPAT_MODE_2 		 0x02 // Alternative data read method (Synchronous)
@@ -79,7 +79,7 @@ typedef struct
 
 	char enabled;
 
-	char haveCompatibilityMode;
+	unsigned char flags;
 
 	/// max inactive frame delay
 	int delay;

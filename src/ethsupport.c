@@ -15,6 +15,7 @@
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include "include/nbns.h"
+#include "httpclient.h"
 
 extern void *smb_cdvdman_irx;
 extern int size_smb_cdvdman_irx;
@@ -33,6 +34,9 @@ extern int size_smbman_irx;
 
 extern void *nbns_irx;
 extern int size_nbns_irx;
+
+extern void *httpclient_irx;
+extern int size_httpclient_irx;
 
 extern void *netman_irx;
 extern int size_netman_irx;
@@ -285,7 +289,9 @@ static int ethLoadModules(void) {
 
 				if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
 					sysLoadModuleBuffer(&ps2ips_irx, size_ps2ips_irx, 0, NULL);
+					sysLoadModuleBuffer(&httpclient_irx, size_httpclient_irx, 0, NULL);
 					ps2ip_init();
+					HttpInit();
 
 					LOG("ETHSUPPORT Modules loaded\n");
 					return 0;
@@ -304,6 +310,7 @@ void ethDeinitModules(void) {
 	if(ethInitSemaID >=0)
 		WaitSema(ethInitSemaID);
 
+	HttpDeinit();
 	nbnsDeinit();
 	NetManDeinit();
 	ethModulesLoaded = 0;
@@ -722,7 +729,7 @@ static int ethCheckVMC(char* name, int createSize) {
 #endif
 
 static item_list_t ethGameList = {
-		ETH_MODE, 0, COMPAT, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
+		ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
 #ifdef __CHILDPROOF
 		&ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
 #else

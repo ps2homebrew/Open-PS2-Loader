@@ -118,6 +118,7 @@ void guiUpdateScreenScale(void);
 void guiDrawBGPlasma();
 int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color);
 
+void guiShowNetCompatUpdate(void);
 void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();

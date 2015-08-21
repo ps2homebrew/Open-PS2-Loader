@@ -17,6 +17,7 @@
 #include "include/config.h"
 #include "include/system.h"
 #include "include/ethsupport.h"
+#include "include/compatupd.h"
 #ifdef GSM
 #include "include/pggsm.h"
 #endif
@@ -211,6 +212,132 @@ void guiShowAbout() {
 	diaSetLabel(diaAbout, 1, OPLVersion);
 
 	diaExecuteDialog(diaAbout, -1, 1, NULL);
+}
+
+static int guiNetCompatUpdRefresh(int modified) {
+	int result;
+	unsigned int done, total;
+
+	if((result = oplGetUpdateGameCompatStatus(&done, &total)) == OPL_COMPAT_UPDATE_STAT_WIP)
+	{
+		diaSetInt(diaNetCompatUpdate, NETUPD_PROGRESS, (done == 0 || total == 0) ? 0 :(int)((float)done / total * 100.0f));
+	}
+
+	return result;
+}
+
+static void guiShowNetCompatUpdateResult(int result) {
+	switch(result)
+	{
+		case OPL_COMPAT_UPDATE_STAT_DONE:
+			//Completed with no errors.
+			guiMsgBox(_l(_STR_NET_UPDATE_DONE), 0, NULL);
+			break;
+		case OPL_COMPAT_UPDATE_STAT_ERROR:
+			//Completed with errors.
+			guiMsgBox(_l(_STR_NET_UPDATE_FAILED), 0, NULL);
+			break;
+		case OPL_COMPAT_UPDATE_STAT_CONN_ERROR:
+			//Completed with errors.
+			guiMsgBox(_l(_STR_NET_UPDATE_CONN_FAILED), 0, NULL);
+			break;
+		case OPL_COMPAT_UPDATE_STAT_ABORTED:
+			//User-aborted.
+			guiMsgBox(_l(_STR_NET_UPDATE_CANCELLED), 0, NULL);
+			break;
+	}
+}
+
+void guiShowNetCompatUpdate(void) {
+	int ret, UpdateAll;
+	u8 done, started;
+	void *UpdateFunction;
+
+	diaSetVisible(diaNetCompatUpdate, NETUPD_BTN_START, 1);
+	diaSetVisible(diaNetCompatUpdate, NETUPD_BTN_CANCEL, 0);
+	diaSetVisible(diaNetCompatUpdate, NETUPD_PROGRESS_LBL, 0);
+	diaSetVisible(diaNetCompatUpdate, NETUPD_PROGRESS_PERC_LBL, 0);
+	diaSetVisible(diaNetCompatUpdate, NETUPD_PROGRESS, 0);
+	diaSetInt(diaNetCompatUpdate, NETUPD_OPT_UPD_ALL, 0);
+	diaSetEnabled(diaNetCompatUpdate, NETUPD_OPT_UPD_ALL, 1);
+
+	done = 0;
+	started = 0;
+	UpdateFunction = NULL;
+	while(!done)
+	{
+		ret = diaExecuteDialog(diaNetCompatUpdate, -1, 1, UpdateFunction);
+		switch(ret)
+		{
+			case NETUPD_BTN_START:
+				if(guiMsgBox(_l(_STR_CONFIRMATION_SETTINGS_UPDATE), 1, NULL))
+				{
+					guiRenderTextScreen(_l(_STR_PLEASE_WAIT));
+
+					if((ret = ethLoadInitModules()) == 0)
+					{
+						diaSetVisible(diaNetCompatUpdate, NETUPD_BTN_START, 0);
+						diaSetVisible(diaNetCompatUpdate, NETUPD_BTN_CANCEL, 1);
+						diaSetVisible(diaNetCompatUpdate, NETUPD_PROGRESS_LBL, 1);
+						diaSetVisible(diaNetCompatUpdate, NETUPD_PROGRESS_PERC_LBL, 1);
+						diaSetVisible(diaNetCompatUpdate, NETUPD_PROGRESS, 1);
+						diaSetEnabled(diaNetCompatUpdate, NETUPD_OPT_UPD_ALL, 0);
+
+						diaGetInt(diaNetCompatUpdate, NETUPD_OPT_UPD_ALL, &UpdateAll);
+						oplUpdateGameCompat(UpdateAll);
+						UpdateFunction = &guiNetCompatUpdRefresh;
+						started = 1;
+					} else {
+						ethDisplayErrorStatus();
+					}
+				}
+				break;
+			case UIID_BTN_CANCEL:	//If the user pressed the cancel button.
+			case NETUPD_BTN_CANCEL:
+				if(started)
+				{
+					if(guiMsgBox(_l(_STR_CONFIRMATION_CANCEL_UPDATE), 1, NULL))
+					{
+						guiRenderTextScreen(_l(_STR_PLEASE_WAIT));
+						oplAbortUpdateGameCompat();
+						//The process truly ends when the UI callback gets the update from the worker thread that the process has ended.
+					}
+				} else {
+					done = 1;
+					started = 0;
+				}
+				break;
+			default:
+				guiShowNetCompatUpdateResult(ret);
+				done = 1;
+				started = 0;
+				UpdateFunction = NULL;
+				break;
+		}
+	}
+}
+
+static void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t* configSet) {
+	int ConfigSource, result;
+
+	ConfigSource = CONFIG_SOURCE_DEFAULT;
+	configGetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, &ConfigSource);
+
+	if(guiMsgBox(_l(_STR_CONFIRMATION_SETTINGS_UPDATE), 1, NULL))
+	{
+		guiRenderTextScreen(_l(_STR_PLEASE_WAIT));
+
+		if((result = ethLoadInitModules()) == 0)
+		{
+			if((result = oplUpdateGameCompatSingle(id, support, configSet)) == OPL_COMPAT_UPDATE_STAT_DONE)
+			{
+				configSetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_DLOAD);
+			}
+			guiShowNetCompatUpdateResult(result);
+		} else {
+			ethDisplayErrorStatus();
+		}
+	}
 }
 
 void guiShowConfig() {
@@ -738,10 +865,10 @@ int guiAltStartupNameHandler(char* text, int maxLen) {
 }
 
 int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
-	int result;
+	int ConfigSource, result;
 
 	int dmaMode = 7; // defaulting to UDMA 4
-	if (support->haveCompatibilityMode == COMPAT_FULL) {
+	if (support->flags & MODE_FLAG_COMPAT_DMA) {
 		configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
 		const char* dmaModes[] = { "MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0",	"UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", NULL };
 		diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
@@ -753,6 +880,14 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	}
 
 	diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
+
+	ConfigSource = CONFIG_SOURCE_DEFAULT;
+	if(configGetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, &ConfigSource))
+	{
+		diaSetLabel(diaCompatConfig, COMPAT_STATUS, ConfigSource == CONFIG_SOURCE_USER ? _l(_STR_CUSTOMIZED_SETTINGS) : _l(_STR_DOWNLOADED_DEFAULTS));
+		diaSetVisible(diaCompatConfig, COMPAT_STATUS, 1);
+	}else
+		diaSetVisible(diaCompatConfig, COMPAT_STATUS, 0);
 
 	int compatMode = 0;
 	configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
@@ -857,6 +992,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	} while (result >= COMPAT_NOEXIT);
 
 	if (result == COMPAT_REMOVE) {
+		configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
 		configRemoveKey(configSet, CONFIG_ITEM_DMA);
 		configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 		configRemoveKey(configSet, CONFIG_ITEM_DNAS);
@@ -881,7 +1017,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			compatMode |= (mdpart ? 1 : 0) << i;
 		}
 
-		if (support->haveCompatibilityMode == COMPAT_FULL) {
+		if (support->flags & MODE_FLAG_COMPAT_DMA) {
 			diaGetInt(diaCompatConfig, COMPAT_DMA, &dmaMode);
 			if (dmaMode != 7)
 				configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
@@ -943,8 +1079,16 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		guiShowVMCConfig(id, support, vmc2, 1, 1);
 #endif
 
-		if (result == COMPAT_SAVE)
-			menuSaveConfig();
+		switch(result)
+		{
+			case COMPAT_SAVE:
+				configSetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);
+				menuSaveConfig();
+				break;
+			case COMPAT_DL_DEFAULTS:
+				guiShowNetCompatUpdateSingle(id, support, configSet);
+				break;
+		}
 	}
 
 	return result;

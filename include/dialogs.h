@@ -4,6 +4,9 @@
 #include "include/dia.h"
 
 enum UI_ITEMS{
+	UIID_BTN_CANCEL		=	0,
+	UIID_BTN_OK,
+
 	UICFG_THEME		=	10,
 	UICFG_LANG,
 	UICFG_SCROLL,
@@ -84,6 +87,8 @@ enum UI_ITEMS{
 	COMPAT_GAME,
 	COMPAT_GAMEID,
 	COMPAT_SAVE,
+	COMPAT_STATUS,
+	COMPAT_DL_DEFAULTS,
 	COMPAT_TEST,
 	COMPAT_REMOVE,
 
@@ -102,6 +107,14 @@ enum UI_ITEMS{
 	VMC_PROGRESS,
 	VMC_REFRESH,
 #endif
+
+	NETUPD_OPT_UPD_ALL_LBL,
+	NETUPD_OPT_UPD_ALL,
+	NETUPD_PROGRESS_LBL,
+	NETUPD_PROGRESS_PERC_LBL,
+	NETUPD_PROGRESS,
+	NETUPD_BTN_START,
+	NETUPD_BTN_CANCEL,
 
 	COMPAT_MODE_BASE		= 200,
 };
@@ -127,5 +140,6 @@ extern struct UIItem diaAbout[];
 #ifdef VMC
 extern struct UIItem diaVMC[];
 #endif
+extern struct UIItem diaNetCompatUpdate[];
 
 #endif

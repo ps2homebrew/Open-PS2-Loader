@@ -26,6 +26,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Language",
 	"The system will be powered off.",
 	"Exit OPL?",
+	"Cancel updating?",
 	"%d: HardDisk Drive not detected",
 	"%d: HardDisk Drive not formatted",
 	"%d: Network startup error",
@@ -119,6 +120,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Hide dev9 module",
 	"Changing the size will reformat the VMC",
 	"Create",
+	"Start",
 	"Modify",
 	"Abort",
 	"Reset",
@@ -194,6 +196,16 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Select game cheats",
 	"Error: failed to load Cheat File",
 	"No cheats found",
+	"Download defaults",
+	"Network update",
+	"Re-download existing records?",
+	"Update failed.",
+	"Failed to connect to update server.",
+	"Update completed.",
+	"Update cancelled.",
+	"Download settings from the network?",
+	"Customized Settings",
+	"Downloaded Defaults",
 };
 
 static int guiLangID = 0;

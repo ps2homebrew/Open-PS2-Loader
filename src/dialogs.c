@@ -95,6 +95,10 @@ struct UIItem diaCompatConfig[] = {
 
 	{UI_SPLITTER},
 
+	{UI_LABEL, COMPAT_STATUS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+	{UI_BREAK},
+	{UI_BREAK},
+
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
@@ -145,7 +149,11 @@ struct UIItem diaCompatConfig[] = {
 #ifndef __CHILDPROOF
 	{UI_BUTTON, COMPAT_SAVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SAVE_CHANGES}}}, {UI_SPACER},
 #endif
-	{UI_BUTTON, COMPAT_TEST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_TEST}}}, {UI_BREAK},
+	{UI_BUTTON, COMPAT_TEST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_TEST}}},
+#ifndef __CHILDPROOF
+	{UI_SPACER}, {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
+#endif
+	{UI_BREAK},
 
 	{UI_BREAK},
 
@@ -269,8 +277,7 @@ struct UIItem diaAbout[] = {
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DEVS}}}, {UI_BREAK},
-
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DEVS}}},
 	{UI_BREAK},
 
 	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - Jay-Jay - crazyc - dlanor", -1}}}, {UI_BREAK},
@@ -278,14 +285,20 @@ struct UIItem diaAbout[] = {
 	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael - misfire", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}}, {UI_BREAK},
     	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"... and the anonymous ...", -1}}}, {UI_BREAK},
-	{UI_SPLITTER}, {UI_BREAK},
+	{UI_BREAK},
 
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_QANDA}}}, {UI_BREAK},
-
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_QANDA}}},
 	{UI_BREAK},
 
 	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"RandQalan - yoshi314 - EP", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH - lee4 - danielB", -1}}}, {UI_BREAK},
+	{UI_BREAK},
+
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NET_UPDATE}}},
+	{UI_BREAK},
+
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}}, {UI_BREAK},
+
 	{UI_BREAK},
 
 	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -318,3 +331,22 @@ struct UIItem diaVMC[] = {
 	{UI_TERMINATOR}
 };
 #endif
+
+struct UIItem diaNetCompatUpdate[] = {
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NET_UPDATE}}},
+
+	{UI_SPLITTER},
+
+	{UI_LABEL, NETUPD_OPT_UPD_ALL_LBL, 1, 1, -1, -20, 0, {.label = {NULL, _STR_NET_UPDATE_ALL}}}, {UI_SPACER}, {UI_BOOL, NETUPD_OPT_UPD_ALL, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 1}}}, {UI_BREAK},
+	{UI_BREAK},
+
+	{UI_LABEL, NETUPD_PROGRESS_LBL, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_PROGRESS}}}, {UI_SPACER}, {UI_INT, NETUPD_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}}, {UI_LABEL, NETUPD_PROGRESS_PERC_LBL, 1, 1, -1, 0, 0, {.label = {"%", -1}}},
+
+	{UI_BREAK},
+
+	{UI_BUTTON, NETUPD_BTN_START, 1, 1, -1, 0, 0, {.label = {NULL, _STR_START}}},
+	{UI_BUTTON, NETUPD_BTN_CANCEL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CANCEL}}},
+
+	// end of dialog
+	{UI_TERMINATOR}
+};

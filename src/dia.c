@@ -851,10 +851,10 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 					cur = newf;
 			}
 
-			// circle breaks focus or exits with false result
+			// Cancel button breaks focus or exits with false result
 			if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
 				diaRestoreScrollSpeed();
-				return 0;
+				return UIID_BTN_CANCEL;
 			}
 
 			// see what key events we have
@@ -868,7 +868,7 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
 
 				if (cur->type == UI_OK) {
 					diaRestoreScrollSpeed();
-					return 1;
+					return UIID_BTN_OK;
 				}
 			}
 		}

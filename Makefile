@@ -42,7 +42,7 @@ CHILDPROOF = 0
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o
+		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o obj/httpclient.o
 
 GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
@@ -55,7 +55,7 @@ MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
 		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
 		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns-iop.o	\
-		obj/netman.o obj/ps2ips.o
+		obj/httpclient-iop.o obj/netman.o obj/ps2ips.o
 
 EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
@@ -242,6 +242,8 @@ sclean:
 	$(MAKE) -C modules/network/smbinit clean
 	echo "    * nbns.irx"
 	$(MAKE) -C modules/network/nbns clean
+	echo "    * httpclient.irx"
+	$(MAKE) -C modules/network/httpclient clean
 	echo "    * ps2atad.irx"
 	$(MAKE) -C modules/hdd/atad clean
 	echo "    * hdpro_atad.irx"
@@ -460,6 +462,11 @@ nbns-iop.s:
 	echo "    * nbns.irx"
 	$(MAKE) -C modules/network/nbns
 	$(BIN2S) modules/network/nbns/nbns.irx asm/nbns-iop.s nbns_irx
+
+httpclient-iop.s:
+	echo "    * httpclient.irx"
+	$(MAKE) -C modules/network/httpclient
+	$(BIN2S) modules/network/httpclient/httpclient.irx asm/httpclient-iop.s httpclient_irx
 
 ps2fs.s:
 	echo "    * ps2fs.irx"

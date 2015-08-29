@@ -18,8 +18,8 @@ loadcore_IMPORTS_end
 oplutils_IMPORTS_start
 I_getModInfo
 #ifdef USB_DRIVER
-I_fat_setFatDirChain
-I_fat_fileIO
+I_mass_stor_readSector
+I_mass_stor_writeSector
 #endif
 #ifdef HDD_DRIVER
 I_ata_device_sector_io

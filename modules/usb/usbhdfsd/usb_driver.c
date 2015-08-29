@@ -1078,19 +1078,6 @@ int InitUSB(void)
 	return(0);
 }
 
-int mass_stor_sectorsize(mass_dev *dev)
-{
-	XPRINTF("USBHDFSD: mass_stor_sectorsize\n");
-
-	if (!(dev->status & USBMASS_DEV_STAT_CONN)) {
-		printf("USBHDFSD: Error - no mass storage device found!\n");
-
-		return -1;
-	}
-
-	return dev->sectorSize;
-}
-
 int UsbMassGetDeviceInfo(int device, UsbMassDeviceInfo_t *info)
 {
 	int result;

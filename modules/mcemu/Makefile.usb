@@ -18,7 +18,7 @@ endif
 IOP_CFLAGS  += -Wall -fno-builtin
 IOP_CFLAGS += -DUSB_DRIVER
 IOP_LDFLAGS += -s
-IOP_INCS += -I../iopcore/common
+IOP_INCS +=
 
 all: $(IOP_BIN)
 

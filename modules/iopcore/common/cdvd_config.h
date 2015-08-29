@@ -37,17 +37,7 @@ struct cdvdman_settings_smb{
 	};
 };
 
-struct fat_file{
-	u32 cluster;
-	u32 size;
-};
-
 struct cdvdman_settings_usb{
 	struct cdvdman_settings_common common;
-	u32 layer1_start;
-	u32 fatStart;
-	u32 dataStart;
-	u16 clusterSize;
-	u16 padding;
-	struct fat_file files[ISO_MAX_PARTS];
+	u32 LBAs[ISO_MAX_PARTS];
 };

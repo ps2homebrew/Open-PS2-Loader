@@ -710,24 +710,6 @@ int fs_ioctl(iop_file_t *fd, u32 request, void *data)
 		case USBHDFSD_IOCTL_GETSECTOR:
 			ret = fat_cluster2sector(&fatd->partBpb, ((fs_rec *)fd->privdata)->dirent.fatdir.chain[0].cluster);
 			break;
-		case USBHDFSD_IOCTL_GETCLUSTER:
-			ret = dirent->fatdir.startCluster;
-			break;
-		case USBHDFSD_IOCTL_GETSIZE:
-			ret = dirent->fatdir.size;
-			break;
-		case USBHDFSD_IOCTL_GETFATSTART:
-			ret = fatd->partBpb.partStart + fatd->partBpb.resSectors;
-			break;
-		case USBHDFSD_IOCTL_GETDATASTART:
-			ret = fatd->partBpb.dataStart;
-			break;
-		case USBHDFSD_IOCTL_GETCLUSTERSIZE:
-			ret = fatd->partBpb.clusterSize;
-			break;
-		case USBHDFSD_IOCTL_GETDEVSECTORSIZE:
-			ret = mass_stor_sectorsize(fatd->dev);
-			break;
 		case USBHDFSD_IOCTL_CHECKCHAIN:
 			ret = fat_CheckChain(fatd, &((fs_dir *)fd->privdata)->dirent.fatdir);
 			break;

@@ -9,7 +9,7 @@
 # $Id: $
 
 IOP_BIN  = cdvdman.irx
-IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o device-usb.o fat.o imports.o exports.o
+IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o device-usb.o imports.o exports.o
 IOP_OBJS += mass_driver.o
 ifeq ($(USE_DEV9),1)
 IOP_OBJS += dev9.o

@@ -104,8 +104,7 @@ struct _McImageSpec
 	int        active;     /* Activation flag */
 
 #ifdef USB_DRIVER
-	struct fat_file file;
-	fat_dir         fatDir;
+	u32        stsec;      /* Vmc file start sector */
 #endif
 
 #ifdef HDD_DRIVER

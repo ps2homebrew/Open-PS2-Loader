@@ -19,7 +19,6 @@
 #include "mass_debug.h"
 #include "mass_common.h"
 #include "mass_stor.h"
-#include "fat.h"
 #include "cdvd_config.h"
 
 extern struct cdvdman_settings_usb cdvdman_settings;
@@ -106,6 +105,16 @@ typedef struct _read_capacity_data {
 
 static UsbDriver driver;
 
+#ifdef VMC_DRIVER
+static int io_sema;
+
+#define WAITIOSEMA(x) WaitSema(x)
+#define SIGNALIOSEMA(x) SignalSema(x)
+#else
+#define WAITIOSEMA(x)
+#define SIGNALIOSEMA(x)
+#endif
+
 typedef struct _usb_callback_data {
 	int semh;
 	int returnCode;
@@ -113,7 +122,7 @@ typedef struct _usb_callback_data {
 } usb_callback_data;
 
 static mass_dev g_mass_device;
-static fat_dir *fatDirs;
+static void *gSectorBuffer;
 
 static void mass_stor_release(mass_dev *dev);
 
@@ -684,13 +693,21 @@ static void cbw_scsi_sector_io(mass_dev* dev, short int dir, unsigned int lba, v
 
 void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char* buffer)
 {
+	WAITIOSEMA(io_sema);
+
 	cbw_scsi_sector_io(&g_mass_device, USB_BLK_EP_IN, lba, buffer, nsectors);
+
+	SIGNALIOSEMA(io_sema);
 }
 
 #ifdef VMC_DRIVER
 void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char* buffer)
 {
+	WAITIOSEMA(io_sema);
+
 	cbw_scsi_sector_io(&g_mass_device, USB_BLK_EP_OUT, lba, (void*)buffer, nsectors);
+
+	SIGNALIOSEMA(io_sema);
 }
 #endif
 
@@ -848,6 +865,8 @@ int mass_stor_connect(int devId)
 
 static void mass_stor_release(mass_dev *dev)
 {
+	int OldState;
+
 	if (dev->bulkEpI >= 0)
 	{
 		pUsbCloseEndpoint(dev->bulkEpI);
@@ -863,7 +882,13 @@ static void mass_stor_release(mass_dev *dev)
 	dev->controlEp = -1;
 	dev->status = 0;
 
-	fat_deinit();
+	if (gSectorBuffer != NULL)
+	{
+		CpuSuspendIntr(&OldState);
+		FreeSysMemory(gSectorBuffer);
+		CpuResumeIntr(OldState);
+		gSectorBuffer = NULL;
+	}
 }
 
 int mass_stor_disconnect(int devId) {
@@ -882,39 +907,11 @@ int mass_stor_disconnect(int devId) {
 	return 0;
 }
 
-static inline void initFileSystem(void)
-{
-	fat_dir_chain_record *pointsBuffer;
-	int i, maxChainPoints, parts;
-	int OldState;
-
-	fat_init(&g_mass_device);
-
-	if(cdvdman_settings.common.NumParts == 1)
-	{
-		parts = cdvdman_settings.files[0].size / 1000000000;	//Determine the number of parts that the single disc image is worth.
-		if(parts < 1) parts = 1;
-		maxChainPoints = OPL_DIR_CHAIN_SIZE * parts;
-		XPRINTF("FAT: parts %u(%u) maxpoints %u\n", cdvdman_settings.common.NumParts, parts, maxChainPoints);
-	}else{
-		maxChainPoints = OPL_DIR_CHAIN_SIZE;
-		XPRINTF("FAT: parts %u maxpoints %u\n", cdvdman_settings.common.NumParts, maxChainPoints);
-	}
-
-	CpuSuspendIntr(&OldState);
-	pointsBuffer = AllocSysMemory(ALLOC_FIRST, (int)cdvdman_settings.common.NumParts * maxChainPoints * sizeof(fat_dir_chain_record), NULL);
-	fatDirs = AllocSysMemory(ALLOC_FIRST, (int)cdvdman_settings.common.NumParts * sizeof(fat_dir), NULL);
-	CpuResumeIntr(OldState);
-
-	for(i = 0; i < cdvdman_settings.common.NumParts; i++)
-		fat_setFatDirChain(&fatDirs[i], cdvdman_settings.files[i].cluster, cdvdman_settings.files[i].size, maxChainPoints, &pointsBuffer[i * maxChainPoints]);
-}
-
 static int mass_stor_warmup(mass_dev *dev) {
 	inquiry_data id;
 	sense_data sd;
 	read_capacity_data rcd;
-	int stat;
+	int stat, OldState;
 
 	XPRINTF("USBHDFSD: mass_stor_warmup\n");
 
@@ -968,7 +965,14 @@ static int mass_stor_warmup(mass_dev *dev) {
 	dev->maxLBA     = getBI32(&rcd.last_lba);
 	XPRINTF("USBHDFSD: sectorSize %u maxLBA %u\n", dev->sectorSize, dev->maxLBA);
 
-	initFileSystem();
+	if(dev->sectorSize > 2048)
+	{
+		CpuSuspendIntr(&OldState);
+		gSectorBuffer = AllocSysMemory(ALLOC_FIRST, dev->sectorSize, NULL);
+		CpuResumeIntr(OldState);
+	} else {
+		gSectorBuffer = NULL;
+	}
 
 	return 0;
 }
@@ -1001,9 +1005,18 @@ int mass_stor_configureDevice(void)
 
 int mass_stor_init(void)
 {
+	iop_sema_t smp;
 	register int ret;
 
 	g_mass_device.devId = -1;
+
+#ifdef VMC_DRIVER
+	smp.initial = 1;
+	smp.max = 1;
+	smp.option = 0;
+	smp.attr = SA_THPRI;
+	io_sema = CreateSema(&smp);
+#endif
 
 	driver.next 		= NULL;
 	driver.prev		= NULL;
@@ -1022,7 +1035,63 @@ int mass_stor_init(void)
 	return 0;
 }
 
+static void ReadSectorUpper(u32 lba, void *buf)
+{
+	mass_stor_readSector(lba, 1, gSectorBuffer);
+	mips_memcpy(buf, gSectorBuffer, 2048);
+}
+
+/*	There are many times of sector sizes for the many devices out there. But because:
+	1. USB transfers have a limit of 4096 bytes (2 CD/DVD sectors).
+	2. we need to keep things simple to save IOP clock cycles and RAM
+	...devices with sector sizes that are either a multiple or factor of the CD/DVD sector will be supported.
+
+	i.e. 512 (typical), 1024, 2048 and 4096 bytes can be supported, while 3072 bytes (if there's even such a thing) will be unsupported.	*/
 int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
-	return(fat_fileIO(&fatDirs[part_num], part_num, FAT_IO_MODE_READ, lsn << 11, buf, nsectors << 11) == nsectors << 11 ? 1 : 0);
+	u32 sectors, nbytes, DiskSectorsToRead, lba;
+	unsigned short int SectorOffset;
+	u8 *p = (u8 *)buf;
+
+	if(g_mass_device.sectorSize > 2048)
+	{
+		lba = cdvdman_settings.LBAs[part_num] + (lsn / (g_mass_device.sectorSize / 2048));
+		if ((SectorOffset = lsn % (g_mass_device.sectorSize / 2048)) > 0)
+		{
+			//Start sector is in the middle of a physical sector.
+			nbytes = g_mass_device.sectorSize;
+			sectors = nbytes / 2048;
+			ReadSectorUpper(lba, p);
+			lba++;
+			lsn += sectors;
+			nsectors -= sectors;
+			p += nbytes;
+		}
+	} else {
+		lba = cdvdman_settings.LBAs[part_num] + (lsn * (2048 / g_mass_device.sectorSize));
+	}
+
+	while (nsectors > 0) {
+		sectors = nsectors;
+		if (sectors > 2)
+			sectors = 2;
+
+		nbytes = sectors * 2048;
+		DiskSectorsToRead = nbytes / g_mass_device.sectorSize;
+
+		if (DiskSectorsToRead == 0) {
+			// nsectors should be 1 at this point.
+			ReadSectorUpper(lba, p);
+		}
+		else {
+			mass_stor_readSector(lba, DiskSectorsToRead, p);
+		}
+
+		lba += DiskSectorsToRead;
+		lsn += sectors;
+		p += nbytes;
+		nsectors -= sectors;
+	}
+
+	return 1;
 }

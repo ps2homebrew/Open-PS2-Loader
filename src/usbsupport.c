@@ -205,7 +205,7 @@ static void usbRenameGame(int id, char* newName) {
 static void usbLaunchGame(int id, config_set_t* configSet) {
 	int i, fd, index, compatmask = 0;
 #ifdef VMC
-	unsigned int start, size;
+	unsigned int start;
 #endif
 	char partname[256], filename[32];
 	base_game_info_t* game = &usbGames[id];
@@ -214,8 +214,8 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	unsigned short int layer1_part;
 
 #ifdef VMC
-	char vmc_name[32], vmc_path[256];
-	int vmc_id, have_error = 0, size_mcemu_irx = 0;
+	char vmc_name[32], vmc_path[256], have_error = 0;
+	int vmc_id, size_mcemu_irx = 0;
 	usb_vmc_infos_t usb_vmc_infos;
 	vmc_superblock_t vmc_superblock;
 
@@ -235,13 +235,16 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 				fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
 				if (fd >= 0) {
-					if ((start = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, vmc_path)) != 0) {
-						if ((size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSIZE, vmc_path)) != 0) {
+					if ((start = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSECTOR, vmc_path)) != 0) {
+						// Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
+						if (fileXioIoctl(fd, USBHDFSD_IOCTL_CHECKCHAIN, vmc_path) != 0) {
+							LOG("USBSUPPORT Cluster Chain OK\n");
 							have_error = 0;
 							usb_vmc_infos.active = 1;
-							usb_vmc_infos.file.cluster = start;
-							usb_vmc_infos.file.size = size;
-							LOG("USBSUPPORT VMC: 0x%X (%u)\n", start, size);
+							usb_vmc_infos.start_sector = start;
+							LOG("USBSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
+						} else {
+							LOG("USBSUPPORT Cluster Chain NG\n");
 						}
 					}
 
@@ -271,7 +274,9 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 	void** irx = &usb_cdvdman_irx;
 	int irx_size = size_usb_cdvdman_irx;
-	for (i = 0, settings = NULL; i < game->parts; i++) {
+	compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
+	settings = (struct cdvdman_settings_usb*)((u8*)irx+index);
+	for (i = 0; i < game->parts; i++) {
 		switch (game->format) {
 			case GAME_FORMAT_ISO:
 				sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
@@ -285,16 +290,17 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 
 		fd = fileXioOpen(partname, O_RDONLY, 0666);
 		if (fd >= 0) {
-			if (i == 0) {
-				compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
-				settings = (struct cdvdman_settings_usb*)((u8*)irx+index);
-				settings->fatStart = fileXioIoctl(fd, USBHDFSD_IOCTL_GETFATSTART, partname);
-				settings->dataStart = fileXioIoctl(fd, USBHDFSD_IOCTL_GETDATASTART, partname);
-				settings->clusterSize = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTERSIZE, partname);
+			settings->LBAs[i] = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSECTOR, partname);
+			if (gCheckUSBFragmentation && fileXioIoctl(fd, USBHDFSD_IOCTL_CHECKCHAIN, partname) == 0) {
+				fileXioClose(fd);
+				//Game is fragmented. Do not continue.
+				if(settings != NULL)
+					sbUnprepare(&settings->common);
+
+				guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
+				return;
 			}
 
-			settings->files[i].cluster = fileXioIoctl(fd, USBHDFSD_IOCTL_GETCLUSTER, partname);
-			settings->files[i].size = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSIZE, partname);
 			fileXioClose(fd);
 		} else {
 			//Unable to open part of the game. Do not continue.

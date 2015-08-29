@@ -553,6 +553,7 @@ static void _loadConfig() {
 			configGetInt(configOPL, "disable_debug", &gDisableDebug);
 			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
 			configGetInt(configOPL, "hdd_spindown", &gHDDSpindown);
+			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
 			configGetStrCopy(configOPL, "usb_prefix", gUSBPrefix, sizeof(gUSBPrefix));
 			configGetStrCopy(configOPL, "eth_prefix", gETHPrefix, sizeof(gETHPrefix));
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
@@ -611,6 +612,7 @@ static void _saveConfig() {
 		configSetInt(configOPL, "disable_debug", gDisableDebug);
 		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
 		configSetInt(configOPL, "hdd_spindown", gHDDSpindown);
+		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);

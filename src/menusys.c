@@ -620,6 +620,9 @@ void menuRenderMain() {
 }
 
 void menuHandleInputMain() {
+	// Auto Start Counter
+	int ValidKeyPressed = 1;
+
 	if(getKey(KEY_LEFT)) {
 		menuPrevH();
 	} else if(getKey(KEY_RIGHT)) {
@@ -656,7 +659,26 @@ void menuHandleInputMain() {
 		menuFirstPage();
 	} else if (getKeyOn(KEY_R2)) { // end
 		menuLastPage();
+
+	// Auto Start Counter
+	} else { // None valid key pressed
+		ValidKeyPressed = 0;
+
 	}
+
+	// Auto Start Counter
+	if(ValidKeyPressed == 1)
+		as_counter_disable = 1;
+	if (as_counter_disable == 0) {
+		if ( (gRememberLastPlayed) && (as_counter < 0) ) {
+			gRememberLastPlayed = 0;
+			if(gSelectButton == KEY_CIRCLE)
+				selected_item->item->execCircle(selected_item->item);
+			else
+				selected_item->item->execCross(selected_item->item);
+		}
+	}
+
 }
 
 void menuRenderInfo() {

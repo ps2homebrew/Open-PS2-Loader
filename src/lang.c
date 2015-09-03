@@ -208,6 +208,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Download settings from the network?",
 	"Customized Settings",
 	"Downloaded Defaults",
+	"Auto start in %i s...",
 };
 
 static int guiLangID = 0;

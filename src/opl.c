@@ -1176,6 +1176,12 @@ static void setDefaults(void) {
 
 	memset(gCheatList, 0, sizeof(gCheatList));
 #endif
+
+	// Auto Start Counter
+	as_counter = 9;
+	as_counter_disable = 0;
+	as_start = 0;
+	as_current = 0;
 }
 
 static void init(void) {

@@ -25,6 +25,9 @@
 #include <stdlib.h>
 #include <libvux.h>
 
+// Auto Start Counter
+#include <time.h>
+
 static int gScheduledOps;
 static int gCompletedOps;
 static int gTerminate;
@@ -1456,6 +1459,16 @@ static void guiDrawOverlays() {
 
 	fntRenderString(gTheme->fonts[0], screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif
+
+	// Auto Start Counter
+	if ( (wfadeout <= 0) && (as_start == 0) )
+		as_start = clock() / CLOCKS_PER_SEC;
+	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
+		as_current = clock() / CLOCKS_PER_SEC;
+		as_counter = 9 - (as_current - as_start);
+		snprintf(asc, sizeof(asc), _l(_STR_AUTO_START_IN_N_SECS), as_counter);
+		fntRenderString(gTheme->fonts[0], screenWidth / 2, screenHeight / 2, ALIGN_CENTER, 0, 0, asc, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	}
 }
 
 static void guiReadPads() {

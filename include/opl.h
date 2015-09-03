@@ -33,6 +33,9 @@
 #include <sys/fcntl.h>
 #endif
 
+// Auto Start Counter
+#include <time.h>
+
 #define OPL_VERSION		"0.9.3 WIP"
 #define OPL_IS_DEV_BUILD	1		//Define if this build is a development build.
 
@@ -156,3 +159,8 @@ unsigned char gDefaultUITextColor[3];
 #define MENU_ITEM_HEIGHT 19
 
 #endif
+
+// Auto Start Counter
+int as_counter, as_counter_disable;
+double as_start, as_current;
+char asc[21];

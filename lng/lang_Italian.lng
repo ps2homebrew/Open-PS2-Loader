@@ -1,6 +1,6 @@
 # translation by andre95d / supervised by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Italian
 Open PS2 Loader %s
@@ -22,6 +22,7 @@ Tema
 Lingua
 The system will be powered off.
 Exit OPL?
+Cancel updating?
 %d: HardDisk Drive not detected
 %d: HardDisk Drive not formatted
 %d: Network startup error
@@ -100,8 +101,10 @@ Cancella
 Esegui
 Impostazioni display
 Abilita azioni di rinomina e cancella
+Check USB game fragmentation
 Ricorda ultimo titolo giocato
 Seleziona tasto
+Error, the game is fragmented
 Errore, impossibile avviare il titolo.
 Test
 Lasciare vuoto per autenticazione GUEST
@@ -115,6 +118,7 @@ High module storage
 Nascondi modulo dev9
 Modificare la dimensione riformatterà la VMC.
 Crea
+Start
 Modifica
 Annulla
 Ripristina
@@ -190,3 +194,14 @@ Auto-seleziona
 Seleziona manualmente
 Errore: impossibile caricare file di trucchi
 Nessun trucco trovato
+Download defaults
+Network update
+Re-download existing records?
+Update failed.
+Failed to connect to update server.
+Update completed.
+Update cancelled.
+Download settings from the network?
+Customized Settings
+Downloaded Defaults
+Auto start in %i s...

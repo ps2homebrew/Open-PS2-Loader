@@ -1,6 +1,6 @@
 # translation by vsub / supervised by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Bulgarian
 Open PS2 Loader %s
@@ -22,6 +22,7 @@ Apps
 език
 The system will be powered off.
 Exit OPL?
+Cancel updating?
 %d: HardDisk Drive not detected
 %d: HardDisk Drive not formatted
 %d: Network startup error
@@ -100,8 +101,10 @@ NetBIOS
 тичам
 настройки на дисплея
 Активирайте Изтриване и преименуване действия
+Check USB game fragmentation
 Запомни Последно играна игра
 Покажи GSM на Main Menu
+Error, the game is fragmented
 Грешка, не могат да работят на позиция
 тест
 Оставете празно за GUEST auth.
@@ -115,6 +118,7 @@ High module storage
 Скрий dev9 модул
 Промяна на размера ще преформатиране на VMC
 създавам
+Start
 Промяна
 абортирам
 Проучване
@@ -190,3 +194,14 @@ Auto-select cheats
 Select game cheats
 Error: failed to load Cheat File
 No cheats found
+Download defaults
+Network update
+Re-download existing records?
+Update failed.
+Failed to connect to update server.
+Update completed.
+Update cancelled.
+Download settings from the network?
+Customized Settings
+Downloaded Defaults
+Auto start in %i s...

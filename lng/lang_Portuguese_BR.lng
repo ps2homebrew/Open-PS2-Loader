@@ -1,6 +1,6 @@
 # translation by Colossus / supervised by Jay-Jay 
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Brazilian Portuguese
 Open PS2 Loader %s
@@ -22,6 +22,7 @@ Tema
 Idioma
 O console irá desligar.
 Sair do OPL?
+Cancelar atualização?
 %d: Disco Rígido não detectado
 %d: Disco Rígido não formatado
 %d: Erro ao iniciar rede 
@@ -33,8 +34,8 @@ Sair do OPL?
 %d: Impossível listar jogos
 %d: Servidor DHCP indisponível
 %d: Sem conexão de rede
-Ati
-Des
+Ativ.
+Desactiv.
 Confirmar
 Eleger
 Cancelar
@@ -100,8 +101,10 @@ Apagar
 Iniciar
 Configurações de Tela
 Ativar função Apagar/Renomear
+Check USB game fragmentation
 Lembrar último jogo jogado
 Botão de Seleção
+Error, the game is fragmented
 Erro, não foi possível iniciar o item
 Testar
 Deixar vazio para autorização como convidado (GUEST)
@@ -115,6 +118,7 @@ Armazenamento elevado do módulo
 Esconder módulo dev9
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
+Iniciar
 Modificar
 Cancelar
 Resetar
@@ -190,3 +194,14 @@ Auto selecionar cheats
 Selecionar cheats do jogo
 Erro: falha ao abrir o arquivo de Cheat
 Nenhum Cheat encontrado
+Baixar configurações
+Atualização pela Internet
+Baixar dados existentes novamente?
+Falha na atualização.
+Falha ao conectar no servidor de atualização.
+Atualização concluída.
+Atualização cancelada.
+Baixar configurações da Internet?
+Configurações personalizadas
+Configurações baixadas
+Auto start in %i s...

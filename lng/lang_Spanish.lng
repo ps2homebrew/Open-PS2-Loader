@@ -1,6 +1,6 @@
 # translation by darkgarba, El Patas, and Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
 Open PS2 Loader %s
@@ -22,6 +22,7 @@ Tema
 Idioma
 El sistema se apagará.
 Salir OPL?
+Cancelar la actualización?
 %d: Disco Duro no detectado
 %d: Disco Duro no formateado
 %d: Error iniciacion de red
@@ -100,8 +101,10 @@ Borrar
 Iniciar
 Opciones de pantalla
 Activar borrado y renombrado
+Compruebe la fragmentación de juego USB
 Recordar ultimo juego cargado
 Seleccione el Botón
+Error, el juego está fragmentado
 Error, no se pudo inicializar
 Prueba
 Dejalo vacio para iniciar como invitado
@@ -115,6 +118,7 @@ Almacenamiento de alta módulo
 Esconder módulo dev9
 Si cambias el tamaño se formateara VMC
 Crear
+Empezar
 Modificar
 Cancelar
 Resetear
@@ -190,3 +194,14 @@ Selección automática cheats
 Seleccionar juego cheats
 Error: no se pudo cargar Cheat Archivo
 No hay Cheats encontrados
+Descargar predeterminados
+Actualización de la red
+Re-descargar registros existentes?
+Error de actualización.
+Error al conectarse para actualizar el servidor.
+Actualización completada.
+Actualización cancelada.
+Descargue ajustes de la red?
+Ajustes personalizados
+Predeterminados descargados
+Inicio automático en %i s...

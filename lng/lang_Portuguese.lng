@@ -1,10 +1,10 @@
-# translation by Gilbert and danielb / supervised by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# translation by danielb / supervised by Jay-Jay
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese
 Open PS2 Loader %s
-Salvar mudanças
+Salvar alterações
 Voltar
 Configurações de Rede
 Opções avançadas
@@ -17,26 +17,27 @@ Menu
 Jogos por USB
 Jogos por HDD 
 Jogos por Rede
-Aplicativos
+Aplicações
 Temas
 Idioma
 O sistema irá desligar.
 Sair do OPL?
+Cancelar atualização?
 %d: Disco Rigido não detetado
 %d: Disco Rigido não formatado
 %d: Erro ao iniciar rede 
 %d: Adaptador de Rede não detetado
 %d: Não foi possível ligar ao servidor SMB  
-%d: Não foi possível efetuar login com o servidor SMB 
-%d: Não foi possível abrir o compartilhamento SMB 
+%d: Não foi possível efetuar login no servidor SMB 
+%d: Não foi possível abrir a partilha SMB 
 %d: Impossivel listar partilhas SMB
 %d: Impossivel listar jogos
 %d: Servidor DHCP indisponivel
 %d: Sem ligação de rede
-Ati
-Des
+Ativ.
+Desactiv.
 Aceitar
-Eleger
+Selecionar
 Cancelar
 Circulo
 Cruz
@@ -53,25 +54,25 @@ Carregar do disco
 Por favor espere
 Erro ao carregar ID do jogo
 Ordenar automaticamente
-Erro ao carregar arquivo de idioma
+Erro ao carregar ficheiro de idioma
 Desativar depuração de cores
-Controle não detectado, esperando...
-Habilitar Arte de Capas 
-Tela Panorâmica
+Comando não detectado, esperando...
+Ativar Arte de Capas 
+Ecrâ Panorâmico
 Desligar PS2
 Carregando configurações
-Salvando configurações...
+A guardar configurações...
 Iniciar dispositivo
 Atualizar
-Modo de inicio para Dispositivo USB
-Modo de inicio para Dispositivo HDD
-Modo de inicio para Dispositivo Rede
-Modo de inicio para Aplicativos
+Modo de inicio para dispositivo USB
+Modo de inicio para dispositivo HDD
+Modo de inicio para dispositivo Rede
+Modo de inicio para Aplicações
 Automático
 Manual
 Iniciar servidor HDL
-Servidor HDL iniciando...
-Servidor HDL executando...
+Servidor HDL a iniciar...
+Servidor HDL a executar...
 Erro a iniciar o servidor de HDL Dump.
 Servidor HDL a fechar...
 Definir saída do IGR
@@ -86,8 +87,8 @@ Máscara de sub-rede
 Gateway padrão
 Servidor de DNS
 Porta
-Compartilhar
-Usuário
+Partiha
+Utilizador
 Senha
 <não usado>
 Tipo de Endereço
@@ -96,25 +97,28 @@ NetBIOS
 Confirmar
 O item será PERMANENTEMENTE apagado! Continuar?
 Renomear
-Deletar
+Apagar
 Iniciar
-Configurações de Tela
-Ativar função Deletar/Renomear
+Configurações de Ecrâ
+Ativar função Apagar/Renomear
+Verificar fragmentação de jogo USB
 Lembrar último jogo executado
 Botão de Seleção
+Erro, o jogo está fragmentado
 Erro, não foi possível iniciar o item
 Testar
-Deixar vazio para autorização como convidado (GUEST)
+Deixar vazio para ligar como convidado (GUEST)
 Carregar núcleo alternativo
 Método alternativo de leitura de dados
 Desativar chamadas do sistema
-Pular videos PSS
+Saltar videos PSS
 Emular DVD-DL
-Desabilitar IGR
+Desativar IGR
 Armazenamento elevado do módulo
 Esconder módulo dev9
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
+Iniciar
 Modificar
 Abortar
 Resetar
@@ -127,7 +131,7 @@ Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 Arquivo VMC precisa ser criado!
-Erro com arquivo VMC, continuar com MC físico?
+Erro com o ficheiro VMC, continuar com MC físico?
 Atualização automática
 Créditos
 Desenvolvedores
@@ -141,9 +145,9 @@ Cor do diálogo
 Cor selecionada
 Mostrar Página de Informação 
 Info
-ELF customizado
+ELF personalizado
 Seleção de Cor
-Reconectar
+Voltar A Lig.
 Deixar vazio para listar partilhas
 Prefixo de caminho ETH
 Retroceder
@@ -178,8 +182,8 @@ Ajuste horizontal
 Definir compensação horizontal
 Ajuste vertical
 Definir compensação vertical
-Pular FMV
-Pular vídeos
+Saltar FMV
+Saltar vídeos
 Mostrar PS2RD Cheat Engine no Menu Principal
 Opções de Cheat
 Ativar PS2RD Cheat Engine
@@ -190,3 +194,14 @@ Auto-Selecionar cheats
 Selecionar cheats do jogo
 Erro: falha ao abrir o ficheiro de Cheat
 Nenhum Cheat encontrado
+Pré-definições de download
+Atualização por Internet
+Voltar a descarregar dados existentes?
+Atualizaçao falhou.
+Falha a ligar ao servidor de atualização.
+Atualização completa.
+Atualização cancelada.
+Descarregar definições da Internet?
+Definições personalizadas
+Pré-definições de download
+Início automático em %i s...

@@ -1,14 +1,14 @@
-# German Translation by Yorda; extra lines added by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# German Translation by ps2guy / supervised by Jay-Jay
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 German
 Open PS2 Loader %s
 Änderungen speichern
 Zurück
-Netzwerk Konfiguration
-Advanced options
-<keine Werte>
+Netzwerkkonfiguration
+Fortgeschrittene Optionen
+<keine werte>
 Einstellungen gespeichert...
 Fehler beim Schreiben der Einstellungen!
 Verlassen
@@ -20,135 +20,139 @@ ETH-Spiele
 Anwendungen
 Design
 Sprache
-The system will be powered off.
-Exit OPL?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
+Das System wird ausgeschaltet.
+OPL verlassen?
+Aktualisierung abbrechen?
+%d: Festplatte wurde nicht gefunden
+%d: Festplatte ist nicht formatiert
 %d: Fehler beim Starten des Netzwerks
-%d: No network adaptor detected
-%d: Kann nicht mit SMB Server verbunden werden
-%d: Kann sich nicht beim SMB Server anmelden
+%d: Netzwerkadapter nicht gefunden
+%d: Keine Verbindung mit dem SMB Server möglich
+%d: Keine Anmeldung am SMB Server möglich
 %d: SMB Freigabe kann nicht geöffnet werden
-%d: Cannot list SMB shares
-%d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
+%d: SMB Freigaben können nicht aufgelistet werden
+%d: Spiele können nicht aufgelistet werden
+%d: DHCP Server nicht erreichbar
+%d: Keine Netzwerkverbindung
 Ein
 Aus
 OK
-Select
-Cancel
-Circle
-Cross
-Games List
-Einstell.
+Auswählen
+Abbrechen
+Kreis
+Kreuz
+Spieleliste
+Spieleinstellungen
 Entferne alle Einstellungen
 Entferne alle keys für das Spiel
 Scrollen
 Langsam
 Mittel
 Schnell
-Standard Einstellungen
+Standardmenü
 Lade von Disk
 Bitte warten
-Fehler beim laden der Spiel-ID
+Fehler beim Laden der Spiel-ID
 Automatische Sortierung
-Fehler beim laden der Sprach-Datei
-Deaktiviere Debug-Farben
-Kein Controller erkannt, warte...
+Fehler beim Laden der Sprachdatei
+Deaktiviere Debugfarben
+Kein Controller erkannt, warten...
 Aktiviere Cover Bilder
 Breitbild
 Ausschalten
 Lade Konfiguration
 Speichere Konfiguration
 Gerät starten
-Refresh
+Aktualisieren
 USB-Gerät Start Modus
 HDD-Gerät Start Modus
 ETH-Gerät Start Modus
 Anwendung Start Modus
 Automatisch
 Manuell
-Start HDL Server
-HDL Server Starting...
-HDL Server Running...
-Failed to start HDL Server.
-HDL Server Unloading...
-Verlassen nach
-Hintergrund-Farbe
-Text-Farbe
-IP address type
-Static
+Starte HDL Server
+HDL Server startet...
+HDL Server läuft...
+Fehler beim Starten des HDL-Server.
+HDL Server entlädt...
+IGR-Pfad
+Hintergrundfarbe
+Textfarbe
+IP-Adresstyp
+Statisch
 DHCP
-IP address
-Address
+IP-Adresse
+Adresse
 Netzmaske
 Gateway
 DNS Server
 Port
-Freigabe
+Freigeben
 Benutzername
 Passwort
 <nicht eingestellt>
-Address type
+Adresstyp
 IP
 NetBIOS
 Annehmen
-Objekt wird permanent gelöscht, weiterfahren?
+Objekt wird dauerhaft gelöscht, wirklich fortfahren?
 Umbenennen
 Löschen
 Ausführen
-Bildschirm Einstellungen
-Aktiviere Löschen- und Umbenennen-Aktionen
+Bildschirmeinstellungen
+Aktiviere Lösch- und Umbenenn -aktionen
+Überprüfe USB Spielefragmentierung
 Erinnere an zuletzt gespieltes Spiel
-Zeige GSM im Hauptmenü an
+Auswählen button
+Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
 Test
 Leer lassen für Anmeldung als GAST
-Lade alternativen Kern
-Alternative Datenlese-Methode
-Systemaufrufe abhängen
+Accurate reads
+Alternative Datenauslesemethode
+Systemaufrufe aushängen
 0 PSS Modus
-Emulate DVD-DL
+Emuliere DVD-DL
 Deaktiviere IGR
-High module storage
+Speichermodul
 Verstecke dev9 Modul
-Die Änderung der Grösse wird die VMC erneut formatieren
+Die Änderung der Größe wird die VMC erneut formatieren.
 Erstellen
+Starten
 Modifizieren
-Abrechen
-Neustarten
-Nutze gewöhnlich
+Abbrechen
+Neu starten
+Nutze allgemeinen
 Konfiguriere VMC
 Name
-Grösse
+Größe
 Status
 Fortschritt
-VMC Datei besteht
-Ungültige VMC Datei, Grösse ist falsch
-VMC file need to be created
-Fehler mit VMC %s, fahre fort mit physischer MC (Stecklatz %d) ?
+VMC Datei existiert
+Ungültige VMC Datei, Größe ist nicht korrekt
+VMC-Datei muss erstellt werden
+Fehler mit VMC %s, fahre fort mit phys. MC (Steckplatz %d)?
 Automatisch aktualisieren
 Über
 Programmierer
-Quality Assurance
+Qualitätssicherung
 USB Präfix Pfad
-Leer lassen um zum Browser zurückzukehren
+Leer lassen, um zum Browser zurückzukehren
 Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
 Automatische Abschaltung der Festplatte
-Video Modus
-Dialog Farbe
+Videomodus
+Dialogfarbe
 Ausgewählte Farbe
-Info Seite anzeigen
+Infoseite anzeigen
 Info
 Benutzerdefinierte ELF
 Farbauswahl
 Verbindung wiederherstellen
 Leerlassen um Freigaben aufzulisten
 ETH Präfix Pfad
-Backspace
-Space
-Enter
+Rücktaste
+Leertaste
+Eingabe
 Modus
 VMC Steckplatz 1
 VMC Steckplatz 2
@@ -163,30 +167,41 @@ Modus 5
 Modus 6
 Modus 7
 Modus 8
-Configure GSM
-Ethernet-Geschwindigkeit und duplex Einstellungen
+GSM konfigurieren
+Ethernet-Geschwindigkeitsmodus
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
 GSM Einstellungen
 Aktiviere GSM
-Toggles GSM ON or OFF
+Schalte GSM AN oder AUS
 VMODE
-Forced Custom Display Mode
+Erzwungener benutzerdefinierter Bildschirmmodus
 H-POS
-Horizontal Adjustment
+Horizontale Einstellung
 V-POS
-Vertical Adjustment
-FMV Skip
-Skips Full Motion Videos
-Show PS2RD Cheat Engine on Main Menu
-Cheat Settings
-Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
-PS2RD Cheat Engine Mode
-Auto-select or Select game cheats
-Auto-select cheats
-Select game cheats
-Error: failed to load Cheat File
-No cheats found
+Vertikale Einstellung
+Videosequenzen (FMV) überspringen
+Überspringe Full Motion Videos
+Zeige PS2RD Cheat Engine im Hauptmenü
+Cheat Einstellungen
+Aktiviere PS2RD Cheat Engine
+PS2RD Cheat Engine deine Spiele patchen lassen
+PS2RD Cheat Engine Modus
+Automatisch auswählen lassen oder Spielecheats auswählen
+Automatisch Cheats auswählen
+Wähle Spielecheats
+Fehler: Laden des Cheat-File fehlgeschlagen
+Keine Cheats gefunden
+Standardeinstellungen herunterladen
+Netzwerkaktualisierung
+Erneutes runterladen von bereits existierenden Aufzeichnungen?
+Aktualisierung fehlgeschlagen.
+Verbindung zum Updateserver fehlgeschlagen.
+Aktualisierung abgeschlossen.
+Aktualisierung abgebrochen.
+Einstellungen übers Netzwerk laden?
+Benutzerdefinierte Einstellungen
+Standardeinstellungen heruntergeladen
+Automatischer Start in %i s...

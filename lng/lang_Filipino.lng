@@ -1,6 +1,6 @@
 # translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>; extra lines added by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Filipino
 Open PS2 Loader %s
@@ -22,6 +22,7 @@ tema
 wika
 The system will be powered off.
 Exit OPL?
+Cancel updating?
 %d: HardDisk Drive not detected
 %d: HardDisk Drive not formatted
 %d: Network startup error 
@@ -63,8 +64,8 @@ Nilo-load ang config
 Sine-save ang config
 Simulan ang aparato
 Refresh
-USB device simula mode
-HDD device simula mode
+USB aparato simula mode
+HDD aparato simula mode
 ETH aparato simula mode
 Mga application na simulan ang mode
 auto
@@ -100,8 +101,10 @@ Alisin
 Tumakbo
 Ipakita ang mga setting
 Enable Delete and Rename actions
+Check USB game fragmentation
 Tandaan ang huling play ng laro
-Ipakita ang GSM sa Main Menu
+Select button
+Error, the game is fragmented
 Error, hindi maaaring tumakbo ang item
 pagsubok
 Iwanang walang laman para sa Guest auth .
@@ -115,6 +118,7 @@ High module storage
 Hide dev9 module
 Ang pagbabago ng laki ay i-reformat ang VMC
 Lumikha
+Start
 Baguhin
 May pagpapalaglag
 I-reset ang
@@ -127,14 +131,14 @@ pag-unlad
 VMC file umiiral
 Di-wastong VMC file , laki ay hindi tama
 VMC file na kailangan upang malikha
-Error sa VMC %s , magpatuloy sa pisikal na MC ( slot %d) ?
+Error sa VMC %s , magpatuloy sa pisikal na MC (slot %d) ?
 Awtomatikong i-refresh
 tungkol sa
 Coders
 Quality Assurance
 USB prefix landas
 Iwanang walang laman upang lumabas sa Browser
-Halaga sa (mga) minuto , 0 upang huwag paganahin iikot pababa
+Halaga sa (mga) minuto, 0 upang huwag paganahin iikot pababa
 Awtomatikong HDD paikutin pababa
 Video mode
 dialog ng kulay
@@ -190,3 +194,14 @@ Auto-select cheats
 Select game cheats
 Error: failed to load Cheat File
 No cheats found
+Download defaults
+Network update
+Re-download existing records?
+Update failed.
+Failed to connect to update server.
+Update completed.
+Update cancelled.
+Download settings from the network?
+Customized Settings
+Downloaded Defaults
+Auto start in %i s...

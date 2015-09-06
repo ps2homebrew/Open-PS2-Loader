@@ -1,6 +1,6 @@
 # Translated by jimmysmith / supervised by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Czech
 Open PS2 Loader %s
@@ -22,6 +22,7 @@ Skin
 Jazyk
 Systém bude vypnut.
 Ukončit OPL?
+Zrušit update?
 %d: Harddisk nebyl detekován
 %d: Harddisk není naformátován
 %d: Chyba při inicializaci sítě
@@ -100,8 +101,10 @@ Smazat
 Spustit
 Nastavení obrazovky
 Povolit operace smazání a přejmenování
+Zkontroluj fragmentaci na USB se hrou
 Pamatovat posledně hranou hru
 Tlačítko Select
+Chyba, hra je fragmentovaná
 Chyba, nemůžu spustit hru
 Test
 Nechte prázdné pro přihlášení GUEST účtu
@@ -115,6 +118,7 @@ Vyšší adresa modulu
 Skrýt modul dev9
 Změna velikosti přeformátuje VMC
 Vytvořit
+Start
 Změnit
 Zrušit
 Reset
@@ -190,3 +194,14 @@ Automaticky hledat a použít cheaty ke hře
 Vybrat cheaty pro hru
 Chyba: nepodařilo se nahrát soubor s cheaty
 Nenalezeny žádné cheaty
+Stáhnout původní verze konfigů
+Síťový update
+Stáhnout znovu již existující záznamy?
+Update selhal.
+Připojení k update serveru se nezdařilo.
+Update kompletní.
+Update zrušen.
+Stáhnout nastavení ze sítě?
+Vlastní nastavení
+Stažené původní verze konfigů
+Automatický start v %i s...

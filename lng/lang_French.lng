@@ -1,10 +1,10 @@
-# Translation by ShaolinAssassin with  AlGollan84's help / supervised by Jay-Jay
-# Last update: 08/02/2015 
-# Updated for OPL_813_DB 
+# Translation by ShaolinAssassin with AlGollan84's help / supervised by Jay-Jay
+# Last update: 09/05/2015 
+# Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
-Français
+French
 Open PS2 Loader %s
-Sauvegarder la configuration
+Sauvegarder
 Retour
 Configuration du réseau
 Réglages avancés
@@ -20,8 +20,9 @@ Jeux sur réseau
 Applications
 Thème
 Langue
-Le système va être êteint
+Le système va être éteint
 Voulez-vous quitter OPL?
+Voulez-vous annuler la mise à jour ?
 %d : erreur, disque dur non détecté
 %d : erreur, disque dur non formaté
 %d : erreur au démarrage du réseau
@@ -100,10 +101,12 @@ Suppr.
 Lancer
 Configuration de l'affichage
 Options supprimer/renommer
+Check USB game fragmentation
 Dernier jeu joué en surbrillance
 Touche de validation
+Error, the game is fragmented
 Impossible d'exécuter l'item
-Tester le jeu avec les nouveaux réglages
+Tester les réglages
 Laisser le champ vide pour s'identifier en tant qu'invité
 Simuler la vitesse de lecture du CD/DVD (uniquement pour HDD)
 Lecture synchrone des données
@@ -115,6 +118,7 @@ Charger le module de stockage d'OPL à une adresse plus élevée
 Renommer le module dev9 en cdvdman
 Changer la taille de la carte mémoire virtuelle la formatera
 Créer
+Démarrer
 Modifier
 Abandonner
 Réinitialiser
@@ -190,3 +194,14 @@ Automatique
 Manuel (inactif, fonction à venir)
 Echec du chargement du fichier .cht
 Aucun fichier .cht détecté
+Télécharger les réglages
+Mise à jour des réglages des jeux
+Mise à jour des données existantes
+Echec de la mise à jour
+Impossible de se connecter au serveur
+Mise à jour effectuée avec succès
+Mise à jour annulée
+Voulez-vous télécharger les réglages depuis Internet ?
+Réglages personnalisés
+Réglages téléchargés
+Auto start in %i s...

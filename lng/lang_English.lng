@@ -2,17 +2,17 @@
 # This file is a template for translators. This file's encoding must be UTF8.                     #
 #                                                                                                 #
 # Translate every line, keeping the same order. Don't add empty lines.                            #
-# Any missing lines will be substituted with the english defaults from lang.c.                    #
+# Any missing lines will be substituted with the English defaults from lang.c.                    #
 #                                                                                                 #
 # Important: if your language require some custom glyphs, you should provide a corresponding      #
-# TTF font file too. By default, OPL only comes with the "basic latin" font built-in.             #
+# TTF font file too. By default, OPL only comes with the "basic Latin" font built-in.             #
 #                                                                                                 #
 # Once the translation is complete, you can submit it to the development team.                    #
 #                                                                                                 #
 # To use your custom language with OPL, simply copy your file into your mc?:/OPL folder.          #
 # (File must start with the "lang_" prefix and have the ".lng" extension)                         #
 #                                                                                                 #
-# Finaly, don't put too many comments in your file, it will waste space and increases loading     #
+# Finally, don't put too many comments in your file, it will waste space and increases loading     #
 # time. One single comment line on top (e.g. "name <yourmail@address.com>") should be enough.     #
 #                                                                                                 #
 # Thanks for your work.                                                                           #

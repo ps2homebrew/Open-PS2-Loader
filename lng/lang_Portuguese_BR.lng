@@ -1,8 +1,8 @@
 # translation by Colossus / supervised by Jay-Jay 
-# Last update: 09/05/2015 
+# Last update: 09/14/2015 
 # Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
-Brazilian Portuguese
+Portuguese Brazil
 Open PS2 Loader %s
 Salvar configurações
 Voltar
@@ -100,11 +100,11 @@ Renomear
 Apagar
 Iniciar
 Configurações de Tela
-Ativar função Apagar/Renomear
-Check USB game fragmentation
+Ativar função Apagar e Renomear
+Checar fragmentação USB
 Lembrar último jogo jogado
 Botão de Seleção
-Error, the game is fragmented
+Erro, O jogo está fragmentado
 Erro, não foi possível iniciar o item
 Testar
 Deixar vazio para autorização como convidado (GUEST)
@@ -131,14 +131,14 @@ Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 Arquivo VMC precisa ser criado!
-Erro com arquivo VMC, continuar com Memory Card físico?
+Erro com VMC %s, continuar com MC físico (slot %d) ?
 Atualização automática
 Sobre
 Desenvolvedores
 Controle de qualidade
 Prefixo de caminho USB
-Deixar vazio sai p/ o Navegador
-Valor em minuto(s), 0 p/ desativar
+Deixar vazio sai para o Navegador
+Valor em minuto(s), 0 para desativar
 Desligamento automático do HDD
 Modo de vídeo
 Cor do diálogo
@@ -204,4 +204,4 @@ Atualização cancelada.
 Baixar configurações da Internet?
 Configurações personalizadas
 Configurações baixadas
-Auto start in %i s...
+Auto começar em %i s...

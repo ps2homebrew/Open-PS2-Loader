@@ -1,5 +1,5 @@
 # Translation by ShaolinAssassin with AlGollan84's help / supervised by Jay-Jay
-# Last update: 09/05/2015 
+# Last update: 09/07/2015 
 # Updated for OPL_r825_DB [578b754]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 French
@@ -14,14 +14,14 @@ Erreur en écriture de la configuration
 Quitter Open PS2 Loader
 Configuration
 Menu
-Jeux sur périph. USB
-Jeux sur disque dur
-Jeux sur réseau
+Périphérique USB
+Disque dur interne
+Serveur SMB
 Applications
 Thème
 Langue
 Le système va être éteint
-Voulez-vous quitter OPL?
+Voulez-vous quitter OPL ?
 Voulez-vous annuler la mise à jour ?
 %d : erreur, disque dur non détecté
 %d : erreur, disque dur non formaté
@@ -45,19 +45,19 @@ Liste des jeux
 Réglages
 Supprimer tous les réglages
 Réglages du jeu supprimés
-Vitesse du curseur de sélection
-Lente
-Moyenne
+Défilement
+Lent
+Moyen
 Rapide
 Menu par défaut
 Charger depuis le disque
 Veuillez patienter
 Erreur lors du chargement de l'ID du jeu
-Tri alphabétique 
+Tri alphabétique
 Erreur lors du chargement du fichier de langue
 Passer l'écran de debug
 Veuillez connecter une manette PS2 Dualshock…
-Jaquettes et images 
+Jaquettes et images
 Plein écran
 Eteindre le système
 Chargement...
@@ -66,16 +66,16 @@ Démarrer le périphérique
 Actualiser
 Mode de démarrage du périph. USB
 Mode de démarrage du disque dur
-Mode de démarrage du réseau
-Mode de démarrage des applications
+Mode de démarrage du serveur SMB
+Affichage de la page des applications
 Automatique
 Manuel
 Démarrer le serveur HDL
 Serveur HDL en cours de démarrage...
-Serveur HDL en cours d'exécution 
+Serveur HDL en cours d'exécution
 Erreur de démarrage du serveur HDL
 Fermeture du serveur HDL...
-Sortie via IGR
+Sortie via IGR vers :
 Couleur d'arrière-plan
 Couleur du texte
 Type d'adresse IP
@@ -101,15 +101,15 @@ Suppr.
 Lancer
 Configuration de l'affichage
 Options supprimer/renommer
-Check USB game fragmentation
-Dernier jeu joué en surbrillance
+Vérifier si le jeu est fragmenté (USB)
+Lancement auto. du dernier jeu joué
 Touche de validation
-Error, the game is fragmented
+Le jeu est fragmenté, impossible de continuer
 Impossible d'exécuter l'item
 Tester les réglages
 Laisser le champ vide pour s'identifier en tant qu'invité
-Simuler la vitesse de lecture du CD/DVD (uniquement pour HDD)
-Lecture synchrone des données
+Simuler la vitesse de lecture du CD/DVD
+Méthode de lecture alternative des données
 Purger OPL de la mémoire après lancement du jeu
 Passer les vidéos au format PSS
 Emuler le support double-couche pour les jeux rippés en DVD5
@@ -145,7 +145,7 @@ Couleur des options
 Couleur de sélection
 Page d'informations
 Infos
-Chemin du nvel ELF de lancement (pr iso mod)
+ELF alternatif
 Sélection des couleurs
 Reconnecter
 Laisser le champ <non renseigné> pour lister les dossiers partagés
@@ -157,7 +157,7 @@ Maj/min
 Carte mém. virtuelle (VMC) 1
 Carte mém. virtuelle (VMC) 2
 ID du jeu
-Mode DMA 
+Mode DMA
 Synchronisation verticale
 Mode 1
 Mode 2
@@ -204,4 +204,4 @@ Mise à jour annulée
 Voulez-vous télécharger les réglages depuis Internet ?
 Réglages personnalisés
 Réglages téléchargés
-Auto start in %i s...
+Lancement automatique dans %i s …

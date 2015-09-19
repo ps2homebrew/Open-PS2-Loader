@@ -1,164 +1,161 @@
-# translation by darkgarba, El Patas, and Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by El_Patas - Email: El_Patas69@hotmail.com
 Spanish
 Open PS2 Loader %s
 Guardar cambios
-Volver
-Configuracion de red
-Opciones Avanzadas
-<sin valores>
-Configuracion guardada...
-Error escribiendo configuracion!
+Atrás
+Ajustes conexión de red
+Opciones avanzadas
+<Sin configurar>
+Configuración guardada.
+¡Error al guardar la configuración!
 Salir
-Configuracion
+Configuración
 Menú
-Juegos USB
-Juegos HDD
-Juegos ETH
+Juegos por USB
+Juegos por Disco duro
+Juegos por Red
 Aplicaciones
-Tema
+Estilo
 Idioma
-El sistema se apagará.
-Salir OPL?
-Cancelar la actualización?
-%d: Disco Duro no detectado
-%d: Disco Duro no formateado
-%d: Error iniciacion de red
-%d: Sin adaptador de red detectado
-%d: No se puede conectar a servidor SMB
-%d: No se puede loguear en servidor SMB
-%d: No se puede abrir carpeta SMB
-%d: No se puede listar carpeta SMB 
-%d: No se puede listar los juegos
-%d: DHCP servidor no disponible
-%d: No hay conexión a la red
-Sí
-No
-OK
-Elegir
+Se apagará el sistema.
+¿Salir del OPL?
+¿Cancelar actualización?
+%d: Disco duro no detectado
+%d: Disco duro no formateado
+%d: Error al iniciar red
+%d: No se ha detectado adaptador de red
+%d: No se puede conectar al servidor SMB
+%d: No se puede iniciar sesión en el servidor SMB
+%d: No se puede abrir la unidad compartida de SMB
+%d: No se puede listar la unidad compartida de SMB
+%d: No se pueden listar los juegos
+%d: Servidor DHCP no disponible
+%d: No hay conexión de red
+Activado
+Desactivado
+Aceptar
+Aceptar
 Cancelar
 Círculo
-Cruz
-Lista de Juegos
-Opciones
-Quitar configuracion
-Quitar todos los botones para el juego
-Movimiento
+Equis
+Lista de juegos
+Ajustes juego
+Borrar todos los ajustes
+Ajustes del juego borrados
+Desplazamiento
 Lento
-Normal
-Rapido
-Menu por defecto
-Cargar de disco
-Por favor espere
-Error cargando ID del juego
-Ordenar automaticamente
-Error cargando archivo de idioma
-Deshabilitar colores debug
-No se detecto controlador, esperando...
-Habilitar Caratulas
-Pantalla Panoramica
-Apagar
-Cargando configuracion
-Guardando configuracion
-Inicializar dispositivo
-Actualizar
-Modo inicio dispositivo USB
-Modo inicio dispositivo HDD
-Modo inicio dispositivo ETH
-Modo inicio de aplicaciones
-Automatico
+Medio
+Rápido
+Menú por defecto
+Cargar del disco
+Espera por favor
+Error al cargar el código ID del juego
+Listas ordenadas por alfabeto
+Error al cargar el archivo de idioma
+No mostrar los colores para depuración
+Mando no encontrado, esperando...
+Carátulas, serigrafías y fondos
+Pantalla panorámica
+Apagar PS2
+Cargando configuración...
+Guardando configuración...
+Iniciar dispositivo
+Refrescar
+Modo de inicio para USB
+Modo de inicio para Disco duro
+Modo de inicio para Red
+Modo de inicio para Aplicaciones
+Automático
 Manual
-Inicializar Servidor HDL
-Inicializando Servidor HDL ...
-Servicor HDL Iniciado...
-Error al iniciar el servidor HDL.
-HDL Servidor Descargando...
-Ruta IGR
-Color de fondo
+Iniciar servidor HDLDump
+Iniciando servidor HDLDump...
+Servidor HDLDump conectado...
+Error al iniciar el servidor HDLDump. 
+Cerrando servidor HDLDump...
+Ruta del IGR
+Color de fondo 
 Color de texto
 Tipo de dirección IP
-Estático
+Estática
 DHCP
 Dirección IP
 Dirección
-Mascara de red
-Gateway
+Máscara de subred
+Puerta de enlace predeterminada
 Servidor DNS
 Puerto
-Carpeta compartida
-Usuario
+Unidad o carpeta compartida
+Cuenta de usuario compartida
 Contraseña
-<ninguna>
+<Sin definir>
 Tipo de dirección
 IP
 NetBIOS
 Aceptar
-El objeto sera eliminado, continuar ?
+El archivo se borrará definitivamente, ¿continuar?
 Renombrar
 Borrar
 Iniciar
-Opciones de pantalla
-Activar borrado y renombrado
-Compruebe la fragmentación de juego USB
-Recordar ultimo juego cargado
-Seleccione el Botón
+Preferencias de pantalla
+Mostrar operaciones Borrar y Renombrar
+Comprobar fragmentación juego USB
+Recordar último juego en uso
+Botón de selección
 Error, el juego está fragmentado
-Error, no se pudo inicializar
-Prueba
-Dejalo vacio para iniciar como invitado
-Lee precisa
-Lectura de datos alternativa
-Deshabilitar llamadas de sistema
-Modo 0 PSS
+Error, no se pudo iniciar el archivo
+Test
+Dejar en blanco para autentificar como GUEST
+Lectura precisa
+Método de lectura de datos alternativo
+Eliminar llamadas del sistema
+Omitir vídeos PSS
 Emular DVD-DL
-Deshabilitar IGR
-Almacenamiento de alta módulo
-Esconder módulo dev9
-Si cambias el tamaño se formateara VMC
+Sin soporte IGR
+Módulo almacenamiento alta dirección de memoria
+Ocultar módulo dev9
+Cambiar el tamaño formateará la VMC
 Crear
-Empezar
+Iniciar
 Modificar
-Cancelar
-Resetear
-Usar generica
+Abortar
+Reiniciar
+Usar genérica
 Configurar VMC
 Nombre
-Medida
+Tamaño
 Estado
 Progreso
-Archivo VMC existe
-Archivo VMC invalido, la medida es incorrecta
-El archivo VMC necesita ser creado
-Error con VMC %s, continuar con la MC(slot %d) ?
-Recargar automaticamente
-Creditos
-Programadores
-Garantía de Calidad
-Prefijo ruta USB
-Dejalo vacio para salir al explorador
-Valor en minuto(s), 0 para deshabilitar detencion
-Detencion automatica de HD
-Modo video
-Color dialogo
-Color seleccionado
-Enseñar pantalla informacion
-Info
-ELF customizado
-Seleccion de color
-Reconectar
-Dejalo vacio para listar carpetas compartidas
-Prefijo ruta ETH
-Borrar
+Archivo VMC creado
+Archivo VMC inválido, el tamaño es incorrecto
+El archivo VMC debe ser creado
+Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
+Refresco automático de las listas
+Acerca del OPL
+Desarrolladores
+Testeadores
+Ruta predeterminada dispositivo USB
+Dejar en blanco para salida hacia el menú de PS2
+Valor en minutos, 0 para desactivar el paro automático
+Paro automático rotación del Disco duro
+Modo de vídeo interfaz OPL
+Color de diálogos
+Color de selección
+Mostrar pantalla de información
+Info.
+Archivo ELF personalizado
+Seleccionar color
+Reconexión
+Dejar en blanco para mostrar todas las unidades o carpetas compartidas
+Ruta predeterminada conexión de red
+Retroceso
 Espacio
-Entrar
+Intro
 Modo
-VMC Slot 1
-VMC Slot 2
-ID Juego
+Ranura VMC 1
+Ranura VMC 2
+ID del juego
 Modo DMA
-Sincronizacion Video
+Sincronización vertical
 Modo 1
 Modo 2
 Modo 3
@@ -168,40 +165,40 @@ Modo 6
 Modo 7
 Modo 8
 Configuración GSM
-Modo de enlace Ethernet
+Configuración de velocidad ethernet y duplex
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
 Opciones GSM
 Activar GSM
-Activar o desactivar GSM
-VMODO
-Modo de visualización personalizado forzado.
-H-POS
-Ajuste Horizontal
-V-POS
-Ajuste Vertical
-Saltar FMV
-Salta las Escenas FMV
-Mostrar PS2RD Cheat Engine en el menú principal
-Ajustes Cheat
-Activar PS2RD Cheat Engine
-Deja parchar PS2RD Cheat Engine los juegos
-PS2RD Cheat Engine Modo
-De selección automática o seleccionar Cheats del juego
-Selección automática cheats
-Seleccionar juego cheats
-Error: no se pudo cargar Cheat Archivo
-No hay Cheats encontrados
-Descargar predeterminados
-Actualización de la red
-Re-descargar registros existentes?
-Error de actualización.
-Error al conectarse para actualizar el servidor.
-Actualización completada.
+Forzar modo de vídeo seleccionado con GSM
+Modo de vídeo seleccionado
+Modo de vídeo a forzar
+Ajuste horizontal
+Configura la posición horizontal de la pantalla
+Ajuste vertical
+Configura la posición vertical de la pantalla
+Omitir vídeos FMV
+Omite escenas Full Motion Vídeos
+Mostrar PS2RD en el menú principal
+Configuración PS2RD
+Activar PS2RD
+Permitir que PS2RD parchee los juegos
+Modo PS2RD
+Auto-seleccionar o Seleccionar códigos de juegos
+Auto-seleccionar códigos
+Seleccionar códigos de juegos
+Error: fallo al cargar el archivo de códigos
+No se han encontrado códigos
+Descargar ajustes predeterminados
+Actualización ajustes juegos a través de red
+¿Cargar de nuevo los ajustes existentes?
+Actualización fallida.
+Error al conectarse con el servidor de actualización.
+Actualización completa.
 Actualización cancelada.
-Descargue ajustes de la red?
-Ajustes personalizados
-Predeterminados descargados
+¿Descargar ajustes desde la red?
+Configuraciones personalizadas
+Descargados ajustes predeterminados
 Inicio automático en %i s...

@@ -8,6 +8,9 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev827 - update language files and also fonts - Thu Sep 17 01:21:16 2015 -0700
+rev826 - update language files - Sat Sep 05 22:05:46 2015 -0700
+rev825 - Now Last Played Game feature starts the chosen game automatically within a few seconds - unless the user presses any valid key. -  Thu Sep 03 02:54:19 2015 -0400
 rev824 - Rollback: removed FAT driver from in-game. New universal system added to support non-standard sector sizes. - Sun Aug 30 02:46:25 2015 +0800
 rev823 - Added support for downloading compatibility entries through the Internet from the OPL-CL service. - Fri Aug 21 18:52:47 2015 +0800
 rev822 - Removed locking semaphore for game list, GUI OPs will now be cleared before the menu is cleared prior to game list updating (so that old commands will not be executed) and added checks for file-open problems under USB support. - Sat Aug 15 18:03:17 2015 +0800

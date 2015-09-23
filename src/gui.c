@@ -1475,7 +1475,7 @@ static void guiDrawOverlays() {
 #endif
 
 	// Auto Start Counter
-	if ( (wfadeout <= 0) && (as_start == 0) )
+	if (( !pending) && (wfadeout <= 0) && (as_start == 0) )
 		as_start = clock() / CLOCKS_PER_SEC;
 	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
 		as_current = clock() / CLOCKS_PER_SEC;

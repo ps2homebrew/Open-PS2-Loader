@@ -670,7 +670,7 @@ void menuHandleInputMain() {
 	if(ValidKeyPressed == 1)
 		as_counter_disable = 1;
 	if (as_counter_disable == 0) {
-		if ( (gRememberLastPlayed) && (as_counter < 0) ) {
+		if ( (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter < 0) ) {
 			gRememberLastPlayed = 0;
 			if(gSelectButton == KEY_CIRCLE)
 				selected_item->item->execCircle(selected_item->item);

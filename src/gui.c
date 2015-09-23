@@ -343,6 +343,16 @@ static void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_se
 	}
 }
 
+static int guiUpdater(int modified) {
+	int showAutoStartLast;
+	
+	if (modified) {
+		diaGetInt(diaConfig, CFG_LASTPLAYED , &showAutoStartLast);
+		diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, showAutoStartLast);
+	}
+	return 0;
+}
+
 void guiShowConfig() {
 	int value;
 
@@ -366,6 +376,9 @@ void guiShowConfig() {
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
 	diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
+	diaSetInt(diaConfig, CFG_AUTOSTARTLAST, gAutoStartLastPlayed);
+	diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, gRememberLastPlayed);
+
 #ifdef CHEAT
 	diaSetInt(diaConfig, CFG_SHOWCHEAT, gShowCheat);
 #endif
@@ -376,7 +389,7 @@ void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
 	diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
-	int ret = diaExecuteDialog(diaConfig, -1, 1, NULL);
+	int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
 	if (ret) {
 		diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
@@ -386,6 +399,7 @@ void guiShowConfig() {
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
+		diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
 #ifdef CHEAT
 		diaGetInt(diaConfig, CFG_SHOWCHEAT, &gShowCheat);
 #endif
@@ -1143,7 +1157,7 @@ static void guiHandleOp(struct gui_update_t* item) {
 				item->menu.menu->submenu = result;
 				item->menu.menu->current = result;
 				item->menu.menu->pagestart = result;
-			} else if (item->submenu.selected) { // remember last game feat.
+			} else if (item->submenu.selected) { // remember last played game feature
 				item->menu.menu->current = result;
 				item->menu.menu->pagestart = result;
 				item->menu.menu->remindLast = 1;
@@ -1463,7 +1477,7 @@ static void guiDrawOverlays() {
 	// Auto Start Counter
 	if ( (wfadeout <= 0) && (as_start == 0) )
 		as_start = clock() / CLOCKS_PER_SEC;
-	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
+	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
 		as_current = clock() / CLOCKS_PER_SEC;
 		as_counter = 9 - (as_current - as_start);
 		snprintf(asc, sizeof(asc), _l(_STR_AUTO_START_IN_N_SECS), as_counter);

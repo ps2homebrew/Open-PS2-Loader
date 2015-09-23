@@ -171,7 +171,8 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_AUTOSTARTLAST}}}, {UI_SPACER}, {UI_BOOL, CFG_AUTOSTARTLAST, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_SELECTBUTTON}}}, {UI_SPACER}, {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 #ifdef CHEAT
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWCHEAT}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWCHEAT, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},

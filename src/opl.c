@@ -35,6 +35,7 @@
 #define LOG_ENABLE()		do { } while(0)
 #else
 #ifdef __DEBUG
+#include "include/debug.h"
 #define LOG_INIT()		do { } while(0)
 #define LOG_ENABLE()		ioPutRequest(IO_CUSTOM_SIMPLEACTION, &debugSetActive)
 #else
@@ -351,8 +352,10 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 			gup->submenu.text_id = -1;
 			gup->submenu.selected = 0;
 
-			if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0)
+			if (gRememberLastPlayed && gAutoStartLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0) {
 				gup->submenu.selected = 1;
+				as_counter_disable = 0;
+			}
 
 			guiDeferUpdate(gup);
 		}
@@ -557,6 +560,7 @@ static void _loadConfig() {
 			configGetStrCopy(configOPL, "usb_prefix", gUSBPrefix, sizeof(gUSBPrefix));
 			configGetStrCopy(configOPL, "eth_prefix", gETHPrefix, sizeof(gETHPrefix));
 			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
+			configGetInt(configOPL, "autostart_last", &gAutoStartLastPlayed);
 #ifdef CHEAT
 			configGetInt(configOPL, "show_cheat", &gShowCheat);
 #endif
@@ -616,6 +620,7 @@ static void _saveConfig() {
 		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
 		configSetStr(configOPL, "eth_prefix", gETHPrefix);
 		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
+		configSetInt(configOPL, "autostart_last", gAutoStartLastPlayed);
 #ifdef CHEAT
 		configSetInt(configOPL, "show_cheat", gShowCheat);
 #endif
@@ -1135,6 +1140,7 @@ static void setDefaults(void) {
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
+	gAutoStartLastPlayed = 0;
 	gSelectButton = KEY_CIRCLE;	//Default to Japan.
 #ifdef CHEAT
 	gShowCheat = 0;
@@ -1178,8 +1184,8 @@ static void setDefaults(void) {
 #endif
 
 	// Auto Start Counter
-	as_counter = 9;
-	as_counter_disable = 0;
+	as_counter = 0;
+	as_counter_disable = 1;
 	as_start = 0;
 	as_current = 0;
 }

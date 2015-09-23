@@ -146,6 +146,11 @@ char gUSBPrefix[32];
 char gETHPrefix[32];
 
 int gRememberLastPlayed;
+// Auto Start Counter
+int gAutoStartLastPlayed;
+int as_counter, as_counter_disable;
+double as_start, as_current;
+char asc[21];
 
 #ifdef CHEAT
 int gShowCheat; // Toggle to reveal "Cheat Settings" on Main Menu
@@ -159,8 +164,3 @@ unsigned char gDefaultUITextColor[3];
 #define MENU_ITEM_HEIGHT 19
 
 #endif
-
-// Auto Start Counter
-int as_counter, as_counter_disable;
-double as_start, as_current;
-char asc[21];

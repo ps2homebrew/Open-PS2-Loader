@@ -1480,7 +1480,7 @@ static void guiDrawOverlays() {
 		as_start = clock() / CLOCKS_PER_SEC;
 	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
 		as_current = clock() / CLOCKS_PER_SEC;
-		as_counter = 9 - (as_current - as_start);
+		as_counter = gAutoStartLastPlayed - (as_current - as_start);
 		snprintf(asc, sizeof(asc), _l(_STR_AUTO_START_IN_N_SECS), as_counter);
 		fntRenderString(gTheme->fonts[0], screenWidth / 2, screenHeight / 2, ALIGN_CENTER, 0, 0, asc, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 	}

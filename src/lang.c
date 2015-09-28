@@ -210,6 +210,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Downloaded Defaults",
 	"Auto start in %i s...",
 	"Auto start",
+	"Value in second(s), 0 to disable auto start",
 };
 
 static int guiLangID = 0;

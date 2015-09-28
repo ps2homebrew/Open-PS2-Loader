@@ -668,7 +668,7 @@ void menuHandleInputMain() {
 
 	// Auto Start Counter
 	if(ValidKeyPressed == 1)
-		as_counter_disable = 1;
+		as_counter_disable = 1;	//Stop Auto Start Last Played counter
 	if (as_counter_disable == 0) {
 		if ( (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter < 0) ) {
 			gRememberLastPlayed = 0;

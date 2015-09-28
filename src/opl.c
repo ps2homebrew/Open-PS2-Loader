@@ -1147,7 +1147,7 @@ static void setDefaults(void) {
 	gDisableDebug = 1;
 	gEnableDandR = 0;
 	gRememberLastPlayed = 0;
-	gAutoStartLastPlayed = 0;
+	gAutoStartLastPlayed = 9;
 	gSelectButton = KEY_CIRCLE;	//Default to Japan.
 #ifdef CHEAT
 	gShowCheat = 0;

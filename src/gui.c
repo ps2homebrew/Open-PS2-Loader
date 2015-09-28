@@ -400,6 +400,7 @@ void guiShowConfig() {
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 		diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
+		as_counter_disable = 1;	//Stop Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
 #ifdef CHEAT
 		diaGetInt(diaConfig, CFG_SHOWCHEAT, &gShowCheat);
 #endif
@@ -1475,7 +1476,7 @@ static void guiDrawOverlays() {
 #endif
 
 	// Auto Start Counter
-	if (( !pending) && (wfadeout <= 0) && (as_start == 0) )
+	if (( !pending) && (wfadeout <= 0) && (as_counter_disable == 0) && (as_start == 0) )
 		as_start = clock() / CLOCKS_PER_SEC;
 	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
 		as_current = clock() / CLOCKS_PER_SEC;

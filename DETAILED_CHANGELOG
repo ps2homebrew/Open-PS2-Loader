@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev830 - Auto-start feature fix - Wait for pending operations to finish - Wed Sep 23 14:00:43 2015 -0400
 rev829 - Added Autostart toggle for Last Played Game feature: When enabled, starts the chosen game automatically within a few seconds - unless the user presses any valid key. - Wed Sep 23 05:16:42 2015 -0400
 rev828 - OPL Spanish translation by El_Patas - Sat Sep 19 06:55:27 2015 -0400
 rev827 - update language files and also fonts - Thu Sep 17 01:21:16 2015 -0700

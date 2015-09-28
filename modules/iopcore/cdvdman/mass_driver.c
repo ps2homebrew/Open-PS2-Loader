@@ -1005,12 +1005,12 @@ int mass_stor_configureDevice(void)
 
 int mass_stor_init(void)
 {
-	iop_sema_t smp;
 	register int ret;
 
 	g_mass_device.devId = -1;
 
 #ifdef VMC_DRIVER
+	iop_sema_t smp;
 	smp.initial = 1;
 	smp.max = 1;
 	smp.option = 0;

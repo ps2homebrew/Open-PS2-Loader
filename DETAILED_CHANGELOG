@@ -8,6 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev833 - Deleted: scripts/out.txt - Tue Sep 29 08:20:27 2015 +0000
+rev832 - Auto Start Last Game - Configureable Countdown : Value in second(s), 0 to disable auto start - Mon Sep 28 10:43:25 2015 -0400
 rev831 - Fixes for VMC (compilation warning) and Auto-start Last Game (bugs and conflicts) - Sun Sep 27 21:09:19 2015 -0400
 rev830 - Auto-start feature fix - Wait for pending operations to finish - Wed Sep 23 14:00:43 2015 -0400
 rev829 - Added Autostart toggle for Last Played Game feature: When enabled, starts the chosen game automatically within a few seconds - unless the user presses any valid key. - Wed Sep 23 05:16:42 2015 -0400

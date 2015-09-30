@@ -39,7 +39,7 @@ Cancelar
 Círculo
 Equis
 Lista de juegos
-Ajustes juego
+Ajustes
 Borrar todos los ajustes
 Ajustes del juego borrados
 Desplazamiento
@@ -55,7 +55,7 @@ Error al cargar el archivo de idioma
 No mostrar los colores para depuración
 Mando no encontrado, esperando...
 Carátulas, serigrafías y fondos
-Pantalla panorámica
+Pantalla panorámica interfaz
 Apagar PS2
 Cargando configuración...
 Guardando configuración...
@@ -137,7 +137,7 @@ Ruta predeterminada dispositivo USB
 Dejar en blanco para salida hacia el menú de PS2
 Valor en minutos, 0 para desactivar el paro automático
 Paro automático rotación del Disco duro
-Modo de vídeo interfaz OPL
+Modo de vídeo interfaz
 Color de diálogos
 Color de selección
 Mostrar pantalla de información
@@ -201,4 +201,6 @@ Actualización cancelada.
 ¿Descargar ajustes desde la red?
 Configuraciones personalizadas
 Descargados ajustes predeterminados
-Inicio automático en %i s...
+Inicio en %i s...
+Inicio automático
+Valor en segundos, 0 para desactivar el inicio automático

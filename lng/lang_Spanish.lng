@@ -1,4 +1,7 @@
-# Translation by El_Patas - Email: El_Patas69@hotmail.com
+# translation by lauchon22 / supervised by Jay-Jay
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
 Open PS2 Loader %s
 Guardar cambios
@@ -31,8 +34,8 @@ Se apagará el sistema.
 %d: No se pueden listar los juegos
 %d: Servidor DHCP no disponible
 %d: No hay conexión de red
-Activado
-Desactivado
+Sí
+No
 Aceptar
 Aceptar
 Cancelar
@@ -75,6 +78,8 @@ Cerrando servidor HDLDump...
 Ruta del IGR
 Color de fondo 
 Color de texto
+- PS2 -
+- SMB Server -
 Tipo de dirección IP
 Estática
 DHCP
@@ -97,7 +102,7 @@ Renombrar
 Borrar
 Iniciar
 Preferencias de pantalla
-Mostrar operaciones Borrar y Renombrar
+Habilitar las operaciones de escritura
 Comprobar fragmentación juego USB
 Recordar último juego en uso
 Botón de selección
@@ -106,7 +111,7 @@ Error, no se pudo iniciar el archivo
 Test
 Dejar en blanco para autentificar como GUEST
 Lectura precisa
-Método de lectura de datos alternativo
+Modo Síncrono
 Eliminar llamadas del sistema
 Omitir vídeos PSS
 Emular DVD-DL
@@ -181,7 +186,6 @@ Ajuste vertical
 Configura la posición vertical de la pantalla
 Omitir vídeos FMV
 Omite escenas Full Motion Vídeos
-Mostrar PS2RD en el menú principal
 Configuración PS2RD
 Activar PS2RD
 Permitir que PS2RD parchee los juegos

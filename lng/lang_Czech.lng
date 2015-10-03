@@ -1,6 +1,6 @@
 # Translated by jimmysmith / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Czech
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ Vypínání HDL Serveru...
 Cesta k IGR
 Barva pozadí
 Barva textu
+- PS2 -
+- SMB Server -
 Typ IP adresy
 Statická
 DHCP
@@ -100,7 +102,7 @@ Přejmen.
 Smazat
 Spustit
 Nastavení obrazovky
-Povolit operace smazání a přejmenování
+Povolit zápisy
 Zkontroluj fragmentaci na USB se hrou
 Pamatovat posledně hranou hru
 Tlačítko Select
@@ -109,7 +111,7 @@ Chyba, nemůžu spustit hru
 Test
 Nechte prázdné pro přihlášení GUEST účtu
 Přesné čtení
-Alternativní metoda čtení dat
+Synchronous Mode
 Unhook Syscalls
 0 PSS mód
 Emulovat DVD-DL
@@ -184,7 +186,6 @@ V-POS
 Vertikální úprava
 Přeskočit FMV
 Přeskočit Full Motion Videa
-Zobrazit PS2RD Cheat Engine v hlavním menu
 Nastavení Cheatů
 Zapnout PS2RD Cheat Engine
 Umožní použití PS2RD Cheat Enginu
@@ -205,3 +206,5 @@ Stáhnout nastavení ze sítě?
 Vlastní nastavení
 Stažené původní verze konfigů
 Automatický start v %i s...
+Auto start
+Hodnota v sekundách, zadej 0 pro vypnutí auto startu

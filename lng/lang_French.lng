@@ -1,6 +1,6 @@
-# Translation by ShaolinAssassin with AlGollan84's help / supervised by Jay-Jay
-# Last update: 09/07/2015 
-# Updated for OPL_r825_DB [578b754]
+# Translation by machiavel and ShaolinAssassin / supervised by Jay-Jay
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 French
 Open PS2 Loader %s
@@ -59,7 +59,7 @@ Passer l'écran de debug
 Veuillez connecter une manette PS2 Dualshock…
 Jaquettes et images
 Plein écran
-Eteindre le système
+Éteindre le système
 Chargement...
 Sauvegarde de la configuration
 Démarrer le périphérique
@@ -78,6 +78,8 @@ Fermeture du serveur HDL...
 Sortie via IGR vers :
 Couleur d'arrière-plan
 Couleur du texte
+- PS2 -
+- SMB Server -
 Type d'adresse IP
 Adresse IP statique
 Adresse IP dynamique
@@ -100,7 +102,7 @@ Renommer
 Suppr.
 Lancer
 Configuration de l'affichage
-Options supprimer/renommer
+Activer les opérations d'écriture
 Vérifier si le jeu est fragmenté (USB)
 Lancement auto. du dernier jeu joué
 Touche de validation
@@ -109,7 +111,7 @@ Impossible d'exécuter l'item
 Tester les réglages
 Laisser le champ vide pour s'identifier en tant qu'invité
 Simuler la vitesse de lecture du CD/DVD
-Méthode de lecture alternative des données
+Synchronous Mode
 Purger OPL de la mémoire après lancement du jeu
 Passer les vidéos au format PSS
 Emuler le support double-couche pour les jeux rippés en DVD5
@@ -126,7 +128,7 @@ VMC générique
 Configurer la carte mémoire virtuelle
 Nom
 Taille
-Etat
+État
 Progression
 La carte mémoire virtuelle existe déjà
 Fichier carte mémoire virtuelle non valide, taille incorrecte
@@ -184,7 +186,6 @@ Ajustement vertical de l'écran
 Ajouter/Soustraire
 Passer les vidéos au format FMV
 Avance rapide
-PS2RD dans le menu
 Configuration de PS2RD
 PS2RD
 Activer/Désactiver PS2RD
@@ -192,16 +193,18 @@ Mode d'activation des codes triche
 Automatique/Manuel
 Automatique
 Manuel (inactif, fonction à venir)
-Echec du chargement du fichier .cht
+Échec du chargement du fichier .cht
 Aucun fichier .cht détecté
 Télécharger les réglages
 Mise à jour des réglages des jeux
 Mise à jour des données existantes
-Echec de la mise à jour
+Échec de la mise à jour
 Impossible de se connecter au serveur
 Mise à jour effectuée avec succès
 Mise à jour annulée
 Voulez-vous télécharger les réglages depuis Internet ?
 Réglages personnalisés
 Réglages téléchargés
-Lancement automatique dans %i s …
+Lancement automatique dans %i s…
+Démarrage auto
+Valeur en seconde(s), 0 pour désactiver le démarrage automatique

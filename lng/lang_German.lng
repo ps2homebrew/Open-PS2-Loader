@@ -1,6 +1,6 @@
 # German Translation by ps2guy / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 German
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ HDL Server entlädt...
 IGR-Pfad
 Hintergrundfarbe
 Textfarbe
+- PS2 -
+- SMB Server -
 IP-Adresstyp
 Statisch
 DHCP
@@ -100,7 +102,7 @@ Umbenennen
 Löschen
 Ausführen
 Bildschirmeinstellungen
-Aktiviere Lösch- und Umbenenn -aktionen
+Enable write operations
 Überprüfe USB Spielefragmentierung
 Erinnere an zuletzt gespieltes Spiel
 Auswählen button
@@ -109,7 +111,7 @@ Fehler, Objekt kann nicht ausgeführt werden
 Test
 Leer lassen für Anmeldung als GAST
 Accurate reads
-Alternative Datenauslesemethode
+Synchronous Mode
 Systemaufrufe aushängen
 0 PSS Modus
 Emuliere DVD-DL
@@ -184,7 +186,6 @@ V-POS
 Vertikale Einstellung
 Videosequenzen (FMV) überspringen
 Überspringe Full Motion Videos
-Zeige PS2RD Cheat Engine im Hauptmenü
 Cheat Einstellungen
 Aktiviere PS2RD Cheat Engine
 PS2RD Cheat Engine deine Spiele patchen lassen
@@ -205,3 +206,5 @@ Einstellungen übers Netzwerk laden?
 Benutzerdefinierte Einstellungen
 Standardeinstellungen heruntergeladen
 Automatischer Start in %i s...
+Auto start
+Value in second(s), 0 to disable auto start

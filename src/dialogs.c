@@ -98,14 +98,14 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, COMPAT_STATUS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
 	{UI_BREAK},
 
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 0, 1, 1, _STR_HINT_MODE1, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE5}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE6}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , 1, 1, _STR_HINT_MODE1, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER}, {UI_BREAK},
 
 	{UI_SPLITTER},
 
@@ -170,7 +170,7 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLE_WRITE}}}, {UI_SPACER}, {UI_BOOL, CFG_ENWRITEOP, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
 	{UI_LABEL, CFG_LBL_AUTOSTARTLAST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_AUTOSTARTLAST}}}, {UI_SPACER}, {UI_INT, CFG_AUTOSTARTLAST, 1, 1, _STR_HINT_AUTOSTARTLAST, 0, 0, {.intvalue = {0, 0, 0, 9}}},{UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SELECTBUTTON}}}, {UI_SPACER}, {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 

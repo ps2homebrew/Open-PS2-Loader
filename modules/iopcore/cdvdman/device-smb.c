@@ -69,7 +69,7 @@ static void ps2ip_init(void)
 void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback)
 {
 	ps2ip_init();
-	smb_NegociateProtocol(cdvdman_settings.pc_ip, cdvdman_settings.pc_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &ServerCapabilities, hash_callback);
+	smb_NegotiateProtocol(cdvdman_settings.smb_ip, cdvdman_settings.smb_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &ServerCapabilities, hash_callback);
 }
 
 void DeviceInit(void)
@@ -94,12 +94,12 @@ void DeviceFSInit(void)
 	smb_SessionSetupAndX(ServerCapabilities);
 
 	// Then tree connect on the share resource
-	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.pc_ip, cdvdman_settings.pc_share);
+	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.smb_ip, cdvdman_settings.smb_share);
 	smb_TreeConnectAndX(tmp_str);
 
 	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
-		if (cdvdman_settings.pc_prefix[0]) {
-			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.pc_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
+		if (cdvdman_settings.smb_prefix[0]) {
+			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.smb_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
 		} else {
 			sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
 		}
@@ -108,8 +108,8 @@ void DeviceFSInit(void)
 	} else {
 		// Open all parts files
 		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
-			if (cdvdman_settings.pc_prefix[0])
-				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.pc_prefix, cdvdman_settings.filename, i);
+			if (cdvdman_settings.smb_prefix[0])
+				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.smb_prefix, cdvdman_settings.filename, i);
 			else
 				sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
 

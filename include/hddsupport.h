@@ -82,29 +82,6 @@ typedef struct
 	} subs[APA_MAXSUB];
 } apa_header;
 
-typedef struct
-{
-	int existing;
-	int modified;
-	int linked;
-	apa_header header;
-} apa_partition_t;
-
-typedef struct
-{
-	u32 device_size_in_mb;
-	u32 total_chunks;
-	u32 allocated_chunks;
-	u32 free_chunks;
-
-	u8 *chunks_map;
-
-	// existing partitions
-	u32 part_alloc_;
-	u32 part_count;
-	apa_partition_t *parts;
-} apa_partition_table_t;
-
 typedef struct {
 	u32 number;
 	u16 subpart;

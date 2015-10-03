@@ -1035,37 +1035,31 @@ int mass_stor_init(void)
 	return 0;
 }
 
-static void ReadSectorUpper(u32 lba, void *buf)
-{
-	mass_stor_readSector(lba, 1, gSectorBuffer);
-	mips_memcpy(buf, gSectorBuffer, 2048);
-}
-
 /*	There are many times of sector sizes for the many devices out there. But because:
 	1. USB transfers have a limit of 4096 bytes (2 CD/DVD sectors).
 	2. we need to keep things simple to save IOP clock cycles and RAM
 	...devices with sector sizes that are either a multiple or factor of the CD/DVD sector will be supported.
 
-	i.e. 512 (typical), 1024, 2048 and 4096 bytes can be supported, while 3072 bytes (if there's even such a thing) will be unsupported.	*/
+	i.e. 512 (typical), 1024, 2048 and 4096 bytes can be supported, while 3072 bytes (if there's even such a thing) will be unsupported.
+	Devices with sector sizes above 4096 bytes are unsupported.	*/
 int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
 	u32 sectors, nbytes, DiskSectorsToRead, lba;
-	unsigned short int SectorOffset;
 	u8 *p = (u8 *)buf;
 
 	if(g_mass_device.sectorSize > 2048)
 	{
-		lba = cdvdman_settings.LBAs[part_num] + (lsn / (g_mass_device.sectorSize / 2048));
-		if ((SectorOffset = lsn % (g_mass_device.sectorSize / 2048)) > 0)
+		//4096-byte sectors
+		lba = cdvdman_settings.LBAs[part_num] + (lsn / 2);
+		if ((lsn % 2) > 0)
 		{
 			//Start sector is in the middle of a physical sector.
-			nbytes = g_mass_device.sectorSize;
-			sectors = nbytes / 2048;
-			ReadSectorUpper(lba, p);
+			mass_stor_readSector(lba, 1, gSectorBuffer);
+			mips_memcpy(p, &((unsigned char *)gSectorBuffer)[2048], 2048);
 			lba++;
-			lsn += sectors;
-			nsectors -= sectors;
-			p += nbytes;
+			lsn++;
+			nsectors--;
+			p += 2048;
 		}
 	} else {
 		lba = cdvdman_settings.LBAs[part_num] + (lsn * (2048 / g_mass_device.sectorSize));
@@ -1081,7 +1075,8 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 
 		if (DiskSectorsToRead == 0) {
 			// nsectors should be 1 at this point.
-			ReadSectorUpper(lba, p);
+			mass_stor_readSector(lba, 1, gSectorBuffer);
+			mips_memcpy(p, gSectorBuffer, 2048);
 		}
 		else {
 			mass_stor_readSector(lba, DiskSectorsToRead, p);

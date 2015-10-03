@@ -4,6 +4,9 @@
 #include "include/fntsys.h"
 #include "include/ioman.h"
 
+#include "include/usbsupport.h"
+#include "include/hddsupport.h"
+
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
 	"English (internal)",
@@ -82,6 +85,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"IGR path",
 	"Background color",
 	"Text color",
+	"- PS2 -",
+	"- SMB Server -",
 	"IP address type",
 	"Static",
 	"DHCP",
@@ -104,7 +109,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Delete",
 	"Run",
 	"Display settings",
-	"Enable Delete and Rename actions",
+	"Enable write operations",
 	"Check USB game fragmentation",
 	"Remember last played game",
 	"Select button",
@@ -112,14 +117,14 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Error, could not run the item",
 	"Test",
 	"Leave empty for GUEST auth.",
-	"Accurate reads",
+	"Slow down reading",
 	"Alternative data read method",
-	"Unhook Syscalls",
-	"0 PSS mode",
-	"Emulate DVD-DL",
-	"Disable IGR",
-	"High module storage",
-	"Hide dev9 module",
+	"Unload OPL when possible",
+	"Skip videos",
+	"For DVD9 rips",
+	"IGR is incompatible with some games",
+	"Stores modules in alternate location",
+	"Hide DEV9 module",
 	"Changing the size will reformat the VMC",
 	"Create",
 	"Start",
@@ -163,14 +168,14 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Game ID",
 	"DMA Mode",
 	"V-Sync",
-	"Mode 1",
-	"Mode 2",
-	"Mode 3",
-	"Mode 4",
-	"Mode 5",
-	"Mode 6",
-	"Mode 7",
-	"Mode 8",
+	"1. Accurate Reads",
+	"2. Synchronous Mode",
+	"3. Unhook Syscalls",
+	"4. 0 PSS",
+	"5. Emulate DVD-DL",
+	"6. Disable IGR",
+	"7. High Mod Storage",
+	"8. Hide DEV9",
 	"Configure GSM",
 	"Ethernet link mode",
 	"100Mbit full-duplex",
@@ -188,7 +193,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Vertical Adjustment",
 	"FMV Skip",
 	"Skips Full Motion Videos",
-	"Show PS2RD Cheat Engine on Main Menu",
 	"Cheat Settings",
 	"Enable PS2RD Cheat Engine",
 	"Lets PS2RD Cheat Engine patch your games",
@@ -239,6 +243,23 @@ static void lngFreeFromFile(void) {
 	lang_strs = NULL;
 }
 
+static int lngLoadFont(const char *dir, const char *name) {
+	char path[256];
+	snprintf(path, sizeof(path), "%s/font_%s.ttf", dir, name);
+	LOG("LANG Custom TTF font path: %s\n", path);
+	if(fntLoadDefault(path) != 0)
+	{
+		snprintf(path, sizeof(path), "%s/font_%s.otf", dir, name);
+		LOG("LANG Custom OTF font path: %s\n", path);
+		if(fntLoadDefault(path) == 0)
+			return 0;
+	}
+
+	LOG("LANG cannot load font.\n");
+
+	return -1;
+}
+
 static int lngLoadFromFile(char* path, char *name) {
 	file_buffer_t* fileBuffer = openFileBuffer(path, O_RDONLY, 1, 1024);
 	if (fileBuffer) {
@@ -263,10 +284,12 @@ static int lngLoadFromFile(char* path, char *name) {
 			strId++;
 		}
 
-		char path[256];
-		snprintf(path, sizeof(path), "%s/font_%s.ttf", gBaseMCDir, name);
-		LOG("LANG Custom font path: %s\n", path);
-		fntLoadDefault(path);
+		if(lngLoadFont(gBaseMCDir, name) != 0) {
+			if(lngLoadFont("mass0:", name) != 0) {
+				hddLoadModules();
+				lngLoadFont("pfs0:", name);
+			}
+		}
 
 		return 1;
 	}

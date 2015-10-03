@@ -116,7 +116,7 @@ void moduleUpdateMenu(int mode, int themeChanged) {
 
 		menuAddHint(&mod->menuItem, _STR_REFRESH, SELECT_ICON);
 
-		if (gEnableDandR) {
+		if (gEnableWrite) {
 			if (mod->support->itemRename)
 				menuAddHint(&mod->menuItem, _STR_RENAME, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
 			if (mod->support->itemDelete)
@@ -142,7 +142,7 @@ static void itemExecSelect(struct menu_item *curMenu) {
 		else {
 			support->itemInit();
 			moduleUpdateMenu(support->mode, 0);
-			if (!gAutoRefresh)
+			if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
 				ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
 		}
 	}
@@ -154,7 +154,7 @@ static void itemExecCancel(struct menu_item *curMenu) {
 	if (!curMenu->current)
 		return;
 
-	if (!gEnableDandR)
+	if (!gEnableWrite)
 		return;
 
 	item_list_t *support = curMenu->userdata;
@@ -205,7 +205,7 @@ static void itemExecSquare(struct menu_item *curMenu) {
 	if (!curMenu->current)
 		return;
 
-	if (!gEnableDandR)
+	if (!gEnableWrite)
 		return;
 
 	item_list_t *support = curMenu->userdata;
@@ -467,7 +467,7 @@ static int tryAlternateDevice(int types) {
 		configInit(path);
 		value = configReadMulti(types);
 		config_set_t *configOPL = configGetByType(CONFIG_OPL);
-		configSetInt(configOPL, "usb_mode", 2);
+		configSetInt(configOPL, CONFIG_OPL_USB_MODE, START_MODE_AUTO);
 		return value;
 	}
 
@@ -481,7 +481,7 @@ static int tryAlternateDevice(int types) {
 		configInit("pfs0:");
 		value = configReadMulti(types);
 		config_set_t *configOPL = configGetByType(CONFIG_OPL);
-		configSetInt(configOPL, "hdd_mode", 2);
+		configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
 		return value;
 	}
 
@@ -503,140 +503,167 @@ static int tryAlternateDevice(int types) {
 }
 
 static void _loadConfig() {
-	int value;
+	int value, themeID = -1, langID = -1;
+	const char *temp;
 	int result = configReadMulti(lscstatus);
 
 	if (lscstatus & CONFIG_OPL) {
-		int themeID = -1, langID = -1;
-
 		if (!(result & CONFIG_OPL)) {
 			result = tryAlternateDevice(lscstatus);
 		}
 
 		if (result & CONFIG_OPL) {
 			config_set_t *configOPL = configGetByType(CONFIG_OPL);
-			const char *temp;
 
-			configGetInt(configOPL, "scrolling", &gScrollSpeed);
-			configGetColor(configOPL, "bg_color", gDefaultBgColor);
-			configGetColor(configOPL, "text_color", gDefaultTextColor);
-			configGetColor(configOPL, "ui_text_color", gDefaultUITextColor);
-			configGetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
-			configGetInt(configOPL, "use_info_screen", &gUseInfoScreen);
-			configGetInt(configOPL, "enable_coverart", &gEnableArt);
-			configGetInt(configOPL, "wide_screen", &gWideScreen);
-			configGetInt(configOPL, "vmode", &gVMode);
+			configGetInt(configOPL, CONFIG_OPL_SCROLLING, &gScrollSpeed);
+			configGetColor(configOPL, CONFIG_OPL_BGCOLOR, gDefaultBgColor);
+			configGetColor(configOPL, CONFIG_OPL_TEXTCOLOR, gDefaultTextColor);
+			configGetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
+			configGetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
+			configGetInt(configOPL, CONFIG_OPL_USE_INFOSCREEN, &gUseInfoScreen);
+			configGetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, &gEnableArt);
+			configGetInt(configOPL, CONFIG_OPL_WIDESCREEN, &gWideScreen);
+			configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
 
 #ifdef CHEAT
-			configGetInt(configOPL, "enable_cheat", &gEnableCheat);
-			configGetInt(configOPL, "cheatmode", &gCheatMode);
+			configGetInt(configOPL, CONFIG_OPL_CHEAT_ENABLE, &gEnableCheat);
+			configGetInt(configOPL, CONFIG_OPL_CHEAT_MODE, &gCheatMode);
 #endif
 
-			if (configGetStr(configOPL, "theme", &temp))
+			if (configGetStr(configOPL, CONFIG_OPL_THEME, &temp))
 				themeID = thmFindGuiID(temp);
 
-			if (configGetStr(configOPL, "language_text", &temp))
+			if (configGetStr(configOPL, CONFIG_OPL_LANGUAGE, &temp))
 				langID = lngFindGuiID(temp);
 
-			configGetInt(configOPL, "eth_linkmode", &gETHOpMode);
+			configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
 
-			configGetInt(configOPL, "ps2_ip_use_dhcp", &ps2_ip_use_dhcp);
-			configGetInt(configOPL, "pc_share_use_nbns", &gPCShareAddressIsNetBIOS);
-			configGetStrCopy(configOPL, "pc_share_nb_addr", gPCShareNBAddress, sizeof(gPCShareNBAddress));
-
-			if (configGetStr(configOPL, "pc_ip", &temp))
-				sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
-
-			configGetInt(configOPL, "pc_port", &gPCPort);
-
-			configGetStrCopy(configOPL, "pc_share", gPCShareName, sizeof(gPCShareName));
-			configGetStrCopy(configOPL, "pc_user", gPCUserName, sizeof(gPCUserName));
-			configGetStrCopy(configOPL, "pc_pass", gPCPassword, sizeof(gPCPassword));
-			configGetStrCopy(configOPL, "exit_path", gExitPath, sizeof(gExitPath));
-
-			if(configGetInt(configOPL, "swap_select_btn", &value))
+			if(configGetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, &value))
 				gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 
-			configGetInt(configOPL, "autosort", &gAutosort);
-			configGetInt(configOPL, "autorefresh", &gAutoRefresh);
-			configGetInt(configOPL, "default_device", &gDefaultDevice);
-			configGetInt(configOPL, "disable_debug", &gDisableDebug);
-			configGetInt(configOPL, "enable_delete_rename", &gEnableDandR);
-			configGetInt(configOPL, "hdd_spindown", &gHDDSpindown);
-			configGetInt(configOPL, "check_usb_frag", &gCheckUSBFragmentation);
-			configGetStrCopy(configOPL, "usb_prefix", gUSBPrefix, sizeof(gUSBPrefix));
-			configGetStrCopy(configOPL, "eth_prefix", gETHPrefix, sizeof(gETHPrefix));
-			configGetInt(configOPL, "remember_last", &gRememberLastPlayed);
-			configGetInt(configOPL, "autostart_last", &gAutoStartLastPlayed);
-#ifdef CHEAT
-			configGetInt(configOPL, "show_cheat", &gShowCheat);
-#endif
-			configGetInt(configOPL, "usb_mode", &gUSBStartMode);
-			configGetInt(configOPL, "hdd_mode", &gHDDStartMode);
-			configGetInt(configOPL, "eth_mode", &gETHStartMode);
-			configGetInt(configOPL, "app_mode", &gAPPStartMode);
+			configGetInt(configOPL, CONFIG_OPL_AUTO_SORT, &gAutosort);
+			configGetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, &gAutoRefresh);
+			configGetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, &gDefaultDevice);
+			configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
+			configGetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, &gEnableWrite);
+			configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
+			configGetInt(configOPL, CONFIG_OPL_USB_CHECK_FRAG, &gCheckUSBFragmentation);
+			configGetStrCopy(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix, sizeof(gUSBPrefix));
+			configGetStrCopy(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix, sizeof(gETHPrefix));
+			configGetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, &gRememberLastPlayed);
+			configGetInt(configOPL, CONFIG_OPL_AUTOSTART_LAST, &gAutoStartLastPlayed);
+			configGetInt(configOPL, CONFIG_OPL_USB_MODE, &gUSBStartMode);
+			configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
+			configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
+			configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
+		}
+	}
+
+	if (lscstatus & CONFIG_NETWORK) {
+		if (!(result & CONFIG_NETWORK)) {
+			result = tryAlternateDevice(lscstatus);
 		}
 
-		applyConfig(themeID, langID);
+		if (result & CONFIG_NETWORK) {
+			config_set_t *configNet = configGetByType(CONFIG_NETWORK);
+
+			configGetInt(configNet, CONFIG_NET_ETH_LINKM, &gETHOpMode);
+
+			configGetInt(configNet, CONFIG_NET_PS2_DHCP, &ps2_ip_use_dhcp);
+			configGetInt(configNet, CONFIG_NET_SMB_NBNS, &gPCShareAddressIsNetBIOS);
+			configGetStrCopy(configNet, CONFIG_NET_SMB_NB_ADDR, gPCShareNBAddress, sizeof(gPCShareNBAddress));
+
+			if (configGetStr(configNet, CONFIG_NET_SMB_IP_ADDR, &temp))
+				sscanf(temp, "%d.%d.%d.%d", &pc_ip[0], &pc_ip[1], &pc_ip[2], &pc_ip[3]);
+
+			configGetInt(configNet, CONFIG_NET_SMB_PORT, &gPCPort);
+
+			configGetStrCopy(configNet, CONFIG_NET_SMB_SHARE, gPCShareName, sizeof(gPCShareName));
+			configGetStrCopy(configNet, CONFIG_NET_SMB_USER, gPCUserName, sizeof(gPCUserName));
+			configGetStrCopy(configNet, CONFIG_NET_SMB_PASSW, gPCPassword, sizeof(gPCPassword));
+
+			if (configGetStr(configNet, CONFIG_NET_PS2_IP, &temp))
+				sscanf(temp, "%d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3]);
+			if (configGetStr(configNet, CONFIG_NET_PS2_NETM, &temp))
+				sscanf(temp, "%d.%d.%d.%d", &ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3]);
+			if (configGetStr(configNet, CONFIG_NET_PS2_GATEW, &temp))
+				sscanf(temp, "%d.%d.%d.%d", &ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
+			if (configGetStr(configNet, CONFIG_NET_PS2_DNS, &temp))
+				sscanf(temp, "%d.%d.%d.%d", &ps2_dns[0], &ps2_dns[1], &ps2_dns[2], &ps2_dns[3]);
+		}
 	}
+
+	applyConfig(themeID, langID);
 
 	lscret = result;
 	lscstatus = 0;
 }
 
 static void _saveConfig() {
+	char temp[256];
+
 	if (lscstatus & CONFIG_OPL) {
 		config_set_t *configOPL = configGetByType(CONFIG_OPL);
-		configSetInt(configOPL, "scrolling", gScrollSpeed);
-		configSetStr(configOPL, "theme", thmGetValue());
-		configSetStr(configOPL, "language_text", lngGetValue());
-		configSetColor(configOPL, "bg_color", gDefaultBgColor);
-		configSetColor(configOPL, "text_color", gDefaultTextColor);
-		configSetColor(configOPL, "ui_text_color", gDefaultUITextColor);
-		configSetColor(configOPL, "sel_text_color", gDefaultSelTextColor);
-		configSetInt(configOPL, "use_info_screen", gUseInfoScreen);
-		configSetInt(configOPL, "enable_coverart", gEnableArt);
-		configSetInt(configOPL, "wide_screen", gWideScreen);
-		configSetInt(configOPL, "vmode", gVMode);
+		configSetInt(configOPL, CONFIG_OPL_SCROLLING, gScrollSpeed);
+		configSetStr(configOPL, CONFIG_OPL_THEME, thmGetValue());
+		configSetStr(configOPL, CONFIG_OPL_LANGUAGE, lngGetValue());
+		configSetColor(configOPL, CONFIG_OPL_BGCOLOR, gDefaultBgColor);
+		configSetColor(configOPL, CONFIG_OPL_TEXTCOLOR, gDefaultTextColor);
+		configSetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
+		configSetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
+		configSetInt(configOPL, CONFIG_OPL_USE_INFOSCREEN, gUseInfoScreen);
+		configSetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, gEnableArt);
+		configSetInt(configOPL, CONFIG_OPL_WIDESCREEN, gWideScreen);
+		configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
 
 
 #ifdef CHEAT
-		configSetInt(configOPL, "enable_cheat", gEnableCheat);
-		configSetInt(configOPL, "cheatmode", gCheatMode);
+		configSetInt(configOPL, CONFIG_OPL_CHEAT_ENABLE, gEnableCheat);
+		configSetInt(configOPL, CONFIG_OPL_CHEAT_MODE, gCheatMode);
 #endif
 
-		configSetInt(configOPL, "eth_linkmode", gETHOpMode);
-		configSetInt(configOPL, "ps2_ip_use_dhcp", ps2_ip_use_dhcp);
-		configSetInt(configOPL, "pc_share_use_nbns", gPCShareAddressIsNetBIOS);
-		configSetStr(configOPL, "pc_share_nb_addr", gPCShareNBAddress);
-		char temp[256];
-		sprintf(temp, "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-		configSetStr(configOPL, "pc_ip", temp);
-		configSetInt(configOPL, "pc_port", gPCPort);
-		configSetStr(configOPL, "pc_share", gPCShareName);
-		configSetStr(configOPL, "pc_user", gPCUserName);
-		configSetStr(configOPL, "pc_pass", gPCPassword);
-		configSetStr(configOPL, "exit_path", gExitPath);
-		configSetInt(configOPL, "autosort", gAutosort);
-		configSetInt(configOPL, "autorefresh", gAutoRefresh);
-		configSetInt(configOPL, "default_device", gDefaultDevice);
-		configSetInt(configOPL, "disable_debug", gDisableDebug);
-		configSetInt(configOPL, "enable_delete_rename", gEnableDandR);
-		configSetInt(configOPL, "hdd_spindown", gHDDSpindown);
-		configSetInt(configOPL, "check_usb_frag", gCheckUSBFragmentation);
-		configSetStr(configOPL, "usb_prefix", gUSBPrefix);
-		configSetStr(configOPL, "eth_prefix", gETHPrefix);
-		configSetInt(configOPL, "remember_last", gRememberLastPlayed);
-		configSetInt(configOPL, "autostart_last", gAutoStartLastPlayed);
-#ifdef CHEAT
-		configSetInt(configOPL, "show_cheat", gShowCheat);
-#endif
-		configSetInt(configOPL, "usb_mode", gUSBStartMode);
-		configSetInt(configOPL, "hdd_mode", gHDDStartMode);
-		configSetInt(configOPL, "eth_mode", gETHStartMode);
-		configSetInt(configOPL, "app_mode", gAPPStartMode);
+		configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
+		configSetInt(configOPL, CONFIG_OPL_AUTO_SORT, gAutosort);
+		configSetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, gAutoRefresh);
+		configSetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, gDefaultDevice);
+		configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
+		configSetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, gEnableWrite);
+		configSetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, gHDDSpindown);
+		configSetInt(configOPL, CONFIG_OPL_USB_CHECK_FRAG, gCheckUSBFragmentation);
+		configSetStr(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix);
+		configSetStr(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix);
+		configSetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, gRememberLastPlayed);
+		configSetInt(configOPL, CONFIG_OPL_AUTOSTART_LAST, gAutoStartLastPlayed);
+		configSetInt(configOPL, CONFIG_OPL_USB_MODE, gUSBStartMode);
+		configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
+		configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
+		configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
 
-		configSetInt(configOPL, "swap_select_btn", gSelectButton == KEY_CIRCLE ? 0 : 1);
+		configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
+	}
+
+	if (lscstatus & CONFIG_NETWORK) {
+		config_set_t *configNet = configGetByType(CONFIG_NETWORK);
+
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
+		configSetStr(configNet, CONFIG_NET_PS2_IP, temp);
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
+		configSetStr(configNet, CONFIG_NET_PS2_NETM, temp);
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+		configSetStr(configNet, CONFIG_NET_PS2_GATEW, temp);
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_dns[0], ps2_dns[1], ps2_dns[2], ps2_dns[3]);
+		configSetStr(configNet, CONFIG_NET_PS2_DNS, temp);
+
+		configSetInt(configNet, CONFIG_NET_ETH_LINKM, gETHOpMode);
+		configSetInt(configNet, CONFIG_NET_PS2_DHCP, ps2_ip_use_dhcp);
+		configSetInt(configNet, CONFIG_NET_SMB_NBNS, gPCShareAddressIsNetBIOS);
+		configSetStr(configNet, CONFIG_NET_SMB_NB_ADDR, gPCShareNBAddress);
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+		configSetStr(configNet, CONFIG_NET_SMB_IP_ADDR, temp);
+		configSetInt(configNet, CONFIG_NET_SMB_PORT, gPCPort);
+		configSetStr(configNet, CONFIG_NET_SMB_SHARE, gPCShareName);
+		configSetStr(configNet, CONFIG_NET_SMB_USER, gPCUserName);
+		configSetStr(configNet, CONFIG_NET_SMB_PASSW, gPCPassword);
 	}
 
 	lscret = configWriteMulti(lscstatus);
@@ -728,7 +755,6 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t*
 	s8 ConnMode, hasMtime;
 	u8 *HttpBuffer;
 	int i, count, HttpSocket, result, retries, ConfigSource;
-	const char *keyValue;
 	iox_stat_t stat;
 	u8 mtime[6];
 	char device, uri[64];
@@ -835,10 +861,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t*
 										if((downloadedConfig = configAlloc(0, NULL, NULL)) != NULL)
 										{
 											configReadBuffer(downloadedConfig, HttpBuffer, length);
-											//TODO: for now, only the settings that affect compatibility will be merged, to avoid breaking themes (which have no standard/reserved variable names).
-											//configMerge(itemConfig, downloadedConfig);
-											if(configGetStr(downloadedConfig, CONFIG_ITEM_COMPAT, &keyValue))
-												configSetStr(itemConfig, CONFIG_ITEM_COMPAT, keyValue);
+											configMerge(itemConfig, downloadedConfig);
 											configFree(downloadedConfig);
 											configSetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_DLOAD);
 											if(!configWrite(itemConfig))
@@ -1138,20 +1161,16 @@ static void setDefaults(void) {
 	gPCPassword[0] = '\0';
 	gNetworkStartup = ERROR_ETH_NOT_STARTED;
 	gHDDSpindown = 20;
-	gNetConfigChanged = 0;
 	gScrollSpeed = 1;
 	gExitPath[0] = '\0';
 	gDefaultDevice = APP_MODE;
 	gAutosort = 1;
 	gAutoRefresh = 0;
 	gDisableDebug = 1;
-	gEnableDandR = 0;
+	gEnableWrite = 0;
 	gRememberLastPlayed = 0;
 	gAutoStartLastPlayed = 9;
 	gSelectButton = KEY_CIRCLE;	//Default to Japan.
-#ifdef CHEAT
-	gShowCheat = 0;
-#endif
 	gUSBPrefix[0] = '\0';
 	gETHPrefix[0] = '\0';
 	gUseInfoScreen = 0;
@@ -1247,37 +1266,8 @@ int main(int argc, char* argv[])
 
 	ChangeThreadPriority(GetThreadId(), 31);
 
-	#ifdef __DEBUG
-	int use_early_debug = 0, exception_test = 0;
-	int i;
-	for (i=1; i<argc; i++) {
-		if (!(strcmp(argv[i], "-use-early-debug"))) {
-			use_early_debug = 1;
-			PREINIT_LOG("OPL Using early debug.\n");
-		}
-		if (!(strcmp(argv[i], "-test-exception"))) {
-			exception_test = 1;
-			PREINIT_LOG("OPL Exception test requested.\n");
-		}
-	}
-	#endif
-
 	// reset, load modules
 	reset();
-
-	#ifdef __DEBUG
-	if (use_early_debug) {
-		configReadIP();
-		debugSetActive();
-	}
-
-	if (exception_test) {
-		// EXCEPTION test !
-		u32 *p = (u32 *)0xDEADC0DE;
-		*p = 0xDEFACED;
-	}
-	#endif
-
 	init();
 
 	// until this point in the code is reached, only PREINIT_LOG macro should be used

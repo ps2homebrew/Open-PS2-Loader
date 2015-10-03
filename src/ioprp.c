@@ -26,9 +26,9 @@ static inline void patch_CDVDFSV(void *image_offset, struct romdir_entry *entryi
 static inline void patch_EESYNC(void *image_offset, struct romdir_entry *entryinfo);
 static inline void Align_offsets(void* base_address,unsigned int* offset_in,struct romdir_entry *romdir_in,unsigned int* offset_out,struct romdir_entry *romdir_out);
 
-/*----------------------------------------------------------------------------------------*/
-/* Replace modules in a IOPRP image.                                                      */
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------
+	Replace modules in a IOPRP image.
+------------------------------------------------------------------------------------------*/
 inline unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, unsigned int size_cdvdman)
 {
 	unsigned int offset_in,offset_out; /* For processing purposes */
@@ -63,36 +63,36 @@ inline unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, u
 	return offset_out;
 }
 
-/*----------------------------------------------------------------------------------------*/
-/* Patch CDVDMAN in an IOPRP image                                                        */
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------
+	Patch CDVDMAN in an IOPRP image
+------------------------------------------------------------------------------------------*/
 static inline void patch_CDVDMAN(void *image_offset, struct romdir_entry *entryinfo, void *cdvdman, unsigned int size)
 {
 	memcpy(image_offset, cdvdman, size);
 	entryinfo->fileSize=size;
 }
 
-/*----------------------------------------------------------------------------------------*/
-/* Patch CDVDFSV in an IOPRP image                                                        */
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------
+	Patch CDVDFSV in an IOPRP image
+------------------------------------------------------------------------------------------*/
 static inline void patch_CDVDFSV(void *image_offset, struct romdir_entry *entryinfo)
 {
 	memcpy(image_offset, cdvdfsv_irx, size_cdvdfsv_irx);
 	entryinfo->fileSize=size_cdvdfsv_irx;
 }
 
-/*----------------------------------------------------------------------------------------*/
-/* Patch EESYNC in an IOPRP image                                                         */
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------
+	Patch EESYNC in an IOPRP image
+------------------------------------------------------------------------------------------*/
 static inline void patch_EESYNC(void *image_offset, struct romdir_entry *entryinfo)
 {
 	memcpy(image_offset, eesync_irx, size_eesync_irx);
 	entryinfo->fileSize=size_eesync_irx;
 }
 
-/*----------------------------------------------------------------------------------------*/
-/* Align offsets to multiples of 16, filling the gaps created with 0s.                    */
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------
+	Align offsets to multiples of 16, filling the gaps created with 0s.
+------------------------------------------------------------------------------------------*/
 static inline void Align_offsets(void* base_address,unsigned int* offset_in,struct romdir_entry *romdir_in,unsigned int* offset_out,struct romdir_entry *romdir_out)
 {
 	/* For ALL modules; Align all addresses to a multiple of 16 */

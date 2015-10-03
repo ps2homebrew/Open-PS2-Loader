@@ -204,6 +204,9 @@ static void usbRenameGame(int id, char* newName) {
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
 	int i, fd, index, compatmask = 0;
+#ifdef CHEAT
+	int result;
+#endif
 #ifdef VMC
 	unsigned int start;
 #endif
@@ -347,20 +350,15 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	settings->common.layer1_start = layer1_start;
 
 #ifdef CHEAT
-	if (gEnableCheat) {
-		char cheatfile[32];
-		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", usbPrefix, game->startup);
-		LOG("Loading Cheat File %s\n", cheatfile);
-		if (load_cheats(cheatfile) < 0) {
-				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
-				LOG("Error: failed to load cheats\n");
-		} else {
-			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
-				LOG("Cheats found\n");
-			} else {
+	if((result = sbLoadCheats(usbPrefix, game->startup)) < 0)
+	{
+		switch(result)
+		{
+			case -ENOENT:
 				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
-				LOG("No cheats found\n");
-			}
+				break;
+			default:
+				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
 		}
 	}
 #endif
@@ -370,11 +368,8 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		saveConfig(CONFIG_LAST, 0);
 	}
 
-	const char *altStartup = NULL;
-	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, sizeof(filename));
-	else
-		sprintf(filename, "%s", game->startup);
+	if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
+		strcpy(filename, game->startup);
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call usbCleanUp, so usbGames/game will be freed
 
 #ifdef VMC

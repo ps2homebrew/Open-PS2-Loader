@@ -110,11 +110,10 @@ static void menuInitMainMenu(void) {
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
-	if (gHDDStartMode && gEnableDandR) // enabled at all?
+	if (gHDDStartMode && gEnableWrite) // enabled at all?
 		submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
 #ifdef CHEAT
-	if (gShowCheat) // Reveals PS2RD Cheat Engine Menu - Default is No
-		submenuAppendItem(&mainMenu, -1, NULL, MENU_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
+	submenuAppendItem(&mainMenu, -1, NULL, MENU_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
 #endif
 #endif
 	submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
@@ -583,7 +582,7 @@ void menuHandleInputMenu() {
 		} else if (id == MENU_NET_UPDATE) {
 			guiShowNetCompatUpdate();
 		} else if (id == MENU_SAVE_CHANGES) {
-			saveConfig(CONFIG_OPL, 1);
+			saveConfig(CONFIG_OPL|CONFIG_NETWORK, 1);
 		} else if (id == MENU_START_HDL) {
 			handleHdlSrv();
 		} else if (id == MENU_ABOUT) {

@@ -6,6 +6,7 @@
 #include "include/supportbase.h"
 #include "include/ioman.h"
 #include "modules/iopcore/common/cdvd_config.h"
+#include "include/cheatman.h"
 #ifdef GSM
 #include "include/pggsm.h"
 #endif
@@ -579,3 +580,30 @@ void sbCreateFolders(const char *path, int createDiscImgFolders) {
 	fileXioMkdir(fullpath, 0777);
 #endif
 }
+
+#ifdef CHEAT
+int sbLoadCheats(const char *path, const char *file) {
+	char cheatfile[64];
+	int result;
+
+	if (gEnableCheat) {
+		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", path, file);
+		LOG("Loading Cheat File %s\n", cheatfile);
+		if ((result = load_cheats(cheatfile)) < 0) {
+			LOG("Error: failed to load cheats\n");
+		} else {
+			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
+				LOG("Cheats found\n");
+				result = 0;
+			} else {
+				LOG("No cheats found\n");
+				result = -ENOENT;
+			}
+		}
+	} else {
+		result = 0;
+	}
+
+	return result;
+}
+#endif

@@ -66,7 +66,6 @@ static float shiftYVal;
 static float (*shiftY)(float posY);
 
 static float shiftYFunc(float posY) {
-	//return (int) ceil(shiftYVal * posY);
 	return (int) (shiftYVal * posY);
 }
 
@@ -216,16 +215,13 @@ static int rmUploadTexture(GSTEXTURE* txt) {
 }
 
 int rmPrepareTexture(GSTEXTURE* txt) {
-	if (txt->Vram && txt->Vram != GSKIT_ALLOC_ERROR) // already uploaded
-		return 1;
-
-	return rmUploadTexture(txt);
+	//Upload, only if not already uploaded.
+	return((txt->Vram && txt->Vram != GSKIT_ALLOC_ERROR) ? 1 : rmUploadTexture(txt));
 }
 
 void rmDispatch(void) {
 	gsKit_queue_exec(gsGlobal);
 }
-
 
 void rmFlush(void) {
 	rmDispatch();

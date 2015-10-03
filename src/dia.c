@@ -48,18 +48,18 @@ int diaShowKeyb(char* text, int maxLen, int hide_text) {
 	int i, j, len = strlen(text), selkeyb = 0, x, w;
 	int selchar = 0, selcommand = -1;
 	char c[2] = "\0\0", *mask_buffer;
-	char keyb0[KEYB_ITEMS] = {
+	static const char keyb0[KEYB_ITEMS] = {
 		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
 		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
 		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\\',
 		'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '`', ':' };
 
-	char keyb1[KEYB_ITEMS] = {
+	static const char keyb1[KEYB_ITEMS] = {
 		'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+',
 		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}',
 		'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '|',
 		'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '~', '.' };
-	char *keyb = keyb0;
+	const char *keyb = keyb0;
 
 	char *commands[KEYB_HEIGHT] = {_l(_STR_BACKSPACE), _l(_STR_SPACE), _l(_STR_ENTER), _l(_STR_MODE)};
 	GSTEXTURE *cmdicons[KEYB_HEIGHT];
@@ -959,7 +959,9 @@ int diaSetString(struct UIItem* ui, int id, const char *text) {
 
 	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
 		strncpy(item->stringvalue.def, text, sizeof(item->stringvalue.def));
+		item->stringvalue.def[sizeof(item->stringvalue.def) - 1] = '\0';
 		strncpy(item->stringvalue.text, text, sizeof(item->stringvalue.text));
+		item->stringvalue.text[sizeof(item->stringvalue.text) - 1] = '\0';
 		return 1;
 	}
 
@@ -1039,4 +1041,3 @@ int diaSetEnum(struct UIItem* ui, int id, const char **enumvals) {
 	item->intvalue.enumvalues = enumvals;
 	return 1;
 }
-

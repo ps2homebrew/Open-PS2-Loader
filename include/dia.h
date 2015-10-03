@@ -59,7 +59,7 @@ struct UIItem {
 			const char **enumvalues; // last one has to be NULL
 		} intvalue;
 		
-		struct { // fixed 32 character string
+		struct { // fixed 32 character string (including NULL terminator)
 			// default value
 			char def[32];
 			char text[32];

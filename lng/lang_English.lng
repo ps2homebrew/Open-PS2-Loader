@@ -96,6 +96,8 @@ HDL Server Unloading...
 IGR path
 Background color
 Text color
+- PS2 -
+- SMB Server -
 IP address type
 Static
 DHCP
@@ -118,7 +120,7 @@ Rename
 Delete
 Run
 Display settings
-Enable Delete and Rename actions
+Enable write operations
 Check USB game fragmentation
 Remember last played game
 Select button
@@ -126,14 +128,14 @@ Error, the game is fragmented
 Error, could not run the item
 Test
 Leave empty for GUEST auth.
-Accurate reads
+Slow down reading
 Alternative data read method
-Unhook Syscalls
-0 PSS mode
-Emulate DVD-DL
-Disable IGR
-High module storage
-Hide dev9 module
+Unload OPL when possible
+Skip videos
+For DVD9 rips
+IGR is incompatible with some games
+Stores modules in alternate location
+Hide DEV9 module
 Changing the size will reformat the VMC
 Create
 Start
@@ -177,14 +179,14 @@ VMC Slot 2
 Game ID
 DMA Mode
 V-Sync
-Mode 1
-Mode 2
-Mode 3
-Mode 4
-Mode 5
-Mode 6
-Mode 7
-Mode 8
+1. Accurate Reads
+2. Synchronous Mode
+3. Unhook Syscalls
+4. 0 PSS
+5. Emulate DVD-DL
+6. Disable IGR
+7. High Mod Storage
+8. Hide DEV9
 Configure GSM
 Ethernet link mode
 100Mbit full-duplex
@@ -202,7 +204,6 @@ V-POS
 Vertical Adjustment
 FMV Skip
 Skips Full Motion Videos
-Show PS2RD Cheat Engine on Main Menu
 Cheat Settings
 Enable PS2RD Cheat Engine
 Lets PS2RD Cheat Engine patch your games

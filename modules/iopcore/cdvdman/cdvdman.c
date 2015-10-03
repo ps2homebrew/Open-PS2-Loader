@@ -1193,7 +1193,7 @@ static int cdrom_lseek(iop_file_t *f, int offset, int where)
 
 	WaitSema(cdrom_io_sema);
 
-	DPRINTF("cdrom_lseek offset=%ld where=%d\n", offset, where);
+	DPRINTF("cdrom_lseek offset=%d where=%d\n", offset, where);
 
 	switch (where) {
 		case SEEK_CUR:
@@ -1552,6 +1552,8 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	u32 lsn;
 	struct dirTocEntry *tocEntryPointer;
 	layer_info_t *pLayerInfo;
+
+	cdvdman_init();
 
 	if (cdvdman_settings.common.flags&IOPCORE_COMPAT_EMU_DVDDL)
 		layer = 0;

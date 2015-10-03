@@ -12,8 +12,17 @@ Copyright (C) 2006-2008 Polo <polo35580@hotmail.fr>
 Adaptation to USB Advance format and User interface
 Copyright (C) 2009 Ifcaro <taslokooo@gmail.com>
 
-Main Project developpers:
-Ifcaro, volca, jimmikaelkael, polo35, izdubar
+Main Project developers:
+Ifcaro, volca, jimmikaelkael, polo35, izdubar, hominem.te.esse, SP193
+
+Other developers:
+BatRastard, crazyc, dlanor, doctorxyz, reprep
+
+UI design:
+Berion, Jay-Jay
+
+Quality Assurance:
+RandQalan, yoshi314, EP, LocalH, lee4, danielB
 
 CDVDMAN, CDVDFSV, CDDEV, DISCID & SMBMAN modules by jimmikaelkael
 Copyright (C) 2009 jimmikaelkael <jimmikaelkael@wanadoo.fr>
@@ -25,7 +34,9 @@ SMSUTILS, SMSMAP & SMSTCPIP modules by Eugene Plotnikov
 
 DEV9, ATAD modules and derived code used in cdvdman by Marcus R. Brown
 
-PS2HDD module has been taken from PS2SDK
+USB, Network and PS2HDD modules were taken from PS2SDK
+
+OPL-CL project/network update support by icyson55
 
 SMB code in Open PS2 Loader includes DES algorithm developed
 by Eric Young (eay@mincom.oz.au)

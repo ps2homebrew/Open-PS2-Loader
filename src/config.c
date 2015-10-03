@@ -9,13 +9,9 @@
 #include "include/ioman.h"
 #include <string.h>
 
-#define CONFIG_INDEX_OPL		0
-#define CONFIG_INDEX_LAST		1
-#define CONFIG_INDEX_APPS		2
-
 static u32 currentUID = 0;
-static config_set_t configFiles[CONFIG_FILE_NUM];
-static char configPath[256] = "mc?:SYS-CONF/IPCONFIG.DAT";
+static config_set_t configFiles[CONFIG_INDEX_COUNT];
+static char legacyNetConfigPath[256] = "mc?:SYS-CONF/IPCONFIG.DAT";
 
 static int strToColor(const char *string, unsigned char *color) {
 	int cnt=0, n=0;
@@ -142,7 +138,7 @@ void configInit(char *prefix) {
 	char path[256];
 
 	if (prefix)
-		snprintf(configPath, sizeof(configPath), "%s/IPCONFIG.DAT", prefix);
+		snprintf(legacyNetConfigPath, sizeof(legacyNetConfigPath), "%s/IPCONFIG.DAT", prefix);
 	else
 		prefix = gBaseMCDir;
 
@@ -152,11 +148,13 @@ void configInit(char *prefix) {
 	configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
 	snprintf(path, sizeof(path), "%s/conf_apps.cfg", prefix);
 	configAlloc(CONFIG_APPS, &configFiles[CONFIG_INDEX_APPS], path);
+	snprintf(path, sizeof(path), "%s/conf_network.cfg", prefix);
+	configAlloc(CONFIG_NETWORK, &configFiles[CONFIG_INDEX_NETWORK], path);
 }
 
 void configEnd() {
 	int index = 0;
-	while(index < CONFIG_FILE_NUM) {
+	while(index < CONFIG_INDEX_COUNT) {
 		config_set_t *configSet = &configFiles[index];
 
 		configClear(configSet);
@@ -192,7 +190,7 @@ void configFree(config_set_t *configSet) {
 
 config_set_t *configGetByType(int type) {
 	int index = 0;
-	while(index < CONFIG_FILE_NUM) {
+	while(index < CONFIG_INDEX_COUNT) {
 		config_set_t *configSet = &configFiles[index];
 
 		if (configSet->type == type)
@@ -238,12 +236,16 @@ int configGetStr(config_set_t* configSet, const char* key, const char** value) {
 		return 0;
 }
 
-void configGetStrCopy(config_set_t* configSet, const char* key, char* value, int length) {
+int configGetStrCopy(config_set_t* configSet, const char* key, char* value, int length) {
 	const char *valref = NULL;
-	if (configGetStr(configSet, key, &valref))
+	if (configGetStr(configSet, key, &valref)) {
 		strncpy(value, valref, length);
-	else
+		value[length - 1] = '\0';
+		return 1;
+	} else {
 		value[0] = '\0';
+		return 0;
+	}
 }
 
 int configSetInt(config_set_t* configSet, const char* key, const int value) {
@@ -319,8 +321,11 @@ void configMerge(config_set_t* dest, const config_set_t *source) {
 	}
 }
 
-void configReadIP() {
-	int fd = openFile(configPath, O_RDONLY);
+int configReadLegacyIP(void) {
+	config_set_t *configSet;
+	char temp[16];
+
+	int fd = openFile(legacyNetConfigPath, O_RDONLY);
 	if (fd >= 0) {
 		char ipconfig[256];
 		int size = getFileSize(fd);
@@ -330,23 +335,22 @@ void configReadIP() {
 		sscanf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3],
 			&ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],
 			&ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
+
+		configSet = &configFiles[CONFIG_NETWORK];
+
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
+		configSetStr(configSet, CONFIG_NET_PS2_IP, temp);
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
+		configSetStr(configSet, CONFIG_NET_PS2_NETM, temp);
+		snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
+		configSetStr(configSet, CONFIG_NET_PS2_GATEW, temp);
+		//The legacy format has no setting for the DNS server, so duplicate the gateway address.
+		configSetStr(configSet, CONFIG_NET_PS2_DNS, temp);
+
+		return CONFIG_NETWORK;
 	}
 
-	return;
-}
-
-void configWriteIP() {
-	int fd = openFile(configPath, O_WRONLY | O_CREAT);
-	if (fd >= 0) {
-		char ipconfig[256];
-		sprintf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d\r\n", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3],
-			ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3],
-			ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
-
-		fileXioWrite(fd, ipconfig, strlen(ipconfig));
-		fileXioClose(fd);
-		gNetConfigChanged = 0;
-	}
+	return 0;
 }
 
 // dst has to have 5 bytes space
@@ -488,38 +492,32 @@ void configClear(config_set_t* configSet) {
 }
 
 int configReadMulti(int types) {
-	int result = 0;
+	int result = 0, index;
 
-	if (CONFIG_OPL & types)
-		configReadIP();
-
-	int index = 0;
-	while(index < CONFIG_FILE_NUM) {
+	for (index = 0; index < CONFIG_INDEX_COUNT; index++) {
 		config_set_t *configSet = &configFiles[index];
 
 		if (configSet->type & types) {
 			configClear(configSet);
 			result |= configRead(configSet);
 		}
-		index++;
 	}
+
+	//If the network configuration is to be loaded and one cannot be loaded, attempt to load from the legacy network config file.
+	if ((types & CONFIG_NETWORK) && !(result & CONFIG_NETWORK))
+		result |= configReadLegacyIP();
 
 	return result;
 }
 
 int configWriteMulti(int types) {
-	int result = 0;
+	int result = 0, index;
 
-	if ((CONFIG_OPL & types) && gNetConfigChanged)
-		configWriteIP();
-
-	int index = 0;
-	while(index < CONFIG_FILE_NUM) {
+	for (index = 0; index < CONFIG_INDEX_COUNT; index++) {
 		config_set_t *configSet = &configFiles[index];
 
 		if (configSet->type & types)
 			result += configWrite(configSet);
-		index++;
 	}
 
 	return result;

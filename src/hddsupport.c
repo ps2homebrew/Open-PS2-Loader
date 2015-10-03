@@ -244,6 +244,9 @@ static void hddRenameGame(int id, char* newName) {
 
 static void hddLaunchGame(int id, config_set_t* configSet) {
 	int i, size_irx = 0;
+#ifdef CHEAT
+	int result;
+#endif
 	void** irx = NULL;
 	char filename[32];
 	hdl_game_info_t* game = &hddGames.games[id];
@@ -342,20 +345,15 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 #endif
 
 #ifdef CHEAT
-	if (gEnableCheat) {
-		char cheatfile[32];
-		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", hddPrefix, game->startup);
-		LOG("Loading Cheat File %s\n", cheatfile);
-		if (load_cheats(cheatfile) < 0) {
-				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
-				LOG("Error: failed to load cheats\n");
-		} else {
-			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
-				LOG("Cheats found\n");
-			} else {
+	if((result = sbLoadCheats(hddPrefix, game->startup)) < 0)
+	{
+		switch(result)
+		{
+			case -ENOENT:
 				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
-				LOG("No cheats found\n");
-			}
+				break;
+			default:
+				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
 		}
 	}
 #endif
@@ -398,11 +396,8 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	// patch start_sector
 	settings->lba_start = game->start_sector;
 
-	const char *altStartup = NULL;
-	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, sizeof(filename));
-	else
-		sprintf(filename, "%s", game->startup);
+	if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
+		strcpy(filename, game->startup);
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
 #ifdef VMC

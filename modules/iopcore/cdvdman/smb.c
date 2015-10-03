@@ -341,7 +341,7 @@ receive:
 }
 
 //-------------------------------------------------------------------------
-int smb_NegociateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback)
+int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback)
 {
 	char *dialect = "NT LM 0.12";
 	struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
@@ -411,9 +411,11 @@ negociate_retry:
 	server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
 	server_specs.SessionKey = NPRsp->SessionKey;
 	mips_memcpy(server_specs.EncryptionKey, &NPRsp->ByteField[0], NPRsp->KeyLength);
-	mips_memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], 32);
-	mips_memcpy(server_specs.Username, Username, 16);
-	mips_memcpy(server_specs.Password, Password, 16);
+	mips_memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], sizeof(server_specs.PrimaryDomainServerName));
+	strncpy(server_specs.Username, Username, sizeof(server_specs.Username));
+	server_specs.Username[sizeof(server_specs.Username) - 1] = '\0';
+	strncpy(server_specs.Password, Password, sizeof(server_specs.Password));
+	server_specs.Password[sizeof(server_specs.Password) - 1] = '\0';
 	server_specs.IOPaddr = (void *)&server_specs;
 	server_specs.HashedFlag = (server_specs.PasswordType == SERVER_USE_ENCRYPTED_PASSWORD) ? 0 : -1;
 

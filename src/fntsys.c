@@ -27,10 +27,10 @@ extern int size_freesansfont_raw;
 /// Atlas height in pixels
 #define ATLAS_HEIGHT 128
 
+#define FNTSYS_CHAR_SIZE	18
+
 // freetype vars
 static FT_Library font_library;
-
-static int gCharHeight = 16;
 
 static s32 gFontSemaId;
 static ee_sema_t gFontSema;
@@ -46,9 +46,9 @@ typedef struct {
 	int ox, oy;
 	// advancements in pixels after rendering this glyph
 	int shx, shy;
-	
+
 	// atlas for which the allocation was done
-    atlas_t* atlas;
+	atlas_t* atlas;
 
 	// atlas allocation position
 	struct atlas_allocation_t *allocation;
@@ -74,7 +74,7 @@ typedef struct {
 
 	/// Texture atlases (default to NULL)
 	atlas_t *atlases[ATLAS_MAX];
-	
+
 	/// Pointer to data, if allocation takeover was selected (will be freed)
 	void *dataPtr;
 } font_t;
@@ -242,8 +242,7 @@ static int fntLoadSlot(font_t *font, char* path) {
 		return FNT_ERROR;
 	}
 
-	error = FT_Set_Char_Size(font->face, 0, gCharHeight * 16, 300, 300);
-	/*error = FT_Set_Pixel_Sizes( face, 0, // pixel_width gCharHeight ); // pixel_height */
+	error = FT_Set_Pixel_Sizes(font->face, FNTSYS_CHAR_SIZE, FNTSYS_CHAR_SIZE);
 	if (error) {
 		LOG("FNTSYS Freetype error setting font pixel size with %x!\n", error);
 		fntDeleteSlot(font);
@@ -260,7 +259,7 @@ void fntInit() {
 	if (error) {
 		// just report over the ps2link
 		LOG("FNTSYS Freetype init failed with %x!\n", error);
-		// SleepThread();
+		return;
 	}
 
 	fntPrepareCLUT();
@@ -292,7 +291,7 @@ int fntLoadFile(char* path) {
 	return FNT_ERROR;
 }
 
-void fntLoadDefault(char* path) {
+int fntLoadDefault(char* path) {
 	font_t newFont, oldFont;
 
 	if (fntLoadSlot(&newFont, path) != FNT_ERROR) {
@@ -306,7 +305,11 @@ void fntLoadDefault(char* path) {
 
 		// delete the old font
 		fntDeleteSlot(&oldFont);
+
+		return 0;
 	}
+
+	return -1;
 }
 
 void fntEnd() {
@@ -320,13 +323,13 @@ void fntEnd() {
 	FT_Done_FreeType(font_library);
 
 	DeleteSema(gFontSemaId);
-	
+
 	fntDestroyCLUT();
 }
 
 static atlas_t *fntNewAtlas() {
 	atlas_t *atl = atlasNew(ATLAS_WIDTH, ATLAS_HEIGHT, GS_PSM_T8);
-	
+
 	atl->surface.ClutPSM = GS_PSM_CT32;
 	atl->surface.Clut = (u32*)(&fontClut);
 
@@ -335,14 +338,14 @@ static atlas_t *fntNewAtlas() {
 
 static int fntGlyphAtlasPlace(font_t *font, fnt_glyph_cache_entry_t* glyph) {
 	FT_GlyphSlot slot = font->face->glyph;
-	
+
  	//LOG("FNTSYS GlyphAtlasPlace: Placing the glyph... %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
-	
+
 	if (slot->bitmap.width == 0 || slot->bitmap.rows == 0) {
 		// no bitmap glyph, just skip
 		return 1;
 	}
-	
+
 	int aid = 0;
 	for (; aid < ATLAS_MAX; aid++) {
 		//LOG("FNTSYS Placing aid %d...\n", aid);
@@ -351,16 +354,16 @@ static int fntGlyphAtlasPlace(font_t *font, fnt_glyph_cache_entry_t* glyph) {
 			//LOG("FNTSYS aid %d is new...\n", aid);
 			*atl = fntNewAtlas();
 		}
-		
+
 		glyph->allocation =	atlasPlace(*atl, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.buffer);
 		if (glyph->allocation) {
 			//LOG("FNTSYS Found placement\n", aid);
 			glyph->atlas = *atl;
-			
+
 			return 1;
 		}
 	}
-	
+
 	LOG("FNTSYS No atlas free\n", aid);
 	return 0;
 }
@@ -407,7 +410,7 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *font, uint32_t gid) {
 	glyph->shx = slot->advance.x;
 	glyph->shy = slot->advance.y;
 	glyph->ox = slot->bitmap_left;
-	glyph->oy = gCharHeight - slot->bitmap_top;
+	glyph->oy = FNTSYS_CHAR_SIZE - slot->bitmap_top;
 
 	glyph->isValid = 1;
 
@@ -415,15 +418,16 @@ static fnt_glyph_cache_entry_t* fntCacheGlyph(font_t *font, uint32_t gid) {
 }
 
 void fntSetAspectRatio(float aw, float ah) {
-	// flush cache - it will be invalid after the setting
-	int i = 0;
-	for (; i < FNT_MAX_COUNT; i++) {
-		if (fonts[i].isValid)
-			fntCacheFlush(&fonts[i]);
-	}
+	int i;
 
-	// TODO: set new aspect ratio (Is this correct, I wonder?)
-	// error = FT_Set_Char_Size(face, 0, gCharHeight*64, ah*300, aw*300);
+	// flush cache - it will be invalid after the setting
+	for (i = 0; i < FNT_MAX_COUNT; i++) {
+		if (fonts[i].isValid) {
+			fntCacheFlush(&fonts[i]);
+			//TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
+		//	FT_Set_Pixel_Sizes(fonts[i].face, FNTSYS_CHAR_SIZE * aw, FNTSYS_CHAR_SIZE * ah);
+		}
+	}
 }
 
 static void fntRenderGlyph(fnt_glyph_cache_entry_t* glyph, int pen_x, int pen_y) {
@@ -535,6 +539,27 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
 }
 
 #else
+static int isRTL(u32 character)
+{
+	return((	(character >= 0x00000590 && character <= 0x000008FF)
+		||	(character >= 0x0000FB50 && character <= 0x0000FDFF)
+		||	(character >= 0x0000FE70 && character <= 0x0000FEFF)
+		||	(character >= 0x00010800 && character <= 0x00010FFF)
+		||	(character >= 0x0001E800 && character <= 0x0001EFFF)
+	) ? 1 : 0);
+}
+
+static int isWeak(u32 character)
+{
+	return((	(character >= 0x0000 && character <= 0x0040)
+		||	(character >= 0x005B && character <= 0x0060)
+		||	(character >= 0x007B && character <= 0x00BF)
+		||	(character >= 0x00D7 && character <= 0x00F7)
+		||	(character >= 0x02B9 && character <= 0x02FF)
+		||	(character >= 0x2000 && character <= 0x2BFF)
+	) ? 1 : 0);
+}
+
 static void fntRenderSubRTL(font_t *font, const unsigned char* startRTL, const unsigned char* string, fnt_glyph_cache_entry_t* glyph, int x, int y) {
 	if (glyph) {
 		x -= glyph->shx >> 6;
@@ -582,8 +607,8 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
 	quad.color = colour;
 
 	int pen_x = x;
-	/*int xmax = x + width;
-	int ymax = y + height;*/
+	int xmax = x + width;
+	int ymax = y + height;
 
 	use_kerning = FT_HAS_KERNING(font->face);
 	state = UTF8_ACCEPT;
@@ -615,26 +640,26 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
 		}
 
 
-		/*if (width) {
+		if (width) {
 			if (codepoint == '\n') {
-				x = xori;
+				pen_x = x;
 				y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
 				continue;
 			}
 
-			if ((x + glyph_w > xmax) || (y > ymax)) // stepped over the max
+			if ((pen_x + glyph->width > xmax) || (y > ymax)) // stepped over the max
 				break;
-		}*/
+		}
 
-		if (codepoint > 0xFF) {
-			if (!inRTL) {
+		if (isRTL(codepoint)) {
+			if (!inRTL && !isWeak(codepoint)) {
 				inRTL = 1;
 				pen_xRTL = pen_x;
 				glyphRTL = glyph;
 				startRTL = string + 1;
 			}
-		} else if ((codepoint > 96 && codepoint < 123) || (codepoint > 64 && codepoint < 91)) {
-			if (inRTL) { // render RTL
+		} else {
+			if (inRTL && !isWeak(codepoint)) { // A LTR character is encountered. Render RTL characters before continuing.
 				inRTL = 0;
 				pen_x = pen_xRTL;
 				fntRenderSubRTL(font, startRTL, string, glyphRTL, pen_xRTL, y);
@@ -665,15 +690,15 @@ void fntFitString(int id, unsigned char *string, size_t width) {
 	unsigned char *str = string;
 	size_t spacewidth = fntCalcDimensions(id, " ");
 	unsigned char *psp = NULL;
-	
+
 	while (*str) {
 		// scan forward to the next whitespace
 		unsigned char *sp = str;
 		for (; *sp && *sp != ' ' && *sp != '\n'; ++sp);
-		
+
 		// store what was there before
 		unsigned char osp = *sp;
-		
+
 		// newline resets the situation
 		if (osp == '\n') {
 			cw = 0;
@@ -681,15 +706,15 @@ void fntFitString(int id, unsigned char *string, size_t width) {
 			psp = NULL;
 			continue;
 		}
-		
+
 		// terminate after the word
 		*sp = '\0';
-		
+
 		// Calc the font's width...
 		// NOTE: The word was terminated, so we're seeing a single word
 		// on that position
 		size_t ww = fntCalcDimensions(id, str);
-		
+
 		if (cw + ww > width) {
 			if (psp) {
 				// we have a prev space to utilise (wrap on it)
@@ -708,7 +733,7 @@ void fntFitString(int id, unsigned char *string, size_t width) {
 			*sp = osp;
 			psp = sp;
 		}
-		
+
 		cw += spacewidth;
 		str = ++sp;
 	}

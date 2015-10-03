@@ -1,6 +1,6 @@
 # translation by danielb / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ Servidor HDL a fechar...
 Definir saída do IGR
 Cor de fundo
 Cor do texto
+- PS2 -
+- Servidor SMB -
 Endereço IP
 Estático
 DHCP
@@ -100,7 +102,7 @@ Renomear
 Apagar
 Iniciar
 Configurações de Ecrâ
-Ativar função Apagar/Renomear
+Ativar operações de escrita
 Verificar fragmentação de jogo USB
 Lembrar último jogo executado
 Botão de Seleção
@@ -109,7 +111,7 @@ Erro, não foi possível iniciar o item
 Testar
 Deixar vazio para ligar como convidado (GUEST)
 Carregar núcleo alternativo
-Método alternativo de leitura de dados
+Modo Síncrono
 Desativar chamadas do sistema
 Saltar videos PSS
 Emular DVD-DL
@@ -184,7 +186,6 @@ Ajuste vertical
 Definir compensação vertical
 Saltar FMV
 Saltar vídeos
-Mostrar PS2RD Cheat Engine no Menu Principal
 Opções de Cheat
 Ativar PS2RD Cheat Engine
 Permite PS2RD Cheat Engine injetar código nos jogos.
@@ -205,3 +206,5 @@ Descarregar definições da Internet?
 Definições personalizadas
 Pré-definições de download
 Início automático em %i s...
+Auto iniciar
+Valor em segundos, 0 para desativar

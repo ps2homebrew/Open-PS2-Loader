@@ -1,6 +1,6 @@
-# translation by Colossus / supervised by Jay-Jay 
-# Last update: 09/14/2015 
-# Updated for OPL_r825_DB [578b754]
+# translation by Colossus and mastertuto / supervised by Jay-Jay 
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese Brazil
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ Servidor HDL está sendo encerrado...
 Definir saída do IGR
 Cor de fundo
 Cor do texto
+- PS2 -
+- Servidor SMB -
 Tipo de Endereço IP
 Estático
 DHCP
@@ -100,7 +102,7 @@ Renomear
 Apagar
 Iniciar
 Configurações de Tela
-Ativar função Apagar e Renomear
+Ativar opções de gravação
 Checar fragmentação USB
 Lembrar último jogo jogado
 Botão de Seleção
@@ -109,7 +111,7 @@ Erro, não foi possível iniciar o item
 Testar
 Deixar vazio para autorização como convidado (GUEST)
 Carregar núcleo alternativo
-Método alternativo de leitura de dados
+Synchronous Mode
 Desativar chamadas do sistema
 Pular vídeos PSS
 Emular DVD-DL
@@ -168,7 +170,7 @@ Modo 6
 Modo 7
 Modo 8
 Configurar GSM
-Velocidade Ethernet e sistema duplex
+Velocidade Ethernet e sistema Duplex
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
@@ -184,7 +186,6 @@ Ajuste vertical
 Definir compensação vertical
 Pular FMV
 Pular vídeos
-Mostrar PS2RD Cheat Engine no Menu Principal
 Opções de Cheats
 Ativar PS2RD Cheat Engine
 Permitir que PS2RD Cheat Engine injete códigos nos jogos.
@@ -205,3 +206,5 @@ Baixar configurações da Internet?
 Configurações personalizadas
 Configurações baixadas
 Auto começar em %i s...
+Auto iniciar
+Valor em segundo(s), 0 para desativar auto iniciar

@@ -1,6 +1,6 @@
 # translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>; extra lines added by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Filipino
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ HDL Server Unloading...
 Lumabas sa
 kulay ng background
 kulay ng teksto
+- PS2 -
+- SMB Server -
 IP address type
 Static
 DHCP
@@ -100,7 +102,7 @@ Rename
 Alisin
 Tumakbo
 Ipakita ang mga setting
-Enable Delete and Rename actions
+Enable write operations
 Check USB game fragmentation
 Tandaan ang huling play ng laro
 Select button
@@ -108,8 +110,8 @@ Error, the game is fragmented
 Error, hindi maaaring tumakbo ang item
 pagsubok
 Iwanang walang laman para sa Guest auth .
-Accurate reads
-Alternatibong data basahin pamamaraan
+Accurate Reads
+Synchronous Mode
 alisin sa pagkakakawit Syscalls
 0 PSS mode
 Emulate DVD-DL
@@ -184,7 +186,6 @@ V-POS
 Vertical Adjustment
 FMV Skip
 Skips Full Motion Videos
-Show PS2RD Cheat Engine on Main Menu
 Cheat Settings
 Enable PS2RD Cheat Engine
 Lets PS2RD Cheat Engine patch your games
@@ -205,3 +206,5 @@ Download settings from the network?
 Customized Settings
 Downloaded Defaults
 Auto start in %i s...
+Auto start
+Value in second(s), 0 to disable auto start

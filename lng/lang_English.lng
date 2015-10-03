@@ -5,7 +5,7 @@
 # Any missing lines will be substituted with the English defaults from lang.c.                    #
 #                                                                                                 #
 # Important: if your language require some custom glyphs, you should provide a corresponding      #
-# TTF font file too. By default, OPL only comes with the "basic Latin" font built-in.             #
+# TTF/OTF font file too. By default, OPL only comes with the "basic Latin" font built-in.         #
 #                                                                                                 #
 # Once the translation is complete, you can submit it to the development team.                    #
 #                                                                                                 #
@@ -128,13 +128,13 @@ Error, the game is fragmented
 Error, could not run the item
 Test
 Leave empty for GUEST auth.
-Slow down reading
-Alternative data read method
-Unload OPL when possible
-Skip videos
-For DVD9 rips
-IGR is incompatible with some games
-Stores modules in alternate location
+Accurate Reads
+Synchronous Mode
+Unhook Syscalls
+0 PSS mode
+Emulate DVD-DL
+Disable IGR
+High module storage
 Hide DEV9 module
 Changing the size will reformat the VMC
 Create
@@ -179,14 +179,14 @@ VMC Slot 2
 Game ID
 DMA Mode
 V-Sync
-1. Accurate Reads
-2. Synchronous Mode
-3. Unhook Syscalls
-4. 0 PSS
-5. Emulate DVD-DL
-6. Disable IGR
-7. High Mod Storage
-8. Hide DEV9
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
 Configure GSM
 Ethernet link mode
 100Mbit full-duplex

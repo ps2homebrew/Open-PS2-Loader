@@ -27,7 +27,7 @@ extern int size_freesansfont_raw;
 /// Atlas height in pixels
 #define ATLAS_HEIGHT 128
 
-#define FNTSYS_CHAR_SIZE	18
+#define FNTSYS_CHAR_SIZE	17
 
 // freetype vars
 static FT_Library font_library;

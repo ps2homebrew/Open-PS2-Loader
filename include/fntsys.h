@@ -20,7 +20,7 @@ void fntEnd();
 int fntLoadFile(char* path);
 
 /** Reloads the default font */
-void fntLoadDefault(char* path);
+int fntLoadDefault(char* path);
 
 /** Releases a font slot */
 void fntRelease(int id);

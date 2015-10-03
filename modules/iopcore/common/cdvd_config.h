@@ -26,12 +26,13 @@ struct cdvdman_settings_smb{
 	s8 filename[80];
 	union{
 		struct{
-			s8 pc_ip[16];
-			u16 pc_port;
-			s8 pc_share[33];
-			s8 pc_prefix[33];
-			s8 smb_user[17];
-			s8 smb_password[17];
+			//Please keep the string lengths in-sync with the limits within the UI.
+			s8 smb_ip[16];
+			u16 smb_port;
+			s8 smb_share[32];
+			s8 smb_prefix[32];
+			s8 smb_user[32];
+			s8 smb_password[32];
 		};
 		u16 FIDs[ISO_MAX_PARTS];
 	};

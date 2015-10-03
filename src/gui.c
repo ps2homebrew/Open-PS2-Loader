@@ -345,9 +345,10 @@ static void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_se
 
 static int guiUpdater(int modified) {
 	int showAutoStartLast;
-	
+
 	if (modified) {
 		diaGetInt(diaConfig, CFG_LASTPLAYED , &showAutoStartLast);
+		diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, showAutoStartLast);
 		diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, showAutoStartLast);
 	}
 	return 0;
@@ -370,7 +371,7 @@ void guiShowConfig() {
 
 	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
 	diaSetString(diaConfig, CFG_EXITTO, gExitPath);
-	diaSetInt(diaConfig, CFG_DANDROP, gEnableDandR);
+	diaSetInt(diaConfig, CFG_ENWRITEOP, gEnableWrite);
 	diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
 	diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
 	diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
@@ -378,10 +379,8 @@ void guiShowConfig() {
 	diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
 	diaSetInt(diaConfig, CFG_AUTOSTARTLAST, gAutoStartLastPlayed);
 	diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, gRememberLastPlayed);
+	diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, gRememberLastPlayed);
 
-#ifdef CHEAT
-	diaSetInt(diaConfig, CFG_SHOWCHEAT, gShowCheat);
-#endif
 	diaSetInt(diaConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
 	diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
 	diaSetInt(diaConfig, CFG_USBMODE, gUSBStartMode);
@@ -393,7 +392,7 @@ void guiShowConfig() {
 	if (ret) {
 		diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
-		diaGetInt(diaConfig, CFG_DANDROP, &gEnableDandR);
+		diaGetInt(diaConfig, CFG_ENWRITEOP, &gEnableWrite);
 		diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
 		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
 		diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
@@ -401,9 +400,6 @@ void guiShowConfig() {
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 		diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
 		as_counter_disable = 1;	//Stop Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
-#ifdef CHEAT
-		diaGetInt(diaConfig, CFG_SHOWCHEAT, &gShowCheat);
-#endif
 		if(diaGetInt(diaConfig, CFG_SELECTBUTTON, &value))
 			gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 		else
@@ -665,7 +661,6 @@ void guiShowNetConfig(void) {
 		diaGetString(diaNetConfig, NETCFG_SHARE_NAME, gPCShareName, sizeof(gPCShareName));
 		diaGetString(diaNetConfig, NETCFG_SHARE_USERNAME, gPCUserName, sizeof(gPCUserName));
 		diaGetString(diaNetConfig, NETCFG_SHARE_PASSWORD, gPCPassword, sizeof(gPCPassword));
-		gNetConfigChanged = 1;
 
 		if (result == NETCFG_RECONNECT && gNetworkStartup < ERROR_ETH_SMB_CONN)
 			gNetworkStartup = ERROR_ETH_SMB_LOGON;
@@ -733,15 +728,17 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 			diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_ERROR));
 		}
 
-		if (gEnableDandR) {
+		diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
+		diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 1);
+		if (gEnableWrite) {
 			diaSetEnabled(diaVMC, VMC_SIZE, 1);
-			diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
-			diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 1);
+			diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 1);
+			diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 1);
 		}
 		else {
 			diaSetEnabled(diaVMC, VMC_SIZE, 0);
-			diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
-			diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 0);
+			diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 0);
+			diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 0);
 		}
 	}
 	else {
@@ -750,6 +747,7 @@ static int guiRefreshVMCConfig(item_list_t *support, char* name) {
 
 		diaSetInt(diaVMC, VMC_SIZE, 0);
 		diaSetEnabled(diaVMC, VMC_SIZE, 1);
+		diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 1);
 		diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 0);
 	}
 

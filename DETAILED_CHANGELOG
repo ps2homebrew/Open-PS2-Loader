@@ -8,7 +8,8 @@
 
 Open PS2 Loader detailed ChangeLog:
 
-rev834 - Update Spanish translation
+rev835 - Update Spanish translation - Wed Sep 30 20:46:49 2015 +0200
+rev834 - About Menu: Credits listed in alphabetical order - Tue Sep 29 21:16:38 2015 -0400
 rev833 - Deleted: scripts/out.txt - Tue Sep 29 08:20:27 2015 +0000
 rev832 - Auto Start Last Game - Configureable Countdown : Value in second(s), 0 to disable auto start - Mon Sep 28 10:43:25 2015 -0400
 rev831 - Fixes for VMC (compilation warning) and Auto-start Last Game (bugs and conflicts) - Sun Sep 27 21:09:19 2015 -0400

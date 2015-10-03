@@ -14,9 +14,9 @@ struct UIItem diaNetConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SHOW_ADVANCED_OPTS}}}, {UI_SPACER}, {UI_SPACER}, {UI_BOOL, NETCFG_SHOW_ADVANCED_OPTS, 1, 1, -1, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ETH_OPMODE}}}, {UI_SPACER}, {UI_ENUM, NETCFG_ETHOPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
-	{UI_BREAK}, 
+	{UI_BREAK},
 
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- PS2 -", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CAT_PS2}}}, {UI_BREAK},
 
 	// ---- IP address type ----
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_IP_ADDRESS_TYPE}}}, {UI_SPACER}, {UI_ENUM, NETCFG_PS2_IP_ADDR_TYPE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
@@ -46,7 +46,7 @@ struct UIItem diaNetConfig[] = {
 	{UI_INT, NETCFG_PS2_GATEWAY_3, 1, 1, -1, 0, 0, {.intvalue = {1, 1, 0, 255}}}, {UI_BREAK},
 
 	//  ---- DNS server ----
-	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DNS}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DNS_SERVER}}}, {UI_SPACER},
 
 	{UI_INT, NETCFG_PS2_DNS_0, 1, 1, -1, 0, 0, {.intvalue = {192, 192, 0, 255}}}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {".", -1}}},
 	{UI_INT, NETCFG_PS2_DNS_1, 1, 1, -1, 0, 0, {.intvalue = {168, 168, 0, 255}}}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {".", -1}}},
@@ -56,7 +56,7 @@ struct UIItem diaNetConfig[] = {
 	{UI_SPLITTER},
 
 	//  ---- SMB Server ----
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"- SMB Server -", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CAT_SMB_SERVER}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ADDRESS_TYPE}}}, {UI_SPACER},
 	{UI_ENUM, NETCFG_SHARE_ADDR_TYPE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
@@ -97,16 +97,15 @@ struct UIItem diaCompatConfig[] = {
 
 	{UI_LABEL, COMPAT_STATUS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
 	{UI_BREAK},
-	{UI_BREAK},
 
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE    , 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 0, 1, 1, _STR_HINT_MODE1, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE5}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE2}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE6}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE3}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE4}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
+	{UI_LABEL, 0, 1, 1, -1, -32, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER}, {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER}, {UI_BREAK},
 
 	{UI_SPLITTER},
 
@@ -168,30 +167,27 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SETTINGS}}},
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DANDROP}}}, {UI_SPACER}, {UI_BOOL, CFG_DANDROP, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_AUTOSTARTLAST}}}, {UI_SPACER}, {UI_INT, CFG_AUTOSTARTLAST, 1, 1, _STR_HINT_AUTOSTARTLAST, 0, 0, {.intvalue = {0, 0, 0, 9}}},{UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_SELECTBUTTON}}}, {UI_SPACER}, {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-#ifdef CHEAT
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_SHOWCHEAT}}}, {UI_SPACER}, {UI_BOOL, CFG_SHOWCHEAT, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_BREAK},
-#endif
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER}, {UI_BOOL, CFG_DEBUG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_EXITTO}}}, {UI_SPACER}, {UI_STRING, CFG_EXITTO, 1, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLE_WRITE}}}, {UI_SPACER}, {UI_BOOL, CFG_ENWRITEOP, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER}, {UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},{UI_SPACER},
+	{UI_LABEL, CFG_LBL_AUTOSTARTLAST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_AUTOSTARTLAST}}}, {UI_SPACER}, {UI_INT, CFG_AUTOSTARTLAST, 1, 1, _STR_HINT_AUTOSTARTLAST, 0, 0, {.intvalue = {0, 0, 0, 9}}},{UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SELECTBUTTON}}}, {UI_SPACER}, {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_CHECKUSBFRAG}}}, {UI_SPACER}, {UI_BOOL, CFG_CHECKUSBFRAG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_USB_PREFIX}}}, {UI_SPACER}, {UI_STRING, CFG_USBPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_ETH_PREFIX}}}, {UI_SPACER}, {UI_STRING, CFG_ETHPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_HDD_SPINDOWN}}}, {UI_SPACER}, {UI_INT, CFG_HDDSPINDOWN, 1, 1, _STR_HINT_SPINDOWN, 0, 0, {.intvalue = {20, 20, 0, 20}}},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CHECKUSBFRAG}}}, {UI_SPACER}, {UI_BOOL, CFG_CHECKUSBFRAG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USB_PREFIX}}}, {UI_SPACER}, {UI_STRING, CFG_USBPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETH_PREFIX}}}, {UI_SPACER}, {UI_STRING, CFG_ETHPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDD_SPINDOWN}}}, {UI_SPACER}, {UI_INT, CFG_HDDSPINDOWN, 1, 1, _STR_HINT_SPINDOWN, 0, 0, {.intvalue = {20, 20, 0, 20}}},
 
 	{UI_SPLITTER},
 
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_USBMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_USBMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_HDDMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_HDDMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_ETHMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_ETHMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_APPMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USBMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_USBMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDDMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_HDDMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETHMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_ETHMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_APPMODE}}}, {UI_SPACER}, {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEFDEVICE}}}, {UI_SPACER}, {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
 
 	{UI_BREAK},
 

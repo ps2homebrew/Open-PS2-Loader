@@ -60,7 +60,7 @@ enum ERROR_CODE{
 #define COMPAT_MODE_5 		 0x10 // Emulate DVD-DL
 #define COMPAT_MODE_6 		 0x20 // Disable IGR
 #define COMPAT_MODE_7 		 0x40 // High Module Storage
-#define COMPAT_MODE_8 		 0x80 // Hide dev9 module
+#define COMPAT_MODE_8 		 0x80 // Hide DEV9 module
 
 #define COMPAT_MODE_COUNT		8
 

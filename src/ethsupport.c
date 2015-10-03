@@ -49,7 +49,7 @@ extern void *smb_mcemu_irx;
 extern int size_smb_mcemu_irx;
 #endif
 
-static char ethPrefix[40];
+static char ethPrefix[40];	//Contains the full path to the folder where all the games are.
 static char* ethBase;
 static int ethULSizePrev = -2;
 static unsigned char ethModifiedCDPrev[8];
@@ -546,6 +546,9 @@ static void ethRenameGame(int id, char* newName) {
 
 static void ethLaunchGame(int id, config_set_t* configSet) {
 	int i, compatmask;
+#ifdef CHEAT
+	int result;
+#endif
 	char filename[32], partname[256];
 	base_game_info_t* game = &ethGames[id];
 	struct cdvdman_settings_smb *settings;
@@ -581,7 +584,7 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 				smb_vmc_infos.active = 1;
 				smb_vmc_infos.fid = 0xFFFF;
 				if (gETHPrefix[0])
-					snprintf(smb_vmc_infos.fname, sizeof(smb_vmc_infos.fname), "%s\\VMC\\%s.bin", gETHPrefix, vmc_name); // may still be too small size here ;) (should add 11 char !)
+					snprintf(smb_vmc_infos.fname, sizeof(smb_vmc_infos.fname), "%s\\VMC\\%s.bin", gETHPrefix, vmc_name);
 				else
 					snprintf(smb_vmc_infos.fname, sizeof(smb_vmc_infos.fname), "VMC\\%s.bin", vmc_name);
 			} else {
@@ -604,20 +607,15 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 #endif
 
 #ifdef CHEAT
-	if (gEnableCheat) {
-		char cheatfile[32];
-		snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", ethPrefix, game->startup);
-		LOG("Loading Cheat File %s\n", cheatfile);
-		if (load_cheats(cheatfile) < 0) {
-				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
-				LOG("Error: failed to load cheats\n");
-		} else {
-			if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
-				LOG("Cheats found\n");
-			} else {
+	if((result = sbLoadCheats(ethPrefix, game->startup)) < 0)
+	{
+		switch(result)
+		{
+			case -ENOENT:
 				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
-				LOG("No cheats found\n");
-			}
+				break;
+			default:
+				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
 		}
 	}
 #endif
@@ -642,10 +640,10 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 			settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
 	}
 
-	sprintf(settings->pc_ip, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
-	settings->pc_port=gPCPort;
-	strcpy(settings->pc_share, gPCShareName);
-	strcpy(settings->pc_prefix, gETHPrefix);
+	sprintf(settings->smb_ip, "%u.%u.%u.%u", pc_ip[0], pc_ip[1], pc_ip[2], pc_ip[3]);
+	settings->smb_port=gPCPort;
+	strcpy(settings->smb_share, gPCShareName);
+	strcpy(settings->smb_prefix, gETHPrefix);
 	strcpy(settings->smb_user, gPCUserName);
 	strcpy(settings->smb_password, gPCPassword);
 
@@ -684,11 +682,8 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	// disconnect from the active SMB session
 	ethSMBDisconnect();
 
-	const char *altStartup = NULL;
-	if (configGetStr(configSet, CONFIG_ITEM_ALTSTARTUP, &altStartup))
-		strncpy(filename, altStartup, sizeof(filename));
-	else
-		sprintf(filename, "%s", game->startup);
+	if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
+		strcpy(filename, game->startup);
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
 #ifdef VMC

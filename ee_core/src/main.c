@@ -84,7 +84,8 @@ int main(int argc, char **argv){
 	_strcpy(ElfPath, "cdrom0:\\");
 	_strcat(ElfPath, argv[i]);
 	_strcat(ElfPath, ";1");
-	_strcpy(GameID, argv[i]);
+	strncpy(GameID, argv[i], sizeof(GameID) - 1);
+	GameID[sizeof(GameID) - 1] = '\0';
 	DPRINTF("Elf path = '%s'\n", ElfPath);
 	DPRINTF("Game ID = '%s'\n", GameID);
 

@@ -36,8 +36,8 @@
 // Auto Start Counter
 #include <time.h>
 
-#define OPL_VERSION		"0.9.3 WIP"
-#define OPL_IS_DEV_BUILD	1		//Define if this build is a development build.
+#define OPL_VERSION		"0.9.3"
+//#define OPL_IS_DEV_BUILD	1		//Define if this build is a development build.
 
 //IO type IDs
 #define IO_CUSTOM_SIMPLEACTION			1	// handler for parameter-less actions
@@ -64,10 +64,6 @@ void deinit();
 
 char *gBaseMCDir;
 
-//// IP config
-
-#define IPCONFIG_MAX_LEN	64
-
 enum ETH_OP_MODES{
 	ETH_OP_MODE_AUTO	= 0,
 	ETH_OP_MODE_100M_FDX,
@@ -85,9 +81,10 @@ int ps2_gateway[4];
 int ps2_dns[4];
 int gETHOpMode;	//See ETH_OP_MODES.
 int gPCShareAddressIsNetBIOS;
-char gPCShareNBAddress[17];
 int pc_ip[4];
 int gPCPort;
+//Please keep these string lengths in-sync with the limits within CDVDMAN.
+char gPCShareNBAddress[17];
 char gPCShareName[32];
 char gPCUserName[32];
 char gPCPassword[32];
@@ -96,8 +93,6 @@ char gPCPassword[32];
 
 // describes what is happening in the network startup thread (>0 means loading, <0 means error)...
 int gNetworkStartup;
-// true if the ip config should be saved as well
-int gNetConfigChanged;
 int gHDDSpindown;
 /// Refer to enum START_MODE within iosupport.h
 int gUSBStartMode;
@@ -139,9 +134,10 @@ int gDisableDebug;
 // Default device
 int gDefaultDevice;
 
-int gEnableDandR;
+int gEnableWrite;
 
 int gCheckUSBFragmentation;
+//These prefixes are relative to the device's name (meaning that they do not include the device name).
 char gUSBPrefix[32];
 char gETHPrefix[32];
 
@@ -151,10 +147,6 @@ int gAutoStartLastPlayed;
 int as_counter, as_counter_disable;
 double as_start, as_current;
 char asc[21];
-
-#ifdef CHEAT
-int gShowCheat; // Toggle to reveal "Cheat Settings" on Main Menu
-#endif
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

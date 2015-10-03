@@ -25,19 +25,19 @@ int getFileSize(int fd) {
 	return size;
 }
 
-static void writeMCIcon() {
-	void** buffer = &icon_icn;
-	file_buffer_t* fileBuffer = openFileBuffer("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC, 0, 0);
-	if (fileBuffer) {
-		writeFileBuffer(fileBuffer, (char *)buffer, size_icon_icn);
-		closeFileBuffer(fileBuffer);
+static void writeMCIcon(void) {
+	int fd;
+
+	fd = fileXioOpen("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	if (fd >= 0) {
+		fileXioWrite(fd, &icon_icn, size_icon_icn);
+		fileXioClose(fd);
 	}
 
-	buffer = &icon_sys;
-	fileBuffer = openFileBuffer("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC, 0, 0);
-	if (fileBuffer) {
-		writeFileBuffer(fileBuffer, (char *)buffer, size_icon_sys);
-		closeFileBuffer(fileBuffer);
+	fd = fileXioOpen("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	if (fd >= 0) {
+		fileXioWrite(fd, &icon_sys, size_icon_sys);
+		fileXioClose(fd);
 	}
 }
 
@@ -125,7 +125,7 @@ void* readFile(char* path, int align, int* size) {
 		}
 
 		if (align > 0)
-			buffer = memalign(128, realSize); // The allocation is aligned to aid the DMA transfers
+			buffer = memalign(64, realSize); // The allocation is aligned to aid the DMA transfers
 		else
 			buffer = malloc(realSize);
 
@@ -161,6 +161,7 @@ int listDir(char* path, const char* separator, int maxElem,
 /* size will be the maximum line size possible */
 file_buffer_t* openFileBuffer(char* fpath, int mode, short allocResult, unsigned int size) {
 	file_buffer_t* fileBuffer = NULL;
+	unsigned char bom[3];
 
 	int fd = openFile(fpath, mode);
 	if (fd >= 0) {
@@ -169,7 +170,17 @@ file_buffer_t* openFileBuffer(char* fpath, int mode, short allocResult, unsigned
 		fileBuffer->available = 0;
 		fileBuffer->buffer = (char*) malloc(size * sizeof(char));
 		if (mode == O_RDONLY)
+		{
 			fileBuffer->lastPtr = NULL;
+
+			//Check for and skip the UTF-8 BOM sequence.
+			if((fileXioRead(fd, bom, sizeof(bom)) != 3) ||
+				(bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF))
+			{
+				//Not BOM, so rewind.
+				fileXioLseek(fd, 0, SEEK_SET);
+			}
+		}
 		else
 			fileBuffer->lastPtr = fileBuffer->buffer;
 		fileBuffer->allocResult = allocResult;
@@ -210,7 +221,7 @@ int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 			lineSize = fileBuffer->available - (fileBuffer->lastPtr - fileBuffer->buffer);
 			/*LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
 					fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]);*/
-			posLF = strchr(fileBuffer->lastPtr, 0x0A);
+			posLF = strchr(fileBuffer->lastPtr, '\n');
 		}
 
 		if (!posLF) { // We can come here either when the buffer is empty, or if the remaining chars don't have a LF
@@ -231,7 +242,7 @@ int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 				fileBuffer->buffer[lineSize + read] = '\0';
 
 				// Search again (from the lastly added chars only), the result will be "analyzed" in next if
-				posLF = strchr(fileBuffer->buffer + lineSize, 0x0A);
+				posLF = strchr(fileBuffer->buffer + lineSize, '\n');
 
 				// Now update read context info
 				lineSize = lineSize + read;
@@ -254,7 +265,7 @@ int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 
 		// Check the previous char (on Windows there are CR/LF instead of single linux LF)
 		if (lineSize)
-			if (*(fileBuffer->lastPtr + lineSize - 1) == 0x0D)
+			if (*(fileBuffer->lastPtr + lineSize - 1) == '\r')
 				lineSize--;
 
 		fileBuffer->lastPtr[lineSize] = '\0';
@@ -266,7 +277,7 @@ int readFileBuffer(file_buffer_t* fileBuffer, char** outBuf) {
 		if (!lineSize && !fileBuffer->available && fileBuffer->fd == -1)
 			return 0;
 
-		if (fileBuffer->lastPtr[0] == 0x23) {// '#' for comment lines
+		if (fileBuffer->lastPtr[0] == '#') {// '#' for comment lines
 			if (posLF)
 				fileBuffer->lastPtr = posLF + 1;
 			else

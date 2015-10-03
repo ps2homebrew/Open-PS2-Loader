@@ -1,6 +1,6 @@
 # translation by alimadhi / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Arabic
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ HDL جاري بتشغيل
 مسار IGR
 لون الخلفية
 لون النص
+- PS2 -
+- SMB Server -
 نوع عنوان IP
 الحالة
 تكوين المضيف الديناميكي
@@ -100,7 +102,7 @@ IP
 حذف
 تشغيل
 اعدادات العرض
-تمكين حذف وإعادة التسمية
+Enable write operations
 تحقق من تجزئة العاب USB
 تذكر آخر لعبة تم اختيارها
 اختر الزر
@@ -109,7 +111,7 @@ IP
 اختبار
 ترك فارغة من اجل مصادقة الضيف.
 قراءات دقيقة
-طريقة قراءة البيانات البديلة
+Synchronous Mode
 Unhook Syscalls
 0 وضع PSS
 محاكي DVD-DL
@@ -185,7 +187,6 @@ V-POS
 FMV اجتياز
 تخطي كامل لحركة الفيديو
 اظهار قائمة الخدع في القائمة الرئيسية
-اعدادات الخدع
 تمكين محرك الغش
 يتيح محرك الغش من تصحيح الألعاب
 وضع محرك الغش
@@ -205,3 +206,5 @@ FMV اجتياز
 إعدادات مخصصة
 افتراضيات تحميلها
 بدأ تلقائي في %i s... 
+Auto start
+Value in second(s), 0 to disable auto start

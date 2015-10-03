@@ -1,6 +1,6 @@
 # translated by verislasher / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Indonesian
 Open PS2 Loader %s
@@ -9,7 +9,7 @@ Kembali
 Konfigurasi jaringan
 Pilihan lanjutan
 <tak ada nilai>
-Setingan disimpan ...
+Setingan disimpan...
 Kesalahan penulisan setingan!
 Keluar
 Setingan
@@ -22,7 +22,7 @@ Tema
 Bahasa
 Sistem akan dimatikan.
 Keluar OPL?
-Batal memperbarui?
+Batal perbarui?
 %d: Harddisk tak terdeteksi
 %d: Harddisk belum diformat
 %d: Kesalahan memulai jaringan
@@ -78,6 +78,8 @@ Mengembalikan Server HDL...
 Pintasan IGR
 Warna latar belakang
 Warna teks
+- PS2 -
+- SMB Server -
 Jenis alamat IP
 Statis
 DHCP
@@ -100,7 +102,7 @@ Ubah nama
 Hapus
 Jalankan
 Setingan tampilan
-Aktifkan tindakan Hapus dan Ubah nama
+Enable write operations
 Cek fragmentasi game USB
 Ingat pertandingan terakhir dimainkan
 Pilih tombol
@@ -109,7 +111,7 @@ Kesalahan, tidak bisa menjalankan item
 Coba
 Tinggalkan kosong untuk Otent TAMU.
 Membaca akurat
-Metode alternatif baca data
+Synchronous Mode
 Melepas kaitan syscalls
 Mode PSS 0
 Emulasi DVD-DL
@@ -184,7 +186,6 @@ V-POS
 Penyesuaian Vertikal
 Lewati FMV
 Lompati Video Gerakan Penuh
-Tampilkan PS2RD Cheat Engine pada Menu Utama
 Setingan Cheat
 Aktifkan PS2RD Cheat Engine
 Biarkan PS2RD Cheat Engine menambal permainan Anda
@@ -194,14 +195,16 @@ Pilih otomatis game cheats
 Pilih game cheats
 Kesalahan: gagal untuk memuat Berkas cheat
 Tak ada cheat ditemukan
-Unduh default
+Unduhan default
 Pembaruan jaringan
-Unduh ulang catatan yang ada?
+Unduh catatan yang ada?
 Pembaruan gagal.
-Gagal menyambung ke server update.
-Pembaruan selesai.
-Pembaruan dibatalkan.
-Unduh Setingan dari jaringan?
+Gagal menyambungkan ke server pembaruan.
+Perbarui selesai.
+Perbarui dibatalkan.
+Unduh pengaturan dari jaringan?
 Setingan disesuaikan
 Unduhan default
 Mulai otomatis dalam %i s...
+Mulai otomatis
+Nilai dalam detik, 0 mencegah mulai otomatis

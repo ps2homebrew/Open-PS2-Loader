@@ -1,6 +1,6 @@
 # translation by andre95d / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Italian
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ HDL Server Unloading...
 Esci su
 Colore di sfondo
 Colore testo
+- PS2 -
+- SMB Server -
 IP address type
 Static
 DHCP
@@ -100,7 +102,7 @@ Rinomina
 Cancella
 Esegui
 Impostazioni display
-Abilita azioni di rinomina e cancella
+Enable write operations
 Check USB game fragmentation
 Ricorda ultimo titolo giocato
 Seleziona tasto
@@ -109,7 +111,7 @@ Errore, impossibile avviare il titolo.
 Test
 Lasciare vuoto per autenticazione GUEST
 Lettura accurata
-Metodo lettura alternativo
+Synchronous Mode
 Unhook syscalls
 0 PSS mode
 Disabilita DVD-DL
@@ -184,7 +186,6 @@ V-POS
 Regolazione verticale
 FMV skip
 Salta video in full motion
-Mostra motore cheat PS2RD nel menù principale
 Impostazioni cheat
 Abilita motore cheat PS2RD
 Permetti a PS2RD di applicare patch ai giochi
@@ -205,3 +206,5 @@ Download settings from the network?
 Customized Settings
 Downloaded Defaults
 Auto start in %i s...
+Auto start
+Value in second(s), 0 to disable auto start

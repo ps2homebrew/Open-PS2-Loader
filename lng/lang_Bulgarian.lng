@@ -1,6 +1,6 @@
 # translation by vsub / supervised by Jay-Jay
-# Last update: 09/05/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Bulgarian
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ HDL Server Unloading...
 Излез
 цвят на фона
 цвят на текста
+- PS2 -
+- SMB Server -
 IP address type
 Static
 DHCP
@@ -100,7 +102,7 @@ NetBIOS
 изтривам
 тичам
 настройки на дисплея
-Активирайте Изтриване и преименуване действия
+Enable write operations
 Check USB game fragmentation
 Запомни Последно играна игра
 Покажи GSM на Main Menu
@@ -109,7 +111,7 @@ Error, the game is fragmented
 тест
 Оставете празно за GUEST auth.
 Заредете заместник ядро
-Алтернативни данни чете метод
+Synchronous Mode
 Откачете Syscalls
 0 PSS режим
 Emulate DVD-DL
@@ -184,7 +186,6 @@ V-POS
 Vertical Adjustment
 FMV Skip
 Skips Full Motion Videos
-Show PS2RD Cheat Engine on Main Menu
 Cheat Settings
 Enable PS2RD Cheat Engine
 Lets PS2RD Cheat Engine patch your games
@@ -205,3 +206,5 @@ Download settings from the network?
 Customized Settings
 Downloaded Defaults
 Auto start in %i s...
+Auto start
+Value in second(s), 0 to disable auto start

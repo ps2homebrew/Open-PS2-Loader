@@ -1,6 +1,6 @@
 # translation by Anousith Phompida <noum_terry@hotmail.com> (aka: blackbutterfly) / supervised by Jay-Jay
-# Last update: 09/14/2015 
-# Updated for OPL_r825_DB [578b754]
+# Last update: 10/03/2015 
+# Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Laotian
 Open PS2 Loader %s
@@ -78,6 +78,8 @@ HDL Server ກໍາລັງຢຸດການໃຊ້ງານ...
 IGR path
 ສີຂອງພື້ນຫຼັງ
 ສີຂອງຂໍ້ຄວາມ
+- PS2 -
+- SMB Server -
 ປະເພດຂອງ IP address
 ຄ່າຄົງທີ່
 DHCP
@@ -100,7 +102,7 @@ NetBIOS
 ລົບ
 ຫຼິ້ນເກມນີ້
 ຕັ້ງຄ່າການສະແດງຜົນ
-ສາມາດລົບເກມ ແລະ ປ່ຽນຊື່ເກມໄດ້
+Enable write operations
 ກວດສອບ game fragmentation ເທິງ USB
 ໃຫ້ລະບົບຈື່ເກມທີ່ຫຼິ້ນໄປຄັ້ງສຸດທ້າຍ
 ເລືອກປຸ່ມ
@@ -109,7 +111,7 @@ NetBIOS
 ທົດລອງ
 ບໍ່ມີຄ່າກຳນົດໃດໆສຳລັບການເຂົ້າເຖິງຂອງ GUEST
 ອ່ານແບບຖືກຕ້ອງແມ່ນຍຳ
-ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
+Synchronous Mode
 Unhook Syscalls
 0 PSS mode
 ປະມວນຜົນ DVD-DL 
@@ -184,7 +186,6 @@ V-POS
 ການປັບແຕ່ງຄ່າສະແດງຜົນຕາມແນວຕັ້ງ
 ຂ້າມຂັ້ນຕອນ FMV
 ຂ້າມຂັ້ນຕອນສະແດງພາບເຄື່ອນໄຫວ Full Video
-ໃຫ້ເມນຼຫຼັກສະແດງຄຳສັ່ງໂກງເກມ PS2RD
 ຕັ້ງຄ່າການໂກງເກມ
 ເປີດໃຊ້ງານ ຄຳສັ່ງໂກງເກມ PS2RD
 ອະນຸຍາດໃຫ້ ຄຳສັ່ງໂກງເກມ PS2RD ເຂົ້າເຖິງເກມຂອງເຈົ້າ
@@ -205,3 +206,5 @@ V-POS
 ການຕັ້ງຄ່າທີ່ຖືກປັບແຕ່ງ
 ຄ່າມາດຕະຖານທີ່ຖືກດາວໂຫຼດ
 ເລີ່ມຕົ້ນອັດຕະໂນມັດ ພາຍໃນ %i ວິນາທີ…
+ເປີດໃຊ້ແບບໂອໂຕ
+ຕັ້ງຄ່າຫົວໜ່ວຍ ວິນາທີ, ໃສ່ 0 ເພື່ອປິດການເປີດໃຊ້ແບບໂອໂຕ

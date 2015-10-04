@@ -1,5 +1,5 @@
 # German Translation by ps2guy / supervised by Jay-Jay
-# Last update: 10/03/2015 
+# Last update: 10/04/2015 
 # Updated for OPL_r837_DB [2de2dda]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 German
@@ -102,7 +102,7 @@ Umbenennen
 Löschen
 Ausführen
 Bildschirmeinstellungen
-Enable write operations
+Aktiviere Schreiborperationen
 Überprüfe USB Spielefragmentierung
 Erinnere an zuletzt gespieltes Spiel
 Auswählen button
@@ -111,7 +111,7 @@ Fehler, Objekt kann nicht ausgeführt werden
 Test
 Leer lassen für Anmeldung als GAST
 Accurate reads
-Synchronous Mode
+Synchronmodus
 Systemaufrufe aushängen
 0 PSS Modus
 Emuliere DVD-DL
@@ -206,5 +206,5 @@ Einstellungen übers Netzwerk laden?
 Benutzerdefinierte Einstellungen
 Standardeinstellungen heruntergeladen
 Automatischer Start in %i s...
-Auto start
-Value in second(s), 0 to disable auto start
+Automatischer Start
+Wert in Sekunden (sek), 0 zum Deaktivieren

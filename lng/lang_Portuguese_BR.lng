@@ -1,26 +1,26 @@
-# translation by Colossus and mastertuto / supervised by Jay-Jay 
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
+# translation by Colossus, mastertuto, Gledson999 and doctorxyz / supervised by Jay-Jay and doctorxyz 
+# Last update: 10/04/2015  
+# Updated for changeset:   837:2de2dda81966
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese Brazil
 Open PS2 Loader %s
-Salvar configurações
+Salvar mudanças
 Voltar
-Configurações de Rede
+Configurações de rede
 Opções avançadas
 <sem valores>
 Configurações salvas
 Erro ao salvar configurações!
 Sair
-Configurações Gerais
+Configurações
 Menu
-Jogos por USB
-Jogos por HDD 
-Jogos por Rede
+Jogos USB
+Jogos HDD
+Jogos ETH
 Aplicativos
 Tema
 Idioma
-O console irá desligar.
+O console será desligado.
 Sair do OPL?
 Cancelar atualização?
 %d: Disco Rígido não detectado
@@ -29,54 +29,54 @@ Cancelar atualização?
 %d: Adaptador de Rede não detectado
 %d: Não foi possível conectar no servidor SMB  
 %d: Não foi possível efetuar login no servidor SMB 
-%d: Não foi possível abrir o compartilhamento SMB 
-%d: Impossível listar compartilhamentos SMB
-%d: Impossível listar jogos
+%d: Não foi possível abrir compartilhamento SMB 
+%d: Não foi possível listar compartilhamentos SMB
+%d: Não foi possível listar jogos
 %d: Servidor DHCP indisponível
 %d: Sem conexão de rede
-Ativ.
-Desactiv.
-Confirmar
-Eleger
+On 
+Off
+Ok
+Selecionar
 Cancelar
-Bolinha
-Xis
+O
+X
 Lista de Jogos
-Aj. do jogo
-Apagar configurações
-As configurações do jogo foram apagadas
-Velocidade de rolagem
+Configurações do Jogo
+Remover todas configurações
+Removidas todas as configurações do jogo
+Rolagem
 Lenta
 Média
 Rápida
 Menu padrão
 Carregar do disco
 Por favor espere
-Erro ao carregar ID do jogo
-Organizar alfabeticamente
-Erro ao carregar arquivo de idioma
-Desativar depuração de cores
-Controle não detectado, esperando...
-Habilitar Arte de Capas
+Erro ao carregar o ID do jogo
+Ordenação Automática
+Erro ao carregar o arquivo de idioma
+Desativar Cores de Depuração
+Nenhum controle detectado, esperando...
+Habilitar Arte de Capa
 Tela Panorâmica
-Desligar PS2
-Carregando configurações
+Desligar
+Carregando configurações...
 Salvando configurações...
 Iniciar dispositivo
 Atualizar
-Modo de inicio para Dispositivo USB
-Modo de inicio para HDD
-Modo de inicio para Rede SMB
-Modo de inicio para Aplicativos
+Modo de inicio USB
+Modo de inicio HDD
+Modo de inicio ETH
+Modo de inicio Aplicativos
 Automático
 Manual
 Iniciar Servidor HDL
 Servidor HDL está iniciando...
 Servidor HDL está sendo executado...
-Falha ao iniciar Servidor HDL.
-Servidor HDL está sendo encerrado...
-Definir saída do IGR
-Cor de fundo
+Falha ao iniciar o servidor HDL.
+Servidor HDL sendo encerrado...
+Caminho de saída do IGR
+Cor do fundo
 Cor do texto
 - PS2 -
 - Servidor SMB -
@@ -92,37 +92,37 @@ Porta
 Compartilhamento
 Usuário
 Senha
-<não usado>
+<não definido>
 Tipo de Endereço
 IP
 NetBIOS
-Confirmar
-O item será PERMANENTEMENTE apagado! Continuar?
+Aceitar
+O item será apagado DEFINITIVAMENTE, continuar?
 Renomear
 Apagar
-Iniciar
-Configurações de Tela
-Ativar opções de gravação
-Checar fragmentação USB
+Executar
+Configurações de tela
+Ativar operações de gravação
+Verificar fragmentação USB
 Lembrar último jogo jogado
 Botão de Seleção
-Erro, O jogo está fragmentado
-Erro, não foi possível iniciar o item
+Erro, o jogo está fragmentado
+Erro, o item não pode ser executado
 Testar
-Deixar vazio para autorização como convidado (GUEST)
-Carregar núcleo alternativo
-Modo de sincronizar
-Desativar chamadas do sistema
+Deixe em branco para autorização como convidado (GUEST)
+Leituras precisas
+Modo Síncrono
+Desativar Chamadas do Sistema
 Pular vídeos PSS
 Emular DVD-DL
 Desativar IGR
-Armazenamento elevado do módulo
-Esconder módulo dev9
-Alterar o tamanho (Irá reformatar o VMC!)
+Armazenamento elevado de módulos
+Esconder módulo DEV9
+Mudar o tamanho reformatará o VMC
 Criar
 Iniciar
 Modificar
-Cancelar
+Abortar
 Resetar
 Usar genérico
 Configurar VMC
@@ -132,35 +132,35 @@ Estado
 Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
-Arquivo VMC precisa ser criado!
+Arquivo VMC precisa ser criado
 Erro com VMC %s, continuar com MC físico (slot %d) ?
 Atualização automática
 Sobre
 Desenvolvedores
-Controle de qualidade
+Controle de Qualidade
 Prefixo de caminho USB
-Deixar vazio sai para o Navegador
-Valor em minuto(s), 0 para desativar
-Desligamento automático do HDD
+Deixe em branco p/ sair p/ o Navegador
+Valor em minuto(s), 0 p/ desativar diminuição da rotação do HDD
+Diminuição automática da rotação do HDD
 Modo de vídeo
 Cor do diálogo
 Cor selecionada
-Mostrar Página de Informação 
-Info
+Mostrar Página de Informações
+Informações
 ELF customizado
 Seleção de Cor
 Reconectar
 Deixar vazio para listar compartilhamentos
 Prefixo de caminho ETH
-Apagar
+Backspace
 Espaço
-Aceitar
+Enter
 Modo
 VMC Slot 1
 VMC Slot 2
 ID do Jogo
 Modo DMA
-Sincronização do vídeo 
+Sincronização Vertical do Vídeo 
 Modo 1
 Modo 2
 Modo 3
@@ -170,41 +170,41 @@ Modo 6
 Modo 7
 Modo 8
 Configurar GSM
-Velocidade Ethernet e sistema Duplex
+Modo de link Ethernet
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-Opções do GSM
+Opções GSM
 Ativar GSM
-Permitir que o GSM ative o modo de vídeo escolhido
-Modo de vídeo selecionado
-Modo de vídeo a ser ativado
-Ajuste horizontal
-Definir compensação horizontal
-Ajuste vertical
-Definir compensação vertical
+Ativar/Desativar GSM
+Modo de vídeo
+Modo de vídeo customizado a forçar
+POS-H
+Ajustes Horizontal
+POS-V
+Ajustes Vertical
 Pular FMV
-Pular vídeos
-Opções de Cheats
-Ativar PS2RD Cheat Engine
-Permitir que PS2RD Cheat Engine injete códigos nos jogos.
-Modo do PS2RD Cheat Engine
-Auto selecionar ou Selecionar cheats do jogo
-Auto selecionar cheats
-Selecionar cheats do jogo
-Erro: falha ao abrir o arquivo de Cheat
-Nenhum Cheat encontrado
-Baixar configurações
-Atualização pela Internet
-Baixar dados existentes novamente?
+Pula os vídeos
+Opções de Trapaças
+Ativa a PS2RD Cheat Engine
+Deixa a PS2RD Cheat Engine aplicar patches
+Modo PS2RD Cheat Engine
+Auto-selecionar ou escolher trapaças
+Auto-selecionar trapaças
+Selecionar trapaças
+Erro: falha ao carregar trapaças
+Nenhuma trapaça encontrada
+Baixar configurações padrão
+Atualização pela rede
+Baixar registros existentes novamente?
 Falha na atualização.
 Falha ao conectar no servidor de atualização.
 Atualização concluída.
 Atualização cancelada.
-Baixar configurações da Internet?
+Baixar configurações da rede?
 Configurações personalizadas
-Configurações baixadas
-Auto começar em %i s...
-Auto iniciar
-Valor em segundo(s), 0 para desativar auto iniciar
+Configurações padrão baixadas
+Inicio automático em %i s...
+Inicio automático
+Valores em segundos (s), 0 para desativar

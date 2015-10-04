@@ -1,6 +1,6 @@
-# translation by lauchon22 and El_Patas / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
+# translation by lauchon22 and El_Patas / supervised by Jay-Jay and doctorxyz
+# Last update: 10/04/2015 
+# Updated for changeset:   837:2de2dda81966
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
 Open PS2 Loader %s
@@ -177,9 +177,9 @@ Configuración de velocidad ethernet y duplex
 10Mbit half-duplex
 Opciones GSM
 Activar GSM
+Activar o desactivar GSM
+VMODO
 Forzar modo de vídeo seleccionado con GSM
-Modo de vídeo seleccionado
-Modo de vídeo a forzar
 Ajuste horizontal
 Configura la posición horizontal de la pantalla
 Ajuste vertical

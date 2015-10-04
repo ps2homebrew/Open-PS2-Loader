@@ -1,6 +1,6 @@
-# Translation by machiavel and ShaolinAssassin / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
+# Translation by machiavel and ShaolinAssassin / supervised by Jay-Jay and doctorxyz
+# Last update: 10/04/2015 
+# Updated for changeset:   837:2de2dda81966
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 French
 Open PS2 Loader %s
@@ -187,8 +187,8 @@ Ajouter/Soustraire
 Passer les vidéos au format FMV
 Avance rapide
 Configuration de PS2RD
-PS2RD
 Activer/Désactiver PS2RD
+Activation des codes
 Mode d'activation des codes triche
 Automatique/Manuel
 Automatique

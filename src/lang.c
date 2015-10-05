@@ -7,6 +7,8 @@
 #include "include/usbsupport.h"
 #include "include/hddsupport.h"
 
+#include "include/iosupport.h"
+
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
 	"English (internal)",
@@ -261,6 +263,7 @@ static int lngLoadFont(const char *dir, const char *name) {
 }
 
 static int lngLoadFromFile(char* path, char *name) {
+	int HddStartMode;
 	file_buffer_t* fileBuffer = openFileBuffer(path, O_RDONLY, 1, 1024);
 	if (fileBuffer) {
 		// file exists, try to read it and load the custom lang
@@ -286,8 +289,10 @@ static int lngLoadFromFile(char* path, char *name) {
 
 		if(lngLoadFont(gBaseMCDir, name) != 0) {
 			if(lngLoadFont("mass0:", name) != 0) {
-				hddLoadModules();
-				lngLoadFont("pfs0:", name);
+				if(configGetInt(configGetByType(CONFIG_OPL), CONFIG_OPL_HDD_MODE, &HddStartMode) && (HddStartMode == START_MODE_AUTO)) {
+					hddLoadModules();
+					lngLoadFont("pfs0:", name);
+				}
 			}
 		}
 

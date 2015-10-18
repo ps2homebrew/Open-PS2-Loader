@@ -34,6 +34,7 @@ CORE:
 * Improved DVD-DL support.
 * Changed "Disable DVD-DL" to "Emulate DVD-DL" to better explain what it does. It's to emulate DVD-DL support, for DVD9 rips (games with their 2 layers compacted into 1).
 * Fixed support for SMB usernames and passwords that are longer than 16 characters (limit extended to 31).
+* Fixed renaming functionality for USBExtreme games.
 * Various fixes for games.
 
 GUI:

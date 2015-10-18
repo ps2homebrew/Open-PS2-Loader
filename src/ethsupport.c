@@ -278,6 +278,8 @@ static int ethLoadModules(void) {
 	if(!ethModulesLoaded) {
 		ethModulesLoaded = 1;
 
+		sysInitDev9();
+
 		if (sysLoadModuleBuffer(&netman_irx, size_netman_irx, 0, NULL) >= 0) {
 			NetManInit();
 

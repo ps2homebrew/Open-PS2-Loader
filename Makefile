@@ -72,7 +72,7 @@ EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 MAPFILE = opl.map
 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
-EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Iinclude
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
 
 BIN2C = $(PS2SDK)/bin/bin2c
 BIN2S = $(PS2SDK)/bin/bin2s
@@ -249,9 +249,9 @@ sclean:
 	echo "    * hdpro_atad.irx"
 	$(MAKE) -C modules/hdd/hdpro_atad clean
 	echo "    * ps2hdd.irx"
-	$(MAKE) -C modules/hdd/ps2hdd clean
+	$(MAKE) -C modules/hdd/apa clean
 	echo "    * ps2fs.irx"
-	$(MAKE) -C modules/hdd/ps2fs clean
+	$(MAKE) -C modules/hdd/pfs clean
 	echo "    * mcemu.irx"
 	$(MAKE) -C modules/mcemu -f Makefile.usb clean
 	$(MAKE) -C modules/mcemu -f Makefile.hdd clean
@@ -425,8 +425,8 @@ poweroff.s:
 
 ps2hdd.s:
 	echo "    * ps2hdd.irx"
-	$(MAKE) -C modules/hdd/ps2hdd
-	$(BIN2S) modules/hdd/ps2hdd/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
+	$(MAKE) -C modules/hdd/apa
+	$(BIN2S) modules/hdd/apa/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
 
 genvmc.s:
 	echo "    * genvmc.irx"
@@ -470,8 +470,8 @@ httpclient-iop.s:
 
 ps2fs.s:
 	echo "    * ps2fs.irx"
-	$(MAKE) -C modules/hdd/ps2fs
-	$(BIN2S) modules/hdd/ps2fs/ps2fs.irx asm/ps2fs.s ps2fs_irx
+	$(MAKE) -C modules/hdd/pfs
+	$(BIN2S) modules/hdd/pfs/ps2fs.irx asm/ps2fs.s ps2fs_irx
 
 iomanx.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/iomanX.irx asm/iomanx.s iomanx_irx

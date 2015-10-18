@@ -228,31 +228,31 @@ int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gam
 	snprintf(path, sizeof(path), "%sul.cfg", prefix);
 	fd = openFile(path, O_RDONLY);
 	if(fd >= 0) {
-		char buffer[0x040];
+		USBExtreme_game_entry_t GameEntry;
 
 		if(count < 0) count = 0;
 		size = getFileSize(fd);
 		*fsize = size;
-		count += size / 0x040;
+		count += size / sizeof(USBExtreme_game_entry_t);
 
 		if (count > 0) {
 			if((*list = (base_game_info_t*)malloc(sizeof(base_game_info_t) * count)) != NULL) {
 				while (size > 0) {
-					fileXioRead(fd, buffer, 0x40);
+					fileXioRead(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
 
 					base_game_info_t *g = &(*list)[id++];
 
 					// to ensure no leaks happen, we copy manually and pad the strings
-					memcpy(g->name, buffer, UL_GAME_NAME_MAX);
+					memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);
 					g->name[UL_GAME_NAME_MAX] = '\0';
-					memcpy(g->startup, &buffer[UL_GAME_NAME_MAX + 3], GAME_STARTUP_MAX);
+					memcpy(g->startup, &GameEntry.startup[3], GAME_STARTUP_MAX);
 					g->startup[GAME_STARTUP_MAX] = '\0';
 					g->extension[0] = '\0';
-					memcpy(&g->parts, &buffer[47], 1);
-					memcpy(&g->media, &buffer[48], 1);
+					g->parts = GameEntry.parts;
+					g->media = GameEntry.media;
 					g->format = GAME_FORMAT_USBLD;
 					g->sizeMB = -1;
-					size -= 0x40;
+					size -= sizeof(USBExtreme_game_entry_t);
 				}
 			}
 		}
@@ -417,37 +417,33 @@ void sbUnprepare(void *pCommon) {
 
 static void sbRebuildULCfg(base_game_info_t **list, const char* prefix, int gamecount, int excludeID) {
 	char path[256];
+	USBExtreme_game_entry_t GameEntry;
 	snprintf(path, sizeof(path), "%sul.cfg", prefix);
 
-	file_buffer_t* fileBuffer = openFileBuffer(path, O_WRONLY | O_CREAT | O_TRUNC, 0, 4096);
-	if (fileBuffer) {
+	FILE *file = fopen(path, "wb");
+	if (file != NULL) {
 		int i;
-		char buffer[0x40];
 		base_game_info_t* game;
 
-		memset(buffer, 0, 0x40);
-		buffer[32] = 0x75; // u
-		buffer[33] = 0x6C; // l
-		buffer[34] = 0x2E; // .
-		buffer[53] = 0x08; // just to be compatible with original ul.cfg
+		memset(&GameEntry, 0, sizeof(GameEntry));
+		GameEntry.Byte08 = 0x08;	// just to be compatible with original ul.cfg
+		strcpy(GameEntry.startup, "ul.");
 
 		for (i = 0; i < gamecount; i++) {
 			game = &(*list)[i];
 
 			if (game->format == GAME_FORMAT_USBLD  && (i != excludeID)) {
-				memset(buffer, 0, UL_GAME_NAME_MAX);
-				memset(&buffer[UL_GAME_NAME_MAX + 3], 0, GAME_STARTUP_MAX);
+				memset(&GameEntry.startup[3], 0, GAME_STARTUP_MAX);
+				memcpy(GameEntry.name, game->name, UL_GAME_NAME_MAX);
+				strncpy(&GameEntry.startup[3], game->startup, GAME_STARTUP_MAX);
+				GameEntry.parts = game->parts;
+				GameEntry.media = game->media;
 
-				memcpy(buffer, game->name, UL_GAME_NAME_MAX);
-				memcpy(&buffer[UL_GAME_NAME_MAX + 3], game->startup, GAME_STARTUP_MAX);
-				buffer[47] = game->parts;
-				buffer[48] = game->media;
-
-				writeFileBuffer(fileBuffer, buffer, 0x40);
+				fwrite(&GameEntry, sizeof(GameEntry), 1, file);
 			}
 		}
 
-		closeFileBuffer(fileBuffer);
+		fclose(file);
 	}
 }
 
@@ -505,19 +501,19 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 		}
 		fileXioRename(oldpath, newpath);
 	} else {
-		memset(game->name, 0, UL_GAME_NAME_MAX);
-		memcpy(game->name, newname, UL_GAME_NAME_MAX);
-
-		char *pathStr = "%sul.%08X.%s.%02x";
+		const char *pathStr = "%sul.%08X.%s.%02x";
 		unsigned int oldcrc = USBA_crc32(game->name);
 		unsigned int newcrc = USBA_crc32(newname);
-		int i = 0;
-		do {
-			snprintf(oldpath, sizeof(oldpath), pathStr, prefix, oldcrc, game->startup, i);
-			snprintf(newpath, sizeof(newpath), pathStr, prefix, newcrc, game->startup, i++);
-			fileXioRename(oldpath, newpath);
-		} while(i < game->parts);
+		int i;
 
+		for (i = 0; i < game->parts; i++) {
+			snprintf(oldpath, sizeof(oldpath), pathStr, prefix, oldcrc, game->startup, i);
+			snprintf(newpath, sizeof(newpath), pathStr, prefix, newcrc, game->startup, i);
+			fileXioRename(oldpath, newpath);
+		}
+
+		memset(game->name, 0, UL_GAME_NAME_MAX + 1);
+		memcpy(game->name, newname, UL_GAME_NAME_MAX);
 		sbRebuildULCfg(list, prefix, gamecount, -1);
 	}
 }

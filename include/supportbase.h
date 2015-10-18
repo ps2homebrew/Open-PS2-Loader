@@ -22,6 +22,17 @@ typedef struct
 	int sizeMB;
 } base_game_info_t;
 
+typedef struct
+{
+	unsigned char name[UL_GAME_NAME_MAX];
+	unsigned char startup[15];
+	unsigned char parts;
+	unsigned char media;			//Disc type
+	unsigned char unknown[4];
+	unsigned char Byte08;			//Always 0x08
+	unsigned char unknown2[10];
+} USBExtreme_game_entry_t;
+
 int sbIsSameSize(const char* prefix, int prevSize);
 int sbCreateSemaphore(void);
 int sbReadList(base_game_info_t **list, const char* prefix, int *fsize, int* gamecount);

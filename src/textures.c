@@ -134,7 +134,7 @@ static void texPngReadMemFunction(png_structp pngPtr, png_bytep data, png_size_t
 	void **PngBufferPtr=png_get_io_ptr(pngPtr);
 
 	memcpy(data, *PngBufferPtr, length);
-	(unsigned int)*PngBufferPtr+=length;
+	*PngBufferPtr = (u8*)(*PngBufferPtr) + length;
 }
 
 static void texPngReadPixels24(GSTEXTURE* texture, png_bytep* rowPointers) {

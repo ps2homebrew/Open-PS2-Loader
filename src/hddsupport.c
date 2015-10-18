@@ -137,8 +137,10 @@ void hddLoadModules(void) {
 		hddHDProKitDetected = hddCheckHDProKit();
 		if (hddHDProKitDetected)
 			ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
-		else
+		else {
+			sysInitDev9();
 			ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+		}
 		if (ret < 0) {
 			LOG("HDD: No HardDisk Drive detected.\n");
 			setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_IF_NOT_DETECTED);
@@ -153,7 +155,7 @@ void hddLoadModules(void) {
 		}
 
 		//Check if a HDD unit is connected
-		ret = fileXioDevctl("hdd0:", HDDCTL_STATUS, NULL, 0, NULL, 0);
+		ret = fileXioDevctl("hdd0:", APA_DEVCTL_STATUS, NULL, 0, NULL, 0);
 		if((ret >= 3) || (ret < 0))
 		{
 			LOG("HDD: No HardDisk Drive detected.\n");
@@ -253,7 +255,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	struct cdvdman_settings_hdd *settings;
 
 #ifdef VMC
-	apa_header part_hdr;
+	apa_header_t part_hdr;
 	char vmc_name[2][32];
 	int fd, part_valid = 0, size_mcemu_irx = 0;
 	hdd_vmc_infos_t hdd_vmc_infos;
@@ -266,7 +268,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 		fileXioUmount(hddPrefix);
 		fd = fileXioOpen(oplPart, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
 		if (fd >= 0) {
-			if (fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header)) == sizeof(apa_header)) {
+			if (fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void*)&part_hdr, sizeof(apa_header_t)) == sizeof(apa_header_t)) {
 				if (part_hdr.nsub <= 4) {
 					hdd_vmc_infos.parts[0].start = part_hdr.start;
 					hdd_vmc_infos.parts[0].length = part_hdr.length;

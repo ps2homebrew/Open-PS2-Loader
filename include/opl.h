@@ -4,6 +4,8 @@
 #include <tamtypes.h>
 #include <kernel.h>
 #include <sifrpc.h>
+#include <hdd-ioctl.h>
+#include "opl-hdd-ioctl.h"
 #include <iopcontrol.h>
 #include <iopheap.h>
 #include <string.h>

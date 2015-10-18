@@ -1002,18 +1002,6 @@ int oplUpdateGameCompatSingle(int id, item_list_t *support, config_set_t* config
 // ----------------------------------------------------------
 // -------------------- HD SRV Support ----------------------
 // ----------------------------------------------------------
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
-
-extern void *smsutils_irx;
-extern int size_smsutils_irx;
-
-extern void *smstcpip_irx;
-extern int size_smstcpip_irx;
-
-extern void *smap_irx;
-extern int size_smap_irx;
-
 extern void *ps2atad_irx;
 extern int size_ps2atad_irx;
 

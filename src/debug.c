@@ -9,9 +9,6 @@
 #include "include/system.h"
 #include "include/ioman.h"
 
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
-
 extern void *netman_irx;
 extern int size_netman_irx;
 

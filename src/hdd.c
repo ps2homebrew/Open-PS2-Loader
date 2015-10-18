@@ -25,20 +25,6 @@ typedef struct				// size = 1024
 #define HDL_GAME_DATA_OFFSET	0x100000	// Sector 0x800 in the user data area.
 #define HDL_FS_MAGIC		0x1337
 
-//
-// DEVCTL commands
-//
-#define APA_DEVCTL_TOTAL_SECTORS	0x00004802
-#define APA_DEVCTL_IDLE			0x00004803
-#define APA_DEVCTL_DEV9_SHUTDOWN	0x00004806
-#define APA_DEVCTL_STATUS		0x00004807
-#define APA_DEVCTL_FORMAT		0x00004808
-#define APA_DEVCTL_SMART_STAT		0x00004809
-#define APA_DEVCTL_ATA_READ		0x00006836// arg  = hddAtaTransfer_t
-#define APA_DEVCTL_ATA_WRITE		0x00006837// arg  = hddAtaTransfer_t
-#define APA_DEVCTL_IS_48BIT		0x00006840
-#define APA_DEVCTL_SET_TRANSFER_MODE	0x00006841
-
 //-------------------------------------------------------------------------
 int hddCheck(void)
 {

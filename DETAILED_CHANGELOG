@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev846 - Jay-Jay'n'gledson999:Portuguese BR language fix - Thu Oct 08 01:45:29 2015 -0400
 rev845 - Updated Portuguese BR language - Mon Oct 05 14:07:48 2015 -0400
 rev844 - SP193: HDD unit will be checked for fonts only if HDD support is set to AUTO. - Mon Oct 05 08:33:33 2015 -0400
 rev843 - Added Traditional Chinese language (It was missing in r840... Sorry) - Sun Oct 04 20:55:55 2015 -0400

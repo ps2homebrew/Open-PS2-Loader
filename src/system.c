@@ -189,6 +189,15 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 
 #define OPL_SIF_CMD_BUFF_SIZE	1
 static SifCmdHandlerData_t OplSifCmdbuffer[OPL_SIF_CMD_BUFF_SIZE];
+static unsigned char dev9Initialized = 0;
+
+void sysInitDev9(void) {
+	if(!dev9Initialized)
+	{
+		sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+		dev9Initialized = 1;
+	}
+}
 
 void sysReset(int modload_mask) {
 	fileXioExit();
@@ -203,6 +212,8 @@ void sysReset(int modload_mask) {
 #else
 	while(!SifIopReset(NULL, 0));
 #endif
+
+	dev9Initialized = 0;
 	while(!SifIopSync());
 
 	SifInitRpc(0);
@@ -233,7 +244,6 @@ void sysReset(int modload_mask) {
 	}
 
 	SifExecModuleBuffer(&padman_irx, size_padman_irx, 0, NULL, NULL);
-
 #else
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
 
@@ -246,7 +256,6 @@ void sysReset(int modload_mask) {
 #endif
 
 	sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
-	sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
 
 	if (modload_mask & SYS_LOAD_USB_MODULES) {
 		usbLoadModules();

@@ -278,18 +278,18 @@ struct UIItem diaAbout[] = {
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DEVS}}},
 	{UI_BREAK},
 
-	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - Jay-Jay - Polo35 - SP193", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"crazyc - dlanor - doctorxyz", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"hominem.te.esse - ifcaro - izdubar", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"jimmikaelkael - misfire - reprep - volca", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - crazyc - dlanor", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"izdubar - Jay-Jay - jimmikaelkael - misfire", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}}, {UI_BREAK},
 	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"... and the anonymous ...", -1}}}, {UI_BREAK},
 	{UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_QANDA}}},
 	{UI_BREAK},
 
-	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"danielB - EP - lee4", -1}}}, {UI_BREAK},
-	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH - RandQalan - yoshi314", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Berion - danielB - ElPatas - EP - gledson999 - lee4", -1}}}, {UI_BREAK},
+	{UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH - RandQalan - ShaolinAssassin - yoshi314 - zero35", -1}}}, {UI_BREAK},
 	{UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NET_UPDATE}}},

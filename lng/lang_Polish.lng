@@ -1,15 +1,12 @@
-# translation by Berion & Loki7777 / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# dragolice (http://psx-scene.com/forums/members/dragolice/)
 Polish
 Open PS2 Loader %s
 Zapisz zmiany
-z powrotem
-config Network
-Advanced options
-<brak values>
-Ustawienia zapisane ...
+Wróć
+Ustawienia sieci
+Opcje zaawansowane
+<brak>
+Ustawienia zapisane...
 Błąd zapisu ustawień!
 Wyjście
 Ustawienia
@@ -18,149 +15,149 @@ Gry USB
 Gry HDD
 Gry ETH
 Aplikacje
-motyw
-język
-The system will be powered off.
-Exit OPL?
-Cancel updating?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
-%d: Network startup error
-%d: No network adaptor detected
-%d: Cannot connect to SMB server
-%d: Cannot log into SMB server
-%d: Cannot open SMB share
-%d: Cannot list SMB shares
-%d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
-na
-od
-dobrze
-Select
-Cancel
-Circle
-Cross
-Games List
-ustawienia
+Motyw
+Język
+System zostanie wyłączony.
+Wyjść z OPL?
+Przerwać aktualizację?
+%d: Nie wykryto dysku twardego
+%d: Dysk twardy nie jest sformatowany
+%d: Błąd startu sieci
+%d: Nie wykryto network adaptora
+%d: Nie można połączyć z serwerem SMB
+%d: Nie można zalogować do serwera SMB
+%d: Nie można otworzyć udostępnienia SMB
+%d: Nie można wyświetlić udostępnień SMB
+%d: Nie można wyświetlić gier
+%d: Serwer DHCP niedostępny
+%d: Brak połączenia sieciowego
+Włącz
+Wyłącz
+OK
+Wybierz 
+Anuluj
+Kółko
+Iks
+Lista gier
+Ustawienia gry
 Usuń wszystkie ustawienia
 Usunięto wszystkie klucze do gry
-przewijanie
-Zwolnij
-medium
-szybko
-Domyślnie menu
+Przewijanie
+Wolno
+Średnio
+Szybko
+Domyślne menu
 Załaduj z dysku
 Proszę czekać
-Błąd podczas ładowania w grze ID
-Automatyczne sortowanie
-Błąd ładowania pliku języka
-Wyłącz Kolory Debug
-No kontroler wykryty, czeka ...
-Włącz Cover Art
+Błąd podczas ładowania ID gry
+Sortowanie automatyczne
+Błąd ładowania pliku językowego
+Wyłącz debugowanie kolorów
+Nie wykryto kontrolera, oczekiwanie...
+Okładki
 Szeroki ekran
 Wyłącz
-Ładowanie config
-Zapisywanie config
+Wczytaj ustawienia
+Zapisz ustawienia
 Uruchom urządzenie
-Nastawić
-Tryb rozruchu urządzenia USB
-Urządzenie HDD tryb startu
-Urządzenie ETH tryb startu
-Tryb uruchamiania aplikacji
-automatyczny
-ręczny
-Start HDL Server
-HDL Server Starting...
-HDL Server Running...
-Failed to start HDL Server.
-HDL Server Unloading...
-Wyjście na
-kolor tła
-kolor tekstu
+Odśwież
+Start urządzenia USB
+Start urządzenia HDD
+Start urządzenia ETH
+Start aplikacji
+Automatycznie
+Ręcznie
+Uruchom serwer HDL
+Uruchamianie serwera HDL...
+Serwer HDL uruchomiony...
+Niepowodzenie startu serwera HDL.
+Odładowanie serwera HDL...
+Ścieżka do IGR
+Kolor tła
+Kolor tekstu
 - PS2 -
-- SMB Server -
-IP address type
-Static
+- Serwer SMB -
+Typ adresu IP
+Statyczny
 DHCP
-IP address
-Address
-maska
+Adres IP
+Adres
+Maska
 Brama
-DNS Server
-port
-udział
-użytkownik
-hasło
-<Nie ustawień>
-Address type
+Serwer DNS
+Port
+Udostępnij
+Użytkownik
+Hasło
+<brak>
+Typ adresu
 IP
 NetBIOS
-akceptować
-Przedmiot zostanie trwale usunięta , kontynuować?
-nazwy
-usunąć
-run
-ustawienia wyświetlacza
-Enable write operations
-Check USB game fragmentation
-Zapamiętaj ostatnio grał grę
-Odkrywamy GSM na Main Menu
-Error, the game is fragmented
-Błąd, nie można uruchomić opcję
-test
-Pozostaw puste dla auth gość.
-Załaduj alternatywne jądro
-Synchronous Mode
-Odczep syscalli
-0 Tryb PSS
-Emulate DVD-DL
+Akceptuj
+Element zostanie trwale usunięty, kontynuować?
+Zmień nazwę
+Usuń
+Uruchom
+Ustawienia obrazu
+Włącz operację zapisu
+Sprawdzaj fragmentację gier USB
+Zapamiętaj ostatnio uruchomioną grę
+Przycisk wyboru
+Błąd, gra jest pofragmentowana
+Błąd, nie można uruchomić pozycji
+Test
+Pozostaw puste dla gości.
+Dokładny odczyt
+Tryb synchroniczny
+Odhookuj Syscalls
+Tryb 0 PSS
+Emuluj DVD-DL
 Wyłącz IGR
-High module storage
-Ukryj dev9 modułu
-Zmiana rozmiaru będzie sformatować VMC
-utworzyć
+Moduł dużej pamięci
+Ukryj moduł DEV9
+Zmiana rozmiaru, zostanie sformatowany VMC
+Utwórz
 Start
-modyfikować
-poronić
-Resetowanie
-Użyj generic
-Skonfiguruj VMC
-nazwa
-rozmiar
-status
-postęp
-VMC plik istnieje
-Nieprawidłowy VMC pliku, rozmiar jest niepoprawny
-VMC pliku muszą być tworzone
-Błąd z VMC % s , nadal z fizycznym MC ( gniazdo % d) ?
-Automatyczne odświeżanie
-About
-Coders
-Quality Assurance
-Path prefix USB
-Pozostaw puste , aby wyjść z przeglądarki
-Wartość w minutę (s), 0 aby wyłączyć wirować
-Automatyczny HDD wirować
-tryb wideo
-kolor Dialog
-wybrany kolor
-Ostatnia aktualizacja informacji
-Info
-Niestandardowe ELF
-wybór kolorów
-Podłącz
-Pozostaw puste do listy akcji
-Path prefix ETH
-Backspace
-miejsce
-wpisać
-tryb
-Slot VMC 1
-Slot VMC 2
+Modyfikuj
+Przerwij
+Reset
+Uzyj ogólnych
+Konfiguruj VMC
+Nazwa
+Rozmiar
+Status
+Postęp
+Plik VMC istnieje
+Błędny plik VMC, nieprawidłowy rozmiar
+Musisz utworzyć plik VMC
+Błąd z plikiem VMC %s, kontynuować z fizyczną MC (slot %d) ?
+Odświeżanie automatyczne
+O programie
+Programiści
+Zapewnienie jakości
+Prefix ścieżki USB
+Pozostaw puste, aby wyjść do Browser
+Wartość w minutach, 0 wyłącza zwalnianie obrotów
+Automatyczne zwalnianie obrotów HDD 
+Tryb wideo
+Kolor ustawień
+Kolor zaznaczenia
+Wyświetl stronę informacji
+Informacje
+Niestandardowy ELF
+Wybór koloru
+Połącz ponownie
+Pozostaw puste aby notować akcje
+Prefix ścieżki ETH
+Cofnij
+Odstęp
+Enter
+Tryb
+VMC Slot 1
+VMC Slot 2
 ID gry
 Tryb DMA
-V- Sync
+V-Sync
 Tryb 1
 Tryb 2
 Tryb 3
@@ -169,42 +166,42 @@ Tryb 5
 Tryb 6
 Tryb 7
 Tryb 8
-Configure GSM
-Prędkość Ethernet i dupleksu
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
-Ustawienia GSM
+Konfiguruj GSM
+Tryb łącza ethernetowego
+100Mbit pełny-dupleks
+100Mbit pół-dupleks
+10Mbit pełny-dupleks
+10Mbit pół-dupleks
+ustawienia GSM
 Włącz GSM
-Toggles GSM ON or OFF
-VMODE
-Forced Custom Display Mode
-H-POS
-Horizontal Adjustment
-V-POS
-Vertical Adjustment
-FMV Skip
-Skips Full Motion Videos
-Cheat Settings
-Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
-PS2RD Cheat Engine Mode
-Auto-select or Select game cheats
-Auto-select cheats
-Select game cheats
-Error: failed to load Cheat File
-No cheats found
-Download defaults
-Network update
-Re-download existing records?
-Update failed.
-Failed to connect to update server.
-Update completed.
-Update cancelled.
-Download settings from the network?
-Customized Settings
-Downloaded Defaults
-Auto start in %i s...
+Przełącz GSM wł lub wył
+Wideo
+Wymuś niestandardowy tryb wyświetlania 
+Poziom
+Regulacja w poziomie
+Pion
+Regulacja w pionie
+Pomiń FMV
+Pomija scenki wideo
+Ustawienia cheat'ów
+Włącz silnik cheat'ów PS2RD
+Pozwól PS2RD patchować gry
+Tryb silnika cheat'ów PS2RD
+Auto-wybieranie lub wybieranie cheat'ów gry
+Auto-wybieranie cheat'ów
+Wybierz cheat'y
+Błąd: niepowodzenie ładowanie pliku
+Nie znaleziono cheat'ow
+Pobierz domyślne
+Aktualizacja sieciowa
+Pobrać ponownie istniejące zapisy?
+Aktualizacja nie powiodła się.
+Błąd połączenia z serwerem aktualizacji.
+Aktualizacja zakończona.
+Aktualizacja przerwana.
+Pobrać ustawienia z sieci?
+Niestandardowe ustawienia
+Pobrano domyślne
+Auto start w %i s...
 Auto start
-Value in second(s), 0 to disable auto start
+Wartość w sekundach, 0 wyłącza auto start

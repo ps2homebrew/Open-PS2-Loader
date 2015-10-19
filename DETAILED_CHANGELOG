@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev848 - About Menu: Contributors added, followed by case-insensitive sorting - Mon Oct 19 15:37:15 2015 -0400
 rev847 - SP193 - Fixed renaming functionality for USBExtreme games + DEV9 will not be activated unless either Ethernet or ATA is used: - Sat Oct 17 21:47:36 2015 -0400
 rev846 - Jay-Jay'n'gledson999:Portuguese BR language fix - Thu Oct 08 01:45:29 2015 -0400
 rev845 - Updated Portuguese BR language - Mon Oct 05 14:07:48 2015 -0400

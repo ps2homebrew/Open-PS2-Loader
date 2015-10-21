@@ -1,7 +1,4 @@
-# Translation by machiavel and ShaolinAssassin / supervised by Jay-Jay and doctorxyz
-# Last update: 10/04/2015 
-# Updated for changeset:   837:2de2dda81966
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by ShaolinAssassin @http://psx-scene.com/forums/members/shaolinassassin/  
 French
 Open PS2 Loader %s
 Sauvegarder
@@ -10,32 +7,32 @@ Configuration du réseau
 Réglages avancés
 <non renseigné>
 Configuration sauvegardée...
-Erreur en écriture de la configuration
+Erreur lors de la sauvegarde de la configuration
 Quitter Open PS2 Loader
 Configuration
 Menu
 Périphérique USB
 Disque dur interne
 Serveur SMB
-Applications
+Apps
 Thème
 Langue
 Le système va être éteint
-Voulez-vous quitter OPL ?
-Voulez-vous annuler la mise à jour ?
-%d : erreur, disque dur non détecté
-%d : erreur, disque dur non formaté
-%d : erreur au démarrage du réseau
-%d : erreur, adaptateur réseau non détecté
-%d : erreur, impossible de se connecter au serveur SMB
-%d : erreur, impossible de s'identifier auprès du serveur SMB
-%d : erreur, impossible d'ouvrir le partage SMB
-%d : erreur, impossible de lister les partages SMB
-%d : erreur, impossible d'établir la liste des jeux
-%d : erreur, serveur DHCP indisponible
-%d : erreur, connexion réseau inexistante
-Activé
-Inactif
+Quitter OPL ?
+Annuler le téléchargement ?
+Erreur %d: disque dur non détecté
+Erreur %d: disque dur non formaté
+Erreur %d au démarrage du réseau
+Erreur %d: adaptateur réseau non détecté
+Erreur %d: connexion  au serveur SMB impossible
+Erreur %d: identification auprès du serveur SMB impossible
+Erreur %d: ouverture du partage SMB impossible
+Erreur %d: listing des partages SMB impossible à établir
+Erreur %d: listing des jeux impossible à établir
+Erreur %d: serveur DHCP indisponible
+Erreur %d: connexion réseau inexistante
+On
+Off
 Valider
 Valider
 Annuler
@@ -49,40 +46,40 @@ Défilement
 Lent
 Moyen
 Rapide
-Menu par défaut
+Page au démarrage
 Charger depuis le disque
 Veuillez patienter
 Erreur lors du chargement de l'ID du jeu
 Tri alphabétique
-Erreur lors du chargement du fichier de langue
+Erreur lors du chargement du fichier langue
 Passer l'écran de debug
-Veuillez connecter une manette PS2 Dualshock…
-Jaquettes et images
-Plein écran
+La manette PS2 a été déconnectée…
+Fichiers ART
+Écran large
 Éteindre le système
 Chargement...
 Sauvegarde de la configuration
 Démarrer le périphérique
-Actualiser
-Mode de démarrage du périph. USB
-Mode de démarrage du disque dur
-Mode de démarrage du serveur SMB
-Affichage de la page des applications
+Rafraîchir
+Démarrage du périphérique USB
+Démarrage du disque dur interne
+Démarrage du serveur SMB
+Page apps
 Automatique
 Manuel
 Démarrer le serveur HDL
 Serveur HDL en cours de démarrage...
-Serveur HDL en cours d'exécution
-Erreur de démarrage du serveur HDL
-Fermeture du serveur HDL...
-Sortie via IGR vers :
-Couleur d'arrière-plan
-Couleur du texte
-- PS2 -
-- SMB Server -
+Serveur HDL connecté…
+Échec au démarrage du serveur HDL
+Fermeture du serveur HDL…
+Quitter via IGR vers :
+Arrière-plan
+Texte principal
+- PS2 - 
+- Serveur SMB -
 Type d'adresse IP
-Adresse IP statique
-Adresse IP dynamique
+Statique
+Dynamique
 Adresse IP
 Adresse
 Masque de sous-réseau
@@ -97,69 +94,69 @@ Type d'adresse
 IP
 NetBIOS
 Valider
-L'item sera définitivement supprimé, voulez-vous continuer ?
+L'item sera définitivement supprimé, continuer ?
 Renommer
 Suppr.
 Lancer
 Configuration de l'affichage
-Activer les opérations d'écriture
-Vérifier si le jeu est fragmenté (USB)
-Lancement auto. du dernier jeu joué
+Opérations d'écriture
+Vérifier fragmentation (USB)
+Dernier jeu joué
 Touche de validation
-Le jeu est fragmenté, impossible de continuer
-Impossible d'exécuter l'item
+Erreur, le jeu est fragmenté
+Erreur, impossible de lancer l'item
 Tester les réglages
 Laisser le champ vide pour s'identifier en tant qu'invité
 Simuler la vitesse de lecture du CD/DVD
-Mode synchrone
-Purger OPL de la mémoire après lancement du jeu
-Passer les vidéos au format PSS
-Emuler le support double-couche pour les jeux rippés en DVD5
-Désactiver l'option IGR (In-Game-Reset)
-Charger le module de stockage d'OPL à une adresse plus élevée
-Renommer le module dev9 en cdvdman
-Changer la taille de la carte mémoire virtuelle la formatera
+Mode de lecture alternatif (lecture synchrone)
+Purger OPL après lancement du jeu
+Passer les cinématiques
+Émuler support double couche (DVD9 rippés en DVD5)
+Désactiver l'IGR (incompatible avec certains jeux)
+Charger les modules de stockage à une adresse plus élevée
+Renommer le module DEV9 en CDVDMAN
+Changer la taille de la VMC la formatera
 Créer
 Démarrer
 Modifier
 Abandonner
 Réinitialiser
 VMC générique
-Configurer la carte mémoire virtuelle
+Configurer la carte mém. virtuelle
 Nom
 Taille
 État
 Progression
-La carte mémoire virtuelle existe déjà
-Fichier carte mémoire virtuelle non valide, taille incorrecte
-La carte mémoire virtuelle doit d'abord être créée
-Une erreur est survenue sur la carte mémoire virtuelle %s. Continuer sur la CM physique %d ?
-Actualisation automatique
+La carte mém. virtuelle existe déjà 
+Fichier carte mém. virtuelle non valide, taille incorrecte
+La carte mém. virtuelle doit d'abord être créée
+Erreur sur la carte mém. virtuelle %s. Continuer sur la carte mém. physique %d ?
+Rafraîchissement automatique
 Crédits
 Développeurs
 Béta-testeurs
 Préfixe du chemin du périph. USB
 Laisser le champ <non renseigné> pour quitter OPL vers le navigateur PS2
 En minute(s), 0 pour désactiver l'arrêt automatique
-Arrêt automatique du disque dur
+Arrêt auto. disque dur interne
 Mode vidéo
-Couleur des options
-Couleur de sélection
+Options
+Sélection
 Page d'informations
-Infos
+Infos.
 ELF alternatif
-Sélection des couleurs
+Choix des couleurs de l'interface
 Reconnecter
 Laisser le champ <non renseigné> pour lister les dossiers partagés
 Préfixe du chemin du réseau
 Effacer
 Espace
 Valider
-Maj/min
+Maj/Min
 Carte mém. virtuelle (VMC) 1
 Carte mém. virtuelle (VMC) 2
-ID du jeu
-Mode DMA
+ID
+Vitesse de lecture (mode DMA)
 Synchronisation verticale
 Mode 1
 Mode 2
@@ -170,41 +167,41 @@ Mode 6
 Mode 7
 Mode 8
 Configurer GSM
-Vitesse ethernet
+Vitesse Ethernet
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-Réglages de GSM
+Configuration de GSM
 GSM
 Activer/Désactiver GSM
 Mode vidéo à forcer
-NTSC/PAL/60Hz/PS1/HDTV/VGA
+Modes vidéo disponibles : NTSC/PAL/60Hz/PS1/HDTV/VGA
 Ajustement horizontal de l'écran
 Ajouter/Soustraire
 Ajustement vertical de l'écran
 Ajouter/Soustraire
-Passer les vidéos au format FMV
 Avance rapide
+Passer les vidéos au format FMV
 Configuration de PS2RD
+PS2RD
 Activer/Désactiver PS2RD
 Activation des codes
-Mode d'activation des codes triche
 Automatique/Manuel
 Automatique
 Manuel (inactif, fonction à venir)
-Échec du chargement du fichier .cht
-Aucun fichier .cht détecté
-Télécharger les réglages
-Mise à jour des réglages des jeux
+Échec du chargement du fichier de code .cht
+Fichier de code .cht introuvable
+Télécharger les régl. prédéfinis
+Téléchargement des régl. prédéfinis
 Mise à jour des données existantes
-Échec de la mise à jour
+Échec du téléchargement
 Impossible de se connecter au serveur
-Mise à jour effectuée avec succès
-Mise à jour annulée
-Voulez-vous télécharger les réglages depuis Internet ?
+Téléchargement effectué avec succès
+Téléchargement annulé
+Télécharger les régl. prédéfinis depuis Internet ?
 Réglages personnalisés
-Réglages téléchargés
-Lancement automatique dans %i s…
-Démarrage auto
-Valeur en seconde(s), 0 pour désactiver le démarrage automatique
+Réglages prédéfinis
+Lancement automatique dans %s…
+Lancement auto. 
+En seconde(s), 0 pour désactiver le lancement automatique

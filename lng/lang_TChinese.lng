@@ -1,4 +1,4 @@
-﻿#kane159<kane12369@gmail.com>
+﻿# Translation by "kane159<kane12369@gmail.com>"
 Traditional Chinese
 Open PS2 Loader %s
 保存設置
@@ -108,13 +108,13 @@ NetBIOS
 測試
 GUEST驗證留空.
 精確讀取
-替代數據讀取方法
-儘可能從內存卸下OPL
-跳過cg
-給dvd9 rips用的
-IGR可能不兼容某些遊戲
-在備用位置裝載核心
-隱藏DEV9模塊
+同步模式
+脫開系統調用
+0 PSS 模式
+模擬 DVD-DL
+禁用 IGR
+隱藏模式內存
+隱藏 DEV9 模式
 改變大小將會重新格式化 VMC
 生成
 開始
@@ -158,14 +158,14 @@ VMC 插槽 2
 Game ID
 DMA 模式
 V-Sync
-1. 精確讀取
-2. 同步模式
-3. 脫開系統調用
-4. 0 PSS
-5. 模擬 DVD-DL
-6. 禁用 IGR
-7. 隱藏模式內存
-8. 隱藏 DEV9
+模式 1
+模式 2
+模式 3
+模式 4
+模式 5
+模式 6
+模式 7
+模式 8
 配置 GSM
 以太網鏈接模式
 100Mbit full-duplex
@@ -201,4 +201,7 @@ PS2RD 金手指引擎模式
 更新已取消.
 從網絡上下載設置?
 自定義設置
-已�
+已下載預設值
+將自動於 %i 秒後啟動...
+自動啟動
+以秒為單位,設為 0 來禁用自動啟動

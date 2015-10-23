@@ -28,13 +28,13 @@ int getFileSize(int fd) {
 static void writeMCIcon(void) {
 	int fd;
 
-	fd = fileXioOpen("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	fd = openFile("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC);
 	if (fd >= 0) {
 		fileXioWrite(fd, &icon_icn, size_icon_icn);
 		fileXioClose(fd);
 	}
 
-	fd = fileXioOpen("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	fd = openFile("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC);
 	if (fd >= 0) {
 		fileXioWrite(fd, &icon_sys, size_icon_sys);
 		fileXioClose(fd);

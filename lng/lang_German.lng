@@ -1,7 +1,4 @@
-# German Translation by ps2guy / supervised by Jay-Jay
-# Last update: 10/04/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by ps2guy
 German
 Open PS2 Loader %s
 Änderungen speichern
@@ -37,7 +34,7 @@ Aktualisierung abbrechen?
 Ein
 Aus
 OK
-Auswählen
+ Ausw.
 Abbrechen
 Kreis
 Kreuz
@@ -94,8 +91,8 @@ Benutzername
 Passwort
 <nicht eingestellt>
 Adresstyp
-IP
-NetBIOS
+
+
 Annehmen
 Objekt wird dauerhaft gelöscht, wirklich fortfahren?
 Umbenennen
@@ -110,7 +107,7 @@ Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
 Test
 Leer lassen für Anmeldung als GAST
-Accurate reads
+
 Synchronmodus
 Systemaufrufe aushängen
 0 PSS Modus
@@ -146,7 +143,7 @@ Videomodus
 Dialogfarbe
 Ausgewählte Farbe
 Infoseite anzeigen
-Info
+
 Benutzerdefinierte ELF
 Farbauswahl
 Verbindung wiederherstellen
@@ -207,4 +204,4 @@ Benutzerdefinierte Einstellungen
 Standardeinstellungen heruntergeladen
 Automatischer Start in %i s...
 Automatischer Start
-Wert in Sekunden (sek), 0 zum Deaktivieren
+Wert in Sekunden (sek), 0 zum Deaktivieren 

@@ -1,16 +1,13 @@
-# translation by andre95d / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by andre95d 
 Italian
 Open PS2 Loader %s
 Salva modifiche
 Indietro
 Configurazione rete
-Advanced options
+Opzioni avanzate
 <nessun valore>
 Impostazioni salvate...
-Errore scrittura impostazioni!
+Errore scrittura impostazioni
 Esci
 Impostazioni
 Menu
@@ -20,25 +17,25 @@ Giochi ETH
 Apps
 Tema
 Lingua
-The system will be powered off.
-Exit OPL?
-Cancel updating?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
-%d: Network startup error
-%d: No network adaptor detected
-%d: Cannot connect to SMB server
-%d: Cannot log into SMB server
-%d: Cannot open SMB share
-%d: Cannot list SMB shares
-%d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
+Il sistema verrà spento.
+Uscire da OPL?
+Annullare l'aggiornamento?
+%d: Hard disk non rilevato
+%d: Hard disk non formattato
+%d: Errore durante l'avvio della rete
+%d: Nessun adattatore di rete rilevato
+%d: Impossibile connettersi al server SMB
+%d: Impossibile autenticarsi al server SMB
+%d: Impossibile aprire le condivisioni SMB
+%d: Impossibile elencare le condivisioni SMB
+%d: Impossibile elencare i giochi
+%d: Server DHCP non disponibile
+%d: Nessuna connessione di rete
 On
 Off
 OK
-Select
-Cancel
+Selez.
+Annulla
 Cerchio
 X
 Lista dei giochi
@@ -52,13 +49,13 @@ Veloce
 Menu di default
 Carica da disco
 Attendere prego
-Errore durante il caricamento del ID di gioco
+Errore durante il caricamento dell'ID di gioco
 Ordinamento automatico
 Errore nel caricamento del file di lingua
 Disattiva colori di debug
 Nessun controller rilevato, in attesa...
 Abilita Cover Art
-Wide screen
+Widescreen
 Spegni
 Caricamento configurazione
 Salvataggio configurazione
@@ -67,27 +64,27 @@ Aggiorna
 Modalità di avvio USB
 Modalità di avvio HDD
 Modalità di avvio ETH
-Modalità di avvio Apps
+Caricamento menu Apps
 Auto
 Manuale
 Avviare server HDL
 Avvio server in corso...
 Server HDL in esecuzione...
 Server HDL in chiusura...
-HDL Server Unloading...
+Server HDL in scaricamento dalla memoria...
 Esci su
 Colore di sfondo
 Colore testo
 - PS2 -
-- SMB Server -
-IP address type
-Static
+- Server SMB -
+Tipo di indirizzo IP
+Statico
 DHCP
-IP address
-Address
+Indirizzo IP
+Indirizzo
 Maschera
 Gateway
-DNS Server
+Server DNS
 Porta
 Condivisione
 Utente
@@ -102,25 +99,25 @@ Rinomina
 Cancella
 Esegui
 Impostazioni display
-Enable write operations
-Check USB game fragmentation
+Abilita operazioni in scrittura
+Verifica frammentazione giochi USB
 Ricorda ultimo titolo giocato
-Seleziona tasto
-Error, the game is fragmented
+Tasto seleziona
+Errore, il gioco è frammentato
 Errore, impossibile avviare il titolo.
 Test
 Lasciare vuoto per autenticazione GUEST
 Lettura accurata
-Synchronous Mode
-Unhook syscalls
-0 PSS mode
+Modo sincrono
+Unhook dalle syscalls
+Modo 0 PSS
 Disabilita DVD-DL
 Disabilita IGR
-High module storage
+Moduli nell'area alta di memoria
 Nascondi modulo dev9
 Modificare la dimensione riformatterà la VMC.
 Crea
-Start
+Avvia
 Modifica
 Annulla
 Ripristina
@@ -135,76 +132,76 @@ File VMC non valido, dimensione non corretta.
 Creazione file VMC richiesta.
 Errore VMC %s, continuare con MC fisica (slot %d)?
 Aggiornamento automatico
-About
-Coders
-Quality Assurance
+Informazioni su
+Sviluppatori
+Controllo qualità
 Percorso prefisso USB
 Lasciare vuoto per uscire al browser
-Valore in minuto(i), 0 per disabilitare lo spin down
+Valore in minuti, 0 per disabilitare lo spin down
 Spin down automatico HDD
 Modalità video
 Colore finestra
-Colore selezionato
+Colore selezione
 Visualizza pagina info
 Info
 ELF personalizzato
-Seleziona di colore
+Seleziona il colore
 Riconnetti
 Lasciare vuoto per elencare le condivisioni
 Percorso prefisso ETH
 Backspace
 Spazio
 Invio
-Modalità
-VMC Slot 1
-VMC Slot 2
+Modalità 
+Slot VMC 1
+Slot VMC 2
 ID gioco
-DMA Mode
+Modo DMA
 V-Sync
-Modalità 1
-Modalità 2
-Modalità 3
-Modalità 4
-Modalità 5
-Modalità 6
-Modalità 7
-Modalità 8
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
 Configura GSM
-Velocità Ethernet e le impostazioni duplex
+Velocità Ethernet e impostazioni duplex
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
 Impostazioni GSM
 Abilita GSM
-Imposta GSM ON/OFF
+Imposta GSM On/Off
 VMODE
-Modo display forzato
+Forza modo di visualizzazione personalizzato
 H-POS
 Regolazione orizzontale
 V-POS
 Regolazione verticale
-FMV skip
+Salta FMV
 Salta video in full motion
 Impostazioni cheat
 Abilita motore cheat PS2RD
 Permetti a PS2RD di applicare patch ai giochi
-PS2RD Cheat Engine Mode
-Selezione automatica o seleziona trucchi
+Modo motore cheat PS2RD
+Selezione automatica o seleziona cheats
 Auto-seleziona
 Seleziona manualmente
-Errore: impossibile caricare file di trucchi
-Nessun trucco trovato
-Download defaults
-Network update
-Re-download existing records?
-Update failed.
-Failed to connect to update server.
-Update completed.
-Update cancelled.
-Download settings from the network?
-Customized Settings
-Downloaded Defaults
-Auto start in %i s...
-Auto start
-Value in second(s), 0 to disable auto start
+Errore: impossibile caricare file cheats
+Nessun cheat trovato
+Scarica predefiniti
+Aggiornamento via rete
+Riscaricare le righe esistenti?
+Aggiornamento fallito.
+Impossibile connettersi al server di aggiornamento.
+Aggiornamento completato.
+Aggiornamento annullato.
+Scaricare le impostazioni via rete?
+Impostazioni personalizzate
+Impostazioni di default scaricate
+Avvio automatico in %i s...
+Avvio automatico
+Valore in secondi, 0 per disabilitare l'avvio automatico

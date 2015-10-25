@@ -1,7 +1,4 @@
-# translation by Flaya / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by Flaya 
 Swedish
 Open PS2 Loader %s
 Spara ändringar
@@ -78,7 +75,7 @@ HDL Server Stängs...
 Utgång till
 Bakgrundsfärg
 Textfärg
-- PS2 -
+- PS2 - 
 - SMB Server -
 IP Address typ
 Statisk
@@ -205,6 +202,6 @@ Uppdatering avbruten
 Hämta inställningar från nätverket?
 Modifierade inställningar
 Hämtade standard
-Autostart in %i s...
-Autostart 
-Värde i sekund(er), 0 inaktiverar Autostart
+Autostart om %i s...
+Autostart
+Värde i sekund(er), 0 inaktiverar Autostart 

@@ -1,7 +1,4 @@
-# translated by verislasher / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by verislasher 
 Indonesian
 Open PS2 Loader %s
 Simpan Perubahan
@@ -9,7 +6,7 @@ Kembali
 Konfigurasi jaringan
 Pilihan lanjutan
 <tak ada nilai>
-Setingan disimpan...
+Setingan disimpan ...
 Kesalahan penulisan setingan!
 Keluar
 Setingan
@@ -79,7 +76,7 @@ Pintasan IGR
 Warna latar belakang
 Warna teks
 - PS2 -
-- SMB Server -
+- Server SMB - 
 Jenis alamat IP
 Statis
 DHCP
@@ -102,7 +99,7 @@ Ubah nama
 Hapus
 Jalankan
 Setingan tampilan
-Enable write operations
+Memungkinkan operasi tulis
 Cek fragmentasi game USB
 Ingat pertandingan terakhir dimainkan
 Pilih tombol
@@ -111,7 +108,7 @@ Kesalahan, tidak bisa menjalankan item
 Coba
 Tinggalkan kosong untuk Otent TAMU.
 Membaca akurat
-Synchronous Mode
+Mode Sinkronisasi
 Melepas kaitan syscalls
 Mode PSS 0
 Emulasi DVD-DL
@@ -198,10 +195,10 @@ Tak ada cheat ditemukan
 Unduhan default
 Pembaruan jaringan
 Unduh catatan yang ada?
-Pembaruan gagal.
-Gagal menyambungkan ke server pembaruan.
-Perbarui selesai.
-Perbarui dibatalkan.
+Pembaruan gagal
+Gagal menyambungkan ke server pembaruan
+Perbarui selesai
+Perbarui dibatalkan
 Unduh pengaturan dari jaringan?
 Setingan disesuaikan
 Unduhan default

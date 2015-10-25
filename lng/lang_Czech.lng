@@ -1,7 +1,4 @@
-# Translated by jimmysmith / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by jimmysmith 
 Czech
 Open PS2 Loader %s
 Uložit změny
@@ -111,7 +108,7 @@ Chyba, nemůžu spustit hru
 Test
 Nechte prázdné pro přihlášení GUEST účtu
 Přesné čtení
-Synchronous Mode
+Synchronní mód
 Unhook Syscalls
 0 PSS mód
 Emulovat DVD-DL

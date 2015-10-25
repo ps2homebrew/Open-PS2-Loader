@@ -1,7 +1,4 @@
-# translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante / supervised by Jay-Jay
-# Last update: 10/03/2015 
-# Updated for OPL_r837_DB [2de2dda]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by dante (Gürkan DEMİR <vampire_bs@hotmail.com>)
 Turkish
 Open PS2 Loader %s
 Değişiklikleri kaydet
@@ -78,8 +75,8 @@ HDL Sunucu Durduruluyor...
 IGR çıkış yolu
 Arkaplan rengi
 Metin rengi
-- PS2 -
-- SMB Server -
+
+
 IP adres türü
 Sabit
 DHCP
@@ -102,7 +99,7 @@ Y.Adlandır
 Sil
 Çalıştır
 Görüntü ayarları
-Enable write operations
+Silme ve İsim değiştirme işlemlerine izin ver
 USB oyun bütünlüğünü kontrol et(Fragmentation)
 Enson oynanan oyunu hatırla
 Select tuşu
@@ -111,7 +108,7 @@ Hata, nesne çalıştırılamıyor
 Test
 MİSAFİR oturumu için boş bırakınız.
 Alternatif çekirdeği yükle
-Synchronous Mode
+Alternatif veri okuma metodu
 Sis çağrılarını çöz
 PSS video iptali
 DVD-DL i etkinleştir
@@ -206,5 +203,3 @@ Internetten ayarlar indirilsin mi?
 Kişiselleştirilmiş Ayarlar
 Varsayılanlar indirildi
 Otomatik başlatılacak %i s...
-Auto start
-Value in second(s), 0 to disable auto start

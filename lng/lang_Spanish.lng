@@ -1,4 +1,4 @@
-# translation by lauchon22 and El_Patas / supervised by Jay-Jay and doctorxyz
+# Translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/
 Spanish
 Open PS2 Loader %s
 Guardar cambios
@@ -31,8 +31,8 @@ Se apagará el sistema.
 %d: No se pueden listar los juegos
 %d: Servidor DHCP no disponible
 %d: No hay conexión de red
-Sí
-No
+Activa.
+Desact.
 Aceptar
 Aceptar
 Cancelar
@@ -76,7 +76,7 @@ Ruta del IGR
 Color de fondo 
 Color de texto
 - PS2 -
-- SMB Server -
+- Servidor SMB -
 Tipo de dirección IP
 Estática
 DHCP
@@ -99,7 +99,7 @@ Renombrar
 Borrar
 Iniciar
 Preferencias de pantalla
-Habilitar las operaciones de escritura
+Mostrar operaciones de escritura
 Comprobar fragmentación juego USB
 Recordar último juego en uso
 Botón de selección
@@ -108,13 +108,13 @@ Error, no se pudo iniciar el archivo
 Test
 Dejar en blanco para autentificar como GUEST
 Lectura precisa
-Modo Síncrono
-Eliminar llamadas del sistema
-Omitir vídeos PSS
-Emular DVD-DL
-Sin soporte IGR
-Módulo almacenamiento alta dirección de memoria
-Ocultar módulo dev9
+Modo sincronizado
+Desvincula el sistema
+Omite los vídeos PSS
+Emula DVD-DL
+Quita el IGR
+Almacena los módulos en alta dirección de memoria
+Oculta el módulo DEV9
 Cambiar el tamaño formateará la VMC
 Crear
 Iniciar
@@ -174,9 +174,9 @@ Configuración de velocidad ethernet y duplex
 10Mbit half-duplex
 Opciones GSM
 Activar GSM
-Activar o desactivar GSM
-VMODO
 Forzar modo de vídeo seleccionado con GSM
+Modo de vídeo seleccionado
+Modo de vídeo a forzar
 Ajuste horizontal
 Configura la posición horizontal de la pantalla
 Ajuste vertical
@@ -187,7 +187,7 @@ Configuración PS2RD
 Activar PS2RD
 Permitir que PS2RD parchee los juegos
 Modo PS2RD
-Auto-seleccionar o Seleccionar códigos de juegos
+Auto-seleccionar o seleccionar códigos de juegos
 Auto-seleccionar códigos
 Seleccionar códigos de juegos
 Error: fallo al cargar el archivo de códigos

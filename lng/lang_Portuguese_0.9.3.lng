@@ -1,0 +1,208 @@
+# Portuguese translation by danielb
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Portuguese
+Open PS2 Loader %s
+Salvar alterações
+Voltar
+Configurações de Rede
+Opções avançadas
+<sem valores>
+Configurações salvas
+Erro ao salvar configurações!
+Sair
+Configurações
+Menu
+Jogos por USB
+Jogos por HDD
+Jogos por Rede
+Aplicações
+Temas
+Idioma
+O sistema irá desligar.
+Sair do OPL?
+Cancelar atualização?
+%d: Disco Rigido não detetado
+%d: Disco Rigido não formatado
+%d: Erro ao iniciar rede
+%d: Adaptador de Rede não detetado
+%d: Não foi possível ligar ao servidor SMB
+%d: Não foi possível efetuar login no servidor SMB 
+%d: Não foi possível abrir a partilha SMB 
+%d: Impossivel listar partilhas SMB
+%d: Impossivel listar jogos
+%d: Servidor DHCP indisponivel
+%d: Sem ligação de rede
+Ativ.
+Desactiv.
+Aceitar
+Selecionar
+Cancelar
+Circulo
+Cruz
+Lista de Jogos
+Aj. do jogo
+Remover todos os ajustes
+Removidos todos os ajustes para o jogo
+Rolagem
+Lento
+Médio
+Rápido
+Menu padrão
+Carregar do disco
+Por favor espere
+Erro ao carregar ID do jogo
+Ordenar automaticamente
+Erro ao carregar ficheiro de idioma
+Desativar depuração de cores
+Comando não detectado, esperando...
+Ativar Arte de Capas
+Ecrâ Panorâmico
+Desligar PS2
+Carregando configurações
+A guardar configurações...
+Iniciar dispositivo
+Atualizar
+Modo de inicio para dispositivo USB
+Modo de inicio para dispositivo HDD
+Modo de inicio para dispositivo Rede
+Modo de inicio para Aplicações
+Automático
+Manual
+Iniciar servidor HDL
+Servidor HDL a iniciar...
+Servidor HDL a executar...
+Erro a iniciar o servidor de HDL Dump.
+Servidor HDL a fechar...
+Definir saída do IGR
+Cor de fundo
+Cor do texto
+- PS2 -
+- Servidor SMB -
+Endereço IP
+Estático
+DHCP
+Endereço IP
+Endereço
+Máscara de sub-rede
+Gateway padrão
+Servidor de DNS
+Porta
+Partiha
+Utilizador
+Senha
+<não usado>
+Tipo de Endereço
+IP
+NetBIOS
+Confirmar
+O item será PERMANENTEMENTE apagado! Continuar?
+Renomear
+Apagar
+Iniciar
+Configurações de Ecrâ
+Ativar operações de escrita
+Verificar fragmentação de jogo USB
+Lembrar último jogo executado
+Botão de Seleção
+Erro, o jogo está fragmentado
+Erro, não foi possível iniciar o item
+Testar
+Deixar vazio para ligar como convidado (GUEST)
+Accurate Reads
+Modo Síncrono
+Desativar chamadas do sistema
+Saltar videos PSS
+Emular DVD-DL
+Desativar IGR
+Armazenamento elevado do módulo
+Esconder módulo dev9
+Alterar o tamanho (Irá reformatar o VMC!)
+Criar
+Iniciar
+Modificar
+Abortar
+Resetar
+Usar genérico
+Configurar VMC
+Nome
+Tamanho
+Estado
+Progresso
+Arquivo VMC já existe
+Arquivo VMC inválido, o tamanho está incorreto
+Arquivo VMC precisa ser criado!
+Erro com o ficheiro VMC, continuar com MC físico?
+Atualização automática
+Créditos
+Desenvolvedores
+Controlo de qualidade
+Prefixo de caminho USB
+Deixar vazio para sair p/ o Browser
+Valor em minuto(s), 0 p/ desativar
+Desligamento automático do HDD
+Modo de vídeo
+Cor do diálogo
+Cor selecionada
+Mostrar Página de Informação
+Info
+ELF personalizado
+Seleção de Cor
+Voltar A Lig.
+Deixar vazio para listar partilhas
+Prefixo de caminho ETH
+Retroceder
+Espaço
+Aceitar
+Modo
+VMC Slot 1
+VMC Slot 2
+ID do Jogo
+Modo DMA
+Sincronização do vídeo
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Configurar GSM
+Velocidade Ethernet e sistema Duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Opções do GSM
+Ativar o GSM
+Permitir que o GSM ative o modo de vídeo escolhido
+Modo de vídeo selecionado
+Modo de vídeo a ser ativado
+Ajuste horizontal
+Definir compensação horizontal
+Ajuste vertical
+Definir compensação vertical
+Saltar FMV
+Saltar vídeos
+Opções de Cheat
+Ativar PS2RD Cheat Engine
+Permite PS2RD Cheat Engine injetar código nos jogos.
+Modo da PS2RD Cheat Engine
+Auto-Selecionar ou Selecionar cheats de jogo
+Auto-Selecionar cheats
+Selecionar cheats do jogo
+Erro: falha ao abrir o ficheiro de Cheat
+Nenhum Cheat encontrado
+Pré-definições de download
+Atualização por Internet
+Voltar a descarregar dados existentes?
+Atualizaçao falhou.
+Falha a ligar ao servidor de atualização.
+Atualização completa.
+Atualização cancelada.
+Descarregar definições da Internet?
+Definições personalizadas
+Pré-definições de download
+Início automático em %i s...
+Auto iniciar
+Valor em segundos, 0 para desativar

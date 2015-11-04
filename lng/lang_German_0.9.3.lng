@@ -1,0 +1,208 @@
+# German translation by ps2guy
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+German
+Open PS2 Loader %s
+Änderungen speichern
+Zurück
+Netzwerkkonfiguration
+Fortgeschrittene Optionen
+<keine werte>
+Einstellungen gespeichert...
+Fehler beim Schreiben der Einstellungen!
+Verlassen
+Einstellungen
+Menü
+USB-Spiele
+HDD-Spiele
+ETH-Spiele
+Anwendungen
+Design
+Sprache
+Das System wird ausgeschaltet.
+OPL verlassen?
+Aktualisierung abbrechen?
+%d: Festplatte wurde nicht gefunden
+%d: Festplatte ist nicht formatiert
+%d: Fehler beim Starten des Netzwerks
+%d: Netzwerkadapter nicht gefunden
+%d: Keine Verbindung mit dem SMB Server möglich
+%d: Keine Anmeldung am SMB Server möglich
+%d: SMB Freigabe kann nicht geöffnet werden
+%d: SMB Freigaben können nicht aufgelistet werden
+%d: Spiele können nicht aufgelistet werden
+%d: DHCP Server nicht erreichbar
+%d: Keine Netzwerkverbindung
+Ein
+Aus
+OK
+Ausw.
+Abbrechen
+Kreis
+Kreuz
+Spieleliste
+Spieleinst.
+Entferne alle Einstellungen
+Entferne alle keys für das Spiel
+Scrollen
+Langsam
+Mittel
+Schnell
+Standardmenü
+Lade von Disk
+Bitte warten
+Fehler beim Laden der Spiel-ID
+Automatische Sortierung
+Fehler beim Laden der Sprachdatei
+Deaktiviere Debugfarben
+Kein Controller erkannt, warten...
+Aktiviere Cover Bilder
+Breitbild
+Ausschalten
+Lade Konfiguration
+Speichere Konfiguration
+Gerät starten
+Aktual.
+USB-Gerät Start Modus
+HDD-Gerät Start Modus
+ETH-Gerät Start Modus
+Anwendung Start Modus
+Automatisch
+Manuell
+Starte HDL Server
+HDL Server startet...
+HDL Server läuft...
+Fehler beim Starten des HDL-Server.
+HDL Server entlädt...
+IGR-Pfad
+Hintergrundfarbe
+Textfarbe
+- PS2 - 
+- SMB Server -
+IP-Adresstyp
+Statisch
+DHCP
+IP-Adresse
+Adresse
+Netzmaske
+Gateway
+DNS Server
+Port
+Freigeben
+Benutzername
+Passwort
+<nicht eingestellt>
+Adresstyp
+IP
+NetBIOS
+Annehmen
+Objekt wird dauerhaft gelöscht, wirklich fortfahren?
+Umbenennen
+Löschen
+Ausführen
+Bildschirmeinstellungen
+Aktiviere Schreiborperationen
+Überprüfe USB Spielefragmentierung
+Erinnere an zuletzt gespieltes Spiel
+Auswählen button
+Fehler, das Spiel ist fragmentiert
+Fehler, Objekt kann nicht ausgeführt werden
+Test
+Leer lassen für Anmeldung als GAST
+Accurate Reads
+Synchronmodus
+Systemaufrufe aushängen
+0 PSS Modus
+Emuliere DVD-DL
+Deaktiviere IGR
+Speichermodul
+Verstecke dev9 Modul
+Die Änderung der Größe wird die VMC erneut formatieren.
+Erstellen
+Starten
+Modifizieren
+Abbrechen
+Neu starten
+Nutze allgemeinen
+Konfiguriere VMC
+Name
+Größe
+Status
+Fortschritt
+VMC Datei existiert
+Ungültige VMC Datei, Größe ist nicht korrekt
+VMC-Datei muss erstellt werden
+Fehler mit VMC %s, fahre fort mit phys. MC (Steckplatz %d)?
+Automatisch aktualisieren
+Über
+Programmierer
+Qualitätssicherung
+USB Präfix Pfad
+Leer lassen, um zum Browser zurückzukehren
+Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
+Automatische Abschaltung der Festplatte
+Videomodus
+Dialogfarbe
+Ausgewählte Farbe
+Infoseite anzeigen
+Info
+Benutzerdefinierte ELF
+Farbauswahl
+Verbindung wiederherstellen
+Leerlassen um Freigaben aufzulisten
+ETH Präfix Pfad
+Rücktaste
+Leertaste
+Eingabe
+Modus
+VMC Steckplatz 1
+VMC Steckplatz 2
+Spiel ID
+DMA Modus
+V-Sync
+Modus 1
+Modus 2
+Modus 3
+Modus 4
+Modus 5
+Modus 6
+Modus 7
+Modus 8
+GSM konfigurieren
+Ethernet-Geschwindigkeitsmodus
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Einstellungen
+Aktiviere GSM
+Schalte GSM AN oder AUS
+VMODE
+Erzwungener benutzerdefinierter Bildschirmmodus
+H-POS
+Horizontale Einstellung
+V-POS
+Vertikale Einstellung
+Videosequenzen (FMV) überspringen
+Überspringe Full Motion Videos
+Cheat Einstellungen
+Aktiviere PS2RD Cheat Engine
+PS2RD Cheat Engine deine Spiele patchen lassen
+PS2RD Cheat Engine Modus
+Automatisch auswählen lassen oder Spielecheats auswählen
+Automatisch Cheats auswählen
+Wähle Spielecheats
+Fehler: Laden des Cheat-File fehlgeschlagen
+Keine Cheats gefunden
+Standardeinstellungen herunterladen
+Netzwerkaktualisierung
+Erneutes runterladen von bereits existierenden Aufzeichnungen?
+Aktualisierung fehlgeschlagen.
+Verbindung zum Updateserver fehlgeschlagen.
+Aktualisierung abgeschlossen.
+Aktualisierung abgebrochen.
+Einstellungen übers Netzwerk laden?
+Benutzerdefinierte Einstellungen
+Standardeinstellungen heruntergeladen
+Automatischer Start in %i s...
+Automatischer Start
+Wert in Sekunden (sek), 0 zum Deaktivieren

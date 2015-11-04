@@ -1,0 +1,208 @@
+# Polish translation by dragolice @http://psx-scene.com/forums/members/dragolice/
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Polish
+Open PS2 Loader %s
+Zapisz zmiany
+Wróć
+Ustawienia sieci
+Opcje zaawansowane
+<brak>
+Ustawienia zapisane...
+Błąd zapisu ustawień!
+Wyjście
+Ustawienia
+Menu
+Gry USB
+Gry HDD
+Gry ETH
+Aplikacje
+Motyw
+Język
+System zostanie wyłączony.
+Wyjść z OPL?
+Przerwać aktualizację?
+%d: Nie wykryto dysku twardego
+%d: Dysk twardy nie jest sformatowany
+%d: Błąd startu sieci
+%d: Nie wykryto network adaptora
+%d: Nie można połączyć z serwerem SMB
+%d: Nie można zalogować do serwera SMB
+%d: Nie można otworzyć udostępnienia SMB
+%d: Nie można wyświetlić udostępnień SMB
+%d: Nie można wyświetlić gier
+%d: Serwer DHCP niedostępny
+%d: Brak połączenia sieciowego
+Włącz
+Wyłącz
+OK
+Wybierz
+Anuluj
+Kółko
+Iks
+Lista gier
+Ustawienia gry
+Usuń wszystkie ustawienia
+Usunięto wszystkie klucze do gry
+Przewijanie
+Wolno
+Średnio
+Szybko
+Domyślne menu
+Załaduj z dysku
+Proszę czekać
+Błąd podczas ładowania ID gry
+Sortowanie automatyczne
+Błąd ładowania pliku językowego
+Wyłącz debugowanie kolorów
+Nie wykryto kontrolera, oczekiwanie...
+Okładki
+Szeroki ekran
+Wyłącz
+Wczytaj ustawienia
+Zapisz ustawienia
+Uruchom urządzenie
+Odśwież
+Start urządzenia USB
+Start urządzenia HDD
+Start urządzenia ETH
+Start aplikacji
+Automatycznie
+Ręcznie
+Uruchom serwer HDL
+Uruchamianie serwera HDL...
+Serwer HDL uruchomiony...
+Niepowodzenie startu serwera HDL.
+Odładowanie serwera HDL...
+Ścieżka do IGR
+Kolor tła
+Kolor tekstu
+- PS2 -
+- Serwer SMB -
+Typ adresu IP
+Statyczny
+DHCP
+Adres IP
+Adres
+Maska
+Brama
+Serwer DNS
+Port
+Udostępnij
+Użytkownik
+Hasło
+<brak>
+Typ adresu
+IP
+NetBIOS
+Akceptuj
+Element zostanie trwale usunięty, kontynuować?
+Zmień nazwę
+Usuń
+Uruchom
+Ustawienia obrazu
+Włącz operację zapisu
+Sprawdzaj fragmentację gier USB
+Zapamiętaj ostatnio uruchomioną grę
+Przycisk wyboru
+Błąd, gra jest pofragmentowana
+Błąd, nie można uruchomić pozycji
+Test
+Pozostaw puste dla gości.
+Dokładny odczyt
+Tryb synchroniczny
+Odhookuj Syscalls
+Tryb 0 PSS
+Emuluj DVD-DL
+Wyłącz IGR
+Moduł dużej pamięci
+Ukryj moduł DEV9
+Zmiana rozmiaru, zostanie sformatowany VMC
+Utwórz
+Start
+Modyfikuj
+Przerwij
+Reset
+Uzyj ogólnych
+Konfiguruj VMC
+Nazwa
+Rozmiar
+Status
+Postęp
+Plik VMC istnieje
+Błędny plik VMC, nieprawidłowy rozmiar
+Musisz utworzyć plik VMC
+Błąd z plikiem VMC %s, kontynuować z fizyczną MC (slot %d) ?
+Odświeżanie automatyczne
+O programie
+Programiści
+Zapewnienie jakości
+Prefix ścieżki USB
+Pozostaw puste, aby wyjść do Browser
+Wartość w minutach, 0 wyłącza zwalnianie obrotów
+Automatyczne zwalnianie obrotów HDD
+Tryb wideo
+Kolor ustawień
+Kolor zaznaczenia
+Wyświetl stronę informacji
+Informacje
+Niestandardowy ELF
+Wybór koloru
+Połącz ponownie
+Pozostaw puste aby notować akcje
+Prefix ścieżki ETH
+Cofnij
+Odstęp
+Enter
+Tryb
+VMC Slot 1
+VMC Slot 2
+ID gry
+Tryb DMA
+V-Sync
+Tryb 1
+Tryb 2
+Tryb 3
+Tryb 4
+Tryb 5
+Tryb 6
+Tryb 7
+Tryb 8
+Konfiguruj GSM
+Tryb łącza ethernetowego
+100Mbit pełny-dupleks
+100Mbit pół-dupleks
+10Mbit pełny-dupleks
+10Mbit pół-dupleks
+ustawienia GSM
+Włącz GSM
+Przełącz GSM wł lub wył
+Wideo
+Wymuś niestandardowy tryb wyświetlania
+Poziom
+Regulacja w poziomie
+Pion
+Regulacja w pionie
+Pomiń FMV
+Pomija scenki wideo
+Ustawienia cheat'ów
+Włącz silnik cheat'ów PS2RD
+Pozwól PS2RD patchować gry
+Tryb silnika cheat'ów PS2RD
+Auto-wybieranie lub wybieranie cheat'ów gry
+Auto-wybieranie cheat'ów
+Wybierz cheat'y
+Błąd: niepowodzenie ładowanie pliku
+Nie znaleziono cheat'ow
+Pobierz domyślne
+Aktualizacja sieciowa
+Pobrać ponownie istniejące zapisy?
+Aktualizacja nie powiodła się.
+Błąd połączenia z serwerem aktualizacji.
+Aktualizacja zakończona.
+Aktualizacja przerwana.
+Pobrać ustawienia z sieci?
+Niestandardowe ustawienia
+Pobrano domyślne
+Auto start w %i s...
+Auto start
+Wartość w sekundach, 0 wyłącza auto start

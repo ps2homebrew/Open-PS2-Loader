@@ -1,0 +1,208 @@
+# Turkish translation by dante (Gürkan DEMİR <vampire_bs@hotmail.com>)
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Turkish
+Open PS2 Loader %s
+Değişiklikleri kaydet
+Geri
+Ağ ayarları
+Gelişmiş ayarlar
+<no values>
+Ayarlar kayıt edildi...
+Ayarlar yazılırken hata oluştu!
+Çıkış
+Ayarlar
+Menü
+USB Oyunları
+HDD Oyunları
+AĞ Oyunları
+Uygulamalar
+Tema
+Dil
+Çıkış işlemi gücü kapatacaktır.
+OPL'den çıkılsın mı?
+Güncelleme iptal edilsinmi?
+%d: HardDisk sürücü bulunamadı
+%d: HardDisk sürücü biçimlendirilmemiş
+%d: Ağ başlatma hatası
+%d: Ağ kartı bulunamadı
+%d: Paylaşım sunucusuna (SMB) bağlanılamadı
+%d: Paylaşım sunucusuna (SMB)oturum açılamıyor
+%d: Paylaşım klasörü açılamıyor
+%d: Ağ paylaşımları listelenemiyor
+%d: Oyunlar listelenemiyor
+%d: DHCP sunucusu erişilebilir değil
+%d: Ağ bağlantısı yok
+Açık
+Kapalı
+Tamam
+Seç
+İptal
+Daire
+Çarpı
+Oyun listesi
+Oyun ayarları
+Tüm ayarları kaldır
+Oyunun yüm anahtarları kaldırıldı
+Kaydırma
+Yavaş
+Orta
+Hızlı
+Varsayılan menü
+Diskten yükle
+Lütfen bekleyiniz
+Oyun kimliği yüklenirken hata oluştu
+Otomatik sıralama
+Dil dosyası yüklenirken hata oluştu
+Hata ayıklama renklerini iptal et
+Oyun kolu algılanmadı, bekliyor...
+Kapak Resimlerini etkinleştir
+Geniş ekran
+Gücü kapat
+Ayarlar yükleniyor
+Ayarlar kayıt ediliyor
+Cihazı başlat
+Yenile
+USB cihazı başlangıç türü
+HDD cihazı başlangıç türü
+AĞ cihazı başlangıç türü
+Uygulamalar menüsü görünüm kipi
+Otomatik
+El ile
+HDL Sunucu Başlat
+HDL Sunucu Başlatma Hatası
+HDL Sunucu Başlıyor...
+HDL Sunucu Çalışıyor...
+HDL Sunucu Durduruluyor...
+IGR çıkış yolu
+Arkaplan rengi
+Metin rengi
+- PS2 - 
+- SMB Server -
+IP adres türü
+Sabit
+DHCP
+IP adresi
+Ağ Adresi
+Ağ Maskesi
+Ağ Geçidi
+DNS
+Port
+Paylaşım
+Kullanıcı Adı
+Şifre
+<ayarlanmadı>
+Adres türü
+IP
+NetBIOS
+Kabul et
+Nesne kalıcı olarak silinecek, devam edilsin mi?
+Y.Adlandır
+Sil
+Çalıştır
+Görüntü ayarları
+Enable write operations
+USB oyun bütünlüğünü kontrol et(Fragmentation)
+Enson oynanan oyunu hatırla
+Select tuşu
+Hata, oyun dosyası parçalı
+Hata, nesne çalıştırılamıyor
+Test
+MİSAFİR oturumu için boş bırakınız.
+Accurate Reads
+Synchronous Mode
+Sis çağrılarını çöz
+PSS video iptali
+DVD-DL i etkinleştir
+IGR i etkisizleştir
+Uüksek konumda bellek kullanımı
+dev9 modulünü gizle
+VMC Boyutu değiştirmek VMC nin biçimlendirilmesine neden olur
+Oluştur
+Başlat
+Düzenle
+Vazgeç
+Sıfırla
+Standardı kullan
+VMC Yapılandırma
+İsim
+Boyut
+Durum
+İlerleme
+VMC dosyası var
+Geçersiz VMC dosyası, boyut hatalı
+VMC dosyasının oluşturulması gerekli
+VMC %sdosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d) ?
+Otomatik yenileme
+Hakkında
+Geliştiriciler
+Kalite Konturolü
+USB önek yolu
+Ps2 menüsüne dönmek için baş bırakınız
+Dakika olarak değer, iptal etmek için 0 giriniz
+Otomatik Sabit Disk durdurma
+Video modu
+İleti rengi
+Seçili öğe rengi
+Bilgi Ekranı göster
+Bilgi
+Özel ELF
+Renk seçimi
+Tekrar Bağlan
+Paylaşımları listelemek için boş bırakınız
+Ağ önek yolu
+Geri tuşu
+Boşluk
+Giriş
+Kip
+VMC Yuvası 1
+VMC Yuvası 2
+Oyun Kimliği
+DMA Kipi
+V-Sync
+Kip 1
+Kip 2
+Kip 3
+Kip 4
+Kip 5
+Kip 6
+Kip 7
+Kip 8
+GSM ayarları
+Ağ Bağlantı kipi
+100Mbit Tam-ikili
+100Mbit Yarım-ikili
+10Mbit Tam-ikili
+10Mbit Yarım-ikili
+GSM Ayarları
+GSM Aktif
+GSM'i Açar ve Kapatır
+VMODE
+Zorlanmış özel görüntüleme kipi
+Y-Konum
+Yatay Ayarlama
+D-Konum
+Dikey Ayarlama
+FMV Atlama
+Full Motion Videoları atlar
+Hile Ayarları
+PS2RD Cheat Engine'i Aktif et
+PS2RD Cheat Engine'in oyunlarınıza yama yapmasına izin verir
+PS2RD Cheat Engine Kipi
+Hileleri Otomatik veya Manuel seçer
+Hileleri Otomatik Seç
+Hileleri Manuel Seç
+Hata: Hile dosyası yüklemesi başarısız
+Hile bulunamadı
+Varsayılanları indir
+Internetten güncelleme
+Varolan kayıtlar tekrar indirilsin mi?
+Güncelleme başarısız.
+Güncelleme sunucusuna bağlantı kurulamadı.
+Güncelleme tamamlandı.
+Güncelleme iptal edildi.
+Internetten ayarlar indirilsin mi?
+Kişiselleştirilmiş Ayarlar
+Varsayılanlar indirildi
+Otomatik başlatılacak %i s...
+Auto start
+Value in second(s), 0 to disable auto start

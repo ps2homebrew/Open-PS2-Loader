@@ -1,0 +1,208 @@
+# Indonesian translation by verislasher
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Indonesian
+Open PS2 Loader %s
+Simpan Perubahan
+Kembali
+Konfigurasi jaringan
+Pilihan lanjutan
+<tak ada nilai>
+Setingan disimpan...
+Kesalahan penulisan setingan!
+Keluar
+Setingan
+Menu
+USB Games
+HDD Games
+ETH Games
+Aplikasi
+Tema
+Bahasa
+Sistem akan dimatikan.
+Keluar OPL?
+Batal perbarui?
+%d: Harddisk tak terdeteksi
+%d: Harddisk belum diformat
+%d: Kesalahan memulai jaringan
+%d: Adaptor jaringan tak terdeteksi
+%d: Tak dapat terhubung ke server SMB
+%d: Tak bisa login ke server SMB
+%d: Tak dapat membuka SMB bersama
+%d: Tak ada daftar SMB bersama
+%d: Tak ada daftar game
+%d: Server DHCP tidak tersedia
+%d: Tak ada koneksi jaringan
+Hidup
+Mati
+OK
+Pilih
+Batal
+Bulat
+Kali
+Daftar Game
+Setingan
+Hapus semua Setingan
+Semua kunci permainan yang dihapus
+Gulir
+Lambat
+Sedang
+Cepat
+Menu standar
+Muat dari disk
+Mohon tunggu
+Kesalahan saat memuat ID Permainan
+Penyortiran otomatis
+Kesalahan memuat file bahasa
+Menonaktifkan Warna Debug
+Tak ada kontroler terdeteksi, menunggu ...
+Aktifkan Sampul
+Layar lebar
+Matikan
+Memuat konfigurasi
+Menyimpan konfigurasi
+Memulai perangkat
+Segarkan
+Memulai mode perangkat USB
+Memulai mode perangkat HDD
+Memulai mode perangkat ETH
+Memulai mode Aplikasi
+Otomatis
+Manual
+Mulai Server HDL
+Memulai Server HDL ...
+Menjalankan Server HDL...
+Gagal memulai Server HDL.
+Mengembalikan Server HDL...
+Pintasan IGR
+Warna latar belakang
+Warna teks
+- PS2 - 
+- SMB Server -
+Jenis alamat IP
+Statis
+DHCP
+Alamat IP
+Alamat
+Mask
+Gateway
+Server DNS
+Port
+Bersama
+Pengguna
+Sandi
+<tidak diatur>
+Tipe alamat
+IP
+NetBIOS
+Terima
+Item akan dihapus secara permanen, lanjut?
+Ubah nama
+Hapus
+Jalankan
+Setingan tampilan
+Memungkinkan operasi tulis
+Cek fragmentasi game USB
+Ingat pertandingan terakhir dimainkan
+Pilih tombol
+Kesalahan, game terfragmentasi
+Kesalahan, tidak bisa menjalankan item
+Coba
+Tinggalkan kosong untuk Otent TAMU.
+Membaca akurat
+Mode Sinkronisasi
+Melepas kaitan syscalls
+Mode PSS 0
+Emulasi DVD-DL
+Nonaktifkan IGR
+Mode Penyimpanan Tinggi
+Sembunyikan mode  Dev9
+Mengubah ukuran akan memformat ulang VMC
+Membuat
+Mulai
+Modifikasi
+Batal
+Reset
+Gunakan generik
+Konfigurasi VMC
+Nama
+Ukuran
+Status
+Kemajuan
+Berkas VMC ada
+Berkas VMC cacat, ukuran salah
+Berkas VMC harus dibuat
+Kesalahan dengan VMC %s, lanjutkan dengan MC fisik (Slot %d)?
+Segarkan otomatis
+Tentang
+Pengkode
+Kualitas jaminan
+Awalan pintas USB
+Kosongkan untuk keluar ke Browser
+Nilai dalam menit (s), 0 untuk menonaktifkan berhenti
+HDD Otomatis berhenti
+Modus video
+Warna dialog
+Warna  dipilih
+Tampilan info halaman
+Info
+Kustom ELF
+Pemilihan warna
+Hubungkan kembali
+Kosongkan untuk daftar bersama
+Awal pintasan ETH
+Hapus
+Spasi
+OK
+Mode
+VMC Slot 1
+VMC Slot 2
+ID Game
+Mode DMA
+V-Sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Konfigurasi GSM
+Mode tautan ethernet
+100Mbit rangkap penuh
+100Mbit setengah rangkap
+10Mbit rangkap penuh
+10Mbit setengah rangkap
+Setingan GSM
+Aktifkan GSM
+Alih GSM ON atau OFF
+VMODE
+Paksa Mode Tampilan Kustom
+H-POS
+Penyesuaian horisontal
+V-POS
+Penyesuaian Vertikal
+Lewati FMV
+Lompati Video Gerakan Penuh
+Setingan Cheat
+Aktifkan PS2RD Cheat Engine
+Biarkan PS2RD Cheat Engine menambal permainan Anda
+Modus PS2RD Cheat Engine
+Pilih otomatis atau Pilih game cheats
+Pilih otomatis game cheats
+Pilih game cheats
+Kesalahan: gagal untuk memuat Berkas cheat
+Tak ada cheat ditemukan
+Unduhan default
+Pembaruan jaringan
+Unduh catatan yang ada?
+Pembaruan gagal
+Gagal menyambungkan ke server pembaruan
+Perbarui selesai
+Perbarui dibatalkan
+Unduh pengaturan dari jaringan?
+Setingan disesuaikan
+Unduhan default
+Mulai otomatis dalam %i s...
+Mulai otomatis
+Nilai dalam detik, 0 mencegah mulai otomatis

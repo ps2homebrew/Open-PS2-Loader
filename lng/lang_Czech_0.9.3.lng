@@ -1,0 +1,208 @@
+# Czech translation by jimmysmith
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Czech
+Open PS2 Loader %s
+Uložit změny
+Zpět
+Síťová konfigurace
+Pokročilé možnosti
+<žádné hodnoty>
+Nastavení uloženo...
+Chyba při ukládání nastavení!
+Ukončit
+Nastavení
+Menu
+USB Hry
+HDD Hry
+ETH Hry
+Aplikace
+Skin
+Jazyk
+Systém bude vypnut.
+Ukončit OPL?
+Zrušit update?
+%d: Harddisk nebyl detekován
+%d: Harddisk není naformátován
+%d: Chyba při inicializaci sítě
+%d: Síťový adaptér nenalezen
+%d: Nelze se připojit k SMB serveru
+%d: Nelze se přihlásit k SMB serveru
+%d: Nelze otevřít SMB share
+%d: Nelze zobrazit SMB share
+%d: Nelze zobrazit seznam her
+%d: DHCP server nenalezen
+%d: Žádné síťové připojení
+Zap
+Vyp
+OK
+Vybrat
+Zrušit
+Kolečko
+Křížek
+Seznam her
+Nast. hry
+Odebrat veškeré nastavení
+Odebrat všechny klíče pro hru
+Skrolování
+Pomalu
+Normálně
+Rychle
+Výchozí menu
+Nahrát z disku
+Chvilku strpení
+Chyba při nahrávání Game ID
+Automatické seřazení
+Chyba při nahrávání jazykového souboru
+Vypnout debug barvy
+Nebyl detekován žádný ovladač, čekám...
+Povolit Cover Art
+Širokoúhlá obrazovka
+Vypnout
+Nahrávám konfiguraci
+Ukládám konfiguraci
+Zapnout zařízení
+Obnovit
+USB zařízení při startu
+HDD zařízení při startu
+ETH zařízení při startu
+Aplikace při startu
+Auto
+Manual
+Spustit HDL Server
+Spouštím HDL Server...
+HDL Server běží...
+Start HDL Serveru se nezdařil.
+Vypínání HDL Serveru...
+Cesta k IGR
+Barva pozadí
+Barva textu
+- PS2 - 
+- SMB Server -
+Typ IP adresy
+Statická
+DHCP
+IP adresa
+Adresa
+Maska
+Brána
+DNS Server
+Port
+Share
+Jméno
+Heslo
+<nenastaveno>
+Typ Adresy
+IP
+NetBIOS
+Potvrdit
+Položka bude nevratně odstraněna, pokračovat?
+Přejmen.
+Smazat
+Spustit
+Nastavení obrazovky
+Povolit zápisy
+Zkontroluj fragmentaci na USB se hrou
+Pamatovat posledně hranou hru
+Tlačítko Select
+Chyba, hra je fragmentovaná
+Chyba, nemůžu spustit hru
+Test
+Nechte prázdné pro přihlášení GUEST účtu
+Přesné čtení
+Synchronní mód
+Unhook Syscalls
+0 PSS mód
+Emulovat DVD-DL
+Vypnout IGR
+Vyšší adresa modulu
+Skrýt modul dev9
+Změna velikosti přeformátuje VMC
+Vytvořit
+Start
+Změnit
+Zrušit
+Reset
+Použít generickou
+Nastavení VMC
+Jméno
+Velikost
+Status
+Postup
+VMC soubor existuje
+Vadný VMC soubor, nesprávná velikost
+Je potřeba vytvořit VMC soubor
+Chyba VMC %s, pokračovat s fyzickým slotem MC (slot %d) ?
+Automatické obnovení
+O aplikaci
+Kodéři
+Kontrola kvality
+prefix cesty k USB
+Nechte prázdné pro ukončení Prohlížeče
+Hodnota v minutách, 0 pro vypnutí spin-down disku
+Automatický HDD spin-down
+Video mód
+Barva dialogu
+Vybraná barva
+Zobrazit stránku s informacemi
+Info
+Custom ELF
+Barva zvýraznení
+Reconnect
+Nechte prázdné pro seznam share
+prefix cesty k ETH
+Backspace
+Mezera
+Enter
+Mód
+VMC Slot 1
+VMC Slot 2
+Game ID
+DMA Mód
+V - Sync
+Mód 1
+Mód 2
+Mód 3
+Mód 4
+Mód 5
+Mód 6
+Mód 7
+Mód 8
+Konfigurovat GSM
+Ethernet link mód
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Nastavení GSM
+Zapnout GSM
+Přepíná GSM ON/OFF
+VMODE
+Vnutit uživatelský Display Mód
+H-POS
+Horizontální úprava
+V-POS
+Vertikální úprava
+Přeskočit FMV
+Přeskočit Full Motion Videa
+Nastavení Cheatů
+Zapnout PS2RD Cheat Engine
+Umožní použití PS2RD Cheat Enginu
+PS2RD Cheat Engine Mód
+Automatické nebo uživatelská volba cheatů
+Automaticky hledat a použít cheaty ke hře
+Vybrat cheaty pro hru
+Chyba: nepodařilo se nahrát soubor s cheaty
+Nenalezeny žádné cheaty
+Stáhnout původní verze konfigů
+Síťový update
+Stáhnout znovu již existující záznamy?
+Update selhal.
+Připojení k update serveru se nezdařilo.
+Update kompletní.
+Update zrušen.
+Stáhnout nastavení ze sítě?
+Vlastní nastavení
+Stažené původní verze konfigů
+Automatický start v %i s...
+Auto start
+Hodnota v sekundách, zadej 0 pro vypnutí auto startu

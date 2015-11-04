@@ -1,0 +1,208 @@
+# Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Portuguese Brazil
+Open PS2 Loader %s
+Salvar mudanças
+Voltar
+Configurações de rede
+Opções avançadas
+<sem valores>
+Configurações salvas...
+Erro ao salvar as configurações!
+Sair
+Configurações
+Menu
+Jogos no USB
+Jogos no HDD
+Jogos em ETH
+Aplicativos
+Temas
+Idioma
+O sistema será desligado.
+Sair do OPL?
+Cancelar as atualizações?
+%d: O Disco Rígido não foi detectado
+%d: O Disco Rígido não está formatado
+%d: Erro ao iniciar a rede
+%d: Nenhum adaptador de rede foi detectado
+%d: Não foi possível conectar com o servidor SMB
+%d: Não foi possível entrar no servidor SMB
+%d: Não foi possível abrir o compartilhamento no SMB
+%d: Não foi possível listar o compartilhamento no SMB
+%d: Não foi possível listar os jogos
+%d: O servidor DHCP está indisponível
+%d: Nenhuma conexão de rede
+ON 
+OFF
+Ok
+Ok
+Cancelar
+O
+X
+Lista de Jogos
+Configurar
+Remover todas as configurações
+Todas as configurações dos jogos foram removidas
+Rolagem
+Lenta
+Média
+Rápida
+Menu padrão
+Carregar do disco
+Por favor aguarde
+Erro ao carregar o ID do jogo
+Organizar em ordem alfabética
+Erro ao carregar os arquivos de idioma
+Desativar cores de depuração
+Nenhum controle detectado, aguardando...
+Habilitar as artes da Capa
+Tela panorâmica
+Desligar o PS2
+Carregando configurações
+Salvando configurações...
+Iniciar dispositivo
+Atualizar
+Modo de inicio no USB
+Modo de inicio no HDD
+Modo de inicio no ETH
+Modo de inicio nos Aplicativos
+Automático
+Manual
+Iniciar o Servidor HDL
+O servidor HDL está iniciando...
+O servidor HDL está sendo executado...
+Falha ao iniciar o servidor HDL.
+O servidor HDL está sendo encerrado...
+Caminho de saída do IGR
+Cor do fundo
+Cor do texto
+- PS2 -
+- Servidor SMB -
+Tipo de Endereço IP
+Estático
+DHCP
+Endereço IP
+Endereço
+Máscara de sub-rede
+Gateway padrão
+Servidor DNS
+Porta
+Compartilhamento
+Usuário
+Senha
+<sem definição>
+Tipo de Endereço
+IP
+NetBIOS
+Aceitar
+O item será apagado permanentemente, continuar?
+Renomear
+Apagar
+Iniciar
+Configurações de tela
+Ativar opções de escritas
+Verificar fragmentação no USB
+Lembrar do último jogo jogado
+Botão de seleção
+Erro, o jogo está fragmentado
+Erro, o item não pode ser iniciado
+Testar
+Deixe em branco para não usar senhas.
+Leituras corretas
+Modo de Sincronia
+Desativar chamadas do sistema
+Modo do PSS em 0
+Emular DVD-DL
+Desativa o IGR
+Armazenamento dos módulos elevados
+Esconder módulo dev9
+Mudando de tamanho, formatará o VMC
+Criar
+Iniciar
+Modificar
+Abortar
+Resetar
+Usa o genérico
+Configure o VMC
+Nome
+Tamanho
+Estatísticas
+Progresso
+O arquivo do VMC já existe
+Arquivo VMC inválido, o tamanho está incorreto
+O arquivo do VMC precisa ser criado
+Error com o VMC %s, continuar com o MC físico (slot %d) ?
+Atualização automática
+Créditos
+Desenvolvedores
+Controle de Qualidade
+Prefixo do caminho USB
+Deixe em branco para ir até o navegador
+Valor em minuto(s), 0 para desativar
+Desligamento automático do HDD
+Modo de vídeo
+Cor do diálogo
+Cor selecionada
+Mostrar Página de Informação
+Info.
+ELF modificado
+Seleção de Cor
+Reconectar
+Deixar vazio para listar compartilhamentos
+Prefixo de caminho ETH
+Apagar
+Espaço
+Enter
+Modo
+VMC Slot 1
+VMC Slot 2
+ID do Jogo
+Modo de DMA
+Sincronização do vídeo
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Configurar GSM
+Modo de link da Internet
+100Mbit duplex-integral
+100Mbit semi-duplex
+10Mbit duplex-integral
+10Mbit semi-duplex
+Opções do GSM
+Ativar GSM
+Ativar/Desativar o GSM
+VMODE
+NTSC/PAL/60Hz/PS1/HDTV/VGA
+POS-H
+Ajustes Horizontais
+POS-V
+Ajustes Verticais
+Pular FMV
+Pula os vídeos do jogo
+Opções de trapaças
+Ativar o PS2RD Cheat Engine
+Deixar o PS2RD patchear seus jogos
+Modo do PS2RD Cheat Engine
+Auto-selecionar ou Escolher as trapaças
+Auto-selecionar trapaças
+Selecionar trapaças
+Erro: falha ao carregar as trapaças
+Nenhuma trapaça encontrada
+Baixar configurações
+Atualizar pela Internet
+Baixar dados existentes novamente?
+Falha na atualização.
+Falha ao conectar no servidor de atualização.
+Atualização concluída.
+Atualização cancelada.
+Baixar configurações da Internet?
+Configurações personalizadas
+Configurações baixadas
+Iniciar automaticamente no %i s...
+Auto-começar
+Valores em segundos (s), 0 para desativar

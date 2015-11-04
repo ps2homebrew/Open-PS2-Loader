@@ -1,0 +1,228 @@
+###################################################################################################
+# This file is a template for translators. This file's encoding must be UTF8.                     #
+#                                                                                                 #
+# Translate every line, keeping the same order. Don't add empty lines.                            #
+# Any missing lines will be substituted with the English defaults from lang.c.                    #
+#                                                                                                 #
+# Important: if your language require some custom glyphs, you should provide a corresponding      #
+# TTF/OTF font file too. By default, OPL only comes with the "basic Latin" font built-in.         #
+#                                                                                                 #
+# Once the translation is complete, you can submit it to the development team.                    #
+#                                                                                                 #
+# To use your custom language with OPL, simply copy your file into your mc?:/OPL folder.          #
+# (File must start with the "lang_" prefix and have the ".lng" extension)                         #
+#                                                                                                 #
+# Finally, don't put too many comments in your file, it will waste space and increases loading     #
+# time. One single comment line on top (e.g. "name <yourmail@address.com>") should be enough.     #
+#                                                                                                 #
+# Thanks for your work.                                                                           #
+#                                                                                                 #
+###################################################################################################
+#
+# Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
+English
+Open PS2 Loader %s
+Save changes
+Back
+Network config
+Advanced options
+<no values>
+Settings saved...
+Error writing settings!
+Exit
+Settings
+Menu
+USB Games
+HDD Games
+ETH Games
+Apps
+Theme
+Language
+The system will be powered off.
+Exit OPL?
+Cancel updating?
+%d: HardDisk Drive not detected
+%d: HardDisk Drive not formatted
+%d: Network startup error
+%d: No network adaptor detected
+%d: Cannot connect to SMB server
+%d: Cannot log into SMB server
+%d: Cannot open SMB share
+%d: Cannot list SMB shares
+%d: Cannot list games
+%d: DHCP server unavailable
+%d: No network connection
+On
+Off
+OK
+Select
+Cancel
+Circle
+Cross
+Games List
+Game settings
+Remove all settings
+Removed all keys for the game
+Scrolling
+Slow
+Medium
+Fast
+Default menu
+Load from disc
+Please wait
+Error while loading the Game ID
+Automatic sorting
+Error loading the language file
+Disable Debug Colors
+No controller detected, waiting...
+Enable Cover Art
+Wide screen
+Power off
+Loading config
+Saving config
+Start device
+Refresh
+USB device start mode
+HDD device start mode
+ETH device start mode
+Applications start mode
+Auto
+Manual
+Start HDL Server
+HDL Server Starting...
+HDL Server Running...
+Failed to start HDL Server.
+HDL Server Unloading...
+IGR path
+Background color
+Text color
+- PS2 -
+- SMB Server -
+IP address type
+Static
+DHCP
+IP address
+Address
+Mask
+Gateway
+DNS Server
+Port
+Share
+User
+Password
+<not set>
+Address type
+IP
+NetBIOS
+Accept
+Item will be permanently deleted, continue?
+Rename
+Delete
+Run
+Display settings
+Enable write operations
+Check USB game fragmentation
+Remember last played game
+Select button
+Error, the game is fragmented
+Error, could not run the item
+Test
+Leave empty for GUEST auth.
+Accurate Reads
+Synchronous Mode
+Unhook Syscalls
+0 PSS mode
+Emulate DVD-DL
+Disable IGR
+High module storage
+Hide DEV9 module
+Changing the size will reformat the VMC
+Create
+Start
+Modify
+Abort
+Reset
+Use generic
+Configure VMC
+Name
+Size
+Status
+Progress
+VMC file exist
+Invalid VMC file, size is incorrect
+VMC file need to be created
+Error with VMC %s, continue with physical MC (slot %d) ?
+Automatic refresh
+About
+Coders
+Quality Assurance
+USB prefix path
+Leave empty to exit to Browser
+Value in minute(s), 0 to disable spin down
+Automatic HDD spin down
+Video mode
+Dialog color
+Selected color
+Display info page
+Info
+Custom ELF
+Color selection
+Reconnect
+Leave empty to list shares
+ETH prefix path
+Backspace
+Space
+Enter
+Mode
+VMC Slot 1
+VMC Slot 2
+Game ID
+DMA Mode
+V-Sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Configure GSM
+Ethernet link mode
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Settings
+Enable GSM
+Toggles GSM ON or OFF
+VMODE
+Forced Custom Display Mode
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+FMV Skip
+Skips Full Motion Videos
+Cheat Settings
+Enable PS2RD Cheat Engine
+Lets PS2RD Cheat Engine patch your games
+PS2RD Cheat Engine Mode
+Auto-select or Select game cheats
+Auto-select cheats
+Select game cheats
+Error: failed to load Cheat File
+No cheats found
+Download defaults
+Network update
+Re-download existing records?
+Update failed.
+Failed to connect to update server.
+Update completed.
+Update cancelled.
+Download settings from the network?
+Customized Settings
+Downloaded Defaults
+Auto start in %i s...
+Auto start
+Value in second(s), 0 to disable auto start

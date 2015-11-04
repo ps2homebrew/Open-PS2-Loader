@@ -8,27 +8,28 @@
 
 Open PS2 Loader detailed ChangeLog:
 
-rev873 - updated changelog
-rev872 - lang_Turkish.lng deleted
-rev871 - lang_TChinese.lng deleted
-rev870 - lang_Swedish.lng deleted
-rev869 - lang_Spanish.lng deleted
-rev868 - lang_Russian.lng deleted
-rev867 - lang_Portuguese_BR.lng deleted
-rev866 - lang_Portuguese.lng deleted
-rev865 - lang_Polish.lng deleted
-rev864 - lang_Laotian.lng deleted
-rev863 - lang_Italian.lng deleted
-rev862 - lang_Indonesian.lng deleted
-rev861 - lang_German.lng deleted
-rev860 - lang_French.lng deleted
-rev859 - lang_English.lng deleted
-rev858 - lang_Czech.lng deleted
-rev857 - lang_Bulgarian.lng deleted
-rev856 - lang_Arabic.lng deleted
-rev855 - Updated languages
-rev854 - Updated languages
-rev853 - writeMCIcon MC Folder Creation fix - Reported by Grahf, fixed by SP193
+rev874 - Updated changelog - Wed Nov 04 02:16:05 2015 +0100
+rev873 - lang_Turkish.lng deleted - Wed Nov 04 00:38:44 2015 +0000
+rev872 - lang_TChinese.lng deleted - Wed Nov 04 00:38:17 2015 +0000
+rev871 - lang_Swedish.lng deleted - Wed Nov 04 00:37:48 2015 +0000
+rev870 - lang_Spanish.lng deleted - Wed Nov 04 00:37:21 2015 +0000
+rev869 - lang_Russian.lng deleted - Wed Nov 04 00:36:55 2015 +0000
+rev868 - lang_Portuguese_BR.lng deleted - Wed Nov 04 00:36:21 2015 +0000
+rev867 - lang_Portuguese.lng deleted - Wed Nov 04 00:35:45 2015 +0000
+rev866 - lang_Polish.lng deleted - Wed Nov 04 00:35:19 2015 +0000
+rev865 - lang_Laotian.lng deleted - Wed Nov 04 00:34:36 2015 +0000
+rev864 - lang_Italian.lng deleted - Wed Nov 04 00:33:50 2015 +0000
+rev863 - lang_Indonesian.lng deleted - Wed Nov 04 00:33:12 2015 +0000
+rev862 - lang_German.lng deleted - Wed Nov 04 00:32:35 2015 +0000
+rev861 - lang_French.lng deleted - Wed Nov 04 00:31:25 2015 +0000
+rev860 - lang_English.lng deleted - Wed Nov 04 00:30:21 2015 +0000
+rev859 - lang_Czech.lng deleted - Wed Nov 04 00:26:29 2015 +0000
+rev858 - lang_Czech.lng deleted - Wed Nov 04 00:24:03 2015 +0000
+rev857 - lang_Bulgarian.lng deleted - Wed Nov 04 00:23:36 2015 +0000
+rev856 - lang_Arabic.lng deleted online with Bitbucket - Wed Nov 04 00:19:25 2015 +0000
+rev855 - Updated languages - Wed Nov 04 01:07:43 2015 +0100
+rev854 - Update languages - Sun Oct 25 13:05:27 2015 +0100
+rev853 - writeMCIcon MC Folder Creation fix - Reported by Grahf, fixed by SP193 - Fri Oct 23 13:30:20 2015 -0400
 rev852 - Change version to 'OPL 0.9.4 WIP', re-enable development build flag - Fri Oct 23 04:16:22 2015 -0400
 rev851 - Added tag 0.9.3 for changeset 9b5321def22d - Wed Oct 21 00:59:28 2015 -0400
 rev850 - Massive language update: Arabic, Brazilian Portuguese, Bulgarian, French, Portuguese, Russian, Spanish and Traditional Chinese. - Wed Oct 21 00:49:42 2015 -0400
@@ -883,4 +884,3 @@ rev2 - added open usb loader sources - Sun Sep 27 17:42:30 2009 +0200
 rev1 - added iso2usbld - Sun Sep 27 17:36:34 2009 +0200
 rev0 - added .hgignore - Sun Sep 27 16:28:14 2009 +0200
 rev -  - Sun Sep 27 16:20:30 2009 +0200
-

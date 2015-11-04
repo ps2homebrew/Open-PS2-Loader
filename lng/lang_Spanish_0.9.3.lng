@@ -1,0 +1,208 @@
+# Spanish translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Spanish
+Open PS2 Loader %s
+Guardar cambios
+Atrás
+Ajustes conexión de red
+Opciones avanzadas
+<Sin configurar>
+Configuración guardada.
+¡Error al guardar la configuración!
+Salir
+Configuración
+Menú
+Juegos por USB
+Juegos por Disco duro
+Juegos por Red
+Aplicaciones
+Estilo
+Idioma
+Se apagará el sistema.
+¿Salir del OPL?
+¿Cancelar actualización?
+%d: Disco duro no detectado
+%d: Disco duro no formateado
+%d: Error al iniciar red
+%d: No se ha detectado adaptador de red
+%d: No se puede conectar al servidor SMB
+%d: No se puede iniciar sesión en el servidor SMB
+%d: No se puede abrir la unidad compartida de SMB
+%d: No se puede listar la unidad compartida de SMB
+%d: No se pueden listar los juegos
+%d: Servidor DHCP no disponible
+%d: No hay conexión de red
+Activa.
+Desact.
+Aceptar
+Aceptar
+Cancelar
+Círculo
+Equis
+Lista de juegos
+Ajustes
+Borrar todos los ajustes
+Ajustes del juego borrados
+Desplazamiento
+Lento
+Medio
+Rápido
+Menú por defecto
+Cargar del disco
+Espera por favor
+Error al cargar el código ID del juego
+Listas ordenadas por alfabeto
+Error al cargar el archivo de idioma
+No mostrar los colores para depuración
+Mando no encontrado, esperando...
+Carátulas, serigrafías y fondos
+Pantalla panorámica interfaz
+Apagar PS2
+Cargando configuración...
+Guardando configuración...
+Iniciar dispositivo
+Refrescar
+Modo de inicio para USB
+Modo de inicio para Disco duro
+Modo de inicio para Red
+Modo de inicio para Aplicaciones
+Automático
+Manual
+Iniciar servidor HDLDump
+Iniciando servidor HDLDump...
+Servidor HDLDump conectado...
+Error al iniciar el servidor HDLDump. 
+Cerrando servidor HDLDump...
+Ruta del IGR
+Color de fondo
+Color de texto
+- PS2 -
+- Servidor SMB -
+Tipo de dirección IP
+Estática
+DHCP
+Dirección IP
+Dirección
+Máscara de subred
+Puerta de enlace predeterminada
+Servidor DNS
+Puerto
+Unidad o carpeta compartida
+Cuenta de usuario compartida
+Contraseña
+<Sin definir>
+Tipo de dirección
+IP
+NetBIOS
+Aceptar
+El archivo se borrará definitivamente, ¿continuar?
+Renombrar
+Borrar
+Iniciar
+Preferencias de pantalla
+Mostrar operaciones de escritura
+Comprobar fragmentación juego USB
+Recordar último juego en uso
+Botón de selección
+Error, el juego está fragmentado
+Error, no se pudo iniciar el archivo
+Test
+Dejar en blanco para autentificar como GUEST
+Lectura precisa
+Modo sincronizado
+Desvincula el sistema
+Omite los vídeos PSS
+Emula DVD-DL
+Quita el IGR
+Almacena los módulos en alta dirección de memoria
+Oculta el módulo DEV9
+Cambiar el tamaño formateará la VMC
+Crear
+Iniciar
+Modificar
+Abortar
+Reiniciar
+Usar genérica
+Configurar VMC
+Nombre
+Tamaño
+Estado
+Progreso
+Archivo VMC creado
+Archivo VMC inválido, el tamaño es incorrecto
+El archivo VMC debe ser creado
+Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
+Refresco automático de las listas
+Acerca del OPL
+Desarrolladores
+Testeadores
+Ruta predeterminada dispositivo USB
+Dejar en blanco para salida hacia el menú de PS2
+Valor en minutos, 0 para desactivar el paro automático
+Paro automático rotación del Disco duro
+Modo de vídeo interfaz
+Color de diálogos
+Color de selección
+Mostrar pantalla de información
+Info.
+Archivo ELF personalizado
+Seleccionar color
+Reconexión
+Dejar en blanco para mostrar todas las unidades o carpetas compartidas
+Ruta predeterminada conexión de red
+Retroceso
+Espacio
+Intro
+Modo
+Ranura VMC 1
+Ranura VMC 2
+ID del juego
+Modo DMA
+Sincronización vertical
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Configuración GSM
+Configuración de velocidad ethernet y duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Opciones GSM
+Activar GSM
+Forzar modo de vídeo seleccionado con GSM
+Modo de vídeo seleccionado
+Modo de vídeo a forzar
+Ajuste horizontal
+Configura la posición horizontal de la pantalla
+Ajuste vertical
+Configura la posición vertical de la pantalla
+Omitir vídeos FMV
+Omite escenas Full Motion Vídeos
+Configuración PS2RD
+Activar PS2RD
+Permitir que PS2RD parchee los juegos
+Modo PS2RD
+Auto-seleccionar o seleccionar códigos de juegos
+Auto-seleccionar códigos
+Seleccionar códigos de juegos
+Error: fallo al cargar el archivo de códigos
+No se han encontrado códigos
+Descargar ajustes predeterminados
+Actualización ajustes juegos a través de red
+¿Cargar de nuevo los ajustes existentes?
+Actualización fallida.
+Error al conectarse con el servidor de actualización.
+Actualización completa.
+Actualización cancelada.
+¿Descargar ajustes desde la red?
+Configuraciones personalizadas
+Descargados ajustes predeterminados
+Inicio en %i s...
+Inicio automático
+Valor en segundos, 0 para desactivar el inicio automático

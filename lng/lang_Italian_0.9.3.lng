@@ -1,0 +1,208 @@
+# Italian translation by jauffreBlades - @http://psx-scene.com/forums/members/jauffreblades/
+# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+Italian
+Open PS2 Loader %s
+Salva modifiche
+Indietro
+Configurazione rete
+Opzioni avanzate
+<nessun valore>
+Impostazioni salvate...
+Errore scrittura impostazioni
+Esci
+Impostazioni
+Menu
+Giochi USB
+Giochi HDD
+Giochi ETH
+Apps
+Tema
+Lingua
+Il sistema verrà spento.
+Uscire da OPL?
+Annullare l'aggiornamento?
+%d: Hard disk non rilevato
+%d: Hard disk non formattato
+%d: Errore durante l'avvio della rete
+%d: Nessun adattatore di rete rilevato
+%d: Impossibile connettersi al server SMB
+%d: Impossibile autenticarsi al server SMB
+%d: Impossibile aprire le condivisioni SMB
+%d: Impossibile elencare le condivisioni SMB
+%d: Impossibile elencare i giochi
+%d: Server DHCP non disponibile
+%d: Nessuna connessione di rete
+On
+Off
+OK
+Selez.
+Annulla
+Cerchio
+X
+Lista dei giochi
+Impost.
+Rimuovi tutte le impostazioni
+Rimosse tutte le chiavi per il gioco
+Scorrimento
+Lento
+Medio
+Veloce
+Menu di default
+Carica da disco
+Attendere prego
+Errore durante il caricamento dell'ID di gioco
+Ordinamento automatico
+Errore nel caricamento del file di lingua
+Disattiva colori di debug
+Nessun controller rilevato, in attesa...
+Abilita Cover Art
+Widescreen
+Spegni
+Caricamento configurazione
+Salvataggio configurazione
+Avvia dispositivo
+Aggiorna
+Modalità di avvio USB
+Modalità di avvio HDD
+Modalità di avvio ETH
+Caricamento menu Apps
+Auto
+Manuale
+Avviare server HDL
+Avvio server in corso...
+Server HDL in esecuzione...
+Server HDL in chiusura...
+Server HDL in scaricamento dalla memoria...
+Esci su
+Colore di sfondo
+Colore testo
+- PS2 -
+- Server SMB -
+Tipo di indirizzo IP
+Statico
+DHCP
+Indirizzo IP
+Indirizzo
+Maschera
+Gateway
+Server DNS
+Porta
+Condivisione
+Utente
+Password
+<non impostato>
+Tipo di indirizzo
+IP
+NetBIOS
+Accetta
+L'oggetto sarà cancellato in modo permanente, continuare?
+Rinomina
+Cancella
+Esegui
+Impostazioni display
+Abilita operazioni in scrittura
+Verifica frammentazione giochi USB
+Ricorda ultimo titolo giocato
+Tasto seleziona
+Errore, il gioco è frammentato
+Errore, impossibile avviare il titolo.
+Test
+Lasciare vuoto per autenticazione GUEST
+Lettura accurata
+Modo sincrono
+Unhook dalle syscalls
+Modo 0 PSS
+Disabilita DVD-DL
+Disabilita IGR
+Moduli nell'area alta di memoria
+Nascondi modulo dev9
+Modificare la dimensione riformatterà la VMC.
+Crea
+Avvia
+Modifica
+Annulla
+Ripristina
+Usa generico
+Configura VMC
+Nome
+Dimensione
+Stato
+Progresso
+File VMC esiste.
+File VMC non valido, dimensione non corretta.
+Creazione file VMC richiesta.
+Errore VMC %s, continuare con MC fisica (slot %d)?
+Aggiornamento automatico
+Informazioni su
+Sviluppatori
+Controllo qualità
+Percorso prefisso USB
+Lasciare vuoto per uscire al browser
+Valore in minuti, 0 per disabilitare lo spin down
+Spin down automatico HDD
+Modalità video
+Colore finestra
+Colore selezione
+Visualizza pagina info
+Info
+ELF personalizzato
+Seleziona il colore
+Riconnetti
+Lasciare vuoto per elencare le condivisioni
+Percorso prefisso ETH
+Backspace
+Spazio
+Invio
+Modalità
+Slot VMC 1
+Slot VMC 2
+ID gioco
+Modo DMA
+V-Sync
+Modo 1
+Modo 2
+Modo 3
+Modo 4
+Modo 5
+Modo 6
+Modo 7
+Modo 8
+Configura GSM
+Velocità Ethernet e impostazioni duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Impostazioni GSM
+Abilita GSM
+Imposta GSM On/Off
+VMODE
+Forza modo di visualizzazione personalizzato
+H-POS
+Regolazione orizzontale
+V-POS
+Regolazione verticale
+Salta FMV
+Salta video in full motion
+Impostazioni cheat
+Abilita motore cheat PS2RD
+Permetti a PS2RD di applicare patch ai giochi
+Modo motore cheat PS2RD
+Selezione automatica o seleziona cheats
+Auto-seleziona
+Seleziona manualmente
+Errore: impossibile caricare file cheats
+Nessun cheat trovato
+Scarica predefiniti
+Aggiornamento via rete
+Riscaricare le righe esistenti?
+Aggiornamento fallito.
+Impossibile connettersi al server di aggiornamento.
+Aggiornamento completato.
+Aggiornamento annullato.
+Scaricare le impostazioni via rete?
+Impostazioni personalizzate
+Impostazioni di default scaricate
+Avvio automatico in %i s...
+Avvio automatico
+Valore in secondi, 0 per disabilitare l'avvio automatico

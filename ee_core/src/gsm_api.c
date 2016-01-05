@@ -25,29 +25,33 @@ struct VModeSettings{
 
 struct GSRegisterValues{
 	u64 smode2;
-	u64 display;
+	u64 display1;
+	u64 display2;
 	u64 syncv;
 };
 
 struct GSRegisterFixValues{
-	u8 automatic_adaptation;
+	u8 auto_adaptation;
 	u8 smode2;
 	u8 display;
 	u8 syncv;
-	u32 X_offset;
-	u32 Y_offset;
+	u32 dx_offset;
+	u32 dy_offset;
 };
 
-struct GSRegisterAdaptationValues{
-	u64 display;
+struct GSAdaptationValues{
+	u64 display1;
+	u64 display2;
 	u8 double_height;
 	u8 smode2;
+	u8 skip_videos;
 };
 
 extern struct VModeSettings Source_VModeSettings;
 extern struct VModeSettings Target_VModeSettings;
 extern struct GSRegisterValues Target_GSRegisterValues;
 extern struct GSRegisterFixValues GSRegisterFixValues;
+extern struct GSAdaptationValues GSAdaptationValues;
 
 extern void Hook_SetGsCrt();
 extern void GSHandler();
@@ -58,23 +62,27 @@ static unsigned int KSEG_backup[2];	//Copies of the original words at 0x80000100
 /* Update GSM params */
 /*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, int dx_offset, int dy_offset)
+void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, u8 skip_videos)
 {
-	Target_VModeSettings.interlace 	= (u32) interlace;
-	Target_VModeSettings.mode	= (u32) mode;
-	Target_VModeSettings.ffmd	= (u32) ffmd;
+	Target_VModeSettings.interlace 		= (u32) interlace;
+	Target_VModeSettings.mode			= (u32) mode;
+	Target_VModeSettings.ffmd			= (u32) ffmd;
 
-	Target_GSRegisterValues.smode2 	= (u8) smode2;
-	Target_GSRegisterValues.display	= (u64) display;
-	Target_GSRegisterValues.syncv	= (u64) syncv;
+	Target_GSRegisterValues.smode2 		= (u8) smode2;
+	Target_GSRegisterValues.display1	= (u64) display;
+	Target_GSRegisterValues.display2	= (u64) display;
+	Target_GSRegisterValues.syncv		= (u64) syncv;
 
-	GSRegisterFixValues.automatic_adaptation	= 0;	// Automatic Adaptation -> 0 = On, 1 = Off ; Default = 0 = On
+	GSRegisterFixValues.auto_adaptation	= 0;	// Automatic Adaptation -> 0 = On, 1 = Off ; Default = 0 = On
 	GSRegisterFixValues.display			= 0;	// DISPLAYx Fix ---------> 0 = On, 1 = Off ; Default = 0 = On
 	GSRegisterFixValues.smode2			= 0;	// SMODE2 Fix -----------> 0 = On, 1 = Off ; Default = 0 = On
 	GSRegisterFixValues.syncv			= 0;	// SYNCV Fix ------------> 0 = On, 1 = Off ; Default = 0 = On
 
-	GSRegisterFixValues.X_offset	= dx_offset;	// X-axis offset -> Use it only when automatic adaptations formulas don't suffice
-	GSRegisterFixValues.Y_offset	= dy_offset;	// Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
+	GSRegisterFixValues.dx_offset		= (u32) dx_offset;	// X-axis offset -> Use it only when automatic adaptations formulas don't suffice
+	GSRegisterFixValues.dy_offset		= (u32) dy_offset;	// Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
+
+	GSAdaptationValues.skip_videos		= (u8) (skip_videos ^ 1);	// Skip Videos Fix ------------> 0 = On, 1 = Off ; Default = 0 = On
+
 }
 
 /*------------------------------------------------------------------*/

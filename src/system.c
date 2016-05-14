@@ -348,9 +348,11 @@ int sysGetDiscID(char *hexDiscID) {
 }
 
 void sysExecExit() {
-	if(gExitPath[0]!='\0') sysExecElf(gExitPath);
-
-	Exit(0);
+	__asm__ __volatile__(
+			"	li $3, 0x04;"
+			"	syscall;"
+			"	nop;"
+	);
 }
 
 //Module bits

@@ -39,7 +39,7 @@ Apps
 Theme
 Language
 The system will be powered off.
-Exit OPL?
+Exit to Browser/OSDSYS?
 Cancel updating?
 %d: HardDisk Drive not detected
 %d: HardDisk Drive not formatted
@@ -157,7 +157,7 @@ About
 Coders
 Quality Assurance
 USB prefix path
-Leave empty to exit to Browser
+Boots Custom ELF after an IGR
 Value in minute(s), 0 to disable spin down
 Automatic HDD spin down
 Video mode

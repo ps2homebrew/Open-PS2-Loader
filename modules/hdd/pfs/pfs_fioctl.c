@@ -81,10 +81,11 @@ int pfsFioDevctl(iop_file_t *f, const char *name, int cmd, void *arg, size_t arg
 		pfsMount->uid=*(u16 *)(arg);
 		break;
 
+ #if PFS_DEVCTL_SET_UID != PFS_DEVCTL_SET_GID
 	case PFS_DEVCTL_SET_GID:
 		pfsMount->gid=*(u16 *)(arg);
 		break;
-
+ #endif
 	case PFS_DEVCTL_SHOW_BITMAP:
 		pfsBitmapShow(pfsMount);
 		break;

@@ -322,7 +322,7 @@ static int ata_device_select(int device)
 
 	48-bit LBA just involves writing the upper 24 bits in the format above into each respective register on the first write pass, before writing the lower 24 bits in the 2nd write pass. The LBA bits within the device field are not used in either write pass.
 */
-int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command)
+int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
 	USE_ATA_REGS;
 	iop_sys_clock_t cmd_timeout;
@@ -755,7 +755,7 @@ int ata_device_set_transfer_mode(int device, int type, int mode)
 }
 
 /* Export 9 */
-int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
+int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
 	int res = 0;
 	unsigned short int sector, lcyl, hcyl, select, command, len;

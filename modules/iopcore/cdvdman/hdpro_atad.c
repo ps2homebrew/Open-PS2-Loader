@@ -380,7 +380,7 @@ static int ata_device_select(int device)
 }
 
 /* Export 6 */
-int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command)
+int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command)
 {
 	iop_sys_clock_t cmd_timeout;
 	const ata_cmd_info_t *cmd_table;

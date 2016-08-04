@@ -8,6 +8,9 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev879 - () Turns out Hommi's ASM is in the PS2SDK as "Exit(0)" so replicating it here - Sat May 14 12:29:00 2016 -0400
+rev878 - (*) Changed the "sysExecExit()" function call, reverted it to Hominem's - Sat May 14 00:28:03 2016 -0400
+rev877 - GSM 0.38 Core readded (now fully PS2RD compatible)* - Tue Jan 05 05:19:55 2016 -0500
 rev876 - Restorations and addtions - Wed Dec 23 13:00:14 2015 +0100
 rev875 - About Menu: Credits added - Wed Nov 04 18:48:54 2015 -0500
 rev874 - Updated changelog - Wed Nov 04 02:16:05 2015 +0100

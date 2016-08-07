@@ -208,7 +208,7 @@ void guiShowAbout() {
 	strcat(OPLVersion, GSM_VERSION);
 #endif
 #ifdef CHEAT
-	strcat(OPLVersion, " PS2RD Cheat Engine ");
+	strcat(OPLVersion, " PS2RD ");
 	strcat(OPLVersion, CHEAT_VERSION);
 #endif
 

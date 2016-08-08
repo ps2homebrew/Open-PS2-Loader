@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev881 - Reduced PS2RD string size in About Screen - Sun Aug 07 18:18:13 2016 -0300
 rev880 - Updated for compiling with latest PS2SDK revision - Thu Aug 04 15:33:21 2016 -0300
 rev879 - () Turns out Hommi's ASM is in the PS2SDK as "Exit(0)" so replicating it here - Sat May 14 12:29:00 2016 -0400
 rev878 - (*) Changed the "sysExecExit()" function call, reverted it to Hominem's - Sat May 14 00:28:03 2016 -0400

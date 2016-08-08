@@ -33,6 +33,9 @@ CHEAT = 0
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 = 0
 
+#Enables/disables the 'Playstation 2' boot logo - NB: It will be properly displayed only if both disc and console region match.
+PS2LOGO = 0
+
 # ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
 DEBUG = 0
 EESIO_DEBUG = 0
@@ -132,6 +135,10 @@ else
 	VMC_FLAGS = VMC=0
 endif
 
+ifeq ($(PS2LOGO),1)
+	EECORE_EXTRA_FLAGS = PS2LOGO=1
+endif
+
 SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 ifeq ($(DEBUG),1)
 	MOD_DEBUG_FLAGS = DEBUG=1
@@ -163,7 +170,9 @@ else
 		IOP_OBJS += obj/udptty-ingame.o
 	endif
 endif
-
+ifeq ($(PS2LOGO),1)
+	CDVDMAN_DEBUG_FLAGS += PS2LOGO=1
+endif
 
 all:
 	@mkdir -p obj

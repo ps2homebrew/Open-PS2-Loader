@@ -1,4 +1,7 @@
-#include "common.h"
+//In the SONY original, all the calls to DEBUG_PRINTF() were to sceInetPrintf().
+#define DEBUG_PRINTF(args...) //printf(args)
+
+#define MAX_FRAME_SIZE	1518
 
 #define PRE_LWIP_130_COMPAT	1
 

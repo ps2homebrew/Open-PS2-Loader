@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev882 - 'Playstation 2' boot logo & startup sound - Mon Aug 08 10:21:15 2016 -0300
 rev881 - Reduced PS2RD string size in About Screen - Sun Aug 07 18:18:13 2016 -0300
 rev880 - Updated for compiling with latest PS2SDK revision - Thu Aug 04 15:33:21 2016 -0300
 rev879 - () Turns out Hommi's ASM is in the PS2SDK as "Exit(0)" so replicating it here - Sat May 14 12:29:00 2016 -0400

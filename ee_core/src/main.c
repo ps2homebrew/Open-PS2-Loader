@@ -135,7 +135,16 @@ int main(int argc, char **argv){
 	SifExitRpc();
 
 	DPRINTF("Executing '%s'...\n", ElfPath);
+
+#ifdef PS2LOGO
+	//PS2LOGO Caller, based on l_oliveira & SP193 tips
+	char *argvs[1];
+	argvs[0] = ElfPath;
+	argvs[1] = NULL;
+	LoadExecPS2("rom0:PS2LOGO", 1, argvs);
+#else
 	LoadExecPS2(ElfPath, 0, NULL);	
+#endif
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x0000ff;	//Red

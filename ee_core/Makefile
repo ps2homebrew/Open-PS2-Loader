@@ -23,18 +23,22 @@ EE_OBJS_DIR = obj/
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
 EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
+
 ifeq ($(EESIO_DEBUG),1) 
 EE_CFLAGS += -D__EESIO_DEBUG
 endif
+
 ifeq ($(DTL_T10000),1)
 	EE_CFLAGS += -D_DTL_T10000
 endif
+
 ifeq ($(LOAD_DEBUG_MODULES),1)
 EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 	ifeq ($(DECI2_DEBUG),1)
 	EE_CFLAGS += -D__DECI2_DEBUG
 	endif
 endif
+
 ifeq ($(VMC),1)
 EE_CFLAGS += -DVMC
 endif
@@ -46,6 +50,10 @@ endif
 ifeq ($(CHEAT),1)
 EE_OBJS += $(CHEATCORE_EE_OBJS)
 EE_CFLAGS += -DCHEAT
+endif
+
+ifeq ($(PS2LOGO),1)
+	EE_CFLAGS += -DPS2LOGO
 endif
 
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)

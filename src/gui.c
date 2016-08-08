@@ -211,6 +211,9 @@ void guiShowAbout() {
 	strcat(OPLVersion, " PS2RD ");
 	strcat(OPLVersion, CHEAT_VERSION);
 #endif
+#ifdef PS2LOGO
+	strcat(OPLVersion, " PS2LOGO");
+#endif
 
 	diaSetLabel(diaAbout, 1, OPLVersion);
 

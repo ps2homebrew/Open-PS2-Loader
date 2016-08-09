@@ -115,13 +115,6 @@ void DeviceFSInit(void)
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
 	u32 offset = 0;
-
-#ifdef __PS2LOGO
-	// PS2LOGO flag  (activation done only on 'boot sectors' of a disc i.e. the first 12 sectors, where encrypted logo is located) and the number of sectors to be read by this routine  
-	u32 j = (lsn < 13)?1:0;
-	u32 k = sectors;
-#endif
-
 	while (sectors) {
 		if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)))))
 			if(cdvdman_get_part_specs(lsn) != 0)
@@ -139,19 +132,6 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 		sectors -= nsectors;
 		lsn += nsectors;
 	}
-
-#ifdef __PS2LOGO
- 	// PS2LOGO Decryptor algorithm (runs only when actived); based on misfire's code (https://github.com/mlafeldt/ps2logo)
-	if ( j == 1 ) {
-		DPRINTF("Decrypting PS2 Logo...\n");
-		u8 *logo = (u8 *)buffer;
-		u8 key = logo[0];
-		for (j = 0; j < (k * 2048); j++) {
-			logo[j] ^= key;
-			logo[j] = (logo[j] << 3) | (logo[j] >> 5);
-		}
-	}
-#endif
 
 	return 0;
 }

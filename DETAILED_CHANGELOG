@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev883 - SP193: PS3 BC(Backwards Compatible) fixes - Mon Aug 08 16:19:43 2016 -0300
 rev882 - 'Playstation 2' boot logo & startup sound - Mon Aug 08 10:21:15 2016 -0300
 rev881 - Reduced PS2RD string size in About Screen - Sun Aug 07 18:18:13 2016 -0300
 rev880 - Updated for compiling with latest PS2SDK revision - Thu Aug 04 15:33:21 2016 -0300

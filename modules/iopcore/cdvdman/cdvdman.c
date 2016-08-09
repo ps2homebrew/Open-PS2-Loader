@@ -371,6 +371,24 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 				CancelAlarm(&cdvdemu_read_end_cb, NULL);
 			break;
 		}
+
+#ifdef __PS2LOGO
+		// PS2LOGO Decryptor algorithm (runs only when actived); based on misfire's code (https://github.com/mlafeldt/ps2logo)
+		if  (lsn < 13)  {
+			DPRINTF("Decrypting PS2 Logo...\n");
+			u32 j;
+			u8 *logo = (u8 *)ptr;
+			u8 key = logo[0];
+			if (logo[0] != 0) {
+				for (j = 0; j < (SectorsToRead * 2048); j++) {
+					logo[j] ^= key;
+					logo[j] = (logo[j] << 3) | (logo[j] >> 5);
+				}
+			}
+		
+		}
+#endif
+
 		ptr += SectorsToRead << 11;
 		remaining -= SectorsToRead;
 		lsn += SectorsToRead;

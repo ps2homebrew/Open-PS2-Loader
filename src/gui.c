@@ -1692,3 +1692,20 @@ void guiRenderTextScreen(const unsigned char* message) {
 
 	guiEndFrame();
 }
+
+void guiWarning(const char* text, int count) {
+	guiStartFrame();
+
+	guiShow();
+
+	rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+
+	rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
+	rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
+
+	fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
+
+	guiEndFrame();
+	
+	delay(count);
+}

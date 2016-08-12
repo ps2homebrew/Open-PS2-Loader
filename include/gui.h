@@ -146,4 +146,6 @@ int guiAltStartupNameHandler(char* text, int maxLen);
 int guiVmcNameHandler(char* text, int maxLen);
 #endif
 
+void guiWarning(const char* text, int count);
+
 #endif

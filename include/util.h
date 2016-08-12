@@ -44,4 +44,6 @@ int InitConsoleRegionData(void);
 const char *GetSystemDataPath(void);
 char GetSystemFolderLetter(void);
 
+inline void delay(int count);
+
 #endif

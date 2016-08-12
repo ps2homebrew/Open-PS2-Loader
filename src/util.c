@@ -415,3 +415,16 @@ char GetSystemFolderLetter(void) {
 int GetSystemRegion(void) {
 	return ConsoleRegion;
 }
+
+/*----------------------------------------------------------------------------------------*/
+/* NOP delay.                                                                             */
+/*----------------------------------------------------------------------------------------*/
+inline void delay(int count)
+{
+	int i, ret;
+
+	for (i  = 0; i < count; i++) {
+		ret = 0x01000000;
+		while(ret--) asm("nop\nnop\nnop\nnop");
+	}
+}

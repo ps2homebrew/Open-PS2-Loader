@@ -135,10 +135,6 @@ else
 	VMC_FLAGS = VMC=0
 endif
 
-ifeq ($(PS2LOGO),1)
-	EECORE_EXTRA_FLAGS = PS2LOGO=1
-endif
-
 SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 ifeq ($(DEBUG),1)
 	MOD_DEBUG_FLAGS = DEBUG=1
@@ -171,6 +167,7 @@ else
 	endif
 endif
 ifeq ($(PS2LOGO),1)
+	EE_CFLAGS += -DPS2LOGO
 	CDVDMAN_DEBUG_FLAGS += PS2LOGO=1
 endif
 

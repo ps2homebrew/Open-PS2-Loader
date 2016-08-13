@@ -209,7 +209,6 @@ void guiShowAbout() {
 #endif
 #ifdef CHEAT
 	strcat(OPLVersion, " PS2RD ");
-	strcat(OPLVersion, CHEAT_VERSION);
 #endif
 #ifdef PS2LOGO
 	strcat(OPLVersion, " PS2LOGO");

@@ -1116,11 +1116,15 @@ static void moduleCleanup(opl_io_module_t* mod, int exception) {
 void deinit(int exception) {
 	unloadPads();
 	ioEnd();
-	guiEnd();
-	menuEnd();
-	lngEnd();
-	thmEnd();
-	rmEnd();
+	// IOP Memory Usage Warning
+	// ===========================================================================================================================
+	if(gDisableDebug) {
+		guiEnd();
+		menuEnd();
+		lngEnd();
+		thmEnd();
+		rmEnd();
+	}
 	configEnd();
 
 	deinitAllSupport(exception);

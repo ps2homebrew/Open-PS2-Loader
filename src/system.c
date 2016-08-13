@@ -155,6 +155,16 @@ typedef struct {
 	u32	align;
 } elf_pheader_t;
 
+	// IOP Memory Usage Warning
+	// ===========================================================================================================================
+	void guiWarning(const char* text, int count);
+	void guiEnd();
+	void menuEnd();
+	void lngEnd();
+	void thmEnd();
+	void rmEnd();
+	// ===========================================================================================================================
+
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 
 	int i, id, ret, index = 0;
@@ -633,6 +643,30 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx) + 0x3F) &~ 0x3F;
 #endif
 	sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorage + ModuleStorageSize);
+
+	// IOP Memory Usage Warning
+	// ===========================================================================================================================
+	if(!gDisableDebug) {
+		char imu[80];
+		float usage;
+		usage = (float)(ModuleStorageSize) / (float)(2*1024*1024) * 100;
+		
+		snprintf(imu, sizeof(imu), "IOP Usage:%.2f%%,by %s(CDVDFSV+CDVDMAN)", (float)usage, mode_str);
+#ifdef VMC
+		strcat(imu, "+VMC");
+#endif
+#ifdef PS2LOGO
+	strcat(imu, "+PS2LOGO");
+#endif
+		guiWarning(imu, 20);
+		guiEnd();
+		menuEnd();
+		lngEnd();
+		thmEnd();
+		rmEnd();
+	}
+	// ===========================================================================================================================
+
 
 #ifdef __DECI2_DEBUG
 	ResetDECI2();

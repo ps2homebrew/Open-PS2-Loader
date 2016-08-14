@@ -134,6 +134,14 @@ ifeq ($(VMC),1)
 else
 	VMC_FLAGS = VMC=0
 endif
+ifeq ($(PS2LOGO),1)
+	EE_CFLAGS += -DPS2LOGO
+	PS2LOGO_FLAGS += PS2LOGO=1
+	CDVDMAN_PS2LOGO_FLAGS += PS2LOGO=1
+else
+	PS2LOGO_FLAGS = PS2LOGO=0
+	CDVDMAN_PS2LOGO_FLAGS = PS2LOGO=0
+endif
 
 SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 ifeq ($(DEBUG),1)
@@ -165,10 +173,6 @@ else
 		SMSTCPIP_INGAME_CFLAGS = 
 		IOP_OBJS += obj/udptty-ingame.o
 	endif
-endif
-ifeq ($(PS2LOGO),1)
-	EE_CFLAGS += -DPS2LOGO
-	CDVDMAN_DEBUG_FLAGS += PS2LOGO=1
 endif
 
 all:
@@ -289,7 +293,7 @@ pc_tools_win32:
 
 ee_core.s:
 	echo "    * EE core"
-	$(MAKE) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
+	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
 	$(BIN2S) ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 elfldr.s:
@@ -320,22 +324,22 @@ eesync.s:
 
 usb_cdvdman.s:
 	echo "    * usb_cdvdman.irx"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
 
 smb_cdvdman.s:
 	echo "    * smb_cdvdman.irx"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
 
 hdd_cdvdman.s:
 	echo "    * hdd_cdvdman.irx"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
 
 hdd_hdpro_cdvdman.s:
 	echo "    * hdd_hdpro_cdvdman.irx"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/hdd_hdpro_cdvdman.s hdd_hdpro_cdvdman_irx
 
 cdvdfsv.s:

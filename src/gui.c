@@ -1702,7 +1702,7 @@ void guiWarning(const char* text, int count) {
 	rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
 	rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
 
-	fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, text, gTheme->textColor);
+	fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, screenWidth, screenHeight, text, gTheme->textColor);
 
 	guiEndFrame();
 	

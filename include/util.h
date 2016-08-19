@@ -44,6 +44,10 @@ int InitConsoleRegionData(void);
 const char *GetSystemDataPath(void);
 char GetSystemFolderLetter(void);
 
+#ifdef PS2LOGO
+int CheckPS2Logo(int fd, u32 lba);
+#endif
+
 inline void delay(int count);
 
 #endif

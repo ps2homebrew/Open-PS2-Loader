@@ -4,6 +4,7 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
+#include "include/opl.h"
 #include "include/util.h"
 #include "include/ioman.h"
 #include <io_common.h>
@@ -12,12 +13,21 @@
 #include <fileXio_rpc.h>
 #include <osd_config.h>
 
+#ifdef PS2LOGO
+#include "include/hdd.h"
+#include "include/pad.h"
+#endif
+
 extern void *icon_sys;
 extern int size_icon_sys;
 extern void *icon_icn;
 extern int size_icon_icn;
 
 static int mcID = -1;
+
+#ifdef PS2LOGO
+void guiWarning(const char* text, int count);
+#endif
 
 int getFileSize(int fd) {
 	int size = fileXioLseek(fd, 0, SEEK_END);
@@ -363,7 +373,6 @@ char toHex(int digit) {
 	return htab[digit & 0x0F];
 }
 
-static short int ConsoleRegion=CONSOLE_REGION_INVALID;
 static char SystemDataFolderPath[]="BRDATA-SYSTEM";
 static char SystemFolderLetter='R';
 
@@ -415,6 +424,80 @@ char GetSystemFolderLetter(void) {
 int GetSystemRegion(void) {
 	return ConsoleRegion;
 }
+
+#ifdef PS2LOGO
+int CheckPS2Logo(int fd, u32 lba) {
+	u8 logo[12*2048] ALIGNED(64);
+	void *buffer = logo;
+	u32 i, j, k, w;
+	u8 EnablePS2LOGO = 0;
+	u32 ps2logochecksum = 0;
+	char text[1024];
+
+	if(!gDisableDebug) guiWarning("Reading first 12 disc sectors (PS2 Logo)...", 10);
+	w = 0;
+	if ((fd>0)&&(lba==0))	// USB_MODE & ETH_MODE
+		w = fileXioRead(fd, logo, sizeof(logo))==sizeof(logo);
+	if ((lba>0)&&(fd==0)) {	// HDD_MODE
+		for(k=0;k<=12*4;k++) {	// NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors (12) by 4.
+			w = !(hddReadSectors(lba+k, 1, buffer));
+			if(!w) break;
+			buffer += 512;
+		}
+	}
+
+	if(w) {
+
+		if(!gDisableDebug) {
+			for(k=0;k<=191;k++) {
+				snprintf(text, sizeof(text), "Disc Offset: 0x%08X - Buffer Address: 0x%08X\n", (u32)(k*8*16), ((u32)(&logo)+(u32)(k*8*16)));
+				for(j=0;j<=7;j++) {
+					for(i=0;i<=15;i++) {
+						snprintf(text, sizeof(text), "%s %02X", text, logo[(i+j*16+k*8*16)]);
+					}
+					strcat(text, "\n");
+				}
+				readPads();
+				if (getKeyOn(KEY_CROSS)) {
+					do {
+						readPads();
+					} while(!getKeyOff(KEY_CROSS));
+					break;
+				}
+				guiWarning(text, ( ( (k<=3) || (k>=188) || ((logo[k*8*16]==0) && (logo[(k-1)*8*16]!=0)) )?5:1 ) );
+			}
+		}
+		if(!gDisableDebug) guiWarning("Checking PS2 Logo first byte...", 10);
+		u8 key = logo[0];
+		if (logo[0] != 0) {
+			if(!gDisableDebug) guiWarning("Decrypting PS2 Logo...", 10);
+			for (j = 0; j < (12 * 2048); j++) {
+				logo[j] ^= key;
+				logo[j] = (logo[j] << 3) | (logo[j] >> 5);
+			}
+			if(!gDisableDebug) guiWarning("Calculating PS2 Logo checksum...", 10);
+			for (j = 0; j < (12 * 2048); j++) {
+				ps2logochecksum += (u32)logo[j];
+			}
+			// PS2LOGO NTSC Checksum = 0x120519
+			// PS2LOGO PAL  Checksum = 0x1555AB
+			snprintf(text, sizeof(text), "%s Disc PS2 Logo(checksum 0x%06X) & %s console ", ((ps2logochecksum == 0x1555AB)?"PAL":"NTSC"), ps2logochecksum, ((ConsoleRegion==CONSOLE_REGION_EUROPE)?"PAL":"NTSC"));
+			if (((ps2logochecksum == 0x1555AB) && (ConsoleRegion==CONSOLE_REGION_EUROPE)) || ((ps2logochecksum == 0x120519) && (ConsoleRegion!=CONSOLE_REGION_EUROPE))) {
+				EnablePS2LOGO = 1;
+				strcat(text, "match.");
+			} else {
+				strcat(text, "don't match!");
+			}
+			if(!gDisableDebug) guiWarning(text, 25);
+		} else {
+			if(!gDisableDebug) guiWarning("Not a valid PS2 Logo first byte!", 25);
+		}
+	} else {
+		if(!gDisableDebug) guiWarning("Error reading first 12 disc sectors (PS2 Logo)!", 25);
+	}
+	return EnablePS2LOGO;
+}
+#endif
 
 /*----------------------------------------------------------------------------------------*/
 /* NOP delay.                                                                             */

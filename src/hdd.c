@@ -84,7 +84,7 @@ int hddSetIdleTimeout(int timeout)
 }
 
 //-------------------------------------------------------------------------
-static int hddReadSectors(u32 lba, u32 nsectors, void *buf)
+int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 {
 	u8 args[16];
 

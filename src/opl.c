@@ -1114,11 +1114,10 @@ static void moduleCleanup(opl_io_module_t* mod, int exception) {
 }
 
 void deinit(int exception) {
-	unloadPads();
-	ioEnd();
-	// IOP Memory Usage Warning
-	// ===========================================================================================================================
+	// Just deinit them if we won't show Debug Warnings later 
 	if(gDisableDebug) {
+		unloadPads();
+		ioEnd();
 		guiEnd();
 		menuEnd();
 		lngEnd();
@@ -1206,11 +1205,14 @@ static void setDefaults(void) {
 	as_counter = 0;
 	as_start = 0;
 	as_current = 0;
+
 }
 
 static void init(void) {
 	// default variable values
 	setDefaults();
+
+	ConsoleRegion = InitConsoleRegionData();
 
 	padInit(0);
 	configInit(NULL);
@@ -1231,7 +1233,7 @@ static void init(void) {
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
 	cacheInit();
 
-	gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
+	gSelectButton = (ConsoleRegion == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
 
 	// try to restore config
 	_loadConfig();

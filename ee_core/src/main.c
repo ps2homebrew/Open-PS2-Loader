@@ -74,6 +74,11 @@ int main(int argc, char **argv){
 	DPRINTF("GSM = %s\n", EnableGSMOp==0?"Disabled":"Enabled");
 #endif
 
+#ifdef PS2LOGO
+	EnablePS2LOGO = _strtoi(_strtok(NULL, " "));
+	DPRINTF("PS2LOGO = %s\n", EnablePS2LOGO==0?"Disabled":"Enabled");
+#endif
+
 	i++;
 
 	ModStorageStart = (void*)_strtoui(_strtok(argv[i], " "));
@@ -138,10 +143,14 @@ int main(int argc, char **argv){
 
 #ifdef PS2LOGO
 	//PS2LOGO Caller, based on l_oliveira & SP193 tips
-	char *argvs[1];
-	argvs[0] = ElfPath;
-	argvs[1] = NULL;
-	LoadExecPS2("rom0:PS2LOGO", 1, argvs);
+	if (EnablePS2LOGO) {
+		char *argvs[1];
+		argvs[0] = ElfPath;
+		argvs[1] = NULL;
+		LoadExecPS2("rom0:PS2LOGO", 1, argvs);
+	} else {
+		LoadExecPS2(ElfPath, 0, NULL);
+	}
 #else
 	LoadExecPS2(ElfPath, 0, NULL);	
 #endif

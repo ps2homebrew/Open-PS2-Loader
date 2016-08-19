@@ -81,4 +81,8 @@ int DisableDebug;
 int *gCheatList;	//Store hooks/codes addr+val pairs
 #endif
 
+#ifdef PS2LOGO
+int EnablePS2LOGO;
+#endif
+
 #endif

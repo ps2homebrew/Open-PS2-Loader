@@ -548,6 +548,9 @@ static void ethRenameGame(int id, char* newName) {
 
 static void ethLaunchGame(int id, config_set_t* configSet) {
 	int i, compatmask;
+#ifdef PS2LOGO
+	int EnablePS2LOGO = 0;
+#endif
 #ifdef CHEAT
 	int result;
 #endif
@@ -658,6 +661,19 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 			sprintf(partname, "%s%s\\%s", ethPrefix, game->media == 0x12?"CD":"DVD", settings->filename);
 	}
 
+#ifdef PS2LOGO
+	char text[80];
+	snprintf(text, sizeof(text), "PS2LOGO located at %s", partname);
+	if(!gDisableDebug) guiWarning(text, 30);
+	int fd = fileXioOpen(partname, O_RDONLY, 0666);
+	if (fd >= 0) {
+		EnablePS2LOGO = CheckPS2Logo(fd, 0);
+		fileXioClose(fd);
+	} else {
+		if(!gDisableDebug) guiWarning("Error opening filename!", 25);
+	}
+#endif
+
 	layer1_start = sbGetISO9660MaxLBA(partname);
 
 	switch(game->format) {
@@ -693,7 +709,14 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 #else
 #define VMC_TEMP2
 #endif
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, VMC_TEMP2 compatmask);
+
+#ifdef PS2LOGO
+#define PS2LOGO_TEMP3	EnablePS2LOGO,
+#else
+#define PS2LOGO_TEMP3
+#endif
+
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, VMC_TEMP2 PS2LOGO_TEMP3 compatmask);
 }
 
 static config_set_t* ethGetConfig(int id) {

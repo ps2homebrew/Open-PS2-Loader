@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev889 - guiWarning: tweaks for displaying multi-line strings - Fri Aug 19 20:42:22 2016 -0300
 rev888 - New Makefile variable (for developers) - Fri Aug 19 20:36:58 2016 -0300
 rev887 - PS2LOGO flag fixes (in Makefile) - Sun Aug 14 08:41:36 2016 -0300
 rev886 - IOP Memory Usage Warning (works together with Debug Colors). - Sat Aug 13 19:51:42 2016 -0300

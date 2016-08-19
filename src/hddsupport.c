@@ -246,6 +246,9 @@ static void hddRenameGame(int id, char* newName) {
 
 static void hddLaunchGame(int id, config_set_t* configSet) {
 	int i, size_irx = 0;
+#ifdef PS2LOGO
+	int EnablePS2LOGO = 0;
+#endif
 #ifdef CHEAT
 	int result;
 #endif
@@ -400,6 +403,68 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 
 	if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
 		strcpy(filename, game->startup);
+
+#ifdef PS2LOGO
+	// ===============================================================
+	// OPL HDD_MODE PS2LOGO Offset (explained with an example)
+	// ===============================================================
+	// hdl_dump query
+	// --------------
+	// Hard drives:
+	// (...)
+	// 	hdd2: 152625 MB, formatted Playstation 2 HDD
+	// (...)
+	// 
+	// ===============================================================
+	// hdl_dump toc hdd2:
+	// ------------------
+	// type   start     #parts size name
+	// 0x0001 00000000.:  1   128MB __mbr                           
+	// 0x0100 00040000.:  1   128MB __net                           
+	// 0x0100 00080000.:  1   256MB __system                        
+	// 0x0100 00100000.:  1   512MB __sysconf                       
+	// 0x0100 00200000.:  1  1024MB __common                        
+	// 0x0100 00400000.:  1   512MB __boot                          
+	// 0x0100 00500000.:  1   128MB HDLoader Settings               
+	// (...)
+	// 0x1337 02600000.:  2  1536MB PP.SLUS-20712.HDL.Gradius_V     
+	// (...)
+	// Total slice size: 152625MB, used: 83968MB, available: 68608MB
+	// 
+	// ===============================================================
+	// 
+	// hdl_dump info hdd2: PP.SLUS-20712.HDL.Gradius_V
+	// -----------------------------------------------
+	// SLUS_207.12: [Gradius V], DVD
+	// dma mode: *u4
+	// 	part  1 is from sector 0x02602000, 1044480KB long
+	// 	part  2 is from sector 0x02500000,  402080KB long
+	// Total size: 1446560KB (1412MB approx.)
+	// 
+	// ===============================================================
+	// 
+	// hdl_dump hdl_toc hdd2:
+	// ----------------------
+	// type     size flags           dma startup      name
+	// (...)
+	// DVD 1446560KB                 *u4 SLUS_207.12  Gradius V
+	// (...)
+	// total 152576MB, used 83968MB, available 68608MB
+	// 
+	// ===============================================================
+	//
+	// hdl_dump info part 1....... 0x07C02000
+	// OPL game->start_sector..... 0x07C00808
+	//                             ----------
+	// PS2LOGO Offset..............0x000017F8 = 6136 = 6 MB - 8
+	//
+#define OPL_HDD_MODE_PS2LOGO_OFFSET	0x17F8
+	char text[80];
+	snprintf(text, sizeof(text), "PS2LOGO located at LBA 0x%08X", game->start_sector+OPL_HDD_MODE_PS2LOGO_OFFSET);
+	if(!gDisableDebug) guiWarning(text, 30);
+	EnablePS2LOGO = CheckPS2Logo(0, game->start_sector+OPL_HDD_MODE_PS2LOGO_OFFSET);
+#endif
+
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
 #ifdef VMC
@@ -407,7 +472,14 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 #else
 #define VMC_TEMP3
 #endif
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 compatMode);
+
+#ifdef PS2LOGO
+#define PS2LOGO_TEMP4	EnablePS2LOGO,
+#else
+#define PS2LOGO_TEMP4
+#endif
+
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 PS2LOGO_TEMP4 compatMode);
 }
 
 static config_set_t* hddGetConfig(int id) {

@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev887 - PS2LOGO flag fixes (in Makefile) - Sun Aug 14 08:41:36 2016 -0300
 rev886 - IOP Memory Usage Warning (works together with Debug Colors). - Sat Aug 13 19:51:42 2016 -0300
 rev885 - Functions added: guiWarning(GUI) & delay(Util) - Fri Aug 12 11:42:28 2016 -0300
 rev884 - 'Playstation 2' boot logo & startup sound - l_oliveira's code optimizations - Tue Aug 09 00:00:44 2016 -0300

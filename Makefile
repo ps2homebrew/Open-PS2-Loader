@@ -36,6 +36,9 @@ DTL_T10000 = 0
 #Enables/disables the 'Playstation 2' boot logo - NB: It will be properly displayed only if both disc and console region match.
 PS2LOGO = 0
 
+#Nor stripping neither compressing binary ELF after compiling.
+NOT_PACKED = 0
+
 # ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
 DEBUG = 0
 EESIO_DEBUG = 0
@@ -184,11 +187,13 @@ all:
 	$(MAKE) $(EE_BIN)
 	
 ifeq ($(DEBUG),0)
+ifeq ($(NOT_PACKED),0)
 	echo "Stripping..."
 	ee-strip $(EE_BIN)
 
 	echo "Compressing..."
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
+endif
 endif
 	
 debug:

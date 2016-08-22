@@ -188,6 +188,7 @@ static void IGR_Thread(void *arg)
 
 		// Reset SPU
 		ResetSPU();
+		
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x0000FF; // Red
 
@@ -229,20 +230,20 @@ static void IGR_Thread(void *arg)
 #ifdef GSM
 		if(EnableGSMOp)
 		{
-			DPRINTF("Stopping GSM...\n");
-			DisableGSM();
 			if(!DisableDebug)
 				GS_BGCOLOUR = 0x00FF00; // Green
+			DPRINTF("Stopping GSM...\n");
+			DisableGSM();
 		}
 #endif
 
 #ifdef CHEAT
 		if(EnableCheatOp)
 		{
-			DPRINTF("Stopping PS2RD Cheat Engine...\n");
-			DisableCheats();
 			if(!DisableDebug)
 				GS_BGCOLOUR = 0xFF0000; // Blue
+			DPRINTF("Stopping PS2RD Cheat Engine...\n");
+			DisableCheats();
 		}
 #endif
 

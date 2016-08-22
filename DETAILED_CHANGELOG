@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev891 - IGR: Yellow Debug Color adjust - Mon Aug 22 08:31:19 2016 -0300
 rev890 - PS2LOGO improvements and new GUI Warning messages - Fri Aug 19 20:55:58 2016 -0300
 rev889 - guiWarning: tweaks for displaying multi-line strings - Fri Aug 19 20:42:22 2016 -0300
 rev888 - New Makefile variable (for developers) - Fri Aug 19 20:36:58 2016 -0300

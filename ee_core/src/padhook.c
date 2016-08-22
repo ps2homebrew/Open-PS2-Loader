@@ -236,9 +236,6 @@ static void IGR_Thread(void *arg)
 		}
 #endif
 
-		if(!DisableDebug)
-			GS_BGCOLOUR = 0x00FFFF; // Yellow
-
 #ifdef CHEAT
 		if(EnableCheatOp)
 		{
@@ -248,6 +245,9 @@ static void IGR_Thread(void *arg)
 				GS_BGCOLOUR = 0xFF0000; // Blue
 		}
 #endif
+
+		if(!DisableDebug)
+			GS_BGCOLOUR = 0x00FFFF; // Yellow
 
 		while (!SifIopSync()){;}
 

@@ -155,15 +155,12 @@ typedef struct {
 	u32	align;
 } elf_pheader_t;
 
-	// IOP Memory Usage Warning
-	// ===========================================================================================================================
-	void guiWarning(const char* text, int count);
-	void guiEnd();
-	void menuEnd();
-	void lngEnd();
-	void thmEnd();
-	void rmEnd();
-	// ===========================================================================================================================
+void guiWarning(const char* text, int count);
+void guiEnd();
+void menuEnd();
+void lngEnd();
+void thmEnd();
+void rmEnd();
 
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv) {
 
@@ -651,8 +648,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 	sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorage + ModuleStorageSize);
 
-	// IOP Memory Usage Warning
-	// ===========================================================================================================================
 	if(!gDisableDebug) {
 		char text[80];
 		float usage;
@@ -667,7 +662,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 		guiWarning(text, 20);
 	}
-	// ===========================================================================================================================
 
 
 #ifdef __DECI2_DEBUG

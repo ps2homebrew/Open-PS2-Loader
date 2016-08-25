@@ -15,7 +15,6 @@
 
 #ifdef PS2LOGO
 #include "include/hdd.h"
-#include "include/pad.h"
 #endif
 
 extern void *icon_sys;
@@ -434,7 +433,6 @@ int CheckPS2Logo(int fd, u32 lba) {
 	u32 ps2logochecksum = 0;
 	char text[1024];
 
-	if(!gDisableDebug) guiWarning("Reading first 12 disc sectors (PS2 Logo)...", 10);
 	w = 0;
 	if ((fd>0)&&(lba==0))	// USB_MODE & ETH_MODE
 		w = fileXioRead(fd, logo, sizeof(logo))==sizeof(logo);
@@ -448,34 +446,12 @@ int CheckPS2Logo(int fd, u32 lba) {
 
 	if(w) {
 
-		if(!gDisableDebug) {
-			for(k=0;k<=191;k++) {
-				snprintf(text, sizeof(text), "Disc Offset: 0x%08X - Buffer Address: 0x%08X\n", (u32)(k*8*16), ((u32)(&logo)+(u32)(k*8*16)));
-				for(j=0;j<=7;j++) {
-					for(i=0;i<=15;i++) {
-						snprintf(text, sizeof(text), "%s %02X", text, logo[(i+j*16+k*8*16)]);
-					}
-					strcat(text, "\n");
-				}
-				readPads();
-				if (getKeyOn(KEY_CROSS)) {
-					do {
-						readPads();
-					} while(!getKeyOff(KEY_CROSS));
-					break;
-				}
-				guiWarning(text, ( ( (k<=3) || (k>=188) || ((logo[k*8*16]==0) && (logo[(k-1)*8*16]!=0)) )?5:1 ) );
-			}
-		}
-		if(!gDisableDebug) guiWarning("Checking PS2 Logo first byte...", 10);
 		u8 key = logo[0];
 		if (logo[0] != 0) {
-			if(!gDisableDebug) guiWarning("Decrypting PS2 Logo...", 10);
 			for (j = 0; j < (12 * 2048); j++) {
 				logo[j] ^= key;
 				logo[j] = (logo[j] << 3) | (logo[j] >> 5);
 			}
-			if(!gDisableDebug) guiWarning("Calculating PS2 Logo checksum...", 10);
 			for (j = 0; j < (12 * 2048); j++) {
 				ps2logochecksum += (u32)logo[j];
 			}

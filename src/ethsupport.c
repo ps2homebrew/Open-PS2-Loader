@@ -662,15 +662,10 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	}
 
 #ifdef PS2LOGO
-	char text[80];
-	snprintf(text, sizeof(text), "PS2LOGO located at %s", partname);
-	if(!gDisableDebug) guiWarning(text, 30);
 	int fd = fileXioOpen(partname, O_RDONLY, 0666);
 	if (fd >= 0) {
 		EnablePS2LOGO = CheckPS2Logo(fd, 0);
 		fileXioClose(fd);
-	} else {
-		if(!gDisableDebug) guiWarning("Error opening filename!", 25);
 	}
 #endif
 

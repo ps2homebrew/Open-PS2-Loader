@@ -308,9 +308,6 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 			}
 #ifdef PS2LOGO
 			if(i==0) {
-				char text[80];
-				snprintf(text, sizeof(text), "PS2LOGO located at %s", partname);
-				if(!gDisableDebug) guiWarning(text, 30);
 				EnablePS2LOGO = CheckPS2Logo(fd, 0);
 			}
 #endif

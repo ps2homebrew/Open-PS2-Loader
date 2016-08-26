@@ -13,9 +13,7 @@
 #include <fileXio_rpc.h>
 #include <osd_config.h>
 
-#ifdef PS2LOGO
 #include "include/hdd.h"
-#endif
 
 extern void *icon_sys;
 extern int size_icon_sys;
@@ -24,9 +22,7 @@ extern int size_icon_icn;
 
 static int mcID = -1;
 
-#ifdef PS2LOGO
 void guiWarning(const char* text, int count);
-#endif
 
 int getFileSize(int fd) {
 	int size = fileXioLseek(fd, 0, SEEK_END);
@@ -424,12 +420,11 @@ int GetSystemRegion(void) {
 	return ConsoleRegion;
 }
 
-#ifdef PS2LOGO
 int CheckPS2Logo(int fd, u32 lba) {
 	u8 logo[12*2048] ALIGNED(64);
 	void *buffer = logo;
-	u32 i, j, k, w;
-	u8 EnablePS2LOGO = 0;
+	u32 j, k, w;
+	u8 ValidPS2Logo = 0;
 	u32 ps2logochecksum = 0;
 	char text[1024];
 
@@ -459,7 +454,7 @@ int CheckPS2Logo(int fd, u32 lba) {
 			// PS2LOGO PAL  Checksum = 0x1555AB
 			snprintf(text, sizeof(text), "%s Disc PS2 Logo(checksum 0x%06X) & %s console ", ((ps2logochecksum == 0x1555AB)?"PAL":"NTSC"), ps2logochecksum, ((ConsoleRegion==CONSOLE_REGION_EUROPE)?"PAL":"NTSC"));
 			if (((ps2logochecksum == 0x1555AB) && (ConsoleRegion==CONSOLE_REGION_EUROPE)) || ((ps2logochecksum == 0x120519) && (ConsoleRegion!=CONSOLE_REGION_EUROPE))) {
-				EnablePS2LOGO = 1;
+				ValidPS2Logo = 1;
 				strcat(text, "match.");
 			} else {
 				strcat(text, "don't match!");
@@ -471,14 +466,13 @@ int CheckPS2Logo(int fd, u32 lba) {
 	} else {
 		if(!gDisableDebug) guiWarning("Error reading first 12 disc sectors (PS2 Logo)!", 25);
 	}
-	return EnablePS2LOGO;
+	return ValidPS2Logo;
 }
-#endif
 
 /*----------------------------------------------------------------------------------------*/
 /* NOP delay.                                                                             */
 /*----------------------------------------------------------------------------------------*/
-inline void delay(int count)
+void delay(int count)
 {
 	int i, ret;
 

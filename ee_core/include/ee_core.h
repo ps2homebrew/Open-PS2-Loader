@@ -75,14 +75,11 @@ int EnableGSMOp;
 int EnableCheatOp;
 
 int DisableDebug;
+int PS2Logo;
 #define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
 
 #ifdef CHEAT
 int *gCheatList;	//Store hooks/codes addr+val pairs
-#endif
-
-#ifdef PS2LOGO
-int EnablePS2LOGO;
 #endif
 
 #endif

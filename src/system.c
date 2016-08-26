@@ -580,13 +580,7 @@ static int ResetDECI2(void){
 #define VMC_TEMP1
 #endif
 
-#ifdef PS2LOGO
-#define PS2LOGO_TEMP6	int EnablePS2LOGO,
-#else
-#define PS2LOGO_TEMP6
-#endif
-
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 PS2LOGO_TEMP6 unsigned int compatflags) {
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 int EnablePS2Logo, unsigned int compatflags) {
 	unsigned int modules, ModuleStorageSize;
 	void *ModuleStorage;
 	u8 local_ip_address[4], local_netmask[4], local_gateway[4];
@@ -657,9 +651,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #ifdef VMC
 		strcat(text, "+VMC");
 #endif
-#ifdef PS2LOGO
-	strcat(text, "+PS2LOGO");
-#endif
 		guiWarning(text, 20);
 	}
 
@@ -702,22 +693,14 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #define GSM_TEMP2
 #endif
 
-#ifdef PS2LOGO
-#define PS2LOGO_TEMP1	" %d"
-#define PS2LOGO_TEMP2	,EnablePS2LOGO
-#else
-#define PS2LOGO_TEMP1
-#define PS2LOGO_TEMP2
-#endif
-
 	i = 0;
-	sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_TEMP1 GSM_TEMP1 PS2LOGO_TEMP1, \
-		mode_str, gDisableDebug, gExitPath, gHDDSpindown, \
+	sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_TEMP1 GSM_TEMP1, \
+		mode_str, gDisableDebug, gPS2Logo, gExitPath, gHDDSpindown, \
 		local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3], \
 		local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3], \
 		local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3], \
 		gETHOpMode \
-		CHEAT_TEMP2 GSM_TEMP2 PS2LOGO_TEMP2);
+		CHEAT_TEMP2 GSM_TEMP2);
 	argv[i] = config_str;
 	i++;
 

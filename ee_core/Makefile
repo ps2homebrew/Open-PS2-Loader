@@ -52,10 +52,6 @@ EE_OBJS += $(CHEATCORE_EE_OBJS)
 EE_CFLAGS += -DCHEAT
 endif
 
-ifeq ($(PS2LOGO),1)
-	EE_CFLAGS += -DPS2LOGO
-endif
-
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
 EE_LIBS += -lpatches
 

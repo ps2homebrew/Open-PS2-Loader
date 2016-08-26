@@ -11,7 +11,8 @@ endif
 all: bin/opl2iso
 
 clean:
-	rm -f bin/*opl2iso* src/*.o
+	rm -f -r bin
+	rm -f src/*.o
 
 rebuild: clean all
 	

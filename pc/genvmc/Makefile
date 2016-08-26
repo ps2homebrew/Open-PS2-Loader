@@ -13,7 +13,8 @@ endif
 all: bin/genvmc
 
 clean:
-	rm -f bin/*genvmc* src/*.o
+	rm -f -r bin
+	rm -f src/*.o
 
 rebuild: clean all
 	

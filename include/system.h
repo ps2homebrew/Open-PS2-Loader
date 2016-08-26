@@ -23,13 +23,7 @@ void sysPowerOff(void);
 #define VMC_TEMP0
 #endif
 
-#ifdef PS2LOGO
-#define PS2LOGO_TEMP0	int EnablePS2LOGO,
-#else
-#define PS2LOGO_TEMP0
-#endif
-
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP0 PS2LOGO_TEMP0 unsigned int compatflags);
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP0 int EnablePS2Logo, unsigned int compatflags);
 
 int sysExecElf(char *path);
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);

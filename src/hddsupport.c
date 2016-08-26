@@ -16,6 +16,8 @@
 
 #include <hdd-ioctl.h>
 
+#define OPL_HDD_MODE_PS2LOGO_OFFSET	0x17F8
+
 extern void *hdd_cdvdman_irx;
 extern int size_hdd_cdvdman_irx;
 
@@ -246,9 +248,7 @@ static void hddRenameGame(int id, char* newName) {
 
 static void hddLaunchGame(int id, config_set_t* configSet) {
 	int i, size_irx = 0;
-#ifdef PS2LOGO
-	int EnablePS2LOGO = 0;
-#endif
+	int EnablePS2Logo = 0;
 #ifdef CHEAT
 	int result;
 #endif
@@ -404,10 +404,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
 		strcpy(filename, game->startup);
 
-#ifdef PS2LOGO
-#define OPL_HDD_MODE_PS2LOGO_OFFSET	0x17F8
-	EnablePS2LOGO = CheckPS2Logo(0, game->start_sector+OPL_HDD_MODE_PS2LOGO_OFFSET);
-#endif
+	if (gPS2Logo) EnablePS2Logo = CheckPS2Logo(0, game->start_sector+OPL_HDD_MODE_PS2LOGO_OFFSET);
 
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
@@ -417,13 +414,7 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 #define VMC_TEMP3
 #endif
 
-#ifdef PS2LOGO
-#define PS2LOGO_TEMP4	EnablePS2LOGO,
-#else
-#define PS2LOGO_TEMP4
-#endif
-
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 PS2LOGO_TEMP4 compatMode);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 EnablePS2Logo, compatMode);
 }
 
 static config_set_t* hddGetConfig(int id) {

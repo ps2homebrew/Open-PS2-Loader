@@ -22,9 +22,6 @@ endif
 ifeq ($(VMC),1)
 IOP_CFLAGS += -DVMC_DRIVER
 endif
-ifeq ($(PS2LOGO),1)
-IOP_CFLAGS += -D__PS2LOGO
-endif
 IOP_LDFLAGS += -s
 
 all: $(IOP_BIN)

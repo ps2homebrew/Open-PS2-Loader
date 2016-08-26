@@ -33,9 +33,6 @@ CHEAT = 0
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 = 0
 
-#Enables/disables the 'Playstation 2' boot logo - NB: It will be properly displayed only if both disc and console region match.
-PS2LOGO = 0
-
 #Nor stripping neither compressing binary ELF after compiling.
 NOT_PACKED = 0
 
@@ -136,14 +133,6 @@ ifeq ($(VMC),1)
 	VMC_FLAGS = VMC=1
 else
 	VMC_FLAGS = VMC=0
-endif
-ifeq ($(PS2LOGO),1)
-	EE_CFLAGS += -DPS2LOGO
-	PS2LOGO_FLAGS += PS2LOGO=1
-	CDVDMAN_PS2LOGO_FLAGS += PS2LOGO=1
-else
-	PS2LOGO_FLAGS = PS2LOGO=0
-	CDVDMAN_PS2LOGO_FLAGS = PS2LOGO=0
 endif
 
 SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1

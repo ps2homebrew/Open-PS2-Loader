@@ -46,6 +46,6 @@ char GetSystemFolderLetter(void);
 
 int CheckPS2Logo(int fd, u32 lba);
 
-void delay(int count);
+inline void delay(int count);
 
 #endif

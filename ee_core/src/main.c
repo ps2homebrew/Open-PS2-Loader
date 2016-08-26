@@ -41,7 +41,7 @@ int main(int argc, char **argv){
 	DisableDebug = 0;
 	if (!_strncmp(&argv[i][9], "1", 1)) {
 		DisableDebug = 1;
-		DPRINTF("Debug color screens enabled\n");
+		DPRINTF("Debug Colors disabled\n");
 	}
 
 	PS2Logo = 0;

@@ -81,90 +81,82 @@ BIN2C = $(PS2SDK)/bin/bin2c
 BIN2S = $(PS2SDK)/bin/bin2s
 BIN2O = $(PS2SDK)/bin/bin2o
 
-ifeq ($(DEBUG),1) 
-	EE_CFLAGS := -D__DEBUG -g
-	EE_OBJS += obj/debug.o obj/udptty.o obj/ioptrap.o obj/ps2link.o
-	ifeq ($(EESIO_DEBUG),1)
-		EE_CFLAGS += -D__EESIO_DEBUG
-	endif
-	EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
-else
-	EE_CFLAGS := -O2
-endif
+# WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
+# but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule! 
 
-ifeq ($(DTL_T10000),1)
-	EE_CFLAGS += -D_DTL_T10000
-	EECORE_EXTRA_FLAGS += DTL_T10000=1
-	IOP_OBJS += obj/sio2man.o obj/padman.o obj/mcman.o obj/mcserv.o
-	EE_LIBS += -lpadx
+ifeq ($(VMC),1)
+  IOP_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
+  EE_CFLAGS += -DVMC
+  VMC_FLAGS = VMC=1
 else
-	EE_LIBS += -lpad
-endif
-
-ifeq ($(CHILDPROOF),0)
-
-ifeq ($(GSM),1)
-	EE_CFLAGS += -DGSM
-	GSM_FLAGS = GSM=1
-else
-	GSM_FLAGS = GSM=0
-endif
-ifeq ($(CHEAT),1)
-	FRONTEND_OBJS += obj/cheatman.o 
-	EE_CFLAGS += -DCHEAT
-	CHEAT_FLAGS = CHEAT=1
-else
-	CHEAT_FLAGS = CHEAT=0
-endif
-
-else
-	EE_CFLAGS += -D__CHILDPROOF
-	GSM_FLAGS = GSM=0
-	CHEAT_FLAGS = CHEAT=0
+  VMC_FLAGS = VMC=0
 endif
 
 ifeq ($(RTL),1)
-	EE_CFLAGS += -D__RTL
+  EE_CFLAGS += -D__RTL
 endif
 
-ifeq ($(VMC),1)
-	IOP_OBJS += obj/usb_mcemu.o obj/hdd_mcemu.o obj/smb_mcemu.o 
-	EE_CFLAGS += -DVMC
-	VMC_FLAGS = VMC=1
+ifeq ($(DTL_T10000),1)
+  EE_CFLAGS += -D_DTL_T10000
+  EECORE_EXTRA_FLAGS += DTL_T10000=1
+  IOP_OBJS += obj/sio2man.o obj/padman.o obj/mcman.o obj/mcserv.o
+  EE_LIBS += -lpadx
 else
-	VMC_FLAGS = VMC=0
+  EE_LIBS += -lpad
 endif
 
-SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
-ifeq ($(DEBUG),1)
-	MOD_DEBUG_FLAGS = DEBUG=1
-endif
-ifeq ($(EESIO_DEBUG),1)
-	EECORE_EXTRA_FLAGS = EESIO_DEBUG=1
-endif
-ifeq ($(INGAME_DEBUG),1)
-	EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
-	CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
-	SMSTCPIP_INGAME_CFLAGS = 
-	EE_CFLAGS += -D__INGAME_DEBUG
-
-	ifeq ($(DECI2_DEBUG),1)
-		EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
-		EE_CFLAGS += -D__DECI2_DEBUG
-		IOP_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
-		DECI2_DEBUG=1
-	else
-		IOP_OBJS += obj/udptty-ingame.o
-	endif
+ifeq ($(CHILDPROOF),0)
+  ifeq ($(GSM),1)
+    EE_CFLAGS += -DGSM
+    GSM_FLAGS = GSM=1
+  else
+    GSM_FLAGS = GSM=0
+  endif
+  ifeq ($(CHEAT),1)
+    FRONTEND_OBJS += obj/cheatman.o 
+    EE_CFLAGS += -DCHEAT
+    CHEAT_FLAGS = CHEAT=1
+  else
+    CHEAT_FLAGS = CHEAT=0
+  endif
 else
-	ifeq ($(IOPCORE_DEBUG),1)
-		EE_CFLAGS += -D__INGAME_DEBUG
-		EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
-		CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
-		MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
-		SMSTCPIP_INGAME_CFLAGS = 
-		IOP_OBJS += obj/udptty-ingame.o
-	endif
+  EE_CFLAGS += -D__CHILDPROOF
+  GSM_FLAGS = GSM=0
+  CHEAT_FLAGS = CHEAT=0
+endif
+
+ifeq ($(DEBUG),1) 
+  EE_CFLAGS += -D__DEBUG -g
+  EE_OBJS += obj/debug.o obj/udptty.o obj/ioptrap.o obj/ps2link.o
+  EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
+  MOD_DEBUG_FLAGS = DEBUG=1
+  ifeq ($(IOPCORE_DEBUG),1)
+    EE_CFLAGS += -D__INGAME_DEBUG
+    EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
+    CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
+    MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
+    SMSTCPIP_INGAME_CFLAGS = 
+    IOP_OBJS += obj/udptty-ingame.o
+  else ifeq ($(EESIO_DEBUG),1)
+    EE_CFLAGS += -D__EESIO_DEBUG
+    EECORE_EXTRA_FLAGS += EESIO_DEBUG=1
+  else ifeq ($(INGAME_DEBUG),1)
+    EE_CFLAGS += -D__INGAME_DEBUG
+    EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
+    CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
+    SMSTCPIP_INGAME_CFLAGS = 
+    ifeq ($(DECI2_DEBUG),1)
+      EE_CFLAGS += -D__DECI2_DEBUG
+      EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
+      IOP_OBJS += obj/drvtif_irx.o obj/tifinet_irx.o
+      DECI2_DEBUG=1
+    else
+      IOP_OBJS += obj/udptty-ingame.o
+    endif
+  endif
+else
+  EE_CFLAGS += -O2
+  SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 endif
 
 all:
@@ -172,107 +164,108 @@ all:
 	@mkdir -p asm
 	
 	echo "Building Open PS2 Loader..."
-	echo "    * Interface"
+	echo "-Interface"
 	$(MAKE) $(EE_BIN)
 	
 ifeq ($(DEBUG),0)
-ifeq ($(NOT_PACKED),0)
+  ifeq ($(NOT_PACKED),0)
 	echo "Stripping..."
 	ee-strip $(EE_BIN)
 
 	echo "Compressing..."
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
-endif
+  endif
 endif
 	
+childproof:
+	$(MAKE) CHILDPROOF=1 all
+
 debug:
 	$(MAKE) DEBUG=1 all
 
-ingame_debug:
-	$(MAKE) INGAME_DEBUG=1 DEBUG=1 all
+iopcore_debug:
+	$(MAKE) DEBUG=1 IOPCORE_DEBUG=1 all
 
 eesio_debug:
-	$(MAKE) EESIO_DEBUG=1 DEBUG=1 all
+	$(MAKE) DEBUG=1 EESIO_DEBUG=1 all
 
-iopcore_debug:
-	$(MAKE) IOPCORE_DEBUG=1 DEBUG=1 all
+ingame_debug:
+	$(MAKE) DEBUG=1 INGAME_DEBUG=1 all
 
 deci2_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
-
-childproof:
-	$(MAKE) CHILDPROOF=1 all
 
 clean:  sclean
 
 sclean:
 	echo "Cleaning..."
-	echo "    * Interface"
+	echo "-Interface"
 	rm -f -r $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
-	echo "    * EE core"
+	echo "-EE core"
 	$(MAKE) -C ee_core clean
-	echo "    * Elf Loader"
+	echo "-Elf Loader"
 	$(MAKE) -C elfldr clean
-	echo "    * udnl-t300.irx"
+	echo "-IOP core"
+	echo " -udnl-t300"
 	$(MAKE) -C modules/iopcore/udnl-t300 clean
-	echo "    * udnl.irx"
+	echo " -udnl"
 	$(MAKE) -C modules/iopcore/udnl clean
-	echo "    * imgdrv.irx"
+	echo " -imgdrv"
 	$(MAKE) -C modules/iopcore/imgdrv clean
-	echo "    * eesync.irx"
+	echo " -eesync"
 	$(MAKE) -C modules/iopcore/eesync clean
-	echo "    * cdvdman.irx"
+	echo " -cdvdman"
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd clean
 	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
-	echo "    * cdvdfsv.irx"
+	echo " -cdvdfsv"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
-	echo "    * isofs.irx"
+	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
-	echo "    * usbhdfsd.irx"
+	echo " -usbhdfsd"
 	$(MAKE) -C modules/usb/usbhdfsd clean
-	echo "    * usbhdfsdfsv.irx"
+	echo " -usbhdfsdfsv"
 	$(MAKE) -C modules/usb/usbhdfsdfsv clean
-	echo "    * ps2dev9.irx"
+	echo " -ps2dev9"
 	$(MAKE) -C modules/dev9 clean
-	echo "    * SMSUTILS.irx"
+	echo " -SMSUTILS"
 	$(MAKE) -C modules/network/SMSUTILS clean
-	echo "    * SMSTCPIP.irx"
+	echo " -SMSTCPIP"
 	$(MAKE) -C modules/network/SMSTCPIP clean
-	echo "    * in-game SMAP.irx"
+	echo " -in-game SMAP"
 	$(MAKE) -C modules/network/smap-ingame clean
-	echo "    * smbinit.irx"
+	echo " -smbinit"
 	$(MAKE) -C modules/network/smbinit clean
-	echo "    * nbns.irx"
+	echo " -nbns"
 	$(MAKE) -C modules/network/nbns clean
-	echo "    * httpclient.irx"
+	echo " -httpclient"
 	$(MAKE) -C modules/network/httpclient clean
-	echo "    * ps2atad.irx"
+	echo " -ps2atad"
 	$(MAKE) -C modules/hdd/atad clean
-	echo "    * hdpro_atad.irx"
+	echo " -hdpro_atad"
 	$(MAKE) -C modules/hdd/hdpro_atad clean
-	echo "    * ps2hdd.irx"
+	echo " -ps2hdd"
 	$(MAKE) -C modules/hdd/apa clean
-	echo "    * ps2fs.irx"
+	echo " -ps2fs"
 	$(MAKE) -C modules/hdd/pfs clean
-	echo "    * mcemu.irx"
+	echo " -mcemu"
 	$(MAKE) -C modules/mcemu -f Makefile.usb clean
 	$(MAKE) -C modules/mcemu -f Makefile.hdd clean
 	$(MAKE) -C modules/mcemu -f Makefile.smb clean
-	echo "    * genvmc.irx"
+	echo " -genvmc"
 	$(MAKE) -C modules/vmc/genvmc clean
-	echo "    * hdldsvr.irx"
+	echo " -hdldsvr"
 	$(MAKE) -C modules/hdd/hdldsvr clean
-	echo "    * udptty.irx"
+	echo " -udptty"
 	$(MAKE) -C modules/debug/udptty clean
-	echo "    * udptty-ingame.irx"
+	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame clean
-	echo "    * ioptrap.irx"
+	echo " -ioptrap"
 	$(MAKE) -C modules/debug/ioptrap clean
-	echo "    * ps2link.irx"
+	echo " -ps2link"
 	$(MAKE) -C modules/debug/ps2link clean
-	echo "    * pc tools"
+	echo "-pc tools"
 	$(MAKE) -C pc clean
 
 rebuild: clean all
@@ -286,78 +279,79 @@ pc_tools_win32:
 	$(MAKE) _WIN32=1 -C pc
 
 ee_core.s:
-	echo "    * EE core"
+	echo "-EE core"
 	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
 	$(BIN2S) ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 elfldr.s:
-	echo "    * Elf Loader"
+	echo "-Elf Loader"
 	$(MAKE) -C elfldr
 	$(BIN2S) elfldr/elfldr.elf asm/elfldr.s elfldr_elf
+	echo "-IOP core"
 
 udnl.s:
 ifeq ($(DTL_T10000),1)
-	echo "    * udnl-t300.irx"
+	echo " -udnl-t300"
 	$(MAKE) -C modules/iopcore/udnl-t300
 	$(BIN2S) modules/iopcore/udnl-t300/udnl.irx asm/udnl.s udnl_irx
 else
-	echo "    * udnl.irx"
+	echo " -udnl"
 	$(MAKE) -C modules/iopcore/udnl
 	$(BIN2S) modules/iopcore/udnl/udnl.irx asm/udnl.s udnl_irx
 endif
 
 imgdrv.s:
-	echo "    * imgdrv.irx"
+	echo " -imgdrv"
 	$(MAKE) -C modules/iopcore/imgdrv
 	$(BIN2S) modules/iopcore/imgdrv/imgdrv.irx asm/imgdrv.s imgdrv_irx
 
 eesync.s:
-	echo "    * eesync.irx"
+	echo " -eesync"
 	$(MAKE) -C modules/iopcore/eesync
 	$(BIN2S) modules/iopcore/eesync/eesync.irx asm/eesync.s eesync_irx
 
 usb_cdvdman.s:
-	echo "    * usb_cdvdman.irx"
+	echo " -usb_cdvdman"
 	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/usb_cdvdman.s usb_cdvdman_irx
 
 smb_cdvdman.s:
-	echo "    * smb_cdvdman.irx"
+	echo " -smb_cdvdman"
 	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/smb_cdvdman.s smb_cdvdman_irx
 
 hdd_cdvdman.s:
-	echo "    * hdd_cdvdman.irx"
+	echo " -hdd_cdvdman"
 	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/hdd_cdvdman.s hdd_cdvdman_irx
 
 hdd_hdpro_cdvdman.s:
-	echo "    * hdd_hdpro_cdvdman.irx"
+	echo " -hdd_hdpro_cdvdman"
 	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
 	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx asm/hdd_hdpro_cdvdman.s hdd_hdpro_cdvdman_irx
 
 cdvdfsv.s:
-	echo "    * cdvdfsv.irx"
+	echo " -cdvdfsv"
 	$(MAKE) -C modules/iopcore/cdvdfsv
 	$(BIN2S) modules/iopcore/cdvdfsv/cdvdfsv.irx asm/cdvdfsv.s cdvdfsv_irx
 
 usb_mcemu.s:
-	echo "    * usb_mcemu.irx"
+	echo " -usb_mcemu"
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.usb rebuild
 	$(BIN2S) modules/mcemu/mcemu.irx asm/usb_mcemu.s usb_mcemu_irx
 
 hdd_mcemu.s:
-	echo "    * hdd_mcemu.irx"
+	echo " -hdd_mcemu"
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.hdd rebuild
 	$(BIN2S) modules/mcemu/mcemu.irx asm/hdd_mcemu.s hdd_mcemu_irx
 
 smb_mcemu.s:
-	echo "    * smb_mcemu.irx"
+	echo " -smb_mcemu"
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.smb rebuild
 	$(BIN2S) modules/mcemu/mcemu.irx asm/smb_mcemu.s smb_mcemu_irx
 
 isofs.s:
-	echo "    * isofs.irx"
+	echo " -isofs"
 	$(MAKE) -C modules/isofs
 	$(BIN2S) modules/isofs/isofs.irx asm/isofs.s isofs_irx
 
@@ -365,22 +359,22 @@ usbd.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/usbd.irx asm/usbd.s usbd_irx
 
 usbhdfsd.s:
-	echo "    * usbhdfsd.irx"
+	echo " -usbhdfsd"
 	$(MAKE) -C modules/usb/usbhdfsd
 	$(BIN2S) modules/usb/usbhdfsd/usbhdfsd.irx asm/usbhdfsd.s usbhdfsd_irx
 
 usbhdfsdfsv.s:
-	echo "    * usbhdfsdfsv.irx"
+	echo " -usbhdfsdfsv"
 	$(MAKE) -C modules/usb/usbhdfsdfsv
 	$(BIN2S) modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx asm/usbhdfsdfsv.s usbhdfsdfsv_irx
 
 ps2dev9.s:
-	echo "    * ps2dev9.irx"
+	echo " -ps2dev9"
 	$(MAKE) -C modules/dev9
 	$(BIN2S) modules/dev9/ps2dev9.irx asm/ps2dev9.s ps2dev9_irx
 
 smsutils.s:
-	echo "    * SMSUTILS.irx"
+	echo " -SMSUTILS"
 	$(MAKE) -C modules/network/SMSUTILS
 	$(BIN2S) modules/network/SMSUTILS/SMSUTILS.irx asm/smsutils.s smsutils_irx
 
@@ -388,12 +382,12 @@ ps2ip.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/ps2ip-nm.irx asm/ps2ip.s ps2ip_irx
 
 ingame_smstcpip.s:
-	echo "    * in-game SMSTCPIP.irx"
+	echo " -in-game SMSTCPIP"
 	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C modules/network/SMSTCPIP rebuild
 	$(BIN2S) modules/network/SMSTCPIP/SMSTCPIP.irx asm/ingame_smstcpip.s ingame_smstcpip_irx
 
 smap_ingame.s:
-	echo "    * in-game SMAP.irx"
+	echo " -in-game SMAP"
 	$(MAKE) -C modules/network/smap-ingame
 	$(BIN2S) modules/network/smap-ingame/smap.irx asm/smap_ingame.s smap_ingame_irx
 
@@ -410,17 +404,17 @@ smbman.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/smbman.irx asm/smbman.s smbman_irx
 
 smbinit.s:
-	echo "    * smbinit.irx"
+	echo " -smbinit"
 	$(MAKE) -C modules/network/smbinit
 	$(BIN2S) modules/network/smbinit/smbinit.irx asm/smbinit.s smbinit_irx
 
 ps2atad.s:
-	echo "    * ps2atad.irx"
+	echo " -ps2atad"
 	$(MAKE) -C modules/hdd/atad
 	$(BIN2S) modules/hdd/atad/ps2atad.irx asm/ps2atad.s ps2atad_irx
 
 hdpro_atad.s:
-	echo "    * hdpro_atad.irx"
+	echo " -hdpro_atad"
 	$(MAKE) -C modules/hdd/hdpro_atad
 	$(BIN2S) modules/hdd/hdpro_atad/hdpro_atad.irx asm/hdpro_atad.s hdpro_atad_irx
 
@@ -428,52 +422,52 @@ poweroff.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/poweroff.irx asm/poweroff.s poweroff_irx
 
 ps2hdd.s:
-	echo "    * ps2hdd.irx"
+	echo " -ps2hdd"
 	$(MAKE) -C modules/hdd/apa
 	$(BIN2S) modules/hdd/apa/ps2hdd.irx asm/ps2hdd.s ps2hdd_irx
 
 genvmc.s:
-	echo "    * genvmc.irx"
+	echo " -genvmc"
 	$(MAKE) $(MOD_DEBUG_FLAGS) -C modules/vmc/genvmc
 	$(BIN2S) modules/vmc/genvmc/genvmc.irx asm/genvmc.s genvmc_irx
 
 hdldsvr.s:
-	echo "    * hdldsvr.irx"
+	echo " -hdldsvr"
 	$(MAKE) -C modules/hdd/hdldsvr
 	$(BIN2S) modules/hdd/hdldsvr/hdldsvr.irx asm/hdldsvr.s hdldsvr_irx
 
 udptty.s:
-	echo "    * udptty.irx"
+	echo " -udptty"
 	$(MAKE) -C modules/debug/udptty
 	$(BIN2S) modules/debug/udptty/udptty.irx asm/udptty.s udptty_irx
 
 udptty-ingame.s:
-	echo "    * udptty-ingame.irx"
+	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame
 	$(BIN2S) modules/debug/udptty-ingame/udptty.irx asm/udptty-ingame.s udptty_ingame_irx
 
 ioptrap.s:
-	echo "    * ioptrap.irx"
+	echo " -ioptrap"
 	$(MAKE) -C modules/debug/ioptrap
 	$(BIN2S) modules/debug/ioptrap/ioptrap.irx asm/ioptrap.s ioptrap_irx
 
 ps2link.s:
-	echo "    * ps2link.irx"
+	echo " -ps2link"
 	$(MAKE) -C modules/debug/ps2link
 	$(BIN2S) modules/debug/ps2link/ps2link.irx asm/ps2link.s ps2link_irx
 
 nbns-iop.s:
-	echo "    * nbns.irx"
+	echo " -nbns"
 	$(MAKE) -C modules/network/nbns
 	$(BIN2S) modules/network/nbns/nbns.irx asm/nbns-iop.s nbns_irx
 
 httpclient-iop.s:
-	echo "    * httpclient.irx"
+	echo " -httpclient"
 	$(MAKE) -C modules/network/httpclient
 	$(BIN2S) modules/network/httpclient/httpclient.irx asm/httpclient-iop.s httpclient_irx
-
+	
 ps2fs.s:
-	echo "    * ps2fs.irx"
+	echo " -ps2fs"
 	$(MAKE) -C modules/hdd/pfs
 	$(BIN2S) modules/hdd/pfs/ps2fs.irx asm/ps2fs.s ps2fs_irx
 

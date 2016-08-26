@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev897 - EE Core debug message bugfix - Fri Aug 26 11:59:48 2016 -0300
 rev896 - PS2Logo (less time on its GUI debug warning messages) - Fri Aug 26 11:57:15 2016 -0300
 rev895 - PS2Logo bugfix - Fri Aug 26 11:54:51 2016 -0300
 rev894 - 'Playstation 2' boot logo GUI setting (on/off) - Thu Aug 25 21:01:42 2016 -0300

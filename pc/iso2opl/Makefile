@@ -13,7 +13,8 @@ endif
 all: bin/iso2opl
 
 clean:
-	rm -f bin/*iso2opl* src/*.o
+	rm -f -r bin
+	rm -f src/*.o
 
 rebuild: clean all
 	

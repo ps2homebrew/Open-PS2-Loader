@@ -204,9 +204,7 @@ static void usbRenameGame(int id, char* newName) {
 
 static void usbLaunchGame(int id, config_set_t* configSet) {
 	int i, fd, index, compatmask = 0;
-#ifdef PS2LOGO
-	int EnablePS2LOGO = 0;
-#endif
+	int EnablePS2Logo = 0;
 #ifdef CHEAT
 	int result;
 #endif
@@ -306,11 +304,9 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 				guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
 				return;
 			}
-#ifdef PS2LOGO
-			if(i==0) {
-				EnablePS2LOGO = CheckPS2Logo(fd, 0);
-			}
-#endif
+
+			if ((gPS2Logo)&&(i==0)) EnablePS2Logo = CheckPS2Logo(fd, 0);
+
 			fileXioClose(fd);
 		} else {
 			//Unable to open part of the game. Do not continue.
@@ -385,13 +381,7 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 #define VMC_TEMP4
 #endif
 
-#ifdef PS2LOGO
-#define PS2LOGO_TEMP5	EnablePS2LOGO,
-#else
-#define PS2LOGO_TEMP5
-#endif
-
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, VMC_TEMP4 PS2LOGO_TEMP5 compatmask);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, VMC_TEMP4 EnablePS2Logo, compatmask);
 }
 
 static config_set_t* usbGetConfig(int id) {

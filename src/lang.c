@@ -217,6 +217,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Auto start in %i s...",
 	"Auto start",
 	"Value in second(s), 0 to disable auto start",
+	"PS2 Logo",
+	"(Only displayed for a valid disc logo which matches the console's region)",
 };
 
 static int guiLangID = 0;

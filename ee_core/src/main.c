@@ -44,7 +44,13 @@ int main(int argc, char **argv){
 		DPRINTF("Debug color screens enabled\n");
 	}
 
-	char *p = _strtok(&argv[i][11], " ");
+	PS2Logo = 0;
+	if (!_strncmp(&argv[i][11], "1", 1)) {
+		PS2Logo = 1;
+		DPRINTF("PS2 Logo enabled\n");
+	}
+
+	char *p = _strtok(&argv[i][13], " ");
 	if (!_strncmp(p, "Browser", 7))
 		ExitPath[0] = '\0';
 	else
@@ -72,11 +78,6 @@ int main(int argc, char **argv){
 #ifdef GSM
 	EnableGSMOp = _strtoi(_strtok(NULL, " "));
 	DPRINTF("GSM = %s\n", EnableGSMOp==0?"Disabled":"Enabled");
-#endif
-
-#ifdef PS2LOGO
-	EnablePS2LOGO = _strtoi(_strtok(NULL, " "));
-	DPRINTF("PS2LOGO = %s\n", EnablePS2LOGO==0?"Disabled":"Enabled");
 #endif
 
 	i++;
@@ -141,9 +142,8 @@ int main(int argc, char **argv){
 
 	DPRINTF("Executing '%s'...\n", ElfPath);
 
-#ifdef PS2LOGO
 	//PS2LOGO Caller, based on l_oliveira & SP193 tips
-	if (EnablePS2LOGO) {
+	if (PS2Logo) {
 		char *argvs[1];
 		argvs[0] = ElfPath;
 		argvs[1] = NULL;
@@ -151,9 +151,6 @@ int main(int argc, char **argv){
 	} else {
 		LoadExecPS2(ElfPath, 0, NULL);
 	}
-#else
-	LoadExecPS2(ElfPath, 0, NULL);	
-#endif
 
 	if(!DisableDebug)
 		GS_BGCOLOUR = 0x0000ff;	//Red

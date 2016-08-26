@@ -133,6 +133,9 @@ int gScrollSpeed;
 char gExitPath[32];
 // Disable Debug Colors
 int gDisableDebug;
+
+int gPS2Logo;
+
 // Default device
 int gDefaultDevice;
 

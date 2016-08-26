@@ -210,9 +210,6 @@ void guiShowAbout() {
 #ifdef CHEAT
 	strcat(OPLVersion, " PS2RD ");
 #endif
-#ifdef PS2LOGO
-	strcat(OPLVersion, " PS2LOGO");
-#endif
 
 	diaSetLabel(diaAbout, 1, OPLVersion);
 
@@ -372,6 +369,7 @@ void guiShowConfig() {
 	diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
 	diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
+	diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
 	diaSetString(diaConfig, CFG_EXITTO, gExitPath);
 	diaSetInt(diaConfig, CFG_ENWRITEOP, gEnableWrite);
 	diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
@@ -392,8 +390,9 @@ void guiShowConfig() {
 
 	int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
 	if (ret) {
-		diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
 		diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
+		diaGetInt(diaConfig, CFG_PS2LOGO, &gPS2Logo);
+		diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
 		diaGetInt(diaConfig, CFG_ENWRITEOP, &gEnableWrite);
 		diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
 		diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);

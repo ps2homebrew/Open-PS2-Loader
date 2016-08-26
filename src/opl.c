@@ -536,15 +536,15 @@ static void _loadConfig() {
 			if (configGetStr(configOPL, CONFIG_OPL_LANGUAGE, &temp))
 				langID = lngFindGuiID(temp);
 
-			configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
-
 			if(configGetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, &value))
 				gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 
+			configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
+			configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
+			configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
 			configGetInt(configOPL, CONFIG_OPL_AUTO_SORT, &gAutosort);
 			configGetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, &gAutoRefresh);
 			configGetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, &gDefaultDevice);
-			configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
 			configGetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, &gEnableWrite);
 			configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
 			configGetInt(configOPL, CONFIG_OPL_USB_CHECK_FRAG, &gCheckUSBFragmentation);
@@ -622,11 +622,12 @@ static void _saveConfig() {
 		configSetInt(configOPL, CONFIG_OPL_CHEAT_MODE, gCheatMode);
 #endif
 
+		configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
+		configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
 		configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
 		configSetInt(configOPL, CONFIG_OPL_AUTO_SORT, gAutosort);
 		configSetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, gAutoRefresh);
 		configSetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, gDefaultDevice);
-		configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
 		configSetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, gEnableWrite);
 		configSetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, gHDDSpindown);
 		configSetInt(configOPL, CONFIG_OPL_USB_CHECK_FRAG, gCheckUSBFragmentation);
@@ -1158,6 +1159,7 @@ static void setDefaults(void) {
 	gAutosort = 1;
 	gAutoRefresh = 0;
 	gDisableDebug = 1;
+	gPS2Logo = 0;
 	gEnableWrite = 0;
 	gRememberLastPlayed = 0;
 	gAutoStartLastPlayed = 9;
@@ -1232,8 +1234,6 @@ static void init(void) {
 	// handler for deffered menu updates
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
 	cacheInit();
-
-	gSelectButton = (ConsoleRegion == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
 
 	// try to restore config
 	_loadConfig();

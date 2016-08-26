@@ -695,7 +695,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 	i = 0;
 	sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_TEMP1 GSM_TEMP1, \
-		mode_str, gDisableDebug, gPS2Logo, gExitPath, gHDDSpindown, \
+		mode_str, gDisableDebug, EnablePS2Logo, gExitPath, gHDDSpindown, \
 		local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3], \
 		local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3], \
 		local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3], \

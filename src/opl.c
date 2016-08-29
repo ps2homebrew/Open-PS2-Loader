@@ -1214,8 +1214,6 @@ static void init(void) {
 	// default variable values
 	setDefaults();
 
-	ConsoleRegion = InitConsoleRegionData();
-
 	padInit(0);
 	configInit(NULL);
 
@@ -1235,7 +1233,9 @@ static void init(void) {
 	ioRegisterHandler(IO_MENU_UPDATE_DEFFERED, &menuDeferredUpdate);
 	cacheInit();
 
-	// try to restore config
+		gSelectButton = (InitConsoleRegionData() == CONSOLE_REGION_JAPAN) ? KEY_CIRCLE : KEY_CROSS;
+ 
+ 	// try to restore config
 	_loadConfig();
 }
 

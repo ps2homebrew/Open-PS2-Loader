@@ -368,6 +368,7 @@ char toHex(int digit) {
 	return htab[digit & 0x0F];
 }
 
+static short int ConsoleRegion=CONSOLE_REGION_INVALID;
 static char SystemDataFolderPath[]="BRDATA-SYSTEM";
 static char SystemFolderLetter='R';
 

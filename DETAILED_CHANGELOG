@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev900 - ConsoleRegion functionality fix - Mon Aug 29 07:27:19 2016 -0300
 rev899 - Rollback changes made to delay() for avoiding BSOD - Fri Aug 26 15:34:41 2016 -0300
 rev898 - Some revisions on Makefiles - Fri Aug 26 12:03:54 2016 -0300
 rev897 - EE Core debug message bugfix - Fri Aug 26 11:59:48 2016 -0300

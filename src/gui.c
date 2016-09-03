@@ -536,8 +536,8 @@ static void guiShowGSConfig(void) {
 	"VGA 640x480p @60Hz", "VGA 640x480p @72Hz", "VGA 640x480p @75Hz", "VGA 640x480p @85Hz", "VGA 640x480i @60Hz", \
 	"VGA 640x960i @60Hz", \
 	"VGA 800x600p @56Hz", "VGA 800x600p @60Hz", "VGA 800x600p @72Hz", "VGA 800x600p @75Hz", "VGA 800x600p @85Hz", \
-	"VGA 1024x768p @60H", "VGA 1024x768p @70H", "VGA 1024x768p @75H", "VGA 1024x768p @85H", \
-	"VGA 1280x1024p @60", "VGA 1280x1024p @75", NULL };
+	"VGA 1024x768p @60Hz", "VGA 1024x768p @70Hz", "VGA 1024x768p @75Hz", "VGA 1024x768p @85Hz", \
+	"VGA 1280x1024p @60Hz", "VGA 1280x1024p @75Hz", NULL };
 
 	diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);
 	diaExecuteDialog(diaGSConfig, -1, 1, &guiGSMUpdater);

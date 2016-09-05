@@ -5,6 +5,7 @@
 
 #define GSM_VERSION "0.38"
 
+// VMODE TYPES
 #define PS1_VMODE	1
 #define SDTV_VMODE	2
 #define HDTV_VMODE	3

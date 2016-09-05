@@ -2,6 +2,8 @@
 # Graphics Synthesizer Mode Selector (a.k.a. GSM) - Force (set and keep) a GS Mode, then load & exec a PS2 ELF
 #-------------------------------------------------------------------------------------------------------------
 # Copyright 2009, 2010, 2011 doctorxyz & dlanor
+# Copyright 2011, 2012 doctorxyz, SP193 & reprep
+# Copyright 2013, 2014, 2015, 2016 doctorxyz
 # Licenced under Academic Free License version 2.0
 # Review LICENSE file for further details.
 #
@@ -25,9 +27,16 @@
 GS_MODE_DTV_576P=0x53
 GS_MODE_DTV_1080P=0x54
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 .set push
+
 .set noreorder # disable assembler reorder mode, so the code will not be optimized or changed in any way, giving complete instruction order control to the programmer
 .set noat # disable assembler from using register $1 (known as the assembler temporary, or $at register) to hold intermediate values when performing macro expansions
+.set macro # disable warning if any statement expands to more than one machine instruction
+#.set nomacro # enable warning if any statement expands to more than one machine instruction
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #####################################################
 # data section
@@ -202,7 +211,6 @@ sync.p			// Await instruction completion
 
 //-----------------------------------------------------------------------------------------
 
-la	$v0, GSAdaptationValues
 lb	$a0, skip_videos($v0)		# a0 = skip_videos
 bnel	$a0,$zero, Skip_skip_videos_Patch	# in case of Skip Videos fix is disabled (i.e. not equal to zero)
 nop					# skip this fix

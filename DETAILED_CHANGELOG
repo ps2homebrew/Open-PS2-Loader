@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev902 - VGA GSM vmode fixes - Sat Sep 03 09:45:58 2016 -0300
 rev901 - Re-added several VGA GSM vmodes for better game compatibility - Tue Aug 30 16:57:49 2016 -0300
 rev900 - ConsoleRegion functionality fix - Mon Aug 29 07:27:19 2016 -0300
 rev899 - Rollback changes made to delay() for avoiding BSOD - Fri Aug 26 15:34:41 2016 -0300

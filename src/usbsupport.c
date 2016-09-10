@@ -358,10 +358,10 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 		switch(result)
 		{
 			case -ENOENT:
-				guiMsgBox(_l(_STR_NO_CHEATS_FOUND), 0, NULL);
+				guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
 				break;
 			default:
-				guiMsgBox(_l(_STR_ERR_CHEATS_LOAD_FAILED), 0, NULL);
+				guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
 		}
 	}
 #endif

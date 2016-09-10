@@ -11,13 +11,11 @@
 #define HDTV_VMODE	3
 #define VGA_VMODE	4
 
-#define make_display_magic_number(dh, dw, magv, magh, dy, dx) \
-	(((u64)(dh)<<44) | ((u64)(dw)<<32) | ((u64)(magv)<<27) | \
+#define makeDISPLAY(dh, dw, magv, magh, dy, dx) \
+	(u64)(((u64)(dh)<<44) | ((u64)(dw)<<32) | ((u64)(magv)<<27) | \
 	((u64)(magh)<<23) | ((u64)(dy)<<12)   | ((u64)(dx)<<0)     )
 
 typedef struct predef_vmode_struct {
-	u8	category;
-	char desc[34];
 	u8	interlace;
 	u8	mode;
 	u8	ffmd;

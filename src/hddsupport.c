@@ -409,12 +409,12 @@ static void hddLaunchGame(int id, config_set_t* configSet) {
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
 #ifdef VMC
-#define VMC_TEMP3	size_mcemu_irx, &hdd_mcemu_irx,
+#define HDD_MCEMU	size_mcemu_irx, &hdd_mcemu_irx,
 #else
-#define VMC_TEMP3
+#define HDD_MCEMU
 #endif
 
-	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, VMC_TEMP3 EnablePS2Logo, compatMode);
+	sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, HDD_MCEMU EnablePS2Logo, compatMode);
 }
 
 static config_set_t* hddGetConfig(int id) {

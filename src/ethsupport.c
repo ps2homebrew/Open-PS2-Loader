@@ -698,12 +698,12 @@ static void ethLaunchGame(int id, config_set_t* configSet) {
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
 #ifdef VMC
-#define VMC_TEMP2	size_mcemu_irx,&smb_mcemu_irx,
+#define ETH_MCEMU	size_mcemu_irx,&smb_mcemu_irx,
 #else
-#define VMC_TEMP2
+#define ETH_MCEMU
 #endif
 
-	sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, VMC_TEMP2 EnablePS2Logo, compatmask);
+	sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, ETH_MCEMU EnablePS2Logo, compatmask);
 }
 
 static config_set_t* ethGetConfig(int id) {

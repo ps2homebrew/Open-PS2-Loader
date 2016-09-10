@@ -376,12 +376,12 @@ static void usbLaunchGame(int id, config_set_t* configSet) {
 	deinit(NO_EXCEPTION); // CAREFUL: deinit will call usbCleanUp, so usbGames/game will be freed
 
 #ifdef VMC
-#define VMC_TEMP4	size_mcemu_irx, &usb_mcemu_irx,
+#define USB_MCEMU	size_mcemu_irx, &usb_mcemu_irx,
 #else
-#define VMC_TEMP4
+#define USB_MCEMU
 #endif
 
-	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, VMC_TEMP4 EnablePS2Logo, compatmask);
+	sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, USB_MCEMU EnablePS2Logo, compatmask);
 }
 
 static config_set_t* usbGetConfig(int id) {

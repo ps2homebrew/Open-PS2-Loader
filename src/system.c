@@ -586,13 +586,7 @@ static int ResetDECI2(void){
 }
 #endif
 
-#ifdef VMC
-#define VMC_TEMP1	int size_mcemu_irx, void **mcemu_irx,
-#else
-#define VMC_TEMP1
-#endif
-
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, VMC_TEMP1 int EnablePS2Logo, unsigned int compatflags) {
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, MCEMU int EnablePS2Logo, unsigned int compatflags) {
 	unsigned int modules, ModuleStorageSize;
 	void *ModuleStorage;
 	u8 local_ip_address[4], local_netmask[4], local_gateway[4];
@@ -602,16 +596,16 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	void *pdata;
 	int i;
 #ifdef GSM
-#define GSM_TEMP3	1
+#define GSM_ARGS	1
 #else
-#define GSM_TEMP3	0
+#define GSM_ARGS	0
 #endif
 #ifdef CHEAT
-#define CHEAT_TEMP3	1
+#define CHEAT_ARGS	1
 #else
-#define CHEAT_TEMP3	0
+#define CHEAT_ARGS	0
 #endif
-	char *argv[4+GSM_TEMP3+CHEAT_TEMP3];
+	char *argv[4+GSM_ARGS+CHEAT_ARGS];
 	char ModStorageConfig[32];
 	char config_str[256];
 #ifdef GSM
@@ -690,29 +684,29 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 	}
 
 #ifdef CHEAT
-#define CHEAT_TEMP1	" %u"
-#define CHEAT_TEMP2	,gEnableCheat?(unsigned int)gCheatList:0
+#define CHEAT_SPECIFIER	" %u"
+#define CHEAT_ARGUMENT	,gEnableCheat?(unsigned int)gCheatList:0
 #else
-#define CHEAT_TEMP1
-#define CHEAT_TEMP2
+#define CHEAT_SPECIFIER
+#define CHEAT_ARGUMENT
 #endif
 
 #ifdef GSM
-#define GSM_TEMP1	" %d"
-#define GSM_TEMP2	,gEnableGSM
+#define GSM_SPECIFIER	" %d"
+#define GSM_ARGUMENT	,gEnableGSM
 #else
-#define GSM_TEMP1
-#define GSM_TEMP2
+#define GSM_SPECIFIER
+#define GSM_ARGUMENT
 #endif
 
 	i = 0;
-	sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_TEMP1 GSM_TEMP1, \
+	sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_SPECIFIER GSM_SPECIFIER, \
 		mode_str, gDisableDebug, EnablePS2Logo, gExitPath, gHDDSpindown, \
 		local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3], \
 		local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3], \
 		local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3], \
 		gETHOpMode \
-		CHEAT_TEMP2 GSM_TEMP2);
+		CHEAT_ARGUMENT GSM_ARGUMENT);
 	argv[i] = config_str;
 	i++;
 

@@ -491,41 +491,39 @@ static void PrepareGSM(char *cmdline) {
 	LOG("Preparing GSM...\n");
 	// Pre-defined vmodes
 	// Some of following vmodes gives BOSD and/or freezing, depending on the console BIOS version, TV/Monitor set, PS2 cable (composite, component, VGA, ...)
-	// Therefore there are many variables involved here that can lead us to success or faild depending on the circumstances above mentioned.
+	// Therefore there are many variables involved here that can lead us to success or fail, depending on the already mentioned circumstances.
 	//
-	//	category	description								interlace			mode			 	ffmd	   	display							dh		dw		magv	magh	dy		dx		syncv
-	//	--------	-----------								---------			----			 	----		----------------------------	--		--		----	----	--		--		-----
 	static const predef_vmode_struct predef_vmode[30] = {
-		{  GS_INTERLACED,		GS_MODE_NTSC,		GS_FIELD,	makeDISPLAY(  447,	2559,	0,		3,		 46,	700),	0x00C7800601A01801},
-		{  GS_INTERLACED,		GS_MODE_NTSC,		GS_FRAME,	makeDISPLAY(  223,	2559,	0,		3,		 26,	700),	0x00C7800601A01802},
-		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	makeDISPLAY(  511,	2559,	0,		3,		 70,	720),	0x00A9000502101401},
-		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FRAME,	makeDISPLAY(  255,	2559,	0,		3,		 37,	720),	0x00A9000502101404},
-		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	makeDISPLAY(  447,	2559,	0,		3,		 46,	700),	0x00C7800601A01801},
-		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FRAME,	makeDISPLAY(  223,	2559,	0,		3,		 26,	700),	0x00C7800601A01802},
-		{  GS_NONINTERLACED,	GS_MODE_DTV_480P,	GS_FRAME,	makeDISPLAY(  255,	2559,	0,		1,		 12,	736),	0x00C78C0001E00006},
-		{  GS_NONINTERLACED,	GS_MODE_DTV_576P,	GS_FRAME,	makeDISPLAY(  255,	2559,	0,		1,		 23,	756),	0x00A9000002700005},
-		{  GS_NONINTERLACED,	GS_MODE_DTV_480P,	GS_FRAME, 	makeDISPLAY(  479,	1279,	0,		1,		 51,	308),	0x00C78C0001E00006},
-		{  GS_NONINTERLACED,	GS_MODE_DTV_576P,	GS_FRAME,	makeDISPLAY(  575,	1279,	0,		1,		 64,	320),	0x00A9000002700005},
-		{  GS_NONINTERLACED,	GS_MODE_DTV_720P,	GS_FRAME, 	makeDISPLAY(  719,	1279,	1,		1,		 24,	302),	0x00AB400001400005},
-		{  GS_INTERLACED,		GS_MODE_DTV_1080I,	GS_FIELD, 	makeDISPLAY( 1079,	1919,	1,		2,		 48,	238),	0x0150E00201C00005},
-		{  GS_INTERLACED,		GS_MODE_DTV_1080I,	GS_FRAME, 	makeDISPLAY( 1079,	1919,	0,		2,		 48,	238),	0x0150E00201C00005},
-		{  GS_NONINTERLACED,	GS_MODE_DTV_1080P,	GS_FRAME, 	makeDISPLAY( 1079,	1919,	1,		2,		 48,	238),	0x0150E00201C00005},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_640_60,	GS_FRAME, 	makeDISPLAY(  479,	1279,	0,		1,		 54,	276),	0x004780000210000A},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_640_72, GS_FRAME,	makeDISPLAY(  479,	1279,	0,		1,		 18,	330),	0x0067800001C00009},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_640_75, GS_FRAME, 	makeDISPLAY(  479,	1279,	0,		1,		 18,	360),	0x0067800001000001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_640_85, GS_FRAME,	makeDISPLAY(  479,	1279,	0,		1,		 18,	260),	0x0067800001000001},
-		{  GS_INTERLACED,		GS_MODE_VGA_640_60,	GS_FIELD,	makeDISPLAY(  959,	1279,	1,		1,		128,	291),	0x004F80000210000A},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_800_56, GS_FRAME,	makeDISPLAY(  599,	1599,	0,		1,		 25,	450),	0x0049600001600001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_800_60, GS_FRAME, 	makeDISPLAY(  599,	1599,	0,		1,		 25,	465),	0x0089600001700001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_800_72, GS_FRAME,	makeDISPLAY(  599,	1599,	0,		1,		 25,	465),	0x00C9600001700025},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_800_75, GS_FRAME, 	makeDISPLAY(  599,	1599,	0,		1,		 25,	510),	0x0069600001500001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_800_85, GS_FRAME,	makeDISPLAY(  599,	1599,	0,		1,		 15,	500),	0x0069600001B00001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_60, GS_FRAME, 	makeDISPLAY(  767,	2047,	0,		2,		 30,	580),	0x00CC000001D00003},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_70, GS_FRAME,	makeDISPLAY(  767,	1023,	0,		0,		 30,	266),	0x00CC000001D00003},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_75, GS_FRAME, 	makeDISPLAY(  767,	1023,	0,		0,		 30,	260),	0x006C000001C00001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_85, GS_FRAME,	makeDISPLAY(  767,	1023,	0,		0,		 30,	290),	0x006C000002400001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_1280_60, GS_FRAME, 	makeDISPLAY( 1023,	1279,	1,		1,		 40,	350),	0x0070000002600001},
-		{  GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	makeDISPLAY( 1023,	1279,	1,		1,		 40,	350),	0x0070000002600001}
+		{  GS_INTERLACED,		GS_MODE_NTSC,		GS_FIELD,	makeDISPLAY(  447,	2559,	0,		3,		 46,	700),	makeSYNCV(    6,  480,    6,   26,    6,    1 )},
+		{  GS_INTERLACED,		GS_MODE_NTSC,		GS_FRAME,	makeDISPLAY(  223,	2559,	0,		3,		 26,	700),	makeSYNCV(    6,  480,    6,   26,    6,    2 )},
+		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	makeDISPLAY(  511,	2559,	0,		3,		 70,	720),	makeSYNCV(    5,  576,    5,   33,    5,    1 )},
+		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FRAME,	makeDISPLAY(  255,	2559,	0,		3,		 37,	720),	makeSYNCV(    5,  576,    5,   33,    5,    4 )},
+		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	makeDISPLAY(  447,	2559,	0,		3,		 46,	700),	makeSYNCV(    6,  480,    6,   26,    6,    1 )},
+		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FRAME,	makeDISPLAY(  223,	2559,	0,		3,		 26,	700),	makeSYNCV(    6,  480,    6,   26,    6,    2 )},
+		{  GS_NONINTERLACED,	GS_MODE_DTV_480P,	GS_FRAME,	makeDISPLAY(  255,	2559,	0,		1,		 12,	736),	makeSYNCV(    6,  483, 3072,   30,    0,    6 )},
+		{  GS_NONINTERLACED,	GS_MODE_DTV_576P,	GS_FRAME,	makeDISPLAY(  255,	2559,	0,		1,		 23,	756),	makeSYNCV(    5,  576,    0,   39,    0,    5 )},
+		{  GS_NONINTERLACED,	GS_MODE_DTV_480P,	GS_FRAME, 	makeDISPLAY(  479,	1279,	0,		1,		 51,	308),	makeSYNCV(    6,  483, 3072,   30,    0,    6 )},
+		{  GS_NONINTERLACED,	GS_MODE_DTV_576P,	GS_FRAME,	makeDISPLAY(  575,	1279,	0,		1,		 64,	320),	makeSYNCV(    5,  576,    0,   39,    0,    5 )},
+		{  GS_NONINTERLACED,	GS_MODE_DTV_720P,	GS_FRAME, 	makeDISPLAY(  719,	1279,	1,		1,		 24,	302),	makeSYNCV(    5,  720,    0,   20,    0,    5 )},
+		{  GS_INTERLACED,		GS_MODE_DTV_1080I,	GS_FIELD, 	makeDISPLAY( 1079,	1919,	1,		2,		 48,	238),	makeSYNCV(   10, 1080,    2,   28,    0,    5 )},
+		{  GS_INTERLACED,		GS_MODE_DTV_1080I,	GS_FRAME, 	makeDISPLAY( 1079,	1919,	0,		2,		 48,	238),	makeSYNCV(   10, 1080,    2,   28,    0,    5 )},
+		{  GS_NONINTERLACED,	GS_MODE_DTV_1080P,	GS_FRAME, 	makeDISPLAY( 1079,	1919,	1,		2,		 48,	238),	makeSYNCV(   10, 1080,    2,   28,    0,    5 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_640_60,	GS_FRAME, 	makeDISPLAY(  479,	1279,	0,		1,		 54,	276),	makeSYNCV(    2,  480,    0,   33,    0,   10 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_640_72, GS_FRAME,	makeDISPLAY(  479,	1279,	0,		1,		 18,	330),	makeSYNCV(    3,  480,    0,   28,    0,    9 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_640_75, GS_FRAME, 	makeDISPLAY(  479,	1279,	0,		1,		 18,	360),	makeSYNCV(    3,  480,    0,   16,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_640_85, GS_FRAME,	makeDISPLAY(  479,	1279,	0,		1,		 18,	260),	makeSYNCV(    3,  480,    0,   16,    0,    1 )},
+		{  GS_INTERLACED,		GS_MODE_VGA_640_60,	GS_FIELD,	makeDISPLAY(  959,	1279,	1,		1,		128,	291),	makeSYNCV(    2,  992,    0,   33,    0,   10 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_800_56, GS_FRAME,	makeDISPLAY(  599,	1599,	0,		1,		 25,	450),	makeSYNCV(    2,  600,    0,   22,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_800_60, GS_FRAME, 	makeDISPLAY(  599,	1599,	0,		1,		 25,	465),	makeSYNCV(    4,  600,    0,   23,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_800_72, GS_FRAME,	makeDISPLAY(  599,	1599,	0,		1,		 25,	465),	makeSYNCV(    6,  600,    0,   23,    0,   37 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_800_75, GS_FRAME, 	makeDISPLAY(  599,	1599,	0,		1,		 25,	510),	makeSYNCV(    3,  600,    0,   21,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_800_85, GS_FRAME,	makeDISPLAY(  599,	1599,	0,		1,		 15,	500),	makeSYNCV(    3,  600,    0,   27,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_60, GS_FRAME, 	makeDISPLAY(  767,	2047,	0,		2,		 30,	580),	makeSYNCV(    6,  768,    0,   29,    0,    3 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_70, GS_FRAME,	makeDISPLAY(  767,	1023,	0,		0,		 30,	266),	makeSYNCV(    6,  768,    0,   29,    0,    3 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_75, GS_FRAME, 	makeDISPLAY(  767,	1023,	0,		0,		 30,	260),	makeSYNCV(    3,  768,    0,   28,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_1024_85, GS_FRAME,	makeDISPLAY(  767,	1023,	0,		0,		 30,	290),	makeSYNCV(    3,  768,    0,   36,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_1280_60, GS_FRAME, 	makeDISPLAY( 1023,	1279,	1,		1,		 40,	350),	makeSYNCV(    3, 1024,    0,   38,    0,    1 )},
+		{  GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	makeDISPLAY( 1023,	1279,	1,		1,		 40,	350),	makeSYNCV(    3, 1024,    0,   38,    0,    1 )}
 	}; //ends predef_vmode definition
 
 	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %u", predef_vmode[gGSMVMode].interlace, \

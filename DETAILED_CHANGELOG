@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev906 - GSM & Cheat Engine gardening - Sat Sep 10 07:36:08 2016 -0300
 rev905 - Cheat Engine: Warning instead of a message box, when no cheats have been found - Sat Sep 10 07:00:01 2016 -0300
 rev904 - Proper naming of VMC, GSM and CHEAT preprocessor conditionals - Sat Sep 10 06:46:16 2016 -0300
 rev903 - VGA GSM vmode adjustments - Mon Sep 05 02:29:10 2016 -0300

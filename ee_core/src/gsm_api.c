@@ -26,19 +26,31 @@ struct VModeSettings{
 };
 
 struct GSRegisterValues{
+	u64 pmode;
+	u64 smode1;
 	u64 smode2;
-	u64 display1;
-	u64 display2;
+	u64 srfsh;
+	u64 synch1;
+	u64 synch2;
 	u64 syncv;
+	u64 dispfb1;
+	u64 display1;
+	u64 dispfb2;
+	u64 display2;
 };
 
 struct GSRegisterFixValues{
-	u8 auto_adaptation;
-	u8 smode2;
-	u8 display;
-	u8 syncv;
 	u32 dx_offset;
 	u32 dy_offset;
+	u8 auto_adaptation;
+	u8 pmode;
+	u8 smode1;
+	u8 smode2;
+	u8 srfsh;
+	u8 synch;
+	u8 syncv;
+	u8 dispfb;
+	u8 display;
 };
 
 struct GSAdaptationValues{
@@ -75,15 +87,19 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
 	Target_GSRegisterValues.display2	= (u64) display;
 	Target_GSRegisterValues.syncv		= (u64) syncv;
 
-	GSRegisterFixValues.auto_adaptation	= 0;	// Automatic Adaptation -> 0 = On, 1 = Off ; Default = 0 = On
-	GSRegisterFixValues.display			= 0;	// DISPLAYx Fix ---------> 0 = On, 1 = Off ; Default = 0 = On
-	GSRegisterFixValues.smode2			= 0;	// SMODE2 Fix -----------> 0 = On, 1 = Off ; Default = 0 = On
-	GSRegisterFixValues.syncv			= 0;	// SYNCV Fix ------------> 0 = On, 1 = Off ; Default = 0 = On
-
 	GSRegisterFixValues.dx_offset		= (u32) dx_offset;	// X-axis offset -> Use it only when automatic adaptations formulas don't suffice
 	GSRegisterFixValues.dy_offset		= (u32) dy_offset;	// Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
-
-	GSAdaptationValues.skip_videos		= (u8) (skip_videos ^ 1);	// Skip Videos Fix ------------> 0 = On, 1 = Off ; Default = 0 = On
+	// 0 = On, 1 = Off (Someday I'll change this inverted logic...:-S)
+	GSRegisterFixValues.auto_adaptation	= (u8) 0;	// Default = 0 = On
+	GSRegisterFixValues.pmode			= (u8) 1;	// Default = 1 = Off
+	GSRegisterFixValues.smode1			= (u8) 1;	// Default = 1 = Off
+	GSRegisterFixValues.smode2			= (u8) 0;	// Default = 0 = On
+	GSRegisterFixValues.srfsh			= (u8) 1;	// Default = 1 = Off
+	GSRegisterFixValues.synch			= (u8) 1;	// Default = 1 = Off
+	GSRegisterFixValues.syncv			= (u8) 0;	// Default = 0 = On
+	GSRegisterFixValues.dispfb			= (u8) 1;	// Default = 1 = Off
+	GSRegisterFixValues.display			= (u8) 0;	// Default = 0 = On
+	GSAdaptationValues.skip_videos		= (u8) (skip_videos ^ 1);
 
 }
 
@@ -123,14 +139,6 @@ static void Install_GSHandler(void)
 	*(volatile u32 *)0x80000104 = NOP;
 	ee_kmode_exit();
 
-/*
-	"li $a0, 0x12000000\n"	// Address base for trapping
-	"li $a1, 0x1FFFFF1F\n"	// Address mask for trapping
-	//We trap writes to 0x12000000 + 0x00,0x20,0x40,0x60,0x80,0xA0,0xC0,0xE0
-	//We only want 0x20, 0x60, 0x80, 0xA0, but can't mask for that combination
-	//But the trapping range is now extended to match all kernel access segments
-*/
-
 	// Set Data Address Write Breakpoint
 	// Trap writes to GS registers, so as to control their values
 	__asm__ __volatile__ (
@@ -138,10 +146,8 @@ static void Install_GSHandler(void)
 	".set noat\n"
 	
 	"li $a0, 0x12000000\n"	// Address base for trapping
-	"li $a1, 0x1FFFFE1F\n"	// Address mask for trapping	//DOCTORXYZ
-	//We trap writes to 0x12000000 + 0x00,0x20,0x40,0x60,0x80,0xA0,0xC0,0xE0,0x100,0x120,0x140,0x160,0x180,0x1A0,0x1C0,0x1E0	//DOCTORXYZ
-	//We only want 0x20, 0x60, 0x80, 0xA0, 0x100, but can't mask for that combination //DOCTORXYZ
-	//But the trapping range is now extended to match all kernel access segments
+	"li $a1, 0x1FFFEF0F\n"	// Address mask for trapping
+							// Trapping range is extended to match all kernel access segments
 
 	"li $k0, 0x8000\n"
 	"mtbpc $k0\n"			// All breakpoints off (BED = 1)

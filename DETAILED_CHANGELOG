@@ -8,24 +8,25 @@
 
 Open PS2 Loader detailed ChangeLog:
 
-rev924 - Changed old lang_Turkish_0.9.3.lng useless name
-rev923 - Changed old lang_TChinese_0.9.3.lng useless name
-rev922 - Changed old lang_Swedish_0.9.3.lng useless name
-rev921 - Changed old lang_Spanish_0.9.3.lng useless name
-rev920 - Changed old lang_Russian_0.9.3.lng useless name 
-rev919 - Changed old lang_Portuguese_BR_0.9.3.lng useless name
-rev918 - Changed old lang_Portuguese_0.9.3.lng useless name
-rev917 - Changed old lang_Polish_0.9.3.lng useless name
-rev916 - Changed old lang_Laotian_0.9.3.lng useless name
-rev915 - Changed old lang_Italian_0.9.3.lng useless name
-rev914 - Changed old lang_Indonesian_0.9.3.lng useless name
-rev913 - Changed old lang_German_0.9.3.lng useless name
-rev912 - Changed old lang_French_0.9.3.lng useless name
-rev911 - Changed old lang_English_0.9.3.lng useless name
-rev910 - Changed old lang_Czech_0.9.3.lng useless name
-rev909 - Changed old lang_Bulgarian_0.9.3.lng useless name
-rev908 - Changed old useless name
-rev907 - GSM Internals: New SMODE1, SYNCH1, SYNCH2 & SYNCV macros; magic numbers on predef VModes replaced to their corresponding SYNCV values
+rev925 - Update languages - Thu Sep 15 04:32:32 2016 -0300
+rev924 - Changed old lang_Turkish_0.9.3.lng useless name - Thu Sep 15 02:00:27 2016 +0000
+rev923 - Changed old lang_TChinese_0.9.3.lng useless name - Thu Sep 15 01:59:37 2016 +0000
+rev922 - Changed old lang_Swedish_0.9.3.lng useless name - Thu Sep 15 01:58:48 2016 +0000
+rev921 - Changed old lang_Spanish_0.9.3.lng useless name - Thu Sep 15 01:58:05 2016 +0000
+rev920 - Changed old lang_Russian_0.9.3.lng useless name - Thu Sep 15 01:57:11 2016 +0000
+rev919 - Changed old lang_Portuguese_BR_0.9.3.lng useless name - Thu Sep 15 01:56:21 2016 +0000
+rev918 - Changed old lang_Portuguese_0.9.3.lng useless name - Thu Sep 15 01:55:33 2016 +0000
+rev917 - Changed old lang_Polish_0.9.3.lng useless name - Thu Sep 15 01:54:41 2016 +0000
+rev916 - Changed old lang_Laotian_0.9.3.lng useless name - Thu Sep 15 01:53:53 2016 +0000
+rev915 - Changed old lang_Italian_0.9.3.lng useless name - Thu Sep 15 01:52:59 2016 +0000
+rev914 - Changed old lang_Indonesian_0.9.3.lng useless name - Thu Sep 15 01:51:56 2016 +0000
+rev913 - Changed old lang_German_0.9.3.lng useless name - Thu Sep 15 01:51:10 2016 +0000
+rev912 - Changed old lang_French_0.9.3.lng useless name - Thu Sep 15 01:49:31 2016 +0000
+rev911 - Changed old lang_English_0.9.3.lng useless name - Thu Sep 15 01:47:57 2016 +0000
+rev910 - Changed old lang_Czech_0.9.3.lng useless name - Thu Sep 15 01:42:49 2016 +0000
+rev909 - Changed old lang_Bulgarian_0.9.3.lng useless name - Thu Sep 15 01:40:28 2016 +0000
+rev908 - Changed old useless name - Thu Sep 15 01:33:16 2016 +0000
+rev907 - GSM Internals: New SMODE1, SYNCH1, SYNCH2 & SYNCV macros; magic numbers on predef VModes replaced to their corresponding SYNCV values - Sun Sep 11 16:05:38 2016 -0300
 rev906 - GSM & Cheat Engine gardening - Sat Sep 10 07:36:08 2016 -0300
 rev905 - Cheat Engine: Warning instead of a message box, when no cheats have been found - Sat Sep 10 07:00:01 2016 -0300
 rev904 - Proper naming of VMC, GSM and CHEAT preprocessor conditionals - Sat Sep 10 06:46:16 2016 -0300

@@ -79,6 +79,7 @@ typedef struct {
 #define IGR_COMBO_R1_L1_R2_L2  0xF0
 #define IGR_COMBO_START_SELECT 0xF6
 #define IGR_COMBO_R3_L3        0xF9
+#define IGR_COMBO_UP           0xEF
 
 #define NB_PADOPEN_PATTERN 7
 

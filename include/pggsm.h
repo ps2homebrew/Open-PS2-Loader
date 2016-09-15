@@ -1,9 +1,22 @@
+/*
+#
+# Graphics Synthesizer Mode Selector (a.k.a. GSM) - Force (set and keep) a GS Mode, then load & exec a PS2 ELF
+#-------------------------------------------------------------------------------------------------------------
+# Copyright 2009, 2010, 2011 doctorxyz & dlanor
+# Copyright 2011, 2012 doctorxyz, SP193 & reprep
+# Copyright 2013 Bat Rastard
+# Copyright 2014, 2015, 2016 doctorxyz
+# Licenced under Academic Free License version 2.0
+# Review LICENSE file for further details.
+#
+*/
+
 // Header For Per-Game GSM -Bat-
 
 #ifndef __PGGSM_H
 #define __PGGSM_H
 
-#define GSM_VERSION "0.38"
+#define GSM_VERSION "0.39"
 
 #define makeSMODE1(VHP,VCKSEL,SLCK2,NVCK,CLKSEL,PEVS,PEHS,PVS,PHS,GCONT,SPML,PCK2,XPCK,SINT,PRST,EX,CMOD,SLCK,T1248,LC,RC)	\
 	(u64)(((u64)(VHP)<<36)   | ((u64)(VCKSEL)<<34) | ((u64)(SLCK2)<<33) | \

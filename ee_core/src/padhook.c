@@ -29,6 +29,9 @@
 #ifdef GSM
 #include "gsm_api.h"
 #endif
+#ifdef IGS
+#include "igs_api.h"
+#endif
 #ifdef CHEAT
 #include "cheat_api.h"
 #endif
@@ -174,8 +177,12 @@ static void IGR_Thread(void *arg)
 
 	DPRINTF("IGR thread woken up!\n");
 
-	// If Pad Combo is Start + Select then Return to Home
-	if(Pad_Data.combo_type == IGR_COMBO_START_SELECT)
+	// If Pad Combo is Start + Select then Return to Home, else if Pad Combo is UP then take IGS
+	if ( (Pad_Data.combo_type == IGR_COMBO_START_SELECT)
+#ifdef IGS
+		|| (Pad_Data.combo_type == IGR_COMBO_UP)
+#endif
+		)
 	{
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0xFFFFFF; // White
@@ -264,6 +271,11 @@ static void IGR_Thread(void *arg)
 		// Exit services
 		SifExitRpc();
 
+#ifdef IGS
+		if((EnableGSMOp)&&(Pad_Data.combo_type == IGR_COMBO_UP))
+			InGameScreenshot();
+#endif
+
 		// Execute home loader
 		if (ExitPath[0] != '\0')
 			ExecPS2(t_loadElf, &_gp, 0, NULL);
@@ -311,9 +323,14 @@ static int IGR_Intc_Handler(int cause)
 		// Combo R1 + L1 + R2 + L2
 		if ( pad_pos_combo1 == IGR_COMBO_R1_L1_R2_L2 )
 		{
-			// Combo Start + Select OR R3 + L3
-			if ( ( pad_pos_combo2 == IGR_COMBO_START_SELECT ) || // Start + Select combo, so reset
-				   ( pad_pos_combo2 == IGR_COMBO_R3_L3 ) )         // R3 + L3 combo, so poweroff
+			// Combo Start + Select, R3 + L3 or UP
+			if ( ( pad_pos_combo2 == IGR_COMBO_START_SELECT ) ||	// Start + Select combo, so reset
+				( pad_pos_combo2 == IGR_COMBO_R3_L3 )				// R3 + L3 combo, so poweroff
+#ifdef IGS
+				|| ( pad_pos_combo2 == IGR_COMBO_UP )				// UP combo, so take IGS
+#endif
+				)
+
 				Pad_Data.combo_type = pad_pos_combo2;
 		}
 	}

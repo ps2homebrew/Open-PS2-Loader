@@ -110,7 +110,9 @@ int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
 int gSelectButton;
 
-// ------------------------------------------------------------------------------------------------------------------------
+#ifdef IGS
+#define IGS_VERSION "0.1"
+#endif
 
 #ifdef CHEAT
 #define CHEAT_VERSION "0.5.3.65.g774d1"

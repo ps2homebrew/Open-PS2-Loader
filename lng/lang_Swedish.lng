@@ -1,5 +1,5 @@
 # Swedish translation by Flaya
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Swedish
 Open PS2 Loader %s
 Spara ändringar
@@ -19,7 +19,7 @@ Appar
 Tema
 Språk
 Systemet stängs av.
-Avsluta OPL?
+Avsluta till Meny/OSDSYS?
 Avbryt uppdatering?
 %d: Ingen Hårddisk hittad
 %d: Hårddisken ej formatterad
@@ -137,7 +137,7 @@ Om
 Kodare
 Kvalitetstestare
 USB prefix sökväg
-Lämna tomt för att avsluta till utforskaren
+Laddar vald ELF efter en IGR
 Värde i minut (er), 0 för att inaktivera nerspinn
 Automatisk HDD nerspinn
 Videoläge
@@ -204,5 +204,7 @@ Hämta inställningar från nätverket?
 Modifierade inställningar
 Hämtade standard
 Autostart om %i s...
-Autostart
+Autostart 
 Värde i sekund(er), 0 inaktiverar Autostart
+PS2 Logo
+Visas bara när skivavbilden matchar konsolens region

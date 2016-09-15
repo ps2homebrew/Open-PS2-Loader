@@ -1,5 +1,5 @@
 # French translation by ShaolinAssassin - @http://psx-scene.com/forums/members/shaolinassassin/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 French
 Open PS2 Loader %s
 Sauvegarder
@@ -19,7 +19,7 @@ Apps
 Thème
 Langue
 Le système va être éteint
-Quitter OPL ?
+Retour au navigateur PS2 / OSDSYS ?
 Annuler le téléchargement ?
 Erreur %d: disque dur non détecté
 Erreur %d: disque dur non formaté
@@ -73,7 +73,7 @@ Serveur HDL en cours de démarrage...
 Serveur HDL connecté…
 Échec au démarrage du serveur HDL
 Fermeture du serveur HDL…
-Quitter via IGR vers :
+Sortie via IGR vers :
 Arrière-plan
 Texte principal
 - PS2 - 
@@ -206,3 +206,5 @@ Réglages prédéfinis
 Lancement automatique dans %s…
 Lancement auto.
 En seconde(s), 0 pour désactiver le lancement automatique
+Logo PS2
+S’affiche uniquement si le jeu et la console appartiennent à la même zone

@@ -1,5 +1,5 @@
 # Polish translation by dragolice @http://psx-scene.com/forums/members/dragolice/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Polish
 Open PS2 Loader %s
 Zapisz zmiany
@@ -19,7 +19,7 @@ Aplikacje
 Motyw
 Język
 System zostanie wyłączony.
-Wyjść z OPL?
+Exit to Browser/OSDSYS?
 Przerwać aktualizację?
 %d: Nie wykryto dysku twardego
 %d: Dysk twardy nie jest sformatowany
@@ -35,7 +35,7 @@ Przerwać aktualizację?
 Włącz
 Wyłącz
 OK
-Wybierz
+Wybierz 
 Anuluj
 Kółko
 Iks
@@ -137,9 +137,9 @@ O programie
 Programiści
 Zapewnienie jakości
 Prefix ścieżki USB
-Pozostaw puste, aby wyjść do Browser
+Boots Custom ELF after an IGR
 Wartość w minutach, 0 wyłącza zwalnianie obrotów
-Automatyczne zwalnianie obrotów HDD
+Automatyczne zwalnianie obrotów HDD 
 Tryb wideo
 Kolor ustawień
 Kolor zaznaczenia
@@ -177,7 +177,7 @@ ustawienia GSM
 Włącz GSM
 Przełącz GSM wł lub wył
 Wideo
-Wymuś niestandardowy tryb wyświetlania
+Wymuś niestandardowy tryb wyświetlania 
 Poziom
 Regulacja w poziomie
 Pion
@@ -206,3 +206,5 @@ Pobrano domyślne
 Auto start w %i s...
 Auto start
 Wartość w sekundach, 0 wyłącza auto start
+PS2 Logo
+Only displayed for a valid disc logo which matches the console's region

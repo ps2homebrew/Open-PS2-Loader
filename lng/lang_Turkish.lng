@@ -1,5 +1,5 @@
 # Turkish translation by dante (Gürkan DEMİR <vampire_bs@hotmail.com>)
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Turkish
 Open PS2 Loader %s
 Değişiklikleri kaydet
@@ -19,7 +19,7 @@ Uygulamalar
 Tema
 Dil
 Çıkış işlemi gücü kapatacaktır.
-OPL'den çıkılsın mı?
+Exit to Browser/OSDSYS?
 Güncelleme iptal edilsinmi?
 %d: HardDisk sürücü bulunamadı
 %d: HardDisk sürücü biçimlendirilmemiş
@@ -137,7 +137,7 @@ Hakkında
 Geliştiriciler
 Kalite Konturolü
 USB önek yolu
-Ps2 menüsüne dönmek için baş bırakınız
+Boots Custom ELF after an IGR
 Dakika olarak değer, iptal etmek için 0 giriniz
 Otomatik Sabit Disk durdurma
 Video modu
@@ -206,3 +206,5 @@ Varsayılanlar indirildi
 Otomatik başlatılacak %i s...
 Auto start
 Value in second(s), 0 to disable auto start
+PS2 Logo
+Only displayed for a valid disc logo which matches the console's region

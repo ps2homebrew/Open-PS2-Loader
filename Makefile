@@ -27,6 +27,9 @@ RTL = 0
 #Enables/disables Graphics Synthesizer Mode (GSM) selector
 GSM = 0
 
+#Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
+IGS = 0
+
 #Enables/disables the cheat engine (PS2RD)
 CHEAT = 0
 
@@ -109,8 +112,15 @@ ifeq ($(CHILDPROOF),0)
   ifeq ($(GSM),1)
     EE_CFLAGS += -DGSM
     GSM_FLAGS = GSM=1
+    ifeq ($(IGS),1)
+      EE_CFLAGS += -DIGS
+      IGS_FLAGS = IGS=1
+    else
+      IGS_FLAGS = IGS=0
+    endif
   else
     GSM_FLAGS = GSM=0
+    IGS_FLAGS = IGS=0
   endif
   ifeq ($(CHEAT),1)
     FRONTEND_OBJS += obj/cheatman.o 
@@ -122,6 +132,7 @@ ifeq ($(CHILDPROOF),0)
 else
   EE_CFLAGS += -D__CHILDPROOF
   GSM_FLAGS = GSM=0
+  IGS_FLAGS = IGS=0
   CHEAT_FLAGS = CHEAT=0
 endif
 
@@ -280,7 +291,7 @@ pc_tools_win32:
 
 ee_core.s:
 	echo "-EE core"
-	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
+	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
 	$(BIN2S) ee_core/ee_core.elf asm/ee_core.s eecore_elf
 
 elfldr.s:

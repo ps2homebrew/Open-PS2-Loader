@@ -4,7 +4,8 @@
 #-------------------------------------------------------------------------------------------------------------
 # Copyright 2009, 2010, 2011 doctorxyz & dlanor
 # Copyright 2011, 2012 doctorxyz, SP193 & reprep
-# Copyright 2013, 2014, 2015, 2016 doctorxyz
+# Copyright 2013 Bat Rastard
+# Copyright 2014, 2015, 2016 doctorxyz
 # Licenced under Academic Free License version 2.0
 # Review LICENSE file for further details.
 #

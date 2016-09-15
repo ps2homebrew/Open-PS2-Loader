@@ -12,6 +12,7 @@
 EE_BIN = ee_core.elf
 
 GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
+IGSCORE_EE_OBJS = obj/igs_api.o
 CHEATCORE_EE_OBJS = obj/cheat_engine.o obj/cheat_api.o
 
 EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o obj/patches_asm.o \
@@ -42,9 +43,16 @@ endif
 ifeq ($(VMC),1)
 EE_CFLAGS += -DVMC
 endif
+
 ifeq ($(GSM),1)
 EE_OBJS += $(GSMCORE_EE_OBJS)
 EE_CFLAGS += -DGSM
+endif
+
+ifeq ($(IGS),1)
+EE_OBJS += $(IGSCORE_EE_OBJS)
+EE_CFLAGS += -DIGS
+EE_LIBS += -lmc
 endif
 
 ifeq ($(CHEAT),1)
@@ -52,7 +60,11 @@ EE_OBJS += $(CHEATCORE_EE_OBJS)
 EE_CFLAGS += -DCHEAT
 endif
 
+ifeq ($(IGS),1)
+EE_LDFLAGS = -nostartfiles -Tlinkfile.igs -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
+else
 EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
+endif
 EE_LIBS += -lpatches
 
 ifeq ($(EESIO_DEBUG),1) 

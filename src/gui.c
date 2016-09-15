@@ -207,6 +207,10 @@ void guiShowAbout() {
 	strcat(OPLVersion, " GSM ");
 	strcat(OPLVersion, GSM_VERSION);
 #endif
+#ifdef IGS
+	strcat(OPLVersion, " IGS ");
+	strcat(OPLVersion, IGS_VERSION);
+#endif
 #ifdef CHEAT
 	strcat(OPLVersion, " PS2RD ");
 #endif

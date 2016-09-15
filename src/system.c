@@ -494,6 +494,7 @@ static void PrepareGSM(char *cmdline) {
 	// Therefore there are many variables involved here that can lead us to success or fail, depending on the already mentioned circumstances.
 	//
 	static const predef_vmode_struct predef_vmode[30] = {
+	//																		  DH    DW      MAGV    MAGH     DY     DX					  VS  VDP     VBPE VBP    VFPE  VFP
 		{  GS_INTERLACED,		GS_MODE_NTSC,		GS_FIELD,	makeDISPLAY(  447,	2559,	0,		3,		 46,	700),	makeSYNCV(    6,  480,    6,   26,    6,    1 )},
 		{  GS_INTERLACED,		GS_MODE_NTSC,		GS_FRAME,	makeDISPLAY(  223,	2559,	0,		3,		 26,	700),	makeSYNCV(    6,  480,    6,   26,    6,    2 )},
 		{  GS_INTERLACED,		GS_MODE_PAL,		GS_FIELD,	makeDISPLAY(  511,	2559,	0,		3,		 70,	720),	makeSYNCV(    5,  576,    5,   33,    5,    1 )},

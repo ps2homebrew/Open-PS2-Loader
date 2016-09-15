@@ -1,5 +1,5 @@
 # Czech translation by jimmysmith
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Czech
 Open PS2 Loader %s
 Uložit změny
@@ -19,7 +19,7 @@ Aplikace
 Skin
 Jazyk
 Systém bude vypnut.
-Ukončit OPL?
+Ukončit a vrátit se do Prohlížeče/OSDSYS?
 Zrušit update?
 %d: Harddisk nebyl detekován
 %d: Harddisk není naformátován
@@ -137,7 +137,7 @@ O aplikaci
 Kodéři
 Kontrola kvality
 prefix cesty k USB
-Nechte prázdné pro ukončení Prohlížeče
+Načíst svůj ELF po IGR
 Hodnota v minutách, 0 pro vypnutí spin-down disku
 Automatický HDD spin-down
 Video mód
@@ -206,3 +206,5 @@ Stažené původní verze konfigů
 Automatický start v %i s...
 Auto start
 Hodnota v sekundách, zadej 0 pro vypnutí auto startu
+PS2 Logo
+Zobrazováno pouze u validního loga disku, který má stejný region jako konzole

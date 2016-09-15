@@ -1,5 +1,5 @@
 # Indonesian translation by verislasher
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Indonesian
 Open PS2 Loader %s
 Simpan Perubahan
@@ -19,7 +19,7 @@ Aplikasi
 Tema
 Bahasa
 Sistem akan dimatikan.
-Keluar OPL?
+Keluar ke Browser /OSDSYS?
 Batal perbarui?
 %d: Harddisk tak terdeteksi
 %d: Harddisk belum diformat
@@ -137,7 +137,7 @@ Tentang
 Pengkode
 Kualitas jaminan
 Awalan pintas USB
-Kosongkan untuk keluar ke Browser
+Jalankan ELF Kustom setelah IGR
 Nilai dalam menit (s), 0 untuk menonaktifkan berhenti
 HDD Otomatis berhenti
 Modus video
@@ -206,3 +206,5 @@ Unduhan default
 Mulai otomatis dalam %i s...
 Mulai otomatis
 Nilai dalam detik, 0 mencegah mulai otomatis
+Logo PS2
+Hanya ditampilkan untuk logo disc yang valid yang cocok dengan region konsol

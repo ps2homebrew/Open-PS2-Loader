@@ -1,5 +1,5 @@
 # Bulgarian translation by wisi - @http://psx-scene.com/forums/members/wisi/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 Betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Bulgarian
 Open PS2 Loader %s
 Запазване на промените
@@ -19,7 +19,7 @@ ETH Игри
 Тема
 Език
 Изключване на системата?
-Изход от OPL?
+Изход към Browser/OSDSYS?
 Отмяна на обновяването?
 %d: Твърд Диск не е свързан.
 %d: Твърд Диск не е форматиран.
@@ -137,7 +137,7 @@ VMC файлът трябва да бъде създаден.
 Програмисти:
 Качествен контрол от:
 USB поддиректория
-Оставете свободно, за изход към PS2 Browser
+Зареждане на ELF по избор при IGR
 Стойност в минути, 0 за деактивиране
 Автоматично спиране на HDD след
 Видео режим
@@ -206,3 +206,5 @@ Cheats по избор
 Авт.старт след %i
 Автостарт
 Стойност в секунди, 0 за деактивиране.
+Показване на PS2 Logo
+Активно само при валидно лого на диска, съвпадащо с региона на конзолата.

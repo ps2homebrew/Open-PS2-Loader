@@ -1,5 +1,5 @@
 # Laotian translation by blackbutterfly (Anousith Phompida <noum_terry@hotmail.com>)
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Laotian
 Open PS2 Loader %s
 ບັນທຶກການປ່ຽນແປງ
@@ -19,7 +19,7 @@ Open PS2 Loader %s
 ຄຸນລັກສະນະຮູບຮ່າງ
 ພາສາ
 ລະບົບຈະຖືກປິດການໃຊ້ງານ
-ອອກຈາກ OPL?
+ອອກໄປສູ່ໜ້າ Browser/OSDSYS
 ຍົກເລີກການອັບເດດ?
 %d: ບໍ່ສາມາດຄົ້ນຫາ HardDisk ໄດ້
 %d: HardDisk ຍັງບໍ່ທັນໄດ້ Format
@@ -63,7 +63,7 @@ Open PS2 Loader %s
 ເປີດໃຊ້ອຸປະກອນເຊື່ອມຕໍ່
 ເອີ້ນຄືນໃໝ່
 ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ USB
-ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk
+ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk 
 ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Network
 ໂໝດ ຕ່າງໆສຳລັບໂປຣແກຣມ
 ອັດຕະໂນມັດ
@@ -77,7 +77,7 @@ IGR path
 ສີຂອງພື້ນຫຼັງ
 ສີຂອງຂໍ້ຄວາມ
 - PS2 -
-Server SMB
+- SMB Server -
 ປະເພດຂອງ IP address
 ຄ່າຄົງທີ່
 DHCP
@@ -100,7 +100,7 @@ NetBIOS
 ລົບ
 ຫຼິ້ນເກມນີ້
 ຕັ້ງຄ່າການສະແດງຜົນ
-Enable write operations
+ສາມາດລົບເກມ ແລະ ປ່ຽນຊື່ເກມໄດ້
 ກວດສອບ game fragmentation ເທິງ USB
 ໃຫ້ລະບົບຈື່ເກມທີ່ຫຼິ້ນໄປຄັ້ງສຸດທ້າຍ
 ເລືອກປຸ່ມ
@@ -109,10 +109,10 @@ Enable write operations
 ທົດລອງ
 ບໍ່ມີຄ່າກຳນົດໃດໆສຳລັບການເຂົ້າເຖິງຂອງ GUEST
 ອ່ານແບບຖືກຕ້ອງແມ່ນຍຳ
-Accurate Reads
+ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
 Unhook Syscalls
 0 PSS mode
-ປະມວນຜົນ DVD-DL
+ປະມວນຜົນ DVD-DL 
 Disable IGR
 High module storage
 ປິດບັງ dev9 module
@@ -137,7 +137,7 @@ File VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຈະຕ້ອງ
 ກຸ່ມນັກພັດທະນາໂປຣແກຣມ
 ການປະກັນໃນຄຸນະພາບ
 USB prefix path
-ບໍ່ມີຄ່າກຳນົດໃດໆຕໍ່ການອອກຈາກໂປຣແກຣມນີ້
+ປະມວນຜົນ ELF ຫຼັງຈາກ IGR
 ໃສ່ຄ່າເປັນນາທີ, ເລືອກ 0 ເພື່ອປິດການຢຸດໝຸນຮອບ
 ການຢຸດຮອບໝູນອັດຕະໂນມັດຂອງ Hard Disk
 ໂໝດວິດິໂອ
@@ -206,3 +206,5 @@ V-POS
 ເລີ່ມຕົ້ນອັດຕະໂນມັດ ພາຍໃນ %i ວິນາທີ…
 ເປີດໃຊ້ແບບໂອໂຕ
 ຕັ້ງຄ່າຫົວໜ່ວຍ ວິນາທີ, ໃສ່ 0 ເພື່ອປິດການເປີດໃຊ້ແບບໂອໂຕ
+PS2 Logo
+ຈະຖືກສະແດງຜົນ ກໍຕໍ່ເມື່ອໂລໂກ້ຂອງແຜ່ນຖືກຕ້ອງ ແລະ ສອດຄ່ອງຕາມໂຊນຂອງເຄື່ອງ

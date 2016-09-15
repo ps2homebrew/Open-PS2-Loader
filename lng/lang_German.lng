@@ -1,5 +1,5 @@
 # German translation by ps2guy
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 German
 Open PS2 Loader %s
 Änderungen speichern
@@ -19,7 +19,7 @@ Anwendungen
 Design
 Sprache
 Das System wird ausgeschaltet.
-OPL verlassen?
+Verlassen und zum Browser/OSDSYS zurückkehren?
 Aktualisierung abbrechen?
 %d: Festplatte wurde nicht gefunden
 %d: Festplatte ist nicht formatiert
@@ -77,7 +77,7 @@ IGR-Pfad
 Hintergrundfarbe
 Textfarbe
 - PS2 - 
-- SMB Server -
+SMB Server -
 IP-Adresstyp
 Statisch
 DHCP
@@ -108,7 +108,7 @@ Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
 Test
 Leer lassen für Anmeldung als GAST
-Accurate Reads
+Korrekte Lesegeschw
 Synchronmodus
 Systemaufrufe aushängen
 0 PSS Modus
@@ -137,7 +137,7 @@ Automatisch aktualisieren
 Programmierer
 Qualitätssicherung
 USB Präfix Pfad
-Leer lassen, um zum Browser zurückzukehren
+Startet eine Custom ELF nach einem IGR
 Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
 Automatische Abschaltung der Festplatte
 Videomodus
@@ -205,4 +205,6 @@ Benutzerdefinierte Einstellungen
 Standardeinstellungen heruntergeladen
 Automatischer Start in %i s...
 Automatischer Start
-Wert in Sekunden (sek), 0 zum Deaktivieren
+Wert in Sekunden (sek), 0 zum Deaktivieren 
+PS2 Logo
+Wird nur bei gültigem Disc Logo angezeigt, welches mit der Region der Konsole übereinstimmen muss

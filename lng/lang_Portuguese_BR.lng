@@ -1,5 +1,5 @@
 # Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
@@ -19,7 +19,7 @@ Aplicativos
 Temas
 Idioma
 O sistema será desligado.
-Sair do OPL?
+Sair para o Navegador/OSDSYS?
 Cancelar as atualizações?
 %d: O Disco Rígido não foi detectado
 %d: O Disco Rígido não está formatado
@@ -121,7 +121,7 @@ Criar
 Iniciar
 Modificar
 Abortar
-Resetar
+Reiniciar
 Usa o genérico
 Configure o VMC
 Nome
@@ -137,13 +137,13 @@ Créditos
 Desenvolvedores
 Controle de Qualidade
 Prefixo do caminho USB
-Deixe em branco para ir até o navegador
+Inicia um ELF preferencial após um IGR
 Valor em minuto(s), 0 para desativar
 Desligamento automático do HDD
 Modo de vídeo
 Cor do diálogo
 Cor selecionada
-Mostrar Página de Informação
+Mostrar Página de Informação 
 Info.
 ELF modificado
 Seleção de Cor
@@ -158,7 +158,7 @@ VMC Slot 1
 VMC Slot 2
 ID do Jogo
 Modo de DMA
-Sincronização do vídeo
+Sincronização do vídeo 
 Modo 1
 Modo 2
 Modo 3
@@ -206,3 +206,5 @@ Configurações baixadas
 Iniciar automaticamente no %i s...
 Auto-começar
 Valores em segundos (s), 0 para desativar
+Logotipo do Playstation 2
+Será mostrado apenas para os jogos que for da mesma região do console

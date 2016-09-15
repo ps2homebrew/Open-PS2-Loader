@@ -1,5 +1,5 @@
 # Spanish translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Spanish
 Open PS2 Loader %s
 Guardar cambios
@@ -19,7 +19,7 @@ Aplicaciones
 Estilo
 Idioma
 Se apagará el sistema.
-¿Salir del OPL?
+¿Salir al Navegador/OSDSYS de la consola?
 ¿Cancelar actualización?
 %d: Disco duro no detectado
 %d: Disco duro no formateado
@@ -137,7 +137,7 @@ Acerca del OPL
 Desarrolladores
 Testeadores
 Ruta predeterminada dispositivo USB
-Dejar en blanco para salida hacia el menú de PS2
+Dejar en blanco para salida hacia el navegador de PS2
 Valor en minutos, 0 para desactivar el paro automático
 Paro automático rotación del Disco duro
 Modo de vídeo interfaz
@@ -206,3 +206,5 @@ Descargados ajustes predeterminados
 Inicio en %i s...
 Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
+Logotipo Playstation 2
+Sólo se mostrará si el juego es de la misma región que la consola

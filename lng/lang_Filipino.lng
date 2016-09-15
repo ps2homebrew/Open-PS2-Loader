@@ -1,9 +1,10 @@
-# Translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
+# Filipino translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Filipino
 Open PS2 Loader %s
 I-save ang mga pagbabago
 Likod
-Network Config
+Network config
 Advanced options
 <Walang values>
 Save ang mga setting...
@@ -18,11 +19,11 @@ Apps
 tema
 wika
 The system will be powered off.
-Exit OPL?
+Exit to Browser/OSDSYS?
 Cancel updating?
 %d: HardDisk Drive not detected
 %d: HardDisk Drive not formatted
-%d: Network startup error 
+%d: Network startup error
 %d: No network adaptor detected
 %d: Hindi makakonekta sa SMB server
 %d: Hindi makapag-log in sa SMB server
@@ -56,7 +57,7 @@ Huwag paganahin ang mga Kulay Debug
 Controller Walang natukoy na , naghihintay...
 Paganahin ang Cover Art
 Malapad na screen
-Power off
+
 Nilo-load ang config
 Sine-save ang config
 Simulan ang aparato
@@ -114,7 +115,7 @@ alisin sa pagkakakawit Syscalls
 Emulate DVD-DL
 Disable IGR
 High module storage
-Hide dev9 module
+Hide DEV9 module
 Ang pagbabago ng laki ay i-reformat ang VMC
 Lumikha
 Start
@@ -136,7 +137,7 @@ tungkol sa
 Coders
 Quality Assurance
 USB prefix landas
-Iwanang walang laman upang lumabas sa Browser
+Boots Custom ELF after an IGR
 Halaga sa (mga) minuto, 0 upang huwag paganahin iikot pababa
 Awtomatikong HDD paikutin pababa
 Video mode
@@ -172,7 +173,7 @@ Ethernet bilis at duplex setting
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-GSM Mga Setting
+GSM Settings
 paganahin GSM
 Toggles GSM ON or OFF
 VMODE
@@ -185,7 +186,7 @@ FMV Skip
 Skips Full Motion Videos
 Cheat Settings
 Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
+Let PS2RD Cheat Engine patch your games
 PS2RD Cheat Engine Mode
 Auto-select or Select game cheats
 Auto-select cheats
@@ -205,3 +206,5 @@ Downloaded Defaults
 Auto start in %i s...
 Auto start
 Value in second(s), 0 to disable auto start
+PS2 Logo
+Only displayed for a valid disc logo which matches the console's region

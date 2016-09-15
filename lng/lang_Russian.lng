@@ -1,5 +1,5 @@
 # Russian translation by druchapucha & frodosumkin
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Russian
 Open PS2 Loader %s
 Сохранить настройки
@@ -19,7 +19,7 @@ HDD-Игры
 Тема
 Язык
 Выключить консоль.
-Выйти из OPL?
+Выйти в браузер/OSDSYS?
 Отменить обновление?
 %d: HardDisk не опознан
 %d: HardDisk не отформатирован
@@ -71,7 +71,7 @@ HDD-Игры
 Запуск HDL сервера
 HDL сервер запускается...
 HDL сервер запущен…
-Failed to start HDL Server.
+Нажмите кнопку [X], чтобы прервать работу HDL сервера
 Выгрузка HDL сервера...
 ELF при вызове IGR
 Цвет фона
@@ -137,7 +137,7 @@ VMC файл существует
 Кодеры
 Гарантия качества
 Префикс пути для USB
-Оставьте пустым, чтобы выйти в меню PlayStaion 2
+Загрузить другой ELF, после IGR
 Значение в минутах, 0 для отключения функции
 Автоматическое отключение HDD
 Видеорежим
@@ -206,3 +206,5 @@ PS2RD Cheat Engine пропатчит вашу игру
 Автозапуск через %i s...
 Автозапуск
 Значение в секундах(ы), 0 чтобы выключить автопуск...
+PS2 логотип
+Отображается экран, который запускается при запуске игрового диска

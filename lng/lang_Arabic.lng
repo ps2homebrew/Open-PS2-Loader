@@ -1,5 +1,5 @@
-﻿# Arabic translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# Arabic Translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Arabic
 Open PS2 Loader %s
 تثبيت التغييرات
@@ -19,7 +19,7 @@ Open PS2 Loader %s
 تيمات
 لغات
 سيتم ايقاف تشغيل النظام
-الجروج من البرنامج ?
+Exit to Browser/OSDSYS?
 الغاء التحديث ?
 %d: لم يتم العثور على القرص الصلب
 %d: القرص المضغوط غير منسق
@@ -137,7 +137,7 @@ High module storage
 المبرمجون
 ضمان الجودة
 مكان بادئة USB
-ترك الفراغ للخروج للمتصفح
+Boots Custom ELF after an IGR
 النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
 الدوران المستمر الاوتوماتيكي لل HDD
 طريقة الفيديو
@@ -206,3 +206,5 @@ PS2RD
 البدء%i الاوتوماتيكي في  ثانية...
 البدء الاوتوماتيكي
 النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
+PS2 Logo
+Only displayed for a valid disc logo which matches the console's region

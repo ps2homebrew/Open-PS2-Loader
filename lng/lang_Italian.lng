@@ -1,5 +1,5 @@
-# Italian translation by jauffreBlades - @http://psx-scene.com/forums/members/jauffreblades/
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# Italian translation by jauffreblades - @http://psx-scene.com/forums/members/jauffreblades/
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Italian
 Open PS2 Loader %s
 Salva modifiche
@@ -19,7 +19,7 @@ Apps
 Tema
 Lingua
 Il sistema verrà spento.
-Uscire da OPL?
+Uscire al Browser/OSDSYS?
 Annullare l'aggiornamento?
 %d: Hard disk non rilevato
 %d: Hard disk non formattato
@@ -76,7 +76,7 @@ Server HDL in scaricamento dalla memoria...
 Esci su
 Colore di sfondo
 Colore testo
-- PS2 -
+- PS2 - 
 - Server SMB -
 Tipo di indirizzo IP
 Statico
@@ -137,7 +137,7 @@ Informazioni su
 Sviluppatori
 Controllo qualità
 Percorso prefisso USB
-Lasciare vuoto per uscire al browser
+Avvia ELF personalizzato dopo un IGR
 Valore in minuti, 0 per disabilitare lo spin down
 Spin down automatico HDD
 Modalità video
@@ -153,7 +153,7 @@ Percorso prefisso ETH
 Backspace
 Spazio
 Invio
-Modalità
+Modalità 
 Slot VMC 1
 Slot VMC 2
 ID gioco
@@ -206,3 +206,5 @@ Impostazioni di default scaricate
 Avvio automatico in %i s...
 Avvio automatico
 Valore in secondi, 0 per disabilitare l'avvio automatico
+Logo PS2
+Mostrato soltanto con un logo del disco valido e compatibile con la regione della console

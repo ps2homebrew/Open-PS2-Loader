@@ -1,5 +1,5 @@
 # Traditional Chinese translation by kane159 - kane159<kane12369@gmail.com
-# For Open PS2 Loader 0.9.3 stable release (rev851, commit e505136)
+# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Traditional Chinese
 Open PS2 Loader %s
 保存設置
@@ -19,7 +19,7 @@ ETH 遊戲
 主題
 語言
 系統電源將會關閉.
-離開 OPL?
+Exit to Browser/OSDSYS?
 取消更新?
 %d: 偵測不到硬碟
 %d: 硬碟沒有格式化
@@ -137,7 +137,7 @@ VMC %s 出錯, 繼續使用物理記憶卡嗎 (slot %d) ?
 Coders
 Quality Assurance
 USB 前墜路徑
-留空回到瀏覽器介面
+Boots Custom ELF after an IGR
 數值以分鐘計,設為 0 禁用降速
 自動 HDD 降速
 影片模式
@@ -206,3 +206,5 @@ PS2RD 金手指引擎模式
 將自動於 %i 秒後啟動...
 自動啟動
 以秒為單位,設為 0 來禁用自動啟動
+PS2 Logo
+Only displayed for a valid disc logo which matches the console's region

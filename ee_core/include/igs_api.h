@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with PS2rd.  If not, see <http://www.gnu.org/licenses/>.
+ * along with PS2 IGS.  If not, see <http://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -30,9 +30,8 @@
 #include <iopcontrol.h>
 #include "iopmgr.h"
 #include "modmgr.h"
-
 #include "util.h"
-
+#include <stdio.h>
 #include <libmc.h>
 
 #define MAXWAITTIME		0x1000000

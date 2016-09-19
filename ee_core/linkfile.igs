@@ -14,7 +14,7 @@
 ENTRY(_start);
 
 SECTIONS {
-	.igs_engine 0x00084000 : {
+	.igs_engine 0x00082000 : {
 		libmc.*(*)
 		igs_api.*(*)
 	}

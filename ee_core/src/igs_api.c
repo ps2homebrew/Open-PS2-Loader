@@ -17,7 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with PS2rd.  If not, see <http://www.gnu.org/licenses/>.
+ * along with PS2 IGS.  If not, see <http://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -44,13 +44,41 @@ _IGS_ENGINE_ void D2_CHCR_Init(void) {
 	*D2_SADR = 0x00000000;
 }
 
- _IGS_ENGINE_ void BlinkError(u8 x) {
+_IGS_ENGINE_ void u64tohexstr(u64 input, char *output)
+{
+	int i = 16;	//Number of digits (output)
+	do{
+		i--;
+		output[i] = "0123456789ABCDEF"[input % 16];
+		input = input/16;
+	}while( input > 0);
+	while( i > 0){
+		i--;
+		output[i] = '0';
+	}
+}
+
+_IGS_ENGINE_ void u16todecstr(int input, char *output)
+{
+	int i = 4;	//Number of digits (output)
+	do{
+		i--;
+		output[i] = "0123456789"[input % 10];
+		input = input/10;
+	}while( input > 0);
+	while( i > 0){
+		i--;
+		output[i] = '0';
+	}
+}
+
+_IGS_ENGINE_ void BlinkError(u8 x) {
 	u8 i;
 	while(1){
 		for(i=1;i<=x;i++){
 			delay(1);
 			GS_BGCOLOUR=0x0000FF;
-			delay(2);
+			delay(1);
 			GS_BGCOLOUR=0;
 		}
 	delay(4);
@@ -58,9 +86,9 @@ _IGS_ENGINE_ void D2_CHCR_Init(void) {
 	}
 }
 
-_IGS_ENGINE_ int GsSetDefStoreImage(GsStoreImage *sp, u16 sbp, u16 sbw, u16 spsm, u16 width, u16 height) {
-	sp->vifcode[0] = VIF1_NOP(0);
-	sp->vifcode[1] = VIF1_MSKPATH3(0x8000, 0);
+_IGS_ENGINE_ int GsSetDefStoreImage(GsStoreImage *sp, u16 sbp, u16 sbw, u16 spsm, u16 width, u16 height, u16 ssax, u16 ssay) {
+	sp->vifcode[0] = VIF1_FLUSHA(0); // FLUSHA should be before MSKPATH3
+	sp->vifcode[1] = VIF1_MSKPATH3(0x8000, 0); //This is done with PATH3 GIF mask, earlier.
 	sp->vifcode[2] = VIF1_FLUSHA(0);
 	sp->vifcode[3] = VIF1_DIRECT(6, 0);
 
@@ -70,26 +98,38 @@ _IGS_ENGINE_ int GsSetDefStoreImage(GsStoreImage *sp, u16 sbp, u16 sbw, u16 spsm
 	sp->giftag.NREG = 1;
 	sp->giftag.REGS0 = 0xe; // GIF Packed A+D (Address+Data) GS Packet
 
-	*(u64 *)&sp->bitbltbuf = GS_SET_BITBLTBUF(sbp, sbw, spsm, 0, 0, 0);
+	*(u64 *)&sp->bitbltbuf = GS_SET_BITBLTBUF(sbp, sbw, spsm, 0, 0, 0); 
 	sp->bitbltbufaddr = (u64)GS_BITBLTBUF;
 
-	*(u64 *)&sp->trxpos = GS_SET_TRXPOS(0, 0, 0, 0, 0);
+	*(u64 *)&sp->trxpos = GS_SET_TRXPOS(ssax, ssay, 0, 0, 0);
 	sp->trxposaddr = (u64)GS_TRXPOS;
 
 	*(u64 *)&sp->trxreg = GS_SET_TRXREG(width, height);
 	sp->trxregaddr = (u64)GS_TRXREG;
 
-	*(u64 *)&sp->finish = (u64) 0;
+	*(u64 *)&sp->finish = (u64) 0; 
 	sp->finishaddr = (u64)GS_FINISH;
 
 	*(u64 *)&sp->trxdir = GS_SET_TRXDIR(1);
 	sp->trxdiraddr = (u64)GS_TRXDIR;
 
+	#if 0
+	while ((*GS_CSR & 0xC000) != (0x01 << 14)) { //Wait while FIFO isn't empty.
+		if (i > 0x1000) {
+			DPRINTF("\nFIFO_NOT EMPTY= %X ", (u32)*GS_CSR );
+			break;
+		}
+		i++;
+		nopdelay();
+	}
+	#endif
+
 	return 0;
 }
 
 _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
-	static	u32 ReinitPATH3Transfers[4] __attribute__((aligned(16))) = {0x06000000, 0x00000000, 0x00000000, 0x00000000 };
+	//VIF1 packet for re-enabling of PATH3 (and a 'FLUSHA' before it).
+	static	u32 ReinitPATH3Transfers[4] __attribute__((aligned(16))) = {0x13000000, 0x06000000, 0x00000000, 0x00000000 };
 
 	u32 width;
 	u32 height;
@@ -147,15 +187,15 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 	//Disable Interrupts
 	//__asm__ __volatile__(" di;");
 
-	delay(2);GS_BGCOLOUR = 0xE5FFCC;	//Light Green
+	delay(1);GS_BGCOLOUR = 0xE5FFCC;	//Light Green
 	//Init DMA Channel #1 (VIF1)
 	D1_CHCR_Init();
 	
 	//Init DMA Channel #2 (GIF)
-	delay(2);GS_BGCOLOUR = 0x00FF00;	//Green
+	delay(1);GS_BGCOLOUR = 0x00FF00;	//Green
 	D2_CHCR_Init();
 	
-	delay(2);GS_BGCOLOUR = 0x006400;	//Dark Green
+	delay(1);GS_BGCOLOUR = 0x006400;	//Dark Green
 	// Wait DMA to be ready (STR=0)
 	FlushCache(0);
 	currwaittime = 0;
@@ -168,7 +208,7 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 		}
 	}
 
-	delay(2);GS_BGCOLOUR = 0xCCFFFF;	//Light Yellow
+	delay(1);GS_BGCOLOUR = 0xCCFFFF;	//Light Yellow
 	// Setup and start DMA transfer to VIF1
 	FlushCache(0);
 	DPUT_D1_SIZE(7);
@@ -176,7 +216,7 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 	DPUT_D1_CHCR((1 | (1<<8)));
 
 /*
-	delay(2);GS_BGCOLOUR = 0x00FFFF;	//Yellow
+	delay(1);GS_BGCOLOUR = 0x00FFFF;	//Yellow
 	// Wait DMA to be ready (STR=0)
 	FlushCache(0);
 	currwaittime = 0;
@@ -190,7 +230,7 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 	}
 */
 	
-	delay(2);GS_BGCOLOUR = 0xCCE5FF;	//Light Orange
+	delay(1);GS_BGCOLOUR = 0xCCE5FF;	//Light Orange
 	FlushCache(0);
 	// Change to the VIF1->Memory direction
 	*VIF1_STAT = 0x00800000;
@@ -199,7 +239,7 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 	
 	for(i = 0; i < qwordslices;i ++) {
 
-		delay(2);GS_BGCOLOUR = 0xFFCCFF;	//Light Magenta
+		delay(1);GS_BGCOLOUR = 0xFFCCFF;	//Light Magenta
 		// Setup and start DMA transfer from VIF1
 		FlushCache(0);
 		DPUT_D1_SIZE(qwords);
@@ -207,7 +247,7 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 		DPUT_D1_CHCR(1<<8);
 
 /*
-		delay(2);GS_BGCOLOUR = 0xFF00FF;	//Magenta
+		delay(1);GS_BGCOLOUR = 0xFF00FF;	//Magenta
 		// Wait DMA to be ready (STR=0)
 		FlushCache(0);
 		currwaittime = 0;
@@ -222,7 +262,7 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 */
 
 /*
-		delay(2);GS_BGCOLOUR = 0x0000FF;	//Red
+		delay(1);GS_BGCOLOUR = 0x0000FF;	//Red
 		// Wait VIF1-FIFO to empty and become idle
 		FlushCache(0);
 		currwaittime = 0;
@@ -235,18 +275,18 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 			}
 		}
 */
-		delay(2);GS_BGCOLOUR = 0x0008B;	//Dark Red
+		delay(1);GS_BGCOLOUR = 0x0008B;	//Dark Red
 		buffer += qwords;
 
 	}
 
-	delay(2);GS_BGCOLOUR = 0xFFFFCC;	//Light Blue
+	delay(1);GS_BGCOLOUR = 0xFFFFCC;	//Light Blue
 	// Restore VIF1 and VIF1 FIFO to normal direction
 	FlushCache(0);
 	*VIF1_STAT = 0;
 	*GS_BUSDIR = 0;
 
-	delay(2);GS_BGCOLOUR = 0xFF0000;	//Blue
+	delay(1);GS_BGCOLOUR = 0xFF0000;	//Blue
 	// Reinit PATH3 Transfers
 	FlushCache(0);
 	DPUT_VIF1_FIFO(*(u128 *)ReinitPATH3Transfers);
@@ -255,7 +295,12 @@ _IGS_ENGINE_ int GsExecStoreImage(GsStoreImage *sp, u128 *buffer) {
 	return 0;
 }
 
-_IGS_ENGINE_ int takeIGS(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer) {
+_IGS_ENGINE_ int TakeIGS(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer) {
+
+	delay(2);GS_BGCOLOUR = 0x808080;	//Gray
+	delay(2);GS_BGCOLOUR = 0x0000FF;	//Red
+	delay(2);GS_BGCOLOUR = 0x00FF00;	//Green
+	delay(2);GS_BGCOLOUR = 0x808080;	//Gray
 
 	u32 width;
 	u32 pixel_size = 0;
@@ -299,13 +344,19 @@ _IGS_ENGINE_ int takeIGS(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer) {
 		BlinkError(8);//return -1;
 
 	// Transmit image from local buffer (GS VRAM) to host buffer (EE RAM)
-	GsSetDefStoreImage(&gs_simage, sbp, sbw, spsm, width, height);
+	GsSetDefStoreImage(&gs_simage, sbp, sbw, spsm, width, height, 0, 0);
 	GsExecStoreImage(&gs_simage, buffer);
 
 	return 0;
 }
 
-_IGS_ENGINE_ int saveIGS_file(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer, u8 DOUBLE_HEIGHT_adaptation) {
+_IGS_ENGINE_ int SaveBitmapFile(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer, u8 DOUBLE_HEIGHT_adaptation) {
+
+	delay(2);GS_BGCOLOUR = 0xFFFFFF;	//White
+	delay(2);GS_BGCOLOUR = 0x0000FF;	//Red
+	delay(2);GS_BGCOLOUR = 0x00FF00;	//Green
+	delay(2);GS_BGCOLOUR = 0xFFFFFF;	//White
+
 	//  0000000001111111111222222
 	//  1234567890123456789012345
 	// "mc1:/XXXX_yyy.zz_SCR.bmp"
@@ -335,7 +386,7 @@ _IGS_ENGINE_ int saveIGS_file(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer
 
 	BmpHeader *bh;
 
-	delay(2);GS_BGCOLOUR = 0xEE82EE;	//Violet
+	delay(1);GS_BGCOLOUR = 0xEE82EE;	//Violet
 	switch(spsm)
 	{
 		case GS_PSM_CT32:
@@ -371,7 +422,7 @@ _IGS_ENGINE_ int saveIGS_file(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer
 	file_size = image_size + 54;
 	bits_per_pixel = pixel_size * 8;
 
-	delay(2);GS_BGCOLOUR = 0x800080;	//Purple
+	delay(1);GS_BGCOLOUR = 0x800080;	//Purple
 	switch(spsm)
 	{
 		case GS_PSM_CT32:
@@ -419,13 +470,13 @@ _IGS_ENGINE_ int saveIGS_file(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer
 	_strcat(PathFilenameExtension, GameID);
 	_strcat(PathFilenameExtension, "_SCR.bmp");
 	
-	delay(2);GS_BGCOLOUR = 0x000080;	//Maroon
+	delay(1);GS_BGCOLOUR = 0x000080;	//Maroon
 	// Open file
 	file_handle = fioOpen(PathFilenameExtension, O_CREAT|O_WRONLY);
 	if(file_handle < 0)
 			BlinkError(11);//return -1;
 
-	delay(2);GS_BGCOLOUR = 0xC0C0C0;	//Silver
+	delay(1);GS_BGCOLOUR = 0xC0C0C0;	//Silver
 	// Write Bitmap Header
 	//(first, write the BMP Header ID ouside of struct, due to alignment issues...)
 	fioWrite(file_handle, id, 2);
@@ -448,10 +499,10 @@ _IGS_ENGINE_ int saveIGS_file(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer
 	// Wait until the preceding loads are completed
 	__asm__ __volatile__(" sync.l; sync.p;");
 	
-	delay(2);GS_BGCOLOUR = 0xFFFF00;	//Cyan
+	delay(1);GS_BGCOLOUR = 0xFFFF00;	//Cyan
 	fioWrite(file_handle, bh, 52);
 	
-	delay(2);GS_BGCOLOUR = 0xFF00FF;	//Magenta
+	delay(1);GS_BGCOLOUR = 0xFF00FF;	//Magenta
 	//Write image in reverse order (since BMP is written Left to Right, Bottom to Top)
 	size = width * pixel_size;
 	for(i = 0; i < height; i++) {
@@ -461,14 +512,20 @@ _IGS_ENGINE_ int saveIGS_file(u16 sbp, u8 sbw, u32 height, u8 spsm, void *buffer
 		GS_BGCOLOUR = (0xFFFFFF - i * 0x10101);
 	}
 
-	delay(2);GS_BGCOLOUR = 0x000000;	//Black
+	delay(1);GS_BGCOLOUR = 0x000000;	//Black
 	// Close file
 	fioClose(file_handle);
 
 	return 0;
 }
 
-_IGS_ENGINE_ int save_gs_dump_file(void) {
+_IGS_ENGINE_ int SaveDumpFile(void) {
+
+	delay(2);GS_BGCOLOUR = 0x000000;	//Black
+	delay(2);GS_BGCOLOUR = 0x0000FF;	//Red
+	delay(2);GS_BGCOLOUR = 0x00FF00;	//Green
+	delay(2);GS_BGCOLOUR = 0x000000;	//Black
+
 	//  000000000111111111122222
 	//  123456789012345678901234
 	// "mc1:/XXXX_yyy.zz_GS.dmp"
@@ -479,7 +536,7 @@ _IGS_ENGINE_ int save_gs_dump_file(void) {
 	_strcat(PathFilenameExtension, GameID);
 	_strcat(PathFilenameExtension, "_GS.dmp");
 
-	delay(2);GS_BGCOLOUR = 0x00FFFF;	//Yellow
+	delay(1);GS_BGCOLOUR = 0x00FFFF;	//Yellow
 	// Open file
 	file_handle = fioOpen(PathFilenameExtension, O_CREAT|O_WRONLY);
 	if(file_handle < 0)
@@ -487,22 +544,115 @@ _IGS_ENGINE_ int save_gs_dump_file(void) {
         
 	fioWrite(file_handle, (u8 *)&Source_VModeSettings, 12);
 
-	fioWrite(file_handle, (u8 *)&Source_GSRegisterValues, 56);
+	fioWrite(file_handle, (u8 *)&Source_GSRegisterValues, 88);
 
-	delay(2);GS_BGCOLOUR = 0xFFFF00;	//Cyan
+	delay(1);GS_BGCOLOUR = 0xFFFF00;	//Cyan
 	// Close file
 	fioClose(file_handle);
 
-	delay(2);GS_BGCOLOUR = 0x000000;	//Black
+	delay(1);GS_BGCOLOUR = 0x000000;	//Black
+
+	return 0;
+}
+
+_IGS_ENGINE_ int SaveTextFile(void) {
+
+	delay(2);GS_BGCOLOUR = 0x404040;	//Dark gray
+	delay(2);GS_BGCOLOUR = 0x0000FF;	//Red
+	delay(2);GS_BGCOLOUR = 0x00FF00;	//Green
+	delay(2);GS_BGCOLOUR = 0x404040;	//Dark gray
+
+	//  000000000111111111122222
+	//  123456789012345678901234
+	// "mc1:/XXXX_yyy.zz_GS.txt"
+	char PathFilenameExtension[24];
+	s32 file_handle;
+
+	char text[1024];
+	char u64text[16];
+	char u16text[4];
+
+	int i = 0;
+	u64 pmode = Source_GSRegisterValues.pmode;
+	u64 smode1 = Source_GSRegisterValues.smode1; 
+	u64 smode2 = Source_GSRegisterValues.smode2;
+	u64 srfsh = Source_GSRegisterValues.srfsh;
+	u64 synch1 = Source_GSRegisterValues.synch1;
+	u64 synch2 = Source_GSRegisterValues.synch2;
+	u64 syncv = Source_GSRegisterValues.syncv;
+	u64 dispfb1 = Source_GSRegisterValues.dispfb1;
+	u64 display1 = Source_GSRegisterValues.display1;
+	u64 dispfb2 = Source_GSRegisterValues.dispfb2;
+	u64 display2 = Source_GSRegisterValues.display2;
+
+	_strcpy(PathFilenameExtension, "mc1:/");
+	_strcat(PathFilenameExtension, GameID);
+	_strcat(PathFilenameExtension, "_GS.txt");
+
+	delay(1);GS_BGCOLOUR = 0x00FFFF;	//Yellow
+	// Open file
+	file_handle = fioOpen(PathFilenameExtension, O_CREAT|O_WRONLY);
+	if(file_handle < 0)
+		BlinkError(12);//return -1;
+
+	_strcpy(text, "PS2 IGS (InGame Screenshot)\n---------------------------\n");
+	_strcat(text, GameID);
+	_strcat(text, "\n\nGS Registers\n------------");
+	_strcat(text, "\nPMODE    0x"); u64tohexstr(pmode   , u64text); _strcat(text, u64text);
+		_strcat(text, " ALP="  );u16todecstr((pmode    >>  8 ) & 0xFF  , u16text ); _strcat(text, u16text);
+		_strcat(text, " SLBG=" );u16todecstr((pmode    >>  7 ) & 0x1   , u16text ); _strcat(text, u16text);
+		_strcat(text, " AMOD=" );u16todecstr((pmode    >>  6 ) & 0x1   , u16text ); _strcat(text, u16text);
+		_strcat(text, " MMOD=" );u16todecstr((pmode    >>  5 ) & 0x1   , u16text ); _strcat(text, u16text);
+		_strcat(text, " CRTMD=");u16todecstr((pmode    >>  2 ) & 0x7   , u16text ); _strcat(text, u16text);
+		_strcat(text, " EN2="  );u16todecstr((pmode    >>  1 ) & 0x1   , u16text ); _strcat(text, u16text);
+		_strcat(text, " EN1="  );u16todecstr((pmode    >>  0 ) & 0x1   , u16text ); _strcat(text, u16text);
+	_strcat(text, "\nSMODE1   0x"); u64tohexstr(smode1  , u64text); _strcat(text, u64text);
+	_strcat(text, "  SMODE2   0x"); u64tohexstr(smode2  , u64text); _strcat(text, u64text);
+	_strcat(text, "  SRFSH    0x"); u64tohexstr(srfsh   , u64text); _strcat(text, u64text);
+	_strcat(text, "\nSYNCH1   0x"); u64tohexstr(synch1  , u64text); _strcat(text, u64text);
+	_strcat(text, "  SYNCH2   0x"); u64tohexstr(synch2  , u64text); _strcat(text, u64text);
+	_strcat(text, "\nSYNCV    0x"); u64tohexstr(syncv   , u64text); _strcat(text, u64text);
+	_strcat(text, "\nDISPFB1  0x"); u64tohexstr(dispfb1 , u64text); _strcat(text, u64text);
+		_strcat(text, " DBY=");  u16todecstr((dispfb1  >> 43 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " DBX=");  u16todecstr((dispfb1  >> 32 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " PSM=");  u16todecstr((dispfb1  >> 15 ) & 0x1F  , u16text ); _strcat(text, u16text);
+		_strcat(text, " FBW=");  u16todecstr((dispfb1  >>  9 ) & 0x3F  , u16text ); _strcat(text, u16text);
+		_strcat(text, " FBP=");  u16todecstr((dispfb1  >>  0 ) & 0x1FF , u16text ); _strcat(text, u16text);
+	_strcat(text, "  DISPLAY1 0x"); u64tohexstr(display1, u64text); _strcat(text, u64text);
+		_strcat(text, " DH=");   u16todecstr(( display1 >> 44 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " DW=");   u16todecstr(( display1 >> 32 ) & 0xFFF , u16text ); _strcat(text, u16text);
+		_strcat(text, " MAGV="); u16todecstr(( display1 >> 27 ) & 0x3   , u16text ); _strcat(text, u16text);
+		_strcat(text, " MAGH="); u16todecstr(( display1 >> 23 ) & 0xF   , u16text ); _strcat(text, u16text);
+		_strcat(text, " DY=");   u16todecstr(( display1 >> 12 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " DX=");   u16todecstr(( display1 >> 0  ) & 0xFFF , u16text ); _strcat(text, u16text);
+	_strcat(text, "\nDISPFB2  0x"); u64tohexstr(dispfb2 , u64text); _strcat(text, u64text);
+		_strcat(text, " DBY=");  u16todecstr((dispfb2  >> 43 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " DBX=");  u16todecstr((dispfb2  >> 32 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " PSM=");  u16todecstr((dispfb2  >> 15 ) & 0x1F  , u16text ); _strcat(text, u16text);
+		_strcat(text, " FBW=");  u16todecstr((dispfb2  >>  9 ) & 0x3F  , u16text ); _strcat(text, u16text);
+		_strcat(text, " FBP=");  u16todecstr((dispfb2  >>  0 ) & 0x1FF , u16text ); _strcat(text, u16text);
+	_strcat(text, "  DISPLAY2 0x"); u64tohexstr(display2, u64text); _strcat(text, u64text);
+		_strcat(text, " DH=");   u16todecstr(( display2 >> 44 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " DW=");   u16todecstr(( display2 >> 32 ) & 0xFFF , u16text ); _strcat(text, u16text);
+		_strcat(text, " MAGV="); u16todecstr(( display2 >> 27 ) & 0x3   , u16text ); _strcat(text, u16text);
+		_strcat(text, " MAGH="); u16todecstr(( display2 >> 23 ) & 0xF   , u16text ); _strcat(text, u16text);
+		_strcat(text, " DY=");   u16todecstr(( display2 >> 12 ) & 0x7FF , u16text ); _strcat(text, u16text);
+		_strcat(text, " DX=");   u16todecstr(( display2 >> 0  ) & 0xFFF , u16text ); _strcat(text, u16text);
+
+	while(text[i]!='\0') {
+		fioPutc(file_handle, text[i++]);
+	}
+                     
+	delay(1);GS_BGCOLOUR = 0xFFFF00;	//Cyan
+	// Close file
+	fioClose(file_handle);
+
+	delay(1);GS_BGCOLOUR = 0x000000;	//Black
 
 	return 0;
 }
 
  _IGS_ENGINE_ int InGameScreenshot(void) {
-
-	delay(2);GS_BGCOLOUR = 0x0000FF;	//Red
-	delay(2);GS_BGCOLOUR = 0x00FF00;	//Green
-	delay(2);GS_BGCOLOUR = 0xFF0000;	//Blue
 
 	u64 pmode;
 	u64 smode2;
@@ -537,7 +687,10 @@ _IGS_ENGINE_ int save_gs_dump_file(void) {
 #endif
 	
 	//Save GS source VModes/Registers Dump File (for debugging purposes)
-	ret = save_gs_dump_file();
+	ret = SaveDumpFile();
+
+	//Save GS source VModes/Registers text Dump File (for debugging purposes)
+	ret = SaveTextFile();
 
 	pmode = Source_GSRegisterValues.pmode;
 	smode2 = Source_GSRegisterValues.smode2;
@@ -563,10 +716,10 @@ _IGS_ENGINE_ int save_gs_dump_file(void) {
 	sbp = (fbp * 2048) / 64;
 
 	//Take IGS
-	ret = takeIGS( sbp, fbw, dh+1, psm, ((void *)0x00100000) );
+	ret = TakeIGS( sbp, fbw, dh+1, psm, ((void *)0x00100000) );
 
-	//Save IGS to file
-	ret = saveIGS_file( sbp, fbw, dh+1, psm, ((void *)0x00100000), DOUBLE_HEIGHT_adaptation );
+	//Save IGS as a Bitmap File
+	ret = SaveBitmapFile( sbp, fbw, dh+1, psm, ((void *)0x00100000), DOUBLE_HEIGHT_adaptation );
 
 	// Exit services
 	fioExit();
@@ -576,7 +729,7 @@ _IGS_ENGINE_ int save_gs_dump_file(void) {
 	FlushCache(0);
 	FlushCache(2);
 
-	delay(2);GS_BGCOLOUR = 0x000000;	//Black
+	delay(1);GS_BGCOLOUR = 0x000000;	//Black
 
 	return 0;
 }

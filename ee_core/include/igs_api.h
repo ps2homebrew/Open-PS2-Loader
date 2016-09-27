@@ -34,196 +34,87 @@
 #include <stdio.h>
 #include <libmc.h>
 
-#define MAXWAITTIME		0x1000000
-
-//Channel #1 (VIF1)
-#define D1_CHCR			(volatile u32 *)0x10009000
-#define D1_MADR         (volatile u32 *)0x10009010
-#define D1_SIZE         (volatile u32 *)0x10009020
-#define D1_TADR         (volatile u32 *)0x10009030
-#define D1_ASR0         (volatile u32 *)0x10009040
-#define D1_ASR1         (volatile u32 *)0x10009050
-#define D1_SADR         (volatile u32 *)0x10009080
-
-#define VIF1_STAT		(volatile u32 *)0x10003C00
-#define VIF1_FBRST      (volatile u32 *)0x10003C10
-#define VIF1_FIFO       (volatile u128 *)0x10005000
-
-
-//Channel #2 (GIF)
-#define D2_CHCR			(volatile u32 *)0x1000A000
-#define D2_MADR         (volatile u32 *)0x1000A010
-#define D2_SIZE         (volatile u32 *)0x1000A020
-#define D2_TADR         (volatile u32 *)0x1000A030
-#define D2_ASR0         (volatile u32 *)0x1000A040
-#define D2_ASR1         (volatile u32 *)0x1000A050
-#define D2_SADR         (volatile u32 *)0x1000A080
-
-#define GIF_CTRL		(volatile u32 *)0x10003000		// GIF Control Register
-#define GIF_STAT		(volatile u32 *)0x10003020		// GIF Status Register
-
-//GS Priviledge Registers
-#define GS_CSR			(volatile u64 *)0x12001000		// GS CSR (GS System Status) Register
-#define GS_IMR			(volatile u64 *)0x12001010		// GS IMR (GS Interrupt Mask) Register
-#define GS_BUSDIR		(volatile u64 *)0x12001040		// GS BUSDIR (GS Bus Direction) Register
-
 #define GS_BITBLTBUF    0x50
 #define GS_TRXPOS       0x51
 #define GS_TRXREG       0x52
 #define GS_TRXDIR       0x53
 #define GS_FINISH       0x61
 
-#define GS_SET_BITBLTBUF(sbp, sbw, spsm, dbp, dbw, dpsm) \
-    ((u64)(sbp)         | ((u64)(sbw) << 16) | \
-    ((u64)(spsm) << 24) | ((u64)(dbp) << 32) | \
-    ((u64)(dbw) << 48)  | ((u64)(dpsm) << 56))
-#define GS_SET_TRXPOS(ssax, ssay, dsax, dsay, dir) \
-    ((u64)(ssax)        | ((u64)(ssay) << 16) | \
-    ((u64)(dsax) << 32) | ((u64)(dsay) << 48) | \
-    ((u64)(dir) << 59))
-#define GS_SET_TRXREG(rrw, rrh) \
-    ((u64)(rrw) | ((u64)(rrh) << 32))
-#define GS_SET_TRXDIR(xdr) ((u64)(xdr))
+//Pixel storage format
+#define GS_PSM_CT32 0x00	//32 bits = 4 bytes		Example: SLUS_202.73 (Namco Museum 50th Anniversary)
+#define GS_PSM_CT24 0x01	//24 bits = 3 bytes		Example: SLPS_250.88 (Final Fantasy X International)
+#define GS_PSM_CT16 0x02	//16 bits = 2 bytes		Example: SLUS_215.56 (Konami Kids Playground: Dinosaurs Shapes & Colors)
+#define GS_PSM_CT16S 0x0A	//16 bits = 2 bytes		Example: SLUS_215.41 (Ratatouille)
 
-#define DPUT_D1_CHCR(x)		(*D1_CHCR = (x))
-#define DPUT_D1_MADR(x)		(*D1_MADR = (x))
-#define DPUT_D1_SIZE(x)		(*D1_SIZE = (x))
-#define DPUT_D1_TADR(x)		(*D1_TADR = (x))
+//Channel #1 (VIF1)
+#define GS_VIF1_STAT           ((volatile u32 *)(0x10003c00))	// VIF Status Register
+#define GS_VIF1_STAT_FDR       (1<< 23)						// VIF1-FIFO transfer direction: VIF1 -> Main memory/SPRAM"
+#define GS_VIF1_MSKPATH3(mask) ((u32)(mask) | ((u32)0x06 << 24))
+#define GS_VIF1_NOP            0
+#define GS_VIF1_FLUSHA         (((u32)0x13 << 24))
+#define GS_VIF1_DIRECT(count)  ((u32)(count) | ((u32)(0x50) << 24))
+#define GS_VIF1_FIFO           ((volatile u128 *)(0x10005000))
 
-#define DGET_VIF1_STAT()	(*VIF1_STAT)
-#define DGET_VIF1_FIFO()	(*VIF1_FIFO)
-#define DPUT_VIF1_FBRST(x)	(*VIF1_FBRST = (x))
-#define DPUT_VIF1_FIFO(x)	(*VIF1_FIFO = (x))
+//DMA CH1 REGISTERS (Linked to VIF1)
+#define GS_D1_CHCR             ((volatile u32 *)(0x10009000))
+#define GS_D1_MADR             ((volatile u32 *)(0x10009010))
+#define GS_D1_QWC              ((volatile u32 *)(0x10009020))
+#define GS_D1_TADR             ((volatile u32 *)(0x10009030))
+#define GS_D1_ASR0             ((volatile u32 *)(0x10009040))
+#define GS_D1_ASR1             ((volatile u32 *)(0x10009050))
 
-#define DGET_GIF_STAT()		(*GIF_STAT)
-#define DPUT_GIF_CTRL(x)	(*GIF_CTRL = (x))
+//Channel #2 (GIF)
+#define GS_GIF_AD    0x0e
 
-#define VIF1_NOP(irq)			((u32)(irq) << 31)
-#define VIF1_MSKPATH3(msk, irq)	((u32)(msk) | ((u32)0x06 << 24) | ((u32)(irq) << 31))
-#define VIF1_FLUSHA(irq)		(((u32)0x13 << 24) | ((u32)(irq) << 31))
-#define VIF1_DIRECT(count, irq)	((u32)(count) | ((u32)(0x50) << 24) | ((u32)(irq) << 31))
+#define GS_GIFTAG(NLOOP,EOP,PRE,PRIM,FLG,NREG) \
+	((u64)(NLOOP) << 0)   | \
+	((u64)(EOP)   << 15)  | \
+	((u64)(PRE)   << 46)  | \
+	((u64)(PRIM)  << 47)  | \
+	((u64)(FLG)   << 58)  | \
+	((u64)(NREG)  << 60)
 
-#define GIF_CLEAR_TAG(tp)		(*(u128 *)(tp) = (u128)0)
+//GS Registers
+#define GS_GSBITBLTBUF_SET(sbp, sbw, spsm, dbp, dbw, dpsm) \
+	((u64)(sbp)         | ((u64)(sbw) << 16) | \
+	((u64)(spsm) << 24) | ((u64)(dbp) << 32) | \
+	((u64)(dbw) << 48)  | ((u64)(dpsm) << 56))
 
-#define DPUT_GS_CSR(x)          (*GS_CSR = (x))
-#define DPUT_GS_IMR(x)          (*GS_IMR = (x))
+#define GS_GSTRXREG_SET(rrw, rrh) \
+	((u64)(rrw) | ((u64)(rrh) << 32))
 
-/// R8 G8 B8 A8 (RGBA32) Texture
-#define GS_PSM_CT32 0x00
-/// R8 G8 B8 (RGB24) Texture
-#define GS_PSM_CT24 0x01
-/// RGBA16 Texture
-#define GS_PSM_CT16 0x02
-/// RGBA16 Texture ?
-#define GS_PSM_CT16S 0x0A
-/// 8 Bit Texture with CLUT
-#define GS_PSM_T8 0x13
-/// 8 Bit Texture with CLUT ?
-#define GS_PSM_T8H 0x1B
-/// 4 Bit Texture with CLUT
-#define GS_PSM_T4 0x14
-/// 4 Bit Texture with CLUT ?
-#define GS_PSM_T4HL 0x24
-/// 4 Bit Texture with CLUT ?
-#define GS_PSM_T4HH 0x2C
+#define GS_GSTRXPOS_SET(ssax, ssay, dsax, dsay, dir) \
+	((u64)(ssax)        | ((u64)(ssay) << 16) | \
+	((u64)(dsax) << 32) | ((u64)(dsay) << 48) | \
+	((u64)(dir) << 59))
 
-#define GET_PMODE_EN1(x)	(u8)(( x >> 0  ) & 0x1  )
-#define GET_PMODE_EN2(x)	(u8)(( x >> 1  ) & 0x1  )
-#define GET_DISPFB_FBP(x)	(u32)(( x >> 0  ) & 0x1FF )
-#define GET_DISPFB_FBW(x)	(u8)(( x >> 9  ) & 0x3F  )
-#define GET_DISPFB_PSM(x)	(u8)(( x >> 15 ) & 0x1F  )
-#define GET_DISPFB_DBX(x)	(u32)(( x >> 32 ) & 0x7FF )
-#define GET_DISPFB_DBY(x)	(u32)(( x >> 43 ) & 0x7FF )
-#define GET_DISPLAY_DH(x)	(u32)(( x >> 44 ) & 0x7FF )
+#define GS_GSTRXDIR_SET(xdr) ((u64)(xdr))
 
-#define BGR2RGB16(x)		(u16)( (x & 0x8000) | ((x << 10) & 0x7C00) | (x & 0x3E0) | ((x >> 10) & 0x1F) )
-#define BGR2RGB32(x)		(u32)( ((x >> 16) & 0xFF) | ((x << 16) & 0xFF0000) | (x & 0xFF00FF00) )
+#define GS_GSBITBLTBUF         0x50
+#define GS_GSFINISH            0x61
+#define GS_GSTRXPOS            0x51
+#define GS_GSTRXREG            0x52
+#define GS_GSTRXDIR            0x53
 
-typedef struct {
-    u64 NLOOP:15;
-    u64 EOP:1;
-    u64 pad16:16;
-    u64 id:14;
-    u64 PRE:1;
-    u64 PRIM:11;
-    u64 FLG:2;
-    u64 NREG:4;
-    u64 REGS0:4;
-    u64 REGS1:4;
-    u64 REGS2:4;
-    u64 REGS3:4;
-    u64 REGS4:4;
-    u64 REGS5:4;
-    u64 REGS6:4;
-    u64 REGS7:4;
-    u64 REGS8:4;
-    u64 REGS9:4;
-    u64 REGS10:4;
-    u64 REGS11:4;
-    u64 REGS12:4;
-    u64 REGS13:4;
-    u64 REGS14:4;
-    u64 REGS15:4;
-} GifTag __attribute__((aligned(16)));
+//GS Priviledge Registers
+#define GS_CSR_FINISH			(1 << 1)
+#define GS_CSR					(volatile u64 *)0x12001000		// GS CSR (GS System Status) Register
+#define GS_IMR					(volatile u64 *)0x12001010		// GS IMR (GS Interrupt Mask) Register
+#define GS_BUSDIR				(volatile u64 *)0x12001040		// GS BUSDIR (GS Bus Direction) Register
 
-typedef struct {
-    u64 SBP:14;
-    u64 pad14:2;
-    u64 SBW:6;
-    u64 pad22:2;
-    u64 SPSM:6;
-    u64 pad30:2;
-    u64 DBP:14;
-    u64 pad46:2;
-    u64 DBW:6;
-    u64 pad54:2;
-    u64 DPSM:6;
-    u64 pad62:2;
-} GsBitbltbuf;
+#define GET_PMODE_EN1(x)		(u8 )(( x >> 0  ) & 0x1   )
+#define GET_PMODE_EN2(x)		(u8 )(( x >> 1  ) & 0x1   )
+#define GET_SMODE2_INTFFMD(x)	(u8 )(( x >> 0  ) & 0x3   )
+#define GET_DISPFB_FBP(x)		(u16)(( x >> 0  ) & 0x1FF )
+#define GET_DISPFB_FBW(x)		(u8 )(( x >> 9  ) & 0x3F  )
+#define GET_DISPFB_PSM(x)		(u8 )(( x >> 15 ) & 0x1F  )
+#define GET_DISPFB_DBX(x)		(u16)(( x >> 32 ) & 0x7FF )
+#define GET_DISPFB_DBY(x)		(u16)(( x >> 43 ) & 0x7FF )
+#define GET_DISPLAY_DH(x)		(u16)(( x >> 44 ) & 0x7FF )
 
-typedef struct {
-    u64 SSAX:11;
-    u64 pad11:5;
-    u64 SSAY:11;
-    u64 pad27:5;
-    u64 DSAX:11;
-    u64 pad43:5;
-    u64 DSAY:11;
-    u64 DIR:2;
-    u64 pad61:3;
-} GsTrxpos;
+#define GS_WRITEBACK_DCACHE    0
 
-typedef struct {
-    u64 RRW:12;
-    u64 pad12:20;
-    u64 RRH:12;
-    u64 pad44:20;
-} GsTrxreg;
-
-typedef struct {
-    u64 pad00;
-} GsFinish;
-
-typedef struct {
-    u64 XDR:2;
-    u64 pad02:62;
-} GsTrxdir;
-
-typedef struct {
-	u32 vifcode[4];
-	GifTag giftag;
-	GsBitbltbuf bitbltbuf;
-	u64 bitbltbufaddr;
-	GsTrxpos trxpos;
-	u64 trxposaddr;
-	GsTrxreg trxreg;
-	u64 trxregaddr;
-	GsFinish finish;
-	u64 finishaddr;
-	GsTrxdir trxdir;
-	u64 trxdiraddr;
-} GsStoreImage __attribute__((aligned(16)));
-
+//GSM Stuff
 struct VModeSettings{
 	unsigned int interlace;
 	unsigned int mode;

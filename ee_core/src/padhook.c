@@ -265,16 +265,16 @@ static void IGR_Thread(void *arg)
 		// Init RPC & CMD
 		SifInitRpc(0);
 
+#ifdef IGS
+		if((EnableGSMOp)&&(Pad_Data.combo_type == IGR_COMBO_UP))
+			InGameScreenshot();
+#endif
+
 		if(!DisableDebug)
 			GS_BGCOLOUR = 0x008000; // Dark Green
 
 		// Exit services
 		SifExitRpc();
-
-#ifdef IGS
-		if((EnableGSMOp)&&(Pad_Data.combo_type == IGR_COMBO_UP))
-			InGameScreenshot();
-#endif
 
 		// Execute home loader
 		if (ExitPath[0] != '\0')

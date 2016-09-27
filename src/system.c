@@ -207,6 +207,7 @@ void sysInitDev9(void) {
 }
 
 void sysReset(int modload_mask) {
+
 	fileXioExit();
 	SifExitIopHeap();
 	SifLoadFileExit();

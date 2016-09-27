@@ -994,7 +994,7 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SRFSH($s0)			# Source_SRFSH = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = SRFSH_fix
+lb	$v0, SRFSH_fix($s2)				# v0 = SRFSH_fix
 bnel	$v0,$zero,store_v0_as_SRFSH	# in case of SRFSH_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for SRFSH
 ld	$v0, Target_SRFSH($s1)			# v0 = Target_SRFSH

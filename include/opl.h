@@ -1,5 +1,5 @@
-#ifndef __USBLD_H
-#define __USBLD_H
+#ifndef __OPL_H
+#define __OPL_H
 
 #include <tamtypes.h>
 #include <kernel.h>

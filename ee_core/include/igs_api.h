@@ -104,6 +104,9 @@
 
 #define GET_PMODE_EN1(x)		(u8 )(( x >> 0  ) & 0x1   )
 #define GET_PMODE_EN2(x)		(u8 )(( x >> 1  ) & 0x1   )
+#define GET_SMODE2_INT(x)		(u8 )(( x >> 0  ) & 0x1   )
+#define GET_SMODE2_FFMD(x)		(u8 )(( x >> 1  ) & 0x1   )
+#define GET_SMODE2_DPMS(x)		(u8 )(( x >> 2  ) & 0x3   )
 #define GET_SMODE2_INTFFMD(x)	(u8 )(( x >> 0  ) & 0x3   )
 #define GET_DISPFB_FBP(x)		(u16)(( x >> 0  ) & 0x1FF )
 #define GET_DISPFB_FBW(x)		(u8 )(( x >> 9  ) & 0x3F  )

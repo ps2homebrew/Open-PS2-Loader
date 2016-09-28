@@ -24,6 +24,27 @@
 
 #include "include/igs_api.h"
 
+inline void FastDelay(int count)
+{
+	int i, ret;
+
+	for (i  = 0; i < count; i++) {
+		ret = 0x0300;
+		while(ret--) asm("nop\nnop\nnop\nnop");
+	}
+}
+
+_IGS_ENGINE_ void BlinkColour(u8 x, u32 colour, u8 forever) {
+	u8 i;
+	do {
+		delay(2);GS_BGCOLOUR=0x000000;	//Black
+		for(i=1;i<=x;i++){
+			delay(1);GS_BGCOLOUR=colour;	//Chosen colour
+			delay(1);GS_BGCOLOUR=0x000000;	//Black
+		}
+	} while(forever);
+}
+
 _IGS_ENGINE_ u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 {
 	u128 *addr = (u128 *)start;
@@ -41,10 +62,26 @@ _IGS_ENGINE_ u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 		addr++;
 	}
 
-	if( counter == emptysize )
+	if( counter == emptysize ) {
 		result = (u32)addr - emptysize;
+		result = ( ( ( result        ) >> 4 ) << 4 );	// It must be 16-bytes aligned
+		BlinkColour(2, 0x00FF00, 0);	//FOUND => Double Green :-)
+	}
+	else {
+		//result = 0x00100000;									//1st. possible workaround: Use the ingame area (Typically starts on "0x00100000"). It must be 16-bytes aligned
+		result = ( (0x01F32568 - emptysize - 16) >> 4) << 4;	//2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
+		BlinkColour(2, 0x0066FF, 0);	//Double Orange :-(
+	}
 
 	return result;
+}
+
+_IGS_ENGINE_ void ClearBuffer(u8 *buffer, u32 size)
+{
+	u32 i;
+	for(i=0;i<size;i++) {
+		buffer[i] = 0;
+	}
 }
 
 _IGS_ENGINE_ void DisableInterrupts()
@@ -66,7 +103,11 @@ _IGS_ENGINE_ void DisableInterrupts()
 
 _IGS_ENGINE_ void EnableInterrupts()
 {
-	asm volatile ("ei");
+	int eie;
+	asm volatile ("mfc0\t%0, $12" : "=r" (eie));
+	eie &= 0x10000;
+	if (eie)
+		asm volatile ("ei");
 }
 
 _IGS_ENGINE_ void u8todecstr(u8 input, char *output)
@@ -142,30 +183,6 @@ _IGS_ENGINE_ void u64tohexstr(u64 input, char *output)
 		output[i] = '0';
 	}
 	output[16] = 0;
-}
-
-/*----------------------------------------------------------------------------------------*/
-/* NOP ***FAST*** delay.                                                                  */
-/*----------------------------------------------------------------------------------------*/
-inline void fastdelay(int count)
-{
-	int i, ret;
-
-	for (i  = 0; i < count; i++) {
-		ret = 0x0300;
-		while(ret--) asm("nop\nnop\nnop\nnop");
-	}
-}
-
-_IGS_ENGINE_ void BlinkColour(u8 x, u32 colour, u8 forever) {
-	u8 i;
-	do {
-		delay(2);GS_BGCOLOUR=0x000000;	//Black
-		for(i=1;i<=x;i++){
-			delay(1);GS_BGCOLOUR=colour;	//Chosen colour
-			delay(1);GS_BGCOLOUR=0x000000;	//Black
-		}
-	} while(forever);
 }
 
 _IGS_ENGINE_ u8 PixelSize(u8 spsm) {
@@ -337,7 +354,7 @@ _IGS_ENGINE_ void ConvertColors32(u32 *buffer, u32 dimensions) {
 		x32 = buffer[i];
 		buffer[i] = ((x32 >> 16) & 0xFF) | ((x32 << 16) & 0xFF0000) | (x32 & 0xFF00FF00);
 
-		fastdelay(1); GS_BGCOLOUR = (0x0000FF - (255 *(i+1)/dimensions) * 0x000001);	//Red Fade Out Effect
+		FastDelay(1); GS_BGCOLOUR = (0x0000FF - (255 *(i+1)/dimensions) * 0x000001);	//Red Fade Out Effect
 	}
 	FlushCache(0);
 	FlushCache(2);
@@ -345,15 +362,15 @@ _IGS_ENGINE_ void ConvertColors32(u32 *buffer, u32 dimensions) {
 
 _IGS_ENGINE_ void ConvertColors24(u8 *buffer, u32 image_size) {
 	u32 i;
-	u32 x32;
+	u32 x32 __attribute__ ((aligned(16)));
 	for(i=0;i<image_size;i+=3) {
 
-		x32 = ( (u32)(buffer[i]) <<16 ) + ( (u32)(buffer[i+1]) <<8 ) + ( (u32)(buffer[i+2]) <<0 );
-		buffer[i]   = (u8)((x32>>0 )&0xFF);
-		buffer[i+1] = (u8)((x32>>8 )&0xFF);
+		x32 = ( ((u32)(buffer[i])) <<16 ) | ( ((u32)(buffer[i+1])) <<8 ) | ( ((u32)(buffer[i+2])) <<0 );
+		buffer[i]   = (u8)((x32>>0  )&0xFF);
+		buffer[i+1] = (u8)((x32>>8  )&0xFF);
 		buffer[i+2] = (u8)((x32>>16 )&0xFF);
 
-		fastdelay(1); GS_BGCOLOUR = (0x00FF00 - (255 *(i+1)/image_size) * 0x000100);	//Green Fade Out Effect
+		FastDelay(1); GS_BGCOLOUR = (0x00FF00 - (255 *(i+1)/image_size) * 0x000100);	//Green Fade Out Effect
 	}
 	FlushCache(0);
 	FlushCache(2);
@@ -367,7 +384,7 @@ _IGS_ENGINE_ void ConvertColors16(u16 *buffer, u32 dimensions) {
 		x16 = buffer[i];
 		buffer[i] = (x16 & 0x8000) | ((x16 << 10) & 0x7C00) | (x16 & 0x3E0) | ((x16 >> 10) & 0x1F);
 
-		fastdelay(1); GS_BGCOLOUR = (0xFF0000 - (255 *(i+1)/dimensions) * 0x010000);	//Blue Fade Out Effect
+		FastDelay(1); GS_BGCOLOUR = (0xFF0000 - (255 *(i+1)/dimensions) * 0x010000);	//Blue Fade Out Effect
 	}
 	FlushCache(0);
 	FlushCache(2);
@@ -421,6 +438,9 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 		_strcat(text, " EN2="  );u16todecstr((pmode    >>  1 ) & 0x1   , u16text ); _strcat(text, u16text);
 		_strcat(text, " EN1="  );u16todecstr((pmode    >>  0 ) & 0x1   , u16text ); _strcat(text, u16text);
 	_strcat(text, "\nSMODE2   0x"); u64tohexstr(smode2  , u64text); _strcat(text, u64text);
+		_strcat(text, " INT=" );u16todecstr((smode2   >>  0 ) & 0x1   , u16text ); _strcat(text, u16text);
+		_strcat(text, " FFMD=");u16todecstr((smode2   >>  1 ) & 0x1   , u16text ); _strcat(text, u16text);
+		_strcat(text, " DPMS=");u16todecstr((smode2   >>  2 ) & 0x3   , u16text ); _strcat(text, u16text);
 	_strcat(text, "\nDISPFB1  0x"); u64tohexstr(dispfb1 , u64text); _strcat(text, u64text);
 		_strcat(text, " DBY=");  u16todecstr((dispfb1  >> 43 ) & 0x7FF , u16text ); _strcat(text, u16text);
 		_strcat(text, " DBX=");  u16todecstr((dispfb1  >> 32 ) & 0x7FF , u16text ); _strcat(text, u16text);
@@ -561,8 +581,6 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 
 	DisableInterrupts();
 
-	int eie;
-
 	u64 pmode;
 	u64 smode2;
 	u64 dispfb1;
@@ -581,7 +599,7 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	u8 pixel_size;
 	u32 image_size;
 
-	void *buffer;
+	void *buffer = NULL;
 	u32 *buffer32;
 	u8 *buffer8;
 	u16 *buffer16;
@@ -612,16 +630,8 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	pixel_size = PixelSize(spsm);
 	image_size = dimensions * pixel_size;
 
-	//Try to find a empty (zeroed) area in EE RAM 
+	//Try to find a empty (zeroed) area in EE RAM
 	buffer = (void *)FindEmptyArea(0x00100000, 0x02000000, image_size + 52);	//image size + Bitmap Header (52 bytes)
-
-	if ((u32)(buffer==0)) {			//NOT FOUND
-		BlinkColour(2, 0x0066FF, 0);	//Double Orange :-(
-		//buffer = (void *)(0x00100000);					//1st. possible workaround: Use the ingame area (Typically starts on "0x00100000")
-		buffer = (void *)(0x01F32568 - image_size);			//2nd. possible workaround: Himem area (The "0x01F32568" upper boundary value has been taken from  PS2LINK hi-mem version)
-
-	} else							//FOUND
-		BlinkColour(2, 0x00FF00, 0);	//Double Green :-)
 
 	//Take IGS
 	Screenshot(sbp, sbw, spsm, width, height, dimensions, pixel_size, image_size, buffer);
@@ -634,10 +644,7 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	case GS_PSM_CT16S: buffer16 = (u16 *)buffer; ConvertColors16(buffer16, dimensions); break;	//16-bit PS2 BGRA (PSMCT16S = 10, pixel_size=2) to BMP RGB conversion 
 	}
 
-	asm volatile ("mfc0\t%0, $12" : "=r" (eie));
-	eie &= 0x10000;
-	if (eie)
-		EnableInterrupts();
+	EnableInterrupts();
 
 	delay(1);GS_BGCOLOUR =  0x660033;	//Midnight Blue
 
@@ -659,6 +666,9 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	//Save IGS Bitmap File
 	intffmd = GET_SMODE2_INTFFMD(smode2);
 	ret = SaveBitmapFile(width, height, pixel_size, buffer, intffmd);
+
+	//Clear buffer
+	ClearBuffer(buffer, image_size + 52);
 
 	// Exit services
 	fioExit();

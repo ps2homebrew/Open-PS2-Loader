@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev929 - IGS source code refactoring (several improvements and fixes) - Tue Sep 27 06:11:30 2016 -0300
 rev928 - IGS some header/api fixes/improvements. - Mon Sep 19 11:57:49 2016 -0300
 rev927 - IGS (InGame Screenshot Feature) initial commit. Update on GSM version & credits. - Thu Sep 15 20:13:41 2016 -0300
 rev926 - GSM Core additions - Thu Sep 15 18:35:06 2016 -0300

@@ -337,7 +337,7 @@ _IGS_ENGINE_ void ConvertColors32(u32 *buffer, u32 dimensions) {
 		x32 = buffer[i];
 		buffer[i] = ((x32 >> 16) & 0xFF) | ((x32 << 16) & 0xFF0000) | (x32 & 0xFF00FF00);
 
-		fastdelay(1); GS_BGCOLOUR = (0xFFFFFF - (255 *(i+1)/dimensions) * 0x010101);	//Red Fade Out Effect
+		fastdelay(1); GS_BGCOLOUR = (0x0000FF - (255 *(i+1)/dimensions) * 0x000001);	//Red Fade Out Effect
 	}
 	FlushCache(0);
 	FlushCache(2);
@@ -353,7 +353,21 @@ _IGS_ENGINE_ void ConvertColors24(u8 *buffer, u32 image_size) {
 		buffer[i+1] = (u8)((x32>>8 )&0xFF);
 		buffer[i+2] = (u8)((x32>>16 )&0xFF);
 
-		fastdelay(1); GS_BGCOLOUR = (0xFF0000 - (255 *(i+1)/image_size) * 0x010000);	//Blue Fade Out Effect
+		fastdelay(1); GS_BGCOLOUR = (0x00FF00 - (255 *(i+1)/image_size) * 0x000100);	//Green Fade Out Effect
+	}
+	FlushCache(0);
+	FlushCache(2);
+}
+
+_IGS_ENGINE_ void ConvertColors16(u16 *buffer, u32 dimensions) {
+	u32 i;
+	u16 x16;
+	for(i=0;i<dimensions;i++) {
+
+		x16 = buffer[i];
+		buffer[i] = (x16 & 0x8000) | ((x16 << 10) & 0x7C00) | (x16 & 0x3E0) | ((x16 >> 10) & 0x1F);
+
+		fastdelay(1); GS_BGCOLOUR = (0xFF0000 - (255 *(i+1)/dimensions) * 0x010000);	//Blue Fade Out Effect
 	}
 	FlushCache(0);
 	FlushCache(2);
@@ -395,8 +409,8 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 	_strcpy(text, "PS2 IGS (InGame Screenshot)\n---------------------------\n");
 	_strcat(text, "\n\nGame ID="); _strcat(text, GameID);
 	_strcat(text, "\nResolution="); u16todecstr(width, u16text ); _strcat(text, u16text); _strcat(text, "x"); u16todecstr(height , u16text); _strcat(text, u16text);
-	_strcat(text, ", Pixel Size ="); u8todecstr(pixel_size, u8text ); _strcat(text, u8text);
-	_strcat(text, ", Image Size ="); u32todecstr(image_size, u32text ); _strcat(text, u32text);
+	_strcat(text, ", Pixel Size="); u8todecstr(pixel_size, u8text ); _strcat(text, u8text);
+	_strcat(text, ", Image Size="); u32todecstr(image_size, u32text ); _strcat(text, u32text);
 	_strcat(text, "\n\nGS Registers\n------------");
 	_strcat(text, "\nPMODE    0x"); u64tohexstr(pmode   , u64text); _strcat(text, u64text);
 		_strcat(text, " ALP="  );u16todecstr((pmode    >>  8 ) & 0xFF  , u16text ); _strcat(text, u16text);
@@ -570,6 +584,7 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	void *buffer;
 	u32 *buffer32;
 	u8 *buffer8;
+	u16 *buffer16;
 
 	int ret;
 
@@ -613,8 +628,10 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 
 	// Color Space conversion from BGR to RGB (i.e. little endian => big endian)
 	switch (spsm) {
-	case GS_PSM_CT32:  buffer32 = (u32 *)buffer; ConvertColors32(buffer32, dimensions); break;	//32-bit PS2 BGR (PSMCT32 = 0, pixel_size=4) to BMP RGB conversion
-	case GS_PSM_CT24:  buffer8  = (u8  *)buffer; ConvertColors24(buffer8,  image_size); break;	//24-bit PS2 BGR (PSMCT24 = 1, pixel_size=3) to BMP RGB conversion 
+	case GS_PSM_CT32:  buffer32 = (u32 *)buffer; ConvertColors32( buffer32, dimensions); break;	//32-bit PS2 BGR  (PSMCT32  =  0, pixel_size=4) to BMP RGB conversion
+	case GS_PSM_CT24:  buffer8  = (u8  *)buffer; ConvertColors24( buffer8,  image_size); break;	//24-bit PS2 BGR  (PSMCT24  =  1, pixel_size=3) to BMP RGB conversion 
+	case GS_PSM_CT16:  buffer16 = (u16 *)buffer; ConvertColors16(buffer16, dimensions); break;	//16-bit PS2 BGR  (PSMCT16  =  2, pixel_size=2) to BMP RGB conversion 
+	case GS_PSM_CT16S: buffer16 = (u16 *)buffer; ConvertColors16(buffer16, dimensions); break;	//16-bit PS2 BGRA (PSMCT16S = 10, pixel_size=2) to BMP RGB conversion 
 	}
 
 	asm volatile ("mfc0\t%0, $12" : "=r" (eie));

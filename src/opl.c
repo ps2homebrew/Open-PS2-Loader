@@ -1164,6 +1164,7 @@ static void setDefaults(void) {
 	gRememberLastPlayed = 0;
 	gAutoStartLastPlayed = 9;
 	gSelectButton = KEY_CIRCLE;	//Default to Japan.
+	gCheckUSBFragmentation = 1;
 	gUSBPrefix[0] = '\0';
 	gETHPrefix[0] = '\0';
 	gUseInfoScreen = 0;

@@ -180,7 +180,7 @@ static void IGR_Thread(void *arg)
 	// If Pad Combo is Start + Select then Return to Home, else if Pad Combo is UP then take IGS
 	if ( (Pad_Data.combo_type == IGR_COMBO_START_SELECT)
 #ifdef IGS
-		|| (Pad_Data.combo_type == IGR_COMBO_UP)
+		|| ((Pad_Data.combo_type == IGR_COMBO_UP)&&(EnableGSMOp))
 #endif
 		)
 	{
@@ -266,7 +266,7 @@ static void IGR_Thread(void *arg)
 		SifInitRpc(0);
 
 #ifdef IGS
-		if((EnableGSMOp)&&(Pad_Data.combo_type == IGR_COMBO_UP))
+		if((Pad_Data.combo_type == IGR_COMBO_UP)&&(EnableGSMOp))
 			InGameScreenshot();
 #endif
 
@@ -327,7 +327,7 @@ static int IGR_Intc_Handler(int cause)
 			if ( ( pad_pos_combo2 == IGR_COMBO_START_SELECT ) ||	// Start + Select combo, so reset
 				( pad_pos_combo2 == IGR_COMBO_R3_L3 )				// R3 + L3 combo, so poweroff
 #ifdef IGS
-				|| ( pad_pos_combo2 == IGR_COMBO_UP )				// UP combo, so take IGS
+				|| ((pad_pos_combo2 == IGR_COMBO_UP)&&(EnableGSMOp))				// UP combo, so take IGS
 #endif
 				)
 

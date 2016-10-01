@@ -110,9 +110,9 @@ _IGS_ENGINE_ void EnableInterrupts()
 		asm volatile ("ei");
 }
 
-_IGS_ENGINE_ void u8todecstr(u8 input, char *output)
+_IGS_ENGINE_ void u8todecstr(u8 input, char *output, u8 digits)
 {
-	int i = 3;	//Number of digits (output)
+	u8 i = digits;	//Number of digits (output)
 	do{
 		i--;
 		output[i] = "0123456789"[input % 10];
@@ -122,12 +122,12 @@ _IGS_ENGINE_ void u8todecstr(u8 input, char *output)
 		i--;
 		output[i] = '0';
 	}
-	output[3] = 0;
+	output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u16todecstr(u16 input, char *output)
+_IGS_ENGINE_ void u16todecstr(u16 input, char *output, u8 digits)
 {
-	int i = 5;	//Number of digits (output)
+	u8 i = digits;	//Number of digits (output)
 	do{
 		i--;
 		output[i] = "0123456789"[input % 10];
@@ -137,12 +137,12 @@ _IGS_ENGINE_ void u16todecstr(u16 input, char *output)
 		i--;
 		output[i] = '0';
 	}
-	output[5] = 0;
+	output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u32todecstr(u32 input, char *output)
+_IGS_ENGINE_ void u32todecstr(u32 input, char *output, u8 digits)
 {
-	int i = 10;	//Number of digits (output)
+	u8 i = digits;	//Number of digits (output)
 	do{
 		i--;
 		output[i] = "0123456789"[input % 10];
@@ -152,12 +152,12 @@ _IGS_ENGINE_ void u32todecstr(u32 input, char *output)
 		i--;
 		output[i] = '0';
 	}
-	output[10] = 0;
+	output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u32tohexstr(u32 input, char *output)
+_IGS_ENGINE_ void u32tohexstr(u32 input, char *output, u8 digits)
 {
-	int i = 8;	//Number of digits (output)
+	u8 i = digits;	//Number of digits (output)
 	do{
 		i--;
 		output[i] = "0123456789ABCDEF"[input % 16];
@@ -167,12 +167,12 @@ _IGS_ENGINE_ void u32tohexstr(u32 input, char *output)
 		i--;
 		output[i] = '0';
 	}
-	output[8] = 0;
+	output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u64tohexstr(u64 input, char *output)
+_IGS_ENGINE_ void u64tohexstr(u64 input, char *output, u8 digits)
 {
-	int i = 16;	//Number of digits (output)
+	u8 i = digits;	//Number of digits (output)
 	do{
 		i--;
 		output[i] = "0123456789ABCDEF"[input % 16];
@@ -182,7 +182,7 @@ _IGS_ENGINE_ void u64tohexstr(u64 input, char *output)
 		i--;
 		output[i] = '0';
 	}
-	output[16] = 0;
+	output[digits] = 0;
 }
 
 _IGS_ENGINE_ u8 PixelSize(u8 spsm) {
@@ -218,7 +218,7 @@ _IGS_ENGINE_ void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u3
 	if((sbw < 1) || (sbw > 32))
 		BlinkColour(2, 0x0000FF, 1);	//Red
 
-	if((height < 64) || (height > 1526))	//Sega Genesis Collection (SLUS_215.42) has DH = 1525!
+	if((height < 64) || (height > 1080))
 		BlinkColour(3, 0x0000FF, 1);	//Red
 
 	// Number of qwords (each qword = 2^4 bytes = 16 bytes = 128 bits)
@@ -394,9 +394,9 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 
 	delay(1);GS_BGCOLOUR = 0x0099FF;	//Orange
 
-	//  000000000111111111122222
-	//  123456789012345678901234
-	// "mc1:/XXXX_yyy.zz_GS.txt"
+	//  0000000001111111111222222222
+	//  1234567890123456789012345678
+	// "mc1:/XXXX_yyy.zz_GS(nnn).txt"
 	char PathFilenameExtension[24];
 	s32 file_handle;
 
@@ -406,7 +406,7 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 	char u16text[6+1];
 	char u8text[3+1];
 
-	int i = 0;
+	u32 i = 0;
 	u64 pmode = Source_GSRegisterValues.pmode;
 	u64 smode2 = Source_GSRegisterValues.smode2;
 	u64 dispfb1 = Source_GSRegisterValues.dispfb1;
@@ -414,60 +414,73 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 	u64 dispfb2 = Source_GSRegisterValues.dispfb2;
 	u64 display2 = Source_GSRegisterValues.display2;
 
-	_strcpy(PathFilenameExtension, "mc1:/");
-	_strcat(PathFilenameExtension, GameID);
-	_strcat(PathFilenameExtension, "_GS.txt");
-
-	// Open file
+	// Sequential numbering feature
+	u8 Counter = 0;
+	while(1){
+		if(Counter==255)
+			BlinkColour(6, 0x0000FF, 1);	//Red
+		Counter++;
+		_strcpy(PathFilenameExtension, "mc1:/");
+		_strcat(PathFilenameExtension, GameID);
+		_strcat(PathFilenameExtension, "_GS(");
+		u8todecstr(Counter, u8text, 3);
+		_strcat(PathFilenameExtension, u8text);
+		_strcat(PathFilenameExtension, ").txt");
+		file_handle=fioOpen(PathFilenameExtension, O_RDONLY);
+		if (file_handle<0)
+			break;
+		fioClose(file_handle);
+	}
+	// Create file
 	file_handle = fioOpen(PathFilenameExtension, O_CREAT|O_WRONLY);
 	if(file_handle < 0)
 			BlinkColour(4, 0x0000FF, 1);	//Red
 
 	_strcpy(text, "PS2 IGS (InGame Screenshot)\n---------------------------\n");
 	_strcat(text, "\n\nGame ID="); _strcat(text, GameID);
-	_strcat(text, "\nResolution="); u16todecstr(width, u16text ); _strcat(text, u16text); _strcat(text, "x"); u16todecstr(height , u16text); _strcat(text, u16text);
-	_strcat(text, ", Pixel Size="); u8todecstr(pixel_size, u8text ); _strcat(text, u8text);
-	_strcat(text, ", Image Size="); u32todecstr(image_size, u32text ); _strcat(text, u32text);
+	_strcat(text, "\nResolution="); u16todecstr(width, u16text, 5); _strcat(text, u16text); _strcat(text, "x"); u16todecstr(height , u16text, 5); _strcat(text, u16text);
+	_strcat(text, ", Pixel Size="); u8todecstr(pixel_size, u8text, 3); _strcat(text, u8text);
+	_strcat(text, ", Image Size="); u32todecstr(image_size, u32text, 10); _strcat(text, u32text);
 	_strcat(text, "\n\nGS Registers\n------------");
-	_strcat(text, "\nPMODE    0x"); u64tohexstr(pmode   , u64text); _strcat(text, u64text);
-		_strcat(text, " ALP="  );u16todecstr((pmode    >>  8 ) & 0xFF  , u16text ); _strcat(text, u16text);
-		_strcat(text, " SLBG=" );u16todecstr((pmode    >>  7 ) & 0x1   , u16text ); _strcat(text, u16text);
-		_strcat(text, " AMOD=" );u16todecstr((pmode    >>  6 ) & 0x1   , u16text ); _strcat(text, u16text);
-		_strcat(text, " MMOD=" );u16todecstr((pmode    >>  5 ) & 0x1   , u16text ); _strcat(text, u16text);
-		_strcat(text, " CRTMD=");u16todecstr((pmode    >>  2 ) & 0x7   , u16text ); _strcat(text, u16text);
-		_strcat(text, " EN2="  );u16todecstr((pmode    >>  1 ) & 0x1   , u16text ); _strcat(text, u16text);
-		_strcat(text, " EN1="  );u16todecstr((pmode    >>  0 ) & 0x1   , u16text ); _strcat(text, u16text);
-	_strcat(text, "\nSMODE2   0x"); u64tohexstr(smode2  , u64text); _strcat(text, u64text);
-		_strcat(text, " INT=" );u16todecstr((smode2   >>  0 ) & 0x1   , u16text ); _strcat(text, u16text);
-		_strcat(text, " FFMD=");u16todecstr((smode2   >>  1 ) & 0x1   , u16text ); _strcat(text, u16text);
-		_strcat(text, " DPMS=");u16todecstr((smode2   >>  2 ) & 0x3   , u16text ); _strcat(text, u16text);
-	_strcat(text, "\nDISPFB1  0x"); u64tohexstr(dispfb1 , u64text); _strcat(text, u64text);
-		_strcat(text, " DBY=");  u16todecstr((dispfb1  >> 43 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " DBX=");  u16todecstr((dispfb1  >> 32 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " PSM=");  u16todecstr((dispfb1  >> 15 ) & 0x1F  , u16text ); _strcat(text, u16text);
-		_strcat(text, " FBW=");  u16todecstr((dispfb1  >>  9 ) & 0x3F  , u16text ); _strcat(text, u16text);
-		_strcat(text, " FBP=");  u16todecstr((dispfb1  >>  0 ) & 0x1FF , u16text ); _strcat(text, u16text);
-	_strcat(text, "  DISPLAY1 0x"); u64tohexstr(display1, u64text); _strcat(text, u64text);
-		_strcat(text, " DH=");   u16todecstr(( display1 >> 44 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " DW=");   u16todecstr(( display1 >> 32 ) & 0xFFF , u16text ); _strcat(text, u16text);
-		_strcat(text, " MAGV="); u16todecstr(( display1 >> 27 ) & 0x3   , u16text ); _strcat(text, u16text);
-		_strcat(text, " MAGH="); u16todecstr(( display1 >> 23 ) & 0xF   , u16text ); _strcat(text, u16text);
-		_strcat(text, " DY=");   u16todecstr(( display1 >> 12 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " DX=");   u16todecstr(( display1 >> 0  ) & 0xFFF , u16text ); _strcat(text, u16text);
-	_strcat(text, "\nDISPFB2  0x"); u64tohexstr(dispfb2 , u64text); _strcat(text, u64text);
-		_strcat(text, " DBY=");  u16todecstr((dispfb2  >> 43 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " DBX=");  u16todecstr((dispfb2  >> 32 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " PSM=");  u16todecstr((dispfb2  >> 15 ) & 0x1F  , u16text ); _strcat(text, u16text);
-		_strcat(text, " FBW=");  u16todecstr((dispfb2  >>  9 ) & 0x3F  , u16text ); _strcat(text, u16text);
-		_strcat(text, " FBP=");  u16todecstr((dispfb2  >>  0 ) & 0x1FF , u16text ); _strcat(text, u16text);
-	_strcat(text, "  DISPLAY2 0x"); u64tohexstr(display2, u64text); _strcat(text, u64text);
-		_strcat(text, " DH=");   u16todecstr(( display2 >> 44 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " DW=");   u16todecstr(( display2 >> 32 ) & 0xFFF , u16text ); _strcat(text, u16text);
-		_strcat(text, " MAGV="); u16todecstr(( display2 >> 27 ) & 0x3   , u16text ); _strcat(text, u16text);
-		_strcat(text, " MAGH="); u16todecstr(( display2 >> 23 ) & 0xF   , u16text ); _strcat(text, u16text);
-		_strcat(text, " DY=");   u16todecstr(( display2 >> 12 ) & 0x7FF , u16text ); _strcat(text, u16text);
-		_strcat(text, " DX=");   u16todecstr(( display2 >> 0  ) & 0xFFF , u16text ); _strcat(text, u16text);
-	_strcat(text, "\n\nHost buffer (EE RAM) address=0x"); u32tohexstr(buffer, u32text); _strcat(text, u32text);
+	_strcat(text, "\nPMODE    0x"); u64tohexstr(pmode   , u64text, 16); _strcat(text, u64text);
+		_strcat(text, " ALP="  );u16todecstr((pmode    >>  8 ) & 0xFF  , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " SLBG=" );u16todecstr((pmode    >>  7 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " AMOD=" );u16todecstr((pmode    >>  6 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " MMOD=" );u16todecstr((pmode    >>  5 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " CRTMD=");u16todecstr((pmode    >>  2 ) & 0x7   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " EN2="  );u16todecstr((pmode    >>  1 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " EN1="  );u16todecstr((pmode    >>  0 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+	_strcat(text, "\nSMODE2   0x"); u64tohexstr(smode2  , u64text, 16); _strcat(text, u64text);
+		_strcat(text, " INT=" );u16todecstr((smode2   >>  0 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " FFMD=");u16todecstr((smode2   >>  1 ) & 0x1   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DPMS=");u16todecstr((smode2   >>  2 ) & 0x3   , u16text, 5); _strcat(text, u16text);
+	_strcat(text, "\nDISPFB1  0x"); u64tohexstr(dispfb1 , u64text, 16); _strcat(text, u64text);
+		_strcat(text, " DBY=");  u16todecstr((dispfb1  >> 43 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DBX=");  u16todecstr((dispfb1  >> 32 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " PSM=");  u16todecstr((dispfb1  >> 15 ) & 0x1F  , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " FBW=");  u16todecstr((dispfb1  >>  9 ) & 0x3F  , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " FBP=");  u16todecstr((dispfb1  >>  0 ) & 0x1FF , u16text, 5); _strcat(text, u16text);
+	_strcat(text, "  DISPLAY1 0x"); u64tohexstr(display1, u64text, 16); _strcat(text, u64text);
+		_strcat(text, " DH=");   u16todecstr(( display1 >> 44 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DW=");   u16todecstr(( display1 >> 32 ) & 0xFFF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " MAGV="); u16todecstr(( display1 >> 27 ) & 0x3   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " MAGH="); u16todecstr(( display1 >> 23 ) & 0xF   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DY=");   u16todecstr(( display1 >> 12 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DX=");   u16todecstr(( display1 >> 0  ) & 0xFFF , u16text, 5); _strcat(text, u16text);
+	_strcat(text, "\nDISPFB2  0x"); u64tohexstr(dispfb2 , u64text, 16); _strcat(text, u64text);
+		_strcat(text, " DBY=");  u16todecstr((dispfb2  >> 43 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DBX=");  u16todecstr((dispfb2  >> 32 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " PSM=");  u16todecstr((dispfb2  >> 15 ) & 0x1F  , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " FBW=");  u16todecstr((dispfb2  >>  9 ) & 0x3F  , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " FBP=");  u16todecstr((dispfb2  >>  0 ) & 0x1FF , u16text, 5); _strcat(text, u16text);
+	_strcat(text, "  DISPLAY2 0x"); u64tohexstr(display2, u64text, 16); _strcat(text, u64text);
+		_strcat(text, " DH=");   u16todecstr(( display2 >> 44 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DW=");   u16todecstr(( display2 >> 32 ) & 0xFFF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " MAGV="); u16todecstr(( display2 >> 27 ) & 0x3   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " MAGH="); u16todecstr(( display2 >> 23 ) & 0xF   , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DY=");   u16todecstr(( display2 >> 12 ) & 0x7FF , u16text, 5); _strcat(text, u16text);
+		_strcat(text, " DX=");   u16todecstr(( display2 >> 0  ) & 0xFFF , u16text, 5); _strcat(text, u16text);
+	_strcat(text, "\n\nHost buffer (EE RAM) address=0x"); u32tohexstr(buffer, u32text, 8); _strcat(text, u32text);
 
 	while(text[i]!='\0') {
 		fioPutc(file_handle, text[i++]);
@@ -485,9 +498,9 @@ _IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buff
 
 	delay(1);GS_BGCOLOUR = 0x990066;	//Purple Violet
 
-	//  0000000001111111111222222
-	//  1234567890123456789012345
-	// "mc1:/XXXX_yyy.zz_IGS.bmp"
+	//  00000000011111111112222222222
+	//  12345678901234567890123456789
+	// "mc1:/XXXX_yyy.zz_IGS(nnn).bmp"
 	char PathFilenameExtension[64];
 
 	u32 i;
@@ -502,6 +515,8 @@ _IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buff
 
 	void *addr;
 
+	char u8text[3+1];
+
 	BmpHeader *bh;
 
 	bpp = (pixel_size << 3);
@@ -511,11 +526,24 @@ _IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buff
 	image_size = dimensions * pixel_size;
 	file_size = image_size + 54;
 
-	_strcpy(PathFilenameExtension, "mc1:/");
-	_strcat(PathFilenameExtension, GameID);
-	_strcat(PathFilenameExtension, "_SCR.bmp");
-	
-	// Open file
+	// Sequential numbering feature
+	u8 Counter = 0;
+	while(1){
+		if(Counter==255)
+			BlinkColour(6, 0x0000FF, 1);	//Red
+		Counter++;
+		_strcpy(PathFilenameExtension, "mc1:/");
+		_strcat(PathFilenameExtension, GameID);
+		_strcat(PathFilenameExtension, "_GS(");
+		u8todecstr(Counter, u8text, 3);
+		_strcat(PathFilenameExtension, u8text);
+		_strcat(PathFilenameExtension, ").bmp");
+		file_handle=fioOpen(PathFilenameExtension, O_RDONLY);
+		if (file_handle<0)
+			break;
+		fioClose(file_handle);
+	}
+	// Create file
 	file_handle = fioOpen(PathFilenameExtension, O_CREAT|O_WRONLY);
 	if(file_handle < 0)
 			BlinkColour(4, 0x0000FF, 1);	//Red

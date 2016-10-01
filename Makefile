@@ -108,6 +108,10 @@ else
   EE_LIBS += -lpad
 endif
 
+ifeq ($(IGS),1)
+    GSM = 1
+endif
+
 ifeq ($(CHILDPROOF),0)
   ifeq ($(GSM),1)
     EE_CFLAGS += -DGSM

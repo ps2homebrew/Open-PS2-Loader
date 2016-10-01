@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev932 - SP193: USB Fragmentation Check enabled as default - Sat Oct 01 18:11:28 2016 -0300
 rev931 - IGS: 24-bit Pixel Storage Size memory alignment fix - Wed Sep 28 18:45:51 2016 -0300
 rev930 - IGS: 16-bit Pixel Storage Size (PSMCT16 and PSMCT16S) fix - Tue Sep 27 21:17:43 2016 -0300
 rev929 - IGS source code refactoring (several improvements and fixes) - Tue Sep 27 06:11:30 2016 -0300

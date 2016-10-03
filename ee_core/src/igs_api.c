@@ -407,12 +407,12 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 	char u8text[3+1];
 
 	u32 i = 0;
-	u64 pmode = Source_GSRegisterValues.pmode;
-	u64 smode2 = Source_GSRegisterValues.smode2;
-	u64 dispfb1 = Source_GSRegisterValues.dispfb1;
-	u64 display1 = Source_GSRegisterValues.display1;
-	u64 dispfb2 = Source_GSRegisterValues.dispfb2;
-	u64 display2 = Source_GSRegisterValues.display2;
+	u64 pmode = GSMSourceGSRegs.pmode;
+	u64 smode2 = GSMSourceGSRegs.smode2;
+	u64 dispfb1 = GSMSourceGSRegs.dispfb1;
+	u64 display1 = GSMSourceGSRegs.display1;
+	u64 dispfb2 = GSMSourceGSRegs.dispfb2;
+	u64 display2 = GSMSourceGSRegs.display2;
 
 	// Sequential numbering feature
 	u8 Counter = 0;
@@ -634,12 +634,12 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 
 	int ret;
 
-	pmode =    Source_GSRegisterValues.pmode;
-	smode2 =   Source_GSRegisterValues.smode2;
-	dispfb1 =  Source_GSRegisterValues.dispfb1;
-	display1 = Source_GSRegisterValues.display1;
-	dispfb2 =  Source_GSRegisterValues.dispfb2;
-	display2 = Source_GSRegisterValues.display2;
+	pmode =    GSMSourceGSRegs.pmode;
+	smode2 =   GSMSourceGSRegs.smode2;
+	dispfb1 =  GSMSourceGSRegs.dispfb1;
+	display1 = GSMSourceGSRegs.display1;
+	dispfb2 =  GSMSourceGSRegs.dispfb2;
+	display2 = GSMSourceGSRegs.display2;
 
 	if(GET_PMODE_EN2(pmode)) {
 		sbp =    (GET_DISPFB_FBP(dispfb2) << 5);	// BITBLTBUF.SBP*64 = DISPFB1.FBP*2048 <-> BITBLTBUF.SBP = DISPFB2.FBP*2048/64 <-> BITBLTBUF.SBP = DISPFB2.FBP*32

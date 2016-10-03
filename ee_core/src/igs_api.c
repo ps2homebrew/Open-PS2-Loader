@@ -390,7 +390,7 @@ _IGS_ENGINE_ void ConvertColors16(u16 *buffer, u32 dimensions) {
 	FlushCache(2);
 }
 
-_IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 image_size) {
+_IGS_ENGINE_ void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 image_size, u8 Number) {
 
 	delay(1);GS_BGCOLOUR = 0x0099FF;	//Orange
 
@@ -414,23 +414,14 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 	u64 dispfb2 = GSMSourceGSRegs.dispfb2;
 	u64 display2 = GSMSourceGSRegs.display2;
 
-	// Sequential numbering feature
-	u8 Counter = 0;
-	while(1){
-		if(Counter==255)
-			BlinkColour(6, 0x0000FF, 1);	//Red
-		Counter++;
-		_strcpy(PathFilenameExtension, "mc1:/");
-		_strcat(PathFilenameExtension, GameID);
-		_strcat(PathFilenameExtension, "_GS(");
-		u8todecstr(Counter, u8text, 3);
-		_strcat(PathFilenameExtension, u8text);
-		_strcat(PathFilenameExtension, ").txt");
-		file_handle=fioOpen(PathFilenameExtension, O_RDONLY);
-		if (file_handle<0)
-			break;
-		fioClose(file_handle);
-	}
+	// Sequential number, inherited from Bitmap File
+	_strcpy(PathFilenameExtension, "mc1:/");
+	_strcat(PathFilenameExtension, GameID);
+	_strcat(PathFilenameExtension, "_GS(");
+	u8todecstr(Number, u8text, 3);
+	_strcat(PathFilenameExtension, u8text);
+	_strcat(PathFilenameExtension, ").txt");
+
 	// Create file
 	file_handle = fioOpen(PathFilenameExtension, O_CREAT|O_WRONLY);
 	if(file_handle < 0)
@@ -490,11 +481,9 @@ _IGS_ENGINE_ int SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, 
 	fioClose(file_handle);
 
 	delay(1);GS_BGCOLOUR = 0x000000;	//Black
-
-	return 0;
 }
 
-_IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd) {
+_IGS_ENGINE_ u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd) {
 
 	delay(1);GS_BGCOLOUR = 0x990066;	//Purple Violet
 
@@ -518,6 +507,8 @@ _IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buff
 	char u8text[3+1];
 
 	BmpHeader *bh;
+	
+	u8 Number = 0;	//255 screenshots per-game should be enough? lol
 
 	bpp = (pixel_size << 3);
 
@@ -527,20 +518,23 @@ _IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buff
 	file_size = image_size + 54;
 
 	// Sequential numbering feature
-	u8 Counter = 0;
 	while(1){
-		if(Counter==255)
+		if(Number==255)	//255 screenshots per-game should be enough? lol
 			BlinkColour(6, 0x0000FF, 1);	//Red
-		Counter++;
+		Number++;
 		_strcpy(PathFilenameExtension, "mc1:/");
 		_strcat(PathFilenameExtension, GameID);
 		_strcat(PathFilenameExtension, "_GS(");
-		u8todecstr(Counter, u8text, 3);
+		u8todecstr(Number, u8text, 3);
 		_strcat(PathFilenameExtension, u8text);
 		_strcat(PathFilenameExtension, ").bmp");
 		file_handle=fioOpen(PathFilenameExtension, O_RDONLY);
-		if (file_handle<0)
+		if (file_handle<0)	//There is no file with this Sequential Number; that's time for creating a new one.
 			break;
+		if(fioLseek(file_handle, 0, SEEK_END)==0) {	//There is a file with this Sequential Number but it's empty, so let's overwrite it.
+			fioClose(file_handle);
+			break;
+		}
 		fioClose(file_handle);
 	}
 	// Create file
@@ -602,7 +596,8 @@ _IGS_ENGINE_ int SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buff
 
 	delay(1);GS_BGCOLOUR = 0x000000;	//Black
 
-	return 0;
+	// Return the Sequential Number to the related Text File
+	return Number;
 }
 
 _IGS_ENGINE_ int InGameScreenshot(void) {
@@ -632,7 +627,7 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	u8 *buffer8;
 	u16 *buffer16;
 
-	int ret;
+	u8 Number;
 
 	pmode =    GSMSourceGSRegs.pmode;
 	smode2 =   GSMSourceGSRegs.smode2;
@@ -688,12 +683,12 @@ _IGS_ENGINE_ int InGameScreenshot(void) {
 	mcInit(MC_TYPE_MC);
 #endif
 
-	//Save Text File (for debugging purposes)
-	ret = SaveTextFile((u32)buffer, width, height, pixel_size, image_size);
-
-	//Save IGS Bitmap File
+	//Save IGS Bitmap File first, since it's the bigger file)
 	intffmd = GET_SMODE2_INTFFMD(smode2);
-	ret = SaveBitmapFile(width, height, pixel_size, buffer, intffmd);
+	Number = SaveBitmapFile(width, height, pixel_size, buffer, intffmd);
+
+	//The Number used on Bitmap File is returned to the related Text File, in order their both Sequential Numbers match
+	SaveTextFile((u32)buffer, width, height, pixel_size, image_size, Number);
 
 	//Clear buffer
 	ClearBuffer(buffer, image_size + 52);

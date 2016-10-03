@@ -60,16 +60,16 @@ MIPS_Regs:			.space	0x200
 .globl Old_SetGsCrt
 Old_SetGsCrt:		.word 0
 
-.globl Source_VModeSettings
-Source_VModeSettings:	.space 12
+.globl GSMSourceSetGsCrt
+GSMSourceSetGsCrt:	.space 12
 .equ Source_INTERLACE,0 # WORD
 .equ Source_MODE,     4 # WORD
 .equ Source_FFMD,     8 # WORD
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-.globl Source_GSRegisterValues
-Source_GSRegisterValues: .space 88
+.globl GSMSourceGSRegs
+GSMSourceGSRegs: .space 88
 .equ Source_PMODE,     0 # DWORD
 .equ Source_SMODE1,    8 # DWORD
 .equ Source_SMODE2,   16 # DWORD
@@ -84,16 +84,16 @@ Source_GSRegisterValues: .space 88
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-.globl Target_VModeSettings
-Target_VModeSettings:	.space 12
+.globl GSMDestSetGsCrt
+GSMDestSetGsCrt:	.space 12
 .equ Target_INTERLACE,0 # WORD
 .equ Target_MODE,     4 # WORD
 .equ Target_FFMD,     8 # WORD
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-.globl Target_GSRegisterValues
-Target_GSRegisterValues: .space 88
+.globl GSMDestGSRegs
+GSMDestGSRegs: .space 88
 .equ Target_PMODE,     0 # DWORD
 .equ Target_SMODE1,    8 # DWORD
 .equ Target_SMODE2,   16 # DWORD
@@ -106,11 +106,11 @@ Target_GSRegisterValues: .space 88
 .equ Target_DISPFB2,  72 # DWORD
 .equ Target_DISPLAY2, 80 # DWORD
 
-.globl GSRegisterFixValues
-GSRegisterFixValues: .space 17
+.globl GSMFlags
+GSMFlags: .space 18
 .equ X_offset,              0 # WORD
 .equ Y_offset,              4 # WORD
-.equ automatic_adaptation,  8 # BYTE
+.equ ADAPTATION_fix,        8 # BYTE
 .equ PMODE_fix,             9 # BYTE
 .equ SMODE1_fix,           10 # BYTE
 .equ SMODE2_fix,           11 # BYTE
@@ -119,20 +119,18 @@ GSRegisterFixValues: .space 17
 .equ SYNCV_fix,            14 # BYTE
 .equ DISPFB_fix,           15 # BYTE
 .equ DISPLAY_fix,          16 # BYTE
+.equ skip_videos_fix,          17 # BYTE
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-.globl GSAdaptationValues
-GSAdaptationValues:	.space 19
+GSMAdapts:	.space 18
 .equ Adapted_DISPLAY1,         0 # DWORD
 .equ Adapted_DISPLAY2,         8 # DWORD
 .equ DOUBLE_HEIGHT_adaptation,16 # BYTE -> Height Doubling at INT&FFMD
 .equ SMODE2_adaptation,       17 # BYTE -> Adapted SMODE2 patch value
-.equ skip_videos,             18 # BYTE
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-.globl OnTheFlyPatcherValues
 OnTheFlyPatcherValues: .space 12
 .equ Pattern_Code_Ptr,    0 # WORD -> Pointer to Pattern Code
 .equ Pattern_Mask_Ptr,    4 # WORD -> Pointer to Pattern Mask Address
@@ -215,13 +213,13 @@ BD_t2:
 Hook_SetGsCrt:
 addiu	$sp, $sp, -0x0010			# reserve 16 bytes stack space (1 reg)
 sd	$ra, 0($sp)				# Push return address on stack
-la	$v0, Source_VModeSettings
+la	$v0, GSMSourceSetGsCrt
 sw	$a0, Source_INTERLACE($v0)
 sw	$a1, Source_MODE($v0)
 sw	$a2, Source_FFMD($v0)
 and	$a3, $a0,$a2				# a3 = Interlace & Field
 andi	$a3, $a3,1				# a3 &= 1 limited to 1 bit
-la	$v0, GSAdaptationValues
+la	$v0, GSMAdapts
 sb	$a3, DOUBLE_HEIGHT_adaptation($v0)
 
 //-----------------------------------------------------------------------------------------
@@ -234,8 +232,9 @@ sync.p			// Await instruction completion
 
 //-----------------------------------------------------------------------------------------
 
-lb	$a0, skip_videos($v0)		# a0 = skip_videos
-bnel	$a0,$zero, Skip_skip_videos_Patch	# in case of Skip Videos fix is disabled (i.e. not equal to zero)
+la	$v0, GSMFlags
+lb	$a0, skip_videos_fix($v0)		# a0 = skip_videos_fix
+beql	$a0,$zero, Skip_skip_videos_Patch	# in case of Skip Videos fix is disabled
 nop					# skip this fix
 // 'skip videos' (sceMpegIsEnd) code - basic method by nachbrenner (original idea from CMX and bongsan)
 // Source: http://replay.waybackmachine.org/20040419134616/http://nachbrenner.pcsx2.net/chapter1.html
@@ -249,11 +248,7 @@ nop
 //-----------------------------------------------------------------------------------------
 
 Skip_skip_videos_Patch:
-la	$v0, Target_VModeSettings
-ld	$a0, Target_SMODE2($v0)
-la	$v0, GSRegisterFixValues
-sb	$a0, SMODE2_adaptation($v0)
-la	$v0, Target_VModeSettings
+la	$v0, GSMDestSetGsCrt
 lw	$a0, Target_INTERLACE($v0)
 lw	$a1, Target_MODE($v0)
 lw	$a2, Target_FFMD($v0)
@@ -278,7 +273,7 @@ nop
 DTV_480P:
 
 //$v0 = Base address
-la	$v0, Target_VModeSettings
+la	$v0, GSMDestSetGsCrt
 //$a0 = Target_SMODE2
 ld	$a0, Target_SMODE2($v0)
 
@@ -365,7 +360,7 @@ nop
 DTV_576P:
 
 //$v0 = Base address
-la	$v0, Target_VModeSettings
+la	$v0, GSMDestSetGsCrt
 //$a0 = Target_SMODE2
 ld	$a0, Target_SMODE2($v0)
 
@@ -451,7 +446,7 @@ nop
 DTV_1080P:
 
 //$v0 = Base address
-la	$v0, Target_VModeSettings
+la	$v0, GSMDestSetGsCrt
 //$a0 = Target_SMODE2
 ld	$a0, Target_SMODE2($v0)
 
@@ -689,10 +684,10 @@ srl	$v1,$v0,26		# v1 = opcode (range 0x00-0x3F)
 andi	$v1,$v1, 0x003F		# v1 = pure opcode number
 sll	$v1,$v1,2		# v1 = op_num*2 (word offset for jump table)
 
-la	$s0, Source_GSRegisterValues
-la	$s1, Target_GSRegisterValues
-la	$s2, GSRegisterFixValues
-la	$s3, GSAdaptationValues
+la	$s0, GSMSourceGSRegs
+la	$s1, GSMDestGSRegs
+la	$s2, GSMFlags
+la	$s3, GSMAdapts
 
 la	$a2, MIPS_Regs		# a2 -> MIPS_Regs
 la	$a3, op_t		# a3 -> op_t
@@ -827,8 +822,8 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_PMODE($s0)			# Source_PMODE = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = PMODE_fix
-bnel	$v0,$zero,store_v0_as_PMODE	# in case of PMODE_fix is disabled
+lb	$v0, PMODE_fix($s2)				# v0 = PMODE_fix
+beql	$v0,$zero,store_v0_as_PMODE	# in case of PMODE_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for PMODE
 ld	$v0, Target_PMODE($s1)			# v0 = Target_PMODE
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_PMODE is zero
@@ -910,8 +905,8 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SMODE1($s0)				# Source_SMODE1 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = SMODE1_fix
-bnel	$v0,$zero,store_v0_as_SMODE1	# in case of SMODE1_fix is disabled
+lb	$v0, SMODE1_fix($s2)				# v0 = SMODE1_fix
+beql	$v0,$zero,store_v0_as_SMODE1	# in case of SMODE1_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for SMODE1
 ld	$v0, Target_SMODE1($s1)				# v0 = Target_SMODE1
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_SMODE1 is zero
@@ -944,20 +939,18 @@ andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0					# a3 = GS register address in KSEG1
 sd	$a1, Source_SMODE2($s0)				# Source_SMODE2 = a1
 lb	$v0, SMODE2_fix($s2)				# v0 = SMODE2_fix
-bnel	$v0,$zero,store_v0_as_SMODE2			# in case of  Separate SMODE2 fix disabled
+beql	$v0,$zero,store_v0_as_SMODE2			# in case of  Separate SMODE2 fix disabled
 or	$v0,$zero,$a1					# go use v0=a1 for SMODE2
 srl	$v0,$a1,1					# v0 = a1 aligned for FFMD in bit0
 and	$v0,$v0,$a1					# v0 bit 0 = INT & FFMD
 andi	$v0,$v0,1					# v0 bit 0 = INT & FFMD isolated
 sb	$v0, DOUBLE_HEIGHT_adaptation($s3)		# store Adapt_DoubleHeight flag
-beqz	$v0,1f						# in case of  no DoubleHeight need
+beqz	$v0,store_v0_as_SMODE2						# in case of  no DoubleHeight need
 ld	$v0, Target_SMODE2($s1)				# go use Target_SMODE2 as adapted SMode2
 							# otherwise just set v0 = Target_SMODE2
 andi	$a1,$a1,2					# a1 = FFMD of Source_SMODE2
 andi	$v0,$v0,0xFFFD					# v0 = Target_SMODE2 without FFMD
 or	$v0,$v0,$a1					# v0 = Target_SMODE2 + Source FFMD
-1: 							# Here v0 is adapted SMode2 value
-sb	$v0, SMODE2_adaptation($s3)			# Remember this adaption for later
 store_v0_as_SMODE2:
 sync.l							# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p							# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
@@ -995,7 +988,7 @@ andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SRFSH($s0)			# Source_SRFSH = a1
 lb	$v0, SRFSH_fix($s2)				# v0 = SRFSH_fix
-bnel	$v0,$zero,store_v0_as_SRFSH	# in case of SRFSH_fix is disabled
+beql	$v0,$zero,store_v0_as_SRFSH	# in case of SRFSH_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for SRFSH
 ld	$v0, Target_SRFSH($s1)			# v0 = Target_SRFSH
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_SRFSH is zero
@@ -1023,8 +1016,8 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SYNCH1($s0)			# Source_SYNCH1 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = SYNCH1_fix
-bnel	$v0,$zero,store_v0_as_SYNCH1	# in case of SYNCH1_fix is disabled
+lb	$v0, SYNCH_fix($s2)				# v0 = SYNCH_fix
+beql	$v0,$zero,store_v0_as_SYNCH1	# in case of SYNCH_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCH1
 ld	$v0, Target_SYNCH1($s1)			# v0 = Target_SYNCH1
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH1 is zero
@@ -1049,8 +1042,8 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SYNCH2($s0)			# Source_SYNCH2 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = SYNCH2_fix
-bnel	$v0,$zero,store_v0_as_SYNCH2	# in case of SYNCH2_fix is disabled
+lb	$v0, SYNCH_fix($s2)				# v0 = SYNCH_fix
+beql	$v0,$zero,store_v0_as_SYNCH2	# in case of SYNCH_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCH2
 ld	$v0, Target_SYNCH2($s1)			# v0 = Target_SYNCH2
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH2 is zero
@@ -1080,7 +1073,7 @@ andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SYNCV($s0)				# Source_SYNCV = a1
 lb	$v0, SYNCV_fix($s2)					# v0 = SYNCV_fix
-bnel	$v0,$zero,store_v0_as_SYNCV		# in case of SYNCV_fix is disabled
+beql	$v0,$zero,store_v0_as_SYNCV		# in case of SYNCV_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCV
 ld	$v0, Target_SYNCV($s1)				# v0 = Target_SYNCV
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCV is zero
@@ -1116,8 +1109,8 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_DISPFB1($s0)			# Source_DISPFB1 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB1_fix
-bnel	$v0,$zero,store_v0_as_DISPFB1	# in case of DISPFB1_fix is disabled
+lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
+beql	$v0,$zero,store_v0_as_DISPFB1	# in case of DISPFB_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_DISPFB1 is zero
@@ -1153,8 +1146,8 @@ lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
 or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_DISPFB2($s0)			# Source_DISPFB2 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB2_fix
-bnel	$v0,$zero,store_v0_as_DISPFB2	# in case of DISPFB2_fix is disabled
+lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
+beql	$v0,$zero,store_v0_as_DISPFB2	# in case of DISPFB_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
 beql	$v0,$zero,exit_GSHandler		# in case of  Target_DISPFB2 is zero
@@ -1182,8 +1175,8 @@ ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
 #  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
 
-lb	$v0, automatic_adaptation($s2)
-bnel	$v0,$zero,have_DISPLAY1_write_1					# in case of (automatic_adaptation)
+lb	$v0, ADAPTATION_fix($s2)
+beql	$v0,$zero,have_DISPLAY1_write_1					# in case of (ADAPTATION_fix)
 or	$a1,$zero,$v1					# 	simulate request same as forced mode
 
 have_DISPLAY1_write_1:
@@ -1398,7 +1391,7 @@ sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAYx value (for feedback)
 
 
 lb	$v1, DISPLAY_fix($s2)		# v1 = DISPLAY_fix
-bnel	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
+beql	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY1($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY1:
@@ -1423,8 +1416,8 @@ ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
 #  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
 
-lb	$v0, automatic_adaptation($s2)
-bnel	$v0,$zero,have_DISPLAY2_write_1					# in case of (automatic_adaptation)
+lb	$v0, ADAPTATION_fix($s2)
+beql	$v0,$zero,have_DISPLAY2_write_1					# in case of (ADAPTATION_fix)
 or	$a1,$zero,$v1					# 	simulate request same as forced mode
 
 have_DISPLAY2_write_1:
@@ -1639,7 +1632,7 @@ sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAYx value (for feedback)
 
 
 lb	$v1, DISPLAY_fix($s2)		# v1 = DISPLAY_fix
-bnel	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
+beql	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY2:
@@ -1929,11 +1922,10 @@ end_GSHandler:
 .ent OnTheFlyPatcher
 OnTheFlyPatcher:
 
-la	$a0, OnTheFlyPatcherValues		# Base Address
-sw	$a2, Pattern_Code_Ptr($a0)		# Store Pattern Code Address
-sw	$a3, Pattern_Mask_Ptr($a0)		# Store Pattern Mask Address
-sw	$a1, Replacement_Code_Ptr($a0)	# Store Replacement Code Address
+addiu	$sp, $sp, -0x0010	# reserve 16 bytes stack space (1 reg)
+sd	$ra, 0($sp)				# Push return address on stack
 
+la	$a0, MIPS_Regs			# Base Address
 sq	$v0, 0x20($a0)			# v0
 sq	$v1, 0x30($a0)			# v1
 sq	$t0, 0x80($a0)			# t0
@@ -1943,10 +1935,14 @@ sq	$t3, 0xB0($a0)			# t3
 sq	$t4, 0xC0($a0)			# t4
 sq	$t5, 0xD0($a0)			# t5
 
-li	$a0, 0x000D0000			# $a0 = scan start address
-li	$a1, 0x02000000			# $a1 = scan end address
-li	$v0, 0xFFFFFFFF			# $v0 = Ending (Wild Card) Value
 la	$t5, OnTheFlyPatcherValues		# Base Address
+sw	$a2, Pattern_Code_Ptr($t5)		# Store Pattern Code Address
+sw	$a3, Pattern_Mask_Ptr($t5)		# Store Pattern Mask Address
+sw	$a1, Replacement_Code_Ptr($t5)	# Store Replacement Code Address
+
+li	$a0, 0x00100000			# $a0 = scan start address
+li	$a1, 0x01C00000			# $a1 = scan end address
+li	$v0, 0xFFFFFFFF			# $v0 = Ending (Wild Card) Value
 beqzl	$zero, OnTheFlyPatcher_Start
 nop
 
@@ -1975,9 +1971,9 @@ and	$t3, $t1, $t2			# $t3 = current pattern masked value
 bne	$v1, $t3, OnTheFlyPatcher_OuterLoop	# stop inner comparison in case of the [current scan masked value] not be equal to the [current pattern masked value]
 nop
 
-addu	$a0, $a0, 4					# increase scan address
-addu	$a2, $a2, 4					# increase pattern address
-addu	$a3, $a3, 4					# increase pattern mask address
+addu	$a0, $a0, 4							# increase scan address
+addu	$a2, $a2, 4							# increase pattern address
+addu	$a3, $a3, 4							# increase pattern mask address
 beqzl	$zero, OnTheFlyPatcher_InnerLoop	# continue inner comparison until matched all whole thing
 nop
 
@@ -2012,8 +2008,9 @@ lq	$t0, 0x80($a0)			# t0
 lq	$v1, 0x30($a0)			# v1
 lq	$v0, 0x20($a0)			# v0
 
-jr $ra
-nop
+ld	$ra, 0($sp)				# Pull return address from stack 
+jr	$ra						# Return to caller
+addiu	$sp, $sp, 0x0010	# Restore sp during return
 
 .end OnTheFlyPatcher
 

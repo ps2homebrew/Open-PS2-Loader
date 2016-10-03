@@ -20,13 +20,13 @@
 
 extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd);
 
-struct VModeSettings{
+struct GSMDestSetGsCrt{
 	unsigned int interlace;
 	unsigned int mode;
 	unsigned int ffmd;
 };
 
-struct GSRegisterValues{
+struct GSMDestGSRegs{
 	u64 pmode;
 	u64 smode1;
 	u64 smode2;
@@ -40,33 +40,24 @@ struct GSRegisterValues{
 	u64 display2;
 };
 
-struct GSRegisterFixValues{
+struct GSMFlags{
 	u32 dx_offset;
 	u32 dy_offset;
-	u8 auto_adaptation;
-	u8 pmode;
-	u8 smode1;
-	u8 smode2;
-	u8 srfsh;
-	u8 synch;
-	u8 syncv;
-	u8 dispfb;
-	u8 display;
+	u8 ADAPTATION_fix;
+	u8 PMODE_fix;
+	u8 SMODE1_fix;
+	u8 SMODE2_fix;
+	u8 SRFSH_fix;
+	u8 SYNCH_fix;
+	u8 SYNCV_fix;
+	u8 DISPFB_fix;
+	u8 DISPLAY_fix;
+	u8 skip_videos_fix;
 };
 
-struct GSAdaptationValues{
-	u64 display1;
-	u64 display2;
-	u8 double_height;
-	u8 smode2;
-	u8 skip_videos;
-};
-
-extern struct VModeSettings Source_VModeSettings;
-extern struct VModeSettings Target_VModeSettings;
-extern struct GSRegisterValues Target_GSRegisterValues;
-extern struct GSRegisterFixValues GSRegisterFixValues;
-extern struct GSAdaptationValues GSAdaptationValues;
+extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
+extern struct GSMDestGSRegs GSMDestGSRegs;
+extern struct GSMFlags GSMFlags;
 
 extern void Hook_SetGsCrt();
 extern void GSHandler();
@@ -77,30 +68,30 @@ static unsigned int KSEG_backup[2];	//Copies of the original words at 0x80000100
 /* Update GSM params */
 /*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, u8 skip_videos)
+void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, u32 skip_videos_fix)
 {
-	Target_VModeSettings.interlace 		= (u32) interlace;
-	Target_VModeSettings.mode			= (u32) mode;
-	Target_VModeSettings.ffmd			= (u32) ffmd;
+	GSMDestSetGsCrt.interlace 		= (u32) interlace;
+	GSMDestSetGsCrt.mode			= (u32) mode;
+	GSMDestSetGsCrt.ffmd			= (u32) ffmd;
 
-	Target_GSRegisterValues.smode2 		= (u8) smode2;
-	Target_GSRegisterValues.display1	= (u64) display;
-	Target_GSRegisterValues.display2	= (u64) display;
-	Target_GSRegisterValues.syncv		= (u64) syncv;
+	GSMDestGSRegs.smode2 		= (u8) smode2;
+	GSMDestGSRegs.display1	= (u64) display;
+	GSMDestGSRegs.display2	= (u64) display;
+	GSMDestGSRegs.syncv		= (u64) syncv;
 
-	GSRegisterFixValues.dx_offset		= (u32) dx_offset;	// X-axis offset -> Use it only when automatic adaptations formulas don't suffice
-	GSRegisterFixValues.dy_offset		= (u32) dy_offset;	// Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
-	// 0 = On, 1 = Off (Someday I'll change this inverted logic...:-S)
-	GSRegisterFixValues.auto_adaptation	= (u8) 0;	// Default = 0 = On
-	GSRegisterFixValues.pmode			= (u8) 1;	// Default = 1 = Off
-	GSRegisterFixValues.smode1			= (u8) 1;	// Default = 1 = Off
-	GSRegisterFixValues.smode2			= (u8) 0;	// Default = 0 = On
-	GSRegisterFixValues.srfsh			= (u8) 1;	// Default = 1 = Off
-	GSRegisterFixValues.synch			= (u8) 1;	// Default = 1 = Off
-	GSRegisterFixValues.syncv			= (u8) 0;	// Default = 0 = On
-	GSRegisterFixValues.dispfb			= (u8) 1;	// Default = 1 = Off
-	GSRegisterFixValues.display			= (u8) 0;	// Default = 0 = On
-	GSAdaptationValues.skip_videos		= (u8) (skip_videos ^ 1);
+	GSMFlags.dx_offset		= (u32) dx_offset;	// X-axis offset -> Use it only when automatic adaptations formulas don't suffice
+	GSMFlags.dy_offset		= (u32) dy_offset;	// Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
+	// 0 = Off, 1 = On
+	GSMFlags.ADAPTATION_fix	= (u8) 1;	// Default = 1 = On
+	GSMFlags.PMODE_fix				= (u8) 0;	// Default = 0 = Off
+	GSMFlags.SMODE1_fix				= (u8) 0;	// Default = 0 = Off
+	GSMFlags.SMODE2_fix				= (u8) 1;	// Default = 1 = On
+	GSMFlags.SRFSH_fix				= (u8) 0;	// Default = 0 = Off
+	GSMFlags.SYNCH_fix				= (u8) 0;	// Default = 0 = Off
+	GSMFlags.SYNCV_fix				= (u8) 1;	// Default = 1 = On
+	GSMFlags.DISPFB_fix				= (u8) 0;	// Default = 0 = Off
+	GSMFlags.DISPLAY_fix			= (u8) 1;	// Default = 1 = On
+	GSMFlags.skip_videos_fix		= (u8) skip_videos_fix;
 
 }
 

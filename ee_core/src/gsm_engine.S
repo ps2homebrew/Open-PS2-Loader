@@ -62,7 +62,7 @@ Old_SetGsCrt:		.word 0
 
 .globl GSMSourceSetGsCrt
 GSMSourceSetGsCrt:	.space 12
-.equ Source_INTERLACE,0 # WORD
+.equ Source_INT,      0 # WORD
 .equ Source_MODE,     4 # WORD
 .equ Source_FFMD,     8 # WORD
 
@@ -86,7 +86,7 @@ GSMSourceGSRegs: .space 88
 
 .globl GSMDestSetGsCrt
 GSMDestSetGsCrt:	.space 12
-.equ Target_INTERLACE,0 # WORD
+.equ Target_INT,      0 # WORD
 .equ Target_MODE,     4 # WORD
 .equ Target_FFMD,     8 # WORD
 
@@ -124,10 +124,10 @@ GSMFlags: .space 18
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
 GSMAdapts:	.space 18
-.equ Adapted_DISPLAY1,         0 # DWORD
-.equ Adapted_DISPLAY2,         8 # DWORD
-.equ DOUBLE_HEIGHT_adaptation,16 # BYTE -> Height Doubling at INT&FFMD
-.equ SMODE2_adaptation,       17 # BYTE -> Adapted SMODE2 patch value
+.equ Adapted_DISPLAY1,             0 # DWORD
+.equ Adapted_DISPLAY2,             8 # DWORD
+.equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
+.equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -214,13 +214,14 @@ Hook_SetGsCrt:
 addiu	$sp, $sp, -0x0010			# reserve 16 bytes stack space (1 reg)
 sd	$ra, 0($sp)				# Push return address on stack
 la	$v0, GSMSourceSetGsCrt
-sw	$a0, Source_INTERLACE($v0)
+sw	$a0, Source_INT($v0)
 sw	$a1, Source_MODE($v0)
 sw	$a2, Source_FFMD($v0)
+
 and	$a3, $a0,$a2				# a3 = Interlace & Field
 andi	$a3, $a3,1				# a3 &= 1 limited to 1 bit
 la	$v0, GSMAdapts
-sb	$a3, DOUBLE_HEIGHT_adaptation($v0)
+sb	$a3, Interlace_FRAME_Mode_Flag($v0)
 
 //-----------------------------------------------------------------------------------------
 
@@ -249,7 +250,7 @@ nop
 
 Skip_skip_videos_Patch:
 la	$v0, GSMDestSetGsCrt
-lw	$a0, Target_INTERLACE($v0)
+lw	$a0, Target_INT($v0)
 lw	$a1, Target_MODE($v0)
 lw	$a2, Target_FFMD($v0)
 sync.l						# The opcodes sync.l and sync.p made a lot of games compatible
@@ -688,6 +689,7 @@ la	$s0, GSMSourceGSRegs
 la	$s1, GSMDestGSRegs
 la	$s2, GSMFlags
 la	$s3, GSMAdapts
+li	$s4,0xB2000000			# s4 = GS base address in KSEG1
 
 la	$a2, MIPS_Regs		# a2 -> MIPS_Regs
 la	$a3, op_t		# a3 -> op_t
@@ -934,28 +936,28 @@ sd	$v0,0($a3)							# after storing GS_SMODE1
 # |    |   |         |01 Stand-by    11 Off              |
 # ^----^---^---------^-----------------------------------.
 have_SMODE2_write:
-lui	$v0,0xB200					# v0 = GS base address in KSEG1
+lui	$v0,0xB200							# v0 = GS base address in KSEG1
 andi	$a3,$a3,0xFFFF					# a3 = GS register offset
-or	$a3,$a3,$v0					# a3 = GS register address in KSEG1
+or	$a3,$a3,$v0							# a3 = GS register address in KSEG1
 sd	$a1, Source_SMODE2($s0)				# Source_SMODE2 = a1
 lb	$v0, SMODE2_fix($s2)				# v0 = SMODE2_fix
-beql	$v0,$zero,store_v0_as_SMODE2			# in case of  Separate SMODE2 fix disabled
-or	$v0,$zero,$a1					# go use v0=a1 for SMODE2
-srl	$v0,$a1,1					# v0 = a1 aligned for FFMD in bit0
-and	$v0,$v0,$a1					# v0 bit 0 = INT & FFMD
-andi	$v0,$v0,1					# v0 bit 0 = INT & FFMD isolated
-sb	$v0, DOUBLE_HEIGHT_adaptation($s3)		# store Adapt_DoubleHeight flag
-beqz	$v0,store_v0_as_SMODE2						# in case of  no DoubleHeight need
+beql	$v0,$zero,store_v0_as_SMODE2	# in case of  Separate SMODE2 fix disabled
+or	$v0,$zero,$a1						# go use v0=a1 for SMODE2
+srl	$v0,$a1,1							# v0 = a1 aligned for FFMD in bit0
+and	$v0,$v0,$a1							# v0 bit 0 = INT & FFMD
+andi	$v0,$v0,1						# v0 bit 0 = INT & FFMD isolated
+sb	$v0, Interlace_FRAME_Mode_Flag($s3)	# store Interlace FRAME Mode Flag
+beqz	$v0,store_v0_as_SMODE2			# in case of  no Double Height need
 ld	$v0, Target_SMODE2($s1)				# go use Target_SMODE2 as adapted SMode2
-							# otherwise just set v0 = Target_SMODE2
-andi	$a1,$a1,2					# a1 = FFMD of Source_SMODE2
+										# otherwise just set v0 = Target_SMODE2
+andi	$a1,$a1,2						# a1 = FFMD of Source_SMODE2
 andi	$v0,$v0,0xFFFD					# v0 = Target_SMODE2 without FFMD
-or	$v0,$v0,$a1					# v0 = Target_SMODE2 + Source FFMD
+or	$v0,$v0,$a1							# v0 = Target_SMODE2 + Source FFMD
 store_v0_as_SMODE2:
-sync.l							# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p							# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler				# Now go exit
-sd	$v0,0($a3)					# after storing GS_reg_SMODE2
+sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
+sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
+beqzl	$zero,exit_GSHandler			# Now go exit
+sd	$v0,0($a3)							# after storing GS_reg_SMODE2
 
 # ----------------------------
 # SRFSH
@@ -1113,14 +1115,16 @@ lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
 beql	$v0,$zero,store_v0_as_DISPFB1	# in case of DISPFB_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_DISPFB1 is zero
-sd	$a1,0($a3)							# 	go use Source_DISPFB1
+beql	$v0,$zero,store_v0_as_DISPFB1	# in case of  Target_DISPFB1 is zero
+or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 
 store_v0_as_DISPFB1:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_DISPFB1
+sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
+sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
+sd	$v0,GS_DISPFB1($s4)					# Write to GS_DISPFB1
+sd	$v0,GS_DISPFB2($s4)					# Write to GS_DISPFB2
+beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
+nop
 
 # ----------------------------
 # DISPFB2
@@ -1150,14 +1154,16 @@ lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
 beql	$v0,$zero,store_v0_as_DISPFB2	# in case of DISPFB_fix is disabled
 or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_DISPFB2 is zero
-sd	$a1,0($a3)							# 	go use Source_DISPFB2
+beql	$v0,$zero,store_v0_as_DISPFB2	# in case of  Target_DISPFB2 is zero
+or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 
 store_v0_as_DISPFB2:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_DISPFB2
+sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
+sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
+sd	$v0,GS_DISPFB2($s4)					# Write to GS_DISPFB2
+sd	$v0,GS_DISPFB1($s4)					# Write to GS_DISPFB1
+beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
+nop
 
 # ----------------------------
 # DISPLAY1
@@ -1349,8 +1355,9 @@ bgtzl	$t0,have_DISPLAY1_write_12			# in case of (Target_DY > Calculated_DY)
 add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
 
 have_DISPLAY1_write_12:
-lb	$t0, DOUBLE_HEIGHT_adaptation($s3)	# in case of  doubled height not needed
+lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
 beq	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
+nop
 
 ld	$t0, Target_SMODE2($s1)
 andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
@@ -1397,8 +1404,10 @@ ld	$v0, Target_DISPLAY1($s1)	# use forced mode without adaption
 store_v0_as_DISPLAY1:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler_complex				# Now go exit (complex)
-sd	$v0,0($a3)					# after storing GS_DISPLAY1
+sd	$v0,GS_DISPLAY1($s4)					# Write to GS_DISPLAY1
+sd	$v0,GS_DISPLAY2($s4)					# Write to GS_DISPLAY2
+beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
+nop
 
 # ----------------------------
 # DISPLAY2
@@ -1590,8 +1599,9 @@ bgtzl	$t0,have_DISPLAY2_write_12			# in case of (Target_DY > Calculated_DY)
 add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
 
 have_DISPLAY2_write_12:
-lb	$t0, DOUBLE_HEIGHT_adaptation($s3)	# in case of  doubled height not needed
+lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
 beq	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
+nop
 
 ld	$t0, Target_SMODE2($s1)
 andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
@@ -1638,8 +1648,10 @@ ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 store_v0_as_DISPLAY2:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler_complex				# Now go exit (complex)
-sd	$v0,0($a3)					# after storing GS_DISPLAY2
+sd	$v0,GS_DISPLAY2($s4)					# Write to GS_DISPLAY2
+sd	$v0,GS_DISPLAY1($s4)					# Write to GS_DISPLAY1
+beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
+nop
 
 exit_GSHandler_complex:
 
@@ -1669,8 +1681,14 @@ lq	$s0, 0x100($k0)
 lq	$s1, 0x110($k0)
 lq	$s2, 0x120($k0)
 lq	$s3, 0x130($k0)
+lq	$s4, 0x140($k0)
+lq	$s5, 0x150($k0)
+lq	$s6, 0x160($k0)
+lq	$s7, 0x170($k0)
+lq	$t8, 0x180($k0)
+lq	$t9, 0x190($k0)
 
-#  Past this point in GSHandler, use only k0,k1,t0,t1
+# Past this point in GSHandler, use only k0,k1,t0,t1
 
 mfc0	$k0, $13		# k0 = Cause of last exception
 srl	$k0, 30			# BD2 Flags debug exception in branch delay slot.

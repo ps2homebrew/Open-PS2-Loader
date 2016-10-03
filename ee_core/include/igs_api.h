@@ -118,13 +118,13 @@
 #define GS_WRITEBACK_DCACHE    0
 
 //GSM Stuff
-struct VModeSettings{
+struct GSMSourceSetGsCrt{
 	unsigned int interlace;
 	unsigned int mode;
 	unsigned int ffmd;
 };
 
-struct GSRegisterValues{
+struct GSMSourceGSRegs{
 	u64 pmode;
 	u64 smode1;
 	u64 smode2;
@@ -138,8 +138,8 @@ struct GSRegisterValues{
 	u64 display2;
 };
 
-extern struct VModeSettings Source_VModeSettings;
-extern struct GSRegisterValues Source_GSRegisterValues;
+extern struct GSMSourceSetGsCrt GSMSourceSetGsCrt;
+extern struct GSMSourceGSRegs GSMSourceGSRegs;
 
 // BMP File Structure and example
 // https://www.siggraph.org/education/materials/HyperVis/asp_data/compimag/bmpfile.htm

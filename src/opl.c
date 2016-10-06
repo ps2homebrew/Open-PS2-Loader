@@ -355,13 +355,6 @@ static void updateMenuFromGameList(opl_io_module_t* mdl) {
 			if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0) {
 				gup->submenu.selected = 1;	//Select Last Played Game
 
-				// Auto Start Counter
-				if (gRememberLastPlayed && gAutoStartLastPlayed) {
-					as_counter_disable = 0;	//Release Auto Start Last Played counter
-					as_counter = 0;
-					as_start = 0;
-				}
-					
 			}
 
 			guiDeferUpdate(gup);
@@ -1203,11 +1196,12 @@ static void setDefaults(void) {
 	memset(gCheatList, 0, sizeof(gCheatList));
 #endif
 
-	// Auto Start Counter
-	as_counter_disable = 1;	//Auto Start Last Played counter disabled by default
-	as_counter = 0;
-	as_start = 0;
-	as_current = 0;
+	// Last Played Auto Start
+	KeyPressedOnce = 0;
+	DisableCron = 1;	//Auto Start Last Played counter disabled by default
+	CronStart = 0;
+	CronCurrent = 0;
+	RemainSecs = 0;
 
 }
 

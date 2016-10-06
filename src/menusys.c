@@ -619,7 +619,7 @@ void menuRenderMain() {
 }
 
 void menuHandleInputMain() {
-	// Auto Start Counter
+	// Last Played Auto Start
 	int ValidKeyPressed = 1;
 
 	if(getKey(KEY_LEFT)) {
@@ -659,23 +659,19 @@ void menuHandleInputMain() {
 	} else if (getKeyOn(KEY_R2)) { // end
 		menuLastPage();
 
-	// Auto Start Counter
+	// Last Played Auto Start
 	} else { // None valid key pressed
 		ValidKeyPressed = 0;
 
 	}
 
-	// Auto Start Counter
-	if(ValidKeyPressed == 1)
-		as_counter_disable = 1;	//Stop Auto Start Last Played counter
-	if (as_counter_disable == 0) {
-		if ( (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter < 0) ) {
-			gRememberLastPlayed = 0;
-			if(gSelectButton == KEY_CIRCLE)
-				selected_item->item->execCircle(selected_item->item);
-			else
-				selected_item->item->execCross(selected_item->item);
-		}
+	// Last Played Auto Start
+	if (RemainSecs < 0) {
+		DisableCron = 1;	//Disable Counter
+		if(gSelectButton == KEY_CIRCLE)
+			selected_item->item->execCircle(selected_item->item);
+		else
+			selected_item->item->execCross(selected_item->item);
 	}
 
 }

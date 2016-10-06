@@ -35,7 +35,7 @@
 #include <sys/fcntl.h>
 #endif
 
-// Auto Start Counter
+// Last Played Auto Start
 #include <time.h>
 
 #define OPL_VERSION		"0.9.4 WIP"
@@ -149,11 +149,13 @@ char gUSBPrefix[32];
 char gETHPrefix[32];
 
 int gRememberLastPlayed;
-// Auto Start Counter
+
+// Last Played Auto Start
+int KeyPressedOnce;
 int gAutoStartLastPlayed;
-int as_counter, as_counter_disable;
-double as_start, as_current;
-char asc[21];
+int RemainSecs, DisableCron;
+double CronStart, CronCurrent;
+char strAutoStartInNSecs[21];
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

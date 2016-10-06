@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev935 - GSM: Improved DISPFBx and DISPLAYx patching (both enabled as default). IGS: Bitmap/TXT Files created with the same automatic number - Mon Oct 03 15:24:30 2016 -0300
 rev934 - GSM: Fixes and improvements on Core Flags and Skip Videos (FMVs) functionality restoration - Mon Oct 03 07:28:47 2016 -0300
 rev933 - IGS improvements - Sat Oct 01 19:08:01 2016 -0300
 rev932 - SP193: USB Fragmentation Check enabled as default - Sat Oct 01 18:11:28 2016 -0300

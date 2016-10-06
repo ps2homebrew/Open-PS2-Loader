@@ -257,6 +257,8 @@ int getKey(int id) {
 	// or it was, then handle the repetition
 	if (getKeyOn(id)) {
 		delaycnt[kid] = getKeyDelay(id, 0);
+		KeyPressedOnce = 1;
+		DisableCron = 1;
 		return 1;
 	}
 
@@ -265,6 +267,8 @@ int getKey(int id) {
 
 	if(delaycnt[kid] <= 0) {
 		delaycnt[kid] = getKeyDelay(id, 1);
+		KeyPressedOnce = 1;
+		DisableCron = 1;
 		return 1;
 	}
 

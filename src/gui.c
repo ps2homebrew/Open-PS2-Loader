@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <libvux.h>
 
-// Auto Start Counter
+// Last Played Auto Start
 #include <time.h>
 
 static int gScheduledOps;
@@ -404,7 +404,7 @@ void guiShowConfig() {
 		diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
 		diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
 		diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
-		as_counter_disable = 1;	//Stop Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
+		DisableCron = 1;	//Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
 		if(diaGetInt(diaConfig, CFG_SELECTBUTTON, &value))
 			gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 		else
@@ -1193,6 +1193,11 @@ static void guiHandleOp(struct gui_update_t* item) {
 				item->menu.menu->current = result;
 				item->menu.menu->pagestart = result;
 				item->menu.menu->remindLast = 1;
+
+				// Last Played Auto Start
+				if ( (gAutoStartLastPlayed) && !(KeyPressedOnce) )
+					DisableCron = 0;	//Release Auto Start Last Played counter
+
 			}
 
 			break;
@@ -1506,14 +1511,16 @@ static void guiDrawOverlays() {
 	fntRenderString(gTheme->fonts[0], screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 #endif
 
-	// Auto Start Counter
-	if (( !pending) && (wfadeout <= 0) && (as_counter_disable == 0) && (as_start == 0) )
-		as_start = clock() / CLOCKS_PER_SEC;
-	if ( (wfadeout <= 0) && (gRememberLastPlayed) && (gAutoStartLastPlayed) && (as_counter_disable == 0) && (as_counter >= 0) ) {
-		as_current = clock() / CLOCKS_PER_SEC;
-		as_counter = gAutoStartLastPlayed - (as_current - as_start);
-		snprintf(asc, sizeof(asc), _l(_STR_AUTO_START_IN_N_SECS), as_counter);
-		fntRenderString(gTheme->fonts[0], screenWidth / 2, screenHeight / 2, ALIGN_CENTER, 0, 0, asc, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+	// Last Played Auto Start
+	if ( (!pending) && (wfadeout <= 0) && (DisableCron == 0) ) {
+		if (CronStart == 0) {
+			CronStart = clock() / CLOCKS_PER_SEC;
+		} else {
+			CronCurrent = clock() / CLOCKS_PER_SEC;
+			RemainSecs = gAutoStartLastPlayed - (CronCurrent - CronStart);
+			snprintf(strAutoStartInNSecs, sizeof(strAutoStartInNSecs), _l(_STR_AUTO_START_IN_N_SECS), RemainSecs);
+			fntRenderString(gTheme->fonts[0], screenWidth / 2, screenHeight / 2, ALIGN_CENTER, 0, 0, strAutoStartInNSecs, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+		}
 	}
 }
 

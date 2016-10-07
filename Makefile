@@ -75,8 +75,10 @@ EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
 EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
-MAPFILE = opl.map
 
+MAPFILE = opl.map
+EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
+ 
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
 
@@ -143,7 +145,6 @@ endif
 ifeq ($(DEBUG),1) 
   EE_CFLAGS += -D__DEBUG -g
   EE_OBJS += obj/debug.o obj/udptty.o obj/ioptrap.o obj/ps2link.o
-  EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
   MOD_DEBUG_FLAGS = DEBUG=1
   ifeq ($(IOPCORE_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG

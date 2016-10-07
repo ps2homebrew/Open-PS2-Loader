@@ -397,7 +397,7 @@ _IGS_ENGINE_ void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size,
 	//  0000000001111111111222222222
 	//  1234567890123456789012345678
 	// "mc1:/XXXX_yyy.zz_GS(nnn).txt"
-	char PathFilenameExtension[24];
+	char PathFilenameExtension[64];
 	s32 file_handle;
 
 	char text[1024];

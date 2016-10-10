@@ -1067,8 +1067,8 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 
 	while (nsectors > 0) {
 		sectors = nsectors;
-		if (sectors > 2)
-			sectors = 2;
+		if (sectors > MAX_USB_SECTORS)
+			sectors = MAX_USB_SECTORS;
 
 		nbytes = sectors * 2048;
 		DiskSectorsToRead = nbytes / g_mass_device.sectorSize;

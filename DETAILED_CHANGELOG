@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev937 - Minor changes - Fri Oct 07 11:54:10 2016 -0300
 rev936 - Auto Start Last Game fix - Thu Oct 06 16:43:19 2016 -0300
 rev935 - GSM: Improved DISPFBx and DISPLAYx patching (both enabled as default). IGS: Bitmap/TXT Files created with the same automatic number - Mon Oct 03 15:24:30 2016 -0300
 rev934 - GSM: Fixes and improvements on Core Flags and Skip Videos (FMVs) functionality restoration - Mon Oct 03 07:28:47 2016 -0300

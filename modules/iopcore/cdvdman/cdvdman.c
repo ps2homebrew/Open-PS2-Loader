@@ -404,7 +404,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
 	cdvdman_stat.status = CDVD_STAT_READ;
 
-#ifdef UNALIGNED_BUFFER_PATCH
+#if UNALIGNED_BUFFER_PATCH
 	if ((u32)(buf) & 3) {
 		//For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
 		WaitSema(cdvdman_searchfilesema);

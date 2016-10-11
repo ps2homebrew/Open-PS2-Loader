@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev939 - I also like to commit in two-phases...:p - Mon Oct 10 01:20:59 2016 -0300
 rev938 - Optional FMV fix (enabled by setting UNALIGNED_BUFFER_PATCH to 0) - Sun Oct 09 21:06:03 2016 -0300
 rev937 - Minor changes - Fri Oct 07 11:54:10 2016 -0300
 rev936 - Auto Start Last Game fix - Thu Oct 06 16:43:19 2016 -0300

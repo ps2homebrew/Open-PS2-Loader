@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev942 - root: Update - Sun Oct 16 15:37:34 2016 -0200
 rev941 - OPL: Improve versioning - Sun Oct 16 15:30:24 2016 -0200
 rev940 - BLURT output (for debugging purposes) It accumulates and - Tue Oct 11 10:28:29 2016 -0300
 rev939 - I also like to commit in two-phases...:p - Mon Oct 10 01:20:59 2016 -0300

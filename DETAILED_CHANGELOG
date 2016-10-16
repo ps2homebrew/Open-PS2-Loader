@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev940 - BLURT output (for debugging purposes) It accumulates and - Tue Oct 11 10:28:29 2016 -0300
 rev939 - I also like to commit in two-phases...:p - Mon Oct 10 01:20:59 2016 -0300
 rev938 - Optional FMV fix (enabled by setting UNALIGNED_BUFFER_PATCH to 0) - Sun Oct 09 21:06:03 2016 -0300
 rev937 - Minor changes - Fri Oct 07 11:54:10 2016 -0300

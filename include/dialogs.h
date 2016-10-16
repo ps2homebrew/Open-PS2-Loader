@@ -132,17 +132,19 @@ enum UI_ITEMS{
 #define COMPAT_VMC2_DEFINE	(COMPAT_VMC2_DEFINE_ID | COMPAT_NOEXIT)
 #endif
 
-extern struct UIItem diaNetConfig[];
-extern struct UIItem diaCompatConfig[];
-extern struct UIItem diaUIConfig[];
-extern struct UIItem diaGSConfig[];
-extern struct UIItem diaCheatConfig[];
-
+// Main Menu
 extern struct UIItem diaConfig[];
+extern struct UIItem diaUIConfig[];
+extern struct UIItem diaNetConfig[];
+extern struct UIItem diaNetCompatUpdate[];
+extern struct UIItem diaCheatConfig[];
 extern struct UIItem diaAbout[];
+
+// Per-Game Settings
+extern struct UIItem diaCompatConfig[];
+extern struct UIItem diaGSConfig[];
 #ifdef VMC
 extern struct UIItem diaVMC[];
 #endif
-extern struct UIItem diaNetCompatUpdate[];
 
 #endif

@@ -12,7 +12,7 @@ struct UIItem diaConfig[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEBUG}}}, {UI_SPACER},
-	{UI_BOOL, CFG_DEBUG_COLORS, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_BOOL, CFG_DEBUG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_PS2LOGO}}}, {UI_SPACER},
 	{UI_BOOL, CFG_PS2LOGO, 1, 1, _STR_HINT_PS2LOGO, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
@@ -21,7 +21,7 @@ struct UIItem diaConfig[] = {
 	{UI_STRING, CFG_EXITTO, 1, 1, _STR_HINT_EXITPATH, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLE_WRITE}}}, {UI_SPACER},
-	{UI_BOOL, CFG_WRITE_OPERATIONS, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
+	{UI_BOOL, CFG_ENWRITEOP, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_LASTPLAYED}}}, {UI_SPACER},
 	{UI_BOOL, CFG_LASTPLAYED, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_SPACER},

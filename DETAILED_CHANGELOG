@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev944 - dialogs: Make it human readable - Sun Oct 16 16:25:09 2016 -0200
 rev943 - TravisCI: Initial template - Sun Oct 16 16:14:36 2016 -0200
 rev942 - root: Update - Sun Oct 16 15:37:34 2016 -0200
 rev941 - OPL: Improve versioning - Sun Oct 16 15:30:24 2016 -0200

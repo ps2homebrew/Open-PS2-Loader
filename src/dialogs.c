@@ -60,7 +60,7 @@ struct UIItem diaConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEFDEVICE}}}, {UI_SPACER},
 	{UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
-	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -110,7 +110,8 @@ struct UIItem diaUIConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_WIDE_SCREEN}}}, {UI_SPACER},
 	{UI_BOOL, UICFG_WIDESCREEN, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
-	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+	// buttons
+	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -122,13 +123,11 @@ struct UIItem diaNetConfig[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SHOW_ADVANCED_OPTS}}}, {UI_SPACER},
-	{UI_SPACER},
 	{UI_BOOL, NETCFG_SHOW_ADVANCED_OPTS, 1, 1, -1, -10, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ETH_OPMODE}}}, {UI_SPACER},
-	{UI_ENUM, NETCFG_ETHOPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
-
-	{UI_BREAK},
+	{UI_ENUM, NETCFG_ETHOPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CAT_PS2}}}, {UI_BREAK},
 
@@ -181,8 +180,6 @@ struct UIItem diaNetConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_PORT}}}, {UI_SPACER},
 	{UI_INT, NETCFG_SHARE_PORT, 1, 1, -1, 0, 0, {.intvalue = {445, 445, 0, 1024}}}, {UI_BREAK},
 
-	{UI_BREAK},
-
 	//  ---- SMB share name ----
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_SHARE}}}, {UI_SPACER},
 	{UI_STRING, NETCFG_SHARE_NAME, 1, 1, _STR_HINT_SHARENAME, 0, 0, {.stringvalue = {"PS2SMB", "PS2SMB", NULL}}}, {UI_BREAK},
@@ -193,11 +190,9 @@ struct UIItem diaNetConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_PASSWORD}}}, {UI_SPACER},
 	{UI_PASSWORD, NETCFG_SHARE_PASSWORD, 1, 1, _STR_HINT_GUEST, 0, 0, {.stringvalue = {"", "", NULL}}}, {UI_BREAK},
 
-	{UI_BREAK},
-
-	//  ---- Ok ----
+	// buttons
 	{UI_BUTTON, NETCFG_OK, 1, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_SPACER},
-	{UI_BUTTON, NETCFG_RECONNECT, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RECONNECT}}},
+	{UI_BUTTON, NETCFG_RECONNECT, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RECONNECT}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -209,15 +204,15 @@ struct UIItem diaNetCompatUpdate[] = {
 	{UI_SPLITTER},
 
 	{UI_LABEL, NETUPD_OPT_UPD_ALL_LBL, 1, 1, -1, -20, 0, {.label = {NULL, _STR_NET_UPDATE_ALL}}}, {UI_SPACER},
-	{UI_BOOL, NETUPD_OPT_UPD_ALL, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 1}}}, {UI_BREAK},
-
-	{UI_BREAK},
+	{UI_BOOL, NETUPD_OPT_UPD_ALL, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 1}}},
+	{UI_SPLITTER},
 
 	{UI_LABEL, NETUPD_PROGRESS_LBL, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_PROGRESS}}}, {UI_SPACER},
 	{UI_INT, NETUPD_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}}, {UI_LABEL, NETUPD_PROGRESS_PERC_LBL, 1, 1, -1, 0, 0, {.label = {"%", -1}}}, {UI_BREAK},
 
-	{UI_BUTTON, NETUPD_BTN_START, 1, 1, -1, 0, 0, {.label = {NULL, _STR_START}}},
-	{UI_BUTTON, NETUPD_BTN_CANCEL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CANCEL}}},
+	// buttons
+	{UI_BUTTON, NETUPD_BTN_START, 1, 1, -1, 0, 0, {.label = {NULL, _STR_START}}}, {UI_SPACER},
+	{UI_BUTTON, NETUPD_BTN_CANCEL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CANCEL}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -235,7 +230,8 @@ struct UIItem diaCheatConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_CHEATMODE}}}, {UI_SPACER},
 	{UI_ENUM, CHEATCFG_CHEATMODE, 1, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}}, {UI_BREAK},
 
-	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+	// buttons
+	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -250,40 +246,37 @@ struct UIItem diaAbout[] = {
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DEVS}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - crazyc - dlanor", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard | crazyc | dlanor", -1}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"doctorxyz | hominem.te.esse | ifcaro", -1}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"izdubar - Jay-Jay - jimmikaelkael - misfire", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"izdubar | Jay-Jay | jimmikaelkael | misfire", -1}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 | reprep | SP193 | volca", -1}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"... and the anonymous ...", -1}}}, {UI_BREAK},
-
-	{UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"and the anonymous...", -1}}},
+	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_QANDA}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"algol - Berion - danielB - El_Patas - EP - gledson999 - lee4", -1}}}, {UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"algol | Berion | danielB | El_Patas | EP | gledson999 | lee4", -1}}}, {UI_BREAK},
 
 	{UI_SPACER},
-	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH - RandQalan - ShaolinAssassin - yoshi314 - zero35", -1}}}, {UI_BREAK},
-
-	{UI_BREAK},
+	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH | RandQalan | ShaolinAssassin | yoshi314 | zero35", -1}}},
+	{UI_SPLITTER},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NET_UPDATE}}}, {UI_BREAK},
 
 	{UI_SPACER},
 	{UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}}, {UI_BREAK},
 
-	{UI_BREAK},
-
-	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+	// buttons
+	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -295,8 +288,7 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, COMPAT_GAME, 1, 1, -1, 0, 0, {.label = {"<Game Label>", -1}}},
 	{UI_SPLITTER},
 
-	{UI_LABEL, COMPAT_STATUS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-	{UI_BREAK},
+	{UI_LABEL, COMPAT_STATUS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_BREAK},
 
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}}, {UI_SPACER},
 	{UI_BOOL, COMPAT_MODE_BASE, 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
@@ -315,9 +307,7 @@ struct UIItem diaCompatConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}}, {UI_SPACER},
 	{UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
 	{UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}}, {UI_SPACER},
-	{UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}}, {UI_SPACER},
-	{UI_BREAK},
-
+	{UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}},
 	{UI_SPLITTER},
 
 // Note: Per-Game GSM uses a UI_BUTTON to open up the menu. An #ifdef should keep it
@@ -339,6 +329,7 @@ struct UIItem diaCompatConfig[] = {
 	{UI_BUTTON, COMPAT_VMC1_DEFINE, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
 #endif
 	{UI_BREAK},
+
 	{UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT2}}}, {UI_SPACER},
 #ifndef __CHILDPROOF
 	{UI_BUTTON, COMPAT_VMC2_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_SPACER},
@@ -358,21 +349,15 @@ struct UIItem diaCompatConfig[] = {
 	{UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiAltStartupNameHandler}}},
 	{UI_SPLITTER},
 
-#ifndef __CHILDPROOF
-	{UI_BUTTON, COMPAT_SAVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SAVE_CHANGES}}}, {UI_SPACER},
-#endif
+	// buttons
 	{UI_BUTTON, COMPAT_TEST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_TEST}}},
 #ifndef __CHILDPROOF
 	{UI_SPACER},
-	{UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
-#endif
-	{UI_BREAK},
-
-	{UI_BREAK},
-
-#ifndef __CHILDPROOF
+	{UI_BUTTON, COMPAT_SAVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SAVE_CHANGES}}}, {UI_SPACER},
+	{UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}}, {UI_SPACER},
 	{UI_BUTTON, COMPAT_REMOVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_REMOVE_ALL_SETTINGS}}},
 #endif
+	{UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -399,7 +384,8 @@ struct UIItem diaGSConfig[] = {
 	{UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_GSMSKIPVIDEOS}}}, {UI_SPACER},
 	{UI_BOOL, GSMCFG_GSMSKIPVIDEOS, 1, 1, _STR_HINT_GSMSKIPVIDEOS, 0, 0, {.intvalue = {1, 1}}}, {UI_BREAK},
 
-	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+	// buttons
+	{UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}
@@ -425,10 +411,9 @@ struct UIItem diaVMC[] = {
 	{UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_PROGRESS}}}, {UI_SPACER},
 	{UI_INT, VMC_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"%", -1}}}, {UI_BREAK},
 
-	{UI_BREAK},
-
+	// buttons
 	{UI_BUTTON, VMC_BUTTON_CREATE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}}, {UI_SPACER},
-	{UI_BUTTON, VMC_BUTTON_DELETE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DELETE}}},
+	{UI_BUTTON, VMC_BUTTON_DELETE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DELETE}}}, {UI_BREAK},
 
 	// end of dialog
 	{UI_TERMINATOR}

@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+rev948 - dialogs: Fix some spacing in UI - Mon Oct 17 12:04:47 2016 -0200
 rev947 - lng_pack: Add script to pack langs - Sun Oct 16 19:28:51 2016 -0200
 rev946 - dialogs: Fix errors introduced in rev944 (89c1acc304b83d916c564886f4d9259f1719a416) - Sun Oct 16 17:19:04 2016 -0200
 rev945 - dialogs: Fix human errors - Sun Oct 16 16:29:10 2016 -0200

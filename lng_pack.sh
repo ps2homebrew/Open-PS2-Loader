@@ -61,8 +61,8 @@ EOF
 
 # Lets pack it!
 cd ${_bdir}/
-zip -r OPL_LANGS-r${_rev}.zip *
-cp ${_bdir}/OPL_LANGS-r${_rev}.zip ${_dir}/OPL_LANGS-r${_rev}.zip
+zip -r OPNPS2LD_LANGS-r${_rev}.zip *
+cp ${_bdir}/OPNPS2LD_LANGS-r${_rev}.zip ${_dir}/OPNPS2LD_LANGS-r${_rev}.zip
 
 # Cleanup
 cd ${_dir}

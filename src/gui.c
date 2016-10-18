@@ -195,24 +195,24 @@ void guiShowAbout() {
 	snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
 
 #ifdef VMC
-	strcat(OPLVersion, " VMC");
+	strcat(OPLVersion, " | VMC");
 #endif
 #ifdef __RTL
-	strcat(OPLVersion, " RTL");
+	strcat(OPLVersion, " | RTL");
 #endif
 #ifdef __CHILDPROOF
-	strcat(OPLVersion, " CHILDPROOF");
+	strcat(OPLVersion, " | CHILDPROOF");
 #endif
 #ifdef GSM
-	strcat(OPLVersion, " GSM ");
+	strcat(OPLVersion, " | GSM");
 	strcat(OPLVersion, GSM_VERSION);
 #endif
 #ifdef IGS
-	strcat(OPLVersion, " IGS ");
+	strcat(OPLVersion, " | IGS");
 	strcat(OPLVersion, IGS_VERSION);
 #endif
 #ifdef CHEAT
-	strcat(OPLVersion, " PS2RD ");
+	strcat(OPLVersion, " | PS2RD");
 #endif
 
 	diaSetLabel(diaAbout, 1, OPLVersion);

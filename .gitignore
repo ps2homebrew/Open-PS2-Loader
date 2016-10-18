@@ -1,5 +1,3 @@
-syntax: glob
-
 *.o
 *.s
 *.elf
@@ -8,6 +6,10 @@ syntax: glob
 *.irx
 *.exe
 *.map
+*.patch
+*.diff
+*.zip
+.hg
 libfreetype.a
 
 pc/iso2usbld/bin/iso2usbld

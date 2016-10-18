@@ -38,9 +38,6 @@
 // Last Played Auto Start
 #include <time.h>
 
-#define OPL_VERSION		"0.9.4 WIP"
-#define OPL_IS_DEV_BUILD	1		//Define if this build is a development build.
-
 //IO type IDs
 #define IO_CUSTOM_SIMPLEACTION			1	// handler for parameter-less actions
 #define IO_MENU_UPDATE_DEFFERED			2

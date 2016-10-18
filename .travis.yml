@@ -151,6 +151,6 @@ script:
 #    secure: [PUT YOUR NEW SECURE API KEY HERE]
 #  file:
 #    - "${opl_build_dir}/out_zip/${opl_set}.zip"
-#    - "${opl_build_dir}/out_zip/OPL_LANGS-r${opl_revision}.zip"
+#    - "${opl_build_dir}/out_zip/OPNPS2LD_LANGS-r${opl_revision}.zip"
 #  on:
 #    tags: true

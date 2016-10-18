@@ -102,6 +102,7 @@ script:
 # Let's build Open PS2 Loader!
 - cd ${opl_build_dir}/
 - . lng_pack.sh
+- . make_changelog.sh
 
 - export opl_version=$(cat Makefile | grep "VERSION =" | cut -c 11- | head -1)
 - export opl_subversion=$(cat Makefile | grep "SUBVERSION =" | cut -c 14- | head -1)

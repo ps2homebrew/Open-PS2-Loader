@@ -1,9 +1,8 @@
 VERSION = 0
 SUBVERSION = 9
 PATCHLEVEL = 4
-REVISION = 950
+REVISION = 951
 EXTRAVERSION = WIP
-OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))
 DEVBUILD = 1
 
 # How to DEBUG?
@@ -51,6 +50,8 @@ EESIO_DEBUG = 0
 INGAME_DEBUG = 0
 DECI2_DEBUG = 0
 CHILDPROOF = 0
+
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \

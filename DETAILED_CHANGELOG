@@ -8,6 +8,9 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+commit951 - Caio Oliveira - lng_pack: Remove old revision versioning - Tue Oct 18 16:56:37 2016 -0200
+commit950 - Caio Oliveira - DETAILED_CHANGELOG: Regenerate - Tue Oct 18 16:52:36 2016 -0200
+commit949 - Caio Oliveira - make_changelog: Update to GIT (Please read below) - Tue Oct 18 16:52:22 2016 -0200
 commit948 - Caio Oliveira - gui: Fix spacing of version in About Menu - Tue Oct 18 11:02:55 2016 -0200
 commit947 - Caio Oliveira - root: Better in this way - Mon Oct 17 12:17:35 2016 -0200
 commit946 - Caio Oliveira - dialogs: Fix some spacing in UI - Mon Oct 17 12:04:47 2016 -0200

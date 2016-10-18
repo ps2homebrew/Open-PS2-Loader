@@ -1,15 +1,10 @@
 #!/bin/bash
+# Lang Packer for Open-PS2-Loader by Caio99BR <caiooliveirafarias0@gmail.com>
 
 # Set variables
 _dir=$(pwd)
 _bdir="/tmp/opl_lng"
-_rev=$(cat ${_dir}/Makefile | grep "REVISION =" | cut -c 12- | head -1)
-
-# Use old revision versioning
-if [ ${_rev} == "" ]
-then
-	_rev=$(cat ${_dir}/DETAILED_CHANGELOG | head -11 | tail -n 1 | cut -c -6 | cut -c 4- | head -1)
-fi
+_rev=$(cat ${_dir}/Makefile | grep "REVISION =" | head -1 | cut -d " " -f 3)
 
 # Print a list
 printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_list

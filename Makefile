@@ -1,3 +1,8 @@
+VERSION = 0
+SUBVERSION = 9
+PATCHLEVEL = 4
+REVISION = 940
+EXTRAVERSION = WIP
 DEVBUILD = 1
 
 # How to DEBUG?
@@ -48,6 +53,8 @@ CHILDPROOF = 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))
+
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o obj/httpclient.o
@@ -73,6 +80,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o \
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
+EE_BIN_VPKD = OPNPS2LD-$(OPL_VERSION).ELF
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
@@ -178,14 +186,14 @@ else
   SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 endif
 
-EE_CFLAGS += -DOPL_IS_DEV_BUILD=\"$(DEVBUILD)\"
+EE_CFLAGS += -DOPL_VERSION=\"$(OPL_VERSION)\" -DOPL_IS_DEV_BUILD=\"$(DEVBUILD)\"
 
 .SILENT:
 all:
 	@mkdir -p obj
 	@mkdir -p asm
 	
-	echo "Building Open PS2 Loader..."
+	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
 	$(MAKE) $(EE_BIN)
 	
@@ -196,7 +204,9 @@ ifeq ($(DEBUG),0)
 
 	echo "Compressing..."
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
-	@echo "Package Complete: $(EE_BIN_PKD)"
+
+	cp $(EE_BIN_PKD) $(EE_BIN_VPKD)
+	@echo "Package Complete: $(EE_BIN_VPKD)"
   endif
 endif
 
@@ -224,7 +234,7 @@ deci2_debug:
 clean:
 	echo "Cleaning..."
 	echo "-Interface"
-	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
+	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_BIN_VPKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-Elf Loader"
@@ -627,6 +637,8 @@ $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 $(EE_OBJS_DIR)%.o : %.s
 	$(EE_AS) $(EE_ASFLAGS) $(EE_ASM_DIR)$< -o $@
 
+oplversion:
+	@echo $(OPLVERSION)
 
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal

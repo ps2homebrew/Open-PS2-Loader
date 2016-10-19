@@ -31,48 +31,43 @@
 /*---------------------------------*/
 void SetupCheats()
 {
-	code_t code;
+    code_t code;
 
-	int i, j, k, nextCodeCanBeHook;
-	i = 0;
-	j = 0;
-	k = 0;
-	nextCodeCanBeHook = 1;
+    int i, j, k, nextCodeCanBeHook;
+    i = 0;
+    j = 0;
+    k = 0;
+    nextCodeCanBeHook = 1;
 
-	while (i<MAX_CHEATLIST) {
+    while (i < MAX_CHEATLIST) {
 
-		code.addr = gCheatList[i];
-		code.val = gCheatList[i+1];
-		i+=2;
+        code.addr = gCheatList[i];
+        code.val = gCheatList[i + 1];
+        i += 2;
 
-		if ((code.addr == 0) && (code.val == 0)) break;
+        if ((code.addr == 0) && (code.val == 0))
+            break;
 
-		if (((code.addr & 0xfe000000) == 0x90000000) && nextCodeCanBeHook == 1)
-		{
-			hooklist[j] = code.addr & 0x01FFFFFC;
-			j++;
-			hooklist[j] = code.val;
-			j++;
-		}
-		else
-		{
-			codelist[k] = code.addr;
-			k++;
-			codelist[k] = code.val;
-			k++;
-		}
-		// Discard any false positives from being possible hooks
-		if ((code.addr & 0xf0000000) == 0x40000000 || 0x30000000)
-		{
-			nextCodeCanBeHook = 0;
-		}
-		else
-		{
-			nextCodeCanBeHook = 1;
-		}
-	}
-	numhooks = j/2;
-	numcodes = k/2;
+        if (((code.addr & 0xfe000000) == 0x90000000) && nextCodeCanBeHook == 1) {
+            hooklist[j] = code.addr & 0x01FFFFFC;
+            j++;
+            hooklist[j] = code.val;
+            j++;
+        } else {
+            codelist[k] = code.addr;
+            k++;
+            codelist[k] = code.val;
+            k++;
+        }
+        // Discard any false positives from being possible hooks
+        if ((code.addr & 0xf0000000) == 0x40000000 || 0x30000000) {
+            nextCodeCanBeHook = 0;
+        } else {
+            nextCodeCanBeHook = 1;
+        }
+    }
+    numhooks = j / 2;
+    numcodes = k / 2;
 }
 
 /*-----------------------------------------------------*/
@@ -80,8 +75,8 @@ void SetupCheats()
 /*-----------------------------------------------------*/
 static inline void Install_HookSetupThread(void)
 {
-	Old_SetupThread = GetSyscallHandler(__NR_SetupThread);
-	SetSyscall(__NR_SetupThread, HookSetupThread);
+    Old_SetupThread = GetSyscallHandler(__NR_SetupThread);
+    SetSyscall(__NR_SetupThread, HookSetupThread);
 }
 
 /*----------------------------------------------------*/
@@ -89,7 +84,7 @@ static inline void Install_HookSetupThread(void)
 /*----------------------------------------------------*/
 static inline void Remove_HookSetupThread(void)
 {
-	SetSyscall(__NR_SetupThread, Old_SetupThread);
+    SetSyscall(__NR_SetupThread, Old_SetupThread);
 }
 
 /*---------------------------*/
@@ -97,10 +92,10 @@ static inline void Remove_HookSetupThread(void)
 /*---------------------------*/
 void EnableCheats(void)
 {
-	// Setup Cheats
-	SetupCheats();
-	// Install Hook SetupThread
-	Install_HookSetupThread();
+    // Setup Cheats
+    SetupCheats();
+    // Install Hook SetupThread
+    Install_HookSetupThread();
 }
 
 /*----------------------------*/
@@ -108,6 +103,6 @@ void EnableCheats(void)
 /*----------------------------*/
 void DisableCheats(void)
 {
-	// Remove Hook SetupThread
-	Remove_HookSetupThread();
+    // Remove Hook SetupThread
+    Remove_HookSetupThread();
 }

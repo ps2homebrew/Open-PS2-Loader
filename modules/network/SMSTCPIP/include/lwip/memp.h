@@ -36,21 +36,21 @@
 #include "lwip/opt.h"
 
 typedef enum {
-  MEMP_PBUF,
-  MEMP_RAW_PCB,
-  MEMP_UDP_PCB,
-  MEMP_TCP_PCB,
-  MEMP_TCP_PCB_LISTEN,
-  MEMP_TCP_SEG,
+    MEMP_PBUF,
+    MEMP_RAW_PCB,
+    MEMP_UDP_PCB,
+    MEMP_TCP_PCB,
+    MEMP_TCP_PCB_LISTEN,
+    MEMP_TCP_SEG,
 
-  MEMP_NETBUF,
-  MEMP_NETCONN,
-  MEMP_API_MSG,
-  MEMP_TCPIP_MSG,
+    MEMP_NETBUF,
+    MEMP_NETCONN,
+    MEMP_API_MSG,
+    MEMP_TCPIP_MSG,
 
-  MEMP_SYS_TIMEOUT,
-  
-  MEMP_MAX
+    MEMP_SYS_TIMEOUT,
+
+    MEMP_MAX
 } memp_t;
 
 void memp_init(void);
@@ -60,4 +60,3 @@ void *memp_realloc(memp_t fromtype, memp_t totype, void *mem);
 void memp_free(memp_t type, void *mem);
 
 #endif /* __LWIP_MEMP_H__  */
-    

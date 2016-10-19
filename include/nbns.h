@@ -1,15 +1,15 @@
 //RPC IDs
-enum NBNS_RPC_ID{
-	NBNS_RPC_ID_FIND_NAME	= 0,
+enum NBNS_RPC_ID {
+    NBNS_RPC_ID_FIND_NAME = 0,
 
-	NBNS_RPC_ID_COUNT
+    NBNS_RPC_ID_COUNT
 };
 
 //RPC structures
 struct nbnsFindNameResult
 {
-	int result;
-	u8 address[4];
+    int result;
+    u8 address[4];
 };
 
 //Function prototypes

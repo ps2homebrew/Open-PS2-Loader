@@ -36,25 +36,26 @@ extern int size_ps2link_irx;
 extern void *smsutils_irx;
 extern int size_smsutils_irx;
 
-int debugSetActive(void) {
+int debugSetActive(void)
+{
 #ifndef _DTL_T10000
-	int ret;
+    int ret;
 
-	if((ret = ethLoadInitModules()) != 0)
-		return -1;
+    if ((ret = ethLoadInitModules()) != 0)
+        return -1;
 
-	ret = sysLoadModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL);
-	if (ret < 0)
-		return -8;
+    ret = sysLoadModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL);
+    if (ret < 0)
+        return -8;
 
-	ret = sysLoadModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL);
-	if (ret < 0)
-		return -9;
+    ret = sysLoadModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL);
+    if (ret < 0)
+        return -9;
 
-	ret = sysLoadModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL);
-	if (ret < 0)
-		return -10;
+    ret = sysLoadModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL);
+    if (ret < 0)
+        return -10;
 #endif
 
-	return 0;
+    return 0;
 }

@@ -32,289 +32,294 @@ static int screenWidth;
 static int screenHeight;
 
 // Utility stuff
-#define KEYB_MODE		2
-#define KEYB_WIDTH 		12
-#define KEYB_HEIGHT		4
-#define KEYB_ITEMS		(KEYB_WIDTH * KEYB_HEIGHT)
+#define KEYB_MODE 2
+#define KEYB_WIDTH 12
+#define KEYB_HEIGHT 4
+#define KEYB_ITEMS (KEYB_WIDTH * KEYB_HEIGHT)
 
-static void diaDrawBoundingBox(int x, int y, int w, int h, int focus) {
-		if (focus)
-			rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->selTextColor & gColFocus);
-		else
-			rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->textColor & gColFocus);
+static void diaDrawBoundingBox(int x, int y, int w, int h, int focus)
+{
+    if (focus)
+        rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->selTextColor & gColFocus);
+    else
+        rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->textColor & gColFocus);
 }
 
-int diaShowKeyb(char* text, int maxLen, int hide_text) {
-	int i, j, len = strlen(text), selkeyb = 0, x, w;
-	int selchar = 0, selcommand = -1;
-	char c[2] = "\0\0", *mask_buffer;
-	static const char keyb0[KEYB_ITEMS] = {
-		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
-		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
-		'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\\',
-		'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '`', ':' };
+int diaShowKeyb(char *text, int maxLen, int hide_text)
+{
+    int i, j, len = strlen(text), selkeyb = 0, x, w;
+    int selchar = 0, selcommand = -1;
+    char c[2] = "\0\0", *mask_buffer;
+    static const char keyb0[KEYB_ITEMS] = {
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
+        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
+        'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '\\',
+        'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '`', ':'};
 
-	static const char keyb1[KEYB_ITEMS] = {
-		'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+',
-		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}',
-		'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '|',
-		'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '~', '.' };
-	const char *keyb = keyb0;
+    static const char keyb1[KEYB_ITEMS] = {
+        '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+',
+        'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}',
+        'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '|',
+        'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '~', '.'};
+    const char *keyb = keyb0;
 
-	char *commands[KEYB_HEIGHT] = {_l(_STR_BACKSPACE), _l(_STR_SPACE), _l(_STR_ENTER), _l(_STR_MODE)};
-	GSTEXTURE *cmdicons[KEYB_HEIGHT];
-	cmdicons[0] = thmGetTexture(SQUARE_ICON);
-	cmdicons[1] = thmGetTexture(TRIANGLE_ICON);
-	cmdicons[2] = thmGetTexture(START_ICON);
-	cmdicons[3] = thmGetTexture(SELECT_ICON);
+    char *commands[KEYB_HEIGHT] = {_l(_STR_BACKSPACE), _l(_STR_SPACE), _l(_STR_ENTER), _l(_STR_MODE)};
+    GSTEXTURE *cmdicons[KEYB_HEIGHT];
+    cmdicons[0] = thmGetTexture(SQUARE_ICON);
+    cmdicons[1] = thmGetTexture(TRIANGLE_ICON);
+    cmdicons[2] = thmGetTexture(START_ICON);
+    cmdicons[3] = thmGetTexture(SELECT_ICON);
 
-	if(hide_text) {
-		if((mask_buffer = malloc(maxLen)) != NULL) {
-			memset(mask_buffer, '*', len);
-			mask_buffer[len] = '\0';
-		}
-	} else {
-		mask_buffer = NULL;
-	}
+    if (hide_text) {
+        if ((mask_buffer = malloc(maxLen)) != NULL) {
+            memset(mask_buffer, '*', len);
+            mask_buffer[len] = '\0';
+        }
+    } else {
+        mask_buffer = NULL;
+    }
 
-	while(1) {
-		readPads();
+    while (1) {
+        readPads();
 
-		rmStartFrame();
-		guiDrawBGPlasma();
-		rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+        rmStartFrame();
+        guiDrawBGPlasma();
+        rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
-		//Text
-		fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
+        //Text
+        fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
 
-		// separating line for simpler orientation
-		rmDrawLine(25, 138, 615, 138, gColWhite);
-		rmDrawLine(25, 139, 615, 139, gColWhite);
+        // separating line for simpler orientation
+        rmDrawLine(25, 138, 615, 138, gColWhite);
+        rmDrawLine(25, 139, 615, 139, gColWhite);
 
-		for (j = 0; j < KEYB_HEIGHT; j++) {
-			for (i = 0; i < KEYB_WIDTH; i++) {
-				c[0] = keyb[i + j * KEYB_WIDTH];
+        for (j = 0; j < KEYB_HEIGHT; j++) {
+            for (i = 0; i < KEYB_WIDTH; i++) {
+                c[0] = keyb[i + j * KEYB_WIDTH];
 
-				x = 50 + i * 31;
-				w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, 0, 0, c, gTheme->uiTextColor) - x;
-				if ((i + j * KEYB_WIDTH) == selchar)
-					diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
-			}
-		}
+                x = 50 + i * 31;
+                w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * j, ALIGN_NONE, 0, 0, c, gTheme->uiTextColor) - x;
+                if ((i + j * KEYB_WIDTH) == selchar)
+                    diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * j, w, UI_SPACING_H, 0);
+            }
+        }
 
-		// Commands
-		for (i = 0; i < KEYB_HEIGHT; i++) {
-			if (cmdicons[i])
-				rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
+        // Commands
+        for (i = 0; i < KEYB_HEIGHT; i++) {
+            if (cmdicons[i])
+                rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
 
-			x = 477;
-			w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;
-			if (i == selcommand)
-				diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
-		}
+            x = 477;
+            w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;
+            if (i == selcommand)
+                diaDrawBoundingBox(x, 170 + 3 * UI_SPACING_H * i, w, UI_SPACING_H, 0);
+        }
 
-		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 
-		rmEndFrame();
+        rmEndFrame();
 
-		if (getKey(KEY_LEFT)) {
-			if (selchar > -1) {
-				if (selchar % KEYB_WIDTH)
-					selchar--;
-				else {
-					selcommand = selchar / KEYB_WIDTH;
-					selchar = -1;
-				}
-			} else {
-				selchar = (selcommand + 1) * KEYB_WIDTH - 1;
-				selcommand = -1;
-			}
-		} else if (getKey(KEY_RIGHT)) {
-			if (selchar > -1) {
-				if ((selchar + 1) % KEYB_WIDTH)
-					selchar++;
-				else {
-					selcommand = selchar / KEYB_WIDTH;
-					selchar = -1;
-				}
-			} else {
-				selchar = selcommand * KEYB_WIDTH;
-				selcommand = -1;
-			}
-		} else if (getKey(KEY_UP)) {
-			if (selchar > -1)
-				selchar = (selchar + KEYB_ITEMS - KEYB_WIDTH) % KEYB_ITEMS;
-			else
-				selcommand = (selcommand + KEYB_HEIGHT - 1) % KEYB_HEIGHT;
-		} else if (getKey(KEY_DOWN)) {
-			if (selchar > -1)
-				selchar = (selchar + KEYB_WIDTH) % KEYB_ITEMS;
-			else
-				selcommand = (selcommand + 1) % KEYB_HEIGHT;
-		} else if (getKeyOn(gSelectButton)) {
-			if (len < (maxLen - 1) && selchar > -1) {
-				if (mask_buffer != NULL) {
-					mask_buffer[len] = '*';
-					mask_buffer[len+1] = '\0';
-				}
+        if (getKey(KEY_LEFT)) {
+            if (selchar > -1) {
+                if (selchar % KEYB_WIDTH)
+                    selchar--;
+                else {
+                    selcommand = selchar / KEYB_WIDTH;
+                    selchar = -1;
+                }
+            } else {
+                selchar = (selcommand + 1) * KEYB_WIDTH - 1;
+                selcommand = -1;
+            }
+        } else if (getKey(KEY_RIGHT)) {
+            if (selchar > -1) {
+                if ((selchar + 1) % KEYB_WIDTH)
+                    selchar++;
+                else {
+                    selcommand = selchar / KEYB_WIDTH;
+                    selchar = -1;
+                }
+            } else {
+                selchar = selcommand * KEYB_WIDTH;
+                selcommand = -1;
+            }
+        } else if (getKey(KEY_UP)) {
+            if (selchar > -1)
+                selchar = (selchar + KEYB_ITEMS - KEYB_WIDTH) % KEYB_ITEMS;
+            else
+                selcommand = (selcommand + KEYB_HEIGHT - 1) % KEYB_HEIGHT;
+        } else if (getKey(KEY_DOWN)) {
+            if (selchar > -1)
+                selchar = (selchar + KEYB_WIDTH) % KEYB_ITEMS;
+            else
+                selcommand = (selcommand + 1) % KEYB_HEIGHT;
+        } else if (getKeyOn(gSelectButton)) {
+            if (len < (maxLen - 1) && selchar > -1) {
+                if (mask_buffer != NULL) {
+                    mask_buffer[len] = '*';
+                    mask_buffer[len + 1] = '\0';
+                }
 
-				len++;
-				c[0] = keyb[selchar];
-				strcat(text,c);
-			} else if (selcommand == 0) {
-				if (len > 0) { // BACKSPACE
-					len--;
-					text[len] = 0;
-					if (mask_buffer != NULL)
-						mask_buffer[len] = '\0';
-				}
-			} else if (selcommand == 1) {
-				if (len < (maxLen - 1)) { // SPACE
-					if (mask_buffer != NULL) {
-						mask_buffer[len] = '*';
-						mask_buffer[len+1] = '\0';
-					}
+                len++;
+                c[0] = keyb[selchar];
+                strcat(text, c);
+            } else if (selcommand == 0) {
+                if (len > 0) { // BACKSPACE
+                    len--;
+                    text[len] = 0;
+                    if (mask_buffer != NULL)
+                        mask_buffer[len] = '\0';
+                }
+            } else if (selcommand == 1) {
+                if (len < (maxLen - 1)) { // SPACE
+                    if (mask_buffer != NULL) {
+                        mask_buffer[len] = '*';
+                        mask_buffer[len + 1] = '\0';
+                    }
 
-					len++;
-					c[0] = ' ';
-					strcat(text,c);
-				}
-			} else if (selcommand == 2) {
-				if(mask_buffer != NULL)
-					free(mask_buffer);
-				return 1; //ENTER
-			} else if (selcommand == 3) {
-				selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
-				if (selkeyb == 0)
-					keyb = keyb0;
-				if (selkeyb == 1)
-					keyb = keyb1;
-			}
-		} else if (getKey(KEY_SQUARE)) {
-			if (len>0) { // BACKSPACE
-				len--;
-				text[len] = 0;
-				if (mask_buffer != NULL)
-					mask_buffer[len] = '\0';
-			}
-		} else if (getKey(KEY_TRIANGLE)) {
-			if (len < (maxLen - 1) && selchar > -1) { // SPACE
-				if (mask_buffer != NULL) {
-					mask_buffer[len] = '*';
-					mask_buffer[len+1] = '\0';
-				}
+                    len++;
+                    c[0] = ' ';
+                    strcat(text, c);
+                }
+            } else if (selcommand == 2) {
+                if (mask_buffer != NULL)
+                    free(mask_buffer);
+                return 1; //ENTER
+            } else if (selcommand == 3) {
+                selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
+                if (selkeyb == 0)
+                    keyb = keyb0;
+                if (selkeyb == 1)
+                    keyb = keyb1;
+            }
+        } else if (getKey(KEY_SQUARE)) {
+            if (len > 0) { // BACKSPACE
+                len--;
+                text[len] = 0;
+                if (mask_buffer != NULL)
+                    mask_buffer[len] = '\0';
+            }
+        } else if (getKey(KEY_TRIANGLE)) {
+            if (len < (maxLen - 1) && selchar > -1) { // SPACE
+                if (mask_buffer != NULL) {
+                    mask_buffer[len] = '*';
+                    mask_buffer[len + 1] = '\0';
+                }
 
-				len++;
-				c[0] = ' ';
-				strcat(text,c);
-			}
-		} else if (getKeyOn(KEY_START)) {
-			if(mask_buffer != NULL)
-				free(mask_buffer);
-			return 1; //ENTER
-		} else if (getKeyOn(KEY_SELECT)) {
-			selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
-			if (selkeyb == 0)
-				keyb = keyb0;
-			if (selkeyb == 1)
-				keyb = keyb1;
-		}
+                len++;
+                c[0] = ' ';
+                strcat(text, c);
+            }
+        } else if (getKeyOn(KEY_START)) {
+            if (mask_buffer != NULL)
+                free(mask_buffer);
+            return 1; //ENTER
+        } else if (getKeyOn(KEY_SELECT)) {
+            selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
+            if (selkeyb == 0)
+                keyb = keyb0;
+            if (selkeyb == 1)
+                keyb = keyb1;
+        }
 
-		if (getKey(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE))
-			break;
-	}
+        if (getKey(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE))
+            break;
+    }
 
 
-	if(mask_buffer != NULL)
-		free(mask_buffer);
+    if (mask_buffer != NULL)
+        free(mask_buffer);
 
-	return 0;
+    return 0;
 }
 
 static int colPadSettings[16];
 
-static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
-	int selc = 0;
-	int ret = 0;
-	unsigned char col[3];
+static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
+{
+    int selc = 0;
+    int ret = 0;
+    unsigned char col[3];
 
-	padStoreSettings(colPadSettings);
+    padStoreSettings(colPadSettings);
 
-	col[0] = *r; col[1] = *g; col[2] = *b;
-	setButtonDelay(KEY_LEFT, 1);
-	setButtonDelay(KEY_RIGHT, 1);
+    col[0] = *r;
+    col[1] = *g;
+    col[2] = *b;
+    setButtonDelay(KEY_LEFT, 1);
+    setButtonDelay(KEY_RIGHT, 1);
 
-	while(1) {
-		readPads();
+    while (1) {
+        readPads();
 
-		rmStartFrame();
-		guiDrawBGPlasma();
-		rmDrawRect(0, 0,  screenWidth, screenHeight, gColDarker);
+        rmStartFrame();
+        guiDrawBGPlasma();
+        rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
-		// "Color selection"
-		fntRenderString(gTheme->fonts[0], 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+        // "Color selection"
+        fntRenderString(gTheme->fonts[0], 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
 
-		// 3 bars representing the colors...
-		size_t co;
-		int x, y;
+        // 3 bars representing the colors...
+        size_t co;
+        int x, y;
 
-		for (co = 0; co < 3; ++co) {
-			unsigned char cc[3] = {0,0,0};
-			cc[co] = col[co];
+        for (co = 0; co < 3; ++co) {
+            unsigned char cc[3] = {0, 0, 0};
+            cc[co] = col[co];
 
-			x = 75;
-			y = 75 + co * 25;
+            x = 75;
+            y = 75 + co * 25;
 
-			u64 dcol = GS_SETREG_RGBA(cc[0], cc[1], cc[2], 0x80);
+            u64 dcol = GS_SETREG_RGBA(cc[0], cc[1], cc[2], 0x80);
 
-			if (selc == co)
-				rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
-			else
-				rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
+            if (selc == co)
+                rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
+            else
+                rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
 
-			rmDrawRect(x + 2, y + 2, 190.0f*(cc[co]*100/255)/100, 16, dcol);
-		}
+            rmDrawRect(x + 2, y + 2, 190.0f * (cc[co] * 100 / 255) / 100, 16, dcol);
+        }
 
-		// target color itself
-		u64 dcol = GS_SETREG_RGBA(col[0],col[1],col[2], 0x80);
+        // target color itself
+        u64 dcol = GS_SETREG_RGBA(col[0], col[1], col[2], 0x80);
 
-		x = 300;
-		y = 75;
+        x = 300;
+        y = 75;
 
-		rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
-		rmDrawRect(x + 5, y + 5, 60, 60, dcol);
+        rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
+        rmDrawRect(x + 5, y + 5, 60, 60, dcol);
 
-		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_OK, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
-		guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_OK, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_CANCEL, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 
-		rmEndFrame();
+        rmEndFrame();
 
-		if (getKey(KEY_LEFT)) {
-			if (col[selc] > 0)
-				col[selc]--;
-		} else if (getKey(KEY_RIGHT)) {
-			if (col[selc] < 255)
-				col[selc]++;
-		} else if (getKey(KEY_UP)) {
-			if (selc > 0)
-				selc--;
-		} else if (getKey(KEY_DOWN)) {
-			if (selc < 2)
-				selc++;
-		} else if (getKeyOn(gSelectButton)) {
-			*r = col[0];
-			*g = col[1];
-			*b = col[2];
-			ret = 1;
-			break;
-		} else if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-			ret = 0;
-			break;
-		}
-	}
+        if (getKey(KEY_LEFT)) {
+            if (col[selc] > 0)
+                col[selc]--;
+        } else if (getKey(KEY_RIGHT)) {
+            if (col[selc] < 255)
+                col[selc]++;
+        } else if (getKey(KEY_UP)) {
+            if (selc > 0)
+                selc--;
+        } else if (getKey(KEY_DOWN)) {
+            if (selc < 2)
+                selc++;
+        } else if (getKeyOn(gSelectButton)) {
+            *r = col[0];
+            *g = col[1];
+            *b = col[2];
+            ret = 1;
+            break;
+        } else if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
+            ret = 0;
+            break;
+        }
+    }
 
-	padRestoreSettings(colPadSettings);
-	return ret;
+    padRestoreSettings(colPadSettings);
+    return ret;
 }
 
 
@@ -322,722 +327,750 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b) {
 // ----------------------------------------------------------------------------
 // --------------------------- Dialogue handling ------------------------------
 // ----------------------------------------------------------------------------
-static const char *diaGetLocalisedText(const char* def, int id) {
-	if (id >= 0)
-		return _l(id);
+static const char *diaGetLocalisedText(const char *def, int id)
+{
+    if (id >= 0)
+        return _l(id);
 
-	return def;
+    return def;
 }
 
 /// returns true if the item is controllable (e.g. a value can be changed on it)
-static int diaIsControllable(struct UIItem *ui) {
-	return (ui->enabled && ui->visible && (ui->type >= UI_OK));
+static int diaIsControllable(struct UIItem *ui)
+{
+    return (ui->enabled && ui->visible && (ui->type >= UI_OK));
 }
 
 /// returns true if the given item should be preceded with nextline
-static int diaShouldBreakLine(struct UIItem *ui) {
-	return (ui->type == UI_SPLITTER || ui->type == UI_OK || ui->type == UI_BREAK);
+static int diaShouldBreakLine(struct UIItem *ui)
+{
+    return (ui->type == UI_SPLITTER || ui->type == UI_OK || ui->type == UI_BREAK);
 }
 
 /// returns true if the given item should be superseded with nextline
-static int diaShouldBreakLineAfter(struct UIItem *ui) {
-	return (ui->type == UI_SPLITTER);
+static int diaShouldBreakLineAfter(struct UIItem *ui)
+{
+    return (ui->type == UI_SPLITTER);
 }
 
-static void diaDrawHint(int text_id) {
-	int x, y;
+static void diaDrawHint(int text_id)
+{
+    int x, y;
 
-	char* text = _l(text_id);
+    char *text = _l(text_id);
 
-	x = screenWidth - fntCalcDimensions(gTheme->fonts[0], text) - 10;
-	y = gTheme->usedHeight - 40;
+    x = screenWidth - fntCalcDimensions(gTheme->fonts[0], text) - 10;
+    y = gTheme->usedHeight - 40;
 
-	// render hint on the lower side of the screen.
-	rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-	fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, text, gTheme->textColor);
+    // render hint on the lower side of the screen.
+    rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+    fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, text, gTheme->textColor);
 }
 
 /// renders an ui item (either selected or not)
 /// sets width and height of the render into the parameters
-static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h) {
-	// Don't draw controllable items that are not visible.
-	if (!item->visible && item->type >= UI_LABEL)
-		return;
+static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int haveFocus, int *w, int *h)
+{
+    // Don't draw controllable items that are not visible.
+    if (!item->visible && item->type >= UI_LABEL)
+        return;
 
-	*h = UI_SPACING_H;
+    *h = UI_SPACING_H;
 
-	// all texts are rendered up from the given point!
-	u64 txtcol;
+    // all texts are rendered up from the given point!
+    u64 txtcol;
 
-	if (diaIsControllable(item))
-		txtcol = gTheme->uiTextColor;
-	else
-		txtcol = gTheme->textColor;
+    if (diaIsControllable(item))
+        txtcol = gTheme->uiTextColor;
+    else
+        txtcol = gTheme->textColor;
 
-	// let's see what do we have here?
-	switch (item->type) {
-		case UI_TERMINATOR:
-			return;
+    // let's see what do we have here?
+    switch (item->type) {
+        case UI_TERMINATOR:
+            return;
 
-		case UI_BUTTON:
-		case UI_LABEL: {
-			// width is text length in pixels...
-			const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
-			if(txt && strlen(txt))
-				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
-			else
-				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
+        case UI_BUTTON:
+        case UI_LABEL: {
+            // width is text length in pixels...
+            const char *txt = diaGetLocalisedText(item->label.text, item->label.stringId);
+            if (txt && strlen(txt))
+                *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
+            else
+                *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
 
-			break;
-		}
+            break;
+        }
 
-		case UI_SPLITTER: {
-			// a line. Thanks to the font rendering, we need to shift up by one font line
-			*w = 0; // nothing to render at all
-			int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
+        case UI_SPLITTER: {
+            // a line. Thanks to the font rendering, we need to shift up by one font line
+            *w = 0;                          // nothing to render at all
+            int ypos = y - UI_SPACING_V / 2; //  gsFont->CharHeight +
 
-			// to ODD lines
-			ypos &= ~1;
+            // to ODD lines
+            ypos &= ~1;
 
-			// two lines for lesser eye strain :)
-			rmDrawLine(x, ypos    , x + UI_BREAK_LEN, ypos    , gColWhite);
-			rmDrawLine(x, ypos + 1, x + UI_BREAK_LEN, ypos + 1, gColWhite);
-			break;
-		}
+            // two lines for lesser eye strain :)
+            rmDrawLine(x, ypos, x + UI_BREAK_LEN, ypos, gColWhite);
+            rmDrawLine(x, ypos + 1, x + UI_BREAK_LEN, ypos + 1, gColWhite);
+            break;
+        }
 
-		case UI_BREAK:
-			*w = 0; // nothing to render at all
-			break;
+        case UI_BREAK:
+            *w = 0; // nothing to render at all
+            break;
 
-		case UI_SPACER: {
-			// next column divisible by spacer
-			*w = (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
+        case UI_SPACER: {
+            // next column divisible by spacer
+            *w = (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
 
-			if (*w < UI_SPACER_MINIMAL) {
-				x += *w + UI_SPACER_MINIMAL;
-				*w += (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
-			}
+            if (*w < UI_SPACER_MINIMAL) {
+                x += *w + UI_SPACER_MINIMAL;
+                *w += (UI_SPACER_WIDTH - x % UI_SPACER_WIDTH);
+            }
 
-			*h = 0;
-			break;
-		}
+            *h = 0;
+            break;
+        }
 
-		case UI_OK: {
-			const char *txt = _l(_STR_OK);
-			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
-			break;
-		}
+        case UI_OK: {
+            const char *txt = _l(_STR_OK);
+            *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txt, txtcol) - x;
+            break;
+        }
 
-		case UI_INT: {
-			char tmp[10];
+        case UI_INT: {
+            char tmp[10];
 
-			snprintf(tmp, sizeof(tmp), "%d", item->intvalue.current);
-			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tmp, txtcol) - x;
-			break;
-		}
+            snprintf(tmp, sizeof(tmp), "%d", item->intvalue.current);
+            *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tmp, txtcol) - x;
+            break;
+        }
 
-		case UI_STRING: {
-			if(strlen(item->stringvalue.text))
-				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, item->stringvalue.text, txtcol) - x;
-			else
-				*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
-			break;
-		}
+        case UI_STRING: {
+            if (strlen(item->stringvalue.text))
+                *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, item->stringvalue.text, txtcol) - x;
+            else
+                *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
+            break;
+        }
 
-		case UI_PASSWORD: {
-			char stars[32];
-			int i;
+        case UI_PASSWORD: {
+            char stars[32];
+            int i;
 
-			int len = min(strlen(item->stringvalue.text), sizeof(stars)-1);
-			for (i = 0; i < len; ++i)
-				stars[i] = '*';
+            int len = min(strlen(item->stringvalue.text), sizeof(stars) - 1);
+            for (i = 0; i < len; ++i)
+                stars[i] = '*';
 
-			stars[i] = '\0';
-			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
-			break;
-		}
+            stars[i] = '\0';
+            *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
+            break;
+        }
 
-		case UI_BOOL: {
-			const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
-			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txtval, txtcol) - x;
-			break;
-		}
+        case UI_BOOL: {
+            const char *txtval = _l((item->intvalue.current) ? _STR_ON : _STR_OFF);
+            *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, txtval, txtcol) - x;
+            break;
+        }
 
-		case UI_ENUM: {
-			const char* tv = item->intvalue.enumvalues[item->intvalue.current];
+        case UI_ENUM: {
+            const char *tv = item->intvalue.enumvalues[item->intvalue.current];
 
-			if (!tv)
-				tv = _l(_STR_NO_ITEMS);
+            if (!tv)
+                tv = _l(_STR_NO_ITEMS);
 
-			*w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tv, txtcol) - x;
-			break;
-		}
+            *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, tv, txtcol) - x;
+            break;
+        }
 
-		case UI_COLOUR: {
-			rmDrawRect(x, y + 3, 25, 17, txtcol);
-			u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
-			rmDrawRect(x + 2, y + 5, 21, 13, dcol);
+        case UI_COLOUR: {
+            rmDrawRect(x, y + 3, 25, 17, txtcol);
+            u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
+            rmDrawRect(x + 2, y + 5, 21, 13, dcol);
 
-			*w = 25;
-			*h = 17;
-			break;
-		}
-	}
+            *w = 25;
+            *h = 17;
+            break;
+        }
+    }
 
-	if (selected)
-		diaDrawBoundingBox(x, y, *w, *h, haveFocus);
+    if (selected)
+        diaDrawBoundingBox(x, y, *w, *h, haveFocus);
 
-	if (item->fixedWidth != 0) {
-		int newSize;
-		if (item->fixedWidth < 0)
-			newSize = item->fixedWidth * screenWidth / -100;
-		else
-			newSize = item->fixedWidth;
-		if (*w < newSize)
-			*w = newSize;
-	}
+    if (item->fixedWidth != 0) {
+        int newSize;
+        if (item->fixedWidth < 0)
+            newSize = item->fixedWidth * screenWidth / -100;
+        else
+            newSize = item->fixedWidth;
+        if (*w < newSize)
+            *w = newSize;
+    }
 
-	if (item->fixedHeight != 0) {
-		int newSize;
-		if (item->fixedHeight < 0)
-			newSize = item->fixedHeight * screenHeight / -100;
-		else
-			newSize = item->fixedHeight;
-		if (*h < newSize)
-			*h = newSize;
-	}
+    if (item->fixedHeight != 0) {
+        int newSize;
+        if (item->fixedHeight < 0)
+            newSize = item->fixedHeight * screenHeight / -100;
+        else
+            newSize = item->fixedHeight;
+        if (*h < newSize)
+            *h = newSize;
+    }
 }
 
 /// renders whole ui screen (for given dialog setup)
-void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus) {
-	guiDrawBGPlasma();
+void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFocus)
+{
+    guiDrawBGPlasma();
 
-	int x0 = 20;
-	int y0 = 20;
+    int x0 = 20;
+    int y0 = 20;
 
-	// render all items
-	struct UIItem *rc = ui;
-	int x = x0, y = y0, hmax = 0;
+    // render all items
+    struct UIItem *rc = ui;
+    int x = x0, y = y0, hmax = 0;
 
-	while (rc->type != UI_TERMINATOR) {
-		int w = 0, h = 0;
+    while (rc->type != UI_TERMINATOR) {
+        int w = 0, h = 0;
 
-		if (diaShouldBreakLine(rc)) {
-			x = x0;
+        if (diaShouldBreakLine(rc)) {
+            x = x0;
 
-			if (hmax > 0)
-				y += hmax + UI_SPACING_H;
+            if (hmax > 0)
+                y += hmax + UI_SPACING_H;
 
-			hmax = 0;
-		}
+            hmax = 0;
+        }
 
-		diaRenderItem(x, y, rc, rc == cur, haveFocus, &w, &h);
+        diaRenderItem(x, y, rc, rc == cur, haveFocus, &w, &h);
 
-		if (w > 0)
-			x += w + UI_SPACING_V;
+        if (w > 0)
+            x += w + UI_SPACING_V;
 
-		hmax = (h > hmax) ? h : hmax;
+        hmax = (h > hmax) ? h : hmax;
 
-		if (diaShouldBreakLineAfter(rc)) {
-			x = x0;
+        if (diaShouldBreakLineAfter(rc)) {
+            x = x0;
 
-			if (hmax > 0)
-				y += hmax + UI_SPACING_H;
+            if (hmax > 0)
+                y += hmax + UI_SPACING_H;
 
-			hmax = 0;
-		}
+            hmax = 0;
+        }
 
-		rc++;
-	}
+        rc++;
+    }
 
-	if ((cur != NULL) && (!haveFocus) && (cur->hintId != -1)) {
-		diaDrawHint(cur->hintId);
-	}
+    if ((cur != NULL) && (!haveFocus) && (cur->hintId != -1)) {
+        diaDrawHint(cur->hintId);
+    }
 
-	guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_SELECT, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
-	guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_SELECT, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
+    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 }
 
 /// sets the ui item value to the default again
-static void diaResetValue(struct UIItem *item) {
-	switch(item->type) {
-		case UI_INT:
-		case UI_BOOL:
-			item->intvalue.current = item->intvalue.def;
-			return;
-		case UI_STRING:
-		case UI_PASSWORD:
-			strncpy(item->stringvalue.text, item->stringvalue.def, sizeof(item->stringvalue.text));
-			return;
-		default:
-			return;
-	}
+static void diaResetValue(struct UIItem *item)
+{
+    switch (item->type) {
+        case UI_INT:
+        case UI_BOOL:
+            item->intvalue.current = item->intvalue.def;
+            return;
+        case UI_STRING:
+        case UI_PASSWORD:
+            strncpy(item->stringvalue.text, item->stringvalue.def, sizeof(item->stringvalue.text));
+            return;
+        default:
+            return;
+    }
 }
 
-static int diaHandleInput(struct UIItem *item, int *modified) {
-	// circle loses focus, sets old values first
-	if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-		diaResetValue(item);
-		return 0;
-	}
+static int diaHandleInput(struct UIItem *item, int *modified)
+{
+    // circle loses focus, sets old values first
+    if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
+        diaResetValue(item);
+        return 0;
+    }
 
-	// cross loses focus without setting default
-	if (getKeyOn(gSelectButton)) {
-		*modified = 0;
-		return 0;
-	}
+    // cross loses focus without setting default
+    if (getKeyOn(gSelectButton)) {
+        *modified = 0;
+        return 0;
+    }
 
-	// UI item type dependant part:
-	if (item->type == UI_BOOL) {
-		// a trick. Set new value, lose focus
-		item->intvalue.current = !item->intvalue.current;
-		return 0;
-	} if (item->type == UI_INT) {
-		// to be sure
-		setButtonDelay(KEY_UP, DIA_INT_SET_SPEED);
-		setButtonDelay(KEY_DOWN, DIA_INT_SET_SPEED);
+    // UI item type dependant part:
+    if (item->type == UI_BOOL) {
+        // a trick. Set new value, lose focus
+        item->intvalue.current = !item->intvalue.current;
+        return 0;
+    }
+    if (item->type == UI_INT) {
+        // to be sure
+        setButtonDelay(KEY_UP, DIA_INT_SET_SPEED);
+        setButtonDelay(KEY_DOWN, DIA_INT_SET_SPEED);
 
-		// up and down
-		if (getKey(KEY_UP))
-		{
-			if (item->intvalue.current < item->intvalue.max)
-				item->intvalue.current++;
-			else
-				item->intvalue.current = 0;
-		}
-		else if (getKey(KEY_DOWN))
-		{
-			if (item->intvalue.current > item->intvalue.min)
-				item->intvalue.current--;
-			else
-				item->intvalue.current = item->intvalue.max;
-		}
-		else
-			*modified = 0;
-	} else if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
-		char tmp[32];
-		strncpy(tmp, item->stringvalue.text, sizeof(tmp));
+        // up and down
+        if (getKey(KEY_UP)) {
+            if (item->intvalue.current < item->intvalue.max)
+                item->intvalue.current++;
+            else
+                item->intvalue.current = 0;
+        } else if (getKey(KEY_DOWN)) {
+            if (item->intvalue.current > item->intvalue.min)
+                item->intvalue.current--;
+            else
+                item->intvalue.current = item->intvalue.max;
+        } else
+            *modified = 0;
+    } else if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
+        char tmp[32];
+        strncpy(tmp, item->stringvalue.text, sizeof(tmp));
 
-		if (item->stringvalue.handler) {
-			if (item->stringvalue.handler(tmp, sizeof(tmp)))
-				strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
-		} else {
-			if (diaShowKeyb(tmp, sizeof(tmp), item->type == UI_PASSWORD))
-				strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
-		}
+        if (item->stringvalue.handler) {
+            if (item->stringvalue.handler(tmp, sizeof(tmp)))
+                strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
+        } else {
+            if (diaShowKeyb(tmp, sizeof(tmp), item->type == UI_PASSWORD))
+                strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
+        }
 
-		return 0;
-	} else if (item->type == UI_ENUM) {
-		int cur = item->intvalue.current;
+        return 0;
+    } else if (item->type == UI_ENUM) {
+        int cur = item->intvalue.current;
 
-		if (item->intvalue.enumvalues[cur] == NULL) {
-			if (cur > 0)
-				item->intvalue.current--;
-			else
-				return 0;
-		}
+        if (item->intvalue.enumvalues[cur] == NULL) {
+            if (cur > 0)
+                item->intvalue.current--;
+            else
+                return 0;
+        }
 
-		if (getKey(KEY_UP) && (item->intvalue.current > 0))
-			item->intvalue.current--;
-		else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL))
-			item->intvalue.current++;
-		else
-			*modified = 0;
-	} else if (item->type == UI_COLOUR) {
-		if (!diaShowColSel(&item->colourvalue.r, &item->colourvalue.g, &item->colourvalue.b))
-			*modified = 0;
+        if (getKey(KEY_UP) && (item->intvalue.current > 0))
+            item->intvalue.current--;
+        else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL))
+            item->intvalue.current++;
+        else
+            *modified = 0;
+    } else if (item->type == UI_COLOUR) {
+        if (!diaShowColSel(&item->colourvalue.r, &item->colourvalue.g, &item->colourvalue.b))
+            *modified = 0;
 
-		return 0;
-	}
+        return 0;
+    }
 
-	return 1;
+    return 1;
 }
 
-static struct UIItem *diaGetFirstControl(struct UIItem *ui) {
-	struct UIItem *cur = ui;
+static struct UIItem *diaGetFirstControl(struct UIItem *ui)
+{
+    struct UIItem *cur = ui;
 
-	while (!diaIsControllable(cur)) {
-		if (cur->type == UI_TERMINATOR)
-			return ui;
+    while (!diaIsControllable(cur)) {
+        if (cur->type == UI_TERMINATOR)
+            return ui;
 
-		cur++;
-	}
+        cur++;
+    }
 
-	return cur;
+    return cur;
 }
 
-static struct UIItem *diaGetLastControl(struct UIItem *ui) {
-	struct UIItem *last = diaGetFirstControl(ui);
-	struct UIItem *cur = last;
+static struct UIItem *diaGetLastControl(struct UIItem *ui)
+{
+    struct UIItem *last = diaGetFirstControl(ui);
+    struct UIItem *cur = last;
 
-	while (cur->type != UI_TERMINATOR) {
-		cur++;
+    while (cur->type != UI_TERMINATOR) {
+        cur++;
 
-		if (diaIsControllable(cur))
-			last = cur;
-	}
+        if (diaIsControllable(cur))
+            last = cur;
+    }
 
-	return last;
+    return last;
 }
 
-static struct UIItem *diaGetNextControl(struct UIItem *cur, struct UIItem* dflt) {
-	while (cur->type != UI_TERMINATOR) {
-		cur++;
+static struct UIItem *diaGetNextControl(struct UIItem *cur, struct UIItem *dflt)
+{
+    while (cur->type != UI_TERMINATOR) {
+        cur++;
 
-		if (diaIsControllable(cur))
-			return cur;
-	}
+        if (diaIsControllable(cur))
+            return cur;
+    }
 
-	return dflt;
+    return dflt;
 }
 
-static struct UIItem *diaGetPrevControl(struct UIItem* cur, struct UIItem *ui) {
-	struct UIItem *newf = cur;
+static struct UIItem *diaGetPrevControl(struct UIItem *cur, struct UIItem *ui)
+{
+    struct UIItem *newf = cur;
 
-	while (newf != ui) {
-		newf--;
+    while (newf != ui) {
+        newf--;
 
-		if (diaIsControllable(newf))
-			return newf;
-	}
+        if (diaIsControllable(newf))
+            return newf;
+    }
 
-	return cur;
+    return cur;
 }
 
 /// finds first control on previous line...
-static struct UIItem *diaGetPrevLine(struct UIItem* cur, struct UIItem *ui) {
-	struct UIItem *newf = cur;
+static struct UIItem *diaGetPrevLine(struct UIItem *cur, struct UIItem *ui)
+{
+    struct UIItem *newf = cur;
 
-	int lb = 0;
-	int hadCtrl = 0; // had the scanned line any control?
+    int lb = 0;
+    int hadCtrl = 0; // had the scanned line any control?
 
-	while (newf != ui) {
-		newf--;
+    while (newf != ui) {
+        newf--;
 
-		if ((lb > 0) && (diaIsControllable(newf)))
-			hadCtrl = 1;
+        if ((lb > 0) && (diaIsControllable(newf)))
+            hadCtrl = 1;
 
-		if (diaShouldBreakLine(newf)) {// is this a line break?
-			if (hadCtrl || lb == 0) {
-				lb++;
-				hadCtrl = 0;
-			}
-		}
+        if (diaShouldBreakLine(newf)) { // is this a line break?
+            if (hadCtrl || lb == 0) {
+                lb++;
+                hadCtrl = 0;
+            }
+        }
 
-		// twice the break? find first control
-		if (lb == 2)
-			return diaGetFirstControl(newf);
-	}
+        // twice the break? find first control
+        if (lb == 2)
+            return diaGetFirstControl(newf);
+    }
 
-	return cur;
+    return cur;
 }
 
-static struct UIItem *diaGetNextLine(struct UIItem* cur, struct UIItem *ui) {
-	struct UIItem *newf = cur;
+static struct UIItem *diaGetNextLine(struct UIItem *cur, struct UIItem *ui)
+{
+    struct UIItem *newf = cur;
 
-	int lb = 0;
+    int lb = 0;
 
-	while (newf->type != UI_TERMINATOR) {
-		newf++;
+    while (newf->type != UI_TERMINATOR) {
+        newf++;
 
-		if (diaShouldBreakLine(newf)) {// is this a line break?
-				lb++;
-		}
+        if (diaShouldBreakLine(newf)) { // is this a line break?
+            lb++;
+        }
 
-		if (lb == 1)
-			return diaGetNextControl(newf, cur);
-	}
+        if (lb == 1)
+            return diaGetNextControl(newf, cur);
+    }
 
-	return cur;
+    return cur;
 }
 
 static int diaPadSettings[16];
 
-static void diaStoreScrollSpeed(void) {
-	padStoreSettings(diaPadSettings);
+static void diaStoreScrollSpeed(void)
+{
+    padStoreSettings(diaPadSettings);
 }
 
-static void diaRestoreScrollSpeed(void) {
-	padRestoreSettings(diaPadSettings);
+static void diaRestoreScrollSpeed(void)
+{
+    padRestoreSettings(diaPadSettings);
 }
 
-static struct UIItem* diaFindByID(struct UIItem* ui, int id) {
-	while (ui->type != UI_TERMINATOR) {
-		if (ui->id == id)
-			return ui;
+static struct UIItem *diaFindByID(struct UIItem *ui, int id)
+{
+    while (ui->type != UI_TERMINATOR) {
+        if (ui->id == id)
+            return ui;
 
-		ui++;
-	}
+        ui++;
+    }
 
-	return NULL;
+    return NULL;
 }
 
-int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(int modified)) {
-	rmGetScreenExtents(&screenWidth, &screenHeight);
+int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(int modified))
+{
+    rmGetScreenExtents(&screenWidth, &screenHeight);
 
-	struct UIItem *cur = NULL;
-	if (uiId != -1)
-		cur = diaFindByID(ui, uiId);
+    struct UIItem *cur = NULL;
+    if (uiId != -1)
+        cur = diaFindByID(ui, uiId);
 
-	if (!cur)
-		cur = diaGetFirstControl(ui);
+    if (!cur)
+        cur = diaGetFirstControl(ui);
 
-	// what? no controllable item? Exit!
-	if (cur == ui)
-		return -1;
+    // what? no controllable item? Exit!
+    if (cur == ui)
+        return -1;
 
-	int haveFocus = 0, modified;
+    int haveFocus = 0, modified;
 
-	diaStoreScrollSpeed();
+    diaStoreScrollSpeed();
 
-	// slower controls for dialogs
-	setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
-	setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
+    // slower controls for dialogs
+    setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
+    setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
 
-	// okay, we have the first selectable item
-	// we can proceed with rendering etc. etc.
-	while (1) {
-		rmStartFrame();
-		diaRenderUI(ui, inMenu, cur, haveFocus);
-		rmEndFrame();
+    // okay, we have the first selectable item
+    // we can proceed with rendering etc. etc.
+    while (1) {
+        rmStartFrame();
+        diaRenderUI(ui, inMenu, cur, haveFocus);
+        rmEndFrame();
 
-		readPads();
+        readPads();
 
-		if (haveFocus) {
-			modified = 1;
-			haveFocus = diaHandleInput(cur, &modified);
+        if (haveFocus) {
+            modified = 1;
+            haveFocus = diaHandleInput(cur, &modified);
 
-			if (!haveFocus) {
-				setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
-				setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
-			}
-		} else {
-			modified = 0;
-			if (getKey(KEY_LEFT)) {
-				struct UIItem *newf = diaGetPrevControl(cur, ui);
+            if (!haveFocus) {
+                setButtonDelay(KEY_UP, DIA_SCROLL_SPEED);
+                setButtonDelay(KEY_DOWN, DIA_SCROLL_SPEED);
+            }
+        } else {
+            modified = 0;
+            if (getKey(KEY_LEFT)) {
+                struct UIItem *newf = diaGetPrevControl(cur, ui);
 
-				if (newf == cur)
-					cur = diaGetLastControl(ui);
-				else
-					cur = newf;
-			}
+                if (newf == cur)
+                    cur = diaGetLastControl(ui);
+                else
+                    cur = newf;
+            }
 
-			if (getKey(KEY_RIGHT)) {
-				struct UIItem *newf = diaGetNextControl(cur, cur);
+            if (getKey(KEY_RIGHT)) {
+                struct UIItem *newf = diaGetNextControl(cur, cur);
 
-				if (newf == cur)
-					cur = diaGetFirstControl(ui);
-				else
-					cur = newf;
-			}
+                if (newf == cur)
+                    cur = diaGetFirstControl(ui);
+                else
+                    cur = newf;
+            }
 
-			if(getKey(KEY_UP)) {
-				// find
-				struct UIItem *newf = diaGetPrevLine(cur, ui);
+            if (getKey(KEY_UP)) {
+                // find
+                struct UIItem *newf = diaGetPrevLine(cur, ui);
 
-				if (newf == cur)
-					cur = diaGetLastControl(ui);
-				else
-					cur = newf;
-			}
+                if (newf == cur)
+                    cur = diaGetLastControl(ui);
+                else
+                    cur = newf;
+            }
 
-			if(getKey(KEY_DOWN)) {
-				// find
-				struct UIItem *newf = diaGetNextLine(cur, ui);
+            if (getKey(KEY_DOWN)) {
+                // find
+                struct UIItem *newf = diaGetNextLine(cur, ui);
 
-				if (newf == cur)
-					cur = diaGetFirstControl(ui);
-				else
-					cur = newf;
-			}
+                if (newf == cur)
+                    cur = diaGetFirstControl(ui);
+                else
+                    cur = newf;
+            }
 
-			// Cancel button breaks focus or exits with false result
-			if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-				diaRestoreScrollSpeed();
-				return UIID_BTN_CANCEL;
-			}
+            // Cancel button breaks focus or exits with false result
+            if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
+                diaRestoreScrollSpeed();
+                return UIID_BTN_CANCEL;
+            }
 
-			// see what key events we have
-			if (getKeyOn(gSelectButton)) {
-				haveFocus = 1;
+            // see what key events we have
+            if (getKeyOn(gSelectButton)) {
+                haveFocus = 1;
 
-				if (cur->type == UI_BUTTON) {
-					diaRestoreScrollSpeed();
-					return cur->id;
-				}
+                if (cur->type == UI_BUTTON) {
+                    diaRestoreScrollSpeed();
+                    return cur->id;
+                }
 
-				if (cur->type == UI_OK) {
-					diaRestoreScrollSpeed();
-					return UIID_BTN_OK;
-				}
-			}
-		}
+                if (cur->type == UI_OK) {
+                    diaRestoreScrollSpeed();
+                    return UIID_BTN_OK;
+                }
+            }
+        }
 
-		if (updater) {
-			int updResult = updater(modified);
-			if (updResult)
-				return updResult;
-		}
-	}
+        if (updater) {
+            int updResult = updater(modified);
+            if (updResult)
+                return updResult;
+        }
+    }
 }
 
-void diaSetEnabled(struct UIItem* ui, int id, int enabled) {
-	struct UIItem *item = diaFindByID(ui, id);
+void diaSetEnabled(struct UIItem *ui, int id, int enabled)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return;
+    if (!item)
+        return;
 
-	item->enabled = enabled;
+    item->enabled = enabled;
 }
 
-void diaSetVisible(struct UIItem* ui, int id, int visible) {
-	struct UIItem *item = diaFindByID(ui, id);
+void diaSetVisible(struct UIItem *ui, int id, int visible)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return;
+    if (!item)
+        return;
 
-	item->visible = visible;
+    item->visible = visible;
 }
 
-void diaSetItemType(struct UIItem* ui, int id, UIItemType type) {
-	struct UIItem *item = diaFindByID(ui, id);
+void diaSetItemType(struct UIItem *ui, int id, UIItemType type)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return;
+    if (!item)
+        return;
 
-	item->type = type;
+    item->type = type;
 }
 
-int diaGetInt(struct UIItem* ui, int id, int *value) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaGetInt(struct UIItem *ui, int id, int *value)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
-		*value = item->intvalue.current;
-		return 1;
-	}
+    if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
+        *value = item->intvalue.current;
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int diaSetInt(struct UIItem* ui, int id, int value) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaSetInt(struct UIItem *ui, int id, int value)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
-		item->intvalue.def = value;
-		item->intvalue.current = value;
-		return 1;
-	}
+    if ((item->type == UI_INT) || (item->type == UI_BOOL) || (item->type == UI_ENUM)) {
+        item->intvalue.def = value;
+        item->intvalue.current = value;
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int diaGetString(struct UIItem* ui, int id, char *value, int length) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaGetString(struct UIItem *ui, int id, char *value, int length)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
-		strncpy(value, item->stringvalue.text, length);
-		return 1;
-	}
+    if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
+        strncpy(value, item->stringvalue.text, length);
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int diaSetString(struct UIItem* ui, int id, const char *text) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaSetString(struct UIItem *ui, int id, const char *text)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
-		strncpy(item->stringvalue.def, text, sizeof(item->stringvalue.def));
-		item->stringvalue.def[sizeof(item->stringvalue.def) - 1] = '\0';
-		strncpy(item->stringvalue.text, text, sizeof(item->stringvalue.text));
-		item->stringvalue.text[sizeof(item->stringvalue.text) - 1] = '\0';
-		return 1;
-	}
+    if ((item->type == UI_STRING) || (item->type == UI_PASSWORD)) {
+        strncpy(item->stringvalue.def, text, sizeof(item->stringvalue.def));
+        item->stringvalue.def[sizeof(item->stringvalue.def) - 1] = '\0';
+        strncpy(item->stringvalue.text, text, sizeof(item->stringvalue.text));
+        item->stringvalue.text[sizeof(item->stringvalue.text) - 1] = '\0';
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int diaGetColor(struct UIItem* ui, int id, unsigned char *col) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaGetColor(struct UIItem *ui, int id, unsigned char *col)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if (item->type != UI_COLOUR)
-		return 0;
+    if (item->type != UI_COLOUR)
+        return 0;
 
-	col[0] = item->colourvalue.r;
-	col[1] = item->colourvalue.g;
-	col[2] = item->colourvalue.b;
-	return 1;
+    col[0] = item->colourvalue.r;
+    col[1] = item->colourvalue.g;
+    col[2] = item->colourvalue.b;
+    return 1;
 }
 
-int diaSetColor(struct UIItem* ui, int id, const unsigned char *col) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaSetColor(struct UIItem *ui, int id, const unsigned char *col)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if (item->type != UI_COLOUR)
-		return 0;
+    if (item->type != UI_COLOUR)
+        return 0;
 
-	item->colourvalue.r = col[0];
-	item->colourvalue.g = col[1];
-	item->colourvalue.b = col[2];
-	return 1;
+    item->colourvalue.r = col[0];
+    item->colourvalue.g = col[1];
+    item->colourvalue.b = col[2];
+    return 1;
 }
 
-int diaSetU64Color(struct UIItem* ui, int id, u64 col) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaSetU64Color(struct UIItem *ui, int id, u64 col)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if (item->type != UI_COLOUR)
-		return 0;
+    if (item->type != UI_COLOUR)
+        return 0;
 
-	item->colourvalue.r = col & 0xFF;
-	col >>= 8;
-	item->colourvalue.g = col & 0xFF;
-	col >>= 8;
-	item->colourvalue.b = col & 0xFF;
-	return 1;
+    item->colourvalue.r = col & 0xFF;
+    col >>= 8;
+    item->colourvalue.g = col & 0xFF;
+    col >>= 8;
+    item->colourvalue.b = col & 0xFF;
+    return 1;
 }
 
-int diaSetLabel(struct UIItem* ui, int id, const char *text) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaSetLabel(struct UIItem *ui, int id, const char *text)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if ((item->type == UI_LABEL) || (item->type == UI_BUTTON)) {
-		item->label.text = text;
-		return 1;
-	}
+    if ((item->type == UI_LABEL) || (item->type == UI_BUTTON)) {
+        item->label.text = text;
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int diaSetEnum(struct UIItem* ui, int id, const char **enumvals) {
-	struct UIItem *item = diaFindByID(ui, id);
+int diaSetEnum(struct UIItem *ui, int id, const char **enumvals)
+{
+    struct UIItem *item = diaFindByID(ui, id);
 
-	if (!item)
-		return 0;
+    if (!item)
+        return 0;
 
-	if (item->type != UI_ENUM)
-		return 0;
+    if (item->type != UI_ENUM)
+        return 0;
 
-	item->intvalue.enumvalues = enumvals;
-	return 1;
+    item->intvalue.enumvalues = enumvals;
+    return 1;
 }

@@ -40,61 +40,67 @@
 
 #if LWIP_STATS
 
-struct stats_proto {
-  u16_t xmit;    /* Transmitted packets. */
-  u16_t rexmit;  /* Retransmitted packets. */
-  u16_t recv;    /* Received packets. */
-  u16_t fw;      /* Forwarded packets. */
-  u16_t drop;    /* Dropped packets. */
-  u16_t chkerr;  /* Checksum error. */
-  u16_t lenerr;  /* Invalid length error. */
-  u16_t memerr;  /* Out of memory error. */
-  u16_t rterr;   /* Routing error. */
-  u16_t proterr; /* Protocol error. */
-  u16_t opterr;  /* Error in options. */
-  u16_t err;     /* Misc error. */
-  u16_t cachehit;
+struct stats_proto
+{
+    u16_t xmit;    /* Transmitted packets. */
+    u16_t rexmit;  /* Retransmitted packets. */
+    u16_t recv;    /* Received packets. */
+    u16_t fw;      /* Forwarded packets. */
+    u16_t drop;    /* Dropped packets. */
+    u16_t chkerr;  /* Checksum error. */
+    u16_t lenerr;  /* Invalid length error. */
+    u16_t memerr;  /* Out of memory error. */
+    u16_t rterr;   /* Routing error. */
+    u16_t proterr; /* Protocol error. */
+    u16_t opterr;  /* Error in options. */
+    u16_t err;     /* Misc error. */
+    u16_t cachehit;
 };
 
-struct stats_mem {
-  mem_size_t avail;
-  mem_size_t used;
-  mem_size_t max;  
-  mem_size_t err;
+struct stats_mem
+{
+    mem_size_t avail;
+    mem_size_t used;
+    mem_size_t max;
+    mem_size_t err;
 };
 
-struct stats_pbuf {
-  u16_t avail;
-  u16_t used;
-  u16_t max;  
-  u16_t err;
+struct stats_pbuf
+{
+    u16_t avail;
+    u16_t used;
+    u16_t max;
+    u16_t err;
 
-  u16_t alloc_locked;
-  u16_t refresh_locked;
+    u16_t alloc_locked;
+    u16_t refresh_locked;
 };
 
-struct stats_syselem {
-  u16_t used;
-  u16_t max;
-  u16_t err;
+struct stats_syselem
+{
+    u16_t used;
+    u16_t max;
+    u16_t err;
 };
 
-struct stats_sys {
-  struct stats_syselem sem;
-  struct stats_syselem mbox;
+struct stats_sys
+{
+    struct stats_syselem sem;
+    struct stats_syselem mbox;
 };
 
-struct stats_ {
-  struct stats_proto link;
-  struct stats_proto ip_frag;
-  struct stats_proto ip;
-  struct stats_proto icmp;
-  struct stats_proto udp;
-  struct stats_proto tcp;
-  struct stats_pbuf pbuf;
-  struct stats_mem mem;
-  struct stats_mem memp[MEMP_MAX];
-  struct stats_sys sys;
+struct stats_
+{
+    struct stats_proto link;
+    struct stats_proto ip_frag;
+    struct stats_proto ip;
+    struct stats_proto icmp;
+    struct stats_proto udp;
+    struct stats_proto tcp;
+    struct stats_pbuf pbuf;
+    struct stats_mem mem;
+    struct stats_mem memp[MEMP_MAX];
+    struct stats_sys sys;
 };
 
 extern struct stats_ lwip_stats;
@@ -145,7 +151,3 @@ void stats_init(void);
 #endif
 
 #endif /* __LWIP_STATS_H__ */
-
-
-
-

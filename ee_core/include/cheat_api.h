@@ -12,9 +12,10 @@ void DisableCheats(void);
  * @addr: code address
  * @val: code value
  */
-typedef struct {
-	u32 addr;
-	u32 val;
+typedef struct
+{
+    u32 addr;
+    u32 val;
 } code_t;
 
 #endif /* _CHEATAPI_H_ */

@@ -8,11 +8,12 @@
 
 #include <tamtypes.h>
 
-typedef struct {
-	// Ethernet header (14)
-	u8	addr_dst[6];
-	u8	addr_src[6];
-	u16	type;
+typedef struct
+{
+    // Ethernet header (14)
+    u8 addr_dst[6];
+    u8 addr_src[6];
+    u16 type;
 } eth_hdr_t;
 
 #endif /* ETH_H */

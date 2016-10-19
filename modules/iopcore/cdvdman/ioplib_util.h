@@ -7,9 +7,10 @@
 #ifndef IOPLIB_UTIL_H
 #define IOPLIB_UTIL_H
 
-typedef struct {
-	int version;
-	void **exports;
+typedef struct
+{
+    int version;
+    void **exports;
 } modinfo_t;
 
 int getModInfo(u8 *modname, modinfo_t *info);

@@ -41,87 +41,86 @@ struct irx_export_table _exp_dev9;
 static void usbd_init(void);
 
 // !!! usbd exports functions pointers !!!
-int (*pUsbRegisterDriver)(UsbDriver *driver); 								// #4
-void *(*pUsbGetDeviceStaticDescriptor)(int devId, void *data, u8 type); 				// #6
-int (*pUsbSetDevicePrivateData)(int devId, void *data); 						// #7
-int (*pUsbOpenEndpoint)(int devId, UsbEndpointDescriptor *desc); 					// #9
-int (*pUsbCloseEndpoint)(int id); 									// #10
-int (*pUsbTransfer)(int id, void *data, u32 len, void *option, UsbCallbackProc callback, void *cbArg); 	// #11
-int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc); 				// #12
+int (*pUsbRegisterDriver)(UsbDriver *driver);                                                          // #4
+void *(*pUsbGetDeviceStaticDescriptor)(int devId, void *data, u8 type);                                // #6
+int (*pUsbSetDevicePrivateData)(int devId, void *data);                                                // #7
+int (*pUsbOpenEndpoint)(int devId, UsbEndpointDescriptor *desc);                                       // #9
+int (*pUsbCloseEndpoint)(int id);                                                                      // #10
+int (*pUsbTransfer)(int id, void *data, u32 len, void *option, UsbCallbackProc callback, void *cbArg); // #11
+int (*pUsbOpenEndpointAligned)(int devId, UsbEndpointDescriptor *desc);                                // #12
 
 static void usbd_init(void)
 {
-	modinfo_t info;
-	getModInfo("usbd\0\0\0\0", &info);
+    modinfo_t info;
+    getModInfo("usbd\0\0\0\0", &info);
 
-	// Set functions pointers here
-	pUsbRegisterDriver = info.exports[4];
-	pUsbGetDeviceStaticDescriptor = info.exports[6];
-	pUsbSetDevicePrivateData = info.exports[7];
-	pUsbOpenEndpoint = info.exports[9];
-	pUsbCloseEndpoint = info.exports[10];
-	pUsbTransfer = info.exports[11];
-	pUsbOpenEndpointAligned = info.exports[12];
+    // Set functions pointers here
+    pUsbRegisterDriver = info.exports[4];
+    pUsbGetDeviceStaticDescriptor = info.exports[6];
+    pUsbSetDevicePrivateData = info.exports[7];
+    pUsbOpenEndpoint = info.exports[9];
+    pUsbCloseEndpoint = info.exports[10];
+    pUsbTransfer = info.exports[11];
+    pUsbOpenEndpointAligned = info.exports[12];
 }
 
 void DeviceInit(void)
 {
 #ifdef __USE_DEV9
-	RegisterLibraryEntries(&_exp_dev9);
-	dev9d_init();
+    RegisterLibraryEntries(&_exp_dev9);
+    dev9d_init();
 #endif
 }
 
 void DeviceDeinit(void)
 {
-
 }
 
 void DeviceFSInit(void)
 {
-	// initialize usbd exports
-	usbd_init();
+    // initialize usbd exports
+    usbd_init();
 
-	// initialize the mass driver
-	mass_stor_init();
+    // initialize the mass driver
+    mass_stor_init();
 
-	// configure mass device
-	while (mass_stor_configureDevice() <= 0) DelayThread(200);
+    // configure mass device
+    while (mass_stor_configureDevice() <= 0)
+        DelayThread(200);
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
-	register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
-	register int i, esc_flag = 0;
-	u8 *p = (u8 *)buffer;
+    register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
+    register int i, esc_flag = 0;
+    u8 *p = (u8 *)buffer;
 
-	lbound = 0;
-	ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
-	offslsn = lsn;
-	r = nlsn = 0;
-	sectors_to_read = sectors;
+    lbound = 0;
+    ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
+    offslsn = lsn;
+    r = nlsn = 0;
+    sectors_to_read = sectors;
 
-	for (i=0; i<cdvdman_settings.common.NumParts; i++, lbound=ubound, ubound+=0x80000, offslsn-=0x80000) {
+    for (i = 0; i < cdvdman_settings.common.NumParts; i++, lbound = ubound, ubound += 0x80000, offslsn -= 0x80000) {
 
-		if (lsn>=lbound && lsn<ubound){
-			if ((lsn + sectors) > (ubound-1)) {
-				sectors_to_read = ubound - lsn;
-				sectors -= sectors_to_read;
-				nlsn = ubound;
-			}
-			else
-				esc_flag = 1;
+        if (lsn >= lbound && lsn < ubound) {
+            if ((lsn + sectors) > (ubound - 1)) {
+                sectors_to_read = ubound - lsn;
+                sectors -= sectors_to_read;
+                nlsn = ubound;
+            } else
+                esc_flag = 1;
 
-			mass_stor_ReadCD(offslsn, sectors_to_read, &p[r], i);
+            mass_stor_ReadCD(offslsn, sectors_to_read, &p[r], i);
 
-			r += sectors_to_read << 11;
-			sectors_to_read = sectors;
-			lsn = nlsn;
-		}
+            r += sectors_to_read << 11;
+            sectors_to_read = sectors;
+            lsn = nlsn;
+        }
 
-		if (esc_flag)
-			break;
-	}
+        if (esc_flag)
+            break;
+    }
 
-	return 0;
+    return 0;
 }

@@ -3,9 +3,9 @@
 
 #include "include/iosupport.h"
 
-#define APP_MODE_UPDATE_DELAY	240
+#define APP_MODE_UPDATE_DELAY 240
 
 void appInit();
-item_list_t* appGetObject(int initOnly);
+item_list_t *appGetObject(int initOnly);
 
 #endif

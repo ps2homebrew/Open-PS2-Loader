@@ -9,15 +9,15 @@ IRX_ID("usbhdfsd_for_EE", 1, 1);
 
 static void usbmass_cb(int cause)
 {
-	static SifCmdHeader_t EventCmdData;
+    static SifCmdHeader_t EventCmdData;
 
-	EventCmdData.opt = cause;
-	sceSifSendCmd(0, &EventCmdData, sizeof(EventCmdData), NULL, NULL, 0);
+    EventCmdData.opt = cause;
+    sceSifSendCmd(0, &EventCmdData, sizeof(EventCmdData), NULL, NULL, 0);
 }
 
 int _start(int argc, char *argv[])
 {
-	UsbMassRegisterCallback(0, &usbmass_cb);
+    UsbMassRegisterCallback(0, &usbmass_cb);
 
-	return MODULE_RESIDENT_END;
+    return MODULE_RESIDENT_END;
 }

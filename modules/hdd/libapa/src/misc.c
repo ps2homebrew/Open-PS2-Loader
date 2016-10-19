@@ -26,60 +26,59 @@ extern char apaDefaultPassword[APA_PASSMAX];
 
 void *apaAllocMem(int size)
 {
-	int intrStat;
-	void *mem;
+    int intrStat;
+    void *mem;
 
-	CpuSuspendIntr(&intrStat);
-	mem = AllocSysMemory(ALLOC_FIRST, size, NULL);
-	CpuResumeIntr(intrStat);
+    CpuSuspendIntr(&intrStat);
+    mem = AllocSysMemory(ALLOC_FIRST, size, NULL);
+    CpuResumeIntr(intrStat);
 
-	return mem;
+    return mem;
 }
 
 void apaFreeMem(void *ptr)
 {
-	int intrStat;
+    int intrStat;
 
-	CpuSuspendIntr(&intrStat);
-	FreeSysMemory(ptr);
-	CpuResumeIntr(intrStat);
+    CpuSuspendIntr(&intrStat);
+    FreeSysMemory(ptr);
+    CpuResumeIntr(intrStat);
 }
 
 int apaGetTime(apa_ps2time_t *tm)
 {
-	sceCdCLOCK	cdtime;
-	apa_ps2time_t timeBuf={ 0, 7, 6, 5, 4, 3, 2000 };
+    sceCdCLOCK cdtime;
+    apa_ps2time_t timeBuf = {0, 7, 6, 5, 4, 3, 2000};
 
-	if(sceCdReadClock(&cdtime)!=0 && cdtime.stat==0)
-	{
-		timeBuf.sec=btoi(cdtime.second);
-		timeBuf.min=btoi(cdtime.minute);
-		timeBuf.hour=btoi(cdtime.hour);
-		timeBuf.day=btoi(cdtime.day);
-		timeBuf.month=btoi(cdtime.month & 0x7F);	//The old CDVDMAN sceCdReadClock() function does not automatically file off the highest bit.
-		timeBuf.year=btoi(cdtime.year)+2000;
-	}
-	memcpy(tm, &timeBuf, sizeof(apa_ps2time_t));
-	return 0;
+    if (sceCdReadClock(&cdtime) != 0 && cdtime.stat == 0) {
+        timeBuf.sec = btoi(cdtime.second);
+        timeBuf.min = btoi(cdtime.minute);
+        timeBuf.hour = btoi(cdtime.hour);
+        timeBuf.day = btoi(cdtime.day);
+        timeBuf.month = btoi(cdtime.month & 0x7F); //The old CDVDMAN sceCdReadClock() function does not automatically file off the highest bit.
+        timeBuf.year = btoi(cdtime.year) + 2000;
+    }
+    memcpy(tm, &timeBuf, sizeof(apa_ps2time_t));
+    return 0;
 }
 
 int apaPassCmp(char *pw1, char *pw2)
 {
-	//Passwords are not supported, hence this check should always pass.
-	/* return memcmp(pw1, (pw2==NULL)?apaDefaultPassword:pw2, APA_PASSMAX) ? -EACCES : 0; */
-	return 0;
+    //Passwords are not supported, hence this check should always pass.
+    /* return memcmp(pw1, (pw2==NULL)?apaDefaultPassword:pw2, APA_PASSMAX) ? -EACCES : 0; */
+    return 0;
 }
 
 int apaGetIlinkID(u8 *idbuf)
 {
-	u32 err=0;
+    u32 err = 0;
 
-	memset(idbuf, 0, 32);
+    memset(idbuf, 0, 32);
 
-	if(sceCdRI(idbuf, &err))
-		if (err)
-			APA_PRINTF(APA_DRV_NAME": Error when reading ilink id\n");
+    if (sceCdRI(idbuf, &err))
+        if (err)
+            APA_PRINTF(APA_DRV_NAME ": Error when reading ilink id\n");
 
-	// Return all ok for compatibility
-	return 0;
+    // Return all ok for compatibility
+    return 0;
 }

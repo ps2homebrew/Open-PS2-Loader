@@ -18,24 +18,25 @@
 #include <irx.h>
 
 /* These are used with the dir parameter of ata_device_sector_io().  */
-#define ATA_DIR_READ	0
-#define ATA_DIR_WRITE	1
+#define ATA_DIR_READ 0
+#define ATA_DIR_WRITE 1
 
-#define ATAD_XFER_MODE_PIO	0x08
-#define ATAD_XFER_MODE_MDMA	0x20
-#define ATAD_XFER_MODE_UDMA	0x40
+#define ATAD_XFER_MODE_PIO 0x08
+#define ATAD_XFER_MODE_MDMA 0x20
+#define ATAD_XFER_MODE_UDMA 0x40
 
-typedef struct _ata_devinfo {
-	int	exists;		/* Was successfully probed.  */
-	int	has_packet;	/* Supports the PACKET command set.  */
-	unsigned int	total_sectors;	/* Total number of user sectors.  */
-	unsigned int	security_status;/* Word 0x100 of the identify info.  */
+typedef struct _ata_devinfo
+{
+    int exists;                   /* Was successfully probed.  */
+    int has_packet;               /* Supports the PACKET command set.  */
+    unsigned int total_sectors;   /* Total number of user sectors.  */
+    unsigned int security_status; /* Word 0x100 of the identify info.  */
 } ata_devinfo_t;
 
 #define atad_IMPORTS_start DECLARE_IMPORT_TABLE(atad, 1, 3)
 #define atad_IMPORTS_end END_IMPORT_TABLE
 
-ata_devinfo_t * ata_get_devinfo(int device);
+ata_devinfo_t *ata_get_devinfo(int device);
 #define I_ata_get_devinfo DECLARE_IMPORT(4, ata_get_devinfo)
 
 int ata_reset_devices(void);

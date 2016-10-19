@@ -26,22 +26,23 @@
 #define PROGRAM_EXTNAME "UL.CFG to ISO converter"
 #define PROGRAM_VER "0.0.2"
 
-typedef	unsigned char		u8;
-typedef unsigned short		u16;
-typedef unsigned int		u32;
-typedef unsigned long long	u64;
-typedef signed char		s8;
-typedef signed short		s16;
-typedef signed int		s32;
-typedef signed long long	s64;
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef signed char s8;
+typedef signed short s16;
+typedef signed int s32;
+typedef signed long long s64;
 
 // padded for easy manipulation (e.g. the first two are one byte longer than needed)
-typedef struct {
-	char	name[33];
-	char	image[16];
-	u8	parts;
-	u8	media;
-	u8	pad[15];
-} cfg_t;	
+typedef struct
+{
+    char name[33];
+    char image[16];
+    u8 parts;
+    u8 media;
+    u8 pad[15];
+} cfg_t;
 
 #endif

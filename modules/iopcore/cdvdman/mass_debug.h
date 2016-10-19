@@ -6,7 +6,9 @@
 #ifdef DEBUG
 #define XPRINTF printf
 #else
-#define XPRINTF while(0) printf
+#define XPRINTF \
+    while (0)   \
+    printf
 #endif
 
-#endif  /* _MASS_DEBUG_H */
+#endif /* _MASS_DEBUG_H */

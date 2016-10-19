@@ -21,57 +21,56 @@ extern int InitUSB();
 
 extern struct irx_export_table _exp_usbmass;
 
-int _start( int argc, char *argv[])
+int _start(int argc, char *argv[])
 {
-	printf("USB HDD FileSystem Driver v%d.%d\n", MAJOR_VER, MINOR_VER);
+    printf("USB HDD FileSystem Driver v%d.%d\n", MAJOR_VER, MINOR_VER);
 
-	if (RegisterLibraryEntries(&_exp_usbmass) != 0) {
-		printf("USBHDFSD: Already registered.\n");
-		return MODULE_NO_RESIDENT_END;
-	}
+    if (RegisterLibraryEntries(&_exp_usbmass) != 0) {
+        printf("USBHDFSD: Already registered.\n");
+        return MODULE_NO_RESIDENT_END;
+    }
 
-	// initialize the FAT driver
-	if(InitFAT() != 0)
-	{
-		printf("USBHDFSD: Error initializing FAT driver!\n");
-		return MODULE_NO_RESIDENT_END;
-	}
+    // initialize the FAT driver
+    if (InitFAT() != 0) {
+        printf("USBHDFSD: Error initializing FAT driver!\n");
+        return MODULE_NO_RESIDENT_END;
+    }
 
-	// initialize the USB driver
-	if(InitUSB() != 0)
-	{
-		printf("USBHDFSD: Error initializing USB driver!\n");
-		return MODULE_NO_RESIDENT_END;
-	}
+    // initialize the USB driver
+    if (InitUSB() != 0) {
+        printf("USBHDFSD: Error initializing USB driver!\n");
+        return MODULE_NO_RESIDENT_END;
+    }
 
-	// initialize the file system driver
-	if(InitFS() != 0)
-	{
-		printf("USBHDFSD: Error initializing FS driver!\n");
-		return MODULE_NO_RESIDENT_END;
-	}
+    // initialize the file system driver
+    if (InitFS() != 0) {
+        printf("USBHDFSD: Error initializing FS driver!\n");
+        return MODULE_NO_RESIDENT_END;
+    }
 
-	// return resident
-	return MODULE_RESIDENT_END;
+    // return resident
+    return MODULE_RESIDENT_END;
 }
 
 #ifndef WIN32
-void *malloc(int size){
-	void *result;
-	int OldState;
+void *malloc(int size)
+{
+    void *result;
+    int OldState;
 
-	CpuSuspendIntr(&OldState);
-	result = AllocSysMemory(ALLOC_FIRST, size, NULL);
-	CpuResumeIntr(OldState);
+    CpuSuspendIntr(&OldState);
+    result = AllocSysMemory(ALLOC_FIRST, size, NULL);
+    CpuResumeIntr(OldState);
 
-	return result;
+    return result;
 }
 
-void free(void *ptr){
-	int OldState;
+void free(void *ptr)
+{
+    int OldState;
 
-	CpuSuspendIntr(&OldState);
-	FreeSysMemory(ptr);
-	CpuResumeIntr(OldState);
+    CpuSuspendIntr(&OldState);
+    FreeSysMemory(ptr);
+    CpuResumeIntr(OldState);
 }
 #endif

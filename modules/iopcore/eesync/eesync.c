@@ -9,16 +9,16 @@
 #define MODNAME "SyncEE"
 IRX_ID(MODNAME, 0x01, 0x01);
 
-static int PostResetCallback(int* arg1, int arg2)
+static int PostResetCallback(int *arg1, int arg2)
 {
-	sceSifSetSMFlag(SIF_STAT_BOOTEND);
+    sceSifSetSMFlag(SIF_STAT_BOOTEND);
 
-	return 0;
+    return 0;
 }
 
-int _start(int argc, char** argv)
+int _start(int argc, char **argv)
 {
-	loadcore20(&PostResetCallback, 2, 0);
+    loadcore20(&PostResetCallback, 2, 0);
 
-	return MODULE_RESIDENT_END;
+    return MODULE_RESIDENT_END;
 }

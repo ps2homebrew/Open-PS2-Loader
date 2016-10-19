@@ -40,60 +40,62 @@
 
 #define UDP_HLEN 8
 
-struct udp_hdr {
-  PACK_STRUCT_FIELD(u16_t src);
-  PACK_STRUCT_FIELD(u16_t dest);  /* src/dest UDP ports */
-  PACK_STRUCT_FIELD(u16_t len);
-  PACK_STRUCT_FIELD(u16_t chksum);
+struct udp_hdr
+{
+    PACK_STRUCT_FIELD(u16_t src);
+    PACK_STRUCT_FIELD(u16_t dest); /* src/dest UDP ports */
+    PACK_STRUCT_FIELD(u16_t len);
+    PACK_STRUCT_FIELD(u16_t chksum);
 } PACK_STRUCT_STRUCT;
 
 #define UDP_FLAGS_NOCHKSUM 0x01U
-#define UDP_FLAGS_UDPLITE  0x02U
-#define UDP_FLAGS_CONNECTED  0x04U
+#define UDP_FLAGS_UDPLITE 0x02U
+#define UDP_FLAGS_CONNECTED 0x04U
 
-struct udp_pcb {
-/* Common members of all PCB types */
-  IP_PCB;
+struct udp_pcb
+{
+    /* Common members of all PCB types */
+    IP_PCB;
 
-/* Protocol specific PCB members */
+    /* Protocol specific PCB members */
 
-  struct udp_pcb *next;
+    struct udp_pcb *next;
 
-  u8_t flags;
-  u16_t local_port, remote_port;
-  
-  u16_t chksum_len;
-  
-  void (* recv)(void *arg, struct udp_pcb *pcb, struct pbuf *p,
-    struct ip_addr *addr, u16_t port);
-  void *recv_arg;  
+    u8_t flags;
+    u16_t local_port, remote_port;
+
+    u16_t chksum_len;
+
+    void (*recv)(void *arg, struct udp_pcb *pcb, struct pbuf *p,
+                 struct ip_addr *addr, u16_t port);
+    void *recv_arg;
 };
 
 /* The following functions is the application layer interface to the
    UDP code. */
-struct udp_pcb * udp_new        (void);
-void             udp_remove     (struct udp_pcb *pcb);
-err_t            udp_bind       (struct udp_pcb *pcb, struct ip_addr *ipaddr,
-                 u16_t port);
-err_t            udp_connect    (struct udp_pcb *pcb, struct ip_addr *ipaddr,
-                 u16_t port);
-void             udp_disconnect    (struct udp_pcb *pcb);
-void             udp_recv       (struct udp_pcb *pcb,
-         void (* recv)(void *arg, struct udp_pcb *upcb,
-                 struct pbuf *p,
-                 struct ip_addr *addr,
-                 u16_t port),
-         void *recv_arg);
-err_t            udp_send       (struct udp_pcb *pcb, struct pbuf *p);
+struct udp_pcb *udp_new(void);
+void udp_remove(struct udp_pcb *pcb);
+err_t udp_bind(struct udp_pcb *pcb, struct ip_addr *ipaddr,
+               u16_t port);
+err_t udp_connect(struct udp_pcb *pcb, struct ip_addr *ipaddr,
+                  u16_t port);
+void udp_disconnect(struct udp_pcb *pcb);
+void udp_recv(struct udp_pcb *pcb,
+              void (*recv)(void *arg, struct udp_pcb *upcb,
+                           struct pbuf *p,
+                           struct ip_addr *addr,
+                           u16_t port),
+              void *recv_arg);
+err_t udp_send(struct udp_pcb *pcb, struct pbuf *p);
 
-#define          udp_flags(pcb)  ((pcb)->flags)
-#define          udp_setflags(pcb, f)  ((pcb)->flags = (f))
+#define udp_flags(pcb) ((pcb)->flags)
+#define udp_setflags(pcb, f) ((pcb)->flags = (f))
 
 
 /* The following functions are the lower layer interface to UDP. */
-u8_t             udp_lookup     (struct ip_hdr *iphdr, struct netif *inp);
-void             udp_input      (struct pbuf *p, struct netif *inp);
-void             udp_init       (void);
+u8_t udp_lookup(struct ip_hdr *iphdr, struct netif *inp);
+void udp_input(struct pbuf *p, struct netif *inp);
+void udp_init(void);
 
 #if UDP_DEBUG
 int udp_debug_print(struct udp_hdr *udphdr);
@@ -101,5 +103,3 @@ int udp_debug_print(struct udp_hdr *udphdr);
 #define udp_debug_print(udphdr)
 #endif
 #endif /* __LWIP_UDP_H__ */
-
-

@@ -38,42 +38,42 @@
 // Last Played Auto Start
 #include <time.h>
 
-#define OPL_VERSION		"0.9.4 WIP"
-#define OPL_IS_DEV_BUILD	1		//Define if this build is a development build.
+#define OPL_VERSION "0.9.4 WIP"
+#define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
 
 //IO type IDs
-#define IO_CUSTOM_SIMPLEACTION			1	// handler for parameter-less actions
-#define IO_MENU_UPDATE_DEFFERED			2
-#define IO_CACHE_LOAD_ART			3	// io call to handle the loading of covers
-#define IO_COMPAT_UPDATE_DEFFERED		4
+#define IO_CUSTOM_SIMPLEACTION 1 // handler for parameter-less actions
+#define IO_MENU_UPDATE_DEFFERED 2
+#define IO_CACHE_LOAD_ART 3 // io call to handle the loading of covers
+#define IO_COMPAT_UPDATE_DEFFERED 4
 
 //Codes have been planned to fit the design of the GUI functions within gui.c.
-#define OPL_COMPAT_UPDATE_STAT_WIP		0
-#define OPL_COMPAT_UPDATE_STAT_DONE		1
-#define OPL_COMPAT_UPDATE_STAT_ERROR		-1
-#define OPL_COMPAT_UPDATE_STAT_CONN_ERROR	-2
-#define OPL_COMPAT_UPDATE_STAT_ABORTED		-3
+#define OPL_COMPAT_UPDATE_STAT_WIP 0
+#define OPL_COMPAT_UPDATE_STAT_DONE 1
+#define OPL_COMPAT_UPDATE_STAT_ERROR -1
+#define OPL_COMPAT_UPDATE_STAT_CONN_ERROR -2
+#define OPL_COMPAT_UPDATE_STAT_ABORTED -3
 
 void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
 int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID);
-void menuDeferredUpdate(void* data);
+void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged);
 void handleHdlSrv();
 void deinit();
 
 char *gBaseMCDir;
 
-enum ETH_OP_MODES{
-	ETH_OP_MODE_AUTO	= 0,
-	ETH_OP_MODE_100M_FDX,
-	ETH_OP_MODE_100M_HDX,
-	ETH_OP_MODE_10M_FDX,
-	ETH_OP_MODE_10M_HDX,
+enum ETH_OP_MODES {
+    ETH_OP_MODE_AUTO = 0,
+    ETH_OP_MODE_100M_FDX,
+    ETH_OP_MODE_100M_HDX,
+    ETH_OP_MODE_10M_FDX,
+    ETH_OP_MODE_10M_HDX,
 
-	ETH_OP_MODE_COUNT
+    ETH_OP_MODE_COUNT
 };
 
 int ps2_ip_use_dhcp;
@@ -81,7 +81,7 @@ int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
 int ps2_dns[4];
-int gETHOpMode;	//See ETH_OP_MODES.
+int gETHOpMode; //See ETH_OP_MODES.
 int gPCShareAddressIsNetBIOS;
 int pc_ip[4];
 int gPCPort;
@@ -117,14 +117,14 @@ int gSelectButton;
 #ifdef CHEAT
 #define CHEAT_VERSION "0.5.3.65.g774d1"
 
-#define MAX_HOOKS	5
-#define MAX_CODES	250
-#define MAX_CHEATLIST	(MAX_HOOKS*2+MAX_CODES*2)
+#define MAX_HOOKS 5
+#define MAX_CODES 250
+#define MAX_CHEATLIST (MAX_HOOKS * 2 + MAX_CODES * 2)
 
-int	gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
-int	gCheatMode;  // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
+int gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
+int gCheatMode;   // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
 
-int gCheatList[MAX_CHEATLIST];	//Store hooks/codes addr+val pairs
+int gCheatList[MAX_CHEATLIST]; //Store hooks/codes addr+val pairs
 #endif
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -167,5 +167,5 @@ unsigned char gDefaultUITextColor[3];
 // BLURT output
 char blurttext[128];
 //#define BLURT	snprintf(blurttext, sizeof(blurttext), "%s\\%s(%d)", __FILE__ , __func__ , __LINE__ );delay(10);
-#define BLURT	snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__ );
+#define BLURT snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__);
 #endif

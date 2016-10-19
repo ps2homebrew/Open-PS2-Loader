@@ -43,114 +43,113 @@ static void ps2ip_init(void);
 
 // !!! ps2ip exports functions pointers !!!
 // Note: recvfrom() used here is not a standard recvfrom() function.
-int (*plwip_close)(int s); 										// #6
-int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen); 					// #7
-int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);	// #10
-int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags); 					// #11
-int (*plwip_socket)(int domain, int type, int protocol); 						// #13
-u32 (*pinet_addr)(const char *cp); 									// #24
+int (*plwip_close)(int s);                                                                                                                    // #6
+int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                        // #7
+int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen); // #10
+int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                        // #11
+int (*plwip_socket)(int domain, int type, int protocol);                                                                                      // #13
+u32 (*pinet_addr)(const char *cp);                                                                                                            // #24
 
 static u32 ServerCapabilities;
 
 static void ps2ip_init(void)
 {
-	modinfo_t info;
-	getModInfo("ps2ip\0\0\0", &info);
+    modinfo_t info;
+    getModInfo("ps2ip\0\0\0", &info);
 
-	// Set functions pointers here
-	plwip_close = info.exports[6];
-	plwip_connect = info.exports[7];
-	plwip_recvfrom = info.exports[10];
-	plwip_send = info.exports[11];
-	plwip_socket = info.exports[13];
-	pinet_addr = info.exports[24];
+    // Set functions pointers here
+    plwip_close = info.exports[6];
+    plwip_connect = info.exports[7];
+    plwip_recvfrom = info.exports[10];
+    plwip_send = info.exports[11];
+    plwip_socket = info.exports[13];
+    pinet_addr = info.exports[24];
 }
 
 void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback)
 {
-	ps2ip_init();
-	smb_NegotiateProtocol(cdvdman_settings.smb_ip, cdvdman_settings.smb_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &ServerCapabilities, hash_callback);
+    ps2ip_init();
+    smb_NegotiateProtocol(cdvdman_settings.smb_ip, cdvdman_settings.smb_port, cdvdman_settings.smb_user, cdvdman_settings.smb_password, &ServerCapabilities, hash_callback);
 }
 
 void DeviceInit(void)
 {
-	RegisterLibraryEntries(&_exp_dev9);
-	dev9d_init();
+    RegisterLibraryEntries(&_exp_dev9);
+    dev9d_init();
 
-	RegisterLibraryEntries(&_exp_oplsmb);
+    RegisterLibraryEntries(&_exp_oplsmb);
 }
 
 void DeviceDeinit(void)
 {
-	smb_Disconnect();
+    smb_Disconnect();
 }
 
 void DeviceFSInit(void)
 {
-	int i = 0;
-	char tmp_str[256];
+    int i = 0;
+    char tmp_str[256];
 
-	// open a session
-	smb_SessionSetupAndX(ServerCapabilities);
+    // open a session
+    smb_SessionSetupAndX(ServerCapabilities);
 
-	// Then tree connect on the share resource
-	sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.smb_ip, cdvdman_settings.smb_share);
-	smb_TreeConnectAndX(tmp_str);
+    // Then tree connect on the share resource
+    sprintf(tmp_str, "\\\\%s\\%s", cdvdman_settings.smb_ip, cdvdman_settings.smb_share);
+    smb_TreeConnectAndX(tmp_str);
 
-	if (!(cdvdman_settings.common.flags&IOPCORE_SMB_FORMAT_USBLD)) {
-		if (cdvdman_settings.smb_prefix[0]) {
-			sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.smb_prefix, cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
-		} else {
-			sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12?"CD":"DVD", cdvdman_settings.filename);
-		}
+    if (!(cdvdman_settings.common.flags & IOPCORE_SMB_FORMAT_USBLD)) {
+        if (cdvdman_settings.smb_prefix[0]) {
+            sprintf(tmp_str, "\\%s\\%s\\%s", cdvdman_settings.smb_prefix, cdvdman_settings.common.media == 0x12 ? "CD" : "DVD", cdvdman_settings.filename);
+        } else {
+            sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12 ? "CD" : "DVD", cdvdman_settings.filename);
+        }
 
-		smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
-	} else {
-		// Open all parts files
-		for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
-			if (cdvdman_settings.smb_prefix[0])
-				sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.smb_prefix, cdvdman_settings.filename, i);
-			else
-				sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
+        smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
+    } else {
+        // Open all parts files
+        for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
+            if (cdvdman_settings.smb_prefix[0])
+                sprintf(tmp_str, "\\%s\\%s.%02x", cdvdman_settings.smb_prefix, cdvdman_settings.filename, i);
+            else
+                sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
 
-			smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
-		}
-	}
+            smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
+        }
+    }
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
-	register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
-	register int i, esc_flag = 0;
-	u8 *p = (u8 *)buffer;
+    register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
+    register int i, esc_flag = 0;
+    u8 *p = (u8 *)buffer;
 
-	lbound = 0;
-	ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
-	offslsn = lsn;
-	r = nlsn = 0;
-	sectors_to_read = sectors;
+    lbound = 0;
+    ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
+    offslsn = lsn;
+    r = nlsn = 0;
+    sectors_to_read = sectors;
 
-	for (i=0; i<cdvdman_settings.common.NumParts; i++, lbound=ubound, ubound+=0x80000, offslsn-=0x80000) {
+    for (i = 0; i < cdvdman_settings.common.NumParts; i++, lbound = ubound, ubound += 0x80000, offslsn -= 0x80000) {
 
-		if (lsn>=lbound && lsn<ubound){
-			if ((lsn + sectors) > (ubound-1)) {
-				sectors_to_read = ubound - lsn;
-				sectors -= sectors_to_read;
-				nlsn = ubound;
-			}
-			else
-				esc_flag = 1;
+        if (lsn >= lbound && lsn < ubound) {
+            if ((lsn + sectors) > (ubound - 1)) {
+                sectors_to_read = ubound - lsn;
+                sectors -= sectors_to_read;
+                nlsn = ubound;
+            } else
+                esc_flag = 1;
 
-			smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
+            smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
 
-			r += sectors_to_read << 11;
-			sectors_to_read = sectors;
-			lsn = nlsn;
-		}
+            r += sectors_to_read << 11;
+            sectors_to_read = sectors;
+            lsn = nlsn;
+        }
 
-		if (esc_flag)
-			break;
-	}
+        if (esc_flag)
+            break;
+    }
 
-	return 0;
+    return 0;
 }

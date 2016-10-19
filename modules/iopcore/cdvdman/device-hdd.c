@@ -45,93 +45,90 @@ static hdl_partspecs_t cdvdman_partspecs[HDL_NUM_PART_SPECS];
 
 static int cdvdman_get_part_specs(u32 lsn)
 {
-	register int i;
-	hdl_partspecs_t *ps;
+    register int i;
+    hdl_partspecs_t *ps;
 
-	for (ps = cdvdman_partspecs, i = 0; i < NumParts; i++, ps++) {
-		if ((lsn >= ps->part_offset) && (lsn < (ps->part_offset + (ps->part_size >> 11)))) {
-			CurrentPart = i;
-			break;
-		}
-	}
+    for (ps = cdvdman_partspecs, i = 0; i < NumParts; i++, ps++) {
+        if ((lsn >= ps->part_offset) && (lsn < (ps->part_offset + (ps->part_size >> 11)))) {
+            CurrentPart = i;
+            break;
+        }
+    }
 
-	if (i >= NumParts)
-		return -ENXIO;
+    if (i >= NumParts)
+        return -ENXIO;
 
-	return 0;
+    return 0;
 }
 
 void DeviceInit(void)
 {
 #ifdef HD_PRO
 #ifdef __IOPCORE_DEBUG
-	RegisterLibraryEntries(&_exp_dev9);
+    RegisterLibraryEntries(&_exp_dev9);
 #endif
 #else
-	RegisterLibraryEntries(&_exp_dev9);
+    RegisterLibraryEntries(&_exp_dev9);
 #endif
-	RegisterLibraryEntries(&_exp_atad);
+    RegisterLibraryEntries(&_exp_atad);
 
 #ifdef HD_PRO
 #ifdef __IOPCORE_DEBUG
-	dev9d_init();
+    dev9d_init();
 #endif
 #else
-	dev9d_init();
+    dev9d_init();
 #endif
-	atad_start();
-	atad_inited = 1;
+    atad_start();
+    atad_inited = 1;
 
-	lba_48bit = cdvdman_settings.common.media;
+    lba_48bit = cdvdman_settings.common.media;
 
-	hdl_apa_header apaHeader;
-	int r;
+    hdl_apa_header apaHeader;
+    int r;
 
-	DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
+    DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
 
-	while((r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ)) != 0)
-	{
-		DPRINTF("fs_init: failed to read apa header %d\n", r);
-		DelayThread(2000);
-	}
+    while ((r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ)) != 0) {
+        DPRINTF("fs_init: failed to read apa header %d\n", r);
+        DelayThread(2000);
+    }
 
-	mips_memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
+    mips_memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
 
-	cdvdman_settings.common.media = apaHeader.discType;
-	cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
-	NumParts = apaHeader.num_partitions;
+    cdvdman_settings.common.media = apaHeader.discType;
+    cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
+    NumParts = apaHeader.num_partitions;
 }
 
 void DeviceDeinit(void)
 {
-
 }
 
 void DeviceFSInit(void)
 {
-
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
-	u32 offset = 0;
-	while (sectors) {
-		if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)))))
-			if(cdvdman_get_part_specs(lsn) != 0)
-				return -ENXIO;
+    u32 offset = 0;
+    while (sectors) {
+        if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)))))
+            if (cdvdman_get_part_specs(lsn) != 0)
+                return -ENXIO;
 
-		u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)) - lsn;
-		if (sectors < nsectors)
-			nsectors = sectors;
+        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)) - lsn;
+        if (sectors < nsectors)
+            nsectors = sectors;
 
-		u32 lba = cdvdman_partspecs[CurrentPart].data_start + ((lsn - cdvdman_partspecs[CurrentPart].part_offset) << 2);	
-		if (ata_device_sector_io(0, (void *)(buffer + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
-			return -EIO;
-		}
-		offset += nsectors << 11;
-		sectors -= nsectors;
-		lsn += nsectors;
-	}
+        u32 lba = cdvdman_partspecs[CurrentPart].data_start + ((lsn - cdvdman_partspecs[CurrentPart].part_offset) << 2);
+        if (ata_device_sector_io(0, (void *)(buffer + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
+            return -EIO;
+        }
+        offset += nsectors << 11;
+        sectors -= nsectors;
+        lsn += nsectors;
+    }
 
-	return 0;
+    return 0;
 }

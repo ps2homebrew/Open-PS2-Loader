@@ -22,11 +22,15 @@
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
-#define DPRINTF(args...)	sio_printf(args)
-#define DINIT()			sio_init(38400, 0, 0, 0, 0)
+#define DPRINTF(args...) sio_printf(args)
+#define DINIT() sio_init(38400, 0, 0, 0, 0)
 #else
-#define DPRINTF(args...)	do { } while(0)
-#define DINIT()			do { } while(0)
+#define DPRINTF(args...) \
+    do {                 \
+    } while (0)
+#define DINIT() \
+    do {        \
+    } while (0)
 #endif
 
 extern int set_reg_hook;
@@ -35,17 +39,17 @@ extern int iop_reboot_count;
 
 extern int padOpen_hooked;
 
-enum ETH_OP_MODES{
-	ETH_OP_MODE_AUTO	= 0,
-	ETH_OP_MODE_100M_FDX,
-	ETH_OP_MODE_100M_HDX,
-	ETH_OP_MODE_10M_FDX,
-	ETH_OP_MODE_10M_HDX,
+enum ETH_OP_MODES {
+    ETH_OP_MODE_AUTO = 0,
+    ETH_OP_MODE_100M_FDX,
+    ETH_OP_MODE_100M_HDX,
+    ETH_OP_MODE_10M_FDX,
+    ETH_OP_MODE_10M_HDX,
 
-	ETH_OP_MODE_COUNT
+    ETH_OP_MODE_COUNT
 };
 
-#define IPCONFIG_MAX_LEN	64
+#define IPCONFIG_MAX_LEN 64
 char g_ipconfig[IPCONFIG_MAX_LEN];
 int g_ipconfig_len;
 char g_ps2_ip[16];
@@ -54,20 +58,20 @@ char g_ps2_gateway[16];
 unsigned char g_ps2_ETHOpMode;
 u32 g_compat_mask;
 
-#define COMPAT_MODE_1 		0x01
-#define COMPAT_MODE_2 		0x02
-#define COMPAT_MODE_3 		0x04
-#define COMPAT_MODE_4 		0x08
-#define COMPAT_MODE_5 		0x10
-#define COMPAT_MODE_6 		0x20
-#define COMPAT_MODE_7 		0x40
-#define COMPAT_MODE_8 		0x80
+#define COMPAT_MODE_1 0x01
+#define COMPAT_MODE_2 0x02
+#define COMPAT_MODE_3 0x04
+#define COMPAT_MODE_4 0x08
+#define COMPAT_MODE_5 0x10
+#define COMPAT_MODE_6 0x20
+#define COMPAT_MODE_7 0x40
+#define COMPAT_MODE_8 0x80
 
 char GameID[16];
 int GameMode;
-#define USB_MODE 	0
-#define ETH_MODE 	1
-#define HDD_MODE 	2
+#define USB_MODE 0
+#define ETH_MODE 1
+#define HDD_MODE 2
 
 char ExitPath[32];
 int HDDSpindown;
@@ -76,10 +80,10 @@ int EnableCheatOp;
 
 int DisableDebug;
 int PS2Logo;
-#define GS_BGCOLOUR *((volatile unsigned long int*)0x120000E0)
+#define GS_BGCOLOUR *((volatile unsigned long int *)0x120000E0)
 
 #ifdef CHEAT
-int *gCheatList;	//Store hooks/codes addr+val pairs
+int *gCheatList; //Store hooks/codes addr+val pairs
 #endif
 
 #endif

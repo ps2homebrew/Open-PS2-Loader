@@ -1,5 +1,5 @@
-#define HTTP_CMODE_CLOSED		0
-#define HTTP_CMODE_PERSISTENT	1
+#define HTTP_CMODE_CLOSED 0
+#define HTTP_CMODE_PERSISTENT 1
 
 //EE-side only
 int HttpInit(void);
@@ -17,42 +17,46 @@ void HttpCloseConnection(s32 HttpSocket);
 
 int HttpSendGetRequest(s32 HttpSocket, const s8 *UserAgent, const s8 *host, s8 *mode, const u8 *mtime, const s8 *uri, u8 *output, u16 *out_len);
 
-#define HTTP_CLIENT_SERVER_NAME_MAX	30
-#define HTTP_CLIENT_USER_AGENT_MAX	16
-#define HTTP_CLIENT_URI_MAX		128
+#define HTTP_CLIENT_SERVER_NAME_MAX 30
+#define HTTP_CLIENT_USER_AGENT_MAX 16
+#define HTTP_CLIENT_URI_MAX 128
 
-enum HTTP_CLIENT_CMD{
-	HTTP_CLIENT_CMD_CONN_ESTAB,
-	HTTP_CLIENT_CMD_CONN_CLOSE,
-	HTTP_CLIENT_CMD_SEND_GET_REQ,
+enum HTTP_CLIENT_CMD {
+    HTTP_CLIENT_CMD_CONN_ESTAB,
+    HTTP_CLIENT_CMD_CONN_CLOSE,
+    HTTP_CLIENT_CMD_SEND_GET_REQ,
 };
 
-struct HttpClientConnEstabArgs{
-	char server[HTTP_CLIENT_SERVER_NAME_MAX];
-	u16 port;
+struct HttpClientConnEstabArgs
+{
+    char server[HTTP_CLIENT_SERVER_NAME_MAX];
+    u16 port;
 };
 
-struct HttpClientConnCloseArgs{
-	s32 socket;
+struct HttpClientConnCloseArgs
+{
+    s32 socket;
 };
 
-struct HttpClientSendGetArgs{
-	s32 socket;
-	s8 UserAgent[HTTP_CLIENT_USER_AGENT_MAX];
-	s8 host[HTTP_CLIENT_SERVER_NAME_MAX];
-	s8 mode;
-	u8 hasMtime;
-	u8 mtime[6];
-	s8 uri[HTTP_CLIENT_URI_MAX];
-	u16 out_len;
-	void *output;
+struct HttpClientSendGetArgs
+{
+    s32 socket;
+    s8 UserAgent[HTTP_CLIENT_USER_AGENT_MAX];
+    s8 host[HTTP_CLIENT_SERVER_NAME_MAX];
+    s8 mode;
+    u8 hasMtime;
+    u8 mtime[6];
+    s8 uri[HTTP_CLIENT_URI_MAX];
+    u16 out_len;
+    void *output;
 };
 
-struct HttpClientSendGetResult{
-	s32 result;
-	s8 mode;
-	u8 padding;
-	u16 out_len;
+struct HttpClientSendGetResult
+{
+    s32 result;
+    s8 mode;
+    u8 padding;
+    u16 out_len;
 };
 
 #ifdef _IOP

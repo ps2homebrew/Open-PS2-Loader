@@ -9,43 +9,43 @@
 #include "lwip/udp.h"
 
 /** period (in seconds) of the application calling dhcp_coarse_tmr() */
-#define DHCP_COARSE_TIMER_SECS 60 
+#define DHCP_COARSE_TIMER_SECS 60
 /** period (in milliseconds) of the application calling dhcp_fine_tmr() */
-#define DHCP_FINE_TIMER_MSECS 500 
+#define DHCP_FINE_TIMER_MSECS 500
 
 struct dhcp
 {
-  /** current DHCP state machine state */
-  u8_t state;
-  /** retries of current request */
-  u8_t tries;
-  /** transaction identifier of last sent request */ 
-  u32_t xid;
-  /** our connection to the DHCP server */ 
-  struct udp_pcb *pcb;
-  /** (first) pbuf of incoming msg */
-  struct pbuf *p;
-  /** incoming msg */
-  struct dhcp_msg *msg_in;
-  /** incoming msg options */
-  struct dhcp_msg *options_in; 
-  /** ingoing msg options length */
-  u16_t options_in_len;
+    /** current DHCP state machine state */
+    u8_t state;
+    /** retries of current request */
+    u8_t tries;
+    /** transaction identifier of last sent request */
+    u32_t xid;
+    /** our connection to the DHCP server */
+    struct udp_pcb *pcb;
+    /** (first) pbuf of incoming msg */
+    struct pbuf *p;
+    /** incoming msg */
+    struct dhcp_msg *msg_in;
+    /** incoming msg options */
+    struct dhcp_msg *options_in;
+    /** ingoing msg options length */
+    u16_t options_in_len;
 
-  struct pbuf *p_out; /* pbuf of outcoming msg */
-  struct dhcp_msg *msg_out; /* outgoing msg */
-  u16_t options_out_len; /* outgoing msg options length */
-  u16_t request_timeout; /* #ticks with period DHCP_FINE_TIMER_SECS for request timeout */
-  u16_t t1_timeout;  /* #ticks with period DHCP_COARSE_TIMER_SECS for renewal time */
-  u16_t t2_timeout;  /* #ticks with period DHCP_COARSE_TIMER_SECS for rebind time */
-  struct ip_addr server_ip_addr; /* dhcp server address that offered this lease */
-  struct ip_addr offered_ip_addr;
-  struct ip_addr offered_sn_mask;
-  struct ip_addr offered_gw_addr;
-  struct ip_addr offered_bc_addr;
-  u32_t offered_t0_lease; /* lease period (in seconds) */
-  u32_t offered_t1_renew; /* recommended renew time (usually 50% of lease period) */
-  u32_t offered_t2_rebind; /* recommended rebind time (usually 66% of lease period)  */
+    struct pbuf *p_out;            /* pbuf of outcoming msg */
+    struct dhcp_msg *msg_out;      /* outgoing msg */
+    u16_t options_out_len;         /* outgoing msg options length */
+    u16_t request_timeout;         /* #ticks with period DHCP_FINE_TIMER_SECS for request timeout */
+    u16_t t1_timeout;              /* #ticks with period DHCP_COARSE_TIMER_SECS for renewal time */
+    u16_t t2_timeout;              /* #ticks with period DHCP_COARSE_TIMER_SECS for rebind time */
+    struct ip_addr server_ip_addr; /* dhcp server address that offered this lease */
+    struct ip_addr offered_ip_addr;
+    struct ip_addr offered_sn_mask;
+    struct ip_addr offered_gw_addr;
+    struct ip_addr offered_bc_addr;
+    u32_t offered_t0_lease;  /* lease period (in seconds) */
+    u32_t offered_t1_renew;  /* recommended renew time (usually 50% of lease period) */
+    u32_t offered_t2_rebind; /* recommended rebind time (usually 66% of lease period)  */
 /** Patch #1308
  *  TODO: See dhcp.c "TODO"s
  */
@@ -57,41 +57,41 @@ struct dhcp
 
 /* MUST be compiled with "pack structs" or equivalent! */
 #ifdef PACK_STRUCT_USE_INCLUDES
-#  include "arch/bpstruct.h"
+#include "arch/bpstruct.h"
 #endif
 PACK_STRUCT_BEGIN
 /** minimum set of fields of any DHCP message */
 struct dhcp_msg
 {
-  PACK_STRUCT_FIELD(u8_t op);
-  PACK_STRUCT_FIELD(u8_t htype);
-  PACK_STRUCT_FIELD(u8_t hlen);
-  PACK_STRUCT_FIELD(u8_t hops);
-  PACK_STRUCT_FIELD(u32_t xid);
-  PACK_STRUCT_FIELD(u16_t secs);
-  PACK_STRUCT_FIELD(u16_t flags);
-  PACK_STRUCT_FIELD(u32_t ciaddr);
-  PACK_STRUCT_FIELD(u32_t yiaddr);
-  PACK_STRUCT_FIELD(u32_t siaddr);
-  PACK_STRUCT_FIELD(u32_t giaddr);
+    PACK_STRUCT_FIELD(u8_t op);
+    PACK_STRUCT_FIELD(u8_t htype);
+    PACK_STRUCT_FIELD(u8_t hlen);
+    PACK_STRUCT_FIELD(u8_t hops);
+    PACK_STRUCT_FIELD(u32_t xid);
+    PACK_STRUCT_FIELD(u16_t secs);
+    PACK_STRUCT_FIELD(u16_t flags);
+    PACK_STRUCT_FIELD(u32_t ciaddr);
+    PACK_STRUCT_FIELD(u32_t yiaddr);
+    PACK_STRUCT_FIELD(u32_t siaddr);
+    PACK_STRUCT_FIELD(u32_t giaddr);
 #define DHCP_CHADDR_LEN 16U
-  PACK_STRUCT_FIELD(u8_t chaddr[DHCP_CHADDR_LEN]);
+    PACK_STRUCT_FIELD(u8_t chaddr[DHCP_CHADDR_LEN]);
 #define DHCP_SNAME_LEN 64U
-  PACK_STRUCT_FIELD(u8_t sname[DHCP_SNAME_LEN]);
+    PACK_STRUCT_FIELD(u8_t sname[DHCP_SNAME_LEN]);
 #define DHCP_FILE_LEN 128U
-  PACK_STRUCT_FIELD(u8_t file[DHCP_FILE_LEN]);
-  PACK_STRUCT_FIELD(u32_t cookie);
+    PACK_STRUCT_FIELD(u8_t file[DHCP_FILE_LEN]);
+    PACK_STRUCT_FIELD(u32_t cookie);
 #define DHCP_MIN_OPTIONS_LEN 68U
 /** allow this to be configured in lwipopts.h, but not too small */
 #if ((!defined(DHCP_OPTIONS_LEN)) || (DHCP_OPTIONS_LEN < DHCP_MIN_OPTIONS_LEN))
 /** set this to be sufficient for your options in outgoing DHCP msgs */
-#  define DHCP_OPTIONS_LEN DHCP_MIN_OPTIONS_LEN
+#define DHCP_OPTIONS_LEN DHCP_MIN_OPTIONS_LEN
 #endif
-  PACK_STRUCT_FIELD(u8_t options[DHCP_OPTIONS_LEN]);
+    PACK_STRUCT_FIELD(u8_t options[DHCP_OPTIONS_LEN]);
 } PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 #ifdef PACK_STRUCT_USE_INCLUDES
-#  include "arch/epstruct.h"
+#include "arch/epstruct.h"
 #endif
 
 /** start DHCP configuration */
@@ -112,29 +112,29 @@ void dhcp_arp_reply(struct netif *netif, struct ip_addr *addr);
 void dhcp_coarse_tmr(void);
 /** to be called every half second */
 void dhcp_fine_tmr(void);
- 
+
 /** DHCP message item offsets and length */
-#define DHCP_MSG_OFS (UDP_DATA_OFS)  
-  #define DHCP_OP_OFS (DHCP_MSG_OFS + 0)
-  #define DHCP_HTYPE_OFS (DHCP_MSG_OFS + 1)
-  #define DHCP_HLEN_OFS (DHCP_MSG_OFS + 2)
-  #define DHCP_HOPS_OFS (DHCP_MSG_OFS + 3)
-  #define DHCP_XID_OFS (DHCP_MSG_OFS + 4)
-  #define DHCP_SECS_OFS (DHCP_MSG_OFS + 8)
-  #define DHCP_FLAGS_OFS (DHCP_MSG_OFS + 10)
-  #define DHCP_CIADDR_OFS (DHCP_MSG_OFS + 12)
-  #define DHCP_YIADDR_OFS (DHCP_MSG_OFS + 16)
-  #define DHCP_SIADDR_OFS (DHCP_MSG_OFS + 20)
-  #define DHCP_GIADDR_OFS (DHCP_MSG_OFS + 24)
-  #define DHCP_CHADDR_OFS (DHCP_MSG_OFS + 28)
-  #define DHCP_SNAME_OFS (DHCP_MSG_OFS + 44)
-  #define DHCP_FILE_OFS (DHCP_MSG_OFS + 108)
+#define DHCP_MSG_OFS (UDP_DATA_OFS)
+#define DHCP_OP_OFS (DHCP_MSG_OFS + 0)
+#define DHCP_HTYPE_OFS (DHCP_MSG_OFS + 1)
+#define DHCP_HLEN_OFS (DHCP_MSG_OFS + 2)
+#define DHCP_HOPS_OFS (DHCP_MSG_OFS + 3)
+#define DHCP_XID_OFS (DHCP_MSG_OFS + 4)
+#define DHCP_SECS_OFS (DHCP_MSG_OFS + 8)
+#define DHCP_FLAGS_OFS (DHCP_MSG_OFS + 10)
+#define DHCP_CIADDR_OFS (DHCP_MSG_OFS + 12)
+#define DHCP_YIADDR_OFS (DHCP_MSG_OFS + 16)
+#define DHCP_SIADDR_OFS (DHCP_MSG_OFS + 20)
+#define DHCP_GIADDR_OFS (DHCP_MSG_OFS + 24)
+#define DHCP_CHADDR_OFS (DHCP_MSG_OFS + 28)
+#define DHCP_SNAME_OFS (DHCP_MSG_OFS + 44)
+#define DHCP_FILE_OFS (DHCP_MSG_OFS + 108)
 #define DHCP_MSG_LEN 236
 
 #define DHCP_COOKIE_OFS (DHCP_MSG_OFS + DHCP_MSG_LEN)
 #define DHCP_OPTIONS_OFS (DHCP_MSG_OFS + DHCP_MSG_LEN + 4)
 
-#define DHCP_CLIENT_PORT 68  
+#define DHCP_CLIENT_PORT 68
 #define DHCP_SERVER_PORT 67
 
 /** DHCP client states */
@@ -151,7 +151,7 @@ void dhcp_fine_tmr(void);
 /** not yet implemented #define DHCP_RELEASING 11 */
 #define DHCP_BACKING_OFF 12
 #define DHCP_OFF 13
- 
+
 #define DHCP_BOOTREQUEST 1
 #define DHCP_BOOTREPLY 2
 
@@ -174,7 +174,7 @@ void dhcp_fine_tmr(void);
 /** BootP options */
 #define DHCP_OPTION_PAD 0
 #define DHCP_OPTION_SUBNET_MASK 1 /* RFC 2132 3.3 */
-#define DHCP_OPTION_ROUTER 3 
+#define DHCP_OPTION_ROUTER 3
 #define DHCP_OPTION_HOSTNAME 12
 #define DHCP_OPTION_IP_TTL 23
 #define DHCP_OPTION_MTU 26
@@ -184,14 +184,14 @@ void dhcp_fine_tmr(void);
 
 /** DHCP options */
 #define DHCP_OPTION_REQUESTED_IP 50 /* RFC 2132 9.1, requested IP address */
-#define DHCP_OPTION_LEASE_TIME 51 /* RFC 2132 9.2, time in seconds, in 4 bytes */
-#define DHCP_OPTION_OVERLOAD 52 /* RFC2132 9.3, use file and/or sname field for options */
+#define DHCP_OPTION_LEASE_TIME 51   /* RFC 2132 9.2, time in seconds, in 4 bytes */
+#define DHCP_OPTION_OVERLOAD 52     /* RFC2132 9.3, use file and/or sname field for options */
 
 #define DHCP_OPTION_MESSAGE_TYPE 53 /* RFC 2132 9.6, important for DHCP */
 #define DHCP_OPTION_MESSAGE_TYPE_LEN 1
 
 
-#define DHCP_OPTION_SERVER_ID 54 /* RFC 2132 9.7, server IP address */
+#define DHCP_OPTION_SERVER_ID 54              /* RFC 2132 9.7, server IP address */
 #define DHCP_OPTION_PARAMETER_REQUEST_LIST 55 /* RFC 2132 9.8, requested option types */
 
 #define DHCP_OPTION_MAX_MSG_SIZE 57 /* RFC 2132 9.10, message size accepted >= 576 */
@@ -206,7 +206,7 @@ void dhcp_fine_tmr(void);
 /** possible combinations of overloading the file and sname fields with options */
 #define DHCP_OVERLOAD_NONE 0
 #define DHCP_OVERLOAD_FILE 1
-#define DHCP_OVERLOAD_SNAME  2
+#define DHCP_OVERLOAD_SNAME 2
 #define DHCP_OVERLOAD_SNAME_FILE 3
 
 #endif /*__LWIP_DHCP_H__*/

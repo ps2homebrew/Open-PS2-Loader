@@ -15,43 +15,46 @@
 #include <kernel.h>
 #include <syscallnr.h>
 
-#define MAKE_J(func)		(u32)( (0x02 << 26) | (((u32)func) / 4) )	// Jump (MIPS instruction)
-#define NOP					0x00000000									// No Operation (MIPS instruction)
+#define MAKE_J(func) (u32)((0x02 << 26) | (((u32)func) / 4)) // Jump (MIPS instruction)
+#define NOP 0x00000000                                       // No Operation (MIPS instruction)
 
 extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd);
 
-struct GSMDestSetGsCrt{
-	unsigned int interlace;
-	unsigned int mode;
-	unsigned int ffmd;
+struct GSMDestSetGsCrt
+{
+    unsigned int interlace;
+    unsigned int mode;
+    unsigned int ffmd;
 };
 
-struct GSMDestGSRegs{
-	u64 pmode;
-	u64 smode1;
-	u64 smode2;
-	u64 srfsh;
-	u64 synch1;
-	u64 synch2;
-	u64 syncv;
-	u64 dispfb1;
-	u64 display1;
-	u64 dispfb2;
-	u64 display2;
+struct GSMDestGSRegs
+{
+    u64 pmode;
+    u64 smode1;
+    u64 smode2;
+    u64 srfsh;
+    u64 synch1;
+    u64 synch2;
+    u64 syncv;
+    u64 dispfb1;
+    u64 display1;
+    u64 dispfb2;
+    u64 display2;
 };
 
-struct GSMFlags{
-	u32 dx_offset;
-	u32 dy_offset;
-	u8 ADAPTATION_fix;
-	u8 PMODE_fix;
-	u8 SMODE1_fix;
-	u8 SMODE2_fix;
-	u8 SRFSH_fix;
-	u8 SYNCH_fix;
-	u8 SYNCV_fix;
-	u8 DISPFB_fix;
-	u8 DISPLAY_fix;
+struct GSMFlags
+{
+    u32 dx_offset;
+    u32 dy_offset;
+    u8 ADAPTATION_fix;
+    u8 PMODE_fix;
+    u8 SMODE1_fix;
+    u8 SMODE2_fix;
+    u8 SRFSH_fix;
+    u8 SYNCH_fix;
+    u8 SYNCV_fix;
+    u8 DISPFB_fix;
+    u8 DISPLAY_fix;
 };
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
@@ -61,7 +64,7 @@ extern struct GSMFlags GSMFlags;
 extern void Hook_SetGsCrt();
 extern void GSHandler();
 
-static unsigned int KSEG_backup[2];	//Copies of the original words at 0x80000100 and 0x80000104.
+static unsigned int KSEG_backup[2]; //Copies of the original words at 0x80000100 and 0x80000104.
 
 /*-------------------*/
 /* Update GSM params */
@@ -69,27 +72,27 @@ static unsigned int KSEG_backup[2];	//Copies of the original words at 0x80000100
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
 void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset)
 {
-	GSMDestSetGsCrt.interlace 		= (u32) interlace;
-	GSMDestSetGsCrt.mode			= (u32) mode;
-	GSMDestSetGsCrt.ffmd			= (u32) ffmd;
+    GSMDestSetGsCrt.interlace = (u32)interlace;
+    GSMDestSetGsCrt.mode = (u32)mode;
+    GSMDestSetGsCrt.ffmd = (u32)ffmd;
 
-	GSMDestGSRegs.smode2 		= (u8) smode2;
-	GSMDestGSRegs.display1	= (u64) display;
-	GSMDestGSRegs.display2	= (u64) display;
-	GSMDestGSRegs.syncv		= (u64) syncv;
+    GSMDestGSRegs.smode2 = (u8)smode2;
+    GSMDestGSRegs.display1 = (u64)display;
+    GSMDestGSRegs.display2 = (u64)display;
+    GSMDestGSRegs.syncv = (u64)syncv;
 
-	GSMFlags.dx_offset		= (u32) dx_offset;	// X-axis offset -> Use it only when automatic adaptations formulas don't suffice
-	GSMFlags.dy_offset		= (u32) dy_offset;	// Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
-	// 0 = Off, 1 = On
-	GSMFlags.ADAPTATION_fix	= (u8) 1;	// Default = 1 = On
-	GSMFlags.PMODE_fix				= (u8) 0;	// Default = 0 = Off
-	GSMFlags.SMODE1_fix				= (u8) 0;	// Default = 0 = Off
-	GSMFlags.SMODE2_fix				= (u8) 1;	// Default = 1 = On
-	GSMFlags.SRFSH_fix				= (u8) 0;	// Default = 0 = Off
-	GSMFlags.SYNCH_fix				= (u8) 0;	// Default = 0 = Off
-	GSMFlags.SYNCV_fix				= (u8) 1;	// Default = 1 = On
-	GSMFlags.DISPFB_fix				= (u8) 1;	// Default = 1 = On
-	GSMFlags.DISPLAY_fix			= (u8) 1;	// Default = 1 = On
+    GSMFlags.dx_offset = (u32)dx_offset; // X-axis offset -> Use it only when automatic adaptations formulas don't suffice
+    GSMFlags.dy_offset = (u32)dy_offset; // Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
+    // 0 = Off, 1 = On
+    GSMFlags.ADAPTATION_fix = (u8)1; // Default = 1 = On
+    GSMFlags.PMODE_fix = (u8)0;      // Default = 0 = Off
+    GSMFlags.SMODE1_fix = (u8)0;     // Default = 0 = Off
+    GSMFlags.SMODE2_fix = (u8)1;     // Default = 1 = On
+    GSMFlags.SRFSH_fix = (u8)0;      // Default = 0 = Off
+    GSMFlags.SYNCH_fix = (u8)0;      // Default = 0 = Off
+    GSMFlags.SYNCV_fix = (u8)1;      // Default = 1 = On
+    GSMFlags.DISPFB_fix = (u8)1;     // Default = 1 = On
+    GSMFlags.DISPLAY_fix = (u8)1;    // Default = 1 = On
 }
 
 /*------------------------------------------------------------------*/
@@ -97,8 +100,8 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
 /*------------------------------------------------------------------*/
 static inline void Install_Hook_SetGsCrt(void)
 {
-	Old_SetGsCrt = GetSyscallHandler(__NR_SetGsCrt);
-	SetSyscall(__NR_SetGsCrt, Hook_SetGsCrt);
+    Old_SetGsCrt = GetSyscallHandler(__NR_SetGsCrt);
+    SetSyscall(__NR_SetGsCrt, Hook_SetGsCrt);
 }
 
 /*-----------------------------------------------------------------*/
@@ -106,7 +109,7 @@ static inline void Install_Hook_SetGsCrt(void)
 /*-----------------------------------------------------------------*/
 static inline void Remove_Hook_SetGsCrt(void)
 {
-	SetSyscall(__NR_SetGsCrt, Old_SetGsCrt);
+    SetSyscall(__NR_SetGsCrt, Old_SetGsCrt);
 }
 
 /*----------------------------------------------------------------------------------------------------*/
@@ -118,79 +121,77 @@ static inline void Remove_Hook_SetGsCrt(void)
 /*----------------------------------------------------------------------------------------------------*/
 static void Install_GSHandler(void)
 {
-	DI();
-	ee_kmode_enter();
+    DI();
+    ee_kmode_enter();
 
-	KSEG_backup[0]=*(volatile u32 *)0x80000100;
-	KSEG_backup[1]=*(volatile u32 *)0x80000104;
+    KSEG_backup[0] = *(volatile u32 *)0x80000100;
+    KSEG_backup[1] = *(volatile u32 *)0x80000104;
 
-	*(volatile u32 *)0x80000100 = MAKE_J((int)GSHandler);
-	*(volatile u32 *)0x80000104 = NOP;
-	ee_kmode_exit();
+    *(volatile u32 *)0x80000100 = MAKE_J((int)GSHandler);
+    *(volatile u32 *)0x80000104 = NOP;
+    ee_kmode_exit();
 
-	// Set Data Address Write Breakpoint
-	// Trap writes to GS registers, so as to control their values
-	__asm__ __volatile__ (
-	".set noreorder\n"
-	".set noat\n"
-	
-	"li $a0, 0x12000000\n"	// Address base for trapping
-	"li $a1, 0x1FFFEF0F\n"	// Address mask for trapping
-							// Trapping range is extended to match all kernel access segments
+    // Set Data Address Write Breakpoint
+    // Trap writes to GS registers, so as to control their values
+    __asm__ __volatile__(
+        ".set noreorder\n"
+        ".set noat\n"
 
-	"li $k0, 0x8000\n"
-	"mtbpc $k0\n"			// All breakpoints off (BED = 1)
+        "li $a0, 0x12000000\n" // Address base for trapping
+        "li $a1, 0x1FFFEF0F\n" // Address mask for trapping
+                               // Trapping range is extended to match all kernel access segments
 
-	"sync.p\n"						// Await instruction completion
+        "li $k0, 0x8000\n"
+        "mtbpc $k0\n" // All breakpoints off (BED = 1)
 
-	"mtdab	$a0\n"
-	"mtdabm	$a1\n"
+        "sync.p\n" // Await instruction completion
 
-	"sync.p\n"						// Await instruction completion
+        "mtdab	$a0\n"
+        "mtdabm	$a1\n"
 
-	"mfbpc $k1\n"
-	"sync.p\n"						// Await instruction completion
+        "sync.p\n" // Await instruction completion
 
-	"li $k0, 0x20200000\n"			// Data write breakpoint on (DWE, DUE = 1)
-	"or $k1, $k1, $k0\n"
-	"xori $k1, $k1, 0x8000\n"		// DEBUG exception trigger on (BED = 0)
-	"mtbpc $k1\n"
-	"sync.p\n"						//  Await instruction completion
-	
-	".set at\n"
-	".set reorder\n"
-	);
+        "mfbpc $k1\n"
+        "sync.p\n" // Await instruction completion
 
-	EI();
+        "li $k0, 0x20200000\n" // Data write breakpoint on (DWE, DUE = 1)
+        "or $k1, $k1, $k0\n"
+        "xori $k1, $k1, 0x8000\n" // DEBUG exception trigger on (BED = 0)
+        "mtbpc $k1\n"
+        "sync.p\n" //  Await instruction completion
 
-	FlushCache(0);
-	FlushCache(2);
+        ".set at\n"
+        ".set reorder\n");
+
+    EI();
+
+    FlushCache(0);
+    FlushCache(2);
 }
 
 static void Remove_GSHandler(void)
 {
-	DI();
+    DI();
 
-	__asm__ __volatile__ (
-	".set noreorder\n"
-	".set noat\n"
-	"li $k0, 0x8000\n"
-	"mtbpc $k0\n"		// All breakpoints off (BED = 1)
-	"sync.p\n"		// Await instruction completion
-	
-	".set at\n"
-	".set reorder\n"
-	);
+    __asm__ __volatile__(
+        ".set noreorder\n"
+        ".set noat\n"
+        "li $k0, 0x8000\n"
+        "mtbpc $k0\n" // All breakpoints off (BED = 1)
+        "sync.p\n"    // Await instruction completion
 
-	//Restore the original stuff at the level 2 exception handler.
-	ee_kmode_enter();
-	*(volatile u32 *)0x80000100=KSEG_backup[0];
-	*(volatile u32 *)0x80000104=KSEG_backup[1];
-	ee_kmode_exit();
-	EI();
+        ".set at\n"
+        ".set reorder\n");
 
-	FlushCache(0);
-	FlushCache(2);
+    //Restore the original stuff at the level 2 exception handler.
+    ee_kmode_enter();
+    *(volatile u32 *)0x80000100 = KSEG_backup[0];
+    *(volatile u32 *)0x80000104 = KSEG_backup[1];
+    ee_kmode_exit();
+    EI();
+
+    FlushCache(0);
+    FlushCache(2);
 }
 
 /*-------------------------------------------*/
@@ -198,10 +199,10 @@ static void Remove_GSHandler(void)
 /*-------------------------------------------*/
 void EnableGSM(void)
 {
-	// Install Hook SetGsCrt
-	Install_Hook_SetGsCrt();
-	// Install Display Handler
-	Install_GSHandler();
+    // Install Hook SetGsCrt
+    Install_Hook_SetGsCrt();
+    // Install Display Handler
+    Install_GSHandler();
 }
 
 /*--------------------------------------------*/
@@ -209,8 +210,8 @@ void EnableGSM(void)
 /*--------------------------------------------*/
 void DisableGSM(void)
 {
-	// Remove Hook SetGsCrt
-	Remove_Hook_SetGsCrt();
-	// Remove Display Handler
-	Remove_GSHandler();
+    // Remove Hook SetGsCrt
+    Remove_Hook_SetGsCrt();
+    // Remove Display Handler
+    Remove_GSHandler();
 }

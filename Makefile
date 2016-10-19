@@ -46,6 +46,8 @@ INGAME_DEBUG = 0
 DECI2_DEBUG = 0
 CHILDPROOF = 0
 
+# ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
+
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
 		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o obj/httpclient.o
@@ -194,8 +196,12 @@ ifeq ($(DEBUG),0)
 
 	echo "Compressing..."
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
+	@echo "Package Complete: $(EE_BIN_PKD)"
   endif
 endif
+
+release:
+	$(MAKE) VMC=1 GSM=1 IGS=1 CHEAT=1 DEVBUILD=0 all
 	
 childproof:
 	$(MAKE) CHILDPROOF=1 all

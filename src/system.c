@@ -528,15 +528,14 @@ static void PrepareGSM(char *cmdline) {
 		{  GS_NONINTERLACED,	GS_MODE_VGA_1280_75, GS_FRAME, 	makeDISPLAY( 1023,	1279,	1,		1,		 40,	350),	makeSYNCV(    3, 1024,    0,   38,    0,    1 )}
 	}; //ends predef_vmode definition
 
-	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %u", predef_vmode[gGSMVMode].interlace, \
+	sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[gGSMVMode].interlace, \
 					predef_vmode[gGSMVMode].mode, \
 					predef_vmode[gGSMVMode].ffmd, \
 					predef_vmode[gGSMVMode].display, \
 					predef_vmode[gGSMVMode].syncv, \
 					((predef_vmode[gGSMVMode].ffmd)<<1)|(predef_vmode[gGSMVMode].interlace), \
 					gGSMXOffset, \
-					gGSMYOffset, \
-					gGSMSkipVideos);
+					gGSMYOffset);
 }
 #endif
 

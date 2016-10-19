@@ -1,7 +1,11 @@
 /*
-  Copyright 2009, Ifcaro, jimmikaelkael
+  Copyright 2006-2008 Polo
+  Copyright 2009-2010, ifcaro, jimmikaelkael & Polo
+  Copyright 2016 doctorxyz
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.
+  Review Open-Ps2-Loader README & LICENSE files for further details.
+  
+  Some parts of the code have been taken from Polo's HD Project and doctorxyz's GSM
 */
 
 #include "ee_core.h"
@@ -123,7 +127,7 @@ static void NIS_generic_patches(void)
 	};
 	u32 *ptr;
 
-	ptr = find_pattern_with_mask((u32 *)0x100000, 0x01e00000, NIScdtimeoutpattern, NIScdtimeoutpattern_mask, 0x28);
+	ptr = find_pattern_with_mask((u32 *)0x00100000, 0x01e00000, NIScdtimeoutpattern, NIScdtimeoutpattern_mask, 0x28);
 	if (ptr) {
 		u16 jmp = _lw((u32)ptr+32) & 0xffff;
 		_sw(0x10000000|jmp, (u32)ptr+32);
@@ -159,7 +163,7 @@ static void AC9B_generic_patches(void)
 	};
 	u32 *ptr;
 
-	ptr = find_pattern_with_mask((u32 *)0x100000, 0x01e00000, AC9Bpattern, AC9Bpattern_mask, 0x28);
+	ptr = find_pattern_with_mask((u32 *)0x00100000, 0x01e00000, AC9Bpattern, AC9Bpattern_mask, 0x28);
 	if (ptr)
 		_sw(0, (u32)ptr+36);
 }
@@ -337,7 +341,7 @@ static void ZombieZone_patches(unsigned int address)
 	u32 *ptr;
 
 	//Locate scePadEnd().
-	ptr = find_pattern_with_mask((u32 *)0x1c0000, 0x01f00000, ZZpattern, ZZpattern_mask, sizeof(ZZpattern));
+	ptr = find_pattern_with_mask((u32 *)0x001c0000, 0x01f00000, ZZpattern, ZZpattern_mask, sizeof(ZZpattern));
 	if (ptr)
 	{
 		pZZInitIOP = (void *)FNADDR(_lw(address));
@@ -345,6 +349,56 @@ static void ZombieZone_patches(unsigned int address)
 
 		_sw(JAL((unsigned int)&ZombieZone_preIOPInit), address);
 	}
+}
+
+// Skip Bink (.BIK) Videos
+// This patch is expected to work with all games using ChoosePlayMovie statements, for instance:
+// SLUS_215.41(Ratatouille), SLES_541.72 (Garfield 2), SLES_555.22 (UP), SLUS_217.36(Wall-E), SLUS_219.31 (Toy Story 3)
+int Skip_BIK_Videos(void) {
+	static const char ChoosePlayMoviePattern[] = {"ChoosePlayMovie"};	// We are looking for an array of 15+1=16 elements: "ChoosePlayMovie" + '\0'(NULL Character).
+																		// That's fine (find_pattern_with_mask works with multiples of 4 bytes since it expects a u32 pattern buffer).
+	static const unsigned int ChoosePlayMoviePattern_mask[] = {			 // We want an exact match, so let's fill it with 255 (0xFF) values. 
+		0xffffffff,
+		0xffffffff,
+		0xffffffff,
+		0xffffffff
+	};
+
+	u32 *ptr;
+	ptr = find_pattern_with_mask((u32 *)0x00100000, 0x01ec0000, (u32 *)ChoosePlayMoviePattern, ChoosePlayMoviePattern_mask, sizeof(ChoosePlayMoviePattern_mask));
+	if (ptr) {
+		_sw(0x41414141, (u32)ptr);	// The built-in game engine script language never will interprete ChoosePlayMovie statements as valid,
+									// since here we are replacing the command "ChoosePlayMovie" by "AAAAePlayMovie"
+									// 0x41414141 = "AAAAAA" ;-)
+		return 1;
+	} else
+		return 0;
+}
+
+// Skip Videos (sceMpegIsEnd) Code - nachbrenner's basic method, based on CMX/bongsan's original idea
+// Source: http://replay.waybackmachine.org/20040419134616/http://nachbrenner.pcsx2.net/chapter1.html
+// This patch is expected to work with all games using sceMpegIsEnd, for example:
+// SCUS_973.99(God of War I), SLUS_212.42 (Burnout Revenge) and SLES-50613 (Woody Woodpecker: Escape from Buzz Buzzard Park)
+int Skip_Videos_sceMpegIsEnd(void) {
+	static const unsigned int sceMpegIsEndPattern[] = { 
+		0x8c830040,	// lw	$v1, $0040($a0)
+		0x03e00008,	// jr	$ra
+		0x8c620000,	// lw	$v0, 0($v1)
+	};
+	static const unsigned int sceMpegIsEndPattern_mask[] = { 
+		0xffffffff,
+		0xffffffff,
+		0xffffffff,
+	};
+
+	u32 *ptr;
+	ptr = find_pattern_with_mask((u32 *)0x00100000, 0x01ec0000, sceMpegIsEndPattern, sceMpegIsEndPattern_mask, sizeof(sceMpegIsEndPattern));
+	if (ptr) {
+		_sw(0x24020001, (u32)ptr+8);	// addiu 	$v0, $zero, 1 <- HERE!!!
+		return 1;
+	} else
+		return 0;
+
 }
 
 void apply_patches(void)
@@ -385,4 +439,7 @@ void apply_patches(void)
 			}
 		}
 	}
+	if (g_compat_mask & COMPAT_MODE_4)
+		if (!Skip_BIK_Videos())	// First try to Skip Bink (.BIK) Videos method...
+			Skip_Videos_sceMpegIsEnd();	// If - and only if the previous approach didn't work, so try to Skip Videos (sceMpegIsEnd) method.
 }

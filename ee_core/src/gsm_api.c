@@ -52,7 +52,6 @@ struct GSMFlags{
 	u8 SYNCV_fix;
 	u8 DISPFB_fix;
 	u8 DISPLAY_fix;
-	u8 skip_videos_fix;
 };
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
@@ -68,7 +67,7 @@ static unsigned int KSEG_backup[2];	//Copies of the original words at 0x80000100
 /* Update GSM params */
 /*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, u32 skip_videos_fix)
+void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset)
 {
 	GSMDestSetGsCrt.interlace 		= (u32) interlace;
 	GSMDestSetGsCrt.mode			= (u32) mode;
@@ -91,8 +90,6 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
 	GSMFlags.SYNCV_fix				= (u8) 1;	// Default = 1 = On
 	GSMFlags.DISPFB_fix				= (u8) 1;	// Default = 1 = On
 	GSMFlags.DISPLAY_fix			= (u8) 1;	// Default = 1 = On
-	GSMFlags.skip_videos_fix		= (u8) skip_videos_fix;
-
 }
 
 /*------------------------------------------------------------------*/

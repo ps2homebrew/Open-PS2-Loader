@@ -122,7 +122,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Accurate Reads",
 	"Synchronous Mode",
 	"Unhook Syscalls",
-	"0 PSS mode",
+	"Skip Videos",
 	"Emulate DVD-DL",
 	"Disable IGR",
 	"High module storage",

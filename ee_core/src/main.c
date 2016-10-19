@@ -111,7 +111,7 @@ int main(int argc, char **argv){
 
 #ifdef GSM
 	if(EnableGSMOp){
-		u32 interlace, mode, ffmd, dx_offset, dy_offset, skip_videos_fix;
+		u32 interlace, mode, ffmd, dx_offset, dy_offset;
 		u64 display, syncv, smode2;
 
 		interlace=_strtoui(_strtok(argv[i], " "));
@@ -122,9 +122,8 @@ int main(int argc, char **argv){
 		smode2=_strtoui(_strtok(NULL, " "));
 		dx_offset=_strtoui(_strtok(NULL, " "));
 		dy_offset=_strtoui(_strtok(NULL, " "));
-		skip_videos_fix=_strtoui(_strtok(NULL, " "));
 
-		UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset, skip_videos_fix);
+		UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset);
 		EnableGSM();
 	}
 #endif

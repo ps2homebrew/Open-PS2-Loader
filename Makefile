@@ -1,5 +1,3 @@
-.SILENT:
-
 # How to DEBUG?
 # Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
 # Debug modes:
@@ -58,12 +56,12 @@ GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
 
 MISC_OBJS =	obj/icon_sys_A.o obj/icon_sys_J.o
 
-IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o	\
-		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o	\
-		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns-iop.o	\
+IOP_OBJS =	obj/iomanx.o obj/filexio.o obj/ps2fs.o obj/usbd.o obj/usbhdfsd.o obj/usbhdfsdfsv.o \
+		obj/ps2atad.o obj/hdpro_atad.o obj/poweroff.o obj/ps2hdd.o obj/genvmc.o obj/hdldsvr.o \
+		obj/ps2dev9.o obj/smsutils.o obj/ps2ip.o obj/smap.o obj/isofs.o obj/nbns-iop.o \
 		obj/httpclient-iop.o obj/netman.o obj/ps2ips.o
 
-EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o	\
+EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o \
 		obj/elfldr.o obj/udnl.o obj/imgdrv.o obj/eesync.o \
 		obj/usb_cdvdman.o obj/IOPRP_img.o obj/smb_cdvdman.o \
 		obj/hdd_cdvdman.o obj/hdd_hdpro_cdvdman.o obj/cdvdfsv.o \
@@ -110,11 +108,15 @@ else
   EE_LIBS += -lpad
 endif
 
-ifeq ($(IGS),1)
+ifeq ($(CHILDPROOF),1)
+  EE_CFLAGS += -D__CHILDPROOF
+  GSM_FLAGS = GSM=0
+  IGS_FLAGS = IGS=0
+  CHEAT_FLAGS = CHEAT=0
+else
+  ifeq ($(IGS),1)
     GSM = 1
-endif
-
-ifeq ($(CHILDPROOF),0)
+  endif
   ifeq ($(GSM),1)
     EE_CFLAGS += -DGSM
     GSM_FLAGS = GSM=1
@@ -135,11 +137,6 @@ ifeq ($(CHILDPROOF),0)
   else
     CHEAT_FLAGS = CHEAT=0
   endif
-else
-  EE_CFLAGS += -D__CHILDPROOF
-  GSM_FLAGS = GSM=0
-  IGS_FLAGS = IGS=0
-  CHEAT_FLAGS = CHEAT=0
 endif
 
 ifeq ($(DEBUG),1) 
@@ -175,6 +172,7 @@ else
   SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 endif
 
+.SILENT:
 all:
 	@mkdir -p obj
 	@mkdir -p asm
@@ -211,12 +209,10 @@ ingame_debug:
 deci2_debug:
 	$(MAKE) DEBUG=1 INGAME_DEBUG=1 DECI2_DEBUG=1 all
 
-clean:  sclean
-
-sclean:
+clean:
 	echo "Cleaning..."
 	echo "-Interface"
-	rm -f -r $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
+	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-Elf Loader"

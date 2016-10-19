@@ -42,7 +42,7 @@ GUI:
 * Improved the behaviour of the auto-refresh option.
 * GSM moved to Game Options menu since its a Per-Game option now.
 * Infamous "Blockhead Grande" theme bug SQUARSHED! (Themes should now get loaded correctly, regardless of display settings).
-* New logo design by Berion, new changed icons by El_Patas.
+* New theme and logo design by Jay-Jay.
 * Better error reporting and help messages in general.
 * Network settings are now saved in opl_network.cfg.
 * Improved stability, design and UI responsiveness.

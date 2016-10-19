@@ -518,7 +518,7 @@ void sbRename(base_game_info_t **list, const char* prefix, const char* sep, int 
 
 config_set_t* sbPopulateConfig(base_game_info_t* game, const char* prefix, const char* sep) {
 	char path[256];
-#if OPL_IS_DEV_BUILD
+#ifdef OPL_IS_DEV_BUILD
 	snprintf(path, sizeof(path), "%sCFG-DEV%s%s.cfg", prefix, sep, game->startup);
 #else
 	snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
@@ -542,7 +542,7 @@ void sbCreateFolders(const char *path, int createDiscImgFolders) {
 	// update Themes
 	char fullpath[256];
 
-#if OPL_IS_DEV_BUILD
+#ifdef OPL_IS_DEV_BUILD
 	sprintf(fullpath, "%sCFG-DEV", path);
 #else
 	sprintf(fullpath, "%sCFG", path);

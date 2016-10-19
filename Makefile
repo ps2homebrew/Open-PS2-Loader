@@ -1,3 +1,5 @@
+DEVBUILD = 1
+
 # How to DEBUG?
 # Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
 # Debug modes:
@@ -113,6 +115,7 @@ ifeq ($(CHILDPROOF),1)
   GSM_FLAGS = GSM=0
   IGS_FLAGS = IGS=0
   CHEAT_FLAGS = CHEAT=0
+  DEVBUILD = 0
 else
   ifeq ($(IGS),1)
     GSM = 1
@@ -167,10 +170,13 @@ ifeq ($(DEBUG),1)
       IOP_OBJS += obj/udptty-ingame.o
     endif
   endif
+  DEVBUILD = 1
 else
   EE_CFLAGS += -O2
   SMSTCPIP_INGAME_CFLAGS = INGAME_DRIVER=1
 endif
+
+EE_CFLAGS += -DOPL_IS_DEV_BUILD=\"$(DEVBUILD)\"
 
 .SILENT:
 all:

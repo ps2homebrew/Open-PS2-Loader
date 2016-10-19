@@ -56,7 +56,7 @@ enum ERROR_CODE{
 #define COMPAT_MODE_1 		 0x01 // Accurate Reads
 #define COMPAT_MODE_2 		 0x02 // Alternative data read method (Synchronous)
 #define COMPAT_MODE_3 		 0x04 // Unhook Syscalls
-#define COMPAT_MODE_4 		 0x08 // 0 PSS mode
+#define COMPAT_MODE_4 		 0x08 // Skip Videos: Apply 0 (zero) file size to PSS videos and also skip Bink (.BIK) ones
 #define COMPAT_MODE_5 		 0x10 // Emulate DVD-DL
 #define COMPAT_MODE_6 		 0x20 // Disable IGR
 #define COMPAT_MODE_7 		 0x40 // High Module Storage

@@ -380,7 +380,7 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 	}
 
 	if (compatmask & COMPAT_MODE_4) {
-		settings->flags |= IOPCORE_COMPAT_0_PSS;
+		settings->flags |= IOPCORE_COMPAT_0_SKIP_VIDEOS;
 	}
 
 	if (compatmask & COMPAT_MODE_5) {
@@ -398,8 +398,6 @@ int sbPrepare(base_game_info_t* game, config_set_t* configSet, int size_cdvdman,
 		configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
 		configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
 		configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
-		configGetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, &gGSMSkipVideos);
-
 	}
 #endif
 

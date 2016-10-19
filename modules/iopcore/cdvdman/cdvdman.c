@@ -1605,7 +1605,8 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 	}
 
 	pcdfile->lsn = lsn;
-	if ((cdvdman_settings.common.flags&IOPCORE_COMPAT_0_PSS) && \
+	// Skip Videos: Apply 0 (zero) filesize to PSS videos
+	if ((cdvdman_settings.common.flags&IOPCORE_COMPAT_0_SKIP_VIDEOS) && \
 		((!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".PSS", 4)) || \
 		(!strncmp(&cdvdman_filepath[strlen(cdvdman_filepath)-6], ".pss", 4))))
 		pcdfile->size = 0;

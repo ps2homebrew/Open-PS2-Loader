@@ -119,7 +119,6 @@ GSMFlags: .space 18
 .equ SYNCV_fix,            14 # BYTE
 .equ DISPFB_fix,           15 # BYTE
 .equ DISPLAY_fix,          16 # BYTE
-.equ skip_videos_fix,          17 # BYTE
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -128,13 +127,6 @@ GSMAdapts:	.space 18
 .equ Adapted_DISPLAY2,             8 # DWORD
 .equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
 .equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value
-
-.p2align 4	# align 16 bytes (IMPORTANT!!!)
-
-OnTheFlyPatcherValues: .space 12
-.equ Pattern_Code_Ptr,    0 # WORD -> Pointer to Pattern Code
-.equ Pattern_Mask_Ptr,    4 # WORD -> Pointer to Pattern Mask Address
-.equ Replacement_Code_Ptr,8 # WORD -> Pointer to Replacement Code Address
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -233,22 +225,6 @@ sync.p			// Await instruction completion
 
 //-----------------------------------------------------------------------------------------
 
-la	$v0, GSMFlags
-lb	$a0, skip_videos_fix($v0)		# a0 = skip_videos_fix
-beql	$a0,$zero, Skip_skip_videos_Patch	# in case of Skip Videos fix is disabled
-nop					# skip this fix
-// 'skip videos' (sceMpegIsEnd) code - basic method by nachbrenner (original idea from CMX and bongsan)
-// Source: http://replay.waybackmachine.org/20040419134616/http://nachbrenner.pcsx2.net/chapter1.html
-
-la	$a2, Pattern_Code_sceMpegIsEnd					# $a2 = pattern start address
-la	$a3, Pattern_Mask_sceMpegIsEnd					# $a3 = pattern mask start address
-la	$a1, Replacement_Code_sceMpegIsEnd				# $a1 = replacement code address
-jal	OnTheFlyPatcher
-nop
-
-//-----------------------------------------------------------------------------------------
-
-Skip_skip_videos_Patch:
 la	$v0, GSMDestSetGsCrt
 lw	$a0, Target_INT($v0)
 lw	$a1, Target_MODE($v0)
@@ -1931,125 +1907,6 @@ nop
 
 end_GSHandler:
 .end	GSHandler
-
-//--------------------
-// On-The-Fly patcher
-//--------------------
-
-#.globl OnTheFlyPatcher
-.ent OnTheFlyPatcher
-OnTheFlyPatcher:
-
-addiu	$sp, $sp, -0x0010	# reserve 16 bytes stack space (1 reg)
-sd	$ra, 0($sp)				# Push return address on stack
-
-la	$a0, MIPS_Regs			# Base Address
-sq	$v0, 0x20($a0)			# v0
-sq	$v1, 0x30($a0)			# v1
-sq	$t0, 0x80($a0)			# t0
-sq	$t1, 0x90($a0)			# t1
-sq	$t2, 0xA0($a0)			# t2
-sq	$t3, 0xB0($a0)			# t3
-sq	$t4, 0xC0($a0)			# t4
-sq	$t5, 0xD0($a0)			# t5
-
-la	$t5, OnTheFlyPatcherValues		# Base Address
-sw	$a2, Pattern_Code_Ptr($t5)		# Store Pattern Code Address
-sw	$a3, Pattern_Mask_Ptr($t5)		# Store Pattern Mask Address
-sw	$a1, Replacement_Code_Ptr($t5)	# Store Replacement Code Address
-
-li	$a0, 0x00100000			# $a0 = scan start address
-li	$a1, 0x01C00000			# $a1 = scan end address
-li	$v0, 0xFFFFFFFF			# $v0 = Ending (Wild Card) Value
-beqzl	$zero, OnTheFlyPatcher_Start
-nop
-
-OnTheFlyPatcher_OuterLoop:
-or	$a0,$zero,$t4			# $a0 = restore current scan address (from temporary $t4)
-addu	$a0, $a0, 4			# increase scan address
-slt	$t0, $a0, $a1			# compare current scan address with end scan address
-beqz	$t0, OnTheFlyPatcher_End		# continue comparison until the end scan address
-nop
-
-OnTheFlyPatcher_Start:
-or	$t4,$zero,$a0			# $t4 = temporary store of current scan address (obtained from $a0)
-lw	$a2, Pattern_Code_Ptr($t5)		# Restore Pattern Code Address
-lw	$a3, Pattern_Mask_Ptr($t5)		# Restore Pattern Mask Address
-
-OnTheFlyPatcher_InnerLoop:
-lw	$t0, 0($a0)				# $t0 = current scan value
-lw	$t1, 0($a2)				# $t1 = current pattern value
-lw	$t2, 0($a3)				# $t2 = current pattern mask value
-
-beq	$v0, $t1, OnTheFlyPatcher_InnerLoop_Exit	# continue inner comparison until matched all whole thing
-nop
-
-and	$v1, $t0, $t2			# $v1 = current scan masked value
-and	$t3, $t1, $t2			# $t3 = current pattern masked value
-bne	$v1, $t3, OnTheFlyPatcher_OuterLoop	# stop inner comparison in case of the [current scan masked value] not be equal to the [current pattern masked value]
-nop
-
-addu	$a0, $a0, 4							# increase scan address
-addu	$a2, $a2, 4							# increase pattern address
-addu	$a3, $a3, 4							# increase pattern mask address
-beqzl	$zero, OnTheFlyPatcher_InnerLoop	# continue inner comparison until matched all whole thing
-nop
-
-OnTheFlyPatcher_InnerLoop_Exit:
-
-# PATCH THE ORIGINAL CODE
-
-or	$a0,$zero,$t4					# $a0 = restore current scan address (from temporary $t4) = target address
-lw	$a1, Replacement_Code_Ptr($t5)	# Restore Replacement Code Address
-
-OnTheFlyPatcher_Looping:
-lw     $v1, 0($a1)					# $v1 = current replacement code value
-
-beq	$v0, $v1, OnTheFlyPatcher_End			# continue replacing until the whole thing be done
-nop
-
-addiu   $a1, $a1, 4					# increase current replacement code address
-sw      $v1, 0($a0)					# store the [current replacement code value] ($v1) into the [current target address] ($a0) 
-addiu   $a0, $a0, 4					# increase current target address
-beqzl    $zero, OnTheFlyPatcher_Looping			# continue replacing until the whole thing be done
-nop
-
-OnTheFlyPatcher_End:
-
-la	$a0, MIPS_Regs		# a0 -> MIPS_Regs
-lq	$t5, 0xD0($a0)			# t5
-lq	$t4, 0xC0($a0)			# t4
-lq	$t3, 0xB0($a0)			# t3
-lq	$t2, 0xA0($a0)			# t2
-lq	$t1, 0x90($a0)			# t1
-lq	$t0, 0x80($a0)			# t0
-lq	$v1, 0x30($a0)			# v1
-lq	$v0, 0x20($a0)			# v0
-
-ld	$ra, 0($sp)				# Pull return address from stack 
-jr	$ra						# Return to caller
-addiu	$sp, $sp, 0x0010	# Restore sp during return
-
-.end OnTheFlyPatcher
-
-# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-.p2align 4	# align 16 bytes (IMPORTANT!!!)
-# sceMpegIsEnd pattern, extracted from "Woody Woodpecker: Escape from Buzz Buzzard Park (SLES-50613 PAL)"
-Pattern_Code_sceMpegIsEnd:
-.word 0x8c830040 # lw	$v1, $0040($a0)
-.word 0x03e00008 # jr	$ra            
-.word 0x8c620000 # lw	$v0, 0($v1)    
-.word 0xFFFFFFFF # Ending (Wild Card) Value
-Pattern_Mask_sceMpegIsEnd:						
-.word 0xFFFFFFFF
-.word 0xFFFFFFFF
-.word 0xFFFFFFFF
-Replacement_Code_sceMpegIsEnd:
-.word 0x8c830040 # lw	$v1, $0040($a0)
-.word 0x03e00008 # jr	$ra            
-.word 0x24020001 # addiu 	$v0, $zero, 1 <- HERE!!!
-.word 0xFFFFFFFF # Ending (Wild Card) Value
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

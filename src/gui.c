@@ -521,7 +521,6 @@ static void guiSetGSMSettingsState(void) {
 	diaSetEnabled(diaGSConfig, GSMCFG_GSMVMODE, isGSMEnabled);
 	diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, isGSMEnabled);
 	diaSetEnabled(diaGSConfig, GSMCFG_GSMYOFFSET, isGSMEnabled);
-	diaSetEnabled(diaGSConfig, GSMCFG_GSMSKIPVIDEOS, isGSMEnabled);
 }
 
 static int guiGSMUpdater(int modified) {
@@ -966,10 +965,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 	configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
 	diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
 
-	int GSMSkipVideos = 0;
-	configGetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, &GSMSkipVideos);
-	diaSetInt(diaGSConfig, GSMCFG_GSMSKIPVIDEOS, GSMSkipVideos);
-
 	guiSetGSMSettingsState();
 
 // End Of Per-Game GSM Integration --Bat--
@@ -1053,7 +1048,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 		configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
 		configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
 		configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-		configRemoveKey(configSet, CONFIG_ITEM_GSMSKIPVIDEOS);
 #endif
 #ifdef VMC
 		configRemoveVMC(configSet, 0);
@@ -1105,12 +1099,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet) {
 			configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
 		else
 			configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-
-		diaGetInt(diaGSConfig, GSMCFG_GSMSKIPVIDEOS, &GSMSkipVideos);
-		if (GSMSkipVideos != 0)
-			configSetInt(configSet, CONFIG_ITEM_GSMSKIPVIDEOS, GSMSkipVideos);
-		else
-			configRemoveKey(configSet, CONFIG_ITEM_GSMSKIPVIDEOS);
 #endif
 
 		diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));

@@ -42,7 +42,6 @@ enum CONFIG_INDEX
 #define CONFIG_ITEM_GSMVMODE		"$GSMVMode"
 #define CONFIG_ITEM_GSMXOFFSET		"$GSMXOffset"
 #define CONFIG_ITEM_GSMYOFFSET		"$GSMYOffset"
-#define CONFIG_ITEM_GSMSKIPVIDEOS	"$GSMSkipVideos"
 
 //OPL config keys
 #define CONFIG_OPL_THEME		"theme"

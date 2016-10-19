@@ -35,8 +35,8 @@
 /* this might define NULL already */
 #include "arch/cc.h"
 
-#define LWIP_MAX(x , y)  (x) > (y) ? (x) : (y)
-#define LWIP_MIN(x , y)  (x) < (y) ? (x) : (y)
+#define LWIP_MAX(x, y) (x) > (y) ? (x) : (y)
+#define LWIP_MIN(x, y) (x) < (y) ? (x) : (y)
 
 #ifndef NULL
 #define NULL ((void *)0)
@@ -44,4 +44,3 @@
 
 
 #endif /* __LWIP_DEF_H__ */
-

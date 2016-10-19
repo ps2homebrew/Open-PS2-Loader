@@ -16,20 +16,20 @@
 
 typedef struct
 {
-	u32 totalLBA;
-	u32 partitionMaxSize;
-	u32 format;
-	u32 status;
+    u32 totalLBA;
+    u32 partitionMaxSize;
+    u32 format;
+    u32 status;
 } hdd_device_t;
 
 typedef struct
 {
-	iop_file_t	*f;				// used to see if open...
-	u32			post;			// offset/post....
-	u16			nsub;
-	u16			type;
-	char		id[APA_IDMAX];
-	apa_sub_t parts[APA_MAXSUB+1];	// Partition data (0 = main partition, 1+ = sub-partition)
+    iop_file_t *f; // used to see if open...
+    u32 post;      // offset/post....
+    u16 nsub;
+    u16 type;
+    char id[APA_IDMAX];
+    apa_sub_t parts[APA_MAXSUB + 1]; // Partition data (0 = main partition, 1+ = sub-partition)
 } hdd_file_slot_t;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -39,7 +39,7 @@
 #if defined(LWIP_SNMP) && (LWIP_SNMP > 0)
 
 /* network interface */
-void snmp_add_ifinoctets(unsigned long value); 
+void snmp_add_ifinoctets(unsigned long value);
 void snmp_inc_ifinucastpkts(void);
 void snmp_inc_ifinnucastpkts(void);
 void snmp_inc_ifindiscards(void);
@@ -78,7 +78,7 @@ void snmp_inc_icmpoutdestunreachs(void);
 void snmp_inc_icmpouttimeexcds(void);
 void snmp_inc_icmpoutparmprobs(void);
 void snmp_inc_icmpoutsrcquenchs(void);
-void snmp_inc_icmpoutredirects(void); 
+void snmp_inc_icmpoutredirects(void);
 void snmp_inc_icmpoutechos(void);
 void snmp_inc_icmpoutechoreps(void);
 void snmp_inc_icmpouttimestamps(void);
@@ -109,7 +109,7 @@ void snmp_inc_udpoutdatagrams(void);
 #else
 
 /* network interface */
-#define snmp_add_ifinoctets(value) 
+#define snmp_add_ifinoctets(value)
 #define snmp_inc_ifinucastpkts()
 #define snmp_inc_ifinnucastpkts()
 #define snmp_inc_ifindiscards()
@@ -130,26 +130,26 @@ void snmp_inc_udpoutdatagrams(void);
 
 /* ICMP */
 #define snmp_inc_icmpinmsgs()
-#define snmp_inc_icmpinerrors() 
-#define snmp_inc_icmpindestunreachs() 
+#define snmp_inc_icmpinerrors()
+#define snmp_inc_icmpindestunreachs()
 #define snmp_inc_icmpintimeexcds()
-#define snmp_inc_icmpinparmprobs() 
-#define snmp_inc_icmpinsrcquenchs() 
-#define snmp_inc_icmpinredirects() 
-#define snmp_inc_icmpinechos() 
+#define snmp_inc_icmpinparmprobs()
+#define snmp_inc_icmpinsrcquenchs()
+#define snmp_inc_icmpinredirects()
+#define snmp_inc_icmpinechos()
 #define snmp_inc_icmpinechoreps()
-#define snmp_inc_icmpintimestamps() 
+#define snmp_inc_icmpintimestamps()
 #define snmp_inc_icmpintimestampreps()
 #define snmp_inc_icmpinaddrmasks()
 #define snmp_inc_icmpinaddrmaskreps()
 #define snmp_inc_icmpoutmsgs()
 #define snmp_inc_icmpouterrors()
-#define snmp_inc_icmpoutdestunreachs() 
-#define snmp_inc_icmpouttimeexcds() 
+#define snmp_inc_icmpoutdestunreachs()
+#define snmp_inc_icmpouttimeexcds()
 #define snmp_inc_icmpoutparmprobs()
 #define snmp_inc_icmpoutsrcquenchs()
-#define snmp_inc_icmpoutredirects() 
-#define snmp_inc_icmpoutechos() 
+#define snmp_inc_icmpoutredirects()
+#define snmp_inc_icmpoutechos()
 #define snmp_inc_icmpoutechoreps()
 #define snmp_inc_icmpouttimestamps()
 #define snmp_inc_icmpouttimestampreps()

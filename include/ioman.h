@@ -11,7 +11,7 @@
 #define IO_ERR_INVALID_HANDLER -4
 #define IO_ERR_IO_BLOCKED -5
 
-typedef void (*io_request_handler_t)(void* request);
+typedef void (*io_request_handler_t)(void *request);
 
 typedef void (*io_simpleaction_t)(void);
 
@@ -26,7 +26,7 @@ int ioRegisterHandler(int type, io_request_handler_t handler);
 
 /** schedules a new request into the pending request list
 * @note The data are not freed! */
-int ioPutRequest(int type, void* data);
+int ioPutRequest(int type, void *data);
 
 /** removes all requests of a given type from the queue
 * @param type the type of the requests to remove
@@ -43,7 +43,7 @@ int ioHasPendingRequests(void);
 int ioIsRunning(void);
 
 /** Helper thread safe printf */
-int ioPrintf(const char* format, ...);
+int ioPrintf(const char *format, ...);
 
 /** Helper function. Will flush the io operation list
  (wait for all io ops requested to end) and then

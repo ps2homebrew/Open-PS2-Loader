@@ -10,24 +10,25 @@
 
 #include <irx.h>
 
-typedef struct {
-	int version;
-	void **exports;
+typedef struct
+{
+    int version;
+    void **exports;
 } modinfo_t;
 
 /* SMS Utils Imports */
-#define smsutils_IMPORTS_start DECLARE_IMPORT_TABLE( smsutils, 1, 1 )
+#define smsutils_IMPORTS_start DECLARE_IMPORT_TABLE(smsutils, 1, 1)
 
-void mips_memcpy ( void*, const void*, unsigned );
-#define I_mips_memcpy DECLARE_IMPORT( 4, mips_memcpy )
+void mips_memcpy(void *, const void *, unsigned);
+#define I_mips_memcpy DECLARE_IMPORT(4, mips_memcpy)
 
-void mips_memset ( void*, int, unsigned );
-#define I_mips_memset DECLARE_IMPORT( 5, mips_memset )
+void mips_memset(void *, int, unsigned);
+#define I_mips_memset DECLARE_IMPORT(5, mips_memset)
 
 #define smsutils_IMPORTS_end END_IMPORT_TABLE
 
 
-#define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE( oplutils, 1, 1 )
+#define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE(oplutils, 1, 1)
 
 int getModInfo(u8 *modname, modinfo_t *info);
 #define I_getModInfo DECLARE_IMPORT(4, getModInfo)
@@ -35,10 +36,10 @@ int getModInfo(u8 *modname, modinfo_t *info);
 /* MASS Transfer Imports */
 #ifdef USB_DRIVER
 
-void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char* buffer);
+void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer);
 #define I_mass_stor_readSector DECLARE_IMPORT(5, mass_stor_readSector)
 
-void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char* buffer);
+void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer);
 #define I_mass_stor_writeSector DECLARE_IMPORT(6, mass_stor_writeSector)
 
 #endif
@@ -47,10 +48,10 @@ void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const 
 #ifdef HDD_DRIVER
 
 /* These are used with the dir parameter of ata_device_dma_transfer().  */
-#define ATA_DIR_READ	0
-#define ATA_DIR_WRITE	1
+#define ATA_DIR_READ 0
+#define ATA_DIR_WRITE 1
 
-int ata_device_sector_io( unsigned int unit, void *buf,  unsigned int lba,  unsigned int sectors, int dir);
+int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigned int sectors, int dir);
 #define I_ata_device_sector_io DECLARE_IMPORT(5, ata_device_sector_io)
 
 #endif
@@ -71,4 +72,4 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nb
 
 #define oplutils_IMPORTS_end END_IMPORT_TABLE
 
-#endif  /* __MCEMU_UTILS_H */
+#endif /* __MCEMU_UTILS_H */

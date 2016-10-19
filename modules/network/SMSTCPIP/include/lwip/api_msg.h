@@ -44,55 +44,59 @@
 #include "lwip/api.h"
 
 enum api_msg_type {
-  API_MSG_NEWCONN,
-  API_MSG_DELCONN,
-  
-  API_MSG_BIND,
-  API_MSG_CONNECT,
-  API_MSG_DISCONNECT,
+    API_MSG_NEWCONN,
+    API_MSG_DELCONN,
 
-  API_MSG_LISTEN,
-  API_MSG_ACCEPT,
+    API_MSG_BIND,
+    API_MSG_CONNECT,
+    API_MSG_DISCONNECT,
 
-  API_MSG_SEND,
-  API_MSG_RECV,
-  API_MSG_WRITE,
+    API_MSG_LISTEN,
+    API_MSG_ACCEPT,
 
-  API_MSG_CLOSE,
-  
-  API_MSG_MAX
+    API_MSG_SEND,
+    API_MSG_RECV,
+    API_MSG_WRITE,
+
+    API_MSG_CLOSE,
+
+    API_MSG_MAX
 };
 
-struct api_msg_msg {
-  struct netconn *conn;
-  enum netconn_type conntype;
-  union {
-    struct pbuf *p;   
-    struct  {
-      struct ip_addr *ipaddr;
-      u16_t port;
-    } bc;
-    struct {
-      void *dataptr;
-      u16_t len;
-      unsigned char copy;
-    } w;    
-    sys_mbox_t mbox;
-    u16_t len;
-  } msg;
+struct api_msg_msg
+{
+    struct netconn *conn;
+    enum netconn_type conntype;
+    union
+    {
+        struct pbuf *p;
+        struct
+        {
+            struct ip_addr *ipaddr;
+            u16_t port;
+        } bc;
+        struct
+        {
+            void *dataptr;
+            u16_t len;
+            unsigned char copy;
+        } w;
+        sys_mbox_t mbox;
+        u16_t len;
+    } msg;
 };
 
-struct api_msg {
-  enum api_msg_type type;
-  struct api_msg_msg msg;
+struct api_msg
+{
+    enum api_msg_type type;
+    struct api_msg_msg msg;
 };
 
-typedef void ( *api_msg_decode ) ( struct api_msg_msg* );
+typedef void (*api_msg_decode)(struct api_msg_msg *);
 
-extern api_msg_decode __decode__[ API_MSG_MAX ];
+extern api_msg_decode __decode__[API_MSG_MAX];
 
-#define api_msg_input( m ) __decode__[ m -> type ] (  &( m -> msg )  )
-#define api_msg_post( m )  tcpip_apimsg ( m )
+#define api_msg_input(m) __decode__[m->type](&(m->msg))
+#define api_msg_post(m) tcpip_apimsg(m)
 
 #endif /* __LWIP_API_MSG_H__ */
-

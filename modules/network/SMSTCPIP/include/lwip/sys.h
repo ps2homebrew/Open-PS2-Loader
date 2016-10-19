@@ -43,21 +43,24 @@
    definitions of the sys_ functions. */
 typedef u8_t sys_sem_t;
 typedef u8_t sys_mbox_t;
-struct sys_timeout {u8_t dummy;};
+struct sys_timeout
+{
+    u8_t dummy;
+};
 
 #define sys_init()
-#define sys_timeout(m,h,a)
-#define sys_untimeout(m,a)
+#define sys_timeout(m, h, a)
+#define sys_untimeout(m, a)
 #define sys_sem_new(c) c
 #define sys_sem_signal(s)
 #define sys_sem_wait(s)
 #define sys_sem_free(s)
 #define sys_mbox_new() 0
-#define sys_mbox_fetch(m,d)
-#define sys_mbox_post(m,d)
+#define sys_mbox_fetch(m, d)
+#define sys_mbox_post(m, d)
 #define sys_mbox_free(m)
 
-#define sys_thread_new(t,a,p)
+#define sys_thread_new(t, a, p)
 
 #else /* NO_SYS */
 
@@ -66,17 +69,19 @@ struct sys_timeout {u8_t dummy;};
 /** Return code for timeouts from sys_arch_mbox_fetch and sys_arch_sem_wait */
 #define SYS_ARCH_TIMEOUT -418
 
-typedef void (* sys_timeout_handler)(void *arg);
+typedef void (*sys_timeout_handler)(void *arg);
 
-struct sys_timeout {
-  struct sys_timeout *next;
-  u32_t time;
-  sys_timeout_handler h;
-  void *arg;
+struct sys_timeout
+{
+    struct sys_timeout *next;
+    u32_t time;
+    sys_timeout_handler h;
+    void *arg;
 };
 
-struct sys_timeouts {
-  struct sys_timeout *next;
+struct sys_timeouts
+{
+    struct sys_timeout *next;
 };
 /* Semaphore functions. */
 sys_sem_t sys_sem_new(u8_t count);
@@ -86,19 +91,19 @@ sys_sem_t sys_sem_new(u8_t count);
 u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout);
 
 void sys_sem_free(sys_sem_t sem);
-#define sys_sem_wait( s ) WaitSema ( s )
-#define sys_sem_wait_timeout( s, t ) (  sys_arch_sem_wait ( s, t ) != SYS_ARCH_TIMEOUT  )
+#define sys_sem_wait(s) WaitSema(s)
+#define sys_sem_wait_timeout(s, t) (sys_arch_sem_wait(s, t) != SYS_ARCH_TIMEOUT)
 
 /* Mailbox functions. */
 sys_mbox_t sys_mbox_new(void);
 void sys_mbox_post(sys_mbox_t mbox, void *msg);
 u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout);
 void sys_mbox_free(sys_mbox_t mbox);
-#define sys_mbox_fetch( mb, msg ) sys_arch_mbox_fetch (  ( mb ), ( msg ), 0  );
+#define sys_mbox_fetch(mb, msg) sys_arch_mbox_fetch((mb), (msg), 0);
 
 
 /* Thread functions. */
-sys_thread_t sys_thread_new(void (* thread)(void *arg), void *arg, int prio);
+sys_thread_t sys_thread_new(void (*thread)(void *arg), void *arg, int prio);
 
 /* The following functions are used only in Unix code, and
    can be omitted when porting the stack. */

@@ -8,39 +8,44 @@
 #include "include/menusys.h"
 
 typedef enum {
-	// Informs gui that init is over and main gui can be rendered
-	GUI_INIT_DONE = 1,
-	GUI_OP_ADD_MENU,
-	GUI_OP_APPEND_MENU,
-	GUI_OP_SELECT_MENU,
-	GUI_OP_CLEAR_SUBMENU,
-	GUI_OP_SORT,
-	GUI_OP_ADD_HINT
-}  gui_op_type_t;
+    // Informs gui that init is over and main gui can be rendered
+    GUI_INIT_DONE = 1,
+    GUI_OP_ADD_MENU,
+    GUI_OP_APPEND_MENU,
+    GUI_OP_SELECT_MENU,
+    GUI_OP_CLEAR_SUBMENU,
+    GUI_OP_SORT,
+    GUI_OP_ADD_HINT
+} gui_op_type_t;
 
 /** a single GUI update in a package form */
-struct gui_update_t {
-	gui_op_type_t type;
+struct gui_update_t
+{
+    gui_op_type_t type;
 
-	struct {
-		menu_item_t *menu;
-		submenu_list_t **subMenu;
-	} menu;
+    struct
+    {
+        menu_item_t *menu;
+        submenu_list_t **subMenu;
+    } menu;
 
-	union {
-		struct {
-			int icon_id;
-			char *text;
-			int id;
-			int text_id;
-			int selected;
-		} submenu;
+    union
+    {
+        struct
+        {
+            int icon_id;
+            char *text;
+            int id;
+            int text_id;
+            int selected;
+        } submenu;
 
-		struct { // hint for the given menu
-			int icon_id;
-			int text_id;
-		} hint;
-	};
+        struct
+        { // hint for the given menu
+            int icon_id;
+            int text_id;
+        } hint;
+    };
 };
 
 typedef void (*gui_callback_t)(void);
@@ -48,14 +53,14 @@ typedef void (*gui_callback_t)(void);
 int guiInactiveFrames;
 int guiFrameId;
 
-#define GUI_SCREEN_MAIN		0
-#define GUI_SCREEN_MENU		1
-#define GUI_SCREEN_INFO		2
+#define GUI_SCREEN_MAIN 0
+#define GUI_SCREEN_MENU 1
+#define GUI_SCREEN_INFO 2
 
-#define TRANSITION_LEFT		0
-#define TRANSITION_RIGHT	1
-#define TRANSITION_UP		2
-#define TRANSITION_DOWN		3
+#define TRANSITION_LEFT 0
+#define TRANSITION_RIGHT 1
+#define TRANSITION_UP 2
+#define TRANSITION_DOWN 3
 
 void guiSwitchScreen(int target, int transition);
 
@@ -108,9 +113,9 @@ struct gui_update_t *guiOpCreate(gui_op_type_t type);
 /** For completeness, the deffered operations are destroyed automatically */
 void guiDestroyOp(struct gui_update_t *op);
 
-int guiShowCompatConfig(int id, item_list_t *support, config_set_t* configSet);
-int guiShowKeyboard(char* value, int maxLength);
-int guiMsgBox(const char* text, int addAccept, struct UIItem *ui);
+int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet);
+int guiShowKeyboard(char *value, int maxLength);
+int guiMsgBox(const char *text, int addAccept, struct UIItem *ui);
 
 void guiUpdateScrollSpeed(void);
 void guiUpdateScreenScale(void);
@@ -134,18 +139,18 @@ void guiShowNetConfig();
 * @param type the io operation type
 * @param data the data for the operation
 */
-void guiHandleDeferedIO(int *ptr, const unsigned char* message, int type, void *data);
+void guiHandleDeferedIO(int *ptr, const unsigned char *message, int type, void *data);
 
 /** Renders a single frame with a specified message on the screen
 */
-void guiRenderTextScreen(const unsigned char* message);
+void guiRenderTextScreen(const unsigned char *message);
 
-int guiAltStartupNameHandler(char* text, int maxLen);
+int guiAltStartupNameHandler(char *text, int maxLen);
 
 #ifdef VMC
-int guiVmcNameHandler(char* text, int maxLen);
+int guiVmcNameHandler(char *text, int maxLen);
 #endif
 
-void guiWarning(const char* text, int count);
+void guiWarning(const char *text, int count);
 
 #endif

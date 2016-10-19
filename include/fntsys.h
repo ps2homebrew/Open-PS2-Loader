@@ -17,10 +17,10 @@ void fntEnd();
 /** Loads a font from a file path
   * @param path The path to the font file
   * @return font slot id (negative value means error happened) */
-int fntLoadFile(char* path);
+int fntLoadFile(char *path);
 
 /** Reloads the default font */
-int fntLoadDefault(char* path);
+int fntLoadDefault(char *path);
 
 /** Releases a font slot */
 void fntRelease(int id);
@@ -30,7 +30,7 @@ void fntRelease(int id);
 void fntSetAspectRatio(float aw, float ah);
 
 /** Renders a text with specified window dimensions */
-int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char* string, u64 colour);
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char *string, u64 colour);
 
 /** replaces spaces with newlines so that the text fits into the specified width.
   * @note A destrutive operation - modifies the given string!
@@ -39,6 +39,6 @@ void fntFitString(int id, unsigned char *string, size_t width);
 
 /** Calculates the width of the given text string
 * We can't use the height for alignment, as the horizontal center would depends of the contained text itself */
-int fntCalcDimensions(int id, const unsigned char* str);
+int fntCalcDimensions(int id, const unsigned char *str);
 
 #endif

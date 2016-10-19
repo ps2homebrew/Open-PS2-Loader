@@ -15,7 +15,7 @@
 #include <loadcore.h>
 
 ////////////////////////////////////////////////////////////////////////
-#define NPM_PUTS     0x01
+#define NPM_PUTS 0x01
 #define RPC_NPM_USER 0x014d704e
 
 ////////////////////////////////////////////////////////////////////////
@@ -23,12 +23,12 @@ static void *
 naplinkRpcHandler(int cmd, void *buffer, int size)
 {
     // Only supports npmPrintf of course
-    switch(cmd) {
-    case NPM_PUTS:
-        printf(buffer);
-        break;
-    default:
-        printf("unknown npm rpc call\n");
+    switch (cmd) {
+        case NPM_PUTS:
+            printf(buffer);
+            break;
+        default:
+            printf("unknown npm rpc call\n");
     }
 
     return buffer;
@@ -36,7 +36,7 @@ naplinkRpcHandler(int cmd, void *buffer, int size)
 
 ////////////////////////////////////////////////////////////////////////
 static SifRpcServerData_t server __attribute((aligned(16)));
-static SifRpcDataQueue_t  queue __attribute((aligned(16)));
+static SifRpcDataQueue_t queue __attribute((aligned(16)));
 static unsigned char rpc_buffer[512] __attribute((aligned(16)));
 
 static void
@@ -49,12 +49,11 @@ napThread(void *arg)
     SifSetRpcQueue(&queue, pid);
     SifRegisterRpc(&server, RPC_NPM_USER, naplinkRpcHandler,
                    rpc_buffer, 0, 0, &queue);
-    SifRpcLoop(&queue);  // Never exits
+    SifRpcLoop(&queue); // Never exits
     ExitDeleteThread();
 }
 ////////////////////////////////////////////////////////////////////////
-int
-naplinkRpcInit(void)
+int naplinkRpcInit(void)
 {
     struct _iop_thread th_attr;
     int ret;

@@ -35,7 +35,7 @@
 #include "lwip/api_msg.h"
 #include "lwip/pbuf.h"
 
-void tcpip_init(void (* tcpip_init_done)(void *), void *arg);
+void tcpip_init(void (*tcpip_init_done)(void *), void *arg);
 void tcpip_apimsg(struct api_msg *apimsg);
 err_t tcpip_input(struct pbuf *p, struct netif *inp);
 err_t tcpip_callback(void (*f)(void));
@@ -43,25 +43,29 @@ err_t tcpip_callback(void (*f)(void));
 void tcpip_tcp_timer_needed(void);
 
 enum tcpip_msg_type {
-  TCPIP_MSG_API,
-  TCPIP_MSG_INPUT,
-  TCPIP_MSG_CALLBACK
+    TCPIP_MSG_API,
+    TCPIP_MSG_INPUT,
+    TCPIP_MSG_CALLBACK
 };
 
-struct tcpip_msg {
-  enum tcpip_msg_type type;
-  sys_sem_t *sem;
-  union {
-    struct api_msg *apimsg;
-    struct {
-      struct pbuf *p;
-      struct netif *netif;
-    } inp;
-    struct {
-      void (*f)(void *ctx);
-      void *ctx;
-    } cb;
-  } msg;
+struct tcpip_msg
+{
+    enum tcpip_msg_type type;
+    sys_sem_t *sem;
+    union
+    {
+        struct api_msg *apimsg;
+        struct
+        {
+            struct pbuf *p;
+            struct netif *netif;
+        } inp;
+        struct
+        {
+            void (*f)(void *ctx);
+            void *ctx;
+        } cb;
+    } msg;
 };
 
 

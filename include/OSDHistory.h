@@ -1,4 +1,4 @@
-#define MAX_HISTORY_ENTRIES	21
+#define MAX_HISTORY_ENTRIES 21
 
 /*
 	If the record is valid, the launch count will be >0.
@@ -81,18 +81,19 @@
 		Note: Year is since year 2000.
 */
 
-#define OSD_HISTORY_GET_YEAR(datestamp) ((datestamp)>>9&0x7F)
-#define OSD_HISTORY_GET_MONTH(datestamp) ((datestamp)>>5&0xF)
+#define OSD_HISTORY_GET_YEAR(datestamp) ((datestamp) >> 9 & 0x7F)
+#define OSD_HISTORY_GET_MONTH(datestamp) ((datestamp) >> 5 & 0xF)
 #define OSD_HISTORY_GET_DATE(datestamp) ((datestamp)&0x1F)
-#define OSD_HISTORY_SET_DATE(year, month, date) (((unsigned short int)(year))<<9 | ((unsigned short int)(month)&0xF)<<5 | ((date)&0x1F))
+#define OSD_HISTORY_SET_DATE(year, month, date) (((unsigned short int)(year)) << 9 | ((unsigned short int)(month)&0xF) << 5 | ((date)&0x1F))
 
-struct HistoryEntry{
-	char name[16];
-	unsigned char LaunchCount;
-	unsigned char bitmask;
-	unsigned char ShiftAmount;
-	unsigned char padding;
-	unsigned short int DateStamp;
+struct HistoryEntry
+{
+    char name[16];
+    unsigned char LaunchCount;
+    unsigned char bitmask;
+    unsigned char ShiftAmount;
+    unsigned char padding;
+    unsigned short int DateStamp;
 };
 
 //Functions
@@ -101,4 +102,3 @@ int SaveHistoryFile(const char *path, const struct HistoryEntry *HistoryEntries)
 int AddOldHistoryFileRecord(const char *path, const struct HistoryEntry *OldHistoryEntry);
 int AddHistoryRecord(const char *name);
 int AddHistoryRecordUsingFullPath(const char *path);
-

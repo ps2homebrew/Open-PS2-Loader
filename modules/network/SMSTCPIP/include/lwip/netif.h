@@ -63,48 +63,49 @@
 #define NETIF_FLAG_LINK_UP 0x10U
 
 /** generic data structure used for all lwIP network interfaces */
-struct netif {
-  /** pointer to next in linked list */
-  struct netif *next;
-  /** The following fields should be filled in by the
+struct netif
+{
+    /** pointer to next in linked list */
+    struct netif *next;
+    /** The following fields should be filled in by the
       initialization function for the device driver. */
-  
-  /** IP address configuration in network byte order */
-  struct ip_addr ip_addr;
-  struct ip_addr netmask;
-  struct ip_addr gw;
 
-  /** This function is called by the network device driver
+    /** IP address configuration in network byte order */
+    struct ip_addr ip_addr;
+    struct ip_addr netmask;
+    struct ip_addr gw;
+
+    /** This function is called by the network device driver
       to pass a packet up the TCP/IP stack. */
-  err_t (* input)(struct pbuf *p, struct netif *inp);
-  /** This function is called by the IP module when it wants
+    err_t (*input)(struct pbuf *p, struct netif *inp);
+    /** This function is called by the IP module when it wants
       to send a packet on the interface. This function typically
       first resolves the hardware address, then sends the packet. */
-  err_t (* output)(struct netif *netif, struct pbuf *p,
-       struct ip_addr *ipaddr);
-  /** This function is called by the ARP module when it wants
+    err_t (*output)(struct netif *netif, struct pbuf *p,
+                    struct ip_addr *ipaddr);
+    /** This function is called by the ARP module when it wants
       to send a packet on the interface. This function outputs
       the pbuf as-is on the link medium. */
-  err_t (* linkoutput)(struct netif *netif, struct pbuf *p);
-  /** This field can be set by the device driver and could point
+    err_t (*linkoutput)(struct netif *netif, struct pbuf *p);
+    /** This field can be set by the device driver and could point
       to state information for the device. */
-  void *state;
+    void *state;
 #if LWIP_DHCP
-  /** the DHCP client state information for this netif */
-  struct dhcp *dhcp;
+    /** the DHCP client state information for this netif */
+    struct dhcp *dhcp;
 #endif
-  /** number of bytes used in hwaddr */
-  unsigned char hwaddr_len;
-  /** link level hardware address of this interface */
-  unsigned char hwaddr[NETIF_MAX_HWADDR_LEN];
-  /** maximum transfer unit (in bytes) */
-  u16_t mtu;
-  /** descriptive abbreviation */
-  char name[2];
-  /** number of this interface */
-  u8_t num;
-  /** NETIF_FLAG_* */
-  u8_t flags;
+    /** number of bytes used in hwaddr */
+    unsigned char hwaddr_len;
+    /** link level hardware address of this interface */
+    unsigned char hwaddr[NETIF_MAX_HWADDR_LEN];
+    /** maximum transfer unit (in bytes) */
+    u16_t mtu;
+    /** descriptive abbreviation */
+    char name[2];
+    /** number of this interface */
+    u8_t num;
+    /** NETIF_FLAG_* */
+    u8_t flags;
 };
 
 /** The list of network interfaces. */
@@ -116,15 +117,14 @@ extern struct netif *netif_default;
 void netif_init(void);
 
 struct netif *netif_add(struct netif *netif, struct ip_addr *ipaddr, struct ip_addr *netmask,
-      struct ip_addr *gw,
-      void *state,
-      err_t (* init)(struct netif *netif),
-      err_t (* input)(struct pbuf *p, struct netif *netif));
+                        struct ip_addr *gw,
+                        void *state,
+                        err_t (*init)(struct netif *netif),
+                        err_t (*input)(struct pbuf *p, struct netif *netif));
 
-void
-netif_set_addr(struct netif *netif,struct ip_addr *ipaddr, struct ip_addr *netmask,
-    struct ip_addr *gw);
-void netif_remove(struct netif * netif);
+void netif_set_addr(struct netif *netif, struct ip_addr *ipaddr, struct ip_addr *netmask,
+                    struct ip_addr *gw);
+void netif_remove(struct netif *netif);
 
 /* Returns a network interface given its name. The name is of the form
    "et0", where the first two letters are the "name" field in the

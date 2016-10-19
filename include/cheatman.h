@@ -35,21 +35,22 @@
 #include <string.h>
 
 /* Some character defines */
-#define NUL	0x00
-#define LF	0x0A
-#define CR	0x0D
-#define SPACE	0x20
+#define NUL 0x00
+#define LF 0x0A
+#define CR 0x0D
+#define SPACE 0x20
 /* Number of digits per cheat code */
-#define CODE_DIGITS	16
+#define CODE_DIGITS 16
 
 /**
  * code_t - a code object
  * @addr: code address
  * @val: code value
  */
-typedef struct {
-	int addr;
-	int val;
+typedef struct
+{
+    int addr;
+    int val;
 } code_t;
 
 int load_cheats(const char *cheatfile);

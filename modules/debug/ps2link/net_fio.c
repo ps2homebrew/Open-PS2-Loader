@@ -36,13 +36,14 @@ static int pko_fileio_active = 0;
 #ifdef DEBUG
 #define dbgprintf(args...) printf(args)
 #else
-#define dbgprintf(args...) do { } while(0)
+#define dbgprintf(args...) \
+    do {                   \
+    } while (0)
 #endif
 
-//---------------------------------------------------------------------- 
+//----------------------------------------------------------------------
 //
-void 
-pko_close_socket(void)
+void pko_close_socket(void)
 {
     int ret;
 
@@ -53,10 +54,9 @@ pko_close_socket(void)
     pko_fileio_sock = -1;
 }
 
-//---------------------------------------------------------------------- 
+//----------------------------------------------------------------------
 //
-void
-pko_close_fsys(void)
+void pko_close_fsys(void)
 {
     if (pko_fileio_sock > 0) {
         disconnect(pko_fileio_sock);
@@ -65,10 +65,10 @@ pko_close_fsys(void)
     return;
 }
 
-//---------------------------------------------------------------------- 
+//----------------------------------------------------------------------
 // XXX: Hm, this func should behave sorta like pko_recv_bytes imho..
 // i.e. check if it was able to send just a part of the packet etc..
-static inline int 
+static inline int
 pko_lwip_send(int sock, void *buf, int len, int flag)
 {
     int ret;
@@ -77,14 +77,13 @@ pko_lwip_send(int sock, void *buf, int len, int flag)
         dbgprintf("pko_file: lwip_send() error %d\n", ret);
         pko_close_socket();
         return -1;
-    }
-    else {
+    } else {
         return ret;
     }
 }
 
 
-//---------------------------------------------------------------------- 
+//----------------------------------------------------------------------
 // Do repetetive recv() calles until 'bytes' bytes are received
 // or error returned
 int pko_recv_bytes(int sock, char *buf, int bytes)
@@ -106,7 +105,7 @@ int pko_recv_bytes(int sock, char *buf, int bytes)
 }
 
 
-//---------------------------------------------------------------------- 
+//----------------------------------------------------------------------
 // Receive a 'packet' of the expected type 'pkt_type', and lenght 'len'
 int pko_accept_pkt(int sock, char *buf, int len, int pkt_type)
 {
@@ -124,27 +123,29 @@ int pko_accept_pkt(int sock, char *buf, int len, int pkt_type)
 
     if (length < sizeof(pko_pkt_hdr)) {
         dbgprintf("pko_file: XXX: did not receive a full header!!!! "
-                  "Fix this! (%d)\n", length);
+                  "Fix this! (%d)\n",
+                  length);
     }
-    
+
     hdr = (pko_pkt_hdr *)buf;
     hcmd = ntohl(hdr->cmd);
     hlen = ntohs(hdr->len);
 
     if (hcmd != pkt_type) {
-        dbgprintf("pko_file: pko_accept_pkt: Expected %x, got %x\n", 
+        dbgprintf("pko_file: pko_accept_pkt: Expected %x, got %x\n",
                   pkt_type, hcmd);
         return 0;
     }
 
     if (hlen > len) {
         dbgprintf("pko_file: pko_accept_pkt: hdr->len is too large!! "
-               "(%d, can only receive %d)\n", hlen, len);
+                  "(%d, can only receive %d)\n",
+                  hlen, len);
         return 0;
     }
 
     // get the actual packet data
-    length = pko_recv_bytes(sock, buf + sizeof(pko_pkt_hdr), 
+    length = pko_recv_bytes(sock, buf + sizeof(pko_pkt_hdr),
                             hlen - sizeof(pko_pkt_hdr));
 
     if (length < 0) {
@@ -154,7 +155,8 @@ int pko_accept_pkt(int sock, char *buf, int len, int pkt_type)
 
     if (length < (hlen - sizeof(pko_pkt_hdr))) {
         dbgprintf("pko_accept_pkt: Did not receive full packet!!! "
-                  "Fix this! (%d)\n", length);
+                  "Fix this! (%d)\n",
+                  length);
     }
 
     return 1;
@@ -186,14 +188,14 @@ int pko_open_file(char *path, int flags)
         return -1;
     }
 
-    if (!pko_accept_pkt(pko_fileio_sock, recv_packet, 
+    if (!pko_accept_pkt(pko_fileio_sock, recv_packet,
                         sizeof(pko_pkt_file_rly), PKO_OPEN_RLY)) {
         dbgprintf("pko_file: pko_open_file: did not receive OPEN_RLY\n");
         return -1;
     }
 
     openrly = (pko_pkt_file_rly *)recv_packet;
-    
+
     dbgprintf("pko_file: file open reply received (ret %d)\n", ntohl(openrly->retval));
 
     return ntohl(openrly->retval);
@@ -225,13 +227,13 @@ int pko_close_file(int fd)
         return -1;
     }
 
-    if(!pko_accept_pkt(pko_fileio_sock, (char *)closerly, 
-                       sizeof(pko_pkt_file_rly), PKO_CLOSE_RLY)) {
+    if (!pko_accept_pkt(pko_fileio_sock, (char *)closerly,
+                        sizeof(pko_pkt_file_rly), PKO_CLOSE_RLY)) {
         dbgprintf("pko_file: pko_close_file: did not receive PKO_CLOSE_RLY\n");
         return -1;
     }
 
-    dbgprintf("pko_file: pko_close_file: close reply received (ret %d)\n", 
+    dbgprintf("pko_file: pko_close_file: close reply received (ret %d)\n",
               ntohl(closerly->retval));
 
     return ntohl(closerly->retval);
@@ -260,21 +262,20 @@ int pko_lseek_file(int fd, unsigned int offset, int whence)
     lseekreq->offset = htonl(offset);
     lseekreq->whence = htonl(whence);
 
-    if(pko_lwip_send(pko_fileio_sock, lseekreq, sizeof(pko_pkt_lseek_req), 0) < 0) {
+    if (pko_lwip_send(pko_fileio_sock, lseekreq, sizeof(pko_pkt_lseek_req), 0) < 0) {
         return -1;
     }
 
-    if(!pko_accept_pkt(pko_fileio_sock, (char *)lseekrly, 
-                       sizeof(pko_pkt_file_rly), PKO_LSEEK_RLY)) {
+    if (!pko_accept_pkt(pko_fileio_sock, (char *)lseekrly,
+                        sizeof(pko_pkt_file_rly), PKO_LSEEK_RLY)) {
         dbgprintf("pko_file: pko_lseek_file: did not receive PKO_LSEEK_RLY\n");
         return -1;
     }
 
-    dbgprintf("pko_file: pko_lseek_file: lseek reply received (ret %d)\n", 
+    dbgprintf("pko_file: pko_lseek_file: lseek reply received (ret %d)\n",
               ntohl(lseekrly->retval));
 
     return ntohl(lseekrly->retval);
-
 }
 
 
@@ -310,39 +311,38 @@ int pko_write_file(int fd, char *buf, int length)
         if ((length - writtenbytes) > PKO_MAX_WRITE_SEGMENT) {
             // Need to split in several read reqs
             nbytes = PKO_MAX_READ_SEGMENT;
-        }
-        else {
+        } else {
             nbytes = length - writtenbytes;
         }
 
         writecmd->nbytes = htonl(nbytes);
 #ifdef ZEROCOPY
         /* Send the packet header.  */
-	if (pko_lwip_send(pko_fileio_sock, writecmd, hlen, 0) < 0)
-		return -1;
-	/* Send the write() data.  */
+        if (pko_lwip_send(pko_fileio_sock, writecmd, hlen, 0) < 0)
+            return -1;
+        /* Send the write() data.  */
         if (pko_lwip_send(pko_fileio_sock, &buf[writtenbytes], nbytes, 0) < 0)
-		return -1;
+            return -1;
 #else
         // Copy data to the acutal packet
         memcpy(&send_packet[sizeof(pko_pkt_write_req)], &buf[writtenbytes],
                nbytes);
 
-	if (pko_lwip_send(pko_fileio_sock, writecmd, hlen + nbytes, 0) < 0)
-		return -1;
+        if (pko_lwip_send(pko_fileio_sock, writecmd, hlen + nbytes, 0) < 0)
+            return -1;
 #endif
 
 
         // Get reply
-        if(!pko_accept_pkt(pko_fileio_sock, (char *)writerly, 
-                           sizeof(pko_pkt_file_rly), PKO_WRITE_RLY)) {
+        if (!pko_accept_pkt(pko_fileio_sock, (char *)writerly,
+                            sizeof(pko_pkt_file_rly), PKO_WRITE_RLY)) {
             dbgprintf("pko_file: pko_write_file: "
                       "did not receive PKO_WRITE_RLY\n");
             return -1;
         }
         retval = ntohl(writerly->retval);
 
-        dbgprintf("pko_file: wrote %d bytes (asked for %d)\n", 
+        dbgprintf("pko_file: wrote %d bytes (asked for %d)\n",
                   retval, nbytes);
 
         if (retval < 0) {
@@ -394,14 +394,13 @@ int pko_read_file(int fd, char *buf, int length)
     readcmd->nbytes = htonl(length);
 
     i = send(pko_fileio_sock, readcmd, sizeof(pko_pkt_read_req), 0);
-    if (i<0)
-    {
+    if (i < 0) {
         dbgprintf("pko_file: pko_read_file: send failed (%d)\n", i);
         return -1;
     }
 
-    if(!pko_accept_pkt(pko_fileio_sock, (char *)readrly, 
-                       sizeof(pko_pkt_read_rly), PKO_READ_RLY)) {
+    if (!pko_accept_pkt(pko_fileio_sock, (char *)readrly,
+                        sizeof(pko_pkt_read_rly), PKO_READ_RLY)) {
         dbgprintf("pko_file: pko_read_file: "
                   "did not receive PKO_READ_RLY\n");
         return -1;
@@ -409,7 +408,8 @@ int pko_read_file(int fd, char *buf, int length)
 
     nbytes = ntohl(readrly->nbytes);
     dbgprintf("pko_file: pko_read_file: Reply said there's %d bytes to read "
-              "(wanted %d)\n", nbytes, length);
+              "(wanted %d)\n",
+              nbytes, length);
 
     // Now read the actual file data
     i = pko_recv_bytes(pko_fileio_sock, &buf[0], nbytes);
@@ -446,7 +446,7 @@ int pko_remove(char *name)
         return -1;
     }
 
-    if (!pko_accept_pkt(pko_fileio_sock, recv_packet, 
+    if (!pko_accept_pkt(pko_fileio_sock, recv_packet,
                         sizeof(pko_pkt_file_rly), PKO_REMOVE_RLY)) {
         dbgprintf("pko_file: pko_remove: did not receive REMOVE_RLY\n");
         return -1;
@@ -483,7 +483,7 @@ int pko_mkdir(char *name, int mode)
         return -1;
     }
 
-    if (!pko_accept_pkt(pko_fileio_sock, recv_packet, 
+    if (!pko_accept_pkt(pko_fileio_sock, recv_packet,
                         sizeof(pko_pkt_file_rly), PKO_MKDIR_RLY)) {
         dbgprintf("pko_file: pko_mkdir: did not receive MKDIR_RLY\n");
         return -1;
@@ -519,7 +519,7 @@ int pko_rmdir(char *name)
         return -1;
     }
 
-    if (!pko_accept_pkt(pko_fileio_sock, recv_packet, 
+    if (!pko_accept_pkt(pko_fileio_sock, recv_packet,
                         sizeof(pko_pkt_file_rly), PKO_RMDIR_RLY)) {
         dbgprintf("pko_file: pko_rmdir: did not receive RMDIR_RLY\n");
         return -1;
@@ -556,14 +556,14 @@ int pko_open_dir(char *path)
         return -1;
     }
 
-    if (!pko_accept_pkt(pko_fileio_sock, recv_packet, 
+    if (!pko_accept_pkt(pko_fileio_sock, recv_packet,
                         sizeof(pko_pkt_file_rly), PKO_OPENDIR_RLY)) {
         dbgprintf("pko_file: pko_open_dir: did not receive OPENDIR_RLY\n");
         return -1;
     }
 
     openrly = (pko_pkt_file_rly *)recv_packet;
-    
+
     dbgprintf("pko_file: dir open reply received (ret %d)\n", ntohl(openrly->retval));
 
     return ntohl(openrly->retval);
@@ -594,24 +594,24 @@ int pko_read_dir(int fd, void *buf)
         return -1;
     }
 
-    if (!pko_accept_pkt(pko_fileio_sock, recv_packet, 
+    if (!pko_accept_pkt(pko_fileio_sock, recv_packet,
                         sizeof(pko_pkt_dread_rly), PKO_READDIR_RLY)) {
         dbgprintf("pko_file: pko_read_dir: did not receive OPENDIR_RLY\n");
         return -1;
     }
 
     dirrly = (pko_pkt_dread_rly *)recv_packet;
-    
+
     dbgprintf("pko_file: dir read reply received (ret %d)\n", ntohl(dirrly->retval));
 
-    dirent = (fio_dirent_t *) buf;
+    dirent = (fio_dirent_t *)buf;
     // now handle the return buffer translation, to build reply bit
-    dirent->stat.mode    = ntohl(dirrly->mode);
-    dirent->stat.attr    = ntohl(dirrly->attr);
-    dirent->stat.size    = ntohl(dirrly->size);
-    dirent->stat.hisize  = ntohl(dirrly->hisize);
-    memcpy(dirent->stat.ctime,dirrly->ctime,8*3);
-    strncpy(dirent->name,dirrly->name,256);
+    dirent->stat.mode = ntohl(dirrly->mode);
+    dirent->stat.attr = ntohl(dirrly->attr);
+    dirent->stat.size = ntohl(dirrly->size);
+    dirent->stat.hisize = ntohl(dirrly->hisize);
+    memcpy(dirent->stat.ctime, dirrly->ctime, 8 * 3);
+    strncpy(dirent->name, dirrly->name, 256);
     dirent->unknown = 0;
 
     return ntohl(dirrly->retval);
@@ -643,13 +643,13 @@ int pko_close_dir(int fd)
         return -1;
     }
 
-    if(!pko_accept_pkt(pko_fileio_sock, (char *)closerly, 
-                       sizeof(pko_pkt_file_rly), PKO_CLOSEDIR_RLY)) {
+    if (!pko_accept_pkt(pko_fileio_sock, (char *)closerly,
+                        sizeof(pko_pkt_file_rly), PKO_CLOSEDIR_RLY)) {
         dbgprintf("pko_file: pko_close_dir: did not receive PKO_CLOSEDIR_RLY\n");
         return -1;
     }
 
-    dbgprintf("pko_file: dir close reply received (ret %d)\n", 
+    dbgprintf("pko_file: dir close reply received (ret %d)\n",
               ntohl(closerly->retval));
 
     return ntohl(closerly->retval);
@@ -657,8 +657,7 @@ int pko_close_dir(int fd)
 
 //----------------------------------------------------------------------
 // Thread that waits for a PC to connect/disconnect/reconnect blah..
-int
-pko_file_serv(void *argv)
+int pko_file_serv(void *argv)
 {
     struct sockaddr_in server_addr;
     struct sockaddr_in client_addr;
@@ -680,8 +679,8 @@ pko_file_serv(void *argv)
         return -1;
     }
 
-    ret = bind(sock, (struct sockaddr *)&server_addr, 
-                    sizeof(server_addr));
+    ret = bind(sock, (struct sockaddr *)&server_addr,
+               sizeof(server_addr));
     if (ret < 0) {
         dbgprintf("pko_file: bind error (%d)\n", ret);
         disconnect(sock);
@@ -701,22 +700,21 @@ pko_file_serv(void *argv)
     pko_fileio_active = 1;
 
     // Connection loop
-    while(pko_fileio_active)
-    {
+    while (pko_fileio_active) {
         dbgprintf("Waiting for connection\n");
 
         client_len = sizeof(client_addr);
-        client_sock = accept(sock, (struct sockaddr *)&client_addr, 
+        client_sock = accept(sock, (struct sockaddr *)&client_addr,
                              &client_len);
         if (client_sock < 0) {
             dbgprintf("pko_file: accept error (%d)", client_sock);
             continue;
         }
 
-        dbgprintf("Client connected from %x\n", 
-               (int)client_addr.sin_addr.s_addr);
+        dbgprintf("Client connected from %x\n",
+                  (int)client_addr.sin_addr.s_addr);
 
-		remote_pc_addr = client_addr.sin_addr.s_addr;
+        remote_pc_addr = client_addr.sin_addr.s_addr;
 
         if (pko_fileio_sock > 0) {
             dbgprintf("Client reconnected\n");

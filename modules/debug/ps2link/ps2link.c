@@ -22,8 +22,7 @@ extern int naplinkRpcInit(void);
 ////////////////////////////////////////////////////////////////////////
 // main
 //   start threads & init rpc & filesys
-int
-_start( int argc, char **argv)
+int _start(int argc, char **argv)
 {
     FlushDcache();
     CpuEnableIntr(0);
@@ -34,14 +33,13 @@ _start( int argc, char **argv)
     SifInitRpc(0);
 
     fsysMount();
-	printf("host: mounted\n");
+    printf("host: mounted\n");
     cmdHandlerInit();
-	printf("IOP cmd thread started\n");
+    printf("IOP cmd thread started\n");
     naplinkRpcInit();
-	printf("Naplink thread started\n");
-	
-	installExceptionHandlers();
+    printf("Naplink thread started\n");
+
+    installExceptionHandlers();
 
     return 0;
 }
-

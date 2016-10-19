@@ -7,4 +7,4 @@
 #define XPRINTF(args...)
 #endif
 
-#endif  /* _MASS_DEBUG_H */
+#endif /* _MASS_DEBUG_H */

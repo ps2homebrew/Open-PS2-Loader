@@ -30,24 +30,24 @@
  */
 static code_t make_code(const char *s)
 {
-	code_t code;
-	int address;
-	int value;
-	char digits[CODE_DIGITS];
-	int i = 0;
+    code_t code;
+    int address;
+    int value;
+    char digits[CODE_DIGITS];
+    int i = 0;
 
-	while (*s) {
-		if (isxdigit(*s))
-			digits[i++] = *s;
-		s++;
-	}
+    while (*s) {
+        if (isxdigit(*s))
+            digits[i++] = *s;
+        s++;
+    }
 
-	sscanf(digits, "%08X %08X", &address, &value);
+    sscanf(digits, "%08X %08X", &address, &value);
 
-	//Return Code Address and Value
-	code.addr = address;
-	code.val = value;
-	return code;
+    //Return Code Address and Value
+    code.addr = address;
+    code.val = value;
+    return code;
 }
 
 
@@ -58,20 +58,19 @@ static code_t make_code(const char *s)
  */
 static int is_cheat_code(const char *s)
 {
-	int i = 0;
+    int i = 0;
 
-	while (*s) {
-		if (isxdigit(*s)) {
-			if (++i > CODE_DIGITS)
-				return 0;
-		}
-		else if (!isspace(*s)) {
-			return 0;
-		}
-		s++;
-	}
+    while (*s) {
+        if (isxdigit(*s)) {
+            if (++i > CODE_DIGITS)
+                return 0;
+        } else if (!isspace(*s)) {
+            return 0;
+        }
+        s++;
+    }
 
-	return (i == CODE_DIGITS);
+    return (i == CODE_DIGITS);
 }
 
 /*
@@ -79,17 +78,17 @@ static int is_cheat_code(const char *s)
  */
 static code_t parse_line(const char *line, int linenumber)
 {
-	code_t code;
-	code.addr = 0;
-	code.val = 0;
-	int ret;
-	LOG("%4i  %s\n", linenumber, line);
-	ret = is_cheat_code(line);
-	if (ret){
-		/* Process actual code and add it to the list. */
-		code = make_code(line);
-	}
-	return code;
+    code_t code;
+    code.addr = 0;
+    code.val = 0;
+    int ret;
+    LOG("%4i  %s\n", linenumber, line);
+    ret = is_cheat_code(line);
+    if (ret) {
+        /* Process actual code and add it to the list. */
+        code = make_code(line);
+    }
+    return code;
 }
 
 /*
@@ -97,7 +96,7 @@ static code_t parse_line(const char *line, int linenumber)
  */
 static inline int is_cmt_str(const char *s)
 {
-	return (strlen(s) >= 2 && !strncmp(s, "//", 2)) || (*s == '#');
+    return (strlen(s) >= 2 && !strncmp(s, "//", 2)) || (*s == '#');
 }
 
 /*
@@ -106,30 +105,30 @@ static inline int is_cmt_str(const char *s)
  */
 size_t chr_idx(const char *s, char c)
 {
-	size_t i = 0;
+    size_t i = 0;
 
-	while (s[i] && (s[i] != c))
-		i++;
+    while (s[i] && (s[i] != c))
+        i++;
 
-	return (s[i] == c) ? i : -1;
+    return (s[i] == c) ? i : -1;
 }
 
 /*
  * term_str - Terminate string @s where the callback functions returns non-zero.
  */
-char *term_str(char *s, int(*callback)(const char *))
+char *term_str(char *s, int (*callback)(const char *))
 {
-	if (callback != NULL) {
-		while (*s) {
-			if (callback(s)) {
-				*s = NUL;
-				break;
-			}
-			s++;
-		}
-	}
+    if (callback != NULL) {
+        while (*s) {
+            if (callback(s)) {
+                *s = NUL;
+                break;
+            }
+            s++;
+        }
+    }
 
-	return s;
+    return s;
 }
 
 /*
@@ -138,14 +137,14 @@ char *term_str(char *s, int(*callback)(const char *))
  */
 int is_empty_str(const char *s)
 {
-	size_t slen = strlen(s);
+    size_t slen = strlen(s);
 
-	while (slen--) {
-		if (isgraph(*s++))
-			return 0;
-	}
+    while (slen--) {
+        if (isgraph(*s++))
+            return 0;
+    }
 
-	return 1;
+    return 1;
 }
 
 /*
@@ -153,31 +152,31 @@ int is_empty_str(const char *s)
  */
 int trim_str(char *s)
 {
-	size_t first = 0;
-	size_t last;
-	size_t slen;
-	char *t = s;
+    size_t first = 0;
+    size_t last;
+    size_t slen;
+    char *t = s;
 
-	/* Return if string is empty */
-	if (is_empty_str(s))
-		return -1;
+    /* Return if string is empty */
+    if (is_empty_str(s))
+        return -1;
 
-	/* Get first non-space char */
-	while (isspace(*t++))
-		first++;
+    /* Get first non-space char */
+    while (isspace(*t++))
+        first++;
 
-	/* Get last non-space char */
-	last = strlen(s) - 1;
-	t = &s[last];
-	while (isspace(*t--))
-		last--;
+    /* Get last non-space char */
+    last = strlen(s) - 1;
+    t = &s[last];
+    while (isspace(*t--))
+        last--;
 
-	/* Kill leading/trailing spaces */
-	slen = last - first + 1;
-	memmove(s, s + first, slen);
-	s[slen] = NUL;
+    /* Kill leading/trailing spaces */
+    slen = last - first + 1;
+    memmove(s, s + first, slen);
+    s[slen] = NUL;
 
-	return slen;
+    return slen;
 }
 
 /*
@@ -186,16 +185,16 @@ int trim_str(char *s)
  */
 int is_empty_substr(const char *s, size_t count)
 {
-	while (count--) {
-		if (isgraph(*s++))
-			return 0;
-	}
+    while (count--) {
+        if (isgraph(*s++))
+            return 0;
+    }
 
-	return 1;
+    return 1;
 }
 
 /* Max line length to parse */
-#define LINE_MAX	255
+#define LINE_MAX 255
 
 /**
  * parse_buf - Parse a text buffer for cheats.
@@ -204,49 +203,50 @@ int is_empty_substr(const char *s, size_t count)
  */
 int parse_buf(const char *buf)
 {
-	code_t code;
-	char line[LINE_MAX + 1];
-	int linenumber = 1;
+    code_t code;
+    char line[LINE_MAX + 1];
+    int linenumber = 1;
 
-	if (buf == NULL) return -1;
+    if (buf == NULL)
+        return -1;
 
-	int i = 0;
-	
-	while (*buf) {
-		/* Scanner */
-		int len = chr_idx(buf, LF);
-		if (len < 0)
-			len = strlen(line);
-		else if (len > LINE_MAX)
-			len = LINE_MAX;
+    int i = 0;
 
-		if (!is_empty_substr(buf, len)) {
-			strncpy(line, buf, len);
-			line[len] = NUL;
+    while (*buf) {
+        /* Scanner */
+        int len = chr_idx(buf, LF);
+        if (len < 0)
+            len = strlen(line);
+        else if (len > LINE_MAX)
+            len = LINE_MAX;
 
-			/* Screener */
-			term_str(line, is_cmt_str);
-			trim_str(line);
+        if (!is_empty_substr(buf, len)) {
+            strncpy(line, buf, len);
+            line[len] = NUL;
 
-			/* Parser */
-			code = parse_line(line, linenumber);
-			if (!((code.addr == 0) && (code.val == 0))) {
-				gCheatList[i] = code.addr;
-				i++;
-				gCheatList[i] = code.val;
-				i++;
-			}
-		}
-		linenumber++;
-		buf += len + 1;
-	}
+            /* Screener */
+            term_str(line, is_cmt_str);
+            trim_str(line);
 
-	gCheatList[i] = 0;
-	i++;
-	gCheatList[i] = 0;
-	i++;
+            /* Parser */
+            code = parse_line(line, linenumber);
+            if (!((code.addr == 0) && (code.val == 0))) {
+                gCheatList[i] = code.addr;
+                i++;
+                gCheatList[i] = code.val;
+                i++;
+            }
+        }
+        linenumber++;
+        buf += len + 1;
+    }
 
-	return 0;
+    gCheatList[i] = 0;
+    i++;
+    gCheatList[i] = 0;
+    i++;
+
+    return 0;
 }
 
 /**
@@ -257,41 +257,41 @@ int parse_buf(const char *buf)
  */
 static inline char *read_text_file(const char *filename, int maxsize)
 {
-	char *buf = NULL;
-	int fd, filesize;
+    char *buf = NULL;
+    int fd, filesize;
 
-	fd = open(filename, O_RDONLY);
-	if (fd < 0) {
-		LOG("%s: Can't open text file %s\n", __FUNCTION__, filename);
-		return NULL;
-	}
+    fd = open(filename, O_RDONLY);
+    if (fd < 0) {
+        LOG("%s: Can't open text file %s\n", __FUNCTION__, filename);
+        return NULL;
+    }
 
-	filesize = lseek(fd, 0, SEEK_END);
-	if (maxsize && filesize > maxsize) {
-		LOG("%s: Text file too large: %i bytes, max: %i bytes\n", __FUNCTION__, filesize, maxsize);
-		goto end;
-	}
+    filesize = lseek(fd, 0, SEEK_END);
+    if (maxsize && filesize > maxsize) {
+        LOG("%s: Text file too large: %i bytes, max: %i bytes\n", __FUNCTION__, filesize, maxsize);
+        goto end;
+    }
 
-	buf = malloc(filesize + 1);
-	if (buf == NULL) {
-		LOG("%s: Unable to allocate %i bytes\n", __FUNCTION__, filesize + 1);
-		goto end;
-	}
+    buf = malloc(filesize + 1);
+    if (buf == NULL) {
+        LOG("%s: Unable to allocate %i bytes\n", __FUNCTION__, filesize + 1);
+        goto end;
+    }
 
-	if (filesize > 0) {
-		lseek(fd, 0, SEEK_SET);
-		if (read(fd, buf, filesize) != filesize) {
-			LOG("%s: Can't read from text file %s\n", __FUNCTION__, filename);
-			free(buf);
-			buf = NULL;
-			goto end;
-		}
-	}
+    if (filesize > 0) {
+        lseek(fd, 0, SEEK_SET);
+        if (read(fd, buf, filesize) != filesize) {
+            LOG("%s: Can't read from text file %s\n", __FUNCTION__, filename);
+            free(buf);
+            buf = NULL;
+            goto end;
+        }
+    }
 
-	buf[filesize] = '\0';
+    buf[filesize] = '\0';
 end:
-	close(fd);
-	return buf;
+    close(fd);
+    return buf;
 }
 
 /*
@@ -299,19 +299,19 @@ end:
  */
 int load_cheats(const char *cheatfile)
 {
-	char *buf = NULL;
-	int ret;
-	LOG("%s: Reading cheat file '%s'...", __FUNCTION__, cheatfile);
-	buf = read_text_file(cheatfile, 0);
-	if (buf == NULL) {
-		LOG("\n%s: Could not read cheats file '%s'\n", __FUNCTION__, cheatfile);
-		return -1;
-	}
-	LOG("Ok!\n");
-	ret = parse_buf(buf);
-	free(buf);
-	if (ret < 0)
-		return -1;
-	else
-		return 0;
+    char *buf = NULL;
+    int ret;
+    LOG("%s: Reading cheat file '%s'...", __FUNCTION__, cheatfile);
+    buf = read_text_file(cheatfile, 0);
+    if (buf == NULL) {
+        LOG("\n%s: Could not read cheats file '%s'\n", __FUNCTION__, cheatfile);
+        return -1;
+    }
+    LOG("Ok!\n");
+    ret = parse_buf(buf);
+    free(buf);
+    if (ret < 0)
+        return -1;
+    else
+        return 0;
 }

@@ -102,20 +102,25 @@ script:
 # Let's build Open PS2 Loader!
 - cd ${opl_build_dir}/
 
-## Builg Lang Pack and Latest Changelog
-- . make_changelog.sh
-- . lng_pack.sh
-
 ## Export main variables
-- export opl_version=$(cat include/opl.h | grep OPL_VERSION | cut -f 3 | tr -d '"' | cut -c -5)
-- export opl_revision=$(cat DETAILED_CHANGELOG | head -11 | tail -n 1 | cut -d " " -f 1 | tr -d "rev" | tr -d "commit")
-- export opl_extraversion=$(cat include/opl.h | grep OPL_VERSION | cut -f 3 | tr -d '"' | cut -c 7-)
+- export opl_version=$(cat Makefile | grep "VERSION =" | head -1 | cut -d " " -f 3)
+- export opl_subversion=$(cat Makefile | grep "SUBVERSION =" | head -1 | cut -d " " -f 3)
+- export opl_patchlevel=$(cat Makefile | grep "PATCHLEVEL =" | head -1 | cut -d " " -f 3)
+- export opl_revision=$(cat Makefile | grep "REVISION =" | head -1 | cut -d " " -f 3)
+- export opl_extraversion=$(cat Makefile | grep "EXTRAVERSION =" | head -1 | cut -d " " -f 3)
+- if [ ${opl_extraversion} ]; then export opl_extraversion=-${opl_extraversion}; fi
 - export opl_git=$(git rev-parse --short=7 HEAD | head -1)
-- export opl_version=${opl_version}.${opl_revision}-${opl_extraversion}
-- export opl_set="OPNPS2LD-${opl_version}-${opl_git}"
+- if [ ${opl_git} ]; then export opl_git=-${opl_git}; fi
+- export opl_version=${opl_version}.${opl_subversion}.${opl_patchlevel}.${opl_revision}
+- export opl_set="OPNPS2LD-${opl_version}${opl_extraversion}${opl_git}"
 
 ## Build OPL with ALL
-- make VMC=1 GSM=1 IGS=1 CHEAT=1 rebuild
+- make clean
+- make release
+
+## Build Lang Pack and Latest Changelog
+- . make_changelog.sh
+- . lng_pack.sh
 
 ## Pack it on zip
 - mkdir -p ${opl_build_dir}/out/

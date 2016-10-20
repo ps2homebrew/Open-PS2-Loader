@@ -1,7 +1,7 @@
 VERSION = 0
 SUBVERSION = 9
 PATCHLEVEL = 4
-REVISION = 947
+REVISION = $(shell git log --oneline | wc -l)
 EXTRAVERSION = WIP
 
 # How to DEBUG?

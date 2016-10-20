@@ -8,6 +8,7 @@
 
 Open PS2 Loader detailed ChangeLog:
 
+commit948 - Caio Oliveira - OPL: Update versioning to new scheme - Thu Oct 20 13:44:31 2016 -0200
 commit947 - uyjulian - run clang-format on all .c and .h files - Wed Oct 19 20:32:12 2016 -0200
 commit946 - uyjulian - add .clang-format configuration file - Wed Oct 19 20:32:12 2016 -0200
 commit945 - Caio Oliveira - .gitignore: Change from .hgignore and add more entries - Wed Oct 19 11:00:18 2016 -0200

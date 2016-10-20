@@ -4,7 +4,7 @@
 # Set variables
 _dir=$(pwd)
 _bdir="/tmp/opl_lng"
-_rev=$(cat ${_dir}/DETAILED_CHANGELOG | head -11 | tail -n 1 | cut -d " " -f 1 | tr -d "rev" | tr -d "commit")
+_rev=$(cat ${_dir}/Makefile | grep "REVISION =" | head -1 | cut -d " " -f 3)
 
 # Print a list
 printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_list

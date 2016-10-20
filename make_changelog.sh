@@ -25,7 +25,7 @@ then
 fi
 
 # Store author, commit and date on temp file
-git log --pretty=format:"%cn - %s - %cd" > /tmp/commit_summary
+git log --pretty=format:"%an - %s - %cd" > /tmp/commit_summary
 if ! [ "${?}" == "0" ]
 then
  echo "Git command failed, exiting..."

@@ -200,6 +200,11 @@ void guiEndFrame(void)
 void guiShowAbout()
 {
     char OPLVersion[64];
+
+    // TODO: Move it into a new variable
+    // If you use VMC + RTL + GSM + IGS + PS2RD, you not will see last chars
+    // in the new version scheme because look like this now
+    // "Open PS2 Loader 0.9.4.9XY-abcdefg"
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
 
 #ifdef VMC
@@ -212,15 +217,15 @@ void guiShowAbout()
     strcat(OPLVersion, " CHILDPROOF");
 #endif
 #ifdef GSM
-    strcat(OPLVersion, " GSM ");
+    strcat(OPLVersion, " GSM");
     strcat(OPLVersion, GSM_VERSION);
 #endif
 #ifdef IGS
-    strcat(OPLVersion, " IGS ");
+    strcat(OPLVersion, " IGS");
     strcat(OPLVersion, IGS_VERSION);
 #endif
 #ifdef CHEAT
-    strcat(OPLVersion, " PS2RD ");
+    strcat(OPLVersion, " PS2RD");
 #endif
 
     diaSetLabel(diaAbout, 1, OPLVersion);

@@ -1,7 +1,6 @@
 VERSION = 0
 SUBVERSION = 9
 PATCHLEVEL = 4
-REVISION = $(shell git log --oneline | wc -l)
 EXTRAVERSION = WIP
 
 # How to DEBUG?
@@ -16,6 +15,9 @@ EXTRAVERSION = WIP
 # I want to build a CHILDPROOF edition! How do I do that?
 # Type "make childproof" to build one.
 # Non-childproof features like GSM will not be available.
+
+# I want to put my name in my custom build! How i can do it?
+# Type "make LOCALVERSION=-foobar"
 
 # ======== START OF CONFIGURABLE SECTION ========
 # You can adjust the variables in this section to meet your needs.
@@ -51,13 +53,17 @@ DECI2_DEBUG = 0
 CHILDPROOF = 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
-
-OPL_GIT_REVISION := $(shell git rev-parse --short=7 HEAD 2>/dev/null)
-ifneq ($(shell git diff --quiet; echo $?),0)
-    OPL_GIT_REVISION := $(OPL_GIT_REVISION)-dirty
+REVISION = $(shell git log --oneline | wc -l 2>/dev/null)
+ifeq ($(REVISION),)
+  REVISION = $(shell $(($(cat DETAILED_CHANGELOG | grep "commit" | head -1 | cut -d " " -f 1 | cut -c 7- 2>/dev/null) + 1)))
 endif
 
-OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(OPL_GIT_REVISION),-$(OPL_GIT_REVISION))
+GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
+ifneq ($(shell git diff --quiet; echo $?),0)
+  DIRTY = -dirty
+endif
+
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).r$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),-$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \

@@ -99,22 +99,8 @@ script:
 - make install
 
 #
-# Let's build Open PS2 Loader!
+# Let's build Open PS2 Loader Release!
 - cd ${opl_build_dir}/
-
-## Export main variables
-- export opl_version=$(cat Makefile | grep "VERSION =" | head -1 | cut -d " " -f 3)
-- export opl_subversion=$(cat Makefile | grep "SUBVERSION =" | head -1 | cut -d " " -f 3)
-- export opl_patchlevel=$(cat Makefile | grep "PATCHLEVEL =" | head -1 | cut -d " " -f 3)
-- export opl_revision=$(cat Makefile | grep "REVISION =" | head -1 | cut -d " " -f 3)
-- export opl_extraversion=$(cat Makefile | grep "EXTRAVERSION =" | head -1 | cut -d " " -f 3)
-- if [ ${opl_extraversion} ]; then export opl_extraversion=-${opl_extraversion}; fi
-- export opl_git=$(git rev-parse --short=7 HEAD | head -1)
-- if [ ${opl_git} ]; then export opl_git=-${opl_git}; fi
-- export opl_version=${opl_version}.${opl_subversion}.${opl_patchlevel}.${opl_revision}
-- export opl_set="OPNPS2LD-${opl_version}${opl_extraversion}${opl_git}"
-
-## Build OPL with ALL
 - make clean
 - make release
 
@@ -122,20 +108,12 @@ script:
 - . make_changelog.sh
 - . lng_pack.sh
 
-## Pack it on zip
-- mkdir -p ${opl_build_dir}/out/
-- cp ${opl_build_dir}/DETAILED_CHANGELOG ${opl_build_dir}/out/DETAILED_CHANGELOG
-- cp ${opl_build_dir}/OPNPS2LD.ELF ${opl_build_dir}/out/${opl_set}.ELF
-- cp ${opl_build_dir}/CREDITS ${opl_build_dir}/out/CREDITS
-- cp ${opl_build_dir}/LICENSE ${opl_build_dir}/out/LICENSE
-- cd ${opl_build_dir}/out/
-- zip -r ${opl_set}.zip *
-- cd ${opl_build_dir}/
+## Set current Version and Revision
+- export opl_version=$(ls | grep "OPNPS2LD-" | cut -c 10- | rev | cut -c 5- | rev)
+- export opl_revision=$(cat DETAILED_CHANGELOG | grep "commit" | head -1 | cut -d " " -f 1 | cut -c 7-)
 
-## Prepare to deploy
-- mkdir -p ${opl_build_dir}/out_zip/
-- cp ${opl_build_dir}/out/${opl_set}.zip ${opl_build_dir}/out_zip/${opl_set}.zip
-- cp ${opl_build_dir}/OPNPS2LD_LANGS-r${opl_revision}.zip ${opl_build_dir}/out_zip/OPNPS2LD_LANGS-r${opl_revision}.zip
+## Pack it on zip
+- zip -r OPNPS2LD-${opl_version}.zip DETAILED_CHANGELOG OPNPS2LD-${opl_version}.ELF CREDITS LICENSE README
 
 #
 # [TEMPLATE] Deploy OPL to Github Releases
@@ -160,7 +138,7 @@ script:
 #  api_key:
 #    secure: [PUT YOUR NEW SECURE API KEY HERE]
 #  file:
-#    - "${opl_build_dir}/out_zip/${opl_set}.zip"
-#    - "${opl_build_dir}/out_zip/OPNPS2LD_LANGS-r${opl_revision}.zip"
+#    - "${opl_build_dir}/OPNPS2LD-${opl_version}.zip"
+#    - "${opl_build_dir}/OPNPS2LD_LANGS-r${opl_revision}.zip"
 #  on:
 #    tags: true

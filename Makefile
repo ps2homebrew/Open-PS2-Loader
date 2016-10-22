@@ -53,17 +53,12 @@ DECI2_DEBUG = 0
 CHILDPROOF = 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
-REVISION = $(shell git log --oneline | wc -l 2>/dev/null)
-ifeq ($(REVISION),)
-  REVISION = $(shell $(($(cat DETAILED_CHANGELOG | grep "commit" | head -1 | cut -d " " -f 1 | cut -c 7- 2>/dev/null) + 1)))
-endif
-
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
-ifneq ($(shell git diff --quiet; echo $?),0)
+ifneq ($(shell git diff --quiet; echo $$?),0)
   DIRTY = -dirty
 endif
 
-OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).r$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),-$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),-$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \

@@ -182,11 +182,21 @@ struct UIItem diaCompatConfig[] = {
 
     {UI_SPLITTER},
 
-// Note: Per-Game GSM uses a UI_BUTTON to open up the menu. An #ifdef should keep it
-// out of Childproof and Non-GSM builds. --Bat--
 #ifdef GSM
+// Note: Per-Game GSM uses a UI_BUTTON to open up the menu. The above #ifdef keeps it
+// out of Childproof and unintended builds. --Bat--
     {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSCONFIG}}},
-    {UI_BREAK},
+		#if defined(GSM) && defined(CHEAT),
+		{UI_SPACER},
+		#else
+		{UI_BREAK},	
+#endif
+
+#ifdef CHEAT	
+// Note: Per Game CHEAT uses a UI Button that only appears next to "Configure GSM"
+// if enabled at compile time. The above #ifdef keeps it out of "Childproof" and
+// other unintended builds. --Bat--
+	{UI_BUTTON}, COMPAT_CHEATCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEATCONFIG}}}, {UI_BREAK},
 #endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
@@ -431,7 +441,7 @@ struct UIItem diaGSConfig[] = {
 #endif
 
 #ifdef CHEAT
-// Cheat Menu
+// Per Game Cheat Menu --Bat--
 struct UIItem diaCheatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
 

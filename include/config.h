@@ -43,6 +43,8 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_GSMYOFFSET "$GSMYOffset"
 
 //Per-Game CHEAT keys. -Bat-
+#define CONFIG_ITEM_ENABLECHEAT "$EnableCheat"
+#define CONFIG ITEM_CHEATMODE "$CheatMode"
 
 //OPL config keys
 #define CONFIG_OPL_THEME "theme"

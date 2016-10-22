@@ -1,30 +1,30 @@
-sudo: required
-language: c
-script:
-#
-# Travis CI Script by Caio Oliveira aka Caio99BR <caiooliveirafarias0@gmail.com>
+## Travis CI Script by Caio Oliveira aka Caio99BR <caiooliveirafarias0@gmail.com>
 # For Open-PS2-Loader
-
-#
-# Thanks to:
+## Thanks to:
 # - izdubar@psx-scene and jimmikaelkael@psx-scene
 #   <http://psx-scene.com/forums/f150/%5Blinux%5D-opl-compile-guides-63749/>
 # - doctorxyz@ps2home
 #   <http://ps2home.freeforums.net/thread/272/linux-creation-compiling-guide-ps2sdk>
 # - and a lot of people around internet :)
+sudo: required
+language: c
 
-#
-# Save current dir, go to previous dir and save it too
+before_install:
+## Save current dir, go to previous dir and save it too
 - export opl_build_dir=$(pwd)
 - cd ../
 - export travis_build_dir=$(pwd)
 
-#
-# OPL Building Dependencies
-- sudo apt-get install -yqq gcc-4.4 patch wget make git mercurial libc6-dev zlib1g zlib1g-dev libucl1 libucl-dev
+install:
+## OPL Building Dependencies
+- sudo apt-get install -yqq gcc-4.4 patch wget make git libc6-dev zlib1g zlib1g-dev libucl1 libucl-dev
 
-#
-# Set up the environment.
+before_script:
+## Make cleanup, just for prevent anything
+- cd ${travis_build_dir}/
+- rm -rf gsKit/ ps2eth/ ps2toolchain/ ps2-packer/ ps2sdk-ports/
+
+## Set up the environment.
 - export PS2DEV=${travis_build_dir}/ps2dev
 - export PS2SDK=${PS2DEV}/ps2sdk
 - export PATH=${PATH}:${PS2DEV}/bin:${PS2DEV}/ee/bin:${PS2DEV}/iop/bin:${PS2DEV}/dvp/bin:${PS2SDK}/bin
@@ -33,112 +33,94 @@ script:
 - export LANG=C
 - export LC_ALL=C
 
-#
-# ps2dev/PS2Toolchain
+## ps2dev/PS2Toolchain
 - cd ${travis_build_dir}/
-- rm -rf ${travis_build_dir}/ps2toolchain/
 - git clone --quiet https://github.com/ps2dev/ps2toolchain.git ${travis_build_dir}/ps2toolchain/
 - cd ${travis_build_dir}/ps2toolchain/
 - ./toolchain.sh
 
-#
-# ps2dev/PS2SDKPorts
+## ps2dev/PS2SDKPorts
 - cd ${travis_build_dir}/
-- rm -rf ${travis_build_dir}/ps2sdk-ports/
 - git clone --quiet https://github.com/ps2dev/ps2sdk-ports.git ${travis_build_dir}/ps2sdk-ports/
 
-#
-# ps2dev/PS2SDKPorts/zlib
+## ps2dev/PS2SDKPorts/zlib
 - cd ${travis_build_dir}/ps2sdk-ports/zlib/
 - make
 - make install
 
-#
-# ps2dev/PS2SDKPorts/libpng
+## ps2dev/PS2SDKPorts/libpng
 - cd ${travis_build_dir}/ps2sdk-ports/libpng/
 - make
 - make install
 
-#
-# ps2dev/PS2SDKPorts/libjpeg
+## ps2dev/PS2SDKPorts/libjpeg
 - cd ${travis_build_dir}/ps2sdk-ports/libjpeg/
 - make
 - make install
 
-#
-# ps2dev/PS2SDKPorts/freetype
+## ps2dev/PS2SDKPorts/freetype
 - cd ${travis_build_dir}/ps2sdk-ports/freetype-2.4.12/
 - source SetupPS2.sh
 
-#
-# ps2dev/PS2ETH
+## ps2dev/PS2ETH
 - cd ${travis_build_dir}/
-- rm -rf ${travis_build_dir}/ps2eth/
 - git clone --quiet https://github.com/ps2dev/ps2eth ${travis_build_dir}/ps2eth/
 - cd ${travis_build_dir}/ps2eth/
 - make
 - sudo mkdir -p /usr/lib/ps2dev/ps2eth
 - sudo tar c $(find . -name \*irx) | sudo tar x -C /usr/lib/ps2dev/ps2eth
 
-#
-# ps2dev/gsKit
+## ps2dev/gsKit
 - cd ${travis_build_dir}/
-- rm -rf ${travis_build_dir}/gsKit/
 - git clone --quiet https://github.com/ps2dev/gsKit.git ${travis_build_dir}/gsKit/
 - cd ${travis_build_dir}/gsKit/
 - make
 - make install
 
-#
-# ps2dev/PS2Packer
+## ps2dev/PS2Packer
 - cd ${travis_build_dir}/
-- rm -rf ${travis_build_dir}/ps2-packer/
 - git clone --quiet https://github.com/ps2dev/ps2-packer.git ${travis_build_dir}/ps2-packer/
 - cd ${travis_build_dir}/ps2-packer/
 - make
 - make install
 
-#
-# Let's build Open PS2 Loader Release!
+script:
+## Let's build Open PS2 Loader Release!
 - cd ${opl_build_dir}/
 - make clean
 - make release
 
+after_script:
 ## Build Lang Pack and Latest Changelog
 - . make_changelog.sh
 - . lng_pack.sh
 
 ## Set current Version and Revision
 - export opl_version=$(ls | grep "OPNPS2LD-" | cut -c 10- | rev | cut -c 5- | rev)
-- export opl_revision=$(cat DETAILED_CHANGELOG | grep "commit" | head -1 | cut -d " " -f 1 | cut -c 7-)
+- export opl_revision=$(($(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
 
-## Pack it on zip
-- zip -r OPNPS2LD-${opl_version}.zip DETAILED_CHANGELOG OPNPS2LD-${opl_version}.ELF CREDITS LICENSE README
+## Pack Open PS2 Loader Release on a zip
+- zip -r OPNPS2LD-${opl_version}.zip DETAILED_CHANGELOG OLD_DETAILED_CHANGELOG OPNPS2LD-${opl_version}.ELF CREDITS LICENSE README
 
-#
-# [TEMPLATE] Deploy OPL to Github Releases
+## [TEMPLATE] Deploy OPL to Github Releases
 # 1. Clone this repository
 # 2. Copy '.travis.yml' to '.travis-original.yml' (you will need it after)
 # 3. Install Travis Client <https://github.com/travis-ci/travis.rb#installation>
 # 4. Run command: $(travis setup releases)
-# 5a. After follow all  previous steps,
-#     pickup ONLY the "secure" line
-#     and change it on '.travis-original.yml'
-# 5b. Remove '#' in and after deploy section
-# 6. Move '.travis-original.yml' to '.travis.yml'
-# 7. Commit it
-#
-# NOTE: You need to configure TravisCI before anything <https://travis-ci.org/>
+#    After follow all previous steps, pickup ONLY the "secure" line
+#    and change it on '.travis-original.yml'
+# 5. Move '.travis-original.yml' to '.travis.yml'
+# 6. Commit it
+## NOTE: You need to configure TravisCI before anything <https://travis-ci.org/>
 
-#
-# Deploy OPL to Github Releases
-#deploy:
-#  provider: releases
-#  skip_cleanup: true
+## Deploy OPL to Github Releases
+deploy:
+  provider: releases
+  skip_cleanup: true
 #  api_key:
 #    secure: [PUT YOUR NEW SECURE API KEY HERE]
-#  file:
-#    - "${opl_build_dir}/OPNPS2LD-${opl_version}.zip"
-#    - "${opl_build_dir}/OPNPS2LD_LANGS-r${opl_revision}.zip"
-#  on:
-#    tags: true
+  file:
+    - "${opl_build_dir}/OPNPS2LD-${opl_version}.zip"
+    - "${opl_build_dir}/OPNPS2LD_LANGS-r${opl_revision}.zip"
+  on:
+    tags: true

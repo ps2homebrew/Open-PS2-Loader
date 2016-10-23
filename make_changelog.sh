@@ -38,29 +38,45 @@ fi
 printf '\n' >> /tmp/commit_summary
 
 # Store number of commits
+old_number_commits=$(($(cat OLD_DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-)))
 number_commits=$(cat /tmp/commit_summary | wc -l)
+new_number_commits=$((${number_commits} - ${old_number_commits} + 2))
+
+# Echo it!
+echo "Current Revision ${number_commits} (Of BitBucket r${old_number_commits} + Of GIT r${new_number_commits})"
+
+# Store author, commit and date on temp file
+git log -${new_number_commits} --pretty=format:"%an - %s - %cd" > /tmp/commit_summary
+if ! [ "${?}" == "0" ]
+then
+ echo "Git command failed, exiting..."
+ break
+fi
+
+# Hack for fix first commit not showed
+printf '\n' >> /tmp/commit_summary
+
+# Reverse commit history
+gawk '{ L[n++] = $0 } END { while(n--) print L[n] }' /tmp/commit_summary > /tmp/commit_summary_reverse
 
 # Store each commit in one variable[list]
-number_summary=0
 while read line_commit_summary
 do
- number_summary=$((${number_summary} + 1))
- commit_summary[${number_summary}]="commit${number_commits} - ${line_commit_summary}"
- number_commits=$((${number_commits} - 1))
-done < /tmp/commit_summary
+ old_number_commits=$((${old_number_commits} + 1))
+ echo "rev${old_number_commits} - ${line_commit_summary}" >> /tmp/commit_summary_new
+done < /tmp/commit_summary_reverse
 
-printf "Found ${number_summary} commits... "
+# Reverse commmit history again
+gawk '{ L[n++] = $0 } END { while(n--) print L[n] }' /tmp/commit_summary_new > /tmp/commit_summary
 
-for ((current=1; current <= ${number_summary}; current++))
-do
- echo "${commit_summary[${current}]}" >> /tmp/DETAILED_CHANGELOG
-done
+# Finish it
+cat /tmp/DETAILED_CHANGELOG /tmp/commit_summary > DETAILED_CHANGELOG
 
-mv /tmp/DETAILED_CHANGELOG DETAILED_CHANGELOG
+# Clean it
+rm -fr /tmp/commit_summary* /tmp/DETAILED_CHANGELOG*
 
-rm -fr /tmp/commit_summary
-
-printf "DETAILED_CHANGELOG file created.\n"
+# Echo it again!
+echo "Add ${new_number_commits} revisions of GIT to DETAILED_CHANGELOG created."
 
 # Exit
 break

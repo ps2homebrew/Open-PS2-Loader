@@ -4,7 +4,7 @@
 # Set variables
 _dir=$(pwd)
 _bdir="/tmp/opl_lng"
-_rev=$(cat ${_dir}/DETAILED_CHANGELOG | grep "commit" | head -1 | cut -d " " -f 1 | cut -c 7-)
+_rev=$(($(cat ${_dir}/DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
 
 # Print a list
 printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_list
@@ -19,12 +19,6 @@ do
 		cp ${_dir}/thirdparty/font_${file}.ttf ${_bdir}/${file}${_rev}/font_${file}.ttf
 	fi
 done < /tmp/opl_lng_list
-
-# Add CREDITS for Translators :)
-if [ -e ${_dir}/CREDITS_LNG ]
-then
-	cp ${_dir}/CREDITS_LNG ${_bdir}/CREDITS_LNG
-fi
 
 (cat << EOF) > ${_bdir}/README
 -----------------------------------------------------------------------------

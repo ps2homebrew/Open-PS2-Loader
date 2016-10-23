@@ -190,7 +190,7 @@ struct UIItem diaCompatConfig[] = {
 // Note: Per Game CHEAT uses a UI Button that only appears next to "Configure GSM"
 // if enabled at compile time. The above #ifdef keeps it out of "Childproof" and
 // other unintended builds. --Bat--
-	{UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEATCONFIG}}}, {UI_BREAK},
+	{UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}}, {UI_BREAK},
 #endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},

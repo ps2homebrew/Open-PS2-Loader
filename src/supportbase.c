@@ -12,7 +12,8 @@
 #endif
 #ifdef CHEAT
 #include "include/pgcht.h"
-endif
+#endif
+
 #include <sys/fcntl.h>
 
 /// internal linked list used to populate the list from directory listing
@@ -401,6 +402,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
     }
 #endif
+
 #ifdef CHEAT
 	gEnableCheat = 0;
 	if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {

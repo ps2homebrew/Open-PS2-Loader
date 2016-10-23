@@ -4,9 +4,9 @@
 #define IGS_VERSION "0.1"
 #endif
 
-#define __PGCHT_H
+#ifndef __PGCHT_H_
+#define __PGCHT_H_
 
-#ifdef CHEAT
 #define CHEAT_VERSION "0.5.3.65.g774d1"
 
 #define MAX_HOOKS 5

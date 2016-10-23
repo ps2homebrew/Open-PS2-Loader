@@ -594,9 +594,9 @@ void guiShowCheatConfig(void)
     // configure the enumerations
     const char *cheatmodeNames[] = {_l(_STR_CHEATMODEAUTO), _l(_STR_CHEATMODESELECT), NULL};
 
-    diaSetEnum(diaCheatConfig, CHEATCFG_CHEATMODE, cheatmodeNames);
-    diaSetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, gEnableCheat);
-    diaSetInt(diaCheatConfig, CHEATCFG_CHEATMODE, gCheatMode);
+    diaSetEnum(diaCheatConfig, CHTCFG_CHEATMODE, cheatmodeNames);
+    diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, gEnableCheat);
+    diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, gCheatMode);
     
 }
 #endif
@@ -987,11 +987,11 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 
 	int EnableCheat = 0;
 	configGetInt{configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
-	diaSetInt(diaCheatConfig}, CHEATCFG_ENABLECHEAT, EnableCheat);
+	diaSetInt(diaCheatConfig}, CHTCFG_ENABLECHEAT, EnableCheat);
 	
 	int CheatMode = 0;
 	configGetInt{configSet, CONFIG_ITEM_CHEATMODE, &CheatMode);
-	diaSetInt(diaCheatConfig, CHEATCFG_CHEATMODE, CheatMode);
+	diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
 
 // End Of Per Game CHEAT Integration --Bat--
 #endif
@@ -1036,7 +1036,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         }
 #endif
 #ifdef CHEAT
-		if  result == COMPAT_CHEATCONFIG) {
+		if  result == COMPAT_CHTCONFIG) {
 			guiShowCheatConfig();
 		}
 #endif
@@ -1138,13 +1138,13 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
 #endif
 #ifdef CHEAT
-		diaGetInt(diaCheatConfig, CHEATCFG_ENABLECHEAT, &EnableCheat);
+		diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
 		if (EnableCheat != 0)
             configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
         else
             configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
 
-        diaGetInt(diaCheatConfig, CHEATCFG_CHEATMODE, &CheatMode);
+        diaGetInt(diaCheatConfig, CHTCFG_CHEATMODE, &CheatMode);
         if (CheatMode != 0)
             configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
         else

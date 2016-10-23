@@ -53,10 +53,13 @@ DECI2_DEBUG = 0
 CHILDPROOF = 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
-REVISION = $(shell $(($(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4- 2>/dev/null) + 1)))
+REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1)
 
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
-ifneq ($(shell git diff --quiet; echo $$?),0)
+ifeq ($(shell git diff --quiet; echo $$?),1)
+  DIRTY = -dirty
+endif
+ifneq ($(shell test -d .git; echo $?),0)
   DIRTY = -dirty
 endif
 
@@ -87,7 +90,7 @@ EECORE_OBJS = obj/ee_core.o obj/ioprp.o obj/util.o \
 
 EE_BIN = opl.elf
 EE_BIN_PKD = OPNPS2LD.ELF
-EE_BIN_VPKD = OPNPS2LD-$(OPL_VERSION).ELF
+EE_VPKD = OPNPS2LD-$(OPL_VERSION)
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
@@ -202,21 +205,24 @@ all:
 	echo "-Interface"
 	$(MAKE) $(EE_BIN)
 	
-ifeq ($(DEBUG),0)
-  ifeq ($(NOT_PACKED),0)
+ifneq ($(DEBUG),1)
+  ifneq ($(NOT_PACKED),1)
 	echo "Stripping..."
 	ee-strip $(EE_BIN)
 
 	echo "Compressing..."
 	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
 
-	cp $(EE_BIN_PKD) $(EE_BIN_VPKD)
-	@echo "Package Complete: $(EE_BIN_VPKD)"
+    ifeq ($(RELEASE),1)
+	cp $(EE_BIN_PKD) $(EE_VPKD).ELF
+	zip -r $(EE_VPKD).zip $(EE_VPKD).ELF CREDITS *DETAILED_CHANGELOG LICENSE README
+	echo "Package Complete: $(EE_VPKD).zip"
+    endif
   endif
 endif
 
 release:
-	$(MAKE) VMC=1 GSM=1 IGS=1 CHEAT=1 all
+	$(MAKE) VMC=1 GSM=1 IGS=1 CHEAT=1 RELEASE=1 all
 	
 childproof:
 	$(MAKE) CHILDPROOF=1 all
@@ -239,7 +245,7 @@ deci2_debug:
 clean:
 	echo "Cleaning..."
 	echo "-Interface"
-	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_BIN_VPKD) $(EE_OBJS_DIR) $(EE_ASM_DIR)
+	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-Elf Loader"

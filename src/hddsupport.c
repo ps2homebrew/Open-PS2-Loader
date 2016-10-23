@@ -53,6 +53,10 @@ const char *oplPart = "hdd0:+OPL";
 // forward declaration
 static item_list_t hddGameList;
 
+char* hddGetPrefix(void){
+	return hddPrefix;
+}
+
 static void hddInitModules(void)
 {
 

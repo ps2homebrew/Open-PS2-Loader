@@ -76,7 +76,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "USB device start mode",
     "HDD device start mode",
     "ETH device start mode",
-    "Applications start mode",
+    "Applications menu display mode",
     "Auto",
     "Manual",
     "Start HDL Server",
@@ -219,6 +219,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Value in second(s), 0 to disable auto start",
     "PS2 Logo",
     "(Only displayed for a valid disc logo which matches the console's region)",
+    "ELF Loader Menu",
+    "ELF Loader Menu display mode",
 };
 
 static int guiLangID = 0;

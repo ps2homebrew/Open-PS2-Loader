@@ -64,9 +64,9 @@ OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERS
 
 FRONTEND_OBJS = obj/pad.o obj/fntsys.o obj/renderman.o obj/menusys.o obj/OSDHistory.o obj/system.o obj/lang.o obj/config.o obj/hdd.o obj/dialogs.o \
 		obj/dia.o obj/ioman.o obj/texcache.o obj/themes.o obj/supportbase.o obj/usbsupport.o obj/ethsupport.o obj/hddsupport.o \
-		obj/appsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o obj/httpclient.o
+		obj/appsupport.o obj/elmsupport.o obj/gui.o obj/textures.o obj/opl.o obj/atlas.o obj/nbns.o obj/httpclient.o
 
-GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o \
+GFX_OBJS =	obj/usb_icon.o obj/hdd_icon.o obj/eth_icon.o obj/app_icon.o obj/elm_icon.o \
 		obj/cross_icon.o obj/triangle_icon.o obj/circle_icon.o obj/square_icon.o obj/select_icon.o obj/start_icon.o \
 		obj/left_icon.o obj/right_icon.o obj/up_icon.o obj/down_icon.o obj/L1_icon.o obj/L2_icon.o obj/R1_icon.o obj/R2_icon.o \
 		obj/load0.o obj/load1.o obj/load2.o obj/load3.o obj/load4.o obj/load5.o obj/load6.o obj/load7.o obj/logo.o obj/bg_overlay.o obj/freesans.o \
@@ -569,6 +569,9 @@ eth_icon.s:
 
 app_icon.s:
 	$(BIN2S) gfx/app.png asm/app_icon.s app_png
+
+elm_icon.s:
+	$(BIN2S) gfx/elm.png asm/elm_icon.s elm_png
 
 cross_icon.s:
 	$(BIN2S) gfx/cross.png asm/cross_icon.s cross_png

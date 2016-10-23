@@ -28,6 +28,7 @@
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
+#include "include/elmsupport.h"
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
@@ -329,6 +330,7 @@ static void initAllSupport(int force_reinit)
     initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
     initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
+    initSupport(elmGetObject(0), gELMStartMode, ELM_MODE, force_reinit);
 }
 
 static void deinitAllSupport(int exception)
@@ -337,6 +339,7 @@ static void deinitAllSupport(int exception)
     moduleCleanup(&list_support[ETH_MODE], exception);
     moduleCleanup(&list_support[HDD_MODE], exception);
     moduleCleanup(&list_support[APP_MODE], exception);
+    moduleCleanup(&list_support[ELM_MODE], exception);
 }
 
 // ----------------------------------------------------------
@@ -571,6 +574,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
+            configGetInt(configOPL, CONFIG_OPL_ELM_MODE, &gELMStartMode);
         }
     }
 
@@ -655,7 +659,8 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
-
+        configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
+  
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
 
@@ -717,6 +722,7 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed);
     moduleUpdateMenu(HDD_MODE, changed);
     moduleUpdateMenu(APP_MODE, changed);
+    moduleUpdateMenu(ELM_MODE, changed);
 }
 
 int loadConfig(int types)
@@ -1145,6 +1151,7 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[ETH_MODE]);
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
+    clearIOModuleT(&list_support[ELM_MODE]);
 
     gBaseMCDir = "mc?:OPL";
 
@@ -1200,6 +1207,7 @@ static void setDefaults(void)
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
+    gELMStartMode = START_MODE_DISABLED;
 
     gDefaultBgColor[0] = 0x030;
     gDefaultBgColor[1] = 0x030;

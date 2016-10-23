@@ -1,5 +1,7 @@
-# Portuguese translation by danielb
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translation by danielb
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Portuguese
 Open PS2 Loader %s
 Salvar alterações
@@ -13,7 +15,7 @@ Sair
 Configurações
 Menu
 Jogos por USB
-Jogos por HDD
+Jogos por HDD 
 Jogos por Rede
 Aplicações
 Temas
@@ -23,9 +25,9 @@ Sair p/ o Browser/OSDSYS?
 Cancelar atualização?
 %d: Disco Rigido não detetado
 %d: Disco Rigido não formatado
-%d: Erro ao iniciar rede
+%d: Erro ao iniciar rede 
 %d: Adaptador de Rede não detetado
-%d: Não foi possível ligar ao servidor SMB
+%d: Não foi possível ligar ao servidor SMB  
 %d: Não foi possível efetuar login no servidor SMB 
 %d: Não foi possível abrir a partilha SMB 
 %d: Impossivel listar partilhas SMB
@@ -55,7 +57,7 @@ Ordenar automaticamente
 Erro ao carregar ficheiro de idioma
 Desativar depuração de cores
 Comando não detectado, esperando...
-Ativar Arte de Capas
+Ativar Arte de Capas 
 Ecrâ Panorâmico
 Desligar PS2
 Carregando configurações
@@ -111,7 +113,7 @@ Deixar vazio para ligar como convidado (GUEST)
 Carregar núcleo alternativo
 Modo Síncrono
 Desativar chamadas do sistema
-Saltar videos
+Saltar videos PSS
 Emular DVD-DL
 Desativar IGR
 Armazenamento elevado do módulo
@@ -131,7 +133,7 @@ Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 Arquivo VMC precisa ser criado!
-Erro com o ficheiro VMC, continuar com MC físico?
+Erro com o ficheiro VMC %s, continuar com MC físico (slot %d) ?
 Atualização automática
 Créditos
 Desenvolvedores
@@ -143,7 +145,7 @@ Desligamento automático do HDD
 Modo de vídeo
 Cor do diálogo
 Cor selecionada
-Mostrar Página de Informação
+Mostrar Página de Informação 
 Info
 ELF personalizado
 Seleção de Cor
@@ -158,7 +160,7 @@ VMC Slot 1
 VMC Slot 2
 ID do Jogo
 Modo DMA
-Sincronização do vídeo
+Sincronização do vídeo 
 Modo 1
 Modo 2
 Modo 3
@@ -208,3 +210,5 @@ Auto iniciar
 Valor em segundos, 0 para desativar
 Logo PS2
 Apenas é exibido para um disco válido e que seja da mesma região da consola
+Menu do Iniciador ELF
+Modo de exibição do iniciador de ELF

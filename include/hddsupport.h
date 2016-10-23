@@ -130,6 +130,7 @@ typedef struct
 } hdd_vmc_infos_t;
 #endif
 
+char* hddGetPrefix(void);
 int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddIs48bit(void);

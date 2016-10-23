@@ -1,5 +1,7 @@
-# Polish translation by dragolice @http://psx-scene.com/forums/members/dragolice/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translation by yohokaru
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Polish
 Open PS2 Loader %s
 Zapisz zmiany
@@ -32,8 +34,8 @@ Przerwać aktualizację?
 %d: Nie można wyświetlić gier
 %d: Serwer DHCP niedostępny
 %d: Brak połączenia sieciowego
-Włącz
-Wyłącz
+na
+od
 OK
 Wybierz 
 Anuluj
@@ -111,7 +113,7 @@ Pozostaw puste dla gości.
 Dokładny odczyt
 Tryb synchroniczny
 Odhookuj Syscalls
-Przejdź filmy
+Tryb 0 PSS
 Emuluj DVD-DL
 Wyłącz IGR
 Moduł dużej pamięci
@@ -144,7 +146,7 @@ Tryb wideo
 Kolor ustawień
 Kolor zaznaczenia
 Wyświetl stronę informacji
-Informacje
+Info
 Niestandardowy ELF
 Wybór koloru
 Połącz ponownie
@@ -206,5 +208,7 @@ Pobrano domyślne
 Auto start w %i s...
 Auto start
 Wartość w sekundach, 0 wyłącza auto start
-PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
+Logo PS2
+Pokaże się tylko jeśli region gry jest zgodny z regionem posiadanej konsoli.
+ELF Loader Menu
+ELF Loader Menu display mode

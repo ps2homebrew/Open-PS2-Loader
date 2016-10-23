@@ -17,6 +17,7 @@ typedef struct
 } usb_vmc_infos_t;
 #endif
 
+char* usbGetPrefix(void);
 void usbInit();
 item_list_t *usbGetObject(int initOnly);
 int usbFindPartition(char *target, char *name);

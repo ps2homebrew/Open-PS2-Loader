@@ -321,6 +321,11 @@ struct UIItem diaConfig[] = {
     {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ELMMODE}}},
+    {UI_SPACER},
+    {UI_ENUM, CFG_ELMMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEFDEVICE}}},
     {UI_SPACER},
     {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
@@ -482,11 +487,11 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, crazyc, dlanor, doctorxyz, hominem.te.esse, ifcaro, izdubar", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, crazyc, danielb, dlanor, doctorxyz, hominem.te.esse, ifcaro,", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"Jay-Jay, jimmikaelkael, misfire, Polo35, reprep, SP193, volca", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, misfire, Polo35, reprep, SP193, volca", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
@@ -498,7 +503,7 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"algol, Berion, danielB, El_Patas, EP, gledson999, lee4, LocalH, RandQalan", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"algol, Berion, El_Patas, EP, gledson999, lee4, LocalH, RandQalan", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},

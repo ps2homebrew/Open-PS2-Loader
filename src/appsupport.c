@@ -9,6 +9,7 @@
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
+#include "include/supportbase.h"
 
 static int appForceUpdate = 1;
 static int appItemCount = 0;
@@ -68,12 +69,52 @@ static int appNeedsUpdate(void)
     return 0;
 }
 
-static int appUpdateItemList(void)
-{
-    appItemCount = 0;
-    configClear(configApps);
-    configRead(configApps);
+static int appUpdateItemList(void) {
+	char path[256];
+	static item_list_t *listSupport = NULL;
+	int ret=0; //Return from configRead
+	appItemCount = 0;
+	
+	//Clear config if already exists
+	if (configApps != NULL)
+		configFree(configApps);
+	
+	//Try MC?:/OPL/conf_apps.cfg
+	snprintf(path, sizeof(path), "%s/conf_apps.cfg", gBaseMCDir);
+	configApps = configAlloc(CONFIG_APPS, NULL, path);
+	ret = configRead(configApps);
+	
+	//Try HDD
+	if ( ret == 0 && (listSupport = hddGetObject(1)) ) {
+		if (configApps != NULL){
+			configFree(configApps);
+		}
+		snprintf(path, sizeof(path), "%sconf_apps.cfg", hddGetPrefix());
+		configApps = configAlloc(CONFIG_APPS, NULL, path);
+		ret = configRead(configApps);
+	}
 
+	//Try ETH
+	if ( ret == 0 && (listSupport = ethGetObject(1)) ) {
+		if (configApps != NULL){
+			configFree(configApps);
+		}
+		snprintf(path, sizeof(path), "%sconf_apps.cfg", ethGetPrefix());
+		configApps = configAlloc(CONFIG_APPS, NULL, path);
+		ret = configRead(configApps);	
+	}
+
+	//Try USB
+	if ( ret == 0 && (listSupport = usbGetObject(1)) ){
+		if (configApps != NULL){
+			configFree(configApps);
+		}
+		snprintf(path, sizeof(path), "%sconf_apps.cfg", usbGetPrefix());
+		configApps = configAlloc(CONFIG_APPS, NULL, path);
+		ret = configRead(configApps);
+	}
+
+	//Count apps
     if (configApps->head) {
         struct config_value_t *cur = configApps->head;
         while (cur) {
@@ -151,20 +192,74 @@ static void appLaunchItem(int id, config_set_t *configSet)
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 }
 
-static config_set_t *appGetConfig(int id)
-{
-    config_set_t *config = configAlloc(0, NULL, NULL);
+static config_set_t* appGetConfig(int id) {
+	config_set_t* config = NULL;
+	static item_list_t *listSupport = NULL;
     struct config_value_t *cur = appGetConfigValue(id);
+	int ret=0;
+	
+	//Search on HDD, SMB, USB for the CFG/GAME.ELF.CFG file.
+	//HDD
+	if ( (listSupport = hddGetObject(1)) ) {
+		char path[256];
+		#if OPL_IS_DEV_BUILD
+			snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", hddGetPrefix(), appGetELFName(cur->val));
+		#else
+			snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddGetPrefix(), appGetELFName(cur->val));
+		#endif
+		config = configAlloc(1, NULL, path);
+		ret = configRead(config);
+	}
+
+	//ETH
+	if ( ret == 0 && (listSupport = ethGetObject(1)) ) {
+		char path[256];
+		if (config != NULL)
+			configFree(config);
+		
+		#if OPL_IS_DEV_BUILD
+			snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", ethGetPrefix(), appGetELFName(cur->val));
+		#else
+			snprintf(path, sizeof(path), "%sCFG/%s.cfg", ethGetPrefix(),appGetELFName(cur->val));
+		#endif
+		config = configAlloc(1, NULL, path);
+		ret = configRead(config);	
+	}
+
+	//USB
+	if ( ret == 0 && (listSupport = usbGetObject(1)) ){
+		char path[256];
+		if (config != NULL)
+			configFree(config);
+		
+		#if OPL_IS_DEV_BUILD
+			snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(),  appGetELFName(cur->val));
+		#else
+			snprintf(path, sizeof(path), "%sCFG/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
+		#endif
+		config = configAlloc(1, NULL, path);
+		ret = configRead(config);
+	}
+
+	if (ret == 0){ //No config found on previous devices, create one.
+		if (config != NULL)
+			configFree(config);
+		
+		config = configAlloc(1, NULL, NULL);
+	}
+	
     configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
     configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
     configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
+	configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
+	configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
     return config;
 }
 
 static int appGetImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
 {
-    value = appGetELFName(value);
-    // We search on ever devices from fatest to slowest (HDD > ETH > USB)
+    //value = appGetELFName(value);
+    // Search every device from fastest to slowest (HDD > ETH > USB)
     static item_list_t *listSupport = NULL;
     if ((listSupport = hddGetObject(1))) {
         if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)

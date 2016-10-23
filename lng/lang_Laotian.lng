@@ -1,5 +1,7 @@
-# Laotian translation by blackbutterfly (Anousith Phompida <noum_terry@hotmail.com>)
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translation by Anousith Phompida <noum_terry@hotmail.com> (aka: blackbutterfly)
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Laotian
 Open PS2 Loader %s
 ບັນທຶກການປ່ຽນແປງ
@@ -111,7 +113,7 @@ NetBIOS
 ອ່ານແບບຖືກຕ້ອງແມ່ນຍຳ
 ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
 Unhook Syscalls
-ຂ້າມວິດີໂອ
+0 PSS mode
 ປະມວນຜົນ DVD-DL 
 Disable IGR
 High module storage
@@ -208,3 +210,5 @@ V-POS
 ຕັ້ງຄ່າຫົວໜ່ວຍ ວິນາທີ, ໃສ່ 0 ເພື່ອປິດການເປີດໃຊ້ແບບໂອໂຕ
 PS2 Logo
 ຈະຖືກສະແດງຜົນ ກໍຕໍ່ເມື່ອໂລໂກ້ຂອງແຜ່ນຖືກຕ້ອງ ແລະ ສອດຄ່ອງຕາມໂຊນຂອງເຄື່ອງ
+ເມນູສຳລັບຈັດການ ELF
+ELF Loader Menu display mode

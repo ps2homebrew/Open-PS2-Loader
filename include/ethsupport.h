@@ -17,6 +17,7 @@ typedef struct
 } smb_vmc_infos_t;
 #endif
 
+char* ethGetPrefix(void);
 void ethInit(void);               //Full initialization (Start ETH + SMB and apply configuration). GUI must be already initialized, used by GUI to start SMB mode.
 void ethDeinitModules(void);      //Module-only deinitialization, without the GUI's knowledge (for specific reasons, otherwise unused).
 int ethLoadInitModules(void);     //Initializes Ethernet and applies configuration.

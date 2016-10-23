@@ -1,5 +1,7 @@
-# Czech translation by jimmysmith
-# For Open PS2 Loader 0.9.3+ betas (r907-r935) - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translated by jimmysmith
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Czech
 Open PS2 Loader %s
 Uložit změny
@@ -76,7 +78,7 @@ Vypínání HDL Serveru...
 Cesta k IGR
 Barva pozadí
 Barva textu
-- PS2 - 
+- PS2 -
 - SMB Server -
 Typ IP adresy
 Statická
@@ -111,7 +113,7 @@ Nechte prázdné pro přihlášení GUEST účtu
 Přesné čtení
 Synchronní mód
 Unhook Syscalls
-Přeskočit videa
+0 PSS mód
 Emulovat DVD-DL
 Vypnout IGR
 Vyšší adresa modulu
@@ -207,4 +209,6 @@ Automatický start v %i s...
 Auto start
 Hodnota v sekundách, zadej 0 pro vypnutí auto startu
 PS2 Logo
-Zobrazováno pouze u validního loga disku, který má stejný region jako konzole
+Only displayed for a valid disc logo which matches the console's region
+ELF Loader Menu
+ELF Loader Menu mód

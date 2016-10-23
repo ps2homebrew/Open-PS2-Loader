@@ -1,80 +1,82 @@
-# Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
-Portuguese Brazil
+# Translation by Colossus and tonyhoro
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
+Brazilian Portuguese
 Open PS2 Loader %s
-Salvar mudanças
+Guardar Configurações
 Voltar
-Configurações de rede
+Configurações de Rede
 Opções avançadas
 <sem valores>
-Configurações salvas...
-Erro ao salvar as configurações!
+Configurações Guardadas
+Erro ao guardar configurações!
 Sair
-Configurações
+Configurações Gerais
 Menu
-Jogos no USB
+Jogos em USB
 Jogos no HDD
-Jogos em ETH
+Jogos na Rede
 Aplicativos
-Temas
+Tema
 Idioma
-O sistema será desligado.
-Sair para o Navegador/OSDSYS?
-Cancelar as atualizações?
+O sistema será desligado
+Sair para o Navegador do PS2/OSDSYS?
+Cancelar atualizações?
 %d: O Disco Rígido não foi detectado
 %d: O Disco Rígido não está formatado
-%d: Erro ao iniciar a rede
+%d: Erro ao iniciar rede
 %d: Nenhum adaptador de rede foi detectado
-%d: Não foi possível conectar com o servidor SMB
-%d: Não foi possível entrar no servidor SMB
-%d: Não foi possível abrir o compartilhamento no SMB
-%d: Não foi possível listar o compartilhamento no SMB
-%d: Não foi possível listar os jogos
-%d: O servidor DHCP está indisponível
-%d: Nenhuma conexão de rede
-ON 
-OFF
-Ok
-Ok
+%d: Não foi possível conectar ao servidor SMB
+%d: Não foi possível logar no servidor SMB
+%d: Não foi possível abrir o compartilhamento SMB
+%d: Impossível listar compartilhamentos SMB
+%d: Impossível listar jogos
+%d: Servidor DHCP indisponível
+%d: Sem conexão de rede
+Ativ.
+Desativ.
+Confirmar
+Eleger
 Cancelar
 O
 X
 Lista de Jogos
 Configurar
-Remover todas as configurações
-Todas as configurações dos jogos foram removidas
-Rolagem
+Apagar configurações
+As configurações do jogo foram apagadas
+Velocidade de rolagem
 Lenta
 Média
 Rápida
 Menu padrão
 Carregar do disco
-Por favor aguarde
-Erro ao carregar o ID do jogo
+Por favor espere
+Erro ao carregar ID do jogo
 Organizar em ordem alfabética
-Erro ao carregar os arquivos de idioma
+Erro ao carregar arquivo de idioma
 Desativar cores de depuração
-Nenhum controle detectado, aguardando...
-Habilitar as artes da Capa
-Tela panorâmica
-Desligar o PS2
-Carregando configurações
-Salvando configurações...
+Nenhum controle detectado, esperando...
+Habilitar Artes de Capa
+Tela Panorâmica
+Desligar PS2
+Carregando configurações...
+Guardando configurações...
 Iniciar dispositivo
 Atualizar
-Modo de inicio no USB
-Modo de inicio no HDD
-Modo de inicio no ETH
-Modo de inicio nos Aplicativos
+Modo de inicio do USB
+Modo de inicio do HDD
+Modo de inicio da Rede
+Modo de inicio de Aplicativos
 Automático
 Manual
-Iniciar o Servidor HDL
-O servidor HDL está iniciando...
-O servidor HDL está sendo executado...
-Falha ao iniciar o servidor HDL.
-O servidor HDL está sendo encerrado...
-Caminho de saída do IGR
-Cor do fundo
+Iniciar Servidor HDL
+O Servidor HDL está sendo iniciado...
+O Servidor HDL está sendo executado...
+Falha ao iniciar Servidor HDL
+O Servidor HDL está sendo encerrado...
+Definir saída do IGR
+Cor de fundo
 Cor do texto
 - PS2 -
 - Servidor SMB -
@@ -90,75 +92,75 @@ Porta
 Compartilhamento
 Usuário
 Senha
-<sem definição>
+<não usado>
 Tipo de Endereço
 IP
 NetBIOS
-Aceitar
-O item será apagado permanentemente, continuar?
+Confirmar
+O item será apagado permanentemente! Continuar?
 Renomear
 Apagar
 Iniciar
-Configurações de tela
-Ativar opções de escritas
-Verificar fragmentação no USB
-Lembrar do último jogo jogado
-Botão de seleção
+Configurações de Tela
+Ativar funções Apagar e Renomear
+Verificar fragmentação de jogos em USB
+Lembrar último jogo jogado
+Botão de Seleção
 Erro, o jogo está fragmentado
-Erro, o item não pode ser iniciado
+Erro, não foi possível iniciar o item
 Testar
-Deixe em branco para não usar senhas.
-Leituras corretas
+Deixar vazio para conectar como convidado (GUEST)
+Leituras mais precisas
 Modo de Sincronia
 Desativar chamadas do sistema
-Pular videos
+Pular vídeos PSS
 Emular DVD-DL
-Desativa o IGR
-Armazenamento dos módulos elevados
-Esconder módulo dev9
-Mudando de tamanho, formatará o VMC
+Desativar IGR
+Armazenamento elevado dos módulos
+Esconder módulo DEV9
+Escolha o tamanho do VMC, caso já exista, alterar o tamanho irá reformatá-lo
 Criar
 Iniciar
 Modificar
-Abortar
-Reiniciar
-Usa o genérico
-Configure o VMC
+Cancelar
+Resetar
+Usar genérico
+Configurar VMC
 Nome
 Tamanho
-Estatísticas
+Estado
 Progresso
-O arquivo do VMC já existe
+Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
-O arquivo do VMC precisa ser criado
-Error com o VMC %s, continuar com o MC físico (slot %d) ?
+Arquivo VMC precisa ser criado
+Erro com o VMC %s, continuar com Memory Card físico (slot %d) ?
 Atualização automática
-Créditos
+Sobre
 Desenvolvedores
 Controle de Qualidade
-Prefixo do caminho USB
-Inicia um ELF preferencial após um IGR
+Prefixo de caminho USB
+Iniciar ELF Personalizado depois do IGR
 Valor em minuto(s), 0 para desativar
 Desligamento automático do HDD
-Modo de vídeo
+Modo de Vídeo
 Cor do diálogo
 Cor selecionada
 Mostrar Página de Informação 
-Info.
-ELF modificado
+Info
+ELF personalizado
 Seleção de Cor
 Reconectar
 Deixar vazio para listar compartilhamentos
-Prefixo de caminho ETH
+Prefixo de caminho de Rede
 Apagar
 Espaço
-Enter
+Confirmar
 Modo
 VMC Slot 1
 VMC Slot 2
 ID do Jogo
-Modo de DMA
-Sincronização do vídeo 
+Modo DMA
+Sincronização Vertical
 Modo 1
 Modo 2
 Modo 3
@@ -168,43 +170,45 @@ Modo 6
 Modo 7
 Modo 8
 Configurar GSM
-Modo de link da Internet
-100Mbit duplex-integral
-100Mbit semi-duplex
-10Mbit duplex-integral
-10Mbit semi-duplex
-Opções do GSM
+Modo de conexão Ethernet
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Configurações do GSM
 Ativar GSM
-Ativar/Desativar o GSM
-VMODE
-NTSC/PAL/60Hz/PS1/HDTV/VGA
-POS-H
-Ajustes Horizontais
-POS-V
-Ajustes Verticais
+Ativar ou Desativar o GSM
+Modo de Vídeo
+Força o Modo de Vídeo escolhido
+Posição Horizontal
+Ajuste Horizontal
+Posição Vertical
+Ajuste Vertical
 Pular FMV
 Pula os vídeos do jogo
-Opções de trapaças
-Ativar o PS2RD Cheat Engine
-Deixar o PS2RD patchear seus jogos
+Opções de Cheats (trapaças)
+Ativar PS2RD Cheat Engine
+Permitir que o PS2RD Cheat Engine injete códigos nos jogos
 Modo do PS2RD Cheat Engine
-Auto-selecionar ou Escolher as trapaças
-Auto-selecionar trapaças
-Selecionar trapaças
-Erro: falha ao carregar as trapaças
-Nenhuma trapaça encontrada
+Auto selecionar ou Selecionar Cheats (trapaças)
+Auto selecionar Cheats (trapaças)
+Selecionar Cheats (trapaças)
+Erro: falha ao carregar arquivo de Cheats (trapaças)
+Nenhum cheat (trapaça) encontrado
 Baixar configurações
-Atualizar pela Internet
+Atualização pela Internet
 Baixar dados existentes novamente?
-Falha na atualização.
-Falha ao conectar no servidor de atualização.
-Atualização concluída.
-Atualização cancelada.
-Baixar configurações da Internet?
+Falha na atualização
+Falha ao conectar no servidor de atualização
+Atualização concluída
+Atualização cancelada
+Baixar configurações pela Internet?
 Configurações personalizadas
 Configurações baixadas
-Iniciar automaticamente no %i s...
-Auto-começar
-Valores em segundos (s), 0 para desativar
-Logotipo do Playstation 2
-Será mostrado apenas no jogo que for da mesma região do console
+Auto iniciar em %i s...
+Auto iniciar
+Valor em segundo(s), 0 para desativar
+Logotipo do PS2
+Aparece apenas se houver um logotipo válido que seja da mesma região que o console
+ELF Loader Menu
+Modo de inicio do ELF Loader Menu

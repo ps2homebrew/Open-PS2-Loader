@@ -14,6 +14,7 @@ enum INTERNAL_TEXTURE {
     HDD_ICON,
     ETH_ICON,
     APP_ICON,
+    ELM_ICON,
     LEFT_ICON,
     RIGHT_ICON,
     UP_ICON,

@@ -64,6 +64,10 @@ static int ethGetNetIFLinkStatus(void);
 
 static int ethInitSemaID = -1;
 
+char* ethGetPrefix(void){
+	return ethPrefix;
+}
+
 //Initializes locking semaphore for network support (not for just SMB support, but for the network subsystem).
 static int ethInitSema(void)
 {

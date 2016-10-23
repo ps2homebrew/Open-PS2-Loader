@@ -8,6 +8,7 @@ enum IO_MODES {
     ETH_MODE,
     HDD_MODE,
     APP_MODE,
+    ELM_MODE,
 
     MODE_COUNT
 };

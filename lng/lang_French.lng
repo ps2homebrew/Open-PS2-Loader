@@ -1,164 +1,166 @@
-# French translation by ShaolinAssassin - @http://psx-scene.com/forums/members/shaolinassassin/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translation by machiavel
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 French
 Open PS2 Loader %s
 Sauvegarder
 Retour
-Configuration du réseau
-Réglages avancés
-<non renseigné>
-Configuration sauvegardée...
-Erreur lors de la sauvegarde de la configuration
-Quitter Open PS2 Loader
-Configuration
+Configuration réseau
+Options avancées
+<vide>
+Options sauvegardées...
+Erreur d'écriture des options!
+Quitter
+Options
 Menu
-Périphérique USB
-Disque dur interne
-Serveur SMB
+Jeux USB
+Jeux HDD
+Jeux ETH
 Apps
 Thème
 Langue
-Le système va être éteint
-Retour au navigateur PS2 / OSDSYS ?
-Annuler le téléchargement ?
-Erreur %d: disque dur non détecté
-Erreur %d: disque dur non formaté
-Erreur %d au démarrage du réseau
-Erreur %d: adaptateur réseau non détecté
-Erreur %d: connexion  au serveur SMB impossible
-Erreur %d: identification auprès du serveur SMB impossible
-Erreur %d: ouverture du partage SMB impossible
-Erreur %d: listing des partages SMB impossible à établir
-Erreur %d: listing des jeux impossible à établir
-Erreur %d: serveur DHCP indisponible
-Erreur %d: connexion réseau inexistante
+Le système va être éteint.
+Quitter vers Menu/OSDSYS?
+Annuler mise à jour?
+%d: HDD non détecté
+%d: HDD non formaté
+%d: Erreur démarrage réseau
+%d: adaptateur réseau non détecté
+%d: Ne peut se connecter au serveur SMB
+%d: Ne peut s'authentifier au serveur SMB
+%d: Ne peut ouvrir le partage SMB
+%d: Ne peut lister les partages SMB
+%d: Ne peut lister les jeux
+%d: Serveur DHCP indisponible
+%d: Pas de connexion réseau
 On
 Off
-Valider
-Valider
+OK
+Select
 Annuler
-O
-X
+Cercle
+Croix
 Liste des jeux
-Réglages
-Supprimer tous les réglages
-Réglages du jeu supprimés
+Options du jeu
+Effacer les options
+Options du jeu supprimées
 Défilement
 Lent
 Moyen
 Rapide
-Page au démarrage
+Menu par défaut
 Charger depuis le disque
 Veuillez patienter
 Erreur lors du chargement de l'ID du jeu
-Tri alphabétique
+Tri automatique
 Erreur lors du chargement du fichier langue
-Passer l'écran de debug
-La manette PS2 a été déconnectée…
-Fichiers ART
+Désactiver couleurs de debug
+Aucune manette détectée, attente...
+Activer jaquette
 Écran large
-Éteindre le système
-Chargement...
-Sauvegarde de la configuration
+Éteindre
+Chargement config
+Sauvegarde config
 Démarrer le périphérique
 Rafraîchir
-Démarrage du périphérique USB
-Démarrage du disque dur interne
-Démarrage du serveur SMB
-Page apps
-Automatique
+Mode de démarrage USB
+Mode de démarrage HDD
+Mode de démarrage SMB
+Mode d'affichage du menu des apps
+Auto
 Manuel
-Démarrer le serveur HDL
-Serveur HDL en cours de démarrage...
-Serveur HDL connecté…
-Échec au démarrage du serveur HDL
-Fermeture du serveur HDL…
-Sortie via IGR vers :
-Arrière-plan
-Texte principal
-- PS2 - 
+Démarrer serveur HDL
+Démarrage serveur HDL...
+Serveur HDL démarré...
+Démarrage serveur HDL échoué
+Déchargement serveur HDL...
+Chemin IGR
+Couleur de fond
+Couleur du texte
+- PS2 -
 - Serveur SMB -
 Type d'adresse IP
 Statique
-Dynamique
+DHCP
 Adresse IP
 Adresse
-Masque de sous-réseau
-Passerelle par défaut
+Masque
+Passerelle
 Serveur DNS
 Port
-Nom du serveur SMB
-Nom d'utilisateur
+Partage
+Utilisateur
 Mot de passe
-<non renseigné>
+<non défini>
 Type d'adresse
 IP
 NetBIOS
-Valider
-L'item sera définitivement supprimé, continuer ?
+Accepter
+L'objet sera définitivement supprimé, continuer ?
 Renommer
-Suppr.
+Supprimer
 Lancer
-Configuration de l'affichage
-Opérations d'écriture
-Vérifier fragmentation (USB)
-Dernier jeu joué
-Touche de validation
+Options d'affichage
+Activer l'écriture
+Vérifier fragmentation jeu USB
+Souvenir dernier jeu joué
+Bouton de sélection
 Erreur, le jeu est fragmenté
-Erreur, impossible de lancer l'item
-Tester les réglages
-Laisser le champ vide pour s'identifier en tant qu'invité
-Simuler la vitesse de lecture du CD/DVD
-Mode de lecture alternatif (lecture synchrone)
-Purger OPL après lancement du jeu
-Passer les cinématiques
-Émuler support double couche (DVD9 rippés en DVD5)
-Désactiver l'IGR (incompatible avec certains jeux)
-Charger les modules de stockage à une adresse plus élevée
-Renommer le module DEV9 en CDVDMAN
-Changer la taille de la VMC la formatera
+Erreur, impossible de lancer l'objet
+Tester
+Laisser vide pour authentification invité
+Lecture précise (simule la vitesse de lecture du CD/DVD)
+Mode synchrone (mode de lecture alternatif)
+Décrocher Syscalls (purge OPL après lancement du jeu)
+Mode 0 PSS (Passe les cinématiques)
+Émuler DVD-DL (DVD9 rippés en DVD5)
+Désactiver IGR (incompatible avec certains jeux)
+Stockage élevé (charge les modules de stockage à une adresse plus élevée)
+Cacher module DEV9 (Renomme le module DEV9 en CDVDMAN)
+Changer la taille reformatera la VMC
 Créer
 Démarrer
 Modifier
 Abandonner
 Réinitialiser
 VMC générique
-Configurer la carte mém. virtuelle
+Configurer la VMC
 Nom
 Taille
 État
 Progression
-La carte mém. virtuelle existe déjà 
-Fichier carte mém. virtuelle non valide, taille incorrecte
-La carte mém. virtuelle doit d'abord être créée
-Erreur sur la carte mém. virtuelle %s. Continuer sur la carte mém. physique %d ?
+Fichier VMC existant
+Fichier VMC invalide, taille incorrecte
+Fichier VMC doit d'abord être créé
+Erreur sur VMC %s. Continuer sur MC physique %d ?
 Rafraîchissement automatique
-Crédits
-Développeurs
-Béta-testeurs
-Préfixe du chemin du périph. USB
-Laisser le champ <non renseigné> pour quitter OPL vers le navigateur PS2
+À propos
+Codeurs
+Assurance qualité
+Préfixe du chemin USB
+Lancer ELF perso après un IGR
 En minute(s), 0 pour désactiver l'arrêt automatique
-Arrêt auto. disque dur interne
+Arrêt auto. HDD
 Mode vidéo
-Options
-Sélection
-Page d'informations
+Couleur dialogue
+Couleur sélectionné
+Afficher page d'infos
 Infos.
-ELF alternatif
-Choix des couleurs de l'interface
+ELF personnalisé
+Sélection de la couleur
 Reconnecter
-Laisser le champ <non renseigné> pour lister les dossiers partagés
-Préfixe du chemin du réseau
+Laisser vide pour lister les partages
+Préfixe du chemin ETH
 Effacer
 Espace
-Valider
-Maj/Min
-Carte mém. virtuelle (VMC) 1
-Carte mém. virtuelle (VMC) 2
-ID
+Entrer
+Mode
+Port VMC 1
+Port VMC 2
+ID jeu
 Vitesse de lecture (mode DMA)
-Synchronisation verticale
+Synchro verticale
 Mode 1
 Mode 2
 Mode 3
@@ -168,43 +170,45 @@ Mode 6
 Mode 7
 Mode 8
 Configurer GSM
-Vitesse Ethernet
+Lien mode ETH
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-Configuration de GSM
-GSM
-Activer/Désactiver GSM
-Mode vidéo à forcer
-Modes vidéo disponibles : NTSC/PAL/60Hz/PS1/HDTV/VGA
-Ajustement horizontal de l'écran
-Ajouter/Soustraire
-Ajustement vertical de l'écran
-Ajouter/Soustraire
-Avance rapide
-Passer les vidéos au format FMV
-Configuration de PS2RD
-PS2RD
-Activer/Désactiver PS2RD
-Activation des codes
+Options GSM
+Activer GSM
+Basculer On/Off GSM
+VMODE
+Mode d'affichage perso forcé
+Pos. H
+Ajustement horizontal
+Pos. V
+Ajustement vertical
+Passer FMV
+Passe les FMV
+Options de cheat
+Activer PS2RD
+Laisser PS2RD patcher vos jeux
+Mode PS2RD
 Automatique/Manuel
 Automatique
 Manuel (inactif, fonction à venir)
-Échec du chargement du fichier de code .cht
-Fichier de code .cht introuvable
-Télécharger les régl. prédéfinis
-Téléchargement des régl. prédéfinis
-Mise à jour des données existantes
-Échec du téléchargement
-Impossible de se connecter au serveur
-Téléchargement effectué avec succès
-Téléchargement annulé
-Télécharger les régl. prédéfinis depuis Internet ?
-Réglages personnalisés
-Réglages prédéfinis
-Lancement automatique dans %s…
-Lancement auto.
-En seconde(s), 0 pour désactiver le lancement automatique
+Erreur: Impossible de charger le fichier de cheat
+Aucun cheat trouvé
+Télécharger les régl. par défaut
+Mise à jour réseau
+Re-télécharger les données existantes?
+Mise à jour échouée
+Échec de connexion au serveur
+Mise à jour terminée.
+Mise à jour annulée.
+Télécharger les options depuis le réseau?
+Options personnalisées
+Options par défaut téléchargées
+Démarrage auto dans %i s...
+Démarrage auto.
+Valeur en seconde(s), 0 pour désactiver le démarrage auto
 Logo PS2
-S’affiche uniquement si le jeu et la console appartiennent à la même zone
+S'affiche uniquement si le logo du disque est compatible avec la région de votre console
+Menu lanceur d'ELF
+Mode d'affichage du menu lanceur d'ELF

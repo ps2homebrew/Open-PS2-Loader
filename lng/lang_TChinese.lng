@@ -1,5 +1,7 @@
-# Traditional Chinese translation by kane159 - kane159<kane12369@gmail.com
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+﻿# Translated by kane159
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Traditional Chinese
 Open PS2 Loader %s
 保存設置
@@ -111,7 +113,7 @@ GUEST驗證留空.
 精確讀取
 同步模式
 脫開系統調用
-跳过视频
+0 PSS 模式
 模擬 DVD-DL
 禁用 IGR
 隱藏模式內存
@@ -208,3 +210,5 @@ PS2RD 金手指引擎模式
 以秒為單位,設為 0 來禁用自動啟動
 PS2 Logo
 Only displayed for a valid disc logo which matches the console's region
+ELF Loader Menu
+ELF Loader Menu display mode

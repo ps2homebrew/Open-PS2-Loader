@@ -1,5 +1,7 @@
-# German translation by ps2guy
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# German Translation by ps2guy and lopotri
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 German
 Open PS2 Loader %s
 Änderungen speichern
@@ -21,11 +23,11 @@ Sprache
 Das System wird ausgeschaltet.
 Verlassen und zum Browser/OSDSYS zurückkehren?
 Aktualisierung abbrechen?
-%d: Festplatte wurde nicht gefunden
-%d: Festplatte ist nicht formatiert
+%d: Festplatte nicht erkannt
+%d: Festplatte ist nicht formatiert 
 %d: Fehler beim Starten des Netzwerks
-%d: Netzwerkadapter nicht gefunden
-%d: Keine Verbindung mit dem SMB Server möglich
+%d: Netzwerkadapter nicht erkannt
+%d: Keine verbindung zum SMB Server
 %d: Keine Anmeldung am SMB Server möglich
 %d: SMB Freigabe kann nicht geöffnet werden
 %d: SMB Freigaben können nicht aufgelistet werden
@@ -42,7 +44,7 @@ Kreuz
 Spieleliste
 Spieleinst.
 Entferne alle Einstellungen
-Entferne alle keys für das Spiel
+Alle keys für das Spiel wurden entfernt
 Scrollen
 Langsam
 Mittel
@@ -54,18 +56,18 @@ Fehler beim Laden der Spiel-ID
 Automatische Sortierung
 Fehler beim Laden der Sprachdatei
 Deaktiviere Debugfarben
-Kein Controller erkannt, warten...
+Kein Controller erkannt, warte...
 Aktiviere Cover Bilder
 Breitbild
 Ausschalten
 Lade Konfiguration
 Speichere Konfiguration
-Gerät starten
+Peripherie starten
 Aktual.
-USB-Gerät Start Modus
-HDD-Gerät Start Modus
-ETH-Gerät Start Modus
-Anwendung Start Modus
+USB Start Modus
+HDD Start Modus
+ETH Start Modus
+Anwendungen Menü Anzeigen
 Automatisch
 Manuell
 Starte HDL Server
@@ -76,8 +78,8 @@ HDL Server entlädt...
 IGR-Pfad
 Hintergrundfarbe
 Textfarbe
-- PS2 - 
-SMB Server -
+- PS2 -
+- SMB Server -
 IP-Adresstyp
 Statisch
 DHCP
@@ -87,7 +89,7 @@ Netzmaske
 Gateway
 DNS Server
 Port
-Freigeben
+Freigabe
 Benutzername
 Passwort
 <nicht eingestellt>
@@ -100,10 +102,10 @@ Umbenennen
 Löschen
 Ausführen
 Bildschirmeinstellungen
-Aktiviere Schreiborperationen
-Überprüfe USB Spielefragmentierung
-Erinnere an zuletzt gespieltes Spiel
-Auswählen button
+Aktiviere Schreiboptionen
+Prüfe USB Spielefragmentierung
+Merke zuletzt gespieltes Spiel
+Auswahltaste
 Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
 Test
@@ -111,25 +113,25 @@ Leer lassen für Anmeldung als GAST
 Korrekte Lesegeschw
 Synchronmodus
 Systemaufrufe aushängen
-Videos überspringen
+0 PSS Modus
 Emuliere DVD-DL
 Deaktiviere IGR
-Speichermodul
-Verstecke dev9 Modul
-Die Änderung der Größe wird die VMC erneut formatieren.
+Erhöhte Speichermoduladresse
+Verstecke DEV9 Modul
+Ändern der Größe wird die VMC erneut formatieren!
 Erstellen
 Starten
-Modifizieren
+Bearbeiten
 Abbrechen
-Neu starten
-Nutze allgemeinen
+Zurücksetzen
+Benutze generierten
 Konfiguriere VMC
 Name
 Größe
 Status
 Fortschritt
-VMC Datei existiert
-Ungültige VMC Datei, Größe ist nicht korrekt
+VMC-Datei existiert
+Ungültige VMC-Datei, Größe ist nicht korrekt
 VMC-Datei muss erstellt werden
 Fehler mit VMC %s, fahre fort mit phys. MC (Steckplatz %d)?
 Automatisch aktualisieren
@@ -137,18 +139,18 @@ Automatisch aktualisieren
 Programmierer
 Qualitätssicherung
 USB Präfix Pfad
-Startet eine Custom ELF nach einem IGR
+Startet benutzerdef. ELF nach einem IGR
 Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
-Automatische Abschaltung der Festplatte
+Autom. Abschaltung der Festplatte
 Videomodus
 Dialogfarbe
-Ausgewählte Farbe
+Auswahlfarbe
 Infoseite anzeigen
 Info
 Benutzerdefinierte ELF
 Farbauswahl
 Verbindung wiederherstellen
-Leerlassen um Freigaben aufzulisten
+Leer lassen um Freigaben aufzulisten
 ETH Präfix Pfad
 Rücktaste
 Leertaste
@@ -168,28 +170,28 @@ Modus 6
 Modus 7
 Modus 8
 GSM konfigurieren
-Ethernet-Geschwindigkeitsmodus
+ETH Geschwindigkeitsmodus
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
 GSM Einstellungen
 Aktiviere GSM
-Schalte GSM AN oder AUS
+Schaltet GSM AN oder AUS
 VMODE
 Erzwungener benutzerdefinierter Bildschirmmodus
 H-POS
-Horizontale Einstellung
+Horizontale Justierung
 V-POS
-Vertikale Einstellung
+Vertikale Justierung
 Videosequenzen (FMV) überspringen
 Überspringe Full Motion Videos
 Cheat Einstellungen
 Aktiviere PS2RD Cheat Engine
-PS2RD Cheat Engine deine Spiele patchen lassen
+PS2RD Cheat Engine Spiele patcher
 PS2RD Cheat Engine Modus
 Automatisch auswählen lassen oder Spielecheats auswählen
-Automatisch Cheats auswählen
+Autom. Auswahl der Cheats
 Wähle Spielecheats
 Fehler: Laden des Cheat-File fehlgeschlagen
 Keine Cheats gefunden
@@ -200,11 +202,13 @@ Aktualisierung fehlgeschlagen.
 Verbindung zum Updateserver fehlgeschlagen.
 Aktualisierung abgeschlossen.
 Aktualisierung abgebrochen.
-Einstellungen übers Netzwerk laden?
+Einstellungen übers Netzwerk herunterladen?
 Benutzerdefinierte Einstellungen
 Standardeinstellungen heruntergeladen
 Automatischer Start in %i s...
 Automatischer Start
-Wert in Sekunden (sek), 0 zum Deaktivieren 
+Wert in Sekunden (sek), 0 um Auto-start zu deaktivieren
 PS2 Logo
 Wird nur bei gültigem Disc Logo angezeigt, welches mit der Region der Konsole übereinstimmen muss
+ELF-starter Menü
+ELF-starter Menü Anzeigen

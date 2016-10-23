@@ -1,5 +1,7 @@
-# Spanish translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translation by lauchon22
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
 Open PS2 Loader %s
 Guardar cambios
@@ -19,7 +21,7 @@ Aplicaciones
 Estilo
 Idioma
 Se apagará el sistema.
-¿Salir al Navegador/OSDSYS de la consola?
+¿Salir al navegador/OSDSYS?
 ¿Cancelar actualización?
 %d: Disco duro no detectado
 %d: Disco duro no formateado
@@ -32,8 +34,8 @@ Se apagará el sistema.
 %d: No se pueden listar los juegos
 %d: Servidor DHCP no disponible
 %d: No hay conexión de red
-Activa.
-Desact.
+Sí
+No
 Aceptar
 Aceptar
 Cancelar
@@ -65,7 +67,7 @@ Refrescar
 Modo de inicio para USB
 Modo de inicio para Disco duro
 Modo de inicio para Red
-Modo de inicio para Aplicaciones
+Modo inicio de menú de Aplicaciones
 Automático
 Manual
 Iniciar servidor HDLDump
@@ -74,7 +76,7 @@ Servidor HDLDump conectado...
 Error al iniciar el servidor HDLDump. 
 Cerrando servidor HDLDump...
 Ruta del IGR
-Color de fondo
+Color de fondo 
 Color de texto
 - PS2 -
 - Servidor SMB -
@@ -111,7 +113,7 @@ Dejar en blanco para autentificar como GUEST
 Lectura precisa
 Modo sincronizado
 Desvincula el sistema
-Omite vídeos
+Omite los vídeos PSS
 Emula DVD-DL
 Quita el IGR
 Almacena los módulos en alta dirección de memoria
@@ -131,13 +133,13 @@ Progreso
 Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
-Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
+Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d) ?
 Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
 Testeadores
 Ruta predeterminada dispositivo USB
-Dejar en blanco para salida hacia el navegador de PS2
+Lanzar ELF personalizado después de IGR
 Valor en minutos, 0 para desactivar el paro automático
 Paro automático rotación del Disco duro
 Modo de vídeo interfaz
@@ -175,9 +177,9 @@ Configuración de velocidad ethernet y duplex
 10Mbit half-duplex
 Opciones GSM
 Activar GSM
+Activar o desactivar GSM
+VMODO
 Forzar modo de vídeo seleccionado con GSM
-Modo de vídeo seleccionado
-Modo de vídeo a forzar
 Ajuste horizontal
 Configura la posición horizontal de la pantalla
 Ajuste vertical
@@ -206,5 +208,7 @@ Descargados ajustes predeterminados
 Inicio en %i s...
 Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
-Logotipo Playstation 2
-Sólo se mostrará si el juego es de la misma región que la consola
+PS2 Logo
+Solo se muestra con un disco válido en una consola de la misma región
+ELF Loader Menu
+Modo inicio de menú de ELF Loader

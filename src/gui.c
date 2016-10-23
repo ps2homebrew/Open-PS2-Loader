@@ -379,6 +379,7 @@ void guiShowConfig()
     diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
+    diaSetEnum(diaConfig, CFG_ELMMODE, deviceModes);
 
     diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
@@ -399,6 +400,7 @@ void guiShowConfig()
     diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
     diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
     diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
+    diaSetInt(diaConfig, CFG_ELMMODE, gELMStartMode);
 
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
@@ -422,6 +424,7 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
+        diaGetInt(diaConfig, CFG_ELMMODE, &gELMStartMode);
 
         applyConfig(-1, -1);
     }
@@ -1055,6 +1058,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_DMA);
         configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+        configRemoveKey(configSet, CONFIG_ITEM_MODES);
         configRemoveKey(configSet, CONFIG_ITEM_DNAS);
         configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 #ifdef GSM
@@ -1070,10 +1074,18 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         menuSaveConfig();
     } else if (result > 0) { // test button pressed or save button
         compatMode = 0;
-        for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
+        char modesBuf[16];//(1+2+3+4+5+6+7+8)= 15 +1 null
+        int modesBufPos = 0;
+	    for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
             int mdpart;
             diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
             compatMode |= (mdpart ? 1 : 0) << i;
+            if (mdpart){
+                if(modesBufPos == 0)
+					modesBufPos+=sprintf(modesBuf + modesBufPos, "%d", i+1);
+                else
+					modesBufPos+=sprintf(modesBuf + modesBufPos, "+%d", i+1);
+            }
         }
 
         if (support->flags & MODE_FLAG_COMPAT_DMA) {
@@ -1084,10 +1096,13 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
                 configRemoveKey(configSet, CONFIG_ITEM_DMA);
         }
 
-        if (compatMode != 0)
-            configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+		if (compatMode != 0){
+			configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+			configSetStr(configSet, CONFIG_ITEM_MODES, modesBuf);
+		}else{
+			configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+			configRemoveKey(configSet, CONFIG_ITEM_MODES);
+		}
 
 #ifdef GSM
         diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);

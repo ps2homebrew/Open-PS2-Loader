@@ -44,6 +44,10 @@ static base_game_info_t *usbGames;
 // forward declaration
 static item_list_t usbGameList;
 
+char* usbGetPrefix(void){
+	return usbPrefix;
+}
+
 //Identifies the partition that the specified file is stored on and generates a full path to it.
 int usbFindPartition(char *target, char *name)
 {

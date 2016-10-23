@@ -160,6 +160,8 @@ void configInit(char *prefix)
     configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
     snprintf(path, sizeof(path), "%s/conf_apps.cfg", prefix);
     configAlloc(CONFIG_APPS, &configFiles[CONFIG_INDEX_APPS], path);
+    snprintf(path, sizeof(path), "%s/conf_elm.cfg", prefix);
+    configAlloc(CONFIG_ELM, &configFiles[CONFIG_INDEX_ELM], path);
     snprintf(path, sizeof(path), "%s/conf_network.cfg", prefix);
     configAlloc(CONFIG_NETWORK, &configFiles[CONFIG_INDEX_NETWORK], path);
 }

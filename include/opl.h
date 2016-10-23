@@ -100,6 +100,7 @@ int gUSBStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
+int gELMStartMode;
 
 int gAutosort;
 int gAutoRefresh;

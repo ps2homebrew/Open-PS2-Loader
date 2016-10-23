@@ -1,5 +1,7 @@
-# Indonesian translation by verislasher
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# translated by verislasher
+# Last update: 08/25/2016 
+# Updated for OPL_r928_DB [616d6fd]
+# official thread: http://ps2home.freeforums.net/post/1966/thread
 Indonesian
 Open PS2 Loader %s
 Simpan Perubahan
@@ -76,7 +78,7 @@ Mengembalikan Server HDL...
 Pintasan IGR
 Warna latar belakang
 Warna teks
-- PS2 - 
+- PS2 -
 - SMB Server -
 Jenis alamat IP
 Statis
@@ -111,7 +113,7 @@ Tinggalkan kosong untuk Otent TAMU.
 Membaca akurat
 Mode Sinkronisasi
 Melepas kaitan syscalls
-Loncat Video
+Mode PSS 0
 Emulasi DVD-DL
 Nonaktifkan IGR
 Mode Penyimpanan Tinggi
@@ -208,3 +210,5 @@ Mulai otomatis
 Nilai dalam detik, 0 mencegah mulai otomatis
 Logo PS2
 Hanya ditampilkan untuk logo disc yang valid yang cocok dengan region konsol
+Menu peluncur ELF
+Mode Tampilan Menu Pemuat ELF

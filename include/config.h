@@ -6,6 +6,7 @@ enum CONFIG_INDEX {
     CONFIG_INDEX_OPL = 0,
     CONFIG_INDEX_LAST,
     CONFIG_INDEX_APPS,
+    CONFIG_INDEX_ELM,
     CONFIG_INDEX_NETWORK,
 
     CONFIG_INDEX_COUNT
@@ -15,6 +16,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL (1 << CONFIG_INDEX_OPL)
 #define CONFIG_LAST (1 << CONFIG_INDEX_LAST)
 #define CONFIG_APPS (1 << CONFIG_INDEX_APPS)
+#define CONFIG_ELM (1 << CONFIG_INDEX_ELM)
 #define CONFIG_NETWORK (1 << CONFIG_INDEX_NETWORK)
 #define CONFIG_ALL 0xFF
 
@@ -32,6 +34,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_ALTSTARTUP "$AltStartup"
 #define CONFIG_ITEM_VMC "$VMC"
 #define CONFIG_ITEM_COMPAT "$Compatibility"
+#define CONFIG_ITEM_DMA "Modes"
 #define CONFIG_ITEM_DMA "$DMA"
 #define CONFIG_ITEM_DNAS "$DNAS"
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
@@ -73,6 +76,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_HDD_MODE "hdd_mode"
 #define CONFIG_OPL_ETH_MODE "eth_mode"
 #define CONFIG_OPL_APP_MODE "app_mode"
+#define CONFIG_OPL_ELM_MODE "elm_mode"
 #define CONFIG_OPL_SWAP_SEL_BUTTON "swap_select_btn"
 
 //Network config keys

@@ -180,9 +180,9 @@ struct UIItem diaCompatConfig[] = {
 // out of Childproof and unintended builds. --Bat--
 #ifdef GSM
     {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSCONFIG}}},
-		#if defined(GSM) && defined(CHEAT);
+	if defined(GSM) && defined(CHEAT); 
 		{UI_SPACER},
-		#else
+	else
 		{UI_BREAK},
 #endif
 

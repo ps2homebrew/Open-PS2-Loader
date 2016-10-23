@@ -109,6 +109,10 @@ int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
 int gSelectButton;
 
+#ifdef IGS
+#define IGS_VERSION "0.1"
+#endif
+
 // ------------------------------------------------------------------------------------------------------------------------
 
 // 0,1,2 scrolling speed

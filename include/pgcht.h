@@ -1,9 +1,5 @@
 // # Header for Per-Game CHEAT
 
-#ifdef IGS
-#define IGS_VERSION "0.1"
-#endif
-
 #ifndef __PGCHT_H_
 #define __PGCHT_H_
 

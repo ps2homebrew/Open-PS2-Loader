@@ -29,6 +29,10 @@
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
 
+#ifdef CHEAT
+#include "include/pgcht.h"
+#endif
+
 #ifdef __EESIO_DEBUG
 #include <sio.h>
 #define LOG_INIT() sio_init(38400, 0, 0, 0, 0)

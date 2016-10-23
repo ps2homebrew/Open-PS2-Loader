@@ -597,7 +597,6 @@ void guiShowCheatConfig(void)
     diaSetEnum(diaCheatConfig, CHTCFG_CHEATMODE, cheatmodeNames);
     diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, gEnableCheat);
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, gCheatMode);
-    
 }
 #endif
 
@@ -960,7 +959,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 
 // Begin Per-Game GSM Integration --Bat--
 #ifdef GSM
-
     int EnableGSM = 0;
     configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
     diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
@@ -978,23 +976,18 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
 
     guiSetGSMSettingsState();
-
-// End Of Per-Game GSM Integration --Bat--
-#endif
+#endif /* GSM */
 
 // Begin of Per-Game CHEAT Integration --Bat--
 #ifdef CHEAT
+    int EnableCheat = 0;
+    configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
+    diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, EnableCheat);
 
-	int EnableCheat = 0;
-	configGetInt{configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
-	diaSetInt(diaCheatConfig}, CHTCFG_ENABLECHEAT, EnableCheat);
-	
-	int CheatMode = 0;
-	configGetInt{configSet, CONFIG_ITEM_CHEATMODE, &CheatMode);
-	diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
-
-// End Of Per Game CHEAT Integration --Bat--
-#endif
+    int CheatMode = 0;
+    configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &CheatMode);
+    diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
+#endif /* CHEAT */
 
     // Find out the current game ID
     char hexid[32];
@@ -1036,9 +1029,9 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         }
 #endif
 #ifdef CHEAT
-		if  result == COMPAT_CHTCONFIG) {
-			guiShowCheatConfig();
-		}
+        if (result == COMPAT_CHEATCONFIG) {
+            guiShowCheatConfig();
+        }
 #endif
 
         if (result == COMPAT_LOADFROMDISC) {
@@ -1082,10 +1075,9 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
 #endif
 #ifdef CHEAT
-		configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-		configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+       configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
+       configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 #endif
-
 #ifdef VMC
         configRemoveVMC(configSet, 0);
         configRemoveVMC(configSet, 1);
@@ -1137,9 +1129,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         else
             configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
 #endif
+
 #ifdef CHEAT
-		diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
-		if (EnableCheat != 0)
+        diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
+        if (EnableCheat != 0)
             configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
         else
             configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);

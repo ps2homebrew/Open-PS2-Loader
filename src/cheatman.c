@@ -25,6 +25,10 @@
 #include "include/cheatman.h"
 #include "include/ioman.h"
 
+#ifdef CHEAT
+#include "include/pgcht.h"
+#endif
+
 /*
  * make_code - Return a code object from string @s.
  */

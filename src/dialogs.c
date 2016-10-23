@@ -176,14 +176,14 @@ struct UIItem diaCompatConfig[] = {
     {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-#ifdef GSM
 // Note: Per-Game GSM uses a UI_BUTTON to open up the menu. The above #ifdef keeps it
 // out of Childproof and unintended builds. --Bat--
+#ifdef GSM
     {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSCONFIG}}},
-		#if defined(GSM) && defined(CHEAT)
+		#if defined(GSM) && defined(CHEAT);
 		{UI_SPACER},
 		#else
-		{UI_BREAK},	
+		{UI_BREAK},
 #endif
 
 #ifdef CHEAT	

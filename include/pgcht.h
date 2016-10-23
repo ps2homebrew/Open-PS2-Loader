@@ -4,7 +4,6 @@
 #define IGS_VERSION "0.1"
 #endif
 
-#ifndef __PGCHT_H
 #define __PGCHT_H
 
 #ifdef CHEAT

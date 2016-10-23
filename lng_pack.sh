@@ -4,7 +4,9 @@
 # Set variables
 _dir=$(pwd)
 _bdir="/tmp/opl_lng"
-_rev=$(($(cat ${_dir}/DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
+opl_revision=$(($(cat ${_dir}/DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
+opl_git=$(git -C ${_dir}/ rev-parse --short=7 HEAD 2>/dev/null)
+if [ ${opl_git} ]; then export opl_git=-${opl_git}; fi
 
 # Print a list
 printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_list
@@ -12,11 +14,11 @@ printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_l
 # Copy like Jay-Jay format
 while IFS= read -r file
 do
-	mkdir -p ${_bdir}/${file}${_rev}/
-	cp ${_dir}/lng/lang_${file}.lng ${_bdir}/${file}${_rev}/lang_${file}${_rev}.lng
+	mkdir -p ${_bdir}/${file}-${opl_revision}/
+	cp ${_dir}/lng/lang_${file}.lng ${_bdir}/${file}-${opl_revision}/lang_${file}.lng
 	if [ -e thirdparty/font_${file}.ttf ]
 	then
-		cp ${_dir}/thirdparty/font_${file}.ttf ${_bdir}/${file}${_rev}/font_${file}.ttf
+		cp ${_dir}/thirdparty/font_${file}.ttf ${_bdir}/${file}-${opl_revision}/font_${file}.ttf
 	fi
 done < /tmp/opl_lng_list
 
@@ -47,10 +49,9 @@ EOF
 
 # Lets pack it!
 cd ${_bdir}/
-zip -r OPNPS2LD_LANGS-r${_rev}.zip *
-cp ${_bdir}/OPNPS2LD_LANGS-r${_rev}.zip ${_dir}/OPNPS2LD_LANGS-r${_rev}.zip
+zip -r ${_dir}/OPNPS2LD_LANGS-${opl_revision}${opl_git}.zip *
 
 # Cleanup
 cd ${_dir}
 rm -rf ${_bdir}/ /tmp/opl_lng_list
-unset _dir _bdir _rev
+unset _dir _bdir opl_revision

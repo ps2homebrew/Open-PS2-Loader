@@ -87,19 +87,13 @@ before_script:
 script:
 ## Let's build Open PS2 Loader Release!
 - cd ${opl_build_dir}/
+- . make_changelog.sh
+- git add DETAILED_CHANGELOG
 - make clean
 - make release
 
 ## Build Lang Pack and Latest Changelog
-- . make_changelog.sh
 - . lng_pack.sh
-
-## Set current Version and Revision
-- export opl_version=$(ls | grep "OPNPS2LD-" | cut -c 10- | rev | cut -c 5- | rev)
-- export opl_revision=$(($(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
-
-## Pack Open PS2 Loader Release on a zip
-- zip -r OPNPS2LD-${opl_version}.zip DETAILED_CHANGELOG OLD_DETAILED_CHANGELOG OPNPS2LD-${opl_version}.ELF CREDITS LICENSE README
 
 ## [TEMPLATE] Deploy OPL to Github Releases
 # 1. Clone this repository
@@ -118,8 +112,9 @@ deploy:
   skip_cleanup: true
 #  api_key:
 #    secure: [PUT YOUR NEW SECURE API KEY HERE]
+  file_glob: true
   file:
-    - "${opl_build_dir}/OPNPS2LD-${opl_version}.zip"
-    - "${opl_build_dir}/OPNPS2LD_LANGS-r${opl_revision}.zip"
+    - "${opl_build_dir}/OPNPS2LD-*.zip"
+    - "${opl_build_dir}/OPNPS2LD_LANGS-*.zip"
   on:
     tags: true

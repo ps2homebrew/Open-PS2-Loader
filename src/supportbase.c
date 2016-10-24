@@ -10,6 +10,9 @@
 #ifdef GSM
 #include "include/pggsm.h"
 #endif
+#ifdef CHEAT
+#include "include/pgcht.h"
+#endif
 
 #include <sys/fcntl.h>
 
@@ -392,11 +395,19 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
 
 #ifdef GSM
     gEnableGSM = 0;
+    //Load the rest of the per-game GSM configuration, only if GSM is enabled.
     if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
-        //Load the rest of the per-game GSM configuration, only if GSM is enabled.
         configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
         configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
         configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
+    }
+#endif
+
+#ifdef CHEAT
+    gEnableCheat = 0;
+    //Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
+    if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
+        configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
     }
 #endif
 

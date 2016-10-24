@@ -176,11 +176,15 @@ struct UIItem diaCompatConfig[] = {
     {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-// Note: Per-Game GSM uses a UI_BUTTON to open up the menu. An #ifdef should keep it
-// out of Childproof and Non-GSM builds. --Bat--
 #ifdef GSM
-    {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSCONFIG}}},
-    {UI_BREAK},
+    {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GSCONFIG}}},
+    {UI_SPACER},
+#endif
+#ifdef CHEAT
+    {UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
+#endif
+#if defined(GSM) || defined(CHEAT)
+    {UI_SPLITTER},
 #endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
@@ -217,8 +221,7 @@ struct UIItem diaCompatConfig[] = {
     {UI_STRING, COMPAT_GAMEID, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_LOADFROMDISC, 1, 1, -1, 0, 0, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
-    {UI_SPLITTER},
-
+    {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
     {UI_SPACER},
     {UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiAltStartupNameHandler}}},
@@ -451,7 +454,7 @@ struct UIItem diaGSConfig[] = {
 };
 #endif
 
-// Cheat Menu
+// Per Game Settings > Cheat Menu --Bat--
 #ifdef CHEAT
 struct UIItem diaCheatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
@@ -459,12 +462,12 @@ struct UIItem diaCheatConfig[] = {
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLECHEAT}}},
     {UI_SPACER},
-    {UI_BOOL, CHEATCFG_ENABLECHEAT, 1, 1, _STR_HINT_ENABLECHEAT, 0, 0, {.intvalue = {1, 1}}},
+    {UI_BOOL, CHTCFG_ENABLECHEAT, 1, 1, _STR_HINT_ENABLECHEAT, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CHEATMODE}}},
     {UI_SPACER},
-    {UI_ENUM, CHEATCFG_CHEATMODE, 1, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}},
+    {UI_ENUM, CHTCFG_CHEATMODE, 1, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     // buttons

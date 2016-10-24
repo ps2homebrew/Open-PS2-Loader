@@ -45,6 +45,10 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_GSMXOFFSET "$GSMXOffset"
 #define CONFIG_ITEM_GSMYOFFSET "$GSMYOffset"
 
+//Per-Game CHEAT keys. -Bat-
+#define CONFIG_ITEM_ENABLECHEAT "$EnableCheat"
+#define CONFIG_ITEM_CHEATMODE "$CheatMode"
+
 //OPL config keys
 #define CONFIG_OPL_THEME "theme"
 #define CONFIG_OPL_LANGUAGE "language_text"
@@ -57,8 +61,6 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_ENABLE_COVERART "enable_coverart"
 #define CONFIG_OPL_WIDESCREEN "wide_screen"
 #define CONFIG_OPL_VMODE "vmode"
-#define CONFIG_OPL_CHEAT_ENABLE "enable_cheat"
-#define CONFIG_OPL_CHEAT_MODE "cheatmode"
 #define CONFIG_OPL_DISABLE_DEBUG "disable_debug"
 #define CONFIG_OPL_PS2LOGO "ps2logo"
 #define CONFIG_OPL_EXIT_PATH "exit_path"

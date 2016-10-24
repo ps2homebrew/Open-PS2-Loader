@@ -24,9 +24,6 @@ enum MENU_IDs {
     MENU_NET_UPDATE,
     MENU_SAVE_CHANGES,
     MENU_START_HDL,
-#ifdef CHEAT
-    MENU_CHEAT_SETTINGS,
-#endif
     MENU_ABOUT,
     MENU_EXIT,
     MENU_POWER_OFF
@@ -119,9 +116,6 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
     if (gHDDStartMode && gEnableWrite) // enabled at all?
         submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
-#ifdef CHEAT
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_CHEAT_SETTINGS, _STR_CHEAT_SETTINGS);
-#endif
 #endif
     submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
@@ -610,10 +604,6 @@ void menuHandleInputMenu()
             guiShowConfig();
         } else if (id == MENU_GFX_SETTINGS) {
             guiShowUIConfig();
-#ifdef CHEAT
-        } else if (id == MENU_CHEAT_SETTINGS) {
-            guiShowCheatConfig();
-#endif
         } else if (id == MENU_NET_CONFIG) {
             guiShowNetConfig();
         } else if (id == MENU_NET_UPDATE) {

@@ -31,6 +31,9 @@ extern int size_genvmc_irx;
 #ifdef GSM
 #include "include/pggsm.h"
 #endif
+#ifdef CHEAT
+#include "include/pgcht.h"
+#endif
 
 extern void *udnl_irx;
 extern int size_udnl_irx;

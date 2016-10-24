@@ -589,14 +589,31 @@ static void guiShowGSConfig(void)
 #endif
 
 #ifdef CHEAT
+static void guiSetCheatSettingsState(void)
+{
+    int isCheatEnabled;
+
+    diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &isCheatEnabled);
+    diaSetEnabled(diaCheatConfig, CHTCFG_CHEATMODE, isCheatEnabled);
+}
+
+static int guiCheatUpdater(int modified)
+{
+    if (modified) {
+        guiSetCheatSettingsState();
+    }
+
+    return 0;
+}
+
 void guiShowCheatConfig(void)
 {
     // configure the enumerations
     const char *cheatmodeNames[] = {_l(_STR_CHEATMODEAUTO), _l(_STR_CHEATMODESELECT), NULL};
 
     diaSetEnum(diaCheatConfig, CHTCFG_CHEATMODE, cheatmodeNames);
-    diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, gEnableCheat);
-    diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, gCheatMode);
+
+    diaExecuteDialog(diaCheatConfig, -1, 1, &guiCheatUpdater);
 }
 #endif
 
@@ -987,6 +1004,9 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     int CheatMode = 0;
     configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &CheatMode);
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
+
+    guiSetCheatSettingsState();
+
 #endif /* CHEAT */
 
     // Find out the current game ID

@@ -1,9 +1,9 @@
 # Translation by Lord_Flaya
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Swedish
-Open PS2 Loader %s
+OPL %s
 Spara ändringar
 Tillbaka
 Nätverkskonfig
@@ -113,7 +113,7 @@ Lämna tomt för Gäst konto.
 Korrekt läsning
 Synkroniseringsläge
 Släpp Syscalls
-0 PSS läge
+Hoppa över videoklipp
 Emulera DVD-DL
 Inaktivera IGR
 Högmoduls-lagring

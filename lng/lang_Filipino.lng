@@ -1,9 +1,9 @@
 # Translation by Ceed Lorenzo
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Filipino
-Open PS2 Loader %s
+OPL %s
 I-save ang mga pagbabago
 Likod
 Network Config
@@ -25,7 +25,7 @@ Exit to Browser/OSDSYS?
 Cancel updating?
 %d: HardDisk Drive not detected
 %d: HardDisk Drive not formatted
-%d: Network startup error 
+%d: Network startup error
 %d: No network adaptor detected
 %d: Hindi makakonekta sa SMB server
 %d: Hindi makapag-log in sa SMB server
@@ -113,11 +113,11 @@ Iwanang walang laman para sa Guest auth .
 Accurate Reads
 Synchronous Mode
 alisin sa pagkakakawit Syscalls
-0 PSS mode
+Skip Videos
 Emulate DVD-DL
 Disable IGR
 High module storage
-Hide dev9 module
+Hide DEV9 module
 Ang pagbabago ng laki ay i-reformat ang VMC
 Lumikha
 Start
@@ -188,7 +188,7 @@ FMV Skip
 Skips Full Motion Videos
 Cheat Settings
 Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
+Let PS2RD Cheat Engine patch your games
 PS2RD Cheat Engine Mode
 Auto-select or Select game cheats
 Auto-select cheats

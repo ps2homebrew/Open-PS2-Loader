@@ -1,9 +1,9 @@
 # Translation by Colossus and tonyhoro
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Brazilian Portuguese
-Open PS2 Loader %s
+OPL %s
 Guardar Configurações
 Voltar
 Configurações de Rede
@@ -113,7 +113,7 @@ Deixar vazio para conectar como convidado (GUEST)
 Leituras mais precisas
 Modo de Sincronia
 Desativar chamadas do sistema
-Pular vídeos PSS
+Pular videos
 Emular DVD-DL
 Desativar IGR
 Armazenamento elevado dos módulos

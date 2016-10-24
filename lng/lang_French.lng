@@ -1,9 +1,9 @@
 # Translation by machiavel
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 French
-Open PS2 Loader %s
+OPL %s
 Sauvegarder
 Retour
 Configuration réseau
@@ -113,7 +113,7 @@ Laisser vide pour authentification invité
 Lecture précise (simule la vitesse de lecture du CD/DVD)
 Mode synchrone (mode de lecture alternatif)
 Décrocher Syscalls (purge OPL après lancement du jeu)
-Mode 0 PSS (Passe les cinématiques)
+Passer les cinématiques
 Émuler DVD-DL (DVD9 rippés en DVD5)
 Désactiver IGR (incompatible avec certains jeux)
 Stockage élevé (charge les modules de stockage à une adresse plus élevée)

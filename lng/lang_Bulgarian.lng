@@ -1,9 +1,9 @@
 # translation by vsub and wisi
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Bulgarian
-Open PS2 Loader %s
+OPL %s
 Запазване на промените
 Назад
 Мрежови настройки
@@ -21,7 +21,7 @@ ETH Игри
 Тема
 Език
 Изключване на системата?
-Exit to Browser/OSDSYS?
+Изход към Browser/OSDSYS?
 Отмяна на обновяването?
 %d: Твърд Диск не е свързан.
 %d: Твърд Диск не е форматиран.
@@ -113,7 +113,7 @@ NetBIOS
 Прецизно четене
 Синхронен режим
 Откачане на OPL от Syscalls
-0 PSS режим
+Напред Видео
 Емулиране на DVD-DL
 Изключване на IGR
 Зареждане на модулите във висока памет
@@ -139,7 +139,7 @@ VMC файлът трябва да бъде създаден.
 Програмисти:
 Качествен контрол от:
 USB поддиректория
-Boots Custom ELF after an IGR
+Зареждане на ELF по избор при IGR
 Стойност в минути, 0 за деактивиране
 Автоматично спиране на HDD след
 Видео режим
@@ -199,16 +199,16 @@ Cheats по избор
 Мрежово обновяване
 Повторно сваляне на наличните записи?
 Неуспешно обновяване.
-Неуспешна връзка с сървъра. Failed to connect to update server.
+Неуспешна връзка с сървъра.
 Обновяване завършено.
 Обновяване отменено.
 Сваляне на настройки от мрежата?
-Потребителски настройки Customized Settings
+Потребителски настройки
 Сваляне по подразбиране
 Авт.старт след %i
 Автостарт
 Стойност в секунди, 0 за деактивиране.
 PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
+Активно само при валидно лого на диска, съвпадащо с региона на конзолата.
 ELF Loader Menu
 ELF Loader Menu display mode

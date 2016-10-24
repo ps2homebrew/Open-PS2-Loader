@@ -1,9 +1,9 @@
 # Translation by Anousith Phompida <noum_terry@hotmail.com> (aka: blackbutterfly)
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Laotian
-Open PS2 Loader %s
+OPL %s
 ບັນທຶກການປ່ຽນແປງ
 ກັບຄືນ
 ກຳນົດຄ່າທາງດ້ານ Network
@@ -113,7 +113,7 @@ NetBIOS
 ອ່ານແບບຖືກຕ້ອງແມ່ນຍຳ
 ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
 Unhook Syscalls
-0 PSS mode
+ຂ້າມວິດີໂອ
 ປະມວນຜົນ DVD-DL 
 Disable IGR
 High module storage

@@ -1,9 +1,9 @@
 # Translation by jauffre and andre95d
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Italian
-Open PS2 Loader %s
+OPL %s
 Salva modifiche
 Indietro
 Configurazione rete
@@ -78,7 +78,7 @@ Server HDL in scaricamento dalla memoria...
 Esci su
 Colore di sfondo
 Colore testo
-- PS2 -
+- PS2 - 
 - Server SMB -
 Tipo di indirizzo IP
 Statico
@@ -113,7 +113,7 @@ Lasciare vuoto per autenticazione GUEST
 Lettura accurata
 Modo sincrono
 Unhook dalle syscalls
-Modo 0 PSS
+Skip Video
 Disabilita DVD-DL
 Disabilita IGR
 Moduli nell'area alta di memoria

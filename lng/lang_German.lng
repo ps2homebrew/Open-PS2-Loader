@@ -1,9 +1,9 @@
 # German Translation by ps2guy and lopotri
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 German
-Open PS2 Loader %s
+OPL %s
 Änderungen speichern
 Zurück
 Netzwerkkonfiguration
@@ -113,7 +113,7 @@ Leer lassen für Anmeldung als GAST
 Korrekte Lesegeschw
 Synchronmodus
 Systemaufrufe aushängen
-0 PSS Modus
+Videos überspringen
 Emuliere DVD-DL
 Deaktiviere IGR
 Erhöhte Speichermoduladresse

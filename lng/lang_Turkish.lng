@@ -1,9 +1,9 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Turkish
-Open PS2 Loader %s
+OPL %s
 Değişiklikleri kaydet
 Geri
 Ağ ayarları
@@ -61,7 +61,7 @@ Kapak Resimlerini etkinleştir
 Geniş ekran
 Gücü kapat
 Ayarlar yükleniyor
-Ayarlar kayıt ediliyor 
+Ayarlar kayıt ediliyor
 Cihazı başlat
 Yenile
 USB cihazı başlangıç türü
@@ -78,7 +78,7 @@ HDL Sunucu Durduruluyor...
 IGR çıkış yolu
 Arkaplan rengi
 Metin rengi
-- PS2 -
+- PS2 - 
 - SMB Server -
 IP adres türü
 Sabit
@@ -113,7 +113,7 @@ MİSAFİR oturumu için boş bırakınız.
 Alternatif çekirdeği yükle
 Synchronous Mode
 Sis çağrılarını çöz
-PSS video iptali
+Videoları atla
 DVD-DL i etkinleştir
 IGR i etkisizleştir
 Uüksek konumda bellek kullanımı

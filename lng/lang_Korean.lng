@@ -1,9 +1,9 @@
 # Translated by DDinghoya
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Korean
-Open PS2 Loader %s
+OPL %s
 저장 변경
 뒤로
 네트워크 구성
@@ -113,7 +113,7 @@ USB 게임 손상 검사
 정밀하게 읽음
 동기화 모드
 시스템 호출 해제
-0 PSS 모드
+동영상 건너 뛰기
 DV-DL 에뮬레이트
 IGR 비활성
 고성능 모듈 스토리지

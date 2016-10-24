@@ -1,9 +1,9 @@
 # translation by alimadhi
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Arabic
-Open PS2 Loader %s
+OPL %s
 حفظ التغييرات
 خلف
 تكوين الشبكة
@@ -114,7 +114,7 @@ IP
 قراءات دقيقة
 وضع التزامن
 Unhook Syscalls
-0 وضع PSS
+تخطي فيديو
 محاكي DVD-DL
 تعطيل IGR
 ارتفاع حدة التخزين

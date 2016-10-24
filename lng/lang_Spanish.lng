@@ -1,9 +1,9 @@
 # Translation by lauchon22
-# Last update: 08/25/2016 
-# Updated for OPL_r928_DB [616d6fd]
+# Last update: 10/23/2016 
+# Updated for OPL_r963_DB [b7e6f26]
 # official thread: http://ps2home.freeforums.net/post/1966/thread
 Spanish
-Open PS2 Loader %s
+OPL %s
 Guardar cambios
 Atrás
 Ajustes conexión de red
@@ -76,7 +76,7 @@ Servidor HDLDump conectado...
 Error al iniciar el servidor HDLDump. 
 Cerrando servidor HDLDump...
 Ruta del IGR
-Color de fondo 
+Color de fondo
 Color de texto
 - PS2 -
 - Servidor SMB -
@@ -113,7 +113,7 @@ Dejar en blanco para autentificar como GUEST
 Lectura precisa
 Modo sincronizado
 Desvincula el sistema
-Omite los vídeos PSS
+Omite vídeos
 Emula DVD-DL
 Quita el IGR
 Almacena los módulos en alta dirección de memoria
@@ -133,7 +133,7 @@ Progreso
 Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
-Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d) ?
+Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
 Refresco automático de las listas
 Acerca del OPL
 Desarrolladores

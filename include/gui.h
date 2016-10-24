@@ -127,6 +127,9 @@ void guiShowNetCompatUpdate(void);
 void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
+
+void guiShowCheatConfig();
+
 void guiShowNetConfig();
 
 /** Renders the given string on screen for the given function until it's io finishes 

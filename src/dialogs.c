@@ -183,7 +183,7 @@ struct UIItem diaCompatConfig[] = {
 #ifdef CHEAT
     {UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
 #endif
-#if defined(GSM) && defined(CHEAT)
+#if defined(GSM) || defined(CHEAT)
     {UI_SPLITTER},
 #endif
 
@@ -221,8 +221,7 @@ struct UIItem diaCompatConfig[] = {
     {UI_STRING, COMPAT_GAMEID, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_LOADFROMDISC, 1, 1, -1, 0, 0, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
-    {UI_SPLITTER},
-
+    {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
     {UI_SPACER},
     {UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiAltStartupNameHandler}}},

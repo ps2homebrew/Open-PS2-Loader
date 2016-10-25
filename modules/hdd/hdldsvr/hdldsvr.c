@@ -123,7 +123,7 @@ int _start(int argc, char **argv)
     // create & start the tcp thread
     thread_param.attr = TH_C;
     thread_param.thread = (void *)tcp_server_thread;
-    thread_param.priority = 0x64;
+    thread_param.priority = 0x10;
     thread_param.stacksize = 0x1000;
     thread_param.option = 0;
 
@@ -134,7 +134,7 @@ int _start(int argc, char **argv)
     // create & start the udp thread
     thread_param.attr = TH_C;
     thread_param.thread = (void *)udp_server_thread;
-    thread_param.priority = 0x64;
+    thread_param.priority = 0x10;
     thread_param.stacksize = 0x1000;
     thread_param.option = 0;
 

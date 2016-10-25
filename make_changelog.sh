@@ -35,7 +35,7 @@ then
 fi
 
 # Hack for fix first commit not showed
-printf '\n' >> /tmp/commit_summary
+echo -e '\n' >> /tmp/commit_summary
 
 # Store number of commits
 old_number_commits=$(($(cat OLD_DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-)))
@@ -54,7 +54,7 @@ then
 fi
 
 # Hack for fix first commit not showed
-printf '\n' >> /tmp/commit_summary
+echo -e '\n' >> /tmp/commit_summary
 
 # Reverse commit history
 gawk '{ L[n++] = $0 } END { while(n--) print L[n] }' /tmp/commit_summary > /tmp/commit_summary_reverse

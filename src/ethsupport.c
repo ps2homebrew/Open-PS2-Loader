@@ -629,6 +629,13 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     }
 #endif
 
+    if (gRememberLastPlayed) {
+        configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
+        saveConfig(CONFIG_LAST, 0);
+    }
+
+    compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
+
 #ifdef CHEAT
     if ((result = sbLoadCheats(ethPrefix, game->startup)) < 0) {
         switch (result) {
@@ -641,12 +648,6 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     }
 #endif
 
-    if (gRememberLastPlayed) {
-        configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
-        saveConfig(CONFIG_LAST, 0);
-    }
-
-    compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
     settings = (struct cdvdman_settings_smb *)((u8 *)(&smb_cdvdman_irx) + i);
 
     switch (game->format) {

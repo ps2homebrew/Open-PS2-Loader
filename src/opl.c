@@ -1193,9 +1193,9 @@ static void setDefaults(void)
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
 
-    gDefaultBgColor[0] = 0x030;
-    gDefaultBgColor[1] = 0x030;
-    gDefaultBgColor[2] = 0x030;
+    gDefaultBgColor[0] = 0x028;
+    gDefaultBgColor[1] = 0x0c5;
+    gDefaultBgColor[2] = 0x0f9;
 
     gDefaultTextColor[0] = 0x0ff;
     gDefaultTextColor[1] = 0x0ff;

@@ -1,5 +1,5 @@
 # Russian translation by druchapucha & frodosumkin
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Russian
 Open PS2 Loader %s
 Сохранить настройки
@@ -111,7 +111,7 @@ NetBIOS
 Аккуратное чтение
 Режим синхронизации
 Разблокировать системные вызовы
-Пропустить Видео
+Пропуск видео
 Эмулировать DVD-DL
 Отключить использование IGR
 Высокий модуль хранения

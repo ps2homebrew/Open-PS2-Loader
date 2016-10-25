@@ -3,8 +3,8 @@
 ## Thanks to:
 # - izdubar@psx-scene and jimmikaelkael@psx-scene
 #   <http://psx-scene.com/forums/f150/%5Blinux%5D-opl-compile-guides-63749/>
-# - doctorxyz@ps2home
-#   <http://ps2home.freeforums.net/thread/272/linux-creation-compiling-guide-ps2sdk>
+# - Bat Rastard@psx-scene and doctorxyz@psx-scene
+#   <http://psx-scene.com/forums/f150/2015-linux-mint-vm-creation-opl-compiling-guide-ps2sdk-127047/index3.html#post1169435>
 # - and a lot of people around internet :)
 sudo: required
 language: c

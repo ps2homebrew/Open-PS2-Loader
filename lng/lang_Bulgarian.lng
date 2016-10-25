@@ -1,5 +1,5 @@
 # Bulgarian translation by wisi - @http://psx-scene.com/forums/members/wisi/
-# For Open PS2 Loader 0.9.3 Betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Bulgarian
 Open PS2 Loader %s
 Запазване на промените
@@ -111,7 +111,7 @@ NetBIOS
 Прецизно четене
 Синхронен режим
 Откачане на OPL от Syscalls
-Напред Видео
+Скриване клипове
 Емулиране на DVD-DL
 Изключване на IGR
 Зареждане на модулите във висока памет

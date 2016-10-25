@@ -57,10 +57,10 @@ REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -
 
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
 ifeq ($(shell git diff --quiet; echo $$?),1)
-  DIRTY = -dirty
+  DIRTY = dirty
 endif
-ifneq ($(shell test -d .git; echo $?),0)
-  DIRTY = -dirty
+ifneq ($(shell test -d .git; echo $$?),0)
+  DIRTY = dirty
 endif
 
 OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),-$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))

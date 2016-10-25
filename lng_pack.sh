@@ -9,7 +9,7 @@ opl_git=$(git -C ${_dir}/ rev-parse --short=7 HEAD 2>/dev/null)
 if [ ${opl_git} ]; then export opl_git=-${opl_git}; fi
 
 # Print a list
-printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_list
+ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev > /tmp/opl_lng_list
 
 # Copy like Jay-Jay format
 while IFS= read -r file
@@ -30,8 +30,6 @@ done < /tmp/opl_lng_list
   Review Open PS2 Loader README & LICENSE files for further details.
 
 -----------------------------------------------------------------------------
-
-Open PS2 Loader Official Translations (25 August 2016)
 
 HOW TO INSTALL:
 1. make sure you are running latest OPL

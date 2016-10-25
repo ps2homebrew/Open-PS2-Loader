@@ -372,18 +372,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     }
 #endif
 
-#ifdef CHEAT
-    if ((result = sbLoadCheats(hddPrefix, game->startup)) < 0) {
-        switch (result) {
-            case -ENOENT:
-                guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
-                break;
-            default:
-                guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
-        }
-    }
-#endif
-
     if (gRememberLastPlayed) {
         configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
         saveConfig(CONFIG_LAST, 0);
@@ -413,6 +401,19 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     }
 
     sbPrepare(NULL, configSet, size_irx, irx, &i);
+
+#ifdef CHEAT
+    if ((result = sbLoadCheats(hddPrefix, game->startup)) < 0) {
+        switch (result) {
+            case -ENOENT:
+                guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
+                break;
+            default:
+                guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
+        }
+    }
+#endif
+
     settings = (struct cdvdman_settings_hdd *)((u8 *)irx + i);
 
     // patch 48bit flag

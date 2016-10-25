@@ -1,5 +1,5 @@
 # Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
@@ -111,7 +111,7 @@ Deixe em branco para não usar senhas.
 Leituras corretas
 Modo de Sincronia
 Desativar chamadas do sistema
-Pular videos
+Pular vídeos
 Emular DVD-DL
 Desativa o IGR
 Armazenamento dos módulos elevados
@@ -207,4 +207,4 @@ Iniciar automaticamente no %i s...
 Auto-começar
 Valores em segundos (s), 0 para desativar
 Logotipo do Playstation 2
-Será mostrado apenas no jogo que for da mesma região do console
+Será mostrado apenas para os jogos que for da mesma região do console

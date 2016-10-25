@@ -11,7 +11,7 @@ if [ ${opl_git} ]; then export opl_git=-${opl_git}; fi
 # Print a list
 printf "$(ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > /tmp/opl_lng_list
 
-# Copy like Jay-Jay format
+# Copy format
 while IFS= read -r file
 do
 	mkdir -p ${_bdir}/${file}-${opl_revision}/

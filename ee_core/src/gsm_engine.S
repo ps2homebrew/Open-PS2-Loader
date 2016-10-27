@@ -107,7 +107,7 @@ GSMDestGSRegs: .space 88
 .equ Target_DISPLAY2, 80 # DWORD
 
 .globl GSMFlags
-GSMFlags: .space 18
+GSMFlags: .space 17
 .equ X_offset,              0 # WORD
 .equ Y_offset,              4 # WORD
 .equ ADAPTATION_fix,        8 # BYTE
@@ -122,11 +122,12 @@ GSMFlags: .space 18
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-GSMAdapts:	.space 18
+GSMAdapts:	.space 19
 .equ Adapted_DISPLAY1,             0 # DWORD
 .equ Adapted_DISPLAY2,             8 # DWORD
 .equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
 .equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value
+.equ RC_adaptation,               18 # BYTE -> RC (Read Circuit) adaptation for avoiding garbage on screen ex.: Sega Genesis Collection (SLUS_215.42)
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -214,6 +215,13 @@ and	$a3, $a0,$a2				# a3 = Interlace & Field
 andi	$a3, $a3,1				# a3 &= 1 limited to 1 bit
 la	$v0, GSMAdapts
 sb	$a3, Interlace_FRAME_Mode_Flag($v0)
+
+//-----------------------------------------------------------------------------------------
+
+// RC (Read Circuit) adaptation for avoiding garbage on screen ex.: Sega Genesis Collection (SLUS_215.42)
+la	$v0, GSMAdapts
+li	$a0, 1
+sb	$a0, RC_adaptation($v0)
 
 //-----------------------------------------------------------------------------------------
 
@@ -811,7 +819,7 @@ store_v0_as_PMODE:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_PMODE
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SMODE1
@@ -894,7 +902,7 @@ store_v0_as_SMODE1:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_SMODE1
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SMODE2
@@ -933,7 +941,7 @@ store_v0_as_SMODE2:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_reg_SMODE2
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SRFSH
@@ -976,7 +984,7 @@ store_v0_as_SRFSH:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_SRFSH
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SYNCH1
@@ -1005,7 +1013,7 @@ store_v0_as_SYNCH1:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_SYNCH1
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SYNCH2
@@ -1031,7 +1039,7 @@ store_v0_as_SYNCH2:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_SYNCH2
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SYNCV
@@ -1061,7 +1069,7 @@ store_v0_as_SYNCV:
 sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing GS_SYNCV
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPFB1
@@ -1097,10 +1105,8 @@ or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 store_v0_as_DISPFB1:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$v0,GS_DISPFB1($s4)					# Write to GS_DISPFB1
-sd	$v0,GS_DISPFB2($s4)					# Write to GS_DISPFB2
-beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
-nop
+beqzl	$zero,exit_GSHandler			# Now go exit
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPFB2
@@ -1136,10 +1142,8 @@ or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 store_v0_as_DISPFB2:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$v0,GS_DISPFB2($s4)					# Write to GS_DISPFB2
-sd	$v0,GS_DISPFB1($s4)					# Write to GS_DISPFB1
-beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
-nop
+beqzl	$zero,exit_GSHandler			# Now go exit
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAY1
@@ -1204,7 +1208,7 @@ nop						# {
 or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
 sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
 li	$t4,0				# t4 = Target_MAGH = 0
-beq	$zero,$zero,have_DISPLAY1_write_4		# }
+beql	$zero,$zero,have_DISPLAY1_write_4		# }
 nop						# otherwise
 						# Target_Width_Scale nonzero
 
@@ -1293,7 +1297,7 @@ nop						# {
 or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
 sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
 li	$t4,0				# t4 = Target_MAGV = 0
-beq	$zero,$zero,have_DISPLAY1_write_10		# }
+beql	$zero,$zero,have_DISPLAY1_write_10		# }
 nop						# otherwise
 						# Target_Height_Scale nonzero
 
@@ -1332,7 +1336,7 @@ add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated
 
 have_DISPLAY1_write_12:
 lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
-beq	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
+beql	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
 nop
 
 ld	$t0, Target_SMODE2($s1)
@@ -1380,10 +1384,8 @@ ld	$v0, Target_DISPLAY1($s1)	# use forced mode without adaption
 store_v0_as_DISPLAY1:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$v0,GS_DISPLAY1($s4)					# Write to GS_DISPLAY1
-sd	$v0,GS_DISPLAY2($s4)					# Write to GS_DISPLAY2
 beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
-nop
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAY2
@@ -1448,7 +1450,7 @@ nop						# {
 or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
 sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
 li	$t4,0				# t4 = Target_MAGH = 0
-beq	$zero,$zero,have_DISPLAY2_write_4		# }
+beql	$zero,$zero,have_DISPLAY2_write_4		# }
 nop						# otherwise
 						# Target_Width_Scale nonzero
 
@@ -1537,7 +1539,7 @@ nop						# {
 or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
 sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
 li	$t4,0				# t4 = Target_MAGV = 0
-beq	$zero,$zero,have_DISPLAY2_write_10		# }
+beql	$zero,$zero,have_DISPLAY2_write_10		# }
 nop						# otherwise
 						# Target_Height_Scale nonzero
 
@@ -1576,7 +1578,7 @@ add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated
 
 have_DISPLAY2_write_12:
 lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
-beq	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
+beql	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
 nop
 
 ld	$t0, Target_SMODE2($s1)
@@ -1624,15 +1626,27 @@ ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 store_v0_as_DISPLAY2:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$v0,GS_DISPLAY2($s4)					# Write to GS_DISPLAY2
-sd	$v0,GS_DISPLAY1($s4)					# Write to GS_DISPLAY1
-beqzl	$zero,exit_GSHandler_complex	# Now go exit (complex)
+sd	$v0,0($a3)		# store DISPLAY2
+
+# ------------------------------------------------------------------------------------------------------
+
+lb	$a1, RC_adaptation($s3)
+beqzl	$a1,exit_GSHandler_complex	# in case of RC_adaptation is disabled, go exit (complex)
 nop
+
+sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
+sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
+sd	$zero, GS_DISPLAY1($s4)		# DISPLAY1 should never be displayed on this scenario (in order to avoid garbage on screen)
+beqzl	$zero,exit_GSHandler_complex
+sb	$zero, RC_adaptation($s3)				# Disable RC_adaptation, since this patch should be applied only once, each time Hook_SetGsCrt is called.
+											# Sega Genesis Collection (SLUS_215.42) doesn't repeatedly write to GS Priviledge Registers, but God of War I (SCUS_973.99) does this!
+
+# ------------------------------------------------------------------------------------------------------
 
 exit_GSHandler_complex:
 
-#li	$t0, 0xFFFFFF 					# White
-#sd	$t0, %lo(GS_BGCOLOUR)($a0)		# Change BGCOLOR (for debugging purposes)
+#li	$v0, 0xFFFFFF 					# White
+#sd	$v0, GS_BGCOLOUR($s4)		# Change BGCOLOR (for debugging purposes)
 
 #  ----- Here we restore some registers, used for complex calculations above
 lq	$t2, 0xA0($a2)					# t2

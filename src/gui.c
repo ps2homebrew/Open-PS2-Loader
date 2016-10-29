@@ -1095,8 +1095,8 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
 #endif
 #ifdef CHEAT
-       configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-       configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+        configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
+        configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 #endif
 #ifdef VMC
         configRemoveVMC(configSet, 0);

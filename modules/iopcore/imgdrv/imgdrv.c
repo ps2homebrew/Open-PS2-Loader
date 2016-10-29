@@ -57,7 +57,7 @@ iop_device_ops_t my_device_ops =
         read_fs,  //read
         NULL,     //dummy_fs,//write
         lseek_fs, //lseek
-        /*dummy_fs,//ioctl
+                  /*dummy_fs,//ioctl
               dummy_fs,//remove
               dummy_fs,//mkdir
               dummy_fs,//rmdir

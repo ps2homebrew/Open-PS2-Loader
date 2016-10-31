@@ -483,10 +483,10 @@ static int ethUpdateGameList(void)
 {
     int result;
 
-    if (gNetworkStartup != 0)
-        return 0;
-
     if (gPCShareName[0]) {
+        if (gNetworkStartup != 0)
+            return 0;
+
         if ((result = sbReadList(&ethGames, ethPrefix, &ethULSizePrev, &ethGameCount)) < 0) {
             gNetworkStartup = ERROR_ETH_SMB_LISTGAMES;
             ethDisplayErrorStatus();
@@ -495,6 +495,10 @@ static int ethUpdateGameList(void)
         int i, count;
         ShareEntry_t sharelist[128];
         smbGetShareList_in_t getsharelist;
+
+        if (gNetworkStartup < ERROR_ETH_SMB_OPENSHARE)
+            return 0;
+
         getsharelist.EE_addr = (void *)&sharelist[0];
         getsharelist.maxent = 128;
 

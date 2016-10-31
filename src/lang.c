@@ -12,7 +12,7 @@
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
     "English (internal)",
-    "Open PS2 Loader %s",
+    "OPL %s",
     "Save changes",
     "Back",
     "Network config",

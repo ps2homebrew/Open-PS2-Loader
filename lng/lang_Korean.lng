@@ -1,5 +1,5 @@
 # Korean translation by ddinghoya
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Korean
 Open PS2 Loader %s
 저장 변경
@@ -111,7 +111,7 @@ USB 게임 손상 검사
 정밀하게 읽음
 동기화 모드
 시스템 호출 해제
-동영상 건너 뛰기
+Skip videos
 DV-DL 에뮬레이트
 IGR 비활성
 고성능 모듈 스토리지

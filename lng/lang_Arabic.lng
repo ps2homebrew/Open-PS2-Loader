@@ -1,5 +1,5 @@
 # Arabic Translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Arabic
 Open PS2 Loader %s
 تثبيت التغييرات
@@ -111,7 +111,7 @@ NetBIOS
 قراءة دقيقة
 الطريقة المتزامنة
 حل Syscalls
-تخطي فيديو
+Skip videos
 تقليد DVD-DL
 الغاء IGR
 High module storage

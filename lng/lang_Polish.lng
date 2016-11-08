@@ -1,15 +1,15 @@
-# Polish translation by dragolice @http://psx-scene.com/forums/members/dragolice/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
-Polish
+# W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbował" Jolek. Podziękowania dla misiozola i innych z Forum CDRinfo.pl za pomoc i sugestie.
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+Polski
 Open PS2 Loader %s
 Zapisz zmiany
 Wróć
 Ustawienia sieci
 Opcje zaawansowane
-<brak>
+<nie ustawiono>
 Ustawienia zapisane...
 Błąd zapisu ustawień!
-Wyjście
+Wyjdź
 Ustawienia
 Menu
 Gry USB
@@ -19,61 +19,61 @@ Aplikacje
 Motyw
 Język
 System zostanie wyłączony.
-Exit to Browser/OSDSYS?
+Wyjdź do Przeglądarki PS2/OSDSYS?
 Przerwać aktualizację?
 %d: Nie wykryto dysku twardego
 %d: Dysk twardy nie jest sformatowany
-%d: Błąd startu sieci
+%d: Wystąpił błąd podczas uruchamiania sieci
 %d: Nie wykryto network adaptora
-%d: Nie można połączyć z serwerem SMB
-%d: Nie można zalogować do serwera SMB
-%d: Nie można otworzyć udostępnienia SMB
-%d: Nie można wyświetlić udostępnień SMB
+%d: Nie można połączyć się z serwerem SMB
+%d: Nie można zalogować się do serwera SMB
+%d: Nie można otworzyć udział SMB
+%d: Nie można wyświetlić udziałów SMB
 %d: Nie można wyświetlić gier
-%d: Serwer DHCP niedostępny
+%d: Niedostępny Serwer DHCP
 %d: Brak połączenia sieciowego
 Włącz
 Wyłącz
 OK
-Wybierz 
+Wybierz
 Anuluj
-Kółko
-Iks
+O
+X
 Lista gier
 Ustawienia gry
 Usuń wszystkie ustawienia
-Usunięto wszystkie klucze do gry
-Przewijanie
+Usunięto wszystkie klucze dla gry
+Szybkość przewijania
 Wolno
 Średnio
 Szybko
 Domyślne menu
 Załaduj z dysku
 Proszę czekać
-Błąd podczas ładowania ID gry
+Błąd podczas ładowania identyfikatora gry
 Sortowanie automatyczne
 Błąd ładowania pliku językowego
-Wyłącz debugowanie kolorów
+Nie wyświetlaj kolorów debugowania
 Nie wykryto kontrolera, oczekiwanie...
-Okładki
+Wyświetlanie okładek
 Szeroki ekran
 Wyłącz
 Wczytaj ustawienia
 Zapisz ustawienia
 Uruchom urządzenie
 Odśwież
-Start urządzenia USB
-Start urządzenia HDD
-Start urządzenia ETH
-Start aplikacji
-Automatycznie
+Uruchom urządzenie USB
+Uruchom urządzenie HDD
+Uruchom urządzenie ETH
+Wyświetl menu aplikacji
+Automatyczny
 Ręcznie
 Uruchom serwer HDL
 Uruchamianie serwera HDL...
 Serwer HDL uruchomiony...
 Niepowodzenie startu serwera HDL.
-Odładowanie serwera HDL...
-Ścieżka do IGR
+Odładowywanie serwera HDL...
+Ścieżka dla IGR
 Kolor tła
 Kolor tekstu
 - PS2 -
@@ -90,7 +90,7 @@ Port
 Udostępnij
 Użytkownik
 Hasło
-<brak>
+<nie ustawiono>
 Typ adresu
 IP
 NetBIOS
@@ -110,19 +110,19 @@ Test
 Pozostaw puste dla gości.
 Dokładny odczyt
 Tryb synchroniczny
-Odhookuj Syscalls
-Przejdź filmy
+Wymarz OPL po uruchomieniu gry
+Pomiń wstawki filmowe
 Emuluj DVD-DL
 Wyłącz IGR
-Moduł dużej pamięci
+Załaduj moduły magazynowe w wyższym adresie pamięci
 Ukryj moduł DEV9
-Zmiana rozmiaru, zostanie sformatowany VMC
+Zmiana rozmiaru spowoduje przeformatowanie VMC
 Utwórz
 Start
 Modyfikuj
 Przerwij
 Reset
-Uzyj ogólnych
+Użyj ogólnych
 Konfiguruj VMC
 Nazwa
 Rozmiar
@@ -130,33 +130,33 @@ Status
 Postęp
 Plik VMC istnieje
 Błędny plik VMC, nieprawidłowy rozmiar
-Musisz utworzyć plik VMC
-Błąd z plikiem VMC %s, kontynuować z fizyczną MC (slot %d) ?
+Plik VMC musi zostać utworzony
+Błąd z plikiem VMC %s, kontynuować z fizyczną MC (gniazdo %d) ?
 Odświeżanie automatyczne
 O programie
 Programiści
 Zapewnienie jakości
 Prefix ścieżki USB
-Boots Custom ELF after an IGR
+Uruchom wybrany ELF po IGR
 Wartość w minutach, 0 wyłącza zwalnianie obrotów
-Automatyczne zwalnianie obrotów HDD 
+Automatyczne zwalnianie obrotów HDD
 Tryb wideo
 Kolor ustawień
 Kolor zaznaczenia
 Wyświetl stronę informacji
 Informacje
-Niestandardowy ELF
+Alternatywny ELF
 Wybór koloru
 Połącz ponownie
-Pozostaw puste aby notować akcje
+Pozostaw puste dla listy udziałów
 Prefix ścieżki ETH
-Cofnij
+Cofnij		
 Odstęp
 Enter
 Tryb
-VMC Slot 1
-VMC Slot 2
-ID gry
+Gniazdo VMC 1
+Gniazdo VMC 2
+Identyfikator gry
 Tryb DMA
 V-Sync
 Tryb 1
@@ -173,31 +173,31 @@ Tryb łącza ethernetowego
 100Mbit pół-dupleks
 10Mbit pełny-dupleks
 10Mbit pół-dupleks
-ustawienia GSM
+Ustawienia GSM
 Włącz GSM
 Przełącz GSM wł lub wył
-Wideo
-Wymuś niestandardowy tryb wyświetlania 
+Tryb wideo
+Wymuś określony tryb wyświetlania
 Poziom
 Regulacja w poziomie
 Pion
 Regulacja w pionie
 Pomiń FMV
-Pomija scenki wideo
-Ustawienia cheat'ów
-Włącz silnik cheat'ów PS2RD
-Pozwól PS2RD patchować gry
-Tryb silnika cheat'ów PS2RD
-Auto-wybieranie lub wybieranie cheat'ów gry
-Auto-wybieranie cheat'ów
-Wybierz cheat'y
-Błąd: niepowodzenie ładowanie pliku
-Nie znaleziono cheat'ow
+Pomija wstawki filmowe
+Ustawienia kodów
+Włącz silnik kodów PS2RD
+Pozwól silnikowi kodów PS2RD patchować gry
+Tryb silnika kodów PS2RD
+Auto-wybieranie lub wybieranie kodów dla gry
+Auto-wybieranie kodów
+Wybierz kody dla gry
+Błąd: Nie udało się załadować pliku z kodami
+Nie znaleziono kodów
 Pobierz domyślne
 Aktualizacja sieciowa
 Pobrać ponownie istniejące zapisy?
 Aktualizacja nie powiodła się.
-Błąd połączenia z serwerem aktualizacji.
+Nie udało się połączyć z serwerem aktualizacji.
 Aktualizacja zakończona.
 Aktualizacja przerwana.
 Pobrać ustawienia z sieci?
@@ -206,5 +206,5 @@ Pobrano domyślne
 Auto start w %i s...
 Auto start
 Wartość w sekundach, 0 wyłącza auto start
-PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
+Logo PS2
+Logo zostanie wyświetlone wyłącznie jeśli region gry i konsoli będzie taki sam

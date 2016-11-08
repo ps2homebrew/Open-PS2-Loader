@@ -1,5 +1,5 @@
 # Italian translation by jauffreblades - @http://psx-scene.com/forums/members/jauffreblades/
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Italian
 Open PS2 Loader %s
 Salva modifiche
@@ -111,7 +111,7 @@ Lasciare vuoto per autenticazione GUEST
 Lettura accurata
 Modo sincrono
 Unhook dalle syscalls
-Skip Video
+Salta i video
 Disabilita DVD-DL
 Disabilita IGR
 Moduli nell'area alta di memoria

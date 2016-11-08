@@ -1,5 +1,5 @@
 # Traditional Chinese translation by kane159 - kane159<kane12369@gmail.com
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Traditional Chinese
 Open PS2 Loader %s
 保存設置
@@ -111,7 +111,7 @@ GUEST驗證留空.
 精確讀取
 同步模式
 脫開系統調用
-跳过视频
+Skip videos
 模擬 DVD-DL
 禁用 IGR
 隱藏模式內存

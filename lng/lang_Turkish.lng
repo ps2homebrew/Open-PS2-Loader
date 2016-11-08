@@ -1,5 +1,5 @@
 # Turkish translation by dante (Gürkan DEMİR <vampire_bs@hotmail.com>)
-# For Open PS2 Loader 0.9.3 betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
 Turkish
 Open PS2 Loader %s
 Değişiklikleri kaydet
@@ -100,7 +100,7 @@ Y.Adlandır
 Sil
 Çalıştır
 Görüntü ayarları
-Enable write operations
+Yazma işlemlerini etkinleştir
 USB oyun bütünlüğünü kontrol et(Fragmentation)
 Enson oynanan oyunu hatırla
 Select tuşu
@@ -108,10 +108,10 @@ Hata, oyun dosyası parçalı
 Hata, nesne çalıştırılamıyor
 Test
 MİSAFİR oturumu için boş bırakınız.
-Accurate Reads
-Synchronous Mode
+Direk okuma
+Senkronize Modu
 Sis çağrılarını çöz
-Videoları atla
+Skip videos
 DVD-DL i etkinleştir
 IGR i etkisizleştir
 Uüksek konumda bellek kullanımı
@@ -204,7 +204,7 @@ Internetten ayarlar indirilsin mi?
 Kişiselleştirilmiş Ayarlar
 Varsayılanlar indirildi
 Otomatik başlatılacak %i s...
-Auto start
-Value in second(s), 0 to disable auto start
+Otomatik başlatma
+Saniye(ler), otomatik başlatmayı kapatmak için 0 girin
 PS2 Logo
 Only displayed for a valid disc logo which matches the console's region

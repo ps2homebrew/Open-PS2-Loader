@@ -9,6 +9,9 @@
 sudo: required
 language: c
 
+services:
+  - docker
+
 before_install:
 ## Save current dir, go to previous dir and save it too
 - export opl_build_dir=$(pwd)
@@ -91,6 +94,7 @@ script:
 - git add DETAILED_CHANGELOG
 - make clean
 - make release
+- docker run -it --rm -v "$PWD:/src" mlafeldt/ps2dev make
 
 ## Build Lang Pack and Latest Changelog
 - . lng_pack.sh

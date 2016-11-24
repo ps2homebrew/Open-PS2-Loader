@@ -10,17 +10,16 @@
 # Standard Makefile
 
 EE_BIN = ee_core.elf
-
-GSMCORE_EE_OBJS = obj/gsm_engine.o obj/gsm_api.o
-IGSCORE_EE_OBJS = obj/igs_api.o
-CHEATCORE_EE_OBJS = obj/cheat_engine.o obj/cheat_api.o
-
-EE_OBJS = obj/main.o obj/syshook.o obj/iopmgr.o obj/modmgr.o obj/util.o obj/patches.o obj/patches_asm.o \
-	  obj/padhook.o obj/spu.o obj/tlb.o obj/asm.o obj/crt0.o
-MAPFILE = ee_core.map
-
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
+
+GSMCORE_EE_OBJS = gsm_engine.o gsm_api.o
+IGSCORE_EE_OBJS = igs_api.o
+CHEATCORE_EE_OBJS = cheat_engine.o cheat_api.o
+
+EE_OBJS = main.o syshook.o iopmgr.o modmgr.o util.o patches.o patches_asm.o \
+	  padhook.o spu.o tlb.o asm.o crt0.o
+MAPFILE = ee_core.map
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
 EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
@@ -60,6 +59,8 @@ EE_OBJS += $(CHEATCORE_EE_OBJS)
 EE_CFLAGS += -DCHEAT
 endif
 
+EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
+
 ifeq ($(IGS),1)
 EE_LDFLAGS = -nostartfiles -Tlinkfile.igs -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
 else
@@ -75,15 +76,15 @@ EE_LIBS += -lkernel
 
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
-	@mkdir -p obj
+	@mkdir -p $(EE_OBJS_DIR)
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.S
-	@mkdir -p obj
+	@mkdir -p $(EE_OBJS_DIR)
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
-	@mkdir -p obj
+	@mkdir -p $(EE_OBJS_DIR)
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
 $(EE_BIN) : $(EE_OBJS)

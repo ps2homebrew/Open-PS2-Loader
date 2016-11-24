@@ -9,35 +9,25 @@
 sudo: required
 language: c
 
+services:
+  - docker
+
 before_install:
 ## Save current dir, go to previous dir and save it too
 - export opl_build_dir=$(pwd)
 - cd ../
 - export travis_build_dir=$(pwd)
 
-install:
-## OPL Building Dependencies
-- sudo apt-get install -yqq gcc-4.4 patch wget make git libc6-dev zlib1g zlib1g-dev libucl1 libucl-dev
-
 before_script:
 ## Make cleanup, just for prevent anything
 - cd ${travis_build_dir}/
-- rm -rf gsKit/ ps2eth/ ps2toolchain/ ps2-packer/ ps2sdk-ports/
+- rm -rf gsKit/ ps2eth/ ps2-packer/ ps2sdk-ports/
 
 ## Set up the environment.
-- export PS2DEV=${travis_build_dir}/ps2dev
-- export PS2SDK=${PS2DEV}/ps2sdk
-- export PATH=${PATH}:${PS2DEV}/bin:${PS2DEV}/ee/bin:${PS2DEV}/iop/bin:${PS2DEV}/dvp/bin:${PS2SDK}/bin
 - export PS2ETH=${PS2DEV}/ps2eth
 - export GSKIT=${PS2DEV}/gsKit
 - export LANG=C
 - export LC_ALL=C
-
-## ps2dev/PS2Toolchain
-- cd ${travis_build_dir}/
-- git clone --quiet https://github.com/ps2dev/ps2toolchain.git ${travis_build_dir}/ps2toolchain/
-- cd ${travis_build_dir}/ps2toolchain/
-- ./toolchain.sh
 
 ## ps2dev/PS2SDKPorts
 - cd ${travis_build_dir}/
@@ -86,14 +76,10 @@ before_script:
 
 script:
 ## Let's build Open PS2 Loader Release!
-- cd ${opl_build_dir}/
-- . make_changelog.sh
-- git add DETAILED_CHANGELOG
-- make clean
-- make release
+- docker run -it --rm -v ${opl_build_dir}/ mlafeldt/ps2dev make
 
 ## Build Lang Pack and Latest Changelog
-- . lng_pack.sh
+- docker run -it --rm -v ${opl_build_dir}/ mlafeldt/ps2dev ./lng_pack.sh
 
 ## [TEMPLATE] Deploy OPL to Github Releases
 # 1. Clone this repository

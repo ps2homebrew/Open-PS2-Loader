@@ -7,15 +7,15 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: dev9.h 1454 2007-11-04 23:19:57Z roman_ps2dev $
+# $Id$
 # DEV9 Device Driver definitions and imports.
 */
 
 #ifndef IOP_DEV9_H
 #define IOP_DEV9_H
 
-#include "types.h"
-#include "irx.h"
+#include <types.h>
+#include <irx.h>
 
 typedef int (*dev9_intr_cb_t)(int flag);
 typedef void (*dev9_shutdown_cb_t)(void);

@@ -36,10 +36,11 @@ static fat_driver *g_fatd[NUM_DRIVES];
 int InitFAT(void)
 {
     int i;
-    int ret = 0;
+
     for (i = 0; i < NUM_DRIVES; ++i)
         g_fatd[i] = NULL;
-    return ret;
+
+    return 0;
 }
 
 //---------------------------------------------------------------------------

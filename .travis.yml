@@ -8,9 +8,7 @@
 # - and a lot of people around internet :)
 sudo: required
 language: c
-
-services:
-  - docker
+services: docker
 
 before_install:
 ## Save current dir, go to previous dir and save it too

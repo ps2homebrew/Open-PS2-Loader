@@ -42,7 +42,7 @@ before_script:
 - git clone --quiet https://github.com/ps2dev/ps2toolchain.git ${ENV_DIR}/ps2toolchain/
 - git clone --quiet https://github.com/ps2dev/ps2sdk-ports.git ${ENV_DIR}/ps2sdk-ports/
 - git clone --quiet https://github.com/ps2dev/ps2eth ${ENV_DIR}/ps2eth/
-- git clone --quiet https://github.com/rickgaiser/gsKit.git ${ENV_DIR}/gsKit/
+- git clone --quiet https://github.com/ps2dev/gsKit.git ${ENV_DIR}/gsKit/
 - git clone --quiet https://github.com/ps2dev/ps2-packer.git ${ENV_DIR}/ps2-packer/
 - chmod +x $(find . -name \*sh)
 

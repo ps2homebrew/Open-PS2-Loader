@@ -59,7 +59,7 @@ GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
 ifeq ($(shell git diff --quiet; echo $$?),1)
   DIRTY = -dirty
 endif
-ifneq ($(shell test -d .git; echo $?),0)
+ifneq ($(shell test -d .git; echo $$?),0)
   DIRTY = -dirty
 endif
 

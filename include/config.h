@@ -58,6 +58,8 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_ENABLE_COVERART "enable_coverart"
 #define CONFIG_OPL_WIDESCREEN "wide_screen"
 #define CONFIG_OPL_VMODE "vmode"
+#define CONFIG_OPL_XOFF "xoff"
+#define CONFIG_OPL_YOFF "yoff"
 #define CONFIG_OPL_DISABLE_DEBUG "disable_debug"
 #define CONFIG_OPL_PS2LOGO "ps2logo"
 #define CONFIG_OPL_EXIT_PATH "exit_path"

@@ -38,15 +38,16 @@ struct rm_mode
     char mode;
     char hsync; //In KHz
     short int height;
+    short int VCK;
 };
 
 static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
-    {-1, 16, -1},                  // AUTO
-    {GS_MODE_PAL, 16, 512},        // PAL@50Hz
-    {GS_MODE_NTSC, 16, 448},       // NTSC@60Hz
-    {GS_MODE_DTV_480P, 31, 448},   // DTV480P@60Hz
-    {GS_MODE_DTV_576P, 31, 512},   // DTV576P@50Hz
-    {GS_MODE_VGA_640_60, 31, 480}, // VGA640x480@60Hz
+    {-1, 16, -1, -1},                  // AUTO
+    {GS_MODE_PAL, 16, 512, 4},         // PAL@50Hz
+    {GS_MODE_NTSC, 16, 448, 4},        // NTSC@60Hz
+    {GS_MODE_DTV_480P, 31, 448, 2},    // DTV480P@60Hz
+    {GS_MODE_DTV_576P, 31, 512, 2},    // DTV576P@50Hz
+    {GS_MODE_VGA_640_60, 31, 480, 2},  // VGA640x480@60Hz
 };
 
 static float aspectWidth;
@@ -351,6 +352,8 @@ int rmSetMode(int force)
 
         gsKit_init_screen(gsGlobal);
 
+        rmSetDisplayOffset(gXOff, gYOff);
+
         gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 
         gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
@@ -488,6 +491,11 @@ void rmDrawRect(int x, int y, int w, int h, u64 color)
 void rmDrawLine(int x, int y, int x1, int y1, u64 color)
 {
     gsKit_prim_line(gsGlobal, x + transX, shiftY(y) + transY, x1 + transX, shiftY(y1) + transY, order, color);
+}
+
+void rmSetDisplayOffset(int x, int y)
+{
+    gsKit_set_display_offset(gsGlobal, x * rm_mode_table[vmode].VCK, y);
 }
 
 void rmSetAspectRatio(float width, float height)

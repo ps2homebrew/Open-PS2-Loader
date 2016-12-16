@@ -438,7 +438,7 @@ static int curTheme = -1;
 static int guiUIUpdater(int modified)
 {
     if (modified) {
-        int temp;
+        int temp, x, y;
         diaGetInt(diaUIConfig, UICFG_THEME, &temp);
         if (temp != curTheme) {
             curTheme = temp;
@@ -477,6 +477,10 @@ static int guiUIUpdater(int modified)
             diaSetEnabled(diaUIConfig, UICFG_TXTCOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_SELCOL, temp);
         }
+
+        diaGetInt(diaUIConfig, UICFG_XOFF, &x);
+        diaGetInt(diaUIConfig, UICFG_YOFF, &y);
+        rmSetDisplayOffset(x, y);
     }
 
     return 0;
@@ -505,6 +509,8 @@ void guiShowUIConfig(void)
     diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
     diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
     diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
+    diaSetInt(diaUIConfig, UICFG_XOFF, gXOff);
+    diaSetInt(diaUIConfig, UICFG_YOFF, gYOff);
 
     int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
     if (ret) {
@@ -524,6 +530,8 @@ void guiShowUIConfig(void)
         diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
         diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
         diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
+        diaGetInt(diaUIConfig, UICFG_XOFF, &gXOff);
+        diaGetInt(diaUIConfig, UICFG_YOFF, &gYOff);
 
         applyConfig(themeID, langID);
     }

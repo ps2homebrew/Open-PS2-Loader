@@ -781,20 +781,20 @@ int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
-        ip_address[0] = ip4_addr1((struct ip_addr *)&ip_info.ipaddr);
-        ip_address[1] = ip4_addr2((struct ip_addr *)&ip_info.ipaddr);
-        ip_address[2] = ip4_addr3((struct ip_addr *)&ip_info.ipaddr);
-        ip_address[3] = ip4_addr4((struct ip_addr *)&ip_info.ipaddr);
+        ip_address[0] = ip4_addr1((struct ip4_addr *)&ip_info.ipaddr);
+        ip_address[1] = ip4_addr2((struct ip4_addr *)&ip_info.ipaddr);
+        ip_address[2] = ip4_addr3((struct ip4_addr *)&ip_info.ipaddr);
+        ip_address[3] = ip4_addr4((struct ip4_addr *)&ip_info.ipaddr);
 
-        netmask[0] = ip4_addr1((struct ip_addr *)&ip_info.netmask);
-        netmask[1] = ip4_addr2((struct ip_addr *)&ip_info.netmask);
-        netmask[2] = ip4_addr3((struct ip_addr *)&ip_info.netmask);
-        netmask[3] = ip4_addr4((struct ip_addr *)&ip_info.netmask);
+        netmask[0] = ip4_addr1((struct ip4_addr *)&ip_info.netmask);
+        netmask[1] = ip4_addr2((struct ip4_addr *)&ip_info.netmask);
+        netmask[2] = ip4_addr3((struct ip4_addr *)&ip_info.netmask);
+        netmask[3] = ip4_addr4((struct ip4_addr *)&ip_info.netmask);
 
-        gateway[0] = ip4_addr1((struct ip_addr *)&ip_info.gw);
-        gateway[1] = ip4_addr2((struct ip_addr *)&ip_info.gw);
-        gateway[2] = ip4_addr3((struct ip_addr *)&ip_info.gw);
-        gateway[3] = ip4_addr4((struct ip_addr *)&ip_info.gw);
+        gateway[0] = ip4_addr1((struct ip4_addr *)&ip_info.gw);
+        gateway[1] = ip4_addr2((struct ip4_addr *)&ip_info.gw);
+        gateway[2] = ip4_addr3((struct ip4_addr *)&ip_info.gw);
+        gateway[3] = ip4_addr4((struct ip4_addr *)&ip_info.gw);
     } else {
         memset(ip_address, 0, 4);
         memset(netmask, 0, 4);
@@ -843,7 +843,7 @@ static int ethGetNetIFLinkStatus(void)
 int ethApplyIPConfig(void)
 {
     t_ip_info ip_info;
-    struct ip_addr ipaddr, netmask, gw, dns, dns_curr;
+    struct ip4_addr ipaddr, netmask, gw, dns, dns_curr;
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
@@ -855,21 +855,21 @@ int ethApplyIPConfig(void)
 
         //Check if it's the same. Otherwise, apply the new configuration.
         if ((ps2_ip_use_dhcp != ip_info.dhcp_enabled) || (!ps2_ip_use_dhcp &&
-                                                          (!ip_addr_cmp(&ipaddr, (struct ip_addr *)&ip_info.ipaddr) ||
-                                                           !ip_addr_cmp(&netmask, (struct ip_addr *)&ip_info.netmask) ||
-                                                           !ip_addr_cmp(&gw, (struct ip_addr *)&ip_info.gw) ||
+                                                          (!ip_addr_cmp(&ipaddr, (struct ip4_addr *)&ip_info.ipaddr) ||
+                                                           !ip_addr_cmp(&netmask, (struct ip4_addr *)&ip_info.netmask) ||
+                                                           !ip_addr_cmp(&gw, (struct ip4_addr *)&ip_info.gw) ||
                                                            !ip_addr_cmp(&dns, &dns_curr)))) {
             if (ps2_ip_use_dhcp) {
-                IP4_ADDR((struct ip_addr *)&ip_info.ipaddr, 169, 254, 0, 1);
-                IP4_ADDR((struct ip_addr *)&ip_info.netmask, 255, 255, 0, 0);
-                IP4_ADDR((struct ip_addr *)&ip_info.gw, 0, 0, 0, 0);
+                IP4_ADDR((struct ip4_addr *)&ip_info.ipaddr, 169, 254, 0, 1);
+                IP4_ADDR((struct ip4_addr *)&ip_info.netmask, 255, 255, 0, 0);
+                IP4_ADDR((struct ip4_addr *)&ip_info.gw, 0, 0, 0, 0);
                 IP4_ADDR(&dns, 0, 0, 0, 0);
 
                 ip_info.dhcp_enabled = 1;
             } else {
-                ip_addr_set((struct ip_addr *)&ip_info.ipaddr, &ipaddr);
-                ip_addr_set((struct ip_addr *)&ip_info.netmask, &netmask);
-                ip_addr_set((struct ip_addr *)&ip_info.gw, &gw);
+                ip_addr_set((struct ip4_addr *)&ip_info.ipaddr, &ipaddr);
+                ip_addr_set((struct ip4_addr *)&ip_info.netmask, &netmask);
+                ip_addr_set((struct ip4_addr *)&ip_info.gw, &gw);
 
                 ip_info.dhcp_enabled = 0;
             }
@@ -890,7 +890,7 @@ int ethGetDHCPStatus(void)
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
         if (ip_info.dhcp_enabled) {
-            result = (ip_info.dhcp_status == DHCP_BOUND || (ip_info.dhcp_status == DHCP_OFF));
+            result = (ip_info.dhcp_status == DHCP_STATE_BOUND || (ip_info.dhcp_status == DHCP_STATE_OFF));
         } else
             result = -1;
     }

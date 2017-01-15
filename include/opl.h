@@ -107,6 +107,8 @@ int gUseInfoScreen;
 int gEnableArt;
 int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
+int gXOff;
+int gYOff;
 int gSelectButton;
 
 #ifdef IGS

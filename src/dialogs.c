@@ -412,6 +412,16 @@ struct UIItem diaUIConfig[] = {
     {UI_ENUM, UICFG_VMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"X-Offset", -1}}},
+    {UI_SPACER},
+    {UI_INT, UICFG_XOFF, 1, 1, -1, 0, 0, {.intvalue = {0, 0, -300, 300}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"Y-Offset", -1}}},
+    {UI_SPACER},
+    {UI_INT, UICFG_YOFF, 1, 1, -1, 0, 0, {.intvalue = {0, 0, -300, 300}}},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_WIDE_SCREEN}}},
     {UI_SPACER},
     {UI_BOOL, UICFG_WIDESCREEN, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},

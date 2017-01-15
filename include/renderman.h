@@ -102,6 +102,9 @@ void rmStartFrame(void);
 /** Ends the frame - last to call every frame */
 void rmEndFrame(void);
 
+/** Sets the display offset in units of pixels */
+void rmSetDisplayOffset(int x, int y);
+
 /** Sets the aspect ratio correction for the upcoming operations.
 * When set, it will treat all pixmap widths/heights (not positions) as scaled with the ratios provided */
 void rmSetAspectRatio(float width, float height);

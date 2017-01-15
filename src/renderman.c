@@ -38,15 +38,16 @@ struct rm_mode
     char mode;
     char hsync; //In KHz
     short int height;
+    short int VCK;
 };
 
 static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
-    {-1, 16, -1},                  // AUTO
-    {GS_MODE_PAL, 16, 512},        // PAL@50Hz
-    {GS_MODE_NTSC, 16, 448},       // NTSC@60Hz
-    {GS_MODE_DTV_480P, 31, 448},   // DTV480P@60Hz
-    {GS_MODE_DTV_576P, 31, 512},   // DTV576P@50Hz
-    {GS_MODE_VGA_640_60, 31, 480}, // VGA640x480@60Hz
+    {-1, 16, -1, -1},                  // AUTO
+    {GS_MODE_PAL, 16, 512, 4},         // PAL@50Hz
+    {GS_MODE_NTSC, 16, 448, 4},        // NTSC@60Hz
+    {GS_MODE_DTV_480P, 31, 448, 2},    // DTV480P@60Hz
+    {GS_MODE_DTV_576P, 31, 512, 2},    // DTV576P@50Hz
+    {GS_MODE_VGA_640_60, 31, 480, 2},  // VGA640x480@60Hz
 };
 
 static float aspectWidth;
@@ -349,42 +350,9 @@ int rmSetMode(int force)
         gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
         gsGlobal->DoubleBuffering = GS_SETTING_ON;
 
-        if ((gsGlobal->Mode) == GS_MODE_DTV_576P) { // Write X, Y, DW and DH positions for DTV576P (not covered by GSKit lib)
-            gsGlobal->StartX = 324;
-            gsGlobal->StartY = 72;
-            gsGlobal->DW = 1280;
-            gsGlobal->DH = 512;
-        }
-
         gsKit_init_screen(gsGlobal);
 
-        if (vmode == RM_VMODE_DTV480P) { // Overwrite X, Y and DW GSKit params for DTV480P
-            gsGlobal->StartX = 312;
-            gsGlobal->StartY = 37 + (480 - 448) / 2;
-            gsGlobal->DW = 1280;
-            gsGlobal->DH = 448;
-        } else if (vmode == RM_VMODE_VGA_640_60) { // Overwrite X, Y GSKit params for VGA_640_60
-            gsGlobal->StartX = 276;
-            gsGlobal->StartY = 42;
-        }
-
-        if ((vmode == RM_VMODE_DTV480P) || (vmode == RM_VMODE_VGA_640_60)) { // Commit settings for DTV480P and VGA_650_60
-            DIntr();                                                         // disable interrupts
-            GS_SET_DISPLAY1(gsGlobal->StartX,                                // X position in the display area (in VCK unit
-                            gsGlobal->StartY,                                // Y position in the display area (in Raster u
-                            gsGlobal->MagH,                                  // Horizontal Magnification
-                            gsGlobal->MagV,                                  // Vertical Magnification
-                            gsGlobal->DW - 1,                                // Display area width
-                            gsGlobal->DH - 1);                               // Display area height
-            GS_SET_DISPLAY2(gsGlobal->StartX,                                // X position in the display area (in VCK units)
-                            gsGlobal->StartY,                                // Y position in the display area (in Raster units)
-                            gsGlobal->MagH,                                  // Horizontal Magnification
-                            gsGlobal->MagV,                                  // Vertical Magnification
-                            gsGlobal->DW - 1,                                // Display area width
-                            gsGlobal->DH - 1);                               // Display area height
-            __asm__("sync.l; sync.p;");
-            EIntr(); // enable interrupts
-        }
+        rmSetDisplayOffset(gXOff, gYOff);
 
         gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 
@@ -523,6 +491,11 @@ void rmDrawRect(int x, int y, int w, int h, u64 color)
 void rmDrawLine(int x, int y, int x1, int y1, u64 color)
 {
     gsKit_prim_line(gsGlobal, x + transX, shiftY(y) + transY, x1 + transX, shiftY(y1) + transY, order, color);
+}
+
+void rmSetDisplayOffset(int x, int y)
+{
+    gsKit_set_display_offset(gsGlobal, x * rm_mode_table[vmode].VCK, y);
 }
 
 void rmSetAspectRatio(float width, float height)

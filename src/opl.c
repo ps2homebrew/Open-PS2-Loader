@@ -543,6 +543,8 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, &gEnableArt);
             configGetInt(configOPL, CONFIG_OPL_WIDESCREEN, &gWideScreen);
             configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
+            configGetInt(configOPL, CONFIG_OPL_XOFF, &gXOff);
+            configGetInt(configOPL, CONFIG_OPL_YOFF, &gYOff);
 
             if (configGetStr(configOPL, CONFIG_OPL_THEME, &temp))
                 themeID = thmFindGuiID(temp);
@@ -630,6 +632,8 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, gEnableArt);
         configSetInt(configOPL, CONFIG_OPL_WIDESCREEN, gWideScreen);
         configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
+        configSetInt(configOPL, CONFIG_OPL_XOFF, gXOff);
+        configSetInt(configOPL, CONFIG_OPL_YOFF, gYOff);
         configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
         configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
         configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
@@ -1212,6 +1216,8 @@ static void setDefaults(void)
     frameCounter = 0;
 
     gVMode = RM_VMODE_AUTO;
+    gXOff = 0;
+    gYOff = 0;
 
 #ifdef CHEAT
     memset(gCheatList, 0, sizeof(gCheatList));

@@ -1058,9 +1058,9 @@ int InitUSB(void)
     int i;
     int ret = 0;
     for (i = 0; i < NUM_DEVICES; ++i) {
-		g_mass_device[i].status = 0;
+        g_mass_device[i].status = 0;
         g_mass_device[i].devId = -1;
-	}
+    }
 
     driver.next = NULL;
     driver.prev = NULL;
@@ -1105,10 +1105,11 @@ int UsbMassRegisterCallback(int device, usbmass_cb_t callback)
     if (device >= 0 && device < NUM_DEVICES) {
         g_mass_device[device].callback = callback;
         result = 0;
-		if(g_mass_device[device].status & USBMASS_DEV_STAT_CONN) {
-			//If the device is already connected, let the callback know.
-			if(callback != NULL) callback(USBMASS_DEV_EV_CONN);
-		}
+        if (g_mass_device[device].status & USBMASS_DEV_STAT_CONN) {
+            //If the device is already connected, let the callback know.
+            if (callback != NULL)
+                callback(USBMASS_DEV_EV_CONN);
+        }
     } else
         result = -ENODEV;
 

@@ -16,41 +16,42 @@ EXTRAVERSION = Beta
 # Type "make childproof" to build one.
 # Non-childproof features like GSM will not be available.
 
-# I want to put my name in my custom build! How i can do it?
+# I want to put my name in my custom build! How can I do it?
 # Type "make LOCALVERSION=-foobar"
 
 # ======== START OF CONFIGURABLE SECTION ========
 # You can adjust the variables in this section to meet your needs.
 # To enable a feature, set its variable's value to 1. To disable, change it to 0.
 # Do not COMMENT out the variables!!
+# You can also specify variables when executing make: "make VMC=1 RTL=1 GSM=1 IGS=1 CHEAT=1"
 
 #Enables/disables Virtual Memory Card (VMC) support
-VMC = 0
+VMC ?= 0
 
 #Enables/disables Right-To-Left (RTL) language support
-RTL = 0
+RTL ?= 0
 
 #Enables/disables Graphics Synthesizer Mode (GSM) selector
-GSM = 0
+GSM ?= 0
 
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
-IGS = 0
+IGS ?= 0
 
 #Enables/disables the cheat engine (PS2RD)
-CHEAT = 0
+CHEAT ?= 0
 
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
-DTL_T10000 = 0
+DTL_T10000 ?= 0
 
 #Nor stripping neither compressing binary ELF after compiling.
-NOT_PACKED = 0
+NOT_PACKED ?= 0
 
 # ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
-DEBUG = 0
-EESIO_DEBUG = 0
-INGAME_DEBUG = 0
-DECI2_DEBUG = 0
-CHILDPROOF = 0
+DEBUG ?= 0
+EESIO_DEBUG ?= 0
+INGAME_DEBUG ?= 0
+DECI2_DEBUG ?= 0
+CHILDPROOF ?= 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1)
@@ -59,11 +60,11 @@ GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
 ifeq ($(shell git diff --quiet; echo $$?),1)
   DIRTY = -dirty
 endif
-ifneq ($(shell test -d .git; echo $?),0)
+ifneq ($(shell test -d .git; echo $$?),0)
   DIRTY = -dirty
 endif
 
-OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),-$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
 		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
@@ -89,7 +90,8 @@ EECORE_OBJS = ee_core.o ioprp.o util.o \
 		ingame_smstcpip.o smap_ingame.o smbman.o smbinit.o
 
 EE_BIN = opl.elf
-EE_BIN_PKD = OPNPS2LD.ELF
+EE_BIN_STRIPPED = opl_stripped.elf
+EE_BIN_PACKED = OPNPS2LD.ELF
 EE_VPKD = OPNPS2LD-$(OPL_VERSION)
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
@@ -125,8 +127,12 @@ ifeq ($(DTL_T10000),1)
   EECORE_EXTRA_FLAGS += DTL_T10000=1
   IOP_OBJS += sio2man.o padman.o mcman.o mcserv.o
   EE_LIBS += -lpadx
+  UDNL_SRC = modules/iopcore/udnl-t300
+  UDNL_OUT = modules/iopcore/udnl-t300/udnl.irx
 else
   EE_LIBS += -lpad
+  UDNL_SRC = modules/iopcore/udnl
+  UDNL_OUT = modules/iopcore/udnl/udnl.irx
 endif
 
 ifeq ($(CHILDPROOF),1)
@@ -194,36 +200,26 @@ else
 endif
 
 EE_CFLAGS += -DOPL_VERSION=\"$(OPL_VERSION)\"
-EE_OBJS = $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
+EE_OBJS += $(FRONTEND_OBJS) $(GFX_OBJS) $(MISC_OBJS) $(EECORE_OBJS) $(IOP_OBJS)
 EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
+
+.PHONY: all release childproof debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
+
 all:
-	@mkdir -p $(EE_OBJS_DIR)
-	@mkdir -p $(EE_ASM_DIR)
-	
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
+ifneq ($(NOT_PACKED),1)
+	$(MAKE) $(EE_BIN_PACKED)
+else
 	$(MAKE) $(EE_BIN)
-	
-ifneq ($(DEBUG),1)
-  ifneq ($(NOT_PACKED),1)
-	echo "Stripping..."
-	$(EE_STRIP) $(EE_BIN)
-
-	echo "Compressing..."
-	ps2-packer $(EE_BIN) $(EE_BIN_PKD) > /dev/null
-
-    ifeq ($(RELEASE),1)
-	cp $(EE_BIN_PKD) $(EE_VPKD).ELF
-	zip -r $(EE_VPKD).zip $(EE_VPKD).ELF CREDITS *DETAILED_CHANGELOG LICENSE README
-	echo "Package Complete: $(EE_VPKD).zip"
-    endif
-  endif
 endif
 
 release:
-	$(MAKE) VMC=1 GSM=1 IGS=1 CHEAT=1 RELEASE=1 all
+	echo "Building Open PS2 Loader $(OPL_VERSION)..."
+	echo "-Interface"
+	$(MAKE) VMC=1 GSM=1 IGS=1 CHEAT=1 $(EE_VPKD).ZIP
 	
 childproof:
 	$(MAKE) CHILDPROOF=1 all
@@ -246,7 +242,7 @@ deci2_debug:
 clean:
 	echo "Cleaning..."
 	echo "-Interface"
-	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PKD) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
+	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-Elf Loader"
@@ -261,10 +257,10 @@ clean:
 	echo " -eesync"
 	$(MAKE) -C modules/iopcore/eesync clean
 	echo " -cdvdman"
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.usb clean
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.smb clean
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd clean
-	$(MAKE) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro clean
+	$(MAKE) -C modules/iopcore/cdvdman USE_USB=1 clean
+	$(MAKE) -C modules/iopcore/cdvdman USE_SMB=1 clean
+	$(MAKE) -C modules/iopcore/cdvdman USE_HDD=1 clean
+	$(MAKE) -C modules/iopcore/cdvdman USE_HDPRO=1 clean
 	echo " -cdvdfsv"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
 	echo " -isofs"
@@ -296,9 +292,9 @@ clean:
 	echo " -ps2fs"
 	$(MAKE) -C modules/hdd/pfs clean
 	echo " -mcemu"
-	$(MAKE) -C modules/mcemu -f Makefile.usb clean
-	$(MAKE) -C modules/mcemu -f Makefile.hdd clean
-	$(MAKE) -C modules/mcemu -f Makefile.smb clean
+	$(MAKE) -C modules/mcemu USE_USB=1 clean
+	$(MAKE) -C modules/mcemu USE_HDD=1 clean
+	$(MAKE) -C modules/mcemu USE_SMB=1 clean
 	echo " -genvmc"
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo " -hdldsvr"
@@ -324,333 +320,417 @@ pc_tools_win32:
 	echo "Building WIN32 iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=1 -C pc
 
-ee_core.s:
+$(EE_ASM_DIR):
+	@mkdir -p $@
+
+$(EE_OBJS_DIR):
+	@mkdir -p $@
+
+DETAILED_CHANGELOG: make_changelog.sh
+	sh make_changelog.sh
+
+$(EE_BIN_STRIPPED): $(EE_BIN)
+	echo "Stripping..."
+	$(EE_STRIP) -o $@ $<
+
+$(EE_BIN_PACKED): $(EE_BIN_STRIPPED)
+	echo "Compressing..."
+	ps2-packer $< $@ > /dev/null
+
+$(EE_VPKD).ELF: $(EE_BIN_PACKED)
+	cp -f $< $@
+
+$(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
+	zip -r $@ $^
+	echo "Package Complete: $@"
+
+ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C ee_core
-	$(BIN2S) ee_core/ee_core.elf $(EE_ASM_DIR)ee_core.s eecore_elf
+	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
-elfldr.s:
+$(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ eecore_elf
+
+elfldr/elfldr.elf: elfldr
 	echo "-Elf Loader"
-	$(MAKE) -C elfldr
-	$(BIN2S) elfldr/elfldr.elf $(EE_ASM_DIR)elfldr.s elfldr_elf
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)elfldr.s: elfldr/elfldr.elf | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ elfldr_elf
+
+$(UDNL_OUT): $(UDNL_SRC)
 	echo "-IOP core"
-
-udnl.s:
-ifeq ($(DTL_T10000),1)
-	echo " -udnl-t300"
-	$(MAKE) -C modules/iopcore/udnl-t300
-	$(BIN2S) modules/iopcore/udnl-t300/udnl.irx $(EE_ASM_DIR)udnl.s udnl_irx
-else
 	echo " -udnl"
-	$(MAKE) -C modules/iopcore/udnl
-	$(BIN2S) modules/iopcore/udnl/udnl.irx $(EE_ASM_DIR)udnl.s udnl_irx
-endif
+	$(MAKE) -C $<
 
-imgdrv.s:
+$(EE_ASM_DIR)udnl.s: $(UDNL_OUT) | $(EE_ASM_DIR)
+	$(BIN2S) $(UDNL_OUT) $@ udnl_irx
+
+modules/iopcore/imgdrv/imgdrv.irx: modules/iopcore/imgdrv
 	echo " -imgdrv"
-	$(MAKE) -C modules/iopcore/imgdrv
-	$(BIN2S) modules/iopcore/imgdrv/imgdrv.irx $(EE_ASM_DIR)imgdrv.s imgdrv_irx
+	$(MAKE) -C $<
 
-eesync.s:
+$(EE_ASM_DIR)imgdrv.s: modules/iopcore/imgdrv/imgdrv.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ imgdrv_irx
+
+modules/iopcore/eesync/eesync.irx: modules/iopcore/eesync
 	echo " -eesync"
-	$(MAKE) -C modules/iopcore/eesync
-	$(BIN2S) modules/iopcore/eesync/eesync.irx $(EE_ASM_DIR)eesync.s eesync_irx
+	$(MAKE) -C $<
 
-usb_cdvdman.s:
+$(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ eesync_irx
+
+modules/iopcore/cdvdman/usb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -usb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.usb rebuild
-	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx $(EE_ASM_DIR)usb_cdvdman.s usb_cdvdman_irx
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
 
-smb_cdvdman.s:
+$(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usb_cdvdman_irx
+
+modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -smb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.smb rebuild
-	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx $(EE_ASM_DIR)smb_cdvdman.s smb_cdvdman_irx
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
 
-hdd_cdvdman.s:
+$(EE_ASM_DIR)smb_cdvdman.s: modules/iopcore/cdvdman/smb_cdvdman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ smb_cdvdman_irx
+
+modules/iopcore/cdvdman/hdd_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd rebuild
-	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx $(EE_ASM_DIR)hdd_cdvdman.s hdd_cdvdman_irx
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
 
-hdd_hdpro_cdvdman.s:
+$(EE_ASM_DIR)hdd_cdvdman.s: modules/iopcore/cdvdman/hdd_cdvdman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ hdd_cdvdman_irx
+
+modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_hdpro_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) -C modules/iopcore/cdvdman -f Makefile.hdd.hdpro rebuild
-	$(BIN2S) modules/iopcore/cdvdman/cdvdman.irx $(EE_ASM_DIR)hdd_hdpro_cdvdman.s hdd_hdpro_cdvdman_irx
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
 
-cdvdfsv.s:
+$(EE_ASM_DIR)hdd_hdpro_cdvdman.s: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ hdd_hdpro_cdvdman_irx
+
+modules/iopcore/cdvdfsv/cdvdfsv.irx: modules/iopcore/cdvdfsv
 	echo " -cdvdfsv"
-	$(MAKE) -C modules/iopcore/cdvdfsv
-	$(BIN2S) modules/iopcore/cdvdfsv/cdvdfsv.irx $(EE_ASM_DIR)cdvdfsv.s cdvdfsv_irx
+	$(MAKE) -C $<
 
-usb_mcemu.s:
+$(EE_ASM_DIR)cdvdfsv.s: modules/iopcore/cdvdfsv/cdvdfsv.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ cdvdfsv_irx
+
+modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.usb rebuild
-	$(BIN2S) modules/mcemu/mcemu.irx $(EE_ASM_DIR)usb_mcemu.s usb_mcemu_irx
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
 
-hdd_mcemu.s:
+$(EE_ASM_DIR)usb_mcemu.s: modules/mcemu/usb_mcemu.irx
+	$(BIN2S) $< $@ usb_mcemu_irx
+
+modules/mcemu/hdd_mcemu.irx: modules/mcemu
 	echo " -hdd_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.hdd rebuild
-	$(BIN2S) modules/mcemu/mcemu.irx $(EE_ASM_DIR)hdd_mcemu.s hdd_mcemu_irx
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
 
-smb_mcemu.s:
+$(EE_ASM_DIR)hdd_mcemu.s: modules/mcemu/hdd_mcemu.irx
+	$(BIN2S) $< $@ hdd_mcemu_irx
+
+modules/mcemu/smb_mcemu.irx: modules/mcemu
 	echo " -smb_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) -C modules/mcemu -f Makefile.smb rebuild
-	$(BIN2S) modules/mcemu/mcemu.irx $(EE_ASM_DIR)smb_mcemu.s smb_mcemu_irx
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
 
-isofs.s:
+$(EE_ASM_DIR)smb_mcemu.s: modules/mcemu/smb_mcemu.irx
+	$(BIN2S) $< $@ smb_mcemu_irx
+
+modules/isofs/isofs.irx: modules/isofs
 	echo " -isofs"
-	$(MAKE) -C modules/isofs
-	$(BIN2S) modules/isofs/isofs.irx $(EE_ASM_DIR)isofs.s isofs_irx
+	$(MAKE) -C $<
 
-usbd.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/usbd.irx $(EE_ASM_DIR)usbd.s usbd_irx
+$(EE_ASM_DIR)isofs.s: modules/isofs/isofs.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ isofs_irx
 
-usbhdfsd.s:
+$(EE_ASM_DIR)usbd.s: $(PS2SDK)/iop/irx/usbd.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usbd_irx
+
+modules/usb/usbhdfsd/usbhdfsd.irx: modules/usb/usbhdfsd
 	echo " -usbhdfsd"
-	$(MAKE) -C modules/usb/usbhdfsd
-	$(BIN2S) modules/usb/usbhdfsd/usbhdfsd.irx $(EE_ASM_DIR)usbhdfsd.s usbhdfsd_irx
+	$(MAKE) -C $<
 
-usbhdfsdfsv.s:
+$(EE_ASM_DIR)usbhdfsd.s: modules/usb/usbhdfsd/usbhdfsd.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usbhdfsd_irx
+
+modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv
 	echo " -usbhdfsdfsv"
-	$(MAKE) -C modules/usb/usbhdfsdfsv
-	$(BIN2S) modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx $(EE_ASM_DIR)usbhdfsdfsv.s usbhdfsdfsv_irx
+	$(MAKE) -C $<
 
-ps2dev9.s:
+$(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usbhdfsdfsv_irx
+
+modules/dev9/ps2dev9.irx: modules/dev9
 	echo " -ps2dev9"
-	$(MAKE) -C modules/dev9
-	$(BIN2S) modules/dev9/ps2dev9.irx $(EE_ASM_DIR)ps2dev9.s ps2dev9_irx
+	$(MAKE) -C $<
 
-smsutils.s:
+$(EE_ASM_DIR)ps2dev9.s: modules/dev9/ps2dev9.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2dev9_irx
+
+modules/network/SMSUTILS/SMSUTILS.irx: modules/network/SMSUTILS
 	echo " -SMSUTILS"
-	$(MAKE) -C modules/network/SMSUTILS
-	$(BIN2S) modules/network/SMSUTILS/SMSUTILS.irx $(EE_ASM_DIR)smsutils.s smsutils_irx
+	$(MAKE) -C $<
 
-ps2ip.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/ps2ip-nm.irx $(EE_ASM_DIR)ps2ip.s ps2ip_irx
+$(EE_ASM_DIR)smsutils.s: modules/network/SMSUTILS/SMSUTILS.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ smsutils_irx
 
-ingame_smstcpip.s:
+$(EE_ASM_DIR)ps2ip.s: $(PS2SDK)/iop/irx/ps2ip-nm.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2ip_irx
+
+modules/network/SMSTCPIP/SMSTCPIP.irx: modules/network/SMSTCPIP
 	echo " -in-game SMSTCPIP"
-	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C modules/network/SMSTCPIP rebuild
-	$(BIN2S) modules/network/SMSTCPIP/SMSTCPIP.irx $(EE_ASM_DIR)ingame_smstcpip.s ingame_smstcpip_irx
+	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C $< rebuild
 
-smap_ingame.s:
+$(EE_ASM_DIR)ingame_smstcpip.s: modules/network/SMSTCPIP/SMSTCPIP.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ingame_smstcpip_irx
+
+modules/network/smap-ingame/smap.irx: modules/network/smap-ingame
 	echo " -in-game SMAP"
-	$(MAKE) -C modules/network/smap-ingame
-	$(BIN2S) modules/network/smap-ingame/smap.irx $(EE_ASM_DIR)smap_ingame.s smap_ingame_irx
+	$(MAKE) -C $<
 
-smap.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/smap.irx $(EE_ASM_DIR)smap.s smap_irx
+$(EE_ASM_DIR)smap_ingame.s: modules/network/smap-ingame/smap.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ smap_ingame_irx
 
-netman.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/netman.irx $(EE_ASM_DIR)netman.s netman_irx
+$(EE_ASM_DIR)smap.s: $(PS2SDK)/iop/irx/smap.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ smap_irx
 
-ps2ips.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/ps2ips.irx $(EE_ASM_DIR)ps2ips.s ps2ips_irx
+$(EE_ASM_DIR)netman.s: $(PS2SDK)/iop/irx/netman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ netman_irx
 
-smbman.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/smbman.irx $(EE_ASM_DIR)smbman.s smbman_irx
+$(EE_ASM_DIR)ps2ips.s: $(PS2SDK)/iop/irx/ps2ips.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2ips_irx
 
-smbinit.s:
+$(EE_ASM_DIR)smbman.s: $(PS2SDK)/iop/irx/smbman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ smbman_irx
+
+modules/network/smbinit/smbinit.irx: modules/network/smbinit
 	echo " -smbinit"
-	$(MAKE) -C modules/network/smbinit
-	$(BIN2S) modules/network/smbinit/smbinit.irx $(EE_ASM_DIR)smbinit.s smbinit_irx
+	$(MAKE) -C $<
 
-ps2atad.s:
+$(EE_ASM_DIR)smbinit.s: modules/network/smbinit/smbinit.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ smbinit_irx
+
+modules/hdd/atad/ps2atad.irx: modules/hdd/atad
 	echo " -ps2atad"
-	$(MAKE) -C modules/hdd/atad
-	$(BIN2S) modules/hdd/atad/ps2atad.irx $(EE_ASM_DIR)ps2atad.s ps2atad_irx
+	$(MAKE) -C $<
 
-hdpro_atad.s:
+$(EE_ASM_DIR)ps2atad.s: modules/hdd/atad/ps2atad.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2atad_irx
+
+modules/hdd/hdpro_atad/hdpro_atad.irx: modules/hdd/hdpro_atad
 	echo " -hdpro_atad"
-	$(MAKE) -C modules/hdd/hdpro_atad
-	$(BIN2S) modules/hdd/hdpro_atad/hdpro_atad.irx $(EE_ASM_DIR)hdpro_atad.s hdpro_atad_irx
+	$(MAKE) -C $<
 
-poweroff.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/poweroff.irx $(EE_ASM_DIR)poweroff.s poweroff_irx
+$(EE_ASM_DIR)hdpro_atad.s: modules/hdd/hdpro_atad/hdpro_atad.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ hdpro_atad_irx
 
-ps2hdd.s:
+$(EE_ASM_DIR)poweroff.s: $(PS2SDK)/iop/irx/poweroff.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ poweroff_irx
+
+modules/hdd/apa/ps2hdd.irx: modules/hdd/apa
 	echo " -ps2hdd"
-	$(MAKE) -C modules/hdd/apa
-	$(BIN2S) modules/hdd/apa/ps2hdd.irx $(EE_ASM_DIR)ps2hdd.s ps2hdd_irx
+	$(MAKE) -C $<
 
-genvmc.s:
+$(EE_ASM_DIR)ps2hdd.s: modules/hdd/apa/ps2hdd.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2hdd_irx
+
+modules/vmc/genvmc/genvmc.irx: modules/vmc/genvmc
 	echo " -genvmc"
-	$(MAKE) $(MOD_DEBUG_FLAGS) -C modules/vmc/genvmc
-	$(BIN2S) modules/vmc/genvmc/genvmc.irx $(EE_ASM_DIR)genvmc.s genvmc_irx
+	$(MAKE) $(MOD_DEBUG_FLAGS) -C $<
 
-hdldsvr.s:
+$(EE_ASM_DIR)genvmc.s: modules/vmc/genvmc/genvmc.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ genvmc_irx
+
+modules/hdd/hdldsvr/hdldsvr.irx: modules/hdd/hdldsvr
 	echo " -hdldsvr"
-	$(MAKE) -C modules/hdd/hdldsvr
-	$(BIN2S) modules/hdd/hdldsvr/hdldsvr.irx $(EE_ASM_DIR)hdldsvr.s hdldsvr_irx
+	$(MAKE) -C $<
 
-udptty.s:
+$(EE_ASM_DIR)hdldsvr.s: modules/hdd/hdldsvr/hdldsvr.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ hdldsvr_irx
+
+modules/debug/udptty/udptty.irx: modules/debug/udptty
 	echo " -udptty"
-	$(MAKE) -C modules/debug/udptty
-	$(BIN2S) modules/debug/udptty/udptty.irx $(EE_ASM_DIR)udptty.s udptty_irx
+	$(MAKE) -C $<
 
-udptty-ingame.s:
+$(EE_ASM_DIR)udptty.s: modules/debug/udptty/udptty.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ udptty_irx
+
+modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame
 	echo " -udptty-ingame"
-	$(MAKE) -C modules/debug/udptty-ingame
-	$(BIN2S) modules/debug/udptty-ingame/udptty.irx $(EE_ASM_DIR)udptty-ingame.s udptty_ingame_irx
+	$(MAKE) -C $<
 
-ioptrap.s:
+$(EE_ASM_DIR)udptty-ingame.s: modules/debug/udptty-ingame/udptty.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ udptty_ingame_irx
+
+modules/debug/ioptrap/ioptrap.irx: modules/debug/ioptrap
 	echo " -ioptrap"
-	$(MAKE) -C modules/debug/ioptrap
-	$(BIN2S) modules/debug/ioptrap/ioptrap.irx $(EE_ASM_DIR)ioptrap.s ioptrap_irx
+	$(MAKE) -C $<
 
-ps2link.s:
+$(EE_ASM_DIR)ioptrap.s: modules/debug/ioptrap/ioptrap.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ioptrap_irx
+
+modules/debug/ps2link/ps2link.irx: modules/debug/ps2link
 	echo " -ps2link"
-	$(MAKE) -C modules/debug/ps2link
-	$(BIN2S) modules/debug/ps2link/ps2link.irx $(EE_ASM_DIR)ps2link.s ps2link_irx
+	$(MAKE) -C $<
 
-nbns-iop.s:
+$(EE_ASM_DIR)ps2link.s: modules/debug/ps2link/ps2link.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2link_irx
+
+modules/network/nbns/nbns.irx: modules/network/nbns
 	echo " -nbns"
-	$(MAKE) -C modules/network/nbns
-	$(BIN2S) modules/network/nbns/nbns.irx $(EE_ASM_DIR)nbns-iop.s nbns_irx
+	$(MAKE) -C $<
 
-httpclient-iop.s:
+$(EE_ASM_DIR)nbns-iop.s: modules/network/nbns/nbns.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ nbns_irx
+
+modules/network/httpclient/httpclient.irx: modules/network/httpclient
 	echo " -httpclient"
-	$(MAKE) -C modules/network/httpclient
-	$(BIN2S) modules/network/httpclient/httpclient.irx $(EE_ASM_DIR)httpclient-iop.s httpclient_irx
-	
-ps2fs.s:
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)httpclient-iop.s: modules/network/httpclient/httpclient.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ httpclient_irx
+
+modules/hdd/pfs/ps2fs.irx: modules/hdd/pfs
 	echo " -ps2fs"
-	$(MAKE) -C modules/hdd/pfs
-	$(BIN2S) modules/hdd/pfs/ps2fs.irx $(EE_ASM_DIR)ps2fs.s ps2fs_irx
+	$(MAKE) -C $<
 
-iomanx.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/iomanX.irx $(EE_ASM_DIR)iomanx.s iomanx_irx
+$(EE_ASM_DIR)ps2fs.s: modules/hdd/pfs/ps2fs.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ps2fs_irx
 
-filexio.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/fileXio.irx $(EE_ASM_DIR)filexio.s filexio_irx
+$(EE_ASM_DIR)iomanx.s: $(PS2SDK)/iop/irx/iomanX.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ iomanx_irx
 
-sio2man.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/freesio2.irx $(EE_ASM_DIR)sio2man.s sio2man_irx
+$(EE_ASM_DIR)filexio.s: $(PS2SDK)/iop/irx/fileXio.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ filexio_irx
 
-padman.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/freepad.irx $(EE_ASM_DIR)padman.s padman_irx
+$(EE_ASM_DIR)sio2man.s: $(PS2SDK)/iop/irx/freesio2.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ sio2man_irx
 
-mcman.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/mcman.irx $(EE_ASM_DIR)mcman.s mcman_irx
+$(EE_ASM_DIR)padman.s: $(PS2SDK)/iop/irx/freepad.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ padman_irx
 
-mcserv.s:
-	$(BIN2S) $(PS2SDK)/iop/irx/mcserv.irx $(EE_ASM_DIR)mcserv.s mcserv_irx
+$(EE_ASM_DIR)mcman.s: $(PS2SDK)/iop/irx/mcman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ mcman_irx
 
-load0.s:
-	$(BIN2S) gfx/load0.png $(EE_ASM_DIR)load0.s load0_png
+$(EE_ASM_DIR)mcserv.s: $(PS2SDK)/iop/irx/mcserv.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ mcserv_irx
 
-load1.s:
-	$(BIN2S) gfx/load1.png $(EE_ASM_DIR)load1.s load1_png
+$(EE_ASM_DIR)load0.s: gfx/load0.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load0_png
 
-load2.s:
-	$(BIN2S) gfx/load2.png $(EE_ASM_DIR)load2.s load2_png
+$(EE_ASM_DIR)load1.s: gfx/load1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load1_png
 
-load3.s:
-	$(BIN2S) gfx/load3.png $(EE_ASM_DIR)load3.s load3_png
+$(EE_ASM_DIR)load2.s: gfx/load2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load2_png
 
-load4.s:
-	$(BIN2S) gfx/load4.png $(EE_ASM_DIR)load4.s load4_png
+$(EE_ASM_DIR)load3.s: gfx/load3.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load3_png
 
-load5.s:
-	$(BIN2S) gfx/load5.png $(EE_ASM_DIR)load5.s load5_png
+$(EE_ASM_DIR)load4.s: gfx/load4.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load4_png
 
-load6.s:
-	$(BIN2S) gfx/load6.png $(EE_ASM_DIR)load6.s load6_png
+$(EE_ASM_DIR)load5.s: gfx/load5.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load5_png
 
-load7.s:
-	$(BIN2S) gfx/load7.png $(EE_ASM_DIR)load7.s load7_png
+$(EE_ASM_DIR)load6.s: gfx/load6.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load6_png
 
-logo.s:
-	$(BIN2S) gfx/logo.png $(EE_ASM_DIR)logo.s logo_png
+$(EE_ASM_DIR)load7.s: gfx/load7.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ load7_png
 
-bg_overlay.s:
-	$(BIN2S) gfx/bg_overlay.png $(EE_ASM_DIR)bg_overlay.s bg_overlay_png
+$(EE_ASM_DIR)logo.s: gfx/logo.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ logo_png
 
-usb_icon.s:
-	$(BIN2S) gfx/usb.png $(EE_ASM_DIR)usb_icon.s usb_png
+$(EE_ASM_DIR)bg_overlay.s: gfx/bg_overlay.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bg_overlay_png
 
-hdd_icon.s:
-	$(BIN2S) gfx/hdd.png $(EE_ASM_DIR)hdd_icon.s hdd_png
+$(EE_ASM_DIR)usb_icon.s: gfx/usb.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usb_png
 
-eth_icon.s:
-	$(BIN2S) gfx/eth.png $(EE_ASM_DIR)eth_icon.s eth_png
+$(EE_ASM_DIR)hdd_icon.s: gfx/hdd.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ hdd_png
 
-app_icon.s:
-	$(BIN2S) gfx/app.png $(EE_ASM_DIR)app_icon.s app_png
+$(EE_ASM_DIR)eth_icon.s: gfx/eth.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ eth_png
 
-cross_icon.s:
-	$(BIN2S) gfx/cross.png $(EE_ASM_DIR)cross_icon.s cross_png
+$(EE_ASM_DIR)app_icon.s: gfx/app.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ app_png
 
-triangle_icon.s:
-	$(BIN2S) gfx/triangle.png $(EE_ASM_DIR)triangle_icon.s triangle_png
+$(EE_ASM_DIR)cross_icon.s: gfx/cross.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ cross_png
 
-circle_icon.s:
-	$(BIN2S) gfx/circle.png $(EE_ASM_DIR)circle_icon.s circle_png
+$(EE_ASM_DIR)triangle_icon.s: gfx/triangle.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ triangle_png
 
-square_icon.s:
-	$(BIN2S) gfx/square.png $(EE_ASM_DIR)square_icon.s square_png
+$(EE_ASM_DIR)circle_icon.s: gfx/circle.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ circle_png
 
-select_icon.s:
-	$(BIN2S) gfx/select.png $(EE_ASM_DIR)select_icon.s select_png
+$(EE_ASM_DIR)square_icon.s: gfx/square.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ square_png
 
-start_icon.s:
-	$(BIN2S) gfx/start.png $(EE_ASM_DIR)start_icon.s start_png
+$(EE_ASM_DIR)select_icon.s: gfx/select.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ select_png
 
-left_icon.s:
-	$(BIN2S) gfx/left.png $(EE_ASM_DIR)left_icon.s left_png
+$(EE_ASM_DIR)start_icon.s: gfx/start.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ start_png
 
-right_icon.s:
-	$(BIN2S) gfx/right.png $(EE_ASM_DIR)right_icon.s right_png
+$(EE_ASM_DIR)left_icon.s: gfx/left.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ left_png
 
-up_icon.s:
-	$(BIN2S) gfx/up.png $(EE_ASM_DIR)up_icon.s up_png
+$(EE_ASM_DIR)right_icon.s: gfx/right.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ right_png
 
-down_icon.s:
-	$(BIN2S) gfx/down.png $(EE_ASM_DIR)down_icon.s down_png
+$(EE_ASM_DIR)up_icon.s: gfx/up.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ up_png
 
-L1_icon.s:
-	$(BIN2S) gfx/L1.png $(EE_ASM_DIR)L1_icon.s L1_png
+$(EE_ASM_DIR)down_icon.s: gfx/down.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ down_png
 
-L2_icon.s:
-	$(BIN2S) gfx/L2.png $(EE_ASM_DIR)L2_icon.s L2_png
+$(EE_ASM_DIR)L1_icon.s: gfx/L1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ L1_png
 
-R1_icon.s:
-	$(BIN2S) gfx/R1.png $(EE_ASM_DIR)R1_icon.s R1_png
+$(EE_ASM_DIR)L2_icon.s: gfx/L2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ L2_png
 
-R2_icon.s:
-	$(BIN2S) gfx/R2.png $(EE_ASM_DIR)R2_icon.s R2_png
+$(EE_ASM_DIR)R1_icon.s: gfx/R1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ R1_png
 
-freesans.s:
-	$(BIN2S) thirdparty/FreeSans_basic_latin.ttf $(EE_ASM_DIR)freesans.s freesansfont_raw
+$(EE_ASM_DIR)R2_icon.s: gfx/R2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ R2_png
 
-icon_sys.s:
-	$(BIN2S) gfx/icon.sys $(EE_ASM_DIR)icon_sys.s icon_sys
+$(EE_ASM_DIR)freesans.s: thirdparty/FreeSans_basic_latin.ttf | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ freesansfont_raw
+
+$(EE_ASM_DIR)icon_sys.s: gfx/icon.sys | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ icon_sys
 	
-icon_icn.s:
-	$(BIN2S) gfx/opl.icn $(EE_ASM_DIR)icon_icn.s icon_icn	
+$(EE_ASM_DIR)icon_icn.s: gfx/opl.icn | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ icon_icn	
 
-icon_sys_A.s:
-	$(BIN2S) misc/icon_A.sys $(EE_ASM_DIR)icon_sys_A.s icon_sys_A
+$(EE_ASM_DIR)icon_sys_A.s: misc/icon_A.sys | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ icon_sys_A
 
-icon_sys_J.s:
-	$(BIN2S) misc/icon_J.sys $(EE_ASM_DIR)icon_sys_J.s icon_sys_J
+$(EE_ASM_DIR)icon_sys_J.s: misc/icon_J.sys | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ icon_sys_J
 
-IOPRP_img.s:
-	$(BIN2S) modules/iopcore/IOPRP.img $(EE_ASM_DIR)IOPRP_img.s IOPRP_img
+$(EE_ASM_DIR)IOPRP_img.s: modules/iopcore/IOPRP.img | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ IOPRP_img
 
-drvtif_irx.s:
-	$(BIN2S) modules/debug/drvtif.irx $(EE_ASM_DIR)drvtif_irx.s drvtif_irx
+$(EE_ASM_DIR)drvtif_irx.s: modules/debug/drvtif.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ drvtif_irx
 
-tifinet_irx.s:
-	$(BIN2S) modules/debug/tifinet.irx $(EE_ASM_DIR)tifinet_irx.s tifinet_irx
+$(EE_ASM_DIR)tifinet_irx.s: modules/debug/tifinet.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ tifinet_irx
 
-$(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
+$(EE_OBJS_DIR)%.o: $(EE_SRC_DIR)%.c | $(EE_OBJS_DIR)
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
-$(EE_OBJS_DIR)%.o : %.s
-	$(EE_AS) $(EE_ASFLAGS) $(EE_ASM_DIR)$< -o $@
+$(EE_OBJS_DIR)%.o: $(EE_ASM_DIR)%.s | $(EE_OBJS_DIR)
+	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
 oplversion:
-	@echo $(OPLVERSION)
+	@echo $(OPL_VERSION)
 
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal

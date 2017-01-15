@@ -12,3 +12,4 @@
 libfreetype.a
 
 pc/iso2usbld/bin/iso2usbld
+IOPRP_img.c

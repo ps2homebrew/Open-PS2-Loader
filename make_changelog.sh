@@ -28,7 +28,7 @@ fi
 
 # Store author, commit and date on temp file
 git log --pretty=format:"%an - %s - %cd" > /tmp/commit_summary
-if ! [ "${?}" == "0" ]
+if [ "${?}" != "0" ]
 then
  echo "Git command failed, exiting..."
  break
@@ -47,7 +47,7 @@ echo "Current Revision ${number_commits} (Of BitBucket r${old_number_commits} + 
 
 # Store author, commit and date on temp file
 git log -${new_number_commits} --pretty=format:"%an - %s - %cd" > /tmp/commit_summary
-if ! [ "${?}" == "0" ]
+if [ "${?}" != "0" ]
 then
  echo "Git command failed, exiting..."
  break

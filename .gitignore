@@ -1,15 +1,32 @@
-*.o
-*.s
+#
+# NOTE! Please use 'git ls-files -i --exclude-standard'
+# command after changing this file, to see if there are
+# any tracked files which get ignored after the change.
+#
+# Normal rules
+#
+*.a
+*.diff
 *.elf
 *.ELF
 *.erl
-*.irx
 *.exe
+*.irx
 *.map
+*.o
 *.patch
-*.diff
+*.rej
+*.s
 *.zip
-libfreetype.a
+*.ZIP
 
+#
+# git files that we don't want to ignore even it they are dot-files
+#
+!.gitignore
+
+#
+# Generated source files
+#
 pc/iso2usbld/bin/iso2usbld
 IOPRP_img.c

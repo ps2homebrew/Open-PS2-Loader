@@ -1,11 +1,28 @@
 #!/bin/bash
-# Lang Packer for Open-PS2-Loader by Caio99BR <caiooliveirafarias0@gmail.com>
+# Lang Packer for Open-PS2-Loader
+# Made by Caio99BR <caiooliveirafarias0@gmail.com>
+# Reworked by Doctor Q <Dr-Q@users.noreply.github.com>
 
 # Set variables
 CURRENT_DIR=$(pwd)
 BUILD_DIR="/tmp/OPL_LANG"
 LANG_LIST="/tmp/OPL_LANG_LIST"
-OPL_VERSION=$(make oplversion)
+make oplversion 2>/dev/null
+if [ $? == "0" ]
+then
+	export OPL_VERSION=$(make oplversion)
+else
+	echo "Falling back to old OPL Lang Pack"
+	VERSION=$(cat ${CURRENT_DIR}/Makefile | grep "VERSION =" | head -1 | cut -d " " -f 3)
+	SUBVERSION=$(cat ${CURRENT_DIR}/Makefile | grep "SUBVERSION =" | head -1 | cut -d " " -f 3)
+	PATCHLEVEL=$(cat ${CURRENT_DIR}/Makefile | grep "PATCHLEVEL =" | head -1 | cut -d " " -f 3)
+	REVISION=$(($(cat ${CURRENT_DIR}/DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
+	EXTRAVERSION=$(cat ${CURRENT_DIR}/Makefile | grep "EXTRAVERSION =" | head -1 | cut -d " " -f 3)
+	if [ ${EXTRAVERSION} != "" ]; then EXTRAVERSION=-${EXTRAVERSION}; fi
+	GIT_HASH=$(git -C ${CURRENT_DIR}/ rev-parse --short=7 HEAD 2>/dev/null)
+	if [ ${GIT_HASH} != "" ]; then GIT_HASH=-${GIT_HASH}; fi
+	export OPL_VERSION=${VERSION}.${SUBVERSION}.${PATCHLEVEL}.${REVISION}${EXTRAVERSION}${GIT_HASH}
+fi
 
 # Print a list
 printf "$(ls ${CURRENT_DIR}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > ${LANG_LIST}

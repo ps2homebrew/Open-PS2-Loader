@@ -17,8 +17,11 @@ git:
 
 before_install:
   ## Save env dir
-  - cd ..
+  - cd ../
   - export TRAVIS_ENV_DIR=$(pwd)
+
+  ## Save repo name
+  - export NEW_REPO_SLUG=$(echo ${TRAVIS_REPO_SLUG} | cut -f 1 -d "/")
 
 install:
   ## Dependencies
@@ -47,7 +50,9 @@ before_script:
 
   ## ps2dev/PS2Toolchain
   - cd ${TRAVIS_ENV_DIR}/ps2toolchain/
-  - bash ./toolchain.sh &> /dev/null
+  - bash ./toolchain.sh > /tmp/OPNPS2LD-PS2TOOLCHAIN.log 2>&1
+  - curl --upload-file /tmp/OPNPS2LD-PS2TOOLCHAIN.log https://transfer.sh/OPNPS2LD-PS2TOOLCHAIN-${NEW_REPO_SLUG}-NIGHTLY${TRAVIS_BUILD_NUMBER}.log
+
   ## ps2dev/PS2SDKPorts/zlib
   - cd ${TRAVIS_ENV_DIR}/ps2sdk-ports/zlib/
   - make
@@ -87,41 +92,23 @@ script:
   ## Go back to opl dir
   - cd ${TRAVIS_BUILD_DIR}/
 
-  ## Make a new changelog and pack of langs
+  ## BUG: If we not call './make_changelog.sh' before 'make', it will always
+  ## build OPL with old REVISION, and make things confuse
+  ##
+  ## Make a new changelog
   - bash ./make_changelog.sh
-  - bash ./lng_pack.sh
 
   ## Hack to prevent '-dirty' flag
   - git add -A
 
   ## Let's build Open PS2 Loader Release!
-  - make release
+  - make release LOCALVERSION=${NEW_REPO_SLUG}
+
+  ## Make the lang pack
+  - bash ./lng_pack.sh
 
 after_success:
   - export OPL_VERSION=$(make oplversion)
-  - curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD-${OPL_VERSION}.zip https://transfer.sh/OPNPS2LD-${OPL_VERSION}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip
+  - curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD-${OPL_VERSION}-${NEW_REPO_SLUG}.ZIP https://transfer.sh/OPNPS2LD-${OPL_VERSION}-${NEW_REPO_SLUG}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip
   - curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip https://transfer.sh/OPNPS2LD_LANGS-${OPL_VERSION}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip
 
-## [TEMPLATE] Deploy OPL to Github Releases
-# 1. Clone this repository
-# 2. Copy '.travis.yml' to '.travis-original.yml' (you will need it after)
-# 3. Install Travis Client <https://github.com/travis-ci/travis.rb#installation>
-# 4. Run command: $(travis setup releases)
-#    After follow all previous steps, pickup ONLY the "secure" line
-#    and change it on '.travis-original.yml'
-# 5. Move '.travis-original.yml' to '.travis.yml'
-# 6. Commit it
-## NOTE: You need to configure TravisCI before anything <https://travis-ci.org/>
-
-## Deploy OPL to Github Releases
-deploy:
-  provider: releases
-  skip_cleanup: true
-  #api_key:
-  #  secure: [PUT YOUR NEW SECURE API KEY HERE]
-  file_glob: true
-  file:
-    - "${TRAVIS_BUILD_DIR}/OPNPS2LD-*.zip"
-    - "${TRAVIS_BUILD_DIR}/OPNPS2LD_LANGS-*.zip"
-  on:
-    tags: true

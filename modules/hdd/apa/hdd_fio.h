@@ -6,8 +6,6 @@
 # Copyright 2001-2004, ps2dev - http://www.ps2dev.org
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
-#
-# $Id$
 */
 
 #ifndef _HDD_FIO_H
@@ -16,7 +14,7 @@
 // I/O functions
 int hddInit(iop_device_t *f);
 int hddDeinit(iop_device_t *f);
-int hddFormat(iop_file_t *f, const char *dev, const char *blockdev, void *arg, size_t arglen);
+int hddFormat(iop_file_t *f, const char *dev, const char *blockdev, void *arg, int arglen);
 int hddOpen(iop_file_t *f, const char *name, int flags, int mode);
 int hddClose(iop_file_t *f);
 int hddRead(iop_file_t *f, void *buf, int size);

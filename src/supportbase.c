@@ -411,6 +411,14 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     }
 #endif
 
+#ifdef PADEMU
+    gEnablePadEmu = 0;
+    configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
+
+    gPadEmuSettings = 0;
+    configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
+#endif
+
     *patchindex = i;
 
     // game id

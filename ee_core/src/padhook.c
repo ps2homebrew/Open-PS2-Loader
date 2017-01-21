@@ -183,6 +183,10 @@ static void IGR_Thread(void *arg)
         if (!DisableDebug)
             GS_BGCOLOUR = 0xFFFFFF; // White
 
+#ifdef PADEMU
+        if (EnablePadEmuOp)
+            pademu_reset();
+#endif
         // Re-Init RPC & CMD
         SifInitRpc(0);
 
@@ -624,3 +628,23 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
     return patched;
 }
+#ifdef PADEMU
+
+#define PADEMU_RESET 1
+#define PADEMU_BIND_RPC_ID 0x18E3878D
+
+static SifRpcClientData_t pademu;
+
+int pademu_reset()
+{
+    pademu.server = NULL;
+
+    do {
+        if (SifBindRpc(&pademu, PADEMU_BIND_RPC_ID, 0) < 0)
+            return -1;
+        nopdelay();
+    } while (!pademu.server);
+
+    return SifCallRpc(&pademu, PADEMU_RESET, 0, NULL, 0, NULL, 0, NULL, NULL);
+}
+#endif

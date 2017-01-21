@@ -617,7 +617,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
             if (item->intvalue.current < item->intvalue.max)
                 item->intvalue.current++;
             else
-                item->intvalue.current = 0;
+                item->intvalue.current = item->intvalue.min; //was "= 0;"
         } else if (getKey(KEY_DOWN)) {
             if (item->intvalue.current > item->intvalue.min)
                 item->intvalue.current--;

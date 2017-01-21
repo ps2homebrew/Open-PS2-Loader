@@ -37,6 +37,9 @@ GSM ?= 0
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
 IGS ?= 0
 
+#Enables/disables pad emulator
+PADEMU ?= 0
+
 #Enables/disables the cheat engine (PS2RD)
 CHEAT ?= 0
 
@@ -166,6 +169,15 @@ else
   endif
 endif
 
+ifeq ($(PADEMU),1)
+  IOP_OBJS += bt_pademu.o usb_pademu.o ds3usb.o ds3bt.o libds3usb.a libds3bt.a
+  EE_CFLAGS += -DPADEMU
+  EE_INCS += -Imodules/ds3bt/ee -Imodules/ds3usb/ee
+  PADEMU_FLAGS = PADEMU=1
+else
+  PADEMU_FLAGS = PADEMU=0
+endif
+
 ifeq ($(DEBUG),1) 
   EE_CFLAGS += -D__DEBUG -g
   EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
@@ -219,7 +231,7 @@ endif
 release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
-	$(MAKE) VMC=1 GSM=1 IGS=1 CHEAT=1 $(EE_VPKD).ZIP
+	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 $(EE_VPKD).ZIP
 	
 childproof:
 	$(MAKE) CHILDPROOF=1 all
@@ -307,6 +319,13 @@ clean:
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo " -ps2link"
 	$(MAKE) -C modules/debug/ps2link clean
+	echo " -ds3usb"
+	$(MAKE) -C modules/ds3usb clean
+	echo " -ds3bt"
+	$(MAKE) -C modules/ds3bt clean
+	echo " -pademu"
+	$(MAKE) -C modules/pademu USE_BT=1 clean
+	$(MAKE) -C modules/pademu USE_USB=1 clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
 
@@ -346,7 +365,7 @@ $(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
 
 ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
+	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
 $(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eecore_elf
@@ -449,6 +468,46 @@ $(EE_ASM_DIR)usbd.s: $(PS2SDK)/iop/irx/usbd.irx | $(EE_ASM_DIR)
 modules/usb/usbhdfsd/usbhdfsd.irx: modules/usb/usbhdfsd
 	echo " -usbhdfsd"
 	$(MAKE) -C $<
+
+$(EE_OBJS_DIR)libds3bt.a: modules/ds3bt/ee/libds3bt.a
+	cp $< $@
+
+modules/ds3bt/ee/libds3bt.a: modules/ds3bt/ee
+	$(MAKE) -C $<
+
+modules/ds3bt/iop/ds3bt.irx: modules/ds3bt/iop
+	echo " -ds3bt"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)ds3bt.s: modules/ds3bt/iop/ds3bt.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ds3bt_irx
+
+$(EE_OBJS_DIR)libds3usb.a: modules/ds3usb/ee/libds3usb.a
+	cp $< $@
+
+modules/ds3usb/ee/libds3usb.a: modules/ds3usb/ee
+	$(MAKE) -C $<
+
+modules/ds3usb/iop/ds3usb.irx: modules/ds3usb/iop
+	echo " -ds3usb"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)ds3usb.s: modules/ds3usb/iop/ds3usb.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ds3usb_irx
+
+modules/pademu/bt_pademu.irx: modules/pademu
+	echo " -bt_pademu"
+	$(MAKE) -C $< USE_BT=1
+
+$(EE_ASM_DIR)bt_pademu.s: modules/pademu/bt_pademu.irx
+	$(BIN2S) $< $@ bt_pademu_irx
+
+modules/pademu/usb_pademu.irx: modules/pademu
+	echo " -usb_pademu"
+	$(MAKE) -C $< USE_USB=1
+
+$(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
+	$(BIN2S) $< $@ usb_pademu_irx
 
 $(EE_ASM_DIR)usbhdfsd.s: modules/usb/usbhdfsd/usbhdfsd.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbhdfsd_irx

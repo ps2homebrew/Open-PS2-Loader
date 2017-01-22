@@ -486,7 +486,7 @@ static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
     return result;
 }
 
-static int IsofsMount(iop_file_t *f, const char *fsname, const char *devname, int flags, void *arg, unsigned int arglen)
+static int IsofsMount(iop_file_t *f, const char *fsname, const char *devname, int flags, void *arg, int arglen)
 {
     int fd, result;
 

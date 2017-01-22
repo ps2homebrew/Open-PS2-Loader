@@ -2,7 +2,7 @@ LIBAPA_PATH = ../libapa
 LIBAPA_SRC_DIR = $(LIBAPA_PATH)/src/
 
 IOP_BIN  = ps2hdd.irx
-APA_OBJS = misc.o cache.o apa.o journal.o
+APA_OBJS = misc.o cache.o apa.o journal.o free.o password.o
 IOP_OBJS = hdd_fio.o hdd.o imports.o $(APA_OBJS)
 
 IOP_INCS += -I$(CURDIR) -I$(LIBAPA_PATH)/include -I../common

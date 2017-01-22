@@ -64,7 +64,6 @@ sysclib_IMPORTS_end
 sysmem_IMPORTS_start
 I_AllocSysMemory
 I_FreeSysMemory
-I_Kprintf_set
 sysmem_IMPORTS_end
 
 thbase_IMPORTS_start

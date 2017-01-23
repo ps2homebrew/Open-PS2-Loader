@@ -10,6 +10,7 @@
 dist: trusty
 sudo: required
 language: c
+cache: ccache
 
 ## Fix make_changelog.sh
 git:
@@ -23,9 +24,12 @@ before_install:
   ## Save repo name
   - export NEW_REPO_SLUG=$(echo ${TRAVIS_REPO_SLUG} | cut -f 1 -d "/")
 
+  ## Make CCache good to us
+  - export PATH="/usr/lib/ccache:${PATH}"
+
 install:
   ## Dependencies
-  - sudo apt-get install -yqqq gcc-4.4 patch wget make git libc6-dev zlib1g zlib1g-dev libucl1 libucl-dev
+  - sudo apt-get install -yqqq gcc-4.4 patch wget make git libc6-dev zlib1g zlib1g-dev libucl1 libucl-dev ccache
 
 before_script:
   ## Make cleanup, just for prevent anything
@@ -108,7 +112,24 @@ script:
   - bash ./lng_pack.sh
 
 after_success:
+  ## Export some variables
   - export OPL_VERSION=$(make oplversion)
-  - curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD-${OPL_VERSION}-${NEW_REPO_SLUG}.ZIP https://transfer.sh/OPNPS2LD-${OPL_VERSION}-${NEW_REPO_SLUG}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip
-  - curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip https://transfer.sh/OPNPS2LD_LANGS-${OPL_VERSION}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip
+  - export OPL_UP_LAST_BUILD=$(curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD-${OPL_VERSION}-${NEW_REPO_SLUG}.ZIP https://transfer.sh/OPNPS2LD-${OPL_VERSION}-${NEW_REPO_SLUG}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip)
+  - export OPL_LANG_UP_LAST_BUILD=$(curl --upload-file ${TRAVIS_BUILD_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip https://transfer.sh/OPNPS2LD_LANGS-${OPL_VERSION}-NIGHTLY${TRAVIS_BUILD_NUMBER}.zip)
+  - export OPL_DATE=$(date +%d'/'%m'/'%Y)
+
+  ## Configure TravisCI git
+  - git config --global user.email "builds@travis-ci.org"
+  - git config --global user.name "Travis-CI"
+
+  ## Clone my gh-page
+  - git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/Caio99BR/Open-PS2-Loader ${TRAVIS_ENV_DIR}/gh-pages/ > /dev/null
+  - cd ${TRAVIS_ENV_DIR}/gh-pages/
+
+  ## Let's upload latest build to gh-page!
+  - bash ${TRAVIS_ENV_DIR}/gh-pages/index-download-make.sh
+
+env:
+  global:
+    secure: "4WrTvtqz76DWeeUqiL76rBr71HNswnvvE1T3SQxR3gWq2i89wrM0jJXeS6zsmXGDN/q4knblvuSoMFJH41AMAnKY0fHOxPZmTcN1W5BVbi8AvkrfEMbenqCzP2cWI4IsvPzeii4OaqrmLzdcuOKjqEE9m3Gbg1cvf3pPt8IgKJoDq1S5Wp+cRWv8QTf2T8sX0HK90MUkvvuELE8kWEb3CZgZCjzL7U2Sav2xE6JQh8mICIeH0yvPzoAiFg2LfhqVzH0qtDW/75DxktZBkYPIxdcZhQiykCXK1Lr6ak2E8RNHMhoPo4pYKXDZhTpT1MzjCRlTnqDbvzXdbZ3hsU7B5/oU9P6GJbSOkU3fN/HjJhzwMSAt0/dvwimGQ4mDV7KYqwHV3XbAXsjkYBzIrVhjcdO6vk6ZZkHUIaXlom+2j9RYMRsR8gy4H5broiH38bFJYQCdCjPel3A7Y/vHvQhV/ZjA+YcC4pnohSpkU9kzzAHLPKmjMCHucjd/xbDrBv99Z4TlFUegGBRC5DmSr3YItalaGsq0aaRNIruNHrD1BcD4g8nSVHNTHJYaYHD7mpsnjb7iRlYsao+zVG4eWUpds1qz2rNym/wa5Fq4SZJc1nbC+jIAH2Ek8j+bCs2hFWb5SjrQUoWrMQiSuszM8/RB6Ex6ZlpO9RCxcLY6E+wz97o="
 

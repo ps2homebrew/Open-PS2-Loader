@@ -28,14 +28,14 @@ fi
 
 # Store author, commit and date on temp file
 git log --pretty=format:"%an - %s - %cd" > /tmp/commit_summary
-if ! [ "${?}" == "0" ]
+if [ "${?}" != "0" ]
 then
  echo "Git command failed, exiting..."
  break
 fi
 
 # Hack for fix first commit not showed
-echo -e '\n' >> /tmp/commit_summary
+printf '\n' >> /tmp/commit_summary
 
 # Store number of commits
 old_number_commits=$(($(cat OLD_DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-)))
@@ -47,14 +47,14 @@ echo "Current Revision ${number_commits} (Of BitBucket r${old_number_commits} + 
 
 # Store author, commit and date on temp file
 git log -${new_number_commits} --pretty=format:"%an - %s - %cd" > /tmp/commit_summary
-if ! [ "${?}" == "0" ]
+if [ "${?}" != "0" ]
 then
  echo "Git command failed, exiting..."
  break
 fi
 
 # Hack for fix first commit not showed
-echo -e '\n' >> /tmp/commit_summary
+printf '\n' >> /tmp/commit_summary
 
 # Reverse commit history
 gawk '{ L[n++] = $0 } END { while(n--) print L[n] }' /tmp/commit_summary > /tmp/commit_summary_reverse

@@ -1,28 +1,44 @@
 #!/bin/bash
-# Lang Packer for Open-PS2-Loader by Caio99BR <caiooliveirafarias0@gmail.com>
+# Lang Packer for Open-PS2-Loader
+# Made by Caio99BR <caiooliveirafarias0@gmail.com>
+# Reworked by Doctor Q <Dr-Q@users.noreply.github.com>
 
 # Set variables
-_dir=$(pwd)
-_bdir="/tmp/opl_lng"
-opl_revision=$(($(cat ${_dir}/DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
-opl_git=$(git -C ${_dir}/ rev-parse --short=7 HEAD 2>/dev/null)
-if [ ${opl_git} ]; then export opl_git=-${opl_git}; fi
+CURRENT_DIR=$(pwd)
+BUILD_DIR="/tmp/OPL_LANG"
+LANG_LIST="/tmp/OPL_LANG_LIST"
+make oplversion 2>/dev/null
+if [ $? == "0" ]
+then
+	export OPL_VERSION=$(make oplversion)
+else
+	echo "Falling back to old OPL Lang Pack"
+	VERSION=$(cat ${CURRENT_DIR}/Makefile | grep "VERSION =" | head -1 | cut -d " " -f 3)
+	SUBVERSION=$(cat ${CURRENT_DIR}/Makefile | grep "SUBVERSION =" | head -1 | cut -d " " -f 3)
+	PATCHLEVEL=$(cat ${CURRENT_DIR}/Makefile | grep "PATCHLEVEL =" | head -1 | cut -d " " -f 3)
+	REVISION=$(($(cat ${CURRENT_DIR}/DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1))
+	EXTRAVERSION=$(cat ${CURRENT_DIR}/Makefile | grep "EXTRAVERSION =" | head -1 | cut -d " " -f 3)
+	if [ ${EXTRAVERSION} != "" ]; then EXTRAVERSION=-${EXTRAVERSION}; fi
+	GIT_HASH=$(git -C ${CURRENT_DIR}/ rev-parse --short=7 HEAD 2>/dev/null)
+	if [ ${GIT_HASH} != "" ]; then GIT_HASH=-${GIT_HASH}; fi
+	export OPL_VERSION=${VERSION}.${SUBVERSION}.${PATCHLEVEL}.${REVISION}${EXTRAVERSION}${GIT_HASH}
+fi
 
 # Print a list
-ls ${_dir}/lng/ | cut -c 6- | rev | cut -c 5- | rev > /tmp/opl_lng_list
+printf "$(ls ${CURRENT_DIR}/lng/ | cut -c 6- | rev | cut -c 5- | rev)" > ${LANG_LIST}
 
-# Copy like Jay-Jay format
-while IFS= read -r file
+# Copy format
+while IFS= read -r CURRENT_FILE
 do
-	mkdir -p ${_bdir}/${file}-${opl_revision}/
-	cp ${_dir}/lng/lang_${file}.lng ${_bdir}/${file}-${opl_revision}/lang_${file}.lng
-	if [ -e thirdparty/font_${file}.ttf ]
+	mkdir -p ${BUILD_DIR}/${CURRENT_FILE}-${OPL_VERSION}/
+	cp ${CURRENT_DIR}/lng/lang_${CURRENT_FILE}.lng ${BUILD_DIR}/${CURRENT_FILE}-${OPL_VERSION}/lang_${CURRENT_FILE}.lng
+	if [ -e thirdparty/font_${CURRENT_FILE}.ttf ]
 	then
-		cp ${_dir}/thirdparty/font_${file}.ttf ${_bdir}/${file}-${opl_revision}/font_${file}.ttf
+		cp ${CURRENT_DIR}/thirdparty/font_${CURRENT_FILE}.ttf ${BUILD_DIR}/${CURRENT_FILE}-${OPL_VERSION}/font_${CURRENT_FILE}.ttf
 	fi
-done < /tmp/opl_lng_list
+done < ${LANG_LIST}
 
-(cat << EOF) > ${_bdir}/README
+(cat << EOF) > ${BUILD_DIR}/README
 -----------------------------------------------------------------------------
 
   Copyright 2009-2010, Ifcaro & jimmikaelkael
@@ -30,6 +46,8 @@ done < /tmp/opl_lng_list
   Review Open PS2 Loader README & LICENSE files for further details.
 
 -----------------------------------------------------------------------------
+
+Open PS2 Loader Official Translations (25 August 2016)
 
 HOW TO INSTALL:
 1. make sure you are running latest OPL
@@ -46,10 +64,14 @@ HOW TO INSTALL:
 EOF
 
 # Lets pack it!
-cd ${_bdir}/
-zip -r ${_dir}/OPNPS2LD_LANGS-${opl_revision}${opl_git}.zip *
+cd ${BUILD_DIR}/
+zip -r ${CURRENT_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip *
+if [ -f "${CURRENT_DIR}/OPNPS2LD_LANGS-${OPL_VERSION}.zip" ]
+	then echo "OPL Lang Package Complete: OPNPS2LD_LANGS-${OPL_VERSION}.zip"
+	else echo "OPL Lang Package not found!"
+fi
 
 # Cleanup
-cd ${_dir}
-rm -rf ${_bdir}/ /tmp/opl_lng_list
-unset _dir _bdir opl_revision
+cd ${CURRENT_DIR}
+rm -rf ${BUILD_DIR}/ ${LANG_LIST}
+unset CURRENT_DIR BUILD_DIR LANG_LIST OPL_VERSION CURRENT_FILE

@@ -19,6 +19,8 @@ You can visit the Open PS2 Loader forum at:
 
 http://psx-scene.com/forums/official-open-ps2-loader-forum/  
 
+http://www.ps2-home.com/forum/viewforum.php?f=13
+
 For updated compatibility list, you can visit OPL-CL site at:  
 
 http://sx.sytes.net/oplcl/games.aspx  

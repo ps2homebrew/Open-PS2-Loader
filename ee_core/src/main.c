@@ -81,6 +81,13 @@ int main(int argc, char **argv)
     DPRINTF("GSM = %s\n", EnableGSMOp == 0 ? "Disabled" : "Enabled");
 #endif
 
+#ifdef PADEMU
+    EnablePadEmuOp = _strtoi(_strtok(NULL, " "));
+    DPRINTF("PADEMU = %s\n", EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
+
+    PadEmuSettings = _strtoi(_strtok(NULL, " "));
+#endif
+
     i++;
 
     ModStorageStart = (void *)_strtoui(_strtok(argv[i], " "));

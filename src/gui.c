@@ -24,6 +24,10 @@
 #ifdef CHEAT
 #include "include/pgcht.h"
 #endif
+#ifdef PADEMU
+#include <libds3bt.h>
+#include <libds3usb.h>
+#endif
 
 #include <stdlib.h>
 #include <libvux.h>
@@ -625,6 +629,135 @@ void guiShowCheatConfig(void)
 }
 #endif
 
+#ifdef PADEMU
+
+static u8 ds3_mac[6];
+static u8 dg_mac[6];
+static char ds3_str[18];
+static char dg_str[18];
+static int ds3macset = 0;
+static int dgmacset = 0;
+
+static int PadEmuSettings = 0;
+
+static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
+{
+    int i;
+
+    memset(addstr, 0, sizeof(addstr));
+
+    for (i = 0; i < 6; i++) {
+        sprintf(addstr, "%s%02X", addstr, bdaddr[i]);
+
+        if (i < 5)
+            sprintf(addstr, "%s:", addstr);
+    }
+
+    return addstr;
+}
+
+static int guiPadEmuUpdater(int modified)
+{
+    int PadEmuEnable, PadEmuMode, PadPort, PadEmuVib, PadEmuPort;
+    static int oldPadPort;
+
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &PadEmuEnable);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, &PadEmuMode);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADPORT, &PadPort);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, &PadEmuPort);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, &PadEmuVib);
+
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuEnable);
+
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADPORT, PadEmuEnable);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_VIB, PadEmuPort & PadEmuEnable);
+
+    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR, PadEmuMode & PadEmuEnable);
+
+    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, PadEmuMode & PadEmuEnable);
+
+    if (modified) {
+        if (PadPort != oldPadPort) {
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort - 1)) & 1);
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort - 1)) & 1);
+
+            oldPadPort = PadPort;
+        }
+    }
+
+    PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort - 1)) | (PadEmuVib << (16 + PadPort - 1));
+    PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort - 1)) & ~(!PadEmuVib << (16 + PadPort - 1)));
+
+    if (PadEmuMode) {
+        if (ds3bt_get_status(0) & DS3BT_STATE_USB_CONFIGURED) {
+            if (!dgmacset) {
+                if (!ds3bt_get_bdaddr(dg_mac)) {
+                    dgmacset = 1;
+                    diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
+                } else {
+                    dgmacset = 0;
+                }
+            }
+        } else {
+            diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
+            dgmacset = 0;
+        }
+
+        if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
+            if (!ds3macset) {
+                if (!ds3usb_get_bdaddr(0, ds3_mac)) {
+                    ds3macset = 1;
+                    diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
+                } else {
+                    ds3macset = 0;
+                }
+            }
+        } else {
+            diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, _l(_STR_NOT_CONNECTED));
+            ds3macset = 0;
+        }
+    }
+
+    return 0;
+}
+
+static void guiShowPadEmuConfig(void)
+{
+    const char *PadEmuModes[] = {_l(_STR_DS3USB_MODE), _l(_STR_DS3BT_MODE), NULL};
+
+    diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
+
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
+
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
+
+    int result = -1;
+
+    while (result != 0) {
+        result = diaExecuteDialog(diaPadEmuConfig, result, 1, &guiPadEmuUpdater);
+
+        if (result == PADCFG_PAIR) {
+            if (ds3macset && dgmacset) {
+                if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
+                    if (!ds3usb_set_bdaddr(0, dg_mac))
+                        ds3macset = 0;
+                }
+            }
+        }
+
+        if (result == UIID_BTN_OK)
+            break;
+    }
+}
+
+#endif
+
 static int netConfigUpdater(int modified)
 {
     int showAdvancedOptions, isNetBIOS, isDHCPEnabled, i;
@@ -1017,6 +1150,16 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 
 #endif /* CHEAT */
 
+#ifdef PADEMU
+    int EnablePadEmu = 0;
+    configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &EnablePadEmu);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, EnablePadEmu);
+
+    PadEmuSettings = 0;
+
+    configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings);
+#endif
+
     // Find out the current game ID
     char hexid[32];
     configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));
@@ -1054,6 +1197,11 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 #ifdef GSM
         if (result == COMPAT_GSMCONFIG) {
             guiShowGSConfig();
+        }
+#endif
+#ifdef PADEMU
+        if (result == COMPAT_PADEMUCONFIG) {
+            guiShowPadEmuConfig();
         }
 #endif
 #ifdef CHEAT
@@ -1105,6 +1253,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 #ifdef CHEAT
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+#endif
+#ifdef PADEMU
+        configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
+        configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
 #ifdef VMC
         configRemoveVMC(configSet, 0);
@@ -1170,6 +1322,20 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
         else
             configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+#endif
+
+#ifdef PADEMU
+        diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
+
+        if (EnablePadEmu != 0)
+            configSetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
+
+        if (PadEmuSettings != 0)
+            configSetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
 
         diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));

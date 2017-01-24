@@ -219,6 +219,28 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Value in second(s), 0 to disable auto start",
     "PS2 Logo",
     "(Only displayed for a valid disc logo which matches the console's region)",
+#ifdef PADEMU
+    "Configure PADEMU",
+    "Pad Emulator Settings",
+    "Enable Pad Emulator",
+    "Turns on/off PadEmulator for selected game.",
+    "Pad Emulator mode",
+    "Select Pad Emulator mode.",
+    "DualShock3 USB",
+    "DualShock3 BT",
+    "Settings for port:",
+    "Select Pad Emulator port for settings.",
+    "Enable emulation",
+    "Turns on/off Pad Emulator for selected port.",
+    "Enable vibration",
+    "Turns on/off vibration for Pad Emulator selected port.",
+    "Usb bluetooth adapter mac address:",
+    "DS3 Controller paired to mac address:",
+    "Pair",
+    "Pair DS3 controller",
+    "Pair DS3 controller with bluetooth adapter mac address.",
+    "Not connected",
+#endif
 };
 
 static int guiLangID = 0;

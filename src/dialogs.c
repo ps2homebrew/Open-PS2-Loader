@@ -190,6 +190,11 @@ struct UIItem diaCompatConfig[] = {
     {UI_SPLITTER},
 #endif
 
+#ifdef PADEMU
+    {UI_BUTTON, COMPAT_PADEMUCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
+    {UI_BREAK},
+#endif
+
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
     {UI_SPACER},
     {UI_ENUM, COMPAT_DMA, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
@@ -463,6 +468,67 @@ struct UIItem diaGSConfig[] = {
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+#endif
+
+#ifdef PADEMU
+struct UIItem diaPadEmuConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}}, {UI_SPACER},
+
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_ENABLE}}},
+    {UI_SPACER},
+    {UI_BOOL, PADCFG_PADEMU_ENABLE, 1, 1, _STR_HINT_PADEMU_ENABLE, 0, 0, {.intvalue = {1, 1}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_MODE}}},
+    {UI_SPACER},
+    {UI_ENUM, PADCFG_PADEMU_MODE, 1, 1, _STR_HINT_PADEMU_MODE, 0, 0, {.intvalue = {1, 1}}},
+    {UI_BREAK},
+
+    {UI_BREAK},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADPORT}}},
+    {UI_SPACER},
+    {UI_INT, PADCFG_PADPORT, 1, 1, _STR_HINT_PAD_PORT, 0, 0, {.intvalue = {1, 1, 1, 2}}},
+    {UI_BREAK},
+
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_PORT}}},
+    {UI_SPACER},
+    {UI_BOOL, PADCFG_PADEMU_PORT, 1, 1, _STR_HINT_PADEMU_PORT, 0, 0, {.intvalue = {1, 1}}},
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_VIB}}},
+    {UI_SPACER},
+    {UI_BOOL, PADCFG_PADEMU_VIB, 1, 1, _STR_HINT_PADEMU_VIB, 0, 0, {.intvalue = {1, 1}}},
+    {UI_BREAK},
+
+    {UI_BREAK},
+    {UI_SPLITTER},
+    {UI_BREAK},
+
+    {UI_LABEL, PADCFG_USBDG_MAC_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_USBDG_MAC}}},
+    {UI_SPACER},
+    {UI_LABEL, PADCFG_USBDG_MAC, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+    {UI_LABEL, PADCFG_PAD_MAC_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PAD_MAC}}},
+    {UI_SPACER},
+    {UI_LABEL, PADCFG_PAD_MAC, 1, 1, -1, 0, 0, {.label = {"", -1}}},
+    {UI_BREAK},
+
+    {UI_BREAK},
+
+    {UI_LABEL, PADCFG_PAIR_STR, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PAIR_PAD}}},
+    {UI_SPACER},
+    {UI_BUTTON, PADCFG_PAIR, 1, 1, _STR_HINT_PAIRPAD, 0, 0, {.label = {NULL, _STR_PAIR}}},
+    {UI_BREAK},
+
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
 
     // end of dialog
     {UI_TERMINATOR}};

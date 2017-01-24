@@ -15,6 +15,12 @@
 #include "include/OSDHistory.h"
 #include "include/renderman.h"
 #include "../ee_core/include/modules.h"
+
+#ifdef PADEMU
+#include <libds3bt.h>
+#include <libds3usb.h>
+#endif
+
 #ifdef VMC
 typedef struct
 {
@@ -105,6 +111,20 @@ extern int size_elfldr_elf;
 
 extern void *pusbd_irx;
 extern int size_pusbd_irx;
+
+#ifdef PADEMU
+extern void *ds3bt_irx;
+extern int size_ds3bt_irx;
+
+extern void *ds3usb_irx;
+extern int size_ds3usb_irx;
+
+extern void *bt_pademu_irx;
+extern int size_bt_pademu_irx;
+
+extern void *usb_pademu_irx;
+extern int size_usb_pademu_irx;
+#endif
 
 #ifdef __INGAME_DEBUG
 extern void *udptty_ingame_irx;
@@ -287,6 +307,16 @@ void sysReset(int modload_mask)
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 #endif
 
+#ifdef PADEMU
+    int ds3pads = 1; //only one pad enabled
+
+    sysLoadModuleBuffer(&ds3usb_irx, size_ds3usb_irx, 4, (char *)&ds3pads);
+    sysLoadModuleBuffer(&ds3bt_irx, size_ds3bt_irx, 4, (char *)&ds3pads);
+
+    ds3usb_init();
+    ds3bt_init();
+#endif
+
     fileXioInit();
     poweroffInit();
 }
@@ -414,7 +444,12 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
     irxptr_tab[modcount].info = size_imgdrv_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IMGDRV);
     irxptr_tab[modcount++].ptr = (void *)&imgdrv_irx;
 
-    if (modules & CORE_IRX_USB) {
+#ifdef PADEMU
+#define PADEMU_ARG || gEnablePadEmu
+#else
+#define PADEMU_ARG
+#endif
+    if ((modules & CORE_IRX_USB)PADEMU_ARG) {
         irxptr_tab[modcount].info = size_pusbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
         irxptr_tab[modcount++].ptr = pusbd_irx;
     }
@@ -435,6 +470,18 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
     if (modules & CORE_IRX_VMC) {
         irxptr_tab[modcount].info = size_mcemu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_MCEMU);
         irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
+    }
+#endif
+
+#ifdef PADEMU
+    if (gEnablePadEmu) {
+        if (gPadEmuSettings & 0xFF) {
+            irxptr_tab[modcount].info = size_bt_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
+            irxptr_tab[modcount++].ptr = (void *)&bt_pademu_irx;
+        } else {
+            irxptr_tab[modcount].info = size_usb_pademu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
+            irxptr_tab[modcount++].ptr = (void *)&usb_pademu_irx;
+        }
     }
 #endif
 
@@ -620,7 +667,12 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #else
 #define CHEAT_ARGS 0
 #endif
-    char *argv[4 + GSM_ARGS + CHEAT_ARGS];
+#ifdef PADEMU
+#define PADEMU_ARGS 2
+#else
+#define PADEMU_ARGS 0
+#endif
+    char *argv[4 + GSM_ARGS + CHEAT_ARGS + PADEMU_ARGS];
     char ModStorageConfig[32];
     char config_str[256];
 #ifdef GSM
@@ -714,14 +766,22 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #define GSM_ARGUMENT
 #endif
 
+#ifdef PADEMU
+#define PADEMU_SPECIFIER " %d, %d"
+#define PADEMU_ARGUMENT , gEnablePadEmu, (gPadEmuSettings >> 8)
+#else
+#define PADEMU_SPECIFIER
+#define PADEMU_ARGUMENT
+#endif
+
     i = 0;
-    sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_SPECIFIER GSM_SPECIFIER,
+    sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_SPECIFIER GSM_SPECIFIER PADEMU_SPECIFIER,
             mode_str, gDisableDebug, EnablePS2Logo, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
             local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
             local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
             gETHOpMode
-                CHEAT_ARGUMENT GSM_ARGUMENT);
+                CHEAT_ARGUMENT GSM_ARGUMENT PADEMU_ARGUMENT);
     argv[i] = config_str;
     i++;
 
@@ -754,6 +814,10 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
         rmEnd();
     }
 
+#ifdef PADEMU
+    ds3usb_reset();
+    ds3bt_reset();
+#endif
     // Let's go.
     fileXioExit();
     SifExitRpc();

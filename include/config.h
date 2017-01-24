@@ -46,6 +46,9 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_ENABLECHEAT "$EnableCheat"
 #define CONFIG_ITEM_CHEATMODE "$CheatMode"
 
+#define CONFIG_ITEM_ENABLEPADEMU "$EnablePadEmu"
+#define CONFIG_ITEM_PADEMUSETTINGS "$PadEmuSettings"
+
 //OPL config keys
 #define CONFIG_OPL_THEME "theme"
 #define CONFIG_OPL_LANGUAGE "language_text"

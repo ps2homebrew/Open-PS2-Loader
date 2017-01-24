@@ -10,7 +10,7 @@
 	3. All partitions can be accessed, even without the right password.
 	4. The starting LBA of the partition will be returned in
 		the private_5 field of the stat structure (returned by getstat and dread). */
-//#define APA_OSD_VER	1
+#define APA_OSD_VER 1
 
 #ifdef APA_OSD_VER
 #define APA_STAT_RETURN_PART_LBA 1

@@ -12,48 +12,50 @@
 #define _PFS_H
 
 #ifndef min
-#define min(a, b)	((a) < (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define PFS_MAJOR	1
-#define PFS_MINOR	4
+#define PFS_MAJOR 1
+#define PFS_MINOR 4
 
 ///////////////////////////////////////////////////////////////////////////////
 //   Global types
 
 typedef struct
 {
-	u16 dirty;	//
-	u16 sub;	// Sub/main partition
-	u32 sector;	// Sector
+    u16 dirty;  //
+    u16 sub;    // Sub/main partition
+    u32 sector; // Sector
 } pfs_restsInfo_t;
 
 typedef struct
 {
-	char key[256];
-	char value[256];
+    char key[256];
+    char value[256];
 } pfs_ioctl2attr_t;
 
-typedef struct {
-	iop_file_t *fd;				//
-	pfs_cache_t *clink;			//
-	u32 aentryOffset;			// used for read offset
-	u64 position;				//
-	pfs_blockpos_t block_pos;	// current position into file
-	pfs_restsInfo_t restsInfo;	//
-	u8 restsBuffer[512];		// used for reading mis-aligned/remainder data
+typedef struct
+{
+    iop_file_t *fd;            //
+    pfs_cache_t *clink;        //
+    u32 aentryOffset;          // used for read offset
+    u64 position;              //
+    pfs_blockpos_t block_pos;  // current position into file
+    pfs_restsInfo_t restsInfo; //
+    u8 restsBuffer[512];       // used for reading mis-aligned/remainder data
 } pfs_file_slot_t;
 
-typedef struct {
-	u32 maxMount;
-	u32 maxOpen;
+typedef struct
+{
+    u32 maxMount;
+    u32 maxOpen;
 } pfs_config_t;
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Global defines
 
 // mount flags
-#define PFS_MOUNT_BUSY				0x8000
+#define PFS_MOUNT_BUSY 0x8000
 
 ///////////////////////////////////////////////////////////////////////////////
 //	Function declarations

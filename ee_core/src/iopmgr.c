@@ -79,9 +79,15 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     sbv_patch_enable_lmb();
 
     DPRINTF("Loading extra IOP modules...\n");
-    if (GameMode == USB_MODE) {
+#ifdef PADEMU
+#define PADEMU_ARG || EnablePadEmuOp
+#else
+#define PADEMU_ARG
+#endif
+    if (GameMode == USB_MODE PADEMU_ARG) {
         LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=15,16");
-    } else if (GameMode == ETH_MODE) {
+    }
+    if (GameMode == ETH_MODE) {
         LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
         LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
         LoadOPLModule(OPL_MODULE_ID_SMBINIT, 0, 0, NULL);
@@ -115,6 +121,11 @@ int New_Reset_Iop(const char *arg, int arglen)
 
     iop_reboot_count++;
 
+#ifdef PADEMU
+    if (iop_reboot_count >= 3 && EnablePadEmuOp) {
+        pademu_reset();
+    }
+#endif
     // Reseting IOP.
     while (!Reset_Iop(NULL, 0)) {
         ;
@@ -137,6 +148,12 @@ int New_Reset_Iop(const char *arg, int arglen)
         if (!DisableDebug)
             GS_BGCOLOUR = 0x00FFFF; //Yellow
     }
+
+#ifdef PADEMU
+    if (iop_reboot_count >= 2 && EnablePadEmuOp) {
+        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, 4, (char *)&PadEmuSettings);
+    }
+#endif
 
 #ifdef VMC
     if (iop_reboot_count >= 2) {

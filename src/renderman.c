@@ -42,12 +42,12 @@ struct rm_mode
 };
 
 static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
-    {-1, 16, -1, -1},                  // AUTO
-    {GS_MODE_PAL, 16, 512, 4},         // PAL@50Hz
-    {GS_MODE_NTSC, 16, 448, 4},        // NTSC@60Hz
-    {GS_MODE_DTV_480P, 31, 448, 2},    // DTV480P@60Hz
-    {GS_MODE_DTV_576P, 31, 512, 2},    // DTV576P@50Hz
-    {GS_MODE_VGA_640_60, 31, 480, 2},  // VGA640x480@60Hz
+    {-1, 16, -1, -1},                 // AUTO
+    {GS_MODE_PAL, 16, 512, 4},        // PAL@50Hz
+    {GS_MODE_NTSC, 16, 448, 4},       // NTSC@60Hz
+    {GS_MODE_DTV_480P, 31, 448, 2},   // DTV480P@60Hz
+    {GS_MODE_DTV_576P, 31, 512, 2},   // DTV576P@50Hz
+    {GS_MODE_VGA_640_60, 31, 480, 2}, // VGA640x480@60Hz
 };
 
 static float aspectWidth;

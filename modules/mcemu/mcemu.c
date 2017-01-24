@@ -10,7 +10,14 @@
 
 static int readyToGo = -1;
 void StartNow(void *param);
+#ifdef PADEMU
+void(pademu_hookSio2man *)(Sio2Packet *sd, Sio2McProc sio2proc);
 
+void no_pademu(Sio2Packet *sd, Sio2McProc sio2proc)
+{
+    sioproc(sd);
+}
+#endif
 
 //---------------------------------------------------------------------------
 // Entry point
@@ -78,6 +85,15 @@ void StartNow(void *param)
     } else {
         DPRINTF("SECRMAN exports not found.\n");
     }
+
+#ifdef PADEMU
+    exp = GetExportTable("pademu", 0x101);
+    if (exp != NULL) {
+        pademu_hookSio2man = GetExportEntry(exp, 0);
+    } else {
+        pademu_hookSio2man = no_pademu;
+    }
+#endif
 
     readyToGo = MODULE_RESIDENT_END;
 }
@@ -291,8 +307,12 @@ void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc)
             sio2proc = Sio2McEmu;
     }
 
-    /* calling original SIO2MAN routine */
+/* calling original SIO2MAN routine */
+#ifdef PADEMU
+    pademu_hookSio2man(sd, sio2proc);
+#else
     sio2proc(sd);
+#endif
 }
 //------------------------------
 //endfunc

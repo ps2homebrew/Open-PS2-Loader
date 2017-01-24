@@ -11,6 +11,11 @@
 #include <timer.h>
 #include <time.h>
 
+#ifdef PADEMU
+#include <libds3bt.h>
+#include <libds3usb.h>
+#endif
+
 #define MAX_PADS 4
 
 // Cpu ticks per one milisecond
@@ -181,12 +186,29 @@ static int initializePad(struct pad_data_t *pad)
 static int readPad(struct pad_data_t *pad)
 {
     int rcode = 0;
+#ifdef PADEMU
+    u32 newpdata = 0;
 
+    int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
+    newpdata = 0xffff ^ pad->buttons.btns;
+
+    if (ds3bt_get_status(pad->port) & DS3BT_STATE_RUNNING) {
+        ret = !ds3bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
+        newpdata |= 0xffff ^ pad->buttons.btns;
+    }
+
+    if (ds3usb_get_status(pad->port) & DS3USB_STATE_RUNNING) {
+        ret = !ds3usb_get_data(pad->port, (u8 *)&pad->buttons.btns);
+        newpdata |= 0xffff ^ pad->buttons.btns;
+    }
+
+    if (ret != 0) {
+#else
     int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
 
     if (ret != 0) {
         u32 newpdata = 0xffff ^ pad->buttons.btns;
-
+#endif
         if (newpdata != 0x0) // something
             rcode = 1;
         else

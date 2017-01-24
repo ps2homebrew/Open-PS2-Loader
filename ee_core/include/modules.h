@@ -15,6 +15,8 @@ enum OPL_MODULE_ID {
     //VMC module
     OPL_MODULE_ID_MCEMU,
 
+    OPL_MODULE_ID_PADEMU,
+
     //Debugging modules
     OPL_MODULE_ID_UDPTTY,
     OPL_MODULE_ID_IOPTRAP,

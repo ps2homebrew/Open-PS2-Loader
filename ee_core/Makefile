@@ -68,12 +68,15 @@ EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
 endif
 EE_LIBS += -lpatches
 
+ifeq ($(PADEMU),1)
+EE_CFLAGS += -DPADEMU
+endif
+
 ifeq ($(EESIO_DEBUG),1) 
 EE_LIBS += -lc
 endif
 
 EE_LIBS += -lkernel
-
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	@mkdir -p $(EE_OBJS_DIR)

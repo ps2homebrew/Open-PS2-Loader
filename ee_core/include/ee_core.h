@@ -77,6 +77,11 @@ char ExitPath[32];
 int HDDSpindown;
 int EnableGSMOp;
 int EnableCheatOp;
+#ifdef PADEMU
+int EnablePadEmuOp;
+int PadEmuSettings;
+int pademu_reset();
+#endif
 
 int DisableDebug;
 int PS2Logo;

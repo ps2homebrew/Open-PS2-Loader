@@ -729,13 +729,16 @@ static int guiPadEmuUpdater(int modified)
 static void guiShowPadEmuConfig(void)
 {
     const char *PadEmuModes[] = {_l(_STR_DS3USB_MODE), _l(_STR_DS3BT_MODE), NULL};
-
+    int PadPort;
+	
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
 
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADPORT, &PadPort);
+
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort - 1)) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort - 1)) & 1);
 
     int result = -1;
 

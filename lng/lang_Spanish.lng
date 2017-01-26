@@ -1,7 +1,7 @@
 # Translation by lauchon22
-# Last update: 10/23/2016 
-# Updated for OPL_r963_DB [b7e6f26]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Last update: 01/25/2017 
+# Updated for OPL_983_DB [7f7e9af]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Spanish
 OPL %s
 Guardar cambios
@@ -210,5 +210,25 @@ Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
 PS2 Logo
 Solo se muestra con un disco válido en una consola de la misma región
+Configurar PADEMU
+Configurar el mando del emulador
+Activar mando del emulador
+Activar/apagar el mando del emulador para el juego elegido
+Modo del mando del emulador
+Seleccione el modo del mando del emulador
+DualShock3 USB
+DualShock3 BlueTooth
+Configuración del puerto
+Seleccione el mando del emulador para ajustes
+Activar emulación
+Activar/apagar el mando del emulador en el puerto elegido
+Activar vibración
+Activar/apagar vibracion en el puerto elegido
+Dirección MAC del mando BlueTooth USB:
+Dirección MAC del mando DS3 emparejado
+Emparejar
+Emparejar mando DS3
+Emparejar mando DS3 con la siguiente dirección MAC:
+No conectado
 ELF Loader Menu
 Modo inicio de menú de ELF Loader

@@ -1,7 +1,7 @@
 # Translation by co5oos
-# Last update: 01/02/2017 
-# Updated for OPL_r963_DB [b7e6f26]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Last update: 01/25/2017 
+# Updated for OPL_983_DB [7f7e9af]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Hungarian
 OPL %s
 Változtatások mentése
@@ -210,5 +210,25 @@ Automatikus indítás
 Érték másodperc(ek)ben, 0 az Automatikus indítás letiltásához
 PS2 Logó
 Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
+PADEMU konfigurálás
+Pad Emulator Beállítások
+Pad Emulátor engedélyezése
+Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
+Pad Emulátor mód
+Válassza ki a  Pad Emulátor módját.
+DualShock3 USB
+DualShock3 BT
+Port beállítások:
+Válassza ki a Pad Emulátor portot a beállításokhoz.
+Emuláció engedélyezése
+Be/ki kapcsolja a Pad Emulátor-t a kiválasztott porthoz.
+Rezgés engedélyezése
+Be/ki kapcsolja a rezgést a Pad Emulátor kiválasztott portjához.
+Usb bluetooth adapter mac címe:
+DS3 Kontroller párosítva erre a mac címre :
+Párosítás
+DS3 kontroller párosítása
+DS3 kontroller párosítása bluetooth adapter mac címmel.
+Nincs csatlakoztatva
 ELF Futtató Menü
 ELF Futtató Menü megjelenítési mód

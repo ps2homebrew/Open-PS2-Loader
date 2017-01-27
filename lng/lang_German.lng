@@ -1,7 +1,7 @@
 # German Translation by ps2guy and lopotri
-# Last update: 10/23/2016 
-# Updated for OPL_r963_DB [b7e6f26]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Last update: 01/26/2017 
+# Updated for OPL_983_DB [7f7e9af]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 German
 OPL %s
 Änderungen speichern
@@ -210,5 +210,25 @@ Automatischer Start
 Wert in Sekunden (sek), 0 um Auto-start zu deaktivieren
 PS2 Logo
 Wird nur bei gültigem Disc Logo angezeigt, welches mit der Region der Konsole übereinstimmen muss
+PADEMU konfigurieren
+Pad Emulator Einstellungen
+Pad Emulator aktivieren
+Aktiviere/deaktiviere den Pad Emulator für das ausgewählte Spiel.
+Pad Emulator Modus
+Wähle Pad Emulator Modus
+DualShock3 USB
+DualShock3 BT
+Einstellungen für Anschluss:
+Wähle Pad Emulator Anschluss für die Einstellungen.
+Emulation aktivieren
+Aktiviert/deaktiviert den Pad Emulator für den ausgewählten Anschluss.
+Vibration aktivieren
+Aktiviert/deaktiviert die Vibration für den ausgewählten Anschluss.
+USB Bluetooth-Aadapter MAC-Adresse:
+DS3 Controller verbunden zur MAC-Adresse:
+Verbinden
+Verbinde DS3 Controller
+Verbinde DS3 Controller mit Bluetooth-Adapter MAC-Adresse.
+Nicht verbunden
 ELF-starter Menü
 ELF-starter Menü Anzeigen

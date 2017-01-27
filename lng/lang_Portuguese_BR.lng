@@ -1,7 +1,7 @@
-# Translation by Colossus and tonyhoro
-# Last update: 10/23/2016 
-# Updated for OPL_r963_DB [b7e6f26]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Translation by Colossus, tonyhoro, and joseri 
+# Last update: 01/26/2017 
+# Updated for OPL_983_DB [7f7e9af]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Brazilian Portuguese
 OPL %s
 Guardar Configurações
@@ -210,5 +210,25 @@ Auto iniciar
 Valor em segundo(s), 0 para desativar
 Logotipo do PS2
 Aparece apenas se houver um logotipo válido que seja da mesma região que o console
+Configurar PADEMU
+Configurações do Emulador de Controles
+Ativar Emulador de Controles
+Liga/desliga o Emulador de Controles para o jogo selecionado.
+Modo Emulador de Controles
+Selecione o modo do Emulador de Controles.
+DualShock3 USB
+DualShock3 BT
+Configurações da porta:
+Selecione a porta que será configurada.
+Ativar emulação
+Liga/desliga a emulação na porta selecionada.
+Ativar vibração
+Liga/desliga a vibração na porta selecionada.
+Endereço MAC do adaptador Bluetooth USB:
+Endereço MAC do Controle DS3 emparelhado:
+Emparelhar
+Emparelhar Controle DS3:
+Emparelha o Controle DS3 com o MAC do adaptador Bluetooth.
+Não conectado
 ELF Loader Menu
 Modo de inicio do ELF Loader Menu

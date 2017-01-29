@@ -89,7 +89,11 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 typedef struct _ata_cmd_state
 {
     s32 type; /* The ata_cmd_info_t type field. */
-    void *buf;
+    union {
+ 		void	*buf;
+ 		u8	*buf8;
+ 		u16	*buf16;
+ 	};
     u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
     s32 dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
@@ -379,7 +383,8 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
     return 0;
 
     USE_ATA_REGS;
-    void *buf;
+    u8 *buf8;
+	u16 *buf16;
     int i, type;
     u16 status = ata_hwport->r_status & 0xff;
 
@@ -396,23 +401,24 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
         for (i = 0; i < 256; i++) {
-            ata_hwport->r_data = *(u16 *)buf;
-            cmd_state->buf = ++((u16 *)buf);
+            ata_hwport->r_data = *buf16;
+            cmd_state->buf16 = ++buf16;
         }
+		buf8 = cmd_state->buf8;
         if (cmd_state->type == 8) {
             for (i = 0; i < 4; i++) {
-                ata_hwport->r_data = *(u8 *)buf;
-                cmd_state->buf = ++((u8 *)buf);
+                ata_hwport->r_data = *buf8;
+                cmd_state->buf8 = ++buf8;
             }
         }
     } else if (type == 2) {
         /* PIO data in  */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
         for (i = 0; i < 256; i++) {
-            *(u16 *)buf = ata_hwport->r_data;
-            cmd_state->buf = ++((u16 *)buf);
+            *buf16 = ata_hwport->r_data;
+            cmd_state->buf16 = ++buf16;
         }
     }
 
@@ -467,7 +473,7 @@ static inline int ata_dma_complete(void *buf, u32 blkcount, int dir)
         if ((res = dev9DmaTransfer(0, buf, (nbytes << 9) | 32, dir)) < 0)
             return res;
 
-        (u8 *)buf += nbytes;
+        buf = (void*)((u8 *)buf + nbytes);
         blkcount -= count;
     }
 

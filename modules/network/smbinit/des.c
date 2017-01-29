@@ -417,7 +417,7 @@ static const unsigned int des_skb[8][64] = {
                                 (a) ^= ((t) << (n)))
 
 
-static unsigned char *key7TOkey8(unsigned char *key7, unsigned char *key8)
+static unsigned char *key7TOkey8(const unsigned char *key7, unsigned char *key8)
 {
     int i;
 
@@ -441,7 +441,7 @@ static unsigned char *key7TOkey8(unsigned char *key7, unsigned char *key8)
  * des_create_keys: take 64bit user key (key) as input and outputs
  * 16 48bit keys (keys)
  */
-static unsigned char *DES_createkeys(unsigned char *key)
+static unsigned char *DES_createkeys(const unsigned char *key)
 {
     unsigned int c, d, t, s;
     unsigned char *in;
@@ -505,7 +505,7 @@ static unsigned char *DES_createkeys(unsigned char *key)
     return (unsigned char *)DES_Keys;
 }
 
-unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *cipher)
+unsigned char *DES(const unsigned char *key, const unsigned char *message, unsigned char *cipher)
 {
     unsigned int l, r, t, u;
     int i;

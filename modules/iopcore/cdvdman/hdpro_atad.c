@@ -120,7 +120,11 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 typedef struct _ata_cmd_state
 {
     s32 type; /* The ata_cmd_info_t type field. */
-    void *buf;
+    union {
+ 		void	*buf;
+ 		u8	*buf8;
+ 		u16	*buf16;
+ 	};
     u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
     s32 dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
@@ -497,7 +501,8 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 /* Do a PIO transfer, to or from the device.  */
 static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 {
-    void *buf;
+    u8 *buf8;
+	u16 *buf16;
     int i, type;
     int res = 0, chk = 0;
     u16 status = hdpro_io_read(ATAreg_STATUS_RD);
@@ -515,16 +520,16 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
 
         HDPROreg_IO8 = 0x43;
         CDVDreg_STATUS = 0;
 
         for (i = 0; i < 256; i++) {
-            u16 r_data = *(u16 *)buf;
+            u16 r_data = *buf16;
             hdpro_io_write(ATAreg_DATA_WR, r_data);
             chk ^= r_data + i;
-            cmd_state->buf = ++((u16 *)buf);
+            cmd_state->buf = ++buf16;
         }
 
         u16 out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
@@ -532,15 +537,16 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
             return -504;
 
         if (cmd_state->type == 8) {
+			buf8 = cmd_state->buf8;
             for (i = 0; i < 4; i++) {
-                hdpro_io_write(ATAreg_DATA_WR, *(u8 *)buf);
-                cmd_state->buf = ++((u8 *)buf);
+                hdpro_io_write(ATAreg_DATA_WR, *buf8);
+                cmd_state->buf = ++buf8;
             }
         }
 
     } else if (type == 2) {
         /* PIO data in  */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
 
         suspend_intr();
 
@@ -558,8 +564,8 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
             res0 = (res0 & 0xff) | (res1 << 8);
             chk ^= res0 + i;
 
-            *(u16 *)buf = res0 & 0xffff;
-            cmd_state->buf = ++((u16 *)buf);
+            *buf16 = res0 & 0xffff;
+            cmd_state->buf16 = ++buf16;
         }
 
         HDPROreg_IO8 = 0x51;
@@ -647,7 +653,6 @@ finish:
 int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     int res = 0;
-    u32 nbytes;
     u16 sector, lcyl, hcyl, select, command, len;
 
     WAITIOSEMA(io_sema);
@@ -683,8 +688,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         if ((res = ata_io_finish()) != 0)
             continue;
 
-		nbytes = len * 512;
-        buf = (void*)((u8 *)buf + nbytes);
+		buf = (void*)((u8 *)buf + len * 512);
         lba += len;
         nsectors -= len;
     }

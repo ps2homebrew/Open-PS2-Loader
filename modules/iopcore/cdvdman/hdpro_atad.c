@@ -40,10 +40,10 @@
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
 // The pseudo ATA controller registers are accessed (input/ouput) by writing
 // an id to the main ATA controller (id specific to HDpro, see registers id below).
-#define HDPROreg_IO8 (*(volatile unsigned char *)0xBFC00000)
-#define HDPROreg_IO32 (*(volatile unsigned int *)0xBFC00000)
+#define HDPROreg_IO8 (*(volatile u8 *)0xBFC00000)
+#define HDPROreg_IO32 (*(volatile u32 *)0xBFC00000)
 
-#define CDVDreg_STATUS (*(volatile unsigned char *)0xBF40200A)
+#define CDVDreg_STATUS (*(volatile u8 *)0xBF40200A)
 
 // Pseudo ATA controller registers id - Output
 #define ATAreg_CONTROL_RD 0x68
@@ -92,8 +92,8 @@ static ata_devinfo_t atad_devinfo;
 /* ATA command info.  */
 typedef struct _ata_cmd_info
 {
-    unsigned char command;
-    unsigned char type;
+    u8 command;
+    u8 type;
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
@@ -119,10 +119,10 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
 typedef struct _ata_cmd_state
 {
-    int type; /* The ata_cmd_info_t type field. */
+    s32 type; /* The ata_cmd_info_t type field. */
     void *buf;
-    unsigned int blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    int dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
+    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    s32 dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -173,7 +173,7 @@ static int hdpro_io_start(void)
     CDVDreg_STATUS = 0;
     HDPROreg_IO8 = 0x61;
     CDVDreg_STATUS = 0;
-    unsigned int res = HDPROreg_IO8;
+    u32 res = HDPROreg_IO8;
     CDVDreg_STATUS = 0;
 
     resume_intr();
@@ -206,7 +206,7 @@ static int hdpro_io_finish(void)
     return hdpro_io_active ^ 1;
 }
 
-static void hdpro_io_write(unsigned char cmd, unsigned short int val)
+static void hdpro_io_write(u8 cmd, u16 val)
 {
     suspend_intr();
 
@@ -221,16 +221,16 @@ static void hdpro_io_write(unsigned char cmd, unsigned short int val)
     resume_intr();
 }
 
-static int hdpro_io_read(unsigned char cmd)
+static int hdpro_io_read(u8 cmd)
 {
     suspend_intr();
 
     // IO read from HD Pro
     HDPROreg_IO8 = cmd;
     CDVDreg_STATUS = 0;
-    unsigned int res0 = HDPROreg_IO8;
+    u32 res0 = HDPROreg_IO8;
     CDVDreg_STATUS = 0;
-    unsigned int res1 = HDPROreg_IO8;
+    u32 res1 = HDPROreg_IO8;
     CDVDreg_STATUS = 0;
     res0 = (res0 & 0xff) | (res1 << 8);
 
@@ -322,7 +322,7 @@ static int ata_wait_busy(int bits)
 
         hdpro_io_start();
 
-        unsigned short int r_control = hdpro_io_read(ATAreg_CONTROL_RD);
+        u16 r_control = hdpro_io_read(ATAreg_CONTROL_RD);
 
         hdpro_io_finish();
 
@@ -386,7 +386,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     const ata_cmd_info_t *cmd_table;
     int i, res, type, cmd_table_size;
     int using_timeout, device = (select >> 4) & 1;
-    unsigned int searchcmd;
+    u32 searchcmd;
 
     ClearEventFlag(ata_evflg, 0);
 
@@ -462,7 +462,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     suspend_intr();
     HDPROreg_IO8 = 0x21;
     CDVDreg_STATUS = 0;
-    unsigned int dummy = HDPROreg_IO8;
+    u32 dummy = HDPROreg_IO8;
     CDVDreg_STATUS = 0;
     resume_intr();
     dummy = 0;
@@ -500,7 +500,7 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
     void *buf;
     int i, type;
     int res = 0, chk = 0;
-    unsigned short int status = hdpro_io_read(ATAreg_STATUS_RD);
+    u16 status = hdpro_io_read(ATAreg_STATUS_RD);
 
     if (status & ATA_STAT_ERR) {
         M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
@@ -521,20 +521,20 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
         CDVDreg_STATUS = 0;
 
         for (i = 0; i < 256; i++) {
-            unsigned short int r_data = *(unsigned short int *)buf;
+            u16 r_data = *(u16 *)buf;
             hdpro_io_write(ATAreg_DATA_WR, r_data);
             chk ^= r_data + i;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            cmd_state->buf = ++((u16 *)buf);
         }
 
-        unsigned short int out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
+        u16 out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
         if (out != (chk & 0xffff))
             return -504;
 
         if (cmd_state->type == 8) {
             for (i = 0; i < 4; i++) {
-                hdpro_io_write(ATAreg_DATA_WR, *(unsigned char *)buf);
-                cmd_state->buf = ++((unsigned char *)buf);
+                hdpro_io_write(ATAreg_DATA_WR, *(u8 *)buf);
+                cmd_state->buf = ++((u8 *)buf);
             }
         }
 
@@ -550,16 +550,16 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
         for (i = 0; i < 256; i++) {
 
-            unsigned int res0 = HDPROreg_IO8;
+            u32 res0 = HDPROreg_IO8;
             CDVDreg_STATUS = 0;
-            unsigned int res1 = HDPROreg_IO8;
+            u32 res1 = HDPROreg_IO8;
             CDVDreg_STATUS = 0;
 
             res0 = (res0 & 0xff) | (res1 << 8);
             chk ^= res0 + i;
 
-            *(unsigned short int *)buf = res0 & 0xffff;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            *(u16 *)buf = res0 & 0xffff;
+            cmd_state->buf = ++((u16 *)buf);
         }
 
         HDPROreg_IO8 = 0x51;
@@ -568,7 +568,7 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
         resume_intr();
 
-        unsigned short int r_data = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
+        u16 r_data = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
         if (r_data != (chk & 0xffff))
             return -504;
     }
@@ -582,7 +582,7 @@ int ata_io_finish(void)
     ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
     int res = 0, type = cmd_state->type;
-    unsigned short int stat;
+    u16 stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
 
@@ -591,7 +591,7 @@ int ata_io_finish(void)
 
         HDPROreg_IO8 = 0x21;
         CDVDreg_STATUS = 0;
-        unsigned int ret = HDPROreg_IO8;
+        u32 ret = HDPROreg_IO8;
         CDVDreg_STATUS = 0;
 
         resume_intr();
@@ -644,11 +644,11 @@ finish:
 }
 
 /* Export 9 */
-int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
+int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     int res = 0;
-    unsigned int nbytes;
-    unsigned short int sector, lcyl, hcyl, select, command, len;
+    u32 nbytes;
+    u16 sector, lcyl, hcyl, select, command, len;
 
     WAITIOSEMA(io_sema);
 
@@ -683,8 +683,8 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
         if ((res = ata_io_finish()) != 0)
             continue;
 
-        nbytes = len * 512;
-        (u8 *)buf += nbytes;
+		nbytes = len * 512;
+        buf = (void*)((u8 *)buf + nbytes);
         lba += len;
         nsectors -= len;
     }

@@ -1,7 +1,7 @@
 # Translation by machiavel
-# Last update: 10/23/2016 
-# Updated for OPL_r963_DB [b7e6f26]
-# official thread: http://ps2home.freeforums.net/post/1966/thread
+# Last update: 01/25/2017 
+# Updated for OPL_983_DB [7f7e9af]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 French
 OPL %s
 Sauvegarder
@@ -210,5 +210,25 @@ Démarrage auto.
 Valeur en seconde(s), 0 pour désactiver le démarrage auto
 Logo PS2
 S'affiche uniquement si le logo du disque est compatible avec la région de votre console
+Configure PADEMU
+Pad Emulator Settings
+Enable Pad Emulator
+Turns on/off PadEmulator for selected game.
+Pad Emulator mode
+Select Pad Emulator mode.
+DualShock3 USB
+DualShock3 BT
+Settings for port:
+Select Pad Emulator port for settings.
+Enable emulation
+Turns on/off Pad Emulator for selected port.
+Enable vibration
+Turns on/off vibration for Pad Emulator selected port.
+Usb bluetooth adapter mac address:
+DS3 Controller paired to mac address:
+Pair
+Pair DS3 controller
+Pair DS3 controller with bluetooth adapter mac address.
+Not connected
 Menu lanceur d'ELF
 Mode d'affichage du menu lanceur d'ELF

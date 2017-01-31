@@ -210,5 +210,25 @@ Auto-start
 Værdi i sekunder(s), 0 for at deaktivere auto start
 PS2-Logo
 Vises kun med et gyldigt disk logo, som matcher konsollens region
+Konfigurér PADEMU
+Pad Emulator indstillinger
+Aktivér Pad Emulator
+Slå Pad Emulator Til/Fra for valgte spil.
+Pad Emulator tilstand
+Vælg Pad Emulator tilstand.
+DualShock 3 USB
+DualShock 3 BT
+indstillinger for port:
+Vælg Pad Emulator port for indstillinger.
+Aktivér emulering
+Slå Pad Emulator Til/Fra for valgte port.
+Aktivér vibration
+Slå vibration Til/Fra for valgte Pad Emulator port.
+USB-bluetooth adapter MAC-adresse:
+DS3-controller parret til MAC-adresse:
+Parring
+Pardan DS3 controller
+Pardan DS3 controller med bluetooth adapters MAC-adresse.
+Ikke tilsluttet
 ELF-Loader Menu
 ELF-Loader Menu visningstilstand

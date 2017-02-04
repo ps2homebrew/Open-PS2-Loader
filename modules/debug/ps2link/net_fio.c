@@ -111,9 +111,7 @@ int pko_accept_pkt(int sock, char *buf, int len, int pkt_type)
 {
     int length;
     pko_pkt_hdr *hdr;
-#ifdef DEBUG
     unsigned int hcmd;
-#endif
     unsigned short hlen;
 
 
@@ -130,9 +128,7 @@ int pko_accept_pkt(int sock, char *buf, int len, int pkt_type)
     }
 
     hdr = (pko_pkt_hdr *)buf;
-#ifdef DEBUG
     hcmd = ntohl(hdr->cmd);
-#endif
     hlen = ntohs(hdr->len);
 
     if (hcmd != pkt_type) {

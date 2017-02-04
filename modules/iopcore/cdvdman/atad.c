@@ -88,14 +88,10 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
 typedef struct _ata_cmd_state
 {
-    s32 type; /* The ata_cmd_info_t type field. */
-    union {
- 		void	*buf;
- 		u8	*buf8;
- 		u16	*buf16;
- 	};
-    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    s32 dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
+    int type; /* The ata_cmd_info_t type field. */
+    void *buf;
+    unsigned int blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    int dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -269,7 +265,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     const ata_cmd_info_t *cmd_table;
     int i, res, type, cmd_table_size;
     int using_timeout, device = (select >> 4) & 1;
-    u8 searchcmd;
+    unsigned char searchcmd;
 
     ClearEventFlag(ata_evflg, 0);
 
@@ -383,10 +379,9 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
     return 0;
 
     USE_ATA_REGS;
-    u8 *buf8;
-	u16 *buf16;
+    void *buf;
     int i, type;
-    u16 status = ata_hwport->r_status & 0xff;
+    unsigned short int status = ata_hwport->r_status & 0xff;
 
     if (status & ATA_STAT_ERR) {
         M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
@@ -401,24 +396,23 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf16 = cmd_state->buf16;
+        buf = cmd_state->buf;
         for (i = 0; i < 256; i++) {
-            ata_hwport->r_data = *buf16;
-            cmd_state->buf16 = ++buf16;
+            ata_hwport->r_data = *(unsigned short int *)buf;
+            cmd_state->buf = ++((unsigned short int *)buf);
         }
-		buf8 = cmd_state->buf8;
         if (cmd_state->type == 8) {
             for (i = 0; i < 4; i++) {
-                ata_hwport->r_data = *buf8;
-                cmd_state->buf8 = ++buf8;
+                ata_hwport->r_data = *(u8 *)buf;
+                cmd_state->buf = ++((u8 *)buf);
             }
         }
     } else if (type == 2) {
         /* PIO data in  */
-        buf16 = cmd_state->buf16;
+        buf = cmd_state->buf;
         for (i = 0; i < 256; i++) {
-            *buf16 = ata_hwport->r_data;
-            cmd_state->buf16 = ++buf16;
+            *(unsigned short int *)buf = ata_hwport->r_data;
+            cmd_state->buf = ++((unsigned short int *)buf);
         }
     }
 
@@ -426,13 +420,14 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 }
 
 /* Complete a DMA transfer, to or from the device.  */
-static inline int ata_dma_complete(void *buf, u32 blkcount, int dir)
+static inline int ata_dma_complete(void *buf, int blkcount, int dir)
 {
     USE_ATA_REGS;
     USE_SPD_REGS;
-    u32 bits, count, nbytes;
+    unsigned int count, nbytes;
+    u32 bits;
     int i, res;
-    u16 dma_stat;
+    unsigned short int dma_stat;
 
     while (blkcount) {
         for (i = 0; i < 20; i++)
@@ -473,7 +468,7 @@ static inline int ata_dma_complete(void *buf, u32 blkcount, int dir)
         if ((res = dev9DmaTransfer(0, buf, (nbytes << 9) | 32, dir)) < 0)
             return res;
 
-        buf = (void*)((u8 *)buf + nbytes);
+        (u8 *)buf += nbytes;
         blkcount -= count;
     }
 
@@ -488,7 +483,7 @@ int ata_io_finish(void)
     ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
     int i, res = 0, type = cmd_state->type;
-    u16 stat;
+    unsigned short int stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
         WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR | WEF_OR, &bits);
@@ -547,10 +542,10 @@ finish:
 }
 
 /* Export 9 */
-int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
+int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
 {
     int res = 0;
-    u16 sector, lcyl, hcyl, select, command, len;
+    unsigned short int sector, lcyl, hcyl, select, command, len;
 
     WAITIOSEMA(io_sema);
 
@@ -562,10 +557,8 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         hcyl = (lba >> 16) & 0xff;
 
         if (lba_48bit) {
-            /* Setup for 48-bit LBA.
- 			   While ATA-6 allows for the transfer of up to 65536 sectors,
- 			   the DMAC allows only up to 65536 x 128 / 512 = 16384 sectors. */
- 			len = (nsectors > 16384) ? 16384 : nsectors;
+            /* Setup for 48-bit LBA.  */
+            len = (nsectors > 65536) ? 65536 : nsectors;
 
             /* Combine bits 24-31 and bits 0-7 of lba into sector.  */
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
@@ -590,7 +583,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             return res;
         }
 
-        buf = (void*)((u8 *)buf + len * 512);
+        (u8 *)buf += (len * 512);
         lba += len;
         nsectors -= len;
     }
@@ -609,7 +602,7 @@ ata_devinfo_t *ata_get_devinfo(int device)
 static void ata_set_dir(int dir)
 {
     USE_SPD_REGS;
-    u16 val;
+    unsigned short int val;
 
     SPD_REG16(0x38) = 3;
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;

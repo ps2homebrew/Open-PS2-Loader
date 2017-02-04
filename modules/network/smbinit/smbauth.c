@@ -26,7 +26,7 @@ static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned c
     int i;
 
     /* keep only 14 bytes of the password (padded with nul bytes) */
-    strncpy((char*)tmp_pass, (const char*)password, 14);
+    strncpy(tmp_pass, password, 14);
 
     /* turn the password to uppercase */
     for (i = 0; i < 14; i++) {
@@ -38,10 +38,10 @@ static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned c
     memcpy(K2, &tmp_pass[7], 7);
 
     /* encrypt the magic string with the keys */
-    DES(K1, (const unsigned char*)"KGS!@#$%", &cipher[0]);
-    DES(K2, (const unsigned char*)"KGS!@#$%", &cipher[8]);
+    DES(K1, "KGS!@#$%", &cipher[0]);
+    DES(K2, "KGS!@#$%", &cipher[8]);
 
-    return cipher;
+    return (unsigned char *)cipher;
 }
 
 /*
@@ -55,7 +55,7 @@ static unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned
     memset(passwd_buf, 0, sizeof(passwd_buf));
 
     /* turn the password to unicode */
-    for (i = 0, j = 0; i < strlen((const char*)password); i++, j += 2)
+    for (i = 0, j = 0; i < strlen(password); i++, j += 2)
         passwd_buf[j] = password[i];
 
     /* get the message digest */

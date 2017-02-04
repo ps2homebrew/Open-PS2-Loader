@@ -10,6 +10,6 @@
 #ifndef DES_H
 #define DES_H
 
-unsigned char *DES(const unsigned char *key, const unsigned char *message, unsigned char *cipher);
+unsigned char *DES(unsigned char *key, unsigned char *message, unsigned char *cipher);
 
 #endif /* DES */

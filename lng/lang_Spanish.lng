@@ -61,7 +61,7 @@ Apagar PS2
 Cargando configuración...
 Guardando configuración...
 Iniciar dispositivo
-Refrescar
+Actualizar
 Modo de inicio para USB
 Modo de inicio para Disco duro
 Modo de inicio para Red
@@ -167,7 +167,7 @@ Modo 5
 Modo 6
 Modo 7
 Modo 8
-Configuración GSM
+Ajustes GSM
 Configuración de velocidad ethernet y duplex
 100Mbit full-duplex
 100Mbit half-duplex
@@ -184,7 +184,7 @@ Ajuste vertical
 Configura la posición vertical de la pantalla
 Omitir vídeos FMV
 Omite escenas Full Motion Vídeos
-Configuración PS2RD
+Ajustes PS2RD
 Activar PS2RD
 Permitir que PS2RD parchee los juegos
 Modo PS2RD
@@ -194,7 +194,7 @@ Seleccionar códigos de juegos
 Error: fallo al cargar el archivo de códigos
 No se han encontrado códigos
 Descargar ajustes predeterminados
-Actualización ajustes juegos a través de red
+Descargar ajustes de los juegos
 ¿Cargar de nuevo los ajustes existentes?
 Actualización fallida.
 Error al conectarse con el servidor de actualización.
@@ -208,3 +208,23 @@ Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
 Logotipo Playstation 2
 Sólo se mostrará si el juego es de la misma región que la consola
+Ajustes DualShock 3
+Opciones emulación del mando
+Usar emulación del mando
+Activa o desactiva la emulación del mando para el juego seleccionado
+Modo emulación del mando
+Selecciona el modo de emulación del mando
+DualShock 3 USB
+DualShock 3 Bluetooth
+Ajustes para el puerto
+Selecciona el puerto del mando emulado para aplicar los ajustes
+Usar emulación
+Activa o desactiva la emulación del mando para el puerto seleccionado
+Usar vibración
+Activa o desactiva la vibración para el mando emulado en el puerto seleccionado
+Dirección MAC adaptador bluetooth USB:
+Mando sincronizado con dirección MAC:
+Sincronizar
+Sincronización mando DualShock 3
+Sincroniza el mando DualShock 3 con la dirección MAC del adaptador bluetooth
+No conectado

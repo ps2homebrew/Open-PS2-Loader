@@ -1,0 +1,230 @@
+# Danish translation by BongKris
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+Danish
+Open PS2 Loader %s
+Gem indstillinger
+Tilbage
+Netværksindstillinger
+Avancerede indstillinger
+<ingen værdi>
+Indstillinger gemt...
+Fejl ved lagering af indstillinger!
+Afslut
+Indstillinger
+Menu
+USB-spil
+HDD-spil
+ETH-spil
+Programmer
+Tema
+Sprog
+Systemet slukkes.
+Vend tilbage til Browser/OSDSYS?
+Annuller opdatering?
+%d: Inget harddisk drev fundet
+%d: Harddisk drevet er ikke formateret
+%d: Netværksopstart fejl
+%d: Ingen netværksadapter fundet
+%d: Kan ikke oprette forbindelse til SMB-serveren
+%d: Kan ikke logge på SMB-server
+%d: Kan ikke åbne SMB-mappe
+%d: Kan ikke liste SMB-mapper
+%d: Kan ikke liste spil
+%d: DHCP-serveren er ikke tilgængelig
+%d: Ingen netværksforbindelse
+Til
+Fra
+OK
+Vælg
+Annuller
+Cirkel
+Kryds
+Spil liste
+Spil indst.
+Nulstil alle indstillinger
+Spil indstillinger nulstillet
+Scrolling
+Langsom
+Medium
+Hurtig
+Standardmenu
+Indlæs fra disk
+Vent venligst
+Fejl ved indlæsning af spil ID
+Automatisk sortering
+Fejl ved indlæsning af sprogfil
+Deaktivér fejlfindingsfarver
+Ingen controller registreret, venter...
+Aktivér Cover Art
+Bredskærmsformat
+Sluk
+Indlæser indstillinger
+Gemmer indstillinger
+Start enhed
+Genindlæs
+USB-enhed starttilstand
+HDD-enhed starttilstand
+ETH-enhed starttilstand
+Programmenu visningstilstand
+Automatisk
+Manuel
+Start HDL-server
+HDL-server starter...
+HDL-server aktiv...
+Kunne ikke starte HDL-server.
+HDL-server lukker ned...
+IGR-sti
+Baggrundsfarve
+Tekstfarve
+- PS2 -
+- SMB-server -
+IP-metode
+Statisk
+DHCP
+IP-adresse
+Adresse
+Undernetmaske
+Gateway
+DNS-server
+Port
+Mappe
+Brugernavn
+Adgangskode
+<ikke specificeret>
+Adressetype
+IP
+NetBIOS
+Acceptér
+Elementet vil slettets permanent, fortsæt?
+Omdøb
+Slet
+Kør
+Skærmindstillinger
+Aktivér skrive operationer
+Kontrollér USB-spil fragmentering
+Husk sidst spillede spil
+Vælgeknap
+Fejl: spillet er fragmenteret
+Fejl: kunne ikke køre elementet
+Test
+Efterlad tom for gæste konto
+Korrekt læsning
+Synkroniseringstilstand
+Frigiv syscalls
+Skip videoer
+Emulere DVD-DL
+Deaktivere IGR
+High module lagering
+Skjul DEV9-modul
+Ændring af størrelsen vil omformatere VMC
+Opret
+Start
+Modificer
+Afbryd
+Nulstil
+Brug generisk
+Konfigurér VMC
+Navn
+Størrelse
+Status
+Fremskridt
+VMC-fil eksisterer allerede
+Ugyldig VMC-fil, størrelse er ukorrekt
+VMC-fil skal oprettes
+Fejl med VMC %s, fortsæt med fysisk MC (port %d) ?
+Automatisk opdatering
+Om
+Kodere
+Kvalitetstestere
+USB-præfiks sti
+Starter brugerdefineret ELF efter en IGR
+Værdi i minuttet(r), 0 for at deaktivere spindown
+Automatisk harddisk spindown
+Videotilstand
+Dialogfarve
+Markeringsfarve
+Vis infoside
+Info
+Brugerdefinerede ELF
+Farvevalg
+Genopret forbindelse
+Efterlad tom for at liste mapper
+ETH-præfiks sti
+Tilbage
+Mellemrum
+Indtast
+Tilstand
+VMC-port 1
+VMC-port 2
+Spil ID
+DMA-tilstand
+V-Sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+Konfigurér GSM
+Ethernet hastighed og duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM-indstillinger
+Aktivér GSM
+Slå GSM Til eller Fra
+Videotilstand
+Tvungen brugerdefinerede skærmtilstand
+Horisontal position
+Horisontal justering
+Vertikal position
+Vertikal justering
+Vis ikke FMV
+Springer over Full Motion Videos
+Snydeindstillinger
+Aktivér PS2RD Cheat Engine
+Tillad PS2RD Cheat Engine at patche dine spil
+PS2RD Cheat Engine tilstand
+Auto-vælg eller Vælg spil snydekoder
+Auto-vælg spil snydekoder
+Vælg spil snydekoder
+Fejl: kunne ikke indlæses fil med snydekoder
+Ingen snydekoder fundet
+Hent standardindstillinger
+Netværksopdatering
+Hent eksisterende arkiv?
+Opdatering mislykkedes.
+Kan ikke oprette forbindes til server.
+Opdatering fuldendt.
+Opdatering annulleret.
+Hent indstillinger fra netværket?
+Brugerdefinerede indstillinger
+Hent standardindstillinger
+Auto-start om %i s...
+Auto-start
+Værdi i sekunder(s), 0 for at deaktivere auto start
+PS2-Logo
+Vises kun med et gyldigt disk logo, som matcher konsollens region
+Konfigurér PADEMU
+Pad Emulator indstillinger
+Aktivér Pad Emulator
+Slå Pad Emulator Til/Fra for valgte spil.
+Pad Emulator tilstand
+Vælg Pad Emulator tilstand.
+DualShock 3 USB
+DualShock 3 BT
+indstillinger for port:
+Vælg Pad Emulator port for indstillinger.
+Aktivér emulering
+Slå Pad Emulator Til/Fra for valgte port.
+Aktivér vibration
+Slå vibration Til/Fra for valgte Pad Emulator port.
+USB-bluetooth adapter MAC-adresse:
+DS3-controller parret til MAC-adresse:
+Parring
+Pardan DS3 controller
+Pardan DS3 controller med bluetooth adapters MAC-adresse.
+Ikke tilsluttet

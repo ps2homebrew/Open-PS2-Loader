@@ -208,3 +208,23 @@ Autostart
 Värde i sekund(er), 0 inaktiverar Autostart
 PS2 Logo
 Visas bara när skivavbilden matchar konsolens region
+Konfigurera PADEMU
+Pad Emulator Inställningar
+Aktivera Pad Emulator
+Slå av/på PadEmulator för valt spel.
+Pad Emulator läge
+Vlj Pad Emulator läge.
+DualShock3 USB
+DualShock3 BT
+Inställningar för port:
+Välj Pad Emulator port för inställningar.
+Aktivera emulation
+Slå av/på Pad Emulator för vald port.
+Aktivera vibration
+Slå av/på vibration för Pad Emulator vald port.
+Usb bluetooth adapter mac address:
+DS3 Controller parkopplad till mac address:
+Parkoppla
+Parkoppla DS3 controller
+Parkoppla DS3 controller till bluetooth adapter mac address.
+Ej ansluten

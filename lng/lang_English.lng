@@ -20,7 +20,7 @@
 ###################################################################################################
 #
 # Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
-English
+English template
 Open PS2 Loader %s
 Save changes
 Back
@@ -53,7 +53,7 @@ Cancel updating?
 %d: DHCP server unavailable
 %d: No network connection
 On
-Off
+Off 
 OK
 Select
 Cancel
@@ -85,7 +85,7 @@ Refresh
 USB device start mode
 HDD device start mode
 ETH device start mode
-Applications start mode
+Applications menu display mode
 Auto
 Manual
 Start HDL Server
@@ -131,7 +131,7 @@ Leave empty for GUEST auth.
 Accurate Reads
 Synchronous Mode
 Unhook Syscalls
-Skip Videos
+Skip videos
 Emulate DVD-DL
 Disable IGR
 High module storage
@@ -164,7 +164,7 @@ Video mode
 Dialog color
 Selected color
 Display info page
-Info
+Info 
 Custom ELF
 Color selection
 Reconnect
@@ -180,13 +180,13 @@ Game ID
 DMA Mode
 V-Sync
 Mode 1
-Mode 2
+Mode 2 
 Mode 3
-Mode 4
+Mode 4 
 Mode 5
-Mode 6
-Mode 7
-Mode 8
+Mode 6 
+Mode 7 
+Mode 8 
 Configure GSM
 Ethernet link mode
 100Mbit full-duplex
@@ -206,7 +206,7 @@ FMV Skip
 Skips Full Motion Videos
 Cheat Settings
 Enable PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
+Let PS2RD Cheat Engine patch your games
 PS2RD Cheat Engine Mode
 Auto-select or Select game cheats
 Auto-select cheats
@@ -228,3 +228,23 @@ Auto start
 Value in second(s), 0 to disable auto start
 PS2 Logo
 Only displayed for a valid disc logo which matches the console's region
+Configure PADEMU
+Pad Emulator Settings
+Enable Pad Emulator
+Turns on/off PadEmulator for selected game.
+Pad Emulator mode
+Select Pad Emulator mode.
+DualShock3 USB
+DualShock3 BT
+Settings for port:
+Select Pad Emulator port for settings.
+Enable emulation
+Turns on/off Pad Emulator for selected port.
+Enable vibration
+Turns on/off vibration for Pad Emulator selected port.
+Usb bluetooth adapter mac address:
+DS3 Controller paired to mac address:
+Pair
+Pair DS3 controller
+Pair DS3 controller with bluetooth adapter mac address.
+Not connected

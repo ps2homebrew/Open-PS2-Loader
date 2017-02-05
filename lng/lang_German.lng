@@ -208,3 +208,23 @@ Automatischer Start
 Wert in Sekunden (sek), 0 zum Deaktivieren 
 PS2 Logo
 Wird nur bei gültigem Disc Logo angezeigt, welches mit der Region der Konsole übereinstimmen muss
+PADEMU konfigurieren
+Pad Emulator Einstellungen
+Pad Emulator aktivieren
+Aktiviere/deaktiviere den Pad Emulator für das ausgewählte Spiel.
+Pad Emulator Modus
+Wähle Pad Emulator Modus
+DualShock3 USB
+DualShock3 BT
+Einstellungen für Anschluss:
+Wähle Pad Emulator Anschluss für die Einstellungen.
+Emulation aktivieren
+Aktiviert/deaktiviert den Pad Emulator für den ausgewählten Anschluss.
+Vibration aktivieren
+Aktiviert/deaktiviert die Vibration für den ausgewählten Anschluss.
+USB Bluetooth-Aadapter MAC-Adresse:
+DS3 Controller verbunden zur MAC-Adresse:
+Verbinden
+Verbinde DS3 Controller
+Verbinde DS3 Controller mit Bluetooth-Adapter MAC-Adresse.
+Nicht verbunden

@@ -242,11 +242,11 @@ Enable emulation
 Turns on/off Pad Emulator for selected port.
 Enable vibration
 Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS3 Controller paired to mac address:
+USB bluetooth adapter MAC address:
+DS3 Controller paired to MAC address:
 Pair
 Pair DS3 controller
-Pair DS3 controller with bluetooth adapter mac address.
+Pair DS3 controller with bluetooth adapter MAC address.
 Not connected
 ELF Loader Menu
 ELF Loader Menu display mode

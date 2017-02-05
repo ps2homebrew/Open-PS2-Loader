@@ -4,7 +4,7 @@ French
 Open PS2 Loader %s
 Sauvegarder
 Retour
-Configuration du réseau
+Configuration réseau
 Réglages avancés
 <non renseigné>
 Configuration sauvegardée...
@@ -19,21 +19,21 @@ Apps
 Thème
 Langue
 Le système va être éteint
-Retour au navigateur PS2 / OSDSYS ?
+Retour au navigateur PS2 ?
 Annuler le téléchargement ?
-Erreur %d: disque dur non détecté
-Erreur %d: disque dur non formaté
-Erreur %d au démarrage du réseau
-Erreur %d: adaptateur réseau non détecté
-Erreur %d: connexion  au serveur SMB impossible
-Erreur %d: identification auprès du serveur SMB impossible
-Erreur %d: ouverture du partage SMB impossible
-Erreur %d: listing des partages SMB impossible à établir
-Erreur %d: listing des jeux impossible à établir
-Erreur %d: serveur DHCP indisponible
-Erreur %d: connexion réseau inexistante
-On
-Off
+Erreur %d : disque dur non détecté
+Erreur %d : disque dur non formaté
+Erreur %d : problème au démarrage du réseau
+Erreur %d : adaptateur réseau non détecté
+Erreur %d : connexion  au serveur SMB impossible
+Erreur %d : identification auprès du serveur SMB impossible
+Erreur %d : ouverture du partage SMB impossible
+Erreur %d : listing des partages SMB impossible à établir
+Erreur %d : listing des jeux impossible à établir
+Erreur %d : serveur DHCP indisponible
+Erreur %d : connexion réseau inexistante
+ON
+OFF
 Valider
 Valider
 Annuler
@@ -80,15 +80,15 @@ Texte principal
 - Serveur SMB -
 Type d'adresse IP
 Statique
-Dynamique
+DHCP
 Adresse IP
 Adresse
 Masque de sous-réseau
 Passerelle par défaut
 Serveur DNS
 Port
-Nom du serveur SMB
-Nom d'utilisateur
+Nom du dossier partagé
+Nom de session
 Mot de passe
 <non renseigné>
 Type d'adresse
@@ -107,11 +107,11 @@ Touche de validation
 Erreur, le jeu est fragmenté
 Erreur, impossible de lancer l'item
 Tester les réglages
-Laisser le champ vide pour s'identifier en tant qu'invité
+Laisser le champ vide pour utiliser la session Invité
 Simuler la vitesse de lecture du CD/DVD
 Mode de lecture alternatif (lecture synchrone)
 Purger OPL après lancement du jeu
-Passer les cinématiques
+Passer les vidéos
 Émuler support double couche (DVD9 rippés en DVD5)
 Désactiver l'IGR (incompatible avec certains jeux)
 Charger les modules de stockage à une adresse plus élevée
@@ -123,15 +123,15 @@ Modifier
 Abandonner
 Réinitialiser
 VMC générique
-Configurer la carte mém. virtuelle
+Configurer VMC
 Nom
 Taille
 État
 Progression
-La carte mém. virtuelle existe déjà 
-Fichier carte mém. virtuelle non valide, taille incorrecte
-La carte mém. virtuelle doit d'abord être créée
-Erreur sur la carte mém. virtuelle %s. Continuer sur la carte mém. physique %d ?
+La VMC existe déjà 
+Fichier VMC non valide, taille incorrecte
+La VMC doit d'abord être créée
+Erreur sur VMC %s. Continuer sur la carte mém. physique %d ?
 Rafraîchissement automatique
 Crédits
 Développeurs
@@ -154,10 +154,10 @@ Effacer
 Espace
 Valider
 Maj/Min
-Carte mém. virtuelle (VMC) 1
-Carte mém. virtuelle (VMC) 2
+VMC 1
+VMC 2
 ID
-Vitesse de lecture (mode DMA)
+DMA mode
 Synchronisation verticale
 Mode 1
 Mode 2
@@ -167,7 +167,7 @@ Mode 5
 Mode 6
 Mode 7
 Mode 8
-Configurer GSM
+GSM
 Vitesse Ethernet
 100Mbit full-duplex
 100Mbit half-duplex
@@ -184,20 +184,20 @@ Ajustement vertical de l'écran
 Ajouter/Soustraire
 Avance rapide
 Passer les vidéos au format FMV
-Configuration de PS2RD
+PS2RD
 PS2RD
 Activer/Désactiver PS2RD
 Activation des codes
 Automatique/Manuel
 Automatique
-Manuel (inactif, fonction à venir)
+Automatique
 Échec du chargement du fichier de code .cht
 Fichier de code .cht introuvable
 Télécharger les régl. prédéfinis
 Téléchargement des régl. prédéfinis
 Mise à jour des données existantes
 Échec du téléchargement
-Impossible de se connecter au serveur
+Impossible de se connecter au serveur OPL-CL
 Téléchargement effectué avec succès
 Téléchargement annulé
 Télécharger les régl. prédéfinis depuis Internet ?
@@ -208,3 +208,23 @@ Lancement auto.
 En seconde(s), 0 pour désactiver le lancement automatique
 Logo PS2
 S’affiche uniquement si le jeu et la console appartiennent à la même zone
+PADEMU
+Configuration emulateur manette
+Emulateur manette 
+Activer/Désactiver emulateur manette pour ce jeu
+Mode
+USB/Bluetooth
+DualShock3 USB
+DualShock3 Bluetooth
+Port
+1/2
+Emulation manette
+Activer/Désactiver emulateur manette pour ce port
+Vibration
+Activer/Désactiver support vibration pour ce port
+Adresse MAC du récepteur bluetooth
+DualShock3 connectée à l'adresse MAC
+Apairer
+Apairer manette DS3 
+Apairer manette DS3 avec l'adresse MAC du récepteur bluetooth
+Non connecté

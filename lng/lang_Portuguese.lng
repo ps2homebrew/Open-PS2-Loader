@@ -208,3 +208,23 @@ Auto iniciar
 Valor em segundos, 0 para desativar
 Logo PS2
 Apenas é exibido para um disco válido e que seja da mesma região da consola
+Configurar PADEMU
+Definições do Emulador de Comando
+Ativar Emulador de Comando
+Ligar/Desligar o emulador para o jogo selecionado.
+Modo do Emulador de Comando
+Selecione o modo do Emulador de Comando.
+DualShock3 USB
+DualShock3 BT
+Definições para a porta:
+Selecione a porta do Emulador de Comando para as definições.
+Ativar emulação
+Ligar/Desligar o emulador para a porta selecionada.
+Ativar vibração.
+Ligar/Desligar vibração na porta selecionada.
+Endereço MAC do adaptador Bluetooth USB:
+Endereço MAC do comando DS3 emparelhado:
+Emparelhar
+Emparelhar comando DS3
+Emparelhar comando DS3 com o seguinte endereço MAC:
+Não ligado

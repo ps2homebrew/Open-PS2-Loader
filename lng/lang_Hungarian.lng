@@ -1,0 +1,230 @@
+# Hungarian translation by co5oos
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+Hungarian
+Open PS2 Loader %s
+Változtatások mentése
+Vissza
+Hálózat konfigurálás
+Haladó beállítások
+<Nincs érték>
+Beállítások mentve...
+Hiba a beállítások írásában!
+Kilépés
+Beállítások
+Menü
+USB Játékok
+HDD Játékok
+ETH Játékok
+Alkalmazások
+Téma
+Nyelv
+A rendszer le fog állni.
+Kilépés a böngészőbe/OSDSYS-be?
+Frissítés visszavonása?
+%d: Merevlemez nem található
+%d: Merevlemez nincs leformázva
+%d: Hálózat indítási hiba
+%d: Nem található hálózati adapter
+%d: Nem sikerült csatlakozni az SMB szerverhez
+%d: Nem sikerült bejelentkezni az SMB szerverbe
+%d: Nem sikerült megnyitni az SMB megosztást
+%d: Nem sikerült listázni az SMB megosztásokat
+%d: Nem sikerült listázni a játékokat
+%d: DHCP szerver nem elérhető
+%d: Nincs hálózati kapcsolat
+Be
+Ki
+OK
+Kiválaszt
+Vissza
+Kör
+Kereszt
+Játék Lista
+Játékbeállítások
+Összes beállítás eltávolítása
+Játékhoz tartozó összes kulcs eltávolítva
+Görgetés
+Lassú
+Közepes
+Gyors
+Alapértelmezett menü
+Lemezről való beolvasás
+Kérem várjon
+Hiba a Játék ID betöltése közben
+Automatikus rendezés
+Hiba a nyelv fájl betöltésnél
+Hibakeresési színek letiltása
+Nem található kontroller, várakozás...
+Lemezborító engedélyezése
+Szélesvásznú
+Kikapcsolás
+Konfiguráció betöltése
+Konfiguráció mentése
+Eszköz indítása
+Frissítés
+USB eszköz indítási mód
+HDD eszköz indítási mód
+ETH eszköz indítási mód
+Alkalmazások menü megjelenítési mód
+Automatikus
+Manuális
+HDL szerver indítása
+HDL Szerver Elindul...
+HDL Szerver Fut...
+Failed to start HDL Server.
+HDL Server Unloading...
+IGR path
+Background color
+Szöveg szín
+- PS2 -
+- SMB Szerver -
+IP Cím típus
+Statikus
+DHCP
+IP Cím
+Cím
+Maszk
+Alapértelmezett átjáró
+DNS Szerver
+Port
+Megosztás
+Felhasználó
+Jelszó
+<nincs megadva>
+Cím típus
+IP
+NetBIOS
+Elfogad
+Az elem véglegesen törlésre kerül, folytatja?
+Átnevezés
+Törlés
+Futtatás
+Képernyő Beállítások
+Írási műveletek engedélyezése
+USB játék töredezettség ellenőrzése
+Emlékezz a legutóbbi játékra
+Select Gomb
+Hiba, a játék töredezett
+Hiba, az elem futtatása sikertelen
+Teszt
+Hagyja üresen VENDÉG hitelesítéshez
+Postos Olvasás
+Egyidejű Mód
+Syscalls kiakasztás
+Videók átugrása
+DVD-DL emulálás
+IGR letiltása
+Magas modul tárhely
+DEV9 modul elrejtése
+A méretváltoztatás leformázza a VMC-t
+Létrehoz
+Indít
+Módosít
+Megszakít
+Visszaállítás
+Generikus használata
+VMC konfiguráció
+Név
+Méret
+Állapot
+Folyamat
+VMC fájl létezik
+Érvénytelen VMC fájl, helytelen méret
+VMC fájl létrehozása szükséges
+Hiba a VMC-vel %s, folytatás a fizikai MC-vel (foglalat %d) ?
+Automatikus frissítés
+Névjegy
+Kódolók
+Minőségbiztosítás
+USB előtag elérési út
+Testreszabott ELF bootolása egy IGR után
+Érték perc(ek)ben, 0 a kikapcsolás letiltására
+Automatikus Merevlemez kikapcsolás
+Videó mód
+Párbeszédablak színe
+Kiválasztott színe
+Információ oldal megjelenítése
+Infó
+Testreszabott ELF
+Szín szelekció
+Újracsatlakozás
+Leave empty to list shares
+ETH előtag elérési út
+Backspace
+Szóköz
+Enter
+Mód
+VMC Foglalat 1
+VMC Foglalat 2
+Játék ID
+DMA Mód
+V-Sync
+Mód 1
+Mód 2
+Mód 3
+Mód 4
+Mód 5
+Mód 6
+Mód 7
+Mód 8
+GSM Konfiguráció
+Ethernet kapcsolat módja
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM Beállítások
+GSM Engedélyezése
+KI vagy BE kapcsolja a GSM-t
+VMODE
+Kényzerített Testreszabott Megjelenítési Mód
+Vízszintes-Pozíció
+Vízszintes Szabályozás
+Függőleges-Pozíció
+Függőleges Szabályozás
+FMV Átugrása
+Átugorja a  Full Motion Videókat
+Csalás Beállítások
+PS2RD Csalás Motor engedélyezése
+Engedd a PS2RD Csalás motornak, hogy patch-elje a játékodat.
+PS2RD Csalás Motor Mód
+Auto-kiválaszt vagy játékcsalások Kiválasztása
+Auto-kiválaszt csalásokat
+Játékcsalások Kiválasztása
+Hiba: A Csalás Fájl betöltése sikertelen
+Nem találhatóak csalások
+Alapértelmezett letöltése
+Hálózat frissítés
+Újra-letölti a meglévő feljegyzéseket?
+Frissítés Sikertelen.
+Nem sikerült csatlakozni a frissítő szerverhez.
+Frissítés befejezve.
+Frissítés visszavonva.
+Beállítások letöltése a hálózatról?
+Testreszabott Beállítások
+Letöltött alapértelmezések
+Automatikus indítás %i s belül...
+Automatikus indítás
+Érték másodperc(ek)ben, 0 az Automatikus indítás letiltásához
+PS2 Logó
+Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
+PADEMU konfigurálás
+Pad Emulator Beállítások
+Pad Emulátor engedélyezése
+Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
+Pad Emulátor mód
+Válassza ki a  Pad Emulátor módját.
+DualShock3 USB
+DualShock3 BT
+Port beállítások:
+Válassza ki a Pad Emulátor portot a beállításokhoz.
+Emuláció engedélyezése
+Be/ki kapcsolja a Pad Emulátor-t a kiválasztott porthoz.
+Rezgés engedélyezése
+Be/ki kapcsolja a rezgést a Pad Emulátor kiválasztott portjához.
+Usb bluetooth adapter mac címe:
+DS3 Kontroller párosítva erre a mac címre :
+Párosítás
+DS3 kontroller párosítása
+DS3 kontroller párosítása bluetooth adapter mac címmel.
+Nincs csatlakoztatva

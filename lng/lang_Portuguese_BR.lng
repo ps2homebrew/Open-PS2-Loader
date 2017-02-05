@@ -191,7 +191,7 @@ Modo do PS2RD Cheat Engine
 Auto-selecionar ou Escolher as trapaças
 Auto-selecionar trapaças
 Selecionar trapaças
-Erro: falha ao carregar as trapaças
+Erro: Falha ao carregar as trapaças
 Nenhuma trapaça encontrada
 Baixar configurações
 Atualizar pela Internet
@@ -208,3 +208,23 @@ Auto-começar
 Valores em segundos (s), 0 para desativar
 Logotipo do Playstation 2
 Será mostrado apenas para os jogos que for da mesma região do console
+Configurar DualShock3
+Configurações de emulação de Controle
+Ativar emulação de Controle
+Liga/desliga a emulação de controle para o jogo selecionado.
+Modo de emulação de controle
+Escolha o modo de emulação de controle.
+DualShock3 USB
+DualShock3 BlueTooth
+Configurações da porta:
+Escolha a porta do controle emulado para aplicar os ajustes.
+Ativar emulação
+Liga/desliga o emulador de controle para a porta selecionada.
+Ativar vibração
+Liga/desliga a vibração para o controle emulado da porta selecionada.
+Endereço MAC do adaptador USB:
+DualShock 3 sincronizado com o MAC:
+Sincronizar
+Sincroniza o controle DualShock 3
+Sincroniza o controle DualShock 3 com endereço MAC do adaptador bluetooth.
+Não está conectado

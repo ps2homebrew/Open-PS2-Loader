@@ -55,35 +55,10 @@ before_script:
   - travis_wait 60 bash ./toolchain.sh > /tmp/OPNPS2LD-PS2TOOLCHAIN.log 2>&1
   - curl --upload-file /tmp/OPNPS2LD-PS2TOOLCHAIN.log https://transfer.sh/OPNPS2LD-PS2TOOLCHAIN-${NEW_REPO_SLUG}-NIGHTLY${TRAVIS_BUILD_NUMBER}.log
 
-  ## PS2SDKPorts/zlib
-  - cd ${TRAVIS_ENV_DIR}/ps2sdk-ports/zlib/
-  - make
-  - make install
-
-  ## PS2SDKPorts/libpng
-  - cd ${TRAVIS_ENV_DIR}/ps2sdk-ports/libpng/
-  - make
-  - make install
-
-  ## PS2SDKPorts/libjpeg
-  - cd ${TRAVIS_ENV_DIR}/ps2sdk-ports/libjpeg/
-  - make
-  - make install
-
-  ## PS2SDKPorts/freetype
-  - cd ${TRAVIS_ENV_DIR}/ps2sdk-ports/freetype2/
-  - make 
-  - make install
-
-  ## gsKit
-  - cd ${TRAVIS_ENV_DIR}/gsKit/
-  - make
-  - make install
-
-  ## PS2Packer
-  - cd ${TRAVIS_ENV_DIR}/ps2-packer/
-  - make
-  - make install
+  ## Build dependencies need for OPL
+  - for TARGET in "ps2sdk-ports/zlib" "ps2sdk-ports/libpng"
+    "ps2sdk-ports/libjpeg" "ps2sdk-ports/freetype2" "gsKit" "ps2-packer"; do
+    cd ${TRAVIS_ENV_DIR}/${TARGET}/; make; make install; done
 
 script:
   ## Go back to opl dir

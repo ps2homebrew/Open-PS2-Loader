@@ -1,6 +1,6 @@
-
 EE_BIN = hdldsvrlab.elf
-EE_OBJS = hdldsvrlab.o discid.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o ps2atad.o ps2hdd.o hdldsvr.o iomanx.o filexio.o
+EE_OBJS = hdldsvrlab.o discid.o poweroff.o ps2dev9.o smsutils.o smstcpip.o \
+		smsmap.o ps2atad.o ps2hdd.o hdldsvr.o iomanx.o filexio.o
 
 EE_LIBS = -lfileXio -lpatches -ldebug -lc -lkernel
 EE_CFLAGS = -g
@@ -40,7 +40,7 @@ smsutils.s:
 smstcpip.s:
 	$(MAKE) -C ../../modules/network/SMSTCPIP -f Makefile rebuild
 	bin2s ../../modules/network/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
-		
+
 smsmap.s:
 	$(MAKE) -C ../../modules/network/SMSMAP
 	bin2s ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx

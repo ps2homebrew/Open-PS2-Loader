@@ -1,6 +1,6 @@
-
 EE_BIN = smblab.elf
-EE_OBJS = smblab.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o smbman.o iomanx.o filexio.o udptty.o ioptrap.o ps2link.o
+EE_OBJS = smblab.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o \
+		smbman.o iomanx.o filexio.o udptty.o ioptrap.o ps2link.o
 
 EE_LIBS = -lfileXio -lpatches -ldebug -lc -lkernel
 EE_CFLAGS = -g
@@ -35,7 +35,7 @@ smsutils.s:
 smstcpip.s:
 	$(MAKE) -C ../../modules/network/SMSTCPIP
 	bin2s ../../modules/network/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
-		
+
 smsmap.s:
 	$(MAKE) -C ../../modules/network/SMSMAP
 	bin2s ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx

@@ -7,7 +7,8 @@
 #.SUFFIXES: .S .c .o .s .elf .irx
 
 IOP_BIN  = ps2link.irx
-IOP_OBJS = net_fsys.o net_fio.o ps2link.o cmdHandler.o nprintf.o excepHandler.o imports.o
+IOP_OBJS = net_fsys.o net_fio.o ps2link.o cmdHandler.o nprintf.o \
+		excepHandler.o imports.o
 
 IOP_INCS += -I$(PS2SDK)/iop/include
 IOP_LIBS += 
@@ -16,28 +17,29 @@ IOP_CFLAGS += -Wall -fno-builtin
 
 # Enable zero-copy on fileio writes.
 ifeq ($(ZEROCOPY),1)
-IOP_CFLAGS += -DZEROCOPY
+  IOP_CFLAGS += -DZEROCOPY
 endif
 
 # Enable debug mode
 ifeq ($(DEBUG),1)
-IOP_CFLAGS += -DDEBUG
+  IOP_CFLAGS += -DDEBUG
 endif
 
 ifeq ($(PWOFFONRESET),1)
-IOP_CFLAGS += -DPWOFFONRESET
+  IOP_CFLAGS += -DPWOFFONRESET
 endif
 
 # Enable screenshot functionality
 ifeq ($(SCREENSHOTS),1)
-IOP_CFLAGS += -DSCREENSHOTS
+  IOP_CFLAGS += -DSCREENSHOTS
 endif
-
 
 all: $(IOP_BIN)
 
 clean:
-	-rm -f $(IOP_OBJS) $(IOP_BIN)
+	rm -f $(IOP_OBJS) $(IOP_BIN)
+
+rebuild: clean all
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

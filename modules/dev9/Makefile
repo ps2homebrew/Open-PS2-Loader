@@ -10,8 +10,13 @@
 
 IOP_BIN  = ps2dev9.irx
 
+ifeq ($(DEBUG),1)
+  DEBUG_FLAGS = -DDEBUG
+endif
+
 IOP_INCS +=
-IOP_CFLAGS  += -Wall -fno-builtin-printf -DCHECK_LOADED -DDEV9X_DEV -DPOWEROFF -DPCMCIA #-DDEBUG
+IOP_CFLAGS += -Wall -fno-builtin-printf -DCHECK_LOADED -DDEV9X_DEV -DPOWEROFF \
+		-DPCMCIA $(DEBUG_FLAGS)
 IOP_LDFLAGS += -s
 
 IOP_OBJS = ps2dev9.o exports.o imports.o
@@ -26,7 +31,6 @@ rebuild: clean all
 
 run:
 	ps2client -t 1 execiop host:$(IOP_BIN)
-
 
 include $(PS2SDK)/Defs.make
 include ../Rules.make

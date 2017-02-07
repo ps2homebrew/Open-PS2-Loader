@@ -13,5 +13,7 @@ clean:
 IOPRP_img.c:
 	$(BIN2C) IOPRP.img IOPRP_img.c IOPRP_img
 
+rebuild: clean all
+
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

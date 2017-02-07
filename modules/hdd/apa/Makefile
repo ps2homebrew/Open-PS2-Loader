@@ -16,7 +16,7 @@ clean:
 
 rebuild: clean all
 
-$(IOP_OBJS_DIR)%.o : $(LIBAPA_SRC_DIR)%.c
+$(IOP_OBJS_DIR)%.o: $(LIBAPA_SRC_DIR)%.c
 	$(IOP_CC) $(IOP_CFLAGS) -c $< -o $@
 
 include $(PS2SDK)/Defs.make

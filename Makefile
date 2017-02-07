@@ -4,93 +4,109 @@ PATCHLEVEL = 3+
 EXTRAVERSION = Beta
 
 # How to DEBUG?
-# Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
-# Debug modes:
-#	debug		-	UI-side debug mode (UDPTTY)
-#	iopcore_debug	-	UI-side + iopcore debug mode (UDPTTY).
-#	ingame_debug	-	UI-side + in-game debug mode. IOP core modules will not be built as debug versions (UDPTTY).
-#	eesio_debug	-	UI-side + eecore debug mode (EE SIO)
-#	deci2_debug	-	UI-side + in-game DECI2 debug mode (EE-side only).
+# Simply type "make <debug mode>" to build OPL with the necessary debugging
+# functionality.
+#  Debug modes:
+#    debug         - UI-side debug mode (UDPTTY).
+#    iopcore_debug - UI-side + iopcore debug mode (UDPTTY).
+#    ingame_debug  - UI-side + in-game debug mode. IOP core modules will not be
+#                              built as debug versions (UDPTTY).
+#    eesio_debug   - UI-side + eecore debug mode (EE SIO).
+#    deci2_debug   - UI-side + in-game DECI2 debug mode (EE-side only).
 
 # I want to build a CHILDPROOF edition! How do I do that?
-# Type "make childproof" to build one.
+#  Type "make childproof" to build one.
 # Non-childproof features like GSM will not be available.
 
 # I want to put my name in my custom build! How can I do it?
-# Type "make LOCALVERSION=-foobar"
+#  Type "make LOCALVERSION=foobar"
 
-# ======== START OF CONFIGURABLE SECTION ========
+# ========== START OF CONFIGURABLE SECTION ==========
 # You can adjust the variables in this section to meet your needs.
-# To enable a feature, set its variable's value to 1. To disable, change it to 0.
-# Do not COMMENT out the variables!!
-# You can also specify variables when executing make: "make VMC=1 RTL=1 GSM=1 IGS=1 CHEAT=1"
+#  To enable a feature, set its variable's value to 1.
+#  To disable, change it to 0.
+# You can also specify variables when executing make:
+#  "make VMC=1 RTL=1 GSM=1 IGS=1 CHEAT=1"
 
-#Enables/disables Virtual Memory Card (VMC) support
+# Virtual Memory Card (VMC)
 VMC ?= 0
 
-#Enables/disables Right-To-Left (RTL) language support
+# Right-To-Left (RTL) Language
 RTL ?= 0
 
-#Enables/disables Graphics Synthesizer Mode (GSM) selector
+# Graphics Synthesizer Mode (GSM) Selector
 GSM ?= 0
 
-#Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
+# In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
 IGS ?= 0
 
-#Enables/disables pad emulator
+# Pad Emulator (PADEMU)
 PADEMU ?= 0
 
-#Enables/disables the cheat engine (PS2RD)
+# Cheat Engine (PS2RD)
 CHEAT ?= 0
 
-#Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
+# ========== END OF CONFIGURABLE SECTION ==========
+# ========== START OF SPECIAL CONFIGURABLE SECTION ==========
+
+# Build an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 ?= 0
 
-#Nor stripping neither compressing binary ELF after compiling.
+# Nor stripping neither compressing binary ELF after compiling.
 NOT_PACKED ?= 0
 
-# ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
+# ========== END OF SPECIAL CONFIGURABLE SECTION ==========
+# ========== DO NOT MODIFY VARIABLES AFTER THIS POINT!! ==========
+
 DEBUG ?= 0
 EESIO_DEBUG ?= 0
 INGAME_DEBUG ?= 0
 DECI2_DEBUG ?= 0
 CHILDPROOF ?= 0
 
-# ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
-REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1)
+# ========== DO NOT MODIFY VALUES AFTER THIS POINT! ==========
+# ========== UNLESS YOU KNOW WHAT YOU ARE DOING ==========
 
+REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 |\
+				cut -d " " -f 1 | cut -c 4-) + 1)
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
+
 ifeq ($(shell git diff --quiet; echo $$?),1)
-  DIRTY = -dirty
+  DIRTY = dirty
 endif
 ifneq ($(shell test -d .git; echo $$?),0)
-  DIRTY = -dirty
+  DIRTY = dirty
 endif
 
-OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)\
+		$(if $(EXTRAVERSION),-$(EXTRAVERSION))\
+		$(if $(GIT_HASH),-$(GIT_HASH))\
+		$(if $(DIRTY),-$(DIRTY))\
+		$(if $(LOCALVERSION),-$(LOCALVERSION))
 
-FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
-		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
+FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o \
+		lang.o config.o hdd.o dialogs.o dia.o ioman.o texcache.o \
+		themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
 		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o
 
-GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
-		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
-		left_icon.o right_icon.o up_icon.o down_icon.o L1_icon.o L2_icon.o R1_icon.o R2_icon.o \
-		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o freesans.o \
-		icon_sys.o icon_icn.o
+GFX_OBJS = usb_icon.o hdd_icon.o eth_icon.o app_icon.o cross_icon.o \
+		triangle_icon.o circle_icon.o square_icon.o select_icon.o \
+		start_icon.o left_icon.o right_icon.o up_icon.o down_icon.o \
+		L1_icon.o L2_icon.o R1_icon.o R2_icon.o load0.o load1.o \
+		load2.o load3.o load4.o load5.o load6.o load7.o logo.o \
+		bg_overlay.o freesans.o icon_sys.o icon_icn.o
 
-MISC_OBJS =	icon_sys_A.o icon_sys_J.o
+MISC_OBJS = icon_sys_A.o icon_sys_J.o
 
-IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
+IOP_OBJS = iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o genvmc.o hdldsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o
 
-EECORE_OBJS = ee_core.o ioprp.o util.o \
-		elfldr.o udnl.o imgdrv.o eesync.o \
-		usb_cdvdman.o IOPRP_img.o smb_cdvdman.o \
-		hdd_cdvdman.o hdd_hdpro_cdvdman.o cdvdfsv.o \
-		ingame_smstcpip.o smap_ingame.o smbman.o smbinit.o
+EECORE_OBJS = ee_core.o ioprp.o util.o elfldr.o udnl.o imgdrv.o eesync.o \
+		usb_cdvdman.o IOPRP_img.o smb_cdvdman.o hdd_cdvdman.o \
+		hdd_hdpro_cdvdman.o cdvdfsv.o ingame_smstcpip.o smap_ingame.o \
+		smbman.o smbinit.o
 
 EE_BIN = opl.elf
 EE_BIN_STRIPPED = opl_stripped.elf
@@ -99,22 +115,29 @@ EE_VPKD = OPNPS2LD-$(OPL_VERSION)
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/
-
 MAPFILE = opl.map
+
 EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
- 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
-EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit \
+		-lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng \
+		-lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
+EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include \
+		-I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include \
+		-I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common \
+		-Imodules/network/common -Imodules/hdd/common -Iinclude
 
 BIN2C = $(PS2SDK)/bin/bin2c
 BIN2S = $(PS2SDK)/bin/bin2s
 BIN2O = $(PS2SDK)/bin/bin2o
 
-# WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
-# but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule! 
+# WARNING:
+# Only extra spaces are allowed and ignored at the beginning of the
+# conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif) but a tab
+# is NOT allowed. If the line begins with a tab, it will be considered part of a
+# recipe for a rule!
 
 ifeq ($(VMC),1)
-  IOP_OBJS += usb_mcemu.o hdd_mcemu.o smb_mcemu.o 
+  IOP_OBJS += usb_mcemu.o hdd_mcemu.o smb_mcemu.o
   EE_CFLAGS += -DVMC
   VMC_FLAGS = VMC=1
 else
@@ -161,7 +184,7 @@ else
     IGS_FLAGS = IGS=0
   endif
   ifeq ($(CHEAT),1)
-    FRONTEND_OBJS += cheatman.o 
+    FRONTEND_OBJS += cheatman.o
     EE_CFLAGS += -DCHEAT
     CHEAT_FLAGS = CHEAT=1
   else
@@ -178,7 +201,7 @@ else
   PADEMU_FLAGS = PADEMU=0
 endif
 
-ifeq ($(DEBUG),1) 
+ifeq ($(DEBUG),1)
   EE_CFLAGS += -D__DEBUG -g
   EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
   MOD_DEBUG_FLAGS = DEBUG=1
@@ -187,7 +210,7 @@ ifeq ($(DEBUG),1)
     EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
-    SMSTCPIP_INGAME_CFLAGS = 
+    SMSTCPIP_INGAME_CFLAGS =
     IOP_OBJS += udptty-ingame.o
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
@@ -196,7 +219,7 @@ ifeq ($(DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
     EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
-    SMSTCPIP_INGAME_CFLAGS = 
+    SMSTCPIP_INGAME_CFLAGS =
     ifeq ($(DECI2_DEBUG),1)
       EE_CFLAGS += -D__DECI2_DEBUG
       EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
@@ -217,7 +240,8 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
 
-.PHONY: all release childproof debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
+.PHONY: all release childproof debug iopcore_debug eesio_debug ingame_debug \
+	deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
 
 all:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
@@ -254,7 +278,8 @@ deci2_debug:
 clean:
 	echo "Cleaning..."
 	echo "-Interface"
-	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) $(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
+	rm -fr $(MAPFILE) $(EE_BIN) $(EE_BIN_PACKED) $(EE_BIN_STRIPPED) \
+		$(EE_VPKD).* $(EE_OBJS_DIR) $(EE_ASM_DIR)
 	echo "-EE core"
 	$(MAKE) -C ee_core clean
 	echo "-Elf Loader"
@@ -365,7 +390,8 @@ $(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
 
 ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
+	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) \
+		$(CHEAT_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
 $(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eecore_elf
@@ -401,30 +427,38 @@ $(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
 
 modules/iopcore/cdvdman/usb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -usb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) \
+		USE_USB=1 -C $< rebuild
 
-$(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_cdvdman_irx
 
 modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -smb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) \
+		USE_SMB=1 -C $< rebuild
 
-$(EE_ASM_DIR)smb_cdvdman.s: modules/iopcore/cdvdman/smb_cdvdman.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)smb_cdvdman.s: modules/iopcore/cdvdman/smb_cdvdman.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ smb_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) \
+		USE_HDD=1 -C $< rebuild
 
-$(EE_ASM_DIR)hdd_cdvdman.s: modules/iopcore/cdvdman/hdd_cdvdman.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)hdd_cdvdman.s: modules/iopcore/cdvdman/hdd_cdvdman.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_hdpro_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
+	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) \
+		USE_HDPRO=1 -C $< rebuild
 
-$(EE_ASM_DIR)hdd_hdpro_cdvdman.s: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)hdd_hdpro_cdvdman.s: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_hdpro_cdvdman_irx
 
 modules/iopcore/cdvdfsv/cdvdfsv.irx: modules/iopcore/cdvdfsv
@@ -516,7 +550,8 @@ modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv
 	echo " -usbhdfsdfsv"
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbhdfsdfsv_irx
 
 modules/dev9/ps2dev9.irx: modules/dev9
@@ -540,7 +575,8 @@ modules/network/SMSTCPIP/SMSTCPIP.irx: modules/network/SMSTCPIP
 	echo " -in-game SMSTCPIP"
 	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C $< rebuild
 
-$(EE_ASM_DIR)ingame_smstcpip.s: modules/network/SMSTCPIP/SMSTCPIP.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ingame_smstcpip.s: modules/network/SMSTCPIP/SMSTCPIP.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ ingame_smstcpip_irx
 
 modules/network/smap-ingame/smap.irx: modules/network/smap-ingame
@@ -618,7 +654,8 @@ modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame
 	echo " -udptty-ingame"
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)udptty-ingame.s: modules/debug/udptty-ingame/udptty.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)udptty-ingame.s: modules/debug/udptty-ingame/udptty.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_ingame_irx
 
 modules/debug/ioptrap/ioptrap.irx: modules/debug/ioptrap
@@ -646,7 +683,8 @@ modules/network/httpclient/httpclient.irx: modules/network/httpclient
 	echo " -httpclient"
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)httpclient-iop.s: modules/network/httpclient/httpclient.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)httpclient-iop.s: modules/network/httpclient/httpclient.irx |\
+		$(EE_ASM_DIR)
 	$(BIN2S) $< $@ httpclient_irx
 
 modules/hdd/pfs/ps2fs.irx: modules/hdd/pfs

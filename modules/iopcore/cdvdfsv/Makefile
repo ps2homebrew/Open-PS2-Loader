@@ -12,7 +12,7 @@ IOP_BIN = cdvdfsv.irx
 IOP_OBJS = cdvdfsv.o imports.o exports.o
 
 ifeq ($(DEBUG),1)
-DEBUG_FLAGS = -DDEBUG
+  DEBUG_FLAGS = -DDEBUG
 endif
 
 IOP_INCS += -I../common
@@ -22,7 +22,9 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	-rm -f *.o *.irx cdvdfsv.map
+	rm -f *.o *.irx cdvdfsv.map
+
+rebuild: clean all
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

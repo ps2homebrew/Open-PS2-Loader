@@ -5,10 +5,10 @@ IOP_CFLAGS  += -Wall -fno-builtin -Os -mno-check-zero-division
 IOP_LDFLAGS += -s
 IOP_INCS += -I./include
 ifeq ($(DECI2_DEBUG),1)
-IOP_CFLAGS += -D__DECI2_DEBUG
-IOP_OBJS += IOPRP_DECI2_img.o
+  IOP_CFLAGS += -D__DECI2_DEBUG
+  IOP_OBJS += IOPRP_DECI2_img.o
 else
-IOP_OBJS += IOPRP_img.o
+  IOP_OBJS += IOPRP_img.o
 endif
 
 all: $(IOP_BIN)
@@ -21,6 +21,8 @@ IOPRP_img.c:
 
 IOPRP_DECI2_img.c:
 	$(BIN2C) IOPRP_DECI2.img IOPRP_DECI2_img.c IOPRP_img
+
+rebuild: clean all
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

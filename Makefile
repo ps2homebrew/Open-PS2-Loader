@@ -67,8 +67,7 @@ CHILDPROOF ?= 0
 # ========== DO NOT MODIFY VALUES AFTER THIS POINT! ==========
 # ========== UNLESS YOU KNOW WHAT YOU ARE DOING ==========
 
-REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 |\
-				cut -d " " -f 1 | cut -c 4-) + 1)
+REVISION = $(shell expr $$(cat DETAILED_CHANGELOG|grep "rev"|head -1|cut -d " " -f 1|cut -c 4-) + 1)
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
 
 ifeq ($(shell git diff --quiet; echo $$?),1)
@@ -78,11 +77,7 @@ ifneq ($(shell test -d .git; echo $$?),0)
   DIRTY = dirty
 endif
 
-OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)\
-		$(if $(EXTRAVERSION),-$(EXTRAVERSION))\
-		$(if $(GIT_HASH),-$(GIT_HASH))\
-		$(if $(DIRTY),-$(DIRTY))\
-		$(if $(LOCALVERSION),-$(LOCALVERSION))
+OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERSION),-$(EXTRAVERSION))$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),-$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o \
 		lang.o config.o hdd.o dialogs.o dia.o ioman.o texcache.o \

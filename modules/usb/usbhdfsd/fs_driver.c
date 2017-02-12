@@ -36,7 +36,6 @@
 #include "fat_driver.h"
 #include "fat_write.h"
 #include "fat.h"
-#include "mass_stor.h"
 
 //#define DEBUG  //comment out this line when not debugging
 
@@ -626,7 +625,7 @@ static int fs_dopen(iop_file_t *fd, const char *name)
     memset(fd->privdata, 0, sizeof(fs_dir)); //NB: also implies "file_flag = FS_FILE_FLAG_FOLDER;"
     rec = (fs_dir *)fd->privdata;
 
-    rec->status = fat_getFirstDirentry(fatd, (char *)name, &rec->fatdlist, &rec->dirent.fatdir, &rec->current_fatdir);
+    rec->status = fat_getFirstDirentry(fatd, name, &rec->fatdlist, &rec->dirent.fatdir, &rec->current_fatdir);
 
     // root directory may have no entries, nothing else may.
     if (rec->status == 0 && !is_root)
@@ -692,7 +691,7 @@ static int fs_dread(iop_file_t *fd, iox_dirent_t *buffer)
     if (rec->status >= 0) {
         memset(buffer, 0, sizeof(iox_dirent_t));
         fillStat(&buffer->stat, &rec->current_fatdir);
-        strcpy(buffer->name, rec->current_fatdir.name);
+        strcpy(buffer->name, (const char *)rec->current_fatdir.name);
     }
 
     if (rec->status > 0)
@@ -735,7 +734,6 @@ static int fs_getstat(iop_file_t *fd, const char *name, iox_stat_t *stat)
 }
 
 //---------------------------------------------------------------------------
-
 int fs_ioctl(iop_file_t *fd, int cmd, void *data)
 {
     fat_driver *fatd;
@@ -844,7 +842,6 @@ static iop_device_ops_t fs_functarray = {
     (void *)&fs_dummy,
     (void *)&fs_dummy,
     (void *)&fs_dummy};
-
 static iop_device_t fs_driver = {
     "mass",
     IOP_DT_FS | IOP_DT_FSEXT,

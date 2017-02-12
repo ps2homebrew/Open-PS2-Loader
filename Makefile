@@ -281,8 +281,6 @@ clean:
 	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo " -usbhdfsdfsv"
 	$(MAKE) -C modules/usb/usbhdfsdfsv clean
-	echo " -ps2dev9"
-	$(MAKE) -C modules/dev9 clean
 	echo " -SMSUTILS"
 	$(MAKE) -C modules/network/SMSUTILS clean
 	echo " -SMSTCPIP"
@@ -519,11 +517,7 @@ modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv
 $(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbhdfsdfsv_irx
 
-modules/dev9/ps2dev9.irx: modules/dev9
-	echo " -ps2dev9"
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)ps2dev9.s: modules/dev9/ps2dev9.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ps2dev9.s: $(PS2SDK)/iop/irx/ps2dev9.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2dev9_irx
 
 modules/network/SMSUTILS/SMSUTILS.irx: modules/network/SMSUTILS

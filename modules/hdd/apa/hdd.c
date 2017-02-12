@@ -23,7 +23,6 @@
 #include <libapa.h>
 #include "hdd.h"
 #include "hdd_fio.h"
-#include "opl-hdd-ioctl.h"
 
 IRX_ID("hdd_driver", APA_MODVER_MAJOR, APA_MODVER_MINOR);
 

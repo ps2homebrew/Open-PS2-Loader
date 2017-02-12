@@ -730,7 +730,7 @@ static void guiShowPadEmuConfig(void)
 {
     const char *PadEmuModes[] = {_l(_STR_DS3USB_MODE), _l(_STR_DS3BT_MODE), NULL};
     int PadPort;
-	
+
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);

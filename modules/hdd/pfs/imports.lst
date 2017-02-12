@@ -16,10 +16,6 @@ I_AddDrv
 I_DelDrv
 iomanX_IMPORTS_end
 
-poweroff_IMPORTS_start
-I_AddPowerOffHandler
-poweroff_IMPORTS_end
-
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end
@@ -42,7 +38,6 @@ sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start
 I_AllocSysMemory
-//I_QueryBlockSize
 I_FreeSysMemory
 sysmem_IMPORTS_end
 

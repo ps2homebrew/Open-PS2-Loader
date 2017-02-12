@@ -7,7 +7,6 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: ps2dev9.c 1454 2007-11-04 23:19:57Z roman_ps2dev $
 # DEV9 Device Driver.
 */
 
@@ -18,6 +17,7 @@
 #include <dmacman.h>
 #include <thbase.h>
 #include <thsemap.h>
+
 #include <aifregs.h>
 #include <dev9regs.h>
 #include <speedregs.h>
@@ -72,8 +72,8 @@ static dev9_dma_cb_t dev9_predma_cbs[4], dev9_postdma_cbs[4];
 static int dev9_intr_dispatch(int flag);
 
 static void dev9_set_stat(int stat);
-static int read_eeprom_data(void);
 
+static int read_eeprom_data(void);
 static int dev9_init(void);
 
 static void pcmcia_set_stat(int stat);
@@ -81,55 +81,61 @@ static void pcmcia_set_stat(int stat);
 static int pcmcia_device_probe(void);
 #endif
 static int pcmcia_init(void);
+
 static void expbay_set_stat(int stat);
 static int expbay_init(void);
 
-static int dev9x_dummy(void) { return 0; }
-static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
-{
-    if (cmd == 0x4401)
-        return dev9type;
+extern struct irx_export_table _exp_dev9;
 
+static int dev9x_dummy(void)
+{
     return 0;
 }
 
-/* driver ops func tab */
-static void *dev9x_ops[27] = {
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_dummy,
-    (void *)dev9x_devctl,
-    (void *)dev9_init,
-    (void *)dev9_init,
-    (void *)dev9_init};
+static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen)
+{
+    switch (cmd) {
+        case DDIOC_MODEL:
+            return dev9type;
+        default:
+            return 0;
+    }
+}
 
-/* driver descriptor */
-static iop_ext_device_t dev9x_dev = {
-    "dev9x",
-    IOP_DT_FS | 0x10000000, /* EXT FS */
-    1,
-    "DEV9",
-    (struct _iop_ext_device_ops *)&dev9x_ops};
+static iop_ext_device_ops_t dev9x_ops =
+    {
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        (void *)&dev9x_dummy,
+        &dev9x_devctl};
+
+static iop_ext_device_t dev9x_device =
+    {
+        "dev9x",
+        IOP_DT_FS | IOP_DT_FSEXT,
+        1,
+        "DEV9",
+        &dev9x_ops};
 
 int dev9d_init(void)
 {
@@ -144,18 +150,22 @@ int dev9d_init(void)
 
     dev9hw = DEV9_REG(DEV9_R_REV) & 0xf0;
     if (dev9hw == 0x20) { /* CXD9566 (PCMCIA) */
-        dev9type = 0;
+        dev9type = DEV9_TYPE_PCMCIA;
+        M_PRINTF("CXD9566 detected.\n");
         res = pcmcia_init();
     } else if (dev9hw == 0x30) { /* CXD9611 (Expansion Bay) */
-        dev9type = 1;
+        dev9type = DEV9_TYPE_EXPBAY;
+        M_PRINTF("CXD9611 detected.\n");
         res = expbay_init();
+    } else {
+        M_PRINTF("unknown dev9 hardware.\n");
     }
 
     if (res)
         return res;
 
     DelDrv("dev9x");
-    AddDrv((iop_device_t *)&dev9x_dev);
+    AddDrv((iop_device_t *)&dev9x_device);
 
     return 0;
 }
@@ -185,7 +195,7 @@ void dev9RegisterPostDmaCb(int ctrl, dev9_dma_cb_t cb)
     dev9_postdma_cbs[ctrl] = cb;
 }
 
-/* flag is 1 if a card (pcmcia) was removed or added */
+// flag is 1 if a card (pcmcia) was removed or added
 static int dev9_intr_dispatch(int flag)
 {
     USE_SPD_REGS;
@@ -214,10 +224,14 @@ static int dev9_intr_dispatch(int flag)
 
 static void dev9_set_stat(int stat)
 {
-    if (dev9type == 0)
-        pcmcia_set_stat(stat);
-    else if (dev9type == 1)
-        expbay_set_stat(stat);
+    switch (dev9type) {
+        case DEV9_TYPE_PCMCIA:
+            pcmcia_set_stat(stat);
+            break;
+        case DEV9_TYPE_EXPBAY:
+            expbay_set_stat(stat);
+            break;
+    }
 }
 
 /* Export 6 */
@@ -230,10 +244,10 @@ void dev9Shutdown(void)
         if (dev9_shutdown_cbs[idx])
             dev9_shutdown_cbs[idx]();
 
-    if (dev9type == 0) { /* PCMCIA */
+    if (dev9type == DEV9_TYPE_PCMCIA) { /* PCMCIA */
         DEV9_REG(DEV9_R_POWER) = 0;
         DEV9_REG(DEV9_R_1474) = 0;
-    } else if (dev9type == 1) {
+    } else if (dev9type == DEV9_TYPE_EXPBAY) {
         DEV9_REG(DEV9_R_1466) = 1;
         DEV9_REG(DEV9_R_1464) = 0;
         DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1464);
@@ -269,6 +283,7 @@ void dev9IntrDisable(int mask)
 int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 {
     USE_SPD_REGS;
+    volatile iop_dmac_chan_t *dev9_chan = (iop_dmac_chan_t *)DEV9_DMAC_BASE;
     int res = 0, dmactrl;
 
     switch (ctrl) {
@@ -298,11 +313,12 @@ int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
     if (dev9_predma_cbs[ctrl])
         dev9_predma_cbs[ctrl](bcr, dir);
 
-    dmac_request(IOP_DMAC_DEV9, buf, bcr & 0xFFFF, bcr >> 16, dir);
-    dmac_transfer(IOP_DMAC_DEV9);
+    dev9_chan->madr = (u32)buf;
+    dev9_chan->bcr = bcr;
+    dev9_chan->chcr = DMAC_CHCR_30 | DMAC_CHCR_TR | DMAC_CHCR_CO | (dir & DMAC_CHCR_DR);
 
     /* Wait for DMA to complete. Do not use a semaphore as thread switching hurts throughput greatly.  */
-    while (dmac_ch_get_chcr(IOP_DMAC_DEV9) & DMAC_CHCR_TR) {
+    while (dev9_chan->chcr & DMAC_CHCR_TR) {
     }
     res = 0;
 
@@ -416,13 +432,15 @@ int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb)
 
 static int dev9_init(void)
 {
-    int i;
+    int i, flags;
 
     if ((dma_lock_sem = CreateMutex(IOP_MUTEX_UNLOCKED)) < 0)
         return -1;
 
+    CpuSuspendIntr(&flags);
     /* Enable the DEV9 DMAC channel.  */
-    dmac_enable(IOP_DMAC_DEV9);
+    dmac_set_dpcr2(dmac_get_dpcr2() | 0x80);
+    CpuResumeIntr(flags);
 
     /* Not quite sure what this enables yet.  */
     dev9_set_stat(0x103);
@@ -550,7 +568,6 @@ static int pcmcia_intr(void *unused)
         /* Shutdown the card.  */
         DEV9_REG(DEV9_R_POWER) = 0;
         DEV9_REG(DEV9_R_1474) = 0;
-
 #ifdef DEBUG
         pcmcia_device_probe();
 #endif
@@ -570,6 +587,7 @@ static int pcmcia_init(void)
     USE_DEV9_REGS;
     USE_AIF_REGS;
     int *mode;
+    int flags;
 
     _sw(0x51011, SSBUS_R_1420);
     _sw(0x1a00bb, SSBUS_R_1418);
@@ -596,10 +614,13 @@ static int pcmcia_init(void)
     if (dev9_init() != 0)
         return 1;
 
+    CpuSuspendIntr(&flags);
     RegisterIntrHandler(IOP_IRQ_DEV9, 1, &pcmcia_intr, NULL);
     EnableIntr(IOP_IRQ_DEV9);
+    CpuResumeIntr(flags);
 
     DEV9_REG(DEV9_R_147E) = 0;
+
     M_PRINTF("CXD9566 (PCMCIA type) initialized.\n");
     return 0;
 }
@@ -625,6 +646,7 @@ static int expbay_intr(void *unused)
 static int expbay_init(void)
 {
     USE_DEV9_REGS;
+    int flags;
 
     _sw(0x51011, SSBUS_R_1420);
     _sw(0xe01a3043, SSBUS_R_1418);
@@ -635,11 +657,13 @@ static int expbay_init(void)
     if (dev9_init() != 0)
         return 1;
 
-    ReleaseIntrHandler(IOP_IRQ_DEV9);
-    RegisterIntrHandler(IOP_IRQ_DEV9, 1, expbay_intr, NULL);
+    CpuSuspendIntr(&flags);
+    RegisterIntrHandler(IOP_IRQ_DEV9, 1, &expbay_intr, NULL);
     EnableIntr(IOP_IRQ_DEV9);
+    CpuResumeIntr(flags);
 
     DEV9_REG(DEV9_R_1466) = 0;
+
     M_PRINTF("CXD9611 (Expansion Bay type) initialized.\n");
     return 0;
 }

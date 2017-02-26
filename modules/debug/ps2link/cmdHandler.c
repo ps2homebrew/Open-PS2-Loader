@@ -22,9 +22,6 @@
 #include "ps2ip.h"
 #include "hostlink.h"
 
-#define ntohl(x) htonl(x)
-#define ntohs(x) htons(x)
-
 #ifdef DEBUG
 #define dbgprintf(args...) printf(args)
 #else
@@ -73,7 +70,7 @@ pkoExecIop(char *buf, int len)
     // Make sure arg vector is null-terminated
     cmd->argv[PKO_MAX_PATH - 1] = '\0';
 
-    printf("IOP cmd: %d args\n", ntohl(cmd->argc));
+    printf("IOP cmd: %ld args\n", ntohl(cmd->argc));
 
     path = &cmd->argv[0];
     args = &cmd->argv[strlen(cmd->argv) + 1];

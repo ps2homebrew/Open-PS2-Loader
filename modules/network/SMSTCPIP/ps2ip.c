@@ -566,3 +566,41 @@ void sys_sem_free(sys_sem_t aSema)
         DeleteSema(aSema);
 
 } /* end sys_sem_free */
+
+#if MEM_LIBC_MALLOC
+void *ps2ip_mem_malloc(int size)
+{
+    int OldState;
+    void* ret;
+
+    CpuSuspendIntr(&OldState);
+    ret = AllocSysMemory(ALLOC_LAST, size, NULL);
+    CpuResumeIntr(OldState);
+
+    return ret;
+}
+
+void ps2ip_mem_free(void *rmem)
+{
+    int OldState;
+
+    CpuSuspendIntr(&OldState);
+    FreeSysMemory(rmem);
+    CpuResumeIntr(OldState);
+}
+
+/* Only pbuf_realloc() uses mem_realloc(), which uses this function.
+   As pbuf_realloc can only shrink PBUFs, I don't think SYSMEM will fail to allocate a smaller region.	*/
+void *ps2ip_mem_realloc(void *rmem, int newsize)
+{
+    int OldState;
+    void* ret;
+
+    CpuSuspendIntr(&OldState);
+    FreeSysMemory(rmem);
+    ret = AllocSysMemory(ALLOC_ADDRESS, newsize, rmem);
+    CpuResumeIntr(OldState);
+
+    return ret;
+}
+#endif

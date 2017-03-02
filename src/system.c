@@ -323,6 +323,8 @@ void sysReset(int modload_mask)
 
 void sysPowerOff(void)
 {
+    deinit(NO_EXCEPTION);
+    fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0);
     poweroffShutdown();
 }
 

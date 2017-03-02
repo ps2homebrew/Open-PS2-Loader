@@ -53,6 +53,15 @@
 #define NO_SYS 0
 #endif
 /* ---------- Memory options ---------- */
+/**
+ * MEM_LIBC_MALLOC==1: Use malloc/free/realloc provided by your C-library
+ * instead of the lwip internal allocator. Can save code size if you
+ * already use it.
+ */
+#if !defined MEM_LIBC_MALLOC
+#define MEM_LIBC_MALLOC 0
+#endif
+
 /* MEM_ALIGNMENT: should be set to the alignment of the CPU for which
    lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
    byte alignment -> define MEM_ALIGNMENT to 2. */

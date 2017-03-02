@@ -212,7 +212,7 @@ int hddGetHDLGamelist(hdl_games_list_t *game_list)
                     pGameEntry->lba = dirent.stat.private_5 + (HDL_GAME_DATA_OFFSET + 4096) / 512;
                 }
 
-                pGameEntry->size += (dirent.stat.hisize << 21) | (dirent.stat.size >> 11); //size in bytes / 2048
+                pGameEntry->size += (dirent.stat.size / 4); //size in sectors * (512 / 2048)
             }
         }
 

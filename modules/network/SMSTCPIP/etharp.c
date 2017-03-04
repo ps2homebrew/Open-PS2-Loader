@@ -759,7 +759,10 @@ err_t etharp_query(struct netif *netif, struct ip_addr *ipaddr, struct pbuf *q)
     if (perform_arp_request) {
         struct pbuf *p;
         /* allocate a pbuf for the outgoing ARP request packet */
-        p = pbuf_alloc(PBUF_LINK, sizeof(struct etharp_hdr), PBUF_RAM);
+        /* SP193: the original used PBUF_LINK, but doesn't reveal the Ethernet header with pbuf_header().
+		So other than causing alignment problems when the frame is sent to linkoutput(),
+		I guess it could possibly write beyond the end of the PBUF. */
+        p = pbuf_alloc(PBUF_RAW, sizeof(struct etharp_hdr), PBUF_RAM);
         /* could allocate pbuf? */
         if (p != NULL) {
             u8_t j;

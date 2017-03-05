@@ -29,7 +29,7 @@ static inline int CopyToFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, int
     int NumBlocks;
     int result;
 
-    if (((unsigned int)buffer & 3) == 0 && (NumBlocks = length >> 7) > 0) {
+    if ((NumBlocks = length >> 7) > 0) {
         if (dev9DmaTransfer(1, buffer, NumBlocks << 16 | 0x20, DMAC_FROM_MEM) >= 0) {
             result = NumBlocks << 7;
         } else
@@ -205,14 +205,10 @@ int SMAPSendPacket(const void *data, unsigned int length)
             "beqz    $at, 3f\n\t"
             "andi    %1, %1, 0xF\n\t"
             "4:\n\t"
-            "lwr     $t0,  0(%0)\n\t"
-            "lwl     $t0,  3(%0)\n\t"
-            "lwr     $t1,  4(%0)\n\t"
-            "lwl     $t1,  7(%0)\n\t"
-            "lwr     $t2,  8(%0)\n\t"
-            "lwl     $t2, 11(%0)\n\t"
-            "lwr     $t3, 12(%0)\n\t"
-            "lwl     $t3, 15(%0)\n\t"
+            "lw      $t0,  0(%0)\n\t"
+            "lw      $t1,  4(%0)\n\t"
+            "lw      $t2,  8(%0)\n\t"
+            "lw      $t3, 12(%0)\n\t"
             "addiu   $at, $at, -1\n\t"
             "sw      $t0, 4352($v1)\n\t"
             "sw      $t1, 4352($v1)\n\t"
@@ -224,8 +220,7 @@ int SMAPSendPacket(const void *data, unsigned int length)
             "beqz    %1, 1f\n\t"
             "nop\n\t"
             "2:\n\t"
-            "lwr     $v0, 0(%0)\n\t"
-            "lwl     $v0, 3(%0)\n\t"
+            "lw      $v0, 0(%0)\n\t"
             "addiu   %1, %1, -4\n\t"
             "sw      $v0, 4352($v1)\n\t"
             "bnez    %1, 2b\n\t"

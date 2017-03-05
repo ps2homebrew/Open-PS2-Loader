@@ -51,6 +51,79 @@
 
 #include "smsutils.h"
 
+#if MEM_LIBC_MALLOC
+/** mem_init is not used when using C library malloc().
+ */
+void
+mem_init(void)
+{
+}
+
+/* lwIP heap implemented using C library malloc() */
+
+/* in case C library malloc() needs extra protection,
+ * allow these defines to be overridden.
+ */
+#ifndef mem_clib_free
+#define mem_clib_free free
+#endif
+#ifndef mem_clib_malloc
+#define mem_clib_malloc malloc
+#endif
+#ifndef mem_clib_realloc
+#define mem_clib_realloc realloc
+#endif
+
+/**
+ * Allocate a block of memory with a minimum of 'size' bytes.
+ *
+ * @param size is the minimum size of the requested block in bytes.
+ * @return pointer to allocated memory or NULL if no free memory was found.
+ *
+ * Note that the returned value must always be aligned (as defined by MEM_ALIGNMENT).
+ */
+void *
+mem_malloc(mem_size_t size)
+{
+    void* ret = mem_clib_malloc(size);
+    if (ret == NULL) {
+#if MEM_STATS
+        ++lwip_stats.mem.err;
+#endif /* MEM_STATS */
+    } else {
+      LWIP_ASSERT("malloc() must return aligned memory", LWIP_MEM_ALIGN(ret) == ret);
+    }
+    return ret;
+}
+
+/** Put memory back on the heap
+ *
+ * @param rmem is the pointer as returned by a previous call to mem_malloc()
+ */
+void
+mem_free(void *rmem)
+{
+    LWIP_ASSERT("rmem != NULL", (rmem != NULL));
+    LWIP_ASSERT("rmem == MEM_ALIGN(rmem)", (rmem == LWIP_MEM_ALIGN(rmem)));
+    mem_clib_free(rmem);
+}
+
+void *
+mem_realloc(void *rmem, mem_size_t newsize)
+{
+    void* ret = mem_clib_realloc(rmem, newsize);
+    if (ret == NULL) {
+#if MEM_STATS
+        ++lwip_stats.mem.err;
+#endif /* MEM_STATS */
+    } else {
+      LWIP_ASSERT("realloc() must return aligned memory", LWIP_MEM_ALIGN(ret) == ret);
+    }
+    return ret;
+}
+
+#else
+
 struct mem
 {
     mem_size_t next, prev;
@@ -177,18 +250,6 @@ void mem_free(void *rmem)
     plug_holes(mem);
     SYS_ARCH_UNPROTECT(old_level);
 }
-void *
-mem_reallocm(void *rmem, mem_size_t newsize)
-{
-    void *nmem;
-    nmem = mem_malloc(newsize);
-    if (nmem == NULL) {
-        return mem_realloc(rmem, newsize);
-    }
-    mips_memcpy(nmem, rmem, newsize);
-    mem_free(rmem);
-    return nmem;
-}
 
 void *
 mem_realloc(void *rmem, mem_size_t newsize)
@@ -242,6 +303,7 @@ mem_realloc(void *rmem, mem_size_t newsize)
     SYS_ARCH_UNPROTECT(old_level);
     return rmem;
 }
+
 void *
 mem_malloc(mem_size_t size)
 {
@@ -314,4 +376,19 @@ mem_malloc(mem_size_t size)
 #endif /* MEM_STATS */
     SYS_ARCH_UNPROTECT(old_level);
     return NULL;
+}
+
+#endif	/* MEM_LIBC_MALLOC */
+
+void *
+mem_reallocm(void *rmem, mem_size_t newsize)
+{
+    void *nmem;
+    nmem = mem_malloc(newsize);
+    if (nmem == NULL) {
+        return mem_realloc(rmem, newsize);
+    }
+    mips_memcpy(nmem, rmem, newsize);
+    mem_free(rmem);
+    return nmem;
 }

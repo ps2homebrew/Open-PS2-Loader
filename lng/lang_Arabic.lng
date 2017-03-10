@@ -1,5 +1,5 @@
 # translation by alimadhi
-# Last update: 01/25/2017 
+# Last update: 03/10/2017 
 # Updated for OPL_983_DB [7f7e9af]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Arabic
@@ -114,7 +114,7 @@ IP
 قراءات دقيقة
 وضع التزامن
 Unhook Syscalls
-تخطي فيديو
+اجتياز الفيديو
 محاكي DVD-DL
 تعطيل IGR
 ارتفاع حدة التخزين
@@ -209,26 +209,26 @@ FMV اجتياز
 تشغيل تلقائي
 القيمة في الثانية (s)، صفر لتعطيل التشغيل التلقائي
 PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
-Configure PADEMU
-Pad Emulator Settings
-Enable Pad Emulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
+عرض شعار القرص فقط الساري المفعول والمطابق لمنطة الجهاز
+تكوين PADEMU
+اعدادات محاكي اليدة
+تمكين محاكي اليدة
+تشغيل/ايقاف محاكي اليدة لتحديد لعبة
+وضع محاكي اليدة
+اختيار وضع محاكي اليدة
 DualShock3 USB
 DualShock3 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS3 Controller paired to mac address:
-Pair
-Pair DS3 controller
-Pair DS3 controller with bluetooth adapter mac address.
-Not connected
+اعدادات المخرج:
+تحديد مخرج محاكي اليدة للاعدادات.
+تمكين المحاكي
+تشغيل/ايقاف محاكي اليدة لتحديد المخرج
+تمكيل الاهتزاز
+تشغيل/ايقاف الاهتزاز لاختيار مخرج محاكي اليدة
+عنوان الماك لمحول اليواسبي البلوتوث
+اقتران DS3التحكم بال العنوان الماك
+اقتران
+اقتران التحكم DS3
+اقتران التحكممع البلوتوث
+غير متصل
 قائمة مشغلات ELF
 مخصص ELF

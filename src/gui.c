@@ -630,13 +630,13 @@ void guiShowCheatConfig(void)
 #endif
 
 #ifdef PADEMU
-
 static u8 ds3_mac[6];
 static u8 dg_mac[6];
 static char ds3_str[18];
 static char dg_str[18];
 static int ds3macset = 0;
 static int dgmacset = 0;
+static int dg_discon = 0;
 
 static int PadEmuSettings = 0;
 
@@ -695,6 +695,10 @@ static int guiPadEmuUpdater(int modified)
 
     if (PadEmuMode) {
         if (ds3bt_get_status(0) & DS3BT_STATE_USB_CONFIGURED) {
+        	if (dg_discon) {
+        		dgmacset = 0;
+        		dg_discon = 0;
+			}
             if (!dgmacset) {
                 if (!ds3bt_get_bdaddr(dg_mac)) {
                     dgmacset = 1;
@@ -704,8 +708,11 @@ static int guiPadEmuUpdater(int modified)
                 }
             }
         } else {
+        	dg_discon = 1;
+		}
+
+		if (!dgmacset) {
             diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
-            dgmacset = 0;
         }
 
         if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
@@ -758,7 +765,6 @@ static void guiShowPadEmuConfig(void)
             break;
     }
 }
-
 #endif
 
 static int netConfigUpdater(int modified)

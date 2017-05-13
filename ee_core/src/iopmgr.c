@@ -121,11 +121,6 @@ int New_Reset_Iop(const char *arg, int arglen)
 
     iop_reboot_count++;
 
-#ifdef PADEMU
-    if (iop_reboot_count >= 3 && EnablePadEmuOp) {
-        pademu_reset();
-    }
-#endif
     // Reseting IOP.
     while (!Reset_Iop(NULL, 0)) {
         ;

@@ -101,16 +101,18 @@ int _start(int argc, char *argv[])
     }
 #endif
 
-    pademu_setup(enable, vibration);
+    if (RegisterLibraryEntries(&_exp_pademu) != 0) {
+        return MODULE_NO_RESIDENT_END;
+    }
 
-    RegisterLibraryEntries(&_exp_pademu);
+    pademu_setup(enable, vibration);
 
     return MODULE_RESIDENT_END;
 }
 
 void _exit(int mode)
 {
-	PAD_RESET();
+    PAD_RESET();
 }
 
 int install_sio2hook()
@@ -238,7 +240,7 @@ void pademu_setup(uint8_t ports, uint8_t vib)
         pad[i].mask[3] = 0x00;
         
         pad[i].lrum = 2;
-    	pad[i].rrum = 2;
+        pad[i].rrum = 2;
     }
 }
 
@@ -312,8 +314,8 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
     mips_memset(out, 0x00, out_size);
 
     if (!(PAD_GET_STATUS(port) & PAD_STATE_RUNNING)) {
-    	pad[port].lrum = 2;
-    	pad[port].rrum = 2;
+        pad[port].lrum = 2;
+        pad[port].rrum = 2;
         return;
     }
 

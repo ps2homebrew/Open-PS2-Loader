@@ -695,10 +695,10 @@ static int guiPadEmuUpdater(int modified)
 
     if (PadEmuMode) {
         if (ds3bt_get_status(0) & DS3BT_STATE_USB_CONFIGURED) {
-        	if (dg_discon) {
-        		dgmacset = 0;
-        		dg_discon = 0;
-			}
+            if (dg_discon) {
+                dgmacset = 0;
+                dg_discon = 0;
+            }
             if (!dgmacset) {
                 if (!ds3bt_get_bdaddr(dg_mac)) {
                     dgmacset = 1;
@@ -708,10 +708,10 @@ static int guiPadEmuUpdater(int modified)
                 }
             }
         } else {
-        	dg_discon = 1;
-		}
+            dg_discon = 1;
+        }
 
-		if (!dgmacset) {
+        if (!dgmacset) {
             diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
         }
 
@@ -737,7 +737,7 @@ static void guiShowPadEmuConfig(void)
 {
     const char *PadEmuModes[] = {_l(_STR_DS3USB_MODE), _l(_STR_DS3BT_MODE), NULL};
     int PadPort;
-	
+
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);

@@ -25,7 +25,7 @@ int ds3usb_init()
 
     do {
         if (SifBindRpc(&ds3usb, DS3USB_BIND_RPC_ID, 0) < 0)
-            return -1;
+            return 0;
 
         nopdelay();
     } while (!ds3usb.server);
@@ -38,7 +38,7 @@ int ds3usb_init()
 int ds3usb_reinit_ports(u8 ports)
 {
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = ports;
     return SifCallRpc(&ds3usb, DS3USB_INIT, 0, rpcbuf, 1, NULL, 0, NULL, NULL);
@@ -47,7 +47,7 @@ int ds3usb_reinit_ports(u8 ports)
 int ds3usb_get_status(int port)
 {
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
 
@@ -61,7 +61,7 @@ int ds3usb_get_bdaddr(int port, u8 *bdaddr)
     int i, ret;
 
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
 
@@ -78,7 +78,7 @@ int ds3usb_set_bdaddr(int port, u8 *bdaddr)
     int i;
 
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
 
@@ -91,7 +91,7 @@ int ds3usb_set_bdaddr(int port, u8 *bdaddr)
 int ds3usb_set_rumble(int port, u8 lrum, u8 rrum)
 {
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
     rpcbuf[1] = lrum;
@@ -103,7 +103,7 @@ int ds3usb_set_rumble(int port, u8 lrum, u8 rrum)
 int ds3usb_set_led(int port, u8 led)
 {
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
     rpcbuf[1] = led;
@@ -116,7 +116,7 @@ int ds3usb_get_data(int port, u8 *data)
     int ret;
 
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
 
@@ -130,7 +130,7 @@ int ds3usb_get_data(int port, u8 *data)
 int ds3usb_reset()
 {
     if (!ds3usb_inited)
-        return -1;
+        return 0;
 
     return SifCallRpc(&ds3usb, DS3USB_RESET, 0, NULL, 0, NULL, 0, NULL, NULL);
 }

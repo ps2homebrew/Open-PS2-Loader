@@ -25,7 +25,7 @@ int ds3bt_init()
 
     do {
         if (SifBindRpc(&ds3bt, DS3BT_BIND_RPC_ID, 0) < 0)
-            return -1;
+            return 0;
 
         nopdelay();
     } while (!ds3bt.server);
@@ -38,7 +38,7 @@ int ds3bt_init()
 int ds3bt_reinit_ports(u8 ports)
 {
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = ports;
     return SifCallRpc(&ds3bt, DS3BT_INIT, 0, rpcbuf, 1, NULL, 0, NULL, NULL);
@@ -47,7 +47,7 @@ int ds3bt_reinit_ports(u8 ports)
 int ds3bt_init_charging()
 {
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     return SifCallRpc(&ds3bt, DS3BT_INIT_CHARGING, 0, NULL, 0, NULL, 0, NULL, NULL);
 }
@@ -55,7 +55,7 @@ int ds3bt_init_charging()
 int ds3bt_get_status(int port)
 {
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
 
@@ -69,7 +69,7 @@ int ds3bt_get_bdaddr(u8 *bdaddr)
     int i, ret;
 
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     ret = SifCallRpc(&ds3bt, DS3BT_GET_BDADDR, 0, NULL, 0, rpcbuf, 6, NULL, NULL);
 
@@ -82,7 +82,7 @@ int ds3bt_get_bdaddr(u8 *bdaddr)
 int ds3bt_set_rumble(int port, u8 lrum, u8 rrum)
 {
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
     rpcbuf[1] = lrum;
@@ -94,7 +94,7 @@ int ds3bt_set_rumble(int port, u8 lrum, u8 rrum)
 int ds3bt_set_led(int port, u8 led)
 {
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
     rpcbuf[1] = led;
@@ -107,7 +107,7 @@ int ds3bt_get_data(int port, u8 *data)
     int ret;
 
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     rpcbuf[0] = port;
 
@@ -121,7 +121,7 @@ int ds3bt_get_data(int port, u8 *data)
 int ds3bt_reset()
 {
     if (!ds3bt_inited)
-        return -1;
+        return 0;
 
     return SifCallRpc(&ds3bt, DS3BT_RESET, 0, NULL, 0, NULL, 0, NULL, NULL);
 }

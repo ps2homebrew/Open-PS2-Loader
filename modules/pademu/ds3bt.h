@@ -267,7 +267,7 @@ enum eBUF_SIZE {
 int ds3bt_init(uint8_t pads);
 int ds3bt_get_status(int port);
 void ds3bt_reset();
-void ds3bt_get_data(char *dst, int size, int port);
+int ds3bt_get_data(char *dst, int size, int mode_lock, int port);
 void ds3bt_set_rumble(uint8_t lrum, uint8_t rrum, int port);
 
 #endif

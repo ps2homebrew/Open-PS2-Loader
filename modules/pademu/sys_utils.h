@@ -16,6 +16,7 @@ typedef struct
     void **exports;
 } modinfo_t;
 
+#ifdef USE_SMSUTILS
 /* SMS Utils Imports */
 #define smsutils_IMPORTS_start DECLARE_IMPORT_TABLE(smsutils, 1, 1)
 
@@ -26,5 +27,9 @@ void mips_memset(void *, int, unsigned);
 #define I_mips_memset DECLARE_IMPORT(5, mips_memset)
 
 #define smsutils_IMPORTS_end END_IMPORT_TABLE
+#else
+#define mips_memset memset
+#define mips_memcpy memcpy
+#endif
 
 #endif /* __MCEMU_UTILS_H */

@@ -15,7 +15,7 @@ endif
 
 IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJNAME)%)
 
-IOP_CFLAGS += -Wall -fno-builtin
+IOP_CFLAGS += -Wall -fno-builtin -DUSE_SMSUTILS
 IOP_LDFLAGS += -s
 
 all: $(IOP_BIN)

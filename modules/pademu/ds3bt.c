@@ -1466,7 +1466,10 @@ static void update_thread(void *param)
 
         UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)update_port);
 
+        WaitSema(bt_dev.l2cap_sema);
+
         SignalSema(bt_dev.hci_sema);
+        SignalSema(bt_dev.l2cap_sema);
 
         SignalSema(update_sema);
     }

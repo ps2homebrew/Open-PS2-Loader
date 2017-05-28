@@ -700,7 +700,7 @@ static int guiPadEmuUpdater(int modified)
                 dg_discon = 0;
             }
             if (!dgmacset) {
-                if (!ds3bt_get_bdaddr(dg_mac)) {
+                if (ds3bt_get_bdaddr(dg_mac)) {
                     dgmacset = 1;
                     diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
                 } else {
@@ -717,7 +717,7 @@ static int guiPadEmuUpdater(int modified)
 
         if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
             if (!ds3macset) {
-                if (!ds3usb_get_bdaddr(0, ds3_mac)) {
+                if (ds3usb_get_bdaddr(0, ds3_mac)) {
                     ds3macset = 1;
                     diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
                 } else {
@@ -755,7 +755,7 @@ static void guiShowPadEmuConfig(void)
         if (result == PADCFG_PAIR) {
             if (ds3macset && dgmacset) {
                 if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
-                    if (!ds3usb_set_bdaddr(0, dg_mac))
+                    if (ds3usb_set_bdaddr(0, dg_mac))
                         ds3macset = 0;
                 }
             }

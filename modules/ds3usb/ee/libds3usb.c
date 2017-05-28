@@ -41,7 +41,7 @@ int ds3usb_reinit_ports(u8 ports)
         return 0;
 
     rpcbuf[0] = ports;
-    return SifCallRpc(&ds3usb, DS3USB_INIT, 0, rpcbuf, 1, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3usb, DS3USB_INIT, 0, rpcbuf, 1, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3usb_get_status(int port)
@@ -65,7 +65,7 @@ int ds3usb_get_bdaddr(int port, u8 *bdaddr)
 
     rpcbuf[0] = port;
 
-    ret = SifCallRpc(&ds3usb, DS3USB_GET_BDADDR, 0, rpcbuf, 1, rpcbuf, 6, NULL, NULL);
+    ret = (SifCallRpc(&ds3usb, DS3USB_GET_BDADDR, 0, rpcbuf, 1, rpcbuf, 6, NULL, NULL) == 0);
 
     for (i = 0; i < 6; i++)
         bdaddr[i] = rpcbuf[i];
@@ -85,7 +85,7 @@ int ds3usb_set_bdaddr(int port, u8 *bdaddr)
     for (i = 0; i < 6; i++)
         rpcbuf[i + 1] = bdaddr[i];
 
-    return SifCallRpc(&ds3usb, DS3USB_SET_BDADDR, 0, rpcbuf, 7, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3usb, DS3USB_SET_BDADDR, 0, rpcbuf, 7, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3usb_set_rumble(int port, u8 lrum, u8 rrum)
@@ -97,7 +97,7 @@ int ds3usb_set_rumble(int port, u8 lrum, u8 rrum)
     rpcbuf[1] = lrum;
     rpcbuf[2] = rrum;
 
-    return SifCallRpc(&ds3usb, DS3USB_SET_RUMBLE, 0, rpcbuf, 3, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3usb, DS3USB_SET_RUMBLE, 0, rpcbuf, 3, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3usb_set_led(int port, u8 led)
@@ -108,7 +108,7 @@ int ds3usb_set_led(int port, u8 led)
     rpcbuf[0] = port;
     rpcbuf[1] = led;
 
-    return SifCallRpc(&ds3usb, DS3USB_SET_LED, 0, rpcbuf, 2, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3usb, DS3USB_SET_LED, 0, rpcbuf, 2, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3usb_get_data(int port, u8 *data)
@@ -120,7 +120,7 @@ int ds3usb_get_data(int port, u8 *data)
 
     rpcbuf[0] = port;
 
-    ret = SifCallRpc(&ds3usb, DS3USB_GET_DATA, 0, rpcbuf, 1, rpcbuf, 18, NULL, NULL);
+    ret = (SifCallRpc(&ds3usb, DS3USB_GET_DATA, 0, rpcbuf, 1, rpcbuf, 18, NULL, NULL) == 0);
 
     memcpy(data, rpcbuf, 18);
 
@@ -132,5 +132,5 @@ int ds3usb_reset()
     if (!ds3usb_inited)
         return 0;
 
-    return SifCallRpc(&ds3usb, DS3USB_RESET, 0, NULL, 0, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3usb, DS3USB_RESET, 0, NULL, 0, NULL, 0, NULL, NULL) == 0);
 }

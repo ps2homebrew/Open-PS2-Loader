@@ -41,7 +41,7 @@ int ds3bt_reinit_ports(u8 ports)
         return 0;
 
     rpcbuf[0] = ports;
-    return SifCallRpc(&ds3bt, DS3BT_INIT, 0, rpcbuf, 1, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3bt, DS3BT_INIT, 0, rpcbuf, 1, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3bt_init_charging()
@@ -49,7 +49,7 @@ int ds3bt_init_charging()
     if (!ds3bt_inited)
         return 0;
 
-    return SifCallRpc(&ds3bt, DS3BT_INIT_CHARGING, 0, NULL, 0, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3bt, DS3BT_INIT_CHARGING, 0, NULL, 0, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3bt_get_status(int port)
@@ -71,7 +71,7 @@ int ds3bt_get_bdaddr(u8 *bdaddr)
     if (!ds3bt_inited)
         return 0;
 
-    ret = SifCallRpc(&ds3bt, DS3BT_GET_BDADDR, 0, NULL, 0, rpcbuf, 6, NULL, NULL);
+    ret = (SifCallRpc(&ds3bt, DS3BT_GET_BDADDR, 0, NULL, 0, rpcbuf, 6, NULL, NULL) == 0);
 
     for (i = 0; i < 6; i++)
         bdaddr[i] = rpcbuf[i];
@@ -88,7 +88,7 @@ int ds3bt_set_rumble(int port, u8 lrum, u8 rrum)
     rpcbuf[1] = lrum;
     rpcbuf[2] = rrum;
 
-    return SifCallRpc(&ds3bt, DS3BT_SET_RUMBLE, 0, rpcbuf, 3, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3bt, DS3BT_SET_RUMBLE, 0, rpcbuf, 3, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3bt_set_led(int port, u8 led)
@@ -99,7 +99,7 @@ int ds3bt_set_led(int port, u8 led)
     rpcbuf[0] = port;
     rpcbuf[1] = led;
 
-    return SifCallRpc(&ds3bt, DS3BT_SET_LED, 0, rpcbuf, 2, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3bt, DS3BT_SET_LED, 0, rpcbuf, 2, NULL, 0, NULL, NULL) == 0);
 }
 
 int ds3bt_get_data(int port, u8 *data)
@@ -111,7 +111,7 @@ int ds3bt_get_data(int port, u8 *data)
 
     rpcbuf[0] = port;
 
-    ret = SifCallRpc(&ds3bt, DS3BT_GET_DATA, 0, rpcbuf, 1, rpcbuf, 18, NULL, NULL);
+    ret = (SifCallRpc(&ds3bt, DS3BT_GET_DATA, 0, rpcbuf, 1, rpcbuf, 18, NULL, NULL) == 0);
 
     memcpy(data, rpcbuf, 18);
 
@@ -123,5 +123,5 @@ int ds3bt_reset()
     if (!ds3bt_inited)
         return 0;
 
-    return SifCallRpc(&ds3bt, DS3BT_RESET, 0, NULL, 0, NULL, 0, NULL, NULL);
+    return (SifCallRpc(&ds3bt, DS3BT_RESET, 0, NULL, 0, NULL, 0, NULL, NULL) == 0);
 }

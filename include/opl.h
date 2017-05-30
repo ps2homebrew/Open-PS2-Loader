@@ -38,7 +38,7 @@
 // Last Played Auto Start
 #include <time.h>
 
-#define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
+//#define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
 
 //IO type IDs
 #define IO_CUSTOM_SIMPLEACTION 1 // handler for parameter-less actions

@@ -12,7 +12,7 @@ IOP_BIN = genvmc.irx
 IOP_OBJS = genvmc.o imports.o
 
 ifeq ($(DEBUG),1)
-DEBUG_FLAGS = -DDEBUG
+  DEBUG_FLAGS = -DDEBUG
 endif
 
 IOP_INCS += -I$(PS2SDK)/iop/include
@@ -22,7 +22,9 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	-rm -f $(IOP_OBJS) $(IOP_BIN)
+	rm -f $(IOP_OBJS) $(IOP_BIN)
+
+rebuild: clean all
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

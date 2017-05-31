@@ -2,7 +2,8 @@ LIBPFS_PATH = ../libpfs
 LIBPFS_SRC_DIR = $(LIBPFS_PATH)/src/
 
 IOP_BIN  = ps2fs.irx
-PFS_OBJS = bitmap.o dir.o inode.o journal.o misc.o super.o superWrite.o cache.o block.o blockWrite.o
+PFS_OBJS = bitmap.o dir.o inode.o journal.o misc.o super.o superWrite.o \
+		cache.o block.o blockWrite.o
 IOP_OBJS = pfs.o pfs_fio.o pfs_fioctl.o imports.o $(PFS_OBJS)
 
 IOP_CFLAGS  += -Wall -fno-builtin-printf

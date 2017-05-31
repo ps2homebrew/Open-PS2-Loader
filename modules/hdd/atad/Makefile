@@ -17,6 +17,5 @@ rebuild: clean all
 run:
 	ps2client -t 1 execiop host:$(IOP_BIN)
 
-
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

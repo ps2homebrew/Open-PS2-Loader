@@ -1,4 +1,3 @@
-
 IOP_BIN = SMSUTILS.irx
 IOP_OBJS = SMSUTILS.o
 
@@ -9,7 +8,9 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	-rm -f $(IOP_OBJS) $(IOP_BIN)
+	rm -f $(IOP_OBJS) $(IOP_BIN)
+
+rebuild: clean all
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

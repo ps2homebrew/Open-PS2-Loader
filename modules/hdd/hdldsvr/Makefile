@@ -12,7 +12,7 @@ IOP_BIN = hdldsvr.irx
 IOP_OBJS = hdldsvr.o imports.o exports.o
 
 ifeq ($(DEBUG),1)
-DEBUG_FLAGS = -DDEBUG
+  DEBUG_FLAGS = -DDEBUG
 endif
 
 IOP_INCS +=
@@ -22,7 +22,7 @@ IOP_LDFLAGS += -s
 all: $(IOP_BIN)
 
 clean:
-	-rm -f $(IOP_OBJS) $(IOP_BIN)
+	rm -f $(IOP_OBJS) $(IOP_BIN)
 
 rebuild: clean all
 

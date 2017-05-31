@@ -12,7 +12,8 @@
 IOP_BIN  = ioptrap.irx
 
 IOP_INCS += -I$(PS2SDK)/common/include
-IOP_CFLAGS += -Wall -fno-builtin-printf #-DTEST_TRAP
+IOP_CFLAGS += -Wall -fno-builtin-printf
+#IOP_CFLAGS += -DTEST_TRAP
 IOP_LDFLAGS += -s
 
 IOP_OBJS = ioptrap.o handler.o breakpoint.o imports.o exports.o
@@ -27,7 +28,6 @@ rebuild: clean all
 
 run:
 	ps2client -t 1 execiop host:$(IOP_BIN)
-
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.make

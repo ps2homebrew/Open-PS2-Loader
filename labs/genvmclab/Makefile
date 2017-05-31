@@ -1,6 +1,7 @@
-
 EE_BIN = genvmclab.elf
-EE_OBJS = genvmclab.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o udptty.o ioptrap.o ps2link.o iomanx.o filexio.o usbd.o usbhdfsd.o mcman.o genvmc.o
+EE_OBJS = genvmclab.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o \
+		udptty.o ioptrap.o ps2link.o iomanx.o filexio.o usbd.o \
+		usbhdfsd.o mcman.o genvmc.o
 
 EE_LIBS = -lfileXio -lpatches -ldebug -lc -lkernel
 EE_CFLAGS = -g
@@ -38,7 +39,7 @@ smsutils.s:
 smstcpip.s:
 	$(MAKE) -C ../../modules/network/SMSTCPIP
 	bin2s ../../modules/network/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
-		
+
 smsmap.s:
 	$(MAKE) -C ../../modules/network/SMSMAP
 	bin2s ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx

@@ -42,7 +42,7 @@ ata_devinfo_t *ata_get_devinfo(int device);
 int ata_reset_devices(void);
 #define I_ata_reset_devices DECLARE_IMPORT(5, ata_reset_devices)
 
-int ata_io_start(void *buf, unsigned int blkcount, unsigned short int feature, unsigned short int nsector, unsigned short int sector, unsigned short int lcyl, unsigned short int hcyl, unsigned short int select, unsigned short int command);
+int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command);
 #define I_ata_io_start DECLARE_IMPORT(6, ata_io_start)
 int ata_io_finish(void);
 #define I_ata_io_finish DECLARE_IMPORT(7, ata_io_finish)
@@ -50,7 +50,7 @@ int ata_io_finish(void);
 int ata_get_error(void);
 #define I_ata_get_error DECLARE_IMPORT(8, ata_get_error)
 
-int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir);
+int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir);
 #define I_ata_device_sector_io DECLARE_IMPORT(9, ata_device_sector_io)
 
 //DRM functions that were meant to keep users from sharing disks (and hence the contained content). Supported by only Sony-modified HDDs (e.g. the SCPH-20400).

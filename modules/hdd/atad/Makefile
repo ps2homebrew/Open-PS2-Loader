@@ -1,6 +1,6 @@
 IOP_BIN  = ps2atad.irx
 
-IOP_INCS +=
+IOP_INCS += -I../common
 IOP_CFLAGS  += -Wall -fno-builtin-printf
 IOP_LDFLAGS += -s
 

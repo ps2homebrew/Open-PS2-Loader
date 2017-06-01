@@ -141,29 +141,32 @@ static void engineReset()
  */
 unsigned char *MD4(unsigned char *message, int len, unsigned char *cipher)
 {
-    unsigned char buffer[128];
+	union {
+		unsigned char ucbuff[128];
+		unsigned int uibuff[128/sizeof(unsigned int)];
+	} buffer;
     unsigned int b = len * 8;
 
     engineReset();
 
     while (len > 64) {
-        memcpy(buffer, message, 64);
-        transform(buffer);
+        memcpy(buffer.ucbuff, message, 64);
+        transform(buffer.ucbuff);
         message += 64;
         len -= 64;
     }
 
-    memset(buffer, 0, 128);
-    memcpy(buffer, message, len);
-    buffer[len] = 0x80;
+    memset(buffer.ucbuff, 0, 128);
+    memcpy(buffer.ucbuff, message, len);
+    buffer.ucbuff[len] = 0x80;
 
     if (len < 56) {
-        *((unsigned int *)&buffer[56]) = b;
-        transform(buffer);
+        buffer.uibuff[56/sizeof(unsigned int)] = b;
+        transform(buffer.ucbuff);
     } else {
-        *((unsigned int *)&buffer[120]) = b;
-        transform(buffer);
-        transform(&buffer[64]);
+        buffer.uibuff[120/sizeof(unsigned int)] = b;
+        transform(buffer.ucbuff);
+        transform(&buffer.ucbuff[64]);
     }
 
     *((unsigned int *)&cipher[0]) = context[0];

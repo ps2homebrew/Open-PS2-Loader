@@ -42,22 +42,22 @@ static int ata_devinfo_init = 0;
 static int ata_evflg = -1;
 
 /* Used for indicating 48-bit LBA support.  */
-static unsigned char lba_48bit[2] = {0, 0};
+static u8 lba_48bit[2] = {0, 0};
 
-static unsigned char Disable48bitLBA = 0; //Please read the comments in _start().
+static u8 Disable48bitLBA = 0; //Please read the comments in _start().
 
 /* Local device info kept for drives 0 and 1.  */
 static ata_devinfo_t atad_devinfo[2];
 
 /* Data returned from DEVICE IDENTIFY is kept here.  Also, this is used by the
    security commands to set and unlock the password.  */
-static unsigned short int ata_param[256];
+static u16 ata_param[256];
 
 /* ATA command info.  */
 typedef struct _ata_cmd_info
 {
-    unsigned char command;
-    unsigned char type;
+    u8 command;
+    u8 type;
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
@@ -139,10 +139,14 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
 typedef struct _ata_cmd_state
 {
-    int type; /* The ata_cmd_info_t type field. */
-    void *buf;
-    unsigned int blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    int dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
+    s32 type; /* The ata_cmd_info_t type field. */
+    union {
+ 		void	*buf;
+ 		u8	*buf8;
+ 		u16	*buf16;
+ 	};
+    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    s32 dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -328,7 +332,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     const ata_cmd_info_t *cmd_table;
     int i, res, type, cmd_table_size;
     int using_timeout, device = (select >> 4) & 1;
-    unsigned char searchcmd;
+    u8 searchcmd;
 
     ClearEventFlag(ata_evflg, 0);
 
@@ -445,9 +449,10 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 {
     USE_ATA_REGS;
-    void *buf;
+    u8 *buf8;
+	u16 *buf16;
     int i, type;
-    unsigned short int status = ata_hwport->r_status & 0xff;
+    u16 status = ata_hwport->r_status & 0xff;
 
     if (status & ATA_STAT_ERR) {
         M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
@@ -462,23 +467,24 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
         for (i = 0; i < 256; i++) {
-            ata_hwport->r_data = *(unsigned short int *)buf;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            ata_hwport->r_data = *buf16;
+            cmd_state->buf16 = ++buf16;
         }
+		buf8 = cmd_state->buf8;
         if (cmd_state->type == 8) {
             for (i = 0; i < 4; i++) {
-                ata_hwport->r_data = *(u8 *)buf;
-                cmd_state->buf = ++((u8 *)buf);
+                ata_hwport->r_data = *buf8;
+                cmd_state->buf8 = ++buf8;
             }
         }
     } else if (type == 2) {
         /* PIO data in  */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
         for (i = 0; i < 256; i++) {
-            *(unsigned short int *)buf = ata_hwport->r_data;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            *buf16 = ata_hwport->r_data;
+            cmd_state->buf16 = ++buf16;
         }
     }
 
@@ -486,14 +492,13 @@ static inline int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 }
 
 /* Complete a DMA transfer, to or from the device.  */
-static inline int ata_dma_complete(void *buf, int blkcount, int dir)
+static inline int ata_dma_complete(void *buf, u32 blkcount, int dir)
 {
     USE_ATA_REGS;
     USE_SPD_REGS;
-    unsigned int count, nbytes;
-    u32 bits;
+    u32 bits, count, nbytes;
     int i, res;
-    unsigned short int dma_stat;
+    u16 dma_stat;
 
     while (blkcount) {
         for (i = 0; i < 20; i++)
@@ -531,7 +536,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
         if ((res = dev9DmaTransfer(0, buf, (nbytes << 9) | 32, dir)) < 0)
             return res;
 
-        (u8 *)buf += nbytes;
+        buf = (void*)((u8 *)buf + nbytes);
         blkcount -= count;
     }
 
@@ -546,7 +551,7 @@ int ata_io_finish(void)
     ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
     int i, res = 0, type = cmd_state->type;
-    unsigned short int stat;
+    u16 stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
         WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR | WEF_OR, &bits);
@@ -763,7 +768,7 @@ int ata_device_set_transfer_mode(int device, int type, int mode)
 int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     int res = 0;
-    unsigned short int sector, lcyl, hcyl, select, command, len;
+    u16 sector, lcyl, hcyl, select, command, len;
 
     while (nsectors > 0) {
         ata_set_dir(dir);
@@ -773,8 +778,10 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         hcyl = (lba >> 16) & 0xff;
 
         if (lba_48bit[device]) {
-            /* Setup for 48-bit LBA.  */
-            len = (nsectors > 65536) ? 65536 : nsectors;
+            /* Setup for 48-bit LBA.
+ 			   While ATA-6 allows for the transfer of up to 65536 sectors,
+ 			   the DMAC allows only up to 65536 x 128 / 512 = 16384 sectors. */
+ 			len = (nsectors > 16384) ? 16384 : nsectors;
 
             /* Combine bits 24-31 and bits 0-7 of lba into sector.  */
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
@@ -795,7 +802,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         if ((res = ata_io_finish()) != 0)
             return res;
 
-        (u8 *)buf += (len * 512);
+        buf = (void*)((u8 *)buf + len * 512);
         lba += len;
         nsectors -= len;
     }
@@ -803,7 +810,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
     return res;
 }
 
-static void ata_get_security_status(int device, ata_devinfo_t *devinfo, unsigned short int *param)
+static void ata_get_security_status(int device, ata_devinfo_t *devinfo, u16 *param)
 {
     if (ata_device_identify(device, param) == 0)
         devinfo[device].security_status = param[ATA_ID_SECURITY_STATUS];
@@ -813,7 +820,7 @@ static void ata_get_security_status(int device, ata_devinfo_t *devinfo, unsigned
 int ata_device_sce_sec_set_password(int device, void *password)
 {
     ata_devinfo_t *devinfo = atad_devinfo;
-    unsigned short int *param = ata_param;
+    u16 *param = ata_param;
     int res;
 
     if (devinfo[device].security_status & ATA_F_SEC_ENABLED)
@@ -834,7 +841,7 @@ int ata_device_sce_sec_set_password(int device, void *password)
 int ata_device_sce_sec_unlock(int device, void *password)
 {
     ata_devinfo_t *devinfo = atad_devinfo;
-    unsigned short int *param = ata_param;
+    u16 *param = ata_param;
     int res;
 
     if (!(devinfo[device].security_status & ATA_F_SEC_LOCKED))
@@ -860,7 +867,6 @@ int ata_device_sce_sec_unlock(int device, void *password)
 int ata_device_sce_sec_erase(int device)
 {
     ata_devinfo_t *devinfo = atad_devinfo;
-    unsigned short int *param = NULL;
     int res;
 
     if (!(devinfo[device].security_status & ATA_F_SEC_ENABLED) || !(devinfo[device].security_status & ATA_F_SEC_LOCKED))
@@ -876,14 +882,14 @@ int ata_device_sce_sec_erase(int device)
         res = ata_io_finish();
 
 finish:
-    ata_get_security_status(device, devinfo, param);
+    ata_get_security_status(device, devinfo, NULL);
     return res;
 }
 
 static void ata_device_probe(ata_devinfo_t *devinfo)
 {
     USE_ATA_REGS;
-    unsigned short int nsector, sector, lcyl, hcyl, select;
+    u16 nsector, sector, lcyl, hcyl, select;
 
     devinfo->exists = 0;
     devinfo->has_packet = 0;
@@ -994,7 +1000,7 @@ ata_devinfo_t *ata_get_devinfo(int device)
 static void ata_set_dir(int dir)
 {
     USE_SPD_REGS;
-    unsigned short int val;
+    u16 val;
 
     SPD_REG16(0x38) = 3;
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;
@@ -1006,7 +1012,7 @@ static void ata_set_dir(int dir)
 static void ata_pio_mode(int mode)
 {
     USE_SPD_REGS;
-    unsigned short int val;
+    u16 val;
 
     switch (mode) {
         case 1:
@@ -1031,7 +1037,7 @@ static void ata_pio_mode(int mode)
 static void ata_multiword_dma_mode(int mode)
 {
     USE_SPD_REGS;
-    unsigned short int val;
+    u16 val;
 
     switch (mode) {
         case 1:
@@ -1051,7 +1057,7 @@ static void ata_multiword_dma_mode(int mode)
 static void ata_ultra_dma_mode(int mode)
 {
     USE_SPD_REGS;
-    unsigned short int val;
+    u16 val;
 
     switch (mode) {
         case 1:

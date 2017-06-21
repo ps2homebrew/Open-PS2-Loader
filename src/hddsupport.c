@@ -476,6 +476,8 @@ static void hddCleanUp(int exception)
 
         if ((exception & UNMOUNT_EXCEPTION) == 0)
             fileXioUmount(hddPrefix);
+
+      fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
     }
 
     hddModulesLoaded = 0;

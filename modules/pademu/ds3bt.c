@@ -318,6 +318,11 @@ static uint8_t led_patterns[][2] =
     { 0x0E, 0x10 }, 
 };
 
+static uint8_t power_level[] = 
+{
+    0x00, 0x02, 0x06, 0x0E, 0x1E
+};
+
 // Taken from nefarius' SCPToolkit
 // https://github.com/nefarius/ScpToolkit/blob/master/ScpControl/ScpControl.ini
 // Valid MAC addresses used by Sony
@@ -565,8 +570,8 @@ static uint8_t HCI_event_task(int result)
     pad = current_pad;
 
     if (!result) {
-        /*  buf[0] = Event Code							*/
-        /*  buf[1] = Parameter Total Length				*/
+        /*  buf[0] = Event Code                            */
+        /*  buf[1] = Parameter Total Length                */
         /*  buf[n] = Event Parameters based on each event  */
         DPRINTF("HCI event = 0x%x\n", hci_buf[0]);
         switch (hci_buf[0]) { // switch on event type
@@ -823,7 +828,7 @@ static void HCI_task(uint8_t pad)
 }
 
 /************************************************************/
-/* HCI Commands											 */
+/* HCI Commands                                             */
 /************************************************************/
 
 static uint8_t hci_reset()
@@ -1100,7 +1105,7 @@ static void L2CAP_task(uint8_t pad)
 }
 
 /************************************************************/
-/* L2CAP Commands											*/
+/* L2CAP Commands                                            */
 /************************************************************/
 static uint8_t l2cap_connect_response(uint8_t rxid, uint16_t dcid, uint16_t scid, uint8_t pad)
 {
@@ -1194,7 +1199,7 @@ static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad)
 }
 
 /************************************************************/
-/* HID Commands											 */
+/* HID Commands                                             */
 /************************************************************/
 
 static uint8_t initPSController(int pad)
@@ -1270,8 +1275,8 @@ static void readReport(uint8_t *data, int bytes, int pad)
                     
                 ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
             }
-            else
-                ds3pad[pad].oldled = ~(1 << data[DATA_START + Power]) & 0x1E;
+            else if(data[DATA_START + Power] != 0xEE)
+                ds3pad[pad].oldled = power_level[data[DATA_START + Power] - 1];
         }
         else
             ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
@@ -1315,6 +1320,11 @@ static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
 
     mips_memcpy(&led_buf[2], output_01_report, sizeof(output_01_report)); // PS3_01_REPORT_LEN);
 
+    if (ds3pad[pad].type == 0xA2) {
+        if(rrum < 5)
+            rrum = 0;
+    }
+
     led_buf[2 + 1] = 0xFE; //rt
     led_buf[2 + 2] = rrum; //rp
     led_buf[2 + 3] = 0xFE; //lt
@@ -1337,7 +1347,7 @@ static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
     return writeReport((uint8_t *)led_buf, sizeof(output_01_report) /*PS3_01_REPORT_LEN*/ + 2, pad);
 }
 /************************************************************/
-/* DS3BT Commands											*/
+/* DS3BT Commands                                            */
 /************************************************************/
 
 static uint8_t LED(uint8_t led, int pad)
@@ -1358,6 +1368,7 @@ static uint8_t Rumble(uint8_t lrum, uint8_t rrum, int pad)
     return ret;
 }
 
+#ifdef USE_THREAD
 static uint8_t update_rum = 0, update_lrum = 0, update_rrum = 0;
 static int update_port, update_thread_id, update_sema;
 
@@ -1372,25 +1383,103 @@ void ds3bt_set_rumble(uint8_t lrum, uint8_t rrum, int port)
     SignalSema(update_sema);
 }
 
-int ds3bt_get_data(char *dst, int size, int mode_lock, int port)
+int ds3bt_get_data(char *dst, int size, int port)
 {
     int ret;
 
     WaitSema(update_sema);
 
-    if(mode_lock)
-        ds3pad[port].analog_btn = mode_lock;
-
     mips_memcpy(dst, ds3pad[port].data, size);
     update_port = port;
     ret = ds3pad[port].analog_btn & 1;
 
-    SignalSema(update_sema);
     WakeupThread(update_thread_id);
 
     return ret;
 }
 
+void ds3bt_set_mode(int mode, int lock, int port)
+{
+    WaitSema(update_sema);
+
+    if (lock == 3) 
+        ds3pad[port].analog_btn = 3;
+    else
+        ds3pad[port].analog_btn = mode;
+
+    SignalSema(update_sema);
+}
+
+static void update_thread(void *param)
+{
+    while(1)
+    {
+        SleepThread();
+
+        WaitSema(bt_dev.hci_sema);
+        WaitSema(bt_dev.l2cap_sema);
+
+        if (update_rum) {
+            Rumble(update_lrum, update_rrum, update_port);
+            update_rum = 0;
+        }
+
+        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)update_port);
+
+        WaitSema(bt_dev.l2cap_sema);
+
+        SignalSema(bt_dev.hci_sema);
+        SignalSema(bt_dev.l2cap_sema);
+
+        SignalSema(update_sema);
+    }
+}
+#else
+void ds3bt_set_rumble(uint8_t lrum, uint8_t rrum, int port)
+{
+    WaitSema(bt_dev.hci_sema);
+    WaitSema(bt_dev.l2cap_sema);
+
+    Rumble(lrum, rrum, port);
+
+    SignalSema(bt_dev.hci_sema);
+    SignalSema(bt_dev.l2cap_sema);
+}
+
+int ds3bt_get_data(char *dst, int size, int port)
+{
+    int ret;
+
+    WaitSema(bt_dev.hci_sema);
+    WaitSema(bt_dev.l2cap_sema);
+
+    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)port);
+
+    WaitSema(bt_dev.l2cap_sema);
+
+    mips_memcpy(dst, ds3pad[port].data, size);
+    ret = ds3pad[port].analog_btn & 1;
+
+    SignalSema(bt_dev.hci_sema);
+    SignalSema(bt_dev.l2cap_sema);
+
+    return ret;
+}
+
+void ds3bt_set_mode(int mode, int lock, int port)
+{
+    WaitSema(bt_dev.hci_sema);
+    WaitSema(bt_dev.l2cap_sema);
+
+    if (lock == 3) 
+        ds3pad[port].analog_btn = 3;
+    else
+        ds3pad[port].analog_btn = mode;
+
+    SignalSema(bt_dev.hci_sema);
+    SignalSema(bt_dev.l2cap_sema);
+}
+#endif
 void ds3bt_reset()
 {
     uint8_t i;
@@ -1418,13 +1507,13 @@ void ds3bt_reset()
 
     SignalSema(bt_dev.hci_sema);
     SignalSema(bt_dev.l2cap_sema);
-
+#ifdef USE_THREAD
     WaitSema(update_sema);
 
     TerminateThread(update_thread_id);
     DeleteThread(update_thread_id);
     DeleteSema(update_sema);
-
+#endif
     DelayThread(1000000);
 
     //bt_release();
@@ -1448,38 +1537,9 @@ int ds3bt_get_status(int port)
     return status;
 }
 
-static void update_thread(void *param)
-{
-    while(1)
-    {
-        SleepThread();
-
-        WaitSema(update_sema);
-
-        WaitSema(bt_dev.hci_sema);
-        WaitSema(bt_dev.l2cap_sema);
-
-        if (update_rum) {
-            Rumble(update_lrum, update_rrum, update_port);
-            update_rum = 0;
-        }
-
-        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)update_port);
-
-        WaitSema(bt_dev.l2cap_sema);
-
-        SignalSema(bt_dev.hci_sema);
-        SignalSema(bt_dev.l2cap_sema);
-
-        SignalSema(update_sema);
-    }
-}
-
 int ds3bt_init(uint8_t pads)
 {
     int ret;
-    iop_thread_t param;
-    iop_sema_t sema;
     
     enable_pad = pads;
 
@@ -1491,6 +1551,9 @@ int ds3bt_init(uint8_t pads)
     }
 
     UsbRegisterDriver(&chrg_driver);
+#ifdef USE_THREAD
+    iop_thread_t param;
+    iop_sema_t sema;
 
     sema.initial = 1;
     sema.max = 1;
@@ -1516,4 +1579,7 @@ int ds3bt_init(uint8_t pads)
     }
 
     return 0;
+#else
+    return 1;
+#endif
 }

@@ -45,6 +45,11 @@ static uint8_t led_patterns[][2] =
     { 0x0E, 0x10 }, 
 };
 
+static uint8_t power_level[] = 
+{
+    0x00, 0x02, 0x06, 0x0E, 0x1E
+};
+
 static uint8_t usb_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 
 int usb_probe(int devId);
@@ -281,11 +286,11 @@ static void readReport(uint8_t *data, int pad)
             if(data[DATA_START + ButtonStateL] == 0x01) { //PS + SELECT
                 if(ds3pad[pad].analog_btn < 2) //unlocked mode 
                     ds3pad[pad].analog_btn = !ds3pad[pad].analog_btn;
-
+                    
                 ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
             }
-            else
-                ds3pad[pad].oldled = ~(1 << data[DATA_START + Power]) & 0x1E;
+            else if(data[DATA_START + Power] != 0xEE)
+                ds3pad[pad].oldled = power_level[data[DATA_START + Power] - 1];
         }
         else
             ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
@@ -347,14 +352,11 @@ void ds3usb_set_rumble(uint8_t lrum, uint8_t rrum, int port)
     SignalSema(ds3pad[port].sema);
 }
 
-int ds3usb_get_data(char *dst, int size, int mode_lock, int port)
+int ds3usb_get_data(char *dst, int size, int port)
 {
     int ret;
     
     WaitSema(ds3pad[port].sema);
-
-    if(mode_lock)
-        ds3pad[port].analog_btn = mode_lock;
 
     UsbInterruptTransfer(ds3pad[port].eventEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
 
@@ -366,6 +368,18 @@ int ds3usb_get_data(char *dst, int size, int mode_lock, int port)
     SignalSema(ds3pad[port].sema);
 
     return ret;
+}
+
+void ds3usb_set_mode(int mode, int lock, int port)
+{
+    WaitSema(ds3pad[port].sema);
+
+    if (lock == 3) 
+        ds3pad[port].analog_btn = 3;
+    else
+        ds3pad[port].analog_btn = mode;
+
+    SignalSema(ds3pad[port].sema);
 }
 
 void ds3usb_reset()

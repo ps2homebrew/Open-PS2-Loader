@@ -8,14 +8,14 @@ IOP_OBJS += ds3usb.o
 endif
 ifeq ($(USE_BT),1)
 IOP_BIN = bt_pademu.irx
-IOP_CFLAGS += -DBT
+IOP_CFLAGS += -DBT -DUSE_THREAD
 IOP_OBJNAME = bt.
 IOP_OBJS += ds3bt.o
 endif
 
 IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJNAME)%)
 
-IOP_CFLAGS += -Wall -fno-builtin
+IOP_CFLAGS += -Wall -fno-builtin -DUSE_SMSUTILS
 IOP_LDFLAGS += -s
 
 all: $(IOP_BIN)

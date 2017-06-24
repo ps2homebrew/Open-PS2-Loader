@@ -89,7 +89,7 @@ void StartNow(void *param)
 #ifdef PADEMU
     exp = GetExportTable("pademu", 0x101);
     if (exp != NULL) {
-        pademu_hookSio2man = GetExportEntry(exp, 0);
+        pademu_hookSio2man = GetExportEntry(exp, 4);
     } else {
         pademu_hookSio2man = no_pademu;
     }

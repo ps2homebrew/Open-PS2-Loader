@@ -37,6 +37,19 @@ static uint8_t output_01_report[] =
         0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00};
 
+static uint8_t led_patterns[][2] =
+{
+    { 0x1C, 0x02 },
+    { 0x1A, 0x04 },
+    { 0x16, 0x08 },
+    { 0x0E, 0x10 }, 
+};
+
+static uint8_t power_level[] = 
+{
+    0x00, 0x02, 0x06, 0x0E, 0x1E
+};
+
 static uint8_t usb_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 
 int usb_probe(int devId);
@@ -66,6 +79,7 @@ typedef struct _usb_ds3
     uint8_t oldrrumble;
     uint8_t data[18];
     uint8_t enabled;
+    uint8_t analog_btn;
 } ds3usb_device;
 
 ds3usb_device ds3pad[MAX_PADS];
@@ -178,6 +192,9 @@ int usb_disconnect(int devId)
 
 static void usb_release(int pad)
 {
+    if (ds3pad[pad].sema >= 0)
+        WaitSema(ds3pad[pad].sema);
+    
     if (ds3pad[pad].eventEndp >= 0)
         UsbCloseEndpoint(ds3pad[pad].eventEndp);
 
@@ -193,7 +210,8 @@ static void usb_release(int pad)
 static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
-
+    
+    PollSema(ds3pad[pad].sema);
     //DPRINTF("usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     if (!resultCode)
@@ -264,10 +282,18 @@ static void readReport(uint8_t *data, int pad)
         ds3pad[pad].data[16] = data[DATA_START + PressureL2]; //L2
         ds3pad[pad].data[17] = data[DATA_START + PressureR2]; //R2
 
-        if (data[DATA_START + PSButtonState]) //display battery level
-            ds3pad[pad].oldled = ~(1 << data[DATA_START + Power]) & 0x1E;
+        if (data[DATA_START + PSButtonState]) { //display battery level
+            if(data[DATA_START + ButtonStateL] == 0x01) { //PS + SELECT
+                if(ds3pad[pad].analog_btn < 2) //unlocked mode 
+                    ds3pad[pad].analog_btn = !ds3pad[pad].analog_btn;
+                    
+                ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
+            }
+            else if(data[DATA_START + Power] != 0xEE)
+                ds3pad[pad].oldled = power_level[data[DATA_START + Power] - 1];
+        }
         else
-            ds3pad[pad].oldled = (pad + 1) << 1;
+            ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
 
         if (data[DATA_START + Power] == 0xEE) //charging
             ds3pad[pad].oldled |= 0x80;
@@ -309,7 +335,12 @@ static uint8_t LED(uint8_t led, int pad)
 
 static uint8_t Rumble(uint8_t lrum, uint8_t rrum, int pad)
 {
-    return LEDRumble(ds3pad[pad].oldled, lrum, rrum, pad);
+    uint8_t ret;
+
+    ret = LEDRumble(ds3pad[pad].oldled, lrum, rrum, pad);
+    WaitSema(ds3pad[pad].sema);
+
+    return ret;
 }
 
 void ds3usb_set_rumble(uint8_t lrum, uint8_t rrum, int port)
@@ -318,13 +349,13 @@ void ds3usb_set_rumble(uint8_t lrum, uint8_t rrum, int port)
 
     Rumble(lrum, rrum, port);
 
-    WaitSema(ds3pad[port].sema);
-
     SignalSema(ds3pad[port].sema);
 }
 
-void ds3usb_get_data(char *dst, int size, int port)
+int ds3usb_get_data(char *dst, int size, int port)
 {
+    int ret;
+    
     WaitSema(ds3pad[port].sema);
 
     UsbInterruptTransfer(ds3pad[port].eventEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
@@ -332,6 +363,21 @@ void ds3usb_get_data(char *dst, int size, int port)
     WaitSema(ds3pad[port].sema);
 
     mips_memcpy(dst, ds3pad[port].data, size);
+    ret = ds3pad[port].analog_btn & 1;
+
+    SignalSema(ds3pad[port].sema);
+
+    return ret;
+}
+
+void ds3usb_set_mode(int mode, int lock, int port)
+{
+    WaitSema(ds3pad[port].sema);
+
+    if (lock == 3) 
+        ds3pad[port].analog_btn = 3;
+    else
+        ds3pad[port].analog_btn = mode;
 
     SignalSema(ds3pad[port].sema);
 }
@@ -346,7 +392,18 @@ void ds3usb_reset()
 
 int ds3usb_get_status(int port)
 {
-    return ds3pad[port].status;
+    int status;
+
+    if (ds3pad[port].sema >= 0) {
+        WaitSema(ds3pad[port].sema);
+        status = ds3pad[port].status;
+        SignalSema(ds3pad[port].sema);
+    }
+    else {
+        return ds3pad[port].status;
+    }
+    
+    return status;
 }
 
 int ds3usb_init(uint8_t pads)
@@ -367,6 +424,7 @@ int ds3usb_init(uint8_t pads)
 
         ds3pad[pad].data[0] = 0xFF;
         ds3pad[pad].data[1] = 0xFF;
+        ds3pad[pad].analog_btn = 0;
 
         mips_memset(&ds3pad[pad].data[2], 0x7F, 4);
         mips_memset(&ds3pad[pad].data[6], 0x00, 12);

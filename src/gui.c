@@ -633,13 +633,13 @@ void guiShowCheatConfig(void)
 #endif
 
 #ifdef PADEMU
-
 static u8 ds3_mac[6];
 static u8 dg_mac[6];
 static char ds3_str[18];
 static char dg_str[18];
 static int ds3macset = 0;
 static int dgmacset = 0;
+static int dg_discon = 0;
 
 static int PadEmuSettings = 0;
 
@@ -698,8 +698,12 @@ static int guiPadEmuUpdater(int modified)
 
     if (PadEmuMode) {
         if (ds3bt_get_status(0) & DS3BT_STATE_USB_CONFIGURED) {
+            if (dg_discon) {
+                dgmacset = 0;
+                dg_discon = 0;
+            }
             if (!dgmacset) {
-                if (!ds3bt_get_bdaddr(dg_mac)) {
+                if (ds3bt_get_bdaddr(dg_mac)) {
                     dgmacset = 1;
                     diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
                 } else {
@@ -707,13 +711,16 @@ static int guiPadEmuUpdater(int modified)
                 }
             }
         } else {
+            dg_discon = 1;
+        }
+
+        if (!dgmacset) {
             diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
-            dgmacset = 0;
         }
 
         if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
             if (!ds3macset) {
-                if (!ds3usb_get_bdaddr(0, ds3_mac)) {
+                if (ds3usb_get_bdaddr(0, ds3_mac)) {
                     ds3macset = 1;
                     diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
                 } else {
@@ -733,7 +740,7 @@ static void guiShowPadEmuConfig(void)
 {
     const char *PadEmuModes[] = {_l(_STR_DS3USB_MODE), _l(_STR_DS3BT_MODE), NULL};
     int PadPort;
-	
+
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
@@ -751,7 +758,7 @@ static void guiShowPadEmuConfig(void)
         if (result == PADCFG_PAIR) {
             if (ds3macset && dgmacset) {
                 if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
-                    if (!ds3usb_set_bdaddr(0, dg_mac))
+                    if (ds3usb_set_bdaddr(0, dg_mac))
                         ds3macset = 0;
                 }
             }
@@ -761,7 +768,6 @@ static void guiShowPadEmuConfig(void)
             break;
     }
 }
-
 #endif
 
 static int netConfigUpdater(int modified)

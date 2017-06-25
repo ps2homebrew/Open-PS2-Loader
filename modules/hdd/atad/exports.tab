@@ -23,7 +23,6 @@ DECLARE_EXPORT_TABLE(atad, 1, 3)
 	DECLARE_EXPORT(ata_device_idle_immediate)
 	DECLARE_EXPORT(ata_device_is_48bit)
 	DECLARE_EXPORT(ata_device_set_transfer_mode)
-
 END_EXPORT_TABLE
 
 void _retonly() {}

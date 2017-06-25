@@ -7,7 +7,6 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id$
 # ATA Device Driver definitions and imports.
 */
 
@@ -27,10 +26,10 @@
 
 typedef struct _ata_devinfo
 {
-    int exists;                   /* Was successfully probed.  */
-    int has_packet;               /* Supports the PACKET command set.  */
-    unsigned int total_sectors;   /* Total number of user sectors.  */
-    unsigned int security_status; /* Word 0x100 of the identify info.  */
+    s32 exists;          /* Was successfully probed.  */
+    s32 has_packet;      /* Supports the PACKET command set.  */
+    u32 total_sectors;   /* Total number of user sectors.  */
+    u32 security_status; /* Word 0x100 of the identify info.  */
 } ata_devinfo_t;
 
 #define atad_IMPORTS_start DECLARE_IMPORT_TABLE(atad, 1, 3)

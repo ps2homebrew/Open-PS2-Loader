@@ -6,7 +6,7 @@ APA_OBJS = misc.o cache.o apa.o journal.o free.o password.o
 IOP_OBJS = hdd_fio.o hdd.o imports.o $(APA_OBJS)
 
 IOP_INCS += -I$(CURDIR) -I$(LIBAPA_PATH)/include -I../common
-IOP_CFLAGS  += -Wall -fno-builtin-printf
+IOP_CFLAGS  += -Wall -fno-builtin-printf -DAPA_OSD_VER
 IOP_LDFLAGS += -s
 
 all: $(IOP_BIN)

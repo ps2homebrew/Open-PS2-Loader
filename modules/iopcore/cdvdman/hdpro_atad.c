@@ -1,15 +1,13 @@
 /*
   Copyright 2011, jimmikaelkael
   Licenced under Academic Free License version 3.0
-  Review Open PS2 Loader README & LICENSE files for further details.
 
-  ATA Driver for the HD Pro Kit, based on original ATAD form ps2sdk:	
+  ATA Driver for the HD Pro Kit, based on original ATAD form ps2sdk:
 
   Copyright (c) 2003 Marcus R. Brown <mrbrown@0xd6.org>
   Licenced under Academic Free License version 2.0
   Review ps2sdk README & LICENSE files for further details.
- 
-  $Id: ps2atad.c 1455 2007-11-04 23:46:27Z roman_ps2dev $
+
   ATA device driver.
 */
 
@@ -23,10 +21,10 @@
 
 #include <atahw.h>
 
-
 #ifdef __IOPCORE_DEBUG
 #define M_PRINTF(format, args...) \
-    printf(format, ##args)
+    printf(MODNAME ": " format, ##args)
+printf(format, ##args)
 #else
 #define M_PRINTF(format, args...) \
     do {                          \
@@ -67,16 +65,17 @@
 #define ATAreg_HCYL_WR 0xb2
 #define ATAreg_DATA_WR 0x12
 
-static int ata_evflg = -1;
+    static int ata_evflg = -1;
 
 /* Used for indicating 48-bit LBA support.  */
 extern char lba_48bit;
 
+/* Local device info kept for drives 0 and 1.  */
+static ata_devinfo_t atad_devinfo;
+
 #ifdef VMC_DRIVER
 #include <thsemap.h>
-
 static int io_sema = -1;
-
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
 #define ATAWRITE 1
@@ -85,9 +84,6 @@ static int io_sema = -1;
 #define SIGNALIOSEMA(x)
 #define ATAWRITE 0
 #endif
-
-/* Local device info.  */
-static ata_devinfo_t atad_devinfo;
 
 /* ATA command info.  */
 typedef struct _ata_cmd_info
@@ -119,10 +115,15 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
 typedef struct _ata_cmd_state
 {
-    int type; /* The ata_cmd_info_t type field. */
-    void *buf;
-    unsigned int blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    int dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
+    s32 type; /* The ata_cmd_info_t type field. */
+    union
+    {
+        void *buf;
+        u8 *buf8;
+        u16 *buf16;
+    };
+    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    s32 dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -267,7 +268,7 @@ static int hdpro_io_init(void)
     return ata_wait_busy(0x80);
 }
 
-int atad_start(void)
+int atad_start()
 {
     int res = 1;
     iop_event_t event;
@@ -286,8 +287,9 @@ int atad_start(void)
     HDPROreg_IO8 = 0xe3;
     CDVDreg_STATUS = 0;
 
-    if (hdpro_io_init() != 0)
+    if (hdpro_io_init() != 0) {
         goto out;
+    }
 
 #ifdef VMC_DRIVER
     iop_sema_t smp;
@@ -307,7 +309,7 @@ out:
 }
 
 /* Export 8 */
-int ata_get_error()
+int ata_get_error(void)
 {
     return hdpro_io_read(ATAreg_ERROR_RD) & 0xff;
 }
@@ -390,10 +392,10 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     ClearEventFlag(ata_evflg, 0);
 
-    if ((res = ata_device_select(device)) != 0)
+    if ((res = ata_device_select(device & 1)) != 0)
         return res;
 
-    /* For the SCE and SMART commands, we need to search on the subcommand
+    /* For the SMART commands, we need to search on the subcommand
 	specified in the feature register.  */
     if (command == ATA_C_SMART) {
         cmd_table = smart_cmd_table;
@@ -448,6 +450,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
             atad_cmd_state.dir = ATA_DIR_READ;
 #endif
             using_timeout = 1;
+            break;
     }
 
     if (using_timeout) {
@@ -462,7 +465,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     suspend_intr();
     HDPROreg_IO8 = 0x21;
     CDVDreg_STATUS = 0;
-    unsigned int dummy = HDPROreg_IO8;
+    unsigned int dummy __attribute__((unused)) = HDPROreg_IO8;
     CDVDreg_STATUS = 0;
     resume_intr();
     dummy = 0;
@@ -497,10 +500,11 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 /* Do a PIO transfer, to or from the device.  */
 static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 {
-    void *buf;
+    u8 *buf8;
+    u16 *buf16;
     int i, type;
     int res = 0, chk = 0;
-    unsigned short int status = hdpro_io_read(ATAreg_STATUS_RD);
+    u16 status = hdpro_io_read(ATAreg_STATUS_RD);
 
     if (status & ATA_STAT_ERR) {
         M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
@@ -515,32 +519,33 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
 
         HDPROreg_IO8 = 0x43;
         CDVDreg_STATUS = 0;
 
         for (i = 0; i < 256; i++) {
-            unsigned short int r_data = *(unsigned short int *)buf;
+            u16 r_data = *buf16;
             hdpro_io_write(ATAreg_DATA_WR, r_data);
             chk ^= r_data + i;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            cmd_state->buf = ++buf16;
         }
 
-        unsigned short int out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
+        u16 out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
         if (out != (chk & 0xffff))
             return -504;
 
         if (cmd_state->type == 8) {
+            buf8 = cmd_state->buf8;
             for (i = 0; i < 4; i++) {
-                hdpro_io_write(ATAreg_DATA_WR, *(unsigned char *)buf);
-                cmd_state->buf = ++((unsigned char *)buf);
+                hdpro_io_write(ATAreg_DATA_WR, *buf8);
+                cmd_state->buf = ++buf8;
             }
         }
 
     } else if (type == 2) {
         /* PIO data in  */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
 
         suspend_intr();
 
@@ -558,8 +563,8 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
             res0 = (res0 & 0xff) | (res1 << 8);
             chk ^= res0 + i;
 
-            *(unsigned short int *)buf = res0 & 0xffff;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            *buf16 = res0 & 0xffff;
+            cmd_state->buf16 = ++buf16;
         }
 
         HDPROreg_IO8 = 0x51;
@@ -568,7 +573,7 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
         resume_intr();
 
-        unsigned short int r_data = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
+        u16 r_data = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
         if (r_data != (chk & 0xffff))
             return -504;
     }
@@ -582,7 +587,7 @@ int ata_io_finish(void)
     ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
     int res = 0, type = cmd_state->type;
-    unsigned short int stat;
+    u16 stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
 
@@ -597,7 +602,6 @@ int ata_io_finish(void)
         resume_intr();
 
         if (((ret & 0xff) & 1) == 0) {
-
             WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR | WEF_OR, &bits);
             if (bits & 0x01) { /* Timeout.  */
                 M_PRINTF("Error: ATA timeout on a non-data command.\n");
@@ -644,11 +648,10 @@ finish:
 }
 
 /* Export 9 */
-int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
+int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     int res = 0;
-    unsigned int nbytes;
-    unsigned short int sector, lcyl, hcyl, select, command, len;
+    u16 sector, lcyl, hcyl, select, command, len;
 
     WAITIOSEMA(io_sema);
 
@@ -668,13 +671,13 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
             /* 0x40 enables LBA.  */
             select = ((device << 4) | 0x40) & 0xffff;
-            command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
+            command = (dir == 1) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
         } else {
             /* Setup for 28-bit LBA.  */
             sector = lba & 0xff;
             /* 0x40 enables LBA.  */
             select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
-            command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
+            command = (dir == 1) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
         }
 
         if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
@@ -683,8 +686,7 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
         if ((res = ata_io_finish()) != 0)
             continue;
 
-        nbytes = len * 512;
-        (u8 *)buf += nbytes;
+        buf = (void *)((u8 *)buf + len * 512);
         lba += len;
         nsectors -= len;
     }

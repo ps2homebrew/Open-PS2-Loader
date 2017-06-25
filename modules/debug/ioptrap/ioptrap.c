@@ -7,7 +7,6 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: ioptrap.c 1619 2009-10-07 04:54:58Z Herben $
 # IOP exception handling.
 */
 
@@ -27,7 +26,7 @@
 
 IRX_ID("ioptrap_driver", 1, 1);
 
-struct irx_export_table _exp_ioptrap;
+extern struct irx_export_table _exp_ioptrap;
 
 
 static const char *exception_type_name[] = {
@@ -211,7 +210,7 @@ static void trigger()
         dbg_jmp_buf_setup = 1;
         *(u32 *)0xdeadbeef = 0xfeedface;
     } else {
-        printf("exception occurred in command, v=%08x\n", (int)v);
+        printf("exception occurred in command, v=%08x\n", v);
     }
     dbg_jmp_buf_setup = 0;
     printf("done.\n");

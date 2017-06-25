@@ -58,7 +58,7 @@ typedef struct _cbw_packet
     unsigned char lun;
     unsigned char comLength;   //command data length
     unsigned char comData[16]; //command data
-} cbw_packet __attribute__((packed));
+} cbw_packet;
 
 typedef struct _csw_packet
 {
@@ -66,7 +66,7 @@ typedef struct _csw_packet
     unsigned int tag;
     unsigned int dataResidue;
     unsigned char status;
-} csw_packet __attribute__((packed));
+} csw_packet;
 
 typedef struct _inquiry_data
 {
@@ -79,7 +79,7 @@ typedef struct _inquiry_data
     u8 vendor[8];
     u8 product[16];
     u8 revision[4];
-} inquiry_data __attribute__((packed));
+} inquiry_data;
 
 typedef struct _sense_data
 {
@@ -92,13 +92,13 @@ typedef struct _sense_data
     u8 add_sense_code;
     u8 add_sense_qual;
     u8 res4[4];
-} sense_data __attribute__((packed));
+} sense_data;
 
 typedef struct _read_capacity_data
 {
     u8 last_lba[4];
     u8 block_length[4];
-} read_capacity_data __attribute__((packed));
+} read_capacity_data;
 
 static UsbDriver driver;
 
@@ -1105,8 +1105,8 @@ int UsbMassRegisterCallback(int device, usbmass_cb_t callback)
     if (device >= 0 && device < NUM_DEVICES) {
         g_mass_device[device].callback = callback;
         result = 0;
-        if (g_mass_device[device].status & USBMASS_DEV_STAT_CONN) {
-            //If the device is already connected, let the callback know.
+
+        if (g_mass_device[device].status & USBMASS_DEV_STAT_CONN) { //If the device is already connected, let the callback know.
             if (callback != NULL)
                 callback(USBMASS_DEV_EV_CONN);
         }

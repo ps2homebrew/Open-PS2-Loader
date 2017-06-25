@@ -1,12 +1,8 @@
-
-#include "ioman_mod.h"
-
-sifcmd_IMPORTS_start
-I_sceSifInitRpc
-I_sceSifSetRpcQueue
-I_sceSifRegisterRpc
-I_sceSifRpcLoop
-sifcmd_IMPORTS_end
+loadcore_IMPORTS_start
+I_RegisterLibraryEntries
+I_GetLoadcoreInternalData
+I_QueryLibraryEntryTable
+loadcore_IMPORTS_end
 
 stdio_IMPORTS_start
 I_printf
@@ -26,19 +22,15 @@ I_CreateThread
 I_DeleteThread
 I_DelayThread
 I_GetThreadId
+I_SleepThread
+I_WakeupThread
+I_TerminateThread
 thbase_IMPORTS_end
 
 intrman_IMPORTS_start
 I_CpuSuspendIntr
 I_CpuResumeIntr
 intrman_IMPORTS_end
-
-sifman_IMPORTS_start
-I_sceSifCheckInit
-I_sceSifInit
-I_sceSifSetDma
-I_sceSifDmaStat
-sifman_IMPORTS_end
 
 usbd_IMPORTS_start
 I_UsbGetDeviceStaticDescriptor
@@ -50,25 +42,17 @@ I_UsbTransfer
 I_UsbRegisterDriver
 usbd_IMPORTS_end
 
-vblank_IMPORTS_start
-I_WaitVblankStart
-I_RegisterVblankHandler
-vblank_IMPORTS_end
+sysclib_IMPORTS_start
+I_strncmp
+#ifndef USE_SMSUTILS
+I_memset
+I_memcpy
+#endif
+sysclib_IMPORTS_end
 
+#ifdef USE_SMSUTILS
 smsutils_IMPORTS_start
 I_mips_memset
 I_mips_memcpy
 smsutils_IMPORTS_end
-
-sysclib_IMPORTS_start
-I_prnt
-I_strncmp
-I_strncpy
-sysclib_IMPORTS_end
-
-loadcore_IMPORTS_start
-I_GetLoadcoreInternalData
-I_QueryLibraryEntryTable
-I_FlushIcache
-I_FlushDcache
-loadcore_IMPORTS_end
+#endif

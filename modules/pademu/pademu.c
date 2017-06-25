@@ -17,6 +17,7 @@
 #define PAD_RESET ds3bt_reset
 #define PAD_GET_DATA ds3bt_get_data
 #define PAD_SET_RUMBLE ds3bt_set_rumble
+#define PAD_SET_MODE ds3bt_set_mode
 
 #elif defined(USB)
 
@@ -27,6 +28,7 @@
 #define PAD_RESET ds3usb_reset
 #define PAD_GET_DATA ds3usb_get_data
 #define PAD_SET_RUMBLE ds3usb_set_rumble
+#define PAD_SET_MODE ds3usb_set_mode
 
 #else
 #error "must define mode"
@@ -37,12 +39,16 @@
 
 typedef struct
 {
-    uint8_t config_mode;
     uint8_t mode;
+    uint8_t mode_p;
+    uint8_t mode_id;
+    uint8_t mode_cfg;
+    uint8_t mode_lock;
     uint8_t enabled;
     uint8_t vibration;
+    uint8_t lrum;
+    uint8_t rrum;
     uint8_t mask[4];
-    uint8_t actalign[6];
 } pad_status_t;
 
 #define DIGITAL_MODE 0x41
@@ -55,9 +61,6 @@ typedef struct
 #define PAD_STATE_RUNNING 0x08
 
 IRX_ID("pademu", 1, 1);
-
-#define PADEMU_BIND_RPC_ID 0x18E3878D
-#define PADEMU_RESET 1
 
 //#define OLD_PADMAN
 
@@ -81,36 +84,8 @@ void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc);
 void pademu_setup(uint8_t ports, uint8_t vib);
 void pademu(sio2_transfer_data_t *td);
 void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size);
-void pademu_reset();
 
-static void rpc_thread(void *data);
-static void *rpc_sf(int cmd, void *data, int size);
-
-static SifRpcDataQueue_t rpc_que __attribute__((aligned(16)));
-static SifRpcServerData_t rpc_svr __attribute__((aligned(16)));
-
-//static int rpc_buf[64] __attribute((aligned(16)));
-
-void rpc_thread(void *data)
-{
-    if (sceSifCheckInit() == 0) {
-        DPRINTF("BT: Sif not initialized \n");
-        sceSifInit();
-    }
-
-    SifInitRpc(0);
-    SifSetRpcQueue(&rpc_que, GetThreadId());
-    SifRegisterRpc(&rpc_svr, PADEMU_BIND_RPC_ID, rpc_sf, NULL, NULL, NULL, &rpc_que);
-    SifRpcLoop(&rpc_que);
-}
-
-void *rpc_sf(int cmd, void *data, int size)
-{
-    if (cmd == PADEMU_RESET)
-        pademu_reset();
-
-    return data;
-}
+extern struct irx_export_table _exp_pademu;
 
 int _start(int argc, char *argv[])
 {
@@ -125,6 +100,10 @@ int _start(int argc, char *argv[])
         return MODULE_NO_RESIDENT_END;
     }
 
+    if (RegisterLibraryEntries(&_exp_pademu) != 0) {
+        return MODULE_NO_RESIDENT_END;
+    }
+
 #ifndef VMC
     if (!install_sio2hook()) {
         return MODULE_NO_RESIDENT_END;
@@ -133,22 +112,12 @@ int _start(int argc, char *argv[])
 
     pademu_setup(enable, vibration);
 
-    iop_thread_t rpc_th;
+    return MODULE_RESIDENT_END;
+}
 
-    rpc_th.attr = TH_C;
-    rpc_th.thread = rpc_thread;
-    rpc_th.priority = 40;
-    rpc_th.stacksize = 0x800;
-    rpc_th.option = 0;
-
-    int thid = CreateThread(&rpc_th);
-
-    if (thid > 0) {
-        StartThread(thid, NULL);
-        return MODULE_RESIDENT_END;
-    }
-
-    return MODULE_NO_RESIDENT_END;
+void _exit(int mode)
+{
+    PAD_RESET();
 }
 
 int install_sio2hook()
@@ -265,17 +234,22 @@ void pademu_setup(uint8_t ports, uint8_t vib)
     uint8_t i;
 
     for (i = 0; i < MAX_PORTS; i++) {
-        pad[i].config_mode = 0;
-        pad[i].mode = DIGITAL_MODE;
+        pad[i].mode = 0;
+        pad[i].mode_p = 0;
+        pad[i].mode_id = DIGITAL_MODE;
+        pad[i].mode_cfg = 0;
+        pad[i].mode_lock = 0;
+        
         pad[i].enabled = ((ports >> i) & 1);
         pad[i].vibration = ((vib >> i) & 1);
-
-        mips_memset(pad[i].actalign, 0xFF, 6);
 
         pad[i].mask[0] = 0xFF;
         pad[i].mask[1] = 0xFF;
         pad[i].mask[2] = 0x03;
         pad[i].mask[3] = 0x00;
+        
+        pad[i].lrum = 2;
+        pad[i].rrum = 2;
     }
 }
 
@@ -344,17 +318,18 @@ void pademu(sio2_transfer_data_t *td)
 
 void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
 {
-    uint8_t rrum = 0, lrum = 0;
     uint8_t i;
 
     mips_memset(out, 0x00, out_size);
 
     if (!(PAD_GET_STATUS(port) & PAD_STATE_RUNNING)) {
+        pad[port].lrum = 2;
+        pad[port].rrum = 2;
         return;
     }
 
     out[0] = 0xFF;
-    out[1] = pad[port].config_mode ? CONFIG_MODE : pad[port].mode;
+    out[1] = CONFIG_MODE;
     out[2] = 0x5A;
 
     switch (in[1]) {
@@ -363,7 +338,7 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             break;
 
         case 0x41: //query button mask
-            if (pad[port].mode != DIGITAL_MODE) {
+            if (pad[port].mode_id != DIGITAL_MODE) {
                 out[3] = pad[port].mask[0];
                 out[4] = pad[port].mask[1];
                 out[5] = pad[port].mask[2];
@@ -373,35 +348,56 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             }
             break;
 
-        case 0x42: //read data
-            PAD_GET_DATA(&out[3], out_size - 3, port);
-
-            if (pad[port].vibration) //disable/enable vibration
-            {
-                for (i = 0; i < 6; i++) //vibration
-                {
-                    if (pad[port].actalign[i] == 0x00)
-                        rrum = in[i + 3];
-
-                    if (pad[port].actalign[i] == 0x01)
-                        lrum = in[i + 3];
+        case 0x43: //enter/exit config mode
+        	    if (pad[port].mode_cfg) {
+                    pad[port].mode_cfg = in[3];
+                    break;
                 }
-                PAD_SET_RUMBLE(lrum, rrum, port);
+                
+                pad[port].mode_cfg = in[3];
+        case 0x42: //read data
+            if (in[1] == 0x42) {
+                if (pad[port].vibration) { //disable/enable vibration
+                    PAD_SET_RUMBLE(in[pad[port].lrum], in[pad[port].rrum], port);
+                }
             }
 
-            break;
+            i = PAD_GET_DATA(&out[3], out_size - 3, port);
+            
+            if (pad[port].mode_lock == 0) { //mode unlocked
+                if (pad[port].mode != i) {
+                    pad[port].mode = i;
 
-        case 0x43: //enter/exit config mode
-            pad[port].config_mode = (in[3] == 0x01);
+                    if (pad[port].mode)
+                        pad[port].mode_id = ANALOG_MODE;
+                    else
+                        pad[port].mode_id = DIGITAL_MODE;
+                }
+            }
+            
+            out[1] = pad[port].mode_id;
             break;
 
         case 0x44: //set mode and lock
-            pad[port].mode = (in[3] == 0x01) ? ANALOG_MODE : DIGITAL_MODE;
+            pad[port].mode = in[3];
+            pad[port].mode_lock = in[4];
+            if (pad[port].mode) {
+                if (pad[port].mode_p) {
+                    pad[port].mode_id = ANALOGP_MODE;
+                }
+                else {
+                    pad[port].mode_id = ANALOG_MODE;
+                }
+            }
+            else {
+                pad[port].mode_id = DIGITAL_MODE;
+            }
+            PAD_SET_MODE(pad[port].mode, pad[port].mode_lock, port);
             break;
 
         case 0x45: //query model and mode
             mips_memcpy(&out[3], &pademu_data[1], 6);
-            out[5] = (pad[port].mode & 0xF) != 1;
+            out[5] = pad[port].mode;
             break;
 
         case 0x46: //query act
@@ -425,12 +421,21 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             break;
 
         case 0x4D: //set act align
-            mips_memcpy(pad[port].actalign, &in[3], 6);
             mips_memcpy(&out[3], &pademu_data[5], 6);
+
+            for (i = 0; i < 6; i++) //vibration
+            {
+                if (in[3 + i] == 0x00)
+                    pad[port].rrum = i + 3;
+
+                if (in[3 + i] == 0x01)
+                    pad[port].lrum = i + 3;
+            }
             break;
 
         case 0x4F: //set button info
-            pad[port].mode = ANALOGP_MODE;
+            pad[port].mode_id = ANALOGP_MODE;
+            pad[port].mode_p = 1;
 
             out[8] = 0x5A;
 
@@ -440,9 +445,4 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             pad[port].mask[3] = in[6];
             break;
     }
-}
-
-void pademu_reset()
-{
-    PAD_RESET();
 }

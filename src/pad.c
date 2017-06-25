@@ -193,12 +193,12 @@ static int readPad(struct pad_data_t *pad)
     newpdata = 0xffff ^ pad->buttons.btns;
 
     if (ds3bt_get_status(pad->port) & DS3BT_STATE_RUNNING) {
-        ret = !ds3bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
+        ret = ds3bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
         newpdata |= 0xffff ^ pad->buttons.btns;
     }
 
     if (ds3usb_get_status(pad->port) & DS3USB_STATE_RUNNING) {
-        ret = !ds3usb_get_data(pad->port, (u8 *)&pad->buttons.btns);
+        ret = ds3usb_get_data(pad->port, (u8 *)&pad->buttons.btns);
         newpdata |= 0xffff ^ pad->buttons.btns;
     }
 

@@ -110,7 +110,8 @@ enum eBUF_SIZE {
 int ds3usb_init(uint8_t pads);
 int ds3usb_get_status(int port);
 void ds3usb_reset();
-void ds3usb_get_data(char *dst, int size, int port);
+int ds3usb_get_data(char *dst, int size, int port);
 void ds3usb_set_rumble(uint8_t lrum, uint8_t rrum, int port);
+void ds3usb_set_mode(int mode, int lock, int port);
 
 #endif

@@ -181,7 +181,7 @@ void kprtty_init(void)
     thid = CreateThread(&thp);
     StartThread(thid, (void *)kpa);
 
-    Kprintf_set((kprintf_handler_func_t *)Kprintf_Handler, (u32)kpa);
+    KprintfSet((KprintfHandler_t *)Kprintf_Handler, (u32*)kpa);
 }
 #endif
 

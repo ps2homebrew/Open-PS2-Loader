@@ -80,7 +80,6 @@ int EnableCheatOp;
 #ifdef PADEMU
 int EnablePadEmuOp;
 int PadEmuSettings;
-int pademu_reset();
 #endif
 
 int DisableDebug;

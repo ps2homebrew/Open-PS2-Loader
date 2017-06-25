@@ -36,7 +36,7 @@ I_strncmp
 sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start
-I_Kprintf_set
+I_KprintfSet
 sysmem_IMPORTS_end
 
 ps2ip_IMPORTS_start

@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     if (result == 0 && exd.epc != 0) {
         //Final IOP reset, to fill the IOP with the default modules.
-        while (!SifIopReset(NULL, 0)) {
+        while (!SifIopReset("", 0)) {
         };
 
         FlushCache(0);

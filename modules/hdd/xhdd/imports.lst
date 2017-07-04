@@ -1,0 +1,13 @@
+atad_IMPORTS_start
+I_ata_get_devinfo
+I_ata_io_start
+I_ata_io_finish
+atad_IMPORTS_end
+
+ioman_IMPORTS_start
+I_AddDrv
+ioman_IMPORTS_end
+
+sysclib_IMPORTS_start
+I_strcmp
+sysclib_IMPORTS_end

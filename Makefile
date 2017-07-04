@@ -82,7 +82,7 @@ GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 MISC_OBJS =	icon_sys_A.o icon_sys_J.o
 
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
-		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o genvmc.o hdldsvr.o \
+		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o
 
@@ -281,8 +281,6 @@ clean:
 	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo " -usbhdfsdfsv"
 	$(MAKE) -C modules/usb/usbhdfsdfsv clean
-	echo " -ps2dev9"
-	$(MAKE) -C modules/dev9 clean
 	echo " -SMSUTILS"
 	$(MAKE) -C modules/network/SMSUTILS clean
 	echo " -SMSTCPIP"
@@ -295,14 +293,8 @@ clean:
 	$(MAKE) -C modules/network/nbns clean
 	echo " -httpclient"
 	$(MAKE) -C modules/network/httpclient clean
-	echo " -ps2atad"
-	$(MAKE) -C modules/hdd/atad clean
-	echo " -hdpro_atad"
-	$(MAKE) -C modules/hdd/hdpro_atad clean
-	echo " -ps2hdd"
-	$(MAKE) -C modules/hdd/apa clean
-	echo " -ps2fs"
-	$(MAKE) -C modules/hdd/pfs clean
+	echo " -xhdd"
+	$(MAKE) -C modules/hdd/xhdd clean
 	echo " -mcemu"
 	$(MAKE) -C modules/mcemu USE_USB=1 clean
 	$(MAKE) -C modules/mcemu USE_HDD=1 clean
@@ -519,11 +511,7 @@ modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv
 $(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbhdfsdfsv_irx
 
-modules/dev9/ps2dev9.irx: modules/dev9
-	echo " -ps2dev9"
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)ps2dev9.s: modules/dev9/ps2dev9.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ps2dev9.s: $(PS2SDK)/iop/irx/ps2dev9.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2dev9_irx
 
 modules/network/SMSUTILS/SMSUTILS.irx: modules/network/SMSUTILS
@@ -569,29 +557,27 @@ modules/network/smbinit/smbinit.irx: modules/network/smbinit
 $(EE_ASM_DIR)smbinit.s: modules/network/smbinit/smbinit.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ smbinit_irx
 
-modules/hdd/atad/ps2atad.irx: modules/hdd/atad
-	echo " -ps2atad"
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)ps2atad.s: modules/hdd/atad/ps2atad.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)ps2atad.s: $(PS2SDK)/iop/irx/ps2atad.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2atad_irx
 
-modules/hdd/hdpro_atad/hdpro_atad.irx: modules/hdd/hdpro_atad
-	echo " -hdpro_atad"
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)hdpro_atad.s: modules/hdd/hdpro_atad/hdpro_atad.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)hdpro_atad.s: $(PS2SDK)/iop/irx/hdproatad.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdpro_atad_irx
 
 $(EE_ASM_DIR)poweroff.s: $(PS2SDK)/iop/irx/poweroff.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ poweroff_irx
 
-modules/hdd/apa/ps2hdd.irx: modules/hdd/apa
-	echo " -ps2hdd"
+modules/hdd/xhdd/xhdd.irx: modules/hdd/xhdd
+	echo " -xhdd"
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)ps2hdd.s: modules/hdd/apa/ps2hdd.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)xhdd.s: modules/hdd/xhdd/xhdd.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ xhdd_irx
+
+$(EE_ASM_DIR)ps2hdd.s: $(PS2SDK)/iop/irx/ps2hdd-osd.irx
 	$(BIN2S) $< $@ ps2hdd_irx
+
+$(EE_ASM_DIR)ps2fs.s: $(PS2SDK)/iop/irx/ps2fs-osd.irx
+	$(BIN2S) $< $@ ps2fs_irx
 
 modules/vmc/genvmc/genvmc.irx: modules/vmc/genvmc
 	echo " -genvmc"
@@ -648,13 +634,6 @@ modules/network/httpclient/httpclient.irx: modules/network/httpclient
 
 $(EE_ASM_DIR)httpclient-iop.s: modules/network/httpclient/httpclient.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ httpclient_irx
-
-modules/hdd/pfs/ps2fs.irx: modules/hdd/pfs
-	echo " -ps2fs"
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)ps2fs.s: modules/hdd/pfs/ps2fs.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ ps2fs_irx
 
 $(EE_ASM_DIR)iomanx.s: $(PS2SDK)/iop/irx/iomanX.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ iomanx_irx

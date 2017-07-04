@@ -2,31 +2,23 @@
 #  ____|   |    ____|   |        | |____|
 # |     ___|   |____ ___|    ____| |    \    PS2DEV Open Source Project.
 #-----------------------------------------------------------------------
-# Copyright 2001-2004, ps2dev - http://www.ps2dev.org
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
-# $Id: $
 
-IOP_BIN  = ps2dev9.irx
+IOP_BIN = xhdd.irx
+IOP_OBJS = xhdd.o xatad.o hdpro.o imports.o
 
-IOP_INCS +=
-IOP_CFLAGS  += -Wall -fno-builtin-printf -DCHECK_LOADED -DDEV9X_DEV -DPOWEROFF -DPCMCIA #-DDEBUG
+IOP_CFLAGS += -Wall -fno-builtin $(DEBUG_FLAGS)
 IOP_LDFLAGS += -s
-
-IOP_OBJS = ps2dev9.o exports.o imports.o
-IOP_LIBS =
+IOP_INCS += -I../common
 
 all: $(IOP_BIN)
 
 clean:
-	rm -f $(IOP_BIN) $(IOP_OBJS)
+	-rm -f $(IOP_OBJS) $(IOP_BIN)
 
 rebuild: clean all
 
-run:
-	ps2client -t 1 execiop host:$(IOP_BIN)
-
-
 include $(PS2SDK)/Defs.make
-include ../Rules.make
+include ../../Rules.make

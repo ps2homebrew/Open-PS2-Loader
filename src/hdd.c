@@ -1,4 +1,5 @@
 #include "include/opl.h"
+#include "include/hdd.h"
 #include "include/ioman.h"
 #include "include/hddsupport.h"
 
@@ -48,7 +49,7 @@ u32 hddGetTotalSectors(void)
 //-------------------------------------------------------------------------
 int hddIs48bit(void)
 {
-    return fileXioDevctl("hdd0:", APA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
+    return fileXioDevctl("xhdd0:", ATA_DEVCTL_IS_48BIT, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -59,7 +60,7 @@ int hddSetTransferMode(int type, int mode)
     *(u32 *)&args[0] = type;
     *(u32 *)&args[4] = mode;
 
-    return fileXioDevctl("hdd0:", APA_DEVCTL_SET_TRANSFER_MODE, args, 8, NULL, 0);
+    return fileXioDevctl("xhdd0:", ATA_DEVCTL_SET_TRANSFER_MODE, args, 8, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -289,4 +290,62 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo)
     sprintf(path, "hdd0:%s", ginfo->partition_name);
 
     return fileXioRemove(path);
+}
+
+//-------------------------------------------------------------------------
+int hddGetPartitionInfo(const char *name, apa_sub_t *parts)
+{
+    u32 lba;
+    iox_stat_t stat;
+    apa_header_t *header;
+    int result, i;
+
+    if((result = fileXioGetStat(name, &stat)) >= 0)
+    {
+        lba = stat.private_5;
+	header = (apa_header_t*)IOBuffer;
+
+        if(hddReadSectors(lba, sizeof(apa_header_t)/512, header) == 0)
+        {
+            parts[0].start = header->start;
+            parts[0].length = header->length;
+
+            for(i = 0; i < header->nsub; i++)
+                parts[1 + i] = header->subs[i];
+
+            result = header->nsub + 1;
+        }
+        else
+            result = -EIO;
+    }
+
+    return result;
+}
+
+//-------------------------------------------------------------------------
+int hddGetFileBlockInfo(const char *name, const apa_sub_t *subs, pfs_blockinfo_t *blocks, int max)
+{
+    u32 lba;
+    iox_stat_t stat;
+    pfs_inode_t *inode;
+    int result;
+
+    if((result = fileXioGetStat(name, &stat)) >= 0)
+    {
+        lba = subs[stat.private_4].start + stat.private_5;
+	inode = (pfs_inode_t*)IOBuffer;
+
+        if(hddReadSectors(lba, sizeof(pfs_inode_t)/512, inode) == 0)
+        {
+            if(inode->number_data < max) {
+                memcpy(blocks, inode->data, max * sizeof (pfs_blockinfo_t));
+                result = inode->number_data;
+            } else
+                result = -ENOMEM;
+        }
+        else
+            result = -EIO;
+    }
+
+    return result;
 }

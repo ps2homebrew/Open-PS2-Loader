@@ -12,7 +12,7 @@ IOP_BIN  = usbhdfsdfsv.irx
 IOP_OBJS = main.o imports.o
 IOP_LIBS =
 
-IOP_INCS +=
+IOP_INCS += -I../../../include/
 IOP_CFLAGS  += -Wall -fno-builtin-printf
 IOP_LDFLAGS += -s
 

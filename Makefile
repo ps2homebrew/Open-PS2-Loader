@@ -277,8 +277,6 @@ clean:
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
-	echo " -usbhdfsd"
-	$(MAKE) -C modules/usb/usbhdfsd clean
 	echo " -usbhdfsdfsv"
 	$(MAKE) -C modules/usb/usbhdfsdfsv clean
 	echo " -SMSUTILS"
@@ -457,10 +455,6 @@ $(EE_ASM_DIR)isofs.s: modules/isofs/isofs.irx | $(EE_ASM_DIR)
 $(EE_ASM_DIR)usbd.s: $(PS2SDK)/iop/irx/usbd.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbd_irx
 
-modules/usb/usbhdfsd/usbhdfsd.irx: modules/usb/usbhdfsd
-	echo " -usbhdfsd"
-	$(MAKE) -C $<
-
 $(EE_OBJS_DIR)libds3bt.a: modules/ds3bt/ee/libds3bt.a
 	cp $< $@
 
@@ -501,7 +495,7 @@ modules/pademu/usb_pademu.irx: modules/pademu
 $(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
 	$(BIN2S) $< $@ usb_pademu_irx
 
-$(EE_ASM_DIR)usbhdfsd.s: modules/usb/usbhdfsd/usbhdfsd.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)usbhdfsd.s: $(PS2SDK)/iop/irx/usbhdfsd.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbhdfsd_irx
 
 modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv

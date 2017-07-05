@@ -217,7 +217,7 @@ _LoadExecPS2:
 	daddu	$a1, $zero, $zero
 	daddu	$a2, $zero, $zero
 	daddu	$a3, $zero, $zero
-	addiu	$v1, $zero, __NR_ExecPS2
+	addiu	$v1, $zero, __NR__ExecPS2
 	syscall
 	nop
 

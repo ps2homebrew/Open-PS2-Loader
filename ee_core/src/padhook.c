@@ -134,7 +134,7 @@ static void t_loadElf(void)
             GS_BGCOLOUR = 0x0080FF; // Orange
 
         // Execute BOOT.ELF
-        ExecPS2((void *)elf.epc, (void *)elf.gp, 1, argv);
+        _ExecPS2((void *)elf.epc, (void *)elf.gp, 1, argv);
     }
 
     if (!DisableDebug) {
@@ -143,7 +143,7 @@ static void t_loadElf(void)
     }
 
     // Return to PS2 Browser
-    Exit(0);
+    _Exit(0);
 }
 
 // Poweroff PlayStation 2
@@ -273,10 +273,10 @@ static void IGR_Thread(void *arg)
 
         // Execute home loader
         if (ExitPath[0] != '\0')
-            ExecPS2(t_loadElf, &_gp, 0, NULL);
+            _ExecPS2(t_loadElf, &_gp, 0, NULL);
 
         // Return to PS2 Browser
-        Exit(0);
+        _Exit(0);
     }
 
     // If combo is R3 + L3 or Reset failed, Poweroff PS2

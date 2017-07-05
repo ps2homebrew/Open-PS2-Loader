@@ -20,7 +20,7 @@ static inline void BootError(char *filename)
     argv[0] = "BootError";
     argv[1] = filename;
 
-    ExecOSD(2, argv);
+    _ExecOSD(2, argv);
 }
 
 static inline void InitializeUserMemory(unsigned int start, unsigned int end)
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     if (result == 0 && exd.epc != 0) {
         //Final IOP reset, to fill the IOP with the default modules.
-        while (!SifIopReset(NULL, 0)) {
+        while (!SifIopReset("", 0)) {
         };
 
         FlushCache(0);
@@ -66,7 +66,6 @@ int main(int argc, char *argv[])
         while (!SifIopSync()) {
         };
 
-        //Sync with the SIF library on the IOP, or it may crash the IOP kernel during the next reset (Depending on the how the next program initializes the IOP).
         SifInitRpc(0);
         //Load modules.
         SifLoadFileInit();
@@ -76,7 +75,7 @@ int main(int argc, char *argv[])
         SifLoadFileExit();
         SifExitRpc();
 
-        ExecPS2((void *)exd.epc, (void *)exd.gp, argc, argv);
+        _ExecPS2((void *)exd.epc, (void *)exd.gp, argc, argv);
     } else {
         SifExitRpc();
     }

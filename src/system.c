@@ -247,7 +247,7 @@ void sysReset(int modload_mask)
     while (!SifIopReset("rom0:UDNL", 0))
         ;
 #else
-    while (!SifIopReset(NULL, 0))
+    while (!SifIopReset("", 0))
         ;
 #endif
 

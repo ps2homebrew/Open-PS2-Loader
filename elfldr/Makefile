@@ -1,5 +1,6 @@
 EE_BIN = elfldr.elf
-EE_OBJS = elfldr.o crt0.o
+KERNEL_OBJS = iWakeupThread.o #iWakeupThread is used by SIFRPC. This prevents the thread patch from libkernel from being linked to.
+EE_OBJS = elfldr.o crt0.o $(KERNEL_OBJS)
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -I.
 EE_CFLAGS := -D_EE -O2 -mgpopt -G8192 -Wall $(EE_INCS)
@@ -16,10 +17,12 @@ EE_LIBS += -lkernel
 $(EE_BIN) : $(EE_OBJS)
 	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS) -Xlinker -Map -Xlinker elfldr.map
 
-
 all: $(EE_BIN)
 
 clean:
 	rm -f $(EE_BIN) $(EE_OBJS) elfldr.map
+
+$(KERNEL_OBJS:%=$(EE_OBJS_DIR)%): $(EE_SRC_DIR)kernel_custom.S
+	$(EE_CC) $(EE_CFLAGS) -DF_$(*:$(EE_OBJS_DIR)%=%) $< -c -o $@
 
 include $(PS2SDK)/samples/Makefile.pref

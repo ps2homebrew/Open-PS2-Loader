@@ -10,18 +10,6 @@
 #ifndef IOPMGR_H
 #define IOPMGR_H
 
-#define RESET_ARG_MAX 79
-
-struct _iop_reset_pkt
-{
-    struct t_SifCmdHeader header;
-    int arglen;
-    int mode;
-    char arg[RESET_ARG_MAX + 1];
-} ALIGNED(16);
-
-void InitSIF0(void);
-void SyncSIF0(void);
 int New_Reset_Iop(const char *arg, int arglen);
 int Reset_Iop(const char *arg, int flag);
 

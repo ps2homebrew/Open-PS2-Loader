@@ -122,7 +122,7 @@ int New_Reset_Iop(const char *arg, int arglen)
     iop_reboot_count++;
 
     // Reseting IOP.
-    while (!Reset_Iop(NULL, 0)) {
+    while (!Reset_Iop("", 0)) {
         ;
     }
     while (!SifIopSync()) {
@@ -183,8 +183,9 @@ int New_Reset_Iop(const char *arg, int arglen)
 /*----------------------------------------------------------------------------------------*/
 int Reset_Iop(const char *arg, int mode)
 {
-    struct _iop_reset_pkt reset_pkt; /* Implicitly aligned. */
+    static SifCmdResetData_t reset_pkt __attribute__((aligned(64)));
     struct t_SifDmaTransfer dmat;
+    int arglen;
 
     _iop_reboot_count++; // increment reboot counter to allow RPC clients to detect unbinding!
 
@@ -200,18 +201,13 @@ int Reset_Iop(const char *arg, int mode)
 				That caused SifSetDChain() to be run ASAP, which re-enables SIF0.
 				I don't find that a good workaround because it may result in a timing problem.	*/
 
-    memset(&reset_pkt, 0, sizeof reset_pkt);
+    for(arglen = 0; arg[arglen] != '\0'; arglen++)
+        reset_pkt.arg[arglen] = arg[arglen];
 
-    reset_pkt.header.size = sizeof reset_pkt;
+    reset_pkt.header.psize = sizeof reset_pkt;	//dsize is not initialized (and not processed, even on the IOP).
     reset_pkt.header.cid = SIF_CMD_RESET_CMD;
-
+    reset_pkt.arglen = arglen;
     reset_pkt.mode = mode;
-    if (arg != NULL) {
-        strncpy(reset_pkt.arg, arg, RESET_ARG_MAX);
-        reset_pkt.arg[RESET_ARG_MAX] = '\0';
-
-        reset_pkt.arglen = strlen(reset_pkt.arg) + 1;
-    }
 
     dmat.src = &reset_pkt;
     dmat.dest = (void *)SifGetReg(SIF_SYSREG_SUBADDR);

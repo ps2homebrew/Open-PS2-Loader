@@ -370,7 +370,7 @@ static int IGR_Intc_Handler(int cause)
         for (i = 1; i < 256; i++) {
             if (i != IGR_Thread_ID) {
                 // Suspend all threads
-                iSuspendThread(i);
+                _iSuspendThread(i);
                 iChangeThreadPriority(i, 127);
             }
         }
@@ -378,7 +378,7 @@ static int IGR_Intc_Handler(int cause)
         DPRINTF("IGR: trying to wake IGR thread...\n");
         iChangeThreadPriority(IGR_Thread_ID, 0);
         // WakeUp IGR thread
-        iWakeupThread(IGR_Thread_ID);
+        _iWakeupThread(IGR_Thread_ID);
     }
 
     ExitHandler();

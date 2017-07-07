@@ -86,14 +86,17 @@ static int io_sema = -1;
 #define ATAWRITE 0
 #endif
 
+#define ATA_EV_TIMEOUT	1
+#define ATA_EV_COMPLETE	2
+
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
 
 /* ATA command info.  */
 typedef struct _ata_cmd_info
 {
-    unsigned char command;
-    unsigned char type;
+    u8 command;
+    u8 type;
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
@@ -117,12 +120,15 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 #define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
 
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
-typedef struct _ata_cmd_state
-{
-    int type; /* The ata_cmd_info_t type field. */
-    void *buf;
-    unsigned int blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
-    int dir;               /* DMA direction: 0 - to RAM, 1 - from RAM.  */
+typedef struct _ata_cmd_state {
+	s32	type;		/* The ata_cmd_info_t type field. */
+	union {
+		void	*buf;
+		u8	*buf8;
+		u16	*buf16;
+	};
+	u32	blkcount;	/* The number of 512-byte blocks (sectors) to transfer.  */
+	s32	dir;		/* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -131,11 +137,16 @@ static int hdpro_io_active = 0;
 static int intr_suspended = 0;
 static int intr_state;
 
-static int ata_wait_busy(int bits);
+static int hdpro_io_start(void);
+static int hdpro_io_finish(void);
+static void hdpro_io_write(unsigned char cmd, unsigned short int val);
+static int hdpro_io_read(unsigned char cmd);
+static int hdpro_io_init(void);
+static int gen_ata_wait_busy(int bits);
 
 static unsigned int ata_alarm_cb(void *unused)
 {
-    iSetEventFlag(ata_evflg, 0x01);
+    iSetEventFlag(ata_evflg, ATA_EV_TIMEOUT);
     return 0;
 }
 
@@ -155,6 +166,107 @@ static void resume_intr(void)
 
         intr_suspended = 0;
     }
+}
+
+int atad_start(void)
+{
+    int res = 1;
+    iop_event_t event;
+
+    M_PRINTF(BANNER, VERSION);
+
+    event.attr = 0;
+    event.bits = 0;
+    if ((ata_evflg = CreateEventFlag(&event)) < 0) {
+        M_PRINTF("Couldn't create event flag, exiting.\n");
+        goto out;
+    }
+
+    hdpro_io_start();
+
+    HDPROreg_IO8 = 0xe3;
+    CDVDreg_STATUS = 0;
+
+    if (hdpro_io_init() != 0)
+        goto out;
+
+#ifdef VMC_DRIVER
+    iop_sema_t smp;
+    smp.initial = 1;
+    smp.max = 1;
+    smp.option = 0;
+    smp.attr = SA_THPRI;
+    io_sema = CreateSema(&smp);
+#endif
+
+    res = 0;
+    M_PRINTF("Driver loaded.\n");
+
+out:
+    hdpro_io_finish();
+    return res;
+}
+
+/* Export 8 */
+int ata_get_error()
+{
+    return hdpro_io_read(ATAreg_ERROR_RD) & 0xff;
+}
+
+#define ATA_WAIT_BUSY		0x80
+#define ATA_WAIT_BUSBUSY	0x88
+
+#define ata_wait_busy()		gen_ata_wait_busy(ATA_WAIT_BUSY)
+#define ata_wait_bus_busy()	gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
+
+/* 0x80 for busy, 0x88 for bus busy.
+	In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
+static int gen_ata_wait_busy(int bits)
+{
+    int i, didx, delay;
+    int res = 0;
+
+    for (i = 0; i < 80; i++) {
+
+        hdpro_io_start();
+
+        unsigned short int r_control = hdpro_io_read(ATAreg_CONTROL_RD);
+
+        hdpro_io_finish();
+
+        if (!((r_control & 0xffff) & bits))
+            goto out;
+
+        didx = i / 10;
+        switch (didx) {
+            case 0:
+                continue;
+            case 1:
+                delay = 100;
+                break;
+            case 2:
+                delay = 1000;
+                break;
+            case 3:
+                delay = 10000;
+                break;
+            case 4:
+                delay = 100000;
+                break;
+            default:
+                delay = 1000000;
+        }
+
+        DelayThread(delay);
+    }
+
+    res = ATA_RES_ERR_TIMEOUT;
+    M_PRINTF("Timeout while waiting on busy (0x%02x).\n", bits);
+
+out:
+    hdpro_io_start();
+
+    return res;
 }
 
 static int hdpro_io_start(void)
@@ -264,108 +376,14 @@ static int hdpro_io_init(void)
 
     DelayThread(3000);
 
-    return ata_wait_busy(0x80);
-}
-
-int atad_start(void)
-{
-    int res = 1;
-    iop_event_t event;
-
-    M_PRINTF(BANNER, VERSION);
-
-    event.attr = 0;
-    event.bits = 0;
-    if ((ata_evflg = CreateEventFlag(&event)) < 0) {
-        M_PRINTF("Couldn't create event flag, exiting.\n");
-        goto out;
-    }
-
-    hdpro_io_start();
-
-    HDPROreg_IO8 = 0xe3;
-    CDVDreg_STATUS = 0;
-
-    if (hdpro_io_init() != 0)
-        goto out;
-
-#ifdef VMC_DRIVER
-    iop_sema_t smp;
-    smp.initial = 1;
-    smp.max = 1;
-    smp.option = 0;
-    smp.attr = 1;
-    io_sema = CreateSema(&smp);
-#endif
-
-    res = 0;
-    M_PRINTF("Driver loaded.\n");
-
-out:
-    hdpro_io_finish();
-    return res;
-}
-
-/* Export 8 */
-int ata_get_error()
-{
-    return hdpro_io_read(ATAreg_ERROR_RD) & 0xff;
-}
-
-/* 0x80 for busy, 0x88 for bus busy.  */
-static int ata_wait_busy(int bits)
-{
-    int i, didx, delay;
-    int res = 0;
-
-    for (i = 0; i < 80; i++) {
-
-        hdpro_io_start();
-
-        unsigned short int r_control = hdpro_io_read(ATAreg_CONTROL_RD);
-
-        hdpro_io_finish();
-
-        if (!((r_control & 0xffff) & bits))
-            goto out;
-
-        didx = i / 10;
-        switch (didx) {
-            case 0:
-                continue;
-            case 1:
-                delay = 100;
-                break;
-            case 2:
-                delay = 1000;
-                break;
-            case 3:
-                delay = 10000;
-                break;
-            case 4:
-                delay = 100000;
-                break;
-            default:
-                delay = 1000000;
-        }
-
-        DelayThread(delay);
-    }
-
-    res = -502;
-    M_PRINTF("Timeout while waiting on busy (0x%02x).\n", bits);
-
-out:
-    hdpro_io_start();
-
-    return res;
+    return ata_wait_busy();
 }
 
 static int ata_device_select(int device)
 {
     int res;
 
-    if ((res = ata_wait_busy(0x88)) < 0)
+    if ((res = ata_wait_bus_busy()) < 0)
         return res;
 
     /* If the device was already selected, nothing to do.  */
@@ -376,7 +394,7 @@ static int ata_device_select(int device)
     hdpro_io_write(ATAreg_SELECT_WR, (device & 1) << 4);
     res = hdpro_io_read(ATAreg_CONTROL_RD);
 
-    return ata_wait_busy(0x88);
+    return ata_wait_bus_busy();
 }
 
 /* Export 6 */
@@ -386,7 +404,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     const ata_cmd_info_t *cmd_table;
     int i, res, type, cmd_table_size;
     int using_timeout, device = (select >> 4) & 1;
-    unsigned int searchcmd;
+    u8 searchcmd;
 
     ClearEventFlag(ata_evflg, 0);
 
@@ -398,23 +416,23 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     if (command == ATA_C_SMART) {
         cmd_table = smart_cmd_table;
         cmd_table_size = SMART_CMD_TABLE_SIZE;
-        searchcmd = feature;
+        searchcmd = (u8)feature;
     } else {
         cmd_table = ata_cmd_table;
         cmd_table_size = ATA_CMD_TABLE_SIZE;
-        searchcmd = command;
+        searchcmd = (u8)command;
     }
 
     type = 0;
     for (i = 0; i < cmd_table_size; i++) {
-        if ((searchcmd & 0xff) == cmd_table[i].command) {
+        if (searchcmd == cmd_table[i].command) {
             type = cmd_table[i].type;
             break;
         }
     }
 
     if (!(atad_cmd_state.type = type & 0x7F))
-        return -506;
+        return ATA_RES_ERR_CMD;
 
     atad_cmd_state.buf = buf;
     atad_cmd_state.blkcount = blkcount;
@@ -422,15 +440,15 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     /* Check that the device is ready if this the appropiate command.  */
     if (!(hdpro_io_read(ATAreg_CONTROL_RD) & 0x40)) {
         switch (command) {
-            case 0x08:
-            case 0x90:
-            case 0x91:
-            case 0xa0:
-            case 0xa1:
+            case ATA_C_DEVICE_RESET:
+            case ATA_C_EXECUTE_DEVICE_DIAGNOSTIC:
+            case ATA_C_INITIALIZE_DEVICE_PARAMETERS:
+            case ATA_C_PACKET:
+            case ATA_C_IDENTIFY_PACKET_DEVICE:
                 break;
             default:
                 M_PRINTF("Error: Device %d is not ready.\n", device);
-                return -501;
+                return ATA_RES_ERR_NOTREADY;
         }
     }
 
@@ -488,7 +506,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     hdpro_io_write(ATAreg_LCYL_WR, lcyl & 0xff);
     hdpro_io_write(ATAreg_HCYL_WR, hcyl & 0xff);
 
-    hdpro_io_write(ATAreg_SELECT_WR, select & 0xff);
+    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff);	//In v1.04, LBA was enabled in the ata_device_sector_io function.
     hdpro_io_write(ATAreg_COMMAND_WR, command & 0xff);
 
     return 0;
@@ -497,50 +515,52 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 /* Do a PIO transfer, to or from the device.  */
 static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 {
-    void *buf;
     int i, type;
     int res = 0, chk = 0;
-    unsigned short int status = hdpro_io_read(ATAreg_STATUS_RD);
+    u8 *buf8;
+    u16 *buf16;
+    u16 status = hdpro_io_read(ATAreg_STATUS_RD);
 
     if (status & ATA_STAT_ERR) {
         M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", status, ata_get_error());
-        return -503;
+        return ATA_RES_ERR_IO;
     }
 
     /* DRQ must be set (data request).  */
     if (!(status & ATA_STAT_DRQ))
-        return -504;
+        return ATA_RES_ERR_NODATA;
 
     type = cmd_state->type;
 
     if (type == 3 || type == 8) {
         /* PIO data out */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
 
         HDPROreg_IO8 = 0x43;
         CDVDreg_STATUS = 0;
 
         for (i = 0; i < 256; i++) {
-            unsigned short int r_data = *(unsigned short int *)buf;
+            u16 r_data = *buf16;
             hdpro_io_write(ATAreg_DATA_WR, r_data);
             chk ^= r_data + i;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            cmd_state->buf16 = ++buf16;
         }
 
-        unsigned short int out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
+        u16 out = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
         if (out != (chk & 0xffff))
-            return -504;
+            return ATA_RES_ERR_NODATA;
 
         if (cmd_state->type == 8) {
+            buf8 = cmd_state->buf8;
             for (i = 0; i < 4; i++) {
-                hdpro_io_write(ATAreg_DATA_WR, *(unsigned char *)buf);
-                cmd_state->buf = ++((unsigned char *)buf);
+                hdpro_io_write(ATAreg_DATA_WR, *buf8);
+                cmd_state->buf8 = ++buf8;
             }
         }
 
     } else if (type == 2) {
         /* PIO data in  */
-        buf = cmd_state->buf;
+        buf16 = cmd_state->buf16;
 
         suspend_intr();
 
@@ -558,8 +578,8 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
             res0 = (res0 & 0xff) | (res1 << 8);
             chk ^= res0 + i;
 
-            *(unsigned short int *)buf = res0 & 0xffff;
-            cmd_state->buf = ++((unsigned short int *)buf);
+            *buf16 = res0 & 0xffff;
+            cmd_state->buf = ++buf16;
         }
 
         HDPROreg_IO8 = 0x51;
@@ -568,9 +588,9 @@ static int ata_pio_transfer(ata_cmd_state_t *cmd_state)
 
         resume_intr();
 
-        unsigned short int r_data = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
+        u16 r_data = hdpro_io_read(ATAreg_DATA_RD) & 0xffff;
         if (r_data != (chk & 0xffff))
-            return -504;
+            return ATA_RES_ERR_NODATA;
     }
 
     return res;
@@ -598,10 +618,10 @@ int ata_io_finish(void)
 
         if (((ret & 0xff) & 1) == 0) {
 
-            WaitEventFlag(ata_evflg, 0x03, WEF_CLEAR | WEF_OR, &bits);
-            if (bits & 0x01) { /* Timeout.  */
+            WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
+            if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
                 M_PRINTF("Error: ATA timeout on a non-data command.\n");
-                return -502;
+                return ATA_RES_ERR_TIMEOUT;
             }
 
             DelayThread(500);
@@ -610,17 +630,17 @@ int ata_io_finish(void)
 
     } else if (type == 4) { /* DMA.  */
         M_PRINTF("Error: DMA mode not implemented.\n");
-        res = -502;
+        res = ATA_RES_ERR_TIMEOUT;
     } else { /* PIO transfers.  */
         stat = hdpro_io_read(ATAreg_CONTROL_RD);
-        if ((res = ata_wait_busy(0x80)) < 0)
+        if ((res = ata_wait_busy()) < 0)
             goto finish;
 
         /* Transfer each PIO data block.  */
         while (--cmd_state->blkcount != -1) {
             if ((res = ata_pio_transfer(cmd_state)) < 0)
                 goto finish;
-            if ((res = ata_wait_busy(0x80)) < 0)
+            if ((res = ata_wait_busy()) < 0)
                 goto finish;
         }
     }
@@ -630,10 +650,10 @@ int ata_io_finish(void)
 
     /* Wait until the device isn't busy.  */
     if (hdpro_io_read(ATAreg_STATUS_RD) & ATA_STAT_BUSY)
-        res = ata_wait_busy(0x80);
+        res = ata_wait_busy();
     if ((stat = hdpro_io_read(ATAreg_STATUS_RD)) & ATA_STAT_ERR) {
         M_PRINTF("Error: Command error: status 0x%02x, error 0x%02x.\n", stat, ata_get_error());
-        res = -503;
+        res = ATA_RES_ERR_IO;
     }
 
 finish:
@@ -644,11 +664,11 @@ finish:
 }
 
 /* Export 9 */
-int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir)
+int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
 {
     int res = 0;
     unsigned int nbytes;
-    unsigned short int sector, lcyl, hcyl, select, command, len;
+    u16 sector, lcyl, hcyl, select, command, len;
 
     WAITIOSEMA(io_sema);
 
@@ -666,14 +686,14 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
             /* Setup for 48-bit LBA.  */
             /* Combine bits 24-31 and bits 0-7 of lba into sector.  */
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
-            /* 0x40 enables LBA.  */
-            select = ((device << 4) | 0x40) & 0xffff;
+            /* In v1.04, LBA was enabled here.  */
+            select = (device << 4) & 0xffff;
             command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
         } else {
             /* Setup for 28-bit LBA.  */
             sector = lba & 0xff;
-            /* 0x40 enables LBA.  */
-            select = ((device << 4) | ((lba >> 24) & 0xf) | 0x40) & 0xffff;
+            /* In v1.04, LBA was enabled here.  */
+            select = ((device << 4) | ((lba >> 24) & 0xf)) & 0xffff;
             command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
         }
 
@@ -684,7 +704,7 @@ int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int n
             continue;
 
         nbytes = len * 512;
-        (u8 *)buf += nbytes;
+        buf = (void*)((u8 *)buf + len * 512);
         lba += len;
         nsectors -= len;
     }

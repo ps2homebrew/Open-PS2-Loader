@@ -196,7 +196,7 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x0000FF; // Red
 
         // Reset IO Processor
-        while (!Reset_Iop(NULL, 0)) {
+        while (!Reset_Iop("", 0)) {
             ;
         }
 

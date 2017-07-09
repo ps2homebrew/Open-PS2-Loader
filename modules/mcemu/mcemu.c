@@ -7,16 +7,14 @@
 
 #include "mcemu.h"
 
-
 static int readyToGo = -1;
 void StartNow(void *param);
 #ifdef PADEMU
-void(pademu_hookSio2man *)(Sio2Packet *sd, Sio2McProc sio2proc);
-
 void no_pademu(Sio2Packet *sd, Sio2McProc sio2proc)
 {
-    sioproc(sd);
+    sio2proc(sd);
 }
+void (*pademu_hookSio2man)(Sio2Packet *sd, Sio2McProc sio2proc) = no_pademu;
 #endif
 
 //---------------------------------------------------------------------------
@@ -85,15 +83,6 @@ void StartNow(void *param)
     } else {
         DPRINTF("SECRMAN exports not found.\n");
     }
-
-#ifdef PADEMU
-    exp = GetExportTable("pademu", 0x101);
-    if (exp != NULL) {
-        pademu_hookSio2man = GetExportEntry(exp, 4);
-    } else {
-        pademu_hookSio2man = no_pademu;
-    }
-#endif
 
     readyToGo = MODULE_RESIDENT_END;
 }
@@ -241,16 +230,43 @@ int DummySecrAuthCard(int port, int slot, int cnum)
 /* Hook for the LOADCORE's RegisterLibraryEntires call */
 int hookRegisterLibraryEntires(iop_library_t *lib)
 {
+    register int ret;
+
     if (!strncmp(lib->name, "sio2man", 8)) {
-        /* hooking SIO2MAN's routines */
-        InstallSio2manHook(&lib[1]);
+        ret = pRegisterLibraryEntires(lib);
+        if (ret == 0) {
+            ReleaseLibraryEntries((struct irx_export_table *)lib);
+            /* hooking SIO2MAN's routines */
+            InstallSio2manHook(&lib[1]);
+        } else {
+            DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
+            return ret;
+        }
     } else if (!strncmp(lib->name, "secrman", 8)) {
-        /* hooking the SecrAuthCard() calls */
-        InstallSecrmanHook(&lib[1]);
+        ret = pRegisterLibraryEntires(lib);
+        if (ret == 0) {
+            ReleaseLibraryEntries((struct irx_export_table *)lib);
+            /* hooking the SecrAuthCard() calls */
+            InstallSecrmanHook(&lib[1]);
+        } else {
+            DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
+            return ret;
+        }
     } else if (!strncmp(lib->name, "mcman", 8)) {
-        /* hooking MCMAN's sceMcReadFast() & sceMcWriteFast() calls */
-        if (lib->version >= 0x208)
-            InstallMcmanHook(&lib[1]);
+        ret = pRegisterLibraryEntires(lib);
+        if (ret == 0) {
+            ReleaseLibraryEntries((struct irx_export_table *)lib);
+            /* hooking MCMAN's sceMcReadFast() & sceMcWriteFast() calls */
+            if (lib->version >= 0x208)
+                InstallMcmanHook(&lib[1]);
+        } else {
+            DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
+            return ret;
+        }
+#ifdef PADEMU
+    } else if (!strncmp(lib->name, "pademu", 8)) {
+        pademu_hookSio2man = GetExportEntry(&lib[1], 4);
+#endif
     }
 
     DPRINTF("registering library %s\n", lib->name);

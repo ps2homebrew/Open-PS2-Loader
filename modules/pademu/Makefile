@@ -12,6 +12,9 @@ IOP_CFLAGS += -DBT -DUSE_THREAD
 IOP_OBJNAME = bt.
 IOP_OBJS += ds3bt.o
 endif
+ifeq ($(VMC),1)
+IOP_CFLAGS += -DVMC
+endif
 
 IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJNAME)%)
 

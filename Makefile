@@ -436,21 +436,21 @@ $(EE_ASM_DIR)cdvdfsv.s: modules/iopcore/cdvdfsv/cdvdfsv.irx | $(EE_ASM_DIR)
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_USB=1 -C $< rebuild
 
 $(EE_ASM_DIR)usb_mcemu.s: modules/mcemu/usb_mcemu.irx
 	$(BIN2S) $< $@ usb_mcemu_irx
 
 modules/mcemu/hdd_mcemu.irx: modules/mcemu
 	echo " -hdd_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_HDD=1 -C $< rebuild
 
 $(EE_ASM_DIR)hdd_mcemu.s: modules/mcemu/hdd_mcemu.irx
 	$(BIN2S) $< $@ hdd_mcemu_irx
 
 modules/mcemu/smb_mcemu.irx: modules/mcemu
 	echo " -smb_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_SMB=1 -C $< rebuild
 
 $(EE_ASM_DIR)smb_mcemu.s: modules/mcemu/smb_mcemu.irx
 	$(BIN2S) $< $@ smb_mcemu_irx
@@ -497,14 +497,14 @@ $(EE_ASM_DIR)ds3usb.s: modules/ds3usb/iop/ds3usb.irx | $(EE_ASM_DIR)
 
 modules/pademu/bt_pademu.irx: modules/pademu
 	echo " -bt_pademu"
-	$(MAKE) -C $< USE_BT=1
+	$(MAKE) -C $< $(VMC_FLAGS) USE_BT=1
 
 $(EE_ASM_DIR)bt_pademu.s: modules/pademu/bt_pademu.irx
 	$(BIN2S) $< $@ bt_pademu_irx
 
 modules/pademu/usb_pademu.irx: modules/pademu
 	echo " -usb_pademu"
-	$(MAKE) -C $< USE_USB=1
+	$(MAKE) -C $< $(VMC_FLAGS) USE_USB=1
 
 $(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
 	$(BIN2S) $< $@ usb_pademu_irx

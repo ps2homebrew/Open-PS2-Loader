@@ -144,15 +144,19 @@ int New_Reset_Iop(const char *arg, int arglen)
             GS_BGCOLOUR = 0x00FFFF; //Yellow
     }
 
+#ifdef VMC
+    if (iop_reboot_count >= 2) {
 #ifdef PADEMU
-    if (iop_reboot_count >= 2 && EnablePadEmuOp) {
-        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, 4, (char *)&PadEmuSettings);
+        PadEmuSettings |= (LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL) > 0) << 24;
+#else
+        LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL);
+#endif
     }
 #endif
 
-#ifdef VMC
-    if (iop_reboot_count >= 2) {
-        LoadOPLModule(OPL_MODULE_ID_MCEMU, 0, 0, NULL);
+#ifdef PADEMU
+    if (iop_reboot_count >= 2 && EnablePadEmuOp) {
+        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, 4, (char *)&PadEmuSettings);
     }
 #endif
 

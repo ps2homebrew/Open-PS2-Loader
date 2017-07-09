@@ -20,6 +20,8 @@
 #include "vblank.h"
 #include "ds3bt.h"
 
+IRX_ID("ds3bt", 1, 1);
+
 //#define DPRINTF(x...) printf(x)
 #define DPRINTF(x...)
 
@@ -213,9 +215,7 @@ static void usb_probeEndpoint(int devId, UsbEndpointDescriptor *endpoint)
         if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && bt_dev.outEndp < 0) {
             bt_dev.outEndp = UsbOpenEndpointAligned(devId, endpoint);
             DPRINTF("BT: register Output endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.outEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
-        } else
-
-            if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_dev.inEndp < 0) {
+        } else if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && bt_dev.inEndp < 0) {
             bt_dev.inEndp = UsbOpenEndpointAligned(devId, endpoint);
             DPRINTF("BT: register Input endpoint id =%i addr=%02X packetSize=%i\n", bt_dev.inEndp, endpoint->bEndpointAddress, (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB);
         }
@@ -291,88 +291,96 @@ UsbDriver chrg_driver = {NULL, NULL, "chrg", chrg_probe, chrg_connect, chrg_disc
 
 /* PS Remote Reports */
 static uint8_t feature_F4_report[] =
-    {
-        0x42, 0x03, 0x00, 0x00};
+{
+    0x42, 0x03, 0x00, 0x00
+};
 
 static uint8_t output_01_report[] =
-    {
-        0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x02,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00};
+{
+    0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x02,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00
+};
+
+static uint8_t power_level[] =
+{
+    0x00, 0x00, 0x02, 0x06, 0x0E, 0x1E
+};
 
 // Taken from nefarius' SCPToolkit
 // https://github.com/nefarius/ScpToolkit/blob/master/ScpControl/ScpControl.ini
 // Valid MAC addresses used by Sony
 static uint8_t GenuineMacAddress[][3] =
-    {
-        // Bluetooth chips by ALPS ELECTRIC CO., LTD
-        {0x00, 0x02, 0xC7},
-        {0x00, 0x06, 0xF5},
-        {0x00, 0x06, 0xF7},
-        {0x00, 0x07, 0x04},
-        {0x00, 0x16, 0xFE},
-        {0x00, 0x19, 0xC1},
-        {0x00, 0x1B, 0xFB},
-        {0x00, 0x1E, 0x3D},
-        {0x00, 0x21, 0x4F},
-        {0x00, 0x23, 0x06},
-        {0x00, 0x24, 0x33},
-        {0x00, 0x26, 0x43},
-        {0x00, 0xA0, 0x79},
-        {0x04, 0x76, 0x6E},
-        {0x04, 0x98, 0xF3},
-        {0x28, 0xA1, 0x83},
-        {0x34, 0xC7, 0x31},
-        {0x38, 0xC0, 0x96},
-        {0x60, 0x38, 0x0E},
-        {0x64, 0xD4, 0xBD},
-        {0xAC, 0x7A, 0x4D},
-        {0xE0, 0x75, 0x0A},
-        {0xE0, 0xAE, 0x5E},
-        {0xFC, 0x62, 0xB9},
-        // Bluetooth chips by AzureWave Technology Inc.
-        {0xE0, 0xB9, 0xA5},
-        {0xDC, 0x85, 0xDE},
-        {0xD0, 0xE7, 0x82},
-        {0xB0, 0xEE, 0x45},
-        {0xAC, 0x89, 0x95},
-        {0xA8, 0x1D, 0x16},
-        {0x94, 0xDB, 0xC9},
-        {0x80, 0xD2, 0x1D},
-        {0x80, 0xA5, 0x89},
-        {0x78, 0x18, 0x81},
-        {0x74, 0xF0, 0x6D},
-        {0x74, 0xC6, 0x3B},
-        {0x74, 0x2F, 0x68},
-        {0x6C, 0xAD, 0xF8},
-        {0x6C, 0x71, 0xD9},
-        {0x60, 0x5B, 0xB4},
-        {0x5C, 0x96, 0x56},
-        {0x54, 0x27, 0x1E},
-        {0x4C, 0xAA, 0x16},
-        {0x48, 0x5D, 0x60},
-        {0x44, 0xD8, 0x32},
-        {0x40, 0xE2, 0x30},
-        {0x38, 0x4F, 0xF0},
-        {0x28, 0xC2, 0xDD},
-        {0x24, 0x0A, 0x64},
-        {0x1C, 0x4B, 0xD6},
-        {0x08, 0xA9, 0x5A},
-        {0x00, 0x25, 0xD3},
-        {0x00, 0x24, 0x23},
-        {0x00, 0x22, 0x43},
-        {0x00, 0x15, 0xAF},
-        //fake with AirohaTechnologyCorp's Chip
-        {0x0C, 0xFC, 0x83}};
+{
+    // Bluetooth chips by ALPS ELECTRIC CO., LTD
+    {0x00, 0x02, 0xC7},
+    {0x00, 0x06, 0xF5},
+    {0x00, 0x06, 0xF7},
+    {0x00, 0x07, 0x04},
+    {0x00, 0x16, 0xFE},
+    {0x00, 0x19, 0xC1},
+    {0x00, 0x1B, 0xFB},
+    {0x00, 0x1E, 0x3D},
+    {0x00, 0x21, 0x4F},
+    {0x00, 0x23, 0x06},
+    {0x00, 0x24, 0x33},
+    {0x00, 0x26, 0x43},
+    {0x00, 0xA0, 0x79},
+    {0x04, 0x76, 0x6E},
+    {0x04, 0x98, 0xF3},
+    {0x28, 0xA1, 0x83},
+    {0x34, 0xC7, 0x31},
+    {0x38, 0xC0, 0x96},
+    {0x60, 0x38, 0x0E},
+    {0x64, 0xD4, 0xBD},
+    {0xAC, 0x7A, 0x4D},
+    {0xE0, 0x75, 0x0A},
+    {0xE0, 0xAE, 0x5E},
+    {0xFC, 0x62, 0xB9},
+    // Bluetooth chips by AzureWave Technology Inc.
+    {0xE0, 0xB9, 0xA5},
+    {0xDC, 0x85, 0xDE},
+    {0xD0, 0xE7, 0x82},
+    {0xB0, 0xEE, 0x45},
+    {0xAC, 0x89, 0x95},
+    {0xA8, 0x1D, 0x16},
+    {0x94, 0xDB, 0xC9},
+    {0x80, 0xD2, 0x1D},
+    {0x80, 0xA5, 0x89},
+    {0x78, 0x18, 0x81},
+    {0x74, 0xF0, 0x6D},
+    {0x74, 0xC6, 0x3B},
+    {0x74, 0x2F, 0x68},
+    {0x6C, 0xAD, 0xF8},
+    {0x6C, 0x71, 0xD9},
+    {0x60, 0x5B, 0xB4},
+    {0x5C, 0x96, 0x56},
+    {0x54, 0x27, 0x1E},
+    {0x4C, 0xAA, 0x16},
+    {0x48, 0x5D, 0x60},
+    {0x44, 0xD8, 0x32},
+    {0x40, 0xE2, 0x30},
+    {0x38, 0x4F, 0xF0},
+    {0x28, 0xC2, 0xDD},
+    {0x24, 0x0A, 0x64},
+    {0x1C, 0x4B, 0xD6},
+    {0x08, 0xA9, 0x5A},
+    {0x00, 0x25, 0xD3},
+    {0x00, 0x24, 0x23},
+    {0x00, 0x22, 0x43},
+    {0x00, 0x15, 0xAF},
+    //fake with AirohaTechnologyCorp's Chip
+    {0x0C, 0xFC, 0x83}
+};
 
 /* variables used by high level HCI task */
 static uint16_t hci_counter_; // counter used for bluetooth HCI loops
@@ -405,6 +413,7 @@ static uint8_t l2cap_connect_response(uint8_t rxid, uint16_t dcid, uint16_t scid
 static uint8_t l2cap_configure(uint16_t dcid, uint8_t pad);
 static uint8_t l2cap_config_response(uint8_t rxid, uint16_t dcid, uint8_t pad);
 static uint8_t l2cap_disconnect_response(uint8_t rxid, uint16_t scid, uint16_t dcid, uint8_t pad);
+static uint8_t l2cap_disconnection_request(uint8_t rxid, uint16_t scid, uint16_t dcid, uint8_t pad);
 static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad);
 
 static uint8_t initPSController(int pad);
@@ -555,8 +564,8 @@ static uint8_t HCI_event_task(int result)
     pad = current_pad;
 
     if (!result) {
-        /*  buf[0] = Event Code							*/
-        /*  buf[1] = Parameter Total Length				*/
+        /*  buf[0] = Event Code                            */
+        /*  buf[1] = Parameter Total Length                */
         /*  buf[n] = Event Parameters based on each event  */
         DPRINTF("HCI event = 0x%x\n", hci_buf[0]);
         switch (hci_buf[0]) { // switch on event type
@@ -821,7 +830,7 @@ static void HCI_task(uint8_t pad)
 }
 
 /************************************************************/
-/* HCI Commands											 */
+/* HCI Commands                                             */
 /************************************************************/
 
 static uint8_t hci_reset()
@@ -1001,6 +1010,18 @@ static uint8_t L2CAP_event_task(int result, int bytes)
                         l2cap_event_status_ |= L2CAP_EV_INTERRUPT_DISCONNECT_REQ;
                         l2cap_disconnect_response(l2cap_buf[9], command_scid_, ds3pad[pad].command_dcid_, pad);
                     }
+                } else if (l2cap_disconnect_response) {
+                    DPRINTF("Disconnect Res  DCID = 0x%x\n", (l2cap_buf[12] | (l2cap_buf[13] << 8)));
+
+                    ds3pad[pad].l2cap_state_ = L2CAP_DISCONNECT_STATE;
+
+                    if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == ds3pad[pad].command_dcid_) {
+                        l2cap_event_status_ |= L2CAP_EV_COMMAND_DISCONNECT_REQ;
+                        hci_disconnect(ds3pad[pad].hci_handle_);
+                    } else if ((l2cap_buf[12] | (l2cap_buf[13] << 8)) == ds3pad[pad].interrupt_dcid_) {
+                        l2cap_event_status_ |= L2CAP_EV_INTERRUPT_DISCONNECT_REQ;
+                        l2cap_disconnection_request((uint8_t)(l2cap_txid_++), command_scid_, ds3pad[pad].command_dcid_, pad);
+                    }
                 }
             } else if (l2cap_interrupt) {
                 readReport(l2cap_buf, bytes, pad);
@@ -1110,7 +1131,7 @@ static void L2CAP_task(uint8_t pad)
 }
 
 /************************************************************/
-/* L2CAP Commands											*/
+/* L2CAP Commands                                            */
 /************************************************************/
 static uint8_t l2cap_connect_response(uint8_t rxid, uint16_t dcid, uint16_t scid, uint8_t pad)
 {
@@ -1186,6 +1207,22 @@ static uint8_t l2cap_disconnect_response(uint8_t rxid, uint16_t scid, uint16_t d
     return L2CAP_Command((uint8_t *)cmd_buf, 8, pad);
 }
 
+static uint8_t l2cap_disconnection_request(uint8_t rxid, uint16_t scid, uint16_t dcid, uint8_t pad)
+{
+    uint8_t cmd_buf[8];
+
+    cmd_buf[0] = L2CAP_CMD_DISCONNECT_REQUEST; // Code
+    cmd_buf[1] = rxid; // Identifier
+    cmd_buf[2] = 0x04; // Length
+    cmd_buf[3] = 0x00;
+    cmd_buf[4] = (uint8_t)(dcid & 0xff); // Destination CID
+    cmd_buf[5] = (uint8_t)(dcid >> 8);
+    cmd_buf[6] = (uint8_t)(scid & 0xff); // Source CID
+    cmd_buf[7] = (uint8_t)(scid >> 8);
+
+    return L2CAP_Command((uint8_t *)cmd_buf, 8, pad);
+}
+
 static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad)
 {
     l2cap_cmd_buf[0] = (uint8_t)(ds3pad[pad].hci_handle_ & 0xff); // HCI handle with PB,BC flag
@@ -1204,7 +1241,7 @@ static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad)
 }
 
 /************************************************************/
-/* HID Commands											 */
+/* HID Commands                                             */
 /************************************************************/
 
 static uint8_t initPSController(int pad)
@@ -1254,6 +1291,8 @@ static void readReport(uint8_t *data, int bytes, int pad)
             ds3pad[pad].data[15] = ((data[DATA_START + ButtonStateH] >> 3) & 1) * 255; //R1
             ds3pad[pad].data[16] = ((data[DATA_START + ButtonStateH] >> 0) & 1) * 255; //L2
             ds3pad[pad].data[17] = ((data[DATA_START + ButtonStateH] >> 1) & 1) * 255; //R2
+
+            data[DATA_START + Power] = 0x05;
         } else {
             ds3pad[pad].data[6] = data[DATA_START + PressureRight]; //right
             ds3pad[pad].data[7] = data[DATA_START + PressureLeft];  //left
@@ -1270,8 +1309,8 @@ static void readReport(uint8_t *data, int bytes, int pad)
             ds3pad[pad].data[16] = data[DATA_START + PressureL2]; //L2
             ds3pad[pad].data[17] = data[DATA_START + PressureR2]; //R2
 
-            if (data[DATA_START + PSButtonState]) //display battery level
-                ds3pad[pad].oldled = ~(1 << data[DATA_START + Power]) & 0x1E;
+            if (data[DATA_START + PSButtonState] && (data[DATA_START + Power] != 0xEE)) //display battery level
+                ds3pad[pad].oldled = power_level[data[DATA_START + Power]];
             else
                 ds3pad[pad].oldled = (pad + 1) << 1;
 
@@ -1336,7 +1375,7 @@ static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
     return writeReport((uint8_t *)led_buf, sizeof(output_01_report) /*PS3_01_REPORT_LEN*/ + 2, pad);
 }
 /************************************************************/
-/* DS3BT Commands											*/
+/* DS3BT Commands                                            */
 /************************************************************/
 
 static uint8_t LED(uint8_t led, int pad)
@@ -1391,12 +1430,13 @@ void ds3bt_set_led(uint8_t led, int port)
     SignalSema(bt_dev.l2cap_sema);
 }
 
-void ds3bt_get_bdaddr(uint8_t *data)
+int ds3bt_get_bdaddr(uint8_t *data)
 {
     uint8_t i;
+    int ret = 0;
 
-    if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED))
-        return;
+    if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) || (ds3pad[0].status_ & DS3BT_STATE_RUNNING))
+        return 0;
 
     WaitSema(bt_dev.hci_sema);
 
@@ -1407,6 +1447,7 @@ void ds3bt_get_bdaddr(uint8_t *data)
     for (i = 0; i < 10; i++) {
         if (hci_read_bdaddr_complete) {
             mips_memcpy(data, dg_bdaddr, 6);
+            ret = 1;
             break;
         }
 
@@ -1414,6 +1455,8 @@ void ds3bt_get_bdaddr(uint8_t *data)
     }
 
     SignalSema(bt_dev.hci_sema);
+
+    return ret;
 }
 
 void ds3bt_get_data(char *dst, int size, int port)
@@ -1444,27 +1487,35 @@ void ds3bt_reset()
     if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED))
         return;
 
-    WaitSema(bt_dev.hci_sema);
-    WaitSema(bt_dev.l2cap_sema);
-
     for (i = 0; i < MAX_PADS; i++) {
+        WaitSema(bt_dev.hci_sema);
+        WaitSema(bt_dev.l2cap_sema);
+
         if ((ds3pad[i].status_ & DS3BT_STATE_CONNECTED) || (ds3pad[i].status_ & DS3BT_STATE_RUNNING)) {
             ds3pad[i].status_ &= ~DS3BT_STATE_RUNNING;
             ds3pad[i].l2cap_state_ = L2CAP_DOWN_STATE;
 
             UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
-            hci_disconnect(ds3pad[i].hci_handle_);
+            if (ds3pad[i].type == HID_THDR_SET_REPORT_OUTPUT) {
+                l2cap_disconnection_request((uint8_t)(l2cap_txid_++), interrupt_scid_, ds3pad[i].interrupt_dcid_, i);
+                WaitSema(bt_dev.l2cap_sema);
+                WaitSema(bt_dev.l2cap_sema);
+            }
+            else {
+                hci_disconnect(ds3pad[i].hci_handle_);
+            }
+
             WaitSema(bt_dev.hci_sema);
         }
+        
+        SignalSema(bt_dev.hci_sema);
+        SignalSema(bt_dev.l2cap_sema);
     }
 
-    hci_reset();
+    DS3BT_init();
 
     WaitSema(bt_dev.hci_sema);
-
-    SignalSema(bt_dev.hci_sema);
-    SignalSema(bt_dev.l2cap_sema);
-
+    
     DelayThread(1000000);
 }
 
@@ -1529,11 +1580,6 @@ static int rpc_buf[64] __attribute((aligned(16)));
 
 void rpc_thread(void *data)
 {
-    if (sceSifCheckInit() == 0) {
-        DPRINTF("DS3BT: Sif not initialized \n");
-        sceSifInit();
-    }
-
     SifInitRpc(0);
     SifSetRpcQueue(&rpc_que, GetThreadId());
     SifRegisterRpc(&rpc_svr, DS3BT_BIND_RPC_ID, rpc_sf, rpc_buf, NULL, NULL, &rpc_que);
@@ -1553,7 +1599,7 @@ void *rpc_sf(int cmd, void *data, int size)
             *(uint8_t *)data = ds3bt_get_status(*(uint8_t *)data);
             break;
         case DS3BT_GET_BDADDR:
-            ds3bt_get_bdaddr((uint8_t *)data);
+            *(uint8_t *)(data + 6) = ds3bt_get_bdaddr((uint8_t *)data);
             break;
         case DS3BT_SET_RUMBLE:
             ds3bt_set_rumble(*(uint8_t *)(data + 1), *(uint8_t *)(data + 2), *(uint8_t *)data);
@@ -1584,9 +1630,7 @@ int _start(int argc, char *argv[])
 
     enable_pad = enable;
 
-    int ret = UsbRegisterDriver(&bt_driver);
-
-    if (ret != USB_RC_OK) {
+    if (UsbRegisterDriver(&bt_driver) != USB_RC_OK) {
         DPRINTF("DS3BT: Error registering BT devices\n");
         return MODULE_NO_RESIDENT_END;
     }

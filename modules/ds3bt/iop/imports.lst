@@ -1,6 +1,3 @@
-
-#include "ioman_mod.h"
-
 sifcmd_IMPORTS_start
 I_sceSifInitRpc
 I_sceSifSetRpcQueue
@@ -28,18 +25,6 @@ I_DelayThread
 I_GetThreadId
 thbase_IMPORTS_end
 
-intrman_IMPORTS_start
-I_CpuSuspendIntr
-I_CpuResumeIntr
-intrman_IMPORTS_end
-
-sifman_IMPORTS_start
-I_sceSifCheckInit
-I_sceSifInit
-I_sceSifSetDma
-I_sceSifDmaStat
-sifman_IMPORTS_end
-
 usbd_IMPORTS_start
 I_UsbGetDeviceStaticDescriptor
 I_UsbOpenEndpoint
@@ -49,9 +34,3 @@ I_UsbSetDevicePrivateData
 I_UsbTransfer
 I_UsbRegisterDriver
 usbd_IMPORTS_end
-
-sysclib_IMPORTS_start
-I_prnt
-I_strncmp
-I_strncpy
-sysclib_IMPORTS_end

@@ -1,5 +1,11 @@
+iomanX_IMPORTS_start
+I_AddDrv
+iomanX_IMPORTS_end
+
 usbmass_IMPORTS_start
 I_UsbMassRegisterCallback
+I_UsbMassFatGetData
+I_UsbMassFatGetClusterChain
 usbmass_IMPORTS_end
 
 sifcmd_IMPORTS_start

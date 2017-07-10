@@ -38,6 +38,7 @@ int sbCreateSemaphore(void);
 int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gamecount);
 int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman, void **cdvdman_irx, int *patchindex);
 void sbUnprepare(void *pCommon);
+void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, int excludeID);
 void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id);
 void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id, char *newname);
 config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const char *sep);

@@ -44,7 +44,7 @@ static inline int CopyFromFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, i
 {
     int result;
     USE_SPD_REGS;
-    unsigned short int OldDMACtrl;
+    u16 OldDMACtrl;
 
     //Attempt to steal the DMA channel from the DEV9 module.
     if ((result = length / 128) > 0) {
@@ -139,7 +139,7 @@ inline int HandleRxIntr(struct SmapDriverData *SmapDrivPrivData)
     volatile smap_bd_t *PktBdPtr;
     volatile u8 *smap_regbase;
     struct pbuf *pbuf;
-    unsigned short int ctrl_stat;
+    u16 ctrl_stat;
 
     smap_regbase = SmapDrivPrivData->smap_regbase;
 

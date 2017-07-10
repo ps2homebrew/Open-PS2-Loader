@@ -6,8 +6,10 @@
 
 #include <loadcore.h>
 #include <stdio.h>
-#include <iomanX.h>
+#include <dev9.h>
+#include <atad.h>
 #include <ps2ip.h>
+#include <poweroff.h>
 #include <sysclib.h>
 #include <thbase.h>
 #include <thsemap.h>
@@ -43,27 +45,6 @@ struct irx_export_table _exp_hdldsvr;
 
 #define SETBIT(mask, bit) (mask)[(bit) / 32] |= 1 << ((bit) % 32)
 #define GETBIT(mask, bit) ((mask)[(bit) / 32] & (1 << ((bit) % 32)))
-
-#define APA_DEVCTL_MAX_SECTORS 0x00004801 // max partition size(in sectors)
-#define APA_DEVCTL_TOTAL_SECTORS 0x00004802
-#define APA_DEVCTL_IDLE 0x00004803
-#define APA_DEVCTL_FLUSH_CACHE 0x00004804
-#define APA_DEVCTL_SWAP_TMP 0x00004805
-#define APA_DEVCTL_DEV9_SHUTDOWN 0x00004806
-#define APA_DEVCTL_STATUS 0x00004807
-#define APA_DEVCTL_FORMAT 0x00004808
-#define APA_DEVCTL_SMART_STAT 0x00004809
-#define APA_DEVCTL_GETTIME 0x00006832
-#define APA_DEVCTL_SET_OSDMBR 0x00006833 // arg = hddSetOsdMBR_t
-#define APA_DEVCTL_GET_SECTOR_ERROR 0x00006834
-#define APA_DEVCTL_GET_ERROR_PART_NAME 0x00006835 // bufp = namebuffer[0x20]
-#define APA_DEVCTL_ATA_READ 0x00006836            // arg  = hddAtaTransfer_t
-#define APA_DEVCTL_ATA_WRITE 0x00006837           // arg  = hddAtaTransfer_t
-#define APA_DEVCTL_SCE_IDENTIFY_DRIVE 0x00006838  // bufp = buffer for atadSceIdentifyDrive
-#define APA_DEVCTL_IS_48BIT 0x00006840
-#define APA_DEVCTL_SET_TRANSFER_MODE 0x00006841
-#define APA_DEVCTL_ATA_IOP_WRITE 0x00006842
-
 
 void tcp_server_thread(void *args);
 void udp_server_thread(void *args);
@@ -185,7 +166,7 @@ static void reject_tcp_command(int sock, char *error_string)
 
     gstats.status = STATUS_AVAIL;
 
-    devctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
+    ata_device_flush_cache(0);
 }
 
 //-------------------------------------------------------------------------
@@ -217,7 +198,7 @@ static int check_datas(u32 command, u32 start_sector, u32 num_sectors)
 static int handle_tcp_client(int tcp_client_socket)
 {
     register int r, i, size;
-    u8 args[16];
+    ata_devinfo_t *devinfo;
     tcp_packet_t *pkt = (tcp_packet_t *)tcp_buf;
 
     while (1) {
@@ -299,15 +280,10 @@ static int handle_tcp_client(int tcp_client_socket)
 
 #ifdef FAKE_WRITES
                     // fake write, we read instead
-                    *(u32 *)&args[0] = pkt->hdr.start_sector;
-                    *(u32 *)&args[4] = pkt->hdr.num_sectors;
-                    devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, gstats.data, pkt->hdr.num_sectors * HDD_SECTOR_SIZE);
+                    ata_device_sector_io(0, gstats.data, pkt->hdr.start_sector, pkt->hdr.num_sectors, ATA_DIR_READ);
 #else
                     // !!! real writes !!!
-                    *(u32 *)&args[0] = pkt->hdr.start_sector;
-                    *(u32 *)&args[4] = pkt->hdr.num_sectors;
-                    *(u32 *)&args[8] = (u32)gstats.data;
-                    devctl("hdd0:", APA_DEVCTL_ATA_IOP_WRITE, args, 8 + (pkt->hdr.num_sectors * HDD_SECTOR_SIZE), NULL, 0);
+                    ata_device_sector_io(0, gstats.data, pkt->hdr.start_sector, pkt->hdr.num_sectors, ATA_DIR_WRITE);
 #endif
                     ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
                 }
@@ -318,11 +294,10 @@ static int handle_tcp_client(int tcp_client_socket)
             // 'stat' command
             // ------------------------------------------------
             case CMD_STAT:
-                r = devctl("hdd0:", APA_DEVCTL_TOTAL_SECTORS, NULL, 0, NULL, 0);
-                if (r < 0)
+                if((devinfo = ata_get_devinfo(0)) == NULL)
                     pkt->hdr.result = -1;
                 else
-                    pkt->hdr.result = r >> 1;
+                    pkt->hdr.result = devinfo->total_sectors >> 1;
                 ack_tcp_command(tcp_client_socket, &tcp_buf[0], sizeof(struct tcp_packet_header));
 
                 break;
@@ -335,12 +310,9 @@ static int handle_tcp_client(int tcp_client_socket)
                 // set up buffer
                 gstats.data = (u8 *)(((long)&gstats.buffer + HDD_SECTOR_SIZE - 1) & ~(HDD_SECTOR_SIZE - 1));
 
-                *(u32 *)&args[0] = pkt->hdr.start_sector;
-                *(u32 *)&args[4] = pkt->hdr.num_sectors;
-
                 if (pkt->hdr.num_sectors > 2) {
-                    r = devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, gstats.data, pkt->hdr.num_sectors * HDD_SECTOR_SIZE);
-                    if (r < 0)
+                    r = ata_device_sector_io(0, gstats.data, pkt->hdr.start_sector, pkt->hdr.num_sectors, ATA_DIR_READ);
+                    if (r != 0)
                         pkt->hdr.result = -1;
                     else
                         pkt->hdr.result = pkt->hdr.num_sectors;
@@ -349,8 +321,8 @@ static int handle_tcp_client(int tcp_client_socket)
                     if (r == 0)
                         ack_tcp_command(tcp_client_socket, gstats.data, pkt->hdr.num_sectors * HDD_SECTOR_SIZE);
                 } else {
-                    r = devctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, pkt->data, pkt->hdr.num_sectors * HDD_SECTOR_SIZE);
-                    if (r < 0)
+                    r = ata_device_sector_io(0, pkt->data, pkt->hdr.start_sector, pkt->hdr.num_sectors, ATA_DIR_READ);
+                    if (r != 0)
                         pkt->hdr.result = -1;
                     else
                         pkt->hdr.result = pkt->hdr.num_sectors;
@@ -365,7 +337,7 @@ static int handle_tcp_client(int tcp_client_socket)
             // 'flsh' command
             // ------------------------------------------------
             case CMD_FLSH:
-                devctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
+                ata_device_flush_cache(0);
 
                 break;
 
@@ -374,10 +346,9 @@ static int handle_tcp_client(int tcp_client_socket)
             // 'powx' command
             // ------------------------------------------------
             case CMD_POWX:
-                devctl("hdd0:", APA_DEVCTL_FLUSH_CACHE, NULL, 0, NULL, 0);
-                devctl("hdd0:", APA_DEVCTL_DEV9_SHUTDOWN, NULL, 0, NULL, 0);
-                *((volatile u8 *)0xbf402017) = 0x00;
-                *((volatile u8 *)0xbf402016) = 0x0f;
+                ata_device_flush_cache(0);
+                dev9Shutdown();
+                PoweroffShutdown();
 
                 break;
 

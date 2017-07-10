@@ -27,18 +27,32 @@
 
 typedef struct _ata_devinfo
 {
-    int exists;                   /* Was successfully probed.  */
-    int has_packet;               /* Supports the PACKET command set.  */
-    unsigned int total_sectors;   /* Total number of user sectors.  */
-    unsigned int security_status; /* Word 0x100 of the identify info.  */
+    /** Was successfully probed.  */
+    s32 exists;
+    /** Supports the PACKET command set.  */
+    s32 has_packet;
+    /** Total number of user sectors.  */
+    u32 total_sectors;
+    /** Word 0x100 of the identify info.  */
+    u32 security_status;
 } ata_devinfo_t;
+
+/* Error definitions.  */
+#define ATA_RES_ERR_NOTREADY	-501
+#define ATA_RES_ERR_TIMEOUT	-502
+#define ATA_RES_ERR_IO		-503
+#define ATA_RES_ERR_NODATA	-504
+#define ATA_RES_ERR_NODEV	-505
+#define ATA_RES_ERR_CMD		-506
+#define ATA_RES_ERR_LOCKED	-509
+#define ATA_RES_ERR_ICRC	-510
 
 int atad_start(void);
 ata_devinfo_t *ata_get_devinfo(int device);
 int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, u16 lcyl, u16 hcyl, u16 select, u16 command);
 int ata_io_finish(void);
 int ata_get_error(void);
-int ata_device_sector_io(int device, void *buf, unsigned int lba, unsigned int nsectors, int dir);
+int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir);
 
 // APA Partition
 #define APA_MAGIC 0x00415041 // 'APA\0'

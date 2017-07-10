@@ -1,5 +1,6 @@
 loadcore_IMPORTS_start
 I_RegisterLibraryEntries
+I_ReleaseLibraryEntries
 I_GetLoadcoreInternalData
 I_QueryLibraryEntryTable
 loadcore_IMPORTS_end
@@ -14,6 +15,7 @@ I_SignalSema
 I_WaitSema
 I_PollSema
 I_DeleteSema
+I_iSignalSema
 thsemap_IMPORTS_end
 
 thbase_IMPORTS_start
@@ -25,6 +27,8 @@ I_GetThreadId
 I_SleepThread
 I_WakeupThread
 I_TerminateThread
+I_SetAlarm
+I_CancelAlarm
 thbase_IMPORTS_end
 
 intrman_IMPORTS_start
@@ -44,6 +48,9 @@ usbd_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_strncmp
+I_sprintf
+I_strcpy
+I_strcat
 #ifndef USE_SMSUTILS
 I_memset
 I_memcpy

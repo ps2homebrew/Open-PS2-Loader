@@ -8,6 +8,7 @@ enum eDS3USBStatus {
 };
 
 int ds3usb_init();
+int ds3usb_deinit();
 int ds3usb_reinit_ports(u8 ports);
 int ds3usb_get_status(int port);
 int ds3usb_get_bdaddr(int port, u8 *bdaddr);

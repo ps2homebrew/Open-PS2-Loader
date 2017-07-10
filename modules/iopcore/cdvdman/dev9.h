@@ -17,6 +17,8 @@
 #include "types.h"
 #include "irx.h"
 
+#include "hdd-ioctl.h"
+
 typedef int (*dev9_intr_cb_t)(int flag);
 typedef void (*dev9_shutdown_cb_t)(void);
 typedef void (*dev9_dma_cb_t)(int bcr, int dir);

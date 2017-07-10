@@ -33,6 +33,9 @@ extern int size_hdpro_atad_irx;
 extern void *ps2hdd_irx;
 extern int size_ps2hdd_irx;
 
+extern void *xhdd_irx;
+extern int size_xhdd_irx;
+
 extern void *ps2fs_irx;
 extern int size_ps2fs_irx;
 
@@ -146,11 +149,13 @@ void hddLoadModules(void)
         // try to detect HD Pro Kit (not the connected HDD),
         // if detected it loads the specific ATAD module
         hddHDProKitDetected = hddCheckHDProKit();
-        if (hddHDProKitDetected)
+        if (hddHDProKitDetected) {
             ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
-        else {
+            sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 6, "-hdpro");
+        } else {
             sysInitDev9();
             ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
+            sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 0, NULL);
         }
         if (ret < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
@@ -166,8 +171,7 @@ void hddLoadModules(void)
         }
 
         //Check if a HDD unit is connected
-        ret = fileXioDevctl("hdd0:", APA_DEVCTL_STATUS, NULL, 0, NULL, 0);
-        if ((ret >= 3) || (ret < 0)) {
+        if (hddCheck() < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_NOT_DETECTED);
             return;
@@ -278,9 +282,9 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     struct cdvdman_settings_hdd *settings;
 
 #ifdef VMC
-    apa_header_t part_hdr;
+    apa_sub_t parts[APA_MAXSUB + 1];
     char vmc_name[2][32];
-    int fd, part_valid = 0, size_mcemu_irx = 0;
+    int part_valid = 0, size_mcemu_irx = 0, nparts;
     hdd_vmc_infos_t hdd_vmc_infos;
     memset(&hdd_vmc_infos, 0, sizeof(hdd_vmc_infos_t));
 
@@ -288,34 +292,23 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     configGetVMC(configSet, vmc_name[1], sizeof(vmc_name[1]), 1);
 
     if (vmc_name[0][0] || vmc_name[1][0]) {
-        fileXioUmount(hddPrefix);
-        fd = fileXioOpen(oplPart, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
-        if (fd >= 0) {
-            if (fileXioIoctl2(fd, APA_IOCTL2_GETHEADER, NULL, 0, (void *)&part_hdr, sizeof(apa_header_t)) == sizeof(apa_header_t)) {
-                if (part_hdr.nsub <= 4) {
-                    hdd_vmc_infos.parts[0].start = part_hdr.start;
-                    hdd_vmc_infos.parts[0].length = part_hdr.length;
-                    LOG("HDDSUPPORT hdd_vmc_infos.parts[0].start : 0x%X\n", hdd_vmc_infos.parts[0].start);
-                    LOG("HDDSUPPORT hdd_vmc_infos.parts[0].length : 0x%X\n", hdd_vmc_infos.parts[0].length);
-                    for (i = 0; i < part_hdr.nsub; i++) {
-                        hdd_vmc_infos.parts[i + 1].start = part_hdr.subs[i].start;
-                        hdd_vmc_infos.parts[i + 1].length = part_hdr.subs[i].length;
-                        LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].start : 0x%X\n", i + 1, hdd_vmc_infos.parts[i + 1].start);
-                        LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].length : 0x%X\n", i + 1, hdd_vmc_infos.parts[i + 1].length);
-                    }
-                    part_valid = 1;
-                }
+        nparts = hddGetPartitionInfo(oplPart, parts);
+        if (nparts > 0 && nparts <= 5) {
+            for (i = 0; i < nparts; i++) {
+                hdd_vmc_infos.parts[i].start = parts[i].start;
+                hdd_vmc_infos.parts[i].length = parts[i].length;
+                LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].start : 0x%X\n", i, hdd_vmc_infos.parts[i].start);
+                LOG("HDDSUPPORT hdd_vmc_infos.parts[%d].length : 0x%X\n", i, hdd_vmc_infos.parts[i].length);
             }
-            fileXioClose(fd);
+            part_valid = 1;
         }
-        fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
     }
 
     if (part_valid) {
         char vmc_path[256];
         int vmc_id, have_error = 0;
         vmc_superblock_t vmc_superblock;
-        pfs_inode_t pfs_inode;
+        pfs_blockinfo_t blocks[11];
 
         for (vmc_id = 0; vmc_id < 2; vmc_id++) {
             if (vmc_name[vmc_id][0]) {
@@ -330,22 +323,18 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 
                     // Check vmc inode block chain (write operation can cause damage)
                     snprintf(vmc_path, sizeof(vmc_path), "%sVMC/%s.bin", hddPrefix, vmc_name[vmc_id]);
-                    fd = fileXioOpen(vmc_path, O_RDWR, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
-                    if (fileXioIoctl2(fd, PFS_IOCTL2_GET_INODE, NULL, 0, (void *)&pfs_inode, sizeof(pfs_inode_t)) == sizeof(pfs_inode_t)) {
-                        if (pfs_inode.number_data <= 11) {
-                            have_error = 0;
-                            hdd_vmc_infos.active = 1;
-                            for (i = 0; i < pfs_inode.number_data - 1; i++) {
-                                hdd_vmc_infos.blocks[i].number = pfs_inode.data[i + 1].number;
-                                hdd_vmc_infos.blocks[i].subpart = pfs_inode.data[i + 1].subpart;
-                                hdd_vmc_infos.blocks[i].count = pfs_inode.data[i + 1].count;
-                                LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].number     : 0x%X\n", i, hdd_vmc_infos.blocks[i].number);
-                                LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
-                                LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
-                            }
-                        } // else Vmc file too much fragmented
-                    }
-                    fileXioClose(fd);
+                    if ((nparts = hddGetFileBlockInfo(vmc_path, parts, blocks, 11)) > 0) {
+                        have_error = 0;
+                        hdd_vmc_infos.active = 1;
+                        for (i = 0; i < nparts - 1; i++) {
+                            hdd_vmc_infos.blocks[i].number = blocks[i + 1].number;
+                            hdd_vmc_infos.blocks[i].subpart = blocks[i + 1].subpart;
+                            hdd_vmc_infos.blocks[i].count = blocks[i + 1].count;
+                            LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].number     : 0x%X\n", i, hdd_vmc_infos.blocks[i].number);
+                            LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
+                            LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
+                        }
+                    }  // else Vmc file too much fragmented
                 }
 
                 if (have_error) {

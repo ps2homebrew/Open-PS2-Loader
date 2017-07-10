@@ -432,7 +432,7 @@ void sbUnprepare(void *pCommon)
     memcpy(pCommon, &cdvdman_settings_common_sample, sizeof(struct cdvdman_settings_common));
 }
 
-static void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, int excludeID)
+void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, int excludeID)
 {
     char path[256];
     USBExtreme_game_entry_t GameEntry;

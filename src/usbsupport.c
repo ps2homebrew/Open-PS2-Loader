@@ -212,7 +212,53 @@ static void usbDeleteGame(int id)
 
 static void usbRenameGame(int id, char *newName)
 {
-    sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
+    char oldpath[256], newpath[256];
+    base_game_info_t *game = &usbGames[id];
+    int fd;
+
+    if (game->format != GAME_FORMAT_USBLD) {
+        if (game->format == GAME_FORMAT_OLD_ISO) {
+            if (game->media == 0x12) {
+                snprintf(oldpath, sizeof(oldpath), "%sCD/%s.%s%s", usbPrefix, game->startup, game->name, game->extension);
+                snprintf(newpath, sizeof(newpath), "%sCD/%s.%s%s", usbPrefix, game->startup, newName, game->extension);
+            } else {
+                snprintf(oldpath, sizeof(oldpath), "%sDVD/%s.%s%s", usbPrefix, game->startup, game->name, game->extension);
+                snprintf(newpath, sizeof(newpath), "%sDVD/%s.%s%s", usbPrefix, game->startup, newName, game->extension);
+            }
+        } else {
+            if (game->media == 0x12) {
+                snprintf(oldpath, sizeof(oldpath), "%sCD/%s%s", usbPrefix, game->name, game->extension);
+                snprintf(newpath, sizeof(newpath), "%sCD/%s%s", usbPrefix, newName, game->extension);
+            } else {
+                snprintf(oldpath, sizeof(oldpath), "%sDVD/%s%s", usbPrefix, game->name, game->extension);
+                snprintf(newpath, sizeof(newpath), "%sDVD/%s%s", usbPrefix, newName, game->extension);
+            }
+        }
+
+        if((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
+            fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newpath);
+            fileXioClose(fd);
+        }
+    } else {
+        const char *pathStr = "%sul.%08X.%s.%02x";
+        unsigned int oldcrc = USBA_crc32(game->name);
+        unsigned int newcrc = USBA_crc32(newName);
+        int i;
+
+        for (i = 0; i < game->parts; i++) {
+            snprintf(oldpath, sizeof(oldpath), pathStr, usbPrefix, oldcrc, game->startup, i);
+            snprintf(newpath, sizeof(newpath), pathStr, usbPrefix, newcrc, game->startup, i);
+            if((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
+                fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newpath);
+                fileXioClose(fd);
+            }
+        }
+
+        memset(game->name, 0, UL_GAME_NAME_MAX + 1);
+        memcpy(game->name, newName, UL_GAME_NAME_MAX);
+        sbRebuildULCfg(&usbGames, usbPrefix, usbGameCount, -1);
+    }
+
     usbULSizePrev = -2;
 }
 #endif
@@ -227,6 +273,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 #ifdef VMC
     unsigned int start;
 #endif
+    unsigned int startCluster;
     char partname[256], filename[32];
     base_game_info_t *game = &usbGames[id];
     struct cdvdman_settings_usb *settings;
@@ -253,11 +300,13 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 
                 sprintf(vmc_path, "%sVMC/%s.bin", usbPrefix, vmc_name);
 
-                fd = fileXioOpen(vmc_path, O_RDONLY, 0666);
+                fd = fileXioOpen(vmc_path, O_RDONLY);
                 if (fd >= 0) {
-                    if ((start = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSECTOR, vmc_path)) != 0) {
+                    if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0
+                        && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
+
                         // Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
-                        if (fileXioIoctl(fd, USBHDFSD_IOCTL_CHECKCHAIN, vmc_path) != 0) {
+                        if (fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) != 0) {
                             LOG("USBSUPPORT Cluster Chain OK\n");
                             have_error = 0;
                             usb_vmc_infos.active = 1;
@@ -308,17 +357,21 @@ static void usbLaunchGame(int id, config_set_t *configSet)
                 sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, i);
         }
 
-        fd = fileXioOpen(partname, O_RDONLY, 0666);
+        fd = fileXioOpen(partname, O_RDONLY);
         if (fd >= 0) {
-            settings->LBAs[i] = fileXioIoctl(fd, USBHDFSD_IOCTL_GETSECTOR, partname);
-            if (gCheckUSBFragmentation && fileXioIoctl(fd, USBHDFSD_IOCTL_CHECKCHAIN, partname) == 0) {
-                fileXioClose(fd);
-                //Game is fragmented. Do not continue.
-                if (settings != NULL)
-                    sbUnprepare(&settings->common);
+            settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, partname);
+            if (gCheckUSBFragmentation) {
+                if ((startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, partname)) == 0
+                   || fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) == 0) {
 
-                guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
-                return;
+                    fileXioClose(fd);
+                    //Game is fragmented. Do not continue.
+                    if (settings != NULL)
+                        sbUnprepare(&settings->common);
+
+                    guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
+                    return;
+                }
             }
 
             if ((gPS2Logo) && (i == 0))

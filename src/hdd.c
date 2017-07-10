@@ -24,15 +24,17 @@ typedef struct // size = 1024
     } part_specs[65];
 } hdl_apa_header;
 
-#define HDL_GAME_DATA_OFFSET 0x100000 // Sector 0x800 in the user data area.
+#define HDL_GAME_DATA_OFFSET 0x100000 // Sector 0x800 in the extended attribute area.
 #define HDL_FS_MAGIC 0x1337
+
+static unsigned char IOBuffer[1024] ALIGNED(64);
 
 //-------------------------------------------------------------------------
 int hddCheck(void)
 {
     int ret;
 
-    ret = fileXioDevctl("hdd0:", APA_DEVCTL_STATUS, NULL, 0, NULL, 0);
+    ret = fileXioDevctl("hdd0:", HDIOC_STATUS, NULL, 0, NULL, 0);
 
     if ((ret >= 3) || (ret < 0))
         return -1;
@@ -43,7 +45,7 @@ int hddCheck(void)
 //-------------------------------------------------------------------------
 u32 hddGetTotalSectors(void)
 {
-    return fileXioDevctl("hdd0:", APA_DEVCTL_TOTAL_SECTORS, NULL, 0, NULL, 0);
+    return fileXioDevctl("hdd0:", HDIOC_TOTALSECTOR, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -55,12 +57,12 @@ int hddIs48bit(void)
 //-------------------------------------------------------------------------
 int hddSetTransferMode(int type, int mode)
 {
-    u8 args[16];
+    hddAtaSetMode_t *args = (hddAtaSetMode_t*)IOBuffer;
 
-    *(u32 *)&args[0] = type;
-    *(u32 *)&args[4] = mode;
+    args->type = type;
+    args->mode = mode;
 
-    return fileXioDevctl("xhdd0:", ATA_DEVCTL_SET_TRANSFER_MODE, args, 8, NULL, 0);
+    return fileXioDevctl("xhdd0:", ATA_DEVCTL_SET_TRANSFER_MODE, args, sizeof(hddAtaSetMode_t), NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -82,18 +84,18 @@ int hddSetIdleTimeout(int timeout)
 
     *(u32 *)&args[0] = timeout & 0xff;
 
-    return fileXioDevctl("hdd0:", APA_DEVCTL_IDLE, args, 4, NULL, 0);
+    return fileXioDevctl("hdd0:", HDIOC_IDLE, args, 4, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
 int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 {
-    u8 args[16];
+    hddAtaTransfer_t *args = (hddAtaTransfer_t*)IOBuffer;
 
-    *(u32 *)&args[0] = lba;
-    *(u32 *)&args[4] = nsectors;
+    args->lba = lba;
+    args->size = nsectors;
 
-    if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_READ, args, 8, buf, nsectors * 512) != 0)
+    if (fileXioDevctl("hdd0:", HDIOC_READSECTOR, args, sizeof(hddAtaTransfer_t), buf, nsectors * 512) != 0)
         return -1;
 
     return 0;
@@ -102,17 +104,20 @@ int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 //-------------------------------------------------------------------------
 static int hddWriteSectors(u32 lba, u32 nsectors, const void *buf)
 {
-    static u8 WriteBuffer[1088] ALIGNED(64);
+    static u8 WriteBuffer[2 * 512 + sizeof(hddAtaTransfer_t)] ALIGNED(64);	//Has to be a different buffer from IOBuffer (input can be in IOBuffer).
     int argsz;
-    u8 *args = (u8 *)WriteBuffer;
+    hddAtaTransfer_t *args = (hddAtaTransfer_t *)WriteBuffer;
 
-    *(u32 *)&args[0] = lba;
-    *(u32 *)&args[4] = nsectors;
-    memcpy(&args[8], buf, nsectors * 512);
+    if(nsectors > 2)  //Sanity check
+        return -ENOMEM;
 
-    argsz = 8 + (nsectors * 512);
+    args->lba = lba;
+    args->size = nsectors;
+    memcpy(args->data, buf, nsectors * 512);
 
-    if (fileXioDevctl("hdd0:", APA_DEVCTL_ATA_WRITE, args, argsz, NULL, 0) != 0)
+    argsz = sizeof(hddAtaTransfer_t) + (nsectors * 512);
+
+    if (fileXioDevctl("hdd0:", HDIOC_WRITESECTOR, args, argsz, NULL, 0) != 0)
         return -1;
 
     return 0;
@@ -121,12 +126,10 @@ static int hddWriteSectors(u32 lba, u32 nsectors, const void *buf)
 //-------------------------------------------------------------------------
 int hddGetFormat(void)
 {
-    return fileXioDevctl("hdd0:", APA_DEVCTL_FORMAT, NULL, 0, NULL, 0);
+    return fileXioDevctl("hdd0:", HDIOC_FORMATVER, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
-static unsigned char IOBuffer[1024] ALIGNED(64);
-
 struct GameDataEntry
 {
     u32 lba, size;

@@ -171,8 +171,7 @@ void hddLoadModules(void)
         }
 
         //Check if a HDD unit is connected
-        ret = fileXioDevctl("hdd0:", APA_DEVCTL_STATUS, NULL, 0, NULL, 0);
-        if ((ret >= 3) || (ret < 0)) {
+        if (hddCheck() < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_NOT_DETECTED);
             return;
@@ -293,7 +292,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     configGetVMC(configSet, vmc_name[1], sizeof(vmc_name[1]), 1);
 
     if (vmc_name[0][0] || vmc_name[1][0]) {
-        fileXioUmount(hddPrefix);
         nparts = hddGetPartitionInfo(oplPart, parts);
         if (nparts > 0 && nparts <= 5) {
             for (i = 0; i < nparts; i++) {
@@ -304,7 +302,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
             }
             part_valid = 1;
         }
-        fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR); // if this fails, something is really screwed up
     }
 
     if (part_valid) {

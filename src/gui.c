@@ -234,6 +234,9 @@ void guiShowAbout()
 #ifdef CHEAT
     strcat(OPLVersion, " PS2RD");
 #endif
+#ifdef PADEMU
+    strcat(OPLVersion, " PADEMU");
+#endif
 
     diaSetLabel(diaAbout, 1, OPLVersion);
 

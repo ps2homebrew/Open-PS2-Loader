@@ -35,6 +35,12 @@ int ds3usb_init()
     return 1;
 }
 
+int ds3usb_deinit()
+{
+    ds3usb_inited = 0;
+    return 1;
+}
+
 int ds3usb_reinit_ports(u8 ports)
 {
     if (!ds3usb_inited)
@@ -51,9 +57,10 @@ int ds3usb_get_status(int port)
 
     rpcbuf[0] = port;
 
-    SifCallRpc(&ds3usb, DS3USB_GET_STATUS, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL);
+    if (SifCallRpc(&ds3usb, DS3USB_GET_STATUS, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL) == 0)
+       return rpcbuf[0];
 
-    return rpcbuf[0];
+    return 0;
 }
 
 int ds3usb_get_bdaddr(int port, u8 *bdaddr)

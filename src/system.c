@@ -235,7 +235,10 @@ void sysInitDev9(void)
 
 void sysReset(int modload_mask)
 {
-
+#ifdef PADEMU
+    ds3usb_reset();
+    ds3bt_reset();
+#endif
     fileXioExit();
     SifExitIopHeap();
     SifLoadFileExit();
@@ -310,11 +313,16 @@ void sysReset(int modload_mask)
 #ifdef PADEMU
     int ds3pads = 1; //only one pad enabled
 
-    sysLoadModuleBuffer(&ds3usb_irx, size_ds3usb_irx, 4, (char *)&ds3pads);
-    sysLoadModuleBuffer(&ds3bt_irx, size_ds3bt_irx, 4, (char *)&ds3pads);
+    ds3usb_deinit();
+    ds3bt_deinit();
 
-    ds3usb_init();
-    ds3bt_init();
+    if (modload_mask & SYS_LOAD_USB_MODULES) {
+        sysLoadModuleBuffer(&ds3usb_irx, size_ds3usb_irx, 4, (char *)&ds3pads);
+        sysLoadModuleBuffer(&ds3bt_irx, size_ds3bt_irx, 4, (char *)&ds3pads);
+
+        ds3usb_init();
+        ds3bt_init();
+    }
 #endif
 
     fileXioInit();
@@ -407,6 +415,10 @@ int sysGetDiscID(char *hexDiscID)
 
 void sysExecExit()
 {
+#ifdef PADEMU
+    ds3usb_reset();
+    ds3bt_reset();
+#endif
     Exit(0);
 }
 
@@ -724,7 +736,13 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
         snprintf(text, sizeof(text), "IOP Usage:%.2f%%,by %s(CDVDFSV+CDVDMAN)", (float)usage, mode_str);
 #ifdef VMC
-        strcat(text, "+VMC");
+        if (size_mcemu_irx > 0)
+            strcat(text, "+VMC");
+#endif
+
+#ifdef PADEMU
+        if (gEnablePadEmu)
+            strcat(text, "+PADEMU");
 #endif
         guiWarning(text, 20);
     }

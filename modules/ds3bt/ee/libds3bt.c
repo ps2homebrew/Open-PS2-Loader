@@ -35,6 +35,12 @@ int ds3bt_init()
     return 1;
 }
 
+int ds3bt_deinit()
+{
+    ds3bt_inited = 0;
+    return 1;
+}
+
 int ds3bt_reinit_ports(u8 ports)
 {
     if (!ds3bt_inited)
@@ -59,22 +65,25 @@ int ds3bt_get_status(int port)
 
     rpcbuf[0] = port;
 
-    SifCallRpc(&ds3bt, DS3BT_GET_STATUS, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL);
+	if (SifCallRpc(&ds3bt, DS3BT_GET_STATUS, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL) == 0)
+    	return rpcbuf[0];
 
-    return rpcbuf[0];
+    return 0;
 }
 
 int ds3bt_get_bdaddr(u8 *bdaddr)
 {
-    int i, ret;
+    int i, ret = 0;
 
     if (!ds3bt_inited)
         return 0;
 
-    ret = (SifCallRpc(&ds3bt, DS3BT_GET_BDADDR, 0, NULL, 0, rpcbuf, 6, NULL, NULL) == 0);
+    if (SifCallRpc(&ds3bt, DS3BT_GET_BDADDR, 0, NULL, 0, rpcbuf, 7, NULL, NULL) == 0) {
+        for (i = 0; i < 6; i++)
+            bdaddr[i] = rpcbuf[i];
 
-    for (i = 0; i < 6; i++)
-        bdaddr[i] = rpcbuf[i];
+        ret = rpcbuf[6];
+    }
 
     return ret;
 }

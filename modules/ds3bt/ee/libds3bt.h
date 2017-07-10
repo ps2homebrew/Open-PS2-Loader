@@ -8,6 +8,7 @@ enum eDS3BTStatus {
 };
 
 int ds3bt_init();
+int ds3bt_deinit();
 int ds3bt_reinit_ports(u8 ports);
 int ds3bt_init_charging();
 int ds3bt_get_status(int port);

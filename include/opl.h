@@ -38,7 +38,9 @@
 // Last Played Auto Start
 #include <time.h>
 
+//START of OPL_DB tweaks
 //#define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
+//END of OPL_DB tweaks
 
 //IO type IDs
 #define IO_CUSTOM_SIMPLEACTION 1 // handler for parameter-less actions
@@ -100,7 +102,9 @@ int gUSBStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
+//START of OPL_DB tweaks
 int gELMStartMode;
+//END of OPL_DB tweaks
 
 int gAutosort;
 int gAutoRefresh;

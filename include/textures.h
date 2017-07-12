@@ -14,7 +14,9 @@ enum INTERNAL_TEXTURE {
     HDD_ICON,
     ETH_ICON,
     APP_ICON,
+//START of OPL_DB tweaks
     ELM_ICON,
+//END of OPL_DB tweaks
     LEFT_ICON,
     RIGHT_ICON,
     UP_ICON,

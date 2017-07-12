@@ -130,7 +130,9 @@ typedef struct
 } hdd_vmc_infos_t;
 #endif
 
+//START of OPL_DB tweaks
 char* hddGetPrefix(void);
+//END of OPL_DB tweaks
 int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddIs48bit(void);

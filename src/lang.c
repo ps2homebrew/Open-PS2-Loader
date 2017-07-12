@@ -12,7 +12,9 @@
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
     "English (internal)",
+//START of OPL_DB tweaks
     "OPL %s",
+//END of OPL_DB tweaks
     "Save changes",
     "Back",
     "Network config",
@@ -76,7 +78,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "USB device start mode",
     "HDD device start mode",
     "ETH device start mode",
+//START of OPL_DB tweaks
     "Applications menu display mode",
+//END of OPL_DB tweaks
     "Auto",
     "Manual",
     "Start HDL Server",
@@ -241,8 +245,10 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Pair DS3 controller with bluetooth adapter mac address.",
     "Not connected",
 #endif
+//START of OPL_DB tweaks
     "ELF Loader Menu",
     "ELF Loader Menu display mode",
+//END of OPL_DB tweaks
 };
 
 static int guiLangID = 0;

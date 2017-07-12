@@ -9,7 +9,9 @@
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
+//START of OPL_DB tweaks
 #include "include/supportbase.h"
+//END of OPL_DB tweaks
 
 static int appForceUpdate = 1;
 static int appItemCount = 0;
@@ -69,6 +71,7 @@ static int appNeedsUpdate(void)
     return 0;
 }
 
+//START of OPL_DB tweaks
 static int appUpdateItemList(void) {
 	char path[256];
 	static item_list_t *listSupport = NULL;
@@ -115,7 +118,8 @@ static int appUpdateItemList(void) {
 	}
 
 	//Count apps
-    if (configApps->head) {
+ //END of OPL_DB tweaks
+   if (configApps->head) {
         struct config_value_t *cur = configApps->head;
         while (cur) {
             cur = cur->next;
@@ -192,6 +196,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 }
 
+//START of OPL_DB tweaks
 static config_set_t* appGetConfig(int id) {
 	config_set_t* config = NULL;
 	static item_list_t *listSupport = NULL;
@@ -248,18 +253,23 @@ static config_set_t* appGetConfig(int id) {
 		config = configAlloc(1, NULL, NULL);
 	}
 	
+//END of OPL_DB tweaks
     configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
     configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
     configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
+//START of OPL_DB tweaks
 	configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
 	configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
+//END of OPL_DB tweaks
     return config;
 }
 
 static int appGetImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
 {
+//START of OPL_DB tweaks
     //value = appGetELFName(value);
     // Search every device from fastest to slowest (HDD > ETH > USB)
+//END of OPL_DB tweaks
     static item_list_t *listSupport = NULL;
     if ((listSupport = hddGetObject(1))) {
         if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)

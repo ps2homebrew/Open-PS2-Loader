@@ -233,8 +233,10 @@ enum _STR_IDS {
     _STR_HINT_PAIRPAD,
     _STR_NOT_CONNECTED,
 #endif
+//START of OPL_DB tweaks
     _STR_ELM,
     _STR_ELMMODE,
+//END of OPL_DB tweaks
     LANG_STR_COUNT
 };
 

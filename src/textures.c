@@ -17,7 +17,9 @@ extern void *usb_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
+//START of OPL_DB tweaks
 extern void *elm_png;
+//END of OPL_DB tweaks
 
 extern void *cross_png;
 extern void *triangle_png;
@@ -61,7 +63,9 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},
+//START of OPL_DB tweaks
     {ELM_ICON, "elm", &elm_png},
+//END of OPL_DB tweaks
     {LEFT_ICON, "left", &left_png},
     {RIGHT_ICON, "right", &right_png},
     {UP_ICON, "up", &up_png},

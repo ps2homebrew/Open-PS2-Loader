@@ -28,7 +28,9 @@
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
+//START of OPL_DB tweaks
 #include "include/elmsupport.h"
+//END of OPL_DB tweaks
 
 #ifdef CHEAT
 #include "include/pgcht.h"
@@ -334,7 +336,9 @@ static void initAllSupport(int force_reinit)
     initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
     initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
+//START of OPL_DB tweaks
     initSupport(elmGetObject(0), gELMStartMode, ELM_MODE, force_reinit);
+//END of OPL_DB tweaks
 }
 
 static void deinitAllSupport(int exception)
@@ -343,7 +347,9 @@ static void deinitAllSupport(int exception)
     moduleCleanup(&list_support[ETH_MODE], exception);
     moduleCleanup(&list_support[HDD_MODE], exception);
     moduleCleanup(&list_support[APP_MODE], exception);
+//START of OPL_DB tweaks
     moduleCleanup(&list_support[ELM_MODE], exception);
+//END of OPL_DB tweaks
 }
 
 // ----------------------------------------------------------
@@ -575,7 +581,9 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
+//START of OPL_DB tweaks
             configGetInt(configOPL, CONFIG_OPL_ELM_MODE, &gELMStartMode);
+//END of OPL_DB tweaks
         }
     }
 
@@ -655,8 +663,10 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
+//START of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
   
+//END of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
 
@@ -718,7 +728,9 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed);
     moduleUpdateMenu(HDD_MODE, changed);
     moduleUpdateMenu(APP_MODE, changed);
+//START of OPL_DB tweaks
     moduleUpdateMenu(ELM_MODE, changed);
+//END of OPL_DB tweaks
 }
 
 int loadConfig(int types)
@@ -1147,7 +1159,9 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[ETH_MODE]);
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
+//START of OPL_DB tweaks
     clearIOModuleT(&list_support[ELM_MODE]);
+//END of OPL_DB tweaks
 
     gBaseMCDir = "mc?:OPL";
 
@@ -1203,11 +1217,13 @@ static void setDefaults(void)
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
+//START of OPL_DB tweaks
     gELMStartMode = START_MODE_DISABLED;
 
     gDefaultBgColor[0] = 0x030;
     gDefaultBgColor[1] = 0x030;
     gDefaultBgColor[2] = 0x030;
+//END of OPL_DB tweaks
 
     gDefaultTextColor[0] = 0x0ff;
     gDefaultTextColor[1] = 0x0ff;

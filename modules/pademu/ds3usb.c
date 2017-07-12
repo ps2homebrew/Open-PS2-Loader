@@ -23,19 +23,20 @@
 #define MAX_PADS 2
 
 static uint8_t output_01_report[] =
-    {
-        0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x02,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00};
+{
+    0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x02,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00
+};
 
 static uint8_t led_patterns[][2] =
 {
@@ -45,9 +46,9 @@ static uint8_t led_patterns[][2] =
     { 0x0E, 0x10 }, 
 };
 
-static uint8_t power_level[] = 
+static uint8_t power_level[] =
 {
-    0x00, 0x02, 0x06, 0x0E, 0x1E
+    0x00, 0x00, 0x02, 0x06, 0x0E, 0x1E
 };
 
 static uint8_t usb_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
@@ -63,9 +64,9 @@ UsbDriver usb_driver = {NULL, NULL, "ds3usb", usb_probe, usb_connect, usb_discon
 
 static void DS3USB_init(int pad);
 static void readReport(uint8_t *data, int pad);
-static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad);
-static uint8_t LED(uint8_t led, int pad);
-static uint8_t Rumble(uint8_t lrum, uint8_t rrum, int pad);
+static int LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad);
+static int LED(uint8_t led, int pad);
+static int Rumble(uint8_t lrum, uint8_t rrum, int pad);
 
 typedef struct _usb_ds3
 {
@@ -184,6 +185,9 @@ int usb_disconnect(int devId)
             break;
     }
 
+    if (ds3pad[pad].eventEndp >= 0)
+        UsbCloseEndpoint(ds3pad[pad].eventEndp);
+
     if (pad < MAX_PADS && (ds3pad[pad].status & DS3USB_STATE_AUTHORIZED))
         usb_release(pad);
 
@@ -192,12 +196,6 @@ int usb_disconnect(int devId)
 
 static void usb_release(int pad)
 {
-    if (ds3pad[pad].sema >= 0)
-        WaitSema(ds3pad[pad].sema);
-    
-    if (ds3pad[pad].eventEndp >= 0)
-        UsbCloseEndpoint(ds3pad[pad].eventEndp);
-
     if (ds3pad[pad].sema >= 0)
         DeleteSema(ds3pad[pad].sema);
 
@@ -210,8 +208,7 @@ static void usb_release(int pad)
 static void usb_data_cb(int resultCode, int bytes, void *arg)
 {
     int pad = (int)arg;
-    
-    PollSema(ds3pad[pad].sema);
+
     //DPRINTF("usb_data_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
 
     if (!resultCode)
@@ -255,6 +252,9 @@ static void DS3USB_init(int pad)
 }
 
 #define DATA_START 2
+#define MAX_DELAY 10
+
+static uint8_t btn_delay = 0;
 
 static void readReport(uint8_t *data, int pad)
 {
@@ -283,14 +283,18 @@ static void readReport(uint8_t *data, int pad)
         ds3pad[pad].data[17] = data[DATA_START + PressureR2]; //R2
 
         if (data[DATA_START + PSButtonState]) { //display battery level
-            if(data[DATA_START + ButtonStateL] == 0x01) { //PS + SELECT
+            if ((data[DATA_START + ButtonStateL] & 1) && (btn_delay == MAX_DELAY)) { //PS + SELECT
                 if(ds3pad[pad].analog_btn < 2) //unlocked mode 
                     ds3pad[pad].analog_btn = !ds3pad[pad].analog_btn;
                     
                 ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
+                btn_delay = 0;
             }
             else if(data[DATA_START + Power] != 0xEE)
-                ds3pad[pad].oldled = power_level[data[DATA_START + Power] - 1];
+                ds3pad[pad].oldled = power_level[data[DATA_START + Power]];
+
+            if (btn_delay < MAX_DELAY)
+                btn_delay++;
         }
         else
             ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
@@ -302,7 +306,7 @@ static void readReport(uint8_t *data, int pad)
     }
 }
 
-static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
+static int LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
 {
     mips_memcpy(usb_buf, output_01_report, sizeof(output_01_report));
 
@@ -328,17 +332,40 @@ static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
     return UsbControlTransfer(ds3pad[pad].controlEndp, bmREQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, sizeof(output_01_report), usb_buf, usb_cmd_cb, (void *)pad);
 }
 
-static uint8_t LED(uint8_t led, int pad)
+static unsigned int timeout(void *arg)
+{
+    int sema = (int)arg;
+    iSignalSema(sema);
+    return 0;
+}
+
+static void TransferWait(int sema)
+{
+    iop_sys_clock_t cmd_timeout;
+
+    cmd_timeout.lo = 200000;
+    cmd_timeout.hi = 0;
+
+    if (SetAlarm(&cmd_timeout, timeout, (void *)sema) == 0) {
+        WaitSema(sema);
+        CancelAlarm(timeout, NULL);
+    }
+}
+
+static int LED(uint8_t led, int pad)
 {
     return LEDRumble(led, ds3pad[pad].oldlrumble, ds3pad[pad].oldrrumble, pad);
 }
 
-static uint8_t Rumble(uint8_t lrum, uint8_t rrum, int pad)
+static int Rumble(uint8_t lrum, uint8_t rrum, int pad)
 {
-    uint8_t ret;
+    int ret;
 
     ret = LEDRumble(ds3pad[pad].oldled, lrum, rrum, pad);
-    WaitSema(ds3pad[pad].sema);
+    if (ret == USB_RC_OK)
+        TransferWait(ds3pad[pad].sema);
+    else
+        DPRINTF("DS3USB: LEDRumble usb transfer error %d\n", ret);
 
     return ret;
 }
@@ -355,12 +382,15 @@ void ds3usb_set_rumble(uint8_t lrum, uint8_t rrum, int port)
 int ds3usb_get_data(char *dst, int size, int port)
 {
     int ret;
-    
-    WaitSema(ds3pad[port].sema);
-
-    UsbInterruptTransfer(ds3pad[port].eventEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
 
     WaitSema(ds3pad[port].sema);
+
+    ret = UsbInterruptTransfer(ds3pad[port].eventEndp, usb_buf, MAX_BUFFER_SIZE, usb_data_cb, (void *)port);
+
+    if (ret == USB_RC_OK)
+        TransferWait(ds3pad[port].sema);
+    else
+        DPRINTF("DS3USB: ds3usb_get_data usb transfer error %d\n", ret);
 
     mips_memcpy(dst, ds3pad[port].data, size);
     ret = ds3pad[port].analog_btn & 1;
@@ -408,8 +438,7 @@ int ds3usb_get_status(int port)
 
 int ds3usb_init(uint8_t pads)
 {
-    int ret;
-    uint8_t pad;
+    int pad;
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         ds3pad[pad].status = 0;
@@ -430,9 +459,7 @@ int ds3usb_init(uint8_t pads)
         mips_memset(&ds3pad[pad].data[6], 0x00, 12);
     }
 
-    ret = UsbRegisterDriver(&usb_driver);
-
-    if (ret != USB_RC_OK) {
+    if (UsbRegisterDriver(&usb_driver) != USB_RC_OK) {
         DPRINTF("DS3USB: Error registering USB devices\n");
         return 0;
     }

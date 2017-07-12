@@ -134,7 +134,7 @@ static void t_loadElf(void)
             GS_BGCOLOUR = 0x0080FF; // Orange
 
         // Execute BOOT.ELF
-        ExecPS2((void *)elf.epc, (void *)elf.gp, 1, argv);
+        _ExecPS2((void *)elf.epc, (void *)elf.gp, 1, argv);
     }
 
     if (!DisableDebug) {
@@ -143,7 +143,7 @@ static void t_loadElf(void)
     }
 
     // Return to PS2 Browser
-    Exit(0);
+    _Exit(0);
 }
 
 // Poweroff PlayStation 2
@@ -196,7 +196,7 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x0000FF; // Red
 
         // Reset IO Processor
-        while (!Reset_Iop(NULL, 0)) {
+        while (!Reset_Iop("", 0)) {
             ;
         }
 
@@ -273,10 +273,10 @@ static void IGR_Thread(void *arg)
 
         // Execute home loader
         if (ExitPath[0] != '\0')
-            ExecPS2(t_loadElf, &_gp, 0, NULL);
+            _ExecPS2(t_loadElf, &_gp, 0, NULL);
 
         // Return to PS2 Browser
-        Exit(0);
+        _Exit(0);
     }
 
     // If combo is R3 + L3 or Reset failed, Poweroff PS2
@@ -370,7 +370,7 @@ static int IGR_Intc_Handler(int cause)
         for (i = 1; i < 256; i++) {
             if (i != IGR_Thread_ID) {
                 // Suspend all threads
-                iSuspendThread(i);
+                _iSuspendThread(i);
                 iChangeThreadPriority(i, 127);
             }
         }
@@ -378,7 +378,7 @@ static int IGR_Intc_Handler(int cause)
         DPRINTF("IGR: trying to wake IGR thread...\n");
         iChangeThreadPriority(IGR_Thread_ID, 0);
         // WakeUp IGR thread
-        iWakeupThread(IGR_Thread_ID);
+        _iWakeupThread(IGR_Thread_ID);
     }
 
     ExitHandler();

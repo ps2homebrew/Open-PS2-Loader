@@ -15,6 +15,7 @@
 #include <defs.h>
 #include <loadcore.h>
 #include <intrman.h>
+#include <iomanX.h>
 #include <dmacman.h>
 #include <thbase.h>
 #include <thsemap.h>
@@ -25,8 +26,6 @@
 #include <stdio.h>
 
 #include "dev9.h"
-#include "ioman.h"
-#include "ioman_add.h"
 
 #ifdef HDD_DRIVER
 extern char atad_inited;
@@ -43,8 +42,6 @@ extern char atad_inited;
 
 #define VERSION "1.0"
 #define BANNER "\nDEV9 device driver v%s - Copyright (c) 2003 Marcus R. Brown\n\n"
-
-#define DEV9_INTR 13
 
 /* SSBUS registers.  */
 #define SSBUS_R_1418 0xbf801418
@@ -87,14 +84,20 @@ static int expbay_init(void);
 static int dev9x_dummy(void) { return 0; }
 static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
 {
-    if (cmd == 0x4401)
-        return dev9type;
-
-    return 0;
+    switch(cmd)
+    {
+        case DDIOC_MODEL:
+            return dev9type;
+        case DDIOC_OFF:
+            dev9Shutdown();
+            return 0;
+        default:
+            return 0;
+    }
 }
 
 /* driver ops func tab */
-static void *dev9x_ops[27] = {
+static iop_device_ops_t dev9x_ops = {
     (void *)dev9x_dummy,
     (void *)dev9x_dummy,
     (void *)dev9x_dummy,
@@ -118,18 +121,15 @@ static void *dev9x_ops[27] = {
     (void *)dev9x_dummy,
     (void *)dev9x_dummy,
     (void *)dev9x_dummy,
-    (void *)dev9x_devctl,
-    (void *)dev9_init,
-    (void *)dev9_init,
-    (void *)dev9_init};
+    (void *)dev9x_devctl};
 
 /* driver descriptor */
-static iop_ext_device_t dev9x_dev = {
+static iop_device_t dev9x_dev = {
     "dev9x",
-    IOP_DT_FS | 0x10000000, /* EXT FS */
+    IOP_DT_FS | IOP_DT_FSEXT,
     1,
     "DEV9",
-    (struct _iop_ext_device_ops *)&dev9x_ops};
+    &dev9x_ops};
 
 int dev9d_init(void)
 {
@@ -155,7 +155,7 @@ int dev9d_init(void)
         return res;
 
     DelDrv("dev9x");
-    AddDrv((iop_device_t *)&dev9x_dev);
+    AddDrv(&dev9x_dev);
 
     return 0;
 }
@@ -269,6 +269,7 @@ void dev9IntrDisable(int mask)
 int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
 {
     USE_SPD_REGS;
+    volatile iop_dmac_chan_t *dev9_chan = (iop_dmac_chan_t *)DEV9_DMAC_BASE;
     int res = 0, dmactrl;
 
     switch (ctrl) {
@@ -298,11 +299,12 @@ int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
     if (dev9_predma_cbs[ctrl])
         dev9_predma_cbs[ctrl](bcr, dir);
 
-    dmac_request(IOP_DMAC_DEV9, buf, bcr & 0xFFFF, bcr >> 16, dir);
-    dmac_transfer(IOP_DMAC_DEV9);
+    dev9_chan->madr = (u32)buf;
+    dev9_chan->bcr  = bcr;
+    dev9_chan->chcr = DMAC_CHCR_30|DMAC_CHCR_TR|DMAC_CHCR_CO|(dir & DMAC_CHCR_DR);
 
     /* Wait for DMA to complete. Do not use a semaphore as thread switching hurts throughput greatly.  */
-    while (dmac_ch_get_chcr(IOP_DMAC_DEV9) & DMAC_CHCR_TR) {
+    while (dev9_chan->chcr & DMAC_CHCR_TR) {
     }
     res = 0;
 
@@ -416,13 +418,19 @@ int dev9RegisterShutdownCb(int idx, dev9_shutdown_cb_t cb)
 
 static int dev9_init(void)
 {
-    int i;
+    iop_sema_t sema;
+    int i, flags;
 
-    if ((dma_lock_sem = CreateMutex(IOP_MUTEX_UNLOCKED)) < 0)
+    sema.attr = SA_THPRI;
+    sema.initial = 1;
+    sema.max = 1;
+    if ((dma_lock_sem = CreateSema(&sema)) < 0)
         return -1;
 
+    CpuSuspendIntr(&flags);
     /* Enable the DEV9 DMAC channel.  */
-    dmac_enable(IOP_DMAC_DEV9);
+    dmac_set_dpcr2(dmac_get_dpcr2() | 0x80);
+    CpuResumeIntr(flags);
 
     /* Not quite sure what this enables yet.  */
     dev9_set_stat(0x103);
@@ -430,6 +438,7 @@ static int dev9_init(void)
     /* Disable all device interrupts.  */
     dev9IntrDisable(0xffff);
 
+    /* Register interrupt dispatch callback handler. */
     p_dev9_intr_cb = (void *)dev9_intr_dispatch;
 
     /* Reset the SMAP interrupt callback table. */
@@ -569,7 +578,7 @@ static int pcmcia_init(void)
 {
     USE_DEV9_REGS;
     USE_AIF_REGS;
-    int *mode;
+    int *mode, flags;
 
     _sw(0x51011, SSBUS_R_1420);
     _sw(0x1a00bb, SSBUS_R_1418);
@@ -596,8 +605,10 @@ static int pcmcia_init(void)
     if (dev9_init() != 0)
         return 1;
 
+    CpuSuspendIntr(&flags);
     RegisterIntrHandler(IOP_IRQ_DEV9, 1, &pcmcia_intr, NULL);
     EnableIntr(IOP_IRQ_DEV9);
+    CpuResumeIntr(flags);
 
     DEV9_REG(DEV9_R_147E) = 0;
     M_PRINTF("CXD9566 (PCMCIA type) initialized.\n");
@@ -625,6 +636,7 @@ static int expbay_intr(void *unused)
 static int expbay_init(void)
 {
     USE_DEV9_REGS;
+    int flags;
 
     _sw(0x51011, SSBUS_R_1420);
     _sw(0xe01a3043, SSBUS_R_1418);
@@ -635,9 +647,10 @@ static int expbay_init(void)
     if (dev9_init() != 0)
         return 1;
 
-    ReleaseIntrHandler(IOP_IRQ_DEV9);
+    CpuSuspendIntr(&flags);
     RegisterIntrHandler(IOP_IRQ_DEV9, 1, expbay_intr, NULL);
     EnableIntr(IOP_IRQ_DEV9);
+    CpuResumeIntr(flags);
 
     DEV9_REG(DEV9_R_1466) = 0;
     M_PRINTF("CXD9611 (Expansion Bay type) initialized.\n");

@@ -259,6 +259,7 @@ enum eBUF_SIZE {
 #define l2cap_configuration_response (l2cap_buf[8] == L2CAP_CMD_CONFIG_RESPONSE)
 #define l2cap_configuration_success ((l2cap_buf[16] | (l2cap_buf[17] << 8)) == 0x0000)
 #define l2cap_disconnect_request (l2cap_buf[8] == L2CAP_CMD_DISCONNECT_REQUEST)
+#define l2cap_disconnection_response (l2cap_buf[8] == L2CAP_CMD_DISCONNECT_RESPONSE)
 
 /* Macros for HID event flag tests */
 #define hid_buttons_changed (hid_flags_ & HID_FLAG_BUTTONS_CHANGED)
@@ -274,6 +275,6 @@ void ds3bt_reset();
 void ds3bt_get_data(char *dst, int size, int port);
 void ds3bt_set_rumble(uint8_t lrum, uint8_t rrum, int port);
 void ds3bt_set_led(uint8_t led, int port);
-void ds3bt_get_bdaddr(uint8_t *data);
+int ds3bt_get_bdaddr(uint8_t *data);
 
 #endif

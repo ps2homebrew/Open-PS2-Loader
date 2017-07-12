@@ -1029,13 +1029,6 @@ extern int size_hdldsvr_irx;
 static int loadHdldSvr(void)
 {
     int ret, padStatus;
-    static char hddarg[] = "-o"
-                           "\0"
-                           "4"
-                           "\0"
-                           "-n"
-                           "\0"
-                           "20";
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
@@ -1052,12 +1045,9 @@ static int loadHdldSvr(void)
     if (ret == 0) {
         ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
         if (ret >= 0) {
-            ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
-            if (ret >= 0) {
-                ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
-                if (ret >= 0)
-                    ret = 0;
-            }
+            ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
+            if (ret >= 0)
+                ret = 0;
         }
     }
 

@@ -25,6 +25,7 @@
 #include <math.h>
 #include <osd_config.h>
 #include <libpwroff.h>
+#include <usbhdfsd-common.h>
 #include <fileXio_rpc.h>
 #include <smod.h>
 #include <smem.h>

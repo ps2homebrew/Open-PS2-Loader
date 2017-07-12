@@ -104,11 +104,16 @@ int _start(int argc, char *argv[])
         return MODULE_NO_RESIDENT_END;
     }
 
-#ifndef VMC
-    if (!install_sio2hook()) {
-        return MODULE_NO_RESIDENT_END;
-    }
+#ifdef VMC
+    uint8_t vmc = 0;
+    
+    if (argc > 1)
+        vmc = argv[1][3];
+
+    if(!vmc)
 #endif
+    if (!install_sio2hook())
+        return MODULE_NO_RESIDENT_END;
 
     pademu_setup(enable, vibration);
 
@@ -160,9 +165,18 @@ void InstallSio2manHook(void *exp)
 /* Hook for the LOADCORE's RegisterLibraryEntires call */
 int hookRegisterLibraryEntires(iop_library_t *lib)
 {
+    register int ret;
+
     if (!strncmp(lib->name, "sio2man", 8)) {
-        /* hooking SIO2MAN's routines */
-        InstallSio2manHook(&lib[1]);
+        ret = pRegisterLibraryEntires(lib);
+        if (ret == 0) {
+            ReleaseLibraryEntries((struct irx_export_table *)lib);
+            /* hooking SIO2MAN's routines */
+            InstallSio2manHook(&lib[1]);
+        } else {
+            DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
+            return ret;
+        }
     }
 
     DPRINTF("registering library %s\n", lib->name);
@@ -349,7 +363,7 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             break;
 
         case 0x43: //enter/exit config mode
-        	    if (pad[port].mode_cfg) {
+                if (pad[port].mode_cfg) {
                     pad[port].mode_cfg = in[3];
                     break;
                 }

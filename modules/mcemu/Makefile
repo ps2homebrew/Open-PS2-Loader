@@ -43,6 +43,10 @@ ifeq ($(USE_USB),1)
 IOP_CFLAGS += -DUSB_DRIVER
 endif
 
+ifeq ($(PADEMU),1)
+IOP_CFLAGS += -DPADEMU
+endif
+
 IOP_LDFLAGS += -s
 IOP_INCS +=
 

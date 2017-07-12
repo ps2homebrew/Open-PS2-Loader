@@ -82,7 +82,7 @@ int main(int argc, char *argv[2])
 
     scr_printf("\t IOP Reset... ");
 
-    while (!SifIopReset("rom0:UDNL rom0:EELOADCNF", 0))
+    while (!SifIopReset("", 0))
         ;
     while (!SifIopSync())
         ;

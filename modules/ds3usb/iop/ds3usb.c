@@ -16,25 +16,33 @@
 #include "vblank.h"
 #include "ds3usb.h"
 
+IRX_ID("ds3usb", 1, 1);
+
 //#define DPRINTF(x...) printf(x)
 #define DPRINTF(x...)
 
 #define MAX_PADS 2
 
 static uint8_t output_01_report[] =
-    {
-        0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00,
-        0x02,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0xff, 0x27, 0x10, 0x00, 0x32,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00};
+{
+    0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x02,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0xff, 0x27, 0x10, 0x00, 0x32,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00
+};
+
+static uint8_t power_level[] =
+{
+    0x00, 0x00, 0x02, 0x06, 0x0E, 0x1E
+};
 
 static uint8_t usb_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 
@@ -177,11 +185,11 @@ int usb_disconnect(int devId)
 
 static void usb_release(int pad)
 {
-    if (ds3pad[pad].eventEndp >= 0)
-        UsbCloseEndpoint(ds3pad[pad].eventEndp);
-
     if (ds3pad[pad].sema >= 0)
         DeleteSema(ds3pad[pad].sema);
+
+    if (ds3pad[pad].eventEndp >= 0)
+        UsbCloseEndpoint(ds3pad[pad].eventEndp);
 
     ds3pad[pad].controlEndp = -1;
     ds3pad[pad].eventEndp = -1;
@@ -263,8 +271,8 @@ static void readReport(uint8_t *data, int pad)
         ds3pad[pad].data[16] = data[DATA_START + PressureL2]; //L2
         ds3pad[pad].data[17] = data[DATA_START + PressureR2]; //R2
 
-        if (data[DATA_START + PSButtonState]) //display battery level
-            ds3pad[pad].oldled = ~(1 << data[DATA_START + Power]) & 0x1E;
+        if (data[DATA_START + PSButtonState] && (data[DATA_START + Power] != 0xEE)) //display battery level
+            ds3pad[pad].oldled = power_level[data[DATA_START + Power]];
         else
             ds3pad[pad].oldled = (pad + 1) << 1;
 
@@ -452,11 +460,6 @@ static int rpc_buf[64] __attribute((aligned(16)));
 
 void rpc_thread(void *data)
 {
-    if (sceSifCheckInit() == 0) {
-        DPRINTF("DS3USB: Sif not initialized \n");
-        sceSifInit();
-    }
-
     SifInitRpc(0);
     SifSetRpcQueue(&rpc_que, GetThreadId());
     SifRegisterRpc(&rpc_svr, DS3USB_BIND_RPC_ID, rpc_sf, rpc_buf, NULL, NULL, &rpc_que);

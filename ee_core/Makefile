@@ -16,9 +16,10 @@ EE_OBJS_DIR = obj/
 GSMCORE_EE_OBJS = gsm_engine.o gsm_api.o
 IGSCORE_EE_OBJS = igs_api.o
 CHEATCORE_EE_OBJS = cheat_engine.o cheat_api.o
+KERNEL_OBJS = iWakeupThread.o #iWakeupThread is used by SIFRPC. This prevents the thread patch from libkernel from being linked to.
 
 EE_OBJS = main.o syshook.o iopmgr.o modmgr.o util.o patches.o patches_asm.o \
-	  padhook.o spu.o tlb.o asm.o crt0.o
+	  padhook.o spu.o tlb.o asm.o crt0.o $(KERNEL_OBJS)
 MAPFILE = ee_core.map
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
@@ -102,5 +103,8 @@ clean:
 clean_all:
 	rm -f -r $(EE_OBJS_DIR) $(EE_BIN) $(MAPFILE)
 
+$(KERNEL_OBJS:%=$(EE_OBJS_DIR)%): $(EE_SRC_DIR)kernel_custom.S
+	@mkdir -p $(EE_OBJS_DIR)
+	$(EE_CC) $(EE_CFLAGS) -DF_$(*:$(EE_OBJS_DIR)%=%) $< -c -o $@
 
 include $(PS2SDK)/samples/Makefile.pref

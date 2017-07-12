@@ -13,6 +13,7 @@ I_GetLoadcoreInternalData
 I_QueryLibraryEntryTable
 I_FlushIcache
 I_FlushDcache
+I_ReleaseLibraryEntries
 loadcore_IMPORTS_end
 
 oplutils_IMPORTS_start

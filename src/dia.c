@@ -94,8 +94,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text)
         fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
 
         // separating line for simpler orientation
-        rmDrawLine(25, 138, 615, 138, gColWhite);
-        rmDrawLine(25, 139, 615, 139, gColWhite);
+        rmDrawRect(25, 138, 590, 2, gColWhite);
 
         for (j = 0; j < KEYB_HEIGHT; j++) {
             for (i = 0; i < KEYB_WIDTH; i++) {
@@ -415,8 +414,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
             ypos &= ~1;
 
             // two lines for lesser eye strain :)
-            rmDrawLine(x, ypos, x + UI_BREAK_LEN, ypos, gColWhite);
-            rmDrawLine(x, ypos + 1, x + UI_BREAK_LEN, ypos + 1, gColWhite);
+            rmDrawRect(x, ypos, UI_BREAK_LEN, 2, gColWhite);
             break;
         }
 

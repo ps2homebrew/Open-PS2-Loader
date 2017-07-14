@@ -72,6 +72,8 @@ int diaShowKeyb(char *text, int maxLen, int hide_text)
     cmdicons[2] = thmGetTexture(START_ICON);
     cmdicons[3] = thmGetTexture(SELECT_ICON);
 
+    rmGetScreenExtents(&screenWidth, &screenHeight);
+
     if (hide_text) {
         if ((mask_buffer = malloc(maxLen)) != NULL) {
             memset(mask_buffer, '*', len);

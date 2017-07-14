@@ -278,7 +278,6 @@ void rmEndFrame(void)
                            gsGlobal->Width / 64, gsGlobal->PSM, 0, 0);
 
             gsGlobal->ActiveBuffer ^= 1;
-            gsGlobal->PrimContext ^= 1;
         }
     }
 

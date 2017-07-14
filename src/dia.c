@@ -39,10 +39,12 @@ static int screenHeight;
 
 static void diaDrawBoundingBox(int x, int y, int w, int h, int focus)
 {
-    if (focus)
-        rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->selTextColor & gColFocus);
-    else
-        rmDrawRect(x - 5, y, w + 10, h + 10, gTheme->textColor & gColFocus);
+    u64 color = focus ? gTheme->selTextColor : gTheme->textColor;
+
+    color |= GS_SETREG_RGBA(0, 0, 0, 0xFF);
+    color &= gColFocus;
+
+    rmDrawRect(x - 5, y, w + 10, h + 10, color);
 }
 
 int diaShowKeyb(char *text, int maxLen, int hide_text)
@@ -257,7 +259,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
         rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
         // "Color selection"
-        fntRenderString(gTheme->fonts[0], 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+        fntRenderString(gTheme->fonts[0], 50, 50, ALIGN_NONE, 0, 0, _l(_STR_COLOR_SELECTION), GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
 
         // 3 bars representing the colors...
         size_t co;
@@ -273,9 +275,9 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
             u64 dcol = GS_SETREG_RGBA(cc[0], cc[1], cc[2], 0x80);
 
             if (selc == co)
-                rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
+                rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
             else
-                rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x020, 0x020, 0x020, 0x60));
+                rmDrawRect(x, y, 200, 20, GS_SETREG_RGBA(0x20, 0x20, 0x20, 0x80));
 
             rmDrawRect(x + 2, y + 2, 190.0f * (cc[co] * 100 / 255) / 100, 16, dcol);
         }
@@ -286,7 +288,7 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
         x = 300;
         y = 75;
 
-        rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x60));
+        rmDrawRect(x, y, 70, 70, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
         rmDrawRect(x + 5, y + 5, 60, 60, dcol);
 
         guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_OK, gTheme->fonts[0], 420, 417, gTheme->selTextColor);

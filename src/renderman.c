@@ -57,12 +57,12 @@ static float aspectHeight;
 static float transX = 0;
 static float transY = 0;
 
-const u64 gColWhite = GS_SETREG_RGBA(0xFF, 0xFF, 0xFF, 0x00);
-const u64 gColBlack = GS_SETREG_RGBA(0x00, 0x00, 0x00, 0x00);
-const u64 gColDarker = GS_SETREG_RGBA(0x00, 0x00, 0x00, 0x60);
-const u64 gColFocus = GS_SETREG_RGBA(0xFF, 0xFF, 0xFF, 0x50);
+const u64 gColWhite = GS_SETREG_RGBA(0xFF, 0xFF, 0xFF, 0x80);   // Alpha 0x80 -> solid white
+const u64 gColBlack = GS_SETREG_RGBA(0x00, 0x00, 0x00, 0x80);   // Alpha 0x80 -> solid black
+const u64 gColDarker = GS_SETREG_RGBA(0x00, 0x00, 0x00, 0x60);  // Alpha 0x60 -> transparent overlay color
+const u64 gColFocus = GS_SETREG_RGBA(0xFF, 0xFF, 0xFF, 0x50);   // Alpha 0x50 -> transparent overlay color
 
-const u64 gDefaultCol = GS_SETREG_RGBA(0x80, 0x80, 0x80, 0x80);
+const u64 gDefaultCol = GS_SETREG_RGBA(0x80, 0x80, 0x80, 0x80); // Special color for texture multiplication
 const u64 gDefaultAlpha = GS_SETREG_ALPHA(0, 1, 0, 1, 0);
 
 static float shiftYVal;
@@ -356,6 +356,7 @@ int rmSetMode(int force)
         gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 
         gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
+        gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
 
         // reset the contents of the screen to avoid garbage being displayed
         gsKit_clear(gsGlobal, gColBlack);
@@ -435,9 +436,10 @@ void rmDrawQuad(rm_quad_t *q)
     if (!rmPrepareTexture(q->txt)) // won't render if not ready!
         return;
 
-    if ((q->txt->PSM == GS_PSM_CT32) || (q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32)) {
-        gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
-    }
+    if ((q->txt->PSM == GS_PSM_CT32) || (q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32))
+        gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
+    else
+        gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
 
     gsKit_prim_sprite_texture(gsGlobal, q->txt,
                               q->ul.x + transX, q->ul.y + transY,
@@ -445,8 +447,6 @@ void rmDrawQuad(rm_quad_t *q)
                               q->br.x + transX, q->br.y + transY,
                               q->br.u - 0.375f, q->br.v + 0.375f, order, q->color);
     order++;
-
-    gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 }
 
 void rmDrawPixmap(GSTEXTURE *txt, int x, int y, short aligned, int w, int h, short scaled, u64 color)
@@ -466,30 +466,32 @@ void rmDrawOverlayPixmap(GSTEXTURE *overlay, int x, int y, short aligned, int w,
     if (!rmPrepareTexture(inlay))
         return;
 
-    if (inlay->PSM == GS_PSM_CT32)
-        gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
+    if ((inlay->PSM == GS_PSM_CT32) || (inlay->Clut && inlay->ClutPSM == GS_PSM_CT32))
+        gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
+    else
+        gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
 
     gsKit_prim_quad_texture(gsGlobal, inlay, quad.ul.x + transX + aspectWidth * ulx, quad.ul.y + transY + uly, 0.5f, 0.5f,
                             quad.ul.x + transX + aspectWidth * urx, quad.ul.y + transY + ury, inlay->Width - 0.375f, 0.5f,
                             quad.ul.x + transX + aspectWidth * blx, quad.ul.y + transY + bly, 0.5f, inlay->Height - 0.375f,
                             quad.ul.x + transX + aspectWidth * brx, quad.ul.y + transY + bry, inlay->Width - 0.375f, inlay->Height - 0.375f, order, gDefaultCol);
     order++;
-    gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 
     rmDrawQuad(&quad);
 }
 
 void rmDrawRect(int x, int y, int w, int h, u64 color)
 {
-    gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0, 1, 0, 1, 0), 0);
+    gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
     gsKit_prim_quad(gsGlobal, x + transX, shiftY(y) + transY, x + w + transX, shiftY(y) + transY, x + transX, shiftY(y) + h + transY, x + w + transX, shiftY(y) + h + transY, order, color);
     order++;
-    gsKit_set_primalpha(gsGlobal, GS_BLEND_BACK2FRONT, 0);
 }
 
 void rmDrawLine(int x, int y, int x1, int y1, u64 color)
 {
+    gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
     gsKit_prim_line(gsGlobal, x + transX, shiftY(y) + transY, x1 + transX, shiftY(y1) + transY, order, color);
+    order++;
 }
 
 void rmSetDisplayOffset(int x, int y)

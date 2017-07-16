@@ -459,7 +459,6 @@ void rmDrawPixmap(GSTEXTURE *txt, int x, int y, short aligned, int w, int h, sho
 void rmDrawOverlayPixmap(GSTEXTURE *overlay, int x, int y, short aligned, int w, int h, short scaled, u64 color,
                          GSTEXTURE *inlay, int ulx, int uly, int urx, int ury, int blx, int bly, int brx, int bry)
 {
-
     rm_quad_t quad;
     rmSetupQuad(overlay, x, y, aligned, w, h, scaled, color, &quad);
 
@@ -483,7 +482,7 @@ void rmDrawOverlayPixmap(GSTEXTURE *overlay, int x, int y, short aligned, int w,
 void rmDrawRect(int x, int y, int w, int h, u64 color)
 {
     gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
-    gsKit_prim_quad(gsGlobal, x + transX, shiftY(y) + transY, x + w + transX, shiftY(y) + transY, x + transX, shiftY(y) + h + transY, x + w + transX, shiftY(y) + h + transY, order, color);
+    gsKit_prim_sprite(gsGlobal, x + transX, shiftY(y) + transY, x + w + transX, shiftY(y) + h + transY, order, color);
     order++;
 }
 

@@ -442,10 +442,10 @@ void rmDrawQuad(rm_quad_t *q)
         gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
 
     gsKit_prim_sprite_texture(gsGlobal, q->txt,
-                              q->ul.x + transX, q->ul.y + transY,
-                              q->ul.u + 0.5f, q->ul.v + 0.5f,
-                              q->br.x + transX, q->br.y + transY,
-                              q->br.u - 0.375f, q->br.v + 0.375f, order, q->color);
+                              q->ul.x + transX - 0.5f, q->ul.y + transY - 0.5f,
+                              q->ul.u, q->ul.v,
+                              q->br.x + transX - 0.5f, q->br.y + transY - 0.5f,
+                              q->br.u, q->br.v, order, q->color);
     order++;
 }
 
@@ -470,10 +470,15 @@ void rmDrawOverlayPixmap(GSTEXTURE *overlay, int x, int y, short aligned, int w,
     else
         gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
 
-    gsKit_prim_quad_texture(gsGlobal, inlay, quad.ul.x + transX + aspectWidth * ulx, quad.ul.y + transY + uly, 0.5f, 0.5f,
-                            quad.ul.x + transX + aspectWidth * urx, quad.ul.y + transY + ury, inlay->Width - 0.375f, 0.5f,
-                            quad.ul.x + transX + aspectWidth * blx, quad.ul.y + transY + bly, 0.5f, inlay->Height - 0.375f,
-                            quad.ul.x + transX + aspectWidth * brx, quad.ul.y + transY + bry, inlay->Width - 0.375f, inlay->Height - 0.375f, order, gDefaultCol);
+    gsKit_prim_quad_texture(gsGlobal, inlay,
+                            quad.ul.x + transX + aspectWidth * ulx - 0.5f, quad.ul.y + transY + uly - 0.5f,
+                            0.0f, 0.0f,
+                            quad.ul.x + transX + aspectWidth * urx - 0.5f, quad.ul.y + transY + ury - 0.5f,
+                            inlay->Width, 0.0f,
+                            quad.ul.x + transX + aspectWidth * blx - 0.5f, quad.ul.y + transY + bly - 0.5f,
+                            0.0f, inlay->Height,
+                            quad.ul.x + transX + aspectWidth * brx - 0.5f, quad.ul.y + transY + bry - 0.5f,
+                            inlay->Width, inlay->Height, order, gDefaultCol);
     order++;
 
     rmDrawQuad(&quad);

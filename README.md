@@ -15,11 +15,15 @@ format. It's now the most compatible homebrew loader.
 OPL is also developed continuously - anyone can contribute improvements to
 the project due to its open source nature.  
 
-You can visit the Open PS2 Loader forum at:  
+You can visit the Open PS2 Loader forums at:  
+
+http://www.ps2-home.com/forum/viewforum.php?f=13
 
 http://psx-scene.com/forums/official-open-ps2-loader-forum/  
 
-For updated compatibility list, you can visit OPL-CL site at:  
+For updated compatibility lists, you can visit OPL-CL site at:  
+
+http://www.ps2-home.com/forum/page/opl-game-compatibility-list-1
 
 http://sx.sytes.net/oplcl/games.aspx  
 

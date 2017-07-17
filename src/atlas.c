@@ -1,7 +1,7 @@
 /*
   Copyright 2010, Volca
   Licenced under Academic Free License version 3.0
-  Review OpenUsbLd README & LICENSE files for further details.  
+  Review OpenUsbLd README & LICENSE files for further details.
 */
 
 #include <stdio.h>
@@ -167,7 +167,7 @@ struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, size_t heigh
     if (!surface)
         return NULL;
 
-    struct atlas_allocation_t *al = allocPlace(atlas->allocation, width, height);
+    struct atlas_allocation_t *al = allocPlace(atlas->allocation, width+1, height+1);
 
     if (!al)
         return NULL;

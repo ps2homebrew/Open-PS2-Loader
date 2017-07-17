@@ -1504,26 +1504,23 @@ static void guiDrawBusy()
     if (gTheme->loadingIcon) {
         GSTEXTURE *texture = thmGetTexture(LOAD0_ICON + (guiFrameId >> 1) % gTheme->loadingIconCount);
         if (texture && texture->Mem) {
-            u64 mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, bfadeout);
+            u64 mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, bfadeout);
             rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, gTheme->loadingIcon->scaled, mycolor);
         }
     }
 }
 
-static int wfadeout = 0x0150;
+static int wfadeout = 0x80;
 static void guiRenderGreeting()
 {
-    int fade = wfadeout > 0xFF ? 0xFF : wfadeout;
-    u64 mycolor = GS_SETREG_RGBA(0x10, 0x10, 0x10, fade >> 1);
+    u64 mycolor = GS_SETREG_RGBA(0x00, 0x00, 0x00, wfadeout);
     rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 
     GSTEXTURE *logo = thmGetTexture(LOGO_PICTURE);
     if (logo) {
-        mycolor = GS_SETREG_RGBA(0x080, 0x080, 0x080, fade >> 1);
+        mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, wfadeout);
         rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, logo->Width, logo->Height, SCALING_RATIO, mycolor);
     }
-
-    return;
 }
 
 static float mix(float a, float b, float t)
@@ -1701,13 +1698,13 @@ void guiDrawBGPlasma()
 
     for (y = pery; y < ymax; y++) {
         for (x = 0; x < PLASMA_W; x++) {
-            u32 fper = guiCalcPerlin((float)(2 * x) / PLASMA_W, (float)(2 * y) / PLASMA_H, perz) * 0x080 + 0x080;
+            u32 fper = guiCalcPerlin((float)(2 * x) / PLASMA_W, (float)(2 * y) / PLASMA_H, perz) * 0x80 + 0x80;
 
             *buf = GS_SETREG_RGBA(
                 (u32)(fper * curbgColor[0]) >> 8,
                 (u32)(fper * curbgColor[1]) >> 8,
                 (u32)(fper * curbgColor[2]) >> 8,
-                0x080);
+                0x80);
 
             ++buf;
         }
@@ -1741,7 +1738,7 @@ static void guiDrawOverlays()
         else
             bfadeout = 0x0;
     } else {
-        if (bfadeout < 0x080)
+        if (bfadeout < 0x80)
             bfadeout += 0x08;
     }
 
@@ -1757,7 +1754,7 @@ static void guiDrawOverlays()
     else
         snprintf(fps, sizeof(fps), "%3d ms ----- FPS", time_render);
 
-    fntRenderString(gTheme->fonts[0], screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+    fntRenderString(gTheme->fonts[0], screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
 #endif
 
     // Last Played Auto Start
@@ -1768,7 +1765,7 @@ static void guiDrawOverlays()
             CronCurrent = clock() / CLOCKS_PER_SEC;
             RemainSecs = gAutoStartLastPlayed - (CronCurrent - CronStart);
             snprintf(strAutoStartInNSecs, sizeof(strAutoStartInNSecs), _l(_STR_AUTO_START_IN_N_SECS), RemainSecs);
-            fntRenderString(gTheme->fonts[0], screenWidth / 2, screenHeight / 2, ALIGN_CENTER, 0, 0, strAutoStartInNSecs, GS_SETREG_RGBA(0x060, 0x060, 0x060, 0x060));
+            fntRenderString(gTheme->fonts[0], screenWidth / 2, screenHeight / 2, ALIGN_CENTER, 0, 0, strAutoStartInNSecs, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
         }
     }
 
@@ -1827,7 +1824,7 @@ void guiIntroLoop(void)
 
         guiReadPads();
 
-        if (wfadeout < 0x0FF)
+        if (wfadeout < 0x80)
             guiShow();
 
         if (gInitComplete)

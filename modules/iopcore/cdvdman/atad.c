@@ -108,20 +108,24 @@ static unsigned int ata_alarm_cb(void *unused);
 static void ata_set_dir(int dir);
 
 /* In v1.04, DMA was enabled in ata_set_dir() instead. */
-static void AtadPreDmaCb(int bcr, int dir){
+//Disabled for compatibility with some clone adaptors.
+/* static void ata_pre_dma_cb(int bcr, int dir)
+{
 	USE_SPD_REGS;
 
 	SPD_REG16(SPD_R_XFR_CTRL)|=0x80;
 }
 
-static void AtadPostDmaCb(int bcr, int dir){
+static void ata_post_dma_cb(int bcr, int dir)
+{
 	USE_SPD_REGS;
 
 	SPD_REG16(SPD_R_XFR_CTRL)&=~0x80;
-}
+} */
 
 #ifdef DEV9_DEBUG
-static int ata_create_event_flag(void) {
+static int ata_create_event_flag(void)
+{
     iop_event_t event;
 
     /* In v1.04, EA_MULTI was specified. */
@@ -162,8 +166,9 @@ int atad_start(void)
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
     dev9RegisterIntrCb(1, &ata_intr_cb);
     dev9RegisterIntrCb(0, &ata_intr_cb);
-    dev9RegisterPreDmaCb(0, &AtadPreDmaCb);
-    dev9RegisterPostDmaCb(0, &AtadPostDmaCb);
+/*  Disabled for compatibility with some clone adaptors.
+    dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
+    dev9RegisterPostDmaCb(0, &ata_post_dma_cb); */
 
 #ifdef VMC_DRIVER
     iop_sema_t smp;
@@ -641,5 +646,6 @@ static void ata_set_dir(int dir)
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;
     val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
     SPD_REG16(SPD_R_IF_CTRL) = val;
-    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6;	//In v1.04, DMA was enabled here (0x86 instead of 0x6)
+//    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6;	//In v1.04, DMA was enabled here (0x86 instead of 0x6)
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x86;	//Enable DMA here for compatibility with some clone adaptors.
 }

@@ -37,17 +37,21 @@ struct rm_mode
 {
     char mode;
     char hsync; //In KHz
+    short int width;
     short int height;
     short int VCK;
+    short int interlace;
+    short int field;
+    short int PSM;
 };
 
 static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
-    {-1, 16, -1, -1},                 // AUTO
-    {GS_MODE_PAL, 16, 512, 4},        // PAL@50Hz
-    {GS_MODE_NTSC, 16, 448, 4},       // NTSC@60Hz
-    {GS_MODE_DTV_480P, 31, 448, 2},   // DTV480P@60Hz
-    {GS_MODE_DTV_576P, 31, 512, 2},   // DTV576P@50Hz
-    {GS_MODE_VGA_640_60, 31, 480, 2}, // VGA640x480@60Hz
+    {-1,                 16,  640,   -1,  4, GS_INTERLACED,    GS_FIELD, GS_PSM_CT24}, // AUTO
+    {GS_MODE_PAL,        16,  640,  512,  4, GS_INTERLACED,    GS_FIELD, GS_PSM_CT24}, // PAL@50Hz
+    {GS_MODE_NTSC,       16,  640,  448,  4, GS_INTERLACED,    GS_FIELD, GS_PSM_CT24}, // NTSC@60Hz
+    {GS_MODE_DTV_480P,   31,  640,  448,  2, GS_NONINTERLACED, GS_FRAME, GS_PSM_CT24}, // DTV480P@60Hz
+    {GS_MODE_DTV_576P,   31,  640,  512,  2, GS_NONINTERLACED, GS_FRAME, GS_PSM_CT24}, // DTV576P@50Hz
+    {GS_MODE_VGA_640_60, 31,  640,  480,  2, GS_NONINTERLACED, GS_FRAME, GS_PSM_CT24}, // VGA640x480@60Hz
 };
 
 static float aspectWidth;
@@ -332,22 +336,16 @@ int rmSetMode(int force)
         vmode = gVMode;
 
         gsGlobal->Mode = rm_mode_table[vmode].mode;
+        gsGlobal->Width = rm_mode_table[vmode].width;
         gsGlobal->Height = rm_mode_table[vmode].height;
-
-        if (vmode == RM_VMODE_DTV480P || vmode == RM_VMODE_DTV576P || vmode == RM_VMODE_VGA_640_60) {
-            gsGlobal->Interlace = GS_NONINTERLACED;
-            gsGlobal->Field = GS_FRAME;
-        } else {
-            gsGlobal->Interlace = GS_INTERLACED;
-            gsGlobal->Field = GS_FIELD;
-        }
-        gsGlobal->Width = 640;
-
-        gsGlobal->PSM = GS_PSM_CT24;
+        gsGlobal->Interlace = rm_mode_table[vmode].interlace;
+        gsGlobal->Field = rm_mode_table[vmode].field;
+        gsGlobal->PSM = rm_mode_table[vmode].PSM;
         gsGlobal->PSMZ = GS_PSMZ_16S;
         gsGlobal->ZBuffering = GS_SETTING_OFF;
         gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
         gsGlobal->DoubleBuffering = GS_SETTING_ON;
+        gsGlobal->Dithering = GS_SETTING_ON;
 
         gsKit_init_screen(gsGlobal);
 

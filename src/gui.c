@@ -484,7 +484,16 @@ static int guiUIUpdater(int modified)
 
         diaGetInt(diaUIConfig, UICFG_XOFF, &x);
         diaGetInt(diaUIConfig, UICFG_YOFF, &y);
-        rmSetDisplayOffset(x, y);
+        if ((x != gXOff) || (y != gYOff)) {
+            gXOff = x;
+            gYOff = y;
+            rmSetDisplayOffset(x, y);
+        }
+        diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &temp);
+        if (temp != gWideScreen) {
+            gWideScreen = temp;
+            guiUpdateScreenScale();
+        }
     }
 
     return 0;
@@ -506,7 +515,6 @@ void guiShowUIConfig(void)
     diaSetInt(diaUIConfig, UICFG_SCROLL, gScrollSpeed);
     diaSetInt(diaUIConfig, UICFG_THEME, thmGetGuiValue());
     diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
-    guiUIUpdater(1);
     diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
     diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
     diaSetInt(diaUIConfig, UICFG_INFOPAGE, gUseInfoScreen);
@@ -515,6 +523,7 @@ void guiShowUIConfig(void)
     diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
     diaSetInt(diaUIConfig, UICFG_XOFF, gXOff);
     diaSetInt(diaUIConfig, UICFG_YOFF, gYOff);
+    guiUIUpdater(1);
 
     int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
     if (ret) {

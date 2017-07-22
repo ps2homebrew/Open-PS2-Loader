@@ -37,6 +37,8 @@ static ee_sema_t gFontSema;
 
 static GSCLUT fontClut;
 
+static const float fDPI = 72.0f;
+
 /** Single entry in the glyph cache */
 typedef struct
 {
@@ -230,6 +232,8 @@ static int fntLoadSlot(font_t *font, char *path)
 {
     void *buffer = NULL;
     int bufferSize = -1;
+    float aw = gWideScreen ? 0.75f : 1.0f;
+    float ah = 1.0f;
 
     fntInitSlot(font);
 
@@ -253,7 +257,7 @@ static int fntLoadSlot(font_t *font, char *path)
         return FNT_ERROR;
     }
 
-    error = FT_Set_Pixel_Sizes(font->face, FNTSYS_CHAR_SIZE, FNTSYS_CHAR_SIZE);
+    error = FT_Set_Char_Size(font->face, FNTSYS_CHAR_SIZE*64, FNTSYS_CHAR_SIZE*64, fDPI*aw, fDPI*ah);
     if (error) {
         LOG("FNTSYS Freetype error setting font pixel size with %x!\n", error);
         fntDeleteSlot(font);
@@ -398,7 +402,7 @@ static fnt_glyph_cache_entry_t *fntCacheGlyph(font_t *font, uint32_t gid)
             return NULL;
 
     fnt_glyph_cache_entry_t *page = font->glyphCache[pageid];
-    /* Should never happen. 
+    /* Should never happen.
 	if (!page) // safeguard
 		return NULL;
 	*/
@@ -444,7 +448,7 @@ void fntSetAspectRatio(float aw, float ah)
         if (fonts[i].isValid) {
             fntCacheFlush(&fonts[i]);
             //TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
-            //	FT_Set_Pixel_Sizes(fonts[i].face, FNTSYS_CHAR_SIZE * aw, FNTSYS_CHAR_SIZE * ah);
+            FT_Set_Char_Size(fonts[i].face, FNTSYS_CHAR_SIZE*64, FNTSYS_CHAR_SIZE*64, fDPI*aw, fDPI*ah);
         }
     }
 }

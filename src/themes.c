@@ -262,8 +262,10 @@ static void findDuplicate(theme_element_t *first, const char *cachePattern, cons
 static void freeImageTexture(image_texture_t *texture)
 {
     if (texture) {
-        if (texture->source.Mem)
+        if (texture->source.Mem) {
+            rmUnloadTexture(&texture->source);
             free(texture->source.Mem);
+        }
 
         free(texture->name);
 
@@ -964,6 +966,7 @@ static void thmFree(theme_t *theme)
         for (; id < TEXTURES_COUNT; id++) {
             texture = &theme->textures[id];
             if (texture->Mem != NULL) {
+                rmUnloadTexture(texture);
                 free(texture->Mem);
                 texture->Mem = NULL;
             }

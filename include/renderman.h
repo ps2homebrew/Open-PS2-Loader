@@ -97,17 +97,12 @@ void rmGetScreenExtentsNative(int *w, int *h);
 /** Fills the parameters with the virtual (640x480) screen width and height */
 void rmGetScreenExtents(int *w, int *h);
 
-/** Manually prepares a texture for rendering (should not be normally needed).
-* txt->Vram will be nonzero on success.
-* @param txt The texture to upload (if not uploaded already)
-* @return 1 if ok, 0 if error uploading happened (likely too big texture) */
-int rmPrepareTexture(GSTEXTURE *txt);
+/** Invalidate a texture so it will be re-transferred to VRAM the next time.
+* @param txt The texture to invalidate */
+void rmInvalidateTexture(GSTEXTURE *txt);
 
-/** Flushes all rendering buffers - renders the gs queue, removes all textures from GS ram */
-void rmFlush(void);
-
-/** Issues immediate rendering of the accumulated operations */
-void rmDispatch(void);
+/** Unload texture from texture manager, performance optimization */
+void rmUnloadTexture(GSTEXTURE *txt);
 
 void rmDrawQuad(rm_quad_t *q);
 

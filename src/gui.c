@@ -509,8 +509,19 @@ void guiShowUIConfig(void)
 
     // configure the enumerations
     const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
-    const char *vmodeNames[] = {_l(_STR_AUTO), "PAL", "NTSC", "HDTV 480p @60Hz", "HDTV 576p @50Hz",
-                                "VGA 640x480p @60Hz", NULL};
+    const char *vmodeNames[] = {_l(_STR_AUTO)
+        , "PAL 640x512i @50Hz 24bit"
+        , "NTSC 640x448i @60Hz 24bit"
+        , "EDTV 640x448p @60Hz 24bit"
+        , "EDTV 640x512p @50Hz 24bit"
+        , "VGA 640x480p @60Hz 24bit"
+        , "PAL 704x576i @50Hz 16bit"
+        , "NTSC 704x480i @60Hz 16bit"
+        , "EDTV 704x480p @60Hz 16bit"
+        , "EDTV 704x576p @50Hz 16bit"
+        , "HDTV 1280x720p @60Hz 16bit scaled"
+        , "HDTV 1920x1080i @60Hz 16bit scaled"
+        , NULL};
 
     diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
     diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());

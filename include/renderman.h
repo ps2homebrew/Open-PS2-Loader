@@ -73,6 +73,8 @@ enum rm_vmode {
     RM_VMODE_NTSC,
     RM_VMODE_DTV480P,
     RM_VMODE_DTV576P,
+    RM_VMODE_DTV720P,
+    RM_VMODE_DTV1080I,
     RM_VMODE_VGA_640_60
 };
 

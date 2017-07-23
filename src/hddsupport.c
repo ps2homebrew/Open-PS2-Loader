@@ -93,8 +93,6 @@ static int hddCheckHDProKit(void)
 
     // check result
     if ((res & 0xff) == 0xe7) {
-        HDPROreg_IO8 = 0xe3;
-        CDVDreg_STATUS = 0;
         // HD Pro IO finish commands sequence
         HDPROreg_IO8 = 0xf3;
         CDVDreg_STATUS = 0;
@@ -146,6 +144,9 @@ void hddLoadModules(void)
     if (!hddModulesLoaded) {
         hddModulesLoaded = 1;
 
+        //DEV9 must be loaded, as HDD.IRX depends on it. Even if not required by the I/F (i.e. HDPro)
+        sysInitDev9();
+
         // try to detect HD Pro Kit (not the connected HDD),
         // if detected it loads the specific ATAD module
         hddHDProKitDetected = hddCheckHDProKit();
@@ -153,7 +154,6 @@ void hddLoadModules(void)
             ret = sysLoadModuleBuffer(&hdpro_atad_irx, size_hdpro_atad_irx, 0, NULL);
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 6, "-hdpro");
         } else {
-            sysInitDev9();
             ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
             sysLoadModuleBuffer(&xhdd_irx, size_xhdd_irx, 0, NULL);
         }

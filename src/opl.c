@@ -545,6 +545,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
             configGetInt(configOPL, CONFIG_OPL_XOFF, &gXOff);
             configGetInt(configOPL, CONFIG_OPL_YOFF, &gYOff);
+            configGetInt(configOPL, CONFIG_OPL_OVERSCAN, &gOverscan);
 
             if (configGetStr(configOPL, CONFIG_OPL_THEME, &temp))
                 themeID = thmFindGuiID(temp);
@@ -634,6 +635,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
         configSetInt(configOPL, CONFIG_OPL_XOFF, gXOff);
         configSetInt(configOPL, CONFIG_OPL_YOFF, gYOff);
+        configSetInt(configOPL, CONFIG_OPL_OVERSCAN, gOverscan);
         configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
         configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
         configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
@@ -689,15 +691,16 @@ void applyConfig(int themeID, int langID)
         gDefaultDevice = APP_MODE;
 
     guiUpdateScrollSpeed();
-    guiUpdateScreenScale();
 
     guiSetFrameHook(&menuUpdateHook);
 
     int changed = rmSetMode(0);
     if (changed) {
         // reinit the graphics...
+        rmSetAspectRatio((gWideScreen == 0) ? RM_ARATIO_4_3 : RM_ARATIO_16_9);
         thmReloadScreenExtents();
         guiReloadScreenExtents();
+        guiUpdateScreenScale();
     }
 
     // theme must be set after color, and lng after theme
@@ -1208,6 +1211,7 @@ static void setDefaults(void)
     gVMode = RM_VMODE_AUTO;
     gXOff = 0;
     gYOff = 0;
+    gOverscan = 0;
 
 #ifdef CHEAT
     memset(gCheatList, 0, sizeof(gCheatList));

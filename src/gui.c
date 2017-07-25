@@ -47,7 +47,6 @@ static s32 gGUILockSemaId;
 static ee_sema_t gQueueSema;
 
 static int screenWidth;
-static float wideScreenScale;
 static int screenHeight;
 
 // forward decl.
@@ -142,8 +141,6 @@ void guiInit(void)
     gBackgroundTex.Vram = 0;
     gBackgroundTex.VramClut = 0;
     gBackgroundTex.Clut = NULL;
-
-    wideScreenScale = 1.0f;
 
     // Precalculate the values for the perlin noise plasma
     int i;
@@ -489,9 +486,16 @@ static int guiUIUpdater(int modified)
             gYOff = y;
             rmSetDisplayOffset(x, y);
         }
+        diaGetInt(diaUIConfig, UICFG_OVERSCAN, &temp);
+        if (temp != gOverscan) {
+            gOverscan = temp;
+            rmSetOverscan(gOverscan);
+            guiUpdateScreenScale();
+        }
         diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &temp);
         if (temp != gWideScreen) {
             gWideScreen = temp;
+            rmSetAspectRatio((gWideScreen == 0) ? RM_ARATIO_4_3 : RM_ARATIO_16_9);
             guiUpdateScreenScale();
         }
     }
@@ -523,6 +527,7 @@ void guiShowUIConfig(void)
     diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
     diaSetInt(diaUIConfig, UICFG_XOFF, gXOff);
     diaSetInt(diaUIConfig, UICFG_YOFF, gYOff);
+    diaSetInt(diaUIConfig, UICFG_OVERSCAN, gOverscan);
     guiUIUpdater(1);
 
     int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
@@ -545,6 +550,7 @@ void guiShowUIConfig(void)
         diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
         diaGetInt(diaUIConfig, UICFG_XOFF, &gXOff);
         diaGetInt(diaUIConfig, UICFG_YOFF, &gYOff);
+        diaGetInt(diaUIConfig, UICFG_OVERSCAN, &gOverscan);
 
         applyConfig(themeID, langID);
     }
@@ -1727,11 +1733,16 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
 {
     GSTEXTURE *iconTex = thmGetTexture(iconId);
     if (iconTex && iconTex->Mem) {
-        rmDrawPixmap(iconTex, x, y, ALIGN_NONE, iconTex->Width, iconTex->Height, SCALING_RATIO, gDefaultCol);
-        x += iconTex->Width + 2;
+        y += iconTex->Height >> 1;
+        rmDrawPixmap(iconTex, x, y, ALIGN_VCENTER, iconTex->Width, iconTex->Height, SCALING_RATIO, gDefaultCol);
+        x += rmWideScale(iconTex->Width) + 2;
+    }
+    else {
+        // HACK: font is aligned to VCENTER, the default height icon height is 20
+        y += 10;
     }
 
-    x = fntRenderString(font, x, y, ALIGN_NONE, 0, 0, _l(textId), color);
+    x = fntRenderString(font, x, y, ALIGN_VCENTER, 0, 0, _l(textId), color);
 
     return x;
 }
@@ -1934,14 +1945,7 @@ void guiUpdateScrollSpeed(void)
 
 void guiUpdateScreenScale(void)
 {
-    if (gWideScreen)
-        wideScreenScale = 0.75f;
-    else
-        wideScreenScale = 1.0f;
-
-    // apply the scaling to renderman and font rendering
-    rmSetAspectRatio(wideScreenScale, 1.0f);
-    fntSetAspectRatio(wideScreenScale, 1.0f);
+    fntUpdateAspectRatio();
 }
 
 int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)

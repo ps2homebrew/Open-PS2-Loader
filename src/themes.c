@@ -1140,12 +1140,6 @@ static void thmLoad(const char *themePath)
     LOG("THEMES Number of cache: %d\n", newT->gameCacheCount);
     LOG("THEMES Used height: %d\n", newT->usedHeight);
 
-    /// Now swap theme and start loading textures
-    if (newT->usedHeight == screenHeight)
-        rmResetShiftRatio();
-    else
-        rmSetShiftRatio((float)screenHeight / newT->usedHeight);
-
     int i;
     // default all to not loaded...
     for (i = 0; i < TEXTURES_COUNT; i++) {

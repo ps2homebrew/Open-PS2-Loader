@@ -427,6 +427,11 @@ struct UIItem diaUIConfig[] = {
     {UI_INT, UICFG_YOFF, 1, 1, -1, 0, 0, {.intvalue = {0, 0, -300, 300}}},
     {UI_BREAK},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_OVERSCAN}}},
+    {UI_SPACER},
+    {UI_INT, UICFG_OVERSCAN, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_WIDE_SCREEN}}},
     {UI_SPACER},
     {UI_BOOL, UICFG_WIDESCREEN, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},

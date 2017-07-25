@@ -94,7 +94,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text)
         fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
 
         // separating line for simpler orientation
-        rmDrawRect(25, 138, 590, 2, gColWhite);
+        rmDrawLine(25, 138, 615, 138, gColWhite);
 
         for (j = 0; j < KEYB_HEIGHT; j++) {
             for (i = 0; i < KEYB_WIDTH; i++) {
@@ -413,8 +413,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
             // to ODD lines
             ypos &= ~1;
 
-            // two lines for lesser eye strain :)
-            rmDrawRect(x, ypos, UI_BREAK_LEN, 2, gColWhite);
+            rmDrawLine(x, ypos, x + UI_BREAK_LEN, ypos, gColWhite);
             break;
         }
 
@@ -487,12 +486,16 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
         }
 
         case UI_COLOUR: {
-            rmDrawRect(x, y + 3, 25, 17, txtcol);
-            u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
-            rmDrawRect(x + 2, y + 5, 21, 13, dcol);
-
-            *w = 25;
+            *w = rmWideScale(25);
             *h = 17;
+
+            // Align to the right
+            x -= *w;
+
+            rmDrawRect(x, y + 3, *w, *h, txtcol);
+            u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
+            rmDrawRect(x + 2, y + 5, *w-4, *h-4, dcol);
+
             break;
         }
     }

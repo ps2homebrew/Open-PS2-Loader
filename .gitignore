@@ -16,7 +16,6 @@
 *.o
 *.patch
 *.rej
-*.s
 *.zip
 *.a
 

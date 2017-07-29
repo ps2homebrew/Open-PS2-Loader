@@ -3,13 +3,12 @@
   Licenced under Academic Free License version 3.0
   Review Open PS2 Loader README & LICENSE files for further details.
 
-  ATA Driver for the HD Pro Kit, based on original ATAD form ps2sdk:	
+  ATA Driver for the HD Pro Kit, based on original & updated ATAD from ps2sdk:
 
   Copyright (c) 2003 Marcus R. Brown <mrbrown@0xd6.org>
   Licenced under Academic Free License version 2.0
   Review ps2sdk README & LICENSE files for further details.
  
-  $Id: ps2atad.c 1455 2007-11-04 23:46:27Z roman_ps2dev $
   ATA device driver.
 */
 
@@ -40,10 +39,10 @@
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
 // The pseudo ATA controller registers are accessed (input/ouput) by writing
 // an id to the main ATA controller (id specific to HDpro, see registers id below).
-#define HDPROreg_IO8 (*(volatile unsigned char *)0xBFC00000)
-#define HDPROreg_IO32 (*(volatile unsigned int *)0xBFC00000)
+#define HDPROreg_IO8 (*(vu8 *)0xBFC00000)
+#define HDPROreg_IO32 (*(vu32 *)0xBFC00000)
 
-#define CDVDreg_STATUS (*(volatile unsigned char *)0xBF40200A)
+#define CDVDreg_STATUS (*(vu8 *)0xBF40200A)
 
 // Pseudo ATA controller registers id - Output
 #define ATAreg_CONTROL_RD 0x68
@@ -87,7 +86,7 @@ static int io_sema = -1;
 #endif
 
 #define ATA_EV_TIMEOUT	1
-#define ATA_EV_COMPLETE	2
+#define ATA_EV_COMPLETE	2    //Unused as there is no completion interrupt
 
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
@@ -100,19 +99,15 @@ typedef struct _ata_cmd_info
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
-    {ATA_C_READ_DMA, 0x04},
     {ATA_C_IDENTIFY_DEVICE, 0x02},
     {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02},
     {ATA_C_SMART, 0x07},
     {ATA_C_SET_FEATURES, 0x01},
-    {ATA_C_READ_DMA_EXT, 0x04},
-    {ATA_C_WRITE_DMA, 0x04},
     {ATA_C_IDLE, 0x01},
-    {ATA_C_WRITE_DMA_EXT, 0x04},
     {ATA_C_READ_SECTOR, 0x02},
-    {ATA_C_READ_SECTOR_EXT, 0x02},
+    {ATA_C_READ_SECTOR_EXT, 0x82},
     {ATA_C_WRITE_SECTOR, 0x03},
-    {ATA_C_WRITE_SECTOR_EXT, 0x03}};
+    {ATA_C_WRITE_SECTOR_EXT, 0x83}};
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
 static const ata_cmd_info_t smart_cmd_table[] = {
@@ -128,7 +123,6 @@ typedef struct _ata_cmd_state {
 		u16	*buf16;
 	};
 	u32	blkcount;	/* The number of 512-byte blocks (sectors) to transfer.  */
-	s32	dir;		/* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -139,9 +133,9 @@ static int intr_state;
 
 static int hdpro_io_start(void);
 static int hdpro_io_finish(void);
-static void hdpro_io_write(unsigned char cmd, unsigned short int val);
-static int hdpro_io_read(unsigned char cmd);
-static int hdpro_io_init(void);
+static void hdpro_io_write(u8 cmd, u16 val);
+static int hdpro_io_read(u8 cmd);
+static int ata_bus_reset(void);
 static int gen_ata_wait_busy(int bits);
 
 static unsigned int ata_alarm_cb(void *unused)
@@ -175,7 +169,7 @@ int atad_start(void)
 
     M_PRINTF(BANNER, VERSION);
 
-    event.attr = 0;
+    event.attr = EA_SINGLE;	//In v1.04, EA_MULTI was specified.
     event.bits = 0;
     if ((ata_evflg = CreateEventFlag(&event)) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
@@ -187,7 +181,7 @@ int atad_start(void)
     HDPROreg_IO8 = 0xe3;
     CDVDreg_STATUS = 0;
 
-    if (hdpro_io_init() != 0)
+    if (ata_bus_reset() != 0)
         goto out;
 
 #ifdef VMC_DRIVER
@@ -230,9 +224,13 @@ static int gen_ata_wait_busy(int bits)
 
         hdpro_io_start();
 
-        unsigned short int r_control = hdpro_io_read(ATAreg_CONTROL_RD);
+        u16 r_control = hdpro_io_read(ATAreg_CONTROL_RD);
 
         hdpro_io_finish();
+
+        //Differs from the normal ATAD here.
+        if (r_control == 0xffff)
+            return ATA_RES_ERR_TIMEOUT;
 
         if (!((r_control & 0xffff) & bits))
             goto out;
@@ -318,7 +316,7 @@ static int hdpro_io_finish(void)
     return hdpro_io_active ^ 1;
 }
 
-static void hdpro_io_write(unsigned char cmd, unsigned short int val)
+static void hdpro_io_write(u8 cmd, u16 val)
 {
     suspend_intr();
 
@@ -333,7 +331,7 @@ static void hdpro_io_write(unsigned char cmd, unsigned short int val)
     resume_intr();
 }
 
-static int hdpro_io_read(unsigned char cmd)
+static int hdpro_io_read(u8 cmd)
 {
     suspend_intr();
 
@@ -351,7 +349,8 @@ static int hdpro_io_read(unsigned char cmd)
     return res0 & 0xffff;
 }
 
-static int hdpro_io_init(void)
+/* Reset the ATA controller/bus.  */
+static int ata_bus_reset(void)
 {
     suspend_intr();
 
@@ -459,13 +458,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         case 6:
             using_timeout = 1;
             break;
-        case 4:
-#ifdef VMC_DRIVER
-            atad_cmd_state.dir = (command != ATA_C_READ_DMA && command != ATA_C_READ_DMA_EXT);
-#else
-            atad_cmd_state.dir = ATA_DIR_READ;
-#endif
-            using_timeout = 1;
+        //Support for DMA commands (type = 4) is removed because HDPro cannot support DMA. The original HDPro driver still had code for it though.
     }
 
     if (using_timeout) {
@@ -487,8 +480,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     /* Finally!  We send off the ATA command with arguments.  */
     hdpro_io_write(ATAreg_CONTROL_WR, (using_timeout == 0) << 1);
-
-    if (type & 0x80) { //For the sake of achieving  (greatly) improved performance, write the registers twice only if required!
+    if (type & 0x80) { //For the sake of achieving improved performance, write the registers twice only if required!
         /* 48-bit LBA requires writing to the address registers twice,
 		   24 bits of the LBA address is written each time.
 		   Writing to registers twice does not affect 28-bit LBA since
@@ -602,35 +594,40 @@ int ata_io_finish(void)
     ata_cmd_state_t *cmd_state = &atad_cmd_state;
     u32 bits;
     int res = 0, type = cmd_state->type;
-    unsigned short int stat;
+    u16 stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
 
-    retry:
-        suspend_intr();
+        //Unlike ATAD, poll until the device either completes its command or times out. There is no completion interrupt.
+        while (1)
+        {
+            suspend_intr();
 
-        HDPROreg_IO8 = 0x21;
-        CDVDreg_STATUS = 0;
-        unsigned int ret = HDPROreg_IO8;
-        CDVDreg_STATUS = 0;
+            HDPROreg_IO8 = 0x21;
+            CDVDreg_STATUS = 0;
+            unsigned int ret = HDPROreg_IO8;
+            CDVDreg_STATUS = 0;
 
-        resume_intr();
+            resume_intr();
 
-        if (((ret & 0xff) & 1) == 0) {
+            if (((ret & 0xff) & 1) != 0)
+                break;
 
-            WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
-            if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
-                M_PRINTF("Error: ATA timeout on a non-data command.\n");
-                return ATA_RES_ERR_TIMEOUT;
+            /* The original did not check on the return value of PollEventFlag,
+               but PollEventFlag does not seem to return the event flag's bits if the wait condition is not satisfied. */
+            if (PollEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits) == 0)
+            {
+                if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
+                    M_PRINTF("Error: ATA timeout on a non-data command.\n");
+                    return ATA_RES_ERR_TIMEOUT;
+                }
             }
 
             DelayThread(500);
-            goto retry;
         }
 
-    } else if (type == 4) { /* DMA.  */
-        M_PRINTF("Error: DMA mode not implemented.\n");
-        res = ATA_RES_ERR_TIMEOUT;
+    /*  Support for DMA commands (type = 4) is removed because HDPro cannot support DMA.
+        The original would return ATA_RES_ERR_TIMEOUT for type = 4. */
     } else { /* PIO transfers.  */
         stat = hdpro_io_read(ATAreg_CONTROL_RD);
         if ((res = ata_wait_busy()) < 0)
@@ -697,6 +694,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
         }
 
+        //Unlike ATAD, retry indefinitely until the I/O operation succeeds.
         if ((res = ata_io_start(buf, len, 0, len, sector, lcyl,
                                 hcyl, select, command)) != 0)
             continue;

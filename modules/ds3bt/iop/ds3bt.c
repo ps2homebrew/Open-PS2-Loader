@@ -40,6 +40,7 @@ typedef struct _bt_dev
     int devId;
     int hci_sema;
     int l2cap_sema;
+    int l2cap_cmd_sema;
     int controlEndp;
     int eventEndp;
     int inEndp;
@@ -47,7 +48,7 @@ typedef struct _bt_dev
     uint8_t status;
 } bt_device;
 
-bt_device bt_dev = {-1, -1, -1, -1, -1, -1, -1, DS3BT_STATE_USB_DISCONNECTED};
+bt_device bt_dev = {-1, -1, -1, -1, -1, -1, -1, -1, DS3BT_STATE_USB_DISCONNECTED};
 
 static void usb_probeEndpoint(int devId, UsbEndpointDescriptor *endpoint);
 static void bt_config_set(int result, int count, void *arg);
@@ -166,6 +167,11 @@ int bt_connect(int devId)
         return -1;
     }
 
+    if ((bt_dev.l2cap_cmd_sema = CreateSema(&SemaData)) < 0) {
+        DPRINTF("DS3BT: Failed to allocate I/O semaphore.\n");
+        return -1;
+    }
+
     bt_dev.devId = devId;
 
     bt_dev.status = DS3BT_STATE_USB_AUTHORIZED;
@@ -177,13 +183,19 @@ int bt_connect(int devId)
 
 int bt_disconnect(int devId)
 {
-    DPRINTF("BT: disconnect: devId=%i\n", devId);
+    DPRINTF("DS3BT: disconnect: devId=%i\n", devId);
 
     if (bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) {
-        bt_release();
+        if (bt_dev.eventEndp >= 0)
+            UsbCloseEndpoint(bt_dev.eventEndp);
 
-        bt_dev.devId = -1;
-        bt_dev.status = DS3BT_STATE_USB_DISCONNECTED;
+        if (bt_dev.inEndp >= 0)
+            UsbCloseEndpoint(bt_dev.inEndp);
+
+        if (bt_dev.outEndp >= 0)
+            UsbCloseEndpoint(bt_dev.outEndp);
+
+        bt_release();
     }
 
     return 0;
@@ -191,22 +203,16 @@ int bt_disconnect(int devId)
 
 static void bt_release()
 {
-    if (bt_dev.eventEndp >= 0)
-        UsbCloseEndpoint(bt_dev.eventEndp);
-
-    if (bt_dev.inEndp >= 0)
-        UsbCloseEndpoint(bt_dev.inEndp);
-
-    if (bt_dev.outEndp >= 0)
-        UsbCloseEndpoint(bt_dev.outEndp);
-
     DeleteSema(bt_dev.hci_sema);
     DeleteSema(bt_dev.l2cap_sema);
+    DeleteSema(bt_dev.l2cap_cmd_sema);
 
+    bt_dev.devId = -1;
     bt_dev.eventEndp = -1;
     bt_dev.inEndp = -1;
     bt_dev.outEndp = -1;
     bt_dev.controlEndp = -1;
+    bt_dev.status = DS3BT_STATE_USB_DISCONNECTED;
 }
 
 static void usb_probeEndpoint(int devId, UsbEndpointDescriptor *endpoint)
@@ -431,9 +437,9 @@ static uint8_t hci_cmd_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 static uint8_t l2cap_cmd_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 
 static void DS3BT_init();
-static uint8_t LED(uint8_t led, int pad);
-static uint8_t Rumble(uint8_t lrum, uint8_t rrum, int pad);
-static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad);
+static int LED(uint8_t led, int pad);
+static int Rumble(uint8_t lrum, uint8_t rrum, int pad);
+static int LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad);
 
 static uint8_t current_pad;
 static uint8_t enable_pad;
@@ -509,47 +515,49 @@ static void hci_event_cb(int resultCode, int bytes, void *arg)
 
 static void l2cap_event_cb(int resultCode, int bytes, void *arg)
 {
-    uint8_t pad;
+    int pad;
+    static uint8_t ret_ctr = 0;
 
     PollSema(bt_dev.l2cap_sema);
 
-    //DPRINTF("l2cap_event_cb: res %d, bytes %d, arg %p arg %x\n", resultCode, bytes, arg, *(uint8_t *)arg);
+    //DPRINTF("l2cap_event_cb: res %d, bytes %d, arg %p\n", resultCode, bytes, arg);
 
     pad = L2CAP_event_task(resultCode, bytes);
     L2CAP_task(pad);
 
-    if (pad >= MAX_PADS)
-        pad = current_pad;
-
-    if (arg != NULL) {
-        if (pad != (int)arg && (int)arg < MAX_PADS) {
-            if ((ds3pad[(int)arg].status_ & DS3BT_STATE_RUNNING)) {
-                UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
-                return;
-            }
-        }
+    if (pad >= MAX_PADS) {
+        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)-1);
+        return;
     }
 
-    SignalSema(bt_dev.l2cap_sema);
-
-    if (ds3pad[pad].l2cap_state_ != L2CAP_READY_STATE) {
+    if (ds3pad[pad].l2cap_state_ != L2CAP_READY_STATE) { //ds3 is connecting
         DelayThread(14000); //fix for some bt adapters
-        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
+        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)-1);
+    } else { //ds3 is running
+        if ((int)arg != -1 && pad != (int)arg && (int)arg < MAX_PADS) { //check if we get what was requested
+            if (ret_ctr == 20) {
+                ret_ctr = 0;
+                SignalSema(bt_dev.l2cap_sema);
+            } else {
+                ret_ctr++;
+                UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, arg); //try again
+            }
+        } else { //we got what we wanted
+            SignalSema(bt_dev.l2cap_sema);
+        }
     }
 }
 
 static void l2cap_cmd_cb(int resultCode, int bytes, void *arg)
 {
     //DPRINTF("l2cap_cmd_cb: res %d, bytes %d, arg %p \n", resultCode, bytes, arg);
-
-    if (ds3pad[(int)arg].status_ & DS3BT_STATE_RUNNING)
-        SignalSema(bt_dev.l2cap_sema);
+    SignalSema(bt_dev.l2cap_cmd_sema);
 }
 
 static void bt_config_set(int result, int count, void *arg)
 {
     UsbInterruptTransfer(bt_dev.eventEndp, hci_buf, MAX_BUFFER_SIZE, hci_event_cb, NULL);
-    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
+    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)-1);
 
     SignalSema(bt_dev.hci_sema);
     SignalSema(bt_dev.l2cap_sema);
@@ -749,7 +757,7 @@ static uint8_t HCI_event_task(int result)
 
 static void HCI_task(uint8_t pad)
 {
-    uint8_t i;
+    int i;
 
     if (pad >= MAX_PADS)
         return;
@@ -775,14 +783,22 @@ static void HCI_task(uint8_t pad)
         case HCI_RESET_STATE:
             if (hci_command_complete) {
                 DPRINTF("HCI Reset complete\n");
-                hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
-                ds3pad[pad].hci_state_ = HCI_CONNECT_IN_STATE;
-                hci_event_flag_ &= ~HCI_FLAG_INCOMING_REQUEST;
+                hci_read_bdaddr();
+                ds3pad[pad].hci_state_ = HCI_READBDADDR_STATE;
             }
             if (hci_timeout) {
                 DPRINTF("No response to HCI Reset\n");
                 ds3pad[pad].hci_state_ = HCI_INIT_STATE;
                 hci_counter_ = 10;
+            }
+            break;
+
+        case HCI_READBDADDR_STATE:
+            if (hci_read_bdaddr_complete) {
+                DPRINTF("HCI read bdaddres complete\n");
+                hci_write_scan_enable(SCAN_ENABLE_NOINQ_ENPAG);
+                ds3pad[pad].hci_state_ = HCI_CONNECT_IN_STATE;
+                hci_event_flag_ &= ~HCI_FLAG_INCOMING_REQUEST;
             }
             break;
 
@@ -819,8 +835,16 @@ static void HCI_task(uint8_t pad)
 
                 if (ds3pad[pad].type != HID_THDR_SET_REPORT_OUTPUT) {
                     ds3pad[pad].l2cap_state_ = L2CAP_DISCONNECT_STATE;
-                    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
+                    for (i = 0; i < MAX_PADS; i++) {
+                        if (ds3pad[i].status_ & DS3BT_STATE_RUNNING)
+                            break;
+                    }
+
+                    if (i == MAX_PADS)
+                        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)-1);
                 }
+
+                SignalSema(bt_dev.l2cap_sema);
             }
             break;
 
@@ -1010,7 +1034,7 @@ static uint8_t L2CAP_event_task(int result, int bytes)
                         l2cap_event_status_ |= L2CAP_EV_INTERRUPT_DISCONNECT_REQ;
                         l2cap_disconnect_response(l2cap_buf[9], command_scid_, ds3pad[pad].command_dcid_, pad);
                     }
-                } else if (l2cap_disconnect_response) {
+                } else if (l2cap_disconnection_response) {
                     DPRINTF("Disconnect Res  DCID = 0x%x\n", (l2cap_buf[12] | (l2cap_buf[13] << 8)));
 
                     ds3pad[pad].l2cap_state_ = L2CAP_DISCONNECT_STATE;
@@ -1108,8 +1132,21 @@ static void L2CAP_task(uint8_t pad)
             break;
 
         case L2CAP_LED_STATE:
+            DPRINTF("L2CAP_LED\n");
             if (hid_command_success) {
-                LED((pad + 1) << 1, pad);
+                if (ds3pad[pad].type == HID_THDR_SET_REPORT_OUTPUT) {
+                    ds3pad[pad].l2cap_state_ = L2CAP_LED_STATE_END;
+                } else {
+                    ds3pad[pad].l2cap_state_ = L2CAP_READY_STATE;
+                    ds3pad[pad].status_ |= DS3BT_STATE_RUNNING;
+                }
+                LEDRumble((pad + 1) << 1, ds3pad[pad].oldlrumble, ds3pad[pad].oldrrumble, pad);
+            }
+            break;
+
+        case L2CAP_LED_STATE_END:
+            DPRINTF("L2CAP_LED_END\n");
+            if (hid_command_success) {
                 ds3pad[pad].l2cap_state_ = L2CAP_READY_STATE;
                 ds3pad[pad].status_ |= DS3BT_STATE_RUNNING;
             }
@@ -1225,6 +1262,8 @@ static uint8_t l2cap_disconnection_request(uint8_t rxid, uint16_t scid, uint16_t
 
 static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad)
 {
+    PollSema(bt_dev.l2cap_cmd_sema);
+
     l2cap_cmd_buf[0] = (uint8_t)(ds3pad[pad].hci_handle_ & 0xff); // HCI handle with PB,BC flag
     l2cap_cmd_buf[1] = (uint8_t)(((ds3pad[pad].hci_handle_ >> 8) & 0x0f) | 0x20);
     l2cap_cmd_buf[2] = (uint8_t)((4 + length) & 0xff); // HCI ACL total data length
@@ -1237,7 +1276,7 @@ static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad)
     mips_memcpy(&l2cap_cmd_buf[8], data, length);
 
     // output on endpoint 2
-    return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), NULL, NULL);
+    return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), l2cap_cmd_cb, NULL);
 }
 
 /************************************************************/
@@ -1246,18 +1285,18 @@ static uint8_t L2CAP_Command(uint8_t *data, uint8_t length, uint8_t pad)
 
 static uint8_t initPSController(int pad)
 {
-    uint8_t header = 2;
-    uint8_t init_buf[header + PS3_F4_REPORT_LEN];
+    uint8_t init_buf[2 + PS3_F4_REPORT_LEN];
     uint8_t i;
     init_buf[0] = HID_THDR_SET_REPORT_FEATURE; // THdr
     init_buf[1] = PS3_F4_REPORT_ID;            // Report ID
 
     for (i = 0; i < PS3_F4_REPORT_LEN; i++) {
-        init_buf[header + i] = (uint8_t)feature_F4_report[i];
+        init_buf[2 + i] = (uint8_t)feature_F4_report[i];
     }
 
-    return writeReport((uint8_t *)init_buf, header + PS3_F4_REPORT_LEN, pad);
+    return writeReport((uint8_t *)init_buf, 2 + PS3_F4_REPORT_LEN, pad);
 }
+
 
 #define DATA_START 11
 
@@ -1327,6 +1366,8 @@ static void readReport(uint8_t *data, int bytes, int pad)
 
 static uint8_t writeReport(uint8_t *data, uint8_t length, int pad)
 {
+    PollSema(bt_dev.l2cap_cmd_sema);
+
     l2cap_cmd_buf[0] = (uint8_t)(ds3pad[pad].hci_handle_ & 0xff); // HCI handle with PB,BC flag
     l2cap_cmd_buf[1] = (uint8_t)(((ds3pad[pad].hci_handle_ >> 8) & 0x0f) | 0x20);
     l2cap_cmd_buf[2] = (uint8_t)((4 + length) & 0xff); // HCI ACL total data length
@@ -1344,7 +1385,7 @@ static uint8_t writeReport(uint8_t *data, uint8_t length, int pad)
     return UsbBulkTransfer(bt_dev.outEndp, l2cap_cmd_buf, (8 + length), l2cap_cmd_cb, (void *)pad);
 } // writeReport
 
-static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
+static int LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
 {
     uint8_t led_buf[PS3_01_REPORT_LEN + 2];
 
@@ -1352,6 +1393,11 @@ static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
     led_buf[1] = PS3_01_REPORT_ID; // Report ID
 
     mips_memcpy(&led_buf[2], output_01_report, sizeof(output_01_report)); // PS3_01_REPORT_LEN);
+
+    if (ds3pad[pad].type == 0xA2) {
+        if(rrum < 5)
+            rrum = 0;
+    }
 
     led_buf[2 + 1] = 0xFE; //rt
     led_buf[2 + 2] = rrum; //rp
@@ -1372,28 +1418,46 @@ static uint8_t LEDRumble(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
     ds3pad[pad].oldlrumble = lrum;
     ds3pad[pad].oldrrumble = rrum;
 
-    return writeReport((uint8_t *)led_buf, sizeof(output_01_report) /*PS3_01_REPORT_LEN*/ + 2, pad);
+    return writeReport((uint8_t *)led_buf, sizeof(output_01_report) + 2, pad);
 }
 /************************************************************/
 /* DS3BT Commands                                            */
 /************************************************************/
 
-static uint8_t LED(uint8_t led, int pad)
+static int LEDRUM(uint8_t led, uint8_t lrum, uint8_t rrum, int pad)
 {
-    return LEDRumble(led, ds3pad[pad].oldlrumble, ds3pad[pad].oldrrumble, pad);
+    int ret;
+
+    ret = LEDRumble(led, lrum, rrum, pad);
+    if (ret == USB_RC_OK) {
+        WaitSema(bt_dev.l2cap_cmd_sema);
+        if (ds3pad[pad].type == HID_THDR_SET_REPORT_OUTPUT) {
+            WaitSema(bt_dev.l2cap_sema);
+            do {
+                ret = UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)pad);
+                if (ret == USB_RC_OK)
+                    WaitSema(bt_dev.l2cap_sema);
+                else
+                    break;
+            } while (!hid_command_success);
+
+            SignalSema(bt_dev.l2cap_sema);
+        }
+    }
+    else
+        DPRINTF("DS3BT: LEDRumble usb transfer error %d\n", ret);
+
+    return ret;
 }
 
-static uint8_t Rumble(uint8_t lrum, uint8_t rrum, int pad)
+static int LED(uint8_t led, int pad)
 {
-    uint8_t ret;
+    return LEDRUM(led, ds3pad[pad].oldlrumble, ds3pad[pad].oldrrumble, pad);
+}
 
-    ret = LEDRumble(ds3pad[pad].oldled, lrum, rrum, pad);
-    WaitSema(bt_dev.l2cap_sema);
-    if (ds3pad[pad].type == HID_THDR_SET_REPORT_OUTPUT) {
-        UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)pad);
-        WaitSema(bt_dev.l2cap_sema);
-    }
-    return ret;
+static int Rumble(uint8_t lrum, uint8_t rrum, int pad)
+{
+    return LEDRUM(ds3pad[pad].oldled, lrum, rrum, pad);
 }
 
 void ds3bt_set_rumble(uint8_t lrum, uint8_t rrum, int port)
@@ -1404,13 +1468,7 @@ void ds3bt_set_rumble(uint8_t lrum, uint8_t rrum, int port)
     if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) && !(ds3pad[port].status_ & DS3BT_STATE_RUNNING))
         return;
 
-    WaitSema(bt_dev.hci_sema);
-    WaitSema(bt_dev.l2cap_sema);
-
     Rumble(lrum, rrum, port);
-
-    SignalSema(bt_dev.hci_sema);
-    SignalSema(bt_dev.l2cap_sema);
 }
 
 void ds3bt_set_led(uint8_t led, int port)
@@ -1421,95 +1479,74 @@ void ds3bt_set_led(uint8_t led, int port)
     if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) && !(ds3pad[port].status_ & DS3BT_STATE_RUNNING))
         return;
 
-    WaitSema(bt_dev.hci_sema);
-    WaitSema(bt_dev.l2cap_sema);
-
     LED(led, port);
-
-    SignalSema(bt_dev.hci_sema);
-    SignalSema(bt_dev.l2cap_sema);
 }
 
 int ds3bt_get_bdaddr(uint8_t *data)
 {
-    uint8_t i;
-    int ret = 0;
-
-    if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) || (ds3pad[0].status_ & DS3BT_STATE_RUNNING))
+    if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED))
         return 0;
 
-    WaitSema(bt_dev.hci_sema);
-
-    hci_read_bdaddr();
-
-    WaitSema(bt_dev.hci_sema);
-
-    for (i = 0; i < 10; i++) {
-        if (hci_read_bdaddr_complete) {
-            mips_memcpy(data, dg_bdaddr, 6);
-            ret = 1;
-            break;
-        }
-
-        DelayThread(100);
+    if (hci_read_bdaddr_complete) {
+        mips_memcpy(data, dg_bdaddr, 6);
+        return 1;
     }
 
-    SignalSema(bt_dev.hci_sema);
-
-    return ret;
+    return 0;
 }
 
 void ds3bt_get_data(char *dst, int size, int port)
 {
+    int ret;
+
     if (port >= MAX_PADS)
         return;
 
     if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED) && !(ds3pad[port].status_ & DS3BT_STATE_RUNNING))
         return;
 
-    WaitSema(bt_dev.hci_sema);
     WaitSema(bt_dev.l2cap_sema);
 
-    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)port);
+    ret = UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)port);
 
-    WaitSema(bt_dev.l2cap_sema);
+    if (ret == USB_RC_OK)
+        WaitSema(bt_dev.l2cap_sema);
+    else
+        DPRINTF("DS3BT: ds3bt_get_data usb transfer error %d\n", ret);
 
     mips_memcpy(dst, ds3pad[port].data, size);
 
-    SignalSema(bt_dev.hci_sema);
     SignalSema(bt_dev.l2cap_sema);
 }
 
 void ds3bt_reset()
 {
-    uint8_t i;
+    int pad, ret;
 
     if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED))
         return;
 
-    for (i = 0; i < MAX_PADS; i++) {
-        WaitSema(bt_dev.hci_sema);
-        WaitSema(bt_dev.l2cap_sema);
+    for (pad = 0; pad < MAX_PADS; pad++) {
+        if ((ds3pad[pad].status_ & DS3BT_STATE_CONNECTED) || (ds3pad[pad].status_ & DS3BT_STATE_RUNNING)) {
+            ds3pad[pad].status_ &= ~DS3BT_STATE_RUNNING;
+            ds3pad[pad].l2cap_state_ = L2CAP_DOWN_STATE;
 
-        if ((ds3pad[i].status_ & DS3BT_STATE_CONNECTED) || (ds3pad[i].status_ & DS3BT_STATE_RUNNING)) {
-            ds3pad[i].status_ &= ~DS3BT_STATE_RUNNING;
-            ds3pad[i].l2cap_state_ = L2CAP_DOWN_STATE;
+            ret = UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, (void *)pad);
 
-            UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, NULL);
-            if (ds3pad[i].type == HID_THDR_SET_REPORT_OUTPUT) {
-                l2cap_disconnection_request((uint8_t)(l2cap_txid_++), interrupt_scid_, ds3pad[i].interrupt_dcid_, i);
+            if (ret == USB_RC_OK)
                 WaitSema(bt_dev.l2cap_sema);
-                WaitSema(bt_dev.l2cap_sema);
-            }
-            else {
-                hci_disconnect(ds3pad[i].hci_handle_);
+            else
+                DPRINTF("DS3BT: ds3bt_get_data usb transfer error %d\n", ret);
+
+            if (ds3pad[pad].type == HID_THDR_SET_REPORT_OUTPUT) {
+                l2cap_disconnection_request((uint8_t)(l2cap_txid_++), interrupt_scid_, ds3pad[pad].interrupt_dcid_, pad);
+                WaitSema(bt_dev.l2cap_cmd_sema);
+            } else {
+                hci_disconnect(ds3pad[pad].hci_handle_);
             }
 
             WaitSema(bt_dev.hci_sema);
         }
-        
-        SignalSema(bt_dev.hci_sema);
-        SignalSema(bt_dev.l2cap_sema);
     }
 
     DS3BT_init();
@@ -1523,19 +1560,8 @@ int ds3bt_get_status(int port)
 {
     int status = bt_dev.status;
 
-    if (!(bt_dev.status & DS3BT_STATE_USB_AUTHORIZED))
-        return status;
-
-    if (port >= MAX_PADS)
-        return status;
-
-    WaitSema(bt_dev.hci_sema);
-    WaitSema(bt_dev.l2cap_sema);
-
-    status |= ds3pad[port].status_;
-
-    SignalSema(bt_dev.hci_sema);
-    SignalSema(bt_dev.l2cap_sema);
+    if ((status & DS3BT_STATE_USB_AUTHORIZED) && (port < MAX_PADS))
+        status |= ds3pad[port].status_;
 
     return status;
 }

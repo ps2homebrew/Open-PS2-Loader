@@ -84,6 +84,7 @@ enum eL2CAP {
     L2CAP_INTERRUPT_CONFIGURING_STATE,
     L2CAP_CONNECTED_STATE,
     L2CAP_LED_STATE,
+    L2CAP_LED_STATE_END,
     L2CAP_READY_STATE,
     L2CAP_DISCONNECT_STATE,
 
@@ -246,7 +247,7 @@ enum eBUF_SIZE {
 #define l2cap_interrupt_disconnected (l2cap_event_status_ & L2CAP_EV_INTERRUPT_DISCONNECT_REQ)
 
 /* Macros for L2CAP event task tests */
-#define acl_handle_ok(handle) ((l2cap_buf[0] | (l2cap_buf[1] << 8)) == ((handle & 0x0FFF) | 0x2000))
+#define acl_handle_ok(handle) (((l2cap_buf[0] | (l2cap_buf[1] << 8)) & 0x0FFF) == (handle & 0x0FFF))
 #define l2cap_control ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == 0x0001) // Channel ID for ACL-U
 #define l2cap_interrupt ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == interrupt_scid_)
 #define l2cap_command ((l2cap_buf[6] | (l2cap_buf[7] << 8)) == command_scid_)

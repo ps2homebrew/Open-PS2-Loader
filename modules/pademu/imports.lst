@@ -48,9 +48,6 @@ usbd_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_strncmp
-I_sprintf
-I_strcpy
-I_strcat
 #ifndef USE_SMSUTILS
 I_memset
 I_memcpy

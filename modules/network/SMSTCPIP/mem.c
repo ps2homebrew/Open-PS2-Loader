@@ -54,8 +54,7 @@
 #if MEM_LIBC_MALLOC
 /** mem_init is not used when using C library malloc().
  */
-void
-mem_init(void)
+void mem_init(void)
 {
 }
 
@@ -85,13 +84,13 @@ mem_init(void)
 void *
 mem_malloc(mem_size_t size)
 {
-    void* ret = mem_clib_malloc(size);
+    void *ret = mem_clib_malloc(size);
     if (ret == NULL) {
 #if MEM_STATS
         ++lwip_stats.mem.err;
 #endif /* MEM_STATS */
     } else {
-      LWIP_ASSERT("malloc() must return aligned memory", LWIP_MEM_ALIGN(ret) == ret);
+        LWIP_ASSERT("malloc() must return aligned memory", LWIP_MEM_ALIGN(ret) == ret);
     }
     return ret;
 }
@@ -100,8 +99,7 @@ mem_malloc(mem_size_t size)
  *
  * @param rmem is the pointer as returned by a previous call to mem_malloc()
  */
-void
-mem_free(void *rmem)
+void mem_free(void *rmem)
 {
     LWIP_ASSERT("rmem != NULL", (rmem != NULL));
     LWIP_ASSERT("rmem == MEM_ALIGN(rmem)", (rmem == LWIP_MEM_ALIGN(rmem)));
@@ -111,13 +109,13 @@ mem_free(void *rmem)
 void *
 mem_realloc(void *rmem, mem_size_t newsize)
 {
-    void* ret = mem_clib_realloc(rmem, newsize);
+    void *ret = mem_clib_realloc(rmem, newsize);
     if (ret == NULL) {
 #if MEM_STATS
         ++lwip_stats.mem.err;
 #endif /* MEM_STATS */
     } else {
-      LWIP_ASSERT("realloc() must return aligned memory", LWIP_MEM_ALIGN(ret) == ret);
+        LWIP_ASSERT("realloc() must return aligned memory", LWIP_MEM_ALIGN(ret) == ret);
     }
     return ret;
 }
@@ -222,8 +220,7 @@ void mem_free(void *rmem)
     SYS_ARCH_DECL_PROTECT(old_level);
     SYS_ARCH_PROTECT(old_level);
 
-    LWIP_ASSERT("mem_free: legal memory", (u8_t *)rmem >= (u8_t *)ram &&
-                                              (u8_t *)rmem < (u8_t *)ram_end);
+    LWIP_ASSERT("mem_free: legal memory", (u8_t *)rmem >= (u8_t *)ram && (u8_t *)rmem < (u8_t *)ram_end);
 
     if ((u8_t *)rmem < (u8_t *)ram || (u8_t *)rmem >= (u8_t *)ram_end) {
         LWIP_DEBUGF(MEM_DEBUG | 3, ("mem_free: illegal memory\n"));
@@ -271,8 +268,7 @@ mem_realloc(void *rmem, mem_size_t newsize)
     SYS_ARCH_DECL_PROTECT(old_level);
     SYS_ARCH_PROTECT(old_level);
 
-    LWIP_ASSERT("mem_realloc: legal memory", (u8_t *)rmem >= (u8_t *)ram &&
-                                                 (u8_t *)rmem < (u8_t *)ram_end);
+    LWIP_ASSERT("mem_realloc: legal memory", (u8_t *)rmem >= (u8_t *)ram && (u8_t *)rmem < (u8_t *)ram_end);
 
     if ((u8_t *)rmem < (u8_t *)ram || (u8_t *)rmem >= (u8_t *)ram_end) {
         LWIP_DEBUGF(MEM_DEBUG | 3, ("mem_realloc: illegal memory\n"));
@@ -378,7 +374,7 @@ mem_malloc(mem_size_t size)
     return NULL;
 }
 
-#endif	/* MEM_LIBC_MALLOC */
+#endif /* MEM_LIBC_MALLOC */
 
 void *
 mem_reallocm(void *rmem, mem_size_t newsize)

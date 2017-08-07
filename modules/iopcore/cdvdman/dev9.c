@@ -84,8 +84,7 @@ static int expbay_init(void);
 static int dev9x_dummy(void) { return 0; }
 static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, int arglen, void *buf, int buflen)
 {
-    switch(cmd)
-    {
+    switch (cmd) {
         case DDIOC_MODEL:
             return dev9type;
         case DDIOC_OFF:
@@ -300,8 +299,8 @@ int dev9DmaTransfer(int ctrl, void *buf, int bcr, int dir)
         dev9_predma_cbs[ctrl](bcr, dir);
 
     dev9_chan->madr = (u32)buf;
-    dev9_chan->bcr  = bcr;
-    dev9_chan->chcr = DMAC_CHCR_30|DMAC_CHCR_TR|DMAC_CHCR_CO|(dir & DMAC_CHCR_DR);
+    dev9_chan->bcr = bcr;
+    dev9_chan->chcr = DMAC_CHCR_30 | DMAC_CHCR_TR | DMAC_CHCR_CO | (dir & DMAC_CHCR_DR);
 
     /* Wait for DMA to complete. Do not use a semaphore as thread switching hurts throughput greatly.  */
     while (dev9_chan->chcr & DMAC_CHCR_TR) {

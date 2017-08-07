@@ -67,8 +67,8 @@ static int io_sema = -1;
 #define ATAWRITE 0
 #endif
 
-#define ATA_EV_TIMEOUT	1
-#define ATA_EV_COMPLETE	2
+#define ATA_EV_TIMEOUT 1
+#define ATA_EV_COMPLETE 2
 
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
@@ -89,15 +89,17 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 #define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
 
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
-typedef struct _ata_cmd_state {
-	s32	type;		/* The ata_cmd_info_t type field. */
-	union {
-		void	*buf;
-		u8	*buf8;
-		u16	*buf16;
-	};
-	u32	blkcount;	/* The number of 512-byte blocks (sectors) to transfer.  */
-	s32	dir;		/* DMA direction: 0 - to RAM, 1 - from RAM.  */
+typedef struct _ata_cmd_state
+{
+    s32 type; /* The ata_cmd_info_t type field. */
+    union
+    {
+        void *buf;
+        u8 *buf8;
+        u16 *buf16;
+    };
+    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
+    s32 dir;      /* DMA direction: 0 - to RAM, 1 - from RAM.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -108,20 +110,23 @@ static unsigned int ata_alarm_cb(void *unused);
 static void ata_set_dir(int dir);
 
 /* In v1.04, DMA was enabled in ata_set_dir() instead. */
-static void AtadPreDmaCb(int bcr, int dir){
-	USE_SPD_REGS;
+static void AtadPreDmaCb(int bcr, int dir)
+{
+    USE_SPD_REGS;
 
-	SPD_REG16(SPD_R_XFR_CTRL)|=0x80;
+    SPD_REG16(SPD_R_XFR_CTRL) |= 0x80;
 }
 
-static void AtadPostDmaCb(int bcr, int dir){
-	USE_SPD_REGS;
+static void AtadPostDmaCb(int bcr, int dir)
+{
+    USE_SPD_REGS;
 
-	SPD_REG16(SPD_R_XFR_CTRL)&=~0x80;
+    SPD_REG16(SPD_R_XFR_CTRL) &= ~0x80;
 }
 
 #ifdef DEV9_DEBUG
-static int ata_create_event_flag(void) {
+static int ata_create_event_flag(void)
+{
     iop_event_t event;
 
     /* In v1.04, EA_MULTI was specified. */
@@ -205,11 +210,11 @@ int ata_get_error(void)
     return ata_hwport->r_error & 0xff;
 }
 
-#define ATA_WAIT_BUSY		0x80
-#define ATA_WAIT_BUSBUSY	0x88
+#define ATA_WAIT_BUSY 0x80
+#define ATA_WAIT_BUSBUSY 0x88
 
-#define ata_wait_busy()		gen_ata_wait_busy(ATA_WAIT_BUSY)
-#define ata_wait_bus_busy()	gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
+#define ata_wait_busy() gen_ata_wait_busy(ATA_WAIT_BUSY)
+#define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
 /* 0x80 for busy, 0x88 for bus busy.
 	In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
@@ -264,7 +269,7 @@ static int ata_device_select(int device)
     /* Select the device.  */
     ata_hwport->r_select = (device & 1) << 4;
     res = ata_hwport->r_control;
-    res = ata_hwport->r_control;	//Only done once in v1.04.
+    res = ata_hwport->r_control; //Only done once in v1.04.
 
     return ata_wait_bus_busy();
 }
@@ -313,7 +318,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         }
     }
 
-    if (!(atad_cmd_state.type = type & 0x7F))	//Non-SONY: ignore the 48-bit LBA flag.
+    if (!(atad_cmd_state.type = type & 0x7F)) //Non-SONY: ignore the 48-bit LBA flag.
         return ATA_RES_ERR_CMD;
 
     atad_cmd_state.buf = buf;
@@ -336,7 +341,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 
     /* Does this command need a timeout?  */
     using_timeout = 0;
-    switch (type & 0x7F) {	//Non-SONY: ignore the 48-bit LBA flag.
+    switch (type & 0x7F) { //Non-SONY: ignore the 48-bit LBA flag.
         case 1:
         case 6:
             using_timeout = 1;
@@ -379,7 +384,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     ata_hwport->r_sector = sector & 0xff;
     ata_hwport->r_lcyl = lcyl & 0xff;
     ata_hwport->r_hcyl = hcyl & 0xff;
-    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff;	//In v1.04, LBA was enabled in the ata_device_sector_io function.
+    ata_hwport->r_select = (select | ATA_SEL_LBA) & 0xff; //In v1.04, LBA was enabled in the ata_device_sector_io function.
     ata_hwport->r_command = command & 0xff;
 
     /* Turn on the LED.  */
@@ -458,7 +463,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
 
         dev9IntrEnable(SPD_INTR_ATA);
         /* Wait for the previous transfer to complete or a timeout.  */
-        WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
+        WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
 
         if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
             M_PRINTF("Error: DMA timeout.\n");
@@ -473,7 +478,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
                 pNetlogSend("Error: Command error status 0x%02x, error 0x%02x.\n", ata_hwport->r_status, ata_get_error());
 #endif
                 /* In v1.04, there was no check for ICRC. */
-                return((ata_get_error() & ATA_ERR_ICRC) ? ATA_RES_ERR_ICRC : ATA_RES_ERR_IO);
+                return ((ata_get_error() & ATA_ERR_ICRC) ? ATA_RES_ERR_ICRC : ATA_RES_ERR_IO);
             } else {
                 M_PRINTF("Warning: Got command interrupt, but not an error.\n");
                 continue;
@@ -488,7 +493,7 @@ static inline int ata_dma_complete(void *buf, int blkcount, int dir)
         if ((res = dev9DmaTransfer(0, buf, (nbytes << 9) | 32, dir)) < 0)
             return res;
 
-        buf = (void*)((u8 *)buf + nbytes);
+        buf = (void *)((u8 *)buf + nbytes);
         blkcount -= count;
     }
 
@@ -506,7 +511,7 @@ int ata_io_finish(void)
     unsigned short int stat;
 
     if (type == 1 || type == 6) { /* Non-data commands.  */
-        WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
+        WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
         if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
             M_PRINTF("Error: ATA timeout on a non-data command.\n");
             return ATA_RES_ERR_TIMEOUT;
@@ -521,7 +526,7 @@ int ata_io_finish(void)
                 break;
         if (!stat) {
             dev9IntrEnable(SPD_INTR_ATA0);
-            WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
+            WaitEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits);
             if (bits & ATA_EV_TIMEOUT) {
                 M_PRINTF("Error: ATA timeout on DMA completion.\n");
                 res = ATA_RES_ERR_TIMEOUT;
@@ -559,7 +564,7 @@ finish:
     /* Turn off the LED.  */
     dev9LEDCtl(0);
 
-    if(res)
+    if (res)
         M_PRINTF("error: ATA failed, %d\n", res);
 
     return res;
@@ -600,7 +605,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_DMA : ATA_C_READ_DMA;
         }
 
-        for(retries = 3; retries > 0; retries--) {
+        for (retries = 3; retries > 0; retries--) {
             if ((res = ata_io_start(buf, len, 0, len, sector, lcyl, hcyl, select, command)) != 0)
                 break;
 
@@ -612,11 +617,11 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             /* In v1.04, this was not done. Neither was there a mechanism to retry if a non-permanent error occurs. */
             SPD_REG16(SPD_R_IF_CTRL) &= ~SPD_IF_DMA_ENABLE;
 
-            if(res != ATA_RES_ERR_ICRC)
+            if (res != ATA_RES_ERR_ICRC)
                 break;
         }
 
-        buf = (void*)((u8 *)buf + len * 512);
+        buf = (void *)((u8 *)buf + len * 512);
         lba += len;
         nsectors -= len;
     }
@@ -641,5 +646,5 @@ static void ata_set_dir(int dir)
     val = SPD_REG16(SPD_R_IF_CTRL) & 1;
     val |= (dir == ATA_DIR_WRITE) ? 0x4c : 0x4e;
     SPD_REG16(SPD_R_IF_CTRL) = val;
-    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6;	//In v1.04, DMA was enabled here (0x86 instead of 0x6)
+    SPD_REG16(SPD_R_XFR_CTRL) = dir | 0x6; //In v1.04, DMA was enabled here (0x86 instead of 0x6)
 }

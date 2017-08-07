@@ -167,7 +167,7 @@ struct atlas_allocation_t *atlasPlace(atlas_t *atlas, size_t width, size_t heigh
     if (!surface)
         return NULL;
 
-    struct atlas_allocation_t *al = allocPlace(atlas->allocation, width+1, height+1);
+    struct atlas_allocation_t *al = allocPlace(atlas->allocation, width + 1, height + 1);
 
     if (!al)
         return NULL;

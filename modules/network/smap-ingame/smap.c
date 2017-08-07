@@ -46,9 +46,9 @@
 #define DEV9_SMAP_ALL_INTR_MASK (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND | SMAP_INTR_TXEND | SMAP_INTR_RXDNV | SMAP_INTR_TXDNV)
 //Unlike the SONY original, the RXDNV interrupt is not handled as statistics are not recorded.
 //For the sake of simplicity, Tx channel 0 is operated in single-mode. Do not handle TXDNV.
-#define DEV9_SMAP_INTR_MASK (SMAP_INTR_EMAC3|SMAP_INTR_RXEND)
+#define DEV9_SMAP_INTR_MASK (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
 //The Tx interrupt events are handled separately
-#define DEV9_SMAP_INTR_MASK2 (SMAP_INTR_EMAC3|SMAP_INTR_RXEND)
+#define DEV9_SMAP_INTR_MASK2 (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
 
 struct SmapDriverData SmapDriverData;
 
@@ -58,39 +58,42 @@ static unsigned int SmapConfiguration = 0x5E0;
 
 extern void *_gp;
 
-static void _smap_write_phy(volatile u8 *emac3_regbase, unsigned int address, u16 value){
+static void _smap_write_phy(volatile u8 *emac3_regbase, unsigned int address, u16 value)
+{
     u32 PHYRegisterValue;
     unsigned int i;
 
-    PHYRegisterValue=(address&SMAP_E3_PHY_REG_ADDR_MSK)|SMAP_E3_PHY_WRITE|((SMAP_DsPHYTER_ADDRESS&SMAP_E3_PHY_ADDR_MSK)<<SMAP_E3_PHY_ADDR_BITSFT);
-    PHYRegisterValue|=((u32)value)<<SMAP_E3_PHY_DATA_BITSFT;
+    PHYRegisterValue = (address & SMAP_E3_PHY_REG_ADDR_MSK) | SMAP_E3_PHY_WRITE | ((SMAP_DsPHYTER_ADDRESS & SMAP_E3_PHY_ADDR_MSK) << SMAP_E3_PHY_ADDR_BITSFT);
+    PHYRegisterValue |= ((u32)value) << SMAP_E3_PHY_DATA_BITSFT;
 
-    i=0;
+    i = 0;
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_STA_CTRL, PHYRegisterValue);
 
-    for(; !(SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL)&SMAP_E3_PHY_OP_COMP); i++){
+    for (; !(SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL) & SMAP_E3_PHY_OP_COMP); i++) {
         DelayThread(1000);
-        if(i>=100) break;
+        if (i >= 100)
+            break;
     }
 
     //if(i>=100) printf("smap: %s: > %d ms\n", "_smap_write_phy", i);
 }
 
-static u16 _smap_read_phy(volatile u8 *emac3_regbase, unsigned int address){
+static u16 _smap_read_phy(volatile u8 *emac3_regbase, unsigned int address)
+{
     unsigned int i;
     u32 value, PHYRegisterValue;
     u16 result;
 
-    PHYRegisterValue=(address&SMAP_E3_PHY_REG_ADDR_MSK)|SMAP_E3_PHY_READ|((SMAP_DsPHYTER_ADDRESS&SMAP_E3_PHY_ADDR_MSK)<<SMAP_E3_PHY_ADDR_BITSFT);
+    PHYRegisterValue = (address & SMAP_E3_PHY_REG_ADDR_MSK) | SMAP_E3_PHY_READ | ((SMAP_DsPHYTER_ADDRESS & SMAP_E3_PHY_ADDR_MSK) << SMAP_E3_PHY_ADDR_BITSFT);
 
-    i=0;
-    result=0;
+    i = 0;
+    result = 0;
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_STA_CTRL, PHYRegisterValue);
 
-    do{
-        if(SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL)&SMAP_E3_PHY_OP_COMP){
-            if(SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL)&SMAP_E3_PHY_OP_COMP){
-                if((value=SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL))&SMAP_E3_PHY_OP_COMP){
+    do {
+        if (SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL) & SMAP_E3_PHY_OP_COMP) {
+            if (SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL) & SMAP_E3_PHY_OP_COMP) {
+                if ((value = SMAP_EMAC3_GET32(SMAP_R_EMAC3_STA_CTRL)) & SMAP_E3_PHY_OP_COMP) {
                     result = (u16)(value >> SMAP_E3_PHY_DATA_BITSFT);
                     break;
                 }
@@ -99,9 +102,10 @@ static u16 _smap_read_phy(volatile u8 *emac3_regbase, unsigned int address){
 
         DelayThread(1000);
         i++;
-    }while(i<100);
+    } while (i < 100);
 
-    if(i>=100) printf("smap: %s: > %d ms\n", "_smap_read_phy", i);
+    if (i >= 100)
+        printf("smap: %s: > %d ms\n", "_smap_read_phy", i);
 
     return result;
 }
@@ -365,7 +369,7 @@ static int Dev9IntrCb(int flag)
     while ((IntrReg = SPD_REG16(SPD_R_INTR_STAT) & DEV9_SMAP_INTR_MASK) != 0) {
         if (IntrReg & SMAP_INTR_EMAC3) {
             SMAP_REG16(SMAP_R_INTR_CLR) = SMAP_INTR_EMAC3;
-            SMAP_EMAC3_SET32(SMAP_R_EMAC3_INTR_STAT, SMAP_E3_INTR_TX_ERR_0|SMAP_E3_INTR_SQE_ERR_0|SMAP_E3_INTR_DEAD_0);
+            SMAP_EMAC3_SET32(SMAP_R_EMAC3_INTR_STAT, SMAP_E3_INTR_TX_ERR_0 | SMAP_E3_INTR_SQE_ERR_0 | SMAP_E3_INTR_DEAD_0);
         }
         if (IntrReg & SMAP_INTR_RXEND) {
             SMAP_REG16(SMAP_R_INTR_CLR) = SMAP_INTR_RXEND;
@@ -603,7 +607,7 @@ int smap_init(int argc, char *argv[])
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_TxMODE1, 7 << SMAP_E3_TX_LOW_REQ_BITSFT | 15 << SMAP_E3_TX_URG_REQ_BITSFT);
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_RxMODE, SMAP_E3_RX_STRIP_PAD | SMAP_E3_RX_STRIP_FCS | SMAP_E3_RX_INDIVID_ADDR | SMAP_E3_RX_BCAST | SMAP_E3_RX_MCAST);
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_INTR_STAT, SMAP_E3_INTR_TX_ERR_0 | SMAP_E3_INTR_SQE_ERR_0 | SMAP_E3_INTR_DEAD_0);
-    SMAP_EMAC3_SET32(SMAP_R_EMAC3_INTR_ENABLE, SMAP_E3_INTR_TX_ERR_0|SMAP_E3_INTR_SQE_ERR_0|SMAP_E3_INTR_DEAD_0);
+    SMAP_EMAC3_SET32(SMAP_R_EMAC3_INTR_ENABLE, SMAP_E3_INTR_TX_ERR_0 | SMAP_E3_INTR_SQE_ERR_0 | SMAP_E3_INTR_DEAD_0);
 
     mac_address = (u16)(eeprom_data[0] >> 8 | eeprom_data[0] << 8);
     SMAP_EMAC3_SET32(SMAP_R_EMAC3_ADDR_HI, mac_address);

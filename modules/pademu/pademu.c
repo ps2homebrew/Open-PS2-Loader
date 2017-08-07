@@ -106,14 +106,14 @@ int _start(int argc, char *argv[])
 
 #ifdef VMC
     uint8_t vmc = 0;
-    
+
     if (argc > 1)
         vmc = argv[1][3];
 
-    if(!vmc)
+    if (!vmc)
 #endif
-    if (!install_sio2hook())
-        return MODULE_NO_RESIDENT_END;
+        if (!install_sio2hook())
+            return MODULE_NO_RESIDENT_END;
 
     pademu_setup(enable, vibration);
 
@@ -253,7 +253,7 @@ void pademu_setup(uint8_t ports, uint8_t vib)
         pad[i].mode_id = DIGITAL_MODE;
         pad[i].mode_cfg = 0;
         pad[i].mode_lock = 0;
-        
+
         pad[i].enabled = ((ports >> i) & 1);
         pad[i].vibration = ((vib >> i) & 1);
 
@@ -261,7 +261,7 @@ void pademu_setup(uint8_t ports, uint8_t vib)
         pad[i].mask[1] = 0xFF;
         pad[i].mask[2] = 0x03;
         pad[i].mask[3] = 0x00;
-        
+
         pad[i].lrum = 2;
         pad[i].rrum = 2;
     }
@@ -363,12 +363,12 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             break;
 
         case 0x43: //enter/exit config mode
-                if (pad[port].mode_cfg) {
-                    pad[port].mode_cfg = in[3];
-                    break;
-                }
-                
+            if (pad[port].mode_cfg) {
                 pad[port].mode_cfg = in[3];
+                break;
+            }
+
+            pad[port].mode_cfg = in[3];
         case 0x42: //read data
             if (in[1] == 0x42) {
                 if (pad[port].vibration) { //disable/enable vibration
@@ -377,7 +377,7 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             }
 
             i = PAD_GET_DATA(&out[3], out_size - 3, port);
-            
+
             if (pad[port].mode_lock == 0) { //mode unlocked
                 if (pad[port].mode != i) {
                     pad[port].mode = i;
@@ -388,7 +388,7 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
                         pad[port].mode_id = DIGITAL_MODE;
                 }
             }
-            
+
             out[1] = pad[port].mode_id;
             break;
 
@@ -398,12 +398,10 @@ void pademu_cmd(int port, uint8_t *in, uint8_t *out, uint8_t out_size)
             if (pad[port].mode) {
                 if (pad[port].mode_p) {
                     pad[port].mode_id = ANALOGP_MODE;
-                }
-                else {
+                } else {
                     pad[port].mode_id = ANALOG_MODE;
                 }
-            }
-            else {
+            } else {
                 pad[port].mode_id = DIGITAL_MODE;
             }
             PAD_SET_MODE(pad[port].mode, pad[port].mode_lock, port);

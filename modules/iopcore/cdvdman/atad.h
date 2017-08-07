@@ -38,14 +38,14 @@ typedef struct _ata_devinfo
 } ata_devinfo_t;
 
 /* Error definitions.  */
-#define ATA_RES_ERR_NOTREADY	-501
-#define ATA_RES_ERR_TIMEOUT	-502
-#define ATA_RES_ERR_IO		-503
-#define ATA_RES_ERR_NODATA	-504
-#define ATA_RES_ERR_NODEV	-505
-#define ATA_RES_ERR_CMD		-506
-#define ATA_RES_ERR_LOCKED	-509
-#define ATA_RES_ERR_ICRC	-510
+#define ATA_RES_ERR_NOTREADY -501
+#define ATA_RES_ERR_TIMEOUT -502
+#define ATA_RES_ERR_IO -503
+#define ATA_RES_ERR_NODATA -504
+#define ATA_RES_ERR_NODEV -505
+#define ATA_RES_ERR_CMD -506
+#define ATA_RES_ERR_LOCKED -509
+#define ATA_RES_ERR_ICRC -510
 
 int atad_start(void);
 ata_devinfo_t *ata_get_devinfo(int device);

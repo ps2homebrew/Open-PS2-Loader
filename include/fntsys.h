@@ -25,9 +25,9 @@ int fntLoadDefault(char *path);
 /** Releases a font slot */
 void fntRelease(int id);
 
-/** Sets a new aspect ratio
+/** Updates to the native display resolution and aspect ratio
 * @note Invalidates the whole glyph cache for all fonts! */
-void fntSetAspectRatio(float aw, float ah);
+void fntUpdateAspectRatio();
 
 /** Renders a text with specified window dimensions */
 int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char *string, u64 colour);

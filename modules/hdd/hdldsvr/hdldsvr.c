@@ -294,7 +294,7 @@ static int handle_tcp_client(int tcp_client_socket)
             // 'stat' command
             // ------------------------------------------------
             case CMD_STAT:
-                if((devinfo = ata_get_devinfo(0)) == NULL)
+                if ((devinfo = ata_get_devinfo(0)) == NULL)
                     pkt->hdr.result = -1;
                 else
                     pkt->hdr.result = devinfo->total_sectors >> 1;

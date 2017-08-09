@@ -205,10 +205,10 @@ int Reset_Iop(const char *arg, int mode)
 				That caused SifSetDChain() to be run ASAP, which re-enables SIF0.
 				I don't find that a good workaround because it may result in a timing problem.	*/
 
-    for(arglen = 0; arg[arglen] != '\0'; arglen++)
+    for (arglen = 0; arg[arglen] != '\0'; arglen++)
         reset_pkt.arg[arglen] = arg[arglen];
 
-    reset_pkt.header.psize = sizeof reset_pkt;	//dsize is not initialized (and not processed, even on the IOP).
+    reset_pkt.header.psize = sizeof reset_pkt; //dsize is not initialized (and not processed, even on the IOP).
     reset_pkt.header.cid = SIF_CMD_RESET_CMD;
     reset_pkt.arglen = arglen;
     reset_pkt.mode = mode;

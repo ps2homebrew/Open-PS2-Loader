@@ -51,7 +51,7 @@ typedef struct
     apa_sub_t subs[APA_MAXSUB];
 } apa_header_t;
 
-#define PFS_INODE_MAX_BLOCKS	114
+#define PFS_INODE_MAX_BLOCKS 114
 
 typedef struct
 {

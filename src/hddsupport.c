@@ -334,7 +334,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
                             LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
                             LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
                         }
-                    }  // else Vmc file too much fragmented
+                    } // else Vmc file too much fragmented
                 }
 
                 if (have_error) {
@@ -466,7 +466,7 @@ static void hddCleanUp(int exception)
         if ((exception & UNMOUNT_EXCEPTION) == 0)
             fileXioUmount(hddPrefix);
 
-      fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
     }
 
     hddModulesLoaded = 0;

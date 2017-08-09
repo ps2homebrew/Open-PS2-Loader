@@ -463,7 +463,7 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
 #else
 #define PADEMU_ARG
 #endif
-    if ((modules & CORE_IRX_USB)PADEMU_ARG) {
+    if ((modules & CORE_IRX_USB) PADEMU_ARG) {
         irxptr_tab[modcount].info = size_pusbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
         irxptr_tab[modcount++].ptr = pusbd_irx;
     }

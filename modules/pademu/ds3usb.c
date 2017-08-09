@@ -23,33 +23,31 @@
 #define MAX_PADS 2
 
 static uint8_t output_01_report[] =
-{
-    0x00,
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,
-    0x02,
-    0xff, 0x27, 0x10, 0x00, 0x32,
-    0xff, 0x27, 0x10, 0x00, 0x32,
-    0xff, 0x27, 0x10, 0x00, 0x32,
-    0xff, 0x27, 0x10, 0x00, 0x32,
-    0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00
-};
+    {
+        0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x02,
+        0xff, 0x27, 0x10, 0x00, 0x32,
+        0xff, 0x27, 0x10, 0x00, 0x32,
+        0xff, 0x27, 0x10, 0x00, 0x32,
+        0xff, 0x27, 0x10, 0x00, 0x32,
+        0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00};
 
 static uint8_t led_patterns[][2] =
-{
-    { 0x1C, 0x02 },
-    { 0x1A, 0x04 },
-    { 0x16, 0x08 },
-    { 0x0E, 0x10 }, 
+    {
+        {0x1C, 0x02},
+        {0x1A, 0x04},
+        {0x16, 0x08},
+        {0x0E, 0x10},
 };
 
 static uint8_t power_level[] =
-{
-    0x00, 0x00, 0x02, 0x06, 0x0E, 0x1E
-};
+    {
+        0x00, 0x00, 0x02, 0x06, 0x0E, 0x1E};
 
 static uint8_t usb_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 
@@ -282,21 +280,19 @@ static void readReport(uint8_t *data, int pad)
         ds3pad[pad].data[16] = data[DATA_START + PressureL2]; //L2
         ds3pad[pad].data[17] = data[DATA_START + PressureR2]; //R2
 
-        if (data[DATA_START + PSButtonState]) { //display battery level
+        if (data[DATA_START + PSButtonState]) {                                      //display battery level
             if ((data[DATA_START + ButtonStateL] & 1) && (btn_delay == MAX_DELAY)) { //PS + SELECT
-                if(ds3pad[pad].analog_btn < 2) //unlocked mode 
+                if (ds3pad[pad].analog_btn < 2)                                      //unlocked mode
                     ds3pad[pad].analog_btn = !ds3pad[pad].analog_btn;
-                    
+
                 ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
                 btn_delay = 0;
-            }
-            else if(data[DATA_START + Power] != 0xEE)
+            } else if (data[DATA_START + Power] != 0xEE)
                 ds3pad[pad].oldled = power_level[data[DATA_START + Power]];
 
             if (btn_delay < MAX_DELAY)
                 btn_delay++;
-        }
-        else
+        } else
             ds3pad[pad].oldled = led_patterns[pad][(ds3pad[pad].analog_btn & 1)];
 
         if (data[DATA_START + Power] == 0xEE) //charging
@@ -404,7 +400,7 @@ void ds3usb_set_mode(int mode, int lock, int port)
 {
     WaitSema(ds3pad[port].sema);
 
-    if (lock == 3) 
+    if (lock == 3)
         ds3pad[port].analog_btn = 3;
     else
         ds3pad[port].analog_btn = mode;
@@ -428,11 +424,10 @@ int ds3usb_get_status(int port)
         WaitSema(ds3pad[port].sema);
         status = ds3pad[port].status;
         SignalSema(ds3pad[port].sema);
-    }
-    else {
+    } else {
         return ds3pad[port].status;
     }
-    
+
     return status;
 }
 

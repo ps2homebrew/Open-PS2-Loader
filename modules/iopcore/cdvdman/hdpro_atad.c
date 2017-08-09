@@ -85,8 +85,8 @@ static int io_sema = -1;
 #define ATAWRITE 0
 #endif
 
-#define ATA_EV_TIMEOUT	1
-#define ATA_EV_COMPLETE	2    //Unused as there is no completion interrupt
+#define ATA_EV_TIMEOUT 1
+#define ATA_EV_COMPLETE 2 //Unused as there is no completion interrupt
 
 /* Local device info.  */
 static ata_devinfo_t atad_devinfo;
@@ -115,14 +115,16 @@ static const ata_cmd_info_t smart_cmd_table[] = {
 #define SMART_CMD_TABLE_SIZE (sizeof smart_cmd_table / sizeof(ata_cmd_info_t))
 
 /* This is the state info tracked between ata_io_start() and ata_io_finish().  */
-typedef struct _ata_cmd_state {
-	s32	type;		/* The ata_cmd_info_t type field. */
-	union {
-		void	*buf;
-		u8	*buf8;
-		u16	*buf16;
-	};
-	u32	blkcount;	/* The number of 512-byte blocks (sectors) to transfer.  */
+typedef struct _ata_cmd_state
+{
+    s32 type; /* The ata_cmd_info_t type field. */
+    union
+    {
+        void *buf;
+        u8 *buf8;
+        u16 *buf16;
+    };
+    u32 blkcount; /* The number of 512-byte blocks (sectors) to transfer.  */
 } ata_cmd_state_t;
 
 static ata_cmd_state_t atad_cmd_state;
@@ -169,7 +171,7 @@ int atad_start(void)
 
     M_PRINTF(BANNER, VERSION);
 
-    event.attr = EA_SINGLE;	//In v1.04, EA_MULTI was specified.
+    event.attr = EA_SINGLE; //In v1.04, EA_MULTI was specified.
     event.bits = 0;
     if ((ata_evflg = CreateEventFlag(&event)) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
@@ -207,11 +209,11 @@ int ata_get_error()
     return hdpro_io_read(ATAreg_ERROR_RD) & 0xff;
 }
 
-#define ATA_WAIT_BUSY		0x80
-#define ATA_WAIT_BUSBUSY	0x88
+#define ATA_WAIT_BUSY 0x80
+#define ATA_WAIT_BUSBUSY 0x88
 
-#define ata_wait_busy()		gen_ata_wait_busy(ATA_WAIT_BUSY)
-#define ata_wait_bus_busy()	gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
+#define ata_wait_busy() gen_ata_wait_busy(ATA_WAIT_BUSY)
+#define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
 /* 0x80 for busy, 0x88 for bus busy.
 	In the original ATAD, the busy and bus-busy functions were separate, but similar.  */
@@ -458,7 +460,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
         case 6:
             using_timeout = 1;
             break;
-        //Support for DMA commands (type = 4) is removed because HDPro cannot support DMA. The original HDPro driver still had code for it though.
+            //Support for DMA commands (type = 4) is removed because HDPro cannot support DMA. The original HDPro driver still had code for it though.
     }
 
     if (using_timeout) {
@@ -498,7 +500,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     hdpro_io_write(ATAreg_LCYL_WR, lcyl & 0xff);
     hdpro_io_write(ATAreg_HCYL_WR, hcyl & 0xff);
 
-    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff);	//In v1.04, LBA was enabled in the ata_device_sector_io function.
+    hdpro_io_write(ATAreg_SELECT_WR, (select | ATA_SEL_LBA) & 0xff); //In v1.04, LBA was enabled in the ata_device_sector_io function.
     hdpro_io_write(ATAreg_COMMAND_WR, command & 0xff);
 
     return 0;
@@ -599,8 +601,7 @@ int ata_io_finish(void)
     if (type == 1 || type == 6) { /* Non-data commands.  */
 
         //Unlike ATAD, poll until the device either completes its command or times out. There is no completion interrupt.
-        while (1)
-        {
+        while (1) {
             suspend_intr();
 
             HDPROreg_IO8 = 0x21;
@@ -615,8 +616,7 @@ int ata_io_finish(void)
 
             /* The original did not check on the return value of PollEventFlag,
                but PollEventFlag does not seem to return the event flag's bits if the wait condition is not satisfied. */
-            if (PollEventFlag(ata_evflg, ATA_EV_TIMEOUT|ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits) == 0)
-            {
+            if (PollEventFlag(ata_evflg, ATA_EV_TIMEOUT | ATA_EV_COMPLETE, WEF_CLEAR | WEF_OR, &bits) == 0) {
                 if (bits & ATA_EV_TIMEOUT) { /* Timeout.  */
                     M_PRINTF("Error: ATA timeout on a non-data command.\n");
                     return ATA_RES_ERR_TIMEOUT;
@@ -626,7 +626,7 @@ int ata_io_finish(void)
             DelayThread(500);
         }
 
-    /*  Support for DMA commands (type = 4) is removed because HDPro cannot support DMA.
+        /*  Support for DMA commands (type = 4) is removed because HDPro cannot support DMA.
         The original would return ATA_RES_ERR_TIMEOUT for type = 4. */
     } else { /* PIO transfers.  */
         stat = hdpro_io_read(ATAreg_CONTROL_RD);
@@ -702,7 +702,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             continue;
 
         nbytes = len * 512;
-        buf = (void*)((u8 *)buf + len * 512);
+        buf = (void *)((u8 *)buf + len * 512);
         lba += len;
         nsectors -= len;
     }

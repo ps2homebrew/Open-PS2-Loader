@@ -57,7 +57,7 @@ int hddIs48bit(void)
 //-------------------------------------------------------------------------
 int hddSetTransferMode(int type, int mode)
 {
-    hddAtaSetMode_t *args = (hddAtaSetMode_t*)IOBuffer;
+    hddAtaSetMode_t *args = (hddAtaSetMode_t *)IOBuffer;
 
     args->type = type;
     args->mode = mode;
@@ -90,7 +90,7 @@ int hddSetIdleTimeout(int timeout)
 //-------------------------------------------------------------------------
 int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 {
-    hddAtaTransfer_t *args = (hddAtaTransfer_t*)IOBuffer;
+    hddAtaTransfer_t *args = (hddAtaTransfer_t *)IOBuffer;
 
     args->lba = lba;
     args->size = nsectors;
@@ -104,11 +104,11 @@ int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 //-------------------------------------------------------------------------
 static int hddWriteSectors(u32 lba, u32 nsectors, const void *buf)
 {
-    static u8 WriteBuffer[2 * 512 + sizeof(hddAtaTransfer_t)] ALIGNED(64);	//Has to be a different buffer from IOBuffer (input can be in IOBuffer).
+    static u8 WriteBuffer[2 * 512 + sizeof(hddAtaTransfer_t)] ALIGNED(64); //Has to be a different buffer from IOBuffer (input can be in IOBuffer).
     int argsz;
     hddAtaTransfer_t *args = (hddAtaTransfer_t *)WriteBuffer;
 
-    if(nsectors > 2)  //Sanity check
+    if (nsectors > 2) //Sanity check
         return -ENOMEM;
 
     args->lba = lba;
@@ -303,22 +303,19 @@ int hddGetPartitionInfo(const char *name, apa_sub_t *parts)
     apa_header_t *header;
     int result, i;
 
-    if((result = fileXioGetStat(name, &stat)) >= 0)
-    {
+    if ((result = fileXioGetStat(name, &stat)) >= 0) {
         lba = stat.private_5;
-	header = (apa_header_t*)IOBuffer;
+        header = (apa_header_t *)IOBuffer;
 
-        if(hddReadSectors(lba, sizeof(apa_header_t)/512, header) == 0)
-        {
+        if (hddReadSectors(lba, sizeof(apa_header_t) / 512, header) == 0) {
             parts[0].start = header->start;
             parts[0].length = header->length;
 
-            for(i = 0; i < header->nsub; i++)
+            for (i = 0; i < header->nsub; i++)
                 parts[1 + i] = header->subs[i];
 
             result = header->nsub + 1;
-        }
-        else
+        } else
             result = -EIO;
     }
 
@@ -333,20 +330,17 @@ int hddGetFileBlockInfo(const char *name, const apa_sub_t *subs, pfs_blockinfo_t
     pfs_inode_t *inode;
     int result;
 
-    if((result = fileXioGetStat(name, &stat)) >= 0)
-    {
+    if ((result = fileXioGetStat(name, &stat)) >= 0) {
         lba = subs[stat.private_4].start + stat.private_5;
-	inode = (pfs_inode_t*)IOBuffer;
+        inode = (pfs_inode_t *)IOBuffer;
 
-        if(hddReadSectors(lba, sizeof(pfs_inode_t)/512, inode) == 0)
-        {
-            if(inode->number_data < max) {
-                memcpy(blocks, inode->data, max * sizeof (pfs_blockinfo_t));
+        if (hddReadSectors(lba, sizeof(pfs_inode_t) / 512, inode) == 0) {
+            if (inode->number_data < max) {
+                memcpy(blocks, inode->data, max * sizeof(pfs_blockinfo_t));
                 result = inode->number_data;
             } else
                 result = -ENOMEM;
-        }
-        else
+        } else
             result = -EIO;
     }
 

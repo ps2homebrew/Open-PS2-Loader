@@ -235,7 +235,7 @@ static void usbRenameGame(int id, char *newName)
             }
         }
 
-        if((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
+        if ((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
             fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newpath);
             fileXioClose(fd);
         }
@@ -248,7 +248,7 @@ static void usbRenameGame(int id, char *newName)
         for (i = 0; i < game->parts; i++) {
             snprintf(oldpath, sizeof(oldpath), pathStr, usbPrefix, oldcrc, game->startup, i);
             snprintf(newpath, sizeof(newpath), pathStr, usbPrefix, newcrc, game->startup, i);
-            if((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
+            if ((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
                 fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newpath);
                 fileXioClose(fd);
             }
@@ -302,8 +302,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 
                 fd = fileXioOpen(vmc_path, O_RDONLY);
                 if (fd >= 0) {
-                    if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0
-                        && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
+                    if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0 && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
 
                         // Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
                         if (fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) != 0) {
@@ -361,8 +360,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
         if (fd >= 0) {
             settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, partname);
             if (gCheckUSBFragmentation) {
-                if ((startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, partname)) == 0
-                   || fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) == 0) {
+                if ((startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, partname)) == 0 || fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) == 0) {
 
                     fileXioClose(fd);
                     //Game is fragmented. Do not continue.

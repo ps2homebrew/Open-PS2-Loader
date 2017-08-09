@@ -571,7 +571,7 @@ void sys_sem_free(sys_sem_t aSema)
 void *ps2ip_mem_malloc(int size)
 {
     int OldState;
-    void* ret;
+    void *ret;
 
     CpuSuspendIntr(&OldState);
     ret = AllocSysMemory(ALLOC_LAST, size, NULL);
@@ -594,7 +594,7 @@ void ps2ip_mem_free(void *rmem)
 void *ps2ip_mem_realloc(void *rmem, int newsize)
 {
     int OldState;
-    void* ret;
+    void *ret;
 
     CpuSuspendIntr(&OldState);
     FreeSysMemory(rmem);

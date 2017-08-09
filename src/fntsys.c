@@ -178,7 +178,7 @@ static void fntPrepareCLUT()
     size_t i;
     u32 *clut = fontClut.Clut;
     for (i = 0; i < 256; ++i) {
-        u8 alpha = (i*128)/255;
+        u8 alpha = (i * 128) / 255;
 
         *clut = GS_SETREG_RGBA(0xFF, 0xFF, 0xFF, alpha);
         clut++;

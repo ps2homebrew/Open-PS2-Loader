@@ -58,7 +58,7 @@ int ds3usb_get_status(int port)
     rpcbuf[0] = port;
 
     if (SifCallRpc(&ds3usb, DS3USB_GET_STATUS, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL) == 0)
-       return rpcbuf[0];
+        return rpcbuf[0];
 
     return 0;
 }

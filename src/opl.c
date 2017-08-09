@@ -108,7 +108,9 @@ static unsigned int frameCounter;
 
 static char errorMessage[256];
 
-static opl_io_module_t list_support[4];
+//START of OPL_DB tweaks
+static opl_io_module_t list_support[5];
+//END of OPL_DB tweaks
 
 void moduleUpdateMenu(int mode, int themeChanged)
 {

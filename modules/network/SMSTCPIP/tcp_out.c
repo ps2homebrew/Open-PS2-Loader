@@ -280,8 +280,7 @@ err_t tcp_enqueue(
     pcb->snd_queuelen = queuelen;
     LWIP_DEBUGF(TCP_QLEN_DEBUG, ("tcp_enqueue: %d (after enqueued)\n", pcb->snd_queuelen));
     if (pcb->snd_queuelen != 0) {
-        LWIP_ASSERT("tcp_enqueue: valid queue length", pcb->unacked != NULL ||
-                                                           pcb->unsent != NULL);
+        LWIP_ASSERT("tcp_enqueue: valid queue length", pcb->unacked != NULL || pcb->unsent != NULL);
     }
 
     /* Set the PSH flag in the last segment that we enqueued, but only
@@ -298,8 +297,7 @@ memerr:
         tcp_segs_free(queue);
     }
     if (pcb->snd_queuelen != 0) {
-        LWIP_ASSERT("tcp_enqueue: valid queue length", pcb->unacked != NULL ||
-                                                           pcb->unsent != NULL);
+        LWIP_ASSERT("tcp_enqueue: valid queue length", pcb->unacked != NULL || pcb->unsent != NULL);
     }
     LWIP_DEBUGF(TCP_QLEN_DEBUG | DBG_STATE, ("tcp_enqueue: %d (with mem err)\n", pcb->snd_queuelen));
     return ERR_MEM;
@@ -447,8 +445,7 @@ tcp_output_segment(struct tcp_seg *seg, struct tcp_pcb *pcb)
         LWIP_DEBUGF(TCP_RTO_DEBUG, ("tcp_output_segment: rtseq %lu\n", pcb->rtseq));
     }
     LWIP_DEBUGF(TCP_OUTPUT_DEBUG, ("tcp_output_segment: %lu:%lu\n",
-                                   htonl(seg->tcphdr->seqno), htonl(seg->tcphdr->seqno) +
-                                                                  seg->len));
+                                   htonl(seg->tcphdr->seqno), htonl(seg->tcphdr->seqno) + seg->len));
 
     len = (u16_t)((u8_t *)seg->tcphdr - (u8_t *)seg->p->payload);
 

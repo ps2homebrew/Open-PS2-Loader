@@ -624,4 +624,3 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
     return patched;
 }
-

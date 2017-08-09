@@ -697,11 +697,10 @@ void applyConfig(int themeID, int langID)
     int changed = rmSetMode(0);
     if (changed) {
         // reinit the graphics...
-        rmSetAspectRatio((gWideScreen == 0) ? RM_ARATIO_4_3 : RM_ARATIO_16_9);
         thmReloadScreenExtents();
         guiReloadScreenExtents();
-        guiUpdateScreenScale();
     }
+    guiUpdateScreenScale();
 
     // theme must be set after color, and lng after theme
     changed = thmSetGuiValue(themeID, changed);

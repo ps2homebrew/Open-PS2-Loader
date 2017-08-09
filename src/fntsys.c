@@ -23,9 +23,9 @@ extern int size_freesansfont_raw;
 /// Maximal count of atlases per font
 #define ATLAS_MAX 4
 /// Atlas width in pixels
-#define ATLAS_WIDTH 128
+#define ATLAS_WIDTH 256
 /// Atlas height in pixels
-#define ATLAS_HEIGHT 128
+#define ATLAS_HEIGHT 256
 
 #define FNTSYS_CHAR_SIZE 17
 
@@ -36,6 +36,8 @@ static s32 gFontSemaId;
 static ee_sema_t gFontSema;
 
 static GSCLUT fontClut;
+
+static const float fDPI = 72.0f;
 
 /** Single entry in the glyph cache */
 typedef struct
@@ -253,14 +255,9 @@ static int fntLoadSlot(font_t *font, char *path)
         return FNT_ERROR;
     }
 
-    error = FT_Set_Pixel_Sizes(font->face, FNTSYS_CHAR_SIZE, FNTSYS_CHAR_SIZE);
-    if (error) {
-        LOG("FNTSYS Freetype error setting font pixel size with %x!\n", error);
-        fntDeleteSlot(font);
-        return FNT_ERROR;
-    }
-
     font->isValid = 1;
+    fntUpdateAspectRatio();
+
     return 0;
 }
 
@@ -347,7 +344,7 @@ static atlas_t *fntNewAtlas()
     atlas_t *atl = atlasNew(ATLAS_WIDTH, ATLAS_HEIGHT, GS_PSM_T8);
 
     atl->surface.ClutPSM = GS_PSM_CT32;
-    atl->surface.Clut = (u32 *)(&fontClut);
+    atl->surface.Clut = fontClut.Clut;
 
     return atl;
 }
@@ -398,7 +395,7 @@ static fnt_glyph_cache_entry_t *fntCacheGlyph(font_t *font, uint32_t gid)
             return NULL;
 
     fnt_glyph_cache_entry_t *page = font->glyphCache[pageid];
-    /* Should never happen. 
+    /* Should never happen.
 	if (!page) // safeguard
 		return NULL;
 	*/
@@ -428,23 +425,32 @@ static fnt_glyph_cache_entry_t *fntCacheGlyph(font_t *font, uint32_t gid)
     glyph->shx = slot->advance.x;
     glyph->shy = slot->advance.y;
     glyph->ox = slot->bitmap_left;
-    glyph->oy = FNTSYS_CHAR_SIZE - slot->bitmap_top;
+    glyph->oy = rmScaleY(FNTSYS_CHAR_SIZE-2) - slot->bitmap_top;
 
     glyph->isValid = 1;
 
     return glyph;
 }
 
-void fntSetAspectRatio(float aw, float ah)
+void fntUpdateAspectRatio()
 {
     int i;
+    int w, h, wn, hn;
+    float ws, hs;
+
+    rmGetScreenExtents(&w, &h);
+    rmGetScreenExtentsNative(&wn, &hn);
+    // Scale height from virtual resolution (640x480) to the native display resolution
+    hs = (float)hn/(float)h;
+    // Scale width according to the PAR (Pixel Aspect Ratio)
+    ws = hs * rmGetPAR();
 
     // flush cache - it will be invalid after the setting
     for (i = 0; i < FNT_MAX_COUNT; i++) {
         if (fonts[i].isValid) {
             fntCacheFlush(&fonts[i]);
             //TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
-            //	FT_Set_Pixel_Sizes(fonts[i].face, FNTSYS_CHAR_SIZE * aw, FNTSYS_CHAR_SIZE * ah);
+            FT_Set_Char_Size(fonts[i].face, FNTSYS_CHAR_SIZE*64, FNTSYS_CHAR_SIZE*64, fDPI*ws, fDPI*hs);
         }
     }
 }
@@ -461,21 +467,18 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t *glyph, int pen_x, int pen_y)
 		 *    performance problems under - beginning with rmSetupQuad and continuing into gsKit
 		 *    - this method would handle the preparation of the quads and GS upload itself,
 		 *    without the use of prim_quad_texture and rmSetupQuad...
-		 *
-		 * 3. We should use clut to keep the memory allocations sane - we're linear in the 32bit buffers
-		 *    anyway, no reason to waste like we do!
 		 */
         quad.ul.x = pen_x + glyph->ox;
-        quad.br.x = quad.ul.x + glyph->width;
         quad.ul.y = pen_y + glyph->oy;
-        quad.br.y = quad.ul.y + glyph->height;
-
-        // UV is our own, custom thing here
-        quad.txt = &glyph->atlas->surface;
         quad.ul.u = glyph->allocation->x;
-        quad.br.u = quad.ul.u + glyph->width;
         quad.ul.v = glyph->allocation->y;
+
+        quad.br.x = quad.ul.x + glyph->width;
+        quad.br.y = quad.ul.y + glyph->height;
+        quad.br.u = quad.ul.u + glyph->width;
         quad.br.v = quad.ul.v + glyph->height;
+
+        quad.txt = &glyph->atlas->surface;
 
         rmDrawQuad(&quad);
     }
@@ -490,16 +493,24 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     font_t *font = &fonts[id];
     SignalSema(gFontSemaId);
 
-    if (aligned) {
+    // Convert to native display resolution
+    x = rmScaleX(x);
+    y = rmScaleY(y);
+    width = rmScaleX(width);
+    height = rmScaleY(height);
+
+    if (aligned & ALIGN_HCENTER) {
         if (width) {
             x -= min(fntCalcDimensions(id, string), width) >> 1;
         } else {
             x -= fntCalcDimensions(id, string) >> 1;
         }
-        y -= MENU_ITEM_HEIGHT >> 1;
     }
 
-    rmApplyShiftRatio(&y);
+    if (aligned & ALIGN_VCENTER) {
+        y -= rmScaleY(FNTSYS_CHAR_SIZE) >> 1;
+    }
+
     quad.color = colour;
 
     int pen_x = x;
@@ -539,7 +550,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
         if (width) {
             if (codepoint == '\n') {
                 pen_x = x;
-                y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
+                y += rmScaleY(MENU_ITEM_HEIGHT); // hmax is too tight and unordered, generally
                 continue;
             }
 
@@ -556,7 +567,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
         pen_x += glyph->shx >> 6;
     }
 
-    return pen_x;
+    return rmUnScaleX(pen_x);
 }
 
 #else
@@ -606,16 +617,24 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     font_t *font = &fonts[id];
     SignalSema(gFontSemaId);
 
-    if (aligned) {
+    // Convert to native display resolution
+    x = rmScaleX(x);
+    y = rmScaleY(y);
+    width = rmScaleX(width);
+    height = rmScaleY(height);
+
+    if (aligned & ALIGN_HCENTER) {
         if (width) {
             x -= min(fntCalcDimensions(id, string), width) >> 1;
         } else {
             x -= fntCalcDimensions(id, string) >> 1;
         }
-        y -= MENU_ITEM_HEIGHT >> 1;
     }
 
-    rmApplyShiftRatio(&y);
+    if (aligned & ALIGN_VCENTER) {
+        y -= rmScaleY(FNTSYS_CHAR_SIZE) >> 1;
+    }
+
     quad.color = colour;
 
     int pen_x = x;
@@ -655,7 +674,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
         if (width) {
             if (codepoint == '\n') {
                 pen_x = x;
-                y += MENU_ITEM_HEIGHT; // hmax is too tight and unordered, generally
+                y += rmScaleY(MENU_ITEM_HEIGHT); // hmax is too tight and unordered, generally
                 continue;
             }
 
@@ -692,7 +711,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
         fntRenderSubRTL(font, startRTL, string, glyphRTL, pen_xRTL, y);
     }
 
-    return pen_x;
+    return rmUnScaleX(pen_x);
 }
 #endif
 

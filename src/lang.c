@@ -197,6 +197,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Horizontal Adjustment",
     "V-POS",
     "Vertical Adjustment",
+    "Overscan",
+    "Overscan Adjustment",
     "FMV Skip",
     "Skips Full Motion Videos",
     "Cheat Settings",

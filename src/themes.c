@@ -13,6 +13,9 @@
 #define HINT_HEIGHT 32
 #define DECORATOR_SIZE 20
 
+extern const char conf_theme_OPL_cfg;
+extern u16 size_conf_theme_OPL_cfg;
+
 theme_t *gTheme;
 
 static int screenWidth;
@@ -1062,6 +1065,7 @@ static void thmLoadFonts(config_set_t *themeConfig, const char *themePath, theme
 static void thmLoad(const char *themePath)
 {
     LOG("THEMES Load theme path=%s\n", themePath);
+    char path[256];
     theme_t *curT = gTheme;
     theme_t *newT = (theme_t *)malloc(sizeof(theme_t));
     memset(newT, 0, sizeof(theme_t));
@@ -1082,60 +1086,48 @@ static void thmLoad(const char *themePath)
     if (!themePath) {
         //No theme specified. Prepare and load the default theme.
         themeConfig = configAlloc(0, NULL, NULL);
-        configSetInt(themeConfig, "bg_overlay_aligned", ALIGN_NONE);
-        configSetInt(themeConfig, "bg_overlay_scaled", SCALING_NONE);
-        configSetStr(themeConfig, "bg_overlay_width", "DIM_INF");
-        configSetStr(themeConfig, "bg_overlay_height", "DIM_INF");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_STATIC_IMAGE], "bg_overlay");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_ICON], "category_icon");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_MENU_TEXT], "category_label");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEMS_LIST], "game_list");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_ICON], "disc_icon");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_COVER], "game_cover");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_ITEM_TEXT], "game_id");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_HINT_TEXT], "hint_text");
-        addGUIElem(themePath, themeConfig, newT, &newT->mainElems, elementsType[ELEM_TYPE_LOADING_ICON], "loading_icon");
+        configReadBuffer(themeConfig, &conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
     } else {
-        char path[256];
         snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);
         themeConfig = configAlloc(0, NULL, path);
         configRead(themeConfig); // try to load the theme config file
+    }
 
-        int intValue;
-        if (configGetInt(themeConfig, "use_default", &intValue))
-            newT->useDefault = intValue;
+    int intValue;
+    if (configGetInt(themeConfig, "use_default", &intValue))
+        newT->useDefault = intValue;
 
-        if (configGetInt(themeConfig, "use_real_height", &intValue)) {
-            if (intValue)
-                newT->usedHeight = screenHeight;
-        }
+    if (configGetInt(themeConfig, "use_real_height", &intValue)) {
+        if (intValue)
+            newT->usedHeight = screenHeight;
+    }
 
-        configGetColor(themeConfig, "bg_color", newT->bgColor);
+    configGetColor(themeConfig, "bg_color", newT->bgColor);
 
-        unsigned char color[3];
-        if (configGetColor(themeConfig, "text_color", color))
-            newT->textColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0x80);
+    unsigned char color[3];
+    if (configGetColor(themeConfig, "text_color", color))
+        newT->textColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0x80);
 
-        if (configGetColor(themeConfig, "ui_text_color", color))
-            newT->uiTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0x80);
+    if (configGetColor(themeConfig, "ui_text_color", color))
+        newT->uiTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0x80);
 
-        if (configGetColor(themeConfig, "sel_text_color", color))
-            newT->selTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0x80);
+    if (configGetColor(themeConfig, "sel_text_color", color))
+        newT->selTextColor = GS_SETREG_RGBA(color[0], color[1], color[2], 0x80);
 
-        // before loading the element definitions, we have to have the fonts prepared
-        // for that, we load the fonts and a translation table
+    // before loading the element definitions, we have to have the fonts prepared
+    // for that, we load the fonts and a translation table
+    if (themePath)
         thmLoadFonts(themeConfig, themePath, newT);
 
-        int i = 1;
-        snprintf(path, sizeof(path), "main0");
-        while (addGUIElem(themePath, themeConfig, newT, &newT->mainElems, NULL, path))
-            snprintf(path, sizeof(path), "main%d", i++);
+    int i = 1;
+    snprintf(path, sizeof(path), "main0");
+    while (addGUIElem(themePath, themeConfig, newT, &newT->mainElems, NULL, path))
+        snprintf(path, sizeof(path), "main%d", i++);
 
-        i = 1;
-        snprintf(path, sizeof(path), "info0");
-        while (addGUIElem(themePath, themeConfig, newT, &newT->infoElems, NULL, path))
-            snprintf(path, sizeof(path), "info%d", i++);
-    }
+    i = 1;
+    snprintf(path, sizeof(path), "info0");
+    while (addGUIElem(themePath, themeConfig, newT, &newT->infoElems, NULL, path))
+        snprintf(path, sizeof(path), "info%d", i++);
 
     validateGUIElems(themePath, themeConfig, newT);
     configFree(themeConfig);
@@ -1143,7 +1135,6 @@ static void thmLoad(const char *themePath)
     LOG("THEMES Number of cache: %d\n", newT->gameCacheCount);
     LOG("THEMES Used height: %d\n", newT->usedHeight);
 
-    int i;
     // default all to not loaded...
     for (i = 0; i < TEXTURES_COUNT; i++) {
         newT->textures[i].Mem = NULL;
@@ -1156,16 +1147,16 @@ static void thmLoad(const char *themePath)
     thmFree(curT);
 
     // First start with busy icon
-    const char *path = themePath;
+    const char *themePath_temp = themePath;
     int customBusy = 0;
     for (i = LOAD0_ICON; i <= LOAD7_ICON; i++) {
-        if (thmLoadResource(i, path, GS_PSM_CT32, gTheme->useDefault) >= 0)
+        if (thmLoadResource(i, themePath_temp, GS_PSM_CT32, gTheme->useDefault) >= 0)
             customBusy = 1;
         else {
             if (customBusy)
                 break;
             else
-                path = NULL;
+                themePath_temp = NULL;
         }
     }
     gTheme->loadingIconCount = i;

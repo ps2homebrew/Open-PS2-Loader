@@ -79,7 +79,7 @@ GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o freesans.o \
 		icon_sys.o icon_icn.o
 
-MISC_OBJS =	icon_sys_A.o icon_sys_J.o
+MISC_OBJS =	icon_sys_A.o icon_sys_J.o conf_theme_OPL.o
 
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
@@ -102,7 +102,7 @@ EE_ASM_DIR = asm/
 
 MAPFILE = opl.map
 EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
- 
+
 EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
 
@@ -111,10 +111,10 @@ BIN2S = $(PS2SDK)/bin/bin2s
 BIN2O = $(PS2SDK)/bin/bin2o
 
 # WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
-# but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule! 
+# but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule!
 
 ifeq ($(VMC),1)
-  IOP_OBJS += usb_mcemu.o hdd_mcemu.o smb_mcemu.o 
+  IOP_OBJS += usb_mcemu.o hdd_mcemu.o smb_mcemu.o
   EE_CFLAGS += -DVMC
   VMC_FLAGS = VMC=1
 else
@@ -161,7 +161,7 @@ else
     IGS_FLAGS = IGS=0
   endif
   ifeq ($(CHEAT),1)
-    FRONTEND_OBJS += cheatman.o 
+    FRONTEND_OBJS += cheatman.o
     EE_CFLAGS += -DCHEAT
     CHEAT_FLAGS = CHEAT=1
   else
@@ -178,7 +178,7 @@ else
   PADEMU_FLAGS = PADEMU=0
 endif
 
-ifeq ($(DEBUG),1) 
+ifeq ($(DEBUG),1)
   EE_CFLAGS += -D__DEBUG -g
   EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
   MOD_DEBUG_FLAGS = DEBUG=1
@@ -187,7 +187,7 @@ ifeq ($(DEBUG),1)
     EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = IOPCORE_DEBUG=1
     MCEMU_DEBUG_FLAGS = IOPCORE_DEBUG=1
-    SMSTCPIP_INGAME_CFLAGS = 
+    SMSTCPIP_INGAME_CFLAGS =
     IOP_OBJS += udptty-ingame.o
   else ifeq ($(EESIO_DEBUG),1)
     EE_CFLAGS += -D__EESIO_DEBUG
@@ -196,7 +196,7 @@ ifeq ($(DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
     EECORE_EXTRA_FLAGS = LOAD_DEBUG_MODULES=1
     CDVDMAN_DEBUG_FLAGS = USE_DEV9=1
-    SMSTCPIP_INGAME_CFLAGS = 
+    SMSTCPIP_INGAME_CFLAGS =
     ifeq ($(DECI2_DEBUG),1)
       EE_CFLAGS += -D__DECI2_DEBUG
       EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
@@ -232,7 +232,7 @@ release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
 	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 $(EE_VPKD).ZIP
-	
+
 childproof:
 	$(MAKE) CHILDPROOF=1 all
 
@@ -736,15 +736,18 @@ $(EE_ASM_DIR)freesans.s: thirdparty/FreeSans_basic_latin.ttf | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)icon_sys.s: gfx/icon.sys | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ icon_sys
-	
+
 $(EE_ASM_DIR)icon_icn.s: gfx/opl.icn | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ icon_icn	
+	$(BIN2S) $< $@ icon_icn
 
 $(EE_ASM_DIR)icon_sys_A.s: misc/icon_A.sys | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ icon_sys_A
 
 $(EE_ASM_DIR)icon_sys_J.s: misc/icon_J.sys | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ icon_sys_J
+
+$(EE_ASM_DIR)conf_theme_OPL.s: misc/conf_theme_OPL.cfg | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ conf_theme_OPL_cfg
 
 $(EE_ASM_DIR)IOPRP_img.s: modules/iopcore/IOPRP.img | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ IOPRP_img

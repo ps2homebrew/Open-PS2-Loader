@@ -112,11 +112,15 @@ void texPrepare(GSTEXTURE *texture, short psm)
 
 int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
 {
-    int rc = texPngLoad(texture, path, texId, psm);
-    if (rc >= 0)
+    if (texPngLoad(texture, path, texId, psm) >= 0)
         return 0;
-    else if (psm == GS_PSM_CT24)
-        return texJpgLoad(texture, path, texId, psm);
+
+    if ((psm == GS_PSM_CT24) && texJpgLoad(texture, path, texId, psm) >= 0)
+        return 0;
+
+    if (texBmpLoad(texture, path, texId, psm) >= 0)
+        return 0;
+
     return ERR_BAD_FILE;
 }
 
@@ -341,6 +345,28 @@ int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
 
     if (file)
         fclose(file);
+
+    return result;
+}
+
+
+/// BMP SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
+
+extern GSGLOBAL *gsGlobal;
+int texBmpLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
+{
+    texPrepare(texture, GS_PSM_CT24);
+    int result = ERR_BAD_FILE;
+    char filePath[256];
+
+    if (texId != -1)
+        snprintf(filePath, sizeof(filePath), "%s%s.bmp", path, internalDefault[texId].name);
+    else
+        snprintf(filePath, sizeof(filePath), "%s.bmp", path);
+
+    texture->Delayed = 1;
+    result = gsKit_texture_bmp(gsGlobal, texture, filePath);
+    texture->Filter = GS_FILTER_LINEAR;
 
     return result;
 }

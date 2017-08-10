@@ -45,6 +45,7 @@ enum INTERNAL_TEXTURE {
 int texLookupInternalTexId(const char *name);
 int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
 int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
+int texBmpLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
 void texPrepare(GSTEXTURE *texture, short psm);
 int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId, short psm);
 

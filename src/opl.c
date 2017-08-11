@@ -700,12 +700,13 @@ void applyConfig(int themeID, int langID)
         thmReloadScreenExtents();
         guiReloadScreenExtents();
     }
-    guiUpdateScreenScale();
 
     // theme must be set after color, and lng after theme
     changed = thmSetGuiValue(themeID, changed);
     if (langID != -1)
         lngSetGuiValue(langID);
+
+    guiUpdateScreenScale();
 
     initAllSupport(0);
 

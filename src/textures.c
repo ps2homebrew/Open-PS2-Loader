@@ -267,6 +267,20 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
         return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     texUpdate(texture, pngWidth, pngHeight);
 
+    png_set_strip_16(pngPtr);
+
+    if (colorType == PNG_COLOR_TYPE_PALETTE)
+        png_set_expand(pngPtr);
+
+    if (colorType == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
+        png_set_expand(pngPtr);
+
+    if (png_get_valid(pngPtr, infoPtr, PNG_INFO_tRNS))
+        png_set_tRNS_to_alpha(pngPtr);
+
+    png_set_filler(pngPtr, 0xff, PNG_FILLER_AFTER);
+    png_read_update_info(pngPtr, infoPtr);
+
     void (*texPngReadPixels)(GSTEXTURE * texture, png_bytep * rowPointers);
     switch (png_get_color_type(pngPtr, infoPtr)) {
         case PNG_COLOR_TYPE_RGB_ALPHA:
@@ -284,19 +298,6 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
             return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DEPTH);
     }
 
-    png_set_strip_16(pngPtr);
-
-    if (colorType == PNG_COLOR_TYPE_PALETTE)
-        png_set_expand(pngPtr);
-
-    if (colorType == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
-        png_set_expand(pngPtr);
-
-    if (png_get_valid(pngPtr, infoPtr, PNG_INFO_tRNS))
-        png_set_tRNS_to_alpha(pngPtr);
-
-    png_set_filler(pngPtr, 0xff, PNG_FILLER_AFTER);
-    png_read_update_info(pngPtr, infoPtr);
     texPngReadData(texture, pngPtr, infoPtr, texPngReadPixels);
 
     return texPngEnd(pngPtr, infoPtr, file, 0);

@@ -177,10 +177,6 @@ int rmSetMode(int force)
             gsGlobal->Height /= 2;
 
         gsKit_init_screen(gsGlobal);
-
-        rmSetDisplayOffset(gXOff, gYOff);
-        rmSetOverscan(gOverscan);
-
         gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 
         gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
@@ -192,6 +188,10 @@ int rmSetMode(int force)
 
         LOG("RENDERMAN New vmode: %d, %d x %d\n", vmode, gsGlobal->Width, gsGlobal->Height);
     }
+
+    rmSetDisplayOffset(gXOff, gYOff);
+    rmSetOverscan(gOverscan);
+    rmSetAspectRatio((gWideScreen == 0) ? RM_ARATIO_4_3 : RM_ARATIO_16_9);
 
     return changed;
 }

@@ -276,14 +276,16 @@ static void lngFreeFromFile(void)
 static int lngLoadFont(const char *dir, const char *name)
 {
     char path[256];
+
     snprintf(path, sizeof(path), "%s/font_%s.ttf", dir, name);
     LOG("LANG Custom TTF font path: %s\n", path);
-    if (fntLoadDefault(path) != 0) {
-        snprintf(path, sizeof(path), "%s/font_%s.otf", dir, name);
-        LOG("LANG Custom OTF font path: %s\n", path);
-        if (fntLoadDefault(path) == 0)
-            return 0;
-    }
+    if (fntLoadDefault(path) == 0)
+        return 0;
+
+    snprintf(path, sizeof(path), "%s/font_%s.otf", dir, name);
+    LOG("LANG Custom OTF font path: %s\n", path);
+    if (fntLoadDefault(path) == 0)
+        return 0;
 
     LOG("LANG cannot load font.\n");
 

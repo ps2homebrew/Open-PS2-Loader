@@ -611,13 +611,13 @@ static theme_element_t *initBasic(const char *themePath, config_set_t *themeConf
 
     snprintf(elemProp, sizeof(elemProp), "%s_aligned", name);
     if (configGetInt(themeConfig, elemProp, &intValue))
-        elem->aligned = intValue;
+        elem->aligned = (intValue == 0) ? ALIGN_NONE : ALIGN_CENTER;
     else
         elem->aligned = aligned;
 
     snprintf(elemProp, sizeof(elemProp), "%s_scaled", name);
     if (configGetInt(themeConfig, elemProp, &intValue))
-        elem->scaled = intValue;
+        elem->scaled = (intValue == 0) ? SCALING_NONE : SCALING_RATIO;
     else
         elem->scaled = scaled;
 

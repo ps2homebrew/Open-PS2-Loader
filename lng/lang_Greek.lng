@@ -1,7 +1,6 @@
 # Greek Translation by RivalK93
-# Recommended font: Roboto Condensed
-# Last update: 05/05/2017 
-# Updated for OPL_983_DB [7f7e9af]
+# Last update: 08/10/2017 
+# Updated for OPL_1019_DB [f57bf5c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Greek
 OPL %s
@@ -185,6 +184,8 @@ H-POS
 Οριζόντια ρύθμιση οθόνης.
 V-POS
 Κάθετη ρύθμιση οθόνης.
+Overscan
+Προσαρμογή του Overscan
 Παράλειψη FMV
 Παράλειψη των βίντεο Full Motion
 Ρυθμίσεις Cheats

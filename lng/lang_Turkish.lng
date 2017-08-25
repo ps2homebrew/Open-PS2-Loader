@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
-# Last update: 01/25/2017 
-# Updated for OPL_983_DB [7f7e9af]
+# Last update: 08/10/2017 
+# Updated for OPL_1019_DB [f57bf5c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Turkish
 OPL %s
@@ -184,6 +184,8 @@ Y-Konum
 Yatay Ayarlama
 D-Konum
 Dikey Ayarlama
+Overscan
+Overscan Adjustment
 FMV Atlama
 Full Motion Videoları atlar
 Hile Ayarları
@@ -224,11 +226,11 @@ Enable emulation
 Turns on/off Pad Emulator for selected port.
 Enable vibration
 Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS3 Controller paired to mac address:
+USB bluetooth adapter MAC address:
+DS3 Controller paired to MAC address:
 Pair
 Pair DS3 controller
-Pair DS3 controller with bluetooth adapter mac address.
+Pair DS3 controller with bluetooth adapter MAC address.
 Not connected
 ELF Loader Menu
 ELF Loader Menu display mode

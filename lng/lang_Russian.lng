@@ -1,6 +1,6 @@
 # Translated by druchapucha and frodosumkin
-# Last update: 01/25/2017 
-# Updated for OPL_983_DB [7f7e9af]
+# Last update: 08/10/2017 
+# Updated for OPL_1019_DB [f57bf5c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Russian
 OPL %s
@@ -184,6 +184,8 @@ ID игры
 Горизонтальное положение
 Отступить вверх или вниз
 Вертикальное положение
+Вылет развёртки
+Регулировать вылет развёртки
 Пропуск FMV
 Пропускать Full Motion видео
 Настройка читов

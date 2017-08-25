@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: 01/25/2017 
-# Updated for OPL_983_DB [7f7e9af]
+# Last update: 08/10/2017 
+# Updated for OPL_1019_DB [f57bf5c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
 Portuguese
 OPL %s
@@ -184,6 +184,8 @@ Ajuste horizontal
 Definir compensação horizontal
 Ajuste vertical
 Definir compensação vertical
+Overscan
+Overscan Adjustment
 Saltar FMV
 Saltar vídeos
 Opções de Cheat

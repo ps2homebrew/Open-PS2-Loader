@@ -133,7 +133,7 @@ void t_loadElf(void)
         disable_padOpen_hook = 0;
 
         DPRINTF("t_loadElf: executing...\n");
-        _ExecPS2((void *)elf.epc, (void *)elf.gp, g_argc, g_argv);
+        ExecPS2((void *)elf.epc, (void *)elf.gp, g_argc, g_argv);
     }
 
     DPRINTF(" failed\n");

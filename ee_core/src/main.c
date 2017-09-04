@@ -154,9 +154,9 @@ int main(int argc, char **argv)
         char *argvs[1];
         argvs[0] = ElfPath;
         argvs[1] = NULL;
-        _LoadExecPS2("rom0:PS2LOGO", 1, argvs);
+        LoadExecPS2("rom0:PS2LOGO", 1, argvs);
     } else {
-        _LoadExecPS2(ElfPath, 0, NULL);
+        LoadExecPS2(ElfPath, 0, NULL);
     }
 
     if (!DisableDebug)

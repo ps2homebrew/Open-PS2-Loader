@@ -46,7 +46,7 @@ static inline void BootError(char *filename)
     argv[0] = "BootError";
     argv[1] = filename;
 
-    _ExecOSD(2, argv);
+    ExecOSD(2, argv);
 }
 
 static inline void InitializeUserMemory(unsigned int start, unsigned int end)
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
             argv[0] = _argv;
         }
 
-        _ExecPS2((void *)exd.epc, (void *)exd.gp, argc, argv);
+        ExecPS2((void *)exd.epc, (void *)exd.gp, argc, argv);
     } else {
         SifExitRpc();
     }

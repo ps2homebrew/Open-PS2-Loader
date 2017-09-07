@@ -409,11 +409,19 @@ static mutable_image_t *initMutableImage(const char *themePath, config_set_t *th
             mutableImage->cache = cacheInitCache(theme->gameCacheCount++, "ART", 1, cachePattern, cacheCount);
     }
 
+    if (themePath != NULL) {
+        if (defaultTexture && !mutableImage->defaultTexture)
+            mutableImage->defaultTexture = initImageTexture(themePath, themeConfig, name, defaultTexture, 0);
+
+        if (overlayTexture && !mutableImage->overlayTexture)
+            mutableImage->overlayTexture = initImageTexture(themePath, themeConfig, name, overlayTexture, 1);
+    }
+
     if (defaultTexture && !mutableImage->defaultTexture)
-        mutableImage->defaultTexture = initImageTexture(themePath, themeConfig, name, defaultTexture, 0);
+        mutableImage->defaultTexture = initImageInternalTexture(themeConfig, defaultTexture);
 
     if (overlayTexture && !mutableImage->overlayTexture)
-        mutableImage->overlayTexture = initImageTexture(themePath, themeConfig, name, overlayTexture, 1);
+        mutableImage->overlayTexture = initImageInternalTexture(themeConfig, overlayTexture);
 
     if (!mutableImage->defaultTexture && !mutableImage->overlayTexture)
         mutableImage->defaultTexture = initImageInternalTexture(themeConfig, name);

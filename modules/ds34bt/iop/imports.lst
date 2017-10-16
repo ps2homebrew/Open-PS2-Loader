@@ -9,12 +9,17 @@ stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end
 
+sysclib_IMPORTS_start
+I_strncmp
+sysclib_IMPORTS_end
+
 thsemap_IMPORTS_start
 I_CreateSema
 I_SignalSema
 I_WaitSema
 I_PollSema
 I_DeleteSema
+I_iSignalSema
 thsemap_IMPORTS_end
 
 thbase_IMPORTS_start
@@ -23,6 +28,8 @@ I_CreateThread
 I_DeleteThread
 I_DelayThread
 I_GetThreadId
+I_SetAlarm
+I_CancelAlarm
 thbase_IMPORTS_end
 
 usbd_IMPORTS_start

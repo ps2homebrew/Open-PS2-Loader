@@ -16,6 +16,7 @@
 #include <thbase.h>
 #include <thsemap.h>
 #include <dmacman.h>
+#include <xloadcore.h>
 
 #include "sys_utils.h"
 

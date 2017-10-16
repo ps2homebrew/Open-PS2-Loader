@@ -1,10 +1,10 @@
-IOP_BIN = ds3usb.irx
+IOP_BIN = ds34usb.irx
 
 IOP_INCS +=
 IOP_CFLAGS += -Wall
 IOP_LDFLAGS += -s
 
-IOP_OBJS = ds3usb.o smsutils.o imports.o
+IOP_OBJS = ds34usb.o smsutils.o imports.o
 IOP_LIBS =
 
 all: $(IOP_BIN)

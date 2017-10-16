@@ -170,9 +170,9 @@ else
 endif
 
 ifeq ($(PADEMU),1)
-  IOP_OBJS += bt_pademu.o usb_pademu.o ds3usb.o ds3bt.o libds3usb.a libds3bt.a
+  IOP_OBJS += bt_pademu.o usb_pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
   EE_CFLAGS += -DPADEMU
-  EE_INCS += -Imodules/ds3bt/ee -Imodules/ds3usb/ee
+  EE_INCS += -Imodules/ds34bt/ee -Imodules/ds34usb/ee
   PADEMU_FLAGS = PADEMU=1
 else
   PADEMU_FLAGS = PADEMU=0
@@ -309,10 +309,10 @@ clean:
 	$(MAKE) -C modules/debug/ioptrap clean
 	echo " -ps2link"
 	$(MAKE) -C modules/debug/ps2link clean
-	echo " -ds3usb"
-	$(MAKE) -C modules/ds3usb clean
-	echo " -ds3bt"
-	$(MAKE) -C modules/ds3bt clean
+	echo " -ds34usb"
+	$(MAKE) -C modules/ds34usb clean
+	echo " -ds34bt"
+	$(MAKE) -C modules/ds34bt clean
 	echo " -pademu"
 	$(MAKE) -C modules/pademu USE_BT=1 clean
 	$(MAKE) -C modules/pademu USE_USB=1 clean
@@ -455,31 +455,31 @@ $(EE_ASM_DIR)isofs.s: modules/isofs/isofs.irx | $(EE_ASM_DIR)
 $(EE_ASM_DIR)usbd.s: $(PS2SDK)/iop/irx/usbd.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbd_irx
 
-$(EE_OBJS_DIR)libds3bt.a: modules/ds3bt/ee/libds3bt.a
+$(EE_OBJS_DIR)libds34bt.a: modules/ds34bt/ee/libds34bt.a
 	cp $< $@
 
-modules/ds3bt/ee/libds3bt.a: modules/ds3bt/ee
+modules/ds34bt/ee/libds34bt.a: modules/ds34bt/ee
 	$(MAKE) -C $<
 
-modules/ds3bt/iop/ds3bt.irx: modules/ds3bt/iop
-	echo " -ds3bt"
+modules/ds34bt/iop/ds34bt.irx: modules/ds34bt/iop
+	echo " -ds34bt"
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)ds3bt.s: modules/ds3bt/iop/ds3bt.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ ds3bt_irx
+$(EE_ASM_DIR)ds34bt.s: modules/ds34bt/iop/ds34bt.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ds34bt_irx
 
-$(EE_OBJS_DIR)libds3usb.a: modules/ds3usb/ee/libds3usb.a
+$(EE_OBJS_DIR)libds34usb.a: modules/ds34usb/ee/libds34usb.a
 	cp $< $@
 
-modules/ds3usb/ee/libds3usb.a: modules/ds3usb/ee
+modules/ds34usb/ee/libds34usb.a: modules/ds34usb/ee
 	$(MAKE) -C $<
 
-modules/ds3usb/iop/ds3usb.irx: modules/ds3usb/iop
-	echo " -ds3usb"
+modules/ds34usb/iop/ds34usb.irx: modules/ds34usb/iop
+	echo " -ds34usb"
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)ds3usb.s: modules/ds3usb/iop/ds3usb.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ ds3usb_irx
+$(EE_ASM_DIR)ds34usb.s: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ds34usb_irx
 
 modules/pademu/bt_pademu.irx: modules/pademu
 	echo " -bt_pademu"

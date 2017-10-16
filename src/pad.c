@@ -12,8 +12,8 @@
 #include <time.h>
 
 #ifdef PADEMU
-#include <libds3bt.h>
-#include <libds3usb.h>
+#include <libds34bt.h>
+#include <libds34usb.h>
 #endif
 
 #define MAX_PADS 4
@@ -192,13 +192,15 @@ static int readPad(struct pad_data_t *pad)
     int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
     newpdata = 0xffff ^ pad->buttons.btns;
 
-    if (ds3bt_get_status(pad->port) & DS3BT_STATE_RUNNING) {
-        ret = ds3bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
+    if (ds34bt_get_status(pad->port) & DS34BT_STATE_RUNNING) {
+        ret = ds34bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
+        ds34bt_set_rumble(pad->port, 0, 0);
         newpdata |= 0xffff ^ pad->buttons.btns;
     }
 
-    if (ds3usb_get_status(pad->port) & DS3USB_STATE_RUNNING) {
-        ret = ds3usb_get_data(pad->port, (u8 *)&pad->buttons.btns);
+    if (ds34usb_get_status(pad->port) & DS34USB_STATE_RUNNING) {
+        ret = ds34usb_get_data(pad->port, (u8 *)&pad->buttons.btns);
+        ds34usb_set_rumble(pad->port, 0, 0);
         newpdata |= 0xffff ^ pad->buttons.btns;
     }
 

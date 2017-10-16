@@ -1,6 +1,6 @@
-EE_LIB  = libds3bt.a
+EE_LIB  = libds34bt.a
 
-EE_OBJS = libds3bt.o
+EE_OBJS = libds34bt.o
 EE_LIBS = -lc
 EE_CFLAGS=-Wall
 

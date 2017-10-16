@@ -33,6 +33,7 @@
 #include "thsemap.h"
 #include "usbd.h"
 #include "vblank.h"
+#include "xloadcore.h"
 
 #include "sys_utils.h"
 

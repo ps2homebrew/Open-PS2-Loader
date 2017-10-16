@@ -17,8 +17,8 @@
 #include "../ee_core/include/modules.h"
 
 #ifdef PADEMU
-#include <libds3bt.h>
-#include <libds3usb.h>
+#include <libds34bt.h>
+#include <libds34usb.h>
 #endif
 
 #ifdef VMC
@@ -113,11 +113,11 @@ extern void *pusbd_irx;
 extern int size_pusbd_irx;
 
 #ifdef PADEMU
-extern void *ds3bt_irx;
-extern int size_ds3bt_irx;
+extern void *ds34bt_irx;
+extern int size_ds34bt_irx;
 
-extern void *ds3usb_irx;
-extern int size_ds3usb_irx;
+extern void *ds34usb_irx;
+extern int size_ds34usb_irx;
 
 extern void *bt_pademu_irx;
 extern int size_bt_pademu_irx;
@@ -236,8 +236,8 @@ void sysInitDev9(void)
 void sysReset(int modload_mask)
 {
 #ifdef PADEMU
-    ds3usb_reset();
-    ds3bt_reset();
+    ds34usb_reset();
+    ds34bt_reset();
 #endif
     fileXioExit();
     SifExitIopHeap();
@@ -313,15 +313,15 @@ void sysReset(int modload_mask)
 #ifdef PADEMU
     int ds3pads = 1; //only one pad enabled
 
-    ds3usb_deinit();
-    ds3bt_deinit();
+    ds34usb_deinit();
+    ds34bt_deinit();
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
-        sysLoadModuleBuffer(&ds3usb_irx, size_ds3usb_irx, 4, (char *)&ds3pads);
-        sysLoadModuleBuffer(&ds3bt_irx, size_ds3bt_irx, 4, (char *)&ds3pads);
+        sysLoadModuleBuffer(&ds34usb_irx, size_ds34usb_irx, 4, (char *)&ds3pads);
+        sysLoadModuleBuffer(&ds34bt_irx, size_ds34bt_irx, 4, (char *)&ds3pads);
 
-        ds3usb_init();
-        ds3bt_init();
+        ds34usb_init();
+        ds34bt_init();
     }
 #endif
 
@@ -416,8 +416,8 @@ int sysGetDiscID(char *hexDiscID)
 void sysExecExit()
 {
 #ifdef PADEMU
-    ds3usb_reset();
-    ds3bt_reset();
+    ds34usb_reset();
+    ds34bt_reset();
 #endif
     Exit(0);
 }
@@ -787,8 +787,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
 #ifdef PADEMU
-#define PADEMU_SPECIFIER " %d, %d"
-#define PADEMU_ARGUMENT , gEnablePadEmu, (gPadEmuSettings >> 8)
+#define PADEMU_SPECIFIER " %d, %u"
+#define PADEMU_ARGUMENT , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8)
 #else
 #define PADEMU_SPECIFIER
 #define PADEMU_ARGUMENT
@@ -835,8 +835,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     }
 
 #ifdef PADEMU
-    ds3usb_reset();
-    ds3bt_reset();
+    ds34usb_reset();
+    ds34bt_reset();
 #endif
     // Let's go.
     fileXioExit();

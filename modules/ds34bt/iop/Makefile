@@ -1,10 +1,10 @@
-IOP_BIN = ds3bt.irx
+IOP_BIN = ds34bt.irx
 
 IOP_INCS +=
-IOP_CFLAGS += -Wall
+IOP_CFLAGS += -Wall -fno-builtin
 IOP_LDFLAGS += -s
 
-IOP_OBJS = ds3bt.o smsutils.o imports.o
+IOP_OBJS = ds34bt.o smsutils.o imports.o
 IOP_LIBS =
 
 all: $(IOP_BIN)
@@ -15,4 +15,4 @@ clean:
 rebuild: clean all
 
 include $(PS2SDK)/Defs.make
-include $(PS2SDK)/samples/Makefile.iopglobal
+include ../../Rules.make

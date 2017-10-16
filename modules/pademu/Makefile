@@ -4,13 +4,13 @@ ifeq ($(USE_USB),1)
 IOP_BIN = usb_pademu.irx
 IOP_CFLAGS += -DUSB
 IOP_OBJNAME = usb.
-IOP_OBJS += ds3usb.o
+IOP_OBJS += ds34usb.o
 endif
 ifeq ($(USE_BT),1)
 IOP_BIN = bt_pademu.irx
 IOP_CFLAGS += -DBT -DUSE_THREAD
 IOP_OBJNAME = bt.
-IOP_OBJS += ds3bt.o
+IOP_OBJS += ds34bt.o
 endif
 ifeq ($(VMC),1)
 IOP_CFLAGS += -DVMC

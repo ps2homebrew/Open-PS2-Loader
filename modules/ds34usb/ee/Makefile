@@ -1,6 +1,6 @@
-EE_LIB  = libds3usb.a
+EE_LIB  = libds34usb.a
 
-EE_OBJS = libds3usb.o
+EE_OBJS = libds34usb.o
 EE_LIBS = -lc
 EE_CFLAGS = -Wall
 

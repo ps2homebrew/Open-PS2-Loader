@@ -25,8 +25,8 @@
 #include "include/pgcht.h"
 #endif
 #ifdef PADEMU
-#include <libds3bt.h>
-#include <libds3usb.h>
+#include <libds34bt.h>
+#include <libds34usb.h>
 #endif
 
 #include <stdlib.h>
@@ -657,14 +657,41 @@ void guiShowCheatConfig(void)
 #endif
 
 #ifdef PADEMU
+
+//from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
+static char *bt_ver_str[] = {
+    "1.0b",
+    "1.1",
+    "1.2",
+    "2.0 + EDR",
+    "2.1 + EDR",
+    "3.0 + HS",
+    "4.0",
+    "4.1",
+    "4.2",
+    "5.0",
+};
+
+static const char *PadEmuPorts_enums[][5] = {
+    {"1P", "2P", NULL, NULL, NULL},
+    {"1A", "1B", "1C", "1D", NULL},
+    {"2A", "2B", "2C", "2D", NULL},
+};
+
 static u8 ds3_mac[6];
 static u8 dg_mac[6];
 static char ds3_str[18];
 static char dg_str[18];
+static char vid_str[4];
+static char pid_str[4];
+static char rev_str[4];
+static char hci_str[26];
+static char lmp_str[26];
+static char man_str[4];
 static int ds3macset = 0;
 static int dgmacset = 0;
 static int dg_discon = 0;
-
+static int ver_set = 0, feat_set = 0;
 static int PadEmuSettings = 0;
 
 static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
@@ -683,9 +710,26 @@ static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
     return addstr;
 }
 
+static char *hex_to_str(u8 *str, u16 hex)
+{
+    sprintf(str, "%04X", hex);
+
+    return str;
+}
+
+static char *ver_to_str(u8 *str, u8 ma, u16 mi)
+{
+    if (ma > 9)
+        ma = 0;
+
+    sprintf(str, "%X.%04X    BT %s", ma, mi, bt_ver_str[ma]);
+
+    return str;
+}
+
 static int guiPadEmuUpdater(int modified)
 {
-    int PadEmuEnable, PadEmuMode, PadPort, PadEmuVib, PadEmuPort;
+    int PadEmuEnable, PadEmuMode, PadPort, PadEmuVib, PadEmuPort, PadEmuMtap, PadEmuMtapPort, PadEmuWorkaround;
     static int oldPadPort;
 
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &PadEmuEnable);
@@ -694,10 +738,16 @@ static int guiPadEmuUpdater(int modified)
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, &PadEmuPort);
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, &PadEmuVib);
 
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, &PadEmuMtap);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, &PadEmuMtapPort);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, &PadEmuWorkaround);
+
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuEnable);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtap);
+
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuEnable);
 
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADPORT, PadEmuEnable);
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_VIB, PadEmuPort & PadEmuEnable);
 
     diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, PadEmuMode & PadEmuEnable);
@@ -708,26 +758,44 @@ static int guiPadEmuUpdater(int modified)
     diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, PadEmuMode & PadEmuEnable);
     diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, PadEmuMode & PadEmuEnable);
 
+    diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND_STR, PadEmuMode & PadEmuEnable);
+
     if (modified) {
+        if (PadEmuMtap) {
+            diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
+            diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadPort == 0) & PadEmuEnable);
+            PadEmuSettings |= 0x00000E00;
+        } else {
+            diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[0]);
+            diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
+            PadEmuSettings &= 0xFFFF03FF;
+            if (PadPort > 1) {
+                PadPort = 0;
+                diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, PadPort);
+            }
+        }
+
         if (PadPort != oldPadPort) {
-            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort - 1)) & 1);
-            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort - 1)) & 1);
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort)) & 1);
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort)) & 1);
 
             oldPadPort = PadPort;
         }
     }
 
-    PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort - 1)) | (PadEmuVib << (16 + PadPort - 1));
-    PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort - 1)) & ~(!PadEmuVib << (16 + PadPort - 1)));
+    PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
+    PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
 
     if (PadEmuMode) {
-        if (ds3bt_get_status(0) & DS3BT_STATE_USB_CONFIGURED) {
+        if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
             if (dg_discon) {
                 dgmacset = 0;
                 dg_discon = 0;
             }
             if (!dgmacset) {
-                if (ds3bt_get_bdaddr(dg_mac)) {
+                if (ds34bt_get_bdaddr(dg_mac)) {
                     dgmacset = 1;
                     diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
                 } else {
@@ -742,9 +810,9 @@ static int guiPadEmuUpdater(int modified)
             diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
         }
 
-        if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
+        if (ds34usb_get_status(0) & DS34USB_STATE_RUNNING) {
             if (!ds3macset) {
-                if (ds3usb_get_bdaddr(0, ds3_mac)) {
+                if (ds34usb_get_bdaddr(0, ds3_mac)) {
                     ds3macset = 1;
                     diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
                 } else {
@@ -760,19 +828,89 @@ static int guiPadEmuUpdater(int modified)
     return 0;
 }
 
+static int guiPadEmuInfoUpdater(int modified)
+{
+    hci_information_t info;
+    u8 feat[8];
+    int i, j;
+    u8 data;
+    int supported;
+
+    if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
+        if (!ver_set) {
+            if (ds34bt_get_version(&info)) {
+                ver_set = 1;
+                diaSetLabel(diaPadEmuInfo, PADCFG_VID, hex_to_str(vid_str, info.vid));
+                diaSetLabel(diaPadEmuInfo, PADCFG_PID, hex_to_str(pid_str, info.pid));
+                diaSetLabel(diaPadEmuInfo, PADCFG_REV, hex_to_str(rev_str, info.rev));
+                diaSetLabel(diaPadEmuInfo, PADCFG_HCIVER, ver_to_str(hci_str, info.hci_ver, info.hci_rev));
+                diaSetLabel(diaPadEmuInfo, PADCFG_LMPVER, ver_to_str(lmp_str, info.lmp_ver, info.lmp_subver));
+                diaSetLabel(diaPadEmuInfo, PADCFG_MANID, hex_to_str(man_str, info.mf_name));
+            } else {
+                ver_set = 0;
+            }
+        }
+
+        if (!feat_set) {
+            if (ds34bt_get_features(feat)) {
+                feat_set = 1;
+                supported = 0;
+                for (i = 0, j = 0; i < 64; i++) {
+                    data = (feat[j] >> (i - j * 8)) & 1;
+                    diaSetLabel(diaPadEmuInfo, PADCFG_FEAT_START + i, _l(_STR_NO - data));
+                    j = (i + 1) / 8;
+                    if (i == 25 || i == 26 || i == 39) {
+                        if (data)
+                            supported++;
+                    }
+                }
+                if (supported == 3)
+                    diaSetLabel(diaPadEmuInfo, PADCFG_BT_SUPPORTED, _l(_STR_BT_SUPPORTED));
+                else
+                    diaSetLabel(diaPadEmuInfo, PADCFG_BT_SUPPORTED, _l(_STR_BT_NOTSUPPORTED));
+            } else {
+                feat_set = 0;
+            }
+        }
+    } else {
+        ver_set = 0;
+        feat_set = 0;
+    }
+
+    return 0;
+}
+
 static void guiShowPadEmuConfig(void)
 {
-    const char *PadEmuModes[] = {_l(_STR_DS3USB_MODE), _l(_STR_DS3BT_MODE), NULL};
-    int PadPort;
+    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), NULL};
+    int PadEmuMtap, PadEmuMtapPort, PadEmuEnable, i;
 
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
+    
+    PadEmuMtap = (PadEmuSettings >> 24) & 1;
+    PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
 
-    diaGetInt(diaPadEmuConfig, PADCFG_PADPORT, &PadPort);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, 0);
 
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort - 1)) & 1);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort - 1)) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
+    
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuMtap);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
+    
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &PadEmuEnable);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
+    
+    if (PadEmuMtap) {
+        diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
+        PadEmuSettings |= 0x00000E00;
+    } else {
+        diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[0]);
+        PadEmuSettings &= 0xFFFF03FF;
+    }
 
     int result = -1;
 
@@ -781,11 +919,27 @@ static void guiShowPadEmuConfig(void)
 
         if (result == PADCFG_PAIR) {
             if (ds3macset && dgmacset) {
-                if (ds3usb_get_status(0) & DS3USB_STATE_RUNNING) {
-                    if (ds3usb_set_bdaddr(0, dg_mac))
+                if (ds34usb_get_status(0) & DS34USB_STATE_RUNNING) {
+                    if (ds34usb_set_bdaddr(0, dg_mac))
                         ds3macset = 0;
                 }
             }
+        }
+        
+        if (result == PADCFG_BTINFO) {
+            for (i = PADCFG_FEAT_START; i < PADCFG_FEAT_END + 1; i++)
+                diaSetLabel(diaPadEmuInfo, i, _l(_STR_NO));
+            
+            diaSetLabel(diaPadEmuInfo, PADCFG_VID, _l(_STR_NOT_CONNECTED));
+            diaSetLabel(diaPadEmuInfo, PADCFG_PID, _l(_STR_NOT_CONNECTED));
+            diaSetLabel(diaPadEmuInfo, PADCFG_REV, _l(_STR_NOT_CONNECTED));
+            diaSetLabel(diaPadEmuInfo, PADCFG_HCIVER, _l(_STR_NOT_CONNECTED));
+            diaSetLabel(diaPadEmuInfo, PADCFG_LMPVER, _l(_STR_NOT_CONNECTED));
+            diaSetLabel(diaPadEmuInfo, PADCFG_MANID, _l(_STR_NOT_CONNECTED));
+            diaSetLabel(diaPadEmuInfo, PADCFG_BT_SUPPORTED, _l(_STR_NOT_CONNECTED));
+            ver_set = 0;
+            feat_set = 0;
+            diaExecuteDialog(diaPadEmuInfo, -1, 1, &guiPadEmuInfoUpdater);
         }
 
         if (result == UIID_BTN_OK)

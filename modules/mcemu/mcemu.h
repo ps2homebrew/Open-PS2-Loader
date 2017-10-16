@@ -153,7 +153,7 @@ void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc);
 int hookRegisterLibraryEntires(iop_library_t *lib);
 
 void InstallSecrmanHook(void *exp);
-void InstallSio2manHook(void *exp);
+void InstallSio2manHook(void *exp, int ver);
 void InstallMcmanHook(void *exp);
 
 void SioResponse(MemoryCard *mcd, void *buf, int length);

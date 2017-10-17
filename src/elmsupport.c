@@ -74,8 +74,8 @@ static int elmUpdateItemList(void) {
 	if (configElm != NULL)
 		configFree(configElm);
 	
-	//Try MC?:/OPL/conf_elm.cfg
-	snprintf(path, sizeof(path), "%s/conf_elm.cfg", gBaseMCDir);
+	//Try MC?:/OPL/conf_elms.cfg
+	snprintf(path, sizeof(path), "%s/conf_elms.cfg", gBaseMCDir);
 	configElm = configAlloc(CONFIG_ELM, NULL, path);
 	ret = configRead(configElm);
 	
@@ -84,7 +84,7 @@ static int elmUpdateItemList(void) {
 		if (configElm != NULL){
 			configFree(configElm);
 		}
-		snprintf(path, sizeof(path), "%sconf_elm.cfg", hddGetPrefix());
+		snprintf(path, sizeof(path), "%sconf_elms.cfg", hddGetPrefix());
 		configElm = configAlloc(CONFIG_ELM, NULL, path);
 		ret = configRead(configElm);
 	}
@@ -94,7 +94,7 @@ static int elmUpdateItemList(void) {
 		if (configElm != NULL){
 			configFree(configElm);
 		}
-		snprintf(path, sizeof(path), "%sconf_elm.cfg", ethGetPrefix());
+		snprintf(path, sizeof(path), "%sconf_elms.cfg", ethGetPrefix());
 		configElm = configAlloc(CONFIG_ELM, NULL, path);
 		ret = configRead(configElm);	
 	}
@@ -104,7 +104,7 @@ static int elmUpdateItemList(void) {
 		if (configElm != NULL){
 			configFree(configElm);
 		}
-		snprintf(path, sizeof(path), "%sconf_elm.cfg", usbGetPrefix());
+		snprintf(path, sizeof(path), "%sconf_elms.cfg", usbGetPrefix());
 		configElm = configAlloc(CONFIG_ELM, NULL, path);
 		ret = configRead(configElm);
 	}

@@ -3,6 +3,7 @@ I_RegisterLibraryEntries
 I_ReleaseLibraryEntries
 I_GetLoadcoreInternalData
 I_QueryLibraryEntryTable
+I_SetRebootTimeLibraryHandlingMode
 loadcore_IMPORTS_end
 
 stdio_IMPORTS_start

@@ -70,7 +70,7 @@ void StartNow(void *param)
     exp = GetExportTable("sio2man", 0x201);
     if (exp != NULL) {
         /* hooking SIO2MAN's routines */
-        InstallSio2manHook(exp);
+        InstallSio2manHook(exp, 1);
     } else {
         DPRINTF("SIO2MAN exports not found.\n");
     }
@@ -109,12 +109,12 @@ void InstallSecrmanHook(void *exp)
 //endfunc
 //---------------------------------------------------------------------------
 /* Installs handlers for SIO2MAN's routine for enabled virtual memory cards */
-void InstallSio2manHook(void *exp)
+void InstallSio2manHook(void *exp, int ver)
 {
     /* hooking SIO2MAN entry #25 (used by MCMAN and old PADMAN) */
     pSio2man25 = HookExportEntry(exp, 25, hookSio2man25);
     /* hooking SIO2MAN entry #51 (used by MC2_* modules and PADMAN) */
-    pSio2man51 = HookExportEntry(exp, 51, hookSio2man51);
+    pSio2man51 = HookExportEntry(exp, 49 + (ver * 2), hookSio2man51);
     pSio2man67 = HookExportEntry(exp, 67, hookSio2man67);
 }
 //------------------------------
@@ -237,7 +237,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
         if (ret == 0) {
             ReleaseLibraryEntries((struct irx_export_table *)lib);
             /* hooking SIO2MAN's routines */
-            InstallSio2manHook(&lib[1]);
+            InstallSio2manHook(&lib[1], GetExportTableSize(&lib[1]) >= 61);
         } else {
             DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
             return ret;

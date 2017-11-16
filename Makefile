@@ -43,6 +43,9 @@ PADEMU ?= 0
 #Enables/disables the cheat engine (PS2RD)
 CHEAT ?= 0
 
+#Enables/disables high resolution multi-pass rendering for the OPL GUI
+HIRES ?= 0
+
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 ?= 0
 
@@ -178,6 +181,10 @@ else
   PADEMU_FLAGS = PADEMU=0
 endif
 
+ifeq ($(HIRES),1)
+  EE_CFLAGS += -DHIRES
+endif
+
 ifeq ($(DEBUG),1)
   EE_CFLAGS += -D__DEBUG -g
   EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
@@ -231,7 +238,7 @@ endif
 release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
-	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 $(EE_VPKD).ZIP
+	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 HIRES=0 $(EE_VPKD).ZIP
 
 childproof:
 	$(MAKE) CHILDPROOF=1 all

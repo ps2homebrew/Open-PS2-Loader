@@ -76,11 +76,11 @@ struct cdvdman_settings_usb cdvdman_settings = {
 #endif
 
 //----------------------------------------------------
-struct irx_export_table _exp_cdvdman;
-struct irx_export_table _exp_cdvdstm;
-struct irx_export_table _exp_smsutils;
+extern struct irx_export_table _exp_cdvdman;
+extern struct irx_export_table _exp_cdvdstm;
+extern struct irx_export_table _exp_smsutils;
 #ifdef VMC_DRIVER
-struct irx_export_table _exp_oplutils;
+extern struct irx_export_table _exp_oplutils;
 #endif
 
 struct dirTocEntry

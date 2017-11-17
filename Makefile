@@ -60,7 +60,7 @@ DECI2_DEBUG ?= 0
 CHILDPROOF ?= 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
-REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1)
+REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
 
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
 ifeq ($(shell git diff --quiet; echo $$?),1)
@@ -342,7 +342,8 @@ $(EE_ASM_DIR):
 $(EE_OBJS_DIR):
 	@mkdir -p $@
 
-DETAILED_CHANGELOG: make_changelog.sh
+.PHONY: DETAILED_CHANGELOG
+DETAILED_CHANGELOG:
 	sh make_changelog.sh
 
 $(EE_BIN_STRIPPED): $(EE_BIN)

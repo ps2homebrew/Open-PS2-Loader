@@ -709,7 +709,7 @@ int pko_file_serv(void *argv)
         }
 
         dbgprintf("Client connected from %lx\n",
-                  (int)client_addr.sin_addr.s_addr);
+                  client_addr.sin_addr.s_addr);
 
         remote_pc_addr = client_addr.sin_addr.s_addr;
 

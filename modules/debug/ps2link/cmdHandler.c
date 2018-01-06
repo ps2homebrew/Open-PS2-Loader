@@ -22,9 +22,6 @@
 #include "ps2ip.h"
 #include "hostlink.h"
 
-#define ntohl(x) htonl(x)
-#define ntohs(x) htons(x)
-
 #ifdef DEBUG
 #define dbgprintf(args...) printf(args)
 #else
@@ -73,7 +70,7 @@ pkoExecIop(char *buf, int len)
     // Make sure arg vector is null-terminated
     cmd->argv[PKO_MAX_PATH - 1] = '\0';
 
-    printf("IOP cmd: %d args\n", ntohl(cmd->argc));
+    printf("IOP cmd: %ld args\n", ntohl(cmd->argc));
 
     path = &cmd->argv[0];
     args = &cmd->argv[strlen(cmd->argv) + 1];
@@ -257,15 +254,6 @@ pkoWriteMem(char *buf, int len)
     ret = pkoSendSifCmd(PKO_RPC_WRITEMEM, buf, len);
 };
 
-#ifdef SCREENSHOTS
-static void
-pkoScreenShot(char *buf, int len)
-{
-    int ret;
-    ret = pkoSendSifCmd(PKO_RPC_SCRSHOT, buf, len);
-};
-#endif
-
 //////////////////////////////////////////////////////////////////////////
 static void
 cmdListener(int sock)
@@ -337,11 +325,6 @@ cmdListener(int sock)
             case PKO_WRITE_MEM:
                 pkoWriteMem(recvbuf, len);
                 break;
-#ifdef SCREENSHOTS
-            case PKO_SCRSHOT_CMD:
-                pkoScreenShot(recvbuf, len);
-                break;
-#endif
             default:
                 dbgprintf("IOP cmd: Uknown cmd received\n");
                 break;

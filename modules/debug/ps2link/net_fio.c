@@ -20,9 +20,6 @@
 #include "net_fio.h"
 #include "hostlink.h"
 
-#define ntohl(x) htonl(x)
-#define ntohs(x) htons(x)
-
 unsigned int remote_pc_addr = 0xffffffff;
 
 #define PACKET_MAXSIZE 4096
@@ -196,7 +193,7 @@ int pko_open_file(char *path, int flags)
 
     openrly = (pko_pkt_file_rly *)recv_packet;
 
-    dbgprintf("pko_file: file open reply received (ret %d)\n", ntohl(openrly->retval));
+    dbgprintf("pko_file: file open reply received (ret %ld)\n", ntohl(openrly->retval));
 
     return ntohl(openrly->retval);
 }
@@ -233,7 +230,7 @@ int pko_close_file(int fd)
         return -1;
     }
 
-    dbgprintf("pko_file: pko_close_file: close reply received (ret %d)\n",
+    dbgprintf("pko_file: pko_close_file: close reply received (ret %ld)\n", 
               ntohl(closerly->retval));
 
     return ntohl(closerly->retval);
@@ -272,7 +269,7 @@ int pko_lseek_file(int fd, unsigned int offset, int whence)
         return -1;
     }
 
-    dbgprintf("pko_file: pko_lseek_file: lseek reply received (ret %d)\n",
+    dbgprintf("pko_file: pko_lseek_file: lseek reply received (ret %ld)\n",
               ntohl(lseekrly->retval));
 
     return ntohl(lseekrly->retval);
@@ -453,7 +450,7 @@ int pko_remove(char *name)
     }
 
     removerly = (pko_pkt_file_rly *)recv_packet;
-    dbgprintf("pko_file: file remove reply received (ret %d)\n", ntohl(removerly->retval));
+    dbgprintf("pko_file: file remove reply received (ret %ld)\n", ntohl(removerly->retval));
     return ntohl(removerly->retval);
 }
 
@@ -490,7 +487,7 @@ int pko_mkdir(char *name, int mode)
     }
 
     mkdirrly = (pko_pkt_file_rly *)recv_packet;
-    dbgprintf("pko_file: make dir reply received (ret %d)\n", ntohl(mkdirrly->retval));
+    dbgprintf("pko_file: make dir reply received (ret %ld)\n", ntohl(mkdirrly->retval));
     return ntohl(mkdirrly->retval);
 }
 
@@ -526,7 +523,7 @@ int pko_rmdir(char *name)
     }
 
     rmdirrly = (pko_pkt_file_rly *)recv_packet;
-    dbgprintf("pko_file: remove dir reply received (ret %d)\n", ntohl(rmdirrly->retval));
+    dbgprintf("pko_file: remove dir reply received (ret %ld)\n", ntohl(rmdirrly->retval));
     return ntohl(rmdirrly->retval);
 }
 
@@ -564,7 +561,7 @@ int pko_open_dir(char *path)
 
     openrly = (pko_pkt_file_rly *)recv_packet;
 
-    dbgprintf("pko_file: dir open reply received (ret %d)\n", ntohl(openrly->retval));
+    dbgprintf("pko_file: dir open reply received (ret %ld)\n", ntohl(openrly->retval));
 
     return ntohl(openrly->retval);
 }
@@ -602,7 +599,7 @@ int pko_read_dir(int fd, void *buf)
 
     dirrly = (pko_pkt_dread_rly *)recv_packet;
 
-    dbgprintf("pko_file: dir read reply received (ret %d)\n", ntohl(dirrly->retval));
+    dbgprintf("pko_file: dir read reply received (ret %ld)\n", ntohl(dirrly->retval));
 
     dirent = (fio_dirent_t *)buf;
     // now handle the return buffer translation, to build reply bit
@@ -649,7 +646,7 @@ int pko_close_dir(int fd)
         return -1;
     }
 
-    dbgprintf("pko_file: dir close reply received (ret %d)\n",
+    dbgprintf("pko_file: dir close reply received (ret %ld)\n",
               ntohl(closerly->retval));
 
     return ntohl(closerly->retval);
@@ -711,8 +708,8 @@ int pko_file_serv(void *argv)
             continue;
         }
 
-        dbgprintf("Client connected from %x\n",
-                  (int)client_addr.sin_addr.s_addr);
+        dbgprintf("Client connected from %lx\n",
+                  client_addr.sin_addr.s_addr);
 
         remote_pc_addr = client_addr.sin_addr.s_addr;
 

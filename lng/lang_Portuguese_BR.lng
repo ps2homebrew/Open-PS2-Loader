@@ -1,86 +1,86 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/20/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 OPL %s
-Guardar Configurações
+Salvar mudanças
 Voltar
-Configurações de Rede
+Configurar rede
 Opções avançadas
 <sem valores>
-Configurações Guardadas
-Erro ao guardar configurações!
+Configurações salvas...
+Erro ao salvar configurações!
 Sair
-Configurações Gerais
+Configurações
 Menu
-Jogos em USB
+Jogos no USB
 Jogos no HDD
-Jogos na Rede
+Jogos em REDE
 Aplicativos
 Tema
 Idioma
-O sistema será desligado
-Sair para o Navegador do PS2/OSDSYS?
-Cancelar atualizações?
-%d: O Disco Rígido não foi detectado
-%d: O Disco Rígido não está formatado
-%d: Erro ao iniciar rede
-%d: Nenhum adaptador de rede foi detectado
-%d: Não foi possível conectar ao servidor SMB
-%d: Não foi possível logar no servidor SMB
-%d: Não foi possível abrir o compartilhamento SMB
-%d: Impossível listar compartilhamentos SMB
-%d: Impossível listar jogos
-%d: Servidor DHCP indisponível
-%d: Sem conexão de rede
-Ativ.
-Desativ.
-Confirmar
-Eleger
+O sistema será desligado.
+Sair para o Navegador/OSDSYS?
+Cancelar atualização?
+Erro %d: Nenhum HD detectado.
+Erro %d: O HD não está formatado.
+Erro %d: Problemas na inicialização da rede.
+Erro %d: Nenhum adaptador de rede detectado.
+Erro %d: Impossível conexão com servidor SMB.
+Erro %d: Impossível logar no servidor SMB.
+Erro %d: Impossível abrir compartilhamento SMB.
+Erro %d: Impossível listar compartilhamentos SMB.
+Erro %d: Impossível listar os jogos.
+Erro %d: Servidor DHCP indisponível.
+Erro %d: Sem conexão de rede.
+Ligado
+Desligado
+Concordar
+Ação
 Cancelar
 O
 X
-Lista de Jogos
-Configurar
-Apagar configurações
-As configurações do jogo foram apagadas
-Velocidade de rolagem
+Lista de jogos
+Ajustes
+Remover todos os ajustes
+Todos os ajustes do jogo foram removidos
+Rolagem
 Lenta
 Média
 Rápida
 Menu padrão
-Carregar do disco
-Por favor espere
+Iniciar a partir do disco
+Espere por favor
 Erro ao carregar ID do jogo
-Organizar em ordem alfabética
+Ordenação automática
 Erro ao carregar arquivo de idioma
-Desativar cores de depuração
-Nenhum controle detectado, esperando...
-Habilitar Artes de Capa
-Tela Panorâmica
-Desligar PS2
+Desativar depuração de cores
+Controle não detectado, esperando...
+Habilitar artes
+Wide screen (Visão panorâmica)
+Desligar
 Carregando configurações...
-Guardando configurações...
+Salvando configurações...
 Iniciar dispositivo
 Atualizar
-Modo de inicio do USB
-Modo de inicio do HDD
-Modo de inicio da Rede
-Modo de inicio de Aplicativos
+Modo de início do dispositivo USB
+Modo de início do dispositivo HDD
+Modo de início do dispositivo REDE
+Modo de início dos Aplicativos
 Automático
 Manual
-Iniciar Servidor HDL
-O Servidor HDL está sendo iniciado...
-O Servidor HDL está sendo executado...
-Falha ao iniciar Servidor HDL
-O Servidor HDL está sendo encerrado...
-Definir saída do IGR
-Cor de fundo
+Iniciar servidor HDL
+Iniciando Servidor HDL...
+Servidor HDL conectado...
+Falha na inicialização do Servidor HDL.
+Fechando servidor HDL...
+Sair para
+Cor do fundo
 Cor do texto
 - PS2 -
 - Servidor SMB -
-Tipo de Endereço IP
+Tipo de endereço IP
 Estático
 DHCP
 Endereço IP
@@ -89,40 +89,40 @@ Máscara de sub-rede
 Gateway padrão
 Servidor DNS
 Porta
-Compartilhamento
+Nome do compartilhamento
 Usuário
 Senha
-<não usado>
-Tipo de Endereço
+<não definido>
+Tipo de endereço
 IP
 NetBIOS
 Confirmar
-O item será apagado permanentemente! Continuar?
+O item será permanentemente apagado! Deseja Continuar?
 Renomear
-Apagar
+Excluir
 Iniciar
-Configurações de Tela
-Ativar funções Apagar e Renomear
-Verificar fragmentação de jogos em USB
-Lembrar último jogo jogado
-Botão de Seleção
-Erro, o jogo está fragmentado
+Definições de tela
+Ativar ações de gravação
+Checar fragmentação dos jogos no USB
+Lembrar último jogo executado
+Escolha o botão de ação ( X ou O )
+Erro, o jogo está fragmentado!
 Erro, não foi possível iniciar o item
 Testar
-Deixar vazio para conectar como convidado (GUEST)
-Leituras mais precisas
-Modo de Sincronia
+Deixar vazio para identificação como convidado (GUEST)
+Simular precisão de leitura CD/DVD
+Modo síncrono
 Desativar chamadas do sistema
-Pular videos
+Pular vídeos PSS
 Emular DVD-DL
-Desativar IGR
-Armazenamento elevado dos módulos
-Esconder módulo DEV9
-Escolha o tamanho do VMC, caso já exista, alterar o tamanho irá reformatá-lo
+Desabilitar IGR
+Mudar módulo de armazenamento
+Ocultar módulo dev9
+Alterar o tamanho (Irá reformatar o VMC!)
 Criar
-Iniciar
+Iniciar atualização
 Modificar
-Cancelar
+Abortar
 Resetar
 Usar genérico
 Configurar VMC
@@ -132,35 +132,35 @@ Estado
 Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
-Arquivo VMC precisa ser criado
-Erro com o VMC %s, continuar com Memory Card físico (slot %d) ?
+Arquivo VMC precisa ser criado!
+Erro com VMC %s, continuar com MC físico (entrada %d)?
 Atualização automática
-Sobre
+Informações do programa
 Desenvolvedores
-Controle de Qualidade
-Prefixo de caminho USB
-Iniciar ELF Personalizado depois do IGR
-Valor em minuto(s), 0 para desativar
-Desligamento automático do HDD
-Modo de Vídeo
+Controle de qualidade
+Prefixar uma pasta no USB
+Inicia um ELF personalizado após o IGR
+Valor em minuto(s), 0(zero) desabilita o spin down
+Desligamento automático do HDD (spin down)
+Modo de vídeo
 Cor do diálogo
-Cor selecionada
-Mostrar Página de Informação 
+Cor da seleção
+Exibir página de informações
 Info
-ELF personalizado
-Seleção de Cor
+Customizar ELF principal
+Seleção de cor
 Reconectar
-Deixar vazio para listar compartilhamentos
-Prefixo de caminho de Rede
+Deixe vazio para listar compartilhamentos
+Prefixar uma pasta na REDE
 Apagar
 Espaço
-Confirmar
+Aceitar
 Modo
-VMC Slot 1
-VMC Slot 2
-ID do Jogo
+VMC entrada 1
+VMC entrada 2
+ID do jogo
 Modo DMA
-Sincronização Vertical
+Sincronização vertical da tela
 Modo 1
 Modo 2
 Modo 3
@@ -170,56 +170,56 @@ Modo 6
 Modo 7
 Modo 8
 Configurar GSM
-Modo de conexão Ethernet
+Conexão de rede
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-Configurações do GSM
+Configurações GSM
 Ativar GSM
-Ativar ou Desativar o GSM
-Modo de Vídeo
-Força o Modo de Vídeo escolhido
-Posição Horizontal
+Autoriza o GSM a forçar o modo de vídeo selecionado abaixo
+Selecione o modo de vídeo
+Modo de vídeo a ser forçado
 Ajuste Horizontal
-Posição Vertical
+Define o ajuste horizontal da imagem na tela
 Ajuste Vertical
+Define o ajuste vertical da imagem na tela
 Tela visível
 Define o ajuste da tela visível
-Pular FMV
-Pula os vídeos do jogo
-Opções de Cheats (trapaças)
-Ativar PS2RD Cheat Engine
-Permitir que o PS2RD Cheat Engine injete códigos nos jogos
-Modo do PS2RD Cheat Engine
-Auto selecionar ou Selecionar Cheats (trapaças)
-Auto selecionar Cheats (trapaças)
-Selecionar Cheats (trapaças)
-Erro: falha ao carregar arquivo de Cheats (trapaças)
-Nenhum cheat (trapaça) encontrado
-Baixar configurações
-Atualização pela Internet
-Baixar dados existentes novamente?
-Falha na atualização
-Falha ao conectar no servidor de atualização
-Atualização concluída
-Atualização cancelada
-Baixar configurações pela Internet?
+Pular vídeos FMV
+Ignora vídeos no formato (FMV)
+Configurar PS2RD
+Ativar PS2RD
+Autoriza o PS2RD a usar Cheats(Trapaças) nos seus jogos
+Modo PS2RD
+Auto seleção(Ativa todos) ou Selecione os Cheats do jogo
+Auto seleção
+Selecione os Cheats do jogo
+Erro: Falha ao carregar o arquivo (Cheat)
+Cheats não encontrados ou ilegíveis
+Baixar arquivos(cfg)
+Atualizar arquivos(cfg)
+Baixar novamente os arquivos(cfg) existentes?
+Atualização falhou.
+Falha na conexão com o servidor(cfg).
+Atualização concluída.
+Atualização cancelada.
+Baixar arquivos(cfg) do servidor?
 Configurações personalizadas
-Configurações baixadas
-Auto iniciar em %i s...
+Arquivos(cfg) baixados
+Auto iniciar em %i segundos
 Auto iniciar
-Valor em segundo(s), 0 para desativar
-Logotipo do PS2
-Aparece apenas se houver um logotipo válido que seja da mesma região que o console
+Valor em segundo(s), 0(zero) desabilita o auto iniciar
+Logo PS2
+(Aparece quando houver uma logo válida que seja da mesma região do PS2)
 Configurar PADEMU
 Configurações do Emulador de Controles
 Ativar Emulador de Controles
 Liga/desliga o Emulador de Controles para o jogo selecionado.
 Modo Emulador de Controles
 Selecione o modo do Emulador de Controles.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Configurações da porta:
 Selecione a porta que será configurada.
 Ativar emulação
@@ -227,10 +227,26 @@ Liga/desliga a emulação na porta selecionada.
 Ativar vibração
 Liga/desliga a vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
-Endereço MAC do Controle DS3 emparelhado:
+Endereço MAC do Controle DS emparelhado:
 Emparelhar
-Emparelhar Controle DS3:
-Emparelha o Controle DS3 com o MAC do adaptador Bluetooth.
+Emparelhar Controle DS:
+Emparelha o Controle DS com o MAC do adaptador Bluetooth.
 Não conectado
-ELF Loader Menu
-Modo de inicio do ELF Loader Menu
+Informações do adaptador Bluetooth
+Mostra mais informações e recursos suportados
+Versão HCI:
+Versão LMP:
+ID do fabricante:
+Recursos suportados:
+Sim
+Não
+O adaptador Bluetooth deve ser totalmente compatível com os controles DS3/4.
+O adaptador Bluetooth pode não funcionar corretamente com os controles DS3/4.
+Ativar emulação Multitap
+Liga/desliga a emulação Multitap para o jogo selecionado.
+Emulador Multitap na porta
+Selecione a porta para a emulação Multitap.
+Desativar solução alternativa para Controle DS3 pirata
+Alguns Controles DS3 piratas precisam de solução alternativa, esta opção irá desativá-lo.
+Jogos em ELF
+Modo de início dos jogos em ELF

@@ -1,7 +1,7 @@
 # Translation by danielb
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/21/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
 Salvar alterações
@@ -185,7 +185,7 @@ Definir compensação horizontal
 Ajuste vertical
 Definir compensação vertical
 Overscan
-Overscan Adjustment
+Ajustar Overscan
 Saltar FMV
 Saltar vídeos
 Opções de Cheat
@@ -214,12 +214,12 @@ Logo PS2
 Apenas é exibido para um disco válido e que seja da mesma região da consola
 Configurar PADEMU
 Definições do Emulador de Comando
-Ativar Emulador de Comando
+Ativar Emulador Comando
 Ligar/Desligar o emulador para o jogo selecionado.
 Modo do Emulador de Comando
 Selecione o modo do Emulador de Comando.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Definições para a porta:
 Selecione a porta do Emulador de Comando para as definições.
 Ativar emulação
@@ -227,10 +227,26 @@ Ligar/Desligar o emulador para a porta selecionada.
 Ativar vibração.
 Ligar/Desligar vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
-Endereço MAC do comando DS3 emparelhado:
+Comando DS emparelhado ao endereço MAC:
 Emparelhar
-Emparelhar comando DS3
-Emparelhar comando DS3 com o seguinte endereço MAC:
+Emparelhar comando DS
+Emparelhar comando DS com endereço MAC do adaptador Bluetooth.
 Não ligado
+Informação do adaptador Bluetooth
+Mostrar mais informação e recursos suportados
+Versão HCI:
+Versão LMP:
+ID do Fabricante:
+Recursos suportados:
+Sim
+Não
+O adaptador Bluetooth deve ser completamente compatível com comandos DS3/DS4.
+O adaptador Bluetooth pode não funcionar corretamente com comandos DS3/DS4.
+Ativar emulação Multitap
+Ligar/Desligar a emulação Multitap para o jogo selecionado
+Emulador Multitap na porta
+Selecionar porta para o emulador de Multitap.
+Desativar workaround para clones DS3
+Alguns clones DS3 precisam de workaround, esta opção irá desativar-lo.
 Menu do Iniciador ELF
 Modo de exibição do iniciador de ELF

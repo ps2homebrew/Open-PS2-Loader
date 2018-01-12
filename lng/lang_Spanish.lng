@@ -1,7 +1,7 @@
 # Translation by lauchon22
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/18/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
 OPL %s
 Guardar cambios
@@ -214,12 +214,12 @@ PS2 Logo
 Solo se muestra con un disco válido en una consola de la misma región
 Configurar PADEMU
 Configurar el mando del emulador
-Activar mando del emulador
+Habilitar PadEmulator
 Activar/apagar el mando del emulador para el juego elegido
 Modo del mando del emulador
 Seleccione el modo del mando del emulador
-DualShock3 USB
-DualShock3 BlueTooth
+DualShock3/4 USB
+DualShock3/4 BT
 Configuración del puerto
 Seleccione el mando del emulador para ajustes
 Activar emulación
@@ -227,10 +227,26 @@ Activar/apagar el mando del emulador en el puerto elegido
 Activar vibración
 Activar/apagar vibracion en el puerto elegido
 Dirección MAC del mando BlueTooth USB:
-Dirección MAC del mando DS3 emparejado
+Controlador DS emparejado a la dirección MAC:
 Emparejar
-Emparejar mando DS3
-Emparejar mando DS3 con la siguiente dirección MAC:
+Emparejar el controlador DS
+Emparejar el controlador DS con la dirección MAC del adaptador Bluetooth.
 No conectado
+Información del adaptador de Bluetooth
+Mostrar más información y características compatibles
+Versión de HCI:
+Versión LMP:
+ID del fabricante:
+Características de soporte:
+Sí
+No
+El adaptador Bluetooth debe ser totalmente compatible con los controladores DS3 / DS4.
+Es posible que el adaptador Bluetooth no funcione correctamente con los controladores DS3 / DS4.
+Habilitar la emulación del multitap
+Enciende/apaga la emulación del multitap para el juego seleccionado.
+Emulador multitap en el puerto
+Seleccione el puerto para la emulación multitap.
+Deshabilitar la solución provisional para DS3 falso
+Algunos DS3 falsos necesitan solución, esta opción lo deshabilitará.
 ELF Loader Menu
 Modo inicio de menú de ELF Loader

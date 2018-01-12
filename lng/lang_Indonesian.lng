@@ -1,7 +1,7 @@
 # translated by verislasher and jbliz
-# Last update: 08/11/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/18/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
 OPL %s
 Simpan Perubahan
@@ -214,12 +214,12 @@ Logo PS2
 Hanya ditampilkan untuk logo disc yang valid yang cocok dengan region konsol
 Konfigurasi PADEMU
 Pengaturan Stik Emulator
-Aktifkan Stik Emulator
+Aktifkan PadEmulator
 Hidup/matikan StikEmulator game dipilih.
 Mode Stik Emulator
 Pilih mode Stik Emulator.
-USB DualShock3
-BT DualShock3
+DualShock3/4 USB
+DualShock3/4 BT
 Pengaturan untuk port:
 Pilih port Emulasi Pad untuk diatur.
 Aktifkan emulasi
@@ -227,10 +227,26 @@ Nyalakan/Matikan Emulasi Pad diport terpilih.
 Aktifkan getaran
 Nyalakan/Matikan getaran untuk Emulasi Pad diport terpilih.
 Alamat Mac Adaptor USB Bluetooth:
-Kontrol DS3 terpasang pada alamat mac:
+Pengontrol DS dipasangkan ke Alamat MAC:
 Pasang
-Pasang Kontrol DS3
-Pasang Kontrol DS3 dengan alamat mac bluetooth.
+Pasangan Pengontrol DS
+Pasangan Pengontrol DS dengan adaptor Alamat MAC Bluetooth.
 Tidak terhubung
+informasi adaptor Bluetooth
+Tampilkan informasi lain dan fitur didukung
+Versi HCI:
+Versi LMP:
+ID Pabrikan:
+Dukungan fitur:
+Ya
+Tidak
+adapter Bluetooth harus sepenuhnya cocok dengan Pengontrol DS3/DS4.
+adapter Bluetooth mungkin tidak bekerja dengan benar dengan Pengontrol DS3/DS4.
+Aktifkan emulasi Multitap
+Aktifkan/NonAktifkan emulasi Multitap untuk game dipilih.
+emulator Multitap pada port
+Pilih port untuk emulasi Multitap.
+Nonaktifkan solusi untuk DS3 palsu
+beberapa ds3s palsu butuh solusi, opsi ini akan nonaktif.
 Menu peluncur ELF
 Mode Tampilan Menu Pemuat ELF

@@ -1,7 +1,7 @@
 # Translation by BongKris
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/19/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Danish
 OPL %s
 Gem indstillinger
@@ -218,8 +218,8 @@ Aktivér Pad Emulator
 Slå Pad Emulator Til/Fra for valgte spil.
 Pad Emulator tilstand
 Vælg Pad Emulator tilstand.
-DualShock 3 USB
-DualShock 3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 indstillinger for port:
 Vælg Pad Emulator port for indstillinger.
 Aktivér emulering
@@ -227,10 +227,26 @@ Slå Pad Emulator Til/Fra for valgte port.
 Aktivér vibration
 Slå vibration Til/Fra for valgte Pad Emulator port.
 USB-bluetooth adapter MAC-adresse:
-DS3-controller parret til MAC-adresse:
+DS controller parret med MAC-adresse:
 Parring
-Pardan DS3 controller
-Pardan DS3 controller med bluetooth adapters MAC-adresse.
+Pardan DS controller
+Pardan DS controller med bluetooth-adapters MAC-adresse.
 Ikke tilsluttet
+Bluetooth-adapteroplysninger
+Viser mere information og understøttede funktioner
+HCI Version:
+LMP Version:
+Fabrikant ID:
+Understøttede funktioner:
+Ja
+Nej
+Bluetooth-adapter skal være fuldt kompatibel med DS3/DS4 controllere.
+Bluetooth-adapter fungerer muligvis ikke korrekt med DS3/DS4 controllere.
+Aktivér Multitap-emulering
+Slå Multitap-emulering Til/Fra for valgte spil.
+Multitap Emulator på port
+Vælg port til Multitap-emulering.
+Deaktiver løsning for falsk DS3
+Nogle falske DS3'er har brug for en løsning, dette deaktivere den.
 ELF-Loader Menu
 ELF-Loader Menu visningstilstand

@@ -1,7 +1,7 @@
 # Translation by co5oos
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/21/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Hungarian
 OPL %s
 Változtatások mentése
@@ -73,10 +73,10 @@ Manuális
 HDL szerver indítása
 HDL Szerver Elindul...
 HDL Szerver Fut...
-Failed to start HDL Server.
-HDL Server Unloading...
-IGR path
-Background color
+Az HDL Szerver elindítása Sikertelen.
+Az HDL Szerver kirakodása...
+IGR útvonala
+Háttér színe
 Szöveg szín
 - PS2 -
 - SMB Szerver -
@@ -150,7 +150,7 @@ Infó
 Testreszabott ELF
 Szín szelekció
 Újracsatlakozás
-Leave empty to list shares
+Hagyja üresen a megosztások listázásához
 ETH előtag elérési út
 Backspace
 Szóköz
@@ -214,12 +214,12 @@ PS2 Logó
 Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
 PADEMU konfigurálás
 Pad Emulator Beállítások
-Pad Emulátor engedélyezése
+PadEmulator Engedélyezése
 Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
 Pad Emulátor mód
 Válassza ki a  Pad Emulátor módját.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Port beállítások:
 Válassza ki a Pad Emulátor portot a beállításokhoz.
 Emuláció engedélyezése
@@ -227,10 +227,26 @@ Be/ki kapcsolja a Pad Emulátor-t a kiválasztott porthoz.
 Rezgés engedélyezése
 Be/ki kapcsolja a rezgést a Pad Emulátor kiválasztott portjához.
 Usb bluetooth adapter mac címe:
-DS3 Kontroller párosítva erre a mac címre :
+DS Kontroller a következő MAC címhez pároztatva:
 Párosítás
-DS3 kontroller párosítása
-DS3 kontroller párosítása bluetooth adapter mac címmel.
+DS Kontroller Pároztatása
+DS Kontroller Pároztatása Bluetooth adapter MAC címmel.
 Nincs csatlakoztatva
+Bluetooth adapter információ
+Több információ és támogatott funkciók mutátása
+HCI Verzió:
+LMP Verzió:
+Gyártó ID:
+Támogatási funkciók:
+Igen
+Nem
+A Bluetooth adapternek teljes mértékben kompatibilisnek kell lennie a DS3/DS4 kontrollerekkel.
+A Bluetooth adapter nem biztos, hogy megfelelően fog működni DS3/DS4 kontrollerekkel.
+Multitap emuláció Engedélyezése
+ki/be kapcsolja Multitap emulációt a kiválasztott játékhoz.
+Multitap emulátor ezen a porton
+Válassza ki a portot a Multitap emulációhoz.
+Megkerülés letiltása a hamisítvány DS3-hoz.
+Néhány hamis ds3-hoz megkerülés szükséges, ez az opció letiltja ezt.
 ELF Futtató Menü
 ELF Futtató Menü megjelenítési mód

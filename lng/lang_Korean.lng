@@ -1,7 +1,7 @@
 # Translated by DDinghoya
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/17/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
 저장 변경
@@ -218,8 +218,8 @@ PADEMU 구성
 선택된 게임 패드에뮬레이터 켬/끔.
 패드 에뮬레이터 모드
 패드 에뮬레이터 모드 선택
-듀얼쇼크3 USB
-듀얼쇼크3 BT
+듀얼쇼크3/4 USB
+듀얼쇼크3/4 BT
 포트 설정:
 설정용 패드 에뮬레이터 포트 활성화.
 에뮬레이션 활성화
@@ -227,10 +227,26 @@ PADEMU 구성
 진동 활성화
 패드 에뮬레이터에 선택된 포트 진동 켬/끔
 USB 블루투스 어답터 맥 주소:
-DS3 컨트롤러 맥 주소와 페어링:
+DS 컨트롤러 맥 주소와 페어링:
 페어
-DS3 컨트롤러 페어링
-블루투스 어댑터 맥 주소가 있는 DS3 컨트롤러 페어
+DS 컨트롤러 페어링
+블루투스 어댑터 맥 주소가 있는 DS 컨트롤러 페어
 연결되지 않음
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake DS3
+Some fake ds3s need workaround, this option will disable it.
 ELF 로더 메뉴
 ELF 로더 메뉴 디스플레이 모드

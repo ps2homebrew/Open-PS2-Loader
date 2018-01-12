@@ -1,7 +1,7 @@
 # Translation by Lord_Flaya
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/17/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 OPL %s
 Spara ändringar
@@ -214,12 +214,12 @@ PS2 Logo
 Visas bara när skivavbilden matchar konsolens region
 Konfigurera PADEMU
 Pad Emulator Inställningar
-Aktivera Pad Emulator
+Aktivera PadEmulator
 Slå av/på PadEmulator för valt spel.
 Pad Emulator läge
 Vlj Pad Emulator läge.
-DualShock3 USB
-DualShock3 BT
+DualShock3 / 4 USB
+DualShock3 / 4 BT
 Inställningar för port:
 Välj Pad Emulator port för inställningar.
 Aktivera emulation
@@ -227,10 +227,26 @@ Slå av/på Pad Emulator för vald port.
 Aktivera vibration
 Slå av/på vibration för Pad Emulator vald port.
 Usb bluetooth adapter mac address:
-DS3 Controller parkopplad till mac address:
+DS Controller kopplad till MAC-adress:
 Parkoppla
-Parkoppla DS3 controller
-Parkoppla DS3 controller till bluetooth adapter mac address.
+Para DS Controller
+Para DS-kontroller med Bluetooth-adapter MAC-adress.
 Ej ansluten
+Bluetooth-adapterinformation
+Visar mer information och funktioner som stöds
+HCI-version:
+LMP-version:
+Tillverkarens ID:
+Supportfunktioner:
+Ja
+Nej
+Bluetooth-adaptern ska vara fullt kompatibel med DS3 / DS4-kontroller.
+Bluetooth-adaptern kanske inte fungerar korrekt med DS3 / DS4-kontroller.
+Aktivera multitapemulering
+Slår på / av multitap emulering för valt spel.
+Multitap emulator på porten
+Välj port för multitap emulering.
+Inaktivera lösningen för falska DS3
+Några falska ds3s behöver lösningen, det här alternativet kommer att inaktivera det.
 ELF launcher meny
 ELF loader meny visningsläge

@@ -1,7 +1,7 @@
 # Translation by machiavel
-# Last update: 08/10/2017 
-# Updated for OPL_1019_DB [f57bf5c]
-# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=13&t=3
+# Last update: 10/20/2017 
+# Updated for OPL_1030_DB [c3257f5]
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
 OPL %s
 Sauvegarder
@@ -214,12 +214,12 @@ Logo PS2
 S'affiche uniquement si le logo du disque est compatible avec la région de votre console
 Configurer PADEMU
 Options de PADEMU
-Activer PADEMU
+Activer PadEmulator
 Actve/désactive PADEMU pour ce jeu.
 Mode de PADEMU
 Sélectionner le mode de PADEMU.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Options du port:
 SSélectionner le port PADEMU pour les options.
 Activer l'émulation
@@ -227,10 +227,26 @@ Active/désactive PADEMU pour ce port.
 Activer la vibration
 Active/désactive la vibration pour le port PADEMU sélectionné.
 Adress MAC de l'adapteur Bluetooth USB:
-Contrôleur DS3 apairé à l'adresse MAC:
+Contrôleur DS appairé à l'adresse MAC:
 Apairer
-Apairer le contrôleur DS3
-Apairer l'adresse MAC du contrôleur Bluetooth DS3.
+Appairer contrôleur DS
+Appairer contrôleur DS avec l'adresse MAC de l'adaptateur Bluetooth.
 Non Connecté
+Informations de l'adaptateur Bluetooth
+Montrer plus d'informations et de fonctions supportées
+Version HCI:
+Version LMP:
+ID Fabricant:
+Fonctions supportées:
+Oui
+Non
+L'adaptateur Bluetooth devrait être parfaitement compatible avec les contrôleurs DS3/DS4.
+L'adaptateur Bluetooth peut ne pas fonctionner correctement avec les contrôleurs DS3/DS4
+Activer l'émulation du Multitap
+Active/désactive l'émulation du Multitap pour le jeu sélectionné.
+Émulateur Multitap sur le port
+Sélectionner le port pour émuler le Multitap
+Désactiver correctif des DS3 simulées
+Certaines DS3 simulées nécessitent ce correctif, cette option le désactivera.
 Menu lanceur d'ELF
 Mode d'affichage du menu lanceur d'ELF

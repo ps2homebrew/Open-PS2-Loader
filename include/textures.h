@@ -33,6 +33,10 @@ enum INTERNAL_TEXTURE {
     R2_ICON,
     LOGO_PICTURE,
     BG_OVERLAY,
+//START of OPL_DB tweaks
+    BG_OVERLAY_2,
+    INFO_OVERLAY,
+//END of OPL_DB tweaks
 
     TEXTURES_COUNT
 };

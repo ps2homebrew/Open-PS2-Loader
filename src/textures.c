@@ -38,6 +38,10 @@ extern void *R2_png;
 
 extern void *logo_png;
 extern void *bg_overlay_png;
+//START of OPL_DB tweaks
+extern void *bg_overlay_2_png;
+extern void *info_overlay_png;
+//END of OPL_DB tweaks
 
 // Not related to screen size, just to limit at some point
 static int maxWidth = 720;
@@ -82,6 +86,10 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {R2_ICON, "R2", &R2_png},
     {LOGO_PICTURE, "logo", &logo_png},
     {BG_OVERLAY, "bg_overlay", &bg_overlay_png},
+//START of OPL_DB tweaks
+    {BG_OVERLAY_2, "bg_overlay_2", &bg_overlay_2_png},
+    {INFO_OVERLAY, "info_overlay", &info_overlay_png},
+//END of OPL_DB tweaks
 };
 
 int texLookupInternalTexId(const char *name)

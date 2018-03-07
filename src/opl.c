@@ -1217,10 +1217,9 @@ static void setDefaults(void)
 //START of OPL_DB tweaks
     gELMStartMode = START_MODE_DISABLED;
 
-    gDefaultBgColor[0] = 0x030;
-    gDefaultBgColor[1] = 0x030;
-    gDefaultBgColor[2] = 0x030;
-//END of OPL_DB tweaks
+    gDefaultBgColor[0] = 0x000;
+    gDefaultBgColor[1] = 0x000;
+    gDefaultBgColor[2] = 0x000;
 
     gDefaultTextColor[0] = 0x0ff;
     gDefaultTextColor[1] = 0x0ff;
@@ -1230,9 +1229,10 @@ static void setDefaults(void)
     gDefaultSelTextColor[1] = 0x080;
     gDefaultSelTextColor[2] = 0x000;
 
-    gDefaultUITextColor[0] = 0x040;
-    gDefaultUITextColor[1] = 0x080;
-    gDefaultUITextColor[2] = 0x040;
+    gDefaultUITextColor[0] = 0x032;
+    gDefaultUITextColor[1] = 0x0ff;
+    gDefaultUITextColor[2] = 0x030;
+//END of OPL_DB tweaks
 
     frameCounter = 0;
 

@@ -596,7 +596,7 @@ static config_set_t* elmGetConfig(int id) {
 	configSetStr(config, CONFIG_ITEM_STARTUP, cur->ID);
 	configSetInt(config, CONFIG_ITEM_SIZE, cur->sizeMB);
 	configSetStr(config, CONFIG_ITEM_FORMAT, "VCD");
-	configSetStr(config, CONFIG_ITEM_MEDIA, "ELM");
+	configSetStr(config, CONFIG_ITEM_MEDIA, "PS1");
 	return config;
 }
 

@@ -77,8 +77,8 @@ FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o elm_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
 		left_icon.o right_icon.o up_icon.o down_icon.o L1_icon.o L2_icon.o R1_icon.o R2_icon.o \
-		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o freesans.o \
-		icon_sys.o icon_icn.o
+		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o bg_overlay_2.o \
+		info_overlay.o freesans.o icon_sys.o icon_icn.o
 
 #END of OPL_DB tweaks
 MISC_OBJS =	icon_sys_A.o icon_sys_J.o conf_theme_OPL.o
@@ -678,6 +678,14 @@ $(EE_ASM_DIR)logo.s: gfx/logo.png | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)bg_overlay.s: gfx/bg_overlay.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ bg_overlay_png
+
+#START of OPL_DB tweaks
+$(EE_ASM_DIR)bg_overlay_2.s: gfx/bg_overlay_2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bg_overlay_2_png
+
+$(EE_ASM_DIR)info_overlay.s: gfx/info_overlay.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ info_overlay_png
+#END of OPL_DB tweaks
 
 $(EE_ASM_DIR)usb_icon.s: gfx/usb.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_png

@@ -799,13 +799,13 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
 //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, misfire, Polo35, reprep, SP193, volca,", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, misfire, Polo35, ps2netbox/ps2usb, reprep,", -1}}},
 //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
 //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"... and the anonymous ...", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"SP193, volca, ... and the anonymous ...", -1}}},
 //END of OPL_DB tweaks
     {UI_BREAK},
 //START of OPL_DB tweaks

@@ -704,9 +704,11 @@ static void _saveConfig()
 
 void applyConfig(int themeID, int langID)
 {
-    if (gDefaultDevice < 0 || gDefaultDevice > APP_MODE)
+	//START of OPL_DB tweaks
+    if (gDefaultDevice < 0 || gDefaultDevice > MODE_COUNT -1)
         gDefaultDevice = APP_MODE;
-
+	//END of OPL_DB tweaks
+	
     guiUpdateScrollSpeed();
 
     guiSetFrameHook(&menuUpdateHook);

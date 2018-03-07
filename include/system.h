@@ -26,6 +26,9 @@ void sysPowerOff(void);
 void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, MCEMU int EnablePS2Logo, unsigned int compatflags);
 
 int sysExecElf(char *path);
+//START of OPL_DB tweaks
+int sysExecElfWithParam(char *path,char *param);
+//END of OPL_DB tweaks
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);
 int sysCheckMC(void);
 #ifdef VMC

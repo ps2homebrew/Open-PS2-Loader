@@ -58,7 +58,7 @@ static item_list_t hddGameList;
 
 //START of OPL_DB tweaks
 char* hddGetPrefix(void){
-	return hddPrefix;
+    return hddPrefix;
 }
 
 //END of OPL_DB tweaks
@@ -144,6 +144,20 @@ void hddLoadModules(void)
                            "-n"
                            "\0"
                            "20";
+   
+    //START of OPL_DB tweaks
+    static char pfsarg[] = "-m" 
+                           "\0"
+                           "4"
+                           "\0"
+                           "-o" 
+                           "\0" 
+                           "10"
+                           "\0"
+                           "-n"
+                           "\0"
+                           "40";
+    //END of OPL_DB tweaks
 
     LOG("HDDSUPPORT LoadModules\n");
 
@@ -182,8 +196,9 @@ void hddLoadModules(void)
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_NOT_DETECTED);
             return;
         }
-
-        ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, 0, NULL);
+        //START of OPL_DB tweaks
+        ret = sysLoadModuleBuffer(&ps2fs_irx, size_ps2fs_irx, sizeof(pfsarg), pfsarg);
+        //END of OPL_DB tweaks
         if (ret < 0) {
             LOG("HDD: HardDisk Drive not formatted (PFS).\n");
             setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_MODULE_PFS_FAILURE);

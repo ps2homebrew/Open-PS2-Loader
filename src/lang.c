@@ -264,8 +264,12 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Some fake ds3s need workaround, this option will disable it.",
 #endif
 //START of OPL_DB tweaks
-    "ELF Loader Menu",
-    "ELF Loader Menu display mode",
+    "PS1 Games",
+    "PS1 Games display mode",
+	"POPSTARTER.ELF not found at '%s'!",
+	"VCD file '%s' not found!",
+	"An error occurred while renaming the file.",
+	"An error ocurred while deleting the file."
 //END of OPL_DB tweaks
 };
 

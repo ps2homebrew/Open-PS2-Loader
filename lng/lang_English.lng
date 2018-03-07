@@ -266,5 +266,9 @@ Multitap emulator on port
 Select port for Multitap emulation.
 Disable workaround for fake DS3
 Some fake ds3s need workaround, this option will disable it.
-ELF Loader Menu
-ELF Loader Menu display mode
+PS1 Games
+PS1 Games display mode
+POPSTARTER.ELF not found at '%s'!
+VCD file '%s' not found!
+An error occurred while renaming the file.
+An error ocurred while deleting the file.

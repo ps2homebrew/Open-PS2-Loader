@@ -376,7 +376,9 @@ void guiShowConfig()
 
     // configure the enumerations
     const char *selectButtons[] = {_l(_STR_CIRCLE), _l(_STR_CROSS), NULL};
-    const char *deviceNames[] = {_l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), NULL};
+    //START of OPL_DB tweaks
+    const char *deviceNames[] = {_l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES),_l(_STR_APPS),_l(_STR_ELM), NULL};
+    //END of OPL_DB tweaks
     const char *deviceModes[] = {_l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL};
 
     diaSetEnum(diaConfig, CFG_SELECTBUTTON, selectButtons);
@@ -385,9 +387,9 @@ void guiShowConfig()
     diaSetEnum(diaConfig, CFG_HDDMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     diaSetEnum(diaConfig, CFG_ELMMODE, deviceModes);
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
@@ -408,9 +410,9 @@ void guiShowConfig()
     diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
     diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
     diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     diaSetInt(diaConfig, CFG_ELMMODE, gELMStartMode);
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {

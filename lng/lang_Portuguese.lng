@@ -248,5 +248,9 @@ Emulador Multitap na porta
 Selecionar porta para o emulador de Multitap.
 Desativar workaround para clones DS3
 Alguns clones DS3 precisam de workaround, esta opção irá desativar-lo.
-Menu do Iniciador ELF
-Modo de exibição do iniciador de ELF
+Jogos PS1
+Modo de inicio para Jogos PS1
+POPSTARTER.ELF não encontrado em '%s'!
+Ficheiro VCD '%s' não encontrado!
+Ocorreu um erro ao renomear o ficheiro.
+Ocorreu um erro ao apagar o ficheiro

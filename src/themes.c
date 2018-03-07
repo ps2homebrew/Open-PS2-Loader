@@ -330,7 +330,11 @@ static image_texture_t *initImageInternalTexture(config_set_t *themeConfig, cons
 {
     image_texture_t *texture = (image_texture_t *)malloc(sizeof(image_texture_t));
     texPrepare(&texture->source, GS_PSM_CT24);
-    texture->name = NULL;
+	//START of OPL_DB tweaks
+	int length = strlen(name) + 1;
+	texture->name = (char *)malloc(length * sizeof(char));
+	memcpy(texture->name, name, length);
+	//END of OPL_DB tweaks
     int result;
 
     if ((result = texLookupInternalTexId(name)) >= 0) {

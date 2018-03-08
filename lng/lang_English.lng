@@ -221,7 +221,7 @@ Re-download existing records?
 Update failed.
 Failed to connect to update server.
 Update completed.
-Update cancelled.
+Update canceled.
 Download settings from the network?
 Customized Settings
 Downloaded Defaults
@@ -244,7 +244,7 @@ Enable emulation
 Turns on/off Pad Emulator for selected port.
 Enable vibration
 Turns on/off vibration for Pad Emulator selected port.
-USB bluetooth adapter MAC address:
+USB Bluetooth adapter MAC address:
 DS Controller paired to MAC address:
 Pair
 Pair DS controller
@@ -271,4 +271,4 @@ PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.
-An error ocurred while deleting the file.
+An error occurred while deleting the file.

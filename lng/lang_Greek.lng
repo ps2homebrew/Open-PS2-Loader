@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: 10/17/2017 
-# Updated for OPL_1030_DB [c3257f5]
+# Last update: 3/7/2018 
+# Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -147,7 +147,7 @@ VMC γενικής χρήσης
 Χρώμα επιλεγμένου
 Εμφάνιση σελίδας πληροφοριών
 Πληροφ.
-Προσαρμοσμένο ELF
+Προκαθορισμένο ELF
 Επιλογή χρώματος
 Επανασύνδεση
 Αφήστε το κενό για απαρίθμηση κοινόχρηστων.
@@ -212,7 +212,7 @@ Patchάρισμα των παιχνιδιών από το PS2RD.
 Τιμή σε δευτερόλεπτα, 0 για μη αυτόματη εκκίνηση
 Λογότυπο PS2
 Εμφάνιση μόνο για συμβατά λογότυπα δίσκων που ταιριάζουν με το console region.
-Προσομοίωση Χειριστηρίου
+Ρυθμίσεις PadEmu
 Ρυθμίσεις προσομοιωτή Χειριστηρίου
 Ενεργοποίηση προσομοιωτή
 Ενεργοποιεί/απενεργοποιεί τον προσομοιωτή για το συγκεκριμένο παιχνίδι.
@@ -232,21 +232,25 @@ DualShock3/4 BlueTooth
 Σύζευξη με χειριστήριο DualShock
 Σύζευξη του προσαρμογέα BlueTooth με το χειριστήριο DualShock.
 Μη συνδεδεμένο
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-ELF Loader
-Εκκίνηση μενού ELF Loader
+Πληροφορίες προσαρμογέα BlueTooth
+Εμφανίζει περισσότερες πληροφορίες και υποστηριζόμενες λειτουργίες.
+Έκδοση HCI:
+Έκδοση LMP:
+ID κατασκευαστή:
+Λειτουργίες υποστήριξης:
+Ναι
+Όχι
+Ο προσαρμογέας BlueTooth θα πρέπει να είναι πλήρως συμβατός με ελεγκτές DS3/DS4.
+Ο προσαρμογέας Bluetooth ενδέχεται να μη λειτουργεί σωστά με τα χειριστήρια DS3/DS4.
+Ενεργοποίηση Multitap emulation
+Ενεργοποιεί/απενεργοποιεί το Multitap emulation για το παιχνίδι.
+Multitap emulator στη θύρα
+Επιλέξτε θύρα για εξομοίωση Multitap.
+Απενεργ. workaround για ψεύτικα DS3
+Κάποια ψεύτικα DS3s χρειάζονται workaround, αυτή η επιλογή θα το απενεργοποιήσει.
+Παιχνίδια PS1
+Εκκίνηση μενού παιχνιδιών PS1
+Το POPSTARTER.ELF δεν βρέθηκε στη θέση '%s'!
+Το αρχείο VCD '%s' δε βρέθηκε!
+Παρουσιάστηκε σφάλμα κατά τη μετονομασία του αρχείου.
+Παρουσιάστηκε σφάλμα κατά τη διαγραφή του αρχείου.

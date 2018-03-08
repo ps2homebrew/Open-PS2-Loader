@@ -1,6 +1,6 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: 10/20/2017 
-# Updated for OPL_1030_DB [c3257f5]
+# Last update: 3/7/2018 
+# Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 OPL %s
@@ -248,5 +248,9 @@ Emulador Multitap na porta
 Selecione a porta para a emulação Multitap.
 Desativar solução alternativa para Controle DS3 pirata
 Alguns Controles DS3 piratas precisam de solução alternativa, esta opção irá desativá-lo.
-Jogos em ELF
-Modo de início dos jogos em ELF
+Jogos PS1
+Modo de início dos Jogos PS1
+Arquivo POPSTARTER.ELF não encontrado em '%s'!
+O arquivo VCD '%s' não foi encontrado!
+Ocorreu um erro ao renomear o arquivo.
+Ocorreu um erro ao excluir o arquivo.

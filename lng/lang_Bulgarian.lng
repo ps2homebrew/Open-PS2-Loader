@@ -1,6 +1,6 @@
 # translation by vsub and wisi
-# Last update: 10/17/2017 
-# Updated for OPL_1030_DB [c3257f5]
+# Last update: 3/7/2018 
+# Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
 OPL %s
@@ -226,7 +226,7 @@ Enable emulation
 Turns on/off Pad Emulator for selected port.
 Enable vibration
 Turns on/off vibration for Pad Emulator selected port.
-USB bluetooth adapter MAC address:
+USB Bluetooth adapter MAC address:
 DS Controller paired to MAC address:
 Pair
 Pair DS controller
@@ -248,5 +248,9 @@ Multitap emulator on port
 Select port for Multitap emulation.
 Disable workaround for fake DS3
 Some fake ds3s need workaround, this option will disable it.
-ELF Loader Menu
-ELF Loader Menu display mode
+PS1 Games
+PS1 Games display mode
+POPSTARTER.ELF not found at '%s'!
+VCD file '%s' not found!
+An error occurred while renaming the file.
+An error occurred while deleting the file.

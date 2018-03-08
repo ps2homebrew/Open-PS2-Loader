@@ -1,6 +1,6 @@
 # Translated by druchapucha and frodosumkin
-# Last update: 10/18/2017 
-# Updated for OPL_1030_DB [c3257f5]
+# Last update: 3/7/2018 
+# Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
 OPL %s
@@ -248,5 +248,9 @@ Multitap эмулятор на порте
 Выбрать порт для Multitap эмуляции.
 Отключить работу для фальшивого DS3
 Эту опцию нужно отключить, если DS3 фальшивый.
-Меню ELF Загрузчика
-Отобразить меню ELF Загрузчика
+PS1 игры
+Отображать экран PS1 игр
+POPSTARTER.ELF не найден '%ы'!
+VCD файл '%ы' не найден!
+При переименовании файла произошла ошибка.
+При удалении файла произошла ошибка.

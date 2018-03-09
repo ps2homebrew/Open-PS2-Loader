@@ -249,8 +249,8 @@ Pilih port untuk emulasi Multitap.
 Nonaktifkan solusi untuk DS3 palsu
 beberapa ds3s palsu butuh solusi, opsi ini akan nonaktif.
 PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
+PS1 Games mode tampilan
+POPSTARTER.ELF tak ada di '%s'!
+berkas VCD'%s' tak ada!
+Terjadi kesalahan mengubah nama berkas.
+Terjadi kesalahan menghapus berkas.

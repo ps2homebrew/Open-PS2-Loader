@@ -1,5 +1,5 @@
 # Translated by druchapucha and frodosumkin
-# Last update: 3/7/2018 
+# Last update: 3/8/2018 
 # Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
@@ -250,7 +250,7 @@ Multitap эмулятор на порте
 Эту опцию нужно отключить, если DS3 фальшивый.
 PS1 игры
 Отображать экран PS1 игр
-POPSTARTER.ELF не найден '%ы'!
-VCD файл '%ы' не найден!
+POPSTARTER.ELF не найден '%s'!
+VCD файл '%s' не найден!
 При переименовании файла произошла ошибка.
 При удалении файла произошла ошибка.

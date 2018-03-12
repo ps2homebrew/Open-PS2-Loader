@@ -1,5 +1,5 @@
 # Translation by lauchon22
-# Last update: 3/7/2018 
+# Last update: 3/9/2018 
 # Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
@@ -248,9 +248,9 @@ Emulador multitap en el puerto
 Seleccione el puerto para la emulación multitap.
 Deshabilitar la solución provisional para DS3 falso
 Algunos DS3 falsos necesitan solución, esta opción lo deshabilitará.
-PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
+Juegos de PS1
+Modo de visualización de juegos de PS1
+¡POPSTARTER.ELF no se encuentra en '%s'!
+No se encuentra el archivo VCD '%s'!
+Se produjo un error al cambiar el nombre del archivo.
+Se produjo un error al eliminar el archivo.

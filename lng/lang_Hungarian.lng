@@ -248,9 +248,9 @@ Multitap emulátor ezen a porton
 Válassza ki a portot a Multitap emulációhoz.
 Megkerülés letiltása a hamisítvány DS3-hoz.
 Néhány hamis ds3-hoz megkerülés szükséges, ez az opció letiltja ezt.
-PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
+PS1 Játékok
+PS1 Játékok megjelenítési módja
+POPSTARTER.ELF nem található '%s'-nél!
+VCD fájl '%s' nem található!
+A fájl átnevezésénél hiba történt.
+A fájl törlésénél hiba történt.

@@ -35,6 +35,9 @@ void *pusbd_irx = NULL;
 int size_pusbd_irx = 0;
 
 static char usbPrefix[40]; //Contains the full path to the folder where all the games are.
+//START of OPL_DB tweaks
+static char usbBase[7];
+//END of OPL_DB tweaks
 static int usbULSizePrev = -2;
 static unsigned char usbModifiedCDPrev[8];
 static unsigned char usbModifiedDVDPrev[8];
@@ -49,7 +52,11 @@ char* usbGetPrefix(void){
 	return usbPrefix;
 }
 
+char* usbGetBase(void){
+	return usbBase;
+}
 //END of OPL_DB tweaks
+
 //Identifies the partition that the specified file is stored on and generates a full path to it.
 int usbFindPartition(char *target, char *name)
 {
@@ -68,6 +75,9 @@ int usbFindPartition(char *target, char *name)
                 sprintf(target, "mass%d:%s/", i, gUSBPrefix);
             else
                 sprintf(target, "mass%d:", i);
+            //START of OPL_DB tweaks
+            sprintf(usbBase,"mass%d:",i);
+            //END of OPL_DB tweaks
             fileXioClose(fd);
             return 1;
         }
@@ -78,6 +88,9 @@ int usbFindPartition(char *target, char *name)
         sprintf(target, "mass0:%s/", gUSBPrefix);
     else
         sprintf(target, "mass0:");
+        //START of OPL_DB tweaks
+        sprintf(usbBase, "mass0:");
+        //END of OPL_DB tweaks
     return 0;
 }
 

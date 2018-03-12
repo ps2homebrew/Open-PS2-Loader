@@ -19,6 +19,7 @@ typedef struct
 
 //START of OPL_DB tweaks
 char* usbGetPrefix(void);
+char* usbGetBase(void);
 //END of OPL_DB tweaks
 void usbInit();
 item_list_t *usbGetObject(int initOnly);

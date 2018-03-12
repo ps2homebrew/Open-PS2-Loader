@@ -197,10 +197,29 @@ static int elmScanVCDsHDD(){
 	char partition[250];
 	iox_dirent_t record;
 
+	char scanned[10][9];
+	int i;
+	int skip = 0;
+	int partitionCount = 0;
 	if ((fd2 = fileXioDopen("hdd0:")) >= 0) {
         while (fileXioDread(fd2, &record) > 0) {
+			skip=0;
 			fileXioUmount(mountPoint);
 			if (strncmp (record.name,"__.POPS",7) == 0){
+				for(i = 0; i < partitionCount; i++)
+				{
+					if(strcmp(scanned[i], record.name) == 0)
+					{
+						LOG("%s was already scanned! Skipping!", record.name);
+						skip = 1;
+						break;
+					}
+				}
+				if (skip == 1) continue;
+				
+				strcpy(scanned[partitionCount],record.name);
+				partitionCount++;
+				
 				sprintf(partition,"hdd0:%s",record.name);
 				LOG("Mounting '%s' into '%s' \n",partition,mountPoint);
 				if ((MountFD = fileXioMount(mountPoint, partition, O_RDONLY)) >= 0) {
@@ -315,14 +334,14 @@ static int elmUpdateItemList(void) {
 	//Try USB
 	if (usbGetObject(1)){
 		//Eg: mass0:POPS/POPSTARTER.ELF
-		snprintf(elmPathElfUsb, sizeof(elmPathElfUsb), "%sPOPS/POPSTARTER.ELF",usbGetPrefix());
+		snprintf(elmPathElfUsb, sizeof(elmPathElfUsb), "%sPOPS/POPSTARTER.ELF",usbGetBase());
 		LOG("elmPathElfUsb = %s\n",elmPathElfUsb);
 		
 		//Check if POPSTARTER.ELF exists in the folder.
 		int fdElf = fileXioOpen(elmPathElfUsb, O_RDONLY, 0666);
 		if (fdElf >= 0) {
 			fileXioClose(fdElf);
-			elmItemCount += elmScanVCDs(usbGetPrefix());
+			elmItemCount += elmScanVCDs(usbGetBase());
 		}else{
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfUsb);
 		}

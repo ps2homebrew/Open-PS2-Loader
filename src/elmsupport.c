@@ -315,14 +315,14 @@ static int elmUpdateItemList(void) {
 	//Try USB
 	if (usbGetObject(1)){
 		//Eg: mass0:POPS/POPSTARTER.ELF
-		snprintf(elmPathElfUsb, sizeof(elmPathElfUsb), "%sPOPS/POPSTARTER.ELF",usbGetPrefix());
+		snprintf(elmPathElfUsb, sizeof(elmPathElfUsb), "%sPOPS/POPSTARTER.ELF",usbGetBase());
 		LOG("elmPathElfUsb = %s\n",elmPathElfUsb);
 		
 		//Check if POPSTARTER.ELF exists in the folder.
 		int fdElf = fileXioOpen(elmPathElfUsb, O_RDONLY, 0666);
 		if (fdElf >= 0) {
 			fileXioClose(fdElf);
-			elmItemCount += elmScanVCDs(usbGetPrefix());
+			elmItemCount += elmScanVCDs(usbGetBase());
 		}else{
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfUsb);
 		}

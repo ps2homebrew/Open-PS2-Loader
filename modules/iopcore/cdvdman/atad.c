@@ -152,9 +152,11 @@ int atad_start(void)
     }
 #endif
 
-    /* A GameStar masquerades as a SCPH-10281, but malfunctions if transfers are not done according to the old ps2atad design.
-       All official adaptors appear to have different values for these two registers, but not the GameStar. */
-    ata_gamestar_workaround = (SPD_REG16(SPD_R_REV) == SPD_REG16(SPD_R_REV_3));
+    /* Some compatible adaptors may malfunction if transfers are not done according to the old ps2atad design.
+       Official adaptors appear to have a 0x0001 set for this register, but not compatibles.
+       While official I/O to this register are 8-bit, some compatibles have a 0x01 for the lower 8-bits,
+       but the upper 8-bits contain some random value. Hence perform a 16-bit read instead. */
+    ata_gamestar_workaround = (SPD_REG16(0x20) != 1);
 
     event.attr = 0;
     event.bits = 0;

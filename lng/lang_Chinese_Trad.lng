@@ -1,5 +1,5 @@
-# Translated by kane159
-# Last update: 3/7/2018 
+# Translated by kane159 and eyu2007
+# Last update: 3/22/2018 
 # Updated for OPL_1036_DB-TA [926069d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
@@ -54,7 +54,7 @@ Exit to Browser/OSDSYS?
 請稍後
 讀取 Game ID 時出錯
 自動滾動
-讀取語言文件時出錯
+讀取語言档案時出錯
 禁用 Debug Colors
 無偵測到搖桿, 等待中...
 啟用圖示封面
@@ -195,8 +195,8 @@ PS2RD 金手指引擎模式
 自動選擇或選擇遊戲金手指
 自動選擇金手指
 選擇遊戲金手指
-錯誤: 讀取金手指文件出錯
-無發現金手指文件
+錯誤: 讀取金手指档案出錯
+無發現金手指档案
 下載預設值
 網絡更新
 重新下載現有記錄?
@@ -210,47 +210,47 @@ PS2RD 金手指引擎模式
 將自動於 %i 秒後啟動...
 自動啟動
 以秒為單位,設為 0 來禁用自動啟動
-PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
-Configure PADEMU
-Pad Emulator Settings
-Enable PadEmulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
-DualShock3/4 USB
-DualShock3/4 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-USB Bluetooth adapter MAC address:
-DS Controller paired to MAC address:
-Pair
-Pair DS controller
-Pair DS controller with Bluetooth adapter MAC address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
+PS2Logo
+僅顯示與控制臺區域疋配的有效磁盤標識
+配置PADEMU
+Pad模擬器設置
+開啟Pad模擬器
+為選定的遊戲開啟/關閉pad模擬調節。
+Pad模擬器模式
+選擇Pad模擬器模式。
+有線連接
+藍牙連接
+設置端口:
+選擇Pad模擬器端口
+開啟模擬
+打開/關閉選定端口的模擬器
+開啟振動
+打開/關閉選定端口的振動。
+USB藍牙適配器MAC地址:
+DS控制器MAC地址:
+配對
+配對DS控制器
+藍牙適配器和DS控制器進行MAC地址配對。
+沒有連接
+藍牙適配器資訊
+顯示更多的資訊和支持的特性
+HCI版本:
+LMP版本:
+制造商ID:
+支持的功能:
+是
+否
+藍牙適配器應該完全兼容DS3/DS4控制器
+藍牙適配器可能無法與DS3/DS4控制器疋配
+開啟多重模擬
+打開/關閉這個遊戲的多重模擬.
+多重模擬端口
+選擇進行多重模擬的端口
+禁用仿冒DS3控制器
+這個選項將使一些仿冒的DS3控制器無法工作
+PS1遊戲
+PS1遊戲啟動模式
+POPSTARTER.ELF在'%s'上找不到!
+VCD档案'%s'沒有找到!
+重命名档案時發生錯誤
+刪除档案時發生錯誤

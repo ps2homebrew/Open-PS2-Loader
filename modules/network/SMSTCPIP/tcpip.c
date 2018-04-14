@@ -43,9 +43,16 @@
 
 #include "lwip/tcpip.h"
 
+#include <thsemap.h>
+
 static void (*tcpip_init_done)(void *arg) = NULL;
 static void *tcpip_init_done_arg;
 sys_mbox_t g_TCPIPMBox;
+
+#if LWIP_TCPIP_CORE_LOCKING
+/** The global semaphore to lock the stack. */
+sys_sem_t lock_tcpip_core;
+#endif /* LWIP_TCPIP_CORE_LOCKING */
 
 static void tcpip_thread(void *arg)
 {
@@ -61,19 +68,24 @@ static void tcpip_thread(void *arg)
 #endif /* LWIP_TCP */
     tcpip_init_done(tcpip_init_done_arg);
 
+    LOCK_TCPIP_CORE();
     while (1) {
-
+        UNLOCK_TCPIP_CORE();
         sys_mbox_fetch(g_TCPIPMBox, (void *)&msg);
+        LOCK_TCPIP_CORE();
 
         switch (msg->type) {
-
+#if !LWIP_TCPIP_CORE_LOCKING
             case TCPIP_MSG_API:
                 api_msg_input(msg->msg.apimsg);
                 break;
+#endif /* !LWIP_TCPIP_CORE_LOCKING */
 
+#if !LWIP_TCPIP_CORE_LOCKING_INPUT
             case TCPIP_MSG_INPUT:
                 ip_input(msg->msg.inp.p, msg->msg.inp.netif);
                 break;
+#endif /* !LWIP_TCPIP_CORE_LOCKING_INPUT */
 
             case TCPIP_MSG_CALLBACK:
                 msg->msg.cb.f(msg->msg.cb.ctx);
@@ -90,6 +102,13 @@ static void tcpip_thread(void *arg)
 err_t tcpip_input(struct pbuf *p, struct netif *inp)
 {
 
+#if LWIP_TCPIP_CORE_LOCKING_INPUT
+    err_t ret;
+    LOCK_TCPIP_CORE();
+    ret = ip_input(p, inp);
+    UNLOCK_TCPIP_CORE();
+    return ret;
+#else /* LWIP_TCPIP_CORE_LOCKING_INPUT */
     struct tcpip_msg *msg = memp_malloc(MEMP_TCPIP_MSG);
 
     if (msg) {
@@ -107,12 +126,18 @@ err_t tcpip_input(struct pbuf *p, struct netif *inp)
         return ERR_MEM;
 
     } /* end else */
+#endif /* LWIP_TCPIP_CORE_LOCKING_INPUT */
 
 } /* end tcpip_input */
 
 void tcpip_apimsg(struct api_msg *apimsg)
 {
 
+#if LWIP_TCPIP_CORE_LOCKING
+    LOCK_TCPIP_CORE();
+    api_msg_input(apimsg);
+    UNLOCK_TCPIP_CORE();
+#else /* LWIP_TCPIP_CORE_LOCKING */
     struct tcpip_msg *msg = memp_malloc(MEMP_TCPIP_MSG);
 
     if (msg) {
@@ -123,6 +148,7 @@ void tcpip_apimsg(struct api_msg *apimsg)
 
     } else
         memp_free(MEMP_API_MSG, apimsg);
+#endif /* LWIP_TCPIP_CORE_LOCKING */
 
 } /* end tcpip_apimsg */
 
@@ -133,6 +159,9 @@ void tcpip_init(void (*initfunc)(void *), void *arg)
     tcpip_init_done_arg = arg;
 
     g_TCPIPMBox = sys_mbox_new();
+#if LWIP_TCPIP_CORE_LOCKING
+    lock_tcpip_core = sys_sem_new(1);
+#endif /* LWIP_TCPIP_CORE_LOCKING */
 
     sys_thread_new(tcpip_thread, NULL, TCPIP_THREAD_PRIO);
 

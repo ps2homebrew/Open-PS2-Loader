@@ -2,6 +2,18 @@
 #define __LWIPOPTS_H__
 
 #define LWIP_CALLBACK_API 1
+
+/* ---------- Core locking ---------- */
+/**
+ * LWIP_TCPIP_CORE_LOCKING_INPUT: when LWIP_TCPIP_CORE_LOCKING is enabled,
+ * this lets tcpip_input() grab the mutex for input packets as well,
+ * instead of allocating a message and passing it to tcpip_thread.
+ *
+ * ATTENTION: this does not work when tcpip_input() is called from
+ * interrupt context!
+ */
+//#define LWIP_TCPIP_CORE_LOCKING_INPUT 1	//Not supported because of the in-game SMAP driver's design (will deadlock).
+
 /* ---------- Memory options ---------- */
 /**
  * MEM_LIBC_MALLOC==1: Use malloc/free/realloc provided by your C-library

@@ -52,6 +52,30 @@
 #ifndef NO_SYS
 #define NO_SYS 0
 #endif
+/* ---------- Core locking ---------- */
+/**
+ * LWIP_TCPIP_CORE_LOCKING
+ * Creates a global mutex that is held during TCPIP thread operations.
+ * Can be locked by client code to perform lwIP operations without changing
+ * into TCPIP thread using callbacks. See LOCK_TCPIP_CORE() and
+ * UNLOCK_TCPIP_CORE().
+ * Your system should provide mutexes supporting priority inversion to use this.
+ */
+#if !defined LWIP_TCPIP_CORE_LOCKING || defined __DOXYGEN__
+#define LWIP_TCPIP_CORE_LOCKING         1
+#endif
+
+/**
+ * LWIP_TCPIP_CORE_LOCKING_INPUT: when LWIP_TCPIP_CORE_LOCKING is enabled,
+ * this lets tcpip_input() grab the mutex for input packets as well,
+ * instead of allocating a message and passing it to tcpip_thread.
+ *
+ * ATTENTION: this does not work when tcpip_input() is called from
+ * interrupt context!
+ */
+#if !defined LWIP_TCPIP_CORE_LOCKING_INPUT || defined __DOXYGEN__
+#define LWIP_TCPIP_CORE_LOCKING_INPUT   0
+#endif
 /* ---------- Memory options ---------- */
 /**
  * MEM_LIBC_MALLOC==1: Use malloc/free/realloc provided by your C-library

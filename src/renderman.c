@@ -206,6 +206,12 @@ int rmSetMode(int force)
         gsGlobal->DoubleBuffering = GS_SETTING_ON;
         gsGlobal->Dithering = GS_SETTING_ON;
 
+        // Do not draw pixels if they are fully transparent
+        //gsGlobal->Test->ATE  = GS_SETTING_ON;
+        gsGlobal->Test->ATST = 7; // NOTEQUAL to AREF passes
+        gsGlobal->Test->AREF = 0x00;
+        gsGlobal->Test->AFAIL = 0; // KEEP
+
         if ((gsGlobal->Interlace == GS_INTERLACED) && (gsGlobal->Field == GS_FRAME))
             gsGlobal->Height /= 2;
 
@@ -314,10 +320,14 @@ static void rmSetupQuad(GSTEXTURE *txt, int x, int y, short aligned, int w, int 
 
 void rmDrawQuad(rm_quad_t *q)
 {
-    if ((q->txt->PSM == GS_PSM_CT32) || (q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32))
+    if ((q->txt->PSM == GS_PSM_CT32) || (q->txt->Clut && q->txt->ClutPSM == GS_PSM_CT32)) {
         gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
-    else
+        gsKit_set_test(gsGlobal, GS_ATEST_ON);
+    }
+    else {
         gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
+        gsKit_set_test(gsGlobal, GS_ATEST_OFF);
+    }
 
     gsKit_TexManager_bind(gsGlobal, q->txt);
     gsKit_prim_sprite_texture(gsGlobal, q->txt,

@@ -425,7 +425,7 @@ static fnt_glyph_cache_entry_t *fntCacheGlyph(font_t *font, uint32_t gid)
     glyph->shx = slot->advance.x;
     glyph->shy = slot->advance.y;
     glyph->ox = slot->bitmap_left;
-    glyph->oy = rmScaleY(FNTSYS_CHAR_SIZE-2) - slot->bitmap_top;
+    glyph->oy = -slot->bitmap_top;
 
     glyph->isValid = 1;
 
@@ -508,7 +508,10 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     }
 
     if (aligned & ALIGN_VCENTER) {
-        y -= rmScaleY(FNTSYS_CHAR_SIZE) >> 1;
+        y += rmScaleY(FNTSYS_CHAR_SIZE-4) >> 1;
+    }
+    else {
+        y += rmScaleY(FNTSYS_CHAR_SIZE-2);
     }
 
     quad.color = colour;
@@ -632,7 +635,10 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     }
 
     if (aligned & ALIGN_VCENTER) {
-        y -= rmScaleY(FNTSYS_CHAR_SIZE) >> 1;
+        y += rmScaleY(FNTSYS_CHAR_SIZE-4) >> 1;
+    }
+    else {
+        y += rmScaleY(FNTSYS_CHAR_SIZE-2);
     }
 
     quad.color = colour;

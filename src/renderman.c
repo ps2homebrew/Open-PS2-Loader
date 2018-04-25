@@ -437,12 +437,19 @@ float rmGetPAR()
         fPAR *= 0.75f;
 
     // In interlaced frame mode, the pixel are (virtually) twice as high
-    // FIXME: this looks ugly!
-    //   we need the font to render at 1920x1080 instead of 1920x540
     if ((gsGlobal->Interlace == GS_INTERLACED) && (gsGlobal->Field == GS_FRAME))
         fPAR *= 2.0f;
 
     return fPAR;
+}
+
+// Get interfaced frame mode
+int rmGetInterlacedFrameMode()
+{
+    if ((gsGlobal->Interlace == GS_INTERLACED) && (gsGlobal->Field == GS_FRAME))
+        return 1;
+
+    return 0;
 }
 
 int rmScaleX(int x)
@@ -469,6 +476,9 @@ static void rmUpdateRenderOffsets()
 {
     fRenderXOff = (float)iDisplayXOff + transX - 0.5f;
     fRenderYOff = (float)iDisplayYOff + transY - 0.5f;
+
+    if (rmGetInterlacedFrameMode() == 1)
+        fRenderYOff += 0.25f;
 }
 
 void rmSetOverscan(int overscan)

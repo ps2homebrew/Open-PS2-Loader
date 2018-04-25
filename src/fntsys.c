@@ -445,6 +445,10 @@ void fntUpdateAspectRatio()
     // Scale width according to the PAR (Pixel Aspect Ratio)
     ws = hs * rmGetPAR();
 
+    // Supersample height*2 when using interlaced frame mode
+    if (rmGetInterlacedFrameMode() == 1)
+        hs *= 2;
+
     // flush cache - it will be invalid after the setting
     for (i = 0; i < FNT_MAX_COUNT; i++) {
         if (fonts[i].isValid) {
@@ -469,12 +473,18 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t *glyph, int pen_x, int pen_y)
 		 *    without the use of prim_quad_texture and rmSetupQuad...
 		 */
         quad.ul.x = pen_x + glyph->ox;
-        quad.ul.y = pen_y + glyph->oy;
+        if (rmGetInterlacedFrameMode() == 0)
+            quad.ul.y = pen_y + glyph->oy;
+        else
+            quad.ul.y = (float)pen_y + ((float)glyph->oy / 2.0f);
         quad.ul.u = glyph->allocation->x;
         quad.ul.v = glyph->allocation->y;
 
         quad.br.x = quad.ul.x + glyph->width;
-        quad.br.y = quad.ul.y + glyph->height;
+        if (rmGetInterlacedFrameMode() == 0)
+            quad.br.y = quad.ul.y + glyph->height;
+        else
+            quad.br.y = quad.ul.y + ((float)glyph->height / 2.0f);
         quad.br.u = quad.ul.u + glyph->width;
         quad.br.v = quad.ul.v + glyph->height;
 

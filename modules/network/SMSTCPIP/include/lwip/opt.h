@@ -632,4 +632,37 @@ a lot of data that needs to be copied, this should be set high. */
 #define DBG_MIN_LEVEL DBG_LEVEL_OFF
 #endif
 
+/*
+   --------------------------------------
+   ---------- Checksum options ----------
+   --------------------------------------
+*/
+/**
+ * CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.
+ */
+#if !defined CHECKSUM_CHECK_IP
+#define CHECKSUM_CHECK_IP               1
+#endif
+
+/**
+ * CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.
+ */
+#if !defined CHECKSUM_CHECK_UDP
+#define CHECKSUM_CHECK_UDP              1
+#endif
+
+/**
+ * CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.
+ */
+#if !defined CHECKSUM_CHECK_TCP
+#define CHECKSUM_CHECK_TCP              1
+#endif
+
+/**
+ * CHECKSUM_CHECK_ICMP==1: Check checksums in software for incoming ICMP packets.
+ */
+#if !defined CHECKSUM_CHECK_ICMP
+#define CHECKSUM_CHECK_ICMP             1
+#endif
+
 #endif /* __LWIP_OPT_H__ */

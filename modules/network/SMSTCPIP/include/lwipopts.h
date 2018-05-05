@@ -294,4 +294,41 @@ a lot of data that needs to be copied, this should be set high. */
 //	One should check performance penalty or improvement by activating any combination
 //	of these three options. The only one which is standard is TCP_NODELAY.
 //	By default, everything is not active.
+
+/*
+   --------------------------------------
+   ---------- Checksum options ----------
+   --------------------------------------
+*/
+#ifdef INGAME_DRIVER
+//Disable all higher-level checksum verification mechanisms for performance, relying on the MAC-level checksum.
+/**
+ * CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.
+ */
+#if !defined CHECKSUM_CHECK_IP
+#define CHECKSUM_CHECK_IP               0
+#endif
+
+/**
+ * CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.
+ */
+#if !defined CHECKSUM_CHECK_UDP
+#define CHECKSUM_CHECK_UDP              0
+#endif
+
+/**
+ * CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.
+ */
+#if !defined CHECKSUM_CHECK_TCP
+#define CHECKSUM_CHECK_TCP              0
+#endif
+
+/**
+ * CHECKSUM_CHECK_ICMP==1: Check checksums in software for incoming ICMP packets.
+ */
+#if !defined CHECKSUM_CHECK_ICMP
+#define CHECKSUM_CHECK_ICMP             0
+#endif
+#endif
+
 #endif /* __LWIPOPTS_H__ */

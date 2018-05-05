@@ -452,6 +452,7 @@ void sys_mbox_post(sys_mbox_t pMBox, void *pvMSG)
 {
 
     sys_prot_t Flags;
+    sys_sem_t sem;
 
     if (!pMBox)
         return;
@@ -473,10 +474,12 @@ void sys_mbox_post(sys_mbox_t pMBox, void *pvMSG)
     pMBox->apvMSG[pMBox->u16Last] = pvMSG;
     pMBox->u16Last = GenNextMBoxIndex(pMBox->u16Last);
 
-    if (pMBox->iWaitFetch > 0)
-        SignalSema(pMBox->Mail);
+    sem = (pMBox->iWaitFetch > 0) ? pMBox->Mail : SYS_SEM_NULL;
 
     CpuResumeIntr(Flags);
+
+    if (sem != SYS_SEM_NULL)
+        SignalSema(sem);
 
 } /* end sys_mbox_post */
 
@@ -484,6 +487,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t pMBox, void **ppvMSG, u32_t u32Timeout)
 {
 
     sys_prot_t Flags;
+    sys_sem_t sem = SYS_SEM_NULL;
     u32_t u32Time = 0;
 
     CpuSuspendIntr(&Flags);
@@ -513,10 +517,12 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t pMBox, void **ppvMSG, u32_t u32Timeout)
     *ppvMSG = pMBox->apvMSG[pMBox->u16First];
     pMBox->u16First = GenNextMBoxIndex(pMBox->u16First);
 
-    if (pMBox->iWaitPost > 0)
-        SignalSema(pMBox->Mail);
+    sem = (pMBox->iWaitPost > 0) ? pMBox->Mail : SYS_SEM_NULL;
 end:
     CpuResumeIntr(Flags);
+
+    if (sem != SYS_SEM_NULL)
+        SignalSema(sem);
 
     return u32Time;
 

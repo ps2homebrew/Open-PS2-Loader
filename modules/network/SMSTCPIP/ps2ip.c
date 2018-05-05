@@ -58,7 +58,7 @@ struct sys_mbox
 typedef struct ip_addr IPAddr;
 
 #define MODNAME "TCP/IP Stack"
-IRX_ID(MODNAME, 1, 3);
+IRX_ID(MODNAME, 1, 4);
 
 extern struct irx_export_table _exp_ps2ip;
 
@@ -415,8 +415,11 @@ sys_mbox_t sys_mbox_new(void)
 {
 
     sys_mbox_t pMBox;
+    int OldState;
 
-    pMBox = (sys_mbox_t)AllocSysMemory(0, sizeof(struct sys_mbox), 0);
+    CpuSuspendIntr(&OldState);
+    pMBox = (sys_mbox_t)AllocSysMemory(ALLOC_FIRST, sizeof(struct sys_mbox), NULL);
+    CpuResumeIntr(OldState);
 
     if (!pMBox)
         return NULL;
@@ -522,7 +525,7 @@ end:
 sys_sem_t sys_sem_new(u8_t aCount)
 {
 
-    iop_sema_t lSema = {1, 1, aCount, 1};
+    iop_sema_t lSema = {SA_THPRI, 1, aCount, 1};
     int retVal;
 
     retVal = CreateSema(&lSema);

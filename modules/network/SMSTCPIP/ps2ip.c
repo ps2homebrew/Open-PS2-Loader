@@ -514,7 +514,8 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t pMBox, void **ppvMSG, u32_t u32Timeout)
 
     } /* end while */
 
-    *ppvMSG = pMBox->apvMSG[pMBox->u16First];
+    if (ppvMSG != NULL) //This pointer may be NULL.
+        *ppvMSG = pMBox->apvMSG[pMBox->u16First];
     pMBox->u16First = GenNextMBoxIndex(pMBox->u16First);
 
     sem = (pMBox->iWaitPost > 0) ? pMBox->Mail : SYS_SEM_NULL;

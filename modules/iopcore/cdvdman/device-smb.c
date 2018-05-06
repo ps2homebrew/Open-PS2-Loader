@@ -143,6 +143,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
 
             r += sectors_to_read << 11;
+            offslsn += sectors_to_read;
             sectors_to_read = sectors;
             lsn = nlsn;
         }

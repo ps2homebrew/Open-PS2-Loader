@@ -92,6 +92,7 @@ void icmp_input(struct pbuf *p, struct netif *inp)
                 return;
             }
             iecho = p->payload;
+#if CHECKSUM_CHECK_ICMP
             if (inet_chksum_pbuf(p) != 0) {
                 LWIP_DEBUGF(ICMP_DEBUG, ("icmp_input: checksum failed for received ICMP echo\n"));
                 pbuf_free(p);
@@ -99,6 +100,7 @@ void icmp_input(struct pbuf *p, struct netif *inp)
                 snmp_inc_icmpinerrors();
                 return;
             }
+#endif
             tmpaddr.addr = iphdr->src.addr;
             iphdr->src.addr = iphdr->dest.addr;
             iphdr->dest.addr = tmpaddr.addr;

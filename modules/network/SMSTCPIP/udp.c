@@ -303,6 +303,7 @@ again_1:
     if (pcb != NULL || ip_addr_cmp(&inp->ip_addr, &iphdr->dest)) {
         LWIP_DEBUGF(UDP_DEBUG | DBG_TRACE, ("udp_input: calculating checksum\n"));
         pbuf_header(p, UDP_HLEN);
+#if CHECKSUM_CHECK_UDP
 #ifdef IPv6
         if (iphdr->nexthdr == IP_PROTO_UDPLITE) {
 #else
@@ -334,6 +335,7 @@ again_1:
                 }
             }
         }
+#endif /* CHECKSUM_CHECK_UDP */
         pbuf_header(p, -UDP_HLEN);
         if (pcb != NULL) {
             snmp_inc_udpindatagrams();

@@ -58,7 +58,7 @@ struct sys_mbox
 typedef struct ip_addr IPAddr;
 
 #define MODNAME "TCP/IP Stack"
-IRX_ID(MODNAME, 1, 3);
+IRX_ID(MODNAME, 1, 4);
 
 extern struct irx_export_table _exp_ps2ip;
 
@@ -415,8 +415,11 @@ sys_mbox_t sys_mbox_new(void)
 {
 
     sys_mbox_t pMBox;
+    int OldState;
 
-    pMBox = (sys_mbox_t)AllocSysMemory(0, sizeof(struct sys_mbox), 0);
+    CpuSuspendIntr(&OldState);
+    pMBox = (sys_mbox_t)AllocSysMemory(ALLOC_FIRST, sizeof(struct sys_mbox), NULL);
+    CpuResumeIntr(OldState);
 
     if (!pMBox)
         return NULL;
@@ -449,6 +452,7 @@ void sys_mbox_post(sys_mbox_t pMBox, void *pvMSG)
 {
 
     sys_prot_t Flags;
+    sys_sem_t sem;
 
     if (!pMBox)
         return;
@@ -470,10 +474,12 @@ void sys_mbox_post(sys_mbox_t pMBox, void *pvMSG)
     pMBox->apvMSG[pMBox->u16Last] = pvMSG;
     pMBox->u16Last = GenNextMBoxIndex(pMBox->u16Last);
 
-    if (pMBox->iWaitFetch > 0)
-        SignalSema(pMBox->Mail);
+    sem = (pMBox->iWaitFetch > 0) ? pMBox->Mail : SYS_SEM_NULL;
 
     CpuResumeIntr(Flags);
+
+    if (sem != SYS_SEM_NULL)
+        SignalSema(sem);
 
 } /* end sys_mbox_post */
 
@@ -481,6 +487,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t pMBox, void **ppvMSG, u32_t u32Timeout)
 {
 
     sys_prot_t Flags;
+    sys_sem_t sem = SYS_SEM_NULL;
     u32_t u32Time = 0;
 
     CpuSuspendIntr(&Flags);
@@ -507,13 +514,16 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t pMBox, void **ppvMSG, u32_t u32Timeout)
 
     } /* end while */
 
-    *ppvMSG = pMBox->apvMSG[pMBox->u16First];
+    if (ppvMSG != NULL) //This pointer may be NULL.
+        *ppvMSG = pMBox->apvMSG[pMBox->u16First];
     pMBox->u16First = GenNextMBoxIndex(pMBox->u16First);
 
-    if (pMBox->iWaitPost > 0)
-        SignalSema(pMBox->Mail);
+    sem = (pMBox->iWaitPost > 0) ? pMBox->Mail : SYS_SEM_NULL;
 end:
     CpuResumeIntr(Flags);
+
+    if (sem != SYS_SEM_NULL)
+        SignalSema(sem);
 
     return u32Time;
 
@@ -522,7 +532,7 @@ end:
 sys_sem_t sys_sem_new(u8_t aCount)
 {
 
-    iop_sema_t lSema = {1, 1, aCount, 1};
+    iop_sema_t lSema = {SA_THPRI, 1, aCount, 1};
     int retVal;
 
     retVal = CreateSema(&lSema);

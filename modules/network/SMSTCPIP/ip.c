@@ -230,10 +230,13 @@ err_t ip_input(struct pbuf *p, struct netif *inp)
         return ERR_OK;
     } /* end if */
 
+    /* verify checksum */
+#if CHECKSUM_CHECK_IP
     if (inet_chksum(iphdr, iphdrlen)) {
         pbuf_free(p);
         return ERR_OK;
     } /* end if */
+#endif
 
     pbuf_realloc(p, ntohs(IPH_LEN(iphdr)));
 

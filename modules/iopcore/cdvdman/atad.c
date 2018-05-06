@@ -125,7 +125,6 @@ static void ata_post_dma_cb(int bcr, int dir)
     SPD_REG16(SPD_R_XFR_CTRL) &= ~0x80;
 }
 
-#ifdef DEV9_DEBUG
 static int ata_create_event_flag(void)
 {
     iop_event_t event;
@@ -135,12 +134,10 @@ static int ata_create_event_flag(void)
     event.bits = 0;
     return CreateEventFlag(&event);
 }
-#endif
 
 int atad_start(void)
 {
     USE_SPD_REGS;
-    iop_event_t event;
     int res = 1;
 
     M_PRINTF(BANNER, VERSION);
@@ -158,16 +155,11 @@ int atad_start(void)
        but the upper 8-bits contain some random value. Hence perform a 16-bit read instead. */
     ata_gamestar_workaround = (SPD_REG16(0x20) != 1);
 
-    event.attr = 0;
-    event.bits = 0;
-    ata_evflg = CreateEventFlag(&event);
-#ifdef DEV9_DEBUG
     if ((ata_evflg = ata_create_event_flag()) < 0) {
         M_PRINTF("Couldn't create event flag, exiting.\n");
         res = 1;
         goto out;
     }
-#endif
 
     /* In v1.04, PIO mode 0 was set here. In late versions, it is set in ata_init_devices(). */
     dev9RegisterIntrCb(1, &ata_intr_cb);
@@ -188,9 +180,7 @@ int atad_start(void)
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
-#ifdef DEV9_DEBUG
 out:
-#endif
     return res;
 }
 

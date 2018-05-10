@@ -157,7 +157,7 @@ static int hddGetHDLGameInfo(struct GameDataEntry *game, hdl_game_info_t *ginfo)
         ginfo->layer_break = hdl_header->layer1_start;
         ginfo->disctype = hdl_header->discType;
         ginfo->start_sector = game->lba;
-        ginfo->total_size_in_kb = game->size / 2; //size * 2048 / 1024 = 0.5x
+        ginfo->total_size_in_kb = game->size * 2; //size * 2048 / 1024 = 2x
     } else
         ret = -1;
 
@@ -216,7 +216,7 @@ int hddGetHDLGamelist(hdl_games_list_t *game_list)
                     pGameEntry->lba = dirent.stat.private_5 + (HDL_GAME_DATA_OFFSET + 4096) / 512;
                 }
 
-                pGameEntry->size += (dirent.stat.size / 4); //size in sectors * (512 / 2048)
+                pGameEntry->size += (dirent.stat.size / 4); //size in HDD sectors * (512 / 2048) = 0.25x
             }
         }
 

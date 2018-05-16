@@ -109,8 +109,11 @@ int diaShowKeyb(char *text, int maxLen, int hide_text)
 
         // Commands
         for (i = 0; i < KEYB_HEIGHT; i++) {
-            if (cmdicons[i])
-                rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, cmdicons[i]->Width, cmdicons[i]->Height, SCALING_RATIO, gDefaultCol);
+            if (cmdicons[i]) {
+                int w = (cmdicons[i]->Width * 20) / cmdicons[i]->Height;
+                int h = 20;
+                rmDrawPixmap(cmdicons[i], 436, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, w, h, SCALING_RATIO, gDefaultCol);
+            }
 
             x = 477;
             w = fntRenderString(gTheme->fonts[0], x, 170 + 3 * UI_SPACING_H * i, ALIGN_NONE, 0, 0, commands[i], gTheme->uiTextColor) - x;

@@ -1905,10 +1905,13 @@ void guiDrawBGPlasma()
 int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color)
 {
     GSTEXTURE *iconTex = thmGetTexture(iconId);
+    int w = (iconTex->Width * 20) / iconTex->Height;
+    int h = 20;
+
     if (iconTex && iconTex->Mem) {
-        y += iconTex->Height >> 1;
-        rmDrawPixmap(iconTex, x, y, ALIGN_VCENTER, iconTex->Width, iconTex->Height, SCALING_RATIO, gDefaultCol);
-        x += rmWideScale(iconTex->Width) + 2;
+        y += h >> 1;
+        rmDrawPixmap(iconTex, x, y, ALIGN_VCENTER, w, h, SCALING_RATIO, gDefaultCol);
+        x += rmWideScale(w) + 2;
     }
     else {
         // HACK: font is aligned to VCENTER, the default height icon height is 20

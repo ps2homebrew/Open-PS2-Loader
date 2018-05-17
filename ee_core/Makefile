@@ -72,10 +72,6 @@ ifeq ($(PADEMU),1)
 EE_CFLAGS += -DPADEMU
 endif
 
-ifeq ($(EESIO_DEBUG),1) 
-EE_LIBS += -lc
-endif
-
 EE_LIBS += -lkernel-nopatch
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c

@@ -140,6 +140,9 @@ int rmWideScale(int x);
 /** Get Pixel Aspect Ratio of native resolution */
 float rmGetPAR();
 
+/** Get interfaced frame mode */
+int rmGetInterlacedFrameMode();
+
 /** Scale x from 640 to native resolution */
 int rmScaleX(int x);
 

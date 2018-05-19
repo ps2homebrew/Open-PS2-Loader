@@ -43,6 +43,9 @@ PADEMU ?= 0
 #Enables/disables the cheat engine (PS2RD)
 CHEAT ?= 0
 
+#Enables/disables high resolution multi-pass rendering for the OPL GUI
+HIRES ?= 0
+
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
 DTL_T10000 ?= 0
 
@@ -57,7 +60,7 @@ DECI2_DEBUG ?= 0
 CHILDPROOF ?= 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
-REVISION = $(shell expr $$(cat DETAILED_CHANGELOG | grep "rev" | head -1 | cut -d " " -f 1 | cut -c 4-) + 1)
+REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
 
 GIT_HASH = $(shell git rev-parse --short=7 HEAD 2>/dev/null)
 ifeq ($(shell git diff --quiet; echo $$?),1)
@@ -178,6 +181,10 @@ else
   PADEMU_FLAGS = PADEMU=0
 endif
 
+ifeq ($(HIRES),1)
+  EE_CFLAGS += -DHIRES
+endif
+
 ifeq ($(DEBUG),1)
   EE_CFLAGS += -D__DEBUG -g
   EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
@@ -231,7 +238,7 @@ endif
 release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
-	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 $(EE_VPKD).ZIP
+	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 HIRES=0 $(EE_VPKD).ZIP
 
 childproof:
 	$(MAKE) CHILDPROOF=1 all
@@ -335,7 +342,8 @@ $(EE_ASM_DIR):
 $(EE_OBJS_DIR):
 	@mkdir -p $@
 
-DETAILED_CHANGELOG: make_changelog.sh
+.PHONY: DETAILED_CHANGELOG
+DETAILED_CHANGELOG:
 	sh make_changelog.sh
 
 $(EE_BIN_STRIPPED): $(EE_BIN)

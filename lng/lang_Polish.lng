@@ -1,5 +1,6 @@
-# W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbował" Jolek. Podziękowania dla misiozola i innych z Forum CDRinfo.pl za pomoc i sugestie.
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+﻿# W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbował" Jolek. Podziękowania dla Haker120, misiozola i innych z Forum CDRinfo.pl (https://forum.cdrinfo.pl/f30/) za pomoc i sugestie.
+# Oficjalny wątek na temat wersji testowych Open PS2 Loader 0.9.3+ betas znaleźć można tutaj: http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Najnowsze wersje testowe znaleźć można tutaj: https://akuhak.github.io/test_build/
 Polski
 Open PS2 Loader %s
 Zapisz zmiany
@@ -19,15 +20,15 @@ Aplikacje
 Motyw
 Język
 System zostanie wyłączony.
-Wyjdź do Przeglądarki PS2/OSDSYS?
+Czy chcesz wyjść z programu?
 Przerwać aktualizację?
 %d: Nie wykryto dysku twardego
 %d: Dysk twardy nie jest sformatowany
 %d: Wystąpił błąd podczas uruchamiania sieci
-%d: Nie wykryto network adaptora
+%d: Nie wykryto network adaptera
 %d: Nie można połączyć się z serwerem SMB
 %d: Nie można zalogować się do serwera SMB
-%d: Nie można otworzyć udział SMB
+%d: Nie można otworzyć udziału SMB
 %d: Nie można wyświetlić udziałów SMB
 %d: Nie można wyświetlić gier
 %d: Niedostępny Serwer DHCP
@@ -87,7 +88,7 @@ Maska
 Brama
 Serwer DNS
 Port
-Udostępnij
+Udostępniany folder
 Użytkownik
 Hasło
 <nie ustawiono>
@@ -107,7 +108,7 @@ Przycisk wyboru
 Błąd, gra jest pofragmentowana
 Błąd, nie można uruchomić pozycji
 Test
-Pozostaw puste dla gości.
+Pozostaw puste dla GOŚCIA.
 Dokładny odczyt
 Tryb synchroniczny
 Wymarz OPL po uruchomieniu gry
@@ -148,7 +149,7 @@ Informacje
 Alternatywny ELF
 Wybór koloru
 Połącz ponownie
-Pozostaw nieustawione aby wyświetlić listę udziałów
+Pozostaw puste aby wyświetlić listę udziałów
 Prefix ścieżki ETH
 Cofnij		
 Odstęp
@@ -174,19 +175,21 @@ Tryb łącza ethernetowego
 10Mbit pełny-dupleks
 10Mbit pół-dupleks
 Ustawienia GSM
-Włącz GSM
-Przełącz GSM wł lub wył
+Aktywuj GSM
+Przełącz GSM na włączony lub wyłączony
 Tryb wideo
 Wymuś określony tryb wyświetlania
-Poziom
+Położenie poziome
 Regulacja w poziomie
-Pion
+Położenie pionowe
 Regulacja w pionie
+Overscan
+Regulacja overscanu
 Pomiń FMV
 Pomija wstawki filmowe
 Ustawienia kodów
 Włącz silnik kodów PS2RD
-Pozwól silnikowi kodów PS2RD patchować gry
+Pozwól silnikowi kodów PS2RD patchować grę
 Tryb silnika kodów PS2RD
 Auto-wybieranie lub wybieranie kodów dla gry
 Auto-wybieranie kodów
@@ -201,30 +204,46 @@ Nie udało się połączyć z serwerem aktualizacji.
 Aktualizacja zakończona.
 Aktualizacja przerwana.
 Pobrać ustawienia z sieci?
-Niestandardowe ustawienia
+Dodatkowe ustawienia
 Pobrano domyślne
 Auto start w %i s...
 Auto start
 Wartość w sekundach, 0 wyłącza auto start
 Logo PS2
 Logo zostanie wyświetlone wyłącznie jeśli region gry i konsoli będzie taki sam
-Configure PADEMU
-Pad Emulator Settings
-Enable Pad Emulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
-DualShock3 USB
-DualShock3 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS3 Controller paired to mac address:
-Pair
-Pair DS3 controller
-Pair DS3 controller with bluetooth adapter mac address.
-Not connected
+Konfiguracja emulacji Pada
+Ustawienia emulacji Pada
+Włącz emulację Pada
+Włącza/wyłącza emulację Pada dla wybranej gry.
+Tryb emulacji Pada
+Wybierz tryb emulacji Pada.
+DualShock3/4 USB
+DualShock3/4 BT
+Ustawienia portu:
+Wybierz Port emulacji Pada dla ustawień
+Włącz emulację
+Włącz/wyłącz emulację Pada dla wybranego portu.
+Włącz wibracje.
+Włącz/wyłącz wibracje dla wybranego portu emulacji Pada.
+Adres MAC adaptera Bluetooth USB
+Kontroler DS sparowany z adresem MAC:
+Paruj
+Paruj kontroler DS
+Paruj kontroler DS z adresem mac adaptera bluetooth.
+Nie podłączony
+Informacje o adapterze Bluetooth
+Wyświetla więcej informacji i obsługiwane funkcje
+Wersja HCI:
+Wersja LMP:
+Identyfikator producenta:
+Wspierane funkcje:
+Tak
+Nie
+Adapter Bluetooth powinien być w pełni kompatybilny z kontrolerami DS3/DS4.
+Adapter Bluetooth może nie współpracować poprawnie z kontrolerami DS3/DS4.
+Włącz emulację Multitapa.
+Włącza/wyłącza emulację Multitapa dla wybranej gry.
+Emulacja Multitapa dla portu
+Wybierz port dla emulacji Multitapa.
+Nie stosuj obejścia dla klonów DS3.
+Niektóre klony DS3 wymagają obejścia, ta opcja to wyłączy.

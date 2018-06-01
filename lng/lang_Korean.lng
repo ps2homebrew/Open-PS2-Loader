@@ -182,6 +182,8 @@ H-POS
 수평 조정
 V-POS
 수직 조정
+Overscan
+Overscan Adjustment
 FMV 건너뛰기
 풀 모션 비디오 건너뛰기
 치트 설정
@@ -214,8 +216,8 @@ PADEMU 구성
 선택된 게임 패드에뮬레이터 켬/끔.
 패드 에뮬레이터 모드
 패드 에뮬레이터 모드 선택
-듀얼쇼크3 USB
-듀얼쇼크3 BT
+듀얼쇼크3/4 USB
+듀얼쇼크3/4 BT
 포트 설정:
 설정용 패드 에뮬레이터 포트 활성화.
 에뮬레이션 활성화
@@ -223,8 +225,24 @@ PADEMU 구성
 진동 활성화
 패드 에뮬레이터에 선택된 포트 진동 켬/끔
 USB 블루투스 어답터 맥 주소:
-DS3 컨트롤러 맥 주소와 페어링:
+DS 컨트롤러 맥 주소와 페어링:
 페어
-DS3 컨트롤러 페어링
-블루투스 어댑터 맥 주소가 있는 DS3 컨트롤러 페어
+DS 컨트롤러 페어링
+블루투스 어댑터 맥 주소가 있는 DS 컨트롤러 페어
 연결되지 않음
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

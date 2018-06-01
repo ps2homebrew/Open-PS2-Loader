@@ -182,6 +182,8 @@ Ajuste horizontal
 Definir compensação horizontal
 Ajuste vertical
 Definir compensação vertical
+Overscan
+Overscan Adjustment
 Saltar FMV
 Saltar vídeos
 Opções de Cheat
@@ -214,8 +216,8 @@ Ativar Emulador de Comando
 Ligar/Desligar o emulador para o jogo selecionado.
 Modo do Emulador de Comando
 Selecione o modo do Emulador de Comando.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Definições para a porta:
 Selecione a porta do Emulador de Comando para as definições.
 Ativar emulação
@@ -223,8 +225,24 @@ Ligar/Desligar o emulador para a porta selecionada.
 Ativar vibração.
 Ligar/Desligar vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
-Endereço MAC do comando DS3 emparelhado:
+Endereço MAC do comando DS emparelhado:
 Emparelhar
-Emparelhar comando DS3
-Emparelhar comando DS3 com o seguinte endereço MAC:
+Emparelhar comando DS
+Emparelhar comando DS com o seguinte endereço MAC:
 Não ligado
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

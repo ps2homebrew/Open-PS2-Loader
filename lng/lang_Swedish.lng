@@ -182,6 +182,8 @@ Horisontell position
 Ställer Horisontell offset
 Vertikal position
 Ställer Vertikal förskjutning
+Overscan
+Overscan Adjustment
 Skippa FMV
 Skippar Full Motion Video
 Inställningar Fusk
@@ -214,8 +216,8 @@ Aktivera Pad Emulator
 Slå av/på PadEmulator för valt spel.
 Pad Emulator läge
 Vlj Pad Emulator läge.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Inställningar för port:
 Välj Pad Emulator port för inställningar.
 Aktivera emulation
@@ -223,8 +225,24 @@ Slå av/på Pad Emulator för vald port.
 Aktivera vibration
 Slå av/på vibration för Pad Emulator vald port.
 Usb bluetooth adapter mac address:
-DS3 Controller parkopplad till mac address:
+DS Controller parkopplad till mac address:
 Parkoppla
-Parkoppla DS3 controller
-Parkoppla DS3 controller till bluetooth adapter mac address.
+Parkoppla DS controller
+Parkoppla DS controller till bluetooth adapter mac address.
 Ej ansluten
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

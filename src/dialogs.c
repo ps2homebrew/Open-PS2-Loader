@@ -807,7 +807,6 @@ struct UIItem diaAbout[] = {
 //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"SP193, volca, ... and the anonymous ...", -1}}},
 //END of OPL_DB tweaks
-    {UI_BREAK},
 //START of OPL_DB tweaks
     {UI_SPLITTER},
 //END of OPL_DB tweaks
@@ -829,7 +828,6 @@ struct UIItem diaAbout[] = {
 //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"ShaolinAssassin, yoshi314, and zero35.", -1}}},
 //END of OPL_DB tweaks
-    {UI_BREAK},
 //START of OPL_DB tweaks
     {UI_SPLITTER},
 //END of OPL_DB tweaks
@@ -843,6 +841,21 @@ struct UIItem diaAbout[] = {
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}},
 //START of OPL_DB tweaks
+    {UI_SPLITTER},
+//END of OPL_DB tweaks
+
+//START of OPL_DB tweaks
+    // OPL Free Statement
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OPL_FREE}}},
+    {UI_BREAK},
+
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {NULL, _STR_OPL_IFCARO}}},
+    {UI_BREAK},
+
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {NULL, _STR_OPL_DB}}},
+    {UI_BREAK},
     {UI_SPLITTER},
 //END of OPL_DB tweaks
 

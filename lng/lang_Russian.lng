@@ -182,6 +182,8 @@ ID игры
 Горизонтальное положение
 Отступить вверх или вниз
 Вертикальное положение
+Overscan
+Overscan Adjustment
 Пропуск FMV
 Пропускать Full Motion видео
 Настройка читов
@@ -214,8 +216,8 @@ PS2 логотип
 Вкл/вык Pad эмулятор для выбранной игры.
 Режим Pad эмулятора
 Выбрать режим Pad эмулятора.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Настройки для порта:
 Выбрать настройки для порта Pad эмулятора.
 Включить эмуляцию
@@ -223,8 +225,24 @@ DualShock3 BT
 Включить вибрацию
 Вкл/вык вибрацию в выбранном порте Pad эмулятора.
 Usb bluetooth адаптер МАК адрес:
-DS3 контроллер подключился к МАК адресу:
+DS контроллер подключился к МАК адресу:
 Подключение
-Подключение DS3 контроллер
-Подключение DS3 с bluetooth адаптер МАК адрес. 
+Подключение DS контроллер
+Подключение DS с bluetooth адаптер МАК адрес. 
 Не подключено
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

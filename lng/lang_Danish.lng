@@ -183,6 +183,8 @@ Horisontal justering
 Vertikal position
 Vertikal justering
 Vis ikke FMV
+Overscan
+Overscan Adjustment
 Springer over Full Motion Videos
 Snydeindstillinger
 Aktivér PS2RD Cheat Engine
@@ -214,8 +216,8 @@ Aktivér Pad Emulator
 Slå Pad Emulator Til/Fra for valgte spil.
 Pad Emulator tilstand
 Vælg Pad Emulator tilstand.
-DualShock 3 USB
-DualShock 3 BT
+DualShock 3/4 USB
+DualShock 3/4 BT
 indstillinger for port:
 Vælg Pad Emulator port for indstillinger.
 Aktivér emulering
@@ -223,8 +225,24 @@ Slå Pad Emulator Til/Fra for valgte port.
 Aktivér vibration
 Slå vibration Til/Fra for valgte Pad Emulator port.
 USB-bluetooth adapter MAC-adresse:
-DS3-controller parret til MAC-adresse:
+DS-controller parret til MAC-adresse:
 Parring
-Pardan DS3 controller
-Pardan DS3 controller med bluetooth adapters MAC-adresse.
+Pardan DS controller
+Pardan DS controller med bluetooth adapters MAC-adresse.
 Ikke tilsluttet
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

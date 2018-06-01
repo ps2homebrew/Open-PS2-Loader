@@ -182,6 +182,8 @@ H-POS
 Horizontal Adjustment
 V-POS
 Vertical Adjustment
+Overscan
+Overscan Adjustment
 FMV Skip
 Skips Full Motion Videos
 Cheat Settings
@@ -210,12 +212,12 @@ PS2 Logo
 Only displayed for a valid disc logo which matches the console's region
 Configure PADEMU
 Pad Emulator Settings
-Enable Pad Emulator
+Enable PadEmulator
 Turns on/off PadEmulator for selected game.
 Pad Emulator mode
 Select Pad Emulator mode.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Settings for port:
 Select Pad Emulator port for settings.
 Enable emulation
@@ -223,8 +225,24 @@ Turns on/off Pad Emulator for selected port.
 Enable vibration
 Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
-DS3 Controller paired to mac address:
+DS Controller paired to mac address:
 Pair
-Pair DS3 controller
-Pair DS3 controller with bluetooth adapter mac address.
+Pair DS controller
+Pair DS controller with bluetooth adapter mac address.
 Not connected
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

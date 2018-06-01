@@ -182,11 +182,13 @@ Ajuste horizontal
 Configura la posición horizontal de la pantalla
 Ajuste vertical
 Configura la posición vertical de la pantalla
+Sobre escaneo
+Ajuste sobre escaneo
 Omitir vídeos FMV
 Omite escenas Full Motion Vídeos
 Ajustes PS2RD
 Activar PS2RD
-Permitir que PS2RD parchee los juegos
+Permitir que PS2RD parchee el juego
 Modo PS2RD
 Auto-seleccionar o seleccionar códigos de juegos
 Auto-seleccionar códigos
@@ -208,23 +210,39 @@ Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
 Logotipo Playstation 2
 Sólo se mostrará si el juego es de la misma región que la consola
-Ajustes DualShock 3
+Ajustes DualShock 3/4
 Opciones emulación del mando
 Usar emulación del mando
-Activa o desactiva la emulación del mando para el juego seleccionado
+Activa/desactiva la emulación del mando para el juego seleccionado
 Modo emulación del mando
 Selecciona el modo de emulación del mando
-DualShock 3 USB
-DualShock 3 Bluetooth
+DualShock 3/4 USB
+DualShock 3/4 Bluetooth
 Ajustes para el puerto
 Selecciona el puerto del mando emulado para aplicar los ajustes
 Usar emulación
-Activa o desactiva la emulación del mando para el puerto seleccionado
+Activa/desactiva la emulación del mando para el puerto seleccionado
 Usar vibración
-Activa o desactiva la vibración para el mando emulado en el puerto seleccionado
+Activa/desactiva la vibración para el mando emulado en el puerto seleccionado
 Dirección MAC adaptador bluetooth USB:
 Mando sincronizado con dirección MAC:
 Sincronizar
-Sincronización mando DualShock 3
-Sincroniza el mando DualShock 3 con la dirección MAC del adaptador bluetooth
+Sincronización mando DualShock
+Sincroniza el mando DualShock con la dirección MAC del adaptador bluetooth
 No conectado
+Información adaptador bluetooth
+Muestra más información y las funciones soportadas
+Versión HCI:
+Versión LMP:
+ID fabricante:
+Funciones soportadas:
+Sí
+No
+El adaptador bluetooth debe ser totalmente compatible con los mandos DS3/DS4
+El adaptador bluetooth puede no funcionar correctamente con los mandos DS3/DS4
+Usar emulación Multitap
+Activa/desactiva la emulación Multitap para el juego seleccionado
+Emulación Multitap en el puerto
+Selecciona puerto para la emulación Multitap
+Desactivar método alternativo para falso DS3
+Algunos DS3 falsos necesitan un método alternativo, esta opción lo desactiva

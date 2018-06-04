@@ -184,8 +184,8 @@ H-POS
 수평 조정
 V-POS
 수직 조정
-Overscan
-Overscan Adjustment
+오버스캔
+오버스캔 조정
 FMV 건너뛰기
 풀 모션 비디오 건너뛰기
 치트 설정
@@ -232,25 +232,25 @@ DS 컨트롤러 맥 주소와 페어링:
 DS 컨트롤러 페어링
 블루투스 어댑터 맥 주소가 있는 DS 컨트롤러 페어
 연결되지 않음
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
+블루투스 어댑터 정보
+더 많은 정보와 지원되는 기능을 보여줌.
+HCI 버전:
+LMP 버전:
+제조업체 ID:
+지원 기능:
+예
+아니오
+블루투스 어댑터는 DS3/DS4 컨트롤러와 완벽하게 호환되어야 합니다.
+블루투스 어댑터가 DS3/DS4 컨트롤러에서 올바르게 작동하지 않을 수 있습니다.
+멀티탭 에뮬레이션 활성화
+선택한 게임을 위한 멀티탭 에뮬레이션 켬/끔.
+포트상의 멀티탭 에뮬레이터
+멀티탭 에뮬레이션을 위한 포트를 선택.
+Fake DS3에 대한 해결방법 비활성화
+일부 fake ds3s는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성.
+PS1 게임
+PS1 게임 표시 모드
+'%s'에 POPSTARTER.ELF이 없습니다!
+VCD 파일 '% s'을(를) 찾을 수 없습니다!
+파일 이름을 바꾸는 중 오류가 발생했습니다.
+파일을 삭제하는 중 오류가 발생했습니다.

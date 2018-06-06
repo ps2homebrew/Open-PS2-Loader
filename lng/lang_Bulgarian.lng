@@ -1,6 +1,6 @@
 # translation by vsub and wisi
-# Last update: 3/7/2018 
-# Updated for OPL_1036_DB-TA [926069d]
+# Last update: 6/3/2018 
+# Updated for OPL_1052_DB-TA [837ff55]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
 OPL %s
@@ -113,7 +113,7 @@ NetBIOS
 Прецизно четене
 Синхронен режим
 Откачане на OPL от Syscalls
-Напред Видео
+0 PSS режим
 Емулиране на DVD-DL
 Изключване на IGR
 Зареждане на модулите във висока памет
@@ -139,7 +139,7 @@ VMC файлът трябва да бъде създаден.
 Програмисти:
 Качествен контрол от:
 USB поддиректория
-Зареждане на ELF по избор при IGR
+Оставете свободно, за изход към PS2 Browser
 Стойност в минути, 0 за деактивиране
 Автоматично спиране на HDD след
 Видео режим
@@ -169,8 +169,8 @@ Game ID
 режим 6
 режим 7
 режим 8
-Настройки на GSM - избор на видеорежим в игра
-Скорост на мрежата и настройки за дуплекс
+GSM видеорежим
+Скорост на мрежата и режим
 100 Mbit пълен дуплекс
 100 Mbit полу-дуплекс
 10 Mbit пълен дуплекс
@@ -184,8 +184,8 @@ PS2 ще е задължен да го използва
 Хоризонтално отместване
 Регулиране по вертикала
 Вертикалното отместване
-Overscan
-Overscan Adjustment
+Компенсация на изрязаната област
+Регулиране областта извън видимата част на екрана
 Пропускане на FMV
 Прескача видеоклиповете (съвместимост)
 Cheat настройки
@@ -208,49 +208,52 @@ Cheats по избор
 Потребителски настройки
 Сваляне по подразбиране
 Авт.старт след %i
-Автостарт
+След
 Стойност в секунди, 0 за деактивиране.
-PS2 Logo
-Активно само при валидно лого на диска, съвпадащо с региона на конзолата.
-Configure PADEMU
-Pad Emulator Settings
-Enable PadEmulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
+PS2 Лого
+Показва се ако е валидно и съвпада с региона на конзолата
+Настройки на PADEMU
+Емулатор за контролер - настройки
+Включване на PADEMU
+Включва/изключва PADEMU за избраната игра
+Режим на емулация
+Избор на свързно устройство.
 DualShock3/4 USB
 DualShock3/4 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-USB Bluetooth adapter MAC address:
-DS Controller paired to MAC address:
-Pair
-Pair DS controller
-Pair DS controller with Bluetooth adapter MAC address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
+Настройки на порта:
+Избор на порта, за който да се зададат настройки.
+Активиране на емулацията
+Включва/изключва емулациятя за този порт.
+Активиране на вибрация
+Включва/изключва вибрация за този емулиран порт.
+USB BlueTooth MAC адрес:
+DS контролер MAC адрес:
+Свързване
+Свързване на DS контролера
+Свързване DS контролера към BlueTooth адаптера по MAC адрес
+Не е свързан
+Информация за BlueTooth адаптера
+Показва допълнителни данни и поддържани функции
+HCI версия:
+LMP версия:
+Идентификатор на производителя:
+Функции:
+да
+не
+Свързаният BlueTooth адаптер би трябвало да е напълно съвместим с DS3/DS4 контролери.
+Свързаният BlueTooth адаптер може да не работи правилно с DS3/DS4 контролери.
+Eмулиране на Multitap
+Включва/изключва емулацията на Multitap за избраната игра.
+Емулация на Multitap за порт
+Избор на порт, на който да се емулира Multitap.
+Деактивиране на корекция при фалшиви DS3
+Неоригинални DS3 контролери се нуждаят от тази корекция.  
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.
 An error occurred while deleting the file.
+Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
+ifcaro OPL version at psx-scene.com
+OPL Daily Builds (DB) version at ps2-home.com

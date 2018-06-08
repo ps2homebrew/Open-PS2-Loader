@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: 3/7/2018 
-# Updated for OPL_1036_DB-TA [926069d]
+# Last update: 6/7/2018 
+# Updated for OPL_1052_DB-TA [837ff55]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -254,3 +254,6 @@ Multitap emulator στη θύρα
 Το αρχείο VCD '%s' δε βρέθηκε!
 Παρουσιάστηκε σφάλμα κατά τη μετονομασία του αρχείου.
 Παρουσιάστηκε σφάλμα κατά τη διαγραφή του αρχείου.
+Ποτέ μην αγοράζετε το OPEN-PS2-LOADER (OPL), αντί αυτού αποκτήστε το δωρεάν:
+Έκδοση OPL του ifcaro στο psx-scene.com
+Έκδοση OPL Daily Builds (DB) στο ps2-home.com

@@ -308,8 +308,6 @@ clean:
 	$(MAKE) -C modules/vmc/genvmc clean
 	echo " -hdldsvr"
 	$(MAKE) -C modules/hdd/hdldsvr clean
-	echo " -udptty"
-	$(MAKE) -C modules/debug/udptty clean
 	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame clean
 	echo " -ioptrap"
@@ -595,11 +593,7 @@ modules/hdd/hdldsvr/hdldsvr.irx: modules/hdd/hdldsvr
 $(EE_ASM_DIR)hdldsvr.s: modules/hdd/hdldsvr/hdldsvr.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdldsvr_irx
 
-modules/debug/udptty/udptty.irx: modules/debug/udptty
-	echo " -udptty"
-	$(MAKE) -C $<
-
-$(EE_ASM_DIR)udptty.s: modules/debug/udptty/udptty.irx | $(EE_ASM_DIR)
+$(EE_ASM_DIR)udptty.s: $(PS2SDK)/iop/irx/udptty.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_irx
 
 modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame

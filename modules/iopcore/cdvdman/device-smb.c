@@ -35,7 +35,7 @@
 
 extern struct cdvdman_settings_smb cdvdman_settings;
 
-struct irx_export_table _exp_oplsmb;
+extern struct irx_export_table _exp_oplsmb;
 
 static void ps2ip_init(void);
 

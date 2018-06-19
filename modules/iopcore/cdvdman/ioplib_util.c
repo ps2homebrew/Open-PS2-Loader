@@ -30,55 +30,37 @@ static int (*SearchModuleByName)(char *modname);
 
 // modules list to fake loading
 static char *lm_modulefake_list[] = {
+#ifdef __USE_DEV9
+    "DEV9.IRX",
+#endif
 #ifdef USB_DRIVER
     "USBD.IRX",
-    "CDVDSTM.IRX",
-    NULL
 #endif
 #ifdef SMB_DRIVER
-    "DEV9.IRX",
     "SMAP.IRX",
-    "CDVDSTM.IRX",
-    NULL
 #endif
 #ifdef HDD_DRIVER
     "ATAD.IRX",
-#ifdef HDPRO
-#ifdef __IOPCORE_DEBUG
-    "DEV9.IRX",
-#endif
-#else
-    "DEV9.IRX",
 #endif
     "CDVDSTM.IRX",
     NULL
-#endif
 };
 
 static char *lmb_modulefake_list[] = {
+#ifdef __USE_DEV9
+    "dev9",
+#endif
 #ifdef USB_DRIVER
     "USB_driver",
-    "cdvd_st_driver",
-    NULL
 #endif
 #ifdef SMB_DRIVER
-    "dev9",
     "INET_SMAP_driver",
-    "cdvd_st_driver",
-    NULL
 #endif
 #ifdef HDD_DRIVER
     "atad_driver",
-#ifdef HDPRO
-#ifdef __IOPCORE_DEBUG
-    "dev9",
-#endif
-#else
-    "dev9",
 #endif
     "cdvd_st_driver",
     NULL
-#endif
 };
 
 static int fakemod_flag = 0;

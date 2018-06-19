@@ -10,7 +10,6 @@
 #include "oplsmb.h"
 #include "smb.h"
 #include "smstcpip.h"
-#include "dev9.h"
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"
@@ -36,7 +35,6 @@
 
 extern struct cdvdman_settings_smb cdvdman_settings;
 
-struct irx_export_table _exp_dev9;
 struct irx_export_table _exp_oplsmb;
 
 static void ps2ip_init(void);
@@ -74,9 +72,6 @@ void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback)
 
 void DeviceInit(void)
 {
-    RegisterLibraryEntries(&_exp_dev9);
-    dev9d_init();
-
     RegisterLibraryEntries(&_exp_oplsmb);
 }
 

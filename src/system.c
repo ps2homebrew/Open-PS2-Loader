@@ -14,6 +14,7 @@
 #include "include/usbsupport.h"
 #include "include/OSDHistory.h"
 #include "include/renderman.h"
+#include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
 
 #ifdef PADEMU
@@ -30,9 +31,6 @@ typedef struct
     int VMC_thread_priority;
     int VMC_card_slot;
 } createVMCparam_t;
-
-extern void *genvmc_irx;
-extern int size_genvmc_irx;
 #endif
 #ifdef GSM
 #include "include/pggsm.h"
@@ -41,106 +39,11 @@ extern int size_genvmc_irx;
 #include "include/pgcht.h"
 #endif
 
-extern void *udnl_irx;
-extern int size_udnl_irx;
-
-extern void *imgdrv_irx;
-extern int size_imgdrv_irx;
-
-extern void *cdvdfsv_irx;
-extern int size_cdvdfsv_irx;
-
-extern void *isofs_irx;
-extern int size_isofs_irx;
-
-extern void *ps2dev9_irx;
-extern int size_ps2dev9_irx;
-
-extern void *smstcpip_irx;
-extern int size_smstcpip_irx;
-
-extern void *ingame_smstcpip_irx;
-extern int size_ingame_smstcpip_irx;
-
-extern void *smap_irx;
-extern int size_smap_irx;
-
-extern void *smap_ingame_irx;
-extern int size_smap_ingame_irx;
-
-extern void *smbinit_irx;
-extern int size_smbinit_irx;
-
-extern void *iomanx_irx;
-extern int size_iomanx_irx;
-
-extern void *filexio_irx;
-extern int size_filexio_irx;
-
-extern void *poweroff_irx;
-extern int size_poweroff_irx;
-
-extern void *ps2atad_irx;
-extern int size_ps2atad_irx;
-
-extern void *ps2hdd_irx;
-extern int size_ps2hdd_irx;
-
-#ifdef _DTL_T10000
-extern void *sio2man_irx;
-extern int size_sio2man_irx;
-
-extern void *padman_irx;
-extern int size_padman_irx;
-
-extern void *mcman_irx;
-extern int size_mcman_irx;
-
-extern void *mcserv_irx;
-extern int size_mcserv_irx;
-#endif
-
-extern void *hdldsvr_irx;
-extern int size_hdldsvr_irx;
-
 extern void *eecore_elf;
 extern int size_eecore_elf;
 
 extern void *elfldr_elf;
 extern int size_elfldr_elf;
-
-extern void *pusbd_irx;
-extern int size_pusbd_irx;
-
-#ifdef PADEMU
-extern void *ds34bt_irx;
-extern int size_ds34bt_irx;
-
-extern void *ds34usb_irx;
-extern int size_ds34usb_irx;
-
-extern void *bt_pademu_irx;
-extern int size_bt_pademu_irx;
-
-extern void *usb_pademu_irx;
-extern int size_usb_pademu_irx;
-#endif
-
-#ifdef __INGAME_DEBUG
-extern void *udptty_ingame_irx;
-extern int size_udptty_ingame_irx;
-
-extern void *ioptrap_irx;
-extern int size_ioptrap_irx;
-#endif
-
-#ifdef __DECI2_DEBUG
-extern void *drvtif_irx;
-extern int size_drvtif_irx;
-
-extern void *tifinet_irx;
-extern int size_tifinet_irx;
-#endif
 
 extern unsigned char IOPRP_img[];
 extern unsigned int size_IOPRP_img;

@@ -193,6 +193,15 @@ a lot of data that needs to be copied, this should be set high. */
 #endif
 #define ARP_QUEUEING 1
 
+/**
+ * If defined to 1, cache entries are updated or added for every kind of ARP traffic
+ * or broadcast IP traffic. Recommended for routers.
+ * If defined to 0, only existing cache entries are updated. Entries are added when
+ * lwIP is sending to them. Recommended for embedded devices.
+ */
+//Do not always insert ARP entries, as the ARP table is small.
+#define ETHARP_ALWAYS_INSERT 0
+
 /* ---------- IP options ---------- */
 /* Define IP_FORWARD to 1 if you wish to have the ability to forward
    IP packets across network interfaces. If you are going to run lwIP

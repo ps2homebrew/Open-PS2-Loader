@@ -544,21 +544,29 @@ sys_sem_t sys_sem_new(u8_t aCount)
 
 } /* end sys_sem_new */
 
+static unsigned int TimeoutHandler(void* pvArg)
+{
+    iReleaseWaitThread((int)pvArg);
+    return 0;
+}
+
 u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
 {
 
-    if (!aTimeout)
-        return WaitSema(aSema);
+    if (aTimeout == 0)
+        return(WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
+    else if (aTimeout == 1)
+        return(PollSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
     else {
 
         iop_sys_clock_t lTimeout;
         int lTID = GetThreadId();
 
         USec2SysClock(aTimeout * 1024, &lTimeout);
-        SetAlarm(&lTimeout, (unsigned (*)(void *))iReleaseWaitThread, (void *)lTID);
+        SetAlarm(&lTimeout, &TimeoutHandler, (void *)lTID);
 
         if (!WaitSema(aSema)) {
-            CancelAlarm((unsigned (*)(void *))iReleaseWaitThread, (void *)lTID);
+            CancelAlarm(&TimeoutHandler, (void *)lTID);
             --aTimeout;
         } else
             aTimeout = SYS_ARCH_TIMEOUT;

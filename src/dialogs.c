@@ -496,7 +496,7 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_MTAP, 1, 1, _STR_HINT_MTAP_ENABLE, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
-    
+
     {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_MTAP_PORT}}},
     {UI_SPACER},
     {UI_INT, PADCFG_PADEMU_MTAP_PORT, 1, 1, _STR_HINT_MTAP_PORT, 0, 0, {.intvalue = {1, 1, 1, 2}}},
@@ -547,7 +547,7 @@ struct UIItem diaPadEmuConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-    
+
 struct UIItem diaPadEmuInfo[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BTINFO}}}, {UI_SPACER},
 
@@ -773,6 +773,10 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}},
+    {UI_BREAK},
+
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Maximus32", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},

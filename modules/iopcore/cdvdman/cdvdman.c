@@ -82,6 +82,9 @@ extern struct irx_export_table _exp_smsutils;
 #ifdef VMC_DRIVER
 extern struct irx_export_table _exp_oplutils;
 #endif
+#ifdef __USE_DEV9
+extern struct irx_export_table _exp_dev9;
+#endif
 
 struct dirTocEntry
 {
@@ -222,7 +225,7 @@ static unsigned char sync_flag;
 static unsigned char cdvdman_cdinited = 0;
 static unsigned int ReadPos = 0; /* Current buffer offset in 2048-byte sectors. */
 
-#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+#ifdef __USE_DEV9
 static int POFFThreadID;
 #endif
 
@@ -264,7 +267,7 @@ static void fs_init(void)
 }
 
 //-------------------------------------------------------------------------
-#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+#ifdef __USE_DEV9
 static void cdvdman_poff_thread(void *arg)
 {
     int stat;
@@ -277,7 +280,7 @@ static void cdvdman_poff_thread(void *arg)
 
 static void cdvdman_init(void)
 {
-#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+#ifdef __USE_DEV9
     iop_thread_t ThreadData;
 #endif
 
@@ -286,7 +289,7 @@ static void cdvdman_init(void)
 
         fs_init();
 
-#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+#ifdef __USE_DEV9
         if (cdvdman_settings.common.flags & IOPCORE_ENABLE_POFF) {
             ThreadData.attr = TH_C;
             ThreadData.option = 0xABCD0001;
@@ -1784,7 +1787,7 @@ static int intrh_cdrom(void *common)
         iSetEventFlag(cdvdman_stat.intr_ef, 0x14); //Notify FILEIO and CDVDFSV of the power-off event.
 
 //Call power-off callback here. OPL doesn't handle one, so do nothing.
-#if (defined(HDD_DRIVER) && !defined(HD_PRO)) || defined(SMB_DRIVER)
+#ifdef __USE_DEV9
         if (cdvdman_settings.common.flags & IOPCORE_ENABLE_POFF) {
             //If IGR is disabled, switch off the console.
             iWakeupThread(POFFThreadID);
@@ -1815,6 +1818,11 @@ int _start(int argc, char **argv)
     RegisterLibraryEntries(&_exp_cdvdstm);
 
     RegisterLibraryEntries(&_exp_smsutils);
+#ifdef __USE_DEV9
+    RegisterLibraryEntries(&_exp_dev9);
+    dev9d_init();
+#endif
+
     DeviceInit();
 
 #ifdef VMC_DRIVER

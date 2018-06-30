@@ -53,7 +53,7 @@ DECLARE_EXPORT_TABLE(cdvdman, 1, 1)
 	DECLARE_EXPORT(sceCdReadCdda)
 	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(_dummy)
-	DECLARE_EXPORT(_dummy)	
+	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(sceCdGetReadPos)
 	DECLARE_EXPORT(_dummy)
 	DECLARE_EXPORT(_dummy)
@@ -136,67 +136,7 @@ DECLARE_EXPORT_TABLE(cdvdstm, 1, 1)
 	DECLARE_EXPORT(_retonly)
 END_EXPORT_TABLE
 
-#ifdef SMB_DRIVER
-// dev9 export table
-DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9d_init)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_ret0)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(dev9RegisterIntrCb)
-	DECLARE_EXPORT(dev9DmaTransfer)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(dev9IntrEnable)
-	DECLARE_EXPORT(dev9IntrDisable)
-	DECLARE_EXPORT(dev9GetEEPROM)
-	DECLARE_EXPORT(dev9LEDCtl)
-	DECLARE_EXPORT(_ret0)
-	DECLARE_EXPORT(dev9RegisterPreDmaCb)
-	DECLARE_EXPORT(dev9RegisterPostDmaCb)
-END_EXPORT_TABLE
-#endif
-
 #ifdef HDD_DRIVER
-#ifdef HD_PRO
-#ifdef __IOPCORE_DEBUG
-// dev9 export table
-DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9d_init)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_ret0)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(dev9RegisterIntrCb)
-	DECLARE_EXPORT(dev9DmaTransfer)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(dev9IntrEnable)
-	DECLARE_EXPORT(dev9IntrDisable)
-	DECLARE_EXPORT(dev9GetEEPROM)
-	DECLARE_EXPORT(dev9LEDCtl)
-	DECLARE_EXPORT(_ret0)
-	DECLARE_EXPORT(dev9RegisterPreDmaCb)
-	DECLARE_EXPORT(dev9RegisterPostDmaCb)
-END_EXPORT_TABLE
-#endif
-#else
-// dev9 export table
-DECLARE_EXPORT_TABLE(dev9, 1, 7)
-	DECLARE_EXPORT(dev9d_init)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(_ret0)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(dev9RegisterIntrCb)
-	DECLARE_EXPORT(dev9DmaTransfer)
-	DECLARE_EXPORT(_retonly)
-	DECLARE_EXPORT(dev9IntrEnable)
-	DECLARE_EXPORT(dev9IntrDisable)
-	DECLARE_EXPORT(dev9GetEEPROM)
-	DECLARE_EXPORT(dev9LEDCtl)
-	DECLARE_EXPORT(_ret0)
-	DECLARE_EXPORT(dev9RegisterPreDmaCb)
-	DECLARE_EXPORT(dev9RegisterPostDmaCb)
-END_EXPORT_TABLE
-#endif
-
 // atad export table
 DECLARE_EXPORT_TABLE(atad, 1, 3)
 	DECLARE_EXPORT(atad_start)
@@ -221,7 +161,6 @@ DECLARE_EXPORT_TABLE(atad, 1, 3)
 END_EXPORT_TABLE
 #endif
 
-#ifdef USB_DRIVER
 #ifdef __USE_DEV9
 // dev9 export table
 DECLARE_EXPORT_TABLE(dev9, 1, 7)
@@ -240,7 +179,6 @@ DECLARE_EXPORT_TABLE(dev9, 1, 7)
 	DECLARE_EXPORT(dev9RegisterPreDmaCb)
 	DECLARE_EXPORT(dev9RegisterPostDmaCb)
 END_EXPORT_TABLE
-#endif
 #endif
 
 // smsutils export table

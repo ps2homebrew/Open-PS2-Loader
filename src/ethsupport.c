@@ -9,6 +9,7 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
+#include "include/extern_irx.h"
 #ifdef CHEAT
 #include "include/cheatman.h"
 #endif
@@ -16,38 +17,6 @@
 
 #include "include/nbns.h"
 #include "httpclient.h"
-
-extern void *smb_cdvdman_irx;
-extern int size_smb_cdvdman_irx;
-
-extern void *smsutils_irx;
-extern int size_smsutils_irx;
-
-extern void *ps2ip_irx;
-extern int size_ps2ip_irx;
-
-extern void *smap_irx;
-extern int size_smap_irx;
-
-extern void *smbman_irx;
-extern int size_smbman_irx;
-
-extern void *nbns_irx;
-extern int size_nbns_irx;
-
-extern void *httpclient_irx;
-extern int size_httpclient_irx;
-
-extern void *netman_irx;
-extern int size_netman_irx;
-
-extern void *ps2ips_irx;
-extern int size_ps2ips_irx;
-
-#ifdef VMC
-extern void *smb_mcemu_irx;
-extern int size_smb_mcemu_irx;
-#endif
 
 static char ethPrefix[40]; //Contains the full path to the folder where all the games are.
 static char *ethBase;

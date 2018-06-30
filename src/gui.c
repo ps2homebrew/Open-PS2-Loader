@@ -232,6 +232,9 @@ void guiShowAbout()
 #ifdef PADEMU
     strcat(OPLVersion, " PADEMU");
 #endif
+#ifdef HIRES
+    strcat(OPLVersion, " HIRES");
+#endif
 
     diaSetLabel(diaAbout, 1, OPLVersion);
 
@@ -895,7 +898,7 @@ static void guiShowPadEmuConfig(void)
     int PadEmuMtap, PadEmuMtapPort, PadEmuEnable, i;
 
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
-    
+
     PadEmuMtap = (PadEmuSettings >> 24) & 1;
     PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
 
@@ -905,14 +908,14 @@ static void guiShowPadEmuConfig(void)
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
-    
+
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuMtap);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
-    
+
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &PadEmuEnable);
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
-    
+
     if (PadEmuMtap) {
         diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
         PadEmuSettings |= 0x00000E00;
@@ -934,11 +937,11 @@ static void guiShowPadEmuConfig(void)
                 }
             }
         }
-        
+
         if (result == PADCFG_BTINFO) {
             for (i = PADCFG_FEAT_START; i < PADCFG_FEAT_END + 1; i++)
                 diaSetLabel(diaPadEmuInfo, i, _l(_STR_NO));
-            
+
             diaSetLabel(diaPadEmuInfo, PADCFG_VID, _l(_STR_NOT_CONNECTED));
             diaSetLabel(diaPadEmuInfo, PADCFG_PID, _l(_STR_NOT_CONNECTED));
             diaSetLabel(diaPadEmuInfo, PADCFG_REV, _l(_STR_NOT_CONNECTED));

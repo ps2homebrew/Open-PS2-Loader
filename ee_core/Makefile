@@ -24,7 +24,7 @@ MAPFILE = ee_core.map
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
 EE_CFLAGS = -D_EE -Os -G0 -Wall $(EE_INCS)
 
-ifeq ($(EESIO_DEBUG),1) 
+ifeq ($(EESIO_DEBUG),1)
 EE_CFLAGS += -D__EESIO_DEBUG
 endif
 
@@ -72,10 +72,6 @@ ifeq ($(PADEMU),1)
 EE_CFLAGS += -DPADEMU
 endif
 
-ifeq ($(EESIO_DEBUG),1) 
-EE_LIBS += -lc
-endif
-
 EE_LIBS += -lkernel-nopatch
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
@@ -93,8 +89,7 @@ $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.s
 $(EE_BIN) : $(EE_OBJS)
 	$(EE_CC) $(EE_CFLAGS) $(EE_LDFLAGS) -o $(EE_BIN) $(EE_OBJS) $(EE_LIBS)
 
-all:
-	$(EE_BIN)
+all: $(EE_BIN)
 
 clean:
 	rm -f -r $(EE_OBJS_DIR) $(EE_BIN) $(MAPFILE)

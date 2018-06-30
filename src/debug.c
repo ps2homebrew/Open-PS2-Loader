@@ -8,33 +8,8 @@
 #include "include/ethsupport.h"
 #include "include/system.h"
 #include "include/ioman.h"
+#include "include/extern_irx.h"
 
-extern void *netman_irx;
-extern int size_netman_irx;
-
-extern void *dns_irx;
-extern int size_dns_irx;
-
-extern void *ps2ips_irx;
-extern int size_ps2ips_irx;
-
-extern void *ps2ip_irx;
-extern int size_ps2ip_irx;
-
-extern void *smap_irx;
-extern int size_smap_irx;
-
-extern void *udptty_irx;
-extern int size_udptty_irx;
-
-extern void *ioptrap_irx;
-extern int size_ioptrap_irx;
-
-extern void *ps2link_irx;
-extern int size_ps2link_irx;
-
-extern void *smsutils_irx;
-extern int size_smsutils_irx;
 
 int debugSetActive(void)
 {

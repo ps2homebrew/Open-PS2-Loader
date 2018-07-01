@@ -525,7 +525,7 @@ struct UIItem diaPadEmuConfig[] = {
     {UI_SPACER},
     {UI_BOOL, PADCFG_PADEMU_MTAP, 1, 1, _STR_HINT_MTAP_ENABLE, 0, 0, {.intvalue = {1, 1}}},
     {UI_BREAK},
-    
+
     {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_MTAP_PORT}}},
     {UI_SPACER},
     {UI_INT, PADCFG_PADEMU_MTAP_PORT, 1, 1, _STR_HINT_MTAP_PORT, 0, 0, {.intvalue = {1, 1, 1, 2}}},
@@ -576,7 +576,7 @@ struct UIItem diaPadEmuConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-    
+
 struct UIItem diaPadEmuInfo[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BTINFO}}}, {UI_SPACER},
 
@@ -799,13 +799,13 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
 //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, misfire, Polo35, ps2netbox/ps2usb, reprep,", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, Maximus32, misfire, Polo35, ps2netbox/ps2usb,", -1}}},
 //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
 //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"SP193, volca, ... and the anonymous ...", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"reprep, SP193, volca, ... and the anonymous ...", -1}}},
 //END of OPL_DB tweaks
 //START of OPL_DB tweaks
     {UI_SPLITTER},

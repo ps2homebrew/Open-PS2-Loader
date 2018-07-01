@@ -9,6 +9,7 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
+#include "include/extern_irx.h"
 #ifdef CHEAT
 #include "include/cheatman.h"
 #endif
@@ -17,32 +18,6 @@
 #include <hdd-ioctl.h>
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
-
-extern void *hdd_cdvdman_irx;
-extern int size_hdd_cdvdman_irx;
-
-extern void *hdd_hdpro_cdvdman_irx;
-extern int size_hdd_hdpro_cdvdman_irx;
-
-extern void *ps2atad_irx;
-extern int size_ps2atad_irx;
-
-extern void *hdpro_atad_irx;
-extern int size_hdpro_atad_irx;
-
-extern void *ps2hdd_irx;
-extern int size_ps2hdd_irx;
-
-extern void *xhdd_irx;
-extern int size_xhdd_irx;
-
-extern void *ps2fs_irx;
-extern int size_ps2fs_irx;
-
-#ifdef VMC
-extern void *hdd_mcemu_irx;
-extern int size_hdd_mcemu_irx;
-#endif
 
 static unsigned char hddForceUpdate = 1;
 static unsigned char hddHDProKitDetected = 0;

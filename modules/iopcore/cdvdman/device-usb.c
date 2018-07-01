@@ -7,7 +7,6 @@
 #include "smsutils.h"
 #include "mass_common.h"
 #include "mass_stor.h"
-#include "dev9.h"
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"
@@ -33,10 +32,6 @@
 #include "device.h"
 
 extern struct cdvdman_settings_usb cdvdman_settings;
-
-#ifdef __USE_DEV9
-struct irx_export_table _exp_dev9;
-#endif
 
 static void usbd_init(void);
 
@@ -66,10 +61,6 @@ static void usbd_init(void)
 
 void DeviceInit(void)
 {
-#ifdef __USE_DEV9
-    RegisterLibraryEntries(&_exp_dev9);
-    dev9d_init();
-#endif
 }
 
 void DeviceDeinit(void)

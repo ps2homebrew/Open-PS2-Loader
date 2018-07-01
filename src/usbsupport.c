@@ -9,27 +9,11 @@
 #include "include/textures.h"
 #include "include/ioman.h"
 #include "include/system.h"
+#include "include/extern_irx.h"
 #ifdef CHEAT
 #include "include/cheatman.h"
 #endif
 #include "modules/iopcore/common/cdvd_config.h"
-
-extern void *usb_cdvdman_irx;
-extern int size_usb_cdvdman_irx;
-
-extern void *usbd_irx;
-extern int size_usbd_irx;
-
-extern void *usbhdfsd_irx;
-extern int size_usbhdfsd_irx;
-
-extern void *usbhdfsdfsv_irx;
-extern int size_usbhdfsdfsv_irx;
-
-#ifdef VMC
-extern void *usb_mcemu_irx;
-extern int size_usb_mcemu_irx;
-#endif
 
 void *pusbd_irx = NULL;
 int size_pusbd_irx = 0;

@@ -550,8 +550,23 @@ static unsigned int TimeoutHandler(void* pvArg)
     return 0;
 }
 
+static u32_t ComputeTimeDiff(const iop_sys_clock_t* pStart, const iop_sys_clock_t* pEnd)
+{
+    iop_sys_clock_t Diff;
+    u32 iSec, iUSec, iDiff;
+
+    Diff.lo = pEnd->lo-pStart->lo;
+    Diff.hi = pEnd->hi-pStart->hi - (pStart->lo>pEnd->lo);
+
+    SysClock2USec(&Diff, &iSec, &iUSec);
+    iDiff=(iSec * 1000) + (iUSec / 1000);
+
+    return((iDiff != 0) ? iDiff : 1);
+}
+
 u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
 {
+    u32 WaitTime;
 
     if (aTimeout == 0)
         return(WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
@@ -560,20 +575,27 @@ u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
     else {
 
         iop_sys_clock_t lTimeout;
+        iop_sys_clock_t Start;
+        iop_sys_clock_t End;
         int lTID = GetThreadId();
 
-        USec2SysClock(aTimeout * 1024, &lTimeout);
+        GetSystemTime(&Start);
+        USec2SysClock(aTimeout * 1000, &lTimeout);
         SetAlarm(&lTimeout, &TimeoutHandler, (void *)lTID);
 
         if (!WaitSema(aSema)) {
             CancelAlarm(&TimeoutHandler, (void *)lTID);
-            --aTimeout;
+            GetSystemTime(&End);
+
+            WaitTime = ComputeTimeDiff(&Start, &End);
+            if (WaitTime > aTimeout)
+              WaitTime = aTimeout;
         } else
-            aTimeout = SYS_ARCH_TIMEOUT;
+            WaitTime = SYS_ARCH_TIMEOUT;
 
     } /* end else */
 
-    return aTimeout;
+    return WaitTime;
 
 } /* end sys_arch_sem_wait */
 

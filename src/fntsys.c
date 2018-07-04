@@ -737,6 +737,7 @@ void fntFitString(int id, unsigned char *string, size_t width)
     unsigned char *str = string;
     size_t spacewidth = fntCalcDimensions(id, " ");
     unsigned char *psp = NULL;
+    width = rmScaleX(width);
 
     while (*str) {
         // scan forward to the next whitespace

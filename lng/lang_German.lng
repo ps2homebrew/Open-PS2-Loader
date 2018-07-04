@@ -182,6 +182,8 @@ H-POS
 Horizontale Einstellung
 V-POS
 Vertikale Einstellung
+Overscan
+Overscan Adjustment
 Videosequenzen (FMV) überspringen
 Überspringe Full Motion Videos
 Cheat Einstellungen
@@ -214,8 +216,8 @@ Pad Emulator aktivieren
 Aktiviere/deaktiviere den Pad Emulator für das ausgewählte Spiel.
 Pad Emulator Modus
 Wähle Pad Emulator Modus
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Einstellungen für Anschluss:
 Wähle Pad Emulator Anschluss für die Einstellungen.
 Emulation aktivieren
@@ -223,8 +225,24 @@ Aktiviert/deaktiviert den Pad Emulator für den ausgewählten Anschluss.
 Vibration aktivieren
 Aktiviert/deaktiviert die Vibration für den ausgewählten Anschluss.
 USB Bluetooth-Aadapter MAC-Adresse:
-DS3 Controller verbunden zur MAC-Adresse:
+DS Controller verbunden zur MAC-Adresse:
 Verbinden
-Verbinde DS3 Controller
-Verbinde DS3 Controller mit Bluetooth-Adapter MAC-Adresse.
+Verbinde DS Controller
+Verbinde DS Controller mit Bluetooth-Adapter MAC-Adresse.
 Nicht verbunden
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

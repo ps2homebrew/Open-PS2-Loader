@@ -21,6 +21,7 @@
 #include "include/config.h"
 #include "include/util.h"
 #include "include/compatupd.h"
+#include "include/extern_irx.h"
 #include "httpclient.h"
 
 #include "include/supportbase.h"
@@ -1002,15 +1003,6 @@ int oplUpdateGameCompatSingle(int id, item_list_t *support, config_set_t *config
 // ----------------------------------------------------------
 // -------------------- HD SRV Support ----------------------
 // ----------------------------------------------------------
-extern void *ps2atad_irx;
-extern int size_ps2atad_irx;
-
-extern void *ps2hdd_irx;
-extern int size_ps2hdd_irx;
-
-extern void *hdldsvr_irx;
-extern int size_hdldsvr_irx;
-
 static int loadHdldSvr(void)
 {
     int ret, padStatus;

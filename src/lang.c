@@ -199,7 +199,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Skips Full Motion Videos",
     "Cheat Settings",
     "Enable PS2RD Cheat Engine",
-    "Lets PS2RD Cheat Engine patch your games",
+    "Lets PS2RD Cheat Engine patch your game",
     "PS2RD Cheat Engine Mode",
     "Auto-select or Select game cheats",
     "Auto-select cheats",

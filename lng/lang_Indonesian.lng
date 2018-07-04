@@ -182,6 +182,8 @@ H-POS
 Penyesuaian horisontal
 V-POS
 Penyesuaian Vertikal
+Overscan
+Overscan Adjustment
 Lewati FMV
 Lompati Video Gerakan Penuh
 Setingan Cheat
@@ -214,8 +216,8 @@ Aktifkan Stik Emulator
 Hidup/matikan StikEmulator game dipilih.
 mode Stik Emulator
 Pilih mode Stik Emulator
-USB DualShock3
-BT DualShock3
+USB DualShock3/4
+BT DualShock3/4
 Setingan untuk port:
 Pilih port Stik Emulator untuk setingan
 Aktifkan emulasi
@@ -223,8 +225,24 @@ Hidup/matikan Stik Emulator port dipilih
 Aktifkan getar
 Hidup/matikan getar Stik Emulator port dipilih
 Alamat mac adaptor bluetooth Usb
-Kendali DS3 dipasangkan ke alamat mac:
+Kendali DS dipasangkan ke alamat mac:
 Pasangan
-Pasangan Kendali DS3
-Pasangan kendali DS3 dgn alamat mac adaptor bluetooth
+Pasangan Kendali DS
+Pasangan kendali DS dgn alamat mac adaptor bluetooth
 Tak tersambung
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

@@ -182,6 +182,8 @@ Vízszintes-Pozíció
 Vízszintes Szabályozás
 Függőleges-Pozíció
 Függőleges Szabályozás
+Overscan
+Overscan Adjustment
 FMV Átugrása
 Átugorja a  Full Motion Videókat
 Csalás Beállítások
@@ -214,8 +216,8 @@ Pad Emulátor engedélyezése
 Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
 Pad Emulátor mód
 Válassza ki a  Pad Emulátor módját.
-DualShock3 USB
-DualShock3 BT
+DualShock3/4 USB
+DualShock3/4 BT
 Port beállítások:
 Válassza ki a Pad Emulátor portot a beállításokhoz.
 Emuláció engedélyezése
@@ -223,8 +225,24 @@ Be/ki kapcsolja a Pad Emulátor-t a kiválasztott porthoz.
 Rezgés engedélyezése
 Be/ki kapcsolja a rezgést a Pad Emulátor kiválasztott portjához.
 Usb bluetooth adapter mac címe:
-DS3 Kontroller párosítva erre a mac címre :
+DS Kontroller párosítva erre a mac címre :
 Párosítás
-DS3 kontroller párosítása
-DS3 kontroller párosítása bluetooth adapter mac címmel.
+DS kontroller párosítása
+DS kontroller párosítása bluetooth adapter mac címmel.
 Nincs csatlakoztatva
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.

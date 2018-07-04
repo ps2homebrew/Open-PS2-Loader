@@ -49,7 +49,7 @@ static inline int CopyFromFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, i
     u16 OldDMACtrl;
 
     //Attempt to steal the DMA channel from the DEV9 module.
-    if ((result = length / 128) > 0) {
+    if ((result = length / 64) > 0) {
         OldDMACtrl = SPD_REG16(SPD_R_DMA_CTRL);
 
         while (dmac_ch_get_chcr(IOP_DMAC_DEV9) & DMAC_CHCR_TR) {

@@ -135,7 +135,7 @@ a lot of data that needs to be copied, this should be set high. */
 /* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
    timeouts. */
 #ifndef MEMP_NUM_SYS_TIMEOUT
-#define MEMP_NUM_SYS_TIMEOUT 3
+#define MEMP_NUM_SYS_TIMEOUT (LWIP_TCP + LWIP_ARP)
 #endif
 
 /* The following four are used only with the sequential API and can be

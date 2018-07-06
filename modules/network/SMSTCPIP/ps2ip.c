@@ -58,13 +58,9 @@ struct sys_mbox
 typedef struct ip_addr IPAddr;
 
 #define MODNAME "TCP/IP Stack"
-IRX_ID(MODNAME, 1, 4);
+IRX_ID(MODNAME, 1, 5);
 
 extern struct irx_export_table _exp_ps2ip;
-
-#ifdef PS2IP_DHCP
-static int iTimerDHCP = 0;
-#endif /* PS2IP_DHCP */
 
 #if LWIP_HAVE_LOOPIF
 static NetIF LoopIF;
@@ -152,79 +148,6 @@ int ps2ip_setconfig(t_ip_info *pInfo)
     return 1;
 
 } /* end ps2ip_setconfig */
-
-#define ALARM_TCP 0x00000001
-#define ALARM_ARP 0x00000002
-#define ALARM_MSK (ALARM_TCP | ALARM_ARP)
-
-typedef struct AlarmData
-{
-
-    int m_EventFlag;
-    unsigned long m_EventMask;
-    iop_sys_clock_t m_Clock;
-
-} AlarmData;
-
-unsigned int _alarm(void *apArg)
-{
-
-    AlarmData *lpData = (AlarmData *)apArg;
-
-    iSetEventFlag(lpData->m_EventFlag, lpData->m_EventMask);
-
-    return lpData->m_Clock.lo;
-
-} /* end _alarm */
-
-static void TimerThread(void *apArg)
-{
-
-    AlarmData lTCPData;
-    AlarmData lARPData;
-    iop_event_t lEvent;
-
-    lEvent.attr = 0;
-    lEvent.bits = 0;
-    lTCPData.m_EventFlag =
-        lARPData.m_EventFlag = CreateEventFlag(&lEvent);
-    lTCPData.m_EventMask = ALARM_TCP;
-    lARPData.m_EventMask = ALARM_ARP;
-    USec2SysClock(TCP_TMR_INTERVAL * 1024, &lTCPData.m_Clock);
-    USec2SysClock(ARP_TMR_INTERVAL * 1024, &lARPData.m_Clock);
-
-    SetAlarm(&lTCPData.m_Clock, _alarm, &lTCPData);
-    SetAlarm(&lARPData.m_Clock, _alarm, &lARPData);
-
-    while (1) {
-
-        unsigned long lRes;
-
-        WaitEventFlag(lTCPData.m_EventFlag, ALARM_MSK, WEF_CLEAR | WEF_OR, &lRes);
-
-#if LWIP_TCP
-        if (lRes & ALARM_TCP)
-            tcp_tmr();
-#endif
-        if (lRes & ALARM_ARP)
-            etharp_tmr();
-
-    } /* end while */
-
-} /* end TimerThread */
-
-static void InitTimer(void)
-{
-
-    iop_thread_t lThread = {TH_C, 0, TimerThread, 0x800, SYS_THREAD_PRIO_BASE};
-    int lTID = CreateThread(&lThread);
-
-    if (lTID < 0)
-        ExitDeleteThread();
-
-    StartThread(lTID, NULL);
-
-} /* end InitTimer */
 
 #ifdef INGAME_DRIVER
 typedef struct InputMSG
@@ -386,7 +309,6 @@ int _start(int argc, char **argv)
 #if LWIP_HAVE_LOOPIF
     AddLoopIF();
 #endif /* LWIP_HAVE_LOOPIF */
-    InitTimer();
 
     return MODULE_RESIDENT_END;
 
@@ -550,8 +472,23 @@ static unsigned int TimeoutHandler(void* pvArg)
     return 0;
 }
 
+static u32_t ComputeTimeDiff(const iop_sys_clock_t* pStart, const iop_sys_clock_t* pEnd)
+{
+    iop_sys_clock_t Diff;
+    u32 iSec, iUSec, iDiff;
+
+    Diff.lo = pEnd->lo-pStart->lo;
+    Diff.hi = pEnd->hi-pStart->hi - (pStart->lo>pEnd->lo);
+
+    SysClock2USec(&Diff, &iSec, &iUSec);
+    iDiff=(iSec * 1000) + (iUSec / 1000);
+
+    return((iDiff != 0) ? iDiff : 1);
+}
+
 u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
 {
+    u32 WaitTime;
 
     if (aTimeout == 0)
         return(WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
@@ -560,20 +497,27 @@ u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
     else {
 
         iop_sys_clock_t lTimeout;
+        iop_sys_clock_t Start;
+        iop_sys_clock_t End;
         int lTID = GetThreadId();
 
-        USec2SysClock(aTimeout * 1024, &lTimeout);
+        GetSystemTime(&Start);
+        USec2SysClock(aTimeout * 1000, &lTimeout);
         SetAlarm(&lTimeout, &TimeoutHandler, (void *)lTID);
 
         if (!WaitSema(aSema)) {
             CancelAlarm(&TimeoutHandler, (void *)lTID);
-            --aTimeout;
+            GetSystemTime(&End);
+
+            WaitTime = ComputeTimeDiff(&Start, &End);
+            if (WaitTime > aTimeout)
+              WaitTime = aTimeout;
         } else
-            aTimeout = SYS_ARCH_TIMEOUT;
+            WaitTime = SYS_ARCH_TIMEOUT;
 
     } /* end else */
 
-    return aTimeout;
+    return WaitTime;
 
 } /* end sys_arch_sem_wait */
 

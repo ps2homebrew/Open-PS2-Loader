@@ -66,12 +66,16 @@ static void tcpip_thread(void *arg)
 #if LWIP_TCP
     tcp_init();
 #endif /* LWIP_TCP */
+#if LWIP_TIMERS
+    sys_timeouts_init();
+#endif /* LWIP_TIMERS */
+
     tcpip_init_done(tcpip_init_done_arg);
 
     LOCK_TCPIP_CORE();
     while (1) {
         UNLOCK_TCPIP_CORE();
-        sys_mbox_fetch(g_TCPIPMBox, (void *)&msg);
+        sys_timeouts_mbox_fetch(g_TCPIPMBox, (void *)&msg);
         LOCK_TCPIP_CORE();
 
         switch (msg->type) {

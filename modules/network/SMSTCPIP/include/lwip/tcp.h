@@ -469,6 +469,12 @@ int tcp_pcbs_sane(void);
 #define tcp_pcbs_sane() 1
 #endif /* TCP_DEBUG */
 
+#if NO_SYS
+#define tcp_timer_needed()
+#else
+void tcp_timer_needed(void);
+#endif
+
 /* The TCP PCB lists. */
 extern struct tcp_pcb_listen *tcp_listen_pcbs; /* List of all TCP PCBs in LISTEN state. */
 extern struct tcp_pcb *tcp_active_pcbs;        /* List of all TCP PCBs that are in a
@@ -492,6 +498,7 @@ extern struct tcp_pcb *tcp_tmp_pcb; /* Only used for temporary storage. */
     do {                    \
         npcb->next = *pcbs; \
         *(pcbs) = npcb;     \
+        tcp_timer_needed(); \
     } while (0)
 #define TCP_RMV(pcbs, npcb)                                                                   \
     do {                                                                                      \

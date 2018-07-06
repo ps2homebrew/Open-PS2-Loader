@@ -69,20 +69,6 @@ struct sys_timeout
 /** Return code for timeouts from sys_arch_mbox_fetch and sys_arch_sem_wait */
 #define SYS_ARCH_TIMEOUT -418
 
-typedef void (*sys_timeout_handler)(void *arg);
-
-struct sys_timeout
-{
-    struct sys_timeout *next;
-    u32_t time;
-    sys_timeout_handler h;
-    void *arg;
-};
-
-struct sys_timeouts
-{
-    struct sys_timeout *next;
-};
 /* Semaphore functions. */
 sys_sem_t sys_sem_new(u8_t count);
 //void sys_sem_signal(sys_sem_t sem);

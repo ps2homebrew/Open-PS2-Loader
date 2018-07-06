@@ -1,7 +1,7 @@
 IOP_BIN = SMSTCPIP.irx
 IOP_OBJS = ps2ip.o inet.o ip.o ip_addr.o ip_frag.o etharp.o tcp_in.o tcp_out.o \
 	tcp.o tcpip.o mem.o api_lib.o api_msg.o sockets.o netif.o udp.o memp.o \
-	icmp.o pbuf.o exports.o imports.o
+	icmp.o pbuf.o timers.o exports.o imports.o
 IOP_LIBS =
 
 IOP_INCS += -Iinclude -I../../iopcore/common

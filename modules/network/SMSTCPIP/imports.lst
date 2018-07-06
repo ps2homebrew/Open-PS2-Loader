@@ -21,6 +21,7 @@ I_ExitDeleteThread
 I_StartThread
 I_iReleaseWaitThread
 I_USec2SysClock
+I_SysClock2USec
 I_GetThreadId
 I_GetSystemTime
 I_SetAlarm

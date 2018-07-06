@@ -34,6 +34,7 @@
 
 #include "lwip/api_msg.h"
 #include "lwip/pbuf.h"
+#include "lwip/timers.h"
 
 #if LWIP_TCPIP_CORE_LOCKING
 /** The global semaphore to lock the stack. */

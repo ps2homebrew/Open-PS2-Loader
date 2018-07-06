@@ -43,6 +43,7 @@
 #include "lwip/tcpip.h"
 
 #include "lwip/sys.h"
+#include "lwip/timers.h"
 #include "lwip/stats.h"
 
 #include <intrman.h>
@@ -67,7 +68,7 @@ static const u16_t memp_sizes[MEMP_MAX] = {
     sizeof(struct netconn),
     sizeof(struct api_msg),
     sizeof(struct tcpip_msg),
-    sizeof(struct sys_timeout)};
+    sizeof(struct sys_timeo)};
 
 static const u16_t memp_num[MEMP_MAX] = {
     MEMP_NUM_PBUF,
@@ -113,7 +114,7 @@ static u8_t memp_memory[(MEMP_NUM_PBUF *
                              MEM_ALIGN_SIZE(sizeof(struct tcpip_msg) +
                                             sizeof(struct memp)) +
                          MEMP_NUM_SYS_TIMEOUT *
-                             MEM_ALIGN_SIZE(sizeof(struct sys_timeout) +
+                             MEM_ALIGN_SIZE(sizeof(struct sys_timeo) +
                                             sizeof(struct memp)))];
 
 

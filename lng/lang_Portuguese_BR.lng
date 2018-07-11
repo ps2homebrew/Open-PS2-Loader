@@ -183,7 +183,7 @@ Ajustes Horizontais
 POS-V
 Ajustes Verticais
 Overscan
-Overscan Adjustment
+Ajustes do Overscan
 Pular FMV
 Pula os vídeos do jogo
 Opções de trapaças
@@ -210,7 +210,7 @@ Auto-começar
 Valores em segundos (s), 0 para desativar
 Logotipo do Playstation 2
 Será mostrado apenas para os jogos que for da mesma região do console
-Configurar DualShock3/4
+Configurar DualShock3
 Configurações de emulação de Controle
 Ativar emulação de Controle
 Liga/desliga a emulação de controle para o jogo selecionado.
@@ -225,24 +225,24 @@ Liga/desliga o emulador de controle para a porta selecionada.
 Ativar vibração
 Liga/desliga a vibração para o controle emulado da porta selecionada.
 Endereço MAC do adaptador USB:
-DualShock sincronizado com o MAC:
+DualShock 3 sincronizado com o MAC:
 Sincronizar
-Sincroniza o controle DualShock
-Sincroniza o controle DualShock com endereço MAC do adaptador bluetooth.
+Sincroniza o controle DualShock 3
+Sincroniza o controle DualShock 3 com endereço MAC do adaptador bluetooth.
 Não está conectado
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Informações do adaptador Bluetooth
+Mostra mais informações e recursos suportados
+Versão do HCI:
+Versão do LMP:
+ID do fabricante:
+Recursos de Suporte:
+Sim
+Não
+O adaptador Bluetooth precisa ser compatível com o controle DS3/DS4.
+O adaptador Bluetooth talvez não funcione corretamente no controle DS3/DS4.
+Ativar emulação do Multitap
+Liga/Desliga a emulação do Multitap para o jogo selecionado.
+Emulador do Multitap na porta
+Escolha a porta para a emulação do Multitap.
+Desativar soluções alternativa para DS3 falsos
+Alguns DS3 falsos precisam de soluções alternativas, esta opção irá desativá-la.

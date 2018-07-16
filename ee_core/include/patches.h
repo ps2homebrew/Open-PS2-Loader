@@ -13,6 +13,6 @@
 
 #define COMPAT_MODE_4 0x08 // Skip Videos
 
-void apply_patches(void);
+void apply_patches(const char *path);
 
 #endif /* PATCHES */

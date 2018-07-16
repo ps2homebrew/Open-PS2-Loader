@@ -119,7 +119,7 @@ void t_loadElf(void)
 
         DPRINTF("t_loadElf: trying to apply patches...\n");
         // applying needed patches
-        apply_patches();
+        apply_patches(g_argv[0]);
 
         FlushCache(0);
         FlushCache(2);

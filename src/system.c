@@ -334,18 +334,56 @@ void sysExecExit()
 #define CORE_IRX_DEBUG 0x20
 #define CORE_IRX_DECI2 0x40
 
-#ifdef VMC
-static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)
+typedef struct
+{
+    char *game;
+    char *mode;
+    void *module;
+    int *module_size;
+} patchlist_t;
+
+//Blank string for mode = all modes.
+static const patchlist_t iop_patch_list[] = {
+    {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Disaster Report
+    {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //SOS: The Final Escape
+    {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Zettai Zetsumei Toshi
+    {NULL, NULL, NULL, NULL },  //Terminator
+};
+
+static unsigned int addIopPatch(const char *mode_str, const char *startup, irxptr_t *tab)
+{
+    const patchlist_t *p;
+    int i;
+
+    for (i = 0; iop_patch_list[i].game != NULL; i++)
+    {
+        p = &iop_patch_list[i];
+
+        if (!strcmp(p->game, startup) && (p->mode[0] == '\0' || !strcmp(p->mode, startup)))
+        {
+            tab->info = (*(p->module_size)) | SET_OPL_MOD_ID(OPL_MODULE_ID_IOP_PATCH);
+            tab->ptr = (void *)p->module;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)
 { // Send IOP modules that core must use to Kernel RAM
-#else
-static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx)
-{ // Send IOP modules that core must use to Kernel RAM
-#endif
     irxtab_t *irxtable;
     irxptr_t *irxptr_tab;
     void *irxptr, *ioprp_image;
     int i, modcount;
     unsigned int curIrxSize, size_ioprp_image, total_size;
+
+    if (!strcmp(mode_str, "USB_MODE"))
+        modules |= CORE_IRX_USB;
+    else if (!strcmp(mode_str, "ETH_MODE"))
+        modules |= CORE_IRX_ETH | CORE_IRX_SMB;
+    else
+        modules |= CORE_IRX_HDD;
 
     irxtable = (irxtab_t *)ModuleStorage;
     irxptr_tab = (irxptr_t *)((unsigned char *)irxtable + sizeof(irxtab_t));
@@ -386,7 +424,7 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
 #ifdef VMC
     if (modules & CORE_IRX_VMC) {
         irxptr_tab[modcount].info = size_mcemu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_MCEMU);
-        irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
+        irxptr_tab[modcount++].ptr = (void *)&mcemu_irx;
     }
 #endif
 
@@ -419,6 +457,8 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
     }
 #endif
 #endif
+
+    modcount += addIopPatch(mode_str, startup, &irxptr_tab[modcount]);
 
     irxtable->modules = irxptr_tab;
     irxtable->count = modcount;
@@ -564,7 +604,7 @@ static int ResetDECI2(void)
 }
 #endif
 
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, MCEMU int EnablePS2Logo, unsigned int compatflags)
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
     void *ModuleStorage;
@@ -607,13 +647,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     //Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
     memset((void *)0x00082000, 0, 0x00100000 - 0x00082000);
 
-    if (!strcmp(mode_str, "USB_MODE"))
-        modules = CORE_IRX_USB;
-    else if (!strcmp(mode_str, "ETH_MODE"))
-        modules = CORE_IRX_ETH | CORE_IRX_SMB;
-    else
-        modules = CORE_IRX_HDD;
-
+    modules = 0;
     ModuleStorage = (void *)((compatflags & COMPAT_MODE_7) ? OPL_MOD_STORAGE_HI : OPL_MOD_STORAGE);
 
 #ifdef __DECI2_DEBUG
@@ -624,12 +658,10 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 #ifdef VMC
     modules |= CORE_IRX_VMC;
-    LOG("SYSTEM LaunchLoaderElf loading modules with size_mcemu_irx = %d\n", size_mcemu_irx);
-    ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
-#else
-    LOG("SYSTEM LaunchLoaderElf loading modules\n");
-    ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx) + 0x3F) & ~0x3F;
 #endif
+    LOG("SYSTEM LaunchLoaderElf loading modules\n");
+    ModuleStorageSize = (sendIrxKernelRAM(filename, mode_str, modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
+
     sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorage + ModuleStorageSize);
 
     if (!gDisableDebug) {

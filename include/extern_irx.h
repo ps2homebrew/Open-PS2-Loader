@@ -58,6 +58,9 @@ extern int size_ioptrap_irx;
 extern void *isofs_irx;
 extern int size_isofs_irx;
 
+extern void *iremsndpatch_irx;
+extern int size_iremsndpatch_irx;
+
 extern void *mcman_irx;
 extern int size_mcman_irx;
 

@@ -23,6 +23,9 @@ enum OPL_MODULE_ID {
     OPL_MODULE_ID_DRVTIF,
     OPL_MODULE_ID_TIFINET,
 
+    //Special patches
+    OPL_MODULE_ID_IOP_PATCH,
+
     OPL_MODULE_ID_COUNT
 };
 

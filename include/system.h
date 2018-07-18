@@ -17,13 +17,7 @@ void sysReset(int modload_mask);
 void sysExecExit();
 void sysPowerOff(void);
 
-#ifdef VMC
-#define MCEMU int size_mcemu_irx, void **mcemu_irx,
-#else
-#define MCEMU
-#endif
-
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, MCEMU int EnablePS2Logo, unsigned int compatflags);
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags);
 
 int sysExecElf(char *path);
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);

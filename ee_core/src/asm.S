@@ -203,9 +203,8 @@ _LoadExecPS2:
 	/* enable Intr */
 	ei
 
-	/* change stack pointer to top of user memory */
-	lui	$v0, 0x0200
-	daddu	$sp, $v0, $zero
+	/* change the stack pointer */
+	la	$sp, _end
 
 	/*
 	 * ExecPS2() does the following for us:

@@ -20,4 +20,6 @@ int Hook_SifSetReg(u32 register_num, int register_value);
 int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[]);
 int Hook_CreateThread(ee_thread_t *thread_param);
 
+void CleanExecPS2(void *epc, void *gp, int argc, char **argv);
+
 #endif /* ASM */

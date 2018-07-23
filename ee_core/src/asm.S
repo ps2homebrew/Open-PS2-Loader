@@ -37,6 +37,7 @@
 	.extern memcpy
 	.extern strlen
 	.extern strncpy
+		.extern ExecPS2
 
 	/* syshook.c */
 	.extern g_argc
@@ -65,6 +66,7 @@
 	.globl	Hook_SifSetReg
 	.globl	Hook_ExecPS2
 	.globl	Hook_CreateThread
+	.globl CleanExecPS2
 
 
 /*
@@ -203,9 +205,8 @@ _LoadExecPS2:
 	/* enable Intr */
 	ei
 
-	/* change stack pointer to top of user memory */
-	lui	$v0, 0x0200
-	daddu	$sp, $v0, $zero
+	/* change the stack pointer */
+	la	$sp, _end
 
 	/*
 	 * ExecPS2() does the following for us:
@@ -418,22 +419,21 @@ Hook_SifSetReg:
 Hook_ExecPS2:
 
 	/* not needed to preserve sX/ra registers values as ExecPS2 won't return */
-	daddu	$s0, $a0, $zero
-	daddu	$s1, $a1, $zero
-	daddu	$s2, $a2, $zero
-	daddu	$s3, $a3, $zero
 
 	/* check entry point is >= 0x00100000 */
 	lui	$v0, 0x0010
-	sltu	$v0, $s0, $v0
+	sltu	$v0, $a0, $v0
 	bne	$v0, $zero, 1f
-	nop
+	daddu	$s0, $a0, $zero		#entrypoint
+
+	daddu	$s1, $a1, $zero		#gp
+	daddu	$s2, $a2, $zero		#argc
 
 	/* check compat mode 6 is disabled */
 	lw	$v0, g_compat_mask
 	andi	$v0, $v0, COMPAT_MODE_6
 	bne	$v0, $zero, 1f
-	nop
+	daddu	$s3, $a3, $zero		#argv
 
 	/* save original stack pointer */
 	daddu	$s4, $sp, $zero
@@ -449,16 +449,18 @@ Hook_ExecPS2:
 	la	$v1, padOpen_hooked
 	sw	$v0, 0x0000($v1)
 
-	/* restore stack pointer */
-	daddu	$sp, $s4, $zero
+	/* Restore arguments */
+	daddu	$a0, $s0, $zero		#entrypoint
+	daddu	$a1, $s1, $zero		#gp
+	daddu	$a2, $s2, $zero		#argc
+
+	jal InitRegsExecPS2
+	daddu	$a3, $s3, $zero		#argv
 1:
 	/* call ExecPS2 */
-	daddu	$a0, $s0, $zero
-	daddu	$a1, $s1, $zero
-	daddu	$a2, $s2, $zero
 	lw	$v0, Old_ExecPS2
 	jr 	$v0
-	daddu	$a3, $s3, $zero
+	nop
 
 	.end	Hook_ExecPS2
 
@@ -525,6 +527,93 @@ Hook_CreateThread:
 
 	.end	Hook_CreateThread
 
+.ent CleanExecPS2
+CleanExecPS2:
+	jal InitRegsExecPS2
+	nop
+
+	j ExecPS2
+	por $ra, $zero, $zero
+
+.end CleanExecPS2
+
+.ent InitRegsExecPS2
+InitRegsExecPS2:
+	/* Erase all registers, so that all games will have the same boot state regardless of whatever OPL was doing.
+	   Note: Sony added something like this at the start of crt0 for newer SDK releases. But older games will still not have this.
+	   While this is not as clean, it is the best thing to do without changing the game. */
+	por $at, $zero, $zero
+	por $v0, $zero, $zero
+	por $v1, $zero, $zero
+	#por $a0, $zero, $zero	#Used for entrypoint
+	#por $a1, $zero, $zero	#Used for gp
+	#por $a2, $zero, $zero	#Used for argc
+	#por $a3, $zero, $zero	#Used for argv
+	por $t0, $zero, $zero
+	por $t1, $zero, $zero
+	por $t2, $zero, $zero
+	por $t3, $zero, $zero
+	por $t4, $zero, $zero
+	por $t5, $zero, $zero
+	por $t6, $zero, $zero
+	por $t7, $zero, $zero
+	por $s0, $zero, $zero
+	por $s1, $zero, $zero
+	por $s2, $zero, $zero
+	por $s3, $zero, $zero
+	por $s4, $zero, $zero
+	por $s5, $zero, $zero
+	por $s6, $zero, $zero
+	por $s7, $zero, $zero
+	por $t8, $zero, $zero
+	por $t9, $zero, $zero
+	por $gp, $zero, $zero
+	la $sp, _end		#Reset SP to top of stack
+	por $fp, $zero, $zero
+	#por $ra, $zero, $zero	#Required for returning
+	mthi $zero
+	mthi1 $zero
+	mtlo $zero
+	mtlo1 $zero
+	mtsah $zero, 0
+	mtc1 $zero, $f0
+	mtc1 $zero, $f1
+	mtc1 $zero, $f2
+	mtc1 $zero, $f3
+	mtc1 $zero, $f4
+	mtc1 $zero, $f5
+	mtc1 $zero, $f6
+	mtc1 $zero, $f7
+	mtc1 $zero, $f8
+	mtc1 $zero, $f9
+	mtc1 $zero, $f10
+	mtc1 $zero, $f11
+	mtc1 $zero, $f12
+	mtc1 $zero, $f13
+	mtc1 $zero, $f14
+	mtc1 $zero, $f15
+	mtc1 $zero, $f16
+	mtc1 $zero, $f17
+	mtc1 $zero, $f18
+	mtc1 $zero, $f19
+	mtc1 $zero, $f20
+	mtc1 $zero, $f21
+	mtc1 $zero, $f22
+	mtc1 $zero, $f23
+	mtc1 $zero, $f24
+	mtc1 $zero, $f25
+	mtc1 $zero, $f26
+	mtc1 $zero, $f27
+	mtc1 $zero, $f28
+	mtc1 $zero, $f29
+	mtc1 $zero, $f30
+	mtc1 $zero, $f31
+	adda.s $f0, $f1		#Clear facc
+	sync.p
+
+	jr $ra
+	ctc1 $zero, $f31
+.end InitRegsExecPS2
 
 /**************************************************************************
  *

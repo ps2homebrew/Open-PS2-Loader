@@ -36,6 +36,7 @@ typedef struct
 #define PATCH_SRW_IMPACT 0x0021e808
 #define PATCH_RNC_UYA 0x00398498
 #define PATCH_ZOMBIE_ZONE 0xEEE62525
+#define PATCH_DOT_HACK 0x0D074A37
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -90,6 +91,10 @@ static const patchlist_t patch_list[] = {
     {"SLES_544.61", ALL_MODE, {PATCH_ZOMBIE_ZONE, 0x001b3e20, 0x00000000}},        // Zombie Hunters
     {"SLPM_625.25", ALL_MODE, {PATCH_ZOMBIE_ZONE, 0x001b1dc0, 0x00000000}},        // Simple 2000 Series Vol. 61: The Oneechanbara
     {"SLPM_626.38", ALL_MODE, {PATCH_ZOMBIE_ZONE, 0x001b355c, 0x00000000}},        // Simple 2000 Series Vol. 80: The Oneechanpuruu
+    {"SLES_522.37", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Infection PAL
+    {"SLES_524.67", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Mutation PAL
+    {"SLES_524.69", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Outbreak PAL
+    {"SLES_524.68", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Quarantine PAL
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -349,6 +354,58 @@ static void ZombieZone_patches(unsigned int address)
     }
 }
 
+static void DotHack_patches(const char *path)
+{   //.hack (PAL) has a multi-language selector that boots the main ELF. However, it does not call scePadEnd() before LoadExecPS2()
+    //We only want to patch the language selector and nothing else!
+    static u32 patch[] = {
+        0x00000000,    //jal scePadEnd()
+        0x00000000,    //nop
+        0x27a40020,    //addiu $a0, $sp, $0020 (Contains boot path)
+        0x0000282d,    //move $a1, $zero
+        0x00000000,    //j LoadExecPS2()
+        0x0000302d,    //move $a2, $zero
+    };
+    u32 *ptr, *pPadEnd, *pLoadExecPS2;
+
+    if (strcmp(path, "cdrom0:\\SLES_522.37;1") == 0)
+    {
+        ptr = (void*)0x0011a5fc;
+        pPadEnd = (void*)0x00119290;
+	pLoadExecPS2 = (void*)FNADDR(ptr[2]);
+    }
+    else if (strcmp(path, "cdrom0:\\SLES_524.67;1") == 0)
+    {
+        ptr = (void*)0x0011a8bc;
+        pPadEnd = (void*)0x00119550;
+	pLoadExecPS2 = (void*)FNADDR(ptr[2]);
+    }
+    else if (strcmp(path, "cdrom0:\\SLES_524.68;1") == 0)
+    {
+        ptr = (void*)0x00111d34;
+        pPadEnd = (void*)0x001109b0;
+	pLoadExecPS2 = (void*)FNADDR(ptr[3]);
+    }
+    else if (strcmp(path, "cdrom0:\\SLES_524.69;1") == 0)
+    {
+        ptr = (void*)0x00111d34;
+        pPadEnd = (void*)0x001109b0;
+	pLoadExecPS2 = (void*)FNADDR(ptr[3]);
+    }
+    else
+    {
+        ptr = NULL;
+        pPadEnd = NULL;
+	pLoadExecPS2 = NULL;
+    }
+
+    if (ptr != NULL && pPadEnd != NULL && pLoadExecPS2 != NULL)
+    {
+        patch[0] = JAL((u32)pPadEnd);
+        patch[4] = JMP((u32)pLoadExecPS2);
+        memcpy(ptr, patch, sizeof(patch));
+    }
+}
+
 // Skip Bink (.BIK) Videos
 // This patch is expected to work with all games using ChoosePlayMovie statements, for instance:
 // SLUS_215.41(Ratatouille), SLES_541.72 (Garfield 2), SLES_555.22 (UP), SLUS_217.36(Wall-E), SLUS_219.31 (Toy Story 3)
@@ -399,7 +456,7 @@ int Skip_Videos_sceMpegIsEnd(void)
         return 0;
 }
 
-void apply_patches(void)
+void apply_patches(const char *path)
 {
     const patchlist_t *p;
 
@@ -430,6 +487,9 @@ void apply_patches(void)
                     break;
                 case PATCH_ZOMBIE_ZONE:
                     ZombieZone_patches(p->patch.val);
+                    break;
+                case PATCH_DOT_HACK:
+                    DotHack_patches(path);
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

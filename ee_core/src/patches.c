@@ -367,25 +367,25 @@ static void DotHack_patches(const char *path)
     };
     u32 *ptr, *pPadEnd, *pLoadExecPS2;
 
-    if (strcmp(path, "cdrom0:\\SLES_522.37;1") == 0)
+    if (_strcmp(path, "cdrom0:\\SLES_522.37;1") == 0)
     {
         ptr = (void*)0x0011a5fc;
         pPadEnd = (void*)0x00119290;
 	pLoadExecPS2 = (void*)FNADDR(ptr[2]);
     }
-    else if (strcmp(path, "cdrom0:\\SLES_524.67;1") == 0)
+    else if (_strcmp(path, "cdrom0:\\SLES_524.67;1") == 0)
     {
         ptr = (void*)0x0011a8bc;
         pPadEnd = (void*)0x00119550;
 	pLoadExecPS2 = (void*)FNADDR(ptr[2]);
     }
-    else if (strcmp(path, "cdrom0:\\SLES_524.68;1") == 0)
+    else if (_strcmp(path, "cdrom0:\\SLES_524.68;1") == 0)
     {
         ptr = (void*)0x00111d34;
         pPadEnd = (void*)0x001109b0;
 	pLoadExecPS2 = (void*)FNADDR(ptr[3]);
     }
-    else if (strcmp(path, "cdrom0:\\SLES_524.69;1") == 0)
+    else if (_strcmp(path, "cdrom0:\\SLES_524.69;1") == 0)
     {
         ptr = (void*)0x00111d34;
         pPadEnd = (void*)0x001109b0;

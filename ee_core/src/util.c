@@ -363,7 +363,7 @@ void CopyToIop(void *eedata, unsigned int size, void *iopptr)
 /*----------------------------------------------------------------------------------------*/
 /* NOP delay.                                                                             */
 /*----------------------------------------------------------------------------------------*/
-inline void delay(int count)
+void delay(int count)
 {
     int i, ret;
 

@@ -34,7 +34,7 @@
 	.extern memcpy
 	.extern strlen
 	.extern strncpy
-		.extern ExecPS2
+	.extern ExecPS2
 
 	/* syshook.c */
 	.extern g_argc
@@ -81,12 +81,9 @@ _SifSetDma:
 	jal	New_SifSetDma
 	sd	$a2, 0x0008($sp)
 
-	/* restore a2 and ra registers */
-	ld	$a2, 0x0008($sp)
+	/* restore sp and ra registers */
 	ld	$ra, 0x0000($sp)
-
-	/* restore the original stack pointer */
-	daddu	$sp, $a2, $zero
+	ld	$sp, 0x0008($sp)
 
 	jr	$ra
 	addiu	$v0, $zero, 1
@@ -174,12 +171,9 @@ _Apply_Mode3:
 	addiu	$v1, $zero, __NR_FlushCache
 	syscall
 
-	/* restore a0 and ra registers */
-	ld	$a0, 0x0008($sp)
+	/* restore sp and ra registers */
 	ld	$ra, 0x0000($sp)
-
-	/* restore the original stack pointer */
-	daddu	$sp, $a0, $zero
+	ld	$sp, 0x0008($sp)
 
 	jr	$ra
 	addiu	$v0, $zero, 1
@@ -323,7 +317,7 @@ Hook_CreateThread:
 	/* change the stack pointer */
 	la	$sp, _end
 
-	/* preserves ra, a1 and a0 registers values */
+	/* preserves ra, a1 (sp) and a0 registers values */
 	addiu	$sp, $sp, -0x20
 	sd	$ra, 0x0000($sp)
 	sd	$a1, 0x0008($sp)
@@ -337,13 +331,11 @@ Hook_CreateThread:
 	la	$v1, padOpen_hooked
 	sw	$v0, 0x0000($v1)
 
-	/* restore a0, a1 and ra registers */
+	/* restore a0, sp and ra registers */
 	ld	$a0, 0x0010($sp)
-	ld	$a1, 0x0008($sp)
 	ld	$ra, 0x0000($sp)
+	ld	$sp, 0x0008($sp)
 
-	/* restore the original stack pointer */
-	daddu	$sp, $a1, $zero
 2:
 	/* call CreateThread */
 	lw	$v0, Old_CreateThread

@@ -14,6 +14,7 @@
 #include <kernel.h>
 #include <stdio.h>
 #include <iopheap.h>
+#include <ps2lib_err.h>
 #include <sifrpc.h>
 #include <string.h>
 #include <sbv_patches.h>

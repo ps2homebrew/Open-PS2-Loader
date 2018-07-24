@@ -55,7 +55,7 @@ int LoadModule(const char *path, int arg_len, const char *args)
     struct _lf_module_load_arg arg;
 
     if (LoadFileInit() < 0)
-        return -E_LIB_API_INIT;
+        return -SCE_EBINDMISS;
 
     memset(&arg, 0, sizeof arg);
 
@@ -69,7 +69,7 @@ int LoadModule(const char *path, int arg_len, const char *args)
         arg.p.arg_len = 0;
 
     if (SifCallRpc(&_lf_cd, LF_F_MOD_LOAD, 0x0, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
-        return -E_SIF_RPC_CALL;
+        return -SCE_ECALLMISS;
 
     return arg.p.result;
 }
@@ -84,7 +84,7 @@ int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, con
     int dma_id;
 
     if (LoadFileInit() < 0)
-        return -E_LIB_API_INIT;
+        return -SCE_EBINDMISS;
 
     /* Round the size up to the nearest 16 bytes. */
     // modsize = (modsize + 15) & -16;
@@ -121,7 +121,7 @@ int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, con
         arg.q.arg_len = 0;
 
     if (SifCallRpc(&_lf_cd, LF_F_MOD_BUF_LOAD, mode, &arg, sizeof(arg), &arg, 8, NULL, NULL) < 0)
-        return -E_SIF_RPC_CALL;
+        return -SCE_ECALLMISS;
 
     if (!(mode & SIF_RPC_M_NOWAIT))
         SifFreeIopHeap(iopmem);
@@ -168,7 +168,7 @@ int LoadElf(const char *path, t_ExecData *data)
     struct _lf_elf_load_arg arg;
 
     if (LoadFileInit() < 0)
-        return -E_LIB_API_INIT;
+        return -SCE_EBINDMISS;
 
     u32 secname = 0x6c6c61; /* "all" */
 
@@ -178,17 +178,15 @@ int LoadElf(const char *path, t_ExecData *data)
     arg.secname[LF_ARG_MAX - 1] = 0;
 
     if (SifCallRpc(&_lf_cd, LF_F_ELF_LOAD, 0, &arg, sizeof arg, &arg, sizeof(t_ExecData), NULL, NULL) < 0)
-        return -E_SIF_RPC_CALL;
+        return -SCE_ECALLMISS;
 
-    if (arg.p.result < 0)
-        return arg.p.result;
+    if (arg.epc != 0) {
+        data->epc = arg.epc;
+        data->gp  = arg.gp;
 
-    if (data) {
-        data->epc = arg.p.epc;
-        data->gp = arg.gp;
-    }
-
-    return 0;
+        return 0;
+    } else
+         return -SCE_ELOADMISS;
 }
 
 /*----------------------------------------------------------------------------------------*/

@@ -103,14 +103,13 @@ void sysLoadElf(char *filename, int argc, char **argv)
     //WipeUserMemory((void *)ModStorageEnd, (void *)GetMemorySize());
 
     FlushCache(0);
-    FlushCache(2);
 
     DPRINTF(" done\n");
 
     DPRINTF("t_loadElf: loading elf...");
     r = LoadElf(filename, &elf);
 
-    if ((!r) && (elf.epc)) {
+    if (!r) {
         DPRINTF(" done\n");
 
         DPRINTF("t_loadElf: trying to apply patches...\n");

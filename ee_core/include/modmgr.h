@@ -62,11 +62,7 @@ struct _lf_module_buffer_load_arg
 
 struct _lf_elf_load_arg
 {
-    union
-    {
-        u32 epc;
-        int result;
-    } p;
+    u32 epc;
     u32 gp;
     char path[LF_PATH_MAX];
     char secname[LF_ARG_MAX];
@@ -79,6 +75,14 @@ typedef struct
     u32 sp;
     u32 dummy;
 } t_ExecData;
+
+/* Extended error codes */
+/** Could not bind with RPC server */
+#define SCE_EBINDMISS 0x10000
+/** Could not call the RPC function */
+#define SCE_ECALLMISS 0x10001
+/** ELF/Module load failed */
+#define SCE_ELOADMISS 0x10003
 
 int LoadFileInit();
 void LoadFileExit();

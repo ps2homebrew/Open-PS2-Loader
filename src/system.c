@@ -718,7 +718,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     void *eeloadCopy, *initUserMemory;
 
     ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
-#ifndef __DEBUG
+#if (!defined(__DEBUG) && !defined(_DTL_T10000))
     AddHistoryRecordUsingFullPath(filename);
 #endif
 

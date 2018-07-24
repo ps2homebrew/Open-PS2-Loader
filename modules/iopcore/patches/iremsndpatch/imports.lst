@@ -1,0 +1,8 @@
+loadcore_IMPORTS_start
+I_GetLoadcoreInternalData
+loadcore_IMPORTS_end
+
+thbase_IMPORTS_start
+I_WakeupThread
+thbase_IMPORTS_end
+

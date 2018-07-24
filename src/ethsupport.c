@@ -691,10 +691,10 @@ static void ethLaunchGame(int id, config_set_t *configSet)
 #ifdef VMC
 #define ETH_MCEMU size_mcemu_irx, &smb_mcemu_irx,
 #else
-#define ETH_MCEMU
+#define ETH_MCEMU 0, NULL,
 #endif
 
-    sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, ETH_MCEMU EnablePS2Logo, compatmask);
+    sysLaunchLoaderElf(filename,  "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, ETH_MCEMU EnablePS2Logo, compatmask);
 }
 
 static config_set_t *ethGetConfig(int id)

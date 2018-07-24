@@ -10,6 +10,8 @@
 
 #include "ee_core.h"
 #include "util.h"
+#include "modules.h"
+#include "modmgr.h"
 
 #define ALL_MODE -1
 
@@ -37,6 +39,7 @@ typedef struct
 #define PATCH_RNC_UYA 0x00398498
 #define PATCH_ZOMBIE_ZONE 0xEEE62525
 #define PATCH_DOT_HACK 0x0D074A37
+#define PATCH_SOS 0x30303030
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -95,6 +98,9 @@ static const patchlist_t patch_list[] = {
     {"SLES_524.67", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Mutation PAL
     {"SLES_524.69", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Outbreak PAL
     {"SLES_524.68", ALL_MODE, {PATCH_DOT_HACK, 0x00000000, 0x00000000}},           // .hack//Quarantine PAL
+    {"SLUS_205.61", ALL_MODE, {PATCH_SOS, 0x00000001, 0x00000000}},                // Disaster Report
+    {"SLES_513.01", ALL_MODE, {PATCH_SOS, 0x00000002, 0x00000000}},                // SOS: The Final Escape
+    {"SLPS_251.13", ALL_MODE, {PATCH_SOS, 0x00000000, 0x00000000}},                // Zettai Zetsumei Toshi
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -104,6 +110,7 @@ static const patchlist_t patch_list[] = {
 
 static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
 static unsigned int g_delay_cycles;
+static int g_mode; //Patch may use this for anything.
 
 // Nippon Ichi Software games generic patch to disable cdvd timeout
 static void NIS_generic_patches(void)
@@ -456,6 +463,92 @@ int Skip_Videos_sceMpegIsEnd(void)
         return 0;
 }
 
+static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres,
+int fno)
+{
+    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres, int fno);
+    void *(*pSifAllocIopHeap)(int size);
+    int (*pSifFreeIopHeap)(void *addr);
+    int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
+    void *iopmem;
+    SifDmaTransfer_t sifdma;
+    int dma_id, ret, ret2;
+    void *iremsndpatch_irx;
+    unsigned int iremsndpatch_irx_size;
+
+    switch(g_mode)
+    {
+        case 0: //NTSC-J
+            _pSifLoadModule = (void*)0x001d0680;
+            pSifAllocIopHeap = (void*)0x001cfc30;
+            pSifFreeIopHeap = (void*)0x001cfd20;
+            pSifLoadModuleBuffer = (void*)0x001d0640;
+            break;
+        case 1: //NTSC-U/C
+            _pSifLoadModule = (void*)0x001d0580;
+            pSifAllocIopHeap = (void*)0x001cfb30;
+            pSifFreeIopHeap = (void*)0x001cfc20;
+            pSifLoadModuleBuffer = (void*)0x001d0540;
+            break;
+        case 2: //PAL
+            _pSifLoadModule = (void*)0x001d11c0;
+            pSifAllocIopHeap = (void*)0x001d0770;
+            pSifFreeIopHeap = (void*)0x001d0860;
+            pSifLoadModuleBuffer = (void*)0x001d1180;
+            break;
+        default:
+            _pSifLoadModule = NULL;
+            pSifAllocIopHeap = NULL;
+            pSifFreeIopHeap = NULL;
+            pSifLoadModuleBuffer = NULL;
+    }
+
+    ret = _pSifLoadModule(path, arg_len, args, modres, fno);
+
+    if((ret >= 0) && (_pSifLoadModule != NULL) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0))
+    {
+        GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &iremsndpatch_irx, &iremsndpatch_irx_size);
+
+        iopmem = pSifAllocIopHeap(iremsndpatch_irx_size);
+        if(iopmem != NULL)
+        {
+            sifdma.src = iremsndpatch_irx;
+            sifdma.dest = iopmem;
+            sifdma.size = iremsndpatch_irx_size;
+            sifdma.attr = 0;
+            do {
+                dma_id = SifSetDma(&sifdma, 1);
+            } while (!dma_id);
+
+            do {
+                ret2 = pSifLoadModuleBuffer(iopmem, 0, NULL);
+            } while (ret2 < 0);
+
+            pSifFreeIopHeap(iopmem);
+        }
+    }
+
+    return ret;
+}
+
+static void SOSPatch(int region)
+{
+    g_mode = region;
+
+    switch(region)
+    {    // JAL SOS_SifLoadModuleHook - replace call to _SifLoadModule.
+        case 0: //NTSC-J
+            _sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d08b4);
+            break;
+        case 1: //NTSC-U/C
+            _sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d07b4);
+            break;
+        case 2: //PAL
+            _sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d13f4);
+            break;
+    }
+}
+
 void apply_patches(const char *path)
 {
     const patchlist_t *p;
@@ -490,6 +583,8 @@ void apply_patches(const char *path)
                     break;
                 case PATCH_DOT_HACK:
                     DotHack_patches(path);
+                case PATCH_SOS:
+                    SOSPatch(p->patch.val);
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

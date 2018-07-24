@@ -427,7 +427,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 #ifdef VMC
 #define USB_MCEMU size_mcemu_irx, &usb_mcemu_irx,
 #else
-#define USB_MCEMU
+#define USB_MCEMU 0, NULL,
 #endif
 
     sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, USB_MCEMU EnablePS2Logo, compatmask);

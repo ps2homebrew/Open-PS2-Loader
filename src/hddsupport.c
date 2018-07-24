@@ -393,7 +393,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 #ifdef VMC
 #define HDD_MCEMU size_mcemu_irx, &hdd_mcemu_irx,
 #else
-#define HDD_MCEMU
+#define HDD_MCEMU 0, NULL,
 #endif
 
     sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, HDD_MCEMU EnablePS2Logo, compatMode);

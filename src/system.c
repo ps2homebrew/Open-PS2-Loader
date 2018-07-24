@@ -409,15 +409,12 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount++].ptr = pusbd_irx;
     }
     if (modules & CORE_IRX_ETH) {
-#ifdef __DECI2_DEBUG //FIXME: I don't know why, but the ingame SMAP driver cannot be used with the DECI2 modules. Perhaps that old bug with the network stack become unresponsive gets triggered? Until this is solved, use the normal SMAP driver.
-        irxptr_tab[modcount].info = size_smap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);
-        irxptr_tab[modcount++].ptr = (void *)&smap_irx;
-#else
         irxptr_tab[modcount].info = size_smap_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);
         irxptr_tab[modcount++].ptr = (void *)&smap_ingame_irx;
-#endif
         irxptr_tab[modcount].info = size_ingame_smstcpip_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMSTCPIP);
         irxptr_tab[modcount++].ptr = (void *)&ingame_smstcpip_irx;
+    }
+    if (modules & CORE_IRX_SMB) {
         irxptr_tab[modcount].info = size_smbinit_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMBINIT);
         irxptr_tab[modcount++].ptr = (void *)&smbinit_irx;
     }
@@ -467,10 +464,10 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     //For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
     //total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
     irxptr = (void *)0x00033000;
-    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr + GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
+    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info));
     DI();
     ee_kmode_enter();
-    memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[OPL_MODULE_ID_UDNL].ptr, GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
+    memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[0].ptr, GET_OPL_MOD_SIZE(irxptr_tab[0].info));
     ee_kmode_exit();
     EI();
 

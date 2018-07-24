@@ -14,9 +14,10 @@
 ENTRY(_start);
 
 MEMORY {
-	ram86	: ORIGIN = 0x00086000, LENGTH =  8K  /* 0x00086000 - 0x00088000: probably free */
-	ram88	: ORIGIN = 0x00088000, LENGTH =  60K /* 0x00088000 - 0x00097000: free */
-	ramD0	: ORIGIN = 0x000D0000, LENGTH = 192K /* 0x000D0000 - 0x00100000: probably free */
+	ram86	: ORIGIN = 0x00086000, LENGTH =  8K   /* 0x00086000 - 0x00088000: probably free */
+	ram88	: ORIGIN = 0x00088000, LENGTH = 60928 /* 0x00088000 - 0x00096E00: free */
+	stack	: ORIGIN = 0x00096E00, LENGTH = 512   /* 0x00096E00 - 0x00097000: free */
+	ramD0	: ORIGIN = 0x000D0000, LENGTH = 192K  /* 0x000D0000 - 0x00100000: probably free */
 }
 
 SECTIONS {

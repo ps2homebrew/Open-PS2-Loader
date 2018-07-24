@@ -118,9 +118,11 @@ static void t_loadElf(void)
     argv[0] = ExitPath;
     argv[1] = NULL;
 
+    FlushCache(0);
+
     ret = LoadElf(argv[0], &elf);
 
-    if (!ret && elf.epc) {
+    if (!ret) {
 
         // Exit services
         LoadFileExit();

@@ -32,7 +32,6 @@
 #include "modmgr.h"
 #include "util.h"
 #include <stdio.h>
-#include <libmc.h>
 
 #define GS_BITBLTBUF 0x50
 #define GS_TRXPOS 0x51

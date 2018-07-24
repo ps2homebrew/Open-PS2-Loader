@@ -24,7 +24,7 @@
 
 #include "include/igs_api.h"
 
-inline void FastDelay(int count)
+static void FastDelay(int count)
 {
     int i, ret;
 
@@ -35,7 +35,7 @@ inline void FastDelay(int count)
     }
 }
 
-_IGS_ENGINE_ void BlinkColour(u8 x, u32 colour, u8 forever)
+static _IGS_ENGINE_ void BlinkColour(u8 x, u32 colour, u8 forever)
 {
     u8 i;
     do {
@@ -50,7 +50,7 @@ _IGS_ENGINE_ void BlinkColour(u8 x, u32 colour, u8 forever)
     } while (forever);
 }
 
-_IGS_ENGINE_ u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
+static _IGS_ENGINE_ u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
 {
     u128 *addr = (u128 *)start;
     u32 counter = 0;
@@ -80,7 +80,7 @@ _IGS_ENGINE_ u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
     return result;
 }
 
-_IGS_ENGINE_ void ClearBuffer(u8 *buffer, u32 size)
+static _IGS_ENGINE_ void ClearBuffer(u8 *buffer, u32 size)
 {
     u32 i;
     for (i = 0; i < size; i++) {
@@ -88,36 +88,7 @@ _IGS_ENGINE_ void ClearBuffer(u8 *buffer, u32 size)
     }
 }
 
-_IGS_ENGINE_ void DisableInterrupts()
-{
-    int eie;
-    asm volatile("mfc0\t%0, $12"
-                 : "=r"(eie));
-    eie &= 0x10000;
-    if (!eie)
-        return;
-    asm(".p2align 3");
-    do {
-        asm volatile("di");
-        asm volatile("sync.p");
-        asm volatile("mfc0\t%0, $12"
-                     : "=r"(eie));
-        eie &= 0x10000;
-    } while (eie);
-    return;
-}
-
-_IGS_ENGINE_ void EnableInterrupts()
-{
-    int eie;
-    asm volatile("mfc0\t%0, $12"
-                 : "=r"(eie));
-    eie &= 0x10000;
-    if (eie)
-        asm volatile("ei");
-}
-
-_IGS_ENGINE_ void u8todecstr(u8 input, char *output, u8 digits)
+static _IGS_ENGINE_ void u8todecstr(u8 input, char *output, u8 digits)
 {
     u8 i = digits; //Number of digits (output)
     do {
@@ -132,7 +103,7 @@ _IGS_ENGINE_ void u8todecstr(u8 input, char *output, u8 digits)
     output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u16todecstr(u16 input, char *output, u8 digits)
+static _IGS_ENGINE_ void u16todecstr(u16 input, char *output, u8 digits)
 {
     u8 i = digits; //Number of digits (output)
     do {
@@ -147,7 +118,7 @@ _IGS_ENGINE_ void u16todecstr(u16 input, char *output, u8 digits)
     output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u32todecstr(u32 input, char *output, u8 digits)
+static _IGS_ENGINE_ void u32todecstr(u32 input, char *output, u8 digits)
 {
     u8 i = digits; //Number of digits (output)
     do {
@@ -162,7 +133,7 @@ _IGS_ENGINE_ void u32todecstr(u32 input, char *output, u8 digits)
     output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u32tohexstr(u32 input, char *output, u8 digits)
+static _IGS_ENGINE_ void u32tohexstr(u32 input, char *output, u8 digits)
 {
     u8 i = digits; //Number of digits (output)
     do {
@@ -177,7 +148,7 @@ _IGS_ENGINE_ void u32tohexstr(u32 input, char *output, u8 digits)
     output[digits] = 0;
 }
 
-_IGS_ENGINE_ void u64tohexstr(u64 input, char *output, u8 digits)
+static _IGS_ENGINE_ void u64tohexstr(u64 input, char *output, u8 digits)
 {
     u8 i = digits; //Number of digits (output)
     do {
@@ -192,7 +163,7 @@ _IGS_ENGINE_ void u64tohexstr(u64 input, char *output, u8 digits)
     output[digits] = 0;
 }
 
-_IGS_ENGINE_ u8 PixelSize(u8 spsm)
+static _IGS_ENGINE_ u8 PixelSize(u8 spsm)
 {
     u8 result = 0;
     if (spsm == GS_PSM_CT32)
@@ -206,7 +177,7 @@ _IGS_ENGINE_ u8 PixelSize(u8 spsm)
     return result;
 }
 
-_IGS_ENGINE_ void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dimensions, u8 pixel_size, u32 image_size, u128 *buffer)
+static _IGS_ENGINE_ void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dimensions, u8 pixel_size, u32 image_size, u128 *buffer)
 {
 
     delay(1);
@@ -365,7 +336,7 @@ _IGS_ENGINE_ void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u3
     *GS_VIF1_FIFO = *(u128 *)EnableGIFPATH3;
 }
 
-_IGS_ENGINE_ void ConvertColors32(u32 *buffer, u32 dimensions)
+static _IGS_ENGINE_ void ConvertColors32(u32 *buffer, u32 dimensions)
 {
     u32 i;
     u32 x32;
@@ -377,11 +348,9 @@ _IGS_ENGINE_ void ConvertColors32(u32 *buffer, u32 dimensions)
         FastDelay(1);
         GS_BGCOLOUR = (0x0000FF - (255 * (i + 1) / dimensions) * 0x000001); //Red Fade Out Effect
     }
-    FlushCache(0);
-    FlushCache(2);
 }
 
-_IGS_ENGINE_ void ConvertColors24(u8 *buffer, u32 image_size)
+static _IGS_ENGINE_ void ConvertColors24(u8 *buffer, u32 image_size)
 {
     u32 i;
     u32 x32 __attribute__((aligned(16)));
@@ -395,11 +364,9 @@ _IGS_ENGINE_ void ConvertColors24(u8 *buffer, u32 image_size)
         FastDelay(1);
         GS_BGCOLOUR = (0x00FF00 - (255 * (i + 1) / image_size) * 0x000100); //Green Fade Out Effect
     }
-    FlushCache(0);
-    FlushCache(2);
 }
 
-_IGS_ENGINE_ void ConvertColors16(u16 *buffer, u32 dimensions)
+static _IGS_ENGINE_ void ConvertColors16(u16 *buffer, u32 dimensions)
 {
     u32 i;
     u16 x16;
@@ -411,11 +378,9 @@ _IGS_ENGINE_ void ConvertColors16(u16 *buffer, u32 dimensions)
         FastDelay(1);
         GS_BGCOLOUR = (0xFF0000 - (255 * (i + 1) / dimensions) * 0x010000); //Blue Fade Out Effect
     }
-    FlushCache(0);
-    FlushCache(2);
 }
 
-_IGS_ENGINE_ void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 image_size, u8 Number)
+static _IGS_ENGINE_ void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 image_size, u8 Number)
 {
 
     delay(1);
@@ -599,7 +564,7 @@ _IGS_ENGINE_ void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size,
     GS_BGCOLOUR = 0x000000; //Black
 }
 
-_IGS_ENGINE_ u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd)
+static _IGS_ENGINE_ u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd)
 {
 
     delay(1);
@@ -721,7 +686,7 @@ _IGS_ENGINE_ u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffe
 _IGS_ENGINE_ int InGameScreenshot(void)
 {
 
-    DisableInterrupts();
+    DI();
 
     u64 pmode;
     u64 smode2;
@@ -781,24 +746,24 @@ _IGS_ENGINE_ int InGameScreenshot(void)
     // Color Space conversion from BGR to RGB (i.e. little endian => big endian)
     switch (spsm) {
         case GS_PSM_CT32:
-            buffer32 = (u32 *)buffer;
+            buffer32 = (u32 *)UNCACHED_SEG(buffer);
             ConvertColors32(buffer32, dimensions);
             break; //32-bit PS2 BGR  (PSMCT32  =  0, pixel_size=4) to BMP RGB conversion
         case GS_PSM_CT24:
-            buffer8 = (u8 *)buffer;
+            buffer8 = (u8 *)UNCACHED_SEG(buffer);
             ConvertColors24(buffer8, image_size);
             break; //24-bit PS2 BGR  (PSMCT24  =  1, pixel_size=3) to BMP RGB conversion
         case GS_PSM_CT16:
-            buffer16 = (u16 *)buffer;
+            buffer16 = (u16 *)UNCACHED_SEG(buffer);
             ConvertColors16(buffer16, dimensions);
             break; //16-bit PS2 BGR  (PSMCT16  =  2, pixel_size=2) to BMP RGB conversion
         case GS_PSM_CT16S:
-            buffer16 = (u16 *)buffer;
+            buffer16 = (u16 *)UNCACHED_SEG(buffer);
             ConvertColors16(buffer16, dimensions);
             break; //16-bit PS2 BGRA (PSMCT16S = 10, pixel_size=2) to BMP RGB conversion
     }
 
-    EnableInterrupts();
+    EI();
 
     delay(1);
     GS_BGCOLOUR = 0x660033; //Midnight Blue
@@ -807,13 +772,6 @@ _IGS_ENGINE_ int InGameScreenshot(void)
     LoadFileInit();
     LoadModule("rom0:SIO2MAN", 0, NULL);
     LoadModule("rom0:MCMAN", 0, NULL);
-    LoadModule("rom0:MCSERV", 0, NULL);
-
-#ifdef _DTL_T10000
-    mcInit(MC_TYPE_XMC);
-#else
-    mcInit(MC_TYPE_MC);
-#endif
 
     //Save IGS Bitmap File first, since it's the bigger file)
     intffmd = GET_SMODE2_INTFFMD(smode2);
@@ -828,7 +786,6 @@ _IGS_ENGINE_ int InGameScreenshot(void)
     // Exit services
     fioExit();
     LoadFileExit();
-    SifExitIopHeap();
     SifExitRpc();
     FlushCache(0);
     FlushCache(2);

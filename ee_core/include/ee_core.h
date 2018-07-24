@@ -83,7 +83,6 @@ int PadEmuSettings;
 #endif
 
 int DisableDebug;
-int PS2Logo;
 #define GS_BGCOLOUR *((volatile unsigned long int *)0x120000E0)
 
 #ifdef CHEAT

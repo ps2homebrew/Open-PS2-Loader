@@ -14,7 +14,7 @@ endif
 all: $(IOP_BIN)
 
 clean:
-	rm -f $(IOP_BIN) $(IOP_OBJS) IOPRP_img.c IOPRP_DECI2_img.c
+	rm -f $(IOP_BIN) $(IOP_OBJS) IOPRP_img.c IOPRP_DECI2_img.c IOPRP_DECI2_img.o IOPRP_img.o
 
 IOPRP_img.c:
 	$(BIN2C) IOPRP.img IOPRP_img.c IOPRP_img

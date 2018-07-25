@@ -81,7 +81,7 @@ static int inline IsMessageBoxEmpty(sys_mbox_t apMBox)
     return apMBox->u16Last == apMBox->u16First;
 } /* end IsMessageBoxEmpty */
 
-#ifdef INGAME_DRIVER
+#ifdef INTERRUPT_CTX_INPKT
 void PostInputMSG(sys_mbox_t pMBox, void *pvMSG)
 {
 
@@ -149,7 +149,7 @@ int ps2ip_setconfig(t_ip_info *pInfo)
 
 } /* end ps2ip_setconfig */
 
-#ifdef INGAME_DRIVER
+#ifdef INTERRUPT_CTX_INPKT
 typedef struct InputMSG
 {
     struct pbuf *pInput;

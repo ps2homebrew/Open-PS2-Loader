@@ -373,15 +373,14 @@ andi	$a1, $a1, 0x1f		# a1 = unscaled rt reg index
 srl	$a0, $v0, 21
 andi	$a0, $a0, 0x1f		# a0 = unscaled base reg index
 
-sll	$k0, $a0, 4		# k0 = raw base_ix << 4 (scaled base_ix reg index)
+sll	$a3, $a0, 4		# a3 = raw base_ix << 4 (scaled base_ix reg index)
+addu	$a3, $a2, $a3		# a3 = &MIPS_Regs[base_ix]; (if type = u128)
+lw	$a3, 0($a3)		# a3 = base register value
+andi	$v0, $v0, 0xFFFF	# v0 = offset field of instruction
+addu	$a3, $a3, $v0		# a3 = address which triggered breakpoint
 
-addu	$v1, $a2, $k0		# v1 = &MIPS_Regs[base_ix]; (if type = u128)
-lw	$a3, 0($v1)		# a3 = base register value
-andi	$k1, $v0, 0xFFFF	# k1 = offset field of instruction
-addu	$a3, $a3, $k1		# a3 = address which triggered breakpoint
-
-sll	$k0, $a1, 4		# k0 = raw rt_ix << 4 (scaled rt_ix reg index)
-addu	$v0, $a2, $k0		# v0 = &MIPS_Regs[rt_ix];
+sll	$v0, $a1, 4		# v0 = raw rt_ix << 4 (scaled rt_ix reg index)
+addu	$v0, $a2, $v0		# v0 = &MIPS_Regs[rt_ix];
 ld	$a1, 0($v0)		# a1 = value in rt
 
 #  NB: The trapping method forces us to trap some GS registers we don't want.

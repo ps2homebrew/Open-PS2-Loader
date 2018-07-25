@@ -50,7 +50,7 @@ static powerbuttondata_t Power_Button;
 static int IGR_Thread_ID = -1;
 
 /* IGR thread stack & stack size */
-#define IGR_STACK_SIZE (16 * 512)
+#define IGR_STACK_SIZE (16 * 192)
 static u8 IGR_Stack[IGR_STACK_SIZE] __attribute__((aligned(16)));
 
 /* Extern symbol */

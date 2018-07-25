@@ -210,6 +210,7 @@ ifeq ($(DEBUG),1)
       EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
       IOP_OBJS += drvtif_irx.o tifinet_irx.o
       DECI2_DEBUG=1
+      CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
     else
       IOP_OBJS += udptty-ingame.o
     endif

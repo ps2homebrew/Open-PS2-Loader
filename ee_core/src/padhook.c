@@ -50,7 +50,7 @@ static powerbuttondata_t Power_Button;
 static int IGR_Thread_ID = -1;
 
 /* IGR thread stack & stack size */
-#define IGR_STACK_SIZE (16 * 512)
+#define IGR_STACK_SIZE (16 * 192)
 static u8 IGR_Stack[IGR_STACK_SIZE] __attribute__((aligned(16)));
 
 /* Extern symbol */
@@ -118,9 +118,11 @@ static void t_loadElf(void)
     argv[0] = ExitPath;
     argv[1] = NULL;
 
+    FlushCache(0);
+
     ret = LoadElf(argv[0], &elf);
 
-    if (!ret && elf.epc) {
+    if (!ret) {
 
         // Exit services
         LoadFileExit();

@@ -316,7 +316,7 @@ andi	$k1, 1			# k1 = BD2
 sll	$k1, 2			# k1 = BD2*4
 mfc0	$k0, $30		# k0 = ErrorPC (COP0 reg 30) -> MIPS instruction
 addu	$k0, $k1		# Add 4 to opcode address for Branch Delay Slot
-				# Next get rt (target register) and write address
+				# Next get rt (target register) and effective address
 				# but first check that the instruction is one we patch
 lw	$v0, 0($k0)		# v0 = MIPS instruction that caused trap
 
@@ -338,36 +338,8 @@ lw	$a1,0($a0)		# a1 = opcode handler from op_t
 
 jr	$a1			# jump to separate opcode handlers
 nop				# with v0=instruction, a2->KSeg, a3->op_t
-	
-#  For the present we ignore read operations (should never happen. Not trapped)
-ldl_op:
-ldr_op:
-lq_op:
-lb_op:
-lh_op:
-lwl_op:
-lw_op:
-lbu_op:
-lhu_op:
-lwr_op:
-lwu_op:
-lq_op:
-ld_op:
-ignore:				# We just ignore weird opcodes that we don't implement
-beqzl	$zero,exit_GSHandler
-nop
 
-#  For the present we treat all write operations as 'sd'
-sq_op:
-sb_op:
-sh_op:
-swl_op:
-sw_op:
-sdl_op:
-sdr_op:
-swr_op:
-sd_op:
-have_some_write:		# Opcode is a write, so we must check further
+get_access_info:
 srl	$a1, $v0, 16
 andi	$a1, $a1, 0x1f		# a1 = unscaled rt reg index
 srl	$a0, $v0, 21
@@ -380,19 +352,122 @@ andi	$v0, $v0, 0xFFFF	# v0 = offset field of instruction
 addu	$a3, $a3, $v0		# a3 = address which triggered breakpoint
 
 sll	$v0, $a1, 4		# v0 = raw rt_ix << 4 (scaled rt_ix reg index)
-addu	$v0, $a2, $v0		# v0 = &MIPS_Regs[rt_ix];
-ld	$a1, 0($v0)		# a1 = value in rt
+addu	$a1, $a2, $v0		# a1 = &MIPS_Regs[rt_ix];
 
 #  NB: The trapping method forces us to trap some GS registers we don't want.
 #      It is crucial that the writing of those registers proceeds undisturbed.
 #      This is handled by the final test case below, at label "not_wanted_reg".
 
-#  Here a1=source_data, a2->.gsm_engine, a3=dest_address
+#  Here a1=pointer to entry for rt reg, a2->.gsm_engine, a3=dest_address
 #  NB: Since address is changed to offset by ANDI, it is valid for all segments
 #  NB: We avoid masking a3 itself though, in case this is an unwanted register
 #  NB: Remasking for KSEG1 should be done in each handler for wanted registers
 
-andi	$v0,$a3,0xFFFF				# v0 = dest offset from GS_BASE
+jr $ra
+andi	$v0,$a3,0xFFFF		# v0 = dest offset from GS_BASE
+
+lb_op:
+	b have_some_read
+	addu $k0, $zero, $zero
+lbu_op:
+	b have_some_read
+	addiu $k0, $zero, 1
+ldl_op:
+ldr_op:
+ld_op:
+	b have_some_read
+	addiu $k0, $zero, 6
+lq_op:
+	b have_some_read
+	addiu $k0, $zero, 7
+lh_op:
+	b have_some_read
+	addiu $k0, $zero, 2
+lhu_op:
+	b have_some_read
+	addiu $k0, $zero, 3
+lwl_op:
+lwr_op:
+lw_op:
+	b have_some_read
+	addiu $k0, $zero, 4
+lwu_op:
+	b have_some_read
+	addiu $k0, $zero, 5
+
+have_some_read:		# Opcode is a read, so we must check further
+jal get_access_info
+nop
+
+#addi	$v1,$v0, -GS_CSR
+#beqzl	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
+#nop
+
+not_wanted_reg_read:				# Register unwanted, so perform op unchanged
+ld	$v0,0($a3)
+
+beqz $k0, do_load_byte	#Byte
+addiu $k0, $k0, -1
+beqz $k0, do_load_ubyte	#Unsigned Byte
+addiu $k0, $k0, -1
+beqz $k0, do_load_half	#Halfword
+addiu $k0, $k0, -1
+beqz $k0, do_load_uhalf	#Unsigned Halfword
+addiu $k0, $k0, -1
+beqz $k0, do_load_word	#Word
+addiu $k0, $k0, -1
+beqz $k0, do_load_uword	#Unsigned Word
+nop			#Fall through for Doubleword & Quadword (Upper 64 bits ignored)
+
+# Store data to destination
+do_load:
+b	exit_GSHandler
+sd	$v0,0($a1)
+
+do_load_byte:
+sll	$v0, $v0, 24
+b	do_load
+sra	$v0, $v0, 24
+
+do_load_ubyte:
+sll	$v0, $v0, 24
+b	do_load
+srl	$v0, $v0, 24
+
+do_load_half:
+sll	$v0, $v0, 16
+b	do_load
+sra	$v0, $v0, 16
+
+do_load_uhalf:
+sll	$v0, $v0, 16
+b	do_load
+srl	$v0, $v0, 16
+
+do_load_word:
+b	do_load
+sll	$v0, $v0, 0	#truncated to 32-bits and sign-extended to 64.
+
+do_load_uword:
+dsll32	$v0, $v0, 0
+b	do_load
+dsrl32	$v0, $v0, 0
+
+#  For the present we treat all write operations as 'sd'
+sq_op:
+sb_op:
+sh_op:
+swl_op:
+sw_op:
+sdl_op:
+sdr_op:
+swr_op:
+sd_op:
+have_some_write:		# Opcode is a write, so we must check further
+
+jal get_access_info
+nop
+ld	$a1, 0($a1)		# a1 = value in rt
 
 addi	$v1,$v0, -GS_PMODE
 beqzl	$v1,have_PMODE_write			# in case of  dest == GS_reg_PMODE
@@ -430,6 +505,10 @@ nop
 
 not_wanted_reg:					# Register unwanted, so perform op unchanged
 sd	$a1,0($a3)				# Store source data unchanged to destination
+beqzl	$zero,exit_GSHandler
+nop
+
+ignore:				# We just ignore weird opcodes that we don't implement
 beqzl	$zero,exit_GSHandler
 nop
 
@@ -1162,7 +1241,7 @@ sync.p			# Await instruction completion
 mfbpc $a3
 sync.p			# Await instruction completion
 
-li $a2, 0x20200000	# Data write breakpoint on (DWE, DUE = 1)
+li $a2, 0x60200000	# Data read & write breakpoint on (DRE, DWE, DUE = 1)
 or $a3, $a3, $a2
 xori $a3, $a3, 0x8000	# DEBUG exception trigger on (BED = 0)
 mtbpc $a3

@@ -61,7 +61,19 @@ GSMDestSetGsCrt:	.space 12
 GSMDestGSRegs: .space 88
 
 .globl GSMFlags
-GSMFlags: .space 17
+GSMFlags: .space 18
+.equ X_offset,              0 # WORD
+.equ Y_offset,              4 # WORD
+.equ ADAPTATION_fix,        8 # BYTE
+.equ PMODE_fix,             9 # BYTE
+.equ SMODE1_fix,           10 # BYTE
+.equ SMODE2_fix,           11 # BYTE
+.equ SRFSH_fix,            12 # BYTE
+.equ SYNCH_fix,            13 # BYTE
+.equ SYNCV_fix,            14 # BYTE
+.equ DISPFB_fix,           15 # BYTE
+.equ DISPLAY_fix,          16 # BYTE
+.equ FIELD_stat,           17 # BYTE
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -399,13 +411,14 @@ have_some_read:		# Opcode is a read, so we must check further
 jal get_access_info
 nop
 
-#addi	$v1,$v0, -GS_CSR
-#beqzl	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
-#nop
+addi	$v1,$v0, -GS_CSR
+beqzl	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
+nop
 
 not_wanted_reg_read:				# Register unwanted, so perform op unchanged
 ld	$v0,0($a3)
 
+load_new_value:
 beqz $k0, do_load_byte	#Byte
 addiu $k0, $k0, -1
 beqz $k0, do_load_ubyte	#Unsigned Byte
@@ -935,6 +948,39 @@ nop
 
 # ------------------------------------------------------------------------------------------------------
 
+# ----------------------------
+# CSR
+#
+have_CSR_read:				# Here a1=pointer to rt reg, a2->.gsm_engine, a3=source_adress, k0 = access mode
+
+slti	$t0, $k0, 2			#Cannot process byte loads (necessary bits will be missing)
+bnez	$t0, not_wanted_reg_read
+
+lbu	$t0, Source_SMODE2($s0)		#Only emulate if the game uses interlace, but a non-interlaced mode is selected.
+lbu	$t1, Target_SMODE2($s1)		#Whereby source interlace != selected interlace, selected interlace == 0 (not interlace)
+xori	$t0, $t0, 1
+and	$t0, $t0, $t1
+andi	$t0, $t0, 1
+bnez	$t0, not_wanted_reg_read
+
+#Emulate ODD/EVEN flipping of the CSR FIELD (bit 13).
+ld      $t0, GS_CSR($s4)		# t0 = CSR. Load CSR to check on the HSINT status
+lbu	$t1, FIELD_stat($s2)		# t1 = FIELD_status
+andi	$t2, $t0, 4			#Check HSINT event.
+beqz	$t2, not_wanted_reg_read	#Flip emulated FIELD status, only at the end of H-Blank.
+xori	$t1, $t1, 2			#Flip counter. This counter is used to half the rate of flipping, since progressive modes have double the Horizontal frequency.
+andi	$t2, $t1, 2			#If counter == 0,
+beqzl	$t2, skip_flip
+xori	$t1, $t1, 1			#Flip odd/even FIELD status.
+skip_flip:
+sb	$t1, FIELD_stat($s2)		#Update status.
+andi	$t1, $t1, 1
+ori	$t0, $t0, 0x2000		#Clear FIELD field 1 ^ 1 = always 0.
+xori	$t0, $t0, 0x2000
+sll	$t1, $t1, 13			#Move bit into position.
+b	load_new_value
+or	$v0, $t0, $t1			#Replace FIELD field.
+
 exit_GSHandler:
 la $k0, MIPS_Regs  # Restore MIPS_Regs via $k0
 # lq $zero, 0x000($k0)
@@ -1241,7 +1287,7 @@ sync.p			# Await instruction completion
 mfbpc $a3
 sync.p			# Await instruction completion
 
-li $a2, 0x60200000	# Data read & write breakpoint on (DRE, DWE, DUE = 1)
+li $a2, 0x60280000	# Data read & write breakpoint on (DRE, DWE, DUE, DKE = 1). Syscalls are run in kernel mode, for the EE.
 or $a3, $a3, $a2
 xori $a3, $a3, 0x8000	# DEBUG exception trigger on (BED = 0)
 mtbpc $a3

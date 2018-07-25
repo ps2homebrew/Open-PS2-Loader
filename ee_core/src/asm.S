@@ -10,9 +10,6 @@
 #include <ee_cop0_defs.h>
 #include <syscallnr.h>
 
-#define MAX_ARGS 	15
-#define ARGBUF_SIZE 	580
-
 #define COMPAT_MODE_3 	0x04 // Unhook Syscalls
 #define COMPAT_MODE_6 	0x20 // Disable IGR
 
@@ -37,12 +34,11 @@
 	.extern memcpy
 	.extern strlen
 	.extern strncpy
-		.extern ExecPS2
+	.extern ExecPS2
 
 	/* syshook.c */
 	.extern g_argc
 	.extern g_argv
-	.extern t_loadElf
 	.extern set_reg_hook
 	.extern iop_reboot_count
 	.extern New_SifSetDma
@@ -61,182 +57,11 @@
 	.extern Install_PadOpen_Hook
 
 	.globl  g_argbuf
-	.globl	Hook_LoadExecPS2
 	.globl	Hook_SifSetDma
 	.globl	Hook_SifSetReg
 	.globl	Hook_ExecPS2
 	.globl	Hook_CreateThread
 	.globl CleanExecPS2
-
-
-/*
- * _LoadExecPS2: this function preserves args and change stack pointer
- * before to execute t_loadElf
- */
-	.ent	_LoadExecPS2
-_LoadExecPS2:
-	/* Set disable_padOpen_hook */
-	la	$v1, disable_padOpen_hook
-	addiu	$v0, $zero, 1
-	sw	$v0, 0x0000($v1)
-
-	/* save args, not needed to preserve sX/ra registers values as we won't return */
-	daddu	$s0, $a0, $zero /* ELF path 	*/
-	daddu	$s1, $a1, $zero /* argc 	*/
-	daddu	$s2, $a2, $zero /* argv 	*/
-
-	lw	$v0, DisableDebug
-	bne	$v0, $zero, 1f
-	nop
-
-	/* dark blue BG color */
-	lui	$v0, 0x1200
-	ori	$v0, $v0, 0x00e0
-	lui	$v1, 0x0040
-	sd	$v1, 0x0000($v0)
-
-1:
-	/* disable Intr */
-	mfc0	$v1, EE_COP0_Status
-	lui	$v0, 0x0010
-	and	$v1, $v1, $v0
-	daddu	$a0, $zero, $zero
-	beq	$v1, $zero, 3f
-	nop
-2:
-	di
-	sync.p
-	mfc0	$v1, EE_COP0_Status
-	nop
-	and	$v1, $v1, $v0
-	nop
-	bne	$v1, $zero, 2b
-	nop
-3:
-	/* entering Kernel mode */
-	mfc0	$v0, EE_COP0_Status
-	lui	$v1, 0xffff
-	ori	$v1, $v1, 0xffe7
-	and	$v0, $v0, $v1
-	mtc0	$v0, EE_COP0_Status
-	sync.p
-
-	/* set g_argc to arg count , or MAX_ARGS if greater */
-	slti	$v0, $s1, MAX_ARGS+1
-	addiu	$v1, $zero, MAX_ARGS
-	movn	$v1, $s1, $v0
-	la	$v0, g_argc
-	sw	$v1, 0x0000($v0)
-
-	/* pointer to g_argbuf */
-	la	$s3, g_argbuf
-
-	/* clear g_argbuf */
-	daddu	$a0, $s3, $zero
-	daddu	$a1, $zero, $zero
-	jal	memset
-	addiu	$a2, $zero, ARGBUF_SIZE
-
-	/* copy elfname to argv[0] */
-	daddu	$a0, $s3, $zero
-	daddu	$a1, $s0, $zero
-	jal	strncpy
-	addiu	$a2, $zero, ARGBUF_SIZE
-
-	/* set g_argv[0] to g_argbuf */
-	la	$v0, g_argv
-	sw	$s3, 0x0000($v0)
-
-	/* increment arg buffer pointer */
-	jal	strlen
-	daddu	$a0, $s0, $zero
-	addiu	$v0, $v0, 1
-	daddu	$s3, $s3, $v0
-
-	/* increment g_argc */
-	la	$v1, g_argc
-	lw	$v0, 0x0000($v1)
-	daddu	$s4, $v0, $zero /* g_argc(-1) */
-	addiu	$v0, $v0, 1
-	sw	$v0, 0x0000($v1)
-
-	/* copy args from main ELF to args buffer */
-	blez	$s4, 5f
-	daddu	$s5, $zero, $zero /* counter */
-4:
-	/* get arg len and increment it */
-	daddu	$a0, $s2, $zero
-	sll	$v0, $s5, 2
-	daddu	$a0, $a0, $v0
-	jal	strlen
-	lw	$a0, 0x0000($a0)
-	addiu	$s6, $v0, 1 /* arg len */
-
-	/* copy arg to main args buffer */
-	daddu	$a0, $s3, $zero
-	daddu	$a1, $s2, $zero
-	sll	$v0, $s5, 2
-	daddu	$a1, $a1, $v0
-	lw	$a1, 0x0000($a1)
-	jal	memcpy
-	daddu	$a2, $s6, $zero
-
-	/* store arg pointer to g_argv[counter+1] */
-	la	$v0, g_argv
-	sll	$v1, $s5, 2
-	daddu	$v0, $v0, $v1
-	sw	$s3, 0x0004($v0)
-
-	/* increment arg buffer pointer with arg len + 1 */
-	daddu	$s3, $s3, $s6
-
-	/* loop on every args */
-	addiu	$s5, $s5, 1
-	slt	$v1, $s5, $s4
-	bne	$v1, $zero, 4b
-	nop
-5:
-	/* exiting Kernel mode */
-	mfc0	$v0, EE_COP0_Status
-	ori	$v0, $v0, 0x0010
-	mtc0	$v0, EE_COP0_Status
-	sync.p
-
-	/* enable Intr */
-	ei
-
-	/* change the stack pointer */
-	la	$sp, _end
-
-	/*
-	 * ExecPS2() does the following for us:
-	 * - do a soft EE peripheral reset
-	 * - terminate all threads and delete all semaphores
-	 * - set up ELF loader thread and run it
-	 */
-	la 	$a0, t_loadElf
-	daddu	$a1, $zero, $zero
-	daddu	$a2, $zero, $zero
-	daddu	$a3, $zero, $zero
-	addiu	$v1, $zero, __NR__ExecPS2
-	syscall
-	nop
-
-	.end	_LoadExecPS2
-
-/*
- * Hook_LoadExecPS2: exit syscall to _LoadExecPS2
- */
-	.ent	Hook_LoadExecPS2
-Hook_LoadExecPS2:
-
-	/* exit syscall to _LoadExecPS2 */
-	la $v1, _LoadExecPS2
-	sw $v1, 8($sp)
-	jr $ra
-	nop
-
-	.end	Hook_LoadExecPS2
 
 /*
  * _SifSetDma: function designed to use our own stack during IOP reboot trap
@@ -256,12 +81,9 @@ _SifSetDma:
 	jal	New_SifSetDma
 	sd	$a2, 0x0008($sp)
 
-	/* restore a2 and ra registers */
-	ld	$a2, 0x0008($sp)
+	/* restore sp and ra registers */
 	ld	$ra, 0x0000($sp)
-
-	/* restore the original stack pointer */
-	daddu	$sp, $a2, $zero
+	ld	$sp, 0x0008($sp)
 
 	jr	$ra
 	addiu	$v0, $zero, 1
@@ -349,12 +171,9 @@ _Apply_Mode3:
 	addiu	$v1, $zero, __NR_FlushCache
 	syscall
 
-	/* restore a0 and ra registers */
-	ld	$a0, 0x0008($sp)
+	/* restore sp and ra registers */
 	ld	$ra, 0x0000($sp)
-
-	/* restore the original stack pointer */
-	daddu	$sp, $a0, $zero
+	ld	$sp, 0x0008($sp)
 
 	jr	$ra
 	addiu	$v0, $zero, 1
@@ -498,7 +317,7 @@ Hook_CreateThread:
 	/* change the stack pointer */
 	la	$sp, _end
 
-	/* preserves ra, a1 and a0 registers values */
+	/* preserves ra, a1 (sp) and a0 registers values */
 	addiu	$sp, $sp, -0x20
 	sd	$ra, 0x0000($sp)
 	sd	$a1, 0x0008($sp)
@@ -512,13 +331,11 @@ Hook_CreateThread:
 	la	$v1, padOpen_hooked
 	sw	$v0, 0x0000($v1)
 
-	/* restore a0, a1 and ra registers */
+	/* restore a0, sp and ra registers */
 	ld	$a0, 0x0010($sp)
-	ld	$a1, 0x0008($sp)
 	ld	$ra, 0x0000($sp)
+	ld	$sp, 0x0008($sp)
 
-	/* restore the original stack pointer */
-	daddu	$sp, $a1, $zero
 2:
 	/* call CreateThread */
 	lw	$v0, Old_CreateThread
@@ -614,16 +431,5 @@ InitRegsExecPS2:
 	jr $ra
 	ctc1 $zero, $f31
 .end InitRegsExecPS2
-
-/**************************************************************************
- *
- * COMMON section
- *
- **************************************************************************/
-
-	.section COMMON
-g_argbuf:
-	.space	(ARGBUF_SIZE)
-
 
 	.set pop

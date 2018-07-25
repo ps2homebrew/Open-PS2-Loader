@@ -29,6 +29,6 @@ unsigned long int _strtoul(const char *p);
 void set_ipconfig(void);
 u32 *find_pattern_with_mask(u32 *buf, unsigned int bufsize, const u32 *pattern, const u32 *mask, unsigned int len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);
-inline void delay(int count);
+void delay(int count);
 
 #endif /* UTIL */

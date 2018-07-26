@@ -122,11 +122,11 @@ static int eecoreInit(int argc, char **argv)
         smode2 = _strtoui(_strtok(NULL, " "));
         dx_offset = _strtoui(_strtok(NULL, " "));
         dy_offset = _strtoui(_strtok(NULL, " "));
-        i++;
 
         UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset);
         EnableGSM();
     }
+    i++;
 #endif
 
     set_ipconfig();

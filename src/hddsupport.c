@@ -425,9 +425,9 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
 {
     char path[256];
     if (isRelative)
-        sprintf(path, "%s%s/%s_%s", hddPrefix, folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s/%s_%s", hddPrefix, folder, value, suffix);
     else
-        sprintf(path, "%s%s_%s", folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s_%s", folder, value, suffix);
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 

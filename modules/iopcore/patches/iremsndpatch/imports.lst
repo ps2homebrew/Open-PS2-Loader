@@ -6,3 +6,9 @@ thbase_IMPORTS_start
 I_WakeupThread
 thbase_IMPORTS_end
 
+thsemap_IMPORTS_start
+I_CreateSema
+I_SignalSema
+I_WaitSema
+thsemap_IMPORTS_end
+

@@ -1,5 +1,5 @@
 IOP_BIN  = iremsndpatch.irx
-IOP_OBJS = main.o imports.o
+IOP_OBJS = main.o asm.o imports.o
 
 IOP_INCS +=
 IOP_CFLAGS += -Os -Wall -fno-builtin

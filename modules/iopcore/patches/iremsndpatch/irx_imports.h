@@ -19,5 +19,6 @@
 /* Please keep these in alphabetical order!  */
 #include <loadcore.h>
 #include <thbase.h>
+#include <thsemap.h>
 
 #endif /* IOP_IRX_IMPORTS_H */

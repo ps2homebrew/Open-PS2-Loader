@@ -106,7 +106,7 @@ static unsigned int frameCounter;
 
 static char errorMessage[256];
 
-static opl_io_module_t list_support[4];
+static opl_io_module_t list_support[MODE_COUNT];
 
 void moduleUpdateMenu(int mode, int themeChanged)
 {

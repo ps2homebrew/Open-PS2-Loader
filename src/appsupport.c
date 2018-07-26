@@ -144,7 +144,8 @@ static void appLaunchItem(int id, config_set_t *configSet)
             exception = UNMOUNT_EXCEPTION;
 
         char filename[256];
-        sprintf(filename, "%s", cur->val);
+        strncpy(filename, cur->val, sizeof(filename) - 1);
+        filename[sizeof(filename) - 1] = '\0';
         deinit(exception); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
         sysExecElf(filename);
     } else

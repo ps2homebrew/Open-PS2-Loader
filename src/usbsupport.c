@@ -96,8 +96,8 @@ void usbInit(void)
 {
     LOG("USBSUPPORT Init\n");
     usbULSizePrev = -2;
-    memset(usbModifiedCDPrev, 0, 8);
-    memset(usbModifiedDVDPrev, 0, 8);
+    memset(usbModifiedCDPrev, 0, sizeof(usbModifiedCDPrev));
+    memset(usbModifiedDVDPrev, 0, sizeof(usbModifiedDVDPrev));
     usbGameCount = 0;
     usbGames = NULL;
     configGetInt(configGetByType(CONFIG_OPL), "usb_frames_delay", &usbGameList.delay);
@@ -127,17 +127,17 @@ static int usbNeedsUpdate(void)
 
     sprintf(path, "%sCD", usbPrefix);
     if (fileXioGetStat(path, &stat) != 0)
-        memset(stat.mtime, 0, 8);
-    if (memcmp(usbModifiedCDPrev, stat.mtime, 8)) {
-        memcpy(usbModifiedCDPrev, stat.mtime, 8);
+        memset(stat.mtime, 0, sizeof(stat.mtime));
+    if (memcmp(usbModifiedCDPrev, stat.mtime, sizeof(usbModifiedCDPrev))) {
+        memcpy(usbModifiedCDPrev, stat.mtime, sizeof(usbModifiedCDPrev));
         result = 1;
     }
 
     sprintf(path, "%sDVD", usbPrefix);
     if (fileXioGetStat(path, &stat) != 0)
-        memset(stat.mtime, 0, 8);
-    if (memcmp(usbModifiedDVDPrev, stat.mtime, 8)) {
-        memcpy(usbModifiedDVDPrev, stat.mtime, 8);
+        memset(stat.mtime, 0, sizeof(stat.mtime));
+    if (memcmp(usbModifiedDVDPrev, stat.mtime, sizeof(usbModifiedDVDPrev))) {
+        memcpy(usbModifiedDVDPrev, stat.mtime, sizeof(usbModifiedDVDPrev));
         result = 1;
     }
 
@@ -442,9 +442,9 @@ static int usbGetImage(char *folder, int isRelative, char *value, char *suffix, 
 {
     char path[256];
     if (isRelative)
-        sprintf(path, "%s%s/%s_%s", usbPrefix, folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s/%s_%s", usbPrefix, folder, value, suffix);
     else
-        sprintf(path, "%s%s_%s", folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s_%s", folder, value, suffix);
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 

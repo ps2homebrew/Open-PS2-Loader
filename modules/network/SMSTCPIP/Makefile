@@ -1,3 +1,9 @@
+#Enable to reduce memory usage (in-game use).
+INGAME_DRIVER ?= 0
+
+#Enable to enable support for packet input from the interrupt context.
+INTERRUPT_CTX_INPKT ?= 1
+
 IOP_BIN = SMSTCPIP.irx
 IOP_OBJS = ps2ip.o inet.o ip.o ip_addr.o ip_frag.o etharp.o tcp_in.o tcp_out.o \
 	tcp.o tcpip.o mem.o api_lib.o api_msg.o sockets.o netif.o udp.o memp.o \
@@ -11,6 +17,10 @@ IOP_LDFLAGS += -s
 
 ifeq ($(INGAME_DRIVER),1)
 IOP_CFLAGS += -DINGAME_DRIVER
+endif
+
+ifeq ($(INTERRUPT_CTX_INPKT),1)
+IOP_CFLAGS += -DINTERRUPT_CTX_INPKT
 endif
 
 all: $(IOP_BIN)

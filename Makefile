@@ -89,7 +89,8 @@ MISC_OBJS =	icon_sys_A.o icon_sys_J.o conf_theme_OPL.o
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
-		httpclient-iop.o netman.o ps2ips.o
+		httpclient-iop.o netman.o ps2ips.o \
+		iremsndpatch.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
 		elfldr.o udnl.o imgdrv.o eesync.o \
@@ -211,6 +212,7 @@ ifeq ($(DEBUG),1)
       EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
       IOP_OBJS += drvtif_irx.o tifinet_irx.o
       DECI2_DEBUG=1
+      CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
     else
       IOP_OBJS += udptty-ingame.o
     endif
@@ -284,6 +286,9 @@ clean:
 	$(MAKE) -C modules/iopcore/cdvdman USE_HDPRO=1 clean
 	echo " -cdvdfsv"
 	$(MAKE) -C modules/iopcore/cdvdfsv clean
+	echo "  -patches"
+	echo "   -iremsnd"
+	$(MAKE) -C modules/iopcore/patches/iremsndpatch clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
 	echo " -usbhdfsdfsv"
@@ -431,6 +436,13 @@ modules/iopcore/cdvdfsv/cdvdfsv.irx: modules/iopcore/cdvdfsv
 
 $(EE_ASM_DIR)cdvdfsv.s: modules/iopcore/cdvdfsv/cdvdfsv.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ cdvdfsv_irx
+
+modules/iopcore/patches/iremsndpatch/iremsndpatch.irx: modules/iopcore/patches/iremsndpatch
+	echo " -iremsnd patch"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)iremsndpatch.s: modules/iopcore/patches/iremsndpatch/iremsndpatch.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ iremsndpatch_irx
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"

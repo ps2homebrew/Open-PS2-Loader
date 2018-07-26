@@ -334,18 +334,56 @@ void sysExecExit()
 #define CORE_IRX_DEBUG 0x20
 #define CORE_IRX_DECI2 0x40
 
-#ifdef VMC
-static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)
+typedef struct
+{
+    char *game;
+    char *mode;
+    void *module;
+    int *module_size;
+} patchlist_t;
+
+//Blank string for mode = all modes.
+static const patchlist_t iop_patch_list[] = {
+    {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Disaster Report
+    {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //SOS: The Final Escape
+    {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Zettai Zetsumei Toshi
+    {NULL, NULL, NULL, NULL },  //Terminator
+};
+
+static unsigned int addIopPatch(const char *mode_str, const char *startup, irxptr_t *tab)
+{
+    const patchlist_t *p;
+    int i;
+
+    for (i = 0; iop_patch_list[i].game != NULL; i++)
+    {
+        p = &iop_patch_list[i];
+
+        if (!strcmp(p->game, startup) && (p->mode[0] == '\0' || !strcmp(p->mode, startup)))
+        {
+            tab->info = (*(p->module_size)) | SET_OPL_MOD_ID(OPL_MODULE_ID_IOP_PATCH);
+            tab->ptr = (void *)p->module;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)
 { // Send IOP modules that core must use to Kernel RAM
-#else
-static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx)
-{ // Send IOP modules that core must use to Kernel RAM
-#endif
     irxtab_t *irxtable;
     irxptr_t *irxptr_tab;
     void *irxptr, *ioprp_image;
     int i, modcount;
     unsigned int curIrxSize, size_ioprp_image, total_size;
+
+    if (!strcmp(mode_str, "USB_MODE"))
+        modules |= CORE_IRX_USB;
+    else if (!strcmp(mode_str, "ETH_MODE"))
+        modules |= CORE_IRX_ETH | CORE_IRX_SMB;
+    else
+        modules |= CORE_IRX_HDD;
 
     irxtable = (irxtab_t *)ModuleStorage;
     irxptr_tab = (irxptr_t *)((unsigned char *)irxtable + sizeof(irxtab_t));
@@ -371,22 +409,19 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
         irxptr_tab[modcount++].ptr = pusbd_irx;
     }
     if (modules & CORE_IRX_ETH) {
-#ifdef __DECI2_DEBUG //FIXME: I don't know why, but the ingame SMAP driver cannot be used with the DECI2 modules. Perhaps that old bug with the network stack become unresponsive gets triggered? Until this is solved, use the normal SMAP driver.
-        irxptr_tab[modcount].info = size_smap_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);
-        irxptr_tab[modcount++].ptr = (void *)&smap_irx;
-#else
         irxptr_tab[modcount].info = size_smap_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);
         irxptr_tab[modcount++].ptr = (void *)&smap_ingame_irx;
-#endif
         irxptr_tab[modcount].info = size_ingame_smstcpip_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMSTCPIP);
         irxptr_tab[modcount++].ptr = (void *)&ingame_smstcpip_irx;
+    }
+    if (modules & CORE_IRX_SMB) {
         irxptr_tab[modcount].info = size_smbinit_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMBINIT);
         irxptr_tab[modcount++].ptr = (void *)&smbinit_irx;
     }
 #ifdef VMC
     if (modules & CORE_IRX_VMC) {
         irxptr_tab[modcount].info = size_mcemu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_MCEMU);
-        irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
+        irxptr_tab[modcount++].ptr = (void *)&mcemu_irx;
     }
 #endif
 
@@ -420,6 +455,8 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
 #endif
 #endif
 
+    modcount += addIopPatch(mode_str, startup, &irxptr_tab[modcount]);
+
     irxtable->modules = irxptr_tab;
     irxtable->count = modcount;
 
@@ -427,10 +464,10 @@ static unsigned int sendIrxKernelRAM(unsigned int modules, void *ModuleStorage, 
     //For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
     //total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
     irxptr = (void *)0x00033000;
-    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr + GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
+    LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info));
     DI();
     ee_kmode_enter();
-    memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[OPL_MODULE_ID_UDNL].ptr, GET_OPL_MOD_SIZE(irxptr_tab[OPL_MODULE_ID_UDNL].info));
+    memcpy((void *)(0x80000000 | (unsigned int)irxptr), irxptr_tab[0].ptr, GET_OPL_MOD_SIZE(irxptr_tab[0].info));
     ee_kmode_exit();
     EI();
 
@@ -527,6 +564,8 @@ static void PrepareGSM(char *cmdline)
 	What happens is that the OSD initializes the EE DECI2 TTY protocol at startup, but the EE DECI2 manager is never aware that the OSDSYS ever loads other programs.
 
 	As a result, the EE kernel crashes immediately when the EE TTY gets used (when the IOP side of DECI2 comes up), when it invokes whatever that exists at the OSD's old ETTY handler's location. :(
+
+	Must be run in kernel mode.
 */
 static int ResetDECI2(void)
 {
@@ -539,9 +578,6 @@ static int ResetDECI2(void)
         0x34423800, //ori v0, v0, $3800
         0x34840102  //ori a0, a0, $0102
     };
-
-    DI();
-    ee_kmode_enter();
 
     result = -1;
     ptr = (void *)0x80000000;
@@ -557,17 +593,96 @@ static int ResetDECI2(void)
         }
     }
 
-    ee_kmode_exit();
-    EI();
-
     return result;
 }
 #endif
 
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, MCEMU int EnablePS2Logo, unsigned int compatflags)
+/*  Returns the patch location of LoadExecPS2(), which resides in kernel memory.
+ *  Patches the kernel to use the EELOAD module at the specified location.
+ *  Must be run in kernel mode.
+ */
+static void *initLoadExecPS2(void *new_eeload)
+{
+    void *result;
+
+    /* The pattern of the code in LoadExecPS2() that prepares the kernel for copying EELOAD from rom0: */
+    static const unsigned int initEELOADCopyPattern[] = {
+        0x8FA30010,    /* lw       v1, 0x0010(sp) */
+        0x0240302D,    /* daddu    a2, s2, zero */
+        0x8FA50014,    /* lw       a1, 0x0014(sp) */
+        0x8C67000C,    /* lw       a3, 0x000C(v1) */
+        0x18E00009,    /* blez     a3, +9 <- The kernel will skip the EELOAD copying loop if the value in $a3 is less than, or equal to 0. Lets do that... */
+    };
+
+    u32 *p;
+
+    result = NULL;
+    /* Find the part of LoadExecPS2() that initilizes the EELOAD copying loop's variables */
+    for(p = (u32 *)0x80001000; p < (u32 *)0x80030000; p++)
+    {
+        if(memcmp(p, &initEELOADCopyPattern, sizeof(initEELOADCopyPattern)) == 0)
+        {
+            p[1] = 0x3C120000 | (u16)((u32)new_eeload >> 16);    /* lui s2, HI16(new_eeload) */
+            p[2] = 0x36520000 | (u16)((u32)new_eeload & 0xFFFF); /* ori s2, s2, LO16(new_eeload) */
+            p[3] = 0x24070000;                                   /* li a3, 0 <- Disable the EELOAD copying loop */
+            result = (void*)p;
+            break;    /* All done. */
+        }
+    }
+
+    return result;
+}
+
+/*  Gets the address of the jump to the function that initializes user memory.
+ *  Pathces the kernel to begin erasure of memory from the specified address.
+ *  Must be run in kernel mode.
+ */
+static void *initInitializeUserMemory(void *start)
+{
+    u32 *p;
+    void *result;
+
+    result = NULL;
+    for (p = (unsigned int*)0x80001000; p < (unsigned int*)0x80030000; p++)
+    {
+        /*
+         * Search for function call and where $a0 is set.
+         *  lui  $a0, 0x0008
+         *  jal  InitializeUserMemory
+         *  ori  $a0, $a0, 0x2000
+         */
+        if (p[0] == 0x3c040008 && (p[1] & 0xfc000000) == 0x0c000000 && p[2] == 0x34842000) {
+            p[0] = 0x3c040000 | ((unsigned int)start >> 16);
+            p[2] = 0x34840000 | ((unsigned int)start & 0xffff);
+            result = (void*)p;
+            break;
+        }
+    }
+
+    return result;
+}
+
+static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void **initUserMemory)
+{
+    DI();
+    ee_kmode_enter();
+
+#ifdef __DECI2_DEBUG
+    ResetDECI2();
+#endif
+    *eeloadCopy = initLoadExecPS2(eeload);
+    *initUserMemory = initInitializeUserMemory(modStorageEnd);
+
+    ee_kmode_exit();
+    EI();
+
+    return((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
+}
+
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
-    void *ModuleStorage;
+    void *ModuleStorage, *ModuleStorageEnd;
     u8 local_ip_address[4], local_netmask[4], local_gateway[4];
     u8 *boot_elf = NULL;
     elf_header_t *eh;
@@ -589,15 +704,18 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #else
 #define PADEMU_ARGS 0
 #endif
-    char *argv[4 + GSM_ARGS + CHEAT_ARGS + PADEMU_ARGS];
+    char ElfPath[32];
+    char *argv[6 + GSM_ARGS + CHEAT_ARGS + PADEMU_ARGS];
     char ModStorageConfig[32];
+    char KernelConfig[32];
     char config_str[256];
 #ifdef GSM
     char gsm_config_str[256];
 #endif
+    void *eeloadCopy, *initUserMemory;
 
     ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
-#ifndef __DEBUG
+#if (!defined(__DEBUG) && !defined(_DTL_T10000))
     AddHistoryRecordUsingFullPath(filename);
 #endif
 
@@ -607,13 +725,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     //Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
     memset((void *)0x00082000, 0, 0x00100000 - 0x00082000);
 
-    if (!strcmp(mode_str, "USB_MODE"))
-        modules = CORE_IRX_USB;
-    else if (!strcmp(mode_str, "ETH_MODE"))
-        modules = CORE_IRX_ETH | CORE_IRX_SMB;
-    else
-        modules = CORE_IRX_HDD;
-
+    modules = 0;
     ModuleStorage = (void *)((compatflags & COMPAT_MODE_7) ? OPL_MOD_STORAGE_HI : OPL_MOD_STORAGE);
 
 #ifdef __DECI2_DEBUG
@@ -624,13 +736,12 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 #ifdef VMC
     modules |= CORE_IRX_VMC;
-    LOG("SYSTEM LaunchLoaderElf loading modules with size_mcemu_irx = %d\n", size_mcemu_irx);
-    ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
-#else
-    LOG("SYSTEM LaunchLoaderElf loading modules\n");
-    ModuleStorageSize = (sendIrxKernelRAM(modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx) + 0x3F) & ~0x3F;
 #endif
-    sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorage + ModuleStorageSize);
+    LOG("SYSTEM LaunchLoaderElf loading modules\n");
+    ModuleStorageSize = (sendIrxKernelRAM(filename, mode_str, modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
+
+    ModuleStorageEnd = (void*)((u8*)ModuleStorage + ModuleStorageSize);
+    sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorageEnd);
 
     if (!gDisableDebug) {
         char text[80];
@@ -650,11 +761,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
         guiWarning(text, 20);
     }
 
-
-#ifdef __DECI2_DEBUG
-    ResetDECI2();
-#endif
-
     // NB: LOADER.ELF is embedded
     boot_elf = (u8 *)&eecore_elf;
     eh = (elf_header_t *)boot_elf;
@@ -672,6 +778,14 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
+
+    //Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
+    if(initKernel((void*)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0)
+    {   //Should not happen, but...
+        printf("Error - kernel is unsupported.\n");
+        asm volatile("break\n");
+    }
+    sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);
 
 #ifdef CHEAT
 #define CHEAT_SPECIFIER " %u"
@@ -698,14 +812,17 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
     i = 0;
-    sprintf(config_str, "%s %d %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_SPECIFIER GSM_SPECIFIER PADEMU_SPECIFIER,
-            mode_str, gDisableDebug, EnablePS2Logo, gExitPath, gHDDSpindown,
+    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_SPECIFIER GSM_SPECIFIER PADEMU_SPECIFIER,
+            mode_str, gDisableDebug, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
             local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
             local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
             gETHOpMode
                 CHEAT_ARGUMENT GSM_ARGUMENT PADEMU_ARGUMENT);
     argv[i] = config_str;
+    i++;
+
+    argv[i] = KernelConfig;
     i++;
 
     argv[i] = ModStorageConfig;
@@ -724,6 +841,10 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     argv[i] = gsm_config_str;
     i++;
 #endif
+
+    strcpy(ElfPath, "cdrom0:\\");
+    strncat(ElfPath, filename, 11); // fix for 8+3 filename.
+    strcat(ElfPath, ";1");
 
     if (!gDisableDebug) {
         guiWarning("Let's go.", 10);
@@ -748,7 +869,13 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     FlushCache(0);
     FlushCache(2);
 
-    ExecPS2((void *)eh->entry, 0, i, argv);
+    //PS2LOGO Caller, based on l_oliveira & SP193 tips
+    if (EnablePS2Logo) {
+        argv[i] = ElfPath;
+        LoadExecPS2("rom0:PS2LOGO", i+1, argv);
+    } else {
+        LoadExecPS2(ElfPath, i, argv);
+    }
 }
 
 int sysExecElf(char *path)

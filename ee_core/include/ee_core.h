@@ -14,6 +14,7 @@
 #include <kernel.h>
 #include <stdio.h>
 #include <iopheap.h>
+#include <ps2lib_err.h>
 #include <sifrpc.h>
 #include <string.h>
 #include <sbv_patches.h>
@@ -83,7 +84,6 @@ int PadEmuSettings;
 #endif
 
 int DisableDebug;
-int PS2Logo;
 #define GS_BGCOLOUR *((volatile unsigned long int *)0x120000E0)
 
 #ifdef CHEAT

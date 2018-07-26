@@ -8,6 +8,7 @@
 # Review ps2sdk README & LICENSE files for further details.
 #
 # Modified crt0.s
+# Changed zerobss to only erase bss if not done once before. Otherwise, variables will lose their values whenever LoadExecPS2 is invoked.
 # Remove _ps2sdk_args_parse, _ps2sdk_libc_init and _ps2sdk_libc_deinit weak functions for size optimization
 
    .weak  _init
@@ -19,6 +20,7 @@
    .extern   _heap_size
    .extern   _stack
    .extern   _stack_size
+   .extern   _isInit
 
    .set   noat
    .set   noreorder
@@ -32,6 +34,11 @@
    .globl  _start
    .ent    _start
 _start:
+   la   $4, isInit
+   lw   $5, ($4)
+
+   bnez $5, 2f #Skip if already initialized.
+   nop
 
 zerobss:
    # clear bss area

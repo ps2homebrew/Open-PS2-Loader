@@ -51,7 +51,6 @@ endif
 ifeq ($(IGS),1)
 EE_OBJS += $(IGSCORE_EE_OBJS)
 EE_CFLAGS += -DIGS
-EE_LIBS += -lmc
 endif
 
 ifeq ($(CHEAT),1)
@@ -61,11 +60,7 @@ endif
 
 EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
-ifeq ($(IGS),1)
-EE_LDFLAGS = -nostartfiles -Tlinkfile.igs -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
-else
-EE_LDFLAGS = -nostartfiles -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
-endif
+EE_LDFLAGS = -nostartfiles -nostdlib -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
 EE_LIBS += -lpatches
 
 ifeq ($(PADEMU),1)

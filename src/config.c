@@ -361,7 +361,7 @@ int configReadLegacyIP(void)
                &ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],
                &ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
 
-        configSet = &configFiles[CONFIG_NETWORK];
+        configSet = &configFiles[CONFIG_INDEX_NETWORK];
 
         snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
         configSetStr(configSet, CONFIG_NET_PS2_IP, temp);

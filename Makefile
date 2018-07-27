@@ -82,7 +82,7 @@ GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o freesans.o \
 		icon_sys.o icon_icn.o
 
-MISC_OBJS =	icon_sys_A.o icon_sys_J.o conf_theme_OPL.o
+MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o
 
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
@@ -759,6 +759,9 @@ $(EE_ASM_DIR)icon_sys_A.s: misc/icon_A.sys | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)icon_sys_J.s: misc/icon_J.sys | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ icon_sys_J
+
+$(EE_ASM_DIR)icon_sys_C.s: misc/icon_C.sys | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ icon_sys_C
 
 $(EE_ASM_DIR)conf_theme_OPL.s: misc/conf_theme_OPL.cfg | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ conf_theme_OPL_cfg

@@ -55,7 +55,7 @@ static void ethSMBConnect(void)
     if (gETHPrefix[0] != '\0')
         sprintf(ethPrefix, "%s%s\\", ethBase, gETHPrefix);
     else
-        sprintf(ethPrefix, ethBase);
+        strcpy(ethPrefix, ethBase);
 
     // open tcp connection with the server / logon to SMB server
     if (gPCShareAddressIsNetBIOS) {
@@ -394,8 +394,8 @@ void ethInit(void)
         LOG("ETHSUPPORT Init\n");
         ethBase = "smb0:";
         ethULSizePrev = -2;
-        memset(ethModifiedCDPrev, 0, 8);
-        memset(ethModifiedDVDPrev, 0, 8);
+        memset(ethModifiedCDPrev, 0, sizeof(ethModifiedCDPrev));
+        memset(ethModifiedDVDPrev, 0, sizeof(ethModifiedDVDPrev));
         ethGameCount = 0;
         ethGames = NULL;
         configGetInt(configGetByType(CONFIG_OPL), "eth_frames_delay", &ethGameList.delay);
@@ -427,17 +427,17 @@ static int ethNeedsUpdate(void)
 
         sprintf(path, "%sCD", ethPrefix);
         if (fileXioGetStat(path, &stat) != 0)
-            memset(stat.mtime, 0, 8);
-        if (memcmp(ethModifiedCDPrev, stat.mtime, 8)) {
-            memcpy(ethModifiedCDPrev, stat.mtime, 8);
+            memset(stat.mtime, 0, sizeof(stat.mtime));
+        if (memcmp(ethModifiedCDPrev, stat.mtime, sizeof(ethModifiedCDPrev))) {
+            memcpy(ethModifiedCDPrev, stat.mtime, sizeof(ethModifiedCDPrev));
             result = 1;
         }
 
         sprintf(path, "%sDVD", ethPrefix);
         if (fileXioGetStat(path, &stat) != 0)
-            memset(stat.mtime, 0, 8);
-        if (memcmp(ethModifiedDVDPrev, stat.mtime, 8)) {
-            memcpy(ethModifiedDVDPrev, stat.mtime, 8);
+            memset(stat.mtime, 0, sizeof(stat.mtime));
+        if (memcmp(ethModifiedDVDPrev, stat.mtime, sizeof(ethModifiedDVDPrev))) {
+            memcpy(ethModifiedDVDPrev, stat.mtime, sizeof(ethModifiedDVDPrev));
             result = 1;
         }
 
@@ -478,7 +478,7 @@ static int ethUpdateGameList(void)
             for (i = 0; i < count; i++) {
                 LOG("ETHSUPPORT Share found: %s\n", sharelist[i].ShareName);
                 base_game_info_t *g = &ethGames[i];
-                memcpy(g->name, sharelist[i].ShareName, 32);
+                memcpy(g->name, sharelist[i].ShareName, sizeof(g->name));
                 g->name[31] = '\0';
                 sprintf(g->startup, "SHARE");
                 g->extension[0] = '\0';
@@ -552,7 +552,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     unsigned short int layer1_part;
 
     if (!gPCShareName[0]) {
-        memcpy(gPCShareName, game->name, 32);
+        memcpy(gPCShareName, game->name, sizeof(gPCShareName));
         ethULSizePrev = -2;
         ethGameCount = 0;
         ioPutRequest(IO_MENU_UPDATE_DEFFERED, &ethGameList.mode); // clear the share list
@@ -706,9 +706,9 @@ static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, 
 {
     char path[256];
     if (isRelative)
-        sprintf(path, "%s%s\\%s_%s", ethPrefix, folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s\\%s_%s", ethPrefix, folder, value, suffix);
     else
-        sprintf(path, "%s%s_%s", folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s_%s", folder, value, suffix);
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
@@ -765,9 +765,9 @@ int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
         gateway[2] = ip4_addr3((struct ip4_addr *)&ip_info.gw);
         gateway[3] = ip4_addr4((struct ip4_addr *)&ip_info.gw);
     } else {
-        memset(ip_address, 0, 4);
-        memset(netmask, 0, 4);
-        memset(gateway, 0, 4);
+        memset(ip_address, 0, sizeof(ip_address));
+        memset(netmask, 0, sizeof(netmask));
+        memset(gateway, 0, sizeof(gateway));
     }
 
     return result;

@@ -422,7 +422,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     *patchindex = i;
 
     // game id
-    memcpy(settings->DiscID, gameid, 5);
+    memcpy(settings->DiscID, gameid, sizeof(settings->DiscID));
 
     return compatmask;
 }

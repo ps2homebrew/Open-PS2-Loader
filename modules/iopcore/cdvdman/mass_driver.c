@@ -672,13 +672,19 @@ static void usb_bulk_probeEndpoint(int devId, mass_dev *dev, UsbEndpointDescript
     if (endpoint->bmAttributes == USB_ENDPOINT_XFER_BULK) {
         /* out transfer */
         if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_OUT && dev->bulkEpO < 0) {
+            /* When sceUsbdOpenPipe() is used to work around the hardware errata that occurs when an unaligned memory address is specified,
+               some USB devices become incompatible. Hence it is preferable to do alignment correction in software instead. */
             dev->bulkEpO = pUsbOpenEndpointAligned(devId, endpoint);
             dev->packetSzO = (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB;
             XPRINTF("USBHDFSD: register Output endpoint id =%i addr=%02X packetSize=%i\n", dev->bulkEpO, endpoint->bEndpointAddress, dev->packetSzO);
         } else
             /* in transfer */
             if ((endpoint->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == USB_DIR_IN && dev->bulkEpI < 0) {
-            dev->bulkEpI = pUsbOpenEndpointAligned(devId, endpoint);
+            /* Open this pipe with sceUsbdOpenPipe, to allow unaligned addresses to be used.
+               According to the Sony documentation and the USBD code,
+               there is always an alignment check if the pipe is opened with the sceUsbdOpenPipeAligned(),
+               even when there is never any correction for the bulk in pipe. */
+            dev->bulkEpI = pUsbOpenEndpoint(devId, endpoint);
             dev->packetSzI = (unsigned short int)endpoint->wMaxPacketSizeHB << 8 | endpoint->wMaxPacketSizeLB;
             XPRINTF("USBHDFSD: register Input endpoint id =%i addr=%02X packetSize=%i\n", dev->bulkEpI, endpoint->bEndpointAddress, dev->packetSzI);
         }

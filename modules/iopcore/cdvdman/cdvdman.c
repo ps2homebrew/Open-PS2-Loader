@@ -394,6 +394,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
     cdvdman_stat.status = CDVD_STAT_READ;
 
+#ifdef HDD_DRIVER //As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
     if ((u32)(buf)&3) {
         //For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.
         WaitSema(cdvdman_searchfilesema);
@@ -419,8 +420,11 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 
         SignalSema(cdvdman_searchfilesema);
     } else {
+#endif
         cdvdman_read_sectors(lsn, sectors, buf);
+#ifdef HDD_DRIVER
     }
+#endif
 
     ReadPos = 0; /* Reset the buffer offset indicator. */
 

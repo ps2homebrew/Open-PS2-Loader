@@ -694,18 +694,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #else
 #define GSM_ARGS 0
 #endif
-#ifdef CHEAT
-#define CHEAT_ARGS 1
-#else
-#define CHEAT_ARGS 0
-#endif
-#ifdef PADEMU
-#define PADEMU_ARGS 2
-#else
-#define PADEMU_ARGS 0
-#endif
     char ElfPath[32];
-    char *argv[6 + GSM_ARGS + CHEAT_ARGS + PADEMU_ARGS];
+    char *argv[6 + GSM_ARGS];
     char ModStorageConfig[32];
     char KernelConfig[32];
     char config_str[256];

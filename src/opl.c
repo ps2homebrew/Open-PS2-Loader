@@ -670,7 +670,6 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
 //START of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
-  
 //END of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }

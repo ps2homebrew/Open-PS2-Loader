@@ -262,8 +262,3 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); // #83
 #define I_sceCdReadDvdDualInfo DECLARE_IMPORT(83, sceCdReadDvdDualInfo)
 int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer); // #84
 #define I_sceCdLayerSearchFile DECLARE_IMPORT(84, sceCdLayerSearchFile)
-
-// By default CDVDMAN attempts to fix misaligned buffers as they happen, however with a considerable performance hit; hence it must be avoided at all costs.
-// Most game developers did avoid it happening, while some of them (Such as Konami with some of its games, like Gradius V) intentionally used misaligned buffers to make things like HDLoader malfunction.
-// This explains why there is no way for ETH/USB modes to be exact substitutes for the CD/DVD drive, without performance loss.
-#define UNALIGNED_BUFFER_PATCH 1

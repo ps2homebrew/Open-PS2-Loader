@@ -421,7 +421,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 #ifdef VMC
     if (modules & CORE_IRX_VMC) {
         irxptr_tab[modcount].info = size_mcemu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_MCEMU);
-        irxptr_tab[modcount++].ptr = (void *)&mcemu_irx;
+        irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
     }
 #endif
 

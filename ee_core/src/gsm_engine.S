@@ -800,33 +800,14 @@ sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPFB1
-# 
-# .-------.-------.------------.----------------------------------------------.-------.
-# | Name  |  Pos. | Format     | Contents                                     | Mask  |
-# |-------+-------+------------+----------------------------------------------+-------+
-# | FBP   | 8:0   | int 0:9:0  | Base Pointer (Address/2048)                  | 0x1FF |
-# | FBW   | 14:9  | int 0:6:0  | Buffer Width (Width/64)                      | 0x3F  |
-# | PSM   | 19:15 | int 0:5:0  | Pixel Storage Format                         | 0x1F  |
-# |       |       |            | 00000 PSMCT32                                |       |
-# |       |       |            | 00001 PSMCT24                                |       |
-# |       |       |            | 00010 PSMCT16                                |       |
-# |       |       |            | 01010 PSMCT16S                               |       |
-# |       |       |            | 10010 PS-GPU24                               |       |
-# | DBX   | 42:32 | int 0:11:0 | X Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# | DBY   | 53:43 | int 0:11:0 | Y Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# '-------^------^-------------^---------------------------------------------^--------^
+#
 have_DISPFB1_write:
 sd	$a1, Source_DISPFB1($s0)			# Source_DISPFB1 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
-beql	$v0,$zero,store_v0_as_DISPFB1	# in case of DISPFB_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
-beql	$v0,$zero,store_v0_as_DISPFB1	# in case of  Target_DISPFB1 is zero
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 
-store_v0_as_DISPFB1:
+jal have_DISPFB_write
+nop
+
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
@@ -834,33 +815,14 @@ sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPFB2
-# 
-# .-------.-------.------------.----------------------------------------------.-------.
-# | Name  |  Pos. | Format     | Contents                                     | Mask  |
-# |-------+-------+------------+----------------------------------------------+-------+
-# | FBP   | 8:0   | int 0:9:0  | Base Pointer (Address/2048)                  | 0x1FF |
-# | FBW   | 14:9  | int 0:6:0  | Buffer Width (Width/64)                      | 0x3F  |
-# | PSM   | 19:15 | int 0:5:0  | Pixel Storage Format                         | 0x1F  |
-# |       |       |            | 00000 PSMCT32                                |       |
-# |       |       |            | 00001 PSMCT24                                |       |
-# |       |       |            | 00010 PSMCT16                                |       |
-# |       |       |            | 01010 PSMCT16S                               |       |
-# |       |       |            | 10010 PS-GPU24                               |       |
-# | DBX   | 42:32 | int 0:11:0 | X Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# | DBY   | 53:43 | int 0:11:0 | Y Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# '-------^------^-------------^---------------------------------------------^--------^
+#
 have_DISPFB2_write:
 sd	$a1, Source_DISPFB2($s0)			# Source_DISPFB2 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
-beql	$v0,$zero,store_v0_as_DISPFB2	# in case of DISPFB_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
-beql	$v0,$zero,store_v0_as_DISPFB2	# in case of  Target_DISPFB2 is zero
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 
-store_v0_as_DISPFB2:
+jal have_DISPFB_write
+nop
+
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
@@ -873,227 +835,10 @@ have_DISPLAY1_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY1($s0)			# request DISPLAY1 value = a1
 ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
-#  Source_DISPLAY1 == Requested   DX, DY, MAGH, MAGV, DW and DH values
-#  Target_DISPLAY1 == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
-#  Both are 64 bit units with encoded bit fields like GS DISPLAY1 registers
-
-#  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
-
-lb	$v0, ADAPTATION_fix($s2)
-beql	$v0,$zero,have_DISPLAY1_write_1					# in case of (ADAPTATION_fix)
-or	$a1,$zero,$v1					# 	simulate request same as forced mode
-
-have_DISPLAY1_write_1:
-li	$v0,0						# preclear v0 as result DISPLAY1 accumulator
-
-#  Here a0=free, a1=Source_DISPLAY1, a2->.gsm_engine, a3=dest_address
-#  Also v0=result_accumulator, v1=Target_DISPLAY1, t0-t7=free
-
-//
-// Automatic adaptation formulas
-//
-# ----- HORIZONTAL FIELDS -----
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGH | 26:23 | int 0: 4:0 | magnification in horizontal direction | 0xF   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,23
-andi	$t0,$t0,0x0F
-addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DW   | 43:32 | int 0:12:0 | display area width - 1 (VCK units)    | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,0
-andi	$t1,$t1,0x0FFF
-addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
-dsrl32	$t0,$v1,0
-andi	$t5,$t0,0x0FFF
-mflo	$t4				# t4 = LO = Source_Pixels_Width
-addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Width_Scale
-bne	$t0,$zero,have_DISPLAY1_write_2		# in case of (!Target_Width_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
-sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
-li	$t4,0				# t4 = Target_MAGH = 0
-beql	$zero,$zero,have_DISPLAY1_write_4		# }
-nop						# otherwise
-						# Target_Width_Scale nonzero
-
-have_DISPLAY1_write_2:                     # {
-addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
-bgtzl	$t1,have_DISPLAY1_write_3			# in case of (Target_Width_Scale > 0)
-or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
-
-have_DISPLAY1_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Width
-addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
-
-have_DISPLAY1_write_4:                     # }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Width (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DX   | 11:0  | int 0:12:0 | x pos in display area (VCK units)     | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-andi	$t1,$v1,0x0FFF	# t1 = Target_DX
-add	$t6,$t0,$t1			# t6 = Calculated_DX = Target_DX + Half_Excess_Width
-bltzl	$t6,have_DISPLAY1_write_5			# in case of (Calculated_DX < 0)
-and	$t6,$t6,$zero		# 	Calculated_DX = 0;
-
-have_DISPLAY1_write_5:
-sub	$t0,$t1,$t6			# t0 = Target_DX - Calculated_DX
-bgtzl	$t0,have_DISPLAY1_write_6			# in case of (Target_DX > Calculated_DX)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
-
-have_DISPLAY1_write_6:
-andi	$t7,$t7,0x0FFF
-andi	$t4,$t4,0x000F
-andi	$t6,$t6,0x0FFF
-dsll32	$t0,$t7,0		# t0 = Calculated_DW
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DW)
-dsll	$t0,$t4,23
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_MAGH)
-
-lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
-bgez	$t6, have_DISPLAY1_write_7		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero		# t6 = Calculated_DX = 0
-have_DISPLAY1_write_7:
-andi	$t6,$t6,0x0FFF
-
-or	$v0,$v0,$t6			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DX)
-
-# ----- VERTICAL FIELDS -------
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGV | 28:27 | int 0: 2:0 | magnification in vertical direction   | 0x3   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,27
-andi	$t0,$t0,0x03
-addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DH   | 54:44 | int 0:11:0 | display area height - 1 (pixel units) | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,12
-andi	$t1,$t1,0x07FF
-addi	$t1,$t1,1		# Source_Height = Source_DH + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
-dsrl32	$t0,$v1,12
-andi	$t5,$t0,0x07FF
-mflo	$t4				# t4 = LO = Source_Pixels_Height
-addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Height_Scale
-bne	$t0,$zero,have_DISPLAY1_write_8		# in case of (!Target_Height_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
-sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
-li	$t4,0				# t4 = Target_MAGV = 0
-beql	$zero,$zero,have_DISPLAY1_write_10		# }
-nop						# otherwise
-						# Target_Height_Scale nonzero
-
-have_DISPLAY1_write_8:						# {
-addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
-bgtzl	$t1,have_DISPLAY1_write_9			# in case of (Target_Height_Scale > 0)
-or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
-
-have_DISPLAY1_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Height
-addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
-
-have_DISPLAY1_write_10:						# }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Height (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DY   | 22:12 | int 0:11:0 | y pos in display area (raster units)  | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t1,$v1,12
-andi	$t1,$t1,0x07FF	# t1 = Target_DY
-add	$t6,$t0,$t1			# t6 = Calculated_DY = Target_DY + Half_Excess_Height
-bltzl	$t6,have_DISPLAY1_write_11			# in case of (Calculated_DY < 0)
-and	$t6,$t6,$zero		#	Calculated_DY = 0;
-
-have_DISPLAY1_write_11:
-sub	$t0,$t1,$t6			# t0 = Target_DY - Calculated_DY
-bgtzl	$t0,have_DISPLAY1_write_12			# in case of (Target_DY > Calculated_DY)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
-
-have_DISPLAY1_write_12:
-lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
-beql	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
+jal	have_DISPLAY_write
 nop
 
-ld	$t0, Target_SMODE2($s1)
-andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
-bne	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
-nop
-beql	$t4,$zero,have_DISPLAY1_write_13	# in case of Calculated_MAGV = 0
-addi	$t4,$t4,1		# 	go use Calculated_MAGV = Calculated_MAGV + 1
-addi	$t4,$t4,2		# Calculated_MAGV = Calculated_MAGV + 2 (Because scale was 2 or larger)
-addi	$t0,$t4,-4		# Compare Calculated_MAGV with 4 (too large ?)
-bgezl	$t0,have_DISPLAY1_write_13			# in case of  Calculated_MAGV too large
-ori	$t4,$zero,3			# 	go use Calculated_MAGV = 3
-
-have_DISPLAY1_write_13:
-andi	$t7,$t7,0x07FF
-andi	$t4,$t4,0x0003
-andi	$t6,$t6,0x07FF
-dsll32	$t0,$t7,12
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DH)
-dsll	$t0,$t4,27
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_MAGV)
-
-lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
-bgez	$t6, have_DISPLAY1_write_14		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero
-have_DISPLAY1_write_14:
-andi	$t6,$t6,0x07FF
-
-dsll	$t0,$t6,12
-or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DY)
-
-# ------------------------------------------------------------------------------------------------------
-
-sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAYx value (for feedback)
-
-#  End of Patch to adapt request with the resulting request in v0
-
+sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAY1 value (for feedback)
 
 lb	$v1, DISPLAY_fix($s2)		# v1 = DISPLAY_fix
 beql	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
@@ -1112,227 +857,10 @@ have_DISPLAY2_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY2($s0)			# request DISPLAY2 value = a1
 ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
-#  Source_DISPLAY2 == Requested   DX, DY, MAGH, MAGV, DW and DH values
-#  Target_DISPLAY2 == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
-#  Both are 64 bit units with encoded bit fields like GS DISPLAY2 registers
-
-#  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
-
-lb	$v0, ADAPTATION_fix($s2)
-beql	$v0,$zero,have_DISPLAY2_write_1					# in case of (ADAPTATION_fix)
-or	$a1,$zero,$v1					# 	simulate request same as forced mode
-
-have_DISPLAY2_write_1:
-li	$v0,0						# preclear v0 as result DISPLAY2 accumulator
-
-#  Here a0=free, a1=Source_DISPLAY2, a2->.gsm_engine, a3=dest_address
-#  Also v0=result_accumulator, v1=Target_DISPLAY2, t0-t7=free
-
-//
-// Automatic adaptation formulas
-//
-# ----- HORIZONTAL FIELDS -----
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGH | 26:23 | int 0: 4:0 | magnification in horizontal direction | 0xF   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,23
-andi	$t0,$t0,0x0F
-addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DW   | 43:32 | int 0:12:0 | display area width - 1 (VCK units)    | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,0
-andi	$t1,$t1,0x0FFF
-addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
-dsrl32	$t0,$v1,0
-andi	$t5,$t0,0x0FFF
-mflo	$t4				# t4 = LO = Source_Pixels_Width
-addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Width_Scale
-bne	$t0,$zero,have_DISPLAY2_write_2		# in case of (!Target_Width_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
-sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
-li	$t4,0				# t4 = Target_MAGH = 0
-beql	$zero,$zero,have_DISPLAY2_write_4		# }
-nop						# otherwise
-						# Target_Width_Scale nonzero
-
-have_DISPLAY2_write_2:                     # {
-addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
-bgtzl	$t1,have_DISPLAY2_write_3			# in case of (Target_Width_Scale > 0)
-or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
-
-have_DISPLAY2_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Width
-addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
-
-have_DISPLAY2_write_4:                     # }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Width (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DX   | 11:0  | int 0:12:0 | x pos in display area (VCK units)     | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-andi	$t1,$v1,0x0FFF	# t1 = Target_DX
-add	$t6,$t0,$t1			# t6 = Calculated_DX = Target_DX + Half_Excess_Width
-bltzl	$t6,have_DISPLAY2_write_5			# in case of (Calculated_DX < 0)
-and	$t6,$t6,$zero		# 	Calculated_DX = 0;
-
-have_DISPLAY2_write_5:
-sub	$t0,$t1,$t6			# t0 = Target_DX - Calculated_DX
-bgtzl	$t0,have_DISPLAY2_write_6			# in case of (Target_DX > Calculated_DX)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
-
-have_DISPLAY2_write_6:
-andi	$t7,$t7,0x0FFF
-andi	$t4,$t4,0x000F
-andi	$t6,$t6,0x0FFF
-dsll32	$t0,$t7,0		# t0 = Calculated_DW
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DW)
-dsll	$t0,$t4,23
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_MAGH)
-
-lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
-bgez	$t6, have_DISPLAY2_write_7		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero		# t6 = Calculated_DX = 0
-have_DISPLAY2_write_7:
-andi	$t6,$t6,0x0FFF
-
-or	$v0,$v0,$t6			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DX)
-
-# ----- VERTICAL FIELDS -------
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGV | 28:27 | int 0: 2:0 | magnification in vertical direction   | 0x3   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,27
-andi	$t0,$t0,0x03
-addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DH   | 54:44 | int 0:11:0 | display area height - 1 (pixel units) | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,12
-andi	$t1,$t1,0x07FF
-addi	$t1,$t1,1		# Source_Height = Source_DH + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
-dsrl32	$t0,$v1,12
-andi	$t5,$t0,0x07FF
-mflo	$t4				# t4 = LO = Source_Pixels_Height
-addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Height_Scale
-bne	$t0,$zero,have_DISPLAY2_write_8		# in case of (!Target_Height_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
-sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
-li	$t4,0				# t4 = Target_MAGV = 0
-beql	$zero,$zero,have_DISPLAY2_write_10		# }
-nop						# otherwise
-						# Target_Height_Scale nonzero
-
-have_DISPLAY2_write_8:						# {
-addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
-bgtzl	$t1,have_DISPLAY2_write_9			# in case of (Target_Height_Scale > 0)
-or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
-
-have_DISPLAY2_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Height
-addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
-
-have_DISPLAY2_write_10:						# }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Height (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DY   | 22:12 | int 0:11:0 | y pos in display area (raster units)  | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t1,$v1,12
-andi	$t1,$t1,0x07FF	# t1 = Target_DY
-add	$t6,$t0,$t1			# t6 = Calculated_DY = Target_DY + Half_Excess_Height
-bltzl	$t6,have_DISPLAY2_write_11			# in case of (Calculated_DY < 0)
-and	$t6,$t6,$zero		#	Calculated_DY = 0;
-
-have_DISPLAY2_write_11:
-sub	$t0,$t1,$t6			# t0 = Target_DY - Calculated_DY
-bgtzl	$t0,have_DISPLAY2_write_12			# in case of (Target_DY > Calculated_DY)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
-
-have_DISPLAY2_write_12:
-lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
-beql	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
+jal	have_DISPLAY_write
 nop
 
-ld	$t0, Target_SMODE2($s1)
-andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
-bne	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
-nop
-beql	$t4,$zero,have_DISPLAY2_write_13	# in case of Calculated_MAGV = 0
-addi	$t4,$t4,1		# 	go use Calculated_MAGV = Calculated_MAGV + 1
-addi	$t4,$t4,2		# Calculated_MAGV = Calculated_MAGV + 2 (Because scale was 2 or larger)
-addi	$t0,$t4,-4		# Compare Calculated_MAGV with 4 (too large ?)
-bgezl	$t0,have_DISPLAY2_write_13			# in case of  Calculated_MAGV too large
-ori	$t4,$zero,3			# 	go use Calculated_MAGV = 3
-
-have_DISPLAY2_write_13:
-andi	$t7,$t7,0x07FF
-andi	$t4,$t4,0x0003
-andi	$t6,$t6,0x07FF
-dsll32	$t0,$t7,12
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DH)
-dsll	$t0,$t4,27
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_MAGV)
-
-lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
-bgez	$t6, have_DISPLAY2_write_14		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero
-have_DISPLAY2_write_14:
-andi	$t6,$t6,0x07FF
-
-dsll	$t0,$t6,12
-or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DY)
-
-# ------------------------------------------------------------------------------------------------------
-
-sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAYx value (for feedback)
-
-#  End of Patch to adapt request with the resulting request in v0
-
+sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAY2 value (for feedback)
 
 lb	$v1, DISPLAY_fix($s2)		# v1 = DISPLAY_fix
 beql	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
@@ -1355,6 +883,264 @@ sd	$zero, GS_DISPLAY1($s4)		# DISPLAY1 should never be displayed on this scenari
 beqzl	$zero,exit_GSHandler
 sb	$zero, RC_adaptation($s3)				# Disable RC_adaptation, since this patch should be applied only once, each time Hook_SetGsCrt is called.
 											# Sega Genesis Collection (SLUS_215.42) doesn't repeatedly write to GS Priviledge Registers, but God of War I (SCUS_973.99) does this!
+
+# ----------------------------
+# DISPLAYx
+# 
+have_DISPLAY_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
+#  Source_DISPLAY == Requested   DX, DY, MAGH, MAGV, DW and DH values
+#  Target_DISPLAY == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
+#  Both are 64 bit units with encoded bit fields like GS DISPLAY registers
+
+#  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
+
+lb	$v0, ADAPTATION_fix($s2)
+beql	$v0,$zero,have_DISPLAY_write_1					# in case of (ADAPTATION_fix)
+or	$a1,$zero,$v1					# 	simulate request same as forced mode
+
+have_DISPLAY_write_1:
+li	$v0,0						# preclear v0 as result DISPLAY accumulator
+
+#  Here a0=free, a1=Source_DISPLAY, a2->.gsm_engine, a3=dest_address
+#  Also v0=result_accumulator, v1=Target_DISPLAY, t0-t7=free
+
+//
+// Automatic adaptation formulas
+//
+# ----- HORIZONTAL FIELDS -----
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | MAGH | 26:23 | int 0: 4:0 | magnification in horizontal direction | 0xF   |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl	$t0,$a1,23
+andi	$t0,$t0,0x0F
+addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DW   | 43:32 | int 0:12:0 | display area width - 1 (VCK units)    | 0xFFF |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl32	$t1,$a1,0
+andi	$t1,$t1,0x0FFF
+addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
+divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
+dsrl32	$t0,$v1,0
+andi	$t5,$t0,0x0FFF
+mflo	$t4				# t4 = LO = Source_Pixels_Width
+addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
+nop
+divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
+nop
+nop
+mflo	$t0				# t0 = LO = Target_Width_Scale
+bne	$t0,$zero,have_DISPLAY_write_2		# in case of (!Target_Width_Scale)
+nop						# {
+or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
+sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
+li	$t4,0				# t4 = Target_MAGH = 0
+beql	$zero,$zero,have_DISPLAY_write_4		# }
+nop						# otherwise
+						# Target_Width_Scale nonzero
+
+have_DISPLAY_write_2:                     # {
+addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
+bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 0)
+or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
+
+have_DISPLAY_write_3:
+mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
+nop
+nop
+mflo	$t1				# t1 = LO = Calculated_Width
+addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
+addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
+sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
+
+have_DISPLAY_write_4:                     # }
+dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Width (can be negative)
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DX   | 11:0  | int 0:12:0 | x pos in display area (VCK units)     | 0xFFF |
+# '------^-------^------------^---------------------------------------^-------^
+andi	$t1,$v1,0x0FFF	# t1 = Target_DX
+add	$t6,$t0,$t1			# t6 = Calculated_DX = Target_DX + Half_Excess_Width
+bltzl	$t6,have_DISPLAY_write_5			# in case of (Calculated_DX < 0)
+and	$t6,$t6,$zero		# 	Calculated_DX = 0;
+
+have_DISPLAY_write_5:
+sub	$t0,$t1,$t6			# t0 = Target_DX - Calculated_DX
+bgtzl	$t0,have_DISPLAY_write_6			# in case of (Target_DX > Calculated_DX)
+add	$t7,$t7,$t0			# 	t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
+
+have_DISPLAY_write_6:
+andi	$t7,$t7,0x0FFF
+andi	$t4,$t4,0x000F
+andi	$t6,$t6,0x0FFF
+dsll32	$t0,$t7,0		# t0 = Calculated_DW
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DW)
+dsll	$t0,$t4,23
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGH)
+
+lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
+add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
+bgez	$t6, have_DISPLAY_write_7		# Is the result greater or equal to zero?
+nop
+move	$t6, $zero		# t6 = Calculated_DX = 0
+have_DISPLAY_write_7:
+andi	$t6,$t6,0x0FFF
+
+or	$v0,$v0,$t6			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DX)
+
+# ----- VERTICAL FIELDS -------
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | MAGV | 28:27 | int 0: 2:0 | magnification in vertical direction   | 0x3   |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl	$t0,$a1,27
+andi	$t0,$t0,0x03
+addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DH   | 54:44 | int 0:11:0 | display area height - 1 (pixel units) | 0x7FF |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl32	$t1,$a1,12
+andi	$t1,$t1,0x07FF
+addi	$t1,$t1,1		# Source_Height = Source_DH + 1
+divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
+dsrl32	$t0,$v1,12
+andi	$t5,$t0,0x07FF
+mflo	$t4				# t4 = LO = Source_Pixels_Height
+addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
+nop
+divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
+nop
+nop
+mflo	$t0				# t0 = LO = Target_Height_Scale
+bne	$t0,$zero,have_DISPLAY_write_8		# in case of (!Target_Height_Scale)
+nop						# {
+or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
+sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
+li	$t4,0				# t4 = Target_MAGV = 0
+beql	$zero,$zero,have_DISPLAY_write_10		# }
+nop						# otherwise
+						# Target_Height_Scale nonzero
+
+have_DISPLAY_write_8:						# {
+addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
+bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 0)
+or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
+
+have_DISPLAY_write_9:
+mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
+nop
+nop
+mflo	$t1				# t1 = LO = Calculated_Height
+addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
+addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
+sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
+
+have_DISPLAY_write_10:						# }
+dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Height (can be negative)
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DY   | 22:12 | int 0:11:0 | y pos in display area (raster units)  | 0x7FF |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl	$t1,$v1,12
+andi	$t1,$t1,0x07FF	# t1 = Target_DY
+add	$t6,$t0,$t1			# t6 = Calculated_DY = Target_DY + Half_Excess_Height
+bltzl	$t6,have_DISPLAY_write_11			# in case of (Calculated_DY < 0)
+and	$t6,$t6,$zero		#	Calculated_DY = 0;
+
+have_DISPLAY_write_11:
+sub	$t0,$t1,$t6			# t0 = Target_DY - Calculated_DY
+bgtzl	$t0,have_DISPLAY_write_12			# in case of (Target_DY > Calculated_DY)
+add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
+
+have_DISPLAY_write_12:
+lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
+beql	$t0,$zero,have_DISPLAY_write_13							# 	Calculation is complete
+nop
+
+ld	$t0, Target_SMODE2($s1)
+andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
+bne	$t0,$zero,have_DISPLAY_write_13							# 	Calculation is complete
+nop
+beql	$t4,$zero,have_DISPLAY_write_13	# in case of Calculated_MAGV = 0
+addi	$t4,$t4,1		# 	go use Calculated_MAGV = Calculated_MAGV + 1
+addi	$t4,$t4,2		# Calculated_MAGV = Calculated_MAGV + 2 (Because scale was 2 or larger)
+addi	$t0,$t4,-4		# Compare Calculated_MAGV with 4 (too large ?)
+bgezl	$t0,have_DISPLAY_write_13			# in case of  Calculated_MAGV too large
+ori	$t4,$zero,3			# 	go use Calculated_MAGV = 3
+
+have_DISPLAY_write_13:
+andi	$t7,$t7,0x07FF
+andi	$t4,$t4,0x0003
+andi	$t6,$t6,0x07FF
+dsll32	$t0,$t7,12
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DH)
+dsll	$t0,$t4,27
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGV)
+
+lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
+add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
+bgez	$t6, have_DISPLAY_write_14		# Is the result greater or equal to zero?
+nop
+move	$t6, $zero
+have_DISPLAY_write_14:
+andi	$t6,$t6,0x07FF
+
+dsll	$t0,$t6,12
+
+jr $ra
+or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DY)
+
+#  End of Patch to adapt request with the resulting request in v0
+
+# ----------------------------
+# DISPFBx
+# 
+# .-------.-------.------------.----------------------------------------------.-------.
+# | Name  |  Pos. | Format     | Contents                                     | Mask  |
+# |-------+-------+------------+----------------------------------------------+-------+
+# | FBP   | 8:0   | int 0:9:0  | Base Pointer (Address/2048)                  | 0x1FF |
+# | FBW   | 14:9  | int 0:6:0  | Buffer Width (Width/64)                      | 0x3F  |
+# | PSM   | 19:15 | int 0:5:0  | Pixel Storage Format                         | 0x1F  |
+# |       |       |            | 00000 PSMCT32                                |       |
+# |       |       |            | 00001 PSMCT24                                |       |
+# |       |       |            | 00010 PSMCT16                                |       |
+# |       |       |            | 01010 PSMCT16S                               |       |
+# |       |       |            | 10010 PS-GPU24                               |       |
+# | DBX   | 42:32 | int 0:11:0 | X Position in Buffer of Upper Left Point of  | 0x7FF |
+# |       |       |            | Rectangular Area (in units of pixels)        |       |
+# | DBY   | 53:43 | int 0:11:0 | Y Position in Buffer of Upper Left Point of  | 0x7FF |
+# |       |       |            | Rectangular Area (in units of pixels)        |       |
+# '-------^------^-------------^---------------------------------------------^--------^
+have_DISPFB_write:
+
+#  Here a0=free, a1=Source_DISPFBx, a2->.gsm_engine, a3=dest_address
+#  Also v0=result_accumulator, v0=Target_DISPFBx, t0-t7=free
+
+lb	$v1, DISPFB_fix($s2)		# v1 = DISPFB_fix
+beql	$v1,$zero,store_v0_as_DISPFB	# in case of DISPFB_fix is disabled
+or	$v0,$zero,$a1			# 	go use v0=a1 for DISPFBx
+beql	$v0,$zero,store_v0_as_DISPFB	# in case of  Target_DISPFBx is zero
+or	$v0,$zero,$a1			# 	go use v0=a1 for DISPFBx
+
+store_v0_as_DISPFB:
+jr $ra
+nop
+
 
 # ------------------------------------------------------------------------------------------------------
 

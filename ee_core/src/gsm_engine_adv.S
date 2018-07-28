@@ -13,6 +13,285 @@
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------------------
+.ent DTV_480P
+DTV_480P:
+
+//$v0 = Base address
+la	$v0, GSMDestSetGsCrt
+//$a0 = Target_SMODE2
+ld	$a0, Target_SMODE2($v0)
+
+//$v0 = GS base address
+lui		$v0, (GS_BASE >> 16)
+
+//*GS_SMODE1=0x0000001740430504;
+lui     $v1, 0x0017
+ori     $v1, 0x4043
+dsll    $v1, 16
+ori     $v1, 0x0504
+sd		$v1, GS_SMODE1($v0)	# store it
+
+//*GS_SYNCH1=0x000402DA20034020;
+lui     $v1, 0x0004
+ori     $v1, 0x02DA
+dsll    $v1, 16
+ori     $v1, 0x2003
+dsll    $v1, 16
+ori     $v1, 0x4020
+sd		$v1, GS_SYNCH1($v0)	# store it
+
+//*GS_SYNCH2=0x0019D272;
+lui     $v1, 0x0019
+ori     $v1, 0xD272
+sd		$v1, GS_SYNCH2($v0)	# store it
+
+//*GS_SYNCV=0x00C78C0001E00006;
+lui     $v1, 0x00C7
+ori     $v1, 0x8C00
+dsll    $v1, 16
+ori     $v1, 0x01E0
+dsll    $v1, 16
+ori     $v1, 0x0006
+sd		$v1, GS_SYNCV($v0)	# store it
+
+//*GS_SMODE2=Target_SMODE2;
+or      $v1, $zero, $a0				# 	v1 = $a0 = Target_SMODE2;
+sd		$v1, GS_SMODE2($v0)	# store it
+
+//*GS_SRFSH=0;
+li      $v1, 4
+sd		$v1, %lo(GS_SRFSH)($v0)	# store it
+
+//*GS_SMODE1=0x0000001742410504;
+lui     $v1, 0x0017
+ori     $v1, 0x4241
+dsll    $v1, 16
+ori     $v1, 0x0504
+sd		$v1, GS_SMODE1($v0)	# store it
+
+//delay some miliseconds...
+li $v1, 0x7A120
+nop
+DTV_480P_SMODE1_delay_loop:
+vnop
+vnop
+addiu $v1, 0xFFFF
+vnop
+vnop
+bnez $v1, DTV_480P_SMODE1_delay_loop
+nop
+
+//*GS_SMODE1=0x0000001742400504;	// Have bits 16 and 17 cleared.
+lui     $v1, 0x0017
+ori     $v1, 0x4240
+dsll    $v1, 16
+ori     $v1, 0x0504
+sd		$v1, GS_SMODE1($v0)	# store it
+
+jr $ra
+nop
+
+.end DTV_480P
+
+//-----------------------------------------------------------------------------------------
+
+.ent DTV_576P
+DTV_576P:
+
+//$v0 = Base address
+la	$v0, GSMDestSetGsCrt
+//$a0 = Target_SMODE2
+ld	$a0, Target_SMODE2($v0)
+
+//$v0 = GS base address
+lui		$v0, (GS_BASE >> 16)
+
+//*GS_SMODE1=0x00000017424B0504;
+lui     $v1, 0x0017
+ori     $v1, 0x424B
+dsll    $v1, 16
+ori     $v1, 0x0504
+sd		$v1, GS_SMODE1($v0)	# store it
+
+//*GS_SYNCH1=0x000402E02003C827;
+lui     $v1, 0x0004
+ori     $v1, 0x02E0
+dsll    $v1, 16
+ori     $v1, 0x2003
+dsll    $v1, 16
+ori     $v1, 0xC827
+sd		$v1, GS_SYNCH1($v0)	# store it
+
+//*GS_SYNCH2=0x0019CA67;
+lui     $v1, 0x0019
+ori     $v1, 0xCA67
+sd		$v1, GS_SYNCH2($v0)	# store it
+
+//*GS_SYNCV=0x00A9000002700005;
+lui     $v1, 0x00A9
+ori     $v1, 0x0000
+dsll    $v1, 16
+ori     $v1, 0x0270
+dsll    $v1, 16
+ori     $v1, 0x0005
+sd		$v1, GS_SYNCV($v0)	# store it
+
+//*GS_SMODE2=Target_SMODE2;
+or      $v1, $zero, $a0				# 	v1 = $a0 = Target_SMODE2;
+sd		$v1, GS_SMODE2($v0)	# store it
+
+//*GS_SRFSH=0;
+li      $v1, 4
+sd		$v1, %lo(GS_SRFSH)($v0)	# store it
+
+//*GS_SMODE1=0x0000001742490504;
+lui     $v1, 0x0017
+ori     $v1, 0x4249
+dsll    $v1, 16
+ori     $v1, 0x0504
+sd		$v1, GS_SMODE1($v0)	# store it
+
+//delay some miliseconds...
+li $v1, 0x7A120
+nop
+DTV_576P_SMODE1_delay_loop:
+vnop
+vnop
+addiu $v1, 0xFFFF
+vnop
+vnop
+bnez $v1, DTV_576P_SMODE1_delay_loop
+nop
+
+//*GS_SMODE1=0x0000001742480504;	// Have bits 16 and 17 cleared.
+lui     $v1, 0x0017
+ori     $v1, 0x4248
+dsll    $v1, 16
+ori     $v1, 0x0504
+sd		$v1, GS_SMODE1($v0)	# store it
+
+jr $ra
+nop
+
+.end DTV_576P
+
+//-----------------------------------------------------------------------------------------
+
+.ent DTV_1080P
+DTV_1080P:
+
+//$v0 = Base address
+la	$v0, GSMDestSetGsCrt
+//$a0 = Target_SMODE2
+ld	$a0, Target_SMODE2($v0)
+
+//$v0 = GS base address
+lui		$v0, (GS_BASE >> 16)
+
+//*GS_SMODE1=0x00000003422304B1
+lui     $v1, 0x0003
+ori     $v1, 0x4223
+dsll    $v1, 16
+ori     $v1, 0x04B1
+or      $v1, $v0, $v1
+sd		$v1, GS_SMODE1($v0)	# store it
+
+//if((*GS_REG_CSR>>16&0xFF)>=0x19){
+ld      $v1, GS_CSR($v0)	# load it
+dsrl    $v1, 16
+andi    $v1, 0xFF
+sltiu   $v1, 0x19
+bnez    $v1, DTV_1080P_else
+nop
+
+//		*GS_REG_SYNCH1=0x 0003 4420 0B04 182D;
+lui     $v1, 0x0003
+ori     $v1, 0x4420
+dsll    $v1, 16
+ori     $v1, 0x0B04
+dsll    $v1, 16
+ori     $v1, 0x182D
+sd		$v1, GS_SYNCH1($v0)	# store it
+
+//		*GS_REG_SYNCH2=0x 0020 FB61;
+lui     $v1, 0x0020
+ori     $v1, 0xFB61
+sd		$v1, GS_SYNCH2($v0)	# store it
+
+beqzl	$zero, DTV_1080P_endif
+nop
+
+//	}
+//	else{
+DTV_1080P_else:
+//		*GS_REG_SYNCH1=0x 0003 4420 0B04 3829;
+lui     $v1, 0x0003
+ori     $v1, 0x4420
+dsll    $v1, 16
+ori     $v1, 0x0B04
+dsll    $v1, 16
+ori     $v1, 0x3829
+sd		$v1, GS_SYNCH1($v0)	# store it
+
+//		*GS_REG_SYNCH2=0x 0020 EB63;
+lui     $v1, 0x0020
+ori     $v1, 0xEB63
+sd		$v1, GS_SYNCH2($v0)	# store it
+
+//	}
+DTV_1080P_endif:
+//*GS_SYNCV=0x0150 E002 01C0 0005;
+lui     $v1, 0x0150
+ori     $v1, 0xE002
+dsll    $v1, 16
+ori     $v1, 0x01C0
+dsll    $v1, 16
+ori     $v1, 0x0005
+sd		$v1, GS_SYNCV($v0)	# store it
+
+//*GS_SMODE2=Target_SMODE2;
+or      $v1, $zero, $a0				# 	v1 = $a0 = Target_SMODE2;
+sd		$v1, GS_SMODE2($v0)	# store it
+
+//*GS_SRFSH=0;
+li      $v1, 4
+sd		$v1, %lo(GS_SRFSH)($v0)	# store it
+
+//*GS_SMODE1=0x00000003422204B1;
+lui     $v1, 0x0003
+ori     $v1, 0x4222
+dsll    $v1, 16
+ori     $v1, 0x04B1
+sd		$v1, GS_SMODE1($v0)	# store it
+
+//delay some miliseconds...
+li $v1, 0x7A120
+nop
+DTV_1080P_SMODE1_delay_loop:
+vnop
+vnop
+addiu $v1, 0xFFFF
+vnop
+vnop
+bnez $v1, DTV_1080P_SMODE1_delay_loop
+nop
+
+//*GS_SMODE1=0x00000003422004B1;	// Have bits 16 and 17 cleared.
+lui     $v1, 0x0003
+ori     $v1, 0x4220
+dsll    $v1, 16
+ori     $v1, 0x04B1
+sd		$v1, GS_SMODE1($v0)	# store it
+
+jr $ra
+nop
+
+.end DTV_1080P
+
+//-----------------------------------------------------------------------------------------
+
+
 # ----------------------------
 # SMODE1
 # .--------.-------.---------------.----------------------------------.-------.

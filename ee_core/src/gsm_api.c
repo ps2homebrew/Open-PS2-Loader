@@ -15,6 +15,8 @@
 #include <kernel.h>
 #include <syscallnr.h>
 
+#include "gsm_api.h"
+
 #define MAKE_J(func) (u32)((0x02 << 26) | (((u32)func) / 4)) // Jump (MIPS instruction)
 #define NOP 0x00000000                                       // No Operation (MIPS instruction)
 
@@ -133,36 +135,7 @@ static void Install_GSHandler(void)
 
     // Set Data Address Write Breakpoint
     // Trap writes to GS registers, so as to control their values
-    __asm__ __volatile__(
-        ".set noreorder\n"
-        ".set noat\n"
-
-        "li $a0, 0x12000000\n" // Address base for trapping
-        "li $a1, 0x1FFFEF0F\n" // Address mask for trapping
-                               // Trapping range is extended to match all kernel access segments
-
-        "li $k0, 0x8000\n"
-        "mtbpc $k0\n" // All breakpoints off (BED = 1)
-
-        "sync.p\n" // Await instruction completion
-
-        "mtdab	$a0\n"
-        "mtdabm	$a1\n"
-
-        "sync.p\n" // Await instruction completion
-
-        "mfbpc $k1\n"
-        "sync.p\n" // Await instruction completion
-
-        "li $k0, 0x20200000\n" // Data write breakpoint on (DWE, DUE = 1)
-        "or $k1, $k1, $k0\n"
-        "xori $k1, $k1, 0x8000\n" // DEBUG exception trigger on (BED = 0)
-        "mtbpc $k1\n"
-        "sync.p\n" //  Await instruction completion
-
-        ".set at\n"
-        ".set reorder\n");
-
+    Enable_GSBreakpoint();
     EI();
 
     FlushCache(0);
@@ -173,15 +146,7 @@ static void Remove_GSHandler(void)
 {
     DI();
 
-    __asm__ __volatile__(
-        ".set noreorder\n"
-        ".set noat\n"
-        "li $k0, 0x8000\n"
-        "mtbpc $k0\n" // All breakpoints off (BED = 1)
-        "sync.p\n"    // Await instruction completion
-
-        ".set at\n"
-        ".set reorder\n");
+    Disable_GSBreakpoint();
 
     //Restore the original stuff at the level 2 exception handler.
     ee_kmode_enter();

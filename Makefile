@@ -153,6 +153,7 @@ else
   endif
   ifeq ($(GSM),1)
     EE_CFLAGS += -DGSM
+    EE_OBJS += gsm.o
     GSM_FLAGS = GSM=1
     ifeq ($(IGS),1)
       EE_CFLAGS += -DIGS

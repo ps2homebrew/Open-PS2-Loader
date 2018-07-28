@@ -164,10 +164,8 @@ sb	$a0, RC_adaptation($v0)
 //-----------------------------------------------------------------------------------------
 
 // Remove all breakpoints (even when they aren't enabled)
-di			// Disable Interupts
-li $a2, 0x8000
-mtbpc $a2		// All breakpoints off (BED = 1)
-sync.p			// Await instruction completion
+jal Disable_GSBreakpoint
+nop
 
 //-----------------------------------------------------------------------------------------
 
@@ -488,37 +486,7 @@ Skip_Call_Original_SetGsCrt:
 //For instance: UP (SLUS 21864)
 //-----------------------------------------------------------------------------------------
 
-// Set Data Address Write Breakpoint
-// Trap writes to GS registers, so as to control their values
-	
-li $a0, GS_BASE	// Address base for trapping
-li $a1, 0x1FFFEF0F	// Address mask for trapping	//DOCTORXYZ
-					// Trapping range is extended to match all kernel access segments
-
-di			// Disable Interupts
-sync.l			// Wait until the preceding loads are completed
-
-li $a2, 0x8000
-mtbpc $a2		// All breakpoints off (BED = 1)
-
-sync.p			// Await instruction completion
-
-mtdab	$a0
-mtdabm	$a1
-
-sync.p			// Await instruction completion
-
-mfbpc $a3
-sync.p			// Await instruction completion
-
-li $a2, 0x20200000	// Data write breakpoint on (DWE, DUE = 1)
-or $a3, $a3, $a2
-xori $a3, $a3, 0x8000	// DEBUG exception trigger on (BED = 0)
-mtbpc $a3
-
-sync.p			//  Await instruction completion
-
-ei			// Enable Interupts
+jal Enable_GSBreakpoint
 nop
 
 //-----------------------------------------------------------------------------------------
@@ -1424,6 +1392,53 @@ end_GSHandler:
 
 #include "gsm_engine_adv.S"
 
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.globl Enable_GSBreakpoint
+.ent Enable_GSBreakpoint
+Enable_GSBreakpoint:
+# Set Data Address Write Breakpoint
+# Trap writes to GS registers, so as to control their values
+
+li $a0, TRAP_BASE	# Address base for trapping
+li $a1, TRAP_MASK	# Address mask for trapping
+			# Trapping range is extended to match all kernel access segments
+
+li $a2, 0x8000
+mtbpc $a2		# All breakpoints off (BED = 1)
+
+sync.p			# Await instruction completion
+
+mtdab	$a0
+mtdabm	$a1
+
+sync.p			# Await instruction completion
+
+mfbpc $a3
+sync.p			# Await instruction completion
+
+li $a2, 0x20200000	# Data write breakpoint on (DWE, DUE = 1)
+or $a3, $a3, $a2
+xori $a3, $a3, 0x8000	# DEBUG exception trigger on (BED = 0)
+mtbpc $a3
+
+sync.p			#  Await instruction completion
+
+jr $ra
+nop
+.end Enable_GSBreakpoint
+
+.globl Disable_GSBreakpoint
+.ent Disable_GSBreakpoint
+Disable_GSBreakpoint:
+li $a2, 0x8000
+mtbpc $a2		# All breakpoints off (BED = 1)
+sync.p			# Await instruction completion
+
+jr $ra
+nop
+.end Disable_GSBreakpoint
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

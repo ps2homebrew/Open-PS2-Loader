@@ -61,7 +61,7 @@ GSMDestSetGsCrt:	.space 12
 GSMDestGSRegs: .space 88
 
 .globl GSMFlags
-GSMFlags: .space 18
+GSMFlags: .space 19
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -185,40 +185,26 @@ sync.p						# They ensure all values are stable before the following call
 //Otherwise, call the original SetGsCrt() syscall handler and let it configure the GS for us.
 //
 
-addiu	$a3, $zero, GS_MODE_DTV_480P
-bne	$a1, $a3, Skip_DTV_480P
-addiu	$a3, $zero, GS_MODE_DTV_576P
+li	$a3, GS_MODE_DTV_576P
+la	$t0, GSMFlags
+bne	$a1, $a3, Call_SetGsCrt
+lb	$v1, gs576P_param($t0)			# v0 = 576P_parm
+andi	$v0, $v1, 2
+beqz	$v0, Call_SetGsCrt			# If the console supports 576P, use SetGsCrt.
+andi	$a3, $v1, 1				# GCONT setting.
 
-jal DTV_480P
-nop
-
-j Skip_Call_Original_SetGsCrt
-nop
-
-Skip_DTV_480P:
-bne	$a1, $a3, Skip_DTV_576P
-addiu	$a3, $zero, GS_MODE_DTV_1080P
+//-----------------------------------------------------------------------------------------
 
 jal DTV_576P
 nop
 
-j Skip_Call_Original_SetGsCrt
+b Skip_Call_Original_SetGsCrt
 nop
 
 //-----------------------------------------------------------------------------------------
 
-Skip_DTV_576P:
-bne	$a1, $a3, Skip_DTV_1080P
-nop
 
-jal DTV_1080P
-nop
-
-j Skip_Call_Original_SetGsCrt
-nop
-
-//-----------------------------------------------------------------------------------------
-Skip_DTV_1080P:
+Call_SetGsCrt:
 lw	$a3, Old_SetGsCrt		# a3 -> original SetGsCrt function
 jalr	$a3					# Call original SetGsCrt
 nop

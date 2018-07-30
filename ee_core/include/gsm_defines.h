@@ -83,6 +83,7 @@ GS_MODE_DTV_1080P=0x54
 .equ SYNCV_fix,            14 # BYTE
 .equ DISPFB_fix,           15 # BYTE
 .equ DISPLAY_fix,          16 # BYTE
+.equ FIELD_stat,           17 # BYTE
 
 # GSMAdapts
 .equ Adapted_DISPLAY1,             0 # DWORD

@@ -62,18 +62,6 @@ GSMDestGSRegs: .space 88
 
 .globl GSMFlags
 GSMFlags: .space 18
-.equ X_offset,              0 # WORD
-.equ Y_offset,              4 # WORD
-.equ ADAPTATION_fix,        8 # BYTE
-.equ PMODE_fix,             9 # BYTE
-.equ SMODE1_fix,           10 # BYTE
-.equ SMODE2_fix,           11 # BYTE
-.equ SRFSH_fix,            12 # BYTE
-.equ SYNCH_fix,            13 # BYTE
-.equ SYNCV_fix,            14 # BYTE
-.equ DISPFB_fix,           15 # BYTE
-.equ DISPLAY_fix,          16 # BYTE
-.equ FIELD_stat,           17 # BYTE
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 

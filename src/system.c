@@ -695,7 +695,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #define GSM_ARGS 0
 #endif
     char ElfPath[32];
-    char *argv[6 + GSM_ARGS];
+    char *argv[7 + GSM_ARGS];
     char ModStorageConfig[32];
     char KernelConfig[32];
     char config_str[256];
@@ -860,11 +860,14 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     FlushCache(2);
 
     //PS2LOGO Caller, based on l_oliveira & SP193 tips
+    //Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
     if (EnablePS2Logo) {
-        argv[i] = ElfPath;
-        LoadExecPS2("rom0:PS2LOGO", i+1, argv);
+        argv[i] = "rom0:PS2LOGO";
+        argv[i+1] = ElfPath;
+        ExecPS2((void*)eh->entry, NULL, i + 2, argv);
     } else {
-        LoadExecPS2(ElfPath, i, argv);
+        argv[i] = ElfPath;
+        ExecPS2((void*)eh->entry, NULL, i + 1, argv);
     }
 }
 
@@ -908,7 +911,7 @@ int sysExecElf(char *path)
     FlushCache(0);
     FlushCache(2);
 
-    ExecPS2((void *)eh->entry, 0, 1, elf_argv);
+    ExecPS2((void *)eh->entry, NULL, 1, elf_argv);
 
     return 0;
 }

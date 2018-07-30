@@ -93,7 +93,7 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
     GSMFlags.SMODE2_fix = (u8)1;     // Default = 1 = On
     GSMFlags.SRFSH_fix = (u8)0;      // Default = 0 = Off
     GSMFlags.SYNCH_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SYNCV_fix = (u8)1;      // Default = 1 = On
+    GSMFlags.SYNCV_fix = (u8)0;      // Default = 0 = Off
     GSMFlags.DISPFB_fix = (u8)1;     // Default = 1 = On
     GSMFlags.DISPLAY_fix = (u8)1;    // Default = 1 = On
 }

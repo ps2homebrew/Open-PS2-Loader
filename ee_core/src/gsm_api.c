@@ -57,6 +57,7 @@ struct GSMFlags
     u8 SYNCV_fix;
     u8 DISPFB_fix;
     u8 DISPLAY_fix;
+    u8 FIELD_stat;
 };
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;

@@ -43,17 +43,15 @@ MIPS_Regs:			.space	0x200
 Old_SetGsCrt:		.word 0
 
 .globl GSMSourceSetGsCrt
-GSMSourceSetGsCrt:	.space 12
+GSMSourceSetGsCrt:	.space 6
+
+.globl GSMDestSetGsCrt
+GSMDestSetGsCrt:	.space 6
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
 .globl GSMSourceGSRegs
 GSMSourceGSRegs: .space 88
-
-.p2align 4	# align 16 bytes (IMPORTANT!!!)
-
-.globl GSMDestSetGsCrt
-GSMDestSetGsCrt:	.space 12
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -65,7 +63,7 @@ GSMFlags: .space 19
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-GSMAdapts:	.space 19
+GSMAdapts:	.space 18
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -144,35 +142,21 @@ BD_t2:
 Hook_SetGsCrt:
 addiu	$sp, $sp, -0x0010			# reserve 16 bytes stack space (1 reg)
 sd	$ra, 0($sp)				# Push return address on stack
+
 la	$v0, GSMSourceSetGsCrt
-sw	$a0, Source_INT($v0)
-sw	$a1, Source_MODE($v0)
-sw	$a2, Source_FFMD($v0)
-
-and	$a3, $a0,$a2				# a3 = Interlace & Field
-andi	$a3, $a3,1				# a3 &= 1 limited to 1 bit
-la	$v0, GSMAdapts
-sb	$a3, Interlace_FRAME_Mode_Flag($v0)
-
-//-----------------------------------------------------------------------------------------
-
-// RC (Read Circuit) adaptation for avoiding garbage on screen ex.: Sega Genesis Collection (SLUS_215.42)
-la	$v0, GSMAdapts
-li	$a0, 1                  # Enable RC_adaptation
-sb	$a0, RC_adaptation($v0)
-
-//-----------------------------------------------------------------------------------------
+sh	$a0, Source_INT($v0)
+sh	$a1, Source_MODE($v0)
 
 // Remove all breakpoints (even when they aren't enabled)
 jal Disable_GSBreakpoint
-nop
+sh	$a2, Source_FFMD($v0)
 
 //-----------------------------------------------------------------------------------------
 
 la	$v0, GSMDestSetGsCrt
-lw	$a0, Target_INT($v0)
-lw	$a1, Target_MODE($v0)
-lw	$a2, Target_FFMD($v0)
+lh	$a0, Target_INT($v0)
+lh	$a1, Target_MODE($v0)
+lh	$a2, Target_FFMD($v0)
 sync.l						# The opcodes sync.l and sync.p made a lot of games compatible
 sync.p						# They ensure all values are stable before the following call
 
@@ -647,20 +631,8 @@ ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 store_v0_as_DISPLAY2:
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$v0,0($a3)		# store DISPLAY2
-
-# ------------------------------------------------------------------------------------------------------
-
-lb	$a1, RC_adaptation($s3)
-beqzl	$a1,exit_GSHandler	# in case of RC_adaptation is disabled, go exit
-nop
-
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$zero, GS_DISPLAY1($s4)		# DISPLAY1 should never be displayed on this scenario (in order to avoid garbage on screen)
-beqzl	$zero,exit_GSHandler
-sb	$zero, RC_adaptation($s3)				# Disable RC_adaptation, since this patch should be applied only once, each time Hook_SetGsCrt is called.
-											# Sega Genesis Collection (SLUS_215.42) doesn't repeatedly write to GS Priviledge Registers, but God of War I (SCUS_973.99) does this!
+beqzl	$zero,exit_GSHandler	# Now go exit
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAYx
@@ -725,11 +697,11 @@ nop						# otherwise
 
 have_DISPLAY_write_2:                     # {
 addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
-bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 0)
+bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 16)
 or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
 
 have_DISPLAY_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
+mult	$t4,$t0			# LO = Calculated_Width = (Source_Pixels_Width * Target_Width_Scale)
 nop
 nop
 mflo	$t1				# t1 = LO = Calculated_Width
@@ -814,11 +786,11 @@ nop						# otherwise
 
 have_DISPLAY_write_8:						# {
 addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
-bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 0)
+bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 4)
 or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
 
 have_DISPLAY_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
+mult	$t4,$t0			# LO = Calculated_Height = (Source_Pixels_Height * Target_Height_Scale)
 nop
 nop
 mflo	$t1				# t1 = LO = Calculated_Height
@@ -918,7 +890,6 @@ or	$v0,$zero,$a1			# 	go use v0=a1 for DISPFBx
 store_v0_as_DISPFB:
 jr $ra
 nop
-
 
 # ------------------------------------------------------------------------------------------------------
 

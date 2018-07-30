@@ -24,9 +24,9 @@ extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd)
 
 struct GSMDestSetGsCrt
 {
-    unsigned int interlace;
-    unsigned int mode;
-    unsigned int ffmd;
+    s16 interlace;
+    s16 mode;
+    s16 ffmd;
 };
 
 struct GSMDestGSRegs
@@ -74,13 +74,13 @@ static unsigned int KSEG_backup[2]; //Copies of the original words at 0x80000100
 /*-------------------*/
 /*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix)
+void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix)
 {
     unsigned int hvParam = GetGsVParam();
 
-    GSMDestSetGsCrt.interlace = (u32)interlace;
-    GSMDestSetGsCrt.mode = (u32)mode;
-    GSMDestSetGsCrt.ffmd = (u32)ffmd;
+    GSMDestSetGsCrt.interlace = interlace;
+    GSMDestSetGsCrt.mode = mode;
+    GSMDestSetGsCrt.ffmd = ffmd;
 
     GSMDestGSRegs.smode2 = (u8)smode2;
     GSMDestGSRegs.display1 = (u64)display;
@@ -90,15 +90,15 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
     GSMFlags.dx_offset = (u32)dx_offset; // X-axis offset -> Use it only when automatic adaptations formulas don't suffice
     GSMFlags.dy_offset = (u32)dy_offset; // Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
     // 0 = Off, 1 = On
-    GSMFlags.ADAPTATION_fix = (u8)1; // Default = 1 = On
-    GSMFlags.PMODE_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SMODE1_fix = (u8)0;     // Default = 0 = Off
-    GSMFlags.SMODE2_fix = (u8)1;     // Default = 1 = On
-    GSMFlags.SRFSH_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SYNCH_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SYNCV_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.DISPFB_fix = (u8)1;     // Default = 1 = On
-    GSMFlags.DISPLAY_fix = (u8)1;    // Default = 1 = On
+    GSMFlags.ADAPTATION_fix = 1; // Default = 1 = On
+    GSMFlags.PMODE_fix = 0;      // Default = 0 = Off
+    GSMFlags.SMODE1_fix = 0;     // Default = 0 = Off
+    GSMFlags.SMODE2_fix = 1;     // Default = 1 = On
+    GSMFlags.SRFSH_fix = 0;      // Default = 0 = Off
+    GSMFlags.SYNCH_fix = 0;      // Default = 0 = Off
+    GSMFlags.SYNCV_fix = 0;      // Default = 0 = Off
+    GSMFlags.DISPFB_fix = 1;     // Default = 1 = On
+    GSMFlags.DISPLAY_fix = 1;    // Default = 1 = On
     GSMFlags.gs576P_param = (k576p_fix ? (1 << 1) : 0) | (hvParam & 1);
 }
 

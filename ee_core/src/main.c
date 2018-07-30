@@ -111,13 +111,14 @@ static int eecoreInit(int argc, char **argv)
 
 #ifdef GSM
     if (EnableGSMOp) {
-        u32 interlace, mode, ffmd, dx_offset, dy_offset;
+        s16 interlace, mode, ffmd;
+        u32 dx_offset, dy_offset;
         u64 display, syncv, smode2;
         int k576P_fix;
 
-        interlace = _strtoui(_strtok(argv[i], " "));
-        mode = _strtoui(_strtok(NULL, " "));
-        ffmd = _strtoui(_strtok(NULL, " "));
+        interlace = _strtoi(_strtok(argv[i], " "));
+        mode = _strtoi(_strtok(NULL, " "));
+        ffmd = _strtoi(_strtok(NULL, " "));
         display = _strtoul(_strtok(NULL, " "));
         syncv = _strtoul(_strtok(NULL, " "));
         smode2 = _strtoui(_strtok(NULL, " "));

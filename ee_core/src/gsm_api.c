@@ -58,6 +58,7 @@ struct GSMFlags
     u8 DISPFB_fix;
     u8 DISPLAY_fix;
     u8 FIELD_stat;
+    u8 gs576P_param;
 };
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
@@ -69,12 +70,14 @@ extern void GSHandler();
 
 static unsigned int KSEG_backup[2]; //Copies of the original words at 0x80000100 and 0x80000104.
 
-/*-------------------*/
 /* Update GSM params */
 /*-------------------*/
+/*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset)
+void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix)
 {
+    unsigned int hvParam = GetGsVParam();
+
     GSMDestSetGsCrt.interlace = (u32)interlace;
     GSMDestSetGsCrt.mode = (u32)mode;
     GSMDestSetGsCrt.ffmd = (u32)ffmd;
@@ -96,6 +99,7 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
     GSMFlags.SYNCV_fix = (u8)0;      // Default = 0 = Off
     GSMFlags.DISPFB_fix = (u8)1;     // Default = 1 = On
     GSMFlags.DISPLAY_fix = (u8)1;    // Default = 1 = On
+    GSMFlags.gs576P_param = (k576p_fix ? (1 << 1) : 0) | (hvParam & 1);
 }
 
 /*------------------------------------------------------------------*/

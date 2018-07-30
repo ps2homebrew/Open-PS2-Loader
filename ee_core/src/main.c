@@ -113,6 +113,7 @@ static int eecoreInit(int argc, char **argv)
     if (EnableGSMOp) {
         u32 interlace, mode, ffmd, dx_offset, dy_offset;
         u64 display, syncv, smode2;
+        int k576P_fix;
 
         interlace = _strtoui(_strtok(argv[i], " "));
         mode = _strtoui(_strtok(NULL, " "));
@@ -122,8 +123,9 @@ static int eecoreInit(int argc, char **argv)
         smode2 = _strtoui(_strtok(NULL, " "));
         dx_offset = _strtoui(_strtok(NULL, " "));
         dy_offset = _strtoui(_strtok(NULL, " "));
+        k576P_fix = _strtoui(_strtok(NULL, " "));
 
-        UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset);
+        UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset, k576P_fix);
         EnableGSM();
     }
     i++;

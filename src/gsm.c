@@ -27,7 +27,7 @@ void PrepareGSM(char *cmdline)
     // Some of following vmodes result in no display and/or freezing, depending on the console kernel and GS revision.
     // Therefore there are many variables involved here that can lead us to success or fail, depending on the already mentioned circumstances.
     //
-    static const predef_vmode_struct predef_vmode[30] = {
+    static const predef_vmode_struct predef_vmode[29] = {
         //                                                            DH    DW   MAGV MAGH  DY   DX              VS  VDP  VBPE  VBP VFPE  VFP
         {GS_INTERLACED,    GS_MODE_NTSC,        GS_FIELD, makeDISPLAY(447,  2559, 0,   3,   46,  700), makeSYNCV(6,  480,  6,    26,  6,   1)},
         {GS_INTERLACED,    GS_MODE_NTSC,        GS_FRAME, makeDISPLAY(223,  2559, 0,   3,   26,  700), makeSYNCV(6,  480,  6,    26,  6,   2)},
@@ -42,7 +42,6 @@ void PrepareGSM(char *cmdline)
         {GS_NONINTERLACED, GS_MODE_DTV_720P,    GS_FRAME, makeDISPLAY(719,  1279, 1,   1,   24,  302), makeSYNCV(5,  720,  0,    20,  0,   5)},
         {GS_INTERLACED,    GS_MODE_DTV_1080I,   GS_FIELD, makeDISPLAY(1079, 1919, 1,   2,   48,  238), makeSYNCV(10, 1080, 2,    28,  0,   5)},
         {GS_INTERLACED,    GS_MODE_DTV_1080I,   GS_FRAME, makeDISPLAY(1079, 1919, 0,   2,   48,  238), makeSYNCV(10, 1080, 2,    28,  0,   5)},
-        {GS_NONINTERLACED, GS_MODE_DTV_1080P,   GS_FRAME, makeDISPLAY(1079, 1919, 1,   2,   48,  238), makeSYNCV(10, 1080, 2,    28,  0,   5)},
         {GS_NONINTERLACED, GS_MODE_VGA_640_60,  GS_FRAME, makeDISPLAY(479,  1279, 0,   1,   54,  276), makeSYNCV(2,  480,  0,    33,  0,   10)},
         {GS_NONINTERLACED, GS_MODE_VGA_640_72,  GS_FRAME, makeDISPLAY(479,  1279, 0,   1,   18,  330), makeSYNCV(3,  480,  0,    28,  0,   9)},
         {GS_NONINTERLACED, GS_MODE_VGA_640_75,  GS_FRAME, makeDISPLAY(479,  1279, 0,   1,   18,  360), makeSYNCV(3,  480,  0,    16,  0,   1)},
@@ -59,14 +58,33 @@ void PrepareGSM(char *cmdline)
         {GS_NONINTERLACED, GS_MODE_VGA_1024_85, GS_FRAME, makeDISPLAY(767,  1023, 0,   0,   30,  290), makeSYNCV(3,  768,  0,    36,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_60, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_75, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)}}; //ends predef_vmode definition
+    int k576p_fix, fd;
+    char romver[5];
 
-    sprintf(cmdline, "%d %d %d %lu %lu %u %u %u", predef_vmode[gGSMVMode].interlace,
+    k576p_fix = 0;
+    if((fd = fileXioOpen("rom0:ROMVER", O_RDONLY)) >= 0) {
+        //Read ROM version (first 4 digits)
+        fileXioRead(fd, romver, sizeof(romver)-1);
+        fileXioClose(fd);
+
+        /* Enable 576P add-on code for v2.00 and earlier. Note that the earlier PSX models already seem to support the 576P mode, despite being older than the SCPH-70000 series.
+           1. The PSX (v1.80) has the same GS as the SCPH-75000 (v2.20), which is also shared with one of the SCPH-70000 (v2.00) models.
+           2. The SCPH-50000a/b has v1.90, but that seemed to be actually older than the v1.80 from the early PSX models.
+           3. All SCPH-50000 and SCPH-70000 series consoles do not support 576P mode.
+
+           However, it should be harmless to use the add-on code, even on consoles that support it.
+           Note that there are also PSX sets with v2.10, hence this check should only include v2.00 and earlier. */
+        k576p_fix = (strtoul(romver, NULL, 10) < 210);
+    }
+
+    sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %d", predef_vmode[gGSMVMode].interlace,
             predef_vmode[gGSMVMode].mode,
             predef_vmode[gGSMVMode].ffmd,
             predef_vmode[gGSMVMode].display,
             predef_vmode[gGSMVMode].syncv,
             ((predef_vmode[gGSMVMode].ffmd) << 1) | (predef_vmode[gGSMVMode].interlace),
             gGSMXOffset,
-            gGSMYOffset);
+            gGSMYOffset,
+            k576p_fix);
 }
 

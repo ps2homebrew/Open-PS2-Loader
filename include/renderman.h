@@ -16,11 +16,8 @@
  *   horizontally. Use rmWideScale to scale any x/width value.
  */
 
-/// DTV 576 Progressive Scan (720x576)
+/// DTV 576 Progressive Scan (720x576). Not available in ROM v1.70 and earlier.
 #define GS_MODE_DTV_576P 0x53
-
-/// DTV 1080 Progressive Scan (1920x1080)
-#define GS_MODE_DTV_1080P 0x54
 
 #define DIM_UNDEF -1
 

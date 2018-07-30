@@ -30,10 +30,8 @@
 .equ GS_BGCOLOUR, 0x00E0
 .equ GS_CSR,      0x1000
 
-# Built-in video modes (made possible by SP193 and reprep)
-GS_MODE_DTV_480P=0x50
+# Add-on video modes (made possible by SP193 and reprep)
 GS_MODE_DTV_576P=0x53
-GS_MODE_DTV_1080P=0x54
 
 # GSMSourceSetGsCrt
 .equ Source_INT,      0 # WORD
@@ -84,6 +82,7 @@ GS_MODE_DTV_1080P=0x54
 .equ DISPFB_fix,           15 # BYTE
 .equ DISPLAY_fix,          16 # BYTE
 .equ FIELD_stat,           17 # BYTE
+.equ gs576P_param,         18 # BYTE
 
 # GSMAdapts
 .equ Adapted_DISPLAY1,             0 # DWORD

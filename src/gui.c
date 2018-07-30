@@ -614,7 +614,6 @@ static void guiShowGSConfig(void)
         "HDTV 720p @60Hz",
         "HDTV 1080i @60Hz",
         "HDTV 1080i @60Hz Non Interlaced",
-        "HDTV 1080p @60Hz",
         "VGA 640x480p @60Hz",
         "VGA 640x480p @72Hz",
         "VGA 640x480p @75Hz",

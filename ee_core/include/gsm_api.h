@@ -11,7 +11,7 @@
 #
 */
 
-void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix);
+void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix, int kGsDxDyOffsetSupported);
 void Enable_GSBreakpoint(void);
 void Disable_GSBreakpoint(void);
 void EnableGSM(void);

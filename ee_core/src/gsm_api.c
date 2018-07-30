@@ -22,6 +22,12 @@
 
 extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd);
 
+// Taken from gsKit
+// NTSC
+#define GS_MODE_NTSC 0x02
+// PAL
+#define GS_MODE_PAL  0x03
+
 struct GSMDestSetGsCrt
 {
     s16 interlace;
@@ -74,9 +80,10 @@ static unsigned int KSEG_backup[2]; //Copies of the original words at 0x80000100
 /*-------------------*/
 /*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix)
+void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix, int kGsDxDyOffsetSupported)
 {
     unsigned int hvParam = GetGsVParam();
+    int gs_DH, gs_DW, gs_DY, gs_DX;
 
     GSMDestSetGsCrt.interlace = interlace;
     GSMDestSetGsCrt.mode = mode;
@@ -100,6 +107,12 @@ void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, 
     GSMFlags.DISPFB_fix = 1;     // Default = 1 = On
     GSMFlags.DISPLAY_fix = 1;    // Default = 1 = On
     GSMFlags.gs576P_param = (k576p_fix ? (1 << 1) : 0) | (hvParam & 1);
+
+    if (kGsDxDyOffsetSupported && (!(mode >= GS_MODE_NTSC && mode <= GS_MODE_PAL))) {
+        _GetGsDxDyOffset(mode, &gs_DX, &gs_DY, &gs_DW, &gs_DH);
+        GSMFlags.dx_offset += gs_DX;
+        GSMFlags.dy_offset += gs_DY;
+    }
 }
 
 /*------------------------------------------------------------------*/

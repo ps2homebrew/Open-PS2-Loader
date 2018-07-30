@@ -58,14 +58,21 @@ void PrepareGSM(char *cmdline)
         {GS_NONINTERLACED, GS_MODE_VGA_1024_85, GS_FRAME, makeDISPLAY(767,  1023, 0,   0,   30,  290), makeSYNCV(3,  768,  0,    36,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_60, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_75, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)}}; //ends predef_vmode definition
-    int k576p_fix, fd;
-    char romver[5];
+    int k576p_fix, kGsDxDyOffsetSupported, fd;
+    char romver[16], romverNum[5], *pROMDate;
 
     k576p_fix = 0;
+    kGsDxDyOffsetSupported = 0;
     if((fd = fileXioOpen("rom0:ROMVER", O_RDONLY)) >= 0) {
-        //Read ROM version (first 4 digits)
-        fileXioRead(fd, romver, sizeof(romver)-1);
+        //Read ROM version
+        fileXioRead(fd, romver, sizeof(romver));
         fileXioClose(fd);
+
+        strncpy(romverNum, romver, 4);
+        romverNum[4] = '\0';
+
+        //ROMVER string format: VVVVRTYYYYMMDD\n
+        pROMDate = &romver[strlen(romver) - 9];
 
         /* Enable 576P add-on code for v2.00 and earlier. Note that the earlier PSX models already seem to support the 576P mode, despite being older than the SCPH-70000 series.
            1. The PSX (v1.80) has the same GS as the SCPH-75000 (v2.20), which is also shared with one of the SCPH-70000 (v2.00) models.
@@ -74,10 +81,13 @@ void PrepareGSM(char *cmdline)
 
            However, it should be harmless to use the add-on code, even on consoles that support it.
            Note that there are also PSX sets with v2.10, hence this check should only include v2.00 and earlier. */
-        k576p_fix = (strtoul(romver, NULL, 10) < 210);
+        k576p_fix = (strtoul(romverNum, NULL, 10) < 210);
+
+        //Record if the _GetGsDxDyOffset syscall is supported.
+        kGsDxDyOffsetSupported = (strtoul(pROMDate, NULL, 10) > 20010608);
     }
 
-    sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %d", predef_vmode[gGSMVMode].interlace,
+    sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %d %d", predef_vmode[gGSMVMode].interlace,
             predef_vmode[gGSMVMode].mode,
             predef_vmode[gGSMVMode].ffmd,
             predef_vmode[gGSMVMode].display,
@@ -85,6 +95,7 @@ void PrepareGSM(char *cmdline)
             ((predef_vmode[gGSMVMode].ffmd) << 1) | (predef_vmode[gGSMVMode].interlace),
             gGSMXOffset,
             gGSMYOffset,
-            k576p_fix);
+            k576p_fix,
+            kGsDxDyOffsetSupported);
 }
 

@@ -11,25 +11,7 @@
 #include <ee_cop0_defs.h>
 #include <syscallnr.h>
 
-.equ GS_BASE,	  0x12000000
-.equ GS_PMODE,    0x0000
-.equ GS_SMODE1,   0x0010
-.equ GS_SMODE2,   0x0020
-.equ GS_SRFSH,    0x0030
-.equ GS_SYNCH1,   0x0040
-.equ GS_SYNCH2,   0x0050
-.equ GS_SYNCV,    0x0060
-.equ GS_DISPFB1,  0x0070
-.equ GS_DISPLAY1, 0x0080
-.equ GS_DISPFB2,  0x0090
-.equ GS_DISPLAY2, 0x00A0
-.equ GS_BGCOLOUR, 0x00E0
-.equ GS_CSR,      0x1000
-
-# Built-in video modes (made possible by SP193 and reprep)
-GS_MODE_DTV_480P=0x50
-GS_MODE_DTV_576P=0x53
-GS_MODE_DTV_1080P=0x54
+#include "gsm_defines.h"
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -62,72 +44,28 @@ Old_SetGsCrt:		.word 0
 
 .globl GSMSourceSetGsCrt
 GSMSourceSetGsCrt:	.space 12
-.equ Source_INT,      0 # WORD
-.equ Source_MODE,     4 # WORD
-.equ Source_FFMD,     8 # WORD
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
 .globl GSMSourceGSRegs
 GSMSourceGSRegs: .space 88
-.equ Source_PMODE,     0 # DWORD
-.equ Source_SMODE1,    8 # DWORD
-.equ Source_SMODE2,   16 # DWORD
-.equ Source_SRFSH,    24 # DWORD
-.equ Source_SYNCH1,   32 # DWORD
-.equ Source_SYNCH2,   40 # DWORD
-.equ Source_SYNCV,    48 # DWORD
-.equ Source_DISPFB1,  56 # DWORD
-.equ Source_DISPLAY1, 64 # DWORD
-.equ Source_DISPFB2,  72 # DWORD
-.equ Source_DISPLAY2, 80 # DWORD
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
 .globl GSMDestSetGsCrt
 GSMDestSetGsCrt:	.space 12
-.equ Target_INT,      0 # WORD
-.equ Target_MODE,     4 # WORD
-.equ Target_FFMD,     8 # WORD
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
 .globl GSMDestGSRegs
 GSMDestGSRegs: .space 88
-.equ Target_PMODE,     0 # DWORD
-.equ Target_SMODE1,    8 # DWORD
-.equ Target_SMODE2,   16 # DWORD
-.equ Target_SRFSH,    24 # DWORD
-.equ Target_SYNCH1,   32 # DWORD
-.equ Target_SYNCH2,   40 # DWORD
-.equ Target_SYNCV,    48 # DWORD
-.equ Target_DISPFB1,  56 # DWORD
-.equ Target_DISPLAY1, 64 # DWORD
-.equ Target_DISPFB2,  72 # DWORD
-.equ Target_DISPLAY2, 80 # DWORD
 
 .globl GSMFlags
 GSMFlags: .space 17
-.equ X_offset,              0 # WORD
-.equ Y_offset,              4 # WORD
-.equ ADAPTATION_fix,        8 # BYTE
-.equ PMODE_fix,             9 # BYTE
-.equ SMODE1_fix,           10 # BYTE
-.equ SMODE2_fix,           11 # BYTE
-.equ SRFSH_fix,            12 # BYTE
-.equ SYNCH_fix,            13 # BYTE
-.equ SYNCV_fix,            14 # BYTE
-.equ DISPFB_fix,           15 # BYTE
-.equ DISPLAY_fix,          16 # BYTE
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
 GSMAdapts:	.space 19
-.equ Adapted_DISPLAY1,             0 # DWORD
-.equ Adapted_DISPLAY2,             8 # DWORD
-.equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
-.equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value
-.equ RC_adaptation,               18 # BYTE -> RC (Read Circuit) adaptation for avoiding garbage on screen ex.: Sega Genesis Collection (SLUS_215.42)
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -226,10 +164,8 @@ sb	$a0, RC_adaptation($v0)
 //-----------------------------------------------------------------------------------------
 
 // Remove all breakpoints (even when they aren't enabled)
-di			// Disable Interupts
-li $a2, 0x8000
-mtbpc $a2		// All breakpoints off (BED = 1)
-sync.p			// Await instruction completion
+jal Disable_GSBreakpoint
+nop
 
 //-----------------------------------------------------------------------------------------
 
@@ -249,291 +185,36 @@ sync.p						# They ensure all values are stable before the following call
 //Otherwise, call the original SetGsCrt() syscall handler and let it configure the GS for us.
 //
 
-li	$a3, GS_MODE_DTV_480P
+addiu	$a3, $zero, GS_MODE_DTV_480P
 bne	$a1, $a3, Skip_DTV_480P
+addiu	$a3, $zero, GS_MODE_DTV_576P
+
+jal DTV_480P
 nop
 
-//-----------------------------------------------------------------------------------------
-
-DTV_480P:
-
-//$v0 = Base address
-la	$v0, GSMDestSetGsCrt
-//$a0 = Target_SMODE2
-ld	$a0, Target_SMODE2($v0)
-
-//$v0 = GS base address
-lui		$v0, (GS_BASE >> 16)
-
-//*GS_SMODE1=0x0000001740430504;
-lui     $v1, 0x0017
-ori     $v1, 0x4043
-dsll    $v1, 16
-ori     $v1, 0x0504
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//*GS_SYNCH1=0x000402DA20034020;
-lui     $v1, 0x0004
-ori     $v1, 0x02DA
-dsll    $v1, 16
-ori     $v1, 0x2003
-dsll    $v1, 16
-ori     $v1, 0x4020
-sd		$v1, GS_SYNCH1($v0)	# store it
-
-//*GS_SYNCH2=0x0019D272;
-lui     $v1, 0x0019
-ori     $v1, 0xD272
-sd		$v1, GS_SYNCH2($v0)	# store it
-
-//*GS_SYNCV=0x00C78C0001E00006;
-lui     $v1, 0x00C7
-ori     $v1, 0x8C00
-dsll    $v1, 16
-ori     $v1, 0x01E0
-dsll    $v1, 16
-ori     $v1, 0x0006
-sd		$v1, GS_SYNCV($v0)	# store it
-
-//*GS_SMODE2=Target_SMODE2;
-or      $v1, $zero, $a0				# 	v1 = $a0 = Target_SMODE2;
-sd		$v1, GS_SMODE2($v0)	# store it
-
-//*GS_SRFSH=0;
-li      $v1, 4
-sd		$v1, %lo(GS_SRFSH)($v0)	# store it
-
-//*GS_SMODE1=0x0000001742410504;
-lui     $v1, 0x0017
-ori     $v1, 0x4241
-dsll    $v1, 16
-ori     $v1, 0x0504
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//delay some miliseconds...
-li $v1, 0x7A120
+j Skip_Call_Original_SetGsCrt
 nop
-DTV_480P_SMODE1_delay_loop:
-vnop
-vnop
-addiu $v1, 0xFFFF
-vnop
-vnop
-bnez $v1, DTV_480P_SMODE1_delay_loop
-nop
-
-//*GS_SMODE1=0x0000001742400504;	// Have bits 16 and 17 cleared.
-lui     $v1, 0x0017
-ori     $v1, 0x4240
-dsll    $v1, 16
-ori     $v1, 0x0504
-sd		$v1, GS_SMODE1($v0)	# store it
-
-beqzl $zero, Skip_Call_Original_SetGsCrt
-nop
-
-//-----------------------------------------------------------------------------------------
 
 Skip_DTV_480P:
-li	$a3, GS_MODE_DTV_576P
 bne	$a1, $a3, Skip_DTV_576P
+addiu	$a3, $zero, GS_MODE_DTV_1080P
+
+jal DTV_576P
 nop
 
-//-----------------------------------------------------------------------------------------
-
-
-DTV_576P:
-
-//$v0 = Base address
-la	$v0, GSMDestSetGsCrt
-//$a0 = Target_SMODE2
-ld	$a0, Target_SMODE2($v0)
-
-//$v0 = GS base address
-lui		$v0, (GS_BASE >> 16)
-
-//*GS_SMODE1=0x00000017424B0504;
-lui     $v1, 0x0017
-ori     $v1, 0x424B
-dsll    $v1, 16
-ori     $v1, 0x0504
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//*GS_SYNCH1=0x000402E02003C827;
-lui     $v1, 0x0004
-ori     $v1, 0x02E0
-dsll    $v1, 16
-ori     $v1, 0x2003
-dsll    $v1, 16
-ori     $v1, 0xC827
-sd		$v1, GS_SYNCH1($v0)	# store it
-
-//*GS_SYNCH2=0x0019CA67;
-lui     $v1, 0x0019
-ori     $v1, 0xCA67
-sd		$v1, GS_SYNCH2($v0)	# store it
-
-//*GS_SYNCV=0x00A9000002700005;
-lui     $v1, 0x00A9
-ori     $v1, 0x0000
-dsll    $v1, 16
-ori     $v1, 0x0270
-dsll    $v1, 16
-ori     $v1, 0x0005
-sd		$v1, GS_SYNCV($v0)	# store it
-
-//*GS_SMODE2=Target_SMODE2;
-or      $v1, $zero, $a0				# 	v1 = $a0 = Target_SMODE2;
-sd		$v1, GS_SMODE2($v0)	# store it
-
-//*GS_SRFSH=0;
-li      $v1, 4
-sd		$v1, %lo(GS_SRFSH)($v0)	# store it
-
-//*GS_SMODE1=0x0000001742490504;
-lui     $v1, 0x0017
-ori     $v1, 0x4249
-dsll    $v1, 16
-ori     $v1, 0x0504
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//delay some miliseconds...
-li $v1, 0x7A120
-nop
-DTV_576P_SMODE1_delay_loop:
-vnop
-vnop
-addiu $v1, 0xFFFF
-vnop
-vnop
-bnez $v1, DTV_576P_SMODE1_delay_loop
-nop
-
-//*GS_SMODE1=0x0000001742480504;	// Have bits 16 and 17 cleared.
-lui     $v1, 0x0017
-ori     $v1, 0x4248
-dsll    $v1, 16
-ori     $v1, 0x0504
-sd		$v1, GS_SMODE1($v0)	# store it
-
-beqzl $zero, Skip_Call_Original_SetGsCrt
+j Skip_Call_Original_SetGsCrt
 nop
 
 //-----------------------------------------------------------------------------------------
 
 Skip_DTV_576P:
-li	$a3, GS_MODE_DTV_1080P
 bne	$a1, $a3, Skip_DTV_1080P
 nop
 
-//-----------------------------------------------------------------------------------------
-
-DTV_1080P:
-
-//$v0 = Base address
-la	$v0, GSMDestSetGsCrt
-//$a0 = Target_SMODE2
-ld	$a0, Target_SMODE2($v0)
-
-//$v0 = GS base address
-lui		$v0, (GS_BASE >> 16)
-
-//*GS_SMODE1=0x00000003422304B1
-lui     $v1, 0x0003
-ori     $v1, 0x4223
-dsll    $v1, 16
-ori     $v1, 0x04B1
-or      $v1, $v0, $v1
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//if((*GS_REG_CSR>>16&0xFF)>=0x19){
-ld      $v1, GS_CSR($v0)	# load it
-dsrl    $v1, 16
-andi    $v1, 0xFF
-sltiu   $v1, 0x19
-bnez    $v1, DTV_1080P_else
+jal DTV_1080P
 nop
 
-//		*GS_REG_SYNCH1=0x 0003 4420 0B04 182D;
-lui     $v1, 0x0003
-ori     $v1, 0x4420
-dsll    $v1, 16
-ori     $v1, 0x0B04
-dsll    $v1, 16
-ori     $v1, 0x182D
-sd		$v1, GS_SYNCH1($v0)	# store it
-
-//		*GS_REG_SYNCH2=0x 0020 FB61;
-lui     $v1, 0x0020
-ori     $v1, 0xFB61
-sd		$v1, GS_SYNCH2($v0)	# store it
-
-beqzl	$zero, DTV_1080P_endif
-nop
-
-//	}
-//	else{
-DTV_1080P_else:
-//		*GS_REG_SYNCH1=0x 0003 4420 0B04 3829;
-lui     $v1, 0x0003
-ori     $v1, 0x4420
-dsll    $v1, 16
-ori     $v1, 0x0B04
-dsll    $v1, 16
-ori     $v1, 0x3829
-sd		$v1, GS_SYNCH1($v0)	# store it
-
-//		*GS_REG_SYNCH2=0x 0020 EB63;
-lui     $v1, 0x0020
-ori     $v1, 0xEB63
-sd		$v1, GS_SYNCH2($v0)	# store it
-
-//	}
-DTV_1080P_endif:
-//*GS_SYNCV=0x0150 E002 01C0 0005;
-lui     $v1, 0x0150
-ori     $v1, 0xE002
-dsll    $v1, 16
-ori     $v1, 0x01C0
-dsll    $v1, 16
-ori     $v1, 0x0005
-sd		$v1, GS_SYNCV($v0)	# store it
-
-//*GS_SMODE2=Target_SMODE2;
-or      $v1, $zero, $a0				# 	v1 = $a0 = Target_SMODE2;
-sd		$v1, GS_SMODE2($v0)	# store it
-
-//*GS_SRFSH=0;
-li      $v1, 4
-sd		$v1, %lo(GS_SRFSH)($v0)	# store it
-
-//*GS_SMODE1=0x00000003422204B1;
-lui     $v1, 0x0003
-ori     $v1, 0x4222
-dsll    $v1, 16
-ori     $v1, 0x04B1
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//delay some miliseconds...
-li $v1, 0x7A120
-nop
-DTV_1080P_SMODE1_delay_loop:
-vnop
-vnop
-addiu $v1, 0xFFFF
-vnop
-vnop
-bnez $v1, DTV_1080P_SMODE1_delay_loop
-nop
-
-//*GS_SMODE1=0x00000003422004B1;	// Have bits 16 and 17 cleared.
-lui     $v1, 0x0003
-ori     $v1, 0x4220
-dsll    $v1, 16
-ori     $v1, 0x04B1
-sd		$v1, GS_SMODE1($v0)	# store it
-
-beqzl	$zero, Skip_Call_Original_SetGsCrt
+j Skip_Call_Original_SetGsCrt
 nop
 
 //-----------------------------------------------------------------------------------------
@@ -550,37 +231,7 @@ Skip_Call_Original_SetGsCrt:
 //For instance: UP (SLUS 21864)
 //-----------------------------------------------------------------------------------------
 
-// Set Data Address Write Breakpoint
-// Trap writes to GS registers, so as to control their values
-	
-li $a0, GS_BASE	// Address base for trapping
-li $a1, 0x1FFFEF0F	// Address mask for trapping	//DOCTORXYZ
-					// Trapping range is extended to match all kernel access segments
-
-di			// Disable Interupts
-sync.l			// Wait until the preceding loads are completed
-
-li $a2, 0x8000
-mtbpc $a2		// All breakpoints off (BED = 1)
-
-sync.p			// Await instruction completion
-
-mtdab	$a0
-mtdabm	$a1
-
-sync.p			// Await instruction completion
-
-mfbpc $a3
-sync.p			// Await instruction completion
-
-li $a2, 0x20200000	// Data write breakpoint on (DWE, DUE = 1)
-or $a3, $a3, $a2
-xori $a3, $a3, 0x8000	// DEBUG exception trigger on (BED = 0)
-mtbpc $a3
-
-sync.p			//  Await instruction completion
-
-ei			// Enable Interupts
+jal Enable_GSBreakpoint
 nop
 
 //-----------------------------------------------------------------------------------------
@@ -823,86 +474,6 @@ beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing 
 
 # ----------------------------
-# SMODE1
-# .--------.-------.---------------.----------------------------------.-------.
-# | Name   | Pos.  | Format        | Contents                         | Mask  |
-# |--------+-------+---------------+----------------------------------+-------|
-# | VHP    | 36:36 | int  0:1:0    | Mode Choice                      | 0x1   |
-# |        |       |               | 0 Progressive                    |       |
-# |        |       |               | 1 Interlace                      |       |
-# | VCKSEL | 35:34 | int  0:2:0    |                                  | 0x3   |
-# | SLCK2  | 33:33 | int  0:1:0    |                                  | 0x1   |
-# | NVCK   | 32:32 | int  0:1:0    |                                  | 0x1   |
-# | CLKSEL | 31:30 | int  0:2:0    |                                  | 0x3   |
-# | PEVS   | 29:29 | int  0:1:0    |                                  | 0x1   |
-# | PEHS   | 28:28 | int  0:1:0    |                                  | 0x1   |
-# | PVS	   | 27:27 | int  0:1:0    |                                  | 0x1   |
-# | PHS	   | 26:26 | int  0:1:0    |                                  | 0x1   |
-# | GCONT  | 25:25 | int  0:1:0    | Component Color Mode             | 0x1   |
-# |        |       |               | 0 RGB                            |       |
-# |        |       |               | 1 YPbPr                          |       |
-# | SPML   | 24:21 | int  0:4:0    | Sub-Pixel Magnification Level    | 0xF   |
-# | PCK2   | 20:19 | int  0:2:0    |                                  | 0x1   |
-# | XPCK   | 18:18 | int  0:1:0    |                                  | 0x1   |
-# | SINT   | 17:17 | int  0:1:0    | PLL (Phase-locked loop)          | 0x1   |
-# |        |       |               | 0 Off                            |       |
-# |        |       |               | 1 On                             |       |
-# | PRST   | 16:16 | int  0:1:0    | PCRTC Reset                      | 0x1   |
-# |        |       |               | 0 Off                            |       |
-# |        |       |               | 1 On                             |       |
-# | EX     | 15:15 | int  0:1:0    |                                  | 0x1   |
-# | CMOD   | 14:13 | int  0:2:0    | Color Subcarrier                 | 0x3   |
-# |        |       |               | 2 NTSC                           |       |
-# |        |       |               | 3 PAL                            |       |
-# |        |       |               | 0 Used by other modes            |       |
-# |        |       |               | 1 Untested                       |       |
-# | SLCK   | 12:12 | int  0:1:0    |                                  | 0x1   |
-# | T1248  | 11:10 | int  0:2:0    |                                  | 0x3   |
-# | LC     |  9:3  | int  0:7:0    | PLL Loop Divider                 | 0x1F  |
-# | RC     |  2:0  | int  0:3:0    | PLL Reference Divider            | 0x7   |
-# '--------^-------^---------------^----------------------------------^-------'
-# Reference Table
-#                                 VHP VCKSEL SLCK2 NVCK CLKSEL PEVS PEHS PVS PHS GCONT SPML PCK2 XPCK SINT PRST EX CMOD SLCK T1248 LC RC
-# NTSC-NI   (640x240(224))        0   1      1     1    1      0    0    0   0   0     4    0    0    1    1    0  2    0    1     32 4
-# NTSC-I    (640x480(448))        0   1      1     1    1      0    0    0   0   0     4    0    0    1    1    0  2    0    1     32 4
-# PAL-NI    (640x288(256))        0   1      1     1    1      0    0    0   0   0     4    0    0    1    1    0  3    0    1     32 4
-# PAL-I     (640x576(512))        0   1      1     1    1      0    0    0   0   0     4    0    0    1    1    0  3    0    1     32 4
-# VESA-1A   (640x480 59.940Hz)    1   0      1     1    1      0    0    0   0   0     2    0    0    1    0    0  0    0    1     15 2
-# VESA-1C   (640x480 75.000Hz)    1   0      1     1    1      0    0    0   0   0     2    0    0    1    0    0  0    0    1     28 3
-# VESA-2B   (800x600 60.317Hz)    1   0      1     1    1      0    0    0   0   0     2    0    0    1    0    0  0    0    1     71 6
-# VESA-2D   (800x600 75.000Hz)    1   0      1     1    1      0    0    0   0   0     2    0    0    1    0    0  0    0    1     44 3
-# VESA-3B   (1024x768 60.004Hz)   1   0      1     1    1      0    0    0   0   0     2    0    0    1    0    0  0    0    0     58 6
-# VESA-3D   (1024x768 75.029Hz)   1   0      1     1    1      0    0    0   0   0     1    0    0    1    0    0  0    0    1     35 3
-# VESA-4A   (1280x1024 60.020Hz)  1   0      1     1    1      0    0    0   0   0     1    0    0    1    0    0  0    0    0      8 1
-# VESA-4B   (1280x1024 75.025Hz)  1   0      1     1    1      0    0    0   0   0     1    0    0    1    0    0  0    0    0     10 1
-# DTV-480P  (720x480)             1   1      1     1    1      0    0    0   0   0     2    0    0    1    1    0  0    0    1     32 4
-# DTV-576P  (720x576)             1   1      1     1    1      0    0    0   0   0     2    1    0    1    1    0  0    0    1     32 4
-# DTV-1080I (1920x1080)           0   0      1     1    1      0    0    0   0   0     1    0    0    1    0    0  0    0    1     22 2
-# DTV-1080P (1920x1080)           0   0      1     1    1      0    0    0   0   0     1    0    0    1    0    0  0    0    1     22 1
-# DTV-720P  (1280x720)            1   0      1     1    1      0    0    0   0   0     1    0    0    1    0    0  0    0    1     22 2
-#
-# low-level PCRTC initialize
-# A critical part of getting this to work is bits 16 (PRST) and 17(SINT).
-# Every time you write to SMODE1 register without resetting these fields causes EE to stop processing. A hard reset was required at that point.
-# GS rev.21 which responds to the above code.
-# An older GS rev. seems to require setting bit 16 and then reseting bit 16 and then waiting for 2.5ms.
-#
-have_SMODE1_write:
-sd	$a1, Source_SMODE1($s0)				# Source_SMODE1 = a1
-lb	$v0, SMODE1_fix($s2)				# v0 = SMODE1_fix
-beql	$v0,$zero,store_v0_as_SMODE1	# in case of SMODE1_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SMODE1
-ld	$v0, Target_SMODE1($s1)				# v0 = Target_SMODE1
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SMODE1 is zero
-sd	$a1,0($a3)							# 	go use Source_SMODE1
-
-store_v0_as_SMODE1:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
-
-# ----------------------------
 # SMODE2
 # .----.---.---------.-----------------------------------.
 # |Name|Pos|Format   |Contents                           |
@@ -941,150 +512,15 @@ beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
-# SRFSH
-# .-----.---.---------.-----------------------------------------------------.
-# |Name |Pos|Format   |Contents                                             |
-# +-----+---+---------+-----------------------------------------------------|
-# |SRFSH| 0 |int 0:?:0| DRAM Refresh Settings. Somewhat correlated to SPML. |
-# ^-----^---^---------^-----------------------------------------------------.
-# Reference Table
-#                                 SRFSH SPML
-#  NTSC-NI   (640x240(224))         8    4  
-#  NTSC-I    (640x480(448))         8    4  
-#  PAL-NI    (640x288(256))         8    4  
-#  PAL-I     (640x576(512))         8    4  
-#  VESA-1A   (640x480 59.940Hz)     4    2  
-#  VESA-1C   (640x480 75.000Hz)     4    2  
-#  VESA-2B   (800x600 60.317Hz)     4    2  
-#  VESA-2D   (800x600 75.000Hz)     4    2  
-#  VESA-3B   (1024x768 60.004Hz)    4    2  
-#  VESA-3D   (1024x768 75.029Hz)    2    1  
-#  VESA-4A   (1280x1024 60.020Hz)   2    1  
-#  VESA-4B   (1280x1024 75.025Hz)   2    1  
-#  DTV-480P  (720x480)              4    2  
-#  DTV-1080I (1920x1080)            4    1  
-#  DTV-720P  (1280x720)             4    1  
-#
-have_SRFSH_write:
-sd	$a1, Source_SRFSH($s0)			# Source_SRFSH = a1
-lb	$v0, SRFSH_fix($s2)				# v0 = SRFSH_fix
-beql	$v0,$zero,store_v0_as_SRFSH	# in case of SRFSH_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SRFSH
-ld	$v0, Target_SRFSH($s1)			# v0 = Target_SRFSH
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SRFSH is zero
-sd	$a1,0($a3)							# 	go use Source_SRFSH
-
-store_v0_as_SRFSH:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
-
-# ----------------------------
-# SYNCH1
-# ----.-----.----------.-------.
-#|Name|Pos. |Format    | Mask  |
-# ----+-----+----------+-------|
-#|HFP |10:0 |int 0:11:0| 0x7FF |
-#|HBP |21:11|int 0:11:0| 0x7FF |
-#|HSEQ|31:22|int 0:11:0| 0x7FF |
-#|HSVS|42:32|int 0:11:0| 0x7FF |
-#|HS  |53:43|int 0:11:0| 0x7FF |
-# ----^-----^----------^-------'
-have_SYNCH1_write:
-sd	$a1, Source_SYNCH1($s0)			# Source_SYNCH1 = a1
-lb	$v0, SYNCH_fix($s2)				# v0 = SYNCH_fix
-beql	$v0,$zero,store_v0_as_SYNCH1	# in case of SYNCH_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCH1
-ld	$v0, Target_SYNCH1($s1)			# v0 = Target_SYNCH1
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH1 is zero
-sd	$a1,0($a3)							# 	go use Source_SYNCH1
-
-store_v0_as_SYNCH1:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
-
-# ----------------------------
-# SYNCH2
-# ----.-----.----------.-------.
-#|Name|Pos. |Format    | Mask  |
-# ----+-----+----------+-------|
-#|HF  |10:0 |int 0:11:0| 0x7FF |
-#|HB  |21:11|int 0:11:0| 0x7FF |
-#'----^-----^----------^-------'
-have_SYNCH2_write:
-sd	$a1, Source_SYNCH2($s0)			# Source_SYNCH2 = a1
-lb	$v0, SYNCH_fix($s2)				# v0 = SYNCH_fix
-beql	$v0,$zero,store_v0_as_SYNCH2	# in case of SYNCH_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCH2
-ld	$v0, Target_SYNCH2($s1)			# v0 = Target_SYNCH2
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH2 is zero
-sd	$a1,0($a3)							# 	go use Source_SYNCH2
-
-store_v0_as_SYNCH2:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
-
-# ----------------------------
-# SYNCV
-# .----.-----.----------.-------.
-# |Name|Pos. |Format    | Mask  |
-# |----+-----+----------+-------|
-# |VFP | 9:0 |int 0:10:0| 0x3FF |
-# |VFPE|19:10|int 0:10:0| 0x3FF |
-# |VBP |31:20|int 0:12:0| 0xFFF |
-# |VBPE|41:32|int 0:12:0| 0xFFF |
-# |VDP |52:42|int 0:11:0| 0x7FF |
-# |VS  |56:53|int 0:04:0| 0xF   |
-# '----^-----^----------^-------'
-have_SYNCV_write:
-sd	$a1, Source_SYNCV($s0)				# Source_SYNCV = a1
-lb	$v0, SYNCV_fix($s2)					# v0 = SYNCV_fix
-beql	$v0,$zero,store_v0_as_SYNCV		# in case of SYNCV_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCV
-ld	$v0, Target_SYNCV($s1)				# v0 = Target_SYNCV
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCV is zero
-sd	$a1,0($a3)							# 	go use Source_SYNCV
-
-store_v0_as_SYNCV:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
-
-# ----------------------------
 # DISPFB1
-# 
-# .-------.-------.------------.----------------------------------------------.-------.
-# | Name  |  Pos. | Format     | Contents                                     | Mask  |
-# |-------+-------+------------+----------------------------------------------+-------+
-# | FBP   | 8:0   | int 0:9:0  | Base Pointer (Address/2048)                  | 0x1FF |
-# | FBW   | 14:9  | int 0:6:0  | Buffer Width (Width/64)                      | 0x3F  |
-# | PSM   | 19:15 | int 0:5:0  | Pixel Storage Format                         | 0x1F  |
-# |       |       |            | 00000 PSMCT32                                |       |
-# |       |       |            | 00001 PSMCT24                                |       |
-# |       |       |            | 00010 PSMCT16                                |       |
-# |       |       |            | 01010 PSMCT16S                               |       |
-# |       |       |            | 10010 PS-GPU24                               |       |
-# | DBX   | 42:32 | int 0:11:0 | X Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# | DBY   | 53:43 | int 0:11:0 | Y Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# '-------^------^-------------^---------------------------------------------^--------^
+#
 have_DISPFB1_write:
 sd	$a1, Source_DISPFB1($s0)			# Source_DISPFB1 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
-beql	$v0,$zero,store_v0_as_DISPFB1	# in case of DISPFB_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
-beql	$v0,$zero,store_v0_as_DISPFB1	# in case of  Target_DISPFB1 is zero
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB1
 
-store_v0_as_DISPFB1:
+jal have_DISPFB_write
+nop
+
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
@@ -1092,33 +528,14 @@ sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPFB2
-# 
-# .-------.-------.------------.----------------------------------------------.-------.
-# | Name  |  Pos. | Format     | Contents                                     | Mask  |
-# |-------+-------+------------+----------------------------------------------+-------+
-# | FBP   | 8:0   | int 0:9:0  | Base Pointer (Address/2048)                  | 0x1FF |
-# | FBW   | 14:9  | int 0:6:0  | Buffer Width (Width/64)                      | 0x3F  |
-# | PSM   | 19:15 | int 0:5:0  | Pixel Storage Format                         | 0x1F  |
-# |       |       |            | 00000 PSMCT32                                |       |
-# |       |       |            | 00001 PSMCT24                                |       |
-# |       |       |            | 00010 PSMCT16                                |       |
-# |       |       |            | 01010 PSMCT16S                               |       |
-# |       |       |            | 10010 PS-GPU24                               |       |
-# | DBX   | 42:32 | int 0:11:0 | X Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# | DBY   | 53:43 | int 0:11:0 | Y Position in Buffer of Upper Left Point of  | 0x7FF |
-# |       |       |            | Rectangular Area (in units of pixels)        |       |
-# '-------^------^-------------^---------------------------------------------^--------^
+#
 have_DISPFB2_write:
 sd	$a1, Source_DISPFB2($s0)			# Source_DISPFB2 = a1
-lb	$v0, DISPFB_fix($s2)				# v0 = DISPFB_fix
-beql	$v0,$zero,store_v0_as_DISPFB2	# in case of DISPFB_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
-beql	$v0,$zero,store_v0_as_DISPFB2	# in case of  Target_DISPFB2 is zero
-or	$v0,$zero,$a1						# 	go use v0=a1 for DISPFB2
 
-store_v0_as_DISPFB2:
+jal have_DISPFB_write
+nop
+
 sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
 sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
@@ -1131,227 +548,10 @@ have_DISPLAY1_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY1($s0)			# request DISPLAY1 value = a1
 ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
-#  Source_DISPLAY1 == Requested   DX, DY, MAGH, MAGV, DW and DH values
-#  Target_DISPLAY1 == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
-#  Both are 64 bit units with encoded bit fields like GS DISPLAY1 registers
-
-#  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
-
-lb	$v0, ADAPTATION_fix($s2)
-beql	$v0,$zero,have_DISPLAY1_write_1					# in case of (ADAPTATION_fix)
-or	$a1,$zero,$v1					# 	simulate request same as forced mode
-
-have_DISPLAY1_write_1:
-li	$v0,0						# preclear v0 as result DISPLAY1 accumulator
-
-#  Here a0=free, a1=Source_DISPLAY1, a2->.gsm_engine, a3=dest_address
-#  Also v0=result_accumulator, v1=Target_DISPLAY1, t0-t7=free
-
-//
-// Automatic adaptation formulas
-//
-# ----- HORIZONTAL FIELDS -----
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGH | 26:23 | int 0: 4:0 | magnification in horizontal direction | 0xF   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,23
-andi	$t0,$t0,0x0F
-addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DW   | 43:32 | int 0:12:0 | display area width - 1 (VCK units)    | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,0
-andi	$t1,$t1,0x0FFF
-addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
-dsrl32	$t0,$v1,0
-andi	$t5,$t0,0x0FFF
-mflo	$t4				# t4 = LO = Source_Pixels_Width
-addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Width_Scale
-bne	$t0,$zero,have_DISPLAY1_write_2		# in case of (!Target_Width_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
-sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
-li	$t4,0				# t4 = Target_MAGH = 0
-beql	$zero,$zero,have_DISPLAY1_write_4		# }
-nop						# otherwise
-						# Target_Width_Scale nonzero
-
-have_DISPLAY1_write_2:                     # {
-addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
-bgtzl	$t1,have_DISPLAY1_write_3			# in case of (Target_Width_Scale > 0)
-or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
-
-have_DISPLAY1_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Width
-addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
-
-have_DISPLAY1_write_4:                     # }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Width (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DX   | 11:0  | int 0:12:0 | x pos in display area (VCK units)     | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-andi	$t1,$v1,0x0FFF	# t1 = Target_DX
-add	$t6,$t0,$t1			# t6 = Calculated_DX = Target_DX + Half_Excess_Width
-bltzl	$t6,have_DISPLAY1_write_5			# in case of (Calculated_DX < 0)
-and	$t6,$t6,$zero		# 	Calculated_DX = 0;
-
-have_DISPLAY1_write_5:
-sub	$t0,$t1,$t6			# t0 = Target_DX - Calculated_DX
-bgtzl	$t0,have_DISPLAY1_write_6			# in case of (Target_DX > Calculated_DX)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
-
-have_DISPLAY1_write_6:
-andi	$t7,$t7,0x0FFF
-andi	$t4,$t4,0x000F
-andi	$t6,$t6,0x0FFF
-dsll32	$t0,$t7,0		# t0 = Calculated_DW
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DW)
-dsll	$t0,$t4,23
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_MAGH)
-
-lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
-bgez	$t6, have_DISPLAY1_write_7		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero		# t6 = Calculated_DX = 0
-have_DISPLAY1_write_7:
-andi	$t6,$t6,0x0FFF
-
-or	$v0,$v0,$t6			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DX)
-
-# ----- VERTICAL FIELDS -------
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGV | 28:27 | int 0: 2:0 | magnification in vertical direction   | 0x3   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,27
-andi	$t0,$t0,0x03
-addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DH   | 54:44 | int 0:11:0 | display area height - 1 (pixel units) | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,12
-andi	$t1,$t1,0x07FF
-addi	$t1,$t1,1		# Source_Height = Source_DH + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
-dsrl32	$t0,$v1,12
-andi	$t5,$t0,0x07FF
-mflo	$t4				# t4 = LO = Source_Pixels_Height
-addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Height_Scale
-bne	$t0,$zero,have_DISPLAY1_write_8		# in case of (!Target_Height_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
-sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
-li	$t4,0				# t4 = Target_MAGV = 0
-beql	$zero,$zero,have_DISPLAY1_write_10		# }
-nop						# otherwise
-						# Target_Height_Scale nonzero
-
-have_DISPLAY1_write_8:						# {
-addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
-bgtzl	$t1,have_DISPLAY1_write_9			# in case of (Target_Height_Scale > 0)
-or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
-
-have_DISPLAY1_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Height
-addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
-
-have_DISPLAY1_write_10:						# }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Height (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DY   | 22:12 | int 0:11:0 | y pos in display area (raster units)  | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t1,$v1,12
-andi	$t1,$t1,0x07FF	# t1 = Target_DY
-add	$t6,$t0,$t1			# t6 = Calculated_DY = Target_DY + Half_Excess_Height
-bltzl	$t6,have_DISPLAY1_write_11			# in case of (Calculated_DY < 0)
-and	$t6,$t6,$zero		#	Calculated_DY = 0;
-
-have_DISPLAY1_write_11:
-sub	$t0,$t1,$t6			# t0 = Target_DY - Calculated_DY
-bgtzl	$t0,have_DISPLAY1_write_12			# in case of (Target_DY > Calculated_DY)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
-
-have_DISPLAY1_write_12:
-lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
-beql	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
+jal	have_DISPLAY_write
 nop
 
-ld	$t0, Target_SMODE2($s1)
-andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
-bne	$t0,$zero,have_DISPLAY1_write_13							# 	Calculation is complete
-nop
-beql	$t4,$zero,have_DISPLAY1_write_13	# in case of Calculated_MAGV = 0
-addi	$t4,$t4,1		# 	go use Calculated_MAGV = Calculated_MAGV + 1
-addi	$t4,$t4,2		# Calculated_MAGV = Calculated_MAGV + 2 (Because scale was 2 or larger)
-addi	$t0,$t4,-4		# Compare Calculated_MAGV with 4 (too large ?)
-bgezl	$t0,have_DISPLAY1_write_13			# in case of  Calculated_MAGV too large
-ori	$t4,$zero,3			# 	go use Calculated_MAGV = 3
-
-have_DISPLAY1_write_13:
-andi	$t7,$t7,0x07FF
-andi	$t4,$t4,0x0003
-andi	$t6,$t6,0x07FF
-dsll32	$t0,$t7,12
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DH)
-dsll	$t0,$t4,27
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_MAGV)
-
-lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
-bgez	$t6, have_DISPLAY1_write_14		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero
-have_DISPLAY1_write_14:
-andi	$t6,$t6,0x07FF
-
-dsll	$t0,$t6,12
-or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY1 = (Adapted_DISPLAY1) OR (Calculated_DY)
-
-# ------------------------------------------------------------------------------------------------------
-
-sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAYx value (for feedback)
-
-#  End of Patch to adapt request with the resulting request in v0
-
+sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAY1 value (for feedback)
 
 lb	$v1, DISPLAY_fix($s2)		# v1 = DISPLAY_fix
 beql	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
@@ -1370,227 +570,10 @@ have_DISPLAY2_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY2($s0)			# request DISPLAY2 value = a1
 ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
-#  Source_DISPLAY2 == Requested   DX, DY, MAGH, MAGV, DW and DH values
-#  Target_DISPLAY2 == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
-#  Both are 64 bit units with encoded bit fields like GS DISPLAY2 registers
-
-#  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
-
-lb	$v0, ADAPTATION_fix($s2)
-beql	$v0,$zero,have_DISPLAY2_write_1					# in case of (ADAPTATION_fix)
-or	$a1,$zero,$v1					# 	simulate request same as forced mode
-
-have_DISPLAY2_write_1:
-li	$v0,0						# preclear v0 as result DISPLAY2 accumulator
-
-#  Here a0=free, a1=Source_DISPLAY2, a2->.gsm_engine, a3=dest_address
-#  Also v0=result_accumulator, v1=Target_DISPLAY2, t0-t7=free
-
-//
-// Automatic adaptation formulas
-//
-# ----- HORIZONTAL FIELDS -----
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGH | 26:23 | int 0: 4:0 | magnification in horizontal direction | 0xF   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,23
-andi	$t0,$t0,0x0F
-addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DW   | 43:32 | int 0:12:0 | display area width - 1 (VCK units)    | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,0
-andi	$t1,$t1,0x0FFF
-addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
-dsrl32	$t0,$v1,0
-andi	$t5,$t0,0x0FFF
-mflo	$t4				# t4 = LO = Source_Pixels_Width
-addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Width_Scale
-bne	$t0,$zero,have_DISPLAY2_write_2		# in case of (!Target_Width_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
-sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
-li	$t4,0				# t4 = Target_MAGH = 0
-beql	$zero,$zero,have_DISPLAY2_write_4		# }
-nop						# otherwise
-						# Target_Width_Scale nonzero
-
-have_DISPLAY2_write_2:                     # {
-addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
-bgtzl	$t1,have_DISPLAY2_write_3			# in case of (Target_Width_Scale > 0)
-or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
-
-have_DISPLAY2_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Width
-addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
-
-have_DISPLAY2_write_4:                     # }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Width (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DX   | 11:0  | int 0:12:0 | x pos in display area (VCK units)     | 0xFFF |
-# '------^-------^------------^---------------------------------------^-------^
-andi	$t1,$v1,0x0FFF	# t1 = Target_DX
-add	$t6,$t0,$t1			# t6 = Calculated_DX = Target_DX + Half_Excess_Width
-bltzl	$t6,have_DISPLAY2_write_5			# in case of (Calculated_DX < 0)
-and	$t6,$t6,$zero		# 	Calculated_DX = 0;
-
-have_DISPLAY2_write_5:
-sub	$t0,$t1,$t6			# t0 = Target_DX - Calculated_DX
-bgtzl	$t0,have_DISPLAY2_write_6			# in case of (Target_DX > Calculated_DX)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
-
-have_DISPLAY2_write_6:
-andi	$t7,$t7,0x0FFF
-andi	$t4,$t4,0x000F
-andi	$t6,$t6,0x0FFF
-dsll32	$t0,$t7,0		# t0 = Calculated_DW
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DW)
-dsll	$t0,$t4,23
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_MAGH)
-
-lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
-bgez	$t6, have_DISPLAY2_write_7		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero		# t6 = Calculated_DX = 0
-have_DISPLAY2_write_7:
-andi	$t6,$t6,0x0FFF
-
-or	$v0,$v0,$t6			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DX)
-
-# ----- VERTICAL FIELDS -------
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | MAGV | 28:27 | int 0: 2:0 | magnification in vertical direction   | 0x3   |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t0,$a1,27
-andi	$t0,$t0,0x03
-addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DH   | 54:44 | int 0:11:0 | display area height - 1 (pixel units) | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl32	$t1,$a1,12
-andi	$t1,$t1,0x07FF
-addi	$t1,$t1,1		# Source_Height = Source_DH + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
-dsrl32	$t0,$v1,12
-andi	$t5,$t0,0x07FF
-mflo	$t4				# t4 = LO = Source_Pixels_Height
-addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
-nop
-nop
-mflo	$t0				# t0 = LO = Target_Height_Scale
-bne	$t0,$zero,have_DISPLAY2_write_8		# in case of (!Target_Height_Scale)
-nop						# {
-or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
-sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
-li	$t4,0				# t4 = Target_MAGV = 0
-beql	$zero,$zero,have_DISPLAY2_write_10		# }
-nop						# otherwise
-						# Target_Height_Scale nonzero
-
-have_DISPLAY2_write_8:						# {
-addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
-bgtzl	$t1,have_DISPLAY2_write_9			# in case of (Target_Height_Scale > 0)
-or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
-
-have_DISPLAY2_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Height
-addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
-addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
-sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
-
-have_DISPLAY2_write_10:						# }
-dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Height (can be negative)
-# .------.-------.------------.---------------------------------------.-------.
-# | Name | Pos.  | Format     | Contents                              | Mask  |
-# |      |       |            |                                       |       |
-# |------+-------+------------+---------------------------------------+-------+
-# | DY   | 22:12 | int 0:11:0 | y pos in display area (raster units)  | 0x7FF |
-# '------^-------^------------^---------------------------------------^-------^
-dsrl	$t1,$v1,12
-andi	$t1,$t1,0x07FF	# t1 = Target_DY
-add	$t6,$t0,$t1			# t6 = Calculated_DY = Target_DY + Half_Excess_Height
-bltzl	$t6,have_DISPLAY2_write_11			# in case of (Calculated_DY < 0)
-and	$t6,$t6,$zero		#	Calculated_DY = 0;
-
-have_DISPLAY2_write_11:
-sub	$t0,$t1,$t6			# t0 = Target_DY - Calculated_DY
-bgtzl	$t0,have_DISPLAY2_write_12			# in case of (Target_DY > Calculated_DY)
-add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
-
-have_DISPLAY2_write_12:
-lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
-beql	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
+jal	have_DISPLAY_write
 nop
 
-ld	$t0, Target_SMODE2($s1)
-andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
-bne	$t0,$zero,have_DISPLAY2_write_13							# 	Calculation is complete
-nop
-beql	$t4,$zero,have_DISPLAY2_write_13	# in case of Calculated_MAGV = 0
-addi	$t4,$t4,1		# 	go use Calculated_MAGV = Calculated_MAGV + 1
-addi	$t4,$t4,2		# Calculated_MAGV = Calculated_MAGV + 2 (Because scale was 2 or larger)
-addi	$t0,$t4,-4		# Compare Calculated_MAGV with 4 (too large ?)
-bgezl	$t0,have_DISPLAY2_write_13			# in case of  Calculated_MAGV too large
-ori	$t4,$zero,3			# 	go use Calculated_MAGV = 3
-
-have_DISPLAY2_write_13:
-andi	$t7,$t7,0x07FF
-andi	$t4,$t4,0x0003
-andi	$t6,$t6,0x07FF
-dsll32	$t0,$t7,12
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DH)
-dsll	$t0,$t4,27
-or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_MAGV)
-
-lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
-add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
-bgez	$t6, have_DISPLAY2_write_14		# Is the result greater or equal to zero?
-nop
-move	$t6, $zero
-have_DISPLAY2_write_14:
-andi	$t6,$t6,0x07FF
-
-dsll	$t0,$t6,12
-or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY2 = (Adapted_DISPLAY2) OR (Calculated_DY)
-
-# ------------------------------------------------------------------------------------------------------
-
-sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAYx value (for feedback)
-
-#  End of Patch to adapt request with the resulting request in v0
-
+sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAY2 value (for feedback)
 
 lb	$v1, DISPLAY_fix($s2)		# v1 = DISPLAY_fix
 beql	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
@@ -1613,6 +596,264 @@ sd	$zero, GS_DISPLAY1($s4)		# DISPLAY1 should never be displayed on this scenari
 beqzl	$zero,exit_GSHandler
 sb	$zero, RC_adaptation($s3)				# Disable RC_adaptation, since this patch should be applied only once, each time Hook_SetGsCrt is called.
 											# Sega Genesis Collection (SLUS_215.42) doesn't repeatedly write to GS Priviledge Registers, but God of War I (SCUS_973.99) does this!
+
+# ----------------------------
+# DISPLAYx
+# 
+have_DISPLAY_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
+#  Source_DISPLAY == Requested   DX, DY, MAGH, MAGV, DW and DH values
+#  Target_DISPLAY == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
+#  Both are 64 bit units with encoded bit fields like GS DISPLAY registers
+
+#  Patch to adapt request to enforced mode in v1 MUST preserve a1, a2, a3
+
+lb	$v0, ADAPTATION_fix($s2)
+beql	$v0,$zero,have_DISPLAY_write_1					# in case of (ADAPTATION_fix)
+or	$a1,$zero,$v1					# 	simulate request same as forced mode
+
+have_DISPLAY_write_1:
+li	$v0,0						# preclear v0 as result DISPLAY accumulator
+
+#  Here a0=free, a1=Source_DISPLAY, a2->.gsm_engine, a3=dest_address
+#  Also v0=result_accumulator, v1=Target_DISPLAY, t0-t7=free
+
+//
+// Automatic adaptation formulas
+//
+# ----- HORIZONTAL FIELDS -----
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | MAGH | 26:23 | int 0: 4:0 | magnification in horizontal direction | 0xF   |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl	$t0,$a1,23
+andi	$t0,$t0,0x0F
+addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DW   | 43:32 | int 0:12:0 | display area width - 1 (VCK units)    | 0xFFF |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl32	$t1,$a1,0
+andi	$t1,$t1,0x0FFF
+addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
+divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
+dsrl32	$t0,$v1,0
+andi	$t5,$t0,0x0FFF
+mflo	$t4				# t4 = LO = Source_Pixels_Width
+addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
+nop
+divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
+nop
+nop
+mflo	$t0				# t0 = LO = Target_Width_Scale
+bne	$t0,$zero,have_DISPLAY_write_2		# in case of (!Target_Width_Scale)
+nop						# {
+or	$t7,$zero,$t5		# t7 = Target_DW = Target_Width - 1
+sub	$t0,$t6,$t4			# t0 = Target_Width - Source_Pixels_Width
+li	$t4,0				# t4 = Target_MAGH = 0
+beql	$zero,$zero,have_DISPLAY_write_4		# }
+nop						# otherwise
+						# Target_Width_Scale nonzero
+
+have_DISPLAY_write_2:                     # {
+addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
+bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 0)
+or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
+
+have_DISPLAY_write_3:
+mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
+nop
+nop
+mflo	$t1				# t1 = LO = Calculated_Width
+addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
+addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
+sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
+
+have_DISPLAY_write_4:                     # }
+dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Width (can be negative)
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DX   | 11:0  | int 0:12:0 | x pos in display area (VCK units)     | 0xFFF |
+# '------^-------^------------^---------------------------------------^-------^
+andi	$t1,$v1,0x0FFF	# t1 = Target_DX
+add	$t6,$t0,$t1			# t6 = Calculated_DX = Target_DX + Half_Excess_Width
+bltzl	$t6,have_DISPLAY_write_5			# in case of (Calculated_DX < 0)
+and	$t6,$t6,$zero		# 	Calculated_DX = 0;
+
+have_DISPLAY_write_5:
+sub	$t0,$t1,$t6			# t0 = Target_DX - Calculated_DX
+bgtzl	$t0,have_DISPLAY_write_6			# in case of (Target_DX > Calculated_DX)
+add	$t7,$t7,$t0			# 	t7 = Calculated_DW = Calculated_DW + Target_DX - Calculated_DX  # Target DW adjusted
+
+have_DISPLAY_write_6:
+andi	$t7,$t7,0x0FFF
+andi	$t4,$t4,0x000F
+andi	$t6,$t6,0x0FFF
+dsll32	$t0,$t7,0		# t0 = Calculated_DW
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DW)
+dsll	$t0,$t4,23
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGH)
+
+lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
+add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
+bgez	$t6, have_DISPLAY_write_7		# Is the result greater or equal to zero?
+nop
+move	$t6, $zero		# t6 = Calculated_DX = 0
+have_DISPLAY_write_7:
+andi	$t6,$t6,0x0FFF
+
+or	$v0,$v0,$t6			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DX)
+
+# ----- VERTICAL FIELDS -------
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | MAGV | 28:27 | int 0: 2:0 | magnification in vertical direction   | 0x3   |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl	$t0,$a1,27
+andi	$t0,$t0,0x03
+addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DH   | 54:44 | int 0:11:0 | display area height - 1 (pixel units) | 0x7FF |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl32	$t1,$a1,12
+andi	$t1,$t1,0x07FF
+addi	$t1,$t1,1		# Source_Height = Source_DH + 1
+divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
+dsrl32	$t0,$v1,12
+andi	$t5,$t0,0x07FF
+mflo	$t4				# t4 = LO = Source_Pixels_Height
+addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
+nop
+divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
+nop
+nop
+mflo	$t0				# t0 = LO = Target_Height_Scale
+bne	$t0,$zero,have_DISPLAY_write_8		# in case of (!Target_Height_Scale)
+nop						# {
+or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
+sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
+li	$t4,0				# t4 = Target_MAGV = 0
+beql	$zero,$zero,have_DISPLAY_write_10		# }
+nop						# otherwise
+						# Target_Height_Scale nonzero
+
+have_DISPLAY_write_8:						# {
+addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
+bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 0)
+or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
+
+have_DISPLAY_write_9:
+mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
+nop
+nop
+mflo	$t1				# t1 = LO = Calculated_Height
+addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
+addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
+sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
+
+have_DISPLAY_write_10:						# }
+dsra $t0,$t0,1			# t0 = t0 / 2 = Half_Excess_Height (can be negative)
+# .------.-------.------------.---------------------------------------.-------.
+# | Name | Pos.  | Format     | Contents                              | Mask  |
+# |      |       |            |                                       |       |
+# |------+-------+------------+---------------------------------------+-------+
+# | DY   | 22:12 | int 0:11:0 | y pos in display area (raster units)  | 0x7FF |
+# '------^-------^------------^---------------------------------------^-------^
+dsrl	$t1,$v1,12
+andi	$t1,$t1,0x07FF	# t1 = Target_DY
+add	$t6,$t0,$t1			# t6 = Calculated_DY = Target_DY + Half_Excess_Height
+bltzl	$t6,have_DISPLAY_write_11			# in case of (Calculated_DY < 0)
+and	$t6,$t6,$zero		#	Calculated_DY = 0;
+
+have_DISPLAY_write_11:
+sub	$t0,$t1,$t6			# t0 = Target_DY - Calculated_DY
+bgtzl	$t0,have_DISPLAY_write_12			# in case of (Target_DY > Calculated_DY)
+add	$t7,$t7,$t0			# 	t7 = Calculated_DH = Calculated_DH + Target_DY - Calculated_DY # Target DH adjusted
+
+have_DISPLAY_write_12:
+lb	$t0, Interlace_FRAME_Mode_Flag($s3)	# in case of Double Height not needed
+beql	$t0,$zero,have_DISPLAY_write_13							# 	Calculation is complete
+nop
+
+ld	$t0, Target_SMODE2($s1)
+andi	$t0,$t0,1							# in case of Target_SMODE2.INT = 1 (Interlace Mode)
+bne	$t0,$zero,have_DISPLAY_write_13							# 	Calculation is complete
+nop
+beql	$t4,$zero,have_DISPLAY_write_13	# in case of Calculated_MAGV = 0
+addi	$t4,$t4,1		# 	go use Calculated_MAGV = Calculated_MAGV + 1
+addi	$t4,$t4,2		# Calculated_MAGV = Calculated_MAGV + 2 (Because scale was 2 or larger)
+addi	$t0,$t4,-4		# Compare Calculated_MAGV with 4 (too large ?)
+bgezl	$t0,have_DISPLAY_write_13			# in case of  Calculated_MAGV too large
+ori	$t4,$zero,3			# 	go use Calculated_MAGV = 3
+
+have_DISPLAY_write_13:
+andi	$t7,$t7,0x07FF
+andi	$t4,$t4,0x0003
+andi	$t6,$t6,0x07FF
+dsll32	$t0,$t7,12
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DH)
+dsll	$t0,$t4,27
+or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGV)
+
+lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
+add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
+bgez	$t6, have_DISPLAY_write_14		# Is the result greater or equal to zero?
+nop
+move	$t6, $zero
+have_DISPLAY_write_14:
+andi	$t6,$t6,0x07FF
+
+dsll	$t0,$t6,12
+
+jr $ra
+or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_DY)
+
+#  End of Patch to adapt request with the resulting request in v0
+
+# ----------------------------
+# DISPFBx
+# 
+# .-------.-------.------------.----------------------------------------------.-------.
+# | Name  |  Pos. | Format     | Contents                                     | Mask  |
+# |-------+-------+------------+----------------------------------------------+-------+
+# | FBP   | 8:0   | int 0:9:0  | Base Pointer (Address/2048)                  | 0x1FF |
+# | FBW   | 14:9  | int 0:6:0  | Buffer Width (Width/64)                      | 0x3F  |
+# | PSM   | 19:15 | int 0:5:0  | Pixel Storage Format                         | 0x1F  |
+# |       |       |            | 00000 PSMCT32                                |       |
+# |       |       |            | 00001 PSMCT24                                |       |
+# |       |       |            | 00010 PSMCT16                                |       |
+# |       |       |            | 01010 PSMCT16S                               |       |
+# |       |       |            | 10010 PS-GPU24                               |       |
+# | DBX   | 42:32 | int 0:11:0 | X Position in Buffer of Upper Left Point of  | 0x7FF |
+# |       |       |            | Rectangular Area (in units of pixels)        |       |
+# | DBY   | 53:43 | int 0:11:0 | Y Position in Buffer of Upper Left Point of  | 0x7FF |
+# |       |       |            | Rectangular Area (in units of pixels)        |       |
+# '-------^------^-------------^---------------------------------------------^--------^
+have_DISPFB_write:
+
+#  Here a0=free, a1=Source_DISPFBx, a2->.gsm_engine, a3=dest_address
+#  Also v0=result_accumulator, v0=Target_DISPFBx, t0-t7=free
+
+lb	$v1, DISPFB_fix($s2)		# v1 = DISPFB_fix
+beql	$v1,$zero,store_v0_as_DISPFB	# in case of DISPFB_fix is disabled
+or	$v0,$zero,$a1			# 	go use v0=a1 for DISPFBx
+beql	$v0,$zero,store_v0_as_DISPFB	# in case of  Target_DISPFBx is zero
+or	$v0,$zero,$a1			# 	go use v0=a1 for DISPFBx
+
+store_v0_as_DISPFB:
+jr $ra
+nop
+
 
 # ------------------------------------------------------------------------------------------------------
 
@@ -1893,6 +1134,56 @@ nop
 
 end_GSHandler:
 .end	GSHandler
+
+#include "gsm_engine_adv.S"
+
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.globl Enable_GSBreakpoint
+.ent Enable_GSBreakpoint
+Enable_GSBreakpoint:
+# Set Data Address Write Breakpoint
+# Trap writes to GS registers, so as to control their values
+
+li $a0, TRAP_BASE	# Address base for trapping
+li $a1, TRAP_MASK	# Address mask for trapping
+			# Trapping range is extended to match all kernel access segments
+
+li $a2, 0x8000
+mtbpc $a2		# All breakpoints off (BED = 1)
+
+sync.p			# Await instruction completion
+
+mtdab	$a0
+mtdabm	$a1
+
+sync.p			# Await instruction completion
+
+mfbpc $a3
+sync.p			# Await instruction completion
+
+li $a2, 0x20200000	# Data write breakpoint on (DWE, DUE = 1)
+or $a3, $a3, $a2
+xori $a3, $a3, 0x8000	# DEBUG exception trigger on (BED = 0)
+mtbpc $a3
+
+sync.p			#  Await instruction completion
+
+jr $ra
+nop
+.end Enable_GSBreakpoint
+
+.globl Disable_GSBreakpoint
+.ent Disable_GSBreakpoint
+Disable_GSBreakpoint:
+li $a2, 0x8000
+mtbpc $a2		# All breakpoints off (BED = 1)
+sync.p			# Await instruction completion
+
+jr $ra
+nop
+.end Disable_GSBreakpoint
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

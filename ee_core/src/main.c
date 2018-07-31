@@ -147,17 +147,19 @@ int main(int argc, char **argv)
 {
     int argOffset;
 
-    //Ignore argv[0], as it contains the name of this module ("EELOAD")
-    argv++;
-    argc--;
-    if(!isInit)
-    {
-        argOffset = eecoreInit(argc - 1, &argv[1]);
-        isInit = 1;
-    } else
-        argOffset = 0;
+    if(isInit)
+    {   //Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
+        argv++;
+        argc--;
 
-    sysLoadElf(argv[0], argc - 1 - argOffset, &argv[1 + argOffset]);
+        sysLoadElf(argv[0], argc, argv);
+    } else {
+        argOffset = eecoreInit(argc, argv);
+        isInit = 1;
+
+        LoadExecPS2(argv[argOffset], argc - 1 - argOffset, &argv[1 + argOffset]);
+    }
 
     return 0;
 }
+

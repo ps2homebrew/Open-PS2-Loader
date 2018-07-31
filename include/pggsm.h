@@ -52,4 +52,6 @@ int gGSMVMode;   // See the related predef_vmode
 int gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
 int gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
 
+void PrepareGSM(char *cmdline);
+
 #endif

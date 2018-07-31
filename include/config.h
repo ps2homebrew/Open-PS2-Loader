@@ -148,10 +148,8 @@ int configWriteMulti(int types);
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 void configClear(config_set_t *configSet);
 
-#ifdef VMC
 void configGetVMC(config_set_t *configSet, char *vmc, int length, int slot);
 void configSetVMC(config_set_t *configSet, const char *vmc, int slot);
 void configRemoveVMC(config_set_t *configSet, int slot);
-#endif
 
 #endif

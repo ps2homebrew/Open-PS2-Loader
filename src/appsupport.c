@@ -191,9 +191,5 @@ static void appCleanUp(int exception)
 static item_list_t appItemList = {
     APP_MODE, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, &appInit, &appNeedsUpdate, &appUpdateItemList,
     &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
-#ifdef VMC
     &appGetConfig, &appGetImage, &appCleanUp, NULL, APP_ICON
-#else
-    &appGetConfig, &appGetImage, &appCleanUp, APP_ICON
-#endif
 };

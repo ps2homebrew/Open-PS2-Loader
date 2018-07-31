@@ -32,9 +32,7 @@
 #include <debug.h>
 #include <ps2smb.h>
 #include "config.h"
-#ifdef VMC
 #include <sys/fcntl.h>
-#endif
 
 // Last Played Auto Start
 #include <time.h>

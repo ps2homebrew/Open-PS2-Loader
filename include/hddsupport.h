@@ -38,7 +38,6 @@ typedef struct
     u32 length;
 } apa_subs;
 
-#ifdef VMC
 #include "include/mcemu.h"
 typedef struct
 {
@@ -48,7 +47,6 @@ typedef struct
     int flags;                  /* Card flag */
     vmc_spec_t specs;           /* Card specifications */
 } hdd_vmc_infos_t;
-#endif
 
 int hddCheck(void);
 u32 hddGetTotalSectors(void);

@@ -39,10 +39,6 @@ EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 	endif
 endif
 
-ifeq ($(VMC),1)
-EE_CFLAGS += -DVMC
-endif
-
 ifeq ($(IGS),1)
 EE_OBJS += $(IGSCORE_EE_OBJS)
 EE_CFLAGS += -DIGS

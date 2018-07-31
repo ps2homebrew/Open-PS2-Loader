@@ -569,10 +569,8 @@ void sbCreateFolders(const char *path, int createDiscImgFolders)
         fileXioMkdir(fullpath, 0777);
     }
 
-#ifdef VMC
     sprintf(fullpath, "%sVMC", path);
     fileXioMkdir(fullpath, 0777);
-#endif
 
     sprintf(fullpath, "%sCHT", path);
     fileXioMkdir(fullpath, 0777);

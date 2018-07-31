@@ -19,10 +19,7 @@ EXTRAVERSION = Beta
 # You can adjust the variables in this section to meet your needs.
 # To enable a feature, set its variable's value to 1. To disable, change it to 0.
 # Do not COMMENT out the variables!!
-# You can also specify variables when executing make: "make VMC=1 RTL=1 IGS=1 PADEMU=1"
-
-#Enables/disables Virtual Memory Card (VMC) support
-VMC ?= 0
+# You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
 
 #Enables/disables Right-To-Left (RTL) language support
 RTL ?= 0
@@ -77,6 +74,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o \
+		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
 		iremsndpatch.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
@@ -105,14 +103,6 @@ BIN2O = $(PS2SDK)/bin/bin2o
 
 # WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
 # but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule!
-
-ifeq ($(VMC),1)
-  IOP_OBJS += usb_mcemu.o hdd_mcemu.o smb_mcemu.o
-  EE_CFLAGS += -DVMC
-  VMC_FLAGS = VMC=1
-else
-  VMC_FLAGS = VMC=0
-endif
 
 ifeq ($(RTL),1)
   EE_CFLAGS += -D__RTL
@@ -205,7 +195,7 @@ endif
 release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
-	$(MAKE) VMC=1 IGS=1 PADEMU=1 HIRES=0 $(EE_VPKD).ZIP
+	$(MAKE) IGS=1 PADEMU=1 HIRES=0 $(EE_VPKD).ZIP
 
 debug:
 	$(MAKE) DEBUG=1 all
@@ -328,7 +318,7 @@ $(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
 
 ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(VMC_FLAGS) $(IGS_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
+	$(MAKE) $(IGS_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
 $(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eecore_elf
@@ -364,28 +354,28 @@ $(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
 
 modules/iopcore/cdvdman/usb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -usb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
 
 $(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_cdvdman_irx
 
 modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -smb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
 
 $(EE_ASM_DIR)smb_cdvdman.s: modules/iopcore/cdvdman/smb_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ smb_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
 
 $(EE_ASM_DIR)hdd_cdvdman.s: modules/iopcore/cdvdman/hdd_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_hdpro_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
 
 $(EE_ASM_DIR)hdd_hdpro_cdvdman.s: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_hdpro_cdvdman_irx
@@ -463,14 +453,14 @@ $(EE_ASM_DIR)ds34usb.s: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
 
 modules/pademu/bt_pademu.irx: modules/pademu
 	echo " -bt_pademu"
-	$(MAKE) -C $< $(VMC_FLAGS) USE_BT=1
+	$(MAKE) -C $< USE_BT=1
 
 $(EE_ASM_DIR)bt_pademu.s: modules/pademu/bt_pademu.irx
 	$(BIN2S) $< $@ bt_pademu_irx
 
 modules/pademu/usb_pademu.irx: modules/pademu
 	echo " -usb_pademu"
-	$(MAKE) -C $< $(VMC_FLAGS) USE_USB=1
+	$(MAKE) -C $< USE_USB=1
 
 $(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
 	$(BIN2S) $< $@ usb_pademu_irx

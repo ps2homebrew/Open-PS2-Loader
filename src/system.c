@@ -17,12 +17,14 @@
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
 
+#include "include/pggsm.h"
+#include "include/cheatman.h"
+
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
 #endif
 
-#ifdef VMC
 typedef struct
 {
     char VMC_filename[1024];
@@ -31,9 +33,6 @@ typedef struct
     int VMC_thread_priority;
     int VMC_card_slot;
 } createVMCparam_t;
-#endif
-#include "include/pggsm.h"
-#include "include/cheatman.h"
 
 extern void *eecore_elf;
 extern int size_eecore_elf;
@@ -205,9 +204,7 @@ void sysReset(int modload_mask)
         sysLoadModuleBuffer(&isofs_irx, size_isofs_irx, 0, NULL);
     }
 
-#ifdef VMC
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
-#endif
 
 #ifdef PADEMU
     int ds3pads = 1; //only one pad enabled
@@ -414,12 +411,11 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount].info = size_smbinit_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMBINIT);
         irxptr_tab[modcount++].ptr = (void *)&smbinit_irx;
     }
-#ifdef VMC
+
     if (modules & CORE_IRX_VMC) {
         irxptr_tab[modcount].info = size_mcemu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_MCEMU);
         irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
     }
-#endif
 
 #ifdef PADEMU
     if (gEnablePadEmu) {
@@ -660,9 +656,8 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     modules |= CORE_IRX_DEBUG | CORE_IRX_ETH;
 #endif
 
-#ifdef VMC
     modules |= CORE_IRX_VMC;
-#endif
+
     LOG("SYSTEM LaunchLoaderElf loading modules\n");
     ModuleStorageSize = (sendIrxKernelRAM(filename, mode_str, modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
 
@@ -675,10 +670,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
         usage = (float)(ModuleStorageSize) / (float)(2 * 1024 * 1024) * 100;
 
         snprintf(text, sizeof(text), "IOP Usage:%.2f%%,by %s(CDVDFSV+CDVDMAN)", (float)usage, mode_str);
-#ifdef VMC
+
         if (size_mcemu_irx > 0)
             strcat(text, "+VMC");
-#endif
 
 #ifdef PADEMU
         if (gEnablePadEmu)
@@ -854,7 +848,6 @@ int sysCheckMC(void)
     return -11;
 }
 
-#ifdef VMC
 // createSize == -1 : delete, createSize == 0 : probing, createSize > 0 : creation
 int sysCheckVMC(const char *prefix, const char *sep, char *name, int createSize, vmc_superblock_t *vmc_superblock)
 {
@@ -912,4 +905,4 @@ int sysCheckVMC(const char *prefix, const char *sep, char *name, int createSize,
     }
     return size;
 }
-#endif
+

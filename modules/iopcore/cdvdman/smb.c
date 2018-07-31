@@ -8,6 +8,7 @@
 #include <sysclib.h>
 #include "smstcpip.h"
 #include <thbase.h>
+#include <thsemap.h>
 #include <intrman.h>
 #include <sifman.h>
 
@@ -16,19 +17,10 @@
 #include "smb.h"
 #include "cdvd_config.h"
 
-#ifdef VMC_DRIVER
-#include <thsemap.h>
-
 static int io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
-#define SMBWRITE 1
-#else
-#define WAITIOSEMA(x)
-#define SIGNALIOSEMA(x)
-#define SMBWRITE 0
-#endif
 
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s);                                                                                                                    // #6
@@ -260,7 +252,6 @@ static struct ReadAndXRequest_t smb_Read_Request = {
     0,
     0};
 
-#ifdef VMC_DRIVER
 static struct WriteAndXRequest_t smb_Write_Request = {
     {0,
      SMB_MAGIC,
@@ -280,7 +271,6 @@ static struct WriteAndXRequest_t smb_Write_Request = {
     0x3f,
     0 //DataOffset = 0x3f, WriteMode = 1
 };
-#endif
 
 static u16 UID, TID;
 static int main_socket;
@@ -375,7 +365,6 @@ int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, 
     struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
     register int length;
     struct in_addr dst_addr;
-#ifdef VMC_DRIVER
     iop_sema_t smp;
 
     smp.initial = 1;
@@ -383,7 +372,7 @@ int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, 
     smp.option = 0;
     smp.attr = 1;
     io_sema = CreateSema(&smp);
-#endif
+
     dst_addr.s_addr = pinet_addr(SMBServerIP);
 
     // Opening TCP session
@@ -628,8 +617,8 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     OR->smbH.TID = TID;
     OR->smbWordcount = 15;
     OR->smbAndxCmd = SMB_COM_NONE; // no ANDX command
-    OR->AccessMask = (Write && (SMBWRITE)) ? 2 : 0;
-    OR->FileAttributes = (Write && (SMBWRITE)) ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
+    OR->AccessMask = Write ? 2 : 0;
+    OR->FileAttributes = Write ? EXT_ATTR_NORMAL : EXT_ATTR_READONLY;
     OR->CreateOptions = 1;
 
     offset = 0;
@@ -663,10 +652,8 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     smb_Read_Request.smbH.UID = UID;
     smb_Read_Request.smbH.TID = TID;
 
-#ifdef VMC_DRIVER
     smb_Write_Request.smbH.UID = UID;
     smb_Write_Request.smbH.TID = TID;
-#endif
 
     SIGNALIOSEMA(io_sema);
 
@@ -707,7 +694,6 @@ receive:
     return 1;
 }
 
-#ifdef VMC_DRIVER
 //-------------------------------------------------------------------------
 int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes)
 {
@@ -734,7 +720,6 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nb
 
     return 1;
 }
-#endif
 
 //-------------------------------------------------------------------------
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)

@@ -106,7 +106,6 @@ static char *appGetItemStartup(int id)
     return appGetELFName(cur->val);
 }
 
-#ifndef __CHILDPROOF
 static void appDeleteItem(int id)
 {
     struct config_value_t *cur = appGetConfigValue(id);
@@ -130,7 +129,6 @@ static void appRenameItem(int id, char *newName)
 
     appForceUpdate = 1;
 }
-#endif
 
 static void appLaunchItem(int id, config_set_t *configSet)
 {
@@ -192,11 +190,7 @@ static void appCleanUp(int exception)
 
 static item_list_t appItemList = {
     APP_MODE, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, &appInit, &appNeedsUpdate, &appUpdateItemList,
-#ifdef __CHILDPROOF
-    &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, NULL, NULL, &appLaunchItem,
-#else
     &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
-#endif
 #ifdef VMC
     &appGetConfig, &appGetImage, &appCleanUp, NULL, APP_ICON
 #else

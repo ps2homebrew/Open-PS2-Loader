@@ -259,6 +259,12 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Some fake ds3s need workaround, this option will disable it.",
     "Emulate FIELD flipping",
     "Fix for games that glitch under progressive video modes.",
+    "Parental Lock Settings",
+    "Parental Lock Password",
+    "Leave blank to disable the parental lock.",
+    "Enter Parental Lock Password",
+    "Parental lock password incorrect.",
+    "Parental lock disabled.",
 };
 
 static int guiLangID = 0;

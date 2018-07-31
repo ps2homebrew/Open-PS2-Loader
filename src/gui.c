@@ -215,9 +215,6 @@ void guiShowAbout()
 #ifdef __RTL
     strcat(OPLVersion, " RTL");
 #endif
-#ifdef __CHILDPROOF
-    strcat(OPLVersion, " CHILDPROOF");
-#endif
 #ifdef GSM
     strcat(OPLVersion, " GSM");
     strcat(OPLVersion, GSM_VERSION);
@@ -1074,6 +1071,33 @@ void guiShowNetConfig(void)
     }
 }
 
+void guiShowParentalLockConfig(void)
+{
+    int result;
+    char password[CONFIG_KEY_VALUE_LEN];
+    config_set_t *configOPL = configGetByType(CONFIG_OPL);
+
+    // Set current values
+    configGetStrCopy(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password, CONFIG_KEY_VALUE_LEN); //This will return the current password, or a blank string if it is not set.
+    diaSetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password);
+
+    result = diaExecuteDialog(diaParentalLockConfig, -1, 1, NULL);
+    if (result) {
+        diaGetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password, CONFIG_KEY_VALUE_LEN);
+
+        if (strlen(password) > 0) {
+            // Store values
+            configSetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password);
+        } else {
+            configRemoveKey(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD);
+
+            guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, diaParentalLockConfig);
+        }
+
+        menuSetParentalLockCheckState(1);
+    }
+}
+
 int guiShowKeyboard(char *value, int maxLength)
 {
     char tmp[maxLength];
@@ -1425,51 +1449,61 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         }
 #ifdef VMC
         else if (result == COMPAT_VMC1_DEFINE) {
-            if (guiShowVMCConfig(id, support, vmc1, 0, 0))
-                diaGetString(diaVMC, VMC_NAME, vmc1, sizeof(vmc1));
+            if (menuCheckParentalLock() == 0) {
+                if (guiShowVMCConfig(id, support, vmc1, 0, 0))
+                    diaGetString(diaVMC, VMC_NAME, vmc1, sizeof(vmc1));
+            }
         } else if (result == COMPAT_VMC2_DEFINE) {
-            if (guiShowVMCConfig(id, support, vmc2, 1, 0))
-                diaGetString(diaVMC, VMC_NAME, vmc2, sizeof(vmc2));
+            if (menuCheckParentalLock() == 0) {
+                if (guiShowVMCConfig(id, support, vmc2, 1, 0))
+                    diaGetString(diaVMC, VMC_NAME, vmc2, sizeof(vmc2));
+            }
         } else if (result == COMPAT_VMC1_ACTION) {
-            if (strlen(vmc1))
-                vmc1[0] = '\0';
-            else
-                snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
+            if (menuCheckParentalLock() == 0) {
+                if (strlen(vmc1))
+                    vmc1[0] = '\0';
+                 else
+                     snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
+            }
         } else if (result == COMPAT_VMC2_ACTION) {
-            if (strlen(vmc2))
-                vmc2[0] = '\0';
-            else
-                snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
+            if (menuCheckParentalLock() == 0) {
+                if (strlen(vmc2))
+                    vmc2[0] = '\0';
+                 else
+                    snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
+            }
         }
 #endif
     } while (result >= COMPAT_NOEXIT);
 
     if (result == COMPAT_REMOVE) {
-        configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
-        configRemoveKey(configSet, CONFIG_ITEM_DMA);
-        configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
-        configRemoveKey(configSet, CONFIG_ITEM_DNAS);
-        configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
+        if (menuCheckParentalLock() == 0) {
+            configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
+            configRemoveKey(configSet, CONFIG_ITEM_DMA);
+            configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+            configRemoveKey(configSet, CONFIG_ITEM_DNAS);
+            configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 #ifdef GSM
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
 #endif
 #ifdef CHEAT
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-        configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
+            configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 #endif
 #ifdef PADEMU
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
-        configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
+            configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
 #ifdef VMC
-        configRemoveVMC(configSet, 0);
-        configRemoveVMC(configSet, 1);
+            configRemoveVMC(configSet, 0);
+            configRemoveVMC(configSet, 1);
 #endif
-        menuSaveConfig();
+            menuSaveConfig();
+        }
     } else if (result > 0) { // test button pressed or save button
         compatMode = 0;
         for (i = 0; i < COMPAT_MODE_COUNT; ++i) {

@@ -128,6 +128,7 @@ void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
 void guiShowNetConfig();
+void guiShowParentalLockConfig();
 
 /** Renders the given string on screen for the given function until it's io finishes 
 * @note The ptr pointer is watched for it's value. The IO is considered finished when the value becomes zero. 

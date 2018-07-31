@@ -524,7 +524,6 @@ static char *ethGetGameStartup(int id)
     return ethGames[id].startup;
 }
 
-#ifndef __CHILDPROOF
 static void ethDeleteGame(int id)
 {
     sbDelete(&ethGames, ethPrefix, "\\", ethGameCount, id);
@@ -536,7 +535,6 @@ static void ethRenameGame(int id, char *newName)
     sbRename(&ethGames, ethPrefix, "\\", ethGameCount, id, newName);
     ethULSizePrev = -2;
 }
-#endif
 
 static void ethLaunchGame(int id, config_set_t *configSet)
 {
@@ -732,11 +730,7 @@ static int ethCheckVMC(char *name, int createSize)
 
 static item_list_t ethGameList = {
     ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
-#ifdef __CHILDPROOF
-    &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, NULL, NULL,
-#else
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-#endif
 #ifdef VMC
     &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
 #else

@@ -83,6 +83,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_ETH_MODE "eth_mode"
 #define CONFIG_OPL_APP_MODE "app_mode"
 #define CONFIG_OPL_SWAP_SEL_BUTTON "swap_select_btn"
+#define CONFIG_OPL_PARENTAL_LOCK_PWD "parental_lock_password"
 
 //Network config keys
 #define CONFIG_NET_ETH_LINKM "eth_linkmode"

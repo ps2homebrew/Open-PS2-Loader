@@ -42,6 +42,8 @@ enum UI_ITEMS {
     CFG_ETHPREFIX,
     CFG_HDDSPINDOWN,
 
+    CFG_PARENLOCK_PASSWORD,
+
     NETCFG_SHOW_ADVANCED_OPTS,
     NETCFG_PS2_IP_ADDR_TYPE,
     NETCFG_PS2_IP_ADDR_0,
@@ -184,5 +186,6 @@ extern struct UIItem diaAbout[];
 extern struct UIItem diaVMC[];
 #endif
 extern struct UIItem diaNetCompatUpdate[];
+extern struct UIItem diaParentalLockConfig[];
 
 #endif

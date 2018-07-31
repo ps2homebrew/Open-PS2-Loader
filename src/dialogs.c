@@ -201,23 +201,15 @@ struct UIItem diaCompatConfig[] = {
 #ifdef VMC
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT1}}},
     {UI_SPACER},
-#ifndef __CHILDPROOF
     {UI_BUTTON, COMPAT_VMC1_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC1_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#else
-    {UI_BUTTON, COMPAT_VMC1_DEFINE, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#endif
     {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT2}}},
     {UI_SPACER},
-#ifndef __CHILDPROOF
     {UI_BUTTON, COMPAT_VMC2_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC2_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#else
-    {UI_BUTTON, COMPAT_VMC2_DEFINE, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#endif
     {UI_SPLITTER},
 #endif
 
@@ -234,30 +226,15 @@ struct UIItem diaCompatConfig[] = {
     {UI_SPLITTER},
 
 // buttons
-#ifndef __CHILDPROOF
-
     {UI_BUTTON, COMPAT_SAVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SAVE_CHANGES}}},
     {UI_SPACER},
-
-#endif
-
     {UI_BUTTON, COMPAT_TEST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_TEST}}},
-
-#ifndef __CHILDPROOF
-
     {UI_SPACER},
     {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
-
-#endif
     {UI_BREAK},
-
     {UI_BREAK},
-
-#ifndef __CHILDPROOF
-
     {UI_BUTTON, COMPAT_REMOVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_REMOVE_ALL_SETTINGS}}},
 
-#endif
     // end of dialog
     {UI_TERMINATOR}};
 
@@ -878,6 +855,23 @@ struct UIItem diaNetCompatUpdate[] = {
     {UI_BUTTON, NETUPD_BTN_START, 1, 1, -1, 0, 0, {.label = {NULL, _STR_START}}},
     {UI_SPACER},
     {UI_BUTTON, NETUPD_BTN_CANCEL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CANCEL}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
+// Parental Lock Config Menu
+struct UIItem diaParentalLockConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PARENLOCKCONFIG}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_PARENLOCK_PASSWORD}}},
+    {UI_SPACER},
+    {UI_PASSWORD, CFG_PARENLOCK_PASSWORD, 1, 1, _STR_PARENLOCK_PASSWORD_HINT, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
 
     // end of dialog

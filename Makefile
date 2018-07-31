@@ -12,10 +12,6 @@ EXTRAVERSION = Beta
 #	eesio_debug	-	UI-side + eecore debug mode (EE SIO)
 #	deci2_debug	-	UI-side + in-game DECI2 debug mode (EE-side only).
 
-# I want to build a CHILDPROOF edition! How do I do that?
-# Type "make childproof" to build one.
-# Non-childproof features like GSM will not be available.
-
 # I want to put my name in my custom build! How can I do it?
 # Type "make LOCALVERSION=-foobar"
 
@@ -57,7 +53,6 @@ DEBUG ?= 0
 EESIO_DEBUG ?= 0
 INGAME_DEBUG ?= 0
 DECI2_DEBUG ?= 0
-CHILDPROOF ?= 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
@@ -142,36 +137,29 @@ else
   UDNL_OUT = modules/iopcore/udnl/udnl.irx
 endif
 
-ifeq ($(CHILDPROOF),1)
-  EE_CFLAGS += -D__CHILDPROOF
-  GSM_FLAGS = GSM=0
-  IGS_FLAGS = IGS=0
-  CHEAT_FLAGS = CHEAT=0
-else
+ifeq ($(IGS),1)
+  GSM = 1
+endif
+ifeq ($(GSM),1)
+  EE_CFLAGS += -DGSM
+  EE_OBJS += gsm.o
+  GSM_FLAGS = GSM=1
   ifeq ($(IGS),1)
-    GSM = 1
-  endif
-  ifeq ($(GSM),1)
-    EE_CFLAGS += -DGSM
-    EE_OBJS += gsm.o
-    GSM_FLAGS = GSM=1
-    ifeq ($(IGS),1)
-      EE_CFLAGS += -DIGS
-      IGS_FLAGS = IGS=1
-    else
-      IGS_FLAGS = IGS=0
-    endif
+    EE_CFLAGS += -DIGS
+    IGS_FLAGS = IGS=1
   else
-    GSM_FLAGS = GSM=0
     IGS_FLAGS = IGS=0
   endif
-  ifeq ($(CHEAT),1)
-    FRONTEND_OBJS += cheatman.o
-    EE_CFLAGS += -DCHEAT
-    CHEAT_FLAGS = CHEAT=1
-  else
-    CHEAT_FLAGS = CHEAT=0
-  endif
+else
+  GSM_FLAGS = GSM=0
+  IGS_FLAGS = IGS=0
+endif
+ifeq ($(CHEAT),1)
+  FRONTEND_OBJS += cheatman.o
+  EE_CFLAGS += -DCHEAT
+  CHEAT_FLAGS = CHEAT=1
+else
+  CHEAT_FLAGS = CHEAT=0
 endif
 
 ifeq ($(PADEMU),1)
@@ -227,7 +215,7 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
 
-.PHONY: all release childproof debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
 
 all:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
@@ -242,9 +230,6 @@ release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
 	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 HIRES=0 $(EE_VPKD).ZIP
-
-childproof:
-	$(MAKE) CHILDPROOF=1 all
 
 debug:
 	$(MAKE) DEBUG=1 all

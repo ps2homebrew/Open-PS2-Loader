@@ -228,7 +228,6 @@ static char *hddGetGameStartup(int id)
     return hddGames.games[id].startup;
 }
 
-#ifndef __CHILDPROOF
 static void hddDeleteGame(int id)
 {
     hddDeleteHDLGame(&hddGames.games[id]);
@@ -242,7 +241,6 @@ static void hddRenameGame(int id, char *newName)
     hddSetHDLGameInfo(&hddGames.games[id]);
     hddForceUpdate = 1;
 }
-#endif
 
 static void hddLaunchGame(int id, config_set_t *configSet)
 {
@@ -456,11 +454,7 @@ static int hddCheckVMC(char *name, int createSize)
 
 static item_list_t hddGameList = {
     HDD_MODE, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
-#ifdef __CHILDPROOF
-    &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL,
-#else
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-#endif
 #ifdef VMC
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
 #else

@@ -47,7 +47,7 @@ static void diaDrawBoundingBox(int x, int y, int w, int h, int focus)
     rmDrawRect(x - 5, y, w + 10, h + 10, color);
 }
 
-int diaShowKeyb(char *text, int maxLen, int hide_text)
+int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
 {
     int i, j, len = strlen(text), selkeyb = 0, x, w;
     int selchar = 0, selcommand = -1;
@@ -89,6 +89,13 @@ int diaShowKeyb(char *text, int maxLen, int hide_text)
         rmStartFrame();
         guiDrawBGPlasma();
         rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+
+        //Title
+        if (title != NULL) {
+          fntRenderString(gTheme->fonts[0], 25, 20, ALIGN_NONE, 0, 0, title, gTheme->textColor);
+          // separating line
+          rmDrawLine(25, 38, 615, 38, gColWhite);
+        }
 
         //Text
         fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
@@ -462,13 +469,17 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
         case UI_PASSWORD: {
             char stars[32];
             int i;
+            int len;
 
-            int len = min(strlen(item->stringvalue.text), sizeof(stars) - 1);
-            for (i = 0; i < len; ++i)
-                stars[i] = '*';
+            if (strlen(item->stringvalue.text)) {
+                len = min(strlen(item->stringvalue.text), sizeof(stars) - 1);
+                for (i = 0; i < len; ++i)
+                   stars[i] = '*';
 
-            stars[i] = '\0';
-            *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
+                stars[i] = '\0';
+                *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
+            } else
+                *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, _l(_STR_NOT_SET), txtcol) - x;
             break;
         }
 
@@ -641,7 +652,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
             if (item->stringvalue.handler(tmp, sizeof(tmp)))
                 strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
         } else {
-            if (diaShowKeyb(tmp, sizeof(tmp), item->type == UI_PASSWORD))
+            if (diaShowKeyb(tmp, sizeof(tmp), item->type == UI_PASSWORD, NULL))
                 strncpy(item->stringvalue.text, tmp, sizeof(item->stringvalue.text));
         }
 

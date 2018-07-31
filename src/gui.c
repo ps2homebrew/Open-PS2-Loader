@@ -1079,7 +1079,7 @@ int guiShowKeyboard(char *value, int maxLength)
     char tmp[maxLength];
     strncpy(tmp, value, maxLength);
 
-    int result = diaShowKeyb(tmp, maxLength, 0);
+    int result = diaShowKeyb(tmp, maxLength, 0, NULL);
     if (result) {
         strncpy(value, tmp, maxLength);
         value[maxLength - 1] = '\0';
@@ -1109,7 +1109,7 @@ static statusVMCparam_t vmc_status;
 
 int guiVmcNameHandler(char *text, int maxLen)
 {
-    int result = diaShowKeyb(text, maxLen, 0);
+    int result = diaShowKeyb(text, maxLen, 0, NULL);
 
     if (result)
         vmc_refresh = 1;
@@ -1274,7 +1274,7 @@ int guiAltStartupNameHandler(char *text, int maxLen)
 {
     int i;
 
-    int result = diaShowKeyb(text, maxLen, 0);
+    int result = diaShowKeyb(text, maxLen, 0, NULL);
     if (result) {
         for (i = 0; text[i]; i++) {
             if (text[i] > 96 && text[i] < 123)

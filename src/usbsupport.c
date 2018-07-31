@@ -10,9 +10,7 @@
 #include "include/ioman.h"
 #include "include/system.h"
 #include "include/extern_irx.h"
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 #include "modules/iopcore/common/cdvd_config.h"
 
 void *pusbd_irx = NULL;
@@ -249,9 +247,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 {
     int i, fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
-#ifdef CHEAT
     int result;
-#endif
 #ifdef VMC
     unsigned int start;
 #endif
@@ -401,7 +397,6 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     }
     settings->common.layer1_start = layer1_start;
 
-#ifdef CHEAT
     if ((result = sbLoadCheats(usbPrefix, game->startup)) < 0) {
         switch (result) {
             case -ENOENT:
@@ -411,7 +406,6 @@ static void usbLaunchGame(int id, config_set_t *configSet)
                 guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
         }
     }
-#endif
 
     if (gRememberLastPlayed) {
         configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);

@@ -11,12 +11,8 @@
 #include "modmgr.h"
 #include "util.h"
 #include "syshook.h"
-#ifdef GSM
 #include "gsm_api.h"
-#endif
-#ifdef CHEAT
 #include "cheat_api.h"
-#endif
 
 void *ModStorageStart, *ModStorageEnd;
 void *eeloadCopy, *initUserMemory;
@@ -66,15 +62,11 @@ static int eecoreInit(int argc, char **argv)
     g_ps2_ETHOpMode = _strtoui(_strtok(NULL, " "));
     DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 
-#ifdef CHEAT
     EnableCheatOp = (gCheatList = (void *)_strtoui(_strtok(NULL, " "))) != NULL;
     DPRINTF("PS2RD Cheat Engine = %s\n", EnableCheatOp == 0 ? "Disabled" : "Enabled");
-#endif
 
-#ifdef GSM
     EnableGSMOp = _strtoi(_strtok(NULL, " "));
     DPRINTF("GSM = %s\n", EnableGSMOp == 0 ? "Disabled" : "Enabled");
-#endif
 
 #ifdef PADEMU
     EnablePadEmuOp = _strtoi(_strtok(NULL, " "));
@@ -103,13 +95,10 @@ static int eecoreInit(int argc, char **argv)
 
     i++;
 
-#ifdef CHEAT
     if (EnableCheatOp) {
         EnableCheats();
     }
-#endif
 
-#ifdef GSM
     if (EnableGSMOp) {
         s16 interlace, mode, ffmd;
         u32 dx_offset, dy_offset;
@@ -132,7 +121,6 @@ static int eecoreInit(int argc, char **argv)
         EnableGSM();
     }
     i++;
-#endif
 
     set_ipconfig();
 

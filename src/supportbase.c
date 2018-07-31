@@ -7,12 +7,8 @@
 #include "include/ioman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 #include "include/cheatman.h"
-#ifdef GSM
 #include "include/pggsm.h"
-#endif
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 
 #include <sys/fcntl.h>
 
@@ -393,13 +389,9 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->flags |= IOPCORE_ENABLE_POFF;
     }
 
-#ifdef GSM
     InitGSMConfig(configSet);
-#endif
 
-#ifdef CHEAT
     InitCheatsConfig(configSet);
-#endif
 
 #ifdef PADEMU
     gEnablePadEmu = 0;
@@ -582,13 +574,10 @@ void sbCreateFolders(const char *path, int createDiscImgFolders)
     fileXioMkdir(fullpath, 0777);
 #endif
 
-#ifdef CHEAT
     sprintf(fullpath, "%sCHT", path);
     fileXioMkdir(fullpath, 0777);
-#endif
 }
 
-#ifdef CHEAT
 int sbLoadCheats(const char *path, const char *file)
 {
     char cheatfile[64];
@@ -617,4 +606,4 @@ int sbLoadCheats(const char *path, const char *file)
 
     return result;
 }
-#endif
+

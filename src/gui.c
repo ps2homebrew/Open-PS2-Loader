@@ -18,12 +18,9 @@
 #include "include/system.h"
 #include "include/ethsupport.h"
 #include "include/compatupd.h"
-#ifdef GSM
 #include "include/pggsm.h"
-#endif
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
+
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
@@ -215,17 +212,13 @@ void guiShowAbout()
 #ifdef __RTL
     strcat(OPLVersion, " RTL");
 #endif
-#ifdef GSM
     strcat(OPLVersion, " GSM");
     strcat(OPLVersion, GSM_VERSION);
-#endif
 #ifdef IGS
     strcat(OPLVersion, " IGS");
     strcat(OPLVersion, IGS_VERSION);
 #endif
-#ifdef CHEAT
     strcat(OPLVersion, " PS2RD");
-#endif
 #ifdef PADEMU
     strcat(OPLVersion, " PADEMU");
 #endif
@@ -574,7 +567,6 @@ void guiShowUIConfig(void)
     }
 }
 
-#ifdef GSM
 static void guiSetGSMSettingsState(void)
 {
     int isGSMEnabled;
@@ -634,9 +626,6 @@ static void guiShowGSConfig(void)
     diaExecuteDialog(diaGSConfig, -1, 1, &guiGSMUpdater);
 }
 
-#endif
-
-#ifdef CHEAT
 static void guiSetCheatSettingsState(void)
 {
     int isCheatEnabled;
@@ -663,7 +652,6 @@ void guiShowCheatConfig(void)
 
     diaExecuteDialog(diaCheatConfig, -1, 1, &guiCheatUpdater);
 }
-#endif
 
 #ifdef PADEMU
 
@@ -1342,7 +1330,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
 // Begin Per-Game GSM Integration --Bat--
-#ifdef GSM
     int EnableGSM = 0;
     configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
     diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
@@ -1364,10 +1351,8 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
 
     guiSetGSMSettingsState();
-#endif /* GSM */
 
 // Begin of Per-Game CHEAT Integration --Bat--
-#ifdef CHEAT
     int EnableCheat = 0;
     configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
     diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, EnableCheat);
@@ -1377,8 +1362,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
 
     guiSetCheatSettingsState();
-
-#endif /* CHEAT */
 
 #ifdef PADEMU
     int EnablePadEmu = 0;
@@ -1424,21 +1407,17 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 
         result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
-#ifdef GSM
         if (result == COMPAT_GSMCONFIG) {
             guiShowGSConfig();
         }
-#endif
 #ifdef PADEMU
         if (result == COMPAT_PADEMUCONFIG) {
             guiShowPadEmuConfig();
         }
 #endif
-#ifdef CHEAT
         if (result == COMPAT_CHEATCONFIG) {
             guiShowCheatConfig();
         }
-#endif
 
         if (result == COMPAT_LOADFROMDISC) {
             char hexDiscID[15];
@@ -1483,22 +1462,26 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
             configRemoveKey(configSet, CONFIG_ITEM_DNAS);
             configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
-#ifdef GSM
+
+            //GSM
             configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
             configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
             configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
             configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
             configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-#endif
-#ifdef CHEAT
+
+            //Cheats
             configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
             configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-#endif
+
 #ifdef PADEMU
+            //PADEMU
             configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
             configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
+
 #ifdef VMC
+            //VMC
             configRemoveVMC(configSet, 0);
             configRemoveVMC(configSet, 1);
 #endif
@@ -1525,7 +1508,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         else
             configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 
-#ifdef GSM
+        //GSM
         diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
         if (EnableGSM != 0)
             configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
@@ -1555,9 +1538,8 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
         else
             configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-#endif
 
-#ifdef CHEAT
+        //Cheats
         diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
         if (EnableCheat != 0)
             configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
@@ -1569,9 +1551,9 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
         else
             configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-#endif
 
 #ifdef PADEMU
+        //PADEMU
         diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
 
         if (EnablePadEmu != 0)
@@ -1596,6 +1578,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
 #ifdef VMC
+        //VMC
         configSetVMC(configSet, vmc1, 0);
         configSetVMC(configSet, vmc2, 1);
         guiShowVMCConfig(id, support, vmc1, 0, 1);

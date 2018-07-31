@@ -19,7 +19,7 @@ EXTRAVERSION = Beta
 # You can adjust the variables in this section to meet your needs.
 # To enable a feature, set its variable's value to 1. To disable, change it to 0.
 # Do not COMMENT out the variables!!
-# You can also specify variables when executing make: "make VMC=1 RTL=1 GSM=1 IGS=1 CHEAT=1"
+# You can also specify variables when executing make: "make VMC=1 RTL=1 IGS=1 PADEMU=1"
 
 #Enables/disables Virtual Memory Card (VMC) support
 VMC ?= 0
@@ -27,17 +27,11 @@ VMC ?= 0
 #Enables/disables Right-To-Left (RTL) language support
 RTL ?= 0
 
-#Enables/disables Graphics Synthesizer Mode (GSM) selector
-GSM ?= 0
-
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
 IGS ?= 0
 
 #Enables/disables pad emulator
 PADEMU ?= 0
-
-#Enables/disables the cheat engine (PS2RD)
-CHEAT ?= 0
 
 #Enables/disables high resolution multi-pass rendering for the OPL GUI
 HIRES ?= 0
@@ -69,7 +63,7 @@ OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERS
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
 		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
-		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o
+		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
@@ -138,28 +132,10 @@ else
 endif
 
 ifeq ($(IGS),1)
-  GSM = 1
-endif
-ifeq ($(GSM),1)
-  EE_CFLAGS += -DGSM
-  EE_OBJS += gsm.o
-  GSM_FLAGS = GSM=1
-  ifeq ($(IGS),1)
-    EE_CFLAGS += -DIGS
-    IGS_FLAGS = IGS=1
-  else
-    IGS_FLAGS = IGS=0
-  endif
+  EE_CFLAGS += -DIGS
+  IGS_FLAGS = IGS=1
 else
-  GSM_FLAGS = GSM=0
   IGS_FLAGS = IGS=0
-endif
-ifeq ($(CHEAT),1)
-  FRONTEND_OBJS += cheatman.o
-  EE_CFLAGS += -DCHEAT
-  CHEAT_FLAGS = CHEAT=1
-else
-  CHEAT_FLAGS = CHEAT=0
 endif
 
 ifeq ($(PADEMU),1)
@@ -229,7 +205,7 @@ endif
 release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
-	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 HIRES=0 $(EE_VPKD).ZIP
+	$(MAKE) VMC=1 IGS=1 PADEMU=1 HIRES=0 $(EE_VPKD).ZIP
 
 debug:
 	$(MAKE) DEBUG=1 all
@@ -352,7 +328,7 @@ $(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
 
 ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
+	$(MAKE) $(VMC_FLAGS) $(IGS_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
 $(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eecore_elf

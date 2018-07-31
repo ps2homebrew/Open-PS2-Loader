@@ -198,35 +198,36 @@ void guiEndFrame(void)
 
 void guiShowAbout()
 {
-    char OPLVersion[64];
+    char OPLVersion[40];
+    char OPLBuildDetails[40];
 
-    // TODO: Move it into a new variable
-    // If you use VMC + RTL + GSM + IGS + PS2RD, you not will see last chars
-    // in the new version scheme because look like this now
-    // "Open PS2 Loader 0.9.4.9XY-abcdefg"
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
+    diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
+    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), ""
 #ifdef VMC
-    strcat(OPLVersion, " VMC");
+        "VMC"
 #endif
 #ifdef __RTL
-    strcat(OPLVersion, " RTL");
+        " RTL"
 #endif
-    strcat(OPLVersion, " GSM");
-    strcat(OPLVersion, GSM_VERSION);
+        " GSM %s"
 #ifdef IGS
-    strcat(OPLVersion, " IGS");
-    strcat(OPLVersion, IGS_VERSION);
+        " IGS %s"
 #endif
-    strcat(OPLVersion, " PS2RD");
 #ifdef PADEMU
-    strcat(OPLVersion, " PADEMU");
+        " PADEMU"
 #endif
 #ifdef HIRES
-    strcat(OPLVersion, " HIRES");
+        " HIRES"
 #endif
-
-    diaSetLabel(diaAbout, 1, OPLVersion);
+        //Version numbers
+        , GSM_VERSION
+#ifdef IGS
+        , IGS_VERSION
+#endif
+    );
+    diaSetLabel(diaAbout, ABOUT_BUILD_DETAILS, OPLBuildDetails);
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
 }

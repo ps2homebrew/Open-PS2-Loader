@@ -265,6 +265,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Enter Parental Lock Password",
     "Parental lock password incorrect.",
     "Parental lock disabled.",
+    "Build Options:",
 };
 
 static int guiLangID = 0;

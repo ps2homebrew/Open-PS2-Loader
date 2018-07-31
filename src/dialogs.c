@@ -724,7 +724,7 @@ struct UIItem diaCheatConfig[] = {
 
 // About Menu
 struct UIItem diaAbout[] = {
-    {UI_LABEL, 1, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_LABEL, ABOUT_TITLE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPLITTER},
 
     // Coders
@@ -732,23 +732,15 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - crazyc - dlanor", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - crazyc - dlanor - doctorxyz - hominem.te.esse", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"ifcaro - izdubar - jimmikaelkael - misfire - Polo35", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael - misfire", -1}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Maximus32", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"reprep - SP193 - volca - Maximus32", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
@@ -777,6 +769,11 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}},
+    {UI_BREAK},
+
+    // Build Options
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}}, {UI_SPACER}, {UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_BREAK},
 
     // buttons

@@ -974,7 +974,7 @@ nop
 mfc0	$k0,$30			# k0 = ErrorEPC
 addiu	$k0,$k0,4		# k0 = ErrorEPC+4 (-> next opcode)
 mtc0	$k0,$30			# store k0 in Error Exception Program Counter
-sync				# ensure COP0 register update before proceeding
+sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
 b	GSHandler_Final_Exit
 nop
@@ -1030,7 +1030,7 @@ la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of JR/JALR rs register
 lw	$t0,0($t0)	# t0 = jump destination address
 mtc0	$t0,$30		# store t0 in Error Exception Program Counter
-sync		# ensure COP0 register update before proceeding
+sync.p		# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 
@@ -1043,7 +1043,7 @@ li	$t0, 0x3FFFFFF	# t0 = bitmask for jump destination bits
 and	$k1, $k0, $t0	# k1 = destination bits (== destination/4)
 sll	$t0, $k1, 2	# t0 = jump destination address
 mtc0	$t0, $30	# store t0 in Error Exception Program Counter
-sync			# ensure COP0 register update before proceeding
+sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 
@@ -1068,7 +1068,7 @@ mfc0	$t0, $30	# t0 = Error Exception Program Counter
 addiu	$t0, 4		# t0 = ErrorEPC+4 (-> address after branch op)
 addu	$t0, $k1	# t0 = jump destination address
 mtc0	$t0, $30	# store t0 in Error Exception Program Counter
-sync			# ensure COP0 register update before proceeding
+sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 
@@ -1080,8 +1080,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 bltz	$t1,B_taken
 nop
 
@@ -1089,7 +1088,7 @@ B_not_taken:
 mfc0	$k0,$30			# k0 = ErrorEPC
 addiu	$k0,$k0,8		# k0 = ErrorEPC+8 pass branch_op and delay_slot
 mtc0	$k0,$30			# store k0 in Error Exception Program Counter
-sync				# ensure COP0 register update before proceeding
+sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 	
@@ -1101,8 +1100,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 bgez	$t1,B_taken
 nop
 b	B_not_taken
@@ -1115,8 +1113,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 blez	$t1,B_taken
 nop
 b	B_not_taken
@@ -1129,8 +1126,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 bgtz	$t1,B_taken
 nop
 b	B_not_taken
@@ -1143,14 +1139,12 @@ andi	$k1,0x1F	# k1 = rs register number
 sll	$k1,$k1, 4	# k1 = array index for saved rs register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$k1,$t0		# k1 -> register data of rs register
-lq	$t1,0($k1)	# t1 = rs register data
-sync
+ld	$t1,0($k1)	# t1 = rs register data
 srl	$k1,$k0, 16	# k1 = aligned for rt register number
 andi	$k1,0x1F	# k1 = rt register number
 sll	$k1,$k1, 4	# k1 = array index for saved rt register data
 addu	$k1,$t0		# k1 -> register data of rt register
-lq	$t0,0($k1)	# t0 = rt register data
-sync
+ld	$t0,0($k1)	# t0 = rt register data
 beq	$t0,$t1,B_taken
 nop
 b	B_not_taken
@@ -1163,14 +1157,12 @@ andi	$k1,0x1F	# k1 = rs register number
 sll	$k1,$k1, 4	# k1 = array index for saved rs register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$k1,$t0		# k1 -> register data of rs register
-lq	$t1,0($k1)	# t1 = rs register data
-sync
+ld	$t1,0($k1)	# t1 = rs register data
 srl	$k1,$k0, 16	# k1 = aligned for rt register number
 andi	$k1,0x1F	# k1 = rt register number
 sll	$k1,$k1, 4	# k1 = array index for saved rt register data
 addu	$k1,$t0		# k1 -> register data of rt register
-lq	$t0,0($k1)	# t0 = rt register data
-sync
+ld	$t0,0($k1)	# t0 = rt register data
 bne	$t0,$t1,B_taken
 nop
 b	B_not_taken
@@ -1183,7 +1175,7 @@ B_skip:			# Unrecognized opcode, so just pass it by
 mfc0	$k0, $30	# k0 = ErrorEPC
 addiu	$k0, $k0, 4	# k0 = ErrorEPC+4 (-> next opcode)
 mtc0	$k0, $30	# store k0 in Error Exception Program Counter
-sync			# ensure COP0 register update before proceeding
+sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
 GSHandler_Final_Exit:
 la $k0, MIPS_Regs  # Restore MIPS_Regs via $k0
@@ -1196,10 +1188,9 @@ lq $ra, 0x1F0($k0)
 lq $k0, -0x10($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
 lq $k1, -0x20($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
 
-sync.p
+sync.p			# These cannot be placed in a branch-delay slot.
 sync.l
-eret			# 	Return from exception
-nop
+eret			# Return from exception. Subsequent instructions are not fetched.
 
 end_GSHandler:
 .end	GSHandler

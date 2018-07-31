@@ -192,7 +192,7 @@ struct UIItem diaCompatConfig[] = {
     {UI_ENUM, COMPAT_DMA, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-#ifdef VMC
+    // VMC
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT1}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC1_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
@@ -205,7 +205,6 @@ struct UIItem diaCompatConfig[] = {
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC2_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPLITTER},
-#endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GAME_ID}}},
     {UI_SPACER},
@@ -784,7 +783,6 @@ struct UIItem diaAbout[] = {
     {UI_TERMINATOR}};
 
 // Per-Game Game Settings > VMC Menu
-#ifdef VMC
 struct UIItem diaVMC[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
     {UI_SPLITTER},
@@ -820,7 +818,6 @@ struct UIItem diaVMC[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 // Network Update Menu
 struct UIItem diaNetCompatUpdate[] = {

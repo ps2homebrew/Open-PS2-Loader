@@ -555,7 +555,6 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         return;
     }
 
-#ifdef VMC
     char vmc_name[32];
     int vmc_id, size_mcemu_irx = 0;
     smb_vmc_infos_t smb_vmc_infos;
@@ -594,7 +593,6 @@ static void ethLaunchGame(int id, config_set_t *configSet)
             }
         }
     }
-#endif
 
     if (gRememberLastPlayed) {
         configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
@@ -680,13 +678,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         strcpy(filename, game->startup);
     deinit(NO_EXCEPTION); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
-#ifdef VMC
-#define ETH_MCEMU size_mcemu_irx, &smb_mcemu_irx,
-#else
-#define ETH_MCEMU 0, NULL,
-#endif
-
-    sysLaunchLoaderElf(filename,  "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, ETH_MCEMU EnablePS2Logo, compatmask);
+    sysLaunchLoaderElf(filename,  "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *ethGetConfig(int id)
@@ -715,21 +707,15 @@ static void ethCleanUp(int exception)
     ethDeinitModules();
 }
 
-#ifdef VMC
 static int ethCheckVMC(char *name, int createSize)
 {
     return sysCheckVMC(ethPrefix, "\\", name, createSize, NULL);
 }
-#endif
 
 static item_list_t ethGameList = {
     ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-#ifdef VMC
     &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
-#else
-    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, ETH_ICON
-#endif
 };
 
 int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)

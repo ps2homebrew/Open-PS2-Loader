@@ -5,7 +5,6 @@
 
 #define ETH_MODE_UPDATE_DELAY 300
 
-#ifdef VMC
 #include "include/mcemu.h"
 typedef struct
 {
@@ -15,7 +14,6 @@ typedef struct
     int flags;        /* Card flag */
     vmc_spec_t specs; /* Card specifications */
 } smb_vmc_infos_t;
-#endif
 
 void ethInit(void);               //Full initialization (Start ETH + SMB and apply configuration). GUI must be already initialized, used by GUI to start SMB mode.
 void ethDeinitModules(void);      //Module-only deinitialization, without the GUI's knowledge (for specific reasons, otherwise unused).

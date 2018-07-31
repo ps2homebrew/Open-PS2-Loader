@@ -205,9 +205,6 @@ void guiShowAbout()
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
     snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), ""
-#ifdef VMC
-        "VMC"
-#endif
 #ifdef __RTL
         " RTL"
 #endif
@@ -1101,7 +1098,6 @@ int guiShowKeyboard(char *value, int maxLength)
     return result;
 }
 
-#ifdef VMC
 typedef struct
 {                   // size = 76
     int VMC_status; // 0=available, 1=busy
@@ -1281,7 +1277,6 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 
     return result;
 }
-#endif
 
 int guiAltStartupNameHandler(char *text, int maxLen)
 {
@@ -1383,7 +1378,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
     diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
-#ifdef VMC
+    // VMC
     char vmc1[32];
     configGetVMC(configSet, vmc1, sizeof(vmc1), 0);
     diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
@@ -1391,11 +1386,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     char vmc2[32]; // required as diaSetLabel use pointer to value
     configGetVMC(configSet, vmc2, sizeof(vmc2), 1);
     diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
-#endif
 
     // show dialog
     do {
-#ifdef VMC
+        // VMC
         if (strlen(vmc1))
             diaSetLabel(diaCompatConfig, COMPAT_VMC1_ACTION, _l(_STR_RESET));
         else
@@ -1404,7 +1398,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_RESET));
         else
             diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_USE_GENERIC));
-#endif
 
         result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
@@ -1427,7 +1420,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             else
                 guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0, NULL);
         }
-#ifdef VMC
+        //VMC
         else if (result == COMPAT_VMC1_DEFINE) {
             if (menuCheckParentalLock() == 0) {
                 if (guiShowVMCConfig(id, support, vmc1, 0, 0))
@@ -1453,7 +1446,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
                     snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
             }
         }
-#endif
     } while (result >= COMPAT_NOEXIT);
 
     if (result == COMPAT_REMOVE) {
@@ -1481,11 +1473,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
 
-#ifdef VMC
             //VMC
             configRemoveVMC(configSet, 0);
             configRemoveVMC(configSet, 1);
-#endif
+
             menuSaveConfig();
         }
     } else if (result > 0) { // test button pressed or save button
@@ -1578,13 +1569,11 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         else
             configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
-#ifdef VMC
         //VMC
         configSetVMC(configSet, vmc1, 0);
         configSetVMC(configSet, vmc2, 1);
         guiShowVMCConfig(id, support, vmc1, 0, 1);
         guiShowVMCConfig(id, support, vmc2, 1, 1);
-#endif
 
         switch (result) {
             case COMPAT_SAVE:

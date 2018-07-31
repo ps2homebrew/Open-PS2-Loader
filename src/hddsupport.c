@@ -250,7 +250,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     hdl_game_info_t *game = &hddGames.games[id];
     struct cdvdman_settings_hdd *settings;
 
-#ifdef VMC
     apa_sub_t parts[APA_MAXSUB + 1];
     char vmc_name[2][32];
     int part_valid = 0, size_mcemu_irx = 0, nparts;
@@ -324,7 +323,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
             }
         }
     }
-#endif
 
     if (gRememberLastPlayed) {
         configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
@@ -382,13 +380,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 
     deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
-#ifdef VMC
-#define HDD_MCEMU size_mcemu_irx, &hdd_mcemu_irx,
-#else
-#define HDD_MCEMU 0, NULL,
-#endif
-
-    sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, HDD_MCEMU EnablePS2Logo, compatMode);
+    sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
 
 static config_set_t *hddGetConfig(int id)
@@ -439,19 +431,13 @@ static void hddCleanUp(int exception)
     hddModulesLoaded = 0;
 }
 
-#ifdef VMC
 static int hddCheckVMC(char *name, int createSize)
 {
     return sysCheckVMC(hddPrefix, "/", name, createSize, NULL);
 }
-#endif
 
 static item_list_t hddGameList = {
     HDD_MODE, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-#ifdef VMC
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
-#else
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, HDD_ICON
-#endif
 };

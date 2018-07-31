@@ -16,6 +16,7 @@
 #include <intrman.h>
 #include <thbase.h>
 #include <thevent.h>
+#include <thsemap.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include "atad.h"
@@ -71,19 +72,10 @@ static int ata_evflg = -1;
 /* Used for indicating 48-bit LBA support.  */
 extern char lba_48bit;
 
-#ifdef VMC_DRIVER
-#include <thsemap.h>
-
 static int io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
-#define ATAWRITE 1
-#else
-#define WAITIOSEMA(x)
-#define SIGNALIOSEMA(x)
-#define ATAWRITE 0
-#endif
 
 #define ATA_EV_TIMEOUT 1
 #define ATA_EV_COMPLETE 2 //Unused as there is no completion interrupt
@@ -186,14 +178,12 @@ int atad_start(void)
     if (ata_bus_reset() != 0)
         goto out;
 
-#ifdef VMC_DRIVER
     iop_sema_t smp;
     smp.initial = 1;
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
     io_sema = CreateSema(&smp);
-#endif
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
@@ -685,13 +675,13 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
             /* In v1.04, LBA was enabled here.  */
             select = (device << 4) & 0xffff;
-            command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
+            command = (dir == 1) ? ATA_C_WRITE_SECTOR_EXT : ATA_C_READ_SECTOR_EXT;
         } else {
             /* Setup for 28-bit LBA.  */
             sector = lba & 0xff;
             /* In v1.04, LBA was enabled here.  */
             select = ((device << 4) | ((lba >> 24) & 0xf)) & 0xffff;
-            command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
+            command = (dir == 1) ? ATA_C_WRITE_SECTOR : ATA_C_READ_SECTOR;
         }
 
         //Unlike ATAD, retry indefinitely until the I/O operation succeeds.

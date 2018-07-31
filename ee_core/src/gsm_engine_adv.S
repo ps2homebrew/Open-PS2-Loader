@@ -169,7 +169,7 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SMODE1 is zero
 sd	$a1,0($a3)							# 	go use Source_SMODE1
 
 store_v0_as_SMODE1:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -207,7 +207,7 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SRFSH is zero
 sd	$a1,0($a3)							# 	go use Source_SRFSH
 
 store_v0_as_SRFSH:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -231,7 +231,7 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH1 is zero
 sd	$a1,0($a3)							# 	go use Source_SYNCH1
 
 store_v0_as_SYNCH1:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -252,7 +252,7 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH2 is zero
 sd	$a1,0($a3)							# 	go use Source_SYNCH2
 
 store_v0_as_SYNCH2:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -277,6 +277,6 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCV is zero
 sd	$a1,0($a3)							# 	go use Source_SYNCV
 
 store_v0_as_SYNCV:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 

@@ -371,7 +371,7 @@ jal get_access_info
 nop
 
 addi	$v1,$v0, -GS_CSR
-beqzl	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
+beqz	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
 nop
 
 not_wanted_reg_read:				# Register unwanted, so perform op unchanged
@@ -442,46 +442,35 @@ nop
 ld	$a1, 0($a1)		# a1 = value in rt
 
 addi	$v1,$v0, -GS_PMODE
-beqzl	$v1,have_PMODE_write			# in case of  dest == GS_reg_PMODE
-nop
+beqz	$v1,have_PMODE_write			# in case of  dest == GS_reg_PMODE
 addi	$v1,$v0, -GS_SMODE1
-beqzl	$v1,have_SMODE1_write			# in case of  dest == GS_reg_SMODE1
-nop
+beqz	$v1,have_SMODE1_write			# in case of  dest == GS_reg_SMODE1
 addi	$v1,$v0, -GS_SMODE2
-beqzl	$v1,have_SMODE2_write			# in case of  dest == GS_reg_SMODE2
-nop
+beqz	$v1,have_SMODE2_write			# in case of  dest == GS_reg_SMODE2
 addi	$v1,$v0, -GS_SRFSH
-beqzl	$v1,have_SRFSH_write			# in case of  dest == GS_reg_SRFSH
-nop
+beqz	$v1,have_SRFSH_write			# in case of  dest == GS_reg_SRFSH
 addi	$v1,$v0, -GS_SYNCH1
-beqzl	$v1,have_SYNCH1_write			# in case of  dest == GS_reg_SYNCH1
-nop
+beqz	$v1,have_SYNCH1_write			# in case of  dest == GS_reg_SYNCH1
 addi	$v1,$v0, -GS_SYNCH2
-beqzl	$v1,have_SYNCH2_write			# in case of  dest == GS_reg_SYNCH2
-nop
+beqz	$v1,have_SYNCH2_write			# in case of  dest == GS_reg_SYNCH2
 addi	$v1,$v0, -GS_SYNCV
-beqzl	$v1,have_SYNCV_write			# in case of  dest == GS_reg_SYNCV
-nop
+beqz	$v1,have_SYNCV_write			# in case of  dest == GS_reg_SYNCV
 addi	$v1,$v0, -GS_DISPFB1
-beqzl	$v1,have_DISPFB1_write			# in case of  dest == GS_reg_DISPFB1
-nop
+beqz	$v1,have_DISPFB1_write			# in case of  dest == GS_reg_DISPFB1
 addi	$v1,$v0, -GS_DISPFB2
-beqzl	$v1,have_DISPFB2_write			# in case of  dest == GS_reg_DISPFB2
-nop
+beqz	$v1,have_DISPFB2_write			# in case of  dest == GS_reg_DISPFB2
 addi	$v1,$v0, -GS_DISPLAY1
-beqzl	$v1,have_DISPLAY1_write			# in case of  dest == GS_reg_DISPLAY1
-nop
+beqz	$v1,have_DISPLAY1_write			# in case of  dest == GS_reg_DISPLAY1
 addi	$v1,$v0, -GS_DISPLAY2
-beqzl	$v1,have_DISPLAY2_write			# in case of  dest == GS_reg_DISPLAY2
+beqz	$v1,have_DISPLAY2_write			# in case of  dest == GS_reg_DISPLAY2
 nop
 
 not_wanted_reg:					# Register unwanted, so perform op unchanged
+b	exit_GSHandler
 sd	$a1,0($a3)				# Store source data unchanged to destination
-beqzl	$zero,exit_GSHandler
-nop
 
 ignore:				# We just ignore weird opcodes that we don't implement
-beqzl	$zero,exit_GSHandler
+b	exit_GSHandler
 nop
 
 # ----------------------------
@@ -518,7 +507,7 @@ beql	$v0,$zero,store_v0_as_PMODE		# in case of  Target_PMODE is zero
 or	$v0,$zero,$a1						# go use Source_PMODE
 
 store_v0_as_PMODE:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing 
 
 # ----------------------------
@@ -554,7 +543,7 @@ andi	$v0,$v0,0xFFFD					# v0 = Target_SMODE2 without FFMD
 or	$v0,$v0,$a1							# v0 = Target_SMODE2 + Source FFMD
 
 store_v0_as_SMODE2:
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -562,12 +551,11 @@ sd	$v0,0($a3)							# after storing
 #
 have_DISPFB1_write:
 sd	$a1, Source_DISPFB1($s0)			# Source_DISPFB1 = a1
-ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
 
 jal have_DISPFB_write
-nop
+ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
 
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -575,12 +563,11 @@ sd	$v0,0($a3)							# after storing
 #
 have_DISPFB2_write:
 sd	$a1, Source_DISPFB2($s0)			# Source_DISPFB2 = a1
-ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
 
 jal have_DISPFB_write
-nop
+ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
 
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -588,10 +575,9 @@ sd	$v0,0($a3)							# after storing
 # 
 have_DISPLAY1_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY1($s0)			# request DISPLAY1 value = a1
-ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
 jal	have_DISPLAY_write
-nop
+ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
 sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAY1 value (for feedback)
 
@@ -600,7 +586,7 @@ beql	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY1($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY1:
-beqzl	$zero,exit_GSHandler	# Now go exit
+b	exit_GSHandler	# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -608,10 +594,9 @@ sd	$v0,0($a3)							# after storing
 # 
 have_DISPLAY2_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY2($s0)			# request DISPLAY2 value = a1
-ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
 jal	have_DISPLAY_write
-nop
+ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
 sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAY2 value (for feedback)
 
@@ -620,7 +605,7 @@ beql	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY2:
-beqzl	$zero,exit_GSHandler	# Now go exit
+b	exit_GSHandler	# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -665,15 +650,12 @@ addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
 dsrl32	$t1,$a1,0
 andi	$t1,$t1,0x0FFF
 addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
+divu	$t1,$t0		# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
 dsrl32	$t0,$v1,0
 andi	$t5,$t0,0x0FFF
 mflo	$t4				# t4 = LO = Source_Pixels_Width
 addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
-nop
-nop
+divu	$t6,$t4		# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
 mflo	$t0				# t0 = LO = Target_Width_Scale
 bne	$t0,$zero,have_DISPLAY_write_2		# in case of (!Target_Width_Scale)
 nop						# {
@@ -690,10 +672,7 @@ bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 16)
 or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
 
 have_DISPLAY_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Source_Pixels_Width * Target_Width_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Width
+mult	$t1,$t4,$t0			# LO = Calculated_Width = (Source_Pixels_Width * Target_Width_Scale)
 addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
 addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
 sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
@@ -727,8 +706,7 @@ or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGH)
 
 lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
 add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
-bgez	$t6, have_DISPLAY_write_7		# Is the result greater or equal to zero?
-nop
+bltzl	$t6, have_DISPLAY_write_7		# Is the result not greater or equal to zero?
 move	$t6, $zero		# t6 = Calculated_DX = 0
 have_DISPLAY_write_7:
 andi	$t6,$t6,0x0FFF
@@ -754,24 +732,20 @@ addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
 dsrl32	$t1,$a1,12
 andi	$t1,$t1,0x07FF
 addi	$t1,$t1,1		# Source_Height = Source_DH + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
+divu	$t1,$t0		# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
 dsrl32	$t0,$v1,12
 andi	$t5,$t0,0x07FF
 mflo	$t4				# t4 = LO = Source_Pixels_Height
 addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
-nop
-nop
+divu	$t6,$t4		# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
 mflo	$t0				# t0 = LO = Target_Height_Scale
 bne	$t0,$zero,have_DISPLAY_write_8		# in case of (!Target_Height_Scale)
 nop						# {
 or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
 sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
-li	$t4,0				# t4 = Target_MAGV = 0
-beql	$zero,$zero,have_DISPLAY_write_10		# }
-nop						# otherwise
-						# Target_Height_Scale nonzero
+b	have_DISPLAY_write_10		# }
+move	$t4, $zero			# t4 = Target_MAGV = 0
+					# otherwise, Target_Height_Scale nonzero
 
 have_DISPLAY_write_8:						# {
 addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
@@ -779,10 +753,7 @@ bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 4)
 or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
 
 have_DISPLAY_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Source_Pixels_Height * Target_Height_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Height
+mult	$t1,$t4,$t0			# t1 = Calculated_Height = (Source_Pixels_Height * Target_Height_Scale)
 addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
 addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
 sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
@@ -833,8 +804,7 @@ or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGV)
 
 lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
 add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
-bgez	$t6, have_DISPLAY_write_14		# Is the result greater or equal to zero?
-nop
+bltzl	$t6, have_DISPLAY_write_14		# Is the result not greater or equal to zero?
 move	$t6, $zero
 have_DISPLAY_write_14:
 andi	$t6,$t6,0x07FF

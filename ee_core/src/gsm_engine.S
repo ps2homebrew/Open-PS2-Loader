@@ -37,7 +37,7 @@
 
 
 .globl MIPS_Regs
-MIPS_Regs:			.space	0x200
+MIPS_Regs:			.space	0x220
 
 .globl Old_SetGsCrt
 Old_SetGsCrt:		.word 0
@@ -231,41 +231,46 @@ addiu	$sp, $sp, 0x0010			# Restore sp during return
 .globl GSHandler
 .ent	GSHandler
 GSHandler:
-sq $k0, -0x10($zero) # Store $k1 register (reserved for kernel usage in interrupt and trap handling)
-sq $k1, -0x20($zero) # Store $k1 register (reserved for kernel usage in interrupt and trap handling)
-la $k0, MIPS_Regs  # Store MIPS_Regs via $k0
-# sq $zero, 0x000($k0)
-sq $at, 0x010($k0)
-sq $v0, 0x020($k0)
-sq $v1, 0x030($k0)
-sq $a0, 0x040($k0)
-sq $a1, 0x050($k0)
-sq $a2, 0x060($k0)
-sq $a3, 0x070($k0)
-sq $t0, 0x080($k0)
-sq $t1, 0x090($k0)
-sq $t2, 0x0A0($k0)
-sq $t3, 0x0B0($k0)
-sq $t4, 0x0C0($k0)
-sq $t5, 0x0D0($k0)
-sq $t6, 0x0E0($k0)
-sq $t7, 0x0F0($k0)
-sq $s0, 0x100($k0)
-sq $s1, 0x110($k0)
-sq $s2, 0x120($k0)
-sq $s3, 0x130($k0)
-sq $s4, 0x140($k0)
-sq $s5, 0x150($k0)
-sq $s6, 0x160($k0)
-sq $s7, 0x170($k0)
-sq $t8, 0x180($k0)
-sq $t9, 0x190($k0)
-sq $k0, 0x1A0($k0)
-sq $k1, 0x1B0($k0)
-sq $gp, 0x1C0($k0)
-sq $sp, 0x1D0($k0)
-sq $fp, 0x1E0($k0)
-sq $ra, 0x1F0($k0)
+# $k1 is used to save the context by the Level 2 exception handler. $k1 is reserved for kernel usage in interrupt and trap handling.
+sq $k1, -0x20($zero) # Store $k1 register in the same place as the kernel does, via kseg3.
+la $k1, MIPS_Regs  # Store MIPS_Regs via $k0
+# sq $zero, 0x000($k1)
+sq $at, 0x010($k1)
+sq $v0, 0x020($k1)
+sq $v1, 0x030($k1)
+sq $a0, 0x040($k1)
+sq $a1, 0x050($k1)
+sq $a2, 0x060($k1)
+sq $a3, 0x070($k1)
+sq $t0, 0x080($k1)
+sq $t1, 0x090($k1)
+sq $t2, 0x0A0($k1)
+sq $t3, 0x0B0($k1)
+sq $t4, 0x0C0($k1)
+sq $t5, 0x0D0($k1)
+sq $t6, 0x0E0($k1)
+sq $t7, 0x0F0($k1)
+sq $s0, 0x100($k1)
+sq $s1, 0x110($k1)
+sq $s2, 0x120($k1)
+sq $s3, 0x130($k1)
+sq $s4, 0x140($k1)
+sq $s5, 0x150($k1)
+sq $s6, 0x160($k1)
+sq $s7, 0x170($k1)
+sq $t8, 0x180($k1)
+sq $t9, 0x190($k1)
+sq $k0, 0x1A0($k1)
+sq $gp, 0x1C0($k1)
+sq $sp, 0x1D0($k1)
+sq $fp, 0x1E0($k1)
+sq $ra, 0x1F0($k1)
+pmfhi $v0
+sq $v0, 0x200($k1)
+pmflo $v0
+sq $v0, 0x210($k1)
+lq $v0, -0x20($zero)
+sq $v0, 0x1B0($k1) #$k1 can now be saved properly.
 
 #
 # The read/write ErrorEPC register holds the virtual address at which instruction
@@ -912,6 +917,7 @@ or	$v0, $t0, $t1			#Replace FIELD field.
 
 exit_GSHandler:
 la $k0, MIPS_Regs  # Restore MIPS_Regs via $k0
+# We will keep a subset of these registers (not restored here) for the remainder of this process.
 # lq $zero, 0x000($k0)
 lq $at, 0x010($k0)
 lq $v0, 0x020($k0)
@@ -944,6 +950,11 @@ lq $t9, 0x190($k0)
 # lq $sp, 0x1D0($k0)
 # lq $fp, 0x1E0($k0)
 # lq $ra, 0x1F0($k0)
+lq $k1, 0x200($k0)
+pmthi $k1
+lq $k1, 0x210($k0)
+pmtlo $k1
+
 
 # WARNING: Past this point in GSHandler, use should only $k0,$k1,$t0,$t1
 
@@ -1162,15 +1173,15 @@ mtc0	$k0, $30	# store k0 in Error Exception Program Counter
 sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
 GSHandler_Final_Exit:
-la $k0, MIPS_Regs  # Restore MIPS_Regs via $k0
-lq $t0, 0x080($k0)
-lq $t1, 0x090($k0)
-lq $gp, 0x1C0($k0)
-lq $sp, 0x1D0($k0)
-lq $fp, 0x1E0($k0)
-lq $ra, 0x1F0($k0)
-lq $k0, -0x10($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
-lq $k1, -0x20($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
+la $k1, MIPS_Regs  # Restore MIPS_Regs via $k1
+lq $t0, 0x080($k1)
+lq $t1, 0x090($k1)
+lq $gp, 0x1C0($k1)
+lq $sp, 0x1D0($k1)
+lq $fp, 0x1E0($k1)
+lq $ra, 0x1F0($k1)
+lq $k0, 0x1A0($k1)
+lq $k1, 0x1B0($k1)
 
 eret			# Return from exception. Subsequent instructions are not fetched.
 

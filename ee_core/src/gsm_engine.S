@@ -157,8 +157,7 @@ la	$v0, GSMDestSetGsCrt
 lh	$a0, Target_INT($v0)
 lh	$a1, Target_MODE($v0)
 lh	$a2, Target_FFMD($v0)
-sync.l						# The opcodes sync.l and sync.p made a lot of games compatible
-sync.p						# They ensure all values are stable before the following call
+sync.l						# Wait for any outstanding stores to registers to complete before calling SetGsCrt. A lot of games were made compatible because of this.
 
 //-----------------------------------------------------------------------------------------
 
@@ -232,9 +231,6 @@ addiu	$sp, $sp, 0x0010			# Restore sp during return
 .globl GSHandler
 .ent	GSHandler
 GSHandler:
-sync.l
-sync.p
-
 sq $k0, -0x10($zero) # Store $k1 register (reserved for kernel usage in interrupt and trap handling)
 sq $k1, -0x20($zero) # Store $k1 register (reserved for kernel usage in interrupt and trap handling)
 la $k0, MIPS_Regs  # Store MIPS_Regs via $k0
@@ -517,8 +513,6 @@ beql	$v0,$zero,store_v0_as_PMODE		# in case of  Target_PMODE is zero
 or	$v0,$zero,$a1						# go use Source_PMODE
 
 store_v0_as_PMODE:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing 
 
@@ -555,8 +549,6 @@ andi	$v0,$v0,0xFFFD					# v0 = Target_SMODE2 without FFMD
 or	$v0,$v0,$a1							# v0 = Target_SMODE2 + Source FFMD
 
 store_v0_as_SMODE2:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -570,8 +562,6 @@ ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
 jal have_DISPFB_write
 nop
 
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -585,8 +575,6 @@ ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
 jal have_DISPFB_write
 nop
 
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -607,8 +595,6 @@ beql	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY1($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY1:
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler	# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -629,8 +615,6 @@ beql	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY2:
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler	# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -1188,8 +1172,6 @@ lq $ra, 0x1F0($k0)
 lq $k0, -0x10($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
 lq $k1, -0x20($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
 
-sync.p			# These cannot be placed in a branch-delay slot.
-sync.l
 eret			# Return from exception. Subsequent instructions are not fetched.
 
 end_GSHandler:

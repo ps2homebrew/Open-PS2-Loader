@@ -10,9 +10,7 @@
 #include "include/ioman.h"
 #include "include/system.h"
 #include "include/extern_irx.h"
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include "include/nbns.h"
@@ -540,9 +538,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
 {
     int i, compatmask;
     int EnablePS2Logo = 0;
-#ifdef CHEAT
     int result;
-#endif
     char filename[32], partname[256];
     base_game_info_t *game = &ethGames[id];
     struct cdvdman_settings_smb *settings;
@@ -607,7 +603,6 @@ static void ethLaunchGame(int id, config_set_t *configSet)
 
     compatmask = sbPrepare(game, configSet, size_smb_cdvdman_irx, &smb_cdvdman_irx, &i);
 
-#ifdef CHEAT
     if ((result = sbLoadCheats(ethPrefix, game->startup)) < 0) {
         switch (result) {
             case -ENOENT:
@@ -617,7 +612,6 @@ static void ethLaunchGame(int id, config_set_t *configSet)
                 guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
         }
     }
-#endif
 
     settings = (struct cdvdman_settings_smb *)((u8 *)(&smb_cdvdman_irx) + i);
 

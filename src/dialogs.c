@@ -179,19 +179,13 @@ struct UIItem diaCompatConfig[] = {
     {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-#ifdef GSM
     {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GSCONFIG}}},
     {UI_SPACER},
-#endif
-#ifdef CHEAT
     {UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
-#endif
 #ifdef PADEMU
     {UI_BUTTON, COMPAT_PADEMUCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
 #endif
-#if defined(GSM) || defined(CHEAT) || defined(PADEMU)
     {UI_SPLITTER},
-#endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
     {UI_SPACER},
@@ -420,7 +414,6 @@ struct UIItem diaUIConfig[] = {
     {UI_TERMINATOR}};
 
 // Per-Game Game Settings > GSM Menu (--Bat--)
-#ifdef GSM
 struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
     {UI_SPLITTER},
@@ -456,7 +449,6 @@ struct UIItem diaGSConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 #ifdef PADEMU
 struct UIItem diaPadEmuConfig[] = {
@@ -709,7 +701,6 @@ struct UIItem diaPadEmuInfo[] = {
 #endif
 
 // Per Game Settings > Cheat Menu --Bat--
-#ifdef CHEAT
 struct UIItem diaCheatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
     {UI_SPLITTER},
@@ -730,7 +721,6 @@ struct UIItem diaCheatConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 // About Menu
 struct UIItem diaAbout[] = {

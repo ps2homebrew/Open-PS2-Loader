@@ -32,12 +32,8 @@ typedef struct
     int VMC_card_slot;
 } createVMCparam_t;
 #endif
-#ifdef GSM
 #include "include/pggsm.h"
-#endif
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 
 extern void *eecore_elf;
 extern int size_eecore_elf;
@@ -636,19 +632,12 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     elf_pheader_t *eph;
     void *pdata;
     int i;
-#ifdef GSM
-#define GSM_ARGS 1
-#else
-#define GSM_ARGS 0
-#endif
     char ElfPath[32];
     char *argv[7 + GSM_ARGS];
     char ModStorageConfig[32];
     char KernelConfig[32];
     char config_str[256];
-#ifdef GSM
     char gsm_config_str[256];
-#endif
     void *eeloadCopy, *initUserMemory;
 
     ethGetNetConfig(local_ip_address, local_netmask, local_gateway);
@@ -724,22 +713,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     }
     sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);
 
-#ifdef CHEAT
-#define CHEAT_SPECIFIER " %u"
-#define CHEAT_ARGUMENT , GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0
-#else
-#define CHEAT_SPECIFIER
-#define CHEAT_ARGUMENT
-#endif
-
-#ifdef GSM
-#define GSM_SPECIFIER " %d"
-#define GSM_ARGUMENT , GetGSMEnabled()
-#else
-#define GSM_SPECIFIER
-#define GSM_ARGUMENT
-#endif
-
 #ifdef PADEMU
 #define PADEMU_SPECIFIER " %d, %u"
 #define PADEMU_ARGUMENT , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8)
@@ -749,13 +722,14 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 #endif
 
     i = 0;
-    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d" CHEAT_SPECIFIER GSM_SPECIFIER PADEMU_SPECIFIER,
+    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER,
             mode_str, gDisableDebug, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
             local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
             local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
-            gETHOpMode
-                CHEAT_ARGUMENT GSM_ARGUMENT PADEMU_ARGUMENT);
+            gETHOpMode,
+            GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0,
+            GetGSMEnabled() PADEMU_ARGUMENT);
     argv[i] = config_str;
     i++;
 
@@ -773,11 +747,9 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     argv[i] = cmask;
     i++;
 
-#ifdef GSM
     PrepareGSM(gsm_config_str);
     argv[i] = gsm_config_str;
     i++;
-#endif
 
     strcpy(ElfPath, "cdrom0:\\");
     strncat(ElfPath, filename, 11); // fix for 8+3 filename.

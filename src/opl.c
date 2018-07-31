@@ -30,9 +30,7 @@
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
 
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>

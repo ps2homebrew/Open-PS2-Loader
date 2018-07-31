@@ -169,8 +169,6 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SMODE1 is zero
 sd	$a1,0($a3)							# 	go use Source_SMODE1
 
 store_v0_as_SMODE1:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -209,8 +207,6 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SRFSH is zero
 sd	$a1,0($a3)							# 	go use Source_SRFSH
 
 store_v0_as_SRFSH:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -235,8 +231,6 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH1 is zero
 sd	$a1,0($a3)							# 	go use Source_SYNCH1
 
 store_v0_as_SYNCH1:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -258,8 +252,6 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH2 is zero
 sd	$a1,0($a3)							# 	go use Source_SYNCH2
 
 store_v0_as_SYNCH2:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
@@ -285,8 +277,6 @@ beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCV is zero
 sd	$a1,0($a3)							# 	go use Source_SYNCV
 
 store_v0_as_SYNCV:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
 beqzl	$zero,exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 

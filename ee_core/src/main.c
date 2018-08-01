@@ -114,7 +114,7 @@ static int eecoreInit(int argc, char **argv)
         s16 interlace, mode, ffmd;
         u32 dx_offset, dy_offset;
         u64 display, syncv, smode2;
-        int k576P_fix, kGsDxDyOffsetSupported;
+        int k576P_fix, kGsDxDyOffsetSupported, FIELD_fix;
 
         interlace = _strtoi(_strtok(argv[i], " "));
         mode = _strtoi(_strtok(NULL, " "));
@@ -126,8 +126,9 @@ static int eecoreInit(int argc, char **argv)
         dy_offset = _strtoui(_strtok(NULL, " "));
         k576P_fix = _strtoui(_strtok(NULL, " "));
         kGsDxDyOffsetSupported = _strtoui(_strtok(NULL, " "));
+        FIELD_fix = _strtoui(_strtok(NULL, " "));
 
-        UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset, k576P_fix, kGsDxDyOffsetSupported);
+        UpdateGSMParams(interlace, mode, ffmd, display, syncv, smode2, dx_offset, dy_offset, k576P_fix, kGsDxDyOffsetSupported, FIELD_fix);
         EnableGSM();
     }
     i++;

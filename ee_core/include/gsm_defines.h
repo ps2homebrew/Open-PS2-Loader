@@ -81,7 +81,7 @@ GS_MODE_DTV_576P=0x53
 .equ SYNCV_fix,            14 # BYTE
 .equ DISPFB_fix,           15 # BYTE
 .equ DISPLAY_fix,          16 # BYTE
-.equ FIELD_stat,           17 # BYTE
+.equ FIELD_fix,            17 # BYTE
 .equ gs576P_param,         18 # BYTE
 
 # GSMAdapts

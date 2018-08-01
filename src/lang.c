@@ -257,6 +257,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Select port for Multitap emulation.",
     "Disable workaround for fake ds3",
     "Some fake ds3s need workaround, this option will disable it.",
+    "Emulate FIELD flipping",
+    "Fix for games that glitch under progressive video modes.",
 };
 
 static int guiLangID = 0;

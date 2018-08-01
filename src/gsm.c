@@ -12,12 +12,42 @@
 */
 
 #include "include/opl.h"
+#include "include/config.h"
 #include "include/util.h"
 #include "include/system.h"
 #include "include/ioman.h"
 #include "include/renderman.h"
 
 #include "include/pggsm.h"
+
+static int gEnableGSM;  // Enables GSM - 0 for Off, 1 for On
+static int gGSMVMode;   // See the related predef_vmode
+static int gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
+static int gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
+static int gGSMFIELDFix; // Enables/disables the FIELD flipping emulation option. 0 for Off, 1 for On.
+
+void InitGSMConfig(config_set_t *configSet)
+{
+    //Default values.
+    gEnableGSM = 0;
+    gGSMVMode = 0;
+    gGSMXOffset = 0;
+    gGSMYOffset = 0;
+    gGSMFIELDFix = 0;
+
+    //Load the rest of the per-game GSM configuration, only if GSM is enabled.
+    if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
+        configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
+        configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
+        configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
+        configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &gGSMFIELDFix);
+    }
+}
+
+int GetGSMEnabled(void)
+{
+    return gEnableGSM;
+}
 
 void PrepareGSM(char *cmdline)
 {
@@ -58,7 +88,7 @@ void PrepareGSM(char *cmdline)
         {GS_NONINTERLACED, GS_MODE_VGA_1024_85, GS_FRAME, makeDISPLAY(767,  1023, 0,   0,   30,  290), makeSYNCV(3,  768,  0,    36,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_60, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_75, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)}}; //ends predef_vmode definition
-    int k576p_fix, kGsDxDyOffsetSupported, fd;
+    int k576p_fix, kGsDxDyOffsetSupported, fd, FIELD_fix;
     char romver[16], romverNum[5], *pROMDate;
 
     k576p_fix = 0;
@@ -87,7 +117,9 @@ void PrepareGSM(char *cmdline)
         kGsDxDyOffsetSupported = (strtoul(pROMDate, NULL, 10) > 20010608);
     }
 
-    sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %d %d", predef_vmode[gGSMVMode].interlace,
+    FIELD_fix = gGSMFIELDFix != 0 ? 1 : 0;
+
+    sprintf(cmdline, "%d %d %d %lu %lu %u %u %u %d %d %d", predef_vmode[gGSMVMode].interlace,
             predef_vmode[gGSMVMode].mode,
             predef_vmode[gGSMVMode].ffmd,
             predef_vmode[gGSMVMode].display,
@@ -96,6 +128,7 @@ void PrepareGSM(char *cmdline)
             gGSMXOffset,
             gGSMYOffset,
             k576p_fix,
-            kGsDxDyOffsetSupported);
+            kGsDxDyOffsetSupported,
+            FIELD_fix);
 }
 

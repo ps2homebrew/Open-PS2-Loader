@@ -869,15 +869,17 @@ bnez	$t0, not_wanted_reg_read
 
 #Emulate ODD/EVEN flipping of the CSR FIELD (bit 13).
 ld      $t0, GS_CSR($s4)		# t0 = CSR. Load CSR to check on the HSINT status
-lbu	$t1, FIELD_stat($s2)		# t1 = FIELD_status
+lbu	$t1, FIELD_fix($s2)		# t1 = FIELD_fix
 andi	$t2, $t0, 4			#Check HSINT event.
 beqz	$t2, not_wanted_reg_read	#Flip emulated FIELD status, only at the end of H-Blank.
+andi	$t2, $t1, 4			#Check whether the FIELD fix is enabled.
+beqz	$t2, not_wanted_reg_read
 xori	$t1, $t1, 2			#Flip counter. This counter is used to half the rate of flipping, since progressive modes have double the Horizontal frequency.
 andi	$t2, $t1, 2			#If counter == 0,
 beqzl	$t2, skip_flip
 xori	$t1, $t1, 1			#Flip odd/even FIELD status.
 skip_flip:
-sb	$t1, FIELD_stat($s2)		#Update status.
+sb	$t1, FIELD_fix($s2)		#Update status.
 andi	$t1, $t1, 1
 ori	$t0, $t0, 0x2000		#Clear FIELD field 1 ^ 1 = always 0.
 xori	$t0, $t0, 0x2000

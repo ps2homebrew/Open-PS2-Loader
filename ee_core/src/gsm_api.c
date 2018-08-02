@@ -16,6 +16,7 @@
 #include <syscallnr.h>
 
 #include "gsm_api.h"
+#include "dve_reg.h"
 
 #define MAKE_J(func) (u32)((0x02 << 26) | (((u32)func) / 4)) // Jump (MIPS instruction)
 #define NOP 0x00000000                                       // No Operation (MIPS instruction)
@@ -199,3 +200,16 @@ void DisableGSM(void)
     // Remove Display Handler
     Remove_GSHandler();
 }
+
+/*--------------------------------------------*/
+/* Set up the DVE for 576P mode               */
+/*--------------------------------------------*/
+void setdve_576P(void)
+{	//The parameters are exactly the same as the 480P mode's. Regardless of the model, GS revision or region.
+	dve_prepare_bus();
+
+	dve_set_reg(0x77, 0x11);
+	dve_set_reg(0x93, 0x01);
+	dve_set_reg(0x91, 0x02);
+}
+

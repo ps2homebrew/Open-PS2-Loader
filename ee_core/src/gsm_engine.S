@@ -148,7 +148,7 @@ sh	$a0, Source_INT($v0)
 sh	$a1, Source_MODE($v0)
 
 // Remove all breakpoints (even when they aren't enabled)
-jal Disable_GSBreakpoint
+jal	Disable_GSBreakpoint
 sh	$a2, Source_FFMD($v0)
 
 //-----------------------------------------------------------------------------------------
@@ -1182,6 +1182,7 @@ end_GSHandler:
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# Must be executed with interrupts disabled.
 .globl Enable_GSBreakpoint
 .ent Enable_GSBreakpoint
 Enable_GSBreakpoint:
@@ -1191,6 +1192,8 @@ Enable_GSBreakpoint:
 li $a0, TRAP_BASE	# Address base for trapping
 li $a1, TRAP_MASK	# Address mask for trapping
 			# Trapping range is extended to match all kernel access segments
+
+sync.l			# Synchronize pipeline. Wait for any preceding loads to complete.
 
 li $a2, 0x8000
 mtbpc $a2		# All breakpoints off (BED = 1)
@@ -1216,9 +1219,12 @@ jr $ra
 nop
 .end Enable_GSBreakpoint
 
+# Must be executed with interrupts disabled.
 .globl Disable_GSBreakpoint
 .ent Disable_GSBreakpoint
 Disable_GSBreakpoint:
+sync.l			# Synchronize pipeline. Wait for any preceding loads to complete.
+
 li $a2, 0x8000
 mtbpc $a2		# All breakpoints off (BED = 1)
 sync.p			# Await instruction completion

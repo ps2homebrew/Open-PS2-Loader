@@ -900,7 +900,7 @@ lq $a2, 0x060($k0)
 lq $a3, 0x070($k0)
 # lq $t0, 0x080($k0)
 # lq $t1, 0x090($k0)
-lq $t2, 0x0A0($k0)
+# lq $t2, 0x0A0($k0)
 lq $t3, 0x0B0($k0)
 lq $t4, 0x0C0($k0)
 lq $t5, 0x0D0($k0)
@@ -928,18 +928,20 @@ lq $k1, 0x210($k0)
 pmtlo $k1
 
 
-# WARNING: Past this point in GSHandler, use should only $k0,$k1,$t0,$t1
+# WARNING: Past this point in GSHandler, use should only $k0,$k1,$t0,$t1,$t2
+# Now we will attempt to skip the current instruction, as the handler has already acted on behalf of it.
+# There is no function for stepping with the hardware breakpoint. Hence there is a need to consider how PC would have been advanced by the EE.
+# $t2 will contain the current ErrorEPC value.
 
 mfc0	$k0, $13		# k0 = Cause of last exception
 srl	$k0, 30			# BD2 Flags debug exception in branch delay slot.
 				# 1 -> delay slot, 0 -> normal
 andi	$k0, 1			# k0 = BD2 bit isolated
-bnez $k0,	GSHandler_BranchDelaySlotException
-				# Deal properly with Branch Delay Slot Exceptions (when needed)
-nop
 
-mfc0	$k0,$30			# k0 = ErrorEPC
-addiu	$k0,$k0,4		# k0 = ErrorEPC+4 (-> next opcode)
+bnez $k0,	GSHandler_BranchDelaySlotException	# Deal properly with Branch Delay Slot Exceptions (when needed)
+mfc0	$t2,$30			# t2 = Error Exception Program Counter (ErrorEPC/EPC)
+
+addiu	$k0,$t2,4		# k0 = ErrorEPC+4 (-> next opcode)
 mtc0	$k0,$30			# store k0 in Error Exception Program Counter
 sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
@@ -948,8 +950,7 @@ nop
 
 # ----------------------------
 GSHandler_BranchDelaySlotException:
-mfc0	$k0,$30		# k0 = Error Exception Program Counter
-lw	$k0,0($k0)	# k0 = instruction at EPC location (branch or jump)
+lw	$k0,0($t2)	# k0 = instruction at EPC location (branch or jump)
 srl	$k1,$k0,26	# k1 = aligned for opcode (range 0x00-0x3F)
 andi	$k1,$k1,0x3F	# k1 = pure opcode number
 sll	$k1,$k1,2	# k1 = op_num*2 (offset for jump table)
@@ -1008,7 +1009,11 @@ B_JAL:
 # Here we have a definite jump with absolute address/4 in instruction
 li	$t0, 0x3FFFFFF	# t0 = bitmask for jump destination bits
 and	$k1, $k0, $t0	# k1 = destination bits (== destination/4)
-sll	$t0, $k1, 2	# t0 = jump destination address
+sll	$t0, $k1, 2	# t0 = jump destination address[27:0]
+addiu	$t1, $t2, 4
+sra	$t1, $t1, 28
+sll	$t1, $t1, 28	# Extract (EPC+4)[31:28]
+or	$t0, $t0, $t1	# Append (EPC+4)[31:28] to instruction index.
 mtc0	$t0, $30	# store t0 in Error Exception Program Counter
 sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
@@ -1031,8 +1036,7 @@ B_taken:
 li	$t0, 0xFFFF	# t0 = bitmask for branch offset bits
 and	$k1, $k0, $t0	# k1 = branch offset bits (== offset/4)
 sll	$k1, 2		# k1 = branch offset
-mfc0	$t0, $30	# t0 = Error Exception Program Counter
-addiu	$t0, 4		# t0 = ErrorEPC+4 (-> address after branch op)
+addiu	$t0, $t2, 4	# t0 = $t2+4 (ErrorEPC+4) (-> address after branch op)
 addu	$t0, $k1	# t0 = jump destination address
 mtc0	$t0, $30	# store t0 in Error Exception Program Counter
 sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
@@ -1052,8 +1056,7 @@ bltz	$t1,B_taken
 nop
 
 B_not_taken:
-mfc0	$k0,$30			# k0 = ErrorEPC
-addiu	$k0,$k0,8		# k0 = ErrorEPC+8 pass branch_op and delay_slot
+addiu	$k0,$t2,8		# k0 = $t2+8 (ErrorEPC+8) pass branch_op and delay_slot
 mtc0	$k0,$30			# store k0 in Error Exception Program Counter
 sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
@@ -1139,8 +1142,7 @@ nop
 B_BC0x:			# At present we do not implement COP0 branches
 B_BC1x:			# At present we do not implement COP1 branches
 B_skip:			# Unrecognized opcode, so just pass it by
-mfc0	$k0, $30	# k0 = ErrorEPC
-addiu	$k0, $k0, 4	# k0 = ErrorEPC+4 (-> next opcode)
+addiu	$k0, $t2, 4	# k0 = $t2+4 (ErrorEPC+4) (-> next opcode)
 mtc0	$k0, $30	# store k0 in Error Exception Program Counter
 sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
@@ -1148,6 +1150,7 @@ GSHandler_Final_Exit:
 la $k1, MIPS_Regs  # Restore MIPS_Regs via $k1
 lq $t0, 0x080($k1)
 lq $t1, 0x090($k1)
+lq $t2, 0x0A0($k1)
 lq $gp, 0x1C0($k1)
 lq $sp, 0x1D0($k1)
 lq $fp, 0x1E0($k1)

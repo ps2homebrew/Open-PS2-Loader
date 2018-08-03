@@ -146,9 +146,6 @@ sd	$ra, 0($sp)				# Push return address on stack
 la	$v0, GSMSourceSetGsCrt
 sh	$a0, Source_INT($v0)
 sh	$a1, Source_MODE($v0)
-
-// Remove all breakpoints (even when they aren't enabled)
-jal	Disable_GSBreakpoint
 sh	$a2, Source_FFMD($v0)
 
 //-----------------------------------------------------------------------------------------
@@ -1195,9 +1192,7 @@ mfbpc $a3
 sync.p			# Await instruction completion
 
 li $a2, 0x60280000	# Data read & write breakpoint on (DRE, DWE, DUE, DKE = 1). Syscalls are run in kernel mode, for the EE.
-or $a3, $a3, $a2
-xori $a3, $a3, 0x8000	# DEBUG exception trigger on (BED = 0)
-mtbpc $a3
+mtbpc $a2
 
 sync.p			#  Await instruction completion
 

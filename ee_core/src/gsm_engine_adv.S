@@ -67,30 +67,12 @@ sd	$zero, GS_SMODE2($v0)	# This mode is a progressive mode. Hence it has to be n
 li      $v1, 4
 sd	$v1, GS_SRFSH($v0)	# store it
 
+//As with 480P mode, there is no need to enable the PLL.
+
 //*GS_SMODE1=0x0000001740490504;
-//Switch on PLL (clear SINT)
+//Sync on (clear SINT)
 lui     $v1, 0x0017
 ori     $v1, 0x4049
-dsll    $v1, 16
-ori     $v1, 0x0504
-or	$v1, $a0
-sd		$v1, GS_SMODE1($v0)	# store it
-
-//Wait 2.5ms
-li $v1, 0x7A120
-nop
-DTV_576P_SMODE1_delay_loop:
-vnop
-vnop
-addiu $v1, 0xFFFF
-vnop
-vnop
-bnez $v1, DTV_576P_SMODE1_delay_loop
-nop
-
-//*GS_SMODE1=0x0000001740480504;	// Have bits 16 and 17 cleared.
-lui     $v1, 0x0017
-ori     $v1, 0x4048
 dsll    $v1, 16
 ori     $v1, 0x0504
 or	$v1, $a0

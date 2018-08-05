@@ -91,6 +91,11 @@ void PrepareGSM(char *cmdline)
     int k576p_fix, kGsDxDyOffsetSupported, fd, FIELD_fix;
     char romver[16], romverNum[5], *pROMDate;
 
+#ifdef _DTL_T10000
+    if (predef_vmode[gGSMVMode].mode == GS_MODE_DTV_576P) //There is no 576P code implemented for development TOOLs.
+        gGSMVMode = 2; //Change to PAL instead.
+#endif
+
     k576p_fix = 0;
     kGsDxDyOffsetSupported = 0;
     if((fd = fileXioOpen("rom0:ROMVER", O_RDONLY)) >= 0) {

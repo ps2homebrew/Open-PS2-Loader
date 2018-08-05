@@ -12,6 +12,7 @@
 #define _DVE_REG_H_
 
 void dve_prepare_bus(void);
-int dve_set_reg(u32 cfg1, u32 cfg2);
+int dve_get_reg(u32 reg);
+int dve_set_reg(u32 reg, u32 val);
 
 #endif

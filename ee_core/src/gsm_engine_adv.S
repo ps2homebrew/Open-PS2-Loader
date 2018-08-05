@@ -12,11 +12,15 @@
 #
 
 .extern setdve_576P
+.extern dveStat1
+.extern dveStat2
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 .ent DTV_576P
 DTV_576P:
+addiu	$sp, $sp, -0x10
+sd	$ra, 0($sp)
 
 //$a0 = GCONT setting (RGB or Y Pb/Cb Pr/Cr)
 sll	$a0, $a3, 25
@@ -91,8 +95,48 @@ dsll    $v1, 16
 ori     $v1, 0x0504
 or	$v1, $a0
 
-j setdve_576P				# Set up DVE parameters
+jal	setdve_576P			# Set up DVE parameters
 sd		$v1, GS_SMODE1($v0)	# store it
+
+lw	$v1, dveStat1
+li	$v0, 0x1C
+andi	$v1, $v1, 0xFE
+bne	$v1, $v0, DTV576P_end
+addiu	$v1, $zero, 0x20
+
+lw	$v0, dveStat2
+andi	$v0, $v0, 0xF0
+bne	$v0, $v1, DTV576P_stat2_020_skip
+addiu	$a0, $zero, 0x63
+
+jal	dve_set_reg
+addiu	$a1, $zero, 0x88
+
+DTV576P_stat2_020_skip:
+addiu	$a0, $zero, 0x30
+jal	dve_set_reg
+move	$a1, $zero
+
+addiu	$a0, $zero, 0x31
+jal	dve_set_reg
+addiu	$a1, $zero, 0x07
+
+addiu	$a0, $zero, 0x32
+jal	dve_set_reg
+addiu	$a1, $zero, 0x01
+
+addiu	$a0, $zero, 0x33
+jal	dve_set_reg
+addiu	$a1, $zero, 0x14
+
+addiu	$a0, $zero, 0x38
+jal	dve_set_reg
+addiu	$a1, $zero, 0x10
+
+DTV576P_end:
+ld	$ra, 0($sp)
+jr	$ra
+addiu	$sp, $sp, 0x10
 
 .end DTV_576P
 

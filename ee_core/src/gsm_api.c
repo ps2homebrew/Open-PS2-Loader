@@ -16,17 +16,24 @@
 #include <syscallnr.h>
 
 #include "gsm_api.h"
+#include "dve_reg.h"
 
 #define MAKE_J(func) (u32)((0x02 << 26) | (((u32)func) / 4)) // Jump (MIPS instruction)
 #define NOP 0x00000000                                       // No Operation (MIPS instruction)
 
 extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd);
 
+// Taken from gsKit
+// NTSC
+#define GS_MODE_NTSC 0x02
+// PAL
+#define GS_MODE_PAL  0x03
+
 struct GSMDestSetGsCrt
 {
-    unsigned int interlace;
-    unsigned int mode;
-    unsigned int ffmd;
+    s16 interlace;
+    s16 mode;
+    s16 ffmd;
 };
 
 struct GSMDestGSRegs
@@ -57,7 +64,8 @@ struct GSMFlags
     u8 SYNCV_fix;
     u8 DISPFB_fix;
     u8 DISPLAY_fix;
-    u8 FIELD_stat;
+    u8 FIELD_fix;
+    u8 gs576P_param;
 };
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
@@ -69,15 +77,18 @@ extern void GSHandler();
 
 static unsigned int KSEG_backup[2]; //Copies of the original words at 0x80000100 and 0x80000104.
 
-/*-------------------*/
 /* Update GSM params */
 /*-------------------*/
+/*-------------------*/
 // Update parameters to be enforced by Hook_SetGsCrt syscall hook and GSHandler service routine functions
-void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset)
+void UpdateGSMParams(s16 interlace, s16 mode, s16 ffmd, u64 display, u64 syncv, u64 smode2, u32 dx_offset, u32 dy_offset, int k576p_fix, int kGsDxDyOffsetSupported, int FIELD_fix)
 {
-    GSMDestSetGsCrt.interlace = (u32)interlace;
-    GSMDestSetGsCrt.mode = (u32)mode;
-    GSMDestSetGsCrt.ffmd = (u32)ffmd;
+    unsigned int hvParam = GetGsVParam();
+    int gs_DH, gs_DW, gs_DY, gs_DX;
+
+    GSMDestSetGsCrt.interlace = interlace;
+    GSMDestSetGsCrt.mode = mode;
+    GSMDestSetGsCrt.ffmd = ffmd;
 
     GSMDestGSRegs.smode2 = (u8)smode2;
     GSMDestGSRegs.display1 = (u64)display;
@@ -87,15 +98,23 @@ void UpdateGSMParams(u32 interlace, u32 mode, u32 ffmd, u64 display, u64 syncv, 
     GSMFlags.dx_offset = (u32)dx_offset; // X-axis offset -> Use it only when automatic adaptations formulas don't suffice
     GSMFlags.dy_offset = (u32)dy_offset; // Y-axis offset -> Use it only when automatic adaptations formulas don't suffice
     // 0 = Off, 1 = On
-    GSMFlags.ADAPTATION_fix = (u8)1; // Default = 1 = On
-    GSMFlags.PMODE_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SMODE1_fix = (u8)0;     // Default = 0 = Off
-    GSMFlags.SMODE2_fix = (u8)1;     // Default = 1 = On
-    GSMFlags.SRFSH_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SYNCH_fix = (u8)0;      // Default = 0 = Off
-    GSMFlags.SYNCV_fix = (u8)1;      // Default = 1 = On
-    GSMFlags.DISPFB_fix = (u8)1;     // Default = 1 = On
-    GSMFlags.DISPLAY_fix = (u8)1;    // Default = 1 = On
+    GSMFlags.ADAPTATION_fix = 1; // Default = 1 = On
+    GSMFlags.PMODE_fix = 0;      // Default = 0 = Off
+    GSMFlags.SMODE1_fix = 0;     // Default = 0 = Off
+    GSMFlags.SMODE2_fix = 1;     // Default = 1 = On
+    GSMFlags.SRFSH_fix = 0;      // Default = 0 = Off
+    GSMFlags.SYNCH_fix = 0;      // Default = 0 = Off
+    GSMFlags.SYNCV_fix = 0;      // Default = 0 = Off
+    GSMFlags.DISPFB_fix = 1;     // Default = 1 = On
+    GSMFlags.DISPLAY_fix = 1;    // Default = 1 = On
+    GSMFlags.FIELD_fix = (FIELD_fix ? (1 << 2) : 0);
+    GSMFlags.gs576P_param = (k576p_fix ? (1 << 1) : 0) | (hvParam & 1);
+
+    if (kGsDxDyOffsetSupported && (!(mode >= GS_MODE_NTSC && mode <= GS_MODE_PAL))) {
+        _GetGsDxDyOffset(mode, &gs_DX, &gs_DY, &gs_DW, &gs_DH);
+        GSMFlags.dx_offset += gs_DX;
+        GSMFlags.dy_offset += gs_DY;
+    }
 }
 
 /*------------------------------------------------------------------*/
@@ -181,3 +200,16 @@ void DisableGSM(void)
     // Remove Display Handler
     Remove_GSHandler();
 }
+
+/*--------------------------------------------*/
+/* Set up the DVE for 576P mode               */
+/*--------------------------------------------*/
+void setdve_576P(void)
+{	//The parameters are exactly the same as the 480P mode's. Regardless of the model, GS revision or region.
+	dve_prepare_bus();
+
+	dve_set_reg(0x77, 0x11);
+	dve_set_reg(0x93, 0x01);
+	dve_set_reg(0x91, 0x02);
+}
+

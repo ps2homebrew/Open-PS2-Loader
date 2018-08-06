@@ -32,7 +32,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Theme",
     "Language",
     "The system will be powered off.",
-    "Exit to Browser/OSDSYS?",
+    "Exit to Browser?",
     "Cancel updating?",
     "%d: HardDisk Drive not detected",
     "%d: HardDisk Drive not formatted",
@@ -225,7 +225,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Value in second(s), 0 to disable auto start",
     "PS2 Logo",
     "(Only displayed for a valid disc logo which matches the console's region)",
-#ifdef PADEMU
     "Configure PADEMU",
     "Pad Emulator Settings",
     "Enable PadEmulator",
@@ -262,7 +261,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Select port for Multitap emulation.",
     "Disable workaround for fake ds3",
     "Some fake ds3s need workaround, this option will disable it.",
-#endif
+    "Emulate FIELD flipping",
+    "Fix for games that glitch under progressive video modes.",
 //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

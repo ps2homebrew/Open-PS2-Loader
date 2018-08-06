@@ -734,7 +734,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 #ifdef GSM
 #define GSM_SPECIFIER " %d"
-#define GSM_ARGUMENT , gEnableGSM
+#define GSM_ARGUMENT , GetGSMEnabled()
 #else
 #define GSM_SPECIFIER
 #define GSM_ARGUMENT

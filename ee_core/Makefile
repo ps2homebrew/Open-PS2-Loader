@@ -13,7 +13,7 @@ EE_BIN = ee_core.elf
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 
-GSMCORE_EE_OBJS = gsm_engine.o gsm_api.o
+GSMCORE_EE_OBJS = gsm_engine.o gsm_api.o dve_reg.o
 IGSCORE_EE_OBJS = igs_api.o
 CHEATCORE_EE_OBJS = cheat_engine.o cheat_api.o
 

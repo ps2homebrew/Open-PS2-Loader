@@ -394,13 +394,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     }
 
 #ifdef GSM
-    gEnableGSM = 0;
-    //Load the rest of the per-game GSM configuration, only if GSM is enabled.
-    if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
-        configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
-        configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
-        configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
-    }
+    InitGSMConfig(configSet);
 #endif
 
 #ifdef CHEAT

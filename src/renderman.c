@@ -100,7 +100,9 @@ void rmUnloadTexture(GSTEXTURE *txt)
 
 void rmStartFrame(void)
 {
+#ifndef HIRES
     gsKit_clear(gsGlobal, gColBlack);
+#endif
     order = 0;
 }
 

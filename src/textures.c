@@ -44,8 +44,7 @@ extern void *info_overlay_png;
 //END of OPL_DB tweaks
 
 // Not related to screen size, just to limit at some point
-static int maxWidth = 720;
-static int maxHeight = 512;
+static int maxSize = 720*512*4;
 
 typedef struct
 {
@@ -110,6 +109,17 @@ static void texUpdate(GSTEXTURE *texture, int width, int height)
 {
     texture->Width = width;
     texture->Height = height;
+}
+
+static int texSizeValidate(int width, int height, short psm)
+{
+    if (width > 1024 || height > 1024)
+        return -1;
+
+    if (gsKit_texture_size(width, height, psm) > maxSize)
+        return -1;
+
+    return 0;
 }
 
 void texPrepare(GSTEXTURE *texture, short psm)
@@ -277,7 +287,7 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     png_uint_32 pngWidth, pngHeight;
     int bitDepth, colorType, interlaceType;
     png_get_IHDR(pngPtr, infoPtr, &pngWidth, &pngHeight, &bitDepth, &colorType, &interlaceType, NULL, NULL);
-    if (pngWidth > maxWidth || pngHeight > maxHeight)
+    if (texSizeValidate(pngWidth, pngHeight, psm) < 0)
         return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     texUpdate(texture, pngWidth, pngHeight);
 
@@ -336,7 +346,7 @@ int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     if (file) {
         jpg = jpgOpenFILE(file, JPG_NORMAL);
         if (jpg != NULL) {
-            if (jpg->width > maxWidth || jpg->height > maxHeight)
+            if (texSizeValidate(jpg->width, jpg->height, psm) < 0)
                 return ERR_BAD_DIMENSION;
 
             size_t size = gsKit_texture_size_ee(jpg->width, jpg->height, psm);
@@ -371,7 +381,6 @@ extern GSGLOBAL *gsGlobal;
 int texBmpLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
 {
     texPrepare(texture, GS_PSM_CT24);
-    int result = ERR_BAD_FILE;
     char filePath[256];
 
     if (texId != -1)
@@ -380,8 +389,23 @@ int texBmpLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
         snprintf(filePath, sizeof(filePath), "%s.bmp", path);
 
     texture->Delayed = 1;
-    result = gsKit_texture_bmp(gsGlobal, texture, filePath);
+    if (gsKit_texture_bmp(gsGlobal, texture, filePath) < 0)
+        return ERR_BAD_FILE;
+
     texture->Filter = GS_FILTER_LINEAR;
 
-    return result;
+    if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
+        if (texture->Mem) {
+            free(texture->Mem);
+            texture->Mem = NULL;
+        }
+        if (texture->Clut) {
+            free(texture->Clut);
+            texture->Clut = NULL;
+        }
+
+        return ERR_BAD_DIMENSION;
+    }
+
+    return 0;
 }

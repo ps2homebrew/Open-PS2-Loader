@@ -721,14 +721,14 @@ static void drawItemsList(struct menu_list *menu, struct submenu_list *item, con
             if (itemsList->decoratorImage) {
                 GSTEXTURE *itemIconTex = getGameImageTexture(itemsList->decoratorImage->cache, menu->item->userdata, &ps->item);
                 if (itemIconTex && itemIconTex->Mem)
-                    rmDrawPixmap(itemIconTex, posX, posY, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
+                    rmDrawPixmap(itemIconTex, posX, posY, elem->aligned, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
                 else {
                     if (itemsList->decoratorImage->defaultTexture)
-                        rmDrawPixmap(&itemsList->decoratorImage->defaultTexture->source, posX, posY, ALIGN_NONE, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
+                        rmDrawPixmap(&itemsList->decoratorImage->defaultTexture->source, posX, posY, elem->aligned, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
                 }
-                fntRenderString(elem->font, posX + DECORATOR_SIZE, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
+                fntRenderString(elem->font, elem->posX + DECORATOR_SIZE, posY, elem->aligned, elem->width, elem->height, submenuItemGetText(&ps->item), color);
             } else
-                fntRenderString(elem->font, posX, posY, ALIGN_NONE, elem->width, elem->height, submenuItemGetText(&ps->item), color);
+                fntRenderString(elem->font, elem->posX, posY, elem->aligned, elem->width, elem->height, submenuItemGetText(&ps->item), color);
 
             posY += MENU_ITEM_HEIGHT;
             ps = ps->next;

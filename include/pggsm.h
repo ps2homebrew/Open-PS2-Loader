@@ -16,7 +16,7 @@
 #ifndef __PGGSM_H
 #define __PGGSM_H
 
-#define GSM_VERSION "0.39"
+#define GSM_VERSION "0.40"
 
 #define makeSMODE1(VHP, VCKSEL, SLCK2, NVCK, CLKSEL, PEVS, PEHS, PVS, PHS, GCONT, SPML, PCK2, XPCK, SINT, PRST, EX, CMOD, SLCK, T1248, LC, RC) \
     (u64)(((u64)(VHP) << 36) | ((u64)(VCKSEL) << 34) | ((u64)(SLCK2) << 33) |                                                                  \
@@ -47,11 +47,8 @@ typedef struct predef_vmode_struct
     u64 syncv;
 } predef_vmode_struct;
 
-int gEnableGSM;  // Enables GSM - 0 for Off, 1 for On
-int gGSMVMode;   // See the related predef_vmode
-int gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
-int gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
-
+void InitGSMConfig(config_set_t *configSet);
+int GetGSMEnabled(void);
 void PrepareGSM(char *cmdline);
 
 #endif

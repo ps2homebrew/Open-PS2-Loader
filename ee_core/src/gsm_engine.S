@@ -37,13 +37,16 @@
 
 
 .globl MIPS_Regs
-MIPS_Regs:			.space	0x200
+MIPS_Regs:			.space	0x220
 
 .globl Old_SetGsCrt
 Old_SetGsCrt:		.word 0
 
 .globl GSMSourceSetGsCrt
-GSMSourceSetGsCrt:	.space 12
+GSMSourceSetGsCrt:	.space 6
+
+.globl GSMDestSetGsCrt
+GSMDestSetGsCrt:	.space 6
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -52,32 +55,15 @@ GSMSourceGSRegs: .space 88
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-.globl GSMDestSetGsCrt
-GSMDestSetGsCrt:	.space 12
-
-.p2align 4	# align 16 bytes (IMPORTANT!!!)
-
 .globl GSMDestGSRegs
 GSMDestGSRegs: .space 88
 
 .globl GSMFlags
-GSMFlags: .space 18
-.equ X_offset,              0 # WORD
-.equ Y_offset,              4 # WORD
-.equ ADAPTATION_fix,        8 # BYTE
-.equ PMODE_fix,             9 # BYTE
-.equ SMODE1_fix,           10 # BYTE
-.equ SMODE2_fix,           11 # BYTE
-.equ SRFSH_fix,            12 # BYTE
-.equ SYNCH_fix,            13 # BYTE
-.equ SYNCV_fix,            14 # BYTE
-.equ DISPFB_fix,           15 # BYTE
-.equ DISPLAY_fix,          16 # BYTE
-.equ FIELD_stat,           17 # BYTE
+GSMFlags: .space 19
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
-GSMAdapts:	.space 19
+GSMAdapts:	.space 18
 
 .p2align 4	# align 16 bytes (IMPORTANT!!!)
 
@@ -156,37 +142,19 @@ BD_t2:
 Hook_SetGsCrt:
 addiu	$sp, $sp, -0x0010			# reserve 16 bytes stack space (1 reg)
 sd	$ra, 0($sp)				# Push return address on stack
+
 la	$v0, GSMSourceSetGsCrt
-sw	$a0, Source_INT($v0)
-sw	$a1, Source_MODE($v0)
-sw	$a2, Source_FFMD($v0)
-
-and	$a3, $a0,$a2				# a3 = Interlace & Field
-andi	$a3, $a3,1				# a3 &= 1 limited to 1 bit
-la	$v0, GSMAdapts
-sb	$a3, Interlace_FRAME_Mode_Flag($v0)
-
-//-----------------------------------------------------------------------------------------
-
-// RC (Read Circuit) adaptation for avoiding garbage on screen ex.: Sega Genesis Collection (SLUS_215.42)
-la	$v0, GSMAdapts
-li	$a0, 1                  # Enable RC_adaptation
-sb	$a0, RC_adaptation($v0)
-
-//-----------------------------------------------------------------------------------------
-
-// Remove all breakpoints (even when they aren't enabled)
-jal Disable_GSBreakpoint
-nop
+sh	$a0, Source_INT($v0)
+sh	$a1, Source_MODE($v0)
+sh	$a2, Source_FFMD($v0)
 
 //-----------------------------------------------------------------------------------------
 
 la	$v0, GSMDestSetGsCrt
-lw	$a0, Target_INT($v0)
-lw	$a1, Target_MODE($v0)
-lw	$a2, Target_FFMD($v0)
-sync.l						# The opcodes sync.l and sync.p made a lot of games compatible
-sync.p						# They ensure all values are stable before the following call
+lh	$a0, Target_INT($v0)
+lh	$a1, Target_MODE($v0)
+lh	$a2, Target_FFMD($v0)
+sync.l						# Wait for any outstanding stores to registers to complete before calling SetGsCrt. A lot of games were made compatible because of this.
 
 //-----------------------------------------------------------------------------------------
 
@@ -197,40 +165,26 @@ sync.p						# They ensure all values are stable before the following call
 //Otherwise, call the original SetGsCrt() syscall handler and let it configure the GS for us.
 //
 
-addiu	$a3, $zero, GS_MODE_DTV_480P
-bne	$a1, $a3, Skip_DTV_480P
-addiu	$a3, $zero, GS_MODE_DTV_576P
+li	$a3, GS_MODE_DTV_576P
+la	$t0, GSMFlags
+bne	$a1, $a3, Call_SetGsCrt
+lb	$v1, gs576P_param($t0)			# v0 = 576P_parm
+andi	$v0, $v1, 2
+beqz	$v0, Call_SetGsCrt			# If the console supports 576P, use SetGsCrt.
+andi	$a3, $v1, 1				# GCONT setting.
 
-jal DTV_480P
-nop
-
-j Skip_Call_Original_SetGsCrt
-nop
-
-Skip_DTV_480P:
-bne	$a1, $a3, Skip_DTV_576P
-addiu	$a3, $zero, GS_MODE_DTV_1080P
+//-----------------------------------------------------------------------------------------
 
 jal DTV_576P
 nop
 
-j Skip_Call_Original_SetGsCrt
+b Skip_Call_Original_SetGsCrt
 nop
 
 //-----------------------------------------------------------------------------------------
 
-Skip_DTV_576P:
-bne	$a1, $a3, Skip_DTV_1080P
-nop
 
-jal DTV_1080P
-nop
-
-j Skip_Call_Original_SetGsCrt
-nop
-
-//-----------------------------------------------------------------------------------------
-Skip_DTV_1080P:
+Call_SetGsCrt:
 lw	$a3, Old_SetGsCrt		# a3 -> original SetGsCrt function
 jalr	$a3					# Call original SetGsCrt
 nop
@@ -274,44 +228,46 @@ addiu	$sp, $sp, 0x0010			# Restore sp during return
 .globl GSHandler
 .ent	GSHandler
 GSHandler:
-sync.l
-sync.p
-
-sq $k0, -0x10($zero) # Store $k1 register (reserved for kernel usage in interrupt and trap handling)
-sq $k1, -0x20($zero) # Store $k1 register (reserved for kernel usage in interrupt and trap handling)
-la $k0, MIPS_Regs  # Store MIPS_Regs via $k0
-# sq $zero, 0x000($k0)
-sq $at, 0x010($k0)
-sq $v0, 0x020($k0)
-sq $v1, 0x030($k0)
-sq $a0, 0x040($k0)
-sq $a1, 0x050($k0)
-sq $a2, 0x060($k0)
-sq $a3, 0x070($k0)
-sq $t0, 0x080($k0)
-sq $t1, 0x090($k0)
-sq $t2, 0x0A0($k0)
-sq $t3, 0x0B0($k0)
-sq $t4, 0x0C0($k0)
-sq $t5, 0x0D0($k0)
-sq $t6, 0x0E0($k0)
-sq $t7, 0x0F0($k0)
-sq $s0, 0x100($k0)
-sq $s1, 0x110($k0)
-sq $s2, 0x120($k0)
-sq $s3, 0x130($k0)
-sq $s4, 0x140($k0)
-sq $s5, 0x150($k0)
-sq $s6, 0x160($k0)
-sq $s7, 0x170($k0)
-sq $t8, 0x180($k0)
-sq $t9, 0x190($k0)
-sq $k0, 0x1A0($k0)
-sq $k1, 0x1B0($k0)
-sq $gp, 0x1C0($k0)
-sq $sp, 0x1D0($k0)
-sq $fp, 0x1E0($k0)
-sq $ra, 0x1F0($k0)
+# $k1 is used to save the context by the Level 2 exception handler. $k1 is reserved for kernel usage in interrupt and trap handling.
+sq $k1, -0x20($zero) # Store $k1 register in the same place as the kernel does, via kseg3.
+la $k1, MIPS_Regs  # Store MIPS_Regs via $k0
+# sq $zero, 0x000($k1)
+sq $at, 0x010($k1)
+sq $v0, 0x020($k1)
+sq $v1, 0x030($k1)
+sq $a0, 0x040($k1)
+sq $a1, 0x050($k1)
+sq $a2, 0x060($k1)
+sq $a3, 0x070($k1)
+sq $t0, 0x080($k1)
+sq $t1, 0x090($k1)
+sq $t2, 0x0A0($k1)
+sq $t3, 0x0B0($k1)
+sq $t4, 0x0C0($k1)
+sq $t5, 0x0D0($k1)
+sq $t6, 0x0E0($k1)
+sq $t7, 0x0F0($k1)
+sq $s0, 0x100($k1)
+sq $s1, 0x110($k1)
+sq $s2, 0x120($k1)
+sq $s3, 0x130($k1)
+sq $s4, 0x140($k1)
+sq $s5, 0x150($k1)
+sq $s6, 0x160($k1)
+sq $s7, 0x170($k1)
+sq $t8, 0x180($k1)
+sq $t9, 0x190($k1)
+sq $k0, 0x1A0($k1)
+sq $gp, 0x1C0($k1)
+sq $sp, 0x1D0($k1)
+sq $fp, 0x1E0($k1)
+sq $ra, 0x1F0($k1)
+pmfhi $v0
+sq $v0, 0x200($k1)
+pmflo $v0
+sq $v0, 0x210($k1)
+lq $v0, -0x20($zero)
+sq $v0, 0x1B0($k1) #$k1 can now be saved properly.
 
 #
 # The read/write ErrorEPC register holds the virtual address at which instruction
@@ -412,7 +368,7 @@ jal get_access_info
 nop
 
 addi	$v1,$v0, -GS_CSR
-beqzl	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
+beqz	$v1,have_CSR_read			# in case of  src == GS_reg_CSR
 nop
 
 not_wanted_reg_read:				# Register unwanted, so perform op unchanged
@@ -483,46 +439,35 @@ nop
 ld	$a1, 0($a1)		# a1 = value in rt
 
 addi	$v1,$v0, -GS_PMODE
-beqzl	$v1,have_PMODE_write			# in case of  dest == GS_reg_PMODE
-nop
+beqz	$v1,have_PMODE_write			# in case of  dest == GS_reg_PMODE
 addi	$v1,$v0, -GS_SMODE1
-beqzl	$v1,have_SMODE1_write			# in case of  dest == GS_reg_SMODE1
-nop
+beqz	$v1,have_SMODE1_write			# in case of  dest == GS_reg_SMODE1
 addi	$v1,$v0, -GS_SMODE2
-beqzl	$v1,have_SMODE2_write			# in case of  dest == GS_reg_SMODE2
-nop
+beqz	$v1,have_SMODE2_write			# in case of  dest == GS_reg_SMODE2
 addi	$v1,$v0, -GS_SRFSH
-beqzl	$v1,have_SRFSH_write			# in case of  dest == GS_reg_SRFSH
-nop
+beqz	$v1,have_SRFSH_write			# in case of  dest == GS_reg_SRFSH
 addi	$v1,$v0, -GS_SYNCH1
-beqzl	$v1,have_SYNCH1_write			# in case of  dest == GS_reg_SYNCH1
-nop
+beqz	$v1,have_SYNCH1_write			# in case of  dest == GS_reg_SYNCH1
 addi	$v1,$v0, -GS_SYNCH2
-beqzl	$v1,have_SYNCH2_write			# in case of  dest == GS_reg_SYNCH2
-nop
+beqz	$v1,have_SYNCH2_write			# in case of  dest == GS_reg_SYNCH2
 addi	$v1,$v0, -GS_SYNCV
-beqzl	$v1,have_SYNCV_write			# in case of  dest == GS_reg_SYNCV
-nop
+beqz	$v1,have_SYNCV_write			# in case of  dest == GS_reg_SYNCV
 addi	$v1,$v0, -GS_DISPFB1
-beqzl	$v1,have_DISPFB1_write			# in case of  dest == GS_reg_DISPFB1
-nop
+beqz	$v1,have_DISPFB1_write			# in case of  dest == GS_reg_DISPFB1
 addi	$v1,$v0, -GS_DISPFB2
-beqzl	$v1,have_DISPFB2_write			# in case of  dest == GS_reg_DISPFB2
-nop
+beqz	$v1,have_DISPFB2_write			# in case of  dest == GS_reg_DISPFB2
 addi	$v1,$v0, -GS_DISPLAY1
-beqzl	$v1,have_DISPLAY1_write			# in case of  dest == GS_reg_DISPLAY1
-nop
+beqz	$v1,have_DISPLAY1_write			# in case of  dest == GS_reg_DISPLAY1
 addi	$v1,$v0, -GS_DISPLAY2
-beqzl	$v1,have_DISPLAY2_write			# in case of  dest == GS_reg_DISPLAY2
+beqz	$v1,have_DISPLAY2_write			# in case of  dest == GS_reg_DISPLAY2
 nop
 
 not_wanted_reg:					# Register unwanted, so perform op unchanged
+b	exit_GSHandler
 sd	$a1,0($a3)				# Store source data unchanged to destination
-beqzl	$zero,exit_GSHandler
-nop
 
 ignore:				# We just ignore weird opcodes that we don't implement
-beqzl	$zero,exit_GSHandler
+b	exit_GSHandler
 nop
 
 # ----------------------------
@@ -559,9 +504,7 @@ beql	$v0,$zero,store_v0_as_PMODE		# in case of  Target_PMODE is zero
 or	$v0,$zero,$a1						# go use Source_PMODE
 
 store_v0_as_PMODE:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing 
 
 # ----------------------------
@@ -597,9 +540,7 @@ andi	$v0,$v0,0xFFFD					# v0 = Target_SMODE2 without FFMD
 or	$v0,$v0,$a1							# v0 = Target_SMODE2 + Source FFMD
 
 store_v0_as_SMODE2:
-sync.l									# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p									# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -607,14 +548,11 @@ sd	$v0,0($a3)							# after storing
 #
 have_DISPFB1_write:
 sd	$a1, Source_DISPFB1($s0)			# Source_DISPFB1 = a1
-ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
 
 jal have_DISPFB_write
-nop
+ld	$v0, Target_DISPFB1($s1)			# v0 = Target_DISPFB1
 
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -622,14 +560,11 @@ sd	$v0,0($a3)							# after storing
 #
 have_DISPFB2_write:
 sd	$a1, Source_DISPFB2($s0)			# Source_DISPFB2 = a1
-ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
 
 jal have_DISPFB_write
-nop
+ld	$v0, Target_DISPFB2($s1)			# v0 = Target_DISPFB2
 
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler			# Now go exit
+b	exit_GSHandler			# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -637,10 +572,9 @@ sd	$v0,0($a3)							# after storing
 # 
 have_DISPLAY1_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY1($s0)			# request DISPLAY1 value = a1
-ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
 jal	have_DISPLAY_write
-nop
+ld	$v1, Target_DISPLAY1($s1)			# v1=forcing DISPLAY1 template
 
 sd	$v0, Adapted_DISPLAY1($s3)  # Store new DISPLAY1 value (for feedback)
 
@@ -649,9 +583,7 @@ beql	$v1,$zero,store_v0_as_DISPLAY1			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY1($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY1:
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-beqzl	$zero,exit_GSHandler	# Now go exit
+b	exit_GSHandler	# Now go exit
 sd	$v0,0($a3)							# after storing
 
 # ----------------------------
@@ -659,10 +591,9 @@ sd	$v0,0($a3)							# after storing
 # 
 have_DISPLAY2_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY2($s0)			# request DISPLAY2 value = a1
-ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
 jal	have_DISPLAY_write
-nop
+ld	$v1, Target_DISPLAY2($s1)			# v1=forcing DISPLAY2 template
 
 sd	$v0, Adapted_DISPLAY2($s3)  # Store new DISPLAY2 value (for feedback)
 
@@ -671,22 +602,8 @@ beql	$v1,$zero,store_v0_as_DISPLAY2			# in case of (DISPLAY_fix)
 ld	$v0, Target_DISPLAY2($s1)	# use forced mode without adaption
 
 store_v0_as_DISPLAY2:
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$v0,0($a3)		# store DISPLAY2
-
-# ------------------------------------------------------------------------------------------------------
-
-lb	$a1, RC_adaptation($s3)
-beqzl	$a1,exit_GSHandler	# in case of RC_adaptation is disabled, go exit
-nop
-
-sync.l				# The addition of these two lines (sync.l and sync.p) made a lot of titles compatible with GSM!
-sync.p				# These ones give a break to ee take a breath after patching and before enter original SetGsCrt
-sd	$zero, GS_DISPLAY1($s4)		# DISPLAY1 should never be displayed on this scenario (in order to avoid garbage on screen)
-beqzl	$zero,exit_GSHandler
-sb	$zero, RC_adaptation($s3)				# Disable RC_adaptation, since this patch should be applied only once, each time Hook_SetGsCrt is called.
-											# Sega Genesis Collection (SLUS_215.42) doesn't repeatedly write to GS Priviledge Registers, but God of War I (SCUS_973.99) does this!
+b	exit_GSHandler	# Now go exit
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAYx
@@ -730,15 +647,12 @@ addi	$t0,$t0,1		# t0 = Source_Width_Scale = Source_MAGH + 1
 dsrl32	$t1,$a1,0
 andi	$t1,$t1,0x0FFF
 addi	$t1,$t1,1		# t1 = Source_Width = Source_DW + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
+divu	$t1,$t0		# LO = Source_Pixels_Width = Source_Width / Source_Width_Scale
 dsrl32	$t0,$v1,0
 andi	$t5,$t0,0x0FFF
 mflo	$t4				# t4 = LO = Source_Pixels_Width
 addi	$t6,$t5,1		# t6 = Target_Width = Target_DW + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
-nop
-nop
+divu	$t6,$t4		# LO = Target_Width_Scale = Target_Width / Source_Pixels_Width
 mflo	$t0				# t0 = LO = Target_Width_Scale
 bne	$t0,$zero,have_DISPLAY_write_2		# in case of (!Target_Width_Scale)
 nop						# {
@@ -751,14 +665,11 @@ nop						# otherwise
 
 have_DISPLAY_write_2:                     # {
 addi	$t1,$t0,-16		# t1 = Target_Width_Scale - 16
-bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 0)
+bgtzl	$t1,have_DISPLAY_write_3			# in case of (Target_Width_Scale > 16)
 or	$t0,$zero,16		# 	t0 = Target_Width_Scale = 16;
 
 have_DISPLAY_write_3:
-mult	$t4,$t0			# LO = Calculated_Width = (Target_MAGH * Target_Width_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Width
+mult	$t1,$t4,$t0			# LO = Calculated_Width = (Source_Pixels_Width * Target_Width_Scale)
 addi	$t7,$t1,-1		# t7 = Calculated_DW = Calculated_Width - 1
 addi	$t4,$t0,-1		# t4 = Calculated_MAGH = Target_Width_Scale - 1
 sub	$t0,$t5,$t7			# t0 = Target_DW - Calculated_DW
@@ -792,8 +703,7 @@ or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGH)
 
 lw	$t1, X_offset($s2)	# t1 = X_offset (signed)
 add	$t6, $t6, $t1		# t6 = Calculated_DX = Calculated_DX + X_offset
-bgez	$t6, have_DISPLAY_write_7		# Is the result greater or equal to zero?
-nop
+bltzl	$t6, have_DISPLAY_write_7		# Is the result not greater or equal to zero?
 move	$t6, $zero		# t6 = Calculated_DX = 0
 have_DISPLAY_write_7:
 andi	$t6,$t6,0x0FFF
@@ -819,35 +729,28 @@ addi	$t0,$t0,1		# t0= Source_Height_Scale = Source_MAGV + 1
 dsrl32	$t1,$a1,12
 andi	$t1,$t1,0x07FF
 addi	$t1,$t1,1		# Source_Height = Source_DH + 1
-divu	$zero,$t1,$t0	# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
+divu	$t1,$t0		# LO = Source_Pixels_Height = Source_Height / Source_Height_Scale
 dsrl32	$t0,$v1,12
 andi	$t5,$t0,0x07FF
 mflo	$t4				# t4 = LO = Source_Pixels_Height
 addi	$t6,$t5,1		# t6 = Target_Height = Target_DH + 1
-nop
-divu	$zero,$t6,$t4	# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
-nop
-nop
+divu	$t6,$t4		# LO = Target_Height_Scale = Target_Height / Source_Pixels_Height
 mflo	$t0				# t0 = LO = Target_Height_Scale
 bne	$t0,$zero,have_DISPLAY_write_8		# in case of (!Target_Height_Scale)
 nop						# {
 or	$t7,$zero,$t5		# t7 = Target_DH = Target_Height - 1
 sub	$t0,$t6,$t4			# t0 = Target_Height - Source_Pixels_Height
-li	$t4,0				# t4 = Target_MAGV = 0
-beql	$zero,$zero,have_DISPLAY_write_10		# }
-nop						# otherwise
-						# Target_Height_Scale nonzero
+b	have_DISPLAY_write_10		# }
+move	$t4, $zero			# t4 = Target_MAGV = 0
+					# otherwise, Target_Height_Scale nonzero
 
 have_DISPLAY_write_8:						# {
 addi	$t1,$t0,-4		# t1 = Target_Height_Scale - 4
-bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 0)
+bgtzl	$t1,have_DISPLAY_write_9			# in case of (Target_Height_Scale > 4)
 or	$t0,$zero,4			# 	t0 = Target_Height_Scale = 4;
 
 have_DISPLAY_write_9:
-mult	$t4,$t0			# LO = Calculated_Height = (Target_MAGV * Target_Height_Scale)
-nop
-nop
-mflo	$t1				# t1 = LO = Calculated_Height
+mult	$t1,$t4,$t0			# t1 = Calculated_Height = (Source_Pixels_Height * Target_Height_Scale)
 addi	$t7,$t1,-1		# t7 = Calculated_DH = Calculated_Height - 1
 addi	$t4,$t0,-1		# t4 = Calculated_MAGV = Target_Height_Scale - 1
 sub	$t0,$t5,$t7			# t0 = Target_DH - Calculated_DH
@@ -898,8 +801,7 @@ or	$v0,$v0,$t0			# v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_MAGV)
 
 lw	$t1, Y_offset($s2)		# t1 = Y_offset (signed)
 add	$t6, $t6, $t1		# t6 = Calculated_DY = Calculated_DY + Y_offset
-bgez	$t6, have_DISPLAY_write_14		# Is the result greater or equal to zero?
-nop
+bltzl	$t6, have_DISPLAY_write_14		# Is the result not greater or equal to zero?
 move	$t6, $zero
 have_DISPLAY_write_14:
 andi	$t6,$t6,0x07FF
@@ -945,7 +847,6 @@ store_v0_as_DISPFB:
 jr $ra
 nop
 
-
 # ------------------------------------------------------------------------------------------------------
 
 # ----------------------------
@@ -965,15 +866,17 @@ bnez	$t0, not_wanted_reg_read
 
 #Emulate ODD/EVEN flipping of the CSR FIELD (bit 13).
 ld      $t0, GS_CSR($s4)		# t0 = CSR. Load CSR to check on the HSINT status
-lbu	$t1, FIELD_stat($s2)		# t1 = FIELD_status
+lbu	$t1, FIELD_fix($s2)		# t1 = FIELD_fix
 andi	$t2, $t0, 4			#Check HSINT event.
 beqz	$t2, not_wanted_reg_read	#Flip emulated FIELD status, only at the end of H-Blank.
+andi	$t2, $t1, 4			#Check whether the FIELD fix is enabled.
+beqz	$t2, not_wanted_reg_read
 xori	$t1, $t1, 2			#Flip counter. This counter is used to half the rate of flipping, since progressive modes have double the Horizontal frequency.
 andi	$t2, $t1, 2			#If counter == 0,
 beqzl	$t2, skip_flip
 xori	$t1, $t1, 1			#Flip odd/even FIELD status.
 skip_flip:
-sb	$t1, FIELD_stat($s2)		#Update status.
+sb	$t1, FIELD_fix($s2)		#Update status.
 andi	$t1, $t1, 1
 ori	$t0, $t0, 0x2000		#Clear FIELD field 1 ^ 1 = always 0.
 xori	$t0, $t0, 0x2000
@@ -983,6 +886,7 @@ or	$v0, $t0, $t1			#Replace FIELD field.
 
 exit_GSHandler:
 la $k0, MIPS_Regs  # Restore MIPS_Regs via $k0
+# We will keep a subset of these registers (not restored here) for the remainder of this process.
 # lq $zero, 0x000($k0)
 lq $at, 0x010($k0)
 lq $v0, 0x020($k0)
@@ -993,7 +897,7 @@ lq $a2, 0x060($k0)
 lq $a3, 0x070($k0)
 # lq $t0, 0x080($k0)
 # lq $t1, 0x090($k0)
-lq $t2, 0x0A0($k0)
+# lq $t2, 0x0A0($k0)
 lq $t3, 0x0B0($k0)
 lq $t4, 0x0C0($k0)
 lq $t5, 0x0D0($k0)
@@ -1015,29 +919,35 @@ lq $t9, 0x190($k0)
 # lq $sp, 0x1D0($k0)
 # lq $fp, 0x1E0($k0)
 # lq $ra, 0x1F0($k0)
+lq $k1, 0x200($k0)
+pmthi $k1
+lq $k1, 0x210($k0)
+pmtlo $k1
 
-# WARNING: Past this point in GSHandler, use should only $k0,$k1,$t0,$t1
+
+# WARNING: Past this point in GSHandler, use should only $k0,$k1,$t0,$t1,$t2
+# Now we will attempt to skip the current instruction, as the handler has already acted on behalf of it.
+# There is no function for stepping with the hardware breakpoint. Hence there is a need to consider how PC would have been advanced by the EE.
+# $t2 will contain the current ErrorEPC value.
 
 mfc0	$k0, $13		# k0 = Cause of last exception
 srl	$k0, 30			# BD2 Flags debug exception in branch delay slot.
 				# 1 -> delay slot, 0 -> normal
 andi	$k0, 1			# k0 = BD2 bit isolated
-bnez $k0,	GSHandler_BranchDelaySlotException
-				# Deal properly with Branch Delay Slot Exceptions (when needed)
-nop
 
-mfc0	$k0,$30			# k0 = ErrorEPC
-addiu	$k0,$k0,4		# k0 = ErrorEPC+4 (-> next opcode)
+bnez $k0,	GSHandler_BranchDelaySlotException	# Deal properly with Branch Delay Slot Exceptions (when needed)
+mfc0	$t2,$30			# t2 = Error Exception Program Counter (ErrorEPC/EPC)
+
+addiu	$k0,$t2,4		# k0 = ErrorEPC+4 (-> next opcode)
 mtc0	$k0,$30			# store k0 in Error Exception Program Counter
-sync				# ensure COP0 register update before proceeding
+sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
 b	GSHandler_Final_Exit
 nop
 
 # ----------------------------
 GSHandler_BranchDelaySlotException:
-mfc0	$k0,$30		# k0 = Error Exception Program Counter
-lw	$k0,0($k0)	# k0 = instruction at EPC location (branch or jump)
+lw	$k0,0($t2)	# k0 = instruction at EPC location (branch or jump)
 srl	$k1,$k0,26	# k1 = aligned for opcode (range 0x00-0x3F)
 andi	$k1,$k1,0x3F	# k1 = pure opcode number
 sll	$k1,$k1,2	# k1 = op_num*2 (offset for jump table)
@@ -1085,7 +995,7 @@ la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of JR/JALR rs register
 lw	$t0,0($t0)	# t0 = jump destination address
 mtc0	$t0,$30		# store t0 in Error Exception Program Counter
-sync		# ensure COP0 register update before proceeding
+sync.p		# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 
@@ -1096,9 +1006,13 @@ B_JAL:
 # Here we have a definite jump with absolute address/4 in instruction
 li	$t0, 0x3FFFFFF	# t0 = bitmask for jump destination bits
 and	$k1, $k0, $t0	# k1 = destination bits (== destination/4)
-sll	$t0, $k1, 2	# t0 = jump destination address
+sll	$t0, $k1, 2	# t0 = jump destination address[27:0]
+addiu	$t1, $t2, 4
+sra	$t1, $t1, 28
+sll	$t1, $t1, 28	# Extract (EPC+4)[31:28]
+or	$t0, $t0, $t1	# Append (EPC+4)[31:28] to instruction index.
 mtc0	$t0, $30	# store t0 in Error Exception Program Counter
-sync			# ensure COP0 register update before proceeding
+sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 
@@ -1119,11 +1033,10 @@ B_taken:
 li	$t0, 0xFFFF	# t0 = bitmask for branch offset bits
 and	$k1, $k0, $t0	# k1 = branch offset bits (== offset/4)
 sll	$k1, 2		# k1 = branch offset
-mfc0	$t0, $30	# t0 = Error Exception Program Counter
-addiu	$t0, 4		# t0 = ErrorEPC+4 (-> address after branch op)
+addiu	$t0, $t2, 4	# t0 = $t2+4 (ErrorEPC+4) (-> address after branch op)
 addu	$t0, $k1	# t0 = jump destination address
 mtc0	$t0, $30	# store t0 in Error Exception Program Counter
-sync			# ensure COP0 register update before proceeding
+sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 
@@ -1135,16 +1048,14 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 bltz	$t1,B_taken
 nop
 
 B_not_taken:
-mfc0	$k0,$30			# k0 = ErrorEPC
-addiu	$k0,$k0,8		# k0 = ErrorEPC+8 pass branch_op and delay_slot
+addiu	$k0,$t2,8		# k0 = $t2+8 (ErrorEPC+8) pass branch_op and delay_slot
 mtc0	$k0,$30			# store k0 in Error Exception Program Counter
-sync				# ensure COP0 register update before proceeding
+sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
 	
@@ -1156,8 +1067,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 bgez	$t1,B_taken
 nop
 b	B_not_taken
@@ -1170,8 +1080,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 blez	$t1,B_taken
 nop
 b	B_not_taken
@@ -1184,8 +1093,7 @@ andi	$k1,0x1F	# k1 = register number
 sll	$t1,$k1, 4	# t1 = array index for saved register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$t0,$t1		# t0 -> register data of rs register
-lq	$t1,0($t0)	# t1 = rs register data
-sync
+ld	$t1,0($t0)	# t1 = rs register data
 bgtz	$t1,B_taken
 nop
 b	B_not_taken
@@ -1198,14 +1106,12 @@ andi	$k1,0x1F	# k1 = rs register number
 sll	$k1,$k1, 4	# k1 = array index for saved rs register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$k1,$t0		# k1 -> register data of rs register
-lq	$t1,0($k1)	# t1 = rs register data
-sync
+ld	$t1,0($k1)	# t1 = rs register data
 srl	$k1,$k0, 16	# k1 = aligned for rt register number
 andi	$k1,0x1F	# k1 = rt register number
 sll	$k1,$k1, 4	# k1 = array index for saved rt register data
 addu	$k1,$t0		# k1 -> register data of rt register
-lq	$t0,0($k1)	# t0 = rt register data
-sync
+ld	$t0,0($k1)	# t0 = rt register data
 beq	$t0,$t1,B_taken
 nop
 b	B_not_taken
@@ -1218,14 +1124,12 @@ andi	$k1,0x1F	# k1 = rs register number
 sll	$k1,$k1, 4	# k1 = array index for saved rs register data
 la	$t0,MIPS_Regs	# t0 -> saved register array
 addu	$k1,$t0		# k1 -> register data of rs register
-lq	$t1,0($k1)	# t1 = rs register data
-sync
+ld	$t1,0($k1)	# t1 = rs register data
 srl	$k1,$k0, 16	# k1 = aligned for rt register number
 andi	$k1,0x1F	# k1 = rt register number
 sll	$k1,$k1, 4	# k1 = array index for saved rt register data
 addu	$k1,$t0		# k1 -> register data of rt register
-lq	$t0,0($k1)	# t0 = rt register data
-sync
+ld	$t0,0($k1)	# t0 = rt register data
 bne	$t0,$t1,B_taken
 nop
 b	B_not_taken
@@ -1235,26 +1139,23 @@ nop
 B_BC0x:			# At present we do not implement COP0 branches
 B_BC1x:			# At present we do not implement COP1 branches
 B_skip:			# Unrecognized opcode, so just pass it by
-mfc0	$k0, $30	# k0 = ErrorEPC
-addiu	$k0, $k0, 4	# k0 = ErrorEPC+4 (-> next opcode)
+addiu	$k0, $t2, 4	# k0 = $t2+4 (ErrorEPC+4) (-> next opcode)
 mtc0	$k0, $30	# store k0 in Error Exception Program Counter
-sync			# ensure COP0 register update before proceeding
+sync.p			# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 
 GSHandler_Final_Exit:
-la $k0, MIPS_Regs  # Restore MIPS_Regs via $k0
-lq $t0, 0x080($k0)
-lq $t1, 0x090($k0)
-lq $gp, 0x1C0($k0)
-lq $sp, 0x1D0($k0)
-lq $fp, 0x1E0($k0)
-lq $ra, 0x1F0($k0)
-lq $k0, -0x10($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
-lq $k1, -0x20($zero) # Restore $k1 register (reserved for kernel usage in interrupt and trap handling)
+la $k1, MIPS_Regs  # Restore MIPS_Regs via $k1
+lq $t0, 0x080($k1)
+lq $t1, 0x090($k1)
+lq $t2, 0x0A0($k1)
+lq $gp, 0x1C0($k1)
+lq $sp, 0x1D0($k1)
+lq $fp, 0x1E0($k1)
+lq $ra, 0x1F0($k1)
+lq $k0, 0x1A0($k1)
+lq $k1, 0x1B0($k1)
 
-sync.p
-sync.l
-eret			# 	Return from exception
-nop
+eret			# Return from exception. Subsequent instructions are not fetched.
 
 end_GSHandler:
 .end	GSHandler
@@ -1264,6 +1165,7 @@ end_GSHandler:
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# Must be executed with interrupts disabled.
 .globl Enable_GSBreakpoint
 .ent Enable_GSBreakpoint
 Enable_GSBreakpoint:
@@ -1273,6 +1175,8 @@ Enable_GSBreakpoint:
 li $a0, TRAP_BASE	# Address base for trapping
 li $a1, TRAP_MASK	# Address mask for trapping
 			# Trapping range is extended to match all kernel access segments
+
+sync.l			# Synchronize pipeline. Wait for any preceding loads to complete.
 
 li $a2, 0x8000
 mtbpc $a2		# All breakpoints off (BED = 1)
@@ -1288,9 +1192,7 @@ mfbpc $a3
 sync.p			# Await instruction completion
 
 li $a2, 0x60280000	# Data read & write breakpoint on (DRE, DWE, DUE, DKE = 1). Syscalls are run in kernel mode, for the EE.
-or $a3, $a3, $a2
-xori $a3, $a3, 0x8000	# DEBUG exception trigger on (BED = 0)
-mtbpc $a3
+mtbpc $a2
 
 sync.p			#  Await instruction completion
 
@@ -1298,9 +1200,12 @@ jr $ra
 nop
 .end Enable_GSBreakpoint
 
+# Must be executed with interrupts disabled.
 .globl Disable_GSBreakpoint
 .ent Disable_GSBreakpoint
 Disable_GSBreakpoint:
+sync.l			# Synchronize pipeline. Wait for any preceding loads to complete.
+
 li $a2, 0x8000
 mtbpc $a2		# All breakpoints off (BED = 1)
 sync.p			# Await instruction completion

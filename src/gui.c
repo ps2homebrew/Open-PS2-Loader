@@ -586,6 +586,7 @@ static void guiSetGSMSettingsState(void)
     diaSetEnabled(diaGSConfig, GSMCFG_GSMVMODE, isGSMEnabled);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, isGSMEnabled);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMYOFFSET, isGSMEnabled);
+    diaSetEnabled(diaGSConfig, GSMCFG_GSMFIELDFIX, isGSMEnabled);
 }
 
 static int guiGSMUpdater(int modified)
@@ -614,7 +615,6 @@ static void guiShowGSConfig(void)
         "HDTV 720p @60Hz",
         "HDTV 1080i @60Hz",
         "HDTV 1080i @60Hz Non Interlaced",
-        "HDTV 1080p @60Hz",
         "VGA 640x480p @60Hz",
         "VGA 640x480p @72Hz",
         "VGA 640x480p @75Hz",
@@ -1335,6 +1335,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
     diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
 
+    int GSMFIELDFix = 0;
+    configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix);
+    diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
+
     guiSetGSMSettingsState();
 #endif /* GSM */
 
@@ -1451,6 +1455,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
         configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
 #endif
 #ifdef CHEAT
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
@@ -1510,6 +1515,12 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
         else
             configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+
+        diaGetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, &GSMFIELDFix);
+        if (GSMFIELDFix != 0)
+            configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
 #endif
 
 #ifdef CHEAT

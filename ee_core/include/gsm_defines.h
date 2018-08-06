@@ -30,15 +30,18 @@
 .equ GS_BGCOLOUR, 0x00E0
 .equ GS_CSR,      0x1000
 
-# Built-in video modes (made possible by SP193 and reprep)
-GS_MODE_DTV_480P=0x50
+# Add-on video modes (made possible by SP193 and reprep)
 GS_MODE_DTV_576P=0x53
-GS_MODE_DTV_1080P=0x54
 
 # GSMSourceSetGsCrt
-.equ Source_INT,      0 # WORD
-.equ Source_MODE,     4 # WORD
-.equ Source_FFMD,     8 # WORD
+.equ Source_INT,      0 # HALF
+.equ Source_MODE,     2 # HALF
+.equ Source_FFMD,     4 # HALF
+
+# GSMDestSetGsCrt
+.equ Target_INT,      0 # HALF
+.equ Target_MODE,     2 # HALF
+.equ Target_FFMD,     4 # HALF
 
 # GSMSourceGSRegs
 .equ Source_PMODE,     0 # DWORD
@@ -52,11 +55,6 @@ GS_MODE_DTV_1080P=0x54
 .equ Source_DISPLAY1, 64 # DWORD
 .equ Source_DISPFB2,  72 # DWORD
 .equ Source_DISPLAY2, 80 # DWORD
-
-# GSMDestSetGsCrt
-.equ Target_INT,      0 # WORD
-.equ Target_MODE,     4 # WORD
-.equ Target_FFMD,     8 # WORD
 
 # GSMDestGSRegs
 .equ Target_PMODE,     0 # DWORD
@@ -83,11 +81,12 @@ GS_MODE_DTV_1080P=0x54
 .equ SYNCV_fix,            14 # BYTE
 .equ DISPFB_fix,           15 # BYTE
 .equ DISPLAY_fix,          16 # BYTE
+.equ FIELD_fix,            17 # BYTE
+.equ gs576P_param,         18 # BYTE
 
 # GSMAdapts
 .equ Adapted_DISPLAY1,             0 # DWORD
 .equ Adapted_DISPLAY2,             8 # DWORD
 .equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
 .equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value
-.equ RC_adaptation,               18 # BYTE -> RC (Read Circuit) adaptation for avoiding garbage on screen ex.: Sega Genesis Collection (SLUS_215.42)
 

@@ -22,7 +22,7 @@
 #include "include/pggsm.h"
 #endif
 #ifdef CHEAT
-#include "include/pgcht.h"
+#include "include/cheatman.h"
 #endif
 #ifdef PADEMU
 #include <libds34bt.h>

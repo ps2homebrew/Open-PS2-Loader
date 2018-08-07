@@ -25,9 +25,33 @@
 #include "include/cheatman.h"
 #include "include/ioman.h"
 
-#ifdef CHEAT
-#include "include/pgcht.h"
-#endif
+static int gEnableCheat; // Enables PS2RD Cheat Engine - 0 for Off, 1 for On
+static int gCheatMode;   // Cheat Mode - 0 Enable all cheats, 1 Cheats selected by user
+
+static int gCheatList[MAX_CHEATLIST]; //Store hooks/codes addr+val pairs
+
+void InitCheatsConfig(config_set_t *configSet)
+{
+    //Default values.
+    gEnableCheat = 0;
+    gCheatMode = 0;
+    memset(gCheatList, 0, sizeof(gCheatList));
+
+    //Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
+    if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
+        configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
+    }
+}
+
+int GetCheatsEnabled(void)
+{
+    return gEnableCheat;
+}
+
+const int *GetCheatsList(void)
+{
+    return gCheatList;
+}
 
 /*
  * make_code - Return a code object from string @s.
@@ -107,7 +131,7 @@ static inline int is_cmt_str(const char *s)
  * chr_idx - Returns the index within @s of the first occurrence of the
  * specified char @c.  If no such char occurs in @s, then (-1) is returned.
  */
-size_t chr_idx(const char *s, char c)
+static size_t chr_idx(const char *s, char c)
 {
     size_t i = 0;
 
@@ -120,7 +144,7 @@ size_t chr_idx(const char *s, char c)
 /*
  * term_str - Terminate string @s where the callback functions returns non-zero.
  */
-char *term_str(char *s, int (*callback)(const char *))
+static char *term_str(char *s, int (*callback)(const char *))
 {
     if (callback != NULL) {
         while (*s) {
@@ -139,7 +163,7 @@ char *term_str(char *s, int (*callback)(const char *))
  * is_empty_str - Returns 1 if @s contains no printable chars other than white
  * space.  Otherwise, 0 is returned.
  */
-int is_empty_str(const char *s)
+static int is_empty_str(const char *s)
 {
     size_t slen = strlen(s);
 
@@ -154,7 +178,7 @@ int is_empty_str(const char *s)
 /*
  * trim_str - Removes white space from both ends of the string @s.
  */
-int trim_str(char *s)
+static int trim_str(char *s)
 {
     size_t first = 0;
     size_t last;
@@ -187,7 +211,7 @@ int trim_str(char *s)
  * is_empty_substr - Returns 1 if the first @count chars of @s are not printable
  * (apart from white space).  Otherwise, 0 is returned.
  */
-int is_empty_substr(const char *s, size_t count)
+static int is_empty_substr(const char *s, size_t count)
 {
     while (count--) {
         if (isgraph(*s++))
@@ -205,7 +229,7 @@ int is_empty_substr(const char *s, size_t count)
  * @buf: buffer holding text (must be NUL-terminated!)
  * @return: 0: success, -1: error
  */
-int parse_buf(const char *buf)
+static int parse_buf(const char *buf)
 {
     code_t code;
     char line[LINE_MAX + 1];
@@ -305,6 +329,9 @@ int load_cheats(const char *cheatfile)
 {
     char *buf = NULL;
     int ret;
+
+    memset(gCheatList, 0, sizeof(gCheatList));
+
     LOG("%s: Reading cheat file '%s'...", __FUNCTION__, cheatfile);
     buf = read_text_file(cheatfile, 0);
     if (buf == NULL) {

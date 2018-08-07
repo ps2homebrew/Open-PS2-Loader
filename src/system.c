@@ -36,7 +36,7 @@ typedef struct
 #include "include/pggsm.h"
 #endif
 #ifdef CHEAT
-#include "include/pgcht.h"
+#include "include/cheatman.h"
 #endif
 
 extern void *eecore_elf;
@@ -726,7 +726,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
 
 #ifdef CHEAT
 #define CHEAT_SPECIFIER " %u"
-#define CHEAT_ARGUMENT , gEnableCheat ? (unsigned int)gCheatList : 0
+#define CHEAT_ARGUMENT , GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0
 #else
 #define CHEAT_SPECIFIER
 #define CHEAT_ARGUMENT

@@ -31,7 +31,7 @@
 #include "include/appsupport.h"
 
 #ifdef CHEAT
-#include "include/pgcht.h"
+#include "include/cheatman.h"
 #endif
 
 #ifdef __EESIO_DEBUG
@@ -1210,10 +1210,6 @@ static void setDefaults(void)
     gXOff = 0;
     gYOff = 0;
     gOverscan = 0;
-
-#ifdef CHEAT
-    memset(gCheatList, 0, sizeof(gCheatList));
-#endif
 
     // Last Played Auto Start
     KeyPressedOnce = 0;

@@ -1,6 +1,6 @@
 # Translation by co5oos
-# Last update: 6/5/2018 
-# Updated for OPL_1052_DB-TA [837ff55]
+# Last update: 8/6/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Hungarian
 OPL %s
@@ -21,7 +21,7 @@ Alkalmazások
 Téma
 Nyelv
 A rendszer le fog állni.
-Kilépés a böngészőbe/OSDSYS-be?
+Kilépés a Browser-be?
 Frissítés visszavonása?
 %d: Merevlemez nem található
 %d: Merevlemez nincs leformázva
@@ -248,6 +248,8 @@ Multitap emulátor ezen a porton
 Válassza ki a portot a Multitap emulációhoz.
 Megkerülés letiltása a hamisítvány DS3-hoz.
 Néhány hamis ds3-hoz megkerülés szükséges, ez az opció letiltja ezt.
+FIELD flipping emulálása
+Fix azon játékokhoz, melyek hibát produkálnak progresszív videó mód alatt.
 PS1 Játékok
 PS1 Játékok megjelenítési módja
 POPSTARTER.ELF nem található '%s'-nél!

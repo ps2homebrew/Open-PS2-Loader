@@ -1,6 +1,6 @@
 # Translation by machiavel
-# Last update: 3/7/2018 
-# Updated for OPL_1036_DB-TA [926069d]
+# Last update: 8/6/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
 OPL %s
@@ -21,7 +21,7 @@ Apps
 Thème
 Langue
 Le système va être éteint.
-Quitter vers Menu/OSDSYS?
+Quitter vers Menu?
 Annuler mise à jour?
 %d: HDD non détecté
 %d: HDD non formaté
@@ -248,9 +248,14 @@ Active/désactive l'émulation du Multitap pour le jeu sélectionné.
 Sélectionner le port pour émuler le Multitap
 Désactiver correctif des DS3 simulées
 Certaines DS3 simulées nécessitent ce correctif, cette option le désactivera.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.
 An error occurred while deleting the file.
+Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
+ifcaro OPL version at psx-scene.com
+OPL Daily Builds (DB) version at ps2-home.com

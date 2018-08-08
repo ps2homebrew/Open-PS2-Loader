@@ -1,6 +1,6 @@
 # Translation by Lord_Flaya
-# Last update: 6/3/2018 
-# Updated for OPL_1052_DB-TA [837ff55]
+# Last update: 8/7/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 OPL %s
@@ -21,7 +21,7 @@ Appar
 Tema
 Språk
 Systemet stängs av.
-Avsluta till Meny/OSDSYS?
+Avsluta till huvudmeny?
 Avbryt uppdatering?
 %d: Ingen Hårddisk hittad
 %d: Hårddisken ej formatterad
@@ -248,6 +248,8 @@ Multitap emulator på porten
 Välj port för multitap emulering.
 Inaktivera lösningen för falska DS3
 Några falska ds3s behöver lösningen, det här alternativet kommer att inaktivera det.
+Emulera FIELD vändning
+Fix för spel med problem i progressivt läge.
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

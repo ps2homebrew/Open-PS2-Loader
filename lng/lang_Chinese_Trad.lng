@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: 3/22/2018 
-# Updated for OPL_1036_DB-TA [926069d]
+# Last update: 8/6/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
 OPL %s
@@ -21,7 +21,7 @@ ETH 遊戲
 主題
 語言
 系統電源將會關閉.
-Exit to Browser/OSDSYS?
+Exit to Browser?
 取消更新?
 %d: 偵測不到硬碟
 %d: 硬碟沒有格式化
@@ -248,9 +248,14 @@ LMP版本:
 選擇進行多重模擬的端口
 禁用仿冒DS3控制器
 這個選項將使一些仿冒的DS3控制器無法工作
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
 PS1遊戲
 PS1遊戲啟動模式
 POPSTARTER.ELF在'%s'上找不到!
 VCD档案'%s'沒有找到!
 重命名档案時發生錯誤
 刪除档案時發生錯誤
+Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
+ifcaro OPL version at psx-scene.com
+OPL Daily Builds (DB) version at ps2-home.com

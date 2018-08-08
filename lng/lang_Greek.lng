@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: 6/7/2018 
-# Updated for OPL_1052_DB-TA [837ff55]
+# Last update: 8/6/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -21,7 +21,7 @@ OPL %s
 Θέμα
 Γλώσσα
 Το σύστημα θα απενεργοποιηθεί.
-Έξοδος στο Browser/OSDSYS;
+Έξοδος στο Browser;
 Ακύρωση ενημέρωσης;
 %d: Δεν εντοπίστηκε Σκληρός Δίσκος.
 %d: Ο Σκληρός Δίσκος δεν έχει διαμορφωθεί.
@@ -248,6 +248,8 @@ Multitap emulator στη θύρα
 Επιλέξτε θύρα για εξομοίωση Multitap.
 Απενεργ. workaround για ψεύτικα DS3
 Κάποια ψεύτικα DS3s χρειάζονται workaround, αυτή η επιλογή θα το απενεργοποιήσει.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
 Παιχνίδια PS1
 Εκκίνηση μενού παιχνιδιών PS1
 Το POPSTARTER.ELF δεν βρέθηκε στη θέση '%s'!

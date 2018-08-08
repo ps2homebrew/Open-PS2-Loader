@@ -1,6 +1,6 @@
 # Translated by DDinghoya
-# Last update: 5/1/2018 
-# Updated for OPL_1036_DB-TA [926069d]
+# Last update: 8/6/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
@@ -21,7 +21,7 @@ ETH 게임
 테마
 언어
 시스템 전원이 꺼집니다.
-Browser/OSDSYS 종료합니까?
+Browser 종료합니까?
 업데이트 취소합니까?
 %d: HDD를 검색할 수 없습니다
 %d: HDD가 포맷되지 않았습니다
@@ -248,9 +248,14 @@ LMP 버전:
 멀티탭 에뮬레이션을 위한 포트를 선택.
 Fake DS3에 대한 해결방법 비활성화
 일부 fake ds3s는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
 PS1 게임
 PS1 게임 표시 모드
 '%s'에 POPSTARTER.ELF이 없습니다!
 VCD 파일 '% s'을(를) 찾을 수 없습니다!
 파일 이름을 바꾸는 중 오류가 발생했습니다.
 파일을 삭제하는 중 오류가 발생했습니다.
+Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
+ifcaro OPL version at psx-scene.com
+OPL Daily Builds (DB) version at ps2-home.com

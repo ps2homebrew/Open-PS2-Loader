@@ -1,6 +1,6 @@
 # Translation by jauffre and andre95d
-# Last update: 3/7/2018 
-# Updated for OPL_1036_DB-TA [926069d]
+# Last update: 8/6/2018 
+# Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Italian
 OPL %s
@@ -21,7 +21,7 @@ Apps
 Tema
 Lingua
 Il sistema verrà spento.
-Uscire al Browser/OSDSYS?
+Uscire al Browser?
 Annullare l'aggiornamento?
 %d: Hard disk non rilevato
 %d: Hard disk non formattato
@@ -248,9 +248,14 @@ Multitap emulator on port
 Select port for Multitap emulation.
 Disable workaround for fake DS3
 Some fake ds3s need workaround, this option will disable it.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.
 An error occurred while deleting the file.
+Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
+ifcaro OPL version at psx-scene.com
+OPL Daily Builds (DB) version at ps2-home.com

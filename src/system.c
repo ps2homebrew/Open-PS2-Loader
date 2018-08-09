@@ -397,7 +397,7 @@ static void *GetModStorageLocation(const char *startup, unsigned compatFlags)
         }
     }
 
-    return((void *)((compatFlags & COMPAT_MODE_7) ? OPL_MOD_STORAGE_HI : OPL_MOD_STORAGE));
+    return((void *)OPL_MOD_STORAGE);
 }
 
 static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)

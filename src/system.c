@@ -370,6 +370,36 @@ static unsigned int addIopPatch(const char *mode_str, const char *startup, irxpt
     return 0;
 }
 
+typedef struct
+{
+    char *game;
+    void *addr;
+} modStorageSetting_t;
+
+static const modStorageSetting_t mod_storage_location_list[] = {
+    {"SLUS_209.77", (void*)0x01fc7000},    //Virtua Quest
+    {"SLPM_656.32", (void*)0x01fc7000},    //Virtua Fighter Cyber Generation: Judgment Six No Yabou
+    {NULL, NULL },                         //Terminator
+};
+
+static void *GetModStorageLocation(const char *startup, unsigned compatFlags)
+{
+    const modStorageSetting_t *p;
+    int i;
+
+    for (i = 0; mod_storage_location_list[i].game != NULL; i++)
+    {
+        p = &mod_storage_location_list[i];
+
+        if (!strcmp(p->game, startup))
+        {
+            return p->addr;
+        }
+    }
+
+    return((void *)((compatFlags & COMPAT_MODE_7) ? OPL_MOD_STORAGE_HI : OPL_MOD_STORAGE));
+}
+
 static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)
 { // Send IOP modules that core must use to Kernel RAM
     irxtab_t *irxtable;
@@ -663,7 +693,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     memset((void *)0x00082000, 0, 0x00100000 - 0x00082000);
 
     modules = 0;
-    ModuleStorage = (void *)((compatflags & COMPAT_MODE_7) ? OPL_MOD_STORAGE_HI : OPL_MOD_STORAGE);
+    ModuleStorage = GetModStorageLocation(filename, compatflags);
 
 #ifdef __DECI2_DEBUG
     modules |= CORE_IRX_DECI2 | CORE_IRX_ETH;

@@ -59,13 +59,12 @@ enum ERROR_CODE {
 #define COMPAT_MODE_4 0x08 // Skip Videos: Apply 0 (zero) file size to PSS videos and also skip Bink (.BIK) ones
 #define COMPAT_MODE_5 0x10 // Emulate DVD-DL
 #define COMPAT_MODE_6 0x20 // Disable IGR
-#define COMPAT_MODE_7 0x40 // High Module Storage
+#define COMPAT_MODE_7 0x40 // Unused
 #define COMPAT_MODE_8 0x80 // Hide DEV9 module
 
 #define COMPAT_MODE_COUNT 8
 
 #define OPL_MOD_STORAGE 0x00097000    //(default) Address of the module storage region
-#define OPL_MOD_STORAGE_HI 0x01C00000 //Alternate address of the module storage region
 
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 8

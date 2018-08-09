@@ -1,5 +1,5 @@
 # Translated by druchapucha and frodosumkin
-# Last update: 8/6/2018 
+# Last update: 8/9/2018 
 # Updated for OPL_1271_DB-TA_[9d02586]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
@@ -248,8 +248,8 @@ Multitap эмулятор на порте
 Выбрать порт для Multitap эмуляции.
 Отключить работу для фальшивого DS3
 Эту опцию нужно отключить, если DS3 фальшивый.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
+Эмулировать ОБЛАСТЬ обзора
+Исправление для игр, где есть проблема с прогрессивным режимом.
 PS1 игры
 Отображать экран PS1 игр
 POPSTARTER.ELF не найден '%s'!

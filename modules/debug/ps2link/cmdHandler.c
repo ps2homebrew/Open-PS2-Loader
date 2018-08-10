@@ -363,6 +363,7 @@ cmdThread(void *arg)
     if (sock < 0) {
         dbgprintf("IOP cmd: Socket error %d\n", sock);
         ExitDeleteThread();
+		return;	// Exit after failing. Passing a negative value results in an infinite loop.
     }
 
     memset((void *)&serv_addr, 0, sizeof(serv_addr));
@@ -374,6 +375,7 @@ cmdThread(void *arg)
     if (ret < 0) {
         dbgprintf("IOP cmd: Udp bind error (%d)\n", sock);
         ExitDeleteThread();
+		return;	// Exit after failing. Passing a negative value results in an infinite loop.
     }
 
     // Do tha thing

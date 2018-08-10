@@ -10,9 +10,7 @@
 #include "include/ioman.h"
 #include "include/system.h"
 #include "include/extern_irx.h"
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 #include "modules/iopcore/common/cdvd_config.h"
 
 #include <hdd-ioctl.h>
@@ -228,7 +226,6 @@ static char *hddGetGameStartup(int id)
     return hddGames.games[id].startup;
 }
 
-#ifndef __CHILDPROOF
 static void hddDeleteGame(int id)
 {
     hddDeleteHDLGame(&hddGames.games[id]);
@@ -242,21 +239,17 @@ static void hddRenameGame(int id, char *newName)
     hddSetHDLGameInfo(&hddGames.games[id]);
     hddForceUpdate = 1;
 }
-#endif
 
 static void hddLaunchGame(int id, config_set_t *configSet)
 {
     int i, size_irx = 0;
     int EnablePS2Logo = 0;
-#ifdef CHEAT
     int result;
-#endif
     void **irx = NULL;
     char filename[32];
     hdl_game_info_t *game = &hddGames.games[id];
     struct cdvdman_settings_hdd *settings;
 
-#ifdef VMC
     apa_sub_t parts[APA_MAXSUB + 1];
     char vmc_name[2][32];
     int part_valid = 0, size_mcemu_irx = 0, nparts;
@@ -330,7 +323,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
             }
         }
     }
-#endif
 
     if (gRememberLastPlayed) {
         configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
@@ -362,7 +354,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 
     sbPrepare(NULL, configSet, size_irx, irx, &i);
 
-#ifdef CHEAT
     if ((result = sbLoadCheats(hddPrefix, game->startup)) < 0) {
         switch (result) {
             case -ENOENT:
@@ -372,7 +363,6 @@ static void hddLaunchGame(int id, config_set_t *configSet)
                 guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
         }
     }
-#endif
 
     settings = (struct cdvdman_settings_hdd *)((u8 *)irx + i);
 
@@ -390,13 +380,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 
     deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
-#ifdef VMC
-#define HDD_MCEMU size_mcemu_irx, &hdd_mcemu_irx,
-#else
-#define HDD_MCEMU 0, NULL,
-#endif
-
-    sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, HDD_MCEMU EnablePS2Logo, compatMode);
+    sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
 
 static config_set_t *hddGetConfig(int id)
@@ -447,23 +431,13 @@ static void hddCleanUp(int exception)
     hddModulesLoaded = 0;
 }
 
-#ifdef VMC
 static int hddCheckVMC(char *name, int createSize)
 {
     return sysCheckVMC(hddPrefix, "/", name, createSize, NULL);
 }
-#endif
 
 static item_list_t hddGameList = {
     HDD_MODE, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
-#ifdef __CHILDPROOF
-    &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, NULL, NULL,
-#else
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-#endif
-#ifdef VMC
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
-#else
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, HDD_ICON
-#endif
 };

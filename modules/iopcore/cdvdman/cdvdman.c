@@ -79,9 +79,7 @@ struct cdvdman_settings_usb cdvdman_settings = {
 extern struct irx_export_table _exp_cdvdman;
 extern struct irx_export_table _exp_cdvdstm;
 extern struct irx_export_table _exp_smsutils;
-#ifdef VMC_DRIVER
 extern struct irx_export_table _exp_oplutils;
-#endif
 #ifdef __USE_DEV9
 extern struct irx_export_table _exp_dev9;
 #endif
@@ -1825,9 +1823,7 @@ int _start(int argc, char **argv)
 
     DeviceInit();
 
-#ifdef VMC_DRIVER
     RegisterLibraryEntries(&_exp_oplutils);
-#endif
 
     // Setup the callback timer.
     USec2SysClock((cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS) ? 5000 : 0, &gCallbackSysClock);

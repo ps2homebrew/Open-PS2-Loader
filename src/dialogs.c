@@ -179,47 +179,32 @@ struct UIItem diaCompatConfig[] = {
     {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-#ifdef GSM
     {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GSCONFIG}}},
     {UI_SPACER},
-#endif
-#ifdef CHEAT
     {UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
-#endif
 #ifdef PADEMU
     {UI_BUTTON, COMPAT_PADEMUCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
 #endif
-#if defined(GSM) || defined(CHEAT) || defined(PADEMU)
     {UI_SPLITTER},
-#endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
     {UI_SPACER},
     {UI_ENUM, COMPAT_DMA, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-#ifdef VMC
+    // VMC
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT1}}},
     {UI_SPACER},
-#ifndef __CHILDPROOF
     {UI_BUTTON, COMPAT_VMC1_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC1_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#else
-    {UI_BUTTON, COMPAT_VMC1_DEFINE, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#endif
     {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT2}}},
     {UI_SPACER},
-#ifndef __CHILDPROOF
     {UI_BUTTON, COMPAT_VMC2_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC2_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#else
-    {UI_BUTTON, COMPAT_VMC2_DEFINE, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
-#endif
     {UI_SPLITTER},
-#endif
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GAME_ID}}},
     {UI_SPACER},
@@ -234,30 +219,15 @@ struct UIItem diaCompatConfig[] = {
     {UI_SPLITTER},
 
 // buttons
-#ifndef __CHILDPROOF
-
     {UI_BUTTON, COMPAT_SAVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SAVE_CHANGES}}},
     {UI_SPACER},
-
-#endif
-
     {UI_BUTTON, COMPAT_TEST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_TEST}}},
-
-#ifndef __CHILDPROOF
-
     {UI_SPACER},
     {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
-
-#endif
     {UI_BREAK},
-
     {UI_BREAK},
-
-#ifndef __CHILDPROOF
-
     {UI_BUTTON, COMPAT_REMOVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_REMOVE_ALL_SETTINGS}}},
 
-#endif
     // end of dialog
     {UI_TERMINATOR}};
 
@@ -443,7 +413,6 @@ struct UIItem diaUIConfig[] = {
     {UI_TERMINATOR}};
 
 // Per-Game Game Settings > GSM Menu (--Bat--)
-#ifdef GSM
 struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
     {UI_SPLITTER},
@@ -479,7 +448,6 @@ struct UIItem diaGSConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 #ifdef PADEMU
 struct UIItem diaPadEmuConfig[] = {
@@ -732,7 +700,6 @@ struct UIItem diaPadEmuInfo[] = {
 #endif
 
 // Per Game Settings > Cheat Menu --Bat--
-#ifdef CHEAT
 struct UIItem diaCheatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
     {UI_SPLITTER},
@@ -753,11 +720,10 @@ struct UIItem diaCheatConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 // About Menu
 struct UIItem diaAbout[] = {
-    {UI_LABEL, 1, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_LABEL, ABOUT_TITLE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPLITTER},
 
     // Coders
@@ -765,23 +731,15 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - crazyc - dlanor", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"BatRastard - crazyc - dlanor - doctorxyz - hominem.te.esse", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"doctorxyz - hominem.te.esse - ifcaro", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"ifcaro - izdubar - jimmikaelkael - misfire - Polo35", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"izdubar - jimmikaelkael - misfire", -1}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Polo35 - reprep - SP193 - volca", -1}}},
-    {UI_BREAK},
-
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"Maximus32", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"reprep - SP193 - volca - Maximus32", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
@@ -812,6 +770,11 @@ struct UIItem diaAbout[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}},
     {UI_BREAK},
 
+    // Build Options
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}}, {UI_SPACER}, {UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_BREAK},
+
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
@@ -820,7 +783,6 @@ struct UIItem diaAbout[] = {
     {UI_TERMINATOR}};
 
 // Per-Game Game Settings > VMC Menu
-#ifdef VMC
 struct UIItem diaVMC[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
     {UI_SPLITTER},
@@ -856,7 +818,6 @@ struct UIItem diaVMC[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
-#endif
 
 // Network Update Menu
 struct UIItem diaNetCompatUpdate[] = {
@@ -878,6 +839,23 @@ struct UIItem diaNetCompatUpdate[] = {
     {UI_BUTTON, NETUPD_BTN_START, 1, 1, -1, 0, 0, {.label = {NULL, _STR_START}}},
     {UI_SPACER},
     {UI_BUTTON, NETUPD_BTN_CANCEL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CANCEL}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
+// Parental Lock Config Menu
+struct UIItem diaParentalLockConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PARENLOCKCONFIG}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_PARENLOCK_PASSWORD}}},
+    {UI_SPACER},
+    {UI_PASSWORD, CFG_PARENLOCK_PASSWORD, 1, 1, _STR_PARENLOCK_PASSWORD_HINT, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
 
     // end of dialog

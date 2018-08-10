@@ -12,10 +12,6 @@ EXTRAVERSION = Beta
 #	eesio_debug	-	UI-side + eecore debug mode (EE SIO)
 #	deci2_debug	-	UI-side + in-game DECI2 debug mode (EE-side only).
 
-# I want to build a CHILDPROOF edition! How do I do that?
-# Type "make childproof" to build one.
-# Non-childproof features like GSM will not be available.
-
 # I want to put my name in my custom build! How can I do it?
 # Type "make LOCALVERSION=-foobar"
 
@@ -23,25 +19,16 @@ EXTRAVERSION = Beta
 # You can adjust the variables in this section to meet your needs.
 # To enable a feature, set its variable's value to 1. To disable, change it to 0.
 # Do not COMMENT out the variables!!
-# You can also specify variables when executing make: "make VMC=1 RTL=1 GSM=1 IGS=1 CHEAT=1"
-
-#Enables/disables Virtual Memory Card (VMC) support
-VMC ?= 0
+# You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
 
 #Enables/disables Right-To-Left (RTL) language support
 RTL ?= 0
-
-#Enables/disables Graphics Synthesizer Mode (GSM) selector
-GSM ?= 0
 
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
 IGS ?= 0
 
 #Enables/disables pad emulator
 PADEMU ?= 0
-
-#Enables/disables the cheat engine (PS2RD)
-CHEAT ?= 0
 
 #Enables/disables high resolution multi-pass rendering for the OPL GUI
 HIRES ?= 0
@@ -57,7 +44,6 @@ DEBUG ?= 0
 EESIO_DEBUG ?= 0
 INGAME_DEBUG ?= 0
 DECI2_DEBUG ?= 0
-CHILDPROOF ?= 0
 
 # ======== DO NOT MODIFY VALUES AFTER THIS POINT! UNLESS YOU KNOW WHAT YOU ARE DOING ========
 REVISION = $(shell expr $(shell git rev-list --count HEAD) + 2)
@@ -74,7 +60,7 @@ OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERS
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
 		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
-		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o
+		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
@@ -88,6 +74,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o \
+		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
 		iremsndpatch.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
@@ -117,14 +104,6 @@ BIN2O = $(PS2SDK)/bin/bin2o
 # WARNING: Only extra spaces are allowed and ignored at the beginning of the conditional directives (ifeq, ifneq, ifdef, ifndef, else and endif)
 # but a tab is not allowed; if the line begins with a tab, it will be considered part of a recipe for a rule!
 
-ifeq ($(VMC),1)
-  IOP_OBJS += usb_mcemu.o hdd_mcemu.o smb_mcemu.o
-  EE_CFLAGS += -DVMC
-  VMC_FLAGS = VMC=1
-else
-  VMC_FLAGS = VMC=0
-endif
-
 ifeq ($(RTL),1)
   EE_CFLAGS += -D__RTL
 endif
@@ -142,36 +121,11 @@ else
   UDNL_OUT = modules/iopcore/udnl/udnl.irx
 endif
 
-ifeq ($(CHILDPROOF),1)
-  EE_CFLAGS += -D__CHILDPROOF
-  GSM_FLAGS = GSM=0
-  IGS_FLAGS = IGS=0
-  CHEAT_FLAGS = CHEAT=0
+ifeq ($(IGS),1)
+  EE_CFLAGS += -DIGS
+  IGS_FLAGS = IGS=1
 else
-  ifeq ($(IGS),1)
-    GSM = 1
-  endif
-  ifeq ($(GSM),1)
-    EE_CFLAGS += -DGSM
-    EE_OBJS += gsm.o
-    GSM_FLAGS = GSM=1
-    ifeq ($(IGS),1)
-      EE_CFLAGS += -DIGS
-      IGS_FLAGS = IGS=1
-    else
-      IGS_FLAGS = IGS=0
-    endif
-  else
-    GSM_FLAGS = GSM=0
-    IGS_FLAGS = IGS=0
-  endif
-  ifeq ($(CHEAT),1)
-    FRONTEND_OBJS += cheatman.o
-    EE_CFLAGS += -DCHEAT
-    CHEAT_FLAGS = CHEAT=1
-  else
-    CHEAT_FLAGS = CHEAT=0
-  endif
+  IGS_FLAGS = IGS=0
 endif
 
 ifeq ($(PADEMU),1)
@@ -227,7 +181,7 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
 
-.PHONY: all release childproof debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
 
 all:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
@@ -241,10 +195,7 @@ endif
 release:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
 	echo "-Interface"
-	$(MAKE) VMC=1 GSM=1 IGS=1 PADEMU=1 CHEAT=1 HIRES=0 $(EE_VPKD).ZIP
-
-childproof:
-	$(MAKE) CHILDPROOF=1 all
+	$(MAKE) IGS=1 PADEMU=1 HIRES=0 $(EE_VPKD).ZIP
 
 debug:
 	$(MAKE) DEBUG=1 all
@@ -367,7 +318,7 @@ $(EE_VPKD).ZIP: $(EE_VPKD).ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
 
 ee_core/ee_core.elf: ee_core
 	echo "-EE core"
-	$(MAKE) $(PS2LOGO_FLAGS) $(VMC_FLAGS) $(GSM_FLAGS) $(IGS_FLAGS) $(CHEAT_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
+	$(MAKE) $(IGS_FLAGS) $(PADEMU_FLAGS) $(EECORE_EXTRA_FLAGS) -C $<
 
 $(EE_ASM_DIR)ee_core.s: ee_core/ee_core.elf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eecore_elf
@@ -403,28 +354,28 @@ $(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
 
 modules/iopcore/cdvdman/usb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -usb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
 
 $(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_cdvdman_irx
 
 modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -smb_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
 
 $(EE_ASM_DIR)smb_cdvdman.s: modules/iopcore/cdvdman/smb_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ smb_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
 
 $(EE_ASM_DIR)hdd_cdvdman.s: modules/iopcore/cdvdman/hdd_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx: modules/iopcore/cdvdman
 	echo " -hdd_hdpro_cdvdman"
-	$(MAKE) $(VMC_FLAGS) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
 
 $(EE_ASM_DIR)hdd_hdpro_cdvdman.s: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_hdpro_cdvdman_irx
@@ -502,14 +453,14 @@ $(EE_ASM_DIR)ds34usb.s: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
 
 modules/pademu/bt_pademu.irx: modules/pademu
 	echo " -bt_pademu"
-	$(MAKE) -C $< $(VMC_FLAGS) USE_BT=1
+	$(MAKE) -C $< USE_BT=1
 
 $(EE_ASM_DIR)bt_pademu.s: modules/pademu/bt_pademu.irx
 	$(BIN2S) $< $@ bt_pademu_irx
 
 modules/pademu/usb_pademu.irx: modules/pademu
 	echo " -usb_pademu"
-	$(MAKE) -C $< $(VMC_FLAGS) USE_USB=1
+	$(MAKE) -C $< USE_USB=1
 
 $(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
 	$(BIN2S) $< $@ usb_pademu_irx

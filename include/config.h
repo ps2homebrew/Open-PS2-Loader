@@ -83,6 +83,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_ETH_MODE "eth_mode"
 #define CONFIG_OPL_APP_MODE "app_mode"
 #define CONFIG_OPL_SWAP_SEL_BUTTON "swap_select_btn"
+#define CONFIG_OPL_PARENTAL_LOCK_PWD "parental_lock_password"
 
 //Network config keys
 #define CONFIG_NET_ETH_LINKM "eth_linkmode"
@@ -147,10 +148,8 @@ int configWriteMulti(int types);
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 void configClear(config_set_t *configSet);
 
-#ifdef VMC
 void configGetVMC(config_set_t *configSet, char *vmc, int length, int slot);
 void configSetVMC(config_set_t *configSet, const char *vmc, int slot);
 void configRemoveVMC(config_set_t *configSet, int slot);
-#endif
 
 #endif

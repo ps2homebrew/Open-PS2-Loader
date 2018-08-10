@@ -18,7 +18,7 @@ IGSCORE_EE_OBJS = igs_api.o
 CHEATCORE_EE_OBJS = cheat_engine.o cheat_api.o
 
 EE_OBJS = main.o syshook.o iopmgr.o modmgr.o util.o patches.o patches_asm.o \
-	  padhook.o spu.o tlb.o asm.o crt0.o
+	  padhook.o spu.o tlb.o asm.o crt0.o $(GSMCORE_EE_OBJS) $(CHEATCORE_EE_OBJS)
 MAPFILE = ee_core.map
 
 EE_INCS := -I$(PS2SDK)/ee/include -I$(PS2SDK)/common/include -Iinclude -I.
@@ -39,23 +39,9 @@ EE_CFLAGS += -D__LOAD_DEBUG_MODULES
 	endif
 endif
 
-ifeq ($(VMC),1)
-EE_CFLAGS += -DVMC
-endif
-
-ifeq ($(GSM),1)
-EE_OBJS += $(GSMCORE_EE_OBJS)
-EE_CFLAGS += -DGSM
-endif
-
 ifeq ($(IGS),1)
 EE_OBJS += $(IGSCORE_EE_OBJS)
 EE_CFLAGS += -DIGS
-endif
-
-ifeq ($(CHEAT),1)
-EE_OBJS += $(CHEATCORE_EE_OBJS)
-EE_CFLAGS += -DCHEAT
 endif
 
 EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)

@@ -124,9 +124,7 @@ typedef struct
 
     void (*itemCleanUp)(int exception);
 
-#ifdef VMC
     int (*itemCheckVMC)(char *name, int createSize);
-#endif
 
     int iconId;
 } item_list_t;

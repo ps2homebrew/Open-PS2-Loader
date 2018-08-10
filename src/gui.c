@@ -18,12 +18,9 @@
 #include "include/system.h"
 #include "include/ethsupport.h"
 #include "include/compatupd.h"
-#ifdef GSM
 #include "include/pggsm.h"
-#endif
-#ifdef CHEAT
-#include "include/pgcht.h"
-#endif
+#include "include/cheatman.h"
+
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
@@ -201,42 +198,33 @@ void guiEndFrame(void)
 
 void guiShowAbout()
 {
-    char OPLVersion[64];
+    char OPLVersion[40];
+    char OPLBuildDetails[40];
 
-    // TODO: Move it into a new variable
-    // If you use VMC + RTL + GSM + IGS + PS2RD, you not will see last chars
-    // in the new version scheme because look like this now
-    // "Open PS2 Loader 0.9.4.9XY-abcdefg"
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
+    diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
-#ifdef VMC
-    strcat(OPLVersion, " VMC");
-#endif
+    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), ""
 #ifdef __RTL
-    strcat(OPLVersion, " RTL");
+        " RTL"
 #endif
-#ifdef __CHILDPROOF
-    strcat(OPLVersion, " CHILDPROOF");
-#endif
-#ifdef GSM
-    strcat(OPLVersion, " GSM");
-    strcat(OPLVersion, GSM_VERSION);
-#endif
+        " GSM %s"
 #ifdef IGS
-    strcat(OPLVersion, " IGS");
-    strcat(OPLVersion, IGS_VERSION);
-#endif
-#ifdef CHEAT
-    strcat(OPLVersion, " PS2RD");
+        " IGS %s"
 #endif
 #ifdef PADEMU
-    strcat(OPLVersion, " PADEMU");
+        " PADEMU"
 #endif
 #ifdef HIRES
-    strcat(OPLVersion, " HIRES");
+        " HIRES"
 #endif
-
-    diaSetLabel(diaAbout, 1, OPLVersion);
+        //Version numbers
+        , GSM_VERSION
+#ifdef IGS
+        , IGS_VERSION
+#endif
+    );
+    diaSetLabel(diaAbout, ABOUT_BUILD_DETAILS, OPLBuildDetails);
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
 }
@@ -577,7 +565,6 @@ void guiShowUIConfig(void)
     }
 }
 
-#ifdef GSM
 static void guiSetGSMSettingsState(void)
 {
     int isGSMEnabled;
@@ -637,9 +624,6 @@ static void guiShowGSConfig(void)
     diaExecuteDialog(diaGSConfig, -1, 1, &guiGSMUpdater);
 }
 
-#endif
-
-#ifdef CHEAT
 static void guiSetCheatSettingsState(void)
 {
     int isCheatEnabled;
@@ -666,7 +650,6 @@ void guiShowCheatConfig(void)
 
     diaExecuteDialog(diaCheatConfig, -1, 1, &guiCheatUpdater);
 }
-#endif
 
 #ifdef PADEMU
 
@@ -1074,12 +1057,39 @@ void guiShowNetConfig(void)
     }
 }
 
+void guiShowParentalLockConfig(void)
+{
+    int result;
+    char password[CONFIG_KEY_VALUE_LEN];
+    config_set_t *configOPL = configGetByType(CONFIG_OPL);
+
+    // Set current values
+    configGetStrCopy(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password, CONFIG_KEY_VALUE_LEN); //This will return the current password, or a blank string if it is not set.
+    diaSetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password);
+
+    result = diaExecuteDialog(diaParentalLockConfig, -1, 1, NULL);
+    if (result) {
+        diaGetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password, CONFIG_KEY_VALUE_LEN);
+
+        if (strlen(password) > 0) {
+            // Store values
+            configSetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password);
+        } else {
+            configRemoveKey(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD);
+
+            guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, diaParentalLockConfig);
+        }
+
+        menuSetParentalLockCheckState(1);
+    }
+}
+
 int guiShowKeyboard(char *value, int maxLength)
 {
     char tmp[maxLength];
     strncpy(tmp, value, maxLength);
 
-    int result = diaShowKeyb(tmp, maxLength, 0);
+    int result = diaShowKeyb(tmp, maxLength, 0, NULL);
     if (result) {
         strncpy(value, tmp, maxLength);
         value[maxLength - 1] = '\0';
@@ -1088,7 +1098,6 @@ int guiShowKeyboard(char *value, int maxLength)
     return result;
 }
 
-#ifdef VMC
 typedef struct
 {                   // size = 76
     int VMC_status; // 0=available, 1=busy
@@ -1109,7 +1118,7 @@ static statusVMCparam_t vmc_status;
 
 int guiVmcNameHandler(char *text, int maxLen)
 {
-    int result = diaShowKeyb(text, maxLen, 0);
+    int result = diaShowKeyb(text, maxLen, 0, NULL);
 
     if (result)
         vmc_refresh = 1;
@@ -1268,13 +1277,12 @@ static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slo
 
     return result;
 }
-#endif
 
 int guiAltStartupNameHandler(char *text, int maxLen)
 {
     int i;
 
-    int result = diaShowKeyb(text, maxLen, 0);
+    int result = diaShowKeyb(text, maxLen, 0, NULL);
     if (result) {
         for (i = 0; text[i]; i++) {
             if (text[i] > 96 && text[i] < 123)
@@ -1318,7 +1326,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
 // Begin Per-Game GSM Integration --Bat--
-#ifdef GSM
     int EnableGSM = 0;
     configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
     diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
@@ -1340,10 +1347,8 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
 
     guiSetGSMSettingsState();
-#endif /* GSM */
 
 // Begin of Per-Game CHEAT Integration --Bat--
-#ifdef CHEAT
     int EnableCheat = 0;
     configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
     diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, EnableCheat);
@@ -1353,8 +1358,6 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
 
     guiSetCheatSettingsState();
-
-#endif /* CHEAT */
 
 #ifdef PADEMU
     int EnablePadEmu = 0;
@@ -1375,7 +1378,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
     diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
-#ifdef VMC
+    // VMC
     char vmc1[32];
     configGetVMC(configSet, vmc1, sizeof(vmc1), 0);
     diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
@@ -1383,11 +1386,10 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
     char vmc2[32]; // required as diaSetLabel use pointer to value
     configGetVMC(configSet, vmc2, sizeof(vmc2), 1);
     diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
-#endif
 
     // show dialog
     do {
-#ifdef VMC
+        // VMC
         if (strlen(vmc1))
             diaSetLabel(diaCompatConfig, COMPAT_VMC1_ACTION, _l(_STR_RESET));
         else
@@ -1396,25 +1398,20 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_RESET));
         else
             diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_USE_GENERIC));
-#endif
 
         result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
 
-#ifdef GSM
         if (result == COMPAT_GSMCONFIG) {
             guiShowGSConfig();
         }
-#endif
 #ifdef PADEMU
         if (result == COMPAT_PADEMUCONFIG) {
             guiShowPadEmuConfig();
         }
 #endif
-#ifdef CHEAT
         if (result == COMPAT_CHEATCONFIG) {
             guiShowCheatConfig();
         }
-#endif
 
         if (result == COMPAT_LOADFROMDISC) {
             char hexDiscID[15];
@@ -1423,53 +1420,65 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             else
                 guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0, NULL);
         }
-#ifdef VMC
+        //VMC
         else if (result == COMPAT_VMC1_DEFINE) {
-            if (guiShowVMCConfig(id, support, vmc1, 0, 0))
-                diaGetString(diaVMC, VMC_NAME, vmc1, sizeof(vmc1));
+            if (menuCheckParentalLock() == 0) {
+                if (guiShowVMCConfig(id, support, vmc1, 0, 0))
+                    diaGetString(diaVMC, VMC_NAME, vmc1, sizeof(vmc1));
+            }
         } else if (result == COMPAT_VMC2_DEFINE) {
-            if (guiShowVMCConfig(id, support, vmc2, 1, 0))
-                diaGetString(diaVMC, VMC_NAME, vmc2, sizeof(vmc2));
+            if (menuCheckParentalLock() == 0) {
+                if (guiShowVMCConfig(id, support, vmc2, 1, 0))
+                    diaGetString(diaVMC, VMC_NAME, vmc2, sizeof(vmc2));
+            }
         } else if (result == COMPAT_VMC1_ACTION) {
-            if (strlen(vmc1))
-                vmc1[0] = '\0';
-            else
-                snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
+            if (menuCheckParentalLock() == 0) {
+                if (strlen(vmc1))
+                    vmc1[0] = '\0';
+                 else
+                     snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
+            }
         } else if (result == COMPAT_VMC2_ACTION) {
-            if (strlen(vmc2))
-                vmc2[0] = '\0';
-            else
-                snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
+            if (menuCheckParentalLock() == 0) {
+                if (strlen(vmc2))
+                    vmc2[0] = '\0';
+                 else
+                    snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
+            }
         }
-#endif
     } while (result >= COMPAT_NOEXIT);
 
     if (result == COMPAT_REMOVE) {
-        configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
-        configRemoveKey(configSet, CONFIG_ITEM_DMA);
-        configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
-        configRemoveKey(configSet, CONFIG_ITEM_DNAS);
-        configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
-#ifdef GSM
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-        configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-#endif
-#ifdef CHEAT
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-        configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-#endif
+        if (menuCheckParentalLock() == 0) {
+            configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
+            configRemoveKey(configSet, CONFIG_ITEM_DMA);
+            configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
+            configRemoveKey(configSet, CONFIG_ITEM_DNAS);
+            configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
+
+            //GSM
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+            configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
+
+            //Cheats
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
+            configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+
 #ifdef PADEMU
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
-        configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
+            //PADEMU
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
+            configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
-#ifdef VMC
-        configRemoveVMC(configSet, 0);
-        configRemoveVMC(configSet, 1);
-#endif
-        menuSaveConfig();
+
+            //VMC
+            configRemoveVMC(configSet, 0);
+            configRemoveVMC(configSet, 1);
+
+            menuSaveConfig();
+        }
     } else if (result > 0) { // test button pressed or save button
         compatMode = 0;
         for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -1491,7 +1500,7 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         else
             configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 
-#ifdef GSM
+        //GSM
         diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
         if (EnableGSM != 0)
             configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
@@ -1521,9 +1530,8 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
         else
             configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-#endif
 
-#ifdef CHEAT
+        //Cheats
         diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
         if (EnableCheat != 0)
             configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
@@ -1535,9 +1543,9 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
             configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
         else
             configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-#endif
 
 #ifdef PADEMU
+        //PADEMU
         diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
 
         if (EnablePadEmu != 0)
@@ -1561,12 +1569,11 @@ int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
         else
             configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
-#ifdef VMC
+        //VMC
         configSetVMC(configSet, vmc1, 0);
         configSetVMC(configSet, vmc2, 1);
         guiShowVMCConfig(id, support, vmc1, 0, 1);
         guiShowVMCConfig(id, support, vmc2, 1, 1);
-#endif
 
         switch (result) {
             case COMPAT_SAVE:

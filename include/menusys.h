@@ -108,4 +108,7 @@ void menuSetSelectedItem(menu_item_t *item);
 void menuAddHint(menu_item_t *menu, int text_id, int icon_id);
 void menuRemoveHints(menu_item_t *menu);
 
+int menuSetParentalLockCheckState(int enabled);
+int menuCheckParentalLock(void);
+
 #endif

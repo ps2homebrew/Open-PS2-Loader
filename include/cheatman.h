@@ -34,6 +34,12 @@
 #include <ctype.h>
 #include <string.h>
 
+#define CHEAT_VERSION "0.5.3.65.g774d1"
+
+#define MAX_HOOKS 5
+#define MAX_CODES 250
+#define MAX_CHEATLIST (MAX_HOOKS * 2 + MAX_CODES * 2)
+
 /* Some character defines */
 #define NUL 0x00
 #define LF 0x0A
@@ -53,6 +59,9 @@ typedef struct
     int val;
 } code_t;
 
+void InitCheatsConfig(config_set_t *configSet);
+int GetCheatsEnabled(void);
+const int *GetCheatsList(void);
 int load_cheats(const char *cheatfile);
 
 #endif /* _CHEATMAN_H_ */

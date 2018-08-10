@@ -111,16 +111,15 @@ int _start(int argc, char *argv[])
 
     SetRebootTimeLibraryHandlingMode(&_exp_pademu, 2);
 
-#ifdef VMC
     u8 vmc = 0;
 
     if (argc > 1)
         vmc = argv[1][3];
 
-    if (!vmc)
-#endif
+    if (!vmc) {
         if (!install_sio2hook())
             return MODULE_NO_RESIDENT_END;
+    }
 
     pademu_setup(pad_enable, pad_vibration);
 

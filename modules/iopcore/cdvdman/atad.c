@@ -21,6 +21,7 @@
 #include <loadcore.h>
 #include <thbase.h>
 #include <thevent.h>
+#include <thsemap.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include <dev9.h>
@@ -54,19 +55,10 @@ static u8 ata_gamestar_workaround = 0;
 
 static int ata_evflg = -1;
 
-#ifdef VMC_DRIVER
-#include <thsemap.h>
-
 static int io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
-#define ATAWRITE 1
-#else
-#define WAITIOSEMA(x)
-#define SIGNALIOSEMA(x)
-#define ATAWRITE 0
-#endif
 
 #define ATA_EV_TIMEOUT 1
 #define ATA_EV_COMPLETE 2
@@ -169,14 +161,12 @@ int atad_start(void)
       dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
     }
 
-#ifdef VMC_DRIVER
     iop_sema_t smp;
     smp.initial = 1;
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
     io_sema = CreateSema(&smp);
-#endif
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
@@ -592,14 +582,14 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);
             /* In v1.04, LBA was enabled here.  */
             select = (device << 4) & 0xffff;
-            command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;
+            command = (dir == 1) ? ATA_C_WRITE_DMA_EXT : ATA_C_READ_DMA_EXT;
         } else {
             /* Setup for 28-bit LBA.  */
             len = (nsectors > 256) ? 256 : nsectors;
             sector = lba & 0xff;
             /* In v1.04, LBA was enabled here.  */
             select = ((device << 4) | ((lba >> 24) & 0xf)) & 0xffff;
-            command = ((dir == 1) && (ATAWRITE)) ? ATA_C_WRITE_DMA : ATA_C_READ_DMA;
+            command = (dir == 1) ? ATA_C_WRITE_DMA : ATA_C_READ_DMA;
         }
 
         for (retries = 3; retries > 0; retries--) {

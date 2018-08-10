@@ -30,9 +30,7 @@
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
 
-#ifdef CHEAT
-#include "include/pgcht.h"
-#endif
+#include "include/cheatman.h"
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
@@ -177,15 +175,17 @@ static void itemExecCancel(struct menu_item *curMenu)
 
     if (support) {
         if (support->itemRename) {
-            int nameLength = support->itemGetNameLength(curMenu->current->item.id);
-            char newName[nameLength];
-            strncpy(newName, curMenu->current->item.text, nameLength);
-            if (guiShowKeyboard(newName, nameLength)) {
-                support->itemRename(curMenu->current->item.id, newName);
-                if (gAutoRefresh)
-                    RefreshAllLists();
-                else
-                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+            if (menuCheckParentalLock() == 0) {
+                int nameLength = support->itemGetNameLength(curMenu->current->item.id);
+                char newName[nameLength];
+                strncpy(newName, curMenu->current->item.text, nameLength);
+                if (guiShowKeyboard(newName, nameLength)) {
+                    support->itemRename(curMenu->current->item.id, newName);
+                     if (gAutoRefresh)
+                        RefreshAllLists();
+                    else
+                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                }
             }
         }
     } else
@@ -209,9 +209,11 @@ static void itemExecTriangle(struct menu_item *curMenu)
 
     if (support) {
         if (!(support->flags & MODE_FLAG_NO_COMPAT)) {
-            config_set_t *configSet = menuLoadConfig();
-            if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
-                support->itemLaunch(curMenu->current->item.id, configSet);
+            if (menuCheckParentalLock() == 0) {
+                config_set_t *configSet = menuLoadConfig();
+                if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
+                    support->itemLaunch(curMenu->current->item.id, configSet);
+            }
         }
     } else
         guiMsgBox("NULL Support object. Please report", 0, NULL);
@@ -229,12 +231,14 @@ static void itemExecSquare(struct menu_item *curMenu)
 
     if (support) {
         if (support->itemDelete) {
-            if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
-                support->itemDelete(curMenu->current->item.id);
-                if (gAutoRefresh)
-                    RefreshAllLists();
-                else
-                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+            if (menuCheckParentalLock() == 0) {
+                if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
+                    support->itemDelete(curMenu->current->item.id);
+                    if (gAutoRefresh)
+                        RefreshAllLists();
+                    else
+                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                }
             }
         }
     } else
@@ -1204,10 +1208,6 @@ static void setDefaults(void)
     gXOff = 0;
     gYOff = 0;
     gOverscan = 0;
-
-#ifdef CHEAT
-    memset(gCheatList, 0, sizeof(gCheatList));
-#endif
 
     // Last Played Auto Start
     KeyPressedOnce = 0;

@@ -22,6 +22,7 @@ enum MENU_IDs {
     MENU_GFX_SETTINGS,
     MENU_NET_CONFIG,
     MENU_NET_UPDATE,
+    MENU_PARENTAL_LOCK,
     MENU_SAVE_CHANGES,
     MENU_START_HDL,
     MENU_ABOUT,
@@ -36,6 +37,8 @@ static menu_list_t *selected_item;
 static int actionStatus;
 static int itemConfigId;
 static config_set_t *itemConfig;
+
+static u8 parentalLockCheckEnabled = 1;
 
 // "main menu submenu"
 static submenu_list_t *mainMenu;
@@ -108,15 +111,14 @@ static void menuInitMainMenu(void)
         submenuDestroy(&mainMenu);
 
 // initialize the menu
-#ifndef __CHILDPROOF
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
     if (gHDDStartMode && gEnableWrite) // enabled at all?
         submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
-#endif
     submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_POWER_OFF, _STR_POWEROFF);
@@ -573,6 +575,56 @@ void menuRenderMenu()
     guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_GAMES_LIST, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
 }
 
+int menuSetParentalLockCheckState(int enabled)
+{
+   int wasEnabled;
+
+   wasEnabled = parentalLockCheckEnabled;
+   parentalLockCheckEnabled = enabled ? 1 : 0;
+
+   return wasEnabled;
+}
+
+int menuCheckParentalLock(void)
+{
+    const char *parentalLockPassword;
+    char password[CONFIG_KEY_VALUE_LEN];
+    int result;
+
+    result = 0; //Default to unlocked.
+    if (parentalLockCheckEnabled) {
+       config_set_t *configOPL = configGetByType(CONFIG_OPL);
+
+       //Prompt for password, only if one was set.
+       if (configGetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, &parentalLockPassword) && (parentalLockPassword[0] != '\0'))
+       {
+           password[0] = '\0';
+           if(diaShowKeyb(password, CONFIG_KEY_VALUE_LEN, 1, _l(_STR_PARENLOCK_ENTER_PASSWORD_TITLE)))
+           {
+               if (strncmp(parentalLockPassword, password, CONFIG_KEY_VALUE_LEN) == 0)
+               {
+                   result = 0;
+                   parentalLockCheckEnabled = 0; //Stop asking for the password.
+               } else if (strncmp(OPL_PARENTAL_LOCK_MASTER_PASS, password, CONFIG_KEY_VALUE_LEN) == 0) {
+                   guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, NULL);
+
+                   configRemoveKey(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD);
+                   saveConfig(CONFIG_OPL, 1);
+
+                   result = 0;
+                   parentalLockCheckEnabled = 0; //Stop asking for the password.
+               } else {
+                   guiMsgBox(_l(_STR_PARENLOCK_PASSWORD_INCORRECT), 0, NULL);
+                   result = EACCES;
+               }
+           } else //User aborted.
+               result = EACCES;
+       }
+    }
+
+    return result;
+}
+
 void menuHandleInputMenu()
 {
     if (!mainMenu)
@@ -601,17 +653,28 @@ void menuHandleInputMenu()
         int id = mainMenuCurrent->item.id;
 
         if (id == MENU_SETTINGS) {
-            guiShowConfig();
+            if (menuCheckParentalLock() == 0)
+              guiShowConfig();
         } else if (id == MENU_GFX_SETTINGS) {
-            guiShowUIConfig();
+            if (menuCheckParentalLock() == 0)
+              guiShowUIConfig();
         } else if (id == MENU_NET_CONFIG) {
-            guiShowNetConfig();
+            if (menuCheckParentalLock() == 0)
+              guiShowNetConfig();
         } else if (id == MENU_NET_UPDATE) {
-            guiShowNetCompatUpdate();
+            if (menuCheckParentalLock() == 0)
+              guiShowNetCompatUpdate();
+        } else if (id == MENU_PARENTAL_LOCK) {
+            if (menuCheckParentalLock() == 0)
+              guiShowParentalLockConfig();
         } else if (id == MENU_SAVE_CHANGES) {
-            saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
+            if (menuCheckParentalLock() == 0) {
+              saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
+              menuSetParentalLockCheckState(1); //Re-enable parental lock check.
+            }
         } else if (id == MENU_START_HDL) {
-            handleHdlSrv();
+            if (menuCheckParentalLock() == 0)
+              handleHdlSrv();
         } else if (id == MENU_ABOUT) {
             guiShowAbout();
         } else if (id == MENU_EXIT) {

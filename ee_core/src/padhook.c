@@ -26,15 +26,11 @@
 #include "padpatterns.h"
 #include "syshook.h"
 #include "tlb.h"
-#ifdef GSM
 #include "gsm_api.h"
-#endif
 #ifdef IGS
 #include "igs_api.h"
 #endif
-#ifdef CHEAT
 #include "cheat_api.h"
-#endif
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)(int port, int slot, void *addr);
@@ -231,23 +227,19 @@ static void IGR_Thread(void *arg)
                 " sync.p;");
         }
 
-#ifdef GSM
         if (EnableGSMOp) {
             if (!DisableDebug)
                 GS_BGCOLOUR = 0x00FF00; // Green
             DPRINTF("Stopping GSM...\n");
             DisableGSM();
         }
-#endif
 
-#ifdef CHEAT
         if (EnableCheatOp) {
             if (!DisableDebug)
                 GS_BGCOLOUR = 0xFF0000; // Blue
             DPRINTF("Stopping PS2RD Cheat Engine...\n");
             DisableCheats();
         }
-#endif
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0x00FFFF; // Yellow

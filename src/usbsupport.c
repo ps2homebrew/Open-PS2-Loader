@@ -10,9 +10,7 @@
 #include "include/ioman.h"
 #include "include/system.h"
 #include "include/extern_irx.h"
-#ifdef CHEAT
 #include "include/cheatman.h"
-#endif
 #include "modules/iopcore/common/cdvd_config.h"
 
 void *pusbd_irx = NULL;
@@ -187,7 +185,6 @@ static char *usbGetGameStartup(int id)
     return usbGames[id].startup;
 }
 
-#ifndef __CHILDPROOF
 static void usbDeleteGame(int id)
 {
     sbDelete(&usbGames, usbPrefix, "/", usbGameCount, id);
@@ -245,18 +242,13 @@ static void usbRenameGame(int id, char *newName)
 
     usbULSizePrev = -2;
 }
-#endif
 
 static void usbLaunchGame(int id, config_set_t *configSet)
 {
     int i, fd, index, compatmask = 0;
     int EnablePS2Logo = 0;
-#ifdef CHEAT
     int result;
-#endif
-#ifdef VMC
     unsigned int start;
-#endif
     unsigned int startCluster;
     char partname[256], filename[32];
     base_game_info_t *game = &usbGames[id];
@@ -264,7 +256,6 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
 
-#ifdef VMC
     char vmc_name[32], vmc_path[256], have_error = 0;
     int vmc_id, size_mcemu_irx = 0;
     usb_vmc_infos_t usb_vmc_infos;
@@ -322,7 +313,6 @@ static void usbLaunchGame(int id, config_set_t *configSet)
             }
         }
     }
-#endif
 
     void **irx = &usb_cdvdman_irx;
     int irx_size = size_usb_cdvdman_irx;
@@ -403,7 +393,6 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     }
     settings->common.layer1_start = layer1_start;
 
-#ifdef CHEAT
     if ((result = sbLoadCheats(usbPrefix, game->startup)) < 0) {
         switch (result) {
             case -ENOENT:
@@ -413,7 +402,6 @@ static void usbLaunchGame(int id, config_set_t *configSet)
                 guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
         }
     }
-#endif
 
     if (gRememberLastPlayed) {
         configSetStr(configGetByType(CONFIG_LAST), "last_played", game->startup);
@@ -424,13 +412,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
         strcpy(filename, game->startup);
     deinit(NO_EXCEPTION); // CAREFUL: deinit will call usbCleanUp, so usbGames/game will be freed
 
-#ifdef VMC
-#define USB_MCEMU size_mcemu_irx, &usb_mcemu_irx,
-#else
-#define USB_MCEMU 0, NULL,
-#endif
-
-    sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, USB_MCEMU EnablePS2Logo, compatmask);
+    sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *usbGetConfig(int id)
@@ -457,23 +439,13 @@ static void usbCleanUp(int exception)
     }
 }
 
-#ifdef VMC
 static int usbCheckVMC(char *name, int createSize)
 {
     return sysCheckVMC(usbPrefix, "/", name, createSize, NULL);
 }
-#endif
 
 static item_list_t usbGameList = {
     USB_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
-#ifdef __CHILDPROOF
-    &usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, NULL, NULL,
-#else
     &usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
-#endif
-#ifdef VMC
     &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbCheckVMC, USB_ICON
-#else
-    &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, USB_ICON
-#endif
 };

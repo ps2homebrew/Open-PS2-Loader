@@ -95,15 +95,10 @@ typedef struct _read_capacity_data
 
 static UsbDriver driver;
 
-#ifdef VMC_DRIVER
 static int io_sema;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
-#else
-#define WAITIOSEMA(x)
-#define SIGNALIOSEMA(x)
-#endif
 
 typedef struct _usb_callback_data
 {
@@ -655,7 +650,6 @@ void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigne
     SIGNALIOSEMA(io_sema);
 }
 
-#ifdef VMC_DRIVER
 void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer)
 {
     WAITIOSEMA(io_sema);
@@ -664,7 +658,6 @@ void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const 
 
     SIGNALIOSEMA(io_sema);
 }
-#endif
 
 /* test that endpoint is bulk endpoint and if so, update device info */
 static void usb_bulk_probeEndpoint(int devId, mass_dev *dev, UsbEndpointDescriptor *endpoint)
@@ -960,14 +953,12 @@ int mass_stor_init(void)
 
     g_mass_device.devId = -1;
 
-#ifdef VMC_DRIVER
     iop_sema_t smp;
     smp.initial = 1;
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
     io_sema = CreateSema(&smp);
-#endif
 
     driver.next = NULL;
     driver.prev = NULL;

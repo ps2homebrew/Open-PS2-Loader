@@ -7,12 +7,8 @@
 #include "include/ioman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 #include "include/cheatman.h"
-#ifdef GSM
 #include "include/pggsm.h"
-#endif
-#ifdef CHEAT
-#include "include/pgcht.h"
-#endif
+#include "include/cheatman.h"
 
 #include <sys/fcntl.h>
 
@@ -393,17 +389,9 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
         settings->flags |= IOPCORE_ENABLE_POFF;
     }
 
-#ifdef GSM
     InitGSMConfig(configSet);
-#endif
 
-#ifdef CHEAT
-    gEnableCheat = 0;
-    //Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
-    if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
-        configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
-    }
-#endif
+    InitCheatsConfig(configSet);
 
 #ifdef PADEMU
     gEnablePadEmu = 0;
@@ -581,30 +569,28 @@ void sbCreateFolders(const char *path, int createDiscImgFolders)
         fileXioMkdir(fullpath, 0777);
     }
 
-#ifdef VMC
     sprintf(fullpath, "%sVMC", path);
     fileXioMkdir(fullpath, 0777);
-#endif
 
-#ifdef CHEAT
     sprintf(fullpath, "%sCHT", path);
     fileXioMkdir(fullpath, 0777);
-#endif
 }
 
-#ifdef CHEAT
 int sbLoadCheats(const char *path, const char *file)
 {
     char cheatfile[64];
+    const int *cheatList;
     int result;
 
-    if (gEnableCheat) {
+    if (GetCheatsEnabled()) {
         snprintf(cheatfile, sizeof(cheatfile), "%sCHT/%s.cht", path, file);
         LOG("Loading Cheat File %s\n", cheatfile);
         if ((result = load_cheats(cheatfile)) < 0) {
             LOG("Error: failed to load cheats\n");
         } else {
-            if (!((gCheatList[0] == 0) && (gCheatList[1] == 0))) {
+            cheatList = GetCheatsList();
+
+            if (!((cheatList[0] == 0) && (cheatList[1] == 0))) {
                 LOG("Cheats found\n");
                 result = 0;
             } else {
@@ -618,4 +604,4 @@ int sbLoadCheats(const char *path, const char *file)
 
     return result;
 }
-#endif
+

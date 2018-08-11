@@ -263,6 +263,13 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Some fake ds3s need workaround, this option will disable it.",
     "Emulate FIELD flipping",
     "Fix for games that glitch under progressive video modes.",
+    "Parental Lock Settings",
+    "Parental Lock Password",
+    "Leave blank to disable the parental lock.",
+    "Enter Parental Lock Password",
+    "Parental lock password incorrect.",
+    "Parental lock disabled.",
+    "Build Options:",
 //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

@@ -32,9 +32,7 @@
 #include <debug.h>
 #include <ps2smb.h>
 #include "config.h"
-#ifdef VMC
 #include <sys/fcntl.h>
-#endif
 
 // Last Played Auto Start
 #include <time.h>
@@ -42,6 +40,9 @@
 //START of OPL_DB tweaks
 //#define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
 //END of OPL_DB tweaks
+
+//Master password for disabling the parental lock.
+#define OPL_PARENTAL_LOCK_MASTER_PASS	"989765"
 
 //IO type IDs
 #define IO_CUSTOM_SIMPLEACTION 1 // handler for parameter-less actions

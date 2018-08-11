@@ -376,7 +376,6 @@ static char* elmGetItemStartup(int id) {
 	return cur->ID;
 }
 
-#ifndef __CHILDPROOF
 static void elmDeleteItem(int id) {
 	ElmGame* cur = elmGetGameInfo(id);
 	int ret = -1;
@@ -470,7 +469,6 @@ static void elmRenameItem(int id, char* newName) {
 		elmForceUpdate = 1;
 	}
 }
-#endif
 
 static void elmLaunchItem(int id, config_set_t* configSet) {
 	ElmGame* cur = elmGetGameInfo(id);
@@ -647,14 +645,6 @@ static void elmCleanUp(int exception) {
 
 static item_list_t elmItemList = {
 		ELM_MODE, 0, MODE_FLAG_NO_COMPAT|MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", _STR_ELM, &elmInit, &elmNeedsUpdate,	&elmUpdateItemList,
-#ifdef __CHILDPROOF
-		&elmGetItemCount, NULL, &elmGetItemName, &elmGetItemNameLength, &elmGetItemStartup, NULL, NULL, &elmLaunchItem,
-#else
 		&elmGetItemCount, NULL, &elmGetItemName, &elmGetItemNameLength, &elmGetItemStartup, &elmDeleteItem, &elmRenameItem, &elmLaunchItem,
-#endif
-#ifdef VMC
 		&elmGetConfig, &elmGetImage, &elmCleanUp, NULL, ELM_ICON
-#else
-		&elmGetConfig, &elmGetImage, &elmCleanUp, ELM_ICON
-#endif
 };

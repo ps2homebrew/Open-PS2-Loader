@@ -191,7 +191,6 @@ DECLARE_EXPORT_TABLE(smsutils, 1, 1)
 	DECLARE_EXPORT(mips_memset)
 END_EXPORT_TABLE
 
-#ifdef VMC_DRIVER
 // opl io utils export table
 DECLARE_EXPORT_TABLE(oplutils, 1, 1)
 	DECLARE_EXPORT(_retonly)
@@ -212,7 +211,6 @@ DECLARE_EXPORT_TABLE(oplutils, 1, 1)
 	DECLARE_EXPORT(smb_WriteFile)
 #endif
 END_EXPORT_TABLE
-#endif
 
 #ifdef SMB_DRIVER
 DECLARE_EXPORT_TABLE(oplsmb, 1, 1)

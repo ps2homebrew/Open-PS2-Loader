@@ -63,10 +63,6 @@ IOP_OBJS += dev9.o
 IOP_CFLAGS += -D__USE_DEV9
 endif
 
-ifeq ($(VMC),1)
-IOP_CFLAGS += -DVMC_DRIVER
-endif
-
 IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJNAME)%)
 
 IOP_LDFLAGS += -s

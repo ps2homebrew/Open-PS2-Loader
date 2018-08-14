@@ -34,6 +34,7 @@ typedef struct
 #define PATCH_GENERIC_CAPCOM 0xBABECAFE
 #define PATCH_GENERIC_AC9B 0xDEADBEE1
 #define PATCH_GENERIC_SLOW_READS 0xDEADBEE2
+#define PATCH_VIRTUA_QUEST 0xDEADBEE3
 #define PATCH_SDF_MACROSS 0x00065405
 #define PATCH_SRW_IMPACT 0x0021e808
 #define PATCH_RNC_UYA 0x00398498
@@ -101,6 +102,8 @@ static const patchlist_t patch_list[] = {
     {"SLUS_205.61", ALL_MODE, {PATCH_SOS, 0x00000001, 0x00000000}},                // Disaster Report
     {"SLES_513.01", ALL_MODE, {PATCH_SOS, 0x00000002, 0x00000000}},                // SOS: The Final Escape
     {"SLPS_251.13", ALL_MODE, {PATCH_SOS, 0x00000000, 0x00000000}},                // Zettai Zetsumei Toshi
+    {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
+    {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -549,6 +552,26 @@ static void SOSPatch(int region)
     }
 }
 
+static void VirtuaQuest_patches(void)
+{
+    /* Move module storage to 0x01FC7000.
+
+       Ideal end of memory: 0x02000000 - (0x000D0000 - 0x00097000) = 0x02000000 - 0x39000 = 0x01FC7000.
+       The main thread's stack size is 0x18000.
+       Note: this means that the stack will overwrite the module storage and hence further IOP reboots are not possible.
+       However, carving out memory for the modules results in a NULL pointer being passed to memset(). */
+
+    //Fix the stack base pointer for SetupThread(), so that the EE kernel will not reserve 4KB.
+    //0x02000000 - 0x18000 = 0x01FE8000
+    _sw(0x3c0501fe, 0x000a019c);    //lui $a1, $01fe
+    _sw(0x34a58000, 0x000a01b0);    //ori a1, a1, $8000
+
+    //Change end of memory pointer (game will subtract 0x18000 from it).
+    //0x02000000 - (0x39000 - 0x18000) = 0x1FDF000
+    _sw(0x3c0301fd, 0x000c565c);    //lui $v1, 0x01fd
+    _sw(0x3463f000, 0x000c566c);    //ori $v1, $v1, 0xf000
+}
+
 void apply_patches(const char *path)
 {
     const patchlist_t *p;
@@ -585,6 +608,9 @@ void apply_patches(const char *path)
                     DotHack_patches(path);
                 case PATCH_SOS:
                     SOSPatch(p->patch.val);
+                    break;
+		case PATCH_VIRTUA_QUEST:
+                    VirtuaQuest_patches();
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

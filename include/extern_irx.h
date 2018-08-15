@@ -4,6 +4,9 @@
 
 // Try to keep this list alphabetical
 
+extern void *apemodpatch_irx;
+extern int size_apemodpatch_irx;
+
 extern void *bt_pademu_irx;
 extern int size_bt_pademu_irx;
 

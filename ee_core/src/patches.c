@@ -41,6 +41,7 @@ typedef struct
 #define PATCH_ZOMBIE_ZONE 0xEEE62525
 #define PATCH_DOT_HACK 0x0D074A37
 #define PATCH_SOS 0x30303030
+#define PATCH_ULT_PRO_PINBALL 0xBA11BA11
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -104,6 +105,7 @@ static const patchlist_t patch_list[] = {
     {"SLPS_251.13", ALL_MODE, {PATCH_SOS, 0x00000000, 0x00000000}},                // Zettai Zetsumei Toshi
     {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
     {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
+    {"SLES_535.08", ALL_MODE, {PATCH_ULT_PRO_PINBALL, 0x00000000, 0x00000000}},    // Ultimate Pro Pinball
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -572,6 +574,108 @@ static void VirtuaQuest_patches(void)
     _sw(0x3463f000, 0x000c566c);    //ori $v1, $v1, 0xf000
 }
 
+enum ULTPROPINBALL_ELF {
+    ULTPROPINBALL_ELF_MAIN,
+    ULTPROPINBALL_ELF_BR,
+    ULTPROPINBALL_ELF_FJ,
+    ULTPROPINBALL_ELF_TS,
+};
+
+static void UltProPinball_LoadModuleHook(const char *path)
+{
+    void (*pLoadModule)(const char *path);
+    void *(*pSifAllocIopHeap)(int size);
+    int (*pSifFreeIopHeap)(void *addr);
+    int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
+    void *iopmem;
+    SifDmaTransfer_t sifdma;
+    int dma_id, ret;
+    void *apemodpatch_irx;
+    unsigned int apemodpatch_irx_size;
+
+    switch(g_mode & 0xf)
+    {
+        case ULTPROPINBALL_ELF_MAIN:
+            pLoadModule = (void*)0x0012e400;
+            pSifAllocIopHeap = (void*)0x001cf278;
+            pSifFreeIopHeap = (void*)0x001cf368;
+            pSifLoadModuleBuffer = (void*)0x001cfed8;
+            break;
+        case ULTPROPINBALL_ELF_BR:
+            pLoadModule = (void*)0x001969c0;
+            pSifAllocIopHeap = (void*)0x00239bb8;
+            pSifFreeIopHeap = (void*)0x00239ca8;
+            pSifLoadModuleBuffer = (void*)0x0023a818;
+            break;
+        case ULTPROPINBALL_ELF_FJ:
+            pLoadModule = (void*)0x00180eb0;
+            pSifAllocIopHeap = (void*)0x00223878;
+            pSifFreeIopHeap = (void*)0x00223968;
+            pSifLoadModuleBuffer = (void*)0x002244d8;
+            break;
+        case ULTPROPINBALL_ELF_TS:
+            pLoadModule = (void*)0x0018d3b8;
+            pSifAllocIopHeap = (void*)0x00232178;
+            pSifFreeIopHeap = (void*)0x00232268;
+            pSifLoadModuleBuffer = (void*)0x00232dd8;
+            break;
+        default:
+            pLoadModule = NULL;
+            pSifAllocIopHeap = NULL;
+            pSifFreeIopHeap = NULL;
+            pSifLoadModuleBuffer = NULL;
+    }
+
+    if (pLoadModule != NULL) 
+    {
+        pLoadModule(path);
+
+        GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &apemodpatch_irx, &apemodpatch_irx_size);
+
+        iopmem = pSifAllocIopHeap(apemodpatch_irx_size);
+        if(iopmem != NULL)
+        {
+            sifdma.src = apemodpatch_irx;
+            sifdma.dest = iopmem;
+            sifdma.size = apemodpatch_irx_size;
+            sifdma.attr = 0;
+            do {
+                dma_id = SifSetDma(&sifdma, 1);
+            } while (!dma_id);
+
+            do {
+                ret = pSifLoadModuleBuffer(iopmem, 0, NULL);
+           } while (ret < 0);
+
+            pSifFreeIopHeap(iopmem);
+        }
+    }
+}
+
+static void UltProPinballPatch(const char *path)
+{
+    if (_strcmp(path, "cdrom0:\\SLES_535.08;1") == 0)
+    {
+        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x0012eae0);
+        g_mode = ULTPROPINBALL_ELF_MAIN;
+    }
+    else if (_strcmp(path, "cdrom0:\\BR.ELF;1") == 0)
+    {
+        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x001970a0);
+        g_mode = ULTPROPINBALL_ELF_BR;
+    }
+    else if (_strcmp(path, "cdrom0:\\FJ.ELF;1") == 0)
+    {
+        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x00181590);
+        g_mode = ULTPROPINBALL_ELF_FJ;
+    }
+    else if (_strcmp(path, "cdrom0:\\TS.ELF;1") == 0)
+    {
+        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x0018da98);
+        g_mode = ULTPROPINBALL_ELF_TS;
+    }
+}
+
 void apply_patches(const char *path)
 {
     const patchlist_t *p;
@@ -611,6 +715,8 @@ void apply_patches(const char *path)
                     break;
 		case PATCH_VIRTUA_QUEST:
                     VirtuaQuest_patches();
+                case PATCH_ULT_PRO_PINBALL:
+                    UltProPinballPatch(path);
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

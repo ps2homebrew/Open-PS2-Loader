@@ -340,6 +340,7 @@ static const patchlist_t iop_patch_list[] = {
     {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Disaster Report
     {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //SOS: The Final Escape
     {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Zettai Zetsumei Toshi
+    {"SLES_535.08", "", &apemodpatch_irx, &size_apemodpatch_irx},      //Ultimate Pro Pinball
     {NULL, NULL, NULL, NULL },  //Terminator
 };
 

@@ -1,6 +1,6 @@
-# German Translation by ps2guy and lopotri
-# Last update: 8/10/2018 
-# Updated for OPL_1281_DB-TA_[aee9db0]
+# German Translation by ps2guy and LopoTRI
+# Last update: 8/14/2018
+# Updated for OPL_1286_DB-TA_[2c8e7d0]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 OPL %s
@@ -24,7 +24,7 @@ Das System wird ausgeschaltet.
 Verlassen und zum Browser zurückkehren?
 Aktualisierung abbrechen?
 %d: Festplatte nicht erkannt
-%d: Festplatte ist nicht formatiert 
+%d: Festplatte ist nicht formatiert
 %d: Fehler beim Starten des Netzwerks
 %d: Netzwerkadapter nicht erkannt
 %d: Keine verbindung zum SMB Server
@@ -116,7 +116,7 @@ Systemaufrufe aushängen
 Videos überspringen
 Emuliere DVD-DL
 Deaktiviere IGR
-Erhöhte Speichermoduladresse
+Unbenutzt
 Verstecke DEV9 Modul
 Ändern der Größe wird die VMC erneut formatieren!
 Erstellen
@@ -133,7 +133,7 @@ Fortschritt
 VMC-Datei existiert
 Ungültige VMC-Datei, Größe ist nicht korrekt
 VMC-Datei muss erstellt werden
-Fehler mit VMC %s, fahre fort mit phys. MC (Steckplatz %d)?
+Fehler mit VMC %s, weiter mit phys. MC (Steckplatz %d)?
 Automatisch aktualisieren
 Über
 Programmierer
@@ -161,14 +161,14 @@ VMC Steckplatz 2
 Spiel ID
 DMA Modus
 V-Sync
-Modus 1
-Modus 2
-Modus 3
-Modus 4
-Modus 5
-Modus 6
-Modus 7
-Modus 8
+Mod. 1
+Mod. 2
+Mod. 3
+Mod. 4
+Mod. 5
+Mod. 6
+Mod. 7
+Mod. 8
 GSM konfigurieren
 ETH Geschwindigkeitsmodus
 100Mbit full-duplex
@@ -181,21 +181,21 @@ Schaltet GSM AN oder AUS
 VMODE
 Erzwungener benutzerdefinierter Bildschirmmodus
 H-POS
-Horizontale Justierung
+Horizontale anpassung
 V-POS
-Vertikale Justierung
-Überabtastung
-Überabtastung anpassen
+Vertikale anpassung
+Overscan
+Overscan anpassen
 Videosequenzen (FMV) überspringen
-Überspringe Full Motion Videos
+Überspringt Full Motion Videos
 Cheat Einstellungen
 Aktiviere PS2RD Cheat Engine
-PS2RD Cheat Engine Spiele patcher
+Lass PS2RD Cheat Engine das Spiel patchen
 PS2RD Cheat Engine Modus
-Automatisch auswählen lassen oder Spielecheats auswählen
+Automatische auswahl oder Spiele-cheats auswählen
 Autom. Auswahl der Cheats
-Wähle Spielecheats
-Fehler: Laden des Cheat-File fehlgeschlagen
+Wähle Spiele-cheats
+Fehler: Laden des Cheat-Files fehlgeschlagen
 Keine Cheats gefunden
 Standardeinstellungen herunterladen
 Netzwerkaktualisierung
@@ -209,60 +209,60 @@ Benutzerdefinierte Einstellungen
 Standardeinstellungen heruntergeladen
 Automatischer Start in %i s...
 Automatischer Start
-Wert in Sekunden (sek), 0 um Auto-start zu deaktivieren
+Wert in Sekunden, 0 um Auto-start zu deaktivieren
 PS2 Logo
-Wird nur bei gültigem Disc Logo angezeigt, welches mit der Region der Konsole übereinstimmen muss
+Wird nur als gültiges Disk-Logo angezeigt, wenn es mit der Region der Konsole übereinstimmt
 PADEMU konfigurieren
-Pad Emulator Einstellungen
+Einstellungen Pad Emulator
 Pad Emulator aktivieren
-Aktiviere/deaktiviere den Pad Emulator für das ausgewählte Spiel.
+Aktiviert/Deaktiviert den Pad Emulator für das ausgewählte Spiel.
 Pad Emulator Modus
 Wähle Pad Emulator Modus
 DualShock3/4 USB
 DualShock3/4 BT
 Einstellungen für Anschluss:
-Wähle Pad Emulator Anschluss für die Einstellungen.
+Wähle Pad Emulatoranschluss für die Einstellungen.
 Emulation aktivieren
-Aktiviert/deaktiviert den Pad Emulator für den ausgewählten Anschluss.
+Aktiviert/Deaktiviert den Pad Emulator für den ausgewählten Anschluss.
 Vibration aktivieren
-Aktiviert/deaktiviert die Vibration für den ausgewählten Anschluss.
-USB Bluetooth-Aadapter MAC-Adresse:
+Aktiviert/Deaktiviert die Vibration für den ausgewählten Anschluss.
+USB Bluetooth-Adapter MAC-Adresse:
 DS Controller verbunden zur MAC-Adresse:
 Verbinden
 Verbinde DS Controller
 Verbinde DS Controller mit Bluetooth-Adapter MAC-Adresse.
 Nicht verbunden
-Bluetooth adapter information
-Shows more information and supported features
+Bluetooth Adapter information
+Zeigt mehr infos und unterstützte Funktionen
 HCI Version:
 LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
-Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
-ifcaro OPL version at psx-scene.com
-OPL Daily Builds (DB) version at ps2-home.com
+Hersteller ID:
+Unterstützt Funktionen:
+Ja
+Nein
+Bluetooth Adapter ist voll kompatibel mit DS3/DS4 Controller.
+Bluetooth Adapter funktioniert evtl nicht korrekt mit DS3/DS4 Controller.
+Aktiviere Multitap emulation
+Schaltet die Multitap emulation An/Aus für das ausgewählte Spiel.
+Multitap emulator an Anschluss
+Wähle Anschluss für Multitap emulation.
+Deaktiviere Problemumgehung für gefälschten DS3
+Manche gefälschte ds3s brauchen Problemumgehung, diese Option schaltet es ab.
+Emuliere Feld-spiegelung
+Fix für Spiele, die Fehler unter progressivem Video modus haben.
+Einstellungen Kindersicherung
+Kindersicherungspasswort
+Leer lassen für keine Kindersicherung.
+Kindersicherungspasswort eingeben
+Falsches Kindersicherungspasswort.
+Kindersicherung ausgeschaltet.
+Erstellungsoptionen:
+PS1 Spiele
+PS1 Spiele Bildschirmeinstellungs-modus
+POPSTARTER.ELF nicht gefunden bei '%s'!
+VCD Datei '%s' nicht gefunden!
+Fehler beim umbenennen der Datei.
+Fehler beim löschen der Datei.
+Niemals OPEN-PS2-LOADER (OPL) kaufen, sondern frei erhältlich bei:
+ifcaro OPL version bei psx-scene.com
+OPL Daily Builds (DB) version bei ps2-home.com

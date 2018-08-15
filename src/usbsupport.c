@@ -193,53 +193,7 @@ static void usbDeleteGame(int id)
 
 static void usbRenameGame(int id, char *newName)
 {
-    char oldpath[256], newpath[256];
-    base_game_info_t *game = &usbGames[id];
-    int fd;
-
-    if (game->format != GAME_FORMAT_USBLD) {
-        if (game->format == GAME_FORMAT_OLD_ISO) {
-            if (game->media == 0x12) {
-                snprintf(oldpath, sizeof(oldpath), "%sCD/%s.%s%s", usbPrefix, game->startup, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sCD/%s.%s%s", usbPrefix, game->startup, newName, game->extension);
-            } else {
-                snprintf(oldpath, sizeof(oldpath), "%sDVD/%s.%s%s", usbPrefix, game->startup, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sDVD/%s.%s%s", usbPrefix, game->startup, newName, game->extension);
-            }
-        } else {
-            if (game->media == 0x12) {
-                snprintf(oldpath, sizeof(oldpath), "%sCD/%s%s", usbPrefix, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sCD/%s%s", usbPrefix, newName, game->extension);
-            } else {
-                snprintf(oldpath, sizeof(oldpath), "%sDVD/%s%s", usbPrefix, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sDVD/%s%s", usbPrefix, newName, game->extension);
-            }
-        }
-
-        if ((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
-            fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newpath);
-            fileXioClose(fd);
-        }
-    } else {
-        const char *pathStr = "%sul.%08X.%s.%02x";
-        unsigned int oldcrc = USBA_crc32(game->name);
-        unsigned int newcrc = USBA_crc32(newName);
-        int i;
-
-        for (i = 0; i < game->parts; i++) {
-            snprintf(oldpath, sizeof(oldpath), pathStr, usbPrefix, oldcrc, game->startup, i);
-            snprintf(newpath, sizeof(newpath), pathStr, usbPrefix, newcrc, game->startup, i);
-            if ((fd = fileXioOpen(oldpath, O_RDONLY)) >= 0) {
-                fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newpath);
-                fileXioClose(fd);
-            }
-        }
-
-        memset(game->name, 0, UL_GAME_NAME_MAX + 1);
-        memcpy(game->name, newName, UL_GAME_NAME_MAX);
-        sbRebuildULCfg(&usbGames, usbPrefix, usbGameCount, -1);
-    }
-
+    sbRename(&usbGames, usbPrefix, "/", usbGameCount, id, newName);
     usbULSizePrev = -2;
 }
 

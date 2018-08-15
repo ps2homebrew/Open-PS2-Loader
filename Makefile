@@ -75,7 +75,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o \
 		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
-		iremsndpatch.o
+		iremsndpatch.o apemodpatch.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
 		elfldr.o udnl.o imgdrv.o eesync.o \
@@ -239,6 +239,8 @@ clean:
 	echo "  -patches"
 	echo "   -iremsnd"
 	$(MAKE) -C modules/iopcore/patches/iremsndpatch clean
+	echo "   -apemod"
+	$(MAKE) -C modules/iopcore/patches/apemodpatch clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
 	echo " -usbhdfsdfsv"
@@ -393,6 +395,13 @@ modules/iopcore/patches/iremsndpatch/iremsndpatch.irx: modules/iopcore/patches/i
 
 $(EE_ASM_DIR)iremsndpatch.s: modules/iopcore/patches/iremsndpatch/iremsndpatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ iremsndpatch_irx
+
+modules/iopcore/patches/apemodpatch/apemodpatch.irx: modules/iopcore/patches/apemodpatch
+	echo " -apemod patch"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)apemodpatch.s: modules/iopcore/patches/apemodpatch/apemodpatch.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ apemodpatch_irx
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"

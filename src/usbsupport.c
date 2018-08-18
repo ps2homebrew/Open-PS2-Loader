@@ -242,6 +242,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
                             LOG("USBSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
                         } else {
                             LOG("USBSUPPORT Cluster Chain NG\n");
+                            have_error = 2;
                         }
                     }
 
@@ -252,7 +253,10 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 
         if (have_error) {
             char error[256];
-            snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
+            if (have_error == 2) //VMC file is fragmented
+                snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name, (vmc_id + 1));
+            else
+                snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
             if (!guiMsgBox(error, 1, NULL)) {
                 return;
             }

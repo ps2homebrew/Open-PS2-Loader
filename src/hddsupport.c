@@ -302,12 +302,18 @@ static void hddLaunchGame(int id, config_set_t *configSet)
                             LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].subpart    : 0x%X\n", i, hdd_vmc_infos.blocks[i].subpart);
                             LOG("HDDSUPPORT hdd_vmc_infos.blocks[%d].count      : 0x%X\n", i, hdd_vmc_infos.blocks[i].count);
                         }
-                    } // else Vmc file too much fragmented
+                    } else { // else VMC file is too fragmented
+                        LOG("HDDSUPPORT Block Chain NG\n");
+                        have_error = 2;
+                    }
                 }
 
                 if (have_error) {
                     char error[256];
-                    snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
+                    if (have_error == 2) //VMC file is fragmented
+                        snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
+                    else
+                        snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
                     if (!guiMsgBox(error, 1, NULL))
                         return;
                 }

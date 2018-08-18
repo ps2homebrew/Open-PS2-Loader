@@ -710,11 +710,13 @@ void apply_patches(const char *path)
                     break;
                 case PATCH_DOT_HACK:
                     DotHack_patches(path);
+                    break;
                 case PATCH_SOS:
                     SOSPatch(p->patch.val);
                     break;
 		case PATCH_VIRTUA_QUEST:
                     VirtuaQuest_patches();
+                    break;
                 case PATCH_ULT_PRO_PINBALL:
                     UltProPinballPatch(path);
                     break;

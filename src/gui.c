@@ -1072,8 +1072,13 @@ void guiShowParentalLockConfig(void)
         diaGetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password, CONFIG_KEY_VALUE_LEN);
 
         if (strlen(password) > 0) {
-            // Store values
-            configSetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password);
+            if (strncmp(OPL_PARENTAL_LOCK_MASTER_PASS, password, CONFIG_KEY_VALUE_LEN) != 0) {
+                // Store password
+                configSetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password);
+            } else {
+                // Password not acceptable (i.e. master password entered).
+                guiMsgBox(_l(_STR_PARENLOCK_INVALID_PASSWORD), 0, NULL);
+            }
         } else {
             configRemoveKey(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD);
 

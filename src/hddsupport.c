@@ -138,8 +138,8 @@ void hddLoadModules(void)
 
         ret = sysLoadModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg);
         if (ret < 0) {
-            LOG("HDD: HardDisk Drive not formatted (HDD).\n");
-            setErrorMessageWithCode(_STR_HDD_NOT_FORMATTED_ERROR, ERROR_HDD_MODULE_HDD_FAILURE);
+            LOG("HDD: No HardDisk Drive detected.\n");
+            setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_MODULE_HDD_FAILURE);
             return;
         }
 

@@ -1,5 +1,5 @@
 # translation by alimadhi
-# Last update: 8/14/2018 
+# Last update: 8/22/2018 
 # Updated for OPL_1286_DB-TA_[2c8e7d0]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Arabic
@@ -21,7 +21,7 @@ OPL %s
 الموضوعه
 اللغة
 سوف يتوقف النضام.
-؟(OSDSYS)خروج الى مستعرض
+الخروج إلى المتصفح؟
 الغاء التحديث؟
 %d: لم يتم العثور على القرص الصلب
 %d: القرص الصلب غير مهيأ
@@ -116,7 +116,7 @@ Unhook Syscalls
 اجتياز الفيديو
 محاكي DVD-DL
 تعطيل IGR
-Unused
+غير مستعمل
 إخفاء حدة dev9 
 تغير الحجم يؤدي الى إعادة تهيئة الـ VMC
 انشاء
@@ -248,15 +248,15 @@ LMP الاصدار:
 اختر منفذ من اجل نقر متعدد المحاكي
 تعطيل الحل لوحدة التحكم الوهمية
 بعض التحكمات تحتاج الى حل، سيؤدي هذا الخيار تعطيله
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
+محاكاة FIELD التقليب
+إصلاح للألعاب التي تندرج تحت أوضاع الفيديو التدريجي.
+إعدادات قفل الوالدين
+كلمة مرور الوالدين قفل
+اتركه فارغا لتعطيل قفل الوالدين.
+أدخل كلمة مرور الوالدين قفل
+كلمة مرور الوالدين قفل غير صحيحة.
+تم تعطيل قفل الوالدين.
+خيارات البناء:
 PS1 العاب
 PS1 وضع عرض الالعاب
 POPSTARTER.ELF غير موجود في '%s'!

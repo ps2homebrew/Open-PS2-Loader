@@ -275,6 +275,8 @@ Enter Parental Lock Password
 Parental lock password incorrect.
 Parental lock disabled.
 Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

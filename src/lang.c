@@ -142,7 +142,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "VMC file exist",
     "Invalid VMC file, size is incorrect",
     "VMC file need to be created",
-    "Error with VMC %s, continue with physical MC (slot %d) ?",
+    "Error accessing VMC %s. Continue with the Memory Card in slot %d?",
     "Automatic refresh",
     "About",
     "Coders",
@@ -266,6 +266,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Parental lock password incorrect.",
     "Parental lock disabled.",
     "Build Options:",
+    "Error - this password cannot be used.",
+    "VMC %s file is fragmented. Continue with Memory Card in slot %d?",
 };
 
 static int guiLangID = 0;

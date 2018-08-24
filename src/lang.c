@@ -12,9 +12,9 @@
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
     "English (internal)",
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     "OPL %s",
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     "Save changes",
     "Back",
     "Network config",
@@ -78,9 +78,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "USB device start mode",
     "HDD device start mode",
     "ETH device start mode",
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     "Applications menu display mode",
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     "Auto",
     "Manual",
     "Start HDL Server",
@@ -146,7 +146,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "VMC file exist",
     "Invalid VMC file, size is incorrect",
     "VMC file need to be created",
-    "Error with VMC %s, continue with physical MC (slot %d) ?",
+    "Error accessing VMC %s. Continue with the Memory Card in slot %d?",
     "Automatic refresh",
     "About",
     "Coders",
@@ -270,7 +270,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Parental lock password incorrect.",
     "Parental lock disabled.",
     "Build Options:",
-//START of OPL_DB tweaks
+    "Error - this password cannot be used.",
+    "VMC %s file is fragmented. Continue with Memory Card in slot %d?",
+    //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",
 	"POPSTARTER.ELF not found at '%s'!",
@@ -280,7 +282,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
 	"Never buy OPEN-PS2-LOADER (OPL), instead get it free at:",
 	"ifcaro OPL version at psx-scene.com",
 	"OPL Daily Builds (DB) version at ps2-home.com",
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 };
 
 static int guiLangID = 0;

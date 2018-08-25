@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: 8/14/2018 
-# Updated for OPL_1286_DB-TA_[2c8e7d0]
+# Last update: 8/24/2018
+# Updated for OPL_1301_DB-TA_[24f2d97]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -257,6 +257,8 @@ Introduza a password do Controlo Parental
 Password do Controlo Parental incorreta.
 Controlo Parental desativado.
 Opções de compilação:
+Erro - esta password não pode ser usada.
+O ficheiro VMC %s está fragmentado. Continuar com o Cartão de Memoria na ranhura %d?
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

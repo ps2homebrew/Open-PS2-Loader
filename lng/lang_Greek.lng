@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: 8/14/2018 
-# Updated for OPL_1286_DB-TA_[2c8e7d0]
+# Last update: 8/24/2018
+# Updated for OPL_1301_DB-TA_[24f2d97]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -257,6 +257,8 @@ Multitap emulator στη θύρα
 Εσφαλμένος κωδικός Γονικού Κλειδώματος.
 Το Γονικό Κλείδωμα είναι απενεργοποιημένο.
 Επιλογές Build:
+Σφάλμα - αυτός ο κωδικός πρόσβασης δεν μπορεί να χρησιμοποιηθεί.
+Το αρχείο VMC %s είναι κατακερματισμένο. Συνέχεια με την Κάρτα Μνήμης στην υποδοχή %d;
 Παιχνίδια PS1
 Εκκίνηση μενού παιχνιδιών PS1
 Το POPSTARTER.ELF δεν βρέθηκε στη θέση '%s'!

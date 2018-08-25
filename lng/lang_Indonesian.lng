@@ -1,6 +1,6 @@
 # translated by verislasher and jbliz
-# Last update: 8/15/2018 
-# Updated for OPL_1286_DB-TA_[2c8e7d0]
+# Last update: 8/24/2018
+# Updated for OPL_1301_DB-TA_[24f2d97]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
 OPL %s
@@ -257,6 +257,8 @@ Masukkan kata sandi kuci Parental
 Kesalahan kata sandi kunci Parental.
 Kunci Parental tidak aktif.
 Opsi Bentukan:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

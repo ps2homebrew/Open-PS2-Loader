@@ -20,7 +20,7 @@
 #define PADOPEN_CHECK 1
 
 int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode);
-
+void IGR_Exit(s32 exit_code);
 
 // DEV9 Registers
 #define DEV9_R_1460 ((volatile u16 *)0xBF801460)

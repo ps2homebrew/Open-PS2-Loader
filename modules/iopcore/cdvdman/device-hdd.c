@@ -93,6 +93,10 @@ void DeviceFSInit(void)
 {
 }
 
+void DeviceUnmount(void)
+{
+}
+
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 offset = 0;

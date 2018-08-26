@@ -227,6 +227,14 @@ static unsigned int ReadPos = 0; /* Current buffer offset in 2048-byte sectors. 
 static int POFFThreadID;
 #endif
 
+typedef void (*oplShutdownCb_t)(void);
+static oplShutdownCb_t vmcShutdownCb = NULL;
+
+void oplRegisterShutdownCallback(oplShutdownCb_t cb)
+{
+    vmcShutdownCb = cb;
+}
+
 //--------------------------------------------------------------
 static void fs_init(void)
 {
@@ -824,6 +832,12 @@ int sceCdSC(int code, int *param)
             break;
         case CDSC_SET_ERROR:
             result = cdvdman_stat.err = *param;
+            break;
+        case CDSC_OPL_SHUTDOWN:
+            if(vmcShutdownCb != NULL)
+                vmcShutdownCb();
+            DeviceDeinit();
+            result = 1;
             break;
         default:
             result = 1; // dummy result

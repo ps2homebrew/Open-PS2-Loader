@@ -167,6 +167,7 @@ enum CDIOC_CODE {
 #define CDSC_IO_SEMA 0xFFFFFFF6          //Wait (param != 0) or signal (param == 0) high-level I/O semaphore.
 #define CDSC_GET_VERSION 0xFFFFFFF7      //Get CDVDMAN version.
 #define CDSC_SET_ERROR 0xFFFFFFFE        //Used by CDVDFSV and CDVDSTM to set the error code (Typically READCF*).
+#define CDSC_OPL_SHUTDOWN 0x00000001     //Shutdown OPL
 
 // exported functions prototypes
 #define cdvdman_IMPORTS_start DECLARE_IMPORT_TABLE(cdvdman, 1, 1)

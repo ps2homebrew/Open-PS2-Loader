@@ -192,12 +192,13 @@ DECLARE_EXPORT_TABLE(smsutils, 1, 1)
 END_EXPORT_TABLE
 
 // opl io utils export table
-DECLARE_EXPORT_TABLE(oplutils, 1, 1)
+DECLARE_EXPORT_TABLE(oplutils, 1, 2)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(getModInfo)
+	DECLARE_EXPORT(oplRegisterShutdownCallback)
 #ifdef USB_DRIVER
 	DECLARE_EXPORT(mass_stor_readSector)
 	DECLARE_EXPORT(mass_stor_writeSector)
@@ -209,6 +210,7 @@ DECLARE_EXPORT_TABLE(oplutils, 1, 1)
 	DECLARE_EXPORT(smb_OpenAndX)
 	DECLARE_EXPORT(smb_ReadFile)
 	DECLARE_EXPORT(smb_WriteFile)
+	DECLARE_EXPORT(smb_Close)
 #endif
 END_EXPORT_TABLE
 

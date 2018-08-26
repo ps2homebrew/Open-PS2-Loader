@@ -5,6 +5,7 @@
    */
 
 #include <stdio.h>
+#include <errno.h>
 #include <sysclib.h>
 #include "smstcpip.h"
 #include <thbase.h>
@@ -223,6 +224,20 @@ struct WriteAndXRequest_t
     u16 DataOffset;          // 59
     u32 OffsetHigh;          // 61
     u16 ByteCount;           // 65
+} __attribute__((packed));
+
+struct CloseRequest_t {      // size = 45
+    struct SMBHeader_t smbH; // 0
+    u8 smbWordcount;         // 36
+    u16 FID;                 // 37
+    u32 LastWrite;           // 39
+    u16 ByteCount;           // 43
+} __attribute__((packed));
+
+struct CloseResponse_t {
+    struct SMBHeader_t smbH; // 0
+    u8 smbWordcount;         // 36
+    u16 ByteCount;           // 37
 } __attribute__((packed));
 
 static server_specs_t server_specs;
@@ -661,6 +676,45 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 }
 
 //-------------------------------------------------------------------------
+int smb_Close(int FID)
+{
+    int r;
+    struct CloseRequest_t *CR = (struct CloseRequest_t *)SMB_buf;
+
+    WAITIOSEMA(io_sema);
+
+    mips_memset(SMB_buf, 0, sizeof(SMB_buf));
+
+    CR->smbH.Magic = SMB_MAGIC;
+    CR->smbH.Cmd = SMB_COM_CLOSE;
+    CR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES;
+    CR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
+    CR->smbH.UID = (u16)UID;
+    CR->smbH.TID = (u16)TID;
+    CR->smbWordcount = 3;
+    CR->FID = (u16)FID;
+
+    rawTCP_SetSessionHeader(41);
+    r = GetSMBServerReply();
+    if (r <= 0)
+        return -EIO;
+
+    struct CloseResponse_t *CRsp = (struct CloseResponse_t *)SMB_buf;
+
+    // check sanity of SMB header
+    if (CRsp->smbH.Magic != SMB_MAGIC)
+        return -EIO;
+
+    // check there's no error
+    if ((CRsp->smbH.Eclass | (CRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
+        return -EIO;
+
+    SIGNALIOSEMA(io_sema);
+
+    return 0;
+}
+
+//-------------------------------------------------------------------------
 int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes)
 {
     register int rcv_size, pkt_size, expected_size;
@@ -744,6 +798,15 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
     }
 
     return 1;
+}
+
+void smb_CloseAll(void)
+{
+    int i;
+
+    for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
+        smb_Close(cdvdman_settings.FIDs[i]);
+    }
 }
 
 //-------------------------------------------------------------------------

@@ -18,12 +18,22 @@ void (*pademu_hookSio2man)(Sio2Packet *sd, Sio2McProc sio2proc) = no_pademu;
 #endif
 
 //---------------------------------------------------------------------------
+// Shutdown callback
+//---------------------------------------------------------------------------
+static void mcemuShutdown(void)
+{   //If necessary, implement some locking mechanism to prevent further requests from being made.
+    DeviceShutdown();
+}
+
+//---------------------------------------------------------------------------
 // Entry point
 //---------------------------------------------------------------------------
 int _start(int argc, char *argv[])
 {
     int thid;
     iop_thread_t param;
+
+    oplRegisterShutdownCallback(&mcemuShutdown);
 
     param.attr = TH_C;
     param.thread = StartNow;

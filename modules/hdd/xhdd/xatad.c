@@ -76,3 +76,20 @@ int ata_device_set_transfer_mode(int device, int type, int mode)
 
     return 0;
 }
+
+/* Set features - enable/disable write cache.  */
+int ata_device_set_write_cache(int device, int enable)
+{
+	int res;
+
+	res = ata_io_start(NULL, 1, enable ? 0x02 : 0x82, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES);
+	if (res)
+		return res;
+
+	res = ata_io_finish();
+	if (res)
+		return res;
+
+	return 0;
+}
+

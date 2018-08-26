@@ -31,6 +31,7 @@
 #include "igs_api.h"
 #endif
 #include "cheat_api.h"
+#include "cd_igr_rpc.h"
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)(int port, int slot, void *addr);
@@ -189,6 +190,11 @@ static void IGR_Thread(void *arg)
 
         // Reset SPU
         ResetSPU();
+
+        if (!DisableDebug)
+            GS_BGCOLOUR = 0xFF8000; // Blue sky
+
+        oplIGRShutdown();
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0x0000FF; // Red

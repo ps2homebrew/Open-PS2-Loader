@@ -567,6 +567,9 @@ static void *cbrpc_S596(int fno, void *buf, int size)
         //Lock all accesses.
         value = -1;
         sceCdSC(CDSC_IO_SEMA, &value);
+        //Shutdown OPL
+        value = 0;
+        sceCdSC(CDSC_OPL_SHUTDOWN, &value);
     }
 
     *(int *)buf = 1;

@@ -77,7 +77,6 @@ void DeviceInit(void)
 
 void DeviceDeinit(void)
 {
-    smb_Disconnect();
 }
 
 void DeviceFSInit(void)
@@ -111,6 +110,12 @@ void DeviceFSInit(void)
             smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
         }
     }
+}
+
+void DeviceUnmount(void)
+{
+    smb_CloseAll();
+    smb_Disconnect();
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)

@@ -257,8 +257,8 @@ Masukkan kata sandi kuci Parental
 Kesalahan kata sandi kunci Parental.
 Kunci Parental tidak aktif.
 Opsi Bentukan:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Kesalahan - kata sandi tak bisa dipakai.
+Berkas VMC %s terfragmentasi. Gunakan kartu memori di slot %d?
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

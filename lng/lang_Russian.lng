@@ -1,5 +1,5 @@
 # Translated by druchapucha and frodosumkin
-# Last update: 8/24/2018
+# Last update: 8/25/2018
 # Updated for OPL_1301_DB-TA_[24f2d97]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
@@ -257,8 +257,8 @@ Multitap эмулятор на порте
 Родительский контроль, неверный пароль.
 Родительский контроль выключен.
 Опции сборки:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Ошибка - этот пароль не может быть использован.
+VMC %s файл фрагментирован. Продолжить с картой памяти в слоте %d?
 PS1 игры
 Отображать экран PS1 игр
 POPSTARTER.ELF не найден '%s'!

@@ -1,5 +1,5 @@
 # Translation by Lord_Flaya
-# Last update: 8/24/2018
+# Last update: 8/25/2018
 # Updated for OPL_1301_DB-TA_[24f2d97]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
@@ -257,8 +257,8 @@ Ange lösenord för föräldrakontroll
 Fel lösenord för föräldrakontroll
 Föräldrakontroll inaktiverat
 Bygg-Alternativ:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Fel - lösenordet kan ej användas.
+VMC %s filen är fragmenterad. Använd minneskort i port %d?
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

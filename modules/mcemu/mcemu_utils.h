@@ -16,6 +16,8 @@ typedef struct
     void **exports;
 } modinfo_t;
 
+typedef void (*oplShutdownCb_t)(void);
+
 /* SMS Utils Imports */
 #define smsutils_IMPORTS_start DECLARE_IMPORT_TABLE(smsutils, 1, 1)
 
@@ -28,19 +30,22 @@ void mips_memset(void *, int, unsigned);
 #define smsutils_IMPORTS_end END_IMPORT_TABLE
 
 
-#define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE(oplutils, 1, 1)
+#define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE(oplutils, 1, 2)
 
 int getModInfo(u8 *modname, modinfo_t *info);
 #define I_getModInfo DECLARE_IMPORT(4, getModInfo)
+
+int oplRegisterShutdownCallback(oplShutdownCb_t cb);
+#define I_oplRegisterShutdownCallback DECLARE_IMPORT(5, oplRegisterShutdownCallback)
 
 /* MASS Transfer Imports */
 #ifdef USB_DRIVER
 
 void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer);
-#define I_mass_stor_readSector DECLARE_IMPORT(5, mass_stor_readSector)
+#define I_mass_stor_readSector DECLARE_IMPORT(6, mass_stor_readSector)
 
 void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer);
-#define I_mass_stor_writeSector DECLARE_IMPORT(6, mass_stor_writeSector)
+#define I_mass_stor_writeSector DECLARE_IMPORT(7, mass_stor_writeSector)
 
 #endif
 
@@ -52,7 +57,7 @@ void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const 
 #define ATA_DIR_WRITE 1
 
 int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigned int sectors, int dir);
-#define I_ata_device_sector_io DECLARE_IMPORT(5, ata_device_sector_io)
+#define I_ata_device_sector_io DECLARE_IMPORT(6, ata_device_sector_io)
 
 #endif
 
@@ -60,13 +65,16 @@ int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigne
 #ifdef SMB_DRIVER
 
 int smb_OpenAndX(char *filename, u16 *FID, int Write);
-#define I_smb_OpenAndX DECLARE_IMPORT(5, smb_OpenAndX)
+#define I_smb_OpenAndX DECLARE_IMPORT(6, smb_OpenAndX)
 
 int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes);
-#define I_smb_ReadFile DECLARE_IMPORT(6, smb_ReadFile)
+#define I_smb_ReadFile DECLARE_IMPORT(7, smb_ReadFile)
 
 int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes);
-#define I_smb_WriteFile DECLARE_IMPORT(7, smb_WriteFile)
+#define I_smb_WriteFile DECLARE_IMPORT(8, smb_WriteFile)
+
+int smb_Close(int FID);
+#define I_smb_Close DECLARE_IMPORT(9, smb_Close)
 
 #endif
 

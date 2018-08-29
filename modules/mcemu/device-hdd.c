@@ -47,3 +47,8 @@ int DeviceReadPage(int mc_num, void *buf, u32 page_num)
 
     return (ata_device_sector_io(0, buf, lba, 1, ATA_DIR_READ) == 0 ? 1 : 0);
 }
+
+void DeviceShutdown(void)
+{
+}
+

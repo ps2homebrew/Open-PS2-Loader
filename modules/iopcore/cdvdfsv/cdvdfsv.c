@@ -555,12 +555,21 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
 //--------------------------------------------------------------
 static void *cbrpc_S596(int fno, void *buf, int size)
 {
-    int cdvdman_intr_ef, dummy;
+    int cdvdman_intr_ef, dummy, value;
 
     if (fno == 1) {
         cdvdman_intr_ef = sceCdSC(CDSC_GET_INTRFLAG, &dummy);
         ClearEventFlag(cdvdman_intr_ef, ~4);
         WaitEventFlag(cdvdman_intr_ef, 4, WEF_AND, NULL);
+    }
+    else if (fno == 0x0596) {
+        //Terminate operations.
+        //Lock all accesses.
+        value = -1;
+        sceCdSC(CDSC_IO_SEMA, &value);
+        //Shutdown OPL
+        value = 0;
+        sceCdSC(CDSC_OPL_SHUTDOWN, &value);
     }
 
     *(int *)buf = 1;

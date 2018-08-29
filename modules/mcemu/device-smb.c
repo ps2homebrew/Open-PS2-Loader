@@ -31,3 +31,19 @@ int DeviceReadPage(int mc_num, void *buf, u32 page_num)
 
     return (smb_ReadFile(vmcSpec[mc_num].fid, offset, 0, buf, vmcSpec[mc_num].cspec.PageSize) != 0 ? 1 : 0);
 }
+
+void DeviceShutdown(void)
+{
+    int i;
+
+    for (i = 0; i < 2; i++)
+    {
+        if (vmcSpec[i].active)
+        {
+            smb_Close(vmcSpec[i].fid);
+            vmcSpec[i].fid = 0xFFFF;
+            vmcSpec[i].active = 0;
+        }
+    }
+}
+

@@ -280,9 +280,11 @@ int smb_SessionSetupTreeConnect(char *share_name);
 int smb_SessionSetupAndX(u32 capabilities); // process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_TreeConnectAndX(char *ShareName);
 int smb_OpenAndX(char *filename, u16 *FID, int Write); // process a Open AndX message
+int smb_Close(int FID);
 int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes);
 int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes);
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
+void smb_CloseAll(void);
 int smb_Disconnect(void);
 
 #define MAX_SMB_SECTORS 2

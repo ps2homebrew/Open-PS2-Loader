@@ -48,6 +48,7 @@
 	.extern disable_padOpen_hook
 	.extern Old_ExecPS2
 	.extern Old_CreateThread
+	.extern sysExit
 
 	/* loader.h */
 	.extern g_compat_mask
@@ -61,6 +62,7 @@
 	.globl	Hook_SifSetReg
 	.globl	Hook_ExecPS2
 	.globl	Hook_CreateThread
+	.globl	Hook_Exit
 	.globl CleanExecPS2
 
 /*
@@ -343,6 +345,14 @@ Hook_CreateThread:
 	nop
 
 	.end	Hook_CreateThread
+
+	.ent	Hook_Exit
+Hook_Exit:
+	la	$v1, sysExit
+	jr 	$ra
+	sw 	$v1, 0x0008($sp)
+
+	.end	Hook_Exit
 
 .ent CleanExecPS2
 CleanExecPS2:

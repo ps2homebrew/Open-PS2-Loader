@@ -131,6 +131,7 @@ static void hdpro_io_write(u8 cmd, u16 val);
 static int hdpro_io_read(u8 cmd);
 static int ata_bus_reset(void);
 static int gen_ata_wait_busy(int bits);
+static int ata_device_set_write_cache(int device, int enable);
 
 static unsigned int ata_alarm_cb(void *unused)
 {
@@ -187,6 +188,10 @@ int atad_start(void)
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
+
+    //Disable write cache for VMC.
+    ata_device_set_write_cache(0, 0);
+    ata_device_set_write_cache(1, 0);
 
 out:
     hdpro_io_finish();
@@ -710,3 +715,20 @@ ata_devinfo_t *ata_get_devinfo(int device)
 {
     return &atad_devinfo;
 }
+
+/* Set features - enable/disable write cache.  */
+static int ata_device_set_write_cache(int device, int enable)
+{
+	int res;
+
+	res = ata_io_start(NULL, 1, enable ? 0x02 : 0x82, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES);
+	if (res)
+		return res;
+
+	res = ata_io_finish();
+	if (res)
+		return res;
+
+	return 0;
+}
+

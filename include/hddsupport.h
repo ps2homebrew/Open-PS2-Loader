@@ -52,6 +52,7 @@ int hddCheck(void);
 u32 hddGetTotalSectors(void);
 int hddIs48bit(void);
 int hddSetTransferMode(int type, int mode);
+int hddSetWriteCache(int enable);
 int hddSetIdleTimeout(int timeout);
 int hddGetHDLGamelist(hdl_games_list_t *game_list);
 void hddFreeHDLGamelist(hdl_games_list_t *game_list);

@@ -31,6 +31,7 @@
 #include "igs_api.h"
 #endif
 #include "cheat_api.h"
+#include "cd_igr_rpc.h"
 
 /* scePadPortOpen & scePad2CreateSocket prototypes */
 static int (*scePadPortOpen)(int port, int slot, void *addr);
@@ -191,6 +192,11 @@ static void IGR_Thread(void *arg)
         ResetSPU();
 
         if (!DisableDebug)
+            GS_BGCOLOUR = 0xFF8000; // Blue sky
+
+        oplIGRShutdown();
+
+        if (!DisableDebug)
             GS_BGCOLOUR = 0x0000FF; // Red
 
         // Reset IO Processor
@@ -265,16 +271,21 @@ static void IGR_Thread(void *arg)
         // Exit services
         SifExitRpc();
 
-        // Execute home loader
-        if (ExitPath[0] != '\0')
-            ExecPS2(t_loadElf, &_gp, 0, NULL);
-
-        // Return to PS2 Browser
-        Exit(0);
+        IGR_Exit(0);
     }
 
     // If combo is R3 + L3 or Reset failed, Poweroff PS2
     PowerOff_PS2();
+}
+
+void IGR_Exit(s32 exit_code)
+{
+    // Execute home loader
+    if (ExitPath[0] != '\0')
+        ExecPS2(t_loadElf, &_gp, 0, NULL);
+
+    // Return to PS2 Browser
+    Exit(exit_code);
 }
 
 // IGR VBLANK_END interrupt handler install to monitor combo trick in pad data aera

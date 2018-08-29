@@ -88,7 +88,8 @@ static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, in
         case DDIOC_MODEL:
             return dev9type;
         case DDIOC_OFF:
-            dev9Shutdown();
+            //Do not let the DEV9 interface to be switched off by other software.
+            //dev9Shutdown();
             return 0;
         default:
             return 0;

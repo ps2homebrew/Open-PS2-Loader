@@ -88,7 +88,8 @@ static int dev9x_devctl(iop_file_t *f, const char *name, int cmd, void *args, in
         case DDIOC_MODEL:
             return dev9type;
         case DDIOC_OFF:
-            dev9Shutdown();
+            //Do not let the DEV9 interface to be switched off by other software.
+            //dev9Shutdown();
             return 0;
         default:
             return 0;
@@ -222,7 +223,24 @@ static void dev9_set_stat(int stat)
 /* Export 6 */
 void dev9Shutdown(void)
 {
-    //Do not let the DEV9 interface to be switched off.
+    int idx;
+    USE_DEV9_REGS;
+
+    for (idx = 0; idx < 16; idx++)
+        if (dev9_shutdown_cbs[idx])
+            dev9_shutdown_cbs[idx]();
+
+    if (dev9type == 0) { /* PCMCIA */
+        DEV9_REG(DEV9_R_POWER) = 0;
+        DEV9_REG(DEV9_R_1474) = 0;
+    } else if (dev9type == 1) {
+        DEV9_REG(DEV9_R_1466) = 1;
+        DEV9_REG(DEV9_R_1464) = 0;
+        DEV9_REG(DEV9_R_1460) = DEV9_REG(DEV9_R_1464);
+        DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~4;
+        DEV9_REG(DEV9_R_POWER) = DEV9_REG(DEV9_R_POWER) & ~1;
+    }
+    DelayThread(1000000);
 }
 
 /* Export 7 */

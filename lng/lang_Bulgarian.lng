@@ -131,7 +131,7 @@ NetBIOS
 VMC файлът съществува.
 Невалиден VMC файл - грешен обем.
 VMC файлът трябва да бъде създаден.
-Грешка с VMC %s, продължаване с MC в слот %s?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Автоматично опресняване
 Относно
 Програмисти:
@@ -245,5 +245,16 @@ Eмулиране на Multitap
 Емулация на Multitap за порт
 Избор на порт, на който да се емулира Multitap.
 Деактивиране на корекция при фалшиви DS3
-Неоригинални DS3 контролери се нуждаят от тази корекция.  
+Неоригинални DS3 контролери се нуждаят от тази корекция.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
+Parental Lock Settings
+Parental Lock Password
+Leave blank to disable the parental lock.
+Enter Parental Lock Password
+Parental lock password incorrect.
+Parental lock disabled.
+Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?  
 

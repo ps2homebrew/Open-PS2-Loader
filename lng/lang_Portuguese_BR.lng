@@ -210,7 +210,7 @@ Auto-começar
 Valores em segundos (s), 0 para desativar
 Logotipo do Playstation 2
 Será mostrado apenas para os jogos que for da mesma região do console
-Configurar DualShock3
+Configurar DualShock3/4
 Configurações de emulação de Controle
 Ativar emulação de Controle
 Liga/desliga a emulação de controle para o jogo selecionado.
@@ -227,8 +227,8 @@ Liga/desliga a vibração para o controle emulado da porta selecionada.
 Endereço MAC do adaptador USB:
 DualShock 3 sincronizado com o MAC:
 Sincronizar
-Sincroniza o controle DualShock 3
-Sincroniza o controle DualShock 3 com endereço MAC do adaptador bluetooth.
+Sincroniza o controle DualShock 3/4
+Sincroniza o controle DualShock 3/4 com endereço MAC do adaptador bluetooth.
 Não está conectado
 Informações do adaptador Bluetooth
 Mostra mais informações e recursos suportados
@@ -246,3 +246,14 @@ Emulador do Multitap na porta
 Escolha a porta para a emulação do Multitap.
 Desativar soluções alternativa para DS3 falsos
 Alguns DS3 falsos precisam de soluções alternativas, esta opção irá desativá-la.
+Emular inversão de campo
+Correção para alguns jogos que apresentam falhas nos modos de vídeos progressivos.
+Configurações de bloqueio parental
+Senha do bloqueio parental
+Deixe em branco para desativar o bloqueio parental.
+Insira a senha do bloqueio parental
+A seha do bloqueio parental está incorreta.
+Bloqueio parental desativado.
+Opção de Montagem:
+Erro - Esta senha não pode ser usada.
+O arquivo do VMC %s está fragmentado. Continuar com o Memory Card do slot %d?

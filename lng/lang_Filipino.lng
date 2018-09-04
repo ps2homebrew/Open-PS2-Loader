@@ -131,7 +131,7 @@ pag-unlad
 VMC file umiiral
 Di-wastong VMC file , laki ay hindi tama
 VMC file na kailangan upang malikha
-Error sa VMC %s , magpatuloy sa pisikal na MC (slot %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Awtomatikong i-refresh
 tungkol sa
 Coders
@@ -246,3 +246,14 @@ Multitap emulator on port
 Select port for Multitap emulation.
 Disable workaround for fake ds3
 Some fake ds3s need workaround, this option will disable it.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
+Parental Lock Settings
+Parental Lock Password
+Leave blank to disable the parental lock.
+Enter Parental Lock Password
+Parental lock password incorrect.
+Parental lock disabled.
+Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?

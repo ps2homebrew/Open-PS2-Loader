@@ -30,12 +30,12 @@ types come with more or less features included.
 
 | Type (can be a combination) | Description                                                            |
 | --------------------------- | ---------------------------------------------------------------------- |
-| "Default"                   | Main OPL release with built-in Graphics Synthesizer Mode (GSM), Parental Lock and Virtual Memory Card (VMC). |
-| "Release" (best choice)     | Default OPL release with Pad Emulator (PadEmu) and In Game Screenshot (IGS). |
-| "PadEmu"                    | OPL release with Pad Emulator. |
+| "Default"                   | Main OPL release with built-in Cheat Engine (PS2RD), Graphics Synthesizer Mode (GSM), Parental Lock and Virtual Memory Card (VMC). |
+| "Release"                   | Default OPL release with Pad Emulator (PadEmu) and In Game Screenshot (IGS). |
+| "PadEmu" (best feature)     | OPL release with Pad Emulator (PS3/PS4 Support). |
+| "HIRES"                     | OPL release with HIgh REsolution multi-pass rendering for the OPL GUI. |
 | "IGS"                       | OPL release with In Game Screenshot. |
 | "RTL"                       | OPL release with Right-To-Left language support. |
-| "HIRES"                     | OPL release with HIgh REsolution multi-pass rendering for the OPL GUI. |
 
 ## How to use
 

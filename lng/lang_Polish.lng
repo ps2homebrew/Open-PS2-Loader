@@ -247,3 +247,14 @@ Emulacja Multitapa dla portu
 Wybierz port dla emulacji Multitapa.
 Nie stosuj obejścia dla klonów DS3.
 Niektóre klony DS3 wymagają obejścia, ta opcja to wyłączy.
+Emuluj FIELD flipping
+Poprawka dla gier w których występują usterki w trybie progresywnego obrazu.
+Ustawienia blokady rodzicielskiej
+Hasło blokady rodzicielskiej
+Pozostaw puste aby wyłączyć blokadę rodzicielską.
+Wprowadź hasło blokady rodzicielskiej.
+Nieprawidłowe hasło blokady rodzicielskiej.
+Blokada rodzicielska wyłączona.
+Opcje kompilacji:
+Błąd - te hasło nie może być użyte.
+Plik VMC %s jest pofragmentowany. Kontynuuj z kartą pamięci w gnieździe %d?

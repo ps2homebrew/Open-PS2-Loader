@@ -131,7 +131,7 @@ Progreso
 Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
-Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
+Error accediendo a la VMC %s, ¿continuar con la tarjeta de memoria en ranura %d)?
 Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
@@ -246,3 +246,14 @@ Emulación Multitap en el puerto
 Selecciona puerto para la emulación Multitap
 Desactivar método alternativo para falso DS3
 Algunos DS3 falsos necesitan un método alternativo, esta opción lo desactiva
+Emular alternancia de valores de CAMPO
+Solución para juegos que fallan bajo modos de vídeo progresivos.
+Configuración de control paterno
+Contraseña de control paterno
+Dejar en blanco para desactivar el control paterno.
+Introduce contraseña de control paterno
+Contraseña control paterno incorrecta.
+Control paterno desactivado.
+Opciones de compilación:
+Error - esta contraseña no se puede usar.
+El archivo VMC %s está fragmentado. ¿Continuar con la tarjeta de memoria en ranura %d?

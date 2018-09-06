@@ -1,5 +1,5 @@
-# Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Portuguese Brazil Translation by gledson999@psx-place and revised by Dr-Vee@Github
+# Last Revision on 2018/August/18 for ifcaro repo
 Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
@@ -19,7 +19,7 @@ Aplicativos
 Temas
 Idioma
 O sistema será desligado.
-Sair para o Navegador/OSDSYS?
+Sair para o Navegador?
 Cancelar as atualizações?
 %d: O Disco Rígido não foi detectado
 %d: O Disco Rígido não está formatado
@@ -32,10 +32,10 @@ Cancelar as atualizações?
 %d: Não foi possível listar os jogos
 %d: O servidor DHCP está indisponível
 %d: Nenhuma conexão de rede
-ON 
-OFF
-Ok
-Ok
+On
+Off
+OK
+OK
 Cancelar
 O
 X
@@ -49,17 +49,17 @@ Média
 Rápida
 Menu padrão
 Carregar do disco
-Por favor aguarde
+Por favor, aguarde
 Erro ao carregar o ID do jogo
 Organizar em ordem alfabética
 Erro ao carregar os arquivos de idioma
-Desativar cores de depuração
+Desativar Cores de Depuração
 Nenhum controle detectado, aguardando...
-Habilitar as artes da Capa
+Habilitar as Artes da Capa
 Tela panorâmica
-Desligar o PS2
+Desligar o sistema
 Carregando configurações
-Salvando configurações...
+Salvando configurações
 Iniciar dispositivo
 Atualizar
 Modo de inicio no USB
@@ -111,12 +111,12 @@ Deixe em branco para não usar senhas.
 Leituras corretas
 Modo de Sincronia
 Desativar chamadas do sistema
-Pular vídeos
+Pular Vídeos
 Emular DVD-DL
 Desativa o IGR
-Armazenamento dos módulos elevados
-Esconder módulo dev9
-Mudando de tamanho, formatará o VMC
+Não usado
+Esconder o módulo DEV9
+Mudando o tamanho, irá formatar o VMC
 Criar
 Iniciar
 Modificar
@@ -128,22 +128,22 @@ Nome
 Tamanho
 Estatísticas
 Progresso
-O arquivo do VMC já existe
+O arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 O arquivo do VMC precisa ser criado
-Error com o VMC %s, continuar com o MC físico (slot %d) ?
+Erro ao acessar o VMC %s. Continuar com o Memory Card no slot %d?
 Atualização automática
 Créditos
 Desenvolvedores
 Controle de Qualidade
 Prefixo do caminho USB
-Inicia um ELF preferencial após um IGR
+Inicia um ELF após um IGR
 Valor em minuto(s), 0 para desativar
 Desligamento automático do HDD
 Modo de vídeo
 Cor do diálogo
 Cor selecionada
-Mostrar Página de Informação 
+Mostrar Página de Informação
 Info.
 ELF modificado
 Seleção de Cor
@@ -158,7 +158,7 @@ VMC Slot 1
 VMC Slot 2
 ID do Jogo
 Modo de DMA
-Sincronização do vídeo 
+Sincronização do vídeo
 Modo 1
 Modo 2
 Modo 3
@@ -177,7 +177,7 @@ Opções do GSM
 Ativar GSM
 Ativar/Desativar o GSM
 VMODE
-NTSC/PAL/60Hz/PS1/HDTV/VGA
+Modo Forçado de Exibição Personalizada
 POS-H
 Ajustes Horizontais
 POS-V
@@ -188,7 +188,7 @@ Pular FMV
 Pula os vídeos do jogo
 Opções de trapaças
 Ativar o PS2RD Cheat Engine
-Deixar o PS2RD patchear seus jogos
+Permite o PS2RD patchear o seu jogo
 Modo do PS2RD Cheat Engine
 Auto-selecionar ou Escolher as trapaças
 Auto-selecionar trapaças
@@ -209,15 +209,15 @@ Iniciar automaticamente no %i s...
 Auto-começar
 Valores em segundos (s), 0 para desativar
 Logotipo do Playstation 2
-Será mostrado apenas para os jogos que for da mesma região do console
-Configurar DualShock3/4
-Configurações de emulação de Controle
-Ativar emulação de Controle
+(Será mostrado apenas para os jogos que for da mesma região do console)
+Configurar o PADEMU
+Configurações de Emulação de Controle
+Ativar Emulação de Controle
 Liga/desliga a emulação de controle para o jogo selecionado.
 Modo de emulação de controle
 Escolha o modo de emulação de controle.
 DualShock3/4 USB
-DualShock3/4 BlueTooth
+DualShock3/4 BT
 Configurações da porta:
 Escolha a porta do controle emulado para aplicar os ajustes.
 Ativar emulação
@@ -225,10 +225,10 @@ Liga/desliga o emulador de controle para a porta selecionada.
 Ativar vibração
 Liga/desliga a vibração para o controle emulado da porta selecionada.
 Endereço MAC do adaptador USB:
-DualShock 3 sincronizado com o MAC:
+Controle DualShock sincronizado com o MAC:
 Sincronizar
-Sincroniza o controle DualShock 3/4
-Sincroniza o controle DualShock 3/4 com endereço MAC do adaptador bluetooth.
+Sincronizar o Controle DualShock
+Sincronizar o Controle DualShock com endereço MAC do adaptador bluetooth.
 Não está conectado
 Informações do adaptador Bluetooth
 Mostra mais informações e recursos suportados
@@ -248,12 +248,12 @@ Desativar soluções alternativa para DS3 falsos
 Alguns DS3 falsos precisam de soluções alternativas, esta opção irá desativá-la.
 Emular inversão de campo
 Correção para alguns jogos que apresentam falhas nos modos de vídeos progressivos.
-Configurações de bloqueio parental
-Senha do bloqueio parental
-Deixe em branco para desativar o bloqueio parental.
-Insira a senha do bloqueio parental
-A seha do bloqueio parental está incorreta.
-Bloqueio parental desativado.
-Opção de Montagem:
+Configurações do Controle Parental
+Senha do Controle Parental
+Deixe em branco para desativar o Controle Parental.
+Entre com a senha do Controle Parental
+Senha do Controle Parental incorreta.
+Controle Parental Desativado.
+Opções da Construção Atual:
 Erro - Esta senha não pode ser usada.
-O arquivo do VMC %s está fragmentado. Continuar com o Memory Card do slot %d?
+O arquivo VMC %s está fragmentado. Continuar com o Memory Card no slot %d?

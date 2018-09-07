@@ -1,5 +1,5 @@
 # translation by alimadhi
-# Last update: 8/24/2018
+# Last update: 8/31/2018
 # Updated for OPL_1301_DB-TA_[24f2d97]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Arabic
@@ -257,8 +257,8 @@ LMP الاصدار:
 كلمة مرور الوالدين قفل غير صحيحة.
 تم تعطيل قفل الوالدين.
 خيارات البناء:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+خطأ - لا يمكن استخدام كلمة المرور هذه.
+ملف VMC %s مجزأ. تواصل مع بطاقة الذاكرة في الفتحة %d?
 PS1 العاب
 PS1 وضع عرض الالعاب
 POPSTARTER.ELF غير موجود في '%s'!

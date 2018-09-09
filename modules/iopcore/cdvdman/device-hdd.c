@@ -41,6 +41,10 @@ static unsigned char NumParts;
 
 static hdl_partspecs_t cdvdman_partspecs[HDL_NUM_PART_SPECS];
 
+#ifdef HD_PRO
+extern int ata_device_set_write_cache(int device, int enable);
+#endif
+
 static int cdvdman_get_part_specs(u32 lsn)
 {
     register int i;
@@ -73,6 +77,14 @@ void DeviceInit(void)
 
     DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
 
+#ifdef HD_PRO
+    //For HDPro, as its custom ATAD module does not export ata_io_start() and ata_io_finish(). And it also resets the ATA bus.
+    if (cdvdman_settings.common.flags & IOPCORE_ENABLE_POFF) {
+        //If IGR is enabled (the poweroff function here is disabled), we can tell when to flush the cache. Hence if IGR is disabled, then we should disable the write cache.
+        ata_device_set_write_cache(0, 0);
+    }
+#endif
+
     while ((r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ)) != 0) {
         DPRINTF("fs_init: failed to read apa header %d\n", r);
         DelayThread(2000);
@@ -95,6 +107,7 @@ void DeviceFSInit(void)
 
 void DeviceUnmount(void)
 {
+    ata_device_flush_cache(0);
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)

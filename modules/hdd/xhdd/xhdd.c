@@ -38,11 +38,6 @@ static int xhddDevctl(iop_file_t *fd, const char *name, int cmd, void *arg, unsi
                 return ata_device_set_transfer_mode(fd->unit, ((hddAtaSetMode_t *)arg)->type, ((hddAtaSetMode_t *)arg)->mode);
             else
                 return hdproata_device_set_transfer_mode(fd->unit, ((hddAtaSetMode_t *)arg)->type, ((hddAtaSetMode_t *)arg)->mode);
-        case ATA_DEVCTL_SET_WRITE_CACHE:
-            if (!isHDPro)
-                return ata_device_set_write_cache(fd->unit, ((hddAtaSetWriteCache_t *)arg)->enable);
-            else
-                return hdproata_device_set_write_cache(fd->unit,  ((hddAtaSetWriteCache_t *)arg)->enable);
         default:
             return -EINVAL;
     }

@@ -279,6 +279,8 @@ static void cdvdman_poff_thread(void *arg)
     int stat;
 
     SleepThread();
+
+    DeviceUnmount();
     dev9Shutdown();
     sceCdPowerOff(&stat);
 }
@@ -836,7 +838,7 @@ int sceCdSC(int code, int *param)
         case CDSC_OPL_SHUTDOWN:
             if(vmcShutdownCb != NULL)
                 vmcShutdownCb();
-            DeviceDeinit();
+            DeviceUnmount();
             result = 1;
             break;
         default:

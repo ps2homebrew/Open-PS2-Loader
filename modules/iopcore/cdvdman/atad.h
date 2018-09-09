@@ -53,6 +53,7 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
 int ata_io_finish(void);
 int ata_get_error(void);
 int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir);
+int ata_device_flush_cache(int device);
 
 // APA Partition
 #define APA_MAGIC 0x00415041 // 'APA\0'

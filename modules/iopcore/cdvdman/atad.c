@@ -74,7 +74,7 @@ typedef struct _ata_cmd_info
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
-    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}};
+    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}, {ATA_C_FLUSH_CACHE, 0x01}, {ATA_C_FLUSH_CACHE_EXT, 0x01}};
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
 static const ata_cmd_info_t smart_cmd_table[] = {
@@ -557,6 +557,17 @@ finish:
     return res;
 }
 
+/* Export 17 */
+int ata_device_flush_cache(int device)
+{
+    int res;
+
+    if(!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
+	res = ata_io_finish();
+
+    return res;
+}
+
 /* Export 9 */
 /* Note: this can only support DMA modes, due to the commands issued. */
 int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
@@ -573,10 +584,8 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         hcyl = (lba >> 16) & 0xff;
 
         if (lba_48bit) {
-            /* Setup for 48-bit LBA.
-               While ATA-6 allows for the transfer of up to 65536 sectors,
-               the DMAC allows only up to 65536 x 128 / 512 = 16384 sectors. */
-            len = (nsectors > 16384) ? 16384 : nsectors;
+            /* Setup for 48-bit LBA. */
+            len = (nsectors > 65536) ? 65536 : nsectors;
 
             /* Combine bits 24-31 and bits 0-7 of lba into sector.  */
             sector = ((lba >> 16) & 0xff00) | (lba & 0xff);

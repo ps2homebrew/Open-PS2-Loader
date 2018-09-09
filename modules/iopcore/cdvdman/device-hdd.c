@@ -45,6 +45,8 @@ static hdl_partspecs_t cdvdman_partspecs[HDL_NUM_PART_SPECS];
 extern int ata_device_set_write_cache(int device, int enable);
 #endif
 
+extern int ata_io_sema;
+
 static int cdvdman_get_part_specs(u32 lsn)
 {
     register int i;
@@ -107,6 +109,7 @@ void DeviceFSInit(void)
 
 void DeviceUnmount(void)
 {
+    WaitSema(ata_io_sema);
     ata_device_flush_cache(0);
 }
 

@@ -18,7 +18,7 @@
 #include "smb.h"
 #include "cdvd_config.h"
 
-static int io_sema = -1;
+int smb_io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
@@ -386,7 +386,7 @@ int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, 
     smp.max = 1;
     smp.option = 0;
     smp.attr = 1;
-    io_sema = CreateSema(&smp);
+    smb_io_sema = CreateSema(&smp);
 
     dst_addr.s_addr = pinet_addr(SMBServerIP);
 
@@ -616,7 +616,7 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
     register int i, offset, CF;
 
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(smb_io_sema);
 
     mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -670,18 +670,19 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     smb_Write_Request.smbH.UID = UID;
     smb_Write_Request.smbH.TID = TID;
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(smb_io_sema);
 
     return 1;
 }
 
 //-------------------------------------------------------------------------
+//Do not call WaitSema() from this function because it would have been already called.
 int smb_Close(int FID)
 {
     int r;
     struct CloseRequest_t *CR = (struct CloseRequest_t *)SMB_buf;
 
-    WAITIOSEMA(io_sema);
+//  WAITIOSEMA(smb_io_sema);
 
     mips_memset(SMB_buf, 0, sizeof(SMB_buf));
 
@@ -709,7 +710,7 @@ int smb_Close(int FID)
     if ((CRsp->smbH.Eclass | (CRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
         return -EIO;
 
-    SIGNALIOSEMA(io_sema);
+//  SIGNALIOSEMA(smb_io_sema);
 
     return 0;
 }
@@ -721,7 +722,7 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbyt
 
     struct ReadAndXRequest_t *RR = &smb_Read_Request;
 
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(smb_io_sema);
 
     RR->FID = FID;
     RR->OffsetLow = offsetlow;
@@ -743,7 +744,7 @@ receive:
         rcv_size += pkt_size;
     }
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(smb_io_sema);
 
     return 1;
 }
@@ -753,7 +754,7 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nb
 {
     struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
 
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(smb_io_sema);
 
     mips_memcpy(WR, &smb_Write_Request, sizeof(struct WriteAndXRequest_t));
 
@@ -770,7 +771,7 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nb
     rawTCP_SetSessionHeader(sizeof(struct WriteAndXRequest_t) - 4 + nbytes);
     GetSMBServerReply();
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(smb_io_sema);
 
     return 1;
 }

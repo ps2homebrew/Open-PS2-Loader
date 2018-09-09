@@ -33,6 +33,8 @@
 
 extern struct cdvdman_settings_usb cdvdman_settings;
 
+extern int usb_io_sema;
+
 static void usbd_init(void);
 
 // !!! usbd exports functions pointers !!!
@@ -82,6 +84,7 @@ void DeviceFSInit(void)
 
 void DeviceUnmount(void)
 {
+    WaitSema(usb_io_sema);
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)

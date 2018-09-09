@@ -564,9 +564,6 @@ static void *cbrpc_S596(int fno, void *buf, int size)
     }
     else if (fno == 0x0596) {
         //Terminate operations.
-        //Lock all accesses.
-        value = -1;
-        sceCdSC(CDSC_IO_SEMA, &value);
         //Shutdown OPL
         value = 0;
         sceCdSC(CDSC_OPL_SHUTDOWN, &value);

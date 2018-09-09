@@ -72,7 +72,7 @@ static int ata_evflg = -1;
 /* Used for indicating 48-bit LBA support.  */
 extern char lba_48bit;
 
-static int io_sema = -1;
+int ata_io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
@@ -186,7 +186,7 @@ int atad_start(void)
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
-    io_sema = CreateSema(&smp);
+    ata_io_sema = CreateSema(&smp);
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
@@ -677,7 +677,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
     unsigned int nbytes;
     u16 sector, lcyl, hcyl, select, command, len;
 
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(ata_io_sema);
 
     if (!hdpro_io_start())
         return -1;
@@ -720,7 +720,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
     if (!hdpro_io_finish())
         return -2;
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(ata_io_sema);
 
     return res;
 }

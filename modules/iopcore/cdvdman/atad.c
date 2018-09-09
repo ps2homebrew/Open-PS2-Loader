@@ -55,7 +55,7 @@ static u8 ata_gamestar_workaround = 0;
 
 static int ata_evflg = -1;
 
-static int io_sema = -1;
+int ata_io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
@@ -166,7 +166,7 @@ int atad_start(void)
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
-    io_sema = CreateSema(&smp);
+    ata_io_sema = CreateSema(&smp);
 
     res = 0;
     M_PRINTF("Driver loaded.\n");
@@ -576,7 +576,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
     int res = 0, retries;
     u16 sector, lcyl, hcyl, select, command, len;
 
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(ata_io_sema);
 
     while (res == 0 && nsectors > 0) {
         /* Variable lba is only 32 bits so no change for lcyl and hcyl.  */
@@ -627,7 +627,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
         nsectors -= len;
     }
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(ata_io_sema);
 
     return res;
 }

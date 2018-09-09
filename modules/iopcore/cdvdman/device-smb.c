@@ -37,6 +37,8 @@ extern struct cdvdman_settings_smb cdvdman_settings;
 
 extern struct irx_export_table _exp_oplsmb;
 
+extern int smb_io_sema;
+
 static void ps2ip_init(void);
 
 // !!! ps2ip exports functions pointers !!!
@@ -114,6 +116,7 @@ void DeviceFSInit(void)
 
 void DeviceUnmount(void)
 {
+    WaitSema(smb_io_sema);
     smb_CloseAll();
     smb_Disconnect();
 }

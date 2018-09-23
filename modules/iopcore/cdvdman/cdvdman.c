@@ -280,6 +280,8 @@ static void cdvdman_poff_thread(void *arg)
 
     SleepThread();
 
+    if(vmcShutdownCb != NULL)
+        vmcShutdownCb();
     DeviceUnmount();
     dev9Shutdown();
     sceCdPowerOff(&stat);

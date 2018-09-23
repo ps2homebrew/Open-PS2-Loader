@@ -5,19 +5,19 @@
 
 #include "cd_igr_rpc.h"
 
-//This uses the libcdvd power-off RPC, which only has 1 official function implemented.
 int oplIGRShutdown(void)
 {
     SifRpcClientData_t _igr_cd;
     int r;
 
-    while ((r = SifBindRpc(&_igr_cd, 0x80000596, 0)) >= 0 && (!_igr_cd.server))
+    _igr_cd.server = NULL;
+    while ((r = SifBindRpc(&_igr_cd, 0x80000598, 0)) >= 0 && (!_igr_cd.server))
         nopdelay();
 
     if (r < 0)
         return -E_SIF_RPC_BIND;
 
-    if (SifCallRpc(&_igr_cd, 0x0596, 0, NULL, 0, NULL, 0, NULL, NULL) < 0)
+    if (SifCallRpc(&_igr_cd, 1, 0, NULL, 0, NULL, 0, NULL, NULL) < 0)
         return -E_SIF_RPC_CALL;
 
     return 0;

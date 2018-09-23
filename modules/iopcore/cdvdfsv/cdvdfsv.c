@@ -121,12 +121,14 @@ static void cdvdfsv_startrpcthreads(void);
 static void cdvdfsv_rpc0_th(void *args);
 static void cdvdfsv_rpc1_th(void *args);
 static void cdvdfsv_rpc2_th(void *args);
+static void cdvdfsv_rpc_sd_th(void *args);
 static void *cbrpc_cdinit(int fno, void *buf, int size);
 static void *cbrpc_cdvdScmds(int fno, void *buf, int size);
 static void *cbrpc_cddiskready(int fno, void *buf, int size);
 static void *cbrpc_cddiskready2(int fno, void *buf, int size);
 static void *cbrpc_cdvdNcmds(int fno, void *buf, int size);
 static void *cbrpc_S596(int fno, void *buf, int size);
+static void *cbrpc_shutdown(int fno, void *buf, int size);
 static void *cbrpc_cdsearchfile(int fno, void *buf, int size);
 static inline void rpcSCmd_cdreadclock(void *buf);
 static inline void rpcSCmd_cdtrayreq(void *buf);
@@ -204,9 +206,11 @@ static u8 *cdvdfsv_buf;
 static SifRpcDataQueue_t rpc0_DQ;
 static SifRpcDataQueue_t rpc1_DQ;
 static SifRpcDataQueue_t rpc2_DQ;
+static SifRpcDataQueue_t rpc_sd_DQ;
 static SifRpcServerData_t cdinit_rpcSD, cddiskready_rpcSD, cddiskready2_rpcSD, cdvdScmds_rpcSD;
 static SifRpcServerData_t cdsearchfile_rpcSD, cdvdNcmds_rpcSD;
 static SifRpcServerData_t S596_rpcSD;
+static SifRpcServerData_t sd_rpcSD;
 
 static u8 cdinit_rpcbuf[16];
 static u8 cddiskready_rpcbuf[16];
@@ -215,10 +219,11 @@ static u8 cdvdScmds_rpcbuf[1024];
 static u8 cdsearchfile_rpcbuf[304];
 static u8 cdvdNcmds_rpcbuf[1024];
 static u8 S596_rpcbuf[16];
+static u8 shutdown_rpcbuf[16];
 
 #define CDVDFSV_BUF_SECTORS (CDVDMAN_FS_SECTORS + 1) //CDVDFSV will use CDVDFSV_BUF_SECTORS+1 sectors of space. Remember that the actual size of the buffer within CDVDMAN is CDVDMAN_FS_SECTORS+2.
 
-static int rpc0_thread_id, rpc1_thread_id, rpc2_thread_id;
+static int rpc0_thread_id, rpc1_thread_id, rpc2_thread_id, rpc_sd_thread_id;
 
 struct irx_export_table _exp_cdvdfsv;
 
@@ -282,6 +287,15 @@ static void cdvdfsv_startrpcthreads(void)
 
     rpc0_thread_id = CreateThread(&thread_param);
     StartThread(rpc0_thread_id, NULL);
+
+    thread_param.attr = TH_C;
+    thread_param.option = 0xABCD8003;
+    thread_param.thread = (void *)cdvdfsv_rpc_sd_th;
+    thread_param.stacksize = 0x440;
+    thread_param.priority = 0x1;
+
+    rpc_sd_thread_id = CreateThread(&thread_param);
+    StartThread(rpc_sd_thread_id, NULL);
 }
 
 //-------------------------------------------------------------------------
@@ -323,6 +337,15 @@ static void cdvdfsv_rpc2_th(void *args)
     sceSifRegisterRpc(&cdsearchfile_rpcSD, 0x80000597, &cbrpc_cdsearchfile, cdsearchfile_rpcbuf, NULL, NULL, &rpc2_DQ);
 
     sceSifRpcLoop(&rpc2_DQ);
+}
+
+//-------------------------------------------------------------------------
+//Unofficial RPC for shutting down OPL.
+static void cdvdfsv_rpc_sd_th(void *args)
+{
+    sceSifSetRpcQueue(&rpc_sd_DQ, GetThreadId());
+    sceSifRegisterRpc(&sd_rpcSD, 0x80000598, &cbrpc_shutdown, shutdown_rpcbuf, NULL, NULL, &rpc_sd_DQ);
+    sceSifRpcLoop(&rpc_sd_DQ);
 }
 
 //-------------------------------------------------------------------------
@@ -555,14 +578,24 @@ static void *cbrpc_cdvdNcmds(int fno, void *buf, int size)
 //--------------------------------------------------------------
 static void *cbrpc_S596(int fno, void *buf, int size)
 {
-    int cdvdman_intr_ef, dummy, value;
+    int cdvdman_intr_ef, dummy;
 
     if (fno == 1) {
         cdvdman_intr_ef = sceCdSC(CDSC_GET_INTRFLAG, &dummy);
         ClearEventFlag(cdvdman_intr_ef, ~4);
         WaitEventFlag(cdvdman_intr_ef, 4, WEF_AND, NULL);
     }
-    else if (fno == 0x0596) {
+
+    *(int *)buf = 1;
+    return buf;
+}
+
+//--------------------------------------------------------------
+static void *cbrpc_shutdown(int fno, void *buf, int size)
+{
+    int value;
+
+    if (fno == 1) {
         //Terminate operations.
         //Shutdown OPL
         value = 0;

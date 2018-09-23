@@ -279,12 +279,12 @@ static struct WriteAndXRequest_t smb_Write_Request = {
     0,
     0,
     0,
-    0x01,
+    0x00,
     0,
     0,
     0,
     0x3f,
-    0 //DataOffset = 0x3f, WriteMode = 1
+    0 //DataOffset = 0x3f, WriteMode = 0
 };
 
 static u16 UID, TID;

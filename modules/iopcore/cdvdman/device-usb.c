@@ -82,9 +82,13 @@ void DeviceFSInit(void)
         DelayThread(200);
 }
 
-void DeviceUnmount(void)
+void DeviceLock(void)
 {
     WaitSema(usb_io_sema);
+}
+
+void DeviceUnmount(void)
+{
 }
 
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)

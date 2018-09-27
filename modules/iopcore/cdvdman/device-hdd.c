@@ -107,9 +107,13 @@ void DeviceFSInit(void)
 {
 }
 
-void DeviceUnmount(void)
+void DeviceLock(void)
 {
     WaitSema(ata_io_sema);
+}
+
+void DeviceUnmount(void)
+{
     ata_device_flush_cache(0);
 }
 

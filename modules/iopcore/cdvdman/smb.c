@@ -655,11 +655,17 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 
     // check sanity of SMB header
     if (ORsp->smbH.Magic != SMB_MAGIC)
+    {
+        SIGNALIOSEMA(smb_io_sema);
         return -1;
+    }
 
     // check there's no error
     if (ORsp->smbH.Eclass != STATUS_SUCCESS)
+    {
+        SIGNALIOSEMA(smb_io_sema);
         return -1000;
+    }
 
     *FID = ORsp->FID;
 

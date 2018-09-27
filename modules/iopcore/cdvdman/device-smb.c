@@ -114,9 +114,13 @@ void DeviceFSInit(void)
     }
 }
 
-void DeviceUnmount(void)
+void DeviceLock(void)
 {
     WaitSema(smb_io_sema);
+}
+
+void DeviceUnmount(void)
+{
     smb_CloseAll();
     smb_Disconnect();
 }

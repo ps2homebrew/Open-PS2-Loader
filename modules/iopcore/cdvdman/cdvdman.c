@@ -108,6 +108,7 @@ typedef struct
 } FHANDLE;
 
 // internal functions prototypes
+static void oplShutdown(void);
 static void fs_init(void);
 static void cdvdman_init(void);
 static int cdvdman_readMechaconVersion(char *mname, u32 *stat);
@@ -235,6 +236,14 @@ void oplRegisterShutdownCallback(oplShutdownCb_t cb)
     vmcShutdownCb = cb;
 }
 
+static void oplShutdown(void)
+{
+    DeviceLock();
+    if(vmcShutdownCb != NULL)
+        vmcShutdownCb();
+    DeviceUnmount();
+}
+
 //--------------------------------------------------------------
 static void fs_init(void)
 {
@@ -280,9 +289,7 @@ static void cdvdman_poff_thread(void *arg)
 
     SleepThread();
 
-    if(vmcShutdownCb != NULL)
-        vmcShutdownCb();
-    DeviceUnmount();
+    oplShutdown();
     dev9Shutdown();
     sceCdPowerOff(&stat);
 }
@@ -838,9 +845,7 @@ int sceCdSC(int code, int *param)
             result = cdvdman_stat.err = *param;
             break;
         case CDSC_OPL_SHUTDOWN:
-            if(vmcShutdownCb != NULL)
-                vmcShutdownCb();
-            DeviceUnmount();
+            oplShutdown();
             result = 1;
             break;
         default:

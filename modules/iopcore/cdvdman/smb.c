@@ -698,17 +698,26 @@ int smb_Close(int FID)
     rawTCP_SetSessionHeader(41);
     r = GetSMBServerReply();
     if (r <= 0)
+    {
+//      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
+    }
 
     struct CloseResponse_t *CRsp = (struct CloseResponse_t *)SMB_buf;
 
     // check sanity of SMB header
     if (CRsp->smbH.Magic != SMB_MAGIC)
+    {
+//      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
+    }
 
     // check there's no error
     if ((CRsp->smbH.Eclass | (CRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
+    {
+//      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
+    }
 
 //  SIGNALIOSEMA(smb_io_sema);
 

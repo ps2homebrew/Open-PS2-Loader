@@ -67,16 +67,6 @@ int hddSetTransferMode(int type, int mode)
 }
 
 //-------------------------------------------------------------------------
-int hddSetWriteCache(int enable)
-{
-    hddAtaSetWriteCache_t *args = (hddAtaSetWriteCache_t *)IOBuffer;
-
-    args->enable = enable;
-
-    return fileXioDevctl("xhdd0:", ATA_DEVCTL_SET_WRITE_CACHE, args, sizeof(hddAtaSetWriteCache_t), NULL, 0);
-}
-
-//-------------------------------------------------------------------------
 int hddSetIdleTimeout(int timeout)
 {
     // From hdparm man:

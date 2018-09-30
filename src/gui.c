@@ -59,7 +59,9 @@ static void guiShow();
 static u32 curtime = 0;
 static u32 time_since_last = 0;
 static u32 time_render = 0;
+static float fps = 0.0f;
 
+extern GSGLOBAL *gsGlobal;
 #endif
 
 struct gui_update_list_t
@@ -1968,15 +1970,31 @@ static void guiDrawOverlays()
         guiDrawBusy();
 
 #ifdef __DEBUG
-    // fps meter
-    char fps[20];
+    char text[20];
+    int x = screenWidth - 120;
+    int y = 15;
+    int yadd = 15;
 
-    if (time_since_last != 0)
-        snprintf(fps, sizeof(fps), "%3d ms %3.1f FPS", time_render, 1000.0f / (float)time_since_last);
-    else
-        snprintf(fps, sizeof(fps), "%3d ms ----- FPS", time_render);
+    snprintf(text, sizeof(text), "VRAM:");
+    fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
+    y += yadd;
 
-    fntRenderString(gTheme->fonts[0], screenWidth - 90, 30, ALIGN_CENTER, 0, 0, fps, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
+    snprintf(text, sizeof(text), "%dKiB FIXED", gsGlobal->CurrentPointer / 1024);
+    fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
+    y += yadd;
+
+    snprintf(text, sizeof(text), "%dKiB TEXMAN", ((4*1024*1024) - gsGlobal->CurrentPointer) / 1024);
+    fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
+    y += yadd;
+    y += yadd; // Empty line
+
+    if (time_since_last != 0) {
+        fps = fps * 0.99 + 10.0f / (float)time_since_last;
+
+        snprintf(text, sizeof(text), "%.1f FPS", fps);
+        fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
+        y += yadd;
+    }
 #endif
 
     // Last Played Auto Start

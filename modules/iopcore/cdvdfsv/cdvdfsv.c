@@ -264,7 +264,7 @@ static void cdvdfsv_startrpcthreads(void)
     thread_param.attr = TH_C;
     thread_param.option = 0xABCD8001;
     thread_param.thread = (void *)cdvdfsv_rpc1_th;
-    thread_param.stacksize = 0x500; //Original: 0x1900. Its operations probably won't need so much space, since its functions will never trigger a callback.
+    thread_param.stacksize = 0x600; //Original: 0x1900. Its operations probably won't need so much space, since its functions will never trigger a callback.
     thread_param.priority = 0x51;
 
     rpc1_thread_id = CreateThread(&thread_param);

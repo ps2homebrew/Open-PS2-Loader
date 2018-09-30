@@ -95,7 +95,7 @@ typedef struct _read_capacity_data
 
 static UsbDriver driver;
 
-static int io_sema;
+int usb_io_sema;
 
 #define WAITIOSEMA(x) WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
@@ -643,20 +643,20 @@ static void cbw_scsi_sector_io(mass_dev *dev, short int dir, unsigned int lba, v
 
 void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer)
 {
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(usb_io_sema);
 
     cbw_scsi_sector_io(&g_mass_device, USB_BLK_EP_IN, lba, buffer, nsectors);
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(usb_io_sema);
 }
 
 void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer)
 {
-    WAITIOSEMA(io_sema);
+    WAITIOSEMA(usb_io_sema);
 
     cbw_scsi_sector_io(&g_mass_device, USB_BLK_EP_OUT, lba, (void *)buffer, nsectors);
 
-    SIGNALIOSEMA(io_sema);
+    SIGNALIOSEMA(usb_io_sema);
 }
 
 /* test that endpoint is bulk endpoint and if so, update device info */
@@ -958,7 +958,7 @@ int mass_stor_init(void)
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
-    io_sema = CreateSema(&smp);
+    usb_io_sema = CreateSema(&smp);
 
     driver.next = NULL;
     driver.prev = NULL;

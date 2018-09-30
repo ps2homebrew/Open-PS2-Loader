@@ -33,6 +33,8 @@
 
 extern struct cdvdman_settings_usb cdvdman_settings;
 
+extern int usb_io_sema;
+
 static void usbd_init(void);
 
 // !!! usbd exports functions pointers !!!
@@ -78,6 +80,11 @@ void DeviceFSInit(void)
     // configure mass device
     while (mass_stor_configureDevice() <= 0)
         DelayThread(200);
+}
+
+void DeviceLock(void)
+{
+    WaitSema(usb_io_sema);
 }
 
 void DeviceUnmount(void)

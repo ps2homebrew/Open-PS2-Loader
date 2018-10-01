@@ -1204,7 +1204,7 @@ static void setDefaults(void)
 
     frameCounter = 0;
 
-    gVMode = RM_VMODE_AUTO;
+    gVMode = 0;
     gXOff = 0;
     gYOff = 0;
     gOverscan = 0;

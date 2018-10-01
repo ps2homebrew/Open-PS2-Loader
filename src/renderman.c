@@ -15,14 +15,15 @@
 #define __VRAM_SIZE 4194304
 
 GSGLOBAL *gsGlobal;
-#ifndef HIRES
 s32 guiThreadID;
-#endif
 
 static int order;
-static enum rm_vmode vmode = RM_VMODE_AUTO;
+static int vmode = -1;
+static int hires = 0;
+static int vsync_id = -1;
 
 #define NUM_RM_VMODES 12
+#define RM_VMODE_AUTO 0
 
 // RM Vmode -> GS Vmode conversion table
 struct rm_mode
@@ -42,24 +43,20 @@ struct rm_mode
 
 static struct rm_mode rm_mode_table[NUM_RM_VMODES] = {
     // 24 bit color mode with black borders
-    {-1,                 16,  640,   -1,  2, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3,  1,  1}, // AUTO
-    {GS_MODE_PAL,        16,  640,  512,  2, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3, 11, 10}, // PAL@50Hz
-    {GS_MODE_NTSC,       16,  640,  448,  2, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3, 54, 59}, // NTSC@60Hz
-    {GS_MODE_DTV_480P,   31,  640,  448,  2, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // DTV480P@60Hz
-    {GS_MODE_DTV_576P,   31,  640,  512,  2, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // DTV576P@50Hz
-    {GS_MODE_VGA_640_60, 31,  640,  480,  2, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // VGA640x480@60Hz
-    // 16bit color mode full screen
+    {-1,                 16,  640,   -1,  1, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3,  1,  1}, // AUTO
+    {GS_MODE_PAL,        16,  640,  512,  1, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3, 11, 10}, // PAL@50Hz
+    {GS_MODE_NTSC,       16,  640,  448,  1, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3, 54, 59}, // NTSC@60Hz
+    {GS_MODE_DTV_480P,   31,  640,  448,  1, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // DTV480P@60Hz
+    {GS_MODE_DTV_576P,   31,  640,  512,  1, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // DTV576P@50Hz
+    {GS_MODE_VGA_640_60, 31,  640,  480,  1, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // VGA640x480@60Hz
+    // 24 bit color mode full screen, multi-pass (2 passes, HIRES)
     {GS_MODE_PAL,        16,  704,  576,  2, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3, 11, 10}, // PAL@50Hz
     {GS_MODE_NTSC,       16,  704,  480,  2, 4, GS_INTERLACED,    GS_FIELD, RM_ARATIO_4_3, 54, 59}, // NTSC@60Hz
     {GS_MODE_DTV_480P,   31,  704,  480,  2, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // DTV480P@60Hz
     {GS_MODE_DTV_576P,   31,  704,  576,  2, 2, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_4_3,  1,  1}, // DTV576P@50Hz
-#ifdef HIRES
+    // 16 bit color mode full screen, multi-pass (3 passes, HIRES)
     {GS_MODE_DTV_720P,   31, 1280,  720,  3, 1, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_16_9, 1,  1}, // HDTV720P@60Hz
     {GS_MODE_DTV_1080I,  31, 1920, 1080,  3, 1, GS_INTERLACED,    GS_FRAME, RM_ARATIO_16_9, 1,  1}, // HDTV1080I@60Hz
-#else
-    {GS_MODE_DTV_720P,   31,  640,  720,  3, 1, GS_NONINTERLACED, GS_FRAME, RM_ARATIO_16_9, 1,  2}, // HDTV720P@60Hz
-    {GS_MODE_DTV_1080I,  31,  640,  540,  3, 1, GS_INTERLACED,    GS_FIELD, RM_ARATIO_16_9, 2,  3}, // HDTV1080I@60Hz
-#endif
 };
 
 // Display Aspect Ratio
@@ -100,59 +97,55 @@ void rmUnloadTexture(GSTEXTURE *txt)
 
 void rmStartFrame(void)
 {
-#ifndef HIRES
-    gsKit_clear(gsGlobal, gColBlack);
-#endif
+    if (hires == 0)
+        gsKit_clear(gsGlobal, gColBlack);
+
     order = 0;
 }
 
 void rmEndFrame(void)
 {
-#ifdef HIRES
-    gsKit_hires_sync(gsGlobal);
-    gsKit_hires_flip(gsGlobal);
-#else
-    gsKit_set_finish(gsGlobal);
-    gsKit_queue_exec(gsGlobal);
+    if (hires) {
+        gsKit_hires_sync(gsGlobal);
+        gsKit_hires_flip(gsGlobal);
+    }
+    else {
+        gsKit_set_finish(gsGlobal);
+        gsKit_queue_exec(gsGlobal);
 
-    // Wait for draw ops to finish
-    gsKit_finish();
+        // Wait for draw ops to finish
+        gsKit_finish();
 
-    if (!gsGlobal->FirstFrame) {
-        SleepThread();
+        if (!gsGlobal->FirstFrame) {
+            SleepThread();
 
-        if (gsGlobal->DoubleBuffering == GS_SETTING_ON) {
-            GS_SET_DISPFB2(gsGlobal->ScreenBuffer[gsGlobal->ActiveBuffer & 1] / 8192,
-                           gsGlobal->Width / 64, gsGlobal->PSM, 0, 0);
+            if (gsGlobal->DoubleBuffering == GS_SETTING_ON) {
+                GS_SET_DISPFB2(gsGlobal->ScreenBuffer[gsGlobal->ActiveBuffer & 1] / 8192,
+                               gsGlobal->Width / 64, gsGlobal->PSM, 0, 0);
 
-            gsGlobal->ActiveBuffer ^= 1;
+                gsGlobal->ActiveBuffer ^= 1;
+            }
         }
+
+        gsKit_setactive(gsGlobal);
     }
 
-    gsKit_setactive(gsGlobal);
-#endif
     gsKit_TexManager_nextFrame(gsGlobal);
 }
 
-#ifndef HIRES
 static int rmOnVSync(void)
 {
     iWakeupThread(guiThreadID);
 
     return 0;
 }
-#endif
 
 void rmInit()
 {
-#ifdef HIRES
-    gsGlobal = gsKit_hires_init_global();
-#else
-    gsGlobal = gsKit_init_global();
-#endif
+    short int mode = gsKit_check_rom();
 
-    rm_mode_table[RM_VMODE_AUTO].mode = gsGlobal->Mode;
-    rm_mode_table[RM_VMODE_AUTO].height = gsGlobal->Height;
+    rm_mode_table[RM_VMODE_AUTO].mode = mode;
+    rm_mode_table[RM_VMODE_AUTO].height = (mode == GS_MODE_PAL) ? 512 : 448;
 
     dmaKit_init(D_CTRL_RELE_OFF, D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC,
                 D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
@@ -164,10 +157,7 @@ void rmInit()
 
     order = 0;
 
-#ifndef HIRES
     guiThreadID = GetThreadId();
-    gsKit_add_vsync_handler(&rmOnVSync);
-#endif
 }
 
 int rmSetMode(int force)
@@ -178,15 +168,20 @@ int rmSetMode(int force)
     // we don't want to set the vmode without a reason...
     int changed = (vmode != gVMode || force);
     if (changed) {
-#ifdef HIRES
-        // Hires mode needs to re-initialize if is was previously initialized
-        if (vmode != RM_VMODE_AUTO) {
-            gsKit_hires_deinit_global(gsGlobal);
+        // Cleanup previous gsKit instance
+        if (vmode >= 0)
+            rmEnd();
+
+        vmode = gVMode;
+        hires = (rm_mode_table[vmode].passes > 1) ? 1 : 0;
+
+        if (hires) {
             gsGlobal = gsKit_hires_init_global();
         }
-#endif
-        vmode = gVMode;
-
+        else {
+            gsGlobal = gsKit_init_global();
+            vsync_id = gsKit_add_vsync_handler(&rmOnVSync);
+        }
         gsGlobal->Mode = rm_mode_table[vmode].mode;
         gsGlobal->Width = rm_mode_table[vmode].width;
         gsGlobal->Height = rm_mode_table[vmode].height;
@@ -195,13 +190,8 @@ int rmSetMode(int force)
         gsGlobal->PSM = GS_PSM_CT24;
         // Higher resolution use too much VRAM
         // so automatically switch back to 16bit color depth
-#ifdef HIRES
         if ((gsGlobal->Width * gsGlobal->Height) > (704 * 576))
             gsGlobal->PSM = GS_PSM_CT16S;
-#else
-        if ((gsGlobal->Width * gsGlobal->Height) > (640 * 512))
-            gsGlobal->PSM = GS_PSM_CT16S;
-#endif
         gsGlobal->PSMZ = GS_PSMZ_16S;
         gsGlobal->ZBuffering = GS_SETTING_OFF;
         gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
@@ -222,24 +212,26 @@ int rmSetMode(int force)
         gsGlobal->OffsetX = ((4096 - gsGlobal->Width)  / 2) * 16;
         gsGlobal->OffsetY = ((4096 - gsGlobal->Height) / 2) * 16;
 
-#ifdef HIRES
-        gsKit_hires_init_screen(gsGlobal, rm_mode_table[vmode].passes);
-#else
-        gsKit_init_screen(gsGlobal);
-        gsKit_mode_switch(gsGlobal, GS_ONESHOT);
-#endif
+        if (hires) {
+            gsKit_hires_init_screen(gsGlobal, rm_mode_table[vmode].passes);
+        }
+        else {
+            gsKit_init_screen(gsGlobal);
+            gsKit_mode_switch(gsGlobal, GS_ONESHOT);
+        }
 
         gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
         gsKit_set_primalpha(gsGlobal, gDefaultAlpha, 0);
 
-#ifdef HIRES
-        gsKit_hires_sync(gsGlobal);
-        gsKit_hires_flip(gsGlobal);
-#else
         // reset the contents of the screen to avoid garbage being displayed
-        gsKit_clear(gsGlobal, gColBlack);
-        gsKit_sync_flip(gsGlobal);
-#endif
+        if (hires) {
+            gsKit_hires_sync(gsGlobal);
+            gsKit_hires_flip(gsGlobal);
+        }
+        else {
+            gsKit_clear(gsGlobal, gColBlack);
+            gsKit_sync_flip(gsGlobal);
+        }
 
         LOG("RENDERMAN New vmode: %d, %d x %d\n", vmode, gsGlobal->Width, gsGlobal->Height);
     }
@@ -266,11 +258,15 @@ void rmGetScreenExtents(int *w, int *h)
 
 void rmEnd(void)
 {
-#ifdef HIRES
-    gsKit_hires_deinit_global(gsGlobal);
-#else
-    gsKit_deinit_global(gsGlobal);
-#endif
+    if (hires) {
+        gsKit_hires_deinit_global(gsGlobal);
+    }
+    else {
+        gsKit_deinit_global(gsGlobal);
+        gsKit_remove_vsync_handler(vsync_id);
+    }
+
+    vmode = -1;
 }
 
 #define X_SCALE(x) (((x)*iDisplayWidth) /640)

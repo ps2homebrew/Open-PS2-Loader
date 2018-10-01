@@ -64,17 +64,6 @@ const u64 gColFocus;
 const u64 gDefaultCol;
 const u64 gDefaultAlpha;
 
-enum rm_vmode {
-    RM_VMODE_AUTO = 0,
-    RM_VMODE_PAL,
-    RM_VMODE_NTSC,
-    RM_VMODE_DTV480P,
-    RM_VMODE_DTV576P,
-    RM_VMODE_DTV720P,
-    RM_VMODE_DTV1080I,
-    RM_VMODE_VGA_640_60
-};
-
 enum rm_aratio {
     RM_ARATIO_4_3 = 0,
     RM_ARATIO_16_9,

@@ -6,9 +6,9 @@ Note: these are not necessarily requirements
 
 ## Open PS2 loader version
 
-## Open PS2 loader mode (USB, SMB, HDD)
+## Open PS2 loader modes tested (USB, SMB, HDD)
 
-## Open PS2 type (Normal, Childproof, VMC, GSM, PS2RD)
+## Open PS2 type (Default, Release, +PadEmu, +IGS, +RTL)
 
 ## Issue description - Describe the problem you are having
 

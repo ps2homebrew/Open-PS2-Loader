@@ -28,13 +28,13 @@ http://sx.sytes.net/oplcl/games.aspx
 Open PS2 Loader bundle included several types of the same OPL version. These
 types come with more or less features included.  
 
-| Type (can be a combination) | Description                                                                       |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| "Normal" (No suffixes)      | Regular, basic OPL release, without any extra features. Aka vanilla build.        |
-| "Childproof"                | OPL release with some controls disabled (e.g. write operations).                  |
-| "VMC"                       | OPL release with Virtual Memory Card (VMC) support.                               |
-| "GSM"                       | OPL release with GSM integrated into it.                                          |
-| "PS2RD"                     | OPL release with PS2RD Cheat Engine built-in feature.                             | 
+| Type (can be a combination) | Description |
+| --------------------------- | ----------- |
+| "Default"                   | Main OPL ELF release with built-in Cheat Engine (PS2RD), Graphics Synthesizer Mode (GSM), Parental Lock, HIgh REsolution multi-pass rendering for the OPL GUI (HIRES) and Virtual Memory Card (VMC). |
+| "Release"                   | Packed Zip with: Main type OPL ELF release with addition of Pad Emulator (PadEmu) and In Game Screenshot (IGS); 'DETAILED_CHANGELOG' text file; 'CREDITS' text file; 'LICENSE' text file; 'README.md' text file. |
+| "PadEmu"                    | Main type OPL ELF release with addition of Pad Emulator (PS3/PS4 Support). |
+| "IGS"                       | Main type OPL ELF release with addition of In Game Screenshot. |
+| "RTL"                       | Main type OPL ELF release with addition of Right-To-Left language support. |
 
 ## How to use
 

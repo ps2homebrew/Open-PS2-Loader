@@ -79,7 +79,7 @@ void DeviceFSInit(void)
 
     // configure mass device
     while (mass_stor_configureDevice() <= 0)
-        DelayThread(200);
+        DelayThread(5000);
 }
 
 void DeviceLock(void)

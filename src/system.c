@@ -206,6 +206,9 @@ void sysReset(int modload_mask)
 
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 
+    sysLoadModuleBuffer(&libsd_irx, size_libsd_irx, 0, NULL);
+    sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
+
 #ifdef PADEMU
     int ds3pads = 1; //only one pad enabled
 

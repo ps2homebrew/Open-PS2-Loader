@@ -20,6 +20,8 @@
 #include "include/compatupd.h"
 #include "include/pggsm.h"
 #include "include/cheatman.h"
+#include "include/sound.h"
+#include <audsrv.h>
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -28,6 +30,9 @@
 
 #include <stdlib.h>
 #include <libvux.h>
+
+extern struct audsrv_adpcm_t sfx[NUM_SFX_FILES];
+extern int sfxInit(void);
 
 // Last Played Auto Start
 #include <time.h>
@@ -1079,6 +1084,30 @@ void guiShowParentalLockConfig(void)
     }
 }
 
+void guiShowAudioConfig(void)
+{
+	int ret;
+    const char *AudioPaths[] = {"<not set>", "MC 1", "MC 2", "HDD", "USB", NULL};
+
+    diaSetEnum(diaAudioConfig, CFG_AUDIOPATH, AudioPaths);
+    diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
+    diaSetInt(diaAudioConfig, CFG_AUDIOPATH, gAudioPath);
+    diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
+
+    ret = diaExecuteDialog(diaAudioConfig, -1, 1, &guiUpdater);
+    if (ret) {
+        diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
+        diaGetInt(diaAudioConfig, CFG_AUDIOPATH, &gAudioPath);
+        diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
+        applyConfig(-1, -1);
+        ret = sfxInit();
+        if (ret >= 0)
+            printf("sfxInit: %d samples loaded.\n", ret);
+        else
+            printf("sfxInit: failed to initialize - %d.\n", ret);
+    }
+}
+
 int guiShowKeyboard(char *value, int maxLength)
 {
     char tmp[maxLength];
@@ -2110,6 +2139,9 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target, int transition)
 {
+    if (gEnableSFX) {
+        audsrv_ch_play_adpcm(4, &sfx[4]);
+    }
     if (transition == TRANSITION_LEFT) {
         transitionX = 1;
         transMax = screenWidth;
@@ -2159,6 +2191,11 @@ void guiUpdateScreenScale(void)
 int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
 {
     int terminate = 0;
+
+    if (gEnableSFX) {
+        audsrv_ch_play_adpcm(5, &sfx[5]);
+    }
+
     while (!terminate) {
         guiStartFrame();
 
@@ -2185,6 +2222,13 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
             guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
 
         guiEndFrame();
+    }
+
+    if (gEnableSFX && terminate == 1) {
+        audsrv_ch_play_adpcm(3, &sfx[3]);
+    }
+    if (gEnableSFX && terminate == 2) {
+        audsrv_ch_play_adpcm(6, &sfx[6]);
     }
 
     return terminate - 1;

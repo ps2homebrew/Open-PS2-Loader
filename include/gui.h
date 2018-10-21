@@ -127,6 +127,7 @@ void guiShowNetCompatUpdate(void);
 void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
+void guiShowAudioConfig();
 void guiShowNetConfig();
 void guiShowParentalLockConfig();
 

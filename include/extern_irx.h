@@ -7,6 +7,9 @@
 extern void *apemodpatch_irx;
 extern int size_apemodpatch_irx;
 
+extern void *audsrv_irx;
+extern int size_audsrv_irx;
+
 extern void *bt_pademu_irx;
 extern int size_bt_pademu_irx;
 
@@ -63,6 +66,9 @@ extern int size_isofs_irx;
 
 extern void *iremsndpatch_irx;
 extern int size_iremsndpatch_irx;
+
+extern void *libsd_irx;
+extern int size_libsd_irx;
 
 extern void *mcman_irx;
 extern int size_mcman_irx;

@@ -114,6 +114,10 @@ int gYOff;
 int gOverscan;
 int gSelectButton;
 
+int gEnableSFX;
+int gAudioPath;
+int gSFXVolume;
+
 #ifdef IGS
 #define IGS_VERSION "0.1"
 #endif

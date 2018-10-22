@@ -928,8 +928,15 @@ int mass_stor_configureDevice(void)
 
         if ((ret = usb_set_interface(dev, dev->interfaceNumber, dev->interfaceAlt)) != USB_RC_OK) {
             XPRINTF("USBHDFSD: Error - sending set_interface %d\n", ret);
-            mass_stor_release(dev);
-            return -1;
+            if (ret == USB_RC_STALL) {
+                /* USB Specification 1.1, section 9.4.10: Devices that only support a default setting for the specified interface may return a STALL.
+                   As with Linux, we shall clear the halt state of the interface's pipes and continue. */
+                usb_bulk_clear_halt(dev, USB_BLK_EP_IN);
+                usb_bulk_clear_halt(dev, USB_BLK_EP_OUT);
+            } else {
+                mass_stor_release(dev);
+                return -1;
+            }
         }
 
         dev->status |= DEVICE_CONFIGURED;
@@ -986,13 +993,14 @@ int mass_stor_init(void)
 	Devices with sector sizes above 4096 bytes are unsupported.	*/
 int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
-    u32 sectors, nbytes, DiskSectorsToRead, lba;
+    u32 sectorsToRead, nbytes, DiskSectorsToRead, lba;
     u8 *p = (u8 *)buf;
 
+	//Phase 1: read sectors until the LSN is aligned with the disk's LBA (sector sizes > 2048).
     if (g_mass_device.sectorSize > 2048) {
         //4096-byte sectors
         lba = cdvdman_settings.LBAs[part_num] + (lsn / 2);
-        if ((lsn % 2) > 0) {
+        if ((lsn % 2) == 1) {
             //Start sector is in the middle of a physical sector.
             mass_stor_readSector(lba, 1, gSectorBuffer);
             mips_memcpy(p, &((unsigned char *)gSectorBuffer)[2048], 2048);
@@ -1005,24 +1013,25 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
         lba = cdvdman_settings.LBAs[part_num] + (lsn * (2048 / g_mass_device.sectorSize));
     }
 
-    while (nsectors > 0) {
-        sectors = nsectors;
+    //Phase 2: read as much of the remaining sectors as possible
+    DiskSectorsToRead = nsectors * 2048 / g_mass_device.sectorSize;
+	if (DiskSectorsToRead > 0) {
+        sectorsToRead = DiskSectorsToRead * g_mass_device.sectorSize / 2048; //Compute the number of CD-ROM/DVD sectors that will be read.
+        nbytes = sectorsToRead * 2048;
 
-        nbytes = sectors * 2048;
-        DiskSectorsToRead = nbytes / g_mass_device.sectorSize;
-
-        if (DiskSectorsToRead == 0) {
-            // nsectors should be 1 at this point.
-            mass_stor_readSector(lba, 1, gSectorBuffer);
-            mips_memcpy(p, gSectorBuffer, 2048);
-        } else {
-            mass_stor_readSector(lba, DiskSectorsToRead, p);
-        }
+        mass_stor_readSector(lba, DiskSectorsToRead, p);
 
         lba += DiskSectorsToRead;
-        lsn += sectors;
+        lsn += sectorsToRead;
         p += nbytes;
-        nsectors -= sectors;
+        nsectors -= sectorsToRead;
+	}
+
+    //Phase 3: read any outstanding amount of data (sector sizes > 2048)
+    if (nsectors > 0) {
+        // nsectors should be 1 at this point, with the first half of the sector being outstanding.
+        mass_stor_readSector(lba, 1, gSectorBuffer);
+        mips_memcpy(p, gSectorBuffer, 2048);
     }
 
     return 1;

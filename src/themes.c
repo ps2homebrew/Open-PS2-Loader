@@ -686,14 +686,14 @@ static void drawMenuText(struct menu_list *menu, struct submenu_list *item, conf
     if (elem->aligned) {
         int offset = elem->width >> 1;
         if (leftIconTex && leftIconTex->Mem)
-            rmDrawPixmap(leftIconTex, elem->posX - offset, elem->posY, elem->aligned, leftIconTex->Width, leftIconTex->Height, elem->scaled, gDefaultCol);
+            rmDrawPixmap(leftIconTex, elem->posX - offset, elem->posY, elem->aligned, 20, 20, elem->scaled, gDefaultCol);
         if (rightIconTex && rightIconTex->Mem)
-            rmDrawPixmap(rightIconTex, elem->posX + offset, elem->posY, elem->aligned, rightIconTex->Width, rightIconTex->Height, elem->scaled, gDefaultCol);
+            rmDrawPixmap(rightIconTex, elem->posX + offset, elem->posY, elem->aligned, 20, 20, elem->scaled, gDefaultCol);
     } else {
         if (leftIconTex && leftIconTex->Mem)
-            rmDrawPixmap(leftIconTex, elem->posX - leftIconTex->Width, elem->posY, elem->aligned, leftIconTex->Width, leftIconTex->Height, elem->scaled, gDefaultCol);
+            rmDrawPixmap(leftIconTex, elem->posX - leftIconTex->Width, elem->posY, elem->aligned, 20, 20, elem->scaled, gDefaultCol);
         if (rightIconTex && rightIconTex->Mem)
-            rmDrawPixmap(rightIconTex, elem->posX + elem->width, elem->posY, elem->aligned, rightIconTex->Width, rightIconTex->Height, elem->scaled, gDefaultCol);
+            rmDrawPixmap(rightIconTex, elem->posX + elem->width, elem->posY, elem->aligned, 20, 20, elem->scaled, gDefaultCol);
     }
     fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, menuItemGetText(menu->item), elem->color);
 }

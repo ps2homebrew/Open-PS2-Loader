@@ -441,6 +441,32 @@ static void menuPrevH()
     }
 }
 
+static void menuFirstPage()
+{
+    submenu_list_t *cur = selected_item->item->current;
+    if (cur) {
+        selected_item->item->current = selected_item->item->submenu;
+        selected_item->item->pagestart = selected_item->item->current;
+    }
+}
+
+static void menuLastPage()
+{
+    submenu_list_t *cur = selected_item->item->current;
+    if (cur) {
+        while (cur->next)
+            cur = cur->next; // go to end
+
+        selected_item->item->current = cur;
+
+        int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems;
+        while (--itms && cur->prev) // and move back to have a full page
+            cur = cur->prev;
+
+        selected_item->item->pagestart = cur;
+    }
+}
+
 static void menuNextV()
 {
     submenu_list_t *cur = selected_item->item->current;
@@ -459,6 +485,9 @@ static void menuNextV()
 
         selected_item->item->pagestart = selected_item->item->current;
     }
+    else { //wrap to start
+        menuFirstPage();
+    }
 }
 
 static void menuPrevV()
@@ -475,19 +504,26 @@ static void menuPrevV()
                 selected_item->item->pagestart = selected_item->item->pagestart->prev;
         }
     }
+    else { //wrap to end
+        menuLastPage();
+    }
 }
 
 static void menuNextPage()
 {
     submenu_list_t *cur = selected_item->item->pagestart;
 
-    if (cur) {
+    if (cur && cur->next) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
+
         while (--itms && cur->next)
             cur = cur->next;
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
+    }
+    else { //wrap to start
+        menuFirstPage();
     }
 }
 
@@ -495,36 +531,17 @@ static void menuPrevPage()
 {
     submenu_list_t *cur = selected_item->item->pagestart;
 
-    if (cur) {
+    if (cur && cur->prev) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
+
         while (--itms && cur->prev)
             cur = cur->prev;
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
     }
-}
-
-static void menuFirstPage()
-{
-    selected_item->item->current = selected_item->item->submenu;
-    selected_item->item->pagestart = selected_item->item->current;
-}
-
-static void menuLastPage()
-{
-    submenu_list_t *cur = selected_item->item->current;
-    if (cur) {
-        while (cur->next)
-            cur = cur->next; // go to end
-
-        selected_item->item->current = cur;
-
-        int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems;
-        while (--itms && cur->prev) // and move back to have a full page
-            cur = cur->prev;
-
-        selected_item->item->pagestart = cur;
+    else { //wrap to end
+        menuLastPage();
     }
 }
 

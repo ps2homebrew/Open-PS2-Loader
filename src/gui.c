@@ -2081,8 +2081,6 @@ void guiIntroLoop(void)
     while (!endIntro) {
         guiStartFrame();
 
-        guiReadPads();
-
         if (wfadeout < 0x80)
             guiShow();
 

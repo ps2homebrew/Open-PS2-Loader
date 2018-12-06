@@ -272,6 +272,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Build Options:",
     "Error - this password cannot be used.",
     "VMC %s file is fragmented. Continue with Memory Card in slot %d?",
+    "Settings must be saved before continuing.",
     //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

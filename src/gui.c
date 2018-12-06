@@ -21,6 +21,9 @@
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 
+#include "include/sound.h"
+#include <audsrv.h>
+
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
@@ -203,6 +206,7 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
+    toggleSfx = -1;
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
@@ -226,6 +230,7 @@ void guiShowAbout()
     diaSetLabel(diaAbout, ABOUT_BUILD_DETAILS, OPLBuildDetails);
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
+    toggleSfx = 0;
 }
 
 static int guiNetCompatUpdRefresh(int modified)
@@ -551,6 +556,10 @@ void guiShowUIConfig(void)
         diaGetInt(diaUIConfig, UICFG_YOFF, &gYOff);
         diaGetInt(diaUIConfig, UICFG_OVERSCAN, &gOverscan);
 
+		int changed = thmSetGuiValue(themeID, changed);
+        if (changed) {
+            sfxInit();
+        }
         applyConfig(themeID, langID);
     }
 }
@@ -1076,6 +1085,26 @@ void guiShowParentalLockConfig(void)
         }
 
         menuSetParentalLockCheckState(1);
+    }
+}
+
+void guiShowAudioConfig(void)
+{
+	int ret;
+
+    diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
+    diaSetInt(diaAudioConfig, CFG_BOOT_SND, gEnableBootSND);
+    diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
+    diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
+
+    ret = diaExecuteDialog(diaAudioConfig, -1, 1, &guiUpdater);
+    if (ret) {
+        diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
+        diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
+        diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
+        diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
+        applyConfig(-1, -1);
+        sfxVolume();
     }
 }
 
@@ -1954,7 +1983,7 @@ static void guiDrawOverlays()
             bfadeout += 0x08;
     }
 
-    if (bfadeout > 0)
+    if (bfadeout > 0 && !toggleSfx)
         guiDrawBusy();
 
 #ifdef __DEBUG
@@ -2044,13 +2073,28 @@ static void guiShow()
         screenHandler->renderScreen();
 }
 
+void guiDelay(int milliSeconds)
+{
+    clock_t time_end = time_end = clock() + milliSeconds * CLOCKS_PER_SEC / 1000;
+    while (clock() < time_end) {}
+
+    toggleSfx = 0;
+}
+
 void guiIntroLoop(void)
 {
     int endIntro = 0;
+
+     if (gEnableSFX && gEnableBootSND)
+         toggleSfx = -1;
+
     while (!endIntro) {
         guiStartFrame();
 
-        if (wfadeout < 0x80)
+        if (wfadeout < 0x80 && toggleSfx)
+            guiDelay(gFadeDelay);
+
+        if (wfadeout < 0x80 && !toggleSfx)
             guiShow();
 
         if (gInitComplete)
@@ -2108,6 +2152,9 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target, int transition)
 {
+    if (gEnableSFX) {
+        audsrv_ch_play_adpcm(5, &sfx[5]);
+    }
     if (transition == TRANSITION_LEFT) {
         transitionX = 1;
         transMax = screenWidth;
@@ -2157,6 +2204,11 @@ void guiUpdateScreenScale(void)
 int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
 {
     int terminate = 0;
+
+    if (gEnableSFX) {
+        audsrv_ch_play_adpcm(4, &sfx[4]);
+    }
+
     while (!terminate) {
         guiStartFrame();
 
@@ -2183,6 +2235,13 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
             guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
 
         guiEndFrame();
+    }
+
+    if (gEnableSFX && terminate == 1) {
+        audsrv_ch_play_adpcm(1, &sfx[1]);
+    }
+    if (gEnableSFX && terminate == 2) {
+        audsrv_ch_play_adpcm(2, &sfx[2]);
     }
 
     return terminate - 1;

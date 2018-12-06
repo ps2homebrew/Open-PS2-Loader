@@ -114,6 +114,14 @@ int gYOff;
 int gOverscan;
 int gSelectButton;
 
+int gEnableSFX;
+int gEnableBootSND;
+int gSFXVolume;
+int gBootSndVolume;
+
+int gFadeDelay;
+int toggleSfx;
+
 #ifdef IGS
 #define IGS_VERSION "0.1"
 #endif

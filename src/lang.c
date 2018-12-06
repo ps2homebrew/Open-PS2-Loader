@@ -51,7 +51,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Circle",
     "Cross",
     "Games List",
-    "Game settings",
+    "Game Settings",
     "Remove all settings",
     "Removed all keys for the game",
     "Scrolling",
@@ -110,7 +110,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Rename",
     "Delete",
     "Run",
-    "Display settings",
+    "Display Settings",
     "Enable write operations",
     "Check USB game fragmentation",
     "Remember last played game",
@@ -269,6 +269,11 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Error - this password cannot be used.",
     "VMC %s file is fragmented. Continue with Memory Card in slot %d?",
     "Settings must be saved before continuing.",
+    "Audio Settings",
+    "Enable Sound Effects",
+    "Enable Boot Sound",
+    "Sound Effects Volume",
+    "Boot Sound Volume",
 };
 
 static int guiLangID = 0;

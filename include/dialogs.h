@@ -46,6 +46,11 @@ enum UI_ITEMS {
     ABOUT_BUILD_DETAILS,
 
     CFG_PARENLOCK_PASSWORD,
+	
+    CFG_SFX,
+    CFG_BOOT_SND,
+    CFG_SFX_VOLUME,
+    CFG_BOOT_SND_VOLUME,
 
     NETCFG_SHOW_ADVANCED_OPTS,
     NETCFG_PS2_IP_ADDR_TYPE,
@@ -179,6 +184,7 @@ extern struct UIItem diaPadEmuInfo[];
 extern struct UIItem diaNetConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
+extern struct UIItem diaAudioConfig[];
 extern struct UIItem diaGSConfig[];
 extern struct UIItem diaCheatConfig[];
 

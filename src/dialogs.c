@@ -860,3 +860,34 @@ struct UIItem diaParentalLockConfig[] = {
 
     // end of dialog
     {UI_TERMINATOR}};
+
+// Audio Settings Menu
+struct UIItem diaAudioConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_AUDIO_SETTINGS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SFX}}},
+    {UI_SPACER},
+    {UI_BOOL, CFG_SFX, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BOOT_SND}}},
+    {UI_SPACER},
+    {UI_BOOL, CFG_BOOT_SND, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SFX_VOLUME}}},
+    {UI_SPACER},
+    {UI_INT, CFG_SFX_VOLUME, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BOOT_SND_VOLUME}}},
+    {UI_SPACER},
+    {UI_INT, CFG_BOOT_SND_VOLUME, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
+    {UI_BREAK},
+
+     // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+     // end of dialog
+    {UI_TERMINATOR}};

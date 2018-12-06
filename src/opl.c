@@ -35,6 +35,9 @@
 
 #include "include/cheatman.h"
 
+#include "include/sound.h"
+#include <audsrv.h>
+
 #ifdef __EESIO_DEBUG
 #include <sio.h>
 #define LOG_INIT() sio_init(38400, 0, 0, 0, 0)
@@ -101,6 +104,7 @@ static void clearIOModuleT(opl_io_module_t *mod)
 static void clearMenuGameList(opl_io_module_t *mdl);
 static void moduleCleanup(opl_io_module_t *mod, int exception);
 static void reset(void);
+static void deferredAudioInit(void);
 
 // frame counter
 static unsigned int frameCounter;
@@ -151,6 +155,9 @@ void moduleUpdateMenu(int mode, int themeChanged)
 static void itemExecSelect(struct menu_item *curMenu)
 {
     item_list_t *support = curMenu->userdata;
+    if (gEnableSFX) {
+        audsrv_ch_play_adpcm(2, &sfx[2]);
+    }
 
     if (support) {
         if (support->enabled) {
@@ -170,8 +177,9 @@ static void itemExecSelect(struct menu_item *curMenu)
 
 static void itemExecCancel(struct menu_item *curMenu)
 {
-    if (!curMenu->current)
+    if (!curMenu->current) {
         return;
+	}
 
     if (!gEnableWrite)
         return;
@@ -181,6 +189,9 @@ static void itemExecCancel(struct menu_item *curMenu)
     if (support) {
         if (support->itemRename) {
             if (menuCheckParentalLock() == 0) {
+                if (gEnableSFX) {
+                    audsrv_ch_play_adpcm(4, &sfx[4]);
+                }
                 int nameLength = support->itemGetNameLength(curMenu->current->item.id);
                 char newName[nameLength];
                 strncpy(newName, curMenu->current->item.text, nameLength);
@@ -216,6 +227,9 @@ static void itemExecTriangle(struct menu_item *curMenu)
         if (!(support->flags & MODE_FLAG_NO_COMPAT)) {
             if (menuCheckParentalLock() == 0) {
                 config_set_t *configSet = menuLoadConfig();
+                if (gEnableSFX) {
+                    audsrv_ch_play_adpcm(5, &sfx[5]);
+                }
                 if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
                     support->itemLaunch(curMenu->current->item.id, configSet);
             }
@@ -264,6 +278,9 @@ static void itemExecRefresh(struct menu_item *curMenu)
 
     if (support && support->enabled)
         ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(2, &sfx[2]);
+        }
 }
 
 static void initMenuForListSupport(int mode)
@@ -592,6 +609,10 @@ static void _loadConfig()
 //START of OPL_DB tweaks
             configGetInt(configOPL, CONFIG_OPL_ELM_MODE, &gELMStartMode);
 //END of OPL_DB tweaks
+            configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
+            configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
+            configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
+            configGetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, &gBootSndVolume);
         }
     }
 
@@ -675,6 +696,10 @@ static void _saveConfig()
 //START of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
 //END of OPL_DB tweaks
+        configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
+        configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
+        configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
+        configSetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, gBootSndVolume);
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
 
@@ -1032,6 +1057,15 @@ static int loadHdldSvr(void)
 {
     int ret, padStatus;
 
+    // disable sfx before audio lib
+    if (gEnableSFX) {
+        gEnableSFX = 0;
+        toggleSfx = 1;
+    }
+
+    //deint audio lib while hdl server is running
+    audsrv_quit();
+
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
     guiExecDeferredOps();
@@ -1087,6 +1121,9 @@ static void unloadHdldSvr(void)
 
     // init all supports again
     initAllSupport(1);
+
+    // reinit audio lib
+    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
 }
 
 void handleHdlSrv()
@@ -1101,6 +1138,7 @@ void handleHdlSrv()
     // restore normal functionality again
     guiRenderTextScreen(_l(_STR_UNLOADHDL));
     unloadHdldSvr();
+
 }
 
 // ----------------------------------------------------------
@@ -1204,6 +1242,10 @@ static void setDefaults(void)
     gUseInfoScreen = 0;
     gEnableArt = 0;
     gWideScreen = 0;
+    gEnableSFX = 0;
+    gEnableBootSND = 0;
+    gSFXVolume = 80;
+    gBootSndVolume = 80;
 
     gUSBStartMode = START_MODE_DISABLED;
     gHDDStartMode = START_MODE_DISABLED;
@@ -1272,6 +1314,9 @@ static void init(void)
 
     // try to restore config
     _loadConfig();
+
+    // queue deffered init of sound effects, which will take place after the preceding initialization steps within the queue are complete.
+    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
 }
 
 static void deferredInit(void)
@@ -1285,6 +1330,33 @@ static void deferredInit(void)
         id = guiOpCreate(GUI_OP_SELECT_MENU);
         id->menu.menu = &list_support[gDefaultDevice].menuItem;
         guiDeferUpdate(id);
+    }
+}
+
+static void deferredAudioInit(void)
+{
+    int ret;
+
+    ret = audsrv_init();
+    if (ret != 0)
+        LOG("Failed to initialize audsrv\n");
+        LOG("Audsrv returned error string: %s\n", audsrv_get_error_string());
+
+    ret = sfxInit();
+    if (ret >= 0)
+        LOG("sfxInit: %d samples loaded.\n", ret);
+    else
+        LOG("sfxInit: failed to initialize - %d.\n", ret);
+
+    //boot sound
+    if (gEnableSFX && gEnableBootSND) {
+        audsrv_ch_play_adpcm(0, &sfx[0]);
+    }
+
+    // re-enable sfx if previously disabled (hdl svr)
+    if (!gEnableSFX && toggleSfx) {
+        gEnableSFX = 1;
+        toggleSfx = 0;
     }
 }
 

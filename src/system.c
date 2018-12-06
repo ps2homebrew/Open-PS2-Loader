@@ -5,6 +5,7 @@
 */
 
 #include "include/opl.h"
+#include "include/gui.h"
 #include "include/ethsupport.h"
 #include "include/util.h"
 #include "include/pad.h"
@@ -16,6 +17,7 @@
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
+#include <audsrv.h>
 
 #include "include/pggsm.h"
 #include "include/cheatman.h"
@@ -206,6 +208,9 @@ void sysReset(int modload_mask)
 
     sysLoadModuleBuffer(&genvmc_irx, size_genvmc_irx, 0, NULL);
 
+    sysLoadModuleBuffer(&libsd_irx, size_libsd_irx, 0, NULL);
+    sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
+
 #ifdef PADEMU
     int ds3pads = 1; //only one pad enabled
 
@@ -315,6 +320,12 @@ void sysExecExit()
     ds34usb_reset();
     ds34bt_reset();
 #endif
+    if (gEnableSFX) {
+        //wait 70ms for confirm sound to finish playing before exit
+        guiDelay(0070);
+        gEnableSFX = 0;
+    }
+    audsrv_quit();
     Exit(0);
 }
 
@@ -796,6 +807,11 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     ds34usb_reset();
     ds34bt_reset();
 #endif
+    if (gEnableSFX) {
+        gEnableSFX = 0;
+    }
+    audsrv_quit();
+
     // Let's go.
     fileXioExit();
     SifExitRpc();
@@ -845,6 +861,10 @@ int sysExecElf(char *path)
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
+    if (gEnableSFX) {
+        gEnableSFX = 0;
+    }
+    audsrv_quit();
 
     // Let's go.
     fileXioExit();

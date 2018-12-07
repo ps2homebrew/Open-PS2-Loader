@@ -60,7 +60,7 @@ Cancel
 Circle
 Cross
 Games List
-Game settings
+Game Settings
 Remove all settings
 Removed all keys for the game
 Scrolling
@@ -119,7 +119,7 @@ Item will be permanently deleted, continue?
 Rename
 Delete
 Run
-Display settings
+Display Settings
 Enable write operations
 Check USB game fragmentation
 Remember last played game
@@ -277,6 +277,12 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Settings must be saved before continuing.
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

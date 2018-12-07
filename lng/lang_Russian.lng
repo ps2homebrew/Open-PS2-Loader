@@ -1,6 +1,6 @@
 # Translated by druchapucha and frodosumkin
-# Last update: 8/25/2018
-# Updated for OPL_1301_DB-TA_[24f2d97]
+# Last update: 12/06/2018
+# Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
 OPL %s
@@ -259,6 +259,12 @@ Multitap эмулятор на порте
 Опции сборки:
 Ошибка - этот пароль не может быть использован.
 VMC %s файл фрагментирован. Продолжить с картой памяти в слоте %d?
+Settings must be saved before continuing.
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
 PS1 игры
 Отображать экран PS1 игр
 POPSTARTER.ELF не найден '%s'!

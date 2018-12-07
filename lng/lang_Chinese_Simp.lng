@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: 8/24/2018
-# Updated for OPL_1301_DB-TA_[24f2d97]
+# Last update: 12/06/2018
+# Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
 OPL %s
@@ -24,13 +24,13 @@ ETH 游戏
 退出到浏览界面?
 取消更新?
 %d: 检测不到硬盘
-%d: 硬盘没有格式化
+%d: 硬盘未格式化
 %d: 启动网络错误
 %d: 检测不到网卡
 %d: 无法连接 SMB 服务器
 %d: 无法登入 SMB 服务器
 %d: 无法开启 SMB 共享
-%d: 无法罗列 SMB 共享清单
+%d: 无法列出 SMB 共享清单
 %d: 无法列出游戏清单
 %d: DHCP 服务器不存在
 %d: 无网络连接
@@ -43,9 +43,9 @@ O
 X
 游戏列表
 游戏设置
-移除所有设置
-移除游戏所有的设置
-滚动
+删除所有设置
+删除游戏所有的设置
+选定项滚动速度
 较慢
 中等
 较快
@@ -53,10 +53,10 @@ X
 从光盘中读取
 请稍后
 读取 游戏 ID 时出错
-自动滚动
-读取语言文件时出错
+自动排序
+加载语言文件时出错
 禁用调试跳色
-未检测到摇杆, 等待中...
+未检测到控制器, 等待中...
 显示游戏封面
 宽屏幕
 关机
@@ -104,7 +104,7 @@ NetBIOS
 显示设置
 启用删除与重新命名功能
 检查 USB 游戏碎片
-记住最后一个玩的游戏
+记住最后运行游戏
 选定键
 错误, 游戏有碎片
 错误, 无法运行该项目
@@ -112,11 +112,11 @@ NetBIOS
 GUEST验证留空.
 精确读取
 同步模式
-脱开系统调用
+解除系统调用
 跳过 videos
 模拟 DVD-DL
 禁用 IGR
-Unused
+空闲
 隐藏 DEV9 模式
 改变大小将会重新格式化 VMC
 生成
@@ -130,9 +130,9 @@ Unused
 大小
 状态
 进度
-VMC 档案已存在
-无效的 VMC 档案, 大小有误
-需要建立VMC 档案
+VMC 存档已存在
+无效的 VMC 存档, 大小有误
+需要建立VMC 存档
 VMC %s 出错, 继续使用物理记忆卡吗 (slot %d) ?
 自动重新整理
 关于
@@ -142,7 +142,7 @@ USB 前缀路径
 自定义IGR启动文件
 数值以分钟计,设为 0 禁用降速
 自动 HDD 降速
-影片模式
+视频模式
 对话框颜色
 被选定颜色
 显示讯息页面
@@ -178,28 +178,28 @@ DMA 模式
 GSM 设置
 启用 GSM
 切换 GSM 开或关
-VMODE
+画面模式
 强制自定义显示模式
-H-POS
 水平调整
-V-POS
+调整水平方向的显示位置
 垂直调整
+调整垂直方向的显示位置
 过扫
 过扫调节
 跳过 FMV
 跳过全动态视频
 金手指设置
-启用 PS2RD 金手指引擎
-允许 PS2RD 金手指引擎对你的游戏进行补丁
-PS2RD 金手指引擎模式
-自动或手动选择游戏金手指
-自动选择金手指
-手动选择金手指
+启用PS2RD 
+允许对选定游戏使用PS2RD金手指
+PS2RD 金手指模式
+自动或手动选择
+自动选择
+手动选择
 错误: 读取金手指文件出错
 未发现金手指文件
-下载默认值
+下载默认设置
 网络更新
-重新下载现有记录?
+重新下载设置?
 更新失败.
 连结更新服务器失败.
 更新已完成.
@@ -209,28 +209,28 @@ PS2RD 金手指引擎模式
 已下载默认值
 将自动于 %i 秒后启动...
 自动启动
-以秒为单位,设为 0 来禁用自动启动
-PS2 Logo
-只显示与控制台区域匹配的有效磁盘标识
+以秒为单位,设为 0 禁用自动启动
+PS2 标志
+进入游戏前显示相应标识
 配置PADEMU
-Pad模拟器设置
-开启Pad模拟器
-为选定的游戏开启/关闭pad模拟调节。
-Pad模拟器模式
-选择Pad模拟器模式。
+PADEMU设置
+开启PADEMU
+为选定游戏开启/关闭PADEMU调节.
+连接模式
+选择PADEMU连接模式.
 有线连接
 蓝牙连接
 设置端口:
-选择Pad模拟器端口
+选择应用PADEMU端口
 开启模拟
-打开/关闭选定端口的模拟器
+打开/关闭选定端口的模拟
 开启振动
-打开/关闭选定端口的振动。
-USB蓝牙适配器MAC地址:
-D  S 手 柄   MAC地址:
+打开/关闭选定端口的振动.
+蓝牙适配器MAC地址:
+D   S  手 柄MAC地址:
 配对
 配对DS手柄
-蓝牙适配器和DS手柄进行MAC地址配对。
+蓝牙适配器和DS手柄进行MAC地址配对.
 没有连接
 蓝牙适配器信息
 显示更多的信息和支持的特性
@@ -240,31 +240,37 @@ LMP版本:
 支持的功能:
 是
 否
-蓝牙适配器应该完全兼容DS3/DS4手柄
-蓝牙适配器可能无法与DS3/DS4手柄匹配
-开启多重模拟
-打开/关闭这个游戏的多重模拟.
-多重模拟端口
-选择进行多重模拟的端口
-禁用仿冒DS3手柄
-这个选项将使一些仿冒的DS3手柄无法工作
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+蓝牙适配器完全兼容DS3/DS4手柄
+蓝牙适配器与DS3/DS4手柄不匹配
+开启分插模拟
+打开/关闭分插模拟.
+模拟分插端口
+选择模拟的分插端口
+禁用仿制DS3手柄
+这个选项将使仿制DS3手柄无法工作
+模拟播片扫描方式切换
+修正逐行模式下视频播放有问题的游戏.
+家长锁设置
+家长锁密码
+留空将不启用家长锁.
+输入家长锁密码
+家长锁密码不正确.
+已禁用家长锁.
+创建选项:
+错误-无法使用此密码.
+vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
+Settings must be saved before continuing.
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
 PS1游戏
 PS1游戏启动模式
 POPSTARTER.ELF在'%s'上找不到!
 VCD文件'%s'没有找到!
 重命名文件时发生错误.
 删除文件时发生错误.
-Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
-ifcaro OPL version at psx-scene.com
-OPL Daily Builds (DB) version at ps2-home.com
+永远不要购买OPEN-PS2-LOADER (OPL)，而是免费获得：
+ifcaro OPL 版本从psx-scene.com
+OPL 日常开发版(DB)从ps2-home.com

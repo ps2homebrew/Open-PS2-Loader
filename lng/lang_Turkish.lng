@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
-# Last update: 8/24/2018
-# Updated for OPL_1301_DB-TA_[24f2d97]
+# Last update: 12/06/2018
+# Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
@@ -259,6 +259,12 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Settings must be saved before continuing.
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

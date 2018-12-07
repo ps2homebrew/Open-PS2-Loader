@@ -101,7 +101,7 @@ Objektet ska tas bort permanent , fortsätta?
 Byt namn
 Radera
 Kör
-Inställningar Skärm
+Skärminställningar
 Aktivera skrivåtkomst
 Kontrollera USB spelfragmentering
 Kom ihåg senast spelade spel
@@ -259,12 +259,12 @@ Föräldrakontroll inaktiverat
 Bygg-Alternativ:
 Fel - lösenordet kan ej användas.
 VMC %s filen är fragmenterad. Använd minneskort i port %d?
-Settings must be saved before continuing.
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+Inställningar måste sparas för att gå vidare.
+Ljudinställningar
+Aktivera Ljudeffekter
+Aktivera Uppstartsljud
+Ljudeffektsvolym
+Uppstartsljudsvolym
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

@@ -1,5 +1,5 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: 12/06/2018
+# Last update: 12/07/2018
 # Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
@@ -101,7 +101,7 @@ Objekt wird dauerhaft gelöscht, wirklich fortfahren?
 Umbenennen
 Löschen
 Ausführen
-Bildschirmeinstellungen
+Anzeige Einstellungen
 Aktiviere Schreiboptionen
 Prüfe USB Spielefragmentierung
 Merke zuletzt gespieltes Spiel
@@ -259,12 +259,12 @@ Kindersicherung ausgeschaltet.
 Erstellungsoptionen:
 Fehler - Dieses Passwort kann nicht benutzt werden.
 VMC %s Datei ist fragmentiert. Weiter mit Memory Card in steckplatz %d?
-Settings must be saved before continuing.
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+Einstellungen müssen gespeichert werden vor dem fortsetzen
+Audio Einstellungen
+Soundeffekte Einschalten
+Startsound Einschalten
+Lautstärke Soundeffekte
+Lautstärke Startsound
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

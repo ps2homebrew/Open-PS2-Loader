@@ -1,5 +1,5 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: 12/06/2018
+# Last update: 12/07/2018
 # Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
@@ -259,12 +259,12 @@ Controle parental desativado.
 Opções nesta compilação:
 Erro - esta senha não pode ser usada.
 O arquivo VMC %s está fragmentado. Continuar com o cartão de memória na entrada %d?
-Settings must be saved before continuing.
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+As configurações devem ser salvas antes de continuar.
+Configurações de áudio
+Ativar efeitos sonoros
+Ativar som de inicialização
+Volume de efeitos sonoros
+Volume do som de inicialização
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

@@ -1,5 +1,5 @@
 # Translation by lauchon22
-# Last update: 12/06/2018
+# Last update: 12/13/2018
 # Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
@@ -101,7 +101,7 @@ El archivo se borrará definitivamente, ¿continuar?
 Renombrar
 Borrar
 Iniciar
-Preferencias de pantalla
+Configuraciones de pantalla
 Mostrar operaciones de escritura
 Comprobar fragmentación juego USB
 Recordar último juego en uso
@@ -259,12 +259,12 @@ Control parental desactivado.
 Opciones de compilación:
 Error - No se puede usar este password.
 El archivo VMC %s está fragmentado. Continuar con Memory Card en slot %d?
-Settings must be saved before continuing.
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+Los ajustes deben guardarse antes de continuar.
+Configuraciones de audio
+Habilitar efectos de sonido
+Habilitar sonido de inicio
+Volumen de efectos de sonido
+Volumen de sonido de inicio
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

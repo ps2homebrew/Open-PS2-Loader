@@ -1,5 +1,5 @@
 # Translated by kane159 and eyu2007
-# Last update: 12/06/2018
+# Last update: 12/10/2018
 # Updated for OPL_1345_DB-TA_[d0f1616]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
@@ -259,12 +259,12 @@ LMP版本:
 创建选项:
 错误-无法使用此密码.
 vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
-Settings must be saved before continuing.
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+必须先保存设置, 然后才能继续.
+音频设置
+启用声音效果
+启用启动声音
+音效音量
+启动音量
 PS1游戏
 PS1游戏启动模式
 POPSTARTER.ELF在'%s'上找不到!

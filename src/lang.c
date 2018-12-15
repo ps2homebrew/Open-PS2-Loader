@@ -268,7 +268,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Build Options:",
     "Error - this password cannot be used.",
     "VMC %s file is fragmented. Continue with Memory Card in slot %d?",
-    "Settings must be saved before continuing.",
     "Audio Settings",
     "Enable Sound Effects",
     "Enable Boot Sound",

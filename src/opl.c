@@ -1315,7 +1315,7 @@ static void deferredAudioInit(void)
         LOG("Failed to initialize audsrv\n");
         LOG("Audsrv returned error string: %s\n", audsrv_get_error_string());
 
-    ret = sfxInit();
+    ret = sfxInit(1);
     if (ret >= 0)
         LOG("sfxInit: %d samples loaded.\n", ret);
     else

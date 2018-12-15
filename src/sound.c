@@ -1,4 +1,4 @@
-/*--    Theme Sound Effects -------------------------------------------------------------------------------------------------
+/*--    Theme Sound Effects    ----------------------------------------------------------------------------------------------
 ----    SP193 wrote the code, I just made small changes.    ---------------------------------------------------------------*/
 
 #include <audsrv.h>
@@ -154,7 +154,7 @@ void sfxVolume(void)
 }
 
 //Returns number of audio files successfully loaded, < 0 if an unrecoverable error occurred.
-int sfxInit(void)
+int sfxInit(int bootSnd)
 {
     char full_path[256];
     int ret, i, loaded;
@@ -163,14 +163,20 @@ int sfxInit(void)
 
     sfxInitDefaults();
     sfxVolume();
-
-    ret = getFadeDelay();
-    if (ret != 0) {
-        gFadeDelay = 1200;
+    //boot sound only needs to be read/loaded at init
+    if (bootSnd) {
+        ret = getFadeDelay();
+        if (ret != 0) {
+            gFadeDelay = 1200;
+        }
+        i = 0;
+    }
+    else {
+        i = 1;
     }
 
     loaded = 0;
-    for (i = 0; i < NUM_SFX_FILES; i++)
+    for (; i < NUM_SFX_FILES; i++)
     {
         if (thmSfxEnabled < 0)
         {

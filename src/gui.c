@@ -556,11 +556,10 @@ void guiShowUIConfig(void)
         diaGetInt(diaUIConfig, UICFG_YOFF, &gYOff);
         diaGetInt(diaUIConfig, UICFG_OVERSCAN, &gOverscan);
 
-		int changed = thmSetGuiValue(themeID, changed);
-        if (changed) {
-            sfxInit();
-        }
         applyConfig(themeID, langID);
+        //wait 70ms for confirm sound to finish playing before clearing buffer
+        guiDelay(0070);
+        sfxInit(0);
     }
 }
 

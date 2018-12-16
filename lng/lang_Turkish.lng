@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: 12/08/2018
-# Updated for OPL_1345_DB-TA_[d0f1616]
+# Last update: 12/15/2018
+# Updated for OPL_1359_DB-TA_[d0ac8e5]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
@@ -259,7 +259,6 @@ Ebeveyn Kilidi Kapatıldı.
 Build Ayarları:
 Hata - bu parola kullanılamaz.
 VMC %sdosyası fragment olmuş, fiziksel HK ile devam edilsin mi (slot %d)?
-Devam etmeden önce ayarlar kaydedilmelidir.
 Ses Ayarları
 Ses Efektleri Olsun
 Açılış Sesi Olsun

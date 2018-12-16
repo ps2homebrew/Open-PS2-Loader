@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: 12/06/2018
-# Updated for OPL_1345_DB-TA_[d0f1616]
+# Last update: 12/15/2018
+# Updated for OPL_1359_DB-TA_[d0ac8e5]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
 OPL %s
@@ -259,7 +259,6 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Settings must be saved before continuing.
 Audio Settings
 Enable Sound Effects
 Enable Boot Sound

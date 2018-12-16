@@ -171,7 +171,7 @@ unsigned char gDefaultUITextColor[3];
 #define MENU_ITEM_HEIGHT 19
 
 // BLURT output
-char blurttext[128];
+//char blurttext[128];
 //#define BLURT	snprintf(blurttext, sizeof(blurttext), "%s\\%s(%d)", __FILE__ , __func__ , __LINE__ );delay(10);
-#define BLURT snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__);
+//#define BLURT snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__);
 #endif

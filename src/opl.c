@@ -1149,16 +1149,13 @@ static void moduleCleanup(opl_io_module_t *mod, int exception)
 
 void deinit(int exception)
 {
-    // Just deinit them if we won't show Debug Warnings later
-    if (gDisableDebug) {
-        unloadPads();
-        ioEnd();
-        guiEnd();
-        menuEnd();
-        lngEnd();
-        thmEnd();
-        rmEnd();
-    }
+    unloadPads();
+    ioEnd();
+    guiEnd();
+    menuEnd();
+    lngEnd();
+    thmEnd();
+    rmEnd();
     configEnd();
 
     deinitAllSupport(exception);

@@ -17,9 +17,13 @@
 #include "include/ioman.h"
 #include <assert.h>
 
+#include "include/sound.h"
+#include <audsrv.h>
+
 enum MENU_IDs {
     MENU_SETTINGS = 0,
     MENU_GFX_SETTINGS,
+    MENU_AUDIO_SETTINGS,
     MENU_NET_CONFIG,
     MENU_NET_UPDATE,
     MENU_PARENTAL_LOCK,
@@ -113,6 +117,7 @@ static void menuInitMainMenu(void)
 // initialize the menu
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
@@ -430,6 +435,9 @@ static void menuNextH()
     if (selected_item->next != NULL) {
         selected_item = selected_item->next;
         itemConfigId = -1;
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
     }
 }
 
@@ -438,6 +446,9 @@ static void menuPrevH()
     if (selected_item->prev != NULL) {
         selected_item = selected_item->prev;
         itemConfigId = -1;
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
     }
 }
 
@@ -445,6 +456,10 @@ static void menuFirstPage()
 {
     submenu_list_t *cur = selected_item->item->current;
     if (cur) {
+        if (gEnableSFX && cur->prev) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
+
         selected_item->item->current = selected_item->item->submenu;
         selected_item->item->pagestart = selected_item->item->current;
     }
@@ -454,6 +469,9 @@ static void menuLastPage()
 {
     submenu_list_t *cur = selected_item->item->current;
     if (cur) {
+        if (gEnableSFX && cur->next) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
         while (cur->next)
             cur = cur->next; // go to end
 
@@ -473,6 +491,9 @@ static void menuNextV()
 
     if (cur && cur->next) {
         selected_item->item->current = cur->next;
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
 
         // if the current item is beyond the page start, move the page start one page down
         cur = selected_item->item->pagestart;
@@ -496,6 +517,9 @@ static void menuPrevV()
 
     if (cur && cur->prev) {
         selected_item->item->current = cur->prev;
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
 
         // if the current item is on the page start, move the page start one page up
         if (selected_item->item->pagestart == cur) {
@@ -515,6 +539,9 @@ static void menuNextPage()
 
     if (cur && cur->next) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
 
         while (--itms && cur->next)
             cur = cur->next;
@@ -533,6 +560,9 @@ static void menuPrevPage()
 
     if (cur && cur->prev) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
 
         while (--itms && cur->prev)
             cur = cur->prev;
@@ -651,6 +681,9 @@ void menuHandleInputMenu()
         mainMenuCurrent = mainMenu;
 
     if (getKey(KEY_UP)) {
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
         if (mainMenuCurrent->prev)
             mainMenuCurrent = mainMenuCurrent->prev;
         else // rewind to the last item
@@ -659,6 +692,9 @@ void menuHandleInputMenu()
     }
 
     if (getKey(KEY_DOWN)) {
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(3, &sfx[3]);
+        }
         if (mainMenuCurrent->next)
             mainMenuCurrent = mainMenuCurrent->next;
         else
@@ -669,12 +705,19 @@ void menuHandleInputMenu()
         // execute the item via looking at the id of it
         int id = mainMenuCurrent->item.id;
 
+        if (gEnableSFX) {
+            audsrv_ch_play_adpcm(2, &sfx[2]);
+        }
+
         if (id == MENU_SETTINGS) {
             if (menuCheckParentalLock() == 0)
               guiShowConfig();
         } else if (id == MENU_GFX_SETTINGS) {
             if (menuCheckParentalLock() == 0)
               guiShowUIConfig();
+        } else if (id == MENU_AUDIO_SETTINGS) {
+            if (menuCheckParentalLock() == 0)
+              guiShowAudioConfig();
         } else if (id == MENU_NET_CONFIG) {
             if (menuCheckParentalLock() == 0)
               guiShowNetConfig();
@@ -693,7 +736,7 @@ void menuHandleInputMenu()
             if (menuCheckParentalLock() == 0)
               handleHdlSrv();
         } else if (id == MENU_ABOUT) {
-            guiShowAbout();
+              guiShowAbout();
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))
                 sysExecExit();

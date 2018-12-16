@@ -18,8 +18,9 @@ GSGLOBAL *gsGlobal;
 s32 guiThreadID;
 
 static int order;
-static int vmode = -1;
-static int hires = 0;
+static short int vmode = -1;
+static u8 hires = 0;
+static u8 guiWakeupCount;
 static int vsync_id = -1;
 
 #define NUM_RM_VMODES 12
@@ -118,6 +119,7 @@ void rmEndFrame(void)
 
         if (!gsGlobal->FirstFrame) {
             SleepThread();
+            guiWakeupCount = 0;
 
             if (gsGlobal->DoubleBuffering == GS_SETTING_ON) {
                 GS_SET_DISPFB2(gsGlobal->ScreenBuffer[gsGlobal->ActiveBuffer & 1] / 8192,
@@ -135,7 +137,11 @@ void rmEndFrame(void)
 
 static int rmOnVSync(void)
 {
-    iWakeupThread(guiThreadID);
+    if (guiWakeupCount == 0)
+    {
+        guiWakeupCount = 1;
+        iWakeupThread(guiThreadID);
+    }
 
     return 0;
 }
@@ -157,6 +163,7 @@ void rmInit()
 
     order = 0;
 
+    guiWakeupCount = 0;
     guiThreadID = GetThreadId();
 }
 

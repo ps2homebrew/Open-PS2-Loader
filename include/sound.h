@@ -5,7 +5,7 @@
 
 extern struct audsrv_adpcm_t sfx[NUM_SFX_FILES];
 
-int sfxInit(void);
+int sfxInit(int bootSnd);
 void sfxVolume(void);
 
 int thmSfxEnabled;

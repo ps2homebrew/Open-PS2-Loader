@@ -733,16 +733,10 @@ void menuHandleInputMenu()
               menuSetParentalLockCheckState(1); //Re-enable parental lock check.
             }
         } else if (id == MENU_START_HDL) {
-            if (menuCheckParentalLock() == 0) {
-                int ret = guiMsgBox(_l(_STR_HDL_SAVE_SETTINGS), 1, NULL);
-                if (ret != 0) {
-                    saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
-                    menuSetParentalLockCheckState(1); //Re-enable parental lock check.
-                    handleHdlSrv();
-                }
-            }
+            if (menuCheckParentalLock() == 0)
+              handleHdlSrv();
         } else if (id == MENU_ABOUT) {
-            guiShowAbout();
+              guiShowAbout();
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))
                 sysExecExit();

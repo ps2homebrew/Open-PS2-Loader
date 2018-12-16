@@ -410,7 +410,7 @@ static mutable_image_t *initMutableImage(const char *themePath, config_set_t *th
 
     findDuplicate(theme->mainElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
     findDuplicate(theme->infoElems.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
-    
+
     //START of OPL_DB tweaks
     findDuplicate(theme->mainElemsELM.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
     findDuplicate(theme->infoElemsELM.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
@@ -1232,7 +1232,7 @@ static void thmLoad(const char *themePath)
     snprintf(path, sizeof(path), "info0");
     while (addGUIElem(themePath, themeConfig, newT, &newT->infoElems, NULL, path))
         snprintf(path, sizeof(path), "info%d", i++);
-    
+
     //START of OPL_DB tweaks
     //Special Main ELM page
     i = 1;

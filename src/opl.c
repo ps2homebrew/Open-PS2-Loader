@@ -363,6 +363,8 @@ static void deinitAllSupport(int exception)
     moduleCleanup(&list_support[ETH_MODE], exception);
     moduleCleanup(&list_support[HDD_MODE], exception);
     moduleCleanup(&list_support[APP_MODE], exception);
+
+    ethDeinitModules(); //Deinitialize here if the UI used network support without SMB.
 }
 
 // ----------------------------------------------------------
@@ -1147,16 +1149,13 @@ static void moduleCleanup(opl_io_module_t *mod, int exception)
 
 void deinit(int exception)
 {
-    // Just deinit them if we won't show Debug Warnings later
-    if (gDisableDebug) {
-        unloadPads();
-        ioEnd();
-        guiEnd();
-        menuEnd();
-        lngEnd();
-        thmEnd();
-        rmEnd();
-    }
+    unloadPads();
+    ioEnd();
+    guiEnd();
+    menuEnd();
+    lngEnd();
+    thmEnd();
+    rmEnd();
     configEnd();
 
     deinitAllSupport(exception);

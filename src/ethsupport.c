@@ -283,18 +283,22 @@ static int ethLoadModules(void)
 
 void ethDeinitModules(void)
 {
-    if (ethInitSemaID >= 0)
-        WaitSema(ethInitSemaID);
+    if (ethModulesLoaded) {
+        if (ethInitSemaID >= 0)
+            WaitSema(ethInitSemaID);
 
-    HttpDeinit();
-    nbnsDeinit();
-    NetManDeinit();
-    ethModulesLoaded = 0;
-    gNetworkStartup = ERROR_ETH_NOT_STARTED;
+        HttpDeinit();
+        nbnsDeinit();
+        NetManDeinit();
+        ethModulesLoaded = 0;
+        gNetworkStartup = ERROR_ETH_NOT_STARTED;
 
-    if (ethInitSemaID >= 0) {
-        DeleteSema(ethInitSemaID);
-        ethInitSemaID = -1;
+        if (ethInitSemaID >= 0) {
+            DeleteSema(ethInitSemaID);
+            ethInitSemaID = -1;
+        }
+
+        ps2ip_deinit();
     }
 }
 

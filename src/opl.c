@@ -363,6 +363,8 @@ static void deinitAllSupport(int exception)
     moduleCleanup(&list_support[ETH_MODE], exception);
     moduleCleanup(&list_support[HDD_MODE], exception);
     moduleCleanup(&list_support[APP_MODE], exception);
+
+    ethDeinitModules(); //Deinitialize here if the UI used network support without SMB.
 }
 
 // ----------------------------------------------------------

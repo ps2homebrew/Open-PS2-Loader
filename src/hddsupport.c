@@ -180,8 +180,6 @@ void hddLoadModules(void)
 
         LOG("HDDSUPPORT modules loaded\n");
 
-        hddSetIdleTimeout(gHDDSpindown * 12); // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
-
         ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
         if (ret == -ENOENT) {
             //Attempt to create the partition.
@@ -369,6 +367,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
         dmaMode -= 3;
     }
     hddSetTransferMode(dmaType, dmaMode);
+    // gHDDSpindown [0..20] -> spindown [0..240] -> seconds [0..1200]
     hddSetIdleTimeout(gHDDSpindown * 12);
 
     if (hddHDProKitDetected) {

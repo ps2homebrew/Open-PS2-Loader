@@ -33,6 +33,8 @@
 #include "include/cheatman.h"
 
 #include "include/sound.h"
+
+#include <unistd.h>
 #include <audsrv.h>
 
 #ifdef __EESIO_DEBUG
@@ -499,7 +501,7 @@ void setErrorMessage(int strId)
 static int lscstatus = CONFIG_ALL;
 static int lscret = 0;
 
-static int tryAlternateDevice(int types)
+static int checkLoadConfigUSB(int types)
 {
     char path[64];
     int value;
@@ -511,13 +513,18 @@ static int tryAlternateDevice(int types)
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_USB_MODE, START_MODE_AUTO);
-        return value;
+        return 0;
     }
 
-    // check HDD
+    return -ENOENT;
+}
+
+static int checkLoadConfigHDD(int types)
+{
+    int value;
+
     hddLoadModules();
-    sprintf(path, "pfs0:conf_opl.cfg");
-    value = fileXioOpen(path, O_RDONLY, 0666);
+    value = fileXioOpen("pfs0:conf_opl.cfg", O_RDONLY);
     if (value >= 0) {
         fileXioClose(value);
         configEnd();
@@ -525,22 +532,62 @@ static int tryAlternateDevice(int types)
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
-        return value;
+        return 0;
     }
 
-    if (sysCheckMC() < 0) { // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
-        // set config path to either mass or hdd, to prepare the saving of a new config
-        value = fileXioDopen("mass0:");
+    return -ENOENT;
+}
+
+//When this function is called, the current device for loading/saving config is the memory card.
+static int tryAlternateDevice(int types)
+{
+    char pwd[8];
+    int value;
+
+    getcwd(pwd, sizeof(pwd));
+
+    //First, try the device that OPL booted from.
+    if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':'))
+    {
+        if (checkLoadConfigUSB(types) == 0)
+            return 0;
+    }
+    else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':'))
+    {
+        if (checkLoadConfigHDD(types) == 0)
+            return 0;
+    }
+
+    //Config was not found on the boot device. Check all supported devices.
+    // Check USB device
+    if (checkLoadConfigUSB(types) == 0)
+        return 0;
+    // Check HDD
+    if (checkLoadConfigHDD(types) == 0)
+        return 0;
+
+    // At this point, the user has no loadable config files on any supported device, so try to find a device to save on.
+    // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
+    // Check for a memory card inserted.
+    if (sysCheckMC() >= 0)
+        return 0;
+    // No memory cards? Try a USB device...
+    value = fileXioDopen("mass0:");
+    if (value >= 0) {
+        fileXioDclose(value);
+        configEnd();
+        configInit("mass0:");
+    } else {
+        // No? Check if the save location on the HDD is available.
+        value = fileXioDopen("pfs0:");
         if (value >= 0) {
             fileXioDclose(value);
-            configEnd();
-            configInit("mass0:");
-        } else {
             configEnd();
             configInit("pfs0:");
         }
     }
 
+    //We tried everything, but... maybe the user will connect a device later.
     return 0;
 }
 
@@ -644,6 +691,77 @@ static void _loadConfig()
     lscstatus = 0;
 }
 
+static int trySaveConfigUSB(int types)
+{
+    char path[64];
+
+    // check USB
+    if (usbFindPartition(path, "conf_opl.cfg")) {
+        configSetMove(path);
+        return configWriteMulti(types);
+    }
+
+    return -ENOENT;
+}
+
+static int trySaveConfigHDD(int types)
+{
+    int value;
+
+    hddLoadModules();
+    value = fileXioOpen("pfs0:conf_opl.cfg", O_RDONLY);
+    if (value >= 0) {
+        fileXioClose(value);
+
+        configSetMove("pfs0:");
+        return configWriteMulti(types);
+    }
+
+    return -ENOENT;
+}
+
+static int trySaveConfigMC(int types)
+{
+    configSetMove(NULL);
+    return configWriteMulti(types);
+}
+
+static int trySaveAlternateDevice(int types)
+{
+    char pwd[8];
+    int value;
+
+    getcwd(pwd, sizeof(pwd));
+
+    //First, try the device that OPL booted from.
+    if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':'))
+    {
+        if ((value = trySaveConfigUSB(types)) > 0)
+            return value;
+    }
+    else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':'))
+    {
+        if ((value = trySaveConfigHDD(types)) > 0)
+            return value;
+    }
+
+    //Config was not saved to the boot device. Try all supported devices.
+    //Try memory cards
+    if (sysCheckMC() >= 0) {
+        if ((value = trySaveConfigMC(types)) > 0)
+            return value;
+    }
+    // Try a USB device
+    if ((value = trySaveConfigUSB(types)) > 0)
+        return value;
+    // Try the HDD
+    if ((value = trySaveConfigHDD(types)) > 0)
+        return value;
+
+    //We tried everything, but...
+    return 0;
+}
+
 static void _saveConfig()
 {
     char temp[256];
@@ -714,6 +832,8 @@ static void _saveConfig()
     }
 
     lscret = configWriteMulti(lscstatus);
+    if (lscret == 0)
+        lscret = trySaveAlternateDevice(lscstatus);
     lscstatus = 0;
 }
 

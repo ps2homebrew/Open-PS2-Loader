@@ -164,6 +164,25 @@ void configInit(char *prefix)
     configAlloc(CONFIG_NETWORK, &configFiles[CONFIG_INDEX_NETWORK], path);
 }
 
+void configSetMove(char *prefix)
+{
+    char path[256];
+
+    if (prefix)
+        snprintf(legacyNetConfigPath, sizeof(legacyNetConfigPath), "%s/IPCONFIG.DAT", prefix);
+    else
+        prefix = gBaseMCDir;
+
+    snprintf(path, sizeof(path), "%s/conf_opl.cfg", prefix);
+    configMove(&configFiles[CONFIG_INDEX_OPL], path);
+    snprintf(path, sizeof(path), "%s/conf_last.cfg", prefix);
+    configMove(&configFiles[CONFIG_INDEX_OPL], path);
+    snprintf(path, sizeof(path), "%s/conf_apps.cfg", prefix);
+    configMove(&configFiles[CONFIG_INDEX_OPL], path);
+    snprintf(path, sizeof(path), "%s/conf_network.cfg", prefix);
+    configMove(&configFiles[CONFIG_INDEX_OPL], path);
+}
+
 void configEnd()
 {
     int index = 0;
@@ -194,6 +213,13 @@ config_set_t *configAlloc(int type, config_set_t *configSet, char *fileName)
         configSet->filename = NULL;
     configSet->modified = 0;
     return configSet;
+}
+
+void configMove(config_set_t *configSet, const char *fileName)
+{
+    int length = strlen(fileName) + 1;
+    configSet->filename = realloc(configSet->filename, length);
+    memcpy(configSet->filename, fileName, length);
 }
 
 void configFree(config_set_t *configSet)

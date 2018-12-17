@@ -25,8 +25,13 @@ static int ethGameCount = 0;
 static unsigned char ethModulesLoaded = 0;
 static base_game_info_t *ethGames = NULL;
 
+static struct ip4_addr lastIP;
+static struct ip4_addr lastNM;
+static struct ip4_addr lastGW;
+
 // forward declaration
 static item_list_t ethGameList;
+static int ethReadNetConfig(void);
 static int ethGetNetIFLinkStatus(void);
 
 static int ethInitSemaID = -1;
@@ -298,6 +303,8 @@ void ethDeinitModules(void)
             ethInitSemaID = -1;
         }
 
+        //To allow the configuration to be read later on, read the latest version now.
+        ethReadNetConfig();
         ps2ip_deinit();
     }
 }
@@ -722,31 +729,44 @@ static item_list_t ethGameList = {
     &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
 };
 
-int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
+static int ethReadNetConfig(void)
 {
     t_ip_info ip_info;
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
-        ip_address[0] = ip4_addr1((struct ip4_addr *)&ip_info.ipaddr);
-        ip_address[1] = ip4_addr2((struct ip4_addr *)&ip_info.ipaddr);
-        ip_address[2] = ip4_addr3((struct ip4_addr *)&ip_info.ipaddr);
-        ip_address[3] = ip4_addr4((struct ip4_addr *)&ip_info.ipaddr);
-
-        netmask[0] = ip4_addr1((struct ip4_addr *)&ip_info.netmask);
-        netmask[1] = ip4_addr2((struct ip4_addr *)&ip_info.netmask);
-        netmask[2] = ip4_addr3((struct ip4_addr *)&ip_info.netmask);
-        netmask[3] = ip4_addr4((struct ip4_addr *)&ip_info.netmask);
-
-        gateway[0] = ip4_addr1((struct ip4_addr *)&ip_info.gw);
-        gateway[1] = ip4_addr2((struct ip4_addr *)&ip_info.gw);
-        gateway[2] = ip4_addr3((struct ip4_addr *)&ip_info.gw);
-        gateway[3] = ip4_addr4((struct ip4_addr *)&ip_info.gw);
+        lastIP = *(struct ip4_addr*)&ip_info.ipaddr;
+        lastNM = *(struct ip4_addr*)&ip_info.netmask;
+        lastGW = *(struct ip4_addr*)&ip_info.gw;
     } else {
-        memset(ip_address, 0, sizeof(ip_address));
-        memset(netmask, 0, sizeof(netmask));
-        memset(gateway, 0, sizeof(gateway));
+        ip4_addr_set_zero(&lastIP);
+        ip4_addr_set_zero(&lastNM);
+        ip4_addr_set_zero(&lastGW);
     }
+
+    return result;
+}
+
+int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
+{
+    int result;
+
+    //Read a cached copy of the settings, if this is read after deinitialization.
+    result = ethModulesLoaded ? ethReadNetConfig() : -1;
+    ip_address[0] = ip4_addr1(&lastIP);
+    ip_address[1] = ip4_addr2(&lastIP);
+    ip_address[2] = ip4_addr3(&lastIP);
+    ip_address[3] = ip4_addr4(&lastIP);
+
+    netmask[0] = ip4_addr1(&lastNM);
+    netmask[1] = ip4_addr2(&lastNM);
+    netmask[2] = ip4_addr3(&lastNM);
+    netmask[3] = ip4_addr4(&lastNM);
+
+    gateway[0] = ip4_addr1(&lastGW);
+    gateway[1] = ip4_addr2(&lastGW);
+    gateway[2] = ip4_addr3(&lastGW);
+    gateway[3] = ip4_addr4(&lastGW);
 
     return result;
 }

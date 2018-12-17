@@ -374,6 +374,8 @@ static void deinitAllSupport(int exception)
 //START of OPL_DB tweaks
     moduleCleanup(&list_support[ELM_MODE], exception);
 //END of OPL_DB tweaks
+
+    ethDeinitModules(); //Deinitialize here if the UI used network support without SMB.
 }
 
 // ----------------------------------------------------------
@@ -700,6 +702,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, gBootSndVolume);
+
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
 
@@ -737,7 +740,6 @@ void applyConfig(int themeID, int langID)
     if (gDefaultDevice < 0 || gDefaultDevice > MODE_COUNT -1)
         gDefaultDevice = APP_MODE;
 	//END of OPL_DB tweaks
-	
     guiUpdateScrollSpeed();
 
     guiSetFrameHook(&menuUpdateHook);
@@ -1168,16 +1170,13 @@ static void moduleCleanup(opl_io_module_t *mod, int exception)
 
 void deinit(int exception)
 {
-    // Just deinit them if we won't show Debug Warnings later
-    if (gDisableDebug) {
-        unloadPads();
-        ioEnd();
-        guiEnd();
-        menuEnd();
-        lngEnd();
-        thmEnd();
-        rmEnd();
-    }
+    unloadPads();
+    ioEnd();
+    guiEnd();
+    menuEnd();
+    lngEnd();
+    thmEnd();
+    rmEnd();
     configEnd();
 
     deinitAllSupport(exception);

@@ -706,23 +706,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     ModuleStorageEnd = (void*)((u8*)ModuleStorage + ModuleStorageSize);
     sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorageEnd);
 
-    if (!gDisableDebug) {
-        char text[80];
-        float usage;
-        usage = (float)(ModuleStorageSize) / (float)(2 * 1024 * 1024) * 100;
-
-        snprintf(text, sizeof(text), "IOP Usage:%.2f%%,by %s(CDVDFSV+CDVDMAN)", (float)usage, mode_str);
-
-        if (size_mcemu_irx > 0)
-            strcat(text, "+VMC");
-
-#ifdef PADEMU
-        if (gEnablePadEmu)
-            strcat(text, "+PADEMU");
-#endif
-        guiWarning(text, 20);
-    }
-
     // NB: LOADER.ELF is embedded
     boot_elf = (u8 *)&eecore_elf;
     eh = (elf_header_t *)boot_elf;
@@ -790,18 +773,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     strcpy(ElfPath, "cdrom0:\\");
     strncat(ElfPath, filename, 11); // fix for 8+3 filename.
     strcat(ElfPath, ";1");
-
-    if (!gDisableDebug) {
-        guiWarning("Let's go.", 10);
-        // deinit stuff
-        unloadPads();
-        ioEnd();
-        guiEnd();
-        menuEnd();
-        lngEnd();
-        thmEnd();
-        rmEnd();
-    }
 
 #ifdef PADEMU
     ds34usb_reset();

@@ -173,17 +173,18 @@ static void IGR_Thread(void *arg)
 
     DPRINTF("IGR thread woken up!\n");
 
+    if (!DisableDebug)
+        GS_BGCOLOUR = 0xFFFFFF; // White
+
+    // Re-Init RPC & CMD
+    SifInitRpc(0);
+
     // If Pad Combo is Start + Select then Return to Home, else if Pad Combo is UP then take IGS
     if ((Pad_Data.combo_type == IGR_COMBO_START_SELECT)
 #ifdef IGS
         || ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
 #endif
             ) {
-        if (!DisableDebug)
-            GS_BGCOLOUR = 0xFFFFFF; // White
-
-        // Re-Init RPC & CMD
-        SifInitRpc(0);
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0x800000; // Dark Blue
@@ -194,7 +195,7 @@ static void IGR_Thread(void *arg)
         if (!DisableDebug)
             GS_BGCOLOUR = 0xFF8000; // Blue sky
 
-        oplIGRShutdown();
+        oplIGRShutdown(0);
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0x0000FF; // Red
@@ -272,10 +273,15 @@ static void IGR_Thread(void *arg)
         SifExitRpc();
 
         IGR_Exit(0);
-    }
+    } else {
+        // If combo is R3 + L3, Poweroff PS2
+        oplIGRShutdown(1);
 
-    // If combo is R3 + L3 or Reset failed, Poweroff PS2
-    PowerOff_PS2();
+        if (!DisableDebug)
+            GS_BGCOLOUR = 0x0000FF; // Red
+
+        PowerOff_PS2();
+    }
 }
 
 void IGR_Exit(s32 exit_code)

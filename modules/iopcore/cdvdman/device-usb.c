@@ -69,6 +69,11 @@ void DeviceDeinit(void)
 {
 }
 
+void DeviceStop(void)
+{
+    mass_stor_stop_unit();
+}
+
 void DeviceFSInit(void)
 {
     // initialize usbd exports

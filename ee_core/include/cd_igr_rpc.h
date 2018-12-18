@@ -1,2 +1,2 @@
-int oplIGRShutdown(void);
+int oplIGRShutdown(int poff);
 

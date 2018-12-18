@@ -513,10 +513,10 @@ static int checkLoadConfigUSB(int types)
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_USB_MODE, START_MODE_AUTO);
-        return 0;
+        return value;
     }
 
-    return -ENOENT;
+    return 0;
 }
 
 static int checkLoadConfigHDD(int types)
@@ -532,10 +532,10 @@ static int checkLoadConfigHDD(int types)
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
-        return 0;
+        return value;
     }
 
-    return -ENOENT;
+    return 0;
 }
 
 //When this function is called, the current device for loading/saving config is the memory card.
@@ -549,22 +549,22 @@ static int tryAlternateDevice(int types)
     //First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':'))
     {
-        if (checkLoadConfigUSB(types) == 0)
-            return 0;
+        if ((value = checkLoadConfigUSB(types)) != 0)
+            return value;
     }
     else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':'))
     {
-        if (checkLoadConfigHDD(types) == 0)
-            return 0;
+        if ((value = checkLoadConfigHDD(types)) != 0)
+            return value;
     }
 
     //Config was not found on the boot device. Check all supported devices.
     // Check USB device
-    if (checkLoadConfigUSB(types) == 0)
-        return 0;
+    if ((value = checkLoadConfigUSB(types)) != 0)
+        return value;
     // Check HDD
-    if (checkLoadConfigHDD(types) == 0)
-        return 0;
+    if ((value = checkLoadConfigHDD(types)) != 0)
+        return value;
 
     // At this point, the user has no loadable config files on any supported device, so try to find a device to save on.
     // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
@@ -587,7 +587,6 @@ static int tryAlternateDevice(int types)
         }
     }
 
-    //We tried everything, but... maybe the user will connect a device later.
     return 0;
 }
 

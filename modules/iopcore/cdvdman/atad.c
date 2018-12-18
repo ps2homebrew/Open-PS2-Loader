@@ -13,6 +13,8 @@
 # 100% compatible with its proprietary counterpart called atad.irx.
 #
 # This module also include support for 48-bit feature set (done by Clement).
+# To avoid causing an "emergency park" for some HDDs, shutdown callback 15 of dev9
+# is used for issuing the STANDBY IMMEDIATE command prior to DEV9 getting shut down.
 */
 
 #include <types.h>
@@ -74,7 +76,9 @@ typedef struct _ata_cmd_info
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
-    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}, {ATA_C_FLUSH_CACHE, 0x01}, {ATA_C_FLUSH_CACHE_EXT, 0x01}};
+    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01},
+    {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}, {ATA_C_STANDBY_IMMEDIATE,0x1},
+    {ATA_C_FLUSH_CACHE, 0x01}, {ATA_C_STANDBY_IMMEDIATE,1},{ATA_C_FLUSH_CACHE_EXT, 0x01}};
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
 static const ata_cmd_info_t smart_cmd_table[] = {
@@ -101,6 +105,7 @@ static int ata_intr_cb(int flag);
 static unsigned int ata_alarm_cb(void *unused);
 
 static void ata_set_dir(int dir);
+static void ata_shutdown_cb(void);
 
 /* In v1.04, DMA was enabled in ata_set_dir() instead. */
 static void ata_pre_dma_cb(int bcr, int dir)
@@ -160,6 +165,8 @@ int atad_start(void)
       dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
       dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
     }
+    /* Register this at the last position, as it should be the last thing done before shutdown. */
+    dev9RegisterShutdownCb(15, &ata_shutdown_cb);
 
     iop_sema_t smp;
     smp.initial = 1;
@@ -649,3 +656,19 @@ static void ata_set_dir(int dir)
     SPD_REG16(SPD_R_IF_CTRL) = val;
     SPD_REG16(SPD_R_XFR_CTRL) = dir | (ata_gamestar_workaround ? 0x86 : 0x6); //In v1.04, DMA was enabled here (0x86 instead of 0x6)
 }
+
+static int ata_device_standby_immediate(int device)
+{
+    int res;
+
+    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4)&0xFFFF, ATA_C_STANDBY_IMMEDIATE))) res = ata_io_finish();
+
+    return res;
+}
+
+static void ata_shutdown_cb(void)
+{
+    if (atad_devinfo.exists)
+        ata_device_standby_immediate(0);
+}
+

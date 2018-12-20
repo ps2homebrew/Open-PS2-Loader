@@ -5,10 +5,11 @@
 
 #include "cd_igr_rpc.h"
 
-int oplIGRShutdown(void)
+int oplIGRShutdown(int poff)
 {
     SifRpcClientData_t _igr_cd;
     int r;
+    s32 poffData;
 
     _igr_cd.server = NULL;
     while ((r = SifBindRpc(&_igr_cd, 0x80000598, 0)) >= 0 && (!_igr_cd.server))
@@ -17,7 +18,8 @@ int oplIGRShutdown(void)
     if (r < 0)
         return -E_SIF_RPC_BIND;
 
-    if (SifCallRpc(&_igr_cd, 1, 0, NULL, 0, NULL, 0, NULL, NULL) < 0)
+    *(s32*)UNCACHED_SEG(&poffData) = poff;
+    if (SifCallRpc(&_igr_cd, 1, SIF_RPC_M_NOWBDC, &poffData, sizeof(poffData), NULL, 0, NULL, NULL) < 0)
         return -E_SIF_RPC_CALL;
 
     return 0;

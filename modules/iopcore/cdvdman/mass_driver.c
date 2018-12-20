@@ -494,7 +494,7 @@ static int cbw_scsi_request_sense(mass_dev *dev, void *buffer, int size)
     return -EIO;
 }
 
-static int cbw_scsi_start_stop_unit(mass_dev *dev)
+static int cbw_scsi_start_stop_unit(mass_dev *dev, u8 param)
 {
     int result, retries;
     static cbw_packet cbw = {
@@ -522,6 +522,8 @@ static int cbw_scsi_start_stop_unit(mass_dev *dev)
         }};
 
     XPRINTF("USBHDFSD: cbw_scsi_start_stop_unit\n");
+
+    cbw.comData[4] = param;
 
     for (result = -EIO, retries = USB_XFER_MAX_RETRIES; retries > 0; retries--) {
         if (usb_bulk_command(dev, &cbw) == USB_RC_OK) {
@@ -885,7 +887,7 @@ static int mass_stor_warmup(mass_dev *dev)
 
             if ((sd.sense_key == 0x02) && (sd.add_sense_code == 0x04) && (sd.add_sense_qual == 0x02)) {
                 XPRINTF("USBHDFSD: Error - Additional initalization is required for this device!\n");
-                if ((stat = cbw_scsi_start_stop_unit(dev)) != 0) {
+                if ((stat = cbw_scsi_start_stop_unit(dev, 1)) != 0) {
                     XPRINTF("USBHDFSD: Error - cbw_scsi_start_stop_unit %d\n", stat);
                     return -1;
                 }
@@ -952,6 +954,21 @@ int mass_stor_configureDevice(void)
     }
 
     return 0;
+}
+
+int mass_stor_stop_unit(void)
+{
+    int stat;
+
+    if (g_mass_device.devId != -1)
+    {
+        if ((stat = cbw_scsi_start_stop_unit(&g_mass_device, 0)) != 0) {
+            XPRINTF("USBHDFSD: Error - cbw_scsi_start_stop_unit %d\n", stat);
+        }
+    } else
+        stat = -ENODEV;
+
+    return stat;
 }
 
 int mass_stor_init(void)

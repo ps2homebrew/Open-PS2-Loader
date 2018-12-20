@@ -117,6 +117,11 @@ void DeviceUnmount(void)
     ata_device_flush_cache(0);
 }
 
+void DeviceStop(void)
+{
+    //This will be handled by ATAD.
+}
+
 int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 offset = 0;

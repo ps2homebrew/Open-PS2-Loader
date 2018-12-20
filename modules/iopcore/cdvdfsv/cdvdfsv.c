@@ -598,7 +598,7 @@ static void *cbrpc_shutdown(int fno, void *buf, int size)
     if (fno == 1) {
         //Terminate operations.
         //Shutdown OPL
-        value = 0;
+        value = *(int*)buf;
         sceCdSC(CDSC_OPL_SHUTDOWN, &value);
     }
 

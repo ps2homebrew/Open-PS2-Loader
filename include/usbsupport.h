@@ -17,7 +17,7 @@ typedef struct
 
 void usbInit();
 item_list_t *usbGetObject(int initOnly);
-int usbFindPartition(char *target, char *name);
+int usbFindPartition(char *target, const char *name, int write);
 void usbLoadModules(void);
 
 #endif

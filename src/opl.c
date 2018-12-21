@@ -518,7 +518,7 @@ static int checkLoadConfigUSB(int types)
     int value;
 
     // check USB
-    if (usbFindPartition(path, "conf_opl.cfg")) {
+    if (usbFindPartition(path, "conf_opl.cfg", 0)) {
         configEnd();
         configInit(path);
         value = configReadMulti(types);
@@ -709,7 +709,7 @@ static int trySaveConfigUSB(int types)
     char path[64];
 
     // check USB
-    if (usbFindPartition(path, "conf_opl.cfg")) {
+    if (usbFindPartition(path, "conf_opl.cfg", 1)) {
         configSetMove(path);
         return configWriteMulti(types);
     }
@@ -719,13 +719,9 @@ static int trySaveConfigUSB(int types)
 
 static int trySaveConfigHDD(int types)
 {
-    int value;
-
     hddLoadModules();
-    value = fileXioOpen("pfs0:conf_opl.cfg", O_RDONLY);
-    if (value >= 0) {
-        fileXioClose(value);
-
+    //Check that the formatted & usable HDD is connected.
+    if (hddCheck() == 0) {
         configSetMove("pfs0:");
         return configWriteMulti(types);
     }

@@ -40,7 +40,7 @@ char* usbGetBase(void){
 //END of OPL_DB tweaks
 
 //Identifies the partition that the specified file is stored on and generates a full path to it.
-int usbFindPartition(char *target, char *name)
+int usbFindPartition(char *target, const char *name, int write)
 {
     int i, fd;
     char path[256];
@@ -50,7 +50,10 @@ int usbFindPartition(char *target, char *name)
             sprintf(path, "mass%d:%s/%s", i, gUSBPrefix, name);
         else
             sprintf(path, "mass%d:%s", i, name);
-        fd = fileXioOpen(path, O_RDONLY, 0666);
+        if (write)
+            fd = fileXioOpen(path, O_WRONLY|O_TRUNC|O_CREAT, 0666);
+        else
+            fd = fileXioOpen(path, O_RDONLY);
 
         if (fd >= 0) {
             if (gUSBPrefix[0] != '\0')
@@ -140,7 +143,7 @@ static int usbNeedsUpdate(void)
         return 0;
     OldGeneration = UsbGeneration;
 
-    usbFindPartition(usbPrefix, "ul.cfg");
+    usbFindPartition(usbPrefix, "ul.cfg", 0);
 
     sprintf(path, "%sCD", usbPrefix);
     if (fileXioGetStat(path, &stat) != 0)

@@ -1369,7 +1369,6 @@ static void setDefaults(void)
     KeyPressedOnce = 0;
     DisableCron = 1; //Auto Start Last Played counter disabled by default
     CronStart = 0;
-    CronCurrent = 0;
     RemainSecs = 0;
 }
 

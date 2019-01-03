@@ -15,6 +15,8 @@ typedef struct
     vmc_spec_t specs; /* Card specifications */
 } usb_vmc_infos_t;
 
+#define MAX_USB_DEVICES 5
+
 void usbInit();
 item_list_t *usbGetObject(int initOnly);
 int usbFindPartition(char *target, const char *name, int write);

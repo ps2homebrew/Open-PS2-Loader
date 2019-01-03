@@ -33,7 +33,7 @@ struct sfxEffect {
     int size;
 };
 
-static struct sfxEffect sfx_files[NUM_SFX_FILES] = {
+static struct sfxEffect sfx_files[SFX_COUNT] = {
     {"boot.adp"},
     {"cancel.adp"},
     {"confirm.adp"},
@@ -42,7 +42,7 @@ static struct sfxEffect sfx_files[NUM_SFX_FILES] = {
     {"transition.adp"},
 };
 
-struct audsrv_adpcm_t sfx[NUM_SFX_FILES];
+static struct audsrv_adpcm_t sfx[SFX_COUNT];
 
 //Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
 static int sfxRead(const char *full_path, struct sfxEffect *sfx)
@@ -88,18 +88,18 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 
 static void sfxInitDefaults(void)
 {
-    sfx_files[0].buffer = boot_adp;
-    sfx_files[0].size = size_boot_adp;
-    sfx_files[1].buffer = cancel_adp;
-    sfx_files[1].size = size_cancel_adp;
-    sfx_files[2].buffer = confirm_adp;
-    sfx_files[2].size = size_confirm_adp;
-    sfx_files[3].buffer = cursor_adp;
-    sfx_files[3].size = size_cursor_adp;
-    sfx_files[4].buffer = message_adp;
-    sfx_files[4].size = size_message_adp;
-    sfx_files[5].buffer = transition_adp;
-    sfx_files[5].size = size_transition_adp;
+    sfx_files[SFX_BOOT].buffer = boot_adp;
+    sfx_files[SFX_BOOT].size = size_boot_adp;
+    sfx_files[SFX_CANCEL].buffer = cancel_adp;
+    sfx_files[SFX_CANCEL].size = size_cancel_adp;
+    sfx_files[SFX_CONFIRM].buffer = confirm_adp;
+    sfx_files[SFX_CONFIRM].size = size_confirm_adp;
+    sfx_files[SFX_CURSOR].buffer = cursor_adp;
+    sfx_files[SFX_CURSOR].size = size_cursor_adp;
+    sfx_files[SFX_MESSAGE].buffer = message_adp;
+    sfx_files[SFX_MESSAGE].size = size_message_adp;
+    sfx_files[SFX_TRANSITION].buffer = transition_adp;
+    sfx_files[SFX_TRANSITION].size = size_transition_adp;
 }
 
 //Returns 0 (AUDSRV_ERR_NOERROR) if the sound was loaded successfully.
@@ -122,7 +122,7 @@ static int getFadeDelay(void)
     int logoFadeTime = 1400; //fade time from sound call to fade to main in milliseconds
     int byteRate = 176400 / 1000; //sample rate * channels * bits per sample /8 (/1000 to get in milliseconds)
 
-    sprintf(boot_path, "%s/%s", sound_path, sfx_files[0].name);
+    sprintf(boot_path, "%s/%s", sound_path, sfx_files[SFX_BOOT].name);
     bootSnd = fopen(boot_path, "rb");
     if (bootSnd == NULL)
     {
@@ -145,7 +145,7 @@ void sfxVolume(void)
 {
     int i;
 
-    for (i = 1; i < NUM_SFX_FILES; i++)
+    for (i = 1; i < SFX_COUNT; i++)
     {
         audsrv_adpcm_set_volume(i, gSFXVolume);
     }
@@ -176,7 +176,7 @@ int sfxInit(int bootSnd)
     }
 
     loaded = 0;
-    for (; i < NUM_SFX_FILES; i++)
+    for (; i < SFX_COUNT; i++)
     {
         if (thmSfxEnabled < 0)
         {
@@ -201,3 +201,11 @@ int sfxInit(int bootSnd)
 
     return loaded;
 }
+
+void sfxPlay(int id)
+{
+    if (gEnableSFX) {
+        audsrv_ch_play_adpcm(id, &sfx[id]);
+    }
+}
+

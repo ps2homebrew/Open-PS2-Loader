@@ -1,12 +1,20 @@
 #ifndef __SOUND_H
 #define __SOUND_H
 
-#define NUM_SFX_FILES 6
+enum SFX {
+    SFX_BOOT,
+    SFX_CANCEL,
+    SFX_CONFIRM,
+    SFX_CURSOR,
+    SFX_MESSAGE,
+    SFX_TRANSITION,
 
-extern struct audsrv_adpcm_t sfx[NUM_SFX_FILES];
+    SFX_COUNT
+};
 
 int sfxInit(int bootSnd);
 void sfxVolume(void);
+void sfxPlay(int id);
 
 int thmSfxEnabled;
 

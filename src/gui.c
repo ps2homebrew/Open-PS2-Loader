@@ -2154,9 +2154,7 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target, int transition)
 {
-    if (gEnableSFX) {
-        audsrv_ch_play_adpcm(5, &sfx[5]);
-    }
+    sfxPlay(SFX_TRANSITION);
     if (transition == TRANSITION_LEFT) {
         transitionX = 1;
         transMax = screenWidth;
@@ -2207,9 +2205,7 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
 {
     int terminate = 0;
 
-    if (gEnableSFX) {
-        audsrv_ch_play_adpcm(4, &sfx[4]);
-    }
+    sfxPlay(SFX_MESSAGE);
 
     while (!terminate) {
         guiStartFrame();
@@ -2239,11 +2235,11 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
         guiEndFrame();
     }
 
-    if (gEnableSFX && terminate == 1) {
-        audsrv_ch_play_adpcm(1, &sfx[1]);
+    if (terminate == 1) {
+        sfxPlay(SFX_CANCEL);
     }
-    if (gEnableSFX && terminate == 2) {
-        audsrv_ch_play_adpcm(2, &sfx[2]);
+    if (terminate == 2) {
+        sfxPlay(SFX_CONFIRM);
     }
 
     return terminate - 1;
@@ -2289,3 +2285,4 @@ void guiWarning(const char *text, int count)
 
     delay(count);
 }
+

@@ -32,7 +32,7 @@ int usbFindPartition(char *target, const char *name, int write)
     int i, fd;
     char path[256];
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < MAX_USB_DEVICES; i++) {
         if (gUSBPrefix[0] != '\0')
             sprintf(path, "mass%d:%s/%s", i, gUSBPrefix, name);
         else

@@ -123,12 +123,15 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
 #define OPL_SIF_CMD_BUFF_SIZE 1
 static SifCmdHandlerData_t OplSifCmdbuffer[OPL_SIF_CMD_BUFF_SIZE];
-static unsigned char dev9Initialized = 0;
+static unsigned char dev9Initialized = 0, dev9Loaded = 0;
 
 void sysInitDev9(void)
 {
+    int ret;
+
     if (!dev9Initialized) {
-        sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+        ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
+        dev9Loaded = (ret == 0);  //DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
     }
 }
@@ -232,8 +235,25 @@ void sysReset(int modload_mask)
 
 void sysPowerOff(void)
 {
+    int i;
+
     deinit(NO_EXCEPTION);
-    fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0);
+    if (dev9Loaded)
+    {
+        /* Close all files */
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+        /* Switch off DEV9 */
+        while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
+        };
+    }
+
+    // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
+    for (i = 0; i < MAX_USB_DEVICES; i++) {
+        char device[7];
+        sprintf(device, "mass%d:", i);
+        fileXioDevctl(device, USBMASS_DEVCTL_STOP_UNIT, NULL, 0, NULL, 0);
+    }
+
     poweroffShutdown();
 }
 

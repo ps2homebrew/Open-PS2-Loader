@@ -29,6 +29,7 @@
 #include <libds34usb.h>
 #endif
 
+#include <limits.h>
 #include <stdlib.h>
 #include <libvux.h>
 
@@ -515,7 +516,10 @@ void guiShowUIConfig(void)
         , "HDTV 1280x720p @60Hz 16bit (HIRES)"
         , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
         , NULL};
+    int previousVMode;
 
+reselect_video_mode:
+    previousVMode = gVMode;
     diaSetEnum(diaUIConfig, UICFG_SCROLL, scrollSpeeds);
     diaSetEnum(diaUIConfig, UICFG_THEME, (const char **)thmGetGuiList());
     diaSetEnum(diaUIConfig, UICFG_LANG, (const char **)lngGetGuiList());
@@ -560,6 +564,13 @@ void guiShowUIConfig(void)
         //wait 70ms for confirm sound to finish playing before clearing buffer
         guiDelay(0070);
         sfxInit(0);
+    }
+
+    if (guiConfirmVideoMode() == 0) {
+        //Restore previous video mode, without changing the theme & language settings.
+        gVMode = previousVMode;
+        applyConfig(-1, -1);
+        goto reselect_video_mode;
     }
 }
 
@@ -2018,6 +2029,9 @@ static void guiDrawOverlays()
         if (CronStart == 0) {
             CronStart = clock() / CLOCKS_PER_SEC;
         } else {
+            char strAutoStartInNSecs[21];
+            double CronCurrent;
+
             CronCurrent = clock() / CLOCKS_PER_SEC;
             RemainSecs = gAutoStartLastPlayed - (CronCurrent - CronStart);
             snprintf(strAutoStartInNSecs, sizeof(strAutoStartInNSecs), _l(_STR_AUTO_START_IN_N_SECS), RemainSecs);
@@ -2151,9 +2165,7 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target, int transition)
 {
-    if (gEnableSFX) {
-        audsrv_ch_play_adpcm(5, &sfx[5]);
-    }
+    sfxPlay(SFX_TRANSITION);
     if (transition == TRANSITION_LEFT) {
         transitionX = 1;
         transMax = screenWidth;
@@ -2204,9 +2216,7 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
 {
     int terminate = 0;
 
-    if (gEnableSFX) {
-        audsrv_ch_play_adpcm(4, &sfx[4]);
-    }
+    sfxPlay(SFX_MESSAGE);
 
     while (!terminate) {
         guiStartFrame();
@@ -2236,11 +2246,11 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
         guiEndFrame();
     }
 
-    if (gEnableSFX && terminate == 1) {
-        audsrv_ch_play_adpcm(1, &sfx[1]);
+    if (terminate == 1) {
+        sfxPlay(SFX_CANCEL);
     }
-    if (gEnableSFX && terminate == 2) {
-        audsrv_ch_play_adpcm(2, &sfx[2]);
+    if (terminate == 2) {
+        sfxPlay(SFX_CONFIRM);
     }
 
     return terminate - 1;
@@ -2286,3 +2296,52 @@ void guiWarning(const char *text, int count)
 
     delay(count);
 }
+
+int guiConfirmVideoMode(void)
+{
+    clock_t timeStart, timeNow, timeElasped;
+    int terminate = 0;
+
+    sfxPlay(SFX_MESSAGE);
+
+    timeStart = clock() / (CLOCKS_PER_SEC / 1000);
+    while (!terminate) {
+        guiStartFrame();
+
+        readPads();
+
+        if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE))
+            terminate = 1;
+        else if (getKeyOn(gSelectButton))
+            terminate = 2;
+
+        //If the user fails to respond within the timeout period, deem it as a cancel operation.
+        timeNow = clock() / (CLOCKS_PER_SEC / 1000);
+        timeElasped = (timeNow < timeStart) ? UINT_MAX - timeStart + timeNow + 1 : timeNow - timeStart;
+        if (timeElasped >= OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS)
+            terminate = 1;
+
+        guiShow();
+
+        rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+
+        rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
+        rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
+
+        fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, _l(_STR_CFM_VMODE_CHG), gTheme->textColor);
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_ACCEPT, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
+
+        guiEndFrame();
+    }
+
+    if (terminate == 1) {
+        sfxPlay(SFX_CANCEL);
+    }
+    if (terminate == 2) {
+        sfxPlay(SFX_CONFIRM);
+    }
+
+    return terminate - 1;
+}
+

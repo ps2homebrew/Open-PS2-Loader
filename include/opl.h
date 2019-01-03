@@ -55,6 +55,8 @@
 #define OPL_COMPAT_UPDATE_STAT_CONN_ERROR -2
 #define OPL_COMPAT_UPDATE_STAT_ABORTED -3
 
+#define OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS 5000
+
 void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
 int loadConfig(int types);
@@ -160,8 +162,7 @@ int gRememberLastPlayed;
 int KeyPressedOnce;
 int gAutoStartLastPlayed;
 int RemainSecs, DisableCron;
-double CronStart, CronCurrent;
-char strAutoStartInNSecs[21];
+double CronStart;
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

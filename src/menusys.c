@@ -435,9 +435,7 @@ static void menuNextH()
     if (selected_item->next != NULL) {
         selected_item = selected_item->next;
         itemConfigId = -1;
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
     }
 }
 
@@ -446,9 +444,7 @@ static void menuPrevH()
     if (selected_item->prev != NULL) {
         selected_item = selected_item->prev;
         itemConfigId = -1;
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
     }
 }
 
@@ -456,8 +452,8 @@ static void menuFirstPage()
 {
     submenu_list_t *cur = selected_item->item->current;
     if (cur) {
-        if (gEnableSFX && cur->prev) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
+        if (cur->prev) {
+            sfxPlay(SFX_CURSOR);
         }
 
         selected_item->item->current = selected_item->item->submenu;
@@ -469,8 +465,8 @@ static void menuLastPage()
 {
     submenu_list_t *cur = selected_item->item->current;
     if (cur) {
-        if (gEnableSFX && cur->next) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
+        if (cur->next) {
+            sfxPlay(SFX_CURSOR);
         }
         while (cur->next)
             cur = cur->next; // go to end
@@ -491,9 +487,7 @@ static void menuNextV()
 
     if (cur && cur->next) {
         selected_item->item->current = cur->next;
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
 
         // if the current item is beyond the page start, move the page start one page down
         cur = selected_item->item->pagestart;
@@ -517,9 +511,7 @@ static void menuPrevV()
 
     if (cur && cur->prev) {
         selected_item->item->current = cur->prev;
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
 
         // if the current item is on the page start, move the page start one page up
         if (selected_item->item->pagestart == cur) {
@@ -539,9 +531,7 @@ static void menuNextPage()
 
     if (cur && cur->next) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
 
         while (--itms && cur->next)
             cur = cur->next;
@@ -560,9 +550,7 @@ static void menuPrevPage()
 
     if (cur && cur->prev) {
         int itms = ((items_list_t *)gTheme->itemsList->extended)->displayedItems + 1;
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
 
         while (--itms && cur->prev)
             cur = cur->prev;
@@ -681,9 +669,7 @@ void menuHandleInputMenu()
         mainMenuCurrent = mainMenu;
 
     if (getKey(KEY_UP)) {
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
         if (mainMenuCurrent->prev)
             mainMenuCurrent = mainMenuCurrent->prev;
         else // rewind to the last item
@@ -692,9 +678,7 @@ void menuHandleInputMenu()
     }
 
     if (getKey(KEY_DOWN)) {
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(3, &sfx[3]);
-        }
+        sfxPlay(SFX_CURSOR);
         if (mainMenuCurrent->next)
             mainMenuCurrent = mainMenuCurrent->next;
         else
@@ -705,9 +689,7 @@ void menuHandleInputMenu()
         // execute the item via looking at the id of it
         int id = mainMenuCurrent->item.id;
 
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(2, &sfx[2]);
-        }
+        sfxPlay(SFX_CURSOR);
 
         if (id == MENU_SETTINGS) {
             if (menuCheckParentalLock() == 0)

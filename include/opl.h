@@ -160,8 +160,7 @@ int gRememberLastPlayed;
 int KeyPressedOnce;
 int gAutoStartLastPlayed;
 int RemainSecs, DisableCron;
-double CronStart, CronCurrent;
-char strAutoStartInNSecs[21];
+double CronStart;
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

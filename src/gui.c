@@ -2018,6 +2018,9 @@ static void guiDrawOverlays()
         if (CronStart == 0) {
             CronStart = clock() / CLOCKS_PER_SEC;
         } else {
+            char strAutoStartInNSecs[21];
+            double CronCurrent;
+
             CronCurrent = clock() / CLOCKS_PER_SEC;
             RemainSecs = gAutoStartLastPlayed - (CronCurrent - CronStart);
             snprintf(strAutoStartInNSecs, sizeof(strAutoStartInNSecs), _l(_STR_AUTO_START_IN_N_SECS), RemainSecs);

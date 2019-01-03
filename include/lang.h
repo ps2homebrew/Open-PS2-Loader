@@ -265,6 +265,7 @@ enum _STR_IDS {
     _STR_BOOT_SND,
     _STR_SFX_VOLUME,
     _STR_BOOT_SND_VOLUME,
+    _STR_CFM_VMODE_CHG,
 
     LANG_STR_COUNT
 };

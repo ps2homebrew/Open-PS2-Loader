@@ -273,6 +273,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Enable Boot Sound",
     "Sound Effects Volume",
     "Boot Sound Volume",
+    "Confirm video mode change?",
 };
 
 static int guiLangID = 0;

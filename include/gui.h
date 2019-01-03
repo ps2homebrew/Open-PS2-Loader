@@ -152,4 +152,6 @@ int guiVmcNameHandler(char *text, int maxLen);
 
 void guiWarning(const char *text, int count);
 
+int guiConfirmVideoMode(void);
+
 #endif

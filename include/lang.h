@@ -265,6 +265,7 @@ enum _STR_IDS {
     _STR_BOOT_SND,
     _STR_SFX_VOLUME,
     _STR_BOOT_SND_VOLUME,
+    _STR_CFM_VMODE_CHG,
 //START of OPL_DB tweaks
     _STR_ELM,
     _STR_ELMMODE,
@@ -276,6 +277,7 @@ enum _STR_IDS {
 	_STR_OPL_IFCARO,
 	_STR_OPL_DB,
 //END of OPL_DB tweaks
+
     LANG_STR_COUNT
 };
 

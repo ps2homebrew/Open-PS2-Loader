@@ -19,6 +19,9 @@ typedef struct
 char* usbGetPrefix(void);
 char* usbGetBase(void);
 //END of OPL_DB tweaks
+
+#define MAX_USB_DEVICES 5
+
 void usbInit();
 item_list_t *usbGetObject(int initOnly);
 int usbFindPartition(char *target, const char *name, int write);

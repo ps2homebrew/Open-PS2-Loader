@@ -136,9 +136,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
         rmEndFrame();
 
         if (getKey(KEY_LEFT)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
             if (selchar > -1) {
                 if (selchar % KEYB_WIDTH)
                     selchar--;
@@ -151,9 +149,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 selcommand = -1;
             }
         } else if (getKey(KEY_RIGHT)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
             if (selchar > -1) {
                 if ((selchar + 1) % KEYB_WIDTH)
                     selchar++;
@@ -166,26 +162,20 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 selcommand = -1;
             }
         } else if (getKey(KEY_UP)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
             if (selchar > -1)
                 selchar = (selchar + KEYB_ITEMS - KEYB_WIDTH) % KEYB_ITEMS;
             else
                 selcommand = (selcommand + KEYB_HEIGHT - 1) % KEYB_HEIGHT;
         } else if (getKey(KEY_DOWN)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
             if (selchar > -1)
                 selchar = (selchar + KEYB_WIDTH) % KEYB_ITEMS;
             else
                 selcommand = (selcommand + 1) % KEYB_HEIGHT;
         } else if (getKeyOn(gSelectButton)) {
             if (len < (maxLen - 1) && selchar > -1) {
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(2, &sfx[2]);
-                }
+                sfxPlay(SFX_CONFIRM);
                 if (mask_buffer != NULL) {
                     mask_buffer[len] = '*';
                     mask_buffer[len + 1] = '\0';
@@ -195,9 +185,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 c[0] = keyb[selchar];
                 strcat(text, c);
             } else if (selcommand == 0) {
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(1, &sfx[1]);
-                }
+                sfxPlay(SFX_CANCEL);
                 if (len > 0) { // BACKSPACE
                     len--;
                     text[len] = 0;
@@ -205,9 +193,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                         mask_buffer[len] = '\0';
                 }
             } else if (selcommand == 1) {
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(2, &sfx[2]);
-                }
+                sfxPlay(SFX_CONFIRM);
                 if (len < (maxLen - 1)) { // SPACE
                     if (mask_buffer != NULL) {
                         mask_buffer[len] = '*';
@@ -219,16 +205,12 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                     strcat(text, c);
                 }
             } else if (selcommand == 2) {
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(2, &sfx[2]);
-                }
+                sfxPlay(SFX_CONFIRM);
                 if (mask_buffer != NULL)
                     free(mask_buffer);
                 return 1; //ENTER
             } else if (selcommand == 3) {
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(2, &sfx[2]);
-                }
+                sfxPlay(SFX_CONFIRM);
                 selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
                 if (selkeyb == 0)
                     keyb = keyb0;
@@ -237,9 +219,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
             }
         } else if (getKey(KEY_SQUARE)) {
             if (len > 0) { // BACKSPACE
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(1, &sfx[1]);
-                }
+                sfxPlay(SFX_CANCEL);
                 len--;
                 text[len] = 0;
                 if (mask_buffer != NULL)
@@ -247,9 +227,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
             }
         } else if (getKey(KEY_TRIANGLE)) {
             if (len < (maxLen - 1) && selchar > -1) { // SPACE
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(2, &sfx[2]);
-                }
+                sfxPlay(SFX_CONFIRM);
                 if (mask_buffer != NULL) {
                     mask_buffer[len] = '*';
                     mask_buffer[len + 1] = '\0';
@@ -260,17 +238,13 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 strcat(text, c);
             }
         } else if (getKeyOn(KEY_START)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(2, &sfx[2]);
-            }
+            sfxPlay(SFX_CONFIRM);
             if (mask_buffer != NULL)
                 free(mask_buffer);
             return 1; //ENTER
         } else if (getKeyOn(KEY_SELECT)) {
             selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(2, &sfx[2]);
-            }
+            sfxPlay(SFX_CONFIRM);
             if (selkeyb == 0)
                 keyb = keyb0;
             if (selkeyb == 1)
@@ -278,9 +252,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
         }
 
         if (getKey(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(1, &sfx[1]);
-            }
+            sfxPlay(SFX_CANCEL);
             break;
         }
     }
@@ -356,44 +328,32 @@ static int diaShowColSel(unsigned char *r, unsigned char *g, unsigned char *b)
         if (getKey(KEY_LEFT)) {
             if (col[selc] > 0) {
                 col[selc]--;
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
-                }
+                sfxPlay(SFX_CURSOR);
             }
         } else if (getKey(KEY_RIGHT)) {
             if (col[selc] < 255) {
                 col[selc]++;
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
-                }
+                sfxPlay(SFX_CURSOR);
             }
         } else if (getKey(KEY_UP)) {
             if (selc > 0) {
                 selc--;
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
-                }
+                sfxPlay(SFX_CURSOR);
             }
         } else if (getKey(KEY_DOWN)) {
             if (selc < 2) {
                 selc++;
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
-                }
+                sfxPlay(SFX_CURSOR);
             }
         } else if (getKeyOn(gSelectButton)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(2, &sfx[2]);
-            }
+            sfxPlay(SFX_CONFIRM);
             *r = col[0];
             *g = col[1];
             *b = col[2];
             ret = 1;
             break;
         } else if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(1, &sfx[1]);
-            }
+            sfxPlay(SFX_CANCEL);
             ret = 0;
             break;
         }
@@ -679,17 +639,13 @@ static int diaHandleInput(struct UIItem *item, int *modified)
     // circle loses focus, sets old values first
     if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
         diaResetValue(item);
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(2, &sfx[2]);
-        }
+        sfxPlay(SFX_CONFIRM);
         return 0;
     }
 
     // cross loses focus without setting default
     if (getKeyOn(gSelectButton)) {
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(2, &sfx[2]);
-        }
+        sfxPlay(SFX_CONFIRM);
         *modified = 0;
         return 0;
     }
@@ -707,9 +663,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
 
         // up and down
         if (getKey(KEY_UP)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
             if (item->intvalue.current < item->intvalue.max) {
                 item->intvalue.current++;
             }
@@ -717,9 +671,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
                 item->intvalue.current = item->intvalue.min; //was "= 0;"
             }
         } else if (getKey(KEY_DOWN)) {
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
             if (item->intvalue.current > item->intvalue.min) {
                 item->intvalue.current--;
             }
@@ -753,15 +705,11 @@ static int diaHandleInput(struct UIItem *item, int *modified)
 
         if (getKey(KEY_UP) && (item->intvalue.current > 0)) {
             item->intvalue.current--;
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
         }
         else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL)) {
             item->intvalue.current++;
-            if (gEnableSFX) {
-                audsrv_ch_play_adpcm(3, &sfx[3]);
-            }
+            sfxPlay(SFX_CURSOR);
         }
 
         else {
@@ -951,8 +899,8 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
             if (getKey(KEY_LEFT)) {
                 struct UIItem *newf = diaGetPrevControl(cur, ui);
 
-                if (gEnableSFX && !toggleSfx) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
+                if (!toggleSfx) {
+                    sfxPlay(SFX_CURSOR);
                 }
 
                 if (newf == cur) {
@@ -966,8 +914,8 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
             if (getKey(KEY_RIGHT)) {
                 struct UIItem *newf = diaGetNextControl(cur, cur);
 
-                if (gEnableSFX && !toggleSfx) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
+                if (!toggleSfx) {
+                    sfxPlay(SFX_CURSOR);
                 }
 
                 if (newf == cur) {
@@ -982,8 +930,8 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
                 // find
                 struct UIItem *newf = diaGetPrevLine(cur, ui);
 
-                if (gEnableSFX && !toggleSfx) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
+                if (!toggleSfx) {
+                    sfxPlay(SFX_CURSOR);
                 }
 
                 if (newf == cur) {
@@ -998,8 +946,8 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
                 // find
                 struct UIItem *newf = diaGetNextLine(cur, ui);
 
-                if (gEnableSFX && !toggleSfx) {
-                    audsrv_ch_play_adpcm(3, &sfx[3]);
+                if (!toggleSfx) {
+                    sfxPlay(SFX_CURSOR);
                 }
 
                 if (newf == cur) {
@@ -1013,18 +961,14 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
             // Cancel button breaks focus or exits with false result
             if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
                 diaRestoreScrollSpeed();
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(1, &sfx[1]);
-                }
+                sfxPlay(SFX_CANCEL);
                 return UIID_BTN_CANCEL;
             }
 
             // see what key events we have
             if (getKeyOn(gSelectButton)) {
                 haveFocus = 1;
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(2, &sfx[2]);
-                }
+                sfxPlay(SFX_CONFIRM);
 
                 if (cur->type == UI_BUTTON) {
                     diaRestoreScrollSpeed();

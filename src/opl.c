@@ -157,9 +157,7 @@ void moduleUpdateMenu(int mode, int themeChanged)
 static void itemExecSelect(struct menu_item *curMenu)
 {
     item_list_t *support = curMenu->userdata;
-    if (gEnableSFX) {
-        audsrv_ch_play_adpcm(2, &sfx[2]);
-    }
+    sfxPlay(SFX_CONFIRM);
 
     if (support) {
         if (support->enabled) {
@@ -191,9 +189,7 @@ static void itemExecCancel(struct menu_item *curMenu)
     if (support) {
         if (support->itemRename) {
             if (menuCheckParentalLock() == 0) {
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(4, &sfx[4]);
-                }
+                sfxPlay(SFX_MESSAGE);
                 int nameLength = support->itemGetNameLength(curMenu->current->item.id);
                 char newName[nameLength];
                 strncpy(newName, curMenu->current->item.text, nameLength);
@@ -229,9 +225,7 @@ static void itemExecTriangle(struct menu_item *curMenu)
         if (!(support->flags & MODE_FLAG_NO_COMPAT)) {
             if (menuCheckParentalLock() == 0) {
                 config_set_t *configSet = menuLoadConfig();
-                if (gEnableSFX) {
-                    audsrv_ch_play_adpcm(5, &sfx[5]);
-                }
+                sfxPlay(SFX_TRANSITION);
                 if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
                     support->itemLaunch(curMenu->current->item.id, configSet);
             }
@@ -280,9 +274,7 @@ static void itemExecRefresh(struct menu_item *curMenu)
 
     if (support && support->enabled)
         ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-        if (gEnableSFX) {
-            audsrv_ch_play_adpcm(2, &sfx[2]);
-        }
+    sfxPlay(SFX_CONFIRM);
 }
 
 static void initMenuForListSupport(int mode)
@@ -1396,7 +1388,6 @@ static void setDefaults(void)
     KeyPressedOnce = 0;
     DisableCron = 1; //Auto Start Last Played counter disabled by default
     CronStart = 0;
-    CronCurrent = 0;
     RemainSecs = 0;
 }
 
@@ -1463,8 +1454,8 @@ static void deferredAudioInit(void)
         LOG("sfxInit: failed to initialize - %d.\n", ret);
 
     //boot sound
-    if (gEnableSFX && gEnableBootSND) {
-        audsrv_ch_play_adpcm(0, &sfx[0]);
+    if (gEnableBootSND) {
+        sfxPlay(SFX_BOOT);
     }
 
     // re-enable sfx if previously disabled (hdl svr)

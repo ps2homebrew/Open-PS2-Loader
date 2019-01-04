@@ -344,6 +344,7 @@ int sceCdStPause(void)
         CpuSuspendIntr(&OldState);
         //Pause.
         SetStm0Callback(NULL);
+        cdvdman_stat.StreamingData.StIsReading = 0;
         CpuResumeIntr(OldState);
 
         sceCdSync(0);

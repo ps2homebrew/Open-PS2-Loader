@@ -282,6 +282,7 @@ Enable Sound Effects
 Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
+Confirm video mode change?
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

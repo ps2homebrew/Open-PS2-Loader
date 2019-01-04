@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: 12/15/2018
-# Updated for OPL_1359_DB-TA_[d0ac8e5]
+# Last update: Jan. 3, 2019
+# Updated for OPL_1386_DB-TA_[d409ba5]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
@@ -264,6 +264,7 @@ Ses Efektleri Olsun
 Açılış Sesi Olsun
 Ses Efektleri Kuvveti
 Açılış Sesi Kuvveti
+Confirm video mode change?
 PS1 Oyunları
 PS1 Oyunları Ekran Modu
 POPSTARTER.ELF '%s' de bulunamadı.

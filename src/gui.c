@@ -566,11 +566,13 @@ reselect_video_mode:
         sfxInit(0);
     }
 
-    if (guiConfirmVideoMode() == 0) {
-        //Restore previous video mode, without changing the theme & language settings.
-        gVMode = previousVMode;
-        applyConfig(-1, -1);
-        goto reselect_video_mode;
+    if (previousVMode != gVMode) {
+        if (guiConfirmVideoMode() == 0) {
+            //Restore previous video mode, without changing the theme & language settings.
+            gVMode = previousVMode;
+            applyConfig(-1, -1);
+            goto reselect_video_mode;
+        }
     }
 }
 

@@ -649,7 +649,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
             sprintf(partname, "%s%s.00", ethPrefix, settings->filename);
             break;
         default: //Raw ISO9660 disc image; one part.
-            sprintf(partname, "%s%s\\%s", ethPrefix, game->media == 0x12 ? "CD" : "DVD", settings->filename);
+            sprintf(partname, "%s%s\\%s", ethPrefix, game->media == SCECdPS2CD ? "CD" : "DVD", settings->filename);
     }
 
     if (gPS2Logo) {

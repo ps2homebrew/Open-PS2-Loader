@@ -19,6 +19,11 @@ struct game_list_t
     struct game_list_t *next;
 };
 
+struct game_cache_list {
+    unsigned int count;
+    base_game_info_t *games;
+};
+
 int sbIsSameSize(const char *prefix, int prevSize)
 {
     int size = -1;
@@ -109,11 +114,192 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
     return result;
 }
 
+static void freeISOGameListCache(struct game_cache_list *cache);
+
+static int loadISOGameListCache(const char *path, struct game_cache_list *cache)
+{
+    char filename[256];
+    FILE *file;
+    base_game_info_t *games;
+    int result, size, count;
+
+    if (!gGameListCache)
+        return 1;
+
+    freeISOGameListCache(cache);
+
+    sprintf(filename, "%s/games.bin", path);
+    file = fopen(filename, "rb");
+    if (file != NULL)
+    {
+        fseek(file, 0, SEEK_END);
+        size = ftell(file);
+        rewind(file);
+
+        count = size / sizeof(base_game_info_t);
+        if (count > 0)
+        {
+            games = memalign(64, count * sizeof(base_game_info_t));
+            if (games != NULL)
+            {
+                if (fread(games, sizeof(base_game_info_t), count, file) == count)
+                {
+                    LOG("loadISOGameListCache: %d games loaded.\n", count);
+                    cache->count = count;
+                    cache->games = games;
+                    result = 0;
+                } else {
+                    LOG("loadISOGameListCache: I/O error.\n");
+                    free(games);
+                    result = EIO;
+                }
+            } else {
+                LOG("loadISOGameListCache: failed to allocate memory.\n");
+                result = ENOMEM;
+            }
+        } else {
+            result = -1; //Empty file (should not happen)
+        }
+
+        fclose(file);
+    } else {
+        result = ENOENT;
+    }
+
+    return result;
+}
+
+static void freeISOGameListCache(struct game_cache_list *cache)
+{
+    if (cache->games != NULL)
+    {
+        free(cache->games);
+        cache->games = NULL;
+        cache->count = 0;
+    }
+}
+
+static int updateISOGameList(const char *path, const struct game_cache_list *cache, const struct game_list_t *head, int count)
+{
+    char filename[256];
+    FILE *file;
+    const struct game_list_t *game;
+    int result, i, j, modified;
+    base_game_info_t *list;
+
+    if (!gGameListCache)
+        return 1;
+
+    modified = 0;
+    if (cache != NULL)
+    {
+        if ((head != NULL) && (count > 0))
+        {
+            game = head;
+
+            for (i = 0; i < count; i++)
+            {
+                for (j = 0; j < cache->count; j++)
+                {
+                    if (strncmp(cache->games[i].name, game->gameinfo.name, ISO_GAME_NAME_MAX+1) == 0
+                       && strncmp(cache->games[i].extension, game->gameinfo.extension, ISO_GAME_EXTENSION_MAX+1) == 0)
+                        break;
+                }
+
+                if (j == cache->count)
+                {
+                    LOG("updateISOGameList: game added.\n");
+                    modified = 1;
+                    break;
+                }
+
+                game = game->next;
+            }
+
+            if ((!modified) && (count != cache->count))
+            {
+                LOG("updateISOGameList: game removed.\n");
+                modified = 1;
+            }
+        } else {
+            modified = 0;
+        }
+    } else {
+        modified = ((head != NULL) && (count > 0)) ? 1 : 0;
+    }
+
+    if (!modified)
+        return 0;
+    LOG("updateISOGameList: caching new game list.\n");
+
+    result = 0;
+    sprintf(filename, "%s/games.bin", path);
+    if ((head != NULL) && (count > 0))
+    {
+        list = (base_game_info_t *)memalign(64, sizeof(base_game_info_t) * count);
+
+        if (list != NULL) {
+            // Convert the linked list into a flat array, for writing performance.
+            game = head;
+            for (i = 0; (i < count) && (game != NULL); i++, game = game->next) {
+                // copy one game, advance
+                memcpy(&list[i], &game->gameinfo, sizeof(base_game_info_t));
+            }
+
+            file = fopen(filename, "wb");
+            if (file != NULL)
+            {
+                result = fwrite(list, sizeof(base_game_info_t), count, file) == count ? 0 : EIO;
+
+                fclose(file);
+
+                if (result != 0)
+                    remove(filename);
+            } else
+                result = EIO;
+
+            free(list);
+        } else
+            result = ENOMEM;
+    } else {
+        //Last game deleted.
+        remove(filename);
+    }
+
+    return result;
+}
+
+//Queries for the game entry, based on filename. Only the new filename format is supported (filename.ext).
+static int queryISOGameListCache(const struct game_cache_list *cache, base_game_info_t *ginfo, const char *filename)
+{
+    char isoname[ISO_GAME_FNAME_MAX+1];
+    int i;
+
+    for (i = 0; i < cache->count; i++)
+    {
+        snprintf(isoname, sizeof(isoname), "%s%s", cache->games[i].name, cache->games[i].extension);
+
+        if (strcmp(filename, isoname) == 0)
+        {
+            memcpy(ginfo, &cache->games[i], sizeof(base_game_info_t));
+            return 0;
+        }
+    }
+
+    return ENOENT;
+}
+
 static int scanForISO(char *path, char type, struct game_list_t **glist)
 {
-    int fd, NameLen, count = 0, format, MountFD;
+    int fd, NameLen, count = 0, format, MountFD, cacheLoaded;
+    struct game_cache_list cache;
+    base_game_info_t cachedGInfo;
     char fullpath[256], startup[GAME_STARTUP_MAX];
     iox_dirent_t record;
+
+    cache.games = NULL;
+    cache.count = 0;
+    cacheLoaded = loadISOGameListCache(path, &cache) == 0;
 
     if ((fd = fileXioDopen(path)) > 0) {
         while (fileXioDread(fd, &record) > 0) {
@@ -143,37 +329,54 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                         break;
                     }
                 } else {
-                    sprintf(fullpath, "%s/%s", path, record.name);
-                    if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
-                        if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {
-                            struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
+                    if(queryISOGameListCache(&cache, &cachedGInfo, record.name) != 0) {
+                        sprintf(fullpath, "%s/%s", path, record.name);
 
-                            if (next != NULL) {
-                                next->next = *glist;
-                                *glist = next;
+                        if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
+                            if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {
+                                struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
 
-                                game = &(*glist)->gameinfo;
+                                if (next != NULL) {
+                                    next->next = *glist;
+                                    *glist = next;
 
-                                strcpy(game->startup, startup);
-                                strncpy(game->name, record.name, NameLen);
-                                game->name[NameLen] = '\0';
-                                strncpy(game->extension, &record.name[NameLen], sizeof(game->extension));
-                                game->extension[sizeof(game->extension) - 1] = '\0';
+                                    game = &(*glist)->gameinfo;
+
+                                    strcpy(game->startup, startup);
+                                    strncpy(game->name, record.name, NameLen);
+                                    game->name[NameLen] = '\0';
+                                    strncpy(game->extension, &record.name[NameLen], sizeof(game->extension));
+                                    game->extension[sizeof(game->extension) - 1] = '\0';
+                                } else {
+                                    //Out of memory.
+                                    fileXioUmount("iso:");
+                                    break;
+                                }
                             } else {
-                                //Out of memory.
+                                //Unable to parse SYSTEM.CNF.
                                 fileXioUmount("iso:");
-                                break;
+                                continue;
                             }
-                        } else {
-                            //Unable to parse SYSTEM.CNF.
+
                             fileXioUmount("iso:");
+                        } else {
+                            //Unable to mount game.
                             continue;
                         }
-
-                        fileXioUmount("iso:");
                     } else {
-                        //Unable to mount game.
-                        continue;
+                        //Entry was found in cache.
+                        struct game_list_t *next = (struct game_list_t *)malloc(sizeof(struct game_list_t));
+
+                        if (next != NULL) {
+                            next->next = *glist;
+                            *glist = next;
+
+                            game = &(*glist)->gameinfo;
+                            memcpy(game, &cachedGInfo, sizeof(base_game_info_t));
+                        } else {
+                            //Out of memory.
+                            break;
+                        }
                     }
                 }
 
@@ -188,6 +391,14 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
         fileXioDclose(fd);
     } else {
         count = fd;
+    }
+
+    if (cacheLoaded)
+    {
+        updateISOGameList(path, &cache, *glist, count);
+        freeISOGameListCache(&cache);
+    } else {
+        updateISOGameList(path, NULL, *glist, count);
     }
 
     return count;

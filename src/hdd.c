@@ -155,7 +155,7 @@ static int hddGetHDLGameInfo(struct GameDataEntry *game, hdl_game_info_t *ginfo)
         ginfo->dma_type = hdl_header->dma_type;
         ginfo->dma_mode = hdl_header->dma_mode;
         ginfo->layer_break = hdl_header->layer1_start;
-        ginfo->disctype = hdl_header->discType;
+        ginfo->disctype = (u8)hdl_header->discType;
         ginfo->start_sector = game->lba;
         ginfo->total_size_in_kb = game->size * 2; //size * 2048 / 1024 = 2x
     } else

@@ -20,8 +20,8 @@ typedef struct
     u8 ops2l_compat_flags;
     u8 dma_type;
     u8 dma_mode;
+    u8 disctype;
     u32 layer_break;
-    int disctype;
     u32 start_sector;
     u32 total_size_in_kb;
 } hdl_game_info_t;

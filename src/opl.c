@@ -701,6 +701,7 @@ static void _loadConfig()
 
             configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
+            configGetInt(configOPL, CONFIG_OPL_GAME_LIST_CACHE, &gGameListCache);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
             configGetInt(configOPL, CONFIG_OPL_AUTO_SORT, &gAutosort);
             configGetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, &gAutoRefresh);
@@ -852,6 +853,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_OVERSCAN, gOverscan);
         configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
         configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
+        configSetInt(configOPL, CONFIG_OPL_GAME_LIST_CACHE, gGameListCache);
         configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
         configSetInt(configOPL, CONFIG_OPL_AUTO_SORT, gAutosort);
         configSetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, gAutoRefresh);
@@ -1417,6 +1419,7 @@ static void setDefaults(void)
     gAutoRefresh = 0;
     gDisableDebug = 1;
     gPS2Logo = 0;
+    gGameListCache = 0;
     gEnableWrite = 0;
     gRememberLastPlayed = 0;
     gAutoStartLastPlayed = 9;

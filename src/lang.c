@@ -274,6 +274,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Sound Effects Volume",
     "Boot Sound Volume",
     "Confirm video mode change?",
+    "Cache Game List",
 };
 
 static int guiLangID = 0;

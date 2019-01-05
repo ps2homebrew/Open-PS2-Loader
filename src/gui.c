@@ -383,6 +383,7 @@ void guiShowConfig()
 
     diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
+    diaSetInt(diaConfig, CFG_GAMELISTCACHE, gGameListCache);
     diaSetString(diaConfig, CFG_EXITTO, gExitPath);
     diaSetInt(diaConfig, CFG_ENWRITEOP, gEnableWrite);
     diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
@@ -405,6 +406,7 @@ void guiShowConfig()
     if (ret) {
         diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
         diaGetInt(diaConfig, CFG_PS2LOGO, &gPS2Logo);
+        diaGetInt(diaConfig, CFG_GAMELISTCACHE, &gGameListCache);
         diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
         diaGetInt(diaConfig, CFG_ENWRITEOP, &gEnableWrite);
         diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);

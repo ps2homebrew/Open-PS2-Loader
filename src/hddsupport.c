@@ -404,7 +404,7 @@ static config_set_t *hddGetConfig(int id)
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     configSetInt(config, CONFIG_ITEM_SIZE, game->total_size_in_kb >> 10);
     configSetStr(config, CONFIG_ITEM_FORMAT, "HDL");
-    configSetStr(config, CONFIG_ITEM_MEDIA, game->disctype == 0x12 ? "CD" : "DVD");
+    configSetStr(config, CONFIG_ITEM_MEDIA, game->disctype == SCECdPS2CD ? "CD" : "DVD");
     configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 
     return config;

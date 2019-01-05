@@ -282,10 +282,10 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     for (i = 0; i < game->parts; i++) {
         switch (game->format) {
             case GAME_FORMAT_ISO:
-                sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
+                sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->name, game->extension);
                 break;
             case GAME_FORMAT_OLD_ISO:
-                sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+                sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->startup, game->name, game->extension);
                 break;
             default: //USBExtreme format.
                 sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, i);
@@ -323,10 +323,10 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     //Initialize layer 1 information.
     switch (game->format) {
         case GAME_FORMAT_ISO:
-            sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->name, game->extension);
+            sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->name, game->extension);
             break;
         case GAME_FORMAT_OLD_ISO:
-            sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == 0x12) ? "CD" : "DVD", game->startup, game->name, game->extension);
+            sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->startup, game->name, game->extension);
             break;
         default: //USBExtreme format.
             sprintf(partname, "%sul.%08X.%s.00", usbPrefix, USBA_crc32(game->name), game->startup);

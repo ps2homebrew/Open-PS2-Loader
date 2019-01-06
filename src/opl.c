@@ -60,8 +60,6 @@
 #endif
 #endif
 
-static void RefreshAllLists(void);
-
 typedef struct
 {
     item_list_t *support;
@@ -163,6 +161,7 @@ static void itemExecSelect(struct menu_item *curMenu)
         } else {
             support->itemInit();
             moduleUpdateMenu(support->mode, 0);
+            // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
             if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
                 ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
         }
@@ -190,10 +189,7 @@ static void itemExecCancel(struct menu_item *curMenu)
                 strncpy(newName, curMenu->current->item.text, nameLength);
                 if (guiShowKeyboard(newName, nameLength)) {
                     support->itemRename(curMenu->current->item.id, newName);
-                     if (gAutoRefresh)
-                        RefreshAllLists();
-                    else
-                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
                 }
             }
         }
@@ -244,10 +240,7 @@ static void itemExecSquare(struct menu_item *curMenu)
             if (menuCheckParentalLock() == 0) {
                 if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
                     support->itemDelete(curMenu->current->item.id);
-                    if (gAutoRefresh)
-                        RefreshAllLists();
-                    else
-                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
                 }
             }
         }
@@ -335,10 +328,7 @@ static void initSupport(item_list_t *itemList, int startMode, int mode, int forc
             mod->support->itemInit();
             moduleUpdateMenu(mode, 0);
 
-            if (gAutoRefresh)
-                RefreshAllLists();
-            else
-                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
+            ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
         }
     }
 }
@@ -418,19 +408,6 @@ void menuDeferredUpdate(void *data)
     if (mod->support->itemNeedsUpdate()) {
         updateMenuFromGameList(mod);
     }
-}
-
-static void RefreshAllLists(void)
-{
-    int i;
-
-    // schedule updates of all the list handlers
-    for (i = 0; i < MODE_COUNT; i++) {
-        if (list_support[i].support && list_support[i].support->enabled)
-            ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
-    }
-
-    frameCounter = 0;
 }
 
 #define MENU_GENERAL_UPDATE_DELAY 60

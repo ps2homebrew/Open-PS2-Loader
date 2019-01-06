@@ -238,12 +238,20 @@ void oplRegisterShutdownCallback(oplShutdownCb_t cb)
 
 static void oplShutdown(int poff)
 {
+    int stat;
+
     DeviceLock();
     if(vmcShutdownCb != NULL)
         vmcShutdownCb();
     DeviceUnmount();
     if (poff)
+    {
         DeviceStop();
+#ifdef __USE_DEV9
+        dev9Shutdown();
+#endif
+        sceCdPowerOff(&stat);
+    }
 }
 
 //--------------------------------------------------------------
@@ -287,13 +295,9 @@ static void fs_init(void)
 #ifdef __USE_DEV9
 static void cdvdman_poff_thread(void *arg)
 {
-    int stat;
-
     SleepThread();
 
     oplShutdown(1);
-    dev9Shutdown();
-    sceCdPowerOff(&stat);
 }
 #endif
 

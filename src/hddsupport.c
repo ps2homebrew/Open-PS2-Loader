@@ -393,11 +393,7 @@ static config_set_t *hddGetConfig(int id)
     char path[256];
     hdl_game_info_t *game = &hddGames.games[id];
 
-#ifdef OPL_IS_DEV_BUILD
-    snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", hddPrefix, game->startup);
-#else
-    snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
-#endif
+    snprintf(path, sizeof(path), "%s"OPL_FOLDER"/%s.cfg", hddPrefix, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file exists or not.
 
@@ -472,7 +468,7 @@ static void hddShutdown(void)
 }
 
 static item_list_t hddGameList = {
-    HDD_MODE, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, "pfs0:/APPS", &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON
 };

@@ -523,11 +523,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
 config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const char *sep)
 {
     char path[256];
-#if OPL_IS_DEV_BUILD
-    snprintf(path, sizeof(path), "%sCFG-DEV%s%s.cfg", prefix, sep, game->startup);
-#else
-    snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
-#endif
+    snprintf(path, sizeof(path), "%s"OPL_FOLDER"%s%s.cfg", prefix, sep, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file could be loaded or not.
 
@@ -543,37 +539,26 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
     return config;
 }
 
-void sbCreateFolders(const char *path, int createDiscImgFolders)
+static void sbCreateFoldersFromList(const char *path, const char **folders)
 {
-    // update Themes
+    int i;
     char fullpath[256];
 
-#if OPL_IS_DEV_BUILD
-    sprintf(fullpath, "%sCFG-DEV", path);
-#else
-    sprintf(fullpath, "%sCFG", path);
-#endif
-    fileXioMkdir(fullpath, 0777);
-
-    sprintf(fullpath, "%sTHM", path);
-    fileXioMkdir(fullpath, 0777);
-
-    sprintf(fullpath, "%sART", path);
-    fileXioMkdir(fullpath, 0777);
-
-    if (createDiscImgFolders) {
-        sprintf(fullpath, "%sCD", path);
-        fileXioMkdir(fullpath, 0777);
-
-        sprintf(fullpath, "%sDVD", path);
+    for (i = 0; folders[i] != NULL; i++) {
+        sprintf(fullpath, "%s%s", path, folders[i]);
         fileXioMkdir(fullpath, 0777);
     }
+}
 
-    sprintf(fullpath, "%sVMC", path);
-    fileXioMkdir(fullpath, 0777);
+void sbCreateFolders(const char *path, int createDiscImgFolders)
+{
+    const char *basicFolders[] = { OPL_FOLDER, "THM", "ART", "VMC", "CHT", "APPS", NULL };
+    const char *discImgFolders[] = { "CD", "DVD", NULL };
 
-    sprintf(fullpath, "%sCHT", path);
-    fileXioMkdir(fullpath, 0777);
+    sbCreateFoldersFromList(path, basicFolders);
+
+    if (createDiscImgFolders)
+        sbCreateFoldersFromList(path, discImgFolders);
 }
 
 int sbLoadCheats(const char *path, const char *file)

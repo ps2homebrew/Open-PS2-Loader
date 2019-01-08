@@ -143,6 +143,7 @@ static int rmOnVSync(void)
         iWakeupThread(guiThreadID);
     }
 
+    ExitHandler();
     return 0;
 }
 

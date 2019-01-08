@@ -349,6 +349,112 @@ static void deinitAllSupport(int exception, int modeSelected)
     moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
 }
 
+char *oplGetModeText(int mode)
+{
+    return(list_support[mode].support->textId == -1 ? list_support[mode].support->text : _l(list_support[mode].support->textId));
+}
+
+//For resolving the mode, given an app's path
+int oplPath2Mode(const char *path)
+{
+    const char *blkdevnameend;
+    int i, blkdevnamelen;
+    item_list_t *listSupport;
+
+    for (i = 0; i < MODE_COUNT; i++)
+    {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->appsPath != NULL))
+        {
+            blkdevnameend = strchr(listSupport->appsPath, ':');
+            if (blkdevnameend != NULL)
+            {
+                blkdevnamelen = (int)(blkdevnameend - listSupport->appsPath) + 1;
+
+                if (strncmp(path, listSupport->appsPath, blkdevnamelen) == 0)
+                    return listSupport->mode;
+            }
+        }
+    }
+
+    return -1;
+}
+
+int oplGetAppImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
+{
+    int i, remaining;
+    char priority;
+    item_list_t *listSupport;
+
+    // We search on ever devices from fatest to slowest (HDD > ETH > USB)
+    for (remaining = MODE_COUNT,priority = 0; remaining > 0 && priority < 4; priority++)
+    {
+        for (i = 0; i < MODE_COUNT; i++)
+        {
+            listSupport = list_support[i].support;
+
+            if (listSupport->appsPriority == priority)
+            {
+                if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
+                    return 0;
+                remaining--;
+            }
+        }
+    }
+
+    return -1;
+}
+
+int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg)
+{
+    iox_dirent_t dirent;
+    int i, fd, count, ret;
+    item_list_t *listSupport;
+    config_set_t *appConfig;
+    char dir[128];
+    char path[128];
+
+    count = 0;
+    for (i = 0; i < MODE_COUNT; i++)
+    {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->appsPath != NULL) && (listSupport->enabled))
+        {
+            if ((fd = fileXioDopen(listSupport->appsPath)) > 0)
+            {
+                while (fileXioDread(fd, &dirent) > 0)
+                {
+                    if (strcmp(dirent.name, ".") == 0 || strcmp(dirent.name, "..") == 0 || (!FIO_S_ISDIR(dirent.stat.mode)))
+                        continue;
+
+                    snprintf(dir, sizeof(dir), "%s/%s", listSupport->appsPath, dirent.name);
+                    snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
+                    appConfig = configAlloc(0, NULL, path);
+                    if (appConfig != NULL)
+                    {
+                        configRead(appConfig);
+
+                        ret = callback(dir, appConfig, arg);
+                        configFree(appConfig);
+
+                        if (ret == 0)
+                            count++;
+                        else if (ret < 0)
+                        {   //Stopped because of unrecoverable error.
+                            break;
+                        }
+                    }
+                }
+
+                fileXioDclose(fd);
+            } else
+                LOG("APPS failed to open dir %s\n", listSupport->appsPath);
+        }
+    }
+
+    return count;
+}
+
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------

@@ -59,13 +59,8 @@ item_list_t *appGetObject(int initOnly)
 }
 
 static int appNeedsUpdate(void)
-{
-    if (appForceUpdate) {
-        appForceUpdate = 0;
-        return 1;
-    }
-
-    return 0;
+{   // Always allow the user & auto refresh to refresh the apps list.
+    return 1;
 }
 
 static int appUpdateItemList(void)

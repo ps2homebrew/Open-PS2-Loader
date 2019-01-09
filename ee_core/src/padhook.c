@@ -52,6 +52,7 @@ static u8 IGR_Stack[IGR_STACK_SIZE] __attribute__((aligned(16)));
 
 /* Extern symbol */
 extern void *_gp;
+extern void *_end;
 
 // Shutdown Dev9 hardware
 static void Shutdown_Dev9()
@@ -114,6 +115,9 @@ static void t_loadElf(void)
     // Load exit ELF
     argv[0] = ExitPath;
     argv[1] = NULL;
+
+    //Wipe everything, even the module storage.
+    WipeUserMemory((void *)&_end, (void *)GetMemorySize());
 
     FlushCache(0);
 

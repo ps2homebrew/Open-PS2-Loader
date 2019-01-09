@@ -529,7 +529,7 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
     snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
 #endif
     config_set_t *config = configAlloc(0, NULL, path);
-    configRead(config);
+    configRead(config); //Does not matter if the config file could be loaded or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     if (game->sizeMB != -1)

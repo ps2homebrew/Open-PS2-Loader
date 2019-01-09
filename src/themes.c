@@ -1104,7 +1104,7 @@ static void thmLoad(const char *themePath)
     } else {
         snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);
         themeConfig = configAlloc(0, NULL, path);
-        configRead(themeConfig); // try to load the theme config file
+        configRead(themeConfig); // try to load the theme config file. If it does not exist, defaults will be used.
 
         //Get theme path for sfx, to use later
         snprintf(sound_path, sizeof(sound_path), "%ssound", themePath);

@@ -52,38 +52,7 @@ static u8 IGR_Stack[IGR_STACK_SIZE] __attribute__((aligned(16)));
 
 /* Extern symbol */
 extern void *_gp;
-
-// Shutdown Dev9 hardware
-static void Shutdown_Dev9()
-{
-    u16 dev9_hw_type;
-
-    DIntr();
-    ee_kmode_enter();
-
-    // Get dev9 hardware type
-    dev9_hw_type = *DEV9_R_146E & 0xf0;
-
-    // Shutdown Pcmcia
-    if (dev9_hw_type == 0x20) {
-        *DEV9_R_146C = 0;
-        *DEV9_R_1474 = 0;
-    }
-    // Shutdown Expansion Bay
-    else if (dev9_hw_type == 0x30) {
-        *DEV9_R_1466 = 1;
-        *DEV9_R_1464 = 0;
-        *DEV9_R_1460 = *DEV9_R_1464;
-        *DEV9_R_146C = *DEV9_R_146C & ~4;
-        *DEV9_R_1460 = *DEV9_R_146C & ~1;
-    }
-
-    //Wait a sec
-    delay(5);
-
-    ee_kmode_exit();
-    EIntr();
-}
+extern void *_end;
 
 // Load home ELF
 static void t_loadElf(void)
@@ -115,6 +84,9 @@ static void t_loadElf(void)
     argv[0] = ExitPath;
     argv[1] = NULL;
 
+    //Wipe everything, even the module storage.
+    WipeUserMemory((void *)&_end, (void *)GetMemorySize());
+
     FlushCache(0);
 
     ret = LoadElf(argv[0], &elf);
@@ -145,27 +117,10 @@ static void t_loadElf(void)
     Exit(0);
 }
 
-// Poweroff PlayStation 2
-static void PowerOff_PS2(void)
-{
-    // Shutdown Dev9 hardware
-    Shutdown_Dev9();
-
-    DIntr();
-    ee_kmode_enter();
-
-    // PowerOff PS2
-    *CDVD_R_SDIN = 0x00;
-    *CDVD_R_SCMD = 0x0F;
-
-    ee_kmode_exit();
-    EIntr();
-}
-
 // In Game Reset Thread
 static void IGR_Thread(void *arg)
 {
-    u32 Cop0_Index, Cop0_Perf;
+    u32 Cop0_Perf;
 
     // Place our IGR thread in WAIT state
     // It will be woken up by our IGR interrupt handler
@@ -208,15 +163,10 @@ static void IGR_Thread(void *arg)
         // Remove kernel hooks
         Remove_Kernel_Hooks();
 
-        // Check Translation Look-Aside Buffer
+        // Initialize Translation Look-Aside Buffer, like the updated ExecPS2() library function does.
         // Some game (GT4, GTA) modify memory map
         // A re-init is needed to properly access memory
-        Cop0_Index = GetCop0(0);
-
-        // Init TLB
-        if (Cop0_Index != 0x26) {
-            InitializeTLB();
-        }
+        InitializeTLB();
 
         // Check Performance Counter
         // Some game (GT4) start performance counter
@@ -274,13 +224,11 @@ static void IGR_Thread(void *arg)
 
         IGR_Exit(0);
     } else {
-        // If combo is R3 + L3, Poweroff PS2
-        oplIGRShutdown(1);
-
         if (!DisableDebug)
             GS_BGCOLOUR = 0x0000FF; // Red
 
-        PowerOff_PS2();
+        // If combo is R3 + L3, Poweroff PS2
+        oplIGRShutdown(1);
     }
 }
 

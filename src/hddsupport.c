@@ -399,7 +399,7 @@ static config_set_t *hddGetConfig(int id)
     snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
 #endif
     config_set_t *config = configAlloc(0, NULL, path);
-    configRead(config);
+    configRead(config); //Does not matter if the config file exists or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     configSetInt(config, CONFIG_ITEM_SIZE, game->total_size_in_kb >> 10);

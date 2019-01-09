@@ -17,6 +17,7 @@ extern int size_cdvdman_irx;
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
 
+extern void *_end;
 
 /* Do not link to strcpy() from libc */
 inline void _strcpy(char *dst, const char *src)
@@ -357,6 +358,22 @@ void CopyToIop(void *eedata, unsigned int size, void *iopptr)
 
     while (SifDmaStat(id) >= 0) {
         ;
+    }
+}
+
+/*----------------------------------------------------------------------------------------*/
+/* Initialize User Memory.                                                                */
+/*----------------------------------------------------------------------------------------*/
+void WipeUserMemory(void *start, void *end)
+{
+    unsigned int i;
+
+    for (i = (unsigned int)start; i < (unsigned int)end; i += 64) {
+        __asm__ __volatile__(
+            "\tsq $0, 0(%0) \n"
+            "\tsq $0, 16(%0) \n"
+            "\tsq $0, 32(%0) \n"
+            "\tsq $0, 48(%0) \n" ::"r"(i));
     }
 }
 

@@ -42,6 +42,7 @@ typedef struct
 #define PATCH_DOT_HACK 0x0D074A37
 #define PATCH_SOS 0x30303030
 #define PATCH_ULT_PRO_PINBALL 0xBA11BA11
+#define PATCH_FERRARI_CHALLENGE 0x0012FCC8
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -106,6 +107,7 @@ static const patchlist_t patch_list[] = {
     {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
     {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
     {"SLES_535.08", ALL_MODE, {PATCH_ULT_PRO_PINBALL, 0x00000000, 0x00000000}},    // Ultimate Pro Pinball
+    {"SLES_552.94", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x00000000, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -676,6 +678,12 @@ static void UltProPinballPatch(const char *path)
     }
 }
 
+static void FerrariChallengePatch(void)
+{   //Ferrari Challenge has the main thread ID hardcoded for a call to WakeupThread().
+    //This breaks when the thread IDs change after IGR is used.
+    *(vu16*)0x0012fcc8 = (u16)GetThreadId();
+}
+
 void apply_patches(const char *path)
 {
     const patchlist_t *p;
@@ -719,6 +727,9 @@ void apply_patches(const char *path)
                     break;
                 case PATCH_ULT_PRO_PINBALL:
                     UltProPinballPatch(path);
+                    break;
+                case PATCH_FERRARI_CHALLENGE:
+                    FerrariChallengePatch();
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

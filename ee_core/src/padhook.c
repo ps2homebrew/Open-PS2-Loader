@@ -120,7 +120,7 @@ static void t_loadElf(void)
 // In Game Reset Thread
 static void IGR_Thread(void *arg)
 {
-    u32 Cop0_Index, Cop0_Perf;
+    u32 Cop0_Perf;
 
     // Place our IGR thread in WAIT state
     // It will be woken up by our IGR interrupt handler
@@ -163,15 +163,10 @@ static void IGR_Thread(void *arg)
         // Remove kernel hooks
         Remove_Kernel_Hooks();
 
-        // Check Translation Look-Aside Buffer
+        // Initialize Translation Look-Aside Buffer, like the updated ExecPS2() library function does.
         // Some game (GT4, GTA) modify memory map
         // A re-init is needed to properly access memory
-        Cop0_Index = GetCop0(0);
-
-        // Init TLB
-        if (Cop0_Index != 0x26) {
-            InitializeTLB();
-        }
+        InitializeTLB();
 
         // Check Performance Counter
         // Some game (GT4) start performance counter

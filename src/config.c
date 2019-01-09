@@ -12,6 +12,12 @@
 static u32 currentUID = 0;
 static config_set_t configFiles[CONFIG_INDEX_COUNT];
 static char legacyNetConfigPath[256] = "mc?:SYS-CONF/IPCONFIG.DAT";
+static const char *configFilenames[CONFIG_INDEX_COUNT] = {
+    "conf_opl.cfg",
+    "conf_last.cfg",
+    "conf_apps.cfg",
+    "conf_network",
+};
 
 static int strToColor(const char *string, unsigned char *color)
 {
@@ -148,39 +154,33 @@ static struct config_value_t *getConfigItemForName(config_set_t *configSet, cons
 void configInit(char *prefix)
 {
     char path[256];
+    int i;
 
     if (prefix)
         snprintf(legacyNetConfigPath, sizeof(legacyNetConfigPath), "%s/IPCONFIG.DAT", prefix);
     else
         prefix = gBaseMCDir;
 
-    snprintf(path, sizeof(path), "%s/conf_opl.cfg", prefix);
-    configAlloc(CONFIG_OPL, &configFiles[CONFIG_INDEX_OPL], path);
-    snprintf(path, sizeof(path), "%s/conf_last.cfg", prefix);
-    configAlloc(CONFIG_LAST, &configFiles[CONFIG_INDEX_LAST], path);
-    snprintf(path, sizeof(path), "%s/conf_apps.cfg", prefix);
-    configAlloc(CONFIG_APPS, &configFiles[CONFIG_INDEX_APPS], path);
-    snprintf(path, sizeof(path), "%s/conf_network.cfg", prefix);
-    configAlloc(CONFIG_NETWORK, &configFiles[CONFIG_INDEX_NETWORK], path);
+    for (i = 0; i < CONFIG_INDEX_COUNT; i++) {
+        snprintf(path, sizeof(path), "%s/%s", prefix, configFilenames[i]);
+        configAlloc(1 << i, &configFiles[i], path);
+    }
 }
 
 void configSetMove(char *prefix)
 {
     char path[256];
+    int i;
 
     if (prefix)
         snprintf(legacyNetConfigPath, sizeof(legacyNetConfigPath), "%s/IPCONFIG.DAT", prefix);
     else
         prefix = gBaseMCDir;
 
-    snprintf(path, sizeof(path), "%s/conf_opl.cfg", prefix);
-    configMove(&configFiles[CONFIG_INDEX_OPL], path);
-    snprintf(path, sizeof(path), "%s/conf_last.cfg", prefix);
-    configMove(&configFiles[CONFIG_INDEX_OPL], path);
-    snprintf(path, sizeof(path), "%s/conf_apps.cfg", prefix);
-    configMove(&configFiles[CONFIG_INDEX_OPL], path);
-    snprintf(path, sizeof(path), "%s/conf_network.cfg", prefix);
-    configMove(&configFiles[CONFIG_INDEX_OPL], path);
+    for (i = 0; i < CONFIG_INDEX_COUNT; i++) {
+        snprintf(path, sizeof(path), "%s/%s", prefix, configFilenames[i]);
+        configMove(&configFiles[i], path);
+    }
 }
 
 void configEnd()
@@ -371,7 +371,7 @@ void configMerge(config_set_t *dest, const config_set_t *source)
     }
 }
 
-int configReadLegacyIP(void)
+static int configReadLegacyIP(void)
 {
     config_set_t *configSet;
     char temp[16];
@@ -398,7 +398,7 @@ int configReadLegacyIP(void)
         //The legacy format has no setting for the DNS server, so duplicate the gateway address.
         configSetStr(configSet, CONFIG_NET_PS2_DNS, temp);
 
-        return CONFIG_NETWORK;
+        return 1;
     }
 
     return 0;
@@ -469,7 +469,7 @@ static int configReadFileBuffer(file_buffer_t *fileBuffer, config_set_t *configS
         }
     }
     configSet->modified = 0;
-    return configSet->type;
+    return 1;
 }
 
 int configReadBuffer(config_set_t *configSet, const void *buffer, int size)
@@ -558,13 +558,15 @@ int configReadMulti(int types)
 
         if (configSet->type & types) {
             configClear(configSet);
-            result |= configRead(configSet);
+            if (configRead(configSet))
+                result |= configSet->type;
         }
     }
 
     //If the network configuration is to be loaded and one cannot be loaded, attempt to load from the legacy network config file.
     if ((types & CONFIG_NETWORK) && !(result & CONFIG_NETWORK))
-        result |= configReadLegacyIP();
+        if (configReadLegacyIP())
+            result |= CONFIG_NETWORK;
 
     return result;
 }

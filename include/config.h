@@ -143,7 +143,6 @@ int configGetColor(config_set_t *configSet, const char *key, unsigned char *colo
 int configRemoveKey(config_set_t *configSet, const char *key);
 void configMerge(config_set_t *dest, const config_set_t *source);
 
-int configReadLegacyIP(void);
 void configGetDiscIDBinary(config_set_t *configSet, void *dst);
 
 int configRead(config_set_t *configSet);

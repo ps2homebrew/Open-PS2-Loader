@@ -30,6 +30,7 @@ int disable_padOpen_hook = 1;
 
 extern void *ModStorageStart, *ModStorageEnd;
 extern void *eeloadCopy, *initUserMemory;
+extern void *_end;
 
 /*----------------------------------------------------------------------------------------*/
 /* This function is called when SifSetDma catches a reboot request.                       */
@@ -53,21 +54,6 @@ u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 }
 
 // ------------------------------------------------------------------------
-extern void *_end;
-
-static void WipeUserMemory(void *start, void *end)
-{
-    unsigned int i;
-
-    for (i = (unsigned int)start; i < (unsigned int)end; i += 64) {
-        __asm__ __volatile__(
-            "\tsq $0, 0(%0) \n"
-            "\tsq $0, 16(%0) \n"
-            "\tsq $0, 32(%0) \n"
-            "\tsq $0, 48(%0) \n" ::"r"(i));
-    }
-}
-
 void sysLoadElf(char *filename, int argc, char **argv)
 {
     int r;

@@ -1278,6 +1278,9 @@ static void moduleCleanup(opl_io_module_t *mod, int exception)
 void deinit(int exception)
 {
     unloadPads();
+
+    deinitAllSupport(exception);
+
     ioEnd();
     guiEnd();
     menuEnd();
@@ -1285,8 +1288,6 @@ void deinit(int exception)
     thmEnd();
     rmEnd();
     configEnd();
-
-    deinitAllSupport(exception);
 }
 
 static void setDefaults(void)

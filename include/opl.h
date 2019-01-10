@@ -65,7 +65,7 @@ void applyConfig(int themeID, int langID);
 void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged);
 void handleHdlSrv();
-void deinit();
+void deinit(int exception, int modeSelected);
 
 char *gBaseMCDir;
 

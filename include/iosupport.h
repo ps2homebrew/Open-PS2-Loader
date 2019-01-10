@@ -3,6 +3,9 @@
 
 #include "include/config.h"
 
+#define IO_MODE_SELECTED_NONE -1
+#define IO_MODE_SELECTED_ALL MODE_COUNT
+
 enum IO_MODES {
     USB_MODE = 0,
     ETH_MODE,
@@ -122,6 +125,8 @@ typedef struct
     int (*itemGetImage)(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm);
 
     void (*itemCleanUp)(int exception);
+
+    void (*itemShutdown)(void);
 
     int (*itemCheckVMC)(char *name, int createSize);
 

@@ -383,7 +383,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     if (gPS2Logo)
         EnablePS2Logo = CheckPS2Logo(0, game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET);
 
-    deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
+    deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
     sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
@@ -420,6 +420,7 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
+//This may be called, even if hddInit() was not.
 static void hddCleanUp(int exception)
 {
     LOG("HDDSUPPORT CleanUp\n");
@@ -429,11 +430,14 @@ static void hddCleanUp(int exception)
 
         if ((exception & UNMOUNT_EXCEPTION) == 0)
             fileXioUmount(hddPrefix);
-
-        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
     }
 
-    hddModulesLoaded = 0;
+    //UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
+    if (hddModulesLoaded) {
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+
+        hddModulesLoaded = 0;
+    }
 }
 
 static int hddCheckVMC(char *name, int createSize)
@@ -441,8 +445,34 @@ static int hddCheckVMC(char *name, int createSize)
     return sysCheckVMC(hddPrefix, "/", name, createSize, NULL);
 }
 
+//This may be called, even if hddInit() was not.
+static void hddShutdown(void)
+{
+    LOG("HDDSUPPORT Shutdown\n");
+
+    if (hddGameList.enabled) {
+        hddFreeHDLGamelist(&hddGames);
+        fileXioUmount(hddPrefix);
+    }
+
+    //UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
+    if (hddModulesLoaded) {
+        /* Close all files */
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+
+        //DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
+        //The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
+        hddSetIdleImmediate();
+
+        //Only shut down dev9 from here, if it was initialized from here before.
+        sysShutdownDev9();
+
+        hddModulesLoaded = 0;
+    }
+}
+
 static item_list_t hddGameList = {
     HDD_MODE, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
+    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON
 };

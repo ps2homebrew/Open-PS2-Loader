@@ -682,12 +682,9 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     }
     settings->common.layer1_start = layer1_start;
 
-    // disconnect from the active SMB session
-    ethSMBDisconnect();
-
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
-    deinit(NO_EXCEPTION); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
+    deinit(NO_EXCEPTION, ETH_MODE); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
     sysLaunchLoaderElf(filename,  "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
@@ -707,15 +704,40 @@ static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
+//This may be called, even if ethInit() was not.
 static void ethCleanUp(int exception)
 {
     if (ethGameList.enabled) {
         LOG("ETHSUPPORT CleanUp\n");
 
         free(ethGames);
+
+        // disconnect from the active SMB session
+        ethSMBDisconnect();
     }
 
+    //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
     ethDeinitModules();
+}
+
+//This may be called, even if ethInit() was not.
+static void ethShutdown(void)
+{
+    if (ethGameList.enabled) {
+        LOG("ETHSUPPORT Shutdown\n");
+
+        free(ethGames);
+
+        // disconnect from the active SMB session
+        ethSMBDisconnect();
+    }
+
+    //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
+    ethDeinitModules();
+
+    //Only shut down dev9 from here, if it was initialized from here before.
+    if (ethModulesLoaded)
+        sysShutdownDev9();
 }
 
 static int ethCheckVMC(char *name, int createSize)
@@ -726,7 +748,7 @@ static int ethCheckVMC(char *name, int createSize)
 static item_list_t ethGameList = {
     ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
+    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, ETH_ICON
 };
 
 static int ethReadNetConfig(void)

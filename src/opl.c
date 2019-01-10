@@ -101,7 +101,7 @@ static void clearIOModuleT(opl_io_module_t *mod)
 
 // forward decl
 static void clearMenuGameList(opl_io_module_t *mdl);
-static void moduleCleanup(opl_io_module_t *mod, int exception);
+static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected);
 static void reset(void);
 static void deferredAudioInit(void);
 
@@ -351,14 +351,12 @@ static void initAllSupport(int force_reinit)
     initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
 }
 
-static void deinitAllSupport(int exception)
+static void deinitAllSupport(int exception, int modeSelected)
 {
-    moduleCleanup(&list_support[USB_MODE], exception);
-    moduleCleanup(&list_support[ETH_MODE], exception);
-    moduleCleanup(&list_support[HDD_MODE], exception);
-    moduleCleanup(&list_support[APP_MODE], exception);
-
-    ethDeinitModules(); //Deinitialize here if the UI used network support without SMB.
+    moduleCleanup(&list_support[USB_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[ETH_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[HDD_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
 }
 
 // ----------------------------------------------------------
@@ -1158,7 +1156,8 @@ static int loadHdldSvr(void)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-    deinitAllSupport(NO_EXCEPTION);
+    //Deinitialize all support without shutting down the HDD unit.
+    deinitAllSupport(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     clearErrorMessage(); /*	At this point, an error might have been displayed (since background tasks were completed).
 					Clear it, otherwise it will get displayed after the server is closed.	*/
 
@@ -1243,22 +1242,38 @@ static void reset(void)
 #endif
 }
 
-static void moduleCleanup(opl_io_module_t *mod, int exception)
+static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
 {
     if (!mod->support)
         return;
 
-    if (mod->support->itemCleanUp)
-        mod->support->itemCleanUp(exception);
+    //Shutdown if not required anymore.
+    if ((mod->support->mode != modeSelected) && (modeSelected != IO_MODE_SELECTED_ALL))
+    {
+        if (mod->support->itemShutdown)
+            mod->support->itemShutdown();
+    } else {
+        if (mod->support->itemCleanUp)
+            mod->support->itemCleanUp(exception);
+    }
 
     clearMenuGameList(mod);
 }
 
-void deinit(int exception)
+void deinit(int exception, int modeSelected)
 {
+    if (gEnableSFX) {
+        gEnableSFX = 0;
+    }
+    audsrv_quit();
+
+#ifdef PADEMU
+    ds34usb_reset();
+    ds34bt_reset();
+#endif
     unloadPads();
 
-    deinitAllSupport(exception);
+    deinitAllSupport(exception, modeSelected);
 
     ioEnd();
     guiEnd();

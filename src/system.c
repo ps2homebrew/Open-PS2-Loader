@@ -123,7 +123,7 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
 #define OPL_SIF_CMD_BUFF_SIZE 1
 static SifCmdHandlerData_t OplSifCmdbuffer[OPL_SIF_CMD_BUFF_SIZE];
-static unsigned char dev9Initialized = 0, dev9Loaded = 0;
+static unsigned char dev9Initialized = 0, dev9Loaded = 0, dev9InitCount = 0;
 
 void sysInitDev9(void)
 {
@@ -133,6 +133,25 @@ void sysInitDev9(void)
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
         dev9Loaded = (ret == 0);  //DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
+    }
+
+    dev9InitCount++;
+}
+
+void sysShutdownDev9(void)
+{
+    if (dev9InitCount > 0)
+    {
+        --dev9InitCount;
+
+        if (dev9InitCount == 0)
+        {   /* Switch off DEV9 once nothing needs it. */
+            if (dev9Loaded)
+            {
+                while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
+                };
+            }
+        }
     }
 }
 
@@ -235,25 +254,7 @@ void sysReset(int modload_mask)
 
 void sysPowerOff(void)
 {
-    int i;
-
-    deinit(NO_EXCEPTION);
-    if (dev9Loaded)
-    {
-        /* Close all files */
-        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
-        /* Switch off DEV9 */
-        while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
-        };
-    }
-
-    // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
-    for (i = 0; i < MAX_USB_DEVICES; i++) {
-        char device[7];
-        sprintf(device, "mass%d:", i);
-        fileXioDevctl(device, USBMASS_DEVCTL_STOP_UNIT, NULL, 0, NULL, 0);
-    }
-
+    deinit(NO_EXCEPTION, IO_MODE_SELECTED_NONE);
     poweroffShutdown();
 }
 
@@ -336,16 +337,12 @@ int sysGetDiscID(char *hexDiscID)
 
 void sysExecExit()
 {
-#ifdef PADEMU
-    ds34usb_reset();
-    ds34bt_reset();
-#endif
     if (gEnableSFX) {
         //wait 70ms for confirm sound to finish playing before exit
         guiDelay(0070);
-        gEnableSFX = 0;
     }
-    audsrv_quit();
+    //Deinitialize without shutting down active devices.
+    deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     Exit(0);
 }
 
@@ -793,15 +790,6 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     strcpy(ElfPath, "cdrom0:\\");
     strncat(ElfPath, filename, 11); // fix for 8+3 filename.
     strcat(ElfPath, ";1");
-
-#ifdef PADEMU
-    ds34usb_reset();
-    ds34bt_reset();
-#endif
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
 
     // Let's go.
     fileXioExit();

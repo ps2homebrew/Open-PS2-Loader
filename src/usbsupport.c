@@ -371,7 +371,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
-    deinit(NO_EXCEPTION); // CAREFUL: deinit will call usbCleanUp, so usbGames/game will be freed
+    deinit(NO_EXCEPTION, USB_MODE); // CAREFUL: deinit will call usbCleanUp, so usbGames/game will be freed
 
     sysLaunchLoaderElf(filename, "USB_MODE", irx_size, irx, size_mcemu_irx, &usb_mcemu_irx, EnablePS2Logo, compatmask);
 }
@@ -391,6 +391,7 @@ static int usbGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
+//This may be called, even if usbInit() was not.
 static void usbCleanUp(int exception)
 {
     if (usbGameList.enabled) {
@@ -398,6 +399,19 @@ static void usbCleanUp(int exception)
 
         free(usbGames);
     }
+}
+
+//This may be called, even if usbInit() was not.
+static void usbShutdown(void)
+{
+    if (usbGameList.enabled) {
+        LOG("USBSUPPORT Shutdown\n");
+
+        free(usbGames);
+    }
+
+    // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
+    fileXioDevctl("mass:", USBMASS_DEVCTL_STOP_ALL, NULL, 0, NULL, 0);
 }
 
 static int usbCheckVMC(char *name, int createSize)
@@ -408,5 +422,5 @@ static int usbCheckVMC(char *name, int createSize)
 static item_list_t usbGameList = {
     USB_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbInit, &usbNeedsUpdate,
     &usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
-    &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbCheckVMC, USB_ICON
+    &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbShutdown, &usbCheckVMC, USB_ICON
 };

@@ -107,7 +107,8 @@ static const patchlist_t patch_list[] = {
     {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
     {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
     {"SLES_535.08", ALL_MODE, {PATCH_ULT_PRO_PINBALL, 0x00000000, 0x00000000}},    // Ultimate Pro Pinball
-    {"SLES_552.94", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x00000000, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli
+    {"SLES_552.94", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcc8, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (PAL)
+    {"SLUS_217.80", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcb0, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (NTSC-U/C)
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -678,10 +679,11 @@ static void UltProPinballPatch(const char *path)
     }
 }
 
-static void FerrariChallengePatch(void)
+static void FerrariChallengePatch(u32 addr)
 {   //Ferrari Challenge has the main thread ID hardcoded for a call to WakeupThread().
+    // addiu $a0, $zero, 1
     //This breaks when the thread IDs change after IGR is used.
-    *(vu16*)0x0012fcc8 = (u16)GetThreadId();
+    *(vu16*)addr = (u16)GetThreadId();
 }
 
 void apply_patches(const char *path)
@@ -729,7 +731,7 @@ void apply_patches(const char *path)
                     UltProPinballPatch(path);
                     break;
                 case PATCH_FERRARI_CHALLENGE:
-                    FerrariChallengePatch();
+                    FerrariChallengePatch(p->patch.val);
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

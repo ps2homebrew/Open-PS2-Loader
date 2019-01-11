@@ -138,7 +138,12 @@ endif
 
 ifeq ($(DEBUG),1)
   EE_CFLAGS += -D__DEBUG -g
-  EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
+  ifeq ($(DECI2_DEBUG),1)
+    EE_OBJS += debug.o drvtif_irx.o tifinet_irx.o deci2_img.o
+    EE_LDFLAGS += -liopreboot
+  else
+    EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
+  endif
   MOD_DEBUG_FLAGS = DEBUG=1
   ifeq ($(IOPCORE_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
@@ -158,9 +163,9 @@ ifeq ($(DEBUG),1)
     ifeq ($(DECI2_DEBUG),1)
       EE_CFLAGS += -D__DECI2_DEBUG
       EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
-      IOP_OBJS += drvtif_irx.o tifinet_irx.o
+      IOP_OBJS += drvtif_ingame_irx.o tifinet_ingame_irx.o
       DECI2_DEBUG=1
-      CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
+      CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #(clear IOPCORE_DEBUG) dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
     else
       IOP_OBJS += udptty-ingame.o
     endif
@@ -749,11 +754,20 @@ $(EE_ASM_DIR)transition.s: misc/transition.adp | $(EE_ASM_DIR)
 $(EE_ASM_DIR)IOPRP_img.s: modules/iopcore/IOPRP.img | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ IOPRP_img
 
+$(EE_ASM_DIR)drvtif_ingame_irx.s: modules/debug/drvtif-ingame.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ drvtif_ingame_irx
+
+$(EE_ASM_DIR)tifinet_ingame_irx.s: modules/debug/tifinet-ingame.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ tifinet_ingame_irx
+
 $(EE_ASM_DIR)drvtif_irx.s: modules/debug/drvtif.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ drvtif_irx
 
 $(EE_ASM_DIR)tifinet_irx.s: modules/debug/tifinet.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ tifinet_irx
+
+$(EE_ASM_DIR)deci2_img.s: modules/debug/deci2.img | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ deci2_img
 
 $(EE_OBJS_DIR)%.o: $(EE_SRC_DIR)%.c | $(EE_OBJS_DIR)
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@

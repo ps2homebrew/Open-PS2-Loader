@@ -830,6 +830,10 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed);
     moduleUpdateMenu(HDD_MODE, changed);
     moduleUpdateMenu(APP_MODE, changed);
+
+#ifdef __DEBUG
+    debugApplyConfig();
+#endif
 }
 
 int loadConfig(int types)
@@ -1434,6 +1438,10 @@ static void deferredAudioInit(void)
 // --------------------- Main --------------------
 int main(int argc, char *argv[])
 {
+#ifdef __DECI2_DEBUG
+    sysInitDECI2();
+#endif
+
     LOG_INIT();
     PREINIT_LOG("OPL GUI start!\n");
 

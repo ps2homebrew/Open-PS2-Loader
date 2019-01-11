@@ -31,8 +31,12 @@ static struct ip4_addr lastGW;
 
 // forward declaration
 static item_list_t ethGameList;
-static int ethReadNetConfig(void);
+static int ethWaitValidNetIFLinkState(void);
+static int ethWaitValidDHCPState(void);
 static int ethGetNetIFLinkStatus(void);
+static int ethApplyNetIFConfig(void);
+static int ethApplyIPConfig(void);
+static int ethReadNetConfig(void);
 
 static int ethInitSemaID = -1;
 
@@ -183,12 +187,12 @@ static int WaitValidNetState(int (*checkingFunction)(void))
     return 0;
 }
 
-int ethWaitValidNetIFLinkState(void)
+static int ethWaitValidNetIFLinkState(void)
 {
     return WaitValidNetState(&ethGetNetIFLinkStatus);
 }
 
-int ethWaitValidDHCPState(void)
+static int ethWaitValidDHCPState(void)
 {
     return WaitValidNetState(&ethGetDHCPStatus);
 }
@@ -219,6 +223,17 @@ static int ethInitApplyConfig(void)
     }
 
     return 0;
+}
+
+int ethApplyConfig(void)
+{
+    int ret;
+
+    WaitSema(ethInitSemaID);
+    ret = ethInitApplyConfig();
+    SignalSema(ethInitSemaID);
+
+    return ret;
 }
 
 static void ethInitSMB(void)
@@ -793,7 +808,7 @@ int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
     return result;
 }
 
-int ethApplyNetIFConfig(void)
+static int ethApplyNetIFConfig(void)
 {
     int mode, result;
     static int CurrentMode = NETMAN_NETIF_ETH_LINK_MODE_AUTO;
@@ -829,7 +844,7 @@ static int ethGetNetIFLinkStatus(void)
     return (NetManIoctl(NETMAN_NETIF_IOCTL_GET_LINK_STATUS, NULL, 0, NULL, 0) == NETMAN_NETIF_ETH_LINK_STATE_UP);
 }
 
-int ethApplyIPConfig(void)
+static int ethApplyIPConfig(void)
 {
     t_ip_info ip_info;
     struct ip4_addr ipaddr, netmask, gw, dns;

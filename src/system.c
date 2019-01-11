@@ -4,6 +4,10 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
+#ifdef __DECI2_DEBUG
+#include <iopcontrol_special.h>
+#endif
+
 #include "include/opl.h"
 #include "include/gui.h"
 #include "include/ethsupport.h"
@@ -172,8 +176,13 @@ void sysReset(int modload_mask)
     while (!SifIopReset("rom0:UDNL", 0))
         ;
 #else
+#ifdef __DECI2_DEBUG
+    while (!SifIopRebootBuffer(&deci2_img, size_deci2_img))
+        ;
+#else
     while (!SifIopReset("", 0))
         ;
+#endif
 #endif
 
     dev9Initialized = 0;
@@ -491,10 +500,10 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 #ifdef __INGAME_DEBUG
 #ifdef __DECI2_DEBUG
     if (modules & CORE_IRX_DECI2) {
-        irxptr_tab[modcount].info = size_drvtif_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
-        irxptr_tab[modcount++].ptr = (void *)&drvtif_irx;
-        irxptr_tab[modcount].info = size_tifinet_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
-        irxptr_tab[modcount++].ptr = (void *)&tifinet_irx;
+        irxptr_tab[modcount].info = size_drvtif_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
+        irxptr_tab[modcount++].ptr = (void *)&drvtif_ingame_irx;
+        irxptr_tab[modcount].info = size_tifinet_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
+        irxptr_tab[modcount++].ptr = (void *)&tifinet_ingame_irx;
     }
 #else
     if (modules & CORE_IRX_DEBUG) {
@@ -590,6 +599,21 @@ static int ResetDECI2(void)
             break;
         }
     }
+
+    return result;
+}
+
+int sysInitDECI2(void)
+{
+    int result;
+
+    DI();
+    ee_kmode_enter();
+
+    result = ResetDECI2();
+
+    ee_kmode_exit();
+    EI();
 
     return result;
 }

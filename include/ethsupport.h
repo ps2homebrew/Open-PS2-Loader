@@ -20,10 +20,7 @@ void ethDeinitModules(void);      //Module-only deinitialization, without the GU
 int ethLoadInitModules(void);     //Initializes Ethernet and applies configuration.
 void ethDisplayErrorStatus(void); //Displays the current error status (if any). GUI must be already initialized.
 int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway);
-int ethWaitValidNetIFLinkState(void);
-int ethWaitValidDHCPState(void);
-int ethApplyNetIFConfig(void);
-int ethApplyIPConfig(void);
+int ethApplyConfig(void);
 int ethGetDHCPStatus(void);
 item_list_t *ethGetObject(int initOnly);
 

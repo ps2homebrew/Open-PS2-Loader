@@ -344,7 +344,7 @@ int sysGetDiscID(char *hexDiscID)
     return 1;
 }
 
-void sysExecExit()
+void sysExecExit(void)
 {
     if (gEnableSFX) {
         //wait 70ms for confirm sound to finish playing before exit
@@ -701,7 +701,7 @@ static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void
     return((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
 }
 
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
+void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
     void *ModuleStorage, *ModuleStorageEnd;
@@ -799,7 +799,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     argv[i] = ModStorageConfig;
     i++;
 
-    argv[i] = filename;
+    argv[i] = (char*)filename;
     i++;
 
     char cmask[10];
@@ -834,7 +834,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     }
 }
 
-int sysExecElf(char *path)
+int sysExecElf(const char *path)
 {
     u8 *boot_elf = NULL;
     elf_header_t *eh;
@@ -873,7 +873,7 @@ int sysExecElf(char *path)
     fileXioExit();
     SifExitRpc();
 
-    elf_argv[0] = path;
+    elf_argv[0] = (char*)path;
 
     FlushCache(0);
     FlushCache(2);

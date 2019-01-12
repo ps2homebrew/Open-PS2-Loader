@@ -36,6 +36,10 @@
 
 #include <unistd.h>
 #include <audsrv.h>
+#ifdef PADEMU
+#include <libds34bt.h>
+#include <libds34usb.h>
+#endif
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>

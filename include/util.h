@@ -44,6 +44,7 @@ enum CONSOLE_REGIONS {
 int InitConsoleRegionData(void);
 const char *GetSystemDataPath(void);
 char GetSystemFolderLetter(void);
+int sysDeleteFolder(const char *folder);
 
 int CheckPS2Logo(int fd, u32 lba);
 

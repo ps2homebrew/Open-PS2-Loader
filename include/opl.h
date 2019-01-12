@@ -39,6 +39,12 @@
 
 #define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
 
+#ifdef OPL_IS_DEV_BUILD
+#define OPL_FOLDER "CFG-DEV"
+#else
+#define OPL_FOLDER "CFG"
+#endif
+
 //Master password for disabling the parental lock.
 #define OPL_PARENTAL_LOCK_MASTER_PASS	"989765"
 
@@ -56,6 +62,11 @@
 #define OPL_COMPAT_UPDATE_STAT_ABORTED -3
 
 #define OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS 10000
+
+int oplPath2Mode(const char *path);
+char *oplGetModeText(int mode);
+int oplGetAppImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm);
+int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg);
 
 void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
@@ -115,6 +126,7 @@ int gXOff;
 int gYOff;
 int gOverscan;
 int gSelectButton;
+int gGameListCache;
 
 int gEnableSFX;
 int gEnableBootSND;

@@ -67,7 +67,7 @@ int hddSetTransferMode(int type, int mode)
 }
 
 //-------------------------------------------------------------------------
-int hddSetIdleTimeout(int timeout)
+void hddSetIdleTimeout(int timeout)
 {
     // From hdparm man:
     // A value of zero means "timeouts  are  disabled":  the
@@ -81,11 +81,16 @@ int hddSetIdleTimeout(int timeout)
     // 21 minutes plus 15 seconds.  Note that  some  older  drives  may
     // have very different interpretations of these values.
 
-    u8 args[16];
+    u8 standbytimer = (u8)timeout;
 
-    *(u32 *)&args[0] = timeout & 0xff;
+    fileXioDevctl("hdd0:", HDIOC_IDLE, &standbytimer, 1, NULL, 0);
+    fileXioDevctl("hdd1:", HDIOC_IDLE, &standbytimer, 1, NULL, 0);
+}
 
-    return fileXioDevctl("hdd0:", HDIOC_IDLE, args, 4, NULL, 0);
+void hddSetIdleImmediate(void)
+{
+    fileXioDevctl("hdd0:", HDIOC_IDLEIMM, NULL, 0, NULL, 0);
+    fileXioDevctl("hdd1:", HDIOC_IDLEIMM, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------

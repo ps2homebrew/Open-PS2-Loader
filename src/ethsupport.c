@@ -31,8 +31,12 @@ static struct ip4_addr lastGW;
 
 // forward declaration
 static item_list_t ethGameList;
-static int ethReadNetConfig(void);
+static int ethWaitValidNetIFLinkState(void);
+static int ethWaitValidDHCPState(void);
 static int ethGetNetIFLinkStatus(void);
+static int ethApplyNetIFConfig(void);
+static int ethApplyIPConfig(void);
+static int ethReadNetConfig(void);
 
 static int ethInitSemaID = -1;
 
@@ -183,12 +187,12 @@ static int WaitValidNetState(int (*checkingFunction)(void))
     return 0;
 }
 
-int ethWaitValidNetIFLinkState(void)
+static int ethWaitValidNetIFLinkState(void)
 {
     return WaitValidNetState(&ethGetNetIFLinkStatus);
 }
 
-int ethWaitValidDHCPState(void)
+static int ethWaitValidDHCPState(void)
 {
     return WaitValidNetState(&ethGetDHCPStatus);
 }
@@ -219,6 +223,17 @@ static int ethInitApplyConfig(void)
     }
 
     return 0;
+}
+
+int ethApplyConfig(void)
+{
+    int ret;
+
+    WaitSema(ethInitSemaID);
+    ret = ethInitApplyConfig();
+    SignalSema(ethInitSemaID);
+
+    return ret;
 }
 
 static void ethInitSMB(void)
@@ -649,7 +664,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
             sprintf(partname, "%s%s.00", ethPrefix, settings->filename);
             break;
         default: //Raw ISO9660 disc image; one part.
-            sprintf(partname, "%s%s\\%s", ethPrefix, game->media == 0x12 ? "CD" : "DVD", settings->filename);
+            sprintf(partname, "%s%s\\%s", ethPrefix, game->media == SCECdPS2CD ? "CD" : "DVD", settings->filename);
     }
 
     if (gPS2Logo) {
@@ -682,12 +697,9 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     }
     settings->common.layer1_start = layer1_start;
 
-    // disconnect from the active SMB session
-    ethSMBDisconnect();
-
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
-    deinit(NO_EXCEPTION); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
+    deinit(NO_EXCEPTION, ETH_MODE); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
     sysLaunchLoaderElf(filename,  "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
@@ -707,15 +719,40 @@ static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
+//This may be called, even if ethInit() was not.
 static void ethCleanUp(int exception)
 {
     if (ethGameList.enabled) {
         LOG("ETHSUPPORT CleanUp\n");
 
         free(ethGames);
+
+        // disconnect from the active SMB session
+        ethSMBDisconnect();
     }
 
+    //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
     ethDeinitModules();
+}
+
+//This may be called, even if ethInit() was not.
+static void ethShutdown(void)
+{
+    if (ethGameList.enabled) {
+        LOG("ETHSUPPORT Shutdown\n");
+
+        free(ethGames);
+
+        // disconnect from the active SMB session
+        ethSMBDisconnect();
+    }
+
+    //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
+    ethDeinitModules();
+
+    //Only shut down dev9 from here, if it was initialized from here before.
+    if (ethModulesLoaded)
+        sysShutdownDev9();
 }
 
 static int ethCheckVMC(char *name, int createSize)
@@ -726,7 +763,7 @@ static int ethCheckVMC(char *name, int createSize)
 static item_list_t ethGameList = {
     ETH_MODE, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethCheckVMC, ETH_ICON
+    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, ETH_ICON
 };
 
 static int ethReadNetConfig(void)
@@ -771,7 +808,7 @@ int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
     return result;
 }
 
-int ethApplyNetIFConfig(void)
+static int ethApplyNetIFConfig(void)
 {
     int mode, result;
     static int CurrentMode = NETMAN_NETIF_ETH_LINK_MODE_AUTO;
@@ -807,7 +844,7 @@ static int ethGetNetIFLinkStatus(void)
     return (NetManIoctl(NETMAN_NETIF_IOCTL_GET_LINK_STATUS, NULL, 0, NULL, 0) == NETMAN_NETIF_ETH_LINK_STATE_UP);
 }
 
-int ethApplyIPConfig(void)
+static int ethApplyIPConfig(void)
 {
     t_ip_info ip_info;
     struct ip4_addr ipaddr, netmask, gw, dns;

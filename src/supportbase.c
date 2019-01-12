@@ -74,7 +74,7 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
         fseek(file, 0, SEEK_END);
         size = ftell(file);
         rewind(file);
-        if ((SystemCNF = malloc(size + 1)) != NULL) {
+        if ((SystemCNF = memalign(64, size + 1)) != NULL) {
             fread(SystemCNF, 1, size, file);
             fclose(file);
             SystemCNF[size] = '\0';
@@ -87,7 +87,7 @@ static inline int GetStartupExecName(const char *path, char *filename, int maxle
             free(SystemCNF);
 
             if (NextLine != NULL && strcmp(strtok(NextLine, "\t ="), "BOOT2") == 0) {
-                if ((p = strtok(NULL, " =")) != NULL && strncmp(p, "cdrom0:\\", 8) == 0) {
+                if ((p = strtok(NULL, "\t =")) != NULL && strncmp(p, "cdrom0:\\", 8) == 0) {
                     strncpy(filename, p + 8, maxlength); /* Skip the device name part of the path ("cdrom0:\"). */
                     filename[maxlength] = '\0';
                     LOG("Startup EXEC path: %s\n", filename);
@@ -209,11 +209,11 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
 
     // count iso games in "cd" directory
     snprintf(path, sizeof(path), "%sCD", prefix);
-    count = scanForISO(path, 0x12, &dlist_head);
+    count = scanForISO(path, SCECdPS2CD, &dlist_head);
 
     // count iso games in "dvd" directory
     snprintf(path, sizeof(path), "%sDVD", prefix);
-    if ((result = scanForISO(path, 0x14, &dlist_head)) >= 0) {
+    if ((result = scanForISO(path, SCECdPS2DVD, &dlist_head)) >= 0) {
         count = count < 0 ? result : count + result;
     }
 
@@ -298,7 +298,7 @@ int sbProbeISO9660(const char *path, base_game_info_t *game, u32 layer1_offset)
     char buffer[6];
 
     result = -1;
-    if (game->media == 0x14) { //Only DVDs can have multiple layers.
+    if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
         if ((file = fopen(path, "rb")) != NULL) {
             if (fseek(file, layer1_offset * 2048, SEEK_SET) == 0) {
                 if ((fread(buffer, 1, sizeof(buffer), file) == sizeof(buffer)) &&
@@ -319,7 +319,7 @@ int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offse
     char buffer[6];
 
     result = -1;
-    if (game->media == 0x14) { //Only DVDs can have multiple layers.
+    if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
         if ((fd = fileXioOpen(path, O_RDONLY, 0666)) >= 0) {
             if (fileXioLseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
                 if ((fileXioRead(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
@@ -454,12 +454,12 @@ void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int 
 
     if (game->format != GAME_FORMAT_USBLD) {
         if (game->format != GAME_FORMAT_OLD_ISO) {
-            if (game->media == 0x12)
+            if (game->media == SCECdPS2CD)
                 snprintf(path, sizeof(path), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
             else
                 snprintf(path, sizeof(path), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
         } else {
-            if (game->media == 0x12)
+            if (game->media == SCECdPS2CD)
                 snprintf(path, sizeof(path), "%sCD%s%s%s", prefix, sep, game->name, game->extension);
             else
                 snprintf(path, sizeof(path), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
@@ -485,7 +485,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
 
     if (game->format != GAME_FORMAT_USBLD) {
         if (game->format == GAME_FORMAT_OLD_ISO) {
-            if (game->media == 0x12) {
+            if (game->media == SCECdPS2CD) {
                 snprintf(oldpath, sizeof(oldpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
                 snprintf(newpath, sizeof(newpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
             } else {
@@ -493,7 +493,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
                 snprintf(newpath, sizeof(newpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
             }
         } else {
-            if (game->media == 0x12) {
+            if (game->media == SCECdPS2CD) {
                 snprintf(oldpath, sizeof(oldpath), "%sCD%s%s%s", prefix, sep, game->name, game->extension);
                 snprintf(newpath, sizeof(newpath), "%sCD%s%s%s", prefix, sep, newname, game->extension);
             } else {
@@ -536,7 +536,7 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
         configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 
     configSetStr(config, CONFIG_ITEM_FORMAT, game->format != GAME_FORMAT_USBLD ? "ISO" : "UL");
-    configSetStr(config, CONFIG_ITEM_MEDIA, game->media == 0x12 ? "CD" : "DVD");
+    configSetStr(config, CONFIG_ITEM_MEDIA, game->media == SCECdPS2CD ? "CD" : "DVD");
 
     configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 

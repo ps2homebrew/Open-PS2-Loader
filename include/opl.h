@@ -55,7 +55,7 @@
 #define OPL_COMPAT_UPDATE_STAT_CONN_ERROR -2
 #define OPL_COMPAT_UPDATE_STAT_ABORTED -3
 
-#define OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS 5000
+#define OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS 10000
 
 void setErrorMessage(int strId);
 void setErrorMessageWithCode(int strId, int error);
@@ -65,7 +65,7 @@ void applyConfig(int themeID, int langID);
 void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged);
 void handleHdlSrv();
-void deinit();
+void deinit(int exception, int modeSelected);
 
 char *gBaseMCDir;
 

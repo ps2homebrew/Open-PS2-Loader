@@ -59,13 +59,8 @@ item_list_t *appGetObject(int initOnly)
 }
 
 static int appNeedsUpdate(void)
-{
-    if (appForceUpdate) {
-        appForceUpdate = 0;
-        return 1;
-    }
-
-    return 0;
+{   // Always allow the user & auto refresh to refresh the apps list.
+    return 1;
 }
 
 static int appUpdateItemList(void)
@@ -144,7 +139,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
         char filename[256];
         strncpy(filename, cur->val, sizeof(filename) - 1);
         filename[sizeof(filename) - 1] = '\0';
-        deinit(exception); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
+        deinit(exception, APP_MODE); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
         sysExecElf(filename);
     } else
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
@@ -181,6 +176,7 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return -1;
 }
 
+//This may be called, even if appInit() was not.
 static void appCleanUp(int exception)
 {
     if (appItemList.enabled) {
@@ -188,8 +184,16 @@ static void appCleanUp(int exception)
     }
 }
 
+//This may be called, even if appInit() was not.
+static void appShutdown(void)
+{
+    if (appItemList.enabled) {
+        LOG("APPSUPPORT Shutdown\n");
+    }
+}
+
 static item_list_t appItemList = {
     APP_MODE, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, &appInit, &appNeedsUpdate, &appUpdateItemList,
     &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
-    &appGetConfig, &appGetImage, &appCleanUp, NULL, APP_ICON
+    &appGetConfig, &appGetImage, &appCleanUp, &appShutdown, NULL, APP_ICON
 };

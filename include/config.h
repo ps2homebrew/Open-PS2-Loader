@@ -67,6 +67,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_OVERSCAN "overscan"
 #define CONFIG_OPL_DISABLE_DEBUG "disable_debug"
 #define CONFIG_OPL_PS2LOGO "ps2logo"
+#define CONFIG_OPL_GAME_LIST_CACHE "game_list_cache"
 #define CONFIG_OPL_EXIT_PATH "exit_path"
 #define CONFIG_OPL_AUTO_SORT "autosort"
 #define CONFIG_OPL_AUTO_REFRESH "autorefresh"

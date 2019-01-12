@@ -79,6 +79,9 @@ typedef struct
 {
     short int mode;
 
+    /// Device priority when it comes to locating art assets for apps. Higher value = lower priority. (< 0) means no support for art assets.
+    char appsPriority;
+
     char enabled;
 
     unsigned char flags;
@@ -95,6 +98,9 @@ typedef struct
 
     /// item description in localised form (used if value is not negative)
     int textId;
+
+    /// Path to applications storage on the device (set to NULL if not applicable).
+    char *appsPath;
 
     void (*itemInit)(void);
 

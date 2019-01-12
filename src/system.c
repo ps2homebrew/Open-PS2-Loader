@@ -811,9 +811,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argv[i] = gsm_config_str;
     i++;
 
-    strcpy(ElfPath, "cdrom0:\\");
-    strncat(ElfPath, filename, 11); // fix for 8+3 filename.
-    strcat(ElfPath, ";1");
+    snprintf(ElfPath, sizeof(ElfPath), "cdrom0:\\%s;1", filename);
 
     // Let's go.
     fileXioExit();

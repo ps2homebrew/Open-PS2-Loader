@@ -386,7 +386,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
 static config_set_t *appGetConfig(int id)
 {
-    config_set_t *config;
+    config_set_t *config = NULL;
 
     if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);

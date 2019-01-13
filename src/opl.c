@@ -401,14 +401,15 @@ int oplGetAppImage(char *folder, int isRelative, char *value, char *suffix, GSTE
     char priority;
     item_list_t *listSupport;
 
-    // We search on ever devices from fatest to slowest (HDD > ETH > USB)
+    // We search on every device from fastest to slowest (HDD > ETH > USB)
     for (remaining = MODE_COUNT,priority = 0; remaining > 0 && priority < 4; priority++)
     {
         for (i = 0; i < MODE_COUNT; i++)
         {
             listSupport = list_support[i].support;
 
-            if (listSupport->appsPriority == priority)
+            // If a device is disabled, listSupport will be NULL here
+            if (listSupport != NULL && listSupport->appsPriority == priority)
             {
                 if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
                     return 0;

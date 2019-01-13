@@ -39,6 +39,10 @@
 
 #include <unistd.h>
 #include <audsrv.h>
+#ifdef PADEMU
+#include <libds34bt.h>
+#include <libds34usb.h>
+#endif
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
@@ -62,8 +66,6 @@
     } while (0)
 #endif
 #endif
-
-static void RefreshAllLists(void);
 
 typedef struct
 {
@@ -104,7 +106,7 @@ static void clearIOModuleT(opl_io_module_t *mod)
 
 // forward decl
 static void clearMenuGameList(opl_io_module_t *mdl);
-static void moduleCleanup(opl_io_module_t *mod, int exception);
+static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected);
 static void reset(void);
 static void deferredAudioInit(void);
 
@@ -168,6 +170,7 @@ static void itemExecSelect(struct menu_item *curMenu)
         } else {
             support->itemInit();
             moduleUpdateMenu(support->mode, 0);
+            // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
             if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
                 ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
         }
@@ -195,10 +198,7 @@ static void itemExecCancel(struct menu_item *curMenu)
                 strncpy(newName, curMenu->current->item.text, nameLength);
                 if (guiShowKeyboard(newName, nameLength)) {
                     support->itemRename(curMenu->current->item.id, newName);
-                     if (gAutoRefresh)
-                        RefreshAllLists();
-                    else
-                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
                 }
             }
         }
@@ -249,10 +249,7 @@ static void itemExecSquare(struct menu_item *curMenu)
             if (menuCheckParentalLock() == 0) {
                 if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
                     support->itemDelete(curMenu->current->item.id);
-                    if (gAutoRefresh)
-                        RefreshAllLists();
-                    else
-                        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
                 }
             }
         }
@@ -340,10 +337,7 @@ static void initSupport(item_list_t *itemList, int startMode, int mode, int forc
             mod->support->itemInit();
             moduleUpdateMenu(mode, 0);
 
-            if (gAutoRefresh)
-                RefreshAllLists();
-            else
-                ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
+            ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
         }
     }
 }
@@ -354,22 +348,126 @@ static void initAllSupport(int force_reinit)
     initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
     initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     initSupport(elmGetObject(0), gELMStartMode, ELM_MODE, force_reinit);
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 }
 
-static void deinitAllSupport(int exception)
+static void deinitAllSupport(int exception, int modeSelected)
 {
-    moduleCleanup(&list_support[USB_MODE], exception);
-    moduleCleanup(&list_support[ETH_MODE], exception);
-    moduleCleanup(&list_support[HDD_MODE], exception);
-    moduleCleanup(&list_support[APP_MODE], exception);
-//START of OPL_DB tweaks
-    moduleCleanup(&list_support[ELM_MODE], exception);
-//END of OPL_DB tweaks
+    moduleCleanup(&list_support[USB_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[ETH_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[HDD_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
+    //START of OPL_DB tweaks
+    moduleCleanup(&list_support[ELM_MODE], exception, modeSelected);
+    //END of OPL_DB tweaks
+}
 
-    ethDeinitModules(); //Deinitialize here if the UI used network support without SMB.
+char *oplGetModeText(int mode)
+{
+    return(list_support[mode].support->textId == -1 ? list_support[mode].support->text : _l(list_support[mode].support->textId));
+}
+
+//For resolving the mode, given an app's path
+int oplPath2Mode(const char *path)
+{
+    const char *blkdevnameend;
+    int i, blkdevnamelen;
+    item_list_t *listSupport;
+
+    for (i = 0; i < MODE_COUNT; i++)
+    {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->appsPath != NULL))
+        {
+            blkdevnameend = strchr(listSupport->appsPath, ':');
+            if (blkdevnameend != NULL)
+            {
+                blkdevnamelen = (int)(blkdevnameend - listSupport->appsPath) + 1;
+
+                if (strncmp(path, listSupport->appsPath, blkdevnamelen) == 0)
+                    return listSupport->mode;
+            }
+        }
+    }
+
+    return -1;
+}
+
+int oplGetAppImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
+{
+    int i, remaining;
+    char priority;
+    item_list_t *listSupport;
+
+    // We search on ever devices from fatest to slowest (HDD > ETH > USB)
+    for (remaining = MODE_COUNT,priority = 0; remaining > 0 && priority < 4; priority++)
+    {
+        for (i = 0; i < MODE_COUNT; i++)
+        {
+            listSupport = list_support[i].support;
+
+            if (listSupport->appsPriority == priority)
+            {
+                if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
+                    return 0;
+                remaining--;
+            }
+        }
+    }
+
+    return -1;
+}
+
+int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg)
+{
+    iox_dirent_t dirent;
+    int i, fd, count, ret;
+    item_list_t *listSupport;
+    config_set_t *appConfig;
+    char dir[128];
+    char path[128];
+
+    count = 0;
+    for (i = 0; i < MODE_COUNT; i++)
+    {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->appsPath != NULL) && (listSupport->enabled))
+        {
+            if ((fd = fileXioDopen(listSupport->appsPath)) > 0)
+            {
+                while (fileXioDread(fd, &dirent) > 0)
+                {
+                    if (strcmp(dirent.name, ".") == 0 || strcmp(dirent.name, "..") == 0 || (!FIO_S_ISDIR(dirent.stat.mode)))
+                        continue;
+
+                    snprintf(dir, sizeof(dir), "%s/%s", listSupport->appsPath, dirent.name);
+                    snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
+                    appConfig = configAlloc(0, NULL, path);
+                    if (appConfig != NULL)
+                    {
+                        configRead(appConfig);
+
+                        ret = callback(dir, appConfig, arg);
+                        configFree(appConfig);
+
+                        if (ret == 0)
+                            count++;
+                        else if (ret < 0)
+                        {   //Stopped because of unrecoverable error.
+                            break;
+                        }
+                    }
+                }
+
+                fileXioDclose(fd);
+            } else
+                LOG("APPS failed to open dir %s\n", listSupport->appsPath);
+        }
+    }
+
+    return count;
 }
 
 // ----------------------------------------------------------
@@ -431,19 +529,6 @@ void menuDeferredUpdate(void *data)
     if (mod->support->itemNeedsUpdate()) {
         updateMenuFromGameList(mod);
     }
-}
-
-static void RefreshAllLists(void)
-{
-    int i;
-
-    // schedule updates of all the list handlers
-    for (i = 0; i < MODE_COUNT; i++) {
-        if (list_support[i].support && list_support[i].support->enabled)
-            ioPutRequest(IO_MENU_UPDATE_DEFFERED, &list_support[i].support->mode);
-    }
-
-    frameCounter = 0;
 }
 
 #define MENU_GENERAL_UPDATE_DELAY 60
@@ -631,6 +716,7 @@ static void _loadConfig()
 
             configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
+            configGetInt(configOPL, CONFIG_OPL_GAME_LIST_CACHE, &gGameListCache);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
             configGetInt(configOPL, CONFIG_OPL_AUTO_SORT, &gAutosort);
             configGetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, &gAutoRefresh);
@@ -646,9 +732,9 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
-//START of OPL_DB tweaks
+            //START of OPL_DB tweaks
             configGetInt(configOPL, CONFIG_OPL_ELM_MODE, &gELMStartMode);
-//END of OPL_DB tweaks
+            //END of OPL_DB tweaks
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
@@ -785,6 +871,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_OVERSCAN, gOverscan);
         configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
         configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
+        configSetInt(configOPL, CONFIG_OPL_GAME_LIST_CACHE, gGameListCache);
         configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
         configSetInt(configOPL, CONFIG_OPL_AUTO_SORT, gAutosort);
         configSetInt(configOPL, CONFIG_OPL_AUTO_REFRESH, gAutoRefresh);
@@ -800,9 +887,9 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
-//START of OPL_DB tweaks
+        //START of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
-//END of OPL_DB tweaks
+        //END of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
@@ -873,9 +960,13 @@ void applyConfig(int themeID, int langID)
     moduleUpdateMenu(ETH_MODE, changed);
     moduleUpdateMenu(HDD_MODE, changed);
     moduleUpdateMenu(APP_MODE, changed);
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     moduleUpdateMenu(ELM_MODE, changed);
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
+
+#ifdef __DEBUG
+    debugApplyConfig();
+#endif
 }
 
 int loadConfig(int types)
@@ -1179,7 +1270,8 @@ static int loadHdldSvr(void)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-    deinitAllSupport(NO_EXCEPTION);
+    //Deinitialize all support without shutting down the HDD unit.
+    deinitAllSupport(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     clearErrorMessage(); /*	At this point, an error might have been displayed (since background tasks were completed).
 					Clear it, otherwise it will get displayed after the server is closed.	*/
 
@@ -1264,22 +1356,38 @@ static void reset(void)
 #endif
 }
 
-static void moduleCleanup(opl_io_module_t *mod, int exception)
+static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
 {
     if (!mod->support)
         return;
 
-    if (mod->support->itemCleanUp)
-        mod->support->itemCleanUp(exception);
+    //Shutdown if not required anymore.
+    if ((mod->support->mode != modeSelected) && (modeSelected != IO_MODE_SELECTED_ALL))
+    {
+        if (mod->support->itemShutdown)
+            mod->support->itemShutdown();
+    } else {
+        if (mod->support->itemCleanUp)
+            mod->support->itemCleanUp(exception);
+    }
 
     clearMenuGameList(mod);
 }
 
-void deinit(int exception)
+void deinit(int exception, int modeSelected)
 {
+    if (gEnableSFX) {
+        gEnableSFX = 0;
+    }
+    audsrv_quit();
+
+#ifdef PADEMU
+    ds34usb_reset();
+    ds34bt_reset();
+#endif
     unloadPads();
 
-    deinitAllSupport(exception);
+    deinitAllSupport(exception, modeSelected);
 
     ioEnd();
     guiEnd();
@@ -1296,9 +1404,9 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[ETH_MODE]);
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     clearIOModuleT(&list_support[ELM_MODE]);
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     gBaseMCDir = "mc?:OPL";
 
@@ -1339,6 +1447,7 @@ static void setDefaults(void)
     gAutoRefresh = 0;
     gDisableDebug = 1;
     gPS2Logo = 0;
+    gGameListCache = 0;
     gEnableWrite = 0;
     gRememberLastPlayed = 0;
     gAutoStartLastPlayed = 9;
@@ -1358,7 +1467,7 @@ static void setDefaults(void)
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     gELMStartMode = START_MODE_DISABLED;
 
     gDefaultBgColor[0] = 0x000;
@@ -1376,7 +1485,7 @@ static void setDefaults(void)
     gDefaultUITextColor[0] = 0x032;
     gDefaultUITextColor[1] = 0x0ff;
     gDefaultUITextColor[2] = 0x030;
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     frameCounter = 0;
 
@@ -1469,6 +1578,10 @@ static void deferredAudioInit(void)
 // --------------------- Main --------------------
 int main(int argc, char *argv[])
 {
+#ifdef __DECI2_DEBUG
+    sysInitDECI2();
+#endif
+
     LOG_INIT();
     PREINIT_LOG("OPL GUI start!\n");
 

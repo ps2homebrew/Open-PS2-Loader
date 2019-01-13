@@ -3,7 +3,10 @@
 
 #define UL_GAME_NAME_MAX 32
 #define ISO_GAME_NAME_MAX 64
+#define ISO_GAME_EXTENSION_MAX 4
 #define GAME_STARTUP_MAX 12
+
+#define ISO_GAME_FNAME_MAX (ISO_GAME_NAME_MAX+ISO_GAME_EXTENSION_MAX)
 
 enum GAME_FORMAT {
     GAME_FORMAT_USBLD = 0,
@@ -15,22 +18,22 @@ typedef struct
 {
     char name[ISO_GAME_NAME_MAX + 1]; // MUST be the higher value from UL / ISO
     char startup[GAME_STARTUP_MAX + 1];
-    char extension[5];
-    unsigned char parts;
-    unsigned char media;
-    unsigned short format;
-    int sizeMB;
+    char extension[ISO_GAME_EXTENSION_MAX + 1];
+    u8 parts;
+    u8 media;
+    u8 format;
+    u32 sizeMB;
 } base_game_info_t;
 
 typedef struct
 {
-    unsigned char name[UL_GAME_NAME_MAX];
-    unsigned char startup[15];
-    unsigned char parts;
-    unsigned char media; //Disc type
-    unsigned char unknown[4];
-    unsigned char Byte08; //Always 0x08
-    unsigned char unknown2[10];
+    char name[UL_GAME_NAME_MAX];
+    char startup[15];
+    u8 parts;
+    u8 media; //Disc type
+    u8 unknown[4];
+    u8 Byte08; //Always 0x08
+    u8 unknown2[10];
 } USBExtreme_game_entry_t;
 
 int sbIsSameSize(const char *prefix, int prevSize);

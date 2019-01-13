@@ -481,10 +481,9 @@ int Skip_Videos_sceMpegIsEnd(void)
         return 0;
 }
 
-static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres,
-int fno)
+static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres)
 {
-    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres, int fno);
+    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres);
     void *(*pSifAllocIopHeap)(int size);
     int (*pSifFreeIopHeap)(void *addr);
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
@@ -521,7 +520,7 @@ int fno)
             pSifLoadModuleBuffer = NULL;
     }
 
-    ret = _pSifLoadModule(path, arg_len, args, modres, fno);
+    ret = _pSifLoadModule(path, arg_len, args, modres);
 
     if((ret >= 0) && (_pSifLoadModule != NULL) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0))
     {

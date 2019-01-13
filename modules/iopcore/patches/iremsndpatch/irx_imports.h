@@ -17,6 +17,7 @@
 #include "irx.h"
 
 /* Please keep these in alphabetical order!  */
+#include <intrman.h>
 #include <loadcore.h>
 #include <thbase.h>
 #include <thsemap.h>

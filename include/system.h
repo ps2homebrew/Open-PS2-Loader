@@ -12,12 +12,15 @@ int sysGetDiscID(char *discID);
 void sysInitDev9(void);
 void sysShutdownDev9(void);
 void sysReset(int modload_mask);
-void sysExecExit();
+void sysExecExit(void);
 void sysPowerOff(void);
+#ifdef __DECI2_DEBUG
+int sysInitDECI2(void);
+#endif
 
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags);
+void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags);
 
-int sysExecElf(char *path);
+int sysExecElf(const char *path);
 //START of OPL_DB tweaks
 int sysExecElfWithParam(char *path,char *param);
 //END of OPL_DB tweaks

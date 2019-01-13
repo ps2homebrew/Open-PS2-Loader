@@ -113,8 +113,8 @@ static const patchlist_t patch_list[] = {
     {"SLUS_217.80", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcb0, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (NTSC-U/C)
     {"SLUS_201.99", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-U/C)
     {"SLES_504.00", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL)
-    {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French) - Untested
-    {"SLES_504.02", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL German) - Untested
+    {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French)
+    {"SLES_504.02", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL German)
     {"SLPM_651.98", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-J) - Untested
     {"SLUS_204.13", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000001, 0x00000000}},       // Shadow Man: 2econd Coming (NTSC-U/C)
     {"SLES_504.46", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000002, 0x00000000}},       // Shadow Man: 2econd Coming (PAL)

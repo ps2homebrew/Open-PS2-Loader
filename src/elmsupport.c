@@ -526,9 +526,6 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 		   
 			fileOnly++;
 			
-			//char fileWithoutExt[256];
-			//strncpy(fileWithoutExt,fileOnly,strlen(fileOnly) -4);
-			//fileWithoutExt[strlen(fileOnly) -4] = '\0';
 			fileOnly[strlen(fileOnly)-4] = '\0';
 			
 			LOG("fileOnly= %s\n",fileOnly);
@@ -538,7 +535,14 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 			LOG("memPath = %s\n",memPath);
 			LOG("params = %s\n",params);
 
-			deinit(); // CAREFUL: deinit will call elmCleanUp, so configElm/cur will be freed
+			//To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
+			int mode = oplPath2Mode(cur->file);
+			if (mode < 0) {
+					mode = ELM_MODE;
+					LOG("ELMSUPPORT warning: cannot find mode for path: %s\n", cur->file);
+			}
+				
+			deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call elmCleanUp, so configElm/cur will be freed
 			sysExecElfWithParam(memPath,params);
 		}else{
 			char error[256];
@@ -643,8 +647,18 @@ static void elmCleanUp(int exception) {
 	}
 }
 
+//This may be called, even if appInit() was not.
+static void appShutdown(void)
+{
+    if (elmItemList.enabled) {
+        LOG("ELMSUPPORT Shutdown\n");
+
+        elmGameListFree();
+    }
+}
+
 static item_list_t elmItemList = {
-		ELM_MODE, 0, MODE_FLAG_NO_COMPAT|MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", _STR_ELM, &elmInit, &elmNeedsUpdate,	&elmUpdateItemList,
+		ELM_MODE, -1, 0, MODE_FLAG_NO_COMPAT|MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", _STR_ELM, NULL, &elmInit, &elmNeedsUpdate,	&elmUpdateItemList,
 		&elmGetItemCount, NULL, &elmGetItemName, &elmGetItemNameLength, &elmGetItemStartup, &elmDeleteItem, &elmRenameItem, &elmLaunchItem,
-		&elmGetConfig, &elmGetImage, &elmCleanUp, NULL, ELM_ICON
+		&elmGetConfig, &elmGetImage, &elmCleanUp, &appShutdown, NULL, ELM_ICON
 };

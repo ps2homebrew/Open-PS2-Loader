@@ -5,7 +5,6 @@
 #include "include/themes.h"
 #include "include/system.h"
 #include "include/ioman.h"
-#include "include/util.h"
 
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
@@ -18,17 +17,9 @@ static int appForceUpdate = 1;
 static int appItemCount = 0;
 
 static config_set_t *configApps;
-static app_info_t *appsList;
-
-struct app_info_linked {
-    struct app_info_linked *next;
-    app_info_t app;
-};
 
 // forward declaration
 static item_list_t appItemList;
-
-static void appFreeList(void);
 
 static struct config_value_t *appGetConfigValue(int id)
 {
@@ -60,7 +51,6 @@ void appInit(void)
     appForceUpdate = 1;
     configGetInt(configGetByType(CONFIG_OPL), "app_frames_delay", &appItemList.delay);
     configApps = configGetByType(CONFIG_APPS);
-    appsList = NULL;
     appItemList.enabled = 1;
 }
 
@@ -72,121 +62,13 @@ item_list_t *appGetObject(int initOnly)
 }
 
 static int appNeedsUpdate(void)
-{   // Always allow the user & auto refresh to refresh the apps list.
-    return 1;
-}
-
-static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
 {
-    struct config_value_t *cur;
-    struct app_info_linked *app;
-    int count;
-
-    configClear(configApps);
-    configRead(configApps);
-
-    count = 0;
-    cur = configApps->head;
-    while (cur != NULL)
-    {
-        if (*appsLinkedList == NULL)
-        {
-            *appsLinkedList = malloc(sizeof(struct app_info_linked));
-            app = *appsLinkedList;
-            app->next = NULL;
-        }
-        else
-        {
-            app = malloc(sizeof(struct app_info_linked));
-            if (app != NULL) {
-              app->next = *appsLinkedList;
-              *appsLinkedList = app;
-            }
-        }
-
-        if (app == NULL)
-        {
-            LOG("APPSUPPORT unable to allocate memory.\n");
-            break;
-        }
-
-        strncpy(app->app.title, cur->key, APP_TITLE_MAX + 1);
-        app->app.title[APP_TITLE_MAX] = '\0';
-
-        //Split the boot filename from the path.
-        const char *elfname = appGetELFName(cur->val);
-        if (elfname != cur->val) {
-            strncpy(app->app.boot, elfname, APP_BOOT_MAX + 1);
-            app->app.boot[APP_BOOT_MAX] = '\0';
-
-            int pathlen = (int)(elfname - cur->val) - 1;
-            if (cur->val[pathlen] == ':') //Discard only '/'.
-                pathlen++;
-            if (pathlen > APP_PATH_MAX)
-                pathlen = APP_PATH_MAX;
-            strncpy(app->app.path, cur->val, pathlen);
-            app->app.path[pathlen] = '\0';
-        } else {
-            //Cannot split boot filename from the path, somehow.
-            strncpy(app->app.boot, cur->val, APP_BOOT_MAX + 1);
-            app->app.boot[APP_BOOT_MAX] = '\0';
-            strncpy(app->app.path, cur->val, APP_PATH_MAX + 1);
-            app->app.path[APP_BOOT_MAX] = '\0';
-        }
-
-        app->app.legacy = 1;
-        count++;
-        cur = cur->next;
-    }
-
-    return count;
-}
-
-static int appScanCallback(const char *path, config_set_t *appConfig, void *arg)
-{
-    struct app_info_linked **appsLinkedList = (struct app_info_linked **)arg;
-    struct app_info_linked *app;
-    const char *title, *boot;
-
-    if (configGetStr(appConfig, APP_CONFIG_TITLE, &title) != 0
-       && configGetStr(appConfig, APP_CONFIG_BOOT, &boot) != 0)
-    {
-        if (*appsLinkedList == NULL)
-        {
-            *appsLinkedList = malloc(sizeof(struct app_info_linked));
-            app = *appsLinkedList;
-            app->next = NULL;
-        }
-        else
-        {
-            app = malloc(sizeof(struct app_info_linked));
-            if (app != NULL)
-            {
-              app->next = *appsLinkedList;
-              *appsLinkedList = app;
-            }
-        }
-
-        if (app == NULL)
-        {
-            LOG("APPSUPPORT unable to allocate memory.\n");
-            return -1;
-        }
-
-        strncpy(app->app.title, title, APP_TITLE_MAX+1);
-        app->app.title[APP_TITLE_MAX] = '\0';
-        strncpy(app->app.boot, boot, APP_BOOT_MAX+1);
-        app->app.boot[APP_BOOT_MAX] = '\0';
-        strncpy(app->app.path, path, APP_PATH_MAX+1);
-        app->app.path[APP_PATH_MAX] = '\0';
-        app->app.legacy = 0;
-        return 0;
-    } else {
-        LOG("APPSUPPORT item has no boot/title.\n");
+    if (appForceUpdate) {
+        appForceUpdate = 0;
         return 1;
     }
 
-    return -1;
+    return 0;
 }
 
 //START of OPL_DB tweaks
@@ -237,57 +119,14 @@ static int appUpdateItemList(void) {
 
 	//Count apps
  //END of OPL_DB tweaks
-
-static int appUpdateItemList(void)
-{
-    struct app_info_linked *appsLinkedList, *appNext;
-    int i;
-
-    appFreeList();
-
-    appsLinkedList = NULL;
-
-    //Get legacy apps list first, so it is possible to use appGetConfigValue(id).
-    appItemCount += addAppsLegacyList(&appsLinkedList);
-
-    //Scan devices for apps.
-    appItemCount += oplScanApps(&appScanCallback, &appsLinkedList);
-
-    // Generate apps list
-    if (appItemCount > 0)
-    {
-        appsList = malloc(appItemCount * sizeof(app_info_t));
-
-        if (appsList != NULL)
-        {
-            for (i = 0; appsLinkedList != NULL; i++)
-            {   //appsLinkedList contains items in reverse order.
-                memcpy(&appsList[appItemCount - i - 1], &appsLinkedList->app, sizeof(app_info_t));
-
-                appNext = appsLinkedList->next;
-                free(appsLinkedList);
-                appsLinkedList = appNext;
-            }
-        }
-        else
-        {
-            LOG("APPSUPPORT unable to allocate memory.\n");
-            appItemCount = 0;
+   if (configApps->head) {
+        struct config_value_t *cur = configApps->head;
+        while (cur) {
+            cur = cur->next;
+            appItemCount++;
         }
     }
-
-    LOG("APPSUPPORT %d apps loaded\n", appItemCount);
-
     return appItemCount;
-}
-
-static void appFreeList(void)
-{
-    if (appsList != NULL)
-    {
-        appsList = NULL;
-        appItemCount = 0;
-    }
 }
 
 static int appGetItemCount(void)
@@ -297,100 +136,60 @@ static int appGetItemCount(void)
 
 static char *appGetItemName(int id)
 {
-    return appsList[id].title;
+    struct config_value_t *cur = appGetConfigValue(id);
+    return cur->key;
 }
 
 static int appGetItemNameLength(int id)
 {
-    return CONFIG_KEY_NAME_LEN;
+    return 32;
 }
 
 static char *appGetItemStartup(int id)
 {
-    if (appsList[id].legacy)
-    {
-        struct config_value_t *cur = appGetConfigValue(id);
-        return cur->val;
-    } else {
-        int mode;
-
-        mode = oplPath2Mode(appsList[id].path);
-        if (mode < 0) {
-            LOG("APPSUPPORT: cannot find mode for path: %s\n", filename);
-            return "";
-        }
-        
-        return oplGetModeText(mode);
-    }
+    struct config_value_t *cur = appGetConfigValue(id);
+    return appGetELFName(cur->val);
 }
 
 static void appDeleteItem(int id)
 {
-    if (appsList[id].legacy)
-    {
-        struct config_value_t *cur = appGetConfigValue(id);
-        fileXioRemove(cur->val);
-        cur->key[0] = '\0';
-        configApps->modified = 1;
-        configWrite(configApps);
-    } else {
-        sysDeleteFolder(appsList[id].path);
-    }
+    struct config_value_t *cur = appGetConfigValue(id);
+    fileXioRemove(cur->val);
+    cur->key[0] = '\0';
+    configApps->modified = 1;
+    configWrite(configApps);
 
     appForceUpdate = 1;
 }
 
 static void appRenameItem(int id, char *newName)
 {
+    struct config_value_t *cur = appGetConfigValue(id);
+
     char value[256];
-
-    if (appsList[id].legacy)
-    {
-        struct config_value_t *cur = appGetConfigValue(id);
-
-        strncpy(value, cur->val, sizeof(value));
-        configRemoveKey(configApps, cur->key);
-        configSetStr(configApps, newName, value);
-        configWrite(configApps);
-    } else {
-        config_set_t *appConfig;
-
-        snprintf(value, sizeof(value), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
-
-        appConfig = configAlloc(0, NULL, value);
-        if (appConfig != NULL)
-        {
-            configRead(appConfig);
-            configSetStr(appConfig, APP_CONFIG_TITLE, newName);
-            configWrite(appConfig);
-
-            configFree(appConfig);
-       }
-    }
+    strncpy(value, cur->val, sizeof(value));
+    configRemoveKey(configApps, cur->key);
+    configSetStr(configApps, newName, value);
+    configWrite(configApps);
 
     appForceUpdate = 1;
 }
 
 static void appLaunchItem(int id, config_set_t *configSet)
 {
-    int mode, fd;
-    const char *filename;
-
-    //Retrieve configuration set by appGetConfig()
-    configGetStr(configSet, CONFIG_ITEM_STARTUP, &filename);
-
-    fd = fileXioOpen(filename, O_RDONLY);
+    struct config_value_t *cur = appGetConfigValue(id);
+    int fd = fileXioOpen(cur->val, O_RDONLY, 0666);
     if (fd >= 0) {
         fileXioClose(fd);
 
-        //To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
-        mode = oplPath2Mode(filename);
-        if (mode < 0) {
-            mode = APP_MODE;
-            LOG("APPSUPPORT warning: cannot find mode for path: %s\n", filename);
-        }
+        int exception = NO_EXCEPTION;
+        if (strncmp(cur->val, "pfs0:", 5) == 0)
+            exception = UNMOUNT_EXCEPTION;
 
-        deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
+        char filename[256];
+        strncpy(filename, cur->val, sizeof(filename) - 1);
+        filename[sizeof(filename) - 1] = '\0';
+        deinit(exception); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
         sysExecElf(filename);
     } else
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
@@ -454,26 +253,13 @@ static config_set_t* appGetConfig(int id) {
 	}
 	
 //END of OPL_DB tweaks
-
-static config_set_t *appGetConfig(int id)
-{
-    config_set_t *config = configAlloc(0, NULL, NULL);
-    if (appsList[id].legacy) {
-        struct config_value_t *cur = appGetConfigValue(id);
-        configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
-        configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
-        configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
-        //START of OPL_DB tweaks
-        configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
-        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
-        //END of OPL_DB tweaks
-    } else {
-        char path[256];
-        configSetStr(config, CONFIG_ITEM_NAME, appsList[id].boot);
-        configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
-        snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);
-        configSetStr(config, CONFIG_ITEM_STARTUP, path);
-    }
+    configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
+    configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
+    configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
+//START of OPL_DB tweaks
+	configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
+	configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
+//END of OPL_DB tweaks
     return config;
 }
 
@@ -483,31 +269,32 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
     //value = appGetELFName(value);
     // Search every device from fastest to slowest (HDD > ETH > USB)
 //END of OPL_DB tweaks
-    return oplGetAppImage(folder, isRelative, appGetELFName(value), suffix, resultTex, psm);
+    static item_list_t *listSupport = NULL;
+    if ((listSupport = hddGetObject(1))) {
+        if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
+            return 0;
+    }
+
+    if ((listSupport = ethGetObject(1))) {
+        if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
+            return 0;
+    }
+
+    if ((listSupport = usbGetObject(1)))
+        return listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm);
+
+    return -1;
 }
 
-//This may be called, even if appInit() was not.
 static void appCleanUp(int exception)
 {
     if (appItemList.enabled) {
         LOG("APPSUPPORT CleanUp\n");
-
-        appFreeList();
-    }
-}
-
-//This may be called, even if appInit() was not.
-static void appShutdown(void)
-{
-    if (appItemList.enabled) {
-        LOG("APPSUPPORT Shutdown\n");
-
-        appFreeList();
     }
 }
 
 static item_list_t appItemList = {
-    APP_MODE, -1, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, NULL, &appInit, &appNeedsUpdate, &appUpdateItemList,
+    APP_MODE, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, &appInit, &appNeedsUpdate, &appUpdateItemList,
     &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
-    &appGetConfig, &appGetImage, &appCleanUp, &appShutdown, NULL, APP_ICON
+    &appGetConfig, &appGetImage, &appCleanUp, NULL, APP_ICON
 };

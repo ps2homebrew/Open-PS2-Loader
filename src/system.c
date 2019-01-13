@@ -4,10 +4,6 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
-#ifdef __DECI2_DEBUG
-#include <iopcontrol_special.h>
-#endif
-
 #include "include/opl.h"
 #include "include/gui.h"
 #include "include/ethsupport.h"
@@ -127,7 +123,7 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
 #define OPL_SIF_CMD_BUFF_SIZE 1
 static SifCmdHandlerData_t OplSifCmdbuffer[OPL_SIF_CMD_BUFF_SIZE];
-static unsigned char dev9Initialized = 0, dev9Loaded = 0, dev9InitCount = 0;
+static unsigned char dev9Initialized = 0, dev9Loaded = 0;
 
 void sysInitDev9(void)
 {
@@ -137,25 +133,6 @@ void sysInitDev9(void)
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
         dev9Loaded = (ret == 0);  //DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
-    }
-
-    dev9InitCount++;
-}
-
-void sysShutdownDev9(void)
-{
-    if (dev9InitCount > 0)
-    {
-        --dev9InitCount;
-
-        if (dev9InitCount == 0)
-        {   /* Switch off DEV9 once nothing needs it. */
-            if (dev9Loaded)
-            {
-                while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
-                };
-            }
-        }
     }
 }
 
@@ -176,13 +153,8 @@ void sysReset(int modload_mask)
     while (!SifIopReset("rom0:UDNL", 0))
         ;
 #else
-#ifdef __DECI2_DEBUG
-    while (!SifIopRebootBuffer(&deci2_img, size_deci2_img))
-        ;
-#else
     while (!SifIopReset("", 0))
         ;
-#endif
 #endif
 
     dev9Initialized = 0;
@@ -263,7 +235,25 @@ void sysReset(int modload_mask)
 
 void sysPowerOff(void)
 {
-    deinit(NO_EXCEPTION, IO_MODE_SELECTED_NONE);
+    int i;
+
+    deinit(NO_EXCEPTION);
+    if (dev9Loaded)
+    {
+        /* Close all files */
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+        /* Switch off DEV9 */
+        while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
+        };
+    }
+
+    // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
+    for (i = 0; i < MAX_USB_DEVICES; i++) {
+        char device[7];
+        sprintf(device, "mass%d:", i);
+        fileXioDevctl(device, USBMASS_DEVCTL_STOP_UNIT, NULL, 0, NULL, 0);
+    }
+
     poweroffShutdown();
 }
 
@@ -344,14 +334,18 @@ int sysGetDiscID(char *hexDiscID)
     return 1;
 }
 
-void sysExecExit(void)
+void sysExecExit()
 {
+#ifdef PADEMU
+    ds34usb_reset();
+    ds34bt_reset();
+#endif
     if (gEnableSFX) {
         //wait 70ms for confirm sound to finish playing before exit
         guiDelay(0070);
+        gEnableSFX = 0;
     }
-    //Deinitialize without shutting down active devices.
-    deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
+    audsrv_quit();
     Exit(0);
 }
 
@@ -500,10 +494,10 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 #ifdef __INGAME_DEBUG
 #ifdef __DECI2_DEBUG
     if (modules & CORE_IRX_DECI2) {
-        irxptr_tab[modcount].info = size_drvtif_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
-        irxptr_tab[modcount++].ptr = (void *)&drvtif_ingame_irx;
-        irxptr_tab[modcount].info = size_tifinet_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
-        irxptr_tab[modcount++].ptr = (void *)&tifinet_ingame_irx;
+        irxptr_tab[modcount].info = size_drvtif_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
+        irxptr_tab[modcount++].ptr = (void *)&drvtif_irx;
+        irxptr_tab[modcount].info = size_tifinet_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
+        irxptr_tab[modcount++].ptr = (void *)&tifinet_irx;
     }
 #else
     if (modules & CORE_IRX_DEBUG) {
@@ -602,21 +596,6 @@ static int ResetDECI2(void)
 
     return result;
 }
-
-int sysInitDECI2(void)
-{
-    int result;
-
-    DI();
-    ee_kmode_enter();
-
-    result = ResetDECI2();
-
-    ee_kmode_exit();
-    EI();
-
-    return result;
-}
 #endif
 
 /*  Returns the patch location of LoadExecPS2(), which resides in kernel memory.
@@ -701,7 +680,7 @@ static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void
     return((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
 }
 
-void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
+void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
     void *ModuleStorage, *ModuleStorageEnd;
@@ -799,7 +778,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argv[i] = ModStorageConfig;
     i++;
 
-    argv[i] = (char*)filename;
+    argv[i] = filename;
     i++;
 
     char cmask[10];
@@ -811,7 +790,18 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argv[i] = gsm_config_str;
     i++;
 
-    snprintf(ElfPath, sizeof(ElfPath), "cdrom0:\\%s;1", filename);
+    strcpy(ElfPath, "cdrom0:\\");
+    strncat(ElfPath, filename, 11); // fix for 8+3 filename.
+    strcat(ElfPath, ";1");
+
+#ifdef PADEMU
+    ds34usb_reset();
+    ds34bt_reset();
+#endif
+    if (gEnableSFX) {
+        gEnableSFX = 0;
+    }
+    audsrv_quit();
 
     // Let's go.
     fileXioExit();
@@ -832,7 +822,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     }
 }
 
-int sysExecElf(const char *path)
+int sysExecElf(char *path)
 {
     u8 *boot_elf = NULL;
     elf_header_t *eh;
@@ -871,7 +861,7 @@ int sysExecElf(const char *path)
     fileXioExit();
     SifExitRpc();
 
-    elf_argv[0] = (char*)path;
+    elf_argv[0] = path;
 
     FlushCache(0);
     FlushCache(2);

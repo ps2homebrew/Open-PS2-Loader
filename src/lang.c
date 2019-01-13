@@ -278,7 +278,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Sound Effects Volume",
     "Boot Sound Volume",
     "Confirm video mode change?",
-    "Cache Game List",
     //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

@@ -43,7 +43,6 @@ typedef struct
 #define PATCH_SOS 0x30303030
 #define PATCH_ULT_PRO_PINBALL 0xBA11BA11
 #define PATCH_FERRARI_CHALLENGE 0x0012FCC8
-#define PATCH_PRO_SNOWBOARDER 0x01020199
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -108,13 +107,7 @@ static const patchlist_t patch_list[] = {
     {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
     {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
     {"SLES_535.08", ALL_MODE, {PATCH_ULT_PRO_PINBALL, 0x00000000, 0x00000000}},    // Ultimate Pro Pinball
-    {"SLES_552.94", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcc8, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (PAL)
-    {"SLUS_217.80", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcb0, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (NTSC-U/C)
-    {"SLUS_201.99", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-U/C)
-    {"SLES_504.00", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL)
-    {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French) - Untested
-    {"SLES_504.02", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL German) - Untested
-    {"SLPM_651.98", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-J) - Untested
+    {"SLES_552.94", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x00000000, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -685,47 +678,10 @@ static void UltProPinballPatch(const char *path)
     }
 }
 
-static void FerrariChallengePatch(u32 addr)
+static void FerrariChallengePatch(void)
 {   //Ferrari Challenge has the main thread ID hardcoded for a call to WakeupThread().
-    // addiu $a0, $zero, 1
     //This breaks when the thread IDs change after IGR is used.
-    *(vu16*)addr = (u16)GetThreadId();
-}
-
-static void ProSnowboarderPatch(void)
-{   //Shaun Palmer's Pro Snowboarder incorrectly uses the main thread ID as the priority, causing a deadlock when the main thread ID changes (ID != priority)
-    //Replace all jal GetThreadId() with a li $v0, 1, whereby 1 is the main thread's priority (never changed by game).
-    static const unsigned int pattern[] = {
-        0x240300ff, //addiu $v1, $zero, 0xff
-        0x3c038080, //li $v0, 0x8080
-        0x34638081, //ori $v1, $v1, 0x8181
-        0x00650018, //mult $v1, $a1
-    };
-    static const unsigned int pattern_mask[] = {
-        0xffffffff,
-        0xffffffff,
-        0xffffffff,
-        0xffffffff};
-    u32 *ptr, *ptr2, *ptr3;
-
-    //Locate the calls to GetThreadId().
-    ptr = find_pattern_with_mask((u32 *)0x00180000, 0x00280000, pattern, pattern_mask, sizeof(pattern));
-    if (ptr)
-    {
-        ptr2 = find_pattern_with_mask(ptr+4, 0x00280000, pattern, pattern_mask, sizeof(pattern));
-
-        if (ptr2)
-        {
-            ptr3 = find_pattern_with_mask(ptr2+4, 0x00280000, pattern, pattern_mask, sizeof(pattern));
-
-            if (ptr3)
-            {
-                *(vu32*)&ptr[-12] = 0x24020001; //addiu $v0, $zero, 1
-                *(vu32*)&ptr2[-9] = 0x24020001; //addiu $v0, $zero, 1
-                *(vu32*)&ptr3[-9] = 0x24020001; //addiu $v0, $zero, 1
-            }
-        }
-    }
+    *(vu16*)0x0012fcc8 = (u16)GetThreadId();
 }
 
 void apply_patches(const char *path)
@@ -773,10 +729,7 @@ void apply_patches(const char *path)
                     UltProPinballPatch(path);
                     break;
                 case PATCH_FERRARI_CHALLENGE:
-                    FerrariChallengePatch(p->patch.val);
-                    break;
-                case PATCH_PRO_SNOWBOARDER:
-                    ProSnowboarderPatch();
+                    FerrariChallengePatch();
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

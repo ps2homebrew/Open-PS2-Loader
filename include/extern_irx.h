@@ -88,6 +88,9 @@ extern int size_nbns_irx;
 extern void *netman_irx;
 extern int size_netman_irx;
 
+extern void *f2techioppatch_irx;
+extern int size_f2techioppatch_irx;
+
 extern void *padman_irx;
 extern int size_padman_irx;
 

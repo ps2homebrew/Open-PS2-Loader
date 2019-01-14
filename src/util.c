@@ -50,7 +50,12 @@ static void writeMCIcon(void)
 
 static int checkMC()
 {
+    int dummy, ret;
+
     if (mcID == -1) {
+        mcGetInfo(0, 0, &dummy, &dummy, &dummy);
+        mcSync(0, NULL, &ret);
+
         int fd = fileXioDopen("mc0:OPL");
         if (fd < 0) {
             fd = fileXioDopen("mc1:OPL");

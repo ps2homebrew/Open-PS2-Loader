@@ -57,7 +57,7 @@ OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERS
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
 		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
-		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o
+		appsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o ps2cnf.o
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
@@ -73,7 +73,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o \
 		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
-		iremsndpatch.o apemodpatch.o \
+		iremsndpatch.o apemodpatch.o f2techioppatch.o \
 		libsd.o audsrv.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
@@ -241,6 +241,8 @@ clean:
 	$(MAKE) -C modules/iopcore/patches/iremsndpatch clean
 	echo "   -apemod"
 	$(MAKE) -C modules/iopcore/patches/apemodpatch clean
+	echo "   -f2techiop"
+	$(MAKE) -C modules/iopcore/patches/f2techioppatch clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
 	echo " -usbhdfsdfsv"
@@ -402,6 +404,13 @@ modules/iopcore/patches/apemodpatch/apemodpatch.irx: modules/iopcore/patches/ape
 
 $(EE_ASM_DIR)apemodpatch.s: modules/iopcore/patches/apemodpatch/apemodpatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ apemodpatch_irx
+
+modules/iopcore/patches/f2techioppatch/f2techioppatch.irx: modules/iopcore/patches/f2techioppatch
+	echo " -f2techiop patch"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)f2techioppatch.s: modules/iopcore/patches/f2techioppatch/f2techioppatch.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ f2techioppatch_irx
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"

@@ -92,6 +92,8 @@ void lngEnd();
 void thmEnd();
 void rmEnd();
 
+static void poweroffHandler(void *arg);
+
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 {
 
@@ -259,6 +261,12 @@ void sysReset(int modload_mask)
 
     fileXioInit();
     poweroffInit();
+    poweroffSetCallback(&poweroffHandler, NULL);
+}
+
+static void poweroffHandler(void *arg)
+{
+    sysPowerOff();
 }
 
 void sysPowerOff(void)

@@ -760,8 +760,13 @@ static int ethCheckVMC(char *name, int createSize)
     return sysCheckVMC(ethPrefix, "\\", name, createSize, NULL);
 }
 
+static void smbGetAppsPath(char *path, int max)
+{
+    snprintf(path, max, "%s/APPS", gETHPrefix);
+}
+
 static item_list_t ethGameList = {
-    ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, "smb0:/APPS", &ethInit, &ethNeedsUpdate,
+    ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &smbGetAppsPath, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
     &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, ETH_ICON
 };

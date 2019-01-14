@@ -444,7 +444,6 @@ static config_set_t *appGetConfig(int id)
             config = configAlloc(0, NULL, NULL);
         }
         //END of OPL_DB tweaks
-        config = configAlloc(0, NULL, NULL);
         configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
         configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);

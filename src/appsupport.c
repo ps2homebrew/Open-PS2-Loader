@@ -81,6 +81,7 @@ static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
     struct config_value_t *cur;
     struct app_info_linked *app;
     int count;
+    //START of OPL_DB tweaks
     char path[256];
 	static item_list_t *listSupport = NULL;
 	int ret=0; //Return from configRead
@@ -121,6 +122,7 @@ static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
 		configApps = configAlloc(CONFIG_APPS, NULL, path);
 		ret = configRead(configApps);
 	}
+	//END of OPL_DB tweaks
 
     count = 0;
     cur = configApps->head;
@@ -393,8 +395,8 @@ static config_set_t *appGetConfig(int id)
     if (appsList[id].legacy) {
         config = configAlloc(0, NULL, NULL);
         struct config_value_t *cur = appGetConfigValue(id);
-        static item_list_t *listSupport = NULL;
         //START of OPL_DB tweaks
+        static item_list_t *listSupport = NULL;
         int ret=0;
 
         //Search on HDD, SMB, USB for the CFG/GAME.ELF.CFG file.

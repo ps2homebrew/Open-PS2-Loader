@@ -56,25 +56,34 @@ static void _iSetEvent(void)
 int _start(int argc, char **argv)
 {
     lc_internals_t *lc;
-    ModuleInfo_t *m, *prevM;
+    ModuleInfo_t *m, *secondLastMod, *lastMod;
     iop_sema_t sema;
     iop_event_t event;
-    int OldState;
+    int OldState, HighestID;
 
     lc = GetLoadcoreInternalData();
 
-    //Locate the last-registered module.
+    //Locate the 2nd last-registered module, which is the module loaded before this.
     m = lc->image_info;
-    prevM = NULL;
-    while(m != NULL)
+    lastMod = NULL;
+    secondLastMod = NULL;
+    HighestID = -1;
+    while (m != NULL)
     {
-      prevM = m;
-      m = m->next;
-    }
-    m = prevM;
+        if (HighestID < m->id)
+        {
+            HighestID = m->id;
+            secondLastMod = lastMod;
+            lastMod = m;
+        }
 
-    if (m != NULL)
+        m = m->next;
+    }
+
+    if (secondLastMod != NULL)
     {
+        m = secondLastMod;
+
         sema.initial = 1;
         sema.max = 1;
         sema.option = 0;

@@ -44,6 +44,7 @@ typedef struct
 #define PATCH_ULT_PRO_PINBALL 0xBA11BA11
 #define PATCH_FERRARI_CHALLENGE 0x0012FCC8
 #define PATCH_PRO_SNOWBOARDER 0x01020199
+#define PATCH_SHADOW_MAN_2 0x01020413
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -112,9 +113,12 @@ static const patchlist_t patch_list[] = {
     {"SLUS_217.80", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcb0, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (NTSC-U/C)
     {"SLUS_201.99", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-U/C)
     {"SLES_504.00", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL)
-    {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French) - Untested
-    {"SLES_504.02", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL German) - Untested
+    {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French)
+    {"SLES_504.02", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL German)
     {"SLPM_651.98", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-J) - Untested
+    {"SLUS_204.13", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000001, 0x00000000}},       // Shadow Man: 2econd Coming (NTSC-U/C)
+    {"SLES_504.46", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000002, 0x00000000}},       // Shadow Man: 2econd Coming (PAL)
+    {"SLES_506.08", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000003, 0x00000000}},       // Shadow Man: 2econd Coming (PAL German)
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -477,10 +481,9 @@ int Skip_Videos_sceMpegIsEnd(void)
         return 0;
 }
 
-static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres,
-int fno)
+static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres)
 {
-    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres, int fno);
+    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres);
     void *(*pSifAllocIopHeap)(int size);
     int (*pSifFreeIopHeap)(void *addr);
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
@@ -517,7 +520,7 @@ int fno)
             pSifLoadModuleBuffer = NULL;
     }
 
-    ret = _pSifLoadModule(path, arg_len, args, modres, fno);
+    ret = _pSifLoadModule(path, arg_len, args, modres);
 
     if((ret >= 0) && (_pSifLoadModule != NULL) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0))
     {
@@ -728,6 +731,93 @@ static void ProSnowboarderPatch(void)
     }
 }
 
+static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const char *args)
+{
+    int (*pSifLoadModule)(const char *path, int arg_len, const char *args);
+    void *(*pSifAllocIopHeap)(int size);
+    int (*pSifFreeIopHeap)(void *addr);
+    int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
+    void *iopmem;
+    SifDmaTransfer_t sifdma;
+    int dma_id, ret;
+    void *f2techioppatch_irx;
+    unsigned int f2techioppatch_irx_size;
+
+    switch(g_mode)
+    {
+        case 1: //NTSC-U/C
+            pSifLoadModule = (void*)0x00234188;
+            pSifAllocIopHeap = (void*)0x239df0;
+            pSifFreeIopHeap = (void*)0x239f58;
+            pSifLoadModuleBuffer = (void*)0x00233f20;
+            break;
+        case 2: //PAL
+            pSifLoadModule = (void*)0x002336c8;
+            pSifAllocIopHeap = (void*)0x00239330;
+            pSifFreeIopHeap = (void*)0x00239498;
+            pSifLoadModuleBuffer = (void*)0x00233460;
+            break;
+        case 3: //PAL German
+            pSifLoadModule = (void*)0x00233588;
+            pSifAllocIopHeap = (void*)0x002391f0;
+            pSifFreeIopHeap = (void*)0x00239358;
+            pSifLoadModuleBuffer = (void*)0x00233320;
+            break;
+        default:
+            pSifLoadModule = NULL;
+            pSifAllocIopHeap = NULL;
+            pSifFreeIopHeap = NULL;
+            pSifLoadModuleBuffer = NULL;
+            //Should not happen.
+            asm volatile("break\n");
+    }
+
+    ret = pSifLoadModule(path, arg_len, args);
+
+    if (ret >= 0)
+    {
+        GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &f2techioppatch_irx, &f2techioppatch_irx_size);
+
+        iopmem = pSifAllocIopHeap(f2techioppatch_irx_size);
+        if(iopmem != NULL)
+        {
+            sifdma.src = f2techioppatch_irx;
+            sifdma.dest = iopmem;
+            sifdma.size = f2techioppatch_irx_size;
+            sifdma.attr = 0;
+            do {
+                dma_id = SifSetDma(&sifdma, 1);
+            } while (!dma_id);
+    
+            do {
+                ret = pSifLoadModuleBuffer(iopmem, 0, NULL);
+            } while (ret < 0);
+
+            pSifFreeIopHeap(iopmem);
+        }
+    }
+
+    return ret;
+}
+
+static void ShadowMan2Patch(int region)
+{
+    g_mode = region;
+
+    switch(region)
+    {    // JAL ShadowMan2_SifLoadModuleHook.
+        case 1: //NTSC-U/C
+            _sw(JAL((u32)&ShadowMan2_SifLoadModuleHook), 0x001d2838);
+            break;
+        case 2: //PAL
+            _sw(JAL((u32)&ShadowMan2_SifLoadModuleHook), 0x001d2768);
+            break;
+        case 3: //PAL German
+            _sw(JAL((u32)&ShadowMan2_SifLoadModuleHook), 0x001d2650);
+            break;
+    }
+}
+
 void apply_patches(const char *path)
 {
     const patchlist_t *p;
@@ -777,6 +867,9 @@ void apply_patches(const char *path)
                     break;
                 case PATCH_PRO_SNOWBOARDER:
                     ProSnowboarderPatch();
+                    break;
+                case PATCH_SHADOW_MAN_2:
+                    ShadowMan2Patch(p->patch.val);
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

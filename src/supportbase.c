@@ -9,6 +9,7 @@
 #include "include/cheatman.h"
 #include "include/pggsm.h"
 #include "include/cheatman.h"
+#include "include/ps2cnf.h"
 
 #include <sys/fcntl.h>
 
@@ -69,49 +70,38 @@ static int isValidIsoName(char *name, int *pNameLen)
     return 0;
 }
 
-static inline int GetStartupExecName(const char *path, char *filename, int maxlength)
+static int GetStartupExecName(const char *path, char *filename, int maxlength)
 {
-    char *SystemCNF, *NextLine, *p;
-    int result, size;
-    FILE *file;
+    char ps2disc_boot[CNF_PATH_LEN_MAX] = "";
+    const char *key;
+    int ret;
 
-    if ((file = fopen(path, "r")) != NULL) {
-        fseek(file, 0, SEEK_END);
-        size = ftell(file);
-        rewind(file);
-        if ((SystemCNF = memalign(64, size + 1)) != NULL) {
-            fread(SystemCNF, 1, size, file);
-            fclose(file);
-            SystemCNF[size] = '\0';
+    if ((ret = ps2cnfGetBootFile(path, ps2disc_boot)) == 0)
+    {
+        /* Skip the device name part of the path ("cdrom0:\"). */
+        key = ps2disc_boot;
 
-            NextLine = strtok(SystemCNF, "\n\r");
-            while ((NextLine != NULL) && (strncmp(NextLine, "BOOT2", 5) != 0)) {
-                NextLine = strtok(NULL, "\n\r");
+        for( ; *key != ':'; key++)
+        {
+            if (*key == '\0')
+            {
+                LOG("GetStartupExecName: missing ':' (%s).\n", ps2disc_boot);
+                return -1;
             }
+	}
 
-            free(SystemCNF);
+        ++key;
+        if (*key == '\\')
+            key++;
 
-            if (NextLine != NULL && strcmp(strtok(NextLine, "\t ="), "BOOT2") == 0) {
-                if ((p = strtok(NULL, "\t =")) != NULL && strncmp(p, "cdrom0:\\", 8) == 0) {
-                    strncpy(filename, p + 8, maxlength); /* Skip the device name part of the path ("cdrom0:\"). */
-                    filename[maxlength] = '\0';
-                    LOG("Startup EXEC path: %s\n", filename);
-                    result = 0;
-                } else {
-                    LOG("BOOT 2 errror: Unsupported boot device.\n");
-                    result = -EINVAL;
-                }
-            } else {
-                LOG("BOOT 2 line not found.\n");
-                result = -EINVAL;
-            }
-        } else {
-            result = -ENOMEM;
-        }
-    } else
-        result = -ENOENT;
+        strncpy(filename, key, maxlength);
+        filename[maxlength] = '\0';
 
-    return result;
+        return 0;
+    } else {
+        LOG("GetStartupExecName: Could not get BOOT2 parameter.\n");
+        return ret;
+    }
 }
 
 static void freeISOGameListCache(struct game_cache_list *cache);

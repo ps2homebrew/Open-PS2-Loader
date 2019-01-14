@@ -264,7 +264,7 @@ static char *appGetItemStartup(int id)
 
         mode = oplPath2Mode(appsList[id].path);
         if (mode < 0) {
-            LOG("APPSUPPORT: cannot find mode for path: %s\n", filename);
+            LOG("APPSUPPORT: cannot find mode for path: %s\n", appsList[id].path);
             return "";
         }
         
@@ -333,9 +333,11 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
         //To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
         mode = oplPath2Mode(filename);
-        if (mode < 0) {
-            mode = APP_MODE;
-            LOG("APPSUPPORT warning: cannot find mode for path: %s\n", filename);
+        if (mode < 0)
+        {
+            LOG("APPSUPPORT: cannot find mode for path: %s\n", filename);
+            guiMsgBox("APPSUPPORT: cannot find mode for path, please report.", 0, NULL);
+            return;
         }
 
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
@@ -346,14 +348,21 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
 static config_set_t *appGetConfig(int id)
 {
-    config_set_t *config = configAlloc(0, NULL, NULL);
+    config_set_t *config;
+
     if (appsList[id].legacy) {
+        config = configAlloc(0, NULL, NULL);
         struct config_value_t *cur = appGetConfigValue(id);
         configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
         configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
     } else {
         char path[256];
+        snprintf(path, sizeof(path), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
+
+        config = configAlloc(0, NULL, path);
+        configRead(config);  //Does not matter if the config file could be loaded or not.
+
         configSetStr(config, CONFIG_ITEM_NAME, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);

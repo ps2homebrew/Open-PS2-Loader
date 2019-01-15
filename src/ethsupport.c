@@ -734,7 +734,8 @@ static void ethCleanUp(int exception)
         free(ethGames);
 
         // disconnect from the active SMB session
-        ethSMBDisconnect();
+        if ((exception & UNMOUNT_EXCEPTION) == 0)
+            ethSMBDisconnect();
     }
 
     //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
@@ -768,7 +769,7 @@ static int ethCheckVMC(char *name, int createSize)
 
 static void smbGetAppsPath(char *path, int max)
 {
-    snprintf(path, max, "%s/APPS", gETHPrefix);
+    snprintf(path, max, "%sAPPS", ethPrefix);
 }
 
 static item_list_t ethGameList = {

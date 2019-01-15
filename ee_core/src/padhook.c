@@ -479,21 +479,20 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                     scePad2CreateSocket = (void *)ptr;
 
                 if (mode == PADOPEN_HOOK) {
-                    // Retrieve PadOpen call Instruction code
-                    inst = 0x00000000;
-                    inst |= 0x03ffffff & ((u32)ptr >> 2);
+                    // Generate generic instruction pattern & mask for a J/JAL to PadOpen()
+                    // Use 000010 as the operation, to match both J & JAL.
+                    inst = 0x08000000 | (0x03ffffff & ((u32)ptr >> 2));
 
-                    // Make pattern with function call code saved above
-                    // Ignore bits 24-27 because Jump type can be J(8) or JAL(C)
+                    // Ignore bit 26 for the mask because the jump type can be either J (000010) or JAL (000011)
                     pattern[0] = inst;
-                    mask[0] = 0xf0ffffff;
+                    mask[0] = 0xfbffffff;
 
                     DPRINTF("IGR: searching opcode %08x witk mask %08x\n", (int)pattern[0], (int)mask[0]);
 
                     // Search & patch for calls to PadOpen
-                    ptr2 = (u32 *)0x00100000;
+                    ptr2 = (u32 *)mem_start;
                     while (ptr2) {
-                        mem_size2 = 0x01ff0000 - (u32)ptr2;
+                        mem_size2 = (u32)((u8*)mem_end - (u8*)ptr2);
 
                         ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
                         if (ptr2) {
@@ -503,8 +502,8 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
                             fncall = (u32)ptr2;
 
-                            // Get PadOpen call Jump Instruction type. (JAL or J)
-                            inst = (ptr2[0] & 0x0f000000);
+                            // Get PadOpen call Jump Instruction type (JAL or J).
+                            inst = (ptr2[0] & 0xfc000000);
 
                             // Get Hook_PadOpen call Instruction code
                             if (padopen_patterns[i].version == IGR_LIBPAD_V1) {
@@ -521,6 +520,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                         }
                     }
 
+                    //Locate pointers to scePadOpen(), likely used for JALR.
                     if (!patched) {
                         DPRINTF("IGR: 2nd padOpen patch attempt...\n");
 
@@ -531,9 +531,9 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                         DPRINTF("IGR: searching opcode %08x witk mask %08x\n", (int)pattern[0], (int)mask[0]);
 
                         // Search & patch for PadOpen function address
-                        ptr2 = (u32 *)0x00100000;
+                        ptr2 = (u32 *)mem_start;
                         while (ptr2) {
-                            mem_size2 = 0x01ff0000 - (u32)ptr2;
+                            mem_size2 = (u32)((u8*)mem_end - (u8*)ptr2);
 
                             ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
                             if (ptr2) {

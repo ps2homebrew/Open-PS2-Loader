@@ -398,6 +398,9 @@ static void usbCleanUp(int exception)
         LOG("USBSUPPORT CleanUp\n");
 
         free(usbGames);
+
+//      if ((exception & UNMOUNT_EXCEPTION) == 0)
+//          ...
     }
 }
 

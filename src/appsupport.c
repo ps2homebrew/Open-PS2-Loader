@@ -300,7 +300,7 @@ static char *appGetItemStartup(int id)
     if (appsList[id].legacy)
     {
         struct config_value_t *cur = appGetConfigValue(id);
-        return cur->val;
+        return appGetELFName(cur->val);
     } else {
         int mode;
 

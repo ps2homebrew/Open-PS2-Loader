@@ -1360,6 +1360,10 @@ static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
 
 void deinit(int exception, int modeSelected)
 {
+    // block all io ops, wait for the ones still running to finish
+    ioBlockOps(1);
+    guiExecDeferredOps();
+
     if (gEnableSFX) {
         gEnableSFX = 0;
     }

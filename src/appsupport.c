@@ -51,6 +51,32 @@ static char *appGetELFName(char *name)
     return name;
 }
 
+static char *appGetBoot(char *device, int max, char *path)
+{
+    char *pos, *filenamesep;
+    int len;
+
+    // Looking for the boot device & filename from the path
+    pos = strrchr(path, ':');
+    if (pos != NULL) {
+        len = (int)(pos + 1 - path);
+        if (len + 1 > max)
+            len = max - 1;
+        strncpy(device, path, len);
+        device[len] = '\0';
+    }
+
+    filenamesep = strchr(path, '/');
+    if (filenamesep != NULL)
+        return filenamesep + 1; 
+
+    if (pos) {
+        return pos + 1;
+    }
+
+    return path;
+}
+
 void appInit(void)
 {
     LOG("APPSUPPORT Init\n");
@@ -253,22 +279,19 @@ static int appGetItemNameLength(int id)
     return CONFIG_KEY_NAME_LEN;
 }
 
+/* appGetItemStartup() is called to get the startup path for display & for the art assets.
+   The path is used immediately, before a subsequent call to appGetItemStartup(). */
 static char *appGetItemStartup(int id)
 {
+    static char itemStartupPath[APP_PATH_MAX + APP_BOOT_MAX + 1 + 1];
+
     if (appsList[id].legacy)
     {
         struct config_value_t *cur = appGetConfigValue(id);
         return cur->val;
     } else {
-        int mode;
-
-        mode = oplPath2Mode(appsList[id].path);
-        if (mode < 0) {
-            LOG("APPSUPPORT: cannot find mode for path: %s\n", appsList[id].path);
-            return "";
-        }
-        
-        return oplGetModeText(mode);
+        snprintf(itemStartupPath, sizeof(itemStartupPath), "%s/%s", appsList[id].path, appsList[id].boot);
+        return itemStartupPath;
     }
 }
 
@@ -369,7 +392,11 @@ static config_set_t *appGetConfig(int id)
 
 static int appGetImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
 {
-    return oplGetAppImage(folder, isRelative, appGetELFName(value), suffix, resultTex, psm);
+    char device[8], *startup;
+
+    startup = appGetBoot(device, sizeof(device), value);
+
+    return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }
 
 //This may be called, even if appInit() was not.

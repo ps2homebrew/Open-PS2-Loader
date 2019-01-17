@@ -353,11 +353,6 @@ static void deinitAllSupport(int exception, int modeSelected)
     moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
 }
 
-char *oplGetModeText(int mode)
-{
-    return(list_support[mode].support->textId == -1 ? list_support[mode].support->text : _l(list_support[mode].support->textId));
-}
-
 //For resolving the mode, given an app's path
 int oplPath2Mode(const char *path)
 {
@@ -386,11 +381,27 @@ int oplPath2Mode(const char *path)
     return -1;
 }
 
-int oplGetAppImage(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
+int oplGetAppImage(const char *device, char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm)
 {
-    int i, remaining;
+    int i, remaining, elfbootmode;
     char priority;
     item_list_t *listSupport;
+
+    elfbootmode = -1;
+    if (device != NULL)
+    {
+        elfbootmode = oplPath2Mode(device);
+        if (elfbootmode >= 0)
+        {
+            listSupport = list_support[elfbootmode].support;
+
+            if ((listSupport != NULL) && (listSupport->enabled))
+            {
+                if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
+                    return 0;
+            }
+        }
+    }
 
     // We search on ever devices from fatest to slowest.
     for (remaining = MODE_COUNT,priority = 0; remaining > 0 && priority < 4; priority++)
@@ -398,6 +409,9 @@ int oplGetAppImage(char *folder, int isRelative, char *value, char *suffix, GSTE
         for (i = 0; i < MODE_COUNT; i++)
         {
             listSupport = list_support[i].support;
+
+            if (i == elfbootmode)
+                continue;
 
             if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->appsPriority == priority))
             {
@@ -1360,6 +1374,10 @@ static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
 
 void deinit(int exception, int modeSelected)
 {
+    // block all io ops, wait for the ones still running to finish
+    ioBlockOps(1);
+    guiExecDeferredOps();
+
     if (gEnableSFX) {
         gEnableSFX = 0;
     }

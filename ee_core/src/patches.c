@@ -119,6 +119,8 @@ static const patchlist_t patch_list[] = {
     {"SLUS_204.13", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000001, 0x00000000}},       // Shadow Man: 2econd Coming (NTSC-U/C)
     {"SLES_504.46", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000002, 0x00000000}},       // Shadow Man: 2econd Coming (PAL)
     {"SLES_506.08", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000003, 0x00000000}},       // Shadow Man: 2econd Coming (PAL German)
+    {"SLUS_200.02", USB_MODE, {0x002c7758, 0x0000182d, 0x8c436d18}},               // Ridge Racer V (NTSC-U/C) - workaround disabling (bugged?) streaming code in favour of processing all data at once, for USB devices.
+    {"SLES_500.00", USB_MODE, {0x002c9760, 0x0000182d, 0x8c43a2f8}},               // Ridge Racer V (PAL) - workaround by disabling (bugged?) streaming code in favour of processing all data at once, for USB devices.
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 

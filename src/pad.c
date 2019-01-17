@@ -27,6 +27,7 @@
 struct pad_data_t
 {
     int port, slot;
+    int state;
     u32 paddata;
     u32 oldpaddata;
     struct padButtonStatus buttons;
@@ -94,8 +95,11 @@ static int initializePad(struct pad_data_t *pad)
     int modes;
     int i;
 
+    LOG("PAD initializing pad %d,%d\n", pad->port, pad->slot);
+
     // is there any device connected to that port?
     if (waitPadReady(pad) == PAD_STATE_DISCONN) {
+        LOG("PAD pad %d,%d not connected.\n", pad->port, pad->slot);
         return 1; // nope, don't waste your time here!
     }
 
@@ -183,34 +187,61 @@ static int initializePad(struct pad_data_t *pad)
     return 1;
 }
 
+static void updatePadState(struct pad_data_t *pad, int state)
+{   //To simplify processing, monitor only Disconnected, FindCTP1 & Stable states.
+    if ((state == PAD_STATE_DISCONN) || (state == PAD_STATE_STABLE) || (state == PAD_STATE_FINDCTP1))
+        pad->state = state;
+}
+
 static int readPad(struct pad_data_t *pad)
 {
-    int rcode = 0;
-#ifdef PADEMU
+    int rcode = 0, oldState, newState, ret, padsRead;
     u32 newpdata = 0;
 
-    int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
-    newpdata = 0xffff ^ pad->buttons.btns;
+    padsRead = 0;
+    oldState = pad->state;
+    newState = padGetState(pad->port, pad->slot);
+    updatePadState(pad, newState);
+    if ((oldState == PAD_STATE_DISCONN) && ((pad->state == PAD_STATE_STABLE) || (pad->state == PAD_STATE_FINDCTP1))) {
+        //Pad just connected.
+        LOG("PAD pad %d,%d connected\n", pad->port, pad->slot);
+        initializePad(pad);
+    }
+    //The pad may transit from any state to disconnected. So check only for the disconnected state.
+    else if ((oldState != PAD_STATE_DISCONN) && (pad->state == PAD_STATE_DISCONN)) {
+        LOG("PAD pad %d,%d disconnected\n", pad->port, pad->slot);
+    }
 
+    if ((pad->state == PAD_STATE_STABLE) || (pad->state == PAD_STATE_FINDCTP1)) {
+        //pad is connected. Read pad button information.
+        ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
+
+        if (ret != 0) {
+            newpdata = 0xffff ^ pad->buttons.btns;
+            padsRead++;
+        }
+    }
+
+#ifdef PADEMU
     if (ds34bt_get_status(pad->port) & DS34BT_STATE_RUNNING) {
         ret = ds34bt_get_data(pad->port, (u8 *)&pad->buttons.btns);
         ds34bt_set_rumble(pad->port, 0, 0);
-        newpdata |= 0xffff ^ pad->buttons.btns;
+        if (ret != 0) {
+            newpdata |= 0xffff ^ pad->buttons.btns;
+            padsRead++;
+        }
     }
 
     if (ds34usb_get_status(pad->port) & DS34USB_STATE_RUNNING) {
         ret = ds34usb_get_data(pad->port, (u8 *)&pad->buttons.btns);
         ds34usb_set_rumble(pad->port, 0, 0);
-        newpdata |= 0xffff ^ pad->buttons.btns;
+        if (ret != 0) {
+            newpdata |= 0xffff ^ pad->buttons.btns;
+            padsRead++;
+        }
     }
-
-    if (ret != 0) {
-#else
-    int ret = padRead(pad->port, pad->slot, &pad->buttons); // port, slot, buttons
-
-    if (ret != 0) {
-        u32 newpdata = 0xffff ^ pad->buttons.btns;
 #endif
+    if (padsRead > 0) {
         if (newpdata != 0x0) // something
             rcode = 1;
         else
@@ -388,6 +419,8 @@ void unloadPads()
 * @return 0 Error, != 0 Ok */
 static int startPad(struct pad_data_t *pad)
 {
+    int newState;
+
     if (padPortOpen(pad->port, pad->slot, pad->padBuf) == 0) {
         return 0;
     }
@@ -396,7 +429,8 @@ static int startPad(struct pad_data_t *pad)
         return 0;
     }
 
-    waitPadReady(pad);
+    newState = waitPadReady(pad);
+    updatePadState(pad, newState);
     return 1;
 }
 
@@ -421,6 +455,7 @@ int startPads()
 
             cpad->port = port;
             cpad->slot = slot;
+            cpad->state = PAD_STATE_DISCONN;
 
             if (startPad(cpad))
                 ++pad_count;

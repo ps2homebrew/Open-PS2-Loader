@@ -42,7 +42,7 @@ typedef struct
 #define PATCH_DOT_HACK 0x0D074A37
 #define PATCH_SOS 0x30303030
 #define PATCH_ULT_PRO_PINBALL 0xBA11BA11
-#define PATCH_FERRARI_CHALLENGE 0x0012FCC8
+#define PATCH_EUTECHNYX_WU_TID 0x0012FCC8
 #define PATCH_PRO_SNOWBOARDER 0x01020199
 #define PATCH_SHADOW_MAN_2 0x01020413
 
@@ -109,8 +109,8 @@ static const patchlist_t patch_list[] = {
     {"SLUS_209.77", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Quest
     {"SLPM_656.32", ALL_MODE, {PATCH_VIRTUA_QUEST, 0x00000000, 0x00000000}},       // Virtua Fighter Cyber Generation: Judgment Six No Yabou
     {"SLES_535.08", ALL_MODE, {PATCH_ULT_PRO_PINBALL, 0x00000000, 0x00000000}},    // Ultimate Pro Pinball
-    {"SLES_552.94", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcc8, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (PAL)
-    {"SLUS_217.80", ALL_MODE, {PATCH_FERRARI_CHALLENGE, 0x0012fcb0, 0x00000000}},  // Ferrari Challenge: Trofeo Pirelli (NTSC-U/C)
+    {"SLES_552.94", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0012fcc8, 0x00000000}},   // Ferrari Challenge: Trofeo Pirelli (PAL)
+    {"SLUS_217.80", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0012fcb0, 0x00000000}},   // Ferrari Challenge: Trofeo Pirelli (NTSC-U/C)
     {"SLUS_201.99", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (NTSC-U/C)
     {"SLES_504.00", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL)
     {"SLES_504.01", ALL_MODE, {PATCH_PRO_SNOWBOARDER, 0x00000000, 0x00000000}},    // Shaun Palmer's Pro Snowboarder (PAL French)
@@ -121,6 +121,8 @@ static const patchlist_t patch_list[] = {
     {"SLES_506.08", ALL_MODE, {PATCH_SHADOW_MAN_2, 0x00000003, 0x00000000}},       // Shadow Man: 2econd Coming (PAL German)
     {"SLUS_200.02", USB_MODE, {0x002c7758, 0x0000182d, 0x8c436d18}},               // Ridge Racer V (NTSC-U/C) - workaround disabling (bugged?) streaming code in favour of processing all data at once, for USB devices.
     {"SLES_500.00", USB_MODE, {0x002c9760, 0x0000182d, 0x8c43a2f8}},               // Ridge Racer V (PAL) - workaround by disabling (bugged?) streaming code in favour of processing all data at once, for USB devices.
+    {"SLUS_205.82", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0033b534, 0x00000000}},   // SRS: Street Racing Syndicate (NTSC-U/C)
+    {"SLES_530.45", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0033fbfc, 0x00000000}},   // SRS: Street Racing Syndicate (PAL)
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -690,8 +692,8 @@ static void UltProPinballPatch(const char *path)
     }
 }
 
-static void FerrariChallengePatch(u32 addr)
-{   //Ferrari Challenge has the main thread ID hardcoded for a call to WakeupThread().
+static void EutechnyxWakeupTIDPatch(u32 addr)
+{   //Eutechnyx games have the main thread ID hardcoded for a call to WakeupThread().
     // addiu $a0, $zero, 1
     //This breaks when the thread IDs change after IGR is used.
     *(vu16*)addr = (u16)GetThreadId();
@@ -864,8 +866,8 @@ void apply_patches(const char *path)
                 case PATCH_ULT_PRO_PINBALL:
                     UltProPinballPatch(path);
                     break;
-                case PATCH_FERRARI_CHALLENGE:
-                    FerrariChallengePatch(p->patch.val);
+                case PATCH_EUTECHNYX_WU_TID:
+                    EutechnyxWakeupTIDPatch(p->patch.val);
                     break;
                 case PATCH_PRO_SNOWBOARDER:
                     ProSnowboarderPatch();

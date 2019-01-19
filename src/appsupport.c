@@ -283,15 +283,12 @@ static int appGetItemNameLength(int id)
    The path is used immediately, before a subsequent call to appGetItemStartup(). */
 static char *appGetItemStartup(int id)
 {
-    static char itemStartupPath[APP_PATH_MAX + APP_BOOT_MAX + 1 + 1];
-
     if (appsList[id].legacy)
     {
         struct config_value_t *cur = appGetConfigValue(id);
         return cur->val;
     } else {
-        snprintf(itemStartupPath, sizeof(itemStartupPath), "%s/%s", appsList[id].path, appsList[id].boot);
-        return itemStartupPath;
+        return appsList[id].boot;
     }
 }
 

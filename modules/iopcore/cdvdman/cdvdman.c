@@ -374,7 +374,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
                 SectorsToRead = 8;
 
             TargetTime.hi = 0;
-            TargetTime.lo = 26321 * SectorsToRead; // approximately 2KB/2800KB/s = 714us required per 2048-byte data sector at 2800KB/s, so 714 * 36.864 = 26321 ticks per sector with a 36.864MHz clock.
+            TargetTime.lo = 20460 * SectorsToRead; // approximately 2KB/3600KB/s = 555us required per 2048-byte data sector at 3600KB/s, so 555 * 36.864 = 20460 ticks per sector with a 36.864MHz clock.
             ClearEventFlag(cdvdman_stat.intr_ef, ~0x1000);
             SetAlarm(&TargetTime, &cdvdemu_read_end_cb, NULL);
         }

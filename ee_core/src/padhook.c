@@ -16,12 +16,12 @@
   Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
 
+#include <ee_regs.h>
 #include <iopcontrol.h>
 #include "ee_core.h"
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
-#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -142,12 +142,6 @@ static void IGR_Thread(void *arg)
             ) {
 
         if (!DisableDebug)
-            GS_BGCOLOUR = 0x800000; // Dark Blue
-
-        // Reset SPU
-        ResetSPU();
-
-        if (!DisableDebug)
             GS_BGCOLOUR = 0xFF8000; // Blue sky
 
         oplIGRShutdown(0);
@@ -210,6 +204,13 @@ static void IGR_Thread(void *arg)
 
         // Init RPC & CMD
         SifInitRpc(0);
+        LoadFileInit();
+
+        if (!DisableDebug)
+            GS_BGCOLOUR = 0x800000; // Dark Blue
+
+        // Reset SPU
+        LoadModule("rom0:CLEARSPU", 0, NULL);
 
 #ifdef IGS
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
@@ -220,6 +221,7 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x008000; // Dark Green
 
         // Exit services
+        LoadFileExit();
         SifExitRpc();
 
         IGR_Exit(0);
@@ -313,26 +315,44 @@ static int IGR_Intc_Handler(int cause)
     // Suspend and Change priority of all threads other then our IGR thread
     // Wakeup and Change priority of our IGR thread
     if (Pad_Data.combo_type != 0x00) {
-        // Disable Interrupts
-        iDisableIntc(kINTC_GS);
-        iDisableIntc(kINTC_VBLANK_START);
-        iDisableIntc(kINTC_VBLANK_END);
-        iDisableIntc(kINTC_VIF0);
-        iDisableIntc(kINTC_VIF1);
-        iDisableIntc(kINTC_VU0);
-        iDisableIntc(kINTC_VU1);
-        iDisableIntc(kINTC_IPU);
-        iDisableIntc(kINTC_TIMER0);
-        iDisableIntc(kINTC_TIMER1);
+        // Disable documented interrupts
+        // INTC interrupts
+        iDisableIntc(INTC_GS);
+        iDisableIntc(INTC_VBLANK_S);
+        iDisableIntc(INTC_VBLANK_E);
+        iDisableIntc(INTC_VIF0);
+        iDisableIntc(INTC_VIF1);
+        iDisableIntc(INTC_VU0);
+        iDisableIntc(INTC_VU1);
+        iDisableIntc(INTC_IPU);
+        iDisableIntc(INTC_TIM0);
+        iDisableIntc(INTC_TIM1);
+        iDisableIntc(INTC_TIM2); //This was available for developers with older SDKs, then it became reserved.
+        // DMAC interrupts (except for SIF0, SIF1 & SIF2).
+        iDisableDmac(DMAC_VIF0);
+        iDisableDmac(DMAC_VIF1);
+        iDisableDmac(DMAC_GIF);
+        iDisableDmac(DMAC_FROM_IPU);
+        iDisableDmac(DMAC_TO_IPU);
+        iDisableDmac(DMAC_FROM_SPR);
+        iDisableDmac(DMAC_TO_SPR);
 
-        // Loop for each threads
+        // Loop for each threads, skipping the idle & IGR threads.
         for (i = 1; i < 256; i++) {
             if (i != IGR_Thread_ID) {
                 // Suspend all threads
                 iSuspendThread(i);
-                iChangeThreadPriority(i, 127);
             }
         }
+
+        //Wait for ongoing transfers to end (except for SIF0, SIF1 & SIF2).
+        while((*R_EE_D0_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D1_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D2_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D3_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D4_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D8_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D9_CHCR) & EE_CHCR_STR) {};
 
         DPRINTF("IGR: trying to wake IGR thread...\n");
         iChangeThreadPriority(IGR_Thread_ID, 0);

@@ -742,7 +742,8 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
 
     //Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
-    memset((void *)0x00082000, 0, 0x00100000 - 0x00082000);
+    //Start wiping from 0x00084000 instead (as the HDD Browser does), as the alarm patch is installed at 0x00082000.
+    memset((void *)0x00084000, 0, 0x00100000 - 0x00084000);
 
     modules = 0;
     ModuleStorage = GetModStorageLocation(filename, compatflags);

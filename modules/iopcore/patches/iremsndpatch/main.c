@@ -1,5 +1,7 @@
 #include <intrman.h>
 #include <loadcore.h>
+#include <stdio.h>
+#include <sysclib.h>
 #include <thbase.h>
 #include <thsemap.h>
 
@@ -46,35 +48,34 @@ int _unlock(void)
 int _start(int argc, char **argv)
 {
     lc_internals_t *lc;
-    ModuleInfo_t *m, *secondLastMod, *lastMod;
+    ModuleInfo_t *m;
     u16 hi16;
     s16 lo16;
     iop_sema_t sema;
-    int HighestID;
+    int modId;
+
+    if (argc != 2)
+    {
+        printf("Missing module ID arg.\n");
+        return MODULE_NO_RESIDENT_END;
+    }
+
+    modId = strtol(argv[1], NULL, 16);
 
     lc = GetLoadcoreInternalData();
 
-    //Locate the 2nd last-registered module, which is the module loaded before this.
+    //Locate the specified module.
     m = lc->image_info;
-    lastMod = NULL;
-    secondLastMod = NULL;
-    HighestID = -1;
     while (m != NULL)
     {
-        if (HighestID < m->id)
-        {
-            HighestID = m->id;
-            secondLastMod = lastMod;
-            lastMod = m;
-        }
+        if (modId == m->id)
+            break;
 
         m = m->next;
     }
 
-    if (secondLastMod != NULL)
+    if (m != NULL)
     {
-        m = secondLastMod;
-
         sema.initial = 1;
         sema.max = 1;
         sema.option = 0;
@@ -106,10 +107,12 @@ int _start(int argc, char **argv)
 	//sndIopCmd_STOPALL
         *(vu32*)(m->text_start + 0x00000c30) = JMP((u32)&postStopSeseqTick);
 
-        FlushIcache();
+        FlushIcache(); //Flush instruction cache as instructions were modified.
 
         return MODULE_RESIDENT_END;
     }
+
+    printf("Could not find module %d.\n", modId);
 
     return MODULE_NO_RESIDENT_END;
 }

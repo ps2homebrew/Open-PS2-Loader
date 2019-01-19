@@ -485,9 +485,9 @@ int Skip_Videos_sceMpegIsEnd(void)
         return 0;
 }
 
-static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres)
+static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args, int *modres, int fno)
 {
-    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres);
+    int (*_pSifLoadModule)(const char *path, int arg_len, const char *args, int *modres, int fno);
     void *(*pSifAllocIopHeap)(int size);
     int (*pSifFreeIopHeap)(void *addr);
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
@@ -496,6 +496,7 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
     int dma_id, ret, ret2;
     void *iremsndpatch_irx;
     unsigned int iremsndpatch_irx_size;
+    char modIdStr[3];
 
     switch(g_mode)
     {
@@ -522,11 +523,13 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
             pSifAllocIopHeap = NULL;
             pSifFreeIopHeap = NULL;
             pSifLoadModuleBuffer = NULL;
+            //Should not happen.
+            asm volatile("break\n");
     }
 
-    ret = _pSifLoadModule(path, arg_len, args, modres);
+    ret = _pSifLoadModule(path, arg_len, args, modres, fno);
 
-    if((ret >= 0) && (_pSifLoadModule != NULL) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0))
+    if((ret >= 0) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0))
     {
         GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &iremsndpatch_irx, &iremsndpatch_irx_size);
 
@@ -541,12 +544,18 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
 
+            modIdStr[0] = '0' + ((ret >> 4) & 0xF);
+            modIdStr[1] = '0' + (ret & 0xF);
+            modIdStr[2] = '\0';
+
             do {
-                ret2 = pSifLoadModuleBuffer(iopmem, 0, NULL);
+                ret2 = pSifLoadModuleBuffer(iopmem, sizeof(modIdStr), modIdStr);
             } while (ret2 < 0);
 
             pSifFreeIopHeap(iopmem);
         }
+        else
+            asm volatile("break\n");
     }
 
     return ret;
@@ -565,7 +574,7 @@ static void SOSPatch(int region)
             _sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d07b4);
             break;
         case 2: //PAL
-            _sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d13f4);
+            //_sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d13f4);
             break;
     }
 }
@@ -597,55 +606,58 @@ enum ULTPROPINBALL_ELF {
     ULTPROPINBALL_ELF_TS,
 };
 
-static void UltProPinball_LoadModuleHook(const char *path)
+static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const char *args)
 {
-    void (*pLoadModule)(const char *path);
+    int (*pSifLoadModule)(const char *path, int arg_len, const char *args);
     void *(*pSifAllocIopHeap)(int size);
     int (*pSifFreeIopHeap)(void *addr);
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
     void *iopmem;
     SifDmaTransfer_t sifdma;
-    int dma_id, ret;
+    int dma_id, ret, ret2;
     void *apemodpatch_irx;
     unsigned int apemodpatch_irx_size;
+    char modIdStr[3];
 
     switch(g_mode & 0xf)
     {
         case ULTPROPINBALL_ELF_MAIN:
-            pLoadModule = (void*)0x0012e400;
+            pSifLoadModule = (void*)0x001d0140;
             pSifAllocIopHeap = (void*)0x001cf278;
             pSifFreeIopHeap = (void*)0x001cf368;
             pSifLoadModuleBuffer = (void*)0x001cfed8;
             break;
         case ULTPROPINBALL_ELF_BR:
-            pLoadModule = (void*)0x001969c0;
+            pSifLoadModule = (void*)0x0023aa80;
             pSifAllocIopHeap = (void*)0x00239bb8;
             pSifFreeIopHeap = (void*)0x00239ca8;
             pSifLoadModuleBuffer = (void*)0x0023a818;
             break;
         case ULTPROPINBALL_ELF_FJ:
-            pLoadModule = (void*)0x00180eb0;
+            pSifLoadModule = (void*)0x00224740;
             pSifAllocIopHeap = (void*)0x00223878;
             pSifFreeIopHeap = (void*)0x00223968;
             pSifLoadModuleBuffer = (void*)0x002244d8;
             break;
         case ULTPROPINBALL_ELF_TS:
-            pLoadModule = (void*)0x0018d3b8;
+            pSifLoadModule = (void*)0x00233040;
             pSifAllocIopHeap = (void*)0x00232178;
             pSifFreeIopHeap = (void*)0x00232268;
             pSifLoadModuleBuffer = (void*)0x00232dd8;
             break;
         default:
-            pLoadModule = NULL;
+            pSifLoadModule = NULL;
             pSifAllocIopHeap = NULL;
             pSifFreeIopHeap = NULL;
             pSifLoadModuleBuffer = NULL;
+            //Should not happen.
+            asm volatile("break\n");
     }
 
-    if (pLoadModule != NULL) 
-    {
-        pLoadModule(path);
+    ret = pSifLoadModule(path, arg_len, args);
 
+    if ((ret >= 0) && (_strcmp(path, "cdrom0:\\APEMOD.IRX;1") == 0))
+    {
         GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &apemodpatch_irx, &apemodpatch_irx_size);
 
         iopmem = pSifAllocIopHeap(apemodpatch_irx_size);
@@ -659,35 +671,43 @@ static void UltProPinball_LoadModuleHook(const char *path)
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
 
+            modIdStr[0] = '0' + ((ret >> 4) & 0xF);
+            modIdStr[1] = '0' + (ret & 0xF);
+            modIdStr[2] = '\0';
+
             do {
-                ret = pSifLoadModuleBuffer(iopmem, 0, NULL);
-           } while (ret < 0);
+                ret2 = pSifLoadModuleBuffer(iopmem, sizeof(modIdStr), modIdStr);
+             } while (ret2 < 0);
 
             pSifFreeIopHeap(iopmem);
         }
+        else
+           asm volatile("break\n");
     }
+
+    return ret;
 }
 
 static void UltProPinballPatch(const char *path)
 {
     if (_strcmp(path, "cdrom0:\\SLES_535.08;1") == 0)
     {
-        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x0012eae0);
+        _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x0012e47c);
         g_mode = ULTPROPINBALL_ELF_MAIN;
     }
     else if (_strcmp(path, "cdrom0:\\BR.ELF;1") == 0)
     {
-        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x001970a0);
+        _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x00196a3c);
         g_mode = ULTPROPINBALL_ELF_BR;
     }
     else if (_strcmp(path, "cdrom0:\\FJ.ELF;1") == 0)
     {
-        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x00181590);
+        _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x00180f2c);
         g_mode = ULTPROPINBALL_ELF_FJ;
     }
     else if (_strcmp(path, "cdrom0:\\TS.ELF;1") == 0)
     {
-        _sw(JAL((u32)&UltProPinball_LoadModuleHook), 0x0018da98);
+        _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x0018d434);
         g_mode = ULTPROPINBALL_ELF_TS;
     }
 }
@@ -743,9 +763,10 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
     void *iopmem;
     SifDmaTransfer_t sifdma;
-    int dma_id, ret;
+    int dma_id, ret, ret2;
     void *f2techioppatch_irx;
     unsigned int f2techioppatch_irx_size;
+    char modIdStr[3];
 
     switch(g_mode)
     {
@@ -792,13 +813,19 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
             do {
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
-    
+
+            modIdStr[0] = '0' + ((ret >> 4) & 0xF);
+            modIdStr[1] = '0' + (ret & 0xF);
+            modIdStr[2] = '\0';
+
             do {
-                ret = pSifLoadModuleBuffer(iopmem, 0, NULL);
-            } while (ret < 0);
+                ret2 = pSifLoadModuleBuffer(iopmem, sizeof(modIdStr), modIdStr);
+            } while (ret2 < 0);
 
             pSifFreeIopHeap(iopmem);
         }
+        else
+            asm volatile("break\n");
     }
 
     return ret;

@@ -12,7 +12,6 @@
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
-#include "spu.h"
 #include "patches.h"
 #include "padhook.h"
 #include "syshook.h"
@@ -62,8 +61,6 @@ void sysLoadElf(char *filename, int argc, char **argv)
     SifInitRpc(0);
 
     DPRINTF("t_loadElf()\n");
-
-    ResetSPU();
 
     DPRINTF("t_loadElf: Resetting IOP...\n");
 

@@ -21,7 +21,6 @@
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
-#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -142,12 +141,6 @@ static void IGR_Thread(void *arg)
             ) {
 
         if (!DisableDebug)
-            GS_BGCOLOUR = 0x800000; // Dark Blue
-
-        // Reset SPU
-        ResetSPU();
-
-        if (!DisableDebug)
             GS_BGCOLOUR = 0xFF8000; // Blue sky
 
         oplIGRShutdown(0);
@@ -210,6 +203,13 @@ static void IGR_Thread(void *arg)
 
         // Init RPC & CMD
         SifInitRpc(0);
+        LoadFileInit();
+
+        if (!DisableDebug)
+            GS_BGCOLOUR = 0x800000; // Dark Blue
+
+        // Reset SPU
+        LoadModule("rom0:CLEARSPU", 0, NULL);
 
 #ifdef IGS
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
@@ -220,6 +220,7 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x008000; // Dark Green
 
         // Exit services
+        LoadFileExit();
         SifExitRpc();
 
         IGR_Exit(0);

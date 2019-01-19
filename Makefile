@@ -73,7 +73,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o \
 		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
-		iremsndpatch.o apemodpatch.o f2techioppatch.o \
+		iremsndpatch.o apemodpatch.o f2techioppatch.o cleareffects.o \
 		libsd.o audsrv.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
@@ -243,6 +243,8 @@ clean:
 	$(MAKE) -C modules/iopcore/patches/apemodpatch clean
 	echo "   -f2techiop"
 	$(MAKE) -C modules/iopcore/patches/f2techioppatch clean
+	echo "   -cleareffects"
+	$(MAKE) -C modules/iopcore/patches/cleareffects clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
 	echo " -usbhdfsdfsv"
@@ -411,6 +413,13 @@ modules/iopcore/patches/f2techioppatch/f2techioppatch.irx: modules/iopcore/patch
 
 $(EE_ASM_DIR)f2techioppatch.s: modules/iopcore/patches/f2techioppatch/f2techioppatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ f2techioppatch_irx
+
+modules/iopcore/patches/cleareffects/cleareffects.irx: modules/iopcore/patches/cleareffects
+	echo " -cleareffects"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)cleareffects.s: modules/iopcore/patches/cleareffects/cleareffects.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ cleareffects_irx
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"

@@ -16,6 +16,9 @@ extern int size_bt_pademu_irx;
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
 
+extern void *cleareffects_irx;
+extern int size_cleareffects_irx;
+
 extern void *deci2_img;
 extern int size_deci2_img;
 

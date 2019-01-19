@@ -738,8 +738,12 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     if (gExitPath[0] == '\0')
         strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
+    //Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
+    sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
+
     //Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
-    memset((void *)0x00082000, 0, 0x00100000 - 0x00082000);
+    //Start wiping from 0x00084000 instead (as the HDD Browser does), as the alarm patch is installed at 0x00082000.
+    memset((void *)0x00084000, 0, 0x00100000 - 0x00084000);
 
     modules = 0;
     ModuleStorage = GetModStorageLocation(filename, compatflags);
@@ -873,10 +877,6 @@ int sysExecElf(const char *path)
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
 
     // Let's go.
     fileXioExit();

@@ -5,12 +5,8 @@
  */
 
 #include <loadcore.h>
-#include <intrman.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <thsemap.h>
-#include <sifman.h>
 #include <stdio.h>
+#include <sysclib.h>
 
 #define JAL(addr) (0x0c000000 | (((addr)&0x03ffffff) >> 2))
 #define JMP(addr) (0x08000000 | (0x3ffffff & ((addr) >> 2)))
@@ -23,39 +19,35 @@ static void (*pIOP_SafeFree)(void *buffer);
 int _start(int argc, char **argv)
 {
     lc_internals_t *lc;
-    ModuleInfo_t *m, *secondLastMod, *lastMod;
-    int OldState, HighestID;
+    ModuleInfo_t *m;
+    int modId;
+
+    if (argc != 2)
+    {
+        printf("Missing module ID arg.\n");
+        return MODULE_NO_RESIDENT_END;
+    }
+
+    modId = strtol(argv[1], NULL, 16);
 
     lc = GetLoadcoreInternalData();
 
-    //Locate the 2nd last-registered module, which is the module loaded before this.
+    //Locate the specified module.
     m = lc->image_info;
-    lastMod = NULL;
-    secondLastMod = NULL;
-    HighestID = -1;
     while (m != NULL)
     {
-        if (HighestID < m->id)
-        {
-            HighestID = m->id;
-            secondLastMod = lastMod;
-            lastMod = m;
-        }
+        if (modId == m->id)
+            break;
 
         m = m->next;
     }
 
-    if (secondLastMod != NULL)
+    if (m != NULL)
     {
-        m = secondLastMod;
 
-        CpuSuspendIntr(&OldState);
 	pIOP_SafeMalloc = (void*)(m->text_start + 0x00000d10);
 	pIOP_SafeFree = (void*)(m->text_start + 0x00000ddc);
 	CompBuffers =  (void**)(m->text_start + 0x00009bb0);
-        CpuResumeIntr(OldState);
-
-        FlushIcache();
 
 	pIOP_SafeFree(CompBuffers[0]);
 	pIOP_SafeFree(CompBuffers[1]);
@@ -64,6 +56,8 @@ int _start(int argc, char **argv)
 
         return MODULE_RESIDENT_END;
     }
+
+    printf("Could not find module %d.\n", modId);
 
     return MODULE_NO_RESIDENT_END;
 }

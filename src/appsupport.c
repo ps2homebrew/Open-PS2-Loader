@@ -497,6 +497,11 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
 
     startup = appGetBoot(device, sizeof(device), value);
 
+    // Try with entire value, fixes not loading theme icons in subfolders.
+    if (oplGetAppImage(device, folder, isRelative, value, suffix, resultTex, psm) >=0){
+        return 0;
+    }
+
     return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }
 

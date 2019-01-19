@@ -876,10 +876,6 @@ int sysExecElf(const char *path)
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
 
     // Let's go.
     fileXioExit();

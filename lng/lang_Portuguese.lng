@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: Jan. 4, 2019
-# Updated for OPL_1386_DB-TA_[d409ba5]
+# Last update: Jan. 20, 2019
+# Updated for OPL_1460_DB-TA_[57fe65c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -265,6 +265,7 @@ Ativar som de Arranque
 Volume dos sons
 Volume do som de arranque
 Confirmar alteração do modo de vídeo?
+Cache Game List
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

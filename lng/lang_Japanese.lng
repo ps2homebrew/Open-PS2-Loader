@@ -1,6 +1,6 @@
 # Japanese Translation by yamamotonew
-# Last update: Jan. 3, 2019
-# Updated for OPL_1386_DB-TA_[d409ba5]
+# Last update: Jan. 20, 2019
+# Updated for OPL_1460_DB-TA_[57fe65c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Japanese
 OPL %s
@@ -265,6 +265,7 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
+Cache Game List
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: Jan. 3, 2019
-# Updated for OPL_1386_DB-TA_[d409ba5]
+# Last update: Jan. 20, 2019
+# Updated for OPL_1460_DB-TA_[57fe65c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -265,6 +265,7 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
+Cache Game List
 Παιχνίδια PS1
 Εκκίνηση μενού παιχνιδιών PS1
 Το POPSTARTER.ELF δεν βρέθηκε στη θέση '%s'!

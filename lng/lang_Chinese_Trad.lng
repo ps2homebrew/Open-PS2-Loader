@@ -1,12 +1,12 @@
 # Translated by kane159 and eyu2007
-# Last update: Jan. 3, 2019
-# Updated for OPL_1386_DB-TA_[d409ba5]
+# Last update: Jan. 20, 2019
+# Updated for OPL_1460_DB-TA_[57fe65c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
 OPL %s
 保存設置
 返回
-網絡設置
+網路設置
 進階設置
 <無數值>
 設置已保存...
@@ -17,57 +17,57 @@ OPL %s
 USB 遊戲
 HDD 遊戲
 ETH 遊戲
-應用程式
+應用程序
 主題
 語言
 系統電源將會關閉.
-Exit to Browser?
+退出到瀏覽界面?
 取消更新?
-%d: 偵測不到硬碟
-%d: 硬碟沒有格式化
-%d: 啟動網絡錯誤
-%d: 偵測不到網卡
+%d: 檢測不到硬碟
+%d: 硬碟未格式化
+%d: 啟動網路錯誤
+%d: 檢測不到網卡
 %d: 無法連接 SMB 伺服器
 %d: 無法登入 SMB 伺服器
 %d: 無法開啟 SMB 共享
-%d: 無法羅列 SMB 共享清單
+%d: 無法列出 SMB 共享清單
 %d: 無法列出遊戲清單
 %d: DHCP 伺服器不存在
-%d: 無網絡連接
+%d: 無網路連接
 開啟
 關閉
 確定
 選擇
 取消
-圓圈
-叉叉
-遊戲清單
+O
+X
+遊戲列表
 遊戲設置
-移除所有設置
-移除遊戲所有的設置
-滾動
+刪除所有設置
+刪除遊戲所有的設置
+選定項滾動速度
 較慢
 中等
 較快
-預設選單
+默認選單
 從光碟中讀取
 請稍後
-讀取 Game ID 時出錯
-自動滾動
-讀取語言档案時出錯
-禁用 Debug Colors
-無偵測到搖桿, 等待中...
-啟用圖示封面
-寬螢幕
+讀取 遊戲 ID 時出錯
+自動排序
+載入語言文件時出錯
+禁用調試跳色
+未檢測到控制器, 等待中...
+顯示遊戲封面
+寬屏幕
 關機
 設置讀取中
 設置儲存中
-啟動裝置
+啟動設備
 重新整理
-USB 裝置啟動模式
-HDD 裝置啟動模式
-ETH 裝置啟動模式
-應用程式啟動模式
+USB 設備啟動模式
+HDD 設備啟動模式
+ETH 設備啟動模式
+應用程序啟動模式
 自動
 手動
 啟動 HDL 服務
@@ -80,20 +80,20 @@ IGR 位置
 文字顏色
 - PS2 -
 - SMB 伺服器 -
-IP 位置模式
+IP 地址模式
 靜態
 DHCP
-IP 位置
-位置
-子網路遮罩
-閘道
+IP 地址
+地址
+子網掩碼
+網關
 DNS 伺服器
-端口
+埠
 共享
 使用者
 密碼
 <無設置>
-位置格式
+地址格式
 IP
 NetBIOS
 允許
@@ -104,7 +104,7 @@ NetBIOS
 顯示設置
 啟用刪除與重新命名功能
 檢查 USB 遊戲碎片
-記住最後一個玩的遊戲
+記住最後運行遊戲
 選定鍵
 錯誤, 遊戲有碎片
 錯誤, 無法運行該項目
@@ -112,11 +112,11 @@ NetBIOS
 GUEST驗證留空.
 精確讀取
 同步模式
-脫開系統調用
-跳过视频
+解除系統調用
+跳過 videos
 模擬 DVD-DL
 禁用 IGR
-Unused
+空閑
 隱藏 DEV9 模式
 改變大小將會重新格式化 VMC
 生成
@@ -130,37 +130,37 @@ Unused
 大小
 狀態
 進度
-VMC 檔案已存在
-無效的 VMC 檔案, 大小有誤
-需要建立VMC 檔案
+VMC 存檔已存在
+無效的 VMC 存檔, 大小有誤
+需要建立VMC 存檔
 VMC %s 出錯, 繼續使用物理記憶卡嗎 (slot %d) ?
 自動重新整理
 關於
-Coders
-Quality Assurance
-USB 前墜路徑
-Boots Custom ELF after an IGR
+程序
+測試
+USB 前綴路徑
+自定義IGR啟動文件
 數值以分鐘計,設為 0 禁用降速
 自動 HDD 降速
-影片模式
+視頻模式
 對話框顏色
 被選定顏色
-顯示資訊業面
-資訊
+顯示訊息頁面
+訊息
 自定義 ELF
 顏色選項
-重新連線
+重新連接
 留空列出共享清單
-ETH 前墜位置
+ETH 前綴路徑
 退格
 空格
-Enter
+回車
 模式
 VMC 插槽 1
 VMC 插槽 2
-Game ID
+遊戲 ID
 DMA 模式
-V-Sync
+垂直同步
 模式 1
 模式 2
 模式 3
@@ -170,107 +170,108 @@ V-Sync
 模式 7
 模式 8
 配置 GSM
-以太網鏈接模式
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+乙太網鏈接模式
+100Mbit 全雙工
+100Mbit 半雙工
+10Mbit 全雙工
+10Mbit 半雙工
 GSM 設置
 啟用 GSM
 切換 GSM 開或關
-VMODE
+畫面模式
 強制自定義顯示模式
-H-POS
 水平調整
-V-POS
+調整水平方向的顯示位置
 垂直調整
-Overscan
-Overscan Adjustment
+調整垂直方向的顯示位置
+過掃
+過掃調節
 跳過 FMV
 跳過全動態視頻
 金手指設置
-啟用 PS2RD 金手指引擎
-允許 PS2RD 金手指引擎對你的遊戲進行補丁
-PS2RD 金手指引擎模式
-自動選擇或選擇遊戲金手指
-自動選擇金手指
-選擇遊戲金手指
-錯誤: 讀取金手指档案出錯
-無發現金手指档案
-下載預設值
-網絡更新
-重新下載現有記錄?
+啟用PS2RD 
+允許對選定遊戲使用PS2RD金手指
+PS2RD 金手指模式
+自動或手動選擇
+自動選擇
+手動選擇
+錯誤: 讀取金手指文件出錯
+未發現金手指文件
+下載默認設置
+網路更新
+重新下載設置?
 更新失敗.
 連結更新伺服器失敗.
 更新已完成.
 更新已取消.
-從網絡上下載設置?
+從網路上下載設置?
 自定義設置
-已下載預設值
+已下載默認值
 將自動於 %i 秒後啟動...
 自動啟動
-以秒為單位,設為 0 來禁用自動啟動
-PS2Logo
-僅顯示與控制臺區域疋配的有效磁盤標識
+以秒為單位,設為 0 禁用自動啟動
+PS2 標誌
+進入遊戲前顯示相應標識
 配置PADEMU
-Pad模擬器設置
-開啟Pad模擬器
-為選定的遊戲開啟/關閉pad模擬調節。
-Pad模擬器模式
-選擇Pad模擬器模式。
+PADEMU設置
+開啟PADEMU
+為選定遊戲開啟/關閉PADEMU調節.
+連接模式
+選擇PADEMU連接模式.
 有線連接
 藍牙連接
-設置端口:
-選擇Pad模擬器端口
+設置埠:
+選擇應用PADEMU埠
 開啟模擬
-打開/關閉選定端口的模擬器
+打開/關閉選定埠的模擬
 開啟振動
-打開/關閉選定端口的振動。
-USB藍牙適配器MAC地址:
-DS控制器MAC地址:
+打開/關閉選定埠的振動.
+藍牙適配器MAC地址:
+D   S  手 柄MAC地址:
 配對
-配對DS控制器
-藍牙適配器和DS控制器進行MAC地址配對。
+配對DS手柄
+藍牙適配器和DS手柄進行MAC地址配對.
 沒有連接
-藍牙適配器資訊
-顯示更多的資訊和支持的特性
+藍牙適配器信息
+顯示更多的信息和支持的特性
 HCI版本:
 LMP版本:
-制造商ID:
+製造商ID:
 支持的功能:
 是
 否
-藍牙適配器應該完全兼容DS3/DS4控制器
-藍牙適配器可能無法與DS3/DS4控制器疋配
-開啟多重模擬
-打開/關閉這個遊戲的多重模擬.
-多重模擬端口
-選擇進行多重模擬的端口
-禁用仿冒DS3控制器
-這個選項將使一些仿冒的DS3控制器無法工作
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
+藍牙適配器完全兼容DS3/DS4手柄
+藍牙適配器與DS3/DS4手柄不匹配
+開啟分插模擬
+打開/關閉分插模擬.
+模擬分插埠
+選擇模擬的分插埠
+禁用仿製DS3手柄
+這個選項將使仿製DS3手柄無法工作
+模擬播片掃描方式切換
+修正逐行模式下視頻播放有問題的遊戲.
+家長鎖設置
+家長鎖密碼
+留空將不啟用家長鎖.
+輸入家長鎖密碼
+家長鎖密碼不正確.
+已禁用家長鎖.
+創建選項:
+錯誤-無法使用此密碼.
+vmc% s 文件碎片化.是否繼續使用插槽% d 中的記憶卡？
+音頻設置
+啟用聲音效果
+啟用啟動聲音
+音效音量
+啟動音量
+確認視頻模式更改？
+Cache Game List
 PS1遊戲
 PS1遊戲啟動模式
-POPSTARTER.ELF在'%s'上找不到!
-VCD档案'%s'沒有找到!
-重命名档案時發生錯誤
-刪除档案時發生錯誤
-Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
-ifcaro OPL version at psx-scene.com
-OPL Daily Builds (DB) version at ps2-home.com
+POPSTARTER.ELF在\'%s\'上找不到!
+VCD文件\'%s\'沒有找到!
+重命名文件時發生錯誤.
+刪除文件時發生錯誤.
+永遠不要購買OPEN-PS2-LOADER (OPL)，而是免費獲得：
+ifcaro OPL 版本從psx-scene.com
+OPL 日常開發版(DB)從ps2-home.com

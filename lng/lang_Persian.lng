@@ -1,6 +1,6 @@
 # Translation by saeid0035
-# Last update: Jan. 3, 2019
-# Updated for OPL_1386_DB-TA_[d409ba5]
+# Last update: Jan. 20, 2019
+# Updated for OPL_1460_DB-TA_[57fe65c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Persian
 OPL %s
@@ -265,6 +265,7 @@ Skips Full Motion Videos
 میزان بلندی صدای افکت ها
 میزان بلندی صدای بوت
 Confirm video mode change?
+Cache Game List
 بازی های پلی استیشن ۱
 حالت نمایش بازی های پلی استیشن ۱
 فایل POPSTARTER.ELF در '%s'موجود نیست!

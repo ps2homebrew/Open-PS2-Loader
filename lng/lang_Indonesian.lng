@@ -1,6 +1,6 @@
 # translated by verislasher and jbliz
-# Last update: Jan. 5, 2019
-# Updated for OPL_1386_DB-TA_[d409ba5]
+# Last update: Jan. 20, 2019
+# Updated for OPL_1460_DB-TA_[57fe65c]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
 OPL %s
@@ -265,6 +265,7 @@ Aktifkan suara Boot
 Volume efek suara
 Volume suara Boot
 Konfirmasi mengubah mode video?
+Cache Game List
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

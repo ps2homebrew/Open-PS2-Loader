@@ -66,9 +66,9 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {ELM_ICON, "elm", &elm_png},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {LEFT_ICON, "left", &left_png},
     {RIGHT_ICON, "right", &right_png},
     {UP_ICON, "up", &up_png},
@@ -85,10 +85,10 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {R2_ICON, "R2", &R2_png},
     {LOGO_PICTURE, "logo", &logo_png},
     {BG_OVERLAY, "bg_overlay", &bg_overlay_png},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {BG_OVERLAY_2, "bg_overlay_2", &bg_overlay_2_png},
     {INFO_OVERLAY, "info_overlay", &info_overlay_png},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 };
 
 int texLookupInternalTexId(const char *name)

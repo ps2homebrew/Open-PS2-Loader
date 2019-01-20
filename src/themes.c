@@ -735,7 +735,6 @@ static void drawItemsList(struct menu_list *menu, struct submenu_list *item, con
             if (itemsList->decoratorImage) {
                 GSTEXTURE *itemIconTex = getGameImageTexture(itemsList->decoratorImage->cache, menu->item->userdata, &ps->item);
                 if (itemIconTex && itemIconTex->Mem)
-//START of OPL_DB tweaks
                     rmDrawPixmap(itemIconTex, posX, posY, elem->aligned, DECORATOR_SIZE, DECORATOR_SIZE, elem->scaled, gDefaultCol);
                 else {
                     if (itemsList->decoratorImage->defaultTexture)
@@ -744,7 +743,6 @@ static void drawItemsList(struct menu_list *menu, struct submenu_list *item, con
                 fntRenderString(elem->font, elem->posX + DECORATOR_SIZE, posY, elem->aligned, elem->width, elem->height, submenuItemGetText(&ps->item), color);
             } else
                 fntRenderString(elem->font, elem->posX, posY, elem->aligned, elem->width, elem->height, submenuItemGetText(&ps->item), color);
-//END of OPL_DB tweaks
 
             posY += MENU_ITEM_HEIGHT;
             ps = ps->next;

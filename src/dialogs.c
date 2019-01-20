@@ -19,12 +19,12 @@ struct UIItem diaNetConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETH_OPMODE}}},
     {UI_SPACER},
     {UI_ENUM, NETCFG_ETHOPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
 
     // {UI_BREAK},
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CAT_PS2}}},
     {UI_BREAK},
@@ -109,10 +109,10 @@ struct UIItem diaNetConfig[] = {
     {UI_INT, NETCFG_SHARE_PORT, 1, 1, -1, 0, 0, {.intvalue = {445, 445, 0, 1024}}},
     {UI_BREAK},
 
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
 
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     //  ---- SMB share name ----
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SHARE}}},
     {UI_SPACER},
@@ -127,15 +127,15 @@ struct UIItem diaNetConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_PASSWORD}}},
     {UI_SPACER},
     {UI_PASSWORD, NETCFG_SHARE_PASSWORD, 1, 1, _STR_HINT_GUEST, 0, 0, {.stringvalue = {"", "", NULL}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // buttons
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_BUTTON, NETCFG_OK, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPACER},
     {UI_BUTTON, NETCFG_RECONNECT, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RECONNECT}}},
@@ -221,10 +221,10 @@ struct UIItem diaCompatConfig[] = {
     {UI_STRING, COMPAT_GAMEID, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_LOADFROMDISC, 1, 1, -1, 0, 0, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_SPLITTER},
     {UI_BREAK},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
     {UI_SPACER},
@@ -328,20 +328,20 @@ struct UIItem diaConfig[] = {
     {UI_ENUM, CFG_APPMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ELMMODE}}},
     {UI_SPACER},
     {UI_ENUM, CFG_ELMMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_DEFDEVICE}}},
     {UI_SPACER},
     {UI_ENUM, CFG_DEFDEVICE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -431,10 +431,10 @@ struct UIItem diaUIConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_WIDE_SCREEN}}},
     {UI_SPACER},
     {UI_BOOL, UICFG_WIDESCREEN, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -466,10 +466,10 @@ struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_YOFFSET}}},
     {UI_SPACER},
     {UI_INT, GSMCFG_GSMYOFFSET, 1, 1, _STR_HINT_YOFFSET, -5, 0, {.intvalue = {0, 0, -100, 100}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // {UI_BREAK},
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSM_FIELD_FIX}}},
     {UI_SPACER},
@@ -758,13 +758,13 @@ struct UIItem diaCheatConfig[] = {
 // About Menu
 struct UIItem diaAbout[] = {
     {UI_LABEL, ABOUT_TITLE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_SPLITTER},
 
     // Build Options
     {UI_BREAK},
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}}, {UI_SPACER}, {UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_SPLITTER},
 
     // Coders
@@ -772,58 +772,54 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, crazyc, danielb, dlanor, doctorxyz, hominem.te.esse, ifcaro,", -1}}},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, Maximus32, misfire, Polo35, ps2netbox/ps2usb,", -1}}},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"reprep, SP193, volca, ... and the anonymous ...", -1}}},
-//END of OPL_DB tweaks
-//START of OPL_DB tweaks
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // Quality Assurance
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_QANDA}}},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"algol, Berion, El_Patas, EP, gledson999, lee4, LocalH, RandQalan,", -1}}},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"ShaolinAssassin, yoshi314, and zero35.", -1}}},
-//END of OPL_DB tweaks
-//START of OPL_DB tweaks
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // Network update
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NET_UPDATE}}},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"icyson55", -1}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     // OPL Free Statement
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OPL_FREE}}},
     {UI_BREAK},
@@ -835,7 +831,7 @@ struct UIItem diaAbout[] = {
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {NULL, _STR_OPL_DB}}},
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -857,9 +853,9 @@ struct UIItem diaVMC[] = {
     {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_SIZE}}},
     {UI_SPACER},
     {UI_ENUM, VMC_SIZE, 1, 1, _STR_HINT_VMC_SIZE, 0, 0, {.intvalue = {0, 0}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_STATUS}}},
     {UI_SPACER},
@@ -870,9 +866,9 @@ struct UIItem diaVMC[] = {
     {UI_SPACER},
     {UI_INT, VMC_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"%", -1}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_BUTTON, VMC_BUTTON_CREATE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
@@ -897,9 +893,9 @@ struct UIItem diaNetCompatUpdate[] = {
     {UI_SPACER},
     {UI_INT, NETUPD_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
     {UI_LABEL, NETUPD_PROGRESS_PERC_LBL, 1, 1, -1, 0, 0, {.label = {"%", -1}}},
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     {UI_SPLITTER},
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_BUTTON, NETUPD_BTN_START, 1, 1, -1, 0, 0, {.label = {NULL, _STR_START}}},

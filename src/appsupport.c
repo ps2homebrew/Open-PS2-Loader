@@ -328,7 +328,9 @@ static char *appGetItemStartup(int id)
     if (appsList[id].legacy)
     {
         struct config_value_t *cur = appGetConfigValue(id);
+        //START of OPL_DB tweaks
         return appGetELFName(cur->val);
+		//END of OPL_DB tweaks
     } else {
         return appsList[id].boot;
     }
@@ -406,7 +408,9 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
 static config_set_t *appGetConfig(int id)
 {
-    config_set_t *config = NULL;
+    //START of OPL_DB tweaks
+	config_set_t *config = NULL;
+	//END of OPL_DB tweaks
 
     if (appsList[id].legacy) {
         config = configAlloc(0, NULL, NULL);
@@ -470,7 +474,7 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
         //START of OPL_DB tweaks
         configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
-	    configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
+        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
         //END of OPL_DB tweaks
     } else {
         char path[256];
@@ -485,7 +489,7 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_STARTUP, path);
         //START of OPL_DB tweaks
         configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
-	    configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
+        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
         //END of OPL_DB tweaks
     }
     return config;
@@ -497,12 +501,14 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
 
     startup = appGetBoot(device, sizeof(device), value);
 
-    // Try with entire value, fixes not loading theme icons in subfolders.
+    //START of OPL_DB tweaks
+	// Try with entire value, fixes not loading theme icons in subfolders.
     if (oplGetAppImage(device, folder, isRelative, value, suffix, resultTex, psm) >=0){
         return 0;
     }
 
-    return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
+    //END of OPL_DB tweaks
+	return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }
 
 //This may be called, even if appInit() was not.

@@ -143,12 +143,6 @@ static void IGR_Thread(void *arg)
             ) {
 
         if (!DisableDebug)
-            GS_BGCOLOUR = 0x800000; // Dark Blue
-
-        // Reset SPU
-        ResetSPU();
-
-        if (!DisableDebug)
             GS_BGCOLOUR = 0xFF8000; // Blue sky
 
         oplIGRShutdown(0);
@@ -211,6 +205,12 @@ static void IGR_Thread(void *arg)
 
         // Init RPC & CMD
         SifInitRpc(0);
+
+        if (!DisableDebug)
+            GS_BGCOLOUR = 0x800000; // Dark Blue
+
+        // Reset SPU - do it after the IOP reboot, so nothing will compete with the EE for it.
+        ResetSPU();
 
 #ifdef IGS
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))

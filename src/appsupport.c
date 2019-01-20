@@ -325,13 +325,13 @@ static int appGetItemNameLength(int id)
    The path is used immediately, before a subsequent call to appGetItemStartup(). */
 static char *appGetItemStartup(int id)
 {
+    //START of OPL_DB tweaks
     if (appsList[id].legacy)
     {
         struct config_value_t *cur = appGetConfigValue(id);
-        //START of OPL_DB tweaks
         return appGetELFName(cur->val);
-        //END of OPL_DB tweaks
     } else {
+    //END of OPL_DB tweaks
         return appsList[id].boot;
     }
 }
@@ -502,7 +502,7 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
     startup = appGetBoot(device, sizeof(device), value);
 
     //START of OPL_DB tweaks
-	// Try with entire value, fixes not loading theme icons in subfolders.
+    // Try with entire value, fixes not loading theme icons in subfolders.
     if (oplGetAppImage(device, folder, isRelative, value, suffix, resultTex, psm) >=0){
         return 0;
     }

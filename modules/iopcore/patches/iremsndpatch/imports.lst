@@ -1,6 +1,20 @@
+intrman_IMPORTS_start
+I_CpuSuspendIntr
+I_CpuResumeIntr
+intrman_IMPORTS_end
+
 loadcore_IMPORTS_start
 I_GetLoadcoreInternalData
+I_FlushIcache
 loadcore_IMPORTS_end
+
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+
+sysclib_IMPORTS_start
+I_strtol
+sysclib_IMPORTS_end
 
 thbase_IMPORTS_start
 I_WakeupThread

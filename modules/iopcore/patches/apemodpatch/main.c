@@ -1,5 +1,7 @@
 #include <loadcore.h>
 #include <intrman.h>
+#include <stdio.h>
+#include <sysclib.h>
 #include <thbase.h>
 #include <thevent.h>
 #include <thsemap.h>
@@ -40,7 +42,7 @@ static void _WaitEvent(void)
     iop_sys_clock_t sys_clock;
     u32 bits;
 
-    sys_clock.lo = 368000; //10000us = 36.8MHz * 1000 * 1000 / 1000 * 10, as per the original timeout.
+    sys_clock.lo = 368640; //10000us = 36.864MHz * 1000 * 1000 / 1000 * 10, as per the original timeout.
     sys_clock.hi = 0;
     SetAlarm(&sys_clock, &EventTimeoutCb, (void*)evFlag);
     WaitEventFlag(evFlag, EV_ACTIVITY|EV_TIMEOUT, WEF_OR|WEF_CLEAR, &bits);
@@ -56,22 +58,30 @@ static void _iSetEvent(void)
 int _start(int argc, char **argv)
 {
     lc_internals_t *lc;
-    ModuleInfo_t *m, *prevM;
+    ModuleInfo_t *m;
     iop_sema_t sema;
     iop_event_t event;
-    int OldState;
+    int OldState, modId;
+
+    if (argc != 2)
+    {
+        printf("Missing module ID arg.\n");
+        return MODULE_NO_RESIDENT_END;
+    }
+
+    modId = strtol(argv[1], NULL, 16);
 
     lc = GetLoadcoreInternalData();
 
-    //Locate the last-registered module.
+    //Locate the specified module.
     m = lc->image_info;
-    prevM = NULL;
-    while(m != NULL)
+    while (m != NULL)
     {
-      prevM = m;
-      m = m->next;
+        if (modId == m->id)
+            break;
+
+        m = m->next;
     }
-    m = prevM;
 
     if (m != NULL)
     {
@@ -105,10 +115,12 @@ int _start(int argc, char **argv)
         *(vu32*)(m->text_start + 0x00001b88) = JAL((u32)&_iSetEvent);
         CpuResumeIntr(OldState);
 
-        FlushIcache();
+        FlushIcache(); //Flush instruction cache as instructions were modified.
 
         return MODULE_RESIDENT_END;
     }
+
+    printf("Could not find module %d.\n", modId);
 
     return MODULE_NO_RESIDENT_END;
 }

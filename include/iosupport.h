@@ -3,6 +3,9 @@
 
 #include "include/config.h"
 
+#define IO_MODE_SELECTED_NONE -1
+#define IO_MODE_SELECTED_ALL MODE_COUNT
+
 enum IO_MODES {
     USB_MODE = 0,
     ETH_MODE,
@@ -72,12 +75,15 @@ enum ERROR_CODE {
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 8
 
-#define MENU_UPD_DELAY_NOUPDATE -1  //Menu won't be ever be updated, even if the user triggers a refresh.
-#define MENU_UPD_DELAY_GENREFRESH 0 //Menu will be refreshed every MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
+#define MENU_UPD_DELAY_NOUPDATE -1  //Auto refresh is disabled for the item. The refresh button may be used to manually refresh the item.
+#define MENU_UPD_DELAY_GENREFRESH 0 //The item will be refreshed every MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
 
 typedef struct
 {
     short int mode;
+
+    /// Device priority when it comes to locating art assets for apps. Higher value = lower priority. (< 0) means no support for art assets.
+    char appsPriority;
 
     char enabled;
 
@@ -95,6 +101,9 @@ typedef struct
 
     /// item description in localised form (used if value is not negative)
     int textId;
+
+    /// @return path to applications storage on the device (set callback to NULL if not applicable).
+    void (*itemGetAppsPath)(char *path, int max);
 
     void (*itemInit)(void);
 
@@ -125,6 +134,8 @@ typedef struct
     int (*itemGetImage)(char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm);
 
     void (*itemCleanUp)(int exception);
+
+    void (*itemShutdown)(void);
 
     int (*itemCheckVMC)(char *name, int createSize);
 

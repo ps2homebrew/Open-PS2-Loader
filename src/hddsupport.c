@@ -17,7 +17,7 @@
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
 
-static unsigned char hddForceUpdate = 1;
+static unsigned char hddForceUpdate = 0;
 static unsigned char hddHDProKitDetected = 0;
 static unsigned char hddModulesLoaded = 0;
 
@@ -35,6 +35,9 @@ char* hddGetPrefix(void){
 }
 
 //END of OPL_DB tweaks
+static int hddLoadGameListCache(hdl_games_list_t *cache);
+static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *game_list);
+
 static void hddInitModules(void)
 {
 
@@ -192,7 +195,7 @@ void hddLoadModules(void)
 void hddInit(void)
 {
     LOG("HDDSUPPORT Init\n");
-    hddForceUpdate = 1;
+    hddForceUpdate = 0; //Use cache at initial startup.
     configGetInt(configGetByType(CONFIG_OPL), "hdd_frames_delay", &hddGameList.delay);
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddInitModules);
     hddGameList.enabled = 1;
@@ -206,18 +209,32 @@ item_list_t *hddGetObject(int initOnly)
 }
 
 static int hddNeedsUpdate(void)
-{
-    if (hddForceUpdate) {
-        hddForceUpdate = 0;
-        return 1;
-    }
-
-    return 0;
+{   /* Auto refresh is disabled by setting HDD_MODE_UPDATE_DELAY to MENU_UPD_DELAY_NOUPDATE, within hddsupport.h.
+       Hence any update request would be issued by the user, which should be taken as an explicit request to re-scan the HDD. */
+    return 1;
 }
 
 static int hddUpdateGameList(void)
 {
-    return (hddGetHDLGamelist(&hddGames) == 0 ? hddGames.count : 0);
+    hdl_games_list_t hddGamesNew;
+    int ret;
+
+    if (((ret = hddLoadGameListCache(&hddGames)) != 0) || (hddForceUpdate))
+    {
+        hddGamesNew.count = 0;
+        hddGamesNew.games = NULL;
+        ret = hddGetHDLGamelist(&hddGamesNew);
+        if (ret == 0)
+        {
+            hddUpdateGameListCache(&hddGames, &hddGamesNew);
+            hddFreeHDLGamelist(&hddGames);
+            hddGames = hddGamesNew;
+        }
+    }
+
+    hddForceUpdate = 1; //Subsequent refresh operations will cause the HDD to be scanned.
+
+    return (ret == 0 ? hddGames.count : 0);
 }
 
 static int hddGetGameCount(void)
@@ -404,7 +421,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     if (gPS2Logo)
         EnablePS2Logo = CheckPS2Logo(0, game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET);
 
-    deinit(NO_EXCEPTION); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
+    deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
 
     sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }
@@ -414,18 +431,14 @@ static config_set_t *hddGetConfig(int id)
     char path[256];
     hdl_game_info_t *game = &hddGames.games[id];
 
-#ifdef OPL_IS_DEV_BUILD
-    snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", hddPrefix, game->startup);
-#else
-    snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
-#endif
+    snprintf(path, sizeof(path), "%s"OPL_FOLDER"/%s.cfg", hddPrefix, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file exists or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     configSetInt(config, CONFIG_ITEM_SIZE, game->total_size_in_kb >> 10);
     configSetStr(config, CONFIG_ITEM_FORMAT, "HDL");
-    configSetStr(config, CONFIG_ITEM_MEDIA, game->disctype == 0x12 ? "CD" : "DVD");
+    configSetStr(config, CONFIG_ITEM_MEDIA, game->disctype == SCECdPS2CD ? "CD" : "DVD");
     configSetStr(config, CONFIG_ITEM_STARTUP, game->startup);
 
     return config;
@@ -441,6 +454,7 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
+//This may be called, even if hddInit() was not.
 static void hddCleanUp(int exception)
 {
     LOG("HDDSUPPORT CleanUp\n");
@@ -450,11 +464,14 @@ static void hddCleanUp(int exception)
 
         if ((exception & UNMOUNT_EXCEPTION) == 0)
             fileXioUmount(hddPrefix);
-
-        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
     }
 
-    hddModulesLoaded = 0;
+    //UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
+    if (hddModulesLoaded) {
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+
+        hddModulesLoaded = 0;
+    }
 }
 
 static int hddCheckVMC(char *name, int createSize)
@@ -462,8 +479,153 @@ static int hddCheckVMC(char *name, int createSize)
     return sysCheckVMC(hddPrefix, "/", name, createSize, NULL);
 }
 
+//This may be called, even if hddInit() was not.
+static void hddShutdown(void)
+{
+    LOG("HDDSUPPORT Shutdown\n");
+
+    if (hddGameList.enabled) {
+        hddFreeHDLGamelist(&hddGames);
+        fileXioUmount(hddPrefix);
+    }
+
+    //UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
+    if (hddModulesLoaded) {
+        /* Close all files */
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+
+        //DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
+        //The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
+        hddSetIdleImmediate();
+
+        //Only shut down dev9 from here, if it was initialized from here before.
+        sysShutdownDev9();
+
+        hddModulesLoaded = 0;
+    }
+}
+
+static int hddLoadGameListCache(hdl_games_list_t *cache)
+{
+    char filename[256];
+    FILE *file;
+    hdl_game_info_t *games;
+    int result, size, count;
+
+    if (!gGameListCache)
+        return 1;
+
+    hddFreeHDLGamelist(cache);
+
+    sprintf(filename, "%s/games.bin", hddPrefix);
+    file = fopen(filename, "rb");
+    if (file != NULL)
+    {
+        fseek(file, 0, SEEK_END);
+        size = ftell(file);
+        rewind(file);
+
+        count = size / sizeof(hdl_game_info_t);
+        if (count > 0)
+        {
+            games = memalign(64, count * sizeof(hdl_game_info_t));
+            if (games != NULL)
+            {
+                if (fread(games, sizeof(hdl_game_info_t), count, file) == count)
+                {
+                    cache->count = count;
+                    cache->games = games;
+                    LOG("hddLoadGameListCache: %d games loaded.\n", count);
+                    result = 0;
+                } else {
+                    LOG("hddLoadGameListCache: I/O error.\n");
+                    free(games);
+                    result = EIO;
+                }
+            } else {
+                LOG("hddLoadGameListCache: failed to allocate memory.\n");
+                result = ENOMEM;
+            }
+        } else {
+            result = -1; //Empty file
+        }
+
+        fclose(file);
+    } else {
+        result = ENOENT;
+    }
+
+    return result;
+}
+
+static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *game_list)
+{
+    char filename[256];
+    FILE *file;
+    int result, i, j, modified;
+
+    if (!gGameListCache)
+        return 1;
+
+    if (cache->count > 0)
+    {
+        modified = 0;
+        for(i = 0; i < cache->count; i++)
+        {
+            for (j = 0; j < game_list->count; j++)
+            {
+                if (strncmp(cache->games[i].partition_name, game_list->games[j].partition_name, APA_IDMAX+1) == 0)
+                    break;
+            }
+
+            if (j == game_list->count)
+            {
+                LOG("hddUpdateGameListCache: game added.\n");
+                modified = 1;
+                break;
+            }
+        }
+
+        if ((!modified) && (game_list->count != cache->count))
+        {
+            LOG("hddUpdateGameListCache: game removed.\n");
+            modified = 1;
+        }
+    } else {
+        modified = (game_list->count > 0) ? 1 : 0;
+    }
+
+    if (!modified)
+        return 0;
+    LOG("hddUpdateGameListCache: caching new game list.\n");
+
+    sprintf(filename, "%s/games.bin", hddPrefix);
+    if (game_list->count > 0)
+    {
+        file = fopen(filename, "wb");
+        if (file != NULL)
+        {
+            result = (fwrite(game_list->games, sizeof(hdl_game_info_t), game_list->count, file) == game_list->count) ? 0 : EIO;
+            fclose(file);
+        } else {
+            result = EIO;
+        }
+    } else {
+        //Last game deleted.
+        remove(filename);
+        result = 0;
+    }
+
+    return result;
+}
+
+static void hddGetAppsPath(char *path, int max)
+{
+    snprintf(path, max, "%s/APPS", hddPrefix);
+}
+
 static item_list_t hddGameList = {
-    HDD_MODE, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddGetAppsPath, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddCheckVMC, HDD_ICON
+    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON
 };

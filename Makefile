@@ -58,7 +58,7 @@ OPL_VERSION = $(VERSION).$(SUBVERSION).$(PATCHLEVEL).$(REVISION)$(if $(EXTRAVERS
 #START of OPL_DB tweaks
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
 		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
-		appsupport.o elmsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o
+		appsupport.o elmsupport.o gui.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o ps2cnf.o
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o elm_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
@@ -76,7 +76,7 @@ IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		httpclient-iop.o netman.o ps2ips.o \
 		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
-		iremsndpatch.o apemodpatch.o \
+		iremsndpatch.o apemodpatch.o f2techioppatch.o cleareffects.o \
 		libsd.o audsrv.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
@@ -141,7 +141,12 @@ endif
 
 ifeq ($(DEBUG),1)
   EE_CFLAGS += -D__DEBUG -g
-  EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
+  ifeq ($(DECI2_DEBUG),1)
+    EE_OBJS += debug.o drvtif_irx.o tifinet_irx.o deci2_img.o
+    EE_LDFLAGS += -liopreboot
+  else
+    EE_OBJS += debug.o udptty.o ioptrap.o ps2link.o
+  endif
   MOD_DEBUG_FLAGS = DEBUG=1
   ifeq ($(IOPCORE_DEBUG),1)
     EE_CFLAGS += -D__INGAME_DEBUG
@@ -161,9 +166,9 @@ ifeq ($(DEBUG),1)
     ifeq ($(DECI2_DEBUG),1)
       EE_CFLAGS += -D__DECI2_DEBUG
       EECORE_EXTRA_FLAGS += DECI2_DEBUG=1
-      IOP_OBJS += drvtif_irx.o tifinet_irx.o
+      IOP_OBJS += drvtif_ingame_irx.o tifinet_ingame_irx.o
       DECI2_DEBUG=1
-      CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
+      CDVDMAN_DEBUG_FLAGS = USE_DEV9=1 #(clear IOPCORE_DEBUG) dsidb cannot be used to handle exceptions or set breakpoints, so disable output to save resources.
     else
       IOP_OBJS += udptty-ingame.o
     endif
@@ -239,6 +244,10 @@ clean:
 	$(MAKE) -C modules/iopcore/patches/iremsndpatch clean
 	echo "   -apemod"
 	$(MAKE) -C modules/iopcore/patches/apemodpatch clean
+	echo "   -f2techiop"
+	$(MAKE) -C modules/iopcore/patches/f2techioppatch clean
+	echo "   -cleareffects"
+	$(MAKE) -C modules/iopcore/patches/cleareffects clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
 	echo " -usbhdfsdfsv"
@@ -400,6 +409,20 @@ modules/iopcore/patches/apemodpatch/apemodpatch.irx: modules/iopcore/patches/ape
 
 $(EE_ASM_DIR)apemodpatch.s: modules/iopcore/patches/apemodpatch/apemodpatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ apemodpatch_irx
+
+modules/iopcore/patches/f2techioppatch/f2techioppatch.irx: modules/iopcore/patches/f2techioppatch
+	echo " -f2techiop patch"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)f2techioppatch.s: modules/iopcore/patches/f2techioppatch/f2techioppatch.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ f2techioppatch_irx
+
+modules/iopcore/patches/cleareffects/cleareffects.irx: modules/iopcore/patches/cleareffects
+	echo " -cleareffects"
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)cleareffects.s: modules/iopcore/patches/cleareffects/cleareffects.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ cleareffects_irx
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
 	echo " -usb_mcemu"
@@ -765,11 +788,20 @@ $(EE_ASM_DIR)transition.s: misc/transition.adp | $(EE_ASM_DIR)
 $(EE_ASM_DIR)IOPRP_img.s: modules/iopcore/IOPRP.img | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ IOPRP_img
 
+$(EE_ASM_DIR)drvtif_ingame_irx.s: modules/debug/drvtif-ingame.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ drvtif_ingame_irx
+
+$(EE_ASM_DIR)tifinet_ingame_irx.s: modules/debug/tifinet-ingame.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ tifinet_ingame_irx
+
 $(EE_ASM_DIR)drvtif_irx.s: modules/debug/drvtif.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ drvtif_irx
 
 $(EE_ASM_DIR)tifinet_irx.s: modules/debug/tifinet.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ tifinet_irx
+
+$(EE_ASM_DIR)deci2_img.s: modules/debug/deci2.img | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ deci2_img
 
 $(EE_OBJS_DIR)%.o: $(EE_SRC_DIR)%.c | $(EE_OBJS_DIR)
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@

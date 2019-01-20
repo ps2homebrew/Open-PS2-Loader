@@ -16,12 +16,12 @@
   Copyright (C) 2009 misfire <misfire@xploderfreax.de>
 */
 
+#include <ee_regs.h>
 #include <iopcontrol.h>
 #include "ee_core.h"
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
-#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -142,12 +142,6 @@ static void IGR_Thread(void *arg)
             ) {
 
         if (!DisableDebug)
-            GS_BGCOLOUR = 0x800000; // Dark Blue
-
-        // Reset SPU
-        ResetSPU();
-
-        if (!DisableDebug)
             GS_BGCOLOUR = 0xFF8000; // Blue sky
 
         oplIGRShutdown(0);
@@ -210,6 +204,13 @@ static void IGR_Thread(void *arg)
 
         // Init RPC & CMD
         SifInitRpc(0);
+        LoadFileInit();
+
+        if (!DisableDebug)
+            GS_BGCOLOUR = 0x800000; // Dark Blue
+
+        // Reset SPU
+        LoadModule("rom0:CLEARSPU", 0, NULL);
 
 #ifdef IGS
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
@@ -220,6 +221,7 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x008000; // Dark Green
 
         // Exit services
+        LoadFileExit();
         SifExitRpc();
 
         IGR_Exit(0);
@@ -313,26 +315,44 @@ static int IGR_Intc_Handler(int cause)
     // Suspend and Change priority of all threads other then our IGR thread
     // Wakeup and Change priority of our IGR thread
     if (Pad_Data.combo_type != 0x00) {
-        // Disable Interrupts
-        iDisableIntc(kINTC_GS);
-        iDisableIntc(kINTC_VBLANK_START);
-        iDisableIntc(kINTC_VBLANK_END);
-        iDisableIntc(kINTC_VIF0);
-        iDisableIntc(kINTC_VIF1);
-        iDisableIntc(kINTC_VU0);
-        iDisableIntc(kINTC_VU1);
-        iDisableIntc(kINTC_IPU);
-        iDisableIntc(kINTC_TIMER0);
-        iDisableIntc(kINTC_TIMER1);
+        // Disable documented interrupts
+        // INTC interrupts
+        iDisableIntc(INTC_GS);
+        iDisableIntc(INTC_VBLANK_S);
+        iDisableIntc(INTC_VBLANK_E);
+        iDisableIntc(INTC_VIF0);
+        iDisableIntc(INTC_VIF1);
+        iDisableIntc(INTC_VU0);
+        iDisableIntc(INTC_VU1);
+        iDisableIntc(INTC_IPU);
+        iDisableIntc(INTC_TIM0);
+        iDisableIntc(INTC_TIM1);
+        iDisableIntc(INTC_TIM2); //This was available for developers with older SDKs, then it became reserved.
+        // DMAC interrupts (except for SIF0, SIF1 & SIF2).
+        iDisableDmac(DMAC_VIF0);
+        iDisableDmac(DMAC_VIF1);
+        iDisableDmac(DMAC_GIF);
+        iDisableDmac(DMAC_FROM_IPU);
+        iDisableDmac(DMAC_TO_IPU);
+        iDisableDmac(DMAC_FROM_SPR);
+        iDisableDmac(DMAC_TO_SPR);
 
-        // Loop for each threads
+        // Loop for each threads, skipping the idle & IGR threads.
         for (i = 1; i < 256; i++) {
             if (i != IGR_Thread_ID) {
                 // Suspend all threads
                 iSuspendThread(i);
-                iChangeThreadPriority(i, 127);
             }
         }
+
+        //Wait for ongoing transfers to end (except for SIF0, SIF1 & SIF2).
+        while((*R_EE_D0_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D1_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D2_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D3_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D4_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D8_CHCR) & EE_CHCR_STR) {};
+        while((*R_EE_D9_CHCR) & EE_CHCR_STR) {};
 
         DPRINTF("IGR: trying to wake IGR thread...\n");
         iChangeThreadPriority(IGR_Thread_ID, 0);
@@ -479,21 +499,20 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                     scePad2CreateSocket = (void *)ptr;
 
                 if (mode == PADOPEN_HOOK) {
-                    // Retrieve PadOpen call Instruction code
-                    inst = 0x00000000;
-                    inst |= 0x03ffffff & ((u32)ptr >> 2);
+                    // Generate generic instruction pattern & mask for a J/JAL to PadOpen()
+                    // Use 000010 as the operation, to match both J & JAL.
+                    inst = 0x08000000 | (0x03ffffff & ((u32)ptr >> 2));
 
-                    // Make pattern with function call code saved above
-                    // Ignore bits 24-27 because Jump type can be J(8) or JAL(C)
+                    // Ignore bit 26 for the mask because the jump type can be either J (000010) or JAL (000011)
                     pattern[0] = inst;
-                    mask[0] = 0xf0ffffff;
+                    mask[0] = 0xfbffffff;
 
                     DPRINTF("IGR: searching opcode %08x witk mask %08x\n", (int)pattern[0], (int)mask[0]);
 
                     // Search & patch for calls to PadOpen
-                    ptr2 = (u32 *)0x00100000;
+                    ptr2 = (u32 *)mem_start;
                     while (ptr2) {
-                        mem_size2 = 0x01ff0000 - (u32)ptr2;
+                        mem_size2 = (u32)((u8*)mem_end - (u8*)ptr2);
 
                         ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
                         if (ptr2) {
@@ -503,8 +522,8 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
                             fncall = (u32)ptr2;
 
-                            // Get PadOpen call Jump Instruction type. (JAL or J)
-                            inst = (ptr2[0] & 0x0f000000);
+                            // Get PadOpen call Jump Instruction type (JAL or J).
+                            inst = (ptr2[0] & 0xfc000000);
 
                             // Get Hook_PadOpen call Instruction code
                             if (padopen_patterns[i].version == IGR_LIBPAD_V1) {
@@ -521,6 +540,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                         }
                     }
 
+                    //Locate pointers to scePadOpen(), likely used for JALR.
                     if (!patched) {
                         DPRINTF("IGR: 2nd padOpen patch attempt...\n");
 
@@ -531,9 +551,9 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                         DPRINTF("IGR: searching opcode %08x witk mask %08x\n", (int)pattern[0], (int)mask[0]);
 
                         // Search & patch for PadOpen function address
-                        ptr2 = (u32 *)0x00100000;
+                        ptr2 = (u32 *)mem_start;
                         while (ptr2) {
-                            mem_size2 = 0x01ff0000 - (u32)ptr2;
+                            mem_size2 = (u32)((u8*)mem_end - (u8*)ptr2);
 
                             ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
                             if (ptr2) {

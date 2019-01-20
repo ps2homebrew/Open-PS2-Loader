@@ -1,0 +1,9 @@
+libsd_IMPORTS_start
+I_sceSdInit
+I_sceSdSetEffectAttr
+libsd_IMPORTS_end
+
+sysclib_IMPORTS_start
+I_memset
+sysclib_IMPORTS_end
+

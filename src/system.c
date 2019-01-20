@@ -4,6 +4,10 @@
   Review OpenUsbLd README & LICENSE files for further details.
 */
 
+#ifdef __DECI2_DEBUG
+#include <iopcontrol_special.h>
+#endif
+
 #include "include/opl.h"
 #include "include/gui.h"
 #include "include/ethsupport.h"
@@ -88,6 +92,8 @@ void lngEnd();
 void thmEnd();
 void rmEnd();
 
+static void poweroffHandler(void *arg);
+
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 {
 
@@ -123,7 +129,7 @@ int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv)
 
 #define OPL_SIF_CMD_BUFF_SIZE 1
 static SifCmdHandlerData_t OplSifCmdbuffer[OPL_SIF_CMD_BUFF_SIZE];
-static unsigned char dev9Initialized = 0, dev9Loaded = 0;
+static unsigned char dev9Initialized = 0, dev9Loaded = 0, dev9InitCount = 0;
 
 void sysInitDev9(void)
 {
@@ -133,6 +139,25 @@ void sysInitDev9(void)
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
         dev9Loaded = (ret == 0);  //DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
+    }
+
+    dev9InitCount++;
+}
+
+void sysShutdownDev9(void)
+{
+    if (dev9InitCount > 0)
+    {
+        --dev9InitCount;
+
+        if (dev9InitCount == 0)
+        {   /* Switch off DEV9 once nothing needs it. */
+            if (dev9Loaded)
+            {
+                while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
+                };
+            }
+        }
     }
 }
 
@@ -153,8 +178,13 @@ void sysReset(int modload_mask)
     while (!SifIopReset("rom0:UDNL", 0))
         ;
 #else
+#ifdef __DECI2_DEBUG
+    while (!SifIopRebootBuffer(&deci2_img, size_deci2_img))
+        ;
+#else
     while (!SifIopReset("", 0))
         ;
+#endif
 #endif
 
     dev9Initialized = 0;
@@ -231,29 +261,17 @@ void sysReset(int modload_mask)
 
     fileXioInit();
     poweroffInit();
+    poweroffSetCallback(&poweroffHandler, NULL);
+}
+
+static void poweroffHandler(void *arg)
+{
+    sysPowerOff();
 }
 
 void sysPowerOff(void)
 {
-    int i;
-
-    deinit(NO_EXCEPTION);
-    if (dev9Loaded)
-    {
-        /* Close all files */
-        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
-        /* Switch off DEV9 */
-        while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
-        };
-    }
-
-    // As required by some (typically 2.5") HDDs, issue the SCSI STOP UNIT command to avoid causing an emergency park.
-    for (i = 0; i < MAX_USB_DEVICES; i++) {
-        char device[7];
-        sprintf(device, "mass%d:", i);
-        fileXioDevctl(device, USBMASS_DEVCTL_STOP_UNIT, NULL, 0, NULL, 0);
-    }
-
+    deinit(NO_EXCEPTION, IO_MODE_SELECTED_NONE);
     poweroffShutdown();
 }
 
@@ -334,18 +352,14 @@ int sysGetDiscID(char *hexDiscID)
     return 1;
 }
 
-void sysExecExit()
+void sysExecExit(void)
 {
-#ifdef PADEMU
-    ds34usb_reset();
-    ds34bt_reset();
-#endif
     if (gEnableSFX) {
         //wait 70ms for confirm sound to finish playing before exit
         guiDelay(0070);
-        gEnableSFX = 0;
     }
-    audsrv_quit();
+    //Deinitialize without shutting down active devices.
+    deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     Exit(0);
 }
 
@@ -372,6 +386,9 @@ static const patchlist_t iop_patch_list[] = {
     {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //SOS: The Final Escape
     {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Zettai Zetsumei Toshi
     {"SLES_535.08", "", &apemodpatch_irx, &size_apemodpatch_irx},      //Ultimate Pro Pinball
+    {"SLUS_204.13", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (NTSC-U/C)
+    {"SLES_504.46", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (PAL)
+    {"SLES_506.08", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (PAL German)
     {NULL, NULL, NULL, NULL },  //Terminator
 };
 
@@ -494,10 +511,10 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 #ifdef __INGAME_DEBUG
 #ifdef __DECI2_DEBUG
     if (modules & CORE_IRX_DECI2) {
-        irxptr_tab[modcount].info = size_drvtif_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
-        irxptr_tab[modcount++].ptr = (void *)&drvtif_irx;
-        irxptr_tab[modcount].info = size_tifinet_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
-        irxptr_tab[modcount++].ptr = (void *)&tifinet_irx;
+        irxptr_tab[modcount].info = size_drvtif_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_DRVTIF);
+        irxptr_tab[modcount++].ptr = (void *)&drvtif_ingame_irx;
+        irxptr_tab[modcount].info = size_tifinet_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_TIFINET);
+        irxptr_tab[modcount++].ptr = (void *)&tifinet_ingame_irx;
     }
 #else
     if (modules & CORE_IRX_DEBUG) {
@@ -596,6 +613,21 @@ static int ResetDECI2(void)
 
     return result;
 }
+
+int sysInitDECI2(void)
+{
+    int result;
+
+    DI();
+    ee_kmode_enter();
+
+    result = ResetDECI2();
+
+    ee_kmode_exit();
+    EI();
+
+    return result;
+}
 #endif
 
 /*  Returns the patch location of LoadExecPS2(), which resides in kernel memory.
@@ -680,7 +712,7 @@ static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void
     return((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
 }
 
-void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
+void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
 {
     unsigned int modules, ModuleStorageSize;
     void *ModuleStorage, *ModuleStorageEnd;
@@ -706,8 +738,12 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     if (gExitPath[0] == '\0')
         strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
+    //Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
+    sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
+
     //Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
-    memset((void *)0x00082000, 0, 0x00100000 - 0x00082000);
+    //Start wiping from 0x00084000 instead (as the HDD Browser does), as the alarm patch is installed at 0x00082000.
+    memset((void *)0x00084000, 0, 0x00100000 - 0x00084000);
 
     modules = 0;
     ModuleStorage = GetModStorageLocation(filename, compatflags);
@@ -778,7 +814,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     argv[i] = ModStorageConfig;
     i++;
 
-    argv[i] = filename;
+    argv[i] = (char*)filename;
     i++;
 
     char cmask[10];
@@ -790,18 +826,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     argv[i] = gsm_config_str;
     i++;
 
-    strcpy(ElfPath, "cdrom0:\\");
-    strncat(ElfPath, filename, 11); // fix for 8+3 filename.
-    strcat(ElfPath, ";1");
-
-#ifdef PADEMU
-    ds34usb_reset();
-    ds34bt_reset();
-#endif
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
+    snprintf(ElfPath, sizeof(ElfPath), "cdrom0:\\%s;1", filename);
 
     // Let's go.
     fileXioExit();
@@ -822,7 +847,7 @@ void sysLaunchLoaderElf(char *filename, char *mode_str, int size_cdvdman_irx, vo
     }
 }
 
-int sysExecElf(char *path)
+int sysExecElf(const char *path)
 {
     u8 *boot_elf = NULL;
     elf_header_t *eh;
@@ -852,16 +877,12 @@ int sysExecElf(char *path)
         if (eph[i].memsz > eph[i].filesz)
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
 
     // Let's go.
     fileXioExit();
     SifExitRpc();
 
-    elf_argv[0] = path;
+    elf_argv[0] = (char*)path;
 
     FlushCache(0);
     FlushCache(2);

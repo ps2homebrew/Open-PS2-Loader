@@ -4,12 +4,8 @@
 #include "irx.h"
 
 /* Please keep these in alphabetical order!  */
-#include <intrman.h>
 #include <loadcore.h>
-#include <stdio.h>
+#include <libsd.h>
 #include <sysclib.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <thsemap.h>
 
 #endif /* IOP_IRX_IMPORTS_H */

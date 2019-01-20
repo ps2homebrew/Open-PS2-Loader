@@ -16,8 +16,17 @@ extern int size_bt_pademu_irx;
 extern void *cdvdfsv_irx;
 extern int size_cdvdfsv_irx;
 
+extern void *cleareffects_irx;
+extern int size_cleareffects_irx;
+
+extern void *deci2_img;
+extern int size_deci2_img;
+
 extern void *drvtif_irx;
 extern int size_drvtif_irx;
+
+extern void *drvtif_ingame_irx;
+extern int size_drvtif_ingame_irx;
 
 extern void *ds34bt_irx;
 extern int size_ds34bt_irx;
@@ -82,6 +91,9 @@ extern int size_nbns_irx;
 extern void *netman_irx;
 extern int size_netman_irx;
 
+extern void *f2techioppatch_irx;
+extern int size_f2techioppatch_irx;
+
 extern void *padman_irx;
 extern int size_padman_irx;
 
@@ -138,6 +150,9 @@ extern int size_smsutils_irx;
 
 extern void *tifinet_irx;
 extern int size_tifinet_irx;
+
+extern void *tifinet_ingame_irx;
+extern int size_tifinet_ingame_irx;
 
 extern void *udptty_irx;
 extern int size_udptty_irx;

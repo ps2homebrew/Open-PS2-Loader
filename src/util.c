@@ -50,7 +50,12 @@ static void writeMCIcon(void)
 
 static int checkMC()
 {
+    int dummy, ret;
+
     if (mcID == -1) {
+        mcGetInfo(0, 0, &dummy, &dummy, &dummy);
+        mcSync(0, NULL, &ret);
+
         int fd = fileXioDopen("mc0:OPL");
         if (fd < 0) {
             fd = fileXioDopen("mc1:OPL");
@@ -486,6 +491,86 @@ int CheckPS2Logo(int fd, u32 lba)
             guiWarning("Error reading first 12 disc sectors (PS2 Logo)!", 25);
     }
     return ValidPS2Logo;
+}
+
+struct DirentToDelete {
+    struct DirentToDelete *next;
+     char *filename;
+};
+
+int sysDeleteFolder(const char *folder)
+{
+    int fd, result;
+    char *path;
+    iox_dirent_t dirent;
+    struct DirentToDelete *head, *start;
+
+    result = 0;
+    start = head = NULL;
+    if((fd = fileXioDopen(folder)) >= 0) {
+        /* Generate a list of files in the directory. */
+        while(fileXioDread(fd, &dirent) > 0) {
+            if((strcmp(dirent.name, ".") == 0) || ((strcmp(dirent.name, "..") == 0)))
+                continue;
+
+            if(FIO_S_ISDIR(dirent.stat.mode)) {
+                if((path = malloc(strlen(folder)+strlen(dirent.name) + 2)) != NULL) {
+                    sprintf(path, "%s/%s", folder, dirent.name);
+                        result = sysDeleteFolder(path);
+                        free(path);
+                }
+            } else {
+                if(start == NULL) {
+                    head = malloc(sizeof(struct DirentToDelete));
+                    if(head == NULL)
+                        break;
+                    start = head;
+                } else {
+                    if((head->next = malloc(sizeof(struct DirentToDelete))) == NULL)
+                        break;
+
+                    head=head->next;
+                }
+
+                head->next=NULL;
+
+                if((head->filename = malloc(strlen(dirent.name) + 1)) != NULL)
+                    strcpy(head->filename, dirent.name);
+                else
+                   break;
+            }
+        }
+
+        fileXioDclose(fd);
+    } else
+        result = fd;
+
+    if (result >= 0) {
+        /* Delete the files. */
+        for (head = start; head != NULL; head = start) {
+            if(head->filename != NULL) {
+                if((path = malloc(strlen(folder) + strlen(head->filename) + 2)) != NULL) {
+                    sprintf(path, "%s/%s", folder, head->filename);
+                    result=fileXioRemove(path);
+                    if (result < 0)
+                        LOG("sysDeleteFolder: failed to remove %s: %d\n", path, result);
+
+                    free(path);
+                }
+                free(head->filename);
+            }
+
+            start = head->next;
+            free(head);
+        }
+
+        if(result >= 0) {
+            result = fileXioRmdir(folder);
+            LOG("sysDeleteFolder: failed to rmdir %s: %d\n", folder, result);
+        }
+    }
+
+    return result;
 }
 
 /*----------------------------------------------------------------------------------------*/

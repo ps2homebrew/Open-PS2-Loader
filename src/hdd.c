@@ -67,7 +67,7 @@ int hddSetTransferMode(int type, int mode)
 }
 
 //-------------------------------------------------------------------------
-int hddSetIdleTimeout(int timeout)
+void hddSetIdleTimeout(int timeout)
 {
     // From hdparm man:
     // A value of zero means "timeouts  are  disabled":  the
@@ -81,11 +81,16 @@ int hddSetIdleTimeout(int timeout)
     // 21 minutes plus 15 seconds.  Note that  some  older  drives  may
     // have very different interpretations of these values.
 
-    u8 args[16];
+    u8 standbytimer = (u8)timeout;
 
-    *(u32 *)&args[0] = timeout & 0xff;
+    fileXioDevctl("hdd0:", HDIOC_IDLE, &standbytimer, 1, NULL, 0);
+    fileXioDevctl("hdd1:", HDIOC_IDLE, &standbytimer, 1, NULL, 0);
+}
 
-    return fileXioDevctl("hdd0:", HDIOC_IDLE, args, 4, NULL, 0);
+void hddSetIdleImmediate(void)
+{
+    fileXioDevctl("hdd0:", HDIOC_IDLEIMM, NULL, 0, NULL, 0);
+    fileXioDevctl("hdd1:", HDIOC_IDLEIMM, NULL, 0, NULL, 0);
 }
 
 //-------------------------------------------------------------------------
@@ -150,7 +155,7 @@ static int hddGetHDLGameInfo(struct GameDataEntry *game, hdl_game_info_t *ginfo)
         ginfo->dma_type = hdl_header->dma_type;
         ginfo->dma_mode = hdl_header->dma_mode;
         ginfo->layer_break = hdl_header->layer1_start;
-        ginfo->disctype = hdl_header->discType;
+        ginfo->disctype = (u8)hdl_header->discType;
         ginfo->start_sector = game->lba;
         ginfo->total_size_in_kb = game->size * 2; //size * 2048 / 1024 = 2x
     } else

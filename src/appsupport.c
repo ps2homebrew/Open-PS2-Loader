@@ -330,7 +330,7 @@ static char *appGetItemStartup(int id)
         struct config_value_t *cur = appGetConfigValue(id);
         //START of OPL_DB tweaks
         return appGetELFName(cur->val);
-		//END of OPL_DB tweaks
+        //END of OPL_DB tweaks
     } else {
         return appsList[id].boot;
     }
@@ -408,7 +408,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
 static config_set_t *appGetConfig(int id)
 {
-    //START of OPL_DB tweaks
+	//START of OPL_DB tweaks
 	config_set_t *config = NULL;
 	//END of OPL_DB tweaks
 

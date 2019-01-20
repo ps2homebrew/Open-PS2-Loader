@@ -63,8 +63,6 @@ void sysLoadElf(char *filename, int argc, char **argv)
 
     DPRINTF("t_loadElf()\n");
 
-    ResetSPU();
-
     DPRINTF("t_loadElf: Resetting IOP...\n");
 
     set_reg_disabled = 0;

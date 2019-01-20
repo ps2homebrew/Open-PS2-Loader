@@ -49,7 +49,8 @@ typedef struct
 
 typedef struct
 {
-    int libpad;
+    u16 libpad;
+    u16 libversion;
     u8 *pad_buf;
     int vb_count;
     int pos_combo1;
@@ -71,11 +72,12 @@ typedef struct
     u32 *pattern;
     u32 *mask;
     int size;
-    int version;
+    u16 type; //Whether it's libpad or libpad2
+    u16 version;
 } pattern_t;
 
-#define IGR_LIBPAD_V1 1
-#define IGR_LIBPAD_V2 2
+#define IGR_LIBPAD 1
+#define IGR_LIBPAD2 2
 
 #define IGR_PAD_STABLE_V1 0x06
 #define IGR_PAD_STABLE_V2 0x01

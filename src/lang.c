@@ -282,13 +282,13 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",
-	"POPSTARTER.ELF not found at '%s'!",
-	"VCD file '%s' not found!",
-	"An error occurred while renaming the file.",
-	"An error occurred while deleting the file.",
-	"Never buy OPEN-PS2-LOADER (OPL), instead get it free at:",
-	"ifcaro OPL version at psx-scene.com",
-	"OPL Daily Builds (DB) version at ps2-home.com",
+    "POPSTARTER.ELF not found at '%s'!",
+    "VCD file '%s' not found!",
+    "An error occurred while renaming the file.",
+    "An error occurred while deleting the file.",
+    "Never buy OPEN-PS2-LOADER (OPL), instead get it free at:",
+    "ifcaro OPL version at psx-scene.com",
+    "OPL Daily Builds (DB) version at ps2-home.com",
     //END of OPL_DB tweaks
 };
 

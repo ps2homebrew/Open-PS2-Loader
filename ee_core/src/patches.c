@@ -129,6 +129,7 @@ static const patchlist_t patch_list[] = {
 #define JAL(addr) (0x0c000000 | (((addr)&0x03ffffff) >> 2))
 #define JMP(addr) (0x08000000 | (0x3ffffff & ((addr) >> 2)))
 #define FNADDR(jal) (((jal)&0x03ffffff) << 2)
+#define NIBBLE2CHAR(n) ((n) <= 9 ? '0' + (n) : 'a' + (n))
 
 static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);
 static unsigned int g_delay_cycles;
@@ -544,8 +545,8 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
 
-            modIdStr[0] = '0' + ((ret >> 4) & 0xF);
-            modIdStr[1] = '0' + (ret & 0xF);
+            modIdStr[0] = NIBBLE2CHAR((ret >> 4) & 0xF);
+            modIdStr[1] = NIBBLE2CHAR(ret & 0xF);
             modIdStr[2] = '\0';
 
             do {
@@ -671,13 +672,13 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
 
-            modIdStr[0] = '0' + ((ret >> 4) & 0xF);
-            modIdStr[1] = '0' + (ret & 0xF);
+            modIdStr[0] = NIBBLE2CHAR((ret >> 4) & 0xF);
+            modIdStr[1] = NIBBLE2CHAR(ret & 0xF);
             modIdStr[2] = '\0';
 
             do {
                 ret2 = pSifLoadModuleBuffer(iopmem, sizeof(modIdStr), modIdStr);
-             } while (ret2 < 0);
+            } while (ret2 < 0);
 
             pSifFreeIopHeap(iopmem);
         }
@@ -814,8 +815,8 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
 
-            modIdStr[0] = '0' + ((ret >> 4) & 0xF);
-            modIdStr[1] = '0' + (ret & 0xF);
+            modIdStr[0] = NIBBLE2CHAR((ret >> 4) & 0xF);
+            modIdStr[1] = NIBBLE2CHAR(ret & 0xF);
             modIdStr[2] = '\0';
 
             do {

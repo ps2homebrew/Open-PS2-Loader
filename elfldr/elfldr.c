@@ -52,6 +52,32 @@ typedef struct
 } elf_pheader_t;
 //END of OPL_DB tweaks
 
+static inline void _strcpy(char *dst, const char *src)
+{
+    strncpy(dst, src, strlen(src) + 1);
+}
+
+static inline void _strcat(char *dst, const char *src)
+{
+    _strcpy(&dst[strlen(dst)], src);
+}
+
+static int _strncmp(const char *s1, const char *s2, int length)
+{
+    const char *a = s1;
+    const char *b = s2;
+
+    while (length > 0) {
+        if ((*a == 0) || (*b == 0))
+            return -1;
+        if (*a++ != *b++)
+            return 1;
+        length--;
+    }
+
+    return 0;
+}
+
 static inline void BootError(char *filename)
 {
     char *argv[2];
@@ -225,9 +251,9 @@ int main(int argc, char *argv[])
 
     SifLoadFileExit();
 
+    //START of OPL_DB tweaks
     if (result == 0 && exd.epc != 0) {
         //Final IOP reset, to fill the IOP with the default modules.
-		
         while (!SifIopReset(NULL, 0)) {
         };
 
@@ -236,19 +262,27 @@ int main(int argc, char *argv[])
 
         while (!SifIopSync()) {
         };
+    //END of OPL_DB tweaks
 
+        //START of OPL_DB tweaks
         //Sync with the SIF library on the IOP, or it may crash the IOP kernel during the next reset (Depending on the how the next program initializes the IOP).
+        //END of OPL_DB tweaks
         SifInitRpc(0);
         //Load modules.
         SifLoadFileInit();
         SifLoadModule("rom0:SIO2MAN", 0, NULL);
         SifLoadModule("rom0:MCMAN", 0, NULL);
         SifLoadModule("rom0:MCSERV", 0, NULL);
-		
-		
         SifLoadFileExit();
-	
         SifExitRpc();
+
+        if (_strncmp(argv[0], "pfs", 3) == 0) {
+            static char _argv[256];
+            _strcpy(_argv, "hdd0:+OPL:");
+            _strcat(_argv, argv[0]);
+
+            argv[0] = _argv;
+        }
 
         ExecPS2((void *)exd.epc, (void *)exd.gp, argc, argv);
     } else {

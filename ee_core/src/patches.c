@@ -615,10 +615,9 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
     void *iopmem;
     SifDmaTransfer_t sifdma;
-    int dma_id, ret, ret2;
+    int dma_id, ret;
     void *apemodpatch_irx;
     unsigned int apemodpatch_irx_size;
-    char modIdStr[3];
 
     switch(g_mode & 0xf)
     {
@@ -655,9 +654,9 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
             asm volatile("break\n");
     }
 
-    ret = pSifLoadModule(path, arg_len, args);
-
-    if ((ret >= 0) && (_strcmp(path, "cdrom0:\\APEMOD.IRX;1") == 0))
+    if (_strcmp(path, "cdrom0:\\APEMOD.IRX;1") != 0)
+        ret = pSifLoadModule(path, arg_len, args);
+    else
     {
         GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &apemodpatch_irx, &apemodpatch_irx_size);
 
@@ -672,18 +671,17 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
                 dma_id = SifSetDma(&sifdma, 1);
             } while (!dma_id);
 
-            modIdStr[0] = NIBBLE2CHAR((ret >> 4) & 0xF);
-            modIdStr[1] = NIBBLE2CHAR(ret & 0xF);
-            modIdStr[2] = '\0';
-
             do {
-                ret2 = pSifLoadModuleBuffer(iopmem, sizeof(modIdStr), modIdStr);
-            } while (ret2 < 0);
+                ret = pSifLoadModuleBuffer(iopmem, strlen(path) + 1, path);
+            } while (ret < 0);
 
             pSifFreeIopHeap(iopmem);
         }
         else
+        {
+           ret = -1;
            asm volatile("break\n");
+        }
     }
 
     return ret;
@@ -764,10 +762,9 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
     void *iopmem;
     SifDmaTransfer_t sifdma;
-    int dma_id, ret, ret2;
+    int dma_id, ret;
     void *f2techioppatch_irx;
     unsigned int f2techioppatch_irx_size;
-    char modIdStr[3];
 
     switch(g_mode)
     {
@@ -798,35 +795,29 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
             asm volatile("break\n");
     }
 
-    ret = pSifLoadModule(path, arg_len, args);
+    GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &f2techioppatch_irx, &f2techioppatch_irx_size);
 
-    if (ret >= 0)
+    iopmem = pSifAllocIopHeap(f2techioppatch_irx_size);
+    if(iopmem != NULL)
     {
-        GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &f2techioppatch_irx, &f2techioppatch_irx_size);
+        sifdma.src = f2techioppatch_irx;
+        sifdma.dest = iopmem;
+        sifdma.size = f2techioppatch_irx_size;
+        sifdma.attr = 0;
+        do {
+            dma_id = SifSetDma(&sifdma, 1);
+        } while (!dma_id);
 
-        iopmem = pSifAllocIopHeap(f2techioppatch_irx_size);
-        if(iopmem != NULL)
-        {
-            sifdma.src = f2techioppatch_irx;
-            sifdma.dest = iopmem;
-            sifdma.size = f2techioppatch_irx_size;
-            sifdma.attr = 0;
-            do {
-                dma_id = SifSetDma(&sifdma, 1);
-            } while (!dma_id);
+        do {
+            ret = pSifLoadModuleBuffer(iopmem, strlen(path) + 1, path);
+        } while (ret < 0);
 
-            modIdStr[0] = NIBBLE2CHAR((ret >> 4) & 0xF);
-            modIdStr[1] = NIBBLE2CHAR(ret & 0xF);
-            modIdStr[2] = '\0';
-
-            do {
-                ret2 = pSifLoadModuleBuffer(iopmem, sizeof(modIdStr), modIdStr);
-            } while (ret2 < 0);
-
-            pSifFreeIopHeap(iopmem);
-        }
-        else
-            asm volatile("break\n");
+        pSifFreeIopHeap(iopmem);
+    }
+    else
+    {
+        ret = -1;
+        asm volatile("break\n");
     }
 
     return ret;

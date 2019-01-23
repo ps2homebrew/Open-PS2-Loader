@@ -1,0 +1,267 @@
+# Japanese Translation by yamamotonew
+# Last update: Jan. 3, 2019
+# Updated for OPL commit 8945719
+Japanese
+OPL %s
+設定を保存する
+戻る
+ネットワーク設定
+詳細オプション
+<未設定>
+設定が保存されました
+設定保存中にエラーが発生しました
+終了
+設定
+メニュー
+USBゲーム
+HDDゲーム
+ETHゲーム
+アプリ
+テーマ
+言語
+システムを終了し電源を切ります
+ブラウザに戻りますか？
+変更をキャンセルしますか？
+%d: HDDが接続されていません
+%d: HDDがフォーマットされていません
+%d: ネットワーク開始エラー
+%d: ネットワークアダプタが接続されていません
+%d: SMBサーバに接続できません
+%d: SMBサーバにログインできません
+%d: SMBフォルダを開けません
+%d: SMBゲームが見つかりません
+%d: ゲームが見つかりません
+%d: DHCPサーバが見つかりません
+%d: ネットワーク接続が見つかりません
+オン
+オフ
+OK
+選択
+キャンセル
+O
+X
+ゲームリスト
+ゲーム設定
+設定を初期化
+キー設定を初期化
+画面スクロール
+遅い
+普通
+速い
+初期メニュー
+ディスクからロード
+お待ちください
+ゲームIDをロード中にエラーが発生しました
+自動的に並べ替え
+言語設定をロード中にエラーが発生しました
+デバッグカラーを無効化
+コントローラーが見つかりません。お待ちください…
+カバーアートを表示
+ワイドスクリーン
+電源を切る
+設定をロード中
+設定を保存中
+デバイスを開始
+リフレッシュ
+USBデバイス開始モード
+HDDデバイス開始モード
+ETHデバイス開始モード
+アプリメニュー表示モード
+自動
+手動
+HDLサーバを開始
+HDLサーバを開始します…
+HDLサーバは開始しました
+HDLサーバ開始に失敗しました
+HDLサーバを取消中…
+IGRパス
+背景色
+文字色
+- PS2 -
+- SMBサーバ -
+IPアドレスタイプ
+Static
+DHCP
+IPアドレス
+アドレス
+マスク
+ゲートウェイ
+DNSサーバ
+ポート
+共有名
+ユーザー名
+パスワード
+<未設定>
+アドレスタイプ
+IP
+NetBIOS
+OK
+削除すると元に戻せません。よろしいですか？
+名前変更
+削除
+実行
+表示設定
+高度なメニューで書換えを有効化
+USBゲームのデフラグを常にチェック
+最後にプレイしたゲームを記憶する
+セレクトボタン
+ゲームがデフラグされていません
+ゲーム（アプリ）を開始できませんでした
+テスト
+GUESTでログインする場合は空欄
+読み込み速度の補正
+データ読み込みをシンクロ化
+Syscallの解除
+一部のムービーをスキップ
+二層ディスク(DVD9)用設定
+IGRを無効化
+Unused
+ネットワーク機能(DEV9)無効化
+サイズを変更するとVMCはフォーマットされます
+VMCファイルを作成
+開始
+変更
+中止
+リセット
+簡易VMC作成
+VMC設定
+ファイル名
+サイズ
+状態
+進行
+VMCファイル作成済
+VMCファイルのサイズが正しくありません
+VMCファイル未作成
+VMC %s でエラー。スロット %d のメモリカードを使いますか？
+自動リフレッシュ
+OPLについて
+コーディング
+QAテスター
+USBプリフィクスパス
+IGR後に指定されたカスタムELFを実行します
+秒数指定。0で無効化
+自動HDDスピンダウン
+画面モード
+ダイアログの色
+選択時の色
+インフォページを表示
+インフォ
+カスタムELF
+表示色設定
+再接続
+全ての共有を表示する場合は空欄
+ETHプリフィクスパス
+一文字消去
+スペース
+決定
+モード
+VMCスロット1
+VMCスロット2
+ゲームID
+DMAモード
+V-Sync
+モード 1
+モード 2
+モード 3
+モード 4
+モード 5
+モード 6
+モード 7
+モード 8
+GSM設定
+ETHリンクモード
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM設定
+GSM有効化
+GSM設定をオン/オフ
+画面モード
+指定されたモードを常に有効化
+水平調整
+水平方向の表示位置を微調整
+垂直調整
+垂直方向の表示位置を微調整
+Overscan
+Overscan Adjustment
+FMVスキップ
+フルモーションムービーをスキップ
+チート設定
+PS2RDチートを有効化
+PS2RDチートをゲーム毎に指定
+PS2RDチートモード
+自動/手動チート選択
+自動チート選択
+手動チート選択
+チートファイルを適用できませんでした
+チートファイルが見つかりません
+デフォルト設定をダウンロード
+ネットワークアップデート
+設定を再ダウンロード
+アップデートが失敗しました
+アップデートサーバに接続できませんでした
+アップデート完了
+アップデートは中止されました
+ネットワークから設定をダウンロードしますか？
+カスタム設定
+デフォルト設定をダウンロード
+あと %i 秒で自動的にスタートします
+自動スタート
+開始までの秒数を指定。0で無効化
+PS2ロゴ
+本体リージョンとディスクが一致した場合のみ表示されます
+PADEMUの設定
+PADEMUの設定
+PADEMU有効化
+ゲーム毎にPADEMUの有効/無効を指定
+PADEMUモード
+モードを選択
+DualShock3/4 USB
+DualShock3/4 BT
+ポート番号:
+PADEMUを適用するポートを指定
+ポート毎設定
+ポート毎にPADEMUを適用
+振動の有効化
+ポート毎に振動の有効/無効を指定
+BluetoothアダプタのMACアドレス:
+DSのペア設定MACアドレス:
+ペア設定
+DS3コントローラーをペア設定
+BluetoothのMACアドレスを指定してDSコントローラーをペア設定
+接続されていません
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake DS3
+Some fake ds3s need workaround, this option will disable it.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
+Parental Lock Settings
+Parental Lock Password
+Leave blank to disable the parental lock.
+Enter Parental Lock Password
+Parental lock password incorrect.
+Parental lock disabled.
+Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List

@@ -20,5 +20,6 @@ int Hook_ExecPS2(void *entry, void *gp, int num_args, char *args[]);
 int Hook_CreateThread(ee_thread_t *thread_param);
 void Hook_Exit(s32 exit_code);
 void CleanExecPS2(void *epc, void *gp, int argc, char **argv);
+void iResetEE(u32 init_bitfield);
 
 #endif /* ASM */

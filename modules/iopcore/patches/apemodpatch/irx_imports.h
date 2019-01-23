@@ -4,8 +4,8 @@
 #include "irx.h"
 
 /* Please keep these in alphabetical order!  */
-#include <intrman.h>
 #include <loadcore.h>
+#include <modload.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include <thbase.h>

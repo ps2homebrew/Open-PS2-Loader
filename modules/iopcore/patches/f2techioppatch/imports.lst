@@ -2,6 +2,11 @@ loadcore_IMPORTS_start
 I_GetLoadcoreInternalData
 loadcore_IMPORTS_end
 
+modload_IMPORTS_start
+I_LoadModule
+I_StartModule
+modload_IMPORTS_end
+
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end

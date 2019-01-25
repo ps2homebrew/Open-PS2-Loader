@@ -22,8 +22,8 @@
 #include "ee_core.h"
 #include "iopmgr.h"
 #include "modmgr.h"
+#include "modules.h"
 #include "util.h"
-#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -206,12 +206,15 @@ static void IGR_Thread(void *arg)
 
         // Init RPC & CMD
         SifInitRpc(0);
+        SifInitIopHeap();
+        LoadFileInit();
+        sbv_patch_enable_lmb();
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0x800000; // Dark Blue
 
         // Reset SPU - do it after the IOP reboot, so nothing will compete with the EE for it.
-        ResetSPU();
+        LoadOPLModule(OPL_MODULE_ID_RESETSPU, 0, 0, NULL);
 
 #ifdef IGS
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
@@ -222,6 +225,8 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x008000; // Dark Green
 
         // Exit services
+        SifExitIopHeap();
+        LoadFileExit();
         SifExitRpc();
 
         IGR_Exit(0);

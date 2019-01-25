@@ -12,7 +12,6 @@
 #include "iopmgr.h"
 #include "modmgr.h"
 #include "util.h"
-#include "spu.h"
 #include "patches.h"
 #include "padhook.h"
 #include "syshook.h"

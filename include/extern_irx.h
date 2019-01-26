@@ -124,6 +124,9 @@ extern int size_ps2link_irx;
 extern void *pusbd_irx;
 extern int size_pusbd_irx;
 
+extern void *resetspu_irx;
+extern int size_resetspu_irx;
+
 extern void *sio2man_irx;
 extern int size_sio2man_irx;
 

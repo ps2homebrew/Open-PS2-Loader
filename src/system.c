@@ -470,6 +470,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     irxptr_tab[modcount++].ptr = ioprp_image;
     irxptr_tab[modcount].info = size_imgdrv_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_IMGDRV);
     irxptr_tab[modcount++].ptr = (void *)&imgdrv_irx;
+    irxptr_tab[modcount].info = size_resetspu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_RESETSPU);
+    irxptr_tab[modcount++].ptr = (void *)&resetspu_irx;
 
 #ifdef PADEMU
 #define PADEMU_ARG || gEnablePadEmu

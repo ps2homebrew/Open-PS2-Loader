@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <iomanX.h>
+#include <limits.h>
 #include <stdio.h>
 #include <thsemap.h>
 #include <loadcore.h>
@@ -114,6 +115,25 @@ static int IsofsDeinit(iop_device_t *device)
 }
 
 //-------------------------------------------------------------------------
+static void longLseek(int fd, unsigned int lba)
+{
+    unsigned int remaining, toSeek;
+
+    if (lba > INT_MAX / 2048) {
+        lseek(fd, INT_MAX / 2048 * 2048, SEEK_SET);
+
+        remaining = lba - INT_MAX / 2048;
+        while(remaining > 0) {
+            toSeek = remaining > INT_MAX / 2048 ? INT_MAX / 2048 : remaining;
+            lseek(fd, toSeek * 2048, SEEK_CUR);
+            remaining -= toSeek;
+        }
+    } else {
+        lseek(fd, lba * 2048, SEEK_SET);
+    }
+}
+
+//-------------------------------------------------------------------------
 static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 {
     if (MountPoint.layer_info[1].maxLBA > 0) {
@@ -130,7 +150,7 @@ static int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 //-------------------------------------------------------------------------
 static int cdEmuRead(u32 lsn, unsigned int count, void *buffer)
 {
-    lseek(MountPoint.fd, lsn * 2048, SEEK_SET);
+    longLseek(MountPoint.fd, lsn);
 
     return (read(MountPoint.fd, buffer, count * 2048) == count * 2048 ? 0 : -EIO);
 }
@@ -313,7 +333,7 @@ static int IsofsOpen(iop_file_t *f, const char *name, int flags, int mode)
 
     WaitSema(MountPoint.sema);
 
-    DPRINTF("cdrom_open %s mode=%d\n", name, mode);
+    DPRINTF("isofs_open %s mode=%d\n", name, mode);
 
     fh = cdvdman_getfilefreeslot();
     if (fh) {
@@ -335,7 +355,7 @@ static int IsofsOpen(iop_file_t *f, const char *name, int flags, int mode)
     } else
         r = -EMFILE;
 
-    DPRINTF("cdrom_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
+    DPRINTF("isofs_open ret=%d lsn=%d size=%d\n", r, (int)fh->lsn, (int)fh->filesize);
 
     SignalSema(MountPoint.sema);
 
@@ -348,7 +368,7 @@ static int IsofsClose(iop_file_t *f)
 
     WaitSema(MountPoint.sema);
 
-    DPRINTF("cdrom_close\n");
+    DPRINTF("isofs_close\n");
 
     if (fh)
         memset(fh, 0, sizeof(FHANDLE));
@@ -367,7 +387,7 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
 
     WaitSema(MountPoint.sema);
 
-    DPRINTF("cdrom_read size=%d file_position=%d\n", size, fh->position);
+    DPRINTF("isofs_read size=%d file_position=%d\n", size, fh->position);
 
     if ((fh->position + size) > fh->filesize)
         size = fh->filesize - fh->position;
@@ -413,7 +433,7 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
         }
     }
 
-    DPRINTF("cdrom_read ret=%d\n", rpos);
+    DPRINTF("isofs_read ret=%d\n", rpos);
     SignalSema(MountPoint.sema);
 
     return rpos;
@@ -426,7 +446,7 @@ static int IsofsLseek(iop_file_t *f, int offset, int where)
 
     WaitSema(MountPoint.sema);
 
-    DPRINTF("cdrom_lseek offset=%ld where=%d\n", offset, where);
+    DPRINTF("isofs_lseek offset=%ld where=%d\n", offset, where);
 
     switch (where) {
         case SEEK_CUR:
@@ -456,7 +476,7 @@ static int IsofsLseek(iop_file_t *f, int offset, int where)
         fh->position = fh->filesize;
 
 ssema:
-    DPRINTF("cdrom_lseek file offset=%d\n", (int)fh->position);
+    DPRINTF("isofs_lseek file offset=%d\n", (int)fh->position);
     SignalSema(MountPoint.sema);
 
     return r;
@@ -466,7 +486,7 @@ static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
 {
     int result;
 
-    lseek(fd, sector * 2048, SEEK_SET);
+    longLseek(fd, sector);
     if (read(fd, cdvdman_buf, 2048) == 2048) {
         if ((cdvdman_buf[0x00] == 1) && (!strncmp(&cdvdman_buf[0x01], "CD001", 5))) {
             struct dirTocEntry *tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
@@ -497,7 +517,7 @@ static int IsofsMount(iop_file_t *f, const char *fsname, const char *devname, in
 
     memset(&MountPoint, 0, sizeof(struct MountData));
 
-    if ((fd = open(devname, O_RDONLY, 0666)) >= 0) {
+    if ((fd = open(devname, O_RDONLY)) >= 0) {
         if ((result = ProbeISO9660(fd, 16, &MountPoint.layer_info[0])) == 0)
             MountPoint.fd = fd;
         else

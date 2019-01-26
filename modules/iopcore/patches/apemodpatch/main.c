@@ -1,5 +1,5 @@
 #include <loadcore.h>
-#include <intrman.h>
+#include <modload.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include <thbase.h>
@@ -61,15 +61,20 @@ int _start(int argc, char **argv)
     ModuleInfo_t *m;
     iop_sema_t sema;
     iop_event_t event;
-    int OldState, modId;
+    int modId, modRet;
 
     if (argc != 2)
     {
-        printf("Missing module ID arg.\n");
+        printf("Missing module arg.\n");
         return MODULE_NO_RESIDENT_END;
     }
 
-    modId = strtol(argv[1], NULL, 16);
+    modId = LoadModule(argv[1]);
+    if (modId < 0)
+    {
+        printf("Failed to load %s (%d).\n", argv[1], modId);
+        return MODULE_NO_RESIDENT_END;
+    }
 
     lc = GetLoadcoreInternalData();
 
@@ -97,10 +102,7 @@ int _start(int argc, char **argv)
         event.bits = 0;
         evFlag = CreateEventFlag(&event);
 
-        /* Apply patch on module. The module's patch locations may be executed, so suspend interrupts.
-           The IOP SignalSema function will not allow the semaphore's value to be incremented pass max,
-           so it should be fine even if there is a thread executing the critical section. */
-        CpuSuspendIntr(&OldState);
+        /* Apply patch on module.  */
         *(vu32*)(m->text_start + 0x00003bf8) = JAL((u32)&_lock);
         *(vu32*)(m->text_start + 0x00003bfc) = 0x00000000;
         *(vu32*)(m->text_start + 0x00003c04) = 0x14400046; //bnez $v0, exit
@@ -113,9 +115,10 @@ int _start(int argc, char **argv)
         *(vu32*)(m->text_start + 0x00000ac8) = JAL((u32)&_iSetEvent);
         *(vu32*)(m->text_start + 0x00000bd0) = JAL((u32)&_iSetEvent);
         *(vu32*)(m->text_start + 0x00001b88) = JAL((u32)&_iSetEvent);
-        CpuResumeIntr(OldState);
 
-        FlushIcache(); //Flush instruction cache as instructions were modified.
+//        FlushIcache(); //Flush instruction cache as instructions were modified.
+
+        StartModule(modId, "", 0, NULL, &modRet);
 
         return MODULE_RESIDENT_END;
     }

@@ -18,11 +18,12 @@
 
 #include <ee_regs.h>
 #include <iopcontrol.h>
+#include "asm.h"
 #include "ee_core.h"
 #include "iopmgr.h"
 #include "modmgr.h"
+#include "modules.h"
 #include "util.h"
-#include "spu.h"
 #include "padhook.h"
 #include "padpatterns.h"
 #include "syshook.h"
@@ -205,12 +206,15 @@ static void IGR_Thread(void *arg)
 
         // Init RPC & CMD
         SifInitRpc(0);
+        SifInitIopHeap();
+        LoadFileInit();
+        sbv_patch_enable_lmb();
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0x800000; // Dark Blue
 
         // Reset SPU - do it after the IOP reboot, so nothing will compete with the EE for it.
-        ResetSPU();
+        LoadOPLModule(OPL_MODULE_ID_RESETSPU, 0, 0, NULL);
 
 #ifdef IGS
         if ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
@@ -221,6 +225,8 @@ static void IGR_Thread(void *arg)
             GS_BGCOLOUR = 0x008000; // Dark Green
 
         // Exit services
+        SifExitIopHeap();
+        LoadFileExit();
         SifExitRpc();
 
         IGR_Exit(0);
@@ -310,31 +316,41 @@ static int IGR_Intc_Handler(int cause)
     ee_kmode_exit();
 
     // If power button or combo is press
-    // Disable all interrupts (not SBUS, TIMER2, TIMER3 use by kernel)
+    // Disable all interrupts & reset some peripherals.
     // Suspend and Change priority of all threads other then our IGR thread
     // Wakeup and Change priority of our IGR thread
     if (Pad_Data.combo_type != 0x00) {
-        // Disable documented interrupts
-        // INTC interrupts
-        iDisableIntc(INTC_GS);
-        iDisableIntc(INTC_VBLANK_S);
-        iDisableIntc(INTC_VBLANK_E);
-        iDisableIntc(INTC_VIF0);
-        iDisableIntc(INTC_VIF1);
-        iDisableIntc(INTC_VU0);
-        iDisableIntc(INTC_VU1);
-        iDisableIntc(INTC_IPU);
-        iDisableIntc(INTC_TIM0);
-        iDisableIntc(INTC_TIM1);
-        iDisableIntc(INTC_TIM2); //This was available for developers with older SDKs, then it became reserved.
-        // DMAC interrupts (except for SIF0, SIF1 & SIF2).
-        iDisableDmac(DMAC_VIF0);
-        iDisableDmac(DMAC_VIF1);
-        iDisableDmac(DMAC_GIF);
-        iDisableDmac(DMAC_FROM_IPU);
-        iDisableDmac(DMAC_TO_IPU);
-        iDisableDmac(DMAC_FROM_SPR);
-        iDisableDmac(DMAC_TO_SPR);
+        //While ExecPS2() would also do some of these (also calls ResetEE),
+        //initialization seems to sometimes get stuck at "Initializing GS", perhaps when waiting for the V-Sync start interrupt.
+        //That happens before ResetEE is called, so ResetEE has to be called earlier.
+
+        //Wait for preceding loads & stores to complete.
+        asm volatile("sync.l\n");
+
+        //Stop all ongoing transfers (except for SIF0, SIF1 & SIF2 - DMA CH 5, 6 & 7).
+        u32 dmaEnableR = *R_EE_D_ENABLER;
+        *R_EE_D_ENABLEW = dmaEnableR | 0x10000;
+        *R_EE_D_CTRL;
+        *R_EE_D_STAT;
+        *R_EE_D0_CHCR = 0;
+        *R_EE_D1_CHCR = 0;
+        *R_EE_D2_CHCR = 0;
+        *R_EE_D3_CHCR = 0;
+        *R_EE_D4_CHCR = 0;
+        *R_EE_D8_CHCR = 0;
+        *R_EE_D9_CHCR = 0;
+        *R_EE_D_ENABLEW = dmaEnableR;
+
+        //Wait for preceding loads & stores to complete.
+        asm volatile("sync.l\n");
+
+        *R_EE_GS_CSR = 0x100; //Reset GS
+        asm volatile("sync.l\n");
+	while(*R_EE_GS_CSR & 0x100){};
+
+        //Disable interrupts & reset some peripherals, back to a standard state.
+        //Call ResetEE(0x7F) from an interrupt handler.
+        iResetEE(0x7F);
 
         // Loop for each threads, skipping the idle & IGR threads.
         for (i = 1; i < 256; i++) {
@@ -343,15 +359,6 @@ static int IGR_Intc_Handler(int cause)
                 iSuspendThread(i);
             }
         }
-
-        //Wait for ongoing transfers to end (except for SIF0, SIF1 & SIF2).
-        while((*R_EE_D0_CHCR) & EE_CHCR_STR) {};
-        while((*R_EE_D1_CHCR) & EE_CHCR_STR) {};
-        while((*R_EE_D2_CHCR) & EE_CHCR_STR) {};
-        while((*R_EE_D3_CHCR) & EE_CHCR_STR) {};
-        while((*R_EE_D4_CHCR) & EE_CHCR_STR) {};
-        while((*R_EE_D8_CHCR) & EE_CHCR_STR) {};
-        while((*R_EE_D9_CHCR) & EE_CHCR_STR) {};
 
         DPRINTF("IGR: trying to wake IGR thread...\n");
         iChangeThreadPriority(IGR_Thread_ID, 0);

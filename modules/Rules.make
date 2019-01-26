@@ -23,7 +23,7 @@ endif
 
 IOP_INCS := $(IOP_INCS) -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include -Iinclude
 
-IOP_CFLAGS  := -D_IOP -fno-builtin -O2 -G0 $(IOP_INCS) $(IOP_CFLAGS)
+IOP_CFLAGS  := -D_IOP -fno-builtin -Os -G0 $(IOP_INCS) $(IOP_CFLAGS)
 IOP_ASFLAGS := $(ASFLAGS_TARGET) -EL -G0 $(IOP_ASFLAGS)
 IOP_LDFLAGS := -nostdlib $(IOP_LDFLAGS)
 

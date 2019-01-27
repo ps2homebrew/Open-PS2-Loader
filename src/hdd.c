@@ -224,6 +224,8 @@ int hddGetHDLGamelist(hdl_games_list_t *game_list)
 
         if (head != NULL) {
             if ((game_list->games = malloc(sizeof(hdl_game_info_t) * count)) != NULL) {
+                memset(game_list->games, 0, sizeof(hdl_game_info_t) * count);
+
                 for (i = 0, current = head; i < count; i++, current = current->next) {
                     if ((ret = hddGetHDLGameInfo(current, &game_list->games[i])) != 0)
                         break;

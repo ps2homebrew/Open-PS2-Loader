@@ -301,6 +301,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                         *glist = next;
 
                         game = &(*glist)->gameinfo;
+                        memset(game, 0, sizeof(base_game_info_t));
 
                         strncpy(game->name, &record.name[GAME_STARTUP_MAX], NameLen);
                         game->name[NameLen] = '\0';
@@ -325,6 +326,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                                     *glist = next;
 
                                     game = &(*glist)->gameinfo;
+                                    memset(game, 0, sizeof(base_game_info_t));
 
                                     strcpy(game->startup, startup);
                                     strncpy(game->name, record.name, NameLen);
@@ -426,6 +428,8 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
 
         if (count > 0) {
             if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count)) != NULL) {
+                memset(*list, 0, sizeof(base_game_info_t) * count);
+
                 while (size > 0) {
                     fileXioRead(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
 

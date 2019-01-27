@@ -491,7 +491,7 @@ static int hddLoadGameListCache(hdl_games_list_t *cache)
     hdl_game_info_t *games;
     int result, size, count;
 
-    if (!gGameListCache)
+    if (!gHDDGameListCache)
         return 1;
 
     hddFreeHDLGamelist(cache);
@@ -543,7 +543,7 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
     FILE *file;
     int result, i, j, modified;
 
-    if (!gGameListCache)
+    if (!gHDDGameListCache)
         return 1;
 
     if (cache->count > 0)

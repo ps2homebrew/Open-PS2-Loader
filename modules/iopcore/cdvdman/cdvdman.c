@@ -119,8 +119,10 @@ static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLen
 static int cdvdman_findfile(cd_file_t *pcd_file, const char *name, int layer);
 static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
 static int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
-static int cdvdman_cb_event(int reason);
+static void cdvdman_cb_event(int reason);
 static unsigned int event_alarm_cb(void *args);
+static void cdvdman_signal_read_end(void);
+static void cdvdman_signal_read_end_intr(void);
 static void cdvdman_startThreads(void);
 static void cdvdman_create_semaphores(void);
 static void cdvdman_initdev(void);
@@ -1703,7 +1705,7 @@ struct cdvdman_cb_data
     int reason;
 };
 
-static int cdvdman_cb_event(int reason)
+static void cdvdman_cb_event(int reason)
 {
     static struct cdvdman_cb_data cb_data;
 
@@ -1717,21 +1719,39 @@ static int cdvdman_cb_event(int reason)
             iSetAlarm(&gCallbackSysClock, &event_alarm_cb, &cb_data);
         else
             SetAlarm(&gCallbackSysClock, &event_alarm_cb, &cb_data);
+    } else {
+        cdvdman_signal_read_end();
     }
-
-    return 1;
 }
 
-//-------------------------------------------------------------------------
 static unsigned int event_alarm_cb(void *args)
 {
     struct cdvdman_cb_data *cb_data = args;
 
+    cdvdman_signal_read_end_intr();
     cb_data->user_cb(cb_data->reason);
     return 0;
 }
 
 //-------------------------------------------------------------------------
+/* Use these to signal that the reading process is complete.
+   Do not run the user callback after the drive can be deemed ready,
+   as this may break games that were not designed to expect the callback to be run
+   after the drive becomes visibly ready via the libcdvd API.
+   Hence if a user callback is registered, signal completion from
+   within the interrupt handler, before the user callback is run. */
+static void cdvdman_signal_read_end(void)
+{
+    sync_flag = 0;
+    SetEventFlag(cdvdman_stat.intr_ef, 9);
+}
+
+static void cdvdman_signal_read_end_intr(void)
+{
+    sync_flag = 0;
+    iSetEventFlag(cdvdman_stat.intr_ef, 9);
+}
+
 static void cdvdman_cdread_Thread(void *args)
 {
     while (1) {
@@ -1739,14 +1759,14 @@ static void cdvdman_cdread_Thread(void *args)
 
         cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.cdread_buf);
 
-        sync_flag = 0;
-        SetEventFlag(cdvdman_stat.intr_ef, 9);
-
         /* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
 			The original is run from the interrupt handler, but we want it to run
 			from a threaded environment because it's easier to protect critical regions. */
         if (Stm0Callback != NULL)
+	{
+            cdvdman_signal_read_end();
             Stm0Callback();
+	}
         else
             cdvdman_cb_event(SCECdFuncRead); //Only runs if streaming is not in action.
     }

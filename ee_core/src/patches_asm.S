@@ -10,9 +10,7 @@
 .set push
 .set noreorder
 .set noat
-
-.extern DIntr
-.extern EIntr
+#.set nomacro #Uncomment to set nomacro, to check for hidden macro instructions.
 
 /**************************************************************************
  *
@@ -25,20 +23,22 @@
 .globl SRWI_IncrementCntrlFlag
 .ent SRWI_IncrementCntrlFlag
 SRWI_IncrementCntrlFlag:
-	addiu $sp, $sp, -0x10
-
-	#Use DIntr() and EIntr() functions, to avoid causing a hang if the di instruction binds within an interrupt handler.
-	jal DIntr
-	sd $ra, 0($sp)
-
-	lui $at, 0x003e;
-	lw $v0, 0xbc14($at)
-	ld $ra, 0($sp)
+	#Wait for interrupts to be disabled, to avoid causing a hang if the di instruction binds within an interrupt handler.
+	lui $at, 1
+1:
+	di
+	sync.p
+	mfc0 $v0, $12
+	and $v0, $v0, $at #Wait until EIE == 0
+        bne $v0, $zero, 1b
+	nop
+	lui $at, 0x003e
+	lw $v0, -17388($at)
 	addiu $v0, 1
-	sw $v0, 0($at)
+	sw $v0, -17388($at)
 
-	j EIntr
-	addiu $sp, $sp, 0x10
+	jr $ra
+        ei
 .end SRWI_IncrementCntrlFlag
 
 .globl RnC3_AlwaysAllocMem

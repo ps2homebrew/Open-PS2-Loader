@@ -63,7 +63,8 @@ static char *lmb_modulefake_list[] = {
     NULL
 };
 
-static int fakemod_flag = 0;
+static u8 fakemod_flag = 0;
+static u16 modloadVersion;
 
 //--------------------------------------------------------------
 int getModInfo(u8 *modname, modinfo_t *info)
@@ -125,7 +126,10 @@ static int Hook_LoadStartModule(char *modpath, int arg_len, char *args, int *mod
     checkFakemod(modpath, lm_modulefake_list);
 
     if (isFakemod())
+    {
+        *modres = modloadVersion > 0x102 ? 2 : 0; //Most of the new, loadable modules return REMOVABLE END.
         return FAKEMOD_ID;
+    }
 
     return LoadStartModule(modpath, arg_len, args, modres);
 }
@@ -136,7 +140,10 @@ static int Hook_StartModule(int id, char *modname, int arg_len, char *args, int 
     DPRINTF("Hook_StartModule() id=%d modname = %s\n", id, modname);
 
     if (isFakemod())
+    {
+        *modres = modloadVersion > 0x102 ? 2 : 0; //Most of the new, loadable modules return REMOVABLE END.
         return FAKEMOD_ID;
+    }
 
     return StartModule(id, modname, arg_len, args, modres);
 }
@@ -158,7 +165,10 @@ static int Hook_StopModule(int id, int arg_len, char *args, int *modres)
     DPRINTF("Hook_StopModule() id=%d arg_len=%d\n", id, arg_len);
 
     if (id == FAKEMOD_ID)
+    {
+        *modres = 1; //Module unloads and returns FAREWELL END
         return 0;
+    }
 
     return StopModule(id, arg_len, args, modres);
 }
@@ -205,6 +215,7 @@ void hookMODLOAD(void)
     info.exports[10] = (void *)Hook_LoadModuleBuffer;
 
     // check modload version
+    modloadVersion = info.version;
     if (info.version > 0x102) {
 
         // hook modload's StopModule

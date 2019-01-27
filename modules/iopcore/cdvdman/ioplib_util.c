@@ -9,6 +9,7 @@
 #include <sysclib.h>
 
 #include "ioplib_util.h"
+#include "smsutils.h"
 
 #ifdef __IOPCORE_DEBUG
 #define DPRINTF(args...) printf(args)
@@ -17,8 +18,6 @@
     do {                 \
     } while (0)
 #endif
-
-#define FAKEMOD_ID 0xdead
 
 // MODLOAD's exports pointers
 static int (*LoadStartModule)(char *modpath, int arg_len, char *args, int *modres);
@@ -29,42 +28,40 @@ static int (*UnloadModule)(int id);
 static int (*SearchModuleByName)(char *modname);
 
 // modules list to fake loading
-static char *lm_modulefake_list[] = {
-#ifdef __USE_DEV9
-    "DEV9.IRX",
-#endif
-#ifdef USB_DRIVER
-    "USBD.IRX",
-#endif
-#ifdef SMB_DRIVER
-    "SMAP.IRX",
-#endif
-#ifdef HDD_DRIVER
-    "ATAD.IRX",
-#endif
-    "CDVDSTM.IRX",
-    NULL
+struct FakeModule {
+    const char *fname;
+    const char *name;
+    int id; //ID to return to the game.
+    int returnValue; //Typical return value of module. RESIDENT END (0), NO RESIDENT END (1) or REMOVABLE END (2).
 };
 
-static char *lmb_modulefake_list[] = {
-#ifdef __USE_DEV9
-    "dev9",
-#endif
-#ifdef USB_DRIVER
-    "USB_driver",
-#endif
-#ifdef SMB_DRIVER
-    "INET_SMAP_driver",
-#endif
-#ifdef HDD_DRIVER
-    "atad_driver",
-#endif
-    "cdvd_st_driver",
-    NULL
+enum FAKE_MODULE_ID {
+    FAKE_MODULE_ID_DEV9 = 0xdead0,
+    FAKE_MODULE_ID_USBD,
+    FAKE_MODULE_ID_SMAP,
+    FAKE_MODULE_ID_ATAD,
+    FAKE_MODULE_ID_CDVDSTM,
+    FAKE_MODULE_ID_CDVDFSV,
 };
 
-static u8 fakemod_flag = 0;
-static u16 modloadVersion;
+static struct FakeModule modulefake_list[] = {
+#ifdef __USE_DEV9
+    { "DEV9.IRX", "dev9", FAKE_MODULE_ID_DEV9, 0 },
+#endif
+#ifdef USB_DRIVER
+    { "USBD.IRX", "USB_driver", FAKE_MODULE_ID_USBD, 2 },
+#endif
+#ifdef SMB_DRIVER
+    { "SMAP.IRX", "INET_SMAP_driver", FAKE_MODULE_ID_SMAP, 2 },
+    { "ENT_SMAP.IRX", "ent_smap", FAKE_MODULE_ID_SMAP, 2 },
+#endif
+#ifdef HDD_DRIVER
+    { "ATAD.IRX", "atad_driver", FAKE_MODULE_ID_ATAD, 0 },
+#endif
+    { "CDVDSTM.IRX", "cdvd_st_driver", FAKE_MODULE_ID_CDVDSTM, 2 },
+    { "CDVDFSV.IRX", "cdvd_ee_driver", FAKE_MODULE_ID_CDVDFSV, 2 }, //Used to simulate module unloading, as CDVDFSV can be unloaded.
+    { NULL, NULL, 0, 0 }
+};
 
 //--------------------------------------------------------------
 int getModInfo(u8 *modname, modinfo_t *info)
@@ -92,43 +89,58 @@ int getModInfo(u8 *modname, modinfo_t *info)
 }
 
 //--------------------------------------------------------------
-static int checkFakemod(char *modname, char **fakemod_list)
+static const struct FakeModule *checkFakemodByFile(const char *path, const struct FakeModule *fakemod_list)
 {
     // check if module is in the list
-    while (*fakemod_list) {
-        if (strstr(modname, *fakemod_list)) {
-            fakemod_flag = 1;
-            return 1;
+    while (fakemod_list->fname != NULL) {
+        if (strstr(path, fakemod_list->fname)) {
+            return fakemod_list;
         }
         fakemod_list++;
     }
 
-    return 0;
+    return NULL;
 }
 
-//--------------------------------------------------------------
-static int isFakemod(void)
+static const struct FakeModule *checkFakemodByName(const char *modname, const struct FakeModule *fakemod_list)
 {
-    if (fakemod_flag) {
-        DPRINTF("isFakemod() module is on fakelist!!!\n");
-        fakemod_flag = 0;
-        return 1;
+    // check if module is in the list
+    while (fakemod_list->fname != NULL) {
+        if (strstr(modname, fakemod_list->name)) {
+            return fakemod_list;
+        }
+        fakemod_list++;
     }
 
-    return 0;
+    return NULL;
+}
+
+static const struct FakeModule *checkFakemodById(int id, const struct FakeModule *fakemod_list)
+{
+    // check if module is in the list
+    while (fakemod_list->fname != NULL) {
+        if (id == fakemod_list->id) {
+            DPRINTF("checkFakemodById() module is on fakelist!!!\n");
+            return fakemod_list;
+        }
+        fakemod_list++;
+    }
+
+    return NULL;
 }
 
 //--------------------------------------------------------------
 static int Hook_LoadStartModule(char *modpath, int arg_len, char *args, int *modres)
 {
+    const struct FakeModule *mod;
+
     DPRINTF("Hook_LoadStartModule() modpath = %s\n", modpath);
 
-    checkFakemod(modpath, lm_modulefake_list);
-
-    if (isFakemod())
+    mod = checkFakemodByFile(modpath, modulefake_list);
+    if (mod != NULL)
     {
-        *modres = modloadVersion > 0x102 ? 2 : 0; //Most of the new, loadable modules return REMOVABLE END.
-        return FAKEMOD_ID;
+        *modres = mod->returnValue;
+        return mod->id;
     }
 
     return LoadStartModule(modpath, arg_len, args, modres);
@@ -137,12 +149,15 @@ static int Hook_LoadStartModule(char *modpath, int arg_len, char *args, int *mod
 //--------------------------------------------------------------
 static int Hook_StartModule(int id, char *modname, int arg_len, char *args, int *modres)
 {
+    const struct FakeModule *mod;
+
     DPRINTF("Hook_StartModule() id=%d modname = %s\n", id, modname);
 
-    if (isFakemod())
+    mod = checkFakemodById(id, modulefake_list);
+    if (mod != NULL)
     {
-        *modres = modloadVersion > 0x102 ? 2 : 0; //Most of the new, loadable modules return REMOVABLE END.
-        return FAKEMOD_ID;
+        *modres = mod->returnValue;
+        return mod->id;
     }
 
     return StartModule(id, modname, arg_len, args, modres);
@@ -151,10 +166,13 @@ static int Hook_StartModule(int id, char *modname, int arg_len, char *args, int 
 //--------------------------------------------------------------
 static int Hook_LoadModuleBuffer(void *ptr)
 {
+    const struct FakeModule *mod;
+
     DPRINTF("Hook_LoadModuleBuffer() modname = %s\n", (char *)(ptr + 0x8e));
 
-    if (checkFakemod((char *)(ptr + 0x8e), lmb_modulefake_list))
-        return FAKEMOD_ID;
+    mod = checkFakemodByName((char *)(ptr + 0x8e), modulefake_list); 
+    if (mod != NULL)
+        return mod->id;
 
     return LoadModuleBuffer(ptr);
 }
@@ -162,12 +180,15 @@ static int Hook_LoadModuleBuffer(void *ptr)
 //--------------------------------------------------------------
 static int Hook_StopModule(int id, int arg_len, char *args, int *modres)
 {
+    const struct FakeModule *mod;
+
     DPRINTF("Hook_StopModule() id=%d arg_len=%d\n", id, arg_len);
 
-    if (id == FAKEMOD_ID)
+    mod = checkFakemodById(id, modulefake_list);
+    if (mod != NULL)
     {
-        *modres = 1; //Module unloads and returns FAREWELL END
-        return 0;
+        *modres = 1; //Module unloads and returns NO RESIDENT END
+        return mod->id;
     }
 
     return StopModule(id, arg_len, args, modres);
@@ -176,10 +197,13 @@ static int Hook_StopModule(int id, int arg_len, char *args, int *modres)
 //--------------------------------------------------------------
 static int Hook_UnloadModule(int id)
 {
+    const struct FakeModule *mod;
+
     DPRINTF("Hook_UnloadModule() id=%d\n", id);
 
-    if (id == FAKEMOD_ID)
-        return 0;
+    mod = checkFakemodById(id, modulefake_list);
+    if (mod != NULL)
+        return mod->id;
 
     return UnloadModule(id);
 }
@@ -187,10 +211,13 @@ static int Hook_UnloadModule(int id)
 //--------------------------------------------------------------
 static int Hook_SearchModuleByName(char *modname)
 {
+    const struct FakeModule *mod;
+
     DPRINTF("Hook_SearchModuleByName() modname = %s\n", modname);
 
-    if (!strcmp(modname, "cdvd_ee_driver"))
-        return FAKEMOD_ID;
+    mod = checkFakemodByName(modname, modulefake_list);
+    if (mod != NULL)
+        return mod->id;
 
     return SearchModuleByName(modname);
 }
@@ -215,9 +242,7 @@ void hookMODLOAD(void)
     info.exports[10] = (void *)Hook_LoadModuleBuffer;
 
     // check modload version
-    modloadVersion = info.version;
     if (info.version > 0x102) {
-
         // hook modload's StopModule
         StopModule = (void *)info.exports[20];
         info.exports[20] = (void *)Hook_StopModule;
@@ -229,6 +254,13 @@ void hookMODLOAD(void)
         // hook modload's SearchModuleByName
         SearchModuleByName = (void *)info.exports[22];
         info.exports[22] = (void *)Hook_SearchModuleByName;
+    } else {
+        // Change all REMOVABLE END values to RESIDENT END, if modload is old.
+        struct FakeModule *modlist;
+        for (modlist = modulefake_list; modlist->fname != NULL; modlist++) {
+            if (modlist->returnValue == 2)
+                modlist->returnValue = 0;
+        }
     }
 
     // fix imports

@@ -113,9 +113,6 @@ static int loadISOGameListCache(const char *path, struct game_cache_list *cache)
     base_game_info_t *games;
     int result, size, count;
 
-    if (!gGameListCache)
-        return 1;
-
     freeISOGameListCache(cache);
 
     sprintf(filename, "%s/games.bin", path);
@@ -176,9 +173,6 @@ static int updateISOGameList(const char *path, const struct game_cache_list *cac
     const struct game_list_t *game;
     int result, i, j, modified;
     base_game_info_t *list;
-
-    if (!gGameListCache)
-        return 1;
 
     modified = 0;
     if (cache != NULL)

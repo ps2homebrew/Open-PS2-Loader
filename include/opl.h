@@ -125,7 +125,7 @@ int gXOff;
 int gYOff;
 int gOverscan;
 int gSelectButton;
-int gGameListCache;
+int gHDDGameListCache;
 
 int gEnableSFX;
 int gEnableBootSND;

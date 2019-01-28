@@ -126,7 +126,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Emulate DVD-DL",
     "Disable IGR",
     "Unused",
-    "Hide DEV9 module",
+    "Unused",
     "Changing the size will reformat the VMC",
     "Create",
     "Start",

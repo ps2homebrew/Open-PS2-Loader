@@ -31,17 +31,8 @@
 #include <usbd.h>
 #include "ioman_add.h"
 
-/*	Some modules (e.g. SMAP) will check for dev9 and its version number.
-	In the interest of maintaining network support of games in HDD mode,
-	the module ID of CDVDMAN is changed to DEV9.
-	SMB mode will never support network support in games, as the SMAP interface cannot be shared.	*/
-#ifdef HDD_DRIVER
-#define MODNAME "dev9"
-IRX_ID(MODNAME, 2, 8);
-#else
 #define MODNAME "cdvd_driver"
 IRX_ID(MODNAME, 1, 1);
-#endif
 
 //------------------ Patch Zone ----------------------
 #ifdef HDD_DRIVER

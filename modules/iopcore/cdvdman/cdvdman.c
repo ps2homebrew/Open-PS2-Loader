@@ -1329,14 +1329,16 @@ static int cdrom_ioctl2(iop_file_t *f, int cmd, void *args, unsigned int arglen,
 {
     int r = 0;
 
+    //There was a check here on whether the file was opened with mode 8.
+
     WaitSema(cdrom_io_sema);
 
     switch (cmd) {
         case CIOCSTREAMPAUSE:
-            sceCdStPause();
+            r = sceCdStPause();
             break;
         case CIOCSTREAMRESUME:
-            sceCdStResume();
+            r = sceCdStResume();
             break;
         case CIOCSTREAMSTAT:
             r = sceCdStStat();
@@ -1360,13 +1362,15 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
     result = 0;
     switch (cmd) {
         case CDIOC_READCLOCK:
-            sceCdReadClock((cd_clock_t *)buf);
+            result = sceCdReadClock((cd_clock_t *)buf);
+            if (result != 1)
+                result = -EIO;
             break;
         case CDIOC_READGUID:
-            sceCdReadGUID(buf);
+            result = sceCdReadGUID(buf);
             break;
         case CDIOC_READDISKGUID:
-            sceCdReadDiskID(buf);
+            result = sceCdReadDiskID(buf);
             break;
         case CDIOC_GETDISKTYPE:
             *(int *)buf = sceCdGetDiskType();
@@ -1375,12 +1379,18 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             *(int *)buf = sceCdGetError();
             break;
         case CDIOC_TRAYREQ:
-            sceCdTrayReq(*(int *)args, (u32 *)buf);
+            result = sceCdTrayReq(*(int *)args, (u32 *)buf);
+            if (result != 1)
+                result = -EIO;
             break;
         case CDIOC_STATUS:
             *(int *)buf = sceCdStatus();
             break;
         case CDIOC_POWEROFF:
+            result = sceCdPowerOff((int *)args);
+            if (result != 1)
+                result = -EIO;
+            break;
         case CDIOC_MMODE:
             result = 1;
             break;
@@ -1388,13 +1398,16 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             *(int *)buf = sceCdDiskReady(*(int *)args);
             break;
         case CDIOC_READMODELID:
-            sceCdReadModelID(buf);
+            result = sceCdReadModelID(buf);
             break;
         case CDIOC_STREAMINIT:
-            sceCdStInit(((u32 *)args)[0], ((u32 *)args)[1], (void *)((u32 *)args)[2]);
+            result = sceCdStInit(((u32 *)args)[0], ((u32 *)args)[1], (void *)((u32 *)args)[2]);
             break;
         case CDIOC_BREAK:
-            sceCdBreak();
+            result = sceCdBreak();
+            if (result != 1)
+                result = -EIO;
+            sceCdSync(0);
             break;
         case CDIOC_SPINNOM:
         case CDIOC_SPINSTM:
@@ -1404,16 +1417,27 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             result = 0;
             break;
         case CDIOC_STANDBY:
-            sceCdStandby();
+            result = sceCdStandby();
+            if (result != 1)
+                result = -EIO;
+            sceCdSync(0);
             break;
         case CDIOC_STOP:
-            sceCdStop();
+            result = sceCdStop();
+            if (result != 1)
+                result = -EIO;
+            sceCdSync(0);
             break;
         case CDIOC_PAUSE:
-            sceCdPause();
+            result = sceCdPause();
+            if (result != 1)
+                result = -EIO;
+            sceCdSync(0);
             break;
         case CDIOC_GETTOC:
-            sceCdGetToc(buf);
+            result = sceCdGetToc(buf);
+            if (result != 1)
+                result = -EIO;
             break;
         case CDIOC_GETINTREVENTFLG:
             *(int *)buf = cdvdman_stat.intr_ef;

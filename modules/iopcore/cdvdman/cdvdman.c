@@ -189,8 +189,14 @@ typedef struct
 
 static layer_info_t layer_info[2];
 
+struct cdvdman_cb_data
+{
+    void (*user_cb)(int reason);
+    int reason;
+};
+
 cdvdman_status_t cdvdman_stat;
-static void *user_cb;
+static struct cdvdman_cb_data cb_data;
 
 static int cdrom_io_sema;
 static int cdrom_rthread_sema;
@@ -758,11 +764,10 @@ int *sceCdCallback(void *func)
 
     DPRINTF("sceCdCallback %p\n", func);
 
-    old_cb = user_cb;
-
     CpuSuspendIntr(&oldstate);
 
-    user_cb = func;
+    old_cb = cb_data.user_cb;
+    cb_data.user_cb = func;
 
     CpuResumeIntr(oldstate);
 
@@ -1690,18 +1695,9 @@ retry:
 }
 
 //--------------------------------------------------------------
-struct cdvdman_cb_data
-{
-    void (*user_cb)(int reason);
-    int reason;
-};
-
 static void cdvdman_cb_event(int reason)
 {
-    static struct cdvdman_cb_data cb_data;
-
-    if (user_cb) {
-        cb_data.user_cb = user_cb;
+    if (cb_data.user_cb != NULL) {
         cb_data.reason = reason;
 
         DPRINTF("cdvdman_cb_event reason: %d - setting cb alarm...\n", reason);
@@ -1720,7 +1716,8 @@ static unsigned int event_alarm_cb(void *args)
     struct cdvdman_cb_data *cb_data = args;
 
     cdvdman_signal_read_end_intr();
-    cb_data->user_cb(cb_data->reason);
+    if (cb_data->user_cb != NULL) //This interrupt does not occur immediately, hence check for the callback again here.
+        cb_data->user_cb(cb_data->reason);
     return 0;
 }
 

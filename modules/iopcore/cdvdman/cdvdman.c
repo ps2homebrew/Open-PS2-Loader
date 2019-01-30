@@ -545,6 +545,9 @@ int sceCdSeek(u32 lsn)
 {
     DPRINTF("sceCdSeek %d\n", (int)lsn);
 
+    if (sync_flag)
+        return 0;
+
     cdvdman_stat.err = CDVD_ERR_NO;
 
     cdvdman_stat.status = CDVD_STAT_PAUSE;
@@ -565,9 +568,12 @@ int sceCdGetError(void)
 //-------------------------------------------------------------------------
 int sceCdGetToc(void *toc)
 {
+    if (sync_flag)
+        return 0;
+
     cdvdman_stat.err = CDVD_ERR_READ;
 
-    return 1;
+    return 0; //Not supported
 }
 
 //-------------------------------------------------------------------------
@@ -670,6 +676,9 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 //-------------------------------------------------------------------------
 int sceCdStop(void)
 {
+    if (sync_flag)
+        return 0;
+
     cdvdman_stat.err = CDVD_ERR_NO;
 
     cdvdman_stat.status = CDVD_STAT_STOP;
@@ -764,6 +773,9 @@ int *sceCdCallback(void *func)
 
     DPRINTF("sceCdCallback %p\n", func);
 
+    if (sceCdSync(1))
+        return NULL;
+
     CpuSuspendIntr(&oldstate);
 
     old_cb = cb_data.user_cb;
@@ -777,6 +789,11 @@ int *sceCdCallback(void *func)
 //-------------------------------------------------------------------------
 int sceCdPause(void)
 {
+    DPRINTF("sceCdPause\n");
+
+    if (sync_flag)
+        return 0;
+
     cdvdman_stat.err = CDVD_ERR_NO;
 
     cdvdman_stat.status = CDVD_STAT_PAUSE;
@@ -789,6 +806,9 @@ int sceCdPause(void)
 int sceCdBreak(void)
 {
     DPRINTF("sceCdBreak\n");
+
+    if (sync_flag)
+        return 0;
 
     cdvdman_stat.err = CDVD_ERR_NO;
     cdvdman_stat.status = CDVD_STAT_PAUSE;

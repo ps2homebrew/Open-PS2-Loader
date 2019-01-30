@@ -123,6 +123,8 @@ static const patchlist_t patch_list[] = {
     {"SCES_500.00", USB_MODE, {0x002c9760, 0x0000182d, 0x8c43a2f8}},               // Ridge Racer V (PAL) - workaround by disabling (bugged?) streaming code in favour of processing all data at once, for USB devices.
     {"SLUS_205.82", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0033b534, 0x00000000}},   // SRS: Street Racing Syndicate (NTSC-U/C)
     {"SLES_530.45", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0033fbfc, 0x00000000}},   // SRS: Street Racing Syndicate (PAL)
+    {"SLUS_214.49", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00361dfc, 0x00000000}},   // The Fast and the Furious (NTSC-U/C)
+    {"SLES_544.83", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00363c4c, 0x00000000}},   // The Fast and the Furious (PAL)
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 

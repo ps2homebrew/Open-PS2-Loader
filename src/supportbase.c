@@ -113,9 +113,6 @@ static int loadISOGameListCache(const char *path, struct game_cache_list *cache)
     base_game_info_t *games;
     int result, size, count;
 
-    if (!gGameListCache)
-        return 1;
-
     freeISOGameListCache(cache);
 
     sprintf(filename, "%s/games.bin", path);
@@ -176,9 +173,6 @@ static int updateISOGameList(const char *path, const struct game_cache_list *cac
     const struct game_list_t *game;
     int result, i, j, modified;
     base_game_info_t *list;
-
-    if (!gGameListCache)
-        return 1;
 
     modified = 0;
     if (cache != NULL)
@@ -307,6 +301,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                         *glist = next;
 
                         game = &(*glist)->gameinfo;
+                        memset(game, 0, sizeof(base_game_info_t));
 
                         strncpy(game->name, &record.name[GAME_STARTUP_MAX], NameLen);
                         game->name[NameLen] = '\0';
@@ -331,6 +326,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                                     *glist = next;
 
                                     game = &(*glist)->gameinfo;
+                                    memset(game, 0, sizeof(base_game_info_t));
 
                                     strcpy(game->startup, startup);
                                     strncpy(game->name, record.name, NameLen);
@@ -432,6 +428,8 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
 
         if (count > 0) {
             if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count)) != NULL) {
+                memset(*list, 0, sizeof(base_game_info_t) * count);
+
                 while (size > 0) {
                     fileXioRead(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
 

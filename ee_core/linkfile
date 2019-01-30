@@ -14,17 +14,13 @@
 ENTRY(_start);
 
 MEMORY {
-	ram86	: ORIGIN = 0x00086000, LENGTH =  8K   /* 0x00086000 - 0x00088000: probably free */
-	ram88	: ORIGIN = 0x00088000, LENGTH = 60928 /* 0x00088000 - 0x00096E00: free */
+	ram84	: ORIGIN = 0x00084000, LENGTH = 77312 /* 0x00084000 - 0x00096E00: free */
 	stack	: ORIGIN = 0x00096E00, LENGTH = 512   /* 0x00096E00 - 0x00097000: free */
-	ramD0	: ORIGIN = 0x000D0000, LENGTH = 192K  /* 0x000D0000 - 0x00100000: probably free */
+	modules	: ORIGIN = 0x00097000, LENGTH = 228K  /* 0x00097000 - 0x000D0000: free */
+	ramD0	: ORIGIN = 0x000D0000, LENGTH = 192K  /* 0x000D0000 - 0x00100000: usually free, but some games use it. */
 }
 
 SECTIONS {
-	.igs_engine : {
-		igs_api.*(*)
-	} >ram86
-
 	.text : {
 		_ftext = . ;
 		*(.text)
@@ -33,12 +29,12 @@ SECTIONS {
 		KEEP(*(.init))
 		KEEP(*(.fini))
 		QUAD(0)
-	} >ram88
+	} >ram84
 
 	PROVIDE(_etext = .);
 	PROVIDE(etext = .);
 
-	.reginfo : { *(.reginfo) } >ram88
+	.reginfo : { *(.reginfo) } >ram84
 
 	/* Global/static constructors and deconstructors. */
 	.ctors ALIGN(16): {
@@ -46,20 +42,20 @@ SECTIONS {
 		KEEP(*(EXCLUDE_FILE(*crtend*.o) .ctors))
 		KEEP(*(SORT(.ctors.*)))
 		KEEP(*(.ctors))
-	} >ram88
+	} >ram84
 	.dtors ALIGN(16): {
 		KEEP(*crtbegin*.o(.dtors))
 		KEEP(*(EXCLUDE_FILE(*crtend*.o) .dtors))
 		KEEP(*(SORT(.dtors.*)))
 		KEEP(*(.dtors))
-	} >ram88
+	} >ram84
 
 	/* Static data.  */
 	.rodata ALIGN(128): {
 		*(.rodata)
 		*(.rodata.*)
 		*(.gnu.linkonce.r*)
-	} >ram88
+	} >ram84
 
 	.data ALIGN(128): {
 		_fdata = . ;
@@ -67,20 +63,20 @@ SECTIONS {
 		*(.data.*)
 		*(.gnu.linkonce.d*)
 		SORT(CONSTRUCTORS)
-	} >ram88
+	} >ram84
 
-	.rdata ALIGN(128): { *(.rdata) } >ram88
-	.gcc_except_table ALIGN(128): { *(.gcc_except_table) } >ram88
+	.rdata ALIGN(128): { *(.rdata) } >ram84
+	.gcc_except_table ALIGN(128): { *(.gcc_except_table) } >ram84
 
 	_gp = ALIGN(128) + 0x7ff0;
-	.lit4 ALIGN(128): { *(.lit4) } >ram88
-	.lit8 ALIGN(128): { *(.lit8) } >ram88
+	.lit4 ALIGN(128): { *(.lit4) } >ram84
+	.lit8 ALIGN(128): { *(.lit8) } >ram84
 
 	.sdata ALIGN(128): {
 		*(.sdata)
 		*(.sdata.*)
 		*(.gnu.linkonce.s*)
-	} >ram88
+	} >ram84
 
 	_edata = .;
 	PROVIDE(edata = .);
@@ -92,14 +88,14 @@ SECTIONS {
 		*(.sbss.*)
 		*(.gnu.linkonce.sb*)
 		*(.scommon)
-	} >ram88
+	} >ram84
 
 	.bss ALIGN(128) : {
 		*(.bss)
 		*(.bss.*)
 		*(.gnu.linkonce.b*)
 		*(COMMON)
-	} >ram88
+	} >ram84
 	_end_bss = .;
 
 	/* Symbols needed by crt0.s.  */

@@ -21,7 +21,6 @@
 
 #include "xfer.h"
 
-extern void *_gp;
 extern struct SmapDriverData SmapDriverData;
 
 static inline int CopyToFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, int length)

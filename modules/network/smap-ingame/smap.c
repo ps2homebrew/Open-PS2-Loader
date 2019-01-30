@@ -1,3 +1,4 @@
+#include <defs.h>
 #include <errno.h>
 #include <stdio.h>
 #include <dmacman.h>
@@ -55,8 +56,6 @@ struct SmapDriverData SmapDriverData;
 static unsigned int EnableAutoNegotiation = 1;
 static unsigned int EnablePinStrapConfig = 0;
 static unsigned int SmapConfiguration = 0x5E0;
-
-extern void *_gp;
 
 static void _smap_write_phy(volatile u8 *emac3_regbase, unsigned int address, u16 value)
 {
@@ -362,7 +361,9 @@ static int Dev9IntrCb(int flag)
     USE_SPD_REGS;
     volatile u8 *smap_regbase, *emac3_regbase;
 
-    SaveGP();
+    void *OldGP;
+
+    OldGP = SetModuleGP();
 
     emac3_regbase = SmapDriverData.emac3_regbase;
     smap_regbase = SmapDriverData.smap_regbase;
@@ -377,7 +378,7 @@ static int Dev9IntrCb(int flag)
         }
     }
 
-    RestoreGP();
+    SetGP(OldGP);
 
     return 0;
 }
@@ -417,7 +418,9 @@ int SMAPStart(void)
     int result;
     volatile u8 *emac3_regbase;
 
-    SaveGP();
+    void *OldGP;
+
+    OldGP = SetModuleGP();
 
     if (!SmapDriverData.SmapIsInitialized) {
         emac3_regbase = SmapDriverData.emac3_regbase;
@@ -440,7 +443,7 @@ int SMAPStart(void)
             SmapDriverData.NetDevStopFlag = 0;
     }
 
-    RestoreGP();
+    SetGP(OldGP);
 
     return 0;
 }
@@ -449,7 +452,9 @@ void SMAPStop(void)
 {
     volatile u8 *emac3_regbase;
 
-    SaveGP();
+    void *OldGP;
+
+    OldGP = SetModuleGP();
     SmapDriverData.NetDevStopFlag = 1;
 
     if (SmapDriverData.SmapIsInitialized) {
@@ -461,7 +466,7 @@ void SMAPStop(void)
         SmapDriverData.SmapIsInitialized = 0;
     }
 
-    RestoreGP();
+    SetGP(OldGP);
 }
 
 static int ParseSmapConfiguration(const char *cmd, unsigned int *configuration)

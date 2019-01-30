@@ -176,8 +176,6 @@ typedef struct
 /* 24 1C ED 24 1C ED 24 1C ED 24 1C ED 00 F2 FF 00 F2 FF 00 F2 FF 24 1C ED 24 1C ED 24 1C ED 24 1C ED 00 F2 FF 00 F2 FF 24 1C ED 24 1C ED 24 1C ED */
 /* 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED 24 1C ED */
 
-#define _IGS_ENGINE_ __attribute__((section(".igs_engine")))
-
-int InGameScreenshot(void) _IGS_ENGINE_;
+int InGameScreenshot(void);
 
 #endif /* _IGSAPI_H_ */

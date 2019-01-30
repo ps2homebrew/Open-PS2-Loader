@@ -135,7 +135,7 @@ static inline void CopyFromFIFO(volatile u8 *smap_regbase, void *buffer, unsigne
         : "at", "v0", "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7");
 }
 
-inline int HandleRxIntr(struct SmapDriverData *SmapDrivPrivData)
+int HandleRxIntr(struct SmapDriverData *SmapDrivPrivData)
 {
     USE_SMAP_RX_BD;
     int NumPacketsReceived;

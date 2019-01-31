@@ -733,7 +733,7 @@ do_write(struct api_msg_msg *msg)
    segments when new outgoing data arrives from the user if any
    previously transmitted data on the connection remains
    unacknowledged. */
-                if (err == ERR_OK && (msg->conn->pcb.tcp->unacked == NULL || (msg->conn->pcb.tcp->flags & TF_NODELAY))) {
+                if (err == ERR_OK && (msg->conn->pcb.tcp->unacked == NULL || (msg->conn->pcb.tcp->flags & TF_NODELAY) || ( msg->conn->pcb.tcp->snd_queuelen) > 1)) {
                     tcp_output(msg->conn->pcb.tcp);
                 }
                 msg->conn->err = err;

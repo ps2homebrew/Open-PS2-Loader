@@ -158,12 +158,6 @@ int New_Reset_Iop(const char *arg, int arglen)
     }
 #endif
 
-    /*	For HDD mode, CDVDMAN's name is set to DEV9 (so that the game can find DEV9 loaded) in order for network support to still work.
-		However, some games will stop working (for one reason or another) if they find DEV9 loaded when it should not...
-		SMB mode never has its CDVDMAN name changed to DEV9 because it cannot share the SMAP interface with the game.	*/
-    if (g_compat_mask & COMPAT_MODE_8)
-        ChangeModuleName("dev9", "cdvdman");
-
     DPRINTF("Exiting services...\n");
     SifExitIopHeap();
     LoadFileExit();

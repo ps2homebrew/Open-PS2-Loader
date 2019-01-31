@@ -450,8 +450,11 @@ static int Hook_scePad2CreateSocket(pad2socketparam_t *SocketParam, void *addr)
     int ret;
 
     // Make sure scePad2CreateSocket function is still available
-    if (SocketParam->port == 0 && SocketParam->slot == 0)
-        Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_CHECK);
+    if (SocketParam != NULL)
+    {   //Do only if game specified this structure, as it is optional.
+        if (SocketParam->port == 0 && SocketParam->slot == 0)
+            Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_CHECK);
+    }
 
     // Call original scePad2CreateSocket function
     ret = scePad2CreateSocket(SocketParam, addr);

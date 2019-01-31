@@ -372,7 +372,7 @@ void guiShowConfig()
     // configure the enumerations
     const char *selectButtons[] = {_l(_STR_CIRCLE), _l(_STR_CROSS), NULL};
     //START of OPL_DB tweaks
-    const char *deviceNames[] = {_l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES),_l(_STR_APPS),_l(_STR_ELM), NULL};
+    const char *deviceNames[] = {_l(_STR_USB_GAMES), _l(_STR_NET_GAMES), _l(_STR_HDD_GAMES), _l(_STR_APPS), _l(_STR_ELM), NULL};
     //END of OPL_DB tweaks
     const char *deviceModes[] = {_l(_STR_OFF), _l(_STR_MANUAL), _l(_STR_AUTO), NULL};
 

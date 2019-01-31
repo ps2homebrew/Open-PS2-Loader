@@ -1,6 +1,6 @@
 # Translation by yohokaru
-# Last update: Jan. 20, 2019
-# Updated for OPL_1460_DB-TA_[57fe65c]
+# Last update: Jan. 30, 2019
+# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
 OPL %s
@@ -117,7 +117,7 @@ Przejdź filmy
 Emuluj DVD-DL
 Wyłącz IGR
 Unused
-Ukryj moduł DEV9
+Unused
 Zmiana rozmiaru, zostanie sformatowany VMC
 Utwórz
 Start
@@ -265,7 +265,7 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
-Cache Game List
+Cache Game List (HD)
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

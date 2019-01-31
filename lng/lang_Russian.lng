@@ -1,6 +1,6 @@
 # Translated by druchapucha and frodosumkin
-# Last update: Jan. 22, 2019
-# Updated for OPL_1460_DB-TA_[57fe65c]
+# Last update: Jan. 30, 2019
+# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
 OPL %s
@@ -117,7 +117,7 @@ NetBIOS
 Эмулировать DVD-DL
 Отключить использование IGR
 Не используется
-Скрывать модули Dev9
+Не используется
 При изменении размера, VMC переформатируется
 Создать
 Старт
@@ -265,7 +265,7 @@ VMC %s файл фрагментирован. Продолжить с карто
 Громкость звуковых эффектов
 Громкость звука загрузки
 Подтвердить изменение режима видео?
-Кэш списка игр
+Кэш списка игр (HD)
 PS1 игры
 Отображать экран PS1 игр
 POPSTARTER.ELF не найден '%s'!

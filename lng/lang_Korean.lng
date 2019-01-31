@@ -1,6 +1,6 @@
 # Translated by DDinghoya
-# Last update: Jan. 20, 2019
-# Updated for OPL_1460_DB-TA_[57fe65c]
+# Last update: Jan. 30, 2019
+# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
@@ -117,7 +117,7 @@ USB 게임 손상 검사
 DV-DL 에뮬레이트
 IGR 비활성
 Unused
-DEV9 모듈 숨기기
+Unused
 크기 변경 시 VMC 재포멧 됩니다.
 생성
 시작
@@ -265,7 +265,7 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
-Cache Game List
+Cache Game List (HD)
 PS1 게임
 PS1 게임 표시 모드
 '%s'에 POPSTARTER.ELF이 없습니다!

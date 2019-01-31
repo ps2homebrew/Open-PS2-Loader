@@ -1,6 +1,6 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: Jan. 23, 2019
-# Updated for OPL_1460_DB-TA_[57fe65c]
+# Last update: Jan. 30, 2019
+# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 OPL %s
@@ -117,7 +117,7 @@ Videos überspringen
 Emuliere DVD-DL
 Deaktiviere IGR
 Unbenutzt
-Verstecke DEV9 Modul
+Unbenutzt
 Ändern der Größe wird die VMC erneut formatieren!
 Erstellen
 Starten
@@ -265,7 +265,7 @@ Startsound Einschalten
 Lautstärke Soundeffekte
 Lautstärke Startsound
 Änderung des Video signals übernehmen?
-Spieleliste zwischenspeichern
+Spieleliste zwischenspeichern (HD)
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

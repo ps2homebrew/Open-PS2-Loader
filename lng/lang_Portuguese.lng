@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: Jan. 20, 2019
-# Updated for OPL_1460_DB-TA_[57fe65c]
+# Last update: Jan. 30, 2019
+# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -117,7 +117,7 @@ Saltar videos
 Emular DVD-DL
 Desativar IGR
 Não utilizado
-Esconder módulo dev9
+Não utilizado
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
 Iniciar
@@ -265,7 +265,7 @@ Ativar som de Arranque
 Volume dos sons
 Volume do som de arranque
 Confirmar alteração do modo de vídeo?
-Cache da lista de jogos
+Cache da lista de jogos (HD)
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

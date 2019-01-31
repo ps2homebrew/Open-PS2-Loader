@@ -1,6 +1,6 @@
 # Translation by Lord_Flaya
-# Last update: Jan. 20, 2019
-# Updated for OPL_1460_DB-TA_[57fe65c]
+# Last update: Jan. 30, 2019
+# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 OPL %s
@@ -117,7 +117,7 @@ Skippa Videos
 Emulera DVD-DL
 Inaktivera IGR
 Används ej
-Göm dev9 modul
+Används ej
 Ändra storleken kommer att formatera om VMC
 Skapa
 Start
@@ -265,7 +265,7 @@ Aktivera Uppstartsljud
 Ljudeffektsvolym
 Uppstartsljudsvolym
 Bekräfta ändring av videoläge?
-Lägg Spellista i Cache
+Lägg Spellista i Cache (HD)
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

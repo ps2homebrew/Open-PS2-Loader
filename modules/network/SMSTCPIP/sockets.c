@@ -53,7 +53,7 @@ struct lwip_socket
     struct netconn *conn;
     struct netbuf *lastdata;
     u16_t lastoffset;
-    u16_t rcvevent;
+    s16_t rcvevent;
     u16_t sendevent;
     u16_t flags;
     int err;
@@ -364,7 +364,7 @@ int lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsig
         buf = sock->lastdata;
     } else {
         /* If this is non-blocking call, then check first */
-        if (((flags & MSG_DONTWAIT) || (sock->flags & O_NONBLOCK)) && !sock->rcvevent) {
+        if (((flags & MSG_DONTWAIT) || (sock->flags & O_NONBLOCK)) && (sock->rcvevent <= 0)) {
             LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_recvfrom(%d): returning EWOULDBLOCK\n", s));
             sock_set_errno(sock, EWOULDBLOCK);
             return -1;
@@ -628,7 +628,7 @@ lwip_selscan(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset)
         if (FD_ISSET(i, readset)) {
             /* See if netconn of this socket is ready for read */
             p_sock = get_socket(i);
-            if (p_sock && (p_sock->lastdata || p_sock->rcvevent)) {
+            if (p_sock && (p_sock->lastdata || (p_sock->rcvevent > 0))) {
                 FD_SET(i, &lreadset);
                 LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_selscan: fd=%d ready for reading\n", i));
                 nready++;
@@ -853,7 +853,7 @@ event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
             if (scb->sem_signalled == 0) {
                 /* Test this select call for our socket */
                 if (scb->readset && FD_ISSET(s, scb->readset))
-                    if (sock->rcvevent)
+                    if (sock->rcvevent > 0)
                         break;
                 if (scb->writeset && FD_ISSET(s, scb->writeset))
                     if (sock->sendevent)

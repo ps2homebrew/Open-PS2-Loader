@@ -94,7 +94,7 @@ struct netconn
     sys_mbox_t acceptmbox;
     sys_sem_t sem;
     int socket;
-    u16_t recv_avail;
+    s16_t recv_avail;
     void (*callback)(struct netconn *, enum netconn_evt, u16_t len);
 };
 

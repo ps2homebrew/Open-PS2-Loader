@@ -72,17 +72,22 @@ void netbuf_delete(struct netbuf *buf)
 
 } /* end netbuf_delete */
 
-void netbuf_ref(struct netbuf *buf, void *dataptr, u16_t size)
+err_t netbuf_ref(struct netbuf *buf, void *dataptr, u16_t size)
 {
 
     if (buf->p)
         pbuf_free(buf->p);
 
     buf->p = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_REF);
+    if (buf->p == NULL) {
+        buf->ptr = NULL;
+        return ERR_MEM;
+    }
     buf->p->payload = dataptr;
     buf->p->len = buf->p->tot_len = size;
     buf->ptr = buf->p;
 
+    return ERR_OK;
 } /* end netbuf_ref */
 
 void netbuf_copy_partial(

@@ -648,7 +648,7 @@ static void elmCleanUp(int exception) {
 }
 
 //This may be called, even if appInit() was not.
-static void appShutdown(void)
+static void elmShutdown(void)
 {
     if (elmItemList.enabled) {
         LOG("ELMSUPPORT Shutdown\n");
@@ -658,7 +658,7 @@ static void appShutdown(void)
 }
 
 static item_list_t elmItemList = {
-		ELM_MODE, -1, 0, MODE_FLAG_NO_COMPAT|MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", _STR_ELM, NULL, &elmInit, &elmNeedsUpdate,	&elmUpdateItemList,
-		&elmGetItemCount, NULL, &elmGetItemName, &elmGetItemNameLength, &elmGetItemStartup, &elmDeleteItem, &elmRenameItem, &elmLaunchItem,
-		&elmGetConfig, &elmGetImage, &elmCleanUp, &appShutdown, NULL, ELM_ICON
+    ELM_MODE, -1, 0, MODE_FLAG_NO_COMPAT|MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", _STR_ELM, NULL, &elmInit, &elmNeedsUpdate, &elmUpdateItemList,
+    &elmGetItemCount, NULL, &elmGetItemName, &elmGetItemNameLength, &elmGetItemStartup, &elmDeleteItem, &elmRenameItem, &elmLaunchItem,
+    &elmGetConfig, &elmGetImage, &elmCleanUp, &elmShutdown, NULL, ELM_ICON
 };

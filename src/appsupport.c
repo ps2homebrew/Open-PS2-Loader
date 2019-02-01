@@ -454,7 +454,7 @@ static config_set_t *appGetConfig(int id)
                 configFree(config);
             
             #if OPL_IS_DEV_BUILD
-                snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(),  appGetELFName(cur->val));
+                snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
             #else
                 snprintf(path, sizeof(path), "%sCFG/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
             #endif

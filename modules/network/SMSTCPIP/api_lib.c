@@ -38,6 +38,7 @@
 #include "lwip/api_msg.h"
 #include "lwip/memp.h"
 
+#include <intrman.h>
 #include <thsemap.h>
 #include <sysclib.h>
 
@@ -439,7 +440,7 @@ netconn_recv(struct netconn *conn)
 
         if (p != NULL) {
             len = p->tot_len;
-            conn->recv_avail -= len;
+            SYS_ARCH_DEC(conn->recv_avail, len);
         } else
             len = 0;
 
@@ -479,7 +480,7 @@ netconn_recv(struct netconn *conn)
         memp_free(MEMP_API_MSG, msg);
     } else {
         sys_mbox_fetch(conn->recvmbox, (void **)&buf);
-        conn->recv_avail -= buf->p->tot_len;
+        SYS_ARCH_DEC(conn->recv_avail, buf->p->tot_len);
         /* Register event with callback */
         if (conn->callback)
             (*conn->callback)(conn, NETCONN_EVT_RCVMINUS, buf->p->tot_len);

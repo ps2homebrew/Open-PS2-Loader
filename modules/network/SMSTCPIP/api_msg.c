@@ -37,6 +37,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcpip.h"
 
+#include <intrman.h>
 #include <thsemap.h>
 
 #if LWIP_RAW
@@ -61,7 +62,7 @@ recv_raw(void *arg, struct raw_pcb *pcb, struct pbuf *p,
         buf->fromaddr = addr;
         buf->fromport = pcb->protocol;
 
-        conn->recv_avail += p->tot_len;
+        SYS_ARCH_INC(conn->recv_avail, p->tot_len);
         /* Register event with callback */
         if (conn->callback)
             (*conn->callback)(conn, NETCONN_EVT_RCVPLUS, p->tot_len);
@@ -97,7 +98,7 @@ recv_udp(void *arg, struct udp_pcb *pcb, struct pbuf *p,
             buf->fromport = port;
         }
 
-        conn->recv_avail += p->tot_len;
+        SYS_ARCH_INC(conn->recv_avail, p->tot_len);
         /* Register event with callback */
         if (conn->callback)
             (*conn->callback)(conn, NETCONN_EVT_RCVPLUS, p->tot_len);
@@ -123,7 +124,7 @@ static err_t recv_tcp(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 
             if (p) {
                 len = p->tot_len;
-                conn->recv_avail += len;
+                SYS_ARCH_INC(conn->recv_avail, len);
             } else
                 len = 0;
 

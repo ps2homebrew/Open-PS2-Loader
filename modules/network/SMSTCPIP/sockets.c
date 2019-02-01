@@ -862,8 +862,8 @@ event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
         }
         if (scb) {
             scb->sem_signalled = 1;
-            sys_sem_signal(selectsem);
             sys_sem_signal(scb->sem);
+            sys_sem_signal(selectsem);
         } else {
             sys_sem_signal(selectsem);
             break;

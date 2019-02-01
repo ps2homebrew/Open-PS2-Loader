@@ -39,6 +39,7 @@
 
 #include "lwip/sockets.h"
 
+#include <intrman.h>
 #include <thsemap.h>
 #include <sysclib.h>
 #include <errno.h>
@@ -1348,7 +1349,7 @@ int lwip_ioctl(int s, long cmd, void *argp)
                 return -1;
             }
 
-            *((u16_t *)argp) = sock->conn->recv_avail;
+            SYS_ARCH_GET(sock->conn->recv_avail, *((u16_t*)argp));
 
             LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_ioctl(%d, FIONREAD, %p) = %u\n", s, argp, *((u16_t *)argp)));
             sock_set_errno(sock, 0);

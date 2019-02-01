@@ -512,7 +512,7 @@ err_t netconn_send(struct netconn *conn, struct netbuf *buf)
 err_t netconn_write(struct netconn *conn, void *dataptr, u16_t size, u8_t copy)
 {
     struct api_msg *msg;
-    u16_t len;
+    u16_t len, sndbuf;
 
     if (conn == NULL) {
         return ERR_VAL;
@@ -535,16 +535,16 @@ err_t netconn_write(struct netconn *conn, void *dataptr, u16_t size, u8_t copy)
         msg->msg.msg.w.copy = copy;
 
         if (conn->type == NETCONN_TCP) {
-            if (tcp_sndbuf(conn->pcb.tcp) == 0) {
+            while ((sndbuf = tcp_sndbuf(conn->pcb.tcp)) == 0) {
                 sys_sem_wait(conn->sem);
                 if (conn->err != ERR_OK) {
                     goto ret;
                 }
             }
-            if (size > tcp_sndbuf(conn->pcb.tcp)) {
+            if (size > sndbuf) {
                 /* We cannot send more than one send buffer's worth of data at a
      time. */
-                len = tcp_sndbuf(conn->pcb.tcp);
+                len = sndbuf;
             } else {
                 len = size;
             }

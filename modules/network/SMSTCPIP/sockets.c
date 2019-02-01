@@ -497,10 +497,10 @@ int lwip_send(int s, void *data, int size, unsigned int flags)
 
             /* make the buffer point to the data that should
        be sent */
-            netbuf_ref(buf, data, size);
-
-            /* send the data */
-            err = netconn_send(sock->conn, buf);
+            if ((err = netbuf_ref(buf, data, size))==ERR_OK) {
+                /* send the data */
+                err = netconn_send(sock->conn, buf);
+            }
 
             /* deallocated the buffer */
             netbuf_delete(buf);

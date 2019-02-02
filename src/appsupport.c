@@ -354,7 +354,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
         //To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
         mode = oplPath2Mode(filename);
         if (mode < 0)
-            mode = APP_MODE; //Legacy apps mode (mc?:/*)
+            mode = APP_MODE; //Legacy apps mode on memory card (mc?:/*)
 
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
         sysExecElf(filename);

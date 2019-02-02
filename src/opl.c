@@ -370,7 +370,10 @@ int oplPath2Mode(const char *path)
             blkdevnameend = strchr(appsPath, ':');
             if (blkdevnameend != NULL)
             {
-                blkdevnamelen = (int)(blkdevnameend - appsPath) + 1;
+                blkdevnamelen = (int)(blkdevnameend - appsPath);
+
+                while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
+                    blkdevnamelen--; //Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)
                     return listSupport->mode;

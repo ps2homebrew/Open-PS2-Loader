@@ -95,8 +95,19 @@ item_list_t *appGetObject(int initOnly)
 }
 
 static int appNeedsUpdate(void)
-{   // Always allow the user & auto refresh to refresh the apps list.
-    return 1;
+{
+    int update;
+
+    update = 0;
+    if (appForceUpdate)
+    {
+        appForceUpdate = 0;
+        update = 1;
+    }
+    if (oplShouldAppsUpdate())
+        update = 1;
+
+    return update;
 }
 
 static int addAppsLegacyList(struct app_info_linked **appsLinkedList)

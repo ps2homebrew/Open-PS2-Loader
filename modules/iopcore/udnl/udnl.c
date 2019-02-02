@@ -391,11 +391,11 @@ static void LoadIRXModule(const void *module, struct ModuleInfo *ModuleInfo)
     ELF_hdr = (elf_header_t *)module;
     ELF_phdr = (elf_pheader_t *)((unsigned int)module + ELF_hdr->phoff);
 
-    ModuleInfo->gp = ModuleInfo->gp + (unsigned int)ModuleInfo->text_start;
-    ModuleInfo->EntryPoint = ModuleInfo->EntryPoint +(unsigned int)ModuleInfo->text_start;
+    ModuleInfo->gp = (void*)((u8*)ModuleInfo->gp + (unsigned int)ModuleInfo->text_start);
+    ModuleInfo->EntryPoint = (void*)((u8*)ModuleInfo->EntryPoint +(unsigned int)ModuleInfo->text_start);
 
     if (ModuleInfo->mod_id + 1 != 0) {
-        ModuleInfo->mod_id = ModuleInfo->mod_id + (unsigned int)ModuleInfo->text_start;
+        ModuleInfo->mod_id = (struct iopmod_id *)((u8*)ModuleInfo->mod_id + (unsigned int)ModuleInfo->text_start);
     }
 
     ELF_shdr = (elf_shdr_t *)((unsigned int)module + ELF_hdr->shoff);
@@ -620,7 +620,7 @@ static const struct ExtInfoField *GetFileInfo(const struct RomdirFileStat *stat,
             return ExtInfoField;
         }
 
-        ExtInfoField = ExtInfoField + ((ExtInfoHeader >> 16 & 0xFC) + 4);
+        ExtInfoField = (const struct ExtInfoField*)((const u8*)ExtInfoField + ((ExtInfoHeader >> 16 & 0xFC) + 4));
     }
 
     return NULL;

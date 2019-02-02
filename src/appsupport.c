@@ -95,8 +95,19 @@ item_list_t *appGetObject(int initOnly)
 }
 
 static int appNeedsUpdate(void)
-{   // Always allow the user & auto refresh to refresh the apps list.
-    return 1;
+{
+    int update;
+
+    update = 0;
+    if (appForceUpdate)
+    {
+        appForceUpdate = 0;
+        update = 1;
+    }
+    if (oplShouldAppsUpdate())
+        update = 1;
+
+    return update;
 }
 
 static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
@@ -354,7 +365,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
         //To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
         mode = oplPath2Mode(filename);
         if (mode < 0)
-            mode = APP_MODE; //Legacy apps mode (mc?:/*)
+            mode = APP_MODE; //Legacy apps mode on memory card (mc?:/*)
 
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
         sysExecElf(filename);

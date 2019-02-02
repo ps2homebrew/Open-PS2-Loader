@@ -13,7 +13,7 @@ USE_DEV9 ?= 0
 
 ifeq ($(USE_HDD),1)
 IOP_BIN  = hdd_cdvdman.irx
-IOP_OBJNAME = obj.hdd/
+IOP_OBJS_DIR = obj.hdd/
 IOP_OBJS += device-hdd.o atad.o
 IOP_CFLAGS += -DHDD_DRIVER
 USE_DEV9 = 1
@@ -21,7 +21,7 @@ endif
 
 ifeq ($(USE_HDPRO),1)
 IOP_BIN  = hdd_hdpro_cdvdman.irx
-IOP_OBJNAME = obj.hdpro/
+IOP_OBJS_DIR = obj.hdpro/
 IOP_OBJS += device-hdd.o hdpro_atad.o
 IOP_CFLAGS += -DHDD_DRIVER -DHD_PRO
 ifeq ($(IOPCORE_DEBUG),1)
@@ -31,7 +31,7 @@ endif
 
 ifeq ($(USE_SMB),1)
 IOP_BIN  = smb_cdvdman.irx
-IOP_OBJNAME = obj.smb/
+IOP_OBJS_DIR = obj.smb/
 IOP_OBJS += device-smb.o smb.o
 IOP_CFLAGS += -DSMB_DRIVER
 USE_DEV9 = 1
@@ -40,7 +40,7 @@ endif
 
 ifeq ($(USE_USB),1)
 IOP_BIN  = usb_cdvdman.irx
-IOP_OBJNAME = obj.usb/
+IOP_OBJS_DIR = obj.usb/
 IOP_OBJS += device-usb.o mass_driver.o
 IOP_CFLAGS += -DUSB_DRIVER
 ifeq ($(IOPCORE_DEBUG),1)
@@ -63,7 +63,7 @@ IOP_OBJS += dev9.o
 IOP_CFLAGS += -D__USE_DEV9
 endif
 
-IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJNAME)%)
+IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)
 
 IOP_LDFLAGS += -s
 
@@ -75,7 +75,7 @@ clean:
 rebuild: clean all
 
 OBJ_DIR:
-	mkdir -p $(IOP_OBJNAME)
+	mkdir -p $(IOP_OBJS_DIR)
 
 include $(PS2SDK)/Defs.make
 include Rules.make

@@ -21,7 +21,6 @@
 
 #include "xfer.h"
 
-extern void *_gp;
 extern struct SmapDriverData SmapDriverData;
 
 static inline int CopyToFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, int length)
@@ -87,7 +86,7 @@ static inline void CopyFromFIFO(volatile u8 *smap_regbase, void *buffer, unsigne
 
     if ((result = CopyFromFIFOWithDMA(smap_regbase, buffer, length)) > 0) {
         length -= result;
-        (unsigned int)buffer += result;
+        buffer = buffer + result;
     }
 
     __asm__ __volatile__(
@@ -135,7 +134,7 @@ static inline void CopyFromFIFO(volatile u8 *smap_regbase, void *buffer, unsigne
         : "at", "v0", "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7");
 }
 
-inline int HandleRxIntr(struct SmapDriverData *SmapDrivPrivData)
+int HandleRxIntr(struct SmapDriverData *SmapDrivPrivData)
 {
     USE_SMAP_RX_BD;
     int NumPacketsReceived;

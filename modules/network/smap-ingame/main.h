@@ -5,22 +5,6 @@
 
 #define PRE_LWIP_130_COMPAT 1
 
-/*
-	Sorry, but even I can't explain the syntax used here. :(
-	I know that _ori_gp has to be "early-clobbered" and the GP register will get clobbered... but I don't really know why GCC can't determine which registers it can and can't use automatically. And I don't really understand what "clobbering" registers is.
-*/
-#define SaveGP()                    \
-    void *_ori_gp;                  \
-    __asm volatile("move %0, $gp\n" \
-                   "move $gp, %1"   \
-                   : "=&r"(_ori_gp) \
-                   : "r"(&_gp)      \
-                   : "gp")
-
-#define RestoreGP()                              \
-    __asm volatile("move $gp, %0" ::"r"(_ori_gp) \
-                   : "gp")
-
 struct SmapDriverData
 {
     volatile u8 *smap_regbase;

@@ -75,6 +75,9 @@ typedef struct
     submenu_list_t *subMenu;
 } opl_io_module_t;
 
+//App support stuff.
+static unsigned char shouldAppsUpdate;
+
 //Network support stuff.
 #define HTTP_IOBUF_SIZE 512
 static unsigned int CompatUpdateComplete, CompatUpdateTotal;
@@ -370,7 +373,10 @@ int oplPath2Mode(const char *path)
             blkdevnameend = strchr(appsPath, ':');
             if (blkdevnameend != NULL)
             {
-                blkdevnamelen = (int)(blkdevnameend - appsPath) + 1;
+                blkdevnamelen = (int)(blkdevnameend - appsPath);
+
+                while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
+                    blkdevnamelen--; //Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)
                     return listSupport->mode;
@@ -478,6 +484,16 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
     return count;
 }
 
+int oplShouldAppsUpdate(void)
+{
+    int result;
+
+    result = (int)shouldAppsUpdate;
+    shouldAppsUpdate = 0;
+
+    return result;
+}
+
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
@@ -536,6 +552,10 @@ void menuDeferredUpdate(void *data)
     // see if we have to update
     if (mod->support->itemNeedsUpdate()) {
         updateMenuFromGameList(mod);
+
+        //If other modes have been updated, then the apps list should be updated too.
+        if (*mode != APP_MODE)
+            shouldAppsUpdate = 1;
     }
 }
 

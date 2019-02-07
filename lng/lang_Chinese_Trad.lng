@@ -1,5 +1,5 @@
 # Translated by kane159 and eyu2007
-# Last update: Jan. 30, 2019
+# Last update: Feb. 03, 2019
 # Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
@@ -265,7 +265,7 @@ vmc% s 文件碎片化.是否繼續使用插槽% d 中的記憶卡？
 音效音量
 啟動音量
 確認視頻模式更改？
-緩存遊戲列表 (HD)
+緩存遊戲列表 (硬碟)
 PS1遊戲
 PS1遊戲啟動模式
 POPSTARTER.ELF在\'%s\'上找不到!

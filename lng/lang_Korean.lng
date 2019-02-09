@@ -21,8 +21,8 @@ ETH 게임
 테마
 언어
 시스템 전원이 꺼집니다.
-Browser 종료합니까?
-업데이트 취소합니까?
+브라우저를 종료합니까?
+업데이트를 취소합니까?
 %d: HDD를 검색할 수 없습니다
 %d: HDD가 포맷되지 않았습니다
 %d: 네트워크 시작 에러
@@ -116,8 +116,8 @@ USB 게임 손상 검사
 동영상 건너 뛰기
 DV-DL 에뮬레이트
 IGR 비활성
-Unused
-Unused
+미사용
+미사용
 크기 변경 시 VMC 재포멧 됩니다.
 생성
 시작
@@ -248,30 +248,30 @@ LMP 버전:
 멀티탭 에뮬레이션을 위한 포트를 선택.
 Fake DS3에 대한 해결방법 비활성화
 일부 fake ds3s는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HD)
+FIELD 반전 에뮬레이션
+프로그레시브 비디오 모드에서 결함이있는 게임을 수정합니다.
+자녀보호 잠금 설정
+자년보호 잠금 비밀번호
+자녀보호를 사용 중지하려면 비워 두십시오.
+자년보호 잠금 비밀번호 입력
+자녀보호 잠금 비밀번호가 잘못되었습니다.
+자녀보호 잠금이 비활성화 되었습니다.
+빌드 옵션:
+오류 - 이 비밀번호는 사용할 수 없습니다.
+VMC %s 파일이 조각났습니다. 슬롯 %d에 있는 메모리 카드로 계속 하시겠습니까?
+오디오 설정
+사운드 효과 활성화
+사운트 부팅 활성화
+사운드 효과 볼륨
+사운드 볼륨 부팅
+비디오 모드 변경을 확인 하시겠습니까?
+캐쉬 게임 목록 (HD)
 PS1 게임
 PS1 게임 표시 모드
 '%s'에 POPSTARTER.ELF이 없습니다!
 VCD 파일 '% s'을(를) 찾을 수 없습니다!
 파일 이름을 바꾸는 중 오류가 발생했습니다.
 파일을 삭제하는 중 오류가 발생했습니다.
-Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
-ifcaro OPL version at psx-scene.com
-OPL Daily Builds (DB) version at ps2-home.com
+OPEN-PS2-LOADER (OPL)를 구입하지 말고 무료로 받으세요.:
+psx-scene.com에서 ifcaro OPL 버전 
+ps2-home.com에서 OPL Daily Builds (DB) 버전

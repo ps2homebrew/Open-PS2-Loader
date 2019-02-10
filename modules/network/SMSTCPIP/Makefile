@@ -4,6 +4,9 @@ INGAME_DRIVER ?= 0
 #Enable to enable support for packet input from the interrupt context.
 INTERRUPT_CTX_INPKT ?= 1
 
+#Enable to build with the functions that were removed since OPL does not use them.
+FULL_LWIP ?= 0
+
 IOP_BIN = SMSTCPIP.irx
 IOP_OBJS = ps2ip.o inet.o ip.o ip_addr.o ip_frag.o etharp.o tcp_in.o tcp_out.o \
 	tcp.o tcpip.o mem.o api_lib.o api_msg.o sockets.o netif.o udp.o memp.o \
@@ -21,6 +24,10 @@ endif
 
 ifeq ($(INTERRUPT_CTX_INPKT),1)
 IOP_CFLAGS += -DINTERRUPT_CTX_INPKT
+endif
+
+ifeq ($(FULL_LWIP),1)
+IOP_CFLAGS += -DFULL_LWIP
 endif
 
 all: $(IOP_BIN)

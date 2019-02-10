@@ -60,12 +60,8 @@ static int StFillStreamBuffer(void)
     int result, OldState;
     void *ptr;
 
-    /*	NOTE:	When this function is called by the timer callback (when a fill request is rescheduled),
-			this critical section here might not be protected properly because CpuSuspendIntr only prevents thread-switching (hardware interrupts are disabled differently).
-			SCEI used a similar design, but their implementation uses a bitmap to mark the filled/empty banks instead
-			(which is probably immune to race conditions, but we are interested in saving memory).
-			I don't think that there will be a problem because the important critical section (AllocBank) is probably far enough beneath this mechanism.
-			If deemed necessary, please replace the rescheduling mechanism with one that is thread-based.	*/
+    /*	SCEI used a similar design, but their implementation uses a bitmap to mark the filled/empty banks instead
+	(which is probably immune to race conditions, but we are interested in saving memory).	*/
     CpuSuspendIntr(&OldState);
 
     if (cdvdman_stat.StreamingData.StIsReading) {
@@ -82,7 +78,7 @@ static int StFillStreamBuffer(void)
     CpuResumeIntr(OldState);
 
     if (result == 0) {
-        //		iDPRINTF("Stream fill buffer: Stream lsn 0x%08x - %u sectors:%p\n", cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, ptr);
+        //iDPRINTF("Stream fill buffer: Stream lsn 0x%08x - %u sectors:%p\n", cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, ptr);
         if (cdvdman_AsyncRead(cdvdman_stat.StreamingData.Stlsn, cdvdman_stat.StreamingData.StBanksize, ptr) == 0) {
             //Failed to start reading.
             cdvdman_stat.StreamingData.StIsReading = 0;

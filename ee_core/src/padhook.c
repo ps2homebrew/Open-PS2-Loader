@@ -45,8 +45,9 @@ static paddata_t Pad_Data;
 /* Monitored power button data */
 static powerbuttondata_t Power_Button;
 
-/* IGR Thread ID */
+/* IGR Thread ID and interrupt handler */
 static int IGR_Thread_ID = -1;
+static int IGR_Intc_ID = -1;
 
 /* IGR thread stack & stack size */
 #define IGR_STACK_SIZE (16 * 192)
@@ -255,38 +256,40 @@ static int IGR_Intc_Handler(int cause)
     int i;
     u8 pad_pos_state, pad_pos_frame, pad_pos_combo1, pad_pos_combo2;
 
-    // Copy values via the uncached segment, to bypass the cache.
-    pad_pos_state = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_state];
-    pad_pos_frame = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_frame];
-    pad_pos_combo1 = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_combo1];
-    pad_pos_combo2 = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_combo2];
+    if (Pad_Data.pad_buf != NULL) {
+        // Copy values via the uncached segment, to bypass the cache.
+        pad_pos_state = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_state];
+        pad_pos_frame = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_frame];
+        pad_pos_combo1 = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_combo1];
+        pad_pos_combo2 = ((u8 *)UNCACHED_SEG(Pad_Data.pad_buf))[Pad_Data.pos_combo2];
 
-    // First check pad state
-    if (((Pad_Data.libpad == IGR_LIBPAD) && (pad_pos_state == IGR_PAD_STABLE_V1)) ||
-        ((Pad_Data.libpad == IGR_LIBPAD2) && (pad_pos_state == IGR_PAD_STABLE_V2))) {
-        // Check if pad buffer is still alive with pad data frame counter
-        // If pad frame change save it, otherwise tell to syshook to re-install padOpen hook
-        if (Pad_Data.vb_count++ >= 10) {
-            if (pad_pos_frame != Pad_Data.prev_frame) {
-                padOpen_hooked = 1;
-                Pad_Data.prev_frame = pad_pos_frame;
-            } else {
-                padOpen_hooked = 0;
+        // First check pad state
+        if (((Pad_Data.libpad == IGR_LIBPAD) && (pad_pos_state == IGR_PAD_STABLE_V1)) ||
+            ((Pad_Data.libpad == IGR_LIBPAD2) && (pad_pos_state == IGR_PAD_STABLE_V2))) {
+            // Check if pad buffer is still alive with pad data frame counter
+            // If pad frame change save it, otherwise tell to syshook to re-install padOpen hook
+            if (Pad_Data.vb_count++ >= 10) {
+                if (pad_pos_frame != Pad_Data.prev_frame) {
+                    padOpen_hooked = 1;
+                    Pad_Data.prev_frame = pad_pos_frame;
+                } else {
+                    padOpen_hooked = 0;
+                }
+                Pad_Data.vb_count = 0;
             }
-            Pad_Data.vb_count = 0;
-        }
 
-        // Combo R1 + L1 + R2 + L2
-        if (pad_pos_combo1 == IGR_COMBO_R1_L1_R2_L2) {
-            // Combo Start + Select, R3 + L3 or UP
-            if ((pad_pos_combo2 == IGR_COMBO_START_SELECT) || // Start + Select combo, so reset
-                (pad_pos_combo2 == IGR_COMBO_R3_L3)           // R3 + L3 combo, so poweroff
+            // Combo R1 + L1 + R2 + L2
+            if (pad_pos_combo1 == IGR_COMBO_R1_L1_R2_L2) {
+                // Combo Start + Select, R3 + L3 or UP
+                if ((pad_pos_combo2 == IGR_COMBO_START_SELECT) || // Start + Select combo, so reset
+                    (pad_pos_combo2 == IGR_COMBO_R3_L3)           // R3 + L3 combo, so poweroff
 #ifdef IGS
-                || ((pad_pos_combo2 == IGR_COMBO_UP) && (EnableGSMOp)) // UP combo, so take IGS
+                    || ((pad_pos_combo2 == IGR_COMBO_UP) && (EnableGSMOp)) // UP combo, so take IGS
 #endif
-                )
+                    )
 
-                Pad_Data.combo_type = pad_pos_combo2;
+                    Pad_Data.combo_type = pad_pos_combo2;
+            }
         }
     }
 
@@ -371,20 +374,12 @@ static int IGR_Intc_Handler(int cause)
     return 0;
 }
 
-// Install IGR thread, and Pad interrupt handler
-static void Install_IGR(void *addr)
+//Install_IGR() must be run first.
+static void Set_libpad_Params(void *addr)
 {
-    ee_thread_t thread_param;
+    DI();
 
-    // Reset power button data
-    Power_Button.press = 0;
-    Power_Button.vb_count = 0;
-
-    // Init runtime Pad_Data information
-    Pad_Data.vb_count = 0;
     Pad_Data.pad_buf = addr;
-    Pad_Data.combo_type = 0x00;
-    Pad_Data.prev_frame = 0x00;
 
     // Set positions of pad data and pad state in buffer
     if (Pad_Data.libpad == IGR_LIBPAD) {
@@ -399,26 +394,57 @@ static void Install_IGR(void *addr)
             Pad_Data.pos_state = 4;
             Pad_Data.pos_frame = 0;
         }
-    } else {
+    } else if (Pad_Data.libpad == IGR_LIBPAD2) {
         Pad_Data.pos_combo1 = 29;
         Pad_Data.pos_combo2 = 28;
         Pad_Data.pos_state = 4;
         Pad_Data.pos_frame = 124;
     }
 
-    // Create and start IGR thread
-    thread_param.gp_reg = &_gp;
-    thread_param.func = IGR_Thread;
-    thread_param.stack = (void *)IGR_Stack;
-    thread_param.stack_size = IGR_STACK_SIZE;
-    thread_param.initial_priority = 127;
-    IGR_Thread_ID = CreateThread(&thread_param);
+    EI();
+}
 
-    StartThread(IGR_Thread_ID, NULL);
+// Install IGR thread, and Pad interrupt handler
+void Install_IGR(void)
+{
+    ee_thread_t thread_param;
 
-    // Create IGR interrupt handler
-    AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
-    EnableIntc(kINTC_VBLANK_END);
+    // Reset power button data
+    Power_Button.press = 0;
+    Pad_Data.pad_buf = NULL;
+    Power_Button.vb_count = 0;
+
+    // Init runtime Pad_Data information
+    Pad_Data.vb_count = 0;
+    Pad_Data.combo_type = 0x00;
+    Pad_Data.prev_frame = 0x00;
+
+    // Do not install the IGR thread or interrupt handler more than once.
+    if (IGR_Thread_ID < 0)
+    {
+        // Create and start IGR thread
+        thread_param.gp_reg = &_gp;
+        thread_param.func = IGR_Thread;
+        thread_param.stack = (void *)IGR_Stack;
+        thread_param.stack_size = IGR_STACK_SIZE;
+        thread_param.initial_priority = 127;
+        IGR_Thread_ID = CreateThread(&thread_param);
+
+        StartThread(IGR_Thread_ID, NULL);
+    }
+
+    if (IGR_Intc_ID < 0)
+    {
+        // Create IGR interrupt handler
+        IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
+        EnableIntc(kINTC_VBLANK_END);
+    }
+}
+
+void Reset_Padhook(void)
+{
+    IGR_Intc_ID = -1;
+    IGR_Thread_ID = -1;
 }
 
 // Hook function for libpad scePadPortOpen
@@ -438,7 +464,8 @@ static int Hook_scePadPortOpen(int port, int slot, void *addr)
     // Install IGR with libpad1 parameters
     if (port == 0 && slot == 0) {
         DPRINTF("IGR: Hook_scePadPortOpen - installing IGR...\n");
-        Install_IGR(addr);
+        Install_IGR();
+        Set_libpad_Params(addr);
     }
 
     return ret;
@@ -458,7 +485,10 @@ static int Hook_scePad2CreateSocket(pad2socketparam_t *SocketParam, void *addr)
 
     // Install IGR with libpad2 parameters
     if ((SocketParam == NULL) || (SocketParam->port == 0 && SocketParam->slot == 0))
-        Install_IGR(addr);
+    {
+        Install_IGR();
+        Set_libpad_Params(addr);
+    }
 
     return ret;
 }

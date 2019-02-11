@@ -20,6 +20,9 @@
 #define PADOPEN_CHECK 1
 
 int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode);
+void Install_IGR(void);
+void Remove_Padhook(void);
+void Reset_Padhook(void);
 void IGR_Exit(s32 exit_code);
 
 // DEV9 Registers
@@ -76,6 +79,7 @@ typedef struct
     u16 version;
 } pattern_t;
 
+#define IGR_LIBPAD_NONE 0 //libpad not found
 #define IGR_LIBPAD 1
 #define IGR_LIBPAD2 2
 

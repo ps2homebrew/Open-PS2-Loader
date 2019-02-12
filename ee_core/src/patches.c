@@ -45,6 +45,7 @@ typedef struct
 #define PATCH_EUTECHNYX_WU_TID 0x0012FCC8
 #define PATCH_PRO_SNOWBOARDER 0x01020199
 #define PATCH_SHADOW_MAN_2 0x01020413
+#define PATCH_HARVEST_MOON_AWL 0xFF025421
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", USB_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -125,6 +126,11 @@ static const patchlist_t patch_list[] = {
     {"SLES_530.45", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x0033fbfc, 0x00000000}},   // SRS: Street Racing Syndicate (PAL)
     {"SLUS_214.49", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00361dfc, 0x00000000}},   // The Fast and the Furious (NTSC-U/C)
     {"SLES_544.83", ALL_MODE, {PATCH_EUTECHNYX_WU_TID, 0x00363c4c, 0x00000000}},   // The Fast and the Furious (PAL)
+    {"SLPS_254.21", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000000, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-J) (First Print Edition)
+    {"SLPS_254.31", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000000, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-J)
+    {"SLPS_732.22", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000000, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-J) (PlayStation 2 The Best)
+    {"SLUS_211.71", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000001, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-U/C)
+    {"SLES_534.80", ALL_MODE, {PATCH_HARVEST_MOON_AWL, 0x00000002, 0x00000000}},   // Harvest Moon: A Wonderful Life (NTSC-PAL)
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
@@ -843,6 +849,39 @@ static void ShadowMan2Patch(int region)
     }
 }
 
+static void HarvestMoonAWLPatch(int region)
+{
+/* Harvest Moon create alot of threads. When the game gets stuck, all the threads are either suspended or waiting.
+   What seems to be happening is thread 16 trying to wake up the main thread. However, this might be failing because
+   the game also has additional checks around WakeupThread, to prevent a thread from waking up another thread
+   if the thread to be woken up is not in a Wait state. So if the main thread has not slept, the main thread will
+   enter a state of eternal sleep once it does because thread 16 will be prohibited from waking it up.
+
+   Thread 16 will not make further attempts to wake up the main thread as it will also sleep,
+   regardless of whether the main thread was successfully woken up or not.
+
+   Disabling the extra checks seem to make the glitch go away, but I don't know why they added extra code like that.
+   By design, calling WakeupThread on a thread that is not sleeping will increase the WakeUpCount value of the thread,
+   which will cause it to inhibit a number of calls to SleepThread() by that amount
+   (which I think is fair - if the thread has to be woken up, it should be).
+
+   The mistake may be made in various places, but seems to only affect the game's initial loading screen. */
+
+    switch(region)
+    {
+        case 1: //NTSC-U/C
+        case 2: //PAL
+            _sw(0x00000000, 0x0011b694);
+            _sw(0x00000000, 0x0011b6c0);
+            _sw(0x00000000, 0x0011b6c4);
+            break;
+        case 0: //NTSC-J
+            _sw(0x00000000, 0x0011b634);
+            _sw(0x00000000, 0x0011b660);
+            _sw(0x00000000, 0x0011b664);
+    }
+}
+
 void apply_patches(const char *path)
 {
     const patchlist_t *p;
@@ -895,6 +934,9 @@ void apply_patches(const char *path)
                     break;
                 case PATCH_SHADOW_MAN_2:
                     ShadowMan2Patch(p->patch.val);
+                    break;
+                case PATCH_HARVEST_MOON_AWL:
+                    HarvestMoonAWLPatch(p->patch.val);
                     break;
                 default: // Single-value patches
                     if (_lw(p->patch.addr) == p->patch.check)

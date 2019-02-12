@@ -397,10 +397,10 @@ static int diaShouldBreakLineAfter(struct UIItem *ui)
 static void diaDrawHint(int text_id)
 {
     int x, y;
-
     char *text = _l(text_id);
 
-    x = screenWidth - fntCalcDimensions(gTheme->fonts[0], text) - 10;
+    // the width of the hint text string will be scaled by the Vmode, we need to unscale it.
+    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], text)) - 10;
     y = gTheme->usedHeight - 40;
 
     // render hint on the lower side of the screen.

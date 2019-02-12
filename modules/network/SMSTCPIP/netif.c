@@ -107,6 +107,7 @@ void netif_set_addr(struct netif *netif, struct ip_addr *ipaddr, struct ip_addr 
     netif_set_gw(netif, gw);
 }
 
+#ifdef FULL_LWIP
 void netif_remove(struct netif *netif)
 {
     if (netif == NULL)
@@ -157,6 +158,7 @@ netif_find(char *name)
     LWIP_DEBUGF(NETIF_DEBUG, ("netif_find: didn't find %c%c\n", name[0], name[1]));
     return NULL;
 }
+#endif
 
 void netif_set_ipaddr(struct netif *netif, struct ip_addr *ipaddr)
 {

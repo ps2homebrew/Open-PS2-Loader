@@ -67,10 +67,10 @@ int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigne
 int smb_OpenAndX(char *filename, u16 *FID, int Write);
 #define I_smb_OpenAndX DECLARE_IMPORT(6, smb_OpenAndX)
 
-int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes);
+int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbytes);
 #define I_smb_ReadFile DECLARE_IMPORT(7, smb_ReadFile)
 
-int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes);
+int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes);
 #define I_smb_WriteFile DECLARE_IMPORT(8, smb_WriteFile)
 
 int smb_Close(int FID);

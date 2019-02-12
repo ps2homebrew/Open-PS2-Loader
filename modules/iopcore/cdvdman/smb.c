@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <sysclib.h>
 #include "smstcpip.h"
+#include <limits.h>
 #include <thbase.h>
 #include <thsemap.h>
 #include <intrman.h>
@@ -18,6 +19,17 @@
 #include "smb.h"
 #include "cdvd_config.h"
 
+//Round up the erasure amount, so that memset can erase memory word-by-word.
+#define ZERO_PKT_ALIGNED(hdr, hdrSize) mips_memset((hdr), 0, ((hdrSize) + 3) & ~3)
+
+/* Limit the maximum chunk size of receiving operations, to avoid triggering the congestion avoidance algorithm of the SMB server.
+   This is because the IOP cannot clear the received frames fast enough, causing the number of bytes in flight to grow exponentially.
+   The TCP congestion avoidence algorithm may induce some latency, causing extremely poor performance.
+   The value to use should be smaller than the TCP window size. Right now, it is 10240 (according to lwipopts.h). */
+#define CLIENT_MAX_BUFFER_SIZE 8192 //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_XMIT_SIZE USHRT_MAX //Allow up to 65535 bytes to be transmitted.
+#define CLIENT_MAX_RECV_SIZE 8192 //Allow up to 8192 bytes to be received.
+
 int smb_io_sema = -1;
 
 #define WAITIOSEMA(x) WaitSema(x)
@@ -26,307 +38,91 @@ int smb_io_sema = -1;
 // !!! ps2ip exports functions pointers !!!
 extern int (*plwip_close)(int s);                                                                                                                    // #6
 extern int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                        // #7
-extern int (*plwip_recvfrom)(int s, void *header, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen); // #10
+extern int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                             // #9
 extern int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                        // #11
 extern int (*plwip_socket)(int domain, int type, int protocol);                                                                                      // #13
+extern int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                                 // #19
 extern u32 (*pinet_addr)(const char *cp);                                                                                                            // #24
 
 extern struct cdvdman_settings_smb cdvdman_settings;
 
-#define SMB_MAGIC 0x424d53ff
-
-struct SMBHeader_t
-{ //size = 36
-    u32 sessionHeader;
-    u32 Magic;
-    u8 Cmd;
-    short Eclass;
-    short Ecode;
-    u8 Flags;
-    u16 Flags2;
-    u8 Extra[12];
-    u16 TID;
-    u16 PID;
-    u16 UID;
-    u16 MID;
-} __attribute__((packed));
-
-struct NegociateProtocolRequest_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u16 ByteCount;           // 37
-    u8 DialectFormat;        // 39
-    char DialectName[0];     // 40
-} __attribute__((packed));
-
-struct NegociateProtocolResponse_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u16 DialectIndex;        // 37
-    u8 SecurityMode;         // 39
-    u16 MaxMpxCount;         // 40
-    u16 MaxVC;               // 42
-    u32 MaxBufferSize;       // 44
-    u32 MaxRawBuffer;        // 48
-    u32 SessionKey;          // 52
-    u32 Capabilities;        // 56
-    s64 SystemTime;          // 60
-    u16 ServerTimeZone;      // 68
-    u8 KeyLength;            // 70
-    u16 ByteCount;           // 71
-    u8 ByteField[0];         // 73
-} __attribute__((packed));
-
-struct SessionSetupAndXRequest_t
-{
-    struct SMBHeader_t smbH;   // 0
-    u8 smbWordcount;           // 36
-    u8 smbAndxCmd;             // 37
-    u8 smbAndxReserved;        // 38
-    u16 smbAndxOffset;         // 39
-    u16 MaxBufferSize;         // 41
-    u16 MaxMpxCount;           // 43
-    u16 VCNumber;              // 45
-    u32 SessionKey;            // 47
-    u16 AnsiPasswordLength;    // 51
-    u16 UnicodePasswordLength; // 53
-    u32 reserved;              // 55
-    u32 Capabilities;          // 59
-    u16 ByteCount;             // 63
-    u8 ByteField[0];           // 65
-} __attribute__((packed));
-
-struct SessionSetupAndXResponse_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 Action;              // 41
-    u16 ByteCount;           // 43
-    u8 ByteField[0];         // 45
-} __attribute__((packed));
-
-struct TreeConnectAndXRequest_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 Flags;               // 41
-    u16 PasswordLength;      // 43
-    u16 ByteCount;           // 45
-    u8 ByteField[0];         // 47
-} __attribute__((packed));
-
-struct TreeConnectAndXResponse_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 OptionalSupport;     // 41
-    u16 ByteCount;           // 43
-} __attribute__((packed));
-
-struct OpenAndXRequest_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 Flags;               // 41
-    u16 AccessMask;          // 43
-    u16 SearchAttributes;    // 45
-    u16 FileAttributes;      // 47
-    u8 CreationTime[4];      // 49
-    u16 CreateOptions;       // 53
-    u32 AllocationSize;      // 55
-    u32 reserved[2];         // 59
-    u16 ByteCount;           // 67
-    u8 ByteField[0];         // 69
-} __attribute__((packed));
-
-struct OpenAndXResponse_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 FID;                 // 41
-    u16 FileAttributes;      // 43
-    u8 LastWriteTime[4];     // 45
-    u32 FileSize;            // 49
-    u16 GrantedAccess;       // 53
-    u16 FileType;            // 55
-    u16 IPCState;            // 57
-    u16 Action;              // 59
-    u32 ServerFID;           // 61
-    u16 reserved;            // 65
-    u16 ByteCount;           // 67
-} __attribute__((packed));
-
-struct ReadAndXRequest_t
-{                            // size = 63
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 FID;                 // 41
-    u32 OffsetLow;           // 43
-    u16 MaxCountLow;         // 47
-    u16 MinCount;            // 49
-    u32 MaxCountHigh;        // 51
-    u16 Remaining;           // 55
-    u32 OffsetHigh;          // 57
-    u16 ByteCount;           // 61
-} __attribute__((packed));
-
-struct ReadAndXResponse_t
-{
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 Remaining;           // 41
-    u16 DataCompactionMode;  // 43
-    u16 reserved;            // 45
-    u16 DataLengthLow;       // 47
-    u16 DataOffset;          // 49
-    u32 DataLengthHigh;      // 51
-    u8 reserved2[6];         // 55
-    u16 ByteCount;           // 61
-} __attribute__((packed));
-
-struct WriteAndXRequest_t
-{                            // size = 67
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u8 smbAndxCmd;           // 37
-    u8 smbAndxReserved;      // 38
-    u16 smbAndxOffset;       // 39
-    u16 FID;                 // 41
-    u32 OffsetLow;           // 43
-    u32 Reserved;            // 47
-    u16 WriteMode;           // 51
-    u16 Remaining;           // 53
-    u16 DataLengthHigh;      // 55
-    u16 DataLengthLow;       // 57
-    u16 DataOffset;          // 59
-    u32 OffsetHigh;          // 61
-    u16 ByteCount;           // 65
-} __attribute__((packed));
-
-struct CloseRequest_t {      // size = 45
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u16 FID;                 // 37
-    u32 LastWrite;           // 39
-    u16 ByteCount;           // 43
-} __attribute__((packed));
-
-struct CloseResponse_t {
-    struct SMBHeader_t smbH; // 0
-    u8 smbWordcount;         // 36
-    u16 ByteCount;           // 37
-} __attribute__((packed));
+// Local function prototypes
+static void nb_SetSessionMessage(u32 size);     // Write Session Service message
+static int nb_GetSessionMessageLength(void);    // Read Session Service message length
+static u8 nb_GetPacketType(void);               // Read message type
 
 static server_specs_t server_specs;
 
-#define SERVER_SHARE_SECURITY_LEVEL 0
-#define SERVER_USER_SECURITY_LEVEL 1
-#define SERVER_USE_PLAINTEXT_PASSWORD 0
-#define SERVER_USE_ENCRYPTED_PASSWORD 1
 #define LM_AUTH 0
 #define NTLM_AUTH 1
-
-static struct ReadAndXRequest_t smb_Read_Request = {
-    {0x3b000000,
-     SMB_MAGIC,
-     SMB_COM_READ_ANDX,
-     0, 0, 0, SMB_FLAGS2_32BIT_STATUS, "\0", 0, 0, 0, 0},
-    12,
-    SMB_COM_NONE,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0};
-
-static struct WriteAndXRequest_t smb_Write_Request = {
-    {0,
-     SMB_MAGIC,
-     SMB_COM_WRITE_ANDX,
-     0, 0, 0, SMB_FLAGS2_32BIT_STATUS, "\0", 0, 0, 0, 0},
-    14,
-    SMB_COM_NONE,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0x00,
-    0,
-    0,
-    0,
-    0x3f,
-    0 //DataOffset = 0x3f, WriteMode = 0
-};
 
 static u16 UID, TID;
 static int main_socket;
 
-static u8 SMB_buf[1024];
+static struct {
+    //Direct transport packet header. This is also a NetBIOS session header.
+    u32 sessionHeader; //The lower 24 bytes are the length of the payload in network byte-order, while the upper 8 bits must be set to 0 (Session Message Packet).
+    union {
+        u8 u8buff[MAX_SMB_BUF+MAX_SMB_BUF_HDR];
+        u16 u16buff[(MAX_SMB_BUF+MAX_SMB_BUF_HDR) / sizeof(u16)];
+        s16 s16buff[(MAX_SMB_BUF+MAX_SMB_BUF_HDR) / sizeof(s16)];
+        NegotiateProtocolRequest_t negotiateProtocolRequest;
+        NegotiateProtocolResponse_t negotiateProtocolResponse;
+        SessionSetupAndXRequest_t sessionSetupAndXRequest;
+        SessionSetupAndXResponse_t sessionSetupAndXResponse;
+        TreeConnectAndXRequest_t treeConnectAndXRequest;
+        TreeConnectAndXResponse_t treeConnectAndXResponse;
+        OpenAndXRequest_t openAndXRequest;
+        OpenAndXResponse_t openAndXResponse;
+        ReadAndXRequest_t readAndXRequest;
+        ReadAndXResponse_t readAndXResponse;
+        WriteAndXRequest_t writeAndXRequest;
+        WriteAndXResponse_t writeAndXResponse;
+        CloseRequest_t closeRequest;
+        CloseResponse_t closeResponse;
+    } smb;
+} __attribute__((packed)) SMB_buf;
 
 //-------------------------------------------------------------------------
-int rawTCP_SetSessionHeader(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
+static void nb_SetSessionMessage(u32 size) // Write Session Service header: careful it's raw TCP transport here and not NBT transport
 {
     // maximum for raw TCP transport (24 bits) !!!
-    SMB_buf[0] = 0;
-    SMB_buf[1] = (size >> 16) & 0xff;
-    SMB_buf[2] = (size >> 8) & 0xff;
-    SMB_buf[3] = size;
+    // Byte-swap length into network byte-order.
+    SMB_buf.sessionHeader = ((size & 0xff0000) >> 8) | ((size & 0xff00) << 8) | ((size & 0xff) << 24);
+}
+
+//-------------------------------------------------------------------------
+static int nb_GetSessionMessageLength(void) // Read Session Service header length: careful it's raw TCP transport here and not NBT transport
+{
+    u32 size;
+
+    // maximum for raw TCP transport (24 bits) !!!
+    // Byte-swap length from network byte-order.
+    size = ((SMB_buf.sessionHeader << 8) & 0xff0000) | ((SMB_buf.sessionHeader >> 8) & 0xff00) | ((SMB_buf.sessionHeader >> 24) & 0xff);
 
     return (int)size;
 }
 
-//-------------------------------------------------------------------------
-int rawTCP_GetSessionHeader(void) // Read Session Service header: careful it's raw TCP transport here and not NBT transport
+static u8 nb_GetPacketType(void) // Read Session Service header type.
 {
-    register u32 size;
-
-    // maximum for raw TCP transport (24 bits) !!!
-    size = SMB_buf[3];
-    size |= SMB_buf[2] << 8;
-    size |= SMB_buf[1] << 16;
-
-    return (int)size;
+    // Byte-swap length from network byte-order.
+    return((u8)(SMB_buf.sessionHeader & 0xff));
 }
 
 //-------------------------------------------------------------------------
 int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 {
     register int sock, ret;
+    int opt;
     struct sockaddr_in sock_addr;
 
     // Creating socket
     sock = plwip_socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock < 0)
         return -2;
+
+    opt = 1;
+    plwip_setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&opt, sizeof(opt));
 
     mips_memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_addr = dst_IP;
@@ -344,40 +140,136 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 }
 
 //-------------------------------------------------------------------------
-int GetSMBServerReply(void)
+static int SendData(int sock, char *buf, int size)
 {
-    register int rcv_size, totalpkt_size, pkt_size;
+	int remaining, result;
+	char *ptr;
 
-    rcv_size = plwip_send(main_socket, SMB_buf, rawTCP_GetSessionHeader() + 4, 0);
-    if (rcv_size <= 0)
-        return -1;
+	ptr = buf;
+	remaining = size;
+	while (remaining > 0)
+	{
+		result = plwip_send(sock, ptr, remaining, 0);
+		if (result <= 0)
+			return result;
 
-receive:
-    rcv_size = plwip_recvfrom(main_socket, NULL, 0, SMB_buf, sizeof(SMB_buf), 0, NULL, NULL);
+		ptr += result;
+		remaining -= result;
+	}
+
+	return size;
+}
+
+static int RecvData(int sock, char *buf, int size)
+{
+	int remaining, result;
+	char *ptr;
+
+	ptr = buf;
+	remaining = size;
+	while (remaining > 0)
+	{
+		result = plwip_recv(sock, ptr, remaining, 0);
+		if (result <= 0)
+			return result;
+
+		ptr += result;
+		remaining -= result;
+	}
+
+	return size;
+}
+
+//-------------------------------------------------------------------------
+static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
+{
+    int rcv_size, totalpkt_size, size;
+
+    totalpkt_size = nb_GetSessionMessageLength() + 4;
+
+    if (shdrlen == 0)
+    {
+        //Send the whole message, including the 4-byte direct transport packet header.
+        rcv_size = SendData(main_socket, (char*)&SMB_buf, totalpkt_size);
+        if (rcv_size <= 0)
+            return -1;
+    }
+    else
+    {
+        size = shdrlen + 4;
+
+        //Send the headers, followed by the payload.
+        rcv_size = SendData(main_socket, (char*)&SMB_buf, size);
+        if (rcv_size <= 0)
+            return -1;
+
+        rcv_size = SendData(main_socket, spayload, totalpkt_size - size);
+        if (rcv_size <= 0)
+            return -1;
+    }
+
+    //Read NetBIOS session message header. Drop NBSS Session Keep alive messages (type == 0x85, with no body), but process session messages (type == 0x00).
+    do{
+        rcv_size = RecvData(main_socket, (char *)&SMB_buf.sessionHeader, sizeof(SMB_buf.sessionHeader));
+        if (rcv_size <= 0)
+            return -2;
+    } while (nb_GetPacketType() != 0);
+
+    totalpkt_size = nb_GetSessionMessageLength();
+
+    //If rhdrlen is not specified, retrieve the whole packet. Otherwise, retrieve only the headers (caller will retrieve the payload separately).
+    size = (rhdrlen == 0) ? totalpkt_size : rhdrlen;
+    rcv_size = RecvData(main_socket, (char *)&SMB_buf.smb, size);
     if (rcv_size <= 0)
         return -2;
 
-    if (SMB_buf[0] != 0) // dropping NBSS Session Keep alive
-        goto receive;
+    return totalpkt_size;
+}
 
-    // Handle fragmented packets
-    totalpkt_size = rawTCP_GetSessionHeader() + 4;
+//-------------------------------------------------------------------------
+//These functions will process UTF-16 characters on a byte-level, so that they will be safe for use with byte-alignment.
+static int asciiToUtf16(char *out, const char *in)
+{
+    int len;
+    const char *pIn;
+    u8 *pOut;
 
-    while (rcv_size < totalpkt_size) {
-        pkt_size = plwip_recvfrom(main_socket, NULL, 0, &SMB_buf[rcv_size], sizeof(SMB_buf) - rcv_size, 0, NULL, NULL);
-        if (pkt_size <= 0)
-            return -2;
-        rcv_size += pkt_size;
+    for(pIn = in, pOut = out, len = 0; *pIn != '\0'; pIn++, pOut += 2, len += 2)
+    {
+        pOut[0] = *pIn;
+        pOut[1] = '\0';
     }
 
-    return rcv_size;
+    pOut[0] = '\0'; //NULL terminate.
+    pOut[1] = '\0';
+    len += 2;
+
+    return len;
+}
+
+static int setStringField(char *out, const char *in)
+{
+    int len;
+
+    if (server_specs.Capabilities & SERVER_CAP_UNICODE)
+    {
+        len = asciiToUtf16(out, in);
+    }
+    else
+    {
+        len = strlen(in) + 1;
+        strcpy(out, in);
+    }
+
+    return len;
 }
 
 //-------------------------------------------------------------------------
 int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback)
 {
     char *dialect = "NT LM 0.12";
-    struct NegociateProtocolRequest_t *NPR = (struct NegociateProtocolRequest_t *)SMB_buf;
+    NegotiateProtocolRequest_t *NPR = &SMB_buf.smb.negotiateProtocolRequest;
+    NegotiateProtocolResponse_t *NPRsp = &SMB_buf.smb.negotiateProtocolResponse;
     register int length;
     struct in_addr dst_addr;
     iop_sema_t smp;
@@ -393,12 +285,12 @@ int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, 
     // Opening TCP session
     main_socket = OpenTCPSession(dst_addr, SMBServerPort);
 
-negociate_retry:
+negotiate_retry:
 
-    mips_memset(SMB_buf, 0, sizeof(SMB_buf));
+    ZERO_PKT_ALIGNED(NPR, sizeof(NegotiateProtocolRequest_t));
 
     NPR->smbH.Magic = SMB_MAGIC;
-    NPR->smbH.Cmd = SMB_COM_NEGOCIATE;
+    NPR->smbH.Cmd = SMB_COM_NEGOTIATE;
     NPR->smbH.Flags = SMB_FLAGS_CASELESS_PATHNAMES;
     NPR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES;
     length = strlen(dialect);
@@ -406,37 +298,25 @@ negociate_retry:
     NPR->DialectFormat = 0x02;
     strcpy(NPR->DialectName, dialect);
 
-    rawTCP_SetSessionHeader(37 + length);
-    GetSMBServerReply();
-
-    struct NegociateProtocolResponse_t *NPRsp = (struct NegociateProtocolResponse_t *)SMB_buf;
+    nb_SetSessionMessage(sizeof(NegotiateProtocolRequest_t) + length + 1);
+    GetSMBServerReply(0, NULL, 0);
 
     // check sanity of SMB header
     if (NPRsp->smbH.Magic != SMB_MAGIC)
-        goto negociate_retry;
+        goto negotiate_retry;
 
     // check there's no error
     if (NPRsp->smbH.Eclass != STATUS_SUCCESS)
-        goto negociate_retry;
+        goto negotiate_retry;
 
     if (NPRsp->smbWordcount != 17)
-        goto negociate_retry;
+        goto negotiate_retry;
 
-    *capabilities = NPRsp->Capabilities & (CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32);
-    if (NPRsp->Capabilities & SERVER_CAP_UNICODE)
-        server_specs.StringsCF = 2;
-    else
-        server_specs.StringsCF = 1;
+    *capabilities = NPRsp->Capabilities & (CLIENT_CAP_LARGE_WRITEX | CLIENT_CAP_LARGE_READX | CLIENT_CAP_UNICODE | CLIENT_CAP_LARGE_FILES | CLIENT_CAP_STATUS32);
 
-    if (NPRsp->SecurityMode & NEGOCIATE_SECURITY_USER_LEVEL)
-        server_specs.SecurityMode = SERVER_USER_SECURITY_LEVEL;
-    else
-        server_specs.SecurityMode = SERVER_SHARE_SECURITY_LEVEL;
-
-    if (NPRsp->SecurityMode & NEGOCIATE_SECURITY_CHALLENGE_RESPONSE)
-        server_specs.PasswordType = SERVER_USE_ENCRYPTED_PASSWORD;
-    else
-        server_specs.PasswordType = SERVER_USE_PLAINTEXT_PASSWORD;
+    server_specs.Capabilities = NPRsp->Capabilities;
+    server_specs.SecurityMode = (NPRsp->SecurityMode & NEGOTIATE_SECURITY_USER_LEVEL) ? SERVER_USER_SECURITY_LEVEL : SERVER_SHARE_SECURITY_LEVEL;
+    server_specs.PasswordType = (NPRsp->SecurityMode & NEGOTIATE_SECURITY_CHALLENGE_RESPONSE) ? SERVER_USE_ENCRYPTED_PASSWORD : SERVER_USE_PLAINTEXT_PASSWORD;
 
     // copy to global struct to keep needed information for further communication
     server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
@@ -459,25 +339,26 @@ negociate_retry:
 //-------------------------------------------------------------------------
 int smb_SessionSetupAndX(u32 capabilities)
 {
-    struct SessionSetupAndXRequest_t *SSR = (struct SessionSetupAndXRequest_t *)SMB_buf;
-    register int i, offset, CF;
+    SessionSetupAndXRequest_t *SSR = &SMB_buf.smb.sessionSetupAndXRequest;
+    SessionSetupAndXResponse_t *SSRsp = &SMB_buf.smb.sessionSetupAndXResponse;
+    register int offset, useUnicode;
     int AuthType = NTLM_AUTH;
     int password_len = 0;
 
 lbl_session_setup:
-    mips_memset(SMB_buf, 0, sizeof(SMB_buf));
+    ZERO_PKT_ALIGNED(SSR, sizeof(SessionSetupAndXRequest_t));
 
-    CF = server_specs.StringsCF;
+    useUnicode = (server_specs.Capabilities & SERVER_CAP_UNICODE) ? 1 : 0;
 
     SSR->smbH.Magic = SMB_MAGIC;
     SSR->smbH.Cmd = SMB_COM_SESSION_SETUP_ANDX;
     SSR->smbH.Flags = SMB_FLAGS_CASELESS_PATHNAMES;
     SSR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
-    if (CF == 2)
+    if (server_specs.Capabilities & SERVER_CAP_UNICODE)
         SSR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
     SSR->smbWordcount = 13;
     SSR->smbAndxCmd = SMB_COM_NONE; // no ANDX command
-    SSR->MaxBufferSize = server_specs.MaxBufferSize > 65535 ? 65535 : (u16)server_specs.MaxBufferSize;
+    SSR->MaxBufferSize = CLIENT_MAX_BUFFER_SIZE;
     SSR->MaxMpxCount = server_specs.MaxMpxCount >= 2 ? 2 : (u16)server_specs.MaxMpxCount;
     SSR->VCNumber = 1;
     SSR->SessionKey = server_specs.SessionKey;
@@ -498,30 +379,37 @@ lbl_session_setup:
         offset += password_len;
     }
 
-    if ((CF == 2) && (!(password_len & 1)))
-        offset += 1; // pad needed only for unicode as aligment fix if password length is even
-
-    for (i = 0; i < strlen(server_specs.Username); i++) {
-        SSR->ByteField[offset] = server_specs.Username[i]; // add User name
-        offset += CF;
+    if ((useUnicode) && (!(password_len & 1))) {
+        SSR->ByteField[offset] = '\0';
+        offset ++; // pad needed only for unicode as aligment fix if password length is even
     }
-    offset += CF; // null terminator
 
-    for (i = 0; server_specs.PrimaryDomainServerName[i] != 0; i += CF) {
-        SSR->ByteField[offset] = server_specs.PrimaryDomainServerName[i]; // PrimaryDomain, acquired from Negociate Protocol Response Datas
-        offset += CF;
+    // Add User name
+    offset += setStringField(&SSR->ByteField[offset], server_specs.Username);
+
+    // PrimaryDomain, acquired from Negotiate Protocol Response data
+    offset += setStringField(&SSR->ByteField[offset], server_specs.PrimaryDomainServerName);
+
+    // NativeOS
+    if (useUnicode && ((offset & 1) != 0)) {
+        //If Unicode is used, the field must begin on a 16-bit aligned address.
+        SSR->ByteField[offset] = '\0';
+        offset++;
     }
-    offset += CF; // null terminator
+    offset += setStringField(&SSR->ByteField[offset], "PlayStation 2");
 
-    for (i = 0; i < (CF << 1); i++)
-        SSR->ByteField[offset++] = 0; // NativeOS, NativeLanMan
+    // NativeLanMan
+    if (useUnicode && ((offset & 1) != 0)) {
+        //If Unicode is used, the field must begin on a 16-bit aligned address.
+        SSR->ByteField[offset] = '\0';
+        offset++;
+    }
+    offset += setStringField(&SSR->ByteField[offset], "SMBMAN");
 
     SSR->ByteCount = offset;
 
-    rawTCP_SetSessionHeader(sizeof(struct SessionSetupAndXRequest_t) - 4 + offset);
-    GetSMBServerReply();
-
-    struct SessionSetupAndXResponse_t *SSRsp = (struct SessionSetupAndXResponse_t *)SMB_buf;
+    nb_SetSessionMessage(sizeof(SessionSetupAndXRequest_t) + offset);
+    GetSMBServerReply(0, NULL, 0);
 
     // check sanity of SMB header
     if (SSRsp->smbH.Magic != SMB_MAGIC)
@@ -546,20 +434,19 @@ lbl_session_setup:
 //-------------------------------------------------------------------------
 int smb_TreeConnectAndX(char *ShareName)
 {
-    struct TreeConnectAndXRequest_t *TCR = (struct TreeConnectAndXRequest_t *)SMB_buf;
-    register int i, offset, CF;
+    TreeConnectAndXRequest_t *TCR = &SMB_buf.smb.treeConnectAndXRequest;
+    TreeConnectAndXResponse_t *TCRsp = &SMB_buf.smb.treeConnectAndXResponse;
+    register int offset;
     int AuthType = NTLM_AUTH;
     int password_len = 0;
 
-    mips_memset(SMB_buf, 0, sizeof(SMB_buf));
-
-    CF = server_specs.StringsCF;
+    ZERO_PKT_ALIGNED(TCR, sizeof(TreeConnectAndXRequest_t));
 
     TCR->smbH.Magic = SMB_MAGIC;
     TCR->smbH.Cmd = SMB_COM_TREE_CONNECT_ANDX;
     TCR->smbH.Flags = SMB_FLAGS_CASELESS_PATHNAMES;
     TCR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
-    if (CF == 2)
+    if (server_specs.Capabilities & SERVER_CAP_UNICODE)
         TCR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
     TCR->smbH.UID = UID;
     TCR->smbWordcount = 4;
@@ -577,24 +464,21 @@ int smb_TreeConnectAndX(char *ShareName)
     TCR->PasswordLength = password_len;
     offset += password_len;
 
-    if ((CF == 2) && (!(password_len & 1)))
-        offset += 1; // pad needed only for unicode as aligment fix is password len is even
-
-    for (i = 0; i < strlen(ShareName); i++) {
-        TCR->ByteField[offset] = ShareName[i]; // add Share name
-        offset += CF;
+    if ((server_specs.Capabilities & SERVER_CAP_UNICODE) && (!(password_len & 1))) {
+        TCR->ByteField[offset] = '\0';
+        offset++; // pad needed only for unicode as aligment fix is password len is even
     }
-    offset += CF; // null terminator
+
+    // Add share name
+    offset += setStringField(&TCR->ByteField[offset], ShareName);
 
     mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
     offset += 6;
 
     TCR->ByteCount = offset;
 
-    rawTCP_SetSessionHeader(sizeof(struct TreeConnectAndXRequest_t) - 4 + offset);
-    GetSMBServerReply();
-
-    struct TreeConnectAndXResponse_t *TCRsp = (struct TreeConnectAndXResponse_t *)SMB_buf;
+    nb_SetSessionMessage(sizeof(TreeConnectAndXRequest_t) + offset);
+    GetSMBServerReply(0, NULL, 0);
 
     // check sanity of SMB header
     if (TCRsp->smbH.Magic != SMB_MAGIC)
@@ -613,20 +497,19 @@ int smb_TreeConnectAndX(char *ShareName)
 //-------------------------------------------------------------------------
 int smb_OpenAndX(char *filename, u16 *FID, int Write)
 {
-    struct OpenAndXRequest_t *OR = (struct OpenAndXRequest_t *)SMB_buf;
-    register int i, offset, CF;
+    OpenAndXRequest_t *OR = &SMB_buf.smb.openAndXRequest;
+    OpenAndXResponse_t *ORsp = &SMB_buf.smb.openAndXResponse;
+    register int offset;
 
     WAITIOSEMA(smb_io_sema);
 
-    mips_memset(SMB_buf, 0, sizeof(SMB_buf));
-
-    CF = server_specs.StringsCF;
+    ZERO_PKT_ALIGNED(OR, sizeof(OpenAndXRequest_t));
 
     OR->smbH.Magic = SMB_MAGIC;
     OR->smbH.Cmd = SMB_COM_OPEN_ANDX;
     OR->smbH.Flags = SMB_FLAGS_CANONICAL_PATHNAMES;
     OR->smbH.Flags2 = SMB_FLAGS2_KNOWS_LONG_NAMES | SMB_FLAGS2_32BIT_STATUS;
-    if (CF == 2)
+    if (server_specs.Capabilities & SERVER_CAP_UNICODE)
         OR->smbH.Flags2 |= SMB_FLAGS2_UNICODE_STRING;
     OR->smbH.UID = UID;
     OR->smbH.TID = TID;
@@ -637,21 +520,17 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     OR->CreateOptions = 1;
 
     offset = 0;
-    if (CF == 2)
+    if (server_specs.Capabilities & SERVER_CAP_UNICODE) {
+        OR->ByteField[offset] = '\0';
         offset++; // pad needed only for unicode as aligment fix
-
-    for (i = 0; i < strlen(filename); i++) {
-        OR->ByteField[offset] = filename[i]; // add filename
-        offset += CF;
     }
-    offset += CF;
 
+    // Add filename
+    offset += setStringField(&OR->ByteField[offset], filename);
     OR->ByteCount = offset;
 
-    rawTCP_SetSessionHeader(66 + offset);
-    GetSMBServerReply();
-
-    struct OpenAndXResponse_t *ORsp = (struct OpenAndXResponse_t *)SMB_buf;
+    nb_SetSessionMessage(sizeof(OpenAndXRequest_t) + offset + 1);
+    GetSMBServerReply(0, NULL, 0);
 
     // check sanity of SMB header
     if (ORsp->smbH.Magic != SMB_MAGIC)
@@ -669,13 +548,6 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 
     *FID = ORsp->FID;
 
-    // Prepare header of Read/Write Request by advance
-    smb_Read_Request.smbH.UID = UID;
-    smb_Read_Request.smbH.TID = TID;
-
-    smb_Write_Request.smbH.UID = UID;
-    smb_Write_Request.smbH.TID = TID;
-
     SIGNALIOSEMA(smb_io_sema);
 
     return 1;
@@ -686,11 +558,12 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
 int smb_Close(int FID)
 {
     int r;
-    struct CloseRequest_t *CR = (struct CloseRequest_t *)SMB_buf;
+    CloseRequest_t *CR = &SMB_buf.smb.closeRequest;
+    CloseResponse_t *CRsp = &SMB_buf.smb.closeResponse;
 
 //  WAITIOSEMA(smb_io_sema);
 
-    mips_memset(SMB_buf, 0, sizeof(SMB_buf));
+    ZERO_PKT_ALIGNED(CR, sizeof(CloseRequest_t));
 
     CR->smbH.Magic = SMB_MAGIC;
     CR->smbH.Cmd = SMB_COM_CLOSE;
@@ -701,15 +574,13 @@ int smb_Close(int FID)
     CR->smbWordcount = 3;
     CR->FID = (u16)FID;
 
-    rawTCP_SetSessionHeader(41);
-    r = GetSMBServerReply();
+    nb_SetSessionMessage(sizeof(CloseRequest_t));
+    r = GetSMBServerReply(0, NULL, 0);
     if (r <= 0)
     {
 //      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
     }
-
-    struct CloseResponse_t *CRsp = (struct CloseResponse_t *)SMB_buf;
 
     // check sanity of SMB header
     if (CRsp->smbH.Magic != SMB_MAGIC)
@@ -731,89 +602,161 @@ int smb_Close(int FID)
 }
 
 //-------------------------------------------------------------------------
-int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes)
+static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbytes)
 {
-    register int rcv_size, pkt_size, expected_size;
+    ReadAndXRequest_t *RR = &SMB_buf.smb.readAndXRequest;
+    ReadAndXResponse_t *RRsp = &SMB_buf.smb.readAndXResponse;
+    register int r, padding, DataLength;
 
-    struct ReadAndXRequest_t *RR = &smb_Read_Request;
+    ZERO_PKT_ALIGNED(RR, sizeof(ReadAndXRequest_t));
+
+    RR->smbH.Magic = SMB_MAGIC;
+    RR->smbH.Flags2 = SMB_FLAGS2_32BIT_STATUS;
+    RR->smbH.Cmd = SMB_COM_READ_ANDX;
+    RR->smbH.UID = (u16)UID;
+    RR->smbH.TID = (u16)TID;
+    RR->smbWordcount = 12;
+    RR->smbAndxCmd = SMB_COM_NONE; // no ANDX command
+    RR->FID = (u16)FID;
+    RR->OffsetLow = offsetlow;
+    RR->OffsetHigh = offsethigh;
+    RR->MaxCountLow = (u16)nbytes;
+    RR->MaxCountHigh = (u16)(nbytes >> 16);
+
+    nb_SetSessionMessage(sizeof(ReadAndXRequest_t));
+    r = GetSMBServerReply(0, NULL, sizeof(ReadAndXResponse_t));
+    if (r <= 0)
+        return -EIO;
+
+    // check there's no error
+    if ((RRsp->smbH.Eclass | (RRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
+        return -EIO;
+
+    //Skip any padding bytes.
+    padding = RRsp->DataOffset - sizeof(ReadAndXResponse_t);
+    if (padding > 0)
+    {
+        r = RecvData(main_socket, (char *)(RRsp + 1), padding);
+        if (r <= 0)
+            return -2;
+    }
+
+    DataLength = (int)(((u32)RRsp->DataLengthHigh << 16) | RRsp->DataLengthLow);
+    if (DataLength > 0)
+    {
+        r = RecvData(main_socket, readbuf, DataLength);
+        if (r <= 0)
+            return -2;
+    }
+
+    return DataLength;
+}
+
+int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbytes)
+{
+    int result, remaining, toRead;
+    char *ptr;
+
+    remaining = nbytes;
+    ptr = readbuf;
 
     WAITIOSEMA(smb_io_sema);
 
-    RR->FID = FID;
-    RR->OffsetLow = offsetlow;
-    RR->OffsetHigh = offsethigh;
-    RR->MaxCountLow = nbytes;
+    while (remaining > 0)
+    {
+        toRead = remaining > CLIENT_MAX_RECV_SIZE ? CLIENT_MAX_RECV_SIZE : remaining;
 
-    plwip_send(main_socket, RR, sizeof(struct ReadAndXRequest_t), 0);
-receive:
-    //offset 49 is the offset of the DataOffset field within the ReadAndXResponse structure.
-    rcv_size = plwip_recvfrom(main_socket, SMB_buf, 49, readbuf, nbytes, 0, NULL, NULL);
-    expected_size = rawTCP_GetSessionHeader() + 4;
+        result = smb_ReadAndX(FID, offsetlow, offsethigh, ptr, toRead);
+        if (result <= 0)
+            return result;
 
-    if (SMB_buf[0] != 0) // dropping NBSS Session Keep alive
-        goto receive;
-
-    // Handle fragmented packets
-    while (rcv_size < expected_size) {
-        pkt_size = plwip_recvfrom(main_socket, NULL, 0, &((u8 *)readbuf)[rcv_size - SMB_buf[49] - 4], expected_size - rcv_size, 0, NULL, NULL); // - rcv_size
-        rcv_size += pkt_size;
+        //Check for and handle overflow.
+        if (offsetlow + result < offsetlow)
+            offsethigh++;
+        offsetlow += result;
+        ptr += result;
+        remaining -= result;
     }
 
     SIGNALIOSEMA(smb_io_sema);
 
-    return 1;
+    return nbytes;
 }
 
 //-------------------------------------------------------------------------
-int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes)
+static int smb_WriteAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes)
 {
-    struct WriteAndXRequest_t *WR = (struct WriteAndXRequest_t *)SMB_buf;
+    const int padding = 1; //1 padding byte, to keep the payload aligned for writing performance.
+    WriteAndXRequest_t *WR = &SMB_buf.smb.writeAndXRequest;
+    WriteAndXResponse_t *WRsp = &SMB_buf.smb.writeAndXResponse;
+    int r;
+
+    ZERO_PKT_ALIGNED(WR, sizeof(WriteAndXRequest_t) + padding);
+
+    WR->smbH.Magic = SMB_MAGIC;
+    WR->smbH.Flags2 = SMB_FLAGS2_32BIT_STATUS;
+    WR->smbH.Cmd = SMB_COM_WRITE_ANDX;
+    WR->smbH.UID = (u16)UID;
+    WR->smbH.TID = (u16)TID;
+    WR->smbWordcount = 14;
+    WR->smbAndxCmd = SMB_COM_NONE; // no ANDX command
+    WR->FID = (u16)FID;
+    WR->OffsetLow = offsetlow;
+    WR->OffsetHigh = offsethigh;
+    WR->WriteMode = 0x0001; //WritethroughMode
+    WR->DataOffset = sizeof(WriteAndXRequest_t) + padding;
+    WR->Remaining = (u16)nbytes;
+    WR->DataLengthLow = (u16)nbytes;
+    WR->DataLengthHigh = (u16)(nbytes >> 16);
+    WR->ByteCount = (u16)nbytes + padding;
+
+    nb_SetSessionMessage(sizeof(WriteAndXRequest_t) + padding + nbytes);
+    r = GetSMBServerReply(sizeof(WriteAndXRequest_t) + padding, writebuf, 0);
+    if (r <= 0)
+        return -EIO;
+
+    // check there's no error
+    if ((WRsp->smbH.Eclass | (WRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
+        return -EIO;
+
+    return nbytes;
+}
+
+int smb_WriteFile(u16 FID,  u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes)
+{
+    int result, remaining, toWrite;
+    char *ptr;
+
+    remaining = nbytes;
+    ptr = writebuf;
 
     WAITIOSEMA(smb_io_sema);
 
-    mips_memcpy(WR, &smb_Write_Request, sizeof(struct WriteAndXRequest_t));
+    while (remaining > 0)
+    {
+        toWrite = remaining > CLIENT_MAX_XMIT_SIZE ? CLIENT_MAX_XMIT_SIZE : remaining;
 
-    WR->FID = FID;
-    WR->OffsetLow = offsetlow;
-    WR->OffsetHigh = offsethigh;
-    WR->Remaining = nbytes;
-    WR->DataLengthLow = nbytes;
-    WR->ByteCount = nbytes;
+        result = smb_WriteAndX(FID, offsetlow, offsethigh, ptr, toWrite);
+        if (result <= 0)
+            return result;
 
-    //DataOffset points to the location of the data within the buffer, from right after sessionHeader, which Microsoft doesn't consider as being part of the SMB header.
-    mips_memcpy((void *)(&SMB_buf[4 + WR->DataOffset]), writebuf, nbytes);
-
-    rawTCP_SetSessionHeader(sizeof(struct WriteAndXRequest_t) - 4 + nbytes);
-    GetSMBServerReply();
+        //Check for and handle overflow.
+        if (offsetlow + result < offsetlow)
+            offsethigh++;
+        offsetlow += result;
+        ptr += result;
+        remaining -= result;
+    }
 
     SIGNALIOSEMA(smb_io_sema);
 
-    return 1;
+    return nbytes;
 }
 
 //-------------------------------------------------------------------------
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
-    register u32 sectors, offset, nbytes;
-    u8 *p = (u8 *)buf;
-
-    offset = lsn;
-
-    while (nsectors > 0) {
-        sectors = nsectors;
-        if (sectors > MAX_SMB_SECTORS)
-            sectors = MAX_SMB_SECTORS;
-
-        nbytes = sectors << 11;
-
-        smb_ReadFile(cdvdman_settings.FIDs[part_num], offset << 11, offset >> 21, p, nbytes);
-
-        p += nbytes;
-        offset += sectors;
-        nsectors -= sectors;
-    }
-
-    return 1;
+    return smb_ReadFile(cdvdman_settings.FIDs[part_num], lsn << 11, lsn >> 21, buf, (int)(nsectors << 11));
 }
 
 void smb_CloseAll(void)

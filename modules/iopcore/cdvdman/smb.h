@@ -7,6 +7,8 @@
 #ifndef __SMB_H__
 #define __SMB_H__
 
+#define SMB_MAGIC 0x424d53ff
+
 // SMB Headers are always 32 bytes long
 #define SMB_HDR_SIZE 32
 
@@ -146,20 +148,21 @@
 #define SERVER_CAP_RAW_MODE 0x00000001
 
 // SMB Client Capabilities
-#define CLIENT_CAP_EXTENDED_SECURITY 0x80000000
-#define CLIENT_CAP_LARGE_READX 0x00004000
-#define CLIENT_CAP_NT_FIND 0x00000200
-#define CLIENT_CAP_LEVEL_II_OPLOCKS 0x00000080
-#define CLIENT_CAP_STATUS32 0x00000040
-#define CLIENT_CAP_NT_SMBS 0x00000010
-#define CLIENT_CAP_LARGE_FILES 0x00000008
-#define CLIENT_CAP_UNICODE 0x00000004
+#define CLIENT_CAP_EXTENDED_SECURITY SERVER_CAP_EXTENDED_SECURITY
+#define CLIENT_CAP_LARGE_WRITEX SERVER_CAP_LARGE_WRITEX
+#define CLIENT_CAP_LARGE_READX SERVER_CAP_LARGE_READX
+#define CLIENT_CAP_NT_FIND SERVER_CAP_NT_FIND
+#define CLIENT_CAP_LEVEL_II_OPLOCKS SERVER_CAP_LEVEL_II_OPLOCKS
+#define CLIENT_CAP_STATUS32 SERVER_CAP_STATUS32
+#define CLIENT_CAP_NT_SMBS SERVER_CAP_NT_SMBS
+#define CLIENT_CAP_LARGE_FILES SERVER_CAP_LARGE_FILES
+#define CLIENT_CAP_UNICODE SERVER_CAP_UNICODE
 
 // Security Modes
-#define NEGOCIATE_SECURITY_SIGNATURES_REQUIRED 0x08
-#define NEGOCIATE_SECURITY_SIGNATURES_ENABLED 0x04
-#define NEGOCIATE_SECURITY_CHALLENGE_RESPONSE 0x02
-#define NEGOCIATE_SECURITY_USER_LEVEL 0x01
+#define NEGOTIATE_SECURITY_SIGNATURES_REQUIRED 0x08
+#define NEGOTIATE_SECURITY_SIGNATURES_ENABLED 0x04
+#define NEGOTIATE_SECURITY_CHALLENGE_RESPONSE 0x02
+#define NEGOTIATE_SECURITY_USER_LEVEL 0x01
 
 // SMB Commands
 #define SMB_COM_CREATE_DIRECTORY 0x00
@@ -213,7 +216,7 @@
 #define SMB_COM_FIND_NOTIFY_CLOSE 0x35
 #define SMB_COM_TREE_CONNECT 0x70
 #define SMB_COM_TREE_DISCONNECT 0x71
-#define SMB_COM_NEGOCIATE 0x72
+#define SMB_COM_NEGOTIATE 0x72
 #define SMB_COM_SESSION_SETUP_ANDX 0x73
 #define SMB_COM_LOGOFF_ANDX 0x74
 #define SMB_COM_TREE_CONNECT_ANDX 0x75
@@ -265,28 +268,245 @@
 #define STATUS_OBJECT_NAME_NOT_FOUND 0xc0000034
 #define STATUS_LOGON_FAILURE 0xc000006d
 
-typedef struct _smb_time
+#define SERVER_SHARE_SECURITY_LEVEL 0
+#define SERVER_USER_SECURITY_LEVEL 1
+#define SERVER_USE_PLAINTEXT_PASSWORD 0
+#define SERVER_USE_ENCRYPTED_PASSWORD 1
+
+typedef struct
 {
-    u32 timeLow;
-    u32 timeHigh;
-} smb_time;
+    u32 Magic;
+    u8 Cmd;
+    short Eclass;
+    short Ecode;
+    u8 Flags;
+    u16 Flags2;
+    u8 Extra[12];
+    u16 TID;
+    u16 PID;
+    u16 UID;
+    u16 MID;
+} __attribute__((packed)) SMBHeader_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u16 ByteCount;
+    u8 DialectFormat;
+    char DialectName[0];
+} __attribute__((packed)) NegotiateProtocolRequest_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u16 DialectIndex;
+    u8 SecurityMode;
+    u16 MaxMpxCount;
+    u16 MaxVC;
+    u32 MaxBufferSize;
+    u32 MaxRawBuffer;
+    u32 SessionKey;
+    u32 Capabilities;
+    s64 SystemTime;
+    u16 ServerTimeZone;
+    u8 KeyLength;
+    u16 ByteCount;
+    u8 ByteField[0];
+} __attribute__((packed)) NegotiateProtocolResponse_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 MaxBufferSize;
+    u16 MaxMpxCount;
+    u16 VCNumber;
+    u32 SessionKey;
+    u16 AnsiPasswordLength;
+    u16 UnicodePasswordLength;
+    u32 reserved;
+    u32 Capabilities;
+    u16 ByteCount;
+    u8 ByteField[0];
+} __attribute__((packed)) SessionSetupAndXRequest_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 Action;
+    u16 ByteCount;
+    u8 ByteField[0];
+} __attribute__((packed)) SessionSetupAndXResponse_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 Flags;
+    u16 PasswordLength;
+    u16 ByteCount;
+    u8 ByteField[0];
+} __attribute__((packed)) TreeConnectAndXRequest_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 OptionalSupport;
+    u16 ByteCount;
+} __attribute__((packed)) TreeConnectAndXResponse_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 Flags;
+    u16 AccessMask;
+    u16 SearchAttributes;
+    u16 FileAttributes;
+    u8 CreationTime[4];
+    u16 CreateOptions;
+    u32 AllocationSize;
+    u32 reserved[2];
+    u16 ByteCount;
+    u8 ByteField[0];
+} __attribute__((packed)) OpenAndXRequest_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 FID;
+    u16 FileAttributes;
+    u8 LastWriteTime[4];
+    u32 FileSize;
+    u16 GrantedAccess;
+    u16 FileType;
+    u16 IPCState;
+    u16 Action;
+    u32 ServerFID;
+    u16 reserved;
+    u16 ByteCount;
+} __attribute__((packed)) OpenAndXResponse_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 FID;
+    u32 OffsetLow;
+    u16 MaxCountLow;
+    u16 MinCount;
+    union {
+        u32 Timeout;
+        u16 MaxCountHigh;
+    };
+    u16 Remaining;
+    u32 OffsetHigh;
+    u16 ByteCount;
+} __attribute__((packed)) ReadAndXRequest_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 Remaining;
+    u16 DataCompactionMode;
+    u16 reserved;
+    u16 DataLengthLow;
+    u16 DataOffset;
+    u32 DataLengthHigh;
+    u8 reserved2[6];
+    u16 ByteCount;
+} __attribute__((packed)) ReadAndXResponse_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 FID;
+    u32 OffsetLow;
+    u32 Reserved;
+    u16 WriteMode;
+    u16 Remaining;
+    u16 DataLengthHigh;
+    u16 DataLengthLow;
+    u16 DataOffset;
+    u32 OffsetHigh;
+    u16 ByteCount;
+} __attribute__((packed)) WriteAndXRequest_t;
+
+typedef struct
+{
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u8 smbAndxCmd;
+    u8 smbAndxReserved;
+    u16 smbAndxOffset;
+    u16 Count;
+    u16 Remaining;
+    u16 CountHigh;
+    u16 Reserved;
+} __attribute__((packed)) WriteAndXResponse_t;
+
+typedef struct {
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u16 FID;
+    u32 LastWrite;
+    u16 ByteCount;
+} __attribute__((packed)) CloseRequest_t;
+
+typedef struct {
+    SMBHeader_t smbH;
+    u8 smbWordcount;
+    u16 ByteCount;
+} __attribute__((packed)) CloseResponse_t;
 
 // function prototypes
-int rawTCP_SetSessionHeader(u32 size); // Write Session Service header
-int rawTCP_GetSessionHeader(void);     // Read Session Service header
-
-int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback); // process a Negociate Procotol message
+int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, char *Password, u32 *capabilities, OplSmbPwHashFunc_t hash_callback); // process a Negotiate Procotol message
 int smb_SessionSetupTreeConnect(char *share_name);
 int smb_SessionSetupAndX(u32 capabilities); // process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_TreeConnectAndX(char *ShareName);
 int smb_OpenAndX(char *filename, u16 *FID, int Write); // process a Open AndX message
 int smb_Close(int FID);
-int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, u16 nbytes);
-int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, u16 nbytes);
+int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbytes);
+int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes);
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num);
 void smb_CloseAll(void);
 int smb_Disconnect(void);
 
-#define MAX_SMB_SECTORS 2
+#define MAX_SMB_BUF 896 // must fit on u16 !!!
+#define MAX_SMB_BUF_HDR 128 //Must be at least as large as the largest header structure.
 
 #endif

@@ -56,6 +56,8 @@
 
 	/* padhook.c */
 	.extern Install_PadOpen_Hook
+	.extern Reset_Padhook
+	.extern Install_IGR
 
 	.globl  g_argbuf
 	.globl	Hook_SifSetDma
@@ -262,6 +264,10 @@ Hook_ExecPS2:
 
 	/* change the stack pointer */
 	la	$sp, _end
+
+	/* call Reset_Padhook to indicate that ExecPS2 will be run. */
+	jal	Reset_Padhook
+	nop
 
 	/* call Install_PadOpen_Hook */
 	lui	$a0, 0x0010

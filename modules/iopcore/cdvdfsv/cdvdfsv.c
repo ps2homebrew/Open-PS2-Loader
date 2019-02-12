@@ -221,8 +221,6 @@ static u8 cdvdNcmds_rpcbuf[1024];
 static u8 S596_rpcbuf[16];
 static u8 shutdown_rpcbuf[16];
 
-#define CDVDFSV_BUF_SECTORS (CDVDMAN_FS_SECTORS + 1) //CDVDFSV will use CDVDFSV_BUF_SECTORS+1 sectors of space. Remember that the actual size of the buffer within CDVDMAN is CDVDMAN_FS_SECTORS+2.
-
 static int rpc0_thread_id, rpc1_thread_id, rpc2_thread_id, rpc_sd_thread_id;
 
 struct irx_export_table _exp_cdvdfsv;
@@ -754,7 +752,7 @@ static inline void cdvd_readchain(void *buf)
             readpos += tsectors * 2048;
         } else { // EE addr
             while (tsectors > 0) {
-                nsectors = (tsectors > CDVDFSV_BUF_SECTORS) ? CDVDFSV_BUF_SECTORS : tsectors;
+                nsectors = (tsectors > CDVDMAN_FS_SECTORS) ? CDVDMAN_FS_SECTORS : tsectors;
 
                 if (sceCdRead(lsn, nsectors, cdvdfsv_buf, NULL) == 0) {
                     if (sceCdGetError() == CDVD_ERR_NO) {
@@ -854,16 +852,17 @@ static inline void cdvd_readee(void *buf)
             }
 
             if (flag_64b == 0) { // not 64 bytes aligned buf
-                if (sectors_to_read < CDVDFSV_BUF_SECTORS)
+                //The data of the last sector of the chunk will be used to correct buffer alignment.
+                if (sectors_to_read < CDVDMAN_FS_SECTORS - 1)
                     nsectors = sectors_to_read;
                 else
-                    nsectors = CDVDFSV_BUF_SECTORS - 1;
+                    nsectors = CDVDMAN_FS_SECTORS - 1;
                 temp = nsectors + 1;
             } else { // 64 bytes aligned buf
-                if (sectors_to_read < (CDVDFSV_BUF_SECTORS + 1))
+                if (sectors_to_read < CDVDMAN_FS_SECTORS)
                     nsectors = sectors_to_read;
                 else
-                    nsectors = CDVDFSV_BUF_SECTORS;
+                    nsectors = CDVDMAN_FS_SECTORS;
                 temp = nsectors;
             }
 
@@ -882,10 +881,10 @@ static inline void cdvd_readee(void *buf)
             size_64bb = size_64b;
 
             if (!flag_64b) {
-                if (sectors_to_read == r->sectors) // check that was the first read
+                if (sectors_to_read == r->sectors) // check that was the first read. Data read will be skewed by readee.b1len bytes into the adjacent sector.
                     mips_memcpy((void *)readee.buf1, (void *)fsvRbuf, readee.b1len);
 
-                if ((!flag_64b) && (sectors_to_read == nsectors) && (readee.b1len))
+                if ((sectors_to_read == nsectors) && (readee.b1len)) // For the last sector read.
                     size_64bb = size_64b - 64;
             }
 
@@ -903,6 +902,7 @@ static inline void cdvd_readee(void *buf)
 
         } while ((flag_64b) || (sectors_to_read));
 
+        //At the very last pass, copy readee.b2len bytes from the last sector, to complete the alignment correction.
         mips_memcpy((void *)readee.buf2, (void *)(fsvRbuf + size_64b - readee.b2len), readee.b2len);
     }
 

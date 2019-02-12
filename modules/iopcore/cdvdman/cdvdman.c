@@ -212,7 +212,7 @@ static iop_sys_clock_t gCallbackSysClock;
 static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS * 2048];
 
 #define CDVDMAN_FS_BUFSIZE CDVDMAN_FS_SECTORS * 2048
-static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE + 2 * 2048];
+static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE];
 
 #define CDVDMAN_MODULE_VERSION 0x225
 static int cdvdman_debug_print_flag = 0;
@@ -1792,12 +1792,16 @@ static void cdvdman_cdread_Thread(void *args)
         cdvdman_read(cdvdman_stat.cdread_lba, cdvdman_stat.cdread_sectors, cdvdman_stat.cdread_buf);
 
         /* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
-			The original is run from the interrupt handler, but we want it to run
-			from a threaded environment because it's easier to protect critical regions. */
+	   The original is run from the interrupt handler, but we want it to run
+	   from a threaded environment because our interrupt is emulated. */
         if (Stm0Callback != NULL)
 	{
             cdvdman_signal_read_end();
-            Stm0Callback();
+
+            /* Check that the streaming callback was not cleared, as this pointer may get changed between function calls.
+               As per the original semantics, once it is cleared, then it should not be called. */
+            if (Stm0Callback != NULL)
+                Stm0Callback();
 	}
         else
             cdvdman_cb_event(SCECdFuncRead); //Only runs if streaming is not in action.

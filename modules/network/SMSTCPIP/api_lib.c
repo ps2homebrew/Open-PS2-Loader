@@ -38,6 +38,7 @@
 #include "lwip/api_msg.h"
 #include "lwip/memp.h"
 
+#include <intrman.h>
 #include <thsemap.h>
 #include <sysclib.h>
 
@@ -72,17 +73,22 @@ void netbuf_delete(struct netbuf *buf)
 
 } /* end netbuf_delete */
 
-void netbuf_ref(struct netbuf *buf, void *dataptr, u16_t size)
+err_t netbuf_ref(struct netbuf *buf, void *dataptr, u16_t size)
 {
 
     if (buf->p)
         pbuf_free(buf->p);
 
     buf->p = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_REF);
+    if (buf->p == NULL) {
+        buf->ptr = NULL;
+        return ERR_MEM;
+    }
     buf->p->payload = dataptr;
     buf->p->len = buf->p->tot_len = size;
     buf->ptr = buf->p;
 
+    return ERR_OK;
 } /* end netbuf_ref */
 
 void netbuf_copy_partial(
@@ -434,7 +440,7 @@ netconn_recv(struct netconn *conn)
 
         if (p != NULL) {
             len = p->tot_len;
-            conn->recv_avail -= len;
+            SYS_ARCH_DEC(conn->recv_avail, len);
         } else
             len = 0;
 
@@ -474,7 +480,7 @@ netconn_recv(struct netconn *conn)
         memp_free(MEMP_API_MSG, msg);
     } else {
         sys_mbox_fetch(conn->recvmbox, (void **)&buf);
-        conn->recv_avail -= buf->p->tot_len;
+        SYS_ARCH_DEC(conn->recv_avail, buf->p->tot_len);
         /* Register event with callback */
         if (conn->callback)
             (*conn->callback)(conn, NETCONN_EVT_RCVMINUS, buf->p->tot_len);
@@ -512,7 +518,7 @@ err_t netconn_send(struct netconn *conn, struct netbuf *buf)
 err_t netconn_write(struct netconn *conn, void *dataptr, u16_t size, u8_t copy)
 {
     struct api_msg *msg;
-    u16_t len;
+    u16_t len, sndbuf;
 
     if (conn == NULL) {
         return ERR_VAL;
@@ -535,16 +541,16 @@ err_t netconn_write(struct netconn *conn, void *dataptr, u16_t size, u8_t copy)
         msg->msg.msg.w.copy = copy;
 
         if (conn->type == NETCONN_TCP) {
-            if (tcp_sndbuf(conn->pcb.tcp) == 0) {
+            while ((sndbuf = tcp_sndbuf(conn->pcb.tcp)) == 0) {
                 sys_sem_wait(conn->sem);
                 if (conn->err != ERR_OK) {
                     goto ret;
                 }
             }
-            if (size > tcp_sndbuf(conn->pcb.tcp)) {
+            if (size > sndbuf) {
                 /* We cannot send more than one send buffer's worth of data at a
      time. */
-                len = tcp_sndbuf(conn->pcb.tcp);
+                len = sndbuf;
             } else {
                 len = size;
             }

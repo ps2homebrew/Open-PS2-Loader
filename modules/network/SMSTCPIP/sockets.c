@@ -39,6 +39,7 @@
 
 #include "lwip/sockets.h"
 
+#include <intrman.h>
 #include <thsemap.h>
 #include <sysclib.h>
 #include <errno.h>
@@ -52,7 +53,7 @@ struct lwip_socket
     struct netconn *conn;
     struct netbuf *lastdata;
     u16_t lastoffset;
-    u16_t rcvevent;
+    s16_t rcvevent;
     u16_t sendevent;
     u16_t flags;
     int err;
@@ -363,7 +364,7 @@ int lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsig
         buf = sock->lastdata;
     } else {
         /* If this is non-blocking call, then check first */
-        if (((flags & MSG_DONTWAIT) || (sock->flags & O_NONBLOCK)) && !sock->rcvevent) {
+        if (((flags & MSG_DONTWAIT) || (sock->flags & O_NONBLOCK)) && (sock->rcvevent <= 0)) {
             LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_recvfrom(%d): returning EWOULDBLOCK\n", s));
             sock_set_errno(sock, EWOULDBLOCK);
             return -1;
@@ -497,10 +498,10 @@ int lwip_send(int s, void *data, int size, unsigned int flags)
 
             /* make the buffer point to the data that should
        be sent */
-            netbuf_ref(buf, data, size);
-
-            /* send the data */
-            err = netconn_send(sock->conn, buf);
+            if ((err = netbuf_ref(buf, data, size))==ERR_OK) {
+                /* send the data */
+                err = netconn_send(sock->conn, buf);
+            }
 
             /* deallocated the buffer */
             netbuf_delete(buf);
@@ -627,7 +628,7 @@ lwip_selscan(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset)
         if (FD_ISSET(i, readset)) {
             /* See if netconn of this socket is ready for read */
             p_sock = get_socket(i);
-            if (p_sock && (p_sock->lastdata || p_sock->rcvevent)) {
+            if (p_sock && (p_sock->lastdata || (p_sock->rcvevent > 0))) {
                 FD_SET(i, &lreadset);
                 LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_selscan: fd=%d ready for reading\n", i));
                 nready++;
@@ -744,7 +745,7 @@ int lwip_select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptse
         sys_sem_signal(selectsem);
 
         sys_sem_free(select_cb.sem);
-        if (i == 0) /* Timeout */
+        if (i == SYS_ARCH_TIMEOUT) /* Timeout */
         {
             if (readset)
                 FD_ZERO(readset);
@@ -852,7 +853,7 @@ event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
             if (scb->sem_signalled == 0) {
                 /* Test this select call for our socket */
                 if (scb->readset && FD_ISSET(s, scb->readset))
-                    if (sock->rcvevent)
+                    if (sock->rcvevent > 0)
                         break;
                 if (scb->writeset && FD_ISSET(s, scb->writeset))
                     if (sock->sendevent)
@@ -861,8 +862,8 @@ event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
         }
         if (scb) {
             scb->sem_signalled = 1;
-            sys_sem_signal(selectsem);
             sys_sem_signal(scb->sem);
+            sys_sem_signal(selectsem);
         } else {
             sys_sem_signal(selectsem);
             break;
@@ -1348,7 +1349,7 @@ int lwip_ioctl(int s, long cmd, void *argp)
                 return -1;
             }
 
-            *((u16_t *)argp) = sock->conn->recv_avail;
+            SYS_ARCH_GET(sock->conn->recv_avail, *((u16_t*)argp));
 
             LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_ioctl(%d, FIONREAD, %p) = %u\n", s, argp, *((u16_t *)argp)));
             sock_set_errno(sock, 0);

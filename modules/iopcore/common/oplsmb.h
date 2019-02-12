@@ -1,13 +1,13 @@
 typedef struct
-{ // size = 156
+{
     u32 MaxBufferSize;
-    u32 MaxMpxCount;
     u32 SessionKey;
-    u32 StringsCF;
     u8 PrimaryDomainServerName[32];
     u8 EncryptionKey[8];
-    int SecurityMode; // 0 = share level, 1 = user level
-    int PasswordType; // 0 = PlainText passwords, 1 = use challenge/response
+    u32 Capabilities;
+    u16 MaxMpxCount;
+    u8 SecurityMode; // 0 = share level, 1 = user level
+    u8 PasswordType; // 0 = PlainText passwords, 1 = use challenge/response
     char Username[36];
     u8 Password[48]; // either PlainText, either hashed
     int PasswordLen;

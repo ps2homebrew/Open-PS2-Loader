@@ -94,6 +94,7 @@ void PostInputMSG(sys_mbox_t pMBox, void *pvMSG)
 } /* end PostInputMSG */
 #endif
 
+#ifdef FULL_LWIP
 int ps2ip_getconfig(char *pszName, t_ip_info *pInfo)
 {
 
@@ -148,6 +149,7 @@ int ps2ip_setconfig(t_ip_info *pInfo)
     return 1;
 
 } /* end ps2ip_setconfig */
+#endif
 
 #ifdef INTERRUPT_CTX_INPKT
 typedef struct InputMSG

@@ -29,10 +29,12 @@
 
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
+/* Setting this too low may cause tcp_write() to fail when it tries to allocate from PBUF_RAM!
+   Up to TCP_SND_BUF * 2 segments may be transmitted at once, thanks to Nagle and Delayed Ack. */
 #ifdef INGAME_DRIVER
 #define MEM_SIZE 0x400
 #else
-#define MEM_SIZE 0x3000
+#define MEM_SIZE (TCP_SND_BUF * 2)
 #endif
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
@@ -40,24 +42,18 @@ a lot of data that needs to be copied, this should be set high. */
    should be set high. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_PBUF 10
-#else
-#define MEMP_NUM_PBUF 40
 #endif
 
 /* MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
    per active UDP "connection". */
-#ifdef INGAME_DRIVER
 #define MEMP_NUM_UDP_PCB 1
-#else
-#define MEMP_NUM_UDP_PCB 15
-#endif
 
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_TCP_PCB 1
 #else
-#define MEMP_NUM_TCP_PCB 15
+#define MEMP_NUM_TCP_PCB 2
 #endif
 
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
@@ -65,35 +61,21 @@ a lot of data that needs to be copied, this should be set high. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_TCP_PCB_LISTEN 1
 #else
-#define MEMP_NUM_TCP_PCB_LISTEN 15
+#define MEMP_NUM_TCP_PCB_LISTEN 2
 #endif
 
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
-#ifdef INGAME_DRIVER
-#define MEMP_NUM_TCP_SEG 15
-#else
-#define MEMP_NUM_TCP_SEG 40
-#endif
+#define MEMP_NUM_TCP_SEG TCP_SND_QUEUELEN
 
 /* MEMP_NUM_SYS_TIMEOUT: the number of simulateously active
    timeouts. */
-#define MEMP_NUM_SYS_TIMEOUT 5
-
-/* The following four are used only with the sequential API and can be
-   set to 0 if the application only will use the raw API. */
-/* MEMP_NUM_NETBUF: the number of struct netbufs. */
-#ifdef INGAME_DRIVER
-#define MEMP_NUM_NETBUF 5
-#else
-#define MEMP_NUM_NETBUF 15
-#endif
+//Only used by tcpip.c, which will be used for IP reassembly and ARP.
+#define MEMP_NUM_SYS_TIMEOUT 1
 
 /* MEMP_NUM_NETCONN: the number of struct netconns. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_NETCONN 1
-#else
-#define MEMP_NUM_NETCONN 15
 #endif
 
 /* MEMP_NUM_APIMSG: the number of struct api_msg, used for
@@ -101,8 +83,6 @@ a lot of data that needs to be copied, this should be set high. */
    programs. */
 #ifdef INGAME_DRIVER
 #define MEMP_NUM_API_MSG 5
-#else
-#define MEMP_NUM_API_MSG 40
 #endif
 
 /* MEMP_NUM_TCPIPMSG: the number of struct tcpip_msg, which is used
@@ -117,13 +97,14 @@ a lot of data that needs to be copied, this should be set high. */
 /* ---------- Pbuf options ---------- */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
 #ifdef INGAME_DRIVER
-#define PBUF_POOL_SIZE 5
+#define PBUF_POOL_SIZE 8
 #else
 #define PBUF_POOL_SIZE 25
 #endif
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
 //Boman666: Should be atleast 1518 to be compatible with ps2smap
+//TCP_MSS+TCP header+IP header+PBUF_LINK_HLEN = 1460 + 20 + 20 + 14 = 1514
 #define PBUF_POOL_BUFSIZE 1540
 
 /* PBUF_LINK_HLEN: the number of bytes that should be allocated for a
@@ -162,16 +143,10 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* TCP receive window. */
 #ifdef INGAME_DRIVER
-#define TCP_WND 5120
+#define TCP_WND 10240
 #else
 #define TCP_WND 32768
 #endif
-
-/* Maximum number of retransmissions of data segments. */
-#define TCP_MAXRTX 12
-
-/* Maximum number of retransmissions of SYN segments. */
-#define TCP_SYNMAXRTX 4
 
 /* TCP writable space (bytes).  This must be less than or equal
    to TCP_SND_BUF.  It is the amount of space which must be
@@ -179,19 +154,15 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_SNDLOWAT (TCP_SND_BUF / 2)
 
 /* ----- TCPIP thread priority ----- */
-#ifdef INGAME_DRIVER
-#define TCPIP_THREAD_PRIO 1
-#else
-#define TCPIP_THREAD_PRIO 0x22
-#endif
+#define TCPIP_THREAD_PRIO 2
 
 /* ---------- ARP options ---------- */
 #ifdef INGAME_DRIVER
 #define ARP_TABLE_SIZE 2
 #else
-#define ARP_TABLE_SIZE 10
+#define ARP_TABLE_SIZE 3
 #endif
-#define ARP_QUEUEING 1
+#define ARP_QUEUEING 0
 
 /**
  * If defined to 1, cache entries are updated or added for every kind of ARP traffic

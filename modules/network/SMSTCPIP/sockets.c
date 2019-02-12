@@ -458,10 +458,12 @@ int lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsig
     return copylen;
 }
 
+#ifdef FULL_LWIP
 int lwip_read(int s, void *mem, int len)
 {
     return lwip_recvfrom(s, NULL, 0, mem, len, 0, NULL, NULL);
 }
+#endif
 
 int lwip_recv(int s, void *mem, int len, unsigned int flags)
 {
@@ -605,12 +607,14 @@ int lwip_socket(int domain, int type, int protocol)
     return i;
 }
 
+#ifdef FULL_LWIP
 int lwip_write(int s, void *data, int size)
 {
     return lwip_send(s, data, size, 0);
 }
+#endif
 
-
+#ifdef FULL_LWIP
 static int
 lwip_selscan(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset)
 {
@@ -790,7 +794,7 @@ int lwip_select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptse
 
     return nready;
 }
-
+#endif
 
 static void
 event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
@@ -879,6 +883,7 @@ int lwip_shutdown(int s, int how)
     return lwip_close(s); /* XXX temporary hack until proper implementation */
 }
 
+#ifdef FULL_LWIP
 int lwip_getpeername(int s, struct sockaddr *name, socklen_t *namelen)
 {
     struct lwip_socket *sock;
@@ -1147,6 +1152,7 @@ int lwip_getsockopt(int s, int level, int optname, void *optval, socklen_t *optl
     sock_set_errno(sock, err);
     return err ? -1 : 0;
 }
+#endif
 
 int lwip_setsockopt(int s, int level, int optname, const void *optval, socklen_t optlen)
 {
@@ -1333,6 +1339,7 @@ int lwip_setsockopt(int s, int level, int optname, const void *optval, socklen_t
     return err ? -1 : 0;
 }
 
+#ifdef FULL_LWIP
 int lwip_ioctl(int s, long cmd, void *argp)
 {
     struct lwip_socket *sock = get_socket(s);
@@ -1370,3 +1377,4 @@ int lwip_ioctl(int s, long cmd, void *argp)
             return -1;
     }
 }
+#endif

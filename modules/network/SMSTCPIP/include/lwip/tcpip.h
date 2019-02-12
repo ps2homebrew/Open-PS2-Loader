@@ -43,9 +43,11 @@ extern sys_sem_t lock_tcpip_core;
 #define LOCK_TCPIP_CORE()     sys_sem_wait(lock_tcpip_core)
 /** Unlock lwIP core mutex (needs @ref LWIP_TCPIP_CORE_LOCKING 1) */
 #define UNLOCK_TCPIP_CORE()   sys_sem_signal(lock_tcpip_core)
+#define TCPIP_APIMSG_ACK(m)
 #else /* LWIP_TCPIP_CORE_LOCKING */
 #define LOCK_TCPIP_CORE()
 #define UNLOCK_TCPIP_CORE()
+#define TCPIP_APIMSG_ACK(m)   sys_mbox_post(m, NULL)
 #endif /* LWIP_TCPIP_CORE_LOCKING */
 
 void tcpip_init(void (*tcpip_init_done)(void *), void *arg);

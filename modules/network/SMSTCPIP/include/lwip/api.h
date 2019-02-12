@@ -76,7 +76,6 @@ struct netbuf
     struct pbuf *p, *ptr;
     struct ip_addr *fromaddr;
     u16_t fromport;
-    err_t err;
 };
 
 struct netconn
@@ -95,7 +94,7 @@ struct netconn
     sys_mbox_t acceptmbox;
     sys_sem_t sem;
     int socket;
-    u16_t recv_avail;
+    s16_t recv_avail;
     void (*callback)(struct netconn *, enum netconn_evt, u16_t len);
 };
 
@@ -104,7 +103,7 @@ struct netbuf *netbuf_new(void);
 void netbuf_delete(struct netbuf *buf);
 void *netbuf_alloc(struct netbuf *buf, u16_t size);
 void netbuf_free(struct netbuf *buf);
-void netbuf_ref(struct netbuf *buf,
+err_t netbuf_ref(struct netbuf *buf,
                 void *dataptr, u16_t size);
 void netbuf_chain(struct netbuf *head,
                   struct netbuf *tail);

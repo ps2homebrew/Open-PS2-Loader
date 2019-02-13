@@ -151,4 +151,40 @@ unsigned long sys_now(void);
 
 #endif /* SYS_ARCH_PROTECT */
 
+#ifndef SYS_ARCH_INC
+#define SYS_ARCH_INC(var, val) do { \
+                                SYS_ARCH_DECL_PROTECT(old_level); \
+                                SYS_ARCH_PROTECT(old_level); \
+                                var += val; \
+                                SYS_ARCH_UNPROTECT(old_level); \
+                              } while(0)
+#endif /* SYS_ARCH_INC */
+
+#ifndef SYS_ARCH_DEC
+#define SYS_ARCH_DEC(var, val) do { \
+                                SYS_ARCH_DECL_PROTECT(old_level); \
+                                SYS_ARCH_PROTECT(old_level); \
+                                var -= val; \
+                                SYS_ARCH_UNPROTECT(old_level); \
+                              } while(0)
+#endif /* SYS_ARCH_DEC */
+
+#ifndef SYS_ARCH_GET
+#define SYS_ARCH_GET(var, ret) do { \
+                                SYS_ARCH_DECL_PROTECT(old_level); \
+                                SYS_ARCH_PROTECT(old_level); \
+                                ret = var; \
+                                SYS_ARCH_UNPROTECT(old_level); \
+                              } while(0)
+#endif /* SYS_ARCH_GET */
+
+#ifndef SYS_ARCH_SET
+#define SYS_ARCH_SET(var, val) do { \
+                                SYS_ARCH_DECL_PROTECT(old_level); \
+                                SYS_ARCH_PROTECT(old_level); \
+                                var = val; \
+                                SYS_ARCH_UNPROTECT(old_level); \
+                              } while(0)
+#endif /* SYS_ARCH_SET */
+
 #endif /* __LWIP_SYS_H__ */

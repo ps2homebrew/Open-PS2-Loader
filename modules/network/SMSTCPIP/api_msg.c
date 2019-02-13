@@ -37,6 +37,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcpip.h"
 
+#include <intrman.h>
 #include <thsemap.h>
 
 #if LWIP_RAW
@@ -61,7 +62,7 @@ recv_raw(void *arg, struct raw_pcb *pcb, struct pbuf *p,
         buf->fromaddr = addr;
         buf->fromport = pcb->protocol;
 
-        conn->recv_avail += p->tot_len;
+        SYS_ARCH_INC(conn->recv_avail, p->tot_len);
         /* Register event with callback */
         if (conn->callback)
             (*conn->callback)(conn, NETCONN_EVT_RCVPLUS, p->tot_len);
@@ -97,7 +98,7 @@ recv_udp(void *arg, struct udp_pcb *pcb, struct pbuf *p,
             buf->fromport = port;
         }
 
-        conn->recv_avail += p->tot_len;
+        SYS_ARCH_INC(conn->recv_avail, p->tot_len);
         /* Register event with callback */
         if (conn->callback)
             (*conn->callback)(conn, NETCONN_EVT_RCVPLUS, p->tot_len);
@@ -123,7 +124,7 @@ static err_t recv_tcp(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
 
             if (p) {
                 len = p->tot_len;
-                conn->recv_avail += len;
+                SYS_ARCH_INC(conn->recv_avail, len);
             } else
                 len = 0;
 
@@ -283,7 +284,7 @@ do_newconn(struct api_msg_msg *msg)
         /* This "new" connection already has a PCB allocated. */
         /* Is this an error condition? Should it be deleted? 
       We currently just are happy and return. */
-        sys_mbox_post(msg->conn->mbox, NULL);
+        TCPIP_APIMSG_ACK(msg->conn->mbox);
         return;
     }
 
@@ -340,7 +341,7 @@ do_newconn(struct api_msg_msg *msg)
     }
 
 
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 
 
@@ -392,7 +393,7 @@ do_delconn(struct api_msg_msg *msg)
     }
 
     if (msg->conn->mbox != SYS_MBOX_NULL) {
-        sys_mbox_post(msg->conn->mbox, NULL);
+        TCPIP_APIMSG_ACK(msg->conn->mbox);
     }
 }
 
@@ -455,7 +456,7 @@ do_bind(struct api_msg_msg *msg)
         default:
             break;
     }
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 #if LWIP_TCP
 
@@ -495,7 +496,7 @@ do_connect(struct api_msg_msg *msg)
                 msg->conn->pcb.udp = udp_new();
                 if (msg->conn->pcb.udp == NULL) {
                     msg->conn->err = ERR_MEM;
-                    sys_mbox_post(msg->conn->mbox, NULL);
+                    TCPIP_APIMSG_ACK(msg->conn->mbox);
                     return;
                 }
                 udp_setflags(msg->conn->pcb.udp, UDP_FLAGS_UDPLITE);
@@ -505,7 +506,7 @@ do_connect(struct api_msg_msg *msg)
                 msg->conn->pcb.udp = udp_new();
                 if (msg->conn->pcb.udp == NULL) {
                     msg->conn->err = ERR_MEM;
-                    sys_mbox_post(msg->conn->mbox, NULL);
+                    TCPIP_APIMSG_ACK(msg->conn->mbox);
                     return;
                 }
                 udp_setflags(msg->conn->pcb.udp, UDP_FLAGS_NOCHKSUM);
@@ -515,7 +516,7 @@ do_connect(struct api_msg_msg *msg)
                 msg->conn->pcb.udp = udp_new();
                 if (msg->conn->pcb.udp == NULL) {
                     msg->conn->err = ERR_MEM;
-                    sys_mbox_post(msg->conn->mbox, NULL);
+                    TCPIP_APIMSG_ACK(msg->conn->mbox);
                     return;
                 }
                 udp_recv(msg->conn->pcb.udp, recv_udp, msg->conn);
@@ -526,7 +527,7 @@ do_connect(struct api_msg_msg *msg)
                 msg->conn->pcb.tcp = tcp_new();
                 if (msg->conn->pcb.tcp == NULL) {
                     msg->conn->err = ERR_MEM;
-                    sys_mbox_post(msg->conn->mbox, NULL);
+                    TCPIP_APIMSG_ACK(msg->conn->mbox);
                     return;
                 }
 #endif
@@ -538,7 +539,7 @@ do_connect(struct api_msg_msg *msg)
 #if LWIP_RAW
         case NETCONN_RAW:
             raw_connect(msg->conn->pcb.raw, msg->msg.bc.ipaddr);
-            sys_mbox_post(msg->conn->mbox, NULL);
+            TCPIP_APIMSG_ACK(msg->conn->mbox);
             break;
 #endif
 #if LWIP_UDP
@@ -548,7 +549,7 @@ do_connect(struct api_msg_msg *msg)
         /* FALLTHROUGH */
         case NETCONN_UDP:
             udp_connect(msg->conn->pcb.udp, msg->msg.bc.ipaddr, msg->msg.bc.port);
-            sys_mbox_post(msg->conn->mbox, NULL);
+            TCPIP_APIMSG_ACK(msg->conn->mbox);
             break;
 #endif
 #if LWIP_TCP
@@ -589,7 +590,7 @@ do_disconnect(struct api_msg_msg *msg)
         default:
             break;
     }
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 
 
@@ -633,7 +634,7 @@ do_listen(struct api_msg_msg *msg)
                 break;
         }
     }
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 
 static void
@@ -688,7 +689,7 @@ do_send(struct api_msg_msg *msg)
                 break;
         }
     }
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 
 static void do_recv(struct api_msg_msg *msg)
@@ -733,7 +734,7 @@ do_write(struct api_msg_msg *msg)
    segments when new outgoing data arrives from the user if any
    previously transmitted data on the connection remains
    unacknowledged. */
-                if (err == ERR_OK && (msg->conn->pcb.tcp->unacked == NULL || (msg->conn->pcb.tcp->flags & TF_NODELAY))) {
+                if (err == ERR_OK && (msg->conn->pcb.tcp->unacked == NULL || (msg->conn->pcb.tcp->flags & TF_NODELAY) || ( msg->conn->pcb.tcp->snd_queuelen) > 1)) {
                     tcp_output(msg->conn->pcb.tcp);
                 }
                 msg->conn->err = err;
@@ -747,7 +748,7 @@ do_write(struct api_msg_msg *msg)
                 break;
         }
     }
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 
 static void
@@ -782,7 +783,7 @@ do_close(struct api_msg_msg *msg)
                 break;
         }
     }
-    sys_mbox_post(msg->conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(msg->conn->mbox);
 }
 
 api_msg_decode __decode__[API_MSG_MAX] = {

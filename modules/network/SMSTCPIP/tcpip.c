@@ -149,9 +149,9 @@ void tcpip_apimsg(struct api_msg *apimsg)
         msg->type = TCPIP_MSG_API;
         msg->msg.apimsg = apimsg;
         sys_mbox_post(g_TCPIPMBox, msg);
+        sys_mbox_fetch(apimsg->msg.conn->mbox, NULL);
 
-    } else
-        memp_free(MEMP_API_MSG, apimsg);
+    }
 #endif /* LWIP_TCPIP_CORE_LOCKING */
 
 } /* end tcpip_apimsg */

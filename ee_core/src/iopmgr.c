@@ -59,7 +59,8 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 
     DIntr();
     ee_kmode_enter();
-    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT | SIF_STAT_CMDINIT);
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT);
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_CMDINIT);
     Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
     Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
     ee_kmode_exit();
@@ -221,7 +222,8 @@ int Reset_Iop(const char *arg, int mode)
         return 0;
     }
 
-    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT | SIF_STAT_CMDINIT);
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_SIFINIT);
+    Old_SifSetReg(SIF_REG_SMFLAG, SIF_STAT_CMDINIT);
     Old_SifSetReg(SIF_SYSREG_RPCINIT, 0);
     Old_SifSetReg(SIF_SYSREG_SUBADDR, (int)NULL);
     ee_kmode_exit();

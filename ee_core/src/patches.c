@@ -331,6 +331,9 @@ static void RnC3_UYA_patches(void *address)
 			1. if it's a module with no name (first 4 characters are 0s), left-shift once.
 			2. if it's a module beginning with "Deci", left-shift once.
 			3. if it's a module beginning with "cdvd", right-shift once.
+		Otherwise, nothing is done for the module.
+
+		Only modules up to before the 3rd last will be considered.
 
 		For us, it's about preserving the pointer to the allocated buffer and to adjust it accordingly:
 			For TOOL units, there are 6 DECI2 modules and 2 libcdvd modules. Therefore the pointer should be right-shifted by 4.
@@ -338,14 +341,6 @@ static void RnC3_UYA_patches(void *address)
 
     word1 = JAL((unsigned int)&RnC3_AlwaysAllocMem);
     switch (GameMode) {
-        case HDD_MODE:
-//For HDD mode, the CDVDMAN module has its name as "dev9", so adjust the shifting accordingly.
-#ifdef _DTL_T10000
-            word2 = 0x00021943; //sra $v1, $v0, 5	For DTL-T10000.
-#else
-            word2 = 0x00021840; //sll $v1, $v0, 1	For retail sets.
-#endif
-            break;
         default:
 #ifdef _DTL_T10000
             word2 = 0x00021903; //sra $v1, $v0, 4	For DTL-T10000.

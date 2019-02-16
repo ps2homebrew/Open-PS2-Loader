@@ -146,10 +146,12 @@ struct
     conn->type = t;
     conn->pcb.tcp = NULL;
 
+#if !LWIP_TCPIP_CORE_LOCKING
     if ((conn->mbox = sys_mbox_new()) == SYS_MBOX_NULL) {
         memp_free(MEMP_NETCONN, conn);
         return NULL;
     }
+#endif
     conn->recvmbox = SYS_MBOX_NULL;
     conn->acceptmbox = SYS_MBOX_NULL;
     conn->sem = SYS_SEM_NULL;
@@ -218,8 +220,10 @@ err_t netconn_delete(struct netconn *conn)
         conn->acceptmbox = SYS_MBOX_NULL;
     }
 
+#if !LWIP_TCPIP_CORE_LOCKING
     sys_mbox_free(conn->mbox);
     conn->mbox = SYS_MBOX_NULL;
+#endif
     if (conn->sem != SYS_SEM_NULL) {
         sys_sem_free(conn->sem);
     }

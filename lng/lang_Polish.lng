@@ -1,6 +1,5 @@
-# W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbował" Jolek. Podziękowania dla Haker120, misiozola i innych z Forum CDRinfo.pl (https://forum.cdrinfo.pl/f30/) za pomoc i sugestie.
-# Oficjalny wątek na temat wersji testowych Open PS2 Loader 0.9.3+ betas znaleźć można tutaj: http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
-# Najnowsze wersje testowe znaleźć można tutaj: https://akuhak.github.io/test_build/
+# Wersja 0.18. W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbowali" Jolek & KaiQ. Podziękowania dla Haker120, misiozola i innych z Forum CDRinfo.pl ("https://forum.cdrinfo.pl/f30/") za pomoc i sugestie.
+# Wątek na temat wersji testowych Open PS2 Loader 0.9.3+ betas można znaleźć tutaj: "http://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/"
 Polski
 Open PS2 Loader %s
 Zapisz zmiany
@@ -25,7 +24,7 @@ Przerwać aktualizację?
 %d: Nie wykryto dysku twardego
 %d: Dysk twardy nie jest sformatowany
 %d: Wystąpił błąd podczas uruchamiania sieci
-%d: Nie wykryto network adaptera
+%d: Nie wykryto Network Adaptora
 %d: Nie można połączyć się z serwerem SMB
 %d: Nie można zalogować się do serwera SMB
 %d: Nie można otworzyć udziału SMB
@@ -72,8 +71,8 @@ Ręcznie
 Uruchom serwer HDL
 Uruchamianie serwera HDL...
 Serwer HDL uruchomiony...
-Niepowodzenie startu serwera HDL.
-Odładowywanie serwera HDL...
+Nieudane uruchomienie serwera HDL.
+Serwer HDL zostanie zamknięty...
 Ścieżka dla IGR
 Kolor tła
 Kolor tekstu
@@ -108,15 +107,15 @@ Przycisk wyboru
 Błąd, gra jest pofragmentowana
 Błąd, nie można uruchomić pozycji
 Test
-Pozostaw puste dla GOŚCIA.
+Pozostaw puste dla "GOŚCIA".
 Dokładny odczyt
 Tryb synchroniczny
-Wymarz OPL po uruchomieniu gry
+Wymaż OPL po uruchomieniu gry
 Pomiń wstawki filmowe
 Emuluj DVD-DL
 Wyłącz IGR
-Załaduj moduły magazynowe w wyższym adresie pamięci
-Ukryj moduł DEV9
+Niewykorzystany
+Niewykorzystany
 Zmiana rozmiaru spowoduje przeformatowanie VMC
 Utwórz
 Start
@@ -132,14 +131,14 @@ Postęp
 Plik VMC istnieje
 Błędny plik VMC, nieprawidłowy rozmiar
 Plik VMC musi zostać utworzony
-Błąd z plikiem VMC %s, kontynuować z fizyczną MC (gniazdo %d) ?
+Błąd dostępu do VMC %s, kontynuuj z kartą pamięci w gnieździe %d?
 Odświeżanie automatyczne
 O programie
 Programiści
-Zapewnienie jakości
+Kontrola jakości
 Prefix ścieżki USB
 Uruchom wybrany ELF po IGR
-Wartość w minutach, 0 wyłącza zwalnianie obrotów
+Wartość w minutach, 0 dla dezaktywacji
 Automatyczne zwalnianie obrotów HDD
 Tryb wideo
 Kolor ustawień
@@ -169,7 +168,7 @@ Tryb 6
 Tryb 7
 Tryb 8
 Konfiguruj GSM
-Tryb łącza ethernetowego
+Szybkość i tryb sieci
 100Mbit pełny-dupleks
 100Mbit pół-dupleks
 10Mbit pełny-dupleks
@@ -256,5 +255,12 @@ Wprowadź hasło blokady rodzicielskiej.
 Nieprawidłowe hasło blokady rodzicielskiej.
 Blokada rodzicielska wyłączona.
 Opcje kompilacji:
-Błąd - te hasło nie może być użyte.
+Błąd - to hasło nie może być użyte.
 Plik VMC %s jest pofragmentowany. Kontynuuj z kartą pamięci w gnieździe %d?
+Ustawienia dźwiękowe
+Efekty dźwiękowe
+Dźwięk startowy
+Głośność efektów dźwiękowych
+Głośność dźwięku startowego
+Potwierdź zmianę rozdzielczości
+Buforowanie listy gier (HDD)

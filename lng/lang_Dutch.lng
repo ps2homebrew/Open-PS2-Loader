@@ -1,0 +1,266 @@
+# Dutch translation by PS2Gaming
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+Dutch
+Open PS2 Loader %s
+Wijzigingen opslaan
+Terug
+Netwerkconfiguratie
+Geavanceerde opties
+<geen waarde>
+Instellingen opgeslagen...
+Fout bij schrijven van instellingen!
+Sluiten
+Instellingen
+Menu
+USB Spellen
+HDD Spellen
+ETH Spellen
+Apps
+Thema's
+Taal
+Het systeem zal worden uitgeschakeld.
+OPL afsluiten?
+Updaten annuleren?
+%d: Harde schijf niet gedetecteerd
+%d: Harde schijf niet geformateerd
+%d: Netwerk startfout
+%d: Geen netwerkadapter gedetecteerd
+%d: Kan niet verbinden met SMB server
+%d: Kan niet inloggen bij SMB server
+%d: Kan SMB-share niet openen
+%d: Kan SMB-shares niet inlijsten
+%d: Kan spellen niet inlijsten
+%d: DHCP server niet beschikbaar
+%d: Geen netwerkconnectie
+Aan
+Uit
+OK
+Select.
+Annuleer
+Cirkel
+Kruis
+Spellenlijst
+Spelinstellingen
+Verwijder alle instellingen
+Verwijder alle keys voor het spel
+Scrollen
+Langzaam
+Normaal
+Snel
+Standaard menu
+Laad vanuit schijf
+Even geduld a.u.b.
+Fout tijdens laden van Spel ID
+Automatisch sorteren
+Fout bij laden van taalbestand
+Debug kleuren uitschakelen
+Geen controller gedetecteerd, wachtend...
+Cover Art inschakelen
+Breedbeeld
+Uitschakelen
+Configuratie laden
+Configuratie opslaan
+Start apparaat
+Vernieuwen
+USB-apparaat startmodus
+HDD-apparaat startmodus
+ETH-apparaat startmodus
+Applicaties startmodus
+Auto
+Handmatig
+Start HDL Server
+HDL Server starten...
+HDL Server uitgevoerd...
+Mislukt om HDL Server te starten.
+HDL Server lossen...
+IGR pad
+Achtergrondkleur
+Tekstkleur
+- PS2 -
+- SMB Server -
+IP-adres type
+Statisch
+DHCP
+IP-adres
+Adres
+Mask
+Gateway
+DNS Server
+Poort
+Deel
+Gebruiker
+Wachtwoord
+<niet ingesteld>
+Adrestype
+IP
+NetBIOS
+Accepteer
+Item zal permanent verwijdert worden, doorgaan?
+Wijzig naam
+Verwijder
+Uitvoeren
+Beeldinstellingen
+Schrijftaken inschakelen
+Check USB-spel fragmentatie
+Herinner laatst gespeelde spel
+Selecteerknop
+Foutmelding, het spel is gefragmenteerd
+Foutmelding, kan het item niet uitvoeren
+Test
+Laat leeg voor GUEST auth.
+Accurate reads
+Synchrone modus
+Syscalls loshaken
+Videos overslaan
+Emuleer DVD-DL
+IGR uitschakelen
+Unused
+Unused
+Het wijzigen van de grootte zal VMC formatteren
+Creëer
+Start
+Aanpassen
+Afbreken
+Reset
+Gebruik generieke
+Configureer VMC
+Naam
+Groote
+Status
+Voortgang
+VMC-bestand bestaat
+Ongeldige VMC-bestand, grootte is incorrect
+VMC-bestand moet gecreëerd worden
+Fout met VMC %s, voorzetten met fysieke MC (slot %d)?
+Automatisch vernieuwen
+Over
+Coders
+Kwaliteitsgarantie
+USB-prefix pad
+Start aangepaste ELF na een IGR
+Waarde in minuten, 0 om spin down uit te schakelen
+Automatische HDD spin down
+Videomodus
+Dialoogvensterkleur
+Geselecteerde kleur
+Toon infopagina
+Info
+Aangepaste ELF
+Kleurselectie
+Opnieuw verbinden
+Laat leeg om het gedeelde in te lijsten
+ETH-prefix pad
+Backspace
+Space
+Enter
+Modus
+VMC Slot 1
+VMC Slot 2
+Spel ID
+DMA Modus
+V-Sync
+Modus 1
+Modus 2
+Modus 3
+Modus 4
+Modus 5
+Modus 6
+Modus 7
+Modus 8
+Configureer GSM
+Ethernet link modus
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+GSM instellingen
+GSM inschakelen
+Schakelt GSM AAN of UIT
+VMODE
+Geforceerde aangepast beeldschermmodus
+H-POS
+Horizontale aanpassing
+V-POS
+Verticale aanpassing
+Overscan
+Overscan aanpassing
+FMV overslaan
+Slaat Full Motion Videos over
+Cheat instellingen
+PS2RD Cheat Engine inschakelen
+Laat PS2RD Cheat Engine uw spellen patchen
+PS2RD Cheat Engine Modus
+Auto-selecteer of selecteer spelcheats
+Auto-selecteer cheats
+Selecteer spelcheats
+Foutmelding: mislukt om cheatbestand te laden
+Geen cheats gevonden
+Download standaardwaarden
+Netwerkupdate
+Bestaande records herdownloaden?
+Update mislukt.
+Mislukt om te verbinden met update server.
+Update voltooid.
+Update geannuleerd.
+Download instellingen van het netwerk?
+Aangepaste instellingen
+Gedownloade standaardwaarden
+Auto-start over %i s...
+Auto-start
+Waarde in seconde(n), 0 om auto-start uit te schakelen
+PS2 logo
+Alleen getoond voor geldige schijflogo die bij de console-regio past
+Configureer PADEMU
+Pad-emulator instellingen
+Pad-emulator inschakelen
+Schakelt Pad-emulator in/uit voor geselecteerde spel
+Pad-emulator modus
+Selecteer Pad-emulator modus.
+DualShock3/4 USB
+DualShock3/4 BT
+Instellingen voor poort:
+Selecteer Pad-emulator poort voor instellingen.
+Emuleren inschakelen
+Schakelt Pad-emulator in/uit voor geselecteerde poort.
+Vibratie inschakelen
+Schakelt vibratie in/uit voor Pad-emulator geselecteerde poort.
+USB-bluetoothadapter mac-adres:
+DS-controller gepaard met mac-adres:
+Paar
+Paar DS-controller
+Paar DS-controller met bluetoothadapter mac-adres
+Niet verbonden
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds3
+Some fake ds3s need workaround, this option will disable it.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
+Parental Lock Settings
+Parental Lock Password
+Leave blank to disable the parental lock.
+Enter Parental Lock Password
+Parental lock password incorrect.
+Parental lock disabled.
+Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

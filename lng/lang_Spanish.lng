@@ -1,16 +1,16 @@
 # Spanish translation by El_Patas - @http://psx-scene.com/forums/members/elpatas/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Spanish
 Open PS2 Loader %s
 Guardar cambios
 Atrás
-Ajustes conexión de red
+Conexión de red
 Opciones avanzadas
 <Sin configurar>
-Configuración guardada.
+Configuración guardada
 ¡Error al guardar la configuración!
 Salir
-Configuración
+Configuración principal
 Menú
 Juegos USB
 Juegos Disco duro
@@ -18,8 +18,8 @@ Juegos Red
 Aplicaciones
 Estilo
 Idioma
-Se apagará el sistema.
-¿Salir al Navegador/OSDSYS de la consola?
+Se apagará el sistema
+¿Salir al navegador de la consola?
 ¿Cancelar actualización?
 %d: Disco duro no detectado
 %d: Disco duro no formateado
@@ -32,8 +32,8 @@ Se apagará el sistema.
 %d: No se pueden listar los juegos
 %d: Servidor DHCP no disponible
 %d: No hay conexión de red
-Activa.
-Desact.
+Activado
+Desactivado
 Aceptar
 Aceptar
 Cancelar
@@ -47,7 +47,7 @@ Desplazamiento
 Lento
 Medio
 Rápido
-Menú por defecto
+Menú predeterminado
 Cargar del disco
 Espera por favor
 Error al cargar el código ID del juego
@@ -56,7 +56,7 @@ Error al cargar el archivo de idioma
 No mostrar los colores para depuración
 Mando no encontrado, esperando...
 Carátulas, serigrafías y fondos
-Pantalla panorámica interfaz
+Pantalla panorámica
 Apagar PS2
 Cargando configuración...
 Guardando configuración...
@@ -99,7 +99,7 @@ El archivo se borrará definitivamente, ¿continuar?
 Renombrar
 Borrar
 Iniciar
-Preferencias de pantalla
+Pantalla
 Mostrar operaciones de escritura
 Comprobar fragmentación juego USB
 Recordar último juego en uso
@@ -114,8 +114,8 @@ Desvincula el sistema
 Omite vídeos
 Emula DVD-DL
 Quita el IGR
-Almacena los módulos en alta dirección de memoria
-Oculta el módulo DEV9
+Sin uso
+Sin uso
 Cambiar el tamaño formateará la VMC
 Crear
 Iniciar
@@ -139,8 +139,8 @@ Testeadores
 Ruta predeterminada dispositivo USB
 Dejar en blanco para salida hacia el navegador de PS2
 Valor en minutos, 0 para desactivar el paro automático
-Paro automático rotación del Disco duro
-Modo de vídeo interfaz
+Paro automático rotación del disco duro
+Modo de vídeo
 Color de diálogos
 Color de selección
 Mostrar pantalla de información
@@ -178,10 +178,10 @@ Activar GSM
 Forzar modo de vídeo seleccionado con GSM
 Modo de vídeo seleccionado
 Modo de vídeo a forzar
-Ajuste horizontal
-Configura la posición horizontal de la pantalla
-Ajuste vertical
-Configura la posición vertical de la pantalla
+Posición horizontal
+Mueve la posición horizontal de la pantalla
+Posición vertical
+Mueve la posición vertical de la pantalla
 Sobre escaneo
 Ajuste sobre escaneo
 Omitir vídeos FMV
@@ -248,8 +248,8 @@ Desactivar método alternativo para falso DS3
 Algunos DS3 falsos necesitan un método alternativo, esta opción lo desactiva
 Emular alternancia de valores de CAMPO
 Solución para juegos que fallan bajo modos de vídeo progresivos.
-Configuración de control paterno
-Contraseña de control paterno
+Control paterno
+Contraseña
 Dejar en blanco para desactivar el control paterno.
 Introduce contraseña de control paterno
 Contraseña control paterno incorrecta.
@@ -257,3 +257,10 @@ Control paterno desactivado.
 Opciones de compilación:
 Error - esta contraseña no se puede usar.
 El archivo VMC %s está fragmentado. ¿Continuar con la tarjeta de memoria en ranura %d?
+Sonido
+Efectos de sonido
+Sonido de inicio
+Volumen efectos de sonido
+Volumen sonido de inicio
+¿Confirmar el cambio de modo de vídeo?
+Caché lista de juegos (Disco duro)

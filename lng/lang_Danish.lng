@@ -1,5 +1,5 @@
 # Danish translation by BongKris
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Danish
 Open PS2 Loader %s
 Gem indstillinger
@@ -19,7 +19,7 @@ Programmer
 Tema
 Sprog
 Systemet slukkes.
-Vend tilbage til Browser/OSDSYS?
+Vend tilbage til Browser?
 Annuller opdatering?
 %d: Inget harddisk drev fundet
 %d: Harddisk drevet er ikke formateret
@@ -114,8 +114,8 @@ Frigiv syscalls
 Skip videoer
 Emulere DVD-DL
 Deaktivere IGR
-High module lagering
-Skjul DEV9-modul
+Unused
+Unused
 Ændring af størrelsen vil omformatere VMC
 Opret
 Start
@@ -131,7 +131,7 @@ Fremskridt
 VMC-fil eksisterer allerede
 Ugyldig VMC-fil, størrelse er ukorrekt
 VMC-fil skal oprettes
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Fejl med VMC %s, fortsæt med fysisk MC (port %d)?
 Automatisk opdatering
 Om
 Kodere
@@ -182,9 +182,9 @@ Horisontal position
 Horisontal justering
 Vertikal position
 Vertikal justering
-Vis ikke FMV
 Overscan
-Overscan Adjustment
+Overscan Justering
+Vis ikke FMV
 Springer over Full Motion Videos
 Snydeindstillinger
 Aktivér PS2RD Cheat Engine
@@ -216,8 +216,8 @@ Aktivér Pad Emulator
 Slå Pad Emulator Til/Fra for valgte spil.
 Pad Emulator tilstand
 Vælg Pad Emulator tilstand.
-DualShock 3/4 USB
-DualShock 3/4 BT
+DualShock3/4 USB
+DualShock3/4 BT
 indstillinger for port:
 Vælg Pad Emulator port for indstillinger.
 Aktivér emulering
@@ -225,27 +225,27 @@ Slå Pad Emulator Til/Fra for valgte port.
 Aktivér vibration
 Slå vibration Til/Fra for valgte Pad Emulator port.
 USB-bluetooth adapter MAC-adresse:
-DS-controller parret til MAC-adresse:
+DS controller parret med MAC-adresse:
 Parring
 Pardan DS controller
-Pardan DS controller med bluetooth adapters MAC-adresse.
+Pardan DS controller med bluetooth-adapters MAC-adresse.
 Ikke tilsluttet
-Bluetooth adapter information
-Shows more information and supported features
+Bluetooth-adapteroplysninger
+Viser mere information og understøttede funktioner
 HCI Version:
 LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Fabrikant ID:
+Understøttede funktioner:
+Ja
+Nej
+Bluetooth-adapter skal være fuldt kompatibel med DS3/DS4 controllere.
+Bluetooth-adapter fungerer muligvis ikke korrekt med DS3/DS4 controllere.
+Aktivér Multitap-emulering
+Slå Multitap-emulering Til/Fra for valgte spil.
+Multitap Emulator på port
+Vælg port til Multitap-emulering.
+Deaktiver løsning for falsk DS3
+Nogle falske DS3'er har brug for en løsning, dette deaktivere den.
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -257,3 +257,10 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

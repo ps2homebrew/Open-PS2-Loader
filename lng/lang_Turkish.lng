@@ -1,12 +1,12 @@
-# Turkish translation by dante (Gürkan DEMİR <vampire_bs@hotmail.com>)
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Turkish
 Open PS2 Loader %s
 Değişiklikleri kaydet
 Geri
 Ağ ayarları
 Gelişmiş ayarlar
-<no values>
+<değer yok>
 Ayarlar kayıt edildi...
 Ayarlar yazılırken hata oluştu!
 Çıkış
@@ -19,14 +19,14 @@ Uygulamalar
 Tema
 Dil
 Çıkış işlemi gücü kapatacaktır.
-Exit to Browser/OSDSYS?
+Exit to Browser?
 Güncelleme iptal edilsinmi?
 %d: HardDisk sürücü bulunamadı
 %d: HardDisk sürücü biçimlendirilmemiş
 %d: Ağ başlatma hatası
 %d: Ağ kartı bulunamadı
-%d: Paylaşım sunucusuna (SMB) bağlanılamadı
-%d: Paylaşım sunucusuna (SMB)oturum açılamıyor
+%d: SMB sunucusuna bağlanılamadı
+%d: SMB sunucusunda oturum açılamıyor
 %d: Paylaşım klasörü açılamıyor
 %d: Ağ paylaşımları listelenemiyor
 %d: Oyunlar listelenemiyor
@@ -41,8 +41,8 @@ Daire
 Çarpı
 Oyun listesi
 Oyun ayarları
-Tüm ayarları kaldır
-Oyunun yüm anahtarları kaldırıldı
+Tüm ayarları sil
+Oyunun tüm anahtarları kaldırıldı
 Kaydırma
 Yavaş
 Orta
@@ -73,11 +73,11 @@ HDL Sunucu Başlatma Hatası
 HDL Sunucu Başlıyor...
 HDL Sunucu Çalışıyor...
 HDL Sunucu Durduruluyor...
-IGR çıkış yolu
+IGR yeri
 Arkaplan rengi
 Metin rengi
 - PS2 - 
-- SMB Server -
+- SMB Sunucusu -
 IP adres türü
 Sabit
 DHCP
@@ -100,22 +100,22 @@ Y.Adlandır
 Sil
 Çalıştır
 Görüntü ayarları
-Yazma işlemlerini etkinleştir
-USB oyun bütünlüğünü kontrol et(Fragmentation)
+Yazma işlemlerini aktif et
+USB oyun bütünlüğünü kontrol et (Fragmentation)
 Enson oynanan oyunu hatırla
-Select tuşu
+Seçme tuşu
 Hata, oyun dosyası parçalı
 Hata, nesne çalıştırılamıyor
 Test
 MİSAFİR oturumu için boş bırakınız.
-Direk okuma
+Okuma hızını emüle et
 Senkronize Modu
-Sis çağrılarını çöz
-Skip videos
+Sistem çağrılarını çöz
+Videoları atla
 DVD-DL i etkinleştir
 IGR i etkisizleştir
-Uüksek konumda bellek kullanımı
-dev9 modulünü gizle
+Kullanılmıyor
+Kullanılmıyor
 VMC Boyutu değiştirmek VMC nin biçimlendirilmesine neden olur
 Oluştur
 Başlat
@@ -131,13 +131,13 @@ Durum
 VMC dosyası var
 Geçersiz VMC dosyası, boyut hatalı
 VMC dosyasının oluşturulması gerekli
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+VMC %sdosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d) ?
 Otomatik yenileme
 Hakkında
 Geliştiriciler
-Kalite Konturolü
+Kalite Kontrolü
 USB önek yolu
-Boots Custom ELF after an IGR
+IGR'den sonra özel bir ELF'e başlar
 Dakika olarak değer, iptal etmek için 0 giriniz
 Otomatik Sabit Disk durdurma
 Video modu
@@ -169,10 +169,10 @@ Kip 7
 Kip 8
 GSM ayarları
 Ağ Bağlantı kipi
-100Mbit Tam-ikili
-100Mbit Yarım-ikili
-10Mbit Tam-ikili
-10Mbit Yarım-ikili
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 GSM Ayarları
 GSM Aktif
 GSM'i Açar ve Kapatır
@@ -183,12 +183,12 @@ Yatay Ayarlama
 D-Konum
 Dikey Ayarlama
 Overscan
-Overscan Adjustment
+Overscan Ayarı
 FMV Atlama
 Full Motion Videoları atlar
 Hile Ayarları
 PS2RD Cheat Engine'i Aktif et
-PS2RD Cheat Engine'in oyunlarınıza yama yapmasına izin verir
+PS2RD Cheat Engine'in oyunlara yama yapmasına izin ver
 PS2RD Cheat Engine Kipi
 Hileleri Otomatik veya Manuel seçer
 Hileleri Otomatik Seç
@@ -206,54 +206,61 @@ Internetten ayarlar indirilsin mi?
 Kişiselleştirilmiş Ayarlar
 Varsayılanlar indirildi
 Otomatik başlatılacak %i s...
-Otomatik başlatma
-Saniye(ler), otomatik başlatmayı kapatmak için 0 girin
-PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
-Configure PADEMU
-Pad Emulator Settings
-Enable PadEmulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
+Otomatik başlat
+Saniye olarak değer, iptal etmek için 0 giriniz
+PS2 Logosu
+Sadece konsolun bölgesine uyan, kabul edilebilir logolar gösterilir.
+PADEMU'yu ayarla
+Pad Emulator Ayarları
+PadEmulator Aktif Et
+Seçilen oyun için PADEMU'nun durumu
+Pad Emulator modu
+Pad Emulator modunu seçin.
 DualShock3/4 USB
 DualShock3/4 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS Controller paired to mac address:
-Pair
-Pair DS controller
-Pair DS controller with bluetooth adapter mac address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
+Port için ayarlar.
+Ayarlanacak Pad Emulator portunu seçin
+Emulasyonu aç
+Seçilen port için Pad Emulator durumu
+Titreşimi aç
+Seçilen port için Pad Emulator titreşimi durumu
+USB Bluetooth adaptörü MAC adresi:
+MAC adresi ile eşleşmiş DS kolu:
+Eşleştir
+DS kolu eşleştir
+DS kolunu Bluetooth adaptörü MAC adresi ile eşleştir
+Bağlı değil
+Bluetooth adaptörü bilgileri
+Desteklenen özellikler ve daha fazla bilgi gösterir
 HCI Version:
 LMP Version:
 Manufacturer ID:
 Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Evet
+Hayır
+Bluetooth adaptörü DS3/DS4 kolları ile büyük ihtimalle tam uyumlu.
+Bluetooth adaptörü DS3/DS4 kolları ile tam doğru çalışmayabilir.
+Multitap emulasyonunu aç
+Seçilen oyun için Multitap emulasyonu durumu
+Multitap emulasyonu portu
+Multitap emulasyonu için port seçin
+Sahte DS3ler için workaround'u kapat
+Bazı sahte DS3ler ile çalışabilmek için gereken workaround'u kapatır.
+FIELD flipping emüle et
+Progressive video modları ile bozulan oyunlar için çözüm yaması.
+Ebeveyn Kilidi Ayarları
+Ebeveyn Kilidi Şifresi
+Ebeveyn Kilidini kapatmak için boş bırakın.
+Ebeveyn Kilidi Şifresini Girin.
+Ebeveyn Kilidi Şifresi Yanlış.
+Ebeveyn Kilidi Kapatıldı.
+Build Ayarları:
+Hata - bu parola kullanılamaz.
+VMC %sdosyası fragment olmuş, fiziksel HK ile devam edilsin mi (slot %d)?
+Ses Ayarları
+Ses Efektleri Olsun
+Açılış Sesi Olsun
+Ses Efektleri Kuvveti
+Açılış Sesi Kuvveti
+Video çıkış modu değiştirilsin mi?
+Cache Game List (HDD)

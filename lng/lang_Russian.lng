@@ -1,5 +1,5 @@
 # Russian translation by druchapucha & frodosumkin
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Russian
 Open PS2 Loader %s
 Сохранить настройки
@@ -19,7 +19,7 @@ HDD-Игры
 Тема
 Язык
 Выключить консоль.
-Выйти в браузер/OSDSYS?
+Выйти в браузер?
 Отменить обновление?
 %d: HardDisk не опознан
 %d: HardDisk не отформатирован
@@ -114,8 +114,8 @@ NetBIOS
 Пропуск видео
 Эмулировать DVD-DL
 Отключить использование IGR
-Высокий модуль хранения
-Скрывать модули Dev9
+Не используется
+Не используется
 При изменении размера, VMC переформатируется
 Создать
 Старт
@@ -131,7 +131,7 @@ NetBIOS
 VMC файл существует
 Поврежденный VMC файл, неправильный размер
 Необходимо создать VMC файл
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Ошибка с VMC %s, использовать физическую карту (слот %d)?
 Автоматическое обновление
 О программе
 Кодеры
@@ -182,8 +182,8 @@ ID игры
 Горизонтальное положение
 Отступить вверх или вниз
 Вертикальное положение
-Overscan
-Overscan Adjustment
+Вылет развёртки
+Регулировать вылет развёртки
 Пропуск FMV
 Пропускать Full Motion видео
 Настройка читов
@@ -212,7 +212,7 @@ PS2 логотип
 Отображается экран, который запускается при запуске игрового диска
 Настроить PADEMU
 Настройки Pad эмулятора
-Включить Pad эмулятор
+Включить PadEmulator
 Вкл/вык Pad эмулятор для выбранной игры.
 Режим Pad эмулятора
 Выбрать режим Pad эмулятора.
@@ -225,35 +225,42 @@ DualShock3/4 BT
 Включить вибрацию
 Вкл/вык вибрацию в выбранном порте Pad эмулятора.
 Usb bluetooth адаптер МАК адрес:
-DS контроллер подключился к МАК адресу:
+DS контроллер подключился к MAC-адресу:
 Подключение
-Подключение DS контроллер
-Подключение DS с bluetooth адаптер МАК адрес. 
+Подключён DS контроллер
+Подключён DS контроллер с Bluetooth адаптером MAC-адрес.
 Не подключено
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Bluetooth адаптер информация
+Показать больше информации и поддерживаемые функции
+HCI версия:
+LMP версия:
+ID производителя:
+Поддерживаемые функции:
+Да
+Нет
+Bluetooth адаптер должен быть полностью совместим с DS3/DS4 контроллерами.
+Bluetooth адаптер может работать неправильно с DS3/DS4 контроллерами.
+Включить Multitap эмуляцию
+Выключатель вкл/выкл Multitap эмуляция для выбранной игры.
+Multitap эмулятор на порте
+Выбрать порт для Multitap эмуляции.
+Отключить работу для фальшивого DS3
+Эту опцию нужно отключить, если DS3 фальшивый.
+Эмулировать ОБЛАСТЬ обзора
+Исправление для игр, где есть проблема с прогрессивным режимом.
+Настроить родительский контроль
+Пароль для родительского контроля
+Не заполняйте, чтобы выключить родительский контроль.
+Родительский контроль, введите пароль
+Родительский контроль, неверный пароль.
+Родительский контроль выключен.
+Опции сборки:
+Ошибка - этот пароль не может быть использован.
+VMC %s файл фрагментирован. Продолжить с картой памяти в слоте %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

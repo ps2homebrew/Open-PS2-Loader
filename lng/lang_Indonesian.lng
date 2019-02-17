@@ -1,5 +1,5 @@
-# Indonesian translation by verislasher
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Indonesian translation by verislasher completed by jbliz
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Indonesian
 Open PS2 Loader %s
 Simpan Perubahan
@@ -19,7 +19,7 @@ Aplikasi
 Tema
 Bahasa
 Sistem akan dimatikan.
-Keluar ke Browser /OSDSYS?
+Keluar ke Browser?
 Batal perbarui?
 %d: Harddisk tak terdeteksi
 %d: Harddisk belum diformat
@@ -114,8 +114,8 @@ Melepas kaitan syscalls
 Lewati video
 Emulasi DVD-DL
 Nonaktifkan IGR
-Mode Penyimpanan Tinggi
-Sembunyikan mode  Dev9
+Tdk terpakai
+Unused
 Mengubah ukuran akan memformat ulang VMC
 Membuat
 Mulai
@@ -131,7 +131,7 @@ Kemajuan
 Berkas VMC ada
 Berkas VMC cacat, ukuran salah
 Berkas VMC harus dibuat
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Kesalahan dengan VMC %s, lanjutkan dengan MC fisik (Slot %d)?
 Segarkan otomatis
 Tentang
 Pengkode
@@ -182,8 +182,8 @@ H-POS
 Penyesuaian horisontal
 V-POS
 Penyesuaian Vertikal
-Overscan
-Overscan Adjustment
+Tampilan berlebih
+Penyesuaian Tampilan berlebih
 Lewati FMV
 Lompati Video Gerakan Penuh
 Setingan Cheat
@@ -212,12 +212,12 @@ Logo PS2
 Hanya ditampilkan untuk logo disc yang valid yang cocok dengan region konsol
 Konfigurasi PADEMU
 Pengaturan Stik Emulator
-Aktifkan Stik Emulator
+Aktifkan PadEmulator
 Hidup/matikan StikEmulator game dipilih.
 mode Stik Emulator
 Pilih mode Stik Emulator
-USB DualShock3/4
-BT DualShock3/4
+DualShock3/4 USB
+DualShock3/4 BT
 Setingan untuk port:
 Pilih port Stik Emulator untuk setingan
 Aktifkan emulasi
@@ -225,35 +225,42 @@ Hidup/matikan Stik Emulator port dipilih
 Aktifkan getar
 Hidup/matikan getar Stik Emulator port dipilih
 Alamat mac adaptor bluetooth Usb
-Kendali DS dipasangkan ke alamat mac:
+Pengontrol DS dipasangkan ke Alamat MAC:
 Pasangan
-Pasangan Kendali DS
-Pasangan kendali DS dgn alamat mac adaptor bluetooth
+Pasangan Pengontrol DS
+Pasangan Pengontrol DS dengan adaptor Alamat MAC Bluetooth.
 Tak tersambung
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+informasi adaptor Bluetooth
+Tampilkan informasi lain dan fitur didukung
+Versi HCI:
+Versi LMP:
+ID Pabrikan:
+Dukungan fitur:
+Ya
+Tidak
+adapter Bluetooth harus sepenuhnya cocok dengan Pengontrol DS3/DS4.
+adapter Bluetooth mungkin tidak bekerja dengan benar dengan Pengontrol DS3/DS4.
+Aktifkan emulasi Multitap
+Aktifkan/NonAktifkan emulasi Multitap untuk game dipilih.
+emulator Multitap pada port
+Pilih port untuk emulasi Multitap.
+Nonaktifkan solusi untuk DS3 palsu
+beberapa ds3s palsu butuh solusi, opsi ini akan nonaktif.
+Emulasikan FIELD flipping
+Perbaiki Game yang bermasalah di mode video progresif.
+Seting kunci Parental
+Kata sandi kunci parental
+Kosongkan untuk non aktif kunci Parental.
+Masukkan kata sandi kuci Parental
+Kesalahan kata sandi kunci Parental.
+Kunci Parental tidak aktif.
+Opsi Bentukan:
+Kesalahan - kata sandi tak bisa dipakai.
+Berkas VMC %s terfragmentasi. Gunakan kartu memori di slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

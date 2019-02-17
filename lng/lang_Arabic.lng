@@ -1,5 +1,5 @@
 # Arabic Translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Arabic
 Open PS2 Loader %s
 تثبيت التغييرات
@@ -19,7 +19,7 @@ Open PS2 Loader %s
 تيمات
 لغات
 سيتم ايقاف تشغيل النظام
-Exit to Browser/OSDSYS?
+Exit to Browser?
 الغاء التحديث ?
 %d: لم يتم العثور على القرص الصلب
 %d: القرص المضغوط غير منسق
@@ -114,8 +114,8 @@ NetBIOS
 Skip videos
 تقليد DVD-DL
 الغاء IGR
-High module storage
-اخفاء بيانات  DEV9
+Unused
+Unused
 تغيير الحجم يؤدي الى حذف ال VMC 
 صنع
 بدء
@@ -209,7 +209,7 @@ PS2RD
 البدء الاوتوماتيكي
 النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
 PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
+(Only displayed for a valid disc logo which matches the console's region)
 Configure PADEMU
 Pad Emulator Settings
 Enable PadEmulator
@@ -227,8 +227,8 @@ Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
 Pair
-Pair DS controller
-Pair DS controller with bluetooth adapter mac address.
+Pair DS Controller
+Pair DS Controller with bluetooth adapter mac address.
 Not connected
 Bluetooth adapter information
 Shows more information and supported features
@@ -257,3 +257,10 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

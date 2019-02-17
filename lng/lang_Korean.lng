@@ -1,5 +1,5 @@
 # Korean translation by ddinghoya
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Korean
 Open PS2 Loader %s
 저장 변경
@@ -19,7 +19,7 @@ ETH 게임
 테마
 언어
 시스템 전원이 꺼집니다.
-Browser/OSDSYS 종료합니까?
+Browser 종료합니까?
 업데이트 취소합니까?
 %d: HDD를 검색할 수 없습니다
 %d: HDD가 포맷되지 않았습니다
@@ -114,8 +114,8 @@ USB 게임 손상 검사
 Skip videos
 DV-DL 에뮬레이트
 IGR 비활성
-고성능 모듈 스토리지
-DEV9 모듈 숨기기
+Unused
+Unused
 크기 변경 시 VMC 재포멧 됩니다.
 생성
 시작
@@ -131,7 +131,7 @@ VMC 구성
 VMC 파일 존재
 잘못된 VMC 파일, 크기가 다릅니다.
 VMC 파일이 생성되야 합니다.
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+VMC %s 에러, 메모리카드(슬롯 %d)에서 계속합니까?
 자동 새로 고침
 오픈 PS2 로더에 관하여
 개발자
@@ -182,8 +182,8 @@ H-POS
 수평 조정
 V-POS
 수직 조정
-Overscan
-Overscan Adjustment
+오버스캔
+오버스캔 조정
 FMV 건너뛰기
 풀 모션 비디오 건너뛰기
 치트 설정
@@ -230,22 +230,22 @@ DS 컨트롤러 맥 주소와 페어링:
 DS 컨트롤러 페어링
 블루투스 어댑터 맥 주소가 있는 DS 컨트롤러 페어
 연결되지 않음
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+블루투스 어댑터 정보
+더 많은 정보와 지원되는 기능을 보여줌.
+HCI 버전:
+LMP 버전:
+제조업체 ID:
+지원 기능:
+예
+아니오
+블루투스 어댑터는 DS3/DS4 컨트롤러와 완벽하게 호환되어야 합니다.
+블루투스 어댑터가 DS3/DS4 컨트롤러에서 올바르게 작동하지 않을 수 있습니다.
+멀티탭 에뮬레이션 활성화
+선택한 게임을 위한 멀티탭 에뮬레이션 켬/끔.
+포트상의 멀티탭 에뮬레이터
+멀티탭 에뮬레이션을 위한 포트를 선택.
+Fake DS3에 대한 해결방법 비활성화
+일부 fake ds3s는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성.
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -257,3 +257,10 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

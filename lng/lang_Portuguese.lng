@@ -1,5 +1,5 @@
 # Portuguese translation by danielb
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Portuguese
 Open PS2 Loader %s
 Salvar alterações
@@ -19,7 +19,7 @@ Aplicações
 Temas
 Idioma
 O sistema irá desligar.
-Sair p/ o Browser/OSDSYS?
+Sair para o Navegador?
 Cancelar atualização?
 %d: Disco Rigido não detetado
 %d: Disco Rigido não formatado
@@ -114,8 +114,8 @@ Desativar chamadas do sistema
 Saltar vídeos
 Emular DVD-DL
 Desativar IGR
-Armazenamento elevado do módulo
-Esconder módulo dev9
+Não utilizado
+Não utilizado
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
 Iniciar
@@ -131,7 +131,7 @@ Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 Arquivo VMC precisa ser criado!
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Erro com o ficheiro VMC, continuar com MC físico?
 Atualização automática
 Créditos
 Desenvolvedores
@@ -183,7 +183,7 @@ Definir compensação horizontal
 Ajuste vertical
 Definir compensação vertical
 Overscan
-Overscan Adjustment
+Ajustar Overscan
 Saltar FMV
 Saltar vídeos
 Opções de Cheat
@@ -212,48 +212,55 @@ Logo PS2
 Apenas é exibido para um disco válido e que seja da mesma região da consola
 Configurar PADEMU
 Definições do Emulador de Comando
-Ativar Emulador de Comando
+Ativar Emulador Comando
 Ligar/Desligar o emulador para o jogo selecionado.
 Modo do Emulador de Comando
 Selecione o modo do Emulador de Comando.
 DualShock3/4 USB
 DualShock3/4 BT
 Definições para a porta:
-Selecione a porta do Emulador de Comando para as definições.
+Selecione a porta do Emulador de Comando para as definições
 Ativar emulação
 Ligar/Desligar o emulador para a porta selecionada.
-Ativar vibração.
+Ativar vibração
 Ligar/Desligar vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
-Endereço MAC do comando DS emparelhado:
+Comando DS emparelhado ao endereço MAC:
 Emparelhar
 Emparelhar comando DS
-Emparelhar comando DS com o seguinte endereço MAC:
+Emparelhar comando DS com endereço MAC do adaptador Bluetooth.
 Não ligado
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Informação do adaptador Bluetooth
+Mostrar mais informação e recursos suportados
+Versão HCI:
+Versão LMP:
+ID do Fabricante:
+Recursos suportados:
+Sim
+Não
+O adaptador Bluetooth deve ser completamente compatível com comandos DS3/DS4.
+O adaptador Bluetooth pode não funcionar corretamente com comandos DS3/DS4.
+Ativar emulação Multitap
+Ligar/Desligar a emulação Multitap para o jogo selecionado
+Emulador Multitap na porta
+Selecionar porta para o emulador de Multitap.
+Desativar workaround para clones DS3
+Alguns clones DS3 precisam de workaround, esta opção irá desativar-lo.
+Emular inversão de CAMPO
+Correção para jogos que apresentam falhas nos modos de vídeo progressivo.
+Definições do Controlo Parental
+Password do Controlo Parental
+Deixe em branco para desativar o Controlo Parental.
+Introduza a password do Controlo Parental
+Password do Controlo Parental incorreta.
+Controlo Parental desativado.
+Opções de compilação:
+Erro - esta password não pode ser usada.
+O ficheiro VMC %s está fragmentado. Continuar com o Cartão de Memoria na ranhura %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

@@ -1,5 +1,5 @@
 # Hungarian translation by co5oos
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Hungarian
 Open PS2 Loader %s
 Változtatások mentése
@@ -71,10 +71,10 @@ Manuális
 HDL szerver indítása
 HDL Szerver Elindul...
 HDL Szerver Fut...
-Failed to start HDL Server.
-HDL Server Unloading...
-IGR path
-Background color
+Az HDL Szerver elindítása Sikertelen.
+Az HDL Szerver kirakodása...
+IGR útvonala
+Háttér színe
 Szöveg szín
 - PS2 -
 - SMB Szerver -
@@ -114,8 +114,8 @@ Syscalls kiakasztás
 Videók átugrása
 DVD-DL emulálás
 IGR letiltása
-Magas modul tárhely
-DEV9 modul elrejtése
+Nem Használt
+Nem Használt
 A méretváltoztatás leformázza a VMC-t
 Létrehoz
 Indít
@@ -131,7 +131,7 @@ Folyamat
 VMC fájl létezik
 Érvénytelen VMC fájl, helytelen méret
 VMC fájl létrehozása szükséges
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Hiba a VMC-vel %s, folytatás a fizikai MC-vel (foglalat %d) ?
 Automatikus frissítés
 Névjegy
 Kódolók
@@ -148,7 +148,7 @@ Infó
 Testreszabott ELF
 Szín szelekció
 Újracsatlakozás
-Leave empty to list shares
+Hagyja üresen a megosztások listázásához
 ETH előtag elérési út
 Backspace
 Szóköz
@@ -183,9 +183,9 @@ Vízszintes Szabályozás
 Függőleges-Pozíció
 Függőleges Szabályozás
 Overscan
-Overscan Adjustment
+Overscan Beállítása
 FMV Átugrása
-Átugorja a  Full Motion Videókat
+Átugorja a  Full Motion Videókat
 Csalás Beállítások
 PS2RD Csalás Motor engedélyezése
 Engedd a PS2RD Csalás motornak, hogy patch-elje a játékodat.
@@ -212,7 +212,7 @@ PS2 Logó
 Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
 PADEMU konfigurálás
 Pad Emulator Beállítások
-Pad Emulátor engedélyezése
+PadEmulator Engedélyezése
 Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
 Pad Emulátor mód
 Válassza ki a  Pad Emulátor módját.
@@ -225,35 +225,42 @@ Be/ki kapcsolja a Pad Emulátor-t a kiválasztott porthoz.
 Rezgés engedélyezése
 Be/ki kapcsolja a rezgést a Pad Emulátor kiválasztott portjához.
 Usb bluetooth adapter mac címe:
-DS Kontroller párosítva erre a mac címre :
+DS Kontroller a következő MAC címhez pároztatva:
 Párosítás
-DS kontroller párosítása
-DS kontroller párosítása bluetooth adapter mac címmel.
+DS Kontroller Pároztatása
+DS Kontroller Pároztatása Bluetooth adapter MAC címmel.
 Nincs csatlakoztatva
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Bluetooth adapter információ
+Több információ és támogatott funkciók mutátása
+HCI Verzió:
+LMP Verzió:
+Gyártó ID:
+Támogatási funkciók:
+Igen
+Nem
+A Bluetooth adapternek teljes mértékben kompatibilisnek kell lennie a DS3/DS4 kontrollerekkel.
+A Bluetooth adapter nem biztos, hogy megfelelően fog működni DS3/DS4 kontrollerekkel.
+Multitap emuláció Engedélyezése
+ki/be kapcsolja Multitap emulációt a kiválasztott játékhoz.
+Multitap emulátor ezen a porton
+Válassza ki a portot a Multitap emulációhoz.
+Megkerülés letiltása a hamisítvány DS3-hoz.
+Néhány hamis ds3-hoz megkerülés szükséges, ez az opció letiltja ezt.
+FIELD flipping emulálása
+Fix azon játékokhoz, melyek hibát produkálnak progresszív videó mód alatt.
+Gyerekzár Beállítások
+Gyerekzár Jelszó
+Hagyja üresen a gyerekzár kikapcsolásához.
+Írja be a gyerekzár jelszót
+Gyerekzár jelszó helytelen.
+Gyerekzás kikapcsolva.
+Build Opciók:
+Hiba - ez a jelszó nem használható.
+VMC %s fájl töredezett. Folytatás a %d foglalatban lévő Memória Kártyával?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

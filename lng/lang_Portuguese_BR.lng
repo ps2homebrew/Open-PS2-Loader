@@ -1,5 +1,5 @@
 # Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
@@ -19,7 +19,7 @@ Aplicativos
 Temas
 Idioma
 O sistema será desligado.
-Sair para o Navegador/OSDSYS?
+Sair para o Navegador?
 Cancelar as atualizações?
 %d: O Disco Rígido não foi detectado
 %d: O Disco Rígido não está formatado
@@ -114,8 +114,8 @@ Desativar chamadas do sistema
 Pular vídeos
 Emular DVD-DL
 Desativa o IGR
-Armazenamento dos módulos elevados
-Esconder módulo dev9
+Sem uso
+Sem uso
 Mudando de tamanho, formatará o VMC
 Criar
 Iniciar
@@ -252,8 +252,15 @@ Configurações de bloqueio parental
 Senha do bloqueio parental
 Deixe em branco para desativar o bloqueio parental.
 Insira a senha do bloqueio parental
-A seha do bloqueio parental está incorreta.
+A senha do bloqueio parental está incorreta.
 Bloqueio parental desativado.
 Opção de Montagem:
 Erro - Esta senha não pode ser usada.
 O arquivo do VMC %s está fragmentado. Continuar com o Memory Card do slot %d?
+Configurações de Áudio
+Ativar feito Sonoro
+Ativar Som de Inicialização
+Volume do Efeito Sonoro
+Volume do Som de Inicialização
+Confirmar as mudanças do modo de vídeo?
+Cache Game List (HDD)

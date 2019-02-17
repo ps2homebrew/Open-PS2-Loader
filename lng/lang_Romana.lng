@@ -1,0 +1,266 @@
+# Romana translation by MRAdyy
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+Romana
+Open PS2 Loader %s
+Salvare Setari
+Inapoi
+Config. retea
+Optiuni avansate
+<nici-o valoare>
+Setari salvate...
+Eroare in scrierea setarilor!
+Iesire
+Setari
+Meniu
+Jocuri pe USB
+Jocuri pe HDD
+Jocuri cu cablu LAN
+Aplicatii
+Teme
+Limba
+Sistemul va fi oprit.
+Iesire OPL?
+Anulezi actualizarea?
+%d: HDD-ul nu a fost gasit
+%d: HDD-ul nu este formatat
+%d: Eroare pornire retea
+%d: Nici-un adaptor de retea gasit
+%d: Nu se poate conecta la serverul SMB
+%d: Nu se poate loga la serverul SMB
+%d: Nu se poate deschide serverul SMB
+%d: Nu se poate lista fisierele din serverul SMB
+%d: Nu s-au gasit jocuri!
+%d: Server DHCP mort
+%d: Nu s-a gasit o conexiune la retea
+Pornit
+Oprit
+Bine
+Selectare
+Anulare
+Cerc
+Cruce
+Lista jocuri
+Setari joc
+Sterge toate setarile
+Au fost sterse toate butoanele jocului
+Miscare
+Incet
+Medium
+Rapid
+Meniu implicit
+Incarcati de pe disc
+Va rugam asteptati
+Eroare in incarcarea Id-ului al jocului
+Sortare automata
+Eroare in incarcarea fisierlui limba
+Oprire culori depanare
+Nici-o maneta gasita, se asteapta...
+Activati Coperta
+Ecran Lat
+Oprire
+Se incarca configurare
+Se salveaza configurarea
+Pornire dispozitiv
+Reimprospatare
+Modul de pornire al dispozitivului USB
+Modul de pornire al dispozitivului HDD
+Modul de pornire al dispozitivului Retea
+Modul de pornire aplicatii
+Automat
+Manual
+Pornire server HDL
+Se porneste serverul HDL...
+Serverul HDL ruleaza...
+Failed to start HDL Server.
+Serverul HDL se descarca...
+cale IGR
+Culoare fundal
+Culoare text
+- PS2 -
+- Server SMB -
+Tip adresa IP
+Statica
+DHCP
+adresa IP
+Addresa
+Masca
+Portal
+Server DNS
+Port
+Impartasire
+Utilizator
+Parola
+<nesetat>
+Tip de adresa
+IP
+NetBIOS
+Accepta
+Elemetul va fi sters definitiv, continuati?
+Redenumire
+Stergere
+Ruleaza
+Setari Imagine
+Activeaza operatiuni de scriere
+Verificați fragmentarea jocului USB
+Aminteste ultimul joc jucat
+Butonul Select
+"Eroare, jocul este fragmentat"
+"Eroare, nu a putut rula elementul"
+Testare
+Lasati goala pentru autentificarea GUEST.
+Citeste exact
+Modul sincron
+Dezactivați apelurile sistemului
+0 PSS mod
+Simulare DVD-DL
+Dezactivare IGR
+Unused
+Unused
+Schimbarea dimensiunii va reformata VMC
+Creeaza
+Start
+Modificare
+Anuleaza
+Resetare
+UUtilizeaza generic
+Configurare VMC
+Nume
+Dimensiune
+Stare
+Progres
+Fisierul VMC exista
+Fisier VMC invalid, dimensiunea este incorecta
+Fisier VMC trebuie creat
+Eroare la VMC %s, continuati cu cardul memorie fizic (slot %d)?
+Reimprospatare Automata
+Despre
+Ingineri
+Asigurarea calitatii
+Calea prefixului USB
+Lasa gol pentru a iesi in Browser
+Valoare in minute, 0 pentru a dezactiva rotirea
+Oprire automata HDD
+Mod video
+Culoare Dialog
+Culoare selectata
+Afisare pagina informatii
+Informatii
+ELF personalizat
+Selectie culoare
+Reconectare
+Lasa gol pentru a afișa impartasirile
+Cale prefix ETH
+Sterge
+Spatiu
+Intrare
+Mod
+Slot VMC 1
+Slot VMC 2
+ID Joc
+Mod DMA
+V-Sync
+Mod 1
+Mod 2
+Mod 3
+Mod 4
+Mod 5
+Mod 6
+Mod 7
+Mod 8
+Configurare GSM
+Mod conectare Retea
+100Mbit ful-dublu
+100Mbit jumatate-dublu
+10Mbit ful-dublu
+10Mbit jumatate-dublu
+Setari GSM
+Activare GSM
+Comuta GSM Pornit sau Oprit
+Mod Video
+Modul de afișare personalizat fortat
+Pozitie-H
+Pozitie Orizontala
+Pozitie-V
+Pozitie Verticala
+Overscan
+Overscan Adjustment
+Salta FMV
+Omite Cutscenes
+Setari coduri
+Activeaza PS2RD Cheat Engine
+Lasa PS2RD Cheat Engine sa-ti patchuiasca jocurile
+Mod PS2RD Cheat Engine
+Selectati automat sau Selectati Codurile
+Selectati Automat Codurile
+Selectati Codurile
+Eroare: nu s-a putut incarca fisierul Cheat
+Nici un cod gasit
+Descarca implicit
+Actualizare Retea
+Reincarcati inregistrarile existente?
+Actualizare esuata.
+Nu sa putut conecta serverul de actualizare.
+Actualizare finalizata.
+Actualizare anulata.
+Descarca setarile din retea?
+Setari personalizate
+Descarca implicite
+Pornire autpmata in %i secunde...
+Pornire automata
+Valoare in secunde, 0 pentru a opri pornirea automata
+PS2 Logo
+Only displayed for a valid disc logo which matches the console's region
+Configure PADEMU
+Pad Emulator Settings
+Enable Pad Emulator
+Turns on/off PadEmulator for selected game.
+Pad Emulator mode
+Select Pad Emulator mode.
+DualShock3 USB
+DualShock3 BT
+Settings for port:
+Select Pad Emulator port for settings.
+Enable emulation
+Turns on/off Pad Emulator for selected port.
+Enable vibration
+Turns on/off vibration for Pad Emulator selected port.
+Usb bluetooth adapter mac address:
+DS3 Controller paired to mac address:
+Pair
+Pair DS3 Controller
+Pair DS3 Controller with bluetooth adapter mac address.
+Not connected
+Bluetooth adapter information
+Shows more information and supported features
+HCI Version:
+LMP Version:
+Manufacturer ID:
+Support features:
+Yes
+No
+Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
+Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Enable Multitap emulation
+Turns on/off Multitap emulation for selected game.
+Multitap emulator on port
+Select port for Multitap emulation.
+Disable workaround for fake ds4
+Some fake ds3s need workaround, this option will disable it.
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
+Parental Lock Settings
+Parental Lock Password
+Leave blank to disable the parental lock.
+Enter Parental Lock Password
+Parental lock password incorrect.
+Parental lock disabled.
+Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

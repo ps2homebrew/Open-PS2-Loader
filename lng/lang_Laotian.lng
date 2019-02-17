@@ -1,5 +1,5 @@
 # Laotian translation by blackbutterfly (Anousith Phompida <noum_terry@hotmail.com>)
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Laotian
 Open PS2 Loader %s
 ບັນທຶກການປ່ຽນແປງ
@@ -19,7 +19,7 @@ Open PS2 Loader %s
 ຄຸນລັກສະນະຮູບຮ່າງ
 ພາສາ
 ລະບົບຈະຖືກປິດການໃຊ້ງານ
-ອອກໄປສູ່ໜ້າ Browser/OSDSYS
+ອອກໄປສູ່ໜ້າ Browser
 ຍົກເລີກການອັບເດດ?
 %d: ບໍ່ສາມາດຄົ້ນຫາ HardDisk ໄດ້
 %d: HardDisk ຍັງບໍ່ທັນໄດ້ Format
@@ -114,8 +114,8 @@ Unhook Syscalls
 ຂ້າມການຫຼິ້ນວິດິໂອ
 ປະມວນຜົນ DVD-DL 
 Disable IGR
-High module storage
-ປິດບັງ dev9 module
+Unused
+Unused
 ການປ່ຽນຂະໜາດຈະເຮັດໃຫ້ VMC(ກ້ອນເຊບສະເໝືອນຈິງ) ຖືກ format ໃໝ່
 ສ້າງ
 Start
@@ -227,8 +227,8 @@ Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
 Pair
-Pair DS controller
-Pair DS controller with bluetooth adapter mac address.
+Pair DS Controller
+Pair DS Controller with bluetooth adapter mac address.
 Not connected
 Bluetooth adapter information
 Shows more information and supported features
@@ -257,3 +257,10 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

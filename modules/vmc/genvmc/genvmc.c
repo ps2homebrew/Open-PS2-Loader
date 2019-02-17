@@ -6,12 +6,12 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
+#include <cdvdman.h>
 #include <stdio.h>
 #include <loadcore.h>
-#include <ioman.h>
-#include "ioman_add.h"
-#include <io_common.h>
+#include <iomanX.h>
 #include <intrman.h>
+#include <mcman.h>
 #include <thsemap.h>
 #include <sysclib.h>
 #include <sysmem.h>
@@ -32,15 +32,15 @@
 IRX_ID(MODNAME, 1, 1);
 
 // driver ops protypes
-int genvmc_dummy(void);
-int genvmc_init(iop_device_t *dev);
-int genvmc_deinit(iop_device_t *dev);
-int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen);
+static int genvmc_dummy(void);
+static int genvmc_init(iop_device_t *dev);
+static int genvmc_deinit(iop_device_t *dev);
+static int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen);
 
 // driver ops func tab
-void *genvmc_ops[27] = {
-    (void *)genvmc_init,
-    (void *)genvmc_deinit,
+static iop_device_ops_t genvmc_ops = {
+    &genvmc_init,
+    &genvmc_deinit,
     (void *)genvmc_dummy,
     (void *)genvmc_dummy,
     (void *)genvmc_dummy,
@@ -62,64 +62,26 @@ void *genvmc_ops[27] = {
     (void *)genvmc_dummy,
     (void *)genvmc_dummy,
     (void *)genvmc_dummy,
-    (void *)genvmc_devctl,
+    &genvmc_devctl,
     (void *)genvmc_dummy,
     (void *)genvmc_dummy,
     (void *)genvmc_dummy};
 
 // driver descriptor
-static iop_ext_device_t genvmc_dev = {
+static iop_device_t genvmc_dev = {
     "genvmc",
     IOP_DT_FS | IOP_DT_FSEXT,
     1,
     "genvmc",
-    (struct _iop_ext_device_ops *)&genvmc_ops};
+    &genvmc_ops};
 
-// from cdvdman
-typedef struct
-{
-    u8 stat;
-    u8 second;
-    u8 minute;
-    u8 hour;
-    u8 week;
-    u8 day;
-    u8 month;
-    u8 year;
-} cd_clock_t;
-
-int sceCdRC(cd_clock_t *rtc); // #51
-
-int sceMcDetectCard(int port, int slot);                         // #05
-int sceMcReadPage(int port, int slot, int page, char *mcbuffer); // #18
-int sceMcGetCardType(int port, int slot);                        // #39
-
-
-// mc file attributes
-#define SCE_STM_R 0x01
-#define SCE_STM_W 0x02
-#define SCE_STM_X 0x04
-#define SCE_STM_C 0x08
-#define SCE_STM_F 0x10
-#define SCE_STM_D 0x20
-#define sceMcFileAttrReadable SCE_STM_R
-#define sceMcFileAttrWriteable SCE_STM_W
-#define sceMcFileAttrExecutable SCE_STM_X
-#define sceMcFileAttrDupProhibit SCE_STM_C
-#define sceMcFileAttrFile SCE_STM_F
-#define sceMcFileAttrSubdir SCE_STM_D
-#define sceMcFileCreateDir 0x0040
-#define sceMcFileAttrClosed 0x0080
-#define sceMcFileCreateFile 0x0200
-#define sceMcFile0400 0x0400
-#define sceMcFileAttrPDAExec 0x0800
-#define sceMcFileAttrPS1 0x1000
-#define sceMcFileAttrHidden 0x2000
-#define sceMcFileAttrExists 0x8000
+#define sceMcDetectCard McDetectCard
+#define sceMcReadPage McReadPage
+#define sceMcGetCardType McGetMcType
 
 // SONY superblock magic & version
-static char SUPERBLOCK_MAGIC[] = "Sony PS2 Memory Card Format ";
-static char SUPERBLOCK_VERSION[] = "1.2.0.0";
+static const char SUPERBLOCK_MAGIC[] = "Sony PS2 Memory Card Format ";
+static const char SUPERBLOCK_VERSION[] = "1.2.0.0";
 
 // superblock struct
 typedef struct
@@ -154,32 +116,6 @@ typedef struct
     u32 unknown4;
     int unknown5;
 } MCDevInfo;
-
-typedef struct _sceMcStDateTime
-{
-    u8 Resv2;
-    u8 Sec;
-    u8 Min;
-    u8 Hour;
-    u8 Day;
-    u8 Month;
-    u16 Year;
-} sceMcStDateTime;
-
-typedef struct
-{                             // size = 512
-    u16 mode;                 // 0
-    u16 unused;               // 2
-    u32 length;               // 4
-    sceMcStDateTime created;  // 8
-    u32 cluster;              // 16
-    u32 dir_entry;            // 20
-    sceMcStDateTime modified; // 24
-    u32 attr;                 // 32
-    u32 unused2[7];           // 36
-    char name[32];            // 64
-    u8 unused3[416];          // 96
-} McFsEntry;
 
 #define BLOCKKB 16
 
@@ -220,7 +156,7 @@ static void long_multiply(u32 v1, u32 v2, u32 *HI, u32 *LO)
 static int mc_getmcrtime(sceMcStDateTime *time)
 {
     register int retries;
-    cd_clock_t cdtime;
+    sceCdCLOCK cdtime;
 
     retries = 64;
 
@@ -229,28 +165,28 @@ static int mc_getmcrtime(sceMcStDateTime *time)
             break;
     } while (--retries > 0);
 
-    if (cdtime.stat & 128) {
-        *((u16 *)&cdtime.month) = 0x7d0;
-        cdtime.day = 3;
-        cdtime.week = 4;
-        cdtime.hour = 0;
-        cdtime.minute = 0;
-        cdtime.second = 0;
-        cdtime.stat = 0;
+    if (cdtime.stat & 0x80) {
+        time->Year = 2000;
+        time->Month = 3;
+        time->Day = 4;
+        time->Hour = 5;
+        time->Min = 6;
+        time->Sec = 7;
+        time->Resv2 = 0;
+    } else {
+        time->Resv2 = 0;
+        time->Sec = btoi(cdtime.second);
+        time->Min = btoi(cdtime.minute);
+        time->Hour = btoi(cdtime.hour);
+        time->Day = btoi(cdtime.day);
+
+        if ((cdtime.month & 0x10) != 0)  //Keep only valid bits: 0x1f (for month values 1-12 in BCD)
+            time->Month = (cdtime.month & 0xf) + 0xa;
+        else
+            time->Month = cdtime.month & 0xf;
+
+        time->Year = btoi(cdtime.year) + 2000;
     }
-
-    time->Resv2 = 0;
-    time->Sec = ((((cdtime.second >> 4) << 2) + (cdtime.second >> 4)) << 1) + (cdtime.second & 0xf);
-    time->Min = ((((cdtime.minute >> 4) << 2) + (cdtime.minute >> 4)) << 1) + (cdtime.minute & 0xf);
-    time->Hour = ((((cdtime.hour >> 4) << 2) + (cdtime.hour >> 4)) << 1) + (cdtime.hour & 0xf);
-    time->Day = ((((cdtime.day >> 4) << 2) + (cdtime.day >> 4)) << 1) + (cdtime.day & 0xf);
-
-    if ((cdtime.month & 0x10) != 0)
-        time->Month = (cdtime.month & 0xf) + 0xa;
-    else
-        time->Month = cdtime.month & 0xf;
-
-    time->Year = ((((cdtime.year >> 4) << 2) + (cdtime.year >> 4)) << 1) + ((cdtime.year & 0xf) | 0x7d0);
 
     return 0;
 }
@@ -387,9 +323,9 @@ static int vmc_mcformat(char *filename, int size_kb, int blocksize, int *progres
     // erase all clusters
     strcpy(msg, "Erasing VMC clusters...");
     memset(cluster_buf, 0xff, sizeof(cluster_buf));
-    for (i = 0; i < mcdi->clusters_per_card; i += 16) {
+    for (i = 0; i < mcdi->clusters_per_card; i += BLOCKKB) {
         *progress = i / (mcdi->clusters_per_card / 99);
-        r = mc_writecluster(genvmc_fh, i, cluster_buf, 16);
+        r = mc_writecluster(genvmc_fh, i, cluster_buf, BLOCKKB);
         if (r < 0) {
             if (r == -2) // it's user abort
                 r = -1000;
@@ -588,13 +524,13 @@ err_out:
 }
 
 //--------------------------------------------------------------
-int genvmc_dummy(void)
+static int genvmc_dummy(void)
 {
     return -EPERM;
 }
 
 //--------------------------------------------------------------
-int genvmc_init(iop_device_t *dev)
+static int genvmc_init(iop_device_t *dev)
 {
     genvmc_io_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
     genvmc_thread_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
@@ -604,7 +540,7 @@ int genvmc_init(iop_device_t *dev)
 }
 
 //--------------------------------------------------------------
-int genvmc_deinit(iop_device_t *dev)
+static int genvmc_deinit(iop_device_t *dev)
 {
     DeleteSema(genvmc_io_sema);
     DeleteSema(genvmc_thread_sema);
@@ -714,7 +650,7 @@ static int vmc_status(statusVMCparam_t *param)
 }
 
 //--------------------------------------------------------------
-int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, u32 arglen, void *buf, u32 buflen)
+static int genvmc_devctl(iop_file_t *f, const char *name, int cmd, void *args, unsigned int arglen, void *buf, unsigned int buflen)
 {
     register int r = 0;
 
@@ -768,15 +704,3 @@ int _start(int argc, char **argv)
     return MODULE_RESIDENT_END;
 }
 
-//--------------------------------------------------------------
-// Extra import tables
-
-DECLARE_IMPORT_TABLE(cdvdman, 1, 1)
-DECLARE_IMPORT(51, sceCdRC)
-END_IMPORT_TABLE
-
-DECLARE_IMPORT_TABLE(mcman, 1, 1)
-DECLARE_IMPORT(5, sceMcDetectCard)
-DECLARE_IMPORT(18, sceMcReadPage)
-DECLARE_IMPORT(39, sceMcGetCardType)
-END_IMPORT_TABLE

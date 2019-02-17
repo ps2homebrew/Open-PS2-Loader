@@ -86,7 +86,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 #define PADEMU_ARG
 #endif
     if (GameMode == USB_MODE PADEMU_ARG) {
-        LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=15,16");
+        LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=2,3");
     }
     if (GameMode == ETH_MODE) {
         LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);

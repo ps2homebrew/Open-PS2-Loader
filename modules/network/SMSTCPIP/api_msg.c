@@ -196,7 +196,7 @@ err_tcp(void *arg, err_t err)
         sys_mbox_post(conn->recvmbox, NULL);
     }
     if (conn->mbox != SYS_MBOX_NULL) {
-        sys_mbox_post(conn->mbox, NULL);
+        TCPIP_APIMSG_ACK(conn->mbox);
     }
     if (conn->acceptmbox != SYS_MBOX_NULL) {
         /* Register event with callback */
@@ -475,7 +475,7 @@ do_connected(void *arg, struct tcp_pcb *pcb, err_t err)
     if (conn->type == NETCONN_TCP && err == ERR_OK) {
         setup_tcp(conn);
     }
-    sys_mbox_post(conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(conn->mbox);
     return ERR_OK;
 }
 #endif
@@ -700,7 +700,7 @@ static void do_recv(struct api_msg_msg *msg)
     if (conn->pcb.tcp && conn->type == NETCONN_TCP)
         tcp_recved(conn->pcb.tcp, msg->msg.len);
 #endif
-    sys_mbox_post(conn->mbox, NULL);
+    TCPIP_APIMSG_ACK(conn->mbox);
 
 } /* end do_recv */
 

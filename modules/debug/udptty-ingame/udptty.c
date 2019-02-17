@@ -20,7 +20,6 @@
 #include <thsemap.h>
 #include <ioman.h>
 #include <intrman.h>
-#include "intrman_add.h"
 #include <sysclib.h>
 #include <sysmem.h>
 #include <thbase.h>
@@ -87,13 +86,13 @@ typedef struct _KprArg
     int calls;
 } KprArg;
 
-KprArg g_kprarg;
+static KprArg g_kprarg;
 
 #define KPR_BUFFER_SIZE 0x1000
-char kprbuffer[KPR_BUFFER_SIZE];
+static char kprbuffer[KPR_BUFFER_SIZE];
 
 
-void PrntFunc(void *common, int chr)
+static void PrntFunc(void *common, int chr)
 {
     KprArg *kpa = (KprArg *)common;
 
@@ -122,12 +121,12 @@ void *Kprnt(void *common, const char *format, void *arg)
     return 0;
 }
 
-void *Kprintf_Handler(void *common, const char *format, void *arg)
+static void *Kprintf_Handler(void *common, const char *format, va_list ap)
 {
     KprArg *kpa = (KprArg *)common;
     void *res;
 
-    res = intrman_14(Kprnt, kpa, (void *)format, arg);
+    res = (void*)CpuInvokeInKmode(Kprnt, kpa, format, ap);
 
     if (QueryIntrContext())
         iSetEventFlag(kpa->eflag, 1);
@@ -137,7 +136,7 @@ void *Kprintf_Handler(void *common, const char *format, void *arg)
     return res;
 }
 
-void KPRTTY_Thread(void *args)
+static void KPRTTY_Thread(void *args)
 {
     u32 flags;
     KprArg *kpa = (KprArg *)args;
@@ -146,14 +145,13 @@ void KPRTTY_Thread(void *args)
         WaitEventFlag(kpa->eflag, 1, WEF_AND | WEF_CLEAR, &flags);
 
         if (kpa->prpos) {
-            if (strncmp(kpa->kpbuf, "WARNING: WaitSema KE_CAN_NOT_WAIT", kpa->prpos - 2))
-                write(1, kpa->kpbuf, kpa->prpos);
+            write(1, kpa->kpbuf, kpa->prpos);
             kpa->prpos = 0;
         }
     }
 }
 
-void kprtty_init(void)
+static void kprtty_init(void)
 {
     iop_event_t efp;
     iop_thread_t thp;

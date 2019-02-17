@@ -1,5 +1,5 @@
 # Swedish translation by Flaya
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Swedish
 Open PS2 Loader %s
 Spara ändringar
@@ -19,7 +19,7 @@ Appar
 Tema
 Språk
 Systemet stängs av.
-Avsluta till Meny/OSDSYS?
+Avsluta till huvudmeny?
 Avbryt uppdatering?
 %d: Ingen Hårddisk hittad
 %d: Hårddisken ej formatterad
@@ -114,8 +114,8 @@ Släpp Syscalls
 Skippa Videos
 Emulera DVD-DL
 Inaktivera IGR
-Högmoduls-lagring
-Göm dev9 modul
+Används ej
+Används ej
 Ändra storleken kommer att formatera om VMC
 Skapa
 Start
@@ -131,7 +131,7 @@ Framsteg
 VMC fil existerar
 Ogiltig VMC fil, felaktig storlek
 VMC filen måste skapas
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d )?
 Automatisk uppdatering
 Om
 Kodare
@@ -182,8 +182,8 @@ Horisontell position
 Ställer Horisontell offset
 Vertikal position
 Ställer Vertikal förskjutning
-Overscan
-Overscan Adjustment
+Överskanning
+Överskanning justering
 Skippa FMV
 Skippar Full Motion Video
 Inställningar Fusk
@@ -212,12 +212,12 @@ PS2 Logo
 Visas bara när skivavbilden matchar konsolens region
 Konfigurera PADEMU
 Pad Emulator Inställningar
-Aktivera Pad Emulator
+Aktivera PadEmulator
 Slå av/på PadEmulator för valt spel.
 Pad Emulator läge
 Vlj Pad Emulator läge.
-DualShock3/4 USB
-DualShock3/4 BT
+DualShock3 / 4 USB
+DualShock3 / 4 BT
 Inställningar för port:
 Välj Pad Emulator port för inställningar.
 Aktivera emulation
@@ -225,35 +225,42 @@ Slå av/på Pad Emulator för vald port.
 Aktivera vibration
 Slå av/på vibration för Pad Emulator vald port.
 Usb bluetooth adapter mac address:
-DS Controller parkopplad till mac address:
+DS Controller kopplad till MAC-adress:
 Parkoppla
-Parkoppla DS controller
-Parkoppla DS controller till bluetooth adapter mac address.
+Para DS Controller
+Para DS-kontroller med Bluetooth-adapter MAC-adress.
 Ej ansluten
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Bluetooth-adapterinformation
+Visar mer information och funktioner som stöds
+HCI-version:
+LMP-version:
+Tillverkarens ID:
+Supportfunktioner:
+Ja
+Nej
+Bluetooth-adaptern ska vara fullt kompatibel med DS3 / DS4-kontroller.
+Bluetooth-adaptern kanske inte fungerar korrekt med DS3 / DS4-kontroller.
+Aktivera multitapemulering
+Slår på / av multitap emulering för valt spel.
+Multitap emulator på porten
+Välj port för multitap emulering.
+Inaktivera lösningen för falska DS3
+Några falska ds3s behöver lösningen, det här alternativet kommer att inaktivera det.
+Emulera FIELD vändning
+Fix för spel med problem i progressivt läge.
+Föräldrakontroll
+Lösenord för föräldrakontroll
+Ange inget för att inaktivera funktionen
+Ange lösenord för föräldrakontroll
+Fel lösenord för föräldrakontroll
+Föräldrakontroll inaktiverat
+Bygg-Alternativ:
+Fel - lösenordet kan ej användas.
+VMC %s filen är fragmenterad. Använd minneskort i port %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

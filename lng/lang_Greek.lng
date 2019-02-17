@@ -1,5 +1,5 @@
-# Greek translation by RivalK93
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# Greek translation by RivalK94
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Greek
 Open PS2 Loader %s
 Αποθήκευση αλλαγών
@@ -19,7 +19,7 @@ Open PS2 Loader %s
 Θέμα
 Γλώσσα
 Το σύστημα θα απενεργοποιηθεί.
-Έξοδος στο Browser/OSDSYS;
+Έξοδος στο Browser;
 Ακύρωση ενημέρωσης;
 %d: Δεν εντοπίστηκε Σκληρός Δίσκος.
 %d: Ο Σκληρός Δίσκος δεν έχει διαμορφωθεί.
@@ -28,21 +28,21 @@ Open PS2 Loader %s
 %d: Αδυναμία σύνδεσης με τον SMB Server.
 %d: Αδυναμία login στον SMB Server.
 %d: Αδυναμία ανοίγματος κοινής χρήσης SMB.
-%d: Αδυναμία απαρίθμισης κοινόχρηστων SMB.
-%d: Αδυναμία απαρίθμισης παιχνιδιών.
+%d: Αδυναμία απαρίθμησης κοινόχρηστων SMB.
+%d: Αδυναμία απαρίθμησης παιχνιδιών.
 %d: Ο DHCP Server δεν είναι διαθέσιμος.
 %d: Δεν υπάρχει σύνδεση δικτύου.
 Ναι
 Όχι
 OK
-Επιλ.
+Επιλογή
 Άκυρο
 Ο
 Χ
 Λίστα Παιχνιδιών
 Ρυθμίσεις
 Κατάργηση όλων των ρυθμίσεων
-Καταργήθηκαν όλα τα πλήκτρα για το παιχνίδι
+Καταργήθηκαν όλα τα πλήκτρα για το παιχνίδι.
 Scrolling
 Αργό
 Κανονικό
@@ -65,15 +65,15 @@ Widescreen
 Εκκίνηση λειτουργίας USB
 Εκκίνηση λειτουργίας HDD
 Εκκίνηση λειτουργίας ETH
-Εμφάνιση μενού Εφαρμογών
+Εκκίνηση μενού Εφαρμογών
 Αυτόματα
-Χειροκίνητα
+Μη αυτόματα
 Εκκίνηση HDL Server
 Γίνεται εκκίνηση HDL Server...
-Λειτουγία HDL Server...
+Λειτουργία HDL Server...
 Αποτυχία εκκίνησης HDL Server.
 Αποφόρτωση HDL Server...
-Θέση IGR
+Θέση In-Game-Reset (IGR)
 Χρώμα στο φόντο
 Χρώμα γραμματοσειράς
 - PS2 -
@@ -86,7 +86,7 @@ DHCP
 Μάσκα υποδικτύου
 Gateway
 DNS Server
-Port
+Θύρα
 Κοινόχρηστο
 Χρήστης
 Κωδικός
@@ -97,26 +97,26 @@ NetBIOS
 Αποδοχή
 Το αρχείο θα διαγραφεί οριστικά, συνέχεια;
 Μετ/σία
-Διαγρ.
+Διαγραφή
 Εκκίνηση
 Ρυθμίσεις οθόνης
 Λειτουργίες εγγραφής
 Έλεγχος κατακερματισμού USB
 Απομνημόνευση τελευταίου παιχν.
 Πλήκτρο επιλογής
-Σφάλμα, το παιχνίδι είναι κατακερματισμένο
-Σφάλμα, αδυναμία εκκίνησης του αρχείου
+Σφάλμα, το παιχνίδι είναι κατακερματισμένο.
+Σφάλμα, αδυναμία εκκίνησης του αρχείου.
 Δοκιμή
-Αφήστε το κενό για δικαιώματα GUEST
-Ακριβής ανάγνωση
-Συγχρονισμένη λειτουργία
-Αποκοπή Syscalls
-Skip videos
-Εξομοίωση DVD-DL
-Απενεργοποίηση IGR
-Μονάδα μνήμης
-Απόκρυψη ενότητας DEV9
-Αλλάζοντας το μέγεθος θα αναδιαμορφώστε τη VMC
+Αφήστε το κενό για δικαιώματα GUEST.
+Ακριβής ανάγνωση.
+Συγχρονισμένη λειτουργία ανάγνωσης.
+Αποκοπή Syscalls.
+Παράλειψη των videos.
+Προσομοίωση DVD-DoubleLayer δίσκου.
+Απενεργοποίηση In-Game-Reset(IGR).
+Αχρησιμοποίητο
+Unused
+Αλλάζοντας το μέγεθος θα αναδιαμορφώστε τη VMC.
 Δημιουργία
 Εκκίνηση
 Τροποποίηση
@@ -131,24 +131,24 @@ VMC γενικής χρήσης
 Το αρχείο VMC υπάρχει ήδη
 Μη έγκυρο αρχείο VMC, το μέγεθος είναι λάθος
 Πρέπει να δημιουργηθεί αρχείο VMC
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Σφάλμα VMC %s, συνέχεια με την κανονική MC (Κάρτα Μνήμης %d) ;
 Αυτόματη ανανέωση
 Σχετικά
 Προγραμματιστές
 Διασφάλιση ποιότητας
 Προεπιλεγμένη θέση USB
 Εκκίνηση συγκεκριμένου ELF μετά το IGR.
-Τιμή σε λεπτά, 0 για απενεργοποίηση του spin down
-Αυτόματο spin down του HDD
+Τιμή σε λεπτά, 0 για απενεργοποίηση του Spin-down.
+Αυτόματο Spin-down του HDD
 Λειτουργία βίντεο
 Χρώμα μηνυμάτων
 Χρώμα επιλεγμένου
 Εμφάνιση σελίδας πληροφοριών
-Πληρ.
-Προσαρμοσμένο ELF
+Πληροφ.
+Προκαθορισμένο ELF
 Επιλογή χρώματος
 Επανασύνδεση
-Αφήστε το κενό για απαρίθμηση κοινόχρηστων
+Αφήστε το κενό για απαρίθμηση κοινόχρηστων.
 Προεπιλεγμένη θέση ETH
 Σβήσιμο
 Κενό
@@ -175,26 +175,26 @@ Mode 8
 10Mbit half-duplex
 Ρυθμίσεις GSM
 Ενεργοποίηση GSM
-Ενεργοποιεί/απενεργοποιεί το GSM
+Ενεργοποιεί/απενεργοποιεί το GSM.
 VMODE
-Αναγκαστική Προσαρμοσμένη λειτουργία οθόνης
+Εξαναγκασμένη προσαρμογή λειτουργίας οθόνης.
 H-POS
-Οριζόντια ρύθμιση
+Οριζόντια ρύθμιση οθόνης.
 V-POS
-Κάθετη ρύθμιση
+Κάθετη ρύθμιση οθόνης.
 Overscan
-Overscan Adjustment
-Παράληψη FMV
-Παράληψη των βίντεο Full Motion
+Προσαρμογή του Overscan
+Παράλειψη FMV
+Παράλειψη των βίντεο Full Motion
 Ρυθμίσεις Cheats
 PS2RD Cheat Engine
-Patchάρισμα των παιχνιδιών από το PS2RD
+Patchάρισμα των παιχνιδιών από το PS2RD.
 Λειτουργία PS2RD
-Αυτόματη επιλογή cheats ή Επιλογή cheats παιχνιδιών
+Αυτόματη/Μη αυτόματη επιλογή cheats των παιχνιδιών.
 Αυτόματη επιλογή cheats
-Επιλογή cheats παιχνιδιών
+Μη αυτόματη επιλογή cheats
 Σφάλμα: Αποτυχία φόρτωσης αρχείου Cheat
-Δε βρέθηκαν cheats
+Δε βρέθηκαν cheats.
 Λήψη προεπιλεγμένων
 Ενημέρωση δικτύου
 Εκ νέου λήψη υπαρχόντων αρχείων;
@@ -204,56 +204,63 @@ Patchάρισμα των παιχνιδιών από το PS2RD
 Η ενημέρωση ακυρώθηκε.
 Λήψη ρυθμίσεων από το δίκτυο;
 Προσαρμοσμένες ρυθμίσεις
-Έγινε λήψη των προεπιλεγμένων
-Αυτόματη εκκίνηση σε %i"...
+Έγινε λήψη των προεπιλεγμένων.
+Αυτόματη εκκίνηση σε %i""...
 Αυτόματη εκκίνηση
 Τιμή σε δευτερόλεπτα, 0 για μη αυτόματη εκκίνηση
-PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
-Configure PADEMU
-Pad Emulator Settings
-Enable Pad Emulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
+Λογότυπο PS2
+Εμφάνιση μόνο για συμβατά λογότυπα δίσκων που ταιριάζουν με το console region.
+Ρυθμίσεις PadEmu
+Ρυθμίσεις προσομοιωτή Χειριστηρίου
+Ενεργοποίηση προσομοιωτή
+Ενεργοποιεί/απενεργοποιεί τον προσομοιωτή για το συγκεκριμένο παιχνίδι.
+Τύπος προσομοίωσης
+Επιλέξτε τον τύπο προσομοίωσης του χειριστηρίου.
 DualShock3/4 USB
-DualShock3/4 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS Controller paired to mac address:
-Pair
-Pair DS controller
-Pair DS controller with bluetooth adapter mac address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
+DualShock3/4 BlueTooth
+Ρυθμίσεις για θύρα:
+Επιλέξτε θύρα προς ρύθμιση.
+Ενεργοποίηση προσομοίωσης
+Ενεργοποιεί/απενεργοποιεί την προσομοίωση για τη συγκεκριμένη θύρα.
+Ενεργοποίηση δόνησης
+Ενεργοποιεί/απενεργοποιεί τη δόνηση για τη συγκεκριμένη θύρα.
+Διεύθυνση mac του προσαρμογέα BT:
+Διεύθυνση mac του χειριστηρίου DS:
+Σύζευξη
+Σύζευξη με χειριστήριο DualShock
+Σύζευξη του προσαρμογέα BlueTooth με το χειριστήριο DualShock.
+Μη συνδεδεμένο
+Πληροφορίες προσαρμογέα BlueTooth
+Εμφανίζει περισσότερες πληροφορίες και υποστηριζόμενες λειτουργίες.
+Έκδοση HCI:
+Έκδοση LMP:
+ID κατασκευαστή:
+Λειτουργίες υποστήριξης:
+Ναι
+Όχι
+Ο προσαρμογέας BlueTooth θα πρέπει να είναι πλήρως συμβατός με ελεγκτές DS3/DS4.
+Ο προσαρμογέας Bluetooth ενδέχεται να μη λειτουργεί σωστά με τα χειριστήρια DS3/DS4.
+Ενεργοποίηση Multitap emulation
+Ενεργοποιεί/απενεργοποιεί το Multitap emulation για το παιχνίδι.
+Multitap emulator στη θύρα
+Επιλέξτε θύρα για εξομοίωση Multitap.
+Απενεργ. workaround για ψεύτικα DS3
+Κάποια ψεύτικα DS3s χρειάζονται workaround, αυτή η επιλογή θα το απενεργοποιήσει.
+Εξομοίωση αντιστροφής του ΠΕΔΙΟΥ
+Επιδιόρθωση για παιχνίδια που glitchάρουν υπό progressive video modes.
+Ρυθμίσεις Γονικού Κλειδώματος
+Κωδικός πρόσβασης Γονικού Κλειδώματος
+Αφήστε το κενό για να απενεργοποιήσετε το Γονικό Κλείδωμα.
+Εισάγετε τον κωδικό Γονικού Κλειδώματος
+Εσφαλμένος κωδικός Γονικού Κλειδώματος.
+Το Γονικό Κλείδωμα είναι απενεργοποιημένο.
+Επιλογές Build:
+Σφάλμα - αυτός ο κωδικός πρόσβασης δεν μπορεί να χρησιμοποιηθεί.
+Το αρχείο VMC %s είναι κατακερματισμένο. Συνέχεια με την Κάρτα Μνήμης στην υποδοχή %d;
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

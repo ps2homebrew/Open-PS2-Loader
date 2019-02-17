@@ -1,5 +1,5 @@
 # French translation by ShaolinAssassin - @http://psx-scene.com/forums/members/shaolinassassin/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @http://psx-scene.com/forums/f150/open-ps2-loader-official-beta-revisions-releases-156209/
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 French
 Open PS2 Loader %s
 Sauvegarder
@@ -104,8 +104,8 @@ Opérations d'écriture
 Vérifier fragmentation (USB)
 Dernier jeu joué
 Touche de validation
-Erreur, le jeu est fragmenté
-Erreur, impossible de lancer l'item
+"Erreur, le jeu est fragmenté"
+"Erreur, impossible de lancer l'item"
 Tester les réglages
 Laisser le champ vide pour utiliser la session Invité
 Simuler la vitesse de lecture du CD/DVD
@@ -114,8 +114,8 @@ Purger OPL après lancement du jeu
 Passer les vidéos
 Émuler support double couche (DVD9 rippés en DVD5)
 Désactiver l'IGR (incompatible avec certains jeux)
-Charger les modules de stockage à une adresse plus élevée
-Renommer le module DEV9 en CDVDMAN
+Unused
+Unused
 Changer la taille de la VMC la formatera
 Créer
 Démarrer
@@ -131,7 +131,7 @@ Progression
 La VMC existe déjà 
 Fichier VMC non valide, taille incorrecte
 La VMC doit d'abord être créée
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Erreur sur VMC %s. Continuer sur la carte mém. physique %d ?
 Rafraîchissement automatique
 Crédits
 Développeurs
@@ -216,36 +216,36 @@ Emulateur manette
 Activer/Désactiver emulateur manette pour ce jeu
 Mode
 USB/Bluetooth
-DualShock3/4 USB
-DualShock3/4 Bluetooth
+DualShock3 USB
+DualShock3 Bluetooth
 Port
-1/2
+1-Feb
 Emulation manette
 Activer/Désactiver emulateur manette pour ce port
 Vibration
 Activer/Désactiver support vibration pour ce port
 Adresse MAC du récepteur bluetooth
-DualShock connectée à l'adresse MAC
+DualShock3 connectée à l'adresse MAC
 Apairer
-Apairer manette DS 
-Apairer manette DS avec l'adresse MAC du récepteur bluetooth
+Apairer manette DS3 
+Apairer manette DS3 avec l'adresse MAC du récepteur bluetooth
 Non connecté
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Informations sur l'adaptateur Bluetooth
+Afficher informations et fonctions supportées
+HCI:
+LMP:
+ID du fabricant:
+Fonctions supportées
+Oui
+Non
+Adaptateur bluetooth totalement compatible avec manettes DS3/4.
+Adaptateur bluetooth potentiellement non compatible avec manettes DS3/4.
+Emulation Multitap
+Activer/Désactiver emulation Multitap pour ce jeu
+Emulateur Multitap sur port manette
+Port 1/Port 2
+Désactiver correctif pour manettes clones DS3
+Désactive correctif permettant à certaines manettes clones DS3 de fonctionner
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -257,3 +257,10 @@ Parental lock disabled.
 Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

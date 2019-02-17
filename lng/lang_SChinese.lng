@@ -1,0 +1,266 @@
+# Simplified Chinese translation by eyu2007
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+Simplified Chinese
+Open PS2 Loader %s
+保存设置
+返回
+网络设置
+进阶设置
+<无数值>
+设置已保存...
+写入设置错误!
+离开
+设置
+选单
+USB 游戏
+HDD 游戏
+ETH 游戏
+应用程序
+主题
+语言
+系统电源将会关闭.
+退出到浏览界面?
+取消更新?
+%d: 检测不到硬盘
+%d: 硬盘没有格式化
+%d: 启动网络错误
+%d: 检测不到网卡
+%d: 无法连接 SMB 服务器
+%d: 无法登入 SMB 服务器
+%d: 无法开启 SMB 共享
+%d: 无法罗列 SMB 共享清单
+%d: 无法列出游戏清单
+%d: DHCP 服务器不存在
+%d: 无网络连接
+开启
+关闭
+确定
+选择
+取消
+O
+X
+游戏列表
+游戏设置
+移除所有设置
+移除游戏所有的设置
+滚动
+较慢
+中等
+较快
+默认选单
+从光盘中读取
+请稍后
+读取 游戏 ID 时出错
+自动滚动
+读取语言文件时出错
+禁用调试跳色
+未检测到摇杆, 等待中...
+显示游戏封面
+宽屏幕
+关机
+设置读取中
+设置储存中
+启动设备
+重新整理
+USB 设备启动模式
+HDD 设备启动模式
+ETH 设备启动模式
+应用程序启动模式
+自动
+手动
+启动 HDL 服务
+HDL 服务启动中...
+HDL 服务正在运行...
+启动 HDL 服务时出错.
+HDL 服务未能读取...
+IGR 位置
+背景颜色
+文字颜色
+- PS2 -
+- SMB 服务器 -
+IP 地址模式
+静态
+DHCP
+IP 地址
+地址
+子网掩码
+网关
+DNS 服务器
+端口
+共享
+使用者
+密码
+<无设置>
+地址格式
+IP
+NetBIOS
+允许
+项目将被永久删除, 继续吗?
+重新命名
+删除
+运行
+显示设置
+启用删除与重新命名功能
+检查 USB 游戏碎片
+记住最后一个玩的游戏
+选定键
+错误, 游戏有碎片
+错误, 无法运行该项目
+测试
+GUEST验证留空.
+精确读取
+同步模式
+脱开系统调用
+跳过 videos
+模拟 DVD-DL
+禁用 IGR
+Unused
+Unused
+改变大小将会重新格式化 VMC
+生成
+开始
+变更
+放弃
+重置
+使用通用
+设置 VMC
+名称
+大小
+状态
+进度
+VMC 档案已存在
+无效的 VMC 档案, 大小有误
+需要建立VMC 档案
+VMC %s 出错, 继续使用物理记忆卡吗 (slot %d)?
+自动重新整理
+关于
+程序
+测试
+USB 前缀路径
+自定义IGR启动文件
+数值以分钟计,设为 0 禁用降速
+自动 HDD 降速
+影片模式
+对话框颜色
+被选定颜色
+显示讯息页面
+讯息
+自定义 ELF
+颜色选项
+重新连接
+留空列出共享清单
+ETH 前缀路径
+退格
+空格
+回车
+模式
+VMC 插槽 1
+VMC 插槽 2
+游戏 ID
+DMA 模式
+垂直同步
+模式 1
+模式 2
+模式 3
+模式 4
+模式 5
+模式 6
+模式 7
+模式 8
+配置 GSM
+以太网链接模式
+100Mbit 全双工
+100Mbit 半双工
+10Mbit 全双工
+10Mbit 半双工
+GSM 设置
+启用 GSM
+切换 GSM 开或关
+VMODE
+强制自定义显示模式
+H-POS
+水平调整
+V-POS
+垂直调整
+过扫
+过扫调节
+跳过 FMV
+跳过全动态视频
+金手指设置
+启用 PS2RD 金手指引擎
+允许 PS2RD 金手指引擎对你的游戏进行补丁
+PS2RD 金手指引擎模式
+自动或手动选择游戏金手指
+自动选择金手指
+手动选择金手指
+错误: 读取金手指文件出错
+未发现金手指文件
+下载默认值
+网络更新
+重新下载现有记录?
+更新失败.
+连结更新服务器失败.
+更新已完成.
+更新已取消.
+从网络上下载设置?
+自定义设置
+已下载默认值
+将自动于 %i 秒后启动...
+自动启动
+以秒为单位,设为 0 来禁用自动启动
+PS2 Logo
+只显示与控制台区域匹配的有效磁盘标识
+配置PADEMU
+Pad模拟器设置
+开启Pad模拟器
+为选定的游戏开启/关闭pad模拟调节。
+Pad模拟器模式
+选择Pad模拟器模式。
+有线连接
+蓝牙连接
+设置端口:
+选择Pad模拟器端口
+开启模拟
+打开/关闭选定端口的模拟器
+开启振动
+打开/关闭选定端口的振动。
+USB蓝牙适配器MAC地址:
+D  S 手 柄   MAC地址:
+配对
+配对DS手柄
+蓝牙适配器和DS手柄进行MAC地址配对。
+没有连接
+蓝牙适配器信息
+显示更多的信息和支持的特性
+HCI版本:
+LMP版本:
+制造商ID:
+支持的功能:
+是
+否
+蓝牙适配器应该完全兼容DS3/DS4手柄
+蓝牙适配器可能无法与DS3/DS4手柄匹配
+开启多重模拟
+打开/关闭这个游戏的多重模拟.
+多重模拟端口
+选择进行多重模拟的端口
+禁用仿冒DS3手柄
+这个选项将使一些仿冒的DS3手柄无法工作
+Emulate FIELD flipping
+Fix for games that glitch under progressive video modes.
+Parental Lock Settings
+Parental Lock Password
+Leave blank to disable the parental lock.
+Enter Parental Lock Password
+Parental lock password incorrect.
+Parental lock disabled.
+Build Options:
+Error - this password cannot be used.
+VMC %s file is fragmented. Continue with Memory Card in slot %d?
+Audio Settings
+Enable Sound Effects
+Enable Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Confirm video mode change?
+Cache Game List (HDD)

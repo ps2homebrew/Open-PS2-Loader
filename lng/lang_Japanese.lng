@@ -1,8 +1,7 @@
-# Japanese Translation by yamamotonew
-# Last update: Jan. 3, 2019
-# Updated for OPL commit 8945719
+# Japanese translation by yamamotonew
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Japanese
-OPL %s
+Open PS2 Loader %s
 設定を保存する
 戻る
 ネットワーク設定
@@ -20,7 +19,7 @@ ETHゲーム
 テーマ
 言語
 システムを終了し電源を切ります
-ブラウザに戻りますか？
+ブラウザ/OSDSYSに戻りますか？
 変更をキャンセルしますか？
 %d: HDDが接続されていません
 %d: HDDがフォーマットされていません
@@ -116,7 +115,7 @@ Syscallの解除
 二層ディスク(DVD9)用設定
 IGRを無効化
 Unused
-ネットワーク機能(DEV9)無効化
+Unused
 サイズを変更するとVMCはフォーマットされます
 VMCファイルを作成
 開始
@@ -160,7 +159,7 @@ VMCスロット2
 ゲームID
 DMAモード
 V-Sync
-モード 1
+モード 1 
 モード 2
 モード 3
 モード 4
@@ -226,9 +225,9 @@ PADEMUを適用するポートを指定
 振動の有効化
 ポート毎に振動の有効/無効を指定
 BluetoothアダプタのMACアドレス:
-DSのペア設定MACアドレス:
+DSのペア設定MACアドレス　　　　:
 ペア設定
-DS3コントローラーをペア設定
+DSコントローラーをペア設定
 BluetoothのMACアドレスを指定してDSコントローラーをペア設定
 接続されていません
 Bluetooth adapter information
@@ -245,7 +244,7 @@ Enable Multitap emulation
 Turns on/off Multitap emulation for selected game.
 Multitap emulator on port
 Select port for Multitap emulation.
-Disable workaround for fake DS3
+Disable workaround for fake ds4
 Some fake ds3s need workaround, this option will disable it.
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
@@ -264,4 +263,4 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
-Cache Game List
+Cache Game List (HDD)

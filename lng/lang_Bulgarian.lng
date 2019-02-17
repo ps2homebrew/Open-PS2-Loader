@@ -1,5 +1,5 @@
 # Bulgarian translation by wisi - @http://psx-scene.com/forums/members/wisi/
-# For Open PS2 Loader 0.9.3 beta release (rev1062, commit before 0825b36)
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Bulgarian
 Open PS2 Loader %s
 Запазване на промените
@@ -114,8 +114,8 @@ NetBIOS
 0 PSS режим
 Емулиране на DVD-DL
 Изключване на IGR
-Зареждане на модулите във висока памет
-Скриване на модула DEV9
+Unused
+Unused
 При промяна на обема, VMC ще бъде форматирана!
 Създаване
 Стартиране
@@ -165,7 +165,7 @@ Game ID
            |  4
   5
   6
-Режими за съвместимост        |  7
+Режими за съвместимост      |  7 
   8
 GSM видеорежим
 Скорост на мрежата и режим
@@ -246,15 +246,21 @@ Eмулиране на Multitap
 Избор на порт, на който да се емулира Multitap.
 Деактивиране на корекция при фалшиви DS3
 Неоригинални DS3 контролери се нуждаят от тази корекция.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?  
-
+Емулация на FIELD-бит превкл.
+Корекция за игри с видеорежим с прогресивна развивка.
+Родителски контрол
+Парола
+Оставете празно за изключване на Родителски контрол.
+Въведете парола за Родителски контрол
+Паролата за Родителски контрол е невярна.
+Родителски контрол - изключен.
+Конфигурация:
+Грешка - невалидна парола.
+VMC %s файлът е фрагментиран. Продължаване с Memory Card в слот %d?
+Звукови настройки
+Звукови ефекти
+Звук при Начално зареждане
+Сила на Звуковите ефекти
+Сила на звука на Начално зареждане
+Потвърждаване на промените във видеорежима?
+Cache Game List (HDD)

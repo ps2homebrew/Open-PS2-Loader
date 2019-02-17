@@ -22,9 +22,9 @@
 # Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
 English
 OPL %s
-Save changes
+Save Changes
 Back
-Network config
+Network Config
 Advanced options
 <no values>
 Settings saved...
@@ -77,7 +77,7 @@ Disable Debug Colors
 No controller detected, waiting...
 Enable Cover Art
 Wide screen
-Power off
+Power Off
 Loading config
 Saving config
 Start device
@@ -216,7 +216,7 @@ Select game cheats
 Error: failed to load Cheat File
 No cheats found
 Download defaults
-Network update
+Network Update
 Re-download existing records?
 Update failed.
 Failed to connect to update server.

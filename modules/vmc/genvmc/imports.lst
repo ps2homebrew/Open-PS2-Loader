@@ -1,3 +1,7 @@
+cdvdman_IMPORTS_start
+I_sceCdRC
+cdvdman_IMPORTS_end
+
 ioman_IMPORTS_start
 I_DelDrv
 I_AddDrv
@@ -12,6 +16,12 @@ intrman_IMPORTS_start
 I_CpuSuspendIntr
 I_CpuResumeIntr
 intrman_IMPORTS_end
+
+mcman_IMPORTS_start
+I_McDetectCard
+I_McReadPage
+I_McGetMcType
+mcman_IMPORTS_end
 
 sysmem_IMPORTS_start
 I_AllocSysMemory

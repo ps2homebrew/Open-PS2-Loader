@@ -52,6 +52,6 @@ loadcore_IMPORTS_end
 
 intrman_IMPORTS_start
 I_QueryIntrContext
-I_intrman_14
+I_CpuInvokeInKmode
 intrman_IMPORTS_end
 

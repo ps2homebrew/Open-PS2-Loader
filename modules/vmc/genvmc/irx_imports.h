@@ -3,9 +3,10 @@
 
 #include <irx.h>
 
+#include <cdvdman.h>
 #include <intrman.h>
 #include <ioman.h>
-#include "ioman_add.h"
+#include <mcman.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif

@@ -133,7 +133,7 @@ Fremskridt
 VMC-fil eksisterer allerede
 Ugyldig VMC-fil, størrelse er ukorrekt
 VMC-fil skal oprettes
-Fejl med VMC %s, fortsæt med fysisk MC (port %d) ?
+Fejl med VMC %s, fortsæt med fysisk MC (port %d)?
 Automatisk opdatering
 Om
 Kodere
@@ -265,7 +265,7 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
-Cache Game List (HD)
+Cache Game List (HDD)
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

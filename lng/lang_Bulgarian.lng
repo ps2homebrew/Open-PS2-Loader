@@ -1,5 +1,5 @@
 # translation by vsub and wisi
-# Last update: Jan. 30, 2019
+# Last update: Feb. 17, 2019
 # Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
@@ -21,7 +21,7 @@ ETH Игри
 Тема
 Език
 Изключване на системата?
-Изход към Browser?
+Изход от OPL?
 Отмяна на обновяването?
 %d: Твърд Диск не е свързан.
 %d: Твърд Диск не е форматиран.
@@ -247,25 +247,25 @@ Eмулиране на Multitap
 Емулация на Multitap за порт
 Избор на порт, на който да се емулира Multitap.
 Деактивиране на корекция при фалшиви DS3
-Неоригинални DS3 контролери се нуждаят от тази корекция.  
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HD)
+Неоригинални DS3 контролери се нуждаят от тази корекция.
+Емулация на FIELD-бит превкл.
+Корекция за игри с видеорежим с прогресивна развивка.
+Родителски контрол
+Парола
+Оставете празно за изключване на Родителски контрол.
+Въведете парола за Родителски контрол
+Паролата за Родителски контрол е невярна.
+Родителски контрол - изключен.
+Конфигурация:
+Грешка - невалидна парола.
+VMC %s файлът е фрагментиран. Продължаване с Memory Card в слот %d?
+Звукови настройки
+Звукови ефекти
+Звук при Начално зареждане
+Сила на Звуковите ефекти
+Сила на звука на Начално зареждане
+Потвърждаване на промените във видеорежима?
+Cache Game List (HDD)
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

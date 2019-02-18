@@ -1,5 +1,5 @@
 # Translation by yohokaru
-# Last update: Jan. 30, 2019
+# Last update: Feb. 17, 2019
 # Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
@@ -116,15 +116,15 @@ Odhookuj Syscalls
 Przejdź filmy
 Emuluj DVD-DL
 Wyłącz IGR
-Unused
-Unused
+Niewykorzystany
+Niewykorzystany
 Zmiana rozmiaru, zostanie sformatowany VMC
 Utwórz
 Start
 Modyfikuj
 Przerwij
 Reset
-Uzyj ogólnych
+Użyj ogólnych
 Konfiguruj VMC
 Nazwa
 Rozmiar
@@ -211,61 +211,61 @@ Auto start w %i s...
 Auto start
 Wartość w sekundach, 0 wyłącza auto start
 Logo PS2
-Pokaże się tylko jeśli region gry jest zgodny z regionem posiadanej konsoli.
-Configure PADEMU
-Pad Emulator Settings
-Enable PadEmulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
+Logo zostanie wyświetlone wyłącznie jeśli region gry i konsoli będzie taki sam
+Konfiguracja emulacji Pada
+Ustawienia emulacji Pada
+Włącz emulację Pada
+Włącza/wyłącza emulację Pada dla wybranej gry.
+Tryb emulacji Pada
+Wybierz tryb emulacji Pada.
 DualShock3/4 USB
 DualShock3/4 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-USB Bluetooth adapter MAC address:
-DS Controller paired to MAC address:
-Pair
-Pair DS controller
-Pair DS controller with Bluetooth adapter MAC address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HD)
+Ustawienia portu:
+Wybierz Port emulacji Pada dla ustawień
+Włącz emulację
+Włącz/wyłącz emulację Pada dla wybranego portu.
+Włącz wibracje.
+Włącz/wyłącz wibracje dla wybranego portu emulacji Pada.
+Adres MAC adaptera Bluetooth USB
+Kontroler DS sparowany z adresem MAC:
+Paruj
+Paruj kontroler DS
+Paruj kontroler DS z adresem mac adaptera bluetooth.
+Nie podłączony
+Informacje o adapterze Bluetooth
+Wyświetla więcej informacji i obsługiwane funkcje
+Wersja HCI:
+Wersja LMP:
+Identyfikator producenta:
+Wspierane funkcje:
+Tak
+Nie
+Adapter Bluetooth powinien być w pełni kompatybilny z kontrolerami DS3/DS4.
+Adapter Bluetooth może nie współpracować poprawnie z kontrolerami DS3/DS4.
+Włącz emulację Multitapa.
+Włącza/wyłącza emulację Multitapa dla wybranej gry.
+Emulacja Multitapa dla portu
+Wybierz port dla emulacji Multitapa.
+Nie stosuj obejścia dla klonów DS3.
+Niektóre klony DS3 wymagają obejścia, ta opcja to wyłączy.
+Emuluj FIELD flipping
+Poprawka dla gier w których występują usterki w trybie progresywnego obrazu.
+Ustawienia blokady rodzicielskiej
+Hasło blokady rodzicielskiej
+Pozostaw puste aby wyłączyć blokadę rodzicielską.
+Wprowadź hasło blokady rodzicielskiej.
+Nieprawidłowe hasło blokady rodzicielskiej.
+Blokada rodzicielska wyłączona.
+Opcje kompilacji:
+Błąd - to hasło nie może być użyte.
+Plik VMC %s jest pofragmentowany. Kontynuuj z kartą pamięci w gnieździe %d?
+Ustawienia dźwiękowe
+Efekty dźwiękowe
+Dźwięk startowy
+Głośność efektów dźwiękowych
+Głośność dźwięku startowego
+Potwierdź zmianę rozdzielczości
+Buforowanie listy gier (HDD)
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

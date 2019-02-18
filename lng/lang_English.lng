@@ -247,8 +247,8 @@ Turns on/off vibration for Pad Emulator selected port.
 USB Bluetooth adapter MAC address:
 DS Controller paired to MAC address:
 Pair
-Pair DS controller
-Pair DS controller with Bluetooth adapter MAC address.
+Pair DS Controller
+Pair DS Controller with Bluetooth adapter MAC address.
 Not connected
 Bluetooth adapter information
 Shows more information and supported features
@@ -283,7 +283,7 @@ Enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
-Cache Game List (HD)
+Cache Game List (HDD)
 PS1 Games
 PS1 Games display mode
 POPSTARTER.ELF not found at '%s'!

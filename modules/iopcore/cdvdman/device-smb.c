@@ -46,6 +46,7 @@ static void ps2ip_init(void);
 int (*plwip_close)(int s);                                                                                                                    // #6
 int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                        // #7
 int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                             // #9
+int (*plwip_recvfrom)(int s, void *mem, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);    // #10
 int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                        // #11
 int (*plwip_socket)(int domain, int type, int protocol);                                                                                      // #13
 int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                                 // #19
@@ -62,6 +63,7 @@ static void ps2ip_init(void)
     plwip_close = info.exports[6];
     plwip_connect = info.exports[7];
     plwip_recv = info.exports[9];
+    plwip_recvfrom = info.exports[10];
     plwip_send = info.exports[11];
     plwip_socket = info.exports[13];
     plwip_setsockopt = info.exports[19];

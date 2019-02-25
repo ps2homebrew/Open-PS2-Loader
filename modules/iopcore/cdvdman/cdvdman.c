@@ -210,9 +210,7 @@ static iop_sys_clock_t gCallbackSysClock;
 // buffers
 #define CDVDMAN_BUF_SECTORS 2
 static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS * 2048];
-
-#define CDVDMAN_FS_BUFSIZE CDVDMAN_FS_SECTORS * 2048
-static u8 cdvdman_fs_buf[CDVDMAN_FS_BUFSIZE];
+static u8 cdvdman_fs_buf[CDVDMAN_FS_SECTORS * 2048];
 
 #define CDVDMAN_MODULE_VERSION 0x225
 static int cdvdman_debug_print_flag = 0;

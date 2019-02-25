@@ -19,6 +19,8 @@
 #include "smb.h"
 #include "cdvd_config.h"
 
+#define USE_CUSTOM_RECV 1
+
 //Round up the erasure amount, so that memset can erase memory word-by-word.
 #define ZERO_PKT_ALIGNED(hdr, hdrSize) mips_memset((hdr), 0, ((hdrSize) + 3) & ~3)
 
@@ -39,6 +41,7 @@ int smb_io_sema = -1;
 extern int (*plwip_close)(int s);                                                                                                                    // #6
 extern int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                        // #7
 extern int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                             // #9
+extern int (*plwip_recvfrom)(int s, void *mem, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);    // #10
 extern int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                        // #11
 extern int (*plwip_socket)(int domain, int type, int protocol);                                                                                      // #13
 extern int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                                 // #19
@@ -606,7 +609,12 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
 {
     ReadAndXRequest_t *RR = &SMB_buf.smb.readAndXRequest;
     ReadAndXResponse_t *RRsp = &SMB_buf.smb.readAndXResponse;
-    register int r, padding, DataLength;
+    register int r, DataLength;
+#ifdef USE_CUSTOM_RECV
+    int rcv_size, expected_size;
+#else
+    int padding;
+#endif
 
     ZERO_PKT_ALIGNED(RR, sizeof(ReadAndXRequest_t));
 
@@ -624,6 +632,30 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
     RR->MaxCountHigh = (u16)(nbytes >> 16);
 
     nb_SetSessionMessage(sizeof(ReadAndXRequest_t));
+
+#ifdef USE_CUSTOM_RECV
+    //Send the whole message, including the 4-byte direct transport packet header.
+    r = SendData(main_socket, (char*)&SMB_buf, sizeof(ReadAndXRequest_t) + 4);
+    if (r <= 0)
+        return -1;
+
+    //offset 49 is the offset of the DataOffset field within the ReadAndXResponse structure.
+    //recvfrom() is a custom function that will receive the reply.
+    do {
+        rcv_size = plwip_recvfrom(main_socket, &SMB_buf, 49, readbuf, nbytes, 0, NULL, NULL);
+        if (rcv_size <= 0)
+            return -2;
+    } while (nb_GetPacketType() != 0); // dropping NBSS Session Keep alive
+
+    expected_size = nb_GetSessionMessageLength() + 4;
+    DataLength = (int)(((u32)RRsp->DataLengthHigh << 16) | RRsp->DataLengthLow);
+
+    // Handle fragmented packets
+    while (rcv_size < expected_size) {
+        r = plwip_recvfrom(main_socket, NULL, 0, &((u8 *)readbuf)[rcv_size - RRsp->DataOffset - 4], expected_size - rcv_size, 0, NULL, NULL); // - rcv_size
+        rcv_size += r;
+    }
+#else
     r = GetSMBServerReply(0, NULL, sizeof(ReadAndXResponse_t));
     if (r <= 0)
         return -EIO;
@@ -648,6 +680,7 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
         if (r <= 0)
             return -2;
     }
+#endif
 
     return DataLength;
 }

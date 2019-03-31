@@ -1,5 +1,5 @@
-# Translation by machiavel
-# Last update: Feb. 17, 2019
+# Translation by machiavel and Squall
+# Last update: March 29, 2019
 # Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
@@ -26,7 +26,7 @@ Annuler mise à jour?
 %d: HDD non détecté
 %d: HDD non formaté
 %d: Erreur démarrage réseau
-%d: adaptateur réseau non détecté
+%d: Adaptateur réseau non détecté
 %d: Ne peut se connecter au serveur SMB
 %d: Ne peut s'authentifier au serveur SMB
 %d: Ne peut ouvrir le partage SMB
@@ -34,10 +34,10 @@ Annuler mise à jour?
 %d: Ne peut lister les jeux
 %d: Serveur DHCP indisponible
 %d: Pas de connexion réseau
-On
-Off
+Acti.
+Désa.
 OK
-Select
+Sélect
 Annuler
 Cercle
 Croix
@@ -109,15 +109,15 @@ Bouton de sélection
 Erreur, le jeu est fragmenté
 Erreur, impossible de lancer l'objet
 Tester
-Laisser vide pour authentification invité
+Laissez vide pour authentification invité
 Lecture précise (simule la vitesse de lecture du CD/DVD)
 Mode synchrone (mode de lecture alternatif)
 Décrocher Syscalls (purge OPL après lancement du jeu)
 Passer les vidéos
 Émuler DVD-DL (DVD9 rippés en DVD5)
 Désactiver IGR (incompatible avec certains jeux)
-Unused
-Unused
+Inutilisé
+Inutilisé
 Changer la taille reformatera la VMC
 Créer
 Démarrer
@@ -146,11 +146,11 @@ Mode vidéo
 Couleur dialogue
 Couleur sélectionné
 Afficher page d'infos
-Infos.
+Info
 ELF personnalisé
 Sélection de la couleur
 Reconnecter
-Laisser vide pour lister les partages
+Laissez vide pour lister les partages
 Préfixe du chemin ETH
 Effacer
 Espace
@@ -221,14 +221,14 @@ Sélectionner le mode de PADEMU.
 DualShock3/4 USB
 DualShock3/4 BT
 Options du port:
-SSélectionner le port PADEMU pour les options.
+Sélectionner le port PADEMU pour les options.
 Activer l'émulation
 Active/désactive PADEMU pour ce port.
 Activer la vibration
 Active/désactive la vibration pour le port PADEMU sélectionné.
 Adress MAC de l'adapteur Bluetooth USB:
 Contrôleur DS appairé à l'adresse MAC:
-Apairer
+Appairer
 Appairer contrôleur DS
 Appairer contrôleur DS avec l'adresse MAC de l'adaptateur Bluetooth.
 Non Connecté
@@ -241,37 +241,37 @@ Fonctions supportées:
 Oui
 Non
 L'adaptateur Bluetooth devrait être parfaitement compatible avec les contrôleurs DS3/DS4.
-L'adaptateur Bluetooth peut ne pas fonctionner correctement avec les contrôleurs DS3/DS4
+L'adaptateur Bluetooth peut ne pas fonctionner correctement avec les contrôleurs DS3/DS4.
 Activer l'émulation du Multitap
 Active/désactive l'émulation du Multitap pour le jeu sélectionné.
 Émulateur Multitap sur le port
-Sélectionner le port pour émuler le Multitap
+Sélectionnez le port pour émuler le Multitap
 Désactiver correctif des DS3 simulées
 Certaines DS3 simulées nécessitent ce correctif, cette option le désactivera.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+Émuler FIELD flipping
+Fix pour les jeux qui glitch sous les modes vidéo progressifs.
+Contrôle parental
+Mot de passe du contrôle parental
+Laissez vide pour désactiver le contrôle parental.
+Entrez le mot de passe du contrôle parental
+Le mot de passe du contrôle parental est incorrect.
+Contrôle parental désactivé.
+Options du Build:
+Erreur - ce mot de passe ne peut pas être utilisé.
+Le fichier VMC %s est fragmenté. Continuer avec la carte mémoire dans le slot %d?
+Paramètres audio
+Activer les effets sonore
+Activer le son de démarrage
+Volume des effets sonore
+Volume du son de démarrage
+Confirmer le changement du mode vidéo?
+Cache liste de jeu (HDD)
 PS1 Games
-PS1 Games display mode
-POPSTARTER.ELF not found at '%s'!
-VCD file '%s' not found!
-An error occurred while renaming the file.
-An error occurred while deleting the file.
-Never buy OPEN-PS2-LOADER (OPL), instead get it free at:
-ifcaro OPL version at psx-scene.com
-OPL Daily Builds (DB) version at ps2-home.com
+Mode d'affichage des jeux PS1
+POPSTARTER.ELF non trouvé à '%s'!
+Fichier VCD '%s' non trouvé!
+Une erreur s'est produite lors du renommage du fichier.
+Une erreur s'est produite lors de la suppression du fichier.
+N'achetez jamais OPEN-PS2-LOADER (OPL), obtenez le gratuitement:
+version ifcaro OPL sur psx-scene.com
+version OPL Daily Builds (DB) sur ps2-home.com

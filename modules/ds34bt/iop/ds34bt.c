@@ -1158,7 +1158,7 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
         }
     }
 
-    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, arg);
+    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE + 23, l2cap_event_cb, arg);
     SignalSema(bt_dev.hid_sema);
 }
 

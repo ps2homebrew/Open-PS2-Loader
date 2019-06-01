@@ -758,17 +758,17 @@ static int guiPadEmuUpdater(int modified)
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADPORT, PadEmuEnable);
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_VIB, PadEmuPort & PadEmuEnable);
 
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, PadEmuMode & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC, PadEmuMode & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, (PadEmuMode == 1) & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC, (PadEmuMode == 1) & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR, (PadEmuMode == 1) & PadEmuEnable);
 
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, PadEmuMode & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, PadEmuMode & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, (PadEmuMode == 1) & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, (PadEmuMode == 1) & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, (PadEmuMode == 1) & PadEmuEnable);
 
-    diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, PadEmuMode & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, PadEmuMode & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND_STR, PadEmuMode & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, (PadEmuMode == 1) & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, (PadEmuMode == 1) & PadEmuEnable);
+    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND_STR, (PadEmuMode == 1) & PadEmuEnable);
 
     if (modified) {
         if (PadEmuMtap) {
@@ -796,7 +796,7 @@ static int guiPadEmuUpdater(int modified)
     PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
     PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
 
-    if (PadEmuMode) {
+    if (PadEmuMode == 1) {
         if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
             if (dg_discon) {
                 dgmacset = 0;

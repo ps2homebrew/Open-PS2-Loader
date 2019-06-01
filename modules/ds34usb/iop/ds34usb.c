@@ -60,7 +60,7 @@ static u8 link_key[] = //for ds4 authorisation
         0xC0, 0x7F, 0x12, 0xAA, 0xD9, 0x66, 0x3C, 0xCE
 };
 
-static u8 usb_buf[MAX_BUFFER_SIZE + 20] __attribute((aligned(4))) = {0};
+static u8 usb_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
 
 int usb_probe(int devId);
 int usb_connect(int devId);
@@ -239,7 +239,7 @@ static void usb_config_set(int result, int count, void *arg)
         DelayThread(10000);
         led[0] = led_patterns[pad][1];
         led[3] = 0;
-    } else if(ds34pad[pad].type == DS4) {
+    } else if (ds34pad[pad].type == DS4) {
         led[0] = rgbled_patterns[pad][1][0];
         led[1] = rgbled_patterns[pad][1][1];
         led[2] = rgbled_patterns[pad][1][2];
@@ -247,6 +247,7 @@ static void usb_config_set(int result, int count, void *arg)
     }
 
     LEDRumble(led, 0, 0, pad);
+    DelayThread(20000);
 
     ds34pad[pad].status |= DS34USB_STATE_RUNNING;
 
@@ -408,8 +409,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
         usb_buf[9] = led[0] & 0x7F; //LED Conf
 
-        if (led[3]) //means charging, so blink
-        {
+        if (led[3]) { //means charging, so blink
             usb_buf[13] = 0x32;
             usb_buf[18] = 0x32;
             usb_buf[23] = 0x32;
@@ -428,8 +428,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         usb_buf[7] = led[1]; //g
         usb_buf[8] = led[2]; //b
         
-        if (led[3]) //means charging, so blink
-        {
+        if (led[3]) { //means charging, so blink
             usb_buf[9] = 0x80; // Time to flash bright (255 = 2.5 seconds)
             usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
         }
@@ -502,7 +501,7 @@ void ds34usb_set_rumble(u8 lrum, u8 rrum, int port)
 {    
     if (port >= MAX_PADS)
         return;
-    
+
     Rumble(lrum, rrum, port);
 }
 
@@ -566,8 +565,11 @@ int ds34usb_get_bdaddr(u8 *data, int port)
 
             for (i = 0; i < 6; i++)
                 data[5 - i] = usb_buf[2 + i];
+                
+            ret = 1;
         } else {
             DPRINTF("DS34USB: ds3usb_get_bdaddr usb transfer error %d\n", ret);
+            ret = 0;
         }
     } else {
         ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x12, 0, 16, usb_buf, usb_cmd_cb, (void *)port);
@@ -577,15 +579,18 @@ int ds34usb_get_bdaddr(u8 *data, int port)
 
             for (i = 0; i < 6; i++)
                 data[5 - i] = usb_buf[15 - i];
+                
+            ret = 1;
         } else {
             DPRINTF("DS34USB: ds3usb_get_bdaddr usb transfer error %d\n", ret);
+            ret = 0;
         }
     }
 
     ds34pad[port].update_rum = 1;
     SignalSema(ds34pad[port].sema);
 
-    return 1;
+    return ret;
 }
 
 void ds34usb_set_bdaddr(u8 *data, int port)
@@ -697,7 +702,7 @@ void *rpc_sf(int cmd, void *data, int size)
             *(u8 *)data = ds34usb_get_status(*(u8 *)data);
             break;
         case DS34USB_GET_BDADDR:
-            *(u8 *)data = ds34usb_get_bdaddr((u8 *)data + 1, *(u8 *)data);
+            *(u8 *)data = ds34usb_get_bdaddr((u8 *)(data + 1), *(u8 *)data);
             break;
         case DS34USB_SET_BDADDR:
             ds34usb_set_bdaddr((u8 *)(data + 1), *(u8 *)data);

@@ -10,7 +10,7 @@ endif
 
 ifeq ($(USE_BT),1)
 IOP_BIN = bt_pademu.irx
-IOP_CFLAGS += -DBT -DUSE_THREAD
+IOP_CFLAGS += -DBT
 IOP_OBJS_DIR = obj.bt/
 IOP_OBJS += ds34bt.o
 endif

@@ -528,8 +528,7 @@ static void HCI_event_task(int result)
                 break;
 
             case HCI_EVENT_COMMAND_STATUS:
-                if (hci_buf[2]) // show status on serial if not OK
-                {
+                if (hci_buf[2]) { // show status on serial if not OK
                     DPRINTF("HCI Command Failed: \n");
                     DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                     DPRINTF("\t Command_OpCode(OGF) = 0x%02X \n", ((hci_buf[5] & 0xFC) >> 2));
@@ -539,8 +538,7 @@ static void HCI_event_task(int result)
 
             case HCI_EVENT_CONNECT_COMPLETE:
                 DPRINTF("HCI event Connect Complete: \n");
-                if (!hci_buf[2]) // check if connected OK
-                {
+                if (!hci_buf[2]) { // check if connected OK
                     DPRINTF("\t Connection_Handle 0x%02X \n", hci_buf[3] | ((hci_buf[4] & 0x0F) << 8));
                     DPRINTF("\t Requested by BD_ADDR: \n\t");
                     for (i = 0; i < 6; i++) {
@@ -645,8 +643,7 @@ static void HCI_event_task(int result)
                 }
                 DPRINTF("\n\t Link = 0x%02X \n", hci_buf[11]);
                 DPRINTF("\t Class = 0x%02X 0x%02X 0x%02X \n", hci_buf[8], hci_buf[9], hci_buf[10]);
-                for (i = 0; i < MAX_PADS; i++) //find free slot
-                {
+                for (i = 0; i < MAX_PADS; i++) { //find free slot
                     if (!pad_status_check(DS34BT_STATE_RUNNING, i) && ds34pad[i].enabled) {
                         if (pad_status_check(DS34BT_STATE_CONNECTED, i)) {
                             if (pad_status_check(DS34BT_STATE_DISCONNECTING, i)) //if we're waiting for hci disconnect event
@@ -657,8 +654,7 @@ static void HCI_event_task(int result)
                         break;
                     }
                 }
-                if (i >= MAX_PADS) //no free slot
-                {
+                if (i >= MAX_PADS) { //no free slot
                     hci_reject_connection(hci_buf + 2);
                     break;
                 }
@@ -667,8 +663,7 @@ static void HCI_event_task(int result)
                 ds34pad[pad].isfake = 0;
                 if (!disable_fake) {
                     ds34pad[pad].isfake = 1; //fake ds3
-                    for (i = 0; i < sizeof(GenuineMacAddress) / 3; i++) //check if ds3 is genuine
-                    {
+                    for (i = 0; i < sizeof(GenuineMacAddress) / 3; i++) { //check if ds3 is genuine
                         if (ds34pad[pad].bdaddr[5] == GenuineMacAddress[i][0] &&
                             ds34pad[pad].bdaddr[4] == GenuineMacAddress[i][1] &&
                             ds34pad[pad].bdaddr[3] == GenuineMacAddress[i][2]) {
@@ -1102,7 +1097,7 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
         }
     }
 
-    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE, l2cap_event_cb, arg);
+    UsbBulkTransfer(bt_dev.inEndp, l2cap_buf, MAX_BUFFER_SIZE + 23, l2cap_event_cb, arg);
     SignalSema(bt_dev.hid_sema);
 }
 
@@ -1175,8 +1170,7 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
         led_buf[11] = led[0] & 0x7F; //LED Conf
 
-        if (led[3]) //means charging, so blink
-        {
+        if (led[3]) { //means charging, so blink
             led_buf[15] = 0x32;
             led_buf[20] = 0x32;
             led_buf[25] = 0x32;
@@ -1199,8 +1193,7 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         led_buf[10] = led[1]; //g
         led_buf[11] = led[2]; //b
         
-        if (led[3]) //means charging, so blink
-        {
+        if (led[3]) { //means charging, so blink
             led_buf[12] = 0x80; // Time to flash bright (255 = 2.5 seconds)
             led_buf[13] = 0x80; // Time to flash dark (255 = 2.5 seconds)
         }

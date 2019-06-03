@@ -534,12 +534,24 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 			
 			LOG("memPath = %s\n",memPath);
 			LOG("params = %s\n",params);
+			LOG("VCD Path= %s", cur->file);
 
-			//To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
-			int mode = oplPath2Mode(cur->file);
-			if (mode < 0) {
-					mode = ELM_MODE;
-					LOG("ELMSUPPORT warning: cannot find mode for path: %s\n", cur->file);
+			int mode = ELM_MODE;
+
+			// Figure out in what device the VCD is at. This is necessary to avoid the device to be unmounted.
+			if (strncmp(cur->file,"mass", 4) == 0){
+				mode = USB_MODE;
+			} else if (strncmp(cur->file,"hdd", 3) == 0){
+				mode = HDD_MODE;
+			} else if (strncmp(cur->file,"smb", 3) == 0){
+				mode = ETH_MODE;
+			} 
+
+			if (mode == ELM_MODE) {
+				// Failed to detect the device...
+				LOG("ELMSUPPORT warning: cannot find mode for path: %s\n", cur->file);
+			} else {
+				LOG("ELMSUPPORT Mode detected as: ", mode);
 			}
 				
 			deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call elmCleanUp, so configElm/cur will be freed

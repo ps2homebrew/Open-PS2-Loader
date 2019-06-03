@@ -104,15 +104,19 @@ item_list_t* elmGetObject(int initOnly) {
 }
 
 static int elmNeedsUpdate(void) {
+	int update;
+
+	update = 0;
 	if (elmForceUpdate) {
 		elmForceUpdate = 0;
-		return 1;
+		update=1;
 	}
 	
-	if (elmGameList == NULL)
-		return 1;
+	if(oplShouldElmUpdate()){
+		update = 1;
+	}
 
-	return 0;
+	return update;
 }
 
 //Scans for POPSTARTER.ELF and VCD files in the given devPrefix.

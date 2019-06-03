@@ -81,6 +81,10 @@ typedef struct
 //App support stuff.
 static unsigned char shouldAppsUpdate;
 
+//START of OPL_DB tweaks
+static unsigned char shouldElmUpdate;
+//END of OPL_DB tweaks
+
 //Network support stuff.
 #define HTTP_IOBUF_SIZE 512
 static unsigned int CompatUpdateComplete, CompatUpdateTotal;
@@ -505,6 +509,18 @@ int oplShouldAppsUpdate(void)
     return result;
 }
 
+//START of OPL_DB tweaks
+int oplShouldElmUpdate(void)
+{
+    int result;
+
+    result = (int)shouldElmUpdate;
+    shouldElmUpdate = 0;
+
+    return result;
+}
+//END of OPL_DB tweaks
+
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------
@@ -567,6 +583,12 @@ void menuDeferredUpdate(void *data)
         //If other modes have been updated, then the apps list should be updated too.
         if (*mode != APP_MODE)
             shouldAppsUpdate = 1;
+        
+        //START of OPL_DB tweaks
+        //If other modes have been updated, then the elm list should be updated too.
+        if (*mode != ELM_MODE)
+            shouldElmUpdate = 1;
+        //END of OPL_DB tweaks
     }
 }
 

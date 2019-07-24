@@ -69,10 +69,12 @@ static int checkMC()
                     writeMCIcon();
                 }
             } else {
+                writeMCIcon();
                 fileXioDclose(fd);
                 mcID = 0x31;
             }
         } else {
+            writeMCIcon();
             fileXioDclose(fd);
             mcID = 0x30;
         }

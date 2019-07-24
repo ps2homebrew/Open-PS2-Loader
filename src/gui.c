@@ -93,7 +93,7 @@ static gui_screen_handler_t *screenHandler = &screenHandlers[GUI_SCREEN_MENU];
 
 // screen transition handling
 static gui_screen_handler_t *screenHandlerTarget = NULL;
-static int transIndex, transMax, transitionX, transitionY;
+static int transIndex;
 
 // Helper perlin noise data
 #define PLASMA_H 32
@@ -2057,31 +2057,35 @@ static void guiReadPads()
 }
 
 // renders the screen and handles inputs. Also handles screen transitions between numerous
-// screen handlers. For now we only have left-to right screen transition
+// screen handlers. Fade transition code written by Maximus32
 static void guiShow()
 {
     // is there a transmission effect going on or are
     // we in a normal rendering state?
     if (screenHandlerTarget) {
-        // advance the effect
+        u8 alpha;
+        const u8 transition_frames = 26;
+        if (transIndex < (transition_frames/2)) {
+            // Fade-out old screen
+            // index: 0..7
+            // alpha: 1..8 * transition_step
+            screenHandler->renderScreen();
+            alpha = fade((float)(transIndex + 1) / (transition_frames / 2)) * 0x80;
+        }
+        else {
+            // Fade-in new screen
+            // index: 8..15
+            // alpha: 8..1 * transition_step
+            screenHandlerTarget->renderScreen();
+            alpha = fade((float)(transition_frames - transIndex) / (transition_frames / 2)) * 0x80;
+        }
 
-        // render the old screen, transposed
-        rmSetTransposition(transIndex * transitionX, transIndex * transitionY);
-        screenHandler->renderScreen();
+        // Overlay the actual "fade"
+        rmDrawRect(0, 0, screenWidth, screenHeight, GS_SETREG_RGBA(0x00, 0x00, 0x00, alpha));
 
-        // render new screen transposed again
-        rmSetTransposition((transIndex - transMax) * transitionX, (transIndex - transMax) * transitionY);
-        screenHandlerTarget->renderScreen();
-
-        // reset transposition to zero
-        rmSetTransposition(0, 0);
-
-        // move the transition indicator forward
-        transIndex += (min(transIndex, transMax - transIndex) >> 1) + 1;
-
-        if (transIndex > transMax) {
-            transitionX = 0;
-            transitionY = 0;
+        // Advance the effect
+        transIndex++;
+        if (transIndex >= transition_frames) {
             screenHandler = screenHandlerTarget;
             screenHandlerTarget = NULL;
         }
@@ -2167,24 +2171,9 @@ void guiSetFrameHook(gui_callback_t cback)
     gFrameHook = cback;
 }
 
-void guiSwitchScreen(int target, int transition)
+void guiSwitchScreen(int target)
 {
-    sfxPlay(SFX_TRANSITION);
-    if (transition == TRANSITION_LEFT) {
-        transitionX = 1;
-        transMax = screenWidth;
-    } else if (transition == TRANSITION_RIGHT) {
-        transitionX = -1;
-        transMax = screenWidth;
-    } else if (transition == TRANSITION_UP) {
-        transitionY = 1;
-        transMax = screenHeight;
-    } else if (transition == TRANSITION_DOWN) {
-        transitionY = -1;
-        transMax = screenHeight;
-    }
     transIndex = 0;
-
     screenHandlerTarget = &screenHandlers[target];
 }
 

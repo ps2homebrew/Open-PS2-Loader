@@ -70,10 +70,6 @@ static int iDisplayHeight;
 static int iDisplayXOff;
 static int iDisplayYOff;
 
-// Transposition values - all rendering will be transposed (moved on screen) by these
-static float transX = 0.0f;
-static float transY = 0.0f;
-
 // Transposition values including overscan compensation
 static float fRenderXOff = 0.0f;
 static float fRenderYOff = 0.0f;
@@ -478,29 +474,19 @@ int rmUnScaleY(int y)
     return (y*480)/iDisplayHeight;
 }
 
-static void rmUpdateRenderOffsets()
-{
-    fRenderXOff = (float)iDisplayXOff + transX - 0.5f;
-    fRenderYOff = (float)iDisplayYOff + transY - 0.5f;
-
-    if (rmGetInterlacedFrameMode() == 1)
-        fRenderYOff += 0.25f;
-}
-
 void rmSetOverscan(int overscan)
 {
     iDisplayXOff = (gsGlobal->Width  * overscan) / (2 * 1000);
     iDisplayYOff = (gsGlobal->Height * overscan) / (2 * 1000);
     iDisplayWidth  = gsGlobal->Width  - (2 * iDisplayXOff);
     iDisplayHeight = gsGlobal->Height - (2 * iDisplayYOff);
-    rmUpdateRenderOffsets();
-}
 
-void rmSetTransposition(float x, float y)
-{
-    transX = X_SCALE(x);
-    transY = Y_SCALE(y);
-    rmUpdateRenderOffsets();
+    fRenderXOff = (float)iDisplayXOff - 0.5f;
+    fRenderYOff = (float)iDisplayYOff - 0.5f;
+
+    if (rmGetInterlacedFrameMode() == 1)
+        fRenderYOff += 0.25f;
+
 }
 
 unsigned char rmGetHsync(void)

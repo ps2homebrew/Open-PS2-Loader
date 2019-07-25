@@ -2173,6 +2173,7 @@ void guiSetFrameHook(gui_callback_t cback)
 
 void guiSwitchScreen(int target)
 {
+    sfxPlay(SFX_TRANSITION);
     transIndex = 0;
     screenHandlerTarget = &screenHandlers[target];
 }

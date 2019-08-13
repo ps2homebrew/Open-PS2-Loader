@@ -736,7 +736,7 @@ void menuHandleInputMenu()
         //START of OPL_DB tweaks
         if (gAPPStartMode || gELMStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
         //END of OPL_DB tweaks
-            guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_LEFT);
+            guiSwitchScreen(GUI_SCREEN_MAIN);
     }
 }
 
@@ -788,14 +788,14 @@ void menuHandleInputMain()
         menuNextV();
     } else if (getKeyOn(KEY_CROSS)) {
         if (gSelectButton == KEY_CROSS && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-            guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
+            guiSwitchScreen(GUI_SCREEN_INFO);
         else
             selected_item->item->execCross(selected_item->item);
     } else if (getKeyOn(KEY_TRIANGLE)) {
         selected_item->item->execTriangle(selected_item->item);
     } else if (getKeyOn(KEY_CIRCLE)) {
         if (gSelectButton == KEY_CIRCLE && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-            guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
+            guiSwitchScreen(GUI_SCREEN_INFO);
         else
             selected_item->item->execCircle(selected_item->item);
     } else if (getKeyOn(KEY_SQUARE)) {
@@ -803,7 +803,7 @@ void menuHandleInputMain()
     } else if (getKeyOn(KEY_START)) {
         // reinit main menu - show/hide items valid in the active context
         menuInitMainMenu();
-        guiSwitchScreen(GUI_SCREEN_MENU, TRANSITION_RIGHT);
+        guiSwitchScreen(GUI_SCREEN_MENU);
     } else if (getKeyOn(KEY_SELECT)) {
         selected_item->item->refresh(selected_item->item);
     } else if (getKey(KEY_L1)) {
@@ -859,7 +859,7 @@ void menuHandleInputInfo()
 {
     if (getKeyOn(KEY_CROSS)) {
         if (gSelectButton == KEY_CIRCLE)
-            guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
+            guiSwitchScreen(GUI_SCREEN_MAIN);
         else
             selected_item->item->execCross(selected_item->item);
     } else if (getKey(KEY_UP)) {
@@ -868,7 +868,7 @@ void menuHandleInputInfo()
         menuNextV();
     } else if (getKeyOn(KEY_CIRCLE)) {
         if (gSelectButton == KEY_CROSS)
-            guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
+            guiSwitchScreen(GUI_SCREEN_MAIN);
         else
             selected_item->item->execCircle(selected_item->item);
     } else if (getKey(KEY_L1)) {

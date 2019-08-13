@@ -57,12 +57,7 @@ int guiFrameId;
 #define GUI_SCREEN_MENU 1
 #define GUI_SCREEN_INFO 2
 
-#define TRANSITION_LEFT 0
-#define TRANSITION_RIGHT 1
-#define TRANSITION_UP 2
-#define TRANSITION_DOWN 3
-
-void guiSwitchScreen(int target, int transition);
+void guiSwitchScreen(int target);
 
 void guiReloadScreenExtents();
 

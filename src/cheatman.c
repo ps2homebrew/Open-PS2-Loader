@@ -22,6 +22,7 @@
  * $Id$
  */
 
+#include <unistd.h>
 #include "include/cheatman.h"
 #include "include/ioman.h"
 

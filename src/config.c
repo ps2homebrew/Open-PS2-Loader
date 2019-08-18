@@ -9,6 +9,12 @@
 #include "include/ioman.h"
 #include <string.h>
 
+// FIXME: We should not need this function.
+//        Use newlib's 'stat' to get GMT time.
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // iox_stat_t, fileXioGetStat
+int configGetStat(config_set_t *configSet, iox_stat_t *stat);
+
 static u32 currentUID = 0;
 static config_set_t configFiles[CONFIG_INDEX_COUNT];
 static char legacyNetConfigPath[256] = "mc?:SYS-CONF/IPCONFIG.DAT";
@@ -411,8 +417,8 @@ static int configReadLegacyIP(void)
     if (fd >= 0) {
         char ipconfig[256];
         int size = getFileSize(fd);
-        fileXioRead(fd, &ipconfig, size);
-        fileXioClose(fd);
+        read(fd, &ipconfig, size);
+        close(fd);
 
         sscanf(ipconfig, "%d.%d.%d.%d %d.%d.%d.%d %d.%d.%d.%d", &ps2_ip[0], &ps2_ip[1], &ps2_ip[2], &ps2_ip[3],
                &ps2_netmask[0], &ps2_netmask[1], &ps2_netmask[2], &ps2_netmask[3],

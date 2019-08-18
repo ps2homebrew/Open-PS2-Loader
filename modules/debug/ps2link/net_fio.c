@@ -572,7 +572,7 @@ int pko_read_dir(int fd, void *buf)
 {
     pko_pkt_dread_req *dirreq;
     pko_pkt_dread_rly *dirrly;
-    fio_dirent_t *dirent;
+    io_dirent_t *dirent;
 
     if (pko_fileio_sock < 0) {
         return -1;
@@ -601,7 +601,7 @@ int pko_read_dir(int fd, void *buf)
 
     dbgprintf("pko_file: dir read reply received (ret %ld)\n", ntohl(dirrly->retval));
 
-    dirent = (fio_dirent_t *)buf;
+    dirent = (io_dirent_t *)buf;
     // now handle the return buffer translation, to build reply bit
     dirent->stat.mode = ntohl(dirrly->mode);
     dirent->stat.attr = ntohl(dirrly->attr);

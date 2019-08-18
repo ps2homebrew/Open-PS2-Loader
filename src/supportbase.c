@@ -11,7 +11,9 @@
 #include "include/cheatman.h"
 #include "include/ps2cnf.h"
 
-#include <sys/fcntl.h>
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // fileXioMount("iso:", ***), fileXioUmount("iso:")
+#include <io_common.h>   // FIO_MT_RDONLY
 
 /// internal linked list used to populate the list from directory listing
 struct game_list_t
@@ -34,7 +36,7 @@ int sbIsSameSize(const char *prefix, int prevSize)
     int fd = openFile(path, O_RDONLY);
     if (fd >= 0) {
         size = getFileSize(fd);
-        fileXioClose(fd);
+        close(fd);
     }
 
     return size == prevSize;
@@ -275,19 +277,21 @@ static int queryISOGameListCache(const struct game_cache_list *cache, base_game_
 
 static int scanForISO(char *path, char type, struct game_list_t **glist)
 {
-    int fd, NameLen, count = 0, format, MountFD, cacheLoaded;
+    int NameLen, count = 0, format, MountFD, cacheLoaded;
     struct game_cache_list cache;
     base_game_info_t cachedGInfo;
     char fullpath[256], startup[GAME_STARTUP_MAX];
-    iox_dirent_t record;
+    struct dirent *dirent;
+    DIR *dir;
+    struct stat st;
 
     cache.games = NULL;
     cache.count = 0;
     cacheLoaded = loadISOGameListCache(path, &cache) == 0;
 
-    if ((fd = fileXioDopen(path)) > 0) {
-        while (fileXioDread(fd, &record) > 0) {
-            if ((format = isValidIsoName(record.name, &NameLen)) > 0) {
+    if ((dir = opendir(path)) != NULL) {
+        while ((dirent = readdir(dir)) != NULL) {
+            if ((format = isValidIsoName(dirent->d_name, &NameLen)) > 0) {
                 base_game_info_t *game;
 
                 if (NameLen > ISO_GAME_NAME_MAX)
@@ -303,19 +307,19 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                         game = &(*glist)->gameinfo;
                         memset(game, 0, sizeof(base_game_info_t));
 
-                        strncpy(game->name, &record.name[GAME_STARTUP_MAX], NameLen);
+                        strncpy(game->name, &dirent->d_name[GAME_STARTUP_MAX], NameLen);
                         game->name[NameLen] = '\0';
-                        strncpy(game->startup, record.name, GAME_STARTUP_MAX - 1);
+                        strncpy(game->startup, dirent->d_name, GAME_STARTUP_MAX - 1);
                         game->startup[GAME_STARTUP_MAX - 1] = '\0';
-                        strncpy(game->extension, &record.name[GAME_STARTUP_MAX + NameLen], sizeof(game->extension));
+                        strncpy(game->extension, &dirent->d_name[GAME_STARTUP_MAX + NameLen], sizeof(game->extension));
                         game->extension[sizeof(game->extension) - 1] = '\0';
                     } else {
                         //Out of memory.
                         break;
                     }
                 } else {
-                    if(queryISOGameListCache(&cache, &cachedGInfo, record.name) != 0) {
-                        sprintf(fullpath, "%s/%s", path, record.name);
+                    if(queryISOGameListCache(&cache, &cachedGInfo, dirent->d_name) != 0) {
+                        sprintf(fullpath, "%s/%s", path, dirent->d_name);
 
                         if ((MountFD = fileXioMount("iso:", fullpath, FIO_MT_RDONLY)) >= 0) {
                             if (GetStartupExecName("iso:/SYSTEM.CNF;1", startup, GAME_STARTUP_MAX - 1) == 0) {
@@ -329,9 +333,9 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                                     memset(game, 0, sizeof(base_game_info_t));
 
                                     strcpy(game->startup, startup);
-                                    strncpy(game->name, record.name, NameLen);
+                                    strncpy(game->name, dirent->d_name, NameLen);
                                     game->name[NameLen] = '\0';
-                                    strncpy(game->extension, &record.name[NameLen], sizeof(game->extension));
+                                    strncpy(game->extension, &dirent->d_name[NameLen], sizeof(game->extension));
                                     game->extension[sizeof(game->extension) - 1] = '\0';
                                 } else {
                                     //Out of memory.
@@ -366,17 +370,20 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                     }
                 }
 
+                sprintf(fullpath, "%s/%s", path, dirent->d_name);
+                stat(fullpath, &st);
+
                 game->parts = 1;
                 game->media = type;
                 game->format = format;
-                game->sizeMB = (record.stat.size >> 20) | (record.stat.hisize << 12);
+                game->sizeMB = st.st_size >> 20;
 
                 count++;
             }
         }
-        fileXioDclose(fd);
+        closedir(dir);
     } else {
-        count = fd;
+        count = 0;
     }
 
     if (cacheLoaded)
@@ -431,7 +438,7 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                 memset(*list, 0, sizeof(base_game_info_t) * count);
 
                 while (size > 0) {
-                    fileXioRead(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
+                    read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
 
                     base_game_info_t *g = &(*list)[id++];
 
@@ -449,7 +456,7 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                 }
             }
         }
-        fileXioClose(fd);
+        close(fd);
     } else if (count > 0) {
         *list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count);
     }
@@ -519,14 +526,14 @@ int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offse
 
     result = -1;
     if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
-        if ((fd = fileXioOpen(path, O_RDONLY, 0666)) >= 0) {
-            if (fileXioLseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
-                if ((fileXioRead(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
+        if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
+            if (lseek(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
+                if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
                     ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
                     result = 0;
                 }
             }
-            fileXioClose(fd);
+            close(fd);
         } else
             result = fd;
     }
@@ -672,14 +679,14 @@ void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int 
             else
                 snprintf(path, sizeof(path), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
         }
-        fileXioRemove(path);
+        unlink(path);
     } else {
         char *pathStr = "%sul.%08X.%s.%02x";
         unsigned int crc = USBA_crc32(game->name);
         int i = 0;
         do {
             snprintf(path, sizeof(path), pathStr, prefix, crc, game->startup, i++);
-            fileXioRemove(path);
+            unlink(path);
         } while (i < game->parts);
 
         sbRebuildULCfg(list, prefix, gamecount, id);
@@ -709,7 +716,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
                 snprintf(newpath, sizeof(newpath), "%sDVD%s%s%s", prefix, sep, newname, game->extension);
             }
         }
-        fileXioRename(oldpath, newpath);
+        rename(oldpath, newpath);
     } else {
         const char *pathStr = "%sul.%08X.%s.%02x";
         unsigned int oldcrc = USBA_crc32(game->name);
@@ -719,7 +726,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
         for (i = 0; i < game->parts; i++) {
             snprintf(oldpath, sizeof(oldpath), pathStr, prefix, oldcrc, game->startup, i);
             snprintf(newpath, sizeof(newpath), pathStr, prefix, newcrc, game->startup, i);
-            fileXioRename(oldpath, newpath);
+            rename(oldpath, newpath);
         }
 
         memset(game->name, 0, UL_GAME_NAME_MAX + 1);
@@ -754,7 +761,7 @@ static void sbCreateFoldersFromList(const char *path, const char **folders)
 
     for (i = 0; folders[i] != NULL; i++) {
         sprintf(fullpath, "%s%s", path, folders[i]);
-        fileXioMkdir(fullpath, 0777);
+        mkdir(fullpath, 0777);
     }
 }
 

@@ -30,6 +30,9 @@
 #include <libds34usb.h>
 #endif
 
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // fileXioInit, fileXioExit, fileXioDevctl
+
 typedef struct
 {
     char VMC_filename[1024];
@@ -926,16 +929,16 @@ int sysCheckVMC(const char *prefix, const char *sep, char *name, int createSize,
     snprintf(path, sizeof(path), "%sVMC%s%s.bin", prefix, sep, name);
 
     if (createSize == -1)
-        fileXioRemove(path);
+        unlink(path);
     else {
-        int fd = fileXioOpen(path, O_RDONLY, FIO_S_IRUSR | FIO_S_IWUSR | FIO_S_IXUSR | FIO_S_IRGRP | FIO_S_IWGRP | FIO_S_IXGRP | FIO_S_IROTH | FIO_S_IWOTH | FIO_S_IXOTH);
+        int fd = open(path, O_RDONLY, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
         if (fd >= 0) {
-            size = fileXioLseek(fd, 0, SEEK_END);
+            size = lseek(fd, 0, SEEK_END);
 
             if (vmc_superblock) {
                 memset(vmc_superblock, 0, sizeof(vmc_superblock_t));
-                fileXioLseek(fd, 0, SEEK_SET);
-                fileXioRead(fd, (void *)vmc_superblock, sizeof(vmc_superblock_t));
+                lseek(fd, 0, SEEK_SET);
+                read(fd, (void *)vmc_superblock, sizeof(vmc_superblock_t));
 
                 LOG("SYSTEM File size  : 0x%X\n", size);
                 LOG("SYSTEM Magic      : %s\n", vmc_superblock->magic);
@@ -956,10 +959,10 @@ int sysCheckVMC(const char *prefix, const char *sep, char *name, int createSize,
             else
                 size /= 1048576;
 
-            fileXioClose(fd);
+            close(fd);
 
             if (createSize && (createSize != size))
-                fileXioRemove(path);
+                unlink(path);
         }
 
 

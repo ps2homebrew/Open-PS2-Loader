@@ -291,6 +291,12 @@ clean:
 
 rebuild: clean all
 
+run: $(EE_BIN)
+	ps2client -h 192.168.1.10 execee host:$(EE_BIN)
+
+sim: $(EE_BIN)
+	PCSX2 --elf=$(PWD)/$(EE_BIN) --nodisc --nogui
+
 pc_tools:
 	echo "Building iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=0 -C pc

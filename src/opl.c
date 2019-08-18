@@ -35,6 +35,12 @@
 
 #include "include/sound.h"
 
+// FIXME: We should not need this function.
+//        Use newlib's 'stat' to get GMT time.
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // iox_stat_t
+int configGetStat(config_set_t *configSet, iox_stat_t *stat);
+
 #include <unistd.h>
 #include <audsrv.h>
 #ifdef PADEMU
@@ -388,8 +394,10 @@ int oplGetAppImage(const char *device, char *folder, int isRelative, char *value
 
 int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg)
 {
-    iox_dirent_t dirent;
-    int i, fd, count, ret;
+    struct dirent *pdirent;
+    DIR *pdir;
+    struct stat st;
+    int i, count, ret;
     item_list_t *listSupport;
     config_set_t *appConfig;
     char appsPath[64];
@@ -404,14 +412,19 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
         {
             listSupport->itemGetAppsPath(appsPath, sizeof(appsPath));
 
-            if ((fd = fileXioDopen(appsPath)) > 0)
+            if ((pdir = opendir(appsPath)) != NULL)
             {
-                while (fileXioDread(fd, &dirent) > 0)
+                while ((pdirent = readdir(pdir)) != NULL)
                 {
-                    if (strcmp(dirent.name, ".") == 0 || strcmp(dirent.name, "..") == 0 || (!FIO_S_ISDIR(dirent.stat.mode)))
+                    if (strcmp(pdirent->d_name, ".") == 0 || strcmp(pdirent->d_name, "..") == 0)
                         continue;
 
-                    snprintf(dir, sizeof(dir), "%s/%s", appsPath, dirent.name);
+                    snprintf(dir, sizeof(dir), "%s/%s", appsPath, pdirent->d_name);
+                    if (stat(dir, &st) < 0)
+						continue;
+					if(!S_ISDIR(st.st_mode))
+						continue;
+
                     snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
                     appConfig = configAlloc(0, NULL, path);
                     if (appConfig != NULL)
@@ -430,7 +443,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
                     }
                 }
 
-                fileXioDclose(fd);
+                closedir(pdir);
             } else
                 LOG("APPS failed to open dir %s\n", appsPath);
         }
@@ -595,9 +608,9 @@ static int checkLoadConfigHDD(int types)
     int value;
 
     hddLoadModules();
-    value = fileXioOpen("pfs0:conf_opl.cfg", O_RDONLY);
+    value = open("pfs0:conf_opl.cfg", O_RDONLY);
     if (value >= 0) {
-        fileXioClose(value);
+        close(value);
         configEnd();
         configInit("pfs0:");
         value = configReadMulti(types);
@@ -614,6 +627,7 @@ static int tryAlternateDevice(int types)
 {
     char pwd[8];
     int value;
+    DIR *dir;
 
     getcwd(pwd, sizeof(pwd));
 
@@ -646,16 +660,16 @@ static int tryAlternateDevice(int types)
         return 0;
     }
     // No memory cards? Try a USB device...
-    value = fileXioDopen("mass0:");
-    if (value >= 0) {
-        fileXioDclose(value);
+    dir = opendir("mass0:");
+    if (dir != NULL) {
+        closedir(dir);
         configEnd();
         configInit("mass0:");
     } else {
         // No? Check if the save location on the HDD is available.
-        value = fileXioDopen("pfs0:");
-        if (value >= 0) {
-            fileXioDclose(value);
+        dir = opendir("pfs0:");
+        if (dir != NULL) {
+            closedir(dir);
             configEnd();
             configInit("pfs0:");
         }

@@ -13,6 +13,10 @@
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // fileXioFormat, fileXioMount, fileXioUmount, fileXioDevctl
+#include <io_common.h>   // FIO_MT_RDWR
+
 #include <hdd-ioctl.h>
 
 #define OPL_HDD_MODE_PS2LOGO_OFFSET 0x17F8
@@ -96,8 +100,8 @@ static int CreateOPLPartition(const char *oplPart, const char *mountpoint)
     char cmd[43];
 
     sprintf(cmd, "%s,,,128M,PFS", oplPart);
-    if ((fd = fileXioOpen(cmd, O_CREAT | O_TRUNC | O_WRONLY)) >= 0) {
-        fileXioClose(fd);
+    if ((fd = open(cmd, O_CREAT | O_TRUNC | O_WRONLY)) >= 0) {
+        close(fd);
         result = fileXioFormat(mountpoint, oplPart, (const char *)&formatArg, sizeof(formatArg));
     } else {
         result = fd;

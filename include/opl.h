@@ -11,6 +11,12 @@
 #include <string.h>
 #include <loadfile.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <errno.h>
+#include <limits.h>
 #include <sbv_patches.h>
 #include <libcdvd.h>
 #include <libpad.h>
@@ -26,13 +32,11 @@
 #include <osd_config.h>
 #include <libpwroff.h>
 #include <usbhdfsd-common.h>
-#include <fileXio_rpc.h>
 #include <smod.h>
 #include <smem.h>
 #include <debug.h>
 #include <ps2smb.h>
 #include "config.h"
-#include <sys/fcntl.h>
 
 // Last Played Auto Start
 #include <time.h>

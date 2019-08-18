@@ -111,10 +111,10 @@ void PrepareGSM(char *cmdline)
 
     k576p_fix = 0;
     kGsDxDyOffsetSupported = 0;
-    if((fd = fileXioOpen("rom0:ROMVER", O_RDONLY)) >= 0) {
+    if((fd = open("rom0:ROMVER", O_RDONLY)) >= 0) {
         //Read ROM version
-        fileXioRead(fd, romver, sizeof(romver));
-        fileXioClose(fd);
+        read(fd, romver, sizeof(romver));
+        close(fd);
 
         strncpy(romverNum, romver, 4);
         romverNum[4] = '\0';

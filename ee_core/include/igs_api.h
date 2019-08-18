@@ -25,7 +25,6 @@
 #ifndef _IGSAPI_H_
 #define _IGSAPI_H_
 
-#include "fileio.h"
 #include "ee_core.h"
 #include <iopcontrol.h>
 #include "iopmgr.h"

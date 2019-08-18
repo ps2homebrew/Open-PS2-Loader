@@ -13,6 +13,9 @@
 #include <limits.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/fcntl.h>
+#include <sys/unistd.h>
 
 #include "include/util.h"
 #include "include/OSDHistory.h"
@@ -35,7 +38,7 @@ int CreateSystemDataFolder(const char *path, char FolderRegionLetter)
 
     sprintf(fullpath, "%s/icon.sys", path);
     if ((fd = open(fullpath, O_RDONLY)) < 0) {
-        mkdir(path);
+        mkdir(path, 0777);
         if ((fd = open(fullpath, O_CREAT | O_TRUNC | O_WRONLY)) >= 0) {
            switch(FolderRegionLetter) {
                case 'I':

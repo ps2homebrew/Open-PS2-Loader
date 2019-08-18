@@ -11,7 +11,7 @@
 #include "include/cheatman.h"
 #include "include/ps2cnf.h"
 
-#include <sys/fcntl.h>
+#include <io_common.h>
 
 /// internal linked list used to populate the list from directory listing
 struct game_list_t
@@ -34,7 +34,7 @@ int sbIsSameSize(const char *prefix, int prevSize)
     int fd = openFile(path, O_RDONLY);
     if (fd >= 0) {
         size = getFileSize(fd);
-        fileXioClose(fd);
+        close(fd);
     }
 
     return size == prevSize;
@@ -431,7 +431,7 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                 memset(*list, 0, sizeof(base_game_info_t) * count);
 
                 while (size > 0) {
-                    fileXioRead(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
+                    read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
 
                     base_game_info_t *g = &(*list)[id++];
 
@@ -449,7 +449,7 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                 }
             }
         }
-        fileXioClose(fd);
+        close(fd);
     } else if (count > 0) {
         *list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count);
     }
@@ -519,14 +519,14 @@ int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offse
 
     result = -1;
     if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
-        if ((fd = fileXioOpen(path, O_RDONLY, 0666)) >= 0) {
-            if (fileXioLseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
-                if ((fileXioRead(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
+        if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
+            if (lseek(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
+                if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
                     ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
                     result = 0;
                 }
             }
-            fileXioClose(fd);
+            close(fd);
         } else
             result = fd;
     }
@@ -663,14 +663,14 @@ void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int 
             else
                 snprintf(path, sizeof(path), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
         }
-        fileXioRemove(path);
+        unlink(path);
     } else {
         char *pathStr = "%sul.%08X.%s.%02x";
         unsigned int crc = USBA_crc32(game->name);
         int i = 0;
         do {
             snprintf(path, sizeof(path), pathStr, prefix, crc, game->startup, i++);
-            fileXioRemove(path);
+            unlink(path);
         } while (i < game->parts);
 
         sbRebuildULCfg(list, prefix, gamecount, id);
@@ -700,7 +700,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
                 snprintf(newpath, sizeof(newpath), "%sDVD%s%s%s", prefix, sep, newname, game->extension);
             }
         }
-        fileXioRename(oldpath, newpath);
+        rename(oldpath, newpath);
     } else {
         const char *pathStr = "%sul.%08X.%s.%02x";
         unsigned int oldcrc = USBA_crc32(game->name);
@@ -710,7 +710,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
         for (i = 0; i < game->parts; i++) {
             snprintf(oldpath, sizeof(oldpath), pathStr, prefix, oldcrc, game->startup, i);
             snprintf(newpath, sizeof(newpath), pathStr, prefix, newcrc, game->startup, i);
-            fileXioRename(oldpath, newpath);
+            rename(oldpath, newpath);
         }
 
         memset(game->name, 0, UL_GAME_NAME_MAX + 1);
@@ -745,7 +745,7 @@ static void sbCreateFoldersFromList(const char *path, const char **folders)
 
     for (i = 0; folders[i] != NULL; i++) {
         sprintf(fullpath, "%s%s", path, folders[i]);
-        fileXioMkdir(fullpath, 0777);
+        mkdir(fullpath, 0777);
     }
 }
 

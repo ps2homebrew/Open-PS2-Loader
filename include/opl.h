@@ -11,6 +11,9 @@
 #include <string.h>
 #include <loadfile.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
 #include <sbv_patches.h>
 #include <libcdvd.h>
 #include <libpad.h>
@@ -32,7 +35,7 @@
 #include <debug.h>
 #include <ps2smb.h>
 #include "config.h"
-#include <sys/fcntl.h>
+#include <io_common.h>
 
 // Last Played Auto Start
 #include <time.h>

@@ -94,8 +94,8 @@ static int CreateOPLPartition(const char *oplPart, const char *mountpoint)
     char cmd[43];
 
     sprintf(cmd, "%s,,,128M,PFS", oplPart);
-    if ((fd = fileXioOpen(cmd, O_CREAT | O_TRUNC | O_WRONLY)) >= 0) {
-        fileXioClose(fd);
+    if ((fd = open(cmd, O_CREAT | O_TRUNC | O_WRONLY)) >= 0) {
+        close(fd);
         result = fileXioFormat(mountpoint, oplPart, (const char *)&formatArg, sizeof(formatArg));
     } else {
         result = fd;

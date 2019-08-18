@@ -453,7 +453,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
             {
                 while (fileXioDread(fd, &dirent) > 0)
                 {
-                    if (strcmp(dirent.name, ".") == 0 || strcmp(dirent.name, "..") == 0 || (!FIO_S_ISDIR(dirent.stat.mode)))
+                    if (strcmp(dirent.name, ".") == 0 || strcmp(dirent.name, "..") == 0 || (!S_ISDIR(dirent.stat.mode)))
                         continue;
 
                     snprintf(dir, sizeof(dir), "%s/%s", appsPath, dirent.name);
@@ -640,9 +640,9 @@ static int checkLoadConfigHDD(int types)
     int value;
 
     hddLoadModules();
-    value = fileXioOpen("pfs0:conf_opl.cfg", O_RDONLY);
+    value = open("pfs0:conf_opl.cfg", O_RDONLY);
     if (value >= 0) {
-        fileXioClose(value);
+        close(value);
         configEnd();
         configInit("pfs0:");
         value = configReadMulti(types);

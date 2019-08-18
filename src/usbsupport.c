@@ -38,16 +38,16 @@ int usbFindPartition(char *target, const char *name, int write)
         else
             sprintf(path, "mass%d:%s", i, name);
         if (write)
-            fd = fileXioOpen(path, O_WRONLY|O_TRUNC|O_CREAT, 0666);
+            fd = open(path, O_WRONLY|O_TRUNC|O_CREAT, 0666);
         else
-            fd = fileXioOpen(path, O_RDONLY);
+            fd = open(path, O_RDONLY);
 
         if (fd >= 0) {
             if (gUSBPrefix[0] != '\0')
                 sprintf(target, "mass%d:%s/", i, gUSBPrefix);
             else
                 sprintf(target, "mass%d:", i);
-            fileXioClose(fd);
+            close(fd);
             return 1;
         }
     }
@@ -232,7 +232,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
 
                 sprintf(vmc_path, "%sVMC/%s.bin", usbPrefix, vmc_name);
 
-                fd = fileXioOpen(vmc_path, O_RDONLY);
+                fd = open(vmc_path, O_RDONLY);
                 if (fd >= 0) {
                     if ((start = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, vmc_path)) != 0 && (startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, vmc_path)) != 0) {
 
@@ -249,7 +249,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
                         }
                     }
 
-                    fileXioClose(fd);
+                    close(fd);
                 }
             }
         }
@@ -291,13 +291,13 @@ static void usbLaunchGame(int id, config_set_t *configSet)
                 sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, i);
         }
 
-        fd = fileXioOpen(partname, O_RDONLY);
+        fd = open(partname, O_RDONLY);
         if (fd >= 0) {
             settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, partname);
             if (gCheckUSBFragmentation) {
                 if ((startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, partname)) == 0 || fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) == 0) {
 
-                    fileXioClose(fd);
+                    close(fd);
                     //Game is fragmented. Do not continue.
                     if (settings != NULL)
                         sbUnprepare(&settings->common);
@@ -310,7 +310,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
             if ((gPS2Logo) && (i == 0))
                 EnablePS2Logo = CheckPS2Logo(fd, 0);
 
-            fileXioClose(fd);
+            close(fd);
         } else {
             //Unable to open part of the game. Do not continue.
             if (settings != NULL)

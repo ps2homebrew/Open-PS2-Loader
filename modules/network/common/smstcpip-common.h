@@ -48,6 +48,8 @@
  *
  */
 
+#include <sys/time.h>
+
 typedef signed char err_t; /* lwIP error type.  */
 
 /* From src/include/lwip/pbuf.h:  */
@@ -292,15 +294,6 @@ typedef struct fd_set
 {
     unsigned char fd_bits[(FD_SETSIZE + 7) / 8];
 } fd_set;
-#endif
-
-#ifndef TIMEVAL
-#define TIMEVAL
-struct timeval
-{
-    long tv_sec;  /* seconds */
-    long tv_usec; /* and microseconds */
-};
 #endif
 
 #if !defined(INVALID_SOCKET)

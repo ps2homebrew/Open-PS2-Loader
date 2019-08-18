@@ -294,7 +294,7 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 
     sprintf(path, "hdd0:%s", ginfo->partition_name);
 
-    return fileXioRemove(path);
+    return unlink(path);
 }
 
 //-------------------------------------------------------------------------

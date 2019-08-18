@@ -46,14 +46,14 @@ endif
 
 EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
-EE_LDFLAGS = -nostartfiles -nostdlib -Tlinkfile -L$(PS2SDK)/ee/lib -s -Wl,-Map,$(MAPFILE)
+EE_LDFLAGS = -nostartfiles -L$(PS2SDK)/ee/lib
 EE_LIBS += -lpatches
 
 ifeq ($(PADEMU),1)
 EE_CFLAGS += -DPADEMU
 endif
 
-EE_LIBS += -lkernel-nopatch
+#EE_LIBS += -lkernel-nopatch
 
 $(EE_OBJS_DIR)%.o : $(EE_SRC_DIR)%.c
 	@mkdir -p $(EE_OBJS_DIR)

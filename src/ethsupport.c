@@ -668,10 +668,10 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     }
 
     if (gPS2Logo) {
-        int fd = fileXioOpen(partname, O_RDONLY, 0666);
+        int fd = open(partname, O_RDONLY, 0666);
         if (fd >= 0) {
             EnablePS2Logo = CheckPS2Logo(fd, 0);
-            fileXioClose(fd);
+            close(fd);
         }
     }
 

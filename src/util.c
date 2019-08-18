@@ -26,8 +26,8 @@ void guiWarning(const char *text, int count);
 
 int getFileSize(int fd)
 {
-    int size = fileXioLseek(fd, 0, SEEK_END);
-    fileXioLseek(fd, 0, SEEK_SET);
+    int size = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
     return size;
 }
 
@@ -37,14 +37,14 @@ static void writeMCIcon(void)
 
     fd = openFile("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC);
     if (fd >= 0) {
-        fileXioWrite(fd, &icon_icn, size_icon_icn);
-        fileXioClose(fd);
+        write(fd, &icon_icn, size_icon_icn);
+        close(fd);
     }
 
     fd = openFile("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC);
     if (fd >= 0) {
-        fileXioWrite(fd, &icon_sys, size_icon_sys);
-        fileXioClose(fd);
+        write(fd, &icon_sys, size_icon_sys);
+        close(fd);
     }
 }
 
@@ -61,10 +61,10 @@ static int checkMC()
             fd = fileXioDopen("mc1:OPL");
             if (fd < 0) {
                 // No base dir found on any MC, will create the folder
-                if (fileXioMkdir("mc0:OPL", 0777) >= 0) {
+                if (mkdir("mc0:OPL", 0777) >= 0) {
                     mcID = 0x30;
                     writeMCIcon();
-                } else if (fileXioMkdir("mc1:OPL", 0777) >= 0) {
+                } else if (mkdir("mc1:OPL", 0777) >= 0) {
                     mcID = 0x31;
                     writeMCIcon();
                 }
@@ -104,7 +104,7 @@ static int checkFile(char *path, int mode)
                 dirPath[pos - path] = '\0';
                 int fd = fileXioDopen(dirPath);
                 if (fd < 0) {
-                    if (fileXioMkdir(dirPath, 0777) < 0)
+                    if (mkdir(dirPath, 0777) < 0)
                         return 0;
                 } else
                     fileXioDclose(fd);
@@ -117,7 +117,7 @@ static int checkFile(char *path, int mode)
 int openFile(char *path, int mode)
 {
     if (checkFile(path, mode))
-        return fileXioOpen(path, mode, 0666);
+        return open(path, mode, 0666);
     else
         return -1;
 }
@@ -132,7 +132,7 @@ void *readFile(char *path, int align, int *size)
 
         if ((*size > 0) && (*size != realSize)) {
             LOG("UTIL Invalid filesize, expected: %d, got: %d\n", *size, realSize);
-            fileXioClose(fd);
+            close(fd);
             return NULL;
         }
 
@@ -145,8 +145,8 @@ void *readFile(char *path, int align, int *size)
             LOG("UTIL ReadFile: Failed allocation of %d bytes", realSize);
             *size = 0;
         } else {
-            fileXioRead(fd, buffer, realSize);
-            fileXioClose(fd);
+            read(fd, buffer, realSize);
+            close(fd);
             *size = realSize;
         }
     }
@@ -187,10 +187,10 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
             fileBuffer->lastPtr = NULL;
 
             //Check for and skip the UTF-8 BOM sequence.
-            if ((fileXioRead(fd, bom, sizeof(bom)) != 3) ||
+            if ((read(fd, bom, sizeof(bom)) != 3) ||
                 (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF)) {
                 //Not BOM, so rewind.
-                fileXioLseek(fd, 0, SEEK_SET);
+                lseek(fd, 0, SEEK_SET);
             }
         } else
             fileBuffer->lastPtr = fileBuffer->buffer;
@@ -224,7 +224,7 @@ file_buffer_t *openFileBufferBuffer(short allocResult, const void *buffer, unsig
 
 int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 {
-    int lineSize = 0, read, length;
+    int lineSize = 0, readSize, length;
     char *posLF = NULL;
 
     while (1) {
@@ -251,20 +251,20 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
                 // Load as many characters necessary to fill the buffer
                 length = fileBuffer->size - lineSize - 1;
                 //LOG("##### Asking for %d characters to complete buffer\n", length);
-                read = fileXioRead(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
-                fileBuffer->buffer[lineSize + read] = '\0';
+                readSize = read(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
+                fileBuffer->buffer[lineSize + readSize] = '\0';
 
                 // Search again (from the lastly added chars only), the result will be "analyzed" in next if
                 posLF = strchr(fileBuffer->buffer + lineSize, '\n');
 
                 // Now update read context info
-                lineSize = lineSize + read;
+                lineSize = lineSize + readSize;
                 //LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
 
                 // If buffer not full it means we are at EOF
                 if (fileBuffer->size != lineSize + 1) {
                     //LOG("##### Reached EOF\n");
-                    fileXioClose(fileBuffer->fd);
+                    close(fileBuffer->fd);
                     fileBuffer->fd = -1;
                 }
             }
@@ -319,14 +319,14 @@ void writeFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size)
     //LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
     if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
         //LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
-        fileXioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+        write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         fileBuffer->lastPtr = fileBuffer->buffer;
         fileBuffer->available = 0;
     }
 
     if (size > fileBuffer->size) {
         //LOG("writeFileBuffer direct write: %d\n", size);
-        fileXioWrite(fileBuffer->fd, inBuf, size);
+        write(fileBuffer->fd, inBuf, size);
     } else {
         memcpy(fileBuffer->lastPtr, inBuf, size);
         fileBuffer->lastPtr += size;
@@ -341,9 +341,9 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
     if (fileBuffer->fd >= 0) {
         if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
             //LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
-            fileXioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+            write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         }
-        fileXioClose(fileBuffer->fd);
+        close(fileBuffer->fd);
     }
     free(fileBuffer->buffer);
     free(fileBuffer);
@@ -450,7 +450,7 @@ int CheckPS2Logo(int fd, u32 lba)
 
     w = 0;
     if ((fd > 0) && (lba == 0)) // USB_MODE & ETH_MODE
-        w = fileXioRead(fd, logo, sizeof(logo)) == sizeof(logo);
+        w = read(fd, logo, sizeof(logo)) == sizeof(logo);
     if ((lba > 0) && (fd == 0)) {       // HDD_MODE
         for (k = 0; k <= 12 * 4; k++) { // NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors (12) by 4.
             w = !(hddReadSectors(lba + k, 1, buffer));
@@ -513,7 +513,7 @@ int sysDeleteFolder(const char *folder)
             if((strcmp(dirent.name, ".") == 0) || ((strcmp(dirent.name, "..") == 0)))
                 continue;
 
-            if(FIO_S_ISDIR(dirent.stat.mode)) {
+            if(S_ISDIR(dirent.stat.mode)) {
                 if((path = malloc(strlen(folder)+strlen(dirent.name) + 2)) != NULL) {
                     sprintf(path, "%s/%s", folder, dirent.name);
                         result = sysDeleteFolder(path);
@@ -551,7 +551,7 @@ int sysDeleteFolder(const char *folder)
             if(head->filename != NULL) {
                 if((path = malloc(strlen(folder) + strlen(head->filename) + 2)) != NULL) {
                     sprintf(path, "%s/%s", folder, head->filename);
-                    result=fileXioRemove(path);
+                    result=unlink(path);
                     if (result < 0)
                         LOG("sysDeleteFolder: failed to remove %s: %d\n", path, result);
 

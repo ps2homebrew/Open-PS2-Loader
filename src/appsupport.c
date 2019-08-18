@@ -308,7 +308,7 @@ static void appDeleteItem(int id)
     if (appsList[id].legacy)
     {
         struct config_value_t *cur = appGetConfigValue(id);
-        fileXioRemove(cur->val);
+        unlink(cur->val);
         cur->key[0] = '\0';
         configApps->modified = 1;
         configWrite(configApps);
@@ -358,9 +358,9 @@ static void appLaunchItem(int id, config_set_t *configSet)
     //Retrieve configuration set by appGetConfig()
     configGetStr(configSet, CONFIG_ITEM_STARTUP, &filename);
 
-    fd = fileXioOpen(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd >= 0) {
-        fileXioClose(fd);
+        close(fd);
 
         //To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
         mode = oplPath2Mode(filename);

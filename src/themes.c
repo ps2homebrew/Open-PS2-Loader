@@ -1144,14 +1144,14 @@ static void thmLoad(const char *themePath)
         thmLoadFonts(themeConfig, themePath, newT);
 
     int i = 1;
-    snprintf(path, sizeof(path), "main0");
+    snprintf(path, sizeof(path), "main00");
     while (addGUIElem(themePath, themeConfig, newT, &newT->mainElems, NULL, path))
-        snprintf(path, sizeof(path), "main%d", i++);
+        snprintf(path, sizeof(path), "main%02d", i++);
 
     i = 1;
-    snprintf(path, sizeof(path), "info0");
+    snprintf(path, sizeof(path), "info00");
     while (addGUIElem(themePath, themeConfig, newT, &newT->infoElems, NULL, path))
-        snprintf(path, sizeof(path), "info%d", i++);
+        snprintf(path, sizeof(path), "info%02d", i++);
 
     validateGUIElems(themePath, themeConfig, newT);
     configFree(themeConfig);

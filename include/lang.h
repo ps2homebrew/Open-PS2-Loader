@@ -283,6 +283,7 @@ typedef struct
     char *name;
 } language_t;
 
+int lngAddLanguages(char *path, const char *separator);
 void lngInit(void);
 char *lngGetValue(void);
 void lngEnd(void);

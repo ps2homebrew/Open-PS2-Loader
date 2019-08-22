@@ -351,10 +351,10 @@ static int lngLoadFromFile(char *path, char *name)
         }
 
         if (lngLoadFont(gBaseMCDir, name) != 0) {
-            if (lngLoadFont("mass0:", name) != 0) {
+            if (lngLoadFont("mass0:LNG", name) != 0) {
                 if (configGetInt(configGetByType(CONFIG_OPL), CONFIG_OPL_HDD_MODE, &HddStartMode) && (HddStartMode == START_MODE_AUTO)) {
                     hddLoadModules();
-                    lngLoadFont("pfs0:", name);
+                    lngLoadFont("pfs0:LNG", name);
                 }
             }
         }
@@ -388,12 +388,12 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
             currLang->name[length - 1] = '\0';
 
             /*file_buffer_t* fileBuffer = openFileBuffer(currLang->filePath, 1, 1024);
-			if (fileBuffer) {
-				// read localized name of language from file
-				if (readLineContext(fileBuffer, &currLang->name))
-					readLineContext(fileBuffer, &currLang->fontName);
-				closeFileBuffer(fileBuffer);
-			}*/
+            if (fileBuffer) {
+                // read localized name of language from file
+                if (readLineContext(fileBuffer, &currLang->name))
+                    readLineContext(fileBuffer, &currLang->fontName);
+                closeFileBuffer(fileBuffer);
+            }*/
 
             index++;
         }
@@ -401,11 +401,10 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
     return index;
 }
 
-void lngInit(void)
+static void lngRebuildLangNames(void)
 {
-    fntInit();
-
-    nLanguages = listDir(gBaseMCDir, "/", MAX_LANGUAGE_FILES, &lngReadEntry);
+    if (guiLangNames)
+        free(guiLangNames);
 
     // build the languages name list
     guiLangNames = (char **)malloc((nLanguages + 2) * sizeof(char **));
@@ -419,6 +418,29 @@ void lngInit(void)
     }
 
     guiLangNames[nLanguages + 1] = NULL;
+}
+
+int lngAddLanguages(char *path, const char *separator)
+{
+    int result;
+
+    result = listDir(path, separator, MAX_LANGUAGE_FILES - nLanguages, &lngReadEntry);
+    nLanguages += result;
+    lngRebuildLangNames();
+
+    const char *temp;
+    if (configGetStr(configGetByType(CONFIG_OPL), "language_text", &temp)) {
+        lngSetGuiValue(lngFindGuiID(temp));
+    }
+
+    return result;
+}
+
+void lngInit(void)
+{
+    fntInit();
+
+    lngAddLanguages(gBaseMCDir, "/");
 }
 
 void lngEnd(void)

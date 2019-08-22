@@ -49,6 +49,7 @@ USB modes:
 | "CFG" | for saving per-game configuration files | all |
 | "ART" | for game art images | all |
 | "THM" | for themes support | all |
+| "LNG" | for translation support | all |
 | "CHT" | for cheats files | all |
 | "CFG-DEV" | for saving per-game configuration files, when used from a OPL dev build - aka beta build | all |
 

@@ -32,6 +32,7 @@ struct sfxEffect {
     const char *name;
     void *buffer;
     int size;
+    int builtin;
 };
 
 static struct sfxEffect sfx_files[SFX_COUNT] = {
@@ -85,6 +86,7 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 
     sfx->buffer = buffer;
     sfx->size = size;
+    sfx->builtin = 0;
 
     return 0;
 }
@@ -93,16 +95,22 @@ static void sfxInitDefaults(void)
 {
     sfx_files[SFX_BOOT].buffer = boot_adp;
     sfx_files[SFX_BOOT].size = size_boot_adp;
+    sfx_files[SFX_BOOT].builtin = 1;
     sfx_files[SFX_CANCEL].buffer = cancel_adp;
     sfx_files[SFX_CANCEL].size = size_cancel_adp;
+    sfx_files[SFX_CANCEL].builtin = 1;
     sfx_files[SFX_CONFIRM].buffer = confirm_adp;
     sfx_files[SFX_CONFIRM].size = size_confirm_adp;
+    sfx_files[SFX_CONFIRM].builtin = 1;
     sfx_files[SFX_CURSOR].buffer = cursor_adp;
     sfx_files[SFX_CURSOR].size = size_cursor_adp;
+    sfx_files[SFX_CURSOR].builtin = 1;
     sfx_files[SFX_MESSAGE].buffer = message_adp;
     sfx_files[SFX_MESSAGE].size = size_message_adp;
+    sfx_files[SFX_MESSAGE].builtin = 1;
     sfx_files[SFX_TRANSITION].buffer = transition_adp;
     sfx_files[SFX_TRANSITION].size = size_transition_adp;
+    sfx_files[SFX_TRANSITION].builtin = 1;
 }
 
 //Returns 0 (AUDSRV_ERR_NOERROR) if the sound was loaded successfully.
@@ -111,8 +119,10 @@ static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
     int ret;
 
     ret = audsrv_load_adpcm(sfx, sfxData->buffer, sfxData->size);
-    free(sfxData->buffer);
-    sfxData->buffer = NULL; //Mark the buffer as freed.
+    if (sfxData->builtin == 0) {
+		free(sfxData->buffer);
+		sfxData->buffer = NULL; //Mark the buffer as freed.
+    }
 
     return ret;
 }

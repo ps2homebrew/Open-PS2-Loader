@@ -1,9 +1,9 @@
-#include <stdio.h>
 #include <string.h>
 #include <kernel.h>
 #include <sifrpc.h>
 
 #include "httpclient.h"
+#include "ioman.h"
 
 static SifRpcClientData_t SifRpcClient;
 static unsigned char RpcTxBuffer[256] ALIGNED(64);
@@ -12,7 +12,7 @@ static unsigned char RpcRxBuffer[64] ALIGNED(64);
 int HttpInit(void)
 {
     while (SifBindRpc(&SifRpcClient, 0x00001B14, 0) < 0 || SifRpcClient.server == NULL) {
-        printf("libhttpclient: bind failed\n");
+        LOG("libhttpclient: bind failed\n");
         nopdelay();
     }
 

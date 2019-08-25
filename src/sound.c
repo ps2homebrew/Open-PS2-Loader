@@ -4,6 +4,7 @@
 #include <audsrv.h>
 #include "include/sound.h"
 #include "include/opl.h"
+#include "include/ioman.h"
 #include "include/themes.h"
 
 //default sfx
@@ -51,10 +52,12 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     void *buffer;
     int ret, size;
 
+    LOG("sfxRead('%s')\n", full_path);
+
     adpcm = fopen(full_path, "rb");
     if (adpcm == NULL)
     {
-        printf("Failed to open adpcm file %s\n", full_path);
+        LOG("Failed to open adpcm file %s\n", full_path);
         return -ENOENT;
     }
 
@@ -65,7 +68,7 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     buffer = memalign(64, size);
     if (buffer == NULL)
     {
-        printf("Failed to allocate memory for SFX\n");
+        LOG("Failed to allocate memory for SFX\n");
         fclose(adpcm);
         return -ENOMEM;
     }
@@ -75,7 +78,7 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 
     if(ret != size)
     {
-        printf("Failed to read SFX: %d (expected %d)\n", ret, size);
+        LOG("Failed to read SFX: %d (expected %d)\n", ret, size);
         free(buffer);
         return -EIO;
     }
@@ -126,7 +129,7 @@ static int getFadeDelay(void)
     bootSnd = fopen(boot_path, "rb");
     if (bootSnd == NULL)
     {
-        printf("Failed to open adpcm file %s\n", boot_path);
+        LOG("Failed to open adpcm file %s\n", boot_path);
         return -ENOENT;
     }
 
@@ -184,7 +187,7 @@ int sfxInit(int bootSnd)
             ret = sfxRead(full_path, &sfx_files[i]);
             if (ret != 0)
             {
-                printf("SFX: %s could not be loaded. Using default sound %d.\n", full_path, ret);
+                LOG("SFX: %s could not be loaded. Using default sound %d.\n", full_path, ret);
             }
         }
 
@@ -195,7 +198,7 @@ int sfxInit(int bootSnd)
         }
         else
         {
-           printf("SFX: failed to load %s, error %d\n", full_path, ret);
+           LOG("SFX: failed to load %s, error %d\n", full_path, ret);
         }
     }
 

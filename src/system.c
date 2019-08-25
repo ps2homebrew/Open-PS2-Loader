@@ -785,7 +785,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     //Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
     if(initKernel((void*)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0)
     {   //Should not happen, but...
-        printf("Error - kernel is unsupported.\n");
+        LOG("Error - kernel is unsupported.\n");
         asm volatile("break\n");
     }
     sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);

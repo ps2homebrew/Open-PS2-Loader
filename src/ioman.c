@@ -314,6 +314,9 @@ static char tbuf[2048];
 
 int ioPrintf(const char *format, ...)
 {
+    if (isIORunning == 0)
+        return -1;
+
     WaitSema(gIOPrintfSemaId);
 
     va_list args;

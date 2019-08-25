@@ -1,9 +1,9 @@
-#include <stdio.h>
 #include <string.h>
 #include <kernel.h>
 #include <sifrpc.h>
 
 #include "nbns.h"
+#include "ioman.h"
 
 static SifRpcClientData_t SifRpcClient;
 static unsigned char RpcBuffer[64] ALIGNED(64);
@@ -11,7 +11,7 @@ static unsigned char RpcBuffer[64] ALIGNED(64);
 int nbnsInit(void)
 {
     while (SifBindRpc(&SifRpcClient, 0x00001B13, 0) < 0 || SifRpcClient.server == NULL) {
-        printf("libnbns: bind failed\n");
+        LOG("libnbns: bind failed\n");
         nopdelay();
     }
 

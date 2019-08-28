@@ -98,6 +98,7 @@ static int parsePrefix(char *line, char *prefix)
     if (colpos && colpos != line) {
         // copy the name and the value
         strncpy(prefix, line, colpos - line);
+        prefix[colpos - line] = 0;
 
         return 1;
     } else {

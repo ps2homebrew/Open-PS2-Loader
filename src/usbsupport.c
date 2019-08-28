@@ -117,6 +117,7 @@ static int usbNeedsUpdate(void)
     char path[256];
     static unsigned int OldGeneration = 0;
     static unsigned char ThemesLoaded = 0;
+    static unsigned char LanguagesLoaded = 0;
     int result = 0;
     iox_stat_t stat;
 
@@ -150,6 +151,13 @@ static int usbNeedsUpdate(void)
         sprintf(path, "%sTHM", usbPrefix);
         if (thmAddElements(path, "/", usbGameList.mode) > 0)
             ThemesLoaded = 1;
+    }
+
+    // update Languages
+    if (!LanguagesLoaded) {
+        sprintf(path, "%sLNG", usbPrefix);
+        if (lngAddLanguages(path, "/") > 0)
+            LanguagesLoaded = 1;
     }
 
     sbCreateFolders(usbPrefix, 1);

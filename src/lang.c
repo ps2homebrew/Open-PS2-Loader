@@ -324,12 +324,12 @@ static int lngLoadFont(const char *dir, const char *name)
 {
     char path[256];
 
-    snprintf(path, sizeof(path), "%s/font_%s.ttf", dir, name);
+    snprintf(path, sizeof(path), "%sfont_%s.ttf", dir, name);
     LOG("LANG Custom TTF font path: %s\n", path);
     if (fntLoadDefault(path) == 0)
         return 0;
 
-    snprintf(path, sizeof(path), "%s/font_%s.otf", dir, name);
+    snprintf(path, sizeof(path), "%sfont_%s.otf", dir, name);
     LOG("LANG Custom OTF font path: %s\n", path);
     if (fntLoadDefault(path) == 0)
         return 0;
@@ -341,7 +341,8 @@ static int lngLoadFont(const char *dir, const char *name)
 
 static int lngLoadFromFile(char *path, char *name)
 {
-    int HddStartMode;
+    char dir[128];
+
     file_buffer_t *fileBuffer = openFileBuffer(path, O_RDONLY, 1, 1024);
     if (fileBuffer) {
         // file exists, try to read it and load the custom lang
@@ -365,14 +366,11 @@ static int lngLoadFromFile(char *path, char *name)
             strId++;
         }
 
-        if (lngLoadFont(gBaseMCDir, name) != 0) {
-            if (lngLoadFont("mass0:", name) != 0) {
-                if (configGetInt(configGetByType(CONFIG_OPL), CONFIG_OPL_HDD_MODE, &HddStartMode) && (HddStartMode == START_MODE_AUTO)) {
-                    hddLoadModules();
-                    lngLoadFont("pfs0:", name);
-                }
-            }
-        }
+        int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
+        strncpy(dir, path, len);
+        dir[len] = '\0';
+
+        lngLoadFont(dir, name);
 
         return 1;
     }
@@ -389,7 +387,7 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
     if (!FIO_S_ISDIR(mode)) {
         if (strstr(name, ".lng") || strstr(name, ".LNG")) {
 
-            language_t *currLang = &languages[index];
+            language_t *currLang = &languages[nLanguages + index];
 
             // filepath for this language file
             int length = strlen(path) + 1 + strlen(name) + 1;
@@ -403,12 +401,12 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
             currLang->name[length - 1] = '\0';
 
             /*file_buffer_t* fileBuffer = openFileBuffer(currLang->filePath, 1, 1024);
-			if (fileBuffer) {
-				// read localized name of language from file
-				if (readLineContext(fileBuffer, &currLang->name))
-					readLineContext(fileBuffer, &currLang->fontName);
-				closeFileBuffer(fileBuffer);
-			}*/
+            if (fileBuffer) {
+                // read localized name of language from file
+                if (readLineContext(fileBuffer, &currLang->name))
+                    readLineContext(fileBuffer, &currLang->fontName);
+                closeFileBuffer(fileBuffer);
+            }*/
 
             index++;
         }
@@ -416,11 +414,10 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
     return index;
 }
 
-void lngInit(void)
+static void lngRebuildLangNames(void)
 {
-    fntInit();
-
-    nLanguages = listDir(gBaseMCDir, "/", MAX_LANGUAGE_FILES, &lngReadEntry);
+    if (guiLangNames)
+        free(guiLangNames);
 
     // build the languages name list
     guiLangNames = (char **)malloc((nLanguages + 2) * sizeof(char **));
@@ -434,6 +431,29 @@ void lngInit(void)
     }
 
     guiLangNames[nLanguages + 1] = NULL;
+}
+
+int lngAddLanguages(char *path, const char *separator)
+{
+    int result;
+
+    result = listDir(path, separator, MAX_LANGUAGE_FILES - nLanguages, &lngReadEntry);
+    nLanguages += result;
+    lngRebuildLangNames();
+
+    const char *temp;
+    if (configGetStr(configGetByType(CONFIG_OPL), "language_text", &temp)) {
+        lngSetGuiValue(lngFindGuiID(temp));
+    }
+
+    return result;
+}
+
+void lngInit(void)
+{
+    fntInit();
+
+    lngAddLanguages(gBaseMCDir, "/");
 }
 
 void lngEnd(void)

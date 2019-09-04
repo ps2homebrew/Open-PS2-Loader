@@ -50,31 +50,33 @@ BIN2O = $(PS2SDK)/bin/bin2o
 
 # Externally defined variables: IOP_BIN, IOP_OBJS, IOP_LIB
 
-%.o : %.c
+$(IOP_OBJS_DIR)%.o : %.c
 	$(IOP_CC) $(IOP_CFLAGS) -c $< -o $@
 
-%.o : %.S
+$(IOP_OBJS_DIR)%.o : %.S
 	$(IOP_CC) $(IOP_CFLAGS) -c $< -o $@
 
-%.o : %.s
+$(IOP_OBJS_DIR)%.o : %.s
 	$(IOP_AS) $(IOP_ASFLAGS) $< -o $@
 
 # A rule to build imports.lst.
-%.o : %.lst
-	$(ECHO) "#include \"irx_imports.h\"" > build-imports.c
-	cat $< >> build-imports.c
-	$(IOP_CC) $(IOP_CFLAGS) -I. -c build-imports.c -o $@
-	-rm -f build-imports.c
+$(IOP_OBJS_DIR)%.o : %.lst
+	$(ECHO) "#include \"irx_imports.h\"" > $(IOP_OBJS_DIR)build-imports.c
+	cat $< >> $(IOP_OBJS_DIR)build-imports.c
+	$(IOP_CC) $(IOP_CFLAGS) -I. -c $(IOP_OBJS_DIR)build-imports.c -o $@
+	-rm -f $(IOP_OBJS_DIR)build-imports.c
 
 # A rule to build exports.tab.
-%.o : %.tab
-	$(ECHO) "#include \"irx.h\"" > build-exports.c
-	cat $< >> build-exports.c
-	$(IOP_CC) $(IOP_CFLAGS) -I. -c build-exports.c -o $@
-	-rm -f build-exports.c
+$(IOP_OBJS_DIR)%.o : %.tab
+	$(ECHO) "#include \"irx.h\"" > $(IOP_OBJS_DIR)build-exports.c
+	cat $< >> $(IOP_OBJS_DIR)build-exports.c
+	$(IOP_CC) $(IOP_CFLAGS) -I. -c $(IOP_OBJS_DIR)build-exports.c -o $@
+	-rm -f $(IOP_OBJS_DIR)build-exports.c
 
 $(IOP_BIN) : $(IOP_OBJS)
+	echo " -$@"
 	$(IOP_CC) $(IOP_CFLAGS) -o $(IOP_BIN) $(IOP_OBJS) $(IOP_LDFLAGS) $(IOP_LIBS)
 
 $(IOP_LIB) : $(IOP_OBJS)
+	echo " -$@"
 	$(IOP_AR) cru $(IOP_LIB) $(IOP_OBJS)

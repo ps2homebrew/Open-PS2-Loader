@@ -150,8 +150,10 @@ void moduleUpdateMenu(int mode, int themeChanged)
     }
 
     // refresh Cache
-    if (themeChanged)
+    if (themeChanged) {
         submenuRebuildCache(mod->subMenu);
+        sfxInit(0);
+    }
 }
 
 static void itemExecSelect(struct menu_item *curMenu)

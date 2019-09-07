@@ -283,13 +283,13 @@ typedef struct
     char *name;
 } language_t;
 
-int lngAddLanguages(char *path, const char *separator);
+int lngAddLanguages(char *path, const char *separator, int mode);
 void lngInit(void);
 char *lngGetValue(void);
 void lngEnd(void);
 
 // Indices are shifted in GUI, as we add the internal english language at 0
-void lngSetGuiValue(int langGuiId);
+int lngSetGuiValue(int langID);
 int lngGetGuiValue(void);
 int lngFindGuiID(const char *lang);
 char **lngGetGuiList(void);

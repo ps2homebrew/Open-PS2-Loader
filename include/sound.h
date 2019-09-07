@@ -16,6 +16,4 @@ int sfxInit(int bootSnd);
 void sfxVolume(void);
 void sfxPlay(int id);
 
-int thmSfxEnabled;
-
 #endif

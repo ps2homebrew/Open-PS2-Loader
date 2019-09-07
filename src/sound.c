@@ -25,8 +25,6 @@ extern unsigned int size_message_adp;
 extern unsigned char transition_adp[];
 extern unsigned int size_transition_adp;
 
-extern char sound_path[256];
-
 struct sfxEffect {
     const char *name;
     void *buffer;
@@ -114,7 +112,7 @@ static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
     return ret;
 }
 
-static int getFadeDelay(void)
+static int getFadeDelay(char *sound_path)
 {
     FILE* bootSnd;
     char boot_path[256];
@@ -156,29 +154,45 @@ void sfxVolume(void)
 //Returns number of audio files successfully loaded, < 0 if an unrecoverable error occurred.
 int sfxInit(int bootSnd)
 {
+    char sound_path[256];
     char full_path[256];
-    int ret, i, loaded;
+    int ret, loaded;
+    int thmSfxEnabled = 0;
+    int i = 1;
 
     audsrv_adpcm_init();
 
     sfxInitDefaults();
     sfxVolume();
+
+    //Check default theme is not current theme
+    int themeID = thmGetGuiValue();
+    if (themeID != 0) {
+        //Get theme path for sfx
+        char *thmPath = thmGetFilePath(themeID);
+        snprintf(sound_path, sizeof(sound_path), "%ssound", thmPath);
+
+        //Check for custom sfx folder
+        int fd = fileXioDopen(sound_path);
+        if (fd >= 0)
+            thmSfxEnabled = 1;
+
+        fileXioDclose(fd);
+    }
+
     //boot sound only needs to be read/loaded at init
     if (bootSnd) {
-        ret = getFadeDelay();
+        i = 0;
+        ret = getFadeDelay(sound_path);
         if (ret != 0) {
             gFadeDelay = 1200;
         }
-        i = 0;
-    }
-    else {
-        i = 1;
     }
 
     loaded = 0;
     for (; i < SFX_COUNT; i++)
     {
-        if (thmSfxEnabled < 0)
+        if (thmSfxEnabled)
         {
             sprintf(full_path, "%s/%s", sound_path, sfx_files[i].name);
             ret = sfxRead(full_path, &sfx_files[i]);
@@ -208,4 +222,3 @@ void sfxPlay(int id)
         audsrv_ch_play_adpcm(id, &sfx[id]);
     }
 }
-

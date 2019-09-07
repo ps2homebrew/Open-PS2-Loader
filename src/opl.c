@@ -167,7 +167,8 @@ static void itemExecSelect(struct menu_item *curMenu)
             }
         } else {
             support->itemInit();
-            moduleUpdateMenu(support->mode, 0);
+            int changed = support->itemNeedsUpdate();
+            moduleUpdateMenu(support->mode, changed);
             // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
             if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
                 ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
@@ -180,7 +181,7 @@ static void itemExecCancel(struct menu_item *curMenu)
 {
     if (!curMenu->current) {
         return;
-	}
+    }
 
     if (!gEnableWrite)
         return;
@@ -1534,7 +1535,7 @@ static void init(void)
 
     startPads();
 
-    //Compatibility update handler
+    // Compatibility update handler
     ioRegisterHandler(IO_COMPAT_UPDATE_DEFFERED, &compatDeferredUpdate);
 
     // handler for deffered menu updates

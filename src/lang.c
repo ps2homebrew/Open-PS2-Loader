@@ -418,7 +418,7 @@ static void lngRebuildLangNames(void)
     guiLangNames[nLanguages + 1] = NULL;
 }
 
-int lngAddLanguages(char *path, const char *separator)
+int lngAddLanguages(char *path, const char *separator, int mode)
 {
     int result;
 
@@ -427,9 +427,9 @@ int lngAddLanguages(char *path, const char *separator)
     lngRebuildLangNames();
 
     const char *temp;
-    if (configGetStr(configGetByType(CONFIG_OPL), "language_text", &temp)) {
-        lngSetGuiValue(lngFindGuiID(temp));
-    }
+    if (configGetStr(configGetByType(CONFIG_OPL), "language_text", &temp))
+        if (lngSetGuiValue(lngFindGuiID(temp)))
+            moduleUpdateMenu(mode, 0);
 
     return result;
 }
@@ -438,7 +438,7 @@ void lngInit(void)
 {
     fntInit();
 
-    lngAddLanguages(gBaseMCDir, "/");
+    lngAddLanguages(gBaseMCDir, "/", -1);
 }
 
 void lngEnd(void)
@@ -456,7 +456,7 @@ void lngEnd(void)
     fntEnd();
 }
 
-void lngSetGuiValue(int langID)
+int lngSetGuiValue(int langID)
 {
     if (guiLangID != langID) {
 
@@ -466,13 +466,14 @@ void lngSetGuiValue(int langID)
             language_t *currLang = &languages[langID - 1];
             if (lngLoadFromFile(currLang->filePath, currLang->name)) {
                 guiLangID = langID;
-                return;
+                return 1;
             }
         }
 
         lang_strs = internalEnglish;
         guiLangID = 0;
     }
+    return 0;
 }
 
 int lngGetGuiValue(void)

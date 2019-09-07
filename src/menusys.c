@@ -15,10 +15,8 @@
 #include "include/gui.h"
 #include "include/system.h"
 #include "include/ioman.h"
-#include <assert.h>
-
 #include "include/sound.h"
-#include <audsrv.h>
+#include <assert.h>
 
 enum MENU_IDs {
     MENU_SETTINGS = 0,

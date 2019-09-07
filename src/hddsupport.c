@@ -41,8 +41,10 @@ static void hddInitModules(void)
     char path[256];
     sprintf(path, "%sTHM", hddPrefix);
     thmAddElements(path, "/", hddGameList.mode);
+
     sprintf(path, "%sLNG", hddPrefix);
-    lngAddLanguages(path, "/");
+    lngAddLanguages(path, "/", hddGameList.mode);
+    guiUpdateScreenScale();
 
     sbCreateFolders(hddPrefix, 0);
 }

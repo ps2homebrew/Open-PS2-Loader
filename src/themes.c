@@ -1019,10 +1019,9 @@ static int thmReadEntry(int index, const char *path, const char *separator, cons
 }
 
 /* themePath must contains the leading separator (as it is dependent of the device, we can't know here) */
-static int thmLoadResource(int texId, const char *themePath, short psm, int useDefault)
+static int thmLoadResource(GSTEXTURE *texture, int texId, const char *themePath, short psm, int useDefault)
 {
     int success = -1;
-    GSTEXTURE *texture = &gTheme->textures[texId];
 
     if (themePath != NULL)
         success = texDiscoverLoad(texture, themePath, texId, psm); // only set success here
@@ -1167,14 +1166,11 @@ static void thmLoad(const char *themePath)
     // LOGO, loaded here to avoid flickering during startup with device in AUTO + theme set
     texPngLoad(&newT->textures[LOGO_PICTURE], NULL, LOGO_PICTURE, GS_PSM_CT24);
 
-    gTheme = newT;
-    thmFree(curT);
-
     // First start with busy icon
     const char *themePath_temp = themePath;
     int customBusy = 0;
     for (i = LOAD0_ICON; i <= LOAD7_ICON; i++) {
-        if (thmLoadResource(i, themePath_temp, GS_PSM_CT32, gTheme->useDefault) >= 0)
+        if (thmLoadResource(&newT->textures[i], i, themePath_temp, GS_PSM_CT32, newT->useDefault) >= 0)
             customBusy = 1;
         else {
             if (customBusy)
@@ -1183,15 +1179,18 @@ static void thmLoad(const char *themePath)
                 themePath_temp = NULL;
         }
     }
-    gTheme->loadingIconCount = i;
+    newT->loadingIconCount = i;
 
     // Customizable icons
     for (i = USB_ICON; i <= START_ICON; i++)
-        thmLoadResource(i, themePath, GS_PSM_CT32, gTheme->useDefault);
+        thmLoadResource(&newT->textures[i], i, themePath, GS_PSM_CT32, newT->useDefault);
 
     // Not  customizable icons
     for (i = L1_ICON; i <= R2_ICON; i++)
-        thmLoadResource(i, NULL, GS_PSM_CT32, 1);
+        thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1);
+
+    gTheme = newT;
+    thmFree(curT);
 }
 
 static void thmRebuildGuiNames(void)

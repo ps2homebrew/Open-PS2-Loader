@@ -784,6 +784,7 @@ static inline void cdvd_readee(void *buf)
     u8 curlsn_buf[16];
     u32 nbytes, nsectors, sectors_to_read, size_64b, size_64bb, bytesent, temp;
     int sector_size, flag_64b, fsverror;
+    void *fsvRbuf = (void *)cdvdfsv_buf;
     void *eeaddr_64b, *eeaddr2_64b;
     cdvdfsv_readee_t readee;
     RpcCdvd_t *r = (RpcCdvd_t *)buf;
@@ -827,6 +828,7 @@ static inline void cdvd_readee(void *buf)
     temp -= (u32)eeaddr2_64b;
     readee.pdst2 = eeaddr2_64b; // get the end address on a 64 bytes align
     readee.b2len = temp;        // get bytes remainder at end of 64 bytes align
+    fsvRbuf += temp;
 
     if (readee.b1len)
         flag_64b = 0; // 64 bytes alignment flag
@@ -864,7 +866,7 @@ static inline void cdvd_readee(void *buf)
                 temp = nsectors;
             }
 
-            if (sceCdRead(r->lsn, temp, (void *)cdvdfsv_buf, NULL) == 0) {
+            if (sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL) == 0) {
                 if (sceCdGetError() == CDVD_ERR_NO) {
                     fsverror = CDVD_ERR_READCF;
                     sceCdSC(CDSC_SET_ERROR, &fsverror);
@@ -880,14 +882,14 @@ static inline void cdvd_readee(void *buf)
 
             if (!flag_64b) {
                 if (sectors_to_read == r->sectors) // check that was the first read. Data read will be skewed by readee.b1len bytes into the adjacent sector.
-                    mips_memcpy((void *)readee.buf1, (void *)cdvdfsv_buf, readee.b1len);
+                    mips_memcpy((void *)readee.buf1, (void *)fsvRbuf, readee.b1len);
 
                 if ((sectors_to_read == nsectors) && (readee.b1len)) // For the last sector read.
                     size_64bb = size_64b - 64;
             }
 
             if (size_64bb > 0) {
-                sysmemSendEE((void *)(cdvdfsv_buf + readee.b1len), (void *)eeaddr_64b, size_64bb);
+                sysmemSendEE((void *)(fsvRbuf + readee.b1len), (void *)eeaddr_64b, size_64bb);
                 bytesent += size_64bb;
             }
 
@@ -901,7 +903,7 @@ static inline void cdvd_readee(void *buf)
         } while ((flag_64b) || (sectors_to_read));
 
         //At the very last pass, copy readee.b2len bytes from the last sector, to complete the alignment correction.
-        mips_memcpy((void *)readee.buf2, (void *)(cdvdfsv_buf + size_64b - readee.b2len), readee.b2len);
+        mips_memcpy((void *)readee.buf2, (void *)(fsvRbuf + size_64b - readee.b2len), readee.b2len);
     }
 
     *(int *)buf = bytesent;

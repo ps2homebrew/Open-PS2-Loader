@@ -4,6 +4,7 @@
 #include <audsrv.h>
 #include "include/sound.h"
 #include "include/opl.h"
+#include "include/ioman.h"
 #include "include/themes.h"
 
 //default sfx
@@ -31,6 +32,7 @@ struct sfxEffect {
     const char *name;
     void *buffer;
     int size;
+    int builtin;
 };
 
 static struct sfxEffect sfx_files[SFX_COUNT] = {
@@ -51,10 +53,12 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     void *buffer;
     int ret, size;
 
+    LOG("sfxRead('%s')\n", full_path);
+
     adpcm = fopen(full_path, "rb");
     if (adpcm == NULL)
     {
-        printf("Failed to open adpcm file %s\n", full_path);
+        LOG("Failed to open adpcm file %s\n", full_path);
         return -ENOENT;
     }
 
@@ -65,7 +69,7 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     buffer = memalign(64, size);
     if (buffer == NULL)
     {
-        printf("Failed to allocate memory for SFX\n");
+        LOG("Failed to allocate memory for SFX\n");
         fclose(adpcm);
         return -ENOMEM;
     }
@@ -75,13 +79,14 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 
     if(ret != size)
     {
-        printf("Failed to read SFX: %d (expected %d)\n", ret, size);
+        LOG("Failed to read SFX: %d (expected %d)\n", ret, size);
         free(buffer);
         return -EIO;
     }
 
     sfx->buffer = buffer;
     sfx->size = size;
+    sfx->builtin = 0;
 
     return 0;
 }
@@ -90,16 +95,22 @@ static void sfxInitDefaults(void)
 {
     sfx_files[SFX_BOOT].buffer = boot_adp;
     sfx_files[SFX_BOOT].size = size_boot_adp;
+    sfx_files[SFX_BOOT].builtin = 1;
     sfx_files[SFX_CANCEL].buffer = cancel_adp;
     sfx_files[SFX_CANCEL].size = size_cancel_adp;
+    sfx_files[SFX_CANCEL].builtin = 1;
     sfx_files[SFX_CONFIRM].buffer = confirm_adp;
     sfx_files[SFX_CONFIRM].size = size_confirm_adp;
+    sfx_files[SFX_CONFIRM].builtin = 1;
     sfx_files[SFX_CURSOR].buffer = cursor_adp;
     sfx_files[SFX_CURSOR].size = size_cursor_adp;
+    sfx_files[SFX_CURSOR].builtin = 1;
     sfx_files[SFX_MESSAGE].buffer = message_adp;
     sfx_files[SFX_MESSAGE].size = size_message_adp;
+    sfx_files[SFX_MESSAGE].builtin = 1;
     sfx_files[SFX_TRANSITION].buffer = transition_adp;
     sfx_files[SFX_TRANSITION].size = size_transition_adp;
+    sfx_files[SFX_TRANSITION].builtin = 1;
 }
 
 //Returns 0 (AUDSRV_ERR_NOERROR) if the sound was loaded successfully.
@@ -108,8 +119,10 @@ static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
     int ret;
 
     ret = audsrv_load_adpcm(sfx, sfxData->buffer, sfxData->size);
-    free(sfxData->buffer);
-    sfxData->buffer = NULL; //Mark the buffer as freed.
+    if (sfxData->builtin == 0) {
+		free(sfxData->buffer);
+		sfxData->buffer = NULL; //Mark the buffer as freed.
+    }
 
     return ret;
 }
@@ -126,7 +139,7 @@ static int getFadeDelay(void)
     bootSnd = fopen(boot_path, "rb");
     if (bootSnd == NULL)
     {
-        printf("Failed to open adpcm file %s\n", boot_path);
+        LOG("Failed to open adpcm file %s\n", boot_path);
         return -ENOENT;
     }
 
@@ -184,7 +197,7 @@ int sfxInit(int bootSnd)
             ret = sfxRead(full_path, &sfx_files[i]);
             if (ret != 0)
             {
-                printf("SFX: %s could not be loaded. Using default sound %d.\n", full_path, ret);
+                LOG("SFX: %s could not be loaded. Using default sound %d.\n", full_path, ret);
             }
         }
 
@@ -195,7 +208,7 @@ int sfxInit(int bootSnd)
         }
         else
         {
-           printf("SFX: failed to load %s, error %d\n", full_path, ret);
+           LOG("SFX: failed to load %s, error %d\n", full_path, ret);
         }
     }
 

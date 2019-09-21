@@ -156,7 +156,7 @@ static int usbNeedsUpdate(void)
     // update Languages
     if (!LanguagesLoaded) {
         sprintf(path, "%sLNG", usbPrefix);
-        if (lngAddLanguages(path, "/") > 0)
+        if (lngAddLanguages(path, "/", usbGameList.mode) > 0)
             LanguagesLoaded = 1;
     }
 

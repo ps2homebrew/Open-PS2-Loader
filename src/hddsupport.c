@@ -34,15 +34,15 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
 
 static void hddInitModules(void)
 {
-
     hddLoadModules();
 
     // update Themes
     char path[256];
     sprintf(path, "%sTHM", hddPrefix);
     thmAddElements(path, "/", hddGameList.mode);
+
     sprintf(path, "%sLNG", hddPrefix);
-    lngAddLanguages(path, "/");
+    lngAddLanguages(path, "/", hddGameList.mode);
 
     sbCreateFolders(hddPrefix, 0);
 }

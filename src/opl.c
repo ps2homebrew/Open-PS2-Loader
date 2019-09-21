@@ -117,7 +117,7 @@ static char errorMessage[256];
 
 static opl_io_module_t list_support[MODE_COUNT];
 
-void moduleUpdateMenu(int mode, int themeChanged)
+void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 {
     if (mode == -1)
         return;
@@ -126,6 +126,9 @@ void moduleUpdateMenu(int mode, int themeChanged)
 
     if (!mod->support)
         return;
+
+    if (langChanged)
+        guiUpdateScreenScale();
 
     // refresh Hints
     menuRemoveHints(&mod->menuItem);
@@ -167,7 +170,7 @@ static void itemExecSelect(struct menu_item *curMenu)
             }
         } else {
             support->itemInit();
-            moduleUpdateMenu(support->mode, 0);
+            moduleUpdateMenu(support->mode, 0, 0);
             // Manual refreshing can only be done if either auto refresh is disabled or auto refresh is disabled for the item.
             if (!gAutoRefresh || (support->updateDelay == MENU_UPD_DELAY_NOUPDATE))
                 ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
@@ -180,7 +183,7 @@ static void itemExecCancel(struct menu_item *curMenu)
 {
     if (!curMenu->current) {
         return;
-	}
+    }
 
     if (!gEnableWrite)
         return;
@@ -296,7 +299,7 @@ static void initMenuForListSupport(int mode)
 
     mod->menuItem.hints = NULL;
 
-    moduleUpdateMenu(mode, 0);
+    moduleUpdateMenu(mode, 0, 0);
 
     struct gui_update_t *mc = guiOpCreate(GUI_OP_ADD_MENU);
     mc->menu.menu = &mod->menuItem;
@@ -333,7 +336,7 @@ static void initSupport(item_list_t *itemList, int startMode, int mode, int forc
 
         if (((force_reinit) && (startMode && mod->support->enabled)) || (startMode == START_MODE_AUTO && !mod->support->enabled)) {
             mod->support->itemInit();
-            moduleUpdateMenu(mode, 0);
+            moduleUpdateMenu(mode, 0, 0);
 
             ioPutRequest(IO_MENU_UPDATE_DEFFERED, &mod->support->mode); // can't use mode as the variable will die at end of execution
         }
@@ -685,8 +688,11 @@ static int tryAlternateDevice(int types)
     // At this point, the user has no loadable config files on any supported device, so try to find a device to save on.
     // We don't want to get users into alternate mode for their very first launch of OPL (i.e no config file at all, but still want to save on MC)
     // Check for a memory card inserted.
-    if (sysCheckMC() >= 0)
+    if (sysCheckMC() >= 0) {
+        configPrepareNotifications(gBaseMCDir);
+        showCfgPopup = 0;
         return 0;
+    }
     // No memory cards? Try a USB device...
     value = fileXioDopen("mass0:");
     if (value >= 0) {
@@ -702,6 +708,7 @@ static int tryAlternateDevice(int types)
             configInit("pfs0:");
         }
     }
+    showCfgPopup = 0;
 
     return 0;
 }
@@ -726,6 +733,7 @@ static void _loadConfig()
             configGetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
             configGetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
             configGetInt(configOPL, CONFIG_OPL_USE_INFOSCREEN, &gUseInfoScreen);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, &gEnableNotifications);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, &gEnableArt);
             configGetInt(configOPL, CONFIG_OPL_WIDESCREEN, &gWideScreen);
             configGetInt(configOPL, CONFIG_OPL_VMODE, &gVMode);
@@ -888,6 +896,7 @@ static void _saveConfig()
         configSetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
         configSetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
         configSetInt(configOPL, CONFIG_OPL_USE_INFOSCREEN, gUseInfoScreen);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, gEnableNotifications);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, gEnableArt);
         configSetInt(configOPL, CONFIG_OPL_WIDESCREEN, gWideScreen);
         configSetInt(configOPL, CONFIG_OPL_VMODE, gVMode);
@@ -968,8 +977,7 @@ void applyConfig(int themeID, int langID)
 
     // theme must be set after color, and lng after theme
     changed = thmSetGuiValue(themeID, changed);
-    if (langID != -1)
-        lngSetGuiValue(langID);
+    int langChanged = lngSetGuiValue(langID);
 
     guiUpdateScreenScale();
 
@@ -977,10 +985,10 @@ void applyConfig(int themeID, int langID)
 
     menuReinitMainMenu();
 
-    moduleUpdateMenu(USB_MODE, changed);
-    moduleUpdateMenu(ETH_MODE, changed);
-    moduleUpdateMenu(HDD_MODE, changed);
-    moduleUpdateMenu(APP_MODE, changed);
+    moduleUpdateMenu(USB_MODE, changed, langChanged);
+    moduleUpdateMenu(ETH_MODE, changed, langChanged);
+    moduleUpdateMenu(HDD_MODE, changed, langChanged);
+    moduleUpdateMenu(APP_MODE, changed, langChanged);
 
 #ifdef __DEBUG
     debugApplyConfig();
@@ -999,14 +1007,22 @@ int loadConfig(int types)
 
 int saveConfig(int types, int showUI)
 {
+    char notification[32];
+    char *col_pos;
     lscstatus = types;
     lscret = 0;
 
     guiHandleDeferedIO(&lscstatus, _l(_STR_SAVING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_saveConfig);
 
     if (showUI) {
-        if (lscret)
-            guiMsgBox(_l(_STR_SETTINGS_SAVED), 0, NULL);
+        if (lscret) {
+            char *path = configGetDir();
+            snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiMsgBox(notification, 0, NULL);
+        }
         else
             guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0, NULL);
     }
@@ -1281,14 +1297,14 @@ static int loadHdldSvr(void)
         toggleSfx = 1;
     }
 
-    //deint audio lib while hdl server is running
+    // deint audio lib while hdl server is running
     audsrv_quit();
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
     guiExecDeferredOps();
 
-    //Deinitialize all support without shutting down the HDD unit.
+    // Deinitialize all support without shutting down the HDD unit.
     deinitAllSupport(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     clearErrorMessage(); /*	At this point, an error might have been displayed (since background tasks were completed).
 					Clear it, otherwise it will get displayed after the server is closed.	*/
@@ -1475,6 +1491,7 @@ static void setDefaults(void)
     gUSBPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gUseInfoScreen = 0;
+    gEnableNotifications = 0;
     gEnableArt = 0;
     gWideScreen = 0;
     gEnableSFX = 0;
@@ -1534,7 +1551,7 @@ static void init(void)
 
     startPads();
 
-    //Compatibility update handler
+    // compatibility update handler
     ioRegisterHandler(IO_COMPAT_UPDATE_DEFFERED, &compatDeferredUpdate);
 
     // handler for deffered menu updates
@@ -1579,7 +1596,7 @@ static void deferredAudioInit(void)
     else
         LOG("sfxInit: failed to initialize - %d.\n", ret);
 
-    //boot sound
+    // boot sound
     if (gEnableBootSND) {
         sfxPlay(SFX_BOOT);
     }

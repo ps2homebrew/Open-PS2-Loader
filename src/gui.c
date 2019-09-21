@@ -20,9 +20,7 @@
 #include "include/compatupd.h"
 #include "include/pggsm.h"
 #include "include/cheatman.h"
-
 #include "include/sound.h"
-#include <audsrv.h>
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -49,6 +47,12 @@ static ee_sema_t gQueueSema;
 
 static int screenWidth;
 static int screenHeight;
+
+static int popupSfxPlayed;
+static int popupTimer;
+
+static int showThmPopup;
+static int showLngPopup;
 
 // forward decl.
 static void guiShow();
@@ -232,6 +236,92 @@ void guiShowAbout()
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
     toggleSfx = 0;
+}
+
+static void guiBootNotifications(void)
+{
+    if (gEnableNotifications) {
+        int themeID = thmGetGuiValue();
+        if (themeID != 0)
+            showThmPopup = 1;
+
+        int langID = lngGetGuiValue();
+        if (langID != 0)   
+            showLngPopup = 1;
+
+        if (showThmPopup || showLngPopup || showCfgPopup) {
+            popupSfxPlayed = 0;
+            popupTimer -= 30;
+        }
+    }
+}
+
+static void guiResetNotifications(void)
+{
+    popupSfxPlayed = 1;
+    popupTimer = 0;
+    showThmPopup = 0;
+    showLngPopup = 0;
+}
+
+static void guiShowNotifications(void)
+{
+    int x;
+    int y = 10;
+    int yadd = 35;
+    char notification[32];
+    char *col_pos;
+
+    if (showThmPopup || showLngPopup || showCfgPopup)
+        popupTimer++;
+
+    if (!popupSfxPlayed && popupTimer >= 20) {
+        sfxPlay(SFX_MESSAGE);
+        popupSfxPlayed = 1;
+    }
+
+    if (showCfgPopup && popupTimer >= 20) {
+        char *path = configGetDir();
+        snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), "CFG", path);
+        if ((col_pos = strchr(notification, ':')) != NULL)
+            *(col_pos + 1) = '\0';
+
+        x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+
+        rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+        fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    }
+    y += yadd;
+
+    if (showThmPopup && popupTimer >= 20) {
+        char *path = thmGetFilePath(thmGetGuiValue());
+        snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), "THM", path);
+        if ((col_pos = strchr(notification, ':')) != NULL)
+            *(col_pos + 1) = '\0';
+
+        x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+
+        rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+        fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    }
+    y += yadd;
+
+    if (showLngPopup && popupTimer >= 20) {
+        char *path = lngGetFilePath(lngGetGuiValue());
+        snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), "LNG", path);
+        if ((col_pos = strchr(notification, ':')) != NULL)
+            *(col_pos + 1) = '\0';
+
+        x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+
+        rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+        fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    }
+
+    if (popupTimer >= CLOCKS_PER_SEC / 2000) {
+        guiResetNotifications();
+        showCfgPopup = 0;
+    }
 }
 
 static int guiNetCompatUpdRefresh(int modified)
@@ -502,6 +592,8 @@ static int guiUIUpdater(int modified)
 void guiShowUIConfig(void)
 {
     curTheme = -1;
+    showCfgPopup = 0;
+    guiResetNotifications();
 
     // configure the enumerations
     const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
@@ -519,6 +611,8 @@ void guiShowUIConfig(void)
         , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
         , NULL};
     int previousVMode;
+    int previousTheme = thmGetGuiValue();
+    int previousLang = lngGetGuiValue();
 
 reselect_video_mode:
     previousVMode = gVMode;
@@ -532,6 +626,7 @@ reselect_video_mode:
     diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
     diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
     diaSetInt(diaUIConfig, UICFG_INFOPAGE, gUseInfoScreen);
+    diaSetInt(diaUIConfig, UICFG_NOTIFICATIONS, gEnableNotifications);
     diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
     diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
     diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
@@ -555,6 +650,7 @@ reselect_video_mode:
         diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
         diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
         diaGetInt(diaUIConfig, UICFG_INFOPAGE, &gUseInfoScreen);
+        diaGetInt(diaUIConfig, UICFG_NOTIFICATIONS, &gEnableNotifications);
         diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
         diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
         diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
@@ -566,6 +662,16 @@ reselect_video_mode:
         //wait 70ms for confirm sound to finish playing before clearing buffer
         guiDelay(0070);
         sfxInit(0);
+
+        if (previousTheme != themeID && themeID != 0) {
+            showThmPopup = 1;
+            popupSfxPlayed = 0;
+        }
+
+        if (previousLang != langID && langID != 0) {
+            showLngPopup = 1;
+            popupSfxPlayed = 0;
+        }
     }
 
     if (previousVMode != gVMode) {
@@ -1104,14 +1210,14 @@ void guiShowParentalLockConfig(void)
 
 void guiShowAudioConfig(void)
 {
-	int ret;
+    int ret;
 
     diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND, gEnableBootSND);
     diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
 
-    ret = diaExecuteDialog(diaAudioConfig, -1, 1, &guiUpdater);
+    ret = diaExecuteDialog(diaAudioConfig, -1, 1, NULL);
     if (ret) {
         diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
         diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
@@ -2106,8 +2212,8 @@ void guiIntroLoop(void)
 {
     int endIntro = 0;
 
-     if (gEnableSFX && gEnableBootSND)
-         toggleSfx = -1;
+    if (gEnableSFX && gEnableBootSND)
+        toggleSfx = -1;
 
     while (!endIntro) {
         guiStartFrame();
@@ -2139,6 +2245,9 @@ void guiIntroLoop(void)
 
 void guiMainLoop(void)
 {
+    guiResetNotifications();
+    guiBootNotifications();
+
     while (!gTerminate) {
         guiStartFrame();
 
@@ -2150,6 +2259,9 @@ void guiMainLoop(void)
 
         // Render overlaying gui thingies :)
         guiDrawOverlays();
+
+        if (gEnableNotifications)
+            guiShowNotifications();
 
         // handle deferred operations
         guiHandleDeferredOps();

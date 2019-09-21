@@ -8,9 +8,7 @@
 #include "include/fntsys.h"
 #include "include/lang.h"
 #include "include/pad.h"
-
 #include "include/sound.h"
-#include <audsrv.h>
 
 #define MENU_POS_V 50
 #define HINT_HEIGHT 32
@@ -28,8 +26,6 @@ static int guiThemeID = 0;
 static int nThemes = 0;
 static theme_file_t themes[THM_MAX_FILES];
 static const char **guiThemesNames = NULL;
-
-char sound_path[256];
 
 enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_ATTRIBUTE_TEXT = 0,
@@ -1099,21 +1095,10 @@ static void thmLoad(const char *themePath)
         //No theme specified. Prepare and load the default theme.
         themeConfig = configAlloc(0, NULL, NULL);
         configReadBuffer(themeConfig, &conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
-        thmSfxEnabled = 0;
     } else {
         snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);
         themeConfig = configAlloc(0, NULL, path);
         configRead(themeConfig); // try to load the theme config file. If it does not exist, defaults will be used.
-
-        //Get theme path for sfx, to use later
-        snprintf(sound_path, sizeof(sound_path), "%ssound", themePath);
-        //Check for custom sfx folder
-        int fd = fileXioDopen(sound_path);
-        if (fd < 0)
-            thmSfxEnabled = 0;
-        else
-            thmSfxEnabled = -1;
-        fileXioDclose(fd);
     }
 
     int intValue;
@@ -1198,7 +1183,7 @@ static void thmRebuildGuiNames(void)
     if (guiThemesNames)
         free(guiThemesNames);
 
-    // build the languages name list
+    // build the themes name list
     guiThemesNames = (const char **)malloc((nThemes + 2) * sizeof(char **));
 
     // add default internal
@@ -1224,7 +1209,7 @@ int thmAddElements(char *path, const char *separator, int mode)
     if (configGetStr(configGetByType(CONFIG_OPL), "theme", &temp)) {
         LOG("THEMES Trying to set again theme: %s\n", temp);
         if (thmSetGuiValue(thmFindGuiID(temp), 0))
-            moduleUpdateMenu(mode, 1);
+            moduleUpdateMenu(mode, 1, 0);
     }
 
     return result;
@@ -1310,6 +1295,14 @@ int thmFindGuiID(const char *theme)
 const char **thmGetGuiList(void)
 {
     return guiThemesNames;
+}
+
+char *thmGetFilePath(int themeID)
+{
+    theme_file_t *currTheme = &themes[themeID - 1];
+    char *path = currTheme->filePath;
+
+    return path;
 }
 
 void thmEnd(void)

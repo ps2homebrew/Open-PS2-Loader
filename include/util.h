@@ -3,6 +3,7 @@
 
 #include <gsToolkit.h>
 
+int getmcID(void);
 int getFileSize(int fd);
 int openFile(char *path, int mode);
 void *readFile(char *path, int align, int *size);

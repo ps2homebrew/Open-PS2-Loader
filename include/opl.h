@@ -74,7 +74,7 @@ int loadConfig(int types);
 int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID);
 void menuDeferredUpdate(void *data);
-void moduleUpdateMenu(int mode, int themeChanged);
+void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
 void handleHdlSrv();
 void deinit(int exception, int modeSelected);
 
@@ -119,6 +119,7 @@ int gAPPStartMode;
 int gAutosort;
 int gAutoRefresh;
 int gUseInfoScreen;
+int gEnableNotifications;
 int gEnableArt;
 int gWideScreen;
 int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
@@ -135,6 +136,8 @@ int gBootSndVolume;
 
 int gFadeDelay;
 int toggleSfx;
+
+int showCfgPopup;
 
 #ifdef IGS
 #define IGS_VERSION "0.1"

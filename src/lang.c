@@ -196,7 +196,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Overscan",
     "Overscan adjustment.",
     "FMV Skip",
-    "Skips Full Motion Videos",
+    "Skips full motion videos.",
     "Cheat Settings",
     "Enable PS2RD Cheat Engine",
     "Lets PS2RD Cheat Engine patch your game.",
@@ -215,7 +215,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Update cancelled.",
     "Download settings from the network?",
     "Customized Settings",
-    "Downloaded Defaults",
+    "Downloaded defaults.",
     "Auto start in %i s...",
     "Auto Start",
     "Value in second(s), 0 to disable auto start.",
@@ -276,7 +276,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Confirm video mode change?",
     "Cache Game List (HDD)",
     "Enable Notifications",
-    "%s Loaded From %s",
+    "%s loaded from %s",
 };
 
 static int guiLangID = 0;

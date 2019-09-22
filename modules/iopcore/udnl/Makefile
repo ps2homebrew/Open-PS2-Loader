@@ -1,8 +1,6 @@
 IOP_BIN  = udnl.irx
 IOP_OBJS = udnl.o udnl_asm.o imports.o
 
-IOP_CFLAGS  += -Wall -fno-builtin -Os -mno-check-zero-division
-IOP_LDFLAGS += -s
 IOP_INCS += -I./include
 ifeq ($(DECI2_DEBUG),1)
 IOP_CFLAGS += -D__DECI2_DEBUG

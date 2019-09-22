@@ -59,6 +59,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_UI_TEXTCOLOR "ui_text_color"
 #define CONFIG_OPL_SEL_TEXTCOLOR "sel_text_color"
 #define CONFIG_OPL_USE_INFOSCREEN "use_info_screen"
+#define CONFIG_OPL_ENABLE_NOTIFICATIONS "enable_notifications"
 #define CONFIG_OPL_ENABLE_COVERART "enable_coverart"
 #define CONFIG_OPL_WIDESCREEN "wide_screen"
 #define CONFIG_OPL_VMODE "vmode"
@@ -157,5 +158,8 @@ void configClear(config_set_t *configSet);
 void configGetVMC(config_set_t *configSet, char *vmc, int length, int slot);
 void configSetVMC(config_set_t *configSet, const char *vmc, int slot);
 void configRemoveVMC(config_set_t *configSet, int slot);
+
+char *configGetDir(void);
+void configPrepareNotifications(char *prefix);
 
 #endif

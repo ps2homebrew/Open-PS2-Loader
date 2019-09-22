@@ -24,6 +24,11 @@ static int mcID = -1;
 
 void guiWarning(const char *text, int count);
 
+int getmcID(void)
+{
+    return mcID;
+}
+
 int getFileSize(int fd)
 {
     int size = fileXioLseek(fd, 0, SEEK_END);

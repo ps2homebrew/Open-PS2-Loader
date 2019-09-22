@@ -152,6 +152,27 @@ static struct config_value_t *getConfigItemForName(config_set_t *configSet, cons
     return val;
 }
 
+static char cfgDevice[8];
+
+char *configGetDir(void)
+{
+    char *path = cfgDevice;
+    return path;
+}
+
+void configPrepareNotifications(char *prefix)
+{
+    int mcID;
+
+    snprintf(cfgDevice, sizeof(cfgDevice), prefix);
+    if (!strncmp(cfgDevice, "mc?", 3)) {
+        mcID = getmcID();
+        cfgDevice[2] = mcID;
+    }
+
+    showCfgPopup = 1;
+}
+
 void configInit(char *prefix)
 {
     char path[256];
@@ -166,6 +187,8 @@ void configInit(char *prefix)
         snprintf(path, sizeof(path), "%s/%s", prefix, configFilenames[i]);
         configAlloc(1 << i, &configFiles[i], path);
     }
+
+    configPrepareNotifications(prefix);
 }
 
 void configSetMove(char *prefix)

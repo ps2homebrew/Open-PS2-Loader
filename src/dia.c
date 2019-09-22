@@ -13,9 +13,7 @@
 #include "include/fntsys.h"
 #include "include/themes.h"
 #include "include/util.h"
-
 #include "include/sound.h"
-#include <audsrv.h>
 
 // UI spacing of the dialogues (pixels between consecutive items)
 #define UI_SPACING_H 10

@@ -21,7 +21,6 @@
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
-#include <audsrv.h>
 
 #include "include/pggsm.h"
 #include "include/cheatman.h"

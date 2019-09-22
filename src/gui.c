@@ -48,11 +48,7 @@ static ee_sema_t gQueueSema;
 static int screenWidth;
 static int screenHeight;
 
-static int popupSfxPlayed;
 static int popupTimer;
-
-static int showThmPopup;
-static int showLngPopup;
 
 // forward decl.
 static void guiShow();
@@ -241,12 +237,10 @@ void guiShowAbout()
 static void guiBootNotifications(void)
 {
     if (gEnableNotifications) {
-        int themeID = thmGetGuiValue();
-        if (themeID != 0)
+        if (thmGetGuiValue() != 0)
             showThmPopup = 1;
 
-        int langID = lngGetGuiValue();
-        if (langID != 0)   
+        if (lngGetGuiValue() != 0)   
             showLngPopup = 1;
 
         if (showThmPopup || showLngPopup || showCfgPopup) {
@@ -599,8 +593,6 @@ void guiShowUIConfig(void)
         , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
         , NULL};
     int previousVMode;
-    int previousTheme = thmGetGuiValue();
-    int previousLang = lngGetGuiValue();
 
 reselect_video_mode:
     previousVMode = gVMode;
@@ -650,16 +642,6 @@ reselect_video_mode:
         //wait 70ms for confirm sound to finish playing before clearing buffer
         guiDelay(0070);
         sfxInit(0);
-
-        if (previousTheme != themeID && themeID != 0) {
-            showThmPopup = 1;
-            popupSfxPlayed = 0;
-        }
-
-        if (previousLang != langID && langID != 0) {
-            showLngPopup = 1;
-            popupSfxPlayed = 0;
-        }
     }
 
     if (previousVMode != gVMode) {

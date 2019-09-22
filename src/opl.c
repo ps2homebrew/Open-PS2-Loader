@@ -127,8 +127,13 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
     if (!mod->support)
         return;
 
-    if (langChanged)
+    if (langChanged) {
         guiUpdateScreenScale();
+        if (lngGetGuiValue() != 0) {
+            showLngPopup = 1;
+            popupSfxPlayed = 0;
+        }
+    }
 
     // refresh Hints
     menuRemoveHints(&mod->menuItem);
@@ -153,8 +158,13 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
     }
 
     // refresh Cache
-    if (themeChanged)
+    if (themeChanged) {
         submenuRebuildCache(mod->subMenu);
+        if (thmGetGuiValue() != 0) {
+            showThmPopup = 1;
+            popupSfxPlayed = 0;
+        }
+    }
 }
 
 static void itemExecSelect(struct menu_item *curMenu)

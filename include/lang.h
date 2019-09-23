@@ -267,6 +267,8 @@ enum _STR_IDS {
     _STR_BOOT_SND_VOLUME,
     _STR_CFM_VMODE_CHG,
     _STR_CACHE_HDD_GAME_LIST,
+    _STR_ENABLE_NOTIFICATIONS,
+    _STR_NOTIFICATIONS,
 //START of OPL_DB tweaks
     _STR_ELM,
     _STR_ELMMODE,
@@ -294,15 +296,16 @@ typedef struct
     char *name;
 } language_t;
 
-int lngAddLanguages(char *path, const char *separator);
+int lngAddLanguages(char *path, const char *separator, int mode);
 void lngInit(void);
 char *lngGetValue(void);
 void lngEnd(void);
 
 // Indices are shifted in GUI, as we add the internal english language at 0
-void lngSetGuiValue(int langGuiId);
+int lngSetGuiValue(int langID);
 int lngGetGuiValue(void);
 int lngFindGuiID(const char *lang);
 char **lngGetGuiList(void);
+char *lngGetFilePath(int langID);
 
 #endif

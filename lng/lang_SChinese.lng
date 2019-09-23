@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: Feb. 17, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Simplified Chinese
 OPL %s
@@ -9,7 +9,7 @@ OPL %s
 网络设置
 进阶设置
 <无数值>
-设置已保存...
+Settings saved to %s
 写入设置错误!
 离开
 设置
@@ -133,7 +133,7 @@ GUEST验证留空.
 VMC 存档已存在
 无效的 VMC 存档, 大小有误
 需要建立VMC 存档
-VMC %s 出错, 继续使用物理记忆卡吗 (slot %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 自动重新整理
 关于
 程序
@@ -266,6 +266,8 @@ vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
 启动音量
 确认视频模式更改？
 缓存游戏列表 (硬盘)
+Enable Notifications
+%s loaded from %s
 PS1游戏
 PS1游戏启动模式
 POPSTARTER.ELF在'%s'上找不到!

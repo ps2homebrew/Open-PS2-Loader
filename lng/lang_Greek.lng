@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: Mar. 24, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -9,7 +9,7 @@ OPL %s
 Ρυθμίσεις δικτύου
 Προχωρημένες ρυθμίσεις
 <κενό>
-Οι ρυθμίσεις αποθηκεύτηκαν...
+Settings saved to %s
 Σφάλμα κατά την εγγραφή των ρυθμίσεων!
 Έξοδος
 Ρυθμίσεις
@@ -133,7 +133,7 @@ VMC γενικής χρήσης
 Το αρχείο VMC υπάρχει ήδη.
 Μη έγκυρο αρχείο VMC, το μέγεθος είναι λάθος.
 Πρέπει να δημιουργηθεί αρχείο VMC.
-Σφάλμα VMC %s, συνέχεια με την κανονική MC (Κάρτα Μνήμης %d) ;
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Αυτόματη ανανέωση
 Σχετικά
 Προγραμματιστές
@@ -266,6 +266,8 @@ ID κατασκευαστή:
 Ένταση ήχου εκκίνησης
 Επιβεβαίωση αλλαγής της λειτουργίας βίντεο;
 Caching λίστας παιχνιδιών (HDD)
+Enable Notifications
+%s loaded from %s
 Παιχνίδια PS1
 Εκκίνηση μενού Παιχνιδιών PS1
 Το POPSTARTER.ELF δεν βρέθηκε στη θέση '%s'!

@@ -1,6 +1,6 @@
 # Translation by lauchon22
-# Last update: Feb. 03, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
 OPL %s
@@ -9,7 +9,7 @@ Atrás
 Ajustes conexión de red
 Opciones avanzadas
 <Sin configurar>
-Configuración guardada.
+Settings saved to %s
 ¡Error al guardar la configuración!
 Salir
 Configuración
@@ -133,7 +133,7 @@ Progreso
 Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
-Error con el archivo VMC %s, ¿continuar con la tarjeta física (slot %d)?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
@@ -171,10 +171,10 @@ Modo 7
 Modo 8
 Configuración GSM
 Configuración de velocidad ethernet y duplex
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 Opciones GSM
 Activar GSM
 Activar o desactivar GSM
@@ -266,6 +266,8 @@ Volumen de efectos de sonido
 Volumen de sonido de inicio
 Confirma cambiar modo de video?
 Cachè de lista de juegos (HDD)
+Enable Notifications
+%s loaded from %s
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

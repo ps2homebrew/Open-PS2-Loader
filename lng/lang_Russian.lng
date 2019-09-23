@@ -1,6 +1,6 @@
 # Translated by druchapucha and frodosumkin
-# Last update: Jan. 31, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
 OPL %s
@@ -9,7 +9,7 @@ OPL %s
 Конфигурация сети
 Расширенные опции
 <не указано>
-Настройки сохранены...
+Settings saved to %s
 Ошибка сохранения настроек!
 Выход
 Настройки
@@ -133,7 +133,7 @@ NetBIOS
 VMC файл существует
 Поврежденный VMC файл, неправильный размер
 Необходимо создать VMC файл
-Ошибка с VMC %s, использовать физическую карту (слот %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Автоматическое обновление
 О программе
 Кодеры
@@ -266,6 +266,8 @@ VMC %s файл фрагментирован. Продолжить с карто
 Громкость звука загрузки
 Подтвердить изменение режима видео?
 Кэш игрового списка (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 игры
 Отображать экран PS1 игр
 POPSTARTER.ELF не найден '%s'!

@@ -1,6 +1,6 @@
 # Translation by machiavel and Squall
-# Last update: March 29, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
 OPL %s
@@ -9,7 +9,7 @@ Retour
 Configuration réseau
 Options avancées
 <vide>
-Options sauvegardées...
+Settings saved to %s
 Erreur d'écriture des options!
 Quitter
 Options
@@ -133,7 +133,7 @@ Progression
 Fichier VMC existant
 Fichier VMC invalide, taille incorrecte
 Fichier VMC doit d'abord être créé
-Erreur sur VMC %s. Continuer sur MC physique %d ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Rafraîchissement automatique
 À propos
 Codeurs
@@ -171,10 +171,10 @@ Mode 7
 Mode 8
 Configurer GSM
 Lien mode ETH
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 Options GSM
 Activer GSM
 Basculer On/Off GSM
@@ -266,6 +266,8 @@ Volume des effets sonore
 Volume du son de démarrage
 Confirmer le changement du mode vidéo?
 Cache liste de jeu (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
 Mode d'affichage des jeux PS1
 POPSTARTER.ELF non trouvé à '%s'!

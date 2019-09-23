@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: Feb. 17, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
@@ -9,7 +9,7 @@ Geri
 Ağ ayarları
 Gelişmiş ayarlar
 <değer yok>
-Ayarlar kayıt edildi...
+Settings saved to %s
 Ayarlar yazılırken hata oluştu!
 Çıkış
 Ayarlar
@@ -133,7 +133,7 @@ Durum
 VMC dosyası var
 Geçersiz VMC dosyası, boyut hatalı
 VMC dosyasının oluşturulması gerekli
-VMC %sdosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Otomatik yenileme
 Hakkında
 Geliştiriciler
@@ -171,10 +171,10 @@ Kip 7
 Kip 8
 GSM ayarları
 Ağ Bağlantı kipi
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 GSM Ayarları
 GSM Aktif
 GSM'i Açar ve Kapatır
@@ -265,7 +265,9 @@ Açılış Sesi Olsun
 Ses Efektleri Kuvveti
 Açılış Sesi Kuvveti
 Video çıkış modu değiştirilsin mi?
-Cache Game List (HDD)
+Cache Game List (HD)
+Enable Notifications
+%s loaded from %s
 PS1 Oyunları
 PS1 Oyunları Ekran Modu
 POPSTARTER.ELF '%s' de bulunamadı.

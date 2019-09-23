@@ -1,6 +1,6 @@
 # Translation by BongKris
-# Last update: Jan. 30, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Danish
 OPL %s
@@ -9,7 +9,7 @@ Tilbage
 Netværksindstillinger
 Avancerede indstillinger
 <ingen værdi>
-Indstillinger gemt...
+Settings saved to %s
 Fejl ved lagering af indstillinger!
 Afslut
 Indstillinger
@@ -133,7 +133,7 @@ Fremskridt
 VMC-fil eksisterer allerede
 Ugyldig VMC-fil, størrelse er ukorrekt
 VMC-fil skal oprettes
-Fejl med VMC %s, fortsæt med fysisk MC (port %d)?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Automatisk opdatering
 Om
 Kodere
@@ -248,7 +248,7 @@ Multitap Emulator på port
 Vælg port til Multitap-emulering.
 Deaktiver løsning for falsk DS3
 Nogle falske DS3'er har brug for en løsning, dette deaktivere den.
-Emulate FIELD flipping
+Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
 Parental Lock Password
@@ -266,8 +266,10 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
-PS1 Games display mode
+PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.

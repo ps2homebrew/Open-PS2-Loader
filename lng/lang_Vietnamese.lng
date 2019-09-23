@@ -1,6 +1,6 @@
 # Translation by zidane89
-# Last update: April 22, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Vietnamese
 OPL %s
@@ -9,7 +9,7 @@ Quay lại
 Cấu hình mạng
 Tùy chọn nâng cao
 <không giá trị>
-Lưu các cài đặt...
+Settings saved to %s
 Không lưu được cài đặt!
 Thoát
 Cài đặt
@@ -133,7 +133,7 @@ Tiến hành
 File VMC không tồn tại
 File VMC không hợp lệ, Dung lượng không đúng
 File VMC cần được tạo
-Lỗi với VMC %s, tiếp tục với thẻ save thật (khe %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Tự động làm tươi
 Thông tin
 Coders
@@ -170,11 +170,11 @@ Mode 6
 Mode 7  
 Mode 8  
 Cấu hình GSM
-Ethernet link mode
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+Ethernet Link Mode
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 Cài đặt GSM 
 Bật GSM
 Bật hoặc tắt GSM
@@ -266,6 +266,8 @@ Mức hiệu ứng âm thanh
 Tăng mức âm lượng
 Thay đổi chế độ video?
 Cache danh sách trò chơi (HDD)
+Enable Notifications
+%s loaded from %s
 Các trò chơi PS1 
 Chế độ hiển thị cho game PS1 
 POPSTARTER.ELF không có ở '%s'!

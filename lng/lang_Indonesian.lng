@@ -9,7 +9,7 @@ Kembali
 Konfigurasi jaringan
 Pilihan lanjutan
 <tak ada nilai>
-Setingan disimpan...
+Settings saved to %s
 Kesalahan penulisan setingan!
 Keluar
 Setingan
@@ -133,7 +133,7 @@ Kemajuan
 Berkas VMC ada
 Berkas VMC cacat, ukuran salah
 Berkas VMC harus dibuat
-Kesalahan dengan VMC %s, lanjutkan dengan MC fisik (Slot %d)?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Segarkan otomatis
 Tentang
 Pengkode
@@ -266,6 +266,8 @@ Volume efek suara
 Volume suara Boot
 Konfirmasi mengubah mode video?
 Daftar Tembolok Game(HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

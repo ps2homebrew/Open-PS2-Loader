@@ -1,6 +1,6 @@
 # Translated by DDinghoya
-# Last update: Feb. 11, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
@@ -9,7 +9,7 @@ OPL %s
 네트워크 구성
 고급 옵션
 <값 없음>
-설정 저장…
+Settings saved to %s
 설정 기록 중 에러!
 종료
 설정
@@ -133,7 +133,7 @@ VMC 구성
 VMC 파일 존재
 잘못된 VMC 파일, 크기가 다릅니다.
 VMC 파일이 생성되야 합니다.
-VMC %s 에러, 메모리카드(슬롯 %d)에서 계속합니까?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 자동 새로 고침
 오픈 PS2 로더에 관하여
 개발자
@@ -171,10 +171,10 @@ V-Sync
 모드 8
 GSM 구성
 이더넷 링크 모드
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 GSM 설정
 GSM 활성
 GSM 켜기 또는 끄기
@@ -266,6 +266,8 @@ VMC %s 파일이 조각났습니다. 슬롯 %d에 있는 메모리 카드로 계
 사운드 볼륨 부팅
 비디오 모드 변경을 확인 하시겠습니까?
 캐쉬 게임 목록 (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 게임
 PS1 게임 표시 모드
 '%s'에 POPSTARTER.ELF이 없습니다!

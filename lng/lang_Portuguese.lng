@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: Jan. 31, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -9,7 +9,7 @@ Voltar
 Configurações de Rede
 Opções avançadas
 <sem valores>
-Configurações salvas
+Configurações guardadas em %s
 Erro ao salvar configurações!
 Sair
 Configurações
@@ -133,7 +133,7 @@ Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 Arquivo VMC precisa ser criado!
-Erro com o ficheiro VMC %s, continuar com MC físico (slot %d) ?
+Erro ao aceder ao VMC %s. Continuar com o Cartão de Memória na ranhura %d?
 Atualização automática
 Créditos
 Desenvolvedores
@@ -171,10 +171,10 @@ Modo 7
 Modo 8
 Configurar GSM
 Velocidade Ethernet e sistema Duplex
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 Opções do GSM
 Ativar o GSM
 Permitir que o GSM ative o modo de vídeo escolhido
@@ -266,6 +266,8 @@ Volume dos sons
 Volume do som de arranque
 Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HDD)
+Ativar notificações
+%s carregado de %s
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

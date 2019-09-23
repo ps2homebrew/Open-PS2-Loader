@@ -1,6 +1,6 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: Feb. 09, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 OPL %s
@@ -9,7 +9,7 @@ Zurück
 Netzwerkkonfiguration
 Fortgeschrittene Optionen
 <keine werte>
-Einstellungen gespeichert...
+Einstellungen gespeichert in %s
 Fehler beim Schreiben der Einstellungen!
 Verlassen
 Einstellungen
@@ -133,7 +133,7 @@ Fortschritt
 VMC-Datei existiert
 Ungültige VMC-Datei, Größe ist nicht korrekt
 VMC-Datei muss erstellt werden
-Fehler mit VMC %s, weiter mit phys. MC (Steckplatz %d)?
+Fehler beim zugriff auf VMC %s. Weiter mit Speicherkarte in Steckplatz %d?
 Automatisch aktualisieren
 Über
 Programmierer
@@ -171,10 +171,10 @@ Mod. 7
 Mod. 8
 GSM konfigurieren
 ETH Geschwindigkeitsmodus
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 GSM Einstellungen
 Aktiviere GSM
 Schaltet GSM AN oder AUS
@@ -266,6 +266,8 @@ Lautstärke Soundeffekte
 Lautstärke Startsound
 Änderung des Video signals übernehmen?
 Spieleliste zwischenspeichern (HDD)
+Benachrichtigungen Einschalten
+%s geladen von %s
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

@@ -1,6 +1,6 @@
 # Translation by PS2gaming @ ps2-home.com
-# Last update: Feb. 17, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Dutch
 OPL %s
@@ -9,7 +9,7 @@ Terug
 Netwerkconfiguratie
 Geavanceerde opties
 <geen waarde>
-Instellingen opgeslagen...
+Settings saved to %s
 Fout bij schrijven van instellingen!
 Sluiten
 Instellingen
@@ -133,7 +133,7 @@ Voortgang
 VMC-bestand bestaat
 Ongeldige VMC-bestand, grootte is incorrect
 VMC-bestand moet gecreëerd worden
-Fout met VMC %s, voorzetten met fysieke MC (slot %d)?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Automatisch vernieuwen
 Over
 Coders
@@ -232,23 +232,23 @@ Paar
 Paar DS-controller
 Paar DS-controller met bluetoothadapter mac-adres
 Niet verbonden
-Bluetooth adapter information
-Shows more information and supported features
+Bluetooth Adapter Information
+Shows more information and supported features.
 HCI Version:
 LMP Version:
 Manufacturer ID:
-Support features:
+Supported Features:
 Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
+Enable Multitap Emulation
 Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
+Multitap Emulator On Port:
 Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
+Disable Fake DS3 Workaround
+Some fake DS3s need workaround, this option will disable it.
+Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
 Parental Lock Password
@@ -266,8 +266,10 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
-PS1 Games display mode
+PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.

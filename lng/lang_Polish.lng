@@ -1,6 +1,6 @@
 # Translation by yohokaru
-# Last update: Feb. 17, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
 OPL %s
@@ -9,7 +9,7 @@ Wróć
 Ustawienia sieci
 Opcje zaawansowane
 <brak>
-Ustawienia zapisane...
+Settings saved to %s
 Błąd zapisu ustawień!
 Wyjście
 Ustawienia
@@ -133,7 +133,7 @@ Postęp
 Plik VMC istnieje
 Błędny plik VMC, nieprawidłowy rozmiar
 Musisz utworzyć plik VMC
-Błąd z plikiem VMC %s, kontynuować z fizyczną MC (slot %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Odświeżanie automatyczne
 O programie
 Programiści
@@ -266,8 +266,10 @@ Głośność efektów dźwiękowych
 Głośność dźwięku startowego
 Potwierdź zmianę rozdzielczości
 Buforowanie listy gier (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
-PS1 Games display mode
+PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.

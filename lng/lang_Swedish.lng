@@ -1,6 +1,6 @@
 # Translation by Lord_Flaya
-# Last update: Jan. 30, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 OPL %s
@@ -9,7 +9,7 @@ Tillbaka
 Nätverkskonfig
 Avancerad Konfig
 <Inga värden>
-Inställningar sparade...
+Settings saved to %s
 Fel vid skrivning av inställningar!
 Avsluta
 Inställning
@@ -133,7 +133,7 @@ Framsteg
 VMC fil existerar
 Ogiltig VMC fil, felaktig storlek
 VMC filen måste skapas
-Fel med VMC %s, fortsätt med fysisk MC (kortplats %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Automatisk uppdatering
 Om
 Kodare
@@ -171,9 +171,9 @@ Läge 7
 Läge 8
 Konfigurera GSM
 Ethernet hastighet och duplex
-100Mbit full duplex
+100Mbit Full-duplex
 100Mbit halv duplex
-10Mbit full duplex
+10Mbit Full-duplex
 10Mbit halv duplex
 GSM inställningar
 Aktivera GSM
@@ -266,6 +266,8 @@ Ljudeffektsvolym
 Uppstartsljudsvolym
 Bekräfta ändring av videoläge?
 Lägg Spellista i Cache (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

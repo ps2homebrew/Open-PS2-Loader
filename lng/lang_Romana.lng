@@ -1,15 +1,15 @@
-# Romana translation by MRAdyy
-# Last update: Feb. 17, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Romanian translation by MRAdyy
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
-Romana
+Romanian
 Open PS2 Loader %s
 Salvare Setari
 Inapoi
 Config. retea
 Optiuni avansate
 <nici-o valoare>
-Setari salvate...
+Settings saved to %s
 Eroare in scrierea setarilor!
 Iesire
 Setari
@@ -133,7 +133,7 @@ Progres
 Fisierul VMC exista
 Fisier VMC invalid, dimensiunea este incorecta
 Fisier VMC trebuie creat
-Eroare la VMC %s, continuati cu cardul memorie fizic (slot %d)?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Reimprospatare Automata
 Despre
 Ingineri
@@ -214,41 +214,41 @@ PS2 Logo
 Only displayed for a valid disc logo which matches the console's region
 Configure PADEMU
 Pad Emulator Settings
-Enable PadEmulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
+Enable Pad Emulator
+Turns On/Off Pad Emulator for selected game.
+Pad Emulator Mode
 Select Pad Emulator mode.
 DualShock3/4 USB
 DualShock3/4 BT
-Settings for port:
+Settings For Port:
 Select Pad Emulator port for settings.
-Enable emulation
+Enable Emulation
 Turns on/off Pad Emulator for selected port.
-Enable vibration
+Enable Vibration
 Turns on/off vibration for Pad Emulator selected port.
-USB Bluetooth adapter MAC address:
-DS Controller paired to MAC address:
+USB Bluetooth Adapter MAC Address:
+DS Controller Paired To MAC Address:
 Pair
 Pair DS Controller
-Pair DS Controller with Bluetooth adapter MAC address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
+Pair DS controller with Bluetooth adapter MAC address.
+Not Connected
+Bluetooth Adapter Information
+Shows more information and supported features.
 HCI Version:
 LMP Version:
 Manufacturer ID:
-Support features:
+Supported Features:
 Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
+Enable Multitap Emulation
 Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
+Multitap Emulator On Port:
 Select port for Multitap emulation.
-Disable workaround for fake DS3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
+Disable Fake DS3 Workaround
+Some fake DS3s need workaround, this option will disable it.
+Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
 Parental Lock Password
@@ -266,8 +266,10 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
-PS1 Games display mode
+PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.

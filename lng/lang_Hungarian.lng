@@ -1,6 +1,6 @@
 # Translation by co5oos
-# Last update: Jan. 31, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Hungarian
 OPL %s
@@ -9,7 +9,7 @@ Vissza
 Hálózat konfigurálás
 Haladó beállítások
 <Nincs érték>
-Beállítások mentve...
+Settings saved to %s
 Hiba a beállítások írásában!
 Kilépés
 Beállítások
@@ -133,7 +133,7 @@ Folyamat
 VMC fájl létezik
 Érvénytelen VMC fájl, helytelen méret
 VMC fájl létrehozása szükséges
-Hiba a VMC-vel %s, folytatás a fizikai MC-vel (foglalat %d) ?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Automatikus frissítés
 Névjegy
 Kódolók
@@ -171,10 +171,10 @@ Mód 7
 Mód 8
 GSM Konfiguráció
 Ethernet kapcsolat módja
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
 GSM Beállítások
 GSM Engedélyezése
 KI vagy BE kapcsolja a GSM-t
@@ -266,6 +266,8 @@ Hanghatások hangereje
 Boot Sound hangereje
 Videó mód változtatás jóváhagyása?
 Játéklista cachelés (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Játékok
 PS1 Játékok megjelenítési módja
 POPSTARTER.ELF nem található '%s'-nél!

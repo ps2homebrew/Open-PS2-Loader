@@ -1,6 +1,6 @@
 # translation by vsub and wisi
-# Last update: Feb. 17, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
 OPL %s
@@ -9,7 +9,7 @@ OPL %s
 Мрежови настройки
 Детайлни настройки
 <Няма опции>
-Настройките са запазени.
+Settings saved to %s
 Грешка при записване на настройките!
 Изход
 Настройки
@@ -21,7 +21,7 @@ ETH Игри
 Тема
 Език
 Изключване на системата?
-Изход от OPL?
+Изход към Browser?
 Отмяна на обновяването?
 %d: Твърд Диск не е свързан.
 %d: Твърд Диск не е форматиран.
@@ -133,7 +133,7 @@ Unused
 VMC файлът съществува.
 Невалиден VMC файл - грешен обем.
 VMC файлът трябва да бъде създаден.
-Грешка с VMC %s, продължаване с MC в слот %s?
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Автоматично опресняване
 Относно
 Програмисти:
@@ -266,8 +266,10 @@ VMC %s файлът е фрагментиран. Продължаване с Mem
 Сила на звука на Начално зареждане
 Потвърждаване на промените във видеорежима?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
 PS1 Games
-PS1 Games display mode
+PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!
 VCD file '%s' not found!
 An error occurred while renaming the file.

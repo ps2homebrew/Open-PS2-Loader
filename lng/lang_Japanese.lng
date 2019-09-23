@@ -1,6 +1,6 @@
 # Japanese Translation by yamamotonew and keiichiro2000
-# Last update: March 28, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 23, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Japanese
 OPL %s
@@ -9,7 +9,7 @@ OPL %s
 ネットワーク設定
 詳細オプション
 <未設定>
-設定が保存されました
+Settings saved to %s
 設定保存中にエラーが発生しました
 終了
 設定
@@ -133,7 +133,7 @@ VMC設定
 VMCファイル作成済
 VMCファイルのサイズが正しくありません
 VMCファイル未作成
-VMC %s でエラー。スロット %d のメモリカードを使いますか？
+Error accessing VMC %s. Continue with the Memory Card in slot %d?
 自動リフレッシュ
 OPLについて
 コーディング
@@ -266,6 +266,8 @@ VMC ％s ファイルは破損しています。 スロット ％d のメモリ�
 起動音の音量
 ビデオモードの変更を確認しますか？
 ゲームリストをキャッシュ（HDD）
+Enable Notifications
+%s loaded from %s
 PS1 ゲーム
 PS1 ゲーム　画面モード
 POPSTARTER.ELFが '％s'に見つかりません!

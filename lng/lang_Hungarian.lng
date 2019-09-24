@@ -1,5 +1,5 @@
 # Translation by co5oos
-# Last update: Sept. 23, 2019
+# Last update: Sept. 24, 2019
 # Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Hungarian
@@ -9,7 +9,7 @@ Vissza
 Hálózat konfigurálás
 Haladó beállítások
 <Nincs érték>
-Settings saved to %s
+Beállítások elmentve %s-be
 Hiba a beállítások írásában!
 Kilépés
 Beállítások
@@ -133,7 +133,7 @@ Folyamat
 VMC fájl létezik
 Érvénytelen VMC fájl, helytelen méret
 VMC fájl létrehozása szükséges
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Hiba történt a VMC %s hozzáférésénél. Folytatás a %d foglalatban lévő memória kártyával?
 Automatikus frissítés
 Névjegy
 Kódolók
@@ -266,8 +266,8 @@ Hanghatások hangereje
 Boot Sound hangereje
 Videó mód változtatás jóváhagyása?
 Játéklista cachelés (HDD)
-Enable Notifications
-%s loaded from %s
+Értesítések engedélyezése
+%s betöltve %s-ből
 PS1 Játékok
 PS1 Játékok megjelenítési módja
 POPSTARTER.ELF nem található '%s'-nél!

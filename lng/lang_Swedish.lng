@@ -1,5 +1,5 @@
 # Translation by Lord_Flaya
-# Last update: Sept. 23, 2019
+# Last update: Sept. 24, 2019
 # Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
@@ -9,7 +9,7 @@ Tillbaka
 Nätverkskonfig
 Avancerad Konfig
 <Inga värden>
-Settings saved to %s
+Inställningar sparade till %s
 Fel vid skrivning av inställningar!
 Avsluta
 Inställning
@@ -133,7 +133,7 @@ Framsteg
 VMC fil existerar
 Ogiltig VMC fil, felaktig storlek
 VMC filen måste skapas
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Felaktig åtkomst till VMC%s. Använd Minneskort i port %d?
 Automatisk uppdatering
 Om
 Kodare
@@ -266,8 +266,8 @@ Ljudeffektsvolym
 Uppstartsljudsvolym
 Bekräfta ändring av videoläge?
 Lägg Spellista i Cache (HDD)
-Enable Notifications
-%s loaded from %s
+Aktivera notifikationer
+%s Laddat från %s
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

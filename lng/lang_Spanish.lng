@@ -1,5 +1,5 @@
 # Translation by lauchon22
-# Last update: Sept. 23, 2019
+# Last update: Sept. 25, 2019
 # Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
@@ -9,7 +9,7 @@ Atrás
 Ajustes conexión de red
 Opciones avanzadas
 <Sin configurar>
-Settings saved to %s
+Configuración guardada en %s
 ¡Error al guardar la configuración!
 Salir
 Configuración
@@ -133,7 +133,7 @@ Progreso
 Archivo VMC creado
 Archivo VMC inválido, el tamaño es incorrecto
 El archivo VMC debe ser creado
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Error al acceder a VMC %s. ¿Continuar con la tarjeta de memoria en la ranura %d?
 Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
@@ -266,8 +266,8 @@ Volumen de efectos de sonido
 Volumen de sonido de inicio
 Confirma cambiar modo de video?
 Cachè de lista de juegos (HDD)
-Enable Notifications
-%s loaded from %s
+Activar notificaciones
+%s cargado desde %s
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

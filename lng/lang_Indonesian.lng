@@ -1,6 +1,6 @@
 # translated by verislasher and jbliz
-# Last update: Feb. 01, 2019
-# Updated for OPL_1499_DB-TA_[f52ac91] and OPL_1307_ifcaro_beta [6571f0d]
+# Last update: Sept. 26, 2019
+# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
 OPL %s
@@ -9,7 +9,7 @@ Kembali
 Konfigurasi jaringan
 Pilihan lanjutan
 <tak ada nilai>
-Settings saved to %s
+Pengaturan disimpan pada %s
 Kesalahan penulisan setingan!
 Keluar
 Setingan
@@ -133,7 +133,7 @@ Kemajuan
 Berkas VMC ada
 Berkas VMC cacat, ukuran salah
 Berkas VMC harus dibuat
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Kesalahan mengakses VMC %s. Lanjutkan dengan Kartu Memori pada slot %d?
 Segarkan otomatis
 Tentang
 Pengkode
@@ -266,8 +266,8 @@ Volume efek suara
 Volume suara Boot
 Konfirmasi mengubah mode video?
 Daftar Tembolok Game(HDD)
-Enable Notifications
-%s loaded from %s
+Izinkan Pemberitahuan
+%s dimuat dari %s
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

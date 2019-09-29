@@ -7,6 +7,7 @@
 #include "include/opl.h"
 #include "include/util.h"
 #include "include/ioman.h"
+#include "include/system.h"
 #include <io_common.h>
 #include <string.h>
 #include <malloc.h>
@@ -53,6 +54,32 @@ static void writeMCIcon(void)
     }
 }
 
+void checkMCFolder(void)
+{
+    char path[32];
+
+    snprintf(path, sizeof(path), "mc%d:OPL", mcID);
+    int fd = fileXioDopen(path);
+    if (fd < 0)
+        fileXioMkdir(path, 0777);
+
+    fileXioDclose(fd);
+
+    snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID);
+    fd = fileXioOpen(path, O_RDONLY, 0666);
+    if (fd < 0)
+        writeMCIcon();
+
+    fileXioClose(fd);
+
+    snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID);
+    fd = fileXioOpen(path, O_RDONLY, 0666);
+    if (fd < 0)
+        writeMCIcon();
+
+    fileXioClose(fd);
+}
+
 static int checkMC()
 {
     int dummy, ret;
@@ -65,14 +92,12 @@ static int checkMC()
         if (fd < 0) {
             fd = fileXioDopen("mc1:OPL");
             if (fd < 0) {
-                // No base dir found on any MC, will create the folder
-                if (fileXioMkdir("mc0:OPL", 0777) >= 0) {
+                // No base dir found on any MC, check MC is inserted
+                fd = sysCheckMC();
+                if (fd == 0)
                     mcID = 0x30;
-                    writeMCIcon();
-                } else if (fileXioMkdir("mc1:OPL", 0777) >= 0) {
+                else if (fd == 1)
                     mcID = 0x31;
-                    writeMCIcon();
-                }
             } else {
                 fileXioDclose(fd);
                 mcID = 0x31;

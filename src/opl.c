@@ -129,10 +129,7 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 
     if (langChanged) {
         guiUpdateScreenScale();
-        if (lngGetGuiValue() != 0) {
-            showLngPopup = 1;
-            popupSfxPlayed = 0;
-        }
+        guiCheckNotifications(0, langChanged);
     }
 
     // refresh Hints
@@ -160,10 +157,7 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
     // refresh Cache
     if (themeChanged) {
         submenuRebuildCache(mod->subMenu);
-        if (thmGetGuiValue() != 0) {
-            showThmPopup = 1;
-            popupSfxPlayed = 0;
-        }
+        guiCheckNotifications(themeChanged, 0);
     }
 }
 
@@ -1027,6 +1021,9 @@ int saveConfig(int types, int showUI)
     if (showUI) {
         if (lscret) {
             char *path = configGetDir();
+            if (!strncmp(path, "mc", 2))
+                checkMCFolder();
+
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
             if ((col_pos = strchr(notification, ':')) != NULL)
                 *(col_pos + 1) = '\0';

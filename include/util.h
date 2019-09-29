@@ -5,6 +5,7 @@
 
 int getmcID(void);
 int getFileSize(int fd);
+void checkMCFolder(void);
 int openFile(char *path, int mode);
 void *readFile(char *path, int align, int *size);
 int listDir(char *path, const char *separator, int maxElem,

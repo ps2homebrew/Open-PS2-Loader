@@ -49,6 +49,10 @@ static int screenWidth;
 static int screenHeight;
 
 static int popupTimer;
+static int popupSfxPlayed;
+
+static int showThmPopup;
+static int showLngPopup;
 
 // forward decl.
 static void guiShow();
@@ -234,18 +238,23 @@ void guiShowAbout()
     toggleSfx = 0;
 }
 
-static void guiBootNotifications(void)
+void guiCheckNotifications(int checkTheme, int checkLang)
 {
     if (gEnableNotifications) {
-        if (thmGetGuiValue() != 0)
-            showThmPopup = 1;
+        if (checkTheme) {
+            if (thmGetGuiValue() != 0)
+                showThmPopup = 1;
+        }
 
-        if (lngGetGuiValue() != 0)   
-            showLngPopup = 1;
+        if (checkLang) {
+            if (lngGetGuiValue() != 0)
+                showLngPopup = 1;
+        }
 
         if (showThmPopup || showLngPopup || showCfgPopup) {
             popupSfxPlayed = 0;
-            popupTimer -= 30;
+            if (showCfgPopup)
+                popupTimer -= 30;
         }
     }
 }
@@ -2216,7 +2225,7 @@ void guiIntroLoop(void)
 void guiMainLoop(void)
 {
     guiResetNotifications();
-    guiBootNotifications();
+    guiCheckNotifications(1, 1);
 
     while (!gTerminate) {
         guiStartFrame();

@@ -542,8 +542,11 @@ int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     if (file) {
         jpg = jpgOpenFILE(file, JPG_NORMAL);
         if (jpg != NULL) {
-            if (texSizeValidate(jpg->width, jpg->height, psm) < 0)
+            if (texSizeValidate(jpg->width, jpg->height, psm) < 0) {
+                jpgClose(jpg);
+                fclose(file);
                 return ERR_BAD_DIMENSION;
+            }
 
             size_t size = gsKit_texture_size_ee(jpg->width, jpg->height, psm);
             texture->Mem = memalign(128, size);

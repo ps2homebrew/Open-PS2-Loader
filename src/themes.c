@@ -298,10 +298,16 @@ static void freeImageTexture(image_texture_t *texture)
         if (texture->source.Mem) {
             rmUnloadTexture(&texture->source);
             free(texture->source.Mem);
+            texture->source.Mem = NULL;
         }
-
-        free(texture->name);
-
+        if (texture->source.Clut) {
+            free(texture->source.Clut);
+            texture->source.Clut = NULL;
+        }
+        if (texture->name) {
+            free(texture->name);
+            texture->name = NULL;
+        }
         free(texture);
     }
 }

@@ -8,9 +8,7 @@
 #include "include/fntsys.h"
 #include "include/lang.h"
 #include "include/pad.h"
-
 #include "include/sound.h"
-#include <audsrv.h>
 
 #define MENU_POS_V 50
 #define HINT_HEIGHT 32
@@ -28,8 +26,6 @@ static int guiThemeID = 0;
 static int nThemes = 0;
 static theme_file_t themes[THM_MAX_FILES];
 static const char **guiThemesNames = NULL;
-
-char sound_path[256];
 
 enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_ATTRIBUTE_TEXT = 0,
@@ -1019,10 +1015,9 @@ static int thmReadEntry(int index, const char *path, const char *separator, cons
 }
 
 /* themePath must contains the leading separator (as it is dependent of the device, we can't know here) */
-static int thmLoadResource(int texId, const char *themePath, short psm, int useDefault)
+static int thmLoadResource(GSTEXTURE *texture, int texId, const char *themePath, short psm, int useDefault)
 {
     int success = -1;
-    GSTEXTURE *texture = &gTheme->textures[texId];
 
     if (themePath != NULL)
         success = texDiscoverLoad(texture, themePath, texId, psm); // only set success here
@@ -1100,21 +1095,10 @@ static void thmLoad(const char *themePath)
         //No theme specified. Prepare and load the default theme.
         themeConfig = configAlloc(0, NULL, NULL);
         configReadBuffer(themeConfig, &conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
-        thmSfxEnabled = 0;
     } else {
         snprintf(path, sizeof(path), "%sconf_theme.cfg", themePath);
         themeConfig = configAlloc(0, NULL, path);
         configRead(themeConfig); // try to load the theme config file. If it does not exist, defaults will be used.
-
-        //Get theme path for sfx, to use later
-        snprintf(sound_path, sizeof(sound_path), "%ssound", themePath);
-        //Check for custom sfx folder
-        int fd = fileXioDopen(sound_path);
-        if (fd < 0)
-            thmSfxEnabled = 0;
-        else
-            thmSfxEnabled = -1;
-        fileXioDclose(fd);
     }
 
     int intValue;
@@ -1167,14 +1151,11 @@ static void thmLoad(const char *themePath)
     // LOGO, loaded here to avoid flickering during startup with device in AUTO + theme set
     texPngLoad(&newT->textures[LOGO_PICTURE], NULL, LOGO_PICTURE, GS_PSM_CT24);
 
-    gTheme = newT;
-    thmFree(curT);
-
     // First start with busy icon
     const char *themePath_temp = themePath;
     int customBusy = 0;
     for (i = LOAD0_ICON; i <= LOAD7_ICON; i++) {
-        if (thmLoadResource(i, themePath_temp, GS_PSM_CT32, gTheme->useDefault) >= 0)
+        if (thmLoadResource(&newT->textures[i], i, themePath_temp, GS_PSM_CT32, newT->useDefault) >= 0)
             customBusy = 1;
         else {
             if (customBusy)
@@ -1183,15 +1164,18 @@ static void thmLoad(const char *themePath)
                 themePath_temp = NULL;
         }
     }
-    gTheme->loadingIconCount = i;
+    newT->loadingIconCount = i;
 
     // Customizable icons
     for (i = USB_ICON; i <= START_ICON; i++)
-        thmLoadResource(i, themePath, GS_PSM_CT32, gTheme->useDefault);
+        thmLoadResource(&newT->textures[i], i, themePath, GS_PSM_CT32, newT->useDefault);
 
     // Not  customizable icons
     for (i = L1_ICON; i <= R2_ICON; i++)
-        thmLoadResource(i, NULL, GS_PSM_CT32, 1);
+        thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1);
+
+    gTheme = newT;
+    thmFree(curT);
 }
 
 static void thmRebuildGuiNames(void)
@@ -1199,7 +1183,7 @@ static void thmRebuildGuiNames(void)
     if (guiThemesNames)
         free(guiThemesNames);
 
-    // build the languages name list
+    // build the themes name list
     guiThemesNames = (const char **)malloc((nThemes + 2) * sizeof(char **));
 
     // add default internal
@@ -1225,7 +1209,7 @@ int thmAddElements(char *path, const char *separator, int mode)
     if (configGetStr(configGetByType(CONFIG_OPL), "theme", &temp)) {
         LOG("THEMES Trying to set again theme: %s\n", temp);
         if (thmSetGuiValue(thmFindGuiID(temp), 0))
-            moduleUpdateMenu(mode, 1);
+            moduleUpdateMenu(mode, 1, 0);
     }
 
     return result;
@@ -1311,6 +1295,14 @@ int thmFindGuiID(const char *theme)
 const char **thmGetGuiList(void)
 {
     return guiThemesNames;
+}
+
+char *thmGetFilePath(int themeID)
+{
+    theme_file_t *currTheme = &themes[themeID - 1];
+    char *path = currTheme->filePath;
+
+    return path;
 }
 
 void thmEnd(void)

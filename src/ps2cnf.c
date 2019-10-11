@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "ps2cnf.h"
+#include "ioman.h"
 
 #define CNF_LEN_MAX 1024
 
@@ -85,7 +86,7 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
 
     if ((fd = fopen(path, "r")) == NULL)
     {
-        printf("Can't open %s\n", path);
+        LOG("Can't open %s\n", path);
         return ENOENT;
     }
 
@@ -99,7 +100,7 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
     if (fread(system_cnf, 1, size, fd) != size)
     {
         fclose(fd);
-        printf("Can't read %s\n", path);
+        LOG("Can't read %s\n", path);
         return EIO;
     }
     fclose(fd);

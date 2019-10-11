@@ -21,7 +21,6 @@
 #include "include/renderman.h"
 #include "include/extern_irx.h"
 #include "../ee_core/include/modules.h"
-#include <audsrv.h>
 
 #include "include/pggsm.h"
 #include "include/cheatman.h"
@@ -48,6 +47,9 @@ extern int size_elfldr_elf;
 
 extern unsigned char IOPRP_img[];
 extern unsigned int size_IOPRP_img;
+
+extern unsigned char eesync_irx[];
+extern unsigned int size_eesync_irx;
 
 #define MAX_MODULES 32
 static void *g_sysLoadedModBuffer[MAX_MODULES];
@@ -459,8 +461,11 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
     irxtable = (irxtab_t *)ModuleStorage;
     irxptr_tab = (irxptr_t *)((unsigned char *)irxtable + sizeof(irxtab_t));
-    ioprp_image = malloc(size_IOPRP_img + size_cdvdman_irx + size_cdvdfsv_irx + 256);
+    size_ioprp_image = size_IOPRP_img + size_cdvdman_irx + size_cdvdfsv_irx + size_eesync_irx + 256;
+    LOG("IOPRP image size calculated: %d\n", size_ioprp_image);
+    ioprp_image = malloc(size_ioprp_image);
     size_ioprp_image = patch_IOPRP_image(ioprp_image, cdvdman_irx, size_cdvdman_irx);
+    LOG("IOPRP image size actual:     %d\n", size_ioprp_image);
 
     modcount = 0;
     //Basic modules
@@ -785,7 +790,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     //Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
     if(initKernel((void*)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0)
     {   //Should not happen, but...
-        printf("Error - kernel is unsupported.\n");
+        LOG("Error - kernel is unsupported.\n");
         asm volatile("break\n");
     }
     sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);

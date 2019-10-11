@@ -31,6 +31,8 @@
 #include <usbd.h>
 #include "ioman_add.h"
 
+#include <defs.h>
+
 #define MODNAME "cdvd_driver"
 IRX_ID(MODNAME, 1, 1);
 
@@ -209,8 +211,9 @@ static iop_sys_clock_t gCallbackSysClock;
 
 // buffers
 #define CDVDMAN_BUF_SECTORS 2
+#define CDVDFSV_ALIGNMENT 64
 static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS * 2048];
-static u8 cdvdman_fs_buf[CDVDMAN_FS_SECTORS * 2048];
+static u8 cdvdman_fs_buf[CDVDMAN_FS_SECTORS * 2048 + CDVDFSV_ALIGNMENT];
 
 #define CDVDMAN_MODULE_VERSION 0x225
 static int cdvdman_debug_print_flag = 0;
@@ -420,6 +423,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
     cdvdman_stat.status = CDVD_STAT_READ;
 
+    buf = (void *)PHYSADDR(buf);
 #ifdef HDD_DRIVER //As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
     if ((u32)(buf)&3) {
         //For transfers to unaligned buffers, a double-copy is required to avoid stalling the device's DMA channel.

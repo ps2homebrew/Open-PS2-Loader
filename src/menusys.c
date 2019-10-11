@@ -15,10 +15,8 @@
 #include "include/gui.h"
 #include "include/system.h"
 #include "include/ioman.h"
-#include <assert.h>
-
 #include "include/sound.h"
-#include <audsrv.h>
+#include <assert.h>
 
 enum MENU_IDs {
     MENU_SETTINGS = 0,
@@ -689,7 +687,7 @@ void menuHandleInputMenu()
         // execute the item via looking at the id of it
         int id = mainMenuCurrent->item.id;
 
-        sfxPlay(SFX_CURSOR);
+        sfxPlay(SFX_CONFIRM);
 
         if (id == MENU_SETTINGS) {
             if (menuCheckParentalLock() == 0)
@@ -734,21 +732,24 @@ void menuHandleInputMenu()
     if (getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
         //Check if there is anything to show the user, at all.
         if (gAPPStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
-            guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_LEFT);
+            guiSwitchScreen(GUI_SCREEN_MAIN);
     }
 }
 
 void menuRenderMain()
 {
     // selected_item can't be NULL here as we only allow to switch to "Main" rendering when there is at least one device activated
-    theme_element_t *elem = gTheme->mainElems.first;
+    _menuRequestConfig();
 
+    WaitSema(menuSemaId);
+    theme_element_t *elem = gTheme->mainElems.first;
     while (elem) {
         if (elem->drawElem)
-            elem->drawElem(selected_item, selected_item->item->current, NULL, elem);
+            elem->drawElem(selected_item, selected_item->item->current, itemConfig, elem);
 
         elem = elem->next;
     }
+    SignalSema(menuSemaId);
 }
 
 void menuHandleInputMain()
@@ -766,14 +767,14 @@ void menuHandleInputMain()
         menuNextV();
     } else if (getKeyOn(KEY_CROSS)) {
         if (gSelectButton == KEY_CROSS && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-            guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
+            guiSwitchScreen(GUI_SCREEN_INFO);
         else
             selected_item->item->execCross(selected_item->item);
     } else if (getKeyOn(KEY_TRIANGLE)) {
         selected_item->item->execTriangle(selected_item->item);
     } else if (getKeyOn(KEY_CIRCLE)) {
         if (gSelectButton == KEY_CIRCLE && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-            guiSwitchScreen(GUI_SCREEN_INFO, TRANSITION_DOWN);
+            guiSwitchScreen(GUI_SCREEN_INFO);
         else
             selected_item->item->execCircle(selected_item->item);
     } else if (getKeyOn(KEY_SQUARE)) {
@@ -781,7 +782,7 @@ void menuHandleInputMain()
     } else if (getKeyOn(KEY_START)) {
         // reinit main menu - show/hide items valid in the active context
         menuInitMainMenu();
-        guiSwitchScreen(GUI_SCREEN_MENU, TRANSITION_RIGHT);
+        guiSwitchScreen(GUI_SCREEN_MENU);
     } else if (getKeyOn(KEY_SELECT)) {
         selected_item->item->refresh(selected_item->item);
     } else if (getKey(KEY_L1)) {
@@ -828,7 +829,7 @@ void menuHandleInputInfo()
 {
     if (getKeyOn(KEY_CROSS)) {
         if (gSelectButton == KEY_CIRCLE)
-            guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
+            guiSwitchScreen(GUI_SCREEN_MAIN);
         else
             selected_item->item->execCross(selected_item->item);
     } else if (getKey(KEY_UP)) {
@@ -837,7 +838,7 @@ void menuHandleInputInfo()
         menuNextV();
     } else if (getKeyOn(KEY_CIRCLE)) {
         if (gSelectButton == KEY_CROSS)
-            guiSwitchScreen(GUI_SCREEN_MAIN, TRANSITION_UP);
+            guiSwitchScreen(GUI_SCREEN_MAIN);
         else
             selected_item->item->execCircle(selected_item->item);
     } else if (getKey(KEY_L1)) {

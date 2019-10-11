@@ -78,4 +78,4 @@ OBJ_DIR:
 	mkdir -p $(IOP_OBJS_DIR)
 
 include $(PS2SDK)/Defs.make
-include Rules.make
+include ../../Rules.make

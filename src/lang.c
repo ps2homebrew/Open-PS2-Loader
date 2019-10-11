@@ -16,9 +16,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Save Changes",
     "Back",
     "Network Config",
-    "Advanced options",
+    "Advanced Options",
     "<no values>",
-    "Settings saved...",
+    "Settings saved to %s",
     "Error writing settings!",
     "Exit",
     "Settings",
@@ -32,17 +32,17 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "The system will be powered off.",
     "Exit to Browser?",
     "Cancel updating?",
-    "%d: HardDisk Drive not detected",
-    "%d: HardDisk Drive not formatted",
-    "%d: Network startup error",
-    "%d: No network adaptor detected",
-    "%d: Cannot connect to SMB server",
-    "%d: Cannot log into SMB server",
-    "%d: Cannot open SMB share",
-    "%d: Cannot list SMB shares",
-    "%d: Cannot list games",
-    "%d: DHCP server unavailable",
-    "%d: No network connection",
+    "%d: HardDisk Drive not detected.",
+    "%d: HardDisk Drive not formatted.",
+    "%d: Network startup error.",
+    "%d: No network adaptor detected.",
+    "%d: Cannot connect to SMB server.",
+    "%d: Cannot log into SMB server.",
+    "%d: Cannot open SMB share.",
+    "%d: Cannot list SMB shares.",
+    "%d: Cannot list games.",
+    "%d: DHCP server unavailable.",
+    "%d: No network connection.",
     "On",
     "Off",
     "OK",
@@ -52,47 +52,47 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Cross",
     "Games List",
     "Game Settings",
-    "Remove all settings",
-    "Removed all keys for the game",
+    "Remove All Settings",
+    "Removed all keys for the game.",
     "Scrolling",
     "Slow",
     "Medium",
     "Fast",
-    "Default menu",
-    "Load from disc",
-    "Please wait",
-    "Error while loading the Game ID",
-    "Automatic sorting",
-    "Error loading the language file",
+    "Default Menu",
+    "Load From Disc",
+    "Please wait.",
+    "Error while loading the Game ID.",
+    "Automatic Sorting",
+    "Error loading the language file.",
     "Disable Debug Colors",
     "No controller detected, waiting...",
     "Enable Cover Art",
-    "Wide screen",
+    "Widescreen",
     "Power Off",
-    "Loading config",
-    "Saving config",
-    "Start device",
+    "Loading config...",
+    "Saving config...",
+    "Start Device",
     "Refresh",
-    "USB device start mode",
-    "HDD device start mode",
-    "ETH device start mode",
-    "Applications start mode",
+    "USB Device Start Mode",
+    "HDD Device Start Mode",
+    "ETH Device Start Mode",
+    "Applications Start Mode",
     "Auto",
     "Manual",
     "Start HDL Server",
-    "HDL Server Starting...",
-    "HDL Server Running...",
+    "HDL Server starting...",
+    "HDL Server running...",
     "Failed to start HDL Server.",
-    "HDL Server Unloading...",
-    "IGR path",
-    "Background color",
-    "Text color",
+    "HDL Server unloading...",
+    "IGR Path",
+    "Background Color",
+    "Text Color",
     "- PS2 -",
     "- SMB Server -",
-    "IP address type",
+    "IP Address Type",
     "Static",
     "DHCP",
-    "IP address",
+    "IP Address",
     "Address",
     "Mask",
     "Gateway",
@@ -102,7 +102,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "User",
     "Password",
     "<not set>",
-    "Address type",
+    "Address Type",
     "IP",
     "NetBIOS",
     "Accept",
@@ -111,12 +111,12 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Delete",
     "Run",
     "Display Settings",
-    "Enable write operations",
-    "Check USB game fragmentation",
-    "Remember last played game",
-    "Select button",
-    "Error, the game is fragmented",
-    "Error, could not run the item",
+    "Enable Write Operations",
+    "Check USB Game Fragmentation",
+    "Remember Last Played Game",
+    "Select Button",
+    "Error, the game is fragmented.",
+    "Error, could not run the item.",
     "Test",
     "Leave empty for GUEST auth.",
     "Accurate Reads",
@@ -127,40 +127,40 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Disable IGR",
     "Unused",
     "Unused",
-    "Changing the size will reformat the VMC",
+    "Changing the size will reformat the VMC.",
     "Create",
     "Start",
     "Modify",
     "Abort",
     "Reset",
-    "Use generic",
+    "Use Generic",
     "Configure VMC",
     "Name",
     "Size",
     "Status",
     "Progress",
-    "VMC file exist",
-    "Invalid VMC file, size is incorrect",
-    "VMC file need to be created",
+    "VMC file exists.",
+    "Invalid VMC file, size is incorrect.",
+    "VMC file needs to be created.",
     "Error accessing VMC %s. Continue with the Memory Card in slot %d?",
-    "Automatic refresh",
+    "Automatic Refresh",
     "About",
     "Coders",
     "Quality Assurance",
-    "USB prefix path",
-    "Boots custom ELF after an IGR",
-    "Value in minute(s), 0 to disable spin down",
-    "Automatic HDD spin down",
-    "Video mode",
-    "Dialog color",
-    "Selected color",
-    "Display info page",
+    "USB Prefix Path",
+    "Boots custom ELF after an IGR.",
+    "Value in minute(s), 0 to disable spin down.",
+    "Automatic HDD Spin Down",
+    "Video Mode",
+    "Dialog Color",
+    "Selected Color",
+    "Display Info Page",
     "Info",
     "Custom ELF",
-    "Color selection",
+    "Color Selection",
     "Reconnect",
-    "Leave empty to list shares",
-    "ETH prefix path",
+    "Leave empty to list shares.",
+    "ETH Prefix Path",
     "Backspace",
     "Space",
     "Enter",
@@ -179,85 +179,85 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Mode 7",
     "Mode 8",
     "Configure GSM",
-    "Ethernet link mode",
-    "100Mbit full-duplex",
-    "100Mbit half-duplex",
-    "10Mbit full-duplex",
-    "10Mbit half-duplex",
+    "Ethernet Link Mode",
+    "100Mbit Full-duplex",
+    "100Mbit Half-duplex",
+    "10Mbit Full-duplex",
+    "10Mbit Half-duplex",
     "GSM Settings",
     "Enable GSM",
-    "Toggles GSM ON or OFF",
+    "Toggles GSM on/off.",
     "VMODE",
-    "Forced Custom Display Mode",
+    "Forced custom display mode.",
     "H-POS",
-    "Horizontal Adjustment",
+    "Horizontal adjustment.",
     "V-POS",
-    "Vertical Adjustment",
+    "Vertical adjustment.",
     "Overscan",
-    "Overscan Adjustment",
+    "Overscan adjustment.",
     "FMV Skip",
-    "Skips Full Motion Videos",
+    "Skips full motion videos.",
     "Cheat Settings",
     "Enable PS2RD Cheat Engine",
-    "Lets PS2RD Cheat Engine patch your game",
+    "Lets PS2RD Cheat Engine patch your game.",
     "PS2RD Cheat Engine Mode",
-    "Auto-select or Select game cheats",
-    "Auto-select cheats",
-    "Select game cheats",
-    "Error: failed to load Cheat File",
-    "No cheats found",
-    "Download defaults",
+    "Auto select or select game cheats.",
+    "Auto Select Cheats",
+    "Select Game Cheats",
+    "Error: failed to load cheat file.",
+    "No cheats found.",
+    "Download Defaults",
     "Network Update",
-    "Re-download existing records?",
+    "Redownload existing records?",
     "Update failed.",
     "Failed to connect to update server.",
     "Update completed.",
     "Update cancelled.",
     "Download settings from the network?",
     "Customized Settings",
-    "Downloaded Defaults",
+    "Downloaded defaults.",
     "Auto start in %i s...",
-    "Auto start",
-    "Value in second(s), 0 to disable auto start",
+    "Auto Start",
+    "Value in second(s), 0 to disable auto start.",
     "PS2 Logo",
-    "(Only displayed for a valid disc logo which matches the console's region)",
+    "Only displayed for a valid disc logo which matches the console's region.",
     "Configure PADEMU",
     "Pad Emulator Settings",
-    "Enable PadEmulator",
-    "Turns on/off PadEmulator for selected game.",
-    "Pad Emulator mode",
+    "Enable Pad Emulator",
+    "Turns on/off Pad Emulator for selected game.",
+    "Pad Emulator Mode",
     "Select Pad Emulator mode.",
     "DualShock3/4 USB",
     "DualShock3/4 BT",
-    "Settings for port:",
+    "Settings For Port:",
     "Select Pad Emulator port for settings.",
-    "Enable emulation",
+    "Enable Emulation",
     "Turns on/off Pad Emulator for selected port.",
-    "Enable vibration",
+    "Enable Vibration",
     "Turns on/off vibration for Pad Emulator selected port.",
-    "Usb bluetooth adapter mac address:",
-    "DS Controller paired to mac address:",
+    "USB Bluetooth Adapter MAC Address:",
+    "DS Controller Paired To MAC Address:",
     "Pair",
     "Pair DS Controller",
-    "Pair DS Controller with bluetooth adapter mac address.",
-    "Not connected",
-    "Bluetooth adapter information",
-    "Shows more information and supported features",
+    "Pair DS controller with Bluetooth adapter MAC address.",
+    "Not Connected",
+    "Bluetooth Adapter Information",
+    "Shows more information and supported features.",
     "HCI Version:",
     "LMP Version:",
     "Manufacturer ID:",
-    "Support features:",
+    "Supported Features:",
     "Yes",
     "No",
     "Bluetooth adapter should be fully compatible with DS3/DS4 controllers.",
     "Bluetooth adapter may not work correctly with DS3/DS4 controllers.",
-    "Enable Multitap emulation",
+    "Enable Multitap Emulation",
     "Turns on/off Multitap emulation for selected game.",
-    "Multitap emulator on port",
+    "Multitap Emulator On Port:",
     "Select port for Multitap emulation.",
-    "Disable workaround for fake ds3",
-    "Some fake ds3s need workaround, this option will disable it.",
-    "Emulate FIELD flipping",
+    "Disable Fake DS3 Workaround",
+    "Some fake DS3s need workaround, this option will disable it.",
+    "Emulate FIELD Flipping",
     "Fix for games that glitch under progressive video modes.",
     "Parental Lock Settings",
     "Parental Lock Password",
@@ -275,6 +275,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Boot Sound Volume",
     "Confirm video mode change?",
     "Cache Game List (HDD)",
+    "Enable Notifications",
+    "%s loaded from %s",
 };
 
 static int guiLangID = 0;
@@ -291,7 +293,7 @@ char *_l(unsigned int id)
     return lang_strs[id];
 }
 
-static void lngFreeFromFile(void)
+static void lngFreeFromFile(char **lang_strs)
 {
     if (guiLangID == 0)
         return;
@@ -309,12 +311,12 @@ static int lngLoadFont(const char *dir, const char *name)
 {
     char path[256];
 
-    snprintf(path, sizeof(path), "%s/font_%s.ttf", dir, name);
+    snprintf(path, sizeof(path), "%sfont_%s.ttf", dir, name);
     LOG("LANG Custom TTF font path: %s\n", path);
     if (fntLoadDefault(path) == 0)
         return 0;
 
-    snprintf(path, sizeof(path), "%s/font_%s.otf", dir, name);
+    snprintf(path, sizeof(path), "%sfont_%s.otf", dir, name);
     LOG("LANG Custom OTF font path: %s\n", path);
     if (fntLoadDefault(path) == 0)
         return 0;
@@ -326,14 +328,17 @@ static int lngLoadFont(const char *dir, const char *name)
 
 static int lngLoadFromFile(char *path, char *name)
 {
-    int HddStartMode;
+    char dir[128];
+
     file_buffer_t *fileBuffer = openFileBuffer(path, O_RDONLY, 1, 1024);
     if (fileBuffer) {
         // file exists, try to read it and load the custom lang
-        lang_strs = (char **)malloc(LANG_STR_COUNT * sizeof(char **));
+        char **curL = lang_strs;
+        char **newL = (char **)malloc(LANG_STR_COUNT * sizeof(char **));
+        memset(newL, 0, sizeof(char **));
 
         int strId = 0;
-        while (strId < LANG_STR_COUNT && readFileBuffer(fileBuffer, &lang_strs[strId])) {
+        while (strId < LANG_STR_COUNT && readFileBuffer(fileBuffer, &newL[strId])) {
             strId++;
         }
         closeFileBuffer(fileBuffer);
@@ -346,18 +351,18 @@ static int lngLoadFromFile(char *path, char *name)
         // if necessary complete lang with default internal
         while (strId < LANG_STR_COUNT) {
             LOG("LANG Default entry added: %s\n", internalEnglish[strId]);
-            lang_strs[strId] = internalEnglish[strId];
+            newL[strId] = internalEnglish[strId];
             strId++;
         }
 
-        if (lngLoadFont(gBaseMCDir, name) != 0) {
-            if (lngLoadFont("mass0:", name) != 0) {
-                if (configGetInt(configGetByType(CONFIG_OPL), CONFIG_OPL_HDD_MODE, &HddStartMode) && (HddStartMode == START_MODE_AUTO)) {
-                    hddLoadModules();
-                    lngLoadFont("pfs0:", name);
-                }
-            }
-        }
+        int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
+        strncpy(dir, path, len);
+        dir[len] = '\0';
+
+        lngLoadFont(dir, name);
+
+        lang_strs = newL;
+        lngFreeFromFile(curL);
 
         return 1;
     }
@@ -374,7 +379,7 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
     if (!FIO_S_ISDIR(mode)) {
         if (strstr(name, ".lng") || strstr(name, ".LNG")) {
 
-            language_t *currLang = &languages[index];
+            language_t *currLang = &languages[nLanguages + index];
 
             // filepath for this language file
             int length = strlen(path) + 1 + strlen(name) + 1;
@@ -388,12 +393,12 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
             currLang->name[length - 1] = '\0';
 
             /*file_buffer_t* fileBuffer = openFileBuffer(currLang->filePath, 1, 1024);
-			if (fileBuffer) {
-				// read localized name of language from file
-				if (readLineContext(fileBuffer, &currLang->name))
-					readLineContext(fileBuffer, &currLang->fontName);
-				closeFileBuffer(fileBuffer);
-			}*/
+            if (fileBuffer) {
+                // read localized name of language from file
+                if (readLineContext(fileBuffer, &currLang->name))
+                    readLineContext(fileBuffer, &currLang->fontName);
+                closeFileBuffer(fileBuffer);
+            }*/
 
             index++;
         }
@@ -401,11 +406,10 @@ static int lngReadEntry(int index, const char *path, const char *separator, cons
     return index;
 }
 
-void lngInit(void)
+static void lngRebuildLangNames(void)
 {
-    fntInit();
-
-    nLanguages = listDir(gBaseMCDir, "/", MAX_LANGUAGE_FILES, &lngReadEntry);
+    if (guiLangNames)
+        free(guiLangNames);
 
     // build the languages name list
     guiLangNames = (char **)malloc((nLanguages + 2) * sizeof(char **));
@@ -421,9 +425,33 @@ void lngInit(void)
     guiLangNames[nLanguages + 1] = NULL;
 }
 
+int lngAddLanguages(char *path, const char *separator, int mode)
+{
+    int result;
+
+    result = listDir(path, separator, MAX_LANGUAGE_FILES - nLanguages, &lngReadEntry);
+    nLanguages += result;
+    lngRebuildLangNames();
+
+    const char *temp;
+    if (configGetStr(configGetByType(CONFIG_OPL), "language_text", &temp)) {
+        if (lngSetGuiValue(lngFindGuiID(temp)))
+            moduleUpdateMenu(mode, 0, 1);
+    }
+
+    return result;
+}
+
+void lngInit(void)
+{
+    fntInit();
+
+    lngAddLanguages(gBaseMCDir, "/", -1);
+}
+
 void lngEnd(void)
 {
-    lngFreeFromFile();
+    lngFreeFromFile(lang_strs);
 
     int i = 0;
     for (; i < nLanguages; i++) {
@@ -436,23 +464,22 @@ void lngEnd(void)
     fntEnd();
 }
 
-void lngSetGuiValue(int langID)
+int lngSetGuiValue(int langID)
 {
-    if (guiLangID != langID) {
-
-        lngFreeFromFile();
-
-        if (langID != 0) {
-            language_t *currLang = &languages[langID - 1];
-            if (lngLoadFromFile(currLang->filePath, currLang->name)) {
-                guiLangID = langID;
-                return;
+    if (langID != -1) {
+        if (guiLangID != langID) {
+            if (langID != 0) {
+                language_t *currLang = &languages[langID - 1];
+                if (lngLoadFromFile(currLang->filePath, currLang->name)) {
+                    guiLangID = langID;
+                    return 1;
+                }
             }
+            lang_strs = internalEnglish;
+            guiLangID = 0;
         }
-
-        lang_strs = internalEnglish;
-        guiLangID = 0;
     }
+    return 0;
 }
 
 int lngGetGuiValue(void)
@@ -475,4 +502,12 @@ int lngFindGuiID(const char *lang)
 char **lngGetGuiList(void)
 {
     return guiLangNames;
+}
+
+char *lngGetFilePath(int langID)
+{
+    language_t *currLang = &languages[langID - 1];
+    char *path = currLang->filePath;
+
+    return path;
 }

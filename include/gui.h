@@ -57,12 +57,7 @@ int guiFrameId;
 #define GUI_SCREEN_MENU 1
 #define GUI_SCREEN_INFO 2
 
-#define TRANSITION_LEFT 0
-#define TRANSITION_RIGHT 1
-#define TRANSITION_UP 2
-#define TRANSITION_DOWN 3
-
-void guiSwitchScreen(int target, int transition);
+void guiSwitchScreen(int target);
 
 void guiReloadScreenExtents();
 
@@ -132,6 +127,7 @@ void guiShowNetConfig();
 void guiShowParentalLockConfig();
 
 void guiDelay(int milliSeconds);
+void guiCheckNotifications(int checkTheme, int checkLang);
 
 /** Renders the given string on screen for the given function until it's io finishes 
 * @note The ptr pointer is watched for it's value. The IO is considered finished when the value becomes zero. 

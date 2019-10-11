@@ -20,9 +20,7 @@
 #include "include/compatupd.h"
 #include "include/pggsm.h"
 #include "include/cheatman.h"
-
 #include "include/sound.h"
-#include <audsrv.h>
 
 #ifdef PADEMU
 #include <libds34bt.h>
@@ -49,6 +47,12 @@ static ee_sema_t gQueueSema;
 
 static int screenWidth;
 static int screenHeight;
+
+static int popupTimer;
+static int popupSfxPlayed;
+
+static int showThmPopup;
+static int showLngPopup;
 
 // forward decl.
 static void guiShow();
@@ -93,7 +97,7 @@ static gui_screen_handler_t *screenHandler = &screenHandlers[GUI_SCREEN_MENU];
 
 // screen transition handling
 static gui_screen_handler_t *screenHandlerTarget = NULL;
-static int transIndex, transMax, transitionX, transitionY;
+static int transIndex;
 
 // Helper perlin noise data
 #define PLASMA_H 32
@@ -232,6 +236,83 @@ void guiShowAbout()
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
     toggleSfx = 0;
+}
+
+void guiCheckNotifications(int checkTheme, int checkLang)
+{
+    if (gEnableNotifications) {
+        if (checkTheme) {
+            if (thmGetGuiValue() != 0)
+                showThmPopup = 1;
+        }
+
+        if (checkLang) {
+            if (lngGetGuiValue() != 0)
+                showLngPopup = 1;
+        }
+
+        if (showThmPopup || showLngPopup || showCfgPopup) {
+            popupSfxPlayed = 0;
+            if (showCfgPopup)
+                popupTimer -= 30;
+        }
+    }
+}
+
+static void guiResetNotifications(void)
+{
+    popupSfxPlayed = 1;
+    popupTimer = 0;
+    showThmPopup = 0;
+    showLngPopup = 0;
+}
+
+static void guiRenderNotifications(char *type, char *path, int y)
+{
+    char notification[32];
+    char *col_pos;
+    int x;
+
+    snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), type, path);
+    if ((col_pos = strchr(notification, ':')) != NULL)
+        *(col_pos + 1) = '\0';
+
+    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+
+    rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+    fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+}
+
+static void guiShowNotifications(void)
+{
+    int y = 10;
+    int yadd = 35;
+
+    if (showThmPopup || showLngPopup || showCfgPopup)
+        popupTimer++;
+
+    if (!popupSfxPlayed && popupTimer >= 20) {
+        sfxPlay(SFX_MESSAGE);
+        popupSfxPlayed = 1;
+    }
+
+    if (showCfgPopup && popupTimer >= 20)
+        guiRenderNotifications("CFG", configGetDir(), y);
+
+    y += yadd;
+
+    if (showThmPopup && popupTimer >= 20)
+        guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
+
+    y += yadd;
+
+    if (showLngPopup && popupTimer >= 20)
+        guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
+
+    if (popupTimer >= CLOCKS_PER_SEC / 2000) {
+        guiResetNotifications();
+        showCfgPopup = 0;
+    }
 }
 
 static int guiNetCompatUpdRefresh(int modified)
@@ -502,6 +583,8 @@ static int guiUIUpdater(int modified)
 void guiShowUIConfig(void)
 {
     curTheme = -1;
+    showCfgPopup = 0;
+    guiResetNotifications();
 
     // configure the enumerations
     const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
@@ -532,6 +615,7 @@ reselect_video_mode:
     diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
     diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
     diaSetInt(diaUIConfig, UICFG_INFOPAGE, gUseInfoScreen);
+    diaSetInt(diaUIConfig, UICFG_NOTIFICATIONS, gEnableNotifications);
     diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
     diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
     diaSetInt(diaUIConfig, UICFG_VMODE, gVMode);
@@ -555,6 +639,7 @@ reselect_video_mode:
         diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
         diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
         diaGetInt(diaUIConfig, UICFG_INFOPAGE, &gUseInfoScreen);
+        diaGetInt(diaUIConfig, UICFG_NOTIFICATIONS, &gEnableNotifications);
         diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
         diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
         diaGetInt(diaUIConfig, UICFG_VMODE, &gVMode);
@@ -1104,14 +1189,14 @@ void guiShowParentalLockConfig(void)
 
 void guiShowAudioConfig(void)
 {
-	int ret;
+    int ret;
 
     diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND, gEnableBootSND);
     diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
 
-    ret = diaExecuteDialog(diaAudioConfig, -1, 1, &guiUpdater);
+    ret = diaExecuteDialog(diaAudioConfig, -1, 1, NULL);
     if (ret) {
         diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
         diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
@@ -2057,31 +2142,35 @@ static void guiReadPads()
 }
 
 // renders the screen and handles inputs. Also handles screen transitions between numerous
-// screen handlers. For now we only have left-to right screen transition
+// screen handlers. Fade transition code written by Maximus32
 static void guiShow()
 {
     // is there a transmission effect going on or are
     // we in a normal rendering state?
     if (screenHandlerTarget) {
-        // advance the effect
+        u8 alpha;
+        const u8 transition_frames = 26;
+        if (transIndex < (transition_frames/2)) {
+            // Fade-out old screen
+            // index: 0..7
+            // alpha: 1..8 * transition_step
+            screenHandler->renderScreen();
+            alpha = fade((float)(transIndex + 1) / (transition_frames / 2)) * 0x80;
+        }
+        else {
+            // Fade-in new screen
+            // index: 8..15
+            // alpha: 8..1 * transition_step
+            screenHandlerTarget->renderScreen();
+            alpha = fade((float)(transition_frames - transIndex) / (transition_frames / 2)) * 0x80;
+        }
 
-        // render the old screen, transposed
-        rmSetTransposition(transIndex * transitionX, transIndex * transitionY);
-        screenHandler->renderScreen();
+        // Overlay the actual "fade"
+        rmDrawRect(0, 0, screenWidth, screenHeight, GS_SETREG_RGBA(0x00, 0x00, 0x00, alpha));
 
-        // render new screen transposed again
-        rmSetTransposition((transIndex - transMax) * transitionX, (transIndex - transMax) * transitionY);
-        screenHandlerTarget->renderScreen();
-
-        // reset transposition to zero
-        rmSetTransposition(0, 0);
-
-        // move the transition indicator forward
-        transIndex += (min(transIndex, transMax - transIndex) >> 1) + 1;
-
-        if (transIndex > transMax) {
-            transitionX = 0;
-            transitionY = 0;
+        // Advance the effect
+        transIndex++;
+        if (transIndex >= transition_frames) {
             screenHandler = screenHandlerTarget;
             screenHandlerTarget = NULL;
         }
@@ -2102,8 +2191,8 @@ void guiIntroLoop(void)
 {
     int endIntro = 0;
 
-     if (gEnableSFX && gEnableBootSND)
-         toggleSfx = -1;
+    if (gEnableSFX && gEnableBootSND)
+        toggleSfx = -1;
 
     while (!endIntro) {
         guiStartFrame();
@@ -2135,6 +2224,9 @@ void guiIntroLoop(void)
 
 void guiMainLoop(void)
 {
+    guiResetNotifications();
+    guiCheckNotifications(1, 1);
+
     while (!gTerminate) {
         guiStartFrame();
 
@@ -2146,6 +2238,9 @@ void guiMainLoop(void)
 
         // Render overlaying gui thingies :)
         guiDrawOverlays();
+
+        if (gEnableNotifications)
+            guiShowNotifications();
 
         // handle deferred operations
         guiHandleDeferredOps();
@@ -2167,24 +2262,10 @@ void guiSetFrameHook(gui_callback_t cback)
     gFrameHook = cback;
 }
 
-void guiSwitchScreen(int target, int transition)
+void guiSwitchScreen(int target)
 {
     sfxPlay(SFX_TRANSITION);
-    if (transition == TRANSITION_LEFT) {
-        transitionX = 1;
-        transMax = screenWidth;
-    } else if (transition == TRANSITION_RIGHT) {
-        transitionX = -1;
-        transMax = screenWidth;
-    } else if (transition == TRANSITION_UP) {
-        transitionY = 1;
-        transMax = screenHeight;
-    } else if (transition == TRANSITION_DOWN) {
-        transitionY = -1;
-        transMax = screenHeight;
-    }
     transIndex = 0;
-
     screenHandlerTarget = &screenHandlers[target];
 }
 

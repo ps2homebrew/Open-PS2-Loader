@@ -93,7 +93,7 @@ EE_ASM_DIR = asm/
 MAPFILE = opl.map
 EE_LDFLAGS += -Wl,-Map,$(MAPFILE)
 
-EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips -laudsrv -lc
+EE_LIBS = -L$(PS2SDK)/ports/lib -L$(GSKIT)/lib -L./lib -lgskit -ldmakit -lgskit_toolkit -lpoweroff -lfileXio -lpatches -ljpeg -lpng -lz -ldebug -lm -lmc -lfreetype -lvux -lcdvd -lnetman -lps2ips -laudsrv
 EE_INCS += -I$(PS2SDK)/ports/include -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include -Imodules/iopcore/common -Imodules/network/common -Imodules/hdd/common -Iinclude
 
 BIN2C = $(PS2SDK)/bin/bin2c
@@ -291,6 +291,12 @@ clean:
 
 rebuild: clean all
 
+run: $(EE_BIN)
+	ps2client -h 192.168.1.10 execee host:$(EE_BIN)
+
+sim: $(EE_BIN)
+	PCSX2 --elf=$(PWD)/$(EE_BIN) --nodisc --nogui
+
 pc_tools:
 	echo "Building iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=0 -C pc
@@ -340,119 +346,102 @@ $(EE_ASM_DIR)elfldr.s: elfldr/elfldr.elf | $(EE_ASM_DIR)
 
 $(UDNL_OUT): $(UDNL_SRC)
 	echo "-IOP core"
-	echo " -udnl"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)udnl.s: $(UDNL_OUT) | $(EE_ASM_DIR)
 	$(BIN2S) $(UDNL_OUT) $@ udnl_irx
 
 modules/iopcore/imgdrv/imgdrv.irx: modules/iopcore/imgdrv
-	echo " -imgdrv"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)imgdrv.s: modules/iopcore/imgdrv/imgdrv.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ imgdrv_irx
 
 modules/iopcore/eesync/eesync.irx: modules/iopcore/eesync
-	echo " -eesync"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eesync_irx
 
 modules/iopcore/cdvdman/usb_cdvdman.irx: modules/iopcore/cdvdman
-	echo " -usb_cdvdman"
-	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< all
 
 $(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_cdvdman_irx
 
 modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
-	echo " -smb_cdvdman"
-	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< all
 
 $(EE_ASM_DIR)smb_cdvdman.s: modules/iopcore/cdvdman/smb_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ smb_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_cdvdman.irx: modules/iopcore/cdvdman
-	echo " -hdd_cdvdman"
-	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDD=1 -C $< all
 
 $(EE_ASM_DIR)hdd_cdvdman.s: modules/iopcore/cdvdman/hdd_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_cdvdman_irx
 
 modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx: modules/iopcore/cdvdman
-	echo " -hdd_hdpro_cdvdman"
-	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< rebuild
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_HDPRO=1 -C $< all
 
 $(EE_ASM_DIR)hdd_hdpro_cdvdman.s: modules/iopcore/cdvdman/hdd_hdpro_cdvdman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_hdpro_cdvdman_irx
 
 modules/iopcore/cdvdfsv/cdvdfsv.irx: modules/iopcore/cdvdfsv
-	echo " -cdvdfsv"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)cdvdfsv.s: modules/iopcore/cdvdfsv/cdvdfsv.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ cdvdfsv_irx
 
 modules/iopcore/patches/iremsndpatch/iremsndpatch.irx: modules/iopcore/patches/iremsndpatch
-	echo " -iremsnd patch"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)iremsndpatch.s: modules/iopcore/patches/iremsndpatch/iremsndpatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ iremsndpatch_irx
 
 modules/iopcore/patches/apemodpatch/apemodpatch.irx: modules/iopcore/patches/apemodpatch
-	echo " -apemod patch"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)apemodpatch.s: modules/iopcore/patches/apemodpatch/apemodpatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ apemodpatch_irx
 
 modules/iopcore/patches/f2techioppatch/f2techioppatch.irx: modules/iopcore/patches/f2techioppatch
-	echo " -f2techiop patch"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)f2techioppatch.s: modules/iopcore/patches/f2techioppatch/f2techioppatch.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ f2techioppatch_irx
 
 modules/iopcore/patches/cleareffects/cleareffects.irx: modules/iopcore/patches/cleareffects
-	echo " -cleareffects"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)cleareffects.s: modules/iopcore/patches/cleareffects/cleareffects.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ cleareffects_irx
 
 modules/iopcore/resetspu/resetspu.irx: modules/iopcore/resetspu
-	echo " -resetspu"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)resetspu.s: modules/iopcore/resetspu/resetspu.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ resetspu_irx
 
 modules/mcemu/usb_mcemu.irx: modules/mcemu
-	echo " -usb_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_USB=1 -C $< rebuild
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_USB=1 -C $< all
 
 $(EE_ASM_DIR)usb_mcemu.s: modules/mcemu/usb_mcemu.irx
 	$(BIN2S) $< $@ usb_mcemu_irx
 
 modules/mcemu/hdd_mcemu.irx: modules/mcemu
-	echo " -hdd_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_HDD=1 -C $< rebuild
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_HDD=1 -C $< all
 
 $(EE_ASM_DIR)hdd_mcemu.s: modules/mcemu/hdd_mcemu.irx
 	$(BIN2S) $< $@ hdd_mcemu_irx
 
 modules/mcemu/smb_mcemu.irx: modules/mcemu
-	echo " -smb_mcemu"
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_SMB=1 -C $< rebuild
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_SMB=1 -C $< all
 
 $(EE_ASM_DIR)smb_mcemu.s: modules/mcemu/smb_mcemu.irx
 	$(BIN2S) $< $@ smb_mcemu_irx
 
 modules/isofs/isofs.irx: modules/isofs
-	echo " -isofs"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)isofs.s: modules/isofs/isofs.irx | $(EE_ASM_DIR)
@@ -474,7 +463,6 @@ modules/ds34bt/ee/libds34bt.a: modules/ds34bt/ee
 	$(MAKE) -C $<
 
 modules/ds34bt/iop/ds34bt.irx: modules/ds34bt/iop
-	echo " -ds34bt"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)ds34bt.s: modules/ds34bt/iop/ds34bt.irx | $(EE_ASM_DIR)
@@ -487,21 +475,18 @@ modules/ds34usb/ee/libds34usb.a: modules/ds34usb/ee
 	$(MAKE) -C $<
 
 modules/ds34usb/iop/ds34usb.irx: modules/ds34usb/iop
-	echo " -ds34usb"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)ds34usb.s: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ds34usb_irx
 
 modules/pademu/bt_pademu.irx: modules/pademu
-	echo " -bt_pademu"
 	$(MAKE) -C $< USE_BT=1
 
 $(EE_ASM_DIR)bt_pademu.s: modules/pademu/bt_pademu.irx
 	$(BIN2S) $< $@ bt_pademu_irx
 
 modules/pademu/usb_pademu.irx: modules/pademu
-	echo " -usb_pademu"
 	$(MAKE) -C $< USE_USB=1
 
 $(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
@@ -511,7 +496,6 @@ $(EE_ASM_DIR)usbhdfsd.s: $(PS2SDK)/iop/irx/usbhdfsd.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usbhdfsd_irx
 
 modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv
-	echo " -usbhdfsdfsv"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx | $(EE_ASM_DIR)
@@ -521,7 +505,6 @@ $(EE_ASM_DIR)ps2dev9.s: $(PS2SDK)/iop/irx/ps2dev9.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2dev9_irx
 
 modules/network/SMSUTILS/SMSUTILS.irx: modules/network/SMSUTILS
-	echo " -SMSUTILS"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)smsutils.s: modules/network/SMSUTILS/SMSUTILS.irx | $(EE_ASM_DIR)
@@ -531,14 +514,12 @@ $(EE_ASM_DIR)ps2ip.s: $(PS2SDK)/iop/irx/ps2ip-nm.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2ip_irx
 
 modules/network/SMSTCPIP/SMSTCPIP.irx: modules/network/SMSTCPIP
-	echo " -in-game SMSTCPIP"
 	$(MAKE) $(SMSTCPIP_INGAME_CFLAGS) -C $< rebuild
 
 $(EE_ASM_DIR)ingame_smstcpip.s: modules/network/SMSTCPIP/SMSTCPIP.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ingame_smstcpip_irx
 
 modules/network/smap-ingame/smap.irx: modules/network/smap-ingame
-	echo " -in-game SMAP"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)smap_ingame.s: modules/network/smap-ingame/smap.irx | $(EE_ASM_DIR)
@@ -557,7 +538,6 @@ $(EE_ASM_DIR)smbman.s: $(PS2SDK)/iop/irx/smbman.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ smbman_irx
 
 modules/network/smbinit/smbinit.irx: modules/network/smbinit
-	echo " -smbinit"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)smbinit.s: modules/network/smbinit/smbinit.irx | $(EE_ASM_DIR)
@@ -573,7 +553,6 @@ $(EE_ASM_DIR)poweroff.s: $(PS2SDK)/iop/irx/poweroff.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ poweroff_irx
 
 modules/hdd/xhdd/xhdd.irx: modules/hdd/xhdd
-	echo " -xhdd"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)xhdd.s: modules/hdd/xhdd/xhdd.irx | $(EE_ASM_DIR)
@@ -586,14 +565,12 @@ $(EE_ASM_DIR)ps2fs.s: $(PS2SDK)/iop/irx/ps2fs-osd.irx
 	$(BIN2S) $< $@ ps2fs_irx
 
 modules/vmc/genvmc/genvmc.irx: modules/vmc/genvmc
-	echo " -genvmc"
 	$(MAKE) $(MOD_DEBUG_FLAGS) -C $<
 
 $(EE_ASM_DIR)genvmc.s: modules/vmc/genvmc/genvmc.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ genvmc_irx
 
 modules/hdd/hdldsvr/hdldsvr.irx: modules/hdd/hdldsvr
-	echo " -hdldsvr"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)hdldsvr.s: modules/hdd/hdldsvr/hdldsvr.irx | $(EE_ASM_DIR)
@@ -603,35 +580,30 @@ $(EE_ASM_DIR)udptty.s: $(PS2SDK)/iop/irx/udptty.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_irx
 
 modules/debug/udptty-ingame/udptty.irx: modules/debug/udptty-ingame
-	echo " -udptty-ingame"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)udptty-ingame.s: modules/debug/udptty-ingame/udptty.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_ingame_irx
 
 modules/debug/ioptrap/ioptrap.irx: modules/debug/ioptrap
-	echo " -ioptrap"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)ioptrap.s: modules/debug/ioptrap/ioptrap.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ioptrap_irx
 
 modules/debug/ps2link/ps2link.irx: modules/debug/ps2link
-	echo " -ps2link"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)ps2link.s: modules/debug/ps2link/ps2link.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2link_irx
 
 modules/network/nbns/nbns.irx: modules/network/nbns
-	echo " -nbns"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)nbns-iop.s: modules/network/nbns/nbns.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ nbns_irx
 
 modules/network/httpclient/httpclient.irx: modules/network/httpclient
-	echo " -httpclient"
 	$(MAKE) -C $<
 
 $(EE_ASM_DIR)httpclient-iop.s: modules/network/httpclient/httpclient.irx | $(EE_ASM_DIR)

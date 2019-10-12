@@ -146,9 +146,6 @@ int gFadeDelay;
 int toggleSfx;
 
 int showCfgPopup;
-int showThmPopup;
-int showLngPopup;
-int popupSfxPlayed;
 
 #ifdef IGS
 #define IGS_VERSION "0.1"

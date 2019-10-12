@@ -11,11 +11,15 @@
 *.ELF
 *.erl
 *.exe
+*.irx
 *.map
 *.o
 *.patch
 *.rej
+*.s
 *.zip
+*.ZIP
+*.a
 DETAILED_CHANGELOG
 
 #

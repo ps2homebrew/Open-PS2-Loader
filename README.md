@@ -17,7 +17,12 @@ the project due to its open source nature.
 
 You can visit the Open PS2 Loader forum at:  
 
-http://psx-scene.com/forums/official-open-ps2-loader-forum/  
+http://psx-scene.com/forums/official-open-ps2-loader-forum/ 
+https://www.psx-place.com/forums/open-ps2-loader-opl.77/
+
+You can report compatibility game problems at:
+
+https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/
 
 For updated compatibility list, you can visit OPL-CL site at:  
 

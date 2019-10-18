@@ -53,7 +53,7 @@ static u8 rgbled_patterns[][2][3] =
         {{0x00, 0x10, 0x10}, {0x00, 0x7F, 0x7F}},  // light cyan/cyan
 };
 
-static u8 usb_buf[MAX_BUFFER_SIZE + 20] __attribute((aligned(4))) = {0};
+static u8 usb_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
 
 int usb_probe(int devId);
 int usb_connect(int devId);
@@ -231,7 +231,7 @@ static void usb_config_set(int result, int count, void *arg)
         DelayThread(10000);
         led[0] = led_patterns[pad][1];
         led[3] = 0;
-    } else if(ds34pad[pad].type == DS4) {
+    } else if (ds34pad[pad].type == DS4) {
         led[0] = rgbled_patterns[pad][1][0];
         led[1] = rgbled_patterns[pad][1][1];
         led[2] = rgbled_patterns[pad][1][2];
@@ -265,7 +265,10 @@ static void readReport(u8 *data, int pad)
             struct ds3report *report;
             
             report = (struct ds3report *)&data[2];
-            
+
+            if (report->RightStickX == 0 && report->RightStickY == 0) // ledrumble cmd causes null report sometime
+                return;
+
             ds34pad[pad].data[0] = ~report->ButtonStateL;
             ds34pad[pad].data[1] = ~report->ButtonStateH;
 
@@ -510,16 +513,6 @@ int ds34usb_get_data(u8 *dst, int size, int port)
     int ret = 0;
 
     WaitSema(ds34pad[port].sema);
-    
-    if (ds34pad[port].update_rum) {
-        ret = LEDRumble(ds34pad[port].oldled, ds34pad[port].lrum, ds34pad[port].rrum, port);
-        if (ret == USB_RC_OK)
-            TransferWait(ds34pad[port].cmd_sema);
-        else
-            DPRINTF("DS34USB: LEDRumble usb transfer error %d\n", ret);
-            
-        ds34pad[port].update_rum = 0;
-    }
 
     PollSema(ds34pad[port].sema);
 
@@ -529,7 +522,7 @@ int ds34usb_get_data(u8 *dst, int size, int port)
         TransferWait(ds34pad[port].sema);
         if (!usb_resulCode)
             readReport(usb_buf, port);
-            
+
         usb_resulCode = 1;
     } else {
         DPRINTF("DS34USB: ds34usb_get_data usb transfer error %d\n", ret);
@@ -537,6 +530,16 @@ int ds34usb_get_data(u8 *dst, int size, int port)
 
     mips_memcpy(dst, ds34pad[port].data, size);
     ret = ds34pad[port].analog_btn & 1;
+        
+    if (ds34pad[port].update_rum) {
+        ret = LEDRumble(ds34pad[port].oldled, ds34pad[port].lrum, ds34pad[port].rrum, port);
+        if (ret == USB_RC_OK)
+            TransferWait(ds34pad[port].cmd_sema);
+        else
+            DPRINTF("DS34USB: LEDRumble usb transfer error %d\n", ret);
+
+        ds34pad[port].update_rum = 0;
+    }
 
     SignalSema(ds34pad[port].sema);
 

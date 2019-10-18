@@ -19,7 +19,13 @@ You can visit the Open PS2 Loader forums at:
 
 http://www.ps2-home.com/forum/viewforum.php?f=13
 
-http://psx-scene.com/forums/official-open-ps2-loader-forum/  
+http://psx-scene.com/forums/official-open-ps2-loader-forum/ 
+
+https://www.psx-place.com/forums/open-ps2-loader-opl.77/
+
+You can report compatibility game problems at:
+
+https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/
 
 For updated compatibility lists, you can visit OPL-CL site at:  
 

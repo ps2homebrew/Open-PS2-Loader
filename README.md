@@ -25,6 +25,8 @@ https://www.psx-place.com/forums/open-ps2-loader-opl.77/
 
 You can report compatibility game problems at:
 
+http://www.ps2-home.com/forum/viewtopic.php?f=13&t=175
+
 https://www.psx-place.com/threads/open-ps2-loader-game-bug-reports.19401/
 
 For updated compatibility lists, you can visit OPL-CL site at:  

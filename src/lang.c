@@ -352,15 +352,14 @@ static int lngLoadFromFile(char *path, char *name)
             newL[strId] = internalEnglish[strId];
             strId++;
         }
+        lang_strs = newL;
+        lngFreeFromFile(curL);
 
         int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
         strncpy(dir, path, len);
         dir[len] = '\0';
 
         lngLoadFont(dir, name);
-
-        lang_strs = newL;
-        lngFreeFromFile(curL);
 
         return 1;
     }

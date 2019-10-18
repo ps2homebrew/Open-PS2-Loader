@@ -44,6 +44,8 @@ enum GAME_MENU_IDs {
     GAME_REMOVE_CHANGES,
     GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
+    GAME_RENAME_GAME,
+    GAME_DELETE_GAME,
 };
 
 // global menu variables
@@ -68,6 +70,61 @@ static submenu_list_t *gameMenuCurrent;
 
 static s32 menuSemaId;
 static ee_sema_t menuSema;
+
+static void menuRenameGame(void)
+{
+    if (!selected_item->item->current) {
+        return;
+    }
+
+    if (!gEnableWrite)
+        return;
+
+    item_list_t *support = selected_item->item->userdata;
+
+    if (support) {
+        if (support->itemRename) {
+            if (menuCheckParentalLock() == 0) {
+                sfxPlay(SFX_MESSAGE);
+                int nameLength = support->itemGetNameLength(selected_item->item->current->item.id);
+                char newName[nameLength];
+                strncpy(newName, selected_item->item->current->item.text, nameLength);
+                if (guiShowKeyboard(newName, nameLength)) {
+                    guiSwitchScreen(GUI_SCREEN_MAIN);
+                    submenuDestroy(&gameMenu);
+                    support->itemRename(selected_item->item->current->item.id, newName);
+                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                }
+            }
+        }
+    } else
+        guiMsgBox("NULL Support object. Please report", 0, NULL);
+}
+
+static void menuDeleteGame(void)
+{
+    if (!selected_item->item->current)
+        return;
+
+    if (!gEnableWrite)
+        return;
+
+    item_list_t *support = selected_item->item->userdata;
+
+    if (support) {
+        if (support->itemDelete) {
+            if (menuCheckParentalLock() == 0) {
+                if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
+                    guiSwitchScreen(GUI_SCREEN_MAIN);
+                    submenuDestroy(&gameMenu);
+                    support->itemDelete(selected_item->item->current->item.id);
+                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+                }
+            }
+        }
+    } else
+        guiMsgBox("NULL Support object. Please report", 0, NULL);
+}
 
 static void _menuLoadConfig()
 {
@@ -169,6 +226,10 @@ void menuInitGameMenu(void)
     submenuAppendItem(&gameMenu, -1, NULL, GAME_REMOVE_CHANGES, _STR_REMOVE_ALL_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
+    if (gEnableWrite) {
+        submenuAppendItem(&gameMenu, -1, NULL, GAME_RENAME_GAME, _STR_RENAME);
+        submenuAppendItem(&gameMenu, -1, NULL, GAME_DELETE_GAME, _STR_DELETE);
+    }
 
     gameMenuCurrent = gameMenu;
 }
@@ -808,17 +869,11 @@ void menuHandleInputMain()
     } else if (getKey(KEY_DOWN)) {
         menuNextV();
     } else if (getKeyOn(KEY_CROSS)) {
-        if (gSelectButton == KEY_CROSS && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-            guiSwitchScreen(GUI_SCREEN_INFO);
-        else
-            selected_item->item->execCross(selected_item->item);
+        selected_item->item->execCross(selected_item->item);
     } else if (getKeyOn(KEY_TRIANGLE)) {
         selected_item->item->execTriangle(selected_item->item);
     } else if (getKeyOn(KEY_CIRCLE)) {
-        if (gSelectButton == KEY_CIRCLE && (selected_item->item->current && gUseInfoScreen && gTheme->infoElems.first))
-            guiSwitchScreen(GUI_SCREEN_INFO);
-        else
-            selected_item->item->execCircle(selected_item->item);
+        selected_item->item->execCircle(selected_item->item);
     } else if (getKeyOn(KEY_SQUARE)) {
         selected_item->item->execSquare(selected_item->item);
     } else if (getKeyOn(KEY_START)) {
@@ -997,6 +1052,10 @@ void menuHandleInputGameMenu()
             guiGameLoadConfig(support, configSet);
         } else if (menuID == GAME_TEST_CHANGES) {
             guiGameTestSettings(gameID, support, itemConfig);
+        } else if (menuID == GAME_RENAME_GAME) {
+            menuRenameGame();
+        } else if (menuID == GAME_DELETE_GAME) {
+            menuDeleteGame();
         }
         // so the exit press wont propagate twice
         readPads();

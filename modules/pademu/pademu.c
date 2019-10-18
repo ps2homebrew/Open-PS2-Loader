@@ -93,9 +93,9 @@ extern struct irx_export_table _exp_pademu;
 
 int _start(int argc, char *argv[])
 {
-    u8 pad_vibration = 0xFF;
+    u8 pad_vibration = 0x03;
 
-    pad_enable = 0xFF;
+    pad_enable = 0x03;
 
     if (argc > 1) {
         pad_enable = argv[1][0];

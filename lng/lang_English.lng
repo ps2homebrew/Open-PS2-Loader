@@ -126,7 +126,7 @@ Remember Last Played Game
 Select Button
 Error, the game is fragmented.
 Error, could not run the item.
-Test
+Test Changes
 Leave empty for GUEST auth.
 Accurate Reads
 Synchronous Mode
@@ -224,7 +224,7 @@ Update completed.
 Update cancelled.
 Download settings from the network?
 Customized Settings
-Downloaded defaults.
+Downloaded Defaults
 Auto start in %i s...
 Auto Start
 Value in second(s), 0 to disable auto start.
@@ -286,3 +286,6 @@ Confirm video mode change?
 Cache Game List (HDD)
 Enable Notifications
 %s loaded from %s
+Game Menu
+Game settings saved.
+Game settings removed.

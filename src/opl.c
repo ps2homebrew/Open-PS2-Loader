@@ -7,6 +7,7 @@
 #include "include/opl.h"
 #include "include/ioman.h"
 #include "include/gui.h"
+#include "include/guigame.h"
 #include "include/renderman.h"
 #include "include/lang.h"
 #include "include/themes.h"
@@ -142,7 +143,7 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
         menuAddHint(&mod->menuItem, (gUseInfoScreen && gTheme->infoElems.first) ? _STR_INFO : _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
 
         if (!(mod->support->flags & MODE_FLAG_NO_COMPAT))
-            menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+            menuAddHint(&mod->menuItem, _STR_GAME_MENU, TRIANGLE_ICON);
 
         menuAddHint(&mod->menuItem, _STR_REFRESH, SELECT_ICON);
 
@@ -229,10 +230,10 @@ static void itemExecTriangle(struct menu_item *curMenu)
     if (support) {
         if (!(support->flags & MODE_FLAG_NO_COMPAT)) {
             if (menuCheckParentalLock() == 0) {
+                menuInitGameMenu();
+                guiSwitchScreen(GUI_SCREEN_GAME_MENU);
                 config_set_t *configSet = menuLoadConfig();
-                sfxPlay(SFX_TRANSITION);
-                if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
-                    support->itemLaunch(curMenu->current->item.id, configSet);
+                guiGameLoadConfig(support, configSet);
             }
         }
     } else
@@ -274,9 +275,10 @@ static void itemExecRefresh(struct menu_item *curMenu)
 {
     item_list_t *support = curMenu->userdata;
 
-    if (support && support->enabled)
+    if (support && support->enabled) {
         ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-    sfxPlay(SFX_CONFIRM);
+        sfxPlay(SFX_CONFIRM);
+    }
 }
 
 static void initMenuForListSupport(int mode)

@@ -4,11 +4,6 @@
 #include "include/fntsys.h"
 #include "include/ioman.h"
 
-#include "include/usbsupport.h"
-#include "include/hddsupport.h"
-
-#include "include/iosupport.h"
-
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
     "English (internal)",
@@ -117,7 +112,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Select Button",
     "Error, the game is fragmented.",
     "Error, could not run the item.",
-    "Test",
+    "Test Changes",
     "Leave empty for GUEST auth.",
     "Accurate Reads",
     "Synchronous Mode",
@@ -215,7 +210,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Update cancelled.",
     "Download settings from the network?",
     "Customized Settings",
-    "Downloaded defaults.",
+    "Downloaded Defaults",
     "Auto start in %i s...",
     "Auto Start",
     "Value in second(s), 0 to disable auto start.",
@@ -277,6 +272,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Cache Game List (HDD)",
     "Enable Notifications",
     "%s loaded from %s",
+    "Game Menu",
+    "Game settings saved.",
+    "Game settings removed.",
 };
 
 static int guiLangID = 0;

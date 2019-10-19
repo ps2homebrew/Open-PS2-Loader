@@ -708,7 +708,8 @@ void menuRenderMenu()
         y += spacing;
     }
 
-    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_GAMES_LIST, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+    //hints
+    guiDrawSubMenuHints();
 }
 
 int menuSetParentalLockCheckState(int enabled)
@@ -988,7 +989,8 @@ void menuRenderGameMenu()
         y += spacing;
     }
 
-    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_GAMES_LIST, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+    //hints
+    guiDrawSubMenuHints();
 }
 
 void menuHandleInputGameMenu()

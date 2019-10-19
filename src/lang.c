@@ -203,7 +203,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "No cheats found.",
     "Download Defaults",
     "Network Update",
-    "Redownload existing records?",
+    "Overwrite Existing Records",
     "Update failed.",
     "Failed to connect to update server.",
     "Update completed.",
@@ -275,6 +275,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Game Menu",
     "Game settings saved.",
     "Game settings removed.",
+    "Overwrites existing game compatibility settings when enabled.",
 };
 
 static int guiLangID = 0;

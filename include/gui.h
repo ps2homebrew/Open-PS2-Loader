@@ -117,6 +117,10 @@ void guiUpdateScreenScale(void);
 
 void guiDrawBGPlasma();
 int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color);
+void guiDrawSubMenuHints(void);
+
+int guiAlignMenuHints(menu_hint_item_t *hint, int font, int width);
+int guiAlignSubMenuHints(int hintCount, int *textID, int *iconID, int font, int width, int align);
 
 void guiShowNetCompatUpdate(void);
 void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *configSet);

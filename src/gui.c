@@ -1194,6 +1194,66 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
     return x;
 }
 
+int guiAlignMenuHints(menu_hint_item_t *hint, int font, int width)
+{
+    int x = screenWidth;
+    int w;
+
+    for (; hint; hint = hint->next) {
+        GSTEXTURE *iconTex = thmGetTexture(hint->icon_id);
+        w = (iconTex->Width * 20) / iconTex->Height;
+        char *text = _l(hint->text_id);
+
+        x -= rmWideScale(w) + 2;
+        x -= rmUnScaleX(fntCalcDimensions(font, text));
+        if (hint->next != NULL)
+            x -= width;
+    }
+
+    // align center
+    x /= 2;
+
+    return x;
+}
+
+int guiAlignSubMenuHints(int hintCount, int *textID, int *iconID, int font, int width, int align)
+{
+    int x = screenWidth;
+    int i, w;
+
+    for (i = 0; i < hintCount; i++) {
+        GSTEXTURE *iconTex = thmGetTexture(iconID[i]);
+        w = (iconTex->Width * 20) / iconTex->Height;
+        char *text = _l(textID[i]);
+
+        x -= rmWideScale(w) + 2;
+        x -= rmUnScaleX(fntCalcDimensions(font, text));
+        if (i != (hintCount - 1))
+            x -= width;
+    }
+
+    if (align == 1) // align center
+        x /= 2;
+
+    if (align == 2) // align right
+        x -= 20;
+
+    return x;
+}
+
+void guiDrawSubMenuHints(void)
+{
+    int subMenuHints[2] = {_STR_SELECT, _STR_GAMES_LIST};
+    int subMenuIcons[2] = {CROSS_ICON, CIRCLE_ICON};
+
+    int x = guiAlignSubMenuHints(2, subMenuHints, subMenuIcons, gTheme->fonts[0], 12, 2);
+    int y = gTheme->usedHeight - 32;
+
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[0], gTheme->fonts[0], x, y, gTheme->textColor);
+    x += 12;
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[0] : subMenuIcons[1], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
+}
+
 static void guiDrawOverlays()
 {
     // are there any pending operations?

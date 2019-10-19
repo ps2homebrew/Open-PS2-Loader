@@ -217,7 +217,7 @@ Error: failed to load cheat file.
 No cheats found.
 Download Defaults
 Network Update
-Redownload existing records?
+Overwrite Existing Records
 Update failed.
 Failed to connect to update server.
 Update completed.
@@ -289,3 +289,4 @@ Enable Notifications
 Game Menu
 Game settings saved.
 Game settings removed.
+Overwrites existing game compatibility settings when enabled.

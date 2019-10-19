@@ -399,7 +399,7 @@ static void diaDrawHint(int text_id)
 
     // the width of the hint text string will be scaled by the Vmode, we need to unscale it.
     x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], text)) - 10;
-    y = gTheme->usedHeight - 40;
+    y = gTheme->usedHeight - 62;
 
     // render hint on the lower side of the screen.
     rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
@@ -611,8 +611,14 @@ void diaRenderUI(struct UIItem *ui, short inMenu, struct UIItem *cur, int haveFo
         diaDrawHint(cur->hintId);
     }
 
-    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_SELECT, gTheme->fonts[0], 420, 417, gTheme->selTextColor);
-    guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+    int uiHints[2] = {_STR_SELECT, _STR_BACK};
+    int uiIcons[2] = {CIRCLE_ICON, CROSS_ICON};
+    int uiY = gTheme->usedHeight - 32;
+    int uiX = guiAlignSubMenuHints(2, uiHints, uiIcons, gTheme->fonts[0], 12, 2);
+
+    uiX = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? uiIcons[0] : uiIcons[1], uiHints[0], gTheme->fonts[0], uiX, uiY, gTheme->textColor);
+    uiX += 12;
+    uiX = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? uiIcons[1] : uiIcons[0], uiHints[1], gTheme->fonts[0], uiX, uiY, gTheme->textColor);
 }
 
 /// sets the ui item value to the default again

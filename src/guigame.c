@@ -885,9 +885,13 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     else if (configSourceID == CONFIG_SOURCE_DLOAD)
         snprintf(configSource, sizeof(configSource), _l(_STR_DOWNLOADED_DEFAULTS));
 
+    dmaMode = 7; // defaulting to UDMA 4
     if (support->flags & MODE_FLAG_COMPAT_DMA) {
         configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
+        diaSetInt(diaCompatConfig, COMPAT_DMA, dmaMode);
     }
+    else
+        diaSetInt(diaCompatConfig, COMPAT_DMA, 0);
 
     compatMode = 0;
     configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);

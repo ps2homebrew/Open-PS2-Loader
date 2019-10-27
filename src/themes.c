@@ -780,6 +780,9 @@ static void drawHintText(struct menu_list *menu, struct submenu_list *item, conf
     if (hint) {
         int x = elem->posX;
 
+        if (elem->aligned)
+            x = guiAlignMenuHints(hint, elem->font, elem->width);
+
         for (; hint; hint = hint->next) {
             x = guiDrawIconAndText(hint->icon_id, hint->text_id, elem->font, x, elem->posY, elem->color);
             x += elem->width;
@@ -789,10 +792,16 @@ static void drawHintText(struct menu_list *menu, struct submenu_list *item, conf
 
 static void drawInfoHintText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
+    int infoHints[2] = {_STR_RUN, _STR_BACK};
+    int infoIcons[2] = {CIRCLE_ICON, CROSS_ICON};
     int x = elem->posX;
-    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_RUN, elem->font, x, elem->posY, elem->color);
+
+    if (elem->aligned)
+        x = guiAlignSubMenuHints(2, infoHints, infoIcons, elem->font, elem->width, 1);
+
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? infoIcons[0] : infoIcons[1], infoHints[0], elem->font, x, elem->posY, elem->color);
     x += elem->width;
-    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, elem->font, x, elem->posY, elem->color);
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? infoIcons[1] : infoIcons[0], infoHints[1], elem->font, x, elem->posY, elem->color);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

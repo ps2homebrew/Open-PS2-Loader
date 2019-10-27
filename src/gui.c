@@ -22,11 +22,6 @@
 #include "include/cheatman.h"
 #include "include/sound.h"
 
-#ifdef PADEMU
-#include <libds34bt.h>
-#include <libds34usb.h>
-#endif
-
 #include <limits.h>
 #include <stdlib.h>
 #include <libvux.h>
@@ -90,7 +85,8 @@ typedef struct
 
 static gui_screen_handler_t screenHandlers[] = {{&menuHandleInputMain, &menuRenderMain, 0},
                                                 {&menuHandleInputMenu, &menuRenderMenu, 1},
-                                                {&menuHandleInputInfo, &menuRenderInfo, 1}};
+                                                {&menuHandleInputInfo, &menuRenderInfo, 1},
+                                                {&menuHandleInputGameMenu, &menuRenderGameMenu, 1}};
 
 // default screen handler (menu screen)
 static gui_screen_handler_t *screenHandler = &screenHandlers[GUI_SCREEN_MENU];
@@ -211,7 +207,7 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
-    toggleSfx = -1;
+    toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
@@ -413,7 +409,7 @@ void guiShowNetCompatUpdate(void)
     }
 }
 
-static void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *configSet)
+void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *configSet)
 {
     int ConfigSource, result;
 
@@ -663,384 +659,6 @@ reselect_video_mode:
     }
 }
 
-static void guiSetGSMSettingsState(void)
-{
-    int isGSMEnabled;
-
-    diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &isGSMEnabled);
-    diaSetEnabled(diaGSConfig, GSMCFG_GSMVMODE, isGSMEnabled);
-    diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, isGSMEnabled);
-    diaSetEnabled(diaGSConfig, GSMCFG_GSMYOFFSET, isGSMEnabled);
-    diaSetEnabled(diaGSConfig, GSMCFG_GSMFIELDFIX, isGSMEnabled);
-}
-
-static int guiGSMUpdater(int modified)
-{
-    if (modified) {
-        guiSetGSMSettingsState();
-    }
-
-    return 0;
-}
-
-static void guiShowGSConfig(void)
-{
-    // configure the enumerations
-    const char *gsmvmodeNames[] = {
-        "NTSC",
-        "NTSC Non Interlaced",
-        "PAL",
-        "PAL Non Interlaced",
-        "PAL @60Hz",
-        "PAL @60Hz Non Interlaced",
-        "PS1 NTSC (HDTV 480p @60Hz)",
-        "PS1 PAL (HDTV 576p @50Hz)",
-        "HDTV 480p @60Hz",
-        "HDTV 576p @50Hz",
-        "HDTV 720p @60Hz",
-        "HDTV 1080i @60Hz",
-        "HDTV 1080i @60Hz Non Interlaced",
-        "VGA 640x480p @60Hz",
-        "VGA 640x480p @72Hz",
-        "VGA 640x480p @75Hz",
-        "VGA 640x480p @85Hz",
-        "VGA 640x960i @60Hz",
-        "VGA 800x600p @56Hz",
-        "VGA 800x600p @60Hz",
-        "VGA 800x600p @72Hz",
-        "VGA 800x600p @75Hz",
-        "VGA 800x600p @85Hz",
-        "VGA 1024x768p @60Hz",
-        "VGA 1024x768p @70Hz",
-        "VGA 1024x768p @75Hz",
-        "VGA 1024x768p @85Hz",
-        "VGA 1280x1024p @60Hz",
-        "VGA 1280x1024p @75Hz",
-        NULL};
-
-    diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);
-    diaExecuteDialog(diaGSConfig, -1, 1, &guiGSMUpdater);
-}
-
-static void guiSetCheatSettingsState(void)
-{
-    int isCheatEnabled;
-
-    diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &isCheatEnabled);
-    diaSetEnabled(diaCheatConfig, CHTCFG_CHEATMODE, isCheatEnabled);
-}
-
-static int guiCheatUpdater(int modified)
-{
-    if (modified) {
-        guiSetCheatSettingsState();
-    }
-
-    return 0;
-}
-
-void guiShowCheatConfig(void)
-{
-    // configure the enumerations
-    const char *cheatmodeNames[] = {_l(_STR_CHEATMODEAUTO), _l(_STR_CHEATMODESELECT), NULL};
-
-    diaSetEnum(diaCheatConfig, CHTCFG_CHEATMODE, cheatmodeNames);
-
-    diaExecuteDialog(diaCheatConfig, -1, 1, &guiCheatUpdater);
-}
-
-#ifdef PADEMU
-
-//from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
-static char *bt_ver_str[] = {
-    "1.0b",
-    "1.1",
-    "1.2",
-    "2.0 + EDR",
-    "2.1 + EDR",
-    "3.0 + HS",
-    "4.0",
-    "4.1",
-    "4.2",
-    "5.0",
-};
-
-static const char *PadEmuPorts_enums[][5] = {
-    {"1P", "2P", NULL, NULL, NULL},
-    {"1A", "1B", "1C", "1D", NULL},
-    {"2A", "2B", "2C", "2D", NULL},
-};
-
-static u8 ds3_mac[6];
-static u8 dg_mac[6];
-static char ds3_str[18];
-static char dg_str[18];
-static char vid_str[4];
-static char pid_str[4];
-static char rev_str[4];
-static char hci_str[26];
-static char lmp_str[26];
-static char man_str[4];
-static int ds3macset = 0;
-static int dgmacset = 0;
-static int dg_discon = 0;
-static int ver_set = 0, feat_set = 0;
-static int PadEmuSettings = 0;
-
-static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
-{
-    int i;
-
-    memset(addstr, 0, sizeof(addstr));
-
-    for (i = 0; i < 6; i++) {
-        sprintf(addstr, "%s%02X", addstr, bdaddr[i]);
-
-        if (i < 5)
-            sprintf(addstr, "%s:", addstr);
-    }
-
-    return addstr;
-}
-
-static char *hex_to_str(u8 *str, u16 hex)
-{
-    sprintf(str, "%04X", hex);
-
-    return str;
-}
-
-static char *ver_to_str(u8 *str, u8 ma, u16 mi)
-{
-    if (ma > 9)
-        ma = 0;
-
-    sprintf(str, "%X.%04X    BT %s", ma, mi, bt_ver_str[ma]);
-
-    return str;
-}
-
-static int guiPadEmuUpdater(int modified)
-{
-    int PadEmuEnable, PadEmuMode, PadPort, PadEmuVib, PadEmuPort, PadEmuMtap, PadEmuMtapPort, PadEmuWorkaround;
-    static int oldPadPort;
-
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &PadEmuEnable);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, &PadEmuMode);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADPORT, &PadPort);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, &PadEmuPort);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, &PadEmuVib);
-
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, &PadEmuMtap);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, &PadEmuMtapPort);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, &PadEmuWorkaround);
-
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuEnable);
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtap);
-
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuEnable);
-
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADPORT, PadEmuEnable);
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_VIB, PadEmuPort & PadEmuEnable);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, (PadEmuMode == 1) & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC, (PadEmuMode == 1) & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR, (PadEmuMode == 1) & PadEmuEnable);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, (PadEmuMode == 1) & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, (PadEmuMode == 1) & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, (PadEmuMode == 1) & PadEmuEnable);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, (PadEmuMode == 1) & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, (PadEmuMode == 1) & PadEmuEnable);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND_STR, (PadEmuMode == 1) & PadEmuEnable);
-
-    if (modified) {
-        if (PadEmuMtap) {
-            diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
-            diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadPort == 0) & PadEmuEnable);
-            PadEmuSettings |= 0x00000E00;
-        } else {
-            diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[0]);
-            diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
-            PadEmuSettings &= 0xFFFF03FF;
-            if (PadPort > 1) {
-                PadPort = 0;
-                diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, PadPort);
-            }
-        }
-
-        if (PadPort != oldPadPort) {
-            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort)) & 1);
-            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort)) & 1);
-
-            oldPadPort = PadPort;
-        }
-    }
-
-    PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
-    PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
-
-    if (PadEmuMode == 1) {
-        if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
-            if (dg_discon) {
-                dgmacset = 0;
-                dg_discon = 0;
-            }
-            if (!dgmacset) {
-                if (ds34bt_get_bdaddr(dg_mac)) {
-                    dgmacset = 1;
-                    diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
-                } else {
-                    dgmacset = 0;
-                }
-            }
-        } else {
-            dg_discon = 1;
-        }
-
-        if (!dgmacset) {
-            diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
-        }
-
-        if (ds34usb_get_status(0) & DS34USB_STATE_RUNNING) {
-            if (!ds3macset) {
-                if (ds34usb_get_bdaddr(0, ds3_mac)) {
-                    ds3macset = 1;
-                    diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
-                } else {
-                    ds3macset = 0;
-                }
-            }
-        } else {
-            diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, _l(_STR_NOT_CONNECTED));
-            ds3macset = 0;
-        }
-    }
-
-    return 0;
-}
-
-static int guiPadEmuInfoUpdater(int modified)
-{
-    hci_information_t info;
-    u8 feat[8];
-    int i, j;
-    u8 data;
-    int supported;
-
-    if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
-        if (!ver_set) {
-            if (ds34bt_get_version(&info)) {
-                ver_set = 1;
-                diaSetLabel(diaPadEmuInfo, PADCFG_VID, hex_to_str(vid_str, info.vid));
-                diaSetLabel(diaPadEmuInfo, PADCFG_PID, hex_to_str(pid_str, info.pid));
-                diaSetLabel(diaPadEmuInfo, PADCFG_REV, hex_to_str(rev_str, info.rev));
-                diaSetLabel(diaPadEmuInfo, PADCFG_HCIVER, ver_to_str(hci_str, info.hci_ver, info.hci_rev));
-                diaSetLabel(diaPadEmuInfo, PADCFG_LMPVER, ver_to_str(lmp_str, info.lmp_ver, info.lmp_subver));
-                diaSetLabel(diaPadEmuInfo, PADCFG_MANID, hex_to_str(man_str, info.mf_name));
-            } else {
-                ver_set = 0;
-            }
-        }
-
-        if (!feat_set) {
-            if (ds34bt_get_features(feat)) {
-                feat_set = 1;
-                supported = 0;
-                for (i = 0, j = 0; i < 64; i++) {
-                    data = (feat[j] >> (i - j * 8)) & 1;
-                    diaSetLabel(diaPadEmuInfo, PADCFG_FEAT_START + i, _l(_STR_NO - data));
-                    j = (i + 1) / 8;
-                    if (i == 25 || i == 26 || i == 39) {
-                        if (data)
-                            supported++;
-                    }
-                }
-                if (supported == 3)
-                    diaSetLabel(diaPadEmuInfo, PADCFG_BT_SUPPORTED, _l(_STR_BT_SUPPORTED));
-                else
-                    diaSetLabel(diaPadEmuInfo, PADCFG_BT_SUPPORTED, _l(_STR_BT_NOTSUPPORTED));
-            } else {
-                feat_set = 0;
-            }
-        }
-    } else {
-        ver_set = 0;
-        feat_set = 0;
-    }
-
-    return 0;
-}
-
-static void guiShowPadEmuConfig(void)
-{
-    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), NULL};
-    int PadEmuMtap, PadEmuMtapPort, PadEmuEnable, i;
-
-    diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
-
-    PadEmuMtap = (PadEmuSettings >> 24) & 1;
-    PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, 0);
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuMtap);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
-
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &PadEmuEnable);
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, PadEmuEnable);
-
-    if (PadEmuMtap) {
-        diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
-        PadEmuSettings |= 0x00000E00;
-    } else {
-        diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[0]);
-        PadEmuSettings &= 0xFFFF03FF;
-    }
-
-    int result = -1;
-
-    while (result != 0) {
-        result = diaExecuteDialog(diaPadEmuConfig, result, 1, &guiPadEmuUpdater);
-
-        if (result == PADCFG_PAIR) {
-            if (ds3macset && dgmacset) {
-                if (ds34usb_get_status(0) & DS34USB_STATE_RUNNING) {
-                    if (ds34usb_set_bdaddr(0, dg_mac))
-                        ds3macset = 0;
-                }
-            }
-        }
-
-        if (result == PADCFG_BTINFO) {
-            for (i = PADCFG_FEAT_START; i < PADCFG_FEAT_END + 1; i++)
-                diaSetLabel(diaPadEmuInfo, i, _l(_STR_NO));
-
-            diaSetLabel(diaPadEmuInfo, PADCFG_VID, _l(_STR_NOT_CONNECTED));
-            diaSetLabel(diaPadEmuInfo, PADCFG_PID, _l(_STR_NOT_CONNECTED));
-            diaSetLabel(diaPadEmuInfo, PADCFG_REV, _l(_STR_NOT_CONNECTED));
-            diaSetLabel(diaPadEmuInfo, PADCFG_HCIVER, _l(_STR_NOT_CONNECTED));
-            diaSetLabel(diaPadEmuInfo, PADCFG_LMPVER, _l(_STR_NOT_CONNECTED));
-            diaSetLabel(diaPadEmuInfo, PADCFG_MANID, _l(_STR_NOT_CONNECTED));
-            diaSetLabel(diaPadEmuInfo, PADCFG_BT_SUPPORTED, _l(_STR_NOT_CONNECTED));
-            ver_set = 0;
-            feat_set = 0;
-            diaExecuteDialog(diaPadEmuInfo, -1, 1, &guiPadEmuInfoUpdater);
-        }
-
-        if (result == UIID_BTN_OK)
-            break;
-    }
-}
-#endif
-
 static int netConfigUpdater(int modified)
 {
     int showAdvancedOptions, isNetBIOS, isDHCPEnabled, i;
@@ -1216,497 +834,6 @@ int guiShowKeyboard(char *value, int maxLength)
     if (result) {
         strncpy(value, tmp, maxLength);
         value[maxLength - 1] = '\0';
-    }
-
-    return result;
-}
-
-typedef struct
-{                   // size = 76
-    int VMC_status; // 0=available, 1=busy
-    int VMC_error;
-    int VMC_progress;
-    char VMC_msg[64];
-} statusVMCparam_t;
-
-#define OPERATION_CREATE 0
-#define OPERATION_CREATING 1
-#define OPERATION_ABORTING 2
-#define OPERATION_ENDING 3
-#define OPERATION_END 4
-
-static short vmc_refresh;
-static int vmc_operation;
-static statusVMCparam_t vmc_status;
-
-int guiVmcNameHandler(char *text, int maxLen)
-{
-    int result = diaShowKeyb(text, maxLen, 0, NULL);
-
-    if (result)
-        vmc_refresh = 1;
-
-    return result;
-}
-
-static int guiRefreshVMCConfig(item_list_t *support, char *name)
-{
-    int size = support->itemCheckVMC(name, 0);
-
-    if (size != -1) {
-        diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_EXISTS));
-
-        if (size == 8)
-            diaSetInt(diaVMC, VMC_SIZE, 0);
-        else if (size == 16)
-            diaSetInt(diaVMC, VMC_SIZE, 1);
-        else if (size == 32)
-            diaSetInt(diaVMC, VMC_SIZE, 2);
-        else if (size == 64)
-            diaSetInt(diaVMC, VMC_SIZE, 3);
-        else {
-            diaSetInt(diaVMC, VMC_SIZE, 0);
-            diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_ERROR));
-        }
-
-        diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_MODIFY));
-        diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 1);
-        if (gEnableWrite) {
-            diaSetEnabled(diaVMC, VMC_SIZE, 1);
-            diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 1);
-            diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 1);
-        } else {
-            diaSetEnabled(diaVMC, VMC_SIZE, 0);
-            diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 0);
-            diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 0);
-        }
-    } else {
-        diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_CREATE));
-        diaSetLabel(diaVMC, VMC_STATUS, _l(_STR_VMC_FILE_NEW));
-
-        diaSetInt(diaVMC, VMC_SIZE, 0);
-        diaSetEnabled(diaVMC, VMC_SIZE, 1);
-        diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 1);
-        diaSetVisible(diaVMC, VMC_BUTTON_DELETE, 0);
-    }
-
-    return size;
-}
-
-static int guiVMCUpdater(int modified)
-{
-    if (vmc_refresh) {
-        vmc_refresh = 0;
-        return VMC_REFRESH;
-    }
-
-    if ((vmc_operation == OPERATION_CREATING) || (vmc_operation == OPERATION_ABORTING)) {
-        int result = fileXioDevctl("genvmc:", 0xC0DE0003, NULL, 0, (void *)&vmc_status, sizeof(vmc_status));
-        if (result == 0) {
-            diaSetLabel(diaVMC, VMC_STATUS, vmc_status.VMC_msg);
-            diaSetInt(diaVMC, VMC_PROGRESS, vmc_status.VMC_progress);
-
-            if (vmc_status.VMC_error != 0)
-                LOG("GUI VMCUpdater: %d\n", vmc_status.VMC_error);
-
-            if (vmc_status.VMC_status == 0x00) {
-                diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_OK));
-                vmc_operation = OPERATION_ENDING;
-                return VMC_BUTTON_CREATE;
-            }
-        } else
-            LOG("GUI Status result: %d\n", result);
-    }
-
-    return 0;
-}
-
-static int guiShowVMCConfig(int id, item_list_t *support, char *VMCName, int slot, int validate)
-{
-    int result = validate ? VMC_BUTTON_CREATE : 0;
-    char vmc[32];
-
-    if (strlen(VMCName))
-        strncpy(vmc, VMCName, sizeof(vmc));
-    else {
-        if (validate)
-            return 1; // nothing to validate if no user input
-
-        char *startup = support->itemGetStartup(id);
-        snprintf(vmc, sizeof(vmc), "%s_%d", startup, slot);
-    }
-
-    vmc_refresh = 0;
-    vmc_operation = OPERATION_CREATE;
-    diaSetEnabled(diaVMC, VMC_NAME, 1);
-    diaSetEnabled(diaVMC, VMC_SIZE, 1);
-    diaSetInt(diaVMC, VMC_PROGRESS, 0);
-
-    const char *VMCSizes[] = {"8 Mb", "16 Mb", "32 Mb", "64 Mb", NULL};
-    diaSetEnum(diaVMC, VMC_SIZE, VMCSizes);
-    int size = guiRefreshVMCConfig(support, vmc);
-    diaSetString(diaVMC, VMC_NAME, vmc);
-
-    do {
-        if (result == VMC_BUTTON_CREATE) {
-            if (vmc_operation == OPERATION_CREATE) { // User start creation of VMC
-                int sizeUI;
-                diaGetInt(diaVMC, VMC_SIZE, &sizeUI);
-                if (sizeUI == 1)
-                    sizeUI = 16;
-                else if (sizeUI == 2)
-                    sizeUI = 32;
-                else if (sizeUI == 3)
-                    sizeUI = 64;
-                else
-                    sizeUI = 8;
-
-                if (sizeUI != size) {
-                    support->itemCheckVMC(vmc, sizeUI);
-
-                    diaSetEnabled(diaVMC, VMC_NAME, 0);
-                    diaSetEnabled(diaVMC, VMC_SIZE, 0);
-                    diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_ABORT));
-                    vmc_operation = OPERATION_CREATING;
-                } else
-                    break;
-            } else if (vmc_operation == OPERATION_ENDING) {
-                if (validate)
-                    break; // directly close VMC config dialog
-
-                vmc_operation = OPERATION_END;
-            } else if (vmc_operation == OPERATION_END) { // User closed creation dialog of VMC
-                break;
-            } else if (vmc_operation == OPERATION_CREATING) { // User canceled creation of VMC
-                fileXioDevctl("genvmc:", 0xC0DE0002, NULL, 0, NULL, 0);
-                vmc_operation = OPERATION_ABORTING;
-            }
-        } else if (result == VMC_BUTTON_DELETE) {
-            if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, diaVMC)) {
-                support->itemCheckVMC(vmc, -1);
-                diaSetString(diaVMC, VMC_NAME, "");
-                break;
-            }
-        } else if (result == VMC_REFRESH) { // User changed the VMC name
-            diaGetString(diaVMC, VMC_NAME, vmc, sizeof(vmc));
-            size = guiRefreshVMCConfig(support, vmc);
-        }
-
-        result = diaExecuteDialog(diaVMC, result, 1, &guiVMCUpdater);
-
-        if ((result == 0) && (vmc_operation == OPERATION_CREATE))
-            break;
-    } while (1);
-
-    return result;
-}
-
-int guiAltStartupNameHandler(char *text, int maxLen)
-{
-    int i;
-
-    int result = diaShowKeyb(text, maxLen, 0, NULL);
-    if (result) {
-        for (i = 0; text[i]; i++) {
-            if (text[i] > 96 && text[i] < 123)
-                text[i] -= 32;
-        }
-    }
-
-    return result;
-}
-
-int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
-{
-    int ConfigSource, result;
-
-    int dmaMode = 7; // defaulting to UDMA 4
-    if (support->flags & MODE_FLAG_COMPAT_DMA) {
-        configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
-        const char *dmaModes[] = {"MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0", "UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", NULL};
-        diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
-        diaSetInt(diaCompatConfig, COMPAT_DMA, dmaMode);
-    } else {
-        const char *dmaModes[] = {NULL};
-        diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
-        diaSetInt(diaCompatConfig, COMPAT_DMA, 0);
-    }
-
-    diaSetLabel(diaCompatConfig, COMPAT_GAME, support->itemGetName(id));
-
-    ConfigSource = CONFIG_SOURCE_DEFAULT;
-    if (configGetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, &ConfigSource)) {
-        diaSetLabel(diaCompatConfig, COMPAT_STATUS, ConfigSource == CONFIG_SOURCE_USER ? _l(_STR_CUSTOMIZED_SETTINGS) : _l(_STR_DOWNLOADED_DEFAULTS));
-        diaSetVisible(diaCompatConfig, COMPAT_STATUS, 1);
-    } else
-        diaSetVisible(diaCompatConfig, COMPAT_STATUS, 0);
-
-    int compatMode = 0;
-    configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatMode);
-    int i;
-    result = -1;
-    for (i = 0; i < COMPAT_MODE_COUNT; ++i)
-        diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
-
-// Begin Per-Game GSM Integration --Bat--
-    int EnableGSM = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
-    diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
-
-    int GSMVMode = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &GSMVMode);
-    diaSetInt(diaGSConfig, GSMCFG_GSMVMODE, GSMVMode);
-
-    int GSMXOffset = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
-    diaSetInt(diaGSConfig, GSMCFG_GSMXOFFSET, GSMXOffset);
-
-    int GSMYOffset = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
-    diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
-
-    int GSMFIELDFix = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix);
-    diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
-
-    guiSetGSMSettingsState();
-
-// Begin of Per-Game CHEAT Integration --Bat--
-    int EnableCheat = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
-    diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, EnableCheat);
-
-    int CheatMode = 0;
-    configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &CheatMode);
-    diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
-
-    guiSetCheatSettingsState();
-
-#ifdef PADEMU
-    int EnablePadEmu = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &EnablePadEmu);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, EnablePadEmu);
-
-    PadEmuSettings = 0;
-
-    configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings);
-#endif
-
-    // Find out the current game ID
-    char hexid[32];
-    configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));
-    diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
-
-    char altStartup[32];
-    configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
-    diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
-
-    // VMC
-    char vmc1[32];
-    configGetVMC(configSet, vmc1, sizeof(vmc1), 0);
-    diaSetLabel(diaCompatConfig, COMPAT_VMC1_DEFINE, vmc1);
-
-    char vmc2[32]; // required as diaSetLabel use pointer to value
-    configGetVMC(configSet, vmc2, sizeof(vmc2), 1);
-    diaSetLabel(diaCompatConfig, COMPAT_VMC2_DEFINE, vmc2);
-
-    // show dialog
-    do {
-        // VMC
-        if (strlen(vmc1))
-            diaSetLabel(diaCompatConfig, COMPAT_VMC1_ACTION, _l(_STR_RESET));
-        else
-            diaSetLabel(diaCompatConfig, COMPAT_VMC1_ACTION, _l(_STR_USE_GENERIC));
-        if (strlen(vmc2))
-            diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_RESET));
-        else
-            diaSetLabel(diaCompatConfig, COMPAT_VMC2_ACTION, _l(_STR_USE_GENERIC));
-
-        result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
-
-        if (result == COMPAT_GSMCONFIG) {
-            guiShowGSConfig();
-        }
-#ifdef PADEMU
-        if (result == COMPAT_PADEMUCONFIG) {
-            guiShowPadEmuConfig();
-        }
-#endif
-        if (result == COMPAT_CHEATCONFIG) {
-            guiShowCheatConfig();
-        }
-
-        if (result == COMPAT_LOADFROMDISC) {
-            char hexDiscID[15];
-            if (sysGetDiscID(hexDiscID) >= 0)
-                diaSetString(diaCompatConfig, COMPAT_GAMEID, hexDiscID);
-            else
-                guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0, NULL);
-        }
-        //VMC
-        else if (result == COMPAT_VMC1_DEFINE) {
-            if (menuCheckParentalLock() == 0) {
-                if (guiShowVMCConfig(id, support, vmc1, 0, 0))
-                    diaGetString(diaVMC, VMC_NAME, vmc1, sizeof(vmc1));
-            }
-        } else if (result == COMPAT_VMC2_DEFINE) {
-            if (menuCheckParentalLock() == 0) {
-                if (guiShowVMCConfig(id, support, vmc2, 1, 0))
-                    diaGetString(diaVMC, VMC_NAME, vmc2, sizeof(vmc2));
-            }
-        } else if (result == COMPAT_VMC1_ACTION) {
-            if (menuCheckParentalLock() == 0) {
-                if (strlen(vmc1))
-                    vmc1[0] = '\0';
-                 else
-                     snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
-            }
-        } else if (result == COMPAT_VMC2_ACTION) {
-            if (menuCheckParentalLock() == 0) {
-                if (strlen(vmc2))
-                    vmc2[0] = '\0';
-                 else
-                    snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
-            }
-        }
-    } while (result >= COMPAT_NOEXIT);
-
-    if (result == COMPAT_REMOVE) {
-        if (menuCheckParentalLock() == 0) {
-            configRemoveKey(configSet, CONFIG_ITEM_CONFIGSOURCE);
-            configRemoveKey(configSet, CONFIG_ITEM_DMA);
-            configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
-            configRemoveKey(configSet, CONFIG_ITEM_DNAS);
-            configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
-
-            //GSM
-            configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
-            configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
-            configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
-            configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-            configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-
-            //Cheats
-            configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-            configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-
-#ifdef PADEMU
-            //PADEMU
-            configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
-            configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
-#endif
-
-            //VMC
-            configRemoveVMC(configSet, 0);
-            configRemoveVMC(configSet, 1);
-
-            menuSaveConfig();
-        }
-    } else if (result > 0) { // test button pressed or save button
-        compatMode = 0;
-        for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
-            int mdpart;
-            diaGetInt(diaCompatConfig, COMPAT_MODE_BASE + i, &mdpart);
-            compatMode |= (mdpart ? 1 : 0) << i;
-        }
-
-        if (support->flags & MODE_FLAG_COMPAT_DMA) {
-            diaGetInt(diaCompatConfig, COMPAT_DMA, &dmaMode);
-            if (dmaMode != 7)
-                configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
-            else
-                configRemoveKey(configSet, CONFIG_ITEM_DMA);
-        }
-
-        if (compatMode != 0)
-            configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
-
-        //GSM
-        diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
-        if (EnableGSM != 0)
-            configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
-
-        diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &GSMVMode);
-        if (GSMVMode != 0)
-            configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
-
-        diaGetInt(diaGSConfig, GSMCFG_GSMXOFFSET, &GSMXOffset);
-        if (GSMXOffset != 0)
-            configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
-
-        diaGetInt(diaGSConfig, GSMCFG_GSMYOFFSET, &GSMYOffset);
-        if (GSMYOffset != 0)
-            configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-
-        diaGetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, &GSMFIELDFix);
-        if (GSMFIELDFix != 0)
-            configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-
-        //Cheats
-        diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
-        if (EnableCheat != 0)
-            configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-
-        diaGetInt(diaCheatConfig, CHTCFG_CHEATMODE, &CheatMode);
-        if (CheatMode != 0)
-            configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-
-#ifdef PADEMU
-        //PADEMU
-        diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
-
-        if (EnablePadEmu != 0)
-            configSetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
-
-        if (PadEmuSettings != 0)
-            configSetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
-#endif
-
-        diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
-        if (hexid[0] != '\0')
-            configSetStr(configSet, CONFIG_ITEM_DNAS, hexid);
-
-        diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup, sizeof(altStartup));
-        if (altStartup[0] != '\0')
-            configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
-        else
-            configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
-
-        //VMC
-        configSetVMC(configSet, vmc1, 0);
-        configSetVMC(configSet, vmc2, 1);
-        guiShowVMCConfig(id, support, vmc1, 0, 1);
-        guiShowVMCConfig(id, support, vmc2, 1, 1);
-
-        switch (result) {
-            case COMPAT_SAVE:
-                configSetInt(configSet, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);
-                menuSaveConfig();
-                break;
-            case COMPAT_DL_DEFAULTS:
-                guiShowNetCompatUpdateSingle(id, support, configSet);
-                break;
-        }
     }
 
     return result;
@@ -2065,6 +1192,66 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
     x = fntRenderString(font, x, y, ALIGN_VCENTER, 0, 0, _l(textId), color);
 
     return x;
+}
+
+int guiAlignMenuHints(menu_hint_item_t *hint, int font, int width)
+{
+    int x = screenWidth;
+    int w;
+
+    for (; hint; hint = hint->next) {
+        GSTEXTURE *iconTex = thmGetTexture(hint->icon_id);
+        w = (iconTex->Width * 20) / iconTex->Height;
+        char *text = _l(hint->text_id);
+
+        x -= rmWideScale(w) + 2;
+        x -= rmUnScaleX(fntCalcDimensions(font, text));
+        if (hint->next != NULL)
+            x -= width;
+    }
+
+    // align center
+    x /= 2;
+
+    return x;
+}
+
+int guiAlignSubMenuHints(int hintCount, int *textID, int *iconID, int font, int width, int align)
+{
+    int x = screenWidth;
+    int i, w;
+
+    for (i = 0; i < hintCount; i++) {
+        GSTEXTURE *iconTex = thmGetTexture(iconID[i]);
+        w = (iconTex->Width * 20) / iconTex->Height;
+        char *text = _l(textID[i]);
+
+        x -= rmWideScale(w) + 2;
+        x -= rmUnScaleX(fntCalcDimensions(font, text));
+        if (i != (hintCount - 1))
+            x -= width;
+    }
+
+    if (align == 1) // align center
+        x /= 2;
+
+    if (align == 2) // align right
+        x -= 20;
+
+    return x;
+}
+
+void guiDrawSubMenuHints(void)
+{
+    int subMenuHints[2] = {_STR_SELECT, _STR_GAMES_LIST};
+    int subMenuIcons[2] = {CROSS_ICON, CIRCLE_ICON};
+
+    int x = guiAlignSubMenuHints(2, subMenuHints, subMenuIcons, gTheme->fonts[0], 12, 2);
+    int y = gTheme->usedHeight - 32;
+
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[0], gTheme->fonts[0], x, y, gTheme->textColor);
+    x += 12;
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[0] : subMenuIcons[1], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
 }
 
 static void guiDrawOverlays()
@@ -2429,4 +1616,3 @@ int guiConfirmVideoMode(void)
 
     return terminate - 1;
 }
-

@@ -7,6 +7,7 @@
 #include "include/opl.h"
 #include "include/ioman.h"
 #include "include/gui.h"
+#include "include/guigame.h"
 #include "include/renderman.h"
 #include "include/lang.h"
 #include "include/themes.h"
@@ -139,19 +140,15 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
     if (!mod->support->enabled)
         menuAddHint(&mod->menuItem, _STR_START_DEVICE, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
     else {
-        menuAddHint(&mod->menuItem, (gUseInfoScreen && gTheme->infoElems.first) ? _STR_INFO : _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
+        menuAddHint(&mod->menuItem, _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
+
+        if (gUseInfoScreen && gTheme->infoElems.first)
+            menuAddHint(&mod->menuItem, _STR_INFO, SQUARE_ICON);
 
         if (!(mod->support->flags & MODE_FLAG_NO_COMPAT))
-            menuAddHint(&mod->menuItem, _STR_COMPAT_SETTINGS, TRIANGLE_ICON);
+            menuAddHint(&mod->menuItem, _STR_GAME_MENU, TRIANGLE_ICON);
 
         menuAddHint(&mod->menuItem, _STR_REFRESH, SELECT_ICON);
-
-        if (gEnableWrite) {
-            if (mod->support->itemRename)
-                menuAddHint(&mod->menuItem, _STR_RENAME, gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON);
-            if (mod->support->itemDelete)
-                menuAddHint(&mod->menuItem, _STR_DELETE, SQUARE_ICON);
-        }
     }
 
     // refresh Cache
@@ -183,40 +180,32 @@ static void itemExecSelect(struct menu_item *curMenu)
         guiMsgBox("NULL Support object. Please report", 0, NULL);
 }
 
-static void itemExecCancel(struct menu_item *curMenu)
+static void itemExecRefresh(struct menu_item *curMenu)
 {
-    if (!curMenu->current) {
-        return;
-    }
-
-    if (!gEnableWrite)
-        return;
-
     item_list_t *support = curMenu->userdata;
 
-    if (support) {
-        if (support->itemRename) {
-            if (menuCheckParentalLock() == 0) {
-                sfxPlay(SFX_MESSAGE);
-                int nameLength = support->itemGetNameLength(curMenu->current->item.id);
-                char newName[nameLength];
-                strncpy(newName, curMenu->current->item.text, nameLength);
-                if (guiShowKeyboard(newName, nameLength)) {
-                    support->itemRename(curMenu->current->item.id, newName);
-                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-                }
-            }
-        }
-    } else
-        guiMsgBox("NULL Support object. Please report", 0, NULL);
+    if (support && support->enabled) {
+        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
+        sfxPlay(SFX_CONFIRM);
+    }
 }
 
 static void itemExecCross(struct menu_item *curMenu)
 {
     if (gSelectButton == KEY_CROSS)
         itemExecSelect(curMenu);
-    else
-        itemExecCancel(curMenu);
+}
+
+static void itemExecCircle(struct menu_item *curMenu)
+{
+    if (gSelectButton == KEY_CIRCLE)
+        itemExecSelect(curMenu);
+}
+
+static void itemExecSquare(struct menu_item *curMenu)
+{
+    if (curMenu->current && gUseInfoScreen && gTheme->infoElems.first)
+        guiSwitchScreen(GUI_SCREEN_INFO);
 }
 
 static void itemExecTriangle(struct menu_item *curMenu)
@@ -229,54 +218,14 @@ static void itemExecTriangle(struct menu_item *curMenu)
     if (support) {
         if (!(support->flags & MODE_FLAG_NO_COMPAT)) {
             if (menuCheckParentalLock() == 0) {
+                menuInitGameMenu();
+                guiSwitchScreen(GUI_SCREEN_GAME_MENU);
                 config_set_t *configSet = menuLoadConfig();
-                sfxPlay(SFX_TRANSITION);
-                if (guiShowCompatConfig(curMenu->current->item.id, support, configSet) == COMPAT_TEST)
-                    support->itemLaunch(curMenu->current->item.id, configSet);
+                guiGameLoadConfig(support, configSet);
             }
         }
     } else
         guiMsgBox("NULL Support object. Please report", 0, NULL);
-}
-
-static void itemExecSquare(struct menu_item *curMenu)
-{
-    if (!curMenu->current)
-        return;
-
-    if (!gEnableWrite)
-        return;
-
-    item_list_t *support = curMenu->userdata;
-
-    if (support) {
-        if (support->itemDelete) {
-            if (menuCheckParentalLock() == 0) {
-                if (guiMsgBox(_l(_STR_DELETE_WARNING), 1, NULL)) {
-                    support->itemDelete(curMenu->current->item.id);
-                    ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-                }
-            }
-        }
-    } else
-        guiMsgBox("NULL Support object. Please report", 0, NULL);
-}
-
-static void itemExecCircle(struct menu_item *curMenu)
-{
-    if (gSelectButton == KEY_CIRCLE)
-        itemExecSelect(curMenu);
-    else
-        itemExecCancel(curMenu);
-}
-
-static void itemExecRefresh(struct menu_item *curMenu)
-{
-    item_list_t *support = curMenu->userdata;
-
-    if (support && support->enabled)
-        ioPutRequest(IO_MENU_UPDATE_DEFFERED, &support->mode);
-    sfxPlay(SFX_CONFIRM);
 }
 
 static void initMenuForListSupport(int mode)

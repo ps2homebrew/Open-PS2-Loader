@@ -56,6 +56,7 @@ int guiFrameId;
 #define GUI_SCREEN_MAIN 0
 #define GUI_SCREEN_MENU 1
 #define GUI_SCREEN_INFO 2
+#define GUI_SCREEN_GAME_MENU 3
 
 void guiSwitchScreen(int target);
 
@@ -108,7 +109,6 @@ struct gui_update_t *guiOpCreate(gui_op_type_t type);
 /** For completeness, the deffered operations are destroyed automatically */
 void guiDestroyOp(struct gui_update_t *op);
 
-int guiShowCompatConfig(int id, item_list_t *support, config_set_t *configSet);
 int guiShowKeyboard(char *value, int maxLength);
 int guiMsgBox(const char *text, int addAccept, struct UIItem *ui);
 
@@ -117,8 +117,13 @@ void guiUpdateScreenScale(void);
 
 void guiDrawBGPlasma();
 int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color);
+void guiDrawSubMenuHints(void);
+
+int guiAlignMenuHints(menu_hint_item_t *hint, int font, int width);
+int guiAlignSubMenuHints(int hintCount, int *textID, int *iconID, int font, int width, int align);
 
 void guiShowNetCompatUpdate(void);
+void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *configSet);
 void guiShowAbout();
 void guiShowConfig();
 void guiShowUIConfig();
@@ -141,10 +146,6 @@ void guiHandleDeferedIO(int *ptr, const unsigned char *message, int type, void *
 /** Renders a single frame with a specified message on the screen
 */
 void guiRenderTextScreen(const unsigned char *message);
-
-int guiAltStartupNameHandler(char *text, int maxLen);
-
-int guiVmcNameHandler(char *text, int maxLen);
 
 void guiWarning(const char *text, int count);
 

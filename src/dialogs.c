@@ -3,6 +3,7 @@
 #include "include/dia.h"
 #include "include/lang.h"
 #include "include/gui.h"
+#include "include/guigame.h"
 
 #include <stdio.h>
 
@@ -130,103 +131,6 @@ struct UIItem diaNetConfig[] = {
     {UI_SPACER},
     {UI_BUTTON, NETCFG_RECONNECT, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RECONNECT}}},
     {UI_BREAK},
-
-    // end of dialog
-    {UI_TERMINATOR}};
-
-// Per-Game Settings
-struct UIItem diaCompatConfig[] = {
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_COMPAT_SETTINGS}}},
-    {UI_SPACER},
-    {UI_LABEL, COMPAT_GAME, 1, 1, -1, 0, 0, {.label = {"<Game Label>", -1}}},
-    {UI_SPLITTER},
-
-    {UI_LABEL, COMPAT_STATUS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE, 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE7}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 6, 1, 1, _STR_HINT_MODE7, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE8}}},
-    {UI_SPACER},
-    {UI_BOOL, COMPAT_MODE_BASE + 7, 1, 1, _STR_HINT_MODE8, -10, 0, {.intvalue = {0, 0}}},
-    {UI_SPLITTER},
-
-    {UI_BUTTON, COMPAT_GSMCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GSCONFIG}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_CHEATCONFIG, 1, 1, -1, -30, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
-#ifdef PADEMU
-    {UI_BUTTON, COMPAT_PADEMUCONFIG, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
-#endif
-    {UI_SPLITTER},
-
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
-    {UI_SPACER},
-    {UI_ENUM, COMPAT_DMA, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_SPLITTER},
-
-    // VMC
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT1}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_VMC1_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_VMC1_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT2}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_VMC2_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_VMC2_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_SPLITTER},
-
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GAME_ID}}},
-    {UI_SPACER},
-    {UI_STRING, COMPAT_GAMEID, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_LOADFROMDISC, 1, 1, -1, 0, 0, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
-    {UI_SPLITTER},
-
-    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
-    {UI_SPACER},
-    {UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiAltStartupNameHandler}}},
-    {UI_SPLITTER},
-
-// buttons
-    {UI_BUTTON, COMPAT_SAVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_SAVE_CHANGES}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_TEST, 1, 1, -1, 0, 0, {.label = {NULL, _STR_TEST}}},
-    {UI_SPACER},
-    {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
-    {UI_BREAK},
-    {UI_BREAK},
-    {UI_BUTTON, COMPAT_REMOVE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_REMOVE_ALL_SETTINGS}}},
 
     // end of dialog
     {UI_TERMINATOR}};
@@ -422,6 +326,127 @@ struct UIItem diaUIConfig[] = {
     // end of dialog
     {UI_TERMINATOR}};
 
+// Per-Game Modes Menu
+struct UIItem diaCompatConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_COMPAT_SETTINGS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE1}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE, 1, 1, _STR_HINT_MODE1, -10, 0, {.intvalue = {0, 0}}},
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE2}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 1, 1, 1, _STR_HINT_MODE2, -10, 0, {.intvalue = {0, 0}}},
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE3}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 2, 1, 1, _STR_HINT_MODE3, -10, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE4}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 3, 1, 1, _STR_HINT_MODE4, -10, 0, {.intvalue = {0, 0}}},
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE5}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 4, 1, 1, _STR_HINT_MODE5, -10, 0, {.intvalue = {0, 0}}},
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_MODE6}}},
+    {UI_SPACER},
+    {UI_BOOL, COMPAT_MODE_BASE + 5, 1, 1, _STR_HINT_MODE6, -10, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_BUTTON, COMPAT_DL_DEFAULTS, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DL_DEFAULTS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_DMA_MODE}}},
+    {UI_SPACER},
+    {UI_ENUM, COMPAT_DMA, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_GAME_ID}}},
+    {UI_SPACER},
+    {UI_STRING, COMPAT_GAMEID, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_SPACER},
+    {UI_BUTTON, COMPAT_LOADFROMDISC, 1, 1, -1, 0, 0, {.label = {NULL, _STR_LOAD_FROM_DISC}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
+    {UI_SPACER},
+    {UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiGameAltStartupNameHandler}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
+// Per-Game VMC Menu
+struct UIItem diaVMCConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
+    {UI_SPLITTER},
+
+    // VMC
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT1}}},
+    {UI_SPACER},
+    {UI_BUTTON, COMPAT_VMC1_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_SPACER},
+    {UI_BUTTON, COMPAT_VMC1_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_VMC_SLOT2}}},
+    {UI_SPACER},
+    {UI_BUTTON, COMPAT_VMC2_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_SPACER},
+    {UI_BUTTON, COMPAT_VMC2_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
+// Per-Game Game Settings > VMC Menu
+struct UIItem diaVMC[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_NAME}}},
+    {UI_SPACER},
+    {UI_STRING, VMC_NAME, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiGameVmcNameHandler}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_SIZE}}},
+    {UI_SPACER},
+    {UI_ENUM, VMC_SIZE, 1, 1, _STR_HINT_VMC_SIZE, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_STATUS}}},
+    {UI_SPACER},
+    {UI_LABEL, VMC_STATUS, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_PROGRESS}}},
+    {UI_SPACER},
+    {UI_INT, VMC_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"%", -1}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_BUTTON, VMC_BUTTON_CREATE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_SPACER},
+    {UI_BUTTON, VMC_BUTTON_DELETE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DELETE}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
 // Per-Game Game Settings > GSM Menu (--Bat--)
 struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
@@ -450,6 +475,28 @@ struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSM_FIELD_FIX}}},
     {UI_SPACER},
     {UI_BOOL, GSMCFG_GSMFIELDFIX, 1, 1, _STR_HINT_GSM_FIELD_FIX, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    // buttons
+    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
+    {UI_BREAK},
+
+    // end of dialog
+    {UI_TERMINATOR}};
+
+// Per Game Settings > Cheat Menu --Bat--
+struct UIItem diaCheatConfig[] = {
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
+    {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLECHEAT}}},
+    {UI_SPACER},
+    {UI_BOOL, CHTCFG_ENABLECHEAT, 1, 1, _STR_HINT_ENABLECHEAT, 0, 0, {.intvalue = {1, 1}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CHEATMODE}}},
+    {UI_SPACER},
+    {UI_ENUM, CHTCFG_CHEATMODE, 1, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     // buttons
@@ -709,28 +756,6 @@ struct UIItem diaPadEmuInfo[] = {
     {UI_TERMINATOR}};
 #endif
 
-// Per Game Settings > Cheat Menu --Bat--
-struct UIItem diaCheatConfig[] = {
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
-    {UI_SPLITTER},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLECHEAT}}},
-    {UI_SPACER},
-    {UI_BOOL, CHTCFG_ENABLECHEAT, 1, 1, _STR_HINT_ENABLECHEAT, 0, 0, {.intvalue = {1, 1}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CHEATMODE}}},
-    {UI_SPACER},
-    {UI_ENUM, CHTCFG_CHEATMODE, 1, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    // buttons
-    {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
-    {UI_BREAK},
-
-    // end of dialog
-    {UI_TERMINATOR}};
-
 // About Menu
 struct UIItem diaAbout[] = {
     {UI_LABEL, ABOUT_TITLE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
@@ -792,43 +817,6 @@ struct UIItem diaAbout[] = {
     // end of dialog
     {UI_TERMINATOR}};
 
-// Per-Game Game Settings > VMC Menu
-struct UIItem diaVMC[] = {
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_VMC_SCREEN}}},
-    {UI_SPLITTER},
-
-    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_NAME}}},
-    {UI_SPACER},
-    {UI_STRING, VMC_NAME, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiVmcNameHandler}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_SIZE}}},
-    {UI_SPACER},
-    {UI_ENUM, VMC_SIZE, 1, 1, _STR_HINT_VMC_SIZE, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_STATUS}}},
-    {UI_SPACER},
-    {UI_LABEL, VMC_STATUS, 0, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_BREAK},
-
-    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_PROGRESS}}},
-    {UI_SPACER},
-    {UI_INT, VMC_PROGRESS, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"%", -1}}},
-    {UI_BREAK},
-
-    // buttons
-    {UI_BUTTON, VMC_BUTTON_CREATE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_SPACER},
-    {UI_BUTTON, VMC_BUTTON_DELETE, 1, 1, -1, 0, 0, {.label = {NULL, _STR_DELETE}}},
-    {UI_BREAK},
-
-    // end of dialog
-    {UI_TERMINATOR}};
-
 // Network Update Menu
 struct UIItem diaNetCompatUpdate[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_NET_UPDATE}}},
@@ -836,7 +824,7 @@ struct UIItem diaNetCompatUpdate[] = {
 
     {UI_LABEL, NETUPD_OPT_UPD_ALL_LBL, 1, 1, -1, -40, 0, {.label = {NULL, _STR_NET_UPDATE_ALL}}},
     {UI_SPACER},
-    {UI_BOOL, NETUPD_OPT_UPD_ALL, 0, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 1}}},
+    {UI_BOOL, NETUPD_OPT_UPD_ALL, 0, 1, _STR_NET_UPDATE_HINT, 0, 0, {.intvalue = {0, 0, 0, 1}}},
     {UI_BREAK},
 
     {UI_LABEL, NETUPD_PROGRESS_LBL, 1, 1, -1, -40, 0, {.label = {NULL, _STR_VMC_PROGRESS}}},

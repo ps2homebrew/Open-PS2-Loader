@@ -102,13 +102,8 @@ enum UI_ITEMS {
 
     COMPAT_DMA = 100,
     COMPAT_ALTSTARTUP,
-    COMPAT_GAME,
     COMPAT_GAMEID,
-    COMPAT_SAVE,
-    COMPAT_STATUS,
     COMPAT_DL_DEFAULTS,
-    COMPAT_TEST,
-    COMPAT_REMOVE,
 
     COMPAT_LOADFROMDISC_ID,
 
@@ -167,8 +162,6 @@ enum UI_ITEMS {
 };
 
 #define COMPAT_NOEXIT 0x70000000
-#define COMPAT_GSMCONFIG (GSMCFG_GSCONFIG | COMPAT_NOEXIT)
-#define COMPAT_CHEATCONFIG (CHTCFG_CHEATCFG | COMPAT_NOEXIT)
 #define COMPAT_LOADFROMDISC (COMPAT_LOADFROMDISC_ID | COMPAT_NOEXIT)
 
 #define COMPAT_VMC1_ACTION (COMPAT_VMC1_ACTION_ID | COMPAT_NOEXIT)
@@ -177,16 +170,15 @@ enum UI_ITEMS {
 #define COMPAT_VMC2_DEFINE (COMPAT_VMC2_DEFINE_ID | COMPAT_NOEXIT)
 
 #ifdef PADEMU
-#define COMPAT_PADEMUCONFIG (PADCFG_PADEMU_CONFIG | COMPAT_NOEXIT)
-
 extern struct UIItem diaPadEmuConfig[];
 extern struct UIItem diaPadEmuInfo[];
 #endif
 
 extern struct UIItem diaNetConfig[];
-extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaUIConfig[];
 extern struct UIItem diaAudioConfig[];
+extern struct UIItem diaCompatConfig[];
+extern struct UIItem diaVMCConfig[];
 extern struct UIItem diaGSConfig[];
 extern struct UIItem diaCheatConfig[];
 

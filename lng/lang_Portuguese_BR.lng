@@ -1,5 +1,5 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: Oct. 27, 2019
+# Last update: Oct. 28, 2019
 # Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
@@ -108,7 +108,7 @@ Lembrar último jogo executado
 Escolha o botão de ação ( X ou O )
 Erro, o jogo está fragmentado!
 Erro, não foi possível iniciar o item
-Test Changes
+Testar Alterações
 Deixar vazio para identificação como convidado (GUEST)
 Simular precisão de leitura CD/DVD
 Modo síncrono
@@ -199,7 +199,7 @@ Erro: Falha ao carregar o arquivo (Cheat)
 Cheats não encontrados ou ilegíveis
 Baixar arquivos(cfg)
 Atualizar arquivos(cfg)
-Overwrite Existing Records
+Substituir os arquivos (cfg) existentes
 Atualização falhou.
 Falha na conexão com o servidor(cfg).
 Atualização concluída.
@@ -268,10 +268,10 @@ Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HD)
 Ativar notificações
 %s carregado de %s
-Game Menu
-Game settings saved.
-Game settings removed.
-Overwrites existing game compatibility settings when enabled.
+Menu do Jogo
+Configurações do jogo salvas.
+Configurações do jogo removidas.
+Substitui as configurações de compatibilidade de jogos existentes quando ativada.
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

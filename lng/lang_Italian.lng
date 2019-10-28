@@ -1,6 +1,6 @@
 # Translation by jauffre and andre95d
-# Last update: Sept. 23, 2019
-# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
+# Last update: Oct. 27, 2019
+# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Italian
 OPL %s
@@ -108,7 +108,7 @@ Ricorda ultimo titolo giocato
 Tasto seleziona
 Errore, il gioco è frammentato
 Errore, impossibile avviare il titolo.
-Test
+Test Changes
 Lasciare vuoto per autenticazione GUEST
 Lettura accurata
 Modo sincrono
@@ -199,7 +199,7 @@ Errore: impossibile caricare file cheats
 Nessun cheat trovato
 Scarica predefiniti
 Aggiornamento via rete
-Riscaricare le righe esistenti?
+Overwrite Existing Records
 Aggiornamento fallito.
 Impossibile connettersi al server di aggiornamento.
 Aggiornamento completato.
@@ -268,6 +268,10 @@ Confirm video mode change?
 Cache Game List (HDD)
 Enable Notifications
 %s loaded from %s
+Game Menu
+Game settings saved.
+Game settings removed.
+Overwrites existing game compatibility settings when enabled.
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

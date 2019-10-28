@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: Sept. 23, 2019
-# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
+# Last update: Oct. 27, 2019
+# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -108,7 +108,7 @@ Lembrar último jogo executado
 Botão de Seleção
 Erro, o jogo está fragmentado
 Erro, não foi possível iniciar o item
-Testar
+Test Changes
 Deixar vazio para ligar como convidado (GUEST)
 Carregar núcleo alternativo
 Modo Síncrono
@@ -199,7 +199,7 @@ Erro: falha ao abrir o ficheiro de Cheat
 Nenhum Cheat encontrado
 Pré-definições de download
 Atualização por Internet
-Voltar a descarregar dados existentes?
+Overwrite Existing Records
 Atualizaçao falhou.
 Falha a ligar ao servidor de atualização.
 Atualização completa.
@@ -268,6 +268,10 @@ Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HDD)
 Ativar notificações
 %s carregado de %s
+Game Menu
+Game settings saved.
+Game settings removed.
+Overwrites existing game compatibility settings when enabled.
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

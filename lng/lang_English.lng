@@ -195,7 +195,7 @@ Ethernet Link Mode
 10Mbit Half-duplex
 GSM Settings
 Enable GSM
-Toggles GSM on/off.
+Toggles GSM On/Off.
 VMODE
 Forced custom display mode.
 H-POS
@@ -233,7 +233,7 @@ Only displayed for a valid disc logo which matches the console's region
 Configure PADEMU
 Pad Emulator Settings
 Enable Pad Emulator
-Turns on/off Pad Emulator for selected game.
+Turns On/Off Pad Emulator for selected game.
 Pad Emulator Mode
 Select Pad Emulator mode.
 DualShock3/4 USB

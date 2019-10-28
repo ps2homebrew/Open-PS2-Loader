@@ -1,6 +1,6 @@
 # translation by alimadhi
-# Last update: Sept. 24, 2019
-# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
+# Last update: Oct. 27, 2019
+# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Arabic
 OPL
@@ -108,7 +108,7 @@ USB ﺏﺎﻌﻟﺍ ﺔﺋﺰﺠﺗ ﻦﻣ ﻖﻘﺤﺗ
 ﺭﺰﻟﺍ ﺮﺘﺧﺍ
 ﺔﺋﺰﺠﻣ ﺔﺒﻌﻠﻟﺍ ،ﺄﻄﺧ
 ﺪﻨﺒﻟﺍ ﺍﺬﻫ ﻞﻴﻐﺸﺗ ﻦﻜﻤﻳ ﻻ ،ﺄﻄﺧ
-ﺭﺎﺒﺘﺧﺍ
+Test Changes
 .ﻒﻴﻀﻟﺍ ﺔﻗﺩﺎﺼﻣ ﻞﺟﺍ ﻦﻣ ﺔﻏﺭﺎﻓ ﻙﺮﺗ
 ﺔﻘﻴﻗﺩ ﺕﺍﺀﺍﺮﻗ
 ﻦﻣﺍﺰﺘﻟﺍ ﻊﺿﻭ
@@ -199,7 +199,7 @@ FMV ﺯﺎﻴﺘﺟﺍ
 ﺶﻐﻟﺍ ﻰﻠﻋ ﺭﻮﺜﻌﻟﺍ ﻢﺘﻳ ﻢﻟ
 ﻲﺿﺍﺮﺘﻓﺍ ﻞﻴﻤﺤﺗ
 ﺔﻜﺒﺸﻟﺍ ﺚﻳﺪﺤﺗ
-؟ﺓﺩﻮﺟﻮﻤﻟﺍ ﺕﻼﺠﺴﻟﺍ ﻞﻴﻤﺤﺗ ﺓﺩﺎﻋﺇ
+Overwrite Existing Records
 .ﺚﻳﺪﺤﺘﻟﺍ ﻞﺸﻓ
 .ﻡﺩﺎﺨﻟﺍ ﺚﻳﺪﺤﺘﻟ ﻝﺎﺼﺗﻻﺍ ﻞﺸﻓ
 .ﺚﻳﺪﺤﺘﻟﺍ ﻰﻬﺘﻧﺍ
@@ -268,6 +268,10 @@ d?% ﺔﺤﺘﻔﻟﺍ ﻲﻓ ﺓﺮﻛﺍﺬﻟﺍ ﺔﻗﺎﻄﺑ ﻊﻣ ﻞ�
 (HDD) ﺖﻗﺆﻤﻟﺍ ﻦﻳﺰﺨﺘﻟﺍ ﺏﺎﻌﻟﺃ ﺔﻤﺋﺎﻗ
 ﺕﺍﺭﺎﻌﺷﻹﺍ ﻦﻴﻜﻤﺗ
 s%  ﻦﻣ ﻞﻤﺤﻣ  s%
+Game Menu
+Game settings saved.
+Game settings removed.
+Overwrites existing game compatibility settings when enabled.
 PS1 ﺏﺎﻌﻟﺍ
 PS1 ﺏﺎﻌﻟﺍ ﻞﻴﻐﺸﺗ
 '%s'! ﻲﻓ ﺩﻮﺟﻮﻣ ﺮﻴﻏ POPSTARTER.ELF

@@ -1,6 +1,6 @@
 # Translation by zidane89
-# Last update: Sept. 23, 2019
-# Updated for OPL_1602_DB-TA_[65af37a] and OPL_1383_ifcaro_beta [cf40031]
+# Last update: Oct. 27, 2019
+# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Vietnamese
 OPL %s
@@ -108,7 +108,7 @@ Nhớ các cài đặt cuối cùng
 Chọn nút
 Lỗi, trò chơi bị phân mảnh
 Error, không thể chạy mục này
-Kiểm tra
+Test Changes
 Để trống với quyền truy cập Khách.
 Đọc chính xác
 Chế độ đồng bộ
@@ -199,7 +199,7 @@ Lỗi: nạp tệp ăn gian thất bại
 Không thấy cheat
 Tải về mặc định
 Network Update
-Tải lại hồ sơ hiện có?
+Overwrite Existing Records
 Cập nhật thất bại.
 Không thể kết nối đến máy chủ để cập nhật.
 Cập nhật hoàn thành.
@@ -268,6 +268,10 @@ Thay đổi chế độ video?
 Cache danh sách trò chơi (HDD)
 Enable Notifications
 %s loaded from %s
+Game Menu
+Game settings saved.
+Game settings removed.
+Overwrites existing game compatibility settings when enabled.
 Các trò chơi PS1 
 Chế độ hiển thị cho game PS1 
 POPSTARTER.ELF không có ở '%s'!

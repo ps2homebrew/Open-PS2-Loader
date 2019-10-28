@@ -4,11 +4,6 @@
 #include "include/fntsys.h"
 #include "include/ioman.h"
 
-#include "include/usbsupport.h"
-#include "include/hddsupport.h"
-
-#include "include/iosupport.h"
-
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
     "English (internal)",
@@ -121,7 +116,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Select Button",
     "Error, the game is fragmented.",
     "Error, could not run the item.",
-    "Test",
+    "Test Changes",
     "Leave empty for GUEST auth.",
     "Accurate Reads",
     "Synchronous Mode",
@@ -212,14 +207,14 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "No cheats found.",
     "Download Defaults",
     "Network Update",
-    "Redownload existing records?",
+    "Overwrite Existing Records",
     "Update failed.",
     "Failed to connect to update server.",
     "Update completed.",
     "Update canceled.",
     "Download settings from the network?",
     "Customized Settings",
-    "Downloaded defaults.",
+    "Downloaded Defaults",
     "Auto start in %i s...",
     "Auto Start",
     "Value in second(s), 0 to disable auto start.",
@@ -281,6 +276,10 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Cache Game List (HDD)",
     "Enable Notifications",
     "%s loaded from %s",
+    "Game Menu",
+    "Game settings saved.",
+    "Game settings removed.",
+    "Overwrites existing game compatibility settings when enabled.",
     //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",
@@ -369,15 +368,14 @@ static int lngLoadFromFile(char *path, char *name)
             newL[strId] = internalEnglish[strId];
             strId++;
         }
+        lang_strs = newL;
+        lngFreeFromFile(curL);
 
         int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
         strncpy(dir, path, len);
         dir[len] = '\0';
 
         lngLoadFont(dir, name);
-
-        lang_strs = newL;
-        lngFreeFromFile(curL);
 
         return 1;
     }

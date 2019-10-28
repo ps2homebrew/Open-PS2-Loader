@@ -1,5 +1,5 @@
 # Translation by lauchon22
-# Last update: Oct. 27, 2019
+# Last update: Oct. 28, 2019
 # Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
@@ -108,7 +108,7 @@ Recordar último juego en uso
 Botón de selección
 Error, el juego está fragmentado
 Error, no se pudo iniciar el archivo
-Test Changes
+Prueba de Cambios
 Dejar en blanco para autentificar como GUEST
 Lectura precisa
 Modo sincronizado
@@ -199,7 +199,7 @@ Error: fallo al cargar el archivo de códigos
 No se han encontrado códigos
 Descargar ajustes predeterminados
 Actualización ajustes juegos a través de red
-Overwrite Existing Records
+Sobrescribir Registros Existentes
 Actualización fallida.
 Error al conectarse con el servidor de actualización.
 Actualización completa.
@@ -268,10 +268,10 @@ Confirma cambiar modo de video?
 Cachè de lista de juegos (HDD)
 Activar notificaciones
 %s cargado desde %s
-Game Menu
-Game settings saved.
-Game settings removed.
-Overwrites existing game compatibility settings when enabled.
+Menú de Juegos
+Configuración de juego guardada
+Configuración de juego eliminada
+Sobrescribe la configuración de compatibilidad de juego cuando está habilitado
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

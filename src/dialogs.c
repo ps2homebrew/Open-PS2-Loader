@@ -452,6 +452,12 @@ struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_GSM_SETTINGS}}},
     {UI_SPLITTER},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
+    {UI_SPACER},
+    {UI_ENUM, GSMCFG_GSMSOURCE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLEGSM}}},
     {UI_SPACER},
     {UI_BOOL, GSMCFG_ENABLEGSM, 1, 1, _STR_HINT_ENABLEGSM, 0, 0, {.intvalue = {1, 1}}},
@@ -489,6 +495,12 @@ struct UIItem diaCheatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_CHEAT_SETTINGS}}},
     {UI_SPLITTER},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
+    {UI_SPACER},
+    {UI_ENUM, CHTCFG_CHEATSOURCE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ENABLECHEAT}}},
     {UI_SPACER},
     {UI_BOOL, CHTCFG_ENABLECHEAT, 1, 1, _STR_HINT_ENABLECHEAT, 0, 0, {.intvalue = {1, 1}}},
@@ -508,9 +520,14 @@ struct UIItem diaCheatConfig[] = {
 
 #ifdef PADEMU
 struct UIItem diaPadEmuConfig[] = {
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}}, {UI_SPACER},
-
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMU_SETTINGS}}},
     {UI_SPLITTER},
+
+    {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_SETTINGS_SOURCE}}},
+    {UI_SPACER},
+    {UI_ENUM, PADCFG_PADEMU_SOURCE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+    {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -45, 0, {.label = {NULL, _STR_PADEMU_ENABLE}}},
     {UI_SPACER},

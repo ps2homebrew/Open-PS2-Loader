@@ -41,9 +41,9 @@ enum GAME_MENU_IDs {
 #ifdef PADEMU
     GAME_PADEMU_SETTINGS,
 #endif
-    GAME_REMOVE_CHANGES,
     GAME_SAVE_CHANGES,
     GAME_TEST_CHANGES,
+    GAME_REMOVE_CHANGES,
     GAME_RENAME_GAME,
     GAME_DELETE_GAME,
 };
@@ -166,6 +166,7 @@ static void _menuRequestConfig()
         }
     } else if (itemConfig)
         actionStatus = 0;
+
     SignalSema(menuSemaId);
 }
 
@@ -174,6 +175,15 @@ config_set_t *menuLoadConfig()
     actionStatus = 1;
     itemConfigId = -1;
     guiHandleDeferedIO(&actionStatus, _l(_STR_LOADING_SETTINGS), IO_CUSTOM_SIMPLEACTION, &_menuRequestConfig);
+    return itemConfig;
+}
+
+// we don't want a pop up when transitioning to or refreshing Game Menu gui.
+config_set_t *gameMenuLoadConfig(struct UIItem *ui)
+{
+    actionStatus = 1;
+    itemConfigId = -1;
+    guiGameHandleDeferedIO(&actionStatus, ui, IO_CUSTOM_SIMPLEACTION, &_menuRequestConfig);
     return itemConfig;
 }
 
@@ -223,9 +233,9 @@ void menuInitGameMenu(void)
 #ifdef PADEMU
     submenuAppendItem(&gameMenu, -1, NULL, GAME_PADEMU_SETTINGS, _STR_PADEMUCONFIG);
 #endif
-    submenuAppendItem(&gameMenu, -1, NULL, GAME_REMOVE_CHANGES, _STR_REMOVE_ALL_SETTINGS);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&gameMenu, -1, NULL, GAME_TEST_CHANGES, _STR_TEST);
+    submenuAppendItem(&gameMenu, -1, NULL, GAME_REMOVE_CHANGES, _STR_REMOVE_ALL_SETTINGS);
     if (gEnableWrite) {
         submenuAppendItem(&gameMenu, -1, NULL, GAME_RENAME_GAME, _STR_RENAME);
         submenuAppendItem(&gameMenu, -1, NULL, GAME_DELETE_GAME, _STR_DELETE);
@@ -987,6 +997,13 @@ void menuRenderGameMenu()
         // render, advance
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
+#ifdef PADEMU
+        if (cp == 4 || cp == 6)
+            y += spacing / 2; // leave a blank space before rendering Save & Remove Settings.
+#else
+        if (cp == 3 || cp == 5)
+            y += spacing / 2;
+#endif
     }
 
     //hints
@@ -995,9 +1012,6 @@ void menuRenderGameMenu()
 
 void menuHandleInputGameMenu()
 {
-    item_list_t *support = selected_item->item->userdata;
-    int gameID = selected_item->item->current->item.id;
-
     if (!gameMenu)
         return;
 
@@ -1028,32 +1042,30 @@ void menuHandleInputGameMenu()
         sfxPlay(SFX_CONFIRM);
 
         if (menuID == GAME_COMPAT_SETTINGS) {
-            guiGameShowCompatConfig(gameID, support, itemConfig);
+            guiGameShowCompatConfig(selected_item->item->current->item.id, selected_item->item->userdata, itemConfig);
         } else if (menuID == GAME_CHEAT_SETTINGS) {
             guiGameShowCheatConfig();
         } else if (menuID == GAME_GSM_SETTINGS) {
             guiGameShowGSConfig();
         } else if (menuID == GAME_VMC_SETTINGS) {
-            guiGameShowVMCMenu(gameID, support);
+            guiGameShowVMCMenu(selected_item->item->current->item.id, selected_item->item->userdata);
 #ifdef PADEMU
         } else if (menuID == GAME_PADEMU_SETTINGS) {
             guiGameShowPadEmuConfig();
 #endif
-        } else if (menuID == GAME_REMOVE_CHANGES) {
-            guiGameRemoveSettings(itemConfig);
-
-            config_set_t *configSet = menuLoadConfig();
-            guiGameLoadConfig(support, configSet);
         } else if (menuID == GAME_SAVE_CHANGES) {
-            guiGameSaveConfig(itemConfig, support);
-            configSetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);
+            if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))
+                configSetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, CONFIG_SOURCE_USER);
             menuSaveConfig();
+            saveConfig(CONFIG_GAME, 0);
             guiMsgBox(_l(_STR_GAME_SETTINGS_SAVED), 0, NULL);
-
-            config_set_t *configSet = menuLoadConfig();
-            guiGameLoadConfig(support, configSet);
+            guiGameLoadConfig(selected_item->item->userdata, gameMenuLoadConfig(NULL));
         } else if (menuID == GAME_TEST_CHANGES) {
-            guiGameTestSettings(gameID, support, itemConfig);
+            guiGameTestSettings(selected_item->item->current->item.id, selected_item->item->userdata, itemConfig);
+        } else if (menuID == GAME_REMOVE_CHANGES) {
+            if (guiGameShowRemoveSettings(itemConfig, configGetByType(CONFIG_GAME))) {
+                guiGameLoadConfig(selected_item->item->userdata, gameMenuLoadConfig(NULL));
+            }
         } else if (menuID == GAME_RENAME_GAME) {
             menuRenameGame();
         } else if (menuID == GAME_DELETE_GAME) {

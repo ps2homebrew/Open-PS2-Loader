@@ -220,8 +220,7 @@ static void itemExecTriangle(struct menu_item *curMenu)
             if (menuCheckParentalLock() == 0) {
                 menuInitGameMenu();
                 guiSwitchScreen(GUI_SCREEN_GAME_MENU);
-                config_set_t *configSet = menuLoadConfig();
-                guiGameLoadConfig(support, configSet);
+                guiGameLoadConfig(support, gameMenuLoadConfig(NULL));
             }
         }
     } else

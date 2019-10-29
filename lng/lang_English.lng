@@ -288,5 +288,10 @@ Enable Notifications
 %s loaded from %s
 Game Menu
 Game settings saved.
-Game settings removed.
+%s settings removed.
 Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.

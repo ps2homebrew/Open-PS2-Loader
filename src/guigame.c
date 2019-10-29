@@ -44,6 +44,13 @@ static char vmc2[32];
 static char hexDiscID[15];
 static char configSource[32];
 
+// forward declartions.
+static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame);
+static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame);
+#ifdef PADEMU
+static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame);
+#endif
+
 int guiGameAltStartupNameHandler(char *text, int maxLen)
 {
     int i;
@@ -301,6 +308,22 @@ void guiGameShowVMCMenu(int id, item_list_t *support)
 //GSM
 static void guiGameSetGSMSettingsState(void)
 {
+    int previousSource = gGSMSource;
+
+    diaGetInt(diaGSConfig, GSMCFG_GSMSOURCE, &gGSMSource);
+
+    // update GUI to display per-game or global settings if changed
+    if (previousSource != gGSMSource && gGSMSource == SETTINGS_GLOBAL) {
+        config_set_t *configSet = gameMenuLoadConfig(diaGSConfig);
+        configRemoveKey(configSet, CONFIG_ITEM_GSMSOURCE);
+        guiGameLoadGSMConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+    else if (previousSource != gGSMSource && gGSMSource == SETTINGS_PERGAME) {
+        config_set_t *configSet = gameMenuLoadConfig(diaGSConfig);
+        configSetInt(configSet, CONFIG_ITEM_GSMSOURCE, gGSMSource);
+        guiGameLoadGSMConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+
     diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMVMODE, EnableGSM);
     diaSetEnabled(diaGSConfig, GSMCFG_GSMXOFFSET, EnableGSM);
@@ -320,6 +343,7 @@ static int guiGameGSMUpdater(int modified)
 void guiGameShowGSConfig(void)
 {
     // configure the enumerations
+    const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
     const char *gsmvmodeNames[] = {
         "NTSC",
         "NTSC Non Interlaced",
@@ -352,6 +376,7 @@ void guiGameShowGSConfig(void)
         "VGA 1280x1024p @75Hz",
         NULL};
 
+    diaSetEnum(diaGSConfig, GSMCFG_GSMSOURCE, settingsSource);
     diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);
 
     diaSetEnabled(diaGSConfig, GSMCFG_GSMVMODE, EnableGSM);
@@ -365,7 +390,24 @@ void guiGameShowGSConfig(void)
 //CHEATS
 static void guiGameSetCheatSettingsState(void)
 {
+    int previousSource = gCheatSource;
+
+    diaGetInt(diaCheatConfig, CHTCFG_CHEATSOURCE, &gCheatSource);
+
+    // update GUI to display per-game or global settings if changed
+    if (previousSource != gCheatSource && gCheatSource == SETTINGS_GLOBAL) {
+        config_set_t *configSet = gameMenuLoadConfig(diaCheatConfig);
+        configRemoveKey(configSet, CONFIG_ITEM_CHEATSSOURCE);
+        guiGameLoadCheatsConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+    else if (previousSource != gCheatSource && gCheatSource == SETTINGS_PERGAME) {
+        config_set_t *configSet = gameMenuLoadConfig(diaCheatConfig);
+        configSetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, gCheatSource);
+        guiGameLoadCheatsConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+
     diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
+    diaGetInt(diaCheatConfig, CHTCFG_CHEATMODE, &CheatMode);
     diaSetEnabled(diaCheatConfig, CHTCFG_CHEATMODE, EnableCheat);
 }
 
@@ -381,8 +423,10 @@ static int guiGameCheatUpdater(int modified)
 void guiGameShowCheatConfig(void)
 {
     // configure the enumerations
+    const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
     const char *cheatmodeNames[] = {_l(_STR_CHEATMODEAUTO), _l(_STR_CHEATMODESELECT), NULL};
 
+    diaSetEnum(diaCheatConfig, CHTCFG_CHEATSOURCE, settingsSource);
     diaSetEnum(diaCheatConfig, CHTCFG_CHEATMODE, cheatmodeNames);
     diaSetEnabled(diaCheatConfig, CHTCFG_CHEATMODE, EnableCheat);
 
@@ -463,6 +507,21 @@ static int guiGamePadEmuUpdater(int modified)
 {
     int PadEmuMode, PadPort, PadEmuVib, PadEmuPort, PadEmuMtap, PadEmuMtapPort, PadEmuWorkaround;
     static int oldPadPort;
+    int previousSource = gPadEmuSource;
+
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_SOURCE, &gPadEmuSource);
+
+    // update GUI to display per-game or global settings if changed
+    if (previousSource != gPadEmuSource && gPadEmuSource == SETTINGS_GLOBAL) {
+        config_set_t *configSet = gameMenuLoadConfig(diaPadEmuConfig);
+        configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
+        guiGameLoadPadEmuConfig(configSet, configGetByType(CONFIG_GAME));
+    }
+    else if (previousSource != gPadEmuSource && gPadEmuSource == SETTINGS_PERGAME) {
+        config_set_t *configSet = gameMenuLoadConfig(diaPadEmuConfig);
+        configSetInt(configSet, CONFIG_ITEM_PADEMUSOURCE, gPadEmuSource);
+        guiGameLoadPadEmuConfig(configSet, configGetByType(CONFIG_GAME));
+    }
 
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, &PadEmuMode);
@@ -614,24 +673,16 @@ static int guiGamePadEmuInfoUpdater(int modified)
 
 void guiGameShowPadEmuConfig(void)
 {
+    const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
     const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), NULL};
+
     int PadEmuMtap, PadEmuMtapPort, i;
 
+    diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_SOURCE, settingsSource);
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
 
     PadEmuMtap = (PadEmuSettings >> 24) & 1;
     PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, 0);
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
-
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuMtap);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
 
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, EnablePadEmu);
 
@@ -735,9 +786,11 @@ void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configS
 }
 
 // sets variables without writing to users cfg file.. follow up with menuSaveConfig() to write
-void guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
+int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
 {
     int i;
+    int result = 0;
+    config_set_t *configGame = configGetByType(CONFIG_GAME);
 
     compatMode = 0;
     for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
@@ -749,87 +802,140 @@ void guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     if (support->flags & MODE_FLAG_COMPAT_DMA) {
         diaGetInt(diaCompatConfig, COMPAT_DMA, &dmaMode);
         if (dmaMode != 7)
-            configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
+            result = configSetInt(configSet, CONFIG_ITEM_DMA, dmaMode);
         else
             configRemoveKey(configSet, CONFIG_ITEM_DMA);
     }
 
     if (compatMode != 0)
-        configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
+        result = configSetInt(configSet, CONFIG_ITEM_COMPAT, compatMode);
     else
         configRemoveKey(configSet, CONFIG_ITEM_COMPAT);
 
-    //GSM
+    /// GSM ///
     diaGetInt(diaGSConfig, GSMCFG_ENABLEGSM, &EnableGSM);
-    if (EnableGSM != 0)
-        configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
-
     diaGetInt(diaGSConfig, GSMCFG_GSMVMODE, &GSMVMode);
-    if (GSMVMode != 0)
-        configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
-
     diaGetInt(diaGSConfig, GSMCFG_GSMXOFFSET, &GSMXOffset);
-    if (GSMXOffset != 0)
-        configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
-
     diaGetInt(diaGSConfig, GSMCFG_GSMYOFFSET, &GSMYOffset);
-    if (GSMYOffset != 0)
-        configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
-
     diaGetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, &GSMFIELDFix);
-    if (GSMFIELDFix != 0)
-        configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
 
-    //Cheats
+    if (gGSMSource == SETTINGS_PERGAME) {
+        result = configSetInt(configSet, CONFIG_ITEM_GSMSOURCE, gGSMSource);
+        if (EnableGSM != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_ENABLEGSM, EnableGSM);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
+
+        if (GSMVMode != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMVMODE, GSMVMode);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
+
+        if (GSMXOffset != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
+
+        if (GSMYOffset != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
+
+        if (GSMFIELDFix != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
+    }
+    else if (gGSMSource == SETTINGS_GLOBAL) {
+        configSetInt(configGame, CONFIG_ITEM_ENABLEGSM, EnableGSM);
+        configSetInt(configGame, CONFIG_ITEM_GSMVMODE, GSMVMode);
+        configSetInt(configGame, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
+        configSetInt(configGame, CONFIG_ITEM_GSMYOFFSET, GSMYOffset);
+        configSetInt(configGame, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
+    }
+
+    /// Cheats ///
+    diaGetInt(diaCheatConfig, CHTCFG_CHEATSOURCE, &gCheatSource);
     diaGetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, &EnableCheat);
-    if (EnableCheat != 0)
-        configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
-
     diaGetInt(diaCheatConfig, CHTCFG_CHEATMODE, &CheatMode);
-    if (CheatMode != 0)
-        configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+
+    if (gCheatSource == SETTINGS_PERGAME) {
+        result = configSetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, gCheatSource);
+        if (EnableCheat != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
+
+        if (CheatMode != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
+    }
+    else if (gCheatSource == SETTINGS_GLOBAL) {
+        configSetInt(configGame, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
+        configSetInt(configGame, CONFIG_ITEM_CHEATMODE, CheatMode);
+    }
 
 #ifdef PADEMU
+    /// PADEMU ///
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
 
-    if (EnablePadEmu != 0)
-        configSetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
+    if (gPadEmuSource == SETTINGS_PERGAME) {
+        result = configSetInt(configSet, CONFIG_ITEM_PADEMUSOURCE, gPadEmuSource);
+        if (EnablePadEmu != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
 
-    if (PadEmuSettings != 0)
-        configSetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
-    else
-        configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
+        if (PadEmuSettings != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
+    }
+    else if (gPadEmuSource == SETTINGS_GLOBAL) {
+        configSetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
+        configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
+    }
 #endif
 
     diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
     if (hexid[0] != '\0')
-        configSetStr(configSet, CONFIG_ITEM_DNAS, hexid);
+        result = configSetStr(configSet, CONFIG_ITEM_DNAS, hexid);
 
     diaGetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup, sizeof(altStartup));
     if (altStartup[0] != '\0')
-        configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
+        result = configSetStr(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup);
     else
         configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
-    //VMC
+    /// VMC ///
     configSetVMC(configSet, vmc1, 0);
     configSetVMC(configSet, vmc2, 1);
+
+    return result;
+}
+
+void guiGameRemoveGlobalSettings(config_set_t *configGame)
+{
+    if (menuCheckParentalLock() == 0) {
+        // Cheats
+        configRemoveKey(configGame, CONFIG_ITEM_ENABLECHEAT);
+        configRemoveKey(configGame, CONFIG_ITEM_CHEATMODE);
+
+        // GSM
+        configRemoveKey(configGame, CONFIG_ITEM_ENABLEGSM);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMVMODE);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMXOFFSET);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
+        configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
+
+#ifdef PADEMU
+        // PADEMU
+        configRemoveKey(configGame, CONFIG_ITEM_ENABLEPADEMU);
+        configRemoveKey(configGame, CONFIG_ITEM_PADEMUSETTINGS);
+#endif
+        saveConfig(CONFIG_GAME, 0);
+    }
 }
 
 void guiGameRemoveSettings(config_set_t *configSet)
@@ -841,28 +947,30 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_DNAS);
         configRemoveKey(configSet, CONFIG_ITEM_ALTSTARTUP);
 
-        //GSM
+        // GSM
+        configRemoveKey(configSet, CONFIG_ITEM_GSMSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEGSM);
         configRemoveKey(configSet, CONFIG_ITEM_GSMVMODE);
         configRemoveKey(configSet, CONFIG_ITEM_GSMXOFFSET);
         configRemoveKey(configSet, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
 
-        //Cheats
+        // Cheats
+        configRemoveKey(configSet, CONFIG_ITEM_CHEATSSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 
 #ifdef PADEMU
-        //PADEMU
+        // PADEMU
+        configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
 #endif
-        //VMC
+        // VMC
         configRemoveVMC(configSet, 0);
         configRemoveVMC(configSet, 1);
 
         menuSaveConfig();
-        guiMsgBox(_l(_STR_GAME_SETTINGS_REMOVED), 0, NULL);
     }
 }
 
@@ -872,10 +980,112 @@ void guiGameTestSettings(int id, item_list_t *support, config_set_t *configSet)
     support->itemLaunch(id, configSet);
 }
 
+static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame)
+{
+    EnableGSM = 0;
+    GSMVMode = 0;
+    GSMXOffset = 0;
+    GSMYOffset = 0;
+    GSMFIELDFix = 0;
+
+    // set global settings.
+    gGSMSource = 0;
+    configGetInt(configGame, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
+    configGetInt(configGame, CONFIG_ITEM_GSMVMODE, &GSMVMode);
+    configGetInt(configGame, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
+    configGetInt(configGame, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
+    configGetInt(configGame, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix);
+
+    // override global with per-game settings if available and selected.
+    configGetInt(configSet, CONFIG_ITEM_GSMSOURCE, &gGSMSource);
+    if (gGSMSource == SETTINGS_PERGAME) {
+        if (!configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM))
+            EnableGSM = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &GSMVMode))
+            GSMVMode = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset))
+            GSMXOffset = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset))
+            GSMYOffset = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix))
+            GSMFIELDFix = 0;
+    }
+
+    // set gui settings.
+    diaSetInt(diaGSConfig, GSMCFG_GSMSOURCE, gGSMSource);
+    diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
+    diaSetInt(diaGSConfig, GSMCFG_GSMVMODE, GSMVMode);
+    diaSetInt(diaGSConfig, GSMCFG_GSMXOFFSET, GSMXOffset);
+    diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
+    diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
+}
+
+static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame)
+{
+    EnableCheat = 0;
+    CheatMode = 0;
+
+    // set global settings.
+    gCheatSource = 0;
+    configGetInt(configGame, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
+    configGetInt(configGame, CONFIG_ITEM_CHEATMODE, &CheatMode);
+
+    // override global with per-game settings if available and selected.
+    configGetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, &gCheatSource);
+    if (gCheatSource == SETTINGS_PERGAME) {
+        if (!configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat))
+            EnableCheat = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &CheatMode))
+            CheatMode = 0;
+    }
+
+    // set gui settings.
+    diaSetInt(diaCheatConfig, CHTCFG_CHEATSOURCE, gCheatSource);
+    diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, EnableCheat);
+    diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
+}
+
+#ifdef PADEMU
+static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame)
+{
+    EnablePadEmu = 0;
+    PadEmuSettings = 0;
+
+    // set global settings.
+    gPadEmuSource = 0;
+    configGetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, &EnablePadEmu);
+    configGetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings);
+
+    // override global with per-game settings if available and selected.
+    configGetInt(configSet, CONFIG_ITEM_PADEMUSOURCE, &gPadEmuSource);
+    if (gPadEmuSource == SETTINGS_PERGAME) {
+        if (!configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &EnablePadEmu))
+            EnablePadEmu = 0;
+        if (!configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings))
+            PadEmuSettings = 0;
+    }
+    // set gui settings.
+    int PadEmuMtap = (PadEmuSettings >> 24) & 1;
+    int PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
+
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_SOURCE, gPadEmuSource);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, EnablePadEmu);
+
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, 0);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuMtap);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
+}
+#endif
+
 // loads defaults if no config found
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
 {
     int i;
+    config_set_t *configGame = configGetByType(CONFIG_GAME);
 
     configSource[0] = '\0';
     configSourceID = CONFIG_SOURCE_DEFAULT;
@@ -898,51 +1108,20 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     for (i = 0; i < COMPAT_MODE_COUNT; ++i)
         diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
-    // GSM
-    EnableGSM = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &EnableGSM);
-    diaSetInt(diaGSConfig, GSMCFG_ENABLEGSM, EnableGSM);
+    guiGameLoadGSMConfig(configSet, configGame);
 
-    GSMVMode = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &GSMVMode);
-    diaSetInt(diaGSConfig, GSMCFG_GSMVMODE, GSMVMode);
-
-    GSMXOffset = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &GSMXOffset);
-    diaSetInt(diaGSConfig, GSMCFG_GSMXOFFSET, GSMXOffset);
-
-    GSMYOffset = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &GSMYOffset);
-    diaSetInt(diaGSConfig, GSMCFG_GSMYOFFSET, GSMYOffset);
-
-    GSMFIELDFix = 0;
-    configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &GSMFIELDFix);
-    diaSetInt(diaGSConfig, GSMCFG_GSMFIELDFIX, GSMFIELDFix);
-
-    // Cheats
-    EnableCheat = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &EnableCheat);
-    diaSetInt(diaCheatConfig, CHTCFG_ENABLECHEAT, EnableCheat);
-
-    CheatMode = 0;
-    configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &CheatMode);
-    diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
+    guiGameLoadCheatsConfig(configSet, configGame);
 #ifdef PADEMU
-    EnablePadEmu = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &EnablePadEmu);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, EnablePadEmu);
-
-    PadEmuSettings = 0;
-    configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings);
+    guiGameLoadPadEmuConfig(configSet, configGame);
 #endif
-    // Find out the current game ID
+    /// Find out the current game ID ///
     configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));
     diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
     configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
     diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
-    // VMC
+    /// VMC ///
     configGetVMC(configSet, vmc1, sizeof(vmc1), 0);
     diaSetLabel(diaVMCConfig, COMPAT_VMC1_DEFINE, vmc1);
 

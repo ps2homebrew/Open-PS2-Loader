@@ -593,11 +593,20 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     InitCheatsConfig(configSet);
 
 #ifdef PADEMU
-    gEnablePadEmu = 0;
-    configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
+    config_set_t *configGame = configGetByType(CONFIG_GAME);
 
+    gPadEmuSource = 0;
+    gEnablePadEmu = 0;
     gPadEmuSettings = 0;
-    configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
+
+    if (configGetInt(configSet, CONFIG_ITEM_PADEMUSOURCE, &gPadEmuSource)) {
+        configGetInt(configSet, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
+        configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
+    }
+    else {
+        configGetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, &gEnablePadEmu);
+        configGetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, &gPadEmuSettings);
+    }
 #endif
 
     *patchindex = i;

@@ -134,6 +134,10 @@ int gEnableBootSND;
 int gSFXVolume;
 int gBootSndVolume;
 
+int gCheatSource;
+int gGSMSource;
+int gPadEmuSource;
+
 int gFadeDelay;
 int toggleSfx;
 

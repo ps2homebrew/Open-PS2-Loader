@@ -1,5 +1,5 @@
 # Translated by kane159 and eyu2007
-# Last update: Oct. 27, 2019
+# Last update: Oct. 31, 2019
 # Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Simplified Chinese
@@ -108,7 +108,7 @@ NetBIOS
 选定键
 错误, 游戏有碎片
 错误, 无法运行该项目
-Test Changes
+测试修改
 GUEST验证留空.
 精确读取
 同步模式
@@ -199,7 +199,7 @@ PS2RD 金手指模式
 未发现金手指文件
 下载默认设置
 网络更新
-Overwrite Existing Records
+覆盖现有记录
 更新失败.
 连结更新服务器失败.
 更新已完成.
@@ -268,10 +268,10 @@ vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
 缓存游戏列表 (硬盘)
 启用通知
 %s 从 %s加载
-Game Menu
-Game settings saved.
-Game settings removed.
-Overwrites existing game compatibility settings when enabled.
+游戏菜单
+游戏设置已保存。
+游戏设置已删除。
+启用时覆盖现有的游戏兼容性设置。
 PS1游戏
 PS1游戏启动模式
 POPSTARTER.ELF在'%s'上找不到!

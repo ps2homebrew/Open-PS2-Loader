@@ -44,7 +44,7 @@ static char vmc2[32];
 static char hexDiscID[15];
 static char configSource[32];
 
-// forward declartions.
+// forward declarations.
 static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame);
 static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame);
 #ifdef PADEMU
@@ -257,13 +257,13 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
 
 void guiGameShowVMCMenu(int id, item_list_t *support)
 {
-    int result = COMPAT_NOEXIT;
-
-    diaSetLabel(diaVMCConfig, COMPAT_VMC1_DEFINE, vmc1);
-    diaSetLabel(diaVMCConfig, COMPAT_VMC2_DEFINE, vmc2);
+    int result = -1;
 
     // show dialog
     do {
+        diaSetLabel(diaVMCConfig, COMPAT_VMC1_DEFINE, vmc1);
+        diaSetLabel(diaVMCConfig, COMPAT_VMC2_DEFINE, vmc2);
+
         if (strlen(vmc1))
             diaSetLabel(diaVMCConfig, COMPAT_VMC1_ACTION, _l(_STR_RESET));
         else
@@ -1115,16 +1115,18 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     guiGameLoadPadEmuConfig(configSet, configGame);
 #endif
     /// Find out the current game ID ///
+    hexid[0] = '\0';
     configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));
     diaSetString(diaCompatConfig, COMPAT_GAMEID, hexid);
 
+    altStartup[0] = '\0';
     configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, altStartup, sizeof(altStartup));
     diaSetString(diaCompatConfig, COMPAT_ALTSTARTUP, altStartup);
 
     /// VMC ///
+    vmc1[0] = '\0';
     configGetVMC(configSet, vmc1, sizeof(vmc1), 0);
-    diaSetLabel(diaVMCConfig, COMPAT_VMC1_DEFINE, vmc1);
 
+    vmc2[0] = '\0';
     configGetVMC(configSet, vmc2, sizeof(vmc2), 1);
-    diaSetLabel(diaVMCConfig, COMPAT_VMC2_DEFINE, vmc2);
 }

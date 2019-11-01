@@ -82,7 +82,8 @@ void DeviceInit(void)
 }
 
 void DeviceDeinit(void)
-{
+{   // Close all files and disconnect before IOP reboots. Note that this seems to help prevent VMC corruption in some games.
+    DeviceUnmount();
 }
 
 void DeviceFSInit(void)

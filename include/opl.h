@@ -118,7 +118,6 @@ int gAPPStartMode;
 
 int gAutosort;
 int gAutoRefresh;
-int gUseInfoScreen;
 int gEnableNotifications;
 int gEnableArt;
 int gWideScreen;

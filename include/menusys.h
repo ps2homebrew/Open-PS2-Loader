@@ -3,6 +3,7 @@
 
 #include <gsToolkit.h>
 #include "include/config.h"
+#include "include/dia.h"
 
 /// a single submenu item
 typedef struct submenu_item
@@ -94,6 +95,7 @@ void submenuSort(submenu_list_t **submenu);
 char *submenuItemGetText(submenu_item_t *it);
 char *menuItemGetText(menu_item_t *it);
 config_set_t *menuLoadConfig();
+config_set_t *gameMenuLoadConfig(struct UIItem *ui);
 void menuSaveConfig();
 
 void menuRenderMain();

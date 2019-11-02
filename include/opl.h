@@ -126,7 +126,6 @@ int gELMStartMode;
 
 int gAutosort;
 int gAutoRefresh;
-int gUseInfoScreen;
 int gEnableNotifications;
 int gEnableArt;
 int gWideScreen;
@@ -141,6 +140,10 @@ int gEnableSFX;
 int gEnableBootSND;
 int gSFXVolume;
 int gBootSndVolume;
+
+int gCheatSource;
+int gGSMSource;
+int gPadEmuSource;
 
 int gFadeDelay;
 int toggleSfx;

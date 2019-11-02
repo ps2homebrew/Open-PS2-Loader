@@ -1,6 +1,6 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: Oct. 28, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 OPL %s
@@ -43,7 +43,7 @@ O
 X
 Lista de jogos
 Ajustes
-Remover todos os ajustes
+Remove Settings
 Todos os ajustes do jogo foram removidos
 Rolagem
 Lenta
@@ -145,7 +145,7 @@ Desligamento automático do HDD (spin down)
 Modo de vídeo
 Cor do diálogo
 Cor da seleção
-Exibir página de informações
+Não utilizado
 Info
 Customizar ELF principal
 Seleção de cor
@@ -270,8 +270,13 @@ Ativar notificações
 %s carregado de %s
 Menu do Jogo
 Configurações do jogo salvas.
-Configurações do jogo removidas.
+%s settings removed.
 Substitui as configurações de compatibilidade de jogos existentes quando ativada.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: Oct. 28, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -43,7 +43,7 @@ Circulo
 Cruz
 Lista de Jogos
 Aj. do jogo
-Remover todos os ajustes
+Remove Settings
 Removidos todos os ajustes para o jogo
 Rolagem
 Lento
@@ -145,7 +145,7 @@ Desligamento automático do HDD
 Modo de vídeo
 Cor do diálogo
 Cor selecionada
-Mostrar Página de Informação
+Não utilizado
 Info
 ELF personalizado
 Seleção de Cor
@@ -270,8 +270,13 @@ Ativar notificações
 %s carregado de %s
 Menu de Jogo
 Configurações do jogo guardadas.
-Configurações do jogo removidas.
+%s settings removed.
 Substitui configurações de compatibilidade de jogos existentes quando ativado.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

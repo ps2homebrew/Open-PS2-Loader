@@ -1,6 +1,6 @@
 # Translation by Anousith Phompida <noum_terry@hotmail.com> (aka: blackbutterfly)
-# Last update: Oct. 27, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Laotian
 OPL %s
@@ -43,7 +43,7 @@ Settings saved to %s
 ຄູນ
 ໄປທີ່ລາຍຊື່ເກມ
 ຕັ້ງຄ່າໃຫ້ເກມນີ້
-ຍົກເລີກການຕັ້ງຄ່າທັງໝົດ
+Remove Settings
 ລົບລ້າງ Key ທັງໝົດອອກຈາກເກມ
 ການເລື່ອນ
 ຊ້າໆ
@@ -145,7 +145,7 @@ USB prefix path
 ໂໝດວິດິໂອ
 ສີ Dialog
 ສີທີ່ຖືກເລືອກ
-ສະແດງຂໍ້ມູນຂອງໜ້າ
+Unused
 ຂໍ້ມູນ
 ELF ທີ່ຖືກປັບແຕ່ງເອງ
 ເລືອກສີ
@@ -270,8 +270,13 @@ Enable Notifications
 %s loaded from %s
 Game Menu
 Game settings saved.
-Game settings removed.
+%s settings removed.
 Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

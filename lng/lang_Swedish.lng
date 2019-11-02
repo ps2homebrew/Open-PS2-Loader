@@ -1,6 +1,6 @@
 # Translation by Lord_Flaya
-# Last update: Oct. 28, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 OPL %s
@@ -43,7 +43,7 @@ Cirkel
 Kryss
 Spel-lista
 Spelinst.
-Ta bort alla inställningar
+Remove Settings
 Tog bort alla nycklar för spelet
 Bläddra
 Sakta
@@ -145,7 +145,7 @@ Automatisk HDD nerspinn
 Videoläge
 Dialog färg
 Vald färg
-Visa info sida
+Används ej
 Info
 Custom ELF
 Färgval
@@ -270,8 +270,13 @@ Aktivera notifikationer
 %s Laddat från %s
 SpelMeny
 Spelinställningar sparade.
-Spelinställningar borttagna.
+%s settings removed.
 Skriver över befintliga spelinställningar om aktiverad.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

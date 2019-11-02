@@ -1,6 +1,6 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: Oct. 28, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 OPL %s
@@ -43,7 +43,7 @@ Kreis
 Kreuz
 Spieleliste
 Spieleinst.
-Entferne alle Einstellungen
+Remove Settings
 Alle keys für das Spiel wurden entfernt
 Scrollen
 Langsam
@@ -145,7 +145,7 @@ Autom. Abschaltung der Festplatte
 Videomodus
 Dialogfarbe
 Auswahlfarbe
-Infoseite anzeigen
+Unbenutzt
 Info
 Benutzerdefinierte ELF
 Farbauswahl
@@ -270,8 +270,13 @@ Benachrichtigungen Einschalten
 %s geladen von %s
 Spiel Menü
 Spiel-Einstellungen gespeichert.
-Spiel-Einstellungen entfernt.
+%s settings removed.
 Wenn angewählt, werden existierende Spiel-Kompatibilitäts-Einstellungen überschrieben.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

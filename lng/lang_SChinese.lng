@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: Oct. 31, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Simplified Chinese
 OPL %s
@@ -43,7 +43,7 @@ O
 X
 游戏列表
 游戏设置
-删除所有设置
+Remove Settings
 删除游戏所有的设置
 选定项滚动速度
 较慢
@@ -145,7 +145,7 @@ USB 前缀路径
 视频模式
 对话框颜色
 被选定颜色
-显示讯息页面
+空闲
 讯息
 自定义 ELF
 颜色选项
@@ -270,8 +270,13 @@ vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
 %s 从 %s加载
 游戏菜单
 游戏设置已保存。
-游戏设置已删除。
+%s settings removed.
 启用时覆盖现有的游戏兼容性设置。
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 PS1游戏
 PS1游戏启动模式
 POPSTARTER.ELF在'%s'上找不到!

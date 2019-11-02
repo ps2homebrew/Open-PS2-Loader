@@ -1,6 +1,6 @@
 # Translation by lauchon22
-# Last update: Oct. 28, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
 OPL %s
@@ -43,7 +43,7 @@ Círculo
 Equis
 Lista de juegos
 Ajustes
-Borrar todos los ajustes
+Remove Settings
 Ajustes del juego borrados
 Desplazamiento
 Lento
@@ -145,7 +145,7 @@ Paro automático rotación del Disco duro
 Modo de vídeo interfaz
 Color de diálogos
 Color de selección
-Mostrar pantalla de información
+Sin uso
 Info.
 Archivo ELF personalizado
 Seleccionar color
@@ -270,8 +270,13 @@ Activar notificaciones
 %s cargado desde %s
 Menú de Juegos
 Configuración de juego guardada
-Configuración de juego eliminada
+%s settings removed.
 Sobrescribe la configuración de compatibilidad de juego cuando está habilitado
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

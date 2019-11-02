@@ -1,6 +1,6 @@
 # Translation by zidane89
-# Last update: Oct. 27, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Vietnamese
 OPL %s
@@ -43,7 +43,7 @@ Nút O
 Nút X
 Danh sách trò chơi
 Cài đặt Game
-Xóa mọi cài đặt
+Remove Settings
 Removed all keys for the game
 Cuộn
 Chậm
@@ -145,7 +145,7 @@ HDD tự động chờ
 Chế độ Video
 Màu hộp thoại
 Chọn màu
-Hiển thị trang thông tin trò chơi
+Không dùng
 Thông tin   
 Tùy chỉnh ELF
 Màu sắc lựa chọn
@@ -270,8 +270,13 @@ Enable Notifications
 %s loaded from %s
 Game Menu
 Game settings saved.
-Game settings removed.
+%s settings removed.
 Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 Các trò chơi PS1 
 Chế độ hiển thị cho game PS1 
 POPSTARTER.ELF không có ở '%s'!

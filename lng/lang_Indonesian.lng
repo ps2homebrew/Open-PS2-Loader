@@ -1,6 +1,6 @@
 # translated by verislasher and jbliz
-# Last update: Oct. 28, 2019
-# Updated for OPL_1627-DB-TA-[784dc3f] and OPL_1399-Beta-[81a94ed]
+# Last update: Nov. 02, 2019
+# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
 OPL %s
@@ -43,7 +43,7 @@ Bulat
 Kali
 Daftar Game
 Setingan
-Hapus semua Setingan
+Remove Settings
 Semua kunci permainan yang dihapus
 Gulir
 Lambat
@@ -145,7 +145,7 @@ HDD Otomatis berhenti
 Modus video
 Warna dialog
 Warna  dipilih
-Tampilan info halaman
+Tdk terpakai
 Info
 Kustom ELF
 Pemilihan warna
@@ -270,8 +270,13 @@ Izinkan Pemberitahuan
 %s dimuat dari %s
 Menu Game
 Pengaturan Game disimpan.
-Pengaturan Game dibuang.
+%s settings removed.
 Timpa pengaturan kompatibilitas game yang ada ketika diaktifkan.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

@@ -28,19 +28,32 @@ static int gGSMFIELDFix; // Enables/disables the FIELD flipping emulation option
 
 void InitGSMConfig(config_set_t *configSet)
 {
+    config_set_t *configGame = configGetByType(CONFIG_GAME);
+
     //Default values.
+    gGSMSource = 0;
     gEnableGSM = 0;
     gGSMVMode = 0;
     gGSMXOffset = 0;
     gGSMYOffset = 0;
     gGSMFIELDFix = 0;
 
-    //Load the rest of the per-game GSM configuration, only if GSM is enabled.
-    if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
-        configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
-        configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
-        configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
-        configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &gGSMFIELDFix);
+    if (configGetInt(configSet, CONFIG_ITEM_GSMSOURCE, &gGSMSource)) {
+        //Load the rest of the per-game GSM configuration, only if GSM is enabled.
+        if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
+            configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
+            configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
+            configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
+            configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &gGSMFIELDFix);
+        }
+    }
+    else {
+        if (configGetInt(configGame, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
+            configGetInt(configGame, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
+            configGetInt(configGame, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
+            configGetInt(configGame, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
+            configGetInt(configGame, CONFIG_ITEM_GSMFIELDFIX, &gGSMFIELDFix);
+        }
     }
 }
 

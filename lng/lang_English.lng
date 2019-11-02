@@ -61,7 +61,7 @@ Circle
 Cross
 Games List
 Game Settings
-Remove All Settings
+Remove Settings
 Removed all keys for the game.
 Scrolling
 Slow
@@ -163,7 +163,7 @@ Automatic HDD Spin Down
 Video Mode
 Dialog Color
 Selected Color
-Display Info Page
+Unused
 Info
 Custom ELF
 Color Selection
@@ -288,5 +288,10 @@ Enable Notifications
 %s loaded from %s
 Game Menu
 Game settings saved.
-Game settings removed.
+%s settings removed.
 Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.

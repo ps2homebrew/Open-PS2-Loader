@@ -32,14 +32,24 @@ static int gCheatList[MAX_CHEATLIST]; //Store hooks/codes addr+val pairs
 
 void InitCheatsConfig(config_set_t *configSet)
 {
+    config_set_t *configGame = configGetByType(CONFIG_GAME);
+
     //Default values.
+    gCheatSource = 0;
     gEnableCheat = 0;
     gCheatMode = 0;
     memset(gCheatList, 0, sizeof(gCheatList));
 
-    //Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
-    if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
-        configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
+    if (configGetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, &gCheatSource)) {
+        //Load the rest of the per-game CHEAT configuration if CHEAT is enabled.
+        if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
+            configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
+        }
+    }
+    else {
+        if (configGetInt(configGame, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
+            configGetInt(configGame, CONFIG_ITEM_CHEATMODE, &gCheatMode);
+        }
     }
 }
 

@@ -142,7 +142,7 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
     else {
         menuAddHint(&mod->menuItem, _STR_RUN, gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON);
 
-        if (gUseInfoScreen && gTheme->infoElems.first)
+        if (gTheme->infoElems.first)
             menuAddHint(&mod->menuItem, _STR_INFO, SQUARE_ICON);
 
         if (!(mod->support->flags & MODE_FLAG_NO_COMPAT))
@@ -204,7 +204,7 @@ static void itemExecCircle(struct menu_item *curMenu)
 
 static void itemExecSquare(struct menu_item *curMenu)
 {
-    if (curMenu->current && gUseInfoScreen && gTheme->infoElems.first)
+    if (curMenu->current && gTheme->infoElems.first)
         guiSwitchScreen(GUI_SCREEN_INFO);
 }
 
@@ -220,8 +220,7 @@ static void itemExecTriangle(struct menu_item *curMenu)
             if (menuCheckParentalLock() == 0) {
                 menuInitGameMenu();
                 guiSwitchScreen(GUI_SCREEN_GAME_MENU);
-                config_set_t *configSet = menuLoadConfig();
-                guiGameLoadConfig(support, configSet);
+                guiGameLoadConfig(support, gameMenuLoadConfig(NULL));
             }
         }
     } else
@@ -685,7 +684,6 @@ static void _loadConfig()
             configGetColor(configOPL, CONFIG_OPL_TEXTCOLOR, gDefaultTextColor);
             configGetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
             configGetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
-            configGetInt(configOPL, CONFIG_OPL_USE_INFOSCREEN, &gUseInfoScreen);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, &gEnableNotifications);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, &gEnableArt);
             configGetInt(configOPL, CONFIG_OPL_WIDESCREEN, &gWideScreen);
@@ -848,7 +846,6 @@ static void _saveConfig()
         configSetColor(configOPL, CONFIG_OPL_TEXTCOLOR, gDefaultTextColor);
         configSetColor(configOPL, CONFIG_OPL_UI_TEXTCOLOR, gDefaultUITextColor);
         configSetColor(configOPL, CONFIG_OPL_SEL_TEXTCOLOR, gDefaultSelTextColor);
-        configSetInt(configOPL, CONFIG_OPL_USE_INFOSCREEN, gUseInfoScreen);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_NOTIFICATIONS, gEnableNotifications);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_COVERART, gEnableArt);
         configSetInt(configOPL, CONFIG_OPL_WIDESCREEN, gWideScreen);
@@ -1446,7 +1443,6 @@ static void setDefaults(void)
     gCheckUSBFragmentation = 1;
     gUSBPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
-    gUseInfoScreen = 0;
     gEnableNotifications = 0;
     gEnableArt = 0;
     gWideScreen = 0;

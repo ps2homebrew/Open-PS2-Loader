@@ -7,6 +7,7 @@ enum CONFIG_INDEX {
     CONFIG_INDEX_LAST,
     CONFIG_INDEX_APPS,
     CONFIG_INDEX_NETWORK,
+    CONFIG_INDEX_GAME,
 
     CONFIG_INDEX_COUNT
 };
@@ -16,13 +17,14 @@ enum CONFIG_INDEX {
 #define CONFIG_LAST (1 << CONFIG_INDEX_LAST)
 #define CONFIG_APPS (1 << CONFIG_INDEX_APPS)
 #define CONFIG_NETWORK (1 << CONFIG_INDEX_NETWORK)
+#define CONFIG_GAME (1 << CONFIG_INDEX_GAME)
 #define CONFIG_ALL 0xFF
 
 #define CONFIG_SOURCE_DEFAULT 0
 #define CONFIG_SOURCE_USER 1
 #define CONFIG_SOURCE_DLOAD 2 //Downloaded from the network
 
-//Items for game config files.
+//Items for per-game config files.
 #define CONFIG_ITEM_NAME "#Name"
 #define CONFIG_ITEM_LONGNAME "#LongName"
 #define CONFIG_ITEM_SIZE "#Size"
@@ -37,6 +39,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
 
 //Per-Game GSM keys. -Bat-
+#define CONFIG_ITEM_GSMSOURCE "$GSMSource"
 #define CONFIG_ITEM_ENABLEGSM "$EnableGSM"
 #define CONFIG_ITEM_GSMVMODE "$GSMVMode"
 #define CONFIG_ITEM_GSMXOFFSET "$GSMXOffset"
@@ -44,9 +47,11 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_GSMFIELDFIX "$GSMFIELDFix"
 
 //Per-Game CHEAT keys. -Bat-
+#define CONFIG_ITEM_CHEATSSOURCE "$CheatsSource"
 #define CONFIG_ITEM_ENABLECHEAT "$EnableCheat"
 #define CONFIG_ITEM_CHEATMODE "$CheatMode"
 
+#define CONFIG_ITEM_PADEMUSOURCE "$PADEMUSource"
 #define CONFIG_ITEM_ENABLEPADEMU "$EnablePadEmu"
 #define CONFIG_ITEM_PADEMUSETTINGS "$PadEmuSettings"
 
@@ -58,7 +63,6 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_TEXTCOLOR "text_color"
 #define CONFIG_OPL_UI_TEXTCOLOR "ui_text_color"
 #define CONFIG_OPL_SEL_TEXTCOLOR "sel_text_color"
-#define CONFIG_OPL_USE_INFOSCREEN "use_info_screen"
 #define CONFIG_OPL_ENABLE_NOTIFICATIONS "enable_notifications"
 #define CONFIG_OPL_ENABLE_COVERART "enable_coverart"
 #define CONFIG_OPL_WIDESCREEN "wide_screen"

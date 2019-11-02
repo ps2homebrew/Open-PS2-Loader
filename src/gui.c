@@ -21,6 +21,7 @@
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 #include "include/sound.h"
+#include "include/guigame.h"
 
 #include <limits.h>
 #include <stdlib.h>
@@ -610,7 +611,6 @@ reselect_video_mode:
     diaSetInt(diaUIConfig, UICFG_LANG, lngGetGuiValue());
     diaSetInt(diaUIConfig, UICFG_AUTOSORT, gAutosort);
     diaSetInt(diaUIConfig, UICFG_AUTOREFRESH, gAutoRefresh);
-    diaSetInt(diaUIConfig, UICFG_INFOPAGE, gUseInfoScreen);
     diaSetInt(diaUIConfig, UICFG_NOTIFICATIONS, gEnableNotifications);
     diaSetInt(diaUIConfig, UICFG_COVERART, gEnableArt);
     diaSetInt(diaUIConfig, UICFG_WIDESCREEN, gWideScreen);
@@ -634,7 +634,6 @@ reselect_video_mode:
         }
         diaGetInt(diaUIConfig, UICFG_AUTOSORT, &gAutosort);
         diaGetInt(diaUIConfig, UICFG_AUTOREFRESH, &gAutoRefresh);
-        diaGetInt(diaUIConfig, UICFG_INFOPAGE, &gUseInfoScreen);
         diaGetInt(diaUIConfig, UICFG_NOTIFICATIONS, &gEnableNotifications);
         diaGetInt(diaUIConfig, UICFG_COVERART, &gEnableArt);
         diaGetInt(diaUIConfig, UICFG_WIDESCREEN, &gWideScreen);
@@ -1244,14 +1243,14 @@ int guiAlignSubMenuHints(int hintCount, int *textID, int *iconID, int font, int 
 void guiDrawSubMenuHints(void)
 {
     int subMenuHints[2] = {_STR_SELECT, _STR_GAMES_LIST};
-    int subMenuIcons[2] = {CROSS_ICON, CIRCLE_ICON};
+    int subMenuIcons[2] = {CIRCLE_ICON, CROSS_ICON};
 
     int x = guiAlignSubMenuHints(2, subMenuHints, subMenuIcons, gTheme->fonts[0], 12, 2);
     int y = gTheme->usedHeight - 32;
 
-    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[0], gTheme->fonts[0], x, y, gTheme->textColor);
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[0] : subMenuIcons[1], subMenuHints[0], gTheme->fonts[0], x, y, gTheme->textColor);
     x += 12;
-    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[0] : subMenuIcons[1], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
+    x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
 }
 
 static void guiDrawOverlays()
@@ -1536,6 +1535,20 @@ void guiHandleDeferedIO(int *ptr, const unsigned char *message, int type, void *
         guiRenderTextScreen(message);
 }
 
+void guiGameHandleDeferedIO(int *ptr, struct UIItem *ui, int type, void *data)
+{
+    ioPutRequest(type, data);
+
+    while (*ptr) {
+        guiStartFrame();
+        if (ui)
+            diaRenderUI(ui, screenHandler->inMenu, NULL, 0);
+        else
+            guiShow();
+        guiEndFrame();
+    }
+}
+
 void guiRenderTextScreen(const unsigned char *message)
 {
     guiStartFrame();
@@ -1615,4 +1628,62 @@ int guiConfirmVideoMode(void)
     }
 
     return terminate - 1;
+}
+
+int guiGameShowRemoveSettings(config_set_t *configSet, config_set_t *configGame)
+{
+    int terminate = 0;
+    char message[128];
+
+    sfxPlay(SFX_MESSAGE);
+
+    while (!terminate) {
+        guiStartFrame();
+
+        readPads();
+
+        if (getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE))
+            terminate = 1;
+        else if (getKeyOn(gSelectButton))
+            terminate = 2;
+        else if (getKeyOn(KEY_SQUARE))
+            terminate = 3;
+        else if (getKeyOn(KEY_TRIANGLE))
+            terminate = 4;
+
+        guiShow();
+
+        rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
+
+        rmDrawLine(50, 75, screenWidth - 50, 75, gColWhite);
+        rmDrawLine(50, 410, screenWidth - 50, 410, gColWhite);
+
+        fntRenderString(gTheme->fonts[0], screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, 0, 0, _l(_STR_GAME_SETTINGS_PROMPT), gTheme->textColor);
+
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CROSS_ICON : CIRCLE_ICON, _STR_BACK, gTheme->fonts[0], 500, 417, gTheme->selTextColor);
+        guiDrawIconAndText(SQUARE_ICON, _STR_GLOBAL_SETTINGS, gTheme->fonts[0], 213, 417, gTheme->selTextColor);
+        guiDrawIconAndText(TRIANGLE_ICON, _STR_ALL_SETTINGS, gTheme->fonts[0], 356, 417, gTheme->selTextColor);
+        guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? CIRCLE_ICON : CROSS_ICON, _STR_PERGAME_SETTINGS, gTheme->fonts[0], 70, 417, gTheme->selTextColor);
+
+        guiEndFrame();
+    }
+
+    if (terminate == 1) {
+        sfxPlay(SFX_CANCEL);
+        return 0;
+    } else if (terminate == 2) {
+        guiGameRemoveSettings(configSet);
+        snprintf(message, sizeof(message), _l(_STR_GAME_SETTINGS_REMOVED), _l(_STR_PERGAME_SETTINGS));
+    } else if (terminate == 3) {
+        guiGameRemoveGlobalSettings(configGame);
+        snprintf(message, sizeof(message), _l(_STR_GAME_SETTINGS_REMOVED), _l(_STR_GLOBAL_SETTINGS));
+    } else if (terminate == 4) {
+        guiGameRemoveSettings(configSet);
+        guiGameRemoveGlobalSettings(configGame);
+        snprintf(message, sizeof(message), _l(_STR_GAME_SETTINGS_REMOVED), _l(_STR_ALL_SETTINGS));
+    }
+    sfxPlay(SFX_CONFIRM);
+    guiMsgBox(message, 0, NULL);
+
+    return 1;
 }

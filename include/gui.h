@@ -143,6 +143,8 @@ void guiCheckNotifications(int checkTheme, int checkLang);
 */
 void guiHandleDeferedIO(int *ptr, const unsigned char *message, int type, void *data);
 
+void guiGameHandleDeferedIO(int *ptr, struct UIItem *ui, int type, void *data);
+
 /** Renders a single frame with a specified message on the screen
 */
 void guiRenderTextScreen(const unsigned char *message);
@@ -150,5 +152,7 @@ void guiRenderTextScreen(const unsigned char *message);
 void guiWarning(const char *text, int count);
 
 int guiConfirmVideoMode(void);
+
+int guiGameShowRemoveSettings(config_set_t *configSet, config_set_t *configGame);
 
 #endif

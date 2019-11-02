@@ -47,7 +47,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Cross",
     "Games List",
     "Game Settings",
-    "Remove All Settings",
+    "Remove Settings",
     "Removed all keys for the game.",
     "Scrolling",
     "Slow",
@@ -149,7 +149,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Video Mode",
     "Dialog Color",
     "Selected Color",
-    "Display Info Page",
+    "Unused", // string no longer used
     "Info",
     "Custom ELF",
     "Color Selection",
@@ -274,8 +274,13 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "%s loaded from %s",
     "Game Menu",
     "Game settings saved.",
-    "Game settings removed.",
+    "%s settings removed.",
     "Overwrites existing game compatibility settings when enabled.",
+    "Settings Mode",
+    "Global",
+    "Per Game",
+    "All",
+    "Select settings to remove.",
 };
 
 static int guiLangID = 0;

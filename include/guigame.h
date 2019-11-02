@@ -1,6 +1,9 @@
 #ifndef __GUIGAME_H
 #define __GUIGAME_H
 
+#define SETTINGS_GLOBAL 0
+#define SETTINGS_PERGAME 1
+
 int guiGameAltStartupNameHandler(char *text, int maxLen);
 
 char *gameConfigSource(void);
@@ -13,7 +16,9 @@ void guiGameShowCheatConfig(void);
 void guiGameShowPadEmuConfig(void);
 
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet);
-void guiGameSaveConfig(config_set_t *configSet, item_list_t *support);
-void guiGameRemoveSettings(config_set_t *configSet);
+int guiGameSaveConfig(config_set_t *configSet, item_list_t *support);
 void guiGameTestSettings(int id, item_list_t *support, config_set_t *configSet);
+
+void guiGameRemoveSettings(config_set_t *configSet);
+void guiGameRemoveGlobalSettings(config_set_t *configGame);
 #endif

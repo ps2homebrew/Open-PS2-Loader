@@ -60,7 +60,7 @@ static server_specs_t server_specs;
 #define NTLM_AUTH 1
 
 static u16 UID, TID;
-static int main_socket;
+static int main_socket = -1;
 
 static struct {
     //Direct transport packet header. This is also a NetBIOS session header.
@@ -794,17 +794,24 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 
 void smb_CloseAll(void)
 {
-    int i;
+    int i, fd;
 
     for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
-        smb_Close(cdvdman_settings.FIDs[i]);
+        fd = cdvdman_settings.FIDs[i];
+        if (fd >= 0) {
+            smb_Close(fd);
+            cdvdman_settings.FIDs[i] = -1;
+        }
     }
 }
 
 //-------------------------------------------------------------------------
 int smb_Disconnect(void)
 {
-    plwip_close(main_socket);
+    if (main_socket >= 0) {
+        plwip_close(main_socket);
+        main_socket = -1;
+    }
 
     return 1;
 }

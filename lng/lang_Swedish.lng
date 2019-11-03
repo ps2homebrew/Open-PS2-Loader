@@ -43,7 +43,7 @@ Cirkel
 Kryss
 Spel-lista
 Spelinst.
-Remove Settings
+Ta bort inställningar
 Tog bort alla nycklar för spelet
 Bläddra
 Sakta
@@ -270,13 +270,13 @@ Aktivera notifikationer
 %s Laddat från %s
 SpelMeny
 Spelinställningar sparade.
-%s settings removed.
+%s inställningar borttagna
 Skriver över befintliga spelinställningar om aktiverad.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
+Inställningsläge
+Globalt
+Per Sper
+Alla
+Välj inställningar att ta bort.
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

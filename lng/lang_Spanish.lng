@@ -43,7 +43,7 @@ Círculo
 Equis
 Lista de juegos
 Ajustes
-Remove Settings
+Eliminar configuración
 Ajustes del juego borrados
 Desplazamiento
 Lento
@@ -270,13 +270,13 @@ Activar notificaciones
 %s cargado desde %s
 Menú de Juegos
 Configuración de juego guardada
-%s settings removed.
+%s configuraciones eliminadas.
 Sobrescribe la configuración de compatibilidad de juego cuando está habilitado
-Settings Mode
+Modo Configuración
 Global
-Per Game
-All
-Select settings to remove.
+Por Juegos
+Todos
+Selecciona configuración a eliminar.
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

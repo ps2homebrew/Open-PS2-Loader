@@ -43,7 +43,7 @@ O
 X
 Lista de jogos
 Ajustes
-Remove Settings
+Remover configurações
 Todos os ajustes do jogo foram removidos
 Rolagem
 Lenta
@@ -270,13 +270,13 @@ Ativar notificações
 %s carregado de %s
 Menu do Jogo
 Configurações do jogo salvas.
-%s settings removed.
+%s configurações removidas.
 Substitui as configurações de compatibilidade de jogos existentes quando ativada.
-Settings Mode
+Modo de configurações
 Global
-Per Game
-All
-Select settings to remove.
+Por jogo
+Todos
+Selecione as configurações para remover.
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

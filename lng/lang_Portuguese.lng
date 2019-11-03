@@ -43,7 +43,7 @@ Circulo
 Cruz
 Lista de Jogos
 Aj. do jogo
-Remove Settings
+Remover configurações
 Removidos todos os ajustes para o jogo
 Rolagem
 Lento
@@ -270,13 +270,13 @@ Ativar notificações
 %s carregado de %s
 Menu de Jogo
 Configurações do jogo guardadas.
-%s settings removed.
+%s configurações removidas.
 Substitui configurações de compatibilidade de jogos existentes quando ativado.
-Settings Mode
+Modo de configurações
 Global
-Per Game
-All
-Select settings to remove.
+Por jogo
+Todos
+Selecione as configurações para remover.
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

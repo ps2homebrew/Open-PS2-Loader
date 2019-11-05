@@ -1,5 +1,5 @@
 # translated by verislasher and jbliz
-# Last update: Nov. 02, 2019
+# Last update: Nov. 03, 2019
 # Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
@@ -43,7 +43,7 @@ Bulat
 Kali
 Daftar Game
 Setingan
-Remove Settings
+Hapus setingan
 Semua kunci permainan yang dihapus
 Gulir
 Lambat
@@ -270,13 +270,13 @@ Izinkan Pemberitahuan
 %s dimuat dari %s
 Menu Game
 Pengaturan Game disimpan.
-%s settings removed.
+%s setingan dihapus.
 Timpa pengaturan kompatibilitas game yang ada ketika diaktifkan.
-Settings Mode
+Mode Setingan
 Global
 Per Game
-All
-Select settings to remove.
+Seluruh
+Pilih setingan untuk dihapus.
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

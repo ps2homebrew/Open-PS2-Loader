@@ -1,5 +1,5 @@
 # Translation by saeid0035
-# Last update: Nov. 02, 2019
+# Last update: Nov. 03, 2019
 # Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Persian
@@ -43,7 +43,7 @@ ETH یﺎﻫ یزﺎﺑ
 رﺪﺑﺮﺿ
 ﺎﻫ یزﺎﺑ ﺖﺴﻴﻟ
 ﺎﻫ یزﺎﺑ تﺎﻤﻴﻈﻨﺗ
-Remove Settings
+ﺕﺎﻤﻴﻈﻨﺗ ﻥﺩﺮﮐ ﮎﺎﭘ
 یزﺎﺑ یﺎﻫ ﺪﻴﻠﻛ مﺎﻤﺗ ندﺮﻛ کﺎﭘ
 لوﺮﻜﺳا ﺖﻋﺮﺳ
 ﻪﺘﺴﻫآ
@@ -108,7 +108,7 @@ USB یﺎﻫ یزﺎﺑ ﻲﮕﺘﺨﻳر ﻢﻬﺑ ندﺮﻛ ﮏﭼ
 بﺎﺨﺘﻧا ی ﻪﻤﻛد
 ﺖﺳا ﻪﺘﺨﻳر ﻢﻫ ﻪﺑ یزﺎﺑ یﺎﻫ ﻞﻳﺎﻓ هﺪﻣآ دﻮﺟو ﻪﺑ ﻲﻠﻜﺸﻣ
 ﺖﺴﻴﻧ ﺮﻳﺬﭘ نﺎﻜﻣا ﻢﺘﻳآ یاﺮﺟا هﺪﻣآ ﺶﻴﭘ ﻲﻠﻜﺸﻣ
-Test Changes
+ﺕﺍﺮﻴﻐﺗ ﺖﺴﺗ
 .ﺪﻳراﺬﮕﺑ ﻲﻟﺎﺧ سﺎﻨﺷﺎﻧ ترﻮﺻ ﻪﺑ دورو یاﺮﺑ
 Accurate Reads
 Synchronous ﺖﻟﺎﺣ
@@ -199,7 +199,7 @@ PS2RD ﺐﻠﻘﺗ ﺪﻛ رﻮﺗﻮﻣ ﺖﻟﺎﺣ
 ﺪﺸﻧ ﺖﻓﺎﻳ ﻲﺒﻠﻘﺗ ﺪﻛ ﭻﻴﻫ
 ﺎﻫ ضﺮﻓ ﺶﻴﭘ دﻮﻠﻧاد
 ﻪﻜﺒﺷ ﻖﻳﺮﻃ زا ﺖﻳﺪﭘآ
-Overwrite Existing Records
+ﺩﻮﺟﻮﻣ ﻖﺑﺍﻮﺳ ﺮﺑ ﻰﺳﻳﻮﻧﻭﺭ
 .درﻮﺧ ﺖﺴﻜﺷ ﺖﻳﺪﭘآ
 .هﺪﻣآ ﺶﻴﭘ ﻲﻠﻜﺸﻣ ﺖﻳﺪﭘآ روﺮﺳ ﻪﺑ لﺎﺼﺗا رد
 .ﺪﺷ ﻞﻴﻤﻜﺗ ﺖﻳﺪﭘا
@@ -268,15 +268,15 @@ FIELD flipping یزﺎﺳ ﻪﻴﺒﺷ
 )HDD( ﺎﻫ یزﺎﺑ ﺖﺳﺮﻬﻓ ﺶﻛ
 ﻰﻧﺎﺳﺭ ﻉﺎﻠﻃا ﻥﺩﺮﻛ ﻝﺎﻌﻓ
 ﺪﺷ ﻯﺭﺍﺬﮔ ﺭﺎﺑ %s زا %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
+ﻯﺯﺎﺑ ﻮﻨﻣ
+ﺪﺷ ﻩﺮﻴﺧﺫ ﻯﺯﺎﺑ ﺕﺎﻤﻴﻈﻨﺗ
+%s ﺪﺷ ﮎﺎﭘ %s ﺕﺎﻤﻴﻈﻨﺗ
+ﻥﺩﻮﺑ ﻝﺎﻌﻓ ﻢﺎﮕﻨﻫ ﻯﺯﺎﺑ ﺎﺑ ﺭﺎﮔﺯﺎﺳ ﺕﺎﻤﻴﻈﻨﺗ ﻰﺴﻳﻮﻧ ﻭﺭ
+ﺕﺎﻤﻴﻈﻨﺗ ﺖﻟﺎﺣ
+ﻯﺭﺍﺮﺳ
+ﻯﺯﺎﺑ ﺮﻫ ﺹﻮﺼﺨﻣ
+ﻪﻤﻫ
+ﺪﻴﻨﮐ ﺏﺎﺨﺘﻧﺍ ﺪﻴﻨﮐ ﮎﺎﭘ ﺪﻴﻫﺍﻮﺨﻴﻣ ﻪﻛ ﻰﺗﺎﻤﻴﻈﻨﺗ
 1 ﻦﺸﻴﺘﺳا ﻲﻠﭘ یﺎﻫ یزﺎﺑ
 1 ﻦﺸﻴﺘﺳا ﻲﻠﭘ یﺎﻫ یزﺎﺑ ﺶﻳﺎﻤﻧ ﺖﻟﺎﺣ
 !'%s' رد ﺪﺸﻧ ﺖﻓﺎﻳ POPSTARTER.ELF ﻞﻳﺎﻓ

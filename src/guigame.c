@@ -747,7 +747,6 @@ void guiGameShowPadEmuConfig(void)
 void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configSet)
 {
     int i;
-    int result = COMPAT_NOEXIT;
 
     if (support->flags & MODE_FLAG_COMPAT_DMA) {
         const char *dmaModes[] = {"MDMA 0", "MDMA 1", "MDMA 2", "UDMA 0", "UDMA 1", "UDMA 2", "UDMA 3", "UDMA 4", NULL};
@@ -757,9 +756,8 @@ void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configS
         diaSetEnum(diaCompatConfig, COMPAT_DMA, dmaModes);
     }
 
-    while (result >= COMPAT_NOEXIT) {
-        result = diaExecuteDialog(diaCompatConfig, result, 1, NULL);
-
+    int result = diaExecuteDialog(diaCompatConfig, -1, 1, NULL);
+    if (result) {
         compatMode = 0;
         for (i = 0; i < COMPAT_MODE_COUNT; ++i) {
             int mdpart;
@@ -774,10 +772,8 @@ void guiGameShowCompatConfig(int id, item_list_t *support, config_set_t *configS
                 guiMsgBox(_l(_STR_ERROR_LOADING_ID), 0, NULL);
         }
 
-        if (result == COMPAT_DL_DEFAULTS) {
+        if (result == COMPAT_DL_DEFAULTS)
             guiShowNetCompatUpdateSingle(id, support, configSet);
-            break;
-        }
 
         diaGetInt(diaCompatConfig, COMPAT_DMA, &dmaMode);
         diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));

@@ -1389,6 +1389,25 @@ void deinit(int exception, int modeSelected)
     configEnd();
 }
 
+void setDefaultColors(void)
+{
+    gDefaultBgColor[0] = 0x028;
+    gDefaultBgColor[1] = 0x0c5;
+    gDefaultBgColor[2] = 0x0f9;
+
+    gDefaultTextColor[0] = 0x0ff;
+    gDefaultTextColor[1] = 0x0ff;
+    gDefaultTextColor[2] = 0x0ff;
+
+    gDefaultSelTextColor[0] = 0x0ff;
+    gDefaultSelTextColor[1] = 0x080;
+    gDefaultSelTextColor[2] = 0x000;
+
+    gDefaultUITextColor[0] = 0x040;
+    gDefaultUITextColor[1] = 0x080;
+    gDefaultUITextColor[2] = 0x040;
+}
+
 static void setDefaults(void)
 {
     clearIOModuleT(&list_support[USB_MODE]);
@@ -1456,28 +1475,14 @@ static void setDefaults(void)
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
 
-    gDefaultBgColor[0] = 0x028;
-    gDefaultBgColor[1] = 0x0c5;
-    gDefaultBgColor[2] = 0x0f9;
-
-    gDefaultTextColor[0] = 0x0ff;
-    gDefaultTextColor[1] = 0x0ff;
-    gDefaultTextColor[2] = 0x0ff;
-
-    gDefaultSelTextColor[0] = 0x0ff;
-    gDefaultSelTextColor[1] = 0x080;
-    gDefaultSelTextColor[2] = 0x000;
-
-    gDefaultUITextColor[0] = 0x040;
-    gDefaultUITextColor[1] = 0x080;
-    gDefaultUITextColor[2] = 0x040;
-
     frameCounter = 0;
 
     gVMode = 0;
     gXOff = 0;
     gYOff = 0;
     gOverscan = 0;
+
+    setDefaultColors();
 
     // Last Played Auto Start
     KeyPressedOnce = 0;

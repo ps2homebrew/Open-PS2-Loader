@@ -287,6 +287,9 @@ struct UIItem diaUIConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_BGCOLOR}}},
     {UI_SPACER},
     {UI_COLOUR, UICFG_BGCOL, 1, 1, -1, -10, 17, {.colourvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_BUTTON, UICFG_RESETCOL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RESETCOLOR}}},
     {UI_SPLITTER},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_VMODE}}},

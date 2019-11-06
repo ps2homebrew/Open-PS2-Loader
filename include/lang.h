@@ -146,7 +146,7 @@ enum _STR_IDS {
     _STR_VMODE,
     _STR_UICOLOR,
     _STR_SELCOLOR,
-    _STR_USE_INFO_SCREEN, // string no longer used
+    _STR_RESETCOLOR,
     _STR_INFO,
     _STR_ALTSTARTUP,
     _STR_COLOR_SELECTION,

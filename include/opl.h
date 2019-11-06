@@ -187,6 +187,8 @@ unsigned char gDefaultTextColor[3];
 unsigned char gDefaultSelTextColor[3];
 unsigned char gDefaultUITextColor[3];
 
+void setDefaultColors(void);
+
 #define MENU_ITEM_HEIGHT 19
 
 // BLURT output

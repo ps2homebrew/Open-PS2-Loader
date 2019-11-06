@@ -149,7 +149,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Video Mode",
     "Dialog Color",
     "Selected Color",
-    "Unused", // string no longer used
+    "Reset Colors",
     "Info",
     "Custom ELF",
     "Color Selection",

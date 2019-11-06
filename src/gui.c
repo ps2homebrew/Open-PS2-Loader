@@ -551,6 +551,7 @@ static int guiUIUpdater(int modified)
             diaSetEnabled(diaUIConfig, UICFG_UICOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_TXTCOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_SELCOL, temp);
+            diaSetEnabled(diaUIConfig, UICFG_RESETCOL, temp);
         }
 
         diaGetInt(diaUIConfig, UICFG_XOFF, &x);
@@ -641,6 +642,9 @@ reselect_video_mode:
         diaGetInt(diaUIConfig, UICFG_XOFF, &gXOff);
         diaGetInt(diaUIConfig, UICFG_YOFF, &gYOff);
         diaGetInt(diaUIConfig, UICFG_OVERSCAN, &gOverscan);
+
+        if (ret == UICFG_RESETCOL)
+            setDefaultColors();
 
         applyConfig(themeID, langID);
         //wait 70ms for confirm sound to finish playing before clearing buffer

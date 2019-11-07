@@ -1,5 +1,5 @@
 # Translation by machiavel and Squall
-# Last update: Nov. 02, 2019
+# Last update: Nov. 06, 2019
 # Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
@@ -9,7 +9,7 @@ Retour
 Configuration réseau
 Options avancées
 <vide>
-Settings saved to %s
+Paramètres sauvegardés vers %s
 Erreur d'écriture des options!
 Quitter
 Options
@@ -43,7 +43,7 @@ Cercle
 Croix
 Liste des jeux
 Options du jeu
-Remove Settings
+Supprimer les paramètres
 Options du jeu supprimées
 Défilement
 Lent
@@ -108,7 +108,7 @@ Souvenir dernier jeu joué
 Bouton de sélection
 Erreur, le jeu est fragmenté
 Erreur, impossible de lancer l'objet
-Test Changes
+Tester les changements
 Laissez vide pour authentification invité
 Lecture précise (simule la vitesse de lecture du CD/DVD)
 Mode synchrone (mode de lecture alternatif)
@@ -133,7 +133,7 @@ Progression
 Fichier VMC existant
 Fichier VMC invalide, taille incorrecte
 Fichier VMC doit d'abord être créé
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Erreur d'accès à la VMC %s. Continuer avec la Memory Card dans le slot %d?
 Rafraîchissement automatique
 À propos
 Codeurs
@@ -199,7 +199,7 @@ Erreur: Impossible de charger le fichier de cheat
 Aucun cheat trouvé
 Télécharger les régl. par défaut
 Mise à jour réseau
-Overwrite Existing Records
+Ecraser les enregistrements existants
 Mise à jour échouée
 Échec de connexion au serveur
 Mise à jour terminée.
@@ -266,17 +266,17 @@ Volume des effets sonore
 Volume du son de démarrage
 Confirmer le changement du mode vidéo?
 Cache liste de jeu (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
+Activer les Notifications
+%s chargé depuis %s
+Menu du jeu
+Supprimer les paramètres
+%s paramètres supprimés
+Écrase les paramètres de compatibilité de jeu existants lorsqu'il est activé.
+Mode Paramètres
 Global
-Per Game
-All
-Select settings to remove.
+Par jeu
+Tout
+Sélectionnez les paramètres à supprimer.
 PS1 Games
 Mode d'affichage des jeux PS1
 POPSTARTER.ELF non trouvé à '%s'!

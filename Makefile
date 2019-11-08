@@ -62,8 +62,15 @@ FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
 		left_icon.o right_icon.o up_icon.o down_icon.o \
-		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o freesans.o \
-		icon_sys.o icon_icn.o
+		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o \
+		background.o info.o cover.o disc.o screen.o logo.o case.o \
+		ELF.o HDL.o ISO.o UL.o CD.o DVD.o Aspect_s.o Aspect_w.o Aspect_w1.o Aspect_w2.o \
+		Device_1.o Device_2.o Device_3.o Device_4.o Device_5.o Device_6.o Device_all.o \
+		Rating_0.o Rating_1.o Rating_2.o Rating_3.o Rating_4.o Rating_5.o \
+		Scan_240p.o Scan_240p1.o Scan_480i.o Scan_480p.o Scan_480p1.o Scan_480p2.o \
+		Scan_480p3.o Scan_480p4.o Scan_480p5.o Scan_576i.o Scan_576p.o Scan_720p.o \
+		Scan_1080i.o Scan_1080i2.o Scan_1080p.o Vmode_multi.o Vmode_ntsc.o Vmode_pal.o \
+		freesans.o icon_sys.o icon_icn.o
 
 MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o \
 		boot.o cancel.o confirm.o cursor.o message.o transition.o
@@ -651,12 +658,6 @@ $(EE_ASM_DIR)load6.s: gfx/load6.png | $(EE_ASM_DIR)
 $(EE_ASM_DIR)load7.s: gfx/load7.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ load7_png
 
-$(EE_ASM_DIR)logo.s: gfx/logo.png | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ logo_png
-
-$(EE_ASM_DIR)bg_overlay.s: gfx/bg_overlay.png | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ bg_overlay_png
-
 $(EE_ASM_DIR)usb_icon.s: gfx/usb.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_png
 
@@ -698,6 +699,150 @@ $(EE_ASM_DIR)up_icon.s: gfx/up.png | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)down_icon.s: gfx/down.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ down_png
+
+$(EE_ASM_DIR)background.s: gfx/background.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ background_png
+
+$(EE_ASM_DIR)info.s: gfx/info.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ info_png
+
+$(EE_ASM_DIR)cover.s: gfx/cover.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ cover_png
+
+$(EE_ASM_DIR)disc.s: gfx/disc.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ disc_png
+
+$(EE_ASM_DIR)screen.s: gfx/screen.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ screen_png
+
+$(EE_ASM_DIR)ELF.s: gfx/ELF.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ELF_png
+
+$(EE_ASM_DIR)HDL.s: gfx/HDL.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ HDL_png
+
+$(EE_ASM_DIR)ISO.s: gfx/ISO.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ISO_png
+
+$(EE_ASM_DIR)UL.s: gfx/UL.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ UL_png
+
+$(EE_ASM_DIR)CD.s: gfx/CD.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ CD_png
+
+$(EE_ASM_DIR)DVD.s: gfx/DVD.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ DVD_png
+
+$(EE_ASM_DIR)Aspect_s.s: gfx/Aspect_s.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Aspect_s_png
+
+$(EE_ASM_DIR)Aspect_w.s: gfx/Aspect_w.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Aspect_w_png
+
+$(EE_ASM_DIR)Aspect_w1.s: gfx/Aspect_w1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Aspect_w1_png
+
+$(EE_ASM_DIR)Aspect_w2.s: gfx/Aspect_w2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Aspect_w2_png
+
+$(EE_ASM_DIR)Device_1.s: gfx/Device_1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_1_png
+
+$(EE_ASM_DIR)Device_2.s: gfx/Device_2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_2_png
+
+$(EE_ASM_DIR)Device_3.s: gfx/Device_3.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_3_png
+
+$(EE_ASM_DIR)Device_4.s: gfx/Device_4.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_4_png
+
+$(EE_ASM_DIR)Device_5.s: gfx/Device_5.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_5_png
+
+$(EE_ASM_DIR)Device_6.s: gfx/Device_6.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_6_png
+
+$(EE_ASM_DIR)Device_all.s: gfx/Device_all.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Device_all_png
+
+$(EE_ASM_DIR)Rating_0.s: gfx/Rating_0.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Rating_0_png
+
+$(EE_ASM_DIR)Rating_1.s: gfx/Rating_1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Rating_1_png
+
+$(EE_ASM_DIR)Rating_2.s: gfx/Rating_2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Rating_2_png
+
+$(EE_ASM_DIR)Rating_3.s: gfx/Rating_3.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Rating_3_png
+
+$(EE_ASM_DIR)Rating_4.s: gfx/Rating_4.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Rating_4_png
+
+$(EE_ASM_DIR)Rating_5.s: gfx/Rating_5.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Rating_5_png
+
+$(EE_ASM_DIR)Scan_240p.s: gfx/Scan_240p.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_240p_png
+
+$(EE_ASM_DIR)Scan_240p1.s: gfx/Scan_240p1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_240p1_png
+
+$(EE_ASM_DIR)Scan_480i.s: gfx/Scan_480i.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480i_png
+
+$(EE_ASM_DIR)Scan_480p.s: gfx/Scan_480p.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480p_png
+
+$(EE_ASM_DIR)Scan_480p1.s: gfx/Scan_480p1.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480p1_png
+
+$(EE_ASM_DIR)Scan_480p2.s: gfx/Scan_480p2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480p2_png
+
+$(EE_ASM_DIR)Scan_480p3.s: gfx/Scan_480p3.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480p3_png
+
+$(EE_ASM_DIR)Scan_480p4.s: gfx/Scan_480p4.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480p4_png
+
+$(EE_ASM_DIR)Scan_480p5.s: gfx/Scan_480p5.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_480p5_png
+
+$(EE_ASM_DIR)Scan_576i.s: gfx/Scan_576i.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_576i_png
+
+$(EE_ASM_DIR)Scan_576p.s: gfx/Scan_576p.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_576p_png
+
+$(EE_ASM_DIR)Scan_720p.s: gfx/Scan_720p.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_720p_png
+
+$(EE_ASM_DIR)Scan_1080i.s: gfx/Scan_1080i.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_1080i_png
+
+$(EE_ASM_DIR)Scan_1080i2.s: gfx/Scan_1080i2.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_1080i2_png
+
+$(EE_ASM_DIR)Scan_1080p.s: gfx/Scan_1080p.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Scan_1080p_png
+
+$(EE_ASM_DIR)Vmode_multi.s: gfx/Vmode_multi.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Vmode_multi_png
+
+$(EE_ASM_DIR)Vmode_ntsc.s: gfx/Vmode_ntsc.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Vmode_ntsc_png
+
+$(EE_ASM_DIR)Vmode_pal.s: gfx/Vmode_pal.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ Vmode_pal_png
+
+$(EE_ASM_DIR)logo.s: gfx/logo.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ logo_png
+
+$(EE_ASM_DIR)case.s: gfx/case.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ case_png
 
 $(EE_ASM_DIR)freesans.s: thirdparty/PoeVeticaNew.ttf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ freesansfont_raw

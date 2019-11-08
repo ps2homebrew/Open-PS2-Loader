@@ -927,31 +927,31 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
                     initBackground(themePath, themeConfig, theme, elem, name, NULL, 1, NULL);
                 }
             } else if (!strcmp(elementsType[ELEM_TYPE_MENU_ICON], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_ICON, 40, 40, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_ICON, screenWidth >> 1, 400, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
                 elem->drawElem = &drawMenuIcon;
             } else if (!strcmp(elementsType[ELEM_TYPE_MENU_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawMenuText;
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEMS_LIST], type)) {
                 if (!theme->itemsList) {
-                    elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                    elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 0, 0, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                     initItemsList(themePath, themeConfig, theme, elem, name, NULL);
                     theme->itemsList = elem;
                 }
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEM_ICON], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 80, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
                 initGameImage(themePath, themeConfig, theme, elem, name, "ICO", 20, NULL, NULL);
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEM_COVER], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 520, theme->usedHeight >> 1, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_GAME_IMAGE, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
                 initGameImage(themePath, themeConfig, theme, elem, name, "COV", 10, NULL, NULL);
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEM_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEM_TEXT, 520, 370, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEM_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawItemText;
             } else if (!strcmp(elementsType[ELEM_TYPE_HINT_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_HINT_TEXT, screenWidth >> 1, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawHintText;
             } else if (!strcmp(elementsType[ELEM_TYPE_INFO_HINT_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_INFO_HINT_TEXT, screenWidth >> 1, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawInfoHintText;
             } else if (!strcmp(elementsType[ELEM_TYPE_LOADING_ICON], type)) {
                 if (!theme->loadingIcon)
@@ -1213,6 +1213,10 @@ static void thmLoad(const char *themePath)
     /* Not customizable icons - currently unused.
     for (i = L1_ICON; i <= R3_ICON; i++)
         thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1); */
+
+	if (!themePath)
+        for (i = ELF_FORMAT; i <= VMODE_PAL; i++)
+            thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1);
 
     gTheme = newT;
     thmFree(curT);

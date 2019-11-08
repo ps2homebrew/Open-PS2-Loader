@@ -1399,13 +1399,13 @@ void setDefaultColors(void)
     gDefaultTextColor[1] = 0x0ff;
     gDefaultTextColor[2] = 0x0ff;
 
-    gDefaultSelTextColor[0] = 0x0ff;
-    gDefaultSelTextColor[1] = 0x080;
-    gDefaultSelTextColor[2] = 0x000;
+    gDefaultSelTextColor[0] = 0x000;
+    gDefaultSelTextColor[1] = 0x0ae;
+    gDefaultSelTextColor[2] = 0x0ff;
 
-    gDefaultUITextColor[0] = 0x040;
-    gDefaultUITextColor[1] = 0x080;
-    gDefaultUITextColor[2] = 0x040;
+    gDefaultUITextColor[0] = 0x058;
+    gDefaultUITextColor[1] = 0x068;
+    gDefaultUITextColor[2] = 0x0b4;
 }
 
 static void setDefaults(void)

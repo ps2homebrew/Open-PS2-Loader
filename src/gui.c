@@ -974,7 +974,7 @@ static void guiDrawBusy()
 static int wfadeout = 0x80;
 static void guiRenderGreeting()
 {
-    u64 mycolor = GS_SETREG_RGBA(0x00, 0x00, 0x00, wfadeout);
+    u64 mycolor = GS_SETREG_RGBA(0x1C, 0x1C, 0x1C, wfadeout);
     rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 
     GSTEXTURE *logo = thmGetTexture(LOGO_PICTURE);
@@ -1264,12 +1264,12 @@ static void guiDrawOverlays()
 
     if (!pending) {
         if (bfadeout > 0x0)
-            bfadeout -= 0x08;
+            bfadeout -= 0x04;
         else
             bfadeout = 0x0;
     } else {
         if (bfadeout < 0x80)
-            bfadeout += 0x08;
+            bfadeout += 0x04;
     }
 
     if (bfadeout > 0 && !toggleSfx)

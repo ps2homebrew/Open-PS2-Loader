@@ -699,7 +699,7 @@ $(EE_ASM_DIR)up_icon.s: gfx/up.png | $(EE_ASM_DIR)
 $(EE_ASM_DIR)down_icon.s: gfx/down.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ down_png
 
-$(EE_ASM_DIR)freesans.s: thirdparty/FreeSans_basic_latin.ttf | $(EE_ASM_DIR)
+$(EE_ASM_DIR)freesans.s: thirdparty/PoeVeticaNew.ttf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ freesansfont_raw
 
 $(EE_ASM_DIR)icon_sys.s: gfx/icon.sys | $(EE_ASM_DIR)

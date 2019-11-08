@@ -295,9 +295,21 @@ static image_texture_t *initImageTexture(const char *themePath, config_set_t *th
     texPrepare(&texture->source, psm);
     texture->name = NULL;
 
-    char path[256];
-    snprintf(path, sizeof(path), "%s%s", themePath, imgName);
-    if (texDiscoverLoad(&texture->source, path, -1, psm) >= 0) {
+    int texId = -1;
+    int result = 0;
+
+    if (themePath) {
+        char path[256];
+        snprintf(path, sizeof(path), "%s%s", themePath, imgName);
+        if (texDiscoverLoad(&texture->source, path, texId, psm) >= 0);
+            result = 1;
+    } else {
+        texId = texLookupInternalTexId(imgName);
+        if (texDiscoverLoad(&texture->source, NULL, texId, psm) >= 0);
+            result = 1;
+    }
+
+    if (result) {
         int length = strlen(imgName) + 1;
         texture->name = (char *)malloc(length * sizeof(char));
         memcpy(texture->name, imgName, length);
@@ -347,6 +359,9 @@ static image_texture_t *initImageInternalTexture(config_set_t *themeConfig, cons
 
     if ((result = texLookupInternalTexId(name)) >= 0) {
         result = texDiscoverLoad(&texture->source, NULL, result, GS_PSM_CT24);
+        int length = strlen(name) + 1;
+        texture->name = (char *)malloc(length * sizeof(char));
+        memcpy(texture->name, name, length);
     }
 
     if (result < 0) {
@@ -395,7 +410,7 @@ static mutable_image_t *initMutableImage(const char *themePath, config_set_t *th
         snprintf(elemProp, sizeof(elemProp), "%s_attribute", name);
         configGetStr(themeConfig, elemProp, &cachePattern);
         LOG("THEMES MutableImage %s: type: %s using cache pattern: %s\n", name, elementsType[type], cachePattern);
-    } else if ((type == ELEM_TYPE_GAME_IMAGE) || type == (ELEM_TYPE_BACKGROUND)) {
+    } else if ((type == ELEM_TYPE_GAME_IMAGE) || (type == ELEM_TYPE_BACKGROUND)) {
         snprintf(elemProp, sizeof(elemProp), "%s_pattern", name);
         configGetStr(themeConfig, elemProp, &cachePattern);
         snprintf(elemProp, sizeof(elemProp), "%s_count", name);
@@ -421,22 +436,15 @@ static mutable_image_t *initMutableImage(const char *themePath, config_set_t *th
             mutableImage->cache = cacheInitCache(theme->gameCacheCount++, "ART", 1, cachePattern, cacheCount);
     }
 
-    if (themePath != NULL) {
+    if (!themePath)
         if (defaultTexture && !mutableImage->defaultTexture)
-            mutableImage->defaultTexture = initImageTexture(themePath, themeConfig, name, defaultTexture, 0);
-
-        if (overlayTexture && !mutableImage->overlayTexture)
-            mutableImage->overlayTexture = initImageTexture(themePath, themeConfig, name, overlayTexture, 1);
-    }
+            mutableImage->defaultTexture = initImageInternalTexture(themeConfig, defaultTexture);
 
     if (defaultTexture && !mutableImage->defaultTexture)
-        mutableImage->defaultTexture = initImageInternalTexture(themeConfig, defaultTexture);
+        mutableImage->defaultTexture = initImageTexture(themePath, themeConfig, name, defaultTexture, 0);
 
     if (overlayTexture && !mutableImage->overlayTexture)
-        mutableImage->overlayTexture = initImageInternalTexture(themeConfig, overlayTexture);
-
-    if (!mutableImage->defaultTexture && !mutableImage->overlayTexture)
-        mutableImage->defaultTexture = initImageInternalTexture(themeConfig, name);
+        mutableImage->overlayTexture = initImageTexture(themePath, themeConfig, name, overlayTexture, 1);
 
     return mutableImage;
 }

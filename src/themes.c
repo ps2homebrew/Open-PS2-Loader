@@ -136,12 +136,12 @@ static mutable_text_t *initMutableText(const char *themePath, config_set_t *them
             else
                 alias = value;
         }
-        length = strlen(alias) + 1 + 3;
+        length = strlen(alias) + 1 + 2;
         mutableText->alias = (char *)malloc(length * sizeof(char));
         if (mutableText->sizingMode == SIZING_WRAP)
-            snprintf(mutableText->alias, length, "%s :\n", alias);
+            snprintf(mutableText->alias, length, "%s:\n", alias);
         else
-            snprintf(mutableText->alias, length, "%s : ", alias);
+            snprintf(mutableText->alias, length, "%s: ", alias);
     } else {
         if (mutableText->sizingMode == SIZING_WRAP)
             fntFitString(elem->font, mutableText->value, elem->width);
@@ -192,14 +192,25 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
             }
         }
         if (mutableText->currentValue) {
+            char result[300];
             if (mutableText->displayMode == DISPLAY_NEVER) {
-                if (mutableText->sizingMode == SIZING_NONE)
-                    fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->currentValue, elem->color);
-                else
-                    fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
+			    if (!strcmp(mutableText->alias, "Size: ")) {
+                    snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
+                    if (mutableText->sizingMode == SIZING_NONE)
+                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
+                    else
+                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
+                } else {
+                    if (mutableText->sizingMode == SIZING_NONE)
+                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->currentValue, elem->color);
+                    else
+                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
+                }
             } else {
-                char result[300];
-                snprintf(result, sizeof(result), "%s%s", mutableText->alias, mutableText->currentValue);
+			    if (!strcmp(mutableText->alias, "Size: "))
+                    snprintf(result, sizeof(result), "%s%s MiB", mutableText->alias, mutableText->currentValue);
+                else
+                    snprintf(result, sizeof(result), "%s%s", mutableText->alias, mutableText->currentValue);
                 if (mutableText->sizingMode == SIZING_NONE)
                     fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
                 else

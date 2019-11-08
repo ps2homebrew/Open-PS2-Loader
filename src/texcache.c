@@ -89,9 +89,13 @@ image_cache_t *cacheInitCache(int userId, const char *prefix, int isPrefixRelati
     image_cache_t *cache = (image_cache_t *)malloc(sizeof(image_cache_t));
     cache->userId = userId;
     cache->count = count;
-    int length = strlen(prefix) + 1;
-    cache->prefix = (char *)malloc(length * sizeof(char));
-    memcpy(cache->prefix, prefix, length);
+    cache->prefix = NULL;
+    int length;
+    if (prefix) {
+        length = strlen(prefix) + 1;
+        cache->prefix = (char *)malloc(length * sizeof(char));
+        memcpy(cache->prefix, prefix, length);
+    }
     cache->isPrefixRelative = isPrefixRelative;
     length = strlen(suffix) + 1;
     cache->suffix = (char *)malloc(length * sizeof(char));

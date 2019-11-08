@@ -36,7 +36,56 @@ extern void *R1_png;
 extern void *R2_png;
 extern void *R3_png; */
 
+extern void *background_png;
+extern void *info_png;
+extern void *cover_png;
+extern void *disc_png;
+extern void *screen_png;
+
+extern void *ELF_png;
+extern void *HDL_png;
+extern void *ISO_png;
+extern void *UL_png;
+extern void *CD_png;
+extern void *DVD_png;
+extern void *Aspect_s_png;
+extern void *Aspect_w_png;
+extern void *Aspect_w1_png;
+extern void *Aspect_w2_png;
+extern void *Device_1_png;
+extern void *Device_2_png;
+extern void *Device_3_png;
+extern void *Device_4_png;
+extern void *Device_5_png;
+extern void *Device_6_png;
+extern void *Device_all_png;
+extern void *Rating_0_png;
+extern void *Rating_1_png;
+extern void *Rating_2_png;
+extern void *Rating_3_png;
+extern void *Rating_4_png;
+extern void *Rating_5_png;
+extern void *Scan_240p_png;
+extern void *Scan_240p1_png;
+extern void *Scan_480i_png;
+extern void *Scan_480p_png;
+extern void *Scan_480p1_png;
+extern void *Scan_480p2_png;
+extern void *Scan_480p3_png;
+extern void *Scan_480p4_png;
+extern void *Scan_480p5_png;
+extern void *Scan_576i_png;
+extern void *Scan_576p_png;
+extern void *Scan_720p_png;
+extern void *Scan_1080i_png;
+extern void *Scan_1080i2_png;
+extern void *Scan_1080p_png;
+extern void *Vmode_multi_png;
+extern void *Vmode_ntsc_png;
+extern void *Vmode_pal_png;
+
 extern void *logo_png;
+extern void *case_png;
 
 // Not related to screen size, just to limit at some point
 static int maxSize = 720*512*4;
@@ -78,7 +127,54 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {R1_ICON, "R1", &R1_png},
     {R2_ICON, "R2", &R2_png},
     {R3_ICON, "R3", &R3_png}, */
+    {MAIN_BG, "background", &background_png},
+    {INFO_BG, "info", &info_png},
+    {COVER_DEFAULT, "cover", &cover_png},
+    {DISC_DEFAULT, "disc", &disc_png},
+    {SCREEN_DEFAULT, "screen", &screen_png},
+    {ELF_FORMAT, "ELF", &ELF_png},
+    {HDL_FORMAT, "HDL", &HDL_png},
+    {ISO_FORMAT, "ISO", &ISO_png},
+    {UL_FORMAT, "UL", &UL_png},
+    {CD_MEDIA, "CD", &CD_png},
+    {DVD_MEDIA, "DVD", &DVD_png},
+    {ASPECT_STD, "Aspect_s", &Aspect_s_png},
+    {ASPECT_WIDE, "Aspect_w", &Aspect_w_png},
+    {ASPECT_WIDE1, "Aspect_w1", &Aspect_w1_png},
+    {ASPECT_WIDE2, "Aspect_w2", &Aspect_w2_png},
+    {DEVICE_1, "Device_1", &Device_1_png},
+    {DEVICE_2, "Device_2", &Device_2_png},
+    {DEVICE_3, "Device_3", &Device_3_png},
+    {DEVICE_4, "Device_4", &Device_4_png},
+    {DEVICE_5, "Device_5", &Device_5_png},
+    {DEVICE_6, "Device_6", &Device_6_png},
+    {DEVICE_ALL, "Device_all", &Device_all_png},
+    {RATING_0, "Rating_0", &Rating_0_png},
+    {RATING_1, "Rating_1", &Rating_1_png},
+    {RATING_2, "Rating_2", &Rating_2_png},
+    {RATING_3, "Rating_3", &Rating_3_png},
+    {RATING_4, "Rating_4", &Rating_4_png},
+    {RATING_5, "Rating_5", &Rating_5_png},
+    {SCAN_240P, "Scan_240p", &Scan_240p_png},
+    {SCAN_240P1, "Scan_240p1", &Scan_240p1_png},
+    {SCAN_480I, "Scan_480i", &Scan_480i_png},
+    {SCAN_480P, "Scan_480p", &Scan_480p_png},
+    {SCAN_480P1, "Scan_480p1", &Scan_480p1_png},
+    {SCAN_480P2, "Scan_480p2", &Scan_480p2_png},
+    {SCAN_480P3, "Scan_480p3", &Scan_480p3_png},
+    {SCAN_480P4, "Scan_480p4", &Scan_480p4_png},
+    {SCAN_480P5, "Scan_480p5", &Scan_480p5_png},
+    {SCAN_576I, "Scan_576i", &Scan_576i_png},
+    {SCAN_576P, "Scan_576p", &Scan_576p_png},
+    {SCAN_720P, "Scan_720p", &Scan_720p_png},
+    {SCAN_1080I, "Scan_1080i", &Scan_1080i_png},
+    {SCAN_1080I2, "Scan_1080i2", &Scan_1080i2_png},
+    {SCAN_1080P, "Scan_1080p", &Scan_1080p_png},
+    {VMODE_MULTI, "Vmode_multi", &Vmode_multi_png},
+    {VMODE_NTSC, "Vmode_ntsc", &Vmode_ntsc_png},
+    {VMODE_PAL, "Vmode_pal", &Vmode_pal_png},
     {LOGO_PICTURE, "logo", &logo_png},
+    {CASE_OVERLAY, "case", &case_png},
 };
 
 int texLookupInternalTexId(const char *name)

@@ -848,10 +848,7 @@ static void validateGUIElems(const char *themePath, config_set_t *themeConfig, t
     if (!theme->mainElems.first || (theme->mainElems.first->type != ELEM_TYPE_BACKGROUND)) {
         LOG("THEMES No valid background found for main, add default BG_ART\n");
         theme_element_t *backgroundElem = initBasic(themePath, themeConfig, theme, "bg", ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
-        if (themePath)
-            initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
-        else
-            initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, NULL);
+        initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, NULL);
         backgroundElem->next = theme->mainElems.first;
         theme->mainElems.first = backgroundElem;
     }
@@ -860,10 +857,7 @@ static void validateGUIElems(const char *themePath, config_set_t *themeConfig, t
         if (theme->infoElems.first->type != ELEM_TYPE_BACKGROUND) {
             LOG("THEMES No valid background found for info, add default BG_ART\n");
             theme_element_t *backgroundElem = initBasic(themePath, themeConfig, theme, "bg", ELEM_TYPE_BACKGROUND, 0, 0, ALIGN_NONE, screenWidth, screenHeight, SCALING_NONE, gDefaultCol, theme->fonts[0]);
-            if (themePath)
-                initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, "background");
-            else
-                initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, NULL);
+            initBackground(themePath, themeConfig, theme, backgroundElem, "bg", "BG", 1, NULL);
             backgroundElem->next = theme->infoElems.first;
             theme->infoElems.first = backgroundElem;
         }
@@ -892,7 +886,7 @@ static void validateGUIElems(const char *themePath, config_set_t *themeConfig, t
         }
     } else {
         LOG("THEMES No itemsList found, adding a default one\n");
-        theme->itemsList = initBasic(themePath, themeConfig, theme, "il", ELEM_TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+        theme->itemsList = initBasic(themePath, themeConfig, theme, "il", ELEM_TYPE_ITEMS_LIST, 42, 42, ALIGN_NONE, 373, 316, SCALING_RATIO, theme->textColor, theme->fonts[0]);
         initItemsList(themePath, themeConfig, theme, theme->itemsList, "il", NULL);
         theme->itemsList->next = theme->mainElems.first->next; // Position the itemsList as second element (right after the Background)
         theme->mainElems.first->next = theme->itemsList;
@@ -1182,16 +1176,17 @@ static void thmLoad(const char *themePath)
     while (addGUIElem(themePath, themeConfig, newT, &newT->infoElems, NULL, path))
         snprintf(path, sizeof(path), "info%d", i++);
 
-    validateGUIElems(themePath, themeConfig, newT);
+    if (themePath)
+        validateGUIElems(themePath, themeConfig, newT);
+
     configFree(themeConfig);
 
     LOG("THEMES Number of cache: %d\n", newT->gameCacheCount);
     LOG("THEMES Used height: %d\n", newT->usedHeight);
 
     // default all to not loaded...
-    for (i = 0; i < TEXTURES_COUNT; i++) {
+    for (i = 0; i < TEXTURES_COUNT; i++)
         newT->textures[i].Mem = NULL;
-    }
 
     // LOGO, loaded here to avoid flickering during startup with device in AUTO + theme set
     texPngLoad(&newT->textures[LOGO_PICTURE], NULL, LOGO_PICTURE, GS_PSM_CT24);

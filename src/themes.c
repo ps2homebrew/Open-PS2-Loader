@@ -1179,9 +1179,9 @@ static void thmLoad(const char *themePath)
     for (i = USB_ICON; i <= START_ICON; i++)
         thmLoadResource(&newT->textures[i], i, themePath, GS_PSM_CT32, newT->useDefault);
 
-    // Not  customizable icons
-    for (i = L1_ICON; i <= R2_ICON; i++)
-        thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1);
+    /* Not customizable icons - currently unused.
+    for (i = L1_ICON; i <= R3_ICON; i++)
+        thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1); */
 
     gTheme = newT;
     thmFree(curT);

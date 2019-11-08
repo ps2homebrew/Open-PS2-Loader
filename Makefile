@@ -61,7 +61,7 @@ FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
-		left_icon.o right_icon.o up_icon.o down_icon.o L1_icon.o L2_icon.o R1_icon.o R2_icon.o \
+		left_icon.o right_icon.o up_icon.o down_icon.o \
 		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o logo.o bg_overlay.o freesans.o \
 		icon_sys.o icon_icn.o
 
@@ -698,18 +698,6 @@ $(EE_ASM_DIR)up_icon.s: gfx/up.png | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)down_icon.s: gfx/down.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ down_png
-
-$(EE_ASM_DIR)L1_icon.s: gfx/L1.png | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ L1_png
-
-$(EE_ASM_DIR)L2_icon.s: gfx/L2.png | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ L2_png
-
-$(EE_ASM_DIR)R1_icon.s: gfx/R1.png | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ R1_png
-
-$(EE_ASM_DIR)R2_icon.s: gfx/R2.png | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ R2_png
 
 $(EE_ASM_DIR)freesans.s: thirdparty/FreeSans_basic_latin.ttf | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ freesansfont_raw

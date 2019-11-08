@@ -24,12 +24,14 @@ enum INTERNAL_TEXTURE {
     SQUARE_ICON,
     SELECT_ICON,
     START_ICON,
+    /* currently unused.
     L1_ICON,
     L2_ICON,
+    L3_ICON,
     R1_ICON,
     R2_ICON,
+    R3_ICON, */
     LOGO_PICTURE,
-    BG_OVERLAY,
 
     TEXTURES_COUNT
 };

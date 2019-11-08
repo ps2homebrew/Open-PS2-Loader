@@ -28,13 +28,15 @@ extern void *left_png;
 extern void *right_png;
 extern void *up_png;
 extern void *down_png;
+/* currently unused.
 extern void *L1_png;
 extern void *L2_png;
+extern void *L3_png;
 extern void *R1_png;
 extern void *R2_png;
+extern void *R3_png; */
 
 extern void *logo_png;
-extern void *bg_overlay_png;
 
 // Not related to screen size, just to limit at some point
 static int maxSize = 720*512*4;
@@ -69,12 +71,14 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {SQUARE_ICON, "square", &square_png},
     {SELECT_ICON, "select", &select_png},
     {START_ICON, "start", &start_png},
+    /* currently unused.
     {L1_ICON, "L1", &L1_png},
     {L2_ICON, "L2", &L2_png},
+    {L3_ICON, "L3", &L3_png},
     {R1_ICON, "R1", &R1_png},
     {R2_ICON, "R2", &R2_png},
+    {R3_ICON, "R3", &R3_png}, */
     {LOGO_PICTURE, "logo", &logo_png},
-    {BG_OVERLAY, "bg_overlay", &bg_overlay_png},
 };
 
 int texLookupInternalTexId(const char *name)

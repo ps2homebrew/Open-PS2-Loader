@@ -10,7 +10,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Open PS2 Loader %s",
     "Save Changes",
     "Back",
-    "Network Config",
+    "Network Settings",
     "Advanced Options",
     "<no values>",
     "Settings saved to %s",

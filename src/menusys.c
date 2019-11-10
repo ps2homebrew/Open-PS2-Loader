@@ -23,12 +23,12 @@ enum MENU_IDs {
     MENU_SETTINGS = 0,
     MENU_GFX_SETTINGS,
     MENU_AUDIO_SETTINGS,
+    MENU_PARENTAL_LOCK,
     MENU_NET_CONFIG,
     MENU_NET_UPDATE,
-    MENU_PARENTAL_LOCK,
-    MENU_SAVE_CHANGES,
     MENU_START_HDL,
     MENU_ABOUT,
+    MENU_SAVE_CHANGES,
     MENU_EXIT,
     MENU_POWER_OFF
 };
@@ -202,13 +202,13 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
-    submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
     if (gHDDStartMode && gEnableWrite) // enabled at all?
         submenuAppendItem(&mainMenu, -1, NULL, MENU_START_HDL, _STR_STARTHDL);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_ABOUT, _STR_ABOUT);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_SAVE_CHANGES, _STR_SAVE_CHANGES);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_EXIT, _STR_EXIT);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_POWER_OFF, _STR_POWEROFF);
 
@@ -716,6 +716,14 @@ void menuRenderMenu()
         // render, advance
         fntRenderString(gTheme->fonts[0], 320, y, ALIGN_CENTER, 0, 0, submenuItemGetText(&it->item), (cp == sitem) ? gTheme->selTextColor : gTheme->textColor);
         y += spacing;
+        if (gHDDStartMode && gEnableWrite) {
+            if (cp == 7)
+                y += spacing / 2;
+        }
+        else {
+            if (cp == 6)
+                y += spacing / 2;
+        }
     }
 
     //hints
@@ -812,25 +820,25 @@ void menuHandleInputMenu()
         } else if (id == MENU_AUDIO_SETTINGS) {
             if (menuCheckParentalLock() == 0)
               guiShowAudioConfig();
+        } else if (id == MENU_PARENTAL_LOCK) {
+            if (menuCheckParentalLock() == 0)
+              guiShowParentalLockConfig();
         } else if (id == MENU_NET_CONFIG) {
             if (menuCheckParentalLock() == 0)
               guiShowNetConfig();
         } else if (id == MENU_NET_UPDATE) {
             if (menuCheckParentalLock() == 0)
               guiShowNetCompatUpdate();
-        } else if (id == MENU_PARENTAL_LOCK) {
-            if (menuCheckParentalLock() == 0)
-              guiShowParentalLockConfig();
-        } else if (id == MENU_SAVE_CHANGES) {
-            if (menuCheckParentalLock() == 0) {
-              saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
-              menuSetParentalLockCheckState(1); //Re-enable parental lock check.
-            }
         } else if (id == MENU_START_HDL) {
             if (menuCheckParentalLock() == 0)
               handleHdlSrv();
         } else if (id == MENU_ABOUT) {
               guiShowAbout();
+        } else if (id == MENU_SAVE_CHANGES) {
+            if (menuCheckParentalLock() == 0) {
+              saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
+              menuSetParentalLockCheckState(1); //Re-enable parental lock check.
+            }
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))
                 sysExecExit();

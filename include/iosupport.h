@@ -65,7 +65,7 @@ enum ERROR_CODE {
 #define COMPAT_MODE_7 0x40 // Unused
 #define COMPAT_MODE_8 0x80 // Unused
 
-#define COMPAT_MODE_COUNT 8
+#define COMPAT_MODE_COUNT 6 // only count modes in use
 
 #define OPL_MOD_STORAGE 0x00097000    //(default) Address of the module storage region
 

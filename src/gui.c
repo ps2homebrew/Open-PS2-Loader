@@ -212,16 +212,15 @@ void guiShowAbout()
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
-    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), ""
+    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
 #ifdef __RTL
-        " RTL"
+        " - RTL"
 #endif
-        " GSM %s"
 #ifdef IGS
-        " IGS %s"
+        " - IGS %s"
 #endif
 #ifdef PADEMU
-        " PADEMU"
+        " - PADEMU"
 #endif
         //Version numbers
         , GSM_VERSION

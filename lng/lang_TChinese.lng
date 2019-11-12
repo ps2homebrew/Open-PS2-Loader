@@ -1,5 +1,5 @@
 # Translated by kane159 and eyu2007
-# Last update: Nov. 02, 2019
+# Last update: Nov. 10, 2019
 # Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
@@ -9,7 +9,7 @@ OPL %s
 網路設置
 進階設置
 <無數值>
-設置保存到%s
+設置保存到 %s
 寫入設置錯誤!
 離開
 設置
@@ -43,7 +43,7 @@ O
 X
 遊戲列表
 遊戲設置
-Remove Settings
+刪除設置
 刪除遊戲所有的設置
 選定項滾動速度
 較慢
@@ -133,7 +133,7 @@ GUEST驗證留空.
 VMC 存檔已存在
 無效的 VMC 存檔, 大小有誤
 需要建立VMC 存檔
-訪問VMC %s出錯。繼續使用插槽%d中的記憶卡?
+訪問VMC %s 出錯。繼續使用插槽%d中的記憶卡 %d?
 自動重新整理
 關於
 程序
@@ -258,7 +258,7 @@ LMP版本:
 已禁用家長鎖.
 創建選項:
 錯誤-無法使用此密碼.
-vmc% s 文件碎片化.是否繼續使用插槽% d 中的記憶卡？
+vmc %s 文件碎片化.是否繼續使用插槽 %d 中的記憶卡？
 音頻設置
 啟用聲音效果
 啟用啟動聲音
@@ -267,16 +267,16 @@ vmc% s 文件碎片化.是否繼續使用插槽% d 中的記憶卡？
 確認視頻模式更改？
 緩存遊戲列表 (硬碟)
 啟用通知
-%s從%s載入
+%s 從 %s 載入
 遊戲菜單
 遊戲設置已保存。
-%s settings removed.
+%s 設置已刪除。
 啟用時覆蓋現有的遊戲兼容性設置。
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
+設置模式
+全局
+當前遊戲
+全部
+選擇要刪除的設置。
 PS1遊戲
 PS1遊戲啟動模式
 POPSTARTER.ELF在\'%s\'上找不到!

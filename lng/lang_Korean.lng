@@ -9,7 +9,7 @@ OPL %s
 네트워크 구성
 고급 옵션
 <값 없음>
-Settings saved to %s
+설정이 % s에 저장되었습니다.
 설정 기록 중 에러!
 종료
 설정
@@ -43,7 +43,7 @@ O
 X
 게임 목록
 게임 설정
-Remove Settings
+설정 삭제
 설정된 게임 키 제거
 스크롤 속도
 느림
@@ -108,7 +108,7 @@ USB 게임 손상 검사
 버튼 선택
 오류, 게임이 손상 되었습니다.
 오류, 항목을 실행할 수 없습니다
-Test Changes
+테스트 변경
 게스트 권한을 위해 지움
 정밀하게 읽음
 동기화 모드
@@ -133,7 +133,7 @@ VMC 구성
 VMC 파일 존재
 잘못된 VMC 파일, 크기가 다릅니다.
 VMC 파일이 생성되야 합니다.
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+VMC %s에 접속하는 동안 오류가 발생했습니다. 슬롯 %d에서 메모리 카드를 계속 사용하겠습니까?
 자동 새로 고침
 오픈 PS2 로더에 관하여
 개발자
@@ -160,7 +160,7 @@ VMC 슬롯 1
 VMC 슬롯 2
 게임 ID
 DMA 모드
-V-Sync
+V-동기화
 모드 1
 모드 2
 모드 3
@@ -178,7 +178,7 @@ GSM 구성
 GSM 설정
 GSM 활성
 GSM 켜기 또는 끄기
-VMODE
+V모드
 강제 사용자 지정 디스플레이 모드
 H-POS
 수평 조정
@@ -199,7 +199,7 @@ PS2RD 치트 엔진 모드
 치트를 찾을 수 없음
 다운로드 기본값
 네트워크 업데이트
-Overwrite Existing Records
+기존 레코드 덮어 쓰기
 업데이트 실패.
 업데이트 서버에 연결 실패.
 업데이트 완료.
@@ -258,7 +258,7 @@ FIELD 반전 에뮬레이션
 자녀보호 잠금이 비활성화 되었습니다.
 빌드 옵션:
 오류 - 이 비밀번호는 사용할 수 없습니다.
-VMC %s 파일이 조각났습니다. 슬롯 %d에 있는 메모리 카드로 계속 하시겠습니까?
+VMC %s 파일이 조각났습니다. 슬롯 %d에 있는 메모리 카드로 계속 하겠습니까?
 오디오 설정
 사운드 효과 활성화
 사운트 부팅 활성화
@@ -266,17 +266,17 @@ VMC %s 파일이 조각났습니다. 슬롯 %d에 있는 메모리 카드로 계
 사운드 볼륨 부팅
 비디오 모드 변경을 확인 하시겠습니까?
 캐쉬 게임 목록 (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
+알림 사용
+%s에서 %s을(를) 로드했습니다.
+게임 메뉴
+게임 설정이 저장되었습니다.
+%s 설정이 제거되었습니다.
+활성화되면 기존 게임 호환성 설정을 덮어 씁니다.
+설정 모드
+글로벌
+게임당
+전부
+제거할 설정을 선택하십시오.
 PS1 게임
 PS1 게임 표시 모드
 '%s'에 POPSTARTER.ELF이 없습니다!

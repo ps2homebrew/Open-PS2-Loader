@@ -234,9 +234,26 @@ int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     return ERR_BAD_FILE;
 }
 
-
 /// PNG SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
 
+typedef struct
+{
+    u8 red;
+    u8 green;
+    u8 blue;
+    u8 alpha;
+} png_clut_t;
+
+typedef struct
+{
+    png_colorp palette;
+    int numPalette;
+    int numTrans;
+    png_bytep trans;
+    png_clut_t *clut;
+} png_texture_t;
+
+static png_texture_t pngTexture;
 
 static int texPngEnd(png_structp pngPtr, png_infop infoPtr, FILE *file, int status)
 {
@@ -255,6 +272,45 @@ static void texPngReadMemFunction(png_structp pngPtr, png_bytep data, png_size_t
 
     memcpy(data, *PngBufferPtr, length);
     *PngBufferPtr = (u8 *)(*PngBufferPtr) + length;
+}
+
+static void texPngReadPixels8(GSTEXTURE *texture, png_bytep *rowPointers)
+{
+    unsigned char *pixel = (unsigned char *)texture->Mem;
+    png_clut_t *clut = (png_clut_t *)texture->Clut;
+
+    int i, j, k = 0;
+
+    for (i = pngTexture.numPalette; i < 256; i++) {
+        memset(&clut[i], 0, sizeof(clut[i]));
+    }
+
+    if (pngTexture.numPalette > 0) {
+        for (i = 0; i < pngTexture.numPalette; i++) {
+            clut[i].red = pngTexture.palette[i].red;
+            clut[i].green = pngTexture.palette[i].green;
+            clut[i].blue = pngTexture.palette[i].blue;
+            clut[i].alpha = 0xff;
+        }
+    }
+
+    for (i = 0; i < pngTexture.numTrans; i++)
+        clut[i].alpha = pngTexture.trans[i] >> 1;
+
+    // rotate clut
+    for (i = 0; i < pngTexture.numPalette; i++) {
+        if ((i&0x18) == 8) {
+            png_clut_t tmp = clut[i];
+            clut[i] = clut[i+8];
+            clut[i+8] = tmp;
+        }
+    }
+
+    for (i = 0; i < texture->Height; i++) {
+        for (j = 0; j < texture->Width; j++) {
+            memcpy(&pixel[k++], &rowPointers[i][1 * j], 1);
+        }
+    }
 }
 
 static void texPngReadPixels24(GSTEXTURE *texture, png_bytep *rowPointers)
@@ -377,16 +433,19 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
         return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     texUpdate(texture, pngWidth, pngHeight);
 
-    png_set_strip_16(pngPtr);
+    if (bitDepth < 8)
+        png_set_packing(pngPtr);
 
-    if (colorType == PNG_COLOR_TYPE_PALETTE)
-        png_set_expand(pngPtr);
+    if (bitDepth == 16)
+        png_set_strip_16(pngPtr);
 
-    if (colorType == PNG_COLOR_TYPE_GRAY && bitDepth < 8)
-        png_set_expand(pngPtr);
+    png_colorp pngPalette = NULL;
+    int numPalette = 0;
+    png_bytep trans = NULL;
+    int numTrans = 0;
 
-    if (png_get_valid(pngPtr, infoPtr, PNG_INFO_tRNS))
-        png_set_tRNS_to_alpha(pngPtr);
+    png_get_PLTE(pngPtr, infoPtr, &pngPalette, &numPalette);
+    png_get_tRNS(pngPtr, infoPtr, &trans, &numTrans, NULL);
 
     png_set_filler(pngPtr, 0xff, PNG_FILLER_AFTER);
     png_read_update_info(pngPtr, infoPtr);
@@ -404,6 +463,20 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
 
             texPngReadPixels = &texPngReadPixels24;
             break;
+        case PNG_COLOR_TYPE_PALETTE:
+            texture->PSM = GS_PSM_T8;
+            texture->Clut = memalign(128, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
+            texture->ClutPSM = GS_PSM_CT32;
+
+            memset(texture->Clut, 0, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
+
+            pngTexture.palette = pngPalette;
+            pngTexture.numPalette = numPalette;
+            pngTexture.numTrans = numTrans;
+            pngTexture.trans = trans;
+
+            texPngReadPixels = &texPngReadPixels8;
+            break;
         default:
             return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DEPTH);
     }
@@ -412,7 +485,6 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
 
     return texPngEnd(pngPtr, infoPtr, file, 0);
 }
-
 
 /// JPG SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
 

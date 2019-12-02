@@ -194,7 +194,7 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
         if (mutableText->currentValue) {
             char result[300];
             if (mutableText->displayMode == DISPLAY_NEVER) {
-			    if (!strcmp(mutableText->alias, "Size: ")) {
+                if (!strcmp(mutableText->alias, "Size: ")) {
                     snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
                     if (mutableText->sizingMode == SIZING_NONE)
                         fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
@@ -207,7 +207,7 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
                         fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
                 }
             } else {
-			    if (!strcmp(mutableText->alias, "Size: "))
+                if (!strcmp(mutableText->alias, "Size: "))
                     snprintf(result, sizeof(result), "%s%s MiB", mutableText->alias, mutableText->currentValue);
                 else
                     snprintf(result, sizeof(result), "%s%s", mutableText->alias, mutableText->currentValue);

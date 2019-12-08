@@ -504,6 +504,7 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
         applyConfig(-1, -1);
+        menuReinitMainMenu();
     }
 }
 

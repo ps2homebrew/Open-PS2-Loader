@@ -933,8 +933,6 @@ void applyConfig(int themeID, int langID)
 
     initAllSupport(0);
 
-    menuReinitMainMenu();
-
     moduleUpdateMenu(USB_MODE, changed, langChanged);
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);

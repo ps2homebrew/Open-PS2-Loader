@@ -42,7 +42,7 @@ static char altStartup[32];
 static char vmc1[32];
 static char vmc2[32];
 static char hexDiscID[15];
-static char configSource[32];
+static char configSource[128];
 
 // forward declarations.
 static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame);

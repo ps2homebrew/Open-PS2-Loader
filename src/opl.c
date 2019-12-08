@@ -957,8 +957,7 @@ int loadConfig(int types)
 
 int saveConfig(int types, int showUI)
 {
-    char notification[32];
-    char *col_pos;
+    char notification[128];
     lscstatus = types;
     lscret = 0;
 
@@ -971,8 +970,6 @@ int saveConfig(int types, int showUI)
                 checkMCFolder();
 
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
-            if ((col_pos = strchr(notification, ':')) != NULL)
-                *(col_pos + 1) = '\0';
 
             guiMsgBox(notification, 0, NULL);
         }

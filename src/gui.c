@@ -807,24 +807,32 @@ void guiShowParentalLockConfig(void)
     }
 }
 
+static void guiSetAudioSettingsState(void)
+{
+    diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
+    diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
+    diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
+    diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
+    sfxVolume();
+}
+
+static int guiAudioUpdater(int modified)
+{
+    if (modified) {
+        guiSetAudioSettingsState();
+    }
+
+    return 0;
+}
+
 void guiShowAudioConfig(void)
 {
-    int ret;
-
     diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND, gEnableBootSND);
     diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
 
-    ret = diaExecuteDialog(diaAudioConfig, -1, 1, NULL);
-    if (ret) {
-        diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
-        diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
-        diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
-        diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
-        applyConfig(-1, -1);
-        sfxVolume();
-    }
+    diaExecuteDialog(diaAudioConfig, -1, 1, guiAudioUpdater);
 }
 
 int guiShowKeyboard(char *value, int maxLength)

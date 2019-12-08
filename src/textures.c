@@ -274,6 +274,36 @@ static void texPngReadMemFunction(png_structp pngPtr, png_bytep data, png_size_t
     *PngBufferPtr = (u8 *)(*PngBufferPtr) + length;
 }
 
+static void texPngReadPixels4(GSTEXTURE *texture, png_bytep *rowPointers)
+{
+    unsigned char *pixel = (unsigned char *)texture->Mem;
+    png_clut_t *clut = (png_clut_t *)texture->Clut;
+
+    int i, j, k = 0;
+
+    for (i = pngTexture.numPalette; i < 16; i++) {
+        memset(&clut[i], 0, sizeof(clut[i]));
+    }
+
+    for (i = 0; i < pngTexture.numPalette; i++) {
+        clut[i].red = pngTexture.palette[i].red;
+        clut[i].green = pngTexture.palette[i].green;
+        clut[i].blue = pngTexture.palette[i].blue;
+        clut[i].alpha = 0x80;
+    }
+
+    for (i = 0; i < pngTexture.numTrans; i++)
+        clut[i].alpha = pngTexture.trans[i] >> 1;
+
+    for (i = 0; i < texture->Height; i++) {
+        for (j = 0; j < texture->Width / 2; j++) {
+            memcpy(&pixel[k], &rowPointers[i][1 * j], 1);
+            pixel[k] = (pixel[k] << 4) | (pixel[k] >> 4);
+            k++;
+        }
+    }
+}
+
 static void texPngReadPixels8(GSTEXTURE *texture, png_bytep *rowPointers)
 {
     unsigned char *pixel = (unsigned char *)texture->Mem;
@@ -285,13 +315,11 @@ static void texPngReadPixels8(GSTEXTURE *texture, png_bytep *rowPointers)
         memset(&clut[i], 0, sizeof(clut[i]));
     }
 
-    if (pngTexture.numPalette > 0) {
-        for (i = 0; i < pngTexture.numPalette; i++) {
-            clut[i].red = pngTexture.palette[i].red;
-            clut[i].green = pngTexture.palette[i].green;
-            clut[i].blue = pngTexture.palette[i].blue;
-            clut[i].alpha = 0xff;
-        }
+    for (i = 0; i < pngTexture.numPalette; i++) {
+        clut[i].red = pngTexture.palette[i].red;
+        clut[i].green = pngTexture.palette[i].green;
+        clut[i].blue = pngTexture.palette[i].blue;
+        clut[i].alpha = 0x80;
     }
 
     for (i = 0; i < pngTexture.numTrans; i++)
@@ -433,21 +461,13 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
         return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     texUpdate(texture, pngWidth, pngHeight);
 
-    if (bitDepth < 8)
+    if (bitDepth < 4)
         png_set_packing(pngPtr);
 
     if (bitDepth == 16)
         png_set_strip_16(pngPtr);
 
-    png_colorp pngPalette = NULL;
-    int numPalette = 0;
-    png_bytep trans = NULL;
-    int numTrans = 0;
-
-    png_get_PLTE(pngPtr, infoPtr, &pngPalette, &numPalette);
-    png_get_tRNS(pngPtr, infoPtr, &trans, &numTrans, NULL);
-
-    png_set_filler(pngPtr, 0xff, PNG_FILLER_AFTER);
+    png_set_filler(pngPtr, 0x80, PNG_FILLER_AFTER);
     png_read_update_info(pngPtr, infoPtr);
 
     void (*texPngReadPixels)(GSTEXTURE * texture, png_bytep * rowPointers);
@@ -464,18 +484,29 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
             texPngReadPixels = &texPngReadPixels24;
             break;
         case PNG_COLOR_TYPE_PALETTE:
-            texture->PSM = GS_PSM_T8;
-            texture->Clut = memalign(128, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
+            pngTexture.palette = NULL;
+            pngTexture.numPalette = 0;
+            pngTexture.trans = NULL;
+            pngTexture.numTrans = 0;
+
+            png_get_PLTE(pngPtr, infoPtr, &pngTexture.palette, &pngTexture.numPalette);
+            png_get_tRNS(pngPtr, infoPtr, &pngTexture.trans, &pngTexture.numTrans, NULL);
             texture->ClutPSM = GS_PSM_CT32;
 
-            memset(texture->Clut, 0, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
+            if (bitDepth == 4) {
+                texture->PSM = GS_PSM_T4;
+                texture->Clut = memalign(128, gsKit_texture_size_ee(8, 2, GS_PSM_CT32));
+                memset(texture->Clut, 0, gsKit_texture_size_ee(8, 2, GS_PSM_CT32));
 
-            pngTexture.palette = pngPalette;
-            pngTexture.numPalette = numPalette;
-            pngTexture.numTrans = numTrans;
-            pngTexture.trans = trans;
+                texPngReadPixels = &texPngReadPixels4;
+            }
+            else {
+                texture->PSM = GS_PSM_T8;
+                texture->Clut = memalign(128, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
+                memset(texture->Clut, 0, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
 
-            texPngReadPixels = &texPngReadPixels8;
+                texPngReadPixels = &texPngReadPixels8;
+            }
             break;
         default:
             return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DEPTH);

@@ -481,6 +481,8 @@ int lngSetGuiValue(int langID)
             }
             lang_strs = internalEnglish;
             guiLangID = 0;
+            // lang switched back to internalEnglish, reload default font
+            fntLoadDefault(NULL);
         }
     }
     return 0;

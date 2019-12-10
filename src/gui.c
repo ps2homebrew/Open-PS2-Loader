@@ -1645,7 +1645,7 @@ int guiConfirmVideoMode(void)
 int guiGameShowRemoveSettings(config_set_t *configSet, config_set_t *configGame)
 {
     int terminate = 0;
-    char message[128];
+    char message[256];
 
     sfxPlay(SFX_MESSAGE);
 

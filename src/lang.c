@@ -282,6 +282,11 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "All",
     "Select settings to remove.",
     "Support Forums:",
+    "Title",
+    "Genre",
+    "Release",
+    "Developer",
+    "Description",
 };
 
 static int guiLangID = 0;

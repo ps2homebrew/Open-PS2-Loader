@@ -180,7 +180,9 @@ static void initStaticText(const char *themePath, config_set_t *themeConfig, the
 
 static void drawAttributeText(struct menu_list *menu, struct submenu_list *item, config_set_t *config, struct theme_element *elem)
 {
+    char result[300];
     mutable_text_t *mutableText = (mutable_text_t *)elem->extended;
+
     if (config) {
         if (mutableText->currentConfigId != config->uid) {
             // force refresh
@@ -192,39 +194,55 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
             }
         }
         if (mutableText->currentValue) {
-            char result[300];
             if (mutableText->displayMode == DISPLAY_NEVER) {
-                if (!strcmp(mutableText->alias, "Size: ")) {
+                if (!strncmp(mutableText->alias, "Size", 4))
                     snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
-                    if (mutableText->sizingMode == SIZING_NONE)
-                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
-                    else
-                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
-                } else {
-                    if (mutableText->sizingMode == SIZING_NONE)
-                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->currentValue, elem->color);
-                    else
-                        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->currentValue, elem->color);
-                }
-            } else {
-                if (!strcmp(mutableText->alias, "Size: "))
-                    snprintf(result, sizeof(result), "%s%s MiB", mutableText->alias, mutableText->currentValue);
                 else
-                    snprintf(result, sizeof(result), "%s%s", mutableText->alias, mutableText->currentValue);
-                if (mutableText->sizingMode == SIZING_NONE)
-                    fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
-                else
-                    fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
+                    snprintf(result, sizeof(result), mutableText->currentValue);
+
+                goto render;
             }
-            return;
         }
     }
-    if (mutableText->displayMode == DISPLAY_ALWAYS) {
-        if (mutableText->sizingMode == SIZING_NONE)
-            fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, mutableText->alias, elem->color);
-        else
-            fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, mutableText->alias, elem->color);
+
+    if (mutableText->displayMode == DISPLAY_DEFINED && mutableText->currentValue == NULL)
+        return;
+
+    char colon[4];
+    if (mutableText->sizingMode == SIZING_WRAP)
+        snprintf(colon, sizeof(colon), ":\n");
+    else
+        snprintf(colon, sizeof(colon), ": ");
+
+    int addSuffix = 0;
+    if (!strncmp(mutableText->alias, "Title", 5))
+        snprintf(result, sizeof(result), "%s%s", _l(_STR_INFO_TITLE), colon);
+    else if (!strncmp(mutableText->alias, "Genre", 5))
+        snprintf(result, sizeof(result), "%s%s", _l(_STR_INFO_GENRE), colon);
+    else if (!strncmp(mutableText->alias, "Release", 7))
+        snprintf(result, sizeof(result), "%s%s", _l(_STR_INFO_RELEASE), colon);
+    else if (!strncmp(mutableText->alias, "Developer", 9))
+        snprintf(result, sizeof(result), "%s%s", _l(_STR_INFO_DEVELOPER), colon);
+    else if (!strncmp(mutableText->alias, "Size", 4)) {
+        snprintf(result, sizeof(result), "%s%s", _l(_STR_SIZE), colon);
+        addSuffix = 1;
     }
+    else if (!strncmp(mutableText->alias, "Description", 11))
+        snprintf(result, sizeof(result), "%s%s", _l(_STR_INFO_DESCRIPTION), colon);
+    else
+        snprintf(result, sizeof(result), "%s", mutableText->alias);
+
+    if (mutableText->currentValue) {
+        strcat(result, mutableText->currentValue);
+        if (addSuffix)
+            strcat(result, " MiB");
+    }
+
+render:
+    if (mutableText->sizingMode == SIZING_NONE)
+        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
+    else
+        fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
 }
 
 static void initAttributeText(const char *themePath, config_set_t *themeConfig, theme_t *theme, theme_element_t *elem, const char *name)

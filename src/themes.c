@@ -1232,7 +1232,7 @@ static void thmLoad(const char *themePath)
     for (i = L1_ICON; i <= R3_ICON; i++)
         thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1); */
 
-	if (!themePath)
+    if (!themePath)
         for (i = ELF_FORMAT; i <= VMODE_PAL; i++)
             thmLoadResource(&newT->textures[i], i, NULL, GS_PSM_CT32, 1);
 

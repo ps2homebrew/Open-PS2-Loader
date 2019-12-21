@@ -457,12 +457,10 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     png_uint_32 pngWidth, pngHeight;
     int bitDepth, colorType, interlaceType;
     png_get_IHDR(pngPtr, infoPtr, &pngWidth, &pngHeight, &bitDepth, &colorType, &interlaceType, NULL, NULL);
-    if (texSizeValidate(pngWidth, pngHeight, psm) < 0)
-        return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     texUpdate(texture, pngWidth, pngHeight);
 
-    if (bitDepth < 4)
-        png_set_packing(pngPtr);
+    if (colorType == PNG_COLOR_TYPE_GRAY)
+        png_set_expand(pngPtr);
 
     if (bitDepth == 16)
         png_set_strip_16(pngPtr);
@@ -510,6 +508,15 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
             break;
         default:
             return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DEPTH);
+    }
+
+    if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
+        if (texture->Clut) {
+            free(texture->Clut);
+            texture->Clut = NULL;
+        }
+
+        return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     }
 
     texPngReadData(texture, pngPtr, infoPtr, texPngReadPixels);

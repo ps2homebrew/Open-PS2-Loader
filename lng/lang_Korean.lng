@@ -1,7 +1,27 @@
 # Korean translation by ddinghoya
 # For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
 Korean
-Open PS2 Loader %s
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+																								   
+ 
+																														
+				
+오픈 PS2 로더 %s
 저장 변경
 뒤로
 네트워크 구성
@@ -19,11 +39,11 @@ ETH 게임
 테마
 언어
 시스템 전원이 꺼집니다.
-Browser 종료합니까?
+브라우저를 종료합니까?
 업데이트 취소합니까?
 %d: HDD를 검색할 수 없습니다
 %d: HDD가 포맷되지 않았습니다
-%d: 네트워크 시작 에러
+%d: 네트워크 시작 오류
 %d: 네트워크 아답터 감지 안됩니다
 %d: SMB 서버에 접속할 수 없습니다
 %d: SMB 서버에 로그인할 수 없습니다
@@ -49,14 +69,14 @@ X
 빠름
 기본 메뉴
 디스크 읽기
-기다리세요
+잠시만 기다리세요
 게임 ID 불러오는 중 오류
 자동 정렬
 언어 파일 불러오는 중 오류
 디버그 색상 비활성
-컨트롤러가 없습니다. 대기 중…
+컨트롤러가 없습니다. 대기 중...
 표지 보기
-와이드 화면
+와이드화면
 전원 끄기
 불러오기 설정
 저장 설정
@@ -69,10 +89,10 @@ ETH 장치 시작 모드
 자동
 수동
 HDL 서버 시작
-HDL 서버 시작 중…
-HDL 서버 가동 중…
+HDL 서버 시작 중...
+HDL 서버 가동 중...
 HDL 서버 시작 실패
-HDL 서버 업로딩 중…
+HDL 서버 업로딩 중...
 IGR 경로
 배경 색상
 문자 색상
@@ -111,12 +131,12 @@ USB 게임 손상 검사
 정밀하게 읽음
 동기화 모드
 시스템 호출 해제
-Skip videos
+비디오 건너뛰기
 DV-DL 에뮬레이트
 IGR 비활성
-Unused
-Unused
-크기 변경 시 VMC 재포멧 됩니다.
+미사용
+미사용
+크기 변경시 VMC 재포멧 됩니다.
 생성
 시작
 수정
@@ -131,9 +151,9 @@ VMC 구성
 VMC 파일 존재
 잘못된 VMC 파일, 크기가 다릅니다.
 VMC 파일이 생성되야 합니다.
-VMC %s 에러, 메모리카드(슬롯 %d)에서 계속합니까?
+VMC %s 오류, 메모리카드(슬롯 %d)에서 계속합니까?
 자동 새로 고침
-오픈 PS2 로더에 관하여
+오픈 PS2 로더 정보
 개발자
 품질 보증
 USB prefix 경로
@@ -145,7 +165,7 @@ IGR 후 사용자 정의 ELF 부팅
 선택한 색상
 정보 페이지 표시
 정보
-사용자 정의 ELF
+커스텀 ELF
 색상 선택
 재접속
 목록 공유를 위해 지움
@@ -158,7 +178,7 @@ VMC 슬롯 1
 VMC 슬롯 2
 게임 ID
 DMA 모드
-V-Sync
+V-동기화
 모드 1
 모드 2
 모드 3
@@ -174,10 +194,10 @@ GSM 구성
 10Mbit full-duplex
 10Mbit half-duplex
 GSM 설정
-GSM 활성
+GSM 활성화
 GSM 켜기 또는 끄기
 VMODE
-강제 사용자 지정 디스플레이 모드
+강제 커스텀 디스플레이 모드
 H-POS
 수평 조정
 V-POS
@@ -187,7 +207,7 @@ V-POS
 FMV 건너뛰기
 풀 모션 비디오 건너뛰기
 치트 설정
-PS2RD 치트 엔진 활성
+PS2RD 치트 엔진 활성화
 PS2RD 치트 엔진 패치 적용
 PS2RD 치트 엔진 모드
 게임 치트 자동 선택 또는 선택
@@ -205,7 +225,7 @@ PS2RD 치트 엔진 모드
 네트워크에서 설정을 다운로드 합니까?
 사용자 정의 설정
 다운로드 받은 기본값
-%i 자동 시작…
+%i 자동 시작...
 자동 시작
 초 입력, 자동 시작하지 않으려면 0으로 설정
 PS2 로고
@@ -226,7 +246,7 @@ PADEMU 구성
 패드 에뮬레이터에 선택된 포트 진동 켬/끔
 USB 블루투스 어답터 맥 주소:
 DS 컨트롤러 맥 주소와 페어링:
-페어
+페어링
 DS 컨트롤러 페어링
 블루투스 어댑터 맥 주소가 있는 DS 컨트롤러 페어
 연결되지 않음
@@ -245,22 +265,33 @@ LMP 버전:
 포트상의 멀티탭 에뮬레이터
 멀티탭 에뮬레이션을 위한 포트를 선택.
 Fake DS3에 대한 해결방법 비활성화
-일부 fake ds3s는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+일부 fake DSs3는 해결 방법이 필요합니다. 이 옵션은 옵션을 비활성화.
+필드 뒤집기 에뮬레이션
+프로그레시브 비디오 모드에서 결함이있는 게임 수정.
+보호자 잠금 설정
+보호자 잠금 비밀번호
+보호자 잠금을 사용하지 않으려면 비워 둡니다.
+보호자 암호 입력
+보호자 잠금 비밀번호가 올바르지 않습니다.
+보호자 잠금이 비활성화되었습니다.
+빌드 옵션:
+오류 - 이 비밀번호를 사용할 수 없습니다.
+VMC %s 파일이 조각화되었습니다. 슬롯 %d에서 메모리 카드를 계속 사용하겠습니까?
+오디오 설정
+사운드 효과 활성화
+부팅 사운드 활성화
+사운드 효과 볼륨
+부팅 사운드 볼륨
+비디오 모드 변경을 확인하겠습니까?
+캐쉬 게임 목록 (HDD)
+알림 활성화
+%s에서 %s을(를)로드했습니다.
+게임 메뉴
+게임 설정이 저장되었습니다.
+%s 설정이 제거되었습니다.
+활성화되면 기존 게임 호환성 설정을 덮어 씁니다.
+설정 모드
+글로벌
+게임별
+모두
+제거 할 설정을 선택하십시오.

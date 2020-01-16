@@ -580,6 +580,7 @@ static int guiUIUpdater(int modified)
 
 void guiShowUIConfig(void)
 {
+    int themeID = -1, langID = -1;
     curTheme = -1;
     showCfgPopup = 0;
     guiResetNotifications();
@@ -623,7 +624,6 @@ reselect_video_mode:
 
     int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
     if (ret) {
-        int themeID = -1, langID = -1;
         diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
         diaGetInt(diaUIConfig, UICFG_LANG, &langID);
         diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
@@ -656,7 +656,7 @@ reselect_video_mode:
         if (guiConfirmVideoMode() == 0) {
             //Restore previous video mode, without changing the theme & language settings.
             gVMode = previousVMode;
-            applyConfig(-1, -1);
+            applyConfig(themeID, langID);
             goto reselect_video_mode;
         }
     }

@@ -55,14 +55,9 @@ static void guiShow();
 
 #ifdef __DEBUG
 
-#include <timer.h>
-
-#define CLOCKS_PER_MILISEC 147456
-
 // debug version displays an FPS meter
-static u32 curtime = 0;
-static u32 time_since_last = 0;
-static u32 time_render = 0;
+static clock_t prevtime = 0;
+static clock_t curtime = 0;
 static float fps = 0.0f;
 
 extern GSGLOBAL *gsGlobal;
@@ -181,12 +176,6 @@ void guiUnlock(void)
 
 void guiStartFrame(void)
 {
-#ifdef __DEBUG
-    u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
-    time_since_last = newtime - curtime;
-    curtime = newtime;
-#endif
-
     guiLock();
     rmStartFrame();
     guiFrameId++;
@@ -194,12 +183,12 @@ void guiStartFrame(void)
 
 void guiEndFrame(void)
 {
-#ifdef __DEBUG
-    u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
-    time_render = newtime - curtime;
-#endif
-
     rmEndFrame();
+#ifdef __DEBUG
+    // Measure time directly after vsync
+    prevtime = curtime;
+    curtime = clock();
+#endif
     guiUnlock();
 }
 
@@ -1314,8 +1303,15 @@ static void guiDrawOverlays()
     y += yadd;
     y += yadd; // Empty line
 
-    if (time_since_last != 0) {
-        fps = fps * 0.99 + 10.0f / (float)time_since_last;
+    if (prevtime != 0) {
+        clock_t diff = curtime - prevtime;
+        // Raw FPS value with 2 decimal places
+        float rawfps = ((100 * CLOCKS_PER_SEC) / diff) / 100.0f;
+
+        if (fps == 0.0f)
+            fps = rawfps;
+        else
+            fps = fps * 0.9f + rawfps / 10.0f; // Smooth FPS value
 
         snprintf(text, sizeof(text), "%.1f FPS", fps);
         fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));

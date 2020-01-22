@@ -70,7 +70,7 @@ GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 		Scan_240p.o Scan_240p1.o Scan_480i.o Scan_480p.o Scan_480p1.o Scan_480p2.o \
 		Scan_480p3.o Scan_480p4.o Scan_480p5.o Scan_576i.o Scan_576p.o Scan_720p.o \
 		Scan_1080i.o Scan_1080i2.o Scan_1080p.o Vmode_multi.o Vmode_ntsc.o Vmode_pal.o \
-		freesans.o icon_sys.o icon_icn.o
+		poeveticanew.o icon_sys.o icon_icn.o
 
 MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o \
 		boot.o cancel.o confirm.o cursor.o message.o transition.o
@@ -844,8 +844,8 @@ $(EE_ASM_DIR)logo.s: gfx/logo.png | $(EE_ASM_DIR)
 $(EE_ASM_DIR)case.s: gfx/case.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ case_png
 
-$(EE_ASM_DIR)freesans.s: thirdparty/PoeVeticaNew.ttf | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ freesansfont_raw
+$(EE_ASM_DIR)poeveticanew.s: thirdparty/PoeVeticaNew.ttf | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ poeveticanew_raw
 
 $(EE_ASM_DIR)icon_sys.s: gfx/icon.sys | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ icon_sys

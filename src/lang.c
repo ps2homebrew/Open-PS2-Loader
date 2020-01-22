@@ -215,7 +215,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Auto Start",
     "Value in second(s), 0 to disable auto start.",
     "PS2 Logo",
-    "Only displayed for a valid disc logo which matches the console's region.",
+    "Displayed for a valid disc logo matching the console's region.",
     "Configure PADEMU",
     "Pad Emulator Settings",
     "Enable Pad Emulator",

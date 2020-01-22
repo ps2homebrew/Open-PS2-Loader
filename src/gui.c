@@ -265,7 +265,7 @@ static void guiResetNotifications(void)
 
 static void guiRenderNotifications(char *type, char *path, int y)
 {
-    char notification[32];
+    char notification[128];
     char *col_pos;
     int x;
 
@@ -1272,12 +1272,12 @@ static void guiDrawOverlays()
 
     if (!pending) {
         if (bfadeout > 0x0)
-            bfadeout -= 0x04;
+            bfadeout -= 0x02;
         else
             bfadeout = 0x0;
     } else {
         if (bfadeout < 0x80)
-            bfadeout += 0x04;
+            bfadeout += 0x02;
     }
 
     if (bfadeout > 0 && !toggleSfx)
@@ -1402,7 +1402,7 @@ void guiIntroLoop(void)
             guiShow();
 
         if (gInitComplete)
-            wfadeout -= 2;
+            wfadeout -= 0x02;
 
         if (wfadeout > 0)
             guiRenderGreeting();

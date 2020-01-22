@@ -1386,21 +1386,21 @@ void deinit(int exception, int modeSelected)
 
 void setDefaultColors(void)
 {
-    gDefaultBgColor[0] = 0x028;
-    gDefaultBgColor[1] = 0x0c5;
-    gDefaultBgColor[2] = 0x0f9;
+    gDefaultBgColor[0] = 0x28;
+    gDefaultBgColor[1] = 0xC5;
+    gDefaultBgColor[2] = 0xF9;
 
-    gDefaultTextColor[0] = 0x0ff;
-    gDefaultTextColor[1] = 0x0ff;
-    gDefaultTextColor[2] = 0x0ff;
+    gDefaultTextColor[0] = 0xFF;
+    gDefaultTextColor[1] = 0xFF;
+    gDefaultTextColor[2] = 0xFF;
 
-    gDefaultSelTextColor[0] = 0x000;
-    gDefaultSelTextColor[1] = 0x0ae;
-    gDefaultSelTextColor[2] = 0x0ff;
+    gDefaultSelTextColor[0] = 0x00;
+    gDefaultSelTextColor[1] = 0xAE;
+    gDefaultSelTextColor[2] = 0xFF;
 
-    gDefaultUITextColor[0] = 0x058;
-    gDefaultUITextColor[1] = 0x068;
-    gDefaultUITextColor[2] = 0x0b4;
+    gDefaultUITextColor[0] = 0x58;
+    gDefaultUITextColor[1] = 0x68;
+    gDefaultUITextColor[2] = 0xB4;
 }
 
 static void setDefaults(void)

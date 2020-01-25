@@ -345,6 +345,7 @@ void guiGameShowGSConfig(void)
 {
     // configure the enumerations
     const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
+    // clang-format off
     const char *gsmvmodeNames[] = {
         "NTSC",
         "NTSC Non Interlaced",
@@ -376,6 +377,7 @@ void guiGameShowGSConfig(void)
         "VGA 1280x1024p @60Hz",
         "VGA 1280x1024p @75Hz",
         NULL};
+    // clang-format on
 
     diaSetEnum(diaGSConfig, GSMCFG_GSMSOURCE, settingsSource);
     diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);

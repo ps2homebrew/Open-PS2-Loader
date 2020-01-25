@@ -70,6 +70,7 @@ void PrepareGSM(char *cmdline)
     // Some of following vmodes result in no display and/or freezing, depending on the console kernel and GS revision.
     // Therefore there are many variables involved here that can lead us to success or fail, depending on the already mentioned circumstances.
     //
+    // clang-format off
     static const predef_vmode_struct predef_vmode[29] = {
         //                                                            DH    DW   MAGV MAGH  DY   DX              VS  VDP  VBPE  VBP VFPE  VFP
         {GS_INTERLACED,    GS_MODE_NTSC,        GS_FIELD, makeDISPLAY(447,  2559, 0,   3,   46,  700), makeSYNCV(6,  480,  6,    26,  6,   1)},
@@ -101,6 +102,7 @@ void PrepareGSM(char *cmdline)
         {GS_NONINTERLACED, GS_MODE_VGA_1024_85, GS_FRAME, makeDISPLAY(767,  1023, 0,   0,   30,  290), makeSYNCV(3,  768,  0,    36,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_60, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)},
         {GS_NONINTERLACED, GS_MODE_VGA_1280_75, GS_FRAME, makeDISPLAY(1023, 1279, 1,   1,   40,  350), makeSYNCV(3,  1024, 0,    38,  0,   1)}}; //ends predef_vmode definition
+    // clang-format on
     int k576p_fix, kGsDxDyOffsetSupported, fd, FIELD_fix;
     char romver[16], romverNum[5], *pROMDate;
 

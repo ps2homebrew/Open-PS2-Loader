@@ -568,6 +568,7 @@ void guiShowUIConfig(void)
 
     // configure the enumerations
     const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
+    // clang-format off
     const char *vmodeNames[] = {_l(_STR_AUTO)
         , "PAL 640x512i @50Hz 24bit"
         , "NTSC 640x448i @60Hz 24bit"
@@ -581,6 +582,7 @@ void guiShowUIConfig(void)
         , "HDTV 1280x720p @60Hz 16bit (HIRES)"
         , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
         , NULL};
+    // clang-format on
     int previousVMode;
 
 reselect_video_mode:

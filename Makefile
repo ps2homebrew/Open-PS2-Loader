@@ -188,7 +188,7 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format
 
 all:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
@@ -311,6 +311,9 @@ pc_tools:
 pc_tools_win32:
 	echo "Building WIN32 iso2opl, opl2iso and genvmc..."
 	$(MAKE) _WIN32=1 -C pc
+
+format:
+	find . -type f -not -path \*modules/network/SMSTCPIP\* -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -i
 
 $(EE_ASM_DIR):
 	@mkdir -p $@

@@ -397,7 +397,6 @@ static void diaDrawHint(int text_id)
     int x, y;
     char *text = _l(text_id);
 
-    // the width of the hint text string will be scaled by the Vmode, we need to unscale it.
     x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], text)) - 10;
     y = gTheme->usedHeight - 62;
 

@@ -24,7 +24,7 @@ English template
 Open PS2 Loader %s
 Save Changes
 Back
-Network Config
+Network Settings
 Advanced Options
 <no values>
 Settings saved to %s
@@ -163,7 +163,7 @@ Automatic HDD Spin Down
 Video Mode
 Dialog Color
 Selected Color
-Unused
+Reset Colors
 Info
 Custom ELF
 Color Selection
@@ -229,7 +229,7 @@ Auto start in %i s...
 Auto Start
 Value in second(s), 0 to disable auto start.
 PS2 Logo
-Only displayed for a valid disc logo which matches the console's region.
+Displayed for a valid disc logo matching the console's region.
 Configure PADEMU
 Pad Emulator Settings
 Enable Pad Emulator
@@ -295,3 +295,9 @@ Global
 Per Game
 All
 Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

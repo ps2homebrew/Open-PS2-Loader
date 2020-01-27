@@ -933,8 +933,6 @@ void applyConfig(int themeID, int langID)
 
     initAllSupport(0);
 
-    menuReinitMainMenu();
-
     moduleUpdateMenu(USB_MODE, changed, langChanged);
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
@@ -957,8 +955,7 @@ int loadConfig(int types)
 
 int saveConfig(int types, int showUI)
 {
-    char notification[32];
-    char *col_pos;
+    char notification[128];
     lscstatus = types;
     lscret = 0;
 
@@ -971,8 +968,6 @@ int saveConfig(int types, int showUI)
                 checkMCFolder();
 
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
-            if ((col_pos = strchr(notification, ':')) != NULL)
-                *(col_pos + 1) = '\0';
 
             guiMsgBox(notification, 0, NULL);
         }
@@ -1389,6 +1384,25 @@ void deinit(int exception, int modeSelected)
     configEnd();
 }
 
+void setDefaultColors(void)
+{
+    gDefaultBgColor[0] = 0x28;
+    gDefaultBgColor[1] = 0xC5;
+    gDefaultBgColor[2] = 0xF9;
+
+    gDefaultTextColor[0] = 0xFF;
+    gDefaultTextColor[1] = 0xFF;
+    gDefaultTextColor[2] = 0xFF;
+
+    gDefaultSelTextColor[0] = 0x00;
+    gDefaultSelTextColor[1] = 0xAE;
+    gDefaultSelTextColor[2] = 0xFF;
+
+    gDefaultUITextColor[0] = 0x58;
+    gDefaultUITextColor[1] = 0x68;
+    gDefaultUITextColor[2] = 0xB4;
+}
+
 static void setDefaults(void)
 {
     clearIOModuleT(&list_support[USB_MODE]);
@@ -1456,28 +1470,14 @@ static void setDefaults(void)
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
 
-    gDefaultBgColor[0] = 0x028;
-    gDefaultBgColor[1] = 0x0c5;
-    gDefaultBgColor[2] = 0x0f9;
-
-    gDefaultTextColor[0] = 0x0ff;
-    gDefaultTextColor[1] = 0x0ff;
-    gDefaultTextColor[2] = 0x0ff;
-
-    gDefaultSelTextColor[0] = 0x0ff;
-    gDefaultSelTextColor[1] = 0x080;
-    gDefaultSelTextColor[2] = 0x000;
-
-    gDefaultUITextColor[0] = 0x040;
-    gDefaultUITextColor[1] = 0x080;
-    gDefaultUITextColor[2] = 0x040;
-
     frameCounter = 0;
 
     gVMode = 0;
     gXOff = 0;
     gYOff = 0;
     gOverscan = 0;
+
+    setDefaultColors();
 
     // Last Played Auto Start
     KeyPressedOnce = 0;

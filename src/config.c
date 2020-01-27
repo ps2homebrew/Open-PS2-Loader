@@ -164,12 +164,16 @@ char *configGetDir(void)
 void configPrepareNotifications(char *prefix)
 {
     int mcID;
+    char *colpos;
 
     snprintf(cfgDevice, sizeof(cfgDevice), prefix);
     if (!strncmp(cfgDevice, "mc?", 3)) {
         mcID = getmcID();
         cfgDevice[2] = mcID;
     }
+
+    if ((colpos = strchr(cfgDevice, ':')) != NULL)
+        *(colpos + 1) = '\0';
 
     showCfgPopup = 1;
 }
@@ -206,6 +210,8 @@ void configSetMove(char *prefix)
         snprintf(path, sizeof(path), "%s/%s", prefix, configFilenames[i]);
         configMove(&configFiles[i], path);
     }
+
+    configPrepareNotifications(prefix);
 }
 
 void configEnd()

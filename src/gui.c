@@ -212,16 +212,15 @@ void guiShowAbout()
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
-    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), ""
+    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
 #ifdef __RTL
-        " RTL"
+        " - RTL"
 #endif
-        " GSM %s"
 #ifdef IGS
-        " IGS %s"
+        " - IGS %s"
 #endif
 #ifdef PADEMU
-        " PADEMU"
+        " - PADEMU"
 #endif
         //Version numbers
         , GSM_VERSION
@@ -266,7 +265,7 @@ static void guiResetNotifications(void)
 
 static void guiRenderNotifications(char *type, char *path, int y)
 {
-    char notification[32];
+    char notification[128];
     char *col_pos;
     int x;
 
@@ -505,6 +504,7 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
         applyConfig(-1, -1);
+        menuReinitMainMenu();
     }
 }
 
@@ -551,6 +551,7 @@ static int guiUIUpdater(int modified)
             diaSetEnabled(diaUIConfig, UICFG_UICOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_TXTCOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_SELCOL, temp);
+            diaSetEnabled(diaUIConfig, UICFG_RESETCOL, temp);
         }
 
         diaGetInt(diaUIConfig, UICFG_XOFF, &x);
@@ -641,6 +642,9 @@ reselect_video_mode:
         diaGetInt(diaUIConfig, UICFG_XOFF, &gXOff);
         diaGetInt(diaUIConfig, UICFG_YOFF, &gYOff);
         diaGetInt(diaUIConfig, UICFG_OVERSCAN, &gOverscan);
+
+        if (ret == UICFG_RESETCOL)
+            setDefaultColors();
 
         applyConfig(themeID, langID);
         //wait 70ms for confirm sound to finish playing before clearing buffer
@@ -804,24 +808,32 @@ void guiShowParentalLockConfig(void)
     }
 }
 
+static void guiSetAudioSettingsState(void)
+{
+    diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
+    diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
+    diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
+    diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
+    sfxVolume();
+}
+
+static int guiAudioUpdater(int modified)
+{
+    if (modified) {
+        guiSetAudioSettingsState();
+    }
+
+    return 0;
+}
+
 void guiShowAudioConfig(void)
 {
-    int ret;
-
     diaSetInt(diaAudioConfig, CFG_SFX, gEnableSFX);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND, gEnableBootSND);
     diaSetInt(diaAudioConfig, CFG_SFX_VOLUME, gSFXVolume);
     diaSetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, gBootSndVolume);
 
-    ret = diaExecuteDialog(diaAudioConfig, -1, 1, NULL);
-    if (ret) {
-        diaGetInt(diaAudioConfig, CFG_SFX, &gEnableSFX);
-        diaGetInt(diaAudioConfig, CFG_BOOT_SND, &gEnableBootSND);
-        diaGetInt(diaAudioConfig, CFG_SFX_VOLUME, &gSFXVolume);
-        diaGetInt(diaAudioConfig, CFG_BOOT_SND_VOLUME, &gBootSndVolume);
-        applyConfig(-1, -1);
-        sfxVolume();
-    }
+    diaExecuteDialog(diaAudioConfig, -1, 1, guiAudioUpdater);
 }
 
 int guiShowKeyboard(char *value, int maxLength)
@@ -970,7 +982,7 @@ static void guiDrawBusy()
 static int wfadeout = 0x80;
 static void guiRenderGreeting()
 {
-    u64 mycolor = GS_SETREG_RGBA(0x00, 0x00, 0x00, wfadeout);
+    u64 mycolor = GS_SETREG_RGBA(0x1C, 0x1C, 0x1C, wfadeout);
     rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 
     GSTEXTURE *logo = thmGetTexture(LOGO_PICTURE);
@@ -1260,12 +1272,12 @@ static void guiDrawOverlays()
 
     if (!pending) {
         if (bfadeout > 0x0)
-            bfadeout -= 0x08;
+            bfadeout -= 0x02;
         else
             bfadeout = 0x0;
     } else {
         if (bfadeout < 0x80)
-            bfadeout += 0x08;
+            bfadeout += 0x02;
     }
 
     if (bfadeout > 0 && !toggleSfx)
@@ -1390,7 +1402,7 @@ void guiIntroLoop(void)
             guiShow();
 
         if (gInitComplete)
-            wfadeout -= 2;
+            wfadeout -= 0x02;
 
         if (wfadeout > 0)
             guiRenderGreeting();
@@ -1633,7 +1645,7 @@ int guiConfirmVideoMode(void)
 int guiGameShowRemoveSettings(config_set_t *configSet, config_set_t *configGame)
 {
     int terminate = 0;
-    char message[128];
+    char message[256];
 
     sfxPlay(SFX_MESSAGE);
 

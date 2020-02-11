@@ -35,6 +35,9 @@ enum INTERNAL_TEXTURE {
     R2_ICON,
     R3_ICON, */
     MAIN_BG,
+//START of OPL_DB tweaks
+    MAIN2_BG,
+//END of OPL_DB tweaks
     INFO_BG,
     COVER_DEFAULT,
     DISC_DEFAULT,
@@ -82,11 +85,6 @@ enum INTERNAL_TEXTURE {
     VMODE_PAL,
     LOGO_PICTURE,
     CASE_OVERLAY,
-    BG_OVERLAY,
-//START of OPL_DB tweaks
-    BG_OVERLAY_2,
-    INFO_OVERLAY,
-//END of OPL_DB tweaks
 
     TEXTURES_COUNT
 };

@@ -40,6 +40,9 @@ extern void *R2_png;
 extern void *R3_png; */
 
 extern void *background_png;
+//START of OPL_DB tweaks
+extern void *background2_png;
+//END of OPL_DB tweaks
 extern void *info_png;
 extern void *cover_png;
 extern void *disc_png;
@@ -88,11 +91,6 @@ extern void *Vmode_ntsc_png;
 extern void *Vmode_pal_png;
 
 extern void *logo_png;
-//START of OPL_DB tweaks
-extern void *bg_overlay_png;
-extern void *bg_overlay_2_png;
-extern void *info_overlay_png;
-//END of OPL_DB tweaks
 extern void *case_png;
 
 // Not related to screen size, just to limit at some point
@@ -139,6 +137,9 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {R2_ICON, "R2", &R2_png},
     {R3_ICON, "R3", &R3_png}, */
     {MAIN_BG, "background", &background_png},
+    //START of OPL_DB tweaks
+    {MAIN2_BG, "background2", &background2_png},
+    //END of OPL_DB tweaks
     {INFO_BG, "info", &info_png},
     {COVER_DEFAULT, "cover", &cover_png},
     {DISC_DEFAULT, "disc", &disc_png},
@@ -185,10 +186,6 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {VMODE_NTSC, "Vmode_ntsc", &Vmode_ntsc_png},
     {VMODE_PAL, "Vmode_pal", &Vmode_pal_png},
     {LOGO_PICTURE, "logo", &logo_png},
-    //START of OPL_DB tweaks
-    {BG_OVERLAY, "bg_overlay", &bg_overlay_png},
-    {BG_OVERLAY_2, "bg_overlay_2", &bg_overlay_2_png},
-    {INFO_OVERLAY, "info_overlay", &info_overlay_png},
     {CASE_OVERLAY, "case", &case_png},
 };
 

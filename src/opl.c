@@ -973,8 +973,6 @@ void applyConfig(int themeID, int langID)
 
     initAllSupport(0);
 
-    menuReinitMainMenu();
-
     moduleUpdateMenu(USB_MODE, changed, langChanged);
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
@@ -1000,8 +998,7 @@ int loadConfig(int types)
 
 int saveConfig(int types, int showUI)
 {
-    char notification[32];
-    char *col_pos;
+    char notification[128];
     lscstatus = types;
     lscret = 0;
 
@@ -1014,8 +1011,6 @@ int saveConfig(int types, int showUI)
                 checkMCFolder();
 
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
-            if ((col_pos = strchr(notification, ':')) != NULL)
-                *(col_pos + 1) = '\0';
 
             guiMsgBox(notification, 0, NULL);
         }
@@ -1432,6 +1427,27 @@ void deinit(int exception, int modeSelected)
     configEnd();
 }
 
+void setDefaultColors(void)
+{
+    //START of OPL_DB tweaks
+    gDefaultBgColor[0] = 0x00;
+    gDefaultBgColor[1] = 0x00;
+    gDefaultBgColor[2] = 0x00;
+
+    gDefaultTextColor[0] = 0xFF;
+    gDefaultTextColor[1] = 0xFF;
+    gDefaultTextColor[2] = 0xFF;
+
+    gDefaultSelTextColor[0] = 0xFF;
+    gDefaultSelTextColor[1] = 0x80;
+    gDefaultSelTextColor[2] = 0x00;
+
+    gDefaultUITextColor[0] = 0x32;
+    gDefaultUITextColor[1] = 0xFF;
+    gDefaultUITextColor[2] = 0x30;
+    //END of OPL_DB tweaks
+}
+
 static void setDefaults(void)
 {
     clearIOModuleT(&list_support[USB_MODE]);
@@ -1503,6 +1519,7 @@ static void setDefaults(void)
     gAPPStartMode = START_MODE_DISABLED;
     //START of OPL_DB tweaks
     gELMStartMode = START_MODE_DISABLED;
+    //END of OPL_DB tweaks
 
     gDefaultBgColor[0] = 0x000;
     gDefaultBgColor[1] = 0x000;
@@ -1527,6 +1544,8 @@ static void setDefaults(void)
     gXOff = 0;
     gYOff = 0;
     gOverscan = 0;
+
+    setDefaultColors();
 
     // Last Played Auto Start
     KeyPressedOnce = 0;

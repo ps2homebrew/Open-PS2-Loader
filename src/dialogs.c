@@ -307,6 +307,9 @@ struct UIItem diaUIConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_BGCOLOR}}},
     {UI_SPACER},
     {UI_COLOUR, UICFG_BGCOL, 1, 1, -1, -10, 17, {.colourvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_BUTTON, UICFG_RESETCOL, 1, 1, -1, 0, 0, {.label = {NULL, _STR_RESETCOLOR}}},
     {UI_SPLITTER},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_VMODE}}},
@@ -441,7 +444,7 @@ struct UIItem diaVMC[] = {
     {UI_STRING, VMC_NAME, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiGameVmcNameHandler}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_VMC_SIZE}}},
+    {UI_LABEL, 0, 1, 1, -1, -20, 0, {.label = {NULL, _STR_SIZE}}},
     {UI_SPACER},
     {UI_ENUM, VMC_SIZE, 1, 1, _STR_HINT_VMC_SIZE, 0, 0, {.intvalue = {0, 0}}},
     //START of OPL_DB tweaks
@@ -819,7 +822,7 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
     //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, crazyc, danielb, dlanor, doctorxyz, hominem.te.esse, ifcaro,", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, belek666, crazyc, danielb, dlanor, doctorxyz, hominem.te.esse, ifcaro,", -1}}},
     //END of OPL_DB tweaks
     {UI_BREAK},
 
@@ -843,13 +846,13 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
     //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"algol, Berion, El_Patas, EP, gledson999, lee4, LocalH, RandQalan,", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"algol, Berion, El_Patas, EP, gledson999, lee4, jolek, LocalH,", -1}}},
     //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
     //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"ShaolinAssassin, yoshi314, and zero35.", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"RandQalan, ShaolinAssassin, yoshi314, and zero35.", -1}}},
     {UI_SPLITTER},
     //END of OPL_DB tweaks
 

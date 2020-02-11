@@ -12,7 +12,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     //END of OPL_DB tweaks
     "Save Changes",
     "Back",
-    "Network Config",
+    "Network Settings",
     "Advanced Options",
     "<no values>",
     "Settings saved to %s",
@@ -153,7 +153,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Video Mode",
     "Dialog Color",
     "Selected Color",
-    "Unused", // string no longer used
+    "Reset Colors",
     "Info",
     "Custom ELF",
     "Color Selection",
@@ -219,7 +219,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Auto Start",
     "Value in second(s), 0 to disable auto start.",
     "PS2 Logo",
-    "Only displayed for a valid disc logo which matches the console's region.",
+    "Displayed for a valid disc logo matching the console's region.",
     "Configure PADEMU",
     "Pad Emulator Settings",
     "Enable Pad Emulator",
@@ -285,6 +285,12 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Per Game",
     "All",
     "Select settings to remove.",
+    "Support Forums:",
+    "Title",
+    "Genre",
+    "Release",
+    "Developer",
+    "Description",
     //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",
@@ -495,6 +501,8 @@ int lngSetGuiValue(int langID)
             }
             lang_strs = internalEnglish;
             guiLangID = 0;
+            // lang switched back to internalEnglish, reload default font
+            fntLoadDefault(NULL);
         }
     }
     return 0;

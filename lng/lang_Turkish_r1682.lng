@@ -1,12 +1,12 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: Nov. 02, 2019
-# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
+# Last update: Feb. 11, 2020
+# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
 Değişiklikleri kaydet
 Geri
-Ağ ayarları
+Network Settings
 Gelişmiş ayarlar
 <değer yok>
 Settings saved to %s
@@ -145,7 +145,7 @@ Otomatik Sabit Disk durdurma
 Video modu
 İleti rengi
 Seçili öğe rengi
-Kullanılmıyor
+Reset Colors
 Bilgi
 Özel ELF
 Renk seçimi
@@ -211,7 +211,7 @@ Otomatik başlatılacak %i s...
 Otomatik başlat
 Saniye olarak değer, iptal etmek için 0 giriniz
 PS2 Logosu
-Sadece konsolun bölgesine uyan, kabul edilebilir logolar gösterilir.
+Displayed for a valid disc logo matching the console's region.
 PADEMU'yu ayarla
 Pad Emulator Ayarları
 PadEmulator Aktif Et
@@ -277,6 +277,12 @@ Global
 Per Game
 All
 Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description
 PS1 Oyunları
 PS1 Oyunları Ekran Modu
 POPSTARTER.ELF '%s' de bulunamadı.

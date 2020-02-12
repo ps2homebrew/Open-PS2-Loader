@@ -1,12 +1,12 @@
 # Translated by kane159 and eyu2007
-# Last update: Nov. 10, 2019
-# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
+# Last update: Feb. 11, 2020
+# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
 OPL %s
 保存設置
 返回
-網路設置
+Network Settings
 進階設置
 <無數值>
 設置保存到 %s
@@ -145,7 +145,7 @@ USB 前綴路徑
 視頻模式
 對話框顏色
 被選定顏色
-空閑
+Reset Colors
 訊息
 自定義 ELF
 顏色選項
@@ -211,7 +211,7 @@ PS2RD 金手指模式
 自動啟動
 以秒為單位,設為 0 禁用自動啟動
 PS2 標誌
-進入遊戲前顯示相應標識
+Displayed for a valid disc logo matching the console's region.
 配置PADEMU
 PADEMU設置
 開啟PADEMU
@@ -277,6 +277,12 @@ vmc %s 文件碎片化.是否繼續使用插槽 %d 中的記憶卡？
 當前遊戲
 全部
 選擇要刪除的設置。
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description
 PS1遊戲
 PS1遊戲啟動模式
 POPSTARTER.ELF在\'%s\'上找不到!

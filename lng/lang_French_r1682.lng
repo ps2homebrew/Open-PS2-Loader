@@ -1,12 +1,12 @@
 # Translation by machiavel and Squall
-# Last update: Nov. 06, 2019
-# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
+# Last update: Feb. 11, 2020
+# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
 OPL %s
 Sauvegarder
 Retour
-Configuration réseau
+Network Settings
 Options avancées
 <vide>
 Paramètres sauvegardés vers %s
@@ -145,7 +145,7 @@ Arrêt auto. HDD
 Mode vidéo
 Couleur dialogue
 Couleur sélectionné
-Inutilisé
+Reset Colors
 Info
 ELF personnalisé
 Sélection de la couleur
@@ -211,7 +211,7 @@ Démarrage auto dans %i s...
 Démarrage auto.
 Valeur en seconde(s), 0 pour désactiver le démarrage auto
 Logo PS2
-S'affiche uniquement si le logo du disque est compatible avec la région de votre console
+Displayed for a valid disc logo matching the console's region.
 Configurer PADEMU
 Options de PADEMU
 Activer PadEmulator
@@ -277,6 +277,12 @@ Global
 Par jeu
 Tout
 Sélectionnez les paramètres à supprimer.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description
 PS1 Games
 Mode d'affichage des jeux PS1
 POPSTARTER.ELF non trouvé à '%s'!

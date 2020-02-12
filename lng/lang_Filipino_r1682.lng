@@ -1,12 +1,12 @@
 # Translation by Ceed Lorenzo
-# Last update: Nov. 02, 2019
-# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
+# Last update: Feb. 11, 2020
+# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Filipino
 OPL %s
 I-save ang mga pagbabago
 Likod
-Network Config
+Network Settings
 Advanced options
 <Walang values>
 Settings saved to %s
@@ -145,7 +145,7 @@ Awtomatikong HDD paikutin pababa
 Video mode
 dialog ng kulay
 Piniling kulay
-Unused
+Reset Colors
 Impo
 Custom ELF
 kulay ng seleksyon
@@ -211,7 +211,7 @@ Auto start in %i s...
 Auto Start
 Value in second(s), 0 to disable auto start.
 PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
+Displayed for a valid disc logo matching the console's region.
 Configure PADEMU
 Pad Emulator Settings
 Enable Pad Emulator
@@ -277,6 +277,12 @@ Global
 Per Game
 All
 Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

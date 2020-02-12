@@ -1,12 +1,12 @@
 # Translated by DDinghoya
-# Last update: Nov. 11, 2019
-# Updated for OPL_1641_DB-TA_all-04fb897-2019-11-02 and OPL_1406_ifcaro_beta_all-5dbb549-2019-11-02
+# Last update: Feb. 11, 2020
+# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
 저장 변경
 뒤로
-네트워크 구성
+Network Settings
 고급 옵션
 <값 없음>
 설정이 %s 에 저장되었습니다.
@@ -145,7 +145,7 @@ IGR 후 사용자 정의 ELF 부팅
 비디오 모드
 대화상자 색상
 선택한 색상
-미사용
+Reset Colors
 정보
 사용자 정의 ELF
 색상 선택
@@ -211,7 +211,7 @@ PS2RD 치트 엔진 모드
 자동 시작
 초 입력, 자동 시작하지 않으려면 0으로 설정
 PS2 로고
-콘솔의 지역과 일치하는 유효한 디스크 로고만 표시
+Displayed for a valid disc logo matching the console's region.
 PADEMU 구성
 패드 에뮬레이터 설정
 패드 에뮬레이터 활성화
@@ -277,6 +277,12 @@ VMC %s 파일이 조각났습니다. 슬롯 %d 에 있는 메모리 카드로 �
 게임당
 전부
 제거할 설정을 선택하십시오.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description
 PS1 게임
 PS1 게임 표시 모드
 '%s' 에 POPSTARTER.ELF이 없습니다!

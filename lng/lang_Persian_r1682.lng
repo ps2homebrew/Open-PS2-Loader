@@ -1,12 +1,12 @@
 # Translation by saeid0035
-# Last update: Feb. 11, 2020
+# Last update: Feb. 12, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Persian
 OPL %s
 تاﺮﻴﻴﻐﺗ هﺮﻴﺧذ
 ﺖﺸﮔﺮﺑ
-Network Settings
+ﻪﻜﺒﺷ ﺕﺎﻤﻴﻈﻨﺗ
 ﻪﺘﻓﺮﺸﻴﭘ یﺎﻫ ﻪﻨﻴﺰﮔ
 >راﺪﻘﻣ نوﺪﺑ<
 ﺪﺷ هﺮﻴﺧذ %s رد ﺕﺎﻤﻴﻈﻨﺗ
@@ -145,7 +145,7 @@ HDD رﺎﻛدﻮﺧ ﺶﺧﺮﭼ ﺶﻫﺎﻛ
 ﻮﻳﺪﻳو ﺖﻟﺎﺣ
 ﺎﻫ گﻮﻟﺎﻳد ﮓﻧر
 ﺎﻫ هﺪﺷ بﺎﺨﺘﻧا ﮓﻧر
-Reset Colors
+ﺎﮪ ﮓﻧﺭ ﻰﻧﺎﺸﻧ ﺯﺎﺑ
 تﺎﻋﺎﻠﻃا
 ﻲﺷرﺎﻔﺳ ELF ﻞﻳﺎﻓ
 ﮓﻧر بﺎﺨﺘﻧا
@@ -211,7 +211,7 @@ PS2RD ﺐﻠﻘﺗ ﺪﻛ رﻮﺗﻮﻣ ﺖﻟﺎﺣ
 رﺎﻛدﻮﺧ عوﺮﺷ
 رﺎﻛدﻮﺧ عوﺮﺷ ندﺮﻛ لﺎﻌﻓﺮﻴﻏ یاﺮﺑ 0 ,ﻪﻴﻧﺎﺛ رد راﺪﻘﻣ
 2 ﻦﺸﻴﺘﺳا ﻲﻠﭘ ﻮﮔﻮﻟ
-Displayed for a valid disc logo matching the console's region.
+.ﺩﻮﺷ ﻰﻣ ﻩﺩﺍﺩ ﻥﺎﺸﻧ ﺪﻧﺭﺍﺩ ﻰﻧﺍﻮﺨﻤﻫ ﻝﻮﺴﻨﻛ ﻦﺠﻳﺭ ﺎﺑ ﻪﻛ ﻯﺮﺒﺘﻌﻣ ﻯﺎﻫ ﮏﺴﻳﺩ ﻯﺍﺮﺑ
 ﺮﻟﺮﺘﻨﻛ زﺎﺳ ﻪﻴﺒﺷ یﺪﻨﺑﺮﻜﻴﭘ
 ﺮﻟﺮﺘﻨﻛ زﺎﺳ ﻪﻴﺒﺷ تﺎﻤﻴﻈﻨﺗ
 ﺮﻟﺮﺘﻨﻛ زﺎﺳ ﻪﻴﺒﺷ ندﺮﻛ لﺎﻌﻓ
@@ -277,12 +277,12 @@ FIELD flipping یزﺎﺳ ﻪﻴﺒﺷ
 ﻯﺯﺎﺑ ﺮﻫ ﺹﻮﺼﺨﻣ
 ﻪﻤﻫ
 ﺪﻴﻨﮐ ﺏﺎﺨﺘﻧﺍ ﺪﻴﻨﮐ ﮎﺎﭘ ﺪﻴﻫﺍﻮﺨﻴﻣ ﻪﻛ ﻰﺗﺎﻤﻴﻈﻨﺗ
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+:ﻩﺪﺷ ﻰﻧﺎﺒﻴﺘﺸﭘ ﻯﺎﻫ ﻡﺮﻓ
+ﻥﺍﻮﻨﻋ
+ﺮﻧﺍﮊ
+ﻪﺿﺮﻋ ﺦﻳﺭﺎﺗ
+ﻩﺪﻧﺯﺎﺳ
+ﺕﺎﺤﻴﺿﻮﺗ
 1 ﻦﺸﻴﺘﺳا ﻲﻠﭘ یﺎﻫ یزﺎﺑ
 1 ﻦﺸﻴﺘﺳا ﻲﻠﭘ یﺎﻫ یزﺎﺑ ﺶﻳﺎﻤﻧ ﺖﻟﺎﺣ
 !'%s' رد ﺪﺸﻧ ﺖﻓﺎﻳ POPSTARTER.ELF ﻞﻳﺎﻓ

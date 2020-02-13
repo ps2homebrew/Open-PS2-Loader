@@ -1,12 +1,12 @@
 # Translation by Lord_Flaya
-# Last update: Feb. 11, 2020
+# Last update: Feb. 12, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 OPL %s
 Spara ändringar
 Tillbaka
-Network Settings
+Nätverksinställningar
 Avancerad Konfig
 <Inga värden>
 Inställningar sparade till %s
@@ -145,7 +145,7 @@ Automatisk HDD nerspinn
 Videoläge
 Dialog färg
 Vald färg
-Reset Colors
+Återställ Färger
 Info
 Custom ELF
 Färgval
@@ -211,7 +211,7 @@ Autostart om %i s...
 Autostart 
 Värde i sekund(er), 0 inaktiverar Autostart
 PS2 Logo
-Displayed for a valid disc logo matching the console's region.
+Visas för giltig disklogo matchande konsolens region.
 Konfigurera PADEMU
 Pad Emulator Inställningar
 Aktivera PadEmulator
@@ -277,12 +277,12 @@ Globalt
 Per Sper
 Alla
 Välj inställningar att ta bort.
-Support Forums:
-Title
+Support-Forum:
+Titel
 Genre
-Release
-Developer
-Description
+Lansering
+Utvecklare
+Beskrivning
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

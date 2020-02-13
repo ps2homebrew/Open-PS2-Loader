@@ -1,12 +1,12 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: Feb. 11, 2020
+# Last update: Feb. 13, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 OPL %s
 Salvar mudanças
 Voltar
-Network Settings
+Configurações de Rede
 Opções avançadas
 <sem valores>
 Configurações salvas em %s
@@ -145,7 +145,7 @@ Desligamento automático do HDD (spin down)
 Modo de vídeo
 Cor do diálogo
 Cor da seleção
-Reset Colors
+Redefinir Cores
 Info
 Customizar ELF principal
 Seleção de cor
@@ -211,7 +211,7 @@ Auto iniciar em %i segundos
 Auto iniciar
 Valor em segundo(s), 0(zero) desabilita o auto iniciar
 Logo PS2
-Displayed for a valid disc logo matching the console's region.
+Exibido para um logotipo de disco válido que corresponde à região do console.
 Configurar PADEMU
 Configurações do Emulador de Controles
 Ativar Emulador de Controles
@@ -277,12 +277,12 @@ Global
 Por jogo
 Todos
 Selecione as configurações para remover.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Fóruns de suporte:
+Título
+Gênero
+Data de lançamento
+Desenvolvedor
+Descrição
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

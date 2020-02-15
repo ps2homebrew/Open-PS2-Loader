@@ -1,12 +1,12 @@
 # Translation by lauchon22
-# Last update: Feb. 11, 2020
+# Last update: Feb. 14, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
 OPL %s
 Guardar cambios
 Atrás
-Network Settings
+Configuración de red
 Opciones avanzadas
 <Sin configurar>
 Configuración guardada en %s
@@ -145,7 +145,7 @@ Paro automático rotación del Disco duro
 Modo de vídeo interfaz
 Color de diálogos
 Color de selección
-Reset Colors
+Restaurar colores
 Info.
 Archivo ELF personalizado
 Seleccionar color
@@ -211,7 +211,7 @@ Inicio en %i s...
 Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
 PS2 Logo
-Displayed for a valid disc logo matching the console's region.
+Muestra un logotipo de disco válido que coincida con la región de la consola.
 Configurar PADEMU
 Configurar el mando del emulador
 Habilitar PadEmulator
@@ -277,12 +277,12 @@ Global
 Por Juegos
 Todos
 Selecciona configuración a eliminar.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Foros de soporte:
+Título
+Género
+Lanzamiento
+Desarrollador
+Descripción
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

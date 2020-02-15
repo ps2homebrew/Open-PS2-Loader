@@ -1,12 +1,12 @@
 # Translation by co5oos
-# Last update: Feb. 11, 2020
+# Last update: Feb. 15, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Hungarian
 OPL %s
 Változtatások mentése
 Vissza
-Network Settings
+Hálózati Beállítások
 Haladó beállítások
 <Nincs érték>
 Beállítások elmentve %s-be
@@ -145,7 +145,7 @@ Automatikus Merevlemez kikapcsolás
 Videó mód
 Párbeszédablak színe
 Kiválasztott színe
-Reset Colors
+Színek Visszaállítása
 Infó
 Testreszabott ELF
 Szín szelekció
@@ -211,7 +211,7 @@ Automatikus indítás %i s belül...
 Automatikus indítás
 Érték másodperc(ek)ben, 0 az Automatikus indítás letiltásához
 PS2 Logó
-Displayed for a valid disc logo matching the console's region.
+A konzol régiójához megfelelő lemez logó megjelenése.
 PADEMU konfigurálás
 Pad Emulator Beállítások
 PadEmulator Engedélyezése
@@ -277,12 +277,12 @@ Globális
 Játékonként
 Összes
 Válassza ki az eltávolítani való beállításokat.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Támogatási Fórumok:
+Cím
+Műfaj
+Megjelenés
+Fejlesztő
+Leírás
 PS1 Játékok
 PS1 Játékok megjelenítési módja
 POPSTARTER.ELF nem található '%s'-nél!

@@ -30,6 +30,6 @@ int SMAPStart(void);
 void SMAPStop(void);
 int SMAPGetMACAddress(unsigned char *buffer);
 
-inline void SMapLowLevelInput(struct pbuf *pBuf);
+void SMapLowLevelInput(struct pbuf *pBuf);
 
 #include "xfer.h"

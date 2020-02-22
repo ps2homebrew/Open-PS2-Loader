@@ -28,8 +28,8 @@ int readFileBuffer(file_buffer_t *readContext, char **outBuf);
 void writeFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size);
 void closeFileBuffer(file_buffer_t *fileBuffer);
 
-inline int max(int a, int b);
-inline int min(int a, int b);
+int max(int a, int b);
+int min(int a, int b);
 int fromHex(char digit);
 char toHex(int digit);
 
@@ -50,6 +50,6 @@ int sysDeleteFolder(const char *folder);
 
 int CheckPS2Logo(int fd, u32 lba);
 
-inline void delay(int count);
+void delay(int count);
 
 #endif

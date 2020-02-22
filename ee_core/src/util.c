@@ -20,13 +20,13 @@ extern int size_cdvdfsv_irx;
 extern void *_end;
 
 /* Do not link to strcpy() from libc */
-inline void _strcpy(char *dst, const char *src)
+void _strcpy(char *dst, const char *src)
 {
     strncpy(dst, src, strlen(src) + 1);
 }
 
 /* Do not link to strcat() from libc */
-inline void _strcat(char *dst, const char *src)
+void _strcat(char *dst, const char *src)
 {
     _strcpy(&dst[strlen(dst)], src);
 }
@@ -177,7 +177,7 @@ char *_strstr(const char *string, const char *substring)
 }
 
 /* Do not link to islower() from libc */
-inline int _islower(int c)
+int _islower(int c)
 {
     if ((c < 'a') || (c > 'z'))
         return 0;
@@ -188,7 +188,7 @@ inline int _islower(int c)
 }
 
 /* Do not link to toupper() from libc */
-inline int _toupper(int c)
+int _toupper(int c)
 {
     if (_islower(c))
         c -= 32;

@@ -15,6 +15,11 @@ IOP_LIBS =
 
 IOP_INCS += -Iinclude -I../../iopcore/common
 IOP_CFLAGS += -DLWIP_NOASSERT -Wall -fno-builtin-printf
+ifneq ($(IOP_CC_VERSION),3.2.2)
+ifneq ($(IOP_CC_VERSION),3.2.3)
+IOP_CFLAGS += -mno-memcpy
+endif
+endif
 IOP_ASFLAGS +=
 IOP_LDFLAGS += -s
 

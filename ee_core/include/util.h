@@ -12,16 +12,16 @@
 
 #include <tamtypes.h>
 
-inline void _strcpy(char *dst, const char *src);
-inline void _strcat(char *dst, const char *src);
+void _strcpy(char *dst, const char *src);
+void _strcat(char *dst, const char *src);
 int _strncmp(const char *s1, const char *s2, int length);
 int _strcmp(const char *s1, const char *s2);
 char *_strchr(const char *string, int c);
 char *_strrchr(const char *string, int c);
 char *_strtok(char *strToken, const char *strDelimit);
 char *_strstr(const char *string, const char *substring);
-inline int _islower(int c);
-inline int _toupper(int c);
+int _islower(int c);
+int _toupper(int c);
 int _memcmp(const void *s1, const void *s2, unsigned int length);
 unsigned int _strtoui(const char *p);
 int _strtoi(const char *p);

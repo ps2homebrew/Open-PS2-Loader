@@ -29,7 +29,7 @@ static inline void Align_offsets(void *base_address, unsigned int *offset_in, st
 /*----------------------------------------------------------------------------------------
 	Replace modules in a IOPRP image.
 ------------------------------------------------------------------------------------------*/
-inline unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, unsigned int size_cdvdman)
+unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, unsigned int size_cdvdman)
 {
     unsigned int offset_in, offset_out; /* For processing purposes */
     struct romdir_entry *romdir_in, *romdir_out;

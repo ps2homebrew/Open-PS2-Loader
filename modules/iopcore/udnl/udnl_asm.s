@@ -1,3 +1,9 @@
+.ifdef .gasversion.
+.section .mdebug.abi32
+.nan legacy
+.module softfloat
+.module nooddspreg
+.endif
 .set noat
 .set noreorder
 

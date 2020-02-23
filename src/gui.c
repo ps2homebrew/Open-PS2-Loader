@@ -294,7 +294,7 @@ static void guiShowNotifications(void)
     if (showLngPopup && popupTimer >= 20)
         guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
 
-    if (popupTimer >= CLOCKS_PER_SEC / 2000) {
+    if (popupTimer >= 60*5) { /* HACK: 5 seconds @ 60fps */
         guiResetNotifications();
         showCfgPopup = 0;
     }

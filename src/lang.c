@@ -503,7 +503,7 @@ int lngFindGuiID(const char *lang)
     if (lang) {
         int i = 0;
         for (; i < nLanguages; i++) {
-            if (stricmp(languages[i].name, lang) == 0)
+            if (strcasecmp(languages[i].name, lang) == 0)
                 return i + 1; // shift for Gui id
         }
     }

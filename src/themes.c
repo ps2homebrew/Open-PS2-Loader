@@ -1360,7 +1360,7 @@ int thmFindGuiID(const char *theme)
     if (theme) {
         int i = 0;
         for (; i < nThemes; i++) {
-            if (stricmp(themes[i].name, theme) == 0)
+            if (strcasecmp(themes[i].name, theme) == 0)
                 return i + 1;
         }
     }

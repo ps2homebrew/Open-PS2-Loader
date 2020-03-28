@@ -1,12 +1,12 @@
 # Translation by machiavel and Squall
-# Last update: Feb. 11, 2020
+# Last update: March 26, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
 OPL %s
 Sauvegarder
 Retour
-Network Settings
+Paramètres réseau
 Options avancées
 <vide>
 Paramètres sauvegardés vers %s
@@ -23,17 +23,17 @@ Langue
 Le système va être éteint.
 Quitter vers Menu?
 Annuler mise à jour?
-%d: HDD non détecté
-%d: HDD non formaté
-%d: Erreur démarrage réseau
-%d: Adaptateur réseau non détecté
-%d: Ne peut se connecter au serveur SMB
-%d: Ne peut s'authentifier au serveur SMB
-%d: Ne peut ouvrir le partage SMB
-%d: Ne peut lister les partages SMB
-%d: Ne peut lister les jeux
-%d: Serveur DHCP indisponible
-%d: Pas de connexion réseau
+%d: HDD non détecté.
+%d: HDD non formaté.
+%d: Erreur démarrage réseau.
+%d: Adaptateur réseau non détecté.
+%d: Ne peut se connecter au serveur SMB.
+%d: Ne peut s'authentifier au serveur SMB.
+%d: Ne peut ouvrir le partage SMB.
+%d: Ne peut lister les partages SMB.
+%d: Ne peut lister les jeux.
+%d: Serveur DHCP indisponible.
+%d: Pas de connexion réseau.
 Acti.
 Désa.
 OK
@@ -44,24 +44,24 @@ Croix
 Liste des jeux
 Options du jeu
 Supprimer les paramètres
-Options du jeu supprimées
+Options du jeu supprimées.
 Défilement
 Lent
 Moyen
 Rapide
 Menu par défaut
 Charger depuis le disque
-Veuillez patienter
-Erreur lors du chargement de l'ID du jeu
+Veuillez patienter.
+Erreur lors du chargement de l'ID du jeu.
 Tri automatique
-Erreur lors du chargement du fichier langue
+Erreur lors du chargement du fichier langue.
 Désactiver couleurs de debug
 Aucune manette détectée, attente...
 Activer jaquette
 Écran large
 Éteindre
-Chargement config
-Sauvegarde config
+Chargement config...
+Sauvegarde config...
 Démarrer le périphérique
 Rafraîchir
 Mode de démarrage USB
@@ -73,7 +73,7 @@ Manuel
 Démarrer serveur HDL
 Démarrage serveur HDL...
 Serveur HDL démarré...
-Démarrage serveur HDL échoué
+Démarrage serveur HDL échoué.
 Déchargement serveur HDL...
 Chemin IGR
 Couleur de fond
@@ -97,7 +97,7 @@ Type d'adresse
 IP
 NetBIOS
 Accepter
-L'objet sera définitivement supprimé, continuer ?
+L'objet sera définitivement supprimé, continuer?
 Renommer
 Supprimer
 Lancer
@@ -106,10 +106,10 @@ Activer l'écriture
 Vérifier fragmentation jeu USB
 Souvenir dernier jeu joué
 Bouton de sélection
-Erreur, le jeu est fragmenté
-Erreur, impossible de lancer l'objet
+Erreur, le jeu est fragmenté.
+Erreur, impossible de lancer l'objet.
 Tester les changements
-Laissez vide pour authentification invité
+Laissez vide pour authentification invité.
 Lecture précise (simule la vitesse de lecture du CD/DVD)
 Mode synchrone (mode de lecture alternatif)
 Décrocher Syscalls (purge OPL après lancement du jeu)
@@ -130,27 +130,27 @@ Nom
 Taille
 État
 Progression
-Fichier VMC existant
-Fichier VMC invalide, taille incorrecte
-Fichier VMC doit d'abord être créé
+Fichier VMC existant.
+Fichier VMC invalide, taille incorrecte.
+Fichier VMC doit d'abord être créé.
 Erreur d'accès à la VMC %s. Continuer avec la Memory Card dans le slot %d?
 Rafraîchissement automatique
 À propos
 Codeurs
 Assurance qualité
 Préfixe du chemin USB
-Lancer ELF perso après un IGR
-En minute(s), 0 pour désactiver l'arrêt automatique
+Lancer ELF perso après un IGR.
+En minute(s), 0 pour désactiver l'arrêt automatique.
 Arrêt auto. HDD
 Mode vidéo
 Couleur dialogue
 Couleur sélectionné
-Reset Colors
+Réinitialiser les couleurs
 Info
 ELF personnalisé
 Sélection de la couleur
 Reconnecter
-Laissez vide pour lister les partages
+Laissez vide pour lister les partages.
 Préfixe du chemin ETH
 Effacer
 Espace
@@ -177,41 +177,41 @@ Lien mode ETH
 10Mbit Half-duplex
 Options GSM
 Activer GSM
-Basculer On/Off GSM
+Basculer On/Off GSM.
 VMODE
-Mode d'affichage perso forcé
+Mode d'affichage perso forcé.
 Pos. H
-Ajustement horizontal
+Ajustement horizontal.
 Pos. V
-Ajustement vertical
+Ajustement vertical.
 Overscan
-Ajustement Overscan
+Ajustement Overscan.
 Passer FMV
-Passe les FMV
+Passe les FMV.
 Options de cheat
 Activer PS2RD
-Laisser PS2RD patcher vos jeux
+Laisser PS2RD patcher vos jeux.
 Mode PS2RD
-Automatique/Manuel
-Automatique
+Automatique/Manuel.
+Automatique.
 Manuel (inactif, fonction à venir)
-Erreur: Impossible de charger le fichier de cheat
+Erreur: Impossible de charger le fichier de cheat.
 Aucun cheat trouvé
 Télécharger les régl. par défaut
 Mise à jour réseau
 Ecraser les enregistrements existants
-Mise à jour échouée
-Échec de connexion au serveur
+Mise à jour échouée.
+Échec de connexion au serveur.
 Mise à jour terminée.
 Mise à jour annulée.
 Télécharger les options depuis le réseau?
 Options personnalisées
 Options par défaut téléchargées
 Démarrage auto dans %i s...
-Démarrage auto.
-Valeur en seconde(s), 0 pour désactiver le démarrage auto
+Démarrage auto
+Valeur en seconde(s), 0 pour désactiver le démarrage auto.
 Logo PS2
-Displayed for a valid disc logo matching the console's region.
+Affiche le logo du disque correspondant à la région de la console.
 Configurer PADEMU
 Options de PADEMU
 Activer PadEmulator
@@ -233,7 +233,7 @@ Appairer contrôleur DS
 Appairer contrôleur DS avec l'adresse MAC de l'adaptateur Bluetooth.
 Non Connecté
 Informations de l'adaptateur Bluetooth
-Montrer plus d'informations et de fonctions supportées
+Montrer plus d'informations et de fonctions supportées.
 Version HCI:
 Version LMP:
 ID Fabricant:
@@ -244,8 +244,8 @@ L'adaptateur Bluetooth devrait être parfaitement compatible avec les contrôleu
 L'adaptateur Bluetooth peut ne pas fonctionner correctement avec les contrôleurs DS3/DS4.
 Activer l'émulation du Multitap
 Active/désactive l'émulation du Multitap pour le jeu sélectionné.
-Émulateur Multitap sur le port
-Sélectionnez le port pour émuler le Multitap
+Émulateur Multitap sur le port:
+Sélectionnez le port pour émuler le Multitap.
 Désactiver correctif des DS3 simulées
 Certaines DS3 simulées nécessitent ce correctif, cette option le désactivera.
 Émuler FIELD flipping
@@ -269,19 +269,19 @@ Cache liste de jeu (HDD)
 Activer les Notifications
 %s chargé depuis %s
 Menu du jeu
-Supprimer les paramètres
-%s paramètres supprimés
+Supprimer les paramètres.
+%s paramètres supprimés.
 Écrase les paramètres de compatibilité de jeu existants lorsqu'il est activé.
 Mode Paramètres
 Global
 Par jeu
 Tout
 Sélectionnez les paramètres à supprimer.
-Support Forums:
-Title
+Forums d'assistance:
+Titre
 Genre
-Release
-Developer
+Mise à jour
+Développeur
 Description
 PS1 Games
 Mode d'affichage des jeux PS1

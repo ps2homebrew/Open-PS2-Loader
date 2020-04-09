@@ -65,13 +65,13 @@ static const patchlist_t patch_list[] = {
     {"SLUS_212.00", USB_MODE, {PATCH_GENERIC_AC9B, 0x00000000, 0x00000000}},       // Armored Core Nine Breaker NTSC U - skip failing case on binding a RPC server
     {"SLES_538.19", USB_MODE, {PATCH_GENERIC_AC9B, 0x00000000, 0x00000000}},       // Armored Core Nine Breaker PAL - skip failing case on binding a RPC server
     {"SLPS_254.08", USB_MODE, {PATCH_GENERIC_AC9B, 0x00000000, 0x00000000}},       // Armored Core Nine Breaker NTSC J - skip failing case on binding a RPC server
-    {"SLUS_210.05", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac514}}, // Kingdom Hearts 2 US - [Gummi mission freezing fix (check addr is where to patch,
-    {"SLES_541.14", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac60c}}, // Kingdom Hearts 2 UK - val is the amount of delay cycles)]
-    {"SLES_542.32", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac60c}}, // Kingdom Hearts 2 FR
-    {"SLES_542.33", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac60c}}, // Kingdom Hearts 2 DE
-    {"SLES_542.34", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac60c}}, // Kingdom Hearts 2 IT
-    {"SLES_542.35", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac60c}}, // Kingdom Hearts 2 ES
-    {"SLPM_662.33", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00100000, 0x001ac44c}}, // Kingdom Hearts 2 JPN
+    {"SLUS_210.05", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac514}}, // Kingdom Hearts 2 US - [Gummi mission freezing fix (check addr is where to patch,
+    {"SLES_541.14", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac60c}}, // Kingdom Hearts 2 UK - val is the amount of delay cycles)]
+    {"SLES_542.32", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac60c}}, // Kingdom Hearts 2 FR
+    {"SLES_542.33", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac60c}}, // Kingdom Hearts 2 DE
+    {"SLES_542.34", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac60c}}, // Kingdom Hearts 2 IT
+    {"SLES_542.35", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac60c}}, // Kingdom Hearts 2 ES
+    {"SLPM_662.33", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00110000, 0x001ac44c}}, // Kingdom Hearts 2 JPN
     {"SLPM_666.75", ALL_MODE, {PATCH_GENERIC_SLOW_READS, 0x00149210, 0x001adf64}}, // Kingdom Hearts 2 Final Mix JPN
     {"SLUS_212.87", ETH_MODE, {PATCH_GENERIC_SLOW_READS, 0x000c0000, 0x006cd15c}}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads
     {"SLUS_212.87", HDD_MODE, {PATCH_GENERIC_SLOW_READS, 0x00040000, 0x006cd15c}}, // Prince of Persia: The Two Thrones NTSC U - slow down cdvd reads

@@ -7,7 +7,7 @@ Open PS2 Loader %s
 網絡設置
 進階設置
 <無數值>
-設置已保存...
+Settings saved to %s
 寫入設置錯誤!
 離開
 設置
@@ -41,7 +41,7 @@ Exit to Browser?
 叉叉
 遊戲清單
 遊戲設置
-移除所有設置
+Remove Settings
 移除遊戲所有的設置
 滾動
 較慢
@@ -54,7 +54,7 @@ Exit to Browser?
 自動滾動
 讀取語言文件時出錯
 禁用 Debug Colors
-無偵測到搖桿, 等待中...
+"無偵測到搖桿, 等待中..."
 啟用圖示封面
 寬螢幕
 關機
@@ -95,7 +95,7 @@ DNS 伺服器
 IP
 NetBIOS
 允許
-項目將被永久刪除, 繼續嗎?
+"項目將被永久刪除, 繼續嗎?"
 重新命名
 刪除
 運行
@@ -104,9 +104,9 @@ NetBIOS
 檢查 USB 遊戲碎片
 記住最後一個玩的遊戲
 選定鍵
-錯誤, 遊戲有碎片
-錯誤, 無法運行該項目
-測試
+"錯誤, 遊戲有碎片"
+"錯誤, 無法運行該項目"
+Test Changes
 GUEST驗證留空.
 精確讀取
 同步模式
@@ -115,7 +115,7 @@ Skip videos
 模擬 DVD-DL
 禁用 IGR
 Unused
-Unused
+隱藏 DEV9 模式
 改變大小將會重新格式化 VMC
 生成
 開始
@@ -129,16 +129,16 @@ Unused
 狀態
 進度
 VMC 檔案已存在
-無效的 VMC 檔案, 大小有誤
+"無效的 VMC 檔案, 大小有誤"
 需要建立VMC 檔案
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+"VMC %s 出錯, 繼續使用物理記憶卡嗎 (slot %d) ?"
 自動重新整理
 關於
 Coders
 Quality Assurance
 USB 前墜路徑
 Boots Custom ELF after an IGR
-數值以分鐘計,設為 0 禁用降速
+"數值以分鐘計,設為 0 禁用降速"
 自動 HDD 降速
 影片模式
 對話框顏色
@@ -197,7 +197,7 @@ PS2RD 金手指引擎模式
 無發現金手指文件
 下載預設值
 網絡更新
-重新下載現有記錄?
+Overwrite Existing Records
 更新失敗.
 連結更新伺服器失敗.
 更新已完成.
@@ -207,7 +207,7 @@ PS2RD 金手指引擎模式
 已下載預設值
 將自動於 %i 秒後啟動...
 自動啟動
-以秒為單位,設為 0 來禁用自動啟動
+"以秒為單位,設為 0 來禁用自動啟動"
 PS2 Logo
 Only displayed for a valid disc logo which matches the console's region
 Configure PADEMU
@@ -227,8 +227,8 @@ Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
 Pair
-Pair DS Controller
-Pair DS Controller with bluetooth adapter mac address.
+Pair DS controller
+Pair DS controller with bluetooth adapter mac address.
 Not connected
 Bluetooth adapter information
 Shows more information and supported features
@@ -244,8 +244,8 @@ Enable Multitap emulation
 Turns on/off Multitap emulation for selected game.
 Multitap emulator on port
 Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Disable workaround for fake ds4
+"Some fake ds3s need workaround, this option will disable it."
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

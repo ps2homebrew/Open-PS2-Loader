@@ -58,7 +58,7 @@ Nenhum controle detectado, aguardando...
 Habilitar as artes da Capa
 Tela panorâmica
 Desligar o PS2
-Carregando configurações
+Carregando configurações...
 Salvando configurações...
 Iniciar dispositivo
 Atualizar
@@ -83,8 +83,8 @@ Estático
 DHCP
 Endereço IP
 Endereço
-Máscara de sub-rede
-Gateway padrão
+Máscara
+Gateway Padrão
 Servidor DNS
 Porta
 Compartilhamento
@@ -108,15 +108,15 @@ Erro, o jogo está fragmentado
 Erro, o item não pode ser iniciado
 Testar
 Deixe em branco para não usar senhas.
-Leituras corretas
+Leituras Corretas
 Modo de Sincronia
 Desativar chamadas do sistema
-Pular vídeos
+Pular Vídeos
 Emular DVD-DL
 Desativa o IGR
 Sem uso
 Sem uso
-Mudando de tamanho, formatará o VMC
+Mudando de tamanho, formatará o VMC.
 Criar
 Iniciar
 Modificar
@@ -129,26 +129,26 @@ Tamanho
 Estatísticas
 Progresso
 O arquivo do VMC já existe
-Arquivo VMC inválido, o tamanho está incorreto
-O arquivo do VMC precisa ser criado
-Error com o VMC %s, continuar com o MC físico (slot %d) ?
-Atualização automática
+Arquivo VMC inválido, o tamanho está incorreto.
+O arquivo do VMC precisa ser criado.
+Error ao acessar o VMC %s, continuar com o MC físico (slot %d)?
+Atualização Automática
 Créditos
 Desenvolvedores
 Controle de Qualidade
 Prefixo do caminho USB
-Inicia um ELF preferencial após um IGR
-Valor em minuto(s), 0 para desativar
+Inicia um ELF preferencial após um IGR.
+Valor em minuto(s), 0 para desativar.
 Desligamento automático do HDD
 Modo de vídeo
-Cor do diálogo
-Cor selecionada
+Cor do Diálogo
+Cor Selecionada
 Mostrar Página de Informação 
 Info.
-ELF modificado
+ELF Modificado
 Seleção de Cor
 Reconectar
-Deixar vazio para listar compartilhamentos
+Deixar vazio para listar compartilhamentos.
 Prefixo de caminho ETH
 Apagar
 Espaço
@@ -158,7 +158,7 @@ VMC Slot 1
 VMC Slot 2
 ID do Jogo
 Modo de DMA
-Sincronização do vídeo 
+Sincronização do Vídeo
 Modo 1
 Modo 2
 Modo 3
@@ -168,29 +168,29 @@ Modo 6
 Modo 7
 Modo 8
 Configurar GSM
-Modo de link da Internet
-100Mbit duplex-integral
-100Mbit semi-duplex
-10Mbit duplex-integral
-10Mbit semi-duplex
+Modo de Link da Internet
+100Mbit Duplex-Integral
+100Mbit Semi-Duplex
+10Mbit Duplex-Integral
+10Mbit Semi-Duplex
 Opções do GSM
 Ativar GSM
-Ativar/Desativar o GSM
+Ativar/Desativar o GSM.
 VMODE
-NTSC/PAL/60Hz/PS1/HDTV/VGA
+Modo de vídeo para forçar.
 POS-H
-Ajustes Horizontais
+Ajustes Horizontais.
 POS-V
-Ajustes Verticais
+Ajustes Verticais.
 Overscan
-Ajustes do Overscan
+Ajustes do Overscan.
 Pular FMV
-Pula os vídeos do jogo
+Pula os vídeos do jogo.
 Opções de trapaças
 Ativar o PS2RD Cheat Engine
 Deixar o PS2RD patchear seus jogos
 Modo do PS2RD Cheat Engine
-Auto-selecionar ou Escolher as trapaças
+Auto-selecionar ou Escolher as trapaças.
 Auto-selecionar trapaças
 Selecionar trapaças
 Erro: Falha ao carregar as trapaças
@@ -207,9 +207,9 @@ Configurações personalizadas
 Configurações baixadas
 Iniciar automaticamente no %i s...
 Auto-começar
-Valores em segundos (s), 0 para desativar
+Valores em segundos (s), 0 para desativar.
 Logotipo do Playstation 2
-Será mostrado apenas para os jogos que for da mesma região do console
+Será mostrado apenas para os jogos que for da mesma região do console.
 Configurar DualShock3/4
 Configurações de emulação de Controle
 Ativar emulação de Controle
@@ -231,7 +231,7 @@ Sincroniza o controle DualShock 3/4
 Sincroniza o controle DualShock 3/4 com endereço MAC do adaptador bluetooth.
 Não está conectado
 Informações do adaptador Bluetooth
-Mostra mais informações e recursos suportados
+Mostra mais informações e recursos suportados.
 Versão do HCI:
 Versão do LMP:
 ID do fabricante:
@@ -242,7 +242,7 @@ O adaptador Bluetooth precisa ser compatível com o controle DS3/DS4.
 O adaptador Bluetooth talvez não funcione corretamente no controle DS3/DS4.
 Ativar emulação do Multitap
 Liga/Desliga a emulação do Multitap para o jogo selecionado.
-Emulador do Multitap na porta
+Emulador do Multitap na porta:
 Escolha a porta para a emulação do Multitap.
 Desativar soluções alternativa para DS3 falsos
 Alguns DS3 falsos precisam de soluções alternativas, esta opção irá desativá-la.
@@ -263,4 +263,21 @@ Ativar Som de Inicialização
 Volume do Efeito Sonoro
 Volume do Som de Inicialização
 Confirmar as mudanças do modo de vídeo?
-Cache Game List (HDD)
+Cache da lista de jogos (HDD)
+Ativar Notificações
+%s carregado do %s
+Menu de Jogo
+Configurações de jogos salvas.
+Ajustes %s removidos.
+Substitui as configurações de compatibilidade de jogos existentes ao ativar.
+Modo de Configuração
+Global
+Por Jogo
+Tudo
+Selecione um ajuste para remover.
+Fórum de Suporte:
+Título
+Gênero
+Lançamento
+Desenvolvedor
+Descrição

@@ -7,7 +7,7 @@ Atrás
 Conexión de red
 Opciones avanzadas
 <Sin configurar>
-Configuración guardada
+Configuración guardada en %s
 ¡Error al guardar la configuración!
 Salir
 Configuración principal
@@ -40,9 +40,9 @@ Cancelar
 Círculo
 Equis
 Lista de juegos
-Ajustes
-Borrar todos los ajustes
-Ajustes del juego borrados
+Configuración
+Borrar configuraciones
+Configuraciones del juego eliminadas
 Desplazamiento
 Lento
 Medio
@@ -96,8 +96,8 @@ IP
 NetBIOS
 Aceptar
 El archivo se borrará definitivamente, ¿continuar?
-Renombrar
-Borrar
+Renombrar juego
+Borrar juego
 Iniciar
 Pantalla
 Mostrar operaciones de escritura
@@ -106,7 +106,7 @@ Recordar último juego en uso
 Botón de selección
 Error, el juego está fragmentado
 Error, no se pudo iniciar el archivo
-Test
+Testear cambios
 Dejar en blanco para autentificar como GUEST
 Lectura precisa
 Modo sincronizado
@@ -123,7 +123,7 @@ Modificar
 Abortar
 Reiniciar
 Usar genérica
-Configurar VMC
+Configuración VMC
 Nombre
 Tamaño
 Estado
@@ -143,7 +143,7 @@ Paro automático rotación del disco duro
 Modo de vídeo
 Color de diálogos
 Color de selección
-Mostrar pantalla de información
+Reinicio colores
 Info.
 Archivo ELF personalizado
 Seleccionar color
@@ -167,7 +167,7 @@ Modo 5
 Modo 6
 Modo 7
 Modo 8
-Ajustes GSM
+Configuración GSM
 Configuración de velocidad ethernet y duplex
 100Mbit full-duplex
 100Mbit half-duplex
@@ -186,7 +186,7 @@ Sobre escaneo
 Ajuste sobre escaneo
 Omitir vídeos FMV
 Omite escenas Full Motion Vídeos
-Ajustes PS2RD
+Configuración PS2RD
 Activar PS2RD
 Permitir que PS2RD parchee el juego
 Modo PS2RD
@@ -195,22 +195,22 @@ Auto-seleccionar códigos
 Seleccionar códigos de juegos
 Error: fallo al cargar el archivo de códigos
 No se han encontrado códigos
-Descargar ajustes predeterminados
-Descargar ajustes de los juegos
-¿Cargar de nuevo los ajustes existentes?
+Descargar configuración predeterminada
+Descargar configuraciones de los juegos
+Sobrescribir configuración existente
 Actualización fallida.
 Error al conectarse con el servidor de actualización.
 Actualización completa.
 Actualización cancelada.
-¿Descargar ajustes desde la red?
+¿Descargar configuración desde la red?
 Configuraciones personalizadas
-Descargados ajustes predeterminados
+Descargada configuración predeterminada
 Inicio en %i s...
 Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
 Logotipo Playstation 2
 Sólo se mostrará si el juego es de la misma región que la consola
-Ajustes DualShock 3/4
+Configuración DualShock 3/4
 Opciones emulación del mando
 Usar emulación del mando
 Activa/desactiva la emulación del mando para el juego seleccionado
@@ -264,3 +264,20 @@ Volumen efectos de sonido
 Volumen sonido de inicio
 ¿Confirmar el cambio de modo de vídeo?
 Caché lista de juegos (Disco duro)
+Activar notificaciones
+%s cargado desde %s
+Menú juegos
+Configuración del juego guardada
+Ajuste %s borrado
+Cuando se activa sobrescribe la configuración de compatibilidad del juego
+Modo de configuración
+Global
+Por juego
+Todo
+Selecciona configuraciones para borrar.
+Foros de soporte
+Título
+Género
+Lanzamiento
+Desarrollador
+Descripción

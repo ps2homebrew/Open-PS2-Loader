@@ -1,12 +1,12 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: Feb. 11, 2020
+# Last update: April 11, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 OPL %s
 Änderungen speichern
 Zurück
-Network Settings
+Netzwerkeinstellungen
 Fortgeschrittene Optionen
 <keine werte>
 Einstellungen gespeichert in %s
@@ -145,7 +145,7 @@ Autom. Abschaltung der Festplatte
 Videomodus
 Dialogfarbe
 Auswahlfarbe
-Reset Colors
+Farben zurücksetzen
 Info
 Benutzerdefinierte ELF
 Farbauswahl
@@ -211,7 +211,7 @@ Automatischer Start in %i s...
 Automatischer Start
 Wert in Sekunden, 0 um Auto-start zu deaktivieren
 PS2 Logo
-Displayed for a valid disc logo matching the console's region.
+Wird für ein gültiges Disc-Logo angezeigt, dass der Region der Konsole entspricht.
 PADEMU konfigurieren
 Einstellungen Pad Emulator
 Pad Emulator aktivieren
@@ -277,12 +277,12 @@ Global
 je Spiel
 Alle
 Einstellungen Auswählen zum entfernen.
-Support Forums:
-Title
+Support-Foren
+Titel
 Genre
-Release
-Developer
-Description
+Veröffentlichung
+Entwickler
+Beschreibung
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

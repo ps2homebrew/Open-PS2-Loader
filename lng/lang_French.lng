@@ -7,7 +7,7 @@ Retour
 Configuration réseau
 Réglages avancés
 <non renseigné>
-Configuration sauvegardée...
+Settings saved to %s
 Erreur lors de la sauvegarde de la configuration
 Quitter Open PS2 Loader
 Configuration
@@ -41,7 +41,7 @@ O
 X
 Liste des jeux
 Réglages
-Supprimer tous les réglages
+Remove Settings
 Réglages du jeu supprimés
 Défilement
 Lent
@@ -106,7 +106,7 @@ Dernier jeu joué
 Touche de validation
 "Erreur, le jeu est fragmenté"
 "Erreur, impossible de lancer l'item"
-Tester les réglages
+Test Changes
 Laisser le champ vide pour utiliser la session Invité
 Simuler la vitesse de lecture du CD/DVD
 Mode de lecture alternatif (lecture synchrone)
@@ -143,7 +143,7 @@ Arrêt auto. disque dur interne
 Mode vidéo
 Options
 Sélection
-Page d'informations
+Reset Colors
 Infos.
 ELF alternatif
 Choix des couleurs de l'interface
@@ -197,7 +197,7 @@ Automatique
 Fichier de code .cht introuvable
 Télécharger les régl. prédéfinis
 Téléchargement des régl. prédéfinis
-Mise à jour des données existantes
+Overwrite Existing Records
 Échec du téléchargement
 Impossible de se connecter au serveur OPL-CL
 Téléchargement effectué avec succès
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

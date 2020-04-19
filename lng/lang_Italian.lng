@@ -7,7 +7,7 @@ Indietro
 Configurazione rete
 Opzioni avanzate
 <nessun valore>
-Impostazioni salvate...
+Settings saved to %s
 Errore scrittura impostazioni
 Esci
 Impostazioni
@@ -41,7 +41,7 @@ Cerchio
 X
 Lista dei giochi
 Impost.
-Rimuovi tutte le impostazioni
+Remove Settings
 Rimosse tutte le chiavi per il gioco
 Scorrimento
 Lento
@@ -106,7 +106,7 @@ Ricorda ultimo titolo giocato
 Tasto seleziona
 Errore, il gioco è frammentato
 Errore, impossibile avviare il titolo.
-Test
+Test Changes
 Lasciare vuoto per autenticazione GUEST
 Lettura accurata
 Modo sincrono
@@ -143,7 +143,7 @@ Spin down automatico HDD
 Modalità video
 Colore finestra
 Colore selezione
-Visualizza pagina info
+Reset Colors
 Info
 ELF personalizzato
 Seleziona il colore
@@ -197,7 +197,7 @@ Errore: impossibile caricare file cheats
 Nessun cheat trovato
 Scarica predefiniti
 Aggiornamento via rete
-Riscaricare le righe esistenti?
+Overwrite Existing Records
 Aggiornamento fallito.
 Impossibile connettersi al server di aggiornamento.
 Aggiornamento completato.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

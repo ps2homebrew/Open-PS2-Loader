@@ -7,7 +7,7 @@ Voltar
 Configurações de rede
 Opções avançadas
 <sem valores>
-Configurações salvas...
+Settings saved to %s
 Erro ao salvar as configurações!
 Sair
 Configurações
@@ -41,7 +41,7 @@ O
 X
 Lista de Jogos
 Configurar
-Remover todas as configurações
+Remove Settings
 Todas as configurações dos jogos foram removidas
 Rolagem
 Lenta
@@ -106,7 +106,7 @@ Lembrar do último jogo jogado
 Botão de seleção
 Erro, o jogo está fragmentado
 Erro, o item não pode ser iniciado
-Testar
+Test Changes
 Deixe em branco para não usar senhas.
 Leituras Corretas
 Modo de Sincronia
@@ -143,7 +143,7 @@ Desligamento automático do HDD
 Modo de vídeo
 Cor do Diálogo
 Cor Selecionada
-Mostrar Página de Informação 
+Reset Colors
 Info.
 ELF Modificado
 Seleção de Cor
@@ -197,7 +197,7 @@ Erro: Falha ao carregar as trapaças
 Nenhuma trapaça encontrada
 Baixar configurações
 Atualizar pela Internet
-Baixar dados existentes novamente?
+Overwrite Existing Records
 Falha na atualização.
 Falha ao conectar no servidor de atualização.
 Atualização concluída.

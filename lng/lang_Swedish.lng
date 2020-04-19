@@ -7,7 +7,7 @@ Tillbaka
 Nätverkskonfig
 Avancerad Konfig
 <Inga värden>
-Inställningar sparade...
+Settings saved to %s
 Fel vid skrivning av inställningar!
 Avsluta
 Inställning
@@ -41,7 +41,7 @@ Cirkel
 Kryss
 Spel-lista
 Spelinst.
-Ta bort alla inställningar
+Remove Settings
 Tog bort alla nycklar för spelet
 Bläddra
 Sakta
@@ -106,7 +106,7 @@ Kom ihåg senast spelade spel
 Välj knapp
 Fel, spelet är fragmenterat
 Fel, kunde inte köra posten
-Test
+Test Changes
 Lämna tomt för Gäst konto.
 Korrekt läsning
 Synkroniseringsläge
@@ -143,7 +143,7 @@ Automatisk HDD nerspinn
 Videoläge
 Dialog färg
 Vald färg
-Visa info sida
+Reset Colors
 Info
 Custom ELF
 Färgval
@@ -197,7 +197,7 @@ Fel: kunde inte ladda Fuskfilen
 Inga fusk funna
 Hämta standard
 Nätverksuppdatering
-Ladda ner befintliga arkiv?
+Overwrite Existing Records
 Uppdatering misslyckad
 Kunde inte ansluta till servern
 Uppdatering klar
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

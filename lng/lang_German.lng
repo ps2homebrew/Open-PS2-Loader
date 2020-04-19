@@ -7,7 +7,7 @@ Zurück
 Netzwerkkonfiguration
 Fortgeschrittene Optionen
 <keine werte>
-Einstellungen gespeichert...
+Settings saved to %s
 Fehler beim Schreiben der Einstellungen!
 Verlassen
 Einstellungen
@@ -41,7 +41,7 @@ Kreis
 Kreuz
 Spieleliste
 Spieleinst.
-Entferne alle Einstellungen
+Remove Settings
 Entferne alle keys für das Spiel
 Scrollen
 Langsam
@@ -106,7 +106,7 @@ Erinnere an zuletzt gespieltes Spiel
 Auswählen button
 Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
-Test
+Test Changes
 Leer lassen für Anmeldung als GAST
 Korrekte Lesegeschw
 Synchronmodus
@@ -143,7 +143,7 @@ Automatische Abschaltung der Festplatte
 Videomodus
 Dialogfarbe
 Ausgewählte Farbe
-Infoseite anzeigen
+Reset Colors
 Info
 Benutzerdefinierte ELF
 Farbauswahl
@@ -197,7 +197,7 @@ Fehler: Laden des Cheat-File fehlgeschlagen
 Keine Cheats gefunden
 Standardeinstellungen herunterladen
 Netzwerkaktualisierung
-Erneutes runterladen von bereits existierenden Aufzeichnungen?
+Overwrite Existing Records
 Aktualisierung fehlgeschlagen.
 Verbindung zum Updateserver fehlgeschlagen.
 Aktualisierung abgeschlossen.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

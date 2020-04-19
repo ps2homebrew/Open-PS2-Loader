@@ -7,7 +7,7 @@ Open PS2 Loader %s
 Конфигурация сети
 Расширенные опции
 <не указано>
-Настройки сохранены...
+Settings saved to %s
 Ошибка сохранения настроек!
 Выход
 Настройки
@@ -41,7 +41,7 @@ HDD-Игры
 Крест
 Список игр
 Конфиг. Игры
-Сбросить все настройки
+Remove Settings
 Все опции сброшены!
 Прокрутка
 Медленная
@@ -106,7 +106,7 @@ NetBIOS
 Кнопка выбор
 Ошибка, игра фрагментирована
 Ошибка, невозможно запустить объект!
-Проверка
+Test Changes
 Оставьте пустым для гостевого доступа
 Аккуратное чтение
 Режим синхронизации
@@ -143,7 +143,7 @@ VMC файл существует
 Видеорежим
 Цвет текста
 Выбранный цвет
-Включить страницу инфо
+Reset Colors
 Инфо
 Пользовательский ELF
 Выбор цвета
@@ -197,7 +197,7 @@ PS2RD Cheat Engine пропатчит вашу игру
 Не найдено ни читы
 Загрузка стандартных
 Обновление из Интернет
-Перезагрузить существующие записи?
+Overwrite Existing Records
 Не удалось загрузить.
 Не удалось соединится с сервером.
 Обновление завершено.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

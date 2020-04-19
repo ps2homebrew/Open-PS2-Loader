@@ -7,7 +7,7 @@ Open PS2 Loader %s
 网络设置
 进阶设置
 <无数值>
-设置已保存...
+Settings saved to %s
 写入设置错误!
 离开
 设置
@@ -41,7 +41,7 @@ O
 X
 游戏列表
 游戏设置
-移除所有设置
+Remove Settings
 移除游戏所有的设置
 滚动
 较慢
@@ -106,7 +106,7 @@ NetBIOS
 选定键
 错误, 游戏有碎片
 错误, 无法运行该项目
-测试
+Test Changes
 GUEST验证留空.
 精确读取
 同步模式
@@ -143,7 +143,7 @@ USB 前缀路径
 影片模式
 对话框颜色
 被选定颜色
-显示讯息页面
+Reset Colors
 讯息
 自定义 ELF
 颜色选项
@@ -197,7 +197,7 @@ PS2RD 金手指引擎模式
 未发现金手指文件
 下载默认值
 网络更新
-重新下载现有记录?
+Overwrite Existing Records
 更新失败.
 连结更新服务器失败.
 更新已完成.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

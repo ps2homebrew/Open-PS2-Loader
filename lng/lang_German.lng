@@ -1,5 +1,5 @@
-# German translation by ps2guy completed by LopoTRI
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# German translation by ps2guy completed by LopoTRI & TnA
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 German
 Open PS2 Loader %s
 Änderungen speichern
@@ -7,7 +7,7 @@ Zurück
 Netzwerkkonfiguration
 Fortgeschrittene Optionen
 <keine werte>
-Settings saved to %s
+Einstellungen auf %s gespeichert
 Fehler beim Schreiben der Einstellungen!
 Verlassen
 Einstellungen
@@ -41,7 +41,7 @@ Kreis
 Kreuz
 Spieleliste
 Spieleinst.
-Remove Settings
+Einstellungen Entfernen
 Entferne alle keys für das Spiel
 Scrollen
 Langsam
@@ -106,7 +106,7 @@ Erinnere an zuletzt gespieltes Spiel
 Auswählen button
 Fehler, das Spiel ist fragmentiert
 Fehler, Objekt kann nicht ausgeführt werden
-Test Changes
+Änderungen Testen
 Leer lassen für Anmeldung als GAST
 Korrekte Lesegeschw
 Synchronmodus
@@ -143,7 +143,7 @@ Automatische Abschaltung der Festplatte
 Videomodus
 Dialogfarbe
 Ausgewählte Farbe
-Reset Colors
+Farben Zurücksetzen
 Info
 Benutzerdefinierte ELF
 Farbauswahl
@@ -197,7 +197,7 @@ Fehler: Laden des Cheat-File fehlgeschlagen
 Keine Cheats gefunden
 Standardeinstellungen herunterladen
 Netzwerkaktualisierung
-Overwrite Existing Records
+Vorhandene Datensätze Überschreiben
 Aktualisierung fehlgeschlagen.
 Verbindung zum Updateserver fehlgeschlagen.
 Aktualisierung abgeschlossen.
@@ -257,27 +257,27 @@ Kindersicherung ausgeschaltet.
 Erstellungsoptionen:
 Fehler - Dieses Passwort kann nicht benutzt werden.
 VMC %s Datei ist fragmentiert. Weiter mit Memory Card in steckplatz %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
+Toneinstellungen
+SFX Aktivieren
+Boot Sound Aktivieren
+SFX Lautstärke
+Boot Sound Lautstärke
+Wechsel der Videoausgabe bestätigen?
+Spieleliste zwischenspeichern (HDD)
+Meldungen anschalten
+%s geladen von %s
+Spiel-Menu
+Spieleinstellungen gespeichert.
+%s Einstellungen entfernt.
+Überschreibt existierende spiel kompatibilitätseinstellungen, falls aktiviert.
+Einstellungsmodus
 Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
+pro Spiel
+Alle
+Wähle die Einstellungen aus, die entfernt werden sollen.
+Support-Foren:
+Titel
 Genre
-Release
-Developer
-Description
+Veröffentlichung
+Entwickler
+Beschreibung

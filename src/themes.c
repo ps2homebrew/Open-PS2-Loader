@@ -954,7 +954,7 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
                 elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_ICON, screenWidth >> 1, 400, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, gDefaultCol, theme->fonts[0]);
                 elem->drawElem = &drawMenuIcon;
             } else if (!strcmp(elementsType[ELEM_TYPE_MENU_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_MENU_TEXT, screenWidth >> 1, 20, ALIGN_CENTER, 200, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawMenuText;
             } else if (!strcmp(elementsType[ELEM_TYPE_ITEMS_LIST], type)) {
                 if (!theme->itemsList) {
@@ -972,10 +972,10 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
                 elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEM_TEXT, 0, 0, ALIGN_CENTER, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawItemText;
             } else if (!strcmp(elementsType[ELEM_TYPE_HINT_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_HINT_TEXT, screenWidth >> 1, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawHintText;
             } else if (!strcmp(elementsType[ELEM_TYPE_INFO_HINT_TEXT], type)) {
-                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_INFO_HINT_TEXT, screenWidth >> 1, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
+                elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_INFO_HINT_TEXT, 16, -HINT_HEIGHT, ALIGN_NONE, 12, 20, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                 elem->drawElem = &drawInfoHintText;
             } else if (!strcmp(elementsType[ELEM_TYPE_LOADING_ICON], type)) {
                 if (!theme->loadingIcon)

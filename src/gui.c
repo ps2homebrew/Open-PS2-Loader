@@ -1604,12 +1604,12 @@ void guiWarning(const char *text, int count)
 
 int guiConfirmVideoMode(void)
 {
-    clock_t timeStart, timeNow, timeElasped;
+    clock_t timeEnd;
     int terminate = 0;
 
     sfxPlay(SFX_MESSAGE);
 
-    timeStart = clock() / (CLOCKS_PER_SEC / 1000);
+    timeEnd = clock() + OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS * (CLOCKS_PER_SEC / 1000);
     while (!terminate) {
         guiStartFrame();
 
@@ -1621,9 +1621,7 @@ int guiConfirmVideoMode(void)
             terminate = 2;
 
         //If the user fails to respond within the timeout period, deem it as a cancel operation.
-        timeNow = clock() / (CLOCKS_PER_SEC / 1000);
-        timeElasped = (timeNow < timeStart) ? UINT_MAX - timeStart + timeNow + 1 : timeNow - timeStart;
-        if (timeElasped >= OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS)
+        if (clock() > timeEnd)
             terminate = 1;
 
         guiShow();

@@ -93,9 +93,9 @@ static int checkMC()
             if (dir == NULL) {
                 // No base dir found on any MC, check MC is inserted
                 fd = sysCheckMC();
-                if (fd == 0)
+                if ((fd = 0))
                     mcID = 0x30;
-                else if (fd == 1)
+                else if ((fd = 1))
                     mcID = 0x31;
             } else {
                 closedir(dir);

@@ -84,7 +84,7 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
 void handleHdlSrv();
 void deinit(int exception, int modeSelected);
 
-char *gBaseMCDir;
+extern char *gBaseMCDir;
 
 enum ETH_OP_MODES {
     ETH_OP_MODE_AUTO = 0,
@@ -96,54 +96,54 @@ enum ETH_OP_MODES {
     ETH_OP_MODE_COUNT
 };
 
-int ps2_ip_use_dhcp;
-int ps2_ip[4];
-int ps2_netmask[4];
-int ps2_gateway[4];
-int ps2_dns[4];
-int gETHOpMode; //See ETH_OP_MODES.
-int gPCShareAddressIsNetBIOS;
-int pc_ip[4];
-int gPCPort;
+extern int ps2_ip_use_dhcp;
+extern int ps2_ip[4];
+extern int ps2_netmask[4];
+extern int ps2_gateway[4];
+extern int ps2_dns[4];
+extern int gETHOpMode; //See ETH_OP_MODES.
+extern int gPCShareAddressIsNetBIOS;
+extern int pc_ip[4];
+extern int gPCPort;
 //Please keep these string lengths in-sync with the limits within CDVDMAN.
-char gPCShareNBAddress[17];
-char gPCShareName[32];
-char gPCUserName[32];
-char gPCPassword[32];
+extern char gPCShareNBAddress[17];
+extern char gPCShareName[32];
+extern char gPCUserName[32];
+extern char gPCPassword[32];
 
 //// Settings
 
 // describes what is happening in the network startup thread (>0 means loading, <0 means error)...
-int gNetworkStartup;
-int gHDDSpindown;
+extern int gNetworkStartup;
+extern int gHDDSpindown;
 /// Refer to enum START_MODE within iosupport.h
-int gUSBStartMode;
-int gHDDStartMode;
-int gETHStartMode;
-int gAPPStartMode;
+extern int gUSBStartMode;
+extern int gHDDStartMode;
+extern int gETHStartMode;
+extern int gAPPStartMode;
 
-int gAutosort;
-int gAutoRefresh;
-int gEnableNotifications;
-int gEnableArt;
-int gWideScreen;
-int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
-int gXOff;
-int gYOff;
-int gOverscan;
-int gSelectButton;
-int gHDDGameListCache;
+extern int gAutosort;
+extern int gAutoRefresh;
+extern int gEnableNotifications;
+extern int gEnableArt;
+extern int gWideScreen;
+extern int gVMode; // 0 - Auto, 1 - PAL, 2 - NTSC
+extern int gXOff;
+extern int gYOff;
+extern int gOverscan;
+extern int gSelectButton;
+extern int gHDDGameListCache;
 
-int gEnableSFX;
-int gEnableBootSND;
-int gSFXVolume;
-int gBootSndVolume;
+extern int gEnableSFX;
+extern int gEnableBootSND;
+extern int gSFXVolume;
+extern int gBootSndVolume;
 
-int gCheatSource;
-int gGSMSource;
-int gPadEmuSource;
+extern int gCheatSource;
+extern int gGSMSource;
+extern int gPadEmuSource;
 
-int showCfgPopup;
+extern int showCfgPopup;
 
 #ifdef IGS
 #define IGS_VERSION "0.1"
@@ -152,43 +152,43 @@ int showCfgPopup;
 // ------------------------------------------------------------------------------------------------------------------------
 
 #ifdef PADEMU
-int gEnablePadEmu;
-int gPadEmuSettings;
+extern int gEnablePadEmu;
+extern int gPadEmuSettings;
 #endif
 
 // ------------------------------------------------------------------------------------------------------------------------
 
 // 0,1,2 scrolling speed
-int gScrollSpeed;
+extern int gScrollSpeed;
 // Exit path
-char gExitPath[32];
+extern char gExitPath[32];
 // Disable Debug Colors
-int gDisableDebug;
+extern int gDisableDebug;
 
-int gPS2Logo;
+extern int gPS2Logo;
 
 // Default device
-int gDefaultDevice;
+extern int gDefaultDevice;
 
-int gEnableWrite;
+extern int gEnableWrite;
 
-int gCheckUSBFragmentation;
+extern int gCheckUSBFragmentation;
 //These prefixes are relative to the device's name (meaning that they do not include the device name).
-char gUSBPrefix[32];
-char gETHPrefix[32];
+extern char gUSBPrefix[32];
+extern char gETHPrefix[32];
 
-int gRememberLastPlayed;
+extern int gRememberLastPlayed;
 
 // Last Played Auto Start
-int KeyPressedOnce;
-int gAutoStartLastPlayed;
-int RemainSecs, DisableCron;
-clock_t CronStart;
+extern int KeyPressedOnce;
+extern int gAutoStartLastPlayed;
+extern int RemainSecs, DisableCron;
+extern clock_t CronStart;
 
-unsigned char gDefaultBgColor[3];
-unsigned char gDefaultTextColor[3];
-unsigned char gDefaultSelTextColor[3];
-unsigned char gDefaultUITextColor[3];
+extern unsigned char gDefaultBgColor[3];
+extern unsigned char gDefaultTextColor[3];
+extern unsigned char gDefaultSelTextColor[3];
+extern unsigned char gDefaultUITextColor[3];
 
 void setDefaultColors(void);
 

@@ -121,7 +121,7 @@ typedef struct theme
     int fonts[THM_MAX_FONTS]; //!< Storage of font handles for removal once not needed
 } theme_t;
 
-theme_t *gTheme;
+extern theme_t *gTheme;
 
 void thmInit(void);
 void thmReinit(const char *path);

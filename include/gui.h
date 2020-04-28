@@ -50,8 +50,8 @@ struct gui_update_t
 
 typedef void (*gui_callback_t)(void);
 
-int guiInactiveFrames;
-int guiFrameId;
+extern int guiInactiveFrames;
+extern int guiFrameId;
 
 #define GUI_SCREEN_MAIN 0
 #define GUI_SCREEN_MENU 1

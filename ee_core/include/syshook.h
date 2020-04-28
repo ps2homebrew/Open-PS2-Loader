@@ -15,11 +15,11 @@
 void Install_Kernel_Hooks(void);
 void Remove_Kernel_Hooks(void);
 
-u32 (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
-int (*Old_SifSetReg)(u32 register_num, int register_value);
-int (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
-int (*Old_CreateThread)(ee_thread_t *thread_param);
-void (*Old_Exit)(s32 exit_code);
+extern u32 (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
+extern int (*Old_SifSetReg)(u32 register_num, int register_value);
+extern int (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
+extern int (*Old_CreateThread)(ee_thread_t *thread_param);
+extern void (*Old_Exit)(s32 exit_code);
 
 void sysLoadElf(char *filename, int argc, char **argv);
 void sysExit(s32 exit_code);

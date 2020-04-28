@@ -62,6 +62,10 @@ static float fps = 0.0f;
 extern GSGLOBAL *gsGlobal;
 #endif
 
+// Global data
+int guiInactiveFrames;
+int guiFrameId;
+
 struct gui_update_list_t
 {
     struct gui_update_t *item;

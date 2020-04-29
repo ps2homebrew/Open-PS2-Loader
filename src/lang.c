@@ -344,8 +344,7 @@ static int lngLoadFromFile(char *path, char *name)
     if (fileBuffer) {
         // file exists, try to read it and load the custom lang
         char **curL = lang_strs;
-        char **newL = (char **)malloc(LANG_STR_COUNT * sizeof(char **));
-        memset(newL, 0, sizeof(char **));
+        char **newL = (char **)calloc(LANG_STR_COUNT, sizeof(char *));
 
         int strId = 0;
         while (strId < LANG_STR_COUNT && readFileBuffer(fileBuffer, &newL[strId])) {
@@ -368,7 +367,7 @@ static int lngLoadFromFile(char *path, char *name)
         lngFreeFromFile(curL);
 
         int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
-        strncpy(dir, path, len);
+        memcpy(dir, path, len);
         dir[len] = '\0';
 
         lngLoadFont(dir, name);

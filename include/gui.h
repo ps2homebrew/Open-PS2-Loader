@@ -140,13 +140,13 @@ void guiCheckNotifications(int checkTheme, int checkLang);
 * @param type the io operation type
 * @param data the data for the operation
 */
-void guiHandleDeferedIO(int *ptr, const unsigned char *message, int type, void *data);
+void guiHandleDeferedIO(int *ptr, const char *message, int type, void *data);
 
 void guiGameHandleDeferedIO(int *ptr, struct UIItem *ui, int type, void *data);
 
 /** Renders a single frame with a specified message on the screen
 */
-void guiRenderTextScreen(const unsigned char *message);
+void guiRenderTextScreen(const char *message);
 
 void guiWarning(const char *text, int count);
 

@@ -496,7 +496,7 @@ static void fntRenderGlyph(fnt_glyph_cache_entry_t *glyph, int pen_x, int pen_y)
 
 
 #ifndef __RTL
-int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char *string, u64 colour)
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const char *string, u64 colour)
 {
     // wait for font lock to unlock
     WaitSema(gFontSemaId);
@@ -593,7 +593,7 @@ static int isWeak(u32 character)
     return (((character >= 0x0000 && character <= 0x0040) || (character >= 0x005B && character <= 0x0060) || (character >= 0x007B && character <= 0x00BF) || (character >= 0x00D7 && character <= 0x00F7) || (character >= 0x02B9 && character <= 0x02FF) || (character >= 0x2000 && character <= 0x2BFF)) ? 1 : 0);
 }
 
-static void fntRenderSubRTL(font_t *font, const unsigned char *startRTL, const unsigned char *string, fnt_glyph_cache_entry_t *glyph, int x, int y)
+static void fntRenderSubRTL(font_t *font, const char *startRTL, const char *string, fnt_glyph_cache_entry_t *glyph, int x, int y)
 {
     if (glyph) {
         x -= glyph->shx >> 6;
@@ -622,7 +622,7 @@ static void fntRenderSubRTL(font_t *font, const unsigned char *startRTL, const u
     }
 }
 
-int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char *string, u64 colour)
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const char *string, u64 colour)
 {
     // wait for font lock to unlock
     WaitSema(gFontSemaId);
@@ -662,7 +662,7 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     short inRTL = 0;
     int delta_x, pen_xRTL = 0;
     fnt_glyph_cache_entry_t *glyphRTL = NULL;
-    const unsigned char *startRTL = NULL;
+    const char *startRTL = NULL;
 
     // cache glyphs and render as we go
     for (; *string; ++string) {
@@ -729,22 +729,22 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
 }
 #endif
 
-void fntFitString(int id, unsigned char *string, size_t width)
+void fntFitString(int id, char *string, size_t width)
 {
     size_t cw = 0;
-    unsigned char *str = string;
+    char *str = string;
     size_t spacewidth = fntCalcDimensions(id, " ");
-    unsigned char *psp = NULL;
+    char *psp = NULL;
     width = rmScaleX(width);
 
     while (*str) {
         // scan forward to the next whitespace
-        unsigned char *sp = str;
+        char *sp = str;
         for (; *sp && *sp != ' ' && *sp != '\n'; ++sp)
             ;
 
         // store what was there before
-        unsigned char osp = *sp;
+        char osp = *sp;
 
         // newline resets the situation
         if (osp == '\n') {
@@ -786,7 +786,7 @@ void fntFitString(int id, unsigned char *string, size_t width)
     }
 }
 
-int fntCalcDimensions(int id, const unsigned char *str)
+int fntCalcDimensions(int id, const char *str)
 {
     int w = 0;
 

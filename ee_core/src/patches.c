@@ -729,7 +729,7 @@ static void ProSnowboarderPatch(void)
 
 static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const char *args)
 {
-    int (*pSifLoadModule)(const char *path, int arg_len, const char *args);
+    //int (*pSifLoadModule)(const char *path, int arg_len, const char *args);
     void *(*pSifAllocIopHeap)(int size);
     int (*pSifFreeIopHeap)(void *addr);
     int (*pSifLoadModuleBuffer)(void *ptr, int arg_len, const char *args);
@@ -741,25 +741,25 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
 
     switch (g_mode) {
         case 1: //NTSC-U/C
-            pSifLoadModule = (void *)0x00234188;
+            //pSifLoadModule = (void *)0x00234188;
             pSifAllocIopHeap = (void *)0x239df0;
             pSifFreeIopHeap = (void *)0x239f58;
             pSifLoadModuleBuffer = (void *)0x00233f20;
             break;
         case 2: //PAL
-            pSifLoadModule = (void *)0x002336c8;
+            //pSifLoadModule = (void *)0x002336c8;
             pSifAllocIopHeap = (void *)0x00239330;
             pSifFreeIopHeap = (void *)0x00239498;
             pSifLoadModuleBuffer = (void *)0x00233460;
             break;
         case 3: //PAL German
-            pSifLoadModule = (void *)0x00233588;
+            //pSifLoadModule = (void *)0x00233588;
             pSifAllocIopHeap = (void *)0x002391f0;
             pSifFreeIopHeap = (void *)0x00239358;
             pSifLoadModuleBuffer = (void *)0x00233320;
             break;
         default:
-            pSifLoadModule = NULL;
+            //pSifLoadModule = NULL;
             pSifAllocIopHeap = NULL;
             pSifFreeIopHeap = NULL;
             pSifLoadModuleBuffer = NULL;

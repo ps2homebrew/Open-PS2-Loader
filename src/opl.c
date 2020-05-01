@@ -397,13 +397,14 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
     struct dirent *pdirent;
     DIR *pdir;
     struct stat st;
-    int i, count, ret;
+    int i, count, ret, mc;
     item_list_t *listSupport;
     config_set_t *appConfig;
     char appsPath[64];
     char dir[128];
     char path[128];
 
+    mc = -1;
     count = 0;
     for (i = 0; i < MODE_COUNT; i++)
     {
@@ -412,6 +413,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
         {
             listSupport->itemGetAppsPath(appsPath, sizeof(appsPath));
 
+readDir:
             if ((pdir = opendir(appsPath)) != NULL)
             {
                 while ((pdirent = readdir(pdir)) != NULL)
@@ -421,9 +423,9 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
 
                     snprintf(dir, sizeof(dir), "%s/%s", appsPath, pdirent->d_name);
                     if (stat(dir, &st) < 0)
-						continue;
-					if(!S_ISDIR(st.st_mode))
-						continue;
+                        continue;
+                    if(!S_ISDIR(st.st_mode))
+                        continue;
 
                     snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
                     appConfig = configAlloc(0, NULL, path);
@@ -447,6 +449,12 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
             } else
                 LOG("APPS failed to open dir %s\n", appsPath);
         }
+    }
+    mc++;
+    if (mc < 2)
+    {
+        snprintf(appsPath, sizeof(appsPath), "mc%d:", mc);
+        goto readDir;
     }
 
     return count;

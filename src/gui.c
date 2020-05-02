@@ -197,7 +197,6 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
-    toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
@@ -220,7 +219,6 @@ void guiShowAbout()
     diaSetLabel(diaAbout, ABOUT_BUILD_DETAILS, OPLBuildDetails);
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
-    toggleSfx = 0;
 }
 
 void guiCheckNotifications(int checkTheme, int checkLang)

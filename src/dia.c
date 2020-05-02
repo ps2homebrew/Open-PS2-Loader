@@ -899,66 +899,36 @@ int diaExecuteDialog(struct UIItem *ui, int uiId, short inMenu, int (*updater)(i
             }
         } else {
             modified = 0;
+            struct UIItem *newf = cur;
+
             if (getKey(KEY_LEFT)) {
-                struct UIItem *newf = diaGetPrevControl(cur, ui);
-
-                if (!toggleSfx) {
-                    sfxPlay(SFX_CURSOR);
-                }
-
-                if (newf == cur) {
-                    cur = diaGetLastControl(ui);
-                }
-                else {
-                    cur = newf;
-                }
+                newf = diaGetPrevControl(cur, ui);
+                if (newf == cur)
+                    newf = diaGetLastControl(ui);
             }
 
             if (getKey(KEY_RIGHT)) {
-                struct UIItem *newf = diaGetNextControl(cur, cur);
-
-                if (!toggleSfx) {
-                    sfxPlay(SFX_CURSOR);
-                }
-
-                if (newf == cur) {
-                    cur = diaGetFirstControl(ui);
-                }
-                else {
-                    cur = newf;
-                }
+                newf = diaGetNextControl(cur, cur);
+                if (newf == cur)
+                    newf = diaGetFirstControl(ui);
             }
 
             if (getKey(KEY_UP)) {
-                // find
-                struct UIItem *newf = diaGetPrevLine(cur, ui);
-
-                if (!toggleSfx) {
-                    sfxPlay(SFX_CURSOR);
-                }
-
-                if (newf == cur) {
-                    cur = diaGetLastControl(ui);
-                }
-                else {
-                    cur = newf;
-                }
+                newf = diaGetPrevLine(cur, ui);
+                if (newf == cur)
+                    newf = diaGetLastControl(ui);
             }
 
             if (getKey(KEY_DOWN)) {
-                // find
-                struct UIItem *newf = diaGetNextLine(cur, ui);
+                newf = diaGetNextLine(cur, ui);
+                if (newf == cur)
+                    newf = diaGetFirstControl(ui);
+            }
 
-                if (!toggleSfx) {
-                    sfxPlay(SFX_CURSOR);
-                }
-
-                if (newf == cur) {
-                    cur = diaGetFirstControl(ui);
-                }
-                else {
-                    cur = newf;
-                }
+            if (newf != cur) {
+                // Navigation change detected
+                sfxPlay(SFX_CURSOR);
+                cur = newf;
             }
 
             // Cancel button breaks focus or exits with false result

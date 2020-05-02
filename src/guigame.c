@@ -134,7 +134,6 @@ static int guiGameRefreshVMCConfig(item_list_t *support, char *name)
             diaSetEnabled(diaVMC, VMC_SIZE, 0);
             diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 0);
             diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 0);
-            toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
         }
     } else {
         diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_CREATE));
@@ -253,7 +252,6 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
             break;
 
     } while (1);
-    toggleSfx = 0;
 
     return result;
 }
@@ -724,7 +722,6 @@ void guiGameShowPadEmuConfig(void)
         }
 
         if (result == PADCFG_BTINFO) {
-            toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
             for (i = PADCFG_FEAT_START; i < PADCFG_FEAT_END + 1; i++)
                 diaSetLabel(diaPadEmuInfo, i, _l(_STR_NO));
 
@@ -738,7 +735,6 @@ void guiGameShowPadEmuConfig(void)
             ver_set = 0;
             feat_set = 0;
             diaExecuteDialog(diaPadEmuInfo, -1, 1, &guiGamePadEmuInfoUpdater);
-            toggleSfx = 0;
         }
 
         if (result == UIID_BTN_OK)

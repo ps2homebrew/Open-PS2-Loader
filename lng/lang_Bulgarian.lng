@@ -131,7 +131,7 @@ Unused
 VMC файлът съществува.
 Невалиден VMC файл - грешен обем.
 VMC файлът трябва да бъде създаден.
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Проблем с VMC %s. Продължаване са Memory Card в слот %d?
 Автоматично опресняване
 Относно
 Програмисти:

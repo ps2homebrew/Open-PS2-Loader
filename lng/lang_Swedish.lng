@@ -7,7 +7,7 @@ Tillbaka
 Nätverkskonfig
 Avancerad Konfig
 <Inga värden>
-Settings saved to %s
+Inställningar sparade till %s
 Fel vid skrivning av inställningar!
 Avsluta
 Inställning
@@ -41,7 +41,7 @@ Cirkel
 Kryss
 Spel-lista
 Spelinst.
-Remove Settings
+Ta bort inställningar
 Tog bort alla nycklar för spelet
 Bläddra
 Sakta
@@ -99,14 +99,14 @@ Objektet ska tas bort permanent , fortsätta?
 Byt namn
 Radera
 Kör
-Inställningar Skärm
+Skärminställningar
 Aktivera skrivåtkomst
 Kontrollera USB spelfragmentering
 Kom ihåg senast spelade spel
 Välj knapp
 Fel, spelet är fragmenterat
 Fel, kunde inte köra posten
-Test Changes
+Testa ändringar
 Lämna tomt för Gäst konto.
 Korrekt läsning
 Synkroniseringsläge
@@ -131,7 +131,7 @@ Framsteg
 VMC fil existerar
 Ogiltig VMC fil, felaktig storlek
 VMC filen måste skapas
-Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d )?
+Felaktig åtkomst till VMC%s. Använd Minneskort i port %d?
 Automatisk uppdatering
 Om
 Kodare
@@ -143,7 +143,7 @@ Automatisk HDD nerspinn
 Videoläge
 Dialog färg
 Vald färg
-Reset Colors
+Återställ Färger
 Info
 Custom ELF
 Färgval
@@ -197,7 +197,7 @@ Fel: kunde inte ladda Fuskfilen
 Inga fusk funna
 Hämta standard
 Nätverksuppdatering
-Overwrite Existing Records
+Skriv över befintliga
 Uppdatering misslyckad
 Kunde inte ansluta till servern
 Uppdatering klar
@@ -257,27 +257,27 @@ Föräldrakontroll inaktiverat
 Bygg-Alternativ:
 Fel - lösenordet kan ej användas.
 VMC %s filen är fragmenterad. Använd minneskort i port %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
+Ljudinställningar
+Aktivera Ljudeffekter
+Aktivera Uppstartsljud
+Ljudeffektsvolym
+Uppstartsljudsvolym
+Bekräfta ändring av videoläge?
+Lägg Spellista i Cache (HDD)
+Aktivera notifikationer
+%s Laddat från %s
+SpelMeny
+Spelinställningar sparade.
+%s inställningar borttagna
+Skriver över befintliga spelinställningar om aktiverad.
+Inställningsläge
+Globalt
+Per Sper
+Alla
+Välj inställningar att ta bort.
+Support-Forum:
+Titel
 Genre
-Release
-Developer
-Description
+Lansering
+Utvecklare
+Beskrivning

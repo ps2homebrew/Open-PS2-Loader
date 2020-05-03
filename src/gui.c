@@ -634,8 +634,6 @@ reselect_video_mode:
             setDefaultColors();
 
         applyConfig(themeID, langID);
-        //wait 70ms for confirm sound to finish playing before clearing buffer
-        guiDelay(0070);
         sfxInit(0);
     }
 
@@ -1382,36 +1380,24 @@ static void guiShow()
         screenHandler->renderScreen();
 }
 
-void guiDelay(int milliSeconds)
-{
-    clock_t time_end = time_end = clock() + milliSeconds * CLOCKS_PER_SEC / 1000;
-    while (clock() < time_end) {}
-
-    toggleSfx = 0;
-}
-
 void guiIntroLoop(void)
 {
     int endIntro = 0;
-
-    if (gEnableSFX && gEnableBootSND)
-        toggleSfx = -1;
+    clock_t tFadeDelayEnd = clock() + gFadeDelay * CLOCKS_PER_SEC / 1000;
 
     while (!endIntro) {
         guiStartFrame();
 
-        if (wfadeout < 0x80 && toggleSfx)
-            guiDelay(gFadeDelay);
-
-        if (wfadeout < 0x80 && !toggleSfx)
+        if (wfadeout < 0x80)
             guiShow();
-
-        if (gInitComplete)
-            wfadeout -= 0x02;
 
         if (wfadeout > 0)
             guiRenderGreeting();
-        else
+
+        if (gInitComplete && clock() >= tFadeDelayEnd)
+            wfadeout -= 0x02;
+
+        if (wfadeout <= 0)
             endIntro = 1;
 
         guiDrawOverlays();

@@ -42,7 +42,6 @@
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 
 #include <unistd.h>
-#include <audsrv.h>
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
@@ -1260,7 +1259,7 @@ static int loadHdldSvr(void)
     }
 
     // deint audio lib while hdl server is running
-    audsrv_quit();
+    sfxEnd();
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
@@ -1376,11 +1375,6 @@ void deinit(int exception, int modeSelected)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
-
 #ifdef PADEMU
     ds34usb_reset();
     ds34bt_reset();
@@ -1389,6 +1383,7 @@ void deinit(int exception, int modeSelected)
 
     deinitAllSupport(exception, modeSelected);
 
+    sfxEnd();
     ioEnd();
     guiEnd();
     menuEnd();
@@ -1551,16 +1546,12 @@ static void deferredAudioInit(void)
 {
     int ret;
 
-    ret = audsrv_init();
-    if (ret != 0)
-        LOG("Failed to initialize audsrv\n");
-        LOG("Audsrv returned error string: %s\n", audsrv_get_error_string());
-
     ret = sfxInit(1);
-    if (ret >= 0)
-        LOG("sfxInit: %d samples loaded.\n", ret);
-    else
+    if (ret < 0) {
         LOG("sfxInit: failed to initialize - %d.\n", ret);
+        return;
+    }
+    LOG("sfxInit: %d samples loaded.\n", ret);
 
     // boot sound
     if (gEnableBootSND) {

@@ -173,6 +173,12 @@ int sfxInit(int bootSnd)
     int thmSfxEnabled = 0;
     int i = 1;
 
+    if (audsrv_init() != 0) {
+        LOG("Failed to initialize audsrv\n");
+        LOG("Audsrv returned error string: %s\n", audsrv_get_error_string());
+        return -1;
+    }
+
     audsrv_adpcm_init();
 
     sfxInitDefaults();
@@ -226,6 +232,13 @@ int sfxInit(int bootSnd)
     }
 
     return loaded;
+}
+
+void sfxEnd()
+{
+    if (gEnableSFX) {
+        audsrv_quit();
+    }
 }
 
 void sfxPlay(int id)

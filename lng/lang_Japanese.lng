@@ -19,7 +19,7 @@ ETHゲーム
 テーマ
 言語
 システムを終了し電源を切ります
-ブラウザ/OSDSYSに戻りますか？
+ブラウザに戻りますか？
 変更をキャンセルしますか？
 %d: HDDが接続されていません
 %d: HDDがフォーマットされていません
@@ -230,40 +230,40 @@ DSのペア設定MACアドレス　　　　:
 DSコントローラーをペア設定
 BluetoothのMACアドレスを指定してDSコントローラーをペア設定
 接続されていません
-Bluetooth adapter information
-Shows more information and supported features
+Bluetooth アダプタ情報
+さらにサポートされている機能を表示
 HCI Version:
 LMP Version:
 Manufacturer ID:
-Support features:
+サポート機能:
 Yes
 No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds4
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+BluetoothアダプタはDS3 / DS4コントローラをサポートしています
+BluetoothアダプタはDS3 / DS4コントローラをサポートしていません
+マルチタップエミュレーションを有効
+選択したゲームのマルチタップエミュレーションをオン/オフにします
+マルチタップエミュレータのポート
+マルチタップエミュレーション用のポートを選択
+フェイクDS3に対する回避策を無効
+いくつかのフェイクDS3は回避策を必要ですが、このオプションはそれを無効にします
+FIELD反転をエミュレートする
+プログレッシブビデオモードでグリッチするゲームを修正しました
+パレンタルロック設定
+パレンタルロックパスワード
+パレンタルロックを無効にするには空白のままにします
+パレンタルロックパスワードを入力してください
+パレンタルロックのパスワードが正しくありません
+パレンタルロックは無効です
+ビルドオプション：
+エラー - このパスワードは使用できません
+VMC ％s ファイルは破損しています。 スロット ％d のメモリカードに保存しますか？
+オーディオ設定
+効果音を有効にする
+起動音を有効にする
+効果音の音量
+起動音の音量
+ビデオモードの変更を確認しますか？
+ゲームリストをキャッシュ（HDD）
 Enable Notifications
 %s loaded from %s
 Game Menu

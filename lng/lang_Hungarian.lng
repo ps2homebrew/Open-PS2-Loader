@@ -7,7 +7,7 @@ Vissza
 Hálózat konfigurálás
 Haladó beállítások
 <Nincs érték>
-Settings saved to %s
+Beállítások elmentve %s-be
 Hiba a beállítások írásában!
 Kilépés
 Beállítások
@@ -19,7 +19,7 @@ Alkalmazások
 Téma
 Nyelv
 A rendszer le fog állni.
-Kilépés a böngészőbe/OSDSYS-be?
+Kilépés a Browser-be?
 Frissítés visszavonása?
 %d: Merevlemez nem található
 %d: Merevlemez nincs leformázva
@@ -41,7 +41,7 @@ Kör
 Kereszt
 Játék Lista
 Játékbeállítások
-Remove Settings
+Beállítások eltávolítása
 Játékhoz tartozó összes kulcs eltávolítva
 Görgetés
 Lassú
@@ -106,7 +106,7 @@ Emlékezz a legutóbbi játékra
 Select Gomb
 Hiba, a játék töredezett
 Hiba, az elem futtatása sikertelen
-Test Changes
+Változások tesztelése
 Hagyja üresen VENDÉG hitelesítéshez
 Postos Olvasás
 Egyidejű Mód
@@ -143,7 +143,7 @@ Automatikus Merevlemez kikapcsolás
 Videó mód
 Párbeszédablak színe
 Kiválasztott színe
-Reset Colors
+Színek Visszaállítása
 Infó
 Testreszabott ELF
 Szín szelekció
@@ -197,7 +197,7 @@ Hiba: A Csalás Fájl betöltése sikertelen
 Nem találhatóak csalások
 Alapértelmezett letöltése
 Hálózat frissítés
-Overwrite Existing Records
+Létező rekordok felülírása
 Frissítés Sikertelen.
 Nem sikerült csatlakozni a frissítő szerverhez.
 Frissítés befejezve.
@@ -257,27 +257,27 @@ Gyerekzás kikapcsolva.
 Build Opciók:
 Hiba - ez a jelszó nem használható.
 VMC %s fájl töredezett. Folytatás a %d foglalatban lévő Memória Kártyával?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Hangbeállítások
+Hanghatások engedélyezése
+Boot Sound engedélyezése
+Hanghatások hangereje
+Boot Sound hangereje
+Videó mód változtatás jóváhagyása?
+Játéklista cachelés (HDD)
+Értesítések engedélyezése
+%s betöltve %s-ből
+Játék Menü
+Játékbeállítások elmentve.
+%s beállítások eltávolítva
+Engedélyezéskor felülírja a létező játék kompatibilitási beállításokat.
+Beállítások Mód
+Globális
+Játékonként
+Összes
+Válassza ki az eltávolítani való beállításokat.
+Támogatási Fórumok:
+Cím
+Műfaj
+Megjelenés
+Fejlesztő
+Leírás

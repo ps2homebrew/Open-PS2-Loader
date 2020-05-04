@@ -1383,7 +1383,7 @@ void guiIntroLoop(void)
 {
     int endIntro = 0;
     int greetingAlpha = 0x80;
-    clock_t tFadeDelayEnd = clock() + gFadeDelay * CLOCKS_PER_SEC / 1000;
+    clock_t tFadeDelayEnd = 0;
 
     while (!endIntro) {
         guiStartFrame();
@@ -1394,8 +1394,17 @@ void guiIntroLoop(void)
         if (greetingAlpha > 0)
             guiRenderGreeting(greetingAlpha);
 
+        // Initialize boot sound
+        if (gInitComplete && !tFadeDelayEnd && gEnableBootSND)
+        {
+            // Start playing sound
+            sfxPlay(SFX_BOOT);
+            // Calculate transition delay
+            tFadeDelayEnd = clock() + sfxGetSoundDuration(SFX_BOOT) * CLOCKS_PER_SEC / 1000;
+        }
+
         if (gInitComplete && clock() >= tFadeDelayEnd)
-            greetingAlpha -= 0x02;
+            greetingAlpha -= 2;
 
         if (greetingAlpha <= 0)
             endIntro = 1;

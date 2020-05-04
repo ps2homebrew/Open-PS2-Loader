@@ -114,7 +114,6 @@ static void clearIOModuleT(opl_io_module_t *mod)
 static void clearMenuGameList(opl_io_module_t *mdl);
 static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected);
 static void reset(void);
-static void deferredAudioInit(void);
 
 // frame counter
 static unsigned int frameCounter;
@@ -1319,7 +1318,11 @@ static void unloadHdldSvr(void)
     initAllSupport(1);
 
     // reinit audio lib
-    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
+    sfxInit(1);
+    if (!gEnableSFX && toggleSfx) {
+        gEnableSFX = 1;
+        toggleSfx = 0;
+    }
 }
 
 void handleHdlSrv()
@@ -1507,6 +1510,7 @@ static void init(void)
     lngInit();
     thmInit();
     guiInit();
+    sfxInit(1);
     ioInit();
     menuInit();
 
@@ -1523,9 +1527,6 @@ static void init(void)
 
     // try to restore config
     _loadConfig();
-
-    // queue deffered init of sound effects, which will take place after the preceding initialization steps within the queue are complete.
-    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
 }
 
 static void deferredInit(void)
@@ -1539,29 +1540,6 @@ static void deferredInit(void)
         id = guiOpCreate(GUI_OP_SELECT_MENU);
         id->menu.menu = &list_support[gDefaultDevice].menuItem;
         guiDeferUpdate(id);
-    }
-}
-
-static void deferredAudioInit(void)
-{
-    int ret;
-
-    ret = sfxInit(1);
-    if (ret < 0) {
-        LOG("sfxInit: failed to initialize - %d.\n", ret);
-        return;
-    }
-    LOG("sfxInit: %d samples loaded.\n", ret);
-
-    // boot sound
-    if (gEnableBootSND) {
-        sfxPlay(SFX_BOOT);
-    }
-
-    // re-enable sfx if previously disabled (hdl svr)
-    if (!gEnableSFX && toggleSfx) {
-        gEnableSFX = 1;
-        toggleSfx = 0;
     }
 }
 

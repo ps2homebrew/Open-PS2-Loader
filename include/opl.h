@@ -141,7 +141,6 @@ int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
 
-int gFadeDelay;
 int toggleSfx;
 
 int showCfgPopup;

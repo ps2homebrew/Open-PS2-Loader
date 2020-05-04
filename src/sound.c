@@ -43,6 +43,7 @@ static struct sfxEffect sfx_files[SFX_COUNT] = {
 };
 
 static struct audsrv_adpcm_t sfx[SFX_COUNT];
+static int sfx_initialized = 0;
 
 //Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
 static int sfxRead(const char *full_path, struct sfxEffect *sfx)
@@ -156,6 +157,12 @@ void sfxVolume(void)
 {
     int i;
 
+    if (!sfx_initialized)
+    {
+        LOG("%s: ERROR: not initialized!\n", __FUNCTION__);
+        return;
+    }
+
     for (i = 1; i < SFX_COUNT; i++)
     {
         audsrv_adpcm_set_volume(i, gSFXVolume);
@@ -173,11 +180,19 @@ int sfxInit(int bootSnd)
     int thmSfxEnabled = 0;
     int i = 1;
 
+    if (sfx_initialized)
+    {
+        LOG("%s: ERROR: already initialized!\n", __FUNCTION__);
+        return -1;
+    }
+
     if (audsrv_init() != 0) {
         LOG("Failed to initialize audsrv\n");
         LOG("Audsrv returned error string: %s\n", audsrv_get_error_string());
-        return -1;
+        return -2;
     }
+
+    sfx_initialized = 1;
 
     audsrv_adpcm_init();
 
@@ -236,13 +251,24 @@ int sfxInit(int bootSnd)
 
 void sfxEnd()
 {
-    if (gEnableSFX) {
-        audsrv_quit();
+    if (!sfx_initialized)
+    {
+        LOG("%s: ERROR: not initialized!\n", __FUNCTION__);
+        return;
     }
+
+    audsrv_quit();
+    sfx_initialized = 0;
 }
 
 void sfxPlay(int id)
 {
+    if (!sfx_initialized)
+    {
+        LOG("%s: ERROR: not initialized!\n", __FUNCTION__);
+        return;
+    }
+
     if (gEnableSFX) {
         audsrv_ch_play_adpcm(id, &sfx[id]);
     }

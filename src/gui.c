@@ -952,27 +952,25 @@ void guiExecDeferredOps(void)
     guiHandleDeferredOps();
 }
 
-static int bfadeout = 0x0;
-static void guiDrawBusy()
+static void guiDrawBusy(int alpha)
 {
     if (gTheme->loadingIcon) {
         GSTEXTURE *texture = thmGetTexture(LOAD0_ICON + (guiFrameId >> 1) % gTheme->loadingIconCount);
         if (texture && texture->Mem) {
-            u64 mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, bfadeout);
+            u64 mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, alpha);
             rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, gTheme->loadingIcon->scaled, mycolor);
         }
     }
 }
 
-static int wfadeout = 0x80;
-static void guiRenderGreeting()
+static void guiRenderGreeting(int alpha)
 {
-    u64 mycolor = GS_SETREG_RGBA(0x1C, 0x1C, 0x1C, wfadeout);
+    u64 mycolor = GS_SETREG_RGBA(0x1C, 0x1C, 0x1C, alpha);
     rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 
     GSTEXTURE *logo = thmGetTexture(LOGO_PICTURE);
     if (logo) {
-        mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, wfadeout);
+        mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, alpha);
         rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, logo->Width, logo->Height, SCALING_RATIO, mycolor);
     }
 }
@@ -1265,19 +1263,20 @@ static void guiDrawOverlays()
 {
     // are there any pending operations?
     int pending = ioHasPendingRequests();
+    static int busyAlpha = 0x00; // Fully transparant
 
     if (!pending) {
-        if (bfadeout > 0x0)
-            bfadeout -= 0x02;
-        else
-            bfadeout = 0x0;
+        // Fade out
+        if (busyAlpha > 0x00)
+            busyAlpha -= 0x02;
     } else {
-        if (bfadeout < 0x80)
-            bfadeout += 0x02;
+        // Fade in
+        if (busyAlpha < 0x80)
+            busyAlpha += 0x02;
     }
 
-    if (bfadeout > 0 && !toggleSfx)
-        guiDrawBusy();
+    if (busyAlpha > 0x00)
+        guiDrawBusy(busyAlpha);
 
 #ifdef __DEBUG
     char text[20];
@@ -1315,7 +1314,7 @@ static void guiDrawOverlays()
 #endif
 
     // Last Played Auto Start
-    if ((!pending) && (wfadeout <= 0) && (DisableCron == 0)) {
+    if (!pending && DisableCron == 0) {
         if (CronStart == 0) {
             CronStart = clock() / CLOCKS_PER_SEC;
         } else {
@@ -1383,21 +1382,22 @@ static void guiShow()
 void guiIntroLoop(void)
 {
     int endIntro = 0;
+    int greetingAlpha = 0x80;
     clock_t tFadeDelayEnd = clock() + gFadeDelay * CLOCKS_PER_SEC / 1000;
 
     while (!endIntro) {
         guiStartFrame();
 
-        if (wfadeout < 0x80)
+        if (greetingAlpha < 0x80)
             guiShow();
 
-        if (wfadeout > 0)
-            guiRenderGreeting();
+        if (greetingAlpha > 0)
+            guiRenderGreeting(greetingAlpha);
 
         if (gInitComplete && clock() >= tFadeDelayEnd)
-            wfadeout -= 0x02;
+            greetingAlpha -= 0x02;
 
-        if (wfadeout <= 0)
+        if (greetingAlpha <= 0)
             endIntro = 1;
 
         guiDrawOverlays();

@@ -163,19 +163,15 @@ int sfxInit(int bootSnd)
     int thmSfxEnabled = 0;
     int i = 1;
 
-    if (sfx_initialized)
+    if (!sfx_initialized)
     {
-        LOG("SFX: %s: ERROR: already initialized!\n", __FUNCTION__);
-        return -1;
+        if (audsrv_init() != 0) {
+            LOG("SFX: Failed to initialize audsrv\n");
+            LOG("SFX: Audsrv returned error string: %s\n", audsrv_get_error_string());
+            return -1;
+        }
+        sfx_initialized = 1;
     }
-
-    if (audsrv_init() != 0) {
-        LOG("SFX: Failed to initialize audsrv\n");
-        LOG("SFX: Audsrv returned error string: %s\n", audsrv_get_error_string());
-        return -2;
-    }
-
-    sfx_initialized = 1;
 
     audsrv_adpcm_init();
 

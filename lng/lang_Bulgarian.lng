@@ -1,5 +1,5 @@
 # Bulgarian translation by wisi - @http://psx-scene.com/forums/members/wisi/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Bulgarian
 Open PS2 Loader %s
 Запазване на промените
@@ -131,7 +131,7 @@ Unused
 VMC файлът съществува.
 Невалиден VMC файл - грешен обем.
 VMC файлът трябва да бъде създаден.
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Проблем с VMC %s. Продължаване са Memory Card в слот %d?
 Автоматично опресняване
 Относно
 Програмисти:

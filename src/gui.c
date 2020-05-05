@@ -978,7 +978,7 @@ static void guiRenderGreeting(int alpha)
 
 static float mix(float a, float b, float t)
 {
-    return (1.0 - t) * a + t * b;
+    return a + (b - a) * t;
 }
 
 static float fade(float t)

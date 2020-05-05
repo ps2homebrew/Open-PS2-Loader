@@ -126,7 +126,12 @@ static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
 {
     int ret;
 
-    sfxData->duration_ms = sfxCalculateSoundDuration(sfxData->size);
+    // Calculate duration based on decompressed size
+    sfxData->duration_ms = sfxCalculateSoundDuration(((u32 *)sfxData->buffer)[3]);
+    // Estimate duration based on filesize, is the ADPCM header was 0
+    if (sfxData->duration_ms == 0)
+        sfxData->duration_ms = sfxData->size / 47;
+
     ret = audsrv_load_adpcm(sfx, sfxData->buffer, sfxData->size);
     if (sfxData->builtin == 0) {
         free(sfxData->buffer);

@@ -1,5 +1,5 @@
 # Arabic Translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Arabic
 Open PS2 Loader %s
 تثبيت التغييرات
@@ -7,7 +7,7 @@ Open PS2 Loader %s
 تثبيت و اعداد الشبكة
 اعدادات متقدمة
 <لا يوجد قيم>
-حفظت التغييرات بنجاح...
+Settings saved to %s
 هناك مشكلة في حفظ التغييرات
 الخروج
 الاعدادات
@@ -41,7 +41,7 @@ Exit to Browser?
 ضرب
 قائمة الالعاب 
 اعدادات اللعبة
-حذف كل الاعدادات 
+Remove Settings
 تم حذف كل مفاتيح لللعبة
 التمرير
 ثقيل 
@@ -106,7 +106,7 @@ NetBIOS
 زر الاختيار
 اللعبة مجزئة
 غير ممكن تشغيل العنوان
-قتجريب
+Test Changes
 ترك الفراغ لGUEST
 قراءة دقيقة
 الطريقة المتزامنة
@@ -143,7 +143,7 @@ Boots Custom ELF after an IGR
 طريقة الفيديو
 لون الكتابة
 اللون المختار
-عرض صفحة المعلومات
+Reset Colors
 المعلومات
 تخصيص ELF
 اختيار الالوان
@@ -197,7 +197,7 @@ PS2RD
 لا يوجد قائمة الغش لهذه اللعبة
 تحميل الافتراضيات
 التحديث عن طريق الشبكة
-اعادة تحميل التسجيلات الموجودة ?
+Overwrite Existing Records
 فشل التحديث
 فشل في الاتصال بسيرفر التحديث
 انتهى التحديث
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

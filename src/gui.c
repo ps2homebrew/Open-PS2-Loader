@@ -1384,6 +1384,8 @@ void guiIntroLoop(void)
 {
     int endIntro = 0;
     int greetingAlpha = 0x80;
+    const int fadeFrameCount = 0x80 / 2;
+    const int fadeDuration = (fadeFrameCount * 1000) / 55; // Average between 50 and 60 fps
     clock_t tFadeDelayEnd = 0;
 
     while (!endIntro) {
@@ -1401,7 +1403,7 @@ void guiIntroLoop(void)
             // Start playing sound
             sfxPlay(SFX_BOOT);
             // Calculate transition delay
-            tFadeDelayEnd = clock() + sfxGetSoundDuration(SFX_BOOT) * CLOCKS_PER_SEC / 1000;
+            tFadeDelayEnd = clock() + (sfxGetSoundDuration(SFX_BOOT) - fadeDuration) * CLOCKS_PER_SEC / 1000;
         }
 
         if (gInitComplete && clock() >= tFadeDelayEnd)

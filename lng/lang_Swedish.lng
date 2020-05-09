@@ -1,5 +1,5 @@
 # Swedish translation by Flaya
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Swedish
 Open PS2 Loader %s
 Spara ändringar
@@ -7,7 +7,7 @@ Tillbaka
 Nätverkskonfig
 Avancerad Konfig
 <Inga värden>
-Inställningar sparade...
+Inställningar sparade till %s
 Fel vid skrivning av inställningar!
 Avsluta
 Inställning
@@ -41,7 +41,7 @@ Cirkel
 Kryss
 Spel-lista
 Spelinst.
-Ta bort alla inställningar
+Ta bort inställningar
 Tog bort alla nycklar för spelet
 Bläddra
 Sakta
@@ -99,14 +99,14 @@ Objektet ska tas bort permanent , fortsätta?
 Byt namn
 Radera
 Kör
-Inställningar Skärm
+Skärminställningar
 Aktivera skrivåtkomst
 Kontrollera USB spelfragmentering
 Kom ihåg senast spelade spel
 Välj knapp
 Fel, spelet är fragmenterat
 Fel, kunde inte köra posten
-Test
+Testa ändringar
 Lämna tomt för Gäst konto.
 Korrekt läsning
 Synkroniseringsläge
@@ -131,7 +131,7 @@ Framsteg
 VMC fil existerar
 Ogiltig VMC fil, felaktig storlek
 VMC filen måste skapas
-Fel med VMC % s , fortsätt med fysisk MC ( kortplats % d )?
+Felaktig åtkomst till VMC%s. Använd Minneskort i port %d?
 Automatisk uppdatering
 Om
 Kodare
@@ -143,7 +143,7 @@ Automatisk HDD nerspinn
 Videoläge
 Dialog färg
 Vald färg
-Visa info sida
+Återställ Färger
 Info
 Custom ELF
 Färgval
@@ -197,7 +197,7 @@ Fel: kunde inte ladda Fuskfilen
 Inga fusk funna
 Hämta standard
 Nätverksuppdatering
-Ladda ner befintliga arkiv?
+Skriv över befintliga
 Uppdatering misslyckad
 Kunde inte ansluta till servern
 Uppdatering klar
@@ -257,10 +257,27 @@ Föräldrakontroll inaktiverat
 Bygg-Alternativ:
 Fel - lösenordet kan ej användas.
 VMC %s filen är fragmenterad. Använd minneskort i port %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+Ljudinställningar
+Aktivera Ljudeffekter
+Aktivera Uppstartsljud
+Ljudeffektsvolym
+Uppstartsljudsvolym
+Bekräfta ändring av videoläge?
+Lägg Spellista i Cache (HDD)
+Aktivera notifikationer
+%s Laddat från %s
+SpelMeny
+Spelinställningar sparade.
+%s inställningar borttagna
+Skriver över befintliga spelinställningar om aktiverad.
+Inställningsläge
+Globalt
+Per Sper
+Alla
+Välj inställningar att ta bort.
+Support-Forum:
+Titel
+Genre
+Lansering
+Utvecklare
+Beskrivning

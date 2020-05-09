@@ -1,5 +1,5 @@
 # Portuguese translation by danielb
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Portuguese
 Open PS2 Loader %s
 Salvar alterações
@@ -7,7 +7,7 @@ Voltar
 Configurações de Rede
 Opções avançadas
 <sem valores>
-Configurações salvas
+Configurações guardadas em %s
 Erro ao salvar configurações!
 Sair
 Configurações
@@ -41,7 +41,7 @@ Circulo
 Cruz
 Lista de Jogos
 Aj. do jogo
-Remover todos os ajustes
+Remover configurações
 Removidos todos os ajustes para o jogo
 Rolagem
 Lento
@@ -106,7 +106,7 @@ Lembrar último jogo executado
 Botão de Seleção
 Erro, o jogo está fragmentado
 Erro, não foi possível iniciar o item
-Testar
+Testar Alterações
 Deixar vazio para ligar como convidado (GUEST)
 Carregar núcleo alternativo
 Modo Síncrono
@@ -131,7 +131,7 @@ Progresso
 Arquivo VMC já existe
 Arquivo VMC inválido, o tamanho está incorreto
 Arquivo VMC precisa ser criado!
-Erro com o ficheiro VMC, continuar com MC físico?
+Erro ao aceder ao VMC %s. Continuar com o Cartão de Memória na ranhura %d?
 Atualização automática
 Créditos
 Desenvolvedores
@@ -143,7 +143,7 @@ Desligamento automático do HDD
 Modo de vídeo
 Cor do diálogo
 Cor selecionada
-Mostrar Página de Informação
+Reiniciar cores
 Info
 ELF personalizado
 Seleção de Cor
@@ -197,7 +197,7 @@ Erro: falha ao abrir o ficheiro de Cheat
 Nenhum Cheat encontrado
 Pré-definições de download
 Atualização por Internet
-Voltar a descarregar dados existentes?
+Substituir Registos Existentes
 Atualizaçao falhou.
 Falha a ligar ao servidor de atualização.
 Atualização completa.
@@ -257,10 +257,27 @@ Controlo Parental desativado.
 Opções de compilação:
 Erro - esta password não pode ser usada.
 O ficheiro VMC %s está fragmentado. Continuar com o Cartão de Memoria na ranhura %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+Definições de Áudio
+Ativar sons
+Ativar som de Arranque
+Volume dos sons
+Volume do som de arranque
+Confirmar alteração do modo de vídeo?
+Cache da lista de jogos (HDD)
+Ativar notificações
+%s carregado de %s
+Menu de Jogo
+Configurações do jogo guardadas.
+%s configurações removidas.
+Substitui configurações de compatibilidade de jogos existentes quando ativado.
+Modo de configurações
+Global
+Por jogo
+Todos
+Selecione as configurações para remover.
+Fóruns de suporte:
+Título
+Gênero
+Data de lançamento
+Desenvolvedor
+Descrição

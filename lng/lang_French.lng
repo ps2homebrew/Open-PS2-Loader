@@ -1,5 +1,5 @@
-# French translation by ShaolinAssassin - @http://psx-scene.com/forums/members/shaolinassassin/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# French translation by ShaolinAssassin completed by Algol
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 French
 Open PS2 Loader %s
 Sauvegarder
@@ -7,7 +7,7 @@ Retour
 Configuration réseau
 Réglages avancés
 <non renseigné>
-Configuration sauvegardée...
+Configs sauvées vers %s
 Erreur lors de la sauvegarde de la configuration
 Quitter Open PS2 Loader
 Configuration
@@ -41,7 +41,7 @@ O
 X
 Liste des jeux
 Réglages
-Supprimer tous les réglages
+Supprimer Les Configs
 Réglages du jeu supprimés
 Défilement
 Lent
@@ -106,7 +106,7 @@ Dernier jeu joué
 Touche de validation
 "Erreur, le jeu est fragmenté"
 "Erreur, impossible de lancer l'item"
-Tester les réglages
+Tester Les Changements
 Laisser le champ vide pour utiliser la session Invité
 Simuler la vitesse de lecture du CD/DVD
 Mode de lecture alternatif (lecture synchrone)
@@ -143,7 +143,7 @@ Arrêt auto. disque dur interne
 Mode vidéo
 Options
 Sélection
-Page d'informations
+Réinitialisation des Couleurs
 Infos.
 ELF alternatif
 Choix des couleurs de l'interface
@@ -197,7 +197,7 @@ Automatique
 Fichier de code .cht introuvable
 Télécharger les régl. prédéfinis
 Téléchargement des régl. prédéfinis
-Mise à jour des données existantes
+Réécrire Enregistrements Existants
 Échec du téléchargement
 Impossible de se connecter au serveur OPL-CL
 Téléchargement effectué avec succès
@@ -246,21 +246,38 @@ Emulateur Multitap sur port manette
 Port 1/Port 2
 Désactiver correctif pour manettes clones DS3
 Désactive correctif permettant à certaines manettes clones DS3 de fonctionner
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+Émuler FIELD Flipping
+Correction jeux Tressautants en mode Vidéo Progressif.
+Paramètres De Verrouillage Parental
+Mot De Passe De Verrouillage Parental
+Laisser vide pour désactiver le verrouillage parental.
+Entrez Le Mot De Passe Du Verrouillage Parental
+Mot de passe de verrouillage parental incorrect.
+Verrouillage parental désactivé.
+Options de compilation:
+Erreur - ce mot de passe ne peut pas être utilisé.
+Le fichier VMC %s est fragmenté. Continuer avec la carte mémoire dans l'emplacement %d?
+Paramètres Audio
+Activer Les Effets Sonores
+Activer Le Son De Démarrage
+Volume Des Effets Sonores
+Volume Du Son De Démarrage
+Confirmer le changement de mode vidéo?
+Masquer Liste Jeux (HDD)
+Activer Les Notifications
+%s chargé par %s
+Menu Jeu
+Configs Jeux sauvées.
+%s Configs supprimées.
+Réécrire Configs Compatibilité Jeux si activée.
+Mode Configs
+Global
+Par Jeux
+Tous
+Sélection Configs à supprimer.
+Support des Forums:
+Titre
+Genre
+Release
+Développeurs
+Description

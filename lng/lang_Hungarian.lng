@@ -1,5 +1,5 @@
 # Hungarian translation by co5oos
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Hungarian
 Open PS2 Loader %s
 Változtatások mentése
@@ -7,7 +7,7 @@ Vissza
 Hálózat konfigurálás
 Haladó beállítások
 <Nincs érték>
-Beállítások mentve...
+Beállítások elmentve %s-be
 Hiba a beállítások írásában!
 Kilépés
 Beállítások
@@ -19,7 +19,7 @@ Alkalmazások
 Téma
 Nyelv
 A rendszer le fog állni.
-Kilépés a böngészőbe/OSDSYS-be?
+Kilépés a Browser-be?
 Frissítés visszavonása?
 %d: Merevlemez nem található
 %d: Merevlemez nincs leformázva
@@ -41,7 +41,7 @@ Kör
 Kereszt
 Játék Lista
 Játékbeállítások
-Összes beállítás eltávolítása
+Beállítások eltávolítása
 Játékhoz tartozó összes kulcs eltávolítva
 Görgetés
 Lassú
@@ -106,7 +106,7 @@ Emlékezz a legutóbbi játékra
 Select Gomb
 Hiba, a játék töredezett
 Hiba, az elem futtatása sikertelen
-Teszt
+Változások tesztelése
 Hagyja üresen VENDÉG hitelesítéshez
 Postos Olvasás
 Egyidejű Mód
@@ -143,7 +143,7 @@ Automatikus Merevlemez kikapcsolás
 Videó mód
 Párbeszédablak színe
 Kiválasztott színe
-Információ oldal megjelenítése
+Színek Visszaállítása
 Infó
 Testreszabott ELF
 Szín szelekció
@@ -185,7 +185,7 @@ Függőleges Szabályozás
 Overscan
 Overscan Beállítása
 FMV Átugrása
-Átugorja a  Full Motion Videókat
+Átugorja a  Full Motion Videókat
 Csalás Beállítások
 PS2RD Csalás Motor engedélyezése
 Engedd a PS2RD Csalás motornak, hogy patch-elje a játékodat.
@@ -197,7 +197,7 @@ Hiba: A Csalás Fájl betöltése sikertelen
 Nem találhatóak csalások
 Alapértelmezett letöltése
 Hálózat frissítés
-Újra-letölti a meglévő feljegyzéseket?
+Létező rekordok felülírása
 Frissítés Sikertelen.
 Nem sikerült csatlakozni a frissítő szerverhez.
 Frissítés befejezve.
@@ -257,10 +257,27 @@ Gyerekzás kikapcsolva.
 Build Opciók:
 Hiba - ez a jelszó nem használható.
 VMC %s fájl töredezett. Folytatás a %d foglalatban lévő Memória Kártyával?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+Hangbeállítások
+Hanghatások engedélyezése
+Boot Sound engedélyezése
+Hanghatások hangereje
+Boot Sound hangereje
+Videó mód változtatás jóváhagyása?
+Játéklista cachelés (HDD)
+Értesítések engedélyezése
+%s betöltve %s-ből
+Játék Menü
+Játékbeállítások elmentve.
+%s beállítások eltávolítva
+Engedélyezéskor felülírja a létező játék kompatibilitási beállításokat.
+Beállítások Mód
+Globális
+Játékonként
+Összes
+Válassza ki az eltávolítani való beállításokat.
+Támogatási Fórumok:
+Cím
+Műfaj
+Megjelenés
+Fejlesztő
+Leírás

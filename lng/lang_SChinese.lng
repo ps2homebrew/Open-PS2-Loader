@@ -1,5 +1,5 @@
 # Simplified Chinese translation by eyu2007
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Simplified Chinese
 Open PS2 Loader %s
 保存设置
@@ -7,7 +7,7 @@ Open PS2 Loader %s
 网络设置
 进阶设置
 <无数值>
-设置已保存...
+设置保存到 %s
 写入设置错误!
 离开
 设置
@@ -41,7 +41,7 @@ O
 X
 游戏列表
 游戏设置
-移除所有设置
+删除设置
 移除游戏所有的设置
 滚动
 较慢
@@ -106,7 +106,7 @@ NetBIOS
 选定键
 错误, 游戏有碎片
 错误, 无法运行该项目
-测试
+测试修改
 GUEST验证留空.
 精确读取
 同步模式
@@ -114,8 +114,8 @@ GUEST验证留空.
 跳过 videos
 模拟 DVD-DL
 禁用 IGR
-Unused
-Unused
+空闲
+空闲
 改变大小将会重新格式化 VMC
 生成
 开始
@@ -143,7 +143,7 @@ USB 前缀路径
 影片模式
 对话框颜色
 被选定颜色
-显示讯息页面
+Reset Colors
 讯息
 自定义 ELF
 颜色选项
@@ -197,7 +197,7 @@ PS2RD 金手指引擎模式
 未发现金手指文件
 下载默认值
 网络更新
-重新下载现有记录?
+覆盖现有记录
 更新失败.
 连结更新服务器失败.
 更新已完成.
@@ -208,7 +208,7 @@ PS2RD 金手指引擎模式
 将自动于 %i 秒后启动...
 自动启动
 以秒为单位,设为 0 来禁用自动启动
-PS2 Logo
+PS2 标志
 只显示与控制台区域匹配的有效磁盘标识
 配置PADEMU
 Pad模拟器设置
@@ -225,7 +225,7 @@ Pad模拟器模式
 开启振动
 打开/关闭选定端口的振动。
 USB蓝牙适配器MAC地址:
-D  S 手 柄   MAC地址:
+D  S 手 柄   MAC地址:
 配对
 配对DS手柄
 蓝牙适配器和DS手柄进行MAC地址配对。
@@ -246,21 +246,38 @@ LMP版本:
 选择进行多重模拟的端口
 禁用仿冒DS3手柄
 这个选项将使一些仿冒的DS3手柄无法工作
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
+模拟播片扫描方式切换
+修正逐行模式下视频播放有问题的游戏.
+家长锁设置
+家长锁密码
+留空将不启用家长锁.
+输入家长锁密码
+家长锁密码不正确.
+已禁用家长锁.
+创建选项:
+错误-无法使用此密码.
+vmc% s 文件碎片化.是否继续使用插槽% d 中的记忆卡？
+音频设置
+启用声音效果
+启用启动声音
+音效音量
+启动音量
+确认视频模式更改？
+缓存游戏列表 (硬盘)
+启用通知
+%s 从 %s加载
+游戏菜单
+游戏设置已保存。
+%s设置已删除。
+启用时覆盖现有的游戏兼容性设置。
+设置模式
+全局
+当前游戏
+全部
+选择要删除的设置。
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

@@ -1,0 +1,283 @@
+# Croatian translation by Blacky5678
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+Croatian
+OPL %s
+Spremi Promjene
+Natrag
+Network Settings
+Napredne Postavke
+<nema vrijednosti>
+Postavke spremljene u %s
+Greska zapisivanja postavki!
+Izlaz
+Postavke
+Izbornik
+USB Igre
+HDD Igre
+ETH Igre
+Aplikacije
+Teme
+Jezik
+Sistem ce se ugasiti.
+Izaci u Preglednik?
+Otkazati azuriranje?
+%d: Hard Disk nije primijecen.
+%d: Hard Disk nije formatiran.
+%d: Greska pokretanja mreze.
+%d: Mrezni adapter nije primijecen.
+%d: Nemoguce se spojiti na SMB server.
+%d: Nemoguce se ulogirati na SMB server.
+%d: Nemoguce otvoriti SMB dijeljenje.
+%d: Nemoguce izlistati SMB dijeljenja.
+%d: Nemoguce izlistati igre.
+%d: DHCP server nije dostupan.
+%d: Nema mrezne konekcije.
+Uklj.
+Isklj.
+U redu
+Odaberi
+Otkazi
+Krug
+Kriz
+Lista Igara
+Postavke Igre
+Ukloni Postavke
+Uklonjeni svi kljucevi za igru.
+Izlistati
+Sporo
+Srednje
+Brzo
+Uobicajeni Izbornik
+Ucitaj sa diska
+Molimo, sacekajte.
+Greska tijekom ucitavanja ID-a igre.
+Automatsko Sortiranje
+Greska ucitavanja jezicne datoteke.
+Onemoguci Debug Boje
+Kontroler nije primijecen, cekanje...
+Omoguci Naslovnice Igara
+Siroki Zaslon
+Ugasi
+Ucitavanje konfiguracije...
+Spremanje konfiguracije...
+Zapocni Uredaj
+Osvjezi
+Pocetni Nacin USB Uredaja
+Pocetni Nacin HDD Uredaja
+Pocetni Nacin ETH Uredaja
+Nacin Prikaza Aplikacijskog Izbornika
+Automatski
+Rucno
+Zapocni HDL Server
+Zapocinjanje HDL Servera...
+Pokretanje HDL Servera...
+Neuspjesno zapocinjanje HDL Servera.
+Gasenje HDL Server...
+IGR Putanja
+Boja Pozadine
+Boja Teksta
+- PS2 -
+- SMB Server -
+Vrsta IP Adrese
+Staticna
+DHCP
+IP Adresa
+Adresa
+Maska
+Propusnica
+DNS Server
+Port
+Dijeli
+Korisnik
+Lozinka
+<nije postavljeno>
+Vrsta Adrese
+IP
+NetBIOS
+Prihvati
+Stavka ce biti trajno obrisana, nastaviti?
+Preimenuj
+Obrisi
+Pokreni
+Postavke Zaslona
+Omoguci Operacije Pisanja
+Provjeri Fragmentaciju USB Igre
+Zapamti Zadnju Upaljenu Igru
+Tipka za Odabir
+Greska, igra je fragmentirana.
+Greska, nije moguce pokrenuti ovu stavku.
+Testiraj Promjene
+Ostavi prazno za autent. GOSTA
+Tocna Citanja
+Sinkronizacijski Nacin
+Otkaci Syscalls
+Preskoci Videe
+Emuliraj DVD-DL
+Onemoguci IGR
+Nekoristeno
+Nekoristeno
+Mijenjanje velice ce preurediti VMC.
+Stvori
+Zapocni
+Izmjeni
+Prekini
+Resetiraj
+Koristi Genericki
+Konfiguriraj VMC
+Ime
+Velicina
+Status
+Napredak
+VMC datoteka vec postoji.
+Nevazeca VMC datoteka, velicina nije tocna.
+VMC datoteka treba biti stvorena.
+Greska pristupanja VMC %s. Nastaviti sa Memory Cardom u slotu %d?
+Automatsko Osvjezavanje
+O
+Koderi
+Osiguranje Kvalitete
+Putanja USB Prefiksa
+Pokrece prilagodeni ELF nakon IGR-a.
+Vrijednost u minutama, 0 za onemogucivanje zavrtanja.
+Automatsko Zavrtanje HDD-a
+Video Nacin
+Boja Dijaloga
+Odabrana Boja
+Reset Colors
+Info
+Prilagodeni ELF
+Odabir Boje
+Ponovno spoji
+Ostavi prazno za listu dijeljenja.
+Putanja ETH Prefiksa
+Brisanje
+Razmak
+Unesi
+Nacin
+VMC Slot 1
+VMC Slot 2
+ID Igre
+DMA Nacin
+V-Sync
+Nacin 1
+Nacin 2
+Nacin 3
+Nacin 4
+Nacin 5
+Nacin 6
+Nacin 7
+Nacin 8
+Konfiguriraj GSM
+Nacin Povezivanja Etherneta
+100Mbit Puni-dupleks
+100Mbit Pola-dupleksa
+10Mbit Puni-dupleks
+10Mbit Pola-dupleksa
+GSM Postavke
+Omoguci GSM
+Uklj./Isklj. GSM
+VMOD
+Forsirani prilagodeni nacin ekrana.
+H-POZ
+Horizontalno nastimavanje.
+V-POZ
+Vertikalno nastimavanje.
+Skaliranje
+Nastimavanje skaliranja.
+Preskoci FMV
+Preskakanje FMV-a
+Postavke Varanja
+Omoguci PS2RD Cheat Engine
+Dopusti PS2RD Cheat Engine da zakrpa tvoju igru.
+Nacin PS2RD Cheat Engine
+Automatski odabir ili odaberi varanja za igru.
+Automatski Odaberi Varanja
+Odaberi Varanja Igre
+Greska: neuspjelo ucitavanje datoteke varanja.
+Varnaje nije pronadeno.
+Preuzmi Uobicajeno
+Mrezno Azuriranje
+Prepisi Postojece Zapise
+Azuriranje nije uspjelo.
+Neuspjesno spajanje na server azuriranja.
+Azuriranje zavrseno.
+Azuriranje otkazano.
+Preuzmi postavke sa mreze?
+Prilagodene Postavke
+Preuzeto Uobicajeno
+Automatski zapocni za %i s...
+Automatski zapocni
+Vrijednost u sekundama, 0 za onemogucavanje automatskog pocetka.
+PS2 Logo
+Displayed for a valid disc logo matching the console's region.
+Konfiguriraj PADEMU
+Postavke Pad Emulatora
+Omoguci Pad Emulator
+Uklj./Isklj. Pad Emulator za odabranu igru.
+Nacin Pad Emulatora
+Odabire nacin Pad Emulatora.
+DualShock3/4 USB
+DualShock3/4 BT
+Postavke Za Port:
+Odaberi port za postavke Pad Emulatora.
+Omoguci Emulaciju
+Uklj./Isklj. Pad Emulator za odabrani port.
+Omoguci Vibraciju
+Uklj./Isklj. vibraciju za odabrani port Pad Emulatora.
+MAC Adresa USB Bluetooth Adaptera:
+DS Kontroler uparen na MAC Adresu:
+Upari
+Upari DS Kontroler
+Upari DS kontroler sa MAC adresom Bluetooth adaptera.
+Nije Spojeno
+Informacije Bluetooth Adaptera
+Prikazuje vise informacija i podrzana svojstva.
+HCI Verzija:
+LMP Verzija:
+ID Proizvodaca:
+Podrzana Svojstva:
+Da
+Ne
+Bluetooth adapter bi trebao biti potpuno kompatibilan sa DS3/DS4 kontrolerom.
+Bluetooth adapter mozda nece raditi ispravno sa DS3/DS4 kontrolerom.
+Omoguci Emulaciju Multitapa
+Uklj./Isklj. emulaciju Multitapa za odabranu igru.
+Emulator Multitapa na Portu:
+Odaberi port za emulaciju Multitapa.
+Onemoguci Lazne DS3 Obilaske
+Neki lazni DS3 ce trebati obilaske, ova postavka ce to onemoguciti.
+Emuliraj preklapanje FIELD-a
+Zakrpe za igre koje se kvare pod progresivnim video nacinom.
+Postavke Roditeljskog Zakljucavanja
+Lozinka Roditeljskog Zakljucavanja
+Ostavi prazno za onemogucavanje roditeljskog zakljucavanja.
+Unesi Lozinku Roditeljskog Zakljucavanja
+Lozinka roditeljskog zakljucavanja nije tocna.
+Roditeljsko zakljucavanje je onemoguceno.
+Izgradi Postavke:
+Greska - ova lozinka se ne moze koristiti.
+VMC %s datoteka je fragmentirana. Nastaviti sa Memory Cardom u slotu %d?
+Postavke Zvuka
+Omoguci Zvucne Efekte
+Omoguci Zvuk Pokretanja
+Glasnoca Zvucnih Efekata
+Glasnoca Zvuka Pokretanja
+Potvrdi promjenu video nacina?
+Predmemorija Liste Igara (HDD)
+Omoguci Notifikacije
+%s ucitano sa %s
+Izbornik Igre
+Postavke igre su spremljene.
+%s postavke su uklonjene.
+Prepisivanje postojecih postavki kompatibilnosti igre kada je omoguceno.
+Nacin Postavki
+Globalno
+Po Igri
+Sve
+Odaberi postavke za ukloniti.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

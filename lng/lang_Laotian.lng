@@ -1,5 +1,5 @@
 # Laotian translation by blackbutterfly (Anousith Phompida <noum_terry@hotmail.com>)
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Laotian
 Open PS2 Loader %s
 ບັນທຶກການປ່ຽນແປງ
@@ -7,7 +7,7 @@ Open PS2 Loader %s
 ກຳນົດຄ່າທາງດ້ານ Network
 ທາງເລືອກສຳລັບການຕັ້ງຄ່າຂັ້ນສູງ
 <ບໍ່ມີຄ່າໃດໆ>
-ບັນທຶກການຕັ້ງຄ່າ…
+Settings saved to %s
 ການຂຽນການຕັ້ງຄ່າມີຂໍ້ຜິດພາດ!
 ອອກຈາກໂປຣແກຣມ
 ການຕັ້ງຄ່າ
@@ -41,7 +41,7 @@ Open PS2 Loader %s
 ຄູນ
 ໄປທີ່ລາຍຊື່ເກມ
 ຕັ້ງຄ່າໃຫ້ເກມນີ້
-ຍົກເລີກການຕັ້ງຄ່າທັງໝົດ
+Remove Settings
 ລົບລ້າງ Key ທັງໝົດອອກຈາກເກມ
 ການເລື່ອນ
 ຊ້າໆ
@@ -106,7 +106,7 @@ NetBIOS
 ເລືອກປຸ່ມ
 ເກີດຂໍ້ຜິດພາດ, ເກມນີ້ມີ fragmentation. ກະລຸນາ Defragment ເກມນີ້ກ່ອນ
 ເກີດຂໍ້ຜິດພາດ, ບໍ່ສາມາດເປີດໃຊ້ງານໄດ້
-ທົດລອງ
+Test Changes
 ບໍ່ມີຄ່າກຳນົດໃດໆສຳລັບການເຂົ້າເຖິງຂອງ GUEST
 ອ່ານແບບຖືກຕ້ອງແມ່ນຍຳ
 ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
@@ -143,7 +143,7 @@ USB prefix path
 ໂໝດວິດິໂອ
 ສີ Dialog
 ສີທີ່ຖືກເລືອກ
-ສະແດງຂໍ້ມູນຂອງໜ້າ
+Reset Colors
 ຂໍ້ມູນ
 ELF ທີ່ຖືກປັບແຕ່ງເອງ
 ເລືອກສີ
@@ -197,7 +197,7 @@ Overscan Adjustment
 ບໍ່ພົບ File ໂກງເກມໃດໆ
 ດາວໂຫຼດຄ່າມາດຕະຖານ
 ອັບເດດ Network
-ດາວໂຫຼດການບັນທຶກທີ່ມີຢູ່ອີກຄັ້ງ?
+Overwrite Existing Records
 ການອັບເດດເກີດຂໍ້ຜິດພາດ.
 ການເຊື່ອມຕໍ່ເພື່ອອັບເດດ Server ບໍ່ສົມບູນ.
 ການອັບເດດສົມບູນ.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

@@ -1,5 +1,5 @@
 # Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
@@ -7,7 +7,7 @@ Voltar
 Configurações de rede
 Opções avançadas
 <sem valores>
-Configurações salvas...
+Configurações salvas em %s
 Erro ao salvar as configurações!
 Sair
 Configurações
@@ -41,7 +41,7 @@ O
 X
 Lista de Jogos
 Configurar
-Remover todas as configurações
+Remover configurações
 Todas as configurações dos jogos foram removidas
 Rolagem
 Lenta
@@ -106,7 +106,7 @@ Lembrar do último jogo jogado
 Botão de seleção
 Erro, o jogo está fragmentado
 Erro, o item não pode ser iniciado
-Testar
+Testar Mudanças
 Deixe em branco para não usar senhas.
 Leituras Corretas
 Modo de Sincronia
@@ -143,7 +143,7 @@ Desligamento automático do HDD
 Modo de vídeo
 Cor do Diálogo
 Cor Selecionada
-Mostrar Página de Informação 
+Redefinir Cores
 Info.
 ELF Modificado
 Seleção de Cor
@@ -197,7 +197,7 @@ Erro: Falha ao carregar as trapaças
 Nenhuma trapaça encontrada
 Baixar configurações
 Atualizar pela Internet
-Baixar dados existentes novamente?
+Substituir Registros Existentes
 Falha na atualização.
 Falha ao conectar no servidor de atualização.
 Atualização concluída.

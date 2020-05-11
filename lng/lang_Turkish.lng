@@ -1,5 +1,5 @@
-# Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# Turkish translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Turkish
 Open PS2 Loader %s
 Değişiklikleri kaydet
@@ -7,7 +7,7 @@ Geri
 Ağ ayarları
 Gelişmiş ayarlar
 <değer yok>
-Ayarlar kayıt edildi...
+Ayarlar %s a kaydedildi
 Ayarlar yazılırken hata oluştu!
 Çıkış
 Ayarlar
@@ -19,8 +19,8 @@ Uygulamalar
 Tema
 Dil
 Çıkış işlemi gücü kapatacaktır.
-Exit to Browser?
-Güncelleme iptal edilsinmi?
+Browser'a çık
+Güncelleme iptal edilsin mi?
 %d: HardDisk sürücü bulunamadı
 %d: HardDisk sürücü biçimlendirilmemiş
 %d: Ağ başlatma hatası
@@ -41,7 +41,7 @@ Daire
 Çarpı
 Oyun listesi
 Oyun ayarları
-Tüm ayarları sil
+Ayarları sil
 Oyunun tüm anahtarları kaldırıldı
 Kaydırma
 Yavaş
@@ -106,7 +106,7 @@ Enson oynanan oyunu hatırla
 Seçme tuşu
 Hata, oyun dosyası parçalı
 Hata, nesne çalıştırılamıyor
-Test
+Test et
 MİSAFİR oturumu için boş bırakınız.
 Okuma hızını emüle et
 Senkronize Modu
@@ -131,7 +131,7 @@ Durum
 VMC dosyası var
 Geçersiz VMC dosyası, boyut hatalı
 VMC dosyasının oluşturulması gerekli
-VMC %sdosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d) ?
+VMC %sdosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d)?
 Otomatik yenileme
 Hakkında
 Geliştiriciler
@@ -143,7 +143,7 @@ Otomatik Sabit Disk durdurma
 Video modu
 İleti rengi
 Seçili öğe rengi
-Bilgi Ekranı göster
+Renkleri sıfırla
 Bilgi
 Özel ELF
 Renk seçimi
@@ -197,7 +197,7 @@ Hata: Hile dosyası yüklemesi başarısız
 Hile bulunamadı
 Varsayılanları indir
 Internetten güncelleme
-Varolan kayıtlar tekrar indirilsin mi?
+Varolan kayıtların üzerine yaz
 Güncelleme başarısız.
 Güncelleme sunucusuna bağlantı kurulamadı.
 Güncelleme tamamlandı.
@@ -263,4 +263,21 @@ Açılış Sesi Olsun
 Ses Efektleri Kuvveti
 Açılış Sesi Kuvveti
 Video çıkış modu değiştirilsin mi?
-Cache Game List (HDD)
+Oyun listesini cachele (HDD)
+Bildirimleri aktifleştir
+%s yüklendi %s konumundan
+Oyun Menüsü
+Oyun ayarları kaydedildi.
+%s ayarları silindi.
+Aktifleştirildiğinde varolan oyun uyumluluk ayarlarının üzerine yazar.
+Ayarlar Modu
+Global
+Oyun başına
+Hepsi
+Silinecek ayarları seçin.
+Destek forumu:
+Ad
+Tür
+Çıkış
+Geliştirici
+Açıklama

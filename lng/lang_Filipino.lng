@@ -1,5 +1,5 @@
 # Filipino translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Filipino
 Open PS2 Loader %s
 I-save ang mga pagbabago
@@ -7,7 +7,7 @@ Likod
 Network config
 Advanced options
 <Walang values>
-Save ang mga setting...
+Settings saved to %s
 Error sa pagsulat setting !
 Lumabas
 Settings
@@ -41,7 +41,7 @@ Circle
 Cross
 Games List
 Game settings
-Alisin ang lahat ng mga setting ng
+Remove Settings
 Inalis ang lahat ng mga pindutan para sa mga laro
 i-scroll
 Mabagal
@@ -106,7 +106,7 @@ Tandaan ang huling play ng laro
 Select button
 Error, the game is fragmented
 Error, hindi maaaring tumakbo ang item
-pagsubok
+Test Changes
 Iwanang walang laman para sa Guest auth .
 Accurate Reads
 Synchronous Mode
@@ -143,7 +143,7 @@ Awtomatikong HDD paikutin pababa
 Video mode
 dialog ng kulay
 Piniling kulay
-Ipakita ang impormasyon ng pahina
+Reset Colors
 Impo
 Custom ELF
 kulay ng seleksyon
@@ -197,7 +197,7 @@ Error: failed to load Cheat File
 No cheats found
 Download defaults
 Network update
-Re-download existing records?
+Overwrite Existing Records
 Update failed.
 Failed to connect to update server.
 Update completed.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

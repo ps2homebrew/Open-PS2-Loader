@@ -1,5 +1,5 @@
 # Traditional Chinese translation by kane159 - kane159<kane12369@gmail.com
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Traditional Chinese
 Open PS2 Loader %s
 保存設置
@@ -7,7 +7,7 @@ Open PS2 Loader %s
 網絡設置
 進階設置
 <無數值>
-Settings saved to %s
+設置保存到 %s
 寫入設置錯誤!
 離開
 設置
@@ -19,7 +19,7 @@ ETH 遊戲
 主題
 語言
 系統電源將會關閉.
-Exit to Browser?
+退出到瀏覽界面?
 取消更新?
 %d: 偵測不到硬碟
 %d: 硬碟沒有格式化
@@ -41,7 +41,7 @@ Exit to Browser?
 叉叉
 遊戲清單
 遊戲設置
-Remove Settings
+刪除設置
 移除遊戲所有的設置
 滾動
 較慢
@@ -53,7 +53,7 @@ Remove Settings
 讀取 Game ID 時出錯
 自動滾動
 讀取語言文件時出錯
-禁用 Debug Colors
+禁用調試跳色
 "無偵測到搖桿, 等待中..."
 啟用圖示封面
 寬螢幕
@@ -106,16 +106,16 @@ NetBIOS
 選定鍵
 "錯誤, 遊戲有碎片"
 "錯誤, 無法運行該項目"
-Test Changes
+測試修改
 GUEST驗證留空.
 精確讀取
 同步模式
 脫開系統調用
-Skip videos
+跳過 videos
 模擬 DVD-DL
 禁用 IGR
-Unused
-隱藏 DEV9 模式
+空閑
+空閑
 改變大小將會重新格式化 VMC
 生成
 開始
@@ -131,19 +131,19 @@ Unused
 VMC 檔案已存在
 "無效的 VMC 檔案, 大小有誤"
 需要建立VMC 檔案
-"VMC %s 出錯, 繼續使用物理記憶卡嗎 (slot %d) ?"
+訪問VMC %s 出錯。繼續使用插槽%d中的記憶卡 %d?
 自動重新整理
 關於
-Coders
-Quality Assurance
+程序
+測試
 USB 前墜路徑
-Boots Custom ELF after an IGR
+自定義IGR啟動文件
 "數值以分鐘計,設為 0 禁用降速"
 自動 HDD 降速
 影片模式
 對話框顏色
 被選定顏色
-顯示資訊業面
+Reset Colors
 資訊
 自定義 ELF
 顏色選項
@@ -152,13 +152,13 @@ Boots Custom ELF after an IGR
 ETH 前墜位置
 退格
 空格
-Enter
+回車
 模式
 VMC 插槽 1
 VMC 插槽 2
-Game ID
+遊戲 ID
 DMA 模式
-V-Sync
+垂直同步
 模式 1
 模式 2
 模式 3
@@ -169,21 +169,21 @@ V-Sync
 模式 8
 配置 GSM
 以太網鏈接模式
-100Mbit full-duplex
-100Mbit half-duplex
-10Mbit full-duplex
-10Mbit half-duplex
+100Mbit 全雙工
+100Mbit 半雙工
+10Mbit 全雙工
+10Mbit 半雙工
 GSM 設置
 啟用 GSM
 切換 GSM 開或關
-VMODE
+畫面模式
 強制自定義顯示模式
-H-POS
 水平調整
-V-POS
+調整水平方向的顯示位置
 垂直調整
-Overscan
-Overscan Adjustment
+調整垂直方向的顯示位置
+過掃
+過掃調節
 跳過 FMV
 跳過全動態視頻
 金手指設置
@@ -197,7 +197,7 @@ PS2RD 金手指引擎模式
 無發現金手指文件
 下載預設值
 網絡更新
-Overwrite Existing Records
+覆蓋現有記錄
 更新失敗.
 連結更新伺服器失敗.
 更新已完成.
@@ -208,73 +208,73 @@ Overwrite Existing Records
 將自動於 %i 秒後啟動...
 自動啟動
 "以秒為單位,設為 0 來禁用自動啟動"
-PS2 Logo
+PS2 標誌
 Only displayed for a valid disc logo which matches the console's region
-Configure PADEMU
-Pad Emulator Settings
-Enable PadEmulator
-Turns on/off PadEmulator for selected game.
-Pad Emulator mode
-Select Pad Emulator mode.
-DualShock3/4 USB
-DualShock3/4 BT
-Settings for port:
-Select Pad Emulator port for settings.
-Enable emulation
-Turns on/off Pad Emulator for selected port.
-Enable vibration
-Turns on/off vibration for Pad Emulator selected port.
-Usb bluetooth adapter mac address:
-DS Controller paired to mac address:
-Pair
-Pair DS controller
-Pair DS controller with bluetooth adapter mac address.
-Not connected
-Bluetooth adapter information
-Shows more information and supported features
-HCI Version:
-LMP Version:
-Manufacturer ID:
-Support features:
-Yes
-No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
-Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds4
-"Some fake ds3s need workaround, this option will disable it."
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
+配置PADEMU
+PADEMU設置
+開啟PADEMU
+為選定遊戲開啟/關閉PADEMU調節.
+連接模式
+選擇PADEMU連接模式.
+有線連接
+藍牙連接
+設置埠:
+選擇應用PADEMU埠
+開啟模擬
+打開/關閉選定埠的模擬
+開啟振動
+打開/關閉選定埠的振動.
+藍牙適配器MAC地址:
+D   S  手 柄MAC地址:
+配對
+配對DS手柄
+藍牙適配器和DS手柄進行MAC地址配對.
+沒有連接
+藍牙適配器信息
+顯示更多的信息和支持的特性
+HCI版本:
+LMP版本:
+製造商ID:
+支持的功能:
+是
+否
+藍牙適配器完全兼容DS3/DS4手柄
+藍牙適配器與DS3/DS4手柄不匹配
+開啟分插模擬
+打開/關閉分插模擬.
+模擬分插埠
+選擇模擬的分插埠
+禁用仿製DS3手柄
+這個選項將使仿製DS3手柄無法工作
+模擬播片掃描方式切換
+修正逐行模式下視頻播放有問題的遊戲.
+家長鎖設置
+家長鎖密碼
+留空將不啟用家長鎖.
+輸入家長鎖密碼
+家長鎖密碼不正確.
+已禁用家長鎖.
+創建選項:
+錯誤-無法使用此密碼.
+vmc %s 文件碎片化.是否繼續使用插槽 %d 中的記憶卡？
+音頻設置
+啟用聲音效果
+啟用啟動聲音
+音效音量
+啟動音量
+確認視頻模式更改？
+緩存遊戲列表 (硬碟)
+啟用通知
+%s 從 %s 載入
+遊戲菜單
+遊戲設置已保存。
+%s 設置已刪除。
+啟用時覆蓋現有的遊戲兼容性設置。
+設置模式
+全局
+當前遊戲
+全部
+選擇要刪除的設置。
 Support Forums:
 Title
 Genre

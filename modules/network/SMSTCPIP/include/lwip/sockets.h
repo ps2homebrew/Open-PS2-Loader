@@ -34,6 +34,7 @@
 #ifndef __LWIP_SOCKETS_H__
 #define __LWIP_SOCKETS_H__
 #include "lwip/ip_addr.h"
+#include <sys/time.h>
 
 struct sockaddr_in
 {
@@ -208,15 +209,6 @@ typedef struct fd_set
 {
     unsigned char fd_bits[(FD_SETSIZE + 7) / 8];
 } fd_set;
-#endif
-
-#ifndef TIMEVAL
-#define TIMEVAL
-struct timeval
-{
-    long tv_sec;  /* seconds */
-    long tv_usec; /* and microseconds */
-};
 #endif
 
 int lwip_accept(int s, struct sockaddr *addr, socklen_t *addrlen);

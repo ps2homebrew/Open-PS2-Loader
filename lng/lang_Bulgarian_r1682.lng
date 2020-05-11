@@ -1,5 +1,5 @@
 # translation by vsub and wisi
-# Last update: April 18, 2020
+# Last update: May 10, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
@@ -133,7 +133,7 @@ Unused
 VMC файлът съществува.
 Невалиден VMC файл - грешен обем.
 VMC файлът трябва да бъде създаден.
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Проблем с VMC %s. Продължаване са Memory Card в слот %d?
 Автоматично опресняване
 Относно
 Програмисти:

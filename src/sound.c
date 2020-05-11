@@ -186,11 +186,11 @@ int sfxInit(int bootSnd)
         snprintf(sound_path, sizeof(sound_path), "%ssound", thmPath);
 
         //Check for custom sfx folder
-        int fd = fileXioDopen(sound_path);
-        if (fd >= 0)
+        DIR *dir = opendir(sound_path);
+        if (dir != NULL) {
             thmSfxEnabled = 1;
-
-        fileXioDclose(fd);
+            closedir(dir);
+        }
     }
 
     //boot sound only needs to be read/loaded at init

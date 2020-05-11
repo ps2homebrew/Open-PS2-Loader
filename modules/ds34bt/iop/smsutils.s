@@ -7,6 +7,12 @@
 # Pulled out 'sde' library from MIPS.
 # by Eugene Plotnikov
 */
+.ifdef .gasversion.
+.section .mdebug.abi32
+.nan legacy
+.module softfloat
+.module nooddspreg
+.endif
 .set noreorder
 .set noat
 .set nomacro

@@ -20,6 +20,9 @@
 #include <libds34usb.h>
 #endif
 
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // fileXioDevctl("genvmc:", ***)
+
 static int configSourceID;
 static int dmaMode;
 static int compatMode;

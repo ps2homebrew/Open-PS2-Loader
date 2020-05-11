@@ -1,5 +1,5 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: Feb. 11, 2020
+# Last update: May 10, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
@@ -9,7 +9,7 @@ Geri
 Network Settings
 Gelişmiş ayarlar
 <değer yok>
-Settings saved to %s
+Ayarlar %s a kaydedildi
 Ayarlar yazılırken hata oluştu!
 Çıkış
 Ayarlar
@@ -20,8 +20,8 @@ AĞ Oyunları
 Uygulamalar
 Tema
 Dil
-Sistem kapatılacaktır.
-Menüye çıkılsın mı?
+Çıkış işlemi gücü kapatacaktır.
+Browser'a çık
 Güncelleme iptal edilsin mi?
 %d: HardDisk sürücü bulunamadı
 %d: HardDisk sürücü biçimlendirilmemiş
@@ -43,7 +43,7 @@ Daire
 Çarpı
 Oyun listesi
 Oyun ayarları
-Remove Settings
+Ayarları sil
 Oyunun tüm anahtarları kaldırıldı
 Kaydırma
 Yavaş
@@ -108,7 +108,7 @@ En son oynanan oyunu hatırla
 Seçme tuşu
 Hata, oyun dosyası parçalı
 Hata, nesne çalıştırılamıyor
-Test Changes
+Test et
 MİSAFİR oturumu için boş bırakınız.
 Okuma hızını emüle et
 Senkronize Mod
@@ -133,7 +133,7 @@ Durum
 VMC dosyası var
 Geçersiz VMC dosyası, boyut hatalı
 VMC dosyasının oluşturulması gerekli
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+VMC %s dosyası hatalı, fiziksel HK ile devam edilsin mi (slot %d)?
 Otomatik yenileme
 Hakkında
 Geliştiriciler
@@ -145,7 +145,7 @@ Otomatik Sabit Disk durdurma
 Video modu
 İleti rengi
 Seçili öğe rengi
-Reset Colors
+Renkleri sıfırla
 Bilgi
 Özel ELF
 Renk seçimi
@@ -199,7 +199,7 @@ Hata: Hile dosyası yüklemesi başarısız
 Hile bulunamadı
 Varsayılanları indir
 Internetten güncelleme
-Overwrite Existing Records
+Varolan kayıtların üzerine yaz
 Güncelleme başarısız.
 Güncelleme sunucusuna bağlantı kurulamadı.
 Güncelleme tamamlandı.
@@ -265,24 +265,24 @@ Açılış Sesi Olsun
 Ses Efektleri Kuvveti
 Açılış Sesi Kuvveti
 Video çıkış modu değiştirilsin mi?
-Cache Game List (HD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
+Oyun listesini cachele (HDD)
+Bildirimleri aktifleştir
+%s yüklendi %s konumundan
+Oyun Menüsü
+Oyun ayarları kaydedildi.
+%s ayarları silindi.
+Aktifleştirildiğinde varolan oyun uyumluluk ayarlarının üzerine yazar.
+Ayarlar Modu
 Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Oyun başına
+Hepsi
+Silinecek ayarları seçin.
+Destek forumu:
+Ad
+Tür
+Çıkış
+Geliştirici
+Açıklama
 PS1 Oyunları
 PS1 Oyunları Ekran Modu
 POPSTARTER.ELF '%s' de bulunamadı.

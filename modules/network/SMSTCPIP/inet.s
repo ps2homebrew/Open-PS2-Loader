@@ -6,6 +6,12 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
+.ifdef .gasversion.
+.section .mdebug.abi32
+.nan legacy
+.module softfloat
+.module nooddspreg
+.endif
 .set noreorder
 .set nomacro
 

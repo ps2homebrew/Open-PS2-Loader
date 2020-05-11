@@ -136,7 +136,7 @@ static err_t SMapIFInit(NetIF *pNetIF)
     return ERR_OK;
 }
 
-inline void SMapLowLevelInput(PBuf *pBuf)
+void SMapLowLevelInput(PBuf *pBuf)
 {
     //When we receive data, the interrupt-handler will invoke this function, which means we are in an interrupt-context. Pass on
     //the received data to ps2ip.

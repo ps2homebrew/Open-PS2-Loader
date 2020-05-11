@@ -1,5 +1,5 @@
 # Danish translation by BongKris
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Danish
 Open PS2 Loader %s
 Gem indstillinger
@@ -7,7 +7,7 @@ Tilbage
 Netværksindstillinger
 Avancerede indstillinger
 <ingen værdi>
-Indstillinger gemt...
+Settings saved to %s
 Fejl ved lagering af indstillinger!
 Afslut
 Indstillinger
@@ -41,7 +41,7 @@ Cirkel
 Kryds
 Spil liste
 Spil indst.
-Nulstil alle indstillinger
+Remove Settings
 Spil indstillinger nulstillet
 Scrolling
 Langsom
@@ -106,7 +106,7 @@ Husk sidst spillede spil
 Vælgeknap
 Fejl: spillet er fragmenteret
 Fejl: kunne ikke køre elementet
-Test
+Test Changes
 Efterlad tom for gæste konto
 Korrekt læsning
 Synkroniseringstilstand
@@ -143,7 +143,7 @@ Automatisk harddisk spindown
 Videotilstand
 Dialogfarve
 Markeringsfarve
-Vis infoside
+Reset Colors
 Info
 Brugerdefinerede ELF
 Farvevalg
@@ -197,7 +197,7 @@ Fejl: kunne ikke indlæses fil med snydekoder
 Ingen snydekoder fundet
 Hent standardindstillinger
 Netværksopdatering
-Hent eksisterende arkiv?
+Overwrite Existing Records
 Opdatering mislykkedes.
 Kan ikke oprette forbindes til server.
 Opdatering fuldendt.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

@@ -1,5 +1,5 @@
 # Dutch translation by PS2Gaming
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Dutch
 Open PS2 Loader %s
 Wijzigingen opslaan
@@ -7,7 +7,7 @@ Terug
 Netwerkconfiguratie
 Geavanceerde opties
 <geen waarde>
-Instellingen opgeslagen...
+Settings saved to %s
 Fout bij schrijven van instellingen!
 Sluiten
 Instellingen
@@ -41,7 +41,7 @@ Cirkel
 Kruis
 Spellenlijst
 Spelinstellingen
-Verwijder alle instellingen
+Remove Settings
 Verwijder alle keys voor het spel
 Scrollen
 Langzaam
@@ -106,7 +106,7 @@ Herinner laatst gespeelde spel
 Selecteerknop
 Foutmelding, het spel is gefragmenteerd
 Foutmelding, kan het item niet uitvoeren
-Test
+Test Changes
 Laat leeg voor GUEST auth.
 Accurate reads
 Synchrone modus
@@ -143,7 +143,7 @@ Automatische HDD spin down
 Videomodus
 Dialoogvensterkleur
 Geselecteerde kleur
-Toon infopagina
+Reset Colors
 Info
 Aangepaste ELF
 Kleurselectie
@@ -197,7 +197,7 @@ Foutmelding: mislukt om cheatbestand te laden
 Geen cheats gevonden
 Download standaardwaarden
 Netwerkupdate
-Bestaande records herdownloaden?
+Overwrite Existing Records
 Update mislukt.
 Mislukt om te verbinden met update server.
 Update voltooid.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

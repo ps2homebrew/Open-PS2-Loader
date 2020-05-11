@@ -1,5 +1,5 @@
 # Korean translation by ddinghoya
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Korean
 오픈 PS2 로더 %s
 저장 변경
@@ -7,7 +7,7 @@ Korean
 네트워크 구성
 고급 옵션
 <값 없음>
-설정 저장…
+설정이 %s 에 저장되었습니다.
 설정 기록 중 에러!
 종료
 설정
@@ -41,7 +41,7 @@ O
 X
 게임 목록
 게임 설정
-모든 설정 제거
+설정 삭제
 설정된 게임 키 제거
 스크롤 속도
 느림
@@ -106,7 +106,7 @@ USB 게임 손상 검사
 버튼 선택
 오류, 게임이 손상 되었습니다.
 오류, 항목을 실행할 수 없습니다
-테스트
+테스트 변경
 게스트 권한을 위해 지움
 정밀하게 읽음
 동기화 모드
@@ -143,7 +143,7 @@ IGR 후 사용자 정의 ELF 부팅
 비디오 모드
 대화상자 색상
 선택한 색상
-정보 페이지 표시
+Reset Colors
 정보
 커스텀 ELF
 색상 선택
@@ -197,7 +197,7 @@ PS2RD 치트 엔진 모드
 치트를 찾을 수 없음
 다운로드 기본값
 네트워크 업데이트
-기존 데이터에서 다시 다운로드 합니까?
+기존 레코드 덮어 쓰기
 업데이트 실패.
 업데이트 서버에 연결 실패.
 업데이트 완료.

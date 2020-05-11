@@ -1,5 +1,5 @@
 # Romana translation by MRAdyy
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://bit.ly/2oAIchM
+# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Romana
 Open PS2 Loader %s
 Salvare Setari
@@ -7,7 +7,7 @@ Inapoi
 Config. retea
 Optiuni avansate
 <nici-o valoare>
-Setari salvate...
+Settings saved to %s
 Eroare in scrierea setarilor!
 Iesire
 Setari
@@ -41,7 +41,7 @@ Cerc
 Cruce
 Lista jocuri
 Setari joc
-Sterge toate setarile
+Remove Settings
 Au fost sterse toate butoanele jocului
 Miscare
 Incet
@@ -106,7 +106,7 @@ Aminteste ultimul joc jucat
 Butonul Select
 "Eroare, jocul este fragmentat"
 "Eroare, nu a putut rula elementul"
-Testare
+Test Changes
 Lasati goala pentru autentificarea GUEST.
 Citeste exact
 Modul sincron
@@ -143,7 +143,7 @@ Oprire automata HDD
 Mod video
 Culoare Dialog
 Culoare selectata
-Afisare pagina informatii
+Reset Colors
 Informatii
 ELF personalizat
 Selectie culoare
@@ -197,7 +197,7 @@ Eroare: nu s-a putut incarca fisierul Cheat
 Nici un cod gasit
 Descarca implicit
 Actualizare Retea
-Reincarcati inregistrarile existente?
+Overwrite Existing Records
 Actualizare esuata.
 Nu sa putut conecta serverul de actualizare.
 Actualizare finalizata.
@@ -264,3 +264,20 @@ Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
+Enable Notifications
+%s loaded from %s
+Game Menu
+Game settings saved.
+%s settings removed.
+Overwrites existing game compatibility settings when enabled.
+Settings Mode
+Global
+Per Game
+All
+Select settings to remove.
+Support Forums:
+Title
+Genre
+Release
+Developer
+Description

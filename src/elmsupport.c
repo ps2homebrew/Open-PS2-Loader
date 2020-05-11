@@ -11,6 +11,10 @@
 #include "include/hddsupport.h"
 #include "include/supportbase.h"
 
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h> // fileXioMount, fileXioUmount
+#include <io_common.h>   // FIO_MT_RDWR
+
 static int elmForceUpdate = 1;
 static int elmItemCount = 0;
 
@@ -24,7 +28,7 @@ struct ElmGame
     char title[ISO_GAME_NAME_MAX - GAME_STARTUP_MAX + 1 ];
 	char ID[GAME_STARTUP_MAX + 1];
 	char file[ISO_GAME_NAME_MAX + 1 + 50];
-	
+
 	//Eg: smb0:POPS .. smb0:POPS9 - It's where the VCD is
 	//Eg: pfs0:POPS/  is where the ELF is and the fake launch path
 	char pathFolder[50];
@@ -76,7 +80,7 @@ static int elmGameDuplicateTitleExists(ElmGame *inGame){
 	if (count > 0){
 		elmGameTitleAppendDevice(inGame);
 	}
-	return count;	
+	return count;
 }
 
 static struct ElmGame* elmGetGameInfo(int id) {
@@ -111,7 +115,7 @@ static int elmNeedsUpdate(void) {
 		elmForceUpdate = 0;
 		update=1;
 	}
-	
+
 	if(oplShouldElmUpdate()){
 		update = 1;
 	}
@@ -122,9 +126,12 @@ static int elmNeedsUpdate(void) {
 //Scans for POPSTARTER.ELF and VCD files in the given devPrefix.
 static int elmScanVCDs(char* devPrefix){
 	int count=0; //Game count
-	int fd,i;
-	iox_dirent_t record;
-	
+	int i;
+	char fullpath[256];
+	struct dirent *pdirent;
+	struct stat st;
+	DIR *pdir;
+
 	LOG("elmScanVCDs()\n");
 
 	char currentPath[30];
@@ -138,16 +145,16 @@ static int elmScanVCDs(char* devPrefix){
 		LOG("currentPath = %s\n",currentPath);
 
 		//Let's open the folder and search for the VCD files.
-		if ((fd = fileXioDopen(currentPath)) > 0) {
-			while (fileXioDread(fd, &record) > 0) {
-				int filename_len = strlen(record.name);
-				if (strlen(record.name) > ISO_GAME_NAME_MAX)
+		if ((pdir = opendir(currentPath)) != NULL) {
+			while ((pdirent = readdir(pdir)) != NULL) {
+				int filename_len = strlen(pdirent->d_name);
+				if (strlen(pdirent->d_name) > ISO_GAME_NAME_MAX)
 					continue; //Skip files that cannot be supported properly.
 
-				if (filename_len >= 4 && strcasecmp(record.name + filename_len - 4, ".VCD") == 0) {
-					LOG("VCD Found: %s\n",record.name);
-					
-					if ((filename_len >= (GAME_STARTUP_MAX-1) + 1 + 1 + 4) && (record.name[4] == '_') && (record.name[8] == '.') && (record.name[11] == '.')) {//Game ID found
+				if (filename_len >= 4 && strcasecmp(pdirent->d_name + filename_len - 4, ".VCD") == 0) {
+					LOG("VCD Found: %s\n",pdirent->d_name);
+
+					if ((filename_len >= (GAME_STARTUP_MAX-1) + 1 + 1 + 4) && (pdirent->d_name[4] == '_') && (pdirent->d_name[8] == '.') && (pdirent->d_name[11] == '.')) {//Game ID found
 						//Create a new game
 						ElmGame* newElmGame = (ElmGame*)malloc(sizeof(ElmGame));
 						if(newElmGame != NULL){
@@ -155,23 +162,27 @@ static int elmScanVCDs(char* devPrefix){
 							int NameLen = filename_len - GAME_STARTUP_MAX -4;
 
 							//Eg: Game Title
-							strncpy(newElmGame->title, &record.name[GAME_STARTUP_MAX], NameLen);
+							strncpy(newElmGame->title, &pdirent->d_name[GAME_STARTUP_MAX], NameLen);
 							newElmGame->title[NameLen] = '\0';
-														
+
 							//Eg: SLES_123.04
-							strncpy(newElmGame->ID, record.name, GAME_STARTUP_MAX - 1);
+							strncpy(newElmGame->ID, pdirent->d_name, GAME_STARTUP_MAX - 1);
 							newElmGame->ID[GAME_STARTUP_MAX - 1] = '\0';
-							
+
+							// Get the file info
+							sprintf(fullpath, "%s/%s", currentPath, pdirent->d_name);
+							stat(fullpath, &st);
+
 							//Eg: smb0:POPS/SLES_123.04.Game Title.VCD
-							snprintf(newElmGame->file,ISO_GAME_NAME_MAX + 1,"%s%s",currentPath,record.name);
-							newElmGame->sizeMB = (record.stat.size >> 20) | (record.stat.hisize << 12);
-							
+							snprintf(newElmGame->file,ISO_GAME_NAME_MAX + 1,"%s%s",currentPath,pdirent->d_name);
+							newElmGame->sizeMB = st.st_size >> 20;
+
 							//Eg: smb0:POPS | smb0:POPS9
 							strncpy(newElmGame->pathFolder,currentPath,sizeof(newElmGame->pathFolder));
-							
-							newElmGame->next = elmGameList;												
+
+							newElmGame->next = elmGameList;
 							elmGameList = newElmGame;
-							
+
 							count++;
 							LOG("newElmGame->file = %s\n",newElmGame->file);
 							LOG("newElmGame->pathFolder = %s\n",newElmGame->pathFolder);
@@ -185,10 +196,10 @@ static int elmScanVCDs(char* devPrefix){
 						LOG("No ID found in file name!!\n");
 					}
 				}else{
-					LOG("Not a .VCD file: %s\n",record.name);
+					LOG("Not a .VCD file: %s\n",pdirent->d_name);
 				}
 			}
-			fileXioDclose(fd);
+			closedir(pdir);
 		}
 	}
 	return count;
@@ -220,10 +231,10 @@ static int elmScanVCDsHDD(){
 					}
 				}
 				if (skip == 1) continue;
-				
+
 				strcpy(scanned[partitionCount],record.name);
 				partitionCount++;
-				
+
 				sprintf(partition,"hdd0:%s",record.name);
 				LOG("Mounting '%s' into '%s' \n",partition,mountPoint);
 				if ((MountFD = fileXioMount(mountPoint, partition, O_RDONLY)) >= 0) {
@@ -244,23 +255,23 @@ static int elmScanVCDsHDD(){
 									ElmGame* newElmGame = (ElmGame*)malloc(sizeof(ElmGame));
 									if(newElmGame != NULL){
 										newElmGame->next = elmGameList;
-										elmGameList = newElmGame;										
-										
+										elmGameList = newElmGame;
+
 										//Eg: SLES_123.04.Game Title.VCD
 										int NameLen = filename_len - GAME_STARTUP_MAX -4;
 
 										//Eg: Game Title
 										strncpy(newElmGame->title, &record.name[GAME_STARTUP_MAX], NameLen);
 										newElmGame->title[NameLen] = '\0';
-										
+
 										//Eg: SLES_123.04
 										strncpy(newElmGame->ID, record.name, GAME_STARTUP_MAX - 1);
 										newElmGame->ID[GAME_STARTUP_MAX - 1] = '\0';
-										
+
 										//Eg: hdd0:__POPS3/SLES_123.04.Game Title.VCD
 										snprintf(newElmGame->file,ISO_GAME_NAME_MAX + 1,"%s/%s",partition,record.name);//!!!!PARTITION
 										newElmGame->sizeMB = (record.stat.size >> 20) | (record.stat.hisize << 12);
-										
+
 										//Always pfs1:
 										strcpy(newElmGame->pathFolder,"pfs1:");
 
@@ -290,24 +301,24 @@ static int elmScanVCDsHDD(){
     } else {
         LOG("fd2 = %d\n",fd2);
     }
-	
-	
-	return count;	
+
+
+	return count;
 }
 
 static int elmUpdateItemList(void) {
 	elmItemCount = 0;
-	
+
 	//Clear game list first.
 	if (elmGameList != NULL)
 		elmGameListFree();
-	
+
 	//Try HDD
 	if (hddGetObject(1)) {
 		//Eg: pfs0:POPS/POPSTARTER.ELF
 		snprintf(elmPathElfHdd, sizeof(elmPathElfHdd), "%sPOPS/POPSTARTER.ELF",hddGetPrefix());
 		LOG("elmPathElfHdd = %s\n",elmPathElfHdd);
-		
+
 		//Check if POPSTARTER.ELF exists in the folder.
 		int fdElf = fileXioOpen(elmPathElfHdd, O_RDONLY, 0666);
 		if (fdElf >= 0) {
@@ -317,13 +328,13 @@ static int elmUpdateItemList(void) {
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfHdd);
 		}
 	}
-	
+
 	//Try ETH
-	if (ethGetObject(1)) {	
+	if (ethGetObject(1)) {
 		//Eg: smb0:POPS/POPSTARTER.ELF
 		snprintf(elmPathElfEth, sizeof(elmPathElfEth), "%sPOPS/POPSTARTER.ELF",ethGetPrefix());
 		LOG("elmPathElfEth = %s\n",elmPathElfEth);
-		
+
 		//Check if POPSTARTER.ELF exists in the folder.
 		int fdElf = fileXioOpen(elmPathElfEth, O_RDONLY, 0666);
 		if (fdElf >= 0) {
@@ -332,7 +343,7 @@ static int elmUpdateItemList(void) {
 		}else{
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfEth);
 		}
-		
+
 	}
 
 	//Try USB
@@ -340,7 +351,7 @@ static int elmUpdateItemList(void) {
 		//Eg: mass0:POPS/POPSTARTER.ELF
 		snprintf(elmPathElfUsb, sizeof(elmPathElfUsb), "%sPOPS/POPSTARTER.ELF",usbGetBase());
 		LOG("elmPathElfUsb = %s\n",elmPathElfUsb);
-		
+
 		//Check if POPSTARTER.ELF exists in the folder.
 		int fdElf = fileXioOpen(elmPathElfUsb, O_RDONLY, 0666);
 		if (fdElf >= 0) {
@@ -350,7 +361,7 @@ static int elmUpdateItemList(void) {
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfUsb);
 		}
 	}
-	
+
 	//Check for duplicates
 	if (elmGameList) {
 		ElmGame* cur = elmGameList;
@@ -383,24 +394,24 @@ static char* elmGetItemStartup(int id) {
 static void elmDeleteItem(int id) {
 	ElmGame* cur = elmGetGameInfo(id);
 	int ret = -1;
-	
+
 	//Check if it's a HDD game.
 	if (!strncmp(cur->file,"hdd0:",5)){
 		int MountFD;
 		char partition[10];
 		char file[256];
-		
+
 		//Let's get the partition Eg: hdd0:__.POPS
 		char *separator = strchr(cur->file, '/');
 		strncpy(partition,cur->file,separator - (cur->file));
 		partition[separator - (cur->file)] = '\0';
-		
+
 		//And the file path Eg: pfs1:SLES_123.45.Game.VCD
 		sprintf(file,"pfs1:%s",separator+1);
-		
+
 		//Make sure it's unmounted
 		fileXioUmount("pfs1:");
-		
+
 		LOG("Mounting '%s' into 'pfs1:'\n",partition);
 		if ((MountFD = fileXioMount("pfs1:", partition, FIO_MT_RDWR)) >= 0) {
 			ret = fileXioRemove(file);
@@ -433,18 +444,18 @@ static void elmRenameItem(int id, char* newName) {
 	if (!strncmp(cur->file,"hdd0:",5)){
 		char partition[10];
 		char file[256];
-		
+
 		//Let's get the partition Eg: hdd0:__.POPS
 		char *separator = strchr(cur->file, '/');
 		strncpy(partition,cur->file,separator - (cur->file));
 		partition[separator - (cur->file)] = '\0';
-		
+
 		//And the file path Eg: pfs1:SLES_123.45.Game.VCD
 		sprintf(file,"pfs1:%s",separator+1);
 
 		//Make sure it's unmounted
 		fileXioUmount("pfs1:");
-		
+
 		LOG("Mounting '%s' into 'pfs1:'\n",partition);
 		if ((fd = fileXioMount("pfs1:", partition, FIO_MT_RDWR)) >= 0) {
 			ret = fileXioRename(file, newNameFull);
@@ -466,7 +477,7 @@ static void elmRenameItem(int id, char* newName) {
 		ret = fileXioRename(cur->file, newNameFull);
 		LOG("fileXioRename(%s , %s) = %d\n",cur->file,newNameFull,ret);
 	}
-	
+
 	if (ret != 0) {
 		guiMsgBox(_l(_STR_ELM_RENAME_ERROR), 0, NULL);
 	}else{
@@ -478,7 +489,7 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 	ElmGame* cur = elmGetGameInfo(id);
 	//The path to POPSTARTER.ELF
 	char elmPathElf[256];
-	
+
 	//The prefix of the ELF file. Eg: XX./SB./<none>
 	char elmElfPrefix[4];
 
@@ -488,14 +499,14 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 		strcpy(elmElfPrefix, "");
 	}else if (!strncmp(cur->file,"mass",4)){
 		strcpy(elmPathElf,elmPathElfUsb);
-		strcpy(elmElfPrefix, "XX.");		
+		strcpy(elmElfPrefix, "XX.");
 	}else{
 		strcpy(elmPathElf,elmPathElfEth);
 		strcpy(elmElfPrefix, "SB.");
 	}
-	
+
 	LOG("elmLaunchItem with %s",elmPathElf);
-	
+
 	int fdElf = fileXioOpen(elmPathElf, O_RDONLY, 0666);
 	if (fdElf >= 0) {
 		int fdVcd = 0;
@@ -505,20 +516,20 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 		}else{
 			fdVcd = fileXioOpen(cur->file, O_RDONLY, 0666);
 		}
-		 
+
 		if(fdVcd >=0){
 			void *buffer = NULL;
 			int realSize = fileXioLseek(fdElf, 0, SEEK_END);
 			fileXioLseek(fdElf, 0, SEEK_SET);
-			
+
 			buffer = malloc(realSize);
 			if (!buffer) {
 				LOG("Failed allocation of %d bytes", realSize);
 			} else {
 				fileXioRead(fdElf, buffer, realSize);
-				LOG("Loaded POPSTARTER ELF with size = %d\n",realSize);	
+				LOG("Loaded POPSTARTER ELF with size = %d\n",realSize);
 			}
-			
+
 			fileXioClose(fdElf);
 
 			char memPath[256];
@@ -527,15 +538,15 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 			char *fileOnly = strrchr(cur->file, '/');
 			if (!fileOnly)
 				fileOnly = strrchr(cur->file, ':');
-		   
+
 			fileOnly++;
-			
+
 			fileOnly[strlen(fileOnly)-4] = '\0';
-			
+
 			LOG("fileOnly= %s\n",fileOnly);
 			char params[256];
 			sprintf(params,"%s%s%s.ELF",cur->pathFolder,elmElfPrefix,fileOnly);
-			
+
 			LOG("memPath = %s\n",memPath);
 			LOG("params = %s\n",params);
 			LOG("VCD Path= %s", cur->file);
@@ -549,7 +560,7 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 				mode = HDD_MODE;
 			} else if (strncmp(cur->file,"smb", 3) == 0){
 				mode = ETH_MODE;
-			} 
+			}
 
 			if (mode == ELM_MODE) {
 				// Failed to detect the device...
@@ -557,7 +568,7 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 			} else {
 				LOG("ELMSUPPORT Mode detected as: ", mode);
 			}
-				
+
 			deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call elmCleanUp, so configElm/cur will be freed
 			sysExecElfWithParam(memPath,params);
 		}else{
@@ -577,7 +588,7 @@ static config_set_t* elmGetConfig(int id) {
 	static item_list_t *listSupport = NULL;
 	ElmGame* cur = elmGetGameInfo(id);
 	int ret=0;
-	
+
 	//Search on HDD, SMB, USB for the CFG/GAME.ELF.cfg file.
 	//HDD
 	if ( (listSupport = hddGetObject(1)) ) {
@@ -596,14 +607,14 @@ static config_set_t* elmGetConfig(int id) {
 		char path[256];
 		if (config != NULL)
 			configFree(config);
-		
+
 		#if OPL_IS_DEV_BUILD
 			snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", ethGetPrefix(), cur->ID);
 		#else
 			snprintf(path, sizeof(path), "%sCFG/%s.cfg", ethGetPrefix(),cur->ID);
 		#endif
 		config = configAlloc(1, NULL, path);
-		ret = configRead(config);	
+		ret = configRead(config);
 	}
 
 	//USB
@@ -611,7 +622,7 @@ static config_set_t* elmGetConfig(int id) {
 		char path[256];
 		if (config != NULL)
 			configFree(config);
-		
+
 		#if OPL_IS_DEV_BUILD
 			snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(),  cur->ID);
 		#else
@@ -624,10 +635,10 @@ static config_set_t* elmGetConfig(int id) {
 	if (ret == 0){ //No config found on previous devices, create one.
 		if (config != NULL)
 			configFree(config);
-		
+
 		config = configAlloc(1, NULL, NULL);
 	}
-	
+
 	configSetStr(config, CONFIG_ITEM_NAME, cur->title);
 	configSetStr(config, CONFIG_ITEM_LONGNAME, cur->title);
 	configSetStr(config, CONFIG_ITEM_STARTUP, cur->ID);

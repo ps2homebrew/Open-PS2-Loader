@@ -1,15 +1,15 @@
 # translation by vsub and wisi
-# Last update: Feb. 11, 2020
+# Last update: April 18, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
 OPL %s
 Запазване на промените
 Назад
-Network Settings
+Мрежови настройки
 Детайлни настройки
 <Няма опции>
-Settings saved to %s
+Настройки запазени в %s
 Грешка при записване на настройките!
 Изход
 Настройки
@@ -43,7 +43,7 @@ O (Кръг)
 X (Хикс)
 Списък Игри
 Опции
-Remove Settings
+Изчистване на настройките
 Изчистени всички бутони за играта
 Превъртане
 бавно
@@ -108,7 +108,7 @@ NetBIOS
 Бутон за избор
 Грешка - играта е фрагментирана!
 Грешка - не може да се стартира!
-Test Changes
+Проба на промените
 Оставете свободно за влизане като "гост".
 Прецизно четене
 Синхронен режим
@@ -145,8 +145,8 @@ USB поддиректория
 Видео режим
 Цвят на опциите
 Цвят на избран обект
-Reset Colors
-Info
+Цвет при начална стойност
+Информация
 Нестандартен ELF
 Избор на цвят
 Свързване
@@ -199,7 +199,7 @@ Cheats по избор
 Не са открити Cheats
 Сваляне на настройки
 Мрежово обновяване
-Overwrite Existing Records
+Презапис на наличните записи?
 Неуспешно обновяване.
 Неуспешна връзка с сървъра.
 Обновяване завършено.
@@ -211,7 +211,7 @@ Overwrite Existing Records
 След
 Стойност в секунди, 0 за деактивиране.
 PS2 Лого
-Displayed for a valid disc logo matching the console's region.
+Показва се ако е валидно и съвпада с региона на конзолата
 Настройки на PADEMU
 Емулатор за контролер - настройки
 Включване на PADEMU
@@ -264,25 +264,25 @@ VMC %s файлът е фрагментиран. Продължаване с Mem
 Звук при Начално зареждане
 Сила на Звуковите ефекти
 Сила на звука на Начално зареждане
-Потвърждаване на промените във видеорежима?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Потвърждаване на промените на видеорежима?
+Кеширане списъка с игри (ЗУТМД - HDD)
+Видими на Известия
+%s зареден от %s
+Меню Игри
+Настройките на игри запазени.
+%s настройки премахнати.
+Презаписва съществуващите настройки на съвместимаст.
+Режим Настройки
+Общи
+За определена игра
+Всички
+Избор на настройки, които да бъдат премахнати.
+Форуми за подръжка:
+Заглавие
+Жанр
+Издадена
+Производител
+Описание
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

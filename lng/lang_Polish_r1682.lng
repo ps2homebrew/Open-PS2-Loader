@@ -1,17 +1,17 @@
 # Translation by yohokaru
-# Last update: Feb. 11, 2020
+# Last update: April 18, 2020
 # Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
 OPL %s
-Zapisz zmiany
+Zapisz Zmiany
 Wróć
-Network Settings
-Opcje zaawansowane
-<brak>
-Settings saved to %s
+Ustawienia Sieci
+Opcje Zaawansowane
+<nie ustawiono>
+Ustawienia zapisane na %s
 Błąd zapisu ustawień!
-Wyjście
+Wyjdź
 Ustawienia
 Menu
 Gry USB
@@ -21,66 +21,66 @@ Aplikacje
 Motyw
 Język
 System zostanie wyłączony.
-Exit to Browser?
+Czy chcesz wyjść z programu?
 Przerwać aktualizację?
-%d: Nie wykryto dysku twardego
-%d: Dysk twardy nie jest sformatowany
-%d: Błąd startu sieci
-%d: Nie wykryto network adaptora
-%d: Nie można połączyć z serwerem SMB
-%d: Nie można zalogować do serwera SMB
-%d: Nie można otworzyć udostępnienia SMB
-%d: Nie można wyświetlić udostępnień SMB
-%d: Nie można wyświetlić gier
-%d: Serwer DHCP niedostępny
-%d: Brak połączenia sieciowego
-na
-od
+%d: Nie wykryto dysku twardego.
+%d: Dysk twardy nie jest sformatowany.
+%d: Wystąpił błąd podczas uruchamiania sieci.
+%d: Nie wykryto Network Adaptora.
+%d: Nie można połączyć się z serwerem SMB.
+%d: Nie można zalogować się do serwera SMB.
+%d: Nie można otworzyć udziału SMB.
+%d: Nie można wyświetlić udziałów SMB.
+%d: Nie można wyświetlić gier.
+%d: Niedostępny Serwer DHCP.
+%d: Brak połączenia sieciowego.
+Włącz
+Wyłącz
 OK
-Wybierz 
+Wybierz
 Anuluj
-Kółko
-Iks
-Lista gier
-Ustawienia gry
-Remove Settings
-Usunięto wszystkie klucze do gry
-Przewijanie
+O
+X
+Lista Gier
+Ustawienia Gry
+Usuń Ustawienia
+Usunięto wszystkie klucze dla gry.
+Szybkość Przewijania
 Wolno
 Średnio
 Szybko
-Domyślne menu
-Załaduj z dysku
-Proszę czekać
-Błąd podczas ładowania ID gry
-Sortowanie automatyczne
-Błąd ładowania pliku językowego
-Wyłącz debugowanie kolorów
+Domyślne Menu
+Załaduj Z Dysku
+Proszę czekać.
+Błąd podczas ładowania identyfikatora gry.
+Sortowanie Automatyczne
+Błąd ładowania pliku językowego.
+Nie Wyświetlaj Kolorów Debugowania
 Nie wykryto kontrolera, oczekiwanie...
-Okładki
-Szeroki ekran
+Wyświetlanie Okładek
+Szeroki Ekran
 Wyłącz
-Wczytaj ustawienia
-Zapisz ustawienia
-Uruchom urządzenie
+Wczytywanie ustawień...
+Zapisywanie ustawień...
+Uruchom Urządzenie
 Odśwież
-Start urządzenia USB
-Start urządzenia HDD
-Start urządzenia ETH
-Start aplikacji
-Automatycznie
+Uruchom Urządzenie USB
+Uruchom Urządzenie HDD
+Uruchom Urządzenie ETH
+Wyświetl Menu Aplikacji
+Automatyczny
 Ręcznie
-Uruchom serwer HDL
-Uruchamianie serwera HDL...
+Uruchom Serwer HDL
+Uruchamianie Serwera HDL...
 Serwer HDL uruchomiony...
-Niepowodzenie startu serwera HDL.
-Odładowanie serwera HDL...
-Ścieżka do IGR
-Kolor tła
-Kolor tekstu
+Nieudane uruchomienie serwera HDL.
+Serwer HDL zostanie zamknięty...
+Ścieżka Dla IGR
+Kolor Tła
+Kolor Tekstu
 - PS2 -
 - Serwer SMB -
-Typ adresu IP
+Typ Adresu IP
 Statyczny
 DHCP
 Adres IP
@@ -89,76 +89,76 @@ Maska
 Brama
 Serwer DNS
 Port
-Udostępnij
+Udostępniany Folder
 Użytkownik
 Hasło
-<brak>
-Typ adresu
+<nie ustawiono>
+Typ Adresu
 IP
 NetBIOS
 Akceptuj
 Element zostanie trwale usunięty, kontynuować?
-Zmień nazwę
+Zmień Nazwę
 Usuń
 Uruchom
-Ustawienia obrazu
-Włącz operację zapisu
-Sprawdzaj fragmentację gier USB
-Zapamiętaj ostatnio uruchomioną grę
-Przycisk wyboru
-Błąd, gra jest pofragmentowana
-Błąd, nie można uruchomić pozycji
-Test Changes
-Pozostaw puste dla gości.
-Dokładny odczyt
-Tryb synchroniczny
-Odhookuj Syscalls
-Przejdź filmy
+Ustawienia Obrazu
+Włącz Operację Zapisu
+Sprawdź Fragmentację Gier USB
+Zapamiętaj Ostatnio Uruchomioną Grę
+Przycisk Wyboru
+Błąd, gra jest pofragmentowana.
+Błąd, nie można uruchomić pozycji.
+Testuj Zmiany
+Pozostaw puste dla "GOŚCIA".
+Dokładny Odczyt
+Tryb Synchroniczny
+Wymaż OPL Po Uruchomieniu Gry
+Pomiń Wstawki Filmowe
 Emuluj DVD-DL
 Wyłącz IGR
 Niewykorzystany
 Niewykorzystany
-Zmiana rozmiaru, zostanie sformatowany VMC
+Zmiana rozmiaru spowoduje przeformatowanie VMC.
 Utwórz
 Start
 Modyfikuj
 Przerwij
 Reset
-Użyj ogólnych
+Użyj Ogólnie
 Konfiguruj VMC
 Nazwa
 Rozmiar
 Status
 Postęp
-Plik VMC istnieje
-Błędny plik VMC, nieprawidłowy rozmiar
-Musisz utworzyć plik VMC
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
-Odświeżanie automatyczne
-O programie
+Plik VMC istnieje.
+Błędny plik VMC, nieprawidłowy rozmiar.
+Plik VMC musi zostać utworzony.
+Błąd dostępu do VMC %s, kontynuuj z kartą pamięci w gnieździe %d?
+Odświeżanie Automatyczne
+O Programie
 Programiści
-Zapewnienie jakości
-Prefix ścieżki USB
-Boots Custom ELF after an IGR
-Wartość w minutach, 0 wyłącza zwalnianie obrotów
-Automatyczne zwalnianie obrotów HDD 
-Tryb wideo
-Kolor ustawień
-Kolor zaznaczenia
-Reset Colors
-Info
-Niestandardowy ELF
-Wybór koloru
-Połącz ponownie
-Pozostaw puste aby notować akcje
-Prefix ścieżki ETH
-Cofnij
+Kontrola Jakości
+Prefix Ścieżki USB
+Uruchom wybrany ELF po IGR.
+Wartość w minutach, 0 dla dezaktywacji.
+Automatyczne Zwalnianie Obrotów HDD
+Tryb Wideo
+Kolor Ustawień
+Kolor Zaznaczenia
+Zresetuj Kolory
+Informacje
+Alternatywny ELF
+Wybór Koloru
+Połącz Ponownie
+Pozostaw puste aby wyświetlić listę udziałów.
+Prefix Ścieżki ETH
+Cofnij	
 Odstęp
 Enter
 Tryb
-VMC Slot 1
-VMC Slot 2
-ID gry
+Gniazdo VMC 1
+Gniazdo VMC 2
+Identyfikator Gry
 Tryb DMA
 V-Sync
 Tryb 1
@@ -170,119 +170,119 @@ Tryb 6
 Tryb 7
 Tryb 8
 Konfiguruj GSM
-Tryb łącza ethernetowego
-100Mbit pełny-dupleks
-100Mbit pół-dupleks
-10Mbit pełny-dupleks
-10Mbit pół-dupleks
-ustawienia GSM
-Włącz GSM
-Przełącz GSM wł lub wył
-Wideo
-Wymuś niestandardowy tryb wyświetlania 
-Poziom
-Regulacja w poziomie
-Pion
-Regulacja w pionie
+Szybkość I Tryb Sieci
+100Mbit Pełny-dupleks
+100Mbit Pół-dupleks
+10Mbit Pełny-dupleks
+10Mbit Pół-dupleks
+Ustawienia GSM
+Aktywuj GSM
+Włącz lub wyłącz GSM.
+Tryb Wideo
+Wymuś określony tryb wyświetlania.
+Położenie Poziome
+Regulacja w poziomie.
+Położenie Pionowe
+Regulacja w pionie.
 Overscan
-Overscan Adjustment
+Regulacja overscanu.
 Pomiń FMV
-Pomija scenki wideo
-Ustawienia cheat'ów
-Włącz silnik cheat'ów PS2RD
-Pozwól PS2RD patchować gry
-Tryb silnika cheat'ów PS2RD
-Auto-wybieranie lub wybieranie cheat'ów gry
-Auto-wybieranie cheat'ów
-Wybierz cheat'y
-Błąd: niepowodzenie ładowanie pliku
-Nie znaleziono cheat'ow
-Pobierz domyślne
-Aktualizacja sieciowa
-Overwrite Existing Records
+Pomija wstawki filmowe.
+Ustawienia Kodów
+Włącz Silnik Kodów PS2RD
+Pozwól silnikowi kodów PS2RD patchować grę.
+Tryb Silnika Kodów PS2RD
+Auto-wybieranie lub wybieranie kodów dla gry.
+Auto-wybieranie Kodów
+Wybierz Kody Dla Gry
+Błąd: Nie udało się załadować pliku z kodami.
+Nie znaleziono kodów.
+Pobierz Domyślne
+Aktualizacja Sieciowa
+Nadpisz Istniejące Zapisy
 Aktualizacja nie powiodła się.
-Błąd połączenia z serwerem aktualizacji.
+Nie udało się połączyć z serwerem aktualizacji.
 Aktualizacja zakończona.
 Aktualizacja przerwana.
 Pobrać ustawienia z sieci?
-Niestandardowe ustawienia
-Pobrano domyślne
+Dodatkowe Ustawienia
+Pobrano domyślne.
 Auto start w %i s...
-Auto start
-Wartość w sekundach, 0 wyłącza auto start
+Auto Start
+Wartość w sekundach, 0 wyłącza auto start.
 Logo PS2
-Displayed for a valid disc logo matching the console's region.
-Konfiguracja emulacji Pada
-Ustawienia emulacji Pada
-Włącz emulację Pada
+Logo zostanie wyświetlone wyłącznie jeśli region gry i konsoli będzie taki sam.
+Konfiguracja Emulacji Pada
+Ustawienia Emulacji Pada
+Włącz Emulację Pada
 Włącza/wyłącza emulację Pada dla wybranej gry.
-Tryb emulacji Pada
+Tryb Emulacji Pada
 Wybierz tryb emulacji Pada.
 DualShock3/4 USB
 DualShock3/4 BT
-Ustawienia portu:
-Wybierz Port emulacji Pada dla ustawień
-Włącz emulację
+Ustawienia Portu:
+Wybierz Port emulacji Pada dla ustawień.
+Włącz Emulację
 Włącz/wyłącz emulację Pada dla wybranego portu.
-Włącz wibracje.
+Włącz Wibracje
 Włącz/wyłącz wibracje dla wybranego portu emulacji Pada.
-Adres MAC adaptera Bluetooth USB
+Adres MAC adaptera Bluetooth USB:
 Kontroler DS sparowany z adresem MAC:
 Paruj
-Paruj kontroler DS
+Paruj Kontroler DS
 Paruj kontroler DS z adresem mac adaptera bluetooth.
-Nie podłączony
-Informacje o adapterze Bluetooth
-Wyświetla więcej informacji i obsługiwane funkcje
+Nie Podłączony
+Informacje O Adapterze Bluetooth
+Wyświetla więcej informacji i obsługiwane funkcje.
 Wersja HCI:
 Wersja LMP:
-Identyfikator producenta:
-Wspierane funkcje:
+Identyfikator Producenta:
+Wspierane Funkcje:
 Tak
 Nie
 Adapter Bluetooth powinien być w pełni kompatybilny z kontrolerami DS3/DS4.
 Adapter Bluetooth może nie współpracować poprawnie z kontrolerami DS3/DS4.
-Włącz emulację Multitapa.
+Włącz emulację Multitapa
 Włącza/wyłącza emulację Multitapa dla wybranej gry.
-Emulacja Multitapa dla portu
+Emulacja Multitapa Dla Portu:
 Wybierz port dla emulacji Multitapa.
-Nie stosuj obejścia dla klonów DS3.
+Nie Stosuj Obejścia Dla Klonów DS3.
 Niektóre klony DS3 wymagają obejścia, ta opcja to wyłączy.
-Emuluj FIELD flipping
+Emuluj FIELD Flipping
 Poprawka dla gier w których występują usterki w trybie progresywnego obrazu.
-Ustawienia blokady rodzicielskiej
-Hasło blokady rodzicielskiej
+Ustawienia Blokady Rodzicielskiej
+Hasło Blokady Rodzicielskiej
 Pozostaw puste aby wyłączyć blokadę rodzicielską.
-Wprowadź hasło blokady rodzicielskiej.
+Wprowadź Hasło Blokady Rodzicielskiej
 Nieprawidłowe hasło blokady rodzicielskiej.
 Blokada rodzicielska wyłączona.
-Opcje kompilacji:
+Opcje Kompilacji:
 Błąd - to hasło nie może być użyte.
 Plik VMC %s jest pofragmentowany. Kontynuuj z kartą pamięci w gnieździe %d?
-Ustawienia dźwiękowe
-Efekty dźwiękowe
-Dźwięk startowy
-Głośność efektów dźwiękowych
-Głośność dźwięku startowego
-Potwierdź zmianę rozdzielczości
-Buforowanie listy gier (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Ustawienia Dźwiękowe
+Efekty Dźwiękowe
+Dźwięk Startowy
+Głośność Efektów Dźwiękowych
+Głośność Dźwięku Startowego
+Potwierdasz zmianę rozdzielczości?
+Buforowanie Listy Gier (HDD)
+Powiadomienia
+%s załadowany z %s
+Menu Gry
+Ustawienia gry zostały zapisane.
+%s ustawienia zostały usunięte.
+Po włączeniu nadpisuje istniejące ustawienia kompatybilności z grami.
+Tryb Ustawień
+Globalne
+Dla Danej Gry
+Wszystkie
+Wybierz ustawienia do usunięcia.
+Wsparcie:
+Tytuł
+Gatunek
+Data wydania
+Deweloper
+Opis
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

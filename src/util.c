@@ -8,10 +8,8 @@
 #include "include/util.h"
 #include "include/ioman.h"
 #include "include/system.h"
-#include <io_common.h>
 #include <string.h>
 #include <malloc.h>
-#include <fileXio_rpc.h>
 #include <osd_config.h>
 
 #include "include/hdd.h"
@@ -32,8 +30,8 @@ int getmcID(void)
 
 int getFileSize(int fd)
 {
-    int size = fileXioLseek(fd, 0, SEEK_END);
-    fileXioLseek(fd, 0, SEEK_SET);
+    int size = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
     return size;
 }
 
@@ -43,55 +41,56 @@ static void writeMCIcon(void)
 
     fd = openFile("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC);
     if (fd >= 0) {
-        fileXioWrite(fd, &icon_icn, size_icon_icn);
-        fileXioClose(fd);
+        write(fd, &icon_icn, size_icon_icn);
+        close(fd);
     }
 
     fd = openFile("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC);
     if (fd >= 0) {
-        fileXioWrite(fd, &icon_sys, size_icon_sys);
-        fileXioClose(fd);
+        write(fd, &icon_sys, size_icon_sys);
+        close(fd);
     }
 }
 
 void checkMCFolder(void)
 {
     char path[32];
+    int fd;
 
     snprintf(path, sizeof(path), "mc%d:OPL", mcID);
-    int fd = fileXioDopen(path);
-    if (fd < 0)
-        fileXioMkdir(path, 0777);
-
-    fileXioDclose(fd);
+    DIR *dir = opendir(path);
+    if (dir != NULL)
+        mkdir(path, 0777);
+    else
+        closedir(dir);
 
     snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID);
-    fd = fileXioOpen(path, O_RDONLY, 0666);
+    fd = open(path, O_RDONLY, 0666);
     if (fd < 0)
         writeMCIcon();
 
-    fileXioClose(fd);
+    close(fd);
 
     snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID);
-    fd = fileXioOpen(path, O_RDONLY, 0666);
+    fd = open(path, O_RDONLY, 0666);
     if (fd < 0)
         writeMCIcon();
 
-    fileXioClose(fd);
+    close(fd);
 }
 
 static int checkMC()
 {
-    int dummy, ret;
+    int dummy, ret, fd;
 
     if (mcID == -1) {
         mcGetInfo(0, 0, &dummy, &dummy, &dummy);
         mcSync(0, NULL, &ret);
 
-        int fd = fileXioDopen("mc0:OPL");
-        if (fd < 0) {
-            fd = fileXioDopen("mc1:OPL");
-            if (fd < 0) {
+        DIR *dir = opendir("mc0:OPL");
+        if (dir == NULL) {
+            dir = opendir("mc1:OPL");
+            if (dir == NULL) {
                 // No base dir found on any MC, check MC is inserted
                 fd = sysCheckMC();
                 if (fd == 0)
@@ -99,11 +98,11 @@ static int checkMC()
                 else if (fd == 1)
                     mcID = 0x31;
             } else {
-                fileXioDclose(fd);
+                closedir(dir);
                 mcID = 0x31;
             }
         } else {
-            fileXioDclose(fd);
+            closedir(dir);
             mcID = 0x30;
         }
     }
@@ -132,12 +131,12 @@ static int checkFile(char *path, int mode)
             if (pos) {
                 memcpy(dirPath, path, pos - path);
                 dirPath[pos - path] = '\0';
-                int fd = fileXioDopen(dirPath);
-                if (fd < 0) {
-                    if (fileXioMkdir(dirPath, 0777) < 0)
+                DIR *dir = opendir(dirPath);
+                if (dir == NULL) {
+                    if (mkdir(dirPath, 0777) < 0)
                         return 0;
                 } else
-                    fileXioDclose(fd);
+                    closedir(dir);
             }
         }
     }
@@ -147,7 +146,7 @@ static int checkFile(char *path, int mode)
 int openFile(char *path, int mode)
 {
     if (checkFile(path, mode))
-        return fileXioOpen(path, mode, 0666);
+        return open(path, mode, 0666);
     else
         return -1;
 }
@@ -162,7 +161,7 @@ void *readFile(char *path, int align, int *size)
 
         if ((*size > 0) && (*size != realSize)) {
             LOG("UTIL Invalid filesize, expected: %d, got: %d\n", *size, realSize);
-            fileXioClose(fd);
+            close(fd);
             return NULL;
         }
 
@@ -175,8 +174,8 @@ void *readFile(char *path, int align, int *size)
             LOG("UTIL ReadFile: Failed allocation of %d bytes", realSize);
             *size = 0;
         } else {
-            fileXioRead(fd, buffer, realSize);
-            fileXioClose(fd);
+            read(fd, buffer, realSize);
+            close(fd);
             *size = realSize;
         }
     }
@@ -186,16 +185,21 @@ void *readFile(char *path, int align, int *size)
 int listDir(char *path, const char *separator, int maxElem,
             int (*readEntry)(int index, const char *path, const char *separator, const char *name, unsigned int mode))
 {
-    int fdDir, index = 0;
+    int index = 0;
+    struct stat st;
+    char filename[128];
+
     if (checkFile(path, O_RDONLY)) {
-        iox_dirent_t record;
+        DIR *dir = opendir(path);
+        struct dirent *dirent;
+        if (dir != NULL) {
+            while (index < maxElem && (dirent = readdir(dir)) != NULL) {
+                snprintf(filename, 128, "%s/%s", path, dirent->d_name);
+                stat(filename, &st);
+                index = readEntry(index, path, separator, dirent->d_name, st.st_mode);
+            }
 
-        fdDir = fileXioDopen(path);
-        if (fdDir > 0) {
-            while (index < maxElem && fileXioDread(fdDir, &record) > 0)
-                index = readEntry(index, path, separator, record.name, record.stat.mode);
-
-            fileXioDclose(fdDir);
+            closedir(dir);
         }
     }
     return index;
@@ -217,10 +221,10 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
             fileBuffer->lastPtr = NULL;
 
             //Check for and skip the UTF-8 BOM sequence.
-            if ((fileXioRead(fd, bom, sizeof(bom)) != 3) ||
+            if ((read(fd, bom, sizeof(bom)) != 3) ||
                 (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF)) {
                 //Not BOM, so rewind.
-                fileXioLseek(fd, 0, SEEK_SET);
+                lseek(fd, 0, SEEK_SET);
             }
         } else
             fileBuffer->lastPtr = fileBuffer->buffer;
@@ -254,7 +258,7 @@ file_buffer_t *openFileBufferBuffer(short allocResult, const void *buffer, unsig
 
 int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 {
-    int lineSize = 0, read, length;
+    int lineSize = 0, readSize, length;
     char *posLF = NULL;
 
     while (1) {
@@ -281,20 +285,20 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
                 // Load as many characters necessary to fill the buffer
                 length = fileBuffer->size - lineSize - 1;
                 //LOG("##### Asking for %d characters to complete buffer\n", length);
-                read = fileXioRead(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
-                fileBuffer->buffer[lineSize + read] = '\0';
+                readSize = read(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
+                fileBuffer->buffer[lineSize + readSize] = '\0';
 
                 // Search again (from the lastly added chars only), the result will be "analyzed" in next if
                 posLF = strchr(fileBuffer->buffer + lineSize, '\n');
 
                 // Now update read context info
-                lineSize = lineSize + read;
+                lineSize = lineSize + readSize;
                 //LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
 
                 // If buffer not full it means we are at EOF
                 if (fileBuffer->size != lineSize + 1) {
                     //LOG("##### Reached EOF\n");
-                    fileXioClose(fileBuffer->fd);
+                    close(fileBuffer->fd);
                     fileBuffer->fd = -1;
                 }
             }
@@ -349,14 +353,14 @@ void writeFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size)
     //LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
     if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
         //LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
-        fileXioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+        write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         fileBuffer->lastPtr = fileBuffer->buffer;
         fileBuffer->available = 0;
     }
 
     if (size > fileBuffer->size) {
         //LOG("writeFileBuffer direct write: %d\n", size);
-        fileXioWrite(fileBuffer->fd, inBuf, size);
+        write(fileBuffer->fd, inBuf, size);
     } else {
         memcpy(fileBuffer->lastPtr, inBuf, size);
         fileBuffer->lastPtr += size;
@@ -371,9 +375,9 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
     if (fileBuffer->fd >= 0) {
         if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
             //LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
-            fileXioWrite(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
+            write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         }
-        fileXioClose(fileBuffer->fd);
+        close(fileBuffer->fd);
     }
     free(fileBuffer->buffer);
     free(fileBuffer);
@@ -480,7 +484,7 @@ int CheckPS2Logo(int fd, u32 lba)
 
     w = 0;
     if ((fd > 0) && (lba == 0)) // USB_MODE & ETH_MODE
-        w = fileXioRead(fd, logo, sizeof(logo)) == sizeof(logo);
+        w = read(fd, logo, sizeof(logo)) == sizeof(logo);
     if ((lba > 0) && (fd == 0)) {       // HDD_MODE
         for (k = 0; k <= 12 * 4; k++) { // NB: Disc sector size (2048 bytes) and HDD sector size (512 bytes) differ, hence why we multiplied the number of sectors (12) by 4.
             w = !(hddReadSectors(lba + k, 1, buffer));
@@ -530,26 +534,31 @@ struct DirentToDelete {
 
 int sysDeleteFolder(const char *folder)
 {
-    int fd, result;
+    int result;
     char *path;
-    iox_dirent_t dirent;
+    struct dirent *dirent;
+    DIR *dir;
+    struct stat st;
     struct DirentToDelete *head, *start;
 
     result = 0;
     start = head = NULL;
-    if((fd = fileXioDopen(folder)) >= 0) {
+    if((dir = opendir(folder)) != NULL) {
         /* Generate a list of files in the directory. */
-        while(fileXioDread(fd, &dirent) > 0) {
-            if((strcmp(dirent.name, ".") == 0) || ((strcmp(dirent.name, "..") == 0)))
+        while((dirent = readdir(dir)) != NULL) {
+            if((strcmp(dirent->d_name, ".") == 0) || ((strcmp(dirent->d_name, "..") == 0)))
                 continue;
 
-            if(FIO_S_ISDIR(dirent.stat.mode)) {
-                if((path = malloc(strlen(folder)+strlen(dirent.name) + 2)) != NULL) {
-                    sprintf(path, "%s/%s", folder, dirent.name);
-                        result = sysDeleteFolder(path);
-                        free(path);
-                }
+            path = malloc(strlen(folder)+strlen(dirent->d_name) + 2);
+            sprintf(path, "%s/%s", folder, dirent->d_name);
+            stat(path, &st);
+
+            if(S_ISDIR(st.st_mode)) {
+                /* Recursive, delete all subfolders */
+                result = sysDeleteFolder(path);
+                free(path);
             } else {
+                free(path);
                 if(start == NULL) {
                     head = malloc(sizeof(struct DirentToDelete));
                     if(head == NULL)
@@ -564,16 +573,16 @@ int sysDeleteFolder(const char *folder)
 
                 head->next=NULL;
 
-                if((head->filename = malloc(strlen(dirent.name) + 1)) != NULL)
-                    strcpy(head->filename, dirent.name);
+                if((head->filename = malloc(strlen(dirent->d_name) + 1)) != NULL)
+                    strcpy(head->filename, dirent->d_name);
                 else
                    break;
             }
         }
 
-        fileXioDclose(fd);
+        closedir(dir);
     } else
-        result = fd;
+        result = 0;
 
     if (result >= 0) {
         /* Delete the files. */
@@ -581,7 +590,7 @@ int sysDeleteFolder(const char *folder)
             if(head->filename != NULL) {
                 if((path = malloc(strlen(folder) + strlen(head->filename) + 2)) != NULL) {
                     sprintf(path, "%s/%s", folder, head->filename);
-                    result=fileXioRemove(path);
+                    result=unlink(path);
                     if (result < 0)
                         LOG("sysDeleteFolder: failed to remove %s: %d\n", path, result);
 
@@ -595,7 +604,7 @@ int sysDeleteFolder(const char *folder)
         }
 
         if(result >= 0) {
-            result = fileXioRmdir(folder);
+            result = rmdir(folder);
             LOG("sysDeleteFolder: failed to rmdir %s: %d\n", folder, result);
         }
     }

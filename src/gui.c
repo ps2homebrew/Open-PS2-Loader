@@ -55,14 +55,9 @@ static void guiShow();
 
 #ifdef __DEBUG
 
-#include <timer.h>
-
-#define CLOCKS_PER_MILISEC 147456
-
 // debug version displays an FPS meter
-static u32 curtime = 0;
-static u32 time_since_last = 0;
-static u32 time_render = 0;
+static clock_t prevtime = 0;
+static clock_t curtime = 0;
 static float fps = 0.0f;
 
 extern GSGLOBAL *gsGlobal;
@@ -181,12 +176,6 @@ void guiUnlock(void)
 
 void guiStartFrame(void)
 {
-#ifdef __DEBUG
-    u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
-    time_since_last = newtime - curtime;
-    curtime = newtime;
-#endif
-
     guiLock();
     rmStartFrame();
     guiFrameId++;
@@ -194,12 +183,12 @@ void guiStartFrame(void)
 
 void guiEndFrame(void)
 {
-#ifdef __DEBUG
-    u32 newtime = cpu_ticks() / CLOCKS_PER_MILISEC;
-    time_render = newtime - curtime;
-#endif
-
     rmEndFrame();
+#ifdef __DEBUG
+    // Measure time directly after vsync
+    prevtime = curtime;
+    curtime = clock();
+#endif
     guiUnlock();
 }
 
@@ -305,7 +294,7 @@ static void guiShowNotifications(void)
     if (showLngPopup && popupTimer >= 20)
         guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
 
-    if (popupTimer >= CLOCKS_PER_SEC / 2000) {
+    if (popupTimer >= 60*5) { /* HACK: 5 seconds @ 60fps */
         guiResetNotifications();
         showCfgPopup = 0;
     }
@@ -580,6 +569,7 @@ static int guiUIUpdater(int modified)
 
 void guiShowUIConfig(void)
 {
+    int themeID = -1, langID = -1;
     curTheme = -1;
     showCfgPopup = 0;
     guiResetNotifications();
@@ -623,7 +613,6 @@ reselect_video_mode:
 
     int ret = diaExecuteDialog(diaUIConfig, -1, 1, guiUIUpdater);
     if (ret) {
-        int themeID = -1, langID = -1;
         diaGetInt(diaUIConfig, UICFG_SCROLL, &gScrollSpeed);
         diaGetInt(diaUIConfig, UICFG_LANG, &langID);
         diaGetInt(diaUIConfig, UICFG_THEME, &themeID);
@@ -656,7 +645,7 @@ reselect_video_mode:
         if (guiConfirmVideoMode() == 0) {
             //Restore previous video mode, without changing the theme & language settings.
             gVMode = previousVMode;
-            applyConfig(-1, -1);
+            applyConfig(themeID, langID);
             goto reselect_video_mode;
         }
     }
@@ -1314,8 +1303,15 @@ static void guiDrawOverlays()
     y += yadd;
     y += yadd; // Empty line
 
-    if (time_since_last != 0) {
-        fps = fps * 0.99 + 10.0f / (float)time_since_last;
+    if (prevtime != 0) {
+        clock_t diff = curtime - prevtime;
+        // Raw FPS value with 2 decimal places
+        float rawfps = ((100 * CLOCKS_PER_SEC) / diff) / 100.0f;
+
+        if (fps == 0.0f)
+            fps = rawfps;
+        else
+            fps = fps * 0.9f + rawfps / 10.0f; // Smooth FPS value
 
         snprintf(text, sizeof(text), "%.1f FPS", fps);
         fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
@@ -1608,12 +1604,12 @@ void guiWarning(const char *text, int count)
 
 int guiConfirmVideoMode(void)
 {
-    clock_t timeStart, timeNow, timeElasped;
+    clock_t timeEnd;
     int terminate = 0;
 
     sfxPlay(SFX_MESSAGE);
 
-    timeStart = clock() / (CLOCKS_PER_SEC / 1000);
+    timeEnd = clock() + OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS * (CLOCKS_PER_SEC / 1000);
     while (!terminate) {
         guiStartFrame();
 
@@ -1625,9 +1621,7 @@ int guiConfirmVideoMode(void)
             terminate = 2;
 
         //If the user fails to respond within the timeout period, deem it as a cancel operation.
-        timeNow = clock() / (CLOCKS_PER_SEC / 1000);
-        timeElasped = (timeNow < timeStart) ? UINT_MAX - timeStart + timeNow + 1 : timeNow - timeStart;
-        if (timeElasped >= OPL_VMODE_CHANGE_CONFIRMATION_TIMEOUT_MS)
+        if (clock() > timeEnd)
             terminate = 1;
 
         guiShow();

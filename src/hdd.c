@@ -3,6 +3,9 @@
 #include "include/ioman.h"
 #include "include/hddsupport.h"
 
+#define NEWLIB_PORT_AWARE
+#include <fileXio_rpc.h>
+
 typedef struct // size = 1024
 {
     u32 checksum; // HDL uses 0xdeadfeed magic here
@@ -294,7 +297,7 @@ int hddDeleteHDLGame(hdl_game_info_t *ginfo)
 
     sprintf(path, "hdd0:%s", ginfo->partition_name);
 
-    return fileXioRemove(path);
+    return unlink(path);
 }
 
 //-------------------------------------------------------------------------

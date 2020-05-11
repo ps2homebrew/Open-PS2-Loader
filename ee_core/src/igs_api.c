@@ -23,6 +23,8 @@
  */
 
 #include "include/igs_api.h"
+#define NEWLIB_PORT_AWARE
+#include "fileio.h"
 
 static void FastDelay(int count)
 {

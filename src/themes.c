@@ -298,10 +298,16 @@ static void freeImageTexture(image_texture_t *texture)
         if (texture->source.Mem) {
             rmUnloadTexture(&texture->source);
             free(texture->source.Mem);
+            texture->source.Mem = NULL;
         }
-
-        free(texture->name);
-
+        if (texture->source.Clut) {
+            free(texture->source.Clut);
+            texture->source.Clut = NULL;
+        }
+        if (texture->name) {
+            free(texture->name);
+            texture->name = NULL;
+        }
         free(texture);
     }
 }
@@ -1052,7 +1058,7 @@ static void thmFree(theme_t *theme)
 
 static int thmReadEntry(int index, const char *path, const char *separator, const char *name, unsigned int mode)
 {
-    if (FIO_S_ISDIR(mode) && strstr(name, "thm_")) {
+    if (S_ISDIR(mode) && strstr(name, "thm_")) {
         theme_file_t *currTheme = &themes[nThemes + index];
 
         int length = strlen(name) - 4 + 1;

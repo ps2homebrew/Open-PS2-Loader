@@ -803,11 +803,11 @@ struct UIItem diaAbout[] = {
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"algol - Berion - danielB - El_Patas - EP - gledson999 - jolek", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"algol - Berion - El_Patas - EP - gledson999 - jolek - lee4", -1}}},
     {UI_BREAK},
 
     {UI_SPACER},
-    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"lee4 - LocalH - RandQalan - ShaolinAssassin - yoshi314 - zero35", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 15, {.label = {"LocalH - RandQalan - ShaolinAssassin - yoshi314 - zero35", -1}}},
     {UI_BREAK},
 
     {UI_BREAK},
@@ -827,7 +827,7 @@ struct UIItem diaAbout[] = {
 
     // Support details
     {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_FORUM_DETAILS}}}, {UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"psx-place.com  -  psx-scene.com", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_FORUM_DETAILS}}}, {UI_SPACER}, {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"psx-place.com", -1}}},
     {UI_BREAK},
 
     // buttons

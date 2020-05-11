@@ -156,7 +156,6 @@ int configReadBuffer(config_set_t *configSet, const void *buffer, int size);
 int configReadMulti(int types);
 int configWrite(config_set_t *configSet);
 int configWriteMulti(int types);
-int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 void configClear(config_set_t *configSet);
 
 void configGetVMC(config_set_t *configSet, char *vmc, int length, int slot);

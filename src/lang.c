@@ -385,7 +385,7 @@ char *lngGetValue(void)
 
 static int lngReadEntry(int index, const char *path, const char *separator, const char *name, unsigned int mode)
 {
-    if (!FIO_S_ISDIR(mode)) {
+    if (!S_ISDIR(mode)) {
         if (strstr(name, ".lng") || strstr(name, ".LNG")) {
 
             language_t *currLang = &languages[nLanguages + index];

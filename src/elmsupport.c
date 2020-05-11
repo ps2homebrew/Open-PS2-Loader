@@ -320,9 +320,9 @@ static int elmUpdateItemList(void) {
 		LOG("elmPathElfHdd = %s\n",elmPathElfHdd);
 
 		//Check if POPSTARTER.ELF exists in the folder.
-		int fdElf = fileXioOpen(elmPathElfHdd, O_RDONLY, 0666);
+		int fdElf = open(elmPathElfHdd, O_RDONLY, 0666);
 		if (fdElf >= 0) {
-			fileXioClose(fdElf);
+			close(fdElf);
 			elmItemCount += elmScanVCDsHDD();
 		}else{
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfHdd);
@@ -336,9 +336,9 @@ static int elmUpdateItemList(void) {
 		LOG("elmPathElfEth = %s\n",elmPathElfEth);
 
 		//Check if POPSTARTER.ELF exists in the folder.
-		int fdElf = fileXioOpen(elmPathElfEth, O_RDONLY, 0666);
+		int fdElf = open(elmPathElfEth, O_RDONLY, 0666);
 		if (fdElf >= 0) {
-			fileXioClose(fdElf);
+			close(fdElf);
 			elmItemCount += elmScanVCDs(ethGetPrefix());
 		}else{
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfEth);
@@ -353,9 +353,9 @@ static int elmUpdateItemList(void) {
 		LOG("elmPathElfUsb = %s\n",elmPathElfUsb);
 
 		//Check if POPSTARTER.ELF exists in the folder.
-		int fdElf = fileXioOpen(elmPathElfUsb, O_RDONLY, 0666);
+		int fdElf = open(elmPathElfUsb, O_RDONLY, 0666);
 		if (fdElf >= 0) {
-			fileXioClose(fdElf);
+			close(fdElf);
 			elmItemCount += elmScanVCDs(usbGetBase());
 		}else{
 			LOG("POPSTARTER.ELF not found at %s",elmPathElfUsb);
@@ -467,9 +467,9 @@ static void elmRenameItem(int id, char* newName) {
 	}else if (!strncmp(cur->file,"mass",4)){
 		LOG("RENAMING MASS\n");
 
-		if ((fd = fileXioOpen(cur->file, O_RDONLY)) >= 0) {
+		if ((fd = open(cur->file, O_RDONLY)) >= 0) {
             ret = fileXioIoctl(fd, USBMASS_IOCTL_RENAME, newNameFull);
-            fileXioClose(fd);
+            close(fd);
         }
 		LOG("fd = %d\n",fd);
 		LOG("ret = %d\n",ret);
@@ -507,14 +507,14 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 
 	LOG("elmLaunchItem with %s",elmPathElf);
 
-	int fdElf = fileXioOpen(elmPathElf, O_RDONLY, 0666);
+	int fdElf = open(elmPathElf, O_RDONLY, 0666);
 	if (fdElf >= 0) {
 		int fdVcd = 0;
 		//If we start with hdd0 don't check if the file exists
 		if (!strncmp(cur->file,"hdd0",4)){
 			fdVcd = 1;
 		}else{
-			fdVcd = fileXioOpen(cur->file, O_RDONLY, 0666);
+			fdVcd = open(cur->file, O_RDONLY, 0666);
 		}
 
 		if(fdVcd >=0){
@@ -530,7 +530,7 @@ static void elmLaunchItem(int id, config_set_t* configSet) {
 				LOG("Loaded POPSTARTER ELF with size = %d\n",realSize);
 			}
 
-			fileXioClose(fdElf);
+			close(fdElf);
 
 			char memPath[256];
 			sprintf(memPath,"mem:%u",(unsigned int)buffer);

@@ -91,12 +91,12 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     return 0;
 }
 
-static int sfxCalculateSoundDuration(int byteSize)
+static int sfxCalculateSoundDuration(int nSamples)
 {
-    const int bytesPerSecond = 44100 * 2 * 2; // 44.1kHz, stereo, 16bit
+    float sampleRate = 44100; // 44.1kHz
 
     // Return duration in milliseconds
-    return (byteSize * 1000) / bytesPerSecond;
+    return (nSamples / sampleRate) * 1000;
 }
 
 static void sfxInitDefaults(void)
@@ -126,9 +126,9 @@ static int sfxLoad(struct sfxEffect *sfxData, audsrv_adpcm_t *sfx)
 {
     int ret;
 
-    // Calculate duration based on decompressed size
+    // Calculate duration based on number of samples
     sfxData->duration_ms = sfxCalculateSoundDuration(((u32 *)sfxData->buffer)[3]);
-    // Estimate duration based on filesize, is the ADPCM header was 0
+    // Estimate duration based on filesize, if the ADPCM header was 0
     if (sfxData->duration_ms == 0)
         sfxData->duration_ms = sfxData->size / 47;
 

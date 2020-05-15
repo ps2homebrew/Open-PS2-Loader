@@ -6,7 +6,7 @@ Laotian
 OPL %s
 ບັນທຶກການປ່ຽນແປງ
 ກັບຄືນ
-Network Settings
+ກຳນົດຄ່າທາງດ້ານ Network
 ທາງເລືອກສຳລັບການຕັ້ງຄ່າຂັ້ນສູງ
 <ບໍ່ມີຄ່າໃດໆ>
 Settings saved to %s
@@ -211,7 +211,7 @@ Overwrite Existing Records
 ເປີດໃຊ້ແບບໂອໂຕ
 ຕັ້ງຄ່າຫົວໜ່ວຍ ວິນາທີ, ໃສ່ 0 ເພື່ອປິດການເປີດໃຊ້ແບບໂອໂຕ
 PS2 Logo
-Displayed for a valid disc logo matching the console's region.
+ຈະຖືກສະແດງຜົນ ກໍຕໍ່ເມື່ອໂລໂກ້ຂອງແຜ່ນຖືກຕ້ອງ ແລະ ສອດຄ່ອງຕາມໂຊນຂອງເຄື່ອງ
 Configure PADEMU
 Pad Emulator Settings
 Enable Pad Emulator

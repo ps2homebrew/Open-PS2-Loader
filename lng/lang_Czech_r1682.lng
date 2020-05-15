@@ -6,7 +6,7 @@ Czech
 OPL %s
 Uložit změny
 Zpět
-Network Settings
+Síťová konfigurace
 Pokročilé možnosti
 <žádné hodnoty>
 Settings saved to %s
@@ -211,7 +211,7 @@ Automatický start v %i s...
 Auto start
 Hodnota v sekundách, zadej 0 pro vypnutí auto startu
 PS2 Logo
-Displayed for a valid disc logo matching the console's region.
+Zobrazováno pouze u validního loga disku, který má stejný region jako konzole
 Configure PADEMU
 Pad Emulator Settings
 Enable Pad Emulator

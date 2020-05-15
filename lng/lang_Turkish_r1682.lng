@@ -6,7 +6,7 @@ Turkish
 OPL %s
 Değişiklikleri kaydet
 Geri
-Network Settings
+Ağ ayarları
 Gelişmiş ayarlar
 <değer yok>
 Ayarlar %s a kaydedildi
@@ -56,7 +56,7 @@ Oyun kimliği yüklenirken hata oluştu
 Otomatik sıralama
 Dil dosyası yüklenirken hata oluştu
 Hata ayıklama renklerini iptal et
-Oyun kolu algılanmadı, bekleniyor...
+Oyun kolu algılanmadı, bekliyor...
 Kapak Resimlerini etkinleştir
 Geniş ekran
 Gücü kapat
@@ -67,7 +67,7 @@ Yenile
 USB cihazı başlangıç türü
 HDD cihazı başlangıç türü
 AĞ cihazı başlangıç türü
-Uygulamalar menüsü görünüm türü
+Uygulamalar menüsü görünüm kipi
 Otomatik
 El ile
 HDL Sunucu Başlat
@@ -104,14 +104,14 @@ Sil
 Görüntü ayarları
 Yazma işlemlerini aktif et
 USB oyun bütünlüğünü kontrol et (Fragmentation)
-En son oynanan oyunu hatırla
+Enson oynanan oyunu hatırla
 Seçme tuşu
 Hata, oyun dosyası parçalı
 Hata, nesne çalıştırılamıyor
 Test et
 MİSAFİR oturumu için boş bırakınız.
 Okuma hızını emüle et
-Senkronize Mod
+Senkronize Modu
 Sistem çağrılarını çöz
 Videoları atla
 DVD-DL i etkinleştir
@@ -211,7 +211,7 @@ Otomatik başlatılacak %i s...
 Otomatik başlat
 Saniye olarak değer, iptal etmek için 0 giriniz
 PS2 Logosu
-Displayed for a valid disc logo matching the console's region.
+Sadece konsolun bölgesine uyan, kabul edilebilir logolar gösterilir.
 PADEMU'yu ayarla
 Pad Emulator Ayarları
 PadEmulator Aktif Et

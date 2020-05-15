@@ -6,7 +6,7 @@ Japanese
 OPL %s
 設定を保存する
 戻る
-Network Settings
+ネットワーク設定
 詳細オプション
 <未設定>
 Settings saved to %s
@@ -133,7 +133,7 @@ VMC設定
 VMCファイル作成済
 VMCファイルのサイズが正しくありません
 VMCファイル未作成
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+VMC %s でエラー。スロット %d のメモリカードを使いますか？
 自動リフレッシュ
 OPLについて
 コーディング
@@ -211,7 +211,7 @@ Overwrite Existing Records
 自動スタート
 開始までの秒数を指定。0で無効化
 PS2ロゴ
-Displayed for a valid disc logo matching the console's region.
+本体リージョンとディスクが一致した場合のみ表示されます
 PADEMUの設定
 PADEMUの設定
 PADEMU有効化

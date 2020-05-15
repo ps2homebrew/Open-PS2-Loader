@@ -6,7 +6,7 @@ Hungarian
 OPL %s
 Változtatások mentése
 Vissza
-Hálózati Beállítások
+Hálózat konfigurálás
 Haladó beállítások
 <Nincs érték>
 Beállítások elmentve %s-be
@@ -133,7 +133,7 @@ Folyamat
 VMC fájl létezik
 Érvénytelen VMC fájl, helytelen méret
 VMC fájl létrehozása szükséges
-Hiba történt a VMC %s hozzáférésénél. Folytatás a %d foglalatban lévő memória kártyával?
+Hiba a VMC-vel %s, folytatás a fizikai MC-vel (foglalat %d) ?
 Automatikus frissítés
 Névjegy
 Kódolók
@@ -211,7 +211,7 @@ Automatikus indítás %i s belül...
 Automatikus indítás
 Érték másodperc(ek)ben, 0 az Automatikus indítás letiltásához
 PS2 Logó
-A konzol régiójához megfelelő lemez logó megjelenése.
+Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
 PADEMU konfigurálás
 Pad Emulator Beállítások
 PadEmulator Engedélyezése

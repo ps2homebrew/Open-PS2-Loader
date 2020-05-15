@@ -6,7 +6,7 @@ Dutch
 OPL %s
 Wijzigingen opslaan
 Terug
-Network Settings
+Netwerkconfiguratie
 Geavanceerde opties
 <geen waarde>
 Settings saved to %s
@@ -133,7 +133,7 @@ Voortgang
 VMC-bestand bestaat
 Ongeldige VMC-bestand, grootte is incorrect
 VMC-bestand moet gecreëerd worden
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Fout met VMC %s, voorzetten met fysieke MC (slot %d)?
 Automatisch vernieuwen
 Over
 Coders
@@ -211,7 +211,7 @@ Auto-start over %i s...
 Auto-start
 Waarde in seconde(n), 0 om auto-start uit te schakelen
 PS2 logo
-Displayed for a valid disc logo matching the console's region.
+Alleen getoond voor geldige schijflogo die bij de console-regio past
 Configureer PADEMU
 Pad-emulator instellingen
 Pad-emulator inschakelen

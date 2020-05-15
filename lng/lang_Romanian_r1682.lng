@@ -6,7 +6,7 @@ Romanian
 Open PS2 Loader %s
 Salvare Setari
 Inapoi
-Network Settings
+Config. retea
 Optiuni avansate
 <nici-o valoare>
 Settings saved to %s
@@ -133,7 +133,7 @@ Progres
 Fisierul VMC exista
 Fisier VMC invalid, dimensiunea este incorecta
 Fisier VMC trebuie creat
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Eroare la VMC %s, continuati cu cardul memorie fizic (slot %d)?
 Reimprospatare Automata
 Despre
 Ingineri

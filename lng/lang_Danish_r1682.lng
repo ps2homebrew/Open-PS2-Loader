@@ -6,7 +6,7 @@ Danish
 OPL %s
 Gem indstillinger
 Tilbage
-Network Settings
+Netværksindstillinger
 Avancerede indstillinger
 <ingen værdi>
 Settings saved to %s
@@ -133,7 +133,7 @@ Fremskridt
 VMC-fil eksisterer allerede
 Ugyldig VMC-fil, størrelse er ukorrekt
 VMC-fil skal oprettes
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Fejl med VMC %s, fortsæt med fysisk MC (port %d)?
 Automatisk opdatering
 Om
 Kodere
@@ -211,7 +211,7 @@ Auto-start om %i s...
 Auto-start
 Værdi i sekunder(s), 0 for at deaktivere auto start
 PS2-Logo
-Displayed for a valid disc logo matching the console's region.
+Vises kun med et gyldigt disk logo, som matcher konsollens region
 Konfigurér PADEMU
 Pad Emulator indstillinger
 Aktivér Pad Emulator

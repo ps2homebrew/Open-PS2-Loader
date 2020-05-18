@@ -59,7 +59,7 @@ void checkMCFolder(void)
 
     snprintf(path, sizeof(path), "mc%d:OPL", mcID);
     DIR *dir = opendir(path);
-    if (dir != NULL)
+    if (dir == NULL)
         mkdir(path, 0777);
     else
         closedir(dir);
@@ -81,22 +81,29 @@ void checkMCFolder(void)
 
 static int checkMC()
 {
-    int dummy, ret, fd;
+    int fd;
 
     if (mcID == -1) {
-        mcGetInfo(0, 0, &dummy, &dummy, &dummy);
-        mcSync(0, NULL, &ret);
-
         DIR *dir = opendir("mc0:OPL");
         if (dir == NULL) {
             dir = opendir("mc1:OPL");
             if (dir == NULL) {
                 // No base dir found on any MC, check MC is inserted
                 fd = sysCheckMC();
-                if (fd == 0)
-                    mcID = 0x30;
-                else if (fd == 1)
-                    mcID = 0x31;
+                if (fd >= 0) {
+                    dir = opendir("mc0:");
+                    if (dir != NULL) {
+                        closedir(dir);
+                        mcID = 0x30;
+                    }
+                    else {
+                        dir = opendir("mc1:");
+                        if (dir != NULL) {
+                            closedir(dir);
+                            mcID = 0x31;
+                        }
+                    }
+                }
             } else {
                 closedir(dir);
                 mcID = 0x31;

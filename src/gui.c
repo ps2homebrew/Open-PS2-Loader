@@ -44,11 +44,10 @@ static ee_sema_t gQueueSema;
 static int screenWidth;
 static int screenHeight;
 
-static int popupTimer;
-static int popupSfxPlayed;
-
 static int showThmPopup;
 static int showLngPopup;
+
+static clock_t popupTimer = 0;
 
 // forward decl.
 static void guiShow();
@@ -233,21 +232,14 @@ void guiCheckNotifications(int checkTheme, int checkLang)
             if (lngGetGuiValue() != 0)
                 showLngPopup = 1;
         }
-
-        if (showThmPopup || showLngPopup || showCfgPopup) {
-            popupSfxPlayed = 0;
-            if (showCfgPopup)
-                popupTimer -= 30;
-        }
     }
 }
 
 static void guiResetNotifications(void)
 {
-    popupSfxPlayed = 1;
-    popupTimer = 0;
     showThmPopup = 0;
     showLngPopup = 0;
+    popupTimer = 0;
 }
 
 static void guiRenderNotifications(char *type, char *path, int y)
@@ -262,39 +254,41 @@ static void guiRenderNotifications(char *type, char *path, int y)
 
     x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
 
-    rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-    fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    rmDrawRect(x - 10, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
 }
 
 static void guiShowNotifications(void)
 {
     int y = 10;
     int yadd = 35;
+    clock_t currentTime;
 
+    currentTime = clock();
     if (showThmPopup || showLngPopup || showCfgPopup)
-        popupTimer++;
+    {
+        if (!popupTimer) {
+            popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
+            sfxPlay(SFX_MESSAGE);
+        }
 
-    if (!popupSfxPlayed && popupTimer >= 20) {
-        sfxPlay(SFX_MESSAGE);
-        popupSfxPlayed = 1;
-    }
+        if (showCfgPopup) {
+            guiRenderNotifications("CFG", configGetDir(), y);
+            y += yadd;
+        }
 
-    if (showCfgPopup && popupTimer >= 20)
-        guiRenderNotifications("CFG", configGetDir(), y);
+        if (showThmPopup) {
+            guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
+            y += yadd;
+        }
 
-    y += yadd;
+        if (showLngPopup)
+            guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
 
-    if (showThmPopup && popupTimer >= 20)
-        guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
-
-    y += yadd;
-
-    if (showLngPopup && popupTimer >= 20)
-        guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
-
-    if (popupTimer >= 60*5) { /* HACK: 5 seconds @ 60fps */
-        guiResetNotifications();
-        showCfgPopup = 0;
+        if (currentTime >= popupTimer) {
+            guiResetNotifications();
+            showCfgPopup = 0;
+        }
     }
 }
 

@@ -151,7 +151,7 @@ void guiInit(void)
     for (i = 0; i <= FADE_SIZE; ++i) {
         float t = (float)(i) / FADE_SIZE;
 
-        fadetbl[i] = t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+        fadetbl[i] = t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
     }
 }
 

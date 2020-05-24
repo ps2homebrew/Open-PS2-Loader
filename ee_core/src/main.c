@@ -108,8 +108,8 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("PADEMU = %s\n", EnablePadEmuOp == 0 ? "Disabled" : "Enabled");
 
     PadEmuSettings = _strtoi(_strtok(NULL, " "));
-
     PadMacroSettings = _strtoi(_strtok(NULL, " "));
+    PadEmuModules = _strtoi(_strtok(NULL, " "));
 #endif
     CustomOSDConfigParam.spdifMode = _strtoi(_strtok(NULL, " "));
     CustomOSDConfigParam.screenType = _strtoi(_strtok(NULL, " "));

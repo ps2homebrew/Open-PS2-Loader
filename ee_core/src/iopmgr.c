@@ -184,11 +184,42 @@ int New_Reset_Iop(const char *arg, int arglen)
     }
 
 #ifdef PADEMU
+    int btstack_loaded = 0;
     if (iop_reboot_count >= 2 && EnablePadEmuOp) {
         char args_for_pademu[8];
         memcpy(args_for_pademu, &PadEmuSettings, 4);
         memcpy(args_for_pademu + 4, &PadMacroSettings, 4);
         LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, sizeof(args_for_pademu), args_for_pademu);
+        LoadOPLModule(OPL_MODULE_ID_PADEMU, 0, 4, (char *)&PadEmuSettings);
+        if (PadEmuModules & (1 << 0)) {
+            LoadOPLModule(OPL_MODULE_ID_DS3USB, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
+        if (PadEmuModules & (1 << 1)) {
+            if (!btstack_loaded) {
+                LoadOPLModule(OPL_MODULE_ID_BTSTACK, 0, sizeof(args_for_pademu), args_for_pademu);
+                btstack_loaded = 1;
+            }
+            LoadOPLModule(OPL_MODULE_ID_DS3BT, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
+        if (PadEmuModules & (1 << 2)) {
+            LoadOPLModule(OPL_MODULE_ID_DS4USB, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
+        if (PadEmuModules & (1 << 3)) {
+            if (!btstack_loaded) {
+                LoadOPLModule(OPL_MODULE_ID_BTSTACK, 0, 0, NULL);
+                btstack_loaded = 1;
+            }
+            LoadOPLModule(OPL_MODULE_ID_DS4BT, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
+        if (PadEmuModules & (1 << 4)) {
+            LoadOPLModule(OPL_MODULE_ID_XBOX360USB, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
+        if (PadEmuModules & (1 << 5)) {
+            LoadOPLModule(OPL_MODULE_ID_XBOXONEUSB, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
+        if (PadEmuModules & (1 << 6)) {
+            LoadOPLModule(OPL_MODULE_ID_HIDUSB, 0, sizeof(args_for_pademu), args_for_pademu);
+        }
     }
 #endif
 

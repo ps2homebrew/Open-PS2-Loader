@@ -670,3 +670,9 @@ gui_strings:
   string: Default Theme Music
 - label: DEF_BGM_PATH_HINT
   string: Set path to stream music for internal theme.
+- label: PADEMU_MODULES
+  string: Select modules to load
+- label: HINT_PADEMU_MODULES
+  string: Select which pademu modules to load.
+- label: HINT_PADEMU_MODULES_SET
+  string: Select/Unselect pademu module.

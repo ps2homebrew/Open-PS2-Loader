@@ -60,6 +60,7 @@ static union
     };
     int raw;
 } PadMacroSettings;
+static int PadEmuModules;
 #endif
 
 static char hexid[32];
@@ -576,8 +577,8 @@ static char *ver_to_str(char *str, u8 ma, u16 mi)
 
 static int guiGamePadEmuUpdater(int modified)
 {
-    int PadEmuMode, PadPort, PadEmuVib, PadEmuPort, PadEmuMtap, PadEmuMtapPort, PadEmuWorkaround;
-    static int oldPadPort;
+    int PadEmuModulesList, PadPort, PadEmuVib, PadEmuPort, PadEmuMtap, PadEmuMtapPort, PadEmuWorkaround, PadEmuModulesSet;
+    static int oldPadPort, oldPadEmuModulesList;
     int previousSource = gPadEmuSource;
 
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_SOURCE, &gPadEmuSource);
@@ -594,7 +595,8 @@ static int guiGamePadEmuUpdater(int modified)
     }
 
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, &EnablePadEmu);
-    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, &PadEmuMode);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MODULES_LIST, &PadEmuModulesList);
+    diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_MODULES_SET, &PadEmuModulesSet);
     diaGetInt(diaPadEmuConfig, PADCFG_PADPORT, &PadPort);
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, &PadEmuPort);
     diaGetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, &PadEmuVib);
@@ -606,32 +608,23 @@ static int guiGamePadEmuUpdater(int modified)
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MTAP, EnablePadEmu);
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtap);
 
-    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MODE, EnablePadEmu);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MODULES_LIST, EnablePadEmu);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_MODULES_SET, EnablePadEmu);
 
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADPORT, EnablePadEmu);
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_VIB, PadEmuPort & EnablePadEmu);
 
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, (PadEmuMode == 1) & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC, (PadEmuMode == 1) & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR, (PadEmuMode == 1) & EnablePadEmu);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, (PadEmuMode == 1) & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, (PadEmuMode == 1) & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, (PadEmuMode == 1) & EnablePadEmu);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, (PadEmuMode == 1) & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, (PadEmuMode == 1) & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND_STR, (PadEmuMode == 1) & EnablePadEmu);
+    diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, EnablePadEmu);
 
     if (modified) {
         if (PadEmuMtap) {
             diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
             diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadPort == 0) & EnablePadEmu);
-            PadEmuSettings |= 0x00000E00;
+            PadEmuSettings |= 0x0000000E;
         } else {
             diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[0]);
             diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, EnablePadEmu);
-            PadEmuSettings &= 0xFFFF03FF;
+            PadEmuSettings &= 0xFFFFFF03;
             if (PadPort > 1) {
                 PadPort = 0;
                 diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, PadPort);
@@ -639,51 +632,58 @@ static int guiGamePadEmuUpdater(int modified)
         }
 
         if (PadPort != oldPadPort) {
-            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (8 + PadPort)) & 1);
-            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (16 + PadPort)) & 1);
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> (PadPort)) & 1);
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> (8 + PadPort)) & 1);
 
             oldPadPort = PadPort;
         }
+
+        if (PadEmuModulesList != oldPadEmuModulesList) {
+            diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODULES_SET, (PadEmuModules >> PadEmuModulesList) & 1);
+
+            oldPadEmuModulesList = PadEmuModulesList;
+        }
     }
 
-    PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
-    PadEmuSettings &= (~(PadEmuMode ? 0 : 1) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
+    PadEmuSettings |= (PadEmuPort << (PadPort)) | (PadEmuVib << (8 + PadPort)) | (PadEmuMtap << 16) | ((PadEmuMtapPort - 1) << 17) | (PadEmuWorkaround << 18);
+    PadEmuSettings &= (~(!PadEmuPort << (PadPort)) & ~(!PadEmuVib << (8 + PadPort)) & ~(!PadEmuMtap << 16) & ~(!(PadEmuMtapPort - 1) << 17) & ~(!PadEmuWorkaround << 18));
 
-    if (PadEmuMode == 1) {
-        if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
-            if (dg_discon) {
-                dgmacset = 0;
-                dg_discon = 0;
-            }
-            if (!dgmacset) {
-                if (ds34bt_get_bdaddr(dg_mac)) {
-                    dgmacset = 1;
-                    diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
-                } else {
-                    dgmacset = 0;
-                }
-            }
-        } else {
-            dg_discon = 1;
+    PadEmuModules |= PadEmuModulesSet << PadEmuModulesList;
+    PadEmuModules &= ~(!PadEmuModulesSet << PadEmuModulesList);
+
+    if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {
+        if (dg_discon) {
+            dgmacset = 0;
+            dg_discon = 0;
         }
-
         if (!dgmacset) {
-            diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
-        }
-
-        if (ds34usb_get_status(0) & DS34USB_STATE_RUNNING) {
-            if (!ds3macset) {
-                if (ds34usb_get_bdaddr(0, ds3_mac)) {
-                    ds3macset = 1;
-                    diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
-                } else {
-                    ds3macset = 0;
-                }
+            if (ds34bt_get_bdaddr(dg_mac)) {
+                dgmacset = 1;
+                diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, bdaddr_to_str(dg_mac, dg_str));
+            } else {
+                dgmacset = 0;
             }
-        } else {
-            diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, _l(_STR_NOT_CONNECTED));
-            ds3macset = 0;
         }
+    } else {
+        dg_discon = 1;
+    }
+
+    if (!dgmacset) {
+        diaSetLabel(diaPadEmuConfig, PADCFG_USBDG_MAC, _l(_STR_NOT_CONNECTED));
+    }
+
+    if (ds34usb_get_status(0) & DS34USB_STATE_RUNNING) {
+        if (!ds3macset) {
+            if (ds34usb_get_bdaddr(0, ds3_mac)) {
+                ds3macset = 1;
+                diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, bdaddr_to_str(ds3_mac, ds3_str));
+            } else {
+                ds3macset = 0;
+            }
+        }
+    } else {
+        diaSetLabel(diaPadEmuConfig, PADCFG_PAD_MAC, _l(_STR_NOT_CONNECTED));
+        ds3macset = 0;
     }
 
     return 0;
@@ -744,7 +744,7 @@ static int guiGamePadEmuInfoUpdater(int modified)
 void guiGameShowPadEmuConfig(int forceGlobal)
 {
     const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
-    const char *PadEmuModes[] = {_l(_STR_DS34USB_MODE), _l(_STR_DS34BT_MODE), NULL};
+    const char *PadEmuModulesList[] = {"DualShock 3 USB", "DualShock 3 BT", "DualShock 4 USB", "DualShock 4 BT", "XBOX 360 USB", "XBOX ONE USB", "HID USB", NULL};
 
     int PadEmuMtap, PadEmuMtapPort, i;
 
@@ -755,31 +755,19 @@ void guiGameShowPadEmuConfig(int forceGlobal)
         guiGameLoadPadEmuConfig(NULL, configGetByType(CONFIG_GAME));
 
     diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_SOURCE, settingsSource);
-    diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuModes);
+    diaSetEnum(diaPadEmuConfig, PADCFG_PADEMU_MODULES_LIST, PadEmuModulesList);
 
-    PadEmuMtap = (PadEmuSettings >> 24) & 1;
-    PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
+    PadEmuMtap = (PadEmuSettings >> 16) & 1;
+    PadEmuMtapPort = ((PadEmuSettings >> 17) & 1) + 1;
 
     diaSetEnabled(diaPadEmuConfig, PADCFG_PADEMU_PORT, EnablePadEmu);
 
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC, PadEmuSettings & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC, PadEmuSettings & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR, PadEmuSettings & EnablePadEmu);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_USBDG_MAC_STR, PadEmuSettings & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAD_MAC_STR, PadEmuSettings & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PAIR_STR, PadEmuSettings & EnablePadEmu);
-
-    diaSetVisible(diaPadEmuConfig, PADCFG_BTINFO, PadEmuSettings & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, PadEmuSettings & EnablePadEmu);
-    diaSetVisible(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND_STR, PadEmuSettings & EnablePadEmu);
-
     if (PadEmuMtap) {
         diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[PadEmuMtapPort]);
-        PadEmuSettings |= 0x00000E00;
+        PadEmuSettings |= 0x0000000E;
     } else {
         diaSetEnum(diaPadEmuConfig, PADCFG_PADPORT, PadEmuPorts_enums[0]);
-        PadEmuSettings &= 0xFFFF03FF;
+        PadEmuSettings &= 0xFFFFFF03;
     }
 
     int result = -1;
@@ -906,6 +894,11 @@ static int guiGameSavePadEmuGameConfig(config_set_t *configSet, int result)
             result = configSetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
         else
             configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
+
+        if (PadEmuModules != 0)
+            result = configSetInt(configSet, CONFIG_ITEM_PADEMUMODULES, PadEmuModules);
+        else
+            configRemoveKey(configSet, CONFIG_ITEM_PADEMUMODULES);
     }
 
     return result;
@@ -931,6 +924,7 @@ void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
 
         configSetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
+        configSetInt(configGame, CONFIG_ITEM_PADEMUMODULES, PadEmuModules);
     }
 }
 
@@ -1069,7 +1063,6 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
     }
 
 #ifdef PADEMU
-    /// PADEMU ///
     result = guiGameSavePadEmuGameConfig(configSet, result);
     guiGameSavePadEmuGlobalConfig(configGame);
     result = guiGameSavePadMacroGameConfig(configSet, result);
@@ -1118,6 +1111,7 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configGame, CONFIG_ITEM_PADEMUSETTINGS);
         configRemoveKey(configGame, CONFIG_ITEM_PADMACROSETTINGS);
+        configRemoveKey(configGame, CONFIG_ITEM_PADEMUMODULES);
 #endif
         saveConfig(CONFIG_GAME, 0);
     }
@@ -1157,6 +1151,7 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
         configRemoveKey(configSet, CONFIG_ITEM_PADMACROSETTINGS);
         configRemoveKey(configSet, CONFIG_ITEM_PADMACROSOURCE);
+        configRemoveKey(configSet, CONFIG_ITEM_PADEMUMODULES);
 #endif
         // VMC
         configRemoveVMC(configSet, 0);
@@ -1242,11 +1237,13 @@ static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *confi
 {
     EnablePadEmu = 0;
     PadEmuSettings = 0;
+    PadEmuModules = 0;
 
     // set global settings.
     gPadEmuSource = 0;
     configGetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, &EnablePadEmu);
     configGetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings);
+    configGetInt(configGame, CONFIG_ITEM_PADEMUMODULES, &PadEmuModules);
 
     // override global with per-game settings if available and selected.
     if (!forceGlobalPadEmu) {
@@ -1256,22 +1253,23 @@ static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *confi
                 EnablePadEmu = 0;
             if (!configGetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, &PadEmuSettings))
                 PadEmuSettings = 0;
+            if (!configGetInt(configSet, CONFIG_ITEM_PADEMUMODULES, &PadEmuModules))
+                PadEmuModules = 0;
         }
     }
     // set gui settings.
-    int PadEmuMtap = (PadEmuSettings >> 24) & 1;
-    int PadEmuMtapPort = ((PadEmuSettings >> 25) & 1) + 1;
+    int PadEmuMtap = (PadEmuSettings >> 16) & 1;
+    int PadEmuMtapPort = ((PadEmuSettings >> 17) & 1) + 1;
 
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_SOURCE, gPadEmuSource);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_ENABLE, EnablePadEmu);
 
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MODE, PadEmuSettings & 0xFF);
     diaSetInt(diaPadEmuConfig, PADCFG_PADPORT, 0);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings >> 8) & 1);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 16) & 1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_PORT, (PadEmuSettings)&1);
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_VIB, (PadEmuSettings >> 8) & 1);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP, PadEmuMtap);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
-    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
+    diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 18) & 1));
 }
 
 static void guiGameLoadPadMacroConfig(config_set_t *configSet, config_set_t *configGame)

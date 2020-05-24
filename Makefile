@@ -146,7 +146,8 @@ else
 endif
 
 ifeq ($(PADEMU),1)
-  IOP_OBJS += bt_pademu.o usb_pademu.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
+  IOP_OBJS += pademu.o btstack.o ds3usb.o ds4usb.o xbox360usb.o xboxoneusb.o \
+		ds3bt.o ds4bt.o hidusb.o ds34usb.o ds34bt.o libds34usb.a libds34bt.a
   EE_CFLAGS += -DPADEMU
   EE_INCS += -Imodules/ds34bt/ee -Imodules/ds34usb/ee
   PADEMU_FLAGS = PADEMU=1
@@ -297,8 +298,15 @@ clean:	download_lwNBD
 	echo " -ds34bt"
 	$(MAKE) -C modules/ds34bt clean
 	echo " -pademu"
-	$(MAKE) -C modules/pademu USE_BT=1 clean
-	$(MAKE) -C modules/pademu USE_USB=1 clean
+	$(MAKE) -C modules/pademu clean
+	$(MAKE) -C modules/pademu/btstack clean
+	$(MAKE) -C modules/pademu/ds3usb clean
+	$(MAKE) -C modules/pademu/ds4usb clean
+	$(MAKE) -C modules/pademu/xbox360usb clean
+	$(MAKE) -C modules/pademu/xboxoneusb clean
+	$(MAKE) -C modules/pademu/ds3bt clean
+	$(MAKE) -C modules/pademu/ds4bt clean
+	$(MAKE) -C modules/pademu/hidusb clean
 	echo "-pc tools"
 	$(MAKE) -C pc clean
 
@@ -490,17 +498,59 @@ modules/ds34usb/iop/ds34usb.irx: modules/ds34usb/iop
 $(EE_ASM_DIR)ds34usb.s: modules/ds34usb/iop/ds34usb.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ds34usb_irx
 
-modules/pademu/bt_pademu.irx: modules/pademu
-	$(MAKE) -C $< USE_BT=1
+modules/pademu/pademu.irx: modules/pademu
+	$(MAKE) -C $<
 
-$(EE_ASM_DIR)bt_pademu.s: modules/pademu/bt_pademu.irx
-	$(BIN2S) $< $@ bt_pademu_irx
+$(EE_ASM_DIR)pademu.s: modules/pademu/pademu.irx
+	$(BIN2S) $< $@ pademu_irx
 
-modules/pademu/usb_pademu.irx: modules/pademu
-	$(MAKE) -C $< USE_USB=1
+modules/pademu/btstack/btstack.irx: modules/pademu/btstack
+	$(MAKE) -C $<
 
-$(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
-	$(BIN2S) $< $@ usb_pademu_irx
+$(EE_ASM_DIR)btstack.s: modules/pademu/btstack/btstack.irx
+	$(BIN2S) $< $@ btstack_irx
+
+modules/pademu/ds3usb/ds3usb.irx: modules/pademu/ds3usb
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)ds3usb.s: modules/pademu/ds3usb/ds3usb.irx
+	$(BIN2S) $< $@ ds3usb_irx
+
+modules/pademu/ds4usb/ds4usb.irx: modules/pademu/ds4usb
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)ds4usb.s: modules/pademu/ds4usb/ds4usb.irx
+	$(BIN2S) $< $@ ds4usb_irx
+
+modules/pademu/xbox360usb/xbox360usb.irx: modules/pademu/xbox360usb
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)xbox360usb.s: modules/pademu/xbox360usb/xbox360usb.irx
+	$(BIN2S) $< $@ xbox360usb_irx
+
+modules/pademu/xboxoneusb/xboxoneusb.irx: modules/pademu/xboxoneusb
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)xboxoneusb.s: modules/pademu/xboxoneusb/xboxoneusb.irx
+	$(BIN2S) $< $@ xboxoneusb_irx
+
+modules/pademu/ds3bt/ds3bt.irx: modules/pademu/ds3bt
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)ds3bt.s: modules/pademu/ds3bt/ds3bt.irx
+	$(BIN2S) $< $@ ds3bt_irx
+
+modules/pademu/ds4bt/ds4bt.irx: modules/pademu/ds4bt
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)ds4bt.s: modules/pademu/ds4bt/ds4bt.irx
+	$(BIN2S) $< $@ ds4bt_irx
+
+modules/pademu/hidusb/hidusb.irx: modules/pademu/hidusb
+	$(MAKE) -C $<
+
+$(EE_ASM_DIR)hidusb.s: modules/pademu/hidusb/hidusb.irx
+	$(BIN2S) $< $@ hidusb_irx
 
 $(EE_ASM_DIR)bdm.s: $(PS2SDK)/iop/irx/bdm.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ bdm_irx

@@ -12,6 +12,8 @@ IMPORT_BIN2C(audsrv_irx);
 
 IMPORT_BIN2C(bdm_irx);
 
+IMPORT_BIN2C(btstack_irx);
+
 IMPORT_BIN2C(bdm_cdvdman_irx);
 
 IMPORT_BIN2C(bdm_mcemu_irx);
@@ -28,6 +30,14 @@ IMPORT_BIN2C(cleareffects_irx);
 
 IMPORT_BIN2C(deci2_img);
 
+IMPORT_BIN2C(ds3bt_irx);
+
+IMPORT_BIN2C(ds3usb_irx);
+
+IMPORT_BIN2C(ds4bt_irx);
+
+IMPORT_BIN2C(ds4usb_irx);
+
 IMPORT_BIN2C(drvtif_irx);
 
 IMPORT_BIN2C(drvtif_ingame_irx);
@@ -41,6 +51,8 @@ IMPORT_BIN2C(filexio_irx);
 IMPORT_BIN2C(genvmc_irx);
 
 IMPORT_BIN2C(hdd_cdvdman_irx);
+
+IMPORT_BIN2C(hidusb_irx);
 
 IMPORT_BIN2C(hdd_hdpro_cdvdman_irx);
 
@@ -67,6 +79,10 @@ IMPORT_BIN2C(ioptrap_irx);
 IMPORT_BIN2C(isofs_irx);
 
 IMPORT_BIN2C(iremsndpatch_irx);
+
+IMPORT_BIN2C(pademu_irx);
+
+IMPORT_BIN2C(padman_irx);
 
 IMPORT_BIN2C(libsd_irx);
 
@@ -125,6 +141,10 @@ IMPORT_BIN2C(tifinet_ingame_irx);
 IMPORT_BIN2C(udptty_irx);
 
 IMPORT_BIN2C(udptty_ingame_irx);
+
+IMPORT_BIN2C(xbox360usb_irx);
+
+IMPORT_BIN2C(xboxoneusb_irx);
 
 IMPORT_BIN2C(udnl_irx);
 

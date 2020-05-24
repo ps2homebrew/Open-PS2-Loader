@@ -141,8 +141,6 @@ int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
 
-int toggleSfx;
-
 int showCfgPopup;
 
 #ifdef IGS

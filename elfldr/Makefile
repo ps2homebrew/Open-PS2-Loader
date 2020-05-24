@@ -10,6 +10,9 @@ EE_LIBS += -lkernel-nopatch
 %.o : %.c
 	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
 
+%.o : %.S
+	$(EE_CC) $(EE_CFLAGS) $(EE_INCS) -c $< -o $@
+
 %.o : %.s
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 

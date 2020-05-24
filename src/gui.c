@@ -994,30 +994,29 @@ static float fade(float t)
 // The same as mix, but with 8 (2*4) values mixed at once
 static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR *res)
 {
-    asm(
+    asm volatile(
 #if __GNUC__ > 3
-        "lqc2   $vf1, 0(%0)\n"          // load the first vector
-        "lqc2   $vf2, 0(%1)\n"          // load the second vector
-        "lw $2, 0(%2)\n"               // load value from ptr to reg
-        "qmtc2  $2, $vf3\n"             // load the mix value from reg to VU
-        "vaddw.x $vf5, $vf0, $vf0\n"    // vf5.x = 1
-        "vsub.x $vf4x, $vf5x, $vf3x\n"    // subtract 1 - vf3,x, store the result in vf4.x
+        "lqc2   $vf1, (%[a])\n"           // load the first vector
+        "lqc2   $vf2, (%[b])\n"           // load the second vector
+        "qmtc2  %[mix], $vf3\n"           // move the mix value from reg to VU
+        "vaddw.x $vf5, $vf0, $vf0\n"      // vf5.x = 1
+        "vsub.x  $vf4x, $vf5x, $vf3x\n"   // subtract 1 - vf3,x, store the result in vf4.x
         "vmulax.xyzw $ACC, $vf1, $vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
         "vmaddx.xyzw $vf1, $vf2, $vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-        "sqc2   $vf1, 0(%3)\n"          // transfer the result in acc to the ee
+        "sqc2   $vf1, (%[res])\n"         // transfer the result in acc to the ee
 #else
-        "lqc2	vf1, 0(%0)\n"          // load the first vector
-        "lqc2	vf2, 0(%1)\n"          // load the second vector
-        "lw	$2, 0(%2)\n"               // load value from ptr to reg
-        "qmtc2	$2, vf3\n"             // load the mix value from reg to VU
+        "lqc2	vf1, (%[a])\n"         // load the first vector
+        "lqc2	vf2, (%[b])\n"         // load the second vector
+        "qmtc2	%[mix], vf3\n"         // move the mix value from reg to VU
         "vaddw.x vf5, vf00, vf00\n"    // vf5.x = 1
         "vsub.x vf4x, vf5x, vf3x\n"    // subtract 1 - vf3,x, store the result in vf4.x
         "vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
         "vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-        "sqc2	vf1, 0(%3)\n"          // transfer the result in acc to the ee
+        "sqc2	vf1, (%[res])\n"       // transfer the result in acc to the ee
 #endif
-        :
-        : "r"(a), "r"(b), "r"(&mix), "r"(res));
+        : [res] "+r"(res)
+        : [a] "r"(a), [b] "r"(b), [mix] "r"(mix)
+        : "memory");
 }
 
 static float guiCalcPerlin(float x, float y, float z)

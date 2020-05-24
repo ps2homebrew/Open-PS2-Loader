@@ -1025,9 +1025,9 @@ static float guiCalcPerlin(float x, float y, float z)
     // By Sean McCullough
 
     // Find unit grid cell containing point
-    int X = floor(x);
-    int Y = floor(y);
-    int Z = floor(z);
+    int X = floorf(x);
+    int Y = floorf(y);
+    int Z = floorf(z);
 
     // Get relative xyz coordinates of point within that cell
     x = x - X;

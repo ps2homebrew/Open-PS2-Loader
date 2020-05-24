@@ -185,12 +185,13 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
     delay(1);
     GS_BGCOLOUR = 0xCCFFFF; //Light Yellow
 
-    static u32 EnableGIFPATH3[4] ALIGNED(16) = {
-        GS_VIF1_MSKPATH3(0),
-        GS_VIF1_NOP,
-        GS_VIF1_NOP,
-        GS_VIF1_NOP,
-    };
+    static u128 EnableGIFPATH3;
+
+    u32 *EnableGIFPATH3_32 = (u32 *)&EnableGIFPATH3;
+    EnableGIFPATH3_32[0] = GS_VIF1_MSKPATH3(0);
+    EnableGIFPATH3_32[1] = GS_VIF1_NOP;
+    EnableGIFPATH3_32[2] = GS_VIF1_NOP;
+    EnableGIFPATH3_32[3] = GS_VIF1_NOP;
 
     u32 DMAChain[20 * 2] ALIGNED(16);
     u32 *DMA32Packet = (u32 *)&DMAChain;
@@ -338,7 +339,7 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
     *GS_CSR = GS_CSR_FINISH;
 
     // Renable PATH3
-    *GS_VIF1_FIFO = *(u128 *)EnableGIFPATH3;
+    *GS_VIF1_FIFO = EnableGIFPATH3;
 }
 
 static void ConvertColors32(u32 *buffer, u32 dimensions)

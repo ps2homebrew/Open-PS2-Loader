@@ -4,6 +4,8 @@ Copyright 2013, Ifcaro & jimmikaelkael
 Licenced under Academic Free License version 3.0  
 Review LICENSE file for further details.  
 
+[![CI](https://github.com/ifcaro/Open-PS2-Loader/workflows/CI/badge.svg)](https://github.com/ifcaro/Open-PS2-Loader/actions?query=workflow%3ACI)
+
 ## Introduction
 
 Open PS2 Loader (OPL) is a 100% Open source game and application loader for

@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  repository_dispatch:
+    types: [run_build]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
+    steps:
+    - name: Install dependencies
+      run: |
+        apk add build-base git zip
+
+    - uses: actions/checkout@v2
+    - run: |
+        git fetch --prune --unshallow
+
+    - name: Compile -> make clean opl.elf
+      run: |
+        make clean opl.elf
+    
+    - name: Compile -> make IGS=1 clean opl.elf
+      run: |
+        make IGS=1 clean opl.elf
+
+    - name: Compile -> make PADEMU=1 clean opl.elf
+      run: |
+        make PADEMU=1 clean opl.elf
+    
+    - name: Compile -> make IGS=1 PADEMU=1 clean opl.elf
+      run: |
+        make IGS=1 PADEMU=1 clean opl.elf
+
+    - name: Compile -> make DEBUG=1 clean opl.elf
+      run: |
+        make DEBUG=1 clean opl.elf
+
+    - name: Compile -> make DEBUG=1 IOPCORE_DEBUG=1 clean opl.elf
+      run: |
+        make DEBUG=1 IOPCORE_DEBUG=1 clean opl.elf
+    
+    - name: Compile -> make DEBUG=1 EESIO_DEBUG=1 clean opl.elf
+      if: false # This step is disabled for now because EESIO_DEBUG is broken after newlib changes
+      run: |
+        make DEBUG=1 EESIO_DEBUG=1 clean opl.elf
+    
+    - name: Compile -> make DEBUG=1 INGAME_DEBUG=1 clean opl.elf
+      run: |
+        make DEBUG=1 INGAME_DEBUG=1 clean opl.elf
+    
+    - name: Compile -> make clean release
+      run: |
+        make clean release
+
+    - name: Get short SHA
+      id: slug
+      run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+
+    - name: Upload artifacts
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: OPNPS2LD-${{ steps.slug.outputs.sha8 }}
+        path: OPNPS2LD-*.ZIP

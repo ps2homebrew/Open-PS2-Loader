@@ -1,2 +1,0 @@
-As the font size is quite big, it's recommanded to load it from mass:/ (root of your USB device) or hdd0:/+OPL/ (if you load your font from HDD, start mode must be set on "AUTO"). Loading will take long though... Be patient :) 
-

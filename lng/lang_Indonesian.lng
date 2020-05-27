@@ -7,7 +7,7 @@ Kembali
 Konfigurasi jaringan
 Pilihan lanjutan
 <tak ada nilai>
-Settings saved to %s
+Pengaturan disimpan pada %s
 Kesalahan penulisan setingan!
 Keluar
 Setingan
@@ -41,7 +41,7 @@ Bulat
 Kali
 Daftar Game
 Setingan
-Remove Settings
+Hapus setingan
 Semua kunci permainan yang dihapus
 Gulir
 Lambat
@@ -106,7 +106,7 @@ Ingat pertandingan terakhir dimainkan
 Pilih tombol
 Kesalahan, game terfragmentasi
 Kesalahan, tidak bisa menjalankan item
-Test Changes
+Uji Perubahan
 Tinggalkan kosong untuk Otent TAMU.
 Membaca akurat
 Mode Sinkronisasi
@@ -143,7 +143,7 @@ HDD Otomatis berhenti
 Modus video
 Warna dialog
 Warna  dipilih
-Reset Colors
+Atur Ulang Warna
 Info
 Kustom ELF
 Pemilihan warna
@@ -197,7 +197,7 @@ Kesalahan: gagal untuk memuat Berkas cheat
 Tak ada cheat ditemukan
 Unduhan default
 Pembaruan jaringan
-Overwrite Existing Records
+Timpa Rekaman Yang Ada
 Pembaruan gagal
 Gagal menyambungkan ke server pembaruan
 Perbarui selesai
@@ -257,27 +257,27 @@ Kunci Parental tidak aktif.
 Opsi Bentukan:
 Kesalahan - kata sandi tak bisa dipakai.
 Berkas VMC %s terfragmentasi. Gunakan kartu memori di slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
+Pengaturan Audio
+Aktifkan efek suara
+Aktifkan suara Boot
+Volume efek suara
+Volume suara Boot
+Konfirmasi perubahan mode video?
+Daftar Tembolok Game(HDD)
+Izinkan Pemberitahuan
+%s dimuat dari %s
+Menu Game
+Pengaturan Game disimpan.
+%s setingan dihapus.
+Timpa pengaturan kompatibilitas game yang ada ketika diaktifkan.
+Mode Setingan
 Global
 Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
-Genre
-Release
-Developer
-Description
+Seluruh
+Pilih setingan untuk dihapus.
+Forum Dukungan:
+Judul
+Aliran
+Rilis
+Pengembang
+Deskripsi

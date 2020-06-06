@@ -6,7 +6,7 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 
-IOP_CC_VERSION := $(shell $(IOP_CC) --version 2>&1 | sed -n 's/^.*(GCC) //p')
+IOP_CC_VERSION := $(shell $(IOP_CC) -dumpversion)
 
 ifeq ($(IOP_CC_VERSION),3.2.2)
 ASFLAGS_TARGET = -march=r3000

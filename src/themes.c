@@ -193,16 +193,21 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
                     fntFitString(elem->font, mutableText->currentValue, elem->width);
             }
         }
-        if (mutableText->currentValue) {
-            if (mutableText->displayMode == DISPLAY_NEVER) {
-                if (!strncmp(mutableText->alias, "Size", 4))
-                    snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
-                else
-                    snprintf(result, sizeof(result), mutableText->currentValue);
+    }
 
-                goto render;
-            }
+    if (mutableText->displayMode == DISPLAY_NEVER) {
+        if (mutableText->currentValue) {
+            if (!strncmp(mutableText->alias, "Size", 4))
+                snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
+            else
+                snprintf(result, sizeof(result), mutableText->currentValue);
+
+            if (mutableText->sizingMode == SIZING_NONE)
+                fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
+            else
+                fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
         }
+        return;
     }
 
     if (mutableText->displayMode == DISPLAY_DEFINED && mutableText->currentValue == NULL)
@@ -238,7 +243,6 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
             strcat(result, " MiB");
     }
 
-render:
     if (mutableText->sizingMode == SIZING_NONE)
         fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
     else

@@ -259,7 +259,7 @@ static void ethInitSMB(void)
         // update Themes
         char path[256];
         sprintf(path, "%sTHM", ethPrefix);
-        thmAddElements(path, "\\", ethGameList.mode);
+        thmAddElements(path, "\\", 1);
 
         sprintf(path, "%sLNG", ethPrefix);
         lngAddLanguages(path, "\\", ethGameList.mode);

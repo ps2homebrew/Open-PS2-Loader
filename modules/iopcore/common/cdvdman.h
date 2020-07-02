@@ -10,7 +10,7 @@
 #define CDVDreg_HOWTO (*(volatile unsigned char *)0xBF402006)
 #define CDVDreg_ABORT (*(volatile unsigned char *)0xBF402007)
 #define CDVDreg_PWOFF (*(volatile unsigned char *)0xBF402008)
-#define CDVDreg_9 (*(volatile unsigned char *)0xBF402008)
+#define CDVDreg_9 (*(volatile unsigned char *)0xBF402009)
 #define CDVDreg_STATUS (*(volatile unsigned char *)0xBF40200A)
 #define CDVDreg_B (*(volatile unsigned char *)0xBF40200B)
 #define CDVDreg_C (*(volatile unsigned char *)0xBF40200C)

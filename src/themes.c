@@ -1269,9 +1269,9 @@ static void thmRebuildGuiNames(void)
     guiThemesNames[nThemes + 1] = NULL;
 }
 
-int thmAddElements(char *path, const char *separator, int mode)
+int thmAddElements(char *path, const char *separator, int forceRefresh)
 {
-    int result;
+    int result, i;
 
     result = listDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
     nThemes += result;
@@ -1280,8 +1280,10 @@ int thmAddElements(char *path, const char *separator, int mode)
     const char *temp;
     if (configGetStr(configGetByType(CONFIG_OPL), "theme", &temp)) {
         LOG("THEMES Trying to set again theme: %s\n", temp);
-        if (thmSetGuiValue(thmFindGuiID(temp), 0))
-            moduleUpdateMenu(mode, 1, 0);
+        if (thmSetGuiValue(thmFindGuiID(temp), 0) && forceRefresh) {
+            for (i = 0; i < MODE_COUNT; i++)
+                moduleUpdateMenu(i, 1, 0);
+        }
     }
 
     return result;
@@ -1297,7 +1299,7 @@ void thmInit(void)
     // initialize default internal
     thmLoad(NULL);
 
-    thmAddElements(gBaseMCDir, "/", -1);
+    thmAddElements(gBaseMCDir, "/", 0);
 }
 
 void thmReinit(const char *path)

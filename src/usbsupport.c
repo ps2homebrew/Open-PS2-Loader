@@ -152,7 +152,7 @@ static int usbNeedsUpdate(void)
     // update Themes
     if (!ThemesLoaded) {
         sprintf(path, "%sTHM", usbPrefix);
-        if (thmAddElements(path, "/", usbGameList.mode) > 0)
+        if (thmAddElements(path, "/", 1) > 0)
             ThemesLoaded = 1;
     }
 

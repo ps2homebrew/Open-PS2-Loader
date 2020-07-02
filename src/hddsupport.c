@@ -43,7 +43,7 @@ static void hddInitModules(void)
     // update Themes
     char path[256];
     sprintf(path, "%sTHM", hddPrefix);
-    thmAddElements(path, "/", hddGameList.mode);
+    thmAddElements(path, "/", 1);
 
     sprintf(path, "%sLNG", hddPrefix);
     lngAddLanguages(path, "/", hddGameList.mode);

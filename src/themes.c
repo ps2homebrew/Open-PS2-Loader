@@ -193,16 +193,21 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
                     fntFitString(elem->font, mutableText->currentValue, elem->width);
             }
         }
-        if (mutableText->currentValue) {
-            if (mutableText->displayMode == DISPLAY_NEVER) {
-                if (!strncmp(mutableText->alias, "Size", 4))
-                    snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
-                else
-                    snprintf(result, sizeof(result), mutableText->currentValue);
+    }
 
-                goto render;
-            }
+    if (mutableText->displayMode == DISPLAY_NEVER) {
+        if (mutableText->currentValue) {
+            if (!strncmp(mutableText->alias, "Size", 4))
+                snprintf(result, sizeof(result), "%s MiB", mutableText->currentValue);
+            else
+                snprintf(result, sizeof(result), mutableText->currentValue);
+
+            if (mutableText->sizingMode == SIZING_NONE)
+                fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
+            else
+                fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, elem->width, elem->height, result, elem->color);
         }
+        return;
     }
 
     if (mutableText->displayMode == DISPLAY_DEFINED && mutableText->currentValue == NULL)
@@ -238,7 +243,6 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
             strcat(result, " MiB");
     }
 
-render:
     if (mutableText->sizingMode == SIZING_NONE)
         fntRenderString(elem->font, elem->posX, elem->posY, elem->aligned, 0, 0, result, elem->color);
     else
@@ -1265,9 +1269,9 @@ static void thmRebuildGuiNames(void)
     guiThemesNames[nThemes + 1] = NULL;
 }
 
-int thmAddElements(char *path, const char *separator, int mode)
+int thmAddElements(char *path, const char *separator, int forceRefresh)
 {
-    int result;
+    int result, i;
 
     result = listDir(path, separator, THM_MAX_FILES - nThemes, &thmReadEntry);
     nThemes += result;
@@ -1276,8 +1280,10 @@ int thmAddElements(char *path, const char *separator, int mode)
     const char *temp;
     if (configGetStr(configGetByType(CONFIG_OPL), "theme", &temp)) {
         LOG("THEMES Trying to set again theme: %s\n", temp);
-        if (thmSetGuiValue(thmFindGuiID(temp), 0))
-            moduleUpdateMenu(mode, 1, 0);
+        if (thmSetGuiValue(thmFindGuiID(temp), 0) && forceRefresh) {
+            for (i = 0; i < MODE_COUNT; i++)
+                moduleUpdateMenu(i, 1, 0);
+        }
     }
 
     return result;
@@ -1293,7 +1299,7 @@ void thmInit(void)
     // initialize default internal
     thmLoad(NULL);
 
-    thmAddElements(gBaseMCDir, "/", -1);
+    thmAddElements(gBaseMCDir, "/", 0);
 }
 
 void thmReinit(const char *path)

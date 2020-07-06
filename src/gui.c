@@ -1253,6 +1253,7 @@ void guiDrawSubMenuHints(void)
     x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
 }
 
+static int endIntro = 0; // Break intro loop and start 'Last Played Auto Start' countdown
 static void guiDrawOverlays()
 {
     // are there any pending operations?
@@ -1308,7 +1309,7 @@ static void guiDrawOverlays()
 #endif
 
     // Last Played Auto Start
-    if (!pending && DisableCron == 0) {
+    if (!pending && DisableCron == 0 && endIntro) {
         if (CronStart == 0) {
             CronStart = clock() / CLOCKS_PER_SEC;
         } else {
@@ -1375,7 +1376,6 @@ static void guiShow()
 
 void guiIntroLoop(void)
 {
-    int endIntro = 0;
     int greetingAlpha = 0x80;
     const int fadeFrameCount = 0x80 / 2;
     const int fadeDuration = (fadeFrameCount * 1000) / 55; // Average between 50 and 60 fps

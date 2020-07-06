@@ -188,7 +188,7 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check
 
 all:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
@@ -314,6 +314,9 @@ pc_tools_win32:
 
 format:
 	find . -type f -not -path \*modules/network/SMSTCPIP\* -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -i
+
+format-check:
+	@! find . -type f -not -path \*modules/network/SMSTCPIP\* -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -style=file -output-replacements-xml | grep "<replacement " >/dev/null
 
 $(EE_ASM_DIR):
 	@mkdir -p $@

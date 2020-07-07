@@ -1314,7 +1314,7 @@ static void guiDrawOverlays()
             CronStart = clock() / CLOCKS_PER_SEC;
         } else {
             char strAutoStartInNSecs[21];
-            double CronCurrent;
+            clock_t CronCurrent;
 
             CronCurrent = clock() / CLOCKS_PER_SEC;
             RemainSecs = gAutoStartLastPlayed - (CronCurrent - CronStart);

@@ -10,6 +10,7 @@
 /* Module Description */
 IRX_ID(MODNAME, 1, 7);
 
+// clang-format off
 const u8 xortable[256] = {
     /* Table for the ECC calculation */
     0x00, 0x87, 0x96, 0x11, 0xA5, 0x22, 0x33, 0xB4,
@@ -45,6 +46,7 @@ const u8 xortable[256] = {
     0x00, 0x87, 0x96, 0x11, 0xA5, 0x22, 0x33, 0xB4,
     0xB4, 0x33, 0x22, 0xA5, 0x11, 0x96, 0x87, 0x00,
 };
+// clang-format on
 
 PtrSecrAuthCard pSecrAuthCard[MCEMU_PORTS] = {DummySecrAuthCard, DummySecrAuthCard}; /* Pointer to SecrAuthCard() handler */
 McImageSpec vmcSpec[MCEMU_PORTS] = {{0xC0DEFAC0}, {0xC0DEFAC1}};                     /* Virtual Memory Card Informations */

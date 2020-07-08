@@ -188,7 +188,7 @@ static int initializePad(struct pad_data_t *pad)
 }
 
 static void updatePadState(struct pad_data_t *pad, int state)
-{   //To simplify processing, monitor only Disconnected, FindCTP1 & Stable states.
+{ //To simplify processing, monitor only Disconnected, FindCTP1 & Stable states.
     if ((state == PAD_STATE_DISCONN) || (state == PAD_STATE_STABLE) || (state == PAD_STATE_FINDCTP1))
         pad->state = state;
 }

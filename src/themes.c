@@ -231,8 +231,7 @@ static void drawAttributeText(struct menu_list *menu, struct submenu_list *item,
     else if (!strncmp(mutableText->alias, "Size", 4)) {
         snprintf(result, sizeof(result), "%s%s", _l(_STR_SIZE), colon);
         addSuffix = 1;
-    }
-    else if (!strncmp(mutableText->alias, "Description", 11))
+    } else if (!strncmp(mutableText->alias, "Description", 11))
         snprintf(result, sizeof(result), "%s%s", _l(_STR_INFO_DESCRIPTION), colon);
     else
         snprintf(result, sizeof(result), "%s", mutableText->alias);
@@ -329,12 +328,14 @@ static image_texture_t *initImageTexture(const char *themePath, config_set_t *th
     if (themePath) {
         char path[256];
         snprintf(path, sizeof(path), "%s%s", themePath, imgName);
-        if (texDiscoverLoad(&texture->source, path, texId, psm) >= 0);
-            result = 1;
+        if (texDiscoverLoad(&texture->source, path, texId, psm) >= 0)
+            ;
+        result = 1;
     } else {
         texId = texLookupInternalTexId(imgName);
-        if (texDiscoverLoad(&texture->source, NULL, texId, psm) >= 0);
-            result = 1;
+        if (texDiscoverLoad(&texture->source, NULL, texId, psm) >= 0)
+            ;
+        result = 1;
     }
 
     if (result) {

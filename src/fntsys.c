@@ -441,7 +441,7 @@ void fntUpdateAspectRatio()
     rmGetScreenExtents(&w, &h);
     rmGetScreenExtentsNative(&wn, &hn);
     // Scale height from virtual resolution (640x480) to the native display resolution
-    hs = (float)hn/(float)h;
+    hs = (float)hn / (float)h;
     // Scale width according to the PAR (Pixel Aspect Ratio)
     ws = hs * rmGetPAR();
 
@@ -454,7 +454,7 @@ void fntUpdateAspectRatio()
         if (fonts[i].isValid) {
             fntCacheFlush(&fonts[i]);
             //TODO: this seems correct, but the rest of the OPL UI (i.e. spacers) doesn't seem to be correctly scaled.
-            FT_Set_Char_Size(fonts[i].face, FNTSYS_CHAR_SIZE*64, FNTSYS_CHAR_SIZE*64, fDPI*ws, fDPI*hs);
+            FT_Set_Char_Size(fonts[i].face, FNTSYS_CHAR_SIZE * 64, FNTSYS_CHAR_SIZE * 64, fDPI * ws, fDPI * hs);
         }
     }
 }
@@ -518,10 +518,9 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     }
 
     if (aligned & ALIGN_VCENTER) {
-        y += rmScaleY(FNTSYS_CHAR_SIZE-4) >> 1;
-    }
-    else {
-        y += rmScaleY(FNTSYS_CHAR_SIZE-2);
+        y += rmScaleY(FNTSYS_CHAR_SIZE - 4) >> 1;
+    } else {
+        y += rmScaleY(FNTSYS_CHAR_SIZE - 2);
     }
 
     quad.color = colour;
@@ -645,10 +644,9 @@ int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t he
     }
 
     if (aligned & ALIGN_VCENTER) {
-        y += rmScaleY(FNTSYS_CHAR_SIZE-4) >> 1;
-    }
-    else {
-        y += rmScaleY(FNTSYS_CHAR_SIZE-2);
+        y += rmScaleY(FNTSYS_CHAR_SIZE - 4) >> 1;
+    } else {
+        y += rmScaleY(FNTSYS_CHAR_SIZE - 2);
     }
 
     quad.color = colour;

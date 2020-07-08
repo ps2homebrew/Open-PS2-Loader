@@ -19,7 +19,7 @@ static void nopdelay(void)
 {
     unsigned int i;
 
-    for(i=0; i < 0x10000; i++)
+    for (i = 0; i < 0x10000; i++)
         asm volatile("nop\nnop\nnop\nnop\nnop");
 }
 
@@ -82,7 +82,7 @@ int _start(int argc, char **argv)
 {
     spuReset();
 
-   /* Let the SPU2 assert any interrupt that it needed to assert here.
+    /* Let the SPU2 assert any interrupt that it needed to assert here.
       Otherwise, the IOP may crash when OSDSYS loads CLEARSPU, as its interrupt handler jumps to a NULL pointer.
       For reasons, this doesn't seem to work when interrupts are enabled before the SPU reset. */
     EnableIntr(IOP_IRQ_DMA_SPU);
@@ -91,4 +91,3 @@ int _start(int argc, char **argv)
 
     return MODULE_NO_RESIDENT_END;
 }
-

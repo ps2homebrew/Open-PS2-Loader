@@ -18,10 +18,9 @@ int oplIGRShutdown(int poff)
     if (r < 0)
         return -E_SIF_RPC_BIND;
 
-    *(s32*)UNCACHED_SEG(&poffData) = poff;
+    *(s32 *)UNCACHED_SEG(&poffData) = poff;
     if (SifCallRpc(&_igr_cd, 1, SIF_RPC_M_NOWBDC, &poffData, sizeof(poffData), NULL, 0, NULL, NULL) < 0)
         return -E_SIF_RPC_CALL;
 
     return 0;
 }
-

@@ -36,14 +36,11 @@ void DeviceShutdown(void)
 {
     int i;
 
-    for (i = 0; i < 2; i++)
-    {
-        if (vmcSpec[i].active)
-        {
+    for (i = 0; i < 2; i++) {
+        if (vmcSpec[i].active) {
             smb_Close(vmcSpec[i].fid);
             vmcSpec[i].fid = 0xFFFF;
             vmcSpec[i].active = 0;
         }
     }
 }
-

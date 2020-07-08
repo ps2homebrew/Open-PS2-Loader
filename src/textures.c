@@ -88,7 +88,7 @@ extern void *logo_png;
 extern void *case_png;
 
 // Not related to screen size, just to limit at some point
-static int maxSize = 720*512*4;
+static int maxSize = 720 * 512 * 4;
 
 typedef struct
 {
@@ -327,10 +327,10 @@ static void texPngReadPixels8(GSTEXTURE *texture, png_bytep *rowPointers)
 
     // rotate clut
     for (i = 0; i < pngTexture.numPalette; i++) {
-        if ((i&0x18) == 8) {
+        if ((i & 0x18) == 8) {
             png_clut_t tmp = clut[i];
-            clut[i] = clut[i+8];
-            clut[i+8] = tmp;
+            clut[i] = clut[i + 8];
+            clut[i + 8] = tmp;
         }
     }
 
@@ -497,8 +497,7 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
                 memset(texture->Clut, 0, gsKit_texture_size_ee(8, 2, GS_PSM_CT32));
 
                 texPngReadPixels = &texPngReadPixels4;
-            }
-            else {
+            } else {
                 texture->PSM = GS_PSM_T8;
                 texture->Clut = memalign(128, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));
                 memset(texture->Clut, 0, gsKit_texture_size_ee(16, 16, GS_PSM_CT32));

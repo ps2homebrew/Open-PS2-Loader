@@ -18,11 +18,11 @@
 static int lockSema;
 static int evFlag;
 
-#define EV_ACTIVITY    1
-#define EV_TIMEOUT     2
+#define EV_ACTIVITY 1
+#define EV_TIMEOUT 2
 
 static int _lock(void)
-{   //Do polling, to keep the original behaviour.
+{ //Do polling, to keep the original behaviour.
     return PollSema(lockSema);
 }
 
@@ -44,10 +44,10 @@ static void _WaitEvent(void)
 
     sys_clock.lo = 368640; //10000us = 36.864MHz * 1000 * 1000 / 1000 * 10, as per the original timeout.
     sys_clock.hi = 0;
-    SetAlarm(&sys_clock, &EventTimeoutCb, (void*)evFlag);
-    WaitEventFlag(evFlag, EV_ACTIVITY|EV_TIMEOUT, WEF_OR|WEF_CLEAR, &bits);
+    SetAlarm(&sys_clock, &EventTimeoutCb, (void *)evFlag);
+    WaitEventFlag(evFlag, EV_ACTIVITY | EV_TIMEOUT, WEF_OR | WEF_CLEAR, &bits);
     if (!(bits & EV_TIMEOUT))
-        CancelAlarm(&EventTimeoutCb, (void*)evFlag);
+        CancelAlarm(&EventTimeoutCb, (void *)evFlag);
 }
 
 static void _iSetEvent(void)
@@ -63,15 +63,13 @@ int _start(int argc, char **argv)
     iop_event_t event;
     int modId, modRet;
 
-    if (argc != 2)
-    {
+    if (argc != 2) {
         printf("Missing module arg.\n");
         return MODULE_NO_RESIDENT_END;
     }
 
     modId = LoadModule(argv[1]);
-    if (modId < 0)
-    {
+    if (modId < 0) {
         printf("Failed to load %s (%d).\n", argv[1], modId);
         return MODULE_NO_RESIDENT_END;
     }
@@ -80,16 +78,14 @@ int _start(int argc, char **argv)
 
     //Locate the specified module.
     m = lc->image_info;
-    while (m != NULL)
-    {
+    while (m != NULL) {
         if (modId == m->id)
             break;
 
         m = m->next;
     }
 
-    if (m != NULL)
-    {
+    if (m != NULL) {
         sema.initial = 1;
         sema.max = 1;
         sema.option = 0;
@@ -103,20 +99,20 @@ int _start(int argc, char **argv)
         evFlag = CreateEventFlag(&event);
 
         /* Apply patch on module.  */
-        *(vu32*)(m->text_start + 0x00003bf8) = JAL((u32)&_lock);
-        *(vu32*)(m->text_start + 0x00003bfc) = 0x00000000;
-        *(vu32*)(m->text_start + 0x00003c04) = 0x14400046; //bnez $v0, exit
-        *(vu32*)(m->text_start + 0x00003c0c) = 0x00000000;
-        *(vu32*)(m->text_start + 0x00003d18) = JAL((u32)&_unlock);
-        *(vu32*)(m->text_start + 0x00003d1c) = 0x00000000;
+        *(vu32 *)(m->text_start + 0x00003bf8) = JAL((u32)&_lock);
+        *(vu32 *)(m->text_start + 0x00003bfc) = 0x00000000;
+        *(vu32 *)(m->text_start + 0x00003c04) = 0x14400046; //bnez $v0, exit
+        *(vu32 *)(m->text_start + 0x00003c0c) = 0x00000000;
+        *(vu32 *)(m->text_start + 0x00003d18) = JAL((u32)&_unlock);
+        *(vu32 *)(m->text_start + 0x00003d1c) = 0x00000000;
 
         //Replace event system that used iReleaseWaitThread() - which could break other functions that use a semaphore.
-        *(vu32*)(m->text_start + 0x00000348) = JAL((u32)&_WaitEvent);
-        *(vu32*)(m->text_start + 0x00000ac8) = JAL((u32)&_iSetEvent);
-        *(vu32*)(m->text_start + 0x00000bd0) = JAL((u32)&_iSetEvent);
-        *(vu32*)(m->text_start + 0x00001b88) = JAL((u32)&_iSetEvent);
+        *(vu32 *)(m->text_start + 0x00000348) = JAL((u32)&_WaitEvent);
+        *(vu32 *)(m->text_start + 0x00000ac8) = JAL((u32)&_iSetEvent);
+        *(vu32 *)(m->text_start + 0x00000bd0) = JAL((u32)&_iSetEvent);
+        *(vu32 *)(m->text_start + 0x00001b88) = JAL((u32)&_iSetEvent);
 
-//        FlushIcache(); //Flush instruction cache as instructions were modified.
+        //        FlushIcache(); //Flush instruction cache as instructions were modified.
 
         StartModule(modId, "", 0, NULL, &modRet);
 
@@ -127,4 +123,3 @@ int _start(int argc, char **argv)
 
     return MODULE_NO_RESIDENT_END;
 }
-

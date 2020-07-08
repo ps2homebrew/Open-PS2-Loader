@@ -388,51 +388,41 @@ static void ZombieZone_patches(unsigned int address)
 }
 
 static void DotHack_patches(const char *path)
-{   //.hack (PAL) has a multi-language selector that boots the main ELF. However, it does not call scePadEnd() before LoadExecPS2()
+{ //.hack (PAL) has a multi-language selector that boots the main ELF. However, it does not call scePadEnd() before LoadExecPS2()
     //We only want to patch the language selector and nothing else!
     static u32 patch[] = {
-        0x00000000,    //jal scePadEnd()
-        0x00000000,    //nop
-        0x27a40020,    //addiu $a0, $sp, $0020 (Contains boot path)
-        0x0000282d,    //move $a1, $zero
-        0x00000000,    //j LoadExecPS2()
-        0x0000302d,    //move $a2, $zero
+        0x00000000, //jal scePadEnd()
+        0x00000000, //nop
+        0x27a40020, //addiu $a0, $sp, $0020 (Contains boot path)
+        0x0000282d, //move $a1, $zero
+        0x00000000, //j LoadExecPS2()
+        0x0000302d, //move $a2, $zero
     };
     u32 *ptr, *pPadEnd, *pLoadExecPS2;
 
-    if (_strcmp(path, "cdrom0:\\SLES_522.37;1") == 0)
-    {
-        ptr = (void*)0x0011a5fc;
-        pPadEnd = (void*)0x00119290;
-	pLoadExecPS2 = (void*)FNADDR(ptr[2]);
-    }
-    else if (_strcmp(path, "cdrom0:\\SLES_524.67;1") == 0)
-    {
-        ptr = (void*)0x0011a8bc;
-        pPadEnd = (void*)0x00119550;
-	pLoadExecPS2 = (void*)FNADDR(ptr[2]);
-    }
-    else if (_strcmp(path, "cdrom0:\\SLES_524.68;1") == 0)
-    {
-        ptr = (void*)0x00111d34;
-        pPadEnd = (void*)0x001109b0;
-	pLoadExecPS2 = (void*)FNADDR(ptr[3]);
-    }
-    else if (_strcmp(path, "cdrom0:\\SLES_524.69;1") == 0)
-    {
-        ptr = (void*)0x00111d34;
-        pPadEnd = (void*)0x001109b0;
-	pLoadExecPS2 = (void*)FNADDR(ptr[3]);
-    }
-    else
-    {
+    if (_strcmp(path, "cdrom0:\\SLES_522.37;1") == 0) {
+        ptr = (void *)0x0011a5fc;
+        pPadEnd = (void *)0x00119290;
+        pLoadExecPS2 = (void *)FNADDR(ptr[2]);
+    } else if (_strcmp(path, "cdrom0:\\SLES_524.67;1") == 0) {
+        ptr = (void *)0x0011a8bc;
+        pPadEnd = (void *)0x00119550;
+        pLoadExecPS2 = (void *)FNADDR(ptr[2]);
+    } else if (_strcmp(path, "cdrom0:\\SLES_524.68;1") == 0) {
+        ptr = (void *)0x00111d34;
+        pPadEnd = (void *)0x001109b0;
+        pLoadExecPS2 = (void *)FNADDR(ptr[3]);
+    } else if (_strcmp(path, "cdrom0:\\SLES_524.69;1") == 0) {
+        ptr = (void *)0x00111d34;
+        pPadEnd = (void *)0x001109b0;
+        pLoadExecPS2 = (void *)FNADDR(ptr[3]);
+    } else {
         ptr = NULL;
         pPadEnd = NULL;
-	pLoadExecPS2 = NULL;
+        pLoadExecPS2 = NULL;
     }
 
-    if (ptr != NULL && pPadEnd != NULL && pLoadExecPS2 != NULL)
-    {
+    if (ptr != NULL && pPadEnd != NULL && pLoadExecPS2 != NULL) {
         patch[0] = JAL((u32)pPadEnd);
         patch[4] = JMP((u32)pLoadExecPS2);
         memcpy(ptr, patch, sizeof(patch));
@@ -502,25 +492,24 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
     unsigned int iremsndpatch_irx_size;
     char modIdStr[3];
 
-    switch(g_mode)
-    {
+    switch (g_mode) {
         case 0: //NTSC-J
-            _pSifLoadModule = (void*)0x001d0680;
-            pSifAllocIopHeap = (void*)0x001cfc30;
-            pSifFreeIopHeap = (void*)0x001cfd20;
-            pSifLoadModuleBuffer = (void*)0x001d0640;
+            _pSifLoadModule = (void *)0x001d0680;
+            pSifAllocIopHeap = (void *)0x001cfc30;
+            pSifFreeIopHeap = (void *)0x001cfd20;
+            pSifLoadModuleBuffer = (void *)0x001d0640;
             break;
         case 1: //NTSC-U/C
-            _pSifLoadModule = (void*)0x001d0580;
-            pSifAllocIopHeap = (void*)0x001cfb30;
-            pSifFreeIopHeap = (void*)0x001cfc20;
-            pSifLoadModuleBuffer = (void*)0x001d0540;
+            _pSifLoadModule = (void *)0x001d0580;
+            pSifAllocIopHeap = (void *)0x001cfb30;
+            pSifFreeIopHeap = (void *)0x001cfc20;
+            pSifLoadModuleBuffer = (void *)0x001d0540;
             break;
         case 2: //PAL
-            _pSifLoadModule = (void*)0x001d11c0;
-            pSifAllocIopHeap = (void*)0x001d0770;
-            pSifFreeIopHeap = (void*)0x001d0860;
-            pSifLoadModuleBuffer = (void*)0x001d1180;
+            _pSifLoadModule = (void *)0x001d11c0;
+            pSifAllocIopHeap = (void *)0x001d0770;
+            pSifFreeIopHeap = (void *)0x001d0860;
+            pSifLoadModuleBuffer = (void *)0x001d1180;
             break;
         default:
             _pSifLoadModule = NULL;
@@ -533,13 +522,11 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
 
     ret = _pSifLoadModule(path, arg_len, args, modres, fno);
 
-    if((ret >= 0) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0))
-    {
+    if ((ret >= 0) && (_strcmp(path, "cdrom0:\\IOP\\IREMSND.IRX;1") == 0)) {
         GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &iremsndpatch_irx, &iremsndpatch_irx_size);
 
         iopmem = pSifAllocIopHeap(iremsndpatch_irx_size);
-        if(iopmem != NULL)
-        {
+        if (iopmem != NULL) {
             sifdma.src = iremsndpatch_irx;
             sifdma.dest = iopmem;
             sifdma.size = iremsndpatch_irx_size;
@@ -557,8 +544,7 @@ static int SOS_SifLoadModuleHook(const char *path, int arg_len, const char *args
             } while (ret2 < 0);
 
             pSifFreeIopHeap(iopmem);
-        }
-        else
+        } else
             asm volatile("break\n");
     }
 
@@ -569,9 +555,8 @@ static void SOSPatch(int region)
 {
     g_mode = region;
 
-    switch(region)
-    {    // JAL SOS_SifLoadModuleHook - replace call to _SifLoadModule.
-        case 0: //NTSC-J
+    switch (region) { // JAL SOS_SifLoadModuleHook - replace call to _SifLoadModule.
+        case 0:       //NTSC-J
             _sw(JAL((u32)&SOS_SifLoadModuleHook), 0x001d08b4);
             break;
         case 1: //NTSC-U/C
@@ -594,13 +579,13 @@ static void VirtuaQuest_patches(void)
 
     //Fix the stack base pointer for SetupThread(), so that the EE kernel will not reserve 4KB.
     //0x02000000 - 0x18000 = 0x01FE8000
-    _sw(0x3c0501fe, 0x000a019c);    //lui $a1, $01fe
-    _sw(0x34a58000, 0x000a01b0);    //ori a1, a1, $8000
+    _sw(0x3c0501fe, 0x000a019c); //lui $a1, $01fe
+    _sw(0x34a58000, 0x000a01b0); //ori a1, a1, $8000
 
     //Change end of memory pointer (game will subtract 0x18000 from it).
     //0x02000000 - (0x39000 - 0x18000) = 0x1FDF000
-    _sw(0x3c0301fd, 0x000c565c);    //lui $v1, 0x01fd
-    _sw(0x3463f000, 0x000c566c);    //ori $v1, $v1, 0xf000
+    _sw(0x3c0301fd, 0x000c565c); //lui $v1, 0x01fd
+    _sw(0x3463f000, 0x000c566c); //ori $v1, $v1, 0xf000
 }
 
 enum ULTPROPINBALL_ELF {
@@ -622,31 +607,30 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
     void *apemodpatch_irx;
     unsigned int apemodpatch_irx_size;
 
-    switch(g_mode & 0xf)
-    {
+    switch (g_mode & 0xf) {
         case ULTPROPINBALL_ELF_MAIN:
-            pSifLoadModule = (void*)0x001d0140;
-            pSifAllocIopHeap = (void*)0x001cf278;
-            pSifFreeIopHeap = (void*)0x001cf368;
-            pSifLoadModuleBuffer = (void*)0x001cfed8;
+            pSifLoadModule = (void *)0x001d0140;
+            pSifAllocIopHeap = (void *)0x001cf278;
+            pSifFreeIopHeap = (void *)0x001cf368;
+            pSifLoadModuleBuffer = (void *)0x001cfed8;
             break;
         case ULTPROPINBALL_ELF_BR:
-            pSifLoadModule = (void*)0x0023aa80;
-            pSifAllocIopHeap = (void*)0x00239bb8;
-            pSifFreeIopHeap = (void*)0x00239ca8;
-            pSifLoadModuleBuffer = (void*)0x0023a818;
+            pSifLoadModule = (void *)0x0023aa80;
+            pSifAllocIopHeap = (void *)0x00239bb8;
+            pSifFreeIopHeap = (void *)0x00239ca8;
+            pSifLoadModuleBuffer = (void *)0x0023a818;
             break;
         case ULTPROPINBALL_ELF_FJ:
-            pSifLoadModule = (void*)0x00224740;
-            pSifAllocIopHeap = (void*)0x00223878;
-            pSifFreeIopHeap = (void*)0x00223968;
-            pSifLoadModuleBuffer = (void*)0x002244d8;
+            pSifLoadModule = (void *)0x00224740;
+            pSifAllocIopHeap = (void *)0x00223878;
+            pSifFreeIopHeap = (void *)0x00223968;
+            pSifLoadModuleBuffer = (void *)0x002244d8;
             break;
         case ULTPROPINBALL_ELF_TS:
-            pSifLoadModule = (void*)0x00233040;
-            pSifAllocIopHeap = (void*)0x00232178;
-            pSifFreeIopHeap = (void*)0x00232268;
-            pSifLoadModuleBuffer = (void*)0x00232dd8;
+            pSifLoadModule = (void *)0x00233040;
+            pSifAllocIopHeap = (void *)0x00232178;
+            pSifFreeIopHeap = (void *)0x00232268;
+            pSifLoadModuleBuffer = (void *)0x00232dd8;
             break;
         default:
             pSifLoadModule = NULL;
@@ -659,13 +643,11 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
 
     if (_strcmp(path, "cdrom0:\\APEMOD.IRX;1") != 0)
         ret = pSifLoadModule(path, arg_len, args);
-    else
-    {
+    else {
         GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &apemodpatch_irx, &apemodpatch_irx_size);
 
         iopmem = pSifAllocIopHeap(apemodpatch_irx_size);
-        if(iopmem != NULL)
-        {
+        if (iopmem != NULL) {
             sifdma.src = apemodpatch_irx;
             sifdma.dest = iopmem;
             sifdma.size = apemodpatch_irx_size;
@@ -679,11 +661,9 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
             } while (ret < 0);
 
             pSifFreeIopHeap(iopmem);
-        }
-        else
-        {
-           ret = -1;
-           asm volatile("break\n");
+        } else {
+            ret = -1;
+            asm volatile("break\n");
         }
     }
 
@@ -692,37 +672,30 @@ static int UltProPinball_SifLoadModuleHook(const char *path, int arg_len, const 
 
 static void UltProPinballPatch(const char *path)
 {
-    if (_strcmp(path, "cdrom0:\\SLES_535.08;1") == 0)
-    {
+    if (_strcmp(path, "cdrom0:\\SLES_535.08;1") == 0) {
         _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x0012e47c);
         g_mode = ULTPROPINBALL_ELF_MAIN;
-    }
-    else if (_strcmp(path, "cdrom0:\\BR.ELF;1") == 0)
-    {
+    } else if (_strcmp(path, "cdrom0:\\BR.ELF;1") == 0) {
         _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x00196a3c);
         g_mode = ULTPROPINBALL_ELF_BR;
-    }
-    else if (_strcmp(path, "cdrom0:\\FJ.ELF;1") == 0)
-    {
+    } else if (_strcmp(path, "cdrom0:\\FJ.ELF;1") == 0) {
         _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x00180f2c);
         g_mode = ULTPROPINBALL_ELF_FJ;
-    }
-    else if (_strcmp(path, "cdrom0:\\TS.ELF;1") == 0)
-    {
+    } else if (_strcmp(path, "cdrom0:\\TS.ELF;1") == 0) {
         _sw(JAL((u32)&UltProPinball_SifLoadModuleHook), 0x0018d434);
         g_mode = ULTPROPINBALL_ELF_TS;
     }
 }
 
 static void EutechnyxWakeupTIDPatch(u32 addr)
-{   //Eutechnyx games have the main thread ID hardcoded for a call to WakeupThread().
+{ //Eutechnyx games have the main thread ID hardcoded for a call to WakeupThread().
     // addiu $a0, $zero, 1
     //This breaks when the thread IDs change after IGR is used.
-    *(vu16*)addr = (u16)GetThreadId();
+    *(vu16 *)addr = (u16)GetThreadId();
 }
 
 static void ProSnowboarderPatch(void)
-{   //Shaun Palmer's Pro Snowboarder incorrectly uses the main thread ID as the priority, causing a deadlock when the main thread ID changes (ID != priority)
+{ //Shaun Palmer's Pro Snowboarder incorrectly uses the main thread ID as the priority, causing a deadlock when the main thread ID changes (ID != priority)
     //Replace all jal GetThreadId() with a li $v0, 1, whereby 1 is the main thread's priority (never changed by game).
     static const unsigned int pattern[] = {
         0x240300ff, //addiu $v1, $zero, 0xff
@@ -739,19 +712,16 @@ static void ProSnowboarderPatch(void)
 
     //Locate the calls to GetThreadId().
     ptr = find_pattern_with_mask((u32 *)0x00180000, 0x00280000, pattern, pattern_mask, sizeof(pattern));
-    if (ptr)
-    {
-        ptr2 = find_pattern_with_mask(ptr+4, 0x00280000, pattern, pattern_mask, sizeof(pattern));
+    if (ptr) {
+        ptr2 = find_pattern_with_mask(ptr + 4, 0x00280000, pattern, pattern_mask, sizeof(pattern));
 
-        if (ptr2)
-        {
-            ptr3 = find_pattern_with_mask(ptr2+4, 0x00280000, pattern, pattern_mask, sizeof(pattern));
+        if (ptr2) {
+            ptr3 = find_pattern_with_mask(ptr2 + 4, 0x00280000, pattern, pattern_mask, sizeof(pattern));
 
-            if (ptr3)
-            {
-                *(vu32*)&ptr[-12] = 0x24020001; //addiu $v0, $zero, 1
-                *(vu32*)&ptr2[-9] = 0x24020001; //addiu $v0, $zero, 1
-                *(vu32*)&ptr3[-9] = 0x24020001; //addiu $v0, $zero, 1
+            if (ptr3) {
+                *(vu32 *)&ptr[-12] = 0x24020001; //addiu $v0, $zero, 1
+                *(vu32 *)&ptr2[-9] = 0x24020001; //addiu $v0, $zero, 1
+                *(vu32 *)&ptr3[-9] = 0x24020001; //addiu $v0, $zero, 1
             }
         }
     }
@@ -769,25 +739,24 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
     void *f2techioppatch_irx;
     unsigned int f2techioppatch_irx_size;
 
-    switch(g_mode)
-    {
+    switch (g_mode) {
         case 1: //NTSC-U/C
-            pSifLoadModule = (void*)0x00234188;
-            pSifAllocIopHeap = (void*)0x239df0;
-            pSifFreeIopHeap = (void*)0x239f58;
-            pSifLoadModuleBuffer = (void*)0x00233f20;
+            pSifLoadModule = (void *)0x00234188;
+            pSifAllocIopHeap = (void *)0x239df0;
+            pSifFreeIopHeap = (void *)0x239f58;
+            pSifLoadModuleBuffer = (void *)0x00233f20;
             break;
         case 2: //PAL
-            pSifLoadModule = (void*)0x002336c8;
-            pSifAllocIopHeap = (void*)0x00239330;
-            pSifFreeIopHeap = (void*)0x00239498;
-            pSifLoadModuleBuffer = (void*)0x00233460;
+            pSifLoadModule = (void *)0x002336c8;
+            pSifAllocIopHeap = (void *)0x00239330;
+            pSifFreeIopHeap = (void *)0x00239498;
+            pSifLoadModuleBuffer = (void *)0x00233460;
             break;
         case 3: //PAL German
-            pSifLoadModule = (void*)0x00233588;
-            pSifAllocIopHeap = (void*)0x002391f0;
-            pSifFreeIopHeap = (void*)0x00239358;
-            pSifLoadModuleBuffer = (void*)0x00233320;
+            pSifLoadModule = (void *)0x00233588;
+            pSifAllocIopHeap = (void *)0x002391f0;
+            pSifFreeIopHeap = (void *)0x00239358;
+            pSifLoadModuleBuffer = (void *)0x00233320;
             break;
         default:
             pSifLoadModule = NULL;
@@ -801,8 +770,7 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
     GetOPLModInfo(OPL_MODULE_ID_IOP_PATCH, &f2techioppatch_irx, &f2techioppatch_irx_size);
 
     iopmem = pSifAllocIopHeap(f2techioppatch_irx_size);
-    if(iopmem != NULL)
-    {
+    if (iopmem != NULL) {
         sifdma.src = f2techioppatch_irx;
         sifdma.dest = iopmem;
         sifdma.size = f2techioppatch_irx_size;
@@ -816,9 +784,7 @@ static int ShadowMan2_SifLoadModuleHook(const char *path, int arg_len, const cha
         } while (ret < 0);
 
         pSifFreeIopHeap(iopmem);
-    }
-    else
-    {
+    } else {
         ret = -1;
         asm volatile("break\n");
     }
@@ -830,9 +796,8 @@ static void ShadowMan2Patch(int region)
 {
     g_mode = region;
 
-    switch(region)
-    {    // JAL ShadowMan2_SifLoadModuleHook.
-        case 1: //NTSC-U/C
+    switch (region) { // JAL ShadowMan2_SifLoadModuleHook.
+        case 1:       //NTSC-U/C
             _sw(JAL((u32)&ShadowMan2_SifLoadModuleHook), 0x001d2838);
             break;
         case 2: //PAL
@@ -846,7 +811,7 @@ static void ShadowMan2Patch(int region)
 
 static void HarvestMoonAWLPatch(int region)
 {
-/* Harvest Moon create alot of threads. When the game gets stuck, all the threads are either suspended or waiting.
+    /* Harvest Moon create alot of threads. When the game gets stuck, all the threads are either suspended or waiting.
    What seems to be happening is thread 16 trying to wake up the main thread. However, this might be failing because
    the game also has additional checks around WakeupThread, to prevent a thread from waking up another thread
    if the thread to be woken up is not in a Wait state. So if the main thread has not slept, the main thread will
@@ -862,8 +827,7 @@ static void HarvestMoonAWLPatch(int region)
 
    The mistake may be made in various places, but seems to only affect the game's initial loading screen. */
 
-    switch(region)
-    {
+    switch (region) {
         case 1: //NTSC-U/C
         case 2: //PAL
             _sw(0x00000000, 0x0011b694);
@@ -915,7 +879,7 @@ void apply_patches(const char *path)
                 case PATCH_SOS:
                     SOSPatch(p->patch.val);
                     break;
-		case PATCH_VIRTUA_QUEST:
+                case PATCH_VIRTUA_QUEST:
                     VirtuaQuest_patches();
                     break;
                 case PATCH_ULT_PRO_PINBALL:

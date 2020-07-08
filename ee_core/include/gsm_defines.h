@@ -30,20 +30,20 @@
 .equ GS_BGCOLOUR, 0x00E0
 .equ GS_CSR,      0x1000
 
-# Add-on video modes (made possible by SP193 and reprep)
+#Add - on video modes(made possible by SP193 and reprep)
 GS_MODE_DTV_576P=0x53
 
-# GSMSourceSetGsCrt
+#GSMSourceSetGsCrt
 .equ Source_INT,      0 # HALF
 .equ Source_MODE,     2 # HALF
 .equ Source_FFMD,     4 # HALF
 
-# GSMDestSetGsCrt
+#GSMDestSetGsCrt
 .equ Target_INT,      0 # HALF
 .equ Target_MODE,     2 # HALF
 .equ Target_FFMD,     4 # HALF
 
-# GSMSourceGSRegs
+#GSMSourceGSRegs
 .equ Source_PMODE,     0 # DWORD
 .equ Source_SMODE1,    8 # DWORD
 .equ Source_SMODE2,   16 # DWORD
@@ -56,7 +56,7 @@ GS_MODE_DTV_576P=0x53
 .equ Source_DISPFB2,  72 # DWORD
 .equ Source_DISPLAY2, 80 # DWORD
 
-# GSMDestGSRegs
+#GSMDestGSRegs
 .equ Target_PMODE,     0 # DWORD
 .equ Target_SMODE1,    8 # DWORD
 .equ Target_SMODE2,   16 # DWORD
@@ -69,7 +69,7 @@ GS_MODE_DTV_576P=0x53
 .equ Target_DISPFB2,  72 # DWORD
 .equ Target_DISPLAY2, 80 # DWORD
 
-# GSMFlags
+#GSMFlags
 .equ X_offset,              0 # WORD
 .equ Y_offset,              4 # WORD
 .equ ADAPTATION_fix,        8 # BYTE
@@ -84,9 +84,8 @@ GS_MODE_DTV_576P=0x53
 .equ FIELD_fix,            17 # BYTE
 .equ gs576P_param,         18 # BYTE
 
-# GSMAdapts
+#GSMAdapts
 .equ Adapted_DISPLAY1,             0 # DWORD
 .equ Adapted_DISPLAY2,             8 # DWORD
 .equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
 .equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value
-

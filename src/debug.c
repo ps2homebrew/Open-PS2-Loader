@@ -55,4 +55,3 @@ void debugApplyConfig(void)
         ethApplyConfig();
 #endif
 }
-

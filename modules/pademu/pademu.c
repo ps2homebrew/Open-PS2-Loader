@@ -210,7 +210,7 @@ void pademu_hookSio2man(sio2_transfer_data_t *td, Sio2McProc sio2proc)
     if ((ctrl & 0xF0) == 0x40) {
         if (td->port_ctrl2[port1] == 0x00030064 && td->in[0] == 0x21 && mtap_enabled) {
             sio2proc = pademu_mtap;
-        } else if(td->in[0] == 0x01) {
+        } else if (td->in[0] == 0x01) {
             if (port2 == 1) { //2 sio cmds
                 if (mtap_inited) {
                     if (pad[0].enabled) {
@@ -357,7 +357,7 @@ void pademu(sio2_transfer_data_t *td)
         out = td->out;
         port = port1;
         cmd_size = td->in_size;
-        
+
         if (mtap_inited) {
             port = mtap_slot;
         }
@@ -495,8 +495,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 }
 
 static u8 mtap_data[] = {
-    0xff, 0x80, 0x5a, 0x00, 0x00, 0x5a
-};
+    0xff, 0x80, 0x5a, 0x00, 0x00, 0x5a};
 
 #define MAX_SLOT 4
 

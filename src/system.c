@@ -142,7 +142,7 @@ void sysInitDev9(void)
 
     if (!dev9Initialized) {
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-        dev9Loaded = (ret == 0);  //DEV9.IRX must have successfully loaded and returned RESIDENT END.
+        dev9Loaded = (ret == 0); //DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
     }
 
@@ -151,14 +151,11 @@ void sysInitDev9(void)
 
 void sysShutdownDev9(void)
 {
-    if (dev9InitCount > 0)
-    {
+    if (dev9InitCount > 0) {
         --dev9InitCount;
 
-        if (dev9InitCount == 0)
-        {   /* Switch off DEV9 once nothing needs it. */
-            if (dev9Loaded)
-            {
+        if (dev9InitCount == 0) { /* Switch off DEV9 once nothing needs it. */
+            if (dev9Loaded) {
                 while (fileXioDevctl("dev9x:", DDIOC_OFF, NULL, 0, NULL, 0) < 0) {
                 };
             }
@@ -383,14 +380,14 @@ typedef struct
 
 //Blank string for mode = all modes.
 static const patchlist_t iop_patch_list[] = {
-    {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Disaster Report
-    {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //SOS: The Final Escape
-    {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},    //Zettai Zetsumei Toshi
-    {"SLES_535.08", "", &apemodpatch_irx, &size_apemodpatch_irx},      //Ultimate Pro Pinball
+    {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     //Disaster Report
+    {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     //SOS: The Final Escape
+    {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     //Zettai Zetsumei Toshi
+    {"SLES_535.08", "", &apemodpatch_irx, &size_apemodpatch_irx},       //Ultimate Pro Pinball
     {"SLUS_204.13", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (NTSC-U/C)
     {"SLES_504.46", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (PAL)
     {"SLES_506.08", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (PAL German)
-    {NULL, NULL, NULL, NULL },  //Terminator
+    {NULL, NULL, NULL, NULL},                                           //Terminator
 };
 
 static unsigned int addIopPatch(const char *mode_str, const char *startup, irxptr_t *tab)
@@ -398,12 +395,10 @@ static unsigned int addIopPatch(const char *mode_str, const char *startup, irxpt
     const patchlist_t *p;
     int i;
 
-    for (i = 0; iop_patch_list[i].game != NULL; i++)
-    {
+    for (i = 0; iop_patch_list[i].game != NULL; i++) {
         p = &iop_patch_list[i];
 
-        if (!strcmp(p->game, startup) && (p->mode[0] == '\0' || !strcmp(p->mode, startup)))
-        {
+        if (!strcmp(p->game, startup) && (p->mode[0] == '\0' || !strcmp(p->mode, startup))) {
             tab->info = (*(p->module_size)) | SET_OPL_MOD_ID(OPL_MODULE_ID_IOP_PATCH);
             tab->ptr = (void *)p->module;
             return 1;
@@ -420,9 +415,9 @@ typedef struct
 } modStorageSetting_t;
 
 static const modStorageSetting_t mod_storage_location_list[] = {
-    {"SLUS_209.77", (void*)0x01fc7000},    //Virtua Quest
-    {"SLPM_656.32", (void*)0x01fc7000},    //Virtua Fighter Cyber Generation: Judgment Six No Yabou
-    {NULL, NULL },                         //Terminator
+    {"SLUS_209.77", (void *)0x01fc7000}, //Virtua Quest
+    {"SLPM_656.32", (void *)0x01fc7000}, //Virtua Fighter Cyber Generation: Judgment Six No Yabou
+    {NULL, NULL},                        //Terminator
 };
 
 static void *GetModStorageLocation(const char *startup, unsigned compatFlags)
@@ -430,17 +425,15 @@ static void *GetModStorageLocation(const char *startup, unsigned compatFlags)
     const modStorageSetting_t *p;
     int i;
 
-    for (i = 0; mod_storage_location_list[i].game != NULL; i++)
-    {
+    for (i = 0; mod_storage_location_list[i].game != NULL; i++) {
         p = &mod_storage_location_list[i];
 
-        if (!strcmp(p->game, startup))
-        {
+        if (!strcmp(p->game, startup)) {
             return p->addr;
         }
     }
 
-    return((void *)OPL_MOD_STORAGE);
+    return ((void *)OPL_MOD_STORAGE);
 }
 
 static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, unsigned int modules, void *ModuleStorage, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx)
@@ -646,26 +639,24 @@ static void *initLoadExecPS2(void *new_eeload)
 
     /* The pattern of the code in LoadExecPS2() that prepares the kernel for copying EELOAD from rom0: */
     static const unsigned int initEELOADCopyPattern[] = {
-        0x8FA30010,    /* lw       v1, 0x0010(sp) */
-        0x0240302D,    /* daddu    a2, s2, zero */
-        0x8FA50014,    /* lw       a1, 0x0014(sp) */
-        0x8C67000C,    /* lw       a3, 0x000C(v1) */
-        0x18E00009,    /* blez     a3, +9 <- The kernel will skip the EELOAD copying loop if the value in $a3 is less than, or equal to 0. Lets do that... */
+        0x8FA30010, /* lw       v1, 0x0010(sp) */
+        0x0240302D, /* daddu    a2, s2, zero */
+        0x8FA50014, /* lw       a1, 0x0014(sp) */
+        0x8C67000C, /* lw       a3, 0x000C(v1) */
+        0x18E00009, /* blez     a3, +9 <- The kernel will skip the EELOAD copying loop if the value in $a3 is less than, or equal to 0. Lets do that... */
     };
 
     u32 *p;
 
     result = NULL;
     /* Find the part of LoadExecPS2() that initilizes the EELOAD copying loop's variables */
-    for(p = (u32 *)0x80001000; p < (u32 *)0x80030000; p++)
-    {
-        if(memcmp(p, &initEELOADCopyPattern, sizeof(initEELOADCopyPattern)) == 0)
-        {
+    for (p = (u32 *)0x80001000; p < (u32 *)0x80030000; p++) {
+        if (memcmp(p, &initEELOADCopyPattern, sizeof(initEELOADCopyPattern)) == 0) {
             p[1] = 0x3C120000 | (u16)((u32)new_eeload >> 16);    /* lui s2, HI16(new_eeload) */
             p[2] = 0x36520000 | (u16)((u32)new_eeload & 0xFFFF); /* ori s2, s2, LO16(new_eeload) */
             p[3] = 0x24070000;                                   /* li a3, 0 <- Disable the EELOAD copying loop */
-            result = (void*)p;
-            break;    /* All done. */
+            result = (void *)p;
+            break; /* All done. */
         }
     }
 
@@ -682,8 +673,7 @@ static void *initInitializeUserMemory(void *start)
     void *result;
 
     result = NULL;
-    for (p = (unsigned int*)0x80001000; p < (unsigned int*)0x80030000; p++)
-    {
+    for (p = (unsigned int *)0x80001000; p < (unsigned int *)0x80030000; p++) {
         /*
          * Search for function call and where $a0 is set.
          *  lui  $a0, 0x0008
@@ -693,7 +683,7 @@ static void *initInitializeUserMemory(void *start)
         if (p[0] == 0x3c040008 && (p[1] & 0xfc000000) == 0x0c000000 && p[2] == 0x34842000) {
             p[0] = 0x3c040000 | ((unsigned int)start >> 16);
             p[2] = 0x34840000 | ((unsigned int)start & 0xffff);
-            result = (void*)p;
+            result = (void *)p;
             break;
         }
     }
@@ -715,7 +705,7 @@ static int initKernel(void *eeload, void *modStorageEnd, void **eeloadCopy, void
     ee_kmode_exit();
     EI();
 
-    return((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
+    return ((*eeloadCopy != NULL && *initUserMemory != NULL) ? 0 : -1);
 }
 
 void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdvdman_irx, void **cdvdman_irx, int size_mcemu_irx, void **mcemu_irx, int EnablePS2Logo, unsigned int compatflags)
@@ -765,7 +755,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     LOG("SYSTEM LaunchLoaderElf loading modules\n");
     ModuleStorageSize = (sendIrxKernelRAM(filename, mode_str, modules, ModuleStorage, size_cdvdman_irx, cdvdman_irx, size_mcemu_irx, mcemu_irx) + 0x3F) & ~0x3F;
 
-    ModuleStorageEnd = (void*)((u8*)ModuleStorage + ModuleStorageSize);
+    ModuleStorageEnd = (void *)((u8 *)ModuleStorage + ModuleStorageSize);
     sprintf(ModStorageConfig, "%u %u", (unsigned int)ModuleStorage, (unsigned int)ModuleStorageEnd);
 
     // NB: LOADER.ELF is embedded
@@ -787,8 +777,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     }
 
     //Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
-    if(initKernel((void*)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0)
-    {   //Should not happen, but...
+    if (initKernel((void *)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0) { //Should not happen, but...
         LOG("Error - kernel is unsupported.\n");
         asm volatile("break\n");
     }
@@ -820,7 +809,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argv[i] = ModStorageConfig;
     i++;
 
-    argv[i] = (char*)filename;
+    argv[i] = (char *)filename;
     i++;
 
     char cmask[10];
@@ -845,11 +834,11 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     //Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
     if (EnablePS2Logo) {
         argv[i] = "rom0:PS2LOGO";
-        argv[i+1] = ElfPath;
-        ExecPS2((void*)eh->entry, NULL, i + 2, argv);
+        argv[i + 1] = ElfPath;
+        ExecPS2((void *)eh->entry, NULL, i + 2, argv);
     } else {
         argv[i] = ElfPath;
-        ExecPS2((void*)eh->entry, NULL, i + 1, argv);
+        ExecPS2((void *)eh->entry, NULL, i + 1, argv);
     }
 }
 
@@ -888,7 +877,7 @@ int sysExecElf(const char *path)
     fileXioExit();
     SifExitRpc();
 
-    elf_argv[0] = (char*)path;
+    elf_argv[0] = (char *)path;
 
     FlushCache(0);
     FlushCache(2);
@@ -974,4 +963,3 @@ int sysCheckVMC(const char *prefix, const char *sep, char *name, int createSize,
     }
     return size;
 }
-

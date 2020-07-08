@@ -123,7 +123,7 @@ static void longLseek(int fd, unsigned int lba)
         lseek(fd, INT_MAX / 2048 * 2048, SEEK_SET);
 
         remaining = lba - INT_MAX / 2048;
-        while(remaining > 0) {
+        while (remaining > 0) {
             toSeek = remaining > INT_MAX / 2048 ? INT_MAX / 2048 : remaining;
             lseek(fd, toSeek * 2048, SEEK_CUR);
             remaining -= toSeek;

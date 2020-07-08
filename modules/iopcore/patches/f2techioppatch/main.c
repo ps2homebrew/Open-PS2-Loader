@@ -20,15 +20,13 @@ int _start(int argc, char **argv)
     ModuleInfo_t *m;
     int modId, modRet;
 
-    if (argc != 2)
-    {
+    if (argc != 2) {
         printf("Missing module arg.\n");
         return MODULE_NO_RESIDENT_END;
     }
 
     modId = LoadModule(argv[1]);
-    if (modId < 0)
-    {
+    if (modId < 0) {
         printf("Failed to load %s (%d).\n", argv[1], modId);
         return MODULE_NO_RESIDENT_END;
     }
@@ -37,18 +35,16 @@ int _start(int argc, char **argv)
 
     //Locate the specified module.
     m = lc->image_info;
-    while (m != NULL)
-    {
+    while (m != NULL) {
         if (modId == m->id)
             break;
 
         m = m->next;
     }
 
-    if (m != NULL)
-    {   //Increase size of CompBuffers, to allow for 17 sectors to be stored.
-        *(u16*)(m->text_start + 0x000016b8) = 0x8800; //Original: 0x8000
-        *(u16*)(m->text_start + 0x000016bc) = 0x8800; //Original: 0x8000
+    if (m != NULL) {                                   //Increase size of CompBuffers, to allow for 17 sectors to be stored.
+        *(u16 *)(m->text_start + 0x000016b8) = 0x8800; //Original: 0x8000
+        *(u16 *)(m->text_start + 0x000016bc) = 0x8800; //Original: 0x8000
 
         StartModule(modId, "", 0, NULL, &modRet);
 
@@ -59,4 +55,3 @@ int _start(int argc, char **argv)
 
     return MODULE_NO_RESIDENT_END;
 }
-

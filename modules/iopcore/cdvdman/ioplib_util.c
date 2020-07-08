@@ -19,7 +19,8 @@
     } while (0)
 #endif
 
-typedef struct ModuleStatus {
+typedef struct ModuleStatus
+{
     char name[56];
     u16 version;
     u16 flags;
@@ -43,7 +44,8 @@ static int (*SearchModuleByName)(char *modname);
 static int (*ReferModuleStatus)(int mid, ModuleStatus_t *status);
 
 // modules list to fake loading
-struct FakeModule {
+struct FakeModule
+{
     const char *fname;
     const char *name;
     int id; //ID to return to the game.
@@ -62,23 +64,22 @@ enum FAKE_MODULE_ID {
 
 static struct FakeModule modulefake_list[] = {
 #ifdef __USE_DEV9
-    { "DEV9.IRX", "dev9", FAKE_MODULE_ID_DEV9, 0x0208, 0 },
+    {"DEV9.IRX", "dev9", FAKE_MODULE_ID_DEV9, 0x0208, 0},
 #endif
 #ifdef USB_DRIVER
-    { "USBD.IRX", "USB_driver", FAKE_MODULE_ID_USBD, 0x0204, 2 },
+    {"USBD.IRX", "USB_driver", FAKE_MODULE_ID_USBD, 0x0204, 2},
 #endif
 #ifdef SMB_DRIVER
-    { "SMAP.IRX", "INET_SMAP_driver", FAKE_MODULE_ID_SMAP, 0x0219, 2 },
-    { "ENT_SMAP.IRX", "ent_smap", FAKE_MODULE_ID_SMAP, 0x021f, 2 },
+    {"SMAP.IRX", "INET_SMAP_driver", FAKE_MODULE_ID_SMAP, 0x0219, 2},
+    {"ENT_SMAP.IRX", "ent_smap", FAKE_MODULE_ID_SMAP, 0x021f, 2},
 #endif
 #ifdef HDD_DRIVER
-    { "ATAD.IRX", "atad_driver", FAKE_MODULE_ID_ATAD, 0x0207, 0 },
+    {"ATAD.IRX", "atad_driver", FAKE_MODULE_ID_ATAD, 0x0207, 0},
 #endif
-    { "CDVDSTM.IRX", "cdvd_st_driver", FAKE_MODULE_ID_CDVDSTM, 0x0202, 2 },
+    {"CDVDSTM.IRX", "cdvd_st_driver", FAKE_MODULE_ID_CDVDSTM, 0x0202, 2},
     //Games cannot load CDVDFSV, but this exits to prevent games from trying to unload it. Some games like Jak X check if this module can be unloaded, ostensibly as an anti-HDLoader measure.
-    { "CDVDFSV.IRX", "cdvd_ee_driver", FAKE_MODULE_ID_CDVDFSV, 0x0202, 2 },
-    { NULL, NULL, 0, 0 }
-};
+    {"CDVDFSV.IRX", "cdvd_ee_driver", FAKE_MODULE_ID_CDVDFSV, 0x0202, 2},
+    {NULL, NULL, 0, 0}};
 
 //--------------------------------------------------------------
 int getModInfo(u8 *modname, modinfo_t *info)
@@ -154,8 +155,7 @@ static int Hook_LoadStartModule(char *modpath, int arg_len, char *args, int *mod
     DPRINTF("Hook_LoadStartModule() modpath = %s\n", modpath);
 
     mod = checkFakemodByFile(modpath, modulefake_list);
-    if (mod != NULL)
-    {
+    if (mod != NULL) {
         *modres = mod->returnValue;
         return mod->id;
     }
@@ -171,8 +171,7 @@ static int Hook_StartModule(int id, char *modname, int arg_len, char *args, int 
     DPRINTF("Hook_StartModule() id=%d modname = %s\n", id, modname);
 
     mod = checkFakemodById(id, modulefake_list);
-    if (mod != NULL)
-    {
+    if (mod != NULL) {
         *modres = mod->returnValue;
         return mod->id;
     }
@@ -187,7 +186,7 @@ static int Hook_LoadModuleBuffer(void *ptr)
 
     DPRINTF("Hook_LoadModuleBuffer() modname = %s\n", (char *)(ptr + 0x8e));
 
-    mod = checkFakemodByName((char *)(ptr + 0x8e), modulefake_list); 
+    mod = checkFakemodByName((char *)(ptr + 0x8e), modulefake_list);
     if (mod != NULL)
         return mod->id;
 
@@ -202,8 +201,7 @@ static int Hook_StopModule(int id, int arg_len, char *args, int *modres)
     DPRINTF("Hook_StopModule() id=%d arg_len=%d\n", id, arg_len);
 
     mod = checkFakemodById(id, modulefake_list);
-    if (mod != NULL)
-    {
+    if (mod != NULL) {
         *modres = 1; //Module unloads and returns NO RESIDENT END
         return mod->id;
     }
@@ -247,8 +245,7 @@ static int Hook_ReferModuleStatus(int id, ModuleStatus_t *status)
     DPRINTF("Hook_ReferModuleStatus() modid = %d\n", id);
 
     mod = checkFakemodById(id, modulefake_list);
-    if (mod != NULL)
-    {
+    if (mod != NULL) {
         mips_memset(status, 0, sizeof(ModuleStatus_t));
         strcpy(status->name, mod->name);
         status->version = mod->version;

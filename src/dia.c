@@ -93,9 +93,9 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
 
         //Title
         if (title != NULL) {
-          fntRenderString(gTheme->fonts[0], 25, 20, ALIGN_NONE, 0, 0, title, gTheme->textColor);
-          // separating line
-          rmDrawLine(25, 38, 615, 38, gColWhite);
+            fntRenderString(gTheme->fonts[0], 25, 20, ALIGN_NONE, 0, 0, title, gTheme->textColor);
+            // separating line
+            rmDrawLine(25, 38, 615, 38, gColWhite);
         }
 
         //Text
@@ -499,7 +499,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
             if (strlen(item->stringvalue.text)) {
                 len = min(strlen(item->stringvalue.text), sizeof(stars) - 1);
                 for (i = 0; i < len; ++i)
-                   stars[i] = '*';
+                    stars[i] = '*';
 
                 stars[i] = '\0';
                 *w = fntRenderString(gTheme->fonts[0], x, y, ALIGN_NONE, 0, 0, stars, txtcol) - x;
@@ -533,7 +533,7 @@ static void diaRenderItem(int x, int y, struct UIItem *item, int selected, int h
 
             rmDrawRect(x, y + 3, *w, *h, txtcol);
             u64 dcol = GS_SETREG_RGBA(item->colourvalue.r, item->colourvalue.g, item->colourvalue.b, 0x80);
-            rmDrawRect(x + 2, y + 5, *w-4, *h-4, dcol);
+            rmDrawRect(x + 2, y + 5, *w - 4, *h - 4, dcol);
 
             break;
         }
@@ -669,16 +669,14 @@ static int diaHandleInput(struct UIItem *item, int *modified)
             sfxPlay(SFX_CURSOR);
             if (item->intvalue.current < item->intvalue.max) {
                 item->intvalue.current++;
-            }
-            else {
+            } else {
                 item->intvalue.current = item->intvalue.min; //was "= 0;"
             }
         } else if (getKey(KEY_DOWN)) {
             sfxPlay(SFX_CURSOR);
             if (item->intvalue.current > item->intvalue.min) {
                 item->intvalue.current--;
-            }
-            else {
+            } else {
                 item->intvalue.current = item->intvalue.max;
             }
         } else
@@ -709,8 +707,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
         if (getKey(KEY_UP) && (item->intvalue.current > 0)) {
             item->intvalue.current--;
             sfxPlay(SFX_CURSOR);
-        }
-        else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL)) {
+        } else if (getKey(KEY_DOWN) && (item->intvalue.enumvalues[item->intvalue.current + 1] != NULL)) {
             item->intvalue.current++;
             sfxPlay(SFX_CURSOR);
         }

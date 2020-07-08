@@ -230,7 +230,7 @@ int pko_close_file(int fd)
         return -1;
     }
 
-    dbgprintf("pko_file: pko_close_file: close reply received (ret %ld)\n", 
+    dbgprintf("pko_file: pko_close_file: close reply received (ret %ld)\n",
               ntohl(closerly->retval));
 
     return ntohl(closerly->retval);

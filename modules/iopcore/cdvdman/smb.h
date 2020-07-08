@@ -421,7 +421,8 @@ typedef struct
     u32 OffsetLow;
     u16 MaxCountLow;
     u16 MinCount;
-    union {
+    union
+    {
         u32 Timeout;
         u16 MaxCountHigh;
     };
@@ -479,7 +480,8 @@ typedef struct
     u16 Reserved;
 } __attribute__((packed)) WriteAndXResponse_t;
 
-typedef struct {
+typedef struct
+{
     SMBHeader_t smbH;
     u8 smbWordcount;
     u16 FID;
@@ -487,7 +489,8 @@ typedef struct {
     u16 ByteCount;
 } __attribute__((packed)) CloseRequest_t;
 
-typedef struct {
+typedef struct
+{
     SMBHeader_t smbH;
     u8 smbWordcount;
     u16 ByteCount;
@@ -506,7 +509,7 @@ int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 void smb_CloseAll(void);
 int smb_Disconnect(void);
 
-#define MAX_SMB_BUF 896 // must fit on u16 !!!
+#define MAX_SMB_BUF 896     // must fit on u16 !!!
 #define MAX_SMB_BUF_HDR 128 //Must be at least as large as the largest header structure.
 
 #endif

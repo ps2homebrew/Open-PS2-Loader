@@ -198,7 +198,7 @@ static void menuInitMainMenu(void)
     if (mainMenu)
         submenuDestroy(&mainMenu);
 
-// initialize the menu
+    // initialize the menu
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
@@ -610,8 +610,7 @@ static void menuNextV()
                 cur = cur->next;
 
         selected_item->item->pagestart = selected_item->item->current;
-    }
-    else { //wrap to start
+    } else { //wrap to start
         menuFirstPage();
     }
 }
@@ -630,8 +629,7 @@ static void menuPrevV()
             while (--itms && selected_item->item->pagestart->prev)
                 selected_item->item->pagestart = selected_item->item->pagestart->prev;
         }
-    }
-    else { //wrap to end
+    } else { //wrap to end
         menuLastPage();
     }
 }
@@ -649,8 +647,7 @@ static void menuNextPage()
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
-    }
-    else { //wrap to start
+    } else { //wrap to start
         menuFirstPage();
     }
 }
@@ -668,8 +665,7 @@ static void menuPrevPage()
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
-    }
-    else { //wrap to end
+    } else { //wrap to end
         menuLastPage();
     }
 }
@@ -719,8 +715,7 @@ void menuRenderMenu()
         if (gHDDStartMode && gEnableWrite) {
             if (cp == 7)
                 y += spacing / 2;
-        }
-        else {
+        } else {
             if (cp == 6)
                 y += spacing / 2;
         }
@@ -732,12 +727,12 @@ void menuRenderMenu()
 
 int menuSetParentalLockCheckState(int enabled)
 {
-   int wasEnabled;
+    int wasEnabled;
 
-   wasEnabled = parentalLockCheckEnabled;
-   parentalLockCheckEnabled = enabled ? 1 : 0;
+    wasEnabled = parentalLockCheckEnabled;
+    parentalLockCheckEnabled = enabled ? 1 : 0;
 
-   return wasEnabled;
+    return wasEnabled;
 }
 
 int menuCheckParentalLock(void)
@@ -748,33 +743,30 @@ int menuCheckParentalLock(void)
 
     result = 0; //Default to unlocked.
     if (parentalLockCheckEnabled) {
-       config_set_t *configOPL = configGetByType(CONFIG_OPL);
+        config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
-       //Prompt for password, only if one was set.
-       if (configGetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, &parentalLockPassword) && (parentalLockPassword[0] != '\0'))
-       {
-           password[0] = '\0';
-           if(diaShowKeyb(password, CONFIG_KEY_VALUE_LEN, 1, _l(_STR_PARENLOCK_ENTER_PASSWORD_TITLE)))
-           {
-               if (strncmp(parentalLockPassword, password, CONFIG_KEY_VALUE_LEN) == 0)
-               {
-                   result = 0;
-                   parentalLockCheckEnabled = 0; //Stop asking for the password.
-               } else if (strncmp(OPL_PARENTAL_LOCK_MASTER_PASS, password, CONFIG_KEY_VALUE_LEN) == 0) {
-                   guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, NULL);
+        //Prompt for password, only if one was set.
+        if (configGetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, &parentalLockPassword) && (parentalLockPassword[0] != '\0')) {
+            password[0] = '\0';
+            if (diaShowKeyb(password, CONFIG_KEY_VALUE_LEN, 1, _l(_STR_PARENLOCK_ENTER_PASSWORD_TITLE))) {
+                if (strncmp(parentalLockPassword, password, CONFIG_KEY_VALUE_LEN) == 0) {
+                    result = 0;
+                    parentalLockCheckEnabled = 0; //Stop asking for the password.
+                } else if (strncmp(OPL_PARENTAL_LOCK_MASTER_PASS, password, CONFIG_KEY_VALUE_LEN) == 0) {
+                    guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, NULL);
 
-                   configRemoveKey(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD);
-                   saveConfig(CONFIG_OPL, 1);
+                    configRemoveKey(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD);
+                    saveConfig(CONFIG_OPL, 1);
 
-                   result = 0;
-                   parentalLockCheckEnabled = 0; //Stop asking for the password.
-               } else {
-                   guiMsgBox(_l(_STR_PARENLOCK_PASSWORD_INCORRECT), 0, NULL);
-                   result = EACCES;
-               }
-           } else //User aborted.
-               result = EACCES;
-       }
+                    result = 0;
+                    parentalLockCheckEnabled = 0; //Stop asking for the password.
+                } else {
+                    guiMsgBox(_l(_STR_PARENLOCK_PASSWORD_INCORRECT), 0, NULL);
+                    result = EACCES;
+                }
+            } else //User aborted.
+                result = EACCES;
+        }
     }
 
     return result;
@@ -813,31 +805,31 @@ void menuHandleInputMenu()
 
         if (id == MENU_SETTINGS) {
             if (menuCheckParentalLock() == 0)
-              guiShowConfig();
+                guiShowConfig();
         } else if (id == MENU_GFX_SETTINGS) {
             if (menuCheckParentalLock() == 0)
-              guiShowUIConfig();
+                guiShowUIConfig();
         } else if (id == MENU_AUDIO_SETTINGS) {
             if (menuCheckParentalLock() == 0)
-              guiShowAudioConfig();
+                guiShowAudioConfig();
         } else if (id == MENU_PARENTAL_LOCK) {
             if (menuCheckParentalLock() == 0)
-              guiShowParentalLockConfig();
+                guiShowParentalLockConfig();
         } else if (id == MENU_NET_CONFIG) {
             if (menuCheckParentalLock() == 0)
-              guiShowNetConfig();
+                guiShowNetConfig();
         } else if (id == MENU_NET_UPDATE) {
             if (menuCheckParentalLock() == 0)
-              guiShowNetCompatUpdate();
+                guiShowNetCompatUpdate();
         } else if (id == MENU_START_HDL) {
             if (menuCheckParentalLock() == 0)
-              handleHdlSrv();
+                handleHdlSrv();
         } else if (id == MENU_ABOUT) {
-              guiShowAbout();
+            guiShowAbout();
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
-              saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
-              menuSetParentalLockCheckState(1); //Re-enable parental lock check.
+                saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
+                menuSetParentalLockCheckState(1); //Re-enable parental lock check.
             }
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))

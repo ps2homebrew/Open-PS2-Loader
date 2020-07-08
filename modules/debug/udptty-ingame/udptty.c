@@ -126,7 +126,7 @@ static void *Kprintf_Handler(void *common, const char *format, va_list ap)
     KprArg *kpa = (KprArg *)common;
     void *res;
 
-    res = (void*)CpuInvokeInKmode(Kprnt, kpa, format, ap);
+    res = (void *)CpuInvokeInKmode(Kprnt, kpa, format, ap);
 
     if (QueryIntrContext())
         iSetEventFlag(kpa->eflag, 1);

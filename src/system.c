@@ -212,25 +212,14 @@ void sysReset(int modload_mask)
     sysLoadModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL);
     sysLoadModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL);
 
-#ifdef _DTL_T10000
-    SifExecModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL, NULL);
+    sysLoadModuleBuffer(&sio2man_irx, size_sio2man_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_MC_MODULES) {
-        SifExecModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL, NULL);
-        SifExecModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL, NULL);
+        sysLoadModuleBuffer(&mcman_irx, size_mcman_irx, 0, NULL);
+        sysLoadModuleBuffer(&mcserv_irx, size_mcserv_irx, 0, NULL);
     }
 
-    SifExecModuleBuffer(&padman_irx, size_padman_irx, 0, NULL, NULL);
-#else
-    SifLoadModule("rom0:SIO2MAN", 0, NULL);
-
-    if (modload_mask & SYS_LOAD_MC_MODULES) {
-        SifLoadModule("rom0:MCMAN", 0, NULL);
-        SifLoadModule("rom0:MCSERV", 0, NULL);
-    }
-
-    SifLoadModule("rom0:PADMAN", 0, NULL);
-#endif
+    sysLoadModuleBuffer(&padman_irx, size_padman_irx, 0, NULL);
 
     sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 

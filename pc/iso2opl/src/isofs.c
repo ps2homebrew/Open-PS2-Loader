@@ -549,8 +549,8 @@ int isofs_Cache_Dir(const char *pathname, enum Cache_getMode getMode)
                     CachedDirInfo.valid = 1;
                     return 1;
                 } else {
-// Requested cache of start of the directory, but thats not what's cached
-// so re-cache the start of the directory
+                    // Requested cache of start of the directory, but thats not what's cached
+                    // so re-cache the start of the directory
 
 #ifdef DEBUG
                     printf("          but dir isn't cached from start, so re-cache existing dir from start\n");

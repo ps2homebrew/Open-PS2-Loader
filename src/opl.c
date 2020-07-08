@@ -324,15 +324,12 @@ int oplPath2Mode(const char *path)
     int i, blkdevnamelen;
     item_list_t *listSupport;
 
-    for (i = 0; i < MODE_COUNT; i++)
-    {
+    for (i = 0; i < MODE_COUNT; i++) {
         listSupport = list_support[i].support;
-        if ((listSupport != NULL) && (listSupport->itemGetAppsPath != NULL))
-        {
+        if ((listSupport != NULL) && (listSupport->itemGetAppsPath != NULL)) {
             listSupport->itemGetAppsPath(appsPath, sizeof(appsPath));
             blkdevnameend = strchr(appsPath, ':');
-            if (blkdevnameend != NULL)
-            {
+            if (blkdevnameend != NULL) {
                 blkdevnamelen = (int)(blkdevnameend - appsPath);
 
                 while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
@@ -354,15 +351,12 @@ int oplGetAppImage(const char *device, char *folder, int isRelative, char *value
     item_list_t *listSupport;
 
     elfbootmode = -1;
-    if (device != NULL)
-    {
+    if (device != NULL) {
         elfbootmode = oplPath2Mode(device);
-        if (elfbootmode >= 0)
-        {
+        if (elfbootmode >= 0) {
             listSupport = list_support[elfbootmode].support;
 
-            if ((listSupport != NULL) && (listSupport->enabled))
-            {
+            if ((listSupport != NULL) && (listSupport->enabled)) {
                 if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
                     return 0;
             }
@@ -370,17 +364,14 @@ int oplGetAppImage(const char *device, char *folder, int isRelative, char *value
     }
 
     // We search on ever devices from fatest to slowest.
-    for (remaining = MODE_COUNT,priority = 0; remaining > 0 && priority < 4; priority++)
-    {
-        for (i = 0; i < MODE_COUNT; i++)
-        {
+    for (remaining = MODE_COUNT, priority = 0; remaining > 0 && priority < 4; priority++) {
+        for (i = 0; i < MODE_COUNT; i++) {
             listSupport = list_support[i].support;
 
             if (i == elfbootmode)
                 continue;
 
-            if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->appsPriority == priority))
-            {
+            if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->appsPriority == priority)) {
                 if (listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm) >= 0)
                     return 0;
                 remaining--;
@@ -404,30 +395,25 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
     char path[128];
 
     count = 0;
-    for (i = 0; i < MODE_COUNT; i++)
-    {
+    for (i = 0; i < MODE_COUNT; i++) {
         listSupport = list_support[i].support;
-        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetAppsPath != NULL))
-        {
+        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetAppsPath != NULL)) {
             listSupport->itemGetAppsPath(appsPath, sizeof(appsPath));
 
-            if ((pdir = opendir(appsPath)) != NULL)
-            {
-                while ((pdirent = readdir(pdir)) != NULL)
-                {
+            if ((pdir = opendir(appsPath)) != NULL) {
+                while ((pdirent = readdir(pdir)) != NULL) {
                     if (strcmp(pdirent->d_name, ".") == 0 || strcmp(pdirent->d_name, "..") == 0)
                         continue;
 
                     snprintf(dir, sizeof(dir), "%s/%s", appsPath, pdirent->d_name);
                     if (stat(dir, &st) < 0)
-						continue;
-					if(!S_ISDIR(st.st_mode))
-						continue;
+                        continue;
+                    if (!S_ISDIR(st.st_mode))
+                        continue;
 
                     snprintf(path, sizeof(path), "%s/%s", dir, APP_TITLE_CONFIG_FILE);
                     appConfig = configAlloc(0, NULL, path);
-                    if (appConfig != NULL)
-                    {
+                    if (appConfig != NULL) {
                         configRead(appConfig);
 
                         ret = callback(dir, appConfig, arg);
@@ -435,8 +421,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
 
                         if (ret == 0)
                             count++;
-                        else if (ret < 0)
-                        {   //Stopped because of unrecoverable error.
+                        else if (ret < 0) { //Stopped because of unrecoverable error.
                             break;
                         }
                     }
@@ -631,13 +616,10 @@ static int tryAlternateDevice(int types)
     getcwd(pwd, sizeof(pwd));
 
     //First, try the device that OPL booted from.
-    if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':'))
-    {
+    if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
         if ((value = checkLoadConfigUSB(types)) != 0)
             return value;
-    }
-    else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':'))
-    {
+    } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
         if ((value = checkLoadConfigHDD(types)) != 0)
             return value;
     }
@@ -818,13 +800,10 @@ static int trySaveAlternateDevice(int types)
     getcwd(pwd, sizeof(pwd));
 
     //First, try the device that OPL booted from.
-    if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':'))
-    {
+    if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
         if ((value = trySaveConfigUSB(types)) > 0)
             return value;
-    }
-    else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':'))
-    {
+    } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
         if ((value = trySaveConfigHDD(types)) > 0)
             return value;
     }
@@ -983,8 +962,7 @@ int saveConfig(int types, int showUI)
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
 
             guiMsgBox(notification, 0, NULL);
-        }
-        else
+        } else
             guiMsgBox(_l(_STR_ERROR_SAVING_SETTINGS), 0, NULL);
     }
 
@@ -1328,7 +1306,6 @@ void handleHdlSrv()
     // restore normal functionality again
     guiRenderTextScreen(_l(_STR_UNLOADHDL));
     unloadHdldSvr();
-
 }
 
 // ----------------------------------------------------------
@@ -1351,8 +1328,7 @@ static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
         return;
 
     //Shutdown if not required anymore.
-    if ((mod->support->mode != modeSelected) && (modeSelected != IO_MODE_SELECTED_ALL))
-    {
+    if ((mod->support->mode != modeSelected) && (modeSelected != IO_MODE_SELECTED_ALL)) {
         if (mod->support->itemShutdown)
             mod->support->itemShutdown();
     } else {

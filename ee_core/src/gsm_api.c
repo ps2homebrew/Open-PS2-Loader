@@ -27,7 +27,7 @@ extern void (*Old_SetGsCrt)(short int interlace, short int mode, short int ffmd)
 // NTSC
 #define GS_MODE_NTSC 0x02
 // PAL
-#define GS_MODE_PAL  0x03
+#define GS_MODE_PAL 0x03
 
 struct GSMDestSetGsCrt
 {
@@ -205,11 +205,10 @@ void DisableGSM(void)
 /* Set up the DVE for 576P mode               */
 /*--------------------------------------------*/
 void setdve_576P(void)
-{	//The parameters are exactly the same as the 480P mode's. Regardless of the model, GS revision or region.
-	dve_prepare_bus();
+{ //The parameters are exactly the same as the 480P mode's. Regardless of the model, GS revision or region.
+    dve_prepare_bus();
 
-	dve_set_reg(0x77, 0x11);
-	dve_set_reg(0x93, 0x01);
-	dve_set_reg(0x91, 0x02);
+    dve_set_reg(0x77, 0x11);
+    dve_set_reg(0x93, 0x01);
+    dve_set_reg(0x91, 0x02);
 }
-

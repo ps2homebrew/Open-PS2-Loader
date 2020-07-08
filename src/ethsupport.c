@@ -707,7 +707,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         strcpy(filename, game->startup);
     deinit(NO_EXCEPTION, ETH_MODE); // CAREFUL: deinit will call ethCleanUp, so ethGames/game will be freed
 
-    sysLaunchLoaderElf(filename,  "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
+    sysLaunchLoaderElf(filename, "ETH_MODE", size_smb_cdvdman_irx, &smb_cdvdman_irx, size_mcemu_irx, &smb_mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *ethGetConfig(int id)
@@ -775,8 +775,7 @@ static void smbGetAppsPath(char *path, int max)
 static item_list_t ethGameList = {
     ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &smbGetAppsPath, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, ETH_ICON
-};
+    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, ETH_ICON};
 
 static int ethReadNetConfig(void)
 {
@@ -784,9 +783,9 @@ static int ethReadNetConfig(void)
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
-        lastIP = *(struct ip4_addr*)&ip_info.ipaddr;
-        lastNM = *(struct ip4_addr*)&ip_info.netmask;
-        lastGW = *(struct ip4_addr*)&ip_info.gw;
+        lastIP = *(struct ip4_addr *)&ip_info.ipaddr;
+        lastNM = *(struct ip4_addr *)&ip_info.netmask;
+        lastGW = *(struct ip4_addr *)&ip_info.gw;
     } else {
         ip4_addr_set_zero(&lastIP);
         ip4_addr_set_zero(&lastNM);

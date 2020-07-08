@@ -315,7 +315,7 @@ static char tbuf[2048];
 int ioPrintf(const char *format, ...)
 {
     if (isIORunning == 1)
-	    WaitSema(gIOPrintfSemaId);
+        WaitSema(gIOPrintfSemaId);
 
     va_list args;
     va_start(args, format);
@@ -328,7 +328,7 @@ int ioPrintf(const char *format, ...)
     va_end(args);
 
     if (isIORunning == 1)
-	    SignalSema(gIOPrintfSemaId);
+        SignalSema(gIOPrintfSemaId);
 
     return ret;
 }

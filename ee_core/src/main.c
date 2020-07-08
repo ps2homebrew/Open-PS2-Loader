@@ -140,8 +140,7 @@ int main(int argc, char **argv)
 {
     int argOffset;
 
-    if(isInit)
-    {   //Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
+    if (isInit) { //Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
         argv++;
         argc--;
 
@@ -155,4 +154,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-

@@ -17,7 +17,8 @@ static int appItemCount = 0;
 static config_set_t *configApps;
 static app_info_t *appsList;
 
-struct app_info_linked {
+struct app_info_linked
+{
     struct app_info_linked *next;
     app_info_t app;
 };
@@ -68,7 +69,7 @@ static char *appGetBoot(char *device, int max, char *path)
 
     filenamesep = strchr(path, '/');
     if (filenamesep != NULL)
-        return filenamesep + 1; 
+        return filenamesep + 1;
 
     if (pos) {
         return pos + 1;
@@ -99,8 +100,7 @@ static int appNeedsUpdate(void)
     int update;
 
     update = 0;
-    if (appForceUpdate)
-    {
+    if (appForceUpdate) {
         appForceUpdate = 0;
         update = 1;
     }
@@ -121,25 +121,20 @@ static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
 
     count = 0;
     cur = configApps->head;
-    while (cur != NULL)
-    {
-        if (*appsLinkedList == NULL)
-        {
+    while (cur != NULL) {
+        if (*appsLinkedList == NULL) {
             *appsLinkedList = malloc(sizeof(struct app_info_linked));
             app = *appsLinkedList;
             app->next = NULL;
-        }
-        else
-        {
+        } else {
             app = malloc(sizeof(struct app_info_linked));
             if (app != NULL) {
-              app->next = *appsLinkedList;
-              *appsLinkedList = app;
+                app->next = *appsLinkedList;
+                *appsLinkedList = app;
             }
         }
 
-        if (app == NULL)
-        {
+        if (app == NULL) {
             LOG("APPSUPPORT unable to allocate memory.\n");
             break;
         }
@@ -182,36 +177,29 @@ static int appScanCallback(const char *path, config_set_t *appConfig, void *arg)
     struct app_info_linked *app;
     const char *title, *boot;
 
-    if (configGetStr(appConfig, APP_CONFIG_TITLE, &title) != 0
-       && configGetStr(appConfig, APP_CONFIG_BOOT, &boot) != 0)
-    {
-        if (*appsLinkedList == NULL)
-        {
+    if (configGetStr(appConfig, APP_CONFIG_TITLE, &title) != 0 && configGetStr(appConfig, APP_CONFIG_BOOT, &boot) != 0) {
+        if (*appsLinkedList == NULL) {
             *appsLinkedList = malloc(sizeof(struct app_info_linked));
             app = *appsLinkedList;
             app->next = NULL;
-        }
-        else
-        {
+        } else {
             app = malloc(sizeof(struct app_info_linked));
-            if (app != NULL)
-            {
-              app->next = *appsLinkedList;
-              *appsLinkedList = app;
+            if (app != NULL) {
+                app->next = *appsLinkedList;
+                *appsLinkedList = app;
             }
         }
 
-        if (app == NULL)
-        {
+        if (app == NULL) {
             LOG("APPSUPPORT unable to allocate memory.\n");
             return -1;
         }
 
-        strncpy(app->app.title, title, APP_TITLE_MAX+1);
+        strncpy(app->app.title, title, APP_TITLE_MAX + 1);
         app->app.title[APP_TITLE_MAX] = '\0';
-        strncpy(app->app.boot, boot, APP_BOOT_MAX+1);
+        strncpy(app->app.boot, boot, APP_BOOT_MAX + 1);
         app->app.boot[APP_BOOT_MAX] = '\0';
-        strncpy(app->app.path, path, APP_PATH_MAX+1);
+        strncpy(app->app.path, path, APP_PATH_MAX + 1);
         app->app.path[APP_PATH_MAX] = '\0';
         app->app.legacy = 0;
         return 0;
@@ -239,23 +227,18 @@ static int appUpdateItemList(void)
     appItemCount += oplScanApps(&appScanCallback, &appsLinkedList);
 
     // Generate apps list
-    if (appItemCount > 0)
-    {
+    if (appItemCount > 0) {
         appsList = malloc(appItemCount * sizeof(app_info_t));
 
-        if (appsList != NULL)
-        {
-            for (i = 0; appsLinkedList != NULL; i++)
-            {   //appsLinkedList contains items in reverse order.
+        if (appsList != NULL) {
+            for (i = 0; appsLinkedList != NULL; i++) { //appsLinkedList contains items in reverse order.
                 memcpy(&appsList[appItemCount - i - 1], &appsLinkedList->app, sizeof(app_info_t));
 
                 appNext = appsLinkedList->next;
                 free(appsLinkedList);
                 appsLinkedList = appNext;
             }
-        }
-        else
-        {
+        } else {
             LOG("APPSUPPORT unable to allocate memory.\n");
             appItemCount = 0;
         }
@@ -268,8 +251,7 @@ static int appUpdateItemList(void)
 
 static void appFreeList(void)
 {
-    if (appsList != NULL)
-    {
+    if (appsList != NULL) {
         appsList = NULL;
         appItemCount = 0;
     }
@@ -294,8 +276,7 @@ static int appGetItemNameLength(int id)
    The path is used immediately, before a subsequent call to appGetItemStartup(). */
 static char *appGetItemStartup(int id)
 {
-    if (appsList[id].legacy)
-    {
+    if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);
         return cur->val;
     } else {
@@ -305,8 +286,7 @@ static char *appGetItemStartup(int id)
 
 static void appDeleteItem(int id)
 {
-    if (appsList[id].legacy)
-    {
+    if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);
         unlink(cur->val);
         cur->key[0] = '\0';
@@ -323,8 +303,7 @@ static void appRenameItem(int id, char *newName)
 {
     char value[256];
 
-    if (appsList[id].legacy)
-    {
+    if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);
 
         strncpy(value, cur->val, sizeof(value));
@@ -337,14 +316,13 @@ static void appRenameItem(int id, char *newName)
         snprintf(value, sizeof(value), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
 
         appConfig = configAlloc(0, NULL, value);
-        if (appConfig != NULL)
-        {
+        if (appConfig != NULL) {
             configRead(appConfig);
             configSetStr(appConfig, APP_CONFIG_TITLE, newName);
             configWrite(appConfig);
 
             configFree(appConfig);
-       }
+        }
     }
 
     appForceUpdate = 1;
@@ -388,7 +366,7 @@ static config_set_t *appGetConfig(int id)
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
 
         config = configAlloc(0, NULL, path);
-        configRead(config);  //Does not matter if the config file could be loaded or not.
+        configRead(config); //Does not matter if the config file could be loaded or not.
 
         configSetStr(config, CONFIG_ITEM_NAME, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
@@ -430,5 +408,4 @@ static void appShutdown(void)
 static item_list_t appItemList = {
     APP_MODE, -1, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, NULL, &appInit, &appNeedsUpdate, &appUpdateItemList,
     &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
-    &appGetConfig, &appGetImage, &appCleanUp, &appShutdown, NULL, APP_ICON
-};
+    &appGetConfig, &appGetImage, &appCleanUp, &appShutdown, NULL, APP_ICON};

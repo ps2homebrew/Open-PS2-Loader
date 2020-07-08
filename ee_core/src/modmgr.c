@@ -182,11 +182,11 @@ int LoadElf(const char *path, t_ExecData *data)
 
     if (arg.epc != 0) {
         data->epc = arg.epc;
-        data->gp  = arg.gp;
+        data->gp = arg.gp;
 
         return 0;
     } else
-         return -SCE_ELOADMISS;
+        return -SCE_ELOADMISS;
 }
 
 /*----------------------------------------------------------------------------------------*/

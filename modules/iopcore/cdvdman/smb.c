@@ -28,9 +28,9 @@
    This is because the IOP cannot clear the received frames fast enough, causing the number of bytes in flight to grow exponentially.
    The TCP congestion avoidence algorithm may induce some latency, causing extremely poor performance.
    The value to use should be smaller than the TCP window size. Right now, it is 10240 (according to lwipopts.h). */
-#define CLIENT_MAX_BUFFER_SIZE 8192 //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_BUFFER_SIZE 8192    //Allow up to 8192 bytes to be received.
 #define CLIENT_MAX_XMIT_SIZE USHRT_MAX //Allow up to 65535 bytes to be transmitted.
-#define CLIENT_MAX_RECV_SIZE 8192 //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_RECV_SIZE 8192      //Allow up to 8192 bytes to be received.
 
 int smb_io_sema = -1;
 
@@ -38,21 +38,21 @@ int smb_io_sema = -1;
 #define SIGNALIOSEMA(x) SignalSema(x)
 
 // !!! ps2ip exports functions pointers !!!
-extern int (*plwip_close)(int s);                                                                                                                    // #6
-extern int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                        // #7
-extern int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                             // #9
-extern int (*plwip_recvfrom)(int s, void *mem, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);    // #10
-extern int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                        // #11
-extern int (*plwip_socket)(int domain, int type, int protocol);                                                                                      // #13
-extern int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                                 // #19
-extern u32 (*pinet_addr)(const char *cp);                                                                                                            // #24
+extern int (*plwip_close)(int s);                                                                                                                 // #6
+extern int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                     // #7
+extern int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                          // #9
+extern int (*plwip_recvfrom)(int s, void *mem, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen); // #10
+extern int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                     // #11
+extern int (*plwip_socket)(int domain, int type, int protocol);                                                                                   // #13
+extern int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                              // #19
+extern u32 (*pinet_addr)(const char *cp);                                                                                                         // #24
 
 extern struct cdvdman_settings_smb cdvdman_settings;
 
 // Local function prototypes
-static void nb_SetSessionMessage(u32 size);     // Write Session Service message
-static int nb_GetSessionMessageLength(void);    // Read Session Service message length
-static u8 nb_GetPacketType(void);               // Read message type
+static void nb_SetSessionMessage(u32 size);  // Write Session Service message
+static int nb_GetSessionMessageLength(void); // Read Session Service message length
+static u8 nb_GetPacketType(void);            // Read message type
 
 static server_specs_t server_specs;
 
@@ -62,13 +62,15 @@ static server_specs_t server_specs;
 static u16 UID, TID;
 static int main_socket = -1;
 
-static struct {
+static struct
+{
     //Direct transport packet header. This is also a NetBIOS session header.
     u32 sessionHeader; //The lower 24 bytes are the length of the payload in network byte-order, while the upper 8 bits must be set to 0 (Session Message Packet).
-    union {
-        u8 u8buff[MAX_SMB_BUF+MAX_SMB_BUF_HDR];
-        u16 u16buff[(MAX_SMB_BUF+MAX_SMB_BUF_HDR) / sizeof(u16)];
-        s16 s16buff[(MAX_SMB_BUF+MAX_SMB_BUF_HDR) / sizeof(s16)];
+    union
+    {
+        u8 u8buff[MAX_SMB_BUF + MAX_SMB_BUF_HDR];
+        u16 u16buff[(MAX_SMB_BUF + MAX_SMB_BUF_HDR) / sizeof(u16)];
+        s16 s16buff[(MAX_SMB_BUF + MAX_SMB_BUF_HDR) / sizeof(s16)];
         NegotiateProtocolRequest_t negotiateProtocolRequest;
         NegotiateProtocolResponse_t negotiateProtocolResponse;
         SessionSetupAndXRequest_t sessionSetupAndXRequest;
@@ -109,7 +111,7 @@ static int nb_GetSessionMessageLength(void) // Read Session Service header lengt
 static u8 nb_GetPacketType(void) // Read Session Service header type.
 {
     // Byte-swap length from network byte-order.
-    return((u8)(SMB_buf.sessionHeader & 0xff));
+    return ((u8)(SMB_buf.sessionHeader & 0xff));
 }
 
 //-------------------------------------------------------------------------
@@ -125,7 +127,7 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
         return -2;
 
     opt = 1;
-    plwip_setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&opt, sizeof(opt));
+    plwip_setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&opt, sizeof(opt));
 
     mips_memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_addr = dst_IP;
@@ -145,42 +147,40 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
 //-------------------------------------------------------------------------
 static int SendData(int sock, char *buf, int size)
 {
-	int remaining, result;
-	char *ptr;
+    int remaining, result;
+    char *ptr;
 
-	ptr = buf;
-	remaining = size;
-	while (remaining > 0)
-	{
-		result = plwip_send(sock, ptr, remaining, 0);
-		if (result <= 0)
-			return result;
+    ptr = buf;
+    remaining = size;
+    while (remaining > 0) {
+        result = plwip_send(sock, ptr, remaining, 0);
+        if (result <= 0)
+            return result;
 
-		ptr += result;
-		remaining -= result;
-	}
+        ptr += result;
+        remaining -= result;
+    }
 
-	return size;
+    return size;
 }
 
 static int RecvData(int sock, char *buf, int size)
 {
-	int remaining, result;
-	char *ptr;
+    int remaining, result;
+    char *ptr;
 
-	ptr = buf;
-	remaining = size;
-	while (remaining > 0)
-	{
-		result = plwip_recv(sock, ptr, remaining, 0);
-		if (result <= 0)
-			return result;
+    ptr = buf;
+    remaining = size;
+    while (remaining > 0) {
+        result = plwip_recv(sock, ptr, remaining, 0);
+        if (result <= 0)
+            return result;
 
-		ptr += result;
-		remaining -= result;
-	}
+        ptr += result;
+        remaining -= result;
+    }
 
-	return size;
+    return size;
 }
 
 //-------------------------------------------------------------------------
@@ -190,19 +190,16 @@ static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
 
     totalpkt_size = nb_GetSessionMessageLength() + 4;
 
-    if (shdrlen == 0)
-    {
+    if (shdrlen == 0) {
         //Send the whole message, including the 4-byte direct transport packet header.
-        rcv_size = SendData(main_socket, (char*)&SMB_buf, totalpkt_size);
+        rcv_size = SendData(main_socket, (char *)&SMB_buf, totalpkt_size);
         if (rcv_size <= 0)
             return -1;
-    }
-    else
-    {
+    } else {
         size = shdrlen + 4;
 
         //Send the headers, followed by the payload.
-        rcv_size = SendData(main_socket, (char*)&SMB_buf, size);
+        rcv_size = SendData(main_socket, (char *)&SMB_buf, size);
         if (rcv_size <= 0)
             return -1;
 
@@ -212,7 +209,7 @@ static int GetSMBServerReply(int shdrlen, void *spayload, int rhdrlen)
     }
 
     //Read NetBIOS session message header. Drop NBSS Session Keep alive messages (type == 0x85, with no body), but process session messages (type == 0x00).
-    do{
+    do {
         rcv_size = RecvData(main_socket, (char *)&SMB_buf.sessionHeader, sizeof(SMB_buf.sessionHeader));
         if (rcv_size <= 0)
             return -2;
@@ -237,8 +234,7 @@ static int asciiToUtf16(char *out, const char *in)
     const char *pIn;
     u8 *pOut;
 
-    for(pIn = in, pOut = out, len = 0; *pIn != '\0'; pIn++, pOut += 2, len += 2)
-    {
+    for (pIn = in, pOut = out, len = 0; *pIn != '\0'; pIn++, pOut += 2, len += 2) {
         pOut[0] = *pIn;
         pOut[1] = '\0';
     }
@@ -254,12 +250,9 @@ static int setStringField(char *out, const char *in)
 {
     int len;
 
-    if (server_specs.Capabilities & SERVER_CAP_UNICODE)
-    {
+    if (server_specs.Capabilities & SERVER_CAP_UNICODE) {
         len = asciiToUtf16(out, in);
-    }
-    else
-    {
+    } else {
         len = strlen(in) + 1;
         strcpy(out, in);
     }
@@ -384,7 +377,7 @@ lbl_session_setup:
 
     if ((useUnicode) && (!(password_len & 1))) {
         SSR->ByteField[offset] = '\0';
-        offset ++; // pad needed only for unicode as aligment fix if password length is even
+        offset++; // pad needed only for unicode as aligment fix if password length is even
     }
 
     // Add User name
@@ -536,15 +529,13 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     GetSMBServerReply(0, NULL, 0);
 
     // check sanity of SMB header
-    if (ORsp->smbH.Magic != SMB_MAGIC)
-    {
+    if (ORsp->smbH.Magic != SMB_MAGIC) {
         SIGNALIOSEMA(smb_io_sema);
         return -1;
     }
 
     // check there's no error
-    if (ORsp->smbH.Eclass != STATUS_SUCCESS)
-    {
+    if (ORsp->smbH.Eclass != STATUS_SUCCESS) {
         SIGNALIOSEMA(smb_io_sema);
         return -1000;
     }
@@ -564,7 +555,7 @@ int smb_Close(int FID)
     CloseRequest_t *CR = &SMB_buf.smb.closeRequest;
     CloseResponse_t *CRsp = &SMB_buf.smb.closeResponse;
 
-//  WAITIOSEMA(smb_io_sema);
+    //  WAITIOSEMA(smb_io_sema);
 
     ZERO_PKT_ALIGNED(CR, sizeof(CloseRequest_t));
 
@@ -579,27 +570,24 @@ int smb_Close(int FID)
 
     nb_SetSessionMessage(sizeof(CloseRequest_t));
     r = GetSMBServerReply(0, NULL, 0);
-    if (r <= 0)
-    {
-//      SIGNALIOSEMA(smb_io_sema);
+    if (r <= 0) {
+        //      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
     }
 
     // check sanity of SMB header
-    if (CRsp->smbH.Magic != SMB_MAGIC)
-    {
-//      SIGNALIOSEMA(smb_io_sema);
+    if (CRsp->smbH.Magic != SMB_MAGIC) {
+        //      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
     }
 
     // check there's no error
-    if ((CRsp->smbH.Eclass | (CRsp->smbH.Ecode << 16)) != STATUS_SUCCESS)
-    {
-//      SIGNALIOSEMA(smb_io_sema);
+    if ((CRsp->smbH.Eclass | (CRsp->smbH.Ecode << 16)) != STATUS_SUCCESS) {
+        //      SIGNALIOSEMA(smb_io_sema);
         return -EIO;
     }
 
-//  SIGNALIOSEMA(smb_io_sema);
+    //  SIGNALIOSEMA(smb_io_sema);
 
     return 0;
 }
@@ -635,7 +623,7 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
 
 #ifdef USE_CUSTOM_RECV
     //Send the whole message, including the 4-byte direct transport packet header.
-    r = SendData(main_socket, (char*)&SMB_buf, sizeof(ReadAndXRequest_t) + 4);
+    r = SendData(main_socket, (char *)&SMB_buf, sizeof(ReadAndXRequest_t) + 4);
     if (r <= 0)
         return -1;
 
@@ -666,16 +654,14 @@ static int smb_ReadAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, i
 
     //Skip any padding bytes.
     padding = RRsp->DataOffset - sizeof(ReadAndXResponse_t);
-    if (padding > 0)
-    {
+    if (padding > 0) {
         r = RecvData(main_socket, (char *)(RRsp + 1), padding);
         if (r <= 0)
             return -2;
     }
 
     DataLength = (int)(((u32)RRsp->DataLengthHigh << 16) | RRsp->DataLengthLow);
-    if (DataLength > 0)
-    {
+    if (DataLength > 0) {
         r = RecvData(main_socket, readbuf, DataLength);
         if (r <= 0)
             return -2;
@@ -695,8 +681,7 @@ int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbyt
 
     WAITIOSEMA(smb_io_sema);
 
-    while (remaining > 0)
-    {
+    while (remaining > 0) {
         toRead = remaining > CLIENT_MAX_RECV_SIZE ? CLIENT_MAX_RECV_SIZE : remaining;
 
         result = smb_ReadAndX(FID, offsetlow, offsethigh, ptr, toRead);
@@ -755,7 +740,7 @@ static int smb_WriteAndX(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf,
     return nbytes;
 }
 
-int smb_WriteFile(u16 FID,  u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes)
+int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes)
 {
     int result, remaining, toWrite;
     char *ptr;
@@ -765,8 +750,7 @@ int smb_WriteFile(u16 FID,  u32 offsetlow, u32 offsethigh, void *writebuf, int n
 
     WAITIOSEMA(smb_io_sema);
 
-    while (remaining > 0)
-    {
+    while (remaining > 0) {
         toWrite = remaining > CLIENT_MAX_XMIT_SIZE ? CLIENT_MAX_XMIT_SIZE : remaining;
 
         result = smb_WriteAndX(FID, offsetlow, offsethigh, ptr, toWrite);

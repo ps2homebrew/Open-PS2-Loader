@@ -15,17 +15,16 @@
 
 static const char *CNFGetToken(const char *cnf, const char *key)
 {
-    for (; isspace(*cnf); cnf++)
-    {}
+    for (; isspace(*cnf); cnf++) {
+    }
 
-    for (; *key != '\0'; key++,cnf++)
-    {
+    for (; *key != '\0'; key++, cnf++) {
         //End of file
         if (*cnf == '\0')
-            return (const char*)-1;
+            return (const char *)-1;
 
         if (*cnf != *key)
-            return NULL;    //Non-match
+            return NULL; //Non-match
     }
 
     return cnf;
@@ -33,8 +32,7 @@ static const char *CNFGetToken(const char *cnf, const char *key)
 
 static const char *CNFAdvanceLine(const char *start, const char *end)
 {
-    for (; start <= end; start++)
-    {
+    for (; start <= end; start++) {
         if (*start == '\n')
             return start;
     }
@@ -47,31 +45,23 @@ static const char *CNFGetKey(const char *line, char *key)
     int i;
 
     //Skip leading whitespace
-    for (; isspace(*line); line++)
-    {
+    for (; isspace(*line); line++) {
     }
 
-    if (*line == '\0')
-    {    //Unexpected end of file
-        return (const char*)-1;
+    if (*line == '\0') { //Unexpected end of file
+        return (const char *)-1;
     }
 
-    for(i = 0; i < CNF_PATH_LEN_MAX && *line != '\0'; i++)
-    {
-        if (isgraph(*line))
-        {
+    for (i = 0; i < CNF_PATH_LEN_MAX && *line != '\0'; i++) {
+        if (isgraph(*line)) {
             *key = *line;
             line++;
             key++;
-        }
-        else if (isspace(*line))
-        {
+        } else if (isspace(*line)) {
             *key = '\0';
             break;
-        }
-        else if (*line == '\0')
-        {    //Unexpected end of file. This check exists, along with the other similar check above.
-            return (const char*)-1;
+        } else if (*line == '\0') { //Unexpected end of file. This check exists, along with the other similar check above.
+            return (const char *)-1;
         }
     }
 
@@ -85,8 +75,7 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
     FILE *fd;
     int size;
 
-    if ((fd = fopen(path, "r")) == NULL)
-    {
+    if ((fd = fopen(path, "r")) == NULL) {
         LOG("Can't open %s\n", path);
         return ENOENT;
     }
@@ -96,10 +85,9 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
     rewind(fd);
 
     if (size >= CNF_LEN_MAX)
-        size = CNF_LEN_MAX -1;
+        size = CNF_LEN_MAX - 1;
 
-    if (fread(system_cnf, 1, size, fd) != size)
-    {
+    if (fread(system_cnf, 1, size, fd) != size) {
         fclose(fd);
         LOG("Can't read %s\n", path);
         return EIO;
@@ -111,28 +99,23 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
 
     //Parse SYSTEM.CNF
     cnf_start = system_cnf;
-    while ((pChar = CNFGetToken(cnf_start, "BOOT2")) == NULL)
-    {
+    while ((pChar = CNFGetToken(cnf_start, "BOOT2")) == NULL) {
         cnf_start = CNFAdvanceLine(cnf_start, cnf_end);
         if (cnf_start == NULL)
             return -1;
     }
 
-    if (pChar == (const char*)-1)
-    {    //Unexpected EOF
+    if (pChar == (const char *)-1) { //Unexpected EOF
         return -1;
     }
 
-    if ((pChar = CNFGetToken(pChar, "=")) == (const char*)-1)
-    {    //Unexpected EOF
+    if ((pChar = CNFGetToken(pChar, "=")) == (const char *)-1) { //Unexpected EOF
         return -1;
     }
 
-    if (CNFGetKey(pChar, bootfile) == (const char*)-1)
-    {    //Unexpected EOF
+    if (CNFGetKey(pChar, bootfile) == (const char *)-1) { //Unexpected EOF
         return -1;
     }
 
     return 0;
 }
-

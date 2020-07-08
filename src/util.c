@@ -95,8 +95,7 @@ static int checkMC()
                     if (dir != NULL) {
                         closedir(dir);
                         mcID = 0x30;
-                    }
-                    else {
+                    } else {
                         dir = opendir("mc1:");
                         if (dir != NULL) {
                             closedir(dir);
@@ -534,9 +533,10 @@ int CheckPS2Logo(int fd, u32 lba)
     return ValidPS2Logo;
 }
 
-struct DirentToDelete {
+struct DirentToDelete
+{
     struct DirentToDelete *next;
-     char *filename;
+    char *filename;
 };
 
 int sysDeleteFolder(const char *folder)
@@ -550,40 +550,40 @@ int sysDeleteFolder(const char *folder)
 
     result = 0;
     start = head = NULL;
-    if((dir = opendir(folder)) != NULL) {
+    if ((dir = opendir(folder)) != NULL) {
         /* Generate a list of files in the directory. */
-        while((dirent = readdir(dir)) != NULL) {
-            if((strcmp(dirent->d_name, ".") == 0) || ((strcmp(dirent->d_name, "..") == 0)))
+        while ((dirent = readdir(dir)) != NULL) {
+            if ((strcmp(dirent->d_name, ".") == 0) || ((strcmp(dirent->d_name, "..") == 0)))
                 continue;
 
-            path = malloc(strlen(folder)+strlen(dirent->d_name) + 2);
+            path = malloc(strlen(folder) + strlen(dirent->d_name) + 2);
             sprintf(path, "%s/%s", folder, dirent->d_name);
             stat(path, &st);
 
-            if(S_ISDIR(st.st_mode)) {
+            if (S_ISDIR(st.st_mode)) {
                 /* Recursive, delete all subfolders */
                 result = sysDeleteFolder(path);
                 free(path);
             } else {
                 free(path);
-                if(start == NULL) {
+                if (start == NULL) {
                     head = malloc(sizeof(struct DirentToDelete));
-                    if(head == NULL)
+                    if (head == NULL)
                         break;
                     start = head;
                 } else {
-                    if((head->next = malloc(sizeof(struct DirentToDelete))) == NULL)
+                    if ((head->next = malloc(sizeof(struct DirentToDelete))) == NULL)
                         break;
 
-                    head=head->next;
+                    head = head->next;
                 }
 
-                head->next=NULL;
+                head->next = NULL;
 
-                if((head->filename = malloc(strlen(dirent->d_name) + 1)) != NULL)
+                if ((head->filename = malloc(strlen(dirent->d_name) + 1)) != NULL)
                     strcpy(head->filename, dirent->d_name);
                 else
-                   break;
+                    break;
             }
         }
 
@@ -594,10 +594,10 @@ int sysDeleteFolder(const char *folder)
     if (result >= 0) {
         /* Delete the files. */
         for (head = start; head != NULL; head = start) {
-            if(head->filename != NULL) {
-                if((path = malloc(strlen(folder) + strlen(head->filename) + 2)) != NULL) {
+            if (head->filename != NULL) {
+                if ((path = malloc(strlen(folder) + strlen(head->filename) + 2)) != NULL) {
                     sprintf(path, "%s/%s", folder, head->filename);
-                    result=unlink(path);
+                    result = unlink(path);
                     if (result < 0)
                         LOG("sysDeleteFolder: failed to remove %s: %d\n", path, result);
 
@@ -610,7 +610,7 @@ int sysDeleteFolder(const char *folder)
             free(head);
         }
 
-        if(result >= 0) {
+        if (result >= 0) {
             result = rmdir(folder);
             LOG("sysDeleteFolder: failed to rmdir %s: %d\n", folder, result);
         }

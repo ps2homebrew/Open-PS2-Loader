@@ -58,7 +58,7 @@ int ds34usb_get_status(int port)
     rpcbuf[0] = port;
 
     if (SifCallRpc(&ds34usb, DS34USB_GET_STATUS, 0, rpcbuf, 1, rpcbuf, 1, NULL, NULL) == 0)
-       return rpcbuf[0];
+        return rpcbuf[0];
 
     return 0;
 }

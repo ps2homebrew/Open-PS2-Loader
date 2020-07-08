@@ -142,7 +142,7 @@ static void IGR_Thread(void *arg)
 #ifdef IGS
         || ((Pad_Data.combo_type == IGR_COMBO_UP) && (EnableGSMOp))
 #endif
-            ) {
+    ) {
 
         if (!DisableDebug)
             GS_BGCOLOUR = 0xFF8000; // Blue sky
@@ -286,7 +286,7 @@ static int IGR_Intc_Handler(int cause)
 #ifdef IGS
                     || ((pad_pos_combo2 == IGR_COMBO_UP) && (EnableGSMOp)) // UP combo, so take IGS
 #endif
-                    )
+                )
 
                     Pad_Data.combo_type = pad_pos_combo2;
             }
@@ -349,7 +349,8 @@ static int IGR_Intc_Handler(int cause)
 
         *R_EE_GS_CSR = 0x100; //Reset GS
         asm volatile("sync.l\n");
-	while(*R_EE_GS_CSR & 0x100){};
+        while (*R_EE_GS_CSR & 0x100) {
+        };
 
         //Disable interrupts & reset some peripherals, back to a standard state.
         //Call ResetEE(0x7F) from an interrupt handler.
@@ -420,8 +421,7 @@ void Install_IGR(void)
     Pad_Data.prev_frame = 0x00;
 
     // Do not install the IGR thread or interrupt handler more than once.
-    if (IGR_Thread_ID < 0)
-    {
+    if (IGR_Thread_ID < 0) {
         // Create and start IGR thread
         thread_param.gp_reg = &_gp;
         thread_param.func = IGR_Thread;
@@ -433,8 +433,7 @@ void Install_IGR(void)
         StartThread(IGR_Thread_ID, NULL);
     }
 
-    if (IGR_Intc_ID < 0)
-    {
+    if (IGR_Intc_ID < 0) {
         // Create IGR interrupt handler
         IGR_Intc_ID = AddIntcHandler(kINTC_VBLANK_END, IGR_Intc_Handler, 0);
         EnableIntc(kINTC_VBLANK_END);
@@ -484,8 +483,7 @@ static int Hook_scePad2CreateSocket(pad2socketparam_t *SocketParam, void *addr)
     ret = scePad2CreateSocket(SocketParam, addr);
 
     // Install IGR with libpad2 parameters
-    if ((SocketParam == NULL) || (SocketParam->port == 0 && SocketParam->slot == 0))
-    {
+    if ((SocketParam == NULL) || (SocketParam->port == 0 && SocketParam->slot == 0)) {
         Install_IGR();
         Set_libpad_Params(addr);
     }
@@ -554,7 +552,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                     // Search & patch for calls to PadOpen
                     ptr2 = (u32 *)mem_start;
                     while (ptr2) {
-                        mem_size2 = (u32)((u8*)mem_end - (u8*)ptr2);
+                        mem_size2 = (u32)((u8 *)mem_end - (u8 *)ptr2);
 
                         ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
                         if (ptr2) {
@@ -598,7 +596,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                         // Search & patch for PadOpen function address
                         ptr2 = (u32 *)mem_start;
                         while (ptr2) {
-                            mem_size2 = (u32)((u8*)mem_end - (u8*)ptr2);
+                            mem_size2 = (u32)((u8 *)mem_end - (u8 *)ptr2);
 
                             ptr2 = find_pattern_with_mask(ptr2, mem_size2, pattern, mask, sizeof(pattern));
                             if (ptr2) {

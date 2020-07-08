@@ -26,7 +26,8 @@ extern unsigned int size_message_adp;
 extern unsigned char transition_adp[];
 extern unsigned int size_transition_adp;
 
-struct sfxEffect {
+struct sfxEffect
+{
     const char *name;
     void *buffer;
     int size;
@@ -49,15 +50,14 @@ static int sfx_initialized = 0;
 //Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
 static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 {
-    FILE* adpcm;
+    FILE *adpcm;
     void *buffer;
     int ret, size;
 
     LOG("SFX: sfxRead('%s')\n", full_path);
 
     adpcm = fopen(full_path, "rb");
-    if (adpcm == NULL)
-    {
+    if (adpcm == NULL) {
         LOG("SFX: %s: Failed to open adpcm file %s\n", __FUNCTION__, full_path);
         return -ENOENT;
     }
@@ -67,8 +67,7 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     rewind(adpcm);
 
     buffer = memalign(64, size);
-    if (buffer == NULL)
-    {
+    if (buffer == NULL) {
         LOG("SFX: Failed to allocate memory for SFX\n");
         fclose(adpcm);
         return -ENOMEM;
@@ -77,8 +76,7 @@ static int sfxRead(const char *full_path, struct sfxEffect *sfx)
     ret = fread(buffer, 1, size, adpcm);
     fclose(adpcm);
 
-    if(ret != size)
-    {
+    if (ret != size) {
         LOG("SFX: Failed to read SFX: %d (expected %d)\n", ret, size);
         free(buffer);
         return -EIO;
@@ -145,14 +143,12 @@ void sfxVolume(void)
 {
     int i;
 
-    if (!sfx_initialized)
-    {
+    if (!sfx_initialized) {
         LOG("SFX: %s: ERROR: not initialized!\n", __FUNCTION__);
         return;
     }
 
-    for (i = 1; i < SFX_COUNT; i++)
-    {
+    for (i = 1; i < SFX_COUNT; i++) {
         audsrv_adpcm_set_volume(i, gSFXVolume);
     }
 
@@ -168,8 +164,7 @@ int sfxInit(int bootSnd)
     int thmSfxEnabled = 0;
     int i = 1;
 
-    if (!sfx_initialized)
-    {
+    if (!sfx_initialized) {
         if (audsrv_init() != 0) {
             LOG("SFX: Failed to initialize audsrv\n");
             LOG("SFX: Audsrv returned error string: %s\n", audsrv_get_error_string());
@@ -200,29 +195,22 @@ int sfxInit(int bootSnd)
 
     loaded = 0;
     i = bootSnd ? 0 : 1;
-    for (; i < SFX_COUNT; i++)
-    {
-        if (thmSfxEnabled)
-        {
+    for (; i < SFX_COUNT; i++) {
+        if (thmSfxEnabled) {
             snprintf(full_path, sizeof(full_path), "%s/%s", sound_path, sfx_files[i].name);
             ret = sfxRead(full_path, &sfx_files[i]);
-            if (ret != 0)
-            {
+            if (ret != 0) {
                 LOG("SFX: %s could not be loaded. Using default sound %d.\n", full_path, ret);
             }
-        }
-        else
+        } else
             snprintf(full_path, sizeof(full_path), "builtin/%s", sfx_files[i].name);
 
         ret = sfxLoad(&sfx_files[i], &sfx[i]);
-        if (ret == 0)
-        {
+        if (ret == 0) {
             LOG("SFX: Loaded %s, size=%d, duration=%dms\n", full_path, sfx_files[i].size, sfx_files[i].duration_ms);
             loaded++;
-        }
-        else
-        {
-           LOG("SFX: failed to load %s, error %d\n", full_path, ret);
+        } else {
+            LOG("SFX: failed to load %s, error %d\n", full_path, ret);
         }
     }
 
@@ -231,8 +219,7 @@ int sfxInit(int bootSnd)
 
 void sfxEnd()
 {
-    if (!sfx_initialized)
-    {
+    if (!sfx_initialized) {
         LOG("SFX: %s: ERROR: not initialized!\n", __FUNCTION__);
         return;
     }
@@ -243,8 +230,7 @@ void sfxEnd()
 
 int sfxGetSoundDuration(int id)
 {
-    if (!sfx_initialized)
-    {
+    if (!sfx_initialized) {
         LOG("SFX: %s: ERROR: not initialized!\n", __FUNCTION__);
         return 0;
     }
@@ -254,8 +240,7 @@ int sfxGetSoundDuration(int id)
 
 void sfxPlay(int id)
 {
-    if (!sfx_initialized)
-    {
+    if (!sfx_initialized) {
         LOG("SFX: %s: ERROR: not initialized!\n", __FUNCTION__);
         return;
     }

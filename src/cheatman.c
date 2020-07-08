@@ -46,8 +46,7 @@ void InitCheatsConfig(config_set_t *configSet)
         if (configGetInt(configSet, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
             configGetInt(configSet, CONFIG_ITEM_CHEATMODE, &gCheatMode);
         }
-    }
-    else {
+    } else {
         if (configGetInt(configGame, CONFIG_ITEM_ENABLECHEAT, &gEnableCheat) && gEnableCheat) {
             configGetInt(configGame, CONFIG_ITEM_CHEATMODE, &gCheatMode);
         }

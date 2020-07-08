@@ -15,7 +15,7 @@ IRX_ID("ds34usb", 1, 1);
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 2
 
@@ -48,17 +48,16 @@ static u8 power_level[] =
 
 static u8 rgbled_patterns[][2][3] =
     {
-        {{0x00, 0x00, 0x10}, {0x00, 0x00, 0x7F}},  // light blue/blue
-        {{0x00, 0x10, 0x00}, {0x00, 0x7F, 0x00}},  // light green/green/
-        {{0x10, 0x10, 0x00}, {0x7F, 0x7F, 0x00}},  // light yellow/yellow
-        {{0x00, 0x10, 0x10}, {0x00, 0x7F, 0x7F}},  // light cyan/cyan
+        {{0x00, 0x00, 0x10}, {0x00, 0x00, 0x7F}}, // light blue/blue
+        {{0x00, 0x10, 0x00}, {0x00, 0x7F, 0x00}}, // light green/green/
+        {{0x10, 0x10, 0x00}, {0x7F, 0x7F, 0x00}}, // light yellow/yellow
+        {{0x00, 0x10, 0x10}, {0x00, 0x7F, 0x7F}}, // light cyan/cyan
 };
 
 static u8 link_key[] = //for ds4 authorisation
     {
-        0x56, 0xE8, 0x81, 0x38, 0x08, 0x06, 0x51, 0x41, 
-        0xC0, 0x7F, 0x12, 0xAA, 0xD9, 0x66, 0x3C, 0xCE
-};
+        0x56, 0xE8, 0x81, 0x38, 0x08, 0x06, 0x51, 0x41,
+        0xC0, 0x7F, 0x12, 0xAA, 0xD9, 0x66, 0x3C, 0xCE};
 
 static u8 usb_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
 
@@ -190,7 +189,7 @@ static void usb_release(int pad)
 
     if (ds34pad[pad].interruptEndp >= 0)
         UsbCloseEndpoint(ds34pad[pad].interruptEndp);
-        
+
     if (ds34pad[pad].outEndp >= 0)
         UsbCloseEndpoint(ds34pad[pad].outEndp);
 
@@ -199,7 +198,7 @@ static void usb_release(int pad)
     ds34pad[pad].outEndp = -1;
     ds34pad[pad].devId = -1;
     ds34pad[pad].status = DS34USB_STATE_DISCONNECTED;
-    
+
     SignalSema(ds34pad[pad].sema);
 }
 
@@ -267,12 +266,12 @@ static void DS3USB_init(int pad)
 static void readReport(u8 *data, int pad)
 {
     if (data[0]) {
-        
+
         if (ds34pad[pad].type == DS3) {
             struct ds3report *report;
-            
+
             report = (struct ds3report *)&data[2];
-            
+
             ds34pad[pad].data[0] = ~report->ButtonStateL;
             ds34pad[pad].data[1] = ~report->ButtonStateH;
 
@@ -280,7 +279,7 @@ static void readReport(u8 *data, int pad)
             ds34pad[pad].data[3] = report->RightStickY; //ry
             ds34pad[pad].data[4] = report->LeftStickX;  //lx
             ds34pad[pad].data[5] = report->LeftStickY;  //ly
-            
+
             ds34pad[pad].data[6] = report->PressureRight; //right
             ds34pad[pad].data[7] = report->PressureLeft;  //left
             ds34pad[pad].data[8] = report->PressureUp;    //up
@@ -296,7 +295,7 @@ static void readReport(u8 *data, int pad)
             ds34pad[pad].data[16] = report->PressureL2; //L2
             ds34pad[pad].data[17] = report->PressureR2; //R2
 
-            if (report->PSButtonState && report->Power != 0xEE)  //display battery level
+            if (report->PSButtonState && report->Power != 0xEE) //display battery level
                 ds34pad[pad].oldled[0] = power_level[report->Power];
             else
                 ds34pad[pad].oldled[0] = led_patterns[pad][1];
@@ -311,26 +310,42 @@ static void readReport(u8 *data, int pad)
             u8 up = 0, down = 0, left = 0, right = 0;
 
             report = (struct ds4report *)data;
-            
-            switch(report->Dpad) {
-                case 0: up = 1;
-                        break;
-                case 1: up = 1; right = 1;
-                        break;
-                case 2: right = 1;
-                        break;
-                case 3: down = 1; right = 1;
-                        break;
-                case 4: down = 1;
-                        break;
-                case 5: down = 1; left = 1;
-                        break;
-                case 6: left = 1;
-                        break;
-                case 7: up = 1; left = 1;
-                        break;
-                case 8: up = 0; down = 0; left = 0; right = 0;
-                        break;
+
+            switch (report->Dpad) {
+                case 0:
+                    up = 1;
+                    break;
+                case 1:
+                    up = 1;
+                    right = 1;
+                    break;
+                case 2:
+                    right = 1;
+                    break;
+                case 3:
+                    down = 1;
+                    right = 1;
+                    break;
+                case 4:
+                    down = 1;
+                    break;
+                case 5:
+                    down = 1;
+                    left = 1;
+                    break;
+                case 6:
+                    left = 1;
+                    break;
+                case 7:
+                    up = 1;
+                    left = 1;
+                    break;
+                case 8:
+                    up = 0;
+                    down = 0;
+                    left = 0;
+                    right = 0;
+                    break;
             }
 
             if (report->TPad) {
@@ -351,7 +366,7 @@ static void readReport(u8 *data, int pad)
 
             ds34pad[pad].data[0] = ~(report->Share | report->L3 << 1 | report->R3 << 2 | report->Option << 3 | up << 4 | right << 5 | down << 6 | left << 7);
             ds34pad[pad].data[1] = ~(report->L2 | report->R2 << 1 | report->L1 << 2 | report->R1 << 3 | report->Triangle << 4 | report->Circle << 5 | report->Cross << 6 | report->Square << 7);
-            
+
             ds34pad[pad].data[2] = report->RightStickX; //rx
             ds34pad[pad].data[3] = report->RightStickY; //ry
             ds34pad[pad].data[4] = report->LeftStickX;  //lx
@@ -367,12 +382,12 @@ static void readReport(u8 *data, int pad)
             ds34pad[pad].data[12] = report->Cross * 255;    //cross
             ds34pad[pad].data[13] = report->Square * 255;   //square
 
-            ds34pad[pad].data[14] = report->L1 * 255; //L1
-            ds34pad[pad].data[15] = report->R1 * 255; //R1
+            ds34pad[pad].data[14] = report->L1 * 255;   //L1
+            ds34pad[pad].data[15] = report->R1 * 255;   //R1
             ds34pad[pad].data[16] = report->PressureL2; //L2
             ds34pad[pad].data[17] = report->PressureR2; //R2
-            
-            if (report->PSButton) {                              //display battery level
+
+            if (report->PSButton) { //display battery level
                 ds34pad[pad].oldled[0] = report->Battery;
                 ds34pad[pad].oldled[1] = 0;
                 ds34pad[pad].oldled[2] = 0;
@@ -386,7 +401,6 @@ static void readReport(u8 *data, int pad)
                 ds34pad[pad].oldled[3] = 1;
             else
                 ds34pad[pad].oldled[3] = 0;
-                
         }
     }
 }
@@ -394,11 +408,11 @@ static void readReport(u8 *data, int pad)
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     int ret = 0;
-    
+
     PollSema(ds34pad[pad].cmd_sema);
-    
+
     mips_memset(usb_buf, 0, sizeof(usb_buf));
-    
+
     if (ds34pad[pad].type == DS3) {
         mips_memcpy(usb_buf, output_01_report, sizeof(output_01_report));
 
@@ -415,27 +429,27 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
             usb_buf[23] = 0x32;
             usb_buf[28] = 0x32;
         }
-        
+
         ret = UsbControlTransfer(ds34pad[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, sizeof(output_01_report), usb_buf, usb_cmd_cb, (void *)pad);
     } else if (ds34pad[pad].type == DS4) {
         usb_buf[0] = 0x05;
         usb_buf[1] = 0xFF;
-        
+
         usb_buf[4] = rrum; //ds4 has full control
         usb_buf[5] = lrum;
-        
+
         usb_buf[6] = led[0]; //r
         usb_buf[7] = led[1]; //g
         usb_buf[8] = led[2]; //b
-        
-        if (led[3]) { //means charging, so blink
-            usb_buf[9] = 0x80; // Time to flash bright (255 = 2.5 seconds)
+
+        if (led[3]) {           //means charging, so blink
+            usb_buf[9] = 0x80;  // Time to flash bright (255 = 2.5 seconds)
             usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
         }
-        
+
         ret = UsbInterruptTransfer(ds34pad[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
     }
-    
+
     ds34pad[pad].oldled[0] = led[0];
     ds34pad[pad].oldled[1] = led[1];
     ds34pad[pad].oldled[2] = led[2];
@@ -443,7 +457,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
     ds34pad[pad].lrum = lrum;
     ds34pad[pad].rrum = rrum;
-    
+
     return ret;
 }
 
@@ -498,7 +512,7 @@ static int Rumble(u8 lrum, u8 rrum, int pad)
 }
 
 void ds34usb_set_rumble(u8 lrum, u8 rrum, int port)
-{    
+{
     if (port >= MAX_PADS)
         return;
 
@@ -506,17 +520,17 @@ void ds34usb_set_rumble(u8 lrum, u8 rrum, int port)
 }
 
 void ds34usb_set_led(u8 *led, int port)
-{    
+{
     if (port >= MAX_PADS)
         return;
-    
+
     LED(led, port);
 }
 
 void ds34usb_get_data(char *dst, int size, int port)
 {
     int ret;
-    
+
     if (port >= MAX_PADS)
         return;
 
@@ -530,14 +544,14 @@ void ds34usb_get_data(char *dst, int size, int port)
         TransferWait(ds34pad[port].sema);
         if (!usb_resulCode)
             readReport(usb_buf, port);
-            
+
         usb_resulCode = 1;
     } else {
         DPRINTF("DS34USB: ds34usb_get_data usb transfer error %d\n", ret);
     }
 
     mips_memcpy(dst, ds34pad[port].data, size);
-    
+
     SignalSema(ds34pad[port].sema);
 }
 
@@ -547,7 +561,7 @@ int ds34usb_get_bdaddr(u8 *data, int port)
 
     if (port >= MAX_PADS)
         return 0;
-    
+
     if (ds34pad[port].update_rum) {
         ds34pad[port].update_rum = 0;
         return 0;
@@ -559,13 +573,13 @@ int ds34usb_get_bdaddr(u8 *data, int port)
 
     if (ds34pad[port].type == DS3) {
         ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0xF5, 0, 8, usb_buf, usb_cmd_cb, (void *)port);
-            
+
         if (ret == USB_RC_OK) {
             TransferWait(ds34pad[port].cmd_sema);
 
             for (i = 0; i < 6; i++)
                 data[5 - i] = usb_buf[2 + i];
-                
+
             ret = 1;
         } else {
             DPRINTF("DS34USB: ds3usb_get_bdaddr usb transfer error %d\n", ret);
@@ -573,13 +587,13 @@ int ds34usb_get_bdaddr(u8 *data, int port)
         }
     } else {
         ret = UsbControlTransfer(ds34pad[port].controlEndp, REQ_USB_IN, USB_REQ_GET_REPORT, (HID_USB_GET_REPORT_FEATURE << 8) | 0x12, 0, 16, usb_buf, usb_cmd_cb, (void *)port);
-        
+
         if (ret == USB_RC_OK) {
             TransferWait(ds34pad[port].cmd_sema);
 
             for (i = 0; i < 6; i++)
                 data[5 - i] = usb_buf[15 - i];
-                
+
             ret = 1;
         } else {
             DPRINTF("DS34USB: ds3usb_get_bdaddr usb transfer error %d\n", ret);
@@ -596,10 +610,10 @@ int ds34usb_get_bdaddr(u8 *data, int port)
 void ds34usb_set_bdaddr(u8 *data, int port)
 {
     int i, ret;
-    
+
     if (port >= MAX_PADS)
         return;
-    
+
     WaitSema(ds34pad[port].sema);
 
     PollSema(ds34pad[port].cmd_sema);
@@ -617,7 +631,7 @@ void ds34usb_set_bdaddr(u8 *data, int port)
 
         for (i = 0; i < 6; i++)
             usb_buf[i + 1] = data[i];
-            
+
         for (i = 0; i < sizeof(link_key); i++)
             usb_buf[i + 7] = link_key[i];
 
@@ -628,7 +642,7 @@ void ds34usb_set_bdaddr(u8 *data, int port)
         TransferWait(ds34pad[port].cmd_sema);
     else
         DPRINTF("DS34USB: ds3usb_set_bdaddr usb transfer error %d\n", ret);
-        
+
     SignalSema(ds34pad[port].sema);
 }
 
@@ -643,14 +657,14 @@ void ds34usb_reset()
 int ds34usb_get_status(int port)
 {
     int ret;
-    
+
     if (port >= MAX_PADS)
         return 0;
-    
+
     WaitSema(ds34pad[port].sema);
     ret = ds34pad[port].status;
     SignalSema(ds34pad[port].sema);
-    
+
     return ret;
 }
 

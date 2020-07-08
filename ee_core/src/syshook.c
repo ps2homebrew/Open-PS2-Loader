@@ -37,8 +37,7 @@ extern void *_end;
 u32 New_SifSetDma(SifDmaTransfer_t *sdd, s32 len)
 {
     // Hook padOpen function to install In Game Reset
-    if (!(g_compat_mask & COMPAT_MODE_6) && padOpen_hooked == 0)
-    {
+    if (!(g_compat_mask & COMPAT_MODE_6) && padOpen_hooked == 0) {
         Install_IGR();
         padOpen_hooked = Install_PadOpen_Hook(0x00100000, 0x01ff0000, PADOPEN_HOOK);
     }
@@ -126,16 +125,16 @@ void sysLoadElf(char *filename, int argc, char **argv)
 
 static void unpatchEELOADCopy(void)
 {
-   vu32 *p = (vu32*)eeloadCopy;
+    vu32 *p = (vu32 *)eeloadCopy;
 
-   p[1] = 0x0240302D; /* daddu    a2, s2, zero */
-   p[2] = 0x8FA50014; /* lw       a1, 0x0014(sp) */
-   p[3] = 0x8C67000C; /* lw       a3, 0x000C(v1) */
+    p[1] = 0x0240302D; /* daddu    a2, s2, zero */
+    p[2] = 0x8FA50014; /* lw       a1, 0x0014(sp) */
+    p[3] = 0x8C67000C; /* lw       a3, 0x000C(v1) */
 }
 
 static void unpatchInitUserMemory(void)
 {
-    vu16 *p = (vu16*)initUserMemory;
+    vu16 *p = (vu16 *)initUserMemory;
 
     /*
      * Reset the start of user memory to 0x00082000, by changing the immediate value being loaded into $a0.
@@ -206,4 +205,3 @@ void Remove_Kernel_Hooks(void)
     FlushCache(0);
     FlushCache(2);
 }
-

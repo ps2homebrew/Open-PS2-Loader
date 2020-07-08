@@ -21,7 +21,7 @@ void (*pademu_hookSio2man)(Sio2Packet *sd, Sio2McProc sio2proc) = no_pademu;
 // Shutdown callback
 //---------------------------------------------------------------------------
 static void mcemuShutdown(void)
-{   //If necessary, implement some locking mechanism to prevent further requests from being made.
+{ //If necessary, implement some locking mechanism to prevent further requests from being made.
     DeviceShutdown();
 }
 

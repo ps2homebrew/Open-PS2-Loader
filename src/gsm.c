@@ -20,10 +20,10 @@
 
 #include "include/pggsm.h"
 
-static int gEnableGSM;  // Enables GSM - 0 for Off, 1 for On
-static int gGSMVMode;   // See the related predef_vmode
-static int gGSMXOffset; // 0 - Off, Any other positive or negative value - Relative position for X Offset
-static int gGSMYOffset; // 0 - Off, Any other positive or negative value - Relative position for Y Offset
+static int gEnableGSM;   // Enables GSM - 0 for Off, 1 for On
+static int gGSMVMode;    // See the related predef_vmode
+static int gGSMXOffset;  // 0 - Off, Any other positive or negative value - Relative position for X Offset
+static int gGSMYOffset;  // 0 - Off, Any other positive or negative value - Relative position for Y Offset
 static int gGSMFIELDFix; // Enables/disables the FIELD flipping emulation option. 0 for Off, 1 for On.
 
 void InitGSMConfig(config_set_t *configSet)
@@ -46,8 +46,7 @@ void InitGSMConfig(config_set_t *configSet)
             configGetInt(configSet, CONFIG_ITEM_GSMYOFFSET, &gGSMYOffset);
             configGetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, &gGSMFIELDFix);
         }
-    }
-    else {
+    } else {
         if (configGetInt(configGame, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
             configGetInt(configGame, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
             configGetInt(configGame, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
@@ -108,12 +107,12 @@ void PrepareGSM(char *cmdline)
 
 #ifdef _DTL_T10000
     if (predef_vmode[gGSMVMode].mode == GS_MODE_DTV_576P) //There is no 576P code implemented for development TOOLs.
-        gGSMVMode = 2; //Change to PAL instead.
+        gGSMVMode = 2;                                    //Change to PAL instead.
 #endif
 
     k576p_fix = 0;
     kGsDxDyOffsetSupported = 0;
-    if((fd = open("rom0:ROMVER", O_RDONLY)) >= 0) {
+    if ((fd = open("rom0:ROMVER", O_RDONLY)) >= 0) {
         //Read ROM version
         read(fd, romver, sizeof(romver));
         close(fd);
@@ -151,4 +150,3 @@ void PrepareGSM(char *cmdline)
             kGsDxDyOffsetSupported,
             FIELD_fix);
 }
-

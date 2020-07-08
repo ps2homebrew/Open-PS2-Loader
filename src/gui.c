@@ -201,18 +201,20 @@ void guiShowAbout()
 
     snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
 #ifdef __RTL
-        " - RTL"
+                                                       " - RTL"
 #endif
 #ifdef IGS
-        " - IGS %s"
+                                                       " - IGS %s"
 #endif
 #ifdef PADEMU
-        " - PADEMU"
+                                                       " - PADEMU"
 #endif
-        //Version numbers
-        , GSM_VERSION
+             //Version numbers
+             ,
+             GSM_VERSION
 #ifdef IGS
-        , IGS_VERSION
+             ,
+             IGS_VERSION
 #endif
     );
     diaSetLabel(diaAbout, ABOUT_BUILD_DETAILS, OPLBuildDetails);
@@ -265,8 +267,7 @@ static void guiShowNotifications(void)
     clock_t currentTime;
 
     currentTime = clock();
-    if (showThmPopup || showLngPopup || showCfgPopup)
-    {
+    if (showThmPopup || showLngPopup || showCfgPopup) {
         if (!popupTimer) {
             popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
             sfxPlay(SFX_MESSAGE);
@@ -1004,8 +1005,8 @@ static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR *res)
         "vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
         "sqc2	vf1, (%[res])\n"       // transfer the result in acc to the ee
 #endif
-        : [res] "+r"(res), "=m"(*res)
-        : [a] "r"(a), [b] "r"(b), [mix] "r"(mix), "m"(*a), "m"(*b));
+        : [ res ] "+r"(res), "=m"(*res)
+        : [ a ] "r"(a), [ b ] "r"(b), [ mix ] "r"(mix), "m"(*a), "m"(*b));
 }
 
 static float guiCalcPerlin(float x, float y, float z)
@@ -1183,8 +1184,7 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
         y += h >> 1;
         rmDrawPixmap(iconTex, x, y, ALIGN_VCENTER, w, h, SCALING_RATIO, gDefaultCol);
         x += rmWideScale(w) + 2;
-    }
-    else {
+    } else {
         // HACK: font is aligned to VCENTER, the default height icon height is 20
         y += 10;
     }
@@ -1288,7 +1288,7 @@ static void guiDrawOverlays()
     fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
     y += yadd;
 
-    snprintf(text, sizeof(text), "%dKiB TEXMAN", ((4*1024*1024) - gsGlobal->CurrentPointer) / 1024);
+    snprintf(text, sizeof(text), "%dKiB TEXMAN", ((4 * 1024 * 1024) - gsGlobal->CurrentPointer) / 1024);
     fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
     y += yadd;
     y += yadd; // Empty line
@@ -1325,8 +1325,8 @@ static void guiDrawOverlays()
     }
 
     // BLURT output
-//    if (!gDisableDebug)
-//        fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
+    //    if (!gDisableDebug)
+    //        fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
 }
 
 static void guiReadPads()
@@ -1346,14 +1346,13 @@ static void guiShow()
     if (screenHandlerTarget) {
         u8 alpha;
         const u8 transition_frames = 26;
-        if (transIndex < (transition_frames/2)) {
+        if (transIndex < (transition_frames / 2)) {
             // Fade-out old screen
             // index: 0..7
             // alpha: 1..8 * transition_step
             screenHandler->renderScreen();
             alpha = fade((float)(transIndex + 1) / (transition_frames / 2)) * 0x80;
-        }
-        else {
+        } else {
             // Fade-in new screen
             // index: 8..15
             // alpha: 8..1 * transition_step
@@ -1392,8 +1391,7 @@ void guiIntroLoop(void)
             guiRenderGreeting(greetingAlpha);
 
         // Initialize boot sound
-        if (gInitComplete && !tFadeDelayEnd && gEnableBootSND)
-        {
+        if (gInitComplete && !tFadeDelayEnd && gEnableBootSND) {
             // Start playing sound
             sfxPlay(SFX_BOOT);
             // Calculate transition delay

@@ -3,13 +3,13 @@
 
 #include "irx.h"
 
-#define USB_CLASS_WIRELESS_CONTROLLER      0xE0
-#define USB_SUBCLASS_RF_CONTROLLER         0x01
-#define USB_PROTOCOL_BLUETOOTH_PROG        0x01
+#define USB_CLASS_WIRELESS_CONTROLLER 0xE0
+#define USB_SUBCLASS_RF_CONTROLLER 0x01
+#define USB_PROTOCOL_BLUETOOTH_PROG 0x01
 
-#define DS34_VID     0x054C // Sony Corporation
-#define DS3_PID      0x0268 // PS3 Controller
-#define DS4_PID      0x05C4 // PS4 Controller
+#define DS34_VID 0x054C     // Sony Corporation
+#define DS3_PID 0x0268      // PS3 Controller
+#define DS4_PID 0x05C4      // PS4 Controller
 #define DS4_PID_SLIM 0x09CC // PS4 Slim Controller
 
 #define DS3 0
@@ -32,16 +32,16 @@ typedef struct
 } bt_device;
 
 typedef struct
-{    
-    u16 hci_handle;                 //hci connection handle
+{
+    u16 hci_handle;     //hci connection handle
     u16 control_scid;   // Channel endpoint on command destination
     u16 interrupt_scid; // Channel endpoint on interrupt destination
     u8 bdaddr[6];
     u8 enabled;
     u8 status;
     u8 isfake;
-    u8 type; //0 - ds3, 1 - ds4
-    u8 oldled[4];  //rgb for ds4 and blink
+    u8 type;      //0 - ds3, 1 - ds4
+    u8 oldled[4]; //rgb for ds4 and blink
     u8 lrum;
     u8 rrum;
     u8 update_rum;
@@ -50,8 +50,7 @@ typedef struct
     u8 btn_delay;
 } ds34bt_pad_t;
 
-enum eDS34BTStatus
-{
+enum eDS34BTStatus {
     DS34BT_STATE_USB_DISCONNECTED = 0x00,
     DS34BT_STATE_USB_AUTHORIZED = 0x01,
     DS34BT_STATE_USB_CONFIGURED = 0x02,
@@ -61,13 +60,13 @@ enum eDS34BTStatus
     DS34BT_STATE_DISCONNECT_REQUEST = 0x20,
 };
 
-#define pad_status_clear(flag, pad)     ds34pad[pad].status &= ~flag
-#define pad_status_set(flag, pad)       ds34pad[pad].status |= flag
-#define pad_status_check(flag, pad)     (ds34pad[pad].status & flag)
+#define pad_status_clear(flag, pad) ds34pad[pad].status &= ~flag
+#define pad_status_set(flag, pad) ds34pad[pad].status |= flag
+#define pad_status_check(flag, pad) (ds34pad[pad].status & flag)
 
-#define hci_event_flag_clear(flag)      hci_event_flag &= ~flag
-#define hci_event_flag_set(flag)        hci_event_flag |= flag
-#define hci_event_flag_check(flag)      (hci_event_flag & flag)
+#define hci_event_flag_clear(flag) hci_event_flag &= ~flag
+#define hci_event_flag_set(flag) hci_event_flag |= flag
+#define hci_event_flag_check(flag) (hci_event_flag & flag)
 
 enum eHCI {
     // {{{
@@ -88,24 +87,24 @@ enum eHCI {
     HCI_OGF_INFO_PARAM = (0x04 << 2),  // OGF: Informational Parameters
 
     /* HCI OpCode Command Field (OCF) */
-    HCI_OCF_DISCONNECT = 0x06,                // OGF = 0x01
+    HCI_OCF_DISCONNECT = 0x06,             // OGF = 0x01
     HCI_OCF_ACCEPT_CONNECTION = 0x09,      // OGF = 0x01
     HCI_OCF_REJECT_CONNECTION = 0x0A,      // OGF = 0x01
     HCI_OCF_CHANGE_CONNECTION_TYPE = 0x0F, // OGF = 0x01
-    HCI_OCF_REMOTE_NAME = 0x19,               // OGF = 0x01
+    HCI_OCF_REMOTE_NAME = 0x19,            // OGF = 0x01
     HCI_OCF_LINK_KEY_REQUEST_REPLY = 0x0B, // OGF = 0x01
-    
-    HCI_OCF_RESET = 0x03,                  // OGF = 0x03
-    HCI_OCF_WRITE_ACCEPT_TIMEOUT = 0x16,   // OGF = 0x03
-    HCI_OCF_WRITE_SCAN_ENABLE = 0x1A,      // OGF = 0x03
-    
-    HCI_OCF_READ_BDADDR = 0x09,      // OGF = 0x04
+
+    HCI_OCF_RESET = 0x03,                // OGF = 0x03
+    HCI_OCF_WRITE_ACCEPT_TIMEOUT = 0x16, // OGF = 0x03
+    HCI_OCF_WRITE_SCAN_ENABLE = 0x1A,    // OGF = 0x03
+
+    HCI_OCF_READ_BDADDR = 0x09, // OGF = 0x04
 
     /* HCI events managed */
     HCI_EVENT_CONNECT_COMPLETE = 0x03,
     HCI_EVENT_CONNECT_REQUEST = 0x04,
     HCI_EVENT_DISCONN_COMPLETE = 0x05,
-    HCI_EVENT_AUTHENTICATION_COMPLETE= 0x06,
+    HCI_EVENT_AUTHENTICATION_COMPLETE = 0x06,
     HCI_EVENT_REMOTE_NAME_COMPLETE = 0x07,
     HCI_EVENT_ENCRYPTION_CHANGE = 0x08,
     HCI_EVENT_READ_REMOTE_SUPPORTED_FEATURES_COMPLETE = 0x0B,
@@ -142,7 +141,7 @@ enum eL2CAP {
     /* Bluetooth L2CAP PSM */
     L2CAP_PSM_SDP = 0x01,
     L2CAP_PSM_CTRL = 0x11, // HID_Control
-    L2CAP_PSM_INTR = 0x13,  // HID_Interrupt
+    L2CAP_PSM_INTR = 0x13, // HID_Interrupt
 
     /* Bluetooth L2CAP states for L2CAP_task() */
     L2CAP_DOWN_STATE = 0,
@@ -178,7 +177,7 @@ enum eL2CAP {
     L2CAP_CMD_DISCONNECT_REQUEST = 0x06,
     L2CAP_CMD_DISCONNECT_RESPONSE = 0x07,
 
-/*  HCI ACL Data Packet
+    /*  HCI ACL Data Packet
  *
  *  buf[0]          buf[1]          buf[2]          buf[3]
  *  0      4        8    11 12      16              24             31 MSB
@@ -226,7 +225,7 @@ enum eHID {
 
     PS3_01_REPORT_ID = 0x01,
     PS3_01_REPORT_LEN = 0x30,
-    
+
     PS4_02_REPORT_ID = 0x02,
     PS4_11_REPORT_ID = 0x11,
     PS4_11_REPORT_LEN = 0x4D,
@@ -234,10 +233,13 @@ enum eHID {
     // }}}
 };
 
-struct ds3report {
-    union {
+struct ds3report
+{
+    union
+    {
         u8 ButtonStateL; // Main buttons Low
-        struct {
+        struct
+        {
             u8 Select : 1;
             u8 L3 : 1;
             u8 R3 : 1;
@@ -248,9 +250,11 @@ struct ds3report {
             u8 Left : 1;
         };
     };
-    union {
-        u8 ButtonStateH;     // Main buttons High
-        struct {
+    union
+    {
+        u8 ButtonStateH; // Main buttons High
+        struct
+        {
             u8 L2 : 1;
             u8 R2 : 1;
             u8 L1 : 1;
@@ -292,13 +296,14 @@ struct ds3report {
 
 } __attribute__((packed));
 
-struct ds4report {
+struct ds4report
+{
     u8 ReportID;
-    u8 LeftStickX;       // left Joystick X axis 0 - 255, 128 is mid
-    u8 LeftStickY;       // left Joystick Y axis 0 - 255, 128 is mid
-    u8 RightStickX;      // right Joystick X axis 0 - 255, 128 is mid
-    u8 RightStickY;      // right Joystick Y axis 0 - 255, 128 is mid
-    u8 Dpad : 4;         // hat format, 0x08 is released, 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW
+    u8 LeftStickX;  // left Joystick X axis 0 - 255, 128 is mid
+    u8 LeftStickY;  // left Joystick Y axis 0 - 255, 128 is mid
+    u8 RightStickX; // right Joystick X axis 0 - 255, 128 is mid
+    u8 RightStickY; // right Joystick Y axis 0 - 255, 128 is mid
+    u8 Dpad : 4;    // hat format, 0x08 is released, 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW
     u8 Square : 1;
     u8 Cross : 1;
     u8 Circle : 1;
@@ -313,34 +318,34 @@ struct ds4report {
     u8 R3 : 1;
     u8 PSButton : 1;
     u8 TPad : 1;
-    u8 Counter1 : 6;     // counts up by 1 per report
-    u8 PressureL2;       // digital Pad L2 button Pressure 0 - 255
-    u8 PressureR2;       // digital Pad R2 button Pressure 0 - 255
+    u8 Counter1 : 6; // counts up by 1 per report
+    u8 PressureL2;   // digital Pad L2 button Pressure 0 - 255
+    u8 PressureR2;   // digital Pad R2 button Pressure 0 - 255
     u8 Counter2;
     u8 Counter3;
-    u8 Battery;             // battery level from 0x00 to 0xff 
+    u8 Battery; // battery level from 0x00 to 0xff
     s16 AccelX;
     s16 AccelY;
     s16 AccelZ;
     s16 GyroZ;
     s16 GyroY;
     s16 GyroX;
-    u8 Reserved1[5];        // Unknown
-    u8 Power : 4;           // from 0x0 to 0xA - charging, 0xB - charged 
+    u8 Reserved1[5]; // Unknown
+    u8 Power : 4;    // from 0x0 to 0xA - charging, 0xB - charged
     u8 Usb_plugged : 1;
     u8 Headphones : 1;
     u8 Microphone : 1;
     u8 Padding : 1;
-    u8 Reserved2[2];          // Unknown
-    u8 TPpack;                // number of trackpad packets (0x00 to 0x04) 
-    u8 PackCounter;           // packet counter
-    u8 Finger1ID : 7;         // counter
-    u8 Finger1Active : 1;     // 0 - active, 1 - unactive
-    u16 Finger1X : 12;        // finger 1 coordinates resolution 1920x943
+    u8 Reserved2[2];      // Unknown
+    u8 TPpack;            // number of trackpad packets (0x00 to 0x04)
+    u8 PackCounter;       // packet counter
+    u8 Finger1ID : 7;     // counter
+    u8 Finger1Active : 1; // 0 - active, 1 - unactive
+    u16 Finger1X : 12;    // finger 1 coordinates resolution 1920x943
     u16 Finger1Y : 12;
     u8 Finger2ID : 7;
     u8 Finger2Active : 1;
-    u16 Finger2X : 12;        // finger 2 coordinates resolution 1920x943
+    u16 Finger2X : 12; // finger 2 coordinates resolution 1920x943
     u16 Finger2Y : 12;
 
 } __attribute__((packed));

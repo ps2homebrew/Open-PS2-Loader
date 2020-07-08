@@ -76,9 +76,7 @@ typedef struct _ata_cmd_info
 } ata_cmd_info_t;
 
 static const ata_cmd_info_t ata_cmd_table[] = {
-    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01},
-    {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}, {ATA_C_STANDBY_IMMEDIATE,0x1},
-    {ATA_C_FLUSH_CACHE, 0x01}, {ATA_C_STANDBY_IMMEDIATE,1},{ATA_C_FLUSH_CACHE_EXT, 0x01}};
+    {ATA_C_READ_DMA, 0x04}, {ATA_C_IDENTIFY_DEVICE, 0x02}, {ATA_C_IDENTIFY_PACKET_DEVICE, 0x02}, {ATA_C_SMART, 0x07}, {ATA_C_SET_FEATURES, 0x01}, {ATA_C_READ_DMA_EXT, 0x84}, {ATA_C_WRITE_DMA, 0x04}, {ATA_C_IDLE, 0x01}, {ATA_C_WRITE_DMA_EXT, 0x84}, {ATA_C_STANDBY_IMMEDIATE, 0x1}, {ATA_C_FLUSH_CACHE, 0x01}, {ATA_C_STANDBY_IMMEDIATE, 1}, {ATA_C_FLUSH_CACHE_EXT, 0x01}};
 #define ATA_CMD_TABLE_SIZE (sizeof ata_cmd_table / sizeof(ata_cmd_info_t))
 
 static const ata_cmd_info_t smart_cmd_table[] = {
@@ -162,8 +160,8 @@ int atad_start(void)
     dev9RegisterIntrCb(1, &ata_intr_cb);
     dev9RegisterIntrCb(0, &ata_intr_cb);
     if (!ata_gamestar_workaround) {
-      dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
-      dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
+        dev9RegisterPreDmaCb(0, &ata_pre_dma_cb);
+        dev9RegisterPostDmaCb(0, &ata_post_dma_cb);
     }
     /* Register this at the last position, as it should be the last thing done before shutdown. */
     dev9RegisterShutdownCb(15, &ata_shutdown_cb);
@@ -569,8 +567,8 @@ int ata_device_flush_cache(int device)
 {
     int res;
 
-    if(!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
-	res = ata_io_finish();
+    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
+        res = ata_io_finish();
 
     return res;
 }
@@ -661,7 +659,8 @@ static int ata_device_standby_immediate(int device)
 {
     int res;
 
-    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4)&0xFFFF, ATA_C_STANDBY_IMMEDIATE))) res = ata_io_finish();
+    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xFFFF, ATA_C_STANDBY_IMMEDIATE)))
+        res = ata_io_finish();
 
     return res;
 }
@@ -671,4 +670,3 @@ static void ata_shutdown_cb(void)
     if (atad_devinfo.exists)
         ata_device_standby_immediate(0);
 }
-

@@ -646,4 +646,3 @@ void configRemoveVMC(config_set_t *configSet, int slot)
     snprintf(gkey, sizeof(gkey), "%s_%d", CONFIG_ITEM_VMC, slot);
     configRemoveKey(configSet, gkey);
 }
-

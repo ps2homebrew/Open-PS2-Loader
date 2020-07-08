@@ -1315,11 +1315,7 @@ static void reset(void)
 {
     sysReset(SYS_LOAD_MC_MODULES | SYS_LOAD_USB_MODULES | SYS_LOAD_ISOFS_MODULE);
 
-#ifdef _DTL_T10000
     mcInit(MC_TYPE_XMC);
-#else
-    mcInit(MC_TYPE_MC);
-#endif
 }
 
 static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)

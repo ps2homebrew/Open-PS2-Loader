@@ -141,9 +141,6 @@ int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
 
-int gFadeDelay;
-int toggleSfx;
-
 int showCfgPopup;
 
 #ifdef IGS
@@ -184,7 +181,7 @@ int gRememberLastPlayed;
 int KeyPressedOnce;
 int gAutoStartLastPlayed;
 int RemainSecs, DisableCron;
-double CronStart;
+clock_t CronStart;
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

@@ -359,10 +359,6 @@ int sysGetDiscID(char *hexDiscID)
 
 void sysExecExit(void)
 {
-    if (gEnableSFX) {
-        //wait 70ms for confirm sound to finish playing before exit
-        guiDelay(0070);
-    }
     //Deinitialize without shutting down active devices.
     deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     Exit(0);

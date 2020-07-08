@@ -42,7 +42,6 @@
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 
 #include <unistd.h>
-#include <audsrv.h>
 #ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
@@ -1253,14 +1252,8 @@ static int loadHdldSvr(void)
 {
     int ret, padStatus;
 
-    // disable sfx before audio lib
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-        toggleSfx = 1;
-    }
-
     // deint audio lib while hdl server is running
-    audsrv_quit();
+    sfxEnd();
 
     // block all io ops, wait for the ones still running to finish
     ioBlockOps(1);
@@ -1319,7 +1312,7 @@ static void unloadHdldSvr(void)
     // init all supports again
     initAllSupport(1);
 
-    // reinit audio lib
+    // deferred reinit of audio lib to avoid crashing if devices aren't ready
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
 }
 
@@ -1376,11 +1369,6 @@ void deinit(int exception, int modeSelected)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-    if (gEnableSFX) {
-        gEnableSFX = 0;
-    }
-    audsrv_quit();
-
 #ifdef PADEMU
     ds34usb_reset();
     ds34bt_reset();
@@ -1389,6 +1377,7 @@ void deinit(int exception, int modeSelected)
 
     deinitAllSupport(exception, modeSelected);
 
+    sfxEnd();
     ioEnd();
     guiEnd();
     menuEnd();
@@ -1551,27 +1540,11 @@ static void deferredAudioInit(void)
 {
     int ret;
 
-    ret = audsrv_init();
-    if (ret != 0)
-        LOG("Failed to initialize audsrv\n");
-        LOG("Audsrv returned error string: %s\n", audsrv_get_error_string());
-
     ret = sfxInit(1);
-    if (ret >= 0)
-        LOG("sfxInit: %d samples loaded.\n", ret);
-    else
+    if (ret < 0)
         LOG("sfxInit: failed to initialize - %d.\n", ret);
-
-    // boot sound
-    if (gEnableBootSND) {
-        sfxPlay(SFX_BOOT);
-    }
-
-    // re-enable sfx if previously disabled (hdl svr)
-    if (!gEnableSFX && toggleSfx) {
-        gEnableSFX = 1;
-        toggleSfx = 0;
-    }
+    else
+        LOG("sfxInit: %d samples loaded.\n", ret);
 }
 
 // --------------------- Main --------------------

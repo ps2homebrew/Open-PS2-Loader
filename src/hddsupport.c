@@ -215,7 +215,7 @@ item_list_t *hddGetObject(int initOnly)
 }
 
 static int hddNeedsUpdate(void)
-{   /* Auto refresh is disabled by setting HDD_MODE_UPDATE_DELAY to MENU_UPD_DELAY_NOUPDATE, within hddsupport.h.
+{ /* Auto refresh is disabled by setting HDD_MODE_UPDATE_DELAY to MENU_UPD_DELAY_NOUPDATE, within hddsupport.h.
        Hence any update request would be issued by the user, which should be taken as an explicit request to re-scan the HDD. */
     return 1;
 }
@@ -225,13 +225,11 @@ static int hddUpdateGameList(void)
     hdl_games_list_t hddGamesNew;
     int ret;
 
-    if (((ret = hddLoadGameListCache(&hddGames)) != 0) || (hddForceUpdate))
-    {
+    if (((ret = hddLoadGameListCache(&hddGames)) != 0) || (hddForceUpdate)) {
         hddGamesNew.count = 0;
         hddGamesNew.games = NULL;
         ret = hddGetHDLGamelist(&hddGamesNew);
-        if (ret == 0)
-        {
+        if (ret == 0) {
             hddUpdateGameListCache(&hddGames, &hddGamesNew);
             hddFreeHDLGamelist(&hddGames);
             hddGames = hddGamesNew;
@@ -437,7 +435,7 @@ static config_set_t *hddGetConfig(int id)
     char path[256];
     hdl_game_info_t *game = &hddGames.games[id];
 
-    snprintf(path, sizeof(path), "%s"OPL_FOLDER"/%s.cfg", hddPrefix, game->startup);
+    snprintf(path, sizeof(path), "%s" OPL_FOLDER "/%s.cfg", hddPrefix, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file exists or not.
 
@@ -525,20 +523,16 @@ static int hddLoadGameListCache(hdl_games_list_t *cache)
 
     sprintf(filename, "%s/games.bin", hddPrefix);
     file = fopen(filename, "rb");
-    if (file != NULL)
-    {
+    if (file != NULL) {
         fseek(file, 0, SEEK_END);
         size = ftell(file);
         rewind(file);
 
         count = size / sizeof(hdl_game_info_t);
-        if (count > 0)
-        {
+        if (count > 0) {
             games = memalign(64, count * sizeof(hdl_game_info_t));
-            if (games != NULL)
-            {
-                if (fread(games, sizeof(hdl_game_info_t), count, file) == count)
-                {
+            if (games != NULL) {
+                if (fread(games, sizeof(hdl_game_info_t), count, file) == count) {
                     cache->count = count;
                     cache->games = games;
                     LOG("hddLoadGameListCache: %d games loaded.\n", count);
@@ -573,27 +567,22 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
     if (!gHDDGameListCache)
         return 1;
 
-    if (cache->count > 0)
-    {
+    if (cache->count > 0) {
         modified = 0;
-        for(i = 0; i < cache->count; i++)
-        {
-            for (j = 0; j < game_list->count; j++)
-            {
-                if (strncmp(cache->games[i].partition_name, game_list->games[j].partition_name, APA_IDMAX+1) == 0)
+        for (i = 0; i < cache->count; i++) {
+            for (j = 0; j < game_list->count; j++) {
+                if (strncmp(cache->games[i].partition_name, game_list->games[j].partition_name, APA_IDMAX + 1) == 0)
                     break;
             }
 
-            if (j == game_list->count)
-            {
+            if (j == game_list->count) {
                 LOG("hddUpdateGameListCache: game added.\n");
                 modified = 1;
                 break;
             }
         }
 
-        if ((!modified) && (game_list->count != cache->count))
-        {
+        if ((!modified) && (game_list->count != cache->count)) {
             LOG("hddUpdateGameListCache: game removed.\n");
             modified = 1;
         }
@@ -606,11 +595,9 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
     LOG("hddUpdateGameListCache: caching new game list.\n");
 
     sprintf(filename, "%s/games.bin", hddPrefix);
-    if (game_list->count > 0)
-    {
+    if (game_list->count > 0) {
         file = fopen(filename, "wb");
-        if (file != NULL)
-        {
+        if (file != NULL) {
             result = (fwrite(game_list->games, sizeof(hdl_game_info_t), game_list->count, file) == game_list->count) ? 0 : EIO;
             fclose(file);
         } else {
@@ -633,5 +620,4 @@ static void hddGetAppsPath(char *path, int max)
 static item_list_t hddGameList = {
     HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddGetAppsPath, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON
-};
+    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON};

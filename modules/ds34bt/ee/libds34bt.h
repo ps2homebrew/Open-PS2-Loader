@@ -9,11 +9,11 @@ enum eDS34BTStatus {
 
 typedef struct
 {
-    u8 hci_ver;      //Version of the Current HCI in the BR/EDR Controller
-    u16 hci_rev;     //Revision of the Current HCI in the BR/EDR Controller
-    u8 lmp_ver;      //Version of the Current LMP or PAL in the Controller
-    u16 mf_name;     //Manufacturer Name of the BR/EDR Controller
-    u16 lmp_subver;  //Subversion of the Current LMP or PAL in the Controller
+    u8 hci_ver;     //Version of the Current HCI in the BR/EDR Controller
+    u16 hci_rev;    //Revision of the Current HCI in the BR/EDR Controller
+    u8 lmp_ver;     //Version of the Current LMP or PAL in the Controller
+    u16 mf_name;    //Manufacturer Name of the BR/EDR Controller
+    u16 lmp_subver; //Subversion of the Current LMP or PAL in the Controller
     u16 vid;
     u16 pid;
     u16 rev;
@@ -31,4 +31,3 @@ int ds34bt_get_data(int port, u8 *data);
 int ds34bt_reset();
 int ds34bt_get_version(hci_information_t *info);
 int ds34bt_get_features(u8 *info);
-

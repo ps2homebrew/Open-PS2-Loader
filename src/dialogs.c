@@ -738,7 +738,7 @@ struct UIItem diaPadEmuInfo[] = {
     {UI_LABEL, 0, 1, 1, -1, -4, 0, {.label = {"52.", -1}}},
     {UI_LABEL, PADCFG_FEAT_START + 52, 0, 1, -1, -7, 0, {.label = {"", -1}}},
     {UI_LABEL, 0, 1, 1, -1, -4, 0, {.label = {"60.", -1}}},
-    {UI_LABEL, PADCFG_FEAT_START+  60, 0, 1, -1, -7, 0, {.label = {"", -1}}},
+    {UI_LABEL, PADCFG_FEAT_START + 60, 0, 1, -1, -7, 0, {.label = {"", -1}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -4, 0, {.label = {"05.", -1}}},
@@ -868,6 +868,7 @@ struct UIItem diaAbout[] = {
     {UI_SPLITTER},
     //END of OPL_DB tweaks
 
+<<<<<<< HEAD
     //START of OPL_DB tweaks
     // OPL Free Statement
     {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OPL_FREE}}},
@@ -875,6 +876,20 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
     {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {NULL, _STR_OPL_IFCARO}}},
+=======
+    // Build Options
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}},
+    {UI_SPACER},
+    {UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_BREAK},
+
+    // Support details
+    {UI_BREAK},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_FORUM_DETAILS}}},
+    {UI_SPACER},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {"psx-place.com", -1}}},
+>>>>>>> 61d1ccbae4df626eef6696f9af492cc48f92c361
     {UI_BREAK},
 
     {UI_SPACER},
@@ -958,8 +973,8 @@ struct UIItem diaAudioConfig[] = {
     {UI_INT, CFG_BOOT_SND_VOLUME, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
     {UI_BREAK},
 
-     // buttons
+    // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
     {UI_BREAK},
-     // end of dialog
+    // end of dialog
     {UI_TERMINATOR}};

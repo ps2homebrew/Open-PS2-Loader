@@ -10,12 +10,12 @@
 int _start(int argc, char **argv)
 {
     sceSdEffectAttr attr = {
-	0,
-	SD_EFFECT_MODE_OFF,
-	0,
-	0,
-	0,
-	0,
+        0,
+        SD_EFFECT_MODE_OFF,
+        0,
+        0,
+        0,
+        0,
     };
 
     sceSdInit(0);
@@ -25,4 +25,3 @@ int _start(int argc, char **argv)
 
     return MODULE_NO_RESIDENT_END;
 }
-

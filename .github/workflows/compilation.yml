@@ -19,50 +19,120 @@ jobs:
     - run: |
         git fetch --prune --unshallow
 
-    - name: Compile -> make clean opl.elf
-      run: |
-        make clean opl.elf
-    
-    - name: Compile -> make IGS=1 clean opl.elf
-      run: |
-        make IGS=1 clean opl.elf
-
-    - name: Compile -> make PADEMU=1 clean opl.elf
-      run: |
-        make PADEMU=1 clean opl.elf
-    
-    - name: Compile -> make IGS=1 PADEMU=1 clean opl.elf
-      run: |
-        make IGS=1 PADEMU=1 clean opl.elf
-
-    - name: Compile -> make DEBUG=1 clean opl.elf
-      run: |
-        make DEBUG=1 clean opl.elf
-
-    - name: Compile -> make DEBUG=1 IOPCORE_DEBUG=1 clean opl.elf
-      run: |
-        make DEBUG=1 IOPCORE_DEBUG=1 clean opl.elf
-    
-    - name: Compile -> make DEBUG=1 EESIO_DEBUG=1 clean opl.elf
-      if: false # This step is disabled for now because EESIO_DEBUG is broken after newlib changes
-      run: |
-        make DEBUG=1 EESIO_DEBUG=1 clean opl.elf
-    
-    - name: Compile -> make DEBUG=1 INGAME_DEBUG=1 clean opl.elf
-      run: |
-        make DEBUG=1 INGAME_DEBUG=1 clean opl.elf
-    
-    - name: Compile -> make clean release
-      run: |
-        make clean release
-
     - name: Get short SHA
       id: slug
       run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
 
-    - name: Upload artifacts
+    - name: Compile -> make clean release
+      run: |
+        make clean release
+
+    - name: Upload release artifact
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
         name: OPNPS2LD-${{ steps.slug.outputs.sha8 }}
         path: OPNPS2LD-*.ZIP
+
+  build-variants:
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
+    steps:
+    - name: Install dependencies
+      run: |
+        apk add build-base git
+
+    - uses: actions/checkout@v2
+    - run: |
+        git fetch --prune --unshallow
+
+    - name: Get short SHA
+      id: slug
+      run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+
+    - name: Compile -> make clean OPNPS2LD.ELF
+      run: |
+        make clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD.ELF
+
+    - name: Compile -> make DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-DTL_T10000.ELF
+
+    - name: Compile -> make PADEMU=1 clean OPNPS2LD.ELF
+      run: |
+        make PADEMU=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-PADEMU.ELF
+
+    - name: Compile -> make PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-PADEMU-DTL_T10000.ELF
+
+    - name: Compile -> make IGS=1 clean OPNPS2LD.ELF
+      run: |
+        make IGS=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-IGS.ELF
+
+    - name: Compile -> make IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-IGS-DTL_T10000.ELF
+
+    - name: Compile -> make IGS=1 PADEMU=1 clean OPNPS2LD.ELF
+      run: |
+        make IGS=1 PADEMU=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-IGS-PADEMU.ELF
+
+    - name: Compile -> make IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-IGS-PADEMU-DTL_T10000.ELF
+
+    - name: Compile -> make RTL=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL.ELF
+
+    - name: Compile -> make RTL=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-DTL_T10000.ELF
+
+    - name: Compile -> make RTL=1 PADEMU=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 PADEMU=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-PADEMU.ELF
+
+    - name: Compile -> make RTL=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-PADEMU-DTL_T10000.ELF
+
+    - name: Compile -> make RTL=1 IGS=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 IGS=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS.ELF
+
+    - name: Compile -> make RTL=1 IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-DTL_T10000.ELF
+
+    - name: Compile -> make RTL=1 IGS=1 PADEMU=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 IGS=1 PADEMU=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-PADEMU.ELF
+
+    - name: Compile -> make RTL=1 IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+      run: |
+        make RTL=1 IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
+        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-PADEMU-DTL_T10000.ELF
+
+    - name: Upload variants artifact
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: OPNPS2LD-VARIANTS-${{ steps.slug.outputs.sha8 }}
+        path: OPNPS2LD*.ELF

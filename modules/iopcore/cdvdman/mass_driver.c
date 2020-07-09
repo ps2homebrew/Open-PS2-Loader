@@ -107,9 +107,10 @@ typedef struct _usb_callback_data
     int returnSize;
 } usb_callback_data;
 
-#define USB_BLOCK_SIZE	4096	//Maximum single USB 1.1 transfer length.
+#define USB_BLOCK_SIZE 4096 //Maximum single USB 1.1 transfer length.
 
-typedef struct _usb_transfer_callback_data {
+typedef struct _usb_transfer_callback_data
+{
     int sema;
     int pipe;
     u8 *buffer;
@@ -121,16 +122,16 @@ static mass_dev g_mass_device;
 static void *gSectorBuffer;
 
 static void usb_callback(int resultCode, int bytes, void *arg);
-static int perform_bulk_transfer(usb_transfer_callback_data* data);
+static int perform_bulk_transfer(usb_transfer_callback_data *data);
 static void usb_transfer_callback(int resultCode, int bytes, void *arg);
-static int usb_set_configuration(mass_dev* dev, int configNumber);
-static int usb_set_interface(mass_dev* dev, int interface, int altSetting);
-static int usb_bulk_clear_halt(mass_dev* dev, int endpoint);
-static void usb_bulk_reset(mass_dev* dev, int mode);
-static int usb_bulk_status(mass_dev* dev, csw_packet* csw, unsigned int tag);
-static int usb_bulk_manage_status(mass_dev* dev, unsigned int tag);
-static int usb_bulk_command(mass_dev* dev, cbw_packet* packet );
-static int usb_bulk_transfer(mass_dev* dev, int direction, void* buffer, unsigned int transferSize);
+static int usb_set_configuration(mass_dev *dev, int configNumber);
+static int usb_set_interface(mass_dev *dev, int interface, int altSetting);
+static int usb_bulk_clear_halt(mass_dev *dev, int endpoint);
+static void usb_bulk_reset(mass_dev *dev, int mode);
+static int usb_bulk_status(mass_dev *dev, csw_packet *csw, unsigned int tag);
+static int usb_bulk_manage_status(mass_dev *dev, unsigned int tag);
+static int usb_bulk_command(mass_dev *dev, cbw_packet *packet);
+static int usb_bulk_transfer(mass_dev *dev, int direction, void *buffer, unsigned int transferSize);
 
 static int mass_stor_warmup(mass_dev *dev);
 static void mass_stor_release(mass_dev *dev);
@@ -144,44 +145,38 @@ static void usb_callback(int resultCode, int bytes, void *arg)
     SignalSema(data->sema);
 }
 
-static int perform_bulk_transfer(usb_transfer_callback_data* data)
+static int perform_bulk_transfer(usb_transfer_callback_data *data)
 {
     int ret, len;
 
     len = data->remaining > USB_BLOCK_SIZE ? USB_BLOCK_SIZE : data->remaining;
     ret = UsbBulkTransfer(
-                data->pipe,		//bulk pipe epI (Read) or epO (Write)
-                data->buffer,		//data ptr
-                len,			//data length
-                &usb_transfer_callback,
-                (void*)data
-            );
+        data->pipe,   //bulk pipe epI (Read) or epO (Write)
+        data->buffer, //data ptr
+        len,          //data length
+        &usb_transfer_callback,
+        (void *)data);
     return ret;
 }
 
 static void usb_transfer_callback(int resultCode, int bytes, void *arg)
 {
     int ret;
-    usb_transfer_callback_data* data = (usb_transfer_callback_data*)arg;
+    usb_transfer_callback_data *data = (usb_transfer_callback_data *)arg;
 
     data->returnCode = resultCode;
-    if(resultCode == USB_RC_OK)
-    {  //Update transfer progress if successful.
+    if (resultCode == USB_RC_OK) { //Update transfer progress if successful.
         data->remaining -= bytes;
         data->buffer += bytes;
     }
 
-    if((resultCode == USB_RC_OK) && (data->remaining > 0))
-    {	//OK to continue.
+    if ((resultCode == USB_RC_OK) && (data->remaining > 0)) { //OK to continue.
         ret = perform_bulk_transfer(data);
-        if (ret != USB_RC_OK)
-        {
+        if (ret != USB_RC_OK) {
             data->returnCode = ret;
             SignalSema(data->sema);
         }
-    }
-    else
-    {
+    } else {
         SignalSema(data->sema);
     }
 }
@@ -392,7 +387,7 @@ static int usb_bulk_transfer(mass_dev *dev, int direction, void *buffer, unsigne
     usb_transfer_callback_data cb_data;
 
     cb_data.sema = dev->ioSema;
-    cb_data.pipe = (direction==USB_BLK_EP_IN) ? dev->bulkEpI : dev->bulkEpO;
+    cb_data.pipe = (direction == USB_BLK_EP_IN) ? dev->bulkEpI : dev->bulkEpO;
     cb_data.buffer = buffer;
     cb_data.remaining = transferSize;
 
@@ -960,8 +955,7 @@ int mass_stor_stop_unit(void)
 {
     int stat;
 
-    if (g_mass_device.devId != -1)
-    {
+    if (g_mass_device.devId != -1) {
         if ((stat = cbw_scsi_start_stop_unit(&g_mass_device, 0)) != 0) {
             XPRINTF("USBHDFSD: Error - cbw_scsi_start_stop_unit %d\n", stat);
         }
@@ -1013,7 +1007,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
     u32 sectorsToRead, nbytes, DiskSectorsToRead, lba;
     u8 *p = (u8 *)buf;
 
-	//Phase 1: read sectors until the LSN is aligned with the disk's LBA (sector sizes > 2048).
+    //Phase 1: read sectors until the LSN is aligned with the disk's LBA (sector sizes > 2048).
     if (g_mass_device.sectorSize > 2048) {
         //4096-byte sectors
         lba = cdvdman_settings.LBAs[part_num] + (lsn / 2);
@@ -1032,7 +1026,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
 
     //Phase 2: read as much of the remaining sectors as possible
     DiskSectorsToRead = nsectors * 2048 / g_mass_device.sectorSize;
-	if (DiskSectorsToRead > 0) {
+    if (DiskSectorsToRead > 0) {
         sectorsToRead = DiskSectorsToRead * g_mass_device.sectorSize / 2048; //Compute the number of CD-ROM/DVD sectors that will be read.
         nbytes = sectorsToRead * 2048;
 
@@ -1042,7 +1036,7 @@ int mass_stor_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int par
         lsn += sectorsToRead;
         p += nbytes;
         nsectors -= sectorsToRead;
-	}
+    }
 
     //Phase 3: read any outstanding amount of data (sector sizes > 2048)
     if (nsectors > 0) {

@@ -52,7 +52,7 @@
 #endif
 
 //Master password for disabling the parental lock.
-#define OPL_PARENTAL_LOCK_MASTER_PASS	"989765"
+#define OPL_PARENTAL_LOCK_MASTER_PASS "989765"
 
 //IO type IDs
 #define IO_CUSTOM_SIMPLEACTION 1 // handler for parameter-less actions
@@ -149,9 +149,6 @@ int gCheatSource;
 int gGSMSource;
 int gPadEmuSource;
 
-int gFadeDelay;
-int toggleSfx;
-
 int showCfgPopup;
 
 #ifdef IGS
@@ -192,7 +189,7 @@ int gRememberLastPlayed;
 int KeyPressedOnce;
 int gAutoStartLastPlayed;
 int RemainSecs, DisableCron;
-double CronStart;
+clock_t CronStart;
 
 unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];

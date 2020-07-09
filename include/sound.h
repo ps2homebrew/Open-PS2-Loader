@@ -13,7 +13,9 @@ enum SFX {
 };
 
 int sfxInit(int bootSnd);
+void sfxEnd(void);
 void sfxVolume(void);
+int sfxGetSoundDuration(int id);
 void sfxPlay(int id);
 
 #endif

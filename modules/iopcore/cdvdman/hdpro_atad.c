@@ -661,7 +661,7 @@ int ata_device_flush_cache(int device)
     if (!hdpro_io_start())
         return -1;
 
-    if(!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
+    if (!(res = ata_io_start(NULL, 1, 0, 0, 0, 0, 0, (device << 4) & 0xffff, lba_48bit ? ATA_C_FLUSH_CACHE_EXT : ATA_C_FLUSH_CACHE)))
         res = ata_io_finish();
 
     if (!hdpro_io_finish())
@@ -739,7 +739,7 @@ int ata_device_set_write_cache(int device, int enable)
     if (!hdpro_io_start())
         return -1;
 
-    if((res = ata_io_start(NULL, 1, enable ? 0x02 : 0x82, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES)) == 0)
+    if ((res = ata_io_start(NULL, 1, enable ? 0x02 : 0x82, 0, 0, 0, 0, (device << 4) & 0xffff, ATA_C_SET_FEATURES)) == 0)
         res = ata_io_finish();
 
     if (!hdpro_io_finish())
@@ -747,4 +747,3 @@ int ata_device_set_write_cache(int device, int enable)
 
     return res;
 }
-

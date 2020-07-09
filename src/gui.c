@@ -44,11 +44,10 @@ static ee_sema_t gQueueSema;
 static int screenWidth;
 static int screenHeight;
 
-static int popupTimer;
-static int popupSfxPlayed;
-
 static int showThmPopup;
 static int showLngPopup;
+
+static clock_t popupTimer = 0;
 
 // forward decl.
 static void guiShow();
@@ -197,30 +196,30 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
-    toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
     snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
     snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
 #ifdef __RTL
-        " - RTL"
+                                                       " - RTL"
 #endif
 #ifdef IGS
-        " - IGS %s"
+                                                       " - IGS %s"
 #endif
 #ifdef PADEMU
-        " - PADEMU"
+                                                       " - PADEMU"
 #endif
-        //Version numbers
-        , GSM_VERSION
+             //Version numbers
+             ,
+             GSM_VERSION
 #ifdef IGS
-        , IGS_VERSION
+             ,
+             IGS_VERSION
 #endif
     );
     diaSetLabel(diaAbout, ABOUT_BUILD_DETAILS, OPLBuildDetails);
 
     diaExecuteDialog(diaAbout, -1, 1, NULL);
-    toggleSfx = 0;
 }
 
 void guiCheckNotifications(int checkTheme, int checkLang)
@@ -235,21 +234,14 @@ void guiCheckNotifications(int checkTheme, int checkLang)
             if (lngGetGuiValue() != 0)
                 showLngPopup = 1;
         }
-
-        if (showThmPopup || showLngPopup || showCfgPopup) {
-            popupSfxPlayed = 0;
-            if (showCfgPopup)
-                popupTimer -= 30;
-        }
     }
 }
 
 static void guiResetNotifications(void)
 {
-    popupSfxPlayed = 1;
-    popupTimer = 0;
     showThmPopup = 0;
     showLngPopup = 0;
+    popupTimer = 0;
 }
 
 static void guiRenderNotifications(char *type, char *path, int y)
@@ -264,39 +256,40 @@ static void guiRenderNotifications(char *type, char *path, int y)
 
     x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
 
-    rmDrawRect(x, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-    fntRenderString(gTheme->fonts[0], x + 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    rmDrawRect(x - 10, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
+    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
 }
 
 static void guiShowNotifications(void)
 {
     int y = 10;
     int yadd = 35;
+    clock_t currentTime;
 
-    if (showThmPopup || showLngPopup || showCfgPopup)
-        popupTimer++;
+    currentTime = clock();
+    if (showThmPopup || showLngPopup || showCfgPopup) {
+        if (!popupTimer) {
+            popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
+            sfxPlay(SFX_MESSAGE);
+        }
 
-    if (!popupSfxPlayed && popupTimer >= 20) {
-        sfxPlay(SFX_MESSAGE);
-        popupSfxPlayed = 1;
-    }
+        if (showCfgPopup) {
+            guiRenderNotifications("CFG", configGetDir(), y);
+            y += yadd;
+        }
 
-    if (showCfgPopup && popupTimer >= 20)
-        guiRenderNotifications("CFG", configGetDir(), y);
+        if (showThmPopup) {
+            guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
+            y += yadd;
+        }
 
-    y += yadd;
+        if (showLngPopup)
+            guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
 
-    if (showThmPopup && popupTimer >= 20)
-        guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
-
-    y += yadd;
-
-    if (showLngPopup && popupTimer >= 20)
-        guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
-
-    if (popupTimer >= 60*5) { /* HACK: 5 seconds @ 60fps */
-        guiResetNotifications();
-        showCfgPopup = 0;
+        if (currentTime >= popupTimer) {
+            guiResetNotifications();
+            showCfgPopup = 0;
+        }
     }
 }
 
@@ -587,6 +580,7 @@ void guiShowUIConfig(void)
 
     // configure the enumerations
     const char *scrollSpeeds[] = {_l(_STR_SLOW), _l(_STR_MEDIUM), _l(_STR_FAST), NULL};
+    // clang-format off
     const char *vmodeNames[] = {_l(_STR_AUTO)
         , "PAL 640x512i @50Hz 24bit"
         , "NTSC 640x448i @60Hz 24bit"
@@ -600,6 +594,7 @@ void guiShowUIConfig(void)
         , "HDTV 1280x720p @60Hz 16bit (HIRES)"
         , "HDTV 1920x1080i @60Hz 16bit (HIRES)"
         , NULL};
+    // clang-format on
     int previousVMode;
 
 reselect_video_mode:
@@ -647,8 +642,6 @@ reselect_video_mode:
             setDefaultColors();
 
         applyConfig(themeID, langID);
-        //wait 70ms for confirm sound to finish playing before clearing buffer
-        guiDelay(0070);
         sfxInit(0);
     }
 
@@ -967,27 +960,25 @@ void guiExecDeferredOps(void)
     guiHandleDeferredOps();
 }
 
-static int bfadeout = 0x0;
-static void guiDrawBusy()
+static void guiDrawBusy(int alpha)
 {
     if (gTheme->loadingIcon) {
         GSTEXTURE *texture = thmGetTexture(LOAD0_ICON + (guiFrameId >> 1) % gTheme->loadingIconCount);
         if (texture && texture->Mem) {
-            u64 mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, bfadeout);
+            u64 mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, alpha);
             rmDrawPixmap(texture, gTheme->loadingIcon->posX, gTheme->loadingIcon->posY, gTheme->loadingIcon->aligned, gTheme->loadingIcon->width, gTheme->loadingIcon->height, gTheme->loadingIcon->scaled, mycolor);
         }
     }
 }
 
-static int wfadeout = 0x80;
-static void guiRenderGreeting()
+static void guiRenderGreeting(int alpha)
 {
-    u64 mycolor = GS_SETREG_RGBA(0x1C, 0x1C, 0x1C, wfadeout);
+    u64 mycolor = GS_SETREG_RGBA(0x1C, 0x1C, 0x1C, alpha);
     rmDrawRect(0, 0, screenWidth, screenHeight, mycolor);
 
     GSTEXTURE *logo = thmGetTexture(LOGO_PICTURE);
     if (logo) {
-        mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, wfadeout);
+        mycolor = GS_SETREG_RGBA(0x80, 0x80, 0x80, alpha);
         rmDrawPixmap(logo, screenWidth >> 1, gTheme->usedHeight >> 1, ALIGN_CENTER, logo->Width, logo->Height, SCALING_RATIO, mycolor);
     }
 }
@@ -1025,8 +1016,8 @@ static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR *res)
         "vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
         "sqc2	vf1, (%[res])\n"       // transfer the result in acc to the ee
 #endif
-        : [res] "+r"(res), "=m"(*res)
-        : [a] "r"(a), [b] "r"(b), [mix] "r"(mix), "m"(*a), "m"(*b));
+        : [ res ] "+r"(res), "=m"(*res)
+        : [ a ] "r"(a), [ b ] "r"(b), [ mix ] "r"(mix), "m"(*a), "m"(*b));
 }
 
 static float guiCalcPerlin(float x, float y, float z)
@@ -1204,8 +1195,7 @@ int guiDrawIconAndText(int iconId, int textId, int font, int x, int y, u64 color
         y += h >> 1;
         rmDrawPixmap(iconTex, x, y, ALIGN_VCENTER, w, h, SCALING_RATIO, gDefaultCol);
         x += rmWideScale(w) + 2;
-    }
-    else {
+    } else {
         // HACK: font is aligned to VCENTER, the default height icon height is 20
         y += 10;
     }
@@ -1275,23 +1265,25 @@ void guiDrawSubMenuHints(void)
     x = guiDrawIconAndText(gSelectButton == KEY_CIRCLE ? subMenuIcons[1] : subMenuIcons[0], subMenuHints[1], gTheme->fonts[0], x, y, gTheme->textColor);
 }
 
+static int endIntro = 0; // Break intro loop and start 'Last Played Auto Start' countdown
 static void guiDrawOverlays()
 {
     // are there any pending operations?
     int pending = ioHasPendingRequests();
+    static int busyAlpha = 0x00; // Fully transparant
 
     if (!pending) {
-        if (bfadeout > 0x0)
-            bfadeout -= 0x02;
-        else
-            bfadeout = 0x0;
+        // Fade out
+        if (busyAlpha > 0x00)
+            busyAlpha -= 0x02;
     } else {
-        if (bfadeout < 0x80)
-            bfadeout += 0x02;
+        // Fade in
+        if (busyAlpha < 0x80)
+            busyAlpha += 0x02;
     }
 
-    if (bfadeout > 0 && !toggleSfx)
-        guiDrawBusy();
+    if (busyAlpha > 0x00)
+        guiDrawBusy(busyAlpha);
 
 #ifdef __DEBUG
     char text[20];
@@ -1307,7 +1299,7 @@ static void guiDrawOverlays()
     fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
     y += yadd;
 
-    snprintf(text, sizeof(text), "%dKiB TEXMAN", ((4*1024*1024) - gsGlobal->CurrentPointer) / 1024);
+    snprintf(text, sizeof(text), "%dKiB TEXMAN", ((4 * 1024 * 1024) - gsGlobal->CurrentPointer) / 1024);
     fntRenderString(gTheme->fonts[0], x, y, ALIGN_LEFT, 0, 0, text, GS_SETREG_RGBA(0x60, 0x60, 0x60, 0x80));
     y += yadd;
     y += yadd; // Empty line
@@ -1329,12 +1321,12 @@ static void guiDrawOverlays()
 #endif
 
     // Last Played Auto Start
-    if ((!pending) && (wfadeout <= 0) && (DisableCron == 0)) {
+    if (!pending && DisableCron == 0 && endIntro) {
         if (CronStart == 0) {
             CronStart = clock() / CLOCKS_PER_SEC;
         } else {
             char strAutoStartInNSecs[21];
-            double CronCurrent;
+            clock_t CronCurrent;
 
             CronCurrent = clock() / CLOCKS_PER_SEC;
             RemainSecs = gAutoStartLastPlayed - (CronCurrent - CronStart);
@@ -1344,8 +1336,8 @@ static void guiDrawOverlays()
     }
 
     // BLURT output
-//    if (!gDisableDebug)
-//        fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
+    //    if (!gDisableDebug)
+    //        fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
 }
 
 static void guiReadPads()
@@ -1365,14 +1357,13 @@ static void guiShow()
     if (screenHandlerTarget) {
         u8 alpha;
         const u8 transition_frames = 26;
-        if (transIndex < (transition_frames/2)) {
+        if (transIndex < (transition_frames / 2)) {
             // Fade-out old screen
             // index: 0..7
             // alpha: 1..8 * transition_step
             screenHandler->renderScreen();
             alpha = fade((float)(transIndex + 1) / (transition_frames / 2)) * 0x80;
-        }
-        else {
+        } else {
             // Fade-in new screen
             // index: 8..15
             // alpha: 8..1 * transition_step
@@ -1394,36 +1385,34 @@ static void guiShow()
         screenHandler->renderScreen();
 }
 
-void guiDelay(int milliSeconds)
-{
-    clock_t time_end = time_end = clock() + milliSeconds * CLOCKS_PER_SEC / 1000;
-    while (clock() < time_end) {}
-
-    toggleSfx = 0;
-}
-
 void guiIntroLoop(void)
 {
-    int endIntro = 0;
-
-    if (gEnableSFX && gEnableBootSND)
-        toggleSfx = -1;
+    int greetingAlpha = 0x80;
+    const int fadeFrameCount = 0x80 / 2;
+    const int fadeDuration = (fadeFrameCount * 1000) / 55; // Average between 50 and 60 fps
+    clock_t tFadeDelayEnd = 0;
 
     while (!endIntro) {
         guiStartFrame();
 
-        if (wfadeout < 0x80 && toggleSfx)
-            guiDelay(gFadeDelay);
-
-        if (wfadeout < 0x80 && !toggleSfx)
+        if (greetingAlpha < 0x80)
             guiShow();
 
-        if (gInitComplete)
-            wfadeout -= 0x02;
+        if (greetingAlpha > 0)
+            guiRenderGreeting(greetingAlpha);
 
-        if (wfadeout > 0)
-            guiRenderGreeting();
-        else
+        // Initialize boot sound
+        if (gInitComplete && !tFadeDelayEnd && gEnableBootSND) {
+            // Start playing sound
+            sfxPlay(SFX_BOOT);
+            // Calculate transition delay
+            tFadeDelayEnd = clock() + (sfxGetSoundDuration(SFX_BOOT) - fadeDuration) * CLOCKS_PER_SEC / 1000;
+        }
+
+        if (gInitComplete && clock() >= tFadeDelayEnd)
+            greetingAlpha -= 2;
+
+        if (greetingAlpha <= 0)
             endIntro = 1;
 
         guiDrawOverlays();

@@ -241,11 +241,10 @@ static void oplShutdown(int poff)
     int stat;
 
     DeviceLock();
-    if(vmcShutdownCb != NULL)
+    if (vmcShutdownCb != NULL)
         vmcShutdownCb();
     DeviceUnmount();
-    if (poff)
-    {
+    if (poff) {
         DeviceStop();
 #ifdef __USE_DEV9
         dev9Shutdown();
@@ -1802,16 +1801,14 @@ static void cdvdman_cdread_Thread(void *args)
         /* This streaming callback is not compatible with the original SONY stream channel 0 (IOP) callback's design.
 	   The original is run from the interrupt handler, but we want it to run
 	   from a threaded environment because our interrupt is emulated. */
-        if (Stm0Callback != NULL)
-	{
+        if (Stm0Callback != NULL) {
             cdvdman_signal_read_end();
 
             /* Check that the streaming callback was not cleared, as this pointer may get changed between function calls.
                As per the original semantics, once it is cleared, then it should not be called. */
             if (Stm0Callback != NULL)
                 Stm0Callback();
-	}
-        else
+        } else
             cdvdman_cb_event(SCECdFuncRead); //Only runs if streaming is not in action.
     }
 }

@@ -134,7 +134,6 @@ static int guiGameRefreshVMCConfig(item_list_t *support, char *name)
             diaSetEnabled(diaVMC, VMC_SIZE, 0);
             diaSetEnabled(diaVMC, VMC_BUTTON_CREATE, 0);
             diaSetEnabled(diaVMC, VMC_BUTTON_DELETE, 0);
-            toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
         }
     } else {
         diaSetLabel(diaVMC, VMC_BUTTON_CREATE, _l(_STR_CREATE));
@@ -253,7 +252,6 @@ static int guiGameShowVMCConfig(int id, item_list_t *support, char *VMCName, int
             break;
 
     } while (1);
-    toggleSfx = 0;
 
     return result;
 }
@@ -291,14 +289,14 @@ void guiGameShowVMCMenu(int id, item_list_t *support)
             if (menuCheckParentalLock() == 0) {
                 if (strlen(vmc1))
                     vmc1[0] = '\0';
-                 else
-                     snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
+                else
+                    snprintf(vmc1, sizeof(vmc1), "generic_%d", 0);
             }
         } else if (result == COMPAT_VMC2_ACTION) {
             if (menuCheckParentalLock() == 0) {
                 if (strlen(vmc2))
                     vmc2[0] = '\0';
-                 else
+                else
                     snprintf(vmc2, sizeof(vmc2), "generic_%d", 1);
             }
         }
@@ -320,8 +318,7 @@ static void guiGameSetGSMSettingsState(void)
         config_set_t *configSet = gameMenuLoadConfig(diaGSConfig);
         configRemoveKey(configSet, CONFIG_ITEM_GSMSOURCE);
         guiGameLoadGSMConfig(configSet, configGetByType(CONFIG_GAME));
-    }
-    else if (previousSource != gGSMSource && gGSMSource == SETTINGS_PERGAME) {
+    } else if (previousSource != gGSMSource && gGSMSource == SETTINGS_PERGAME) {
         config_set_t *configSet = gameMenuLoadConfig(diaGSConfig);
         configSetInt(configSet, CONFIG_ITEM_GSMSOURCE, gGSMSource);
         guiGameLoadGSMConfig(configSet, configGetByType(CONFIG_GAME));
@@ -347,6 +344,7 @@ void guiGameShowGSConfig(void)
 {
     // configure the enumerations
     const char *settingsSource[] = {_l(_STR_GLOBAL_SETTINGS), _l(_STR_PERGAME_SETTINGS), NULL};
+    // clang-format off
     const char *gsmvmodeNames[] = {
         "NTSC",
         "NTSC Non Interlaced",
@@ -378,6 +376,7 @@ void guiGameShowGSConfig(void)
         "VGA 1280x1024p @60Hz",
         "VGA 1280x1024p @75Hz",
         NULL};
+    // clang-format on
 
     diaSetEnum(diaGSConfig, GSMCFG_GSMSOURCE, settingsSource);
     diaSetEnum(diaGSConfig, GSMCFG_GSMVMODE, gsmvmodeNames);
@@ -402,8 +401,7 @@ static void guiGameSetCheatSettingsState(void)
         config_set_t *configSet = gameMenuLoadConfig(diaCheatConfig);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATSSOURCE);
         guiGameLoadCheatsConfig(configSet, configGetByType(CONFIG_GAME));
-    }
-    else if (previousSource != gCheatSource && gCheatSource == SETTINGS_PERGAME) {
+    } else if (previousSource != gCheatSource && gCheatSource == SETTINGS_PERGAME) {
         config_set_t *configSet = gameMenuLoadConfig(diaCheatConfig);
         configSetInt(configSet, CONFIG_ITEM_CHEATSSOURCE, gCheatSource);
         guiGameLoadCheatsConfig(configSet, configGetByType(CONFIG_GAME));
@@ -519,8 +517,7 @@ static int guiGamePadEmuUpdater(int modified)
         config_set_t *configSet = gameMenuLoadConfig(diaPadEmuConfig);
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         guiGameLoadPadEmuConfig(configSet, configGetByType(CONFIG_GAME));
-    }
-    else if (previousSource != gPadEmuSource && gPadEmuSource == SETTINGS_PERGAME) {
+    } else if (previousSource != gPadEmuSource && gPadEmuSource == SETTINGS_PERGAME) {
         config_set_t *configSet = gameMenuLoadConfig(diaPadEmuConfig);
         configSetInt(configSet, CONFIG_ITEM_PADEMUSOURCE, gPadEmuSource);
         guiGameLoadPadEmuConfig(configSet, configGetByType(CONFIG_GAME));
@@ -724,7 +721,6 @@ void guiGameShowPadEmuConfig(void)
         }
 
         if (result == PADCFG_BTINFO) {
-            toggleSfx = 1; //user cannot navigate we don't want to hear cursor sfx
             for (i = PADCFG_FEAT_START; i < PADCFG_FEAT_END + 1; i++)
                 diaSetLabel(diaPadEmuInfo, i, _l(_STR_NO));
 
@@ -738,7 +734,6 @@ void guiGameShowPadEmuConfig(void)
             ver_set = 0;
             feat_set = 0;
             diaExecuteDialog(diaPadEmuInfo, -1, 1, &guiGamePadEmuInfoUpdater);
-            toggleSfx = 0;
         }
 
         if (result == UIID_BTN_OK)
@@ -861,8 +856,7 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
             result = configSetInt(configSet, CONFIG_ITEM_GSMFIELDFIX, GSMFIELDFix);
         else
             configRemoveKey(configSet, CONFIG_ITEM_GSMFIELDFIX);
-    }
-    else if (gGSMSource == SETTINGS_GLOBAL) {
+    } else if (gGSMSource == SETTINGS_GLOBAL) {
         configSetInt(configGame, CONFIG_ITEM_ENABLEGSM, EnableGSM);
         configSetInt(configGame, CONFIG_ITEM_GSMVMODE, GSMVMode);
         configSetInt(configGame, CONFIG_ITEM_GSMXOFFSET, GSMXOffset);
@@ -886,8 +880,7 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
             result = configSetInt(configSet, CONFIG_ITEM_CHEATMODE, CheatMode);
         else
             configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
-    }
-    else if (gCheatSource == SETTINGS_GLOBAL) {
+    } else if (gCheatSource == SETTINGS_GLOBAL) {
         configSetInt(configGame, CONFIG_ITEM_ENABLECHEAT, EnableCheat);
         configSetInt(configGame, CONFIG_ITEM_CHEATMODE, CheatMode);
     }
@@ -907,8 +900,7 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
             result = configSetInt(configSet, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
         else
             configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
-    }
-    else if (gPadEmuSource == SETTINGS_GLOBAL) {
+    } else if (gPadEmuSource == SETTINGS_GLOBAL) {
         configSetInt(configGame, CONFIG_ITEM_ENABLEPADEMU, EnablePadEmu);
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
     }
@@ -1118,8 +1110,7 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
     if (support->flags & MODE_FLAG_COMPAT_DMA) {
         configGetInt(configSet, CONFIG_ITEM_DMA, &dmaMode);
         diaSetInt(diaCompatConfig, COMPAT_DMA, dmaMode);
-    }
-    else
+    } else
         diaSetInt(diaCompatConfig, COMPAT_DMA, 0);
 
     compatMode = 0;

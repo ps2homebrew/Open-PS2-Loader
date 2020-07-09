@@ -43,14 +43,14 @@ static void ps2ip_init(void);
 
 // !!! ps2ip exports functions pointers !!!
 // Note: recvfrom() used here is not a standard recvfrom() function.
-int (*plwip_close)(int s);                                                                                                                    // #6
-int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                        // #7
-int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                             // #9
-int (*plwip_recvfrom)(int s, void *mem, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen);    // #10
-int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                        // #11
-int (*plwip_socket)(int domain, int type, int protocol);                                                                                      // #13
-int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                                 // #19
-u32 (*pinet_addr)(const char *cp);                                                                                                            // #24
+int (*plwip_close)(int s);                                                                                                                 // #6
+int (*plwip_connect)(int s, struct sockaddr *name, socklen_t namelen);                                                                     // #7
+int (*plwip_recv)(int s, void *mem, int len, unsigned int flags);                                                                          // #9
+int (*plwip_recvfrom)(int s, void *mem, int hlen, void *payload, int plen, unsigned int flags, struct sockaddr *from, socklen_t *fromlen); // #10
+int (*plwip_send)(int s, void *dataptr, int size, unsigned int flags);                                                                     // #11
+int (*plwip_socket)(int domain, int type, int protocol);                                                                                   // #13
+int (*plwip_setsockopt)(int s, int level, int optname, const void *optval, socklen_t optlen);                                              // #19
+u32 (*pinet_addr)(const char *cp);                                                                                                         // #24
 
 static u32 ServerCapabilities;
 
@@ -82,7 +82,7 @@ void DeviceInit(void)
 }
 
 void DeviceDeinit(void)
-{   // Close all files and disconnect before IOP reboots. Note that this seems to help prevent VMC corruption in some games.
+{ // Close all files and disconnect before IOP reboots. Note that this seems to help prevent VMC corruption in some games.
     DeviceUnmount();
 }
 

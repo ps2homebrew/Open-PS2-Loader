@@ -812,7 +812,9 @@ struct UIItem diaAbout[] = {
 
     // Build Options
     {UI_BREAK},
-    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}}, {UI_SPACER}, {UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_BUILD_DETAILS}}}, 
+	{UI_SPACER}, 
+	{UI_LABEL, ABOUT_BUILD_DETAILS, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     //END of OPL_DB tweaks
     {UI_SPLITTER},
 

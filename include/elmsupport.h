@@ -3,9 +3,9 @@
 
 #include "include/iosupport.h"
 
-#define ELM_MODE_UPDATE_DELAY	240
+#define ELM_MODE_UPDATE_DELAY 240
 
 void elmInit();
-item_list_t* elmGetObject(int initOnly);
+item_list_t *elmGetObject(int initOnly);
 
 #endif

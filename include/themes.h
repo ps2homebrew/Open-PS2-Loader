@@ -117,7 +117,7 @@ typedef struct theme
     int inElmPage;
     theme_element_t *itemsListELM;
     //END of OPL_DB tweaks
-    
+
     int gameCacheCount;
 
     theme_element_t *itemsList;

@@ -16,8 +16,8 @@ typedef struct
 } usb_vmc_infos_t;
 
 //START of OPL_DB tweaks
-char* usbGetPrefix(void);
-char* usbGetBase(void);
+char *usbGetPrefix(void);
+char *usbGetBase(void);
 //END of OPL_DB tweaks
 
 #define MAX_USB_DEVICES 5

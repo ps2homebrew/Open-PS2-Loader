@@ -23,7 +23,7 @@
 //------------------------------
 typedef struct
 {
-    u8 ident[16];  // struct definition for ELF object header
+    u8 ident[16]; // struct definition for ELF object header
     u16 type;
     u16 machine;
     u32 version;
@@ -41,7 +41,7 @@ typedef struct
 //------------------------------
 typedef struct
 {
-    u32 type;  // struct definition for ELF program section header
+    u32 type; // struct definition for ELF program section header
     u32 offset;
     void *vaddr;
     u32 paddr;
@@ -120,18 +120,18 @@ unsigned int _strtoui(const char *p)
 
 
 
-void RunLoaderElf(char *filename,u8 *pElf)
+void RunLoaderElf(char *filename, u8 *pElf)
 {
     u8 *boot_elf;
     elf_header_t *eh;
     elf_pheader_t *eph;
     void *pdata;
-    int  i;
+    int i;
     char *argv[2];
-	int elfsize=0;
-	int boverlap;
-	int vaddr;
-	
+    int elfsize = 0;
+    int boverlap;
+    int vaddr;
+
     /* NB: LOADER.ELF is embedded  */
     boot_elf = (u8 *)pElf;
     eh = (elf_header_t *)boot_elf;
@@ -140,61 +140,60 @@ void RunLoaderElf(char *filename,u8 *pElf)
             ;
     eph = (elf_pheader_t *)(boot_elf + eh->phoff);
 
-	// calc elf size
+    // calc elf size
     for (i = 0; i < eh->phnum; i++) {
         if (eph[i].type != ELF_PT_LOAD)
             continue;
 
-		if( elfsize <(eph[i].offset+eph[i].filesz)){
-			elfsize = eph[i].offset+eph[i].filesz;
-		}
-    }	
-	// check for overlap 
-	boverlap=0;
-	for (i = 0; i < eh->phnum; i++) {
+        if (elfsize < (eph[i].offset + eph[i].filesz)) {
+            elfsize = eph[i].offset + eph[i].filesz;
+        }
+    }
+    // check for overlap
+    boverlap = 0;
+    for (i = 0; i < eh->phnum; i++) {
         if (eph[i].type != ELF_PT_LOAD)
             continue;
         vaddr = (int)eph[i].vaddr;
-		if( vaddr <((int)pElf)) {
-			if(vaddr+eph[i].memsz>((int)pElf))
-			boverlap=1;
-			break;
-		}
-		
-		if( vaddr >((int)pElf)) {
-			if(vaddr+eph[i].memsz<((int)pElf))
-			boverlap=1;
-			break;
-		}
-    }	
-	if(boverlap)	
-	{
-	   u32 u;
-	   u = (u32)pElf;
-	   u = u >>20;
-	   u = u+16;
-	   
-	   u = u&0x1F;
-	   
-	   if(u==0)
-		   u=1;
-	   if(u>24)
-		   u=24;
-	   u = u << 20;
-	   u = u & ( 32*1024*1024-1);
+        if (vaddr < ((int)pElf)) {
+            if (vaddr + eph[i].memsz > ((int)pElf))
+                boverlap = 1;
+            break;
+        }
 
-	   memcpy((void*)u,pElf,elfsize);
-	   boot_elf = (u8 *)u;
-	   
-       eh = (elf_header_t *)boot_elf;
-       if (_lw((u32)&eh->ident) != ELF_MAGIC)
-       while (1)
-            ;
-       eph = (elf_pheader_t *)(boot_elf + eh->phoff);		
-	}		
-									
-	/* Scan through the ELF's program headers and copy them into RAM, then
-									zero out any non-loaded regions.  */								
+        if (vaddr > ((int)pElf)) {
+            if (vaddr + eph[i].memsz < ((int)pElf))
+                boverlap = 1;
+            break;
+        }
+    }
+    if (boverlap) {
+        u32 u;
+        u = (u32)pElf;
+        u = u >> 20;
+        u = u + 16;
+
+        u = u & 0x1F;
+
+        if (u == 0)
+            u = 1;
+        if (u > 24)
+            u = 24;
+        u = u << 20;
+        u = u & (32 * 1024 * 1024 - 1);
+
+        memcpy((void *)u, pElf, elfsize);
+        boot_elf = (u8 *)u;
+
+        eh = (elf_header_t *)boot_elf;
+        if (_lw((u32)&eh->ident) != ELF_MAGIC)
+            while (1)
+                ;
+        eph = (elf_pheader_t *)(boot_elf + eh->phoff);
+    }
+
+    /* Scan through the ELF's program headers and copy them into RAM, then
+									zero out any non-loaded regions.  */
     for (i = 0; i < eh->phnum; i++) {
         if (eph[i].type != ELF_PT_LOAD)
             continue;
@@ -206,9 +205,9 @@ void RunLoaderElf(char *filename,u8 *pElf)
             memset(eph[i].vaddr + eph[i].filesz, 0,
                    eph[i].memsz - eph[i].filesz);
     }
-	
-	
-	
+
+
+
     FlushCache(0);
     FlushCache(2);
 
@@ -220,20 +219,16 @@ void RunLoaderElf(char *filename,u8 *pElf)
 
 int main(int argc, char *argv[])
 {
-	//START of OPL_DB tweaks
-	if(argc>0 && (argv[0][0]=='m')
-			&& (argv[0][1]=='e')
-			&& (argv[0][2]=='m')
-			&& (argv[0][3]==':'))
-	{
-		// boot from memaddr ;
-		unsigned int n=_strtoui(&(argv[0][4]));
-		RunLoaderElf(argv[1],(void*)n);
-		BootError(argv[0]);	
-		return 0;
-	}
-	//END of OPL_DB tweaks
-	
+    //START of OPL_DB tweaks
+    if (argc > 0 && (argv[0][0] == 'm') && (argv[0][1] == 'e') && (argv[0][2] == 'm') && (argv[0][3] == ':')) {
+        // boot from memaddr ;
+        unsigned int n = _strtoui(&(argv[0][4]));
+        RunLoaderElf(argv[1], (void *)n);
+        BootError(argv[0]);
+        return 0;
+    }
+    //END of OPL_DB tweaks
+
     int result;
     t_ExecData exd;
 
@@ -262,7 +257,7 @@ int main(int argc, char *argv[])
 
         while (!SifIopSync()) {
         };
-    //END of OPL_DB tweaks
+        //END of OPL_DB tweaks
 
         //START of OPL_DB tweaks
         //Sync with the SIF library on the IOP, or it may crash the IOP kernel during the next reset (Depending on the how the next program initializes the IOP).

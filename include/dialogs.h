@@ -34,9 +34,9 @@ enum UI_ITEMS {
     CFG_HDDMODE,
     CFG_ETHMODE,
     CFG_APPMODE,
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     CFG_ELMMODE,
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     CFG_CHECKUSBFRAG,
     CFG_LASTPLAYED,
     CFG_LBL_AUTOSTARTLAST,

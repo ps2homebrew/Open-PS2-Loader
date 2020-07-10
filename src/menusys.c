@@ -847,7 +847,7 @@ void menuHandleInputMenu()
         //Check if there is anything to show the user, at all.
         //START of OPL_DB tweaks
         if (gAPPStartMode || gELMStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
-        //END of OPL_DB tweaks
+            //END of OPL_DB tweaks
             guiSwitchScreen(GUI_SCREEN_MAIN);
     }
 }
@@ -860,19 +860,19 @@ void menuRenderMain()
     WaitSema(menuSemaId);
 
     //START of OPL_DB tweaks
-    theme_element_t* elem = NULL;
+    theme_element_t *elem = NULL;
     item_list_t *list = selected_item->item->userdata;
-    if(list && gTheme->mainElemsELM.first && list->mode == ELM_MODE){
+    if (list && gTheme->mainElemsELM.first && list->mode == ELM_MODE) {
         elem = gTheme->mainElemsELM.first;
-        if (gTheme->inElmPage == 0){//Switch to ELM
+        if (gTheme->inElmPage == 0) { //Switch to ELM
             theme_element_t *tmp = gTheme->itemsListELM;
             gTheme->itemsListELM = gTheme->itemsList;
             gTheme->itemsList = tmp;
         }
         gTheme->inElmPage = 1;
-    }else{
+    } else {
         elem = gTheme->mainElems.first;
-        if (gTheme->inElmPage == 1){//Switch to Normal
+        if (gTheme->inElmPage == 1) { //Switch to Normal
             theme_element_t *tmp = gTheme->itemsListELM;
             gTheme->itemsListELM = gTheme->itemsList;
             gTheme->itemsList = tmp;
@@ -948,11 +948,11 @@ void menuRenderInfo()
 
     WaitSema(menuSemaId);
     //START of OPL_DB tweaks
-    theme_element_t* elem = NULL;
+    theme_element_t *elem = NULL;
     item_list_t *list = selected_item->item->userdata;
-    if(list && gTheme->infoElemsELM.first && list->mode == ELM_MODE){
+    if (list && gTheme->infoElemsELM.first && list->mode == ELM_MODE) {
         elem = gTheme->infoElemsELM.first;
-    }else{
+    } else {
         elem = gTheme->infoElems.first;
     }
     //END of OPL_DB tweaks

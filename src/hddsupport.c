@@ -34,7 +34,8 @@ const char *oplPart = "hdd0:+OPL";
 static item_list_t hddGameList;
 
 //START of OPL_DB tweaks
-char* hddGetPrefix(void){
+char *hddGetPrefix(void)
+{
     return hddPrefix;
 }
 
@@ -126,14 +127,14 @@ void hddLoadModules(void)
                            "-n"
                            "\0"
                            "20";
-   
+
     //START of OPL_DB tweaks
-    static char pfsarg[] = "-m" 
+    static char pfsarg[] = "-m"
                            "\0"
                            "4"
                            "\0"
-                           "-o" 
-                           "\0" 
+                           "-o"
+                           "\0"
                            "10"
                            "\0"
                            "-n"

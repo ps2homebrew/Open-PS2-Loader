@@ -383,11 +383,11 @@ static image_texture_t *initImageInternalTexture(config_set_t *themeConfig, cons
 {
     image_texture_t *texture = (image_texture_t *)malloc(sizeof(image_texture_t));
     texPrepare(&texture->source, GS_PSM_CT24);
-	//START of OPL_DB tweaks
-	int length = strlen(name) + 1;
-	texture->name = (char *)malloc(length * sizeof(char));
-	memcpy(texture->name, name, length);
-	//END of OPL_DB tweaks
+    //START of OPL_DB tweaks
+    int length = strlen(name) + 1;
+    texture->name = (char *)malloc(length * sizeof(char));
+    memcpy(texture->name, name, length);
+    //END of OPL_DB tweaks
     int result;
 
     if ((result = texLookupInternalTexId(name)) >= 0) {
@@ -466,7 +466,7 @@ static mutable_image_t *initMutableImage(const char *themePath, config_set_t *th
     findDuplicate(theme->mainElemsELM.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
     findDuplicate(theme->infoElemsELM.first, cachePattern, defaultTexture, overlayTexture, mutableImage);
     //END of OPL_DB tweaks
-    
+
     if (cachePattern && !mutableImage->cache) {
         if (type == ELEM_TYPE_ATTRIBUTE_IMAGE)
             mutableImage->cache = cacheInitCache(-1, themePath, 0, cachePattern, 1);
@@ -926,7 +926,7 @@ static void validateGUIElems(const char *themePath, config_set_t *themeConfig, t
         }
     }
     //END of OPL_DB tweaks
-    
+
     // 2. check we have a valid ItemsList element, and link its decorator to the target element
     if (theme->itemsList) {
         items_list_t *itemsList = (items_list_t *)theme->itemsList->extended;
@@ -976,7 +976,7 @@ static void validateGUIElems(const char *themePath, config_set_t *themeConfig, t
             }
             itemsList->decorator = NULL;
         }
-    } else if(theme->mainElemsELM.first){
+    } else if (theme->mainElemsELM.first) {
         LOG("THEMES No itemsList found in ELM page, adding a default one\n");
         theme->itemsListELM = initBasic(themePath, themeConfig, theme, "il", ELEM_TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
         initItemsList(themePath, themeConfig, theme, theme->itemsListELM, "il", NULL);
@@ -1030,8 +1030,8 @@ static int addGUIElem(const char *themePath, config_set_t *themeConfig, theme_t 
                     elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 0, 0, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                     initItemsList(themePath, themeConfig, theme, elem, name, NULL);
                     theme->itemsList = elem;
-                //START of OPL_DB tweaks
-                }else if (!theme->itemsListELM){
+                    //START of OPL_DB tweaks
+                } else if (!theme->itemsListELM) {
                     elem = initBasic(themePath, themeConfig, theme, name, ELEM_TYPE_ITEMS_LIST, 150, MENU_POS_V, ALIGN_NONE, DIM_UNDEF, DIM_UNDEF, SCALING_RATIO, theme->textColor, theme->fonts[0]);
                     initItemsList(themePath, themeConfig, theme, elem, name, NULL);
                     theme->itemsListELM = elem;
@@ -1289,15 +1289,15 @@ static void thmLoad(const char *themePath)
     snprintf(path, sizeof(path), "mainELM0");
     while (addGUIElem(themePath, themeConfig, newT, &newT->mainElemsELM, NULL, path))
         snprintf(path, sizeof(path), "mainELM%d", i++);
-    
+
     //Special Info ELM page
     i = 1;
     snprintf(path, sizeof(path), "infoELM0");
-    while(addGUIElem(themePath, themeConfig, newT, &newT->infoElemsELM, NULL, path))
+    while (addGUIElem(themePath, themeConfig, newT, &newT->infoElemsELM, NULL, path))
         snprintf(path, sizeof(path), "infoELM%d", i++);
-    
+
     //END of OPL_DB tweaks
-    
+
     validateGUIElems(themePath, themeConfig, newT);
     if (themePath)
         validateGUIElems(themePath, themeConfig, newT);

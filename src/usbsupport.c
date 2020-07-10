@@ -33,12 +33,14 @@ static base_game_info_t *usbGames;
 static item_list_t usbGameList;
 
 //START of OPL_DB tweaks
-char* usbGetPrefix(void){
-	return usbPrefix;
+char *usbGetPrefix(void)
+{
+    return usbPrefix;
 }
 
-char* usbGetBase(void){
-	return usbBase;
+char *usbGetBase(void)
+{
+    return usbBase;
 }
 //END of OPL_DB tweaks
 
@@ -64,7 +66,7 @@ int usbFindPartition(char *target, const char *name, int write)
             else
                 sprintf(target, "mass%d:", i);
             //START of OPL_DB tweaks
-            sprintf(usbBase,"mass%d:",i);
+            sprintf(usbBase, "mass%d:", i);
             //END of OPL_DB tweaks
             close(fd);
             return 1;
@@ -76,9 +78,9 @@ int usbFindPartition(char *target, const char *name, int write)
         sprintf(target, "mass0:%s/", gUSBPrefix);
     else
         sprintf(target, "mass0:");
-        //START of OPL_DB tweaks
-        sprintf(usbBase, "mass0:");
-        //END of OPL_DB tweaks
+    //START of OPL_DB tweaks
+    sprintf(usbBase, "mass0:");
+    //END of OPL_DB tweaks
     return 0;
 }
 

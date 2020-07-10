@@ -11,9 +11,9 @@ enum IO_MODES {
     ETH_MODE,
     HDD_MODE,
     APP_MODE,
-//START of OPL_DB tweaks
+    //START of OPL_DB tweaks
     ELM_MODE,
-//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
 
     MODE_COUNT
 };

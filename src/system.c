@@ -877,7 +877,7 @@ int sysExecElf(const char *path)
 }
 
 //START of OPL_DB tweaks
-int sysExecElfWithParam(char *path,char *param)
+int sysExecElfWithParam(char *path, char *param)
 {
     u8 *boot_elf = NULL;
     elf_header_t *eh;
@@ -913,11 +913,11 @@ int sysExecElfWithParam(char *path,char *param)
     SifExitRpc();
 
     elf_argv[0] = path;
-	elf_argv[1] = param;
+    elf_argv[1] = param;
 
     FlushCache(0);
     FlushCache(2);
-	
+
     ExecPS2((void *)eh->entry, 0, 2, elf_argv);
 
     return 0;

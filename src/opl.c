@@ -535,7 +535,7 @@ void menuDeferredUpdate(void *data)
         //If other modes have been updated, then the apps list should be updated too.
         if (*mode != APP_MODE)
             shouldAppsUpdate = 1;
-        
+
         //START of OPL_DB tweaks
         //If other modes have been updated, then the elm list should be updated too.
         if (*mode != ELM_MODE)
@@ -942,10 +942,10 @@ static void _saveConfig()
 
 void applyConfig(int themeID, int langID)
 {
-	//START of OPL_DB tweaks
-    if (gDefaultDevice < 0 || gDefaultDevice > MODE_COUNT -1)
+    //START of OPL_DB tweaks
+    if (gDefaultDevice < 0 || gDefaultDevice > MODE_COUNT - 1)
         gDefaultDevice = APP_MODE;
-	//END of OPL_DB tweaks
+    //END of OPL_DB tweaks
     guiUpdateScrollSpeed();
 
     guiSetFrameHook(&menuUpdateHook);

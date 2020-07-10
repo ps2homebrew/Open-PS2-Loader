@@ -22,7 +22,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 
 int sysExecElf(const char *path);
 //START of OPL_DB tweaks
-int sysExecElfWithParam(char *path,char *param);
+int sysExecElfWithParam(char *path, char *param);
 //END of OPL_DB tweaks
 int sysLoadModuleBuffer(void *buffer, int size, int argc, char *argv);
 int sysCheckMC(void);

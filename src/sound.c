@@ -50,31 +50,30 @@ static int sfx_initialized = 0;
 //Returns 0 if the specified file was read. The sfxEffect structure will not be updated unless the file is successfully read.
 static int sfxRead(const char *full_path, struct sfxEffect *sfx)
 {
-    FILE *adpcm;
+    int adpcm;
     void *buffer;
     int ret, size;
 
     LOG("SFX: sfxRead('%s')\n", full_path);
 
-    adpcm = fopen(full_path, "rb");
-    if (adpcm == NULL) {
+    adpcm = open(full_path, O_RDONLY);
+    if (adpcm < 0) {
         LOG("SFX: %s: Failed to open adpcm file %s\n", __FUNCTION__, full_path);
         return -ENOENT;
     }
 
-    fseek(adpcm, 0, SEEK_END);
-    size = ftell(adpcm);
-    rewind(adpcm);
+    size = lseek(adpcm, 0, SEEK_END);
+    lseek(adpcm, 0L, SEEK_SET);
 
     buffer = memalign(64, size);
     if (buffer == NULL) {
         LOG("SFX: Failed to allocate memory for SFX\n");
-        fclose(adpcm);
+        close(adpcm);
         return -ENOMEM;
     }
 
-    ret = fread(buffer, 1, size, adpcm);
-    fclose(adpcm);
+    ret = read(adpcm, buffer, size);
+    close(adpcm);
 
     if (ret != size) {
         LOG("SFX: Failed to read SFX: %d (expected %d)\n", ret, size);

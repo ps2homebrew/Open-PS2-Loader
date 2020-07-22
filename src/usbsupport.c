@@ -435,7 +435,7 @@ static int usbCheckVMC(char *name, int createSize)
 
 static void usbGetAppsPath(char *path, int max)
 {
-    snprintf(path, max, "%s/APPS", usbPrefix);
+    snprintf(path, max, "%sAPPS", usbPrefix);
 }
 
 static item_list_t usbGameList = {

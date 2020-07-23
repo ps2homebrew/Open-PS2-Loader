@@ -1406,7 +1406,7 @@ void guiIntroLoop(void)
             // Start playing sound
             sfxPlay(SFX_BOOT);
             // Calculate transition delay
-            tFadeDelayEnd = clock() + (sfxGetSoundDuration(SFX_BOOT) - fadeDuration) * CLOCKS_PER_SEC / 1000;
+            tFadeDelayEnd = clock() + (sfxGetSoundDuration(SFX_BOOT) - fadeDuration) * (CLOCKS_PER_SEC / 1000);
         }
 
         if (gInitComplete && clock() >= tFadeDelayEnd)

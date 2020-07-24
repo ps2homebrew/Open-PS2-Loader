@@ -438,7 +438,12 @@ static void usbGetAppsPath(char *path, int max)
     snprintf(path, max, "%sAPPS", usbPrefix);
 }
 
+static void usbGetLegacyAppsPath(char *path, int max)
+{
+    snprintf(path, max, "%sconf_apps.cfg", usbPrefix);
+}
+
 static item_list_t usbGameList = {
-    USB_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbGetAppsPath, &usbInit, &usbNeedsUpdate,
+    USB_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbGetAppsPath, &usbGetLegacyAppsPath, &usbInit, &usbNeedsUpdate,
     &usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
     &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbShutdown, &usbCheckVMC, USB_ICON};

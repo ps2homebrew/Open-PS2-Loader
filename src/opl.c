@@ -482,6 +482,34 @@ config_set_t *oplGetLegacyAppsConfig(void)
     return appConfig;
 }
 
+config_set_t *oplGetLegacyAppsInfo(char *name)
+{
+    int i, fd;
+    item_list_t *listSupport;
+    config_set_t *appConfig;
+    char appsPath[128];
+
+    for (i = MODE_COUNT; i >= 0; i--) {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsInfo != NULL)) {
+            listSupport->itemGetLegacyAppsInfo(appsPath, sizeof(appsPath), name);
+
+            fd = openFile(appsPath, O_RDONLY);
+            if (fd >= 0) {
+                appConfig = configAlloc(0, NULL, appsPath);
+                close(fd);
+                return appConfig;
+            }
+        }
+    }
+
+    /* Apps config not found on any device, go with last tested device.
+       Does not matter if the config file could be loaded or not */
+    appConfig = configAlloc(0, NULL, appsPath);
+
+    return appConfig;
+}
+
 // ----------------------------------------------------------
 // ----------------------- Updaters -------------------------
 // ----------------------------------------------------------

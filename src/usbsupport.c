@@ -443,7 +443,12 @@ static void usbGetLegacyAppsPath(char *path, int max)
     snprintf(path, max, "%sconf_apps.cfg", usbPrefix);
 }
 
+static void usbGetLegacyAppsInfo(char *path, int max, char *name)
+{
+    snprintf(path, max, "%s" OPL_FOLDER "/%s.cfg", usbPrefix, name);
+}
+
 static item_list_t usbGameList = {
-    USB_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbGetAppsPath, &usbGetLegacyAppsPath, &usbInit, &usbNeedsUpdate,
+    USB_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, USB_MODE_UPDATE_DELAY, "USB Games", _STR_USB_GAMES, &usbGetAppsPath, &usbGetLegacyAppsPath, &usbGetLegacyAppsInfo, &usbInit, &usbNeedsUpdate,
     &usbUpdateGameList, &usbGetGameCount, &usbGetGame, &usbGetGameName, &usbGetGameNameLength, &usbGetGameStartup, &usbDeleteGame, &usbRenameGame,
     &usbLaunchGame, &usbGetConfig, &usbGetImage, &usbCleanUp, &usbShutdown, &usbCheckVMC, USB_ICON};

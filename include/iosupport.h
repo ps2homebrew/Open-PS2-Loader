@@ -104,6 +104,8 @@ typedef struct
 
     void (*itemGetLegacyAppsPath)(char *path, int max);
 
+    void (*itemGetLegacyAppsInfo)(char *path, int max, char *name);
+
     void (*itemInit)(void);
 
     /** @return 1 if update is needed, 0 otherwise */

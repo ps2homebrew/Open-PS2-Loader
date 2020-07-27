@@ -186,7 +186,9 @@ EE_OBJS := $(EE_OBJS:%=$(EE_OBJS_DIR)%)
 
 .SILENT:
 
-.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check
+.PHONY: all release debug iopcore_debug eesio_debug ingame_debug deci2_debug clean rebuild pc_tools pc_tools_win32 oplversion format format-check ps2sdk-not-setup
+
+ifdef PS2SDK
 
 all:
 	echo "Building Open PS2 Loader $(OPL_VERSION)..."
@@ -911,8 +913,17 @@ $(EE_OBJS_DIR)%.o: $(EE_SRC_DIR)%.c | $(EE_OBJS_DIR)
 $(EE_OBJS_DIR)%.o: $(EE_ASM_DIR)%.s | $(EE_OBJS_DIR)
 	$(EE_AS) $(EE_ASFLAGS) $< -o $@
 
+endif
+
+ifndef PS2SDK
+ps2sdk-not-setup:
+	@echo "PS2SDK is not setup. Please setup PS2SDK before building this project"
+endif
+
 oplversion:
 	@echo $(OPL_VERSION)
 
+ifdef PS2SDK
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal
+endif

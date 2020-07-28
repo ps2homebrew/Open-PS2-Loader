@@ -1,10 +1,8 @@
-name: CI
+name: CI-format-check
 
 on:
   push:
   pull_request:
-  repository_dispatch:
-    types: [run_build]
 
 jobs:
   check-format:

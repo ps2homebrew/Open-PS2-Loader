@@ -52,6 +52,24 @@ static char *appGetELFName(char *name)
     return name;
 }
 
+static float appGetELFSize(char *path)
+{
+    int fd, size;
+    float bytesInMiB = 1048576.0f;
+
+    fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        LOG("Failed to open APP %s\n", path);
+        return 0.0f;
+    }
+
+    size = getFileSize(fd);
+    close(fd);
+
+    // Return size in MiB
+    return (size / bytesInMiB);
+}
+
 static char *appGetBoot(char *device, int max, char *path)
 {
     char *pos, *filenamesep;
@@ -354,6 +372,7 @@ static void appLaunchItem(int id, config_set_t *configSet)
 static config_set_t *appGetConfig(int id)
 {
     config_set_t *config;
+    char tmp[8];
 
     if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);
@@ -363,6 +382,9 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
         configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
+
+        snprintf(tmp, sizeof(tmp), "%.2f", appGetELFSize(cur->val));
+        configSetStr(config, CONFIG_ITEM_SIZE, tmp);
     } else {
         char path[256];
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
@@ -374,6 +396,9 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_STARTUP, path);
+
+        snprintf(tmp, sizeof(tmp), "%.2f", appGetELFSize(path));
+        configSetStr(config, CONFIG_ITEM_SIZE, tmp);
     }
     return config;
 }

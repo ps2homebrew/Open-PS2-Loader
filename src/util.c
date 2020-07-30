@@ -57,21 +57,21 @@ void checkMCFolder(void)
     char path[32];
     int fd;
 
-    snprintf(path, sizeof(path), "mc%d:OPL", mcID);
+    snprintf(path, sizeof(path), "mc%d:OPL", mcID & 1);
     DIR *dir = opendir(path);
     if (dir == NULL)
         mkdir(path, 0777);
     else
         closedir(dir);
 
-    snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID);
+    snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID & 1);
     fd = open(path, O_RDONLY, 0666);
     if (fd < 0)
         writeMCIcon();
 
     close(fd);
 
-    snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID);
+    snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID & 1);
     fd = open(path, O_RDONLY, 0666);
     if (fd < 0)
         writeMCIcon();

@@ -14,6 +14,7 @@
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioMount("iso:", ***), fileXioUmount("iso:")
 #include <io_common.h>   // FIO_MT_RDONLY
+#include <ps2sdkapi.h>   // lseek64
 
 /// internal linked list used to populate the list from directory listing
 struct game_list_t
@@ -508,7 +509,7 @@ int sbProbeISO9660_64(const char *path, base_game_info_t *game, u32 layer1_offse
     result = -1;
     if (game->media == SCECdPS2DVD) { //Only DVDs can have multiple layers.
         if ((fd = open(path, O_RDONLY, 0666)) >= 0) {
-            if (lseek(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
+            if (lseek64(fd, (u64)layer1_offset * 2048, SEEK_SET) == (u64)layer1_offset * 2048) {
                 if ((read(fd, buffer, sizeof(buffer)) == sizeof(buffer)) &&
                     ((buffer[0x00] == 1) && (!strncmp(&buffer[0x01], "CD001", 5)))) {
                     result = 0;

@@ -895,6 +895,10 @@ static void _saveConfig()
         configSetStr(configNet, CONFIG_NET_SMB_PASSW, gPCPassword);
     }
 
+    char *path = configGetDir();
+    if (!strncmp(path, "mc", 2))
+        checkMCFolder();
+
     lscret = configWriteMulti(lscstatus);
     if (lscret == 0)
         lscret = trySaveAlternateDevice(lscstatus);
@@ -956,8 +960,6 @@ int saveConfig(int types, int showUI)
     if (showUI) {
         if (lscret) {
             char *path = configGetDir();
-            if (!strncmp(path, "mc", 2))
-                checkMCFolder();
 
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
 

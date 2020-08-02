@@ -125,6 +125,9 @@ static int appNeedsUpdate(void)
     if (oplShouldAppsUpdate())
         update = 1;
 
+    if (update)
+        configApps = oplGetLegacyAppsConfig();
+
     return update;
 }
 

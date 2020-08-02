@@ -759,6 +759,7 @@ static void _loadConfig()
 
     lscret = result;
     lscstatus = 0;
+    showCfgPopup = 1;
 }
 
 static int trySaveConfigUSB(int types)
@@ -896,8 +897,10 @@ static void _saveConfig()
     }
 
     char *path = configGetDir();
-    if (!strncmp(path, "mc", 2))
+    if (!strncmp(path, "mc", 2)) {
         checkMCFolder();
+        configPrepareNotifications(gBaseMCDir);
+    }
 
     lscret = configWriteMulti(lscstatus);
     if (lscret == 0)

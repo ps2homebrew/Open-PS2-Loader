@@ -13,7 +13,7 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        apk add build-base git zip
+        apk add build-base git zip gawk
 
     - uses: actions/checkout@v2
     - run: |
@@ -41,7 +41,7 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        apk add build-base git zip
+        apk add build-base git zip gawk
 
     - uses: actions/checkout@v2
     - run: |

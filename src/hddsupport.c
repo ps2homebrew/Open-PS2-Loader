@@ -596,7 +596,17 @@ static void hddGetAppsPath(char *path, int max)
     snprintf(path, max, "%s/APPS", hddPrefix);
 }
 
+static void hddGetLegacyAppsPath(char *path, int max)
+{
+    snprintf(path, max, "%sconf_apps.cfg", hddPrefix);
+}
+
+static void hddGetLegacyAppsInfo(char *path, int max, char *name)
+{
+    snprintf(path, max, "%s" OPL_FOLDER "/%s.cfg", hddPrefix, name);
+}
+
 static item_list_t hddGameList = {
-    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddGetAppsPath, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddGetAppsPath, &hddGetLegacyAppsPath, &hddGetLegacyAppsInfo, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON};

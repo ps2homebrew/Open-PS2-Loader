@@ -102,6 +102,10 @@ typedef struct
     /// @return path to applications storage on the device (set callback to NULL if not applicable).
     void (*itemGetAppsPath)(char *path, int max);
 
+    void (*itemGetLegacyAppsPath)(char *path, int max);
+
+    void (*itemGetLegacyAppsInfo)(char *path, int max, char *name);
+
     void (*itemInit)(void);
 
     /** @return 1 if update is needed, 0 otherwise */

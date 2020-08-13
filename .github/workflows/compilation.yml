@@ -1,4 +1,4 @@
-name: CI
+name: CI-compile
 
 on:
   push:
@@ -25,23 +25,43 @@ jobs:
 
     - name: Compile -> make clean release
       run: |
-        make clean release
-        mv OPNPS2LD-*.ZIP OPNPS2LD-LATEST.ZIP
+        make --trace clean release
+        mv OPNPS2LD-*.ZIP OPNPS2LD.ZIP
 
     - name: Upload release artifact
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
         name: OPNPS2LD
-        path: OPNPS2LD-LATEST.ZIP
+        path: OPNPS2LD.ZIP
+
+    - name: Create detailed changelog
+      run: sh ./make_changelog.sh
+
+    - name: Upload changelog for variants artifact 
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: OPNPS2LD-VARIANTS
+        path: |
+          DETAILED_CHANGELOG
+          CREDITS
+          LICENSE
+          README.md
 
   build-variants:
     runs-on: ubuntu-latest
     container: ps2dev/ps2dev:latest
+    strategy:
+      matrix:
+        rtl: ["", RTL=1]
+        pademu: ["", PADEMU=1]
+        igs: ["", IGS=1]
+        t10k: ["", DTL_T10000=1]
     steps:
     - name: Install dependencies
       run: |
-        apk add build-base git zip gawk
+        apk add build-base git
 
     - uses: actions/checkout@v2
     - run: |
@@ -51,91 +71,10 @@ jobs:
       id: version
       run: echo "::set-output name=version::$(make oplversion)"
 
-    - name: Compile -> make clean OPNPS2LD.ELF
+    - name: Compile -> make ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
       run: |
-        make clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make PADEMU=1 clean OPNPS2LD.ELF
-      run: |
-        make PADEMU=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-PADEMU-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-PADEMU-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make IGS=1 clean OPNPS2LD.ELF
-      run: |
-        make IGS=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-IGS-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-IGS-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make IGS=1 PADEMU=1 clean OPNPS2LD.ELF
-      run: |
-        make IGS=1 PADEMU=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-IGS-PADEMU-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-IGS-PADEMU-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 PADEMU=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 PADEMU=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-PADEMU-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-PADEMU-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 IGS=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 IGS=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 IGS=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 IGS=1 PADEMU=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 IGS=1 PADEMU=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-PADEMU-${{ steps.version.outputs.version }}.ELF
-
-    - name: Compile -> make RTL=1 IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-      run: |
-        make RTL=1 IGS=1 PADEMU=1 DTL_T10000=1 clean OPNPS2LD.ELF
-        mv OPNPS2LD.ELF OPNPS2LD-RTL-IGS-PADEMU-DTL_T10000-${{ steps.version.outputs.version }}.ELF
-
-    - name: Create detailed changelog
-      run: sh ./make_changelog.sh
-
-    - name: Create zip archive
-      run: zip -r OPNPS2LD-VARIANTS-LATEST.ZIP OPNPS2LD*.ELF DETAILED_CHANGELOG CREDITS LICENSE README.md
+        make --trace ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
+        mv opl.elf OPNPS2LD-${{ matrix.t10k }}-${{ matrix.igs }}-${{ matrix.pademu }}-${{ matrix.rtl }}-${{ steps.version.outputs.version }}.ELF
 
     - name: Upload variants artifact
       if: ${{ success() }}
@@ -143,17 +82,13 @@ jobs:
       with:
         name: OPNPS2LD-VARIANTS
         path: |
-          OPNPS2LD-VARIANTS-LATEST.ZIP
+          OPNPS2LD*.ELF
 
   create-release:
     needs: [build, build-variants]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
-    - uses: actions/checkout@v2
-    - run: |
-        git fetch --prune --unshallow
-
     - name: Download release artifact
       uses: actions/download-artifact@v1
       with:
@@ -164,6 +99,11 @@ jobs:
       with:
         name: OPNPS2LD-VARIANTS
 
+    - name: Prepare artifacts for release
+      run: |
+        mv OPNPS2LD OPNPS2LD-LATEST.ZIP
+        7z a -t7z OPNPS2LD-VARIANTS-LATEST.7z OPNPS2LD-VARIANTS/*
+
     - name: Create release
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -171,5 +111,5 @@ jobs:
         automatic_release_tag: "latest"
         title: "Latest development builds"
         files: |
-          OPNPS2LD/OPNPS2LD-LATEST.ZIP
-          OPNPS2LD-VARIANTS/OPNPS2LD-VARIANTS-LATEST.ZIP
+          OPNPS2LD-LATEST.ZIP
+          OPNPS2LD-VARIANTS-LATEST.7z

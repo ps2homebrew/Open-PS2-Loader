@@ -180,6 +180,8 @@ static struct RomdirFileStat *GetFileStatFromImage(const struct RomImgData *Imag
                     result = stat;
                     goto end;
                 }
+              
+                return stat;
             }
 
             offset += (RomdirEntry->size + 0xF) & 0xFFFFFFF0;

@@ -177,7 +177,7 @@ static struct RomdirFileStat *GetFileStatFromImage(const struct RomImgData *Imag
                 if (RomdirEntry->ExtInfoEntrySize > 0) {
                     stat->extinfo = (void *)((unsigned int)ImageStat->RomdirEnd + ExtInfoOffset);
                 }
-              
+
                 return stat;
             }
 
@@ -186,7 +186,7 @@ static struct RomdirFileStat *GetFileStatFromImage(const struct RomImgData *Imag
             RomdirEntry++;
         } while (((unsigned int *)RomdirEntry->name)[0] != 0x00000000);
     }
-	
+
     return NULL;
 }
 

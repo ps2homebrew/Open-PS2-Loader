@@ -10,9 +10,6 @@
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
-//START of OPL_DB tweaks
-#include "include/supportbase.h"
-//END of OPL_DB tweaks
 
 static int appForceUpdate = 1;
 static int appItemCount = 0;
@@ -118,48 +115,9 @@ static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
     struct config_value_t *cur;
     struct app_info_linked *app;
     int count;
-    //START of OPL_DB tweaks
-    char path[256];
-    static item_list_t *listSupport = NULL;
-    int ret = 0; //Return from configRead
 
     configClear(configApps);
-
-    //Try MC?:/OPL/conf_apps.cfg
-    snprintf(path, sizeof(path), "%s/conf_apps.cfg", gBaseMCDir);
-    configApps = configAlloc(CONFIG_APPS, NULL, path);
-    ret = configRead(configApps);
-
-    //Try HDD
-    if (ret == 0 && (listSupport = hddGetObject(1))) {
-        if (configApps != NULL) {
-            configFree(configApps);
-        }
-        snprintf(path, sizeof(path), "%sconf_apps.cfg", hddGetPrefix());
-        configApps = configAlloc(CONFIG_APPS, NULL, path);
-        ret = configRead(configApps);
-    }
-
-    //Try ETH
-    if (ret == 0 && (listSupport = ethGetObject(1))) {
-        if (configApps != NULL) {
-            configFree(configApps);
-        }
-        snprintf(path, sizeof(path), "%sconf_apps.cfg", ethGetPrefix());
-        configApps = configAlloc(CONFIG_APPS, NULL, path);
-        ret = configRead(configApps);
-    }
-
-    //Try USB
-    if (ret == 0 && (listSupport = usbGetObject(1))) {
-        if (configApps != NULL) {
-            configFree(configApps);
-        }
-        snprintf(path, sizeof(path), "%sconf_apps.cfg", usbGetPrefix());
-        configApps = configAlloc(CONFIG_APPS, NULL, path);
-        ret = configRead(configApps);
-    }
-    //END of OPL_DB tweaks
+    configRead(configApps);
 
     count = 0;
     cur = configApps->head;
@@ -318,12 +276,10 @@ static int appGetItemNameLength(int id)
    The path is used immediately, before a subsequent call to appGetItemStartup(). */
 static char *appGetItemStartup(int id)
 {
-    //START of OPL_DB tweaks
     if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);
-        return appGetELFName(cur->val);
+        return cur->val;
     } else {
-        //END of OPL_DB tweaks
         return appsList[id].boot;
     }
 }
@@ -397,74 +353,14 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
 static config_set_t *appGetConfig(int id)
 {
-    //START of OPL_DB tweaks
-    config_set_t *config = NULL;
-    //END of OPL_DB tweaks
+    config_set_t *config;
 
     if (appsList[id].legacy) {
         config = configAlloc(0, NULL, NULL);
         struct config_value_t *cur = appGetConfigValue(id);
-        //START of OPL_DB tweaks
-        static item_list_t *listSupport = NULL;
-        int ret = 0;
-
-        //Search on HDD, SMB, USB for the CFG/GAME.ELF.CFG file.
-        //HDD
-        if ((listSupport = hddGetObject(1))) {
-            char path[256];
-#if OPL_IS_DEV_BUILD
-            snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", hddGetPrefix(), appGetELFName(cur->val));
-#else
-            snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddGetPrefix(), appGetELFName(cur->val));
-#endif
-            config = configAlloc(0, NULL, path);
-            ret = configRead(config);
-        }
-
-        //ETH
-        if (ret == 0 && (listSupport = ethGetObject(1))) {
-            char path[256];
-            if (config != NULL)
-                configFree(config);
-
-#if OPL_IS_DEV_BUILD
-            snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", ethGetPrefix(), appGetELFName(cur->val));
-#else
-            snprintf(path, sizeof(path), "%sCFG/%s.cfg", ethGetPrefix(), appGetELFName(cur->val));
-#endif
-            config = configAlloc(0, NULL, path);
-            ret = configRead(config);
-        }
-
-        //USB
-        if (ret == 0 && (listSupport = usbGetObject(1))) {
-            char path[256];
-            if (config != NULL)
-                configFree(config);
-
-#if OPL_IS_DEV_BUILD
-            snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
-#else
-            snprintf(path, sizeof(path), "%sCFG/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
-#endif
-            config = configAlloc(0, NULL, path);
-            ret = configRead(config);
-        }
-
-        if (ret == 0) { //No config found on previous devices, create one.
-            if (config != NULL)
-                configFree(config);
-
-            config = configAlloc(0, NULL, NULL);
-        }
-        //END of OPL_DB tweaks
         configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
         configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
-        //START of OPL_DB tweaks
-        configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
-        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
-        //END of OPL_DB tweaks
     } else {
         char path[256];
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
@@ -476,10 +372,6 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_STARTUP, path);
-        //START of OPL_DB tweaks
-        configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
-        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
-        //END of OPL_DB tweaks
     }
     return config;
 }
@@ -490,13 +382,6 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
 
     startup = appGetBoot(device, sizeof(device), value);
 
-    //START of OPL_DB tweaks
-    // Try with entire value, fixes not loading theme icons in subfolders.
-    if (oplGetAppImage(device, folder, isRelative, value, suffix, resultTex, psm) >= 0) {
-        return 0;
-    }
-
-    //END of OPL_DB tweaks
     return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }
 

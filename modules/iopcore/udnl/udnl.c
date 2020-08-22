@@ -153,7 +153,6 @@ static struct RomdirFileStat *GetFileStatFromImage(const struct RomImgData *Imag
     unsigned int i, offset, ExtInfoOffset;
     unsigned char filename_temp[12];
     const struct RomDirEntry *RomdirEntry;
-    struct RomdirFileStat *result;
 
     offset = 0;
     ExtInfoOffset = 0;
@@ -177,22 +176,18 @@ static struct RomdirFileStat *GetFileStatFromImage(const struct RomImgData *Imag
 
                 if (RomdirEntry->ExtInfoEntrySize > 0) {
                     stat->extinfo = (void *)((unsigned int)ImageStat->RomdirEnd + ExtInfoOffset);
-                    result = stat;
-                    goto end;
                 }
+
+                return stat;
             }
 
             offset += (RomdirEntry->size + 0xF) & 0xFFFFFFF0;
             ExtInfoOffset += RomdirEntry->ExtInfoEntrySize;
             RomdirEntry++;
         } while (((unsigned int *)RomdirEntry->name)[0] != 0x00000000);
+    }
 
-        result = NULL;
-    } else
-        result = NULL;
-
-end:
-    return result;
+    return NULL;
 }
 
 /* 0x0000055c */

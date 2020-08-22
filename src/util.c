@@ -35,6 +35,76 @@ int getFileSize(int fd)
     return size;
 }
 
+#define MAX_ENTRY 128
+
+static int checkMC()
+{
+    int mc0_is_ps2card, mc1_is_ps2card;
+    int mc0_has_folder, mc1_has_folder;
+    int memcardtype, dummy;
+    int i, ret;
+    static sceMcTblGetDir mc_direntry[MAX_ENTRY] __attribute__((aligned(64)));
+
+    if (mcID == -1) {
+        mcSync(0, NULL, NULL);
+
+        mcGetInfo(0, 0, &memcardtype, &dummy, &dummy);
+        mcSync(0, NULL, &ret);
+        mc0_is_ps2card = (ret == 0 && memcardtype == 2);
+        mc0_has_folder = 0;
+
+        mcGetInfo(1, 0, &memcardtype, &dummy, &dummy);
+        mcSync(0, NULL, &ret);
+        mc1_is_ps2card = (ret == 0 && memcardtype == 2);
+        mc1_has_folder = 0;
+
+        if (mc0_is_ps2card) {
+            memset(mc_direntry, 0, sizeof(mc_direntry));
+            mcGetDir(0, 0, "*", 0, MAX_ENTRY - 2, mc_direntry);
+            mcSync(0, NULL, &ret);
+            for (i = 0; i < ret; i++) {
+                if (mc_direntry[i].AttrFile & sceMcFileAttrSubdir && !strcmp((char *)mc_direntry[i].EntryName, "OPL")) {
+                    mc0_has_folder = 1;
+                    break;
+                }
+            }
+        }
+
+        if (mc1_is_ps2card) {
+            memset(mc_direntry, 0, sizeof(mc_direntry));
+            mcGetDir(1, 0, "*", 0, MAX_ENTRY - 2, mc_direntry);
+            mcSync(0, NULL, &ret);
+            for (i = 0; i < ret; i++) {
+                if (mc_direntry[i].AttrFile & sceMcFileAttrSubdir && !strcmp((char *)mc_direntry[i].EntryName, "OPL")) {
+                    mc1_has_folder = 1;
+                    break;
+                }
+            }
+        }
+
+        if (mc0_has_folder) {
+            mcID = 0x30;
+            return mcID;
+        }
+
+        if (mc1_has_folder) {
+            mcID = 0x31;
+            return mcID;
+        }
+
+        if (mc0_is_ps2card) {
+            mcID = 0x30;
+            return mcID;
+        }
+
+        if (mc1_is_ps2card) {
+            mcID = 0x31;
+            return mcID;
+        }
+    }
+    return mcID;
+}
+
 static void writeMCIcon(void)
 {
     int fd;
@@ -57,62 +127,29 @@ void checkMCFolder(void)
     char path[32];
     int fd;
 
-    snprintf(path, sizeof(path), "mc%d:OPL", mcID);
-    DIR *dir = opendir(path);
-    if (dir == NULL)
-        mkdir(path, 0777);
-    else
-        closedir(dir);
-
-    snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID);
-    fd = open(path, O_RDONLY, 0666);
-    if (fd < 0)
-        writeMCIcon();
-
-    close(fd);
-
-    snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID);
-    fd = open(path, O_RDONLY, 0666);
-    if (fd < 0)
-        writeMCIcon();
-
-    close(fd);
-}
-
-static int checkMC()
-{
-    int fd;
-
-    if (mcID == -1) {
-        DIR *dir = opendir("mc0:OPL");
-        if (dir == NULL) {
-            dir = opendir("mc1:OPL");
-            if (dir == NULL) {
-                // No base dir found on any MC, check MC is inserted
-                fd = sysCheckMC();
-                if (fd >= 0) {
-                    dir = opendir("mc0:");
-                    if (dir != NULL) {
-                        closedir(dir);
-                        mcID = 0x30;
-                    } else {
-                        dir = opendir("mc1:");
-                        if (dir != NULL) {
-                            closedir(dir);
-                            mcID = 0x31;
-                        }
-                    }
-                }
-            } else {
-                closedir(dir);
-                mcID = 0x31;
-            }
-        } else {
-            closedir(dir);
-            mcID = 0x30;
-        }
+    if (checkMC() < 0) {
+        return;
     }
-    return mcID;
+
+    mcSync(0, NULL, NULL);
+    mcMkDir(mcID & 1, 0, "OPL");
+    mcSync(0, NULL, NULL);
+
+    snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID & 1);
+    fd = open(path, O_RDONLY, 0666);
+    if (fd < 0) {
+        writeMCIcon();
+    } else {
+        close(fd);
+    }
+
+    snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID & 1);
+    fd = open(path, O_RDONLY, 0666);
+    if (fd < 0) {
+        writeMCIcon();
+    } else {
+        close(fd);
+    }
 }
 
 static int checkFile(char *path, int mode)
@@ -135,14 +172,18 @@ static int checkFile(char *path, int mode)
             char dirPath[256];
             char *pos = strrchr(path, '/');
             if (pos) {
-                memcpy(dirPath, path, pos - path);
-                dirPath[pos - path] = '\0';
-                DIR *dir = opendir(dirPath);
-                if (dir == NULL) {
-                    if (mkdir(dirPath, 0777) < 0)
+                memcpy(dirPath, path + 4, (pos - path) - 4);
+                dirPath[(pos - path) - 4] = '\0';
+                int ret = 0;
+                mcSync(0, NULL, NULL);
+                mcMkDir(path[2] - '0', 0, dirPath);
+                mcSync(0, NULL, &ret);
+                if (ret < 0) {
+                    // If the error is that the folder already exists, just pass through
+                    if (ret != -4) {
                         return 0;
-                } else
-                    closedir(dir);
+                    }
+                }
             }
         }
     }

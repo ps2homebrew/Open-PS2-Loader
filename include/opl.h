@@ -73,6 +73,8 @@ int oplPath2Mode(const char *path);
 int oplGetAppImage(const char *device, char *folder, int isRelative, char *value, char *suffix, GSTEXTURE *resultTex, short psm);
 int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void *arg), void *arg);
 int oplShouldAppsUpdate(void);
+config_set_t *oplGetLegacyAppsConfig(void);
+config_set_t *oplGetLegacyAppsInfo(char *name);
 //START of OPL_DB tweaks
 int oplShouldElmUpdate(void);
 //END of OPL_DB tweaks

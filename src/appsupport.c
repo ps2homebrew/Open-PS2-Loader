@@ -386,6 +386,11 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
 
+        //START of OPL_DB tweaks
+        configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
+        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
+        //END of OPL_DB tweaks
+
         snprintf(tmp, sizeof(tmp), "%.2f", appGetELFSize(cur->val));
         configSetStr(config, CONFIG_ITEM_SIZE, tmp);
     } else {
@@ -400,6 +405,11 @@ static config_set_t *appGetConfig(int id)
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_STARTUP, path);
 
+        //START of OPL_DB tweaks
+        configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
+        configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
+        //END of OPL_DB tweaks
+
         snprintf(tmp, sizeof(tmp), "%.2f", appGetELFSize(path));
         configSetStr(config, CONFIG_ITEM_SIZE, tmp);
     }
@@ -411,6 +421,14 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
     char device[8], *startup;
 
     startup = appGetBoot(device, sizeof(device), value);
+
+    //START of OPL_DB tweaks
+    // Try with entire value, fixes not loading theme icons in subfolders.
+    if (oplGetAppImage(device, folder, isRelative, value, suffix, resultTex, psm) >= 0) {
+        return 0;
+    }
+
+    //END of OPL_DB tweaks
 
     return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }

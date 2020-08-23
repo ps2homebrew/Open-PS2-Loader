@@ -10,9 +10,6 @@
 #include "include/usbsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
-//START of OPL_DB tweaks
-#include "include/supportbase.h"
-//END of OPL_DB tweaks
 
 static int appForceUpdate = 1;
 static int appItemCount = 0;
@@ -55,6 +52,24 @@ static char *appGetELFName(char *name)
     return name;
 }
 
+static float appGetELFSize(char *path)
+{
+    int fd, size;
+    float bytesInMiB = 1048576.0f;
+
+    fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        LOG("Failed to open APP %s\n", path);
+        return 0.0f;
+    }
+
+    size = getFileSize(fd);
+    close(fd);
+
+    // Return size in MiB
+    return (size / bytesInMiB);
+}
+
 static char *appGetBoot(char *device, int max, char *path)
 {
     char *pos, *filenamesep;
@@ -86,7 +101,7 @@ void appInit(void)
     LOG("APPSUPPORT Init\n");
     appForceUpdate = 1;
     configGetInt(configGetByType(CONFIG_OPL), "app_frames_delay", &appItemList.delay);
-    configApps = configGetByType(CONFIG_APPS);
+    configApps = oplGetLegacyAppsConfig();
     appsList = NULL;
     appItemList.enabled = 1;
 }
@@ -110,6 +125,9 @@ static int appNeedsUpdate(void)
     if (oplShouldAppsUpdate())
         update = 1;
 
+    if (update)
+        configApps = oplGetLegacyAppsConfig();
+
     return update;
 }
 
@@ -118,48 +136,9 @@ static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
     struct config_value_t *cur;
     struct app_info_linked *app;
     int count;
-    //START of OPL_DB tweaks
-    char path[256];
-    static item_list_t *listSupport = NULL;
-    int ret = 0; //Return from configRead
 
     configClear(configApps);
-
-    //Try MC?:/OPL/conf_apps.cfg
-    snprintf(path, sizeof(path), "%s/conf_apps.cfg", gBaseMCDir);
-    configApps = configAlloc(CONFIG_APPS, NULL, path);
-    ret = configRead(configApps);
-
-    //Try HDD
-    if (ret == 0 && (listSupport = hddGetObject(1))) {
-        if (configApps != NULL) {
-            configFree(configApps);
-        }
-        snprintf(path, sizeof(path), "%sconf_apps.cfg", hddGetPrefix());
-        configApps = configAlloc(CONFIG_APPS, NULL, path);
-        ret = configRead(configApps);
-    }
-
-    //Try ETH
-    if (ret == 0 && (listSupport = ethGetObject(1))) {
-        if (configApps != NULL) {
-            configFree(configApps);
-        }
-        snprintf(path, sizeof(path), "%sconf_apps.cfg", ethGetPrefix());
-        configApps = configAlloc(CONFIG_APPS, NULL, path);
-        ret = configRead(configApps);
-    }
-
-    //Try USB
-    if (ret == 0 && (listSupport = usbGetObject(1))) {
-        if (configApps != NULL) {
-            configFree(configApps);
-        }
-        snprintf(path, sizeof(path), "%sconf_apps.cfg", usbGetPrefix());
-        configApps = configAlloc(CONFIG_APPS, NULL, path);
-        ret = configRead(configApps);
-    }
-    //END of OPL_DB tweaks
+    configRead(configApps);
 
     count = 0;
     cur = configApps->head;
@@ -318,12 +297,10 @@ static int appGetItemNameLength(int id)
    The path is used immediately, before a subsequent call to appGetItemStartup(). */
 static char *appGetItemStartup(int id)
 {
-    //START of OPL_DB tweaks
     if (appsList[id].legacy) {
         struct config_value_t *cur = appGetConfigValue(id);
         return appGetELFName(cur->val);
     } else {
-        //END of OPL_DB tweaks
         return appsList[id].boot;
     }
 }
@@ -397,74 +374,25 @@ static void appLaunchItem(int id, config_set_t *configSet)
 
 static config_set_t *appGetConfig(int id)
 {
-    //START of OPL_DB tweaks
-    config_set_t *config = NULL;
-    //END of OPL_DB tweaks
+    config_set_t *config;
+    char tmp[8];
 
     if (appsList[id].legacy) {
-        config = configAlloc(0, NULL, NULL);
         struct config_value_t *cur = appGetConfigValue(id);
-        //START of OPL_DB tweaks
-        static item_list_t *listSupport = NULL;
-        int ret = 0;
+        config = oplGetLegacyAppsInfo(appGetELFName(cur->val));
+        configRead(config);
 
-        //Search on HDD, SMB, USB for the CFG/GAME.ELF.CFG file.
-        //HDD
-        if ((listSupport = hddGetObject(1))) {
-            char path[256];
-#if OPL_IS_DEV_BUILD
-            snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", hddGetPrefix(), appGetELFName(cur->val));
-#else
-            snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddGetPrefix(), appGetELFName(cur->val));
-#endif
-            config = configAlloc(0, NULL, path);
-            ret = configRead(config);
-        }
-
-        //ETH
-        if (ret == 0 && (listSupport = ethGetObject(1))) {
-            char path[256];
-            if (config != NULL)
-                configFree(config);
-
-#if OPL_IS_DEV_BUILD
-            snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", ethGetPrefix(), appGetELFName(cur->val));
-#else
-            snprintf(path, sizeof(path), "%sCFG/%s.cfg", ethGetPrefix(), appGetELFName(cur->val));
-#endif
-            config = configAlloc(0, NULL, path);
-            ret = configRead(config);
-        }
-
-        //USB
-        if (ret == 0 && (listSupport = usbGetObject(1))) {
-            char path[256];
-            if (config != NULL)
-                configFree(config);
-
-#if OPL_IS_DEV_BUILD
-            snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
-#else
-            snprintf(path, sizeof(path), "%sCFG/%s.cfg", usbGetPrefix(), appGetELFName(cur->val));
-#endif
-            config = configAlloc(0, NULL, path);
-            ret = configRead(config);
-        }
-
-        if (ret == 0) { //No config found on previous devices, create one.
-            if (config != NULL)
-                configFree(config);
-
-            config = configAlloc(0, NULL, NULL);
-        }
-        //END of OPL_DB tweaks
         configSetStr(config, CONFIG_ITEM_NAME, appGetELFName(cur->val));
         configSetStr(config, CONFIG_ITEM_LONGNAME, cur->key);
         configSetStr(config, CONFIG_ITEM_STARTUP, cur->val);
+
         //START of OPL_DB tweaks
         configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
         configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
         //END of OPL_DB tweaks
+
+        snprintf(tmp, sizeof(tmp), "%.2f", appGetELFSize(cur->val));
+        configSetStr(config, CONFIG_ITEM_SIZE, tmp);
     } else {
         char path[256];
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
@@ -476,10 +404,14 @@ static config_set_t *appGetConfig(int id)
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_STARTUP, path);
+
         //START of OPL_DB tweaks
         configSetStr(config, CONFIG_ITEM_FORMAT, "ELF");
         configSetStr(config, CONFIG_ITEM_MEDIA, "PS2");
         //END of OPL_DB tweaks
+
+        snprintf(tmp, sizeof(tmp), "%.2f", appGetELFSize(path));
+        configSetStr(config, CONFIG_ITEM_SIZE, tmp);
     }
     return config;
 }
@@ -497,6 +429,7 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
     }
 
     //END of OPL_DB tweaks
+
     return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }
 
@@ -521,6 +454,6 @@ static void appShutdown(void)
 }
 
 static item_list_t appItemList = {
-    APP_MODE, -1, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, NULL, &appInit, &appNeedsUpdate, &appUpdateItemList,
+    APP_MODE, -1, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, APP_MODE_UPDATE_DELAY, "Applications", _STR_APPS, NULL, NULL, NULL, &appInit, &appNeedsUpdate, &appUpdateItemList,
     &appGetItemCount, NULL, &appGetItemName, &appGetItemNameLength, &appGetItemStartup, &appDeleteItem, &appRenameItem, &appLaunchItem,
     &appGetConfig, &appGetImage, &appCleanUp, &appShutdown, NULL, APP_ICON};

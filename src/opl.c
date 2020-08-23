@@ -461,6 +461,70 @@ int oplShouldAppsUpdate(void)
     return result;
 }
 
+config_set_t *oplGetLegacyAppsConfig(void)
+{
+    int i, fd;
+    item_list_t *listSupport;
+    config_set_t *appConfig;
+    char appsPath[128];
+
+    snprintf(appsPath, sizeof(appsPath), "mc?:OPL/conf_apps.cfg");
+    fd = openFile(appsPath, O_RDONLY);
+    if (fd >= 0) {
+        appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
+        close(fd);
+        return appConfig;
+    }
+
+    for (i = MODE_COUNT; i >= 0; i--) {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsPath != NULL)) {
+            listSupport->itemGetLegacyAppsPath(appsPath, sizeof(appsPath));
+
+            fd = openFile(appsPath, O_RDONLY);
+            if (fd >= 0) {
+                appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
+                close(fd);
+                return appConfig;
+            }
+        }
+    }
+
+    /* Apps config not found on any device, go with last tested device.
+       Does not matter if the config file could be loaded or not */
+    appConfig = configAlloc(CONFIG_APPS, NULL, appsPath);
+
+    return appConfig;
+}
+
+config_set_t *oplGetLegacyAppsInfo(char *name)
+{
+    int i, fd;
+    item_list_t *listSupport;
+    config_set_t *appConfig;
+    char appsPath[128];
+
+    for (i = MODE_COUNT; i >= 0; i--) {
+        listSupport = list_support[i].support;
+        if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsInfo != NULL)) {
+            listSupport->itemGetLegacyAppsInfo(appsPath, sizeof(appsPath), name);
+
+            fd = openFile(appsPath, O_RDONLY);
+            if (fd >= 0) {
+                appConfig = configAlloc(0, NULL, appsPath);
+                close(fd);
+                return appConfig;
+            }
+        }
+    }
+
+    /* Apps config not found on any device, go with last tested device.
+       Does not matter if the config file could be loaded or not */
+    appConfig = configAlloc(0, NULL, appsPath);
+
+    return appConfig;
+}
+
 //START of OPL_DB tweaks
 int oplShouldElmUpdate(void)
 {
@@ -795,6 +859,7 @@ static void _loadConfig()
 
     lscret = result;
     lscstatus = 0;
+    showCfgPopup = 1;
 }
 
 static int trySaveConfigUSB(int types)
@@ -934,6 +999,12 @@ static void _saveConfig()
         configSetStr(configNet, CONFIG_NET_SMB_PASSW, gPCPassword);
     }
 
+    char *path = configGetDir();
+    if (!strncmp(path, "mc", 2)) {
+        checkMCFolder();
+        configPrepareNotifications(gBaseMCDir);
+    }
+
     lscret = configWriteMulti(lscstatus);
     if (lscret == 0)
         lscret = trySaveAlternateDevice(lscstatus);
@@ -999,8 +1070,6 @@ int saveConfig(int types, int showUI)
     if (showUI) {
         if (lscret) {
             char *path = configGetDir();
-            if (!strncmp(path, "mc", 2))
-                checkMCFolder();
 
             snprintf(notification, sizeof(notification), _l(_STR_SETTINGS_SAVED), path);
 

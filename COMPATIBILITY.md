@@ -11,6 +11,6 @@
 | Crazy Taxi                                       | xbox360usb             | Perfect |       |
 | Megaman X Collection                             | xbox360usb             | Perfect |       |
 | Klonoa 2 - Lunatea's Veil                        | xbox360usb             | Works   | Game will sometimes infinite load|
-| Jak and Daxter - The Precursor Legacy            | xbox360usb             | Borked  | All Jak games need Unhook Syscalls to work, thus making PADEMU non-functional by default |
+| Jak and Daxter - The Precursor Legacy            | xbox360usb             | Borked  | Needs Unhook Syscalls to work, thus making PADEMU non-functional by default |
 
 Feel free to add your own test entries.

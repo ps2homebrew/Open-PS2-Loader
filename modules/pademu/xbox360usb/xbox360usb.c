@@ -186,10 +186,10 @@ static void readReport(u8 *data, int pad)
         xbox360dev[pad].data[0] = ~(report->Back | report->LS << 1 | report->RS << 2 | report->Start << 3 | report->Up << 4 | report->Right << 5 | report->Down << 6 | report->Left << 7);
         xbox360dev[pad].data[1] = ~((report->LeftTrigger != 0) | (report->RightTrigger != 0) << 1 | report->LB << 2 | report->RB << 3 | report->Y << 4 | report->B << 5 | report->A << 6 | report->X << 7);
 
-        xbox360dev[pad].data[2] = report->RightStickXH; //rx
-        xbox360dev[pad].data[3] = report->RightStickYH; //ry
-        xbox360dev[pad].data[4] = report->LeftStickXH;  //lx
-        xbox360dev[pad].data[5] = report->LeftStickYH;  //ly
+        xbox360dev[pad].data[2] = report->RightStickXH + 128;  //rx
+        xbox360dev[pad].data[3] = ~(report->RightStickYH + 128); //ry
+        xbox360dev[pad].data[4] = report->LeftStickXH + 128;  //lx
+        xbox360dev[pad].data[5] = ~(report->LeftStickYH + 128);  //ly
 
         xbox360dev[pad].data[6] = report->Right * 255; //right
         xbox360dev[pad].data[7] = report->Left * 255;  //left

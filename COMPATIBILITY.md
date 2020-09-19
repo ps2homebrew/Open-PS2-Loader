@@ -9,5 +9,6 @@
 | Crash Bandicoot - Wrath of Cortex                | xboxoneusb, xbox360usb | Perfect |       |
 | Ratchet and Clank                                | xbox360usb             | Perfect |       |
 | Crazy Taxi                                       | xbox360usb             | Perfect |       |
+| Megaman X Collection                             | xbox360usb             | Perfect |       |
 
 Feel free to add your own test entries.

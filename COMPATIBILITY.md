@@ -12,5 +12,6 @@
 | Megaman X Collection                             | xbox360usb             | Perfect |       |
 | Klonoa 2 - Lunatea's Veil                        | xbox360usb             | Works   | Game will sometimes infinite load|
 | Jak and Daxter - The Precursor Legacy            | xbox360usb             | Borked  | Gets stuck on copyright screen |
+| Nights Into Dreams                               | xbox360usb             | Perfect |       |
 
 Feel free to add your own test entries.

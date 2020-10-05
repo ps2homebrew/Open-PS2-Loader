@@ -21,6 +21,7 @@
 | Red Faction                                      | xbox360usb             | Perfect |       |
 | Tony Hawk's Pro Skater 4                         | xbox360usb             | Perfect |       |                   
 | Warriors Orochi 2                                | xbox360usb             | Perfect |       |
+| Burnout 2                                        | xbox360usb             | Perfect |       |
 
 Perfect - No problems whatsoever
 
@@ -30,5 +31,7 @@ Borked - Non-functional
 
 Keep in mind that multiplayer with 2 Xbox controllers doesn't work properly right now.
 
-Feel free to add your own test entries.
+Also, vibration doesn't work either.
+
+Feel free to add your own test entries via a pull request.
 

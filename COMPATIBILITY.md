@@ -14,5 +14,8 @@
 | Jak and Daxter - The Precursor Legacy            | xbox360usb             | Borked  | Gets stuck on copyright screen |
 | Nights Into Dreams                               | xbox360usb             | Perfect |       |
 | Alien Hominid                                    | xbox360usb             | Perfect |       |
+| God of War II                                    | xbox360usb             | Perfect |       |
+| Tak and the Power of Juju                        | xbox360usb             | Perfect |       |
+| Wipeout Fusion                                   | xbox360usb             | Perfect |       |
 
 Feel free to add your own test entries.

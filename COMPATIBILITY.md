@@ -22,6 +22,7 @@
 | Tony Hawk's Pro Skater 4                         | xbox360usb             | Perfect |       |                   
 | Warriors Orochi 2                                | xbox360usb             | Perfect |       |
 | Burnout 2                                        | xbox360usb             | Perfect |       |
+| Sonic Mega Collection Plus                       | xbox360usb             | Perfect |       |
 
 Perfect - No problems whatsoever
 

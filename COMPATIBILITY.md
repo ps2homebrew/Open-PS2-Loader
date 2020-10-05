@@ -19,4 +19,11 @@
 | Wipeout Fusion                                   | xbox360usb             | Perfect |       |
 | Ratchet and Clank - Going Commando               | xbox360usb             | Perfect |       |
 
+Perfect - No problems whatsoever
+Works - Playable with some issues
+Borked - Non-functional
+
+Keep in mind that multiplayer with 2 Xbox controllers doesn't work properly right now.
+
 Feel free to add your own test entries.
+

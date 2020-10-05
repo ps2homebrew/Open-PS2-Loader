@@ -18,6 +18,7 @@
 | Tak and the Power of Juju                        | xbox360usb             | Perfect |       |
 | Wipeout Fusion                                   | xbox360usb             | Perfect |       |
 | Ratchet and Clank - Going Commando               | xbox360usb             | Perfect |       |
+| Red Faction                                      | xbox360usb             | Perfect |       |
 
 Perfect - No problems whatsoever
 

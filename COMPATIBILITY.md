@@ -17,5 +17,6 @@
 | God of War II                                    | xbox360usb             | Perfect |       |
 | Tak and the Power of Juju                        | xbox360usb             | Perfect |       |
 | Wipeout Fusion                                   | xbox360usb             | Perfect |       |
+| Ratchet and Clank - Going Commando               | xbox360usb             | Perfect |       |
 
 Feel free to add your own test entries.

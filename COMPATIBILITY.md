@@ -20,6 +20,7 @@
 | Ratchet and Clank - Going Commando               | xbox360usb             | Perfect |       |
 | Red Faction                                      | xbox360usb             | Perfect |       |
 | Tony Hawk's Pro Skater 4                         | xbox360usb             | Perfect |       |                   
+| Warriors Orochi 2                                | xbox360usb             | Perfect |       |
 
 Perfect - No problems whatsoever
 

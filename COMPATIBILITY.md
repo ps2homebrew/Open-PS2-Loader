@@ -19,6 +19,7 @@
 | Wipeout Fusion                                   | xbox360usb             | Perfect |       |
 | Ratchet and Clank - Going Commando               | xbox360usb             | Perfect |       |
 | Red Faction                                      | xbox360usb             | Perfect |       |
+| Tony Hawk's Pro Skater 4                         | xbox360usb             | Perfect |       |                   
 
 Perfect - No problems whatsoever
 

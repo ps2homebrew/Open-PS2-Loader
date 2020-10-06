@@ -23,6 +23,7 @@
 | Warriors Orochi 2                                | xbox360usb             | Perfect |       |
 | Burnout 2                                        | xbox360usb             | Perfect |       |
 | Sonic Mega Collection Plus                       | xbox360usb             | Perfect |       |
+| Jak II                                            | xbox360usb             | Perfect |       |
 
 Perfect - No problems whatsoever
 

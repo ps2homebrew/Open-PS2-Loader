@@ -33,7 +33,7 @@ bt_paddrv_t ds4btdrv = {0x0070, 0x0071, ds4bt_connect, ds4bt_init, ds4bt_read_re
 
 int ds4bt_connect(bt_paddata_t *data, u8 *str, int size)
 {
-	if (strncmp(str, "Wireless Controller", 19) == 0) {
+    if (strncmp(str, "Wireless Controller", 19) == 0) {
         DPRINTF("BS4BT: %s \n", str);
         return 1;
     }
@@ -49,7 +49,7 @@ void ds4bt_init(bt_paddata_t *data, int id)
 
     btstack_hid_command(&ds4btdrv, init_buf, 2, data->id);
 
-	data->id = id;
+    data->id = id;
     data->led[0] = rgbled_patterns[id][1][0];
     data->led[1] = rgbled_patterns[id][1][1];
     data->led[2] = rgbled_patterns[id][1][2];
@@ -141,15 +141,15 @@ void ds4bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
             data->data[16] = report->PressureL2; //L2
             data->data[17] = report->PressureR2; //R2
 
-            if (report->PSButton) {                                     //display battery level
+            if (report->PSButton) {                                    //display battery level
                 if (report->Share && (data->btn_delay == MAX_DELAY)) { //PS + SELECT
-                    if (data->analog_btn < 2)                           //unlocked mode
+                    if (data->analog_btn < 2)                          //unlocked mode
                         data->analog_btn = !data->analog_btn;
 
                     data->led[0] = rgbled_patterns[data->id][(data->analog_btn & 1)][0];
                     data->led[1] = rgbled_patterns[data->id][(data->analog_btn & 1)][1];
                     data->led[2] = rgbled_patterns[data->id][(data->analog_btn & 1)][2];
-					data->btn_delay = 1;
+                    data->btn_delay = 1;
                 } else {
                     data->led[0] = report->Battery;
                     data->led[1] = 0;
@@ -172,7 +172,7 @@ void ds4bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
             else
                 data->led[3] = 0;
 
-			if (data->btn_delay > 0) {
+            if (data->btn_delay > 0) {
                 data->update_rum = 1;
             }
         }
@@ -199,7 +199,7 @@ void ds4bt_rumble(bt_paddata_t *data)
     led_buf[10] = data->led[1]; //g
     led_buf[11] = data->led[2]; //b
 
-    if (data->led[3]) { //means charging, so blink
+    if (data->led[3]) {     //means charging, so blink
         led_buf[12] = 0x80; // Time to flash bright (255 = 2.5 seconds)
         led_buf[13] = 0x80; // Time to flash dark (255 = 2.5 seconds)
     }

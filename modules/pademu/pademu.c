@@ -133,7 +133,6 @@ int _start(int argc, char *argv[])
 
 void _exit(int mode)
 {
-
 }
 
 int install_sio2hook()
@@ -399,7 +398,7 @@ void pademu_cmd(int port, u8 *in, u8 *out, u8 out_size)
 {
     u8 i;
 
-	//DPRINTF("PADEMU: sio cmd %02x port %d\n", in[1], port);
+    //DPRINTF("PADEMU: sio cmd %02x port %d\n", in[1], port);
 
     mips_memset(out, 0x00, out_size);
 

@@ -13,7 +13,7 @@
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 4
 
@@ -47,7 +47,7 @@ int usb_probe(int devId)
 
     if ((device->idVendor == XBOX_VID || device->idVendor == MADCATZ_VID || device->idVendor == JOYTECH_VID || device->idVendor == GAMESTOP_VID) &&
         (device->idProduct == XBOX_WIRED_PID || device->idProduct == MADCATZ_WIRED_PID || device->idProduct == GAMESTOP_WIRED_PID ||
-		 device->idProduct == AFTERGLOW_WIRED_PID || device->idProduct == JOYTECH_WIRED_PID))
+         device->idProduct == AFTERGLOW_WIRED_PID || device->idProduct == JOYTECH_WIRED_PID))
         return 1;
 
     return 0;
@@ -83,7 +83,7 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
     epCount = interface->bNumEndpoints - 1;
-	endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
+    endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
     do {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
@@ -130,14 +130,14 @@ int usb_disconnect(int devId)
 static void usb_release(int pad)
 {
     PollSema(xbox360dev[pad].sema);
-    
+
     if (xbox360dev[pad].interruptEndp >= 0)
         UsbCloseEndpoint(xbox360dev[pad].interruptEndp);
 
     xbox360dev[pad].controlEndp = -1;
     xbox360dev[pad].interruptEndp = -1;
     xbox360dev[pad].usb_id = -1;
-    
+
     SignalSema(xbox360dev[pad].sema);
 }
 
@@ -174,7 +174,7 @@ static void usb_config_set(int result, int count, void *arg)
     LEDRumble(led, 0, 0, pad);
     SignalSema(xbox360dev[pad].sema);
 
-	pademu_connect(&xbox360dev[pad].dev);
+    pademu_connect(&xbox360dev[pad].dev);
 }
 
 #define MAX_DELAY 10
@@ -186,9 +186,9 @@ static void readReport(u8 *data, int pad)
         xbox360dev[pad].data[0] = ~(report->Back | report->LS << 1 | report->RS << 2 | report->Start << 3 | report->Up << 4 | report->Right << 5 | report->Down << 6 | report->Left << 7);
         xbox360dev[pad].data[1] = ~((report->LeftTrigger != 0) | (report->RightTrigger != 0) << 1 | report->LB << 2 | report->RB << 3 | report->Y << 4 | report->B << 5 | report->A << 6 | report->X << 7);
 
-        xbox360dev[pad].data[2] = report->RightStickXH + 128;  //rx
+        xbox360dev[pad].data[2] = report->RightStickXH + 128;    //rx
         xbox360dev[pad].data[3] = ~(report->RightStickYH + 128); //ry
-        xbox360dev[pad].data[4] = report->LeftStickXH + 128;  //lx
+        xbox360dev[pad].data[4] = report->LeftStickXH + 128;     //lx
         xbox360dev[pad].data[5] = ~(report->LeftStickYH + 128);  //ly
 
         xbox360dev[pad].data[6] = report->Right * 255; //right
@@ -206,7 +206,7 @@ static void readReport(u8 *data, int pad)
         xbox360dev[pad].data[16] = report->LeftTrigger;  //L2
         xbox360dev[pad].data[17] = report->RightTrigger; //R2
 
-        if (report->XBOX) {                                              //display battery level
+        if (report->XBOX) {                                                 //display battery level
             if (report->Back && (xbox360dev[pad].btn_delay == MAX_DELAY)) { //XBOX + BACK
                 if (xbox360dev[pad].analog_btn < 2)                         //unlocked mode
                     xbox360dev[pad].analog_btn = !xbox360dev[pad].analog_btn;
@@ -233,7 +233,7 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     int ret;
     PollSema(xbox360dev[pad].cmd_sema);
-    
+
     usb_buf[0] = 0x00;
     usb_buf[1] = 0x08;
     usb_buf[2] = 0x00;
@@ -251,10 +251,10 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         ret = UsbControlTransfer(xbox360dev[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, 3, usb_buf, usb_cmd_cb, (void *)pad);
     }
 
-	xbox360dev[pad].oldled[0] = led[0];
+    xbox360dev[pad].oldled[0] = led[0];
     xbox360dev[pad].oldled[1] = led[1];
 
-	return ret;
+    return ret;
 }
 
 static unsigned int timeout(void *arg)
@@ -280,11 +280,11 @@ static void TransferWait(int sema)
 void xbox360usb_set_rumble(u8 lrum, u8 rrum, int port)
 {
     WaitSema(xbox360dev[port].sema);
-    
+
     xbox360dev[port].update_rum = 1;
     xbox360dev[port].lrum = lrum;
     xbox360dev[port].rrum = rrum;
-        
+
     SignalSema(xbox360dev[port].sema);
 }
 
@@ -310,7 +310,7 @@ int xbox360usb_get_data(u8 *dst, int size, int port)
 
     mips_memcpy(dst, xbox360dev[port].data, size);
     ret = xbox360dev[port].analog_btn & 1;
-        
+
     if (xbox360dev[port].update_rum) {
         ret = LEDRumble(xbox360dev[port].oldled, xbox360dev[port].lrum, xbox360dev[port].rrum, port);
         if (ret == USB_RC_OK)
@@ -348,7 +348,7 @@ int _start(int argc, char *argv[])
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         xbox360dev[pad].usb_id = -1;
-		xbox360dev[pad].dev.id = -1;
+        xbox360dev[pad].dev.id = -1;
         xbox360dev[pad].dev.pad_get_data = xbox360usb_get_data;
         xbox360dev[pad].dev.pad_set_rumble = xbox360usb_set_rumble;
         xbox360dev[pad].dev.pad_set_mode = xbox360usb_set_mode;

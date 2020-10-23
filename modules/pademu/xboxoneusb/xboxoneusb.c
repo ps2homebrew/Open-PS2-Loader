@@ -13,7 +13,7 @@
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 4
 
@@ -85,7 +85,7 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
     epCount = interface->bNumEndpoints - 1;
-	endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
+    endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
     do {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
@@ -138,18 +138,18 @@ int usb_disconnect(int devId)
 static void usb_release(int pad)
 {
     PollSema(xboxonedev[pad].sema);
-    
+
     if (xboxonedev[pad].interruptEndp >= 0)
         UsbCloseEndpoint(xboxonedev[pad].interruptEndp);
 
-	if (xboxonedev[pad].outEndp >= 0)
+    if (xboxonedev[pad].outEndp >= 0)
         UsbCloseEndpoint(xboxonedev[pad].outEndp);
 
     xboxonedev[pad].controlEndp = -1;
     xboxonedev[pad].interruptEndp = -1;
     xboxonedev[pad].outEndp = -1;
     xboxonedev[pad].usb_id = -1;
-    
+
     SignalSema(xboxonedev[pad].sema);
 }
 
@@ -190,7 +190,7 @@ static void usb_config_set(int result, int count, void *arg)
 
     SignalSema(xboxonedev[pad].sema);
 
-	pademu_connect(&xboxonedev[pad].dev);
+    pademu_connect(&xboxonedev[pad].dev);
 }
 
 #define MAX_DELAY 10
@@ -227,7 +227,7 @@ static void readReport(u8 *data, int pad)
 static int Rumble(u8 lrum, u8 rrum, int pad)
 {
     PollSema(xboxonedev[pad].cmd_sema);
-    
+
     usb_buf[0] = 0x09;
     usb_buf[1] = 0x00;
     usb_buf[2] = cmdcnt++;
@@ -268,11 +268,11 @@ static void TransferWait(int sema)
 void xboxoneusb_set_rumble(u8 lrum, u8 rrum, int port)
 {
     WaitSema(xboxonedev[port].sema);
-    
+
     xboxonedev[port].update_rum = 1;
     xboxonedev[port].lrum = lrum;
     xboxonedev[port].rrum = rrum;
-        
+
     SignalSema(xboxonedev[port].sema);
 }
 
@@ -300,7 +300,7 @@ int xboxoneusb_get_data(u8 *dst, int size, int port)
 
     mips_memcpy(dst, xboxonedev[port].data, size);
     ret = xboxonedev[port].analog_btn & 1;
-        
+
     if (xboxonedev[port].update_rum) {
         ret = Rumble(xboxonedev[port].lrum, xboxonedev[port].rrum, port);
         if (ret == USB_RC_OK) {
@@ -341,7 +341,7 @@ int _start(int argc, char *argv[])
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         xboxonedev[pad].usb_id = -1;
-		xboxonedev[pad].dev.id = -1;
+        xboxonedev[pad].dev.id = -1;
         xboxonedev[pad].dev.pad_get_data = xboxoneusb_get_data;
         xboxonedev[pad].dev.pad_set_rumble = xboxoneusb_set_rumble;
         xboxonedev[pad].dev.pad_set_mode = xboxoneusb_set_mode;

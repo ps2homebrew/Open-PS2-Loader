@@ -13,7 +13,7 @@
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 4
 
@@ -155,14 +155,14 @@ int usb_disconnect(int devId)
 static void usb_release(int pad)
 {
     PollSema(ds3dev[pad].sema);
-    
+
     if (ds3dev[pad].interruptEndp >= 0)
         UsbCloseEndpoint(ds3dev[pad].interruptEndp);
 
     ds3dev[pad].controlEndp = -1;
     ds3dev[pad].interruptEndp = -1;
     ds3dev[pad].usb_id = -1;
-    
+
     SignalSema(ds3dev[pad].sema);
 }
 
@@ -275,14 +275,14 @@ static void readReport(u8 *data, int pad)
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     PollSema(ds3dev[pad].cmd_sema);
-    
+
     mips_memset(usb_buf, 0, sizeof(usb_buf));
     mips_memcpy(usb_buf, output_01_report, sizeof(output_01_report));
 
-    usb_buf[1] = 0xFE; //rt
-    usb_buf[2] = rrum; //rp
-    usb_buf[3] = 0xFE; //lt
-    usb_buf[4] = lrum; //lp
+    usb_buf[1] = 0xFE;          //rt
+    usb_buf[2] = rrum;          //rp
+    usb_buf[3] = 0xFE;          //lt
+    usb_buf[4] = lrum;          //lp
     usb_buf[9] = led[0] & 0x7F; //LED Conf
 
     if (led[1]) { //means charging, so blink
@@ -291,8 +291,8 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         usb_buf[23] = 0x32;
         usb_buf[28] = 0x32;
     }
-        
-	ds3dev[pad].oldled[0] = led[0];
+
+    ds3dev[pad].oldled[0] = led[0];
     ds3dev[pad].oldled[1] = led[1];
 
     return UsbControlTransfer(ds3dev[pad].controlEndp, REQ_USB_OUT, USB_REQ_SET_REPORT, (HID_USB_SET_REPORT_OUTPUT << 8) | 0x01, 0, sizeof(output_01_report), usb_buf, usb_cmd_cb, (void *)pad);
@@ -321,11 +321,11 @@ static void TransferWait(int sema)
 void ds3usb_set_rumble(u8 lrum, u8 rrum, int port)
 {
     WaitSema(ds3dev[port].sema);
-    
+
     ds3dev[port].update_rum = 1;
     ds3dev[port].lrum = lrum;
     ds3dev[port].rrum = rrum;
-        
+
     SignalSema(ds3dev[port].sema);
 }
 
@@ -351,7 +351,7 @@ int ds3usb_get_data(u8 *dst, int size, int port)
 
     mips_memcpy(dst, ds3dev[port].data, size);
     ret = ds3dev[port].analog_btn & 1;
-        
+
     if (ds3dev[port].update_rum) {
         ret = LEDRumble(ds3dev[port].oldled, ds3dev[port].lrum, ds3dev[port].rrum, port);
         if (ret == USB_RC_OK)
@@ -389,7 +389,7 @@ int _start(int argc, char *argv[])
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         ds3dev[pad].usb_id = -1;
-		ds3dev[pad].dev.id = -1;
+        ds3dev[pad].dev.id = -1;
         ds3dev[pad].dev.pad_get_data = ds3usb_get_data;
         ds3dev[pad].dev.pad_set_rumble = ds3usb_set_rumble;
         ds3dev[pad].dev.pad_set_mode = ds3usb_set_mode;

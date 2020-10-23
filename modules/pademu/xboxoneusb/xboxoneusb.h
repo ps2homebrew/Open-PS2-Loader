@@ -14,11 +14,11 @@
 #define XBOX_ONE_PID13 0x0B0A // Microsoft X-Box One Adaptive Controller
 
 // Unofficial controllers
-#define XBOX_VID2 0x0738   // Mad Catz
-#define XBOX_VID3 0x0E6F   // Afterglow
-#define XBOX_VID4 0x0F0D   // HORIPAD ONE
-#define XBOX_VID5 0x1532   // Razer
-#define XBOX_VID6 0x24C6   // PowerA
+#define XBOX_VID2 0x0738 // Mad Catz
+#define XBOX_VID3 0x0E6F // Afterglow
+#define XBOX_VID4 0x0F0D // HORIPAD ONE
+#define XBOX_VID5 0x1532 // Razer
+#define XBOX_VID6 0x24C6 // PowerA
 
 #define XBOX_ONE_PID5 0x4A01  // Mad Catz FightStick TE 2 - might have different mapping for triggers?
 #define XBOX_ONE_PID6 0x0139  // Afterglow Prismatic Wired Controller
@@ -77,7 +77,8 @@ enum eHID {
     // }}}
 };
 
-typedef struct {
+typedef struct
+{
     u8 ReportID; // 0x20
     u8 Zero;
     u16 id;

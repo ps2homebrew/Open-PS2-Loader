@@ -55,8 +55,8 @@ static u8 press_emu = 0;
 int ds3bt_connect(bt_paddata_t *data, u8 *str, int size)
 {
     DPRINTF("BS3BT: %s \n", str); //PLAYSTATION(R)3 Controller
-    
-	if (strncmp(str, "PLAYSTATION(R)3 Controller", 26) != 0) {
+
+    if (strncmp(str, "PLAYSTATION(R)3 Controller", 26) != 0) {
         return 0;
     }
 
@@ -76,8 +76,8 @@ void ds3bt_init(bt_paddata_t *data, int id)
 
     btstack_hid_command(&ds3btdrv, init_buf, PS3_F4_REPORT_LEN + 2, data->id);
 
-	data->id = id;
-	data->led[0] = led_patterns[id][1];
+    data->id = id;
+    data->led[0] = led_patterns[id][1];
     data->led[1] = 0;
     DelayThread(CMD_DELAY);
     ds3bt_rumble(data);
@@ -105,7 +105,7 @@ void ds3bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
             if (bytes == 21 && !press_emu)
                 press_emu = 1;
 
-            if (press_emu) {                                //needs emulating pressure buttons
+            if (press_emu) {                         //needs emulating pressure buttons
                 data->data[6] = report->Right * 255; //right
                 data->data[7] = report->Left * 255;  //left
                 data->data[8] = report->Up * 255;    //up
@@ -139,7 +139,7 @@ void ds3bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
                 data->data[17] = report->PressureR2; //R2
             }
 
-            if (report->PSButtonState) {                                       //display battery level
+            if (report->PSButtonState) {                                //display battery level
                 if (report->Select && (data->btn_delay == MAX_DELAY)) { //PS + SELECT
                     if (data->analog_btn < 2)                           //unlocked mode
                         data->analog_btn = !data->analog_btn;
@@ -165,7 +165,7 @@ void ds3bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
             else
                 data->led[1] = 0;
 
-			if (data->btn_delay > 0) {
+            if (data->btn_delay > 0) {
                 data->update_rum = 1;
             }
         }
@@ -177,7 +177,7 @@ void ds3bt_read_report(bt_paddata_t *data, u8 *in, int bytes)
 
 void ds3bt_rumble(bt_paddata_t *data)
 {
-	u8 led_buf[PS3_01_REPORT_LEN + 2];
+    u8 led_buf[PS3_01_REPORT_LEN + 2];
     mips_memset(led_buf, 0, sizeof(led_buf));
     mips_memcpy(led_buf + 2, output_01_report, sizeof(output_01_report));
 
@@ -195,9 +195,9 @@ void ds3bt_rumble(bt_paddata_t *data)
             data->rrum = 0;
     }
 
-    led_buf[3] = 0xFE; //rt
+    led_buf[3] = 0xFE;       //rt
     led_buf[4] = data->rrum; //rp
-    led_buf[5] = 0xFE; //lt
+    led_buf[5] = 0xFE;       //lt
     led_buf[6] = data->lrum; //lp
 
     led_buf[11] = data->led[0] & 0x7F; //LED Conf

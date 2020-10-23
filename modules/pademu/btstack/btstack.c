@@ -148,7 +148,7 @@ static int bt_disconnect(int devId)
 
     if (bt_adp.devId != -1) {
 
-		disconnect_all();
+        disconnect_all();
 
         if (bt_adp.interruptEndp >= 0)
             UsbCloseEndpoint(bt_adp.interruptEndp);
@@ -165,7 +165,7 @@ static int bt_disconnect(int devId)
         bt_adp.outEndp = -1;
         bt_adp.controlEndp = -1;
 
-		dev_init();
+        dev_init();
         SignalSema(bt_adp.hid_sema);
     }
 

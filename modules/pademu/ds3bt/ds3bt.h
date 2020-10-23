@@ -31,12 +31,15 @@ enum eHID {
     // }}}
 };
 
-typedef struct {
+typedef struct
+{
     u8 ReportID;
     u8 Zero;
-    union {
+    union
+    {
         u8 ButtonStateL; // Main buttons Low
-        struct {
+        struct
+        {
             u8 Select : 1;
             u8 L3 : 1;
             u8 R3 : 1;
@@ -47,9 +50,11 @@ typedef struct {
             u8 Left : 1;
         };
     };
-    union {
-        u8 ButtonStateH;     // Main buttons High
-        struct {
+    union
+    {
+        u8 ButtonStateH; // Main buttons High
+        struct
+        {
             u8 L2 : 1;
             u8 R2 : 1;
             u8 L1 : 1;

@@ -199,11 +199,11 @@ static void read_report(u8 *data, int pad)
             hiddev[pad].data[2 + i] = data[1 + (hiddev[pad].rep.axes.start_pos + hiddev[pad].rep.axes.size * i) / 8];
         }
 
-		count = 16;
+        count = 16;
         bits = 8;
         if (hiddev[pad].rep.hats.count > 0) {
             pos = hiddev[pad].rep.hats.start_pos;
-			switch ((data[1 + pos / 8] >> pos % 8) & 0x0F) {
+            switch ((data[1 + pos / 8] >> pos % 8) & 0x0F) {
                 case 0:
                     up = 1;
                     break;
@@ -239,11 +239,11 @@ static void read_report(u8 *data, int pad)
                     right = 0;
                     break;
             }
-			hiddev[pad].data[0] = ~(up << 4 | right << 5 | down << 6 | left << 7 | 0x0F);
+            hiddev[pad].data[0] = ~(up << 4 | right << 5 | down << 6 | left << 7 | 0x0F);
             hiddev[pad].data[6] = right * 255; //right
-			hiddev[pad].data[7] = left * 255; //left
-			hiddev[pad].data[8] = up * 255; //up
-			hiddev[pad].data[9] = down * 255; //down
+            hiddev[pad].data[7] = left * 255;  //left
+            hiddev[pad].data[8] = up * 255;    //up
+            hiddev[pad].data[9] = down * 255;  //down
 
             count = 12;
             bits = 4;
@@ -265,10 +265,10 @@ static void read_report(u8 *data, int pad)
             }
         }
 
-		//(report->Share | report->L3 << 1 | report->R3 << 2 | report->Option << 3 | up << 4 | right << 5 | down << 6 | left << 7);
+        //(report->Share | report->L3 << 1 | report->R3 << 2 | report->Option << 3 | up << 4 | right << 5 | down << 6 | left << 7);
         //(report->L2 | report->R2 << 1 | report->L1 << 2 | report->R1 << 3 | report->Triangle << 4 | report->Circle << 5 | report->Cross << 6 | report->Square << 7);
 
-		/*
+        /*
         hiddev[pad].data[10] = report->PressureTriangle; //triangle
         hiddev[pad].data[11] = report->PressureCircle;   //circle
         hiddev[pad].data[12] = report->PressureCross;    //cross

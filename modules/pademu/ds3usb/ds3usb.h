@@ -15,6 +15,8 @@
 #define MODEL_PS2    3
 #define SONY_VID     0x054C // Sony Corporation
 #define DS3_PID      0x0268 // PS3 Controller
+#define SONY_VID 0x054C // Sony Corporation
+#define DS3_PID 0x0268  // PS3 Controller
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
 
@@ -70,10 +72,12 @@ enum eHID {
     // }}}
 };
 
-typedef struct {
+typedef struct
+{
     u8 ReportID;
     u8 Zero;
-    union {
+    union
+    {
         u8 ButtonStateL; // Main buttons Low
         struct {
             u8 Select : 1;

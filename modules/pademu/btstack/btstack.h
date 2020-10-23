@@ -1,9 +1,9 @@
 #ifndef _BTSTACK_H_
 #define _BTSTACK_H_
 
-#define USB_CLASS_WIRELESS_CONTROLLER      0xE0
-#define USB_SUBCLASS_RF_CONTROLLER         0x01
-#define USB_PROTOCOL_BLUETOOTH_PROG        0x01
+#define USB_CLASS_WIRELESS_CONTROLLER 0xE0
+#define USB_SUBCLASS_RF_CONTROLLER 0x01
+#define USB_PROTOCOL_BLUETOOTH_PROG 0x01
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
 
@@ -88,24 +88,24 @@ enum eHCI {
     HCI_OGF_INFO_PARAM = (0x04 << 2),  // OGF: Informational Parameters
 
     /* HCI OpCode Command Field (OCF) */
-    HCI_OCF_DISCONNECT = 0x06,                // OGF = 0x01
+    HCI_OCF_DISCONNECT = 0x06,             // OGF = 0x01
     HCI_OCF_ACCEPT_CONNECTION = 0x09,      // OGF = 0x01
     HCI_OCF_REJECT_CONNECTION = 0x0A,      // OGF = 0x01
     HCI_OCF_CHANGE_CONNECTION_TYPE = 0x0F, // OGF = 0x01
-    HCI_OCF_REMOTE_NAME = 0x19,               // OGF = 0x01
+    HCI_OCF_REMOTE_NAME = 0x19,            // OGF = 0x01
     HCI_OCF_LINK_KEY_REQUEST_REPLY = 0x0B, // OGF = 0x01
-    
-    HCI_OCF_RESET = 0x03,                  // OGF = 0x03
-    HCI_OCF_WRITE_ACCEPT_TIMEOUT = 0x16,   // OGF = 0x03
-    HCI_OCF_WRITE_SCAN_ENABLE = 0x1A,      // OGF = 0x03
-    
-    HCI_OCF_READ_BDADDR = 0x09,      // OGF = 0x04
+
+    HCI_OCF_RESET = 0x03,                // OGF = 0x03
+    HCI_OCF_WRITE_ACCEPT_TIMEOUT = 0x16, // OGF = 0x03
+    HCI_OCF_WRITE_SCAN_ENABLE = 0x1A,    // OGF = 0x03
+
+    HCI_OCF_READ_BDADDR = 0x09, // OGF = 0x04
 
     /* HCI events managed */
     HCI_EVENT_CONNECT_COMPLETE = 0x03,
     HCI_EVENT_CONNECT_REQUEST = 0x04,
     HCI_EVENT_DISCONN_COMPLETE = 0x05,
-    HCI_EVENT_AUTHENTICATION_COMPLETE= 0x06,
+    HCI_EVENT_AUTHENTICATION_COMPLETE = 0x06,
     HCI_EVENT_REMOTE_NAME_COMPLETE = 0x07,
     HCI_EVENT_ENCRYPTION_CHANGE = 0x08,
     HCI_EVENT_READ_REMOTE_SUPPORTED_FEATURES_COMPLETE = 0x0B,
@@ -142,7 +142,7 @@ enum eL2CAP {
     /* Bluetooth L2CAP PSM */
     L2CAP_PSM_SDP = 0x01,
     L2CAP_PSM_CTRL = 0x11, // HID_Control
-    L2CAP_PSM_INTR = 0x13,  // HID_Interrupt
+    L2CAP_PSM_INTR = 0x13, // HID_Interrupt
 
     /* Bluetooth L2CAP states for L2CAP_task() */
     L2CAP_DOWN_STATE = 0,
@@ -178,7 +178,7 @@ enum eL2CAP {
     L2CAP_CMD_DISCONNECT_REQUEST = 0x06,
     L2CAP_CMD_DISCONNECT_RESPONSE = 0x07,
 
-/*  HCI ACL Data Packet
+    /*  HCI ACL Data Packet
  *
  *  buf[0]          buf[1]          buf[2]          buf[3]
  *  0      4        8    11 12      16              24             31 MSB

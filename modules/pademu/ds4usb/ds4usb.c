@@ -13,7 +13,7 @@
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 4
 
@@ -89,12 +89,12 @@ int usb_connect(int devId)
     config = (UsbConfigDescriptor *)UsbGetDeviceStaticDescriptor(devId, device, USB_DT_CONFIG);
     interface = (UsbInterfaceDescriptor *)((char *)config + config->bLength);
     epCount = interface->bNumEndpoints - 1;
-    
-	if (device->idProduct == DS4_PID_SLIM) {
-		epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
-	}
-	
-	endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
+
+    if (device->idProduct == DS4_PID_SLIM) {
+        epCount = 20; // ds4 v2 returns interface->bNumEndpoints as 0
+    }
+
+    endpoint = (UsbEndpointDescriptor *)UsbGetDeviceStaticDescriptor(devId, NULL, USB_DT_ENDPOINT);
 
     do {
         if (endpoint->bmAttributes == USB_ENDPOINT_XFER_INT) {
@@ -145,18 +145,18 @@ int usb_disconnect(int devId)
 static void usb_release(int pad)
 {
     PollSema(ds4dev[pad].sema);
-    
+
     if (ds4dev[pad].interruptEndp >= 0)
         UsbCloseEndpoint(ds4dev[pad].interruptEndp);
 
-	if (ds4dev[pad].outEndp >= 0)
+    if (ds4dev[pad].outEndp >= 0)
         UsbCloseEndpoint(ds4dev[pad].outEndp);
 
     ds4dev[pad].controlEndp = -1;
     ds4dev[pad].interruptEndp = -1;
     ds4dev[pad].outEndp = -1;
     ds4dev[pad].usb_id = -1;
-    
+
     SignalSema(ds4dev[pad].sema);
 }
 
@@ -187,7 +187,7 @@ static void usb_config_set(int result, int count, void *arg)
 
     PollSema(ds4dev[pad].sema);
 
-	pademu_connect(&ds4dev[pad].dev);
+    pademu_connect(&ds4dev[pad].dev);
 
     led[0] = rgbled_patterns[ds4dev[pad].dev.id][1][0];
     led[1] = rgbled_patterns[ds4dev[pad].dev.id][1][1];
@@ -282,7 +282,7 @@ static void readReport(u8 *data, int pad)
         ds4dev[pad].data[16] = report->PressureL2; //L2
         ds4dev[pad].data[17] = report->PressureR2; //R2
 
-        if (report->PSButton) {                                           //display battery level
+        if (report->PSButton) {                                          //display battery level
             if (report->Share && (ds4dev[pad].btn_delay == MAX_DELAY)) { //PS + Share
                 if (ds4dev[pad].analog_btn < 2)                          //unlocked mode
                     ds4dev[pad].analog_btn = !ds4dev[pad].analog_btn;
@@ -313,7 +313,7 @@ static void readReport(u8 *data, int pad)
         else
             ds4dev[pad].oldled[3] = 0;
 
-		if (ds4dev[pad].btn_delay > 0) {
+        if (ds4dev[pad].btn_delay > 0) {
             ds4dev[pad].update_rum = 1;
         }
     }
@@ -322,7 +322,7 @@ static void readReport(u8 *data, int pad)
 static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 {
     PollSema(ds4dev[pad].cmd_sema);
-    
+
     usb_buf[0] = 0x05;
     usb_buf[1] = 0xFF;
 
@@ -339,12 +339,12 @@ static int LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
         usb_buf[10] = 0x80; // Time to flash dark (255 = 2.5 seconds)
     }
 
-	ds4dev[pad].oldled[0] = led[0];
+    ds4dev[pad].oldled[0] = led[0];
     ds4dev[pad].oldled[1] = led[1];
     ds4dev[pad].oldled[2] = led[2];
     ds4dev[pad].oldled[3] = led[3];
-	
-	return UsbInterruptTransfer(ds4dev[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
+
+    return UsbInterruptTransfer(ds4dev[pad].outEndp, usb_buf, 32, usb_cmd_cb, (void *)pad);
 }
 
 static unsigned int timeout(void *arg)
@@ -370,11 +370,11 @@ static void TransferWait(int sema)
 void ds4usb_set_rumble(u8 lrum, u8 rrum, int port)
 {
     WaitSema(ds4dev[port].sema);
-    
+
     ds4dev[port].update_rum = 1;
     ds4dev[port].lrum = lrum;
     ds4dev[port].rrum = rrum;
-        
+
     SignalSema(ds4dev[port].sema);
 }
 
@@ -400,7 +400,7 @@ int ds4usb_get_data(u8 *dst, int size, int port)
 
     mips_memcpy(dst, ds4dev[port].data, size);
     ret = ds4dev[port].analog_btn & 1;
-        
+
     if (ds4dev[port].update_rum) {
         ret = LEDRumble(ds4dev[port].oldled, ds4dev[port].lrum, ds4dev[port].rrum, port);
         if (ret == USB_RC_OK)
@@ -438,7 +438,7 @@ int _start(int argc, char *argv[])
 
     for (pad = 0; pad < MAX_PADS; pad++) {
         ds4dev[pad].usb_id = -1;
-		ds4dev[pad].dev.id = -1;
+        ds4dev[pad].dev.id = -1;
         ds4dev[pad].dev.pad_get_data = ds4usb_get_data;
         ds4dev[pad].dev.pad_set_rumble = ds4usb_set_rumble;
         ds4dev[pad].dev.pad_set_mode = ds4usb_set_mode;

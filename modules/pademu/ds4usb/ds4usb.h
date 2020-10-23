@@ -4,8 +4,8 @@
 #include "irx.h"
 #include "../pademu.h"
 
-#define SONY_VID     0x054C // Sony Corporation
-#define DS4_PID      0x05C4 // PS4 Controller
+#define SONY_VID 0x054C     // Sony Corporation
+#define DS4_PID 0x05C4      // PS4 Controller
 #define DS4_PID_SLIM 0x09CC // PS4 Slim Controller
 
 #define MAX_BUFFER_SIZE 64 // Size of general purpose data buffer
@@ -55,7 +55,8 @@ enum eHID {
     // }}}
 };
 
-typedef struct {
+typedef struct
+{
     u8 ReportID;
     u8 LeftStickX;  // left Joystick X axis 0 - 255, 128 is mid
     u8 LeftStickY;  // left Joystick Y axis 0 - 255, 128 is mid

@@ -64,7 +64,8 @@ enum eHID {
     // }}}
 };
 
-typedef struct {
+typedef struct
+{
     u8 ReportID;
     u8 Length; //0x14
     union

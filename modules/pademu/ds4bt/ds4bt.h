@@ -31,7 +31,8 @@ enum eHID {
     // }}}
 };
 
-typedef struct {
+typedef struct
+{
     u8 ReportID;
     u8 Unk;
     u8 ReportID2;

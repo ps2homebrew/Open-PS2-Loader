@@ -80,6 +80,19 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     sbv_patch_enable_lmb();
 
     DPRINTF("Loading extra IOP modules...\n");
+
+#ifdef __LOAD_DEBUG_MODULES
+    LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
+    LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
+#ifdef __DECI2_DEBUG
+    LoadOPLModule(OPL_MODULE_ID_DRVTIF, 0, 0, NULL);
+    LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
+#else
+    LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
+    LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
+#endif
+#endif
+
 #ifdef PADEMU
 #define PADEMU_ARG || EnablePadEmuOp
 #else
@@ -89,24 +102,12 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
         LoadOPLModule(OPL_MODULE_ID_USBD, 0, 11, "thpri=2,3");
     }
     if (GameMode == ETH_MODE) {
+#ifndef __LOAD_DEBUG_MODULES
         LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
         LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
+#endif
         LoadOPLModule(OPL_MODULE_ID_SMBINIT, 0, 0, NULL);
     }
-
-#ifdef __LOAD_DEBUG_MODULES
-    if (GameMode != ETH_MODE) {
-        LoadOPLModule(OPL_MODULE_ID_SMSTCPIP, 0, 0, NULL);
-        LoadOPLModule(OPL_MODULE_ID_SMAP, 0, g_ipconfig_len, g_ipconfig);
-    }
-#ifdef __DECI2_DEBUG
-    LoadOPLModule(OPL_MODULE_ID_DRVTIF, 0, 0, NULL);
-    LoadOPLModule(OPL_MODULE_ID_TIFINET, 0, 0, NULL);
-#else
-    LoadOPLModule(OPL_MODULE_ID_UDPTTY, 0, 0, NULL);
-    LoadOPLModule(OPL_MODULE_ID_IOPTRAP, 0, 0, NULL);
-#endif
-#endif
 }
 
 /*----------------------------------------------------------------------------------------*/

@@ -22,10 +22,9 @@ IOP_INCS := $(IOP_INCS) -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include -Iinc
 # C compiler flags
 # -fno-builtin is required to prevent the GCC built-in functions from being included,
 #   for finer-grained control over what goes into each IRX.
-IOP_CFLAGS  := -D_IOP -fno-builtin -Os -G0 $(IOP_INCS) $(IOP_CFLAGS)
+IOP_CFLAGS  := -D_IOP -fno-builtin -Os -G0 -Wall -Werror $(IOP_INCS) $(IOP_CFLAGS)
 # linker flags
-IOP_LDFLAGS := -nostdlib $(IOP_LDFLAGS)
-#IOP_LDFLAGS := -nostdlib -L$(PS2SDK)/iop/lib $(IOP_LDFLAGS)
+IOP_LDFLAGS := -nostdlib -s $(IOP_LDFLAGS)
 
 # Additional C compiler flags for GCC >=v5.3.0
 # -msoft-float is to "remind" GCC/Binutils that the soft-float ABI is to be used. This is due to a bug, which
@@ -49,6 +48,8 @@ BIN2S = $(PS2SDK)/bin/bin2s
 BIN2O = $(PS2SDK)/bin/bin2o
 
 # Externally defined variables: IOP_BIN, IOP_OBJS, IOP_LIB
+$(IOP_OBJS_DIR):
+	mkdir -p $(IOP_OBJS_DIR)
 
 $(IOP_OBJS_DIR)%.o : %.c
 	$(IOP_CC) $(IOP_CFLAGS) -c $< -o $@
@@ -73,10 +74,10 @@ $(IOP_OBJS_DIR)%.o : %.tab
 	$(IOP_CC) $(IOP_CFLAGS) -I. -c $(IOP_OBJS_DIR)build-exports.c -o $@
 	-rm -f $(IOP_OBJS_DIR)build-exports.c
 
-$(IOP_BIN) : $(IOP_OBJS)
+$(IOP_BIN) : $(IOP_OBJS_DIR) $(IOP_OBJS)
 	echo " -$@"
 	$(IOP_CC) $(IOP_CFLAGS) -o $(IOP_BIN) $(IOP_OBJS) $(IOP_LDFLAGS) $(IOP_LIBS)
 
-$(IOP_LIB) : $(IOP_OBJS)
+$(IOP_LIB) : $(IOP_OBJS_DIR) $(IOP_OBJS)
 	echo " -$@"
 	$(IOP_AR) cru $(IOP_LIB) $(IOP_OBJS)

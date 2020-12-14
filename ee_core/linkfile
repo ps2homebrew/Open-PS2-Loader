@@ -20,6 +20,11 @@ MEMORY {
 	ramD0	: ORIGIN = 0x000D0000, LENGTH = 192K  /* 0x000D0000 - 0x00100000: usually free, but some games use it. */
 }
 
+PHDRS {
+  text PT_LOAD;
+}
+
+
 SECTIONS {
 	.text : {
 		_ftext = . ;
@@ -29,7 +34,7 @@ SECTIONS {
 		KEEP(*(.init))
 		KEEP(*(.fini))
 		QUAD(0)
-	} >ram84
+	} >ram84 :text
 
 	PROVIDE(_etext = .);
 	PROVIDE(etext = .);

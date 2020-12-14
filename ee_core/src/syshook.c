@@ -31,6 +31,13 @@ extern void *ModStorageStart, *ModStorageEnd;
 extern void *eeloadCopy, *initUserMemory;
 extern void *_end;
 
+// Global data
+u32 (*Old_SifSetDma)(SifDmaTransfer_t *sdd, s32 len);
+int (*Old_SifSetReg)(u32 register_num, int register_value);
+int (*Old_ExecPS2)(void *entry, void *gp, int num_args, char *args[]);
+int (*Old_CreateThread)(ee_thread_t *thread_param);
+void (*Old_Exit)(s32 exit_code);
+
 /*----------------------------------------------------------------------------------------*/
 /* This function is called when SifSetDma catches a reboot request.                       */
 /*----------------------------------------------------------------------------------------*/

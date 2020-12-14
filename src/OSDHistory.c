@@ -240,7 +240,7 @@ int AddHistoryRecord(const char *name)
             }
 
             //Initialize the new entry.
-            strncpy(NewEntry->name, name, sizeof(NewEntry->name));
+            strncpy(NewEntry->name, name, sizeof(NewEntry->name) - 1);
             NewEntry->LaunchCount = 1;
             NewEntry->bitmask = 1;
             NewEntry->ShiftAmount = 0;

@@ -3,7 +3,7 @@
 
 typedef struct
 {
-    u8 magic[40];
+    char magic[40];
     u16 page_size;
     u16 pages_per_cluster;
     u16 pages_per_block;

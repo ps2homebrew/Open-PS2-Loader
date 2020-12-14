@@ -51,13 +51,13 @@ enum ETH_OP_MODES {
 };
 
 #define IPCONFIG_MAX_LEN 64
-char g_ipconfig[IPCONFIG_MAX_LEN];
-int g_ipconfig_len;
-char g_ps2_ip[16];
-char g_ps2_netmask[16];
-char g_ps2_gateway[16];
-unsigned char g_ps2_ETHOpMode;
-u32 g_compat_mask;
+extern char g_ipconfig[IPCONFIG_MAX_LEN];
+extern int g_ipconfig_len;
+extern char g_ps2_ip[16];
+extern char g_ps2_netmask[16];
+extern char g_ps2_gateway[16];
+extern unsigned char g_ps2_ETHOpMode;
+extern u32 g_compat_mask;
 
 #define COMPAT_MODE_1 0x01
 #define COMPAT_MODE_2 0x02
@@ -68,24 +68,24 @@ u32 g_compat_mask;
 #define COMPAT_MODE_7 0x40
 #define COMPAT_MODE_8 0x80
 
-char GameID[16];
-int GameMode;
+extern char GameID[16];
+extern int GameMode;
 #define USB_MODE 0
 #define ETH_MODE 1
 #define HDD_MODE 2
 
-char ExitPath[32];
-int HDDSpindown;
-int EnableGSMOp;
-int EnableCheatOp;
+extern char ExitPath[32];
+extern int HDDSpindown;
+extern int EnableGSMOp;
+extern int EnableCheatOp;
 #ifdef PADEMU
-int EnablePadEmuOp;
-int PadEmuSettings;
+extern int EnablePadEmuOp;
+extern int PadEmuSettings;
 #endif
 
-int DisableDebug;
+extern int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int *)0x120000E0)
 
-int *gCheatList; //Store hooks/codes addr+val pairs
+extern int *gCheatList; //Store hooks/codes addr+val pairs
 
 #endif

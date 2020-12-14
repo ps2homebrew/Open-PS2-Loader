@@ -27,6 +27,9 @@ static int nThemes = 0;
 static theme_file_t themes[THM_MAX_FILES];
 static const char **guiThemesNames = NULL;
 
+// Global data
+theme_t *gTheme;
+
 enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_ATTRIBUTE_TEXT = 0,
     ELEM_TYPE_STATIC_TEXT,
@@ -1360,7 +1363,7 @@ int thmFindGuiID(const char *theme)
     if (theme) {
         int i = 0;
         for (; i < nThemes; i++) {
-            if (stricmp(themes[i].name, theme) == 0)
+            if (strcasecmp(themes[i].name, theme) == 0)
                 return i + 1;
         }
     }

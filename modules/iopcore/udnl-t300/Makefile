@@ -1,9 +1,7 @@
 IOP_BIN  = udnl.irx
 IOP_OBJS = udnl.o udnl_asm.o imports.o IOPRP_img.o
 
-IOP_CFLAGS  += -Wall -fno-builtin -Os -mno-check-zero-division
-IOP_LDFLAGS += -s
-IOP_INCS += -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include -I./include
+IOP_INCS += -I./include
 
 all: $(IOP_BIN)
 

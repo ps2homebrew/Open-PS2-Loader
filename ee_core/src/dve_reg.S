@@ -147,7 +147,7 @@ dev9_set_reg_wait_loop2:
 	sync.l
 	jr	$ra
 	andi	$v0, $v1, 0xff
-.end dve_set_reg
+.end dve_get_reg
 
 /* Set DVE register */
 /* Parameter: a0, a1 */

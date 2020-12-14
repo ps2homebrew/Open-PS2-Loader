@@ -232,7 +232,7 @@ static int is_empty_substr(const char *s, size_t count)
 }
 
 /* Max line length to parse */
-#define LINE_MAX 255
+#define CHEAT_LINE_MAX 255
 
 /**
  * parse_buf - Parse a text buffer for cheats.
@@ -242,7 +242,7 @@ static int is_empty_substr(const char *s, size_t count)
 static int parse_buf(const char *buf)
 {
     code_t code;
-    char line[LINE_MAX + 1];
+    char line[CHEAT_LINE_MAX + 1];
     int linenumber = 1;
 
     if (buf == NULL)
@@ -255,8 +255,8 @@ static int parse_buf(const char *buf)
         int len = chr_idx(buf, LF);
         if (len < 0)
             len = strlen(line);
-        else if (len > LINE_MAX)
-            len = LINE_MAX;
+        else if (len > CHEAT_LINE_MAX)
+            len = CHEAT_LINE_MAX;
 
         if (!is_empty_substr(buf, len)) {
             strncpy(line, buf, len);

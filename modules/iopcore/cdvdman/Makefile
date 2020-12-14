@@ -1,13 +1,3 @@
-# _____     ___ ____     ___ ____
-#  ____|   |    ____|   |        | |____|
-# |     ___|   |____ ___|    ____| |    \    PS2DEV Open Source Project.
-#-----------------------------------------------------------------------
-# Copyright 2001-2004, ps2dev - http://www.ps2dev.org
-# Licenced under Academic Free License version 2.0
-# Review ps2sdk README & LICENSE files for further details.
-#
-# $Id: $
-
 IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o imports.o exports.o
 USE_DEV9 ?= 0
 
@@ -48,11 +38,7 @@ USE_DEV9 = 1
 endif
 endif
 
-
-IOP_LIBS =
 IOP_INCS += -I../common
-
-IOP_CFLAGS += -Wall -fno-builtin-printf
 
 ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -D__IOPCORE_DEBUG
@@ -65,17 +51,6 @@ endif
 
 IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)
 
-IOP_LDFLAGS += -s
-
-all: OBJ_DIR $(IOP_BIN)
-
-clean:
-	rm -f $(IOP_BIN) $(IOP_OBJS) cdvdman.map
-
-rebuild: clean all
-
-OBJ_DIR:
-	mkdir -p $(IOP_OBJS_DIR)
-
 include $(PS2SDK)/Defs.make
+include ../../Rules.bin.make
 include ../../Rules.make

@@ -523,7 +523,7 @@ void submenuSort(submenu_list_t **submenu)
             char *txt1 = submenuItemGetText(&tip->item);
             char *txt2 = submenuItemGetText(&nxt->item);
 
-            int cmp = stricmp(txt1, txt2);
+            int cmp = strcasecmp(txt1, txt2);
 
             if (cmp > 0) {
                 swap(tip, nxt);
@@ -892,9 +892,6 @@ void menuRenderMain()
 
 void menuHandleInputMain()
 {
-    // Last Played Auto Start
-    int ValidKeyPressed = 1;
-
     if (getKey(KEY_LEFT)) {
         menuPrevH();
     } else if (getKey(KEY_RIGHT)) {
@@ -925,10 +922,6 @@ void menuHandleInputMain()
         menuFirstPage();
     } else if (getKeyOn(KEY_R2)) { // end
         menuLastPage();
-
-        // Last Played Auto Start
-    } else { // None valid key pressed
-        ValidKeyPressed = 0;
     }
 
     // Last Played Auto Start

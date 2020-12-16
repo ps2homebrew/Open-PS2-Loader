@@ -54,7 +54,7 @@ typedef struct
 
 static inline void _strcpy(char *dst, const char *src)
 {
-    strncpy(dst, src, strlen(src) + 1);
+    memcpy(dst, src, strlen(src) + 1);
 }
 
 static inline void _strcat(char *dst, const char *src)

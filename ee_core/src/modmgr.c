@@ -194,7 +194,7 @@ int LoadElf(const char *path, t_ExecData *data)
 /*----------------------------------------------------------------------------------------*/
 void ChangeModuleName(const char *name, const char *newname)
 {
-    u8 search_name[60];
+    char search_name[60];
     smod_mod_info_t info;
     int len;
 

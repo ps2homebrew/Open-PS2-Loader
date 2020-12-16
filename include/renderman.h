@@ -57,12 +57,12 @@ typedef struct
 } rm_quad_t;
 
 // Some convenience globals
-const u64 gColWhite;
-const u64 gColBlack;
-const u64 gColDarker;
-const u64 gColFocus;
-const u64 gDefaultCol;
-const u64 gDefaultAlpha;
+extern const u64 gColWhite;
+extern const u64 gColBlack;
+extern const u64 gColDarker;
+extern const u64 gColFocus;
+extern const u64 gDefaultCol;
+extern const u64 gDefaultAlpha;
 
 enum rm_aratio {
     RM_ARATIO_4_3 = 0,

@@ -62,6 +62,10 @@ static float fps = 0.0f;
 extern GSGLOBAL *gsGlobal;
 #endif
 
+// Global data
+int guiInactiveFrames;
+int guiFrameId;
+
 struct gui_update_list_t
 {
     struct gui_update_t *item;
@@ -985,7 +989,7 @@ static void guiRenderGreeting(int alpha)
 
 static float mix(float a, float b, float t)
 {
-    return (1.0 - t) * a + t * b;
+    return a + (b - a) * t;
 }
 
 static float fade(float t)
@@ -1545,7 +1549,7 @@ int guiMsgBox(const char *text, int addAccept, struct UIItem *ui)
     return terminate - 1;
 }
 
-void guiHandleDeferedIO(int *ptr, const unsigned char *message, int type, void *data)
+void guiHandleDeferedIO(int *ptr, const char *message, int type, void *data)
 {
     ioPutRequest(type, data);
 
@@ -1567,7 +1571,7 @@ void guiGameHandleDeferedIO(int *ptr, struct UIItem *ui, int type, void *data)
     }
 }
 
-void guiRenderTextScreen(const unsigned char *message)
+void guiRenderTextScreen(const char *message)
 {
     guiStartFrame();
 

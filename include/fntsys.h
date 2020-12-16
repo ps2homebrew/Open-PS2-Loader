@@ -30,15 +30,15 @@ void fntRelease(int id);
 void fntUpdateAspectRatio();
 
 /** Renders a text with specified window dimensions */
-int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const unsigned char *string, u64 colour);
+int fntRenderString(int id, int x, int y, short aligned, size_t width, size_t height, const char *string, u64 colour);
 
 /** replaces spaces with newlines so that the text fits into the specified width.
   * @note A destrutive operation - modifies the given string!
   */
-void fntFitString(int id, unsigned char *string, size_t width);
+void fntFitString(int id, char *string, size_t width);
 
 /** Calculates the width of the given text string
 * We can't use the height for alignment, as the horizontal center would depends of the contained text itself */
-int fntCalcDimensions(int id, const unsigned char *str);
+int fntCalcDimensions(int id, const char *str);
 
 #endif

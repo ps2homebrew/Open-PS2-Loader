@@ -19,6 +19,27 @@ void *eeloadCopy, *initUserMemory;
 
 int isInit = 0;
 
+// Global data
+char g_ipconfig[IPCONFIG_MAX_LEN];
+int g_ipconfig_len;
+char g_ps2_ip[16];
+char g_ps2_netmask[16];
+char g_ps2_gateway[16];
+unsigned char g_ps2_ETHOpMode;
+u32 g_compat_mask;
+char GameID[16];
+int GameMode;
+char ExitPath[32];
+int HDDSpindown;
+int EnableGSMOp;
+int EnableCheatOp;
+#ifdef PADEMU
+int EnablePadEmuOp;
+int PadEmuSettings;
+#endif
+int DisableDebug;
+int *gCheatList; //Store hooks/codes addr+val pairs
+
 static int eecoreInit(int argc, char **argv)
 {
     SifInitRpc(0);

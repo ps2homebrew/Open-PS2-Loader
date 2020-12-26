@@ -7,6 +7,9 @@
 #include <ee_cop0_defs.h>
 #include <syscallnr.h>
 
+#define ABI_EABI64 // force all register names to EABI64 (legacy toolchain)
+#include "as_reg_compat.h"
+
 .set push
 .set noreorder
 .set noat

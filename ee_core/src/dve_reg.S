@@ -9,6 +9,9 @@
 #
 */
 
+#define ABI_EABI64 // force all register names to EABI64 (legacy toolchain)
+#include "as_reg_compat.h"
+
 .global dveStat1
 .global dveStat2
 

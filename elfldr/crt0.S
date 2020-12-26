@@ -10,6 +10,9 @@
 # Modified crt0.s
 # Remove _ps2sdk_args_parse, _ps2sdk_libc_init and _ps2sdk_libc_deinit weak functions for size optimization
 
+#define ABI_EABI64 // force all register names to EABI64 (legacy toolchain)
+#include "as_reg_compat.h"
+
 	.weak  _init
 	.type  _init, @function
 

@@ -354,9 +354,7 @@ static int lngLoadFromFile(char *path, char *name)
 
         LOG("LANG Loaded %d entries\n", strId);
 
-        // remember how many entries were read from the file (for the free later)
-        nValidEntries = strId;
-
+        int newEntries = strId;
         // if necessary complete lang with default internal
         while (strId < LANG_STR_COUNT) {
             LOG("LANG Default entry added: %s\n", internalEnglish[strId]);
@@ -365,6 +363,9 @@ static int lngLoadFromFile(char *path, char *name)
         }
         lang_strs = newL;
         lngFreeFromFile(curL);
+
+        // remember how many entries were read from the file (for the free later)
+        nValidEntries = newEntries;
 
         int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
         memcpy(dir, path, len);

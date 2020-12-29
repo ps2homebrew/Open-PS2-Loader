@@ -50,12 +50,12 @@ static int checkMC()
 
         mcGetInfo(0, 0, &memcardtype, &dummy, &dummy);
         mcSync(0, NULL, &ret);
-        mc0_is_ps2card = (ret == 0 && memcardtype == 2);
+        mc0_is_ps2card = (ret == -1 && memcardtype == 2);
         mc0_has_folder = 0;
 
         mcGetInfo(1, 0, &memcardtype, &dummy, &dummy);
         mcSync(0, NULL, &ret);
-        mc1_is_ps2card = (ret == 0 && memcardtype == 2);
+        mc1_is_ps2card = (ret == -1 && memcardtype == 2);
         mc1_has_folder = 0;
 
         if (mc0_is_ps2card) {

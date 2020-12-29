@@ -42,28 +42,31 @@ int *gCheatList; //Store hooks/codes addr+val pairs
 
 static int eecoreInit(int argc, char **argv)
 {
+    int i = 0;
+    char *p;
+
     SifInitRpc(0);
 
     DINIT();
     DPRINTF("OPL EE core start!\n");
 
-    int i = 0;
-
-    if (!_strncmp(argv[i], "USB_MODE", 8))
+    p = _strtok(argv[i], " ");
+    if (!_strncmp(p, "USB_MODE", 8))
         GameMode = USB_MODE;
-    else if (!_strncmp(argv[i], "ETH_MODE", 8))
+    else if (!_strncmp(p, "ETH_MODE", 8))
         GameMode = ETH_MODE;
-    else if (!_strncmp(argv[i], "HDD_MODE", 8))
+    else if (!_strncmp(p, "HDD_MODE", 8))
         GameMode = HDD_MODE;
     DPRINTF("Game Mode = %d\n", GameMode);
 
+    p = _strtok(NULL, " ");
     DisableDebug = 0;
-    if (!_strncmp(&argv[i][9], "1", 1)) {
+    if (!_strncmp(p, "1", 1)) {
         DisableDebug = 1;
         DPRINTF("Debug Colors disabled\n");
     }
 
-    char *p = _strtok(&argv[i][11], " ");
+    p = _strtok(NULL, " ");
     if (!_strncmp(p, "Browser", 7))
         ExitPath[0] = '\0';
     else
@@ -74,12 +77,9 @@ static int eecoreInit(int argc, char **argv)
     HDDSpindown = _strtoui(p);
     DPRINTF("HDD Spindown = %d\n", HDDSpindown);
 
-    p = _strtok(NULL, " ");
-    _strcpy(g_ps2_ip, p);
-    p = _strtok(NULL, " ");
-    _strcpy(g_ps2_netmask, p);
-    p = _strtok(NULL, " ");
-    _strcpy(g_ps2_gateway, p);
+    _strcpy(g_ps2_ip, _strtok(NULL, " "));
+    _strcpy(g_ps2_netmask, _strtok(NULL, " "));
+    _strcpy(g_ps2_gateway, _strtok(NULL, " "));
     g_ps2_ETHOpMode = _strtoui(_strtok(NULL, " "));
     DPRINTF("IP=%s NM=%s GW=%s mode: %d\n", g_ps2_ip, g_ps2_netmask, g_ps2_gateway, g_ps2_ETHOpMode);
 

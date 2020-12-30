@@ -665,13 +665,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     strcpy(settings->smb_password, gPCPassword);
 
     //Initialize layer 1 information.
-    switch (game->format) {
-        case GAME_FORMAT_USBLD:
-            sprintf(partname, "%s%s.00", ethPrefix, settings->filename);
-            break;
-        default: //Raw ISO9660 disc image; one part.
-            sprintf(partname, "%s%s\\%s", ethPrefix, game->media == SCECdPS2CD ? "CD" : "DVD", settings->filename);
-    }
+    sbCreatePath(game, partname, ethPrefix, "\\", 0);
 
     if (gPS2Logo) {
         int fd = open(partname, O_RDONLY, 0666);
@@ -687,7 +681,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         case GAME_FORMAT_USBLD:
             layer1_part = layer1_start / 0x80000;
             layer1_offset = layer1_start % 0x80000;
-            sprintf(partname, "%s%s.%02x", ethPrefix, settings->filename, layer1_part);
+            sbCreatePath(game, partname, ethPrefix, "\\", layer1_part);
             break;
         default: //Raw ISO9660 disc image; one part.
             layer1_part = 0;

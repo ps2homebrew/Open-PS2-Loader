@@ -643,73 +643,55 @@ void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, 
     }
 }
 
+static void sbCreatePath_name(const base_game_info_t *game, char *path, const char *prefix, const char *sep, int part, const char *game_name)
+{
+    switch (game->format) {
+        case GAME_FORMAT_USBLD:
+            snprintf(path, 256, "%sul.%08X.%s.%02x", prefix, USBA_crc32(game_name), game->startup, part);
+            break;
+        case GAME_FORMAT_ISO:
+            snprintf(path, 256, "%s%s%s%s%s", prefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", sep, game_name, game->extension);
+            break;
+        case GAME_FORMAT_OLD_ISO:
+            snprintf(path, 256, "%s%s%s%s.%s%s", prefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", sep, game->startup, game_name, game->extension);
+            break;
+    }
+}
+
+void sbCreatePath(const base_game_info_t *game, char *path, const char *prefix, const char *sep, int part)
+{
+    sbCreatePath_name(game, path, prefix, sep, part, game->name);
+}
+
 void sbDelete(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id)
 {
+    int part;
     char path[256];
     base_game_info_t *game = &(*list)[id];
 
-    if (game->format != GAME_FORMAT_USBLD) {
-        if (game->format != GAME_FORMAT_OLD_ISO) {
-            if (game->media == SCECdPS2CD)
-                snprintf(path, sizeof(path), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-            else
-                snprintf(path, sizeof(path), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-        } else {
-            if (game->media == SCECdPS2CD)
-                snprintf(path, sizeof(path), "%sCD%s%s%s", prefix, sep, game->name, game->extension);
-            else
-                snprintf(path, sizeof(path), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
-        }
+    for (part = 0; part < game->parts; part++) {
+        sbCreatePath(game, path, prefix, sep, part);
         unlink(path);
-    } else {
-        char *pathStr = "%sul.%08X.%s.%02x";
-        unsigned int crc = USBA_crc32(game->name);
-        int i = 0;
-        do {
-            snprintf(path, sizeof(path), pathStr, prefix, crc, game->startup, i++);
-            unlink(path);
-        } while (i < game->parts);
+    }
 
+    if (game->format == GAME_FORMAT_USBLD) {
         sbRebuildULCfg(list, prefix, gamecount, id);
     }
 }
 
 void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int gamecount, int id, char *newname)
 {
+    int part;
     char oldpath[256], newpath[256];
     base_game_info_t *game = &(*list)[id];
 
-    if (game->format != GAME_FORMAT_USBLD) {
-        if (game->format == GAME_FORMAT_OLD_ISO) {
-            if (game->media == SCECdPS2CD) {
-                snprintf(oldpath, sizeof(oldpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sCD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
-            } else {
-                snprintf(oldpath, sizeof(oldpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sDVD%s%s.%s%s", prefix, sep, game->startup, newname, game->extension);
-            }
-        } else {
-            if (game->media == SCECdPS2CD) {
-                snprintf(oldpath, sizeof(oldpath), "%sCD%s%s%s", prefix, sep, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sCD%s%s%s", prefix, sep, newname, game->extension);
-            } else {
-                snprintf(oldpath, sizeof(oldpath), "%sDVD%s%s%s", prefix, sep, game->name, game->extension);
-                snprintf(newpath, sizeof(newpath), "%sDVD%s%s%s", prefix, sep, newname, game->extension);
-            }
-        }
+    for (part = 0; part < game->parts; part++) {
+        sbCreatePath_name(game, oldpath, prefix, sep, part, game->name);
+        sbCreatePath_name(game, newpath, prefix, sep, part, newname);
         rename(oldpath, newpath);
-    } else {
-        const char *pathStr = "%sul.%08X.%s.%02x";
-        unsigned int oldcrc = USBA_crc32(game->name);
-        unsigned int newcrc = USBA_crc32(newname);
-        int i;
+    }
 
-        for (i = 0; i < game->parts; i++) {
-            snprintf(oldpath, sizeof(oldpath), pathStr, prefix, oldcrc, game->startup, i);
-            snprintf(newpath, sizeof(newpath), pathStr, prefix, newcrc, game->startup, i);
-            rename(oldpath, newpath);
-        }
-
+    if (game->format == GAME_FORMAT_USBLD) {
         memset(game->name, 0, UL_GAME_NAME_MAX + 1);
         memcpy(game->name, newname, UL_GAME_NAME_MAX);
         sbRebuildULCfg(list, prefix, gamecount, -1);

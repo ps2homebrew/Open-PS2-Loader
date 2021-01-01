@@ -706,7 +706,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     elf_header_t *eh;
     elf_pheader_t *eph;
     void *pdata;
-    int i;
+    int argc, i;
     char ElfPath[32];
     char *argv[7 + GSM_ARGS];
     char ModStorageConfig[32];
@@ -780,7 +780,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 #define PADEMU_ARGUMENT
 #endif
 
-    i = 0;
+    argc = 0;
     sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER,
             mode_str, gDisableDebug, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
@@ -789,28 +789,44 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
             gETHOpMode,
             GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0,
             GetGSMEnabled() PADEMU_ARGUMENT);
-    argv[i] = config_str;
-    i++;
+    argv[argc] = config_str;
+    argc++;
 
-    argv[i] = KernelConfig;
-    i++;
+    argv[argc] = KernelConfig;
+    argc++;
 
-    argv[i] = ModStorageConfig;
-    i++;
+    argv[argc] = ModStorageConfig;
+    argc++;
 
-    argv[i] = (char *)filename;
-    i++;
+    argv[argc] = (char *)filename;
+    argc++;
 
     char cmask[10];
     snprintf(cmask, 10, "%d", compatflags);
-    argv[i] = cmask;
-    i++;
+    argv[argc] = cmask;
+    argc++;
 
     PrepareGSM(gsm_config_str);
-    argv[i] = gsm_config_str;
-    i++;
+    argv[argc] = gsm_config_str;
+    argc++;
+
+    //PS2LOGO Caller, based on l_oliveira & SP193 tips
+    //Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
+    if (EnablePS2Logo) {
+        argv[argc] = "rom0:PS2LOGO";
+        argc++;
+    }
 
     snprintf(ElfPath, sizeof(ElfPath), "cdrom0:\\%s;1", filename);
+    argv[argc] = ElfPath;
+    argc++;
+
+#ifdef __DEBUG
+    LOG("Starting ee_core with following arguments:\n");
+    for (i = 0; i < argc; i++) {
+        LOG("[%d] %s\n", i, argv[i]);
+    }
+#endif
 
     // Let's go.
     fileXioExit();
@@ -819,16 +835,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     FlushCache(0);
     FlushCache(2);
 
-    //PS2LOGO Caller, based on l_oliveira & SP193 tips
-    //Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
-    if (EnablePS2Logo) {
-        argv[i] = "rom0:PS2LOGO";
-        argv[i + 1] = ElfPath;
-        ExecPS2((void *)eh->entry, NULL, i + 2, argv);
-    } else {
-        argv[i] = ElfPath;
-        ExecPS2((void *)eh->entry, NULL, i + 1, argv);
-    }
+    ExecPS2((void *)eh->entry, NULL, argc, argv);
 }
 
 int sysExecElf(const char *path)

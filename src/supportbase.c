@@ -266,7 +266,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
     char fullpath[256], startup[GAME_STARTUP_MAX];
     struct dirent *dirent;
     DIR *dir;
-    struct stat st;
+    //struct stat st;
 
     cache.games = NULL;
     cache.count = 0;
@@ -353,13 +353,13 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
                     }
                 }
 
-                sprintf(fullpath, "%s/%s", path, dirent->d_name);
-                stat(fullpath, &st);
+                //sprintf(fullpath, "%s/%s", path, dirent->d_name);
+                //stat(fullpath, &st);
 
                 game->parts = 1;
                 game->media = type;
                 game->format = format;
-                game->sizeMB = st.st_size >> 20;
+                game->sizeMB = -1; //st.st_size >> 20;
 
                 count++;
             }

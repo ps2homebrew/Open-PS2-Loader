@@ -35,8 +35,9 @@ static const uint8_t utf8d[] = {
     1, 3, 1, 1, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // s7..s8
 };
 
-uint32_t static utf8Decode(uint32_t *state, uint32_t *codep, uint32_t byte)
+uint32_t static utf8Decode(uint32_t *state, uint32_t *codep, char c)
 {
+    uint8_t byte = (uint8_t)c;
     uint32_t type = utf8d[byte];
 
     *codep = (*state != UTF8_ACCEPT) ?

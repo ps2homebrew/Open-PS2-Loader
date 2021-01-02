@@ -34,7 +34,7 @@ struct GSMDestSetGsCrt
     s16 interlace;
     s16 mode;
     s16 ffmd;
-};
+} __attribute__((packed));
 
 struct GSMDestGSRegs
 {
@@ -49,7 +49,7 @@ struct GSMDestGSRegs
     u64 display1;
     u64 dispfb2;
     u64 display2;
-};
+} __attribute__((packed));
 
 struct GSMFlags
 {
@@ -66,7 +66,7 @@ struct GSMFlags
     u8 DISPLAY_fix;
     u8 FIELD_fix;
     u8 gs576P_param;
-};
+} __attribute__((packed));
 
 extern struct GSMDestSetGsCrt GSMDestSetGsCrt;
 extern struct GSMDestGSRegs GSMDestGSRegs;

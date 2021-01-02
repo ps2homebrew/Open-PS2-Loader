@@ -118,10 +118,10 @@
 //GSM Stuff
 struct GSMSourceSetGsCrt
 {
-    unsigned int interlace;
-    unsigned int mode;
-    unsigned int ffmd;
-};
+    s16 interlace;
+    s16 mode;
+    s16 ffmd;
+} __attribute__((packed));
 
 struct GSMSourceGSRegs
 {
@@ -136,7 +136,7 @@ struct GSMSourceGSRegs
     u64 display1;
     u64 dispfb2;
     u64 display2;
-};
+} __attribute__((packed));
 
 extern struct GSMSourceSetGsCrt GSMSourceSetGsCrt;
 extern struct GSMSourceGSRegs GSMSourceGSRegs;

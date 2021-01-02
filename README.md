@@ -36,13 +36,13 @@ http://sx.sytes.net/oplcl/games.aspx
 Open PS2 Loader bundle included several types of the same OPL version. These
 types come with more or less features included.  
 
-| Type (can be a combination) | Description                                                                       |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| "Normal" (No suffixes)      | Regular, basic OPL release, without any extra features. Aka vanilla build.        |
-| "Childproof"                | OPL release with some controls disabled (e.g. write operations).                  |
-| "VMC"                       | OPL release with Virtual Memory Card (VMC) support.                               |
-| "GSM"                       | OPL release with GSM integrated into it.                                          |
-| "PS2RD"                     | OPL release with PS2RD Cheat Engine built-in feature.                             | 
+| Type (can be a combination) | Description                                                                                    |
+| --------------------------- | ---------------------------------------------------------------------------------------------- |
+| "Release"                   | Regular OPL release with GSM, IGS, PADEMU, VMC, PS2RD Cheat Engine & Parental Controls.        |
+| "DTL_T10000"                | OPL for TOOLs (DevKit PS2)                                                                     |
+| "IGS"                       | OPL with InGame Screenshot feature.                                                            |
+| "PADEMU"                    | OPL with Pad Emulation for DS3 & DS4.                                                          |
+| "RTL"                       | OPL with right to left language suppport.                                                      |
 
 ## How to use
 
@@ -93,6 +93,8 @@ formatted with either HDLoader or uLaunchELF (uLaunchELF is recommended).
 
 To launch OPL, you can use any of the existing methods for loading an
 executable elf.  
+
+## PS3
 
 On PS3, you need an original SwapMagic 3.6+ or 3.8 disc (at the moment
 there aren't any other options). The steps for loading OPL on a PS3 are:  

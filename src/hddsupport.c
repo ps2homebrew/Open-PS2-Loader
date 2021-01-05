@@ -414,7 +414,7 @@ static config_set_t *hddGetConfig(int id)
     char path[256];
     hdl_game_info_t *game = &hddGames.games[id];
 
-    snprintf(path, sizeof(path), "%s" OPL_FOLDER "/%s.cfg", hddPrefix, game->startup);
+    snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file exists or not.
 
@@ -603,7 +603,7 @@ static void hddGetLegacyAppsPath(char *path, int max)
 
 static void hddGetLegacyAppsInfo(char *path, int max, char *name)
 {
-    snprintf(path, max, "%s" OPL_FOLDER "/%s.cfg", hddPrefix, name);
+    snprintf(path, max, "%sCFG/%s.cfg", hddPrefix, name);
 }
 
 static item_list_t hddGameList = {

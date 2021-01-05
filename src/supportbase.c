@@ -719,7 +719,7 @@ void sbRename(base_game_info_t **list, const char *prefix, const char *sep, int 
 config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const char *sep)
 {
     char path[256];
-    snprintf(path, sizeof(path), "%s" OPL_FOLDER "%s%s.cfg", prefix, sep, game->startup);
+    snprintf(path, sizeof(path), "%sCFG%s%s.cfg", prefix, sep, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file could be loaded or not.
 
@@ -748,7 +748,7 @@ static void sbCreateFoldersFromList(const char *path, const char **folders)
 
 void sbCreateFolders(const char *path, int createDiscImgFolders)
 {
-    const char *basicFolders[] = {OPL_FOLDER, "THM", "LNG", "ART", "VMC", "CHT", "APPS", NULL};
+    const char *basicFolders[] = {"CFG", "THM", "LNG", "ART", "VMC", "CHT", "APPS", NULL};
     const char *discImgFolders[] = {"CD", "DVD", NULL};
 
     sbCreateFoldersFromList(path, basicFolders);

@@ -445,7 +445,7 @@ static void usbGetLegacyAppsPath(char *path, int max)
 
 static void usbGetLegacyAppsInfo(char *path, int max, char *name)
 {
-    snprintf(path, max, "%s" OPL_FOLDER "/%s.cfg", usbPrefix, name);
+    snprintf(path, max, "%sCFG/%s.cfg", usbPrefix, name);
 }
 
 static item_list_t usbGameList = {

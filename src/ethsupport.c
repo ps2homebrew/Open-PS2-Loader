@@ -779,7 +779,7 @@ static void ethGetLegacyAppsPath(char *path, int max)
 
 static void ethGetLegacyAppsInfo(char *path, int max, char *name)
 {
-    snprintf(path, max, "%s" OPL_FOLDER "\\%s.cfg", ethPrefix, name);
+    snprintf(path, max, "%sCFG\\%s.cfg", ethPrefix, name);
 }
 
 static item_list_t ethGameList = {

@@ -1,7 +1,7 @@
 VERSION = 1
-SUBVERSION = 0
+SUBVERSION = 1
 PATCHLEVEL = 0
-EXTRAVERSION =
+EXTRAVERSION = Beta
 
 # How to DEBUG?
 # Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.

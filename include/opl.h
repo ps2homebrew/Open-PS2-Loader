@@ -41,16 +41,6 @@
 // Last Played Auto Start
 #include <time.h>
 
-//START of OPL_DB tweaks
-//#define OPL_IS_DEV_BUILD 1 //Define if this build is a development build.
-//END of OPL_DB tweaks
-
-#ifdef OPL_IS_DEV_BUILD
-#define OPL_FOLDER "CFG-DEV"
-#else
-#define OPL_FOLDER "CFG"
-#endif
-
 //Master password for disabling the parental lock.
 #define OPL_PARENTAL_LOCK_MASTER_PASS "989765"
 

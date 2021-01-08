@@ -215,8 +215,8 @@ void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
         if (gTheme->infoElems.first)
             menuAddHint(&mod->menuItem, _STR_INFO, SQUARE_ICON);
 
-        if (!(mod->support->flags & MODE_FLAG_NO_COMPAT))
-            menuAddHint(&mod->menuItem, _STR_GAME_MENU, TRIANGLE_ICON);
+        if (!(mod->support->flags & MODE_FLAG_NO_COMPAT) || gEnableWrite)
+            menuAddHint(&mod->menuItem, _STR_OPTIONS, TRIANGLE_ICON);
 
         menuAddHint(&mod->menuItem, _STR_REFRESH, SELECT_ICON);
     }
@@ -291,6 +291,11 @@ static void itemExecTriangle(struct menu_item *curMenu)
                 menuInitGameMenu();
                 guiSwitchScreen(GUI_SCREEN_GAME_MENU);
                 guiGameLoadConfig(support, gameMenuLoadConfig(NULL));
+            }
+        } else {
+            if (menuCheckParentalLock() == 0 && gEnableWrite) {
+                menuInitAppMenu();
+                guiSwitchScreen(GUI_SCREEN_APP_MENU);
             }
         }
     } else

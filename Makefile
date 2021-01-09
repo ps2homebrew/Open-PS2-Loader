@@ -54,12 +54,13 @@ ifneq ($(shell test -d .git; echo $$?),0)
 endif
 
 GIT_TAG = $(shell git describe --exact-match --tags 2>/dev/null)
-ifeq ($(GIT_TAG),)
-	# git revision is not tagged
-	OPL_VERSION = v$(VERSION).$(SUBVERSION).$(PATCHLEVEL)$(if $(EXTRAVERSION),-$(EXTRAVERSION))-$(REVISION)$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
-else
+OPL_VERSION = v$(VERSION).$(SUBVERSION).$(PATCHLEVEL)$(if $(EXTRAVERSION),-$(EXTRAVERSION))-$(REVISION)$(if $(GIT_HASH),-$(GIT_HASH))$(if $(DIRTY),$(DIRTY))$(if $(LOCALVERSION),-$(LOCALVERSION))
+
+ifneq ($(GIT_TAG),)
+ifneq ($(GIT_TAG),latest)
 	# git revision is tagged
 	OPL_VERSION = $(GIT_TAG)$(if $(DIRTY),$(DIRTY))
+endif
 endif
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \

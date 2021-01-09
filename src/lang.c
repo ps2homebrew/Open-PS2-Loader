@@ -276,7 +276,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Cache Game List (HDD)",
     "Enable Notifications",
     "%s loaded from %s",
-    "Game Menu",
+    "Options",
     "Game settings saved.",
     "%s settings removed.",
     "Overwrites existing game compatibility settings when enabled.",

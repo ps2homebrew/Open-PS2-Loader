@@ -291,17 +291,7 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
     settings = (struct cdvdman_settings_usb *)((u8 *)irx + index);
     for (i = 0; i < game->parts; i++) {
-        switch (game->format) {
-            case GAME_FORMAT_ISO:
-                sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->name, game->extension);
-                break;
-            case GAME_FORMAT_OLD_ISO:
-                sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->startup, game->name, game->extension);
-                break;
-            default: //USBExtreme format.
-                sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, i);
-        }
-
+        sbCreatePath(game, partname, usbPrefix, "/", i);
         fd = open(partname, O_RDONLY);
         if (fd >= 0) {
             settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, partname);
@@ -332,24 +322,14 @@ static void usbLaunchGame(int id, config_set_t *configSet)
     }
 
     //Initialize layer 1 information.
-    switch (game->format) {
-        case GAME_FORMAT_ISO:
-            sprintf(partname, "%s%s/%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->name, game->extension);
-            break;
-        case GAME_FORMAT_OLD_ISO:
-            sprintf(partname, "%s%s/%s.%s%s", usbPrefix, (game->media == SCECdPS2CD) ? "CD" : "DVD", game->startup, game->name, game->extension);
-            break;
-        default: //USBExtreme format.
-            sprintf(partname, "%sul.%08X.%s.00", usbPrefix, USBA_crc32(game->name), game->startup);
-    }
-
+    sbCreatePath(game, partname, usbPrefix, "/", 0);
     layer1_start = sbGetISO9660MaxLBA(partname);
 
     switch (game->format) {
         case GAME_FORMAT_USBLD:
             layer1_part = layer1_start / 0x80000;
             layer1_offset = layer1_start % 0x80000;
-            sprintf(partname, "%sul.%08X.%s.%02x", usbPrefix, USBA_crc32(game->name), game->startup, layer1_part);
+            sbCreatePath(game, partname, usbPrefix, "/", layer1_part);
             break;
         default: //Raw ISO9660 disc image; one part.
             layer1_part = 0;

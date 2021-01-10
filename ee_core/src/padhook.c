@@ -83,6 +83,17 @@ static void t_loadElf(void)
     LoadModule("rom0:SIO2MAN", 0, NULL);
     LoadModule("rom0:MCMAN", 0, NULL);
 
+    if (ExitPath[1] == 'a') { // ie mass:
+        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL);
+        if (ret >= 0)
+            LoadModule("mc0:SYS-CONF/USBHDFSD.IRX", 0, NULL);
+        else {
+            LoadModule("mc1:SYS-CONF/USBD.IRX", 0, NULL);
+            LoadModule("mc1:SYS-CONF/USBHDFSD.IRX", 0, NULL);
+        }
+        delay(5); // Wait for device to be detected.
+    }
+
     // Load exit ELF
     argv[0] = ExitPath;
     argv[1] = NULL;

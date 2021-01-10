@@ -7,7 +7,7 @@
 #define SYS_LOAD_USB_MODULES 0x02
 #define SYS_LOAD_ISOFS_MODULE 0x04
 
-unsigned int USBA_crc32(char *string);
+unsigned int USBA_crc32(const char *string);
 int sysGetDiscID(char *discID);
 void sysInitDev9(void);
 void sysShutdownDev9(void);

@@ -261,16 +261,16 @@ int _strtoi(const char *p)
 }
 
 /*----------------------------------------------------------------------------------------*/
-/* This function converts string to unsigned long integer. Stops on illegal characters.   */
+/* This function converts string to u64. Stops on illegal characters.                     */
 /* Put here because including atoi rises the size of loader.elf by another kilobyte       */
 /* and that causes some games to stop working.                                            */
 /*----------------------------------------------------------------------------------------*/
-unsigned long int _strtoul(const char *p)
+u64 _strtoul(const char *p)
 {
     if (!p)
         return 0;
 
-    unsigned long int r = 0;
+    u64 r = 0;
 
     while (*p) {
         if ((*p < '0') || (*p > '9'))

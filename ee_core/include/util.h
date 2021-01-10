@@ -25,7 +25,7 @@ int _toupper(int c);
 int _memcmp(const void *s1, const void *s2, unsigned int length);
 unsigned int _strtoui(const char *p);
 int _strtoi(const char *p);
-unsigned long int _strtoul(const char *p);
+u64 _strtoul(const char *p);
 void set_ipconfig(void);
 u32 *find_pattern_with_mask(u32 *buf, unsigned int bufsize, const u32 *pattern, const u32 *mask, unsigned int len);
 void CopyToIop(void *eedata, unsigned int size, void *iopptr);

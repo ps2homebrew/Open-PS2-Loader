@@ -268,7 +268,7 @@ void sysPowerOff(void)
 
 static unsigned int crctab[0x400];
 
-unsigned int USBA_crc32(char *string)
+unsigned int USBA_crc32(const char *string)
 {
     int crc, table, count, byte;
 

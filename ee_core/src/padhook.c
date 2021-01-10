@@ -50,7 +50,7 @@ static int IGR_Thread_ID = -1;
 static int IGR_Intc_ID = -1;
 
 /* IGR thread stack & stack size */
-#define IGR_STACK_SIZE (16 * 192)
+#define IGR_STACK_SIZE (4 * 1024)
 static u8 IGR_Stack[IGR_STACK_SIZE] __attribute__((aligned(16)));
 
 /* Extern symbol */

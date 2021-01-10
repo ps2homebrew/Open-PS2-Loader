@@ -4,7 +4,6 @@
  Review OpenUsbLd README & LICENSE files for further details.
  */
 
-#include "include/integers.h"
 #include "include/opl.h"
 #include "include/fntsys.h"
 #include "include/renderman.h"
@@ -13,6 +12,7 @@
 #include "include/util.h"
 #include "include/atlas.h"
 
+#include <sys/types.h>
 #include <ft2build.h>
 
 #include FT_FREETYPE_H

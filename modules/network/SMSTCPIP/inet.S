@@ -6,6 +6,9 @@
 # Licenced under Academic Free License version 2.0
 # Review ps2sdk README & LICENSE files for further details.
 #
+
+#include "as_reg_compat.h"
+
 .ifdef .gasversion.
 .section .mdebug.abi32
 .nan legacy

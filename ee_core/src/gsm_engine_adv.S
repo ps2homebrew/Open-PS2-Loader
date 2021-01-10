@@ -11,6 +11,9 @@
 # This file is included by gsm_engine.S
 #
 
+#define ABI_EABI64 // force all register names to EABI64 (legacy toolchain)
+#include "as_reg_compat.h"
+
 .extern setdve_576P
 .extern dveStat1
 .extern dveStat2

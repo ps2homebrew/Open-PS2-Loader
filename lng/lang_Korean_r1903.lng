@@ -1,6 +1,6 @@
 # Translated by DDinghoya
-# Last update: April 18, 2020
-# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
+# Last update: Jan. 10, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1903-00169c4-2021-01-10 and OPNPS2LD-v1.1.0-Beta-1606-ifcaro_all-a2b2472-2021-01-10
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
@@ -268,7 +268,7 @@ VMC %s 파일이 조각화되었습니다. 슬롯 %d에서 메모리 카드를 �
 캐쉬 게임 목록 (HDD)
 알림 활성화
 %s에서 %s을(를)로드했습니다.
-게임 메뉴
+Options
 게임 설정이 저장되었습니다.
 %s 설정이 제거되었습니다.
 활성화되면 기존 게임 호환성 설정을 덮어 씁니다.

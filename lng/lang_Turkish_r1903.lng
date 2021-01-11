@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: May 10, 2020
-# Updated for OPL_1682_DB-TA_all-5bf829f-2020-02-11 and OPL_OPL_1436_ifcaro_beta_all-f8ba412-2020-01-27
+# Last update: Jan. 10, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1903-00169c4-2021-01-10 and OPNPS2LD-v1.1.0-Beta-1606-ifcaro_all-a2b2472-2021-01-10
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
@@ -268,7 +268,7 @@ Video çıkış modu değiştirilsin mi?
 Oyun listesini cachele (HDD)
 Bildirimleri aktifleştir
 %s yüklendi %s konumundan
-Oyun Menüsü
+Options
 Oyun ayarları kaydedildi.
 %s ayarları silindi.
 Aktifleştirildiğinde varolan oyun uyumluluk ayarlarının üzerine yazar.

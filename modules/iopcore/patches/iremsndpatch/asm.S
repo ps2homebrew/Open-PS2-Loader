@@ -1,3 +1,5 @@
+#include "as_reg_compat.h"
+
 .set noreorder
 
 .text

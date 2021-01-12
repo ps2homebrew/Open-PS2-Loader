@@ -7,6 +7,9 @@
 # Pulled out 'sde' library from MIPS.
 #
 */
+
+#include "as_reg_compat.h"
+
 .ifdef .gasversion.
 .section .mdebug.abi32
 .nan legacy

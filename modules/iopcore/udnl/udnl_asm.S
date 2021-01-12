@@ -1,50 +1,26 @@
+#include "as_reg_compat.h"
+
+.ifdef .gasversion.
+.section .mdebug.abi32
+.nan legacy
+.module softfloat
+.module nooddspreg
+.endif
 .set noat
 .set noreorder
 
 .text
 
-.globl CpuExecuteKmode
-.ent CpuExecuteKmode
-CpuExecuteKmode:
-	li	$v0, 0x0C
-	syscall
-	jr $ra
-	nop
-.end CpuExecuteKmode
-
-.globl func_00001b38
-.ent func_00001b38
-func_00001b38:
-	mfc0	$t0, $12
-	nop
-	la		$t4, func_00001b38_main
-	lui		$at, 0xA000
-	or		$t4, $t4, $at
-	jr		$t4
-	mtc0	$zero, $12
-func_00001b38_main:
-	nop
-	lui		$at, 0xFFFE
-	sw		$a0, 0x0130($at)
-	lui		$at, 0xFFFE
-	lw		$zero, 0x0130($at)
-	nop
-	mtc0	$t0, $12
-	nop
-	jr		$ra
-	nop
-.end func_00001b38
-
-.globl func_00001930
-.ent func_00001930
-func_00001930:
+.globl func_00001440
+.ent func_00001440
+func_00001440:
 	mfc0		$t0, $12
 	nop
-	la		$t4, func_00001930_main
+	la		$t4, func_00001440_main
 	lui		$at, 0xA000
 	or		$t4, $t4, $at
 	jr		$t4
-func_00001930_main:
+func_00001440_main:
 	mtc0		$zero, $12
 	nop
 	nop
@@ -74,7 +50,7 @@ func_00001930_main:
 	nop
 	addiu		$t2, $zero, 0x0000
 	addiu		$t3, $zero, 0x0f80
-func_00001930_loop:
+func_00001440_loop:
 	sw		$zero, 0x0000($t2)
 	sw		$zero, 0x0010($t2)
 	sw		$zero, 0x0020($t2)
@@ -83,7 +59,7 @@ func_00001930_loop:
 	sw		$zero, 0x0050($t2)
 	sw		$zero, 0x0060($t2)
 	sw		$zero, 0x0070($t2)
-	bne		$t2, $t3, func_00001930_loop
+	bne		$t2, $t3, func_00001440_loop
 	addi		$t2, $t2, 0x0080
 	mtc0		$zero, $12
 	nop
@@ -104,19 +80,19 @@ func_00001930_loop:
 	nop
 	jr		$ra
 	nop
-.end func_00001930
+.end func_00001440
 
 #Note: This doesn't seem to be used.
-#.globl	func_00001a34
-#.ent	func_00001a34
-#func_00001a34:
+#.globl	func_00001544
+#.ent	func_00001544
+#func_00001544:
 #	mfc0		$t0, $12
 #	nop
-#	la		$t4, func_00001a34_main
+#	la		$t4, func_00001544_main
 #	lui		$at, 0xa000
 #	or		$t4, $t4, $at
 #	jr		$t4
-#func_00001a34_main:
+#func_00001544_main:
 #	mtc0		$zero, $12
 #	nop
 #	nop
@@ -146,7 +122,7 @@ func_00001930_loop:
 #	nop
 #	addiu		$t2, $zero, 0x0000
 #	addiu		$t3, $zero, 0x0380
-#func_00001a34_loop:
+#func_00001544_loop:
 #	sw		$zero, 0x0000($t2)
 #	sw		$zero, 0x0010($t2)
 #	sw		$zero, 0x0020($t2)
@@ -155,7 +131,7 @@ func_00001930_loop:
 #	sw		$zero, 0x0050($t2)
 #	sw		$zero, 0x0060($t2)
 #	sw		$zero, 0x0070($t2)
-#	bne		$t2, $t3, func_00001a34_loop
+#	bne		$t2, $t3, func_00001544_loop
 #	addi		$t2, $t2, 0x0080
 #	mtc0		$zero, $12
 #	nop
@@ -176,4 +152,4 @@ func_00001930_loop:
 #	nop
 #	jr		$ra
 #	nop
-#.end	func_00001a34
+#.end	func_00001544

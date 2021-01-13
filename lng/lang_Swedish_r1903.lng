@@ -1,5 +1,5 @@
 # Translation by Lord_Flaya
-# Last update: Jan. 10, 2021
+# Last update: Jan. 13, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1903-00169c4-2021-01-10 and OPNPS2LD-v1.1.0-Beta-1606-ifcaro_all-a2b2472-2021-01-10
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
@@ -268,7 +268,7 @@ Bekräfta ändring av videoläge?
 Lägg Spellista i Cache (HDD)
 Aktivera notifikationer
 %s Laddat från %s
-Options
+Val
 Spelinställningar sparade.
 %s inställningar borttagna
 Skriver över befintliga spelinställningar om aktiverad.
@@ -290,5 +290,5 @@ VCD fil '%s' saknas!
 Ett fel inträffade vid namnbyte.
 Ett fel inträffade vid radering.
 Köp aldrig OPEN-PS2-LOADER (OPL), det finns gratis här:
-ifcaro OPL version @ psx-scene.com
+ifcaro OPL version @ psx-place.com
 OPL Daily Builds (DB) version @ ps2-home.com

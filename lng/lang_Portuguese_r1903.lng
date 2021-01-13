@@ -1,5 +1,5 @@
 # Translation by danielb
-# Last update: Jan. 10, 2021
+# Last update: Jan. 13, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1903-00169c4-2021-01-10 and OPNPS2LD-v1.1.0-Beta-1606-ifcaro_all-a2b2472-2021-01-10
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
@@ -268,7 +268,7 @@ Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HDD)
 Ativar notificações
 %s carregado de %s
-Options
+Opções
 Configurações do jogo guardadas.
 %s configurações removidas.
 Substitui configurações de compatibilidade de jogos existentes quando ativado.
@@ -290,5 +290,5 @@ Ficheiro VCD '%s' não encontrado!
 Ocorreu um erro ao renomear o ficheiro.
 Ocorreu um erro ao apagar o ficheiro
 Nunca compre o OPEN-PS2-LOADER (OPL), descarregue grátis em:
-OPL versão ifcaro em psx-scene.com
+OPL versão ifcaro em psx-place.com
 OPL versão Daily Builds (DB) em ps2-home.com

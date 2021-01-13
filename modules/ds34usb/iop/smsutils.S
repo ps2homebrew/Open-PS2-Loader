@@ -7,6 +7,9 @@
 # Pulled out 'sde' library from MIPS.
 # by Eugene Plotnikov
 */
+
+#include "as_reg_compat.h"
+
 .ifdef .gasversion.
 .section .mdebug.abi32
 .nan legacy
@@ -175,4 +178,3 @@ mips_memset:
 _dummy:
     jr      $ra
     nop
-    

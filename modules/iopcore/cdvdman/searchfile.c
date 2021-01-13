@@ -52,7 +52,7 @@ static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLen
     struct dirTocEntry *tocEntryPointer;
 
 lbl_startlocate:
-    DPRINTF("cdvdman_locatefile start locating, layer=%d\n", layer);
+    DPRINTF("cdvdman_locatefile start locating %s, layer=%d\n", name, layer);
 
     while (*p == '/')
         p++;

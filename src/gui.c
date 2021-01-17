@@ -451,7 +451,6 @@ void guiShowConfig()
     diaSetString(diaConfig, CFG_EXITTO, gExitPath);
     diaSetInt(diaConfig, CFG_ENWRITEOP, gEnableWrite);
     diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
-    diaSetInt(diaConfig, CFG_CHECKUSBFRAG, gCheckUSBFragmentation);
     diaSetString(diaConfig, CFG_USBPREFIX, gUSBPrefix);
     diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
     diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
@@ -474,7 +473,6 @@ void guiShowConfig()
         diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
         diaGetInt(diaConfig, CFG_ENWRITEOP, &gEnableWrite);
         diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
-        diaGetInt(diaConfig, CFG_CHECKUSBFRAG, &gCheckUSBFragmentation);
         diaGetString(diaConfig, CFG_USBPREFIX, gUSBPrefix, sizeof(gUSBPrefix));
         diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
         diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);

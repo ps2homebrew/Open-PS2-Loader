@@ -295,17 +295,15 @@ static void usbLaunchGame(int id, config_set_t *configSet)
         fd = open(partname, O_RDONLY);
         if (fd >= 0) {
             settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, partname);
-            if (gCheckUSBFragmentation) {
-                if ((startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, partname)) == 0 || fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) == 0) {
+            if ((startCluster = (unsigned int)fileXioIoctl(fd, USBMASS_IOCTL_GET_CLUSTER, partname)) == 0 || fileXioDevctl("xmass0:", XUSBHDFSD_CHECK_CLUSTER_CHAIN, &startCluster, 4, NULL, 0) == 0) {
 
-                    close(fd);
-                    //Game is fragmented. Do not continue.
-                    if (settings != NULL)
-                        sbUnprepare(&settings->common);
+                close(fd);
+                //Game is fragmented. Do not continue.
+                if (settings != NULL)
+                    sbUnprepare(&settings->common);
 
-                    guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
-                    return;
-                }
+                guiMsgBox(_l(_STR_ERR_FRAGMENTED), 0, NULL);
+                return;
             }
 
             if ((gPS2Logo) && (i == 0))

@@ -107,7 +107,6 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Run",
     "Display Settings",
     "Enable Write Operations",
-    "Check USB Game Fragmentation",
     "Remember Last Played Game",
     "Select Button",
     "Error, the game is fragmented.",

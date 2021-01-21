@@ -28,7 +28,7 @@ static unsigned char hddModulesLoaded = 0;
 static char *hddPrefix = "pfs0:";
 static hdl_games_list_t hddGames;
 
-const char *oplPart = "hdd0:+OPL";
+char gOPLPart[128];
 
 // forward declaration
 static item_list_t hddGameList;
@@ -42,13 +42,13 @@ static void hddInitModules(void)
 
     // update Themes
     char path[256];
-    sprintf(path, "%sTHM", hddPrefix);
+    sprintf(path, "%sTHM", gHDDPrefix);
     thmAddElements(path, "/", 1);
 
-    sprintf(path, "%sLNG", hddPrefix);
+    sprintf(path, "%sLNG", gHDDPrefix);
     lngAddLanguages(path, "/", hddGameList.mode);
 
-    sbCreateFolders(hddPrefix, 0);
+    sbCreateFolders(gHDDPrefix, 0);
 }
 
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
@@ -93,16 +93,76 @@ static int hddCheckHDProKit(void)
 #define PFS_ZONE_SIZE 8192
 #define PFS_FRAGMENT  0x00000000
 
-static int CreateOPLPartition(const char *oplPart, const char *mountpoint)
+static void hddCheckOPLFolder(const char *mountPoint)
+{
+    DIR *dir;
+    char path[32];
+
+    sprintf(path, "%sOPL", mountPoint);
+
+    dir = opendir(path);
+    if (dir == NULL)
+        mkdir(path, 0777);
+    else
+        closedir(dir);
+}
+
+static void hddFindOPLPartition(void)
+{
+    static config_set_t *config;
+    char name[64];
+    int fd, ret = 0;
+
+    fileXioUmount(hddPrefix);
+
+    ret = fileXioMount("pfs0:", "hdd0:__common", FIO_MT_RDWR);
+    if (ret == 0) {
+        fd = open("pfs0:OPL/conf_hdd.cfg", O_RDONLY);
+        if (fd >= 0) {
+            config = configAlloc(0, NULL, "pfs0:OPL/conf_hdd.cfg");
+            configRead(config);
+
+            configGetStrCopy(config, "hdd_partition", name, sizeof(name));
+            snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", name);
+
+            configFree(config);
+            close(fd);
+
+            fileXioUmount(hddPrefix);
+            return;
+        }
+
+        hddCheckOPLFolder(hddPrefix);
+
+        fd = open("pfs0:OPL/conf_hdd.cfg", O_CREAT | O_TRUNC | O_WRONLY);
+        if (fd >= 0) {
+            config = configAlloc(0, NULL, "pfs0:OPL/conf_hdd.cfg");
+            configRead(config);
+
+            configSetStr(config, "hdd_partition", "+OPL");
+            configWrite(config);
+
+            configFree(config);
+            close(fd);
+        }
+    }
+
+    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:+OPL");
+    fileXioUmount(hddPrefix);
+
+    return;
+}
+
+static int hddCreateOPLPartition(const char *name)
 {
     int formatArg[3] = {PFS_ZONE_SIZE, 0x2d66, PFS_FRAGMENT};
     int fd, result;
-    char cmd[43];
+    char cmd[140];
 
-    sprintf(cmd, "%s,,,128M,PFS", oplPart);
+    sprintf(cmd, "%s,,,128M,PFS", name);
     if ((fd = open(cmd, O_CREAT | O_TRUNC | O_WRONLY)) >= 0) {
         close(fd);
-        result = fileXioFormat(mountpoint, oplPart, (const char *)&formatArg, sizeof(formatArg));
+        result = fileXioFormat(hddPrefix, name, (const char *)&formatArg, sizeof(formatArg));
     } else {
         result = fd;
     }
@@ -168,11 +228,18 @@ void hddLoadModules(void)
 
         LOG("HDDSUPPORT modules loaded\n");
 
-        ret = fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
+        hddFindOPLPartition();
+
+        ret = fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
         if (ret == -ENOENT) {
             //Attempt to create the partition.
-            if ((CreateOPLPartition(oplPart, hddPrefix)) >= 0)
-                fileXioMount(hddPrefix, oplPart, FIO_MT_RDWR);
+            if ((hddCreateOPLPartition(gOPLPart)) >= 0)
+                fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
+        }
+
+        if (gOPLPart[5] != '+') {
+            hddCheckOPLFolder(hddPrefix);
+            gHDDPrefix = "pfs0:OPL/";
         }
     }
 }
@@ -279,7 +346,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     configGetVMC(configSet, vmc_name[1], sizeof(vmc_name[1]), 1);
 
     if (vmc_name[0][0] || vmc_name[1][0]) {
-        nparts = hddGetPartitionInfo(oplPart, parts);
+        nparts = hddGetPartitionInfo(gOPLPart, parts);
         if (nparts > 0 && nparts <= 5) {
             for (i = 0; i < nparts; i++) {
                 hdd_vmc_infos.parts[i].start = parts[i].start;
@@ -301,7 +368,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
             if (vmc_name[vmc_id][0]) {
                 have_error = 1;
                 hdd_vmc_infos.active = 0;
-                if (sysCheckVMC(hddPrefix, "/", vmc_name[vmc_id], 0, &vmc_superblock) > 0) {
+                if (sysCheckVMC(gHDDPrefix, "/", vmc_name[vmc_id], 0, &vmc_superblock) > 0) {
                     hdd_vmc_infos.flags = vmc_superblock.mc_flag & 0xFF;
                     hdd_vmc_infos.flags |= 0x100;
                     hdd_vmc_infos.specs.page_size = vmc_superblock.page_size;
@@ -309,7 +376,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
                     hdd_vmc_infos.specs.card_size = vmc_superblock.pages_per_cluster * vmc_superblock.clusters_per_card;
 
                     // Check vmc inode block chain (write operation can cause damage)
-                    snprintf(vmc_path, sizeof(vmc_path), "%sVMC/%s.bin", hddPrefix, vmc_name[vmc_id]);
+                    snprintf(vmc_path, sizeof(vmc_path), "%sVMC/%s.bin", gHDDPrefix, vmc_name[vmc_id]);
                     if ((nparts = hddGetFileBlockInfo(vmc_path, parts, blocks, 11)) > 0) {
                         have_error = 0;
                         hdd_vmc_infos.active = 1;
@@ -380,7 +447,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 
     sbPrepare(NULL, configSet, size_irx, irx, &i);
 
-    if ((result = sbLoadCheats(hddPrefix, game->startup)) < 0) {
+    if ((result = sbLoadCheats(gHDDPrefix, game->startup)) < 0) {
         switch (result) {
             case -ENOENT:
                 guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
@@ -414,7 +481,7 @@ static config_set_t *hddGetConfig(int id)
     char path[256];
     hdl_game_info_t *game = &hddGames.games[id];
 
-    snprintf(path, sizeof(path), "%sCFG/%s.cfg", hddPrefix, game->startup);
+    snprintf(path, sizeof(path), "%sCFG/%s.cfg", gHDDPrefix, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
     configRead(config); //Does not matter if the config file exists or not.
 
@@ -431,7 +498,7 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
 {
     char path[256];
     if (isRelative)
-        snprintf(path, sizeof(path), "%s%s/%s_%s", hddPrefix, folder, value, suffix);
+        snprintf(path, sizeof(path), "%s%s/%s_%s", gHDDPrefix, folder, value, suffix);
     else
         snprintf(path, sizeof(path), "%s%s_%s", folder, value, suffix);
     return texDiscoverLoad(resultTex, path, -1, psm);
@@ -459,7 +526,7 @@ static void hddCleanUp(int exception)
 
 static int hddCheckVMC(char *name, int createSize)
 {
-    return sysCheckVMC(hddPrefix, "/", name, createSize, NULL);
+    return sysCheckVMC(gHDDPrefix, "/", name, createSize, NULL);
 }
 
 //This may be called, even if hddInit() was not.
@@ -500,7 +567,7 @@ static int hddLoadGameListCache(hdl_games_list_t *cache)
 
     hddFreeHDLGamelist(cache);
 
-    sprintf(filename, "%s/games.bin", hddPrefix);
+    sprintf(filename, "%sgames.bin", gHDDPrefix);
     file = fopen(filename, "rb");
     if (file != NULL) {
         fseek(file, 0, SEEK_END);
@@ -573,7 +640,7 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
         return 0;
     LOG("hddUpdateGameListCache: caching new game list.\n");
 
-    sprintf(filename, "%s/games.bin", hddPrefix);
+    sprintf(filename, "%sgames.bin", gHDDPrefix);
     if (game_list->count > 0) {
         file = fopen(filename, "wb");
         if (file != NULL) {
@@ -593,17 +660,17 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
 
 static void hddGetAppsPath(char *path, int max)
 {
-    snprintf(path, max, "%s/APPS", hddPrefix);
+    snprintf(path, max, "%sAPPS", gHDDPrefix);
 }
 
 static void hddGetLegacyAppsPath(char *path, int max)
 {
-    snprintf(path, max, "%sconf_apps.cfg", hddPrefix);
+    snprintf(path, max, "%sconf_apps.cfg", gHDDPrefix);
 }
 
 static void hddGetLegacyAppsInfo(char *path, int max, char *name)
 {
-    snprintf(path, max, "%sCFG/%s.cfg", hddPrefix, name);
+    snprintf(path, max, "%sCFG/%s.cfg", gHDDPrefix, name);
 }
 
 static item_list_t hddGameList = {

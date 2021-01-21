@@ -164,6 +164,7 @@ extern int gDefaultDevice;
 
 extern int gEnableWrite;
 
+extern char *gHDDPrefix;
 //These prefixes are relative to the device's name (meaning that they do not include the device name).
 extern char gBDMPrefix[32];
 extern char gETHPrefix[32];

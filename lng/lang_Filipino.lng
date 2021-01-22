@@ -1,14 +1,15 @@
 # Filipino translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
+# Fixed by Colton SIlva @ColtonSilvaonKnoxKontor
 # For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
 Filipino
 Open PS2 Loader %s
 I-save ang mga pagbabago
 Likod
 Network config
-Advanced options
+Advanced na opsyon
 <Walang values>
 Settings saved to %s
-Error sa pagsulat setting !
+Error sa pagsulat ng setting!
 Lumabas
 Settings
 Menu
@@ -16,48 +17,48 @@ USB Laro
 HDD Laro
 ETH Laro
 Apps
-tema
-wika
-The system will be powered off.
-Exit to Browser?
-Cancel updating?
-%d: HardDisk Drive not detected
-%d: HardDisk Drive not formatted
+Tema
+Wika
+I-popower off ang system?.
+Lumabas sa Browser?
+Kanselahin ang pag-update?
+%d: Hindi na-detect ang HardDisk Drive
+%d: Hindi naka-format ang HardDisk Drive
 %d: Network startup error
-%d: No network adaptor detected
+%d: Walang ma-detect na network adaptor
 %d: Hindi makakonekta sa SMB server
 %d: Hindi makapag-log in sa SMB server
 %d: Hindi mabuksan ang SMB ibahagi
 %d: Cannot list SMB shares
 %d: Cannot list games
-%d: DHCP server unavailable
-%d: No network connection
+%d: Hindi available ang DHCP server
+%d: Walang koneksyon sa network
 Sa
 Mula sa
 Ayos
-Select
-Cancel
+Piliin
+Kansel
 Circle
 Cross
-Games List
+Listahan
 Game settings
 Remove Settings
 Inalis ang lahat ng mga pindutan para sa mga laro
-i-scroll
+I-scroll
 Mabagal
-medium
-mabilis
-default na menu
+Medium
+Mabilis
+Default na menu
 Mag-load mula sa disc
 Mangyaring maghintay
 Nagkaroon ng error habang naglo-load ang ID ng Laro
 Awtomatikong pag-uuri
 Error sa paglo-load ng file wika
-Huwag paganahin ang mga Kulay Debug
+Huwag paganahin ang mga Kulay ng Debug
 Controller Walang natukoy na , naghihintay...
 Paganahin ang Cover Art
 Malapad na screen
-
+Power-off
 Nilo-load ang config
 Sine-save ang config
 Simulan ang aparato
@@ -66,19 +67,19 @@ USB aparato simula mode
 HDD aparato simula mode
 ETH aparato simula mode
 Mga application na simulan ang mode
-auto
-manwal
-Start HDL Server
+Awto
+Manwal
+I-sart ang HDL Server
 HDL Server Starting...
 HDL Server Running...
-Failed to start HDL Server.
+Bigong i- start ang HDL Server.
 HDL Server Unloading...
 Lumabas sa
 kulay ng background
 kulay ng teksto
 - PS2 -
 - SMB Server -
-IP address type
+uri ng IP address
 Static
 DHCP
 IP address
@@ -87,26 +88,26 @@ Mask
 Gateway
 DNS Server
 Port
-magbahagi
-gumagamit
+Magbahagi
+Gumagamit
 Password
-<Hindi set>
+<Hindi nai-set>
 Address type
 IP
 NetBIOS
-tanggapin
+Tanggapin
 Item ay permanenteng tatanggalin, magpatuloy?
 Rename
 Alisin
 Tumakbo
 Ipakita ang mga setting
-Enable write operations
+I-enable ang write operations
 Check USB game fragmentation
 Tandaan ang huling play ng laro
 Select button
-Error, the game is fragmented
+Error, fragmented ang laro
 Error, hindi maaaring tumakbo ang item
-Test Changes
+Subukan
 Iwanang walang laman para sa Guest auth .
 Accurate Reads
 Synchronous Mode
@@ -126,22 +127,22 @@ gumamit ng generic
 I-configure ang VMC
 Pangalan
 Laki
-katayuan
-pag-unlad
-VMC file umiiral
+Katayuan
+Pag-unlad
+Umiiral ang VMC file
 Di-wastong VMC file , laki ay hindi tama
 VMC file na kailangan upang malikha
 Error accessing VMC %s. Continue with the Memory Card in slot %d?
 Awtomatikong i-refresh
-tungkol sa
+Tungkol sa
 Coders
 Quality Assurance
-USB prefix landas
+USB prefix path
 Boots Custom ELF after an IGR
-Halaga sa (mga) minuto, 0 upang huwag paganahin iikot pababa
+Value sa (mga) minuto, 0 upang huwag paganahin
 Awtomatikong HDD paikutin pababa
 Video mode
-dialog ng kulay
+Dialog ng kulay
 Piniling kulay
 Reset Colors
 Impo
@@ -167,8 +168,8 @@ Mode 5
 Mode 6
 Mode 7
 Mode 8
-Configure GSM
-Ethernet bilis at duplex setting
+I-configure ang GSM
+Ethernet speed at duplex setting
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
@@ -187,42 +188,42 @@ Overscan Adjustment
 FMV Skip
 Skips Full Motion Videos
 Cheat Settings
-Enable PS2RD Cheat Engine
+I-enable ang PS2RD Cheat Engine
 Lets PS2RD Cheat Engine patch your games
 PS2RD Cheat Engine Mode
 Auto-select or Select game cheats
 Auto-select cheats
 Select game cheats
-Error: failed to load Cheat File
+Error: Bigong i-load Cheat File
 No cheats found
 Download defaults
 Network update
 Overwrite Existing Records
 Update failed.
-Failed to connect to update server.
+Bigong kumonekta sa update server.
 Update completed.
 Update cancelled.
-Download settings from the network?
+I-download ang settings mula sa network?
 Customized Settings
 Downloaded Defaults
 Auto start in %i s...
 Auto start
-Value in second(s), 0 to disable auto start
+Value sa segundo, 0 para i-disable auto start
 PS2 Logo
 Only displayed for a valid disc logo which matches the console's region
-Configure PADEMU
+I-configure ang PADEMU
 Pad Emulator Settings
-Enable PadEmulator
+I-enable ang PadEmulator
 Turns on/off PadEmulator for selected game.
-Pad Emulator mode
+mode ng Pad Emulator
 Select Pad Emulator mode.
 DualShock3/4 USB
 DualShock3/4 BT
-Settings for port:
+Settings para sa port:
 Select Pad Emulator port for settings.
-Enable emulation
+I-enable emulation
 Turns on/off Pad Emulator for selected port.
-Enable vibration
+I-enable vibration
 Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
@@ -230,16 +231,16 @@ Pair
 Pair DS Controller
 Pair DS Controller with bluetooth adapter mac address.
 Not connected
-Bluetooth adapter information
-Shows more information and supported features
+Impormasyon ng Bluetooth adapter
+Ipakita ang impormation at supported features
 HCI Version:
 LMP Version:
 Manufacturer ID:
 Support features:
 Yes
 No
-Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
-Bluetooth adapter may not work correctly with DS3/DS4 controllers.
+Ang Bluetooth adapter ay daapat suportado ng DS3/DS4 controllers.
+Ang Bluetooth adapter ay maaring hindi gumana sa DS3/DS4 controllers.
 Enable Multitap emulation
 Turns on/off Multitap emulation for selected game.
 Multitap emulator on port
@@ -258,26 +259,26 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+I-enable Sound Effects
+I-enable Boot Sound
 Sound Effects Volume
 Boot Sound Volume
-Confirm video mode change?
+Kumpirmahin "video mode change"?
 Cache Game List (HDD)
 Enable Notifications
 %s loaded from %s
 Game Menu
-Game settings saved.
-%s settings removed.
+Nai-save "Game settings".
+%s settings ay nai-alis.
 Overwrites existing game compatibility settings when enabled.
 Settings Mode
 Global
 Per Game
-All
-Select settings to remove.
+Lahat
+Piliin ang settings para alisin.
 Support Forums:
-Title
+Pamagat
 Genre
-Release
-Developer
-Description
+Nai-eelease
+Debeloper
+Deskripsyon

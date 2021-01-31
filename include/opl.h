@@ -164,7 +164,6 @@ extern int gDefaultDevice;
 
 extern int gEnableWrite;
 
-extern int gCheckUSBFragmentation;
 //These prefixes are relative to the device's name (meaning that they do not include the device name).
 extern char gUSBPrefix[32];
 extern char gETHPrefix[32];

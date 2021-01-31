@@ -79,7 +79,6 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_DEFAULT_DEVICE "default_device"
 #define CONFIG_OPL_ENABLE_WRITE "enable_delete_rename"
 #define CONFIG_OPL_HDD_SPINDOWN "hdd_spindown"
-#define CONFIG_OPL_USB_CHECK_FRAG "check_usb_frag"
 #define CONFIG_OPL_USB_PREFIX "usb_prefix"
 #define CONFIG_OPL_ETH_PREFIX "eth_prefix"
 #define CONFIG_OPL_REMEMBER_LAST "remember_last"

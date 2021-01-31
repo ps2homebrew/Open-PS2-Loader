@@ -179,11 +179,6 @@ struct UIItem diaConfig[] = {
     {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CHECKUSBFRAG}}},
-    {UI_SPACER},
-    {UI_BOOL, CFG_CHECKUSBFRAG, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
-
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USB_PREFIX}}},
     {UI_SPACER},
     {UI_STRING, CFG_USBPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},

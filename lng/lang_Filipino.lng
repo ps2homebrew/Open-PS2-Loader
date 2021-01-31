@@ -19,7 +19,7 @@ ETH Laro
 Apps
 Tema
 Wika
-I-popower off ang system?.
+Ipa-power off ang system?.
 Lumabas sa Browser?
 Kanselahin ang pag-update?
 %d: Hindi na-detect ang HardDisk Drive
@@ -29,8 +29,8 @@ Kanselahin ang pag-update?
 %d: Hindi makakonekta sa SMB server
 %d: Hindi makapag-log in sa SMB server
 %d: Hindi mabuksan ang SMB ibahagi
-%d: Cannot list SMB shares
-%d: Cannot list games
+%d: Hindi mailista ang SMB Shares
+%d: Hindi mailista ang mga laro
 %d: Hindi available ang DHCP server
 %d: Walang koneksyon sa network
 Sa
@@ -41,8 +41,8 @@ Kansel
 Circle
 Cross
 Listahan
-Game settings
-Remove Settings
+Settings ng laro
+Alisin ang Settings
 Inalis ang lahat ng mga pindutan para sa mga laro
 I-scroll
 Mabagal
@@ -53,7 +53,7 @@ Mag-load mula sa disc
 Mangyaring maghintay
 Nagkaroon ng error habang naglo-load ang ID ng Laro
 Awtomatikong pag-uuri
-Error sa paglo-load ng file wika
+Error sa paglo-load ng file na wika
 Huwag paganahin ang mga Kulay ng Debug
 Controller Walang natukoy na , naghihintay...
 Paganahin ang Cover Art
@@ -82,8 +82,8 @@ kulay ng teksto
 uri ng IP address
 Static
 DHCP
-IP address
-Address
+Adres ng IP
+Adres
 Mask
 Gateway
 DNS Server
@@ -102,7 +102,7 @@ Alisin
 Tumakbo
 Ipakita ang mga setting
 I-enable ang write operations
-Check USB game fragmentation
+I-check ang USB game fragmentation
 Tandaan ang huling play ng laro
 Select button
 Error, fragmented ang laro
@@ -110,16 +110,16 @@ Error, hindi maaaring tumakbo ang item
 Subukan
 Iwanang walang laman para sa Guest auth .
 Accurate Reads
-Synchronous Mode
-alisin sa pagkakakawit Syscalls
+Synchronous na Mode
+Alisin sa pagkakakawit ng Syscalls
 0 PSS mode
-Emulate DVD-DL
-Disable IGR
+I-emulate ang DVD-DL
+I-disable ang IGR
 Unused
 Unused
 Ang pagbabago ng laki ay i-reformat ang VMC
 Lumikha
-Start
+Magsimula
 Baguhin
 May pagpapalaglag
 I-reset ang
@@ -132,16 +132,16 @@ Pag-unlad
 Umiiral ang VMC file
 Di-wastong VMC file , laki ay hindi tama
 VMC file na kailangan upang malikha
-Error accessing VMC %s. Continue with the Memory Card in slot %d?
+Bigong ma-access ang VMC %s. Magpatuloy gamit ang memory card ng PS2 sa slot %d?
 Awtomatikong i-refresh
 Tungkol sa
-Coders
+Mga coders
 Quality Assurance
 USB prefix path
-Boots Custom ELF after an IGR
+Ibo-boot ang Custom ELF pagtapos ng IGR
 Value sa (mga) minuto, 0 upang huwag paganahin
-Awtomatikong HDD paikutin pababa
-Video mode
+Awtomatikong pababagalin ang HDD
+Mode ng bidyo
 Dialog ng kulay
 Piniling kulay
 Reset Colors
@@ -175,10 +175,10 @@ Ethernet speed at duplex setting
 10Mbit full-duplex
 10Mbit half-duplex
 GSM Settings
-paganahin GSM
+paganahin ang GSM
 Toggles GSM ON or OFF
 VMODE
-Forced Custom Display Mode
+Pwersahin ang Custom Display Mode
 H-POS
 Horizontal Adjustment
 V-POS
@@ -186,91 +186,91 @@ Vertical Adjustment
 Overscan
 Overscan Adjustment
 FMV Skip
-Skips Full Motion Videos
-Cheat Settings
+I-skip ang Full Motion Videos
+Settings ng cheat
 I-enable ang PS2RD Cheat Engine
-Lets PS2RD Cheat Engine patch your games
+Ipa-patch ng PS2RD Cheat Engine ang iyong games
 PS2RD Cheat Engine Mode
-Auto-select or Select game cheats
-Auto-select cheats
-Select game cheats
-Error: Bigong i-load Cheat File
-No cheats found
+Awto. pagpili or pagpili ng game cheats
+Awto. pagpili ng cheats
+Pagpili ng game cheats
+Error: Bigong i-load ang Cheat File
+Walang makitang Cheat
 Download defaults
-Network update
+I-update ang network
 Overwrite Existing Records
-Update failed.
+Bigong mag-update.
 Bigong kumonekta sa update server.
-Update completed.
-Update cancelled.
+Kumpletong na-update.
+Nakansela ang pag-update.
 I-download ang settings mula sa network?
 Customized Settings
 Downloaded Defaults
-Auto start in %i s...
+Mag aawto-start ng %i s...
 Auto start
 Value sa segundo, 0 para i-disable auto start
 PS2 Logo
-Only displayed for a valid disc logo which matches the console's region
+Ididisplay ang valid disc logo kung tugma ito sa region na bersyon ng laro
 I-configure ang PADEMU
 Pad Emulator Settings
 I-enable ang PadEmulator
-Turns on/off PadEmulator for selected game.
-mode ng Pad Emulator
-Select Pad Emulator mode.
+Turns on/off PadEmulator para sa piling laro.
+Mode ng Pad Emulator
+Pumili ng Pad Emulator mode.
 DualShock3/4 USB
 DualShock3/4 BT
 Settings para sa port:
-Select Pad Emulator port for settings.
-I-enable emulation
-Turns on/off Pad Emulator for selected port.
-I-enable vibration
-Turns on/off vibration for Pad Emulator selected port.
+Pumili ng Pad Emulator port para sa settings.
+I-enable ang emulation
+Turns on/off Pad Emulator para sa piling port.
+I-enable ang vibration
+Turns on/off vibration ng Pad Emulator para sa piling port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
-Pair
-Pair DS Controller
-Pair DS Controller with bluetooth adapter mac address.
-Not connected
+I-pair
+I-pair ang DS Controller
+I-pair ang DS Controller gamit ang bluetooth adapter mac address.
+Walang koneksyon
 Impormasyon ng Bluetooth adapter
 Ipakita ang impormation at supported features
-HCI Version:
-LMP Version:
+Bersyon ng HCI:
+Bersyon ng LMP:
 Manufacturer ID:
-Support features:
-Yes
-No
+Suportadong mga features:
+Opo
+Hindi
 Ang Bluetooth adapter ay daapat suportado ng DS3/DS4 controllers.
 Ang Bluetooth adapter ay maaring hindi gumana sa DS3/DS4 controllers.
-Enable Multitap emulation
-Turns on/off Multitap emulation for selected game.
+I-enable ang Multitap emulation
+Turns on/off Multitap emulation para sa piling game.
 Multitap emulator on port
-Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
+Pumili ng port para sa Multitap emulation.
+I-disable ang workaround para sa pekeng ds3
+Ang ilang fake ds3s ay nangangailangan ng workaround, Maididisable ito ng opsyon na ito.
+I-emulate ang FIELD flipping
+Aayusin ang laro na may isyu ng glitch sa progressive video modes.
+Settings ng Parental Lock
 Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
+Hayaang nakablangko para ma-disable ang parental lock.
+I-enter ang Parental Lock Password
+Ang Parental lock password ay mali.
 Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-I-enable Sound Effects
-I-enable Boot Sound
+Opsyon ng build:
+Error - Hindi maaring gamitin ang password na ito.
+VMC %s na file ay fragmented. Magpatuloy gamit ang Memory Card sa slot %d?
+Settings ng Audio
+I-enable ang Sound Effects
+I-enable ang Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Kumpirmahin "video mode change"?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Nai-save "Game settings".
+I-enable ang Notifications
+%s Naiload mula sa %s
+Menu ng game
+Nai-save ang "Game settings".
 %s settings ay nai-alis.
-Overwrites existing game compatibility settings when enabled.
+Io-overwrite ang nakairal na game compatibility settings kapag naka-enable.
 Settings Mode
 Global
 Per Game

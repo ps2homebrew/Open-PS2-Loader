@@ -298,7 +298,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "An error occurred while renaming the file.",
     "An error occurred while deleting the file.",
     "Never buy OPEN-PS2-LOADER (OPL), instead get it free at:",
-    "ifcaro OPL version at psx-scene.com",
+    "ifcaro OPL version at psx-place.com",
     "OPL Daily Builds (DB) version at ps2-home.com",
     //END of OPL_DB tweaks
 };

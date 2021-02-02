@@ -185,7 +185,6 @@ int gDisableDebug;
 int gPS2Logo;
 int gDefaultDevice;
 int gEnableWrite;
-int gCheckUSBFragmentation;
 char gUSBPrefix[32];
 char gETHPrefix[32];
 int gRememberLastPlayed;
@@ -873,7 +872,6 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, &gDefaultDevice);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, &gEnableWrite);
             configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
-            configGetInt(configOPL, CONFIG_OPL_USB_CHECK_FRAG, &gCheckUSBFragmentation);
             configGetStrCopy(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix, sizeof(gUSBPrefix));
             configGetStrCopy(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix, sizeof(gETHPrefix));
             configGetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, &gRememberLastPlayed);
@@ -1026,7 +1024,6 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, gDefaultDevice);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, gEnableWrite);
         configSetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, gHDDSpindown);
-        configSetInt(configOPL, CONFIG_OPL_USB_CHECK_FRAG, gCheckUSBFragmentation);
         configSetStr(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix);
         configSetStr(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix);
         configSetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, gRememberLastPlayed);
@@ -1617,7 +1614,6 @@ static void setDefaults(void)
     gRememberLastPlayed = 0;
     gAutoStartLastPlayed = 9;
     gSelectButton = KEY_CIRCLE; //Default to Japan.
-    gCheckUSBFragmentation = 1;
     gUSBPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gEnableNotifications = 0;

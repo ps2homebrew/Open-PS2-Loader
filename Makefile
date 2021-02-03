@@ -1,7 +1,7 @@
-VERSION = 1
+VERSION = 0
 SUBVERSION = 1
 PATCHLEVEL = 0
-EXTRAVERSION = Beta
+EXTRAVERSION = alpha
 
 # How to DEBUG?
 # Simply type "make <debug mode>" to build OPL with the necessary debugging functionality.
@@ -100,8 +100,8 @@ EECORE_OBJS = ee_core.o ioprp.o util.o \
 
 EE_BIN = opl.elf
 EE_BIN_STRIPPED = opl_stripped.elf
-EE_BIN_PACKED = OPNPS2LD.ELF
-EE_VPKD = OPNPS2LD-$(OPL_VERSION)
+EE_BIN_PACKED = EX4OPL.ELF
+EE_VPKD = EX4OPL-$(OPL_VERSION)
 EE_SRC_DIR = src/
 EE_OBJS_DIR = obj/
 EE_ASM_DIR = asm/

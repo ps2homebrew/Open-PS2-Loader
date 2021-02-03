@@ -83,7 +83,7 @@ jobs:
       with:
         name: OPNPS2LD-VARIANTS
         path: |
-          OPNPS2LD*.ELF
+          EX4OPL*.ELF
 
   release:
     needs: [build, build-variants]
@@ -102,12 +102,12 @@ jobs:
     - name: Download release artifact
       uses: actions/download-artifact@v1
       with:
-        name: OPNPS2LD
+        name: EX4OPL
 
     - name: Download variants artifact
       uses: actions/download-artifact@v1
       with:
-        name: OPNPS2LD-VARIANTS
+        name: EX4OPL-VARIANTS
 
     - name: Download info artifact
       uses: actions/download-artifact@v1
@@ -130,8 +130,8 @@ jobs:
         automatic_release_tag: "latest"
         title: "${{ steps.version.outputs.version }}"
         files: |
-          OPNPS2LD-${{ steps.version.outputs.version }}.7z
-          OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
+          EX4OPL-${{ steps.version.outputs.version }}.7z
+          EX4OPL-VARIANTS-${{ steps.version.outputs.version }}.7z
 
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/v')
@@ -141,5 +141,5 @@ jobs:
         prerelease: "${{ contains(github.ref, '-rc') }}"
         title: "${{ steps.version.outputs.version }}"
         files: |
-          OPNPS2LD-${{ steps.version.outputs.version }}.7z
-          OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
+          EX4OPL-${{ steps.version.outputs.version }}.7z
+          EXO4OPL-VARIANTS-${{ steps.version.outputs.version }}.7z

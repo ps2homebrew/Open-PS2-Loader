@@ -22,7 +22,7 @@ EXTRAVERSION = dev
 # You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
 
 #Enables/disables Right-To-Left (RTL) language support
-RTL ?= 0
+RTL ?= 1
 
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
 IGS ?= 1
@@ -34,7 +34,7 @@ PADEMU ?= 1
 DTL_T10000 ?= 0
 
 #Nor stripping neither compressing binary ELF after compiling.
-NOT_PACKED ?= 0
+NOT_PACKED ?= 1
 
 # ======== END OF CONFIGURABLE SECTION. DO NOT MODIFY VARIABLES AFTER THIS POINT!! ========
 DEBUG ?= 0

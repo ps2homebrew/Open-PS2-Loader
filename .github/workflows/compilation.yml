@@ -81,7 +81,7 @@ jobs:
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
-        name: OPNPS2LD-VARIANTS
+        name: EX4OPL-VARIANTS
         path: |
           EX4OPL*.ELF
 
@@ -116,10 +116,10 @@ jobs:
 
     - name: Prepare artifacts for release
       run: |
-        cp INFO/* OPNPS2LD/
-        cp INFO/* OPNPS2LD-VARIANTS/
-        7z a -t7z OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD/*
-        7z a -t7z OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS/*
+        cp INFO/* EX4OPL/
+        cp INFO/* EX4OPL-VARIANTS/
+        7z a -t7z EX4OPL-${{ steps.version.outputs.version }}.7z EX4OPL/*
+        7z a -t7z EX4OPL-${{ steps.version.outputs.version }}.7z EX4OPL-VARIANTS/*
 
     - name: Create prerelease
       if: github.ref == 'refs/heads/master'

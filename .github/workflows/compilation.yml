@@ -14,16 +14,13 @@ jobs:
     - name: Install dependencies
       run: |
         apk add build-base git zip gawk
-
     - name: git checkout
       uses: actions/checkout@v2
     - run: |
         git fetch --prune --unshallow
-
     - name: Compile -> make clean release
       run: |
         make --trace clean release
-
     - name: Create detailed changelog
       run: sh ./make_changelog.sh
 
@@ -34,7 +31,6 @@ jobs:
         name: OPNPS2LD
         path: |
           OPNPS2LD-*.ELF
-
     - name: Upload release artifact info
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
@@ -45,7 +41,6 @@ jobs:
           CREDITS
           LICENSE
           README.md
-
   build-variants:
     runs-on: ubuntu-latest
     container: ps2dev/ps2dev:latest
@@ -59,12 +54,10 @@ jobs:
     - name: Install dependencies
       run: |
         apk add build-base git
-
     - name: git checkout
       uses: actions/checkout@v2
     - run: |
         git fetch --prune --unshallow
-
     - name: Get version
       id: version
       run: echo "::set-output name=version::$(make oplversion)"
@@ -73,7 +66,6 @@ jobs:
       run: |
         make --trace ${{ matrix.t10k }} ${{ matrix.igs }} ${{ matrix.pademu }} ${{ matrix.rtl }} NOT_PACKED=1
         mv opl.elf OPNPS2LD-${{ steps.version.outputs.version }}-${{ matrix.t10k }}-${{ matrix.igs }}-${{ matrix.pademu }}-${{ matrix.rtl }}.ELF
-
     - name: Create detailed changelog
       run: sh ./make_changelog.sh
 
@@ -84,7 +76,6 @@ jobs:
         name: OPNPS2LD-VARIANTS
         path: |
           OPNPS2LD*.ELF
-
   release:
     needs: [build, build-variants]
     runs-on: ubuntu-latest
@@ -94,7 +85,6 @@ jobs:
       uses: actions/checkout@v2
     - run: |
         git fetch --prune --unshallow
-
     - name: Get version
       id: version
       run: echo "::set-output name=version::$(make oplversion)"
@@ -120,7 +110,6 @@ jobs:
         cp INFO/* OPNPS2LD-VARIANTS/
         7z a -t7z OPNPS2LD-${{ steps.version.outputs.version }}.7z OPNPS2LD/*
         7z a -t7z OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z OPNPS2LD-VARIANTS/*
-
     - name: Create prerelease
       if: github.ref == 'refs/heads/master'
       uses: marvinpinto/action-automatic-releases@latest
@@ -132,7 +121,6 @@ jobs:
         files: |
           OPNPS2LD-${{ steps.version.outputs.version }}.7z
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
-
     - name: Create release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: marvinpinto/action-automatic-releases@latest

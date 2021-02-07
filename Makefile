@@ -22,16 +22,16 @@ EXTRAVERSION = dev
 # You can also specify variables when executing make: "make RTL=1 IGS=1 PADEMU=1"
 
 #Enables/disables Right-To-Left (RTL) language support
-RTL ?= 0
+RTL ?= 1
 
 #Enables/disables In Game Screenshot (IGS). NB: It depends on GSM and IGR to work
-IGS ?= 0
+IGS ?= 1
 
 #Enables/disables pad emulator
-PADEMU ?= 0
+PADEMU ?= 1
 
 #Enables/disables building of an edition of OPL that will support the DTL-T10000 (SDK v2.3+)
-DTL_T10000 ?= 0
+DTL_T10000 ?= 1
 
 #Nor stripping neither compressing binary ELF after compiling.
 NOT_PACKED ?= 1

@@ -1,0 +1,22 @@
+name: CI-format-check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
+    steps:
+    - name: Install dependencies
+      run: |
+        apk add git make clang
+
+    - uses: actions/checkout@v2
+    - run: |
+        git fetch --prune --unshallow
+
+    - name: Check format -> make format-check
+      run: |
+        make format-check

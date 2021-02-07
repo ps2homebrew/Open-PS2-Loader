@@ -12,7 +12,7 @@
 #define APP_CONFIG_TITLE "title"
 #define APP_CONFIG_BOOT "boot"
 
-#define APP_TITLE_CONFIG_FILE "title.cfg"
+#define APP_TITLE_CONFIG_FILE "title.conf"
 
 typedef struct
 {

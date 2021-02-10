@@ -4,13 +4,13 @@ Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
 Voltar
-Configurações de rede
+Configurações de Rede
 Opções avançadas
 <sem valores>
 Configurações salvas em %s
 Erro ao salvar as configurações!
 Sair
-Configurações
+Configurações Gerais
 Menu
 Jogos no USB
 Jogos no HDD
@@ -40,7 +40,7 @@ Cancelar
 O
 X
 Lista de Jogos
-Configurar
+Configurar Modo
 Remover configurações
 Todas as configurações dos jogos foram removidas
 Rolagem
@@ -99,9 +99,8 @@ O item será apagado permanentemente, continuar?
 Renomear
 Apagar
 Iniciar
-Configurações de tela
+Configurações de Tela
 Ativar opções de escritas
-Verificar fragmentação no USB
 Lembrar do último jogo jogado
 Botão de seleção
 Erro, o jogo está fragmentado
@@ -123,7 +122,7 @@ Modificar
 Abortar
 Reiniciar
 Usa o genérico
-Configure o VMC
+Configurar VMC
 Nome
 Tamanho
 Estatísticas
@@ -186,7 +185,7 @@ Overscan
 Ajustes do Overscan.
 Pular FMV
 Pula os vídeos do jogo.
-Opções de trapaças
+Configurar Cheat
 Ativar o PS2RD Cheat Engine
 Deixar o PS2RD patchear seus jogos
 Modo do PS2RD Cheat Engine
@@ -248,7 +247,7 @@ Desativar soluções alternativa para DS3 falsos
 Alguns DS3 falsos precisam de soluções alternativas, esta opção irá desativá-la.
 Emular inversão de campo
 Correção para alguns jogos que apresentam falhas nos modos de vídeos progressivos.
-Configurações de bloqueio parental
+Configurações de Bloqueio Parental
 Senha do bloqueio parental
 Deixe em branco para desativar o bloqueio parental.
 Insira a senha do bloqueio parental

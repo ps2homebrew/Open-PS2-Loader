@@ -1,5 +1,5 @@
-# Bulgarian translation by wisi - @http://psx-scene.com/forums/members/wisi/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# Bulgarian translation by wisi - @http://psx-scene.com/forums/members/wisi/ @https://www.psx-place.com/members/wisi.40263/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Bulgarian
 Open PS2 Loader %s
 Запазване на промените
@@ -101,7 +101,6 @@ NetBIOS
 Старт
 Визуални настройки
 Изтриване и Преименуване
-Проверка фрагментацията при USB
 Запомняне на последната игра
 Бутон за избор
 Грешка - играта е фрагментирана!
@@ -266,7 +265,7 @@ VMC %s файлът е фрагментиран. Продължаване с Mem
 Кеширане списъка с игри (ЗУТМД - HDD)
 Видими на Известия
 %s зареден от %s
-Меню Игри
+Опции
 Настройките на игри запазени.
 %s настройки премахнати.
 Презаписва съществуващите настройки на съвместимаст.

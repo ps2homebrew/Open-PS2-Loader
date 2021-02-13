@@ -1,5 +1,5 @@
-# Danish translation by BongKris
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# Danish translation by BongKris, updated by Mufhin
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Danish
 Open PS2 Loader %s
 Gem indstillinger
@@ -7,7 +7,7 @@ Tilbage
 Netværksindstillinger
 Avancerede indstillinger
 <ingen værdi>
-Settings saved to %s
+Indstillinger gemt til %s
 Fejl ved lagering af indstillinger!
 Afslut
 Indstillinger
@@ -39,10 +39,10 @@ Vælg
 Annuller
 Cirkel
 Kryds
-Spil liste
-Spil indst.
-Remove Settings
-Spil indstillinger nulstillet
+Spilliste
+Spilindst.
+Fjern indstillinger
+Spilindstillinger nulstillet
 Scrolling
 Langsom
 Medium
@@ -50,13 +50,13 @@ Hurtig
 Standardmenu
 Indlæs fra disk
 Vent venligst
-Fejl ved indlæsning af spil ID
+Fejl ved indlæsning af spil-ID
 Automatisk sortering
 Fejl ved indlæsning af sprogfil
 Deaktivér fejlfindingsfarver
 Ingen controller registreret, venter...
 Aktivér Cover Art
-Bredskærmsformat
+Widescreen-format
 Sluk
 Indlæser indstillinger
 Gemmer indstillinger
@@ -65,7 +65,7 @@ Genindlæs
 USB-enhed starttilstand
 HDD-enhed starttilstand
 ETH-enhed starttilstand
-Programmenu visningstilstand
+Programmenu starttilstand
 Automatisk
 Manuel
 Start HDL-server
@@ -100,20 +100,19 @@ Omdøb
 Slet
 Kør
 Skærmindstillinger
-Aktivér skrive operationer
-Kontrollér USB-spil fragmentering
+Aktivér skriveoperationer
 Husk sidst spillede spil
-Vælgeknap
+Select-knap
 Fejl: spillet er fragmenteret
 Fejl: kunne ikke køre elementet
-Test Changes
-Efterlad tom for gæste konto
+Test ændringer
+Efterlad tom for gæstekonto
 Korrekt læsning
 Synkroniseringstilstand
 Frigiv syscalls
 Skip videoer
-Emulere DVD-DL
-Deaktivere IGR
+Emuler DVD-DL
+Deaktiver IGR
 Unused
 Unused
 Ændring af størrelsen vil omformatere VMC
@@ -139,24 +138,24 @@ Kvalitetstestere
 USB-præfiks sti
 Starter brugerdefineret ELF efter en IGR
 Værdi i minuttet(r), 0 for at deaktivere spindown
-Automatisk harddisk spindown
+Automatisk harddisk-spindown
 Videotilstand
 Dialogfarve
 Markeringsfarve
-Reset Colors
+Gendan farver
 Info
-Brugerdefinerede ELF
+Brugerdefineret ELF
 Farvevalg
 Genopret forbindelse
 Efterlad tom for at liste mapper
-ETH-præfiks sti
+ETH-præfikssti
 Tilbage
 Mellemrum
 Indtast
 Tilstand
 VMC-port 1
 VMC-port 2
-Spil ID
+Spil-ID
 DMA-tilstand
 V-Sync
 Mode 1
@@ -168,38 +167,38 @@ Mode 6
 Mode 7
 Mode 8
 Konfigurér GSM
-Ethernet hastighed og duplex
+Ethernet-hastighed og duplex
 100Mbit full-duplex
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
 GSM-indstillinger
 Aktivér GSM
-Slå GSM Til eller Fra
+Slå GSM til eller fra
 Videotilstand
-Tvungen brugerdefinerede skærmtilstand
+Tvungen brugerdefineret skærmtilstand
 Horisontal position
 Horisontal justering
 Vertikal position
 Vertikal justering
 Overscan
-Overscan Justering
+Overscan-justering
 Vis ikke FMV
-Springer over Full Motion Videos
+Springer over Full Motion-videoer
 Snydeindstillinger
 Aktivér PS2RD Cheat Engine
 Tillad PS2RD Cheat Engine at patche dine spil
-PS2RD Cheat Engine tilstand
-Auto-vælg eller Vælg spil snydekoder
-Auto-vælg spil snydekoder
-Vælg spil snydekoder
-Fejl: kunne ikke indlæses fil med snydekoder
+PS2RD Cheat Engine-tilstand
+Auto-vælg eller Vælg spilsnydekoder
+Auto-vælg spilsnydekoder
+Vælg spilsnydekoder
+Fejl: Kunne ikke indlæses fil med snydekoder
 Ingen snydekoder fundet
 Hent standardindstillinger
 Netværksopdatering
-Overwrite Existing Records
+Overskriv eksisterende data
 Opdatering mislykkedes.
-Kan ikke oprette forbindes til server.
+Kan ikke oprette forbindelse til server.
 Opdatering fuldendt.
 Opdatering annulleret.
 Hent indstillinger fra netværket?
@@ -207,23 +206,23 @@ Brugerdefinerede indstillinger
 Hent standardindstillinger
 Auto-start om %i s...
 Auto-start
-Værdi i sekunder(s), 0 for at deaktivere auto start
-PS2-Logo
-Vises kun med et gyldigt disk logo, som matcher konsollens region
+Værdi i sekunder(s), 0 for at deaktivere auto-start
+PS2-logo
+Vises kun med et gyldigt disklogo, som matcher konsollens region
 Konfigurér PADEMU
-Pad Emulator indstillinger
-Aktivér Pad Emulator
+Pad Emulator-indstillinger
+Aktivér PadEmulator
 Slå Pad Emulator Til/Fra for valgte spil.
-Pad Emulator tilstand
-Vælg Pad Emulator tilstand.
+Pad Emulator-tilstand
+Vælg Pad Emulator-tilstand.
 DualShock3/4 USB
 DualShock3/4 BT
 indstillinger for port:
-Vælg Pad Emulator port for indstillinger.
+Vælg Pad Emulator-port for indstillinger.
 Aktivér emulering
 Slå Pad Emulator Til/Fra for valgte port.
 Aktivér vibration
-Slå vibration Til/Fra for valgte Pad Emulator port.
+Slå vibration Til/Fra for valgte Pad Emulator-port.
 USB-bluetooth adapter MAC-adresse:
 DS controller parret med MAC-adresse:
 Parring
@@ -245,39 +244,39 @@ Slå Multitap-emulering Til/Fra for valgte spil.
 Multitap Emulator på port
 Vælg port til Multitap-emulering.
 Deaktiver løsning for falsk DS3
-Nogle falske DS3'er har brug for en løsning, dette deaktivere den.
-Emulate FIELD flipping
-Fix for games that glitch under progressive video modes.
-Parental Lock Settings
-Parental Lock Password
-Leave blank to disable the parental lock.
-Enter Parental Lock Password
-Parental lock password incorrect.
-Parental lock disabled.
-Build Options:
-Error - this password cannot be used.
-VMC %s file is fragmented. Continue with Memory Card in slot %d?
-Audio Settings
-Enable Sound Effects
-Enable Boot Sound
-Sound Effects Volume
-Boot Sound Volume
-Confirm video mode change?
-Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
-Game settings saved.
-%s settings removed.
-Overwrites existing game compatibility settings when enabled.
-Settings Mode
-Global
-Per Game
-All
-Select settings to remove.
-Support Forums:
-Title
+Nogle falske DS3'er har brug for en workaround-løsning, dette deaktiverer den.
+Emuler FIELD flipping
+Fikser spil der har fejl ved progressive video-tilstand.
+Forældrelås-indstillinger
+Forældrelås-adgangskode
+Efterlad blankt for at deaktivere forældrelås.
+Indtast forældrelås-adgangskode
+Forældrelås-adgangskode ikke korrekt.
+Forældrelås-adgangskode deaktiveret.
+Build-muligheder:
+Fejl - adgangskoden kan ikke anvendes.
+VMC %s fil er fragmenteret. Fortsæt med Memory Card i indgang %d?
+Lydindstillinger
+Aktiver lydeffekter
+Aktiver opstartslyd
+Lydeffekter-volumen
+Opstartslyd-volumen
+Bekræft skift af videotilstand?
+Cache spillisten (HDD)
+Aktiver notifikationer
+%s indlæst fra  %s
+Indstillinger
+Spilindstillinger gemt.
+%s indstillinger fjernet.
+Overskriv eksisterende indstillinger for spilkompatibilitet når aktiveret.
+Indstillingstilstand
+Globalt
+Per spil
+Alle
+Vælg indstiller der skal fjernes.
+Supportfora:
+Titel
 Genre
-Release
-Developer
-Description
+Udgivelse
+Udvikler
+Beskrivelse

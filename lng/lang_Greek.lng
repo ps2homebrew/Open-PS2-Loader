@@ -1,5 +1,5 @@
 # Greek Translation by RivalK93 (Discord:RivalK93#1970). Last update: Jan. 26, 2020.
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Greek
 Open PS2 Loader %s
 Αποθήκευση Αλλαγών
@@ -101,7 +101,6 @@ NetBIOS
 Εκκίνηση
 Ρυθμίσεις Οθόνης
 Λειτουργίες Εγγραφής
-Έλεγχος Κατακερματισμού USB
 Απομνημόνευση Τελευταίου Παιχνιδιού
 Πλήκτρο Επιλογής
 Σφάλμα, το παιχνίδι είναι κατακερματισμένο.
@@ -266,7 +265,7 @@ ID κατασκευαστή:
 Caching Λίστας Παιχνιδιών (HDD)
 Ενεργοποίηση Ειδοποιήσεων
 Το %s φορτώθηκε από %s
-Μενού Παιχνιδιού
+Options
 Οι ρυθμίσεις παιχνιδιού αποθηκεύτηκαν.
 Οι ρυθμίσεις %s καταργήθηκαν.
 Αν είναι ενεργό, αντικαθιστά τις υπάρχουσες ρυθμίσεις συμβατότητας παιχνιδιού.

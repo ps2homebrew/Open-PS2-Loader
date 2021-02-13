@@ -1,5 +1,5 @@
 # French translation by ShaolinAssassin completed by Algol & chronoss.
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 French
 Open PS2 Loader %s
 Sauvegarder
@@ -101,7 +101,6 @@ Suppr.
 Lancer
 Configuration de l'affichage
 Opérations d'écriture
-Vérifier fragmentation (USB)
 Dernier jeu joué
 Touche de validation
 "Erreur, le jeu est fragmenté"
@@ -266,7 +265,7 @@ Confirmer le changement de mode vidéo?
 Masquer la liste des jeux (HDD)
 Activer les notifications
 %s chargé par %s
-Menu Jeu
+Options
 Paramètres sauvegardés.
 %s paramètres supprimés.
 Remplace les paramètres de compatibilité des jeux existants lorsqu'ils sont activés.

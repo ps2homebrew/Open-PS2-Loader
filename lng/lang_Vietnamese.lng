@@ -1,5 +1,5 @@
 # Vietnamese translation by zidane89
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Vietnamese
 OPL %s
 Lưu thay đổi
@@ -101,7 +101,6 @@ Xóa
 Chạy
 Cài đặt hiển thị
 Kích hoạt thao tác ghi
-Kiểm tra phân mảnh trò chơi trên USB 
 Nhớ các cài đặt cuối cùng
 Chọn nút
 Lỗi, trò chơi bị phân mảnh
@@ -266,7 +265,7 @@ Thay đổi chế độ video?
 Cache danh sách trò chơi (HDD)
 Enable Notifications
 %s loaded from %s
-Game Menu
+Options
 Game settings saved.
 %s settings removed.
 Overwrites existing game compatibility settings when enabled.

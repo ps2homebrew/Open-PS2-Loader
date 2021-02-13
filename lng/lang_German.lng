@@ -1,5 +1,5 @@
 # German translation by ps2guy completed by velocet, LopoTRI & TnA
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 German
 Open PS2 Loader %s
 Änderungen Speichern
@@ -101,7 +101,6 @@ Löschen
 Start
 Anzeige
 Schreib Operationen
-USB Fragmentierung Prüfen
 Letztes Spiel Merken
 Ausw. Button
 Fehler: Spiel Fragmentiert!
@@ -266,7 +265,7 @@ Video Mode Änderungen Bestätigen?
 Spiele Liste Cache (HDD)
 Benachrichtigungen
 %s von %s Geladen
-Spiel Menü
+Optionen
 Spiel Einstellungen Gespeichert.
 %s Einstellungen Entfernt.
 Überschreibt Kompatibilitäts Einstellungen

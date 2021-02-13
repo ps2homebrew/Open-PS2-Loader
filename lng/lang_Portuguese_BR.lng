@@ -1,5 +1,5 @@
-# Portuguese_Brazil translation by gledson999. http://gledson999.blogspot.com.br/
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# Portuguese_Brazil Translation by gledson999. https://www.retro-jogos.com/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Portuguese Brazil
 Open PS2 Loader %s
 Salvar mudanças
@@ -10,7 +10,7 @@ Opções avançadas
 Configurações salvas em %s
 Erro ao salvar as configurações!
 Sair
-Configurações Gerais
+Configurações
 Menu
 Jogos no USB
 Jogos no HDD
@@ -40,8 +40,8 @@ Cancelar
 O
 X
 Lista de Jogos
-Configurar Modo
-Remover configurações
+Configurar
+Remover Configurações
 Todas as configurações dos jogos foram removidas
 Rolagem
 Lenta
@@ -122,7 +122,7 @@ Modificar
 Abortar
 Reiniciar
 Usa o genérico
-Configurar VMC
+Configure o VMC
 Nome
 Tamanho
 Estatísticas
@@ -143,7 +143,7 @@ Modo de vídeo
 Cor do Diálogo
 Cor Selecionada
 Redefinir Cores
-Info.
+Informações
 ELF Modificado
 Seleção de Cor
 Reconectar
@@ -185,7 +185,7 @@ Overscan
 Ajustes do Overscan.
 Pular FMV
 Pula os vídeos do jogo.
-Configurar Cheat
+Opções de Trapaças
 Ativar o PS2RD Cheat Engine
 Deixar o PS2RD patchear seus jogos
 Modo do PS2RD Cheat Engine
@@ -246,7 +246,7 @@ Escolha a porta para a emulação do Multitap.
 Desativar soluções alternativa para DS3 falsos
 Alguns DS3 falsos precisam de soluções alternativas, esta opção irá desativá-la.
 Emular inversão de campo
-Correção para alguns jogos que apresentam falhas nos modos de vídeos progressivos.
+Correção para jogos que apresentam falhas nos modos de vídeos progressivos.
 Configurações de Bloqueio Parental
 Senha do bloqueio parental
 Deixe em branco para desativar o bloqueio parental.

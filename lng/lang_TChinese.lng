@@ -1,5 +1,5 @@
 # Traditional Chinese translation by kane159 - kane159<kane12369@gmail.com
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Traditional Chinese
 Open PS2 Loader %s
 保存設置
@@ -101,7 +101,6 @@ NetBIOS
 運行
 顯示設置
 啟用刪除與重新命名功能
-檢查 USB 遊戲碎片
 記住最後一個玩的遊戲
 選定鍵
 "錯誤, 遊戲有碎片"
@@ -266,7 +265,7 @@ vmc %s 文件碎片化.是否繼續使用插槽 %d 中的記憶卡？
 緩存遊戲列表 (硬碟)
 啟用通知
 %s 從 %s 載入
-遊戲菜單
+Options
 遊戲設置已保存。
 %s 設置已刪除。
 啟用時覆蓋現有的遊戲兼容性設置。

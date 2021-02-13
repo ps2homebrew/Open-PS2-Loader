@@ -1,6 +1,6 @@
 # Filipino translation by Ceed Lorenzo <Ceedlorenzo@yahoo.com>
 # Fixed by Colton SIlva @ColtonSilvaonKnoxKontor
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Filipino
 Open PS2 Loader %s
 I-save ang mga pagbabago
@@ -102,7 +102,6 @@ Alisin
 Tumakbo
 Ipakita ang mga setting
 I-enable ang write operations
-I-check ang USB game fragmentation
 Tandaan ang huling play ng laro
 Select button
 Error, fragmented ang laro
@@ -267,7 +266,7 @@ Kumpirmahin "video mode change"?
 Cache Game List (HDD)
 I-enable ang Notifications
 %s Naiload mula sa %s
-Menu ng game
+Options
 Nai-save ang "Game settings".
 %s settings ay nai-alis.
 Io-overwrite ang nakairal na game compatibility settings kapag naka-enable.

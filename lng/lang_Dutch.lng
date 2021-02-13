@@ -1,5 +1,5 @@
 # Dutch translation by PS2Gaming
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Dutch
 Open PS2 Loader %s
 Wijzigingen opslaan
@@ -101,7 +101,6 @@ Verwijder
 Uitvoeren
 Beeldinstellingen
 Schrijftaken inschakelen
-Check USB-spel fragmentatie
 Herinner laatst gespeelde spel
 Selecteerknop
 Foutmelding, het spel is gefragmenteerd
@@ -266,7 +265,7 @@ Confirm video mode change?
 Cache Game List (HDD)
 Enable Notifications
 %s loaded from %s
-Game Menu
+Options
 Game settings saved.
 %s settings removed.
 Overwrites existing game compatibility settings when enabled.

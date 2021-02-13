@@ -1,5 +1,5 @@
 # Portuguese translation by danielb
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Portuguese
 Open PS2 Loader %s
 Salvar alterações
@@ -101,7 +101,6 @@ Apagar
 Iniciar
 Configurações de Ecrâ
 Ativar operações de escrita
-Verificar fragmentação de jogo USB
 Lembrar último jogo executado
 Botão de Seleção
 Erro, o jogo está fragmentado
@@ -266,7 +265,7 @@ Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HDD)
 Ativar notificações
 %s carregado de %s
-Menu de Jogo
+Options
 Configurações do jogo guardadas.
 %s configurações removidas.
 Substitui configurações de compatibilidade de jogos existentes quando ativado.

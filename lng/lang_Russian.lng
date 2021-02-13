@@ -1,5 +1,5 @@
 # Russian translation by druchapucha & frodosumkin
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Russian
 Open PS2 Loader %s
 Сохранить настройки
@@ -101,7 +101,6 @@ NetBIOS
 Запустить
 Настройки экрана
 Включить операцию записи
-Проверять фрагментацию игр на USB
 Запоминать последнюю игру
 Кнопка выбор
 Ошибка, игра фрагментирована
@@ -266,7 +265,7 @@ VMC %s файл фрагментирован. Продолжить с карто
 Кэширование списка игр (HDD)
 Показывать уведомления
 %s загружено из %s
-Меню игры
+Options
 Настройки игры сохранены.
 %s настройки удалены.
 Перезапись существующих настроек совместимости игр, если вкл.

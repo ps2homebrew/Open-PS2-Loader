@@ -1,5 +1,5 @@
 # Swedish translation by Flaya
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Swedish
 Open PS2 Loader %s
 Spara ändringar
@@ -101,7 +101,6 @@ Radera
 Kör
 Skärminställningar
 Aktivera skrivåtkomst
-Kontrollera USB spelfragmentering
 Kom ihåg senast spelade spel
 Välj knapp
 Fel, spelet är fragmenterat
@@ -266,7 +265,7 @@ Bekräfta ändring av videoläge?
 Lägg Spellista i Cache (HDD)
 Aktivera notifikationer
 %s Laddat från %s
-SpelMeny
+Options
 Spelinställningar sparade.
 %s inställningar borttagna
 Skriver över befintliga spelinställningar om aktiverad.

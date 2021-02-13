@@ -1,5 +1,5 @@
 # Croatian translation by Blacky5678
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Croatian
 OPL %s
 Spremi Promjene
@@ -101,7 +101,6 @@ Obrisi
 Pokreni
 Postavke Zaslona
 Omoguci Operacije Pisanja
-Provjeri Fragmentaciju USB Igre
 Zapamti Zadnju Upaljenu Igru
 Tipka za Odabir
 Greska, igra je fragmentirana.
@@ -266,7 +265,7 @@ Potvrdi promjenu video nacina?
 Predmemorija Liste Igara (HDD)
 Omoguci Notifikacije
 %s ucitano sa %s
-Izbornik Igre
+Options
 Postavke igre su spremljene.
 %s postavke su uklonjene.
 Prepisivanje postojecih postavki kompatibilnosti igre kada je omoguceno.

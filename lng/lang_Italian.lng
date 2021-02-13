@@ -1,5 +1,5 @@
 # Italian translation by jauffreblades completed by Peppe90
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Italian
 Open PS2 Loader %s
 Salva Modifiche
@@ -101,7 +101,6 @@ Cancella
 Esegui
 Impostazioni Display
 Abilita Operazioni in Scrittura
-Verifica Frammentazione Giochi USB
 Ricorda Ultimo Titolo Giocato
 Tasto di Selezione
 Errore, il gioco è frammentato.
@@ -266,7 +265,7 @@ Confermare la modifica della modalità video?
 Cache Lista Giochi (HDD)
 Abilita Notifiche
 %s caricato da %s
-Menu Gioco
+Opzioni
 Impostazioni salvate.
 %s impostazioni rimosse.
 Se abilitato sovrascrive le impostazioni di compatibilità esistenti.

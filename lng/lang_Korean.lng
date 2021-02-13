@@ -1,5 +1,5 @@
 # Korean translation by ddinghoya
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Korean
 오픈 PS2 로더 %s
 저장 변경
@@ -101,7 +101,6 @@ NetBIOS
 실행
 디스플레이 설정
 쓰기 작업 활성
-USB 게임 손상 검사
 마지막에 실행한 게임 기억
 버튼 선택
 오류, 게임이 손상 되었습니다.
@@ -266,7 +265,7 @@ VMC %s 파일이 조각화되었습니다. 슬롯 %d에서 메모리 카드를 �
 캐쉬 게임 목록 (HDD)
 알림 활성화
 %s에서 %s을(를)로드했습니다.
-게임 메뉴
+Options
 게임 설정이 저장되었습니다.
 %s 설정이 제거되었습니다.
 활성화되면 기존 게임 호환성 설정을 덮어 씁니다.

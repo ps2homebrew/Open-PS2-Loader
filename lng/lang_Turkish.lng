@@ -1,5 +1,5 @@
 # Turkish translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Turkish
 Open PS2 Loader %s
 Değişiklikleri kaydet
@@ -101,7 +101,6 @@ Sil
 Çalıştır
 Görüntü ayarları
 Yazma işlemlerini aktif et
-USB oyun bütünlüğünü kontrol et (Fragmentation)
 Enson oynanan oyunu hatırla
 Seçme tuşu
 Hata, oyun dosyası parçalı
@@ -266,7 +265,7 @@ Video çıkış modu değiştirilsin mi?
 Oyun listesini cachele (HDD)
 Bildirimleri aktifleştir
 %s yüklendi %s konumundan
-Oyun Menüsü
+Options
 Oyun ayarları kaydedildi.
 %s ayarları silindi.
 Aktifleştirildiğinde varolan oyun uyumluluk ayarlarının üzerine yazar.

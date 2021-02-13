@@ -1,5 +1,5 @@
 # Persian translation by saeid0035 (RTL version)
-# For Open PS2 Loader 0.9.3+ betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-official-beta-releases.21573/
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Persian
 OPL %s
 ذﺧﻴﺮه ﺗﻐﻴﻴﺮات
@@ -101,7 +101,6 @@ NetBIOS
 اﺟﺮا
 ﺗﻨﻈﻴﻤﺎت ﻧﻤﺎﻳﺸﮕﺮ
 ﻓﻌﺎل ﻛﺮدن اﺟﺎزه ﻧﻮﺷﺘﻦ
-USB ﭼﮏ ﻛﺮدن ﺑﻬﻢ رﻳﺨﺘﮕﻲ ﺑﺎزی ﻫﺎی
 ﺑﻪ ﻳﺎد داﺷﺘﻦ آﺧﺮﻳﻦ ﺑﺎزی اﻧﺟﺎم ﺷﺪه
 دﻛﻤﻪ ی اﻧﺘﺨﺎب
 ﻣﺸﻜﻠﻲ ﺑﻪ وﺟﻮد آﻣﺪه ﻓﺎﻳﻞ ﻫﺎی ﺑﺎزی ﺑﻪ ﻫﻢ رﻳﺨﺘﻪ اﺳﺖ
@@ -266,7 +265,7 @@ FIELD flipping ﺷﺒﻴﻪ ﺳﺎزی
 (HDD) ﻛﺶ ﻓﻬﺮﺳﺖ ﺑﺎزی ﻫﺎ
 ﻓﻌﺎﻝ ﻛﺮﺩﻥ اﻃﻠﺎﻉ ﺭﺳﺎﻧﻰ
 ﺑﺎﺭ ﮔﺬﺍﺭﻯ ﺷﺪ %s از %s          
-ﻣﻨﻮ ﺑﺎﺯﻯ
+Options
 ﺗﻨﻈﻴﻤﺎﺕ ﺑﺎﺯﻯ ﺫﺧﻴﺮﻩ ﺷﺪ
 %s ﭘﺎﮎ ﺷﺪ %s ﺗﻨﻈﻴﻤﺎﺕ          
 ﺭﻭ ﻧﻮﻳﺴﻰ ﺗﻨﻈﻴﻤﺎﺕ ﺳﺎﺯﮔﺎﺭ ﺑﺎ ﺑﺎﺯﻯ ﻫﻨﮕﺎﻢ ﻓﻌﺎﻝ ﺑﻮﺩﻥ

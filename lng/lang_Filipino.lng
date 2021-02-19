@@ -149,7 +149,7 @@ Custom ELF
 kulay ng seleksyon
 Muling kumonekta
 Iwanang walang laman upang ilista ang pagbabahagi
-ETH prefix landas
+Path ng ETH prefix
 Backspace
 Puwang
 Magpasok
@@ -266,7 +266,7 @@ Kumpirmahin "video mode change"?
 Cache Game List (HDD)
 I-enable ang Notifications
 %s Naiload mula sa %s
-Options
+Mga Opsyon
 Nai-save ang "Game settings".
 %s settings ay nai-alis.
 Io-overwrite ang nakairal na game compatibility settings kapag naka-enable.

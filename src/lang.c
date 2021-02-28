@@ -3,6 +3,7 @@
 #include "include/util.h"
 #include "include/fntsys.h"
 #include "include/ioman.h"
+#include "include/themes.h"
 
 // Language support
 static char *internalEnglish[LANG_STR_COUNT] = {
@@ -480,6 +481,7 @@ int lngSetGuiValue(int langID)
                 language_t *currLang = &languages[langID - 1];
                 if (lngLoadFromFile(currLang->filePath, currLang->name)) {
                     guiLangID = langID;
+                    thmSetGuiValue(thmGetGuiValue(), 1);
                     return 1;
                 }
             }
@@ -487,6 +489,7 @@ int lngSetGuiValue(int langID)
             guiLangID = 0;
             // lang switched back to internalEnglish, reload default font
             fntLoadDefault(NULL);
+            thmSetGuiValue(thmGetGuiValue(), 1);
         }
     }
     return 0;

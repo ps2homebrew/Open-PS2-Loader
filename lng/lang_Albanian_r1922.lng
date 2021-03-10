@@ -1,0 +1,293 @@
+# Translation by LoniTheFricc
+# Last update: March 10, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
+Albanian
+OPL %s
+Ruaj Ndryshimet
+Mbrapa
+Opsionet e Networkit
+Opsionet e Avancuara 
+<no values>
+Opsionet ruajtur tek %s
+Gabim gjatë shkrimit të opsioneve!
+Dil
+Opsione
+Menu
+Lojëra USB
+Lojëra HDD
+Lojëra ETH
+Programe
+Tema
+Gjuhë
+Sistemi do të fiket.
+Dil tek Browseri?
+Anulo?
+%d: HardDisku nuk u dallua.
+%d: HardDisku nuk është i formatuar.
+%d: Gabim gjatë Nisjes së Networkit.
+%d: Adapteri i Networkit nuk u dallua.
+%d: Nuk mund të lidhet me serverin SMB.
+%d: Nuk mund të logohet në serverin SMB.
+%d: Nuk mund të hapet ndarja SMB.
+%d: Nuk mund të listohet ndarja SMB.
+%d: Nuk mund të listohen lojërat.
+%d: Serveri DHCP është i pa disponueshëm.
+%d: Nuk ka lidhje me Networkin.
+Nezur
+Fikur
+OK
+Zgjedh
+Anulo
+Rreth
+Kqyq
+Lista e Lojërave
+Konfigurimet e Lojrave
+Hiq Konfigurimet
+Hequr të gjithë çelësat nga loja.
+Lëvizja
+Ngadalë
+Mesatare
+Shpejt
+Menuja e Parazgjedhur
+Ngarko nga Disku
+Prisni.
+Gabim duke ngarkuar ID e Lojës.
+Rënditje Automatike.
+Gabim duke ngarkuar skedarin e gjuhës.
+Çaktivizo korrigjimin e Ngjyrave.
+Nuk u dallua nje telekomandë, duke pritur...
+Aktivizo Artin e Kopertinës
+Ekran i gjerë
+Fike
+Duke Ngarkuar Konfigurimin...
+Duke Ruajtur Konfigurimin...
+Fillo Pajisjen
+Rifresko
+Moda e Fillimit të USB-s
+Moda e Fillimit të HDD-s
+Moda e Fillimit të ETH-it
+Moda e Shfaqjes së menusë e Aplikacioneve
+Auto
+Manual
+Fillo Serverin HDL
+Serveri HDL duke filluar...
+Serveri HDL në operacion...
+Dështim në fillimin e serverit HDL.
+Serveri HDL duke u shkarkuar...
+Rruga e IGR
+Ngjyra e Sfondit
+Ngjyra e Tekstit
+- PS2 -
+- Server SMB -
+Lloji i Adresës IP
+Statik
+DHCP
+Adresë IP
+Adresë
+Maskë
+Gateway
+Serveri DNS
+Portë
+Ndarje
+Përdorues
+Fjalëkalim
+<e pavendosur>
+Lloji i Adresës
+IP
+NetBIOS
+Prano
+Artikulli do të fshihet përgjithmonë, vazdho?
+Riemërto
+Fshi
+Hap
+Opsionet e Ekranit
+Lejo Operacionet e Modifikimit
+Mbaj mend lojen e fundit të luajtur
+Zgjidh Butonin
+Gabim, Loja është e fragmentuar.
+Gabim, artikulli nuk mundej te hapej.
+Provo Ndryshimet
+Lëje bosh per autorizim Vizitori.
+Lexime te Sakta
+Modë te Sinkronizuar
+Zhvendo Syscalls
+Kapërce Video
+Imito DVD-DL
+Çaktivizo IGR
+E pa Përdorur
+E pa Përdorur
+Ndryshimi i Madhësisë do të riformatojë VMC-n.
+Krijo
+Fillo
+Modifiko
+Nderpre
+Ristarto
+Përdor Gjenerike
+Konfiguro VMC-n
+Emër
+Madhësi
+Status
+Progres
+Skedari VMC ekziston.
+Skedar VMC i pavlefshëm, përmasa është gabim.
+Skedari VMC duhet të krijohet.
+Gabim duke aksesuar VMC %s. Vazdho me Kartën e Memorjes ne Portin %d?
+Rifreskim Automatik
+Për Ne
+Koduesit
+Sigurimi i Cilësisë
+Rruga e Parashtesës se USB-s
+Hap një ELF te Modifikuar mbas një IGR.
+Vlera në minuta(s), 0 të çaktivizosh Ngadalsimin e Rrotullimit.
+Ngadalsim Rrotullimi Automatik te HDD-së.
+Moda e Videos
+Ngjyra e Dialogut
+Ngjyra e Zgjedhur
+Rivendos Ngjyrat
+Info
+ELF i personalizuar
+Zgjedhja e Ngjyrës
+Rilidhu
+Lëre bosh te listosh ndarjet.
+Rruga e Parashtesësh se ETH.
+Fshi
+Hapësirë
+Mbaro
+Modë
+Porti VMC 1
+Porti VMC 2
+ID-ja e Lojës
+Moda DMA
+V-Sync
+Moda 1
+Moda 2
+Moda 3
+Moda 4
+Moda 5
+Moda 6
+Moda 7
+Moda 8
+Konfiguro GSM
+Moda e Lidhjes Ethernet
+100Mbit Full-duplex
+100Mbit Half-duplex
+10Mbit Full-duplex
+10Mbit Half-duplex
+Opsionet GSM
+Aktiviyo GSM
+Ndërron GSM Ndezur/Fikur.
+VMODE
+Moda e shfaqjes së personalizuar te detyruar.
+H-POZ
+Rregullim Horizontal.
+V-POZ
+Rregullim Vertikal.
+Tejkalim
+Rregullim të Tejkalimit e TV.
+Tejkalim FMV.
+Tejkalon Videot ne Mocion të Plotë.
+Opsionet e Hileve
+Aktivizo Programin e hiles PS2RD
+Lejo Programin e hiles PS2RD te modifikojë lojën.
+Moda e hiles PS2RD.
+Zgjedhje Automatike ose Zgjedhe të hileve te lojrave.
+Zgjidh Hile Automatikisht
+Select Game Cheats
+Gabim: Skedari i hiles nuk arriti te ngarkohet.
+Nuk u gjendën hile.
+Shkarkoni Parazgjedhjet
+Përditsim me Internet
+Mbishkruaj rekordet ekzistuese
+Perditsimi Dështoi.
+Lidhja me serverin e përditsimit dështoi.
+Përditsimi Mbaroi.
+Përditsimi u Anulua.
+Shkarko Opsionet nga Interneti?
+Opsionet e Personalizuara
+Parazgjedhjet e shkarkuara 
+Fillim Auto në %i s...
+Fillim Auto
+Vlerë në sekonda(s), 0 për të çaktivizuar Fillimin Auto.
+Logoja e PS2
+Shfaqet për një logo të vlefshme të diskut që përputhet me rajonin e konsolës.
+Konfiguro PADEMU
+Konfigurimet e Emulatorit te Pad-it
+Aktivizo Emulatorin e Pad-it
+Aktivizon/Çaktivizon Emulatorin e Pad-it për lojën e zgjedhur.
+Moda e Emulatorit të Pad-it
+Zgjidj Modën e Emulatorit të Pad-it.
+DualShock3/4 USB
+DualShock3/4 BT
+Opsionet për Port:
+Zgjidh Portën e Emulatorit te Pad-it për opsione.
+Aktivizo Emulimin
+Aktivizon/Çaktivizon Emulatorin e Pad-it për portën e zgjedhur.
+Aktivizo Dridhjen
+Aktivizon/Çaktivizon Dridhjen e Emulatorit të Pad-it për portën e zgjedhur.
+Adresa MAC e Adapterit BT USB:
+Telekomanda DS e lidhur me MAC Adresin:
+Lidh
+Lidh Telekomandën DS
+Lidh Telekomandën DS me Adresën MAC të Adapterit Bluetooth.
+Nuk është Lidhur
+Informacion i Adapterit Bluetooth
+Tregon më shumë informacion dhe veçoritë e mbështetura.
+Versioni HCI:
+Versioni LMP:
+ID-ja e Prodhuesit:
+Karakteristikat e mbështetura:
+Po
+Jo
+Adapteri Bluetooth duhet të jetë plotësisht i pajtueshëm me telekomandat DS3/DS4.
+Adapteri Bluetooth mund të mos funksionojë si duhet me kontrolluesit DS3/DS4.
+Aktivizo Emulimin e Multitap
+Aktivizon/Çaktivizon emulimin e Multitap për lojën e zgjedhur.
+Emulatori i Multitap në Portën:
+Zgjidh portën për Emulimin e Multitap.
+Çaktivizo Zgjidhjen e DS3-ve të rreme.
+Disa DS3 të rreme kanë nevojë për zgjidhje, ky opsion do ta çaktivizoj atë.
+Emulo Shfletimin FIELD
+Rregullo lojërat që kanë anomali në mënyrat progresive të videos.
+Opsionet e Kyçit Prindëror.
+Fjalëkalimi i Kyçit Prindëror.
+Lëre bosh qe të çaktivizosh kyçin prindëror.
+Shkruani Fjalëkalimin e kyçit prindëror.
+Fjalëkalimi është gabim.
+Kyçi Prinderor u Çaktivizua.
+Opsionet e Versionit:
+Gabim - ky fjalëkalim nuk mund të përdoret.
+Skedari VMC %s është i fragmentuar.Vazdho me Kartën e Memorjes ne Portën %d?
+Opsionet Audio
+Aktivizo Tingujt
+Aktivizo Tingullin e nisjes
+Volumi i Tingujve
+Volumi i Tinguliit të nisjes 
+Konfirmo ndryshimet e Videos?
+Depozito Listën e Lojerave? (HDD)
+Aktivizo Njoftimet
+%s ngarkuar nga %s
+Opsione
+Konfigurimet e Lojës u ruajtën.
+%s konfigurimet u heqën.
+Zëvendëson cilësimet ekzistuese të përputhshmërisë së lojërave kur aktivizohet.
+Moda e Konfigurimeve
+Global
+Per Çdo Lojë
+Gjithçka
+Zgjith Konfigurimet per t'u hequr.
+Forume Ndihme:
+Titulli
+Zhanri
+Publikimi
+Zhvilluesi
+Përshkrimi
+Lojrat e PS1-shit
+Moda e Shfaqjes se Lojrave se PS1-shit
+POPSTARTER.ELF nuk është gjetur tek '%s'!
+Skedari VCD '%s' nuk është gjetur!
+Ndodhi një gabim gjatë riemërimit të skedarit.
+Ndodhi një gabim gjatë fshirjes së skedarit.
+Kurrë mos blej OPEN-PS2-LOADER (OPL), mundesh ta gjeshë falas tek:
+ifcaro OPL version at psx-place.com
+OPL Daily Builds (DB) version at ps2-home.com

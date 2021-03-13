@@ -1,5 +1,5 @@
 # Translation by LoniTheFricc
-# Last update: March 10, 2021
+# Last update: March 13, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Albanian
@@ -8,7 +8,7 @@ Ruaj Ndryshimet
 Mbrapa
 Opsionet e Networkit
 Opsionet e Avancuara 
-<no values>
+<nuk ka vlera>
 Opsionet ruajtur tek %s
 Gabim gjatë shkrimit të opsioneve!
 Dil
@@ -42,7 +42,7 @@ Anulo
 Rreth
 Kqyq
 Lista e Lojërave
-Konfigurimet e Lojrave
+Konfigurimet e Lojës
 Hiq Konfigurimet
 Hequr të gjithë çelësat nga loja.
 Lëvizja
@@ -67,7 +67,7 @@ Rifresko
 Moda e Fillimit të USB-s
 Moda e Fillimit të HDD-s
 Moda e Fillimit të ETH-it
-Moda e Shfaqjes së menusë e Aplikacioneve
+Moda e Shfaqjes së Aplikacioneve
 Auto
 Manual
 Fillo Serverin HDL
@@ -79,7 +79,7 @@ Rruga e IGR
 Ngjyra e Sfondit
 Ngjyra e Tekstit
 - PS2 -
-- Server SMB -
+- Serveri SMB -
 Lloji i Adresës IP
 Statik
 DHCP
@@ -139,8 +139,8 @@ Koduesit
 Sigurimi i Cilësisë
 Rruga e Parashtesës se USB-s
 Hap një ELF te Modifikuar mbas një IGR.
-Vlera në minuta(s), 0 të çaktivizosh Ngadalsimin e Rrotullimit.
-Ngadalsim Rrotullimi Automatik te HDD-së.
+Vlera në minuta(s),0 të çaktivizosh Ngadalsimin e Rrotullimit.
+Ngadalsim Auto Rrotullimit së HDD-së.
 Moda e Videos
 Ngjyra e Dialogut
 Ngjyra e Zgjedhur
@@ -150,7 +150,7 @@ ELF i personalizuar
 Zgjedhja e Ngjyrës
 Rilidhu
 Lëre bosh te listosh ndarjet.
-Rruga e Parashtesësh se ETH.
+Rruga e Parashtesës se ETH.
 Fshi
 Hapësirë
 Mbaro
@@ -160,14 +160,14 @@ Porti VMC 2
 ID-ja e Lojës
 Moda DMA
 V-Sync
-Moda 1
-Moda 2
-Moda 3
-Moda 4
-Moda 5
-Moda 6
-Moda 7
-Moda 8
+Moda 1  
+Moda 2 
+Moda 3  
+Moda 4  
+Moda 5 
+Moda 6  
+Moda 7  
+Moda 8  
 Konfiguro GSM
 Moda e Lidhjes Ethernet
 100Mbit Full-duplex
@@ -179,9 +179,9 @@ Aktiviyo GSM
 Ndërron GSM Ndezur/Fikur.
 VMODE
 Moda e shfaqjes së personalizuar te detyruar.
-H-POZ
+POZ-H
 Rregullim Horizontal.
-V-POZ
+POZ-V
 Rregullim Vertikal.
 Tejkalim
 Rregullim të Tejkalimit e TV.
@@ -193,7 +193,7 @@ Lejo Programin e hiles PS2RD te modifikojë lojën.
 Moda e hiles PS2RD.
 Zgjedhje Automatike ose Zgjedhe të hileve te lojrave.
 Zgjidh Hile Automatikisht
-Select Game Cheats
+Zgjidh Hilet
 Gabim: Skedari i hiles nuk arriti te ngarkohet.
 Nuk u gjendën hile.
 Shkarkoni Parazgjedhjet
@@ -272,7 +272,7 @@ Konfigurimet e Lojës u ruajtën.
 %s konfigurimet u heqën.
 Zëvendëson cilësimet ekzistuese të përputhshmërisë së lojërave kur aktivizohet.
 Moda e Konfigurimeve
-Global
+Globale
 Per Çdo Lojë
 Gjithçka
 Zgjith Konfigurimet per t'u hequr.
@@ -282,8 +282,8 @@ Zhanri
 Publikimi
 Zhvilluesi
 Përshkrimi
-Lojrat e PS1-shit
-Moda e Shfaqjes se Lojrave se PS1-shit
+Lojrat PS1
+Moda e Shfaqjes se Lojrave PS1
 POPSTARTER.ELF nuk është gjetur tek '%s'!
 Skedari VCD '%s' nuk është gjetur!
 Ndodhi një gabim gjatë riemërimit të skedarit.

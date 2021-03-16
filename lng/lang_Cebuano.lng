@@ -1,0 +1,282 @@
+# Cebuano by Colton Silva
+# For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+Cebuano
+Open PS2 Loader %s
+Tipigi ang mga pagbag-o
+Likod
+Mga setting sa Network
+Mga advanced nga kapilian
+<walay kantidad>
+Ang setting gitipig sa %s
+Sayup nga mga setting sa pagsulat!
+Paggawas
+Setting
+Menu
+Dula sa USB
+Dula sa HDD
+Dula sa ETH
+Apps
+Tema
+Sinultian
+Gipawong ang sistema?
+Paggawas sa Browser?
+Kanselahon ang pag-update?
+%d: Dili nakit-an ang HardDisk Drive
+%d: Dili ma-format ang HardDisk Drive
+%d: Sayup sa pagsugod sa network.
+%d: Wala’y nakita nga adapter sa network
+%d: Dili makakonek sa SMB server
+%d: Dili maka-log in sa SMB server
+%d: Dili maablihan ang SMB shares
+%d: Dili malista ang SMB Shares
+%d: Dili malista ang mga dula
+%d: Dili available ang DHCP server
+%d: Wala'y koneksyon sa network
+Sa
+Gikan sa
+Ayos
+Pilia
+Kansel
+Lingin
+Krus
+Lista
+Settings sa dula
+Tangtanga ang setting
+Gikuha ang tanan nga mga yawi alang sa dula.
+I-scroll
+Hinay
+Medium
+Paspas
+Default na menu
+Pag-load gikan sa disc
+Pahilog hulat
+Sayup samtang gikarga ang Game ID.
+Awtomatik nga paghan-ay
+Sayup sa pagkarga sa file sa sinultian
+I-disable ang kulay sa pag-debug
+Wala’y nakita nga tigpugong, naghulat...
+Pagpalihok sa Cover Art
+Malapad nga screen
+Power-off
+Nilo-load ang config
+Sine-save ang config
+Pagsugod sa Device
+Pagpalagsik
+USB aparato simula mode
+HDD aparato simula mode
+ETH aparato simula mode
+Mga application simula mode
+Awto
+Manwal
+Pagsugod sa HDL Server
+HDL Server Starting...
+HDL Server Running...
+Napakyas sa pagsugod sa HDL Server.
+Pagdiskarga sa HDL Server.
+IGR path
+kolor sa background
+kolor sa teksto
+- PS2 -
+- SMB Server -
+Klase sa IP address
+Static
+DHCP
+Adres sa IP
+Adres
+Mask
+Gateway
+DNS Server
+Port
+Share
+Gumagamit
+Password
+<Hindi nai-set>
+Address type
+IP
+NetBIOS
+Dawata
+Ang butang permanente nga mapapas, magpadayon?
+Igngalan usab
+tangtangon
+Pagdagan
+Ipakita ang mga setting
+Pagpalihok Pagsulat Operations
+Hinumdomi ang Katapusan nga Dula
+Select nga buton
+Sayup, ang dula ay mabahinbahin
+Sayop, dili mapadagan ang aytem
+Sulayi kini
+Biyai nga wala’y sulod alang sa GUEST auth.
+Accurate Reads
+Synchronous na Mode
+Alisin sa pagkakakawit ng Syscalls
+0 PSS mode
+I-emulate nga DVD-DL
+I-disable mga IGR
+Unused
+Unused
+Ang pagbag-o sa gidak-on mag-usab sa VMC.
+Paghimo
+Pagsugod
+Pagbag-o
+I-abort
+I-reset
+Paggamit Generic
+I-configure ang VMC
+Ngalan
+Tawo
+Kahimtang
+Pag-uswang
+Adunay VMC file
+Dili balido nga file sa VMC, dili husto ang gidak-on
+Ang file sa VMC kinahanglan buhaton.
+Sayup sa pag-access sa VMC% s. Padayon sa Memory Card sa slot% d?
+Awtomatikong i-refresh
+Mahitungod sa
+Mga coder
+Kalidad nga Pasalig
+USB prefix path
+Ang botas nga gipasadya nga ELF pagkahuman sa usa ka IGR.
+Balor sa (mga) minuto, 0 aron dili paganahon
+Ang HDD hinay nga mohinay
+Mode sa bidyo
+Dialog sa kulay
+Pinil nga kolor
+Reset Colors
+Impo
+Custom ELF
+kolor nga seleksyon
+Sumpaysumpaya usab
+Iwanang walang laman upang ilista ang pagbabahagi
+ETH prefix na path
+Backspace
+Luna
+Pagsulud
+Moda
+VMC Slot 1
+VMC Slot 2
+ID ng Laro
+DMA Mode
+V-Sync
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
+I-configure ang GSM
+Ethernet speed at duplex setting
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
+Settings sa GSM
+Pagpaandar sa GSM
+Toggles GSM ON or OFF
+VMODE
+Gipugos nga custom display mode.
+H-POS
+Horizontal Adjustment
+V-POS
+Vertical Adjustment
+Overscan
+Overscan Adjustment
+FMV Skip
+Laktaw ang Mga Video sa Tibuok nga Paglihok
+Settings sa cheat
+Pagpalihok sa PS2RD Cheat Engine
+Gihangyo nga i-patch sa PS2RD Cheat Engine ang imong dula.
+PS2RD Cheat Engine Mode
+Awto. pagpili or pagpili sa mga cheat sa dula
+Awto. pagpili sa cheats
+Pagpili mga cheat sa dula
+Sayup: napakyas sa pag-load cheat file.
+Wala nakit-an nga mga cheat
+Download defaults
+Pagbag-o sa network
+Pag-overwrite mga Adunay nga Rekord
+Napakyas sa pag-update
+Napakyas sa pagkonektar aron ma-update ang server.
+Hingpit nga na-update.
+Nakansela ang pag-update.
+Pag-download sa settings gikan sa network?
+Gipahiangay nga setting
+Na-download nga default
+Awtomatik nga pagsugod sa% i ...
+Auto start
+Bililhon sa segundo, 0 aron dili paganahon ang pagsugod sa awto
+PS2 Logo
+Gipakita alang sa usa ka balido nga logo sa disc nga nahiangay sa rehiyon sa console.
+I-configure ang PADEMU
+Settings sa Pad Emulator
+I-enable ang PadEmulator
+Gipasiga / gipatay ang Pad Emulator alang sa pinili nga dula.
+Mode ng Pad Emulator
+Pilia ang mode nga Pad Emulator.
+DualShock3/4 USB
+DualShock3/4 BT
+Settings alang sa port:
+Pilia ang Pad Emulator port alang sa mga setting.
+Pagpalihok sa pagsundog
+Gipasiga / gipalong ang Pad Emulator alang sa pinili nga port.
+Paglihok sa Vibration
+Nag-on / off nga pagkurog alang sa napili sa Pad Emulator port.
+Usb bluetooth adapter mac address:
+DS Controller paired to mac address:
+Pares
+Pares nga DS Controller
+Igpares ang DS controller nga adunay adapter sa MAC adapter sa Bluetooth.
+Dili konektado
+Ang kasayuran sa Bluetooth Adapter
+Ipakita ang kasayuran ug gisuportahan nga mga dagway
+Bersyon sa HCI:
+Bersyon sa LMP:
+Manufacturer ID:
+Gisuportahan nga bahin:
+Opo
+Dili
+Ang Bluetooth adapter kinahanglan nga hingpit nga katugma sa mga kontrol sa DS3 / DS4.
+Ang Bluetooth adapter mahimong dili molihok sa mga tigdumala sa DS3 / DS4.
+Paglihok sa Multitap Emulation
+Gipasiga / gipalayo ang pagsundog sa Multitap alang sa pinili nga dula.
+Multitap emulator sa port
+Pagpili usa ka port alang sa pagsundog sa Multitap.
+Disable Fake DS3 Workaround
+Ang pipila nga peke nga DS3s kinahanglan nga solusyon, kini nga kapilian dili pag-disable niini.
+Sundoga ang FIELD Flipping
+Pag-ayo alang sa mga dula nga ning-glitch ubos sa mga progresibo nga mga mode sa video.
+Setting sa Parental Lock
+Parental Lock Password
+Biyai nga blangko aron dili paganahon ang lock sa ginikanan
+Pagsulud sa Parental Lock Password
+Ang Parental lock password ay dili husto.
+Wala’y kaputli ang lock sa ginikanan.
+Opsyon sa build:
+Sayop - dili magamit ang kini nga password.
+Ang VMC% s file nabahinbahin. Padayon sa Memory Card sa slot% d?
+Setting sa Audio
+Pagpalihok sa Sound Effects
+Pagpalihok sa Boot Sound
+Sound Effects Volume
+Boot Sound Volume
+Gikumpirma nga "video mode change"?
+Cache Game List (HDD)
+Pagpalihok sa Notifications
+%s Nag-load gikan sa %s
+Options
+Nai-save ang "Game settings".
+%s settings ay nai-alis.
+Nag-overwrite sa kasamtangan nga mga setting sa pagkaangay sa dula kung gipaandar.
+Settings Mode
+Global
+Per Game
+Tanan
+Pilia ang mga setting aron makuha.
+Support Forums:
+Titulo
+Genre
+Buhian
+Debeloper
+Paghulagway

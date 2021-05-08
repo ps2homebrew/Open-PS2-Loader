@@ -97,6 +97,9 @@ void bdmLoadModules(void)
     // Load Optional Block Device drivers
     bdmLoadBlockDeviceModules();
 
+    // Load MX4SIO Block Device drivers
+    sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
+
     sysLoadModuleBuffer(&bdmevent_irx, size_bdmevent_irx, 0, NULL);
     SifAddCmdHandler(0, &bdmEventHandler, NULL);
 
@@ -378,6 +381,8 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
         sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
     else if (!strcmp(bdmDriver, "sd") && strlen(bdmDriver) == 2)
         sysLaunchLoaderElf(filename, "BDM_ILK_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+    else if (!strcmp(bdmDriver, "sdc") && strlen(bdmDriver) == 3)
+        sysLaunchLoaderElf(filename, "BDM_M4S_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *bdmGetConfig(int id)

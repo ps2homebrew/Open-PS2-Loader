@@ -14,11 +14,11 @@ IOP_OBJS += device-smb.o
 IOP_CFLAGS += -DSMB_DRIVER
 endif
 
-ifeq ($(USE_USB),1)
-IOP_BIN  = usb_mcemu.irx
-IOP_OBJS_DIR = obj.usb/
-IOP_OBJS += device-usb.o
-IOP_CFLAGS += -DUSB_DRIVER
+ifeq ($(USE_BDM),1)
+IOP_BIN  = bdm_mcemu.irx
+IOP_OBJS_DIR = obj.bdm/
+IOP_OBJS += device-bdm.o
+IOP_CFLAGS += -DBDM_DRIVER
 endif
 
 IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)

@@ -64,7 +64,7 @@ endif
 endif
 
 FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.o config.o hdd.o dialogs.o \
-		dia.o ioman.o texcache.o themes.o supportbase.o usbsupport.o ethsupport.o hddsupport.o \
+		dia.o ioman.o texcache.o themes.o supportbase.o bdmsupport.o ethsupport.o hddsupport.o \
 		appsupport.o gui.o guigame.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o ps2cnf.o
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
@@ -83,18 +83,19 @@ GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
 MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o \
 		boot.o cancel.o confirm.o cursor.o message.o transition.o
 
-IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o usbhdfsd.o usbhdfsdfsv.o \
+IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
+		bdm.o bdmfs_vfat.o usbmass_bd.o iLinkman.o IEEE1394_bd.o \
 		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		sio2man.o padman.o mcman.o mcserv.o \
 		httpclient-iop.o netman.o ps2ips.o \
-		usb_mcemu.o hdd_mcemu.o smb_mcemu.o \
+		bdm_mcemu.o hdd_mcemu.o smb_mcemu.o \
 		iremsndpatch.o apemodpatch.o f2techioppatch.o cleareffects.o resetspu.o \
 		libsd.o audsrv.o
 
 EECORE_OBJS = ee_core.o ioprp.o util.o \
 		elfldr.o udnl.o imgdrv.o eesync.o \
-		usb_cdvdman.o IOPRP_img.o smb_cdvdman.o \
+		bdm_cdvdman.o IOPRP_img.o smb_cdvdman.o \
 		hdd_cdvdman.o hdd_hdpro_cdvdman.o cdvdfsv.o \
 		ingame_smstcpip.o smap_ingame.o smbman.o smbinit.o
 
@@ -242,7 +243,7 @@ clean:
 	echo " -eesync"
 	$(MAKE) -C modules/iopcore/eesync clean
 	echo " -cdvdman"
-	$(MAKE) -C modules/iopcore/cdvdman USE_USB=1 clean
+	$(MAKE) -C modules/iopcore/cdvdman USE_BDM=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_SMB=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_HDD=1 clean
 	$(MAKE) -C modules/iopcore/cdvdman USE_HDPRO=1 clean
@@ -261,8 +262,8 @@ clean:
 	$(MAKE) -C modules/iopcore/patches/cleareffects clean
 	echo " -isofs"
 	$(MAKE) -C modules/isofs clean
-	echo " -usbhdfsdfsv"
-	$(MAKE) -C modules/usb/usbhdfsdfsv clean
+	echo " -bdmevent"
+	$(MAKE) -C modules/bdmevent clean
 	echo " -SMSUTILS"
 	$(MAKE) -C modules/network/SMSUTILS clean
 	echo " -SMSTCPIP"
@@ -278,7 +279,7 @@ clean:
 	echo " -xhdd"
 	$(MAKE) -C modules/hdd/xhdd clean
 	echo " -mcemu"
-	$(MAKE) -C modules/mcemu USE_USB=1 clean
+	$(MAKE) -C modules/mcemu USE_BDM=1 clean
 	$(MAKE) -C modules/mcemu USE_HDD=1 clean
 	$(MAKE) -C modules/mcemu USE_SMB=1 clean
 	echo " -genvmc"
@@ -381,11 +382,11 @@ modules/iopcore/eesync/eesync.irx: modules/iopcore/eesync
 $(EE_ASM_DIR)eesync.s: modules/iopcore/eesync/eesync.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ eesync_irx
 
-modules/iopcore/cdvdman/usb_cdvdman.irx: modules/iopcore/cdvdman
-	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_USB=1 -C $< all
+modules/iopcore/cdvdman/bdm_cdvdman.irx: modules/iopcore/cdvdman
+	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_BDM=1 -C $< all
 
-$(EE_ASM_DIR)usb_cdvdman.s: modules/iopcore/cdvdman/usb_cdvdman.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ usb_cdvdman_irx
+$(EE_ASM_DIR)bdm_cdvdman.s: modules/iopcore/cdvdman/bdm_cdvdman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bdm_cdvdman_irx
 
 modules/iopcore/cdvdman/smb_cdvdman.irx: modules/iopcore/cdvdman
 	$(MAKE) $(CDVDMAN_PS2LOGO_FLAGS) $(CDVDMAN_DEBUG_FLAGS) USE_SMB=1 -C $< all
@@ -441,11 +442,11 @@ modules/iopcore/resetspu/resetspu.irx: modules/iopcore/resetspu
 $(EE_ASM_DIR)resetspu.s: modules/iopcore/resetspu/resetspu.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ resetspu_irx
 
-modules/mcemu/usb_mcemu.irx: modules/mcemu
-	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_USB=1 -C $< all
+modules/mcemu/bdm_mcemu.irx: modules/mcemu
+	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_BDM=1 -C $< all
 
-$(EE_ASM_DIR)usb_mcemu.s: modules/mcemu/usb_mcemu.irx
-	$(BIN2S) $< $@ usb_mcemu_irx
+$(EE_ASM_DIR)bdm_mcemu.s: modules/mcemu/bdm_mcemu.irx
+	$(BIN2S) $< $@ bdm_mcemu_irx
 
 modules/mcemu/hdd_mcemu.irx: modules/mcemu
 	$(MAKE) $(MCEMU_DEBUG_FLAGS) $(PADEMU_FLAGS) USE_HDD=1 -C $< all
@@ -510,14 +511,36 @@ modules/pademu/usb_pademu.irx: modules/pademu
 $(EE_ASM_DIR)usb_pademu.s: modules/pademu/usb_pademu.irx
 	$(BIN2S) $< $@ usb_pademu_irx
 
-$(EE_ASM_DIR)usbhdfsd.s: $(PS2SDK)/iop/irx/usbhdfsd.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ usbhdfsd_irx
+$(EE_ASM_DIR)bdm.s: $(PS2SDK)/iop/irx/bdm.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bdm_irx
 
-modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx: modules/usb/usbhdfsdfsv
+$(EE_ASM_DIR)bdmfs_vfat.s: $(PS2SDK)/iop/irx/bdmfs_vfat.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bdmfs_vfat_irx
+
+$(EE_ASM_DIR)iLinkman.s: $(PS2SDK)/iop/irx/iLinkman.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ iLinkman_irx
+
+ifeq ($(DEBUG),1)
+# block device drivers with printf's
+$(EE_ASM_DIR)usbmass_bd.s: $(PS2SDK)/iop/irx/usbmass_bd.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usbmass_bd_irx
+
+$(EE_ASM_DIR)IEEE1394_bd.s: $(PS2SDK)/iop/irx/IEEE1394_bd.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ IEEE1394_bd_irx
+else
+# block device drivers without printf's
+$(EE_ASM_DIR)usbmass_bd.s: $(PS2SDK)/iop/irx/usbmass_bd_mini.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usbmass_bd_irx
+
+$(EE_ASM_DIR)IEEE1394_bd.s: $(PS2SDK)/iop/irx/IEEE1394_bd_mini.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ IEEE1394_bd_irx
+endif
+
+modules/bdmevent/bdmevent.irx: modules/bdmevent
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)usbhdfsdfsv.s: modules/usb/usbhdfsdfsv/usbhdfsdfsv.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ usbhdfsdfsv_irx
+$(EE_ASM_DIR)bdmevent.s: modules/bdmevent/bdmevent.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ bdmevent_irx
 
 $(EE_ASM_DIR)ps2dev9.s: $(PS2SDK)/iop/irx/ps2dev9.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ ps2dev9_irx

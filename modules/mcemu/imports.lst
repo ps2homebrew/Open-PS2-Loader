@@ -19,9 +19,9 @@ loadcore_IMPORTS_end
 oplutils_IMPORTS_start
 I_getModInfo
 I_oplRegisterShutdownCallback
-#ifdef USB_DRIVER
-I_mass_stor_readSector
-I_mass_stor_writeSector
+#ifdef BDM_DRIVER
+I_bdm_readSector
+I_bdm_writeSector
 #endif
 #ifdef HDD_DRIVER
 I_ata_device_sector_io

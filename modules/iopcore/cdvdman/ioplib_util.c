@@ -66,7 +66,7 @@ static struct FakeModule modulefake_list[] = {
 #ifdef __USE_DEV9
     {"DEV9.IRX", "dev9", FAKE_MODULE_ID_DEV9, 0x0208, 0},
 #endif
-#ifdef USB_DRIVER
+#ifdef BDM_DRIVER
     {"USBD.IRX", "USB_driver", FAKE_MODULE_ID_USBD, 0x0204, 2},
 #endif
 #ifdef SMB_DRIVER

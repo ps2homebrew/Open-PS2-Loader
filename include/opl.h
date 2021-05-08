@@ -109,7 +109,7 @@ extern char gPCPassword[32];
 extern int gNetworkStartup;
 extern int gHDDSpindown;
 /// Refer to enum START_MODE within iosupport.h
-extern int gUSBStartMode;
+extern int gBDMStartMode;
 extern int gHDDStartMode;
 extern int gETHStartMode;
 extern int gAPPStartMode;
@@ -165,7 +165,7 @@ extern int gDefaultDevice;
 extern int gEnableWrite;
 
 //These prefixes are relative to the device's name (meaning that they do not include the device name).
-extern char gUSBPrefix[32];
+extern char gBDMPrefix[32];
 extern char gETHPrefix[32];
 
 extern int gRememberLastPlayed;

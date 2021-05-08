@@ -12,12 +12,12 @@
 #include <irx.h>
 
 /* Please keep these in alphabetical order!  */
+#include <bdm.h>
 #include <iomanX.h>
 #include <loadcore.h>
 #include <sifcmd.h>
 #include <stdio.h>
 #include <sysclib.h>
 #include <sysmem.h>
-#include <usbhdfsd.h>
 
 #endif /* IOP_IRX_IMPORTS_H */

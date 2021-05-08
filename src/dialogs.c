@@ -179,9 +179,9 @@ struct UIItem diaConfig[] = {
     {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USB_PREFIX}}},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BDM_PREFIX}}},
     {UI_SPACER},
-    {UI_STRING, CFG_USBPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_STRING, CFG_BDMPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ETH_PREFIX}}},
@@ -196,7 +196,7 @@ struct UIItem diaConfig[] = {
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USBMODE}}},
     {UI_SPACER},
-    {UI_ENUM, CFG_USBMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_ENUM, CFG_BDMMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDDMODE}}},

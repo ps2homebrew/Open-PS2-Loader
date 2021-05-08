@@ -5,8 +5,6 @@
 */
 
 #include "smsutils.h"
-#include "mass_common.h"
-#include "mass_stor.h"
 #include "atad.h"
 #include "ioplib_util.h"
 #include "cdvdman.h"

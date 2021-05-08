@@ -5,8 +5,6 @@
 */
 
 #include "smsutils.h"
-#include "mass_common.h"
-#include "mass_stor.h"
 #include "dev9.h"
 #include "oplsmb.h"
 #include "smb.h"
@@ -57,8 +55,8 @@ struct cdvdman_settings_smb cdvdman_settings = {
       "",
       "GUEST",
       ""}}};
-#elif USB_DRIVER
-struct cdvdman_settings_usb cdvdman_settings = {
+#elif BDM_DRIVER
+struct cdvdman_settings_bdm cdvdman_settings = {
     {0x69, 0x69,
      0x1234,
      0x39393939,
@@ -316,7 +314,7 @@ static void cdvdman_init(void)
             ThreadData.attr = TH_C;
             ThreadData.option = 0xABCD0001;
             ThreadData.priority = 1;
-            ThreadData.stacksize = 0x400;
+            ThreadData.stacksize = 0x1000;
             ThreadData.thread = &cdvdman_poff_thread;
             StartThread(POFFThreadID = CreateThread(&ThreadData), NULL);
         }
@@ -1822,7 +1820,7 @@ static void cdvdman_startThreads(void)
     cdvdman_stat.err = CDVD_ERR_NO;
 
     thread_param.thread = &cdvdman_cdread_Thread;
-    thread_param.stacksize = 0x440;
+    thread_param.stacksize = 0x1000;
     thread_param.priority = 0x0f;
     thread_param.attr = TH_C;
     thread_param.option = 0xABCD0000;

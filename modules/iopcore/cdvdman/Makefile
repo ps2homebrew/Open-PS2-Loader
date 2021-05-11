@@ -28,11 +28,11 @@ USE_DEV9 = 1
 IOP_INCS += -I../../network/common
 endif
 
-ifeq ($(USE_USB),1)
-IOP_BIN  = usb_cdvdman.irx
-IOP_OBJS_DIR = obj.usb/
-IOP_OBJS += device-usb.o mass_driver.o
-IOP_CFLAGS += -DUSB_DRIVER
+ifeq ($(USE_BDM),1)
+IOP_BIN  = bdm_cdvdman.irx
+IOP_OBJS_DIR = obj.bdm/
+IOP_OBJS += device-bdm.o
+IOP_CFLAGS += -DBDM_DRIVER
 ifeq ($(IOPCORE_DEBUG),1)
 USE_DEV9 = 1
 endif

@@ -7,7 +7,7 @@
 #include "include/ioman.h"
 #include "include/util.h"
 
-#include "include/usbsupport.h"
+#include "include/bdmsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 

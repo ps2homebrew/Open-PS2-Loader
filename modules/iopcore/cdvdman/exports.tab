@@ -136,6 +136,21 @@ DECLARE_EXPORT_TABLE(cdvdstm, 1, 1)
 	DECLARE_EXPORT(_retonly)
 END_EXPORT_TABLE
 
+#ifdef BDM_DRIVER
+DECLARE_EXPORT_TABLE(bdm, 1, 1)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(_ret0)
+	DECLARE_EXPORT(_retonly)
+	DECLARE_EXPORT(bdm_connect_bd)
+	DECLARE_EXPORT(bdm_disconnect_bd)
+//	DECLARE_EXPORT(bdm_connect_fs)
+//	DECLARE_EXPORT(bdm_disconnect_fs)
+//	DECLARE_EXPORT(bdm_get_bd)
+//	DECLARE_EXPORT(bdm_RegisterCallback)
+END_EXPORT_TABLE
+#endif
+
 #ifdef HDD_DRIVER
 // atad export table
 DECLARE_EXPORT_TABLE(atad, 1, 3)
@@ -199,9 +214,9 @@ DECLARE_EXPORT_TABLE(oplutils, 1, 2)
 	DECLARE_EXPORT(_retonly)
 	DECLARE_EXPORT(getModInfo)
 	DECLARE_EXPORT(oplRegisterShutdownCallback)
-#ifdef USB_DRIVER
-	DECLARE_EXPORT(mass_stor_readSector)
-	DECLARE_EXPORT(mass_stor_writeSector)
+#ifdef BDM_DRIVER
+	DECLARE_EXPORT(bdm_readSector)
+	DECLARE_EXPORT(bdm_writeSector)
 #endif
 #ifdef HDD_DRIVER
 	DECLARE_EXPORT(ata_device_sector_io)

@@ -26,7 +26,7 @@
 #include "httpclient.h"
 
 #include "include/supportbase.h"
-#include "include/usbsupport.h"
+#include "include/bdmsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 #include "include/appsupport.h"
@@ -140,7 +140,7 @@ char gPCUserName[32];
 char gPCPassword[32];
 int gNetworkStartup;
 int gHDDSpindown;
-int gUSBStartMode;
+int gBDMStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
@@ -175,7 +175,7 @@ int gDisableDebug;
 int gPS2Logo;
 int gDefaultDevice;
 int gEnableWrite;
-char gUSBPrefix[32];
+char gBDMPrefix[32];
 char gETHPrefix[32];
 int gRememberLastPlayed;
 int KeyPressedOnce;
@@ -371,7 +371,7 @@ static void initSupport(item_list_t *itemList, int startMode, int mode, int forc
 
 static void initAllSupport(int force_reinit)
 {
-    initSupport(usbGetObject(0), gUSBStartMode, USB_MODE, force_reinit);
+    initSupport(bdmGetObject(0), gBDMStartMode, BDM_MODE, force_reinit);
     initSupport(ethGetObject(0), gETHStartMode, ETH_MODE, force_reinit || (gNetworkStartup >= ERROR_ETH_SMB_CONN));
     initSupport(hddGetObject(0), gHDDStartMode, HDD_MODE, force_reinit);
     initSupport(appGetObject(0), gAPPStartMode, APP_MODE, force_reinit);
@@ -379,7 +379,7 @@ static void initAllSupport(int force_reinit)
 
 static void deinitAllSupport(int exception, int modeSelected)
 {
-    moduleCleanup(&list_support[USB_MODE], exception, modeSelected);
+    moduleCleanup(&list_support[BDM_MODE], exception, modeSelected);
     moduleCleanup(&list_support[ETH_MODE], exception, modeSelected);
     moduleCleanup(&list_support[HDD_MODE], exception, modeSelected);
     moduleCleanup(&list_support[APP_MODE], exception, modeSelected);
@@ -702,18 +702,18 @@ void setErrorMessage(int strId)
 static int lscstatus = CONFIG_ALL;
 static int lscret = 0;
 
-static int checkLoadConfigUSB(int types)
+static int checkLoadConfigBDM(int types)
 {
     char path[64];
     int value;
 
     // check USB
-    if (usbFindPartition(path, "conf_opl.cfg", 0)) {
+    if (bdmFindPartition(path, "conf_opl.cfg", 0)) {
         configEnd();
         configInit(path);
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
-        configSetInt(configOPL, CONFIG_OPL_USB_MODE, START_MODE_AUTO);
+        configSetInt(configOPL, CONFIG_OPL_BDM_MODE, START_MODE_AUTO);
         return value;
     }
 
@@ -750,7 +750,7 @@ static int tryAlternateDevice(int types)
 
     //First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
-        if ((value = checkLoadConfigUSB(types)) != 0)
+        if ((value = checkLoadConfigBDM(types)) != 0)
             return value;
     } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
         if ((value = checkLoadConfigHDD(types)) != 0)
@@ -759,7 +759,7 @@ static int tryAlternateDevice(int types)
 
     //Config was not found on the boot device. Check all supported devices.
     // Check USB device
-    if ((value = checkLoadConfigUSB(types)) != 0)
+    if ((value = checkLoadConfigBDM(types)) != 0)
         return value;
     // Check HDD
     if ((value = checkLoadConfigHDD(types)) != 0)
@@ -838,11 +838,11 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, &gDefaultDevice);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, &gEnableWrite);
             configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
-            configGetStrCopy(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix, sizeof(gUSBPrefix));
+            configGetStrCopy(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix, sizeof(gBDMPrefix));
             configGetStrCopy(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix, sizeof(gETHPrefix));
             configGetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, &gRememberLastPlayed);
             configGetInt(configOPL, CONFIG_OPL_AUTOSTART_LAST, &gAutoStartLastPlayed);
-            configGetInt(configOPL, CONFIG_OPL_USB_MODE, &gUSBStartMode);
+            configGetInt(configOPL, CONFIG_OPL_BDM_MODE, &gBDMStartMode);
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
@@ -894,12 +894,12 @@ static void _loadConfig()
     showCfgPopup = 1;
 }
 
-static int trySaveConfigUSB(int types)
+static int trySaveConfigBDM(int types)
 {
     char path[64];
 
     // check USB
-    if (usbFindPartition(path, "conf_opl.cfg", 1)) {
+    if (bdmFindPartition(path, "conf_opl.cfg", 1)) {
         configSetMove(path);
         return configWriteMulti(types);
     }
@@ -934,7 +934,7 @@ static int trySaveAlternateDevice(int types)
 
     //First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
-        if ((value = trySaveConfigUSB(types)) > 0)
+        if ((value = trySaveConfigBDM(types)) > 0)
             return value;
     } else if (!strncmp(pwd, "hdd", 3) && (pwd[3] == ':' || pwd[4] == ':')) {
         if ((value = trySaveConfigHDD(types)) > 0)
@@ -948,7 +948,7 @@ static int trySaveAlternateDevice(int types)
             return value;
     }
     // Try a USB device
-    if ((value = trySaveConfigUSB(types)) > 0)
+    if ((value = trySaveConfigBDM(types)) > 0)
         return value;
     // Try the HDD
     if ((value = trySaveConfigHDD(types)) > 0)
@@ -987,11 +987,11 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_DEFAULT_DEVICE, gDefaultDevice);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_WRITE, gEnableWrite);
         configSetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, gHDDSpindown);
-        configSetStr(configOPL, CONFIG_OPL_USB_PREFIX, gUSBPrefix);
+        configSetStr(configOPL, CONFIG_OPL_BDM_PREFIX, gBDMPrefix);
         configSetStr(configOPL, CONFIG_OPL_ETH_PREFIX, gETHPrefix);
         configSetInt(configOPL, CONFIG_OPL_REMEMBER_LAST, gRememberLastPlayed);
         configSetInt(configOPL, CONFIG_OPL_AUTOSTART_LAST, gAutoStartLastPlayed);
-        configSetInt(configOPL, CONFIG_OPL_USB_MODE, gUSBStartMode);
+        configSetInt(configOPL, CONFIG_OPL_BDM_MODE, gBDMStartMode);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
@@ -1063,7 +1063,7 @@ void applyConfig(int themeID, int langID)
 
     initAllSupport(0);
 
-    moduleUpdateMenu(USB_MODE, changed, langChanged);
+    moduleUpdateMenu(BDM_MODE, changed, langChanged);
     moduleUpdateMenu(ETH_MODE, changed, langChanged);
     moduleUpdateMenu(HDD_MODE, changed, langChanged);
     moduleUpdateMenu(APP_MODE, changed, langChanged);
@@ -1139,7 +1139,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     const char *startup;
 
     switch (support->mode) {
-        case USB_MODE:
+        case BDM_MODE:
             device = 3;
             break;
         case ETH_MODE:
@@ -1516,7 +1516,7 @@ void setDefaultColors(void)
 
 static void setDefaults(void)
 {
-    clearIOModuleT(&list_support[USB_MODE]);
+    clearIOModuleT(&list_support[BDM_MODE]);
     clearIOModuleT(&list_support[ETH_MODE]);
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
@@ -1565,7 +1565,7 @@ static void setDefaults(void)
     gRememberLastPlayed = 0;
     gAutoStartLastPlayed = 9;
     gSelectButton = KEY_CIRCLE; //Default to Japan.
-    gUSBPrefix[0] = '\0';
+    gBDMPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gEnableNotifications = 0;
     gEnableArt = 0;
@@ -1575,7 +1575,7 @@ static void setDefaults(void)
     gSFXVolume = 80;
     gBootSndVolume = 80;
 
-    gUSBStartMode = START_MODE_DISABLED;
+    gBDMStartMode = START_MODE_DISABLED;
     gHDDStartMode = START_MODE_DISABLED;
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;

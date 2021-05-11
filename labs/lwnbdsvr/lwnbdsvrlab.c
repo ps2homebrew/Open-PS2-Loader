@@ -35,8 +35,8 @@ extern void ps2atad_irx;
 extern int size_ps2atad_irx;
 extern void ps2hdd_irx;
 extern int size_ps2hdd_irx;
-extern void hdldsvr_irx;
-extern int size_hdldsvr_irx;
+extern void lwnbdsvr_irx;
+extern int size_lwnbdsvr_irx;
 extern void iomanx_irx;
 extern int size_iomanx_irx;
 extern void filexio_irx;
@@ -76,7 +76,7 @@ int main(int argc, char *argv[2])
 
     init_scr();
     scr_clear();
-    scr_printf("\t hdldsvrlab\n\n");
+    scr_printf("\t lwnbdsvrlab\n\n");
 
     SifInitRpc(0);
 
@@ -122,7 +122,7 @@ int main(int argc, char *argv[2])
     id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
     id = SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
     id = SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
-    id = SifExecModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL, &ret);
+    id = SifExecModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL, &ret);
 
     scr_printf("OK\n");
 

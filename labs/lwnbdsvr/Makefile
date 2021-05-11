@@ -1,6 +1,6 @@
 
-EE_BIN = hdldsvrlab.elf
-EE_OBJS = hdldsvrlab.o discid.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o ps2atad.o ps2hdd.o hdldsvr.o iomanx.o filexio.o
+EE_BIN = lwnbdsvrlab.elf
+EE_OBJS = lwnbdsvrlab.o discid.o poweroff.o ps2dev9.o smsutils.o smstcpip.o smsmap.o ps2atad.o ps2hdd.o lwnbdsvr.o iomanx.o filexio.o
 
 EE_LIBS = -lfileXio -lpatches -ldebug -lc -lkernel
 EE_CFLAGS = -g
@@ -19,7 +19,7 @@ clean:
 	$(MAKE) -C ../../modules/network/SMSMAP clean
 	$(MAKE) -C ../../modules/hdd/atad clean
 	$(MAKE) -C ../../modules/hdd/ps2hdd clean
-	$(MAKE) -C ../../modules/hdd/hdldsvr clean
+	$(MAKE) -C ../../modules/network/lwnbdsvr clean
 	rm -f *.elf *.o *.a *.s
 
 rebuild: clean all
@@ -42,7 +42,7 @@ smsutils.s:
 smstcpip.s:
 	$(MAKE) -C ../../modules/network/SMSTCPIP -f Makefile rebuild
 	$(BIN2S) ../../modules/network/SMSTCPIP/SMSTCPIP.irx smstcpip.s smstcpip_irx
-		
+
 smsmap.s:
 	$(MAKE) -C ../../modules/network/SMSMAP
 	$(BIN2S) ../../modules/network/SMSMAP/SMSMAP.irx smsmap.s smsmap_irx
@@ -55,9 +55,9 @@ ps2hdd.s:
 	$(MAKE) -C ../../modules/hdd/ps2hdd
 	$(BIN2S) ../../modules/hdd/ps2hdd/ps2hdd.irx ps2hdd.s ps2hdd_irx
 
-hdldsvr.s:
-	$(MAKE) -C ../../modules/hdd/hdldsvr
-	$(BIN2S) ../../modules/hdd/hdldsvr/hdldsvr.irx hdldsvr.s hdldsvr_irx
+lwnbdsvr.s:
+	$(MAKE) -C ../../modules/network/lwnbdsvr
+	$(BIN2S) ../../modules/network/lwnbdsvr/lwnbdsvr.irx lwnbdsvr.s lwnbdsvr_irx
 
 iomanx.s:
 	$(BIN2S) $(PS2SDK)/iop/irx/iomanX.irx iomanx.s iomanx_irx

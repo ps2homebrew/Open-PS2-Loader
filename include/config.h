@@ -79,11 +79,11 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_DEFAULT_DEVICE "default_device"
 #define CONFIG_OPL_ENABLE_WRITE "enable_delete_rename"
 #define CONFIG_OPL_HDD_SPINDOWN "hdd_spindown"
-#define CONFIG_OPL_USB_PREFIX "usb_prefix"
+#define CONFIG_OPL_BDM_PREFIX "usb_prefix" // Leave this "usb" for compatibility
 #define CONFIG_OPL_ETH_PREFIX "eth_prefix"
 #define CONFIG_OPL_REMEMBER_LAST "remember_last"
 #define CONFIG_OPL_AUTOSTART_LAST "autostart_last"
-#define CONFIG_OPL_USB_MODE "usb_mode"
+#define CONFIG_OPL_BDM_MODE "usb_mode" // Leave this "usb" for compatibility
 #define CONFIG_OPL_HDD_MODE "hdd_mode"
 #define CONFIG_OPL_ETH_MODE "eth_mode"
 #define CONFIG_OPL_APP_MODE "app_mode"

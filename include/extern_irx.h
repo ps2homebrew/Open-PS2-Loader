@@ -10,6 +10,21 @@ extern int size_apemodpatch_irx;
 extern void *audsrv_irx;
 extern int size_audsrv_irx;
 
+extern void *bdm_irx;
+extern int size_bdm_irx;
+
+extern void *bdm_cdvdman_irx;
+extern int size_bdm_cdvdman_irx;
+
+extern void *bdm_mcemu_irx;
+extern int size_bdm_mcemu_irx;
+
+extern void *bdmevent_irx;
+extern int size_bdmevent_irx;
+
+extern void *bdmfs_vfat_irx;
+extern int size_bdmfs_vfat_irx;
+
 extern void *bt_pademu_irx;
 extern int size_bt_pademu_irx;
 
@@ -57,6 +72,12 @@ extern int size_hdpro_atad_irx;
 
 extern void *httpclient_irx;
 extern int size_httpclient_irx;
+
+extern void *IEEE1394_bd_irx;
+extern int size_IEEE1394_bd_irx;
+
+extern void *iLinkman_irx;
+extern int size_iLinkman_irx;
 
 extern void *imgdrv_irx;
 extern int size_imgdrv_irx;
@@ -121,9 +142,6 @@ extern int size_ps2ip_irx;
 extern void *ps2link_irx;
 extern int size_ps2link_irx;
 
-extern void *pusbd_irx;
-extern int size_pusbd_irx;
-
 extern void *resetspu_irx;
 extern int size_resetspu_irx;
 
@@ -169,17 +187,8 @@ extern int size_udnl_irx;
 extern void *usbd_irx;
 extern int size_usbd_irx;
 
-extern void *usb_cdvdman_irx;
-extern int size_usb_cdvdman_irx;
-
-extern void *usbhdfsd_irx;
-extern int size_usbhdfsd_irx;
-
-extern void *usbhdfsdfsv_irx;
-extern int size_usbhdfsdfsv_irx;
-
-extern void *usb_mcemu_irx;
-extern int size_usb_mcemu_irx;
+extern void *usbmass_bd_irx;
+extern int size_usbmass_bd_irx;
 
 extern void *usb_pademu_irx;
 extern int size_usb_pademu_irx;

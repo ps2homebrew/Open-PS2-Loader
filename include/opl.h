@@ -73,7 +73,7 @@ int saveConfig(int types, int showUI);
 void applyConfig(int themeID, int langID);
 void menuDeferredUpdate(void *data);
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged);
-void handleHdlSrv();
+void handleLwnbdSrv();
 void deinit(int exception, int modeSelected);
 
 extern char *gBaseMCDir;

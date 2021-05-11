@@ -4,13 +4,12 @@
 #include <irx.h>
 
 #include <atad.h>
-#include <dev9.h>
 #include <loadcore.h>
-#include <poweroff.h>
 #include <ps2ip.h>
-#include "smsutils.h"
+#include <stdio.h>
 #include <sysclib.h>
 #include <thbase.h>
 #include <thsemap.h>
+#include <mcman.h>
 
 #endif

@@ -7,7 +7,7 @@
 #define IO_MODE_SELECTED_ALL MODE_COUNT
 
 enum IO_MODES {
-    USB_MODE = 0,
+    BDM_MODE = 0,
     ETH_MODE,
     HDD_MODE,
     APP_MODE,

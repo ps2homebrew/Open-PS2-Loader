@@ -51,8 +51,10 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("OPL EE core start!\n");
 
     p = _strtok(argv[i], " ");
-    if (!_strncmp(p, "USB_MODE", 8))
-        GameMode = USB_MODE;
+    if (!_strncmp(argv[i], "BDM_ILK_MODE", 12))
+        GameMode = BDM_ILK_MODE;
+    else if (!_strncmp(p, "BDM_USB_MODE", 12))
+        GameMode = BDM_USB_MODE;
     else if (!_strncmp(p, "ETH_MODE", 8))
         GameMode = ETH_MODE;
     else if (!_strncmp(p, "HDD_MODE", 8))

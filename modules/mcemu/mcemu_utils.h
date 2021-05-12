@@ -38,14 +38,14 @@ int getModInfo(u8 *modname, modinfo_t *info);
 int oplRegisterShutdownCallback(oplShutdownCb_t cb);
 #define I_oplRegisterShutdownCallback DECLARE_IMPORT(5, oplRegisterShutdownCallback)
 
-/* MASS Transfer Imports */
-#ifdef USB_DRIVER
+/* BDM Transfer Imports */
+#ifdef BDM_DRIVER
 
-void mass_stor_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer);
-#define I_mass_stor_readSector DECLARE_IMPORT(6, mass_stor_readSector)
+void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char *buffer);
+#define I_bdm_readSector DECLARE_IMPORT(6, bdm_readSector)
 
-void mass_stor_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer);
-#define I_mass_stor_writeSector DECLARE_IMPORT(7, mass_stor_writeSector)
+void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer);
+#define I_bdm_writeSector DECLARE_IMPORT(7, bdm_writeSector)
 
 #endif
 

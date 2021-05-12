@@ -864,7 +864,7 @@ void menuHandleInputMenu()
     if (getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
         //Check if there is anything to show the user, at all.
         //START of OPL_DB tweaks
-        if (gAPPStartMode || gELMStartMode || gETHStartMode || gUSBStartMode || gHDDStartMode)
+        if (gAPPStartMode || gELMStartMode || gETHStartMode || gBDMStartMode || gHDDStartMode)
             //END of OPL_DB tweaks
             guiSwitchScreen(GUI_SCREEN_MAIN);
     }

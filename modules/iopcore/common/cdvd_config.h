@@ -43,7 +43,7 @@ struct cdvdman_settings_smb
     };
 };
 
-struct cdvdman_settings_usb
+struct cdvdman_settings_bdm
 {
     struct cdvdman_settings_common common;
     u32 LBAs[ISO_MAX_PARTS];

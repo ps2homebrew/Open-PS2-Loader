@@ -16,7 +16,7 @@
 #include "include/system.h"
 #include "include/ioman.h"
 #include "include/ioprp.h"
-#include "include/usbsupport.h"
+#include "include/bdmsupport.h"
 #include "include/OSDHistory.h"
 #include "include/renderman.h"
 #include "include/extern_irx.h"
@@ -224,7 +224,7 @@ void sysReset(int modload_mask)
     sysLoadModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL);
 
     if (modload_mask & SYS_LOAD_USB_MODULES) {
-        usbLoadModules();
+        bdmLoadModules();
     }
     if (modload_mask & SYS_LOAD_ISOFS_MODULE) {
         sysLoadModuleBuffer(&isofs_irx, size_isofs_irx, 0, NULL);
@@ -358,6 +358,7 @@ void sysExecExit(void)
 #define CORE_IRX_VMC 0x10
 #define CORE_IRX_DEBUG 0x20
 #define CORE_IRX_DECI2 0x40
+#define CORE_IRX_ILINK 0x80
 
 typedef struct
 {
@@ -433,8 +434,10 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     int i, modcount;
     unsigned int curIrxSize, size_ioprp_image, total_size;
 
-    if (!strcmp(mode_str, "USB_MODE"))
+    if (!strcmp(mode_str, "BDM_USB_MODE"))
         modules |= CORE_IRX_USB;
+    else if (!strcmp(mode_str, "BDM_ILK_MODE"))
+        modules |= CORE_IRX_ILINK;
     else if (!strcmp(mode_str, "ETH_MODE"))
         modules |= CORE_IRX_ETH | CORE_IRX_SMB;
     else
@@ -465,8 +468,18 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 #define PADEMU_ARG
 #endif
     if ((modules & CORE_IRX_USB) PADEMU_ARG) {
-        irxptr_tab[modcount].info = size_pusbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
-        irxptr_tab[modcount++].ptr = pusbd_irx;
+        irxptr_tab[modcount].info = size_usbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
+        irxptr_tab[modcount++].ptr = (void *)&usbd_irx;
+    }
+    if (modules & CORE_IRX_USB) {
+        irxptr_tab[modcount].info = size_usbmass_bd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBMASSBD);
+        irxptr_tab[modcount++].ptr = (void *)&usbmass_bd_irx;
+    }
+    if (modules & CORE_IRX_ILINK) {
+        irxptr_tab[modcount].info = size_iLinkman_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_ILINK);
+        irxptr_tab[modcount++].ptr = (void *)&iLinkman_irx;
+        irxptr_tab[modcount].info = size_IEEE1394_bd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_ILINKBD);
+        irxptr_tab[modcount++].ptr = (void *)&IEEE1394_bd_irx;
     }
     if (modules & CORE_IRX_ETH) {
         irxptr_tab[modcount].info = size_smap_ingame_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_SMAP);

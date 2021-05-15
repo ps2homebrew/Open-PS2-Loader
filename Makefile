@@ -85,7 +85,7 @@ MISC_OBJS =	icon_sys_A.o icon_sys_J.o icon_sys_C.o conf_theme_OPL.o \
 
 IOP_OBJS =	iomanx.o filexio.o ps2fs.o usbd.o bdmevent.o \
 		bdm.o bdmfs_vfat.o usbmass_bd.o iLinkman.o IEEE1394_bd.o \
-		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o hdldsvr.o \
+		ps2atad.o hdpro_atad.o poweroff.o ps2hdd.o xhdd.o genvmc.o lwnbdsvr.o \
 		ps2dev9.o smsutils.o ps2ip.o smap.o isofs.o nbns-iop.o \
 		sio2man.o padman.o mcman.o mcserv.o \
 		httpclient-iop.o netman.o ps2ips.o \
@@ -284,8 +284,8 @@ clean:
 	$(MAKE) -C modules/mcemu USE_SMB=1 clean
 	echo " -genvmc"
 	$(MAKE) -C modules/vmc/genvmc clean
-	echo " -hdldsvr"
-	$(MAKE) -C modules/hdd/hdldsvr clean
+	echo " -lwnbdsvr"
+	$(MAKE) -C modules/network/lwnbdsvr clean
 	echo " -udptty-ingame"
 	$(MAKE) -C modules/debug/udptty-ingame clean
 	echo " -ioptrap"
@@ -611,11 +611,11 @@ modules/vmc/genvmc/genvmc.irx: modules/vmc/genvmc
 $(EE_ASM_DIR)genvmc.s: modules/vmc/genvmc/genvmc.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ genvmc_irx
 
-modules/hdd/hdldsvr/hdldsvr.irx: modules/hdd/hdldsvr
+modules/network/lwnbdsvr/lwnbdsvr.irx: modules/network/lwnbdsvr
 	$(MAKE) -C $<
 
-$(EE_ASM_DIR)hdldsvr.s: modules/hdd/hdldsvr/hdldsvr.irx | $(EE_ASM_DIR)
-	$(BIN2S) $< $@ hdldsvr_irx
+$(EE_ASM_DIR)lwnbdsvr.s: modules/network/lwnbdsvr/lwnbdsvr.irx | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ lwnbdsvr_irx
 
 $(EE_ASM_DIR)udptty.s: $(PS2SDK)/iop/irx/udptty.irx | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ udptty_irx

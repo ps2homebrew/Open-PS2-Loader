@@ -1360,13 +1360,13 @@ int oplUpdateGameCompatSingle(int id, item_list_t *support, config_set_t *config
 }
 
 // ----------------------------------------------------------
-// -------------------- HD SRV Support ----------------------
+// -------------------- NBD SRV Support ---------------------
 // ----------------------------------------------------------
-static int loadHdldSvr(void)
+static int loadLwnbdSvr(void)
 {
     int ret, padStatus;
 
-    // deint audio lib while hdl server is running
+    // deint audio lib while nbd server is running
     sfxEnd();
 
     // block all io ops, wait for the ones still running to finish
@@ -1385,7 +1385,7 @@ static int loadHdldSvr(void)
     if (ret == 0) {
         ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
         if (ret >= 0) {
-            ret = sysLoadModuleBuffer(&hdldsvr_irx, size_hdldsvr_irx, 0, NULL);
+            ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL);
             if (ret >= 0)
                 ret = 0;
         }
@@ -1403,7 +1403,7 @@ static int loadHdldSvr(void)
     return ret;
 }
 
-static void unloadHdldSvr(void)
+static void unloadLwnbdSvr(void)
 {
     ethDeinitModules();
     unloadPads();
@@ -1430,18 +1430,21 @@ static void unloadHdldSvr(void)
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &deferredAudioInit);
 }
 
-void handleHdlSrv()
+void handleLwnbdSrv()
 {
-    // prepare for hdl, display screen with info
-    guiRenderTextScreen(_l(_STR_STARTINGHDL));
-    if (loadHdldSvr() == 0)
-        guiMsgBox(_l(_STR_RUNNINGHDL), 0, NULL);
-    else
-        guiMsgBox(_l(_STR_STARTFAILHDL), 0, NULL);
+    char temp[256];
+    // prepare for lwnbd, display screen with info
+    guiRenderTextScreen(_l(_STR_STARTINGNBD));
+    if (loadLwnbdSvr() == 0) {
+        snprintf(temp, sizeof(temp), "%s\nIP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
+                 ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], ps2_ip_use_dhcp ? "DHCP" : "");
+        guiMsgBox(temp, 0, NULL);
+    } else
+        guiMsgBox(_l(_STR_STARTFAILNBD), 0, NULL);
 
     // restore normal functionality again
-    guiRenderTextScreen(_l(_STR_UNLOADHDL));
-    unloadHdldSvr();
+    guiRenderTextScreen(_l(_STR_UNLOADNBD));
+    unloadLwnbdSvr();
 }
 
 // ----------------------------------------------------------

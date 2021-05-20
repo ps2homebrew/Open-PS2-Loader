@@ -6,7 +6,7 @@
 #include "include/system.h"
 #include "include/ioman.h"
 
-#include "include/usbsupport.h"
+#include "include/bdmsupport.h"
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 #include "include/supportbase.h"
@@ -41,7 +41,7 @@ static ElmGame *elmGameList = NULL;
 
 //The full path to the POPSTARTER.ELF file. Eg: smb0:POPS/POPSTARTER.ELF
 char elmPathElfHdd[256];
-char elmPathElfUsb[256];
+char elmPathElfBdm[256];
 char elmPathElfEth[256];
 
 //Last modified for the folder
@@ -355,18 +355,18 @@ static int elmUpdateItemList(void)
     }
 
     //Try USB
-    if (usbGetObject(1)) {
+    if (bdmGetObject(1)) {
         //Eg: mass0:POPS/POPSTARTER.ELF
-        snprintf(elmPathElfUsb, sizeof(elmPathElfUsb), "%sPOPS/POPSTARTER.ELF", usbGetBase());
-        LOG("elmPathElfUsb = %s\n", elmPathElfUsb);
+        snprintf(elmPathElfBdm, sizeof(elmPathElfBdm), "%sPOPS/POPSTARTER.ELF", bdmGetBase());
+        LOG("elmPathElfUsb = %s\n", elmPathElfBdm);
 
         //Check if POPSTARTER.ELF exists in the folder.
-        int fdElf = open(elmPathElfUsb, O_RDONLY, 0666);
+        int fdElf = open(elmPathElfBdm, O_RDONLY, 0666);
         if (fdElf >= 0) {
             close(fdElf);
-            elmItemCount += elmScanVCDs(usbGetBase());
+            elmItemCount += elmScanVCDs(bdmGetBase());
         } else {
-            LOG("POPSTARTER.ELF not found at %s", elmPathElfUsb);
+            LOG("POPSTARTER.ELF not found at %s", elmPathElfBdm);
         }
     }
 
@@ -513,7 +513,7 @@ static void elmLaunchItem(int id, config_set_t *configSet)
         strcpy(elmPathElf, elmPathElfHdd);
         strcpy(elmElfPrefix, "");
     } else if (!strncmp(cur->file, "mass", 4)) {
-        strcpy(elmPathElf, elmPathElfUsb);
+        strcpy(elmPathElf, elmPathElfBdm);
         strcpy(elmElfPrefix, "XX.");
     } else {
         strcpy(elmPathElf, elmPathElfEth);
@@ -570,7 +570,7 @@ static void elmLaunchItem(int id, config_set_t *configSet)
 
             // Figure out in what device the VCD is at. This is necessary to avoid the device to be unmounted.
             if (strncmp(cur->file, "mass", 4) == 0) {
-                mode = USB_MODE;
+                mode = BDM_MODE;
             } else if (strncmp(cur->file, "hdd", 3) == 0) {
                 mode = HDD_MODE;
             } else if (strncmp(cur->file, "smb", 3) == 0) {
@@ -634,15 +634,15 @@ static config_set_t *elmGetConfig(int id)
     }
 
     //USB
-    if (ret == 0 && (listSupport = usbGetObject(1))) {
+    if (ret == 0 && (listSupport = bdmGetObject(1))) {
         char path[256];
         if (config != NULL)
             configFree(config);
 
 #if OPL_IS_DEV_BUILD
-        snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", usbGetPrefix(), cur->ID);
+        snprintf(path, sizeof(path), "%sCFG-DEV/%s.cfg", bdmGetPrefix(), cur->ID);
 #else
-        snprintf(path, sizeof(path), "%sCFG/%s.cfg", usbGetPrefix(), cur->ID);
+        snprintf(path, sizeof(path), "%sCFG/%s.cfg", bdmGetPrefix(), cur->ID);
 #endif
         config = configAlloc(1, NULL, path);
         ret = configRead(config);
@@ -678,7 +678,7 @@ static int elmGetImage(char *folder, int isRelative, char *value, char *suffix, 
             return 0;
     }
 
-    if ((listSupport = usbGetObject(1)))
+    if ((listSupport = bdmGetObject(1)))
         return listSupport->itemGetImage(folder, isRelative, value, suffix, resultTex, psm);
 
     return -1;

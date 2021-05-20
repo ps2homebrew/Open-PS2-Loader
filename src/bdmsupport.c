@@ -35,7 +35,7 @@ char *bdmGetPrefix(void)
     return bdmPrefix;
 }
 
-char bdmGetBase(void)
+char *bdmGetBase(void)
 {
     return bdmBase;
 }

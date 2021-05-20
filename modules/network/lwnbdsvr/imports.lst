@@ -5,17 +5,9 @@ I_ata_device_sector_io
 I_ata_device_flush_cache
 atad_IMPORTS_end
 
-dev9_IMPORTS_start
-I_dev9Shutdown
-dev9_IMPORTS_end
-
 loadcore_IMPORTS_start
 I_RegisterLibraryEntries
 loadcore_IMPORTS_end
-
-poweroff_IMPORTS_start
-I_PoweroffShutdown
-poweroff_IMPORTS_end
 
 ps2ip_IMPORTS_start
 I_lwip_recv
@@ -29,11 +21,6 @@ I_lwip_select
 I_inet_addr
 ps2ip_IMPORTS_end
 
-smsutils_IMPORTS_start
-I_mips_memset
-I_mips_memcpy
-smsutils_IMPORTS_end
-
 thbase_IMPORTS_start
 I_DelayThread
 I_CreateThread
@@ -41,17 +28,15 @@ I_StartThread
 I_DeleteThread
 thbase_IMPORTS_end
 
-thsemap_IMPORTS_start
-I_CreateSema
-I_WaitSema
-I_SignalSema
-I_DeleteSema
-thsemap_IMPORTS_end
-
 sysclib_IMPORTS_start
+I_strcpy
 I_strlen
+I_memcpy
+I_memset
 sysclib_IMPORTS_end
 
-//stdio_IMPORTS_start
-//I_printf
-//stdio_IMPORTS_end
+stdio_IMPORTS_start
+I_printf
+stdio_IMPORTS_end
+
+

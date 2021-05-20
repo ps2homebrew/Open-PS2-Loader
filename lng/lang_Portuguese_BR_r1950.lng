@@ -1,6 +1,6 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: Feb. 01, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 OPL %s
@@ -70,11 +70,11 @@ Modo de início do dispositivo REDE
 Modo de início dos Aplicativos
 Automático
 Manual
-Iniciar servidor HDL
-Iniciando Servidor HDL...
-Servidor HDL conectado...
-Falha na inicialização do Servidor HDL.
-Fechando servidor HDL...
+Iniciar servidor NBD
+Iniciando Servidor NBD...
+Servidor NBD conectado...
+Falha na inicialização do Servidor NBD.
+Fechando servidor NBD...
 Sair para
 Cor do fundo
 Cor do texto

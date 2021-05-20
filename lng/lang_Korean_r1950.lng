@@ -1,6 +1,6 @@
 # Translated by DDinghoya
-# Last update: Feb. 16, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
@@ -70,11 +70,11 @@ ETH 장치 시작 모드
 응용프로그램 시작 모드
 자동
 수동
-HDL 서버 시작
-HDL 서버 시작 중...
-HDL 서버 가동 중...
-HDL 서버 시작 실패
-HDL 서버 업로딩 중...
+NBD 서버 시작
+NBD 서버 시작 중...
+NBD 서버 가동 중...
+NBD 서버 시작 실패
+NBD 서버 업로딩 중...
 IGR 경로
 배경 색상
 문자 색상

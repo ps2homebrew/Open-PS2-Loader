@@ -1,6 +1,6 @@
 # Translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante and Çağhan DEMİR <caghandemir@gmail.com> aka: caghandemir
-# Last update: Feb. 01, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Turkish
 OPL %s
@@ -70,11 +70,11 @@ AĞ cihazı başlangıç türü
 Uygulamalar menüsü görünüm kipi
 Otomatik
 El ile
-HDL Sunucu Başlat
-HDL Sunucu Başlatma Hatası
-HDL Sunucu Başlıyor...
-HDL Sunucu Çalışıyor...
-HDL Sunucu Durduruluyor...
+NBD Sunucu Başlat
+NBD Sunucu Başlatma Hatası
+NBD Sunucu Başlıyor...
+NBD Sunucu Çalışıyor...
+NBD Sunucu Durduruluyor...
 IGR yeri
 Arkaplan rengi
 Metin rengi

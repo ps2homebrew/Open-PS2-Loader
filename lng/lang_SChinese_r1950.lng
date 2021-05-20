@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: Feb. 01, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Simplified Chinese
 OPL %s
@@ -70,11 +70,11 @@ ETH 设备启动模式
 应用程序启动模式
 自动
 手动
-启动 HDL 服务
-HDL 服务启动中...
-HDL 服务正在运行...
-启动 HDL 服务时出错.
-HDL 服务未能读取...
+启动 NBD 服务
+NBD 服务启动中...
+NBD 服务正在运行...
+启动 NBD 服务时出错.
+NBD 服务未能读取...
 IGR 位置
 背景颜色
 文字颜色

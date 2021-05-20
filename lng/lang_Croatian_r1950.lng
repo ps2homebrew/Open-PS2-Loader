@@ -1,6 +1,6 @@
 # Translation by Blacky5678
-# Last update: Feb. 01, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Croatian
 OPL %s
@@ -70,11 +70,11 @@ Pocetni Nacin ETH Uredaja
 Nacin Prikaza Aplikacijskog Izbornika
 Automatski
 Rucno
-Zapocni HDL Server
-Zapocinjanje HDL Servera...
-Pokretanje HDL Servera...
-Neuspjesno zapocinjanje HDL Servera.
-Gasenje HDL Server...
+Zapocni NBD Server
+Zapocinjanje NBD Servera...
+Pokretanje NBD Servera...
+Neuspjesno zapocinjanje NBD Servera.
+Gasenje NBD Server...
 IGR Putanja
 Boja Pozadine
 Boja Teksta

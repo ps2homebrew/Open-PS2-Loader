@@ -1,6 +1,6 @@
 # Translation by yohokaru
-# Last update: Feb. 01, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
 OPL %s
@@ -70,11 +70,11 @@ Uruchom Urządzenie ETH
 Wyświetl Menu Aplikacji
 Automatyczny
 Ręcznie
-Uruchom Serwer HDL
-Uruchamianie Serwera HDL...
-Serwer HDL uruchomiony...
-Nieudane uruchomienie serwera HDL.
-Serwer HDL zostanie zamknięty...
+Uruchom Serwer NBD
+Uruchamianie Serwera NBD...
+Serwer NBD uruchomiony...
+Nieudane uruchomienie serwera NBD.
+Serwer NBD zostanie zamknięty...
 Ścieżka Dla IGR
 Kolor Tła
 Kolor Tekstu

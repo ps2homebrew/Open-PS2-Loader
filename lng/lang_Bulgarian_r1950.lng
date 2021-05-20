@@ -1,6 +1,6 @@
 # translation by vsub and wisi
-# Last update: Feb. 01, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: May 20, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
 OPL %s
@@ -70,11 +70,11 @@ ETH режим - стартиране
 Меню "Приложения" - стартиране
 Автоматично
 Ръчно
-Стартиране на HDL сървъра
-HDL сървърът стартира...
-HDL сървърът работи...
-Провалено стартиране на HDL сървъра.
-HDL сървърът се изключва...
+Стартиране на NBD сървъра
+NBD сървърът стартира...
+NBD сървърът работи...
+Провалено стартиране на NBD сървъра.
+NBD сървърът се изключва...
 Изход от игра (IGR) към:
 Цвят на фона
 Цвят на текста

@@ -82,17 +82,17 @@ Loading config...
 Saving config...
 Start Device
 Refresh
-USB Device Start Mode
+BDM Device Start Mode
 HDD Device Start Mode
 ETH Device Start Mode
 Applications Start Mode
 Auto
 Manual
-Start HDL Server
-HDL Server starting...
-HDL Server running...
-Failed to start HDL Server.
-HDL Server unloading...
+Start NBD Server
+NBD Server starting...
+NBD Server running...
+Failed to start NBD Server.
+NBD Server unloading...
 IGR Path
 Background Color
 Text Color
@@ -155,7 +155,7 @@ Automatic Refresh
 About
 Coders
 Quality Assurance
-USB Prefix Path
+BDM Prefix Path
 Boots custom ELF after an IGR.
 Value in minute(s), 0 to disable spin down.
 Automatic HDD Spin Down
@@ -300,3 +300,4 @@ Genre
 Release
 Developer
 Description
+BDM Games

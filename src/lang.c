@@ -69,7 +69,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Saving config...",
     "Start Device",
     "Refresh",
-    "USB Device Start Mode",
+    "BDM Device Start Mode",
     "HDD Device Start Mode",
     "ETH Device Start Mode",
     "Applications Start Mode",
@@ -142,7 +142,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "About",
     "Coders",
     "Quality Assurance",
-    "USB Prefix Path",
+    "BDM Prefix Path",
     "Boots custom ELF after an IGR.",
     "Value in minute(s), 0 to disable spin down.",
     "Automatic HDD Spin Down",
@@ -287,6 +287,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Release",
     "Developer",
     "Description",
+    "BDM Games",
 };
 
 static int guiLangID = 0;

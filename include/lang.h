@@ -15,7 +15,7 @@ enum _STR_IDS {
     _STR_EXIT,
     _STR_SETTINGS,
     _STR_MENU,
-    _STR_BDM_GAMES,
+    _STR_USB_GAMES,
     _STR_HDD_GAMES,
     _STR_NET_GAMES,
     _STR_APPS,
@@ -283,6 +283,7 @@ enum _STR_IDS {
     _STR_INFO_RELEASE,
     _STR_INFO_DEVELOPER,
     _STR_INFO_DESCRIPTION,
+    _STR_BDM_GAMES,
 
     LANG_STR_COUNT
 };

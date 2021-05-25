@@ -82,7 +82,7 @@ Loading config...
 Saving config...
 Start Device
 Refresh
-USB Device Start Mode
+BDM Device Start Mode
 HDD Device Start Mode
 ETH Device Start Mode
 Applications Menu Display Mode
@@ -155,7 +155,7 @@ Automatic Refresh
 About
 Coders
 Quality Assurance
-USB Prefix Path
+BDM Prefix Path
 Boots custom ELF after an IGR.
 Value in minute(s), 0 to disable spin down.
 Automatic HDD Spin Down
@@ -300,6 +300,7 @@ Genre
 Release
 Developer
 Description
+BDM Games
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

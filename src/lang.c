@@ -71,7 +71,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Saving config...",
     "Start Device",
     "Refresh",
-    "USB Device Start Mode",
+    "BDM Device Start Mode",
     "HDD Device Start Mode",
     "ETH Device Start Mode",
     //START of OPL_DB tweaks
@@ -146,7 +146,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "About",
     "Coders",
     "Quality Assurance",
-    "USB Prefix Path",
+    "BDM Prefix Path",
     "Boots custom ELF after an IGR.",
     "Value in minute(s), 0 to disable spin down.",
     "Automatic HDD Spin Down",
@@ -291,6 +291,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Release",
     "Developer",
     "Description",
+    "BDM Games",
     //START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

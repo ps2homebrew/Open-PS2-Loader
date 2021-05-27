@@ -1,4 +1,4 @@
-# Portuguese_Brazil Translation by gledson999. https://www.retro-jogos.com/
+# Portuguese_Brazil Translation by gledson999 - https://www.retro-jogos.com/,DavidBrazSan
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Portuguese Brazil
 Open PS2 Loader %s
@@ -12,7 +12,7 @@ Erro ao salvar as configurações!
 Sair
 Configurações
 Menu
-Jogos no USB
+Jogos no BDM
 Jogos no HDD
 Jogos em ETH
 Aplicativos
@@ -62,17 +62,17 @@ Carregando configurações...
 Salvando configurações...
 Iniciar dispositivo
 Atualizar
-Modo de inicio no USB
+Modo de inicio no BDM
 Modo de inicio no HDD
 Modo de inicio no ETH
 Modo de inicio nos Aplicativos
 Automático
 Manual
-Iniciar o Servidor HDL
-O servidor HDL está iniciando...
-O servidor HDL está sendo executado...
-Falha ao iniciar o servidor HDL.
-O servidor HDL está sendo encerrado...
+Iniciar o Servidor NBD
+O servidor NBD está iniciando...
+O servidor NBD está sendo executado...
+Falha ao iniciar o servidor NBD.
+O servidor NBD está sendo encerrado...
 Caminho de saída do IGR
 Cor do fundo
 Cor do texto
@@ -135,7 +135,7 @@ Atualização Automática
 Créditos
 Desenvolvedores
 Controle de Qualidade
-Prefixo do caminho USB
+Prefixo do caminho BDM
 Inicia um ELF preferencial após um IGR.
 Valor em minuto(s), 0 para desativar.
 Desligamento automático do HDD
@@ -280,3 +280,4 @@ Gênero
 Lançamento
 Desenvolvedor
 Descrição
+Jogos BDM

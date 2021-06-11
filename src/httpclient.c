@@ -24,7 +24,7 @@ void HttpDeinit(void)
     memset(&SifRpcClient, 0, sizeof(SifRpcClientData_t));
 }
 
-int HttpEstabConnection(s8 *server, u16 port)
+int HttpEstabConnection(char *server, u16 port)
 {
     int result;
 
@@ -44,7 +44,7 @@ void HttpCloseConnection(s32 HttpSocket)
     SifCallRpc(&SifRpcClient, HTTP_CLIENT_CMD_CONN_CLOSE, 0, RpcTxBuffer, sizeof(struct HttpClientConnCloseArgs), NULL, 0, NULL, NULL);
 }
 
-int HttpSendGetRequest(s32 HttpSocket, const s8 *UserAgent, const s8 *host, s8 *mode, const u8 *mtime, const s8 *uri, u8 *output, u16 *out_len)
+int HttpSendGetRequest(s32 HttpSocket, const char *UserAgent, const char *host, s8 *mode, const u8 *mtime, const char *uri, char *output, u16 *out_len)
 {
     int result;
 

@@ -530,7 +530,7 @@ int sbPrepare(base_game_info_t *game, config_set_t *configSet, int size_cdvdman,
     int i;
     struct cdvdman_settings_common *settings;
 
-    unsigned int compatmask = 0;
+    int compatmask = 0;
     configGetInt(configSet, CONFIG_ITEM_COMPAT, &compatmask);
 
     char gameid[5];

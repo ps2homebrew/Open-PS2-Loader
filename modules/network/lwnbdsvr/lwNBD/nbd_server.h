@@ -84,7 +84,7 @@ extern "C" {
 #endif
 
 //extern uint8_t buffer[];
-uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
+extern uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
 
 /** @ingroup nbd
  * NBD context containing callback functions for NBD transfers

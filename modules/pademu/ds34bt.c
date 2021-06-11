@@ -547,7 +547,7 @@ static void HCI_event_task(int result)
                     }
                     DPRINTF("\n");
                     for (i = 0; i < MAX_PADS; i++) {
-                        if (strncmp(ds34pad[i].bdaddr, hci_buf + 5, 6) == 0) {
+                        if (memcmp(ds34pad[i].bdaddr, hci_buf + 5, 6) == 0) {
                             // store the handle for the ACL connection
                             ds34pad[i].hci_handle = hci_buf[3] | ((hci_buf[4] & 0x0F) << 8);
                             break;
@@ -603,14 +603,14 @@ static void HCI_event_task(int result)
                 DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                 if (!hci_buf[2]) {
                     for (i = 0; i < MAX_PADS; i++) {
-                        if (strncmp(ds34pad[i].bdaddr, hci_buf + 3, 6) == 0) {
+                        if (memcmp(ds34pad[i].bdaddr, hci_buf + 3, 6) == 0) {
                             break;
                         }
                     }
                     if (i >= MAX_PADS) {
                         break;
                     }
-                    if (strncmp(hci_buf + 9, "Wireless Controller", 19) == 0) {
+                    if (memcmp(hci_buf + 9, "Wireless Controller", 19) == 0) {
                         ds34pad[i].type = DS4;
                         ds34pad[i].isfake = 0;
                         DPRINTF("\t Type: Dualshock 4 \n");

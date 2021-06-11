@@ -40,7 +40,7 @@ static void *SifRpc_handler(int fno, void *buffer, int nbytes)
                 ((struct HttpClientSendGetArgs *)buffer)->out_len = sizeof(DmaBuffer);
             }
 
-            ((struct HttpClientSendGetResult *)SifServerTxBuffer)->result = HttpSendGetRequest(((struct HttpClientSendGetArgs *)buffer)->socket, ((struct HttpClientSendGetArgs *)buffer)->UserAgent, ((struct HttpClientSendGetArgs *)buffer)->host, &((struct HttpClientSendGetArgs *)buffer)->mode, ((struct HttpClientSendGetArgs *)buffer)->hasMtime ? ((struct HttpClientSendGetArgs *)buffer)->mtime : NULL, ((struct HttpClientSendGetArgs *)buffer)->uri, DmaBuffer, &((struct HttpClientSendGetArgs *)buffer)->out_len);
+            ((struct HttpClientSendGetResult *)SifServerTxBuffer)->result = HttpSendGetRequest(((struct HttpClientSendGetArgs *)buffer)->socket, ((struct HttpClientSendGetArgs *)buffer)->UserAgent, ((struct HttpClientSendGetArgs *)buffer)->host, &((struct HttpClientSendGetArgs *)buffer)->mode, ((struct HttpClientSendGetArgs *)buffer)->hasMtime ? ((struct HttpClientSendGetArgs *)buffer)->mtime : NULL, ((struct HttpClientSendGetArgs *)buffer)->uri, (char *)DmaBuffer, &((struct HttpClientSendGetArgs *)buffer)->out_len);
             ((struct HttpClientSendGetResult *)SifServerTxBuffer)->mode = ((struct HttpClientSendGetArgs *)buffer)->mode;
             ((struct HttpClientSendGetResult *)SifServerTxBuffer)->out_len = ((struct HttpClientSendGetArgs *)buffer)->out_len;
 

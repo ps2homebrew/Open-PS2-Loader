@@ -232,7 +232,7 @@ static int asciiToUtf16(char *out, const char *in)
 {
     int len;
     const char *pIn;
-    u8 *pOut;
+    char *pOut;
 
     for (pIn = in, pOut = out, len = 0; *pIn != '\0'; pIn++, pOut += 2, len += 2) {
         pOut[0] = *pIn;
@@ -381,10 +381,10 @@ lbl_session_setup:
     }
 
     // Add User name
-    offset += setStringField(&SSR->ByteField[offset], server_specs.Username);
+    offset += setStringField((char *)&SSR->ByteField[offset], server_specs.Username);
 
     // PrimaryDomain, acquired from Negotiate Protocol Response data
-    offset += setStringField(&SSR->ByteField[offset], server_specs.PrimaryDomainServerName);
+    offset += setStringField((char *)&SSR->ByteField[offset], server_specs.PrimaryDomainServerName);
 
     // NativeOS
     if (useUnicode && ((offset & 1) != 0)) {
@@ -392,7 +392,7 @@ lbl_session_setup:
         SSR->ByteField[offset] = '\0';
         offset++;
     }
-    offset += setStringField(&SSR->ByteField[offset], "PlayStation 2");
+    offset += setStringField((char *)&SSR->ByteField[offset], "PlayStation 2");
 
     // NativeLanMan
     if (useUnicode && ((offset & 1) != 0)) {
@@ -400,7 +400,7 @@ lbl_session_setup:
         SSR->ByteField[offset] = '\0';
         offset++;
     }
-    offset += setStringField(&SSR->ByteField[offset], "SMBMAN");
+    offset += setStringField((char *)&SSR->ByteField[offset], "SMBMAN");
 
     SSR->ByteCount = offset;
 
@@ -466,7 +466,7 @@ int smb_TreeConnectAndX(char *ShareName)
     }
 
     // Add share name
-    offset += setStringField(&TCR->ByteField[offset], ShareName);
+    offset += setStringField((char *)&TCR->ByteField[offset], ShareName);
 
     mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
     offset += 6;
@@ -522,7 +522,7 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
     }
 
     // Add filename
-    offset += setStringField(&OR->ByteField[offset], filename);
+    offset += setStringField((char *)&OR->ByteField[offset], filename);
     OR->ByteCount = offset;
 
     nb_SetSessionMessage(sizeof(OpenAndXRequest_t) + offset + 1);

@@ -488,7 +488,7 @@ static int ProbeISO9660(int fd, unsigned int sector, layer_info_t *layer_info)
 
     longLseek(fd, sector);
     if (read(fd, cdvdman_buf, 2048) == 2048) {
-        if ((cdvdman_buf[0x00] == 1) && (!strncmp(&cdvdman_buf[0x01], "CD001", 5))) {
+        if ((cdvdman_buf[0x00] == 1) && (!memcmp(&cdvdman_buf[0x01], "CD001", 5))) {
             struct dirTocEntry *tocEntryPointer = (struct dirTocEntry *)&cdvdman_buf[0x9c];
 
             layer_info->maxLBA = *(u32 *)&cdvdman_buf[0x50];

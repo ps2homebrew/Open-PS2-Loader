@@ -68,7 +68,7 @@ iop_device_ops_t my_device_ops =
               dummy_fs,//chstat*/
 };
 
-const u8 name[] = "img";
+const char name[] = "img";
 iop_device_t my_device = {
     name,
     IOP_DT_FS,

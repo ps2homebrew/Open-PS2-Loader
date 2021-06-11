@@ -326,7 +326,7 @@ cmdPowerOff(void *arg)
     reset.cmd = htonl(PKO_RESET_CMD);
     reset.len = 0;
 
-    pkoReset((char *)&reset, sizeof(reset));
+    pkoReset((unsigned char *)&reset, sizeof(reset));
 #endif
 }
 

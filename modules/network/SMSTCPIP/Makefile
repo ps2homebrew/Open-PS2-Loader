@@ -18,6 +18,8 @@ IOP_CFLAGS += -DLWIP_NOASSERT
 ifneq ($(IOP_CC_VERSION),3.2.2)
 ifneq ($(IOP_CC_VERSION),3.2.3)
 IOP_CFLAGS += -mno-memcpy
+# Ignore warnings due to the old version of lwIP being used.
+IOP_CFLAGS += -Wno-attributes -Wno-array-bounds -Wno-unused-but-set-variable
 endif
 endif
 

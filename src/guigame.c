@@ -460,12 +460,12 @@ static u8 ds3_mac[6];
 static u8 dg_mac[6];
 static char ds3_str[18];
 static char dg_str[18];
-static char vid_str[4];
-static char pid_str[4];
-static char rev_str[4];
+static char vid_str[5];
+static char pid_str[5];
+static char rev_str[5];
 static char hci_str[26];
 static char lmp_str[26];
-static char man_str[4];
+static char man_str[5];
 static int ds3macset = 0;
 static int dgmacset = 0;
 static int dg_discon = 0;
@@ -473,16 +473,7 @@ static int ver_set = 0, feat_set = 0;
 
 static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
 {
-    int i;
-
-    memset(addstr, 0, sizeof(addstr));
-
-    for (i = 0; i < 6; i++) {
-        sprintf(addstr, "%s%02X", addstr, bdaddr[i]);
-
-        if (i < 5)
-            sprintf(addstr, "%s:", addstr);
-    }
+    snprintf(addstr, 18, "%02X:%02X:%02X:%02X:%02X:%02X", bdaddr[0], bdaddr[1], bdaddr[2], bdaddr[3], bdaddr[4], bdaddr[5]);
 
     return addstr;
 }

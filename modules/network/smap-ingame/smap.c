@@ -361,9 +361,11 @@ static int Dev9IntrCb(int flag)
     USE_SPD_REGS;
     volatile u8 *smap_regbase, *emac3_regbase;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     emac3_regbase = SmapDriverData.emac3_regbase;
     smap_regbase = SmapDriverData.smap_regbase;
@@ -378,7 +380,9 @@ static int Dev9IntrCb(int flag)
         }
     }
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return 0;
 }
@@ -418,9 +422,11 @@ int SMAPStart(void)
     int result;
     volatile u8 *emac3_regbase;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     if (!SmapDriverData.SmapIsInitialized) {
         emac3_regbase = SmapDriverData.emac3_regbase;
@@ -443,7 +449,9 @@ int SMAPStart(void)
             SmapDriverData.NetDevStopFlag = 0;
     }
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return 0;
 }
@@ -452,9 +460,11 @@ void SMAPStop(void)
 {
     volatile u8 *emac3_regbase;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
     SmapDriverData.NetDevStopFlag = 1;
 
     if (SmapDriverData.SmapIsInitialized) {
@@ -466,7 +476,9 @@ void SMAPStop(void)
         SmapDriverData.SmapIsInitialized = 0;
     }
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 }
 
 static int ParseSmapConfiguration(const char *cmd, unsigned int *configuration)

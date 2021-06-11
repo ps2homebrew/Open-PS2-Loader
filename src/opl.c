@@ -1131,7 +1131,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     config_set_t *itemConfig, *downloadedConfig;
     u16 length;
     s8 ConnMode, hasMtime;
-    u8 *HttpBuffer;
+    char *HttpBuffer;
     int i, count, HttpSocket, result, retries, ConfigSource;
     iox_stat_t stat;
     u8 mtime[6];

@@ -27,7 +27,7 @@
 
 IRX_ID("ioptrap_driver", 1, 1);
 
-struct irx_export_table _exp_ioptrap;
+extern struct irx_export_table _exp_ioptrap;
 
 
 static const char *exception_type_name[] = {

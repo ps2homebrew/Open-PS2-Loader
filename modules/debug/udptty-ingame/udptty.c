@@ -30,7 +30,7 @@
 #define MODNAME "udptty"
 IRX_ID(MODNAME, 2, 1);
 
-struct irx_export_table _exp_udptty;
+extern struct irx_export_table _exp_udptty;
 
 #define DEVNAME "tty"
 

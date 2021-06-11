@@ -8,6 +8,13 @@ ifeq ($(DEBUG),1)
 IOP_CFLAGS += -DDEBUG -DNBD_DEBUG
 endif
 
+ifneq ($(IOP_CC_VERSION),3.2.2)
+ifneq ($(IOP_CC_VERSION),3.2.3)
+# Due to usage of 64 bit integers, support code for __ashldi3 and __lshrdi3 is needed
+IOP_LIBS += -lgcc
+endif
+endif
+
 include $(PS2SDK)/Defs.make
 include ../../Rules.bin.make
 include ../../Rules.make

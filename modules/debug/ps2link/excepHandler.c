@@ -22,7 +22,7 @@ extern int excepscrdump;
 typedef struct _smod_mod_info
 {
     struct _smod_mod_info *next;
-    u8 *name;
+    char *name;
     u16 version;
     u16 newflags; /* For modload shipped with games.  */
     u16 id;

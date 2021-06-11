@@ -18,9 +18,9 @@
 /*
  * LM_Password_Hash: this function create a LM password hash from a given password
  */
-static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned char *cipher)
+static unsigned char *LM_Password_Hash(const char *password, unsigned char *cipher)
 {
-    unsigned char tmp_pass[14] = {"\0\0\0\0\0\0\0\0\0\0\0\0\0\0"};
+    char tmp_pass[14] = {"\0\0\0\0\0\0\0\0\0\0\0\0\0\0"};
     unsigned char K1[7];
     unsigned char K2[7];
     int i;
@@ -38,8 +38,8 @@ static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned c
     memcpy(K2, &tmp_pass[7], 7);
 
     /* encrypt the magic string with the keys */
-    DES(K1, "KGS!@#$%", &cipher[0]);
-    DES(K2, "KGS!@#$%", &cipher[8]);
+    DES(K1, (unsigned char *)"KGS!@#$%", &cipher[0]);
+    DES(K2, (unsigned char *)"KGS!@#$%", &cipher[8]);
 
     return (unsigned char *)cipher;
 }
@@ -47,9 +47,9 @@ static unsigned char *LM_Password_Hash(const unsigned char *password, unsigned c
 /*
  * NTLM_Password_Hash: this function create a NTLM password hash from a given password
  */
-static unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned char *cipher)
+static unsigned char *NTLM_Password_Hash(const char *password, unsigned char *cipher)
 {
-    u8 passwd_buf[512];
+    char passwd_buf[512];
     int i, j;
 
     memset(passwd_buf, 0, sizeof(passwd_buf));
@@ -59,7 +59,7 @@ static unsigned char *NTLM_Password_Hash(const unsigned char *password, unsigned
         passwd_buf[j] = password[i];
 
     /* get the message digest */
-    MD4(passwd_buf, j, cipher);
+    MD4((unsigned char *)passwd_buf, j, cipher);
 
     return (unsigned char *)cipher;
 }
@@ -93,7 +93,7 @@ static unsigned char *LM_Response(const unsigned char *LMpasswordhash, unsigned 
 /*
  * GenerateLMHashes: function used to generate LM/NTLM hashes
  */
-static void GenerateLMHashes(char *Password, int PasswordType, u8 *EncryptionKey, int *PasswordLen, u8 *Buffer)
+static void GenerateLMHashes(char *Password, int PasswordType, u8 *EncryptionKey, int *PasswordLen, char *Buffer)
 {
     u8 LMpasswordhash[16];
     u8 NTLMpasswordhash[16];

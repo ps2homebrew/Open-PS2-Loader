@@ -728,7 +728,7 @@ void *rpc_sf(int cmd, void *data, int size)
             ds34usb_set_led((u8 *)(data + 1), *(u8 *)data);
             break;
         case DS34USB_GET_DATA:
-            ds34usb_get_data((u8 *)data, 18, *(u8 *)data);
+            ds34usb_get_data((char *)data, 18, *(u8 *)data);
             break;
         case DS34USB_RESET:
             ds34usb_reset();

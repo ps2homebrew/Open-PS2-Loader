@@ -801,7 +801,7 @@ static void ParseIOPBTCONF(const struct ImageData *ImageDataBuffer, unsigned int
 {
     unsigned int FilesRemaining, i, NumModules;
     const char *ptr;
-    unsigned char filename_temp[16];
+    char filename_temp[16];
     struct RomdirFileStat FileStat;
     struct RomdirFileStat ModuleFileStat;
     const void **ModList;

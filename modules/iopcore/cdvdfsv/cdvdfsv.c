@@ -223,7 +223,7 @@ static u8 shutdown_rpcbuf[16];
 
 static int rpc0_thread_id, rpc1_thread_id, rpc2_thread_id, rpc_sd_thread_id;
 
-struct irx_export_table _exp_cdvdfsv;
+extern struct irx_export_table _exp_cdvdfsv;
 
 //-------------------------------------------------------------------------
 int _start(int argc, char *argv[])

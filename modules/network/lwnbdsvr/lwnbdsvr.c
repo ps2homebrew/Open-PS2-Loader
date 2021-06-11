@@ -6,7 +6,7 @@
 #define MODNAME "lwnbdsvr"
 IRX_ID(MODNAME, 1, 1);
 static int nbd_tid;
-struct irx_export_table _exp_lwnbdsvr;
+extern struct irx_export_table _exp_lwnbdsvr;
 
 int _start(int argc, char **argv)
 {

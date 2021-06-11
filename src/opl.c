@@ -401,7 +401,7 @@ int oplPath2Mode(const char *path)
             if (blkdevnameend != NULL) {
                 blkdevnamelen = (int)(blkdevnameend - appsPath);
 
-                while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
+                while ((blkdevnamelen > 0) && isdigit((int)appsPath[blkdevnamelen - 1]))
                     blkdevnamelen--; //Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)

@@ -468,10 +468,9 @@ int ata_io_start(void *buf, u32 blkcount, u16 feature, u16 nsector, u16 sector, 
     suspend_intr();
     HDPROreg_IO8 = 0x21;
     CDVDreg_STATUS = 0;
-    unsigned int dummy = HDPROreg_IO8;
+    (void)HDPROreg_IO8;
     CDVDreg_STATUS = 0;
     resume_intr();
-    dummy = 0;
 
     /* Finally!  We send off the ATA command with arguments.  */
     hdpro_io_write(ATAreg_CONTROL_WR, (using_timeout == 0) << 1);
@@ -712,7 +711,7 @@ int ata_device_sector_io(int device, void *buf, u32 lba, u32 nsectors, int dir)
             continue;
 
         nbytes = len * 512;
-        buf = (void *)((u8 *)buf + len * 512);
+        buf = (void *)((u8 *)buf + nbytes);
         lba += len;
         nsectors -= len;
     }

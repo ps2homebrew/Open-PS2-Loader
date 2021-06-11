@@ -568,7 +568,7 @@ static int guiGamePadEmuUpdater(int modified)
     }
 
     PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
-    PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
+    PadEmuSettings &= (~(PadEmuMode ? 0 : 1) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
 
     if (PadEmuMode == 1) {
         if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {

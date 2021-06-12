@@ -32,7 +32,7 @@ void mips_memset(void *, int, unsigned);
 
 #define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE(oplutils, 1, 2)
 
-int getModInfo(u8 *modname, modinfo_t *info);
+int getModInfo(char *modname, modinfo_t *info);
 #define I_getModInfo DECLARE_IMPORT(4, getModInfo)
 
 int oplRegisterShutdownCallback(oplShutdownCb_t cb);

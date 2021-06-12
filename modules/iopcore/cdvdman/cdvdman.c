@@ -1674,7 +1674,6 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size)
 {
     int i;
-    u8 dummy;
     u8 *p;
     u8 rdbuf[64];
 
@@ -1687,7 +1686,7 @@ static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_s
 
     if (!(CDVDreg_SDATAIN & 0x40)) {
         do {
-            dummy = CDVDreg_SDATAOUT;
+            (void)CDVDreg_SDATAOUT;
         } while (!(CDVDreg_SDATAIN & 0x40));
     }
 
@@ -1699,7 +1698,7 @@ static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_s
     }
 
     CDVDreg_SCOMMAND = cmd;
-    dummy = CDVDreg_SCOMMAND;
+    (void)CDVDreg_SCOMMAND;
 
     while (CDVDreg_SDATAIN & 0x80) {
         ;

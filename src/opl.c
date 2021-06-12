@@ -401,7 +401,7 @@ int oplPath2Mode(const char *path)
             if (blkdevnameend != NULL) {
                 blkdevnamelen = (int)(blkdevnameend - appsPath);
 
-                while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
+                while ((blkdevnamelen > 0) && isdigit((int)appsPath[blkdevnamelen - 1]))
                     blkdevnamelen--; //Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)
@@ -1131,7 +1131,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     config_set_t *itemConfig, *downloadedConfig;
     u16 length;
     s8 ConnMode, hasMtime;
-    u8 *HttpBuffer;
+    char *HttpBuffer;
     int i, count, HttpSocket, result, retries, ConfigSource;
     iox_stat_t stat;
     u8 mtime[6];

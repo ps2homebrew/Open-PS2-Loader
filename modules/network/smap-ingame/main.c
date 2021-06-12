@@ -49,9 +49,11 @@ SMapLowLevelOutput(NetIF *pNetIF, PBuf *pOutput)
     struct pbuf *pbuf;
     static unsigned char FrameBuffer[MAX_FRAME_SIZE];
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     if (pOutput->next != NULL) {
         TotalLength = 0;
@@ -70,7 +72,9 @@ SMapLowLevelOutput(NetIF *pNetIF, PBuf *pOutput)
 
     SMAPSendPacket(buffer, TotalLength);
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return ERR_OK;
 }
@@ -85,15 +89,19 @@ static err_t SMapOutput(NetIF *pNetIF, PBuf *pOutput, IPAddr *pIPAddr)
     err_t result;
     PBuf *pBuf;
 
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     pBuf = etharp_output(pNetIF, pIPAddr, pOutput);
 
     result = pBuf != NULL ? SMapLowLevelOutput(pNetIF, pBuf) : ERR_OK;
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return result;
 }
@@ -103,9 +111,11 @@ static err_t SMapOutput(NetIF *pNetIF, PBuf *pOutput, IPAddr *pIPAddr)
 //Should be called at the beginning of the program to set up the network interface.
 static err_t SMapIFInit(NetIF *pNetIF)
 {
+#if USE_GP_REGISTER
     void *OldGP;
 
     OldGP = SetModuleGP();
+#endif
 
     pNetIF->name[0] = IFNAME0;
     pNetIF->name[1] = IFNAME1;
@@ -131,7 +141,9 @@ static err_t SMapIFInit(NetIF *pNetIF)
     //Enable sending and receiving of data.
     SMAPStart();
 
+#if USE_GP_REGISTER
     SetGP(OldGP);
+#endif
 
     return ERR_OK;
 }

@@ -16,11 +16,6 @@ I_RegisterDefaultExceptionHandler
 I_RegisterPriorityExceptionHandler
 excepman_IMPORTS_end
 
-intrman_IMPORTS_start
-I_CpuSuspendIntr
-I_CpuResumeIntr
-intrman_IMPORTS_end
-
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end

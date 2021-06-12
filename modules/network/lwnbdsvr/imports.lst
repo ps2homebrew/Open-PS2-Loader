@@ -1,4 +1,3 @@
-
 atad_IMPORTS_start
 I_ata_get_devinfo
 I_ata_device_sector_io
@@ -17,26 +16,19 @@ I_lwip_socket
 I_lwip_bind
 I_lwip_accept
 I_lwip_listen
-I_lwip_select
-I_inet_addr
 ps2ip_IMPORTS_end
 
 thbase_IMPORTS_start
-I_DelayThread
 I_CreateThread
 I_StartThread
 I_DeleteThread
 thbase_IMPORTS_end
 
 sysclib_IMPORTS_start
-I_strcpy
 I_strlen
-I_memcpy
 I_memset
 sysclib_IMPORTS_end
 
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end
-
-

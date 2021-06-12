@@ -10,8 +10,3 @@ modload_IMPORTS_end
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end
-
-sysclib_IMPORTS_start
-I_strtol
-sysclib_IMPORTS_end
-

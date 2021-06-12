@@ -82,7 +82,7 @@ static struct FakeModule modulefake_list[] = {
     {NULL, NULL, 0, 0}};
 
 //--------------------------------------------------------------
-int getModInfo(u8 *modname, modinfo_t *info)
+int getModInfo(char *modname, modinfo_t *info)
 {
     iop_library_t *libptr;
     register int i;

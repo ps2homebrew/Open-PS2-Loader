@@ -47,6 +47,8 @@
 
 #include "nbd_server.h"
 
+uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
+
 /*
  * https://lwip.fandom.com/wiki/Receiving_data_with_LWIP
  */

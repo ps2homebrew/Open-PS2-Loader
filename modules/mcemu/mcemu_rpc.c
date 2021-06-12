@@ -58,7 +58,7 @@ int hookMcman63(int fd, u32 eeaddr, int nbyte)
     register int rlen;
     register int rval;
     register int size;
-    register u32 id;
+    register u32 id __attribute__((unused));
     register char *rpcbuf, *fiobuf;
     SifRpcClientData_t *cldata;
 

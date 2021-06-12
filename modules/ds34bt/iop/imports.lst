@@ -11,6 +11,7 @@ stdio_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_strncmp
+I_memcmp
 sysclib_IMPORTS_end
 
 thsemap_IMPORTS_start

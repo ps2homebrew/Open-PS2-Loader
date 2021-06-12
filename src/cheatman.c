@@ -75,7 +75,7 @@ static code_t make_code(const char *s)
     int i = 0;
 
     while (*s) {
-        if (isxdigit(*s))
+        if (isxdigit((int)*s))
             digits[i++] = *s;
         s++;
     }
@@ -99,10 +99,10 @@ static int is_cheat_code(const char *s)
     int i = 0;
 
     while (*s) {
-        if (isxdigit(*s)) {
+        if (isxdigit((int)*s)) {
             if (++i > CODE_DIGITS)
                 return 0;
-        } else if (!isspace(*s)) {
+        } else if (!isspace((int)*s)) {
             return 0;
         }
         s++;
@@ -178,7 +178,7 @@ static int is_empty_str(const char *s)
     size_t slen = strlen(s);
 
     while (slen--) {
-        if (isgraph(*s++))
+        if (isgraph((int)*s++))
             return 0;
     }
 
@@ -200,13 +200,13 @@ static int trim_str(char *s)
         return -1;
 
     /* Get first non-space char */
-    while (isspace(*t++))
+    while (isspace((int)*t++))
         first++;
 
     /* Get last non-space char */
     last = strlen(s) - 1;
     t = &s[last];
-    while (isspace(*t--))
+    while (isspace((int)*t--))
         last--;
 
     /* Kill leading/trailing spaces */
@@ -224,7 +224,7 @@ static int trim_str(char *s)
 static int is_empty_substr(const char *s, size_t count)
 {
     while (count--) {
-        if (isgraph(*s++))
+        if (isgraph((int)*s++))
             return 0;
     }
 

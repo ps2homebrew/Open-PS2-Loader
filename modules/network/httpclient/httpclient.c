@@ -119,7 +119,7 @@ static void HttpParseEntityLine(const char *line)
     HeaderLineNumber++;
 }
 
-static int HttpGetResponse(s32 socket, s8 *mode, s8 *buffer, u16 *length)
+static int HttpGetResponse(s32 socket, s8 *mode, char *buffer, u16 *length)
 {
     char work[HTTP_WORK_BUFFER_SIZE + 1], EndOfEntity, *ptr, *next_ptr, *PayloadPtr;
     int result, DataAvailable, PayloadAmount;
@@ -215,7 +215,7 @@ static int ResolveHostname(char *hostname, struct in_addr *ip)
     return 1;
 }
 
-int HttpEstabConnection(s8 *server, u16 port)
+int HttpEstabConnection(char *server, u16 port)
 {
     struct in_addr ip;
     int result;
@@ -250,7 +250,7 @@ static const char *GetDayInWeek(const unsigned char *mtime)
     return dayLabels[(5 + days) % 7]; //2000/1/1 was a Saturday (5).
 }
 
-int HttpSendGetRequest(s32 HttpSocket, const s8 *UserAgent, const s8 *host, s8 *mode, const u8 *mtime, const s8 *uri, u8 *output, u16 *out_len)
+int HttpSendGetRequest(s32 HttpSocket, const char *UserAgent, const char *host, s8 *mode, const u8 *mtime, const char *uri, char *output, u16 *out_len)
 {
     const char *months[] = {
         "Jan",

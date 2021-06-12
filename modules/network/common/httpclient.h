@@ -5,7 +5,7 @@
 int HttpInit(void);
 void HttpDeinit(void);
 
-int HttpEstabConnection(s8 *server, u16 port);
+int HttpEstabConnection(char *server, u16 port);
 void HttpCloseConnection(s32 HttpSocket);
 
 /*	mtime[0] = Years since year 2000
@@ -15,7 +15,7 @@ void HttpCloseConnection(s32 HttpSocket);
 	mtime[4] = Minute (0-59)
 	mtime[5] = Second (0-59)	*/
 
-int HttpSendGetRequest(s32 HttpSocket, const s8 *UserAgent, const s8 *host, s8 *mode, const u8 *mtime, const s8 *uri, u8 *output, u16 *out_len);
+int HttpSendGetRequest(s32 HttpSocket, const char *UserAgent, const char *host, s8 *mode, const u8 *mtime, const char *uri, char *output, u16 *out_len);
 
 #define HTTP_CLIENT_SERVER_NAME_MAX 30
 #define HTTP_CLIENT_USER_AGENT_MAX 16
@@ -41,12 +41,12 @@ struct HttpClientConnCloseArgs
 struct HttpClientSendGetArgs
 {
     s32 socket;
-    s8 UserAgent[HTTP_CLIENT_USER_AGENT_MAX];
-    s8 host[HTTP_CLIENT_SERVER_NAME_MAX];
+    char UserAgent[HTTP_CLIENT_USER_AGENT_MAX];
+    char host[HTTP_CLIENT_SERVER_NAME_MAX];
     s8 mode;
     u8 hasMtime;
     u8 mtime[6];
-    s8 uri[HTTP_CLIENT_URI_MAX];
+    char uri[HTTP_CLIENT_URI_MAX];
     u16 out_len;
     void *output;
 };

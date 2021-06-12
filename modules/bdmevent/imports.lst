@@ -1,7 +1,3 @@
-iomanX_IMPORTS_start
-I_AddDrv
-iomanX_IMPORTS_end
-
 bdm_IMPORTS_start
 I_bdm_RegisterCallback
 bdm_IMPORTS_end

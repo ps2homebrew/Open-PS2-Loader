@@ -38,13 +38,11 @@ I_sceCdLayerSearchFile
 cdvdman_IMPORTS_end
 
 intrman_IMPORTS_start
-I_CpuEnableIntr
 I_CpuSuspendIntr
 I_CpuResumeIntr
 intrman_IMPORTS_end
 
 loadcore_IMPORTS_start
-I_FlushDcache
 I_RegisterLibraryEntries
 loadcore_IMPORTS_end
 
@@ -78,4 +76,3 @@ thevent_IMPORTS_start
 I_ClearEventFlag
 I_WaitEventFlag
 thevent_IMPORTS_end
-

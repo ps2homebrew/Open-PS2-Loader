@@ -588,7 +588,7 @@ static iop_device_t IsofsDevice = {
 int _start(int argc, char *argv[])
 {
     if (AddDrv(&IsofsDevice) == 0) {
-        printf("ISOFS driver start.\n");
+        DPRINTF("ISOFS driver start.\n");
         return MODULE_RESIDENT_END;
     }
 

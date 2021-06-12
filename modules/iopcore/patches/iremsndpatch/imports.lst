@@ -1,8 +1,3 @@
-intrman_IMPORTS_start
-I_CpuSuspendIntr
-I_CpuResumeIntr
-intrman_IMPORTS_end
-
 loadcore_IMPORTS_start
 I_GetLoadcoreInternalData
 I_FlushIcache
@@ -25,4 +20,3 @@ I_CreateSema
 I_SignalSema
 I_WaitSema
 thsemap_IMPORTS_end
-

@@ -17,13 +17,10 @@ I_CpuSuspendIntr
 I_CpuResumeIntr
 I_QueryIntrContext
 I_EnableIntr
-I_DisableIntr
 I_RegisterIntrHandler
 intrman_IMPORTS_end
 
 sysmem_IMPORTS_start
-I_AllocSysMemory
-I_FreeSysMemory
 I_Kprintf
 sysmem_IMPORTS_end
 
@@ -38,14 +35,11 @@ loadcore_IMPORTS_end
 sysclib_IMPORTS_start
 I_strcpy
 I_strlen
-I_strcmp
 I_strncmp
 I_strchr
 I_strrchr
 I_strstr
 I_strncpy
-I_strtok
-I_toupper
 I_sprintf
 sysclib_IMPORTS_end
 
@@ -67,7 +61,6 @@ I_iSetAlarm
 I_CancelAlarm
 I_USec2SysClock
 I_SleepThread
-I_WakeupThread
 I_iWakeupThread
 thbase_IMPORTS_end
 

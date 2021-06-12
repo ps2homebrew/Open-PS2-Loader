@@ -5,7 +5,6 @@
 intrman_IMPORTS_start
 I_CpuSuspendIntr
 I_CpuResumeIntr
-I_QueryIntrContext
 intrman_IMPORTS_end
 
 loadcore_IMPORTS_start
@@ -35,16 +34,16 @@ I_smb_Close
 oplutils_IMPORTS_end
 
 sifcmd_IMPORTS_start
-I_sceSifBindRpc 
-I_sceSifCallRpc 
+I_sceSifCallRpc
 I_sceSifGetOtherData
 I_sceSifInitRpc
+I_sceSifBindRpc
 I_sceSifSendCmd
 sifcmd_IMPORTS_end
 
 sifman_IMPORTS_start
 I_sceSifInit
-I_sceSifSetDma 
+I_sceSifSetDma
 I_sceSifCheckInit
 I_sceSifDmaStat
 sifman_IMPORTS_end
@@ -61,7 +60,6 @@ stdio_IMPORTS_end
 sysclib_IMPORTS_start
 I_prnt
 I_strncmp
-I_strncpy
 sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start
@@ -72,21 +70,9 @@ sysmem_IMPORTS_end
 thbase_IMPORTS_start
 I_CreateThread
 I_StartThread
-I_ExitDeleteThread
 I_DeleteThread
-I_SleepThread
-I_iWakeupThread
 I_DelayThread
 thbase_IMPORTS_end
-
-thsemap_IMPORTS_start
-I_CreateSema
-I_SignalSema
-I_iSignalSema
-I_WaitSema
-I_DeleteSema
-I_PollSema
-thsemap_IMPORTS_end
 
 dmacman_IMPORTS_start
 I_dmac_request

@@ -93,7 +93,7 @@ RFC 3220 4.6          IP Mobility Support for IPv4          January 2002
 #endif
 
 /** the time an ARP entry stays valid after its last update, (120 * 10) seconds = 20 minutes. */
-#define ARP_MAXAGE 120
+#define ARP_MAXAGE     120
 /** the time an ARP entry stays pending after first request, (2 * 10) seconds = 20 seconds. */
 #define ARP_MAXPENDING 2
 
@@ -101,12 +101,12 @@ RFC 3220 4.6          IP Mobility Support for IPv4          January 2002
 
 /** ARP message types */
 #define ARP_REQUEST 0x0100
-#define ARP_REPLY 0x0200
+#define ARP_REPLY   0x0200
 
-#define ARPH_HWLEN(hdr) (ntohs((hdr)->_hwlen_protolen) >> 8)
+#define ARPH_HWLEN(hdr)    (ntohs((hdr)->_hwlen_protolen) >> 8)
 #define ARPH_PROTOLEN(hdr) (ntohs((hdr)->_hwlen_protolen) & 0xff)
 
-#define ARPH_HWLEN_SET(hdr, len) (hdr)->_hwlen_protolen = htons(ARPH_PROTOLEN(hdr) | ((len) << 8))
+#define ARPH_HWLEN_SET(hdr, len)    (hdr)->_hwlen_protolen = htons(ARPH_PROTOLEN(hdr) | ((len) << 8))
 #define ARPH_PROTOLEN_SET(hdr, len) (hdr)->_hwlen_protolen = htons((len) | (ARPH_HWLEN(hdr) << 8))
 
 enum etharp_state {

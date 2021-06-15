@@ -35,7 +35,7 @@
 #include "ps2ip_internal.h"
 #include "arch/sys_arch.h"
 
-#define SYS_MBOX_SIZE 64
+#define SYS_MBOX_SIZE        64
 #define SYS_THREAD_PRIO_BASE TCPIP_THREAD_PRIO
 
 struct sys_mbox_msg
@@ -468,24 +468,24 @@ sys_sem_t sys_sem_new(u8_t aCount)
 
 } /* end sys_sem_new */
 
-static unsigned int TimeoutHandler(void* pvArg)
+static unsigned int TimeoutHandler(void *pvArg)
 {
     iReleaseWaitThread((int)pvArg);
     return 0;
 }
 
-static u32_t ComputeTimeDiff(const iop_sys_clock_t* pStart, const iop_sys_clock_t* pEnd)
+static u32_t ComputeTimeDiff(const iop_sys_clock_t *pStart, const iop_sys_clock_t *pEnd)
 {
     iop_sys_clock_t Diff;
     u32 iSec, iUSec, iDiff;
 
-    Diff.lo = pEnd->lo-pStart->lo;
-    Diff.hi = pEnd->hi-pStart->hi - (pStart->lo>pEnd->lo);
+    Diff.lo = pEnd->lo - pStart->lo;
+    Diff.hi = pEnd->hi - pStart->hi - (pStart->lo > pEnd->lo);
 
     SysClock2USec(&Diff, &iSec, &iUSec);
-    iDiff=(iSec * 1000) + (iUSec / 1000);
+    iDiff = (iSec * 1000) + (iUSec / 1000);
 
-    return((iDiff != 0) ? iDiff : 1);
+    return ((iDiff != 0) ? iDiff : 1);
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
@@ -493,9 +493,9 @@ u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
     u32 WaitTime;
 
     if (aTimeout == 0)
-        return(WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
+        return (WaitSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
     else if (aTimeout == 1)
-        return(PollSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
+        return (PollSema(aSema) == 0 ? 0 : SYS_ARCH_TIMEOUT);
     else {
 
         iop_sys_clock_t lTimeout;
@@ -513,7 +513,7 @@ u32_t sys_arch_sem_wait(sys_sem_t aSema, u32_t aTimeout)
 
             WaitTime = ComputeTimeDiff(&Start, &End);
             if (WaitTime > aTimeout)
-              WaitTime = aTimeout;
+                WaitTime = aTimeout;
         } else
             WaitTime = SYS_ARCH_TIMEOUT;
 

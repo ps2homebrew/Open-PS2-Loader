@@ -248,7 +248,7 @@ again_1:
     }
     /* no fully matching pcb found? then look for an unconnected pcb */
     if (pcb == NULL) {
-/* Iterate through the UDP PCB list for a pcb that matches
+        /* Iterate through the UDP PCB list for a pcb that matches
        the local address. */
 
 #ifdef SO_REUSE
@@ -609,7 +609,7 @@ err_t udp_bind(struct udp_pcb *pcb, struct ip_addr *ipaddr, u16_t port)
     if (port == 0) {
 #ifndef UDP_LOCAL_PORT_RANGE_START
 #define UDP_LOCAL_PORT_RANGE_START 4096
-#define UDP_LOCAL_PORT_RANGE_END 0x7fff
+#define UDP_LOCAL_PORT_RANGE_END   0x7fff
 #endif
         port = UDP_LOCAL_PORT_RANGE_START;
         ipcb = udp_pcbs;

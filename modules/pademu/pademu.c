@@ -12,23 +12,23 @@
 
 #include "ds34bt.h"
 
-#define PAD_INIT ds34bt_init
+#define PAD_INIT       ds34bt_init
 #define PAD_GET_STATUS ds34bt_get_status
-#define PAD_RESET ds34bt_reset
-#define PAD_GET_DATA ds34bt_get_data
+#define PAD_RESET      ds34bt_reset
+#define PAD_GET_DATA   ds34bt_get_data
 #define PAD_SET_RUMBLE ds34bt_set_rumble
-#define PAD_SET_MODE ds34bt_set_mode
+#define PAD_SET_MODE   ds34bt_set_mode
 
 #elif defined(USB)
 
 #include "ds34usb.h"
 
-#define PAD_INIT ds34usb_init
+#define PAD_INIT       ds34usb_init
 #define PAD_GET_STATUS ds34usb_get_status
-#define PAD_RESET ds34usb_reset
-#define PAD_GET_DATA ds34usb_get_data
+#define PAD_RESET      ds34usb_reset
+#define PAD_GET_DATA   ds34usb_get_data
 #define PAD_SET_RUMBLE ds34usb_set_rumble
-#define PAD_SET_MODE ds34usb_set_mode
+#define PAD_SET_MODE   ds34usb_set_mode
 
 #else
 #error "must define mode"
@@ -52,9 +52,9 @@ typedef struct
 } pad_status_t;
 
 #define DIGITAL_MODE 0x41
-#define ANALOG_MODE 0x73
+#define ANALOG_MODE  0x73
 #define ANALOGP_MODE 0x79
-#define CONFIG_MODE 0xF3
+#define CONFIG_MODE  0xF3
 
 #define MAX_PORTS 4
 

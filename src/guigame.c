@@ -84,11 +84,11 @@ typedef struct
     char VMC_msg[64];
 } statusVMCparam_t;
 
-#define OPERATION_CREATE 0
+#define OPERATION_CREATE   0
 #define OPERATION_CREATING 1
 #define OPERATION_ABORTING 2
-#define OPERATION_ENDING 3
-#define OPERATION_END 4
+#define OPERATION_ENDING   3
+#define OPERATION_END      4
 
 static short vmc_refresh;
 static int vmc_operation;

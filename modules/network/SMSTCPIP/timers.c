@@ -72,16 +72,16 @@ static int tcpip_tcp_timer_active;
 static void
 tcpip_tcp_timer(void *arg)
 {
-  /* call TCP timer handler */
-  tcp_tmr();
-  /* timer still needed? */
-  if (tcp_active_pcbs || tcp_tw_pcbs) {
-    /* restart timer */
-    sys_timeout(TCP_TMR_INTERVAL, tcpip_tcp_timer, NULL);
-  } else {
-    /* disable timer */
-    tcpip_tcp_timer_active = 0;
-  }
+    /* call TCP timer handler */
+    tcp_tmr();
+    /* timer still needed? */
+    if (tcp_active_pcbs || tcp_tw_pcbs) {
+        /* restart timer */
+        sys_timeout(TCP_TMR_INTERVAL, tcpip_tcp_timer, NULL);
+    } else {
+        /* disable timer */
+        tcpip_tcp_timer_active = 0;
+    }
 }
 
 /**
@@ -89,15 +89,14 @@ tcpip_tcp_timer(void *arg)
  * the reason is to have the TCP timer only running when
  * there are active (or time-wait) PCBs.
  */
-void
-tcp_timer_needed(void)
+void tcp_timer_needed(void)
 {
-  /* timer is off but needed again? */
-  if (!tcpip_tcp_timer_active && (tcp_active_pcbs || tcp_tw_pcbs)) {
-    /* enable and start timer */
-    tcpip_tcp_timer_active = 1;
-    sys_timeout(TCP_TMR_INTERVAL, tcpip_tcp_timer, NULL);
-  }
+    /* timer is off but needed again? */
+    if (!tcpip_tcp_timer_active && (tcp_active_pcbs || tcp_tw_pcbs)) {
+        /* enable and start timer */
+        tcpip_tcp_timer_active = 1;
+        sys_timeout(TCP_TMR_INTERVAL, tcpip_tcp_timer, NULL);
+    }
 }
 #endif /* LWIP_TCP */
 
@@ -110,10 +109,10 @@ tcp_timer_needed(void)
 static void
 arp_timer(void *arg)
 {
-  LWIP_UNUSED_ARG(arg);
-  LWIP_DEBUGF(TIMERS_DEBUG, ("tcpip: etharp_tmr()\n"));
-  etharp_tmr();
-  sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
+    LWIP_UNUSED_ARG(arg);
+    LWIP_DEBUGF(TIMERS_DEBUG, ("tcpip: etharp_tmr()\n"));
+    etharp_tmr();
+    sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
 }
 #endif /* LWIP_ARP */
 
@@ -121,7 +120,7 @@ arp_timer(void *arg)
 void sys_timeouts_init(void)
 {
 #if LWIP_ARP
-  sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
+    sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
 #endif /* LWIP_ARP */
 }
 
@@ -136,52 +135,50 @@ void sys_timeouts_init(void)
  * @param arg argument to pass to the callback function
  */
 #if LWIP_DEBUG_TIMERNAMES
-void
-sys_timeout_debug(u32_t msecs, sys_timeout_handler handler, void *arg, const char* handler_name)
-#else /* LWIP_DEBUG_TIMERNAMES */
-void
-sys_timeout(u32_t msecs, sys_timeout_handler handler, void *arg)
+void sys_timeout_debug(u32_t msecs, sys_timeout_handler handler, void *arg, const char *handler_name)
+#else  /* LWIP_DEBUG_TIMERNAMES */
+void sys_timeout(u32_t msecs, sys_timeout_handler handler, void *arg)
 #endif /* LWIP_DEBUG_TIMERNAMES */
 {
-  struct sys_timeo *timeout, *t;
+    struct sys_timeo *timeout, *t;
 
-  timeout = (struct sys_timeo *)memp_malloc(MEMP_SYS_TIMEOUT);
-  if (timeout == NULL) {
-    LWIP_ASSERT("sys_timeout: timeout != NULL, pool MEMP_SYS_TIMEOUT is empty", timeout != NULL);
-    return;
-  }
-  timeout->next = NULL;
-  timeout->h = handler;
-  timeout->arg = arg;
-  timeout->time = msecs;
+    timeout = (struct sys_timeo *)memp_malloc(MEMP_SYS_TIMEOUT);
+    if (timeout == NULL) {
+        LWIP_ASSERT("sys_timeout: timeout != NULL, pool MEMP_SYS_TIMEOUT is empty", timeout != NULL);
+        return;
+    }
+    timeout->next = NULL;
+    timeout->h = handler;
+    timeout->arg = arg;
+    timeout->time = msecs;
 #if LWIP_DEBUG_TIMERNAMES
-  timeout->handler_name = handler_name;
-  LWIP_DEBUGF(TIMERS_DEBUG, ("sys_timeout: %p msecs=%"U32_F" handler=%s arg=%p\n",
-    (void *)timeout, msecs, handler_name, (void *)arg));
+    timeout->handler_name = handler_name;
+    LWIP_DEBUGF(TIMERS_DEBUG, ("sys_timeout: %p msecs=%" U32_F " handler=%s arg=%p\n",
+                               (void *)timeout, msecs, handler_name, (void *)arg));
 #endif /* LWIP_DEBUG_TIMERNAMES */
 
-  if (next_timeout == NULL) {
-    next_timeout = timeout;
-    return;
-  }
-
-  if (next_timeout->time > msecs) {
-    next_timeout->time -= msecs;
-    timeout->next = next_timeout;
-    next_timeout = timeout;
-  } else {
-    for(t = next_timeout; t != NULL; t = t->next) {
-      timeout->time -= t->time;
-      if (t->next == NULL || t->next->time > timeout->time) {
-        if (t->next != NULL) {
-          t->next->time -= timeout->time;
-        }
-        timeout->next = t->next;
-        t->next = timeout;
-        break;
-      }
+    if (next_timeout == NULL) {
+        next_timeout = timeout;
+        return;
     }
-  }
+
+    if (next_timeout->time > msecs) {
+        next_timeout->time -= msecs;
+        timeout->next = next_timeout;
+        next_timeout = timeout;
+    } else {
+        for (t = next_timeout; t != NULL; t = t->next) {
+            timeout->time -= t->time;
+            if (t->next == NULL || t->next->time > timeout->time) {
+                if (t->next != NULL) {
+                    t->next->time -= timeout->time;
+                }
+                timeout->next = t->next;
+                t->next = timeout;
+                break;
+            }
+        }
+    }
 }
 
 /**
@@ -194,33 +191,32 @@ sys_timeout(u32_t msecs, sys_timeout_handler handler, void *arg)
  * @param handler callback function that would be called by the timeout
  * @param arg callback argument that would be passed to handler
 */
-void
-sys_untimeout(sys_timeout_handler handler, void *arg)
+void sys_untimeout(sys_timeout_handler handler, void *arg)
 {
-  struct sys_timeo *prev_t, *t;
+    struct sys_timeo *prev_t, *t;
 
-  if (next_timeout == NULL) {
-    return;
-  }
-
-  for (t = next_timeout, prev_t = NULL; t != NULL; prev_t = t, t = t->next) {
-    if ((t->h == handler) && (t->arg == arg)) {
-      /* We have a match */
-      /* Unlink from previous in list */
-      if (prev_t == NULL) {
-        next_timeout = t->next;
-      } else {
-        prev_t->next = t->next;
-      }
-      /* If not the last one, add time of this one back to next */
-      if (t->next != NULL) {
-        t->next->time += t->time;
-      }
-      memp_free(MEMP_SYS_TIMEOUT, t);
-      return;
+    if (next_timeout == NULL) {
+        return;
     }
-  }
-  return;
+
+    for (t = next_timeout, prev_t = NULL; t != NULL; prev_t = t, t = t->next) {
+        if ((t->h == handler) && (t->arg == arg)) {
+            /* We have a match */
+            /* Unlink from previous in list */
+            if (prev_t == NULL) {
+                next_timeout = t->next;
+            } else {
+                prev_t->next = t->next;
+            }
+            /* If not the last one, add time of this one back to next */
+            if (t->next != NULL) {
+                t->next->time += t->time;
+            }
+            memp_free(MEMP_SYS_TIMEOUT, t);
+            return;
+        }
+    }
+    return;
 }
 
 
@@ -231,66 +227,64 @@ sys_untimeout(sys_timeout_handler handler, void *arg)
  * @param mbox the mbox to fetch the message from
  * @param msg the place to store the message
  */
-void
-sys_timeouts_mbox_fetch(sys_mbox_t mbox, void **msg)
+void sys_timeouts_mbox_fetch(sys_mbox_t mbox, void **msg)
 {
-  u32_t time_needed;
-  struct sys_timeo *tmptimeout;
-  sys_timeout_handler handler;
-  void *arg;
+    u32_t time_needed;
+    struct sys_timeo *tmptimeout;
+    sys_timeout_handler handler;
+    void *arg;
 
- again:
-  if (!next_timeout) {
-    time_needed = sys_arch_mbox_fetch(mbox, msg, 0);
-  } else {
-    if (next_timeout->time > 0) {
-      time_needed = sys_arch_mbox_fetch(mbox, msg, next_timeout->time);
+again:
+    if (!next_timeout) {
+        time_needed = sys_arch_mbox_fetch(mbox, msg, 0);
     } else {
-      time_needed = SYS_ARCH_TIMEOUT;
-    }
+        if (next_timeout->time > 0) {
+            time_needed = sys_arch_mbox_fetch(mbox, msg, next_timeout->time);
+        } else {
+            time_needed = SYS_ARCH_TIMEOUT;
+        }
 
-    if (time_needed == SYS_ARCH_TIMEOUT) {
-      /* If time == SYS_ARCH_TIMEOUT, a timeout occured before a message
+        if (time_needed == SYS_ARCH_TIMEOUT) {
+            /* If time == SYS_ARCH_TIMEOUT, a timeout occured before a message
          could be fetched. We should now call the timeout handler and
          deallocate the memory allocated for the timeout. */
-      tmptimeout = next_timeout;
-      next_timeout = tmptimeout->next;
-      handler = tmptimeout->h;
-      arg = tmptimeout->arg;
+            tmptimeout = next_timeout;
+            next_timeout = tmptimeout->next;
+            handler = tmptimeout->h;
+            arg = tmptimeout->arg;
 #if LWIP_DEBUG_TIMERNAMES
-      if (handler != NULL) {
-        LWIP_DEBUGF(TIMERS_DEBUG, ("stmf calling h=%s arg=%p\n",
-          tmptimeout->handler_name, arg));
-      }
+            if (handler != NULL) {
+                LWIP_DEBUGF(TIMERS_DEBUG, ("stmf calling h=%s arg=%p\n",
+                                           tmptimeout->handler_name, arg));
+            }
 #endif /* LWIP_DEBUG_TIMERNAMES */
-      memp_free(MEMP_SYS_TIMEOUT, tmptimeout);
-      if (handler != NULL) {
-        /* For LWIP_TCPIP_CORE_LOCKING, lock the core before calling the
+            memp_free(MEMP_SYS_TIMEOUT, tmptimeout);
+            if (handler != NULL) {
+                /* For LWIP_TCPIP_CORE_LOCKING, lock the core before calling the
            timeout handler function. */
-        LOCK_TCPIP_CORE();
-        handler(arg);
-        UNLOCK_TCPIP_CORE();
-      }
+                LOCK_TCPIP_CORE();
+                handler(arg);
+                UNLOCK_TCPIP_CORE();
+            }
 
-      /* We try again to fetch a message from the mbox. */
-      goto again;
-    } else {
-      /* If time != SYS_ARCH_TIMEOUT, a message was received before the timeout
+            /* We try again to fetch a message from the mbox. */
+            goto again;
+        } else {
+            /* If time != SYS_ARCH_TIMEOUT, a message was received before the timeout
          occured. The time variable is set to the number of
          milliseconds we waited for the message. */
-      if (time_needed < next_timeout->time) {
-        next_timeout->time -= time_needed;
-      } else {
-        next_timeout->time = 0;
-      }
+            if (time_needed < next_timeout->time) {
+                next_timeout->time -= time_needed;
+            } else {
+                next_timeout->time = 0;
+            }
+        }
     }
-  }
 }
 
-#else /* LWIP_TIMERS */
+#else  /* LWIP_TIMERS */
 /* Satisfy the TCP code which calls this function */
-void
-tcp_timer_needed(void)
+void tcp_timer_needed(void)
 {
 }
 #endif /* LWIP_TIMERS */

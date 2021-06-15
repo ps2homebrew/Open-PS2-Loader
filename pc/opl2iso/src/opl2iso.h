@@ -22,9 +22,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define PROGRAM_NAME "opl2iso"
+#define PROGRAM_NAME    "opl2iso"
 #define PROGRAM_EXTNAME "UL.CFG to ISO converter"
-#define PROGRAM_VER "0.0.2"
+#define PROGRAM_VER     "0.0.2"
 
 typedef unsigned char u8;
 typedef unsigned short u16;

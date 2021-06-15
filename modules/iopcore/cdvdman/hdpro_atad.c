@@ -33,39 +33,39 @@
     } while (0)
 #endif
 
-#define BANNER "ATA device driver for HD Pro Kit %s\n"
+#define BANNER  "ATA device driver for HD Pro Kit %s\n"
 #define VERSION "v1.0"
 
 
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
 // The pseudo ATA controller registers are accessed (input/ouput) by writing
 // an id to the main ATA controller (id specific to HDpro, see registers id below).
-#define HDPROreg_IO8 (*(vu8 *)0xBFC00000)
+#define HDPROreg_IO8  (*(vu8 *)0xBFC00000)
 #define HDPROreg_IO32 (*(vu32 *)0xBFC00000)
 
 #define CDVDreg_STATUS (*(vu8 *)0xBF40200A)
 
 // Pseudo ATA controller registers id - Output
 #define ATAreg_CONTROL_RD 0x68
-#define ATAreg_SELECT_RD 0x70
-#define ATAreg_STATUS_RD 0xf0
-#define ATAreg_ERROR_RD 0x90
+#define ATAreg_SELECT_RD  0x70
+#define ATAreg_STATUS_RD  0xf0
+#define ATAreg_ERROR_RD   0x90
 #define ATAreg_NSECTOR_RD 0x50
-#define ATAreg_SECTOR_RD 0xd0
-#define ATAreg_LCYL_RD 0x30
-#define ATAreg_HCYL_RD 0xb0
-#define ATAreg_DATA_RD 0x41
+#define ATAreg_SECTOR_RD  0xd0
+#define ATAreg_LCYL_RD    0x30
+#define ATAreg_HCYL_RD    0xb0
+#define ATAreg_DATA_RD    0x41
 
 // Pseudo ATA controller registers id - Input
 #define ATAreg_CONTROL_WR 0x6a
-#define ATAreg_SELECT_WR 0x72
+#define ATAreg_SELECT_WR  0x72
 #define ATAreg_COMMAND_WR 0xf2
 #define ATAreg_FEATURE_WR 0x92
 #define ATAreg_NSECTOR_WR 0x52
-#define ATAreg_SECTOR_WR 0xd2
-#define ATAreg_LCYL_WR 0x32
-#define ATAreg_HCYL_WR 0xb2
-#define ATAreg_DATA_WR 0x12
+#define ATAreg_SECTOR_WR  0xd2
+#define ATAreg_LCYL_WR    0x32
+#define ATAreg_HCYL_WR    0xb2
+#define ATAreg_DATA_WR    0x12
 
 static int ata_evflg = -1;
 
@@ -74,10 +74,10 @@ extern char lba_48bit;
 
 int ata_io_sema = -1;
 
-#define WAITIOSEMA(x) WaitSema(x)
+#define WAITIOSEMA(x)   WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
 
-#define ATA_EV_TIMEOUT 1
+#define ATA_EV_TIMEOUT  1
 #define ATA_EV_COMPLETE 2 //Unused as there is no completion interrupt
 
 /* Local device info.  */
@@ -202,10 +202,10 @@ int ata_get_error()
     return hdpro_io_read(ATAreg_ERROR_RD) & 0xff;
 }
 
-#define ATA_WAIT_BUSY 0x80
+#define ATA_WAIT_BUSY    0x80
 #define ATA_WAIT_BUSBUSY 0x88
 
-#define ata_wait_busy() gen_ata_wait_busy(ATA_WAIT_BUSY)
+#define ata_wait_busy()     gen_ata_wait_busy(ATA_WAIT_BUSY)
 #define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
 /* 0x80 for busy, 0x88 for bus busy.

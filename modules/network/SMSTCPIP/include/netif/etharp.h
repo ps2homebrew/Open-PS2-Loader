@@ -86,7 +86,7 @@ struct ethip_hdr
 #define ARP_TMR_INTERVAL 10000
 
 #define ETHTYPE_ARP 0x0608
-#define ETHTYPE_IP 0x0008
+#define ETHTYPE_IP  0x0008
 
 void etharp_init(void);
 void etharp_tmr(void);

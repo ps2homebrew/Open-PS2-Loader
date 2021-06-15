@@ -39,17 +39,17 @@
 
 #include "lwip/netif.h"
 
-#define ICMP_ER 0   /* echo reply */
-#define ICMP_DUR 3  /* destination unreachable */
-#define ICMP_SQ 4   /* source quench */
-#define ICMP_RD 5   /* redirect */
-#define ICMP_ECHO 8 /* echo */
-#define ICMP_TE 11  /* time exceeded */
-#define ICMP_PP 12  /* parameter problem */
-#define ICMP_TS 13  /* timestamp */
-#define ICMP_TSR 14 /* timestamp reply */
-#define ICMP_IRQ 15 /* information request */
-#define ICMP_IR 16  /* information reply */
+#define ICMP_ER   0  /* echo reply */
+#define ICMP_DUR  3  /* destination unreachable */
+#define ICMP_SQ   4  /* source quench */
+#define ICMP_RD   5  /* redirect */
+#define ICMP_ECHO 8  /* echo */
+#define ICMP_TE   11 /* time exceeded */
+#define ICMP_PP   12 /* parameter problem */
+#define ICMP_TS   13 /* timestamp */
+#define ICMP_TSR  14 /* timestamp reply */
+#define ICMP_IRQ  15 /* information request */
+#define ICMP_IR   16 /* information reply */
 
 enum icmp_dur_type {
     ICMP_DUR_NET = 0,   /* net unreachable */

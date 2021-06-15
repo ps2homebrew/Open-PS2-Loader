@@ -59,7 +59,7 @@ struct nbd_old_handshake
     char zeroes[124]; /* must be sent as zero bytes */
 } NBD_ATTRIBUTE_PACKED;
 
-#define NBD_MAGIC UINT64_C(0x4e42444d41474943) /* ASCII "NBDMAGIC" */
+#define NBD_MAGIC       UINT64_C(0x4e42444d41474943) /* ASCII "NBDMAGIC" */
 #define NBD_OLD_VERSION UINT64_C(0x0000420281861253)
 
 /* New-style handshake. */
@@ -104,53 +104,53 @@ struct nbd_fixed_new_option_reply
 
 /* Global flags. */
 #define NBD_FLAG_FIXED_NEWSTYLE (1 << 0)
-#define NBD_FLAG_NO_ZEROES (1 << 1)
+#define NBD_FLAG_NO_ZEROES      (1 << 1)
 
 /* Per-export flags. */
-#define NBD_FLAG_HAS_FLAGS (1 << 0)
-#define NBD_FLAG_READ_ONLY (1 << 1)
-#define NBD_FLAG_SEND_FLUSH (1 << 2)
-#define NBD_FLAG_SEND_FUA (1 << 3)
-#define NBD_FLAG_ROTATIONAL (1 << 4)
-#define NBD_FLAG_SEND_TRIM (1 << 5)
+#define NBD_FLAG_HAS_FLAGS         (1 << 0)
+#define NBD_FLAG_READ_ONLY         (1 << 1)
+#define NBD_FLAG_SEND_FLUSH        (1 << 2)
+#define NBD_FLAG_SEND_FUA          (1 << 3)
+#define NBD_FLAG_ROTATIONAL        (1 << 4)
+#define NBD_FLAG_SEND_TRIM         (1 << 5)
 #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6)
-#define NBD_FLAG_SEND_DF (1 << 7)
-#define NBD_FLAG_CAN_MULTI_CONN (1 << 8)
-#define NBD_FLAG_SEND_CACHE (1 << 10)
-#define NBD_FLAG_SEND_FAST_ZERO (1 << 11)
+#define NBD_FLAG_SEND_DF           (1 << 7)
+#define NBD_FLAG_CAN_MULTI_CONN    (1 << 8)
+#define NBD_FLAG_SEND_CACHE        (1 << 10)
+#define NBD_FLAG_SEND_FAST_ZERO    (1 << 11)
 
 /* NBD options (new style handshake only). */
-#define NBD_OPT_EXPORT_NAME 1
-#define NBD_OPT_ABORT 2
-#define NBD_OPT_LIST 3
-#define NBD_OPT_STARTTLS 5
-#define NBD_OPT_INFO 6
-#define NBD_OPT_GO 7
-#define NBD_OPT_STRUCTURED_REPLY 8
+#define NBD_OPT_EXPORT_NAME       1
+#define NBD_OPT_ABORT             2
+#define NBD_OPT_LIST              3
+#define NBD_OPT_STARTTLS          5
+#define NBD_OPT_INFO              6
+#define NBD_OPT_GO                7
+#define NBD_OPT_STRUCTURED_REPLY  8
 #define NBD_OPT_LIST_META_CONTEXT 9
-#define NBD_OPT_SET_META_CONTEXT 10
+#define NBD_OPT_SET_META_CONTEXT  10
 
-#define NBD_REP_ERR(val) (0x80000000 | (val))
+#define NBD_REP_ERR(val)    (0x80000000 | (val))
 #define NBD_REP_IS_ERR(val) (!!((val)&0x80000000))
 
-#define NBD_REP_ACK 1
-#define NBD_REP_SERVER 2
-#define NBD_REP_INFO 3
-#define NBD_REP_META_CONTEXT 4
-#define NBD_REP_ERR_UNSUP NBD_REP_ERR(1)
-#define NBD_REP_ERR_POLICY NBD_REP_ERR(2)
-#define NBD_REP_ERR_INVALID NBD_REP_ERR(3)
-#define NBD_REP_ERR_PLATFORM NBD_REP_ERR(4)
-#define NBD_REP_ERR_TLS_REQD NBD_REP_ERR(5)
-#define NBD_REP_ERR_UNKNOWN NBD_REP_ERR(6)
-#define NBD_REP_ERR_SHUTDOWN NBD_REP_ERR(7)
+#define NBD_REP_ACK                 1
+#define NBD_REP_SERVER              2
+#define NBD_REP_INFO                3
+#define NBD_REP_META_CONTEXT        4
+#define NBD_REP_ERR_UNSUP           NBD_REP_ERR(1)
+#define NBD_REP_ERR_POLICY          NBD_REP_ERR(2)
+#define NBD_REP_ERR_INVALID         NBD_REP_ERR(3)
+#define NBD_REP_ERR_PLATFORM        NBD_REP_ERR(4)
+#define NBD_REP_ERR_TLS_REQD        NBD_REP_ERR(5)
+#define NBD_REP_ERR_UNKNOWN         NBD_REP_ERR(6)
+#define NBD_REP_ERR_SHUTDOWN        NBD_REP_ERR(7)
 #define NBD_REP_ERR_BLOCK_SIZE_REQD NBD_REP_ERR(8)
-#define NBD_REP_ERR_TOO_BIG NBD_REP_ERR(9)
+#define NBD_REP_ERR_TOO_BIG         NBD_REP_ERR(9)
 
-#define NBD_INFO_EXPORT 0
-#define NBD_INFO_NAME 1
+#define NBD_INFO_EXPORT      0
+#define NBD_INFO_NAME        1
 #define NBD_INFO_DESCRIPTION 2
-#define NBD_INFO_BLOCK_SIZE 3
+#define NBD_INFO_BLOCK_SIZE  3
 
 /* NBD_INFO_EXPORT reply (follows fixed_new_option_reply). */
 struct nbd_fixed_new_option_reply_info_export
@@ -247,49 +247,49 @@ struct nbd_structured_reply_error
                     /* Followed by human readable error string, and possibly more structure. */
 } NBD_ATTRIBUTE_PACKED;
 
-#define NBD_REQUEST_MAGIC 0x25609513
-#define NBD_SIMPLE_REPLY_MAGIC 0x67446698
+#define NBD_REQUEST_MAGIC          0x25609513
+#define NBD_SIMPLE_REPLY_MAGIC     0x67446698
 #define NBD_STRUCTURED_REPLY_MAGIC 0x668e33ef
 
 /* Structured reply flags. */
 #define NBD_REPLY_FLAG_DONE (1 << 0)
 
-#define NBD_REPLY_TYPE_ERR(val) ((1 << 15) | (val))
+#define NBD_REPLY_TYPE_ERR(val)    ((1 << 15) | (val))
 #define NBD_REPLY_TYPE_IS_ERR(val) (!!((val) & (1 << 15)))
 
 /* Structured reply types. */
-#define NBD_REPLY_TYPE_NONE 0
-#define NBD_REPLY_TYPE_OFFSET_DATA 1
-#define NBD_REPLY_TYPE_OFFSET_HOLE 2
+#define NBD_REPLY_TYPE_NONE         0
+#define NBD_REPLY_TYPE_OFFSET_DATA  1
+#define NBD_REPLY_TYPE_OFFSET_HOLE  2
 #define NBD_REPLY_TYPE_BLOCK_STATUS 5
-#define NBD_REPLY_TYPE_ERROR NBD_REPLY_TYPE_ERR(1)
+#define NBD_REPLY_TYPE_ERROR        NBD_REPLY_TYPE_ERR(1)
 #define NBD_REPLY_TYPE_ERROR_OFFSET NBD_REPLY_TYPE_ERR(2)
 
 /* NBD commands. */
-#define NBD_CMD_READ 0
-#define NBD_CMD_WRITE 1
-#define NBD_CMD_DISC 2 /* Disconnect. */
-#define NBD_CMD_FLUSH 3
-#define NBD_CMD_TRIM 4
-#define NBD_CMD_CACHE 5
+#define NBD_CMD_READ         0
+#define NBD_CMD_WRITE        1
+#define NBD_CMD_DISC         2 /* Disconnect. */
+#define NBD_CMD_FLUSH        3
+#define NBD_CMD_TRIM         4
+#define NBD_CMD_CACHE        5
 #define NBD_CMD_WRITE_ZEROES 6
 #define NBD_CMD_BLOCK_STATUS 7
 
-#define NBD_CMD_FLAG_FUA (1 << 0)
-#define NBD_CMD_FLAG_NO_HOLE (1 << 1)
-#define NBD_CMD_FLAG_DF (1 << 2)
-#define NBD_CMD_FLAG_REQ_ONE (1 << 3)
+#define NBD_CMD_FLAG_FUA       (1 << 0)
+#define NBD_CMD_FLAG_NO_HOLE   (1 << 1)
+#define NBD_CMD_FLAG_DF        (1 << 2)
+#define NBD_CMD_FLAG_REQ_ONE   (1 << 3)
 #define NBD_CMD_FLAG_FAST_ZERO (1 << 4)
 
 /* NBD error codes. */
-#define NBD_SUCCESS 0
-#define NBD_EPERM 1
-#define NBD_EIO 5
-#define NBD_ENOMEM 12
-#define NBD_EINVAL 22
-#define NBD_ENOSPC 28
+#define NBD_SUCCESS   0
+#define NBD_EPERM     1
+#define NBD_EIO       5
+#define NBD_ENOMEM    12
+#define NBD_EINVAL    22
+#define NBD_ENOSPC    28
 #define NBD_EOVERFLOW 75
-#define NBD_ENOTSUP 95
+#define NBD_ENOTSUP   95
 #define NBD_ESHUTDOWN 108
 
 #endif /* NBD_PROTOCOL_H */

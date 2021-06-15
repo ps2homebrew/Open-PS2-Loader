@@ -62,7 +62,7 @@
  * Your system should provide mutexes supporting priority inversion to use this.
  */
 #if !defined LWIP_TCPIP_CORE_LOCKING || defined __DOXYGEN__
-#define LWIP_TCPIP_CORE_LOCKING         1
+#define LWIP_TCPIP_CORE_LOCKING 1
 #endif
 
 /**
@@ -74,7 +74,7 @@
  * interrupt context!
  */
 #if !defined LWIP_TCPIP_CORE_LOCKING_INPUT || defined __DOXYGEN__
-#define LWIP_TCPIP_CORE_LOCKING_INPUT   0
+#define LWIP_TCPIP_CORE_LOCKING_INPUT 0
 #endif
 /* ---------- Memory options ---------- */
 /**
@@ -338,10 +338,10 @@ a lot of data that needs to be copied, this should be set high. */
 #endif
 
 #ifndef LWIP_EVENT_API
-#define LWIP_EVENT_API 0
+#define LWIP_EVENT_API    0
 #define LWIP_CALLBACK_API 1
 #else
-#define LWIP_EVENT_API 1
+#define LWIP_EVENT_API    1
 #define LWIP_CALLBACK_API 0
 #endif
 
@@ -427,17 +427,17 @@ a lot of data that needs to be copied, this should be set high. */
 
 #else
 
-#define LINK_STATS 0
-#define IP_STATS 0
+#define LINK_STATS   0
+#define IP_STATS     0
 #define IPFRAG_STATS 0
-#define ICMP_STATS 0
-#define UDP_STATS 0
-#define TCP_STATS 0
-#define MEM_STATS 0
-#define MEMP_STATS 0
-#define PBUF_STATS 0
-#define SYS_STATS 0
-#define RAW_STATS 0
+#define ICMP_STATS   0
+#define UDP_STATS    0
+#define TCP_STATS    0
+#define MEM_STATS    0
+#define MEMP_STATS   0
+#define PBUF_STATS   0
+#define SYS_STATS    0
+#define RAW_STATS    0
 
 #endif /* LWIP_STATS */
 
@@ -462,8 +462,8 @@ a lot of data that needs to be copied, this should be set high. */
 #endif
 
 #define MSCHAP_SUPPORT 0 /* Set for MSCHAP (NOT FUNCTIONAL!) */
-#define CBCP_SUPPORT 0   /* Set for CBCP (NOT FUNCTIONAL!) */
-#define CCP_SUPPORT 0    /* Set for CCP (NOT FUNCTIONAL!) */
+#define CBCP_SUPPORT   0 /* Set for CBCP (NOT FUNCTIONAL!) */
+#define CCP_SUPPORT    0 /* Set for CCP (NOT FUNCTIONAL!) */
 
 #ifndef VJ_SUPPORT
 #define VJ_SUPPORT 0 /* Set for VJ header compression. */
@@ -477,7 +477,7 @@ a lot of data that needs to be copied, this should be set high. */
 /*
  * Timeouts.
  */
-#define FSM_DEFTIMEOUT 6      /* Timeout time in seconds */
+#define FSM_DEFTIMEOUT     6  /* Timeout time in seconds */
 #define FSM_DEFMAXTERMREQS 2  /* Maximum Terminate-Request transmissions */
 #define FSM_DEFMAXCONFREQS 10 /* Maximum Configure-Request transmissions */
 #define FSM_DEFMAXNAKLOOPS 5  /* Maximum number of nak loops */
@@ -485,7 +485,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define UPAP_DEFTIMEOUT 6  /* Timeout (seconds) for retransmitting req */
 #define UPAP_DEFREQTIME 30 /* Time to wait for auth-req from peer */
 
-#define CHAP_DEFTIMEOUT 6    /* Timeout time in seconds */
+#define CHAP_DEFTIMEOUT   6  /* Timeout time in seconds */
 #define CHAP_DEFTRANSMITS 10 /* max # times to send challenge */
 
 
@@ -517,13 +517,13 @@ a lot of data that needs to be copied, this should be set high. */
 #define PPP_MAXMTU 1500 /* Largest MTU we allow */
 #endif
 #define PPP_MINMTU 64
-#define PPP_MRU 1500    /* default MRU = max length of info field */
+#define PPP_MRU    1500 /* default MRU = max length of info field */
 #define PPP_MAXMRU 1500 /* Largest MRU we allow */
 #define PPP_DEFMRU 296  /* Try for this */
 #define PPP_MINMRU 128  /* No MRUs below this */
 
 
-#define MAXNAMELEN 256   /* max length of hostname or name for auth */
+#define MAXNAMELEN   256 /* max length of hostname or name for auth */
 #define MAXSECRETLEN 256 /* max length of password or secret */
 
 #endif /* PPP_SUPPORT */
@@ -665,28 +665,28 @@ a lot of data that needs to be copied, this should be set high. */
  * CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.
  */
 #if !defined CHECKSUM_CHECK_IP
-#define CHECKSUM_CHECK_IP               1
+#define CHECKSUM_CHECK_IP 1
 #endif
 
 /**
  * CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.
  */
 #if !defined CHECKSUM_CHECK_UDP
-#define CHECKSUM_CHECK_UDP              1
+#define CHECKSUM_CHECK_UDP 1
 #endif
 
 /**
  * CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.
  */
 #if !defined CHECKSUM_CHECK_TCP
-#define CHECKSUM_CHECK_TCP              1
+#define CHECKSUM_CHECK_TCP 1
 #endif
 
 /**
  * CHECKSUM_CHECK_ICMP==1: Check checksums in software for incoming ICMP packets.
  */
 #if !defined CHECKSUM_CHECK_ICMP
-#define CHECKSUM_CHECK_ICMP             1
+#define CHECKSUM_CHECK_ICMP 1
 #endif
 
 #endif /* __LWIP_OPT_H__ */

@@ -49,7 +49,7 @@ extern int netlog_inited;
     } while (0)
 #endif
 
-#define BANNER "ATA device driver %s - Copyright (c) 2003 Marcus R. Brown\n"
+#define BANNER  "ATA device driver %s - Copyright (c) 2003 Marcus R. Brown\n"
 #define VERSION "v1.2"
 
 extern char lba_48bit;
@@ -59,10 +59,10 @@ static int ata_evflg = -1;
 
 int ata_io_sema = -1;
 
-#define WAITIOSEMA(x) WaitSema(x)
+#define WAITIOSEMA(x)   WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
 
-#define ATA_EV_TIMEOUT 1
+#define ATA_EV_TIMEOUT  1
 #define ATA_EV_COMPLETE 2
 
 /* Local device info.  */
@@ -202,10 +202,10 @@ int ata_get_error(void)
     return ata_hwport->r_error & 0xff;
 }
 
-#define ATA_WAIT_BUSY 0x80
+#define ATA_WAIT_BUSY    0x80
 #define ATA_WAIT_BUSBUSY 0x88
 
-#define ata_wait_busy() gen_ata_wait_busy(ATA_WAIT_BUSY)
+#define ata_wait_busy()     gen_ata_wait_busy(ATA_WAIT_BUSY)
 #define ata_wait_bus_busy() gen_ata_wait_busy(ATA_WAIT_BUSBUSY)
 
 /* 0x80 for busy, 0x88 for bus busy.

@@ -18,7 +18,7 @@ typedef struct
 typedef void (*OplSmbPwHashFunc_t)(server_specs_t *ss);
 
 #define oplsmb_IMPORTS_start DECLARE_IMPORT_TABLE(oplsmb, 1, 1)
-#define oplsmb_IMPORTS_end END_IMPORT_TABLE
+#define oplsmb_IMPORTS_end   END_IMPORT_TABLE
 
 void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback);
 #define I_smb_NegotiateProt DECLARE_IMPORT(4, smb_NegotiateProt)

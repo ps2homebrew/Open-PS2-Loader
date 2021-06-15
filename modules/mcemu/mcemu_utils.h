@@ -53,7 +53,7 @@ void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsign
 #ifdef HDD_DRIVER
 
 /* These are used with the dir parameter of ata_device_dma_transfer().  */
-#define ATA_DIR_READ 0
+#define ATA_DIR_READ  0
 #define ATA_DIR_WRITE 1
 
 int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigned int sectors, int dir);

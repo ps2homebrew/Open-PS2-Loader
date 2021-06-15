@@ -47,9 +47,9 @@
 #define DEV9_SMAP_ALL_INTR_MASK (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND | SMAP_INTR_TXEND | SMAP_INTR_RXDNV | SMAP_INTR_TXDNV)
 //Unlike the SONY original, the RXDNV interrupt is not handled as statistics are not recorded.
 //For the sake of simplicity, Tx channel 0 is operated in single-mode. Do not handle TXDNV.
-#define DEV9_SMAP_INTR_MASK (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
+#define DEV9_SMAP_INTR_MASK     (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
 //The Tx interrupt events are handled separately
-#define DEV9_SMAP_INTR_MASK2 (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
+#define DEV9_SMAP_INTR_MASK2    (SMAP_INTR_EMAC3 | SMAP_INTR_RXEND)
 
 struct SmapDriverData SmapDriverData;
 

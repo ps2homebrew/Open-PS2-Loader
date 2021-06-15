@@ -335,10 +335,10 @@ static u8 GenuineMacAddress[][3] =
         //fake with AirohaTechnologyCorp's Chip
         {0x0C, 0xFC, 0x83}};
 
-#define REQ_HCI_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_DEVICE)
+#define REQ_HCI_OUT     (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_DEVICE)
 #define HCI_COMMAND_REQ 0
 
-#define MAX_PADS 4
+#define MAX_PADS  4
 #define MAX_DELAY 10
 
 static u8 hci_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};

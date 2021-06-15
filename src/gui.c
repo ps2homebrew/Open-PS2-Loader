@@ -96,10 +96,10 @@ static gui_screen_handler_t *screenHandlerTarget = NULL;
 static int transIndex;
 
 // Helper perlin noise data
-#define PLASMA_H 32
-#define PLASMA_W 32
+#define PLASMA_H              32
+#define PLASMA_W              32
 #define PLASMA_ROWS_PER_FRAME 6
-#define FADE_SIZE 256
+#define FADE_SIZE             256
 
 static GSTEXTURE gBackgroundTex;
 static int pperm[512];
@@ -1008,8 +1008,8 @@ static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR *res)
         "vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
         "sqc2	vf1, (%[res])\n"       // transfer the result in acc to the ee
 #endif
-        : [ res ] "+r"(res), "=m"(*res)
-        : [ a ] "r"(a), [ b ] "r"(b), [ mix ] "r"(mix), "m"(*a), "m"(*b));
+        : [res] "+r"(res), "=m"(*res)
+        : [a] "r"(a), [b] "r"(b), [mix] "r"(mix), "m"(*a), "m"(*b));
 }
 
 static float guiCalcPerlin(float x, float y, float z)

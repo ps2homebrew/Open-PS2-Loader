@@ -55,7 +55,7 @@ typedef signed char err_t; /* lwIP error type.  */
 /* From src/include/lwip/pbuf.h:  */
 
 #define PBUF_TRANSPORT_HLEN 20
-#define PBUF_IP_HLEN 20
+#define PBUF_IP_HLEN        20
 
 typedef enum {
     PBUF_TRANSPORT,
@@ -73,10 +73,10 @@ typedef enum {
 
 /* Definitions for the pbuf flag field (these are not the flags that
    are passed to pbuf_alloc()). */
-#define PBUF_FLAG_RAM 0x00  /* Flags that pbuf data is stored in RAM */
-#define PBUF_FLAG_ROM 0x01  /* Flags that pbuf data is stored in ROM */
+#define PBUF_FLAG_RAM  0x00 /* Flags that pbuf data is stored in RAM */
+#define PBUF_FLAG_ROM  0x01 /* Flags that pbuf data is stored in ROM */
 #define PBUF_FLAG_POOL 0x02 /* Flags that the pbuf comes from the pbuf pool */
-#define PBUF_FLAG_REF 0x04  /* Flags thet the pbuf payload refers to RAM */
+#define PBUF_FLAG_REF  0x04 /* Flags thet the pbuf payload refers to RAM */
 
 struct pbuf
 {
@@ -116,7 +116,7 @@ struct ip_addr
 #define IP4_ADDR(ipaddr, a, b, c, d) (ipaddr)->addr = htonl(((u32)(a & 0xff) << 24) | ((u32)(b & 0xff) << 16) | \
                                                             ((u32)(c & 0xff) << 8) | (u32)(d & 0xff))
 
-#define ip_addr_set(dest, src) (dest)->addr = ((struct ip_addr *)src)->addr
+#define ip_addr_set(dest, src)              (dest)->addr = ((struct ip_addr *)src)->addr
 #define ip_addr_maskcmp(addr1, addr2, mask) (((addr1)->addr &  \
                                               (mask)->addr) == \
                                              ((addr2)->addr &  \
@@ -149,16 +149,16 @@ struct ip_addr
 /** whether the network interface is 'up'. this is
  * a software flag used to control whether this network
  * interface is enabled and processes traffic */
-#define NETIF_FLAG_UP 0x1U
+#define NETIF_FLAG_UP           0x1U
 /** if set, the netif has broadcast capability */
-#define NETIF_FLAG_BROADCAST 0x2U
+#define NETIF_FLAG_BROADCAST    0x2U
 /** if set, the netif is one end of a point-to-point connection */
 #define NETIF_FLAG_POINTTOPOINT 0x4U
 /** if set, the interface is configured using DHCP */
-#define NETIF_FLAG_DHCP 0x08U
+#define NETIF_FLAG_DHCP         0x08U
 /** if set, the interface has an active link
  *  (set by the interface) */
-#define NETIF_FLAG_LINK_UP 0x10U
+#define NETIF_FLAG_LINK_UP      0x10U
 
 /** generic data structure used for all lwIP network interfaces */
 struct netif
@@ -234,35 +234,35 @@ struct sockaddr
 #endif
 
 #define SOCK_STREAM 1
-#define SOCK_DGRAM 2
-#define SOCK_RAW 3
+#define SOCK_DGRAM  2
+#define SOCK_RAW    3
 
 /*
  * Option flags per-socket.
  */
-#define SO_DEBUG 0x0001       /* turn on debugging info recording */
-#define SO_ACCEPTCONN 0x0002  /* socket has had listen() */
-#define SO_REUSEADDR 0x0004   /* allow local address reuse */
-#define SO_KEEPALIVE 0x0008   /* keep connections alive */
-#define SO_DONTROUTE 0x0010   /* just use interface addresses */
-#define SO_BROADCAST 0x0020   /* permit sending of broadcast msgs */
+#define SO_DEBUG       0x0001 /* turn on debugging info recording */
+#define SO_ACCEPTCONN  0x0002 /* socket has had listen() */
+#define SO_REUSEADDR   0x0004 /* allow local address reuse */
+#define SO_KEEPALIVE   0x0008 /* keep connections alive */
+#define SO_DONTROUTE   0x0010 /* just use interface addresses */
+#define SO_BROADCAST   0x0020 /* permit sending of broadcast msgs */
 #define SO_USELOOPBACK 0x0040 /* bypass hardware when possible */
-#define SO_LINGER 0x0080      /* linger on close if data present */
-#define SO_OOBINLINE 0x0100   /* leave received OOB data in line */
+#define SO_LINGER      0x0080 /* linger on close if data present */
+#define SO_OOBINLINE   0x0100 /* leave received OOB data in line */
 
 #define SO_DONTLINGER (int)(~SO_LINGER)
 
 /*
  * Additional options, not kept in so_options.
  */
-#define SO_SNDBUF 0x1001   /* send buffer size */
-#define SO_RCVBUF 0x1002   /* receive buffer size */
+#define SO_SNDBUF   0x1001 /* send buffer size */
+#define SO_RCVBUF   0x1002 /* receive buffer size */
 #define SO_SNDLOWAT 0x1003 /* send low-water mark */
 #define SO_RCVLOWAT 0x1004 /* receive low-water mark */
 #define SO_SNDTIMEO 0x1005 /* send timeout */
 #define SO_RCVTIMEO 0x1006 /* receive timeout */
-#define SO_ERROR 0x1007    /* get error status and clear */
-#define SO_TYPE 0x1008     /* get socket type */
+#define SO_ERROR    0x1007 /* get error status and clear */
+#define SO_TYPE     0x1008 /* get socket type */
 
 /*
  * Level number for (get/set)sockopt() to apply to socket itself.
@@ -270,13 +270,13 @@ struct sockaddr
 #define SOL_SOCKET 0xfff /* options for socket level */
 
 #define AF_UNSPEC 0
-#define AF_INET 2
-#define PF_INET AF_INET
+#define AF_INET   2
+#define PF_INET   AF_INET
 
 #define IPPROTO_TCP 6
 #define IPPROTO_UDP 17
 
-#define INADDR_ANY 0
+#define INADDR_ANY       0
 #define INADDR_BROADCAST 0xffffffff
 
 /* Flags we can use with send and recv. */
@@ -284,11 +284,11 @@ struct sockaddr
 
 #ifndef FD_SET
 #undef FD_SETSIZE
-#define FD_SETSIZE 16
-#define FD_SET(n, p) ((p)->fd_bits[(n) / 8] |= (1 << ((n)&7)))
-#define FD_CLR(n, p) ((p)->fd_bits[(n) / 8] &= ~(1 << ((n)&7)))
+#define FD_SETSIZE     16
+#define FD_SET(n, p)   ((p)->fd_bits[(n) / 8] |= (1 << ((n)&7)))
+#define FD_CLR(n, p)   ((p)->fd_bits[(n) / 8] &= ~(1 << ((n)&7)))
 #define FD_ISSET(n, p) ((p)->fd_bits[(n) / 8] & (1 << ((n)&7)))
-#define FD_ZERO(p) memset((void *)(p), 0, sizeof(*(p)))
+#define FD_ZERO(p)     memset((void *)(p), 0, sizeof(*(p)))
 
 typedef struct fd_set
 {
@@ -328,14 +328,14 @@ typedef struct fd_set
  */
 
 #if !defined(FIONREAD) || !defined(FIONBIO)
-#define IOCPARM_MASK 0x7f   /* parameters must be < 128 bytes */
-#define IOC_VOID 0x20000000 /* no parameters */
-#define IOC_OUT 0x40000000  /* copy out parameters */
-#define IOC_IN 0x80000000   /* copy in parameters */
-#define IOC_INOUT (IOC_IN | IOC_OUT)
+#define IOCPARM_MASK 0x7f       /* parameters must be < 128 bytes */
+#define IOC_VOID     0x20000000 /* no parameters */
+#define IOC_OUT      0x40000000 /* copy out parameters */
+#define IOC_IN       0x80000000 /* copy in parameters */
+#define IOC_INOUT    (IOC_IN | IOC_OUT)
 /* 0x20000000 distinguishes new &
                                            old ioctl's */
-#define _IO(x, y) (IOC_VOID | ((x) << 8) | (y))
+#define _IO(x, y)    (IOC_VOID | ((x) << 8) | (y))
 
 #define _IOR(x, y, t) (IOC_OUT | (((long)sizeof(t) & IOCPARM_MASK) << 16) | ((x) << 8) | (y))
 
@@ -383,7 +383,7 @@ struct hostent
 /*
  * User-settable options (used with setsockopt, IPPROTO_TCP level).
  */
-#define TCP_NODELAY 0x01   /* don't delay send to coalesce packets */
+#define TCP_NODELAY   0x01 /* don't delay send to coalesce packets */
 #define TCP_KEEPALIVE 0x02 /* send KEEPALIVE probes when idle for pcb->keepalive miliseconds */
 
 #endif

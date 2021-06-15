@@ -73,11 +73,11 @@ struct sys_timeout
 sys_sem_t sys_sem_new(u8_t count);
 //void sys_sem_signal(sys_sem_t sem);
 
-#define sys_sem_signal(s) SignalSema(s)
+#define sys_sem_signal(s)          SignalSema(s)
 u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout);
 
 void sys_sem_free(sys_sem_t sem);
-#define sys_sem_wait(s) WaitSema(s)
+#define sys_sem_wait(s)            WaitSema(s)
 #define sys_sem_wait_timeout(s, t) (sys_arch_sem_wait(s, t) != SYS_ARCH_TIMEOUT)
 
 /* Mailbox functions. */
@@ -85,7 +85,7 @@ sys_mbox_t sys_mbox_new(void);
 void sys_mbox_post(sys_mbox_t mbox, void *msg);
 u32_t sys_arch_mbox_fetch(sys_mbox_t mbox, void **msg, u32_t timeout);
 void sys_mbox_free(sys_mbox_t mbox);
-#define sys_mbox_fetch(mb, msg) sys_arch_mbox_fetch((mb), (msg), 0);
+#define sys_mbox_fetch(mb, msg)    sys_arch_mbox_fetch((mb), (msg), 0);
 
 
 /* Thread functions. */
@@ -126,7 +126,7 @@ unsigned long sys_now(void);
  * which should be implemented in sys_arch.c. If a particular port needs a
  * different implementation, then this macro may be defined in sys_arch.h
  */
-#define SYS_ARCH_PROTECT(lev) CpuSuspendIntr(&lev)
+#define SYS_ARCH_PROTECT(lev)      CpuSuspendIntr(&lev)
 //lev = sys_arch_protect()
 /** SYS_ARCH_UNPROTECT
  * Perform a "fast" set of the protection level to "lev". This could be
@@ -136,7 +136,7 @@ unsigned long sys_now(void);
  * sys_arch.c. If a particular port needs a different implementation, then
  * this macro may be defined in sys_arch.h
  */
-#define SYS_ARCH_UNPROTECT(lev) CpuResumeIntr(lev)
+#define SYS_ARCH_UNPROTECT(lev)    CpuResumeIntr(lev)
 //sys_arch_unprotect(lev)
 //sys_prot_t sys_arch_protect(void);
 //void sys_arch_unprotect(sys_prot_t pval);
@@ -152,39 +152,43 @@ unsigned long sys_now(void);
 #endif /* SYS_ARCH_PROTECT */
 
 #ifndef SYS_ARCH_INC
-#define SYS_ARCH_INC(var, val) do { \
-                                SYS_ARCH_DECL_PROTECT(old_level); \
-                                SYS_ARCH_PROTECT(old_level); \
-                                var += val; \
-                                SYS_ARCH_UNPROTECT(old_level); \
-                              } while(0)
+#define SYS_ARCH_INC(var, val)            \
+    do {                                  \
+        SYS_ARCH_DECL_PROTECT(old_level); \
+        SYS_ARCH_PROTECT(old_level);      \
+        var += val;                       \
+        SYS_ARCH_UNPROTECT(old_level);    \
+    } while (0)
 #endif /* SYS_ARCH_INC */
 
 #ifndef SYS_ARCH_DEC
-#define SYS_ARCH_DEC(var, val) do { \
-                                SYS_ARCH_DECL_PROTECT(old_level); \
-                                SYS_ARCH_PROTECT(old_level); \
-                                var -= val; \
-                                SYS_ARCH_UNPROTECT(old_level); \
-                              } while(0)
+#define SYS_ARCH_DEC(var, val)            \
+    do {                                  \
+        SYS_ARCH_DECL_PROTECT(old_level); \
+        SYS_ARCH_PROTECT(old_level);      \
+        var -= val;                       \
+        SYS_ARCH_UNPROTECT(old_level);    \
+    } while (0)
 #endif /* SYS_ARCH_DEC */
 
 #ifndef SYS_ARCH_GET
-#define SYS_ARCH_GET(var, ret) do { \
-                                SYS_ARCH_DECL_PROTECT(old_level); \
-                                SYS_ARCH_PROTECT(old_level); \
-                                ret = var; \
-                                SYS_ARCH_UNPROTECT(old_level); \
-                              } while(0)
+#define SYS_ARCH_GET(var, ret)            \
+    do {                                  \
+        SYS_ARCH_DECL_PROTECT(old_level); \
+        SYS_ARCH_PROTECT(old_level);      \
+        ret = var;                        \
+        SYS_ARCH_UNPROTECT(old_level);    \
+    } while (0)
 #endif /* SYS_ARCH_GET */
 
 #ifndef SYS_ARCH_SET
-#define SYS_ARCH_SET(var, val) do { \
-                                SYS_ARCH_DECL_PROTECT(old_level); \
-                                SYS_ARCH_PROTECT(old_level); \
-                                var = val; \
-                                SYS_ARCH_UNPROTECT(old_level); \
-                              } while(0)
+#define SYS_ARCH_SET(var, val)            \
+    do {                                  \
+        SYS_ARCH_DECL_PROTECT(old_level); \
+        SYS_ARCH_PROTECT(old_level);      \
+        var = val;                        \
+        SYS_ARCH_UNPROTECT(old_level);    \
+    } while (0)
 #endif /* SYS_ARCH_SET */
 
 #endif /* __LWIP_SYS_H__ */

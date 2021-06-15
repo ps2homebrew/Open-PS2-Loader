@@ -36,15 +36,15 @@
 
 #define CHEAT_VERSION "0.5.3.65.g774d1"
 
-#define MAX_HOOKS 5
-#define MAX_CODES 250
+#define MAX_HOOKS     5
+#define MAX_CODES     250
 #define MAX_CHEATLIST (MAX_HOOKS * 2 + MAX_CODES * 2)
 
 /* Some character defines */
-#define NUL 0x00
-#define LF 0x0A
-#define CR 0x0D
-#define SPACE 0x20
+#define NUL         0x00
+#define LF          0x0A
+#define CR          0x0D
+#define SPACE       0x20
 /* Number of digits per cheat code */
 #define CODE_DIGITS 16
 

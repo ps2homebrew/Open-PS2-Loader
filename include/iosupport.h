@@ -4,7 +4,7 @@
 #include "include/config.h"
 
 #define IO_MODE_SELECTED_NONE -1
-#define IO_MODE_SELECTED_ALL MODE_COUNT
+#define IO_MODE_SELECTED_ALL  MODE_COUNT
 
 enum IO_MODES {
     BDM_MODE = 0,
@@ -49,12 +49,12 @@ enum ERROR_CODE {
     ERROR_HDD_NOT_DETECTED,
 };
 
-#define NO_EXCEPTION 0x00
+#define NO_EXCEPTION      0x00
 #define UNMOUNT_EXCEPTION 0x01
 
-#define MODE_FLAG_NO_COMPAT 0x01  // no compat support
+#define MODE_FLAG_NO_COMPAT  0x01 // no compat support
 #define MODE_FLAG_COMPAT_DMA 0x02 // Supports DMA compat flags
-#define MODE_FLAG_NO_UPDATE 0x04  // Network update not supported.
+#define MODE_FLAG_NO_UPDATE  0x04 // Network update not supported.
 
 #define COMPAT_MODE_1 0x01 // Accurate Reads
 #define COMPAT_MODE_2 0x02 // Alternative data read method (Synchronous)
@@ -72,8 +72,8 @@ enum ERROR_CODE {
 // minimal inactive frames for cover display, can be pretty low since it means no button is pressed :)
 #define MENU_MIN_INACTIVE_FRAMES 8
 
-#define MENU_UPD_DELAY_NOUPDATE -1  //Auto refresh is disabled for the item. The refresh button may be used to manually refresh the item.
-#define MENU_UPD_DELAY_GENREFRESH 0 //The item will be refreshed every MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
+#define MENU_UPD_DELAY_NOUPDATE   -1 //Auto refresh is disabled for the item. The refresh button may be used to manually refresh the item.
+#define MENU_UPD_DELAY_GENREFRESH 0  //The item will be refreshed every MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
 
 typedef struct
 {

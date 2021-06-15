@@ -594,7 +594,7 @@ HookSetupThread:
 	/* jump to original SetupThread() */
 	lw	$t1, Old_SetupThread		# $t1 -> original SetupThread function
 	j	$t1
-	nop 
+	nop
 	.end	HookSetupThread
 
 /*******************************************************************************

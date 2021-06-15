@@ -21,9 +21,9 @@ extern void *poeveticanew_raw;
 extern int size_poeveticanew_raw;
 
 /// Maximal count of atlases per font
-#define ATLAS_MAX 4
+#define ATLAS_MAX    4
 /// Atlas width in pixels
-#define ATLAS_WIDTH 256
+#define ATLAS_WIDTH  256
 /// Atlas height in pixels
 #define ATLAS_HEIGHT 256
 

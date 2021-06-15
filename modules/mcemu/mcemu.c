@@ -360,7 +360,7 @@ int hookSecrAuthCard(int port, int slot, int cnum)
 
 #define SIO2CTRL (*(volatile u32 *)(0xbf808268))
 #define SIO2STAT (*(volatile u32 *)(0xbf80826c))
-#define SIO2CMD ((volatile u32 *)(0xbf808200))
+#define SIO2CMD  ((volatile u32 *)(0xbf808200))
 static Sio2Packet *temp_packet = NULL;
 static int skip_sema_wait = 0;
 

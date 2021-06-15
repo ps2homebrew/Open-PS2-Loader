@@ -59,7 +59,7 @@
                    *((c)++) = (unsigned char)(((l) >> 16) & 0xff), \
                    *((c)++) = (unsigned char)(((l) >> 24) & 0xff))
 
-#define ITERATIONS 16
+#define ITERATIONS           16
 #define HPERM_OP(a, t, n, m) ((t) = ((((a) << (16 - (n))) ^ (a)) & (m)), \
                               (a) = (a) ^ (t) ^ (t >> (16 - (n))))
 

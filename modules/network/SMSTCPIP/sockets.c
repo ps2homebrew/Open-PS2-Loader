@@ -500,7 +500,7 @@ int lwip_send(int s, void *data, int size, unsigned int flags)
 
             /* make the buffer point to the data that should
        be sent */
-            if ((err = netbuf_ref(buf, data, size))==ERR_OK) {
+            if ((err = netbuf_ref(buf, data, size)) == ERR_OK) {
                 /* send the data */
                 err = netconn_send(sock->conn, buf);
             }
@@ -1356,7 +1356,7 @@ int lwip_ioctl(int s, long cmd, void *argp)
                 return -1;
             }
 
-            SYS_ARCH_GET(sock->conn->recv_avail, *((u16_t*)argp));
+            SYS_ARCH_GET(sock->conn->recv_avail, *((u16_t *)argp));
 
             LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_ioctl(%d, FIONREAD, %p) = %u\n", s, argp, *((u16_t *)argp)));
             sock_set_errno(sock, 0);

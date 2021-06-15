@@ -19,7 +19,7 @@ static int lockSema;
 static int evFlag;
 
 #define EV_ACTIVITY 1
-#define EV_TIMEOUT 2
+#define EV_TIMEOUT  2
 
 static int _lock(void)
 { //Do polling, to keep the original behaviour.

@@ -1,7 +1,7 @@
 #ifndef __GUIGAME_H
 #define __GUIGAME_H
 
-#define SETTINGS_GLOBAL 0
+#define SETTINGS_GLOBAL  0
 #define SETTINGS_PERGAME 1
 
 int guiGameAltStartupNameHandler(char *text, int maxLen);

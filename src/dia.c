@@ -16,16 +16,16 @@
 #include "include/sound.h"
 
 // UI spacing of the dialogues (pixels between consecutive items)
-#define UI_SPACING_H 10
-#define UI_SPACING_V 2
+#define UI_SPACING_H      10
+#define UI_SPACING_V      2
 // spacer ui element width (simulates tab)
-#define UI_SPACER_WIDTH 50
+#define UI_SPACER_WIDTH   50
 // minimal pixel width of spacer
 #define UI_SPACER_MINIMAL 30
 // length of breaking line in pixels
-#define UI_BREAK_LEN 600
+#define UI_BREAK_LEN      600
 // scroll speed (delay in ms!) when in dialogs
-#define DIA_SCROLL_SPEED 300
+#define DIA_SCROLL_SPEED  300
 // scroll speed (delay in ms!) when setting int value
 #define DIA_INT_SET_SPEED 100
 
@@ -33,10 +33,10 @@ static int screenWidth;
 static int screenHeight;
 
 // Utility stuff
-#define KEYB_MODE 2
-#define KEYB_WIDTH 12
+#define KEYB_MODE   2
+#define KEYB_WIDTH  12
 #define KEYB_HEIGHT 4
-#define KEYB_ITEMS (KEYB_WIDTH * KEYB_HEIGHT)
+#define KEYB_ITEMS  (KEYB_WIDTH * KEYB_HEIGHT)
 
 static void diaDrawBoundingBox(int x, int y, int w, int h, int focus)
 {

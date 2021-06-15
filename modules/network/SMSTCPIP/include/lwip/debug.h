@@ -41,14 +41,14 @@
  * - 3 severe
  */
 
-#define DBG_LEVEL_OFF 0
+#define DBG_LEVEL_OFF     0
 #define DBG_LEVEL_WARNING 1 /* bad checksums, dropped packets, ... */
 #define DBG_LEVEL_SERIOUS 2 /* memory allocation failures, ... */
-#define DBG_LEVEL_SEVERE 3  /* */
-#define DBG_MASK_LEVEL 3
+#define DBG_LEVEL_SEVERE  3 /* */
+#define DBG_MASK_LEVEL    3
 
 /** flag for LWIP_DEBUGF to enable that debug message */
-#define DBG_ON 0x80U
+#define DBG_ON  0x80U
 /** flag for LWIP_DEBUGF to disable that debug message */
 #define DBG_OFF 0x00U
 
@@ -59,7 +59,7 @@
 /** flag for LWIP_DEBUGF indicating newly added code, not thoroughly tested yet */
 #define DBG_FRESH 0x10U
 /** flag for LWIP_DEBUGF to halt after printing this debug message */
-#define DBG_HALT 0x08U
+#define DBG_HALT  0x08U
 
 #ifndef LWIP_NOASSERT
 #define LWIP_ASSERT(x, y)            \

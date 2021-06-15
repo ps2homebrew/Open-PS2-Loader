@@ -1,5 +1,5 @@
 #ifdef __IOPCORE_DEBUG
-#define DPRINTF(args...) printf(args)
+#define DPRINTF(args...)  printf(args)
 #define iDPRINTF(args...) Kprintf(args)
 #else
 #define DPRINTF(args...)

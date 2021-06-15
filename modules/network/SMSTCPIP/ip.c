@@ -244,8 +244,7 @@ err_t ip_input(struct pbuf *p, struct netif *inp)
 
         if (!ip_addr_isany(&netif->ip_addr)) {
 
-            if (ip_addr_cmp(&iphdr->dest, &netif->ip_addr) || (ip_addr_isbroadcast(&iphdr->dest, &netif->netmask) &&
-                                                               ip_addr_maskcmp(&iphdr->dest, &netif->ip_addr, &netif->netmask)) ||
+            if (ip_addr_cmp(&iphdr->dest, &netif->ip_addr) || (ip_addr_isbroadcast(&iphdr->dest, &netif->netmask) && ip_addr_maskcmp(&iphdr->dest, &netif->ip_addr, &netif->netmask)) ||
                 ip_addr_cmp(&iphdr->dest, IP_ADDR_BROADCAST))
                 break;
 

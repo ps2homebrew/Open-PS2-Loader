@@ -80,8 +80,8 @@ static struct pbuf *copy_from_pbuf(
 } /* end copy_from_pbuf */
 
 #define IP_REASS_BUFSIZE 5760
-#define IP_REASS_MAXAGE 30
-#define IP_REASS_TMO 250
+#define IP_REASS_MAXAGE  30
+#define IP_REASS_TMO     250
 
 static iop_sys_clock_t s_Clock = {
     0x01194000, 0x00000000};

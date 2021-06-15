@@ -11,7 +11,7 @@
 #define MODMGR_H
 
 #define LF_PATH_MAX 252
-#define LF_ARG_MAX 252
+#define LF_ARG_MAX  252
 
 enum _lf_functions {
     LF_F_MOD_LOAD = 0,

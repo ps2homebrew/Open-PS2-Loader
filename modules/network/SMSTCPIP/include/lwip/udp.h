@@ -48,8 +48,8 @@ struct udp_hdr
     PACK_STRUCT_FIELD(u16_t chksum);
 } PACK_STRUCT_STRUCT;
 
-#define UDP_FLAGS_NOCHKSUM 0x01U
-#define UDP_FLAGS_UDPLITE 0x02U
+#define UDP_FLAGS_NOCHKSUM  0x01U
+#define UDP_FLAGS_UDPLITE   0x02U
 #define UDP_FLAGS_CONNECTED 0x04U
 
 struct udp_pcb
@@ -88,7 +88,7 @@ void udp_recv(struct udp_pcb *pcb,
               void *recv_arg);
 err_t udp_send(struct udp_pcb *pcb, struct pbuf *p);
 
-#define udp_flags(pcb) ((pcb)->flags)
+#define udp_flags(pcb)       ((pcb)->flags)
 #define udp_setflags(pcb, f) ((pcb)->flags = (f))
 
 

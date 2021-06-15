@@ -460,7 +460,7 @@ tcp_new_port(void)
     struct tcp_pcb *pcb;
 #ifndef TCP_LOCAL_PORT_RANGE_START
 #define TCP_LOCAL_PORT_RANGE_START 4096
-#define TCP_LOCAL_PORT_RANGE_END 0x7fff
+#define TCP_LOCAL_PORT_RANGE_END   0x7fff
 #endif
     static u16_t port = TCP_LOCAL_PORT_RANGE_START;
     // randomize the port value a bit to avoid TCP conflicts

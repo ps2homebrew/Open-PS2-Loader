@@ -15,7 +15,7 @@ IRX_ID("ds34usb", 1, 1);
 #define DPRINTF(x...)
 
 #define REQ_USB_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
-#define REQ_USB_IN (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
+#define REQ_USB_IN  (USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE)
 
 #define MAX_PADS 2
 
@@ -687,14 +687,14 @@ static SifRpcServerData_t rpc_svr __attribute__((aligned(16)));
 
 static int rpc_buf[64] __attribute((aligned(16)));
 
-#define DS34USB_INIT 1
+#define DS34USB_INIT       1
 #define DS34USB_GET_STATUS 2
 #define DS34USB_GET_BDADDR 3
 #define DS34USB_SET_BDADDR 4
 #define DS34USB_SET_RUMBLE 5
-#define DS34USB_SET_LED 6
-#define DS34USB_GET_DATA 7
-#define DS34USB_RESET 8
+#define DS34USB_SET_LED    6
+#define DS34USB_GET_DATA   7
+#define DS34USB_RESET      8
 
 #define DS34USB_BIND_RPC_ID 0x18E3878E
 

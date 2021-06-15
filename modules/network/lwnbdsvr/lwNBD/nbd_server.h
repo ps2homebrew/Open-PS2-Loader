@@ -75,7 +75,7 @@ static inline uint64_t bswap64(uint64_t x)
 
 //TODO: Missing in PS2SK's <stdint.h> , needed for "nbd-protocol.h"
 // https://en.cppreference.com/w/c/types/integer
-#define UINT64_MAX 0xffffffffffffffff
+#define UINT64_MAX  0xffffffffffffffff
 #define UINT64_C(x) ((x) + (UINT64_MAX - UINT64_MAX))
 #endif
 

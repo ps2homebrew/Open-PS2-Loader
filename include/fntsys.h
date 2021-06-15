@@ -6,7 +6,7 @@
 /// default (built-in) font id
 #define FNT_DEFAULT (0)
 /// Value returned on errors
-#define FNT_ERROR (-1)
+#define FNT_ERROR   (-1)
 
 /** Initializes the font subsystem */
 void fntInit();

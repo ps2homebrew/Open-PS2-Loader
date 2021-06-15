@@ -56,7 +56,7 @@ typedef void (*trap_exception_handler_t)(exception_type_t, exception_frame_t *);
 #define DCIC_PC (1 << 24)
 
 #define ioptrap_IMPORTS_start DECLARE_IMPORT_TABLE(ioptrap, 1, 1)
-#define ioptrap_IMPORTS_end END_IMPORT_TABLE
+#define ioptrap_IMPORTS_end   END_IMPORT_TABLE
 
 const char *get_exception_name(exception_type_t type);
 #define I_get_exception_name DECLARE_IMPORT(4, get_exception_name)

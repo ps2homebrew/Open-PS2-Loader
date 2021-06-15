@@ -76,7 +76,7 @@ loopif_output(struct netif *netif, struct pbuf *p,
             ptr += q->len;
         }
 
-        arg = mem_malloc(sizeof(void * [2]));
+        arg = mem_malloc(sizeof(void *[2]));
         if (NULL == arg) {
             return ERR_MEM;
         }

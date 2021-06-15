@@ -13,7 +13,7 @@
 
 u32 crctab[0x400];
 
-#define EXIT_OK 0
+#define EXIT_OK      0
 #define EXIT_FAILURE 1
 
 //-----------------------------------------------------------------------

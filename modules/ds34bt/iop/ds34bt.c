@@ -340,7 +340,7 @@ static u8 GenuineMacAddress[][3] =
         //fake with AirohaTechnologyCorp's Chip
         {0x0C, 0xFC, 0x83}};
 
-#define REQ_HCI_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_DEVICE)
+#define REQ_HCI_OUT     (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_DEVICE)
 #define HCI_COMMAND_REQ 0
 
 #define MAX_PADS 2
@@ -1611,16 +1611,16 @@ static SifRpcServerData_t rpc_svr __attribute__((aligned(16)));
 
 static int rpc_buf[64] __attribute((aligned(16)));
 
-#define DS34BT_INIT 1
+#define DS34BT_INIT          1
 #define DS34BT_INIT_CHARGING 2
-#define DS34BT_GET_STATUS 3
-#define DS34BT_GET_BDADDR 4
-#define DS34BT_SET_RUMBLE 5
-#define DS34BT_SET_LED 6
-#define DS34BT_GET_DATA 7
-#define DS34BT_RESET 8
-#define DS34BT_GET_VERSION 9
-#define DS34BT_GET_FEATURES 10
+#define DS34BT_GET_STATUS    3
+#define DS34BT_GET_BDADDR    4
+#define DS34BT_SET_RUMBLE    5
+#define DS34BT_SET_LED       6
+#define DS34BT_GET_DATA      7
+#define DS34BT_RESET         8
+#define DS34BT_GET_VERSION   9
+#define DS34BT_GET_FEATURES  10
 
 #define DS34BT_BIND_RPC_ID 0x18E3878F
 

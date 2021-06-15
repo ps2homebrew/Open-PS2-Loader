@@ -96,6 +96,6 @@ typedef void (*api_msg_decode)(struct api_msg_msg *);
 extern api_msg_decode __decode__[API_MSG_MAX];
 
 #define api_msg_input(m) __decode__[m->type](&(m->msg))
-#define api_msg_post(m) tcpip_apimsg(m)
+#define api_msg_post(m)  tcpip_apimsg(m)
 
 #endif /* __LWIP_API_MSG_H__ */

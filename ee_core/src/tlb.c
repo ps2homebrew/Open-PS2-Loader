@@ -56,8 +56,8 @@ struct TLBInfo
     const struct TLBEntry *extendedTLB;
 };
 
-#define TLB_NUM_KERNEL_ENTRIES 0x0D
-#define TLB_NUM_DEFAULT_ENTRIES 0x12
+#define TLB_NUM_KERNEL_ENTRIES   0x0D
+#define TLB_NUM_DEFAULT_ENTRIES  0x12
 #define TLB_NUM_EXTENDED_ENTRIES 0x08
 
 //Compile-time sanity checks.

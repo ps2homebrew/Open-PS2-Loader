@@ -322,10 +322,10 @@ pc_tools_win32:
 	$(MAKE) _WIN32=1 -C pc
 
 format:
-	find . -type f -not -path \*modules/network/SMSTCPIP\* -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -i
+	find . -type f -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -i
 
 format-check:
-	@! find . -type f -not -path \*modules/network/SMSTCPIP\* -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -style=file -output-replacements-xml | grep "<replacement " >/dev/null
+	@! find . -type f -a \( -iname \*.h -o -iname \*.c \) | xargs clang-format -style=file -output-replacements-xml | grep "<replacement " >/dev/null
 
 $(EE_ASM_DIR):
 	@mkdir -p $@

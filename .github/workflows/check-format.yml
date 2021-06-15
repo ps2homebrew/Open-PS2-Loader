@@ -7,16 +7,13 @@ on:
 jobs:
   check-format:
     runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
+      shell: bash
       run: |
-        apk add git make clang
+        sudo apt-get install git make clang-format
 
     - uses: actions/checkout@v2
-    - run: |
-        git fetch --prune --unshallow
 
     - name: Check format -> make format-check
-      run: |
-        make format-check
+      run: make format-check

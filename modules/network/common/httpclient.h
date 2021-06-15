@@ -1,4 +1,4 @@
-#define HTTP_CMODE_CLOSED 0
+#define HTTP_CMODE_CLOSED     0
 #define HTTP_CMODE_PERSISTENT 1
 
 //EE-side only
@@ -18,8 +18,8 @@ void HttpCloseConnection(s32 HttpSocket);
 int HttpSendGetRequest(s32 HttpSocket, const char *UserAgent, const char *host, s8 *mode, const u8 *mtime, const char *uri, char *output, u16 *out_len);
 
 #define HTTP_CLIENT_SERVER_NAME_MAX 30
-#define HTTP_CLIENT_USER_AGENT_MAX 16
-#define HTTP_CLIENT_URI_MAX 128
+#define HTTP_CLIENT_USER_AGENT_MAX  16
+#define HTTP_CLIENT_URI_MAX         128
 
 enum HTTP_CLIENT_CMD {
     HTTP_CLIENT_CMD_CONN_ESTAB,
@@ -61,9 +61,9 @@ struct HttpClientSendGetResult
 
 #ifdef _IOP
 #define httpc_IMPORTS_start DECLARE_IMPORT_TABLE(httpc, 1, 1)
-#define httpc_IMPORTS_end END_IMPORT_TABLE
+#define httpc_IMPORTS_end   END_IMPORT_TABLE
 
 #define I_HttpEstabConnection DECLARE_IMPORT(4, HttpEstabConnection)
 #define I_HttpCloseConnection DECLARE_IMPORT(5, HttpCloseConnection)
-#define I_HttpSendGetRequest DECLARE_IMPORT(6, HttpSendGetRequest)
+#define I_HttpSendGetRequest  DECLARE_IMPORT(6, HttpSendGetRequest)
 #endif

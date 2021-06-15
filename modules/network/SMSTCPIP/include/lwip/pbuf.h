@@ -37,7 +37,7 @@
 
 
 #define PBUF_TRANSPORT_HLEN 20
-#define PBUF_IP_HLEN 20
+#define PBUF_IP_HLEN        20
 
 typedef enum {
     PBUF_TRANSPORT,
@@ -55,10 +55,10 @@ typedef enum {
 
 /* Definitions for the pbuf flag field (these are not the flags that
    are passed to pbuf_alloc()). */
-#define PBUF_FLAG_RAM 0x00U  /* Flags that pbuf data is stored in RAM */
-#define PBUF_FLAG_ROM 0x01U  /* Flags that pbuf data is stored in ROM */
+#define PBUF_FLAG_RAM  0x00U /* Flags that pbuf data is stored in RAM */
+#define PBUF_FLAG_ROM  0x01U /* Flags that pbuf data is stored in ROM */
 #define PBUF_FLAG_POOL 0x02U /* Flags that the pbuf comes from the pbuf pool */
-#define PBUF_FLAG_REF 0x04U  /* Flags thet the pbuf payload refers to RAM */
+#define PBUF_FLAG_REF  0x04U /* Flags thet the pbuf payload refers to RAM */
 
 /** indicates this packet was broadcast on the link */
 #define PBUF_FLAG_LINK_BROADCAST 0x80U

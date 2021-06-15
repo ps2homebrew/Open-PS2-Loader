@@ -5,6 +5,7 @@
 #
 # Normal rules
 #
+.*
 *.a
 *.diff
 *.elf
@@ -23,9 +24,14 @@
 DETAILED_CHANGELOG
 
 #
-# git files that we don't want to ignore even it they are dot-files
+# files that we don't want to ignore
 #
 !.gitignore
+!.gitattributes
+!.github
+!.editorconfig
+!.clang-format
+!modules/debug/*.irx
 
 #
 # Generated source files

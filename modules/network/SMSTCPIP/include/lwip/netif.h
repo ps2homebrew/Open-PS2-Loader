@@ -51,16 +51,16 @@
 /** whether the network interface is 'up'. this is
  * a software flag used to control whether this network
  * interface is enabled and processes traffic */
-#define NETIF_FLAG_UP 0x1U
+#define NETIF_FLAG_UP           0x1U
 /** if set, the netif has broadcast capability */
-#define NETIF_FLAG_BROADCAST 0x2U
+#define NETIF_FLAG_BROADCAST    0x2U
 /** if set, the netif is one end of a point-to-point connection */
 #define NETIF_FLAG_POINTTOPOINT 0x4U
 /** if set, the interface is configured using DHCP */
-#define NETIF_FLAG_DHCP 0x08U
+#define NETIF_FLAG_DHCP         0x08U
 /** if set, the interface has an active link
  *  (set by the interface) */
-#define NETIF_FLAG_LINK_UP 0x10U
+#define NETIF_FLAG_LINK_UP      0x10U
 
 /** generic data structure used for all lwIP network interfaces */
 struct netif

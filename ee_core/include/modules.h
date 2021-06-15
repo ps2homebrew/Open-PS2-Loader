@@ -48,6 +48,6 @@ typedef struct
 } irxtab_t;
 
 //Macros for working with module information.
-#define GET_OPL_MOD_ID(x) ((x) >> 24)
-#define SET_OPL_MOD_ID(x) ((x) << 24)
+#define GET_OPL_MOD_ID(x)   ((x) >> 24)
+#define SET_OPL_MOD_ID(x)   ((x) << 24)
 #define GET_OPL_MOD_SIZE(x) ((x)&0x00FFFFFF)

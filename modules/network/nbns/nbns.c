@@ -17,14 +17,14 @@
 
 #define BSWAP16(x) (((x) << 8 & 0xFF00) | ((x) >> 8 & 0xFF))
 
-#define NB_OPCODE(R, OPCODE) (((R) << 4) | (OPCODE))
+#define NB_OPCODE(R, OPCODE)           (((R) << 4) | (OPCODE))
 #define NB_MN_FLAGS(AA, TC, RD, RA, B) (((AA) << 6) | ((TC) << 5) | ((RD) << 4) | ((RA) << 3) | (B))
-#define NB_CODE(OPCODE, FLAGS, RCODE) (((OPCODE) << 11) | ((FLAGS) << 4) | (RCODE))
+#define NB_CODE(OPCODE, FLAGS, RCODE)  (((OPCODE) << 11) | ((FLAGS) << 4) | (RCODE))
 
-#define NB_GET_RCODE(CODE) ((CODE)&0xF)
+#define NB_GET_RCODE(CODE)    ((CODE)&0xF)
 #define NB_GET_MN_FLAGS(CODE) (((CODE) >> 4) & 0x7F)
-#define NB_GET_OPCODE(CODE) (((CODE) >> 11) & 0xF)
-#define NB_GET_R(CODE) (((CODE) >> 15) & 1)
+#define NB_GET_OPCODE(CODE)   (((CODE) >> 11) & 0xF)
+#define NB_GET_R(CODE)        (((CODE) >> 15) & 1)
 
 enum NB_OPCODE_TYPE {
     NB_OPCODE_TYPE_QUERY = 0,
@@ -36,7 +36,7 @@ enum NB_OPCODE_TYPE {
     NB_OPCODE_TYPE_COUNT
 };
 
-#define QUESTION_TYPE_NB 0x0020  //NetBIOS general Name Service Resource Record
+#define QUESTION_TYPE_NB  0x0020 //NetBIOS general Name Service Resource Record
 #define QUESTION_CLASS_IN 0x0001 //Internet class
 
 struct NbHeader
@@ -57,8 +57,8 @@ struct NbQuestionTrailer
 
 //Record status bits.
 #define NBNS_NAME_RECORD_ALLOCATED 0x01
-#define NBNS_NAME_RECORD_INIT 0x02
-#define NBNS_NAME_RECORD_VALID 0x04
+#define NBNS_NAME_RECORD_INIT      0x02
+#define NBNS_NAME_RECORD_VALID     0x04
 
 struct NBNSNameRecord
 {

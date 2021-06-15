@@ -21,7 +21,7 @@
 
 	.extern	_heap_size
 	.extern	_stack
-	.extern	_stack_size	
+	.extern	_stack_size
 
 	.set	noat
 	.set	noreorder

@@ -1105,8 +1105,8 @@ int saveConfig(int types, int showUI)
     return lscret;
 }
 
-#define COMPAT_UPD_MODE_UPD_USR 1   //Update all records, even those that were modified by the user.
-#define COMPAT_UPD_MODE_NO_MTIME 2  //Do not check the modified time-stamp.
+#define COMPAT_UPD_MODE_UPD_USR   1 //Update all records, even those that were modified by the user.
+#define COMPAT_UPD_MODE_NO_MTIME  2 //Do not check the modified time-stamp.
 #define COMPAT_UPD_MODE_MTIME_GMT 4 //Modified time-stamp is in GMT, not JST.
 
 #define EOPLCONNERR 0x4000 //Special error code for connection errors.

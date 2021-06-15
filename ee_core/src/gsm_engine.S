@@ -163,7 +163,7 @@ sync.l						# Wait for any outstanding stores to registers to complete before ca
 
 //
 //This function will get called first, in place of the original SetGsCrt() syscall handler. It will check the video mode argument.
-//If it's one of the extended video modes, do not call the original SetGsCrt() syscall handler, 
+//If it's one of the extended video modes, do not call the original SetGsCrt() syscall handler,
 //but handle GS configuration on our own.
 //Otherwise, call the original SetGsCrt() syscall handler and let it configure the GS for us.
 //
@@ -196,7 +196,7 @@ nop
 Skip_Call_Original_SetGsCrt:
 
 //Re-enable GSHandler whenever Hook_SetGsCrt is called
-//This aggressive approach is needed for those titles which disable breakpoints 
+//This aggressive approach is needed for those titles which disable breakpoints
 //For instance: UP (SLUS 21864)
 //-----------------------------------------------------------------------------------------
 
@@ -205,7 +205,7 @@ nop
 
 //-----------------------------------------------------------------------------------------
 
-ld	$ra, 0($sp)				# Pull return address from stack 
+ld	$ra, 0($sp)				# Pull return address from stack
 jr	$ra					# Return to caller
 addiu	$sp, $sp, 0x0010			# Restore sp during return
 
@@ -508,7 +508,7 @@ or	$v0,$zero,$a1						# go use Source_PMODE
 
 store_v0_as_PMODE:
 b	exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing 
+sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # SMODE2
@@ -572,7 +572,7 @@ sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAY1
-# 
+#
 have_DISPLAY1_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY1($s0)			# request DISPLAY1 value = a1
 
@@ -591,7 +591,7 @@ sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAY2
-# 
+#
 have_DISPLAY2_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 sd	$a1, Source_DISPLAY2($s0)			# request DISPLAY2 value = a1
 
@@ -610,7 +610,7 @@ sd	$v0,0($a3)							# after storing
 
 # ----------------------------
 # DISPLAYx
-# 
+#
 have_DISPLAY_write:					# Here a1=source_data, a2->.gsm_engine, a3=dest_adress
 #  Source_DISPLAY == Requested   DX, DY, MAGH, MAGV, DW and DH values
 #  Target_DISPLAY == Modded(forced) DX, DY, MAGH, MAGV, DW and DH values
@@ -818,7 +818,7 @@ or	$v0,$v0,$t0        # v0 = Adapted_DISPLAY = (Adapted_DISPLAY) OR (Calculated_
 
 # ----------------------------
 # DISPFBx
-# 
+#
 # .-------.-------.------------.----------------------------------------------.-------.
 # | Name  |  Pos. | Format     | Contents                                     | Mask  |
 # |-------+-------+------------+----------------------------------------------+-------+
@@ -987,7 +987,7 @@ nop
 li	$t0,0xFC1FFFFF	# t0 = bitmask for JR
 and	$k1,$k0, $t0	# k1 = potential JR instruction
 li	$t0,8		# t0 = JR test constant
-bne	$k1,$t0,B_skip	# in case of  JR not identified, go skip this code 
+bne	$k1,$t0,B_skip	# in case of  JR not identified, go skip this code
 nop
 
 B_JR_JALR:		# JR or JALR found, so make register indirect jump
@@ -1061,7 +1061,7 @@ mtc0	$k0,$30			# store k0 in Error Exception Program Counter
 sync.p				# ensure COP0 register update before proceeding. This cannot be placed in a branch-delay slot.
 b	GSHandler_Final_Exit
 nop
-	
+
 #  ----------------------------
 B_BGEZ:
 B_BGEZAL:

@@ -120,9 +120,9 @@ static void cdvdman_initdev(void);
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf);
 
 // for "cdrom" ioctl2
-#define CIOCSTREAMPAUSE 0x630D
+#define CIOCSTREAMPAUSE  0x630D
 #define CIOCSTREAMRESUME 0x630E
-#define CIOCSTREAMSTAT 0x630F
+#define CIOCSTREAMSTAT   0x630F
 
 // driver ops protypes
 static int cdrom_dummy(void);
@@ -209,7 +209,7 @@ static iop_sys_clock_t gCallbackSysClock;
 
 // buffers
 #define CDVDMAN_BUF_SECTORS 2
-#define CDVDFSV_ALIGNMENT 64
+#define CDVDFSV_ALIGNMENT   64
 static u8 cdvdman_buf[CDVDMAN_BUF_SECTORS * 2048];
 static u8 cdvdman_fs_buf[CDVDMAN_FS_SECTORS * 2048 + CDVDFSV_ALIGNMENT];
 

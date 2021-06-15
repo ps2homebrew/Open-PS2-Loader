@@ -112,7 +112,7 @@ err_t tcpip_input(struct pbuf *p, struct netif *inp)
     ret = ip_input(p, inp);
     UNLOCK_TCPIP_CORE();
     return ret;
-#else /* LWIP_TCPIP_CORE_LOCKING_INPUT */
+#else  /* LWIP_TCPIP_CORE_LOCKING_INPUT */
     struct tcpip_msg *msg = memp_malloc(MEMP_TCPIP_MSG);
 
     if (msg) {
@@ -141,7 +141,7 @@ void tcpip_apimsg(struct api_msg *apimsg)
     LOCK_TCPIP_CORE();
     api_msg_input(apimsg);
     UNLOCK_TCPIP_CORE();
-#else /* LWIP_TCPIP_CORE_LOCKING */
+#else  /* LWIP_TCPIP_CORE_LOCKING */
     struct tcpip_msg *msg = memp_malloc(MEMP_TCPIP_MSG);
 
     if (msg) {
@@ -150,7 +150,6 @@ void tcpip_apimsg(struct api_msg *apimsg)
         msg->msg.apimsg = apimsg;
         sys_mbox_post(g_TCPIPMBox, msg);
         sys_mbox_fetch(apimsg->msg.conn->mbox, NULL);
-
     }
 #endif /* LWIP_TCPIP_CORE_LOCKING */
 

@@ -121,7 +121,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- TCP options ---------- */
 #define LWIP_TCP 1
-#define TCP_TTL 255
+#define TCP_TTL  255
 
 /* Controls if TCP should queue segments that arrive out of
    order. Define to 0 if your device is low on memory. */
@@ -182,7 +182,7 @@ a lot of data that needs to be copied, this should be set high. */
 /* IP reassembly and segmentation. These are orthogonal even
    if they both deal with IP fragments */
 #define IP_REASSEMBLY 1
-#define IP_FRAG 1
+#define IP_FRAG       1
 
 /* ---------- ICMP options ---------- */
 #define ICMP_TTL 255
@@ -200,11 +200,11 @@ a lot of data that needs to be copied, this should be set high. */
 /**
  * DHCP_DOES_ARP_CHECK==1: Do an ARP check on the offered address.
  */
-#define DHCP_DOES_ARP_CHECK	0	//Don't do the ARP check because an IP address would be first required.
+#define DHCP_DOES_ARP_CHECK 0 //Don't do the ARP check because an IP address would be first required.
 
 #else
 
-#define LWIP_DHCP 0
+#define LWIP_DHCP           0
 #define DHCP_DOES_ARP_CHECK 0
 
 #endif
@@ -222,17 +222,17 @@ a lot of data that needs to be copied, this should be set high. */
 #define LWIP_STATS 0
 
 #if LWIP_STATS
-#define LINK_STATS 1
-#define IP_STATS 1
+#define LINK_STATS   1
+#define IP_STATS     1
 #define IPFRAG_STATS 1
-#define ICMP_STATS 1
-#define UDP_STATS 1
-#define TCP_STATS 1
-#define MEM_STATS 1
-#define MEMP_STATS 1
-#define PBUF_STATS 1
-#define SYS_STATS 1
-#define RAW_STATS 1
+#define ICMP_STATS   1
+#define UDP_STATS    1
+#define TCP_STATS    1
+#define MEM_STATS    1
+#define MEMP_STATS   1
+#define PBUF_STATS   1
+#define SYS_STATS    1
+#define RAW_STATS    1
 #endif /*LWIP_STATS*/
 
 //Boman666: This define will force the TX-data to be splitted in an even number of TCP-segments. This will significantly increase
@@ -299,28 +299,28 @@ a lot of data that needs to be copied, this should be set high. */
  * CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.
  */
 #if !defined CHECKSUM_CHECK_IP
-#define CHECKSUM_CHECK_IP               0
+#define CHECKSUM_CHECK_IP 0
 #endif
 
 /**
  * CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.
  */
 #if !defined CHECKSUM_CHECK_UDP
-#define CHECKSUM_CHECK_UDP              0
+#define CHECKSUM_CHECK_UDP 0
 #endif
 
 /**
  * CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.
  */
 #if !defined CHECKSUM_CHECK_TCP
-#define CHECKSUM_CHECK_TCP              0
+#define CHECKSUM_CHECK_TCP 0
 #endif
 
 /**
  * CHECKSUM_CHECK_ICMP==1: Check checksums in software for incoming ICMP packets.
  */
 #if !defined CHECKSUM_CHECK_ICMP
-#define CHECKSUM_CHECK_ICMP             0
+#define CHECKSUM_CHECK_ICMP 0
 #endif
 #endif
 

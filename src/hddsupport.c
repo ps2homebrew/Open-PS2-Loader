@@ -54,7 +54,7 @@ static void hddInitModules(void)
 // HD Pro Kit is mapping the 1st word in ROM0 seg as a main ATA controller,
 // The pseudo ATA controller registers are accessed (input/ouput) by writing
 // an id to the main ATA controller
-#define HDPROreg_IO8 (*(volatile unsigned char *)0xBFC00000)
+#define HDPROreg_IO8   (*(volatile unsigned char *)0xBFC00000)
 #define CDVDreg_STATUS (*(volatile unsigned char *)0xBF40200A)
 
 static int hddCheckHDProKit(void)
@@ -91,7 +91,7 @@ static int hddCheckHDProKit(void)
 
 //Taken from libhdd:
 #define PFS_ZONE_SIZE 8192
-#define PFS_FRAGMENT 0x00000000
+#define PFS_FRAGMENT  0x00000000
 
 static int CreateOPLPartition(const char *oplPart, const char *mountpoint)
 {

@@ -40,13 +40,13 @@ typedef s8_t err_t;
 
 /* Definitions for error constants. */
 
-#define ERR_OK 0   /* No error, everything OK. */
+#define ERR_OK  0  /* No error, everything OK. */
 #define ERR_MEM -1 /* Out of memory error.     */
 #define ERR_BUF -2 /* Buffer error.            */
 
 
 #define ERR_ABRT -3 /* Connection aborted.      */
-#define ERR_RST -4  /* Connection reset.        */
+#define ERR_RST  -4 /* Connection reset.        */
 #define ERR_CLSD -5 /* Connection closed.       */
 #define ERR_CONN -6 /* Not connected.           */
 

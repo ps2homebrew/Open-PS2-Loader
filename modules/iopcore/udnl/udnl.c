@@ -17,7 +17,7 @@
 #define DEBUG_PRINTF(args...)
 #endif
 
-#define FULL_UDNL 1 //Comment out to build a UDNL module that updates the IOP with only its payload.
+#define FULL_UDNL   1 //Comment out to build a UDNL module that updates the IOP with only its payload.
 #define MAX_MODULES 256
 
 #define alloca(size) __builtin_alloca(size) //The homebrew PS2SDK lacks alloca.h.

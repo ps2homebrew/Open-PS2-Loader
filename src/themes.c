@@ -10,8 +10,8 @@
 #include "include/pad.h"
 #include "include/sound.h"
 
-#define MENU_POS_V 50
-#define HINT_HEIGHT 32
+#define MENU_POS_V     50
+#define HINT_HEIGHT    32
 #define DECORATOR_SIZE 20
 
 extern const char conf_theme_OPL_cfg;
@@ -50,9 +50,9 @@ enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_COUNT
 };
 
-#define DISPLAY_ALWAYS 0
+#define DISPLAY_ALWAYS  0
 #define DISPLAY_DEFINED 1
-#define DISPLAY_NEVER 2
+#define DISPLAY_NEVER   2
 
 #define SIZING_NONE -1
 #define SIZING_CLIP 0

@@ -31,22 +31,22 @@ typedef struct
 } patchlist_t;
 
 //Keep patch codes unique!
-#define PATCH_GENERIC_NIS 0xDEADBEE0
-#define PATCH_GENERIC_CAPCOM 0xBABECAFE
-#define PATCH_GENERIC_AC9B 0xDEADBEE1
+#define PATCH_GENERIC_NIS        0xDEADBEE0
+#define PATCH_GENERIC_CAPCOM     0xBABECAFE
+#define PATCH_GENERIC_AC9B       0xDEADBEE1
 #define PATCH_GENERIC_SLOW_READS 0xDEADBEE2
-#define PATCH_VIRTUA_QUEST 0xDEADBEE3
-#define PATCH_SDF_MACROSS 0x00065405
-#define PATCH_SRW_IMPACT 0x0021e808
-#define PATCH_RNC_UYA 0x00398498
-#define PATCH_ZOMBIE_ZONE 0xEEE62525
-#define PATCH_DOT_HACK 0x0D074A37
-#define PATCH_SOS 0x30303030
-#define PATCH_ULT_PRO_PINBALL 0xBA11BA11
-#define PATCH_EUTECHNYX_WU_TID 0x0012FCC8
-#define PATCH_PRO_SNOWBOARDER 0x01020199
-#define PATCH_SHADOW_MAN_2 0x01020413
-#define PATCH_HARVEST_MOON_AWL 0xFF025421
+#define PATCH_VIRTUA_QUEST       0xDEADBEE3
+#define PATCH_SDF_MACROSS        0x00065405
+#define PATCH_SRW_IMPACT         0x0021e808
+#define PATCH_RNC_UYA            0x00398498
+#define PATCH_ZOMBIE_ZONE        0xEEE62525
+#define PATCH_DOT_HACK           0x0D074A37
+#define PATCH_SOS                0x30303030
+#define PATCH_ULT_PRO_PINBALL    0xBA11BA11
+#define PATCH_EUTECHNYX_WU_TID   0x0012FCC8
+#define PATCH_PRO_SNOWBOARDER    0x01020199
+#define PATCH_SHADOW_MAN_2       0x01020413
+#define PATCH_HARVEST_MOON_AWL   0xFF025421
 
 static const patchlist_t patch_list[] = {
     {"SLES_524.58", BDM_MODE, {PATCH_GENERIC_NIS, 0x00000000, 0x00000000}},        // Disgaea Hour of Darkness PAL - disable cdvd timeout stuff
@@ -135,9 +135,9 @@ static const patchlist_t patch_list[] = {
     {NULL, 0, {0x00000000, 0x00000000, 0x00000000}}                                // terminater
 };
 
-#define JAL(addr) (0x0c000000 | (((addr)&0x03ffffff) >> 2))
-#define JMP(addr) (0x08000000 | (0x3ffffff & ((addr) >> 2)))
-#define FNADDR(jal) (((jal)&0x03ffffff) << 2)
+#define JAL(addr)      (0x0c000000 | (((addr)&0x03ffffff) >> 2))
+#define JMP(addr)      (0x08000000 | (0x3ffffff & ((addr) >> 2)))
+#define FNADDR(jal)    (((jal)&0x03ffffff) << 2)
 #define NIBBLE2CHAR(n) ((n) <= 9 ? '0' + (n) : 'a' + (n))
 
 static int (*cdRead)(u32 lsn, u32 nsectors, void *buf, int *mode);

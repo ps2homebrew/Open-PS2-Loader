@@ -1,7 +1,7 @@
 /* ELF-loading stuff */
-#define ELF_MAGIC 0x464c457f
+#define ELF_MAGIC        0x464c457f
 #define ELF_TYPE_SCE_IRX 0xFF80 /* SCE IOP Relocatable eXcutable file */
-#define ELF_PT_LOAD 1
+#define ELF_PT_LOAD      1
 
 /*------------------------------*/
 typedef struct
@@ -86,17 +86,17 @@ enum ELF_reloc_types {
     R_MIPS_LO16
 };
 
-#define SHT_LOPROC 0x70000000
+#define SHT_LOPROC               0x70000000
 #define SHT_LOPROC_EE_IMPORT_TAB 0x90
-#define SHT_LOPROC_IOPMOD 0x80
-#define SHT_HIPROC 0x7fffffff
-#define SHT_LOUSER 0x80000000
-#define SHT_HIUSER 0xffffffff
+#define SHT_LOPROC_IOPMOD        0x80
+#define SHT_HIPROC               0x7fffffff
+#define SHT_LOUSER               0x80000000
+#define SHT_HIUSER               0xffffffff
 
-#define SHF_WRITE 0x1
-#define SHF_ALLOC 0x2
+#define SHF_WRITE     0x1
+#define SHF_ALLOC     0x2
 #define SHF_EXECINSTR 0x4
-#define SHF_MASKPROC 0xf0000000
+#define SHF_MASKPROC  0xf0000000
 
 struct iopmod_id
 {

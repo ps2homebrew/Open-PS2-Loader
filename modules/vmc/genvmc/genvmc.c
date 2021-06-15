@@ -75,8 +75,8 @@ static iop_device_t genvmc_dev = {
     "genvmc",
     &genvmc_ops};
 
-#define sceMcDetectCard McDetectCard
-#define sceMcReadPage McReadPage
+#define sceMcDetectCard  McDetectCard
+#define sceMcReadPage    McReadPage
 #define sceMcGetCardType McGetMcType
 
 // SONY superblock magic & version

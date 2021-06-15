@@ -21,9 +21,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define PROGRAM_NAME "iso2opl"
+#define PROGRAM_NAME    "iso2opl"
 #define PROGRAM_EXTNAME "ISO installer for Open PS2 Loader"
-#define PROGRAM_VER "0.1.2"
+#define PROGRAM_VER     "0.1.2"
 
 typedef unsigned char u8;
 typedef unsigned short u16;

@@ -4,12 +4,12 @@
 // Input output manager
 // asynchronous io handling thread with worker queue
 
-#define IO_OK 0
+#define IO_OK                       0
 #define IO_ERR_UNKNOWN_REQUEST_TYPE -1
-#define IO_ERR_TOO_MANY_HANDLERS -2
-#define IO_ERR_DUPLICIT_HANDLER -3
-#define IO_ERR_INVALID_HANDLER -4
-#define IO_ERR_IO_BLOCKED -5
+#define IO_ERR_TOO_MANY_HANDLERS    -2
+#define IO_ERR_DUPLICIT_HANDLER     -3
+#define IO_ERR_INVALID_HANDLER      -4
+#define IO_ERR_IO_BLOCKED           -5
 
 typedef void (*io_request_handler_t)(void *request);
 
@@ -55,7 +55,7 @@ int ioBlockOps(int block);
 
 #ifdef __DEBUG
 #define PREINIT_LOG(...) printf(__VA_ARGS__)
-#define LOG(...) ioPrintf(__VA_ARGS__)
+#define LOG(...)         ioPrintf(__VA_ARGS__)
 #else
 #define PREINIT_LOG(...)
 #define LOG(...)

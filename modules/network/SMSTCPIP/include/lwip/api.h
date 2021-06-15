@@ -45,7 +45,7 @@
 #include "lwip/err.h"
 
 #define NETCONN_NOCOPY 0x00
-#define NETCONN_COPY 0x01
+#define NETCONN_COPY   0x01
 
 enum netconn_type {
     NETCONN_TCP,
@@ -104,7 +104,7 @@ void netbuf_delete(struct netbuf *buf);
 void *netbuf_alloc(struct netbuf *buf, u16_t size);
 void netbuf_free(struct netbuf *buf);
 err_t netbuf_ref(struct netbuf *buf,
-                void *dataptr, u16_t size);
+                 void *dataptr, u16_t size);
 void netbuf_chain(struct netbuf *head,
                   struct netbuf *tail);
 
@@ -115,13 +115,13 @@ void netbuf_first(struct netbuf *buf);
 void netbuf_copy_partial(struct netbuf *buf, void *dataptr,
                          u16_t len, u16_t offset);
 
-#define netbuf_fromaddr(b) (b->fromaddr)
-#define netbuf_fromport(b) (b->fromport)
-#define netbuf_len(b) (b->p->tot_len)
-#define netbuf_first(b) (b->ptr = b->p)
-#define netconn_new(t) netconn_new_with_proto_and_callback((t), 0, NULL)
+#define netbuf_fromaddr(b)              (b->fromaddr)
+#define netbuf_fromport(b)              (b->fromport)
+#define netbuf_len(b)                   (b->p->tot_len)
+#define netbuf_first(b)                 (b->ptr = b->p)
+#define netconn_new(t)                  netconn_new_with_proto_and_callback((t), 0, NULL)
 #define netconn_new_with_callback(t, c) netconn_new_with_proto_and_callback((t), 0, (c))
-#define netconn_type(c) (c->type)
+#define netconn_type(c)                 (c->type)
 
 /* Network connection functions: */
 struct

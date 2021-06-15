@@ -28,13 +28,13 @@
    This is because the IOP cannot clear the received frames fast enough, causing the number of bytes in flight to grow exponentially.
    The TCP congestion avoidence algorithm may induce some latency, causing extremely poor performance.
    The value to use should be smaller than the TCP window size. Right now, it is 10240 (according to lwipopts.h). */
-#define CLIENT_MAX_BUFFER_SIZE 8192    //Allow up to 8192 bytes to be received.
-#define CLIENT_MAX_XMIT_SIZE USHRT_MAX //Allow up to 65535 bytes to be transmitted.
-#define CLIENT_MAX_RECV_SIZE 8192      //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_BUFFER_SIZE 8192      //Allow up to 8192 bytes to be received.
+#define CLIENT_MAX_XMIT_SIZE   USHRT_MAX //Allow up to 65535 bytes to be transmitted.
+#define CLIENT_MAX_RECV_SIZE   8192      //Allow up to 8192 bytes to be received.
 
 int smb_io_sema = -1;
 
-#define WAITIOSEMA(x) WaitSema(x)
+#define WAITIOSEMA(x)   WaitSema(x)
 #define SIGNALIOSEMA(x) SignalSema(x)
 
 // !!! ps2ip exports functions pointers !!!
@@ -56,7 +56,7 @@ static u8 nb_GetPacketType(void);            // Read message type
 
 static server_specs_t server_specs;
 
-#define LM_AUTH 0
+#define LM_AUTH   0
 #define NTLM_AUTH 1
 
 static u16 UID, TID;

@@ -15,7 +15,7 @@ struct coff_filehdr
 
 #define MIPSELMAGIC 0x0162
 
-#define OMAGIC 0407
+#define OMAGIC  0407
 #define SOMAGIC 0x0701
 
 typedef struct aouthdr

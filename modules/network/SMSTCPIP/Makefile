@@ -30,7 +30,7 @@ endif
 
 include $(PS2SDK)/Defs.make
 include ../../Rules.bin.make
-include ../../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal
 
 ifneq ($(IOP_CC_VERSION),3.2.2)
 ifneq ($(IOP_CC_VERSION),3.2.3)

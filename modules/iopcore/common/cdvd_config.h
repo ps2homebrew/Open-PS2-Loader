@@ -15,13 +15,13 @@ struct cdvdman_settings_common
     u32 layer1_start;
     u8 DiscID[5];
     u8 padding[3];
-};
+} __attribute__((packed));
 
 struct cdvdman_settings_hdd
 {
     struct cdvdman_settings_common common;
     u32 lba_start;
-};
+} __attribute__((packed));
 
 struct cdvdman_settings_smb
 {
@@ -41,10 +41,10 @@ struct cdvdman_settings_smb
         };
         u16 FIDs[ISO_MAX_PARTS];
     };
-};
+} __attribute__((packed));
 
 struct cdvdman_settings_bdm
 {
     struct cdvdman_settings_common common;
     u32 LBAs[ISO_MAX_PARTS];
-};
+} __attribute__((packed));

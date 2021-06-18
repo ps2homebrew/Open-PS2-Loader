@@ -33,6 +33,16 @@ ioman_IMPORTS_end
 
 ps2ip_IMPORTS_start
 I_lwip_send
+#ifdef DEBUG
+I_lwip_sendto
+I_lwip_socket
+I_lwip_listen
+I_lwip_recv
+I_lwip_recvfrom
+I_lwip_close
+I_lwip_bind
+I_lwip_accept
+#endif
 ps2ip_IMPORTS_end
 
 sifcmd_IMPORTS_start

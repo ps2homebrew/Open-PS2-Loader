@@ -1,6 +1,11 @@
 IOP_BIN  = udnl.irx
 IOP_OBJS = udnl.o udnl_asm.o imports.o
 
+BIN2C = $(PS2SDK)/bin/bin2c
+BIN2S = $(PS2SDK)/bin/bin2s
+BIN2O = $(PS2SDK)/bin/bin2o
+IOP_SRC_DIR = ./
+
 IOP_INCS += -I./include
 ifeq ($(DECI2_DEBUG),1)
 IOP_CFLAGS += -D__DECI2_DEBUG
@@ -21,4 +26,4 @@ IOPRP_DECI2_img.c:
 	$(BIN2C) IOPRP_DECI2.img IOPRP_DECI2_img.c IOPRP_img
 
 include $(PS2SDK)/Defs.make
-include ../../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal

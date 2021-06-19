@@ -125,6 +125,7 @@ static opl_io_module_t list_support[MODE_COUNT];
 
 // Global data
 char *gBaseMCDir;
+char *gHDDPrefix;
 int ps2_ip_use_dhcp;
 int ps2_ip[4];
 int ps2_netmask[4];
@@ -723,13 +724,16 @@ static int checkLoadConfigBDM(int types)
 static int checkLoadConfigHDD(int types)
 {
     int value;
+    char path[64];
 
     hddLoadModules();
-    value = open("pfs0:conf_opl.cfg", O_RDONLY);
+
+    snprintf(path, sizeof(path), "%sconf_opl.cfg", gHDDPrefix);
+    value = open(path, O_RDONLY);
     if (value >= 0) {
         close(value);
         configEnd();
-        configInit("pfs0:");
+        configInit(gHDDPrefix);
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
@@ -781,11 +785,11 @@ static int tryAlternateDevice(int types)
         configInit("mass0:");
     } else {
         // No? Check if the save location on the HDD is available.
-        dir = opendir("pfs0:");
+        dir = opendir(gHDDPrefix);
         if (dir != NULL) {
             closedir(dir);
             configEnd();
-            configInit("pfs0:");
+            configInit(gHDDPrefix);
         }
     }
     showCfgPopup = 0;
@@ -912,7 +916,7 @@ static int trySaveConfigHDD(int types)
     hddLoadModules();
     //Check that the formatted & usable HDD is connected.
     if (hddCheck() == 0) {
-        configSetMove("pfs0:");
+        configSetMove(gHDDPrefix);
         return configWriteMulti(types);
     }
 
@@ -1525,6 +1529,7 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[APP_MODE]);
 
     gBaseMCDir = "mc?:OPL";
+    gHDDPrefix = "pfs0:";
 
     ps2_ip_use_dhcp = 1;
     gETHOpMode = ETH_OP_MODE_AUTO;

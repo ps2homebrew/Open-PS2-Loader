@@ -63,4 +63,6 @@ void hddInit();
 item_list_t *hddGetObject(int initOnly);
 void hddLoadModules(void);
 
+extern char gOPLPart[128];
+
 #endif

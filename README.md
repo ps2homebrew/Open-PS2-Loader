@@ -58,9 +58,11 @@ USB modes:
 | "LNG" | for translation support | all |
 | "CHT" | for cheats files | all |
 
-OPL will automatically create the above directory structure the first time
-you launch it and enable your favourite device. For HDD users, a 128Mb +OPL
-partition will be created (you can enlarge it using uLaunchELF if you need to).
+OPL will automatically create the above directory structure the first time you launch it and enable your favourite device.
+
+For HDD users, OPL will read hdd0:__common/OPL/conf_hdd.cfg for the config entry "hdd_partition" to use as your OPL partition.
+If not found a config file and a 128Mb +OPL partition will be created, you can edit the config if you wish to use/create a different partition.
+All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
 
 ## USB
 

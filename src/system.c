@@ -11,6 +11,7 @@
 #include "include/opl.h"
 #include "include/gui.h"
 #include "include/ethsupport.h"
+#include "include/hddsupport.h"
 #include "include/util.h"
 #include "include/pad.h"
 #include "include/system.h"
@@ -858,7 +859,9 @@ int sysExecElf(const char *path)
     elf_pheader_t *eph;
     void *pdata;
     int i;
-    char *elf_argv[1];
+    char *elf_argv[2];
+    char argv[256];
+    int elf_argc = 1;
 
     // NB: ELFLDR.ELF is embedded
     boot_elf = (u8 *)&elfldr_elf;
@@ -888,10 +891,16 @@ int sysExecElf(const char *path)
 
     elf_argv[0] = (char *)path;
 
+    if (strncmp(path, "pfs", 3) == 0) {
+        snprintf(argv, sizeof(argv), "%s:%s", gOPLPart, elf_argv[0]);
+        elf_argv[1] = argv;
+        elf_argc++;
+    }
+
     FlushCache(0);
     FlushCache(2);
 
-    ExecPS2((void *)eh->entry, NULL, 1, elf_argv);
+    ExecPS2((void *)eh->entry, NULL, elf_argc, elf_argv);
 
     return 0;
 }

@@ -17,12 +17,11 @@ jobs:
 
     - name: git checkout
       uses: actions/checkout@v2
-    - run: |
-        git fetch --prune --unshallow
+
+    - run: git fetch --prune --unshallow
 
     - name: Compile -> make clean release
-      run: |
-        make --trace clean release
+      run: make --trace clean release
 
     - name: Create detailed changelog
       run: sh ./make_changelog.sh
@@ -47,23 +46,23 @@ jobs:
           README.md
 
   build-variants:
-    runs-on: ubuntu-latest
-    container: ps2dev/ps2dev:latest
     strategy:
+      fail-fast: false
       matrix:
         rtl: ["", RTL=1]
         pademu: ["", PADEMU=1]
         igs: ["", IGS=1]
         t10k: ["", DTL_T10000=1]
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
     steps:
     - name: Install dependencies
-      run: |
-        apk add build-base git
+      run: apk add build-base git zip gawk
 
     - name: git checkout
       uses: actions/checkout@v2
-    - run: |
-        git fetch --prune --unshallow
+
+    - run: git fetch --prune --unshallow
 
     - name: Get version
       id: version
@@ -78,12 +77,41 @@ jobs:
       run: sh ./make_changelog.sh
 
     - name: Upload variants artifact ELF
-      if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
         name: OPNPS2LD-VARIANTS
-        path: |
-          OPNPS2LD*.ELF
+        path: OPNPS2LD*.ELF
+
+  build-debug:
+    strategy:
+      fail-fast: false
+      matrix:
+        debug: [debug, iopcore_debug, ingame_debug, deci2_debug] # eesio_debug broken
+    runs-on: ubuntu-latest
+    container: ps2dev/ps2dev:latest
+    steps:
+    - name: Install dependencies
+      run: apk add build-base git zip gawk
+
+    - name: git checkout
+      uses: actions/checkout@v2
+
+    - run: git fetch --prune --unshallow
+
+    - name: Get version
+      id: version
+      run: echo "::set-output name=version::$(make oplversion)"
+
+    - name: Compile -> make debug
+      run: |
+        make ${{ matrix.debug }} --trace
+        mv opl.elf opl-${{ matrix.debug }}.elf
+
+    - name: Upload variants artifact ELF
+      uses: actions/upload-artifact@v2
+      with:
+        name: opl-debug-${{ steps.version.outputs.version }}-${{ matrix.docker }}
+        path: opl-*.elf
 
   release:
     needs: [build, build-variants]
@@ -92,8 +120,8 @@ jobs:
     steps:
     - name: git checkout
       uses: actions/checkout@v2
-    - run: |
-        git fetch --prune --unshallow
+
+    - run: git fetch --prune --unshallow
 
     - name: Get version
       id: version

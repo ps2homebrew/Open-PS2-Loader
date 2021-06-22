@@ -17,9 +17,12 @@
 #include "syshook.h"
 
 extern int _iop_reboot_count;
+static int imgdrv_offset_ioprpimg = 0;
+static int imgdrv_offset_ioprpsiz = 0;
 
 static void ResetIopSpecial(const char *args, unsigned int arglen)
 {
+    int i;
     void *pIOP_buffer, *IOPRP_img, *imgdrv_irx;
     unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
     char command[RESET_ARG_MAX + 1];
@@ -44,8 +47,19 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 
     CopyToIop(IOPRP_img, length_rounded, pIOP_buffer);
 
-    *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[0x180])) = pIOP_buffer;
-    *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[0x184])) = size_IOPRP_img;
+    if (imgdrv_offset_ioprpimg == 0 || imgdrv_offset_ioprpsiz == 0) {
+        for (i = 0; i < size_imgdrv_irx; i += 4) {
+            if (*(u32 *)((&((unsigned char *)imgdrv_irx)[i])) == 0xDEC1DEC1) {
+                imgdrv_offset_ioprpimg = i;
+            }
+            if (*(u32 *)((&((unsigned char *)imgdrv_irx)[i])) == 0xDEC2DEC2) {
+                imgdrv_offset_ioprpsiz = i;
+            }
+        }
+    }
+
+    *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpimg])) = pIOP_buffer;
+    *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpsiz])) = size_IOPRP_img;
 
     LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
 

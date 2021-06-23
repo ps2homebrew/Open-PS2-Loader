@@ -23,6 +23,7 @@ enum MENU_IDs {
     MENU_SETTINGS = 0,
     MENU_GFX_SETTINGS,
     MENU_AUDIO_SETTINGS,
+    MENU_CONTROLLER_SETTINGS,
     MENU_PARENTAL_LOCK,
     MENU_NET_CONFIG,
     MENU_NET_UPDATE,
@@ -205,6 +206,7 @@ static void menuInitMainMenu(void)
     submenuAppendItem(&mainMenu, -1, NULL, MENU_SETTINGS, _STR_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_GFX_SETTINGS, _STR_GFX_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_AUDIO_SETTINGS, _STR_AUDIO_SETTINGS);
+    submenuAppendItem(&mainMenu, -1, NULL, MENU_CONTROLLER_SETTINGS, _STR_CONTROLLER_SETTINGS);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_PARENTAL_LOCK, _STR_PARENLOCKCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_CONFIG, _STR_NETCONFIG);
     submenuAppendItem(&mainMenu, -1, NULL, MENU_NET_UPDATE, _STR_NET_UPDATE);
@@ -830,6 +832,9 @@ void menuHandleInputMenu()
         } else if (id == MENU_AUDIO_SETTINGS) {
             if (menuCheckParentalLock() == 0)
                 guiShowAudioConfig();
+        } else if (id == MENU_CONTROLLER_SETTINGS) {
+            if (menuCheckParentalLock() == 0)
+                guiShowControllerConfig();
         } else if (id == MENU_PARENTAL_LOCK) {
             if (menuCheckParentalLock() == 0)
                 guiShowParentalLockConfig();

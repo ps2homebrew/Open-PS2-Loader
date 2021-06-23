@@ -425,6 +425,9 @@ static int guiUpdater(int modified)
         diaGetInt(diaConfig, CFG_LASTPLAYED, &showAutoStartLast);
         diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, showAutoStartLast);
         diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, showAutoStartLast);
+
+        diaGetInt(diaConfig, CFG_BDMMODE, &gBDMStartMode);
+        diaSetEnabled(diaConfig, CFG_ENABLEFW, gBDMStartMode);
     }
     return 0;
 }
@@ -465,6 +468,8 @@ void guiShowConfig()
     diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
     diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
 
+    diaSetInt(diaConfig, CFG_ENABLEFW, gEnableFW);
+
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
         diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
@@ -483,10 +488,11 @@ void guiShowConfig()
         else
             gSelectButton = KEY_CIRCLE;
         diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
-        diaGetInt(diaConfig, CFG_BDMMODE, &gBDMStartMode);
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
+
+        diaGetInt(diaConfig, CFG_ENABLEFW, &gEnableFW);
 
         applyConfig(-1, -1);
         menuReinitMainMenu();

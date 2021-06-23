@@ -180,6 +180,7 @@ extern struct UIItem diaPadEmuInfo[];
 extern struct UIItem diaNetConfig[];
 extern struct UIItem diaUIConfig[];
 extern struct UIItem diaAudioConfig[];
+extern struct UIItem diaControllerConfig[];
 extern struct UIItem diaCompatConfig[];
 extern struct UIItem diaVMCConfig[];
 extern struct UIItem diaGSConfig[];

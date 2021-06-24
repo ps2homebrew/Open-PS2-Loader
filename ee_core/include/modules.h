@@ -5,9 +5,12 @@ enum OPL_MODULE_ID {
     OPL_MODULE_ID_IMGDRV,
     OPL_MODULE_ID_RESETSPU,
 
-    //USB mode modules
+    //USB and BDM mode modules
     OPL_MODULE_ID_USBD,
     OPL_MODULE_ID_USBMASSBD,
+    OPL_MODULE_ID_BDM,
+    OPL_MODULE_ID_BDMFSVFAT,
+
 
     //iLink mode modules
     OPL_MODULE_ID_ILINK,

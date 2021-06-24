@@ -462,20 +462,22 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     irxptr_tab[modcount++].ptr = (void *)&imgdrv_irx;
     irxptr_tab[modcount].info = size_resetspu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_RESETSPU);
     irxptr_tab[modcount++].ptr = (void *)&resetspu_irx;
+    //Filesystem resident modules
+    irxptr_tab[modcount].info = size_bdm_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_BDM);
+    irxptr_tab[modcount++].ptr = (void *)&bdm_irx;
+    irxptr_tab[modcount].info = size_bdmfs_vfat_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_BDMFSVFAT);
+    irxptr_tab[modcount++].ptr = (void *)&bdmfs_vfat_irx;
+    irxptr_tab[modcount].info = size_usbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
+    irxptr_tab[modcount++].ptr = (void *)&usbd_irx;
+    irxptr_tab[modcount].info = size_usbmass_bd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBMASSBD);
+    irxptr_tab[modcount++].ptr = (void *)&usbmass_bd_irx;
 
 #ifdef PADEMU
 #define PADEMU_ARG || gEnablePadEmu
 #else
 #define PADEMU_ARG
 #endif
-    if ((modules & CORE_IRX_USB) PADEMU_ARG) {
-        irxptr_tab[modcount].info = size_usbd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
-        irxptr_tab[modcount++].ptr = (void *)&usbd_irx;
-    }
-    if (modules & CORE_IRX_USB) {
-        irxptr_tab[modcount].info = size_usbmass_bd_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_USBMASSBD);
-        irxptr_tab[modcount++].ptr = (void *)&usbmass_bd_irx;
-    }
+
     if (modules & CORE_IRX_ILINK) {
         irxptr_tab[modcount].info = size_iLinkman_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_ILINK);
         irxptr_tab[modcount++].ptr = (void *)&iLinkman_irx;

@@ -83,14 +83,12 @@ static void t_loadElf(void)
     LoadModule("rom0:SIO2MAN", 0, NULL);
     LoadModule("rom0:MCMAN", 0, NULL);
 
-    if (ExitPath[1] == 'a') { // ie mass:
-        ret = LoadModule("mc0:SYS-CONF/USBD.IRX", 0, NULL);
-        if (ret >= 0)
-            LoadModule("mc0:SYS-CONF/USBHDFSD.IRX", 0, NULL);
-        else {
-            LoadModule("mc1:SYS-CONF/USBD.IRX", 0, NULL);
-            LoadModule("mc1:SYS-CONF/USBHDFSD.IRX", 0, NULL);
-        }
+    if (ExitPath[1] == 'a') { // ie mass0:
+        // Load USB and BDM modules from RAM
+        LoadOPLModule(OPL_MODULE_ID_BDM, 0, 0, NULL);
+        LoadOPLModule(OPL_MODULE_ID_BDMFSVFAT, 0, 0, NULL);
+        LoadOPLModule(OPL_MODULE_ID_USBD, 0, 0, NULL);
+        LoadOPLModule(OPL_MODULE_ID_USBMASSBD, 0, 0, NULL);
         delay(5); // Wait for device to be detected.
     }
 

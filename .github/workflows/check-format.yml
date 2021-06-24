@@ -1,18 +1,29 @@
+
 name: CI-format-check
 
 on:
   push:
+    paths:
+      - '**.h'
+      - '**.c'
+      - '.github/workflows/check-format.yml'
+      - '.clang-format'
   pull_request:
+    paths:
+      - '**.h'
+      - '**.c'
+      - '.github/workflows/check-format.yml'
+      - '.clang-format'
 
 jobs:
   check-format:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Install dependencies
-      shell: bash
-      run: sudo apt-get install git make clang-format
-
     - uses: actions/checkout@v2
-
-    - name: Check format -> make format-check
-      run: make format-check
+    - uses: DoozyX/clang-format-lint-action@v0.12
+      with:
+        source: '.'
+        extensions: 'h,c'
+        clangFormatVersion: 12
+        inplace: False

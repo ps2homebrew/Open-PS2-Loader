@@ -23,6 +23,8 @@ static int bdmGameCount = 0;
 static base_game_info_t *bdmGames;
 static char bdmDriver[5];
 
+static int fireWireModLoaded = 0;
+
 // forward declaration
 static item_list_t bdmGameList;
 
@@ -67,6 +69,17 @@ static void bdmEventHandler(void *packet, void *opt)
     BdmGeneration++;
 }
 
+static void bdmLoadBlockDeviceModules(void)
+{
+    if (gEnableFW && !fireWireModLoaded) {
+        // Load iLink Block Device drivers
+        sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
+        sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
+
+        fireWireModLoaded = 1;
+    }
+}
+
 void bdmLoadModules(void)
 {
     LOG("BDMSUPPORT LoadModules\n");
@@ -81,9 +94,8 @@ void bdmLoadModules(void)
     sysLoadModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL);
     sysLoadModuleBuffer(&usbmass_bd_irx, size_usbmass_bd_irx, 0, NULL);
 
-    // Load iLink Block Device drivers
-    sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
-    sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
+    // Load Optional Block Device drivers
+    bdmLoadBlockDeviceModules();
 
     sysLoadModuleBuffer(&bdmevent_irx, size_bdmevent_irx, 0, NULL);
     SifAddCmdHandler(0, &bdmEventHandler, NULL);
@@ -118,6 +130,8 @@ static int bdmNeedsUpdate(void)
     static unsigned char LanguagesLoaded = 0;
     int result = 0;
     struct stat st;
+
+    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
 
     if (bdmULSizePrev != -2 && OldGeneration == BdmGeneration)
         return 0;

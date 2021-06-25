@@ -114,6 +114,8 @@ extern int gHDDStartMode;
 extern int gETHStartMode;
 extern int gAPPStartMode;
 
+extern int gEnableFW;
+
 extern int gAutosort;
 extern int gAutoRefresh;
 extern int gEnableNotifications;

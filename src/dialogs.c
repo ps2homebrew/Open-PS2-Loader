@@ -194,9 +194,14 @@ struct UIItem diaConfig[] = {
     {UI_INT, CFG_HDDSPINDOWN, 1, 1, _STR_HINT_SPINDOWN, 0, 0, {.intvalue = {20, 20, 0, 20}}},
     {UI_SPLITTER},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_USBMODE}}},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BDMMODE}}},
     {UI_SPACER},
     {UI_ENUM, CFG_BDMMODE, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BREAK},
+
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"- FireWire", -1}}},
+    {UI_SPACER},
+    {UI_BOOL, CFG_ENABLEFW, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDDMODE}}},

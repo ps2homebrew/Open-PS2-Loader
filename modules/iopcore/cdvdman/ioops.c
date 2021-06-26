@@ -91,7 +91,7 @@ void cdvdman_fs_init(void)
 
     DeviceFSInit();
 
-    mips_memset(&cdvdman_fdhandles[0], 0, MAX_FDHANDLES * sizeof(FHANDLE));
+    memset(&cdvdman_fdhandles[0], 0, MAX_FDHANDLES * sizeof(FHANDLE));
 
     cdvdman_searchfile_init();
 
@@ -233,7 +233,7 @@ static int cdrom_close(iop_file_t *f)
 
     DPRINTF("cdrom_close\n");
 
-    mips_memset(fh, 0, sizeof(FHANDLE));
+    memset(fh, 0, sizeof(FHANDLE));
     f->mode = 0; //SCE invalidates FDs by clearing the open flags.
 
     SignalSema(cdrom_io_sema);
@@ -272,7 +272,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
             rpos += nbytes;
 
             sceCdSync(0);
-            mips_memcpy(buf, &cdvdman_fs_buf[offset], nbytes);
+            memcpy(buf, &cdvdman_fs_buf[offset], nbytes);
             buf += nbytes;
         }
 
@@ -301,7 +301,7 @@ static int cdrom_read(iop_file_t *f, void *buf, int size)
             rpos += nbytes;
 
             sceCdSync(0);
-            mips_memcpy(buf, cdvdman_fs_buf, nbytes);
+            memcpy(buf, cdvdman_fs_buf, nbytes);
         }
     }
 

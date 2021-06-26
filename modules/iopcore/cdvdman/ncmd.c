@@ -146,7 +146,7 @@ int sceCdReadDiskID(unsigned int *DiskID)
     if (i == 5)
         *((u16 *)DiskID) = (u16)0xadde;
     else
-        mips_memcpy(DiskID, cdvdman_settings.common.DiscID, 5);
+        memcpy(DiskID, cdvdman_settings.common.DiscID, 5);
 
     return 1;
 }

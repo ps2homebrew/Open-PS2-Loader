@@ -175,7 +175,7 @@ int sceCdRI(u8 *buf, u32 *stat)
     if (stat)
         *stat = (u32)rdbuf[0];
 
-    mips_memcpy((void *)buf, (void *)&rdbuf[1], 8);
+    memcpy((void *)buf, (void *)&rdbuf[1], 8);
 
     return 1;
 }
@@ -200,7 +200,7 @@ static int cdvdman_readMechaconVersion(u8 *mname, u32 *stat)
     *stat = rdbuf[0] & 0x80;
     rdbuf[0] &= 0x7f;
 
-    mips_memcpy(mname, &rdbuf[0], 4);
+    memcpy(mname, &rdbuf[0], 4);
 
     return 1;
 }
@@ -216,20 +216,20 @@ int sceCdRM(char *m, u32 *stat)
     r = cdvdman_readMechaconVersion(rdbuf, stat);
     if ((r == 1) && (0x104FE < (rdbuf[3] | (rdbuf[2] << 8) | (rdbuf[1] << 16)))) {
 
-        mips_memcpy(&m[0], "M_NAME_UNKNOWN\0\0", 16);
+        memcpy(&m[0], "M_NAME_UNKNOWN\0\0", 16);
         *stat |= 0x40;
     } else {
         wrbuf[0] = 0;
         cdvdman_sendSCmd(0x17, wrbuf, 1, rdbuf, 9);
 
         *stat = rdbuf[0];
-        mips_memcpy(&m[0], &rdbuf[1], 8);
+        memcpy(&m[0], &rdbuf[1], 8);
 
         wrbuf[0] = 8;
         cdvdman_sendSCmd(0x17, wrbuf, 1, rdbuf, 9);
 
         *stat |= rdbuf[0];
-        mips_memcpy(&m[8], &rdbuf[1], 8);
+        memcpy(&m[8], &rdbuf[1], 8);
     }
 
     return 1;

@@ -231,7 +231,7 @@ static int ReadSectors(int maxcount, void *buffer)
         if (SectorsToCopy > maxcount)
             SectorsToCopy = maxcount;
         if (SectorsToCopy > 0) {
-            mips_memcpy(buffer, cdvdman_stat.StreamingData.StIOP_bufaddr + cdvdman_stat.StreamingData.StReadPtr * 2048, SectorsToCopy * 2048);
+            memcpy(buffer, cdvdman_stat.StreamingData.StIOP_bufaddr + cdvdman_stat.StreamingData.StReadPtr * 2048, SectorsToCopy * 2048);
             ptr += SectorsToCopy * 2048;
             cdvdman_stat.StreamingData.StReadPtr += SectorsToCopy;
             if (cdvdman_stat.StreamingData.StReadPtr >= cdvdman_stat.StreamingData.StBufmax)
@@ -246,7 +246,7 @@ static int ReadSectors(int maxcount, void *buffer)
         if (SectorsToCopy > maxcount - result)
             SectorsToCopy = maxcount - result;
         if (SectorsToCopy > 0) {
-            mips_memcpy(ptr, cdvdman_stat.StreamingData.StIOP_bufaddr + cdvdman_stat.StreamingData.StReadPtr * 2048, SectorsToCopy * 2048);
+            memcpy(ptr, cdvdman_stat.StreamingData.StIOP_bufaddr + cdvdman_stat.StreamingData.StReadPtr * 2048, SectorsToCopy * 2048);
             cdvdman_stat.StreamingData.StReadPtr += SectorsToCopy;
             if (cdvdman_stat.StreamingData.StReadPtr >= cdvdman_stat.StreamingData.StBufmax)
                 cdvdman_stat.StreamingData.StReadPtr = 0;

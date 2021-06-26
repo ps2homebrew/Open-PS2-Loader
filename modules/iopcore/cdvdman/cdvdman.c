@@ -231,7 +231,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
             sectors -= nsectors;
             nbytes = nsectors << 11;
 
-            mips_memcpy(buf, cdvdman_buf, nbytes);
+            memcpy(buf, cdvdman_buf, nbytes);
 
             buf = (void *)(buf + nbytes);
         }
@@ -476,7 +476,7 @@ static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16
     if (out_size > i)
         out_size = i;
 
-    mips_memcpy((void *)out, (void *)rdbuf, out_size);
+    memcpy((void *)out, (void *)rdbuf, out_size);
 
     SignalSema(cdvdman_scmdsema);
 

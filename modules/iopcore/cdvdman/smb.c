@@ -14,15 +14,18 @@
 #include <intrman.h>
 #include <sifman.h>
 
-#include "smsutils.h"
 #include "oplsmb.h"
 #include "smb.h"
 #include "cdvd_config.h"
 
+#include "smsutils.h"
+#define memcpy mips_memcpy
+#define memset mips_memset
+
 #define USE_CUSTOM_RECV 1
 
 //Round up the erasure amount, so that memset can erase memory word-by-word.
-#define ZERO_PKT_ALIGNED(hdr, hdrSize) mips_memset((hdr), 0, ((hdrSize) + 3) & ~3)
+#define ZERO_PKT_ALIGNED(hdr, hdrSize) memset((hdr), 0, ((hdrSize) + 3) & ~3)
 
 /* Limit the maximum chunk size of receiving operations, to avoid triggering the congestion avoidance algorithm of the SMB server.
    This is because the IOP cannot clear the received frames fast enough, causing the number of bytes in flight to grow exponentially.
@@ -129,7 +132,7 @@ int OpenTCPSession(struct in_addr dst_IP, u16 dst_port)
     opt = 1;
     plwip_setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&opt, sizeof(opt));
 
-    mips_memset(&sock_addr, 0, sizeof(sock_addr));
+    memset(&sock_addr, 0, sizeof(sock_addr));
     sock_addr.sin_addr = dst_IP;
     sock_addr.sin_family = AF_INET;
     sock_addr.sin_port = htons(dst_port);
@@ -318,8 +321,8 @@ negotiate_retry:
     server_specs.MaxBufferSize = NPRsp->MaxBufferSize;
     server_specs.MaxMpxCount = NPRsp->MaxMpxCount;
     server_specs.SessionKey = NPRsp->SessionKey;
-    mips_memcpy(server_specs.EncryptionKey, &NPRsp->ByteField[0], NPRsp->KeyLength);
-    mips_memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], sizeof(server_specs.PrimaryDomainServerName));
+    memcpy(server_specs.EncryptionKey, &NPRsp->ByteField[0], NPRsp->KeyLength);
+    memcpy(server_specs.PrimaryDomainServerName, &NPRsp->ByteField[NPRsp->KeyLength], sizeof(server_specs.PrimaryDomainServerName));
     strncpy(server_specs.Username, Username, sizeof(server_specs.Username));
     server_specs.Username[sizeof(server_specs.Username) - 1] = '\0';
     strncpy(server_specs.Password, Password, sizeof(server_specs.Password));
@@ -366,7 +369,7 @@ lbl_session_setup:
     if (server_specs.SecurityMode == SERVER_USER_SECURITY_LEVEL) {
         password_len = server_specs.PasswordLen;
         // Copy the password accordingly to auth type
-        mips_memcpy(&SSR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
+        memcpy(&SSR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
         // fill SSR->AnsiPasswordLength or SSR->UnicodePasswordLength accordingly to auth type
         if (AuthType == LM_AUTH)
             SSR->AnsiPasswordLength = password_len;
@@ -455,7 +458,7 @@ int smb_TreeConnectAndX(char *ShareName)
     if (server_specs.SecurityMode == SERVER_SHARE_SECURITY_LEVEL) {
         password_len = server_specs.PasswordLen;
         // Copy the password accordingly to auth type
-        mips_memcpy(&TCR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
+        memcpy(&TCR->ByteField[offset], &server_specs.Password[(AuthType << 4) + (AuthType << 3)], password_len);
     }
     TCR->PasswordLength = password_len;
     offset += password_len;
@@ -468,7 +471,7 @@ int smb_TreeConnectAndX(char *ShareName)
     // Add share name
     offset += setStringField((char *)&TCR->ByteField[offset], ShareName);
 
-    mips_memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
+    memcpy(&TCR->ByteField[offset], "?????\0", 6); // Service, any type of device
     offset += 6;
 
     TCR->ByteCount = offset;

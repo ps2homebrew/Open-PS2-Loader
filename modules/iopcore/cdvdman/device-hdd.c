@@ -70,7 +70,7 @@ void DeviceInit(void)
         DelayThread(2000);
     }
 
-    mips_memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
+    memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
 
     cdvdman_settings.common.media = apaHeader.discType;
     cdvdman_settings.common.layer1_start = apaHeader.layer1_start;

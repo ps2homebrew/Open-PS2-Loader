@@ -2,7 +2,6 @@
 #ifndef __CDVDMAN_INTERNAL__
 #define __CDVDMAN_INTERNAL__
 
-#include "smsutils.h"
 #include "dev9.h"
 #include "oplsmb.h"
 #include "smb.h"
@@ -29,6 +28,10 @@
 #include "ioman_add.h"
 
 #include <defs.h>
+
+#include "smsutils.h"
+#define memcpy mips_memcpy
+#define memset mips_memset
 
 #ifdef __IOPCORE_DEBUG
 #define DPRINTF(args...)  printf(args)

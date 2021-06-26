@@ -1,3 +1,7 @@
+
+#ifndef __CDVDMAN__
+#define __CDVDMAN__
+
 // PS2 CDVD hardware registers
 #define CDL_DATA_RDY      0x01
 #define CDL_DATA_COMPLETE 0x02
@@ -99,15 +103,6 @@ typedef struct
     char name[16];
     u8 date[8];
 } cd_file_t;
-
-typedef struct
-{
-    u32 lsn;
-    u32 size;
-    char name[16];
-    u8 date[8];
-    u32 flag;
-} cdl_file_t;
 
 typedef struct
 {
@@ -262,5 +257,7 @@ int sceCdReadModelID(void *ModelID); // #82
 #define I_sceCdReadModelID DECLARE_IMPORT(82, sceCdReadModelID)
 int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start); // #83
 #define I_sceCdReadDvdDualInfo DECLARE_IMPORT(83, sceCdReadDvdDualInfo)
-int sceCdLayerSearchFile(cdl_file_t *fp, const char *name, int layer); // #84
+int sceCdLayerSearchFile(cd_file_t *fp, const char *name, int layer); // #84
 #define I_sceCdLayerSearchFile DECLARE_IMPORT(84, sceCdLayerSearchFile)
+
+#endif

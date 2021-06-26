@@ -1,19 +1,10 @@
-#include "smsutils.h"
-#include "ioplib_util.h"
-#include "cdvdman.h"
-#include "cdvd_config.h"
+/*
+  Copyright 2009-2010, jimmikaelkael
+  Licenced under Academic Free License version 3.0
+  Review Open PS2 Loader README & LICENSE files for further details.
+*/
+
 #include "internal.h"
-
-#include <stdio.h>
-#include <sifman.h>
-#include <sysclib.h>
-#include <sysmem.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <intrman.h>
-#include <errno.h>
-
-extern cdvdman_status_t cdvdman_stat;
 
 static int AllocBank(void **pointer);
 static int ReadSectors(int maxcount, void *buffer);

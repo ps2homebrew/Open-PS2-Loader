@@ -99,7 +99,6 @@ int sceCdBreak(void)
     if (sync_flag)
         return 0;
 
-    cdvdman_stat.err = SCECdErNO;
     cdvdman_stat.status = SCECdStatPause;
 
     cdvdman_stat.err = SCECdErABRT;

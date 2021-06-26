@@ -4,29 +4,9 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
-#include "smsutils.h"
-#include "atad.h"
-#include "ioplib_util.h"
-#include "cdvdman.h"
 #include "internal.h"
-#include "cdvd_config.h"
 
 #include <bdm.h>
-#include <loadcore.h>
-#include <stdio.h>
-#include <sysclib.h>
-#include <sysmem.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <intrman.h>
-#include <ioman.h>
-#include <thsemap.h>
-#include <usbd.h>
-#include <errno.h>
-#include <io_common.h>
-#include "ioman_add.h"
-
-#include <errno.h>
 
 #include "device.h"
 

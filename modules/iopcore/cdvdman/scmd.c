@@ -9,15 +9,15 @@
 static unsigned char cdvdman_media_changed = 1;
 
 //-------------------------------------------------------------------------
-int sceCdReadClock(cd_clock_t *rtc)
+int sceCdReadClock(sceCdCLOCK *rtc)
 {
     int rc;
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
     rc = cdvdman_sendSCmd(0x08, NULL, 0, (void *)rtc, 8);
 
-    rtc->week = 0;
+    rtc->pad = 0;
     rtc->month &= 0x7f;
 
     return rc;
@@ -42,7 +42,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 {
     DPRINTF("sceCdTrayReq(%d, 0x%lX)\n", mode, *traycnt);
 
-    if (mode == CDVD_TRAY_CHECK) {
+    if (mode == SCECdTrayCheck) {
         if (traycnt)
             *traycnt = cdvdman_media_changed;
 
@@ -51,20 +51,20 @@ int sceCdTrayReq(int mode, u32 *traycnt)
         return 1;
     }
 
-    if (mode == CDVD_TRAY_OPEN) {
-        cdvdman_stat.status = CDVD_STAT_OPEN;
+    if (mode == SCECdTrayOpen) {
+        cdvdman_stat.status = SCECdStatShellOpen;
         cdvdman_stat.disc_type_reg = 0;
 
         DelayThread(11000);
 
-        cdvdman_stat.err = CDVD_ERR_OPENS; /* not sure about this error code */
+        cdvdman_stat.err = SCECdErOPENS; /* not sure about this error code */
 
         return 1;
-    } else if (mode == CDVD_TRAY_CLOSE) {
+    } else if (mode == SCECdTrayClose) {
         DelayThread(25000);
 
-        cdvdman_stat.status = CDVD_STAT_PAUSE; /* not sure if the status is right, may be - CDVD_STAT_SPIN */
-        cdvdman_stat.err = CDVD_ERR_NO;        /* not sure if this error code is suitable here */
+        cdvdman_stat.status = SCECdStatPause; /* not sure if the status is right, may be - SCECdStatSpin */
+        cdvdman_stat.err = SCECdErNO;         /* not sure if this error code is suitable here */
         cdvdman_stat.disc_type_reg = (int)cdvdman_settings.common.media;
 
         cdvdman_media_changed = 1;
@@ -76,7 +76,7 @@ int sceCdTrayReq(int mode, u32 *traycnt)
 }
 
 //-------------------------------------------------------------------------
-int sceCdApplySCmd(int cmd, void *in, u32 in_size, void *out)
+int sceCdApplySCmd(u8 cmd, const void *in, u16 in_size, void *out)
 {
     DPRINTF("sceCdApplySCmd\n");
 
@@ -99,17 +99,17 @@ int sceCdBreak(void)
     if (sync_flag)
         return 0;
 
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
 
-    cdvdman_stat.err = CDVD_ERR_ABRT;
+    cdvdman_stat.err = SCECdErABRT;
     cdvdman_cb_event(SCECdFuncBreak);
 
     return 1;
 }
 
 //-------------------------------------------------------------------------
-int sceCdPowerOff(int *stat)
+int sceCdPowerOff(u32 *stat)
 {
     return cdvdman_sendSCmd(0x0F, NULL, 0, (unsigned char *)stat, 1);
 }
@@ -118,7 +118,7 @@ int sceCdPowerOff(int *stat)
 int cdvdman_readID(int mode, u8 *buf)
 {
     u8 lbuf[16];
-    int stat;
+    u32 stat;
     int r;
 
     r = sceCdRI(lbuf, &stat);
@@ -139,15 +139,15 @@ int cdvdman_readID(int mode, u8 *buf)
 }
 
 //--------------------------------------------------------------
-int sceCdReadGUID(void *GUID)
+int sceCdReadGUID(u64 *GUID)
 {
-    return cdvdman_readID(0, GUID);
+    return cdvdman_readID(0, (u8 *)GUID);
 }
 
 //--------------------------------------------------------------
-int sceCdReadModelID(void *ModelID)
+int sceCdReadModelID(unsigned long int *ModelID)
 {
-    return cdvdman_readID(1, ModelID);
+    return cdvdman_readID(1, (u8 *)ModelID);
 }
 
 //-------------------------------------------------------------------------
@@ -166,14 +166,14 @@ int sceCdReadDvdDualInfo(int *on_dual, u32 *layer1_start)
 }
 
 //-------------------------------------------------------------------------
-int sceCdRI(char *buf, int *stat)
+int sceCdRI(u8 *buf, u32 *stat)
 {
     u8 rdbuf[16];
 
     cdvdman_sendSCmd(0x12, NULL, 0, rdbuf, 9);
 
     if (stat)
-        *stat = (int)rdbuf[0];
+        *stat = (u32)rdbuf[0];
 
     mips_memcpy((void *)buf, (void *)&rdbuf[1], 8);
 
@@ -181,15 +181,15 @@ int sceCdRI(char *buf, int *stat)
 }
 
 //-------------------------------------------------------------------------
-int sceCdRC(cd_clock_t *rtc)
+int sceCdRC(sceCdCLOCK *rtc)
 {
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
     return cdvdman_sendSCmd(0x08, NULL, 0, (void *)rtc, 8);
 }
 
 //-------------------------------------------------------------------------
-static int cdvdman_readMechaconVersion(char *mname, u32 *stat)
+static int cdvdman_readMechaconVersion(u8 *mname, u32 *stat)
 {
     u8 rdbuf[16];
     u8 wrbuf[16];

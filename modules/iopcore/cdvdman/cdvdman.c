@@ -25,7 +25,7 @@ extern struct irx_export_table _exp_dev9;
 
 // internal functions prototypes
 static void oplShutdown(int poff);
-static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
+static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16 out_size);
 static unsigned int event_alarm_cb(void *args);
 static void cdvdman_signal_read_end(void);
 static void cdvdman_signal_read_end_intr(void);
@@ -75,7 +75,7 @@ void oplRegisterShutdownCallback(oplShutdownCb_t cb)
 
 static void oplShutdown(int poff)
 {
-    int stat;
+    u32 stat;
 
     DeviceLock();
     if (vmcShutdownCb != NULL)
@@ -107,7 +107,7 @@ void cdvdman_init(void)
 #endif
 
     if (!cdvdman_cdinited) {
-        cdvdman_stat.err = CDVD_ERR_NO;
+        cdvdman_stat.err = SCECdErNO;
 
         cdvdman_fs_init();
 
@@ -146,10 +146,10 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
 
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
     for (ptr = buf, remaining = sectors; remaining > 0;) {
-        if (cdvdman_stat.err != CDVD_ERR_NO)
+        if (cdvdman_stat.err != SCECdErNO)
             break;
 
         SectorsToRead = remaining;
@@ -168,7 +168,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
         }
 
         if (DeviceReadSectors(lsn, ptr, SectorsToRead) != 0) {
-            cdvdman_stat.err = CDVD_ERR_READ;
+            cdvdman_stat.err = SCECdErREAD;
             if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS)
                 CancelAlarm(&cdvdemu_read_end_cb, NULL);
             break;
@@ -204,12 +204,12 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
         }
     }
 
-    return (cdvdman_stat.err == CDVD_ERR_NO ? 0 : 1);
+    return (cdvdman_stat.err == SCECdErNO ? 0 : 1);
 }
 
 static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 {
-    cdvdman_stat.status = CDVD_STAT_READ;
+    cdvdman_stat.status = SCECdStatRead;
 
     buf = (void *)PHYSADDR(buf);
 #ifdef HDD_DRIVER //As of now, only the ATA interface requires this. We do this here to share cdvdman_buf.
@@ -246,13 +246,13 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 
     ReadPos = 0; /* Reset the buffer offset indicator. */
 
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.status = SCECdStatPause;
 
     return 1;
 }
 
 //-------------------------------------------------------------------------
-int sceCdGetReadPos(void)
+u32 sceCdGetReadPos(void)
 {
     DPRINTF("sceCdGetReadPos\n");
 
@@ -331,16 +331,16 @@ int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf)
 //-------------------------------------------------------------------------
 static void cdvdman_initDiskType(void)
 {
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
     cdvdman_stat.disc_type_reg = (int)cdvdman_settings.common.media;
     DPRINTF("DiskType=0x%x\n", cdvdman_settings.common.media);
 }
 
 //-------------------------------------------------------------------------
-int sceCdPosToInt(cd_location_t *p)
+u32 sceCdPosToInt(sceCdlLOCCD *p)
 {
-    register int result;
+    register u32 result;
 
     result = ((u32)p->minute >> 16) * 10 + ((u32)p->minute & 0xF);
     result *= 60;
@@ -353,9 +353,9 @@ int sceCdPosToInt(cd_location_t *p)
 }
 
 //-------------------------------------------------------------------------
-cd_location_t *sceCdIntToPos(int i, cd_location_t *p)
+sceCdlLOCCD *sceCdIntToPos(u32 i, sceCdlLOCCD *p)
 {
-    register int sc, se, mi;
+    register u32 sc, se, mi;
 
     i += 150;
     se = i / 75;
@@ -370,7 +370,7 @@ cd_location_t *sceCdIntToPos(int i, cd_location_t *p)
 }
 
 //-------------------------------------------------------------------------
-int *sceCdCallback(void *func)
+sceCdCBFunc sceCdCallback(sceCdCBFunc func)
 {
     int oldstate;
     void *old_cb;
@@ -387,7 +387,7 @@ int *sceCdCallback(void *func)
 
     CpuResumeIntr(oldstate);
 
-    return (int *)old_cb;
+    return old_cb;
 }
 
 //-------------------------------------------------------------------------
@@ -431,7 +431,7 @@ int sceCdSC(int code, int *param)
 }
 
 //-------------------------------------------------------------------------
-static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size)
+static int cdvdman_writeSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16 out_size)
 {
     int i;
     u8 *p;
@@ -484,7 +484,7 @@ static int cdvdman_writeSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_s
 }
 
 //--------------------------------------------------------------
-int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size)
+int cdvdman_sendSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16 out_size)
 {
     int r, retryCount = 0;
 
@@ -575,8 +575,8 @@ static void cdvdman_startThreads(void)
 {
     iop_thread_t thread_param;
 
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.status = SCECdStatPause;
+    cdvdman_stat.err = SCECdErNO;
 
     thread_param.thread = &cdvdman_cdread_Thread;
     thread_param.stacksize = 0x1000;

@@ -8,7 +8,7 @@
 
 static void cdvdman_trimspaces(char *str);
 static struct dirTocEntry *cdvdman_locatefile(char *name, u32 tocLBA, int tocLength, int layer);
-static int cdvdman_findfile(cd_file_t *pcd_file, const char *name, int layer);
+static int cdvdman_findfile(sceCdlFILE *pcd_file, const char *name, int layer);
 
 typedef struct
 {
@@ -152,7 +152,7 @@ lbl_startlocate:
 }
 
 //-------------------------------------------------------------------------
-static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
+static int cdvdman_findfile(sceCdlFILE *pcdfile, const char *name, int layer)
 {
     static char cdvdman_filepath[256];
     u32 lsn;
@@ -211,7 +211,7 @@ static int cdvdman_findfile(cd_file_t *pcdfile, const char *name, int layer)
 }
 
 //-------------------------------------------------------------------------
-int sceCdSearchFile(cd_file_t *pcd_file, const char *name)
+int sceCdSearchFile(sceCdlFILE *pcd_file, const char *name)
 {
     DPRINTF("sceCdSearchFile %s\n", name);
 
@@ -219,7 +219,7 @@ int sceCdSearchFile(cd_file_t *pcd_file, const char *name)
 }
 
 //-------------------------------------------------------------------------
-int sceCdLayerSearchFile(cd_file_t *fp, const char *name, int layer)
+int sceCdLayerSearchFile(sceCdlFILE *fp, const char *name, int layer)
 {
     DPRINTF("sceCdLayerSearchFile %s\n", name);
 

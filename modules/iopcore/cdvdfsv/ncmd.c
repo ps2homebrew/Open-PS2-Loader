@@ -11,7 +11,7 @@ typedef struct
     u32 lsn;
     u32 sectors;
     void *buf;
-    cd_read_mode_t mode;
+    sceCdRMode mode;
     void *eeaddr1;
     void *eeaddr2;
 } RpcCdvd_t;
@@ -22,7 +22,7 @@ typedef struct
     u32 sectors;
     void *buf;
     int cmd;
-    cd_read_mode_t mode;
+    sceCdRMode mode;
     u32 pad;
 } RpcCdvdStream_t;
 
@@ -51,7 +51,7 @@ typedef struct
     u8 buf2[64];
 } cdvdfsv_readee_t;
 
-static cd_read_mode_t cdvdfsv_Stmode;
+static sceCdRMode cdvdfsv_Stmode;
 
 static SifRpcServerData_t cdvdNcmds_rpcSD;
 static u8 cdvdNcmds_rpcbuf[1024];
@@ -161,7 +161,7 @@ static inline void cdvd_readee(void *buf)
 
     while (1) {
         do {
-            if ((sectors_to_read == 0) || (sceCdGetError() == CDVD_ERR_ABRT)) {
+            if ((sectors_to_read == 0) || (sceCdGetError() == SCECdErABRT)) {
                 sysmemSendEE((void *)&readee, (void *)r->eeaddr1, sizeof(cdvdfsv_readee_t));
 
                 *((u32 *)&curlsn_buf[0]) = nbytes;
@@ -187,8 +187,8 @@ static inline void cdvd_readee(void *buf)
             }
 
             if (sceCdRead(r->lsn, temp, (void *)fsvRbuf, NULL) == 0) {
-                if (sceCdGetError() == CDVD_ERR_NO) {
-                    fsverror = CDVD_ERR_READCF;
+                if (sceCdGetError() == SCECdErNO) {
+                    fsverror = SCECdErREADCF;
                     sceCdSC(CDSC_SET_ERROR, &fsverror);
                 }
 
@@ -297,8 +297,8 @@ static inline void cdvd_readiopm(void *buf)
     }
 
     if (r == 0) {
-        if (sceCdGetError() == CDVD_ERR_NO) {
-            fsverror = CDVD_ERR_READCFR;
+        if (sceCdGetError() == SCECdErNO) {
+            fsverror = SCECdErREADCFR;
             sceCdSC(CDSC_SET_ERROR, &fsverror);
         }
     }
@@ -323,8 +323,8 @@ static inline void cdvd_readchain(void *buf)
 
         if ((u32)ch->buf & 1) { // IOP addr
             if (sceCdRead(lsn, tsectors, (void *)addr, NULL) == 0) {
-                if (sceCdGetError() == CDVD_ERR_NO) {
-                    fsverror = CDVD_ERR_READCFR;
+                if (sceCdGetError() == SCECdErNO) {
+                    fsverror = SCECdErREADCFR;
                     sceCdSC(CDSC_SET_ERROR, &fsverror);
                 }
 
@@ -339,8 +339,8 @@ static inline void cdvd_readchain(void *buf)
                 nsectors = (tsectors > CDVDMAN_FS_SECTORS) ? CDVDMAN_FS_SECTORS : tsectors;
 
                 if (sceCdRead(lsn, nsectors, cdvdfsv_buf, NULL) == 0) {
-                    if (sceCdGetError() == CDVD_ERR_NO) {
-                        fsverror = CDVD_ERR_READCF;
+                    if (sceCdGetError() == SCECdErNO) {
+                        fsverror = SCECdErREADCF;
                         sceCdSC(CDSC_SET_ERROR, &fsverror);
                     }
 
@@ -368,7 +368,7 @@ static inline void rpcNCmd_cdreadDiskID(void *buf)
     u8 *p = (u8 *)buf;
 
     mips_memset(p, 0, 10);
-    *(int *)buf = sceCdReadDiskID(&p[4]);
+    *(int *)buf = sceCdReadDiskID((unsigned int *)&p[4]);
 }
 
 //-------------------------------------------------------------------------

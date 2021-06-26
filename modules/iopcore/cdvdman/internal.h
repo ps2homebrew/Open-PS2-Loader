@@ -8,7 +8,7 @@
 #include "smb.h"
 #include "atad.h"
 #include "ioplib_util.h"
-#include "cdvdman.h"
+#include "cdvdman_opl.h"
 #include "cdvd_config.h"
 #include "device.h"
 
@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <io_common.h>
 #include <usbd.h>
+#include <cdvdman.h>
 #include "ioman_add.h"
 
 #include <defs.h>
@@ -110,7 +111,7 @@ typedef void (*StmCallback_t)(void);
 extern void SetStm0Callback(StmCallback_t callback);
 extern int cdvdman_AsyncRead(u32 lsn, u32 sectors, void *buf);
 extern int cdvdman_SyncRead(u32 lsn, u32 sectors, void *buf);
-extern int cdvdman_sendSCmd(u8 cmd, void *in, u32 in_size, void *out, u32 out_size);
+extern int cdvdman_sendSCmd(u8 cmd, const void *in, u16 in_size, void *out, u16 out_size);
 extern void cdvdman_cb_event(int reason);
 
 extern void cdvdman_init(void);

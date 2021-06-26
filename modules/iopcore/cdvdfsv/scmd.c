@@ -9,7 +9,7 @@
 typedef struct
 {
     int result;
-    cd_clock_t rtc;
+    sceCdCLOCK rtc;
 } cdvdreadclock_res_t;
 
 typedef struct
@@ -91,7 +91,7 @@ static inline void rpcSCmd_cdreadGUID(void *buf)
 
     cdvdSCmd_res_t *r = (cdvdSCmd_res_t *)buf;
 
-    r->result = sceCdReadGUID(&r->param1);
+    r->result = sceCdReadGUID((u64 *)&r->param1);
 }
 
 //-------------------------------------------------------------------------
@@ -151,7 +151,7 @@ static void *cbrpc_cdvdScmds(int fno, void *buf, int size)
             *(int *)buf = 1;
             break;
         case CDVDFSV_SCMD_POWEROFF:
-            *(int *)buf = sceCdPowerOff((int *)buf);
+            *(int *)buf = sceCdPowerOff((u32 *)buf);
             break;
         case CDVDFSV_SCMD_MMODE:
             *(int *)buf = sceCdMmode(*(int *)buf);

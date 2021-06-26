@@ -24,7 +24,7 @@ int sceCdSync(int mode)
 }
 
 //-------------------------------------------------------------------------
-int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
+int sceCdRead(u32 lsn, u32 sectors, void *buf, sceCdRMode *mode)
 {
     int result;
 
@@ -40,18 +40,18 @@ int sceCdRead(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
 }
 
 //-------------------------------------------------------------------------
-int sceCdReadCdda(u32 lsn, u32 sectors, void *buf, cd_read_mode_t *mode)
+int sceCdReadCdda(u32 lsn, u32 sectors, void *buf, sceCdRMode *mode)
 {
     return sceCdRead(lsn, sectors, buf, mode);
 }
 
 //-------------------------------------------------------------------------
-int sceCdGetToc(void *toc)
+int sceCdGetToc(u8 *toc)
 {
     if (sync_flag)
         return 0;
 
-    cdvdman_stat.err = CDVD_ERR_READ;
+    cdvdman_stat.err = SCECdErREAD;
 
     return 0; //Not supported
 }
@@ -64,9 +64,9 @@ int sceCdSeek(u32 lsn)
     if (sync_flag)
         return 0;
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.status = SCECdStatPause;
 
     cdvdman_cb_event(SCECdFuncSeek);
 
@@ -76,8 +76,8 @@ int sceCdSeek(u32 lsn)
 //-------------------------------------------------------------------------
 int sceCdStandby(void)
 {
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
 
     cdvdman_cb_event(SCECdFuncStandby);
 
@@ -90,9 +90,9 @@ int sceCdStop(void)
     if (sync_flag)
         return 0;
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
-    cdvdman_stat.status = CDVD_STAT_STOP;
+    cdvdman_stat.status = SCECdStatStop;
     cdvdman_cb_event(SCECdFuncStop);
 
     return 1;
@@ -106,9 +106,9 @@ int sceCdPause(void)
     if (sync_flag)
         return 0;
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.status = SCECdStatPause;
     cdvdman_cb_event(SCECdFuncPause);
 
     return 1;
@@ -118,7 +118,7 @@ int sceCdPause(void)
 int sceCdDiskReady(int mode)
 {
     DPRINTF("sceCdDiskReady %d\n", mode);
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
     if (cdvdman_cdinited) {
         if (mode == 0) {
@@ -127,14 +127,14 @@ int sceCdDiskReady(int mode)
         }
 
         if (!sync_flag)
-            return CDVD_READY_READY;
+            return SCECdComplete;
     }
 
-    return CDVD_READY_NOTREADY;
+    return SCECdNotReady;
 }
 
 //-------------------------------------------------------------------------
-int sceCdReadDiskID(void *DiskID)
+int sceCdReadDiskID(unsigned int *DiskID)
 {
     int i;
     u8 *p = (u8 *)DiskID;

@@ -7,27 +7,27 @@
 #include "cdvdfsv-internal.h"
 
 typedef struct
-{                     // size =0x124
-    cd_file_t cdfile; // 0x000
-    char name[256];   // 0x020
-    void *dest;       // 0x120
+{                      // size =0x124
+    sceCdlFILE cdfile; // 0x000
+    char name[256];    // 0x020
+    void *dest;        // 0x120
 } SearchFilePkt_t;
 
 typedef struct
-{                     // size =0x128
-    cd_file_t cdfile; // 0x000
-    u32 flag;         // 0x020
-    char name[256];   // 0x024
-    void *dest;       // 0x124
+{                      // size =0x128
+    sceCdlFILE cdfile; // 0x000
+    u32 flag;          // 0x020
+    char name[256];    // 0x024
+    void *dest;        // 0x124
 } SearchFilePkt2_t;
 
 typedef struct
-{                     // size =0x12c
-    cd_file_t cdfile; // 0x000
-    u32 flag;         // 0x020
-    char name[256];   // 0x024
-    void *dest;       // 0x124
-    int layer;        // 0x128
+{                      // size =0x12c
+    sceCdlFILE cdfile; // 0x000
+    u32 flag;          // 0x020
+    char name[256];    // 0x024
+    void *dest;        // 0x124
+    int layer;         // 0x128
 } SearchFilePktl_t;
 
 static SifRpcServerData_t cdsearchfile_rpcSD;
@@ -50,21 +50,21 @@ static void *cbrpc_cdsearchfile(int fno, void *buf, int size)
     if (size == sizeof(SearchFilePkt2_t)) {
         ee_addr = (void *)pkt2->dest; // Search File: Called from Not Dual_layer Version
         p = (void *)&pkt2->name[0];
-        pktsize = sizeof(cd_file_t) + sizeof(u32);
-        r = sceCdSearchFile((cd_file_t *)buf, p);
+        pktsize = sizeof(sceCdlFILE) + sizeof(u32);
+        r = sceCdSearchFile((sceCdlFILE *)buf, p);
         pkt2->flag = 0;
     } else {
         if (size > sizeof(SearchFilePkt2_t)) { // Search File: Called from Dual_layer Version
             ee_addr = (void *)pktl->dest;
             p = (char *)&pktl->name[0];
-            pktsize = sizeof(cd_file_t) + sizeof(u32);
-            r = sceCdLayerSearchFile((cd_file_t *)buf, p, pktl->layer);
+            pktsize = sizeof(sceCdlFILE) + sizeof(u32);
+            r = sceCdLayerSearchFile((sceCdlFILE *)buf, p, pktl->layer);
             pktl->flag = 0;
         } else { // Search File: Called from Old Library
             ee_addr = (void *)pkt->dest;
             p = (char *)&pkt->name[0];
-            pktsize = sizeof(cd_file_t);
-            r = sceCdSearchFile((cd_file_t *)buf, p);
+            pktsize = sizeof(sceCdlFILE);
+            r = sceCdSearchFile((sceCdlFILE *)buf, p);
         }
     }
 

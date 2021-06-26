@@ -16,8 +16,9 @@
 #include <thbase.h>
 #include <thevent.h>
 #include <thsemap.h>
+#include <cdvdman.h>
 
-#include "cdvdman.h"
+#include "cdvdman_opl.h"
 #include "smsutils.h"
 
 extern void cdvdfsv_register_scmd_rpc(SifRpcDataQueue_t *rpc_DQ);

@@ -118,7 +118,7 @@ static int cdvdman_open(iop_file_t *f, const char *filename, int mode)
 {
     int r = 0;
     FHANDLE *fh;
-    cd_file_t cdfile;
+    sceCdlFILE cdfile;
 
     WaitSema(cdrom_io_sema);
 
@@ -355,7 +355,7 @@ static int cdrom_getstat(iop_file_t *f, const char *filename, iox_stat_t *stat)
     cdrom_purifyPath(path_buffer); //Unlike the SCE original, purify the path right away.
 
     sceCdDiskReady(0);
-    return sceCdLayerSearchFile((cd_file_t *)&stat->attr, path_buffer, f->unit) - 1;
+    return sceCdLayerSearchFile((sceCdlFILE *)&stat->attr, path_buffer, f->unit) - 1;
 }
 
 //--------------------------------------------------------------
@@ -435,7 +435,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
     result = 0;
     switch (cmd) {
         case CDIOC_READCLOCK:
-            result = sceCdReadClock((cd_clock_t *)buf);
+            result = sceCdReadClock((sceCdCLOCK *)buf);
             if (result != 1)
                 result = -EIO;
             break;
@@ -460,7 +460,7 @@ static int cdrom_devctl(iop_file_t *f, const char *name, int cmd, void *args, u3
             *(int *)buf = sceCdStatus();
             break;
         case CDIOC_POWEROFF:
-            result = sceCdPowerOff((int *)args);
+            result = sceCdPowerOff((u32 *)args);
             if (result != 1)
                 result = -EIO;
             break;

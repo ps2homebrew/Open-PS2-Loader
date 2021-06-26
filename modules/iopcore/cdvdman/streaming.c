@@ -103,7 +103,7 @@ int sceCdStInit(u32 bufmax, u32 bankmax, void *iop_bufaddr)
 {
     int OldState;
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
 
     CancelAlarm(&StmScheduleCb, &cdvdman_stat.StreamingData);
 
@@ -260,7 +260,7 @@ static int ReadSectors(int maxcount, void *buffer)
     return result;
 }
 
-int sceCdStStart(u32 lsn, cd_read_mode_t *mode)
+int sceCdStStart(u32 lsn, sceCdRMode *mode)
 {
     int OldState;
 
@@ -276,8 +276,8 @@ int sceCdStStart(u32 lsn, cd_read_mode_t *mode)
     SetStm0Callback(&StmCallback);
     CpuResumeIntr(OldState);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
     StStartFillStreamBuffer();
 
     return 1;
@@ -286,7 +286,7 @@ int sceCdStStart(u32 lsn, cd_read_mode_t *mode)
 int sceCdStStat(void)
 {
     DPRINTF("StStat called: %u\n", cdvdman_stat.StreamingData.StStreamed);
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
     return cdvdman_stat.StreamingData.StStreamed;
 }
 
@@ -296,8 +296,8 @@ int sceCdStStop(void)
 
     DPRINTF("StStop called. Stat: 0x%x\n", cdvdman_stat.StreamingData.StStat);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
     if (cdvdman_stat.StreamingData.StStat) {
         CancelAlarm(&StmScheduleCb, &cdvdman_stat.StreamingData);
 
@@ -323,8 +323,8 @@ int sceCdStPause(void)
 
     DPRINTF("StPause called. Stat: 0x%x\n", cdvdman_stat.StreamingData.StStat);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
     if (cdvdman_stat.StreamingData.StStat) {
         CancelAlarm(&StmScheduleCb, &cdvdman_stat.StreamingData);
 
@@ -348,8 +348,8 @@ int sceCdStResume(void)
 
     DPRINTF("StResume called. Stat: 0x%x\n", cdvdman_stat.StreamingData.StStat);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
     if (cdvdman_stat.StreamingData.StStat) {
         CpuSuspendIntr(&OldState);
         //Resume
@@ -368,8 +368,8 @@ int sceCdStSeek(u32 lsn)
 {
     DPRINTF("StSeek: %lu\n", lsn);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
-    cdvdman_stat.status = CDVD_STAT_PAUSE;
+    cdvdman_stat.err = SCECdErNO;
+    cdvdman_stat.status = SCECdStatPause;
     if (cdvdman_stat.StreamingData.StStat) {
         return sceCdStStart(lsn, NULL);
     } else {
@@ -377,14 +377,14 @@ int sceCdStSeek(u32 lsn)
     }
 }
 
-int sceCdStRead(u32 sectors, void *buffer, u32 mode, u32 *error)
+int sceCdStRead(u32 sectors, u32 *buffer, u32 mode, u32 *error)
 {
     int SectorsRead, SectorsToRead, result;
     void *ptr;
 
     DPRINTF("StRead called: sectors %lu:%p, mode: %lu, stat: %u,%u\n", sectors, buffer, mode, cdvdman_stat.StreamingData.StStat, cdvdman_stat.StreamingData.StIsReading);
 
-    cdvdman_stat.err = CDVD_ERR_NO;
+    cdvdman_stat.err = SCECdErNO;
     if (cdvdman_stat.StreamingData.StStat) {
         SetEventFlag(cdvdman_stat.intr_ef, 8);
         for (SectorsToRead = sectors, result = 0, SectorsRead = 0, ptr = (void *)((u32)buffer & ~0x80000000); result < sectors; SectorsToRead -= SectorsRead, ptr += SectorsRead * 2048) {

@@ -81,7 +81,7 @@ void DeviceFSInit(void)
             sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12 ? "CD" : "DVD", cdvdman_settings.filename);
         }
 
-        smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
+        smb_OpenAndX(tmp_str, (u8 *)&cdvdman_settings.FIDs[i++], 0);
     } else {
         // Open all parts files
         for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
@@ -90,7 +90,7 @@ void DeviceFSInit(void)
             else
                 sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
 
-            smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
+            smb_OpenAndX(tmp_str, (u8 *)&cdvdman_settings.FIDs[i], 0);
         }
     }
 }

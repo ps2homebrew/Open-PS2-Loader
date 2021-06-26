@@ -494,7 +494,7 @@ int smb_TreeConnectAndX(char *ShareName)
 }
 
 //-------------------------------------------------------------------------
-int smb_OpenAndX(char *filename, u16 *FID, int Write)
+int smb_OpenAndX(char *filename, u8 *FID, int Write)
 {
     OpenAndXRequest_t *OR = &SMB_buf.smb.openAndXRequest;
     OpenAndXResponse_t *ORsp = &SMB_buf.smb.openAndXResponse;
@@ -543,7 +543,7 @@ int smb_OpenAndX(char *filename, u16 *FID, int Write)
         return -1000;
     }
 
-    *FID = ORsp->FID;
+    memcpy(FID, &ORsp->FID, 2);
 
     SIGNALIOSEMA(smb_io_sema);
 

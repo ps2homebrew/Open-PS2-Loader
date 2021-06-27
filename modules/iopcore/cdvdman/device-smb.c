@@ -4,30 +4,8 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
-#include "smsutils.h"
-#include "oplsmb.h"
-#include "smb.h"
 #include "smstcpip.h"
-#include "atad.h"
-#include "ioplib_util.h"
-#include "cdvdman.h"
 #include "internal.h"
-#include "cdvd_config.h"
-
-#include <loadcore.h>
-#include <stdio.h>
-#include <sysclib.h>
-#include <sysmem.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <intrman.h>
-#include <ioman.h>
-#include <thsemap.h>
-#include <errno.h>
-#include <io_common.h>
-#include "ioman_add.h"
-
-#include <errno.h>
 
 #include "device.h"
 
@@ -103,7 +81,7 @@ void DeviceFSInit(void)
             sprintf(tmp_str, "\\%s\\%s", cdvdman_settings.common.media == 0x12 ? "CD" : "DVD", cdvdman_settings.filename);
         }
 
-        smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i++], 0);
+        smb_OpenAndX(tmp_str, (u8 *)&cdvdman_settings.FIDs[i++], 0);
     } else {
         // Open all parts files
         for (i = 0; i < cdvdman_settings.common.NumParts; i++) {
@@ -112,7 +90,7 @@ void DeviceFSInit(void)
             else
                 sprintf(tmp_str, "\\%s.%02x", cdvdman_settings.filename, i);
 
-            smb_OpenAndX(tmp_str, &cdvdman_settings.FIDs[i], 0);
+            smb_OpenAndX(tmp_str, (u8 *)&cdvdman_settings.FIDs[i], 0);
         }
     }
 }
@@ -156,7 +134,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 
             smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
 
-            r += sectors_to_read << 11;
+            r += sectors_to_read * 2048;
             offslsn += sectors_to_read;
             sectors_to_read = sectors;
             lsn = nlsn;

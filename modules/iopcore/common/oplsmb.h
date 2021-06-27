@@ -1,3 +1,7 @@
+
+#ifndef __OPLSMB__
+#define __OPLSMB__
+
 typedef struct
 {
     u32 MaxBufferSize;
@@ -22,3 +26,5 @@ typedef void (*OplSmbPwHashFunc_t)(server_specs_t *ss);
 
 void smb_NegotiateProt(OplSmbPwHashFunc_t hash_callback);
 #define I_smb_NegotiateProt DECLARE_IMPORT(4, smb_NegotiateProt)
+
+#endif

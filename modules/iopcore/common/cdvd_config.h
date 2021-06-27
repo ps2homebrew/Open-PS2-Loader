@@ -1,3 +1,6 @@
+
+#ifndef __CDVD_CONFIG__
+#define __CDVD_CONFIG__
 #define IOPCORE_COMPAT_ALT_READ      0x0001
 #define IOPCORE_COMPAT_0_SKIP_VIDEOS 0x0002
 #define IOPCORE_COMPAT_EMU_DVDDL     0x0004
@@ -48,3 +51,5 @@ struct cdvdman_settings_bdm
     struct cdvdman_settings_common common;
     u32 LBAs[ISO_MAX_PARTS];
 } __attribute__((packed));
+
+#endif

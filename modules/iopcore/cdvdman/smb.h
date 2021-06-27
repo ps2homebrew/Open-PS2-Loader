@@ -501,7 +501,7 @@ int smb_NegotiateProtocol(char *SMBServerIP, int SMBServerPort, char *Username, 
 int smb_SessionSetupTreeConnect(char *share_name);
 int smb_SessionSetupAndX(u32 capabilities); // process a Session Setup message, for NT LM 0.12 dialect, Non Extended Security negociated
 int smb_TreeConnectAndX(char *ShareName);
-int smb_OpenAndX(char *filename, u16 *FID, int Write); // process a Open AndX message
+int smb_OpenAndX(char *filename, u8 *FID, int Write); // process a Open AndX message
 int smb_Close(int FID);
 int smb_ReadFile(u16 FID, u32 offsetlow, u32 offsethigh, void *readbuf, int nbytes);
 int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nbytes);

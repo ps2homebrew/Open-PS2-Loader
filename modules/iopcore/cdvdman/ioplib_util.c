@@ -9,7 +9,10 @@
 #include <sysclib.h>
 
 #include "ioplib_util.h"
+
 #include "smsutils.h"
+#define memcpy mips_memcpy
+#define memset mips_memset
 
 #ifdef __IOPCORE_DEBUG
 #define DPRINTF(args...) printf(args)
@@ -246,7 +249,7 @@ static int Hook_ReferModuleStatus(int id, ModuleStatus_t *status)
 
     mod = checkFakemodById(id, modulefake_list);
     if (mod != NULL) {
-        mips_memset(status, 0, sizeof(ModuleStatus_t));
+        memset(status, 0, sizeof(ModuleStatus_t));
         strcpy(status->name, mod->name);
         status->version = mod->version;
         status->id = mod->id;

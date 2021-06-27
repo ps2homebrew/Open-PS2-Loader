@@ -1,5 +1,5 @@
 IOP_BIN = cdvdfsv.irx
-IOP_OBJS = cdvdfsv.o imports.o exports.o
+IOP_OBJS = cdvdfsv.o searchfile.o ncmd.o scmd.o imports.o exports.o
 
 IOP_INCS += -I../common
 

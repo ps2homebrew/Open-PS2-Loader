@@ -776,7 +776,7 @@ int smb_WriteFile(u16 FID, u32 offsetlow, u32 offsethigh, void *writebuf, int nb
 //-------------------------------------------------------------------------
 int smb_ReadCD(unsigned int lsn, unsigned int nsectors, void *buf, int part_num)
 {
-    return smb_ReadFile(cdvdman_settings.FIDs[part_num], lsn << 11, lsn >> 21, buf, (int)(nsectors << 11));
+    return smb_ReadFile(cdvdman_settings.FIDs[part_num], lsn * 2048, lsn >> 21, buf, (int)(nsectors * 2048));
 }
 
 void smb_CloseAll(void)

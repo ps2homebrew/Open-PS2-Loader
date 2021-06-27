@@ -237,7 +237,7 @@ static inline void cdvdSt_read(void *buf)
     int r, rpos, remaining;
     void *ee_addr;
 
-    for (rpos = 0, ee_addr = St->buf, remaining = St->sectors; remaining > 0; ee_addr += r << 11, rpos += r, remaining -= r) {
+    for (rpos = 0, ee_addr = St->buf, remaining = St->sectors; remaining > 0; ee_addr += r * 2048, rpos += r, remaining -= r) {
         if ((r = sceCdStRead(remaining, (void *)((u32)ee_addr | 0x80000000), 0, &err)) < 1)
             break;
     }
@@ -348,12 +348,12 @@ static inline void cdvd_readchain(void *buf)
                     return;
                 }
                 sceCdSync(0);
-                sysmemSendEE(cdvdfsv_buf, (void *)addr, nsectors << 11);
+                sysmemSendEE(cdvdfsv_buf, (void *)addr, nsectors * 2048);
 
                 lsn += nsectors;
                 tsectors -= nsectors;
-                addr += nsectors << 11;
-                readpos += nsectors << 11;
+                addr += nsectors * 2048;
+                readpos += nsectors * 2048;
             }
         }
 

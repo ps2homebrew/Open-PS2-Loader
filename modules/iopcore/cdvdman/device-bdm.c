@@ -132,7 +132,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             count = sectors_to_read * g_bd_sectors_per_sector;
             g_bd->read(g_bd, sector, &p[r], count);
 
-            r += sectors_to_read << 11;
+            r += sectors_to_read * 2048;
             offslsn += sectors_to_read;
             sectors_to_read = sectors;
             lsn = nlsn;

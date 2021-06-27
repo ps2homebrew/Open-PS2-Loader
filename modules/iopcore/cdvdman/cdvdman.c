@@ -193,10 +193,10 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
             }
         }
 
-        ptr += SectorsToRead << 11;
+        ptr += SectorsToRead * 2048;
         remaining -= SectorsToRead;
         lsn += SectorsToRead;
-        ReadPos += SectorsToRead << 11;
+        ReadPos += SectorsToRead * 2048;
 
         if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS) {
             //Sleep until the required amount of time has been spent.
@@ -229,7 +229,7 @@ static int cdvdman_read(u32 lsn, u32 sectors, void *buf)
 
             rpos += nsectors;
             sectors -= nsectors;
-            nbytes = nsectors << 11;
+            nbytes = nsectors * 2048;
 
             memcpy(buf, cdvdman_buf, nbytes);
 

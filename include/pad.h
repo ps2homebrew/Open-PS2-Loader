@@ -1,7 +1,7 @@
 #ifndef __PAD_H
 #define __PAD_H
 
-//PAD handling
+// PAD handling
 
 #define KEY_LEFT     1
 #define KEY_DOWN     2
@@ -31,8 +31,8 @@ int getKeyOff(int num);
 int getKeyPressed(int num);
 
 /** Sets the repetition delay for the specified button
-* @param button id (KEY_XXX values)
-* @param btndelay the delay in miliseconds per repeat (clamped by framerate!) */
+ * @param button id (KEY_XXX values)
+ * @param btndelay the delay in miliseconds per repeat (clamped by framerate!) */
 void setButtonDelay(int button, int btndelay);
 
 /** Gets the repetition delay for the specified button */

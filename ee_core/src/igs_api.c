@@ -42,12 +42,12 @@ static void BlinkColour(u8 x, u32 colour, u8 forever)
     u8 i;
     do {
         delay(2);
-        GS_BGCOLOUR = 0x000000; //Black
+        GS_BGCOLOUR = 0x000000; // Black
         for (i = 1; i <= x; i++) {
             delay(1);
-            GS_BGCOLOUR = colour; //Chosen colour
+            GS_BGCOLOUR = colour; // Chosen colour
             delay(1);
-            GS_BGCOLOUR = 0x000000; //Black
+            GS_BGCOLOUR = 0x000000; // Black
         }
     } while (forever);
 }
@@ -72,11 +72,11 @@ static u32 FindEmptyArea(u32 start, u32 end, u32 emptysize)
     if (counter == emptysize) {
         result = (u32)addr - emptysize;
         result = (((result) >> 4) << 4); // It must be 16-bytes aligned
-        BlinkColour(2, 0x00FF00, 0);     //FOUND => Double Green :-)
+        BlinkColour(2, 0x00FF00, 0);     // FOUND => Double Green :-)
     } else {
-        //result = 0x00100000;									//1st. possible workaround: Use the ingame area (Typically starts on "0x00100000"). It must be 16-bytes aligned
-        result = ((0x01F32568 - emptysize - 16) >> 4) << 4; //2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
-        BlinkColour(2, 0x0066FF, 0);                        //Double Orange :-(
+        // result = 0x00100000;                                // 1st. possible workaround: Use the ingame area (Typically starts on "0x00100000"). It must be 16-bytes aligned
+        result = ((0x01F32568 - emptysize - 16) >> 4) << 4; // 2nd. possible workaround: Himem area ("0x01F32568" taken from  PS2LINK hi-mem).   It must be 16-bytes aligned
+        BlinkColour(2, 0x0066FF, 0);                        // Double Orange :-(
     }
 
     return result;
@@ -92,7 +92,7 @@ static void ClearBuffer(u8 *buffer, u32 size)
 
 static void u8todecstr(u8 input, char *output, u8 digits)
 {
-    u8 i = digits; //Number of digits (output)
+    u8 i = digits; // Number of digits (output)
     do {
         i--;
         output[i] = "0123456789"[input % 10];
@@ -107,7 +107,7 @@ static void u8todecstr(u8 input, char *output, u8 digits)
 
 static void u16todecstr(u16 input, char *output, u8 digits)
 {
-    u8 i = digits; //Number of digits (output)
+    u8 i = digits; // Number of digits (output)
     do {
         i--;
         output[i] = "0123456789"[input % 10];
@@ -122,7 +122,7 @@ static void u16todecstr(u16 input, char *output, u8 digits)
 
 static void u32todecstr(u32 input, char *output, u8 digits)
 {
-    u8 i = digits; //Number of digits (output)
+    u8 i = digits; // Number of digits (output)
     do {
         i--;
         output[i] = "0123456789"[input % 10];
@@ -137,7 +137,7 @@ static void u32todecstr(u32 input, char *output, u8 digits)
 
 static void u32tohexstr(u32 input, char *output, u8 digits)
 {
-    u8 i = digits; //Number of digits (output)
+    u8 i = digits; // Number of digits (output)
     do {
         i--;
         output[i] = "0123456789ABCDEF"[input % 16];
@@ -152,7 +152,7 @@ static void u32tohexstr(u32 input, char *output, u8 digits)
 
 static void u64tohexstr(u64 input, char *output, u8 digits)
 {
-    u8 i = digits; //Number of digits (output)
+    u8 i = digits; // Number of digits (output)
     do {
         i--;
         output[i] = "0123456789ABCDEF"[input % 16];
@@ -175,7 +175,7 @@ static u8 PixelSize(u8 spsm)
     else if ((spsm == GS_PSM_CT16) || (spsm == GS_PSM_CT16S))
         result = 2;
     else
-        BlinkColour(1, 0x0000FF, 1); //Red
+        BlinkColour(1, 0x0000FF, 1); // Red
     return result;
 }
 
@@ -183,7 +183,7 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
 {
 
     delay(1);
-    GS_BGCOLOUR = 0xCCFFFF; //Light Yellow
+    GS_BGCOLOUR = 0xCCFFFF; // Light Yellow
 
     static u128 EnableGIFPATH3;
 
@@ -205,10 +205,10 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
     u8 i;
 
     if ((sbw < 1) || (sbw > 32))
-        BlinkColour(2, 0x0000FF, 1); //Red
+        BlinkColour(2, 0x0000FF, 1); // Red
 
     if ((height < 64) || (height > 1080))
-        BlinkColour(3, 0x0000FF, 1); //Red
+        BlinkColour(3, 0x0000FF, 1); // Red
 
     // Number of qwords (each qword = 2^4 bytes = 16 bytes = 128 bits)
     qwords = image_size >> 4;
@@ -299,7 +299,7 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
         // Ensure that all the data has indeed been written back to main memory
         FlushCache(GS_WRITEBACK_DCACHE);
 
-        //Transfer image to host
+        // Transfer image to host
         *GS_D1_QWC = (8192 + ((i + 1 == slices) ? remainder : 0));
         *GS_D1_MADR = addr;
         *GS_D1_CHCR = 0x0100;
@@ -315,7 +315,7 @@ static void Screenshot(u16 sbp, u8 sbw, u8 spsm, u16 width, u16 height, u32 dime
             ;
 
         delay(1);
-        GS_BGCOLOUR = (0x00FFFF - (255 * i / slices) * 0x000101); //Yellow Fade Out Effect
+        GS_BGCOLOUR = (0x00FFFF - (255 * i / slices) * 0x000101); // Yellow Fade Out Effect
 
     } while (i < slices);
 
@@ -352,7 +352,7 @@ static void ConvertColors32(u32 *buffer, u32 dimensions)
         buffer[i] = ((x32 >> 16) & 0xFF) | ((x32 << 16) & 0xFF0000) | (x32 & 0xFF00FF00);
 
         FastDelay(1);
-        GS_BGCOLOUR = (0x0000FF - (255 * (i + 1) / dimensions) * 0x000001); //Red Fade Out Effect
+        GS_BGCOLOUR = (0x0000FF - (255 * (i + 1) / dimensions) * 0x000001); // Red Fade Out Effect
     }
 }
 
@@ -368,7 +368,7 @@ static void ConvertColors24(u8 *buffer, u32 image_size)
         buffer[i + 2] = (u8)((x32 >> 16) & 0xFF);
 
         FastDelay(1);
-        GS_BGCOLOUR = (0x00FF00 - (255 * (i + 1) / image_size) * 0x000100); //Green Fade Out Effect
+        GS_BGCOLOUR = (0x00FF00 - (255 * (i + 1) / image_size) * 0x000100); // Green Fade Out Effect
     }
 }
 
@@ -382,7 +382,7 @@ static void ConvertColors16(u16 *buffer, u32 dimensions)
         buffer[i] = (x16 & 0x8000) | ((x16 << 10) & 0x7C00) | (x16 & 0x3E0) | ((x16 >> 10) & 0x1F);
 
         FastDelay(1);
-        GS_BGCOLOUR = (0xFF0000 - (255 * (i + 1) / dimensions) * 0x010000); //Blue Fade Out Effect
+        GS_BGCOLOUR = (0xFF0000 - (255 * (i + 1) / dimensions) * 0x010000); // Blue Fade Out Effect
     }
 }
 
@@ -390,7 +390,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
 {
 
     delay(1);
-    GS_BGCOLOUR = 0x0099FF; //Orange
+    GS_BGCOLOUR = 0x0099FF; // Orange
 
     //  0000000001111111111222222222
     //  1234567890123456789012345678
@@ -423,7 +423,7 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
     // Create file
     file_handle = fioOpen(PathFilenameExtension, O_CREAT | O_WRONLY);
     if (file_handle < 0)
-        BlinkColour(4, 0x0000FF, 1); //Red
+        BlinkColour(4, 0x0000FF, 1); // Red
 
     _strcpy(text, "PS2 IGS (InGame Screenshot)\n---------------------------\n");
     _strcat(text, "\n\nGame ID=");
@@ -567,14 +567,14 @@ static void SaveTextFile(u32 buffer, u16 width, u16 height, u8 pixel_size, u32 i
     fioClose(file_handle);
 
     delay(1);
-    GS_BGCOLOUR = 0x000000; //Black
+    GS_BGCOLOUR = 0x000000; // Black
 }
 
 static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 intffmd)
 {
 
     delay(1);
-    GS_BGCOLOUR = 0x990066; //Purple Violet
+    GS_BGCOLOUR = 0x990066; // Purple Violet
 
     //  00000000011111111112222222222
     //  12345678901234567890123456789
@@ -597,7 +597,7 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
     BmpHeader *bh;
 
-    u8 Number = 0; //255 screenshots per-game should be enough? lol
+    u8 Number = 0; // 255 screenshots per-game should be enough? lol
 
     bpp = (pixel_size << 3);
 
@@ -608,8 +608,8 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
     // Sequential numbering feature
     while (1) {
-        if (Number == 255)               //255 screenshots per-game should be enough? lol
-            BlinkColour(6, 0x0000FF, 1); //Red
+        if (Number == 255)               // 255 screenshots per-game should be enough? lol
+            BlinkColour(6, 0x0000FF, 1); // Red
         Number++;
         _strcpy(PathFilenameExtension, "mc1:/");
         _strcat(PathFilenameExtension, GameID);
@@ -618,9 +618,9 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
         _strcat(PathFilenameExtension, u8text);
         _strcat(PathFilenameExtension, ").bmp");
         file_handle = fioOpen(PathFilenameExtension, O_RDONLY);
-        if (file_handle < 0) //There is no file with this Sequential Number; that's time for creating a new one.
+        if (file_handle < 0) // There is no file with this Sequential Number; that's time for creating a new one.
             break;
-        if (fioLseek(file_handle, 0, SEEK_END) == 0) { //There is a file with this Sequential Number but it's empty, so let's overwrite it.
+        if (fioLseek(file_handle, 0, SEEK_END) == 0) { // There is a file with this Sequential Number but it's empty, so let's overwrite it.
             fioClose(file_handle);
             break;
         }
@@ -629,13 +629,13 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
     // Create file
     file_handle = fioOpen(PathFilenameExtension, O_CREAT | O_WRONLY);
     if (file_handle < 0)
-        BlinkColour(4, 0x0000FF, 1); //Red
+        BlinkColour(4, 0x0000FF, 1); // Red
 
     // Write Bitmap Header
     //(first, write the BMP Header ID ouside of struct, due to alignment issues...)
     ret = fioWrite(file_handle, id, 2);
     if (ret != 2)
-        BlinkColour(5, 0x0000FF, 1); //Red
+        BlinkColour(5, 0x0000FF, 1); // Red
     //(...then, write the remaining info!)
     bh = buffer + image_size;
     bh->filesize = (u32)file_size;
@@ -657,10 +657,10 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
     ret = fioWrite(file_handle, bh, 52);
     if (ret != 52)
-        BlinkColour(5, 0x0000FF, 1); //Red
+        BlinkColour(5, 0x0000FF, 1); // Red
 
-    //Write image in reverse order (since BMP is written Left to Right, Bottom to Top)
-    if (intffmd == 3) //Interlace Mode, FRAME Mode (Read every line)
+    // Write image in reverse order (since BMP is written Left to Right, Bottom to Top)
+    if (intffmd == 3) // Interlace Mode, FRAME Mode (Read every line)
         height >>= 1;
     for (i = 1; i <= height; i++) {
         addr = buffer + ((height - i) * lenght);
@@ -670,20 +670,20 @@ static u8 SaveBitmapFile(u16 width, u16 height, u8 pixel_size, void *buffer, u8 
 
         ret = fioWrite(file_handle, addr, lenght);
         if (ret != lenght)
-            BlinkColour(5, 0x0000FF, 1); //Red
-        if (intffmd == 3) {              //Interlace Mode, FRAME Mode (Read every line)
+            BlinkColour(5, 0x0000FF, 1); // Red
+        if (intffmd == 3) {              // Interlace Mode, FRAME Mode (Read every line)
             ret = fioWrite(file_handle, addr, lenght);
             if (ret != lenght)
-                BlinkColour(5, 0x0000FF, 1); //Red
+                BlinkColour(5, 0x0000FF, 1); // Red
         }
-        GS_BGCOLOUR = (0xFFFFFF - (255 * i / height) * 0x010101); //Gray Fade Out Effect
+        GS_BGCOLOUR = (0xFFFFFF - (255 * i / height) * 0x010101); // Gray Fade Out Effect
     }
 
     // Close file
     fioClose(file_handle);
 
     delay(1);
-    GS_BGCOLOUR = 0x000000; //Black
+    GS_BGCOLOUR = 0x000000; // Black
 
     // Return the Sequential Number to the related Text File
     return Number;
@@ -743,10 +743,10 @@ int InGameScreenshot(void)
     pixel_size = PixelSize(spsm);
     image_size = dimensions * pixel_size;
 
-    //Try to find a empty (zeroed) area in EE RAM
-    buffer = (void *)FindEmptyArea(0x00100000, 0x02000000, image_size + 52); //image size + Bitmap Header (52 bytes)
+    // Try to find a empty (zeroed) area in EE RAM
+    buffer = (void *)FindEmptyArea(0x00100000, 0x02000000, image_size + 52); // image size + Bitmap Header (52 bytes)
 
-    //Take IGS
+    // Take IGS
     Screenshot(sbp, sbw, spsm, width, height, dimensions, pixel_size, image_size, buffer);
 
     // Color Space conversion from BGR to RGB (i.e. little endian => big endian)
@@ -754,39 +754,39 @@ int InGameScreenshot(void)
         case GS_PSM_CT32:
             buffer32 = (u32 *)UNCACHED_SEG(buffer);
             ConvertColors32(buffer32, dimensions);
-            break; //32-bit PS2 BGR  (PSMCT32  =  0, pixel_size=4) to BMP RGB conversion
+            break; // 32-bit PS2 BGR  (PSMCT32  =  0, pixel_size=4) to BMP RGB conversion
         case GS_PSM_CT24:
             buffer8 = (u8 *)UNCACHED_SEG(buffer);
             ConvertColors24(buffer8, image_size);
-            break; //24-bit PS2 BGR  (PSMCT24  =  1, pixel_size=3) to BMP RGB conversion
+            break; // 24-bit PS2 BGR  (PSMCT24  =  1, pixel_size=3) to BMP RGB conversion
         case GS_PSM_CT16:
             buffer16 = (u16 *)UNCACHED_SEG(buffer);
             ConvertColors16(buffer16, dimensions);
-            break; //16-bit PS2 BGR  (PSMCT16  =  2, pixel_size=2) to BMP RGB conversion
+            break; // 16-bit PS2 BGR  (PSMCT16  =  2, pixel_size=2) to BMP RGB conversion
         case GS_PSM_CT16S:
             buffer16 = (u16 *)UNCACHED_SEG(buffer);
             ConvertColors16(buffer16, dimensions);
-            break; //16-bit PS2 BGRA (PSMCT16S = 10, pixel_size=2) to BMP RGB conversion
+            break; // 16-bit PS2 BGRA (PSMCT16S = 10, pixel_size=2) to BMP RGB conversion
     }
 
     EI();
 
     delay(1);
-    GS_BGCOLOUR = 0x660033; //Midnight Blue
+    GS_BGCOLOUR = 0x660033; // Midnight Blue
 
-    //Load modules.
+    // Load modules.
     LoadFileInit();
     LoadModule("rom0:SIO2MAN", 0, NULL);
     LoadModule("rom0:MCMAN", 0, NULL);
 
-    //Save IGS Bitmap File first, since it's the bigger file)
+    // Save IGS Bitmap File first, since it's the bigger file)
     intffmd = GET_SMODE2_INTFFMD(smode2);
     Number = SaveBitmapFile(width, height, pixel_size, buffer, intffmd);
 
-    //The Number used on Bitmap File is returned to the related Text File, in order their both Sequential Numbers match
+    // The Number used on Bitmap File is returned to the related Text File, in order their both Sequential Numbers match
     SaveTextFile((u32)buffer, width, height, pixel_size, image_size, Number);
 
-    //Clear buffer
+    // Clear buffer
     ClearBuffer(buffer, image_size + 52);
 
     // Exit services
@@ -796,7 +796,7 @@ int InGameScreenshot(void)
     FlushCache(0);
     FlushCache(2);
 
-    BlinkColour(1, 0xFF0000, 0); //Double Blue :-)
+    BlinkColour(1, 0xFF0000, 0); // Double Blue :-)
 
     return 0;
 }

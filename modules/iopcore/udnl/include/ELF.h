@@ -106,12 +106,12 @@ struct iopmod_id
 
 struct iopmod
 {
-    struct iopmod_id *mod_id;   //0x00
-    void *EntryPoint;           //0x04
-    void *gp;                   //0x08
-    unsigned int text_size;     //0x0C
-    unsigned int data_size;     //0x10
-    unsigned int bss_size;      //0x14
-    unsigned short int version; //0x18
-    char modname[1];            //0x1A
+    struct iopmod_id *mod_id;   // 0x00
+    void *EntryPoint;           // 0x04
+    void *gp;                   // 0x08
+    unsigned int text_size;     // 0x0C
+    unsigned int data_size;     // 0x10
+    unsigned int bss_size;      // 0x14
+    unsigned short int version; // 0x18
+    char modname[1];            // 0x1A
 };

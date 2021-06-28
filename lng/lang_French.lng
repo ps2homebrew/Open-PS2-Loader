@@ -76,7 +76,7 @@ Fermeture du serveur HDL…
 Sortie via IGR vers :
 Arrière-plan
 Texte principal
-- PS2 - 
+- PS2 -
 - Serveur SMB -
 Type d'adresse IP
 Statique
@@ -127,7 +127,7 @@ Nom
 Taille
 État
 Progression
-La VMC existe déjà 
+La VMC existe déjà
 Fichier VMC non valide, taille incorrecte
 La VMC doit d'abord être créée
 Erreur sur VMC %s. Continuer sur la carte mém. physique %d ?
@@ -211,7 +211,7 @@ Logo PS2
 Affiche le logo de disque valide correspondant à la région de la console.
 PADEMU
 Configuration émulateur manette
-Émulateur manette 
+Émulateur manette
 Activer/Désactiver émulateur manette pour ce jeu
 Mode
 USB/Bluetooth
@@ -226,7 +226,7 @@ Activer/Désactiver support vibration pour le port sélectionné
 Adresse MAC du récepteur Bluetooth
 DualShock3 connectée à l'adresse MAC
 Appairer
-Appairer manette DS3 
+Appairer manette DS3
 Appairer manette DS3 avec l'adresse MAC du récepteur Bluetooth
 Non connecté
 Informations sur l'adaptateur Bluetooth

@@ -14,7 +14,7 @@ Cài đặt
 Menu
 Trò chơi trên USB
 Trò chơi trên HDD
-Trò chơi qua ETH 
+Trò chơi qua ETH
 Ứng dụng
 Chủ đề
 Ngôn ngữ
@@ -24,7 +24,7 @@ Hủy bỏ các cập nhật?
 %d: Không phát hiện ổ cứng
 %d: Ổ cứng chưa định dạng
 %d: Lỗi khởi chạy mạng
-%d: Không có adaptor mạng 
+%d: Không có adaptor mạng
 %d: Không thể kết nối đến SMB server
 %d: Không thể đăng nhập vào SMB server
 %d: Không mở được SMB share
@@ -53,7 +53,7 @@ Vui lòng chờ
 Lỗi khi nạp Game ID
 Tự động phân loại
 Lỗi nạp tập tin ngôn ngữ
-Ngắt màu Debug 
+Ngắt màu Debug
 Không có cần điều khiển, đợi chút...
 Bật Cover Art
 Màn hình rộng
@@ -62,13 +62,13 @@ Nạp cấu hình
 Lưu cấu hình
 Chọn thiết bị lưu trò chơi
 Làm mới
-Chọn USB 
-Chọn HDD 
-Chọn ETH 
+Chọn USB
+Chọn HDD
+Chọn ETH
 Hiển thị menu ứng dụng
 Tự động
 Thủ công
-Khởi chạy máy chủ HDL 
+Khởi chạy máy chủ HDL
 Máy chủ HDL khởi chạy...
 Máy chủ HDL đang chạy...
 khởi chạy máy chủ HDL thất bại.
@@ -96,8 +96,8 @@ IP
 NetBIOS
 Truy cập
 Mục này sẽ bị xóa vĩnh viễn, tiếp tục?
-Đổi tên 
-Xóa  
+Đổi tên
+Xóa
 Chạy
 Cài đặt hiển thị
 Kích hoạt thao tác ghi
@@ -143,7 +143,7 @@ Chế độ Video
 Màu hộp thoại
 Chọn màu
 Reset Colors
-Thông tin   
+Thông tin
 Tùy chỉnh ELF
 Màu sắc lựa chọn
 Kết nối lại
@@ -156,23 +156,23 @@ Chế độ
 VMC ở Khe 1
 VMC ở Khe 2
 Game ID
-Chế độ DMA 
+Chế độ DMA
 V-Sync
-Mode 1  
-Mode 2  
-Mode 3  
-Mode 4  
-Mode 5  
-Mode 6  
-Mode 7  
-Mode 8  
+Mode 1
+Mode 2
+Mode 3
+Mode 4
+Mode 5
+Mode 6
+Mode 7
+Mode 8
 Cấu hình GSM
 Ethernet Link Mode
 100Mbit Full-duplex
 100Mbit Half-duplex
 10Mbit Full-duplex
 10Mbit Half-duplex
-Cài đặt GSM 
+Cài đặt GSM
 Bật GSM
 Bật hoặc tắt GSM
 VMODE
@@ -185,10 +185,10 @@ Overscan
 Overscan Adjustment
 Bỏ qua FMV
 Bỏ qua Full Motion Videos
-Cài đặt Cheat 
+Cài đặt Cheat
 Bật PS2RD Cheat Engine
 Hãy để PS2RD Cheat Engine vá vào trò chơi
-Chế độ PS2RD Cheat Engine 
+Chế độ PS2RD Cheat Engine
 Tự động chọn hoặc chọn trò chơi ăn gian
 Tự động chọn cheats
 Chọn cheats trò chơi
@@ -207,7 +207,7 @@ Tải về mặc định
 Tự khởi động trong %i s...
 Tự khởi động
 đơn vị bằng giây(s), 0 để ngắt tự khởi động
-Logo PS2 
+Logo PS2
 Displayed for a valid disc logo matching the console's region.
 Cấu hình PADEMU
 Cài đặt giả lập tay cầm
@@ -239,7 +239,7 @@ Yes
 No
 Bluetooth adapter phải tương thích với tay cầm DS3/DS4.
 Bluetooth adapter có thể không hoạt động chính xác với tay cầm DS3/DS4.
-Bật giả lập Multitap 
+Bật giả lập Multitap
 Bật/tắt giả lập Multitap cho trò chơi đã chọn.
 Giả lập Multitap tại cổng
 Chọn cổng giả lập Multitap.

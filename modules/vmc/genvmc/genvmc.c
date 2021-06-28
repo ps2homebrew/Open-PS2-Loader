@@ -180,7 +180,7 @@ static int mc_getmcrtime(sceMcStDateTime *time)
         time->Hour = btoi(cdtime.hour);
         time->Day = btoi(cdtime.day);
 
-        if ((cdtime.month & 0x10) != 0) //Keep only valid bits: 0x1f (for month values 1-12 in BCD)
+        if ((cdtime.month & 0x10) != 0) // Keep only valid bits: 0x1f (for month values 1-12 in BCD)
             time->Month = (cdtime.month & 0xf) + 0xa;
         else
             time->Month = cdtime.month & 0xf;

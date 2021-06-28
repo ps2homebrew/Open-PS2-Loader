@@ -41,16 +41,16 @@
 // Last Played Auto Start
 #include <time.h>
 
-//Master password for disabling the parental lock.
+// Master password for disabling the parental lock.
 #define OPL_PARENTAL_LOCK_MASTER_PASS "989765"
 
-//IO type IDs
+// IO type IDs
 #define IO_CUSTOM_SIMPLEACTION    1 // handler for parameter-less actions
 #define IO_MENU_UPDATE_DEFFERED   2
 #define IO_CACHE_LOAD_ART         3 // io call to handle the loading of covers
 #define IO_COMPAT_UPDATE_DEFFERED 4
 
-//Codes have been planned to fit the design of the GUI functions within gui.c.
+// Codes have been planned to fit the design of the GUI functions within gui.c.
 #define OPL_COMPAT_UPDATE_STAT_WIP        0
 #define OPL_COMPAT_UPDATE_STAT_DONE       1
 #define OPL_COMPAT_UPDATE_STAT_ERROR      -1
@@ -93,11 +93,11 @@ extern int ps2_ip[4];
 extern int ps2_netmask[4];
 extern int ps2_gateway[4];
 extern int ps2_dns[4];
-extern int gETHOpMode; //See ETH_OP_MODES.
+extern int gETHOpMode; // See ETH_OP_MODES.
 extern int gPCShareAddressIsNetBIOS;
 extern int pc_ip[4];
 extern int gPCPort;
-//Please keep these string lengths in-sync with the limits within CDVDMAN.
+// Please keep these string lengths in-sync with the limits within CDVDMAN.
 extern char gPCShareNBAddress[17];
 extern char gPCShareName[32];
 extern char gPCUserName[32];
@@ -167,7 +167,7 @@ extern int gDefaultDevice;
 extern int gEnableWrite;
 
 extern char *gHDDPrefix;
-//These prefixes are relative to the device's name (meaning that they do not include the device name).
+// These prefixes are relative to the device's name (meaning that they do not include the device name).
 extern char gBDMPrefix[32];
 extern char gETHPrefix[32];
 
@@ -188,8 +188,11 @@ void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19
 
-// BLURT output
-//char blurttext[128];
-//#define BLURT	snprintf(blurttext, sizeof(blurttext), "%s\\%s(%d)", __FILE__ , __func__ , __LINE__ );delay(10);
-//#define BLURT snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__);
+/*
+BLURT output char blurttext[128];
+#define BLURT                                                                           \
+    snprintf(blurttext, sizeof(blurttext), "%s\\%s(%d)", __FILE__, __func__, __LINE__); \
+    delay(10);
+#define BLURT snprintf(blurttext, sizeof(blurttext), "%s(%d)", blurttext, __LINE__);
+*/
 #endif

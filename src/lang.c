@@ -368,7 +368,7 @@ static int lngLoadFromFile(char *path, char *name)
         // remember how many entries were read from the file (for the free later)
         nValidEntries = newEntries;
 
-        int len = strlen(path) - strlen(name) - 9; //-4 for extension,  -5 for prefix
+        int len = strlen(path) - strlen(name) - 9; // -4 for extension,  -5 for prefix
         memcpy(dir, path, len);
         dir[len] = '\0';
 

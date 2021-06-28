@@ -163,21 +163,21 @@ static int addAppsLegacyList(struct app_info_linked **appsLinkedList)
         strncpy(app->app.title, cur->key, APP_TITLE_MAX + 1);
         app->app.title[APP_TITLE_MAX] = '\0';
 
-        //Split the boot filename from the path.
+        // Split the boot filename from the path.
         const char *elfname = appGetELFName(cur->val);
         if (elfname != cur->val) {
             strncpy(app->app.boot, elfname, APP_BOOT_MAX + 1);
             app->app.boot[APP_BOOT_MAX] = '\0';
 
             int pathlen = (int)(elfname - cur->val) - 1;
-            if (cur->val[pathlen] == ':') //Discard only '/'.
+            if (cur->val[pathlen] == ':') // Discard only '/'.
                 pathlen++;
             if (pathlen > APP_PATH_MAX)
                 pathlen = APP_PATH_MAX;
             strncpy(app->app.path, cur->val, pathlen);
             app->app.path[pathlen] = '\0';
         } else {
-            //Cannot split boot filename from the path, somehow.
+            // Cannot split boot filename from the path, somehow.
             strncpy(app->app.boot, cur->val, APP_BOOT_MAX + 1);
             app->app.boot[APP_BOOT_MAX] = '\0';
             strncpy(app->app.path, cur->val, APP_PATH_MAX + 1);
@@ -241,10 +241,10 @@ static int appUpdateItemList(void)
 
     appsLinkedList = NULL;
 
-    //Get legacy apps list first, so it is possible to use appGetConfigValue(id).
+    // Get legacy apps list first, so it is possible to use appGetConfigValue(id).
     appItemCount += addAppsLegacyList(&appsLinkedList);
 
-    //Scan devices for apps.
+    // Scan devices for apps.
     appItemCount += oplScanApps(&appScanCallback, &appsLinkedList);
 
     // Generate apps list
@@ -252,7 +252,7 @@ static int appUpdateItemList(void)
         appsList = malloc(appItemCount * sizeof(app_info_t));
 
         if (appsList != NULL) {
-            for (i = 0; appsLinkedList != NULL; i++) { //appsLinkedList contains items in reverse order.
+            for (i = 0; appsLinkedList != NULL; i++) { // appsLinkedList contains items in reverse order.
                 memcpy(&appsList[appItemCount - i - 1], &appsLinkedList->app, sizeof(app_info_t));
 
                 appNext = appsLinkedList->next;
@@ -354,17 +354,17 @@ static void appLaunchItem(int id, config_set_t *configSet)
     int mode, fd;
     const char *filename;
 
-    //Retrieve configuration set by appGetConfig()
+    // Retrieve configuration set by appGetConfig()
     configGetStr(configSet, CONFIG_ITEM_STARTUP, &filename);
 
     fd = open(filename, O_RDONLY);
     if (fd >= 0) {
         close(fd);
 
-        //To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
+        // To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
         mode = oplPath2Mode(filename);
         if (mode < 0)
-            mode = APP_MODE; //Legacy apps mode on memory card (mc?:/*)
+            mode = APP_MODE; // Legacy apps mode on memory card (mc?:/*)
 
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
         sysExecElf(filename);
@@ -393,7 +393,7 @@ static config_set_t *appGetConfig(int id)
         snprintf(path, sizeof(path), "%s/%s", appsList[id].path, APP_TITLE_CONFIG_FILE);
 
         config = configAlloc(0, NULL, path);
-        configRead(config); //Does not matter if the config file could be loaded or not.
+        configRead(config); // Does not matter if the config file could be loaded or not.
 
         configSetStr(config, CONFIG_ITEM_NAME, appsList[id].boot);
         configSetStr(config, CONFIG_ITEM_LONGNAME, appsList[id].title);
@@ -415,7 +415,7 @@ static int appGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return oplGetAppImage(device, folder, isRelative, startup, suffix, resultTex, psm);
 }
 
-//This may be called, even if appInit() was not.
+// This may be called, even if appInit() was not.
 static void appCleanUp(int exception)
 {
     if (appItemList.enabled) {
@@ -425,7 +425,7 @@ static void appCleanUp(int exception)
     }
 }
 
-//This may be called, even if appInit() was not.
+// This may be called, even if appInit() was not.
 static void appShutdown(void)
 {
     if (appItemList.enabled) {

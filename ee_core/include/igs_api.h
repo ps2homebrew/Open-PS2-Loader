@@ -38,13 +38,13 @@
 #define GS_TRXDIR    0x53
 #define GS_FINISH    0x61
 
-//Pixel storage format
-#define GS_PSM_CT32  0x00 //32 bits = 4 bytes		Example: SLUS_202.73 (Namco Museum 50th Anniversary)
-#define GS_PSM_CT24  0x01 //24 bits = 3 bytes		Example: SLPS_250.88 (Final Fantasy X International)
-#define GS_PSM_CT16  0x02 //16 bits = 2 bytes		Example: SLUS_215.56 (Konami Kids Playground: Dinosaurs Shapes & Colors)
-#define GS_PSM_CT16S 0x0A //16 bits = 2 bytes		Example: SLUS_215.41 (Ratatouille)
+// Pixel storage format
+#define GS_PSM_CT32  0x00 // 32 bits = 4 bytes    Example: SLUS_202.73 (Namco Museum 50th Anniversary)
+#define GS_PSM_CT24  0x01 // 24 bits = 3 bytes    Example: SLPS_250.88 (Final Fantasy X International)
+#define GS_PSM_CT16  0x02 // 16 bits = 2 bytes    Example: SLUS_215.56 (Konami Kids Playground: Dinosaurs Shapes & Colors)
+#define GS_PSM_CT16S 0x0A // 16 bits = 2 bytes    Example: SLUS_215.41 (Ratatouille)
 
-//Channel #1 (VIF1)
+// Channel #1 (VIF1)
 #define GS_VIF1_STAT           ((volatile u32 *)(0x10003c00)) // VIF Status Register
 #define GS_VIF1_STAT_FDR       (1 << 23)                      // VIF1-FIFO transfer direction: VIF1 -> Main memory/SPRAM"
 #define GS_VIF1_MSKPATH3(mask) ((u32)(mask) | ((u32)0x06 << 24))
@@ -53,7 +53,7 @@
 #define GS_VIF1_DIRECT(count)  ((u32)(count) | ((u32)(0x50) << 24))
 #define GS_VIF1_FIFO           ((volatile u128 *)(0x10005000))
 
-//DMA CH1 REGISTERS (Linked to VIF1)
+// DMA CH1 REGISTERS (Linked to VIF1)
 #define GS_D1_CHCR ((volatile u32 *)(0x10009000))
 #define GS_D1_MADR ((volatile u32 *)(0x10009010))
 #define GS_D1_QWC  ((volatile u32 *)(0x10009020))
@@ -61,7 +61,7 @@
 #define GS_D1_ASR0 ((volatile u32 *)(0x10009040))
 #define GS_D1_ASR1 ((volatile u32 *)(0x10009050))
 
-//Channel #2 (GIF)
+// Channel #2 (GIF)
 #define GS_GIF_AD 0x0e
 
 #define GS_GIFTAG(NLOOP, EOP, PRE, PRIM, FLG, NREG) \
@@ -72,7 +72,7 @@
         ((u64)(FLG) << 58) |                        \
         ((u64)(NREG) << 60)
 
-//GS Registers
+// GS Registers
 #define GS_GSBITBLTBUF_SET(sbp, sbw, spsm, dbp, dbw, dpsm) \
     ((u64)(sbp) | ((u64)(sbw) << 16) |                     \
      ((u64)(spsm) << 24) | ((u64)(dbp) << 32) |            \
@@ -94,7 +94,7 @@
 #define GS_GSTRXREG    0x52
 #define GS_GSTRXDIR    0x53
 
-//GS Priviledge Registers
+// GS Priviledge Registers
 #define GS_CSR_FINISH (1 << 1)
 #define GS_CSR        (volatile u64 *)0x12001000 // GS CSR (GS System Status) Register
 #define GS_IMR        (volatile u64 *)0x12001010 // GS IMR (GS Interrupt Mask) Register
@@ -115,7 +115,7 @@
 
 #define GS_WRITEBACK_DCACHE 0
 
-//GSM Stuff
+// GSM Stuff
 struct GSMSourceSetGsCrt
 {
     s16 interlace;

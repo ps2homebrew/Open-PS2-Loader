@@ -1,15 +1,15 @@
 /****************************************************************/ /**
- *
- * @file nbd_opts.h
- *
- * @author   Ronan Bignaux <ronan@aimao.org>
- *
- * @brief    Network Block Device Protocol implementation options
- *
- * Copyright (c) Ronan Bignaux. 2021
- * All rights reserved.
- *
- ********************************************************************/
+                                                                    *
+                                                                    * @file nbd_opts.h
+                                                                    *
+                                                                    * @author   Ronan Bignaux <ronan@aimao.org>
+                                                                    *
+                                                                    * @brief    Network Block Device Protocol implementation options
+                                                                    *
+                                                                    * Copyright (c) Ronan Bignaux. 2021
+                                                                    * All rights reserved.
+                                                                    *
+                                                                    ********************************************************************/
 
 /*
  * Redistribution and use in source and binary forms, with or without

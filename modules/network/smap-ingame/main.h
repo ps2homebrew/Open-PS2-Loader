@@ -1,5 +1,5 @@
-//In the SONY original, all the calls to DEBUG_PRINTF() were to sceInetPrintf().
-#define DEBUG_PRINTF(args...) //printf(args)
+// In the SONY original, all the calls to DEBUG_PRINTF() were to sceInetPrintf().
+#define DEBUG_PRINTF(args...) // printf(args)
 
 #define MAX_FRAME_SIZE 1518
 

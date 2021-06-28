@@ -267,10 +267,10 @@ file_buffer_t *openFileBuffer(char *fpath, int mode, short allocResult, unsigned
         if (mode == O_RDONLY) {
             fileBuffer->lastPtr = NULL;
 
-            //Check for and skip the UTF-8 BOM sequence.
+            // Check for and skip the UTF-8 BOM sequence.
             if ((read(fd, bom, sizeof(bom)) != 3) ||
                 (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF)) {
-                //Not BOM, so rewind.
+                // Not BOM, so rewind.
                 lseek(fd, 0, SEEK_SET);
             }
         } else
@@ -292,7 +292,7 @@ file_buffer_t *openFileBufferBuffer(short allocResult, const void *buffer, unsig
     fileBuffer->size = size;
     fileBuffer->available = size;
     fileBuffer->buffer = (char *)malloc((size + 1) * sizeof(char));
-    fileBuffer->lastPtr = fileBuffer->buffer; //O_RDONLY, but with the data in the buffer.
+    fileBuffer->lastPtr = fileBuffer->buffer; // O_RDONLY, but with the data in the buffer.
     fileBuffer->allocResult = allocResult;
     fileBuffer->fd = -1;
     fileBuffer->mode = O_RDONLY;
@@ -313,8 +313,8 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
         if (fileBuffer->lastPtr) {
             // Calculate the remaining chars to the right of lastPtr
             lineSize = fileBuffer->available - (fileBuffer->lastPtr - fileBuffer->buffer);
-            /*LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
-					fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]);*/
+            /* LOG("##### Continue read, position: %X (total: %d) line size (\\0 not inc.): %d end: %x\n",
+                fileBuffer->lastPtr - fileBuffer->buffer, fileBuffer->available, lineSize, fileBuffer->lastPtr[lineSize]); */
             posLF = strchr(fileBuffer->lastPtr, '\n');
         }
 
@@ -322,7 +322,7 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
             // if available, we shift the remaining chars to the left ...
             if (lineSize) {
-                //LOG("##### LF not found, Shift %d characters from end to beginning\n", lineSize);
+                // LOG("##### LF not found, Shift %d characters from end to beginning\n", lineSize);
                 memmove(fileBuffer->buffer, fileBuffer->lastPtr, lineSize);
             }
 
@@ -331,7 +331,7 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
                 // Load as many characters necessary to fill the buffer
                 length = fileBuffer->size - lineSize - 1;
-                //LOG("##### Asking for %d characters to complete buffer\n", length);
+                // LOG("##### Asking for %d characters to complete buffer\n", length);
                 readSize = read(fileBuffer->fd, fileBuffer->buffer + lineSize, length);
                 fileBuffer->buffer[lineSize + readSize] = '\0';
 
@@ -340,11 +340,11 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
                 // Now update read context info
                 lineSize = lineSize + readSize;
-                //LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
+                // LOG("##### %d characters really read, line size now (\\0 not inc.): %d\n", read, lineSize);
 
                 // If buffer not full it means we are at EOF
                 if (fileBuffer->size != lineSize + 1) {
-                    //LOG("##### Reached EOF\n");
+                    // LOG("##### Reached EOF\n");
                     close(fileBuffer->fd);
                     fileBuffer->fd = -1;
                 }
@@ -365,7 +365,7 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
         fileBuffer->lastPtr[lineSize] = '\0';
         *outBuf = fileBuffer->lastPtr;
 
-        //LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", fileBuffer->lastPtr, lineSize, fileBuffer->available, fileBuffer->lastPtr - fileBuffer->buffer);
+        // LOG("##### Result line is \"%s\" size: %d avail: %d pos: %d\n", fileBuffer->lastPtr, lineSize, fileBuffer->available, fileBuffer->lastPtr - fileBuffer->buffer);
 
         // If we are at EOF and no more chars available to scan, then we are finished
         if (!lineSize && !fileBuffer->available && fileBuffer->fd == -1)
@@ -397,23 +397,23 @@ int readFileBuffer(file_buffer_t *fileBuffer, char **outBuf)
 
 void writeFileBuffer(file_buffer_t *fileBuffer, char *inBuf, int size)
 {
-    //LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
+    // LOG("writeFileBuffer avail: %d size: %d\n", fileBuffer->available, size);
     if (fileBuffer->available && fileBuffer->available + size > fileBuffer->size) {
-        //LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
+        // LOG("writeFileBuffer flushing: %d\n", fileBuffer->available);
         write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         fileBuffer->lastPtr = fileBuffer->buffer;
         fileBuffer->available = 0;
     }
 
     if (size > fileBuffer->size) {
-        //LOG("writeFileBuffer direct write: %d\n", size);
+        // LOG("writeFileBuffer direct write: %d\n", size);
         write(fileBuffer->fd, inBuf, size);
     } else {
         memcpy(fileBuffer->lastPtr, inBuf, size);
         fileBuffer->lastPtr += size;
         fileBuffer->available += size;
 
-        //LOG("writeFileBuffer lastPrt: %d\n", (fileBuffer->lastPtr - fileBuffer->buffer));
+        // LOG("writeFileBuffer lastPrt: %d\n", (fileBuffer->lastPtr - fileBuffer->buffer));
     }
 }
 
@@ -421,7 +421,7 @@ void closeFileBuffer(file_buffer_t *fileBuffer)
 {
     if (fileBuffer->fd >= 0) {
         if (fileBuffer->mode != O_RDONLY && fileBuffer->available) {
-            //LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
+            // LOG("writeFileBuffer final write: %d\n", fileBuffer->available);
             write(fileBuffer->fd, fileBuffer->buffer, fileBuffer->available);
         }
         close(fileBuffer->fd);
@@ -493,7 +493,7 @@ int InitConsoleRegionData(void)
             case 'A':
                 ConsoleRegion = CONSOLE_REGION_USA;
                 break;
-            default: //For Japanese and unidentified consoles.
+            default: // For Japanese and unidentified consoles.
                 ConsoleRegion = CONSOLE_REGION_JAPAN;
         }
 

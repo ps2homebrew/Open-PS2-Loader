@@ -31,7 +31,7 @@ void *GetExportTable(char *libname, int version)
     return NULL;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Returns number of entries in the export table */
 u32 GetExportTableSize(void *table)
@@ -49,7 +49,7 @@ u32 GetExportTableSize(void *table)
     return size;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Returns an entry from the export table */
 void *GetExportEntry(void *table, u32 entry)
@@ -65,7 +65,7 @@ void *GetExportEntry(void *table, u32 entry)
     return NULL;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Replaces an entry in the export table */
 void *HookExportEntry(void *table, u32 entry, void *func)
@@ -89,7 +89,7 @@ void *HookExportEntry(void *table, u32 entry, void *func)
     return NULL;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Allocates system memory on IOP */
 void *_SysAlloc(u64 size)
@@ -104,7 +104,7 @@ void *_SysAlloc(u64 size)
     return p;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Frees system memory on IOP */
 int _SysFree(void *area)
@@ -119,7 +119,7 @@ int _SysFree(void *area)
     return r;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Makes an integer value */
 int GetInt(void *ptr)
@@ -131,7 +131,7 @@ int GetInt(void *ptr)
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Calculates a "checksum" */
 u32 CalculateEDC(u8 *buf, u32 size)
@@ -147,7 +147,7 @@ u32 CalculateEDC(u8 *buf, u32 size)
     return x & 0xFF;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Calculates ECC for a 0x80 bytes of data */
 void CalculateECC(u8 *buf, void *chk)
@@ -176,7 +176,7 @@ void CalculateECC(u8 *buf, void *chk)
     ptr[2] = ~c3 & 0x7F;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 // End of file: mcsiosys.c

@@ -540,7 +540,7 @@ tcp_process(struct tcp_pcb *pcb)
                 tcp_parseopt(pcb);
 
                 /* Call the user specified function to call when sucessfully
-       * connected. */
+                 * connected. */
                 TCP_EVENT_CONNECTED(pcb, ERR_OK, err);
                 tcp_ack(pcb);
             }
@@ -559,12 +559,12 @@ tcp_process(struct tcp_pcb *pcb)
                     TCP_EVENT_ACCEPT(pcb, ERR_OK, err);
                     if (err != ERR_OK) {
                         /* If the accept function returns with an error, we abort
-           * the connection. */
+                         * the connection. */
                         tcp_abort(pcb);
                         return ERR_ABRT;
                     }
                     /* If there was any data contained within this ACK,
-         * we'd better pass it on to the application as well. */
+                     * we'd better pass it on to the application as well. */
                     tcp_receive(pcb);
                     pcb->cwnd = pcb->mss;
                 }
@@ -706,8 +706,8 @@ tcp_receive(struct tcp_pcb *pcb)
             /* We come here when the ACK acknowledges new data. */
 
             /* Reset the "IN Fast Retransmit" flag, since we are no longer
-	         in fast retransmit. Also reset the congestion window to the
-	         slow start threshold. */
+             in fast retransmit. Also reset the congestion window to the
+             slow start threshold. */
             if (pcb->flags & TF_INFR) {
                 pcb->flags &= ~TF_INFR;
                 pcb->cwnd = pcb->ssthresh;
@@ -752,11 +752,11 @@ tcp_receive(struct tcp_pcb *pcb)
         }
 
         /* We go through the ->unsent list to see if any of the segments
-	      on the list are acknowledged by the ACK. This may seem
-	      strange since an "unsent" segment shouldn't be acked. The
-	      rationale is that lwIP puts all outstanding segments on the
-	      ->unsent list after a retransmission, so these segments may
-	      in fact have been sent once. */
+          on the list are acknowledged by the ACK. This may seem
+          strange since an "unsent" segment shouldn't be acked. The
+          rationale is that lwIP puts all outstanding segments on the
+          ->unsent list after a retransmission, so these segments may
+          in fact have been sent once. */
         while (pcb->unsent != NULL && TCP_SEQ_LEQ((lLen = ntohl(pcb->unsent->tcphdr->seqno)) + TCP_TCPLEN(pcb->unsent), ackno) &&
                TCP_SEQ_LEQ(ackno, pcb->snd_max)) {
             next = pcb->unsent;
@@ -772,7 +772,7 @@ tcp_receive(struct tcp_pcb *pcb)
         /* End of ACK for new data processing. */
 
         /* RTT estimation calculations. This is done by checking if the incoming segment acknowledges the segment we use to take a
-			round-trip time measurement. */
+           round-trip time measurement. */
         if (pcb->rttest && TCP_SEQ_LT(pcb->rtseq, ackno)) {
             m = tcp_ticks - pcb->rttest;
 
@@ -794,53 +794,53 @@ tcp_receive(struct tcp_pcb *pcb)
     if (tcplen > 0) {
         /* This code basically does three things:
 
-			+) If the incoming segment contains data that is the next
-				in-sequence data, this data is passed to the application. This
-				might involve trimming the first edge of the data. The rcv_nxt
-				variable and the advertised window are adjusted.
+            +) If the incoming segment contains data that is the next
+                in-sequence data, this data is passed to the application. This
+                might involve trimming the first edge of the data. The rcv_nxt
+                variable and the advertised window are adjusted.
 
-			+) If the incoming segment has data that is above the next
-				sequence number expected (->rcv_nxt), the segment is placed on
-				the ->ooseq queue. This is done by finding the appropriate
-				place in the ->ooseq queue (which is ordered by sequence
-				number) and trim the segment in both ends if needed. An
-				immediate ACK is sent to indicate that we received an
-				out-of-sequence segment.
+            +) If the incoming segment has data that is above the next
+                sequence number expected (->rcv_nxt), the segment is placed on
+                the ->ooseq queue. This is done by finding the appropriate
+                place in the ->ooseq queue (which is ordered by sequence
+                number) and trim the segment in both ends if needed. An
+                immediate ACK is sent to indicate that we received an
+                out-of-sequence segment.
 
-			+) Finally, we check if the first segment on the ->ooseq queue
-				now is in sequence (i.e., if rcv_nxt >= ooseq->seqno). If
-				rcv_nxt > ooseq->seqno, we must trim the first edge of the
-				segment on ->ooseq before we adjust rcv_nxt. The data in the
-				segments that are now on sequence are chained onto the
-				incoming segment so that we only need to call the application
-				once.
-		*/
+            +) Finally, we check if the first segment on the ->ooseq queue
+                now is in sequence (i.e., if rcv_nxt >= ooseq->seqno). If
+                rcv_nxt > ooseq->seqno, we must trim the first edge of the
+                segment on ->ooseq before we adjust rcv_nxt. The data in the
+                segments that are now on sequence are chained onto the
+                incoming segment so that we only need to call the application
+                once.
+        */
 
         /* First, we check if we must trim the first edge. We have to do
-			this if the sequence number of the incoming segment is less
-			than rcv_nxt, and the sequence number plus the length of the
-			segment is larger than rcv_nxt. */
+            this if the sequence number of the incoming segment is less
+            than rcv_nxt, and the sequence number plus the length of the
+            segment is larger than rcv_nxt. */
         if (TCP_SEQ_LT(seqno, pcb->rcv_nxt)) {
             if (TCP_SEQ_LT(pcb->rcv_nxt, seqno + tcplen)) {
                 /* Trimming the first edge is done by pushing the payload
-					pointer in the pbuf downwards. This is somewhat tricky since
-					we do not want to discard the full contents of the pbuf up to
-					the new starting point of the data since we have to keep the
-					TCP header which is present in the first pbuf in the chain.
+                    pointer in the pbuf downwards. This is somewhat tricky since
+                    we do not want to discard the full contents of the pbuf up to
+                    the new starting point of the data since we have to keep the
+                    TCP header which is present in the first pbuf in the chain.
 
-					What is done is really quite a nasty hack: the first pbuf in
-					the pbuf chain is pointed to by inseg.p. Since we need to be
-					able to deallocate the whole pbuf, we cannot change this
-					inseg.p pointer to point to any of the later pbufs in the
-					chain. Instead, we point the ->payload pointer in the first
-					pbuf to data in one of the later pbufs. We also set the
-					inseg.data pointer to point to the right place. This way, the
-					->p pointer will still point to the first pbuf, but the
-					->p->payload pointer will point to data in another pbuf.
+                    What is done is really quite a nasty hack: the first pbuf in
+                    the pbuf chain is pointed to by inseg.p. Since we need to be
+                    able to deallocate the whole pbuf, we cannot change this
+                    inseg.p pointer to point to any of the later pbufs in the
+                    chain. Instead, we point the ->payload pointer in the first
+                    pbuf to data in one of the later pbufs. We also set the
+                    inseg.data pointer to point to the right place. This way, the
+                    ->p pointer will still point to the first pbuf, but the
+                    ->p->payload pointer will point to data in another pbuf.
 
-					After we are done with adjusting the pbuf pointers we must
-					adjust the ->data pointer in the seg and the segment
-					length.*/
+                    After we are done with adjusting the pbuf pointers we must
+                    adjust the ->data pointer in the seg and the segment
+                    length.*/
                 off = pcb->rcv_nxt - seqno;
                 if (inseg.p->len < off) {
                     p = inseg.p;
@@ -867,14 +867,14 @@ tcp_receive(struct tcp_pcb *pcb)
         }
 
         /* The sequence number must be within the window (above rcv_nxt
-			and below rcv_nxt + rcv_wnd) in order to be further
-			processed. */
+            and below rcv_nxt + rcv_wnd) in order to be further
+            processed. */
         if (TCP_SEQ_GEQ(seqno, pcb->rcv_nxt) && TCP_SEQ_LT(seqno, pcb->rcv_nxt + pcb->rcv_wnd)) {
             if (pcb->rcv_nxt == seqno) {
                 int tcpflags;
 /* The incoming segment is the next in sequence. We check if
-					we have to trim the end of the segment and update rcv_nxt
-					and pass the data to the application. */
+                    we have to trim the end of the segment and update rcv_nxt
+                    and pass the data to the application. */
 #if TCP_QUEUE_OOSEQ
                 if (pcb->ooseq != NULL && TCP_SEQ_LEQ(pcb->ooseq->tcphdr->seqno, seqno + inseg.len)) {
                     /* We have to trim the second edge of the incoming segment. */
@@ -895,19 +895,19 @@ tcp_receive(struct tcp_pcb *pcb)
                 }
 
                 /* If there is data in the segment, we make preparations to
-					pass this up to the application. The ->recv_data variable
-					is used for holding the pbuf that goes to the
-					application. The code for reassembling out-of-sequence data
-					chains its data on this pbuf as well.
+                    pass this up to the application. The ->recv_data variable
+                    is used for holding the pbuf that goes to the
+                    application. The code for reassembling out-of-sequence data
+                    chains its data on this pbuf as well.
 
-					If the segment was a FIN, we set the TF_GOT_FIN flag that will
-					be used to indicate to the application that the remote side has
-					closed its end of the connection. */
+                    If the segment was a FIN, we set the TF_GOT_FIN flag that will
+                    be used to indicate to the application that the remote side has
+                    closed its end of the connection. */
                 if (inseg.p->tot_len > 0) {
                     recv_data = inseg.p;
                     /* Since this pbuf now is the responsibility of the
-						application, we delete our reference to it so that we won't
-						(mistakingly) deallocate it. */
+                        application, we delete our reference to it so that we won't
+                        (mistakingly) deallocate it. */
                     inseg.p = NULL;
                 }
                 if (tcpflags & TCP_FIN) {
@@ -960,28 +960,28 @@ tcp_receive(struct tcp_pcb *pcb)
                     pcb->ooseq = tcp_seg_copy(&inseg);
                 } else {
                     /* If the queue is not empty, we walk through the queue and
-						try to find a place where the sequence number of the
-						incoming segment is between the sequence numbers of the
-						previous and the next segment on the ->ooseq queue. That is
-						the place where we put the incoming segment. If needed, we
-						trim the second edges of the previous and the incoming
-						segment so that it will fit into the sequence.
+                        try to find a place where the sequence number of the
+                        incoming segment is between the sequence numbers of the
+                        previous and the next segment on the ->ooseq queue. That is
+                        the place where we put the incoming segment. If needed, we
+                        trim the second edges of the previous and the incoming
+                        segment so that it will fit into the sequence.
 
-						If the incoming segment has the same sequence number as a
-						segment on the ->ooseq queue, we discard the segment that
-						contains less data. */
+                        If the incoming segment has the same sequence number as a
+                        segment on the ->ooseq queue, we discard the segment that
+                        contains less data. */
 
                     prev = NULL;
                     for (next = pcb->ooseq; next != NULL; next = next->next) {
                         if (seqno == next->tcphdr->seqno) {
                             /* The sequence number of the incoming segment is the
-								same as the sequence number of the segment on
-								->ooseq. We check the lengths to see which one to
-								discard. */
+                                same as the sequence number of the segment on
+                                ->ooseq. We check the lengths to see which one to
+                                discard. */
                             if (inseg.len > next->len) {
                                 /* The incoming segment is larger than the old
-									segment. We replace the old segment with the new
-									one. */
+                                    segment. We replace the old segment with the new
+                                    one. */
                                 cseg = tcp_seg_copy(&inseg);
                                 if (cseg != NULL) {
                                     cseg->next = next->next;
@@ -994,17 +994,17 @@ tcp_receive(struct tcp_pcb *pcb)
                                 break;
                             } else {
                                 /* Either the lenghts are the same or the incoming
-									segment was smaller than the old one; in either
-									case, we ditch the incoming segment. */
+                                    segment was smaller than the old one; in either
+                                    case, we ditch the incoming segment. */
                                 break;
                             }
                         } else {
                             if (prev == NULL) {
                                 if (TCP_SEQ_LT(seqno, next->tcphdr->seqno)) {
                                     /* The sequence number of the incoming segment is lower
-										than the sequence number of the first segment on the
-										queue. We put the incoming segment first on the
-										queue. */
+                                        than the sequence number of the first segment on the
+                                        queue. We put the incoming segment first on the
+                                        queue. */
 
                                     if (TCP_SEQ_GT(seqno + inseg.len, next->tcphdr->seqno)) {
                                         /* We need to trim the incoming segment. */
@@ -1020,10 +1020,10 @@ tcp_receive(struct tcp_pcb *pcb)
                                 }
                             } else if (TCP_SEQ_LT(prev->tcphdr->seqno, seqno) && TCP_SEQ_LT(seqno, next->tcphdr->seqno)) {
                                 /* The sequence number of the incoming segment is in
-									between the sequence numbers of the previous and
-									the next segment on ->ooseq. We trim and insert the
-									incoming segment and trim the previous segment, if
-									needed. */
+                                    between the sequence numbers of the previous and
+                                    the next segment on ->ooseq. We trim and insert the
+                                    incoming segment and trim the previous segment, if
+                                    needed. */
                                 if (TCP_SEQ_GT(seqno + inseg.len, next->tcphdr->seqno)) {
                                     /* We need to trim the incoming segment. */
                                     inseg.len = next->tcphdr->seqno - seqno;
@@ -1043,8 +1043,8 @@ tcp_receive(struct tcp_pcb *pcb)
                                 break;
                             }
                             /* If the "next" segment is the last segment on the
-								ooseq queue, we add the incoming segment to the end
-								of the list. */
+                                ooseq queue, we add the incoming segment to the end
+                                of the list. */
                             if (next->next == NULL && TCP_SEQ_GT(seqno, next->tcphdr->seqno)) {
                                 next->next = tcp_seg_copy(&inseg);
                                 if (next->next != NULL) {

@@ -98,8 +98,8 @@ int LoadMemModule(int mode, void *modptr, unsigned int modsize, int arg_len, con
     sifdma.size = modsize;
     sifdma.attr = 0;
 
-    //All IOP modules should have already been written back to RAM by the FlushCache() calls within the GUI and the CRT.
-    //SifWriteBackDCache(modptr, modsize);
+    // All IOP modules should have already been written back to RAM by the FlushCache() calls within the GUI and the CRT.
+    // SifWriteBackDCache(modptr, modsize);
 
     do {
         dma_id = SifSetDma(&sifdma, 1);

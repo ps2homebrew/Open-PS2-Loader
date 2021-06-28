@@ -98,7 +98,7 @@ static void t_loadElf(void)
     argv[0] = ExitPath;
     argv[1] = NULL;
 
-    //Wipe everything, even the module storage.
+    // Wipe everything, even the module storage.
     WipeUserMemory((void *)&_end, (void *)GetMemorySize());
 
     FlushCache(0);
@@ -184,11 +184,11 @@ static void IGR_Thread(void *arg)
         // Stop Performance Counter
         if (Cop0_Perf & 0x80000000) {
             __asm__ __volatile__(
-                " mfc0 $3, $25;"
-                " lui	 $2, 0x8000;"
-                " or	 $3, $3, $2;"
-                " xor	 $3, $3, $2;"
-                " mtc0 $3, $25;"
+                " mfc0  $3, $25;"
+                " lui   $2, 0x8000;"
+                " or    $3, $3, $2;"
+                " xor   $3, $3, $2;"
+                " mtc0  $3, $25;"
                 " sync.p;");
         }
 
@@ -334,14 +334,14 @@ static int IGR_Intc_Handler(int cause)
     // Suspend and Change priority of all threads other then our IGR thread
     // Wakeup and Change priority of our IGR thread
     if (Pad_Data.combo_type != 0x00) {
-        //While ExecPS2() would also do some of these (also calls ResetEE),
-        //initialization seems to sometimes get stuck at "Initializing GS", perhaps when waiting for the V-Sync start interrupt.
-        //That happens before ResetEE is called, so ResetEE has to be called earlier.
+        // While ExecPS2() would also do some of these (also calls ResetEE),
+        // initialization seems to sometimes get stuck at "Initializing GS", perhaps when waiting for the V-Sync start interrupt.
+        // That happens before ResetEE is called, so ResetEE has to be called earlier.
 
-        //Wait for preceding loads & stores to complete.
+        // Wait for preceding loads & stores to complete.
         asm volatile("sync.l\n");
 
-        //Stop all ongoing transfers (except for SIF0, SIF1 & SIF2 - DMA CH 5, 6 & 7).
+        // Stop all ongoing transfers (except for SIF0, SIF1 & SIF2 - DMA CH 5, 6 & 7).
         u32 dmaEnableR = *R_EE_D_ENABLER;
         *R_EE_D_ENABLEW = dmaEnableR | 0x10000;
         *R_EE_D_CTRL;
@@ -355,16 +355,16 @@ static int IGR_Intc_Handler(int cause)
         *R_EE_D9_CHCR = 0;
         *R_EE_D_ENABLEW = dmaEnableR;
 
-        //Wait for preceding loads & stores to complete.
+        // Wait for preceding loads & stores to complete.
         asm volatile("sync.l\n");
 
-        *R_EE_GS_CSR = 0x100; //Reset GS
+        *R_EE_GS_CSR = 0x100; // Reset GS
         asm volatile("sync.l\n");
         while (*R_EE_GS_CSR & 0x100) {
         };
 
-        //Disable interrupts & reset some peripherals, back to a standard state.
-        //Call ResetEE(0x7F) from an interrupt handler.
+        // Disable interrupts & reset some peripherals, back to a standard state.
+        // Call ResetEE(0x7F) from an interrupt handler.
         iResetEE(0x7F);
 
         // Loop for each threads, skipping the idle & IGR threads.
@@ -386,7 +386,7 @@ static int IGR_Intc_Handler(int cause)
     return 0;
 }
 
-//Install_IGR() must be run first.
+// Install_IGR() must be run first.
 static void Set_libpad_Params(void *addr)
 {
     DI();
@@ -529,7 +529,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
         while (ptr) {
             // Purple while PadOpen pattern search
             if (!DisableDebug)
-                GS_BGCOLOUR = 0x800080; //Purple
+                GS_BGCOLOUR = 0x800080; // Purple
 
             mem_size = mem_end - (u32)ptr;
 
@@ -541,7 +541,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
                 // Green while PadOpen patches
                 if (!DisableDebug)
-                    GS_BGCOLOUR = 0x008000; //Dark green
+                    GS_BGCOLOUR = 0x008000; // Dark green
 
                 // Save original PadOpen function
                 if (padopen_patterns[i].type == IGR_LIBPAD)
@@ -594,7 +594,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                         }
                     }
 
-                    //Locate pointers to scePadOpen(), likely used for JALR.
+                    // Locate pointers to scePadOpen(), likely used for JALR.
                     if (!patched) {
                         DPRINTF("IGR: 2nd padOpen patch attempt...\n");
 
@@ -642,7 +642,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
                 }
 
                 // Increment search pointer
-                //ptr += padopen_patterns[i].size;
+                // ptr += padopen_patterns[i].size;
                 ptr += (padopen_patterns[i].size >> 2);
             }
         }
@@ -656,7 +656,7 @@ int Install_PadOpen_Hook(u32 mem_start, u32 mem_end, int mode)
 
     // Done
     if (!DisableDebug)
-        GS_BGCOLOUR = 0x000000; //Black
+        GS_BGCOLOUR = 0x000000; // Black
 
     return patched;
 }

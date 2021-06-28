@@ -19,8 +19,6 @@
 #include "cdvd_config.h"
 
 #include "smsutils.h"
-#define memcpy mips_memcpy
-#define memset mips_memset
 
 #define USE_CUSTOM_RECV 1
 

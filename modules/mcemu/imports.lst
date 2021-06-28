@@ -59,7 +59,7 @@ stdio_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_prnt
-I_strncmp
+I_strcmp
 sysclib_IMPORTS_end
 
 sysmem_IMPORTS_start

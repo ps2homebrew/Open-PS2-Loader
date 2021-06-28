@@ -21,8 +21,6 @@
 #include "cdvdman_opl.h"
 
 #include "smsutils.h"
-#define memcpy mips_memcpy
-#define memset mips_memset
 
 extern void cdvdfsv_register_scmd_rpc(SifRpcDataQueue_t *rpc_DQ);
 extern void cdvdfsv_register_ncmd_rpc(SifRpcDataQueue_t *rpc_DQ);

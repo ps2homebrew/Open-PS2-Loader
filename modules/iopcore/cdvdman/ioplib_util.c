@@ -11,8 +11,6 @@
 #include "ioplib_util.h"
 
 #include "smsutils.h"
-#define memcpy mips_memcpy
-#define memset mips_memset
 
 #ifdef __IOPCORE_DEBUG
 #define DPRINTF(args...) printf(args)

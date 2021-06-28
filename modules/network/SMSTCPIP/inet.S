@@ -35,8 +35,8 @@ s_Str:  .space  16
 
 .text
 
-htons :
-ntohs :
+htons:
+ntohs:
 _htons:
     andi    $v1, $a0, 0xFFFF
     andi    $a1, $v1, 0xFF
@@ -45,9 +45,9 @@ _htons:
     jr      $ra
     or      $v0, $v0, $a0
 
-htonl :
+htonl:
 _htonl:
-ntohl :
+ntohl:
     andi    $t1, $a0, 0xFF00
     sll     $t0, $a0, 24
     srl     $a3, $a0, 8
@@ -59,7 +59,7 @@ ntohl :
     jr      $ra
     or      $v0, $v0, $a0
 
-ip_cksum :
+ip_cksum:
 _ip_cksum:
     andi    $v0, $a0, 0x3
     move    $t0, $a0
@@ -271,7 +271,7 @@ inet_chksum_pseudo:
     move    $s2, $zero
     li      $s5, 1
 5:
-    lw      $a0,  4($s0)
+    lw      $a0, 4($s0)
     bal     _ip_cksum
     lhu     $a1, 10($s0)
     b       2f
@@ -361,7 +361,7 @@ inet_chksum_pbuf:
     move    $s2, $zero
     li      $s3, 1
 5:
-    lw      $a0,  4($s1)
+    lw      $a0, 4($s1)
     bal     _ip_cksum
     lhu     $a1, 10($s1)
     b       2f
@@ -403,7 +403,7 @@ inet_chksum_pbuf:
     jr      $ra
     addiu   $sp, $sp, 40
 
-inet_aton :
+inet_aton:
 _inet_aton:
     addiu   $sp, $sp, -40
     sw      $s0, 32($sp)

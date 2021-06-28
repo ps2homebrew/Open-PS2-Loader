@@ -48,17 +48,17 @@ mips_memcpy:
     move    $a2, $v1
     addu    $a3, $a3, $a1
 6:
-    lwr     $v1,  0($a1)
-    lwl     $v1,  3($a1)
-    lwr     $t0,  4($a1)
-    lwl     $t0,  7($a1)
-    lwr     $t1,  8($a1)
+    lwr     $v1, 0($a1)
+    lwl     $v1, 3($a1)
+    lwr     $t0, 4($a1)
+    lwl     $t0, 7($a1)
+    lwr     $t1, 8($a1)
     lwl     $t1, 11($a1)
     lwr     $t2, 12($a1)
     lwl     $t2, 15($a1)
-    sw      $v1,  0($a0)
-    sw      $t0,  4($a0)
-    sw      $t1,  8($a0)
+    sw      $v1, 0($a0)
+    sw      $t0, 4($a0)
+    sw      $t1, 8($a0)
     addiu   $a1, $a1, 16
     addiu   $a0, $a0, 16
     bne     $a1, $a3, 6b
@@ -92,13 +92,13 @@ mips_memcpy:
     move    $a2, $v1
     addu    $a3, $a3, $a1
 10:
-    lw      $v1,  0($a1)
-    lw      $t0,  4($a1)
-    lw      $t1,  8($a1)
+    lw      $v1, 0($a1)
+    lw      $t0, 4($a1)
+    lw      $t1, 8($a1)
     lw      $t2, 12($a1)
-    sw      $v1,  0($a0)
-    sw      $t0,  4($a0)
-    sw      $t1,  8($a0)
+    sw      $v1, 0($a0)
+    sw      $t0, 4($a0)
+    sw      $t1, 8($a0)
     addiu   $a1, $a1, 16
     addiu   $a0, $a0, 16
     bne     $a1, $a3, 10b

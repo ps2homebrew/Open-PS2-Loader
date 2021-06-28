@@ -21,7 +21,7 @@ void (*pademu_hookSio2man)(Sio2Packet *sd, Sio2McProc sio2proc) = no_pademu;
 // Shutdown callback
 //---------------------------------------------------------------------------
 static void mcemuShutdown(void)
-{ //If necessary, implement some locking mechanism to prevent further requests from being made.
+{ // If necessary, implement some locking mechanism to prevent further requests from being made.
     DeviceShutdown();
 }
 
@@ -49,7 +49,7 @@ int _start(int argc, char *argv[])
     return readyToGo;
 }
 //------------------------------
-//endfunc _start
+// endfunc _start
 //---------------------------------------------------------------------------
 void StartNow(void *param)
 {
@@ -97,7 +97,7 @@ void StartNow(void *param)
     readyToGo = MODULE_RESIDENT_END;
 }
 //------------------------------
-//endfunc _start
+// endfunc _start
 //---------------------------------------------------------------------------
 /* Installs SecrAuthCard handler for the enabled virtual memory cards */
 void InstallSecrmanHook(void *exp)
@@ -116,7 +116,7 @@ void InstallSecrmanHook(void *exp)
     }
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Installs handlers for SIO2MAN's routine for enabled virtual memory cards */
 void InstallSio2manHook(void *exp, int ver)
@@ -128,7 +128,7 @@ void InstallSio2manHook(void *exp, int ver)
     pSio2man67 = HookExportEntry(exp, 67, hookSio2man67);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Install hooks for MCMAN's sceMcReadFast & sceMcWriteFast */
 void InstallMcmanHook(void *exp)
@@ -150,7 +150,7 @@ void InstallMcmanHook(void *exp)
     HookExportEntry(exp, 68, mcman68);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 int hookDmac_request(u32 channel, void *addr, u32 size, u32 count, int dir);
 void hookDmac_transfer(u32 channel);
@@ -229,13 +229,14 @@ int DummySecrAuthCard(int port, int slot, int cnum)
     // port; slot; cnum;
     DPRINTF("SecrAuthCard(0x%X, 0x%X, 0x%X)\n", port, slot, cnum);
 
-    //	if(slot != 0)
-    //		return 0;
-
+    /*
+    if (slot != 0)
+        return 0;
+    */
     return 1;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Hook for the LOADCORE's RegisterLibraryEntires call */
 int hookRegisterLibraryEntires(iop_library_t *lib)
@@ -284,7 +285,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
     return pRegisterLibraryEntires(lib);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Hook for SIO2MAN entry #25 (called by MCMAN) */
 void hookSio2man25(Sio2Packet *sd)
@@ -292,7 +293,7 @@ void hookSio2man25(Sio2Packet *sd)
     hookSio2man(sd, pSio2man25);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Hook for SIO2MAN entry #51 (called by MC2* and PADMAN) */
 void hookSio2man51(Sio2Packet *sd)
@@ -300,7 +301,7 @@ void hookSio2man51(Sio2Packet *sd)
     hookSio2man(sd, pSio2man51);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* SIO2MAN generic hook routine */
 void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc)
@@ -341,7 +342,7 @@ void hookSio2man(Sio2Packet *sd, Sio2McProc sio2proc)
 #endif
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Hook for the SecrAuthCard call */
 int hookSecrAuthCard(int port, int slot, int cnum)
@@ -355,7 +356,7 @@ int hookSecrAuthCard(int port, int slot, int cnum)
     return pSecrAuthCard[port & 0x1](port, slot, cnum);
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 
 #define SIO2CTRL (*(volatile u32 *)(0xbf808268))
@@ -591,7 +592,7 @@ void Sio2McEmu(Sio2Packet *sd)
     /* DPRINTF("SIO2 status 0x%X\n", sd->iostatus); */
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Generates a "0xFF 0xFF ... 0xFF 0x2B 0x55" sequence */
 void SioResponse(MemoryCard *mcd, void *buf, int length)
@@ -614,7 +615,7 @@ void SioResponse(MemoryCard *mcd, void *buf, int length)
     p[1] = mcd->tcode;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* int cslogfd = -1;
    int prnflag = 0; */
@@ -641,7 +642,7 @@ int MceEraseBlock(MemoryCard *mcd, int page)
     return 1;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 static int do_read(MemoryCard *mcd)
 {
@@ -668,7 +669,7 @@ int MceStartRead(MemoryCard *mcd, int page)
     return 1;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Reads memory card page */
 int MceRead(MemoryCard *mcd, void *buf, u32 size)
@@ -709,7 +710,7 @@ restart:
     return 1;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 int MceStartWrite(MemoryCard *mcd, int page)
 {
@@ -720,7 +721,7 @@ int MceStartWrite(MemoryCard *mcd, int page)
     return 1;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Writes memory card page */
 int MceWrite(MemoryCard *mcd, void *buf, u32 size)
@@ -765,7 +766,7 @@ restart:
     return 1;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 // End of file: mcemu.c
 //---------------------------------------------------------------------------

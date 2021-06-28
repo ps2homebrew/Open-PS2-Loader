@@ -429,7 +429,7 @@ static int configReadLegacyIP(void)
         configSetStr(configSet, CONFIG_NET_PS2_NETM, temp);
         snprintf(temp, sizeof(temp), "%d.%d.%d.%d", ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
         configSetStr(configSet, CONFIG_NET_PS2_GATEW, temp);
-        //The legacy format has no setting for the DNS server, so duplicate the gateway address.
+        // The legacy format has no setting for the DNS server, so duplicate the gateway address.
         configSetStr(configSet, CONFIG_NET_PS2_DNS, temp);
 
         return 1;
@@ -481,8 +481,8 @@ static int configReadFileBuffer(file_buffer_t *fileBuffer, config_set_t *configS
 
         if (splitAssignment(line, key, sizeof(key), val, sizeof(val))) {
             /* if the line does not start with whitespace,
-			* the prefix ends and we have to reset it
-			*/
+             * the prefix ends and we have to reset it
+             */
             if (!isWS(line[0]))
                 memset(prefix, 0, sizeof(prefix));
 
@@ -597,7 +597,7 @@ int configReadMulti(int types)
         }
     }
 
-    //If the network configuration is to be loaded and one cannot be loaded, attempt to load from the legacy network config file.
+    // If the network configuration is to be loaded and one cannot be loaded, attempt to load from the legacy network config file.
     if ((types & CONFIG_NETWORK) && !(result & CONFIG_NETWORK))
         if (configReadLegacyIP())
             result |= CONFIG_NETWORK;

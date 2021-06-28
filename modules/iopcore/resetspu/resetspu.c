@@ -1,6 +1,6 @@
 /*
   resetspu.c Open PS2 Loader
- 
+
   Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0

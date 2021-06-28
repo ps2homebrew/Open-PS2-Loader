@@ -33,7 +33,7 @@ int _start(int argc, char **argv)
 
     lc = GetLoadcoreInternalData();
 
-    //Locate the specified module.
+    // Locate the specified module.
     m = lc->image_info;
     while (m != NULL) {
         if (modId == m->id)
@@ -42,9 +42,9 @@ int _start(int argc, char **argv)
         m = m->next;
     }
 
-    if (m != NULL) {                                   //Increase size of CompBuffers, to allow for 17 sectors to be stored.
-        *(u16 *)(m->text_start + 0x000016b8) = 0x8800; //Original: 0x8000
-        *(u16 *)(m->text_start + 0x000016bc) = 0x8800; //Original: 0x8000
+    if (m != NULL) {                                   // Increase size of CompBuffers, to allow for 17 sectors to be stored.
+        *(u16 *)(m->text_start + 0x000016b8) = 0x8800; // Original: 0x8000
+        *(u16 *)(m->text_start + 0x000016bc) = 0x8800; // Original: 0x8000
 
         StartModule(modId, "", 0, NULL, &modRet);
 

@@ -36,7 +36,7 @@ typedef struct
 
 typedef struct
 {
-    u16 hci_handle;     //hci connection handle
+    u16 hci_handle;     // hci connection handle
     u16 control_scid;   // Channel endpoint on command destination
     u16 interrupt_scid; // Channel endpoint on interrupt destination
     u8 hci_state;       // current state of bluetooth HCI connection
@@ -44,8 +44,8 @@ typedef struct
     u8 enabled;
     u8 status;
     u8 isfake;
-    u8 type;      //0 - ds3, 1 - ds4
-    u8 oldled[4]; //rgb for ds4 and blink
+    u8 type;      // 0 - ds3, 1 - ds4
+    u8 oldled[4]; // rgb for ds4 and blink
     u8 lrum;
     u8 rrum;
     u8 update_rum;
@@ -54,11 +54,11 @@ typedef struct
 
 typedef struct
 {
-    u8 hci_ver;     //Version of the Current HCI in the BR/EDR Controller
-    u16 hci_rev;    //Revision of the Current HCI in the BR/EDR Controller
-    u8 lmp_ver;     //Version of the Current LMP or PAL in the Controller
-    u16 mf_name;    //Manufacturer Name of the BR/EDR Controller
-    u16 lmp_subver; //Subversion of the Current LMP or PAL in the Controller
+    u8 hci_ver;     // Version of the Current HCI in the BR/EDR Controller
+    u16 hci_rev;    // Revision of the Current HCI in the BR/EDR Controller
+    u8 lmp_ver;     // Version of the Current LMP or PAL in the Controller
+    u16 mf_name;    // Manufacturer Name of the BR/EDR Controller
+    u16 lmp_subver; // Subversion of the Current LMP or PAL in the Controller
     u16 vid;
     u16 pid;
     u16 rev;
@@ -135,7 +135,7 @@ enum eHCI {
     HCI_EVENT_LINK_KEY_REQUEST = 0x17,
     HCI_EVENT_CHANGED_CONNECTION_TYPE = 0x1D,
     HCI_EVENT_PAGE_SR_CHANGED = 0x20,
-    HCI_EVENT_MAX_SLOT_CHANGE = 0x1B, //Max Slots Change event
+    HCI_EVENT_MAX_SLOT_CHANGE = 0x1B, // Max Slots Change event
 
     /* HCI event flags for hci_event_flag */
     HCI_FLAG_COMMAND_COMPLETE = 0x0001,
@@ -198,25 +198,25 @@ enum eL2CAP {
     L2CAP_CMD_DISCONNECT_RESPONSE = 0x07,
 
     /*  HCI ACL Data Packet
- *
- *  buf[0]          buf[1]          buf[2]          buf[3]
- *  0      4        8    11 12      16              24             31 MSB
- *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
- *  |        HCI Handle     |PB |BC |      Data Total Length        |    HCI ACL Data Packet
- *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
- *
- *   buf[4]         buf[5]          buf[6]          buf[7]
- *  0               8               16                             31 MSB
- *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
- *  |         Length                |        Channel ID             |    Basic L2CAP header
- *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
- *
- *  buf[8]          buf[9]          buf[10]         buf[11]
- *  0               8               16                             31 MSB
- *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
- *  |     Code      |  Identifier   |         Length                |    Control frame (C-frame)
- *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.    (signaling packet format)
- */
+     *
+     *  buf[0]          buf[1]          buf[2]          buf[3]
+     *  0      4        8    11 12      16              24             31 MSB
+     *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+     *  |        HCI Handle     |PB |BC |      Data Total Length        |    HCI ACL Data Packet
+     *  .-+-+-+-+-+-+-+-|-+-+-+-|-+-|-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+     *
+     *   buf[4]         buf[5]          buf[6]          buf[7]
+     *  0               8               16                             31 MSB
+     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+     *  |         Length                |        Channel ID             |    Basic L2CAP header
+     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+     *
+     *  buf[8]          buf[9]          buf[10]         buf[11]
+     *  0               8               16                             31 MSB
+     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.
+     *  |     Code      |  Identifier   |         Length                |    Control frame (C-frame)
+     *  .-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-.    (signaling packet format)
+     */
     // }}}
 };
 

@@ -91,14 +91,14 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
         guiDrawBGPlasma();
         rmDrawRect(0, 0, screenWidth, screenHeight, gColDarker);
 
-        //Title
+        // Title
         if (title != NULL) {
             fntRenderString(gTheme->fonts[0], 25, 20, ALIGN_NONE, 0, 0, title, gTheme->textColor);
             // separating line
             rmDrawLine(25, 38, 615, 38, gColWhite);
         }
 
-        //Text
+        // Text
         fntRenderString(gTheme->fonts[0], 50, 120, ALIGN_NONE, 0, 0, hide_text ? mask_buffer : text, gTheme->textColor);
 
         // separating line for simpler orientation
@@ -206,7 +206,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
                 sfxPlay(SFX_CONFIRM);
                 if (mask_buffer != NULL)
                     free(mask_buffer);
-                return 1; //ENTER
+                return 1; // ENTER
             } else if (selcommand == 3) {
                 sfxPlay(SFX_CONFIRM);
                 selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
@@ -239,7 +239,7 @@ int diaShowKeyb(char *text, int maxLen, int hide_text, const char *title)
             sfxPlay(SFX_CONFIRM);
             if (mask_buffer != NULL)
                 free(mask_buffer);
-            return 1; //ENTER
+            return 1; // ENTER
         } else if (getKeyOn(KEY_SELECT)) {
             selkeyb = (selkeyb + 1) % KEYB_MODE; // MODE
             sfxPlay(SFX_CONFIRM);
@@ -670,7 +670,7 @@ static int diaHandleInput(struct UIItem *item, int *modified)
             if (item->intvalue.current < item->intvalue.max) {
                 item->intvalue.current++;
             } else {
-                item->intvalue.current = item->intvalue.min; //was "= 0;"
+                item->intvalue.current = item->intvalue.min; // was "= 0;"
             }
         } else if (getKey(KEY_DOWN)) {
             sfxPlay(SFX_CURSOR);

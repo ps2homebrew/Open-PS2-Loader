@@ -43,7 +43,7 @@ static unsigned int rpc_data[1024 / 4] __attribute__((aligned(16)));
 int excepscrdump = 1;
 
 #define PKO_DMA_DEST ((void *)0x200ff800)
-//unsigned int *dma_ptr =(unsigned int*)(0x20100000-2048);
+// unsigned int *dma_ptr =(unsigned int*)(0x20100000-2048);
 
 //////////////////////////////////////////////////////////////////////////
 static void
@@ -383,7 +383,7 @@ int cmdHandlerInit(void)
     thread.option = 0;
     thread.thread = (void *)cmdThread;
     thread.stacksize = 0x800;
-    thread.priority = 60; //0x1e;
+    thread.priority = 60; // 0x1e;
 
     pid = CreateThread(&thread);
     if (pid >= 0) {

@@ -1,19 +1,20 @@
 #define HTTP_CMODE_CLOSED     0
 #define HTTP_CMODE_PERSISTENT 1
 
-//EE-side only
+// EE-side only
 int HttpInit(void);
 void HttpDeinit(void);
 
 int HttpEstabConnection(char *server, u16 port);
 void HttpCloseConnection(s32 HttpSocket);
 
-/*	mtime[0] = Years since year 2000
-	mtime[1] = Month, 0-11
-	mtime[2] = day in month, 0-30
-	mtime[3] = Hour (0-23)
-	mtime[4] = Minute (0-59)
-	mtime[5] = Second (0-59)	*/
+/*  mtime[0] = Years since year 2000
+    mtime[1] = Month, 0-11
+    mtime[2] = day in month, 0-30
+    mtime[3] = Hour (0-23)
+    mtime[4] = Minute (0-59)
+    mtime[5] = Second (0-59)
+*/
 
 int HttpSendGetRequest(s32 HttpSocket, const char *UserAgent, const char *host, s8 *mode, const u8 *mtime, const char *uri, char *output, u16 *out_len);
 

@@ -3,7 +3,7 @@
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
   Some parts of the code are taken from HD Project by Polo
 */
 
@@ -38,7 +38,7 @@ int EnablePadEmuOp;
 int PadEmuSettings;
 #endif
 int DisableDebug;
-int *gCheatList; //Store hooks/codes addr+val pairs
+int *gCheatList; // Store hooks/codes addr+val pairs
 
 static int eecoreInit(int argc, char **argv)
 {
@@ -152,7 +152,7 @@ static int eecoreInit(int argc, char **argv)
     Install_Kernel_Hooks();
 
     if (!DisableDebug)
-        GS_BGCOLOUR = 0xff0000; //Blue
+        GS_BGCOLOUR = 0xff0000; // Blue
 
     SifExitRpc();
 
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 {
     int argOffset;
 
-    if (isInit) { //Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
+    if (isInit) { // Ignore argv[0], as it contains the name of this module ("EELOAD"), as passed by the LoadExecPS2 syscall itself (2nd invocation and later will be from LoadExecPS2).
         argv++;
         argc--;
 

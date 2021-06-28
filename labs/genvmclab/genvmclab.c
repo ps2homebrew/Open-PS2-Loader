@@ -121,7 +121,7 @@ int main(int argc, char *argv[2])
     sbv_patch_disable_prefix_check();
 
     SifLoadModule("rom0:SIO2MAN", 0, 0);
-    //SifLoadModule("rom0:MCMAN", 0, 0);
+    // SifLoadModule("rom0:MCMAN", 0, 0);
 
     DPRINTF("OK\n");
 

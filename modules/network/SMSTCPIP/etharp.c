@@ -121,9 +121,10 @@ struct etharp_entry
     struct eth_addr ethaddr;
     enum etharp_state state;
 #if ARP_QUEUEING
-    /** 
-   * Pointer to queue of pending outgoing packets on this ARP entry.
-   * Must be at most a single packet for now. */
+    /**
+     * Pointer to queue of pending outgoing packets on this ARP entry.
+     * Must be at most a single packet for now.
+     */
     struct pbuf *p;
 #endif
     u8_t ctime;
@@ -237,17 +238,17 @@ find_arp_entry(void)
 #if ARP_QUEUEING
 /*
  * Enqueues a pbuf (chain) on an ARP entry.
- * 
+ *
  * Places the pbuf (chain) on the queue (if space allows). The
  * caller may safely free the pbuf (chain) afterwards, as the
  * pbufs will be referenced by the queue and copies are made of
  * pbufs referencing external payloads.
- * 
+ *
  * @ i the ARP entry index
  * @arg q the pbuf (chain) to be queued on the ARP entry
- * 
+ *
  * @return Returns the new head of queue of the ARP entry.
- * 
+ *
  */
 static struct pbuf *
 etharp_enqueue(s8_t i, struct pbuf *q)
@@ -277,9 +278,9 @@ etharp_enqueue(s8_t i, struct pbuf *q)
 
 /**
  * Dequeues any pbufs queued on an ARP entry
- * 
+ *
  * @return number of pbufs removed from the queue
- * 
+ *
  * TODO: decide what is a sensible return value?
  */
 static u8_t
@@ -302,7 +303,7 @@ etharp_dequeue(s8_t i)
  *
  * If a pending entry is resolved, any queued packets will be sent
  * at this point.
- * 
+ *
  * @param ipaddr IP address of the inserted ARP entry.
  * @param ethaddr Ethernet address of the inserted ARP entry.
  * @param flags Defines behaviour:
@@ -457,7 +458,7 @@ void etharp_ip_input(struct netif *netif, struct pbuf *p)
 }
 
 /**
- * Responds to ARP requests to us. Upon ARP replies to us, add entry to cache  
+ * Responds to ARP requests to us. Upon ARP replies to us, add entry to cache
  * send out queued IP packets. Updates cache with snooped address pairs.
  *
  * Should be called for incoming ARP packets. The pbuf in the argument
@@ -494,7 +495,7 @@ void etharp_arp_input(struct netif *netif, struct eth_addr *ethaddr, struct pbuf
     /* add or update entries in the ARP cache */
     if (for_us) {
         /* insert IP address in ARP cache (assume requester wants to talk to us)
-     * we might even send out a queued packet to this host */
+         * we might even send out a queued packet to this host */
         update_arp_entry(netif, &(hdr->sipaddr), &(hdr->shwaddr), ARP_INSERT_FLAG);
         /* request was not directed to us, but snoop anyway */
     } else {
@@ -626,7 +627,7 @@ etharp_output(struct netif *netif, struct ip_addr *ipaddr, struct pbuf *q)
     /* destination IP address is an IP unicast address */
     else {
         /* destination IP network address not on local network?
-     * IP layer wants us to forward to the default gateway */
+         * IP layer wants us to forward to the default gateway */
         if (!ip_addr_maskcmp(ipaddr, &(netif->ip_addr), &(netif->netmask))) {
             /* interface has default gateway? */
             if (netif->gw.addr != 0) {
@@ -671,7 +672,7 @@ etharp_output(struct netif *netif, struct ip_addr *ipaddr, struct pbuf *q)
         srcaddr = (struct eth_addr *)netif->hwaddr;
 
         /* A valid IP->MAC address mapping was found, fill in the
-     * Ethernet header for the outgoing packet */
+         * Ethernet header for the outgoing packet */
         ethhdr = q->payload;
 
         for (i = 0; i < netif->hwaddr_len; i++) {
@@ -760,8 +761,8 @@ err_t etharp_query(struct netif *netif, struct ip_addr *ipaddr, struct pbuf *q)
         struct pbuf *p;
         /* allocate a pbuf for the outgoing ARP request packet */
         /* SP193: the original used PBUF_LINK, but doesn't reveal the Ethernet header with pbuf_header().
-		So other than causing alignment problems when the frame is sent to linkoutput(),
-		I guess it could possibly write beyond the end of the PBUF. */
+        So other than causing alignment problems when the frame is sent to linkoutput(),
+        I guess it could possibly write beyond the end of the PBUF. */
         p = pbuf_alloc(PBUF_RAW, sizeof(struct etharp_hdr), PBUF_RAM);
         /* could allocate pbuf? */
         if (p != NULL) {
@@ -772,7 +773,7 @@ err_t etharp_query(struct netif *netif, struct ip_addr *ipaddr, struct pbuf *q)
             for (j = 0; j < netif->hwaddr_len; ++j) {
                 hdr->shwaddr.addr[j] = srcaddr->addr[j];
                 /* the hardware address is what we ask for, in
-         * a request it is a don't-care, we use 0's */
+                 * a request it is a don't-care, we use 0's */
                 hdr->dhwaddr.addr[j] = 0x00;
             }
             ip_addr_set(&(hdr->dipaddr), ipaddr);

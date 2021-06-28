@@ -28,7 +28,7 @@
 static char fsname[] = "host";
 
 ////////////////////////////////////////////////////////////////////////
-//static iop_device_t fsys_driver;
+// static iop_device_t fsys_driver;
 
 /* File desc struct is probably larger than this, but we only
  * need to access the word @ offset 0x0C (in which we put our identifier)
@@ -47,7 +47,7 @@ struct filedesc_info
  */
 static int fsys_sema;
 static int fsys_pid = 0;
-//static iop_device_t fsys_driver;
+// static iop_device_t fsys_driver;
 
 ////////////////////////////////////////////////////////////////////////
 static int dummy5()

@@ -628,7 +628,7 @@ static void menuNextV()
                 cur = cur->next;
 
         selected_item->item->pagestart = selected_item->item->current;
-    } else { //wrap to start
+    } else { // wrap to start
         menuFirstPage();
     }
 }
@@ -647,7 +647,7 @@ static void menuPrevV()
             while (--itms && selected_item->item->pagestart->prev)
                 selected_item->item->pagestart = selected_item->item->pagestart->prev;
         }
-    } else { //wrap to end
+    } else { // wrap to end
         menuLastPage();
     }
 }
@@ -665,7 +665,7 @@ static void menuNextPage()
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
-    } else { //wrap to start
+    } else { // wrap to start
         menuFirstPage();
     }
 }
@@ -683,7 +683,7 @@ static void menuPrevPage()
 
         selected_item->item->current = cur;
         selected_item->item->pagestart = selected_item->item->current;
-    } else { //wrap to end
+    } else { // wrap to end
         menuLastPage();
     }
 }
@@ -739,7 +739,7 @@ void menuRenderMenu()
         }
     }
 
-    //hints
+    // hints
     guiDrawSubMenuHints();
 }
 
@@ -759,17 +759,17 @@ int menuCheckParentalLock(void)
     char password[CONFIG_KEY_VALUE_LEN];
     int result;
 
-    result = 0; //Default to unlocked.
+    result = 0; // Default to unlocked.
     if (parentalLockCheckEnabled) {
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
-        //Prompt for password, only if one was set.
+        // Prompt for password, only if one was set.
         if (configGetStr(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, &parentalLockPassword) && (parentalLockPassword[0] != '\0')) {
             password[0] = '\0';
             if (diaShowKeyb(password, CONFIG_KEY_VALUE_LEN, 1, _l(_STR_PARENLOCK_ENTER_PASSWORD_TITLE))) {
                 if (strncmp(parentalLockPassword, password, CONFIG_KEY_VALUE_LEN) == 0) {
                     result = 0;
-                    parentalLockCheckEnabled = 0; //Stop asking for the password.
+                    parentalLockCheckEnabled = 0; // Stop asking for the password.
                 } else if (strncmp(OPL_PARENTAL_LOCK_MASTER_PASS, password, CONFIG_KEY_VALUE_LEN) == 0) {
                     guiMsgBox(_l(_STR_PARENLOCK_DISABLE_WARNING), 0, NULL);
 
@@ -777,12 +777,12 @@ int menuCheckParentalLock(void)
                     saveConfig(CONFIG_OPL, 1);
 
                     result = 0;
-                    parentalLockCheckEnabled = 0; //Stop asking for the password.
+                    parentalLockCheckEnabled = 0; // Stop asking for the password.
                 } else {
                     guiMsgBox(_l(_STR_PARENLOCK_PASSWORD_INCORRECT), 0, NULL);
                     result = EACCES;
                 }
-            } else //User aborted.
+            } else // User aborted.
                 result = EACCES;
         }
     }
@@ -847,7 +847,7 @@ void menuHandleInputMenu()
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
-                menuSetParentalLockCheckState(1); //Re-enable parental lock check.
+                menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }
         } else if (id == MENU_EXIT) {
             if (guiMsgBox(_l(_STR_CONFIRMATION_EXIT), 1, NULL))
@@ -862,7 +862,7 @@ void menuHandleInputMenu()
     }
 
     if (getKeyOn(KEY_START) || getKeyOn(gSelectButton == KEY_CIRCLE ? KEY_CROSS : KEY_CIRCLE)) {
-        //Check if there is anything to show the user, at all.
+        // Check if there is anything to show the user, at all.
         if (gAPPStartMode || gETHStartMode || gBDMStartMode || gHDDStartMode)
             guiSwitchScreen(GUI_SCREEN_MAIN);
     }
@@ -920,7 +920,7 @@ void menuHandleInputMain()
 
     // Last Played Auto Start
     if (RemainSecs < 0) {
-        DisableCron = 1; //Disable Counter
+        DisableCron = 1; // Disable Counter
         if (gSelectButton == KEY_CIRCLE)
             selected_item->item->execCircle(selected_item->item);
         else
@@ -1017,7 +1017,7 @@ void menuRenderGameMenu()
 #endif
     }
 
-    //hints
+    // hints
     guiDrawSubMenuHints();
 }
 
@@ -1121,7 +1121,7 @@ void menuRenderAppMenu()
         y += spacing;
     }
 
-    //hints
+    // hints
     guiDrawSubMenuHints();
 }
 

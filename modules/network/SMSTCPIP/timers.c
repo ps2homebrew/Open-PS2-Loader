@@ -190,7 +190,7 @@ void sys_timeout(u32_t msecs, sys_timeout_handler handler, void *arg)
  *
  * @param handler callback function that would be called by the timeout
  * @param arg callback argument that would be passed to handler
-*/
+ */
 void sys_untimeout(sys_timeout_handler handler, void *arg)
 {
     struct sys_timeo *prev_t, *t;

@@ -22,106 +22,106 @@
 
 .ent DTV_576P
 DTV_576P:
-addiu	$sp, $sp, -0x10
-sd	$ra, 0($sp)
+    addiu   $sp, $sp, -0x10
+    sd      $ra, 0($sp)
 
-//$a0 = GCONT setting (RGB or Y Pb/Cb Pr/Cr)
-sll	$a0, $a3, 25
+    # $a0 = GCONT setting (RGB or Y Pb/Cb Pr/Cr)
+    sll     $a0, $a3, 25
 
-//$v0 = GS base address
-lui		$v0, (GS_BASE >> 16)
+    # $v0 = GS base address
+    lui     $v0, (GS_BASE >> 16)
 
-//*GS_SMODE1=0x00000017404B0504;
-#Reset (SINT and PRST bits set)
-lui     $v1, 0x0017
-ori     $v1, 0x404B
-dsll    $v1, 16
-ori     $v1, 0x0504
-or	$v1, $a0
-sd		$v1, GS_SMODE1($v0)	# store it
+# *GS_SMODE1=0x00000017404B0504;
+    # Reset (SINT and PRST bits set)
+    lui     $v1, 0x0017
+    ori     $v1, 0x404B
+    dsll    $v1, 16
+    ori     $v1, 0x0504
+    or      $v1, $a0
+    sd      $v1, GS_SMODE1($v0)             # store it
 
-//*GS_SYNCH1=0x000402E02003C827;
-lui     $v1, 0x0004
-ori     $v1, 0x02E0
-dsll    $v1, 16
-ori     $v1, 0x2003
-dsll    $v1, 16
-ori     $v1, 0xC827
-sd		$v1, GS_SYNCH1($v0)	# store it
+# *GS_SYNCH1=0x000402E02003C827;
+    lui     $v1, 0x0004
+    ori     $v1, 0x02E0
+    dsll    $v1, 16
+    ori     $v1, 0x2003
+    dsll    $v1, 16
+    ori     $v1, 0xC827
+    sd      $v1, GS_SYNCH1($v0)             # store it
 
-//*GS_SYNCH2=0x0019CA67;
-lui     $v1, 0x0019
-ori     $v1, 0xCA67
-sd		$v1, GS_SYNCH2($v0)	# store it
+# *GS_SYNCH2=0x0019CA67;
+    lui     $v1, 0x0019
+    ori     $v1, 0xCA67
+    sd      $v1, GS_SYNCH2($v0)             # store it
 
-//*GS_SYNCV=0x00A9000002700005;
-lui     $v1, 0x00A9
-ori     $v1, 0x0000
-dsll    $v1, 16
-ori     $v1, 0x0270
-dsll    $v1, 16
-ori     $v1, 0x0005
-sd		$v1, GS_SYNCV($v0)	# store it
+# *GS_SYNCV=0x00A9000002700005;
+    lui     $v1, 0x00A9
+    ori     $v1, 0x0000
+    dsll    $v1, 16
+    ori     $v1, 0x0270
+    dsll    $v1, 16
+    ori     $v1, 0x0005
+    sd      $v1, GS_SYNCV($v0)              # store it
 
-//*GS_SMODE2=Target_SMODE2;
-sd	$zero, GS_SMODE2($v0)	# This mode is a progressive mode. Hence it has to be non-interlaced and its FFMD setting does not matter.
+# *GS_SMODE2=Target_SMODE2;
+    sd      $zero, GS_SMODE2($v0)           # This mode is a progressive mode. Hence it has to be non-interlaced and its FFMD setting does not matter.
 
-//*GS_SRFSH=0;
-li      $v1, 4
-sd	$v1, GS_SRFSH($v0)	# store it
+# *GS_SRFSH=0;
+    li      $v1, 4
+    sd      $v1, GS_SRFSH($v0)              # store it
 
-//As with 480P mode, there is no need to enable the PLL.
+# As with 480P mode, there is no need to enable the PLL.
 
-//*GS_SMODE1=0x0000001740490504;
-//Sync on (clear SINT)
-lui     $v1, 0x0017
-ori     $v1, 0x4049
-dsll    $v1, 16
-ori     $v1, 0x0504
-or	$v1, $a0
+# *GS_SMODE1=0x0000001740490504;
+# Sync on (clear SINT)
+    lui     $v1, 0x0017
+    ori     $v1, 0x4049
+    dsll    $v1, 16
+    ori     $v1, 0x0504
+    or      $v1, $a0
 
-jal	setdve_576P			# Set up DVE parameters
-sd		$v1, GS_SMODE1($v0)	# store it
+    jal     setdve_576P                     # Set up DVE parameters
+    sd      $v1, GS_SMODE1($v0)             # store it
 
-lw	$v1, dveStat1
-li	$v0, 0x1C
-andi	$v1, $v1, 0xFE
-bne	$v1, $v0, DTV576P_end
-addiu	$v1, $zero, 0x20
+    lw      $v1, dveStat1
+    li      $v0, 0x1C
+    andi    $v1, $v1, 0xFE
+    bne     $v1, $v0, DTV576P_end
+    addiu   $v1, $zero, 0x20
 
-lw	$v0, dveStat2
-andi	$v0, $v0, 0xF0
-bne	$v0, $v1, DTV576P_stat2_020_skip
-addiu	$a0, $zero, 0x63
+    lw      $v0, dveStat2
+    andi    $v0, $v0, 0xF0
+    bne     $v0, $v1, DTV576P_stat2_020_skip
+    addiu   $a0, $zero, 0x63
 
-jal	dve_set_reg
-addiu	$a1, $zero, 0x88
+    jal     dve_set_reg
+    addiu   $a1, $zero, 0x88
 
 DTV576P_stat2_020_skip:
-addiu	$a0, $zero, 0x30
-jal	dve_set_reg
-move	$a1, $zero
+    addiu   $a0, $zero, 0x30
+    jal     dve_set_reg
+    move    $a1, $zero
 
-addiu	$a0, $zero, 0x31
-jal	dve_set_reg
-addiu	$a1, $zero, 0x07
+    addiu   $a0, $zero, 0x31
+    jal     dve_set_reg
+    addiu   $a1, $zero, 0x07
 
-addiu	$a0, $zero, 0x32
-jal	dve_set_reg
-addiu	$a1, $zero, 0x01
+    addiu   $a0, $zero, 0x32
+    jal     dve_set_reg
+    addiu   $a1, $zero, 0x01
 
-addiu	$a0, $zero, 0x33
-jal	dve_set_reg
-addiu	$a1, $zero, 0x14
+    addiu   $a0, $zero, 0x33
+    jal     dve_set_reg
+    addiu   $a1, $zero, 0x14
 
-addiu	$a0, $zero, 0x38
-jal	dve_set_reg
-addiu	$a1, $zero, 0x10
+    addiu   $a0, $zero, 0x38
+    jal     dve_set_reg
+    addiu   $a1, $zero, 0x10
 
 DTV576P_end:
-ld	$ra, 0($sp)
-jr	$ra
-addiu	$sp, $sp, 0x10
+    ld      $ra, 0($sp)
+    jr      $ra
+    addiu   $sp, $sp, 0x10
 
 .end DTV_576P
 
@@ -141,8 +141,8 @@ addiu	$sp, $sp, 0x10
 # | CLKSEL | 31:30 | int  0:2:0    |                                  | 0x3   |
 # | PEVS   | 29:29 | int  0:1:0    |                                  | 0x1   |
 # | PEHS   | 28:28 | int  0:1:0    |                                  | 0x1   |
-# | PVS	   | 27:27 | int  0:1:0    |                                  | 0x1   |
-# | PHS	   | 26:26 | int  0:1:0    |                                  | 0x1   |
+# | PVS    | 27:27 | int  0:1:0    |                                  | 0x1   |
+# | PHS    | 26:26 | int  0:1:0    |                                  | 0x1   |
 # | GCONT  | 25:25 | int  0:1:0    | Component Color Mode             | 0x1   |
 # |        |       |               | 0 RGB                            |       |
 # |        |       |               | 1 YPbPr                          |       |
@@ -193,17 +193,17 @@ addiu	$sp, $sp, 0x10
 # An older GS rev. seems to require setting bit 16 and then reseting bit 16 and then waiting for 2.5ms.
 #
 have_SMODE1_write:
-sd	$a1, Source_SMODE1($s0)				# Source_SMODE1 = a1
-lb	$v0, SMODE1_fix($s2)				# v0 = SMODE1_fix
-beql	$v0,$zero,store_v0_as_SMODE1	# in case of SMODE1_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SMODE1
-ld	$v0, Target_SMODE1($s1)				# v0 = Target_SMODE1
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SMODE1 is zero
-sd	$a1,0($a3)							# 	go use Source_SMODE1
+    sd      $a1, Source_SMODE1($s0)         # Source_SMODE1 = a1
+    lb      $v0, SMODE1_fix($s2)            # v0 = SMODE1_fix
+    beql    $v0, $zero, store_v0_as_SMODE1  # in case of SMODE1_fix is disabled
+    or      $v0, $zero, $a1                 #   go use v0=a1 for SMODE1
+    ld      $v0, Target_SMODE1($s1)         # v0 = Target_SMODE1
+    beql    $v0, $zero, exit_GSHandler      # in case of  Target_SMODE1 is zero
+    sd      $a1, 0($a3)                     #   go use Source_SMODE1
 
 store_v0_as_SMODE1:
-b	exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
+    b       exit_GSHandler                  # Now go exit
+    sd      $v0, 0($a3)                     # after storing
 
 # ----------------------------
 # SRFSH
@@ -231,17 +231,17 @@ sd	$v0,0($a3)							# after storing
 #  DTV-720P  (1280x720)             4    1
 #
 have_SRFSH_write:
-sd	$a1, Source_SRFSH($s0)			# Source_SRFSH = a1
-lb	$v0, SRFSH_fix($s2)				# v0 = SRFSH_fix
-beql	$v0,$zero,store_v0_as_SRFSH	# in case of SRFSH_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SRFSH
-ld	$v0, Target_SRFSH($s1)			# v0 = Target_SRFSH
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SRFSH is zero
-sd	$a1,0($a3)							# 	go use Source_SRFSH
+    sd      $a1, Source_SRFSH($s0)          # Source_SRFSH = a1
+    lb      $v0, SRFSH_fix($s2)             # v0 = SRFSH_fix
+    beql    $v0, $zero, store_v0_as_SRFSH   # in case of SRFSH_fix is disabled
+    or      $v0, $zero, $a1                 #   go use v0=a1 for SRFSH
+    ld      $v0, Target_SRFSH($s1)          # v0 = Target_SRFSH
+    beql    $v0, $zero, exit_GSHandler      # in case of  Target_SRFSH is zero
+    sd      $a1, 0($a3)                     #   go use Source_SRFSH
 
 store_v0_as_SRFSH:
-b	exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
+    b       exit_GSHandler                  # Now go exit
+    sd      $v0, 0($a3)                     # after storing
 
 # ----------------------------
 # SYNCH1
@@ -255,17 +255,17 @@ sd	$v0,0($a3)							# after storing
 #|HS  |53:43|int 0:11:0| 0x7FF |
 # ----^-----^----------^-------'
 have_SYNCH1_write:
-sd	$a1, Source_SYNCH1($s0)			# Source_SYNCH1 = a1
-lb	$v0, SYNCH_fix($s2)				# v0 = SYNCH_fix
-beql	$v0,$zero,store_v0_as_SYNCH1	# in case of SYNCH_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCH1
-ld	$v0, Target_SYNCH1($s1)			# v0 = Target_SYNCH1
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH1 is zero
-sd	$a1,0($a3)							# 	go use Source_SYNCH1
+    sd      $a1, Source_SYNCH1($s0)         # Source_SYNCH1 = a1
+    lb      $v0, SYNCH_fix($s2)             # v0 = SYNCH_fix
+    beql    $v0, $zero, store_v0_as_SYNCH1  # in case of SYNCH_fix is disabled
+    or      $v0, $zero, $a1                 #   go use v0=a1 for SYNCH1
+    ld      $v0, Target_SYNCH1($s1)         # v0 = Target_SYNCH1
+    beql    $v0, $zero, exit_GSHandler      # in case of  Target_SYNCH1 is zero
+    sd      $a1, 0($a3)                     #   go use Source_SYNCH1
 
 store_v0_as_SYNCH1:
-b	exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
+    b       exit_GSHandler                  # Now go exit
+    sd      $v0, 0($a3)                     # after storing
 
 # ----------------------------
 # SYNCH2
@@ -276,17 +276,17 @@ sd	$v0,0($a3)							# after storing
 #|HB  |21:11|int 0:11:0| 0x7FF |
 #'----^-----^----------^-------'
 have_SYNCH2_write:
-sd	$a1, Source_SYNCH2($s0)			# Source_SYNCH2 = a1
-lb	$v0, SYNCH_fix($s2)				# v0 = SYNCH_fix
-beql	$v0,$zero,store_v0_as_SYNCH2	# in case of SYNCH_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCH2
-ld	$v0, Target_SYNCH2($s1)			# v0 = Target_SYNCH2
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCH2 is zero
-sd	$a1,0($a3)							# 	go use Source_SYNCH2
+    sd      $a1, Source_SYNCH2($s0)         # Source_SYNCH2 = a1
+    lb      $v0, SYNCH_fix($s2)             # v0 = SYNCH_fix
+    beql    $v0, $zero, store_v0_as_SYNCH2  # in case of SYNCH_fix is disabled
+    or      $v0, $zero, $a1                 #   go use v0=a1 for SYNCH2
+    ld      $v0, Target_SYNCH2($s1)         # v0 = Target_SYNCH2
+    beql    $v0, $zero, exit_GSHandler      # in case of  Target_SYNCH2 is zero
+    sd      $a1, 0($a3)                     #   go use Source_SYNCH2
 
 store_v0_as_SYNCH2:
-b	exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
+    b       exit_GSHandler                  # Now go exit
+    sd      $v0, 0($a3)                     # after storing
 
 # ----------------------------
 # SYNCV
@@ -301,15 +301,14 @@ sd	$v0,0($a3)							# after storing
 # |VS  |56:53|int 0:04:0| 0xF   |
 # '----^-----^----------^-------'
 have_SYNCV_write:
-sd	$a1, Source_SYNCV($s0)				# Source_SYNCV = a1
-lb	$v0, SYNCV_fix($s2)					# v0 = SYNCV_fix
-beql	$v0,$zero,store_v0_as_SYNCV		# in case of SYNCV_fix is disabled
-or	$v0,$zero,$a1						# 	go use v0=a1 for SYNCV
-ld	$v0, Target_SYNCV($s1)				# v0 = Target_SYNCV
-beql	$v0,$zero,exit_GSHandler		# in case of  Target_SYNCV is zero
-sd	$a1,0($a3)							# 	go use Source_SYNCV
+    sd      $a1, Source_SYNCV($s0)          # Source_SYNCV = a1
+    lb      $v0, SYNCV_fix($s2)             # v0 = SYNCV_fix
+    beql    $v0, $zero, store_v0_as_SYNCV   # in case of SYNCV_fix is disabled
+    or      $v0, $zero, $a1                 #   go use v0=a1 for SYNCV
+    ld      $v0, Target_SYNCV($s1)          # v0 = Target_SYNCV
+    beql    $v0, $zero, exit_GSHandler      # in case of  Target_SYNCV is zero
+    sd      $a1, 0($a3)                     #   go use Source_SYNCV
 
 store_v0_as_SYNCV:
-b	exit_GSHandler			# Now go exit
-sd	$v0,0($a3)							# after storing
-
+    b       exit_GSHandler                  # Now go exit
+    sd      $v0, 0($a3)                     # after storing

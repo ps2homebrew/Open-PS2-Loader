@@ -191,25 +191,25 @@ _dummy:
 
 
 __exp_smsutils:
-    .word   0x41C00000
-    .word   0x00000000
-    .word   0x00000101
-    .byte   's', 'm', 's', 'u'
-    .byte   't', 'i', 'l', 's'
-    .word   _start
-    .word   _dummy
-    .word   _dummy
-    .word   _dummy
-    .word   mips_memcpy
-    .word   mips_memset
-    .word   0x00000000
+.word   0x41C00000
+.word   0x00000000
+.word   0x00000101
+.byte   's', 'm', 's', 'u'
+.byte   't', 'i', 'l', 's'
+.word   _start
+.word   _dummy
+.word   _dummy
+.word   _dummy
+.word   mips_memcpy
+.word   mips_memset
+.word   0x00000000
 
 __imp_sms_utils:
-    .word   0x41E00000
-    .word   0x00000000
-    .word   0x00000101
-    .byte   'l', 'o', 'a', 'd'
-    .byte   'c', 'o', 'r', 'e'
+.word   0x41E00000
+.word   0x00000000
+.word   0x00000101
+.byte   'l', 'o', 'a', 'd'
+.byte   'c', 'o', 'r', 'e'
 RegisterLibraryEntries:
     jr      $ra
     addiu   $zero, $zero, 6

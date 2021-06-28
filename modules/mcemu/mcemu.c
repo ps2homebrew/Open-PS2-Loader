@@ -242,7 +242,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
 {
     register int ret;
 
-    if (!strncmp(lib->name, "sio2man", 8)) {
+    if (!strcmp(lib->name, "sio2man")) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
             ReleaseLibraryEntries((struct irx_export_table *)lib);
@@ -252,7 +252,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
             DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
             return ret;
         }
-    } else if (!strncmp(lib->name, "secrman", 8)) {
+    } else if (!strcmp(lib->name, "secrman")) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
             ReleaseLibraryEntries((struct irx_export_table *)lib);
@@ -262,7 +262,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
             DPRINTF("registering library %s failed, error %d\n", lib->name, ret);
             return ret;
         }
-    } else if (!strncmp(lib->name, "mcman", 8)) {
+    } else if (!strcmp(lib->name, "mcman")) {
         ret = pRegisterLibraryEntires(lib);
         if (ret == 0) {
             ReleaseLibraryEntries((struct irx_export_table *)lib);
@@ -274,7 +274,7 @@ int hookRegisterLibraryEntires(iop_library_t *lib)
             return ret;
         }
 #ifdef PADEMU
-    } else if (!strncmp(lib->name, "pademu", 8)) {
+    } else if (!strcmp(lib->name, "pademu")) {
         pademu_hookSio2man = GetExportEntry(&lib[1], 4);
 #endif
     }

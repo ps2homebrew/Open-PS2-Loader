@@ -34,7 +34,7 @@ struct cdvdman_settings_smb
     {
         struct
         {
-            //Please keep the string lengths in-sync with the limits within the UI.
+            // Please keep the string lengths in-sync with the limits within the UI.
             char smb_ip[16];
             u16 smb_port;
             char smb_share[32];

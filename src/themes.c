@@ -36,7 +36,7 @@ enum ELEM_ATTRIBUTE_TYPE {
     ELEM_TYPE_ATTRIBUTE_IMAGE,
     ELEM_TYPE_GAME_IMAGE,
     ELEM_TYPE_STATIC_IMAGE,
-    ELEM_TYPE_BACKGROUND, //A static image can be specified as the background. Otherwise, the plasma background will be drawn.
+    ELEM_TYPE_BACKGROUND, // A static image can be specified as the background. Otherwise, the plasma background will be drawn.
     ELEM_TYPE_MENU_ICON,
     ELEM_TYPE_MENU_TEXT,
     ELEM_TYPE_ITEMS_LIST,
@@ -1159,7 +1159,7 @@ static void thmLoad(const char *themePath)
 
     config_set_t *themeConfig = NULL;
     if (!themePath) {
-        //No theme specified. Prepare and load the default theme.
+        // No theme specified. Prepare and load the default theme.
         themeConfig = configAlloc(0, NULL, NULL);
         configReadBuffer(themeConfig, &conf_theme_OPL_cfg, size_conf_theme_OPL_cfg);
     } else {

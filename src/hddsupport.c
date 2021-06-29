@@ -89,7 +89,7 @@ static int hddCheckHDProKit(void)
     return ret;
 }
 
-//Taken from libhdd:
+// Taken from libhdd:
 #define PFS_ZONE_SIZE 8192
 #define PFS_FRAGMENT  0x00000000
 
@@ -186,7 +186,7 @@ void hddLoadModules(void)
     if (!hddModulesLoaded) {
         hddModulesLoaded = 1;
 
-        //DEV9 must be loaded, as HDD.IRX depends on it. Even if not required by the I/F (i.e. HDPro)
+        // DEV9 must be loaded, as HDD.IRX depends on it. Even if not required by the I/F (i.e. HDPro)
         sysInitDev9();
 
         // try to detect HD Pro Kit (not the connected HDD),
@@ -212,7 +212,7 @@ void hddLoadModules(void)
             return;
         }
 
-        //Check if a HDD unit is connected
+        // Check if a HDD unit is connected
         if (hddCheck() < 0) {
             LOG("HDD: No HardDisk Drive detected.\n");
             setErrorMessageWithCode(_STR_HDD_NOT_CONNECTED_ERROR, ERROR_HDD_NOT_DETECTED);
@@ -232,7 +232,7 @@ void hddLoadModules(void)
 
         ret = fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
         if (ret == -ENOENT) {
-            //Attempt to create the partition.
+            // Attempt to create the partition.
             if ((hddCreateOPLPartition(gOPLPart)) >= 0)
                 fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
         }
@@ -247,7 +247,7 @@ void hddLoadModules(void)
 void hddInit(void)
 {
     LOG("HDDSUPPORT Init\n");
-    hddForceUpdate = 0; //Use cache at initial startup.
+    hddForceUpdate = 0; // Use cache at initial startup.
     configGetInt(configGetByType(CONFIG_OPL), "hdd_frames_delay", &hddGameList.delay);
     ioPutRequest(IO_CUSTOM_SIMPLEACTION, &hddInitModules);
     hddGameList.enabled = 1;
@@ -282,7 +282,7 @@ static int hddUpdateGameList(void)
         }
     }
 
-    hddForceUpdate = 1; //Subsequent refresh operations will cause the HDD to be scanned.
+    hddForceUpdate = 1; // Subsequent refresh operations will cause the HDD to be scanned.
 
     return (ret == 0 ? hddGames.count : 0);
 }
@@ -396,7 +396,7 @@ static void hddLaunchGame(int id, config_set_t *configSet)
 
                 if (have_error) {
                     char error[256];
-                    if (have_error == 2) //VMC file is fragmented
+                    if (have_error == 2) // VMC file is fragmented
                         snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
                     else
                         snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
@@ -483,7 +483,7 @@ static config_set_t *hddGetConfig(int id)
 
     snprintf(path, sizeof(path), "%sCFG/%s.cfg", gHDDPrefix, game->startup);
     config_set_t *config = configAlloc(0, NULL, path);
-    configRead(config); //Does not matter if the config file exists or not.
+    configRead(config); // Does not matter if the config file exists or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
     configSetInt(config, CONFIG_ITEM_SIZE, game->total_size_in_kb >> 10);
@@ -504,7 +504,7 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
-//This may be called, even if hddInit() was not.
+// This may be called, even if hddInit() was not.
 static void hddCleanUp(int exception)
 {
     LOG("HDDSUPPORT CleanUp\n");
@@ -516,7 +516,7 @@ static void hddCleanUp(int exception)
             fileXioUmount(hddPrefix);
     }
 
-    //UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
+    // UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
     if (hddModulesLoaded) {
         fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
 
@@ -529,7 +529,7 @@ static int hddCheckVMC(char *name, int createSize)
     return sysCheckVMC(gHDDPrefix, "/", name, createSize, NULL);
 }
 
-//This may be called, even if hddInit() was not.
+// This may be called, even if hddInit() was not.
 static void hddShutdown(void)
 {
     LOG("HDDSUPPORT Shutdown\n");
@@ -539,16 +539,16 @@ static void hddShutdown(void)
         fileXioUmount(hddPrefix);
     }
 
-    //UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
+    // UI may have loaded modules outside of HDD mode, so deinitialize regardless of the enabled status.
     if (hddModulesLoaded) {
         /* Close all files */
         fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
 
-        //DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
-        //The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
+        // DEV9 will remain active if ETH is in use, so put the HDD in IDLE state.
+        // The HDD should still enter standby state after 21 minutes & 15 seconds, as per the ATAD defaults.
         hddSetIdleImmediate();
 
-        //Only shut down dev9 from here, if it was initialized from here before.
+        // Only shut down dev9 from here, if it was initialized from here before.
         sysShutdownDev9();
 
         hddModulesLoaded = 0;
@@ -593,7 +593,7 @@ static int hddLoadGameListCache(hdl_games_list_t *cache)
                 result = ENOMEM;
             }
         } else {
-            result = -1; //Empty file
+            result = -1; // Empty file
         }
 
         fclose(file);
@@ -650,7 +650,7 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
             result = EIO;
         }
     } else {
-        //Last game deleted.
+        // Last game deleted.
         remove(filename);
         result = 0;
     }

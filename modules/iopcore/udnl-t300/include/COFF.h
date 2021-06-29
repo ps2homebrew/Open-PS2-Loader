@@ -29,7 +29,7 @@ typedef struct aouthdr
     u32 text_start; /* base of text used for this file */
     u32 data_start; /* base of data used for this file */
     u32 bss_start;  /* base of bss used for this file */
-    //Instead of the GPR and CPR masks, these 5 fields exist.
+    // Instead of the GPR and CPR masks, these 5 fields exist.
     u32 field_20;
     u32 field_24;
     u32 field_28;

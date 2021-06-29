@@ -30,7 +30,7 @@ void InitGSMConfig(config_set_t *configSet)
 {
     config_set_t *configGame = configGetByType(CONFIG_GAME);
 
-    //Default values.
+    // Default values.
     gGSMSource = 0;
     gEnableGSM = 0;
     gGSMVMode = 0;
@@ -39,7 +39,7 @@ void InitGSMConfig(config_set_t *configSet)
     gGSMFIELDFix = 0;
 
     if (configGetInt(configSet, CONFIG_ITEM_GSMSOURCE, &gGSMSource)) {
-        //Load the rest of the per-game GSM configuration, only if GSM is enabled.
+        // Load the rest of the per-game GSM configuration, only if GSM is enabled.
         if (configGetInt(configSet, CONFIG_ITEM_ENABLEGSM, &gEnableGSM) && gEnableGSM) {
             configGetInt(configSet, CONFIG_ITEM_GSMVMODE, &gGSMVMode);
             configGetInt(configSet, CONFIG_ITEM_GSMXOFFSET, &gGSMXOffset);
@@ -106,21 +106,21 @@ void PrepareGSM(char *cmdline)
     char romver[16], romverNum[5], *pROMDate;
 
 #ifdef _DTL_T10000
-    if (predef_vmode[gGSMVMode].mode == GS_MODE_DTV_576P) //There is no 576P code implemented for development TOOLs.
-        gGSMVMode = 2;                                    //Change to PAL instead.
+    if (predef_vmode[gGSMVMode].mode == GS_MODE_DTV_576P) // There is no 576P code implemented for development TOOLs.
+        gGSMVMode = 2;                                    // Change to PAL instead.
 #endif
 
     k576p_fix = 0;
     kGsDxDyOffsetSupported = 0;
     if ((fd = open("rom0:ROMVER", O_RDONLY)) >= 0) {
-        //Read ROM version
+        // Read ROM version
         read(fd, romver, sizeof(romver));
         close(fd);
 
         strncpy(romverNum, romver, 4);
         romverNum[4] = '\0';
 
-        //ROMVER string format: VVVVRTYYYYMMDD\n
+        // ROMVER string format: VVVVRTYYYYMMDD\n
         pROMDate = &romver[strlen(romver) - 9];
 
         /* Enable 576P add-on code for v2.00 and earlier. Note that the earlier PSX models already seem to support the 576P mode, despite being older than the SCPH-70000 series.
@@ -132,7 +132,7 @@ void PrepareGSM(char *cmdline)
            Note that there are also PSX sets with v2.10, hence this check should only include v2.00 and earlier. */
         k576p_fix = (strtoul(romverNum, NULL, 10) < 210);
 
-        //Record if the _GetGsDxDyOffset syscall is supported.
+        // Record if the _GetGsDxDyOffset syscall is supported.
         kGsDxDyOffsetSupported = (strtoul(pROMDate, NULL, 10) > 20010608);
     }
 

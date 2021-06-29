@@ -1,4 +1,4 @@
-//sio2man hook code taken from opl mcemu:
+// sio2man hook code taken from opl mcemu:
 /*
   Copyright 2006-2008, Romz
   Copyright 2010, Polo
@@ -32,7 +32,7 @@ void *GetExportTable(char *libname, int version)
     return NULL;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Returns number of entries in the export table */
 u32 GetExportTableSize(void *table)
@@ -50,7 +50,7 @@ u32 GetExportTableSize(void *table)
     return size;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Returns an entry from the export table */
 void *GetExportEntry(void *table, u32 entry)
@@ -66,7 +66,7 @@ void *GetExportEntry(void *table, u32 entry)
     return NULL;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------
 /* Replaces an entry in the export table */
 void *HookExportEntry(void *table, u32 entry, void *func)
@@ -90,5 +90,5 @@ void *HookExportEntry(void *table, u32 entry, void *func)
     return NULL;
 }
 //------------------------------
-//endfunc
+// endfunc
 //---------------------------------------------------------------------------

@@ -65,7 +65,7 @@ void *pFastRpcBuf;               /* Pointer to buffer for RPC data for libmc cal
 
 PtrMcIo pMcRead, pMcWrite; /* Pointers to MCMAN's file I/O functions */
 //------------------------------
-//end of data definitions
+// end of data definitions
 //---------------------------------------------------------------------------
 // End of file: mcsiovar.c
 //---------------------------------------------------------------------------

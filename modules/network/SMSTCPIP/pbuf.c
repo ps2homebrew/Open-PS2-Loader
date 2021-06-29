@@ -312,10 +312,10 @@ pbuf_alloc(pbuf_layer l, u16_t length, pbuf_flag flag)
             }
             /* Set up internal structure of the pbuf. */
 
-            //Boman666: The memory isn't allocated to allow payload to be aligned. If payload is aligned according to the commented out
-            //line the last two bytes in payload will be located outside the allocated memoryblock. Which will have the effect of
-            //screwing up the memory-allocation structures, causing a crash.
-            //    p->payload = MEM_ALIGN((void *)((u8_t *)p + sizeof(struct pbuf) + offset));
+            // Boman666: The memory isn't allocated to allow payload to be aligned. If payload is aligned according to the commented out
+            // line the last two bytes in payload will be located outside the allocated memoryblock. Which will have the effect of
+            // screwing up the memory-allocation structures, causing a crash.
+            //     p->payload = MEM_ALIGN((void *)((u8_t *)p + sizeof(struct pbuf) + offset));
             p->payload = (void *)((u8_t *)p + sizeof(struct pbuf) + offset);
 
             p->len = p->tot_len = length;
@@ -413,7 +413,7 @@ void pbuf_realloc(struct pbuf *p, u16_t new_len)
     }
 
     /* the pbuf chain grows by (new_len - p->tot_len) bytes
-   * (which may be negative in case of shrinking) */
+     * (which may be negative in case of shrinking) */
     grow = new_len - p->tot_len;
 
     /* first, step over any pbufs that should remain in the chain */
@@ -497,7 +497,7 @@ u8_t pbuf_header(struct pbuf *p, s16_t header_size)
             p->payload = (u8_t *)p->payload - header_size;
         } else {
             /* cannot expand payload to front (yet!)
-       * bail out unsuccesfully */
+             * bail out unsuccesfully */
             return 1;
         }
     }
@@ -533,7 +533,7 @@ u8_t pbuf_header(struct pbuf *p, s16_t header_size)
  *
  * Assuming existing chains a->b->c with the following reference
  * counts, calling pbuf_free(a) results in:
- * 
+ *
  * 1->2->3 becomes ...1->3
  * 3->3->3 becomes 2->3->3
  * 1->1->2 becomes ......1
@@ -559,11 +559,11 @@ u8_t pbuf_free(struct pbuf *p)
 
     count = 0;
     /* Since decrementing ref cannot be guaranteed to be a single machine operation
-   * we must protect it. Also, the later test of ref must be protected.
-   */
+     * we must protect it. Also, the later test of ref must be protected.
+     */
     SYS_ARCH_PROTECT(old_level);
     /* de-allocate all consecutive pbufs from the head of the chain that
-   * obtain a zero reference count after decrementing*/
+     * obtain a zero reference count after decrementing*/
     while (p != NULL) {
         /* all pbufs in a chain are referenced at least once */
         LWIP_ASSERT("pbuf_free: p->ref > 0", p->ref > 0);
@@ -643,10 +643,10 @@ void pbuf_ref(struct pbuf *p)
 /**
  * Concatenate two pbufs (each may be a pbuf chain) and take over
  * the caller's reference of the tail pbuf.
- * 
+ *
  * @note The caller MAY NOT reference the tail pbuf afterwards.
  * Use pbuf_chain() for that purpose.
- * 
+ *
  * @see pbuf_chain()
  */
 
@@ -674,10 +674,10 @@ void pbuf_cat(struct pbuf *h, struct pbuf *t)
 
 /**
  * Chain two pbufs (or pbuf chains) together.
- * 
+ *
  * The caller MUST call pbuf_free(t) once it has stopped
  * using it. Use pbuf_cat() instead if you no longer use t.
- * 
+ *
  * @param h head pbuf (chain)
  * @param t tail pbuf (chain)
  * @note The pbufs MUST belong to the same packet.
@@ -771,12 +771,12 @@ pbuf_take(struct pbuf *p)
                 q->tot_len = p->tot_len;
                 q->len = p->len;
                 /* in case p was the first pbuf, it is no longer refered to by
-         * our caller, as the caller MUST do p = pbuf_take(p);
-         * in case p was not the first pbuf, it is no longer refered to
-         * by prev. we can safely free the pbuf here.
-         * (note that we have set p->next to NULL already so that
-         * we will not free the rest of the chain by accident.)
-         */
+                 * our caller, as the caller MUST do p = pbuf_take(p);
+                 * in case p was not the first pbuf, it is no longer refered to
+                 * by prev. we can safely free the pbuf here.
+                 * (note that we have set p->next to NULL already so that
+                 * we will not free the rest of the chain by accident.)
+                 */
                 pbuf_free(p);
                 /* do not copy ref, since someone else might be using the old buffer */
                 LWIP_DEBUGF(PBUF_DEBUG, ("pbuf_take: replaced PBUF_REF %p with %p\n", (void *)p, (void *)q));

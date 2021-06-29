@@ -1,12 +1,12 @@
-/* 
+/*
  * Adapted from java to C by jimmikaelkael <jimmikaelkael@wanadoo.fr>
  */
 
 /**
  * Implements the MD4 message digest algorithm in Java.
- * 
+ *
  * References:
- * 
+ *
  *        Ronald L. Rivest,
  *        The MD4 Message-Digest Algorithm: <http://www.roxen.com/rfc/rfc1320.html>,
  *        IETF RFC-1320 (informational).
@@ -136,8 +136,8 @@ static void engineReset()
     context[3] = 0x10325476;
 }
 
-/** 
- * produce a MD4 message digest from message of len bytes 
+/**
+ * produce a MD4 message digest from message of len bytes
  */
 unsigned char *MD4(unsigned char *message, int len, unsigned char *cipher)
 {

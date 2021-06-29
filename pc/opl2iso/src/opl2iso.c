@@ -1,7 +1,7 @@
 /*
   Copyright 2010, volca
   Parts Copyright 2009, jimmikaelkael
-  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 
@@ -168,7 +168,7 @@ int findGame(const char *gameid, cfg_t *item)
             temp = (char *)gameid;
         else
             temp++;
-        if ((strlen(temp) >= 23)                                //Minimum part file name length is really 26
+        if ((strlen(temp) >= 23)                                // Minimum part file name length is really 26
             && (strncmp("ul.", temp, 3) == 0)                   //"ul." at start
             && (strncmp(&item->image[2], &(temp[11]), 12) == 0) //.game_ID after CRC
         )

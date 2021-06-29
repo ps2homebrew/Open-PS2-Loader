@@ -143,7 +143,7 @@ void sysInitDev9(void)
 
     if (!dev9Initialized) {
         ret = sysLoadModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL);
-        dev9Loaded = (ret == 0); //DEV9.IRX must have successfully loaded and returned RESIDENT END.
+        dev9Loaded = (ret == 0); // DEV9.IRX must have successfully loaded and returned RESIDENT END.
         dev9Initialized = 1;
     }
 
@@ -237,7 +237,7 @@ void sysReset(int modload_mask)
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
 #ifdef PADEMU
-    int ds3pads = 1; //only one pad enabled
+    int ds3pads = 1; // only one pad enabled
 
     ds34usb_deinit();
     ds34bt_deinit();
@@ -346,12 +346,12 @@ int sysGetDiscID(char *hexDiscID)
 
 void sysExecExit(void)
 {
-    //Deinitialize without shutting down active devices.
+    // Deinitialize without shutting down active devices.
     deinit(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
     Exit(0);
 }
 
-//Module bits
+// Module bits
 #define CORE_IRX_USB   0x01
 #define CORE_IRX_ETH   0x02
 #define CORE_IRX_SMB   0x04
@@ -369,16 +369,16 @@ typedef struct
     int *module_size;
 } patchlist_t;
 
-//Blank string for mode = all modes.
+// Blank string for mode = all modes.
 static const patchlist_t iop_patch_list[] = {
-    {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     //Disaster Report
-    {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     //SOS: The Final Escape
-    {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     //Zettai Zetsumei Toshi
-    {"SLES_535.08", "", &apemodpatch_irx, &size_apemodpatch_irx},       //Ultimate Pro Pinball
-    {"SLUS_204.13", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (NTSC-U/C)
-    {"SLES_504.46", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (PAL)
-    {"SLES_506.08", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, //Shadow Man: 2econd Coming (PAL German)
-    {NULL, NULL, NULL, NULL},                                           //Terminator
+    {"SLUS_205.61", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     // Disaster Report
+    {"SLES_513.01", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     // SOS: The Final Escape
+    {"SLPS_251.13", "", &iremsndpatch_irx, &size_iremsndpatch_irx},     // Zettai Zetsumei Toshi
+    {"SLES_535.08", "", &apemodpatch_irx, &size_apemodpatch_irx},       // Ultimate Pro Pinball
+    {"SLUS_204.13", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, // Shadow Man: 2econd Coming (NTSC-U/C)
+    {"SLES_504.46", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, // Shadow Man: 2econd Coming (PAL)
+    {"SLES_506.08", "", &f2techioppatch_irx, &size_f2techioppatch_irx}, // Shadow Man: 2econd Coming (PAL German)
+    {NULL, NULL, NULL, NULL},                                           // Terminator
 };
 
 static unsigned int addIopPatch(const char *mode_str, const char *startup, irxptr_t *tab)
@@ -406,9 +406,9 @@ typedef struct
 } modStorageSetting_t;
 
 static const modStorageSetting_t mod_storage_location_list[] = {
-    {"SLUS_209.77", (void *)0x01fc7000}, //Virtua Quest
-    {"SLPM_656.32", (void *)0x01fc7000}, //Virtua Fighter Cyber Generation: Judgment Six No Yabou
-    {NULL, NULL},                        //Terminator
+    {"SLUS_209.77", (void *)0x01fc7000}, // Virtua Quest
+    {"SLPM_656.32", (void *)0x01fc7000}, // Virtua Fighter Cyber Generation: Judgment Six No Yabou
+    {NULL, NULL},                        // Terminator
 };
 
 static void *GetModStorageLocation(const char *startup, unsigned compatFlags)
@@ -453,7 +453,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     LOG("IOPRP image size actual:     %d\n", size_ioprp_image);
 
     modcount = 0;
-    //Basic modules
+    // Basic modules
     irxptr_tab[modcount].info = size_udnl_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_UDNL);
     irxptr_tab[modcount++].ptr = (void *)&udnl_irx;
     irxptr_tab[modcount].info = size_ioprp_image | SET_OPL_MOD_ID(OPL_MODULE_ID_IOPRP);
@@ -534,8 +534,8 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     irxtable->count = modcount;
 
 #ifdef __DECI2_DEBUG
-    //For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
-    //total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
+    // For DECI2 debugging mode, the UDNL module will have to be stored within kernel RAM because there isn't enough space below user RAM.
+    // total_size will hence not include the IOPRP image, but it's okay because the EE core is interested in protecting the module storage within user RAM.
     irxptr = (void *)0x00033000;
     LOG("SYSTEM DECI2 UDNL address start: %p end: %p\n", irxptr, irxptr + GET_OPL_MOD_SIZE(irxptr_tab[0].info));
     DI();
@@ -544,7 +544,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     ee_kmode_exit();
     EI();
 
-    irxptr_tab[0].ptr = irxptr; //UDNL is the first module.
+    irxptr_tab[0].ptr = irxptr; // UDNL is the first module.
 #endif
 
     total_size = (sizeof(irxtab_t) + sizeof(irxptr_t) * modcount + 0xF) & ~0xF;
@@ -578,14 +578,14 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
 
 #ifdef __DECI2_DEBUG
 /*
-	Look for the start of the EE DECI2 manager initialization function.
+    Look for the start of the EE DECI2 manager initialization function.
 
-	The stock EE kernel has no reset function, but the EE kernel is most likely already primed to self-destruct and in need of a good reset.
-	What happens is that the OSD initializes the EE DECI2 TTY protocol at startup, but the EE DECI2 manager is never aware that the OSDSYS ever loads other programs.
+    The stock EE kernel has no reset function, but the EE kernel is most likely already primed to self-destruct and in need of a good reset.
+    What happens is that the OSD initializes the EE DECI2 TTY protocol at startup, but the EE DECI2 manager is never aware that the OSDSYS ever loads other programs.
 
-	As a result, the EE kernel crashes immediately when the EE TTY gets used (when the IOP side of DECI2 comes up), when it invokes whatever that exists at the OSD's old ETTY handler's location. :(
+    As a result, the EE kernel crashes immediately when the EE TTY gets used (when the IOP side of DECI2 comes up), when it invokes whatever that exists at the OSD's old ETTY handler's location. :(
 
-	Must be run in kernel mode.
+    Must be run in kernel mode.
 */
 static int ResetDECI2(void)
 {
@@ -593,10 +593,10 @@ static int ResetDECI2(void)
     unsigned int i, *ptr;
     void (*pDeci2ManagerInit)(void);
     static const unsigned int Deci2ManagerInitPattern[] = {
-        0x3c02bf80, //lui v0, $bf80
-        0x3c04bfc0, //lui a0, $bfc0
-        0x34423800, //ori v0, v0, $3800
-        0x34840102  //ori a0, a0, $0102
+        0x3c02bf80, // lui v0, $bf80
+        0x3c04bfc0, // lui a0, $bfc0
+        0x34423800, // ori v0, v0, $3800
+        0x34840102  // ori a0, a0, $0102
     };
 
     result = -1;
@@ -737,11 +737,11 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     if (gExitPath[0] == '\0')
         strncpy(gExitPath, "Browser", sizeof(gExitPath));
 
-    //Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
+    // Disable sound effects via libsd, to prevent some games with improper initialization from inadvertently using digital effect settings from other software.
     sysLoadModuleBuffer(&cleareffects_irx, size_cleareffects_irx, 0, NULL);
 
-    //Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
-    //Start wiping from 0x00084000 instead (as the HDD Browser does), as the alarm patch is installed at 0x00082000.
+    // Wipe the low user memory region, since this region might not be wiped after OPL's EE core is installed.
+    // Start wiping from 0x00084000 instead (as the HDD Browser does), as the alarm patch is installed at 0x00082000.
     memset((void *)0x00084000, 0, 0x00100000 - 0x00084000);
 
     modules = 0;
@@ -779,8 +779,8 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
             memset(eph[i].vaddr + eph[i].filesz, 0, eph[i].memsz - eph[i].filesz);
     }
 
-    //Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
-    if (initKernel((void *)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0) { //Should not happen, but...
+    // Get the kernel to use our EELOAD module and to begin erasure after module storage. EE core will erase any memory before the module storage (if any).
+    if (initKernel((void *)eh->entry, ModuleStorageEnd, &eeloadCopy, &initUserMemory) != 0) { // Should not happen, but...
         LOG("Error - kernel is unsupported.\n");
         asm volatile("break\n");
     }
@@ -824,8 +824,8 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     argv[argc] = gsm_config_str;
     argc++;
 
-    //PS2LOGO Caller, based on l_oliveira & SP193 tips
-    //Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
+    // PS2LOGO Caller, based on l_oliveira & SP193 tips
+    // Don't call LoadExecPS2 here because it will wipe all memory above the EE core, making it impossible to pass data via pointers.
     if (EnablePS2Logo) {
         argv[argc] = "rom0:PS2LOGO";
         argc++;

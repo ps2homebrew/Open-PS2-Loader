@@ -169,10 +169,10 @@ err_t tcp_enqueue(
         else {
 
             /* first, allocate a pbuf for holding the data.
-       * since the referenced data is available at least until it is sent out on the
-       * link (as it has to be ACKed by the remote party) we can safely use PBUF_ROM
-       * instead of PBUF_REF here.
-       */
+             * since the referenced data is available at least until it is sent out on the
+             * link (as it has to be ACKed by the remote party) we can safely use PBUF_ROM
+             * instead of PBUF_REF here.
+             */
             if ((p = pbuf_alloc(PBUF_TRANSPORT, seglen, PBUF_ROM)) == NULL) {
                 LWIP_DEBUGF(TCP_OUTPUT_DEBUG | 2, ("tcp_enqueue: could not allocate memory for zero-copy pbuf\n"));
                 goto memerr;
@@ -184,7 +184,7 @@ err_t tcp_enqueue(
             /* Second, allocate a pbuf for the headers. */
             if ((seg->p = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_RAM)) == NULL) {
                 /* If allocation fails, we have to deallocate the data pbuf as
-         * well. */
+                 * well. */
                 pbuf_free(p);
                 LWIP_DEBUGF(TCP_OUTPUT_DEBUG | 2, ("tcp_enqueue: could not allocate memory for header pbuf\n"));
                 goto memerr;

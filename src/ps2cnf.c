@@ -19,12 +19,12 @@ static const char *CNFGetToken(const char *cnf, const char *key)
     }
 
     for (; *key != '\0'; key++, cnf++) {
-        //End of file
+        // End of file
         if (*cnf == '\0')
             return (const char *)-1;
 
         if (*cnf != *key)
-            return NULL; //Non-match
+            return NULL; // Non-match
     }
 
     return cnf;
@@ -44,11 +44,11 @@ static const char *CNFGetKey(const char *line, char *key)
 {
     int i;
 
-    //Skip leading whitespace
+    // Skip leading whitespace
     for (; isspace((int)*line); line++) {
     }
 
-    if (*line == '\0') { //Unexpected end of file
+    if (*line == '\0') { // Unexpected end of file
         return (const char *)-1;
     }
 
@@ -60,7 +60,7 @@ static const char *CNFGetKey(const char *line, char *key)
         } else if (isspace((int)*line)) {
             *key = '\0';
             break;
-        } else if (*line == '\0') { //Unexpected end of file. This check exists, along with the other similar check above.
+        } else if (*line == '\0') { // Unexpected end of file. This check exists, along with the other similar check above.
             return (const char *)-1;
         }
     }
@@ -97,7 +97,7 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
     system_cnf[size] = '\0';
     cnf_end = &system_cnf[size];
 
-    //Parse SYSTEM.CNF
+    // Parse SYSTEM.CNF
     cnf_start = system_cnf;
     while ((pChar = CNFGetToken(cnf_start, "BOOT2")) == NULL) {
         cnf_start = CNFAdvanceLine(cnf_start, cnf_end);
@@ -105,15 +105,15 @@ int ps2cnfGetBootFile(const char *path, char *bootfile)
             return -1;
     }
 
-    if (pChar == (const char *)-1) { //Unexpected EOF
+    if (pChar == (const char *)-1) { // Unexpected EOF
         return -1;
     }
 
-    if ((pChar = CNFGetToken(pChar, "=")) == (const char *)-1) { //Unexpected EOF
+    if ((pChar = CNFGetToken(pChar, "=")) == (const char *)-1) { // Unexpected EOF
         return -1;
     }
 
-    if (CNFGetKey(pChar, bootfile) == (const char *)-1) { //Unexpected EOF
+    if (CNFGetKey(pChar, bootfile) == (const char *)-1) { // Unexpected EOF
         return -1;
     }
 

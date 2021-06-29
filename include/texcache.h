@@ -41,19 +41,19 @@ typedef struct
 } image_cache_t;
 
 /** Initializes the cache subsystem.
-*/
+ */
 void cacheInit();
 
 /** Terminates the cache. Does nothing currently. Users of this code have to destroy caches via cacheDestroyCache
-*/
+ */
 void cacheEnd();
 
-/** Initializes a single cache 
-*/
+/** Initializes a single cache
+ */
 image_cache_t *cacheInitCache(int userId, const char *prefix, int isPrefixRelative, const char *suffix, int count);
 
 /** Destroys a given cache (unallocates all memory stored there, disconnects the pixmaps from the usage points).
-*/
+ */
 void cacheDestroyCache(image_cache_t *cache);
 
 GSTEXTURE *cacheGetTexture(image_cache_t *cache, item_list_t *list, int *cacheId, int *UID, char *value);

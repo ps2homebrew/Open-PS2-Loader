@@ -8,7 +8,7 @@
 
 #include <irx.h>
 
-#define DPRINTF(args...) //printf(args)
+#define DPRINTF(args...) // printf(args)
 
 struct dirTocEntry
 {
@@ -216,7 +216,7 @@ lbl_startlocate:
 
         strcpy(cdvdman_dirname, p);
 
-        //Correct filenames (for files), if necessary.
+        // Correct filenames (for files), if necessary.
         if ((p_tmp = strchr(cdvdman_dirname, '.')) != NULL) {
             for (i = 0, p_tmp++; i < 3 && (*p_tmp != '\0'); i++, p_tmp++) {
                 if (p_tmp[0] == ';')
@@ -394,7 +394,7 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
 
     rpos = 0;
     if (size > 0) {
-        //Phase 1: read data until the offset of the file is nicely aligned to a 2048-byte boundary.
+        // Phase 1: read data until the offset of the file is nicely aligned to a 2048-byte boundary.
         if ((offset = fh->position % 2048) != 0) {
             nbytes = 2048 - offset;
             if (size < nbytes)
@@ -409,7 +409,7 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
             buf += nbytes;
         }
 
-        //Phase 2: read the data to the middle of the buffer, in units of 2048.
+        // Phase 2: read the data to the middle of the buffer, in units of 2048.
         if ((nsectors = size / 2048) > 0) {
             nbytes = nsectors * 2048;
 
@@ -421,7 +421,7 @@ static int IsofsRead(iop_file_t *f, void *buf, int size)
             rpos += nbytes;
         }
 
-        //Phase 3: read any remaining data that isn't divisible by 2048.
+        // Phase 3: read any remaining data that isn't divisible by 2048.
         if ((nbytes = size) > 0) {
             cdEmuRead(fh->lsn + (fh->position / 2048), 1, cdvdman_fs_buf);
 

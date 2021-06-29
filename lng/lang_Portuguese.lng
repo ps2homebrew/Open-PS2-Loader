@@ -26,8 +26,8 @@ Cancelar atualização?
 %d: Erro ao iniciar rede
 %d: Adaptador de Rede não detetado
 %d: Não foi possível ligar ao servidor SMB
-%d: Não foi possível efetuar login no servidor SMB 
-%d: Não foi possível abrir a partilha SMB 
+%d: Não foi possível efetuar login no servidor SMB
+%d: Não foi possível abrir a partilha SMB
 %d: Impossivel listar partilhas SMB
 %d: Impossivel listar jogos
 %d: Servidor DHCP indisponivel

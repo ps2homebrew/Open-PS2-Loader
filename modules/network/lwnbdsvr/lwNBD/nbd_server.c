@@ -1,15 +1,15 @@
 /****************************************************************/ /**
- *
- * @file nbd_server.c
- *
- * @author   Ronan Bignaux <ronan@aimao.org>
- *
- * @brief    Network Block Device Protocol server
- *
- * Copyright (c) Ronan Bignaux. 2021
- * All rights reserved.
- *
- ********************************************************************/
+                                                                    *
+                                                                    * @file nbd_server.c
+                                                                    *
+                                                                    * @author   Ronan Bignaux <ronan@aimao.org>
+                                                                    *
+                                                                    * @brief    Network Block Device Protocol server
+                                                                    *
+                                                                    * Copyright (c) Ronan Bignaux. 2021
+                                                                    * All rights reserved.
+                                                                    *
+                                                                    ********************************************************************/
 
 /*
  * Redistribution and use in source and binary forms, with or without
@@ -86,14 +86,14 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
     struct nbd_fixed_new_option_reply fixed_new_option_reply;
     struct nbd_new_handshake new_hs;
 
-    //temporary workaround
+    // temporary workaround
     struct nbd_context *ctx = ctxs[0];
 
     /*** handshake ***/
 
     new_hs.nbdmagic = htonll(NBD_MAGIC);
     new_hs.version = htonll(NBD_NEW_VERSION);
-    new_hs.gflags = 0; //htons(NBD_FLAG_FIXED_NEWSTYLE);
+    new_hs.gflags = 0; // htons(NBD_FLAG_FIXED_NEWSTYLE);
     size = send(client_socket, &new_hs, sizeof(struct nbd_new_handshake),
                 0);
     if (size < sizeof(struct nbd_new_handshake))
@@ -143,7 +143,7 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 goto abort;
 
             case NBD_OPT_ABORT:
-                //TODO : test
+                // TODO : test
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_ACK);
@@ -159,7 +159,7 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 desc_len = ctx->export_desc ? strlen(ctx->export_desc) : 0;
                 len = htonl(name_len);
 
-                //TODO : many export in a loop
+                // TODO : many export in a loop
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_SERVER);
@@ -172,23 +172,23 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 size = send(client_socket, ctx->export_name, name_len, MSG_MORE);
                 size = send(client_socket, ctx->export_desc, desc_len, 0);
                 break;
-                //TODO
-                //                break;
-                //            case NBD_OPT_STARTTLS:
-                //                break;
-                // see nbdkit send_newstyle_option_reply_info_export()
+                // TODO
+                //                 break;
+                //             case NBD_OPT_STARTTLS:
+                //                 break;
+                //  see nbdkit send_newstyle_option_reply_info_export()
             case NBD_OPT_INFO:
             case NBD_OPT_GO:
 
 
-                //            	if (new_opt.option == NBD_OPT_GO)
-                //            		goto abort;
-                //            	break;
+                //                if (new_opt.option == NBD_OPT_GO)
+                //                    goto abort;
+                //                break;
             case NBD_OPT_STRUCTURED_REPLY:
             case NBD_OPT_LIST_META_CONTEXT:
             case NBD_OPT_SET_META_CONTEXT:
             default:
-                //TODO: test
+                // TODO: test
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_ERR_UNSUP);
@@ -284,7 +284,7 @@ static int transmission_phase(int client_socket, struct nbd_context *ctx)
                         sendflag = 1;
                     } else {
                         goto error; // -EIO
-                                    //                    	LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
+                                    //                        LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
                     }
                 }
 
@@ -322,15 +322,15 @@ static int transmission_phase(int client_socket, struct nbd_context *ctx)
                         if (r != 0) {
                             error = NBD_EIO;
                             sendflag = 0;
-                            //                    	LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
+                            //                        LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
                         }
                         offset += bufbklsz;
                         blkremains -= bufbklsz;
                         retry = NBD_MAX_RETRIES;
                     } else {
-                        error = NBD_EOVERFLOW; //TODO
+                        error = NBD_EOVERFLOW; // TODO
                         sendflag = 0;
-                        //                    	LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
+                        //                        LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
                     }
                 }
 
@@ -341,7 +341,7 @@ static int transmission_phase(int client_socket, struct nbd_context *ctx)
                 break;
 
             case NBD_CMD_DISC:
-                //TODO
+                // TODO
                 goto soft_disconnect;
                 break;
 

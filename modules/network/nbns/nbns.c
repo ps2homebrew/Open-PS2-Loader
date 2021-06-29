@@ -1,8 +1,8 @@
-/*	Basic NetBIOS Name Service resolver client.
-	This client does not completely implement RFC1002,
-	as it only allows network addresses to be resolved.
+/*  Basic NetBIOS Name Service resolver client.
+    This client does not completely implement RFC1002,
+    as it only allows network addresses to be resolved.
 
-	Related reading materials: RFC1001 and RFC1002.	*/
+    Related reading materials: RFC1001 and RFC1002.    */
 
 #include <errno.h>
 #include <intrman.h>
@@ -36,8 +36,8 @@ enum NB_OPCODE_TYPE {
     NB_OPCODE_TYPE_COUNT
 };
 
-#define QUESTION_TYPE_NB  0x0020 //NetBIOS general Name Service Resource Record
-#define QUESTION_CLASS_IN 0x0001 //Internet class
+#define QUESTION_TYPE_NB  0x0020 // NetBIOS general Name Service Resource Record
+#define QUESTION_CLASS_IN 0x0001 // Internet class
 
 struct NbHeader
 {
@@ -55,7 +55,7 @@ struct NbQuestionTrailer
     u16 qnClass;
 };
 
-//Record status bits.
+// Record status bits.
 #define NBNS_NAME_RECORD_ALLOCATED 0x01
 #define NBNS_NAME_RECORD_INIT      0x02
 #define NBNS_NAME_RECORD_VALID     0x04
@@ -180,31 +180,31 @@ static void nbnsReceiveThread(void *arg)
                 header = (struct NbHeader *)frame;
                 code = BSWAP16(header->code);
 
-                //	printf("R: %d, opcode: 0x%x, rcode: 0x%x, tcode: 0x%04x, flags: 0x%x\n", NB_GET_R(code), NB_GET_OPCODE(code), NB_GET_RCODE(code), BSWAP16(header->TransactionID), NB_GET_MN_FLAGS(code));
+                //    printf("R: %d, opcode: 0x%x, rcode: 0x%x, tcode: 0x%04x, flags: 0x%x\n", NB_GET_R(code), NB_GET_OPCODE(code), NB_GET_RCODE(code), BSWAP16(header->TransactionID), NB_GET_MN_FLAGS(code));
 
                 switch (NB_GET_OPCODE(code)) {
                     case NB_OPCODE_TYPE_QUERY:
                         if (NB_GET_R(code)) {
-                            //Responses.
-                            if (NB_GET_RCODE(code) == 0 && BSWAP16(header->ANCount) == 1) //Positive query response.
+                            // Responses.
+                            if (NB_GET_RCODE(code) == 0 && BSWAP16(header->ANCount) == 1) // Positive query response.
                             {
                                 result = decode_name(&frame[sizeof(struct NbHeader)], decoded_name);
                                 decoded_name[result] = '\0';
 
                                 if ((record = lookupName(decoded_name, BSWAP16(header->TransactionID))) != NULL && (record->status & NBNS_NAME_RECORD_INIT)) {
                                     if (!(record->status & NBNS_NAME_RECORD_VALID)) {
-                                        //Set the record as authoritative.
+                                        // Set the record as authoritative.
                                         CpuSuspendIntr(&OldState);
                                         memcpy(record->address, &frame[sizeof(struct NbHeader) + 34 + sizeof(struct NbQuestionTrailer) + 4 + 2 + 2], sizeof(record->address));
                                         record->status |= NBNS_NAME_RECORD_VALID;
                                         CpuResumeIntr(OldState);
 
-                                        //		printf("Received IP %u.%u.%u.%u for %s\n", record->address[0], record->address[1], record->address[2], record->address[3], record->name);
+                                        //        printf("Received IP %u.%u.%u.%u for %s\n", record->address[0], record->address[1], record->address[2], record->address[3], record->name);
 
                                         if (record->thid >= 0)
                                             WakeupThread(record->thid);
                                     } else {
-                                        //Conflict. Don't handle.
+                                        // Conflict. Don't handle.
                                     }
                                 }
                             }
@@ -215,7 +215,7 @@ static void nbnsReceiveThread(void *arg)
                     case NB_OPCODE_TYPE_REL:
                     case NB_OPCODE_TYPE_REG:
                     case NB_OPCODE_TYPE_REFRESH:
-                        //Do nothing for unsupported codes.
+                        // Do nothing for unsupported codes.
                         break;
                     default:
                         printf("nbnsReceiveThread: unrecognized opcode: %x\n", NB_GET_OPCODE(code));
@@ -277,7 +277,7 @@ void nbnsDeinit(void)
     }
 
     if (nbnsReceiveThreadID > 0) {
-        //Wait for the receive thread to terminate.
+        // Wait for the receive thread to terminate.
         while (ReferThreadStatus(nbnsReceiveThreadID, &ThreadInfo) == 0 && ThreadInfo.status != THS_DORMANT)
             DelayThread(1000);
         DeleteThread(nbnsReceiveThreadID);
@@ -330,7 +330,7 @@ int nbnsFindName(const char *name, unsigned char *ip_address)
         trailer->qnClass = BSWAP16(QUESTION_CLASS_IN);
 
         TotalLength = sizeof(struct NbHeader) + 34 + sizeof(struct NbQuestionTrailer);
-        //Like with Microsoft Windows, make up to 10 attempts.
+        // Like with Microsoft Windows, make up to 10 attempts.
         for (retries = 10; retries > 0; retries--) {
             struct sockaddr_in service;
 
@@ -339,7 +339,7 @@ int nbnsFindName(const char *name, unsigned char *ip_address)
             service.sin_port = htons(137);
 
             if (sendto(nbnsSocket, frame, TotalLength, 0, (struct sockaddr *)&service, sizeof(service)) == TotalLength) {
-                clock.lo = 27600000; //250ms * 3 = 750ms of 36.8MHz clock ticks
+                clock.lo = 27600000; // 250ms * 3 = 750ms of 36.8MHz clock ticks
                 clock.hi = 0;
                 SetAlarm(&clock, &nbnsQueryNameTimeout, record);
                 SleepThread();

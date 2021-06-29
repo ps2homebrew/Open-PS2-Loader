@@ -217,7 +217,7 @@ void texPrepare(GSTEXTURE *texture, short psm)
     texture->Vram = 0;
     texture->VramClut = 0;
     texture->Clut = NULL;
-    //gsKit_setup_tbw(texture); already done in gsKit_texture_upload
+    // gsKit_setup_tbw(texture); already done in gsKit_texture_upload
 }
 
 int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
@@ -428,7 +428,7 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
         if (file == NULL)
             return ERR_BAD_FILE;
 
-        readFunction = NULL; //Use default reading function.
+        readFunction = NULL; // Use default reading function.
     } else {
         if (!internalDefault[texId].texture)
             return ERR_BAD_FILE;

@@ -1,7 +1,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-//Enum for the different types of config files. Game-specific config files (<game ID>.cfg) will always have an ID of 0.
+// Enum for the different types of config files. Game-specific config files (<game ID>.cfg) will always have an ID of 0.
 enum CONFIG_INDEX {
     CONFIG_INDEX_OPL = 0,
     CONFIG_INDEX_LAST,
@@ -12,7 +12,7 @@ enum CONFIG_INDEX {
     CONFIG_INDEX_COUNT
 };
 
-//Config type bits
+// Config type bits
 #define CONFIG_OPL     (1 << CONFIG_INDEX_OPL)
 #define CONFIG_LAST    (1 << CONFIG_INDEX_LAST)
 #define CONFIG_APPS    (1 << CONFIG_INDEX_APPS)
@@ -22,9 +22,9 @@ enum CONFIG_INDEX {
 
 #define CONFIG_SOURCE_DEFAULT 0
 #define CONFIG_SOURCE_USER    1
-#define CONFIG_SOURCE_DLOAD   2 //Downloaded from the network
+#define CONFIG_SOURCE_DLOAD   2 // Downloaded from the network
 
-//Items for per-game config files.
+// Items for per-game config files.
 #define CONFIG_ITEM_NAME         "#Name"
 #define CONFIG_ITEM_LONGNAME     "#LongName"
 #define CONFIG_ITEM_SIZE         "#Size"
@@ -38,7 +38,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_DNAS         "$DNAS"
 #define CONFIG_ITEM_CONFIGSOURCE "$ConfigSource"
 
-//Per-Game GSM keys. -Bat-
+// Per-Game GSM keys. -Bat-
 #define CONFIG_ITEM_GSMSOURCE   "$GSMSource"
 #define CONFIG_ITEM_ENABLEGSM   "$EnableGSM"
 #define CONFIG_ITEM_GSMVMODE    "$GSMVMode"
@@ -46,7 +46,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_GSMYOFFSET  "$GSMYOffset"
 #define CONFIG_ITEM_GSMFIELDFIX "$GSMFIELDFix"
 
-//Per-Game CHEAT keys. -Bat-
+// Per-Game CHEAT keys. -Bat-
 #define CONFIG_ITEM_CHEATSSOURCE "$CheatsSource"
 #define CONFIG_ITEM_ENABLECHEAT  "$EnableCheat"
 #define CONFIG_ITEM_CHEATMODE    "$CheatMode"
@@ -55,7 +55,7 @@ enum CONFIG_INDEX {
 #define CONFIG_ITEM_ENABLEPADEMU   "$EnablePadEmu"
 #define CONFIG_ITEM_PADEMUSETTINGS "$PadEmuSettings"
 
-//OPL config keys
+// OPL config keys
 #define CONFIG_OPL_THEME                "theme"
 #define CONFIG_OPL_LANGUAGE             "language_text"
 #define CONFIG_OPL_SCROLLING            "scrolling"
@@ -95,7 +95,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_SFX_VOLUME           "sfx_volume"
 #define CONFIG_OPL_BOOT_SND_VOLUME      "boot_snd_volume"
 
-//Network config keys
+// Network config keys
 #define CONFIG_NET_ETH_LINKM   "eth_linkmode"
 #define CONFIG_NET_PS2_DHCP    "ps2_ip_use_dhcp"
 #define CONFIG_NET_PS2_IP      "ps2_ip_addr"
@@ -115,7 +115,7 @@ enum CONFIG_INDEX {
 
 struct config_value_t
 {
-    //Including the NULL terminator
+    // Including the NULL terminator
     char key[CONFIG_KEY_NAME_LEN];
     char val[CONFIG_KEY_VALUE_LEN];
 

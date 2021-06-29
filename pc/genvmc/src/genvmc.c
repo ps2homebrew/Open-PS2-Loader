@@ -405,10 +405,10 @@ int main(int argc, char **argv, char **env)
         return EXIT_FAILURE;
     }
 
-    //if ((size_MB != 1) && (size_MB % 8)) {
-    //	printf("Error: VMC size_in_MB not multiple of 8...\n");
-    //	return EXIT_FAILURE;
-    //}
+    // if ((size_MB != 1) && (size_MB % 8)) {
+    //     printf("Error: VMC size_in_MB not multiple of 8...\n");
+    //     return EXIT_FAILURE;
+    // }
 
     int r = vmc_mcformat(argv[2], size_MB * 1024, 16);
     if (r != 0) {

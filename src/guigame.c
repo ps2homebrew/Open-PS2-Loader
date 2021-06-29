@@ -75,7 +75,7 @@ char *gameConfigSource(void)
     return source;
 }
 
-//VMC
+// VMC
 typedef struct
 {                   // size = 76
     int VMC_status; // 0=available, 1=busy
@@ -306,7 +306,7 @@ void guiGameShowVMCMenu(int id, item_list_t *support)
     guiGameShowVMCConfig(id, support, vmc2, 1, 1);
 }
 
-//GSM
+// GSM
 static void guiGameSetGSMSettingsState(void)
 {
     int previousSource = gGSMSource;
@@ -389,7 +389,7 @@ void guiGameShowGSConfig(void)
     diaExecuteDialog(diaGSConfig, -1, 1, &guiGameGSMUpdater);
 }
 
-//CHEATS
+// CHEATS
 static void guiGameSetCheatSettingsState(void)
 {
     int previousSource = gCheatSource;
@@ -434,9 +434,9 @@ void guiGameShowCheatConfig(void)
     diaExecuteDialog(diaCheatConfig, -1, 1, &guiGameCheatUpdater);
 }
 
-//PADEMU
+// PADEMU
 #ifdef PADEMU
-//from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
+// from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
 static char *bt_ver_str[] = {
     "1.0b",
     "1.1",

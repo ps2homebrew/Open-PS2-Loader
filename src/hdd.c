@@ -39,7 +39,7 @@ int hddCheck(void)
 
     ret = fileXioDevctl("hdd0:", HDIOC_STATUS, NULL, 0, NULL, 0);
 
-    //0 = HDD connected and formatted, 1 = not formatted, 2 = HDD not usable, 3 = HDD not connected.
+    // 0 = HDD connected and formatted, 1 = not formatted, 2 = HDD not usable, 3 = HDD not connected.
     if ((ret >= 3) || (ret < 0))
         return -1;
 
@@ -113,11 +113,11 @@ int hddReadSectors(u32 lba, u32 nsectors, void *buf)
 //-------------------------------------------------------------------------
 static int hddWriteSectors(u32 lba, u32 nsectors, const void *buf)
 {
-    static u8 WriteBuffer[2 * 512 + sizeof(hddAtaTransfer_t)] ALIGNED(64); //Has to be a different buffer from IOBuffer (input can be in IOBuffer).
+    static u8 WriteBuffer[2 * 512 + sizeof(hddAtaTransfer_t)] ALIGNED(64); // Has to be a different buffer from IOBuffer (input can be in IOBuffer).
     int argsz;
     hddAtaTransfer_t *args = (hddAtaTransfer_t *)WriteBuffer;
 
-    if (nsectors > 2) //Sanity check
+    if (nsectors > 2) // Sanity check
         return -ENOMEM;
 
     args->lba = lba;
@@ -160,7 +160,7 @@ static int hddGetHDLGameInfo(struct GameDataEntry *game, hdl_game_info_t *ginfo)
         ginfo->layer_break = hdl_header->layer1_start;
         ginfo->disctype = (u8)hdl_header->discType;
         ginfo->start_sector = game->lba;
-        ginfo->total_size_in_kb = game->size * 2; //size * 2048 / 1024 = 2x
+        ginfo->total_size_in_kb = game->size * 2; // size * 2048 / 1024 = 2x
     } else
         ret = -1;
 
@@ -219,7 +219,7 @@ int hddGetHDLGamelist(hdl_games_list_t *game_list)
                     pGameEntry->lba = dirent.stat.private_5 + (HDL_GAME_DATA_OFFSET + 4096) / 512;
                 }
 
-                pGameEntry->size += (dirent.stat.size / 4); //size in HDD sectors * (512 / 2048) = 0.25x
+                pGameEntry->size += (dirent.stat.size / 4); // size in HDD sectors * (512 / 2048) = 0.25x
             }
         }
 
@@ -277,7 +277,7 @@ int hddSetHDLGameInfo(hdl_game_info_t *ginfo)
     // just change game name and compat flags !!!
     strncpy(hdl_header->gamename, ginfo->name, sizeof(hdl_header->gamename));
     hdl_header->gamename[sizeof(hdl_header->gamename) - 1] = '\0';
-    //hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
+    // hdl_header->hdl_compat_flags = ginfo->hdl_compat_flags;
     hdl_header->ops2l_compat_flags = ginfo->ops2l_compat_flags;
     hdl_header->dma_type = ginfo->dma_type;
     hdl_header->dma_mode = ginfo->dma_mode;

@@ -47,19 +47,19 @@ static inline int CopyFromFIFOWithDMA(volatile u8 *smap_regbase, void *buffer, i
     USE_SPD_REGS;
     u16 OldDMACtrl;
 
-    //Attempt to steal the DMA channel from the DEV9 module.
+    // Attempt to steal the DMA channel from the DEV9 module.
     if ((result = length / 64) > 0) {
         OldDMACtrl = SPD_REG16(SPD_R_DMA_CTRL);
 
         while (dmac_ch_get_chcr(IOP_DMAC_DEV9) & DMAC_CHCR_TR) {
         }
 
-        SPD_REG16(SPD_R_DMA_CTRL) = 7; //SPEED revision 17 (ES2) and above only.
+        SPD_REG16(SPD_R_DMA_CTRL) = 7; // SPEED revision 17 (ES2) and above only.
 
         SMAP_REG16(SMAP_R_RXFIFO_SIZE) = result;
         SMAP_REG8(SMAP_R_RXFIFO_CTRL) = SMAP_RXFIFO_DMAEN;
 
-        //Transfer in 64-byte (16x4) blocks
+        // Transfer in 64-byte (16x4) blocks
         dmac_request(IOP_DMAC_DEV9, buffer, 0x10, result, DMAC_TO_MEM);
         dmac_transfer(IOP_DMAC_DEV9);
 
@@ -93,39 +93,39 @@ static inline void CopyFromFIFO(volatile u8 *smap_regbase, void *buffer, unsigne
         ".set noreorder\n\t"
         ".set nomacro\n\t"
         ".set noat\n\t"
-        "lui      $2, 0xB000\n\t"
-        "srl      $at, %1, 5\n\t"
-        "blez     $at, 3f\n\t"
-        "andi     %1, %1, 0x1F\n\t"
+        "   lui      $2, 0xB000\n\t"
+        "   srl      $at, %1, 5\n\t"
+        "   blez     $at, 3f\n\t"
+        "   andi     %1, %1, 0x1F\n\t"
         "4:\n\t"
-        "lw      $8, 4608($2)\n\t"
-        "lw      $9, 4608($2)\n\t"
-        "lw      $10, 4608($2)\n\t"
-        "lw      $11, 4608($2)\n\t"
-        "lw      $12, 4608($2)\n\t"
-        "lw      $13, 4608($2)\n\t"
-        "lw      $14, 4608($2)\n\t"
-        "lw      $15, 4608($2)\n\t"
-        "addiu   $at, $at, -1\n\t"
-        "sw      $8,  0(%0)\n\t"
-        "sw      $9,  4(%0)\n\t"
-        "sw      $10,  8(%0)\n\t"
-        "sw      $11, 12(%0)\n\t"
-        "sw      $12, 16(%0)\n\t"
-        "sw      $13, 20(%0)\n\t"
-        "sw      $14, 24(%0)\n\t"
-        "sw      $15, 28(%0)\n\t"
-        "bgtz    $at, 4b\n\t"
-        "addiu   %0, %0, 32\n\t"
+        "   lw      $8, 4608($2)\n\t"
+        "   lw      $9, 4608($2)\n\t"
+        "   lw      $10, 4608($2)\n\t"
+        "   lw      $11, 4608($2)\n\t"
+        "   lw      $12, 4608($2)\n\t"
+        "   lw      $13, 4608($2)\n\t"
+        "   lw      $14, 4608($2)\n\t"
+        "   lw      $15, 4608($2)\n\t"
+        "   addiu   $at, $at, -1\n\t"
+        "   sw      $8,  0(%0)\n\t"
+        "   sw      $9,  4(%0)\n\t"
+        "   sw      $10,  8(%0)\n\t"
+        "   sw      $11, 12(%0)\n\t"
+        "   sw      $12, 16(%0)\n\t"
+        "   sw      $13, 20(%0)\n\t"
+        "   sw      $14, 24(%0)\n\t"
+        "   sw      $15, 28(%0)\n\t"
+        "   bgtz    $at, 4b\n\t"
+        "   addiu   %0, %0, 32\n\t"
         "3:\n\t"
-        "blez     %1, 1f\n\t"
-        "nop\n\t"
+        "   blez     %1, 1f\n\t"
+        "   nop\n\t"
         "2:\n\t"
-        "lw      $8, 4608($2)\n\t"
-        "addiu   %1, %1, -4\n\t"
-        "sw      $8, 0(%0)\n\t"
-        "bgtz    %1, 2b\n\t"
-        "addiu   %0, %0, 4\n\t"
+        "   lw      $8, 4608($2)\n\t"
+        "   addiu   %1, %1, -4\n\t"
+        "   sw      $8, 0(%0)\n\t"
+        "   bgtz    %1, 2b\n\t"
+        "   addiu   %0, %0, 4\n\t"
         "1:\n\t"
         ".set at\n\t"
         ".set macro\n\t"
@@ -162,7 +162,7 @@ int HandleRxIntr(struct SmapDriverData *SmapDrivPrivData)
                 if ((pbuf = pbuf_alloc(PBUF_RAW, LengthRounded, PBUF_POOL)) != NULL) {
                     CopyFromFIFO(SmapDrivPrivData->smap_regbase, pbuf->payload, length, pointer);
 
-                    //Inform ps2ip that we've received data.
+                    // Inform ps2ip that we've received data.
                     SMapLowLevelInput(pbuf);
 
                     NumPacketsReceived++;
@@ -209,31 +209,31 @@ int SMAPSendPacket(const void *data, unsigned int length)
             ".set noreorder\n\t"
             ".set nomacro\n\t"
             ".set noat\n\t"
-            "srl     $at, %1, 4\n\t"
-            "lui     $3, 0xB000\n\t"
-            "beqz    $at, 3f\n\t"
-            "andi    %1, %1, 0xF\n\t"
+            "   srl     $at, %1, 4\n\t"
+            "   lui     $3, 0xB000\n\t"
+            "   beqz    $at, 3f\n\t"
+            "   andi    %1, %1, 0xF\n\t"
             "4:\n\t"
-            "lw      $8,  0(%0)\n\t"
-            "lw      $9,  4(%0)\n\t"
-            "lw      $10,  8(%0)\n\t"
-            "lw      $11, 12(%0)\n\t"
-            "addiu   $at, $at, -1\n\t"
-            "sw      $8, 4352($3)\n\t"
-            "sw      $9, 4352($3)\n\t"
-            "sw      $10, 4352($3)\n\t"
-            "addiu   %0, %0, 16\n\t"
-            "bgtz    $at, 4b\n\t"
-            "sw      $11, 4352($3)\n\t"
+            "   lw      $8,  0(%0)\n\t"
+            "   lw      $9,  4(%0)\n\t"
+            "   lw      $10,  8(%0)\n\t"
+            "   lw      $11, 12(%0)\n\t"
+            "   addiu   $at, $at, -1\n\t"
+            "   sw      $8, 4352($3)\n\t"
+            "   sw      $9, 4352($3)\n\t"
+            "   sw      $10, 4352($3)\n\t"
+            "   addiu   %0, %0, 16\n\t"
+            "   bgtz    $at, 4b\n\t"
+            "   sw      $11, 4352($3)\n\t"
             "3:\n\t"
-            "beqz    %1, 1f\n\t"
-            "nop\n\t"
+            "   beqz    %1, 1f\n\t"
+            "   nop\n\t"
             "2:\n\t"
-            "lw      $2, 0(%0)\n\t"
-            "addiu   %1, %1, -4\n\t"
-            "sw      $2, 4352($3)\n\t"
-            "bnez    %1, 2b\n\t"
-            "addiu   %0, %0, 4\n\t"
+            "   lw      $2, 0(%0)\n\t"
+            "   addiu   %1, %1, -4\n\t"
+            "   sw      $2, 4352($3)\n\t"
+            "   bnez    %1, 2b\n\t"
+            "   addiu   %0, %0, 4\n\t"
             "1:\n\t"
             ".set reorder\n\t"
             ".set macro\n\t"

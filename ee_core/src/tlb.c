@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "tlb.h"
 
-#define kprintf(args...) //sio_printf(args)
+#define kprintf(args...) // sio_printf(args)
 
 static int InitTLB32MB(void);
 
@@ -60,7 +60,7 @@ struct TLBInfo
 #define TLB_NUM_DEFAULT_ENTRIES  0x12
 #define TLB_NUM_EXTENDED_ENTRIES 0x08
 
-//Compile-time sanity checks.
+// Compile-time sanity checks.
 #if (TLB_NUM_KERNEL_ENTRIES + TLB_NUM_DEFAULT_ENTRIES + TLB_NUM_EXTENDED_ENTRIES >= 0x31)
 #error TLB over flow
 #endif

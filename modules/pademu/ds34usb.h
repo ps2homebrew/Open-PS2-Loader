@@ -23,8 +23,8 @@ typedef struct _usb_ds34
     int outEndp;
     u8 enabled;
     u8 status;
-    u8 type;      //0 - ds3, 1 - ds4
-    u8 oldled[4]; //rgb for ds4 and blink
+    u8 type;      // 0 - ds3, 1 - ds4
+    u8 oldled[4]; // rgb for ds4 and blink
     u8 lrum;
     u8 rrum;
     u8 update_rum;

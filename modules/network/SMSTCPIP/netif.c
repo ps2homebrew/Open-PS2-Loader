@@ -189,7 +189,7 @@ void netif_set_ipaddr(struct netif *netif, struct ip_addr *ipaddr)
             /* PCB bound to current local interface address? */
             if (ip_addr_cmp(&(lpcb->local_ip), &(netif->ip_addr))) {
                 /* The PCB is listening to the old ipaddr and
-         * is set to listen to the new one instead */
+                 * is set to listen to the new one instead */
                 ip_addr_set(&(lpcb->local_ip), ipaddr);
             }
         }

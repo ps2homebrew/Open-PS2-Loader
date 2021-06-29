@@ -1,6 +1,6 @@
 /*
   padhook.h Open PS2 Loader In Game Reset
- 
+
   Copyright 2009-2010, Ifcaro, jimmikaelkael & Polo
   Copyright 2006-2008 Polo
   Licenced under Academic Free License version 3.0
@@ -75,11 +75,11 @@ typedef struct
     u32 *pattern;
     u32 *mask;
     int size;
-    u16 type; //Whether it's libpad or libpad2
+    u16 type; // Whether it's libpad or libpad2
     u16 version;
 } pattern_t;
 
-#define IGR_LIBPAD_NONE 0 //libpad not found
+#define IGR_LIBPAD_NONE 0 // libpad not found
 #define IGR_LIBPAD      1
 #define IGR_LIBPAD2     2
 

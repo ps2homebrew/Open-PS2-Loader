@@ -27,7 +27,7 @@ static inline void patch_EESYNC(void *image_offset, struct romdir_entry *entryin
 static inline void Align_offsets(void *base_address, unsigned int *offset_in, struct romdir_entry *romdir_in, unsigned int *offset_out, struct romdir_entry *romdir_out);
 
 /*----------------------------------------------------------------------------------------
-	Replace modules in a IOPRP image.
+    Replace modules in a IOPRP image.
 ------------------------------------------------------------------------------------------*/
 unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, unsigned int size_cdvdman)
 {
@@ -67,7 +67,7 @@ unsigned int patch_IOPRP_image(void *ioprp_image, void *cdvdman_module, unsigned
 }
 
 /*----------------------------------------------------------------------------------------
-	Patch CDVDMAN in an IOPRP image
+    Patch CDVDMAN in an IOPRP image
 ------------------------------------------------------------------------------------------*/
 static inline void patch_CDVDMAN(void *image_offset, struct romdir_entry *entryinfo, void *cdvdman, unsigned int size)
 {
@@ -76,7 +76,7 @@ static inline void patch_CDVDMAN(void *image_offset, struct romdir_entry *entryi
 }
 
 /*----------------------------------------------------------------------------------------
-	Patch CDVDFSV in an IOPRP image
+    Patch CDVDFSV in an IOPRP image
 ------------------------------------------------------------------------------------------*/
 static inline void patch_CDVDFSV(void *image_offset, struct romdir_entry *entryinfo)
 {
@@ -85,7 +85,7 @@ static inline void patch_CDVDFSV(void *image_offset, struct romdir_entry *entryi
 }
 
 /*----------------------------------------------------------------------------------------
-	Patch EESYNC in an IOPRP image
+    Patch EESYNC in an IOPRP image
 ------------------------------------------------------------------------------------------*/
 static inline void patch_EESYNC(void *image_offset, struct romdir_entry *entryinfo)
 {
@@ -94,7 +94,7 @@ static inline void patch_EESYNC(void *image_offset, struct romdir_entry *entryin
 }
 
 /*----------------------------------------------------------------------------------------
-	Align offsets to multiples of 16, filling the gaps created with 0s.
+    Align offsets to multiples of 16, filling the gaps created with 0s.
 ------------------------------------------------------------------------------------------*/
 static inline void Align_offsets(void *base_address, unsigned int *offset_in, struct romdir_entry *romdir_in, unsigned int *offset_out, struct romdir_entry *romdir_out)
 {

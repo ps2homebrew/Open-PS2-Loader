@@ -26,7 +26,7 @@ typedef struct _usb_ds34
     u8 lrum;
     u8 rrum;
     u8 update_rum;
-    u8 oldled[4]; //rgb for ds4 and blink
+    u8 oldled[4]; // rgb for ds4 and blink
     u8 data[18];
     u8 type;
 } ds34usb_device;

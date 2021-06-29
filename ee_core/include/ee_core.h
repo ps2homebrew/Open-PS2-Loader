@@ -89,6 +89,6 @@ extern int PadEmuSettings;
 extern int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int *)0x120000E0)
 
-extern int *gCheatList; //Store hooks/codes addr+val pairs
+extern int *gCheatList; // Store hooks/codes addr+val pairs
 
 #endif

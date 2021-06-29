@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
- * All rights reserved. 
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice,
@@ -11,21 +11,21 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission. 
+ *    derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  *
  * This file is part of the lwIP TCP/IP stack.
- * 
+ *
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
@@ -71,7 +71,7 @@ struct sys_timeout
 
 /* Semaphore functions. */
 sys_sem_t sys_sem_new(u8_t count);
-//void sys_sem_signal(sys_sem_t sem);
+// void sys_sem_signal(sys_sem_t sem);
 
 #define sys_sem_signal(s)          SignalSema(s)
 u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout);
@@ -127,7 +127,7 @@ unsigned long sys_now(void);
  * different implementation, then this macro may be defined in sys_arch.h
  */
 #define SYS_ARCH_PROTECT(lev)      CpuSuspendIntr(&lev)
-//lev = sys_arch_protect()
+// lev = sys_arch_protect()
 /** SYS_ARCH_UNPROTECT
  * Perform a "fast" set of the protection level to "lev". This could be
  * implemented by setting the interrupt level to "lev" within the MACRO or by
@@ -137,9 +137,9 @@ unsigned long sys_now(void);
  * this macro may be defined in sys_arch.h
  */
 #define SYS_ARCH_UNPROTECT(lev)    CpuResumeIntr(lev)
-//sys_arch_unprotect(lev)
-//sys_prot_t sys_arch_protect(void);
-//void sys_arch_unprotect(sys_prot_t pval);
+// sys_arch_unprotect(lev)
+// sys_prot_t sys_arch_protect(void);
+// void sys_arch_unprotect(sys_prot_t pval);
 
 #else
 

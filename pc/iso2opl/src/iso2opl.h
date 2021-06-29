@@ -1,6 +1,6 @@
 /*
   Copyright 2009, jimmikaelkael
-  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 

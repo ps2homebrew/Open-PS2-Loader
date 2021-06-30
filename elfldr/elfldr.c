@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdio.h>
 
-//START of OPL_DB tweaks
+// START of OPL_DB tweaks
 // ELF-loading stuff
 #define ELF_MAGIC 0x464c457f
 #define ELF_PT_LOAD 1
@@ -50,7 +50,7 @@ typedef struct
     u32 flags;
     u32 align;
 } elf_pheader_t;
-//END of OPL_DB tweaks
+// END of OPL_DB tweaks
 
 /* static inline void _strcpy(char *dst, const char *src)
 {

@@ -27,7 +27,7 @@
 
 IRX_ID("ioptrap_driver", 1, 1);
 
-struct irx_export_table _exp_ioptrap;
+extern struct irx_export_table _exp_ioptrap;
 
 
 static const char *exception_type_name[] = {
@@ -77,7 +77,7 @@ exception_type_t dbg_setjmp()
 typedef struct _smod_mod_info
 {
     struct _smod_mod_info *next;
-    u8 *name;
+    char *name;
     u16 version;
     u16 newflags; /* For modload shipped with games.  */
     u16 id;

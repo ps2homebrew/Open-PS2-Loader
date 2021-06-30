@@ -21,8 +21,6 @@ IOP_OBJS += device-bdm.o
 IOP_CFLAGS += -DBDM_DRIVER
 endif
 
-IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)
-
 ifeq ($(IOPCORE_DEBUG),1)
 IOP_CFLAGS += -DDEBUG
 endif
@@ -33,4 +31,4 @@ endif
 
 include $(PS2SDK)/Defs.make
 include ../Rules.bin.make
-include ../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal

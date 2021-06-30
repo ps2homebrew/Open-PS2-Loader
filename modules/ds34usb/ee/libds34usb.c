@@ -2,14 +2,14 @@
 #include <sifrpc.h>
 #include <string.h>
 
-#define DS34USB_INIT 1
+#define DS34USB_INIT       1
 #define DS34USB_GET_STATUS 2
 #define DS34USB_GET_BDADDR 3
 #define DS34USB_SET_BDADDR 4
 #define DS34USB_SET_RUMBLE 5
-#define DS34USB_SET_LED 6
-#define DS34USB_GET_DATA 7
-#define DS34USB_RESET 8
+#define DS34USB_SET_LED    6
+#define DS34USB_GET_DATA   7
+#define DS34USB_RESET      8
 
 #define DS34USB_BIND_RPC_ID 0x18E3878E
 

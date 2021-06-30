@@ -6,14 +6,14 @@
 #define MODNAME "lwnbdsvr"
 IRX_ID(MODNAME, 1, 1);
 static int nbd_tid;
-struct irx_export_table _exp_lwnbdsvr;
+extern struct irx_export_table _exp_lwnbdsvr;
 
 int _start(int argc, char **argv)
 {
     iop_thread_t nbd_thread;
 
-    //TODO : platform specific block device detection then nbd_context initialization go here
-    //TODO : many export in a loop
+    // TODO : platform specific block device detection then nbd_context initialization go here
+    // TODO : many export in a loop
     if (nbd_contexts[0]->export_init(nbd_contexts[0]) != 0)
         return -1;
 

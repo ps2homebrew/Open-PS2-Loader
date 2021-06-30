@@ -341,7 +341,7 @@ int lwip_listen(int s, int backlog)
     return 0;
 }
 
-//Note: This function was modified so that the SMB header can be retrieved directly and the payload stored separately from it.
+// Note: This function was modified so that the SMB header can be retrieved directly and the payload stored separately from it.
 int lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsigned int flags,
                   struct sockaddr *from, socklen_t *fromlen)
 {
@@ -391,7 +391,7 @@ int lwip_recvfrom(int s, void *header, int index, void *payload, int plen, unsig
     if (index) {
         if (avail_len >= 63) { // header of (SMB command) READ ANDX RESPONSE is 63 + padding bytes, which are "0x00" thus useless
             netbuf_copy_partial(buf, header, 63, sock->lastoffset);
-            index = ((u8_t *)header)[index] + 4; //The word at offset 0 is sessionHeader, which Microsoft doesn't consider as being part of the SMB header.
+            index = ((u8_t *)header)[index] + 4; // The word at offset 0 is sessionHeader, which Microsoft doesn't consider as being part of the SMB header.
             copylen = index;
             avail_len -= index;
         } else {
@@ -500,7 +500,7 @@ int lwip_send(int s, void *data, int size, unsigned int flags)
 
             /* make the buffer point to the data that should
        be sent */
-            if ((err = netbuf_ref(buf, data, size))==ERR_OK) {
+            if ((err = netbuf_ref(buf, data, size)) == ERR_OK) {
                 /* send the data */
                 err = netconn_send(sock->conn, buf);
             }
@@ -1356,7 +1356,7 @@ int lwip_ioctl(int s, long cmd, void *argp)
                 return -1;
             }
 
-            SYS_ARCH_GET(sock->conn->recv_avail, *((u16_t*)argp));
+            SYS_ARCH_GET(sock->conn->recv_avail, *((u16_t *)argp));
 
             LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_ioctl(%d, FIONREAD, %p) = %u\n", s, argp, *((u16_t *)argp)));
             sock_set_errno(sock, 0);

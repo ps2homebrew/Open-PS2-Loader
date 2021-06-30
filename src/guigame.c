@@ -75,7 +75,7 @@ char *gameConfigSource(void)
     return source;
 }
 
-//VMC
+// VMC
 typedef struct
 {                   // size = 76
     int VMC_status; // 0=available, 1=busy
@@ -84,11 +84,11 @@ typedef struct
     char VMC_msg[64];
 } statusVMCparam_t;
 
-#define OPERATION_CREATE 0
+#define OPERATION_CREATE   0
 #define OPERATION_CREATING 1
 #define OPERATION_ABORTING 2
-#define OPERATION_ENDING 3
-#define OPERATION_END 4
+#define OPERATION_ENDING   3
+#define OPERATION_END      4
 
 static short vmc_refresh;
 static int vmc_operation;
@@ -306,7 +306,7 @@ void guiGameShowVMCMenu(int id, item_list_t *support)
     guiGameShowVMCConfig(id, support, vmc2, 1, 1);
 }
 
-//GSM
+// GSM
 static void guiGameSetGSMSettingsState(void)
 {
     int previousSource = gGSMSource;
@@ -389,7 +389,7 @@ void guiGameShowGSConfig(void)
     diaExecuteDialog(diaGSConfig, -1, 1, &guiGameGSMUpdater);
 }
 
-//CHEATS
+// CHEATS
 static void guiGameSetCheatSettingsState(void)
 {
     int previousSource = gCheatSource;
@@ -434,9 +434,9 @@ void guiGameShowCheatConfig(void)
     diaExecuteDialog(diaCheatConfig, -1, 1, &guiGameCheatUpdater);
 }
 
-//PADEMU
+// PADEMU
 #ifdef PADEMU
-//from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
+// from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
 static char *bt_ver_str[] = {
     "1.0b",
     "1.1",
@@ -460,12 +460,12 @@ static u8 ds3_mac[6];
 static u8 dg_mac[6];
 static char ds3_str[18];
 static char dg_str[18];
-static char vid_str[4];
-static char pid_str[4];
-static char rev_str[4];
+static char vid_str[5];
+static char pid_str[5];
+static char rev_str[5];
 static char hci_str[26];
 static char lmp_str[26];
-static char man_str[4];
+static char man_str[5];
 static int ds3macset = 0;
 static int dgmacset = 0;
 static int dg_discon = 0;
@@ -473,28 +473,19 @@ static int ver_set = 0, feat_set = 0;
 
 static char *bdaddr_to_str(u8 *bdaddr, char *addstr)
 {
-    int i;
-
-    memset(addstr, 0, sizeof(addstr));
-
-    for (i = 0; i < 6; i++) {
-        sprintf(addstr, "%s%02X", addstr, bdaddr[i]);
-
-        if (i < 5)
-            sprintf(addstr, "%s:", addstr);
-    }
+    snprintf(addstr, 18, "%02X:%02X:%02X:%02X:%02X:%02X", bdaddr[0], bdaddr[1], bdaddr[2], bdaddr[3], bdaddr[4], bdaddr[5]);
 
     return addstr;
 }
 
-static char *hex_to_str(u8 *str, u16 hex)
+static char *hex_to_str(char *str, u16 hex)
 {
     sprintf(str, "%04X", hex);
 
     return str;
 }
 
-static char *ver_to_str(u8 *str, u8 ma, u16 mi)
+static char *ver_to_str(char *str, u8 ma, u16 mi)
 {
     if (ma > 9)
         ma = 0;
@@ -577,7 +568,7 @@ static int guiGamePadEmuUpdater(int modified)
     }
 
     PadEmuSettings |= PadEmuMode | (PadEmuPort << (8 + PadPort)) | (PadEmuVib << (16 + PadPort)) | (PadEmuMtap << 24) | ((PadEmuMtapPort - 1) << 25) | (PadEmuWorkaround << 26);
-    PadEmuSettings &= (~(!PadEmuMode) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
+    PadEmuSettings &= (~(PadEmuMode ? 0 : 1) & ~(!PadEmuPort << (8 + PadPort)) & ~(!PadEmuVib << (16 + PadPort)) & ~(!PadEmuMtap << 24) & ~(!(PadEmuMtapPort - 1) << 25) & ~(!PadEmuWorkaround << 26));
 
     if (PadEmuMode == 1) {
         if (ds34bt_get_status(0) & DS34BT_STATE_USB_CONFIGURED) {

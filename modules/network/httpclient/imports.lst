@@ -9,13 +9,13 @@ I_ReleaseLibraryEntries
 loadcore_IMPORTS_end
 
 ps2ip_IMPORTS_start
-I_lwip_socket
-I_lwip_connect
-I_lwip_send
 I_lwip_recv
-I_lwip_select
+I_lwip_send
 I_lwip_close
+I_lwip_select
+I_lwip_socket
 I_lwip_shutdown
+I_lwip_connect
 I_lwip_gethostbyname
 ps2ip_IMPORTS_end
 
@@ -36,9 +36,8 @@ stdio_IMPORTS_end
 sysclib_IMPORTS_start
 I_look_ctype_table
 I_memcpy
-I_memset
 I_memmove
-I_strcpy
+I_memset
 I_strcmp
 I_strncmp
 I_strlen

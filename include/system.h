@@ -3,8 +3,8 @@
 
 #include "include/mcemu.h"
 
-#define SYS_LOAD_MC_MODULES 0x01
-#define SYS_LOAD_USB_MODULES 0x02
+#define SYS_LOAD_MC_MODULES   0x01
+#define SYS_LOAD_USB_MODULES  0x02
 #define SYS_LOAD_ISOFS_MODULE 0x04
 
 unsigned int USBA_crc32(const char *string);

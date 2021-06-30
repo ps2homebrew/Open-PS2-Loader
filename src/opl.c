@@ -84,14 +84,14 @@ typedef struct
     submenu_list_t *subMenu;
 } opl_io_module_t;
 
-//App support stuff.
+// App support stuff.
 static unsigned char shouldAppsUpdate;
 
 //START of OPL_DB tweaks
 static unsigned char shouldElmUpdate;
 //END of OPL_DB tweaks
 
-//Network support stuff.
+// Network support stuff.
 #define HTTP_IOBUF_SIZE 512
 static unsigned int CompatUpdateComplete, CompatUpdateTotal;
 static unsigned char CompatUpdateStopFlag, CompatUpdateFlags;
@@ -134,12 +134,13 @@ static opl_io_module_t list_support[MODE_COUNT];
 
 // Global data
 char *gBaseMCDir;
+char *gHDDPrefix;
 int ps2_ip_use_dhcp;
 int ps2_ip[4];
 int ps2_netmask[4];
 int ps2_gateway[4];
 int ps2_dns[4];
-int gETHOpMode; //See ETH_OP_MODES.
+int gETHOpMode; // See ETH_OP_MODES.
 int gPCShareAddressIsNetBIOS;
 int pc_ip[4];
 int gPCPort;
@@ -154,6 +155,7 @@ int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
 int gELMStartMode;
+int gEnableFW;
 int gAutosort;
 int gAutoRefresh;
 int gEnableNotifications;
@@ -401,7 +403,7 @@ static void deinitAllSupport(int exception, int modeSelected)
     //END of OPL_DB tweaks
 }
 
-//For resolving the mode, given an app's path
+// For resolving the mode, given an app's path
 int oplPath2Mode(const char *path)
 {
     char appsPath[64];
@@ -417,8 +419,8 @@ int oplPath2Mode(const char *path)
             if (blkdevnameend != NULL) {
                 blkdevnamelen = (int)(blkdevnameend - appsPath);
 
-                while ((blkdevnamelen > 0) && isdigit(appsPath[blkdevnamelen - 1]))
-                    blkdevnamelen--; //Ignore the unit number.
+                while ((blkdevnamelen > 0) && isdigit((int)appsPath[blkdevnamelen - 1]))
+                    blkdevnamelen--; // Ignore the unit number.
 
                 if (strncmp(path, appsPath, blkdevnamelen) == 0)
                     return listSupport->mode;
@@ -506,7 +508,7 @@ int oplScanApps(int (*callback)(const char *path, config_set_t *appConfig, void 
 
                         if (ret == 0)
                             count++;
-                        else if (ret < 0) { //Stopped because of unrecoverable error.
+                        else if (ret < 0) { // Stopped because of unrecoverable error.
                             break;
                         }
                     }
@@ -639,7 +641,7 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
             gup->submenu.selected = 0;
 
             if (gRememberLastPlayed && temp && strcmp(temp, mdl->support->itemGetStartup(i)) == 0) {
-                gup->submenu.selected = 1; //Select Last Played Game
+                gup->submenu.selected = 1; // Select Last Played Game
             }
 
             guiDeferUpdate(gup);
@@ -666,7 +668,7 @@ void menuDeferredUpdate(void *data)
     if (mod->support->itemNeedsUpdate()) {
         updateMenuFromGameList(mod);
 
-        //If other modes have been updated, then the apps list should be updated too.
+        // If other modes have been updated, then the apps list should be updated too.
         if (*mode != APP_MODE)
             shouldAppsUpdate = 1;
 
@@ -757,13 +759,16 @@ static int checkLoadConfigBDM(int types)
 static int checkLoadConfigHDD(int types)
 {
     int value;
+    char path[64];
 
     hddLoadModules();
-    value = open("pfs0:conf_opl.cfg", O_RDONLY);
+
+    snprintf(path, sizeof(path), "%sconf_opl.cfg", gHDDPrefix);
+    value = open(path, O_RDONLY);
     if (value >= 0) {
         close(value);
         configEnd();
-        configInit("pfs0:");
+        configInit(gHDDPrefix);
         value = configReadMulti(types);
         config_set_t *configOPL = configGetByType(CONFIG_OPL);
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, START_MODE_AUTO);
@@ -773,7 +778,7 @@ static int checkLoadConfigHDD(int types)
     return 0;
 }
 
-//When this function is called, the current device for loading/saving config is the memory card.
+// When this function is called, the current device for loading/saving config is the memory card.
 static int tryAlternateDevice(int types)
 {
     char pwd[8];
@@ -782,7 +787,7 @@ static int tryAlternateDevice(int types)
 
     getcwd(pwd, sizeof(pwd));
 
-    //First, try the device that OPL booted from.
+    // First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
         if ((value = checkLoadConfigBDM(types)) != 0)
             return value;
@@ -791,8 +796,8 @@ static int tryAlternateDevice(int types)
             return value;
     }
 
-    //Config was not found on the boot device. Check all supported devices.
-    // Check USB device
+    // Config was not found on the boot device. Check all supported devices.
+    //  Check USB device
     if ((value = checkLoadConfigBDM(types)) != 0)
         return value;
     // Check HDD
@@ -815,11 +820,11 @@ static int tryAlternateDevice(int types)
         configInit("mass0:");
     } else {
         // No? Check if the save location on the HDD is available.
-        dir = opendir("pfs0:");
+        dir = opendir(gHDDPrefix);
         if (dir != NULL) {
             closedir(dir);
             configEnd();
-            configInit("pfs0:");
+            configInit(gHDDPrefix);
         }
     }
     showCfgPopup = 0;
@@ -883,6 +888,7 @@ static void _loadConfig()
             //START of OPL_DB tweaks
             configGetInt(configOPL, CONFIG_OPL_ELM_MODE, &gELMStartMode);
             //END of OPL_DB tweaks
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_FW, &gEnableFW);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
@@ -947,9 +953,9 @@ static int trySaveConfigBDM(int types)
 static int trySaveConfigHDD(int types)
 {
     hddLoadModules();
-    //Check that the formatted & usable HDD is connected.
+    // Check that the formatted & usable HDD is connected.
     if (hddCheck() == 0) {
-        configSetMove("pfs0:");
+        configSetMove(gHDDPrefix);
         return configWriteMulti(types);
     }
 
@@ -969,7 +975,7 @@ static int trySaveAlternateDevice(int types)
 
     getcwd(pwd, sizeof(pwd));
 
-    //First, try the device that OPL booted from.
+    // First, try the device that OPL booted from.
     if (!strncmp(pwd, "mass", 4) && (pwd[4] == ':' || pwd[5] == ':')) {
         if ((value = trySaveConfigBDM(types)) > 0)
             return value;
@@ -978,8 +984,8 @@ static int trySaveAlternateDevice(int types)
             return value;
     }
 
-    //Config was not saved to the boot device. Try all supported devices.
-    //Try memory cards
+    // Config was not saved to the boot device. Try all supported devices.
+    // Try memory cards
     if (sysCheckMC() >= 0) {
         if ((value = trySaveConfigMC(types)) > 0)
             return value;
@@ -991,7 +997,7 @@ static int trySaveAlternateDevice(int types)
     if ((value = trySaveConfigHDD(types)) > 0)
         return value;
 
-    //We tried everything, but...
+    // We tried everything, but...
     return 0;
 }
 
@@ -1035,6 +1041,7 @@ static void _saveConfig()
         //START of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
         //END of OPL_DB tweaks
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_FW, gEnableFW);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
@@ -1149,11 +1156,11 @@ int saveConfig(int types, int showUI)
     return lscret;
 }
 
-#define COMPAT_UPD_MODE_UPD_USR 1   //Update all records, even those that were modified by the user.
-#define COMPAT_UPD_MODE_NO_MTIME 2  //Do not check the modified time-stamp.
-#define COMPAT_UPD_MODE_MTIME_GMT 4 //Modified time-stamp is in GMT, not JST.
+#define COMPAT_UPD_MODE_UPD_USR   1 // Update all records, even those that were modified by the user.
+#define COMPAT_UPD_MODE_NO_MTIME  2 // Do not check the modified time-stamp.
+#define COMPAT_UPD_MODE_MTIME_GMT 4 // Modified time-stamp is in GMT, not JST.
 
-#define EOPLCONNERR 0x4000 //Special error code for connection errors.
+#define EOPLCONNERR 0x4000 // Special error code for connection errors.
 
 static int CompatAttemptConnection(void)
 {
@@ -1175,7 +1182,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     config_set_t *itemConfig, *downloadedConfig;
     u16 length;
     s8 ConnMode, hasMtime;
-    u8 *HttpBuffer;
+    char *HttpBuffer;
     int i, count, HttpSocket, result, retries, ConfigSource;
     iox_stat_t stat;
     u8 mtime[6];
@@ -1200,7 +1207,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
     if (device < 0) {
         LOG("CompatUpdate: unrecognized mode: %d\n", support->mode);
         CompatUpdateStatus = OPL_COMPAT_UPDATE_STAT_ERROR;
-        return; //Shouldn't happen, but what if?
+        return; // Shouldn't happen, but what if?
     }
 
     result = 0;
@@ -1212,7 +1219,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
         if (count > 0) {
             ConnMode = HTTP_CMODE_PERSISTENT;
             if ((HttpSocket = CompatAttemptConnection()) >= 0) {
-                //Update compatibility list.
+                // Update compatibility list.
                 for (i = 0; !CompatUpdateStopFlag && result >= 0 && i < count; i++, CompatUpdateComplete++) {
                     startup = support->itemGetStartup(configSet != NULL ? id : i);
 
@@ -1228,7 +1235,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
                     if (itemConfig != NULL) {
                         ConfigSource = CONFIG_SOURCE_DEFAULT;
                         if ((mode & COMPAT_UPD_MODE_UPD_USR) || !configGetInt(itemConfig, CONFIG_ITEM_CONFIGSOURCE, &ConfigSource) || ConfigSource != CONFIG_SOURCE_USER) {
-                            if (!(mode & COMPAT_UPD_MODE_NO_MTIME) && (ConfigSource == CONFIG_SOURCE_DLOAD) && configGetStat(itemConfig, &stat)) { //Only perform a stat operation for downloaded setting files.
+                            if (!(mode & COMPAT_UPD_MODE_NO_MTIME) && (ConfigSource == CONFIG_SOURCE_DLOAD) && configGetStat(itemConfig, &stat)) { // Only perform a stat operation for downloaded setting files.
                                 if (!(mode & COMPAT_UPD_MODE_MTIME_GMT)) {
                                     clock.second = itob(stat.mtime[1]);
                                     clock.minute = itob(stat.mtime[2]);
@@ -1238,19 +1245,19 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
                                     clock.year = itob((stat.mtime[6] | ((unsigned short int)stat.mtime[7] << 8)) - 2000);
                                     configConvertToGmtTime(&clock);
 
-                                    mtime[0] = btoi(clock.year);      //Year
-                                    mtime[1] = btoi(clock.month) - 1; //Month
-                                    mtime[2] = btoi(clock.day) - 1;   //Day
-                                    mtime[3] = btoi(clock.hour);      //Hour
-                                    mtime[4] = btoi(clock.minute);    //Minute
-                                    mtime[5] = btoi(clock.second);    //Second
+                                    mtime[0] = btoi(clock.year);      // Year
+                                    mtime[1] = btoi(clock.month) - 1; // Month
+                                    mtime[2] = btoi(clock.day) - 1;   // Day
+                                    mtime[3] = btoi(clock.hour);      // Hour
+                                    mtime[4] = btoi(clock.minute);    // Minute
+                                    mtime[5] = btoi(clock.second);    // Second
                                 } else {
-                                    mtime[0] = (stat.mtime[6] | ((unsigned short int)stat.mtime[7] << 8)) - 2000; //Year
-                                    mtime[1] = stat.mtime[5] - 1;                                                 //Month
-                                    mtime[2] = stat.mtime[4] - 1;                                                 //Day
-                                    mtime[3] = stat.mtime[3];                                                     //Hour
-                                    mtime[4] = stat.mtime[2];                                                     //Minute
-                                    mtime[5] = stat.mtime[1];                                                     //Second
+                                    mtime[0] = (stat.mtime[6] | ((unsigned short int)stat.mtime[7] << 8)) - 2000; // Year
+                                    mtime[1] = stat.mtime[5] - 1;                                                 // Month
+                                    mtime[2] = stat.mtime[4] - 1;                                                 // Day
+                                    mtime[3] = stat.mtime[3];                                                     // Hour
+                                    mtime[4] = stat.mtime[2];                                                     // Minute
+                                    mtime[5] = stat.mtime[1];                                                     // Second
                                 }
                                 hasMtime = 1;
 
@@ -1284,7 +1291,7 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
 
                                 LOG("CompatUpdate: Connection lost. Retrying.\n");
 
-                                //Connection lost. Attempt to re-connect.
+                                // Connection lost. Attempt to re-connect.
                                 ConnMode = HTTP_CMODE_PERSISTENT;
                                 if ((HttpSocket = CompatAttemptConnection()) < 0) {
                                     result = HttpSocket | EOPLCONNERR;
@@ -1297,10 +1304,10 @@ static void compatUpdate(item_list_t *support, unsigned char mode, config_set_t 
                             LOG("CompatUpdate: skipping %s\n", startup);
                         }
 
-                        if (configSet == NULL) //Do not free what is not ours.
+                        if (configSet == NULL) // Do not free what is not ours.
                             configFree(itemConfig);
                     } else {
-                        //Can't do anything because the config file cannot be opened/created.
+                        // Can't do anything because the config file cannot be opened/created.
                         LOG("CompatUpdate: skipping %s (no config)\n", startup);
                     }
 
@@ -1373,7 +1380,7 @@ void oplUpdateGameCompat(int UpdateAll)
         }
     }
 
-    if (started < 1) //Nothing done
+    if (started < 1) // Nothing done
         CompatUpdateStatus = OPL_COMPAT_UPDATE_STAT_DONE;
 }
 
@@ -1419,8 +1426,8 @@ static int loadLwnbdSvr(void)
 
     // Deinitialize all support without shutting down the HDD unit.
     deinitAllSupport(NO_EXCEPTION, IO_MODE_SELECTED_ALL);
-    clearErrorMessage(); /*	At this point, an error might have been displayed (since background tasks were completed).
-					Clear it, otherwise it will get displayed after the server is closed.	*/
+    clearErrorMessage(); /* At this point, an error might have been displayed (since background tasks were completed).
+                            Clear it, otherwise it will get displayed after the server is closed. */
 
     unloadPads();
     sysReset(0);
@@ -1506,7 +1513,7 @@ static void moduleCleanup(opl_io_module_t *mod, int exception, int modeSelected)
     if (!mod->support)
         return;
 
-    //Shutdown if not required anymore.
+    // Shutdown if not required anymore.
     if ((mod->support->mode != modeSelected) && (modeSelected != IO_MODE_SELECTED_ALL)) {
         if (mod->support->itemShutdown)
             mod->support->itemShutdown();
@@ -1574,6 +1581,7 @@ static void setDefaults(void)
     //END of OPL_DB tweaks
 
     gBaseMCDir = "mc?:OPL";
+    gHDDPrefix = "pfs0:";
 
     ps2_ip_use_dhcp = 1;
     gETHOpMode = ETH_OP_MODE_AUTO;
@@ -1616,7 +1624,7 @@ static void setDefaults(void)
     gEnableWrite = 0;
     gRememberLastPlayed = 0;
     gAutoStartLastPlayed = 9;
-    gSelectButton = KEY_CIRCLE; //Default to Japan.
+    gSelectButton = KEY_CIRCLE; // Default to Japan.
     gBDMPrefix[0] = '\0';
     gETHPrefix[0] = '\0';
     gEnableNotifications = 0;
@@ -1652,6 +1660,8 @@ static void setDefaults(void)
     gDefaultUITextColor[2] = 0x030;
     //END of OPL_DB tweaks
 
+    gEnableFW = 0;
+
     frameCounter = 0;
 
     gVMode = 0;
@@ -1663,7 +1673,7 @@ static void setDefaults(void)
 
     // Last Played Auto Start
     KeyPressedOnce = 0;
-    DisableCron = 1; //Auto Start Last Played counter disabled by default
+    DisableCron = 1; // Auto Start Last Played counter disabled by default
     CronStart = 0;
     RemainSecs = 0;
 }

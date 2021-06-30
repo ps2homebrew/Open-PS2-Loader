@@ -86,10 +86,10 @@ typedef struct
 
 int hddReadSectors(u32 lba, u32 nsectors, void *buf);
 
-//Array should be APA_MAXSUB+1 entries.
+// Array should be APA_MAXSUB+1 entries.
 int hddGetPartitionInfo(const char *name, apa_sub_t *parts);
 
-//Array should be max entries.
+// Array should be max entries.
 int hddGetFileBlockInfo(const char *name, const apa_sub_t *subs, pfs_blockinfo_t *blocks, int max);
 
 #endif

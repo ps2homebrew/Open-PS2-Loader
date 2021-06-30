@@ -1,6 +1,6 @@
 /*
   Copyright 2009, jimmikaelkael
-  Copyright (c) 2002, A.Lee & Nicholas Van Veen  
+  Copyright (c) 2002, A.Lee & Nicholas Van Veen
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
 
@@ -73,7 +73,7 @@ u32 crc32(const char *string)
 int check_cfg(const char *drive, const char *game_name, const char *game_id)
 {
     int r;
-    //int fh_cfg;
+    // int fh_cfg;
     FILE *fh_cfg;
     cfg_t cfg;
     char cfg_path[256];
@@ -90,24 +90,26 @@ int check_cfg(const char *drive, const char *game_name, const char *game_id)
 #endif
     sprintf(cfg_image, "ul.%s", game_id);
 
-    /*fh_cfg = open(cfg_path, O_RDONLY);
-	if (fh_cfg >= 0) {
-		while ((r = read(fh_cfg, &cfg, sizeof(cfg_t))) != 0) {
-			if (r != sizeof(cfg_t)) {
-				close(fh_cfg);
-				return -3;
-			}
-			if (!strcmp(cfg.name, game_name)) {
-				close(fh_cfg);
-				return -1;
-			}
-			if (!strcmp(cfg.image, cfg_image)) {
-				close(fh_cfg);
-				return -2;
-			}
-		}
-		close(fh_cfg);
-	}*/
+
+    /* fh_cfg = open(cfg_path, O_RDONLY);
+    if (fh_cfg >= 0) {
+        while ((r = read(fh_cfg, &cfg, sizeof(cfg_t))) != 0) {
+            if (r != sizeof(cfg_t)) {
+                close(fh_cfg);
+                return -3;
+            }
+            if (!strcmp(cfg.name, game_name)) {
+                close(fh_cfg);
+                return -1;
+            }
+            if (!strcmp(cfg.image, cfg_image)) {
+                close(fh_cfg);
+                return -2;
+            }
+        }
+        close(fh_cfg);
+    } */
+
     fh_cfg = fopen(cfg_path, "rb");
     if (fh_cfg) {
         while ((r = fread(&cfg, 1, sizeof(cfg_t), fh_cfg)) != 0) {
@@ -133,7 +135,7 @@ int check_cfg(const char *drive, const char *game_name, const char *game_id)
 //-----------------------------------------------------------------------
 int write_cfg(const char *drive, const char *game_name, const char *game_id, const char *media, int parts)
 {
-    //int fh_cfg;
+    // int fh_cfg;
     FILE *fh_cfg;
     cfg_t cfg;
     char cfg_path[256];
@@ -163,19 +165,18 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
     else if (!strcmp(media, "DVD"))
         cfg.media = 0x14;
 
-    /*
-	fh_cfg = open(cfg_path, O_WRONLY|O_CREAT|O_APPEND);
-	if (fh_cfg < 0)
-		return -1;
+    /* fh_cfg = open(cfg_path, O_WRONLY | O_CREAT | O_APPEND);
+    if (fh_cfg < 0)
+        return -1;
 
-	r = write(fh_cfg, &cfg, sizeof(cfg_t));
-	if (r != sizeof(cfg_t)) {
-		close(fh_cfg);
-		return -2;
-	}
+    r = write(fh_cfg, &cfg, sizeof(cfg_t));
+    if (r != sizeof(cfg_t)) {
+        close(fh_cfg);
+        return -2;
+    }
 
-	close(fh_cfg);
-	*/
+    close(fh_cfg); */
+
     fh_cfg = fopen(cfg_path, "ab");
     if (!fh_cfg)
         return -1;
@@ -194,7 +195,7 @@ int write_cfg(const char *drive, const char *game_name, const char *game_id, con
 //----------------------------------------------------------------
 int write_parts(const char *drive, const char *game_name, const char *game_id, s64 filesize, int parts)
 {
-    //int fh_part;
+    // int fh_part;
     FILE *fh_part;
     char part_path[256];
     int i, r;
@@ -221,52 +222,52 @@ int write_parts(const char *drive, const char *game_name, const char *game_id, s
         sprintf(part_path, "%s/ul.%08X.%s.%02d", drive, crc32(game_name), game_id, i);
 #endif
         /*
-		fh_part = open(part_path, O_WRONLY|O_TRUNC|O_CREAT);
-		if (fh_part < 0) {
-			free(buf);
-			return -2;
-		}
+        fh_part = open(part_path, O_WRONLY | O_TRUNC | O_CREAT);
+        if (fh_part < 0) {
+            free(buf);
+            return -2;
+        }
 
-		nbytes = filesize;
-		if (nbytes > 1073741824)
-			nbytes = 1073741824;
+        nbytes = filesize;
+        if (nbytes > 1073741824)
+            nbytes = 1073741824;
 
-		rpos = 0;
-		if (nbytes) {
-			do {
-				if (nbytes > WR_SIZE)
-					size = WR_SIZE;
-				else
-					size = nbytes;
+        rpos = 0;
+        if (nbytes) {
+            do {
+                if (nbytes > WR_SIZE)
+                    size = WR_SIZE;
+                else
+                    size = nbytes;
 
-				r = isofs_ReadISO(iso_pos, size, buf);
-				if (r != size) {
-					free(buf);
-					close(fh_part);
-				return -3;
-				}
+                r = isofs_ReadISO(iso_pos, size, buf);
+                if (r != size) {
+                    free(buf);
+                    close(fh_part);
+                    return -3;
+                }
 
-				printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, (int)(iso_pos >> 11));
+                printf("Writing %d sectors to %s - LBA: %d\n", WR_SIZE >> 11, part_path, (int)(iso_pos >> 11));
 
-				// write to file
-				r = write(fh_part, buf, size);
-				if (r != size) {
-					free(buf);
-					close(fh_part);
-				return -4;
-				}
+                // write to file
+                r = write(fh_part, buf, size);
+                if (r != size) {
+                    free(buf);
+                    close(fh_part);
+                    return -4;
+                }
 
-				size = r;
-				rpos += size;
-				iso_pos += size;
-				nbytes -= size;
+                size = r;
+                rpos += size;
+                iso_pos += size;
+                nbytes -= size;
 
-			} while (nbytes);
-		}
-		filesize -= rpos;
-		close(fh_part);
-	}
-*/
+            } while (nbytes);
+        }
+        filesize -= rpos;
+        close(fh_part);
+    }
+        */
         fh_part = fopen(part_path, "wb");
         if (!fh_part) {
             free(buf);
@@ -557,7 +558,7 @@ int main(int argc, char **argv, char **env)
 #ifdef DEBUG
     printf("ISO filesize: 0x%llx\n", filesize);
     printf("Number of parts: %d\n", num_parts);
-//return 0;
+// return 0;
 #endif
 
     // write ISO parts to drive

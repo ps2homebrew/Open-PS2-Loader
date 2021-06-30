@@ -1,4 +1,4 @@
-IOP_OBJS = cdvdman.o streaming.o ioplib_util.o smsutils.o imports.o exports.o
+IOP_OBJS = cdvdman.o ioops.o ncmd.o scmd.o searchfile.o streaming.o ioplib_util.o smsutils.o imports.o exports.o
 USE_DEV9 ?= 0
 
 ifeq ($(USE_HDD),1)
@@ -49,8 +49,6 @@ IOP_OBJS += dev9.o
 IOP_CFLAGS += -D__USE_DEV9
 endif
 
-IOP_OBJS := $(IOP_OBJS:%=$(IOP_OBJS_DIR)%)
-
 include $(PS2SDK)/Defs.make
 include ../../Rules.bin.make
-include ../../Rules.make
+include $(PS2SDK)/samples/Makefile.iopglobal

@@ -3,16 +3,16 @@
 #include <string.h>
 #include "libds34bt.h"
 
-#define DS34BT_INIT 1
+#define DS34BT_INIT          1
 #define DS34BT_INIT_CHARGING 2
-#define DS34BT_GET_STATUS 3
-#define DS34BT_GET_BDADDR 4
-#define DS34BT_SET_RUMBLE 5
-#define DS34BT_SET_LED 6
-#define DS34BT_GET_DATA 7
-#define DS34BT_RESET 8
-#define DS34BT_GET_VERSION 9
-#define DS34BT_GET_FEATURES 10
+#define DS34BT_GET_STATUS    3
+#define DS34BT_GET_BDADDR    4
+#define DS34BT_SET_RUMBLE    5
+#define DS34BT_SET_LED       6
+#define DS34BT_GET_DATA      7
+#define DS34BT_RESET         8
+#define DS34BT_GET_VERSION   9
+#define DS34BT_GET_FEATURES  10
 
 #define DS34BT_BIND_RPC_ID 0x18E3878F
 

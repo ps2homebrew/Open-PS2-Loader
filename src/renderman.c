@@ -30,7 +30,7 @@ static int vsync_id = -1;
 struct rm_mode
 {
     char mode;
-    char hsync; //In KHz
+    char hsync; // In KHz
     short int width;
     short int height;
     short int passes;
@@ -203,7 +203,7 @@ int rmSetMode(int force)
         gsGlobal->Dithering = GS_SETTING_ON;
 
         // Do not draw pixels if they are fully transparent
-        //gsGlobal->Test->ATE  = GS_SETTING_ON;
+        // gsGlobal->Test->ATE  = GS_SETTING_ON;
         gsGlobal->Test->ATST = 7; // NOTEQUAL to AREF passes
         gsGlobal->Test->AREF = 0x00;
         gsGlobal->Test->AFAIL = 0; // KEEP

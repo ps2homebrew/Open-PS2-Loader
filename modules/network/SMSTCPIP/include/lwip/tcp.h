@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
- * All rights reserved. 
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice,
@@ -11,21 +11,21 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission. 
+ *    derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  *
  * This file is part of the lwIP TCP/IP stack.
- * 
+ *
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
@@ -76,16 +76,14 @@ void tcp_poll(struct tcp_pcb *pcb,
 void tcp_err(struct tcp_pcb *pcb,
              void (*err)(void *arg, err_t err));
 
-#define tcp_mss(pcb) ((pcb)->mss)
+#define tcp_mss(pcb)    ((pcb)->mss)
 #define tcp_sndbuf(pcb) ((pcb)->snd_buf)
 
 void tcp_recved(struct tcp_pcb *pcb, u16_t len);
 err_t tcp_bind(struct tcp_pcb *pcb, struct ip_addr *ipaddr,
                u16_t port);
 err_t tcp_connect(struct tcp_pcb *pcb, struct ip_addr *ipaddr,
-                  u16_t port, err_t (*connected)(void *arg,
-                                                 struct tcp_pcb *tpcb,
-                                                 err_t err));
+                  u16_t port, err_t (*connected)(void *arg, struct tcp_pcb *tpcb, err_t err));
 struct tcp_pcb *tcp_listen(struct tcp_pcb *pcb);
 void tcp_abort(struct tcp_pcb *pcb);
 err_t tcp_close(struct tcp_pcb *pcb);
@@ -94,9 +92,9 @@ err_t tcp_write(struct tcp_pcb *pcb, const void *dataptr, u16_t len,
 
 #define tcp_setprio(pcb, prio) pcb->prio = (prio)
 
-#define TCP_PRIO_MIN 1
+#define TCP_PRIO_MIN    1
 #define TCP_PRIO_NORMAL 64
-#define TCP_PRIO_MAX 127
+#define TCP_PRIO_MAX    127
 
 /* It is also possible to call these two functions at the right
    intervals (instead of calling tcp_tmr()). */
@@ -112,9 +110,9 @@ void tcp_rexmit(struct tcp_pcb *pcb);
 
 
 
-#define TCP_SEQ_LT(a, b) ((s32_t)((a) - (b)) < 0)
+#define TCP_SEQ_LT(a, b)  ((s32_t)((a) - (b)) < 0)
 #define TCP_SEQ_LEQ(a, b) ((s32_t)((a) - (b)) <= 0)
-#define TCP_SEQ_GT(a, b) ((s32_t)((a) - (b)) > 0)
+#define TCP_SEQ_GT(a, b)  ((s32_t)((a) - (b)) > 0)
 #define TCP_SEQ_GEQ(a, b) ((s32_t)((a) - (b)) >= 0)
 
 #define TCP_FIN 0x01U
@@ -156,16 +154,16 @@ void tcp_rexmit(struct tcp_pcb *pcb);
 /*
  * User-settable options (used with setsockopt, IPPROTO_TCP level).
  */
-#define TCP_NODELAY 0x01    /* don't delay send to coalesce packets */
-#define TCP_KEEPALIVE 0x02  /* send KEEPALIVE probes when idle for pcb->keepalive miliseconds */
+#define TCP_NODELAY    0x01 /* don't delay send to coalesce packets */
+#define TCP_KEEPALIVE  0x02 /* send KEEPALIVE probes when idle for pcb->keepalive miliseconds */
 #define TCP_ACKNODELAY 0x04 /* send ack as soon as data is received [not standard] */
-#define TCP_EVENSEG 0x08    /* Boman666 patch: send an even number of segments [not standard] */
+#define TCP_EVENSEG    0x08 /* Boman666 patch: send an even number of segments [not standard] */
 
 /* Keepalive values */
-#define TCP_KEEPDEFAULT 7200000                /* KEEPALIVE timer in miliseconds */
-#define TCP_KEEPINTVL 75000                    /* Time between KEEPALIVE probes in miliseconds */
-#define TCP_KEEPCNT 9                          /* Counter for KEEPALIVE probes */
-#define TCP_MAXIDLE TCP_KEEPCNT *TCP_KEEPINTVL /* Maximum KEEPALIVE probe time */
+#define TCP_KEEPDEFAULT 7200000                    /* KEEPALIVE timer in miliseconds */
+#define TCP_KEEPINTVL   75000                      /* Time between KEEPALIVE probes in miliseconds */
+#define TCP_KEEPCNT     9                          /* Counter for KEEPALIVE probes */
+#define TCP_MAXIDLE     TCP_KEEPCNT *TCP_KEEPINTVL /* Maximum KEEPALIVE probe time */
 
 
 #ifdef PACK_STRUCT_USE_INCLUDES
@@ -190,13 +188,13 @@ PACK_STRUCT_END
 
 #define TCPH_OFFSET(phdr) (ntohs((phdr)->_hdrlen_rsvd_flags) >> 8)
 #define TCPH_HDRLEN(phdr) (ntohs((phdr)->_hdrlen_rsvd_flags) >> 12)
-#define TCPH_FLAGS(phdr) (ntohs((phdr)->_hdrlen_rsvd_flags) & TCP_FLAGS)
+#define TCPH_FLAGS(phdr)  (ntohs((phdr)->_hdrlen_rsvd_flags) & TCP_FLAGS)
 
 #define TCPH_OFFSET_SET(phdr, offset) (phdr)->_hdrlen_rsvd_flags = htons(((offset) << 8) | TCPH_FLAGS(phdr))
-#define TCPH_HDRLEN_SET(phdr, len) (phdr)->_hdrlen_rsvd_flags = htons(((len) << 12) | TCPH_FLAGS(phdr))
-#define TCPH_FLAGS_SET(phdr, flags) (phdr)->_hdrlen_rsvd_flags = htons((ntohs((phdr)->_hdrlen_rsvd_flags) & ~TCP_FLAGS) | (flags))
-#define TCPH_SET_FLAG(phdr, flags) (phdr)->_hdrlen_rsvd_flags = htons(ntohs((phdr)->_hdrlen_rsvd_flags) | (flags))
-#define TCPH_UNSET_FLAG(phdr, flags) (phdr)->_hdrlen_rsvd_flags = htons(ntohs((phdr)->_hdrlen_rsvd_flags) | (TCPH_FLAGS(phdr) & ~(flags)))
+#define TCPH_HDRLEN_SET(phdr, len)    (phdr)->_hdrlen_rsvd_flags = htons(((len) << 12) | TCPH_FLAGS(phdr))
+#define TCPH_FLAGS_SET(phdr, flags)   (phdr)->_hdrlen_rsvd_flags = htons((ntohs((phdr)->_hdrlen_rsvd_flags) & ~TCP_FLAGS) | (flags))
+#define TCPH_SET_FLAG(phdr, flags)    (phdr)->_hdrlen_rsvd_flags = htons(ntohs((phdr)->_hdrlen_rsvd_flags) | (flags))
+#define TCPH_UNSET_FLAG(phdr, flags)  (phdr)->_hdrlen_rsvd_flags = htons(ntohs((phdr)->_hdrlen_rsvd_flags) | (TCPH_FLAGS(phdr) & ~(flags)))
 
 #define TCP_TCPLEN(seg) ((seg)->len + ((TCPH_FLAGS((seg)->tcphdr) & TCP_FIN || \
                                         TCPH_FLAGS((seg)->tcphdr) & TCP_SYN) ? \
@@ -240,15 +238,15 @@ struct tcp_pcb
   u8_t flags; */
 #define flags_t /*u8_t*/ u16_t
     flags_t flags;
-#define TF_ACK_DELAY (flags_t)0x01U  /* Delayed ACK. */
-#define TF_ACK_NOW (flags_t)0x02U    /* Immediate ACK. */
-#define TF_INFR (flags_t)0x04U       /* In fast recovery. */
-#define TF_RESET (flags_t)0x08U      /* Connection was reset. */
-#define TF_CLOSED (flags_t)0x10U     /* Connection was sucessfully closed. */
-#define TF_GOT_FIN (flags_t)0x20U    /* Connection was closed by the remote end. */
-#define TF_NODELAY (flags_t)0x40U    /* Disable Nagle algorithm */
-#define TF_ACKNODELAY (flags_t)0x80U /* Force ACK at every receive [not standard] */
-#define TF_EVENSEG (flags_t)0x100U   /* Send an even number of segment [not standard] */
+#define TF_ACK_DELAY  (flags_t)0x01U  /* Delayed ACK. */
+#define TF_ACK_NOW    (flags_t)0x02U  /* Immediate ACK. */
+#define TF_INFR       (flags_t)0x04U  /* In fast recovery. */
+#define TF_RESET      (flags_t)0x08U  /* Connection was reset. */
+#define TF_CLOSED     (flags_t)0x10U  /* Connection was sucessfully closed. */
+#define TF_GOT_FIN    (flags_t)0x20U  /* Connection was closed by the remote end. */
+#define TF_NODELAY    (flags_t)0x40U  /* Disable Nagle algorithm */
+#define TF_ACKNODELAY (flags_t)0x80U  /* Force ACK at every receive [not standard] */
+#define TF_EVENSEG    (flags_t)0x100U /* Send an even number of segment [not standard] */
 
     /* receiver varables */
     u32_t rcv_nxt; /* next seqno expected */
@@ -336,9 +334,9 @@ struct tcp_pcb_listen
     struct tcp_pcb_listen *next; /* for the linked list */
 
     /* Even if state is obviously LISTEN this is here for
-   * field compatibility with tpc_pcb to which it is cast sometimes
-   * Until a cleaner solution emerges this is here.FIXME
-   */
+     * field compatibility with tpc_pcb to which it is cast sometimes
+     * Until a cleaner solution emerges this is here.FIXME
+     */
     enum tcp_state state; /* TCP state */
 
     u8_t prio;
@@ -484,7 +482,7 @@ extern struct tcp_pcb *tcp_tw_pcbs;            /* List of all TCP PCBs in TIME-W
 
 extern struct tcp_pcb *tcp_tmp_pcb; /* Only used for temporary storage. */
 
-/* Axioms about the above lists:   
+/* Axioms about the above lists:
    1) Every TCP PCB that is not CLOSED is in one of the lists.
    2) A PCB is only in one of the lists.
    3) All PCBs in the tcp_listen_pcbs list is in LISTEN state.

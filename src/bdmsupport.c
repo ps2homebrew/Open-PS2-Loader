@@ -15,7 +15,7 @@
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioIoctl, fileXioDevctl
 
-static char bdmPrefix[40]; //Contains the full path to the folder where all the games are.
+static char bdmPrefix[40]; // Contains the full path to the folder where all the games are.
 //START of OPL_DB tweaks
 static char bdmBase[7];
 //END of OPL_DB tweaks
@@ -25,6 +25,8 @@ static time_t bdmModifiedDVDPrev;
 static int bdmGameCount = 0;
 static base_game_info_t *bdmGames;
 static char bdmDriver[5];
+
+static int fireWireModLoaded = 0;
 
 // forward declaration
 static item_list_t bdmGameList;
@@ -41,7 +43,7 @@ char *bdmGetBase(void)
 }
 //END of OPL_DB tweaks
 
-//Identifies the partition that the specified file is stored on and generates a full path to it.
+// Identifies the partition that the specified file is stored on and generates a full path to it.
 int bdmFindPartition(char *target, const char *name, int write)
 {
     int i, fd;
@@ -88,6 +90,17 @@ static void bdmEventHandler(void *packet, void *opt)
     BdmGeneration++;
 }
 
+static void bdmLoadBlockDeviceModules(void)
+{
+    if (gEnableFW && !fireWireModLoaded) {
+        // Load iLink Block Device drivers
+        sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
+        sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
+
+        fireWireModLoaded = 1;
+    }
+}
+
 void bdmLoadModules(void)
 {
     LOG("BDMSUPPORT LoadModules\n");
@@ -102,9 +115,8 @@ void bdmLoadModules(void)
     sysLoadModuleBuffer(&usbd_irx, size_usbd_irx, 0, NULL);
     sysLoadModuleBuffer(&usbmass_bd_irx, size_usbmass_bd_irx, 0, NULL);
 
-    // Load iLink Block Device drivers
-    sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
-    sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
+    // Load Optional Block Device drivers
+    bdmLoadBlockDeviceModules();
 
     sysLoadModuleBuffer(&bdmevent_irx, size_bdmevent_irx, 0, NULL);
     SifAddCmdHandler(0, &bdmEventHandler, NULL);
@@ -139,6 +151,8 @@ static int bdmNeedsUpdate(void)
     static unsigned char LanguagesLoaded = 0;
     int result = 0;
     struct stat st;
+
+    ioPutRequest(IO_CUSTOM_SIMPLEACTION, &bdmLoadBlockDeviceModules);
 
     if (bdmULSizePrev != -2 && OldGeneration == BdmGeneration)
         return 0;
@@ -283,7 +297,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
         if (have_error) {
             char error[256];
-            if (have_error == 2) //VMC file is fragmented
+            if (have_error == 2) // VMC file is fragmented
                 snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name, (vmc_id + 1));
             else
                 snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name, (vmc_id + 1));
@@ -317,7 +331,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
             settings->LBAs[i] = fileXioIoctl(fd, USBMASS_IOCTL_GET_LBA, "");
             if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") != 1) {
                 close(fd);
-                //Game is fragmented. Do not continue.
+                // Game is fragmented. Do not continue.
                 if (settings != NULL)
                     sbUnprepare(&settings->common);
 
@@ -330,7 +344,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
             close(fd);
         } else {
-            //Unable to open part of the game. Do not continue.
+            // Unable to open part of the game. Do not continue.
             if (settings != NULL)
                 sbUnprepare(&settings->common);
             guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
@@ -338,7 +352,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
         }
     }
 
-    //Initialize layer 1 information.
+    // Initialize layer 1 information.
     sbCreatePath(game, partname, bdmPrefix, "/", 0);
     layer1_start = sbGetISO9660MaxLBA(partname);
 
@@ -348,7 +362,7 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
             layer1_offset = layer1_start % 0x80000;
             sbCreatePath(game, partname, bdmPrefix, "/", layer1_part);
             break;
-        default: //Raw ISO9660 disc image; one part.
+        default: // Raw ISO9660 disc image; one part.
             layer1_part = 0;
             layer1_offset = layer1_start;
     }
@@ -402,7 +416,7 @@ static int bdmGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
-//This may be called, even if bdmInit() was not.
+// This may be called, even if bdmInit() was not.
 static void bdmCleanUp(int exception)
 {
     if (bdmGameList.enabled) {
@@ -415,7 +429,7 @@ static void bdmCleanUp(int exception)
     }
 }
 
-//This may be called, even if bdmInit() was not.
+// This may be called, even if bdmInit() was not.
 static void bdmShutdown(void)
 {
     if (bdmGameList.enabled) {

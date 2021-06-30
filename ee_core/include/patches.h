@@ -4,7 +4,7 @@
   Copyright 2016 doctorxyz
   Licenced under Academic Free License version 3.0
   Review Open-Ps2-Loader README & LICENSE files for further details.
-  
+
   Some parts of the code have been taken from Polo's HD Project and doctorxyz's GSM
 */
 

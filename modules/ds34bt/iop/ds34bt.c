@@ -270,7 +270,7 @@ static u8 rgbled_patterns[][2][3] =
         {{0x00, 0x10, 0x10}, {0x00, 0x7F, 0x7F}}, // light cyan/cyan
 };
 
-static u8 link_key[] = //for ds4 authorisation
+static u8 link_key[] = // for ds4 authorisation
     {
         0x56, 0xE8, 0x81, 0x38, 0x08, 0x06, 0x51, 0x41,
         0xC0, 0x7F, 0x12, 0xAA, 0xD9, 0x66, 0x3C, 0xCE};
@@ -337,17 +337,17 @@ static u8 GenuineMacAddress[][3] =
         {0x00, 0x24, 0x23},
         {0x00, 0x22, 0x43},
         {0x00, 0x15, 0xAF},
-        //fake with AirohaTechnologyCorp's Chip
+        // fake with AirohaTechnologyCorp's Chip
         {0x0C, 0xFC, 0x83}};
 
-#define REQ_HCI_OUT (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_DEVICE)
+#define REQ_HCI_OUT     (USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_DEVICE)
 #define HCI_COMMAND_REQ 0
 
 #define MAX_PADS 2
 
-static u8 bt_bdaddr[6];              //usb bt adapter mac address
-static hci_information_t bt_version; //bt adapter version information
-static u8 bt_features[8];            //bt adapter supported features
+static u8 bt_bdaddr[6];              // usb bt adapter mac address
+static hci_information_t bt_version; // bt adapter version information
+static u8 bt_features[8];            // bt adapter supported features
 
 static u8 hci_buf[MAX_BUFFER_SIZE] __attribute((aligned(4))) = {0};
 static u8 l2cap_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
@@ -424,7 +424,7 @@ static int hci_accept_connection(u8 *bdaddr)
     hci_cmd_buf[6] = *(bdaddr + 3);
     hci_cmd_buf[7] = *(bdaddr + 4);
     hci_cmd_buf[8] = *(bdaddr + 5);
-    hci_cmd_buf[9] = 0x01; //switch role to (slave = 1 / master = 0)
+    hci_cmd_buf[9] = 0x01; // switch role to (slave = 1 / master = 0)
 
     return HCI_Command(10, hci_cmd_buf);
 }
@@ -459,7 +459,7 @@ static int hci_reject_connection(u8 *bdaddr)
     hci_cmd_buf[6] = *(bdaddr + 3);
     hci_cmd_buf[7] = *(bdaddr + 4);
     hci_cmd_buf[8] = *(bdaddr + 5);
-    hci_cmd_buf[9] = 0x09; //reason max connection
+    hci_cmd_buf[9] = 0x09; // reason max connection
 
     return HCI_Command(10, hci_cmd_buf);
 }
@@ -610,7 +610,7 @@ static void HCI_event_task(int result)
                     }
                     DPRINTF("\n");
                     for (i = 0; i < MAX_PADS; i++) {
-                        if (strncmp(ds34pad[i].bdaddr, hci_buf + 5, 6) == 0) {
+                        if (memcmp(ds34pad[i].bdaddr, hci_buf + 5, 6) == 0) {
                             // store the handle for the ACL connection
                             ds34pad[i].hci_handle = hci_buf[3] | ((hci_buf[4] & 0x0F) << 8);
                             break;
@@ -642,7 +642,7 @@ static void HCI_event_task(int result)
                 DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                 DPRINTF("\t Connection_Handle = 0x%04X \n", (hci_buf[3] | ((hci_buf[4] & 0x0F) << 8)));
                 DPRINTF("\t Reason = 0x%02X \n", hci_buf[5]);
-                for (i = 0; i < MAX_PADS; i++) { //detect pad
+                for (i = 0; i < MAX_PADS; i++) { // detect pad
                     if (ds34pad[i].hci_handle == (hci_buf[3] | ((hci_buf[4] & 0x0F) << 8))) {
                         break;
                     }
@@ -666,14 +666,14 @@ static void HCI_event_task(int result)
                 DPRINTF("\t Status = 0x%02X \n", hci_buf[2]);
                 if (!hci_buf[2]) {
                     for (i = 0; i < MAX_PADS; i++) {
-                        if (strncmp(ds34pad[i].bdaddr, hci_buf + 3, 6) == 0) {
+                        if (memcmp(ds34pad[i].bdaddr, hci_buf + 3, 6) == 0) {
                             break;
                         }
                     }
                     if (i >= MAX_PADS) {
                         break;
                     }
-                    if (strncmp(hci_buf + 9, "Wireless Controller", 19) == 0) {
+                    if (memcmp(hci_buf + 9, "Wireless Controller", 19) == 0) {
                         ds34pad[i].type = DS4;
                         ds34pad[i].isfake = 0;
                         DPRINTF("\t Type: Dualshock 4 \n");
@@ -705,19 +705,19 @@ static void HCI_event_task(int result)
                 }
                 DPRINTF("\n\t Link = 0x%02X \n", hci_buf[11]);
                 DPRINTF("\t Class = 0x%02X 0x%02X 0x%02X \n", hci_buf[8], hci_buf[9], hci_buf[10]);
-                for (i = 0; i < MAX_PADS; i++) //find free slot
+                for (i = 0; i < MAX_PADS; i++) // find free slot
                 {
                     if (!pad_status_check(DS34BT_STATE_RUNNING, i) && ds34pad[i].enabled) {
                         if (pad_status_check(DS34BT_STATE_CONNECTED, i)) {
-                            if (pad_status_check(DS34BT_STATE_DISCONNECTING, i)) //if we're waiting for hci disconnect event
+                            if (pad_status_check(DS34BT_STATE_DISCONNECTING, i)) // if we're waiting for hci disconnect event
                                 continue;
                             else
-                                hci_disconnect(ds34pad[i].hci_handle); //try to disconnect
+                                hci_disconnect(ds34pad[i].hci_handle); // try to disconnect
                         }
                         break;
                     }
                 }
-                if (i >= MAX_PADS) //no free slot
+                if (i >= MAX_PADS) // no free slot
                 {
                     hci_reject_connection(hci_buf + 2);
                     break;
@@ -726,8 +726,8 @@ static void HCI_event_task(int result)
                 mips_memcpy(ds34pad[pad].bdaddr, hci_buf + 2, 6);
                 ds34pad[pad].isfake = 0;
                 if (!disable_fake) {
-                    ds34pad[pad].isfake = 1;                            //fake ds3
-                    for (i = 0; i < sizeof(GenuineMacAddress) / 3; i++) //check if ds3 is genuine
+                    ds34pad[pad].isfake = 1;                            // fake ds3
+                    for (i = 0; i < sizeof(GenuineMacAddress) / 3; i++) // check if ds3 is genuine
                     {
                         if (ds34pad[pad].bdaddr[5] == GenuineMacAddress[i][0] &&
                             ds34pad[pad].bdaddr[4] == GenuineMacAddress[i][1] &&
@@ -903,10 +903,10 @@ static int l2cap_config_request(u16 handle, u8 rxid, u16 dcid)
     cmd_buf[7] = 0x00;
     cmd_buf[8] = 0x01; // Config Opt: type = MTU (Maximum Transmission Unit)
     cmd_buf[9] = 0x02; // Config Opt: length
-    //cmd_buf[10] = 0x96; // Config Opt: data
-    //cmd_buf[11] = 0x00;
+    // cmd_buf[10] = 0x96; // Config Opt: data
+    // cmd_buf[11] = 0x00;
 
-    //this setting disable hid cmd reports from ds3
+    // this setting disable hid cmd reports from ds3
     cmd_buf[10] = 0xFF; // Config Opt: data
     cmd_buf[11] = 0xFF;
 
@@ -1153,7 +1153,7 @@ static void l2cap_event_cb(int resultCode, int bytes, void *arg)
             }
         } else {
             if (!ds34pad[ret].isfake && ds34pad[ret].type == DS3)
-                DelayThread(42000); //fix for some bt adapters
+                DelayThread(42000); // fix for some bt adapters
         }
     }
 
@@ -1223,14 +1223,14 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
                 rrum = 0;
         }
 
-        led_buf[3] = 0xFE; //rt
-        led_buf[4] = rrum; //rp
-        led_buf[5] = 0xFE; //lt
-        led_buf[6] = lrum; //lp
+        led_buf[3] = 0xFE; // rt
+        led_buf[4] = rrum; // rp
+        led_buf[5] = 0xFE; // lt
+        led_buf[6] = lrum; // lp
 
-        led_buf[11] = led[0] & 0x7F; //LED Conf
+        led_buf[11] = led[0] & 0x7F; // LED Conf
 
-        if (led[3]) //means charging, so blink
+        if (led[3]) // means charging, so blink
         {
             led_buf[15] = 0x32;
             led_buf[20] = 0x32;
@@ -1244,17 +1244,17 @@ static int hid_LEDRumble(u8 *led, u8 lrum, u8 rrum, int pad)
 
         led_buf[0] = HID_THDR_SET_REPORT_OUTPUT; // THdr
         led_buf[1] = PS4_11_REPORT_ID;           // Report ID
-        led_buf[2] = 0x80;                       //update rate 1000Hz
+        led_buf[2] = 0x80;                       // update rate 1000Hz
         led_buf[4] = 0xFF;
 
         led_buf[7] = rrum;
         led_buf[8] = lrum;
 
-        led_buf[9] = led[0];  //r
-        led_buf[10] = led[1]; //g
-        led_buf[11] = led[2]; //b
+        led_buf[9] = led[0];  // r
+        led_buf[10] = led[1]; // g
+        led_buf[11] = led[2]; // b
 
-        if (led[3]) //means charging, so blink
+        if (led[3]) // means charging, so blink
         {
             led_buf[12] = 0x80; // Time to flash bright (255 = 2.5 seconds)
             led_buf[13] = 0x80; // Time to flash dark (255 = 2.5 seconds)
@@ -1287,54 +1287,54 @@ static void hid_readReport(u8 *data, int bytes, int pad)
             ds34pad[pad].data[0] = ~report->ButtonStateL;
             ds34pad[pad].data[1] = ~report->ButtonStateH;
 
-            ds34pad[pad].data[2] = report->RightStickX; //rx
-            ds34pad[pad].data[3] = report->RightStickY; //ry
-            ds34pad[pad].data[4] = report->LeftStickX;  //lx
-            ds34pad[pad].data[5] = report->LeftStickY;  //ly
+            ds34pad[pad].data[2] = report->RightStickX; // rx
+            ds34pad[pad].data[3] = report->RightStickY; // ry
+            ds34pad[pad].data[4] = report->LeftStickX;  // lx
+            ds34pad[pad].data[5] = report->LeftStickY;  // ly
 
             if (bytes == 21 && !press_emu)
                 press_emu = 1;
 
-            if (press_emu) {                                //needs emulating pressure buttons
-                ds34pad[pad].data[6] = report->Right * 255; //right
-                ds34pad[pad].data[7] = report->Left * 255;  //left
-                ds34pad[pad].data[8] = report->Up * 255;    //up
-                ds34pad[pad].data[9] = report->Down * 255;  //down
+            if (press_emu) {                                // needs emulating pressure buttons
+                ds34pad[pad].data[6] = report->Right * 255; // right
+                ds34pad[pad].data[7] = report->Left * 255;  // left
+                ds34pad[pad].data[8] = report->Up * 255;    // up
+                ds34pad[pad].data[9] = report->Down * 255;  // down
 
-                ds34pad[pad].data[10] = report->Triangle * 255; //triangle
-                ds34pad[pad].data[11] = report->Circle * 255;   //circle
-                ds34pad[pad].data[12] = report->Cross * 255;    //cross
-                ds34pad[pad].data[13] = report->Square * 255;   //square
+                ds34pad[pad].data[10] = report->Triangle * 255; // triangle
+                ds34pad[pad].data[11] = report->Circle * 255;   // circle
+                ds34pad[pad].data[12] = report->Cross * 255;    // cross
+                ds34pad[pad].data[13] = report->Square * 255;   // square
 
-                ds34pad[pad].data[14] = report->L1 * 255; //L1
-                ds34pad[pad].data[15] = report->R1 * 255; //R1
-                ds34pad[pad].data[16] = report->L2 * 255; //L2
-                ds34pad[pad].data[17] = report->R2 * 255; //R2
+                ds34pad[pad].data[14] = report->L1 * 255; // L1
+                ds34pad[pad].data[15] = report->R1 * 255; // R1
+                ds34pad[pad].data[16] = report->L2 * 255; // L2
+                ds34pad[pad].data[17] = report->R2 * 255; // R2
 
                 report->Power = 0x05;
             } else {
-                ds34pad[pad].data[6] = report->PressureRight; //right
-                ds34pad[pad].data[7] = report->PressureLeft;  //left
-                ds34pad[pad].data[8] = report->PressureUp;    //up
-                ds34pad[pad].data[9] = report->PressureDown;  //down
+                ds34pad[pad].data[6] = report->PressureRight; // right
+                ds34pad[pad].data[7] = report->PressureLeft;  // left
+                ds34pad[pad].data[8] = report->PressureUp;    // up
+                ds34pad[pad].data[9] = report->PressureDown;  // down
 
-                ds34pad[pad].data[10] = report->PressureTriangle; //triangle
-                ds34pad[pad].data[11] = report->PressureCircle;   //circle
-                ds34pad[pad].data[12] = report->PressureCross;    //cross
-                ds34pad[pad].data[13] = report->PressureSquare;   //square
+                ds34pad[pad].data[10] = report->PressureTriangle; // triangle
+                ds34pad[pad].data[11] = report->PressureCircle;   // circle
+                ds34pad[pad].data[12] = report->PressureCross;    // cross
+                ds34pad[pad].data[13] = report->PressureSquare;   // square
 
-                ds34pad[pad].data[14] = report->PressureL1; //L1
-                ds34pad[pad].data[15] = report->PressureR1; //R1
-                ds34pad[pad].data[16] = report->PressureL2; //L2
-                ds34pad[pad].data[17] = report->PressureR2; //R2
+                ds34pad[pad].data[14] = report->PressureL1; // L1
+                ds34pad[pad].data[15] = report->PressureR1; // R1
+                ds34pad[pad].data[16] = report->PressureL2; // L2
+                ds34pad[pad].data[17] = report->PressureR2; // R2
             }
 
-            if (report->PSButtonState && report->Power != 0xEE) //display battery level
+            if (report->PSButtonState && report->Power != 0xEE) // display battery level
                 ds34pad[pad].oldled[0] = power_level[report->Power];
             else
                 ds34pad[pad].oldled[0] = led_patterns[pad][1];
 
-            if (report->Power == 0xEE) //charging
+            if (report->Power == 0xEE) // charging
                 ds34pad[pad].oldled[3] = 1;
             else
                 ds34pad[pad].oldled[3] = 0;
@@ -1401,27 +1401,27 @@ static void hid_readReport(u8 *data, int bytes, int pad)
             ds34pad[pad].data[0] = ~(report->Share | report->L3 << 1 | report->R3 << 2 | report->Option << 3 | up << 4 | right << 5 | down << 6 | left << 7);
             ds34pad[pad].data[1] = ~(report->L2 | report->R2 << 1 | report->L1 << 2 | report->R1 << 3 | report->Triangle << 4 | report->Circle << 5 | report->Cross << 6 | report->Square << 7);
 
-            ds34pad[pad].data[2] = report->RightStickX; //rx
-            ds34pad[pad].data[3] = report->RightStickY; //ry
-            ds34pad[pad].data[4] = report->LeftStickX;  //lx
-            ds34pad[pad].data[5] = report->LeftStickY;  //ly
+            ds34pad[pad].data[2] = report->RightStickX; // rx
+            ds34pad[pad].data[3] = report->RightStickY; // ry
+            ds34pad[pad].data[4] = report->LeftStickX;  // lx
+            ds34pad[pad].data[5] = report->LeftStickY;  // ly
 
-            ds34pad[pad].data[6] = right * 255; //right
-            ds34pad[pad].data[7] = left * 255;  //left
-            ds34pad[pad].data[8] = up * 255;    //up
-            ds34pad[pad].data[9] = down * 255;  //down
+            ds34pad[pad].data[6] = right * 255; // right
+            ds34pad[pad].data[7] = left * 255;  // left
+            ds34pad[pad].data[8] = up * 255;    // up
+            ds34pad[pad].data[9] = down * 255;  // down
 
-            ds34pad[pad].data[10] = report->Triangle * 255; //triangle
-            ds34pad[pad].data[11] = report->Circle * 255;   //circle
-            ds34pad[pad].data[12] = report->Cross * 255;    //cross
-            ds34pad[pad].data[13] = report->Square * 255;   //square
+            ds34pad[pad].data[10] = report->Triangle * 255; // triangle
+            ds34pad[pad].data[11] = report->Circle * 255;   // circle
+            ds34pad[pad].data[12] = report->Cross * 255;    // cross
+            ds34pad[pad].data[13] = report->Square * 255;   // square
 
-            ds34pad[pad].data[14] = report->L1 * 255;   //L1
-            ds34pad[pad].data[15] = report->R1 * 255;   //R1
-            ds34pad[pad].data[16] = report->PressureL2; //L2
-            ds34pad[pad].data[17] = report->PressureR2; //R2
+            ds34pad[pad].data[14] = report->L1 * 255;   // L1
+            ds34pad[pad].data[15] = report->R1 * 255;   // R1
+            ds34pad[pad].data[16] = report->PressureL2; // L2
+            ds34pad[pad].data[17] = report->PressureR2; // R2
 
-            if (report->PSButton) { //display battery level
+            if (report->PSButton) { // display battery level
                 ds34pad[pad].oldled[0] = report->Battery;
                 ds34pad[pad].oldled[1] = 0;
                 ds34pad[pad].oldled[2] = 0;
@@ -1431,7 +1431,7 @@ static void hid_readReport(u8 *data, int bytes, int pad)
                 ds34pad[pad].oldled[2] = rgbled_patterns[pad][1][2];
             }
 
-            if (report->Power != 0xB && report->Usb_plugged) //charging
+            if (report->Power != 0xB && report->Usb_plugged) // charging
                 ds34pad[pad].oldled[3] = 1;
             else
                 ds34pad[pad].oldled[3] = 0;
@@ -1611,16 +1611,16 @@ static SifRpcServerData_t rpc_svr __attribute__((aligned(16)));
 
 static int rpc_buf[64] __attribute((aligned(16)));
 
-#define DS34BT_INIT 1
+#define DS34BT_INIT          1
 #define DS34BT_INIT_CHARGING 2
-#define DS34BT_GET_STATUS 3
-#define DS34BT_GET_BDADDR 4
-#define DS34BT_SET_RUMBLE 5
-#define DS34BT_SET_LED 6
-#define DS34BT_GET_DATA 7
-#define DS34BT_RESET 8
-#define DS34BT_GET_VERSION 9
-#define DS34BT_GET_FEATURES 10
+#define DS34BT_GET_STATUS    3
+#define DS34BT_GET_BDADDR    4
+#define DS34BT_SET_RUMBLE    5
+#define DS34BT_SET_LED       6
+#define DS34BT_GET_DATA      7
+#define DS34BT_RESET         8
+#define DS34BT_GET_VERSION   9
+#define DS34BT_GET_FEATURES  10
 
 #define DS34BT_BIND_RPC_ID 0x18E3878F
 
@@ -1654,7 +1654,7 @@ void *rpc_sf(int cmd, void *data, int size)
             ds34bt_set_led((u8 *)(data + 1), *(u8 *)data);
             break;
         case DS34BT_GET_DATA:
-            ds34bt_get_data((u8 *)data, 18, *(u8 *)data);
+            ds34bt_get_data((char *)data, 18, *(u8 *)data);
             break;
         case DS34BT_RESET:
             ds34bt_reset();

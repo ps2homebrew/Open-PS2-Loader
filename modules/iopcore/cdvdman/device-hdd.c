@@ -4,27 +4,7 @@
   Review Open PS2 Loader README & LICENSE files for further details.
 */
 
-#include "smsutils.h"
-#include "atad.h"
-#include "ioplib_util.h"
-#include "cdvdman.h"
 #include "internal.h"
-#include "cdvd_config.h"
-
-#include <loadcore.h>
-#include <stdio.h>
-#include <sysclib.h>
-#include <sysmem.h>
-#include <thbase.h>
-#include <thevent.h>
-#include <intrman.h>
-#include <ioman.h>
-#include <thsemap.h>
-#include <errno.h>
-#include <io_common.h>
-#include "ioman_add.h"
-
-#include <errno.h>
 
 #include "device.h"
 
@@ -51,7 +31,7 @@ static int cdvdman_get_part_specs(u32 lsn)
     hdl_partspecs_t *ps;
 
     for (ps = cdvdman_partspecs, i = 0; i < NumParts; i++, ps++) {
-        if ((lsn >= ps->part_offset) && (lsn < (ps->part_offset + (ps->part_size >> 11)))) {
+        if ((lsn >= ps->part_offset) && (lsn < (ps->part_offset + (ps->part_size / 2048)))) {
             CurrentPart = i;
             break;
         }
@@ -90,7 +70,7 @@ void DeviceInit(void)
         DelayThread(2000);
     }
 
-    mips_memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
+    memcpy(cdvdman_partspecs, apaHeader.part_specs, sizeof(cdvdman_partspecs));
 
     cdvdman_settings.common.media = apaHeader.discType;
     cdvdman_settings.common.layer1_start = apaHeader.layer1_start;
@@ -124,11 +104,11 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 {
     u32 offset = 0;
     while (sectors) {
-        if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)))))
+        if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)))))
             if (cdvdman_get_part_specs(lsn) != 0)
                 return -ENXIO;
 
-        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size >> 11)) - lsn;
+        u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)) - lsn;
         if (sectors < nsectors)
             nsectors = sectors;
 
@@ -136,7 +116,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
         if (ata_device_sector_io(0, (void *)(buffer + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
             return -EIO;
         }
-        offset += nsectors << 11;
+        offset += nsectors * 2048;
         sectors -= nsectors;
         lsn += nsectors;
     }

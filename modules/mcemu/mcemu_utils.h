@@ -32,7 +32,7 @@ void mips_memset(void *, int, unsigned);
 
 #define oplutils_IMPORTS_start DECLARE_IMPORT_TABLE(oplutils, 1, 2)
 
-int getModInfo(u8 *modname, modinfo_t *info);
+int getModInfo(char *modname, modinfo_t *info);
 #define I_getModInfo DECLARE_IMPORT(4, getModInfo)
 
 int oplRegisterShutdownCallback(oplShutdownCb_t cb);
@@ -53,7 +53,7 @@ void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsign
 #ifdef HDD_DRIVER
 
 /* These are used with the dir parameter of ata_device_dma_transfer().  */
-#define ATA_DIR_READ 0
+#define ATA_DIR_READ  0
 #define ATA_DIR_WRITE 1
 
 int ata_device_sector_io(unsigned int unit, void *buf, unsigned int lba, unsigned int sectors, int dir);

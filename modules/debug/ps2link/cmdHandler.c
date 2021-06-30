@@ -43,7 +43,7 @@ static unsigned int rpc_data[1024 / 4] __attribute__((aligned(16)));
 int excepscrdump = 1;
 
 #define PKO_DMA_DEST ((void *)0x200ff800)
-//unsigned int *dma_ptr =(unsigned int*)(0x20100000-2048);
+// unsigned int *dma_ptr =(unsigned int*)(0x20100000-2048);
 
 //////////////////////////////////////////////////////////////////////////
 static void
@@ -52,7 +52,6 @@ pkoExecIop(char *buf, int len)
     pko_pkt_execiop_req *cmd;
     int retval;
     int arglen;
-    char *path;
     char *args;
     unsigned int argc;
     int id;
@@ -72,7 +71,6 @@ pkoExecIop(char *buf, int len)
 
     printf("IOP cmd: %ld args\n", ntohl(cmd->argc));
 
-    path = &cmd->argv[0];
     args = &cmd->argv[strlen(cmd->argv) + 1];
     argc = ntohl(cmd->argc);
 
@@ -161,33 +159,25 @@ pkoSendSifCmd(unsigned int cmd, void *src, unsigned int len)
 static void
 pkoExecEE(char *buf, int len)
 {
-    int ret;
-
-    ret = pkoSendSifCmd(PKO_RPC_EXECEE, buf, len);
+    pkoSendSifCmd(PKO_RPC_EXECEE, buf, len);
 };
 //////////////////////////////////////////////////////////////////////////
 static void
 pkoGSExec(char *buf, int len)
 {
-    int ret;
-
-    ret = pkoSendSifCmd(PKO_RPC_GSEXEC, buf, len);
+    pkoSendSifCmd(PKO_RPC_GSEXEC, buf, len);
 };
 //////////////////////////////////////////////////////////////////////////
 static void
 pkoNetDump(char *buf, int len)
 {
-    int ret;
-
-    ret = pkoSendSifCmd(PKO_RPC_NETDUMP, buf, len);
+    pkoSendSifCmd(PKO_RPC_NETDUMP, buf, len);
 };
 //////////////////////////////////////////////////////////////////////////
 static void
 pkoScrDump(char *buf, int len)
 {
-    int ret;
-
-    ret = pkoSendSifCmd(PKO_RPC_SCRDUMP, buf, len);
+    pkoSendSifCmd(PKO_RPC_SCRDUMP, buf, len);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -201,8 +191,6 @@ pkoPowerOff()
 static void
 pkoReset(char *buf, int len)
 {
-    int ret;
-
     dbgprintf("IOP cmd: RESET\n");
 
     if (len != sizeof(pko_pkt_reset_req)) {
@@ -215,43 +203,37 @@ pkoReset(char *buf, int len)
     printf("unmounted\n");
     DelDrv("tty");
 
-    ret = pkoSendSifCmd(PKO_RPC_RESET, buf, len);
+    pkoSendSifCmd(PKO_RPC_RESET, buf, len);
 };
 
 static void
 pkoStopVU(char *buf, int len)
 {
-    int ret;
-
-    ret = pkoSendSifCmd(PKO_RPC_STOPVU, buf, len);
+    pkoSendSifCmd(PKO_RPC_STOPVU, buf, len);
 };
 
 static void
 pkoStartVU(char *buf, int len)
 {
-    int ret;
-    ret = pkoSendSifCmd(PKO_RPC_STARTVU, buf, len);
+    pkoSendSifCmd(PKO_RPC_STARTVU, buf, len);
 };
 
 static void
 pkoDumpMem(char *buf, int len)
 {
-    int ret;
-    ret = pkoSendSifCmd(PKO_RPC_DUMPMEM, buf, len);
+    pkoSendSifCmd(PKO_RPC_DUMPMEM, buf, len);
 };
 
 static void
 pkoDumpReg(char *buf, int len)
 {
-    int ret;
-    ret = pkoSendSifCmd(PKO_RPC_DUMPREG, buf, len);
+    pkoSendSifCmd(PKO_RPC_DUMPREG, buf, len);
 };
 
 static void
 pkoWriteMem(char *buf, int len)
 {
-    int ret;
-    ret = pkoSendSifCmd(PKO_RPC_WRITEMEM, buf, len);
+    pkoSendSifCmd(PKO_RPC_WRITEMEM, buf, len);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -401,7 +383,7 @@ int cmdHandlerInit(void)
     thread.option = 0;
     thread.thread = (void *)cmdThread;
     thread.stacksize = 0x800;
-    thread.priority = 60; //0x1e;
+    thread.priority = 60; // 0x1e;
 
     pid = CreateThread(&thread);
     if (pid >= 0) {

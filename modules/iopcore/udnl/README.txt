@@ -1,4 +1,4 @@
-UDNL (Updater) module	-	2013/08/04
+UDNL (Updater) module    -    2013/08/04
 ------------------------------------------
 
 UDNL is a updater module, which is used for the final phase (Boot mode 3) within the IOP reset cycle. It is responsible for loading the requested IOPRP image into RAM and kickstarting the final IOP bootup sequence.
@@ -21,7 +21,7 @@ Comment out FULL_UDNL within udnl.c to build a UDNL module that works like the S
 
 Syntax:
 -------
-	UDNL <last IOPRP image>...<first IOPRP image> [-v]
+    UDNL <last IOPRP image>...<first IOPRP image> [-v]
 
 UDNL accepts multiple IORP images in the command passed to it. It'll scan through all the specified images to locate the newest version of each module that is specified in IOPBTCONF (which acts like CONFIG.SYS of MS-DOs, for those who know what that is), and will build a list of modules to load.
 
@@ -36,10 +36,10 @@ IOPBTCONF files can include other IOPBTCONF files, although this has some limita
 
 IOPBTCONF file syntax:
 ----------------------
-@<address>	- The address at which to start loading modules from.
-!include <file>	- Includes the specified file.
-!addr <address>	- Includes a module that exists at the specified memory address.
-#<characters>	- The '#' symbol marks the whole line as a comment.
+@<address>      - The address at which to start loading modules from.
+!include <file> - Includes the specified file.
+!addr <address> - Includes a module that exists at the specified memory address.
+#<characters>   - The '#' symbol marks the whole line as a comment.
 
 Lines beginning with other characters are automatically assumed to be the filenames of modules that are to be loaded.
 
@@ -52,14 +52,14 @@ Known bugs and limitations:
 3. Certain devices cannot be used for storing IOPRP images, due to an internal blacklist (Refer to isIllegalBootDevice()). Blacklisted devices are "mc", "hd", "net" and "dev".
 4. When IOPBTCONF files include another IOPBTCONF file that is being parsed and its modules are located, the modules will only be scanned from starting with the IOPRP image that contains the IOPBTCONF that is being parsed (e.g. if the 2nd IOPRP image contains a IOPBTCONF file that is included by another file, the modules listed in the IOPBTCONF file will only be scanned for stating with the 2nd IOPRP image. Files in the first IOPRP image will be IGNORED). Hence, keep the order of your IOPRP images/commands in mind!
 5. The design for loading modules from an embedded IOPRP image of the boot ROM UDNL module is flawed. Its design seemed to be to allow the programmer to use either an embedded IOPRP image OR IOPRP images that are stored as accessible files. If the embedded IOPRP image is to be used, it would just get its reset data structure to point to the embedded IOPRP image as the buffer containing the IOPRP images... but that causes the reset data structure itself to become unprotected during the IOP bootup sequence and will possibly cause corruption under certain conditions.
-	The Sony DVD player UDNL modules were designed to allocate memory for storing its reset data structure and the embedded IOPRP image. It'll check the image and copy the image into the buffer, as if it is a normal IOPRP image that is stored as a file.
+    The Sony DVD player UDNL modules were designed to allocate memory for storing its reset data structure and the embedded IOPRP image. It'll check the image and copy the image into the buffer, as if it is a normal IOPRP image that is stored as a file.
 6. If the IOPRP image (Other than the boot ROM) contains an IOPBTCONF file which includes another file, Modules will only be scanned for and selected from IOPRP images which come after the image which contains the IOPBTCONF file which included another IOPBTCONF file:
-	boot ROM
-	IOPRP image #3
-	IOPRP image #2	(Contains IOPTBTCONF which includes IOPBTCONF again)
-	IOPRP image #1
+    boot ROM
+    IOPRP image #3
+    IOPRP image #2    (Contains IOPTBTCONF which includes IOPBTCONF again)
+    IOPRP image #1
 
-	This means that when the list of modules within IOPBTCONF is parsed from IOPRP image #2, modules will only be selected from IOPRP image #2 and later. When the UDNL module finds the "!include" statement and parses through the boot ROM IOPBTCONF file (since no further images after IOPRP image #2 has one), only modules from IOPRP image #3 and the boot ROM will be selected.
+    This means that when the list of modules within IOPBTCONF is parsed from IOPRP image #2, modules will only be selected from IOPRP image #2 and later. When the UDNL module finds the "!include" statement and parses through the boot ROM IOPBTCONF file (since no further images after IOPRP image #2 has one), only modules from IOPRP image #3 and the boot ROM will be selected.
 
 #1 only applies to the Sony UDNL module, as it doesn't reset the relative module pointer. This clone has that bug fixed.
 #2 only applies to the Sony boot ROM UDNL module, as it does not copy the embedded IOPRP image into its allocated buffer. It does not work well either, as the region that the embedded IOPRP image exists in does not get reserved.

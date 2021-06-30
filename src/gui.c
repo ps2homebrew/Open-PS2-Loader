@@ -96,10 +96,10 @@ static gui_screen_handler_t *screenHandlerTarget = NULL;
 static int transIndex;
 
 // Helper perlin noise data
-#define PLASMA_H 32
-#define PLASMA_W 32
+#define PLASMA_H              32
+#define PLASMA_W              32
 #define PLASMA_ROWS_PER_FRAME 6
-#define FADE_SIZE 256
+#define FADE_SIZE             256
 
 static GSTEXTURE gBackgroundTex;
 static int pperm[512];
@@ -214,7 +214,7 @@ void guiShowAbout()
 #ifdef PADEMU
                                                        " - PADEMU"
 #endif
-             //Version numbers
+             // Version numbers
              ,
              GSM_VERSION
 #ifdef IGS
@@ -314,19 +314,19 @@ static void guiShowNetCompatUpdateResult(int result)
 {
     switch (result) {
         case OPL_COMPAT_UPDATE_STAT_DONE:
-            //Completed with no errors.
+            // Completed with no errors.
             guiMsgBox(_l(_STR_NET_UPDATE_DONE), 0, NULL);
             break;
         case OPL_COMPAT_UPDATE_STAT_ERROR:
-            //Completed with errors.
+            // Completed with errors.
             guiMsgBox(_l(_STR_NET_UPDATE_FAILED), 0, NULL);
             break;
         case OPL_COMPAT_UPDATE_STAT_CONN_ERROR:
-            //Completed with errors.
+            // Completed with errors.
             guiMsgBox(_l(_STR_NET_UPDATE_CONN_FAILED), 0, NULL);
             break;
         case OPL_COMPAT_UPDATE_STAT_ABORTED:
-            //User-aborted.
+            // User-aborted.
             guiMsgBox(_l(_STR_NET_UPDATE_CANCELLED), 0, NULL);
             break;
     }
@@ -373,13 +373,13 @@ void guiShowNetCompatUpdate(void)
                     }
                 }
                 break;
-            case UIID_BTN_CANCEL: //If the user pressed the cancel button.
+            case UIID_BTN_CANCEL: // If the user pressed the cancel button.
             case NETUPD_BTN_CANCEL:
                 if (started) {
                     if (guiMsgBox(_l(_STR_CONFIRMATION_CANCEL_UPDATE), 1, NULL)) {
                         guiRenderTextScreen(_l(_STR_PLEASE_WAIT));
                         oplAbortUpdateGameCompat();
-                        //The process truly ends when the UI callback gets the update from the worker thread that the process has ended.
+                        // The process truly ends when the UI callback gets the update from the worker thread that the process has ended.
                     }
                 } else {
                     done = 1;
@@ -425,6 +425,9 @@ static int guiUpdater(int modified)
         diaGetInt(diaConfig, CFG_LASTPLAYED, &showAutoStartLast);
         diaSetVisible(diaConfig, CFG_LBL_AUTOSTARTLAST, showAutoStartLast);
         diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, showAutoStartLast);
+
+        diaGetInt(diaConfig, CFG_BDMMODE, &gBDMStartMode);
+        diaSetEnabled(diaConfig, CFG_ENABLEFW, gBDMStartMode);
     }
     return 0;
 }
@@ -473,6 +476,8 @@ void guiShowConfig()
     diaSetInt(diaConfig, CFG_ELMMODE, gELMStartMode);
     //END of OPL_DB tweaks
 
+    diaSetInt(diaConfig, CFG_ENABLEFW, gEnableFW);
+
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
         diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
@@ -485,19 +490,20 @@ void guiShowConfig()
         diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
         diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
         diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
-        DisableCron = 1; //Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
+        DisableCron = 1; // Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)
         if (diaGetInt(diaConfig, CFG_SELECTBUTTON, &value))
             gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
         else
             gSelectButton = KEY_CIRCLE;
         diaGetInt(diaConfig, CFG_DEFDEVICE, &gDefaultDevice);
-        diaGetInt(diaConfig, CFG_BDMMODE, &gBDMStartMode);
         diaGetInt(diaConfig, CFG_HDDMODE, &gHDDStartMode);
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
         //START of OPL_DB tweaks
         diaGetInt(diaConfig, CFG_ELMMODE, &gELMStartMode);
         //END of OPL_DB tweaks
+
+        diaGetInt(diaConfig, CFG_ENABLEFW, &gEnableFW);
 
         applyConfig(-1, -1);
         menuReinitMainMenu();
@@ -514,7 +520,7 @@ static int guiUIUpdater(int modified)
         if (temp != curTheme) {
             curTheme = temp;
             if (temp == 0) {
-                //Display the default theme's colours.
+                // Display the default theme's colours.
                 diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_COLOUR); // Must be correctly set before doing the diaS/GetColor !!
                 diaSetItemType(diaUIConfig, UICFG_UICOL, UI_COLOUR);
                 diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_COLOUR);
@@ -524,7 +530,7 @@ static int guiUIUpdater(int modified)
                 diaSetColor(diaUIConfig, UICFG_TXTCOL, gDefaultTextColor);
                 diaSetColor(diaUIConfig, UICFG_SELCOL, gDefaultSelTextColor);
             } else if (temp == thmGetGuiValue()) {
-                //Display the current theme's colours.
+                // Display the current theme's colours.
                 diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_COLOUR);
                 diaSetItemType(diaUIConfig, UICFG_UICOL, UI_COLOUR);
                 diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_COLOUR);
@@ -534,14 +540,14 @@ static int guiUIUpdater(int modified)
                 diaSetU64Color(diaUIConfig, UICFG_TXTCOL, gTheme->textColor);
                 diaSetU64Color(diaUIConfig, UICFG_SELCOL, gTheme->selTextColor);
             } else {
-                //When another theme is highlighted in the list, its colours are not known. Don't show any colours.
+                // When another theme is highlighted in the list, its colours are not known. Don't show any colours.
                 diaSetItemType(diaUIConfig, UICFG_BGCOL, UI_SPACER);
                 diaSetItemType(diaUIConfig, UICFG_UICOL, UI_SPACER);
                 diaSetItemType(diaUIConfig, UICFG_TXTCOL, UI_SPACER);
                 diaSetItemType(diaUIConfig, UICFG_SELCOL, UI_SPACER);
             }
 
-            //The user cannot adjust the current theme's colours.
+            // The user cannot adjust the current theme's colours.
             temp = !temp;
             diaSetEnabled(diaUIConfig, UICFG_BGCOL, temp);
             diaSetEnabled(diaUIConfig, UICFG_UICOL, temp);
@@ -650,7 +656,7 @@ reselect_video_mode:
 
     if (previousVMode != gVMode) {
         if (guiConfirmVideoMode() == 0) {
-            //Restore previous video mode, without changing the theme & language settings.
+            // Restore previous video mode, without changing the theme & language settings.
             gVMode = previousVMode;
             applyConfig(themeID, langID);
             goto reselect_video_mode;
@@ -732,7 +738,7 @@ void guiShowNetConfig(void)
     diaSetString(diaNetConfig, NETCFG_SHARE_PASSWORD, gPCPassword);
     diaSetInt(diaNetConfig, NETCFG_ETHOPMODE, gETHOpMode);
 
-    //Update the spacer item between the OK and reconnect buttons (See dialogs.c).
+    // Update the spacer item between the OK and reconnect buttons (See dialogs.c).
     if (gNetworkStartup == 0) {
         diaSetLabel(diaNetConfig, NETCFG_OK, _l(_STR_OK));
         diaSetVisible(diaNetConfig, NETCFG_RECONNECT, 1);
@@ -779,7 +785,7 @@ void guiShowParentalLockConfig(void)
     config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
     // Set current values
-    configGetStrCopy(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password, CONFIG_KEY_VALUE_LEN); //This will return the current password, or a blank string if it is not set.
+    configGetStrCopy(configOPL, CONFIG_OPL_PARENTAL_LOCK_PWD, password, CONFIG_KEY_VALUE_LEN); // This will return the current password, or a blank string if it is not set.
     diaSetString(diaParentalLockConfig, CFG_PARENLOCK_PASSWORD, password);
 
     result = diaExecuteDialog(diaParentalLockConfig, -1, 1, NULL);
@@ -900,7 +906,7 @@ static void guiHandleOp(struct gui_update_t *item)
 
                 // Last Played Auto Start
                 if ((gAutoStartLastPlayed) && !(KeyPressedOnce))
-                    DisableCron = 0; //Release Auto Start Last Played counter
+                    DisableCron = 0; // Release Auto Start Last Played counter
             }
 
             break;
@@ -959,7 +965,7 @@ static void guiHandleDeferredOps(void)
 
 void guiExecDeferredOps(void)
 {
-    //Clears deferred operations list by executing them.
+    // Clears deferred operations list by executing them.
     guiHandleDeferredOps();
 }
 
@@ -1001,26 +1007,26 @@ static void VU0MixVec(VU_VECTOR *a, VU_VECTOR *b, float mix, VU_VECTOR *res)
 {
     asm volatile(
 #if __GNUC__ > 3
-        "lqc2   $vf1, (%[a])\n"           // load the first vector
-        "lqc2   $vf2, (%[b])\n"           // load the second vector
-        "qmtc2  %[mix], $vf3\n"           // move the mix value from reg to VU
-        "vaddw.x $vf5, $vf0, $vf0\n"      // vf5.x = 1
-        "vsub.x  $vf4x, $vf5x, $vf3x\n"   // subtract 1 - vf3,x, store the result in vf4.x
-        "vmulax.xyzw $ACC, $vf1, $vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
-        "vmaddx.xyzw $vf1, $vf2, $vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-        "sqc2   $vf1, (%[res])\n"         // transfer the result in acc to the ee
+        "lqc2           $vf1, (%[a])\n"        // load the first vector
+        "lqc2           $vf2, (%[b])\n"        // load the second vector
+        "qmtc2          %[mix], $vf3\n"        // move the mix value from reg to VU
+        "vaddw.x        $vf5, $vf0, $vf0\n"    // vf5.x = 1
+        "vsub.x         $vf4x, $vf5x, $vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
+        "vmulax.xyzw    $ACC, $vf1, $vf3x\n"   // multiply vf1 by vf3.x, store the result in ACC
+        "vmaddx.xyzw    $vf1, $vf2, $vf4x\n"   // multiply vf2 by vf4.x add ACC, store the result in vf1
+        "sqc2           $vf1, (%[res])\n"      // transfer the result in acc to the ee
 #else
-        "lqc2	vf1, (%[a])\n"         // load the first vector
-        "lqc2	vf2, (%[b])\n"         // load the second vector
-        "qmtc2	%[mix], vf3\n"         // move the mix value from reg to VU
-        "vaddw.x vf5, vf00, vf00\n"    // vf5.x = 1
-        "vsub.x vf4x, vf5x, vf3x\n"    // subtract 1 - vf3,x, store the result in vf4.x
-        "vmulax.xyzw ACC, vf1, vf3x\n" // multiply vf1 by vf3.x, store the result in ACC
-        "vmaddx.xyzw vf1, vf2, vf4x\n" // multiply vf2 by vf4.x add ACC, store the result in vf1
-        "sqc2	vf1, (%[res])\n"       // transfer the result in acc to the ee
+        "lqc2           vf1, (%[a])\n"      // load the first vector
+        "lqc2           vf2, (%[b])\n"      // load the second vector
+        "qmtc2          %[mix], vf3\n"      // move the mix value from reg to VU
+        "vaddw.x        vf5, vf00, vf00\n"  // vf5.x = 1
+        "vsub.x         vf4x, vf5x, vf3x\n" // subtract 1 - vf3,x, store the result in vf4.x
+        "vmulax.xyzw    ACC, vf1, vf3x\n"   // multiply vf1 by vf3.x, store the result in ACC
+        "vmaddx.xyzw    vf1, vf2, vf4x\n"   // multiply vf2 by vf4.x add ACC, store the result in vf1
+        "sqc2           vf1, (%[res])\n"    // transfer the result in acc to the ee
 #endif
-        : [ res ] "+r"(res), "=m"(*res)
-        : [ a ] "r"(a), [ b ] "r"(b), [ mix ] "r"(mix), "m"(*a), "m"(*b));
+        : [res] "+r"(res), "=m"(*res)
+        : [a] "r"(a), [b] "r"(b), [mix] "r"(mix), "m"(*a), "m"(*b));
 }
 
 static float guiCalcPerlin(float x, float y, float z)
@@ -1081,7 +1087,7 @@ static float guiCalcPerlin(float x, float y, float z)
 
     vec.x -= 1;
 
-    //float n110
+    // float n110
     b.z = Vu0DotProduct(&pgrad3[gi110], &vec);
 
     vec.y += 1;
@@ -1339,8 +1345,8 @@ static void guiDrawOverlays()
     }
 
     // BLURT output
-    //    if (!gDisableDebug)
-    //        fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
+    // if (!gDisableDebug)
+    //     fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
 }
 
 static void guiReadPads()
@@ -1621,7 +1627,7 @@ int guiConfirmVideoMode(void)
         else if (getKeyOn(gSelectButton))
             terminate = 2;
 
-        //If the user fails to respond within the timeout period, deem it as a cancel operation.
+        // If the user fails to respond within the timeout period, deem it as a cancel operation.
         if (clock() > timeEnd)
             terminate = 1;
 

@@ -13,9 +13,9 @@
 #
 */
 
-.equ TRAP_BASE,	  0x12000000
-.equ TRAP_MASK,	  0x1FFFEF0F
-.equ GS_BASE,	  0x12000000
+.equ TRAP_BASE,   0x12000000
+.equ TRAP_MASK,   0x1FFFEF0F
+.equ GS_BASE,     0x12000000
 .equ GS_PMODE,    0x0000
 .equ GS_SMODE1,   0x0010
 .equ GS_SMODE2,   0x0020
@@ -87,5 +87,5 @@ GS_MODE_DTV_576P=0x53
 #GSMAdapts
 .equ Adapted_DISPLAY1,             0 # DWORD
 .equ Adapted_DISPLAY2,             8 # DWORD
-.equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line) 
+.equ Interlace_FRAME_Mode_Flag,   16 # BYTE -> Double Height for SMODE2's INT=1 (Interlace Mode) and FFMD=1 (FRAME Mode. Read every line)
 .equ SMODE2_adaptation,           17 # BYTE -> Adapted SMODE2 patch value

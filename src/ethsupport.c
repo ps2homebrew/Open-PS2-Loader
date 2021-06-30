@@ -19,7 +19,7 @@
 #include "include/nbns.h"
 #include "httpclient.h"
 
-static char ethPrefix[40]; //Contains the full path to the folder where all the games are.
+static char ethPrefix[40]; // Contains the full path to the folder where all the games are.
 static char *ethBase;
 static int ethULSizePrev = -2;
 static time_t ethModifiedCDPrev;
@@ -50,7 +50,7 @@ char *ethGetPrefix(void)
 }
 
 //END of OPL_DB tweaks
-//Initializes locking semaphore for network support (not for just SMB support, but for the network subsystem).
+// Initializes locking semaphore for network support (not for just SMB support, but for the network subsystem).
 static int ethInitSema(void)
 {
     if (ethInitSemaID < 0) {
@@ -186,7 +186,7 @@ static int WaitValidNetState(int (*checkingFunction)(void))
         SetAlarm(1000 * rmGetHsync(), &EthStatusCheckCb, &SemaID);
         WaitSema(SemaID);
 
-        if (retry_cycles >= 30) //30s = 30*1000ms
+        if (retry_cycles >= 30) // 30s = 30*1000ms
         {
             DeleteSema(SemaID);
             return -1;
@@ -218,7 +218,7 @@ static int ethInitApplyConfig(void)
         }
     } while (ethApplyNetIFConfig() != 0);
 
-    //Before the network configuration is applied, wait for a valid link status.
+    // Before the network configuration is applied, wait for a valid link status.
     if (ethWaitValidNetIFLinkState() != 0) {
         gNetworkStartup = ERROR_ETH_LINK_FAIL;
         return ERROR_ETH_LINK_FAIL;
@@ -226,7 +226,7 @@ static int ethInitApplyConfig(void)
 
     ethApplyIPConfig();
 
-    //Wait for DHCP to initialize, if DHCP is enabled.
+    // Wait for DHCP to initialize, if DHCP is enabled.
     if (ps2_ip_use_dhcp && (ethWaitValidDHCPState() != 0)) {
         gNetworkStartup = ERROR_ETH_DHCP_FAIL;
         return ERROR_ETH_DHCP_FAIL;
@@ -291,8 +291,8 @@ static int ethLoadModules(void)
 
             sysLoadModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL);
             if (sysLoadModuleBuffer(&smap_irx, size_smap_irx, 0, NULL) >= 0) {
-                //Before the network stack is loaded, attempt to set the link settings in order to avoid needing double-initialization of the IF.
-                //But do not fail here because there is currently no way to re-start initialization.
+                // Before the network stack is loaded, attempt to set the link settings in order to avoid needing double-initialization of the IF.
+                // But do not fail here because there is currently no way to re-start initialization.
                 ethApplyNetIFConfig();
 
                 if (sysLoadModuleBuffer(&ps2ip_irx, size_ps2ip_irx, 0, NULL) >= 0) {
@@ -331,7 +331,7 @@ void ethDeinitModules(void)
             ethInitSemaID = -1;
         }
 
-        //To allow the configuration to be read later on, read the latest version now.
+        // To allow the configuration to be read later on, read the latest version now.
         ethReadNetConfig();
         ps2ip_deinit();
     }
@@ -358,7 +358,7 @@ int ethLoadInitModules(void)
 void ethDisplayErrorStatus(void)
 {
     switch (gNetworkStartup) {
-        case 0: //No error
+        case 0: // No error
             break;
         case ERROR_ETH_MODULE_NETIF_FAILURE:
             setErrorMessageWithCode(_STR_NETWORK_STARTUP_ERROR_NETIF, gNetworkStartup);
@@ -659,7 +659,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
         case GAME_FORMAT_ISO:
             sprintf(settings->filename, "%s%s", game->name, game->extension);
             break;
-        default: //USBExtreme format.
+        default: // USBExtreme format.
             sprintf(settings->filename, "ul.%08X.%s", USBA_crc32(game->name), game->startup);
             settings->common.flags |= IOPCORE_SMB_FORMAT_USBLD;
     }
@@ -671,7 +671,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
     strcpy(settings->smb_user, gPCUserName);
     strcpy(settings->smb_password, gPCPassword);
 
-    //Initialize layer 1 information.
+    // Initialize layer 1 information.
     sbCreatePath(game, partname, ethPrefix, "\\", 0);
 
     if (gPS2Logo) {
@@ -690,7 +690,7 @@ static void ethLaunchGame(int id, config_set_t *configSet)
             layer1_offset = layer1_start % 0x80000;
             sbCreatePath(game, partname, ethPrefix, "\\", layer1_part);
             break;
-        default: //Raw ISO9660 disc image; one part.
+        default: // Raw ISO9660 disc image; one part.
             layer1_part = 0;
             layer1_offset = layer1_start;
     }
@@ -726,7 +726,7 @@ static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1, psm);
 }
 
-//This may be called, even if ethInit() was not.
+// This may be called, even if ethInit() was not.
 static void ethCleanUp(int exception)
 {
     if (ethGameList.enabled) {
@@ -739,11 +739,11 @@ static void ethCleanUp(int exception)
             ethSMBDisconnect();
     }
 
-    //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
+    // UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
     ethDeinitModules();
 }
 
-//This may be called, even if ethInit() was not.
+// This may be called, even if ethInit() was not.
 static void ethShutdown(void)
 {
     if (ethGameList.enabled) {
@@ -755,10 +755,10 @@ static void ethShutdown(void)
         ethSMBDisconnect();
     }
 
-    //UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
+    // UI may have initialized modules outside of ETH mode, so deinitialize regardless of the enabled status.
     ethDeinitModules();
 
-    //Only shut down dev9 from here, if it was initialized from here before.
+    // Only shut down dev9 from here, if it was initialized from here before.
     if (ethModulesLoaded)
         sysShutdownDev9();
 }
@@ -794,9 +794,9 @@ static int ethReadNetConfig(void)
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
-        lastIP = *(struct ip4_addr *)&ip_info.ipaddr;
-        lastNM = *(struct ip4_addr *)&ip_info.netmask;
-        lastGW = *(struct ip4_addr *)&ip_info.gw;
+        memcpy(&lastIP, &ip_info.ipaddr, sizeof(lastIP));
+        memcpy(&lastNM, &ip_info.netmask, sizeof(lastNM));
+        memcpy(&lastGW, &ip_info.gw, sizeof(lastGW));
     } else {
         ip4_addr_set_zero(&lastIP);
         ip4_addr_set_zero(&lastNM);
@@ -810,7 +810,7 @@ int ethGetNetConfig(u8 *ip_address, u8 *netmask, u8 *gateway)
 {
     int result;
 
-    //Read a cached copy of the settings, if this is read after deinitialization.
+    // Read a cached copy of the settings, if this is read after deinitialization.
     result = ethModulesLoaded ? ethReadNetConfig() : -1;
     ip_address[0] = ip4_addr1(&lastIP);
     ip_address[1] = ip4_addr2(&lastIP);
@@ -870,33 +870,37 @@ static int ethApplyIPConfig(void)
 {
     t_ip_info ip_info;
     struct ip4_addr ipaddr, netmask, gw, dns;
+    struct ip4_addr ip_info_ipaddr, ip_info_netmask, ip_info_gw;
     const struct ip4_addr *dns_curr;
     int result;
 
     if ((result = ps2ip_getconfig("sm0", &ip_info)) >= 0) {
+        memcpy(&ip_info_ipaddr, &ip_info.ipaddr, sizeof(ip_info_ipaddr));
+        memcpy(&ip_info_netmask, &ip_info.netmask, sizeof(ip_info_netmask));
+        memcpy(&ip_info_gw, &ip_info.gw, sizeof(ip_info_gw));
         IP4_ADDR(&ipaddr, ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3]);
         IP4_ADDR(&netmask, ps2_netmask[0], ps2_netmask[1], ps2_netmask[2], ps2_netmask[3]);
         IP4_ADDR(&gw, ps2_gateway[0], ps2_gateway[1], ps2_gateway[2], ps2_gateway[3]);
         IP4_ADDR(&dns, ps2_dns[0], ps2_dns[1], ps2_dns[2], ps2_dns[3]);
         dns_curr = dns_getserver(0);
 
-        //Check if it's the same. Otherwise, apply the new configuration.
+        // Check if it's the same. Otherwise, apply the new configuration.
         if ((ps2_ip_use_dhcp != ip_info.dhcp_enabled) || (!ps2_ip_use_dhcp &&
-                                                          (!ip_addr_cmp(&ipaddr, (struct ip4_addr *)&ip_info.ipaddr) ||
-                                                           !ip_addr_cmp(&netmask, (struct ip4_addr *)&ip_info.netmask) ||
-                                                           !ip_addr_cmp(&gw, (struct ip4_addr *)&ip_info.gw) ||
+                                                          (!ip_addr_cmp(&ipaddr, &ip_info_ipaddr) ||
+                                                           !ip_addr_cmp(&netmask, &ip_info_netmask) ||
+                                                           !ip_addr_cmp(&gw, &ip_info_gw) ||
                                                            !ip_addr_cmp(&dns, dns_curr)))) {
             if (ps2_ip_use_dhcp) {
-                ip4_addr_set_zero((struct ip4_addr *)&ip_info.ipaddr);
-                ip4_addr_set_zero((struct ip4_addr *)&ip_info.netmask);
-                ip4_addr_set_zero((struct ip4_addr *)&ip_info.gw);
+                memset(&ip_info.ipaddr, 0, sizeof(ip_info.ipaddr));
+                memset(&ip_info.netmask, 0, sizeof(ip_info.netmask));
+                memset(&ip_info.gw, 0, sizeof(ip_info.gw));
                 ip4_addr_set_zero(&dns);
 
                 ip_info.dhcp_enabled = 1;
             } else {
-                ip_addr_set((struct ip4_addr *)&ip_info.ipaddr, &ipaddr);
-                ip_addr_set((struct ip4_addr *)&ip_info.netmask, &netmask);
-                ip_addr_set((struct ip4_addr *)&ip_info.gw, &gw);
+                memcpy(&ip_info.ipaddr, &ip_info_ipaddr, sizeof(ip_info_ipaddr));
+                memcpy(&ip_info.netmask, &ip_info_netmask, sizeof(ip_info_netmask));
+                memcpy(&ip_info.gw, &ip_info_gw, sizeof(ip_info_gw));
 
                 ip_info.dhcp_enabled = 0;
             }

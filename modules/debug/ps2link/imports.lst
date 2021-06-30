@@ -1,4 +1,3 @@
-
 stdio_IMPORTS_start
 I_printf
 stdio_IMPORTS_end
@@ -8,7 +7,6 @@ I_memset
 I_memcpy
 I_strlen
 I_strncpy
-I_strncmp
 sysclib_IMPORTS_end
 
 thsemap_IMPORTS_start
@@ -21,8 +19,8 @@ thsemap_IMPORTS_end
 thbase_IMPORTS_start
 I_CreateThread
 I_DeleteThread
-I_StartThread 
-I_GetThreadId 
+I_StartThread
+I_GetThreadId
 I_ExitDeleteThread
 thbase_IMPORTS_end
 
@@ -35,6 +33,7 @@ ioman_IMPORTS_end
 
 ps2ip_IMPORTS_start
 I_lwip_send
+#ifdef DEBUG
 I_lwip_sendto
 I_lwip_socket
 I_lwip_listen
@@ -43,6 +42,7 @@ I_lwip_recvfrom
 I_lwip_close
 I_lwip_bind
 I_lwip_accept
+#endif
 ps2ip_IMPORTS_end
 
 sifcmd_IMPORTS_start
@@ -81,6 +81,5 @@ ioptrap_IMPORTS_end
 
 poweroff_IMPORTS_start
 I_SetPowerButtonHandler
-I_AddPowerOffHandler
 I_PoweroffShutdown
 poweroff_IMPORTS_end

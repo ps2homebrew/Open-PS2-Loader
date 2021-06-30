@@ -1,33 +1,20 @@
 loadcore_IMPORTS_start
 I_RegisterLibraryEntries
 I_ReleaseLibraryEntries
-I_GetLoadcoreInternalData
 I_QueryLibraryEntryTable
 I_SetRebootTimeLibraryHandlingMode
 loadcore_IMPORTS_end
-
-stdio_IMPORTS_start
-I_printf
-stdio_IMPORTS_end
 
 thsemap_IMPORTS_start
 I_CreateSema
 I_SignalSema
 I_WaitSema
 I_PollSema
-I_DeleteSema
 I_iSignalSema
 thsemap_IMPORTS_end
 
 thbase_IMPORTS_start
-I_StartThread
-I_CreateThread
-I_DeleteThread
 I_DelayThread
-I_GetThreadId
-I_SleepThread
-I_WakeupThread
-I_TerminateThread
 I_SetAlarm
 I_CancelAlarm
 thbase_IMPORTS_end
@@ -42,13 +29,12 @@ I_sceUsbdScanStaticDescriptor
 I_sceUsbdOpenPipe
 I_sceUsbdClosePipe
 I_sceUsbdOpenPipeAligned
-I_sceUsbdSetPrivateData
 I_sceUsbdTransferPipe
 I_sceUsbdRegisterLdd
 usbd_IMPORTS_end
 
 sysclib_IMPORTS_start
-I_strncmp
+I_memcmp
 #ifndef USE_SMSUTILS
 I_memset
 I_memcpy

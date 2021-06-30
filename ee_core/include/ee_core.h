@@ -24,7 +24,7 @@
 #ifdef __EESIO_DEBUG
 #include <sio.h>
 #define DPRINTF(args...) sio_printf(args)
-#define DINIT() sio_init(38400, 0, 0, 0, 0)
+#define DINIT()          sio_init(38400, 0, 0, 0, 0)
 #else
 #define DPRINTF(args...) \
     do {                 \
@@ -89,6 +89,6 @@ extern int PadEmuSettings;
 extern int DisableDebug;
 #define GS_BGCOLOUR *((volatile unsigned long int *)0x120000E0)
 
-extern int *gCheatList; //Store hooks/codes addr+val pairs
+extern int *gCheatList; // Store hooks/codes addr+val pairs
 
 #endif

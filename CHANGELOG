@@ -3,7 +3,7 @@
   Copyright 2013, Ifcaro & jimmikaelkael
   Licenced under Academic Free License version 3.0
   Review OpenUsbLd README & LICENSE files for further details.
-  
+
 -----------------------------------------------------------------------------
 
 === Changelog ===
@@ -77,7 +77,7 @@ CORE:
 
 * Merged OPL/OPLGSM codebase
 * GSM Core 0.36.R - don't worry; 0.38 will be coming back better than ever!
-* GSM Core no longer supports 576p, 1080p, Skip FMVs - this is temporary. 
+* GSM Core no longer supports 576p, 1080p, Skip FMVs - this is temporary.
 * GSM Core is now IGR and CodeBreaker/PS2rd compatible!
 * GSM no longer included in Childproof builds.
 * Unified Makefile builds from single source tree via "GSM=0/1" argument (ala VMC/No VMC)
@@ -87,32 +87,32 @@ CORE:
 * Added power-off processing code. Games should be able to power-off the console now.
 * Optimzed CDVDMAN and CDVDFSV
 * Support for PSX (DVR) units
-* Built-in TLB reinitialization mechanism - no more EECORE hooking and patching. 
+* Built-in TLB reinitialization mechanism - no more EECORE hooking and patching.
 * Added compatibility mode 7 - "IOP Threading Hack".
 * Replaced SMAP driver.
 * Modified SMSTCPIP.
 * Ported a version of ETH Mode types from doctorxyz's OPLGSM.
 * Retired the built-in kernel update for Protokernel consoles (SCPH-10000 and SCPH-15000).
 
-GUI: 
+GUI:
 
 * New "Show GSM on Main Menu" toggle in "Settings" (GSM Builds Only)
 * New "GSM Settings" on Main Menu - easier navigation! (GSM Builds Only)
 * Fixed issue with HDLSERV and GSM Settings not showing up immediately.
-* Full Ethernet controls - can disable Auto-Negotiation and force a mode. 
+* Full Ethernet controls - can disable Auto-Negotiation and force a mode.
 * Some things were are worded differently as less words carry more freight.
 * Removed redundant UDMA modes - PS2 will never handle UDMA 5 and UDMA 6.
-* Updated SMB support to give better error messages. 
-* Network error codes changed slightly - 300 for connection errors, 301 for logon errors, 302 for ECHO isalive         
+* Updated SMB support to give better error messages.
+* Network error codes changed slightly - 300 for connection errors, 301 for logon errors, 302 for ECHO isalive
   test failing, and 303 for share opening errors.
 
-	
-COMPATIBILITY: 
 
-	* Kingdom Hearts 2 Final Mix (Gummi Fix)
-	* Baldar's Gate Series (HDD)
-	* Champions of Norrath (HDD)
-	* New Mode 7 fixes stuttering with games such as DDR and Pop'N Music (HDD ONLY!) 
+COMPATIBILITY:
+
+* Kingdom Hearts 2 Final Mix (Gummi Fix)
+* Baldar's Gate Series (HDD)
+* Champions of Norrath (HDD)
+* New Mode 7 fixes stuttering with games such as DDR and Pop'N Music (HDD ONLY!)
 
 ==== Version 0.9 ====
 

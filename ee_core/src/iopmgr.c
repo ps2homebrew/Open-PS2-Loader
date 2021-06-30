@@ -17,9 +17,12 @@
 #include "syshook.h"
 
 extern int _iop_reboot_count;
+static int imgdrv_offset_ioprpimg = 0;
+static int imgdrv_offset_ioprpsiz = 0;
 
 static void ResetIopSpecial(const char *args, unsigned int arglen)
 {
+    int i;
     void *pIOP_buffer, *IOPRP_img, *imgdrv_irx;
     unsigned int length_rounded, CommandLen, size_IOPRP_img, size_imgdrv_irx;
     char command[RESET_ARG_MAX + 1];
@@ -27,8 +30,8 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     if (arglen > 0) {
         strncpy(command, args, arglen);
         command[arglen] = '\0'; /* In a normal IOP reset process, the IOP reset command line will be NULL-terminated properly somewhere.
-						Since we're now taking things into our own hands, NULL terminate it here.
-						Some games like SOCOM3 will use a command line that isn't NULL terminated, resulting in things like "cdrom0:\RUN\IRX\DNAS300.IMGG;1" */
+                        Since we're now taking things into our own hands, NULL terminate it here.
+                        Some games like SOCOM3 will use a command line that isn't NULL terminated, resulting in things like "cdrom0:\RUN\IRX\DNAS300.IMGG;1" */
         _strcpy(&command[arglen + 1], "img0:");
         CommandLen = arglen + 6;
     } else {
@@ -44,8 +47,19 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 
     CopyToIop(IOPRP_img, length_rounded, pIOP_buffer);
 
-    *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[0x180])) = pIOP_buffer;
-    *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[0x184])) = size_IOPRP_img;
+    if (imgdrv_offset_ioprpimg == 0 || imgdrv_offset_ioprpsiz == 0) {
+        for (i = 0; i < size_imgdrv_irx; i += 4) {
+            if (*(u32 *)((&((unsigned char *)imgdrv_irx)[i])) == 0xDEC1DEC1) {
+                imgdrv_offset_ioprpimg = i;
+            }
+            if (*(u32 *)((&((unsigned char *)imgdrv_irx)[i])) == 0xDEC2DEC2) {
+                imgdrv_offset_ioprpsiz = i;
+            }
+        }
+    }
+
+    *(void **)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpimg])) = pIOP_buffer;
+    *(u32 *)(UNCACHED_SEG(&((unsigned char *)imgdrv_irx)[imgdrv_offset_ioprpsiz])) = size_IOPRP_img;
 
     LoadMemModule(0, imgdrv_irx, size_imgdrv_irx, 0, NULL);
 
@@ -66,7 +80,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     ee_kmode_exit();
     EIntr();
 
-    LoadFileExit(); //OPL's integrated LOADFILE RPC does not automatically unbind itself after IOP resets.
+    LoadFileExit(); // OPL's integrated LOADFILE RPC does not automatically unbind itself after IOP resets.
 
     _iop_reboot_count++; // increment reboot counter to allow RPC clients to detect unbinding!
 
@@ -122,14 +136,14 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
     };
 }
 
-/*----------------------------------------------------------------------------------------*/
-/* Reset IOP to include our modules.							  */
-/*----------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------*/
+/* Reset IOP to include our modules.                              */
+/*----------------------------------------------------------------*/
 int New_Reset_Iop(const char *arg, int arglen)
 {
     DPRINTF("New_Reset_Iop start!\n");
     if (!DisableDebug)
-        GS_BGCOLOUR = 0xFF00FF; //Purple
+        GS_BGCOLOUR = 0xFF00FF; // Purple
 
     SifInitRpc(0);
 
@@ -150,12 +164,12 @@ int New_Reset_Iop(const char *arg, int arglen)
 
     ResetIopSpecial(NULL, 0);
     if (!DisableDebug)
-        GS_BGCOLOUR = 0x00A5FF; //Orange
+        GS_BGCOLOUR = 0x00A5FF; // Orange
 
     if (arglen > 0) {
         ResetIopSpecial(&arg[10], arglen - 10);
         if (!DisableDebug)
-            GS_BGCOLOUR = 0x00FFFF; //Yellow
+            GS_BGCOLOUR = 0x00FFFF; // Yellow
     }
 
     if (iop_reboot_count >= 2) {
@@ -183,7 +197,7 @@ int New_Reset_Iop(const char *arg, int arglen)
         set_reg_hook = 4;
 
     if (!DisableDebug)
-        GS_BGCOLOUR = 0x000000; //Black
+        GS_BGCOLOUR = 0x000000; // Black
 
     return 1;
 }
@@ -199,22 +213,22 @@ int Reset_Iop(const char *arg, int mode)
 
     _iop_reboot_count++; // increment reboot counter to allow RPC clients to detect unbinding!
 
-    /*	SifStopDma();		For the sake of IGR (Which uses this function), don't disable SIF0 (IOP -> EE)
-				because some games will be still spamming DMA transfers across SIF0 when IGR is invoked.
-				SCE documents that DMA transfers should be stopped before IOP resets, but has neglected
-				to explain the effects of not doing so.
-				So far, it seems like the SIF (at least SIF0) will stop functioning properly.
+    /*    SifStopDma();        For the sake of IGR (Which uses this function), don't disable SIF0 (IOP -> EE)
+                because some games will be still spamming DMA transfers across SIF0 when IGR is invoked.
+                SCE documents that DMA transfers should be stopped before IOP resets, but has neglected
+                to explain the effects of not doing so.
+                So far, it seems like the SIF (at least SIF0) will stop functioning properly.
 
-				2 commits before this one, OPL appears to have worked around this problem by preventing
-				the SIF BOOTEND flag from being set,
-				which allowed SifInitCmd() to run ASAP (Even before the IOP finishes rebooting.
-				That caused SifSetDChain() to be run ASAP, which re-enables SIF0.
-				I don't find that a good workaround because it may result in a timing problem.	*/
+                2 commits before this one, OPL appears to have worked around this problem by preventing
+                the SIF BOOTEND flag from being set,
+                which allowed SifInitCmd() to run ASAP (Even before the IOP finishes rebooting.
+                That caused SifSetDChain() to be run ASAP, which re-enables SIF0.
+                I don't find that a good workaround because it may result in a timing problem.    */
 
     for (arglen = 0; arg[arglen] != '\0'; arglen++)
         reset_pkt.arg[arglen] = arg[arglen];
 
-    reset_pkt.header.psize = sizeof reset_pkt; //dsize is not initialized (and not processed, even on the IOP).
+    reset_pkt.header.psize = sizeof reset_pkt; // dsize is not initialized (and not processed, even on the IOP).
     reset_pkt.header.cid = SIF_CMD_RESET_CMD;
     reset_pkt.arglen = arglen;
     reset_pkt.mode = mode;

@@ -10,66 +10,66 @@
 #include "ELF.h"
 #include "COFF.h"
 
-//#define DEBUG	1	//Comment out to disable debug messages.
+//#define DEBUG 1 //Comment out to disable debug messages.
 #ifdef DEBUG
 #define DEBUG_PRINTF(args...) printf(args)
 #else
 #define DEBUG_PRINTF(args...)
 #endif
 
-#define FULL_UDNL 1 //Comment out to build a UDNL module that updates the IOP with only its payload.
+#define FULL_UDNL   1 // Comment out to build a UDNL module that updates the IOP with only its payload.
 #define MAX_MODULES 256
 
-#define alloca(size) __builtin_alloca(size) //The homebrew PS2SDK lacks alloca.h.
+#define alloca(size) __builtin_alloca(size) // The homebrew PS2SDK lacks alloca.h.
 
-//Function prototypes
+// Function prototypes
 static void CopySection(const void *module, void *buffer, unsigned int FileSize);
 static void *AllocMemory(int nbytes);
 
 #ifdef FULL_UDNL
 /* Evil function. */
 /* 0x00000000 */
-/* int isIllegalBootDevice(const char *arg1){
-	// Eliminate spaces from the path.
-	if(arg1[0]==' '){
-		arg1++;
-		do{
-			arg1++;
-		}while(arg1[0]==' ');
+/*
+int isIllegalBootDevice(const char *arg1)
+{
+    // Eliminate spaces from the path.
+    if (arg1[0] == ' ') {
+        arg1++;
+        do {
+            arg1++;
+        } while (arg1[0] == ' ');
 
-	 	arg1--;
-	}
+        arg1--;
+    }
 
-	if(((arg1[0]|0x20)=='m')&&((arg1[1]|0x20)=='c')){	//"mc"
-		arg1+=2;
-		goto end_func1;
-	}
-	else if(((arg1[0]|0x20)=='h')&&((arg1[1]|0x20)=='d')){	//"hd"
-		arg1+=2;
-		goto end_func1;
-	}
-	else if(((arg1[0]|0x20)=='n')&&((arg1[1]|0x20)=='e')&&((arg1[2]|0x20)=='t')){	//"net"
-		arg1+=3;
-		goto end_func1;
-	}
-	else if(((arg1[0]|0x20)=='d')&&((arg1[1]|0x20)=='e')&&((arg1[2]|0x20)=='v')){	//"dev"
-		arg1+=3;
-		goto end_func1;
-	}
-	else return 0;
+    if (((arg1[0] | 0x20) == 'm') && ((arg1[1] | 0x20) == 'c')) { //"mc"
+        arg1 += 2;
+        goto end_func1;
+    } else if (((arg1[0] | 0x20) == 'h') && ((arg1[1] | 0x20) == 'd')) { //"hd"
+        arg1 += 2;
+        goto end_func1;
+    } else if (((arg1[0] | 0x20) == 'n') && ((arg1[1] | 0x20) == 'e') && ((arg1[2] | 0x20) == 't')) { //"net"
+        arg1 += 3;
+        goto end_func1;
+    } else if (((arg1[0] | 0x20) == 'd') && ((arg1[1] | 0x20) == 'e') && ((arg1[2] | 0x20) == 'v')) { //"dev"
+        arg1 += 3;
+        goto end_func1;
+    } else
+        return 0;
 
 end_func1:
-	return((*arg1-0x30<0x0b)?1:0);	// '0' to '9' and ':'
-} */
+    return ((*arg1 - 0x30 < 0x0b) ? 1 : 0); // '0' to '9' and ':'
+}
+*/
 #endif
 
 /*
-	0x00 - RAM size in MB.
-	0x04 - The boot mode (0 = hard reset, 1 = soft reset, 2 = update reset, 3 = update complete).
-	0x08 - Updater command line (Only for when boot mode = 2).
-	0x0C - Pointer to the entry point of the first module.
-	0x10 - Result from QueryMemSize() - 0x00200000
-	0x1C - pointer to the buffer (Size: Size of images + MAX_MODULES*sizeof(void*) + sizeof(struct ResetData) bytes)
+    0x00 - RAM size in MB.
+    0x04 - The boot mode (0 = hard reset, 1 = soft reset, 2 = update reset, 3 = update complete).
+    0x08 - Updater command line (Only for when boot mode = 2).
+    0x0C - Pointer to the entry point of the first module.
+    0x10 - Result from QueryMemSize() - 0x00200000
+    0x1C - pointer to the buffer (Size: Size of images + MAX_MODULES*sizeof(void*) + sizeof(struct ResetData) bytes)
 */
 
 struct ResetData
@@ -198,13 +198,13 @@ static void ScanImagesForFile(const struct ImageData *ImageDataBuffer, unsigned 
 
     if (NumFiles > 0) {
         /*
-			Let f(x)=((x-1)*2+(x-1))*8;
-				f(1)=((1-1)*2+(1-1))*8=0
-				f(2)=((2-1)*2+(2-1))*8=24
-				f(3)=((3-1)*2+(3-1))*8=48
+            Let f(x)=((x-1)*2+(x-1))*8;
+                f(1)=((1-1)*2+(1-1))*8=0
+                f(2)=((2-1)*2+(2-1))*8=24
+                f(3)=((3-1)*2+(3-1))*8=48
 
-			ImageDataBuffer+(NumFiles<<1+NumFiles)<<3
-		*/
+            ImageDataBuffer+(NumFiles<<1+NumFiles)<<3
+        */
 
         i = NumFiles - 1;
         ImageData = &ImageDataBuffer[i];
@@ -228,16 +228,16 @@ static void ScanImagesForFile(const struct ImageData *ImageDataBuffer, unsigned 
 
 struct ModuleInfo
 {
-    unsigned int ModuleType;  //0x00
-    void *EntryPoint;         //0x04
-    void *gp;                 //0x08
-    void *text_start;         //0x0C
-    unsigned int text_size;   //0x10
-    unsigned int data_size;   //0x14
-    unsigned int bss_size;    //0x18
-    unsigned int MemSize;     //0x1C
-    struct iopmod_id *mod_id; //0x20
-    unsigned int unknown_24;  //0x24
+    unsigned int ModuleType;  // 0x00
+    void *EntryPoint;         // 0x04
+    void *gp;                 // 0x08
+    void *text_start;         // 0x0C
+    unsigned int text_size;   // 0x10
+    unsigned int data_size;   // 0x14
+    unsigned int bss_size;    // 0x18
+    unsigned int MemSize;     // 0x1C
+    struct iopmod_id *mod_id; // 0x20
+    unsigned int unknown_24;  // 0x24
 };
 
 void func_00001440(void);
@@ -259,16 +259,18 @@ static int InitModuleInfo(const void *module, struct ModuleInfo *ModuleInfo)
     const elf_pheader_t *ELF_phdr;
     const struct iopmod *iopmod;
 
-    /*	sizeof(struct coff_filehdr)	= 20 bytes
-		sizeof(AOUTHDR)			= 56 bytes
-		sizeof(struct scnhdr)		= 40 bytes */
+    /*
+     sizeof(struct coff_filehdr) = 20 bytes
+     sizeof(AOUTHDR)             = 56 bytes
+     sizeof(struct scnhdr)       = 40 bytes
+     */
 
-    Ident_10 = *(unsigned int *)&((struct coff_filehdr *)module)->f_opthdr;
+    memcpy(&Ident_10, &((struct coff_filehdr *)module)->f_opthdr, 4);
     COFF_AoutHdr = (AOUTHDR *)((unsigned int)module + sizeof(struct coff_filehdr));
     COFF_ScnHdr = (struct scnhdr *)((unsigned int)module + sizeof(struct coff_filehdr) + sizeof(AOUTHDR));
     if (((struct coff_filehdr *)module)->f_magic == MIPSELMAGIC && COFF_AoutHdr->magic == OMAGIC && ((struct coff_filehdr *)module)->f_nscns < 0x20 && ((Ident_10 & 0x0002FFFF) == 0x20038) && COFF_ScnHdr->s_paddr == COFF_AoutHdr->text_start) {
         if (COFF_AoutHdr->vstamp != 0x7001) {
-            /* 0x00000bf8	- COFF */
+            /* 0x00000bf8    - COFF */
             ModuleInfo->ModuleType = IOP_MOD_TYPE_COFF;
             ModuleInfo->EntryPoint = (void *)COFF_AoutHdr->entry;
             ModuleInfo->gp = (void *)COFF_AoutHdr->gp_value;
@@ -284,7 +286,7 @@ static int InitModuleInfo(const void *module, struct ModuleInfo *ModuleInfo)
             return -1;
         }
     } else {
-        /* 0x00000C68	- ELF */
+        /* 0x00000C68    - ELF */
         ELF_Hdr = module;
         ELF_phdr = (elf_pheader_t *)((unsigned int)module + ELF_Hdr->phoff);
 
@@ -358,9 +360,11 @@ static void LoadCOFFModule(const void *module)
     const AOUTHDR *COFF_AoutHdr;
     const struct scnhdr *ScnHdr;
 
-    /*	sizeof(struct coff_filehdr)	= 20 bytes
-		sizeof(AOUTHDR)			= 56 bytes
-		sizeof(struct scnhdr)		= 40 bytes */
+    /*
+     sizeof(struct coff_filehdr) = 20 bytes
+     sizeof(AOUTHDR)             = 56 bytes
+     sizeof(struct scnhdr)       = 40 bytes
+     */
 
     COFF_AoutHdr = (AOUTHDR *)((unsigned int)module + sizeof(struct coff_filehdr));
     ScnHdr = (struct scnhdr *)((unsigned int)module + sizeof(struct coff_filehdr) + sizeof(AOUTHDR));
@@ -409,7 +413,7 @@ static void LoadIRXModule(const void *module, struct ModuleInfo *ModuleInfo)
 
             /* 0x0000107c - Warning: beware of sign extension! The code here depends on sign extension. */
             for (i = 0, ELF_relocation = (elf_rel *)((unsigned int)module + CurrentELF_shdr->offset); i < NumRelocs; i++, ELF_relocation++) {
-                //			DEBUG_PRINTF("Reloc %d: %p\n", (unsigned char)ELF_relocation->info&0xFF, ModuleInfo->text_start+ELF_relocation->offset);	//Code for debugging only: Not originally present.
+                //            DEBUG_PRINTF("Reloc %d: %p\n", (unsigned char)ELF_relocation->info&0xFF, ModuleInfo->text_start+ELF_relocation->offset);    //Code for debugging only: Not originally present.
 
                 switch (ELF_relocation->info & 0xFF) {
                     case R_MIPS_NONE:
@@ -428,7 +432,7 @@ static void LoadIRXModule(const void *module, struct ModuleInfo *ModuleInfo)
                         WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation->offset);
                         *WordPatchLocation = (((unsigned int)ModuleInfo->text_start + ((*WordPatchLocation & 0x03FFFFFF) << 2 | ((unsigned int)WordPatchLocation & 0xF0000000))) << 4 >> 6) | (*WordPatchLocation & 0xFC000000);
                         break;
-                    case R_MIPS_HI16: //0x00001120	- Ouch. D:
+                    case R_MIPS_HI16: // 0x00001120    - Ouch. D:
                         temp = (((unsigned int)*(unsigned short int *)(ModuleInfo->text_start + ELF_relocation->offset)) << 16) + *(short int *)(ModuleInfo->text_start + ELF_relocation[1].offset);
                         temp += (unsigned int)ModuleInfo->text_start;
                         WordPatchLocation = (unsigned int *)(ModuleInfo->text_start + ELF_relocation->offset);
@@ -448,20 +452,20 @@ static void LoadIRXModule(const void *module, struct ModuleInfo *ModuleInfo)
 
 struct ModInfo
 {
-    struct ModInfo *next;        //0x00
-    const char *name;            //0x04
-    unsigned short int version;  //0x08
-    unsigned short int newflags; //0x0A
-    unsigned short int id;       //0x0C
-    unsigned short int flags;    //0x0E
-    void *EntryPoint;            //0x10
-    void *gp;                    //0x14
-    void *text_start;            //0x18
-    unsigned int text_size;      //0x1C
-    unsigned int data_size;      //0x20
-    unsigned int bss_size;       //0x24
-    unsigned int unused1;        //0x28
-    unsigned int unused2;        //0x2C
+    struct ModInfo *next;        // 0x00
+    const char *name;            // 0x04
+    unsigned short int version;  // 0x08
+    unsigned short int newflags; // 0x0A
+    unsigned short int id;       // 0x0C
+    unsigned short int flags;    // 0x0E
+    void *EntryPoint;            // 0x10
+    void *gp;                    // 0x14
+    void *text_start;            // 0x18
+    unsigned int text_size;      // 0x1C
+    unsigned int data_size;      // 0x20
+    unsigned int bss_size;       // 0x24
+    unsigned int unused1;        // 0x28
+    unsigned int unused2;        // 0x2C
 };
 
 /* 0x00000df8 - Initializes the module information structure, which exists 0x30 bytes before the module itself. */
@@ -519,12 +523,12 @@ static void BeginBootupSequence(struct ResetData *ResetData)
 
     MemSizeInBytes = ResetData->MemSize << 20;
 
-    //Load SYSMEM
+    // Load SYSMEM
     switch (InitModuleInfo(ResetData->ModData[0], &LoadedModules[0])) {
         case IOP_MOD_TYPE_2:
         case IOP_MOD_TYPE_IRX:
             LoadedModules[0].text_start = (void *)((unsigned int)ResetData->StartAddress + 0x30);
-        //Fall through.
+        // Fall through.
         case IOP_MOD_TYPE_COFF:
         case IOP_MOD_TYPE_ELF:
             LoadModule(ResetData->ModData[0], &LoadedModules[0]);
@@ -537,12 +541,12 @@ static void BeginBootupSequence(struct ResetData *ResetData)
     ModuleEntryPoint = LoadedModules[0].EntryPoint;
     FreeMemStart = (void *)ModuleEntryPoint(MemSizeInBytes);
 
-    //Load LOADCORE
+    // Load LOADCORE
     switch (InitModuleInfo(ResetData->ModData[1], &LoadedModules[1])) {
         case IOP_MOD_TYPE_2:
         case IOP_MOD_TYPE_IRX:
             LoadedModules[1].text_start = (void *)((unsigned int)FreeMemStart + 0x30);
-        //Fall through.
+        // Fall through.
         case IOP_MOD_TYPE_COFF:
         case IOP_MOD_TYPE_ELF:
             LoadModule(ResetData->ModData[1], &LoadedModules[1]);
@@ -555,9 +559,9 @@ static void BeginBootupSequence(struct ResetData *ResetData)
     ResetData->StartAddress = LoadedModules[0].text_start;
 
     ModuleEntryPoint = LoadedModules[1].EntryPoint;
-    ModuleEntryPoint((int)ResetData); //LOADCORE will start the bootup sequence.
+    ModuleEntryPoint((int)ResetData); // LOADCORE will start the bootup sequence.
 
-    //HALT loop
+    // HALT loop
     while (1)
         *(volatile unsigned char *)0x80000000 = 2;
 }
@@ -593,7 +597,7 @@ static void *ParseStartAddress(const char **line)
 struct ExtInfoField
 {
     unsigned short int data;
-    unsigned short int header; //Upper 8 bits contain the type.
+    unsigned short int header; // Upper 8 bits contain the type.
 };
 
 /* 0x000013d8 */
@@ -621,7 +625,7 @@ static const struct ExtInfoField *GetFileInfo(const struct RomdirFileStat *stat,
     return NULL;
 }
 
-/* 0x00000878	- Scans through all loaded IOPRP images for the newest version of the specified module. */
+/* 0x00000878    - Scans through all loaded IOPRP images for the newest version of the specified module. */
 static struct RomdirFileStat *SelectModuleFromImages(const struct ImageData *ImageDataBuffer, unsigned int NumFiles, const char *line, struct RomdirFileStat *stat_out)
 {
     char filename[32];
@@ -681,7 +685,7 @@ static struct RomdirFileStat *SelectModuleFromImages(const struct ImageData *Ima
     return result;
 }
 
-//Code for debugging only - not originally present.
+// Code for debugging only - not originally present.
 #ifdef DEBUG
 static void DisplayModuleName(int id, const char *line)
 {
@@ -702,7 +706,7 @@ static void ParseIOPBTCONF(const struct ImageData *ImageDataBuffer, unsigned int
 {
     unsigned int FilesRemaining, i, NumModules;
     const char *ptr;
-    unsigned char filename_temp[16];
+    char filename_temp[16];
     struct RomdirFileStat FileStat;
     struct RomdirFileStat ModuleFileStat;
     const void **ModList;
@@ -748,36 +752,36 @@ static void ParseIOPBTCONF(const struct ImageData *ImageDataBuffer, unsigned int
                         ModList = &ResetData->ModData[ResetData->NumModules];
 
                         /*
-							I have problems seeing why this won't break down if "!include" is used in the middle of a list of modules:
-								Before parsing included IOPBTCONF file:
-									###_____________
-									|  ^
-								After parsing included IOPBTCONF file:
-									###XXXXXXXX_____
-									           |  ^		(The pointer would still be offset by 3, wouldn't it?)
-								If 2 additional modules are added to the list of modules:
-									###XXXXXXXX___XX_
-										   |    ^	(If I'm not wrong, a gap of 3 would result)
-							Legend:
-								# -> Modules loaded during the first call to ParseIOPBTCONF.
-								X -> Modules loaded when the included IOPBTCONF file is parsed.
-								| -> The base pointer to the start of the module list.
-								^ -> The pointer to the end of the module list.
-								_ -> Blank module slots.
+                            I have problems seeing why this won't break down if "!include" is used in the middle of a list of modules:
+                                Before parsing included IOPBTCONF file:
+                                    ###_____________
+                                    |  ^
+                                After parsing included IOPBTCONF file:
+                                    ###XXXXXXXX_____
+                                               |  ^        (The pointer would still be offset by 3, wouldn't it?)
+                                If 2 additional modules are added to the list of modules:
+                                    ###XXXXXXXX___XX_
+                                           |    ^    (If I'm not wrong, a gap of 3 would result)
+                            Legend:
+                                # -> Modules loaded during the first call to ParseIOPBTCONF.
+                                X -> Modules loaded when the included IOPBTCONF file is parsed.
+                                | -> The base pointer to the start of the module list.
+                                ^ -> The pointer to the end of the module list.
+                                _ -> Blank module slots.
 
-							$s2 seems to contain a relative pointer which points to the first blank module slot. It seems to be added to the base pointer ($s0) when the module list is accessed.
-							When an included IOPBTCONF file is parsed, $s0 is adjusted but $s2 is not.
+                            $s2 seems to contain a relative pointer which points to the first blank module slot. It seems to be added to the base pointer ($s0) when the module list is accessed.
+                            When an included IOPBTCONF file is parsed, $s0 is adjusted but $s2 is not.
 
-							If it's by design, then it will mean that Sony had intended only one additional IOPBTCONF file to be included in each file, and it must be included at only either the absolute start or end of the file.
-						*/
-                        NumModules = 0; //Therefore, unlike the Sony original, reset the module offset counter.
+                            If it's by design, then it will mean that Sony had intended only one additional IOPBTCONF file to be included in each file, and it must be included at only either the absolute start or end of the file.
+                        */
+                        NumModules = 0; // Therefore, unlike the Sony original, reset the module offset counter.
                     }
                     break;
                 case '#': /* 0x0000077c */
                     break;
                 default: /* 0x00000784 */
 #ifdef DEBUG
-                    DisplayModuleName(ResetData->NumModules, ptr); //Code for debugging only - not originally present.
+                    DisplayModuleName(ResetData->NumModules, ptr); // Code for debugging only - not originally present.
 #endif
                     if (SelectModuleFromImages(ImageDataBuffer, NumFiles, ptr, &ModuleFileStat) == NULL) {
                         __asm("break\n");
@@ -828,28 +832,28 @@ int _start(int argc, char *argv[])
     struct RomdirFileStat FileStat;
 
     /*
-		Let f(x)=((x+2)*2+(x+2))*8, where x>0
-			f(1)=((1+2)*2+(1+2))*8=72
-			f(2)=((2+2)*2+(2+2))*8=96
-			f(3)=((3+2)*2+(3+2))*8=120
+        Let f(x)=((x+2)*2+(x+2))*8, where x>0
+            f(1)=((1+2)*2+(1+2))*8=72
+            f(2)=((2+2)*2+(2+2))*8=96
+            f(3)=((3+2)*2+(3+2))*8=120
 
-		Therefore, each element is 24 bytes long, with an additional 48 bytes extra allocated for the built-in IOPRP images (The boot ROM and the DATA section of the UDNL module).
+        Therefore, each element is 24 bytes long, with an additional 48 bytes extra allocated for the built-in IOPRP images (The boot ROM and the DATA section of the UDNL module).
 
-		--- Original disassembly ---
-		ImageDataTotalSize=((argc+2)<<1);
-		ImageDataTotalSize=ImageDataTotalSize+(argc+2);
-		ImageDataTotalSize=(ImageDataTotalSize<<3);
+        --- Original disassembly ---
+        ImageDataTotalSize=((argc+2)<<1);
+        ImageDataTotalSize=ImageDataTotalSize+(argc+2);
+        ImageDataTotalSize=(ImageDataTotalSize<<3);
 
-		Note: The function reserves an additional 32-bytes of space on the stack when the function enters.
-			The pointers are then offset by 0x10 bytes.
-		$s7=$sp+0x10	<- Start of image list buffer.
-		$s4=$sp+0x40	<- Points to the image entries within the image list buffer.
-	 */
+        Note: The function reserves an additional 32-bytes of space on the stack when the function enters.
+            The pointers are then offset by 0x10 bytes.
+        $s7=$sp+0x10    <- Start of image list buffer.
+        $s4=$sp+0x40    <- Points to the image entries within the image list buffer.
+     */
     ImageDataTotalSize = (argc + 2) * sizeof(struct ImageData);
     ImageDataBuffer = alloca(ImageDataTotalSize);
     memset(ImageDataBuffer, 0, ImageDataTotalSize);
 
-    TotalSize = MAX_MODULES * sizeof(void *) + sizeof(struct ResetData) + ((size_IOPRP_img + 0xF) & ~0xF); //Unlike the ROM UDNL module, allocate space for the embedded IOPRP image as well like the DVD player UDNL module does.
+    TotalSize = MAX_MODULES * sizeof(void *) + sizeof(struct ResetData) + ((size_IOPRP_img + 0xF) & ~0xF); // Unlike the ROM UDNL module, allocate space for the embedded IOPRP image as well like the DVD player UDNL module does.
 
 #ifdef FULL_UDNL
     i = 1;
@@ -857,10 +861,12 @@ int _start(int argc, char *argv[])
     ImageData = &ImageDataBuffer[2];
     while (i < argc) {
         if (strcmp(argv[i], "-v") != 0) {
-            /*		if(isIllegalBootDevice(argv[i])){	//This block of commented-out code (and the commented-out isIllegalBootDevice() function) is what all Sony UDNL modules have, to prevent the loading of IOPRP images from unsecured devices.
-			    	SleepThread();
-				__asm("break");
-			} */
+            /*
+            if (isIllegalBootDevice(argv[i])) { //This block of commented-out code (and the commented-out isIllegalBootDevice() function) is what all Sony UDNL modules have, to prevent the loading of IOPRP images from unsecured devices.
+                SleepThread();
+                __asm("break");
+            }
+            */
 
             if ((fd = open(argv[i], O_RDONLY)) < 0) {
                 printf("file \'%s\' can't open\n", argv[i]);
@@ -907,12 +913,12 @@ int _start(int argc, char *argv[])
         ImageDataBuffer[0].filename = "ROM";
     }
     /* 0x00000398 */
-    /*	Originally, the Sony boot ROM UDNL module did this. However, it doesn't work well because the rest of the data used in the reset will go unprotected. The Sony DVD player UDNL modules allocate memory for the embedded IOPRP image and copies the IOPRP image into the buffer, like if it was read in from a file.
-	if(size_IOPRP_img>=0x10 && GetIOPRPStat(IOPRP_img, &IOPRP_img[size_IOPRP_img], &ImageDataBuffer[1].stat)!=NULL){
-		ImageDataBuffer[1].filename="DATA";
-		ResetData->IOPRPBuffer=(void*)((unsigned int)IOPRP_img&~0xF);
-	} */
-    if (size_IOPRP_img >= 0x10) { //Hence, do this instead:
+    /*    Originally, the Sony boot ROM UDNL module did this. However, it doesn't work well because the rest of the data used in the reset will go unprotected. The Sony DVD player UDNL modules allocate memory for the embedded IOPRP image and copies the IOPRP image into the buffer, like if it was read in from a file.
+    if(size_IOPRP_img>=0x10 && GetIOPRPStat(IOPRP_img, &IOPRP_img[size_IOPRP_img], &ImageDataBuffer[1].stat)!=NULL){
+        ImageDataBuffer[1].filename="DATA";
+        ResetData->IOPRPBuffer=(void*)((unsigned int)IOPRP_img&~0xF);
+    } */
+    if (size_IOPRP_img >= 0x10) { // Hence, do this instead:
         memcpy(IoprpBuffer, IOPRP_img, size_IOPRP_img);
         if (GetIOPRPStat(IoprpBuffer, (void *)((unsigned int)IoprpBuffer + size_IOPRP_img), &ImageDataBuffer[1].stat) != NULL) {
             ImageDataBuffer[1].filename = "DATA";

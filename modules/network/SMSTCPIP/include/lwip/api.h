@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
- * All rights reserved. 
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice,
@@ -11,21 +11,21 @@
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission. 
+ *    derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED 
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  *
  * This file is part of the lwIP TCP/IP stack.
- * 
+ *
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
@@ -45,7 +45,7 @@
 #include "lwip/err.h"
 
 #define NETCONN_NOCOPY 0x00
-#define NETCONN_COPY 0x01
+#define NETCONN_COPY   0x01
 
 enum netconn_type {
     NETCONN_TCP,
@@ -104,7 +104,7 @@ void netbuf_delete(struct netbuf *buf);
 void *netbuf_alloc(struct netbuf *buf, u16_t size);
 void netbuf_free(struct netbuf *buf);
 err_t netbuf_ref(struct netbuf *buf,
-                void *dataptr, u16_t size);
+                 void *dataptr, u16_t size);
 void netbuf_chain(struct netbuf *head,
                   struct netbuf *tail);
 
@@ -115,13 +115,13 @@ void netbuf_first(struct netbuf *buf);
 void netbuf_copy_partial(struct netbuf *buf, void *dataptr,
                          u16_t len, u16_t offset);
 
-#define netbuf_fromaddr(b) (b->fromaddr)
-#define netbuf_fromport(b) (b->fromport)
-#define netbuf_len(b) (b->p->tot_len)
-#define netbuf_first(b) (b->ptr = b->p)
-#define netconn_new(t) netconn_new_with_proto_and_callback((t), 0, NULL)
+#define netbuf_fromaddr(b)              (b->fromaddr)
+#define netbuf_fromport(b)              (b->fromport)
+#define netbuf_len(b)                   (b->p->tot_len)
+#define netbuf_first(b)                 (b->ptr = b->p)
+#define netconn_new(t)                  netconn_new_with_proto_and_callback((t), 0, NULL)
 #define netconn_new_with_callback(t, c) netconn_new_with_proto_and_callback((t), 0, (c))
-#define netconn_type(c) (c->type)
+#define netconn_type(c)                 (c->type)
 
 /* Network connection functions: */
 struct

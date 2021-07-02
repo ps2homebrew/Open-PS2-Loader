@@ -13,6 +13,11 @@
 #include "include/cheatman.h"
 #include "modules/iopcore/common/cdvd_config.h"
 
+#ifdef PADEMU
+#include <libds34bt.h>
+#include <libds34usb.h>
+#endif
+
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioFormat, fileXioMount, fileXioUmount, fileXioDevctl
 #include <io_common.h>   // FIO_MT_RDWR
@@ -27,8 +32,6 @@ static unsigned char hddModulesLoaded = 0;
 
 static char *hddPrefix = "pfs0:";
 static hdl_games_list_t hddGames;
-
-char gOPLPart[128];
 
 // forward declaration
 static item_list_t hddGameList;
@@ -128,7 +131,6 @@ static void hddFindOPLPartition(void)
             configFree(config);
             close(fd);
 
-            fileXioUmount(hddPrefix);
             return;
         }
 
@@ -148,7 +150,6 @@ static void hddFindOPLPartition(void)
     }
 
     snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:+OPL");
-    fileXioUmount(hddPrefix);
 
     return;
 }
@@ -228,7 +229,10 @@ void hddLoadModules(void)
 
         LOG("HDDSUPPORT modules loaded\n");
 
-        hddFindOPLPartition();
+        if (gOPLPart[0] == '\0')
+            hddFindOPLPartition();
+
+        fileXioUmount(hddPrefix);
 
         ret = fileXioMount(hddPrefix, gOPLPart, FIO_MT_RDWR);
         if (ret == -ENOENT) {
@@ -326,15 +330,20 @@ static void hddRenameGame(int id, char *newName)
     hddForceUpdate = 1;
 }
 
-static void hddLaunchGame(int id, config_set_t *configSet)
+void hddLaunchGame(int id, config_set_t *configSet)
 {
     int i, size_irx = 0;
     int EnablePS2Logo = 0;
     int result;
     void **irx = NULL;
     char filename[32];
-    hdl_game_info_t *game = &hddGames.games[id];
+    hdl_game_info_t *game;
     struct cdvdman_settings_hdd *settings;
+
+    if (gAutoLaunchGame == NULL)
+        game = &hddGames.games[id];
+    else
+        game = gAutoLaunchGame;
 
     apa_sub_t parts[APA_MAXSUB + 1];
     char vmc_name[2][32];
@@ -395,13 +404,16 @@ static void hddLaunchGame(int id, config_set_t *configSet)
                 }
 
                 if (have_error) {
-                    char error[256];
-                    if (have_error == 2) // VMC file is fragmented
-                        snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
-                    else
-                        snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
-                    if (!guiMsgBox(error, 1, NULL))
-                        return;
+                    if (gAutoLaunchGame == NULL) {
+                        char error[256];
+                        if (have_error == 2) // VMC file is fragmented
+                            snprintf(error, sizeof(error), _l(_STR_ERR_VMC_FRAGMENTED_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
+                        else
+                            snprintf(error, sizeof(error), _l(_STR_ERR_VMC_CONTINUE), vmc_name[vmc_id], (vmc_id + 1));
+                        if (!guiMsgBox(error, 1, NULL))
+                            return;
+                    } else
+                        LOG("VMC error\n");
                 }
 
                 for (i = 0; i < size_hdd_mcemu_irx; i++) {
@@ -448,13 +460,16 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     sbPrepare(NULL, configSet, size_irx, irx, &i);
 
     if ((result = sbLoadCheats(gHDDPrefix, game->startup)) < 0) {
-        switch (result) {
-            case -ENOENT:
-                guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
-                break;
-            default:
-                guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
-        }
+        if (gAutoLaunchGame == NULL) {
+            switch (result) {
+                case -ENOENT:
+                    guiWarning(_l(_STR_NO_CHEATS_FOUND), 10);
+                    break;
+                default:
+                    guiWarning(_l(_STR_ERR_CHEATS_LOAD_FAILED), 10);
+            }
+        } else
+            LOG("Cheats error\n");
     }
 
     settings = (struct cdvdman_settings_hdd *)((u8 *)irx + i);
@@ -471,7 +486,25 @@ static void hddLaunchGame(int id, config_set_t *configSet)
     if (gPS2Logo)
         EnablePS2Logo = CheckPS2Logo(0, game->start_sector + OPL_HDD_MODE_PS2LOGO_OFFSET);
 
-    deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
+    if (gAutoLaunchGame == NULL) {
+        deinit(NO_EXCEPTION, HDD_MODE); // CAREFUL: deinit will call hddCleanUp, so hddGames/game will be freed
+    } else {
+        ioBlockOps(1);
+#ifdef PADEMU
+        ds34usb_reset();
+        ds34bt_reset();
+#endif
+        configFree(configSet);
+
+        free(gAutoLaunchGame);
+        gAutoLaunchGame = NULL;
+
+        fileXioUmount("pfs0:");
+        fileXioDevctl("pfs:", PDIOC_CLOSEALL, NULL, 0, NULL, 0);
+
+        ioEnd();
+        configEnd();
+    }
 
     sysLaunchLoaderElf(filename, "HDD_MODE", size_irx, irx, size_mcemu_irx, &hdd_mcemu_irx, EnablePS2Logo, compatMode);
 }

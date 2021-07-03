@@ -852,6 +852,10 @@ void menuHandleInputMenu()
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
                 saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
+#ifdef PADEMU
+                guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
+                saveConfig(CONFIG_GAME, 0);
+#endif
                 menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }
         } else if (id == MENU_EXIT) {
@@ -1067,7 +1071,7 @@ void menuHandleInputGameMenu()
             guiGameShowVMCMenu(selected_item->item->current->item.id, selected_item->item->userdata);
 #ifdef PADEMU
         } else if (menuID == GAME_PADEMU_SETTINGS) {
-            guiGameShowPadEmuConfig();
+            guiGameShowPadEmuConfig(0);
 #endif
         } else if (menuID == GAME_SAVE_CHANGES) {
             if (guiGameSaveConfig(itemConfig, selected_item->item->userdata))

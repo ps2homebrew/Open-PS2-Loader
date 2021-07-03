@@ -835,7 +835,10 @@ void guiShowControllerConfig(void)
             gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
         else
             gSelectButton = KEY_CIRCLE;
-
+#ifdef PADEMU
+        if (result == PADEMU_GLOBAL_BUTTON)
+            guiGameShowPadEmuConfig(1);
+#endif
         applyConfig(-1, -1);
     }
 }

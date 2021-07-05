@@ -177,3 +177,21 @@ jobs:
           OPNPS2LD-VARIANTS-${{ steps.version.outputs.version }}.7z
           OPNPS2LD.7z
           OPNPS2LD-VARIANTS.7z
+          
+    - name: Upload pre-release to Mega
+      if: github.ref == 'refs/heads/master'
+      uses: Difegue/action-megacmd@master
+      with:
+        args: put -c OPNPS2LD.7z /OPL/Pre-Release/${{ steps.version.outputs.version }}/
+      env:
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+
+    - name: Upload release to Mega
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: Difegue/action-megacmd@master
+      with:
+        args: put -c OPNPS2LD.7z /OPL/Release/${{ steps.version.outputs.version }}/
+      env:
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}

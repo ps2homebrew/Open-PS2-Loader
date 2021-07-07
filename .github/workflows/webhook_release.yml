@@ -20,4 +20,4 @@ jobs:
         uses: tsickert/discord-webhook@v2.0.2
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_NEWS_CHANNEL }}
-          content: "Hey everyone! **OPL**  **${{ env.RELEASE_VERSION }}** has been released!"
+          content: "Hey @everyone! **OPL**  **${{ env.RELEASE_VERSION }}** has been released!"

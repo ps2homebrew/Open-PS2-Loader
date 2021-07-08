@@ -62,6 +62,11 @@ void DeviceDeinit(void)
     DeviceUnmount();
 }
 
+int DeviceReady(void)
+{
+    return SCECdComplete;
+}
+
 void DeviceFSInit(void)
 {
     int i = 0;
@@ -115,6 +120,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
     register int i, esc_flag = 0;
     u8 *p = (u8 *)buffer;
+    int rv = SCECdErNO;
 
     lbound = 0;
     ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
@@ -132,7 +138,10 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             } else
                 esc_flag = 1;
 
-            smb_ReadCD(offslsn, sectors_to_read, &p[r], i);
+            if (smb_ReadCD(offslsn, sectors_to_read, &p[r], i) <= 0) {
+                rv = SCECdErREAD;
+                break;
+            }
 
             r += sectors_to_read * 2048;
             offslsn += sectors_to_read;
@@ -144,5 +153,5 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
             break;
     }
 
-    return 0;
+    return rv;
 }

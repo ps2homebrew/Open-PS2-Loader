@@ -16,7 +16,7 @@
 
 // START of OPL_DB tweaks
 // ELF-loading stuff
-#define ELF_MAGIC 0x464c457f
+#define ELF_MAGIC   0x464c457f
 #define ELF_PT_LOAD 1
 
 

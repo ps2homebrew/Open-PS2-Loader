@@ -94,6 +94,7 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_BOOT_SND             "enable_boot_snd"
 #define CONFIG_OPL_SFX_VOLUME           "sfx_volume"
 #define CONFIG_OPL_BOOT_SND_VOLUME      "boot_snd_volume"
+#define CONFIG_OPL_HDD_APP_PART         "hdd_app_partition"
 
 // Network config keys
 #define CONFIG_NET_ETH_LINKM   "eth_linkmode"

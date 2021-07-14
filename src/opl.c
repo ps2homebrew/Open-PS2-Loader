@@ -188,6 +188,7 @@ unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];
 unsigned char gDefaultSelTextColor[3];
 unsigned char gDefaultUITextColor[3];
+char gAPPPart[128];
 
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 {
@@ -856,6 +857,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, &gBootSndVolume);
+            configGetStrCopy(configOPL, CONFIG_OPL_HDD_APP_PART, gAPPPart, sizeof(gAPPPart));
         }
     }
 
@@ -1006,6 +1008,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND_VOLUME, gBootSndVolume);
+        configSetStr(configOPL, CONFIG_OPL_HDD_APP_PART, gAPPPart);
 
         configSetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     }
@@ -1531,6 +1534,7 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
 
+    gAPPPart[0] = '\0';
     gBaseMCDir = "mc?:OPL";
     gHDDPrefix = "pfs0:";
 

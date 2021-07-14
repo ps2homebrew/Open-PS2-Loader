@@ -892,7 +892,7 @@ int sysExecElf(const char *path)
     elf_argv[0] = (char *)path;
 
     if (strncmp(path, "pfs", 3) == 0) {
-        snprintf(argv, sizeof(argv), "%s:%s", gOPLPart, elf_argv[0]);
+        snprintf(argv, sizeof(argv), gAPPPart[0] == '\0' ? "%s:%s" : "hdd0:%s:%s", gAPPPart[0] == '\0' ? gOPLPart : gAPPPart, elf_argv[0]);
         elf_argv[1] = argv;
         elf_argc++;
     }

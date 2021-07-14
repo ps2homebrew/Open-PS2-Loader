@@ -456,6 +456,7 @@ void guiShowConfig()
     diaSetInt(diaConfig, CFG_HDDSPINDOWN, gHDDSpindown);
     diaSetString(diaConfig, CFG_BDMPREFIX, gBDMPrefix);
     diaSetString(diaConfig, CFG_ETHPREFIX, gETHPrefix);
+    diaSetString(diaConfig, CFG_HDD_APP_PART, gAPPPart);
     diaSetInt(diaConfig, CFG_LASTPLAYED, gRememberLastPlayed);
     diaSetInt(diaConfig, CFG_AUTOSTARTLAST, gAutoStartLastPlayed);
     diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, gRememberLastPlayed);
@@ -480,6 +481,7 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_HDDSPINDOWN, &gHDDSpindown);
         diaGetString(diaConfig, CFG_BDMPREFIX, gBDMPrefix, sizeof(gBDMPrefix));
         diaGetString(diaConfig, CFG_ETHPREFIX, gETHPrefix, sizeof(gETHPrefix));
+        diaGetString(diaConfig, CFG_HDD_APP_PART, gAPPPart, sizeof(gAPPPart));
         diaGetInt(diaConfig, CFG_LASTPLAYED, &gRememberLastPlayed);
         diaGetInt(diaConfig, CFG_AUTOSTARTLAST, &gAutoStartLastPlayed);
         DisableCron = 1; // Disable Auto Start Last Played counter (we don't want to call it right after enable it on GUI)

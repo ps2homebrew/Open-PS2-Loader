@@ -288,6 +288,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Developer",
     "Description",
     "BDM Games",
+    "HDD Applications Partition",
+    "Leave blank to use OPL partition for APPS.",
 };
 
 static int guiLangID = 0;

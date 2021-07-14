@@ -189,6 +189,11 @@ struct UIItem diaConfig[] = {
     {UI_STRING, CFG_ETHPREFIX, 1, 1, -1, 0, 0, {.stringvalue = {"", "", NULL}}},
     {UI_BREAK},
 
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDD_APP_PART}}},
+    {UI_SPACER},
+    {UI_STRING, CFG_HDD_APP_PART, 1, 1, _STR_HINT_APP_PART, 0, 0, {.stringvalue = {"", "", NULL}}},
+    {UI_BREAK},
+
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_HDD_SPINDOWN}}},
     {UI_SPACER},
     {UI_INT, CFG_HDDSPINDOWN, 1, 1, _STR_HINT_SPINDOWN, 0, 0, {.intvalue = {20, 20, 0, 20}}},

@@ -184,6 +184,8 @@ extern unsigned char gDefaultTextColor[3];
 extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
 
+extern char gAPPPart[128];
+
 void setDefaultColors(void);
 
 #define MENU_ITEM_HEIGHT 19

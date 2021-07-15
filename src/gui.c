@@ -417,6 +417,18 @@ void guiShowNetCompatUpdateSingle(int id, item_list_t *support, config_set_t *co
     }
 }
 
+static void guiShowBlockDeviceConfig(void)
+{
+    int ret;
+
+    diaSetInt(diaBlockDevicesConfig, CFG_ENABLEFW, gEnableFW);
+
+    ret = diaExecuteDialog(diaBlockDevicesConfig, -1, 1, NULL);
+    if (ret) {
+        diaGetInt(diaBlockDevicesConfig, CFG_ENABLEFW, &gEnableFW);
+    }
+}
+
 static int guiUpdater(int modified)
 {
     int showAutoStartLast;
@@ -427,7 +439,7 @@ static int guiUpdater(int modified)
         diaSetVisible(diaConfig, CFG_AUTOSTARTLAST, showAutoStartLast);
 
         diaGetInt(diaConfig, CFG_BDMMODE, &gBDMStartMode);
-        diaSetEnabled(diaConfig, CFG_ENABLEFW, gBDMStartMode);
+        diaSetVisible(diaConfig, BLOCKDEVICE_BUTTON, gBDMStartMode);
     }
     return 0;
 }
@@ -464,11 +476,10 @@ void guiShowConfig()
     diaSetInt(diaConfig, CFG_SELECTBUTTON, gSelectButton == KEY_CIRCLE ? 0 : 1);
     diaSetInt(diaConfig, CFG_DEFDEVICE, gDefaultDevice);
     diaSetInt(diaConfig, CFG_BDMMODE, gBDMStartMode);
+    diaSetVisible(diaConfig, BLOCKDEVICE_BUTTON, gBDMStartMode);
     diaSetInt(diaConfig, CFG_HDDMODE, gHDDStartMode);
     diaSetInt(diaConfig, CFG_ETHMODE, gETHStartMode);
     diaSetInt(diaConfig, CFG_APPMODE, gAPPStartMode);
-
-    diaSetInt(diaConfig, CFG_ENABLEFW, gEnableFW);
 
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
@@ -492,7 +503,8 @@ void guiShowConfig()
         diaGetInt(diaConfig, CFG_ETHMODE, &gETHStartMode);
         diaGetInt(diaConfig, CFG_APPMODE, &gAPPStartMode);
 
-        diaGetInt(diaConfig, CFG_ENABLEFW, &gEnableFW);
+        if (ret == BLOCKDEVICE_BUTTON)
+            guiShowBlockDeviceConfig();
 
         applyConfig(-1, -1);
         menuReinitMainMenu();

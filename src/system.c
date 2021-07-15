@@ -352,14 +352,14 @@ void sysExecExit(void)
 }
 
 // Module bits
-#define CORE_IRX_USB   0x01
-#define CORE_IRX_ETH   0x02
-#define CORE_IRX_SMB   0x04
-#define CORE_IRX_HDD   0x08
-#define CORE_IRX_VMC   0x10
-#define CORE_IRX_DEBUG 0x20
-#define CORE_IRX_DECI2 0x40
-#define CORE_IRX_ILINK 0x80
+#define CORE_IRX_USB    0x01
+#define CORE_IRX_ETH    0x02
+#define CORE_IRX_SMB    0x04
+#define CORE_IRX_HDD    0x08
+#define CORE_IRX_VMC    0x10
+#define CORE_IRX_DEBUG  0x20
+#define CORE_IRX_DECI2  0x40
+#define CORE_IRX_ILINK  0x80
 #define CORE_IRX_MX4SIO 0x100
 
 typedef struct

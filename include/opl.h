@@ -115,6 +115,7 @@ extern int gETHStartMode;
 extern int gAPPStartMode;
 
 extern int gEnableFW;
+extern int gEnableMX4SIO;
 
 extern int gAutosort;
 extern int gAutoRefresh;

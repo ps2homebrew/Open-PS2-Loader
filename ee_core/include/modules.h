@@ -13,10 +13,10 @@ enum OPL_MODULE_ID {
     OPL_MODULE_ID_ILINK,
     OPL_MODULE_ID_ILINKBD,
 
-    //mx4sio mode modules
+    // mx4sio mode modules
     OPL_MODULE_ID_MX4SIOBD,
 
-    //SMB mode modules
+    // SMB mode modules
     OPL_MODULE_ID_SMSTCPIP,
     OPL_MODULE_ID_SMAP,
     OPL_MODULE_ID_SMBINIT,

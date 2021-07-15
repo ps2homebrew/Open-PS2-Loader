@@ -24,6 +24,7 @@ static base_game_info_t *bdmGames;
 static char bdmDriver[5];
 
 static int fireWireModLoaded = 0;
+static int mx4sioModLoaded = 0;
 
 // forward declaration
 static item_list_t bdmGameList;
@@ -78,6 +79,13 @@ static void bdmLoadBlockDeviceModules(void)
 
         fireWireModLoaded = 1;
     }
+
+    if (gEnableMX4SIO && !mx4sioModLoaded) {
+        // Load MX4SIO Block Device drivers
+        sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
+
+        mx4sioModLoaded = 1;
+    }
 }
 
 void bdmLoadModules(void)
@@ -96,9 +104,6 @@ void bdmLoadModules(void)
 
     // Load Optional Block Device drivers
     bdmLoadBlockDeviceModules();
-
-    // Load MX4SIO Block Device drivers
-    sysLoadModuleBuffer(&mx4sio_bd_irx, size_mx4sio_bd_irx, 0, NULL);
 
     sysLoadModuleBuffer(&bdmevent_irx, size_bdmevent_irx, 0, NULL);
     SifAddCmdHandler(0, &bdmEventHandler, NULL);

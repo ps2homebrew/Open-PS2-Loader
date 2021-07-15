@@ -290,6 +290,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "BDM Games",
     "HDD Applications Partition",
     "Leave blank to use OPL partition for APPS.",
+    "Select Block Devices",
 };
 
 static int guiLangID = 0;

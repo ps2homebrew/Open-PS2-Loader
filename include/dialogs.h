@@ -44,6 +44,7 @@ enum UI_ITEMS {
     CFG_ETHPREFIX,
     CFG_HDDSPINDOWN,
     CFG_HDD_APP_PART,
+    BLOCKDEVICE_BUTTON,
 
     ABOUT_TITLE,
     ABOUT_BUILD_DETAILS,
@@ -191,5 +192,6 @@ extern struct UIItem diaAbout[];
 extern struct UIItem diaVMC[];
 extern struct UIItem diaNetCompatUpdate[];
 extern struct UIItem diaParentalLockConfig[];
+extern struct UIItem diaBlockDevicesConfig[];
 
 #endif

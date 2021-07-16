@@ -1708,7 +1708,6 @@ static void autoLaunchHDDGame(char *argv[])
             config_set_t *configOPL = configGetByType(CONFIG_OPL);
 
             configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
-            configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
             configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
         }
@@ -1742,7 +1741,7 @@ int main(int argc, char *argv[])
        argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
        argv[4] "mini" (this is probably unnecessary.. how many args would there be typically?) */
     if (argc >= 5) {
-        if (argv[4][0] == 'm' && argv[4][1] == 'i' && argv[4][2] == 'n' && argv[4][3] == 'i')
+        if (!strcmp(argv[4], "mini");
             autoLaunchHDDGame(argv);
     }
 

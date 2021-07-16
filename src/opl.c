@@ -1741,7 +1741,7 @@ int main(int argc, char *argv[])
        argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
        argv[4] "mini" (this is probably unnecessary.. how many args would there be typically?) */
     if (argc >= 5) {
-        if (!strcmp(argv[4], "mini");
+        if (!strcmp(argv[4], "mini")
             autoLaunchHDDGame(argv);
     }
 

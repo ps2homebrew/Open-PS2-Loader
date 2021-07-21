@@ -146,6 +146,7 @@ int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
 int gEnableFW;
+int gEnableMX4SIO;
 int gAutosort;
 int gAutoRefresh;
 int gEnableNotifications;
@@ -852,6 +853,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_FW, &gEnableFW);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
             configGetInt(configOPL, CONFIG_OPL_SFX_VOLUME, &gSFXVolume);
@@ -1002,6 +1004,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_FW, gEnableFW);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
         configSetInt(configOPL, CONFIG_OPL_SFX_VOLUME, gSFXVolume);
@@ -1592,6 +1595,7 @@ static void setDefaults(void)
     gAPPStartMode = START_MODE_DISABLED;
 
     gEnableFW = 0;
+    gEnableMX4SIO = 0;
 
     frameCounter = 0;
 

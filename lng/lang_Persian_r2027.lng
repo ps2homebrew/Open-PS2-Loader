@@ -1,6 +1,6 @@
 # Translation by saeid0035
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Persian
 OPL %s
@@ -64,7 +64,7 @@ ETH یﺎﻫ یزﺎﺑ
 یﺪﻨﺑﺮﻜﻴﭘ هﺮﻴﺧذ لﺎﺣرد
 هﺪﻨﻨﻛ عوﺮﺷ هﺎﮕﺘﺳد
 یزﺎﺳ هزﺎﺗ
-USB هﺎﮕﺘﺳد عوﺮﺷ ﺖﻟﺎﺣ
+BDM هﺎﮕﺘﺳد عوﺮﺷ ﺖﻟﺎﺣ
 HDD هﺎﮕﺘﺳد عوﺮﺷ ﺖﻟﺎﺣ
 ETH هﺎﮕﺘﺳد عوﺮﺷ ﺖﻟﺎﺣ
 ﺎﻫ ﻪﻣﺎﻧﺮﺑ ﻮﻨﻣ نداد نﺎﺸﻧ
@@ -137,7 +137,7 @@ generic زا هدﺎﻔﺘﺳا
 هرﺎﺑرد
 نﺎﺴﻳﻮﻧ ﻪﻣﺎﻧرﺑ
 ﺖﻴﻔﻴﻛ ﺖﺴﺗ
-USB ﻲﺤﻴﺟﺮﺗ ﺮﻴﺴﻣ
+BDM ﻲﺤﻴﺟﺮﺗ ﺮﻴﺴﻣ
 IGR زا ﺪﻌﺑ ﻲﺷرﺎﻔﺳ ELF ﻞﻳﺎﻓ یاﺮﺟا
 ﻦﻴﻳﺎﭘ ﺶﺧﺮﭼ یاﺮﺑ 0 ,ﻪﻘﻴﻗد رد راﺪﻘﻣ
 HDD رﺎﻛدﻮﺧ ﺶﺧﺮﭼ ﺶﻫﺎﻛ
@@ -282,6 +282,8 @@ FIELD flipping یزﺎﺳ ﻪﻴﺒﺷ
 ﻪﺿﺮﻋ ﺦﻳﺭﺎﺗ
 ﻩﺪﻧﺯﺎﺳ
 ﺕﺎﺤﻴﺿﻮﺗ
+BDM Games
+Select Block Devices
 1 ﻦﺸﻴﺘﺳا ﻲﻠﭘ یﺎﻫ یزﺎﺑ
 1 ﻦﺸﻴﺘﺳا ﻲﻠﭘ یﺎﻫ یزﺎﺑ ﺶﻳﺎﻤﻧ ﺖﻟﺎﺣ
 !'%s' رد ﺪﺸﻧ ﺖﻓﺎﻳ POPSTARTER.ELF ﻞﻳﺎﻓ

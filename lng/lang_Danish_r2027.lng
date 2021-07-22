@@ -1,6 +1,6 @@
 # Translation by BongKris
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Danish
 OPL %s
@@ -64,7 +64,7 @@ Indlæser indstillinger
 Gemmer indstillinger
 Start enhed
 Genindlæs
-USB-enhed starttilstand
+BDM-enhed starttilstand
 HDD-enhed starttilstand
 ETH-enhed starttilstand
 Programmenu visningstilstand
@@ -137,7 +137,7 @@ Automatisk opdatering
 Om
 Kodere
 Kvalitetstestere
-USB-præfiks sti
+BDM-præfiks sti
 Starter brugerdefineret ELF efter en IGR
 Værdi i minuttet(r), 0 for at deaktivere spindown
 Automatisk harddisk spindown
@@ -282,6 +282,8 @@ Genre
 Release
 Developer
 Description
+BDM Games
+Select Block Devices
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

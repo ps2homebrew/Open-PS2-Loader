@@ -1,6 +1,6 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
 OPL %s
@@ -64,7 +64,7 @@ Lade Konfiguration
 Speichere Konfiguration
 Peripherie starten
 Aktual.
-USB Start Modus
+BDM Geräte Startmodus
 HDD Start Modus
 ETH Start Modus
 Anwendungen Menü Anzeigen
@@ -137,7 +137,7 @@ Automatisch aktualisieren
 Über
 Programmierer
 Qualitätssicherung
-USB Präfix Pfad
+BDM Präfix Pfad
 Startet benutzerdef. ELF nach einem IGR
 Wert in Minuten, 0 um Abschaltung der Festplatte zu deaktivieren
 Autom. Abschaltung der Festplatte
@@ -282,6 +282,8 @@ Genre
 Veröffentlichung
 Entwickler
 Beschreibung
+BDM Spiele
+Select Block Devices
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

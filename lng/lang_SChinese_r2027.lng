@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Simplified Chinese
 OPL %s
@@ -64,7 +64,7 @@ X
 设置储存中
 启动设备
 重新整理
-USB 设备启动模式
+BDM 设备启动模式
 HDD 设备启动模式
 ETH 设备启动模式
 应用程序启动模式
@@ -137,7 +137,7 @@ VMC 存档已存在
 关于
 程序
 测试
-USB 前缀路径
+BDM 前缀路径
 自定义IGR启动文件
 数值以分钟计,设为 0 禁用降速
 自动 HDD 降速
@@ -282,6 +282,8 @@ Genre
 Release
 Developer
 Description
+BDM Games
+Select Block Devices
 PS1游戏
 PS1游戏启动模式
 POPSTARTER.ELF在'%s'上找不到!

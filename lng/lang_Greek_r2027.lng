@@ -1,6 +1,6 @@
 # Greek Translation by RivalK93
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-1922-DB_all-f1ee78a-2021-02-01 and OPNPS2LD-v1.1.0-Beta-1617-ifcaro_all-4260147-2021-01-31
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Greek
 OPL %s
@@ -64,7 +64,7 @@ Widescreen
 Αποθήκευση ρυθμίσεων...
 Εκκίνηση Συσκευής
 Ανανέωση
-Εκκίνηση Λειτουργίας USB
+Εκκίνηση Λειτουργίας BDM
 Εκκίνηση Λειτουργίας HDD
 Εκκίνηση Λειτουργίας ETH
 Εκκίνηση Μενού Εφαρμογών
@@ -137,7 +137,7 @@ VMC Γενικής Χρήσης
 Σχετικά
 Προγραμματιστές
 Διασφάλιση Ποιότητας
-Πρόθεμα Μονοπατιού USB
+Πρόθεμα Μονοπατιού BDM
 Εκκίνηση του ορισμένου ELF μετά από In-Game-Reset.
 Τιμή σε λεπτά, 0 για απενεργοποίηση του spin-down.
 Αυτόματο Spin-Down του HDD
@@ -282,6 +282,8 @@ Forum Υποστήριξης:
 Κυκλοφορία
 Προγραμματιστής
 Περιγραφή
+BDM Games
+Select Block Devices
 Παιχνίδια PS1
 Εκκίνηση μενού Παιχνιδιών PS1
 Το POPSTARTER.ELF δεν βρέθηκε στη θέση '%s'!

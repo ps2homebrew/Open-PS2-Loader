@@ -1,6 +1,6 @@
 # Translated by DDinghoya
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Korean
 OPL %s
@@ -64,7 +64,7 @@ X
 저장 설정
 장치 시작
 새로 고침
-USB 장치 시작 모드
+BDM 장치 시작 모드
 HDD 장치 시작 모드
 ETH 장치 시작 모드
 응용프로그램 시작 모드
@@ -137,7 +137,7 @@ VMC %s 오류, 메모리카드(슬롯 %d)에서 계속합니까?
 오픈 PS2 로더 정보
 개발자
 품질 보증
-USB prefix 경로
+BDM prefix 경로
 IGR 후 사용자 정의 ELF 부팅
 분 입력, 회전 멈추지 않으려면 0으로 설정
 자동 HDD 회전 멈춤
@@ -282,6 +282,8 @@ VMC %s 파일이 조각화되었습니다. 슬롯 %d에서 메모리 카드를 �
 개정
 개발자
 설명
+BDM Games
+Select Block Devices
 PS1 게임
 PS1 게임 표시 모드
 '%s' 에 POPSTARTER.ELF이 없습니다!

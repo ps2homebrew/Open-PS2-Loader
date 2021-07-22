@@ -1,6 +1,6 @@
 # Translation by Blacky5678
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Croatian
 OPL %s
@@ -64,7 +64,7 @@ Ucitavanje konfiguracije...
 Spremanje konfiguracije...
 Zapocni Uredaj
 Osvjezi
-Pocetni Nacin USB Uredaja
+Pocetni Nacin BDM Uredaja
 Pocetni Nacin HDD Uredaja
 Pocetni Nacin ETH Uredaja
 Nacin Prikaza Aplikacijskog Izbornika
@@ -137,7 +137,7 @@ Automatsko Osvjezavanje
 O
 Koderi
 Osiguranje Kvalitete
-Putanja USB Prefiksa
+Putanja BDM Prefiksa
 Pokrece prilagodeni ELF nakon IGR-a.
 Vrijednost u minutama, 0 za onemogucivanje zavrtanja.
 Automatsko Zavrtanje HDD-a
@@ -282,6 +282,8 @@ Genre
 Release
 Developer
 Description
+BDM Games
+Select Block Devices
 PS1 Igre
 Nacin Prikaza PS1 Igara
 POPSTARTER.ELF nije pronaden kod '%s'!

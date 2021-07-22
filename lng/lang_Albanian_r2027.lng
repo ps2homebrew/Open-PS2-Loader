@@ -1,6 +1,6 @@
 # Translation by LoniTheFricc
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Albanian
 OPL %s
@@ -64,7 +64,7 @@ Duke Ngarkuar Konfigurimin...
 Duke Ruajtur Konfigurimin...
 Fillo Pajisjen
 Rifresko
-Moda e Fillimit të USB-s
+Moda e Fillimit të BDM-s
 Moda e Fillimit të HDD-s
 Moda e Fillimit të ETH-it
 Moda e Shfaqjes së Aplikacioneve
@@ -137,7 +137,7 @@ Rifreskim Automatik
 Për Ne
 Koduesit
 Sigurimi i Cilësisë
-Rruga e Parashtesës se USB-s
+Rruga e Parashtesës se BDM-s
 Hap një ELF te Modifikuar mbas një IGR.
 Vlera në minuta(s),0 të çaktivizosh Ngadalsimin e Rrotullimit.
 Ngadalsim Auto Rrotullimit së HDD-së.
@@ -282,6 +282,8 @@ Zhanri
 Publikimi
 Zhvilluesi
 Përshkrimi
+BDM Games
+Select Block Devices
 Lojrat PS1
 Moda e Shfaqjes se Lojrave PS1
 POPSTARTER.ELF nuk është gjetur tek '%s'!

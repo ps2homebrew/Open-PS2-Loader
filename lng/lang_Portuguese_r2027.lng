@@ -1,6 +1,6 @@
 # Translation by danielb
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
 OPL %s
@@ -28,8 +28,8 @@ Cancelar atualização?
 %d: Erro ao iniciar rede
 %d: Adaptador de Rede não detetado
 %d: Não foi possível ligar ao servidor SMB
-%d: Não foi possível efetuar login no servidor SMB
-%d: Não foi possível abrir a partilha SMB
+%d: Não foi possível efetuar login no servidor SMB 
+%d: Não foi possível abrir a partilha SMB 
 %d: Impossivel listar partilhas SMB
 %d: Impossivel listar jogos
 %d: Servidor DHCP indisponivel
@@ -64,7 +64,7 @@ Carregando configurações
 A guardar configurações...
 Iniciar dispositivo
 Atualizar
-Modo de inicio para dispositivo USB
+Modo de inicialização do dispositivo BDM
 Modo de inicio para dispositivo HDD
 Modo de inicio para dispositivo Rede
 Modo de inicio para Aplicações
@@ -137,7 +137,7 @@ Atualização automática
 Créditos
 Desenvolvedores
 Controlo de qualidade
-Prefixo de caminho USB
+Prefixo de caminho BDM
 Iniciar ELF personalizado depois do IGR
 Valor em minuto(s), 0 p/ desativar
 Desligamento automático do HDD
@@ -282,6 +282,8 @@ Gênero
 Data de lançamento
 Desenvolvedor
 Descrição
+Jogos BDM
+Select Block Devices
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

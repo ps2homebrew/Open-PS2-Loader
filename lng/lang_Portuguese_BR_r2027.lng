@@ -1,6 +1,6 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 OPL %s
@@ -64,7 +64,7 @@ Carregando configurações...
 Salvando configurações...
 Iniciar dispositivo
 Atualizar
-Modo de início do dispositivo USB
+Modo de início do dispositivo BDM
 Modo de início do dispositivo HDD
 Modo de início do dispositivo REDE
 Modo de início dos Aplicativos
@@ -137,7 +137,7 @@ Atualização automática
 Informações do programa
 Desenvolvedores
 Controle de qualidade
-Prefixar uma pasta no USB
+Prefixar uma pasta no BDM
 Inicia um ELF personalizado após o IGR
 Valor em minuto(s), 0(zero) desabilita o spin down
 Desligamento automático do HDD (spin down)
@@ -282,6 +282,8 @@ Gênero
 Data de lançamento
 Desenvolvedor
 Descrição
+Jogos BDM
+Select Block Devices
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

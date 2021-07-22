@@ -1,6 +1,6 @@
 # Translation by Anousith Phompida <noum_terry@hotmail.com> (aka: blackbutterfly)
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Laotian
 OPL %s
@@ -64,8 +64,8 @@ Remove Settings
 ກຳລັງບັນທຶກການຕັ້ງຄ່າ
 ເປີດໃຊ້ອຸປະກອນເຊື່ອມຕໍ່
 ເອີ້ນຄືນໃໝ່
-ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ USB
-ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk
+ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ BDM
+ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Hard Disk 
 ໂໝດ ເຊື່ອມຕໍ່ອຸປະກອນ Network
 ໂໝດ ຕ່າງໆສຳລັບໂປຣແກຣມ
 ອັດຕະໂນມັດ
@@ -113,7 +113,7 @@ Test Changes
 ວິທີການອ່ານຂໍ້ມູນທີ່ມີທາງເລືອກ
 Unhook Syscalls
 ຂ້າມການຫຼິ້ນວິດິໂອ
-ປະມວນຜົນ DVD-DL
+ປະມວນຜົນ DVD-DL 
 Disable IGR
 Unused
 Unused
@@ -137,7 +137,7 @@ Error accessing VMC %s. Continue with the Memory Card in slot %d?
 ກ່ຽວກັບໂປຣແກຣມ
 ກຸ່ມນັກພັດທະນາໂປຣແກຣມ
 ການປະກັນໃນຄຸນະພາບ
-USB prefix path
+BDM prefix path
 ປະມວນຜົນ ELF ຫຼັງຈາກ IGR
 ໃສ່ຄ່າເປັນນາທີ, ເລືອກ 0 ເພື່ອປິດການຢຸດໝຸນຮອບ
 ການຢຸດຮອບໝູນອັດຕະໂນມັດຂອງ Hard Disk
@@ -282,6 +282,8 @@ Genre
 Release
 Developer
 Description
+BDM Games
+Select Block Devices
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

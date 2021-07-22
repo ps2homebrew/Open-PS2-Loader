@@ -1,6 +1,6 @@
 # Translation by jauffre and andre95d and completed by Peppe90
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Italian
 OPL %s
@@ -42,7 +42,7 @@ Annulla
 Cerchio
 X
 Lista Giochi
-Impostazioni Gioco
+Impostazioni Gioco 
 Rimuovi Impostazioni
 Rimosse tutte le chiavi per il gioco.
 Scorrimento
@@ -64,7 +64,7 @@ Caricamento configurazione...
 Salvataggio configurazione...
 Avvia Dispositivo
 Aggiorna
-Modalità di Avvio USB
+Modalità di Avvio BDM
 Modalità di Avvio HDD
 Modalità di Avvio ETH
 Modalità di Avvio Apps
@@ -78,7 +78,7 @@ Server NBD in scaricamento dalla memoria...
 Percorso IGR
 Colore dello Sfondo
 Colore Testo
-- PS2 -
+- PS2 - 
 - Server SMB -
 Tipo di Indirizzo IP
 Statico
@@ -137,7 +137,7 @@ Aggiornamento Automatico
 Info Versione
 Sviluppatori
 Controllo Qualità
-Percorso USB Prefisso
+Percorso BDM Prefisso
 Avvia ELF personalizzato dopo un IGR.
 Valore in minuti, 0 per disabilitare lo spin down.
 Spin Down Automatico HDD
@@ -154,7 +154,7 @@ Percorso ETH Prefisso
 Backspace
 Spazio
 Invio
-Modalità
+Modalità 
 Slot VMC 1
 Slot VMC 2
 ID gioco
@@ -282,6 +282,8 @@ Genere
 Pubblicazione
 Sviluppatore
 Descrizione
+BDM Games
+Select Block Devices
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

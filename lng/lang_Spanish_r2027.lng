@@ -1,6 +1,6 @@
 # Translation by lauchon22
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
 OPL %s
@@ -64,7 +64,7 @@ Cargando configuración...
 Guardando configuración...
 Iniciar dispositivo
 Refrescar
-Modo de inicio para USB
+Modo de inicio del dispositivo BDM
 Modo de inicio para Disco duro
 Modo de inicio para Red
 Modo inicio de menú de Aplicaciones
@@ -137,7 +137,7 @@ Refresco automático de las listas
 Acerca del OPL
 Desarrolladores
 Testeadores
-Ruta predeterminada dispositivo USB
+Ruta de prefijo BDM
 Lanzar ELF personalizado después de IGR
 Valor en minutos, 0 para desactivar el paro automático
 Paro automático rotación del Disco duro
@@ -282,6 +282,8 @@ Género
 Lanzamiento
 Desarrollador
 Descripción
+Juegos BDM
+Select Block Devices
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

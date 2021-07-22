@@ -1,6 +1,6 @@
 # Translation by yohokaru
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
 OPL %s
@@ -64,7 +64,7 @@ Wczytywanie ustawień...
 Zapisywanie ustawień...
 Uruchom Urządzenie
 Odśwież
-Uruchom Urządzenie USB
+Uruchom Urządzenie BDM
 Uruchom Urządzenie HDD
 Uruchom Urządzenie ETH
 Wyświetl Menu Aplikacji
@@ -137,7 +137,7 @@ Odświeżanie Automatyczne
 O Programie
 Programiści
 Kontrola Jakości
-Prefix Ścieżki USB
+Prefix Ścieżki BDM
 Uruchom wybrany ELF po IGR.
 Wartość w minutach, 0 dla dezaktywacji.
 Automatyczne Zwalnianie Obrotów HDD
@@ -151,7 +151,7 @@ Wybór Koloru
 Połącz Ponownie
 Pozostaw puste aby wyświetlić listę udziałów.
 Prefix Ścieżki ETH
-Cofnij
+Cofnij	
 Odstęp
 Enter
 Tryb
@@ -282,6 +282,8 @@ Gatunek
 Data wydania
 Deweloper
 Opis
+BDM Games
+Select Block Devices
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

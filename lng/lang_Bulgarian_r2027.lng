@@ -1,6 +1,6 @@
 # translation by vsub and wisi
-# Last update: May 20, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-1950-b329309-2021-05-19 and OPNPS2LD-v1.1.0-Beta_all-1635-ifcaro-1101a9d-2021-05-18
+# Last update: July 21, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Bulgarian
 OPL %s
@@ -64,7 +64,7 @@ X (Хикс)
 Запазвам настройките...
 Стартиране на устройството
 Опресни
-USB режим - стартиране
+BDM режим - стартиране
 HDD режим - стартиране
 ETH режим - стартиране
 Меню "Приложения" - стартиране
@@ -137,7 +137,7 @@ VMC файлът трябва да бъде създаден.
 Относно
 Програмисти:
 Качествен контрол от:
-USB поддиректория
+BDM поддиректория
 Оставете свободно, за изход към PS2 Browser
 Стойност в минути, 0 за деактивиране
 Автоматично спиране на HDD след
@@ -282,6 +282,8 @@ Options
 Издадена
 Производител
 Описание
+BDM Games
+Select Block Devices
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

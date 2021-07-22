@@ -5,7 +5,8 @@ Licensed under Academic Free License version 3.0
 Review the LICENSE file for further details.
 
 [![CI](https://github.com/ifcaro/Open-PS2-Loader/workflows/CI/badge.svg)](https://github.com/ifcaro/Open-PS2-Loader/actions?query=workflow%3ACI)
-[![CI](https://img.shields.io/badge/Mega-%23D90007.svg?style=flat&logo=Mega&logoColor=white)](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A)
+[![Discord](https://img.shields.io/discord/652861436992946216?style=flat&logo=Discord)](https://discord.gg/CVFUa9xh6B)
+[![Mega](https://img.shields.io/badge/Mega-%23D90007.svg?style=flat&logo=Mega&logoColor=white)](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A)
 
 ## Introduction
 
@@ -29,7 +30,6 @@ You can report compatibility game problems at:
 For an updated compatibility list, you can visit the OPL-CL site at:
 
 <http://sx.sytes.net/oplcl/games.aspx>
-
 
 <details>
   <summary> <b> Release types </b> </summary>
@@ -56,18 +56,18 @@ types come with more or fewer features included.
 OPL uses the following directory tree structure across HDD, SMB, and
 USB modes:
 
-| Folder | Description                                                                                                                                                                  | Modes       |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `CD`   | for games on CD media - i.e. blue-bottom discs                                                                                                                               | USB and SMB |
+| Folder | Description                                          | Modes       |
+| ------ | ---------------------------------------------------- | ----------- |
+| `CD`   | for games on CD media - i.e. blue-bottom discs       | USB and SMB |
 | `DVD`  | for DVD5 and DVD9 images if using the NTFS file system on USB or SMB; DVD9 images must be split and placed into the device root if using the FAT32 file system on USB or SMB | USB and SMB |
-| `VMC`  | for Virtual Memory Card images - from 8MB up to 64MB                                                                                                                         | all         |
-| `CFG`  | for saving per-game configuration files                                                                                                                                      | all         |
-| `ART`  | for game art images                                                                                                                                                          | all         |
-| `THM`  | for themes support                                                                                                                                                           | all         |
-| `LNG`  | for translation support                                                                                                                                                      | all         |
-| `CHT`  | for cheats files                                                                                                                                                             | all         |
+| `VMC`  | for Virtual Memory Card images - from 8MB up to 64MB | all         |
+| `CFG`  | for saving per-game configuration files              | all         |
+| `ART`  | for game art images                                  | all         |
+| `THM`  | for themes support                                   | all         |
+| `LNG`  | for translation support                              | all         |
+| `CHT`  | for cheats files                                     | all         |
 
-OPL will automatically create the above directory structure the first time you launch it and enable your favourite device.
+OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
 For HDD users, OPL will read hdd0:\_\_common/OPL/conf_hdd.cfg for the config entry "hdd_partition" to use as your OPL partition.
 If not found a config file and a 128Mb +OPL partition will be created. You can edit the config if you wish to use/create a different partition.
@@ -76,11 +76,9 @@ All partitions created by OPL will be 128Mb (it is not recommended to enlarge pa
 </p>
 </details>
 
-
 <details>
   <summary> <b> USB </b> </summary>
 <p>
-
 
 Game files on USB must be perfectly defragmented either file by file or
 by whole drive, and Dual Layer DVD9 images must be split to avoid the 4GB
@@ -93,7 +91,6 @@ format, such as USBUtil 2.0.
 
 </p>
 </details>
-
 
 <details>
   <summary> <b> SMB </b> </summary>
@@ -109,7 +106,6 @@ EXT3/4 file system.
 </p>
 </details>
 
-
 <details>
   <summary> <b> HDD </b> </summary>
 <p>
@@ -122,7 +118,6 @@ executable elf.
 
 </p>
 </details>
-
 
 <details>
   <summary> <b> PS3 </b> </summary>
@@ -143,15 +138,15 @@ SMBOOT2.ELF = UP + R1
 SMBOOT3.ELF = UP + R2
 
 Note: on PS3, only USB and SMB modes are supported.
+
 </p>
 </details>
-
 
 <details>
   <summary> <b> Some notes for DEVS </b> </summary>
 <p>
 
-Open PS2 Loader needs the [__latest PS2SDK__](https://github.com/ps2dev/ps2sdk)
+Open PS2 Loader needs the [**latest PS2SDK**](https://github.com/ps2dev/ps2sdk)
 
 </p>
 </details>
@@ -160,7 +155,7 @@ Open PS2 Loader needs the [__latest PS2SDK__](https://github.com/ps2dev/ps2sdk)
   <summary> <b> OPL Archive </b> </summary>
 <p>
 
-Since 5/07/2021 every OPL build dispatched to the release section of this repository will be uploaded to a mega account, you can access the archive by clicking the mega badge on top of this readme
+Since 05/07/2021 every OPL build dispatched to the release section of this repository will be uploaded to a mega account, you can access the archive by clicking the mega badge on top of this readme
 
 </p>
 </details>

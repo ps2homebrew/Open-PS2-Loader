@@ -121,6 +121,7 @@ extern int gELMStartMode;
 //END of OPL_DB tweaks
 
 extern int gEnableFW;
+extern int gEnableMX4SIO;
 
 extern int gAutosort;
 extern int gAutoRefresh;

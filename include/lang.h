@@ -284,7 +284,8 @@ enum _STR_IDS {
     _STR_INFO_DEVELOPER,
     _STR_INFO_DESCRIPTION,
     _STR_BDM_GAMES,
-    //START of OPL_DB tweaks
+    _STR_BLOCKDEVICE_SETTINGS,
+    // START of OPL_DB tweaks
     _STR_ELM,
     _STR_ELMMODE,
     _STR_ELM_LAUNCH_POPSTARTER_NOTFOUND,
@@ -294,7 +295,7 @@ enum _STR_IDS {
     _STR_OPL_FREE,
     _STR_OPL_IFCARO,
     _STR_OPL_DB,
-    //END of OPL_DB tweaks
+    // END of OPL_DB tweaks
 
     LANG_STR_COUNT
 };

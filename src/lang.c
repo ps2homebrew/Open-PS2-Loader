@@ -292,7 +292,8 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Developer",
     "Description",
     "BDM Games",
-    //START of OPL_DB tweaks
+    "Select Block Devices",
+    // START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",
     "POPSTARTER.ELF not found at '%s'!",
@@ -302,7 +303,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Never buy OPEN-PS2-LOADER (OPL), instead get it free at:",
     "ifcaro OPL version at psx-place.com",
     "OPL Daily Builds (DB) version at ps2-home.com",
-    //END of OPL_DB tweaks
+    // END of OPL_DB tweaks
 };
 
 static int guiLangID = 0;

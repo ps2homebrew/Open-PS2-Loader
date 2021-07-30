@@ -288,6 +288,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Developer",
     "Description",
     "BDM Games",
+    "Select Block Devices",
     "Controller Settings",
 };
 

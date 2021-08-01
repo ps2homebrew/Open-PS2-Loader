@@ -2,7 +2,7 @@
 #include "include/textures.h"
 #include "include/util.h"
 #include "include/ioman.h"
-#include <libjpg.h>
+#include <libjpg_ps2_addons.h>
 #include <png.h>
 
 extern void *load0_png;
@@ -545,38 +545,15 @@ int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
         snprintf(filePath, sizeof(filePath), "%s%s.jpg", path, internalDefault[texId].name);
     else
         snprintf(filePath, sizeof(filePath), "%s.jpg", path);
-    FILE *file = fopen(filePath, "rb");
-    if (file) {
-        jpg = jpgOpenFILE(file, JPG_NORMAL);
-        if (jpg != NULL) {
-            if (texSizeValidate(jpg->width, jpg->height, psm) < 0) {
-                jpgClose(jpg);
-                fclose(file);
-                return ERR_BAD_DIMENSION;
-            }
 
-            size_t size = gsKit_texture_size_ee(jpg->width, jpg->height, psm);
-            texture->Mem = memalign(128, size);
 
-            // failed allocation
-            if (!texture->Mem) {
-                LOG("TEXTURES JpgLoad: Failed to allocate %d bytes\n", size);
-            } else {
-                // okay
-                texUpdate(texture, jpg->width, jpg->height);
-
-                jpgReadImage(jpg, (void *)texture->Mem);
-                result = 0;
-            }
-        }
+    jpg = jpgFromFilename(filePath, JPG_NORMAL);
+    if (jpg) {
+        texture->Mem = jpg->buffer;
+        texUpdate(texture, jpg->width, jpg->height);
+        free(jpg);
+        result = 0;
     }
-
-    if (jpg)
-        jpgClose(jpg);
-
-    if (file)
-        fclose(file);
-
     return result;
 }
 

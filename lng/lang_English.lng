@@ -63,7 +63,7 @@ Games List
 Game Settings
 Remove Settings
 Removed all keys for the game.
-Scrolling
+Scrolling Speed
 Slow
 Medium
 Fast
@@ -302,6 +302,7 @@ Developer
 Description
 BDM Games
 Select Block Devices
+Controller Settings
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

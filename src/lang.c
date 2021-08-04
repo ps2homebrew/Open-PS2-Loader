@@ -52,7 +52,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Game Settings",
     "Remove Settings",
     "Removed all keys for the game.",
-    "Scrolling",
+    "Scrolling Speed",
     "Slow",
     "Medium",
     "Fast",
@@ -293,6 +293,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Description",
     "BDM Games",
     "Select Block Devices",
+    "Controller Settings",
     // START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

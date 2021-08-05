@@ -533,7 +533,7 @@ config_set_t *oplGetLegacyAppsConfig(void)
         return appConfig;
     }
 
-    for (i = MODE_COUNT; i >= 0; i--) {
+    for (i = MODE_COUNT - 1; i >= 0; i--) {
         listSupport = list_support[i].support;
         if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsPath != NULL)) {
             listSupport->itemGetLegacyAppsPath(appsPath, sizeof(appsPath));
@@ -561,7 +561,7 @@ config_set_t *oplGetLegacyAppsInfo(char *name)
     config_set_t *appConfig;
     char appsPath[128];
 
-    for (i = MODE_COUNT; i >= 0; i--) {
+    for (i = MODE_COUNT - 1; i >= 0; i--) {
         listSupport = list_support[i].support;
         if ((listSupport != NULL) && (listSupport->enabled) && (listSupport->itemGetLegacyAppsInfo != NULL)) {
             listSupport->itemGetLegacyAppsInfo(appsPath, sizeof(appsPath), name);

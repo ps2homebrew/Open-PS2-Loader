@@ -87,6 +87,11 @@ extern void *Vmode_pal_png;
 extern void *logo_png;
 extern void *case_png;
 
+static int texPngLoad(GSTEXTURE *texture, const char *path);
+static int texPngLoadInternal(GSTEXTURE *texture, int texId);
+static int texJpgLoad(GSTEXTURE *texture, const char *path);
+static int texBmpLoad(GSTEXTURE *texture, const char *path);
+
 // Not related to screen size, just to limit at some point
 static int maxSize = 720 * 512 * 4;
 
@@ -179,9 +184,10 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
 
 int texLookupInternalTexId(const char *name)
 {
-    int i, result;
+    int i;
+    int result = -1;
 
-    for (result = -1, i = 0; i < TEXTURES_COUNT; i++) {
+    for (i = 0; i < TEXTURES_COUNT; i++) {
         if (!strcmp(name, internalDefault[i].name)) {
             result = internalDefault[i].id;
             break;
@@ -189,12 +195,6 @@ int texLookupInternalTexId(const char *name)
     }
 
     return result;
-}
-
-static void texUpdate(GSTEXTURE *texture, int width, int height)
-{
-    texture->Width = width;
-    texture->Height = height;
 }
 
 static int texSizeValidate(int width, int height, short psm)
@@ -208,30 +208,76 @@ static int texSizeValidate(int width, int height, short psm)
     return 0;
 }
 
-void texPrepare(GSTEXTURE *texture, short psm)
+static void texPrepare(GSTEXTURE *texture)
 {
-    texture->PSM = psm;
-    texture->ClutPSM = 0;
-    texture->Filter = GS_FILTER_LINEAR;
-    texture->Mem = NULL;
-    texture->Vram = 0;
-    texture->VramClut = 0;
-    texture->Clut = NULL;
-    // gsKit_setup_tbw(texture); already done in gsKit_texture_upload
+    texture->Width = 0;                 // Must be set by loader
+    texture->Height = 0;                // Must be set by loader
+    texture->PSM = GS_PSM_CT24;         // Must be set by loader
+    texture->ClutPSM = 0;               // Default, can be set by loader
+    texture->TBW = 0;                   // gsKit internal value
+    texture->Mem = NULL;                // Must be allocated by loader
+    texture->Clut = NULL;               // Default, can be set by loader
+    texture->Vram = 0;                  // VRAM allocation handled by texture manager
+    texture->VramClut = 0;              // VRAM allocation handled by texture manager
+    texture->Filter = GS_FILTER_LINEAR; // Default
+
+    // Do not load the texture to VRAM directly, only load it to EE RAM
+    texture->Delayed = 1;
 }
 
-int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
+void texFree(GSTEXTURE *texture)
 {
-    if (texPngLoad(texture, path, texId, psm) >= 0)
-        return 0;
+    if (texture->Mem) {
+        free(texture->Mem);
+        texture->Mem = NULL;
+    }
+    if (texture->Clut) {
+        free(texture->Clut);
+        texture->Clut = NULL;
+    }
+}
 
-    if ((psm == GS_PSM_CT24) && texJpgLoad(texture, path, texId, psm) >= 0)
-        return 0;
+typedef int (*fpTexLoad)(GSTEXTURE *texture, const char *path);
+struct STexLoader
+{
+    char *sFileExtension;
+    fpTexLoad load;
+};
+static struct STexLoader texLoader[] = {
+    {"png", texPngLoad},
+    {"jpg", texJpgLoad},
+    {"bmp", texBmpLoad},
+    {NULL, NULL}};
 
-    if (texBmpLoad(texture, path, texId, psm) >= 0)
-        return 0;
+int texDiscoverLoad(GSTEXTURE *texture, const char *path, int texId)
+{
+    char filePath[256];
+    int loaderId = 0;
+
+    LOG("texDiscoverLoad(%s)\n", path);
+
+    while (texLoader[loaderId].load != NULL) {
+        if (texId != -1)
+            snprintf(filePath, sizeof(filePath), "%s%s.%s", path, internalDefault[texId].name, texLoader[loaderId].sFileExtension);
+        else
+            snprintf(filePath, sizeof(filePath), "%s.%s", path, texLoader[loaderId].sFileExtension);
+
+        int fd = open(filePath, O_RDONLY);
+        if (fd > 0) {
+            // File found, load it
+            close(fd);
+            return (texLoader[loaderId].load(texture, filePath) >= 0) ? 0 : ERR_BAD_FILE;
+        }
+
+        loaderId++;
+    }
 
     return ERR_BAD_FILE;
+}
+
+int texLoadInternal(GSTEXTURE *texture, int texId)
+{
+    return texPngLoadInternal(texture, texId);
 }
 
 /// PNG SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
@@ -407,9 +453,9 @@ static void texPngReadData(GSTEXTURE *texture, png_structp pngPtr, png_infop inf
     png_read_end(pngPtr, NULL);
 }
 
-int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
+static int texPngLoadAll(GSTEXTURE *texture, const char *filePath, int texId)
 {
-    texPrepare(texture, psm);
+    texPrepare(texture);
     png_structp pngPtr = NULL;
     png_infop infoPtr = NULL;
     png_voidp readData = NULL;
@@ -417,13 +463,7 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     FILE *file = NULL;
     void **PngFileBufferPtr;
 
-    if (path) {
-        char filePath[256];
-        if (texId != -1)
-            snprintf(filePath, sizeof(filePath), "%s%s.png", path, internalDefault[texId].name);
-        else
-            snprintf(filePath, sizeof(filePath), "%s.png", path);
-
+    if (filePath) {
         file = fopen(filePath, "rb");
         if (file == NULL)
             return ERR_BAD_FILE;
@@ -461,7 +501,8 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     png_uint_32 pngWidth, pngHeight;
     int bitDepth, colorType, interlaceType;
     png_get_IHDR(pngPtr, infoPtr, &pngWidth, &pngHeight, &bitDepth, &colorType, &interlaceType, NULL, NULL);
-    texUpdate(texture, pngWidth, pngHeight);
+    texture->Width = pngWidth;
+    texture->Height = pngHeight;
 
     if (bitDepth == 16)
         png_set_strip_16(pngPtr);
@@ -478,14 +519,11 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     void (*texPngReadPixels)(GSTEXTURE * texture, png_bytep * rowPointers, size_t size);
     switch (png_get_color_type(pngPtr, infoPtr)) {
         case PNG_COLOR_TYPE_RGB_ALPHA:
-            // if PNG have alpha, then it fits for every case (even if we only wanted RGB)
             texture->PSM = GS_PSM_CT32;
             texPngReadPixels = &texPngReadPixels32;
             break;
         case PNG_COLOR_TYPE_RGB:
-            if (psm != GS_PSM_CT24)
-                return texPngEnd(pngPtr, infoPtr, file, ERR_MISSING_ALPHA);
-
+            texture->PSM = GS_PSM_CT24;
             texPngReadPixels = &texPngReadPixels24;
             break;
         case PNG_COLOR_TYPE_PALETTE:
@@ -518,10 +556,7 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     }
 
     if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
-        if (texture->Clut) {
-            free(texture->Clut);
-            texture->Clut = NULL;
-        }
+        texFree(texture);
 
         return texPngEnd(pngPtr, infoPtr, file, ERR_BAD_DIMENSION);
     }
@@ -531,26 +566,31 @@ int texPngLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
     return texPngEnd(pngPtr, infoPtr, file, 0);
 }
 
+static int texPngLoad(GSTEXTURE *texture, const char *filePath)
+{
+    return texPngLoadAll(texture, filePath, -1);
+}
+
+static int texPngLoadInternal(GSTEXTURE *texture, int texId)
+{
+    return texPngLoadAll(texture, NULL, texId);
+}
+
 /// JPG SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
 
 
-int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
+static int texJpgLoad(GSTEXTURE *texture, const char *filePath)
 {
-    texPrepare(texture, GS_PSM_CT24);
+    texPrepare(texture);
     int result = ERR_BAD_FILE;
     jpgData *jpg = NULL;
-    char filePath[256];
-
-    if (texId != -1)
-        snprintf(filePath, sizeof(filePath), "%s%s.jpg", path, internalDefault[texId].name);
-    else
-        snprintf(filePath, sizeof(filePath), "%s.jpg", path);
-
 
     jpg = jpgFromFilename(filePath, JPG_NORMAL);
     if (jpg) {
+        texture->Width = jpg->width;
+        texture->Height = jpg->height;
+        texture->PSM = GS_PSM_CT24;
         texture->Mem = jpg->buffer;
-        texUpdate(texture, jpg->width, jpg->height);
         free(jpg);
         result = 0;
     }
@@ -561,32 +601,17 @@ int texJpgLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
 /// BMP SUPPORT ///////////////////////////////////////////////////////////////////////////////////////
 
 extern GSGLOBAL *gsGlobal;
-int texBmpLoad(GSTEXTURE *texture, const char *path, int texId, short psm)
+static int texBmpLoad(GSTEXTURE *texture, const char *filePath)
 {
-    texPrepare(texture, GS_PSM_CT24);
-    char filePath[256];
+    texPrepare(texture);
 
-    if (texId != -1)
-        snprintf(filePath, sizeof(filePath), "%s%s.bmp", path, internalDefault[texId].name);
-    else
-        snprintf(filePath, sizeof(filePath), "%s.bmp", path);
-
-    texture->Delayed = 1;
-    if (gsKit_texture_bmp(gsGlobal, texture, filePath) < 0)
+    if (gsKit_texture_bmp(gsGlobal, texture, (char *)filePath) < 0)
         return ERR_BAD_FILE;
 
     texture->Filter = GS_FILTER_LINEAR;
 
     if (texSizeValidate(texture->Width, texture->Height, texture->PSM) < 0) {
-        if (texture->Mem) {
-            free(texture->Mem);
-            texture->Mem = NULL;
-        }
-        if (texture->Clut) {
-            free(texture->Clut);
-            texture->Clut = NULL;
-        }
-
+        texFree(texture);
         return ERR_BAD_DIMENSION;
     }
 

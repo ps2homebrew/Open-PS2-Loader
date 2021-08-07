@@ -316,9 +316,7 @@ static void freeImageTexture(image_texture_t *texture)
 
 static image_texture_t *initImageTexture(const char *themePath, config_set_t *themeConfig, const char *name, const char *imgName, int isOverlay)
 {
-    int psm = isOverlay ? GS_PSM_CT32 : GS_PSM_CT24;
     image_texture_t *texture = (image_texture_t *)malloc(sizeof(image_texture_t));
-    texPrepare(&texture->source, psm);
     texture->name = NULL;
 
     int texId = -1;
@@ -327,12 +325,12 @@ static image_texture_t *initImageTexture(const char *themePath, config_set_t *th
     if (themePath) {
         char path[256];
         snprintf(path, sizeof(path), "%s%s", themePath, imgName);
-        if (texDiscoverLoad(&texture->source, path, texId, psm) >= 0)
+        if (texDiscoverLoad(&texture->source, path, texId) >= 0)
             ;
         result = 1;
     } else {
         texId = texLookupInternalTexId(imgName);
-        if (texDiscoverLoad(&texture->source, NULL, texId, psm) >= 0)
+        if (texLoadInternal(&texture->source, texId) >= 0)
             ;
         result = 1;
     }
@@ -381,12 +379,11 @@ static image_texture_t *initImageTexture(const char *themePath, config_set_t *th
 static image_texture_t *initImageInternalTexture(config_set_t *themeConfig, const char *name)
 {
     image_texture_t *texture = (image_texture_t *)malloc(sizeof(image_texture_t));
-    texPrepare(&texture->source, GS_PSM_CT24);
     texture->name = NULL;
     int result;
 
     if ((result = texLookupInternalTexId(name)) >= 0) {
-        result = texDiscoverLoad(&texture->source, NULL, result, GS_PSM_CT24);
+        result = texLoadInternal(&texture->source, result);
         int length = strlen(name) + 1;
         texture->name = (char *)malloc(length * sizeof(char));
         memcpy(texture->name, name, length);
@@ -1046,8 +1043,7 @@ static void thmFree(theme_t *theme)
             texture = &theme->textures[id];
             if (texture->Mem != NULL) {
                 rmUnloadTexture(texture);
-                free(texture->Mem);
-                texture->Mem = NULL;
+                texFree(texture);
             }
         }
 
@@ -1087,10 +1083,10 @@ static int thmLoadResource(GSTEXTURE *texture, int texId, const char *themePath,
     int success = -1;
 
     if (themePath != NULL)
-        success = texDiscoverLoad(texture, themePath, texId, psm); // only set success here
+        success = texDiscoverLoad(texture, themePath, texId); // only set success here
 
     if ((success < 0) && useDefault)
-        texPngLoad(texture, NULL, texId, psm); // we don't mind the result of "default"
+        texLoadInternal(texture, texId); // we don't mind the result of "default"
 
     return success;
 }
@@ -1217,7 +1213,7 @@ static void thmLoad(const char *themePath)
         newT->textures[i].Mem = NULL;
 
     // LOGO, loaded here to avoid flickering during startup with device in AUTO + theme set
-    texPngLoad(&newT->textures[LOGO_PICTURE], NULL, LOGO_PICTURE, GS_PSM_CT24);
+    texLoadInternal(&newT->textures[LOGO_PICTURE], LOGO_PICTURE);
 
     // First start with busy icon
     const char *themePath_temp = themePath;

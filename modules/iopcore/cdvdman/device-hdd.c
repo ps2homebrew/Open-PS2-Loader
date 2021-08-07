@@ -81,6 +81,11 @@ void DeviceDeinit(void)
 {
 }
 
+int DeviceReady(void)
+{
+    return SCECdComplete;
+}
+
 void DeviceFSInit(void)
 {
 }
@@ -106,7 +111,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     while (sectors) {
         if (!((lsn >= cdvdman_partspecs[CurrentPart].part_offset) && (lsn < (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)))))
             if (cdvdman_get_part_specs(lsn) != 0)
-                return -ENXIO;
+                return SCECdErTRMOPN;
 
         u32 nsectors = (cdvdman_partspecs[CurrentPart].part_offset + (cdvdman_partspecs[CurrentPart].part_size / 2048)) - lsn;
         if (sectors < nsectors)
@@ -114,12 +119,12 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 
         u32 lba = cdvdman_partspecs[CurrentPart].data_start + ((lsn - cdvdman_partspecs[CurrentPart].part_offset) << 2);
         if (ata_device_sector_io(0, (void *)(buffer + offset), lba, nsectors << 2, ATA_DIR_READ) != 0) {
-            return -EIO;
+            return SCECdErREAD;
         }
         offset += nsectors * 2048;
         sectors -= nsectors;
         lsn += nsectors;
     }
 
-    return 0;
+    return SCECdErNO;
 }

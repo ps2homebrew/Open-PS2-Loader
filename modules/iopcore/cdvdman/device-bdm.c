@@ -68,6 +68,13 @@ void DeviceDeinit(void)
     DPRINTF("%s\n", __func__);
 }
 
+int DeviceReady(void)
+{
+    //DPRINTF("%s\n", __func__);
+
+    return (g_bd == NULL) ? SCECdNotReady : SCECdComplete;
+}
+
 void DeviceStop(void)
 {
     DPRINTF("%s\n", __func__);
@@ -108,8 +115,12 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     register u32 r, sectors_to_read, lbound, ubound, nlsn, offslsn;
     register int i, esc_flag = 0;
     u8 *p = (u8 *)buffer;
+    int rv = SCECdErNO;
 
     //DPRINTF("%s(%u, 0x%p, %u)\n", __func__, (unsigned int)lsn, buffer, sectors);
+
+    if (g_bd == NULL)
+        return SCECdErTRMOPN;
 
     lbound = 0;
     ubound = (cdvdman_settings.common.NumParts > 1) ? 0x80000 : 0xFFFFFFFF;
@@ -130,7 +141,10 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
 
             sector = cdvdman_settings.LBAs[i] + (offslsn * g_bd_sectors_per_sector);
             count = sectors_to_read * g_bd_sectors_per_sector;
-            g_bd->read(g_bd, sector, &p[r], count);
+            if (g_bd->read(g_bd, sector, &p[r], count) != count) {
+                rv = SCECdErREAD;
+                break;
+            }
 
             r += sectors_to_read * 2048;
             offslsn += sectors_to_read;
@@ -143,7 +157,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     }
     SignalSema(bdm_io_sema);
 
-    return 0;
+    return rv;
 }
 
 //

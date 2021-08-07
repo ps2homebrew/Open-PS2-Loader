@@ -1,6 +1,6 @@
 # Translation by zidane89
-# Last update: July 21, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
+# Last update: August 06, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Vietnamese
 OPL %s
@@ -45,7 +45,7 @@ Danh sách trò chơi
 Cài đặt Game
 Remove Settings
 Removed all keys for the game
-Cuộn
+Scrolling Speed
 Chậm
 Thường
 Nhanh
@@ -284,6 +284,7 @@ Developer
 Description
 BDM Games
 Select Block Devices
+Controller Settings
 Các trò chơi PS1 
 Chế độ hiển thị cho game PS1 
 POPSTARTER.ELF không có ở '%s'!

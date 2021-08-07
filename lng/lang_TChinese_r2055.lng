@@ -1,6 +1,6 @@
 # Translated by kane159 and eyu2007
-# Last update: July 21, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2027-48f95c9-2021-07-21 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1703-4c44ccd-2021-07-21
+# Last update: August 06, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
 OPL %s
@@ -45,7 +45,7 @@ X
 遊戲設置
 刪除設置
 刪除遊戲所有的設置
-選定項滾動速度
+Scrolling Speed
 較慢
 中等
 較快
@@ -284,6 +284,7 @@ Developer
 Description
 BDM Games
 Select Block Devices
+Controller Settings
 PS1遊戲
 PS1遊戲啟動模式
 POPSTARTER.ELF在\'%s\'上找不到!

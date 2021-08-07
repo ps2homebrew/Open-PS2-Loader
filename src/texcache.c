@@ -1,5 +1,6 @@
 #include "include/opl.h"
 #include "include/texcache.h"
+#include "include/textures.h"
 #include "include/ioman.h"
 #include "include/gui.h"
 #include "include/util.h"
@@ -34,16 +35,7 @@ static void cacheLoadImage(void *data)
 
     // seems okay. we can proceed
     GSTEXTURE *texture = &req->entry->texture;
-    if (texture->Mem != NULL) {
-        free(texture->Mem);
-        texture->Mem = NULL;
-        texture->ClutPSM = 0;
-        if (texture->Clut != NULL)
-            free(texture->Clut);
-        texture->Clut = NULL;
-        texture->Vram = 0;
-        texture->VramClut = 0;
-    }
+    texFree(texture);
 
     if (handler->itemGetImage(req->cache->prefix, req->cache->isPrefixRelative, req->value, req->cache->suffix, texture, GS_PSM_CT24) < 0)
         req->entry->lastUsed = 0;

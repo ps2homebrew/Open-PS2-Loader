@@ -849,6 +849,8 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     }
 #endif
 
+    LOG("Leaving OPL GUI, starting eecore...\n");
+
     // Let's go.
     fileXioExit();
     SifExitRpc();

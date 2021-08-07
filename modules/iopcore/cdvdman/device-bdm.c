@@ -13,7 +13,7 @@
 extern struct cdvdman_settings_bdm cdvdman_settings;
 static struct block_device *g_bd = NULL;
 static u32 g_bd_sectors_per_sector = 4;
-static int usb_io_sema;
+static int bdm_io_sema;
 
 extern struct irx_export_table _exp_bdm;
 
@@ -29,7 +29,7 @@ void bdm_connect_bd(struct block_device *bd)
         g_bd = bd;
         g_bd_sectors_per_sector = (2048 / bd->sectorSize);
         // Free usage of block device
-        SignalSema(usb_io_sema);
+        SignalSema(bdm_io_sema);
     }
 }
 
@@ -38,7 +38,7 @@ void bdm_disconnect_bd(struct block_device *bd)
     DPRINTF("disconnecting device %s%dp%d\n", bd->name, bd->devNr, bd->parNr);
 
     // Lock usage of block device
-    WaitSema(usb_io_sema);
+    WaitSema(bdm_io_sema);
     if (g_bd == bd)
         g_bd = NULL;
 }
@@ -58,7 +58,7 @@ void DeviceInit(void)
     smp.max = 1;
     smp.option = 0;
     smp.attr = SA_THPRI;
-    usb_io_sema = CreateSema(&smp);
+    bdm_io_sema = CreateSema(&smp);
 
     RegisterLibraryEntries(&_exp_bdm);
 }
@@ -84,16 +84,16 @@ void DeviceFSInit(void)
         DPRINTF("USB: LBAs[%d] = %lu\n", i, cdvdman_settings.LBAs[i]);
 
     DPRINTF("Waiting for device...\n");
-    WaitSema(usb_io_sema);
+    WaitSema(bdm_io_sema);
     DPRINTF("Waiting for device...done!\n");
-    SignalSema(usb_io_sema);
+    SignalSema(bdm_io_sema);
 }
 
 void DeviceLock(void)
 {
     DPRINTF("%s\n", __func__);
 
-    WaitSema(usb_io_sema);
+    WaitSema(bdm_io_sema);
 }
 
 void DeviceUnmount(void)
@@ -117,7 +117,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
     r = nlsn = 0;
     sectors_to_read = sectors;
 
-    WaitSema(usb_io_sema);
+    WaitSema(bdm_io_sema);
     for (i = 0; i < cdvdman_settings.common.NumParts; i++, lbound = ubound, ubound += 0x80000, offslsn -= 0x80000) {
 
         if (lsn >= lbound && lsn < ubound) {
@@ -141,7 +141,7 @@ int DeviceReadSectors(u32 lsn, void *buffer, unsigned int sectors)
         if (esc_flag)
             break;
     }
-    SignalSema(usb_io_sema);
+    SignalSema(bdm_io_sema);
 
     return 0;
 }
@@ -154,16 +154,16 @@ void bdm_readSector(unsigned int lba, unsigned short int nsectors, unsigned char
 {
     DPRINTF("%s\n", __func__);
 
-    WaitSema(usb_io_sema);
+    WaitSema(bdm_io_sema);
     g_bd->read(g_bd, lba, buffer, nsectors);
-    SignalSema(usb_io_sema);
+    SignalSema(bdm_io_sema);
 }
 
 void bdm_writeSector(unsigned int lba, unsigned short int nsectors, const unsigned char *buffer)
 {
     DPRINTF("%s\n", __func__);
 
-    WaitSema(usb_io_sema);
+    WaitSema(bdm_io_sema);
     g_bd->write(g_bd, lba, buffer, nsectors);
-    SignalSema(usb_io_sema);
+    SignalSema(bdm_io_sema);
 }

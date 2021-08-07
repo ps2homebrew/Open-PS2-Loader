@@ -287,13 +287,13 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
                         // Check VMC cluster chain for fragmentation (write operation can cause damage to the filesystem).
                         if (fileXioIoctl(fd, USBMASS_IOCTL_CHECK_CHAIN, "") == 1) {
-                            LOG("USBSUPPORT Cluster Chain OK\n");
+                            LOG("BDMSUPPORT Cluster Chain OK\n");
                             have_error = 0;
                             bdm_vmc_infos.active = 1;
                             bdm_vmc_infos.start_sector = start;
-                            LOG("USBSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
+                            LOG("BDMSUPPORT VMC slot %d start: 0x%X\n", vmc_id, start);
                         } else {
-                            LOG("USBSUPPORT Cluster Chain NG\n");
+                            LOG("BDMSUPPORT Cluster Chain NG\n");
                             have_error = 2;
                         }
                     }
@@ -423,14 +423,14 @@ static int bdmGetImage(char *folder, int isRelative, char *value, char *suffix, 
         snprintf(path, sizeof(path), "%s%s/%s_%s", bdmPrefix, folder, value, suffix);
     else
         snprintf(path, sizeof(path), "%s%s_%s", folder, value, suffix);
-    return texDiscoverLoad(resultTex, path, -1, psm);
+    return texDiscoverLoad(resultTex, path, -1);
 }
 
 // This may be called, even if bdmInit() was not.
 static void bdmCleanUp(int exception)
 {
     if (bdmGameList.enabled) {
-        LOG("USBSUPPORT CleanUp\n");
+        LOG("BDMSUPPORT CleanUp\n");
 
         free(bdmGames);
 
@@ -443,7 +443,7 @@ static void bdmCleanUp(int exception)
 static void bdmShutdown(void)
 {
     if (bdmGameList.enabled) {
-        LOG("USBSUPPORT Shutdown\n");
+        LOG("BDMSUPPORT Shutdown\n");
 
         free(bdmGames);
     }

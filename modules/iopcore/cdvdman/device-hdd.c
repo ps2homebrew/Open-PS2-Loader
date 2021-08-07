@@ -55,7 +55,7 @@ void DeviceInit(void)
     hdl_apa_header apaHeader;
     int r;
 
-    DPRINTF("fs_init: apa header LBA = %lu\n", cdvdman_settings.lba_start);
+    DPRINTF("DeviceInit: apa header LBA = %lu\n", cdvdman_settings.lba_start);
 
 #ifdef HD_PRO
     //For HDPro, as its custom ATAD module does not export ata_io_start() and ata_io_finish(). And it also resets the ATA bus.
@@ -66,7 +66,7 @@ void DeviceInit(void)
 #endif
 
     while ((r = ata_device_sector_io(0, &apaHeader, cdvdman_settings.lba_start, 2, ATA_DIR_READ)) != 0) {
-        DPRINTF("fs_init: failed to read apa header %d\n", r);
+        DPRINTF("DeviceInit: failed to read apa header %d\n", r);
         DelayThread(2000);
     }
 

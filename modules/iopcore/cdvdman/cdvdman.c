@@ -147,11 +147,7 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
     DPRINTF("cdvdman_read lsn=%lu sectors=%u buf=%p\n", lsn, sectors, buf);
 
     cdvdman_stat.err = SCECdErNO;
-
     for (ptr = buf, remaining = sectors; remaining > 0;) {
-        if (cdvdman_stat.err != SCECdErNO)
-            break;
-
         SectorsToRead = remaining;
 
         if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS) {
@@ -167,8 +163,8 @@ static int cdvdman_read_sectors(u32 lsn, unsigned int sectors, void *buf)
             SetAlarm(&TargetTime, &cdvdemu_read_end_cb, NULL);
         }
 
-        if (DeviceReadSectors(lsn, ptr, SectorsToRead) != 0) {
-            cdvdman_stat.err = SCECdErREAD;
+        cdvdman_stat.err = DeviceReadSectors(lsn, ptr, SectorsToRead);
+        if (cdvdman_stat.err != SCECdErNO) {
             if (cdvdman_settings.common.flags & IOPCORE_COMPAT_ACCU_READS)
                 CancelAlarm(&cdvdemu_read_end_cb, NULL);
             break;

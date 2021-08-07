@@ -127,7 +127,7 @@ int sceCdDiskReady(int mode)
         }
 
         if (!sync_flag)
-            return SCECdComplete;
+            return DeviceReady();
     }
 
     return SCECdNotReady;

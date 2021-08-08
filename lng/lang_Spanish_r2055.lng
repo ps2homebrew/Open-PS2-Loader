@@ -1,5 +1,5 @@
-# Translation by lauchon22
-# Last update: August 06, 2021
+# Translation by lauchon22 and destro
+# Last update: August 07, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Spanish
@@ -45,7 +45,7 @@ Lista de juegos
 Ajustes
 Eliminar configuración
 Ajustes del juego borrados
-Scrolling Speed
+Velocidad de Desplazamiento
 Lento
 Medio
 Rápido
@@ -283,8 +283,8 @@ Lanzamiento
 Desarrollador
 Descripción
 Juegos BDM
-Select Block Devices
-Controller Settings
+Seleccionar Dispositivos de Entrada
+Ajustes de Mando
 Juegos de PS1
 Modo de visualización de juegos de PS1
 ¡POPSTARTER.ELF no se encuentra en '%s'!

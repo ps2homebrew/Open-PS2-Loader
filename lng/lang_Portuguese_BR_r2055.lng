@@ -1,5 +1,5 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: August 06, 2021
+# Last update: August 07, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
@@ -45,7 +45,7 @@ Lista de jogos
 Ajustes
 Remover configurações
 Todos os ajustes do jogo foram removidos
-Scrolling Speed
+Velocidade de rolagem
 Lenta
 Média
 Rápida
@@ -283,8 +283,8 @@ Data de lançamento
 Desenvolvedor
 Descrição
 Jogos BDM
-Selecione os Dispositivos de Entrada
-Controller Settings
+Selecionar dispositivos de entrada
+Configurar controles
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

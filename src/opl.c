@@ -125,7 +125,6 @@ static opl_io_module_t list_support[MODE_COUNT];
 
 // Global data
 char *gBaseMCDir;
-char *gHDDPrefix;
 int ps2_ip_use_dhcp;
 int ps2_ip[4];
 int ps2_netmask[4];
@@ -189,6 +188,9 @@ unsigned char gDefaultBgColor[3];
 unsigned char gDefaultTextColor[3];
 unsigned char gDefaultSelTextColor[3];
 unsigned char gDefaultUITextColor[3];
+hdl_game_info_t *gAutoLaunchGame;
+char gOPLPart[128];
+char *gHDDPrefix;
 
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 {
@@ -1534,8 +1536,10 @@ static void setDefaults(void)
     clearIOModuleT(&list_support[HDD_MODE]);
     clearIOModuleT(&list_support[APP_MODE]);
 
-    gBaseMCDir = "mc?:OPL";
+    gAutoLaunchGame = NULL;
+    gOPLPart[0] = '\0';
     gHDDPrefix = "pfs0:";
+    gBaseMCDir = "mc?:OPL";
 
     ps2_ip_use_dhcp = 1;
     gETHOpMode = ETH_OP_MODE_AUTO;
@@ -1671,6 +1675,54 @@ static void deferredAudioInit(void)
         LOG("sfxInit: %d samples loaded.\n", ret);
 }
 
+static void autoLaunchHDDGame(char *argv[])
+{
+    int ret;
+    char path[256];
+    config_set_t *configSet;
+
+    setDefaults();
+
+    gAutoLaunchGame = malloc(sizeof(hdl_game_info_t));
+    if (gAutoLaunchGame == NULL) {
+        PREINIT_LOG("Failed to allocate memory. Loading GUI\n");
+        return;
+    }
+
+    memset(gAutoLaunchGame, 0, sizeof(hdl_game_info_t));
+
+    snprintf(gAutoLaunchGame->startup, sizeof(gAutoLaunchGame->startup), argv[1]);
+    gAutoLaunchGame->start_sector = strtoul(argv[2], NULL, 0);
+    snprintf(gOPLPart, sizeof(gOPLPart), "hdd0:%s", argv[3]);
+
+    configInit(NULL);
+
+    ioInit();
+    LOG_ENABLE();
+
+    hddLoadModules();
+
+    ret = configReadMulti(CONFIG_ALL);
+    if (CONFIG_ALL & CONFIG_OPL) {
+        if (!(ret & CONFIG_OPL))
+            ret = checkLoadConfigHDD(CONFIG_ALL);
+
+        if (ret & CONFIG_OPL) {
+            config_set_t *configOPL = configGetByType(CONFIG_OPL);
+
+            configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
+            configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
+            configGetInt(configOPL, CONFIG_OPL_HDD_SPINDOWN, &gHDDSpindown);
+        }
+    }
+
+    snprintf(path, sizeof(path), "%sCFG/%s.cfg", gHDDPrefix, gAutoLaunchGame->startup);
+    configSet = configAlloc(0, NULL, path);
+    configRead(configSet);
+
+    hddLaunchGame(-1, configSet);
+}
+
 // --------------------- Main --------------------
 int main(int argc, char *argv[])
 {
@@ -1685,6 +1737,17 @@ int main(int argc, char *argv[])
 
     // reset, load modules
     reset();
+
+    /* argv[0] boot path
+       argv[1] game->startup
+       argv[2] str to u32 game->start_sector
+       argv[3] opl partition read from hdd0:__common/OPL/conf_hdd.cfg
+       argv[4] "mini" */
+    if (argc >= 5) {
+        if (!strcmp(argv[4], "mini"))
+            autoLaunchHDDGame(argv);
+    }
+
     init();
 
     // until this point in the code is reached, only PREINIT_LOG macro should be used

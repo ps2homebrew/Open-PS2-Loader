@@ -38,6 +38,8 @@
 #include <ps2smb.h>
 #include "config.h"
 
+#include "include/hddsupport.h"
+
 // Last Played Auto Start
 #include <time.h>
 
@@ -173,7 +175,6 @@ extern int gDefaultDevice;
 
 extern int gEnableWrite;
 
-extern char *gHDDPrefix;
 // These prefixes are relative to the device's name (meaning that they do not include the device name).
 extern char gBDMPrefix[32];
 extern char gETHPrefix[32];
@@ -190,6 +191,10 @@ extern unsigned char gDefaultBgColor[3];
 extern unsigned char gDefaultTextColor[3];
 extern unsigned char gDefaultSelTextColor[3];
 extern unsigned char gDefaultUITextColor[3];
+
+extern hdl_game_info_t *gAutoLaunchGame;
+extern char *gHDDPrefix;
+extern char gOPLPart[128];
 
 void setDefaultColors(void);
 

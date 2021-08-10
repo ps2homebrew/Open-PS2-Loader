@@ -27,7 +27,7 @@ typedef struct
 
 typedef struct
 {
-    char name[UL_GAME_NAME_MAX];
+    char name[UL_GAME_NAME_MAX + 1];
     char startup[15];
     u8 parts;
     u8 media; // Disc type

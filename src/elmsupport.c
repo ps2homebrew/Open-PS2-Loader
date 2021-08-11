@@ -218,7 +218,7 @@ static int elmScanVCDsHDD()
 {
     int fd, fd2, MountFD = 0, count = 0;
     const char *mountPoint = "pfs1:";
-    char partition[250];
+    char partition[261];
     iox_dirent_t record;
 
     char scanned[10][9];

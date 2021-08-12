@@ -37,7 +37,7 @@ int EnableCheatOp;
 int EnablePadEmuOp;
 int PadEmuSettings;
 #endif
-int DisableDebug;
+int EnableDebug;
 int *gCheatList; // Store hooks/codes addr+val pairs
 
 static int eecoreInit(int argc, char **argv)
@@ -64,10 +64,10 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("Game Mode = %d\n", GameMode);
 
     p = _strtok(NULL, " ");
-    DisableDebug = 0;
+    EnableDebug = 0;
     if (!_strncmp(p, "1", 1)) {
-        DisableDebug = 1;
-        DPRINTF("Debug Colors disabled\n");
+        EnableDebug = 1;
+        DPRINTF("Debug Colors enabled\n");
     }
 
     p = _strtok(NULL, " ");
@@ -153,7 +153,7 @@ static int eecoreInit(int argc, char **argv)
     DPRINTF("Installing Kernel Hooks...\n");
     Install_Kernel_Hooks();
 
-    if (!DisableDebug)
+    if (EnableDebug)
         GS_BGCOLOUR = 0xff0000; // Blue
 
     SifExitRpc();

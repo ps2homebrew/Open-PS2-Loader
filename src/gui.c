@@ -458,7 +458,7 @@ void guiShowConfig()
     diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
-    diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
+    diaSetInt(diaConfig, CFG_DEBUG, gEnableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
     diaSetInt(diaConfig, CFG_HDDGAMELISTCACHE, gHDDGameListCache);
     diaSetString(diaConfig, CFG_EXITTO, gExitPath);
@@ -480,7 +480,7 @@ void guiShowConfig()
 
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
-        diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
+        diaGetInt(diaConfig, CFG_DEBUG, &gEnableDebug);
         diaGetInt(diaConfig, CFG_PS2LOGO, &gPS2Logo);
         diaGetInt(diaConfig, CFG_HDDGAMELISTCACHE, &gHDDGameListCache);
         diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
@@ -1364,7 +1364,7 @@ static void guiDrawOverlays()
     }
 
     // BLURT output
-    // if (!gDisableDebug)
+    // if (gEnableDebug)
     //     fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
 }
 

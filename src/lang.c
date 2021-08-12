@@ -60,7 +60,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Error while loading the Game ID.",
     "Automatic Sorting",
     "Error loading the language file.",
-    "Disable Debug Colors",
+    "Debug Colors",
     "No controller detected, waiting...",
     "Enable Cover Art",
     "Widescreen",

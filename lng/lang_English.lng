@@ -21,7 +21,6 @@
 #
 # Put here the English name of your language (will be displayed in the OPL Settings menu), in standard latin characters.
 English template
-Open PS2 Loader %s
 Save Changes
 Back
 Network Settings
@@ -32,7 +31,7 @@ Error writing settings!
 Exit
 Settings
 Menu
-USB Games
+BDM Games
 HDD Games
 ETH Games
 Apps
@@ -62,7 +61,6 @@ Cross
 Games List
 Game Settings
 Remove Settings
-Removed all keys for the game.
 Scrolling Speed
 Slow
 Medium
@@ -75,14 +73,14 @@ Automatic Sorting
 Error loading the language file.
 Debug Colors
 No controller detected, waiting...
-Enable Cover Art
+Cover Art
 Widescreen
 Power Off
 Loading config...
 Saving config...
 Start Device
 Refresh
-BDM Device Start Mode
+BDM Start Mode
 HDD Device Start Mode
 ETH Device Start Mode
 Applications Start Mode
@@ -96,7 +94,6 @@ NBD Server unloading...
 IGR Path
 Background Color
 Text Color
-- PS2 -
 - SMB Server -
 IP Address Type
 Static
@@ -120,7 +117,7 @@ Rename
 Delete
 Run
 Display Settings
-Enable Write Operations
+Write Operations
 Remember Last Played Game
 Select Button
 Error, the game is fragmented.
@@ -133,8 +130,6 @@ Unhook Syscalls
 Skip Videos
 Emulate DVD-DL
 Disable IGR
-Unused
-Unused
 Changing the size will reformat the VMC.
 Create
 Start
@@ -184,8 +179,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 Configure GSM
 Ethernet Link Mode
 100Mbit Full-duplex
@@ -193,9 +186,8 @@ Ethernet Link Mode
 10Mbit Full-duplex
 10Mbit Half-duplex
 GSM Settings
-Enable GSM
+GSM Selector
 Toggles GSM on/off.
-VMODE
 Forced custom display mode.
 H-POS
 Horizontal adjustment.
@@ -206,7 +198,7 @@ Overscan adjustment.
 FMV Skip
 Skips full motion videos.
 Cheat Settings
-Enable PS2RD Cheat Engine
+PS2RD Cheat Engine
 Lets PS2RD Cheat Engine patch your game.
 PS2RD Cheat Engine Mode
 Auto select or select game cheats.
@@ -231,7 +223,7 @@ PS2 Logo
 Displayed for a valid disc logo matching the console's region.
 Configure PADEMU
 Pad Emulator Settings
-Enable Pad Emulator
+Pad Emulator
 Turns on/off Pad Emulator for selected game.
 Pad Emulator Mode
 Select Pad Emulator mode.
@@ -239,9 +231,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Settings For Port:
 Select Pad Emulator port for settings.
-Enable Emulation
+Emulation
 Turns on/off Pad Emulator for selected port.
-Enable Vibration
+Vibration
 Turns on/off vibration for Pad Emulator selected port.
 USB Bluetooth Adapter MAC Address:
 DS Controller Paired To MAC Address:
@@ -259,7 +251,7 @@ Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap Emulation
+Multitap Emulation
 Turns on/off Multitap emulation for selected game.
 Multitap Emulator On Port:
 Select port for Multitap emulation.
@@ -277,13 +269,13 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
+Notifications
 %s loaded from %s
 Options
 Game settings saved.
@@ -300,6 +292,7 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).

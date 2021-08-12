@@ -538,14 +538,14 @@ int CheckPS2Logo(int fd, u32 lba)
             } else {
                 strcat(text, "don't match!");
             }
-            if (!gDisableDebug)
+            if (gEnableDebug)
                 guiWarning(text, 12);
         } else {
-            if (!gDisableDebug)
+            if (gEnableDebug)
                 guiWarning("Not a valid PS2 Logo first byte!", 12);
         }
     } else {
-        if (!gDisableDebug)
+        if (gEnableDebug)
             guiWarning("Error reading first 12 disc sectors (PS2 Logo)!", 25);
     }
     return ValidPS2Logo;

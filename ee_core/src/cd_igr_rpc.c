@@ -9,7 +9,7 @@ int oplIGRShutdown(int poff)
 {
     SifRpcClientData_t _igr_cd;
     int r;
-    s32 poffData;
+    s32 poffData __attribute__((aligned(64)));
 
     _igr_cd.server = NULL;
     while ((r = SifBindRpc(&_igr_cd, 0x80000598, 0)) >= 0 && (!_igr_cd.server))

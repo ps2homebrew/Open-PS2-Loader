@@ -249,29 +249,23 @@ static void guiResetNotifications(void)
     popupTimer = 0;
 }
 
-static void guiRenderNotifications(char *type, char *path, int y)
+static void guiRenderNotifications(char *string, int y)
 {
-    char notification[128];
-    char *col_pos;
     int x;
 
-    snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), type, path);
-    if ((col_pos = strchr(notification, ':')) != NULL)
-        *(col_pos + 1) = '\0';
-
-    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], string)) - 10;
 
     rmDrawRect(x - 10, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, string, gTheme->textColor);
 }
 
 static void guiShowNotifications(void)
 {
+    char notification[128];
+    char *col_pos;
     int y = 10;
     int yadd = 35;
-    clock_t currentTime;
 
-    currentTime = clock();
     if (showThmPopup || showLngPopup || showCfgPopup) {
         if (!popupTimer) {
             popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
@@ -279,19 +273,32 @@ static void guiShowNotifications(void)
         }
 
         if (showCfgPopup) {
-            guiRenderNotifications("CFG", configGetDir(), y);
+            snprintf(notification, sizeof(notification), _l(_STR_CFG_NOTIFICATION), configGetDir());
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiRenderNotifications(notification, y);
             y += yadd;
         }
 
         if (showThmPopup) {
-            guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
+            snprintf(notification, sizeof(notification), _l(_STR_THM_NOTIFICATION), thmGetFilePath(thmGetGuiValue()));
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiRenderNotifications(notification, y);
             y += yadd;
         }
 
-        if (showLngPopup)
-            guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
+        if (showLngPopup) {
+            snprintf(notification, sizeof(notification), _l(_STR_LNG_NOTIFICATION), lngGetFilePath(lngGetGuiValue()));
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
 
-        if (currentTime >= popupTimer) {
+            guiRenderNotifications(notification, y);
+        }
+
+        if (clock() >= popupTimer) {
             guiResetNotifications();
             showCfgPopup = 0;
         }

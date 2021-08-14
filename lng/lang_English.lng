@@ -276,7 +276,9 @@ Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
 Notifications
-%s loaded from %s
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
 Options
 Game settings saved.
 %s settings removed.

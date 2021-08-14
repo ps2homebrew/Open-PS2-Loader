@@ -266,6 +266,7 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Config loaded from %s",
     "Theme loaded from %s",
     "Language loaded from %s",
+    "%s partition mounted.",
     "Options",
     "Game settings saved.",
     "%s settings removed.",

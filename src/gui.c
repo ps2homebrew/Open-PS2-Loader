@@ -44,10 +44,11 @@ static ee_sema_t gQueueSema;
 static int screenWidth;
 static int screenHeight;
 
+static int showPartPopup = 0;
 static int showThmPopup;
 static int showLngPopup;
 
-static clock_t popupTimer = 0;
+static clock_t popupTimer;
 
 // forward decl.
 static void guiShow();
@@ -266,10 +267,19 @@ static void guiShowNotifications(void)
     int y = 10;
     int yadd = 35;
 
-    if (showThmPopup || showLngPopup || showCfgPopup) {
+    if (showPartPopup || showThmPopup || showLngPopup || showCfgPopup) {
         if (!popupTimer) {
             popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
             sfxPlay(SFX_MESSAGE);
+        }
+
+        if (showPartPopup) {
+            col_pos = strchr(gOPLPart, ':');
+            col_pos++;
+
+            snprintf(notification, sizeof(notification), _l(_STR_PARTITION_NOTIFICATION), col_pos);
+            guiRenderNotifications(notification, y);
+            y += yadd;
         }
 
         if (showCfgPopup) {
@@ -300,6 +310,7 @@ static void guiShowNotifications(void)
 
         if (clock() >= popupTimer) {
             guiResetNotifications();
+            showPartPopup = 0;
             showCfgPopup = 0;
         }
     }
@@ -1465,6 +1476,9 @@ void guiMainLoop(void)
 {
     guiResetNotifications();
     guiCheckNotifications(1, 1);
+
+    if (gOPLPart[0] != NULL)
+        showPartPopup = 1;
 
     while (!gTerminate) {
         guiStartFrame();

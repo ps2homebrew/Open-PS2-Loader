@@ -378,7 +378,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
 int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gamecount)
 {
     int fd, size, id = 0, result;
-    int count;
+    int count, ulcount;
     char path[256];
 
     free(*list);
@@ -409,28 +409,32 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
             count = 0;
         size = getFileSize(fd);
         *fsize = size;
-        count += size / sizeof(USBExtreme_game_entry_t);
+        ulcount = size / sizeof(USBExtreme_game_entry_t);
 
-        if (count > 0) {
-            if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count)) != NULL) {
-                memset(*list, 0, sizeof(base_game_info_t) * count);
+        if (ulcount > 0) {
+            if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * ulcount)) != NULL) {
+                memset(*list, 0, sizeof(base_game_info_t) * ulcount);
 
                 while (size > 0) {
                     read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
-
-                    base_game_info_t *g = &(*list)[id++];
-
-                    // to ensure no leaks happen, we copy manually and pad the strings
-                    memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);
-                    g->name[UL_GAME_NAME_MAX] = '\0';
-                    memcpy(g->startup, &GameEntry.startup[3], GAME_STARTUP_MAX);
-                    g->startup[GAME_STARTUP_MAX] = '\0';
-                    g->extension[0] = '\0';
-                    g->parts = GameEntry.parts;
-                    g->media = GameEntry.media;
-                    g->format = GAME_FORMAT_USBLD;
-                    g->sizeMB = -1;
                     size -= sizeof(USBExtreme_game_entry_t);
+
+                    // populate game entry in list only if it has valid magic
+                    if (!memcmp(GameEntry.magic, "ul.", 3)) {
+                        base_game_info_t *g = &(*list)[id++];
+                        count++;
+
+                        // to ensure no leaks happen, we copy manually and pad the strings
+                        memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);
+                        g->name[UL_GAME_NAME_MAX] = '\0';
+                        memcpy(g->startup, GameEntry.startup, GAME_STARTUP_MAX);
+                        g->startup[GAME_STARTUP_MAX] = '\0';
+                        g->extension[0] = '\0';
+                        g->parts = GameEntry.parts;
+                        g->media = GameEntry.media;
+                        g->format = GAME_FORMAT_USBLD;
+                        g->sizeMB = -1;
+                    }
                 }
             }
         }
@@ -619,15 +623,15 @@ void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, 
 
         memset(&GameEntry, 0, sizeof(GameEntry));
         GameEntry.Byte08 = 0x08; // just to be compatible with original ul.cfg
-        strcpy(GameEntry.startup, "ul.");
+        memcpy(GameEntry.magic, "ul.", 3);
 
         for (i = 0; i < gamecount; i++) {
             game = &(*list)[i];
 
             if (game->format == GAME_FORMAT_USBLD && (i != excludeID)) {
-                memset(&GameEntry.startup[3], 0, GAME_STARTUP_MAX);
+                memcpy(GameEntry.startup, game->startup, GAME_STARTUP_MAX);
                 memcpy(GameEntry.name, game->name, UL_GAME_NAME_MAX);
-                strncpy(&GameEntry.startup[3], game->startup, GAME_STARTUP_MAX);
+                // don't fill last symbol with zero, cause leading symbol can be useful character
                 GameEntry.parts = game->parts;
                 GameEntry.media = game->media;
 

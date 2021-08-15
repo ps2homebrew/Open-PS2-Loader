@@ -27,13 +27,14 @@ typedef struct
 
 typedef struct
 {
-    char name[UL_GAME_NAME_MAX];
-    char startup[15];
-    u8 parts;
-    u8 media; // Disc type
-    u8 unknown[4];
-    u8 Byte08; // Always 0x08
-    u8 unknown2[10];
+    char name[UL_GAME_NAME_MAX];    // it is not a string but character array, terminating NULL is not necessary
+    char magic[3];                  // magic string "ul."
+    char startup[GAME_STARTUP_MAX]; // it is not a string but character array, terminating NULL is not necessary
+    u8 parts;                       // slice count
+    u8 media;                       // Disc type
+    u8 unknown[4];                  // Always zero
+    u8 Byte08;                      // Always 0x08
+    u8 unknown2[10];                // Always zero
 } USBExtreme_game_entry_t;
 
 int sbIsSameSize(const char *prefix, int prevSize);

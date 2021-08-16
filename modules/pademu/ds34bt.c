@@ -348,7 +348,7 @@ static u8 l2cap_cmd_buf[MAX_BUFFER_SIZE + 32] __attribute((aligned(4))) = {0};
 
 static u8 identifier = 0;
 static u8 press_emu = 0;
-static u8 disable_fake = 0;
+static u8 enable_fake = 0;
 
 static ds34bt_pad_t ds34pad[MAX_PADS];
 
@@ -660,7 +660,7 @@ static void HCI_event_task(int result)
                 pad = i;
                 mips_memcpy(ds34pad[pad].bdaddr, hci_buf + 2, 6);
                 ds34pad[pad].isfake = 0;
-                if (!disable_fake) {
+                if (enable_fake) {
                     ds34pad[pad].isfake = 1;                              // fake ds3
                     for (i = 0; i < sizeof(GenuineMacAddress) / 3; i++) { // check if ds3 is genuine
                         if (ds34pad[pad].bdaddr[5] == GenuineMacAddress[i][0] &&
@@ -1475,7 +1475,7 @@ int ds34bt_init(u8 pads, u8 options)
 
     ds34pad_init();
 
-    disable_fake = options & 1;
+    enable_fake = options & 1;
 
     bt_dev.hid_sema = CreateMutex(IOP_MUTEX_UNLOCKED);
 

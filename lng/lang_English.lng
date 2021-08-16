@@ -255,8 +255,8 @@ Multitap Emulation
 Turns on/off Multitap emulation for selected game.
 Multitap Emulator On Port:
 Select port for Multitap emulation.
-Disable Fake DS3 Workaround
-Some fake DS3s need workaround, this option will disable it.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings

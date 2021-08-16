@@ -378,7 +378,7 @@ static int scanForISO(char *path, char type, struct game_list_t **glist)
 int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gamecount)
 {
     int fd, size, id = 0, result;
-    int count, ulcount;
+    int count;
     char path[256];
 
     free(*list);
@@ -403,6 +403,7 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
     snprintf(path, sizeof(path), "%sul.cfg", prefix);
     fd = openFile(path, O_RDONLY);
     if (fd >= 0) {
+        int ulcount;
         USBExtreme_game_entry_t GameEntry;
 
         if (count < 0)
@@ -421,6 +422,9 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
 
                     // populate game entry in list only if it has valid magic
                     if (!memcmp(GameEntry.magic, "ul.", 3)) {
+                        int ulfd = 1;
+                        u8 part;
+                        unsigned int name_checksum;
                         base_game_info_t *g = &(*list)[id++];
                         count++;
 
@@ -433,7 +437,18 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                         g->parts = GameEntry.parts;
                         g->media = GameEntry.media;
                         g->format = GAME_FORMAT_USBLD;
-                        g->sizeMB = -1;
+                        g->sizeMB = 0;
+                        name_checksum = USBA_crc32(g->name);
+
+                        // calculate total size
+                        for (part = 0; part < g->parts && ulfd >= 0; part++) {
+                            snprintf(path, sizeof(path), "%sul.%08X.%s.%02x", prefix, name_checksum, g->startup, part);
+                            ulfd = openFile(path, O_RDONLY);
+                            if (ulfd >= 0) {
+                                g->sizeMB += (getFileSize(ulfd) >> 20);
+                                close(ulfd);
+                            }
+                        }
                     }
                 }
             }
@@ -631,7 +646,7 @@ void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, 
             if (game->format == GAME_FORMAT_USBLD && (i != excludeID)) {
                 memcpy(GameEntry.startup, game->startup, GAME_STARTUP_MAX);
                 memcpy(GameEntry.name, game->name, UL_GAME_NAME_MAX);
-                // don't fill last symbol with zero, cause leading symbol can be useful character
+                // don't fill last symbol with zero, cause trailing symbol can be useful character
                 GameEntry.parts = game->parts;
                 GameEntry.media = game->media;
 
@@ -706,8 +721,7 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
     configRead(config); // Does not matter if the config file could be loaded or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
-    if (game->sizeMB != -1)
-        configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
+    configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 
     configSetStr(config, CONFIG_ITEM_FORMAT, game->format != GAME_FORMAT_USBLD ? "ISO" : "UL");
     configSetStr(config, CONFIG_ITEM_MEDIA, game->media == SCECdPS2CD ? "CD" : "DVD");

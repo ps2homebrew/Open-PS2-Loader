@@ -165,8 +165,6 @@ static void cdvdman_trimspaces(char *str)
     if (len == 0)
         return;
 
-    i = len - 1;
-
     for (i = len - 1; i != -1; i--) {
         p = &str[i];
         if ((*p != 0x20) && (*p != 0x2e))

@@ -127,7 +127,7 @@ void set_ipconfig(void)
 //--------------------------------------------------------------
 int main(int argc, char *argv[2])
 {
-    int i, ret, id;
+    int i, ret;
 
     init_scr();
     scr_clear();
@@ -167,47 +167,47 @@ int main(int argc, char *argv[2])
     set_ipconfig();
 
     DPRINTF("loading iomanX... ");
-    id = SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading fileXio... ");
-    id = SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading poweroff... ");
-    id = SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading ps2dev9... ");
-    id = SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smsutils... ");
-    id = SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smstcpip... ");
-    id = SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smsmap... ");
-    id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
+    SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading udptty... ");
-    id = SifExecModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&udptty_irx, size_udptty_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading ioptrap... ");
-    id = SifExecModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ioptrap_irx, size_ioptrap_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading ps2link... ");
-    id = SifExecModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2link_irx, size_ps2link_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("loading smbman... ");
-    id = SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smbman_irx, size_smbman_irx, 0, NULL, &ret);
     DPRINTF("ret=%d\n", ret);
 
     DPRINTF("modules load OK\n");

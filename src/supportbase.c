@@ -403,34 +403,53 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
     snprintf(path, sizeof(path), "%sul.cfg", prefix);
     fd = openFile(path, O_RDONLY);
     if (fd >= 0) {
+        int ulcount;
         USBExtreme_game_entry_t GameEntry;
 
         if (count < 0)
             count = 0;
         size = getFileSize(fd);
         *fsize = size;
-        count += size / sizeof(USBExtreme_game_entry_t);
+        ulcount = size / sizeof(USBExtreme_game_entry_t);
 
-        if (count > 0) {
-            if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count)) != NULL) {
-                memset(*list, 0, sizeof(base_game_info_t) * count);
+        if (ulcount > 0) {
+            if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * ulcount)) != NULL) {
+                memset(*list, 0, sizeof(base_game_info_t) * ulcount);
 
                 while (size > 0) {
                     read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
-
-                    base_game_info_t *g = &(*list)[id++];
-
-                    // to ensure no leaks happen, we copy manually and pad the strings
-                    memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);
-                    g->name[UL_GAME_NAME_MAX] = '\0';
-                    memcpy(g->startup, &GameEntry.startup[3], GAME_STARTUP_MAX);
-                    g->startup[GAME_STARTUP_MAX] = '\0';
-                    g->extension[0] = '\0';
-                    g->parts = GameEntry.parts;
-                    g->media = GameEntry.media;
-                    g->format = GAME_FORMAT_USBLD;
-                    g->sizeMB = -1;
                     size -= sizeof(USBExtreme_game_entry_t);
+
+                    // populate game entry in list only if it has valid magic
+                    if (!memcmp(GameEntry.magic, "ul.", 3)) {
+                        int ulfd = 1;
+                        u8 part;
+                        unsigned int name_checksum;
+                        base_game_info_t *g = &(*list)[id++];
+                        count++;
+
+                        // to ensure no leaks happen, we copy manually and pad the strings
+                        memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);
+                        g->name[UL_GAME_NAME_MAX] = '\0';
+                        memcpy(g->startup, GameEntry.startup, GAME_STARTUP_MAX);
+                        g->startup[GAME_STARTUP_MAX] = '\0';
+                        g->extension[0] = '\0';
+                        g->parts = GameEntry.parts;
+                        g->media = GameEntry.media;
+                        g->format = GAME_FORMAT_USBLD;
+                        g->sizeMB = 0;
+                        name_checksum = USBA_crc32(g->name);
+
+                        // calculate total size
+                        for (part = 0; part < g->parts && ulfd >= 0; part++) {
+                            snprintf(path, sizeof(path), "%sul.%08X.%s.%02x", prefix, name_checksum, g->startup, part);
+                            ulfd = openFile(path, O_RDONLY);
+                            if (ulfd >= 0) {
+                                g->sizeMB += (getFileSize(ulfd) >> 20);
+                                close(ulfd);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -619,15 +638,15 @@ void sbRebuildULCfg(base_game_info_t **list, const char *prefix, int gamecount, 
 
         memset(&GameEntry, 0, sizeof(GameEntry));
         GameEntry.Byte08 = 0x08; // just to be compatible with original ul.cfg
-        strcpy(GameEntry.startup, "ul.");
+        memcpy(GameEntry.magic, "ul.", 3);
 
         for (i = 0; i < gamecount; i++) {
             game = &(*list)[i];
 
             if (game->format == GAME_FORMAT_USBLD && (i != excludeID)) {
-                memset(&GameEntry.startup[3], 0, GAME_STARTUP_MAX);
+                memcpy(GameEntry.startup, game->startup, GAME_STARTUP_MAX);
                 memcpy(GameEntry.name, game->name, UL_GAME_NAME_MAX);
-                strncpy(&GameEntry.startup[3], game->startup, GAME_STARTUP_MAX);
+                // don't fill last symbol with zero, cause trailing symbol can be useful character
                 GameEntry.parts = game->parts;
                 GameEntry.media = game->media;
 
@@ -702,8 +721,7 @@ config_set_t *sbPopulateConfig(base_game_info_t *game, const char *prefix, const
     configRead(config); // Does not matter if the config file could be loaded or not.
 
     configSetStr(config, CONFIG_ITEM_NAME, game->name);
-    if (game->sizeMB != -1)
-        configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
+    configSetInt(config, CONFIG_ITEM_SIZE, game->sizeMB);
 
     configSetStr(config, CONFIG_ITEM_FORMAT, game->format != GAME_FORMAT_USBLD ? "ISO" : "UL");
     configSetStr(config, CONFIG_ITEM_MEDIA, game->media == SCECdPS2CD ? "CD" : "DVD");

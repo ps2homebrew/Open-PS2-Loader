@@ -72,7 +72,7 @@ void set_ipconfig(void)
 //--------------------------------------------------------------
 int main(int argc, char *argv[2])
 {
-    int ret, id;
+    int ret;
 
     init_scr();
     scr_clear();
@@ -112,17 +112,17 @@ int main(int argc, char *argv[2])
 
     scr_printf("\t loading modules... ");
 
-    id = SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
-    id = SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
-    id = SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
-    id = SifExecModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&discid_irx, size_discid_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&iomanx_irx, size_iomanx_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&filexio_irx, size_filexio_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&poweroff_irx, size_poweroff_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2dev9_irx, size_ps2dev9_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smsutils_irx, size_smsutils_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smstcpip_irx, size_smstcpip_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&smsmap_irx, size_smsmap_irx, g_ipconfig_len, g_ipconfig, &ret);
+    SifExecModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL, &ret);
+    SifExecModuleBuffer(&ps2hdd_irx, size_ps2hdd_irx, sizeof(hddarg), hddarg, &ret);
+    SifExecModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL, &ret);
 
     scr_printf("OK\n");
 

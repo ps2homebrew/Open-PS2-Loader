@@ -386,7 +386,7 @@ static int ata_device_select(int device)
 
     /* Select the device.  */
     hdpro_io_write(ATAreg_SELECT_WR, (device & 1) << 4);
-    res = hdpro_io_read(ATAreg_CONTROL_RD);
+    hdpro_io_read(ATAreg_CONTROL_RD);
 
     return ata_wait_bus_busy();
 }

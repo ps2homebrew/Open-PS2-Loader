@@ -296,7 +296,6 @@ typedef struct
     int numPalette;
     int numTrans;
     png_bytep trans;
-    png_clut_t *clut;
 } png_texture_t;
 
 static png_texture_t pngTexture;

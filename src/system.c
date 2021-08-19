@@ -288,7 +288,7 @@ unsigned int USBA_crc32(const char *string)
     do {
         byte = string[count++];
         crc = crctab[byte ^ ((crc >> 24) & 0xFF)] ^ ((crc << 8) & 0xFFFFFF00);
-    } while (string[count - 1] != 0);
+    } while ((string[count - 1] != 0) && (count <= 32));
 
     return crc;
 }

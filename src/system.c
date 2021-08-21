@@ -803,7 +803,7 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
 
     argc = 0;
     sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER,
-            mode_str, gDisableDebug, gExitPath, gHDDSpindown,
+            mode_str, gEnableDebug, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
             local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
             local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],

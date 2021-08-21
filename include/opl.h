@@ -159,8 +159,8 @@ extern int gPadEmuSettings;
 extern int gScrollSpeed;
 // Exit path
 extern char gExitPath[32];
-// Disable Debug Colors
-extern int gDisableDebug;
+// Enable Debug Colors
+extern int gEnableDebug;
 
 extern int gPS2Logo;
 

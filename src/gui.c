@@ -44,10 +44,11 @@ static ee_sema_t gQueueSema;
 static int screenWidth;
 static int screenHeight;
 
+static int showPartPopup = 0;
 static int showThmPopup;
 static int showLngPopup;
 
-static clock_t popupTimer = 0;
+static clock_t popupTimer;
 
 // forward decl.
 static void guiShow();
@@ -201,7 +202,7 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
-    snprintf(OPLVersion, sizeof(OPLVersion), _l(_STR_OPL_VER), OPL_VERSION);
+    snprintf(OPLVersion, sizeof(OPLVersion), "Open PS2 Loader %s", OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
     snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
@@ -249,50 +250,67 @@ static void guiResetNotifications(void)
     popupTimer = 0;
 }
 
-static void guiRenderNotifications(char *type, char *path, int y)
+static void guiRenderNotifications(char *string, int y)
 {
-    char notification[128];
-    char *col_pos;
     int x;
 
-    snprintf(notification, sizeof(notification), _l(_STR_NOTIFICATIONS), type, path);
-    if ((col_pos = strchr(notification, ':')) != NULL)
-        *(col_pos + 1) = '\0';
-
-    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], notification)) - 10;
+    x = screenWidth - rmUnScaleX(fntCalcDimensions(gTheme->fonts[0], string)) - 10;
 
     rmDrawRect(x - 10, y, screenWidth - x, MENU_ITEM_HEIGHT + 10, gColDarker);
-    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, notification, gTheme->textColor);
+    fntRenderString(gTheme->fonts[0], x - 5, y + 5, ALIGN_NONE, 0, 0, string, gTheme->textColor);
 }
 
 static void guiShowNotifications(void)
 {
+    char notification[128];
+    char *col_pos;
     int y = 10;
     int yadd = 35;
-    clock_t currentTime;
 
-    currentTime = clock();
-    if (showThmPopup || showLngPopup || showCfgPopup) {
+    if (showPartPopup || showThmPopup || showLngPopup || showCfgPopup) {
         if (!popupTimer) {
             popupTimer = clock() + 5000 * (CLOCKS_PER_SEC / 1000);
             sfxPlay(SFX_MESSAGE);
         }
 
+        if (showPartPopup) {
+            col_pos = strchr(gOPLPart, ':');
+            col_pos++;
+
+            snprintf(notification, sizeof(notification), _l(_STR_PARTITION_NOTIFICATION), col_pos);
+            guiRenderNotifications(notification, y);
+            y += yadd;
+        }
+
         if (showCfgPopup) {
-            guiRenderNotifications("CFG", configGetDir(), y);
+            snprintf(notification, sizeof(notification), _l(_STR_CFG_NOTIFICATION), configGetDir());
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiRenderNotifications(notification, y);
             y += yadd;
         }
 
         if (showThmPopup) {
-            guiRenderNotifications("THM", thmGetFilePath(thmGetGuiValue()), y);
+            snprintf(notification, sizeof(notification), _l(_STR_THM_NOTIFICATION), thmGetFilePath(thmGetGuiValue()));
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
+
+            guiRenderNotifications(notification, y);
             y += yadd;
         }
 
-        if (showLngPopup)
-            guiRenderNotifications("LNG", lngGetFilePath(lngGetGuiValue()), y);
+        if (showLngPopup) {
+            snprintf(notification, sizeof(notification), _l(_STR_LNG_NOTIFICATION), lngGetFilePath(lngGetGuiValue()));
+            if ((col_pos = strchr(notification, ':')) != NULL)
+                *(col_pos + 1) = '\0';
 
-        if (currentTime >= popupTimer) {
+            guiRenderNotifications(notification, y);
+        }
+
+        if (clock() >= popupTimer) {
             guiResetNotifications();
+            showPartPopup = 0;
             showCfgPopup = 0;
         }
     }
@@ -458,7 +476,7 @@ void guiShowConfig()
     diaSetEnum(diaConfig, CFG_ETHMODE, deviceModes);
     diaSetEnum(diaConfig, CFG_APPMODE, deviceModes);
 
-    diaSetInt(diaConfig, CFG_DEBUG, gDisableDebug);
+    diaSetInt(diaConfig, CFG_DEBUG, gEnableDebug);
     diaSetInt(diaConfig, CFG_PS2LOGO, gPS2Logo);
     diaSetInt(diaConfig, CFG_HDDGAMELISTCACHE, gHDDGameListCache);
     diaSetString(diaConfig, CFG_EXITTO, gExitPath);
@@ -480,7 +498,7 @@ void guiShowConfig()
 
     int ret = diaExecuteDialog(diaConfig, -1, 1, &guiUpdater);
     if (ret) {
-        diaGetInt(diaConfig, CFG_DEBUG, &gDisableDebug);
+        diaGetInt(diaConfig, CFG_DEBUG, &gEnableDebug);
         diaGetInt(diaConfig, CFG_PS2LOGO, &gPS2Logo);
         diaGetInt(diaConfig, CFG_HDDGAMELISTCACHE, &gHDDGameListCache);
         diaGetString(diaConfig, CFG_EXITTO, gExitPath, sizeof(gExitPath));
@@ -1364,7 +1382,7 @@ static void guiDrawOverlays()
     }
 
     // BLURT output
-    // if (!gDisableDebug)
+    // if (gEnableDebug)
     //     fntRenderString(gTheme->fonts[0], 0, screenHeight - 24, ALIGN_NONE, 0, 0, blurttext, GS_SETREG_RGBA(255, 255, 0, 128));
 }
 
@@ -1458,6 +1476,9 @@ void guiMainLoop(void)
 {
     guiResetNotifications();
     guiCheckNotifications(1, 1);
+
+    if (gOPLPart[0] != NULL)
+        showPartPopup = 1;
 
     while (!gTerminate) {
         guiStartFrame();

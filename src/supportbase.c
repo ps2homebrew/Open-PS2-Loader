@@ -403,18 +403,17 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
     snprintf(path, sizeof(path), "%sul.cfg", prefix);
     fd = openFile(path, O_RDONLY);
     if (fd >= 0) {
-        int ulcount;
         USBExtreme_game_entry_t GameEntry;
 
         if (count < 0)
             count = 0;
         size = getFileSize(fd);
         *fsize = size;
-        ulcount = size / sizeof(USBExtreme_game_entry_t);
+        count += size / sizeof(USBExtreme_game_entry_t);
 
-        if (ulcount > 0) {
-            if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * ulcount)) != NULL) {
-                memset(*list, 0, sizeof(base_game_info_t) * ulcount);
+        if (count > 0) {
+            if ((*list = (base_game_info_t *)malloc(sizeof(base_game_info_t) * count)) != NULL) {
+                memset(*list, 0, sizeof(base_game_info_t) * count);
 
                 while (size > 0) {
                     read(fd, &GameEntry, sizeof(USBExtreme_game_entry_t));
@@ -426,7 +425,6 @@ int sbReadList(base_game_info_t **list, const char *prefix, int *fsize, int *gam
                         u8 part;
                         unsigned int name_checksum;
                         base_game_info_t *g = &(*list)[id++];
-                        count++;
 
                         // to ensure no leaks happen, we copy manually and pad the strings
                         memcpy(g->name, GameEntry.name, UL_GAME_NAME_MAX);

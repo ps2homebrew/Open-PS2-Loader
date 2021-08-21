@@ -173,7 +173,7 @@ int gPadEmuSettings;
 #endif
 int gScrollSpeed;
 char gExitPath[32];
-int gDisableDebug;
+int gEnableDebug;
 int gPS2Logo;
 int gDefaultDevice;
 int gEnableWrite;
@@ -837,7 +837,7 @@ static void _loadConfig()
             if (configGetInt(configOPL, CONFIG_OPL_SWAP_SEL_BUTTON, &value))
                 gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
 
-            configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gDisableDebug);
+            configGetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, &gEnableDebug);
             configGetInt(configOPL, CONFIG_OPL_PS2LOGO, &gPS2Logo);
             configGetInt(configOPL, CONFIG_OPL_HDD_GAME_LIST_CACHE, &gHDDGameListCache);
             configGetStrCopy(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath, sizeof(gExitPath));
@@ -988,7 +988,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_XOFF, gXOff);
         configSetInt(configOPL, CONFIG_OPL_YOFF, gYOff);
         configSetInt(configOPL, CONFIG_OPL_OVERSCAN, gOverscan);
-        configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gDisableDebug);
+        configSetInt(configOPL, CONFIG_OPL_DISABLE_DEBUG, gEnableDebug);
         configSetInt(configOPL, CONFIG_OPL_PS2LOGO, gPS2Logo);
         configSetInt(configOPL, CONFIG_OPL_HDD_GAME_LIST_CACHE, gHDDGameListCache);
         configSetStr(configOPL, CONFIG_OPL_EXIT_PATH, gExitPath);
@@ -1576,7 +1576,7 @@ static void setDefaults(void)
     gDefaultDevice = APP_MODE;
     gAutosort = 1;
     gAutoRefresh = 0;
-    gDisableDebug = 1;
+    gEnableDebug = 0;
     gPS2Logo = 0;
     gHDDGameListCache = 0;
     gEnableWrite = 0;

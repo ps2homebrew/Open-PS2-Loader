@@ -102,7 +102,7 @@ int _start(int argc, char *argv[])
         pad_vibration = argv[1][1];
         mtap_enabled = argv[1][2] & 1;
         mtap_port = (argv[1][2] >> 1) & 1;
-        pad_options = (argv[1][2] >> 2) & 1; // disable workaround for fake ds3
+        pad_options = (argv[1][2] >> 2) & 1; // enable workaround for fake ds3
     }
 
     if (RegisterLibraryEntries(&_exp_pademu) != 0) {

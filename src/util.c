@@ -10,7 +10,7 @@
 #include "include/system.h"
 #include <string.h>
 #include <malloc.h>
-#include <osd_config.h>
+#include <rom0_info.h>
 
 #include "include/hdd.h"
 

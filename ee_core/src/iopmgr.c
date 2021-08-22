@@ -145,7 +145,7 @@ static void ResetIopSpecial(const char *args, unsigned int arglen)
 int New_Reset_Iop(const char *arg, int arglen)
 {
     DPRINTF("New_Reset_Iop start!\n");
-    if (!DisableDebug)
+    if (EnableDebug)
         GS_BGCOLOUR = 0xFF00FF; // Purple
 
     SifInitRpc(0);
@@ -166,12 +166,12 @@ int New_Reset_Iop(const char *arg, int arglen)
     sbv_patch_enable_lmb();
 
     ResetIopSpecial(NULL, 0);
-    if (!DisableDebug)
+    if (EnableDebug)
         GS_BGCOLOUR = 0x00A5FF; // Orange
 
     if (arglen > 0) {
         ResetIopSpecial(&arg[10], arglen - 10);
-        if (!DisableDebug)
+        if (EnableDebug)
             GS_BGCOLOUR = 0x00FFFF; // Yellow
     }
 
@@ -199,7 +199,7 @@ int New_Reset_Iop(const char *arg, int arglen)
     if (set_reg_disabled)
         set_reg_hook = 4;
 
-    if (!DisableDebug)
+    if (EnableDebug)
         GS_BGCOLOUR = 0x000000; // Black
 
     return 1;

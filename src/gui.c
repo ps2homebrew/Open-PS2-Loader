@@ -202,7 +202,9 @@ void guiShowAbout()
     char OPLVersion[40];
     char OPLBuildDetails[40];
 
-    snprintf(OPLVersion, sizeof(OPLVersion), "Open PS2 Loader %s", OPL_VERSION);
+    //START of OPL_DB tweaks
+    snprintf(OPLVersion, sizeof(OPLVersion), "OPL %s", OPL_VERSION);
+    //END of OPL_DB tweaks
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
     snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"

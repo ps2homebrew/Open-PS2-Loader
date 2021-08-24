@@ -11,11 +11,26 @@ extern struct irx_export_table _exp_lwnbdsvr;
 int _start(int argc, char **argv)
 {
     iop_thread_t nbd_thread;
+    int successed_exported_ctx = 0;
+    struct nbd_context **ptr_ctx = nbd_contexts;
 
-    // TODO : platform specific block device detection then nbd_context initialization go here
-    // TODO : many export in a loop
-    if (nbd_contexts[0]->export_init(nbd_contexts[0]) != 0)
+    //Platform specific block device detection then nbd_context initialization go here
+    while (*ptr_ctx) {
+        if ((*ptr_ctx)->export_init(*ptr_ctx) != 0) {
+            printf("lwnbdsvr: failed to init %s driver!\n", (*ptr_ctx)->export_name);
+        } else {
+            printf("lwnbdsvr: export %s\n", (*ptr_ctx)->export_desc);
+            successed_exported_ctx++;
+        }
+        ptr_ctx++;
+    }
+
+    if (!successed_exported_ctx) {
+        printf("lwnbdsvr: nothing to export.\n");
         return -1;
+    }
+
+    printf("lwnbdsvr: init nbd_contexts ok.\n");
 
     // register exports
     RegisterLibraryEntries(&_exp_lwnbdsvr);

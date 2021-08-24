@@ -1,5 +1,5 @@
 IOP_BIN = lwnbdsvr.irx
-IOP_OBJS = lwnbdsvr.o imports.o exports.o drivers/atad.o lwNBD/nbd_server.o
+IOP_OBJS = lwnbdsvr.o imports.o exports.o drivers/atad.o lwNBD/nbd_server.o lwNBD/nbd_protocol.o
 
 IOP_CFLAGS += -DPS2SDK
 IOP_INCS += -I../../iopcore/common -I../../../include/

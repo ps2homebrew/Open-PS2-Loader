@@ -1,10 +1,10 @@
 /****************************************************************/ /**
  *
- * @file nbd_opts.h
+ * @file nbd_protocol.h
  *
  * @author   Ronan Bignaux <ronan@aimao.org>
  *
- * @brief    Network Block Device Protocol implementation options
+ * @brief    Network Block Device Protocol server
  *
  * Copyright (c) Ronan Bignaux. 2021
  * All rights reserved.
@@ -38,72 +38,18 @@
  *
  */
 
-#ifndef LWIP_HDR_APPS_NBD_OPTS_H
-#define LWIP_HDR_APPS_NBD_OPTS_H
+#ifndef LWIP_HDR_APPS_NBD_PROTOCOL_H
+#define LWIP_HDR_APPS_NBD_PROTOCOL_H
 
-#ifndef PS2SDK
-#include "lwip/opt.h"
-#else
-#include "tcpip.h"
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-/**
- * @defgroup NBD_opts Options
- * @ingroup NBD
- * @{
- */
+struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ctxs);
+int transmission_phase(int client_socket, struct nbd_context *ctx);
 
-/**
- * Enable NBD debug messages
- */
-#if !defined NBD_DEBUG || defined __DOXYGEN__
-#define NBD_DEBUG LWIP_DBG_ON
+#ifdef __cplusplus
+}
 #endif
 
-/**
- * NBD server port
- */
-#if !defined NBD_SERVER_PORT || defined __DOXYGEN__
-#define NBD_SERVER_PORT 10809
-#endif
-
-/**
- * NBD timeout
- */
-#if !defined NBD_TIMEOUT_MSECS || defined __DOXYGEN__
-#define NBD_TIMEOUT_MSECS 10000
-#endif
-
-/**
- * Max. number of retries when a file is read from server
- */
-#if !defined NBD_MAX_RETRIES || defined __DOXYGEN__
-#define NBD_MAX_RETRIES 5
-#endif
-
-/**
- * NBD timer cyclic interval
- */
-#if !defined NBD_TIMER_MSECS || defined __DOXYGEN__
-#define NBD_TIMER_MSECS 50
-#endif
-
-/**
- * Max. length of NBD buffer : NBD_MAX_STRING is minimal size for the buffer
- */
-#if !defined NBD_BUFFER_LEN || defined __DOXYGEN__
-#define NBD_BUFFER_LEN 512 * 256
-#endif
-
-/**
- * Max. length of NBD mode
- */
-#if !defined NBD_MAX_MODE_LEN || defined __DOXYGEN__
-#define NBD_MAX_MODE_LEN 7
-#endif
-
-/**
- * @}
- */
-
-#endif /* LWIP_HDR_APPS_NBD_OPTS_H */
+#endif /* LWIP_HDR_APPS_NBD_PROTOCOL_H */

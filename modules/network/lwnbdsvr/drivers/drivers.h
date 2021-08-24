@@ -1,5 +1,3 @@
-
-
 #ifndef DRIVERS_NBD_H
 #define DRIVERS_NBD_H
 
@@ -13,18 +11,19 @@ extern "C" {
 
 static struct nbd_context hdd_atad =
     {
-        .export_name = "hdd",
         .export_desc = "PlayStation 2 HDD via ATAD",
+        .export_name = "hdd0",
         .blockshift = 9,
         .buffer = nbd_buffer,
-        .export_init = hdd_atad_init,
-        .read = hdd_atad_read,
-        .write = hdd_atad_write,
-        .flush = hdd_atad_flush,
+        .export_init = atad_init,
+        .read = atad_read,
+        .write = atad_write,
+        .flush = atad_flush,
 };
 
 struct nbd_context *nbd_contexts[] = {
     &hdd_atad,
+    NULL,
 };
 
 #ifdef __cplusplus

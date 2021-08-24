@@ -1391,7 +1391,7 @@ static int loadLwnbdSvr(void)
                             Clear it, otherwise it will get displayed after the server is closed. */
 
     unloadPads();
-    sysReset(0);
+    //    sysReset(0); // usefull ? printf doesn't work with it.
 
     ret = ethLoadInitModules();
     if (ret == 0) {

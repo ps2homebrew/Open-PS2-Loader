@@ -1,5 +1,5 @@
 # translation by alimadhi
-# Last update: August 06, 2021
+# Last update: August 21, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Arabic
@@ -45,7 +45,7 @@ SMB ﺔﻤﺋﺎﻗ ﺔﻛﺭﺎﺸﻣ ﻦﻜﻤﻳﻻ
 ﺔﺒﻌﻠﻟﺍ ﺕﺍﺩﺍﺪﻋﺇ
 ﺕﺍﺩﺍﺪﻋﺇ ﺔﻟﺍﺯﺇ
 ﺔﺒﻌﻠﻟﺍ ﺢﻴﺗﺎﻔﻣ ﺔﻓﺎﻛ ﺔﻟﺍﺯﺇ
-Scrolling Speed
+ﺮﻳﺮﻤﺘﻟﺍ ﺔﻋﺮﺳ
 ﺀﻲﻄﺑ
 ﻂﺳﻮﺘﻣ
 ﻊﻳﺮﺳ
@@ -64,17 +64,17 @@ Scrolling Speed
 ﻦﻳﻮﻜﺘﻟﺍ ﻆﻔﺣ
 ﺯﺎﻬﺠﻟﺍ ﺃﺪﺑ
 ﺚﻳﺪﺤﺗ
-BDM ﺯﺎﻬﺟ ﻞﻴﻐﺸﺗ
+BDM ﺯﺎﻬﺟ ﻞﻴﻐﺸﺗ ﺀﺪﺑ ﻊﺿﻭ
 HDD ﺯﺎﻬﺟ ﻞﻴﻐﺸﺗ
 ETH ﺯﺎﻬﺟ ﻞﻴﻐﺸﺗ
 APPS ﺕﺎﻘﻴﺒﻄﺘﻟﺍ ﻞﻴﻐﺸﺗ
 ﻲﺋﺎﻘﻠﺗ
 ﻱﻭﺪﻳ
-NBD ﻡﺩﺎﺧ ﺃﺪﺑ
-NBD ﺮﻓﺮﻴﺳ ﺃﺪﺑ ﻱﺭﺎﺟ
-NBD ﻞﻴﻐﺸﺗ ﻱﺭﺎﺟ
-NBD ﺮﻓﺮﻴﺳ ﺍﺪﺑ ﻲﻓ ﻞﺸﻓ
-NBD ﻡﺩﺎﺧ ﻞﻴﻤﺤﺗ ﺀﺎﻐﻟﺍ
+NBD ﻡﺩﺎﺧ ﻞﻴﻐﺸﺗ ﺃﺪﺑﺍ
+... NBD ﻡﺩﺎﺧ ﻞﻴﻐﺸﺗ ﺀﺪﺑ
+... ﻞﻴﻐﺸﺘﻟﺍ ﺪﻴﻗ NBD ﻡﺩﺎﺧ
+NBD. ﻡﺩﺎﺧ ﻞﻴﻐﺸﺗ ﺀﺪﺑ ﻞﺸﻓ
+... NBD ﻡﺩﺎﺧ ﻎﻳﺮﻔﺗ ٍﺭﺎﺟ
 IGR ﺭﺎﺴﻣ
 ﺔﻴﻔﻠﺨﻟﺍ ﻥﻮﻟ
 ﺺﻨﻟﺍ ﻥﻮﻟ
@@ -282,9 +282,9 @@ s%  ﻦﻣ ﻞﻤﺤﻣ  s%
 ﺭﺍﺪﺻﻻﺍ
 ﺭﻮﻄﻣ
 ﻒﺻﻭ
-BDM Games
-Select Block Devices
-Controller Settings
+BDM ﺏﺎﻌﻟﺃ
+ﺓﺰﻬﺟﻷﺍ ﺮﻈﺣ ﺩﺪﺣ
+ﻢﻜﺤﺗ ﺕﺍﺩﺍﺪﻋﺇ
 PS1 ﺏﺎﻌﻟﺍ
 PS1 ﺏﺎﻌﻟﺍ ﻞﻴﻐﺸﺗ
 '%s'! ﻲﻓ ﺩﻮﺟﻮﻣ ﺮﻴﻏ POPSTARTER.ELF

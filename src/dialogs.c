@@ -163,7 +163,10 @@ struct UIItem diaBlockDevicesConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"MX4SIO", -1}}},
     {UI_SPACER},
     {UI_BOOL, CFG_ENABLEMX4SIO, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -413,7 +416,10 @@ struct UIItem diaCompatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -30, 0, {.label = {NULL, _STR_ALTSTARTUP}}},
     {UI_SPACER},
     {UI_STRING, COMPAT_ALTSTARTUP, 1, 1, -1, 0, 0, {.stringvalue = {"", "", &guiGameAltStartupNameHandler}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -439,7 +445,10 @@ struct UIItem diaVMCConfig[] = {
     {UI_BUTTON, COMPAT_VMC2_DEFINE, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
     {UI_SPACER},
     {UI_BUTTON, COMPAT_VMC2_ACTION, 1, 1, -1, 0, 0, {.label = {NULL, -1}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -526,7 +535,10 @@ struct UIItem diaGSConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_GSM_FIELD_FIX}}},
     {UI_SPACER},
     {UI_BOOL, GSMCFG_GSMFIELDFIX, 1, 1, _STR_HINT_GSM_FIELD_FIX, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -554,7 +566,10 @@ struct UIItem diaCheatConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_CHEATMODE}}},
     {UI_SPACER},
     {UI_ENUM, CHTCFG_CHEATMODE, 1, 1, _STR_HINT_CHEATMODE, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -838,19 +853,19 @@ struct UIItem diaAbout[] = {
 
     {UI_SPACER},
     //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, belek666, crazyc, danielb, dlanor, doctorxyz, hominem.te.esse, ifcaro,", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"BatRastard, belek666, crazyc, danielb, dlanor, doctorxyz, hominem.te.esse,", -1}}},
     //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
     //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"izdubar, Jay-Jay, jimmikaelkael, Maximus32, misfire, Polo35, ps2netbox/ps2usb,", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"ifcaro, izdubar, Jay-Jay, jimmikaelkael, Maximus32, misfire, Polo35,", -1}}},
     //END of OPL_DB tweaks
     {UI_BREAK},
 
     {UI_SPACER},
     //START of OPL_DB tweaks
-    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"reprep, SP193, volca, ... and the anonymous ...", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, 0, 10, {.label = {"ps2netbox/ps2usb, reprep, SP193, volca, ... and the anonymous ...", -1}}},
     {UI_SPLITTER},
     //END of OPL_DB tweaks
 
@@ -940,7 +955,10 @@ struct UIItem diaParentalLockConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_PARENLOCK_PASSWORD}}},
     {UI_SPACER},
     {UI_PASSWORD, CFG_PARENLOCK_PASSWORD, 1, 1, _STR_PARENLOCK_PASSWORD_HINT, 0, 0, {.stringvalue = {"", "", NULL}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -972,7 +990,10 @@ struct UIItem diaAudioConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_BOOT_SND_VOLUME}}},
     {UI_SPACER},
     {UI_INT, CFG_BOOT_SND_VOLUME, 1, 1, -1, 0, 0, {.intvalue = {0, 0, 0, 100}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},
@@ -993,7 +1014,10 @@ struct UIItem diaControllerConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_SELECTBUTTON}}},
     {UI_SPACER},
     {UI_ENUM, CFG_SELECTBUTTON, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 #ifdef PADEMU
     {UI_BREAK},
     {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},

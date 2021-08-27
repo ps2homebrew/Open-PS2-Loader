@@ -1021,7 +1021,10 @@ struct UIItem diaControllerConfig[] = {
 #ifdef PADEMU
     {UI_BREAK},
     {UI_BUTTON, PADEMU_GLOBAL_BUTTON, 1, 1, -1, 0, 0, {.label = {NULL, _STR_PADEMUCONFIG}}},
-    {UI_BREAK},
+    //START of OPL_DB tweaks
+    // {UI_BREAK},
+    {UI_SPLITTER},
+    //END of OPL_DB tweaks
 #endif
     // buttons
     {UI_OK, 0, 1, 1, -1, 0, 0, {.label = {NULL, _STR_OK}}},

@@ -1,7 +1,7 @@
 # French translation by ShaolinAssassin completed by Algol & chronoss.
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
+#
 French
-Open PS2 Loader %s
 Sauvegarder
 Retour
 Configuration réseau
@@ -9,10 +9,10 @@ Réglages avancés
 <non renseigné>
 Configs sauvées vers %s
 Erreur lors de la sauvegarde de la configuration
-Quitter Open PS2 Loader
+Quitter
 Configuration
 Menu
-Périphérique USB
+Périphérique BDM
 Disque dur interne
 Serveur SMB
 Apps
@@ -42,7 +42,6 @@ X
 Liste des jeux
 Réglages
 Supprimer Les Configs
-Réglages du jeu supprimés
 Défilement
 Lent
 Moyen
@@ -62,21 +61,20 @@ Chargement...
 Sauvegarde de la configuration
 Démarrer le périphérique
 Rafraîchir
-Démarrage du périphérique USB
+Démarrage du périphérique BDM
 Démarrage du disque dur interne
 Démarrage du serveur SMB
 Page apps
 Automatique
 Manuel
-Démarrer le serveur HDL
-Serveur HDL en cours de démarrage...
-Serveur HDL connecté…
-Échec au démarrage du serveur HDL
-Fermeture du serveur HDL…
-Sortie via IGR vers :
+Démarrer le serveur NBD
+Serveur NBD en cours de démarrage…
+Serveur NBD connecté…
+Échec au démarrage du serveur NBD
+Fermeture du serveur NBD…
+Chemin IGR
 Arrière-plan
 Texte principal
-- PS2 -
 - Serveur SMB -
 Type d'adresse IP
 Statique
@@ -113,8 +111,6 @@ Purger OPL après lancement du jeu
 Passer les vidéos
 Émuler support double couche (DVD9 rippés en DVD5)
 Désactiver l'IGR (incompatible avec certains jeux)
-Non utilisé
-Non utilisé
 Changer la taille de la VMC la formatera
 Créer
 Démarrer
@@ -156,7 +152,7 @@ Maj/Min
 VMC 1
 VMC 2
 ID
-DMA mode
+mode DMA
 Synchronisation verticale
 Mode 1
 Mode 2
@@ -164,8 +160,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 GSM
 Vitesse Ethernet
 100Mbit full-duplex
@@ -176,7 +170,6 @@ Configuration de GSM
 GSM
 Activer/Désactiver GSM
 Mode vidéo à forcer
-Modes vidéo disponibles : NTSC/PAL/60Hz/PS1/HDTV/VGA
 Ajustement horizontal de l'écran
 Ajouter/Soustraire
 Ajustement vertical de l'écran
@@ -215,8 +208,8 @@ Configuration émulateur manette
 Activer/Désactiver émulateur manette pour ce jeu
 Mode
 USB/Bluetooth
-DualShock3 USB
-DualShock3 Bluetooth
+DualShock3/4 USB
+DualShock3/4 Bluetooth
 Port
 1-Feb
 Émulation manette
@@ -264,7 +257,10 @@ Volume du son de démarrage
 Confirmer le changement de mode vidéo?
 Masquer la liste des jeux (HDD)
 Activer les notifications
-%s chargé par %s
+Configuration chargée depuis %s
+Theme chargé depuis %s
+Langue chargée depuis %s
+partition %s montée
 Options
 Paramètres sauvegardés.
 %s paramètres supprimés.
@@ -280,3 +276,7 @@ Genre
 Release
 Développeurs
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).

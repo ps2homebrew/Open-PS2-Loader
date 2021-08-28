@@ -17,7 +17,7 @@ storage devices, SMB shares and the PlayStation 2 HDD unit. USB devices and
 SMB shares support USBExtreme and \*.ISO formats while PS2 HDD supports HDLoader
 format. It's now the most compatible homebrew loader.
 
-OPL is also developed continuously - anyone can contribute improvements to
+OPL developed continuously - anyone can contribute improvements to
 the project due to its open-source nature.
 
 You can visit the Open PS2 Loader forum at:
@@ -70,8 +70,8 @@ USB modes:
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
-For HDD users, OPL will read hdd0:\_\_common/OPL/conf_hdd.cfg for the config entry "hdd_partition" to use as your OPL partition.
-If not found a config file and a 128Mb +OPL partition will be created. You can edit the config if you wish to use/create a different partition.
+For HDD users, OPL will read `hdd0:__common/OPL/conf_hdd.cfg` for the config entry "hdd_partition" to use as your OPL partition.
+If not found a config file, a 128Mb `+OPL` partition will be created. You can edit the config if you wish to use/create a different partition.
 All partitions created by OPL will be 128Mb (it is not recommended to enlarge partitions as it will break LBAs, instead remove and recreate manually with uLaunchELF at a larger size if needed).
 
 </p>
@@ -111,34 +111,59 @@ EXT3/4 file system.
   <summary> <b> HDD </b> </summary>
 <p>
 
-For PS2, 48-bit LBA internal HDDs up to 2TB are supported. They have to be
-formatted with either HDLoader or uLaunchELF (uLaunchELF is recommended).
-
-To launch OPL, you can use any of the existing methods for loading an
-executable elf.
+For PS2, 48-bit LBA internal HDDs up to 2TB are supported. HDD should be
+formatted with the APA partition scheme. OPL will create the `+OPL` partition on the HDD.
+To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
+that contains the preferred partition name (for example `__common`).
 
 </p>
 </details>
 
 <details>
-  <summary> <b> PS3 </b> </summary>
+  <summary> <b> NBD Server </b> </summary>
 <p>
 
-On PS3, you need an original SwapMagic 3.6+ or 3.8 disc (at the moment
-there aren't any other options). The steps for loading OPL on a PS3 are:
+NBD server replaced HDL server. For using it, you need a way to run some NBD client on your machine.
 
-1.  Rename OPNPS2LD.ELF to SMBOOT0.ELF
-2.  Make a folder in the root of a USB device called SWAPMAGIC and copy SMBOOT0.ELF to it.
-3.  Launch SwapMagic in PS3 and press UP+L1 then Open PS2 Loader should start.
+### Linux
 
-There are 4 forms for launching elfs in SwapMagic.
+For example, on Windows 10 you can use WSL2. The nbd client will create a block device on the PC. Currently, the only working nbd client on the WSL2 - `nbdfuse`.
+An example, how to install HDL game to the HDD:
 
-SMBOOT0.ELF = UP + L1
-SMBOOT1.ELF = UP + L2
-SMBOOT2.ELF = UP + R1
-SMBOOT3.ELF = UP + R2
+```sh
+mkdir ps2
+nbdfuse ps2/ nbd://192.168.1.45 &
+hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO
+```
+After you are done, type `umount ps2` to prevent corruption.
 
-Note: on PS3, only USB and SMB modes are supported.
+On pure Linux, you can also use `nbd-client -no-optgo`.
+
+### Windows
+
+On Windows systems, you can use [WNBD client](https://cloudbase.it/ceph-for-windows/). Install, reboot, open elevated (with Administrator rights) [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.1#how-to-start-windows-powershell-on-earlier-versions-of-windows) and type the following command:
+
+```sh
+wnbd-client.exe map hdd0 192.168.1.22
+```
+
+Now you can use hdl-dump, pfs-shell, or even directly edit disk in some hex editor.
+After you are done, type `wnbd-client.exe unmap hdd0` to prevent corruption.
+
+### Mac OS
+
+Not supported.
+
+</p>
+</details>
+
+<details>
+  <summary> <b> PS3 BC </b> </summary>
+<p>
+
+Currently, supported only [PS3 Backward Compatible](https://www.psdevwiki.com/ps3/PS2_Compatibility#PS2-Compatibility) (BC) versions. So only [COK-001](https://www.psdevwiki.com/ps3/COK-00x#COK-001) and [COK-002/COK-002W](https://www.psdevwiki.com/ps3/COK-00x#COK-002) boards are supported. USB, SMB, HDD modes are supported.
+
+To run OPL, you need an entry point for running PS2 titles. You can use everything (Swapmagic PS2, for example), but custom firmware with the latest Cobra is preferred. Note: only CFW supports HDD mode.
 
 </p>
 </details>
@@ -156,7 +181,7 @@ Open PS2 Loader needs the [**latest PS2SDK**](https://github.com/ps2dev/ps2sdk)
   <summary> <b> OPL Archive </b> </summary>
 <p>
 
-Since 05/07/2021 every OPL build dispatched to the release section of this repository will be uploaded to a mega account, you can access the archive by clicking the mega badge on top of this readme
+Since 05/07/2021 every OPL build dispatched to the release section of this repository will be uploaded to a [mega account](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A). You can access the archive by clicking the mega badge on top of this readme
 
 </p>
 </details>

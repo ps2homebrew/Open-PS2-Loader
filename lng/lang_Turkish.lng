@@ -1,7 +1,6 @@
 # Turkish translation by Gürkan DEMİR <vampire_bs@hotmail.com> aka: dante
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Turkish
-Open PS2 Loader %s
 Değişiklikleri kaydet
 Geri
 Ağ ayarları
@@ -12,7 +11,7 @@ Ayarlar yazılırken hata oluştu!
 Çıkış
 Ayarlar
 Menü
-USB Oyunları
+BDM Oyunları
 HDD Oyunları
 AĞ Oyunları
 Uygulamalar
@@ -42,7 +41,6 @@ Daire
 Oyun listesi
 Oyun ayarları
 Ayarları sil
-Oyunun tüm anahtarları kaldırıldı
 Kaydırma
 Yavaş
 Orta
@@ -53,30 +51,29 @@ Lütfen bekleyiniz
 Oyun kimliği yüklenirken hata oluştu
 Otomatik sıralama
 Dil dosyası yüklenirken hata oluştu
-Hata ayıklama renklerini iptal et
-Oyun kolu algılanmadı, bekliyor...
-Kapak Resimlerini etkinleştir
+Debug Colors
+Oyun kolu algılanmadı, bekliyor…
+Cover Art
 Geniş ekran
 Gücü kapat
 Ayarlar yükleniyor
 Ayarlar kayıt ediliyor
 Cihazı başlat
 Yenile
-USB cihazı başlangıç türü
+BDM Start Mode
 HDD cihazı başlangıç türü
 AĞ cihazı başlangıç türü
 Uygulamalar menüsü görünüm kipi
 Otomatik
 El ile
-HDL Sunucu Başlat
-HDL Sunucu Başlatma Hatası
-HDL Sunucu Başlıyor...
-HDL Sunucu Çalışıyor...
-HDL Sunucu Durduruluyor...
+NBD Sunucu Başlat
+NBD Sunucu Başlatma Hatası
+NBD Sunucu Başlıyor…
+NBD Sunucu Çalışıyor…
+NBD Sunucu Durduruluyor…
 IGR yeri
 Arkaplan rengi
 Metin rengi
-- PS2 -
 - SMB Sunucusu -
 IP adres türü
 Sabit
@@ -100,7 +97,7 @@ Y.Adlandır
 Sil
 Çalıştır
 Görüntü ayarları
-Yazma işlemlerini aktif et
+Write Operations
 Enson oynanan oyunu hatırla
 Seçme tuşu
 Hata, oyun dosyası parçalı
@@ -113,8 +110,6 @@ Sistem çağrılarını çöz
 Videoları atla
 DVD-DL i etkinleştir
 IGR i etkisizleştir
-Kullanılmıyor
-Kullanılmıyor
 VMC Boyutu değiştirmek VMC nin biçimlendirilmesine neden olur
 Oluştur
 Başlat
@@ -135,7 +130,7 @@ Otomatik yenileme
 Hakkında
 Geliştiriciler
 Kalite Kontrolü
-USB önek yolu
+BDM önek yolu
 IGR'den sonra özel bir ELF'e başlar
 Dakika olarak değer, iptal etmek için 0 giriniz
 Otomatik Sabit Disk durdurma
@@ -164,8 +159,6 @@ Kip 3
 Kip 4
 Kip 5
 Kip 6
-Kip 7
-Kip 8
 GSM ayarları
 Ağ Bağlantı kipi
 100Mbit full-duplex
@@ -173,9 +166,8 @@ Ağ Bağlantı kipi
 10Mbit full-duplex
 10Mbit half-duplex
 GSM Ayarları
-GSM Aktif
+GSM Selector
 GSM'i Açar ve Kapatır
-VMODE
 Zorlanmış özel görüntüleme kipi
 Y-Konum
 Yatay Ayarlama
@@ -186,7 +178,7 @@ Overscan Ayarı
 FMV Atlama
 Full Motion Videoları atlar
 Hile Ayarları
-PS2RD Cheat Engine'i Aktif et
+PS2RD Cheat Engine
 PS2RD Cheat Engine'in oyunlara yama yapmasına izin ver
 PS2RD Cheat Engine Kipi
 Hileleri Otomatik veya Manuel seçer
@@ -204,14 +196,14 @@ Güncelleme iptal edildi.
 Internetten ayarlar indirilsin mi?
 Kişiselleştirilmiş Ayarlar
 Varsayılanlar indirildi
-Otomatik başlatılacak %i s...
+Otomatik başlatılacak %i s…
 Otomatik başlat
 Saniye olarak değer, iptal etmek için 0 giriniz
 PS2 Logosu
 Sadece konsolun bölgesine uyan, kabul edilebilir logolar gösterilir.
 PADEMU'yu ayarla
 Pad Emulator Ayarları
-PadEmulator Aktif Et
+Pad Emulator
 Seçilen oyun için PADEMU'nun durumu
 Pad Emulator modu
 Pad Emulator modunu seçin.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Port için ayarlar.
 Ayarlanacak Pad Emulator portunu seçin
-Emulasyonu aç
+Emulation
 Seçilen port için Pad Emulator durumu
-Titreşimi aç
+Vibration
 Seçilen port için Pad Emulator titreşimi durumu
 USB Bluetooth adaptörü MAC adresi:
 MAC adresi ile eşleşmiş DS kolu:
@@ -239,12 +231,12 @@ Evet
 Hayır
 Bluetooth adaptörü DS3/DS4 kolları ile büyük ihtimalle tam uyumlu.
 Bluetooth adaptörü DS3/DS4 kolları ile tam doğru çalışmayabilir.
-Multitap emulasyonunu aç
+Multitap Emulation
 Seçilen oyun için Multitap emulasyonu durumu
 Multitap emulasyonu portu
 Multitap emulasyonu için port seçin
-Sahte DS3ler için workaround'u kapat
-Bazı sahte DS3ler ile çalışabilmek için gereken workaround'u kapatır.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 FIELD flipping emüle et
 Progressive video modları ile bozulan oyunlar için çözüm yaması.
 Ebeveyn Kilidi Ayarları
@@ -257,14 +249,17 @@ Build Ayarları:
 Hata - bu parola kullanılamaz.
 VMC %sdosyası fragment olmuş, fiziksel HK ile devam edilsin mi (slot %d)?
 Ses Ayarları
-Ses Efektleri Olsun
-Açılış Sesi Olsun
+Sound Effects
+Boot Sound
 Ses Efektleri Kuvveti
 Açılış Sesi Kuvveti
 Video çıkış modu değiştirilsin mi?
 Oyun listesini cachele (HDD)
-Bildirimleri aktifleştir
-%s yüklendi %s konumundan
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Oyun ayarları kaydedildi.
 %s ayarları silindi.
@@ -280,3 +275,7 @@ Tür
 Çıkış
 Geliştirici
 Açıklama
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).

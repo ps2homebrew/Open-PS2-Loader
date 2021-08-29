@@ -52,7 +52,7 @@ Fel vid laddning av Game ID
 Automatisk sortering
 Fel vid inläsning av språkfilen
 Debug Colors
-Ingen kontroll upptäcks , vänta ...
+Ingen kontroll upptäcks , vänta …
 Cover Art
 Bredbild
 Stäng av
@@ -67,10 +67,10 @@ APP-meny visningsläge
 Auto
 Manuell
 Starta NBD Server
-NBD Server Startar ...
-NBD Server Running...
+NBD Server Startar …
+NBD Server Running…
 Kan inte starta NBD server.
-NBD Server Stängs...
+NBD Server Stängs…
 Utgång till
 Bakgrundsfärg
 Textfärg
@@ -196,8 +196,8 @@ Uppdatering avbruten
 Hämta inställningar från nätverket?
 Modifierade inställningar
 Hämtade standard
-Autostart om %i s...
-Autostart 
+Autostart om %i s…
+Autostart
 Värde i sekund(er), 0 inaktiverar Autostart
 PS2 Logo
 Visas bara när skivavbilden matchar konsolens region

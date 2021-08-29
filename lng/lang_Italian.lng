@@ -39,7 +39,7 @@ Annulla
 Cerchio
 X
 Lista Giochi
-Impostazioni Gioco 
+Impostazioni Gioco
 Rimuovi Impostazioni
 Scorrimento
 Lento
@@ -52,12 +52,12 @@ Errore durante il caricamento dell'ID di gioco.
 Ordinamento Automatico
 Errore nel caricamento del file di lingua.
 Debug Colors
-Nessun controller rilevato, in attesa...
+Nessun controller rilevato, in attesa…
 Cover Art
 Widescreen
 Spegni
-Caricamento configurazione...
-Salvataggio configurazione...
+Caricamento configurazione…
+Salvataggio configurazione…
 Avvia Dispositivo
 Aggiorna
 BDM Start Mode
@@ -67,10 +67,10 @@ Modalità di Avvio Apps
 Auto
 Manuale
 Avvia Server NBD
-Avvio server in corso...
-Server NBD in esecuzione...
-Server NBD in chiusura...
-Server NBD in scaricamento dalla memoria...
+Avvio server in corso…
+Server NBD in esecuzione…
+Server NBD in chiusura…
+Server NBD in scaricamento dalla memoria…
 Percorso IGR
 Colore dello Sfondo
 Colore Testo
@@ -147,7 +147,7 @@ Percorso ETH Prefisso
 Backspace
 Spazio
 Invio
-Modalità 
+Modalità
 Slot VMC 1
 Slot VMC 2
 ID gioco
@@ -196,7 +196,7 @@ Aggiornamento annullato.
 Scaricare le impostazioni via rete?
 Impostazioni Personalizzate
 Impostazioni di Default Scaricate
-Avvio automatico in %i s...
+Avvio automatico in %i s…
 Avvio Automatico
 Valore in secondi, 0 per disabilitare l'avvio automatico.
 Logo PS2

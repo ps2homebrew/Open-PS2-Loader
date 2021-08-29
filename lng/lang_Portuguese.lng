@@ -25,8 +25,8 @@ Cancelar atualização?
 %d: Erro ao iniciar rede
 %d: Adaptador de Rede não detetado
 %d: Não foi possível ligar ao servidor SMB
-%d: Não foi possível efetuar login no servidor SMB 
-%d: Não foi possível abrir a partilha SMB 
+%d: Não foi possível efetuar login no servidor SMB
+%d: Não foi possível abrir a partilha SMB
 %d: Impossivel listar partilhas SMB
 %d: Impossivel listar jogos
 %d: Servidor DHCP indisponivel
@@ -52,12 +52,12 @@ Erro ao carregar ID do jogo
 Ordenar automaticamente
 Erro ao carregar ficheiro de idioma
 Debug Colors
-Comando não detectado, esperando...
+Comando não detectado, esperando…
 Cover Art
 Ecrâ Panorâmico
 Desligar PS2
 Carregando configurações
-A guardar configurações...
+A guardar configurações…
 Iniciar dispositivo
 Atualizar
 BDM Start Mode
@@ -67,10 +67,10 @@ Modo de inicio para Aplicações
 Automático
 Manual
 Iniciar servidor NBD
-Servidor NBD a iniciar...
-Servidor NBD a executar...
+Servidor NBD a iniciar…
+Servidor NBD a executar…
 Erro a iniciar o servidor de NBD Dump.
-Servidor NBD a fechar...
+Servidor NBD a fechar…
 Definir saída do IGR
 Cor de fundo
 Cor do texto
@@ -196,7 +196,7 @@ Atualização cancelada.
 Descarregar definições da Internet?
 Definições personalizadas
 Pré-definições de download
-Início automático em %i s...
+Início automático em %i s…
 Auto iniciar
 Valor em segundos, 0 para desativar
 Logo PS2

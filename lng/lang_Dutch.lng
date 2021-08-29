@@ -1,7 +1,6 @@
 # Dutch translation by PS2Gaming
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Dutch
-Open PS2 Loader %s
 Wijzigingen opslaan
 Terug
 Netwerkconfiguratie
@@ -12,7 +11,7 @@ Fout bij schrijven van instellingen!
 Sluiten
 Instellingen
 Menu
-USB Spellen
+BDM Spellen
 HDD Spellen
 ETH Spellen
 Apps
@@ -42,7 +41,6 @@ Kruis
 Spellenlijst
 Spelinstellingen
 Remove Settings
-Verwijder alle keys voor het spel
 Scrollen
 Langzaam
 Normaal
@@ -53,30 +51,29 @@ Even geduld a.u.b.
 Fout tijdens laden van Spel ID
 Automatisch sorteren
 Fout bij laden van taalbestand
-Debug kleuren uitschakelen
-Geen controller gedetecteerd, wachtend...
-Cover Art inschakelen
+Debug Colors
+Geen controller gedetecteerd, wachtend…
+Cover Art
 Breedbeeld
 Uitschakelen
 Configuratie laden
 Configuratie opslaan
 Start apparaat
 Vernieuwen
-USB-apparaat startmodus
+BDM Start Mode
 HDD-apparaat startmodus
 ETH-apparaat startmodus
 Applicaties startmodus
 Auto
 Handmatig
-Start HDL Server
-HDL Server starten...
-HDL Server uitgevoerd...
-Mislukt om HDL Server te starten.
-HDL Server lossen...
+Start NBD Server
+NBD Server starten…
+NBD Server uitgevoerd…
+Mislukt om NBD Server te starten.
+NBD Server lossen…
 IGR pad
 Achtergrondkleur
 Tekstkleur
-- PS2 -
 - SMB Server -
 IP-adres type
 Statisch
@@ -100,7 +97,7 @@ Wijzig naam
 Verwijder
 Uitvoeren
 Beeldinstellingen
-Schrijftaken inschakelen
+Write Operations
 Herinner laatst gespeelde spel
 Selecteerknop
 Foutmelding, het spel is gefragmenteerd
@@ -113,8 +110,6 @@ Syscalls loshaken
 Videos overslaan
 Emuleer DVD-DL
 IGR uitschakelen
-Unused
-Unused
 Het wijzigen van de grootte zal VMC formatteren
 Creëer
 Start
@@ -135,7 +130,7 @@ Automatisch vernieuwen
 Over
 Coders
 Kwaliteitsgarantie
-USB-prefix pad
+BDM-prefix pad
 Start aangepaste ELF na een IGR
 Waarde in minuten, 0 om spin down uit te schakelen
 Automatische HDD spin down
@@ -164,8 +159,6 @@ Modus 3
 Modus 4
 Modus 5
 Modus 6
-Modus 7
-Modus 8
 Configureer GSM
 Ethernet link modus
 100Mbit full-duplex
@@ -173,9 +166,8 @@ Ethernet link modus
 10Mbit full-duplex
 10Mbit half-duplex
 GSM instellingen
-GSM inschakelen
+GSM Selector
 Schakelt GSM AAN of UIT
-VMODE
 Geforceerde aangepast beeldschermmodus
 H-POS
 Horizontale aanpassing
@@ -186,7 +178,7 @@ Overscan aanpassing
 FMV overslaan
 Slaat Full Motion Videos over
 Cheat instellingen
-PS2RD Cheat Engine inschakelen
+PS2RD Cheat Engine
 Laat PS2RD Cheat Engine uw spellen patchen
 PS2RD Cheat Engine Modus
 Auto-selecteer of selecteer spelcheats
@@ -204,14 +196,14 @@ Update geannuleerd.
 Download instellingen van het netwerk?
 Aangepaste instellingen
 Gedownloade standaardwaarden
-Auto-start over %i s...
+Auto-start over %i s…
 Auto-start
 Waarde in seconde(n), 0 om auto-start uit te schakelen
 PS2 logo
 Alleen getoond voor geldige schijflogo die bij de console-regio past
 Configureer PADEMU
 Pad-emulator instellingen
-Pad-emulator inschakelen
+Pad Emulator
 Schakelt Pad-emulator in/uit voor geselecteerde spel
 Pad-emulator modus
 Selecteer Pad-emulator modus.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Instellingen voor poort:
 Selecteer Pad-emulator poort voor instellingen.
-Emuleren inschakelen
+Emulation
 Schakelt Pad-emulator in/uit voor geselecteerde poort.
-Vibratie inschakelen
+Vibration
 Schakelt vibratie in/uit voor Pad-emulator geselecteerde poort.
 USB-bluetoothadapter mac-adres:
 DS-controller gepaard met mac-adres:
@@ -239,12 +231,12 @@ Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
+Multitap Emulation
 Turns on/off Multitap emulation for selected game.
 Multitap emulator on port
 Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -257,14 +249,17 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -280,3 +275,7 @@ Genre
 Release
 Developer
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).

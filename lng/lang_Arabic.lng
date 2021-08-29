@@ -1,7 +1,6 @@
 # Arabic Translation by LightWave - @http://psx-scene.com/forums/members/lightwave/
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Arabic
-Open PS2 Loader %s
 تثبيت التغييرات
 العودة
 تثبيت و اعداد الشبكة
@@ -12,7 +11,7 @@ Settings saved to %s
 الخروج
 الاعدادات
 القائمة الرئيسية
-العاب USB
+العاب BDM
 العاب HDD
 لعاب ETH
 برامج
@@ -39,12 +38,11 @@ Exit to Browser?
 الغاء
 دائرة
 ضرب
-قائمة الالعاب 
+قائمة الالعاب
 اعدادات اللعبة
 Remove Settings
-تم حذف كل مفاتيح لللعبة
 التمرير
-ثقيل 
+ثقيل
 متوسط
 سريع
 القائمة الافتراضية
@@ -53,30 +51,29 @@ Remove Settings
 هناك مشكل في شحن هوية اللعبة
 الفرز الاوتوماتيكي
 هناك مشكل  في شحن ملف اللغات
-تعطيل مصحح الالوان
+Debug Colors
 لم يتم وجود على وحدة التحكم
-تشغيل صورة اللعبة
+Cover Art
 شاشة واسعة
 ايقاف
 شحن الاعدادات
 حفظ الاعدادات
 تشغيل الجهاز
 اعادة تنشيط
-طريقة تشغيل الجهاز USB
+BDM Start Mode
 طريقة تشغيل الجهاز HDD
 طريقة تشغيل الجهاز ETH
 طريقة تشغيل الجهاز البرامج
 تلقائي
 يدوي
-تشغيل الخادم HDL
-بداية تشغسل الخادم HDL ...
-الخادم HDL في حالة تشغيل ...
-لم يتم تشغسل الخادم HDL
-تفريغ الخادم HDL ...
+تشغيل الخادم NBD
+بداية تشغسل الخادم NBD …
+الخادم NBD في حالة تشغيل …
+لم يتم تشغسل الخادم NBD
+تفريغ الخادم NBD …
 مكان IGR
 لون الخلفية
 لون الكتابة
-- PS2 -
 - السيرفر SMB -
 نوع عنوان الي بي
 ساكن
@@ -100,7 +97,7 @@ NetBIOS
 حذف
 تشغيل
 اعدادات العرض
-تمكين عمليات الكتابة
+Write Operations
 التذكير باخر لعبة
 زر الاختيار
 اللعبة مجزئة
@@ -113,9 +110,7 @@ Test Changes
 Skip videos
 تقليد DVD-DL
 الغاء IGR
-Unused
-Unused
-تغيير الحجم يؤدي الى حذف ال VMC 
+تغيير الحجم يؤدي الى حذف ال VMC
 صنع
 بدء
 تغيير
@@ -132,10 +127,10 @@ Unused
 يجب صنع ملف VMC
 Error accessing VMC %s. Continue with the Memory Card in slot %d?
 تحديث اوتوماتيكي
-معلومات حول ...
+معلومات حول …
 المبرمجون
 ضمان الجودة
-مكان بادئة USB
+مكان بادئة BDM
 Boots Custom ELF after an IGR
 النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
 الدوران المستمر الاوتوماتيكي لل HDD
@@ -164,8 +159,6 @@ DMA طريقة
 طريقة 4
 طريقة 5
 طريقة 6
-طريقة 7
-طريقة 8
 اعداداتGSM
 طريقة صلة الايثرنيت
 100Mbit full-duplex
@@ -173,9 +166,8 @@ DMA طريقة
 10Mbit full-duplex
 10Mbit half-duplex
 اعداداتGSM
-تشغيل
+GSM Selector
 تبديل GSM ON او OFF
-وضع الفيديو
 اجبار طريقة الشاشة المستبدلة
 موضع افقي
 تعديل افقي
@@ -186,10 +178,10 @@ Overscan Adjustment
 تخطي FMV
 بتخطى FMV
 اعدادات قائمة الغش
-تشغيل PS2RD
+PS2RD Cheat Engine
 تدع PS2RD لتصحيح الالعاب
 PS2RD
-اختيار اوتوماتيكي او اختيار قائمة الغش 
+اختيار اوتوماتيكي او اختيار قائمة الغش
 اختيار اوتوماتيكي لقائمة الغش للالعاب
 اختيار قائمة الغش للالعاب
 هنك مشكلة في شحن ملف الغش
@@ -204,14 +196,14 @@ Overwrite Existing Records
 تحميل الاعدادات من الانترنيت ?
 اعدادات مغيرة
 تحميل الافتراضيات
-البدء%i الاوتوماتيكي في  ثانية...
+البدء%i الاوتوماتيكي في  ثانية…
 البدء الاوتوماتيكي
 النسبة في الدقيقة, 0 للالغاء التدوير باستمرار
 PS2 Logo
 (Only displayed for a valid disc logo which matches the console's region)
 Configure PADEMU
 Pad Emulator Settings
-Enable PadEmulator
+Pad Emulator
 Turns on/off PadEmulator for selected game.
 Pad Emulator mode
 Select Pad Emulator mode.
@@ -219,9 +211,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Settings for port:
 Select Pad Emulator port for settings.
-Enable emulation
+Emulation
 Turns on/off Pad Emulator for selected port.
-Enable vibration
+Vibration
 Turns on/off vibration for Pad Emulator selected port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
@@ -239,12 +231,12 @@ Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap emulation
+Multitap emulation
 Turns on/off Multitap emulation for selected game.
 Multitap emulator on port
 Select port for Multitap emulation.
-Disable workaround for fake ds3
-Some fake ds3s need workaround, this option will disable it.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -257,15 +249,18 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
-Game Menu
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
+Options
 Game settings saved.
 %s settings removed.
 Overwrites existing game compatibility settings when enabled.
@@ -280,3 +275,7 @@ Genre
 Release
 Developer
 Description
+Block Devices
+Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).

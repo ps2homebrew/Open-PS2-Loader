@@ -8,10 +8,13 @@
 extern "C" {
 #endif
 
-int atad_init(struct nbd_context *me);
-int atad_read(struct nbd_context *me, void *buffer, uint64_t offset, uint32_t length);
-int atad_write(struct nbd_context *me, void *buffer, uint64_t offset, uint32_t length);
-int atad_flush(struct nbd_context *me);
+typedef struct atad_driver
+{
+    nbd_context super;
+    int device;
+} atad_driver;
+
+int atad_ctor(atad_driver *const me, int device);
 
 #ifdef __cplusplus
 }

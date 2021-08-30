@@ -1,29 +1,28 @@
 
 #include "irx_imports.h"
 #include "lwNBD/nbd_server.h"
-#include "drivers/drivers.h"
+#include "drivers/atad.h"
 
 #define MODNAME "lwnbdsvr"
 IRX_ID(MODNAME, 1, 1);
 static int nbd_tid;
 extern struct irx_export_table _exp_lwnbdsvr;
 
+//need to be global to be accessible from thread
+atad_driver hdd;
+nbd_context *nbd_contexts[] = {
+    &hdd.super,
+    NULL,
+};
+
 int _start(int argc, char **argv)
 {
     iop_thread_t nbd_thread;
-    int successed_exported_ctx = 0;
-    struct nbd_context **ptr_ctx = nbd_contexts;
+    int ret, successed_exported_ctx = 0;
 
-    //Platform specific block device detection then nbd_context initialization go here
-    while (*ptr_ctx) {
-        if ((*ptr_ctx)->export_init(*ptr_ctx) != 0) {
-            printf("lwnbdsvr: failed to init %s driver!\n", (*ptr_ctx)->export_name);
-        } else {
-            printf("lwnbdsvr: export %s\n", (*ptr_ctx)->export_desc);
-            successed_exported_ctx++;
-        }
-        ptr_ctx++;
-    }
+    ret = atad_ctor(&hdd, 0);
+    if (ret == 0)
+        successed_exported_ctx = 1;
 
     if (!successed_exported_ctx) {
         printf("lwnbdsvr: nothing to export.\n");

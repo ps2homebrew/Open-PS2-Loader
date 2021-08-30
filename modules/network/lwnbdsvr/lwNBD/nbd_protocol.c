@@ -38,8 +38,8 @@
  *
  */
 
+#include <string.h>
 #include "nbd_server.h"
-
 uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
 
 /** @ingroup nbd
@@ -47,7 +47,7 @@ uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
  * @param client_socket
  * @param ctx NBD callback struct
  */
-struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ctxs)
+nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
 {
     register int size;
     uint32_t cflags, name_len, desc_len, len;
@@ -57,15 +57,15 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
     struct nbd_new_handshake new_hs;
 
     //temporary workaround
-    struct nbd_context *ctx = ctxs[0];
+    nbd_context *ctx = ctxs[0];
 
     /*** handshake ***/
 
     new_hs.nbdmagic = htonll(NBD_MAGIC);
     new_hs.version = htonll(NBD_NEW_VERSION);
     new_hs.gflags = 0; //htons(NBD_FLAG_FIXED_NEWSTYLE);
-    size = nbd_send(client_socket, &new_hs, sizeof(struct nbd_new_handshake),
-                    0);
+    size = send(client_socket, &new_hs, sizeof(struct nbd_new_handshake),
+                0);
     if (size < sizeof(struct nbd_new_handshake))
         goto error;
 
@@ -108,8 +108,8 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 handshake_finish.eflags = htons(ctx->eflags);
                 // TODO if NBD_FLAG_NO_ZEROES / NBD_FLAG_C_NO_ZEROES
                 memset(handshake_finish.zeroes, 0, sizeof(handshake_finish.zeroes));
-                size = nbd_send(client_socket, &handshake_finish,
-                                sizeof(struct nbd_export_name_option_reply), 0);
+                size = send(client_socket, &handshake_finish,
+                            sizeof(struct nbd_export_name_option_reply), 0);
                 goto abort;
 
             case NBD_OPT_ABORT:
@@ -118,8 +118,8 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_ACK);
                 fixed_new_option_reply.replylen = 0;
-                size = nbd_send(client_socket, &fixed_new_option_reply,
-                                sizeof(struct nbd_fixed_new_option_reply), 0);
+                size = send(client_socket, &fixed_new_option_reply,
+                            sizeof(struct nbd_fixed_new_option_reply), 0);
                 goto soft_disconnect;
                 break;
             // see nbdkit send_newstyle_option_reply_exportnames()
@@ -136,11 +136,11 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 fixed_new_option_reply.replylen = htonl(name_len + sizeof(len) +
                                                         desc_len);
 
-                size = nbd_send(client_socket, &fixed_new_option_reply,
-                                sizeof(struct nbd_fixed_new_option_reply), MSG_MORE);
-                size = nbd_send(client_socket, &len, sizeof len, MSG_MORE);
-                size = nbd_send(client_socket, ctx->export_name, name_len, MSG_MORE);
-                size = nbd_send(client_socket, ctx->export_desc, desc_len, 0);
+                size = send(client_socket, &fixed_new_option_reply,
+                            sizeof(struct nbd_fixed_new_option_reply), MSG_MORE);
+                size = send(client_socket, &len, sizeof len, MSG_MORE);
+                size = send(client_socket, ctx->export_name, name_len, MSG_MORE);
+                size = send(client_socket, ctx->export_desc, desc_len, 0);
                 break;
                 //TODO
                 //                break;
@@ -163,8 +163,8 @@ struct nbd_context *negotiation_phase(int client_socket, struct nbd_context **ct
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_ERR_UNSUP);
                 fixed_new_option_reply.replylen = 0;
-                size = nbd_send(client_socket, &fixed_new_option_reply,
-                                sizeof(struct nbd_fixed_new_option_reply), 0);
+                size = send(client_socket, &fixed_new_option_reply,
+                            sizeof(struct nbd_fixed_new_option_reply), 0);
                 break;
         }
     }
@@ -181,7 +181,7 @@ error:
  * @param client_socket
  * @param ctx NBD callback struct
  */
-int transmission_phase(int client_socket, struct nbd_context *ctx)
+int transmission_phase(int client_socket, nbd_context *ctx)
 {
     register int r, size, error = -1, retry = NBD_MAX_RETRIES, sendflag = 0;
     register uint32_t blkremains = 0, byteread = 0, bufbklsz = 0;
@@ -217,7 +217,7 @@ int transmission_phase(int client_socket, struct nbd_context *ctx)
 
         reply.handle = request.handle;
 
-        // printf("lwNBD : entering NBD_CMD %d.\n", request.type);
+        // printf("lwNBD: entering NBD_CMD %d.\n", request.type);
 
         switch (request.type) {
 
@@ -235,8 +235,8 @@ int transmission_phase(int client_socket, struct nbd_context *ctx)
                 }
 
                 reply.error = ntohl(error);
-                r = nbd_send(client_socket, &reply, sizeof(struct nbd_simple_reply),
-                             sendflag);
+                r = send(client_socket, &reply, sizeof(struct nbd_simple_reply),
+                         sendflag);
 
                 while (sendflag) {
 
@@ -248,10 +248,10 @@ int transmission_phase(int client_socket, struct nbd_context *ctx)
                     if (blkremains <= bufbklsz)
                         sendflag = 0;
 
-                    r = ctx->read(ctx, ctx->buffer, offset, bufbklsz);
+                    r = nbd_read(ctx, ctx->buffer, offset, bufbklsz);
 
                     if (r == 0) {
-                        r = nbd_send(client_socket, ctx->buffer, byteread, sendflag);
+                        r = send(client_socket, ctx->buffer, byteread, sendflag);
                         if (r != byteread)
                             break;
                         offset += bufbklsz;
@@ -297,7 +297,7 @@ int transmission_phase(int client_socket, struct nbd_context *ctx)
                     r = nbd_recv(client_socket, ctx->buffer, byteread, 0);
 
                     if (r == byteread) {
-                        r = ctx->write(ctx, ctx->buffer, offset, bufbklsz);
+                        r = nbd_write(ctx, ctx->buffer, offset, bufbklsz);
                         if (r != 0) {
                             error = NBD_EIO;
                             sendflag = 0;
@@ -314,8 +314,8 @@ int transmission_phase(int client_socket, struct nbd_context *ctx)
                 }
 
                 reply.error = ntohl(error);
-                r = nbd_send(client_socket, &reply, sizeof(struct nbd_simple_reply),
-                             0);
+                r = send(client_socket, &reply, sizeof(struct nbd_simple_reply),
+                         0);
 
                 break;
 
@@ -325,7 +325,7 @@ int transmission_phase(int client_socket, struct nbd_context *ctx)
                 break;
 
             case NBD_CMD_FLUSH:
-                ctx->flush(ctx);
+                nbd_flush(ctx);
                 break;
 
             case NBD_CMD_TRIM:

@@ -45,18 +45,34 @@
 #include "nbd_protocol.h"
 #include "nbd_opts.h"
 
+#include <stdint.h>
+#include <stdio.h>
+
 //#include "lwip/apps/nbd_opts.h"
 //#include "lwip/err.h"
 //#include "lwip/pbuf.h"
 //#include "lwip/mem.h"
 
+#ifdef __linux__
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <endian.h>
+#include <unistd.h>
+//TODO : manage endianess
+#define htonll(x) htobe64(x)
+#define ntohll(x) be64toh(x)
+#endif
+
 #ifdef PS2SDK
 #include <ps2ip.h>
-#include <stdio.h>
 #include <sysclib.h>
-#include <stdint.h>
+
 //#include <errno.h>
 //#include <malloc.h>
+
+//why not provide lwip/sockets.h ?
+// #define send(a, b, c, d) lwip_send(a, b, c, d)
+#define close(x) lwip_close(x)
 
 #ifdef DEBUG
 #define dbgprintf(args...) printf(args)
@@ -99,29 +115,29 @@ extern uint8_t nbd_buffer[];
  * https://github.com/QuantumLeaps/OOP-in-C/blob/master/AN_OOP_in_C.pdf
  */
 
-struct nbd_context
-{
+struct nbd_context_Vtbl;
 
-    // move in
+typedef struct nbd_context
+{
+    struct nbd_context_Vtbl const *vptr;
+
+    char export_desc[64];
     char export_name[32];
     uint64_t export_size; /* size of export in byte */
     uint16_t eflags;      /* per-export flags */
-
-    char export_desc[64];
-    uint8_t blockshift; /* in power of 2 for bit shifting - log2(blocksize) */
+    uint8_t blockshift;   /* in power of 2 for bit shifting - log2(blocksize) */
     uint8_t *buffer;
 
-    /**
-   *  block device
-   * @param
-   * @returns
-   */
-    int (*export_init)(struct nbd_context *me);
+} nbd_context;
+
+struct nbd_context_Vtbl
+{
+
     /**
    * Close block device handle
    * @param handle File handle returned by open()
    */
-    //  void (*close)(struct nbd_context *me);
+    //  void (*close)(nbd_context *me);
     /**
    * Read from block device
    * @param
@@ -130,7 +146,7 @@ struct nbd_context
    * @param length Number of blocks to copy to buffer
    * @returns &gt;= 0: Success; &lt; 0: Error
    */
-    int (*read)(struct nbd_context *me, void *buffer, uint64_t offset, uint32_t length);
+    int (*read)(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length);
     /**
    * Write to block device
    * @param me ()
@@ -139,18 +155,32 @@ struct nbd_context
    * @param length Number of blocks to copy to buffer
    * @returns &gt;= 0: Success; &lt; 0: Error
    */
-    int (*write)(struct nbd_context *me, void *buffer, uint64_t offset, uint32_t length);
+    int (*write)(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length);
     /**
    * Flush to block device
    * @param me ()
    * @returns &gt;= 0: Success; &lt; 0: Error
    */
-    int (*flush)(struct nbd_context *me);
+    int (*flush)(nbd_context const *const me);
 };
 
-#define nbd_send(a, b, c, d) lwip_send(a, b, c, d)
 int nbd_recv(int s, void *mem, size_t len, int flags);
-int nbd_init(struct nbd_context **ctx);
+int nbd_init(nbd_context **ctx);
+
+static inline int nbd_read(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length)
+{
+    return (*me->vptr->read)(me, buffer, offset, length);
+}
+
+static inline int nbd_write(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length)
+{
+    return (*me->vptr->write)(me, buffer, offset, length);
+}
+
+static inline int nbd_flush(nbd_context const *const me)
+{
+    return (*me->vptr->flush)(me);
+}
 
 #ifdef __cplusplus
 }

@@ -41,6 +41,8 @@
 #ifndef LWIP_HDR_APPS_NBD_PROTOCOL_H
 #define LWIP_HDR_APPS_NBD_PROTOCOL_H
 
+// #include "nbd_server.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -75,13 +75,13 @@ int nbd_recv(int s, void *mem, size_t len, int flags)
  * Initialize NBD server.
  * @param ctx NBD callback struct
  */
-int nbd_init(struct nbd_context **ctx)
+int nbd_init(nbd_context **ctx)
 {
     int tcp_socket, client_socket = -1;
     struct sockaddr_in peer;
     socklen_t addrlen;
     register int r;
-    struct nbd_context *ctxt;
+    nbd_context *ctxt;
 
     peer.sin_family = AF_INET;
     peer.sin_port = htons(NBD_SERVER_PORT);
@@ -103,14 +103,13 @@ int nbd_init(struct nbd_context **ctx)
 
         while (1) {
 
-            printf("lwNBD: a new client connected.\n");
-
             addrlen = sizeof(peer);
             client_socket = accept(tcp_socket, (struct sockaddr *)&peer,
                                    &addrlen);
             if (client_socket < 0)
                 goto error;
 
+            printf("lwNBD: a client connected.\n");
             ctxt = negotiation_phase(client_socket, ctx);
             if (ctxt != NULL)
                 r = transmission_phase(client_socket, ctxt);
@@ -120,11 +119,13 @@ int nbd_init(struct nbd_context **ctx)
             if (r != NBD_SUCCESS)
                 printf("lwNBD: an error occured during transmission phase.\n");
 
-            closesocket(client_socket);
+            close(client_socket);
+            printf("lwNBD: a client disconnected.\n");
         }
-
-    error:
-        printf("lwNBD: failed to init server.");
-        closesocket(tcp_socket);
     }
+error:
+    printf("lwNBD: failed to init server.");
+    close(tcp_socket);
+
+    return 0;
 }

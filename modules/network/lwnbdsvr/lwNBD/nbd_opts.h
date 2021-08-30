@@ -41,11 +41,15 @@
 #ifndef LWIP_HDR_APPS_NBD_OPTS_H
 #define LWIP_HDR_APPS_NBD_OPTS_H
 
-#ifndef PS2SDK
-#include "lwip/opt.h"
-#else
-#include "tcpip.h"
+#ifdef __linux__
+#include <sys/socket.h>
 #endif
+
+// #ifndef PS2SDK
+// #include "lwip/opt.h"
+// #else
+// #include "tcpip.h"
+// #endif
 
 /**
  * @defgroup NBD_opts Options

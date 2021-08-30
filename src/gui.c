@@ -1477,7 +1477,7 @@ void guiMainLoop(void)
     guiResetNotifications();
     guiCheckNotifications(1, 1);
 
-    if (gOPLPart[0] != NULL)
+    if (gOPLPart[0] != '\0')
         showPartPopup = 1;
 
     while (!gTerminate) {

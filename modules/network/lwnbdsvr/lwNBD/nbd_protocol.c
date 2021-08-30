@@ -233,10 +233,10 @@ int transmission_phase(const int client_socket, const nbd_context *ctx)
                 else {
                     error = NBD_SUCCESS;
                     sendflag = MSG_MORE;
-                    bufbklsz = NBD_BUFFER_LEN >> ctx->blockshift;
-                    blkremains = request.count >> ctx->blockshift;
-                    offset = request.offset >> ctx->blockshift;
-                    byteread = bufbklsz << ctx->blockshift;
+                    bufbklsz = NBD_BUFFER_LEN / ctx->blocksize;
+                    blkremains = request.count / ctx->blocksize;
+                    offset = request.offset / ctx->blocksize;
+                    byteread = bufbklsz * ctx->blocksize;
                 }
 
                 reply.error = ntohl(error);
@@ -247,7 +247,7 @@ int transmission_phase(const int client_socket, const nbd_context *ctx)
 
                     if (blkremains < bufbklsz) {
                         bufbklsz = blkremains;
-                        byteread = bufbklsz << ctx->blockshift;
+                        byteread = bufbklsz * ctx->blocksize;
                     }
 
                     if (blkremains <= bufbklsz)
@@ -283,17 +283,17 @@ int transmission_phase(const int client_socket, const nbd_context *ctx)
                 else {
                     error = NBD_SUCCESS;
                     sendflag = MSG_MORE;
-                    bufbklsz = NBD_BUFFER_LEN >> ctx->blockshift;
-                    blkremains = request.count >> ctx->blockshift;
-                    offset = request.offset >> ctx->blockshift;
-                    byteread = bufbklsz << ctx->blockshift;
+                    bufbklsz = NBD_BUFFER_LEN / ctx->blocksize;
+                    blkremains = request.count / ctx->blocksize;
+                    offset = request.offset / ctx->blocksize;
+                    byteread = bufbklsz * ctx->blocksize;
                 }
 
                 while (sendflag) {
 
                     if (blkremains < bufbklsz) {
                         bufbklsz = blkremains;
-                        byteread = bufbklsz << ctx->blockshift;
+                        byteread = bufbklsz * ctx->blocksize;
                     }
 
                     if (blkremains <= bufbklsz)

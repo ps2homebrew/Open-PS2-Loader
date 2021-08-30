@@ -1,9 +1,8 @@
 # Romanian translation by MRAdyy
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Romanian
-Open PS2 Loader %s
 Salvare Setari
 Inapoi
 Config. retea
@@ -14,7 +13,7 @@ Eroare in scrierea setarilor!
 Iesire
 Setari
 Meniu
-Jocuri pe USB
+Jocuri pe BDM
 Jocuri pe HDD
 Jocuri cu cablu LAN
 Aplicatii
@@ -44,7 +43,6 @@ Cruce
 Lista jocuri
 Setari joc
 Remove Settings
-Au fost sterse toate butoanele jocului
 Scrolling Speed
 Incet
 Medium
@@ -55,16 +53,16 @@ Va rugam asteptati
 Eroare in incarcarea Id-ului al jocului
 Sortare automata
 Eroare in incarcarea fisierlui limba
-Oprire culori depanare
+Debug Colors
 Nici-o maneta gasita, se asteapta...
-Activati Coperta
+Cover Art
 Ecran Lat
 Oprire
 Se incarca configurare
 Se salveaza configurarea
 Pornire dispozitiv
 Reimprospatare
-Modul de pornire al dispozitivului BDM
+BDM Start Mode
 Modul de pornire al dispozitivului HDD
 Modul de pornire al dispozitivului Retea
 Modul de pornire aplicatii
@@ -78,7 +76,6 @@ Serverul NBD se descarca...
 cale IGR
 Culoare fundal
 Culoare text
-- PS2 -
 - Server SMB -
 Tip adresa IP
 Statica
@@ -102,7 +99,7 @@ Redenumire
 Stergere
 Ruleaza
 Setari Imagine
-Activeaza operatiuni de scriere
+Write Operations
 Aminteste ultimul joc jucat
 Butonul Select
 "Eroare, jocul este fragmentat"
@@ -115,8 +112,6 @@ Dezactivați apelurile sistemului
 0 PSS mod
 Simulare DVD-DL
 Dezactivare IGR
-Unused
-Unused
 Schimbarea dimensiunii va reformata VMC
 Creeaza
 Start
@@ -166,8 +161,6 @@ Mod 3
 Mod 4
 Mod 5
 Mod 6
-Mod 7
-Mod 8
 Configurare GSM
 Mod conectare Retea
 100Mbit ful-dublu
@@ -175,9 +168,8 @@ Mod conectare Retea
 10Mbit ful-dublu
 10Mbit jumatate-dublu
 Setari GSM
-Activare GSM
+GSM Selector
 Comuta GSM Pornit sau Oprit
-Mod Video
 Modul de afișare personalizat fortat
 Pozitie-H
 Pozitie Orizontala
@@ -188,7 +180,7 @@ Overscan Adjustment
 Salta FMV
 Omite Cutscenes
 Setari coduri
-Activeaza PS2RD Cheat Engine
+PS2RD Cheat Engine
 Lasa PS2RD Cheat Engine sa-ti patchuiasca jocurile
 Mod PS2RD Cheat Engine
 Selectati automat sau Selectati Codurile
@@ -213,17 +205,17 @@ PS2 Logo
 Displayed for a valid disc logo matching the console's region.
 Configure PADEMU
 Pad Emulator Settings
-Enable Pad Emulator
-Turns On/Off Pad Emulator for selected game.
+Pad Emulator
+Turns on/off Pad Emulator for selected game.
 Pad Emulator Mode
 Select Pad Emulator mode.
 DualShock3/4 USB
 DualShock3/4 BT
 Settings For Port:
 Select Pad Emulator port for settings.
-Enable Emulation
+Emulation
 Turns on/off Pad Emulator for selected port.
-Enable Vibration
+Vibration
 Turns on/off vibration for Pad Emulator selected port.
 USB Bluetooth Adapter MAC Address:
 DS Controller Paired To MAC Address:
@@ -241,12 +233,12 @@ Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap Emulation
+Multitap Emulation
 Turns on/off Multitap emulation for selected game.
 Multitap Emulator On Port:
 Select port for Multitap emulation.
-Disable Fake DS3 Workaround
-Some fake DS3s need workaround, this option will disable it.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -259,14 +251,17 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -282,9 +277,10 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

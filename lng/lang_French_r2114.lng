@@ -1,9 +1,8 @@
 # Translation by machiavel and Squall
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 French
-OPL %s
 Sauvegarder
 Retour
 Paramètres réseau
@@ -14,7 +13,7 @@ Erreur d'écriture des options!
 Quitter
 Options
 Menu
-Jeux USB
+Jeux BDM
 Jeux HDD
 Jeux ETH
 Apps
@@ -44,7 +43,6 @@ Croix
 Liste des jeux
 Options du jeu
 Supprimer les paramètres
-Options du jeu supprimées.
 Scrolling Speed
 Lent
 Moyen
@@ -55,16 +53,16 @@ Veuillez patienter.
 Erreur lors du chargement de l'ID du jeu.
 Tri automatique
 Erreur lors du chargement du fichier langue.
-Désactiver couleurs de debug
+MOD: Debug Colors
 Aucune manette détectée, attente...
-Activer jaquette
+MOD: Cover Art
 Écran large
 Éteindre
 Chargement config...
 Sauvegarde config...
 Démarrer le périphérique
 Rafraîchir
-Mode de démarrage BDM
+MOD: BDM Start Mode
 Mode de démarrage HDD
 Mode de démarrage SMB
 Mode d'affichage du menu des apps
@@ -78,7 +76,6 @@ Déchargement serveur NBD...
 Chemin IGR
 Couleur de fond
 Couleur du texte
-- PS2 -
 - Serveur SMB -
 Type d'adresse IP
 Statique
@@ -102,7 +99,7 @@ Renommer
 Supprimer
 Lancer
 Options d'affichage
-Activer l'écriture
+MOD: Write Operations
 Souvenir dernier jeu joué
 Bouton de sélection
 Erreur, le jeu est fragmenté.
@@ -115,8 +112,6 @@ Décrocher Syscalls (purge OPL après lancement du jeu)
 Passer les vidéos
 Émuler DVD-DL (DVD9 rippés en DVD5)
 Désactiver IGR (incompatible avec certains jeux)
-Inutilisé
-Inutilisé
 Changer la taille reformatera la VMC
 Créer
 Démarrer
@@ -166,8 +161,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 Configurer GSM
 Lien mode ETH
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ Lien mode ETH
 10Mbit Full-duplex
 10Mbit Half-duplex
 Options GSM
-Activer GSM
+MOD: GSM Selector
 Basculer On/Off GSM.
-VMODE
 Mode d'affichage perso forcé.
 Pos. H
 Ajustement horizontal.
@@ -188,7 +180,7 @@ Ajustement Overscan.
 Passer FMV
 Passe les FMV.
 Options de cheat
-Activer PS2RD
+MOD: PS2RD Cheat Engine
 Laisser PS2RD patcher vos jeux.
 Mode PS2RD
 Automatique/Manuel.
@@ -213,7 +205,7 @@ Logo PS2
 Affiche le logo du disque correspondant à la région de la console.
 Configurer PADEMU
 Options de PADEMU
-Activer PadEmulator
+MOD: Pad Emulator
 Actve/désactive PADEMU pour ce jeu.
 Mode de PADEMU
 Sélectionner le mode de PADEMU.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Options du port:
 Sélectionner le port PADEMU pour les options.
-Activer l'émulation
+MOD: Emulation
 Active/désactive PADEMU pour ce port.
-Activer la vibration
+MOD: Vibration
 Active/désactive la vibration pour le port PADEMU sélectionné.
 Adress MAC de l'adapteur Bluetooth USB:
 Contrôleur DS appairé à l'adresse MAC:
@@ -241,12 +233,12 @@ Oui
 Non
 L'adaptateur Bluetooth devrait être parfaitement compatible avec les contrôleurs DS3/DS4.
 L'adaptateur Bluetooth peut ne pas fonctionner correctement avec les contrôleurs DS3/DS4.
-Activer l'émulation du Multitap
+MOD: Multitap Emulation
 Active/désactive l'émulation du Multitap pour le jeu sélectionné.
 Émulateur Multitap sur le port:
 Sélectionnez le port pour émuler le Multitap.
-Désactiver correctif des DS3 simulées
-Certaines DS3 simulées nécessitent ce correctif, cette option le désactivera.
+MOD: Fake DS3 Workaround
+MOD: Some fake DS3s need a workaround, this option will enable it.
 Émuler FIELD flipping
 Fix pour les jeux qui glitch sous les modes vidéo progressifs.
 Contrôle parental
@@ -259,14 +251,17 @@ Options du Build:
 Erreur - ce mot de passe ne peut pas être utilisé.
 Le fichier VMC %s est fragmenté. Continuer avec la carte mémoire dans le slot %d?
 Paramètres audio
-Activer les effets sonore
-Activer le son de démarrage
+MOD: Sound Effects
+MOD: Boot Sound
 Volume des effets sonore
 Volume du son de démarrage
 Confirmer le changement du mode vidéo?
 Cache liste de jeu (HDD)
-Activer les Notifications
-%s chargé depuis %s
+MOD: Notifications
+ADD: Config loaded from %s
+ADD: Theme loaded from %s
+MOD: Language loaded from %s
+ADD: %s partition mounted.
 Options
 Supprimer les paramètres.
 %s paramètres supprimés.
@@ -282,9 +277,10 @@ Genre
 Mise à jour
 Développeur
 Description
-BDM Games
-Select Block Devices
+MOD: Block Devices
 Controller Settings
+ADD: Turn on/off Block Device Manager.
+ADD: Turn on/off Block Devices (e.g. USB).
 PS1 Games
 Mode d'affichage des jeux PS1
 POPSTARTER.ELF non trouvé à '%s'!

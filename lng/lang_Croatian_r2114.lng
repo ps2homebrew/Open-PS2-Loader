@@ -1,9 +1,8 @@
 # Translation by Blacky5678
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Croatian
-OPL %s
 Spremi Promjene
 Natrag
 Network Settings
@@ -14,7 +13,7 @@ Greska zapisivanja postavki!
 Izlaz
 Postavke
 Izbornik
-USB Igre
+BDM Igre
 HDD Igre
 ETH Igre
 Aplikacije
@@ -44,7 +43,6 @@ Kriz
 Lista Igara
 Postavke Igre
 Ukloni Postavke
-Uklonjeni svi kljucevi za igru.
 Scrolling Speed
 Sporo
 Srednje
@@ -55,16 +53,16 @@ Molimo, sacekajte.
 Greska tijekom ucitavanja ID-a igre.
 Automatsko Sortiranje
 Greska ucitavanja jezicne datoteke.
-Onemoguci Debug Boje
+Debug Colors
 Kontroler nije primijecen, cekanje...
-Omoguci Naslovnice Igara
+Cover Art
 Siroki Zaslon
 Ugasi
 Ucitavanje konfiguracije...
 Spremanje konfiguracije...
 Zapocni Uredaj
 Osvjezi
-Pocetni Nacin BDM Uredaja
+BDM Start Mode
 Pocetni Nacin HDD Uredaja
 Pocetni Nacin ETH Uredaja
 Nacin Prikaza Aplikacijskog Izbornika
@@ -78,7 +76,6 @@ Gasenje NBD Server...
 IGR Putanja
 Boja Pozadine
 Boja Teksta
-- PS2 -
 - SMB Server -
 Vrsta IP Adrese
 Staticna
@@ -102,7 +99,7 @@ Preimenuj
 Obrisi
 Pokreni
 Postavke Zaslona
-Omoguci Operacije Pisanja
+Write Operations
 Zapamti Zadnju Upaljenu Igru
 Tipka za Odabir
 Greska, igra je fragmentirana.
@@ -115,8 +112,6 @@ Otkaci Syscalls
 Preskoci Videe
 Emuliraj DVD-DL
 Onemoguci IGR
-Nekoristeno
-Nekoristeno
 Mijenjanje velice ce preurediti VMC.
 Stvori
 Zapocni
@@ -166,8 +161,6 @@ Nacin 3
 Nacin 4
 Nacin 5
 Nacin 6
-Nacin 7
-Nacin 8
 Konfiguriraj GSM
 Nacin Povezivanja Etherneta
 100Mbit Puni-dupleks
@@ -175,9 +168,8 @@ Nacin Povezivanja Etherneta
 10Mbit Puni-dupleks
 10Mbit Pola-dupleksa
 GSM Postavke
-Omoguci GSM
+GSM Selector
 Uklj./Isklj. GSM
-VMOD
 Forsirani prilagodeni nacin ekrana.
 H-POZ
 Horizontalno nastimavanje.
@@ -188,7 +180,7 @@ Nastimavanje skaliranja.
 Preskoci FMV
 Preskakanje FMV-a
 Postavke Varanja
-Omoguci PS2RD Cheat Engine
+PS2RD Cheat Engine
 Dopusti PS2RD Cheat Engine da zakrpa tvoju igru.
 Nacin PS2RD Cheat Engine
 Automatski odabir ili odaberi varanja za igru.
@@ -213,7 +205,7 @@ PS2 Logo
 Displayed for a valid disc logo matching the console's region.
 Konfiguriraj PADEMU
 Postavke Pad Emulatora
-Omoguci Pad Emulator
+Pad Emulator
 Uklj./Isklj. Pad Emulator za odabranu igru.
 Nacin Pad Emulatora
 Odabire nacin Pad Emulatora.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Postavke Za Port:
 Odaberi port za postavke Pad Emulatora.
-Omoguci Emulaciju
+Emulation
 Uklj./Isklj. Pad Emulator za odabrani port.
-Omoguci Vibraciju
+Vibration
 Uklj./Isklj. vibraciju za odabrani port Pad Emulatora.
 MAC Adresa USB Bluetooth Adaptera:
 DS Kontroler uparen na MAC Adresu:
@@ -241,12 +233,12 @@ Da
 Ne
 Bluetooth adapter bi trebao biti potpuno kompatibilan sa DS3/DS4 kontrolerom.
 Bluetooth adapter mozda nece raditi ispravno sa DS3/DS4 kontrolerom.
-Omoguci Emulaciju Multitapa
+Multitap Emulation
 Uklj./Isklj. emulaciju Multitapa za odabranu igru.
 Emulator Multitapa na Portu:
 Odaberi port za emulaciju Multitapa.
-Onemoguci Lazne DS3 Obilaske
-Neki lazni DS3 ce trebati obilaske, ova postavka ce to onemoguciti.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emuliraj preklapanje FIELD-a
 Zakrpe za igre koje se kvare pod progresivnim video nacinom.
 Postavke Roditeljskog Zakljucavanja
@@ -259,14 +251,17 @@ Izgradi Postavke:
 Greska - ova lozinka se ne moze koristiti.
 VMC %s datoteka je fragmentirana. Nastaviti sa Memory Cardom u slotu %d?
 Postavke Zvuka
-Omoguci Zvucne Efekte
-Omoguci Zvuk Pokretanja
+Sound Effects
+Boot Sound
 Glasnoca Zvucnih Efekata
 Glasnoca Zvuka Pokretanja
 Potvrdi promjenu video nacina?
 Predmemorija Liste Igara (HDD)
-Omoguci Notifikacije
-%s ucitano sa %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Postavke igre su spremljene.
 %s postavke su uklonjene.
@@ -282,9 +277,10 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Igre
 Nacin Prikaza PS1 Igara
 POPSTARTER.ELF nije pronaden kod '%s'!

@@ -1,9 +1,8 @@
 # German Translation by ps2guy and LopoTRI
-# Last update: August 08, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 German
-OPL %s
 Änderungen speichern
 Zurück
 Netzwerkeinstellungen
@@ -14,7 +13,7 @@ Fehler beim Schreiben der Einstellungen!
 Verlassen
 Einstellungen
 Menü
-USB-Spiele
+BDM-Spiele
 HDD-Spiele
 ETH-Spiele
 Anwendungen
@@ -44,7 +43,6 @@ Kreuz
 Spieleliste
 Spieleinst.
 Entferne Einstellungen
-Alle keys für das Spiel wurden entfernt
 Scrollgeschwindigkeit
 Langsam
 Mittel
@@ -55,16 +53,16 @@ Bitte warten
 Fehler beim Laden der Spiel-ID
 Automatische Sortierung
 Fehler beim Laden der Sprachdatei
-Deaktiviere Debugfarben
+Debug Colors
 Kein Controller erkannt, warte...
-Aktiviere Cover Bilder
+Cover Art
 Breitbild
 Ausschalten
 Lade Konfiguration
 Speichere Konfiguration
 Peripherie starten
 Aktual.
-BDM Geräte Startmodus
+BDM Start Mode
 HDD Start Modus
 ETH Start Modus
 Anwendungen Menü Anzeigen
@@ -78,7 +76,6 @@ NBD Server entlädt...
 IGR-Pfad
 Hintergrundfarbe
 Textfarbe
-- PS2 -
 - SMB Server -
 IP-Adresstyp
 Statisch
@@ -102,7 +99,7 @@ Umbenennen
 Löschen
 Ausführen
 Anzeige Einstellungen
-Aktiviere Schreiboptionen
+Write Operations
 Merke zuletzt gespieltes Spiel
 Auswahltaste
 Fehler, das Spiel ist fragmentiert
@@ -115,8 +112,6 @@ Systemaufrufe aushängen
 Videos überspringen
 Emuliere DVD-DL
 Deaktiviere IGR
-Unbenutzt
-Unbenutzt
 Ändern der Größe wird die VMC erneut formatieren!
 Erstellen
 Starten
@@ -166,8 +161,6 @@ Mod. 3
 Mod. 4
 Mod. 5
 Mod. 6
-Mod. 7
-Mod. 8
 GSM konfigurieren
 ETH Geschwindigkeitsmodus
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ ETH Geschwindigkeitsmodus
 10Mbit Full-duplex
 10Mbit Half-duplex
 GSM Einstellungen
-Aktiviere GSM
+GSM Selector
 Schaltet GSM AN oder AUS
-VMODE
 Erzwungener benutzerdefinierter Bildschirmmodus
 H-POS
 Horizontale anpassung
@@ -188,7 +180,7 @@ Overscan anpassen
 Videosequenzen (FMV) überspringen
 Überspringt Full Motion Videos
 Cheat Einstellungen
-Aktiviere PS2RD Cheat Engine
+PS2RD Cheat Engine
 Lass PS2RD Cheat Engine das Spiel patchen
 PS2RD Cheat Engine Modus
 Automatische auswahl oder Spiele-cheats auswählen
@@ -213,7 +205,7 @@ PS2 Logo
 Wird für ein gültiges Disc-Logo angezeigt, dass der Region der Konsole entspricht.
 PADEMU konfigurieren
 Einstellungen Pad Emulator
-Pad Emulator aktivieren
+Pad Emulator
 Aktiviert/Deaktiviert den Pad Emulator für das ausgewählte Spiel.
 Pad Emulator Modus
 Wähle Pad Emulator Modus
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Einstellungen für Anschluss:
 Wähle Pad Emulatoranschluss für die Einstellungen.
-Emulation aktivieren
+Emulation
 Aktiviert/Deaktiviert den Pad Emulator für den ausgewählten Anschluss.
-Vibration aktivieren
+Vibration
 Aktiviert/Deaktiviert die Vibration für den ausgewählten Anschluss.
 USB Bluetooth-Adapter MAC-Adresse:
 DS Controller verbunden zur MAC-Adresse:
@@ -241,12 +233,12 @@ Ja
 Nein
 Bluetooth Adapter ist voll kompatibel mit DS3/DS4 Controller.
 Bluetooth Adapter funktioniert evtl nicht korrekt mit DS3/DS4 Controller.
-Aktiviere Multitap emulation
+Multitap Emulation
 Schaltet die Multitap emulation An/Aus für das ausgewählte Spiel.
 Multitap emulator an Anschluss
 Wähle Anschluss für Multitap emulation.
-Deaktiviere Problemumgehung für gefälschten DS3
-Manche gefälschte ds3s brauchen Problemumgehung, diese Option schaltet es ab.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emuliere Feld-spiegelung
 Fix für Spiele, die Fehler unter progressivem Video modus haben.
 Einstellungen Kindersicherung
@@ -259,14 +251,17 @@ Erstellungsoptionen:
 Fehler - Dieses Passwort kann nicht benutzt werden.
 VMC %s Datei ist fragmentiert. Weiter mit Memory Card in steckplatz %d?
 Audio Einstellungen
-Soundeffekte Einschalten
-Startsound Einschalten
+Sound Effects
+Boot Sound
 Lautstärke Soundeffekte
 Lautstärke Startsound
 Änderung des Video signals übernehmen?
 Spieleliste zwischenspeichern (HDD)
-Benachrichtigungen Einschalten
-%s geladen von %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Optionen
 Spiel-Einstellungen gespeichert.
 %s Einstellungen entfernt.
@@ -282,9 +277,10 @@ Genre
 Veröffentlichung
 Entwickler
 Beschreibung
-BDM Spiele
-Wähle Blockgeräte
+Block Devices
 Controller einstellungen
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Spiele
 PS1 Spiele Bildschirmeinstellungs-modus
 POPSTARTER.ELF nicht gefunden bei '%s'!

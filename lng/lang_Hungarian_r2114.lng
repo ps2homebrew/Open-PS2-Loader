@@ -1,9 +1,8 @@
 # Translation by co5oos
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Hungarian
-OPL %s
 Változtatások mentése
 Vissza
 Hálózat konfigurálás
@@ -14,7 +13,7 @@ Hiba a beállítások írásában!
 Kilépés
 Beállítások
 Menü
-USB Játékok
+BDM Játékok
 HDD Játékok
 ETH Játékok
 Alkalmazások
@@ -44,7 +43,6 @@ Kereszt
 Játék Lista
 Játékbeállítások
 Beállítások eltávolítása
-Játékhoz tartozó összes kulcs eltávolítva
 Scrolling Speed
 Lassú
 Közepes
@@ -55,16 +53,16 @@ Kérem várjon
 Hiba a Játék ID betöltése közben
 Automatikus rendezés
 Hiba a nyelv fájl betöltésnél
-Hibakeresési színek letiltása
+Debug Colors
 Nem található kontroller, várakozás...
-Lemezborító engedélyezése
+Cover Art
 Szélesvásznú
 Kikapcsolás
 Konfiguráció betöltése
 Konfiguráció mentése
 Eszköz indítása
 Frissítés
-BDM eszköz indítási mód
+BDM Start Mode
 HDD eszköz indítási mód
 ETH eszköz indítási mód
 Alkalmazások menü megjelenítési mód
@@ -78,7 +76,6 @@ Az NBD Szerver kirakodása...
 IGR útvonala
 Háttér színe
 Szöveg szín
-- PS2 -
 - SMB Szerver -
 IP Cím típus
 Statikus
@@ -102,7 +99,7 @@ Az elem véglegesen törlésre kerül, folytatja?
 Törlés
 Futtatás
 Képernyő Beállítások
-Írási műveletek engedélyezése
+Write Operations
 Emlékezz a legutóbbi játékra
 Select Gomb
 Hiba, a játék töredezett
@@ -115,8 +112,6 @@ Syscalls kiakasztás
 Videók átugrása
 DVD-DL emulálás
 IGR letiltása
-Nem Használt
-Nem Használt
 A méretváltoztatás leformázza a VMC-t
 Létrehoz
 Indít
@@ -166,8 +161,6 @@ Mód 3
 Mód 4
 Mód 5
 Mód 6
-Mód 7
-Mód 8
 GSM Konfiguráció
 Ethernet kapcsolat módja
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ Ethernet kapcsolat módja
 10Mbit Full-duplex
 10Mbit Half-duplex
 GSM Beállítások
-GSM Engedélyezése
+GSM Selector
 KI vagy BE kapcsolja a GSM-t
-VMODE
 Kényzerített Testreszabott Megjelenítési Mód
 Vízszintes-Pozíció
 Vízszintes Szabályozás
@@ -188,7 +180,7 @@ Overscan Beállítása
 FMV Átugrása
 Átugorja a  Full Motion Videókat
 Csalás Beállítások
-PS2RD Csalás Motor engedélyezése
+PS2RD Cheat Engine
 Engedd a PS2RD Csalás motornak, hogy patch-elje a játékodat.
 PS2RD Csalás Motor Mód
 Auto-kiválaszt vagy játékcsalások Kiválasztása
@@ -213,7 +205,7 @@ PS2 Logó
 Csak egy érvényes lemez logónál jelenik meg, amely egyezik a konzol régiójával
 PADEMU konfigurálás
 Pad Emulator Beállítások
-PadEmulator Engedélyezése
+Pad Emulator
 Be/ki kapcsolja a PadEmulátor-t a kiválaszott játékhoz.
 Pad Emulátor mód
 Válassza ki a  Pad Emulátor módját.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Port beállítások:
 Válassza ki a Pad Emulátor portot a beállításokhoz.
-Emuláció engedélyezése
+Emulation
 Be/ki kapcsolja a Pad Emulátor-t a kiválasztott porthoz.
-Rezgés engedélyezése
+Vibration
 Be/ki kapcsolja a rezgést a Pad Emulátor kiválasztott portjához.
 Usb bluetooth adapter mac címe:
 DS Kontroller a következő MAC címhez pároztatva:
@@ -241,12 +233,12 @@ Igen
 Nem
 A Bluetooth adapternek teljes mértékben kompatibilisnek kell lennie a DS3/DS4 kontrollerekkel.
 A Bluetooth adapter nem biztos, hogy megfelelően fog működni DS3/DS4 kontrollerekkel.
-Multitap emuláció Engedélyezése
+Multitap Emulation
 ki/be kapcsolja Multitap emulációt a kiválasztott játékhoz.
 Multitap emulátor ezen a porton
 Válassza ki a portot a Multitap emulációhoz.
-Megkerülés letiltása a hamisítvány DS3-hoz.
-Néhány hamis ds3-hoz megkerülés szükséges, ez az opció letiltja ezt.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 FIELD flipping emulálása
 Fix azon játékokhoz, melyek hibát produkálnak progresszív videó mód alatt.
 Gyerekzár Beállítások
@@ -259,14 +251,17 @@ Build Opciók:
 Hiba - ez a jelszó nem használható.
 VMC %s fájl töredezett. Folytatás a %d foglalatban lévő Memória Kártyával?
 Hangbeállítások
-Hanghatások engedélyezése
-Boot Sound engedélyezése
+Sound Effects
+Boot Sound
 Hanghatások hangereje
 Boot Sound hangereje
 Videó mód változtatás jóváhagyása?
 Játéklista cachelés (HDD)
-Értesítések engedélyezése
-%s betöltve %s-ből
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Játékbeállítások elmentve.
 %s beállítások eltávolítva
@@ -282,9 +277,10 @@ Műfaj
 Megjelenés
 Fejlesztő
 Leírás
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Játékok
 PS1 Játékok megjelenítési módja
 POPSTARTER.ELF nem található '%s'-nél!

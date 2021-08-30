@@ -1,9 +1,8 @@
 # translated by verislasher and jbliz
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Indonesian
-OPL %s
 Simpan Perubahan
 Kembali
 Pengaturan Jaringan
@@ -14,7 +13,7 @@ Kesalahan penulisan setingan!
 Keluar
 Setingan
 Menu
-USB Games
+BDM Games
 HDD Games
 ETH Games
 Aplikasi
@@ -44,7 +43,6 @@ Kali
 Daftar Game
 Setingan
 Hapus setingan
-Semua kunci permainan yang dihapus
 Scrolling Speed
 Lambat
 Sedang
@@ -55,16 +53,16 @@ Mohon tunggu
 Kesalahan saat memuat ID Permainan
 Penyortiran otomatis
 Kesalahan memuat file bahasa
-Menonaktifkan Warna Debug
+Debug Colors
 Tak ada kontroler terdeteksi, menunggu ...
-Aktifkan Sampul
+Cover Art
 Layar lebar
 Matikan
 Memuat konfigurasi
 Menyimpan konfigurasi
 Memulai perangkat
 Segarkan
-Memulai mode perangkat BDM
+BDM Start Mode
 Memulai mode perangkat HDD
 Memulai mode perangkat ETH
 Memulai mode Aplikasi
@@ -78,7 +76,6 @@ Mengembalikan Server NBD...
 Pintasan IGR
 Warna latar belakang
 Warna teks
-- PS2 - 
 - SMB Server -
 Jenis alamat IP
 Statis
@@ -102,7 +99,7 @@ Ubah nama
 Hapus
 Jalankan
 Pengaturan Tampilan
-Memungkinkan operasi tulis
+Write Operations
 Ingat pertandingan terakhir dimainkan
 Pilih tombol
 Kesalahan, game terfragmentasi
@@ -115,8 +112,6 @@ Melepas kaitan syscalls
 Lewati video
 Emulasi DVD-DL
 Nonaktifkan IGR
-Tdk terpakai
-Tdk terpakai
 Mengubah ukuran akan memformat ulang VMC
 Membuat
 Mulai
@@ -166,8 +161,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 Konfigurasi GSM
 Mode tautan ethernet
 100Mbit rangkap penuh
@@ -175,9 +168,8 @@ Mode tautan ethernet
 10Mbit rangkap penuh
 10Mbit setengah rangkap
 Setingan GSM
-Aktifkan GSM
+GSM Selector
 Alih GSM ON atau OFF
-VMODE
 Paksa Mode Tampilan Kustom
 H-POS
 Penyesuaian horisontal
@@ -188,7 +180,7 @@ Penyesuaian Tampilan berlebih
 Lewati FMV
 Lompati Video Gerakan Penuh
 Setingan Cheat
-Aktifkan PS2RD Cheat Engine
+PS2RD Cheat Engine
 Biarkan PS2RD Cheat Engine menambal permainan Anda
 Modus PS2RD Cheat Engine
 Pilih otomatis atau Pilih game cheats
@@ -213,7 +205,7 @@ Logo PS2
 Ditampilkan logo disc valid sesuai wilayah konsol.
 Konfigurasi PADEMU
 Pengaturan Stik Emulator
-Aktifkan PadEmulator
+Pad Emulator
 Hidup/matikan StikEmulator game dipilih.
 Mode Stik Emulator
 Pilih mode Stik Emulator.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Pengaturan untuk port:
 Pilih port Emulasi Pad untuk diatur.
-Aktifkan emulasi
+Emulation
 Nyalakan/Matikan Emulasi Pad diport terpilih.
-Aktifkan getaran
+Vibration
 Nyalakan/Matikan getaran untuk Emulasi Pad diport terpilih.
 Alamat Mac Adaptor USB Bluetooth:
 Pengontrol DS dipasangkan ke Alamat MAC:
@@ -241,12 +233,12 @@ Ya
 Tidak
 adapter Bluetooth harus sepenuhnya cocok dengan Pengontrol DS3/DS4.
 adapter Bluetooth mungkin tidak bekerja dengan benar dengan Pengontrol DS3/DS4.
-Aktifkan emulasi Multitap
+Multitap Emulation
 Aktifkan/NonAktifkan emulasi Multitap untuk game dipilih.
 emulator Multitap pada port
 Pilih port untuk emulasi Multitap.
-Nonaktifkan solusi untuk DS3 palsu
-beberapa ds3s palsu butuh solusi, opsi ini akan nonaktif.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulasikan FIELD flipping
 Perbaiki Game yang bermasalah di mode video progresif.
 Seting kunci Parental
@@ -259,14 +251,17 @@ Opsi Bentukan:
 Kesalahan - kata sandi tak bisa dipakai.
 Berkas VMC %s terfragmentasi. Gunakan kartu memori di slot %d?
 Pengaturan Audio
-Aktifkan efek suara
-Aktifkan suara Boot
+Sound Effects
+Boot Sound
 Volume efek suara
 Volume suara Boot
 Konfirmasi perubahan mode video?
 Daftar Tembolok Game(HDD)
-Izinkan Pemberitahuan
-%s dimuat dari %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Pengaturan Game disimpan.
 %s setingan dihapus.
@@ -282,9 +277,10 @@ Aliran
 Rilis
 Pengembang
 Deskripsi
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Games
 PS1 Games mode tampilan
 POPSTARTER.ELF tak ada di '%s'!

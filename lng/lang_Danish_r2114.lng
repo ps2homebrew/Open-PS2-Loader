@@ -1,9 +1,8 @@
 # Translation by BongKris
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Danish
-OPL %s
 Gem indstillinger
 Tilbage
 Netværksindstillinger
@@ -14,7 +13,7 @@ Fejl ved lagering af indstillinger!
 Afslut
 Indstillinger
 Menu
-USB-spil
+BDM-spil
 HDD-spil
 ETH-spil
 Programmer
@@ -44,7 +43,6 @@ Kryds
 Spil liste
 Spil indst.
 Remove Settings
-Spil indstillinger nulstillet
 Scrolling Speed
 Langsom
 Medium
@@ -55,16 +53,16 @@ Vent venligst
 Fejl ved indlæsning af spil ID
 Automatisk sortering
 Fejl ved indlæsning af sprogfil
-Deaktivér fejlfindingsfarver
+Debug Colors
 Ingen controller registreret, venter...
-Aktivér Cover Art
+Cover Art
 Bredskærmsformat
 Sluk
 Indlæser indstillinger
 Gemmer indstillinger
 Start enhed
 Genindlæs
-BDM-enhed starttilstand
+BDM Start Mode
 HDD-enhed starttilstand
 ETH-enhed starttilstand
 Programmenu visningstilstand
@@ -78,7 +76,6 @@ NBD-server lukker ned...
 IGR-sti
 Baggrundsfarve
 Tekstfarve
-- PS2 -
 - SMB-server -
 IP-metode
 Statisk
@@ -102,7 +99,7 @@ Omdøb
 Slet
 Kør
 Skærmindstillinger
-Aktivér skrive operationer
+Write Operations
 Husk sidst spillede spil
 Vælgeknap
 Fejl: spillet er fragmenteret
@@ -115,8 +112,6 @@ Frigiv syscalls
 Skip videoer
 Emulere DVD-DL
 Deaktivere IGR
-Unused
-Unused
 Ændring af størrelsen vil omformatere VMC
 Opret
 Start
@@ -166,8 +161,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 Konfigurér GSM
 Ethernet hastighed og duplex
 100Mbit full-duplex
@@ -175,9 +168,8 @@ Ethernet hastighed og duplex
 10Mbit full-duplex
 10Mbit half-duplex
 GSM-indstillinger
-Aktivér GSM
+GSM Selector
 Slå GSM Til eller Fra
-Videotilstand
 Tvungen brugerdefinerede skærmtilstand
 Horisontal position
 Horisontal justering
@@ -188,7 +180,7 @@ Overscan Justering
 Vis ikke FMV
 Springer over Full Motion Videos
 Snydeindstillinger
-Aktivér PS2RD Cheat Engine
+PS2RD Cheat Engine
 Tillad PS2RD Cheat Engine at patche dine spil
 PS2RD Cheat Engine tilstand
 Auto-vælg eller Vælg spil snydekoder
@@ -213,7 +205,7 @@ PS2-Logo
 Vises kun med et gyldigt disk logo, som matcher konsollens region
 Konfigurér PADEMU
 Pad Emulator indstillinger
-Aktivér Pad Emulator
+Pad Emulator
 Slå Pad Emulator Til/Fra for valgte spil.
 Pad Emulator tilstand
 Vælg Pad Emulator tilstand.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 indstillinger for port:
 Vælg Pad Emulator port for indstillinger.
-Aktivér emulering
+Emulation
 Slå Pad Emulator Til/Fra for valgte port.
-Aktivér vibration
+Vibration
 Slå vibration Til/Fra for valgte Pad Emulator port.
 USB-bluetooth adapter MAC-adresse:
 DS controller parret med MAC-adresse:
@@ -241,12 +233,12 @@ Ja
 Nej
 Bluetooth-adapter skal være fuldt kompatibel med DS3/DS4 controllere.
 Bluetooth-adapter fungerer muligvis ikke korrekt med DS3/DS4 controllere.
-Aktivér Multitap-emulering
+Multitap Emulation
 Slå Multitap-emulering Til/Fra for valgte spil.
 Multitap Emulator på port
 Vælg port til Multitap-emulering.
-Deaktiver løsning for falsk DS3
-Nogle falske DS3'er har brug for en løsning, dette deaktivere den.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -259,14 +251,17 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -282,9 +277,10 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

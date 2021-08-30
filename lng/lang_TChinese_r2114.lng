@@ -1,9 +1,8 @@
 # Translated by kane159 and eyu2007
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Traditional Chinese
-OPL %s
 保存設置
 返回
 網絡設置
@@ -14,7 +13,7 @@ OPL %s
 離開
 設置
 選單
-USB 遊戲
+BDM 遊戲
 HDD 遊戲
 ETH 遊戲
 應用程序
@@ -44,7 +43,6 @@ X
 遊戲列表
 遊戲設置
 刪除設置
-刪除遊戲所有的設置
 Scrolling Speed
 較慢
 中等
@@ -55,16 +53,16 @@ Scrolling Speed
 讀取 遊戲 ID 時出錯
 自動排序
 載入語言文件時出錯
-禁用調試跳色
+Debug Colors
 未檢測到控制器, 等待中...
-顯示遊戲封面
+Cover Art
 寬屏幕
 關機
 設置讀取中
 設置儲存中
 啟動設備
 重新整理
-BDM 設備啟動模式
+BDM Start Mode
 HDD 設備啟動模式
 ETH 設備啟動模式
 應用程序啟動模式
@@ -78,7 +76,6 @@ NBD 服務未能讀取...
 IGR 位置
 背景顏色
 文字顏色
-- PS2 -
 - SMB 伺服器 -
 IP 地址模式
 靜態
@@ -102,7 +99,7 @@ NetBIOS
 刪除
 運行
 顯示設置
-啟用刪除與重新命名功能
+Write Operations
 記住最後運行遊戲
 選定鍵
 錯誤, 遊戲有碎片
@@ -115,8 +112,6 @@ GUEST驗證留空.
 跳過 videos
 模擬 DVD-DL
 禁用 IGR
-空閑
-空閑
 改變大小將會重新格式化 VMC
 生成
 開始
@@ -166,8 +161,6 @@ DMA 模式
 模式 4
 模式 5
 模式 6
-模式 7
-模式 8
 配置 GSM
 乙太網鏈接模式
 100Mbit 全雙工
@@ -175,9 +168,8 @@ DMA 模式
 10Mbit 全雙工
 10Mbit 半雙工
 GSM 設置
-啟用 GSM
+GSM Selector
 切換 GSM 開或關
-畫面模式
 強制自定義顯示模式
 水平調整
 調整水平方向的顯示位置
@@ -188,7 +180,7 @@ GSM 設置
 跳過 FMV
 跳過全動態視頻
 金手指設置
-啟用PS2RD 
+PS2RD Cheat Engine
 允許對選定遊戲使用PS2RD金手指
 PS2RD 金手指模式
 自動或手動選擇
@@ -213,7 +205,7 @@ PS2 標誌
 Displayed for a valid disc logo matching the console's region.
 配置PADEMU
 PADEMU設置
-開啟PADEMU
+Pad Emulator
 為選定遊戲開啟/關閉PADEMU調節.
 連接模式
 選擇PADEMU連接模式.
@@ -221,9 +213,9 @@ PADEMU設置
 藍牙連接
 設置埠:
 選擇應用PADEMU埠
-開啟模擬
+Emulation
 打開/關閉選定埠的模擬
-開啟振動
+Vibration
 打開/關閉選定埠的振動.
 藍牙適配器MAC地址:
 D   S  手 柄MAC地址:
@@ -241,12 +233,12 @@ LMP版本:
 否
 藍牙適配器完全兼容DS3/DS4手柄
 藍牙適配器與DS3/DS4手柄不匹配
-開啟分插模擬
+Multitap Emulation
 打開/關閉分插模擬.
 模擬分插埠
 選擇模擬的分插埠
-禁用仿製DS3手柄
-這個選項將使仿製DS3手柄無法工作
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 模擬播片掃描方式切換
 修正逐行模式下視頻播放有問題的遊戲.
 家長鎖設置
@@ -259,14 +251,17 @@ LMP版本:
 錯誤-無法使用此密碼.
 vmc %s 文件碎片化.是否繼續使用插槽 %d 中的記憶卡？
 音頻設置
-啟用聲音效果
-啟用啟動聲音
+Sound Effects
+Boot Sound
 音效音量
 啟動音量
 確認視頻模式更改？
 緩存遊戲列表 (硬碟)
-啟用通知
-%s 從 %s 載入
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 遊戲設置已保存。
 %s 設置已刪除。
@@ -282,9 +277,10 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1遊戲
 PS1遊戲啟動模式
 POPSTARTER.ELF在\'%s\'上找不到!

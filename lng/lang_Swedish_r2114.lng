@@ -1,9 +1,8 @@
 # Translation by Lord_Flaya
-# Last update: August 07, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
-OPL %s
 Spara ändringar
 Tillbaka
 Nätverksinställningar
@@ -14,7 +13,7 @@ Fel vid skrivning av inställningar!
 Avsluta
 Inställning
 Meny
-USB Spel
+BDM Spel
 HDD Spel
 ETH Spel
 Appar
@@ -44,7 +43,6 @@ Kryss
 Spel-lista
 Spelinst.
 Ta bort inställningar
-Tog bort alla nycklar för spelet
 Scrollhastighet
 Sakta
 Medel
@@ -55,16 +53,16 @@ Vänta
 Fel vid laddning av Game ID
 Automatisk sortering
 Fel vid inläsning av språkfilen
-Inaktivera Debug Färger
+Debug Colors
 Ingen kontroll upptäcks , vänta ...
-Aktivera Omslag
+Cover Art
 Bredbild
 Stäng av
 Ladda config
 Spara config
 Starta enheten
 Uppdatera
-BDM enhets startläge
+BDM Start Mode
 HDD enhet startläge
 ETH enhet startläge
 APP-meny visningsläge
@@ -78,7 +76,6 @@ NBD Server Stängs...
 Utgång till
 Bakgrundsfärg
 Textfärg
-- PS2 -
 - SMB Server -
 IP Address typ
 Statisk
@@ -102,7 +99,7 @@ Byt namn
 Radera
 Kör
 Skärminställningar
-Aktivera skrivåtkomst
+Write Operations
 Kom ihåg senast spelade spel
 Välj knapp
 Fel, spelet är fragmenterat
@@ -115,8 +112,6 @@ Släpp Syscalls
 Skippa Videos
 Emulera DVD-DL
 Inaktivera IGR
-Används ej
-Används ej
 Ändra storleken kommer att formatera om VMC
 Skapa
 Start
@@ -166,8 +161,6 @@ Läge 3
 Läge 4
 Läge 5
 Läge 6
-Läge 7
-Läge 8
 Konfigurera GSM
 Ethernet hastighet och duplex
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ Ethernet hastighet och duplex
 10Mbit Full-duplex
 10Mbit halv duplex
 GSM inställningar
-Aktivera GSM
+GSM Selector
 GSM PÅ eller AV
-Vidoeläge
 Videoläge tvingas
 Horisontell position
 Ställer Horisontell offset
@@ -188,7 +180,7 @@ Ställer Vertikal förskjutning
 Skippa FMV
 Skippar Full Motion Video
 Inställningar Fusk
-Aktivera PS2RD Fusk Motor
+PS2RD Cheat Engine
 Tillåter PS2RD patcha dina spel
 PS2RD Fusk Motor Läge
 Autovälj eller Välj spel fusk
@@ -213,7 +205,7 @@ PS2 Logo
 Visas för giltig disklogo matchande konsolens region.
 Konfigurera PADEMU
 Pad Emulator Inställningar
-Aktivera PadEmulator
+Pad Emulator
 Slå av/på PadEmulator för valt spel.
 Pad Emulator läge
 Vlj Pad Emulator läge.
@@ -221,9 +213,9 @@ DualShock3 / 4 USB
 DualShock3 / 4 BT
 Inställningar för port:
 Välj Pad Emulator port för inställningar.
-Aktivera emulation
+Emulation
 Slå av/på Pad Emulator för vald port.
-Aktivera vibration
+Vibration
 Slå av/på vibration för Pad Emulator vald port.
 Usb bluetooth adapter mac address:
 DS Controller kopplad till MAC-adress:
@@ -241,12 +233,12 @@ Ja
 Nej
 Bluetooth-adaptern ska vara fullt kompatibel med DS3 / DS4-kontroller.
 Bluetooth-adaptern kanske inte fungerar korrekt med DS3 / DS4-kontroller.
-Aktivera multitapemulering
+Multitap Emulation
 Slår på / av multitap emulering för valt spel.
 Multitap emulator på porten
 Välj port för multitap emulering.
-Inaktivera lösningen för falska DS3
-Några falska ds3s behöver lösningen, det här alternativet kommer att inaktivera det.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulera FIELD vändning
 Fix för spel med problem i progressivt läge.
 Föräldrakontroll
@@ -259,14 +251,17 @@ Bygg-Alternativ:
 Fel - lösenordet kan ej användas.
 VMC %s filen är fragmenterad. Använd minneskort i port %d?
 Ljudinställningar
-Aktivera Ljudeffekter
-Aktivera Uppstartsljud
+Sound Effects
+Boot Sound
 Ljudeffektsvolym
 Uppstartsljudsvolym
 Bekräfta ändring av videoläge?
 Lägg Spellista i Cache (HDD)
-Aktivera notifikationer
-%s Laddat från %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Val
 Spelinställningar sparade.
 %s inställningar borttagna
@@ -282,9 +277,10 @@ Genre
 Lansering
 Utvecklare
 Beskrivning
-BDM Spel
-Välj enhet
+Block Devices
 Kontroll-inställningar
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

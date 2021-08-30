@@ -1,9 +1,8 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: August 07, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
-OPL %s
 Salvar configurações
 Voltar
 Configurações de rede
@@ -14,7 +13,7 @@ Erro ao salvar configurações!
 Sair
 Configurações
 Menu
-Jogos no USB
+Jogos no BDM
 Jogos no HDD
 Jogos em REDE
 Aplicativos
@@ -44,7 +43,6 @@ X
 Lista de jogos
 Ajustes
 Remover configurações
-Todos os ajustes do jogo foram removidos
 Velocidade de rolagem
 Lenta
 Média
@@ -55,16 +53,16 @@ Espere por favor
 Erro ao carregar ID do jogo
 Ordenação automática
 Erro ao carregar arquivo de idioma
-Desativar depuração de cores
+Debug Colors
 Controle não detectado, esperando...
-Habilitar artes
+Cover Art
 Wide screen (Visão panorâmica)
 Desligar
 Carregando configurações...
 Salvando configurações...
 Iniciar dispositivo
 Atualizar
-Modo de início do dispositivo BDM
+BDM Start Mode
 Modo de início do dispositivo HDD
 Modo de início do dispositivo REDE
 Modo de início dos Aplicativos
@@ -78,7 +76,6 @@ Fechando servidor NBD...
 Sair para
 Cor do fundo
 Cor do texto
-- PS2 -
 - Servidor SMB -
 Tipo de endereço IP
 Estático
@@ -102,7 +99,7 @@ Renomear
 Excluir
 Iniciar
 Definições de tela
-Ativar ações de gravação
+Write Operations
 Lembrar último jogo executado
 Escolha o botão de ação ( X ou O )
 Erro, o jogo está fragmentado!
@@ -115,8 +112,6 @@ Desativar chamadas do sistema
 Pular vídeos PSS
 Emular DVD-DL
 Desabilitar IGR
-Não utilizado
-Não utilizado
 Alterar o tamanho (Irá reformatar o VMC!)
 Criar
 Iniciar atualização
@@ -166,8 +161,6 @@ Modo 3
 Modo 4
 Modo 5
 Modo 6
-Modo 7
-Modo 8
 Configurar GSM
 Conexão de rede
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ Conexão de rede
 10Mbit Full-duplex
 10Mbit Half-duplex
 Configurações GSM
-Ativar GSM
+GSM Selector
 Autoriza o GSM a forçar o modo de vídeo selecionado abaixo
-Selecione o modo de vídeo
 Modo de vídeo a ser forçado
 Ajuste Horizontal
 Define o ajuste horizontal da imagem na tela
@@ -188,7 +180,7 @@ Define o ajuste da tela visível
 Pular vídeos FMV
 Ignora vídeos no formato (FMV)
 Configurar PS2RD
-Ativar PS2RD
+PS2RD Cheat Engine
 Autoriza o PS2RD a usar Cheats(Trapaças) nos seus jogos
 Modo PS2RD
 Auto seleção(Ativa todos) ou Selecione os Cheats do jogo
@@ -213,7 +205,7 @@ Logo PS2
 Exibido para um logotipo de disco válido que corresponde à região do console.
 Configurar PADEMU
 Configurações do Emulador de Controles
-Ativar Emulador de Controles
+Pad Emulator
 Liga/desliga o Emulador de Controles para o jogo selecionado.
 Modo Emulador de Controles
 Selecione o modo do Emulador de Controles.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Configurações da porta:
 Selecione a porta que será configurada.
-Ativar emulação
+Emulation
 Liga/desliga a emulação na porta selecionada.
-Ativar vibração
+Vibration
 Liga/desliga a vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
 Endereço MAC do Controle DS emparelhado:
@@ -241,12 +233,12 @@ Sim
 Não
 O adaptador Bluetooth deve ser totalmente compatível com os controles DS3/4.
 O adaptador Bluetooth pode não funcionar corretamente com os controles DS3/4.
-Ativar emulação Multitap
+Multitap Emulation
 Liga/desliga a emulação Multitap para o jogo selecionado.
 Emulador Multitap na porta
 Selecione a porta para a emulação Multitap.
-Desativar solução alternativa para Controle DS3 pirata
-Alguns Controles DS3 piratas precisam de solução alternativa, esta opção irá desativá-lo.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emular inversão de CAMPO
 Correção para jogos que apresentam falhas nos modos de vídeo progressivo.
 Controle parental
@@ -259,14 +251,17 @@ Opções nesta compilação:
 Erro - esta senha não pode ser usada.
 O arquivo VMC %s está fragmentado. Continuar com o cartão de memória na entrada %d?
 Configurações de áudio
-Ativar efeitos sonoros
-Ativar som de inicialização
+Sound Effects
+Boot Sound
 Volume de efeitos sonoros
 Volume do som de inicialização
 Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HD)
-Ativar notificações
-%s carregado de %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Opções
 Configurações do jogo salvas.
 %s configurações removidas.
@@ -282,9 +277,10 @@ Gênero
 Data de lançamento
 Desenvolvedor
 Descrição
-Jogos BDM
-Selecionar dispositivos de entrada
+Block Devices
 Configurar controles
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

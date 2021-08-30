@@ -1,9 +1,8 @@
 # Translation by Colton Silva
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Cebuano
-Open PS2 Loader %s
 Tipigi ang mga pagbag-o
 Likod
 Mga setting sa Network
@@ -14,7 +13,7 @@ Sayup nga mga setting sa pagsulat!
 Paggawas
 Setting
 Menu
-Dula sa USB
+Dula sa BDM
 Dula sa HDD
 Dula sa ETH
 Apps
@@ -44,7 +43,6 @@ Krus
 Lista
 Settings sa dula
 Tangtanga ang setting
-Gikuha ang tanan nga mga yawi alang sa dula.
 Scrolling Speed
 Hinay
 Medium
@@ -55,16 +53,16 @@ Pahilog hulat
 Sayup samtang gikarga ang Game ID.
 Awtomatik nga paghan-ay
 Sayup sa pagkarga sa file sa sinultian
-I-disable ang kulay sa pag-debug
+Debug Colors
 Wala’y nakita nga tigpugong, naghulat...
-Pagpalihok sa Cover Art
+Cover Art
 Malapad nga screen
 Power-off
 Nilo-load ang config
 Sine-save ang config
 Pagsugod sa Device
 Pagpalagsik
-BDM aparato simula mode
+BDM Start Mode
 HDD aparato simula mode
 ETH aparato simula mode
 Mga application simula mode
@@ -78,7 +76,6 @@ Pagdiskarga sa NBD Server.
 IGR path
 kolor sa background
 kolor sa teksto
-- PS2 -
 - SMB Server -
 Klase sa IP address
 Static
@@ -102,7 +99,7 @@ Igngalan usab
 tangtangon
 Pagdagan
 Ipakita ang mga setting
-Pagpalihok Pagsulat Operations
+Write Operations
 Hinumdomi ang Katapusan nga Dula
 Select nga buton
 Sayup, ang dula ay mabahinbahin
@@ -115,8 +112,6 @@ Alisin sa pagkakakawit ng Syscalls
 0 PSS mode
 I-emulate nga DVD-DL
 I-disable mga IGR
-Unused
-Unused
 Ang pagbag-o sa gidak-on mag-usab sa VMC.
 Paghimo
 Pagsugod
@@ -166,8 +161,6 @@ Mode 3
 Mode 4
 Mode 5
 Mode 6
-Mode 7
-Mode 8
 I-configure ang GSM
 Ethernet speed at duplex setting
 100Mbit full-duplex
@@ -175,9 +168,8 @@ Ethernet speed at duplex setting
 10Mbit full-duplex
 10Mbit half-duplex
 Settings sa GSM
-Pagpaandar sa GSM
-Toggles GSM ON or OFF
-VMODE
+GSM Selector
+Toggles GSM on/off.
 Gipugos nga custom display mode.
 H-POS
 Horizontal Adjustment
@@ -188,7 +180,7 @@ Overscan Adjustment
 FMV Skip
 Laktaw ang Mga Video sa Tibuok nga Paglihok
 Settings sa cheat
-Pagpalihok sa PS2RD Cheat Engine
+PS2RD Cheat Engine
 Gihangyo nga i-patch sa PS2RD Cheat Engine ang imong dula.
 PS2RD Cheat Engine Mode
 Awto. pagpili or pagpili sa mga cheat sa dula
@@ -213,7 +205,7 @@ PS2 Logo
 Gipakita alang sa usa ka balido nga logo sa disc nga nahiangay sa rehiyon sa console.
 I-configure ang PADEMU
 Settings sa Pad Emulator
-I-enable ang PadEmulator
+Pad Emulator
 Gipasiga / gipatay ang Pad Emulator alang sa pinili nga dula.
 Mode ng Pad Emulator
 Pilia ang mode nga Pad Emulator.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Settings alang sa port:
 Pilia ang Pad Emulator port alang sa mga setting.
-Pagpalihok sa pagsundog
+Emulation
 Gipasiga / gipalong ang Pad Emulator alang sa pinili nga port.
-Paglihok sa Vibration
+Vibration
 Nag-on / off nga pagkurog alang sa napili sa Pad Emulator port.
 Usb bluetooth adapter mac address:
 DS Controller paired to mac address:
@@ -241,12 +233,12 @@ Opo
 Dili
 Ang Bluetooth adapter kinahanglan nga hingpit nga katugma sa mga kontrol sa DS3 / DS4.
 Ang Bluetooth adapter mahimong dili molihok sa mga tigdumala sa DS3 / DS4.
-Paglihok sa Multitap Emulation
+Multitap Emulation
 Gipasiga / gipalayo ang pagsundog sa Multitap alang sa pinili nga dula.
 Multitap emulator sa port
 Pagpili usa ka port alang sa pagsundog sa Multitap.
-Disable Fake DS3 Workaround
-Ang pipila nga peke nga DS3s kinahanglan nga solusyon, kini nga kapilian dili pag-disable niini.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Sundoga ang FIELD Flipping
 Pag-ayo alang sa mga dula nga ning-glitch ubos sa mga progresibo nga mga mode sa video.
 Setting sa Parental Lock
@@ -259,14 +251,17 @@ Opsyon sa build:
 Sayop - dili magamit ang kini nga password.
 Ang VMC% s file nabahinbahin. Padayon sa Memory Card sa slot% d?
 Setting sa Audio
-Pagpalihok sa Sound Effects
-Pagpalihok sa Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Gikumpirma nga "video mode change"?
 Cache Game List (HDD)
-Pagpalihok sa Notifications
-%s Nag-load gikan sa %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Nai-save ang "Game settings".
 %s settings ay nai-alis.
@@ -282,9 +277,10 @@ Genre
 Buhian
 Debeloper
 Paghulagway
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

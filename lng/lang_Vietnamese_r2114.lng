@@ -1,9 +1,8 @@
 # Translation by zidane89
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Vietnamese
-OPL %s
 Lưu thay đổi
 Quay lại
 Network Settings
@@ -14,7 +13,7 @@ Không lưu được cài đặt!
 Thoát
 Cài đặt
 Menu
-Trò chơi trên USB
+Trò chơi trên BDM
 Trò chơi trên HDD
 Trò chơi qua ETH 
 Ứng dụng
@@ -44,7 +43,6 @@ Nút X
 Danh sách trò chơi
 Cài đặt Game
 Remove Settings
-Removed all keys for the game
 Scrolling Speed
 Chậm
 Thường
@@ -55,16 +53,16 @@ Vui lòng chờ
 Lỗi khi nạp Game ID
 Tự động phân loại
 Lỗi nạp tập tin ngôn ngữ
-Ngắt màu Debug 
+Debug Colors
 Không có cần điều khiển, đợi chút...
-Bật Cover Art
+Cover Art
 Màn hình rộng
 Tắt máy
 Nạp cấu hình
 Lưu cấu hình
 Chọn thiết bị lưu trò chơi
 Làm mới
-Chọn BDM 
+BDM Start Mode
 Chọn HDD 
 Chọn ETH 
 Hiển thị menu ứng dụng
@@ -78,7 +76,6 @@ Không nạp được máy chủ NBD...
 Vá IGR
 Màu nền
 Màu chữ
-- PS2 -
 - SMB Server -
 Gõ địa chỉ IP
 Tĩnh
@@ -102,7 +99,7 @@ Mục này sẽ bị xóa vĩnh viễn, tiếp tục?
 Xóa  
 Chạy
 Cài đặt hiển thị
-Kích hoạt thao tác ghi
+Write Operations
 Nhớ các cài đặt cuối cùng
 Chọn nút
 Lỗi, trò chơi bị phân mảnh
@@ -115,8 +112,6 @@ Unhook Syscalls
 Bỏ qua các Video
 Giả lập DVD-DL
 Ngắt IGR
-Không dùng
-Không dùng
 Thay đổi dung lượng sẽ định dạng lại VMC
 Tạo
 Bắt đầu
@@ -166,8 +161,6 @@ Mode 3
 Mode 4  
 Mode 5  
 Mode 6  
-Mode 7  
-Mode 8  
 Cấu hình GSM
 Ethernet Link Mode
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ Ethernet Link Mode
 10Mbit Full-duplex
 10Mbit Half-duplex
 Cài đặt GSM 
-Bật GSM
+GSM Selector
 Bật hoặc tắt GSM
-VMODE
 Chế độ hiển thị tùy chỉnh bắt buộc
 H-POS
 Điều chỉnh theo chiều ngang
@@ -188,7 +180,7 @@ Overscan Adjustment
 Bỏ qua FMV
 Bỏ qua Full Motion Videos
 Cài đặt Cheat 
-Bật PS2RD Cheat Engine
+PS2RD Cheat Engine
 Hãy để PS2RD Cheat Engine vá vào trò chơi
 Chế độ PS2RD Cheat Engine 
 Tự động chọn hoặc chọn trò chơi ăn gian
@@ -213,7 +205,7 @@ Logo PS2
 Displayed for a valid disc logo matching the console's region.
 Cấu hình PADEMU
 Cài đặt giả lập tay cầm
-Bật PadEmulator
+Pad Emulator
 Bật/tắt PadEmulator cho trò chơi đã chọn.
 Chế độ Pad Emulator
 Chọn chế độ Pad Emulator.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Cài đặt cổng:
 Chọn cổng cài đặt Pad Emulator.
-Bật giả lập
+Emulation
 Bật/tắt Pad Emulator cổng đã chọn.
-Bật rung
+Vibration
 Bật/tắt rung Pad Emulator cho cổng đã chọn.
 Địa chỉ MAC của USB Bluetooth:
 Địa chỉ MAC của tay DS:
@@ -241,12 +233,12 @@ Yes
 No
 Bluetooth adapter phải tương thích với tay cầm DS3/DS4.
 Bluetooth adapter có thể không hoạt động chính xác với tay cầm DS3/DS4.
-Bật giả lập Multitap 
+Multitap Emulation
 Bật/tắt giả lập Multitap cho trò chơi đã chọn.
 Giả lập Multitap tại cổng
 Chọn cổng giả lập Multitap.
-Ngắt workaround để fake DS3
-Fake ds3s cần workaround, Tùy chọn này sẽ ngắt nó.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD flipping
 Khắc phục các game bị trục trặc trong chế độ progressive modes.
 Cài đặt khóa phụ huynh
@@ -259,14 +251,17 @@ Tùy chọn Build:
 Lỗi - mật khẩu này không thể sử dụng.
 Tệp VMC %s bị phân mảnh. Tiếp tục với MC ở khe %d?
 Cài đặt âm thanh
-Bật hiệu ứng âm thanh
-Tăng cường âm lượng
+Sound Effects
+Boot Sound
 Mức hiệu ứng âm thanh
 Tăng mức âm lượng
 Thay đổi chế độ video?
 Cache danh sách trò chơi (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -282,9 +277,10 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 Các trò chơi PS1 
 Chế độ hiển thị cho game PS1 
 POPSTARTER.ELF không có ở '%s'!

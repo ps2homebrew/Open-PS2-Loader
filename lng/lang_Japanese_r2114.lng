@@ -1,9 +1,8 @@
 # Japanese Translation by yamamotonew and keiichiro2000
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Japanese
-OPL %s
 設定を保存する
 戻る
 ネットワーク設定
@@ -14,7 +13,7 @@ OPL %s
 終了
 設定
 メニュー
-USBゲーム
+BDMゲーム
 HDDゲーム
 ETHゲーム
 アプリ
@@ -44,7 +43,6 @@ X
 ゲームリスト
 ゲーム設定
 設定を削除
-キー設定を初期化
 Scrolling Speed
 遅い
 普通
@@ -55,16 +53,16 @@ Scrolling Speed
 ゲームIDをロード中にエラーが発生しました
 自動的に並べ替え
 言語設定をロード中にエラーが発生しました
-デバッグカラーを無効化
+Debug Colors
 コントローラーが見つかりません。お待ちください…
-カバーアートを表示
+Cover Art
 ワイドスクリーン
 電源を切る
 設定をロード中
 設定を保存中
 デバイスを開始
 リフレッシュ
-BDMデバイス開始モード
+BDM Start Mode
 HDDデバイス開始モード
 ETHデバイス開始モード
 アプリメニュー表示モード
@@ -78,7 +76,6 @@ NBDサーバを取消中…
 IGRパス
 背景色
 文字色
-- PS2 -
 - SMBサーバ -
 IPアドレスタイプ
 Static
@@ -102,7 +99,7 @@ OK
 削除
 実行
 表示設定
-高度なメニューで書換えを有効化
+Write Operations
 最後にプレイしたゲームを記憶する
 セレクトボタン
 ゲームがデフラグされていません
@@ -115,8 +112,6 @@ Syscallの解除
 一部のムービーをスキップ
 二層ディスク(DVD9)用設定
 IGRを無効化
-未使用
-未使用
 サイズを変更するとVMCはフォーマットされます
 VMCファイルを作成
 開始
@@ -166,8 +161,6 @@ V-Sync
 モード 4
 モード 5
 モード 6
-モード 7
-モード 8
 GSM設定
 ETHリンクモード
 100Mbit full-duplex
@@ -175,9 +168,8 @@ ETHリンクモード
 10Mbit full-duplex
 10Mbit half-duplex
 GSM設定
-GSM有効化
+GSM Selector
 GSM設定をオン/オフ
-画面モード
 指定されたモードを常に有効化
 水平調整
 水平方向の表示位置を微調整
@@ -188,7 +180,7 @@ Overscan 調整
 FMVスキップ
 フルモーションムービーをスキップ
 チート設定
-PS2RDチートを有効化
+PS2RD Cheat Engine
 PS2RDチートをゲーム毎に指定
 PS2RDチートモード
 自動/手動チート選択
@@ -213,7 +205,7 @@ PS2ロゴ
 本体リージョンとディスクが一致した場合のみ表示されます
 PADEMUの設定
 PADEMUの設定
-PADEMU有効化
+Pad Emulator
 ゲーム毎にPADEMUの有効/無効を指定
 PADEMUモード
 モードを選択
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 ポート番号:
 PADEMUを適用するポートを指定
-ポート毎設定
+Emulation
 ポート毎にPADEMUを適用
-振動の有効化
+Vibration
 ポート毎に振動の有効/無効を指定
 BluetoothアダプタのMACアドレス:
 DSのペア設定MACアドレス:
@@ -241,12 +233,12 @@ Yes
 No
 BluetoothアダプタはDS3 / DS4コントローラをサポートしています
 BluetoothアダプタはDS3 / DS4コントローラをサポートしていません
-マルチタップエミュレーションを有効
+Multitap Emulation
 選択したゲームのマルチタップエミュレーションをオン/オフにします
 マルチタップエミュレータのポート
 マルチタップエミュレーション用のポートを選択
-フェイクDS3に対する回避策を無効
-いくつかのフェイクDS3は回避策を必要ですが、このオプションはそれを無効にします
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 FIELD反転をエミュレートする
 プログレッシブビデオモードでグリッチするゲームを修正しました
 パレンタルロック設定
@@ -259,14 +251,17 @@ FIELD反転をエミュレートする
 エラー - このパスワードは使用できません
 VMC %s ファイルは破損しています。 スロット %d のメモリカードに保存しますか？
 オーディオ設定
-効果音を有効にする
-起動音を有効にする
+Sound Effects
+Boot Sound
 効果音の音量
 起動音の音量
 ビデオモードの変更を確認しますか？
 ゲームリストをキャッシュ（HDD）
-通知を有効にします
-%s から %s をロード 
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 ゲーム設定を保存しました
 %s 設定を削除しました
@@ -282,9 +277,10 @@ Options
 リリース
 開発元
 説明文
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 ゲーム
 PS1 ゲーム　画面モード
 POPSTARTER.ELFが '%s'に見つかりません!

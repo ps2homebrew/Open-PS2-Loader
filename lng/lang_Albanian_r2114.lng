@@ -1,9 +1,8 @@
 # Translation by LoniTheFricc
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Albanian
-OPL %s
 Ruaj Ndryshimet
 Mbrapa
 Opsionet e Networkit
@@ -14,7 +13,7 @@ Gabim gjatë shkrimit të opsioneve!
 Dil
 Opsione
 Menu
-Lojëra USB
+Lojëra BDM
 Lojëra HDD
 Lojëra ETH
 Programe
@@ -44,7 +43,6 @@ Kqyq
 Lista e Lojërave
 Konfigurimet e Lojës
 Hiq Konfigurimet
-Hequr të gjithë çelësat nga loja.
 Scrolling Speed
 Ngadalë
 Mesatare
@@ -55,16 +53,16 @@ Prisni.
 Gabim duke ngarkuar ID e Lojës.
 Rënditje Automatike.
 Gabim duke ngarkuar skedarin e gjuhës.
-Çaktivizo korrigjimin e Ngjyrave.
+Debug Colors
 Nuk u dallua nje telekomandë, duke pritur...
-Aktivizo Artin e Kopertinës
+Cover Art
 Ekran i gjerë
 Fike
 Duke Ngarkuar Konfigurimin...
 Duke Ruajtur Konfigurimin...
 Fillo Pajisjen
 Rifresko
-Moda e Fillimit të BDM-s
+BDM Start Mode
 Moda e Fillimit të HDD-s
 Moda e Fillimit të ETH-it
 Moda e Shfaqjes së Aplikacioneve
@@ -78,7 +76,6 @@ Serveri NBD duke u shkarkuar...
 Rruga e IGR
 Ngjyra e Sfondit
 Ngjyra e Tekstit
-- PS2 -
 - Serveri SMB -
 Lloji i Adresës IP
 Statik
@@ -102,7 +99,7 @@ Riemërto
 Fshi
 Hap
 Opsionet e Ekranit
-Lejo Operacionet e Modifikimit
+Write Operations
 Mbaj mend lojen e fundit të luajtur
 Zgjidh Butonin
 Gabim, Loja është e fragmentuar.
@@ -115,8 +112,6 @@ Zhvendo Syscalls
 Kapërce Video
 Imito DVD-DL
 Çaktivizo IGR
-E pa Përdorur
-E pa Përdorur
 Ndryshimi i Madhësisë do të riformatojë VMC-n.
 Krijo
 Fillo
@@ -166,8 +161,6 @@ Moda 3
 Moda 4  
 Moda 5 
 Moda 6  
-Moda 7  
-Moda 8  
 Konfiguro GSM
 Moda e Lidhjes Ethernet
 100Mbit Full-duplex
@@ -175,9 +168,8 @@ Moda e Lidhjes Ethernet
 10Mbit Full-duplex
 10Mbit Half-duplex
 Opsionet GSM
-Aktiviyo GSM
-Ndërron GSM Ndezur/Fikur.
-VMODE
+GSM Selector
+Toggles GSM on/off.
 Moda e shfaqjes së personalizuar te detyruar.
 POZ-H
 Rregullim Horizontal.
@@ -188,7 +180,7 @@ Rregullim të Tejkalimit e TV.
 Tejkalim FMV.
 Tejkalon Videot ne Mocion të Plotë.
 Opsionet e Hileve
-Aktivizo Programin e hiles PS2RD
+PS2RD Cheat Engine
 Lejo Programin e hiles PS2RD te modifikojë lojën.
 Moda e hiles PS2RD.
 Zgjedhje Automatike ose Zgjedhe të hileve te lojrave.
@@ -213,7 +205,7 @@ Logoja e PS2
 Shfaqet për një logo të vlefshme të diskut që përputhet me rajonin e konsolës.
 Konfiguro PADEMU
 Konfigurimet e Emulatorit te Pad-it
-Aktivizo Emulatorin e Pad-it
+Pad Emulator
 Aktivizon/Çaktivizon Emulatorin e Pad-it për lojën e zgjedhur.
 Moda e Emulatorit të Pad-it
 Zgjidj Modën e Emulatorit të Pad-it.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Opsionet për Port:
 Zgjidh Portën e Emulatorit te Pad-it për opsione.
-Aktivizo Emulimin
+Emulation
 Aktivizon/Çaktivizon Emulatorin e Pad-it për portën e zgjedhur.
-Aktivizo Dridhjen
+Vibration
 Aktivizon/Çaktivizon Dridhjen e Emulatorit të Pad-it për portën e zgjedhur.
 Adresa MAC e Adapterit BT USB:
 Telekomanda DS e lidhur me MAC Adresin:
@@ -241,12 +233,12 @@ Po
 Jo
 Adapteri Bluetooth duhet të jetë plotësisht i pajtueshëm me telekomandat DS3/DS4.
 Adapteri Bluetooth mund të mos funksionojë si duhet me kontrolluesit DS3/DS4.
-Aktivizo Emulimin e Multitap
+Multitap Emulation
 Aktivizon/Çaktivizon emulimin e Multitap për lojën e zgjedhur.
 Emulatori i Multitap në Portën:
 Zgjidh portën për Emulimin e Multitap.
-Çaktivizo Zgjidhjen e DS3-ve të rreme.
-Disa DS3 të rreme kanë nevojë për zgjidhje, ky opsion do ta çaktivizoj atë.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulo Shfletimin FIELD
 Rregullo lojërat që kanë anomali në mënyrat progresive të videos.
 Opsionet e Kyçit Prindëror.
@@ -259,14 +251,17 @@ Opsionet e Versionit:
 Gabim - ky fjalëkalim nuk mund të përdoret.
 Skedari VMC %s është i fragmentuar.Vazdho me Kartën e Memorjes ne Portën %d?
 Opsionet Audio
-Aktivizo Tingujt
-Aktivizo Tingullin e nisjes
+Sound Effects
+Boot Sound
 Volumi i Tingujve
 Volumi i Tinguliit të nisjes 
 Konfirmo ndryshimet e Videos?
 Depozito Listën e Lojerave? (HDD)
-Aktivizo Njoftimet
-%s ngarkuar nga %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Opsione
 Konfigurimet e Lojës u ruajtën.
 %s konfigurimet u heqën.
@@ -282,9 +277,10 @@ Zhanri
 Publikimi
 Zhvilluesi
 Përshkrimi
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 Lojrat PS1
 Moda e Shfaqjes se Lojrave PS1
 POPSTARTER.ELF nuk është gjetur tek '%s'!

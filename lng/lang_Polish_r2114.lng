@@ -1,9 +1,8 @@
 # Translation by yohokaru
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Polish
-OPL %s
 Zapisz Zmiany
 Wróć
 Ustawienia Sieci
@@ -14,7 +13,7 @@ Błąd zapisu ustawień!
 Wyjdź
 Ustawienia
 Menu
-Gry USB
+Gry BDM
 Gry HDD
 Gry ETH
 Aplikacje
@@ -44,7 +43,6 @@ X
 Lista Gier
 Ustawienia Gry
 Usuń Ustawienia
-Usunięto wszystkie klucze dla gry.
 Scrolling Speed
 Wolno
 Średnio
@@ -55,16 +53,16 @@ Proszę czekać.
 Błąd podczas ładowania identyfikatora gry.
 Sortowanie Automatyczne
 Błąd ładowania pliku językowego.
-Nie Wyświetlaj Kolorów Debugowania
+Debug Colors
 Nie wykryto kontrolera, oczekiwanie...
-Wyświetlanie Okładek
+Cover Art
 Szeroki Ekran
 Wyłącz
 Wczytywanie ustawień...
 Zapisywanie ustawień...
 Uruchom Urządzenie
 Odśwież
-Uruchom Urządzenie BDM
+BDM Start Mode
 Uruchom Urządzenie HDD
 Uruchom Urządzenie ETH
 Wyświetl Menu Aplikacji
@@ -78,7 +76,6 @@ Serwer NBD zostanie zamknięty...
 Ścieżka Dla IGR
 Kolor Tła
 Kolor Tekstu
-- PS2 -
 - Serwer SMB -
 Typ Adresu IP
 Statyczny
@@ -102,7 +99,7 @@ Zmień Nazwę
 Usuń
 Uruchom
 Ustawienia Obrazu
-Włącz Operację Zapisu
+Write Operations
 Zapamiętaj Ostatnio Uruchomioną Grę
 Przycisk Wyboru
 Błąd, gra jest pofragmentowana.
@@ -115,8 +112,6 @@ Wymaż OPL Po Uruchomieniu Gry
 Pomiń Wstawki Filmowe
 Emuluj DVD-DL
 Wyłącz IGR
-Niewykorzystany
-Niewykorzystany
 Zmiana rozmiaru spowoduje przeformatowanie VMC.
 Utwórz
 Start
@@ -166,8 +161,6 @@ Tryb 3
 Tryb 4
 Tryb 5
 Tryb 6
-Tryb 7
-Tryb 8
 Konfiguruj GSM
 Szybkość I Tryb Sieci
 100Mbit Pełny-dupleks
@@ -175,9 +168,8 @@ Szybkość I Tryb Sieci
 10Mbit Pełny-dupleks
 10Mbit Pół-dupleks
 Ustawienia GSM
-Aktywuj GSM
+GSM Selector
 Włącz lub wyłącz GSM.
-Tryb Wideo
 Wymuś określony tryb wyświetlania.
 Położenie Poziome
 Regulacja w poziomie.
@@ -188,7 +180,7 @@ Regulacja overscanu.
 Pomiń FMV
 Pomija wstawki filmowe.
 Ustawienia Kodów
-Włącz Silnik Kodów PS2RD
+PS2RD Cheat Engine
 Pozwól silnikowi kodów PS2RD patchować grę.
 Tryb Silnika Kodów PS2RD
 Auto-wybieranie lub wybieranie kodów dla gry.
@@ -213,7 +205,7 @@ Logo PS2
 Logo zostanie wyświetlone wyłącznie jeśli region gry i konsoli będzie taki sam.
 Konfiguracja Emulacji Pada
 Ustawienia Emulacji Pada
-Włącz Emulację Pada
+Pad Emulator
 Włącza/wyłącza emulację Pada dla wybranej gry.
 Tryb Emulacji Pada
 Wybierz tryb emulacji Pada.
@@ -221,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Ustawienia Portu:
 Wybierz Port emulacji Pada dla ustawień.
-Włącz Emulację
+Emulation
 Włącz/wyłącz emulację Pada dla wybranego portu.
-Włącz Wibracje
+Vibration
 Włącz/wyłącz wibracje dla wybranego portu emulacji Pada.
 Adres MAC adaptera Bluetooth USB:
 Kontroler DS sparowany z adresem MAC:
@@ -241,12 +233,12 @@ Tak
 Nie
 Adapter Bluetooth powinien być w pełni kompatybilny z kontrolerami DS3/DS4.
 Adapter Bluetooth może nie współpracować poprawnie z kontrolerami DS3/DS4.
-Włącz emulację Multitapa
+Multitap Emulation
 Włącza/wyłącza emulację Multitapa dla wybranej gry.
 Emulacja Multitapa Dla Portu:
 Wybierz port dla emulacji Multitapa.
-Nie Stosuj Obejścia Dla Klonów DS3.
-Niektóre klony DS3 wymagają obejścia, ta opcja to wyłączy.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emuluj FIELD Flipping
 Poprawka dla gier w których występują usterki w trybie progresywnego obrazu.
 Ustawienia Blokady Rodzicielskiej
@@ -259,14 +251,17 @@ Opcje Kompilacji:
 Błąd - to hasło nie może być użyte.
 Plik VMC %s jest pofragmentowany. Kontynuuj z kartą pamięci w gnieździe %d?
 Ustawienia Dźwiękowe
-Efekty Dźwiękowe
-Dźwięk Startowy
+Sound Effects
+Boot Sound
 Głośność Efektów Dźwiękowych
 Głośność Dźwięku Startowego
 Potwierdasz zmianę rozdzielczości?
 Buforowanie Listy Gier (HDD)
-Powiadomienia
-%s załadowany z %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Ustawienia gry zostały zapisane.
 %s ustawienia zostały usunięte.
@@ -282,9 +277,10 @@ Gatunek
 Data wydania
 Deweloper
 Opis
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

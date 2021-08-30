@@ -1,9 +1,8 @@
 # Translated by jimmysmith
-# Last update: August 06, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2055-2c84440-2021-08-06 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1728-3c146fb-2021-08-06
+# Last update: August 29, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Czech
-OPL %s
 Uložit změny
 Zpět
 Síťová konfigurace
@@ -14,7 +13,7 @@ Chyba při ukládání nastavení!
 Ukončit
 Nastavení
 Menu
-USB Hry
+BDM Hry
 HDD Hry
 ETH Hry
 Aplikace
@@ -44,7 +43,6 @@ Křížek
 Seznam her
 Nast. hry
 Remove Settings
-Odebrat všechny klíče pro hru
 Scrolling Speed
 Pomalu
 Normálně
@@ -55,16 +53,16 @@ Chvilku strpení
 Chyba při nahrávání Game ID
 Automatické seřazení
 Chyba při nahrávání jazykového souboru
-Vypnout debug barvy
+Debug Colors
 Nebyl detekován žádný ovladač, čekám...
-Povolit Cover Art
+Cover Art
 Širokoúhlá obrazovka
 Vypnout
 Nahrávám konfiguraci
 Ukládám konfiguraci
 Zapnout zařízení
 Obnovit
-BDM zařízení při startu
+BDM Start Mode
 HDD zařízení při startu
 ETH zařízení při startu
 Aplikace při startu
@@ -78,7 +76,6 @@ Vypínání NBD Serveru...
 Cesta k IGR
 Barva pozadí
 Barva textu
-- PS2 -
 - SMB Server -
 Typ IP adresy
 Statická
@@ -102,7 +99,7 @@ Přejmen.
 Smazat
 Spustit
 Nastavení obrazovky
-Povolit zápisy
+Write Operations
 Pamatovat posledně hranou hru
 Tlačítko Select
 Chyba, hra je fragmentovaná
@@ -115,8 +112,6 @@ Unhook Syscalls
 Přeskočit videa
 Emulovat DVD-DL
 Vypnout IGR
-Unused
-Unused
 Změna velikosti přeformátuje VMC
 Vytvořit
 Start
@@ -166,8 +161,6 @@ Mód 3
 Mód 4
 Mód 5
 Mód 6
-Mód 7
-Mód 8
 Konfigurovat GSM
 Ethernet link mód
 100Mbit full-duplex
@@ -175,9 +168,8 @@ Ethernet link mód
 10Mbit full-duplex
 10Mbit half-duplex
 Nastavení GSM
-Zapnout GSM
+GSM Selector
 Přepíná GSM ON/OFF
-VMODE
 Vnutit uživatelský Display Mód
 H-POS
 Horizontální úprava
@@ -188,7 +180,7 @@ Overscan Adjustment
 Přeskočit FMV
 Přeskočit Full Motion Videa
 Nastavení Cheatů
-Zapnout PS2RD Cheat Engine
+PS2RD Cheat Engine
 Umožní použití PS2RD Cheat Enginu
 PS2RD Cheat Engine Mód
 Automatické nebo uživatelská volba cheatů
@@ -213,17 +205,17 @@ PS2 Logo
 Zobrazováno pouze u validního loga disku, který má stejný region jako konzole
 Configure PADEMU
 Pad Emulator Settings
-Enable Pad Emulator
-Turns On/Off Pad Emulator for selected game.
+Pad Emulator
+Turns on/off Pad Emulator for selected game.
 Pad Emulator Mode
 Select Pad Emulator mode.
 DualShock3/4 USB
 DualShock3/4 BT
 Settings For Port:
 Select Pad Emulator port for settings.
-Enable Emulation
+Emulation
 Turns on/off Pad Emulator for selected port.
-Enable Vibration
+Vibration
 Turns on/off vibration for Pad Emulator selected port.
 USB Bluetooth Adapter MAC Address:
 DS Controller Paired To MAC Address:
@@ -241,12 +233,12 @@ Yes
 No
 Bluetooth adapter should be fully compatible with DS3/DS4 controllers.
 Bluetooth adapter may not work correctly with DS3/DS4 controllers.
-Enable Multitap Emulation
+Multitap Emulation
 Turns on/off Multitap emulation for selected game.
 Multitap Emulator On Port:
 Select port for Multitap emulation.
-Disable Fake DS3 Workaround
-Some fake DS3s need workaround, this option will disable it.
+Fake DS3 Workaround
+Some fake DS3s need a workaround, this option will enable it.
 Emulate FIELD Flipping
 Fix for games that glitch under progressive video modes.
 Parental Lock Settings
@@ -259,14 +251,17 @@ Build Options:
 Error - this password cannot be used.
 VMC %s file is fragmented. Continue with Memory Card in slot %d?
 Audio Settings
-Enable Sound Effects
-Enable Boot Sound
+Sound Effects
+Boot Sound
 Sound Effects Volume
 Boot Sound Volume
 Confirm video mode change?
 Cache Game List (HDD)
-Enable Notifications
-%s loaded from %s
+Notifications
+Config loaded from %s
+Theme loaded from %s
+Language loaded from %s
+%s partition mounted.
 Options
 Game settings saved.
 %s settings removed.
@@ -282,9 +277,10 @@ Genre
 Release
 Developer
 Description
-BDM Games
-Select Block Devices
+Block Devices
 Controller Settings
+Turn on/off Block Device Manager.
+Turn on/off Block Devices (e.g. USB).
 PS1 Games
 PS1 Games Display Mode
 POPSTARTER.ELF not found at '%s'!

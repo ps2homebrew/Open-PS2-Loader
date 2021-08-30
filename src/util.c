@@ -10,7 +10,7 @@
 #include "include/system.h"
 #include <string.h>
 #include <malloc.h>
-#include <osd_config.h>
+#include <rom0_info.h>
 
 #include "include/hdd.h"
 
@@ -35,8 +35,6 @@ int getFileSize(int fd)
     return size;
 }
 
-#define MAX_ENTRY 128
-
 static int checkMC()
 {
     int mc0_is_ps2card, mc1_is_ps2card;
@@ -44,14 +42,14 @@ static int checkMC()
 
     if (mcID == -1) {
         mc0_is_ps2card = 0;
-        DIR *mc0_root_dir = opendir("mc0:");
+        DIR *mc0_root_dir = opendir("mc0:/");
         if (mc0_root_dir != NULL) {
             closedir(mc0_root_dir);
             mc0_is_ps2card = 1;
         }
 
         mc1_is_ps2card = 0;
-        DIR *mc1_root_dir = opendir("mc1:");
+        DIR *mc1_root_dir = opendir("mc1:/");
         if (mc1_root_dir != NULL) {
             closedir(mc1_root_dir);
             mc1_is_ps2card = 1;
@@ -94,23 +92,6 @@ static int checkMC()
     return mcID;
 }
 
-static void writeMCIcon(void)
-{
-    int fd;
-
-    fd = openFile("mc?:OPL/opl.icn", O_WRONLY | O_CREAT | O_TRUNC);
-    if (fd >= 0) {
-        write(fd, &icon_icn, size_icon_icn);
-        close(fd);
-    }
-
-    fd = openFile("mc?:OPL/icon.sys", O_WRONLY | O_CREAT | O_TRUNC);
-    if (fd >= 0) {
-        write(fd, &icon_sys, size_icon_sys);
-        close(fd);
-    }
-}
-
 void checkMCFolder(void)
 {
     char path[32];
@@ -126,7 +107,11 @@ void checkMCFolder(void)
     snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID & 1);
     fd = open(path, O_RDONLY, 0666);
     if (fd < 0) {
-        writeMCIcon();
+        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd >= 0) {
+            write(fd, &icon_icn, size_icon_icn);
+            close(fd);
+        }
     } else {
         close(fd);
     }
@@ -134,7 +119,11 @@ void checkMCFolder(void)
     snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID & 1);
     fd = open(path, O_RDONLY, 0666);
     if (fd < 0) {
-        writeMCIcon();
+        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+        if (fd >= 0) {
+            write(fd, &icon_sys, size_icon_sys);
+            close(fd);
+        }
     } else {
         close(fd);
     }
@@ -157,10 +146,16 @@ static int checkFile(char *path, int mode)
 
         // in create mode, we check that the directory exist, or create it
         if (mode & O_CREAT) {
-            int res = mkdir(path, 0777);
-            // Non-standard POSIX check: the error value is supposed to be assigned to errno, not the return value
-            if (res >= 0 || res == -EEXIST) {
-                return 0;
+            char dirPath[256];
+            char *pos = strrchr(path, '/');
+            if (pos) {
+                memcpy(dirPath, path, (pos - path));
+                dirPath[(pos - path)] = '\0';
+                int res = mkdir(dirPath, 0777);
+                // Non-standard POSIX check: the error value is supposed to be assigned to errno, not the return value
+                if (res >= 0 || res == -EEXIST) {
+                    return 0;
+                }
             }
         }
     }

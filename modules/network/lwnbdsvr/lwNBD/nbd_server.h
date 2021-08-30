@@ -124,7 +124,7 @@ typedef struct nbd_context
     char export_name[32];
     uint64_t export_size; /* size of export in byte */
     uint16_t eflags;      /* per-export flags */
-    uint8_t blockshift;   /* in power of 2 for bit shifting - log2(blocksize) */
+    uint16_t blocksize;   /* in power of 2 for bit shifting - log2(blocksize) */
     uint8_t *buffer;
 
 } nbd_context;

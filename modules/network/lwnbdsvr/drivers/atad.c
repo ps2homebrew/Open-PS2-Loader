@@ -30,12 +30,12 @@ int atad_ctor(atad_driver *const me, int device)
     // int ata_device_sce_identify_drive(int device, void *data);
     strcpy(me->super.export_desc, "PlayStation 2 HDD via ATAD");
     strcpy(me->super.export_name, "hdd0");
-    me->super.blockshift = 9;
+    me->super.blocksize = 512;
     me->super.buffer = nbd_buffer;
     me->super.eflags = NBD_FLAG_HAS_FLAGS;
 
     if (dev_info != NULL && dev_info->exists) {
-        me->super.export_size = (uint64_t)dev_info->total_sectors << me->super.blockshift;
+        me->super.export_size = (uint64_t)dev_info->total_sectors * me->super.blocksize;
         return 0;
     }
     return 1;

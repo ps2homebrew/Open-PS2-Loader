@@ -32,6 +32,7 @@ int atad_ctor(atad_driver *const me, int device)
     strcpy(me->super.export_name, "hdd0");
     me->super.blockshift = 9;
     me->super.buffer = nbd_buffer;
+    me->super.eflags = NBD_FLAG_HAS_FLAGS;
 
     if (dev_info != NULL && dev_info->exists) {
         me->super.export_size = (uint64_t)dev_info->total_sectors << me->super.blockshift;

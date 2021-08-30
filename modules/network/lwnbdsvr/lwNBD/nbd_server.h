@@ -42,7 +42,6 @@
 #define LWIP_HDR_APPS_NBD_SERVER_H
 
 #include "nbd-protocol.h"
-#include "nbd_protocol.h"
 #include "nbd_opts.h"
 
 #include <stdint.h>
@@ -166,6 +165,11 @@ struct nbd_context_Vtbl
 
 int nbd_recv(int s, void *mem, size_t len, int flags);
 int nbd_init(nbd_context **ctx);
+
+// in nbd_protocol.c
+//todo: const ctxs
+nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs);
+int transmission_phase(const int client_socket, const nbd_context *ctx);
 
 static inline int nbd_read(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length)
 {

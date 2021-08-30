@@ -47,7 +47,7 @@ uint8_t nbd_buffer[NBD_BUFFER_LEN] __attribute__((aligned(64)));
  * @param client_socket
  * @param ctx NBD callback struct
  */
-nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
+nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs)
 {
     register int size;
     uint32_t cflags, name_len, desc_len, len;
@@ -55,6 +55,7 @@ nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
     struct nbd_export_name_option_reply handshake_finish;
     struct nbd_fixed_new_option_reply fixed_new_option_reply;
     struct nbd_new_handshake new_hs;
+    nbd_context **ptr_ctx = ctxs;
 
     //temporary workaround
     nbd_context *ctx = ctxs[0];
@@ -63,7 +64,7 @@ nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
 
     new_hs.nbdmagic = htonll(NBD_MAGIC);
     new_hs.version = htonll(NBD_NEW_VERSION);
-    new_hs.gflags = 0; //htons(NBD_FLAG_FIXED_NEWSTYLE);
+    new_hs.gflags = htons(NBD_FLAG_FIXED_NEWSTYLE);
     size = send(client_socket, &new_hs, sizeof(struct nbd_new_handshake),
                 0);
     if (size < sizeof(struct nbd_new_handshake))
@@ -76,8 +77,6 @@ nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
     /* TODO: manage cflags
      * https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md#client-flags
      */
-
-    ctx->eflags = NBD_FLAG_HAS_FLAGS;
 
     while (1) {
 
@@ -99,6 +98,8 @@ nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
             size = nbd_recv(client_socket, &nbd_buffer, new_opt.optlen, 0);
             nbd_buffer[new_opt.optlen] = '\0';
         }
+
+        printf("%d\n", new_opt.option);
 
         switch (new_opt.option) {
 
@@ -125,22 +126,26 @@ nbd_context *negotiation_phase(int client_socket, nbd_context **ctxs)
             // see nbdkit send_newstyle_option_reply_exportnames()
             case NBD_OPT_LIST:
 
-                name_len = strlen(ctx->export_name);
-                desc_len = ctx->export_desc ? strlen(ctx->export_desc) : 0;
-                len = htonl(name_len);
-
-                //TODO : many export in a loop
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_SERVER);
-                fixed_new_option_reply.replylen = htonl(name_len + sizeof(len) +
-                                                        desc_len);
+                while (*ptr_ctx) {
+                    name_len = strlen(ctx->export_name);
+                    desc_len = (*ptr_ctx)->export_desc ? strlen((*ptr_ctx)->export_desc) : 0;
+                    len = htonl(name_len);
+                    fixed_new_option_reply.replylen = htonl(name_len + sizeof(len) +
+                                                            desc_len);
 
+                    size = send(client_socket, &fixed_new_option_reply,
+                                sizeof(struct nbd_fixed_new_option_reply), MSG_MORE);
+                    size = send(client_socket, &len, sizeof len, MSG_MORE);
+                    size = send(client_socket, (*ptr_ctx)->export_name, name_len, MSG_MORE);
+                    size = send(client_socket, (*ptr_ctx)->export_desc, desc_len, MSG_MORE);
+                    ptr_ctx++;
+                }
+                fixed_new_option_reply.reply = htonl(NBD_REP_ACK);
                 size = send(client_socket, &fixed_new_option_reply,
-                            sizeof(struct nbd_fixed_new_option_reply), MSG_MORE);
-                size = send(client_socket, &len, sizeof len, MSG_MORE);
-                size = send(client_socket, ctx->export_name, name_len, MSG_MORE);
-                size = send(client_socket, ctx->export_desc, desc_len, 0);
+                            sizeof(struct nbd_fixed_new_option_reply), 0);
                 break;
                 //TODO
                 //                break;
@@ -181,7 +186,7 @@ error:
  * @param client_socket
  * @param ctx NBD callback struct
  */
-int transmission_phase(int client_socket, nbd_context *ctx)
+int transmission_phase(const int client_socket, const nbd_context *ctx)
 {
     register int r, size, error = -1, retry = NBD_MAX_RETRIES, sendflag = 0;
     register uint32_t blkremains = 0, byteread = 0, bufbklsz = 0;

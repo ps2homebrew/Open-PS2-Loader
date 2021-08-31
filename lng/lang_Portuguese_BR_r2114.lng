@@ -1,5 +1,5 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: August 29, 2021
+# Last update: August 30, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
 # official thread: http://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
@@ -20,7 +20,7 @@ Aplicativos
 Tema
 Idioma
 O sistema será desligado.
-Sair para o navegador?
+Sair para o Navegador?
 Cancelar atualização?
 Erro %d: Nenhum HD detectado.
 Erro %d: O HD não está formatado.
@@ -49,30 +49,30 @@ Média
 Rápida
 Menu padrão
 Iniciar a partir do disco
-Espere por favor
-Erro ao carregar ID do jogo
+Espere por favor.
+Erro ao carregar ID do jogo.
 Ordenação automática
-Erro ao carregar arquivo de idioma
-Debug Colors
-Controle não detectado, esperando...
-Cover Art
+Erro ao carregar arquivo de idioma.
+Depuração de cores
+Controle não detectado, esperando…
+Artes
 Wide screen (Visão panorâmica)
 Desligar
-Carregando configurações...
-Salvando configurações...
-Iniciar dispositivo
+Carregando configurações…
+Salvando configurações…
+Iniciar dispositivo.
 Atualizar
-BDM Start Mode
+Modo de início BDM
 Modo de início do dispositivo HDD
 Modo de início do dispositivo REDE
 Modo de início dos Aplicativos
 Automático
 Manual
 Iniciar servidor NBD
-Iniciando Servidor NBD...
-Servidor NBD conectado...
+Iniciando Servidor NBD…
+Servidor NBD conectado…
 Falha na inicialização do Servidor NBD.
-Fechando servidor NBD...
+Fechando servidor NBD…
 Sair para
 Cor do fundo
 Cor do texto
@@ -99,13 +99,13 @@ Renomear
 Excluir
 Iniciar
 Definições de tela
-Write Operations
+Ações de gravação
 Lembrar último jogo executado
 Escolha o botão de ação ( X ou O )
 Erro, o jogo está fragmentado!
-Erro, não foi possível iniciar o item
-Testar Alterações
-Deixar vazio para identificação como convidado (GUEST)
+Erro, não foi possível iniciar o item.
+Testar alterações
+Deixar vazio para identificação como convidado.
 Simular precisão de leitura CD/DVD
 Modo síncrono
 Desativar chamadas do sistema
@@ -124,27 +124,27 @@ Nome
 Tamanho
 Estado
 Progresso
-Arquivo VMC já existe
-Arquivo VMC inválido, o tamanho está incorreto
+Arquivo VMC já existe.
+Arquivo VMC inválido, o tamanho está incorreto.
 Arquivo VMC precisa ser criado!
 Erro ao acessar o VMC %s. Continuar com MC na entrada %d?
 Atualização automática
-Informações do programa
+Informações
 Desenvolvedores
 Controle de qualidade
 Prefixar uma pasta no BDM
-Inicia um ELF personalizado após o IGR
-Valor em minuto(s), 0(zero) desabilita o spin down
+Inicia um ELF personalizado após o IGR.
+Valor em minuto(s), 0(zero) desabilita o spin down.
 Desligamento automático do HDD (spin down)
 Modo de vídeo
 Cor do diálogo
 Cor da seleção
-Redefinir Cores
+Redefinir cores
 Info
 Customizar ELF principal
 Seleção de cor
 Reconectar
-Deixe vazio para listar compartilhamentos
+Deixe vazio para listar compartilhamentos.
 Prefixar uma pasta na REDE
 Apagar
 Espaço
@@ -163,34 +163,34 @@ Modo 5
 Modo 6
 Configurar GSM
 Conexão de rede
-100Mbit Full-duplex
-100Mbit Half-duplex
-10Mbit Full-duplex
-10Mbit Half-duplex
+100Mbit full-duplex
+100Mbit half-duplex
+10Mbit full-duplex
+10Mbit half-duplex
 Configurações GSM
-GSM Selector
-Autoriza o GSM a forçar o modo de vídeo selecionado abaixo
-Modo de vídeo a ser forçado
+Seletor GSM
+Autoriza o GSM a forçar o modo de vídeo selecionado abaixo.
+Modo de vídeo a ser forçado.
 Ajuste Horizontal
-Define o ajuste horizontal da imagem na tela
+Define o ajuste horizontal da imagem na tela.
 Ajuste Vertical
-Define o ajuste vertical da imagem na tela
+Define o ajuste vertical da imagem na tela.
 Tela visível
-Define o ajuste da tela visível
+Define o ajuste da tela visível.
 Pular vídeos FMV
-Ignora vídeos no formato (FMV)
+Ignora vídeos no formato (FMV).
 Configurar PS2RD
-PS2RD Cheat Engine
-Autoriza o PS2RD a usar Cheats(Trapaças) nos seus jogos
+PS2RD
+Autoriza o PS2RD a usar Trapaças nos seus jogos.
 Modo PS2RD
-Auto seleção(Ativa todos) ou Selecione os Cheats do jogo
+Auto seleção(Ativa todos) ou Selecione os Cheats do jogo.
 Auto seleção
 Selecione os Cheats do jogo
-Erro: Falha ao carregar o arquivo (Cheat)
-Cheats não encontrados ou ilegíveis
+Erro: Falha ao carregar o arquivo (Cheat).
+Cheats não encontrados ou ilegíveis.
 Baixar arquivos(cfg)
 Atualizar arquivos(cfg)
-Substituir os arquivos (cfg) existentes
+Substituir os arquivos(cfg) existentes
 Atualização falhou.
 Falha na conexão com o servidor(cfg).
 Atualização concluída.
@@ -198,14 +198,14 @@ Atualização cancelada.
 Baixar arquivos(cfg) do servidor?
 Configurações personalizadas
 Arquivos(cfg) baixados
-Auto iniciar em %i segundos
+Auto iniciar em %i s…
 Auto iniciar
-Valor em segundo(s), 0(zero) desabilita o auto iniciar
+Valor em segundo(s), 0(zero) desabilita o auto iniciar.
 Logo PS2
 Exibido para um logotipo de disco válido que corresponde à região do console.
 Configurar PADEMU
 Configurações do Emulador de Controles
-Pad Emulator
+Emulador de Controles
 Liga/desliga o Emulador de Controles para o jogo selecionado.
 Modo Emulador de Controles
 Selecione o modo do Emulador de Controles.
@@ -213,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Configurações da porta:
 Selecione a porta que será configurada.
-Emulation
+Emulação
 Liga/desliga a emulação na porta selecionada.
-Vibration
+Vibração
 Liga/desliga a vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
 Endereço MAC do Controle DS emparelhado:
@@ -224,7 +224,7 @@ Emparelhar Controle DS:
 Emparelha o Controle DS com o MAC do adaptador Bluetooth.
 Não conectado
 Informações do adaptador Bluetooth
-Mostra mais informações e recursos suportados
+Mostra mais informações e recursos suportados.
 Versão HCI:
 Versão LMP:
 ID do fabricante:
@@ -233,12 +233,12 @@ Sim
 Não
 O adaptador Bluetooth deve ser totalmente compatível com os controles DS3/4.
 O adaptador Bluetooth pode não funcionar corretamente com os controles DS3/4.
-Multitap Emulation
+Emulação Multitap
 Liga/desliga a emulação Multitap para o jogo selecionado.
-Emulador Multitap na porta
+Emulador Multitap na porta:
 Selecione a porta para a emulação Multitap.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Solução alternativa para Controle DS3 pirata
+Alguns Controles DS3 piratas precisam de solução alternativa, esta opção irá habilitá-la.
 Emular inversão de CAMPO
 Correção para jogos que apresentam falhas nos modos de vídeo progressivo.
 Controle parental
@@ -251,17 +251,17 @@ Opções nesta compilação:
 Erro - esta senha não pode ser usada.
 O arquivo VMC %s está fragmentado. Continuar com o cartão de memória na entrada %d?
 Configurações de áudio
-Sound Effects
-Boot Sound
-Volume de efeitos sonoros
+Efeitos sonoros
+Som de inicialização
+Volume dos efeitos sonoros
 Volume do som de inicialização
 Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Notificações
+Configuração carregada de %s
+Tema carregado de %s
+Idioma carregado de %s
+Partição %s montada.
 Opções
 Configurações do jogo salvas.
 %s configurações removidas.
@@ -277,10 +277,10 @@ Gênero
 Data de lançamento
 Desenvolvedor
 Descrição
-Block Devices
-Configurar controles
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
+Dispositivos de entrada
+Configurações dos controles
+Ligue/desligue o gerenciador de dispositivos de entrada.
+Ligue/desligue dispositivos de entrada (ex: USB).
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

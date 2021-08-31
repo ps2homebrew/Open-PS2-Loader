@@ -13,7 +13,10 @@ extern void *load4_png;
 extern void *load5_png;
 extern void *load6_png;
 extern void *load7_png;
-extern void *usb_png;
+extern void *usb_png; // Leave BDM Icon as usb.png to maintain theme compat
+extern void *usb_bd_png;
+extern void *ilk_bd_png;
+extern void *m4s_bd_png;
 extern void *hdd_png;
 extern void *eth_png;
 extern void *app_png;
@@ -111,7 +114,10 @@ static texture_t internalDefault[TEXTURES_COUNT] = {
     {LOAD5_ICON, "load5", &load5_png},
     {LOAD6_ICON, "load6", &load6_png},
     {LOAD7_ICON, "load7", &load7_png},
-    {USB_ICON, "usb", &usb_png},
+    {BDM_ICON, "usb", &usb_png},
+    {USB_ICON, "usb_bd", &usb_bd_png},
+    {ILINK_ICON, "ilk_bd", &ilk_bd_png},
+    {MX4SIO_ICON, "m4s_bd", &m4s_bd_png},
     {HDD_ICON, "hdd", &hdd_png},
     {ETH_ICON, "eth", &eth_png},
     {APP_ICON, "app", &app_png},

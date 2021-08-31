@@ -1231,7 +1231,7 @@ static void thmLoad(const char *themePath)
     newT->loadingIconCount = i;
 
     // Customizable icons
-    for (i = USB_ICON; i <= START_ICON; i++)
+    for (i = BDM_ICON; i <= START_ICON; i++)
         thmLoadResource(&newT->textures[i], i, themePath, GS_PSM_CT32, newT->useDefault);
 
     /* Not customizable icons - currently unused.

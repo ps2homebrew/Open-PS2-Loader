@@ -23,7 +23,7 @@ static int bdmGameCount = 0;
 static base_game_info_t *bdmGames;
 static char bdmDriver[5];
 
-static int fireWireModLoaded = 0;
+static int iLinkModLoaded = 0;
 static int mx4sioModLoaded = 0;
 
 // forward declaration
@@ -72,12 +72,12 @@ static void bdmEventHandler(void *packet, void *opt)
 
 static void bdmLoadBlockDeviceModules(void)
 {
-    if (gEnableFW && !fireWireModLoaded) {
+    if (gEnableILK && !iLinkModLoaded) {
         // Load iLink Block Device drivers
         sysLoadModuleBuffer(&iLinkman_irx, size_iLinkman_irx, 0, NULL);
         sysLoadModuleBuffer(&IEEE1394_bd_irx, size_IEEE1394_bd_irx, 0, NULL);
 
-        fireWireModLoaded = 1;
+        iLinkModLoaded = 1;
     }
 
     if (gEnableMX4SIO && !mx4sioModLoaded) {
@@ -146,6 +146,13 @@ static int bdmNeedsUpdate(void)
     OldGeneration = BdmGeneration;
 
     bdmFindPartition(bdmPrefix, "ul.cfg", 0);
+
+    DIR *dir = opendir("mass0:/");
+    if (dir != NULL) {
+        int *pBDMDriver = (int *)bdmDriver;
+        *pBDMDriver = fileXioIoctl(dir->dd_fd, USBMASS_IOCTL_GET_DRIVERNAME, "");
+        closedir(dir);
+    }
 
     sprintf(path, "%sCD", bdmPrefix);
     if (stat(path, &st) != 0)
@@ -405,6 +412,34 @@ static int bdmGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1);
 }
 
+static int bdmGetTextId(void)
+{
+    int mode = _STR_BDM_GAMES;
+
+    if (!strcmp(bdmDriver, "usb"))
+        mode = _STR_USB_GAMES;
+    else if (!strcmp(bdmDriver, "sd") && strlen(bdmDriver) == 2)
+        mode = _STR_ILINK_GAMES;
+    else if (!strcmp(bdmDriver, "sdc") && strlen(bdmDriver) == 3)
+        mode = _STR_MX4SIO_GAMES;
+
+    return mode;
+}
+
+static int bdmGetIconId(void)
+{
+    int mode = BDM_ICON;
+
+    if (!strcmp(bdmDriver, "usb"))
+        mode = USB_ICON;
+    else if (!strcmp(bdmDriver, "sd") && strlen(bdmDriver) == 2)
+        mode = ILINK_ICON;
+    else if (!strcmp(bdmDriver, "sdc") && strlen(bdmDriver) == 3)
+        mode = MX4SIO_ICON;
+
+    return mode;
+}
+
 // This may be called, even if bdmInit() was not.
 static void bdmCleanUp(int exception)
 {
@@ -452,6 +487,6 @@ static void bdmGetLegacyAppsInfo(char *path, int max, char *name)
 }
 
 static item_list_t bdmGameList = {
-    BDM_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, BDM_MODE_UPDATE_DELAY, "BDM Games", _STR_BDM_GAMES, &bdmGetAppsPath, &bdmGetLegacyAppsPath, &bdmGetLegacyAppsInfo, &bdmInit, &bdmNeedsUpdate,
+    BDM_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, BDM_MODE_UPDATE_DELAY, "BDM Games", &bdmGetTextId, &bdmGetAppsPath, &bdmGetLegacyAppsPath, &bdmGetLegacyAppsInfo, &bdmInit, &bdmNeedsUpdate,
     &bdmUpdateGameList, &bdmGetGameCount, &bdmGetGame, &bdmGetGameName, &bdmGetGameNameLength, &bdmGetGameStartup, &bdmDeleteGame, &bdmRenameGame,
-    &bdmLaunchGame, &bdmGetConfig, &bdmGetImage, &bdmCleanUp, &bdmShutdown, &bdmCheckVMC, USB_ICON};
+    &bdmLaunchGame, &bdmGetConfig, &bdmGetImage, &bdmCleanUp, &bdmShutdown, &bdmCheckVMC, &bdmGetIconId};

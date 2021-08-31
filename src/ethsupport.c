@@ -719,6 +719,16 @@ static int ethGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1);
 }
 
+static int ethGetTextId(void)
+{
+    return _STR_NET_GAMES;
+}
+
+static int ethGetIconId(void)
+{
+    return ETH_ICON;
+}
+
 // This may be called, even if ethInit() was not.
 static void ethCleanUp(int exception)
 {
@@ -777,9 +787,9 @@ static void ethGetLegacyAppsInfo(char *path, int max, char *name)
 }
 
 static item_list_t ethGameList = {
-    ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", _STR_NET_GAMES, &ethGetAppsPath, &ethGetLegacyAppsPath, &ethGetLegacyAppsInfo, &ethInit, &ethNeedsUpdate,
+    ETH_MODE, 1, 0, 0, MENU_MIN_INACTIVE_FRAMES, ETH_MODE_UPDATE_DELAY, "ETH Games", &ethGetTextId, &ethGetAppsPath, &ethGetLegacyAppsPath, &ethGetLegacyAppsInfo, &ethInit, &ethNeedsUpdate,
     &ethUpdateGameList, &ethGetGameCount, &ethGetGame, &ethGetGameName, &ethGetGameNameLength, &ethGetGameStartup, &ethDeleteGame, &ethRenameGame,
-    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, ETH_ICON};
+    &ethLaunchGame, &ethGetConfig, &ethGetImage, &ethCleanUp, &ethShutdown, &ethCheckVMC, &ethGetIconId};
 
 static int ethReadNetConfig(void)
 {

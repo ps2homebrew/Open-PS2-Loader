@@ -52,6 +52,14 @@
 //#include "lwip/pbuf.h"
 //#include "lwip/mem.h"
 
+#ifdef DEBUG
+#define dbgprintf(args...) printf(args)
+#else
+#define dbgprintf(args...) \
+    do {                   \
+    } while (0)
+#endif
+
 #ifdef __linux__
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -72,14 +80,6 @@
 //why not provide lwip/sockets.h ?
 // #define send(a, b, c, d) lwip_send(a, b, c, d)
 #define close(x) lwip_close(x)
-
-#ifdef DEBUG
-#define dbgprintf(args...) printf(args)
-#else
-#define dbgprintf(args...) \
-    do {                   \
-    } while (0)
-#endif
 
 //TODO: Missing <byteswap.h> in PS2SDK
 // pickup from https://gist.github.com/jtbr/7a43e6281e6cca353b33ee501421860c

@@ -439,12 +439,12 @@ static void guiShowBlockDeviceConfig(void)
 {
     int ret;
 
-    diaSetInt(diaBlockDevicesConfig, CFG_ENABLEFW, gEnableFW);
+    diaSetInt(diaBlockDevicesConfig, CFG_ENABLEILK, gEnableILK);
     diaSetInt(diaBlockDevicesConfig, CFG_ENABLEMX4SIO, gEnableMX4SIO);
 
     ret = diaExecuteDialog(diaBlockDevicesConfig, -1, 1, NULL);
     if (ret) {
-        diaGetInt(diaBlockDevicesConfig, CFG_ENABLEFW, &gEnableFW);
+        diaGetInt(diaBlockDevicesConfig, CFG_ENABLEILK, &gEnableILK);
         diaGetInt(diaBlockDevicesConfig, CFG_ENABLEMX4SIO, &gEnableMX4SIO);
     }
 }

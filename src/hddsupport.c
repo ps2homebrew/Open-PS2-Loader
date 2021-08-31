@@ -537,6 +537,16 @@ static int hddGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return texDiscoverLoad(resultTex, path, -1);
 }
 
+static int hddGetTextId(void)
+{
+    return _STR_HDD_GAMES;
+}
+
+static int hddGetIconId(void)
+{
+    return HDD_ICON;
+}
+
 // This may be called, even if hddInit() was not.
 static void hddCleanUp(int exception)
 {
@@ -707,6 +717,6 @@ static void hddGetLegacyAppsInfo(char *path, int max, char *name)
 }
 
 static item_list_t hddGameList = {
-    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", _STR_HDD_GAMES, &hddGetAppsPath, &hddGetLegacyAppsPath, &hddGetLegacyAppsInfo, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", &hddGetTextId, &hddGetAppsPath, &hddGetLegacyAppsPath, &hddGetLegacyAppsInfo, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
-    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, HDD_ICON};
+    &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, &hddGetIconId};

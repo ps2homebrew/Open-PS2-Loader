@@ -9,20 +9,22 @@ static int nbd_tid;
 extern struct irx_export_table _exp_lwnbdsvr;
 
 //need to be global to be accessible from thread
-atad_driver hdd;
-nbd_context *nbd_contexts[] = {
-    &hdd.super,
-    NULL,
-};
+atad_driver hdd[2]; // could have 2 ATA disks
+nbd_context *nbd_contexts[10];
 
 int _start(int argc, char **argv)
 {
     iop_thread_t nbd_thread;
     int ret, successed_exported_ctx = 0;
 
-    ret = atad_ctor(&hdd, 0);
-    if (ret == 0)
-        successed_exported_ctx = 1;
+    for (int i = 0; i < 2; i++) {
+        ret = atad_ctor(&hdd[i], i);
+        if (ret == 0) {
+            nbd_contexts[successed_exported_ctx] = &hdd[i].super;
+            successed_exported_ctx++;
+        }
+    }
+    nbd_contexts[successed_exported_ctx] = NULL;
 
     if (!successed_exported_ctx) {
         printf("lwnbdsvr: nothing to export.\n");

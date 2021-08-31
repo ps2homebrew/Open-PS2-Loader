@@ -29,7 +29,7 @@ int atad_ctor(atad_driver *const me, int device)
     me->super.vptr = &vtbl; /* override the vptr */
     // int ata_device_sce_identify_drive(int device, void *data);
     strcpy(me->super.export_desc, "PlayStation 2 HDD via ATAD");
-    strcpy(me->super.export_name, "hdd0");
+    sprintf(me->super.export_name, "%s%d", "hdd", me->device);
     me->super.blocksize = 512;
     me->super.buffer = nbd_buffer;
     me->super.eflags = NBD_FLAG_HAS_FLAGS;

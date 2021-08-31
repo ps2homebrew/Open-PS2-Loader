@@ -58,7 +58,7 @@ nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs)
     nbd_context **ptr_ctx = ctxs;
 
     //temporary workaround
-    nbd_context *ctx = ctxs[0];
+    nbd_context const *ctx = ctxs[0];
 
     /*** handshake ***/
 
@@ -99,7 +99,21 @@ nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs)
             nbd_buffer[new_opt.optlen] = '\0';
         }
 
-        printf("%d\n", new_opt.option);
+#ifdef DEBUG
+        static const char *NBD_OPTIONS[] = {
+            NULL,
+            "NBD_OPT_EXPORT_NAME",
+            "NBD_OPT_ABORT",
+            "NBD_OPT_LIST",
+            "NBD_OPT_STARTTLS",
+            "NBD_OPT_INFO",
+            "NBD_OPT_GO",
+            "NBD_OPT_STRUCTURED_REPLY",
+            "NBD_OPT_LIST_META_CONTEXT",
+            "NBD_OPT_SET_META_CONTEXT",
+        };
+        printf("lwNBD: %s\n", NBD_OPTIONS[new_opt.option]);
+#endif
 
         switch (new_opt.option) {
 
@@ -144,6 +158,7 @@ nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs)
                     ptr_ctx++;
                 }
                 fixed_new_option_reply.reply = htonl(NBD_REP_ACK);
+                fixed_new_option_reply.replylen = 0;
                 size = send(client_socket, &fixed_new_option_reply,
                             sizeof(struct nbd_fixed_new_option_reply), 0);
                 break;
@@ -175,7 +190,7 @@ nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs)
     }
 
 abort:
-    return ctx;
+    return (nbd_context *)ctx;
 soft_disconnect:
 error:
     return NULL;
@@ -203,7 +218,7 @@ int transmission_phase(const int client_socket, const nbd_context *ctx)
         // TODO : blocking here if no proper NBD_CMD_DISC, bad threading design ?
         size = nbd_recv(client_socket, &request, sizeof(struct nbd_request), 0);
         if (size < sizeof(struct nbd_request)) {
-            printf("lwNBD : sizeof NOK\n");
+            printf("lwNBD: sizeof NOK\n");
             goto error;
         }
 
@@ -211,7 +226,7 @@ int transmission_phase(const int client_socket, const nbd_context *ctx)
 
         request.magic = ntohl(request.magic);
         if (request.magic != NBD_REQUEST_MAGIC) {
-            printf("lwNBD : wrong NBD_REQUEST_MAGIC\n");
+            printf("lwNBD: wrong NBD_REQUEST_MAGIC\n");
             goto error;
         }
 
@@ -222,7 +237,19 @@ int transmission_phase(const int client_socket, const nbd_context *ctx)
 
         reply.handle = request.handle;
 
-        // printf("lwNBD: entering NBD_CMD %d.\n", request.type);
+#ifdef DEBUG
+        static const char *NBD_CMD[] = {
+            "NBD_CMD_READ",
+            "NBD_CMD_WRITE",
+            "NBD_CMD_DISC",
+            "NBD_CMD_FLUSH",
+            "NBD_CMD_TRIM",
+            "NBD_CMD_CACHE",
+            "NBD_CMD_WRITE_ZEROES",
+            "NBD_CMD_BLOCK_STATUS",
+        };
+        printf("lwNBD: %s\n", NBD_CMD[request.type]);
+#endif
 
         switch (request.type) {
 

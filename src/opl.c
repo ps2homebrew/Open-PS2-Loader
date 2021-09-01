@@ -1391,7 +1391,7 @@ static int loadLwnbdSvr(void)
                             Clear it, otherwise it will get displayed after the server is closed. */
 
     unloadPads();
-    //    sysReset(0); // usefull ? printf doesn't work with it.
+    // sysReset(0); // usefull ? printf doesn't work with it.
 
     ret = ethLoadInitModules();
     if (ret == 0) {
@@ -1448,7 +1448,7 @@ void handleLwnbdSrv()
     // prepare for lwnbd, display screen with info
     guiRenderTextScreen(_l(_STR_STARTINGNBD));
     if (loadLwnbdSvr() == 0) {
-        snprintf(temp, sizeof(temp), "%s\nIP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
+        snprintf(temp, sizeof(temp), "%s IP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
                  ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], ps2_ip_use_dhcp ? "DHCP" : "");
         guiMsgBox(temp, 0, NULL);
     } else

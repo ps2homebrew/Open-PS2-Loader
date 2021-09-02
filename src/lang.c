@@ -286,6 +286,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Controller Settings",
     "Turn on/off Block Device Manager.",
     "Turn on/off Block Devices (e.g. USB).",
+    "USB Games",
+    "iLink Games",
+    "MX4SIO Games",
 };
 
 static int guiLangID = 0;

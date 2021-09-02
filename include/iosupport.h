@@ -97,7 +97,7 @@ typedef struct
     char *text;
 
     /// item description in localised form (used if value is not negative)
-    int textId;
+    int (*itemTextId)(void);
 
     /// @return path to applications storage on the device (set callback to NULL if not applicable).
     void (*itemGetAppsPath)(char *path, int max);
@@ -140,7 +140,7 @@ typedef struct
 
     int (*itemCheckVMC)(char *name, int createSize);
 
-    int iconId;
+    int (*itemIconId)(void);
 } item_list_t;
 
 #endif

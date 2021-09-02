@@ -116,7 +116,7 @@ extern int gHDDStartMode;
 extern int gETHStartMode;
 extern int gAPPStartMode;
 
-extern int gEnableFW;
+extern int gEnableILK;
 extern int gEnableMX4SIO;
 
 extern int gAutosort;

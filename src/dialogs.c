@@ -145,9 +145,9 @@ struct UIItem diaBlockDevicesConfig[] = {
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {NULL, _STR_ON}}},
     {UI_BREAK},
 
-    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"FireWire", -1}}},
+    {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"iLink", -1}}},
     {UI_SPACER},
-    {UI_BOOL, CFG_ENABLEFW, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
+    {UI_BOOL, CFG_ENABLEILK, 1, 1, -1, 0, 0, {.intvalue = {0, 0}}},
     {UI_BREAK},
 
     {UI_LABEL, 0, 1, 1, -1, -40, 0, {.label = {"MX4SIO", -1}}},

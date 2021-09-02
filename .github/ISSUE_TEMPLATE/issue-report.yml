@@ -63,7 +63,7 @@ body:
         - USB
         - SMB
         - HDD
-        - Firewire
+        - iLink
         - MX4SIO
 
   - type: textarea

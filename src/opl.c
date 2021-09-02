@@ -144,7 +144,7 @@ int gBDMStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
-int gEnableFW;
+int gEnableILK;
 int gEnableMX4SIO;
 int gAutosort;
 int gAutoRefresh;
@@ -309,9 +309,9 @@ static void itemExecTriangle(struct menu_item *curMenu)
 static void initMenuForListSupport(int mode)
 {
     opl_io_module_t *mod = &list_support[mode];
-    mod->menuItem.icon_id = mod->support->iconId;
+    mod->menuItem.icon_id = mod->support->itemIconId();
     mod->menuItem.text = NULL;
-    mod->menuItem.text_id = mod->support->textId;
+    mod->menuItem.text_id = mod->support->itemTextId();
 
     mod->menuItem.userdata = mod->support;
 
@@ -596,6 +596,10 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
     if (gRememberLastPlayed)
         configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
 
+    // refresh device icon and text (for bdm)
+    mdl->menuItem.icon_id = mdl->support->itemIconId();
+    mdl->menuItem.text_id = mdl->support->itemTextId();
+
     // read the new game list
     struct gui_update_t *gup = NULL;
     int count = mdl->support->itemUpdate();
@@ -854,7 +858,7 @@ static void _loadConfig()
             configGetInt(configOPL, CONFIG_OPL_HDD_MODE, &gHDDStartMode);
             configGetInt(configOPL, CONFIG_OPL_ETH_MODE, &gETHStartMode);
             configGetInt(configOPL, CONFIG_OPL_APP_MODE, &gAPPStartMode);
-            configGetInt(configOPL, CONFIG_OPL_ENABLE_FW, &gEnableFW);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, &gEnableILK);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
@@ -1005,7 +1009,7 @@ static void _saveConfig()
         configSetInt(configOPL, CONFIG_OPL_HDD_MODE, gHDDStartMode);
         configSetInt(configOPL, CONFIG_OPL_ETH_MODE, gETHStartMode);
         configSetInt(configOPL, CONFIG_OPL_APP_MODE, gAPPStartMode);
-        configSetInt(configOPL, CONFIG_OPL_ENABLE_FW, gEnableFW);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, gEnableILK);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
@@ -1598,7 +1602,7 @@ static void setDefaults(void)
     gETHStartMode = START_MODE_DISABLED;
     gAPPStartMode = START_MODE_DISABLED;
 
-    gEnableFW = 0;
+    gEnableILK = 0;
     gEnableMX4SIO = 0;
 
     frameCounter = 0;

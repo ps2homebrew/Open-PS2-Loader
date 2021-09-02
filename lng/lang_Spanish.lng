@@ -52,12 +52,12 @@ Error al cargar el código ID del juego
 Listas ordenadas por alfabeto
 Error al cargar el archivo de idioma
 Colores para depuración
-Mando no encontrado, esperando…
+Mando no encontrado, esperando...
 Carátulas, serigrafías y fondos
 Pantalla panorámica
 Apagar PS2
-Cargando configuración…
-Guardando configuración…
+Cargando configuración...
+Guardando configuración...
 Iniciar dispositivo
 Actualizar
 Modo de inicio para BDM
@@ -67,10 +67,10 @@ Modo de inicio para Aplicaciones
 Automático
 Manual
 Iniciar servidor NBD
-Iniciando servidor NBD…
-Servidor NBD conectado…
-Error al iniciar el servidor NBD.
-Cerrando servidor NBD…
+Iniciando servidor NBD...
+Servidor NBD conectado...
+Error al iniciar el servidor NBD. 
+Cerrando servidor NBD...
 Ruta del IGR
 Color de fondo
 Color de texto
@@ -196,7 +196,7 @@ Actualización cancelada.
 ¿Descargar configuración desde la red?
 Configuraciones personalizadas
 Descargada configuración predeterminada
-Inicio en %i s…
+Inicio en %i s...
 Inicio automático
 Valor en segundos, 0 para desactivar el inicio automático
 Logotipo Playstation 2
@@ -235,7 +235,7 @@ Emulación Multitap
 Activa/Desactiva la emulación Multitap para el juego seleccionado
 Emulación Multitap en el puerto:
 Selecciona puerto para la emulación Multitap
-Solución alternativa para los DS3 falsos
+Solución alternativa para los DS3 falsos 
 Algunos DS3 falsos necesitan una solución alternativa, esta opción la activa
 Emular alternancia de valores de CAMPO
 Solución para juegos que fallan bajo modos de vídeo progresivos.
@@ -279,3 +279,6 @@ Dispositivos de bloque
 Configuración del mando
 Activa/Desactiva el Gestor de Dispositivos de Bloque (Block Device Manager)
 Selecciona dispositivos de bloque (Ejemplo: USB, iLink, MX4SIO)
+Juegos USB
+Juegos iLink
+Juegos MX4SIO

@@ -684,6 +684,16 @@ static int elmGetImage(char *folder, int isRelative, char *value, char *suffix, 
     return -1;
 }
 
+static int elmGetTextId(void)
+{
+    return _STR_ELM;
+}
+
+static int elmGetIconId(void)
+{
+    return ELM_ICON;
+}
+
 static void elmCleanUp(int exception)
 {
     if (elmItemList.enabled) {
@@ -703,6 +713,6 @@ static void elmShutdown(void)
 }
 
 static item_list_t elmItemList = {
-    ELM_MODE, -1, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", _STR_ELM, NULL, NULL, NULL, &elmInit, &elmNeedsUpdate, &elmUpdateItemList,
+    ELM_MODE, -1, 0, MODE_FLAG_NO_COMPAT | MODE_FLAG_NO_UPDATE, MENU_MIN_INACTIVE_FRAMES, ELM_MODE_UPDATE_DELAY, "PS1 Games", &elmGetTextId, NULL, NULL, NULL, &elmInit, &elmNeedsUpdate, &elmUpdateItemList,
     &elmGetItemCount, NULL, &elmGetItemName, &elmGetItemNameLength, &elmGetItemStartup, &elmDeleteItem, &elmRenameItem, &elmLaunchItem,
-    &elmGetConfig, &elmGetImage, &elmCleanUp, &elmShutdown, NULL, ELM_ICON};
+    &elmGetConfig, &elmGetImage, &elmCleanUp, &elmShutdown, NULL, &elmGetIconId};

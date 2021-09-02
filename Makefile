@@ -68,6 +68,7 @@ FRONTEND_OBJS = pad.o fntsys.o renderman.o menusys.o OSDHistory.o system.o lang.
 		appsupport.o gui.o guigame.o textures.o opl.o atlas.o nbns.o httpclient.o gsm.o cheatman.o sound.o ps2cnf.o
 
 GFX_OBJS =	usb_icon.o hdd_icon.o eth_icon.o app_icon.o \
+		usb_bd_icon.o ilk_bd_icon.o m4s_bd_icon.o \
 		cross_icon.o triangle_icon.o circle_icon.o square_icon.o select_icon.o start_icon.o \
 		left_icon.o right_icon.o up_icon.o down_icon.o \
 		load0.o load1.o load2.o load3.o load4.o load5.o load6.o load7.o \
@@ -703,6 +704,15 @@ $(EE_ASM_DIR)load7.s: gfx/load7.png | $(EE_ASM_DIR)
 
 $(EE_ASM_DIR)usb_icon.s: gfx/usb.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ usb_png
+
+$(EE_ASM_DIR)usb_bd_icon.s: gfx/usb_bd.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ usb_bd_png
+
+$(EE_ASM_DIR)ilk_bd_icon.s: gfx/ilk_bd.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ ilk_bd_png
+
+$(EE_ASM_DIR)m4s_bd_icon.s: gfx/m4s_bd.png | $(EE_ASM_DIR)
+	$(BIN2S) $< $@ m4s_bd_png
 
 $(EE_ASM_DIR)hdd_icon.s: gfx/hdd.png | $(EE_ASM_DIR)
 	$(BIN2S) $< $@ hdd_png

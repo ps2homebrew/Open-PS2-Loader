@@ -93,7 +93,7 @@ enum CONFIG_INDEX {
 //START of OPL_DB tweaks
 #define CONFIG_OPL_ELM_MODE             "elm_mode"
 //END of OPL_DB tweaks
-#define CONFIG_OPL_ENABLE_FW            "enable_firewire"
+#define CONFIG_OPL_ENABLE_ILINK         "enable_ilink"
 #define CONFIG_OPL_ENABLE_MX4SIO        "enable_mx4sio"
 #define CONFIG_OPL_SWAP_SEL_BUTTON      "swap_select_btn"
 #define CONFIG_OPL_PARENTAL_LOCK_PWD    "parental_lock_password"

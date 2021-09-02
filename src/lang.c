@@ -288,6 +288,9 @@ static char *internalEnglish[LANG_STR_COUNT] = {
     "Controller Settings",
     "Turn on/off Block Device Manager.",
     "Turn on/off Block Devices (e.g. USB).",
+    "USB Games",
+    "iLink Games",
+    "MX4SIO Games",
     // START of OPL_DB tweaks
     "PS1 Games",
     "PS1 Games display mode",

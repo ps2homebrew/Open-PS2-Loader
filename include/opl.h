@@ -122,7 +122,7 @@ extern int gAPPStartMode;
 extern int gELMStartMode;
 //END of OPL_DB tweaks
 
-extern int gEnableFW;
+extern int gEnableILK;
 extern int gEnableMX4SIO;
 
 extern int gAutosort;

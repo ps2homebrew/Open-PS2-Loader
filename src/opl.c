@@ -153,8 +153,8 @@ int gBDMStartMode;
 int gHDDStartMode;
 int gETHStartMode;
 int gAPPStartMode;
-int gELMStartMode;
-int gEnableFW;
+int gELMStartMode; // OPL_DB tweaks
+int gEnableILK;
 int gEnableMX4SIO;
 int gAutosort;
 int gAutoRefresh;
@@ -319,9 +319,9 @@ static void itemExecTriangle(struct menu_item *curMenu)
 static void initMenuForListSupport(int mode)
 {
     opl_io_module_t *mod = &list_support[mode];
-    mod->menuItem.icon_id = mod->support->iconId;
+    mod->menuItem.icon_id = mod->support->itemIconId();
     mod->menuItem.text = NULL;
-    mod->menuItem.text_id = mod->support->textId;
+    mod->menuItem.text_id = mod->support->itemTextId();
 
     mod->menuItem.userdata = mod->support;
 
@@ -624,6 +624,10 @@ static void updateMenuFromGameList(opl_io_module_t *mdl)
     if (gRememberLastPlayed)
         configGetStr(configGetByType(CONFIG_LAST), "last_played", &temp);
 
+    // refresh device icon and text (for bdm)
+    mdl->menuItem.icon_id = mdl->support->itemIconId();
+    mdl->menuItem.text_id = mdl->support->itemTextId();
+
     // read the new game list
     struct gui_update_t *gup = NULL;
     int count = mdl->support->itemUpdate();
@@ -891,7 +895,7 @@ static void _loadConfig()
             //START of OPL_DB tweaks
             configGetInt(configOPL, CONFIG_OPL_ELM_MODE, &gELMStartMode);
             //END of OPL_DB tweaks
-            configGetInt(configOPL, CONFIG_OPL_ENABLE_FW, &gEnableFW);
+            configGetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, &gEnableILK);
             configGetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, &gEnableMX4SIO);
             configGetInt(configOPL, CONFIG_OPL_SFX, &gEnableSFX);
             configGetInt(configOPL, CONFIG_OPL_BOOT_SND, &gEnableBootSND);
@@ -1045,7 +1049,7 @@ static void _saveConfig()
         //START of OPL_DB tweaks
         configSetInt(configOPL, CONFIG_OPL_ELM_MODE, gELMStartMode);
         //END of OPL_DB tweaks
-        configSetInt(configOPL, CONFIG_OPL_ENABLE_FW, gEnableFW);
+        configSetInt(configOPL, CONFIG_OPL_ENABLE_ILINK, gEnableILK);
         configSetInt(configOPL, CONFIG_OPL_ENABLE_MX4SIO, gEnableMX4SIO);
         configSetInt(configOPL, CONFIG_OPL_SFX, gEnableSFX);
         configSetInt(configOPL, CONFIG_OPL_BOOT_SND, gEnableBootSND);
@@ -1435,7 +1439,7 @@ static int loadLwnbdSvr(void)
                             Clear it, otherwise it will get displayed after the server is closed. */
 
     unloadPads();
-    //    sysReset(0); // usefull ? printf doesn't work with it.
+    // sysReset(0); // usefull ? printf doesn't work with it.
 
     ret = ethLoadInitModules();
     if (ret == 0) {
@@ -1492,7 +1496,7 @@ void handleLwnbdSrv()
     // prepare for lwnbd, display screen with info
     guiRenderTextScreen(_l(_STR_STARTINGNBD));
     if (loadLwnbdSvr() == 0) {
-        snprintf(temp, sizeof(temp), "%s\nIP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
+        snprintf(temp, sizeof(temp), "%s IP: %d.%d.%d.%d %s", _l(_STR_RUNNINGNBD),
                  ps2_ip[0], ps2_ip[1], ps2_ip[2], ps2_ip[3], ps2_ip_use_dhcp ? "DHCP" : "");
         guiMsgBox(temp, 0, NULL);
     } else
@@ -1650,6 +1654,7 @@ static void setDefaults(void)
     gELMStartMode = START_MODE_DISABLED;
     //END of OPL_DB tweaks
 
+    //START of OPL_DB tweaks
     gDefaultBgColor[0] = 0x000;
     gDefaultBgColor[1] = 0x000;
     gDefaultBgColor[2] = 0x000;
@@ -1667,7 +1672,7 @@ static void setDefaults(void)
     gDefaultUITextColor[2] = 0x030;
     //END of OPL_DB tweaks
 
-    gEnableFW = 0;
+    gEnableILK = 0;
     gEnableMX4SIO = 0;
 
     frameCounter = 0;

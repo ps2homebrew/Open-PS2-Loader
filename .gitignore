@@ -30,6 +30,7 @@ DETAILED_CHANGELOG
 !.github
 !.editorconfig
 !.clang-format
+!.clang-format-ignore
 !modules/debug/*.irx
 
 #

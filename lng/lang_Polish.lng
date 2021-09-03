@@ -1,4 +1,4 @@
-# Wersja 0.26. W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbowali" Jolek & KaiQ. Podziękowania dla Haker120, misiozola i innych z Forum CDRinfo.pl ("https://forum.cdrinfo.pl/f30/") za pomoc i sugestie.
+# Wersja 0.28. W większości przetłumaczone przez dragolice. Ponownie tłumaczyć "próbowali" Jolek & KaiQ. Podziękowania dla Haker120, misiozola i innych z Forum CDRinfo.pl ("https://forum.cdrinfo.pl/f30/") za pomoc i sugestie.
 # For Open PS2 Loader v1.0.0 + betas - Official OPL Beta thread @https://www.psx-place.com/threads/open-ps2-loader-language-pack.20547/
 Polski
 Zapisz Zmiany
@@ -52,12 +52,12 @@ Błąd podczas ładowania identyfikatora gry.
 Automatyczne Sortowanie
 Błąd ładowania pliku językowego.
 Wyświetl Kolory Debugowania
-Nie wykryto kontrolera, oczekiwanie…
+Nie wykryto kontrolera, oczekiwanie...
 Okładki
 Szeroki Ekran
 Wyłącz
-Wczytywanie ustawień…
-Zapisywanie ustawień…
+Wczytywanie ustawień...
+Zapisywanie ustawień...
 Uruchom Urządzenie
 Odśwież
 Uruchom BDM
@@ -67,10 +67,10 @@ Wyświetl Menu Aplikacji
 Automatyczny
 Ręcznie
 Uruchom Serwer NBD
-Uruchamianie Serwera NBD…
-Serwer NBD uruchomiony…
+Uruchamianie Serwera NBD...
+Serwer NBD uruchomiony...
 Nieudane uruchomienie serwera NBD.
-Serwer NBD zostanie zamknięty…
+Serwer NBD zostanie zamknięty...
 Ścieżka Dla IGR
 Kolor Tła
 Kolor Tekstu
@@ -196,7 +196,7 @@ Aktualizacja przerwana.
 Pobrać ustawienia z sieci?
 Dodatkowe Ustawienia
 Pobrano domyślne.
-Auto start w %i s…
+Auto start w %i s...
 Auto Start
 Wartość w sekundach, 0 wyłącza auto start.
 Logo PS2
@@ -279,3 +279,6 @@ Urządzenia Blokowe
 Ustawienia Kontrolera
 Włącz/wyłącz menedżera urządzeń blokowych.
 Włącz/wyłącz urządzenia blokowe (np. USB).
+Gry USB
+Gry iLink
+Gry MX4SIO

@@ -1,6 +1,6 @@
 # Translated by druchapucha, frodosumkin, and Marsi4eg.
-# Last update: August 29, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
+# Last update: Sept. 2, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
 Сохранить настройки
@@ -53,16 +53,16 @@ Russian
 Ошибка загрузки ID игры.
 Автоматическая сортировка
 Ошибка загрузки языкового файла.
-Debug Colors
+Цвета отладки
 Контроллер не обнаружен, ожидание...
-Cover Art
+Фоновые рисунки
 Широкий экран
 Выключить консоль
 Загрузка настроек...
 Сохранение настроек...
 Запуск устройства
 Обновить
-BDM Start Mode
+Режим запуска BDM
 Режим запуска HDD
 Режим запуска ETH
 Режим показа Приложений
@@ -99,7 +99,7 @@ NetBIOS
 Удалить
 Старт
 Настройки экрана
-Write Operations
+Операции записи
 Запоминать последнюю игру
 Кнопка выбора
 Ошибка, игра фрагментирована.
@@ -168,7 +168,7 @@ ID игры
 10 Мбит полный дуплекс
 10 Мбит полудуплекс
 Настройки GSM
-GSM Selector
+GSM-переключатель
 Включает или выключает GSM.
 Принудительный пользовательский видеорежим.
 Смещение по горизонтали 
@@ -205,7 +205,7 @@ PS2RD Cheat Engine пропатчит Вашу игру.
 Отображается при совпадении регионов диска и консоли.
 Настроить PADEMU
 Настройки Pad-эмулятора
-Pad Emulator
+Pad-эмулятор
 При включении будет задействован Pad-эмулятор.
 Режим Pad-эмулятора
 Выбрать режим Pad-эмулятора.
@@ -213,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Настройки для порта:
 Выбрать настройки для порта Pad-эмулятора.
-Emulation
+Эмуляция
 Вкл/выкл Pad-эмулятор для выбранного порта.
-Vibration
+Вибрация
 Вкл/выкл вибрацию в выбранном порте Pad-эмулятора.
 MAC-адрес USB Bluetooth-адаптера:
 Контроллер привязан к MAC-адресу:
@@ -233,12 +233,12 @@ ID производителя:
 Нет
 Bluetooth-адаптер совместим с контроллерами DS3/DS4.
 Bluetooth-адаптер может плохо работать с контроллерами DS3/DS4.
-Multitap Emulation
+Эмуляция Multitap
 Вкл/выкл эмуляцию Multitap.
 Порт эмулятора Multitap:
 Выбрать порт для эмуляции Multitap.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Неоригинальный DS3
+Некоторым репликам DS3 нужно исправление, тут можно включить его.
 Эмуляция полукадра (FIELD)
 Исправление для игр, имеющих проблемы с прогрессивным режимом.
 Родительский контроль
@@ -251,17 +251,17 @@ Some fake DS3s need a workaround, this option will enable it.
 Ошибка - этот пароль не может быть установлен.
 Файл VMC %s фрагментирован. Продолжить с картой памяти в слоте %d?
 Настройки звука
-Sound Effects
-Boot Sound
+Звуковые эффекты
+Звук загрузки
 Громкость звуковых эффектов
 Громкость звука загрузки
 Изменить режим видео?
 Кэширование списка игр (HDD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Уведомления
+Настройки загружены из %s
+Тема загружена из %s
+Язык загружен из %s
+Раздел %s смонтирован.
 Опции
 Настройки игры сохранены.
 %s настройки удалены.
@@ -277,10 +277,13 @@ Language loaded from %s
 Выпуск
 Разработчик
 Описание
-Block Devices
+Устройства BDM
 Настройки контроллера
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
+Вкл/выкл Block Device Manager.
+Вкл/выкл устройства BDM (напр. USB).
+USB Games
+iLink Games
+MX4SIO Games
 Игры PS1
 Режим показа игр PS1
 POPSTARTER.ELF не найден в '%s'!

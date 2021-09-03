@@ -1,6 +1,6 @@
 # Translation by Colossus, tonyhoro, and joseri 
-# Last update: August 30, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
+# Last update: Sept. 2, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Brazilian Portuguese
 Salvar configurações
@@ -281,6 +281,9 @@ Dispositivos de entrada
 Configurações dos controles
 Ligue/desligue o gerenciador de dispositivos de entrada.
 Ligue/desligue dispositivos de entrada (ex: USB).
+USB Games
+iLink Games
+MX4SIO Games
 Jogos PS1
 Modo de início dos Jogos PS1
 Arquivo POPSTARTER.ELF não encontrado em '%s'!

@@ -1,6 +1,6 @@
 # Translation by Blacky5678
-# Last update: August 29, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
+# Last update: Sept. 2, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Croatian
 Spremi Promjene
@@ -281,6 +281,9 @@ Block Devices
 Controller Settings
 Turn on/off Block Device Manager.
 Turn on/off Block Devices (e.g. USB).
+USB Games
+iLink Games
+MX4SIO Games
 PS1 Igre
 Nacin Prikaza PS1 Igara
 POPSTARTER.ELF nije pronaden kod '%s'!

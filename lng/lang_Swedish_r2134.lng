@@ -1,6 +1,6 @@
 # Translation by Lord_Flaya
-# Last update: August 29, 2021
-# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2114-48e7057-2021-08-29 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1765-dbf652f-2021-08-29
+# Last update: Sept. 2, 2021
+# Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
 Spara ändringar
@@ -53,23 +53,23 @@ Vänta
 Fel vid laddning av Game ID
 Automatisk sortering
 Fel vid inläsning av språkfilen
-Debug Colors
-Ingen kontroll upptäcks , vänta ...
-Cover Art
+Felsökningsfärger
+Ingen kontroll upptäcks, vänta...
+Omslag
 Bredbild
 Stäng av
 Ladda config
 Spara config
 Starta enheten
 Uppdatera
-BDM Start Mode
+BDM Startläge
 HDD enhet startläge
 ETH enhet startläge
 APP-meny visningsläge
 Auto
 Manuell
 Starta NBD Server
-NBD Server Startar ...
+NBD Server Startar...
 NBD Server Running...
 Kan inte starta NBD server.
 NBD Server Stängs...
@@ -99,7 +99,7 @@ Byt namn
 Radera
 Kör
 Skärminställningar
-Write Operations
+Skrivoperationer
 Kom ihåg senast spelade spel
 Välj knapp
 Fel, spelet är fragmenterat
@@ -168,7 +168,7 @@ Ethernet hastighet och duplex
 10Mbit Full-duplex
 10Mbit halv duplex
 GSM inställningar
-GSM Selector
+GSM-väljare
 GSM PÅ eller AV
 Videoläge tvingas
 Horisontell position
@@ -180,7 +180,7 @@ Ställer Vertikal förskjutning
 Skippa FMV
 Skippar Full Motion Video
 Inställningar Fusk
-PS2RD Cheat Engine
+PS2RD Fuskmotor
 Tillåter PS2RD patcha dina spel
 PS2RD Fusk Motor Läge
 Autovälj eller Välj spel fusk
@@ -237,8 +237,8 @@ Multitap Emulation
 Slår på / av multitap emulering för valt spel.
 Multitap emulator på porten
 Välj port för multitap emulering.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Falsk DS3 Fix
+Vissa falska DS3s behöver en fix, detta val löser det.
 Emulera FIELD vändning
 Fix för spel med problem i progressivt läge.
 Föräldrakontroll
@@ -251,17 +251,17 @@ Bygg-Alternativ:
 Fel - lösenordet kan ej användas.
 VMC %s filen är fragmenterad. Använd minneskort i port %d?
 Ljudinställningar
-Sound Effects
-Boot Sound
+Ljudeffekter
+Startljud
 Ljudeffektsvolym
 Uppstartsljudsvolym
 Bekräfta ändring av videoläge?
 Lägg Spellista i Cache (HDD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Notifikationer
+Konfiguration laddas från %s
+Tema laddas från %s
+Språk laddas från %s
+%s partition monterad.
 Val
 Spelinställningar sparade.
 %s inställningar borttagna
@@ -277,10 +277,13 @@ Genre
 Lansering
 Utvecklare
 Beskrivning
-Block Devices
+Blockera enheter
 Kontroll-inställningar
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
+Slå på/av Blockera enhetshaterare.
+Slå på/av Blockera enheter (T.ex USB).
+USB Games
+iLink Games
+MX4SIO Games
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

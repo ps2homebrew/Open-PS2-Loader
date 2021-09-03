@@ -31,7 +31,7 @@ Cancelar as atualizações?
 %d: Não foi possível listar os jogos
 %d: O servidor DHCP está indisponível
 %d: Nenhuma conexão de rede
-ON
+ON 
 OFF
 Ok
 Ok
@@ -52,12 +52,12 @@ Erro ao carregar o ID do jogo.
 Ordenação Automática
 Erro ao carregar os arquivos de idioma.
 Cores de Depuração
-Nenhum controle detectado, aguardando…
+Nenhum controle detectado, aguardando...
 Artes da Capa
 Tela Panorâmica
 Desligar o PS2
-Carregando configurações…
-Salvando configurações…
+Carregando configurações...
+Salvando configurações...
 Iniciar Dispositivo
 Atualizar
 Modo de Início no BDM
@@ -67,10 +67,10 @@ Modo de Início nos Aplicativos
 Automático
 Manual
 Iniciar o Servidor NBD
-O servidor NBD está iniciando…
-O servidor NBD está sendo executado…
+O servidor NBD está iniciando...
+O servidor NBD está sendo executado...
 Falha ao iniciar o servidor NBD.
-O servidor NBD está sendo encerrado…
+O servidor NBD está sendo encerrado...
 Caminho de Saída do IGR
 Cor do Fundo
 Cor do Texto
@@ -196,7 +196,7 @@ Atualização cancelada.
 Baixar configurações da Internet?
 Configurações Personalizadas
 Configurações Baixadas
-Iniciar automaticamente no %i s…
+Iniciar automaticamente no %i s...
 Auto-começar
 Valores em segundos (s), 0 para desativar.
 Logotipo do PlayStation 2
@@ -279,3 +279,6 @@ Dispositivos de Blocos
 Configurações de Controles
 Ativa/Desativa o Gerenciador de Dispositivos de Blocos.
 Ativa/Desativa Dispositivos de Blocos (Exemplo: USB).
+Jogos no USB
+Jogos no iLink
+Jogos no MX4SIO

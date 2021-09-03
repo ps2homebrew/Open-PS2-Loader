@@ -1,8 +1,7 @@
 #ifndef ATAD_DRIVERS_NBD_H
 #define ATAD_DRIVERS_NBD_H
 
-#include "../irx_imports.h"
-#include "../lwNBD/nbd_server.h"
+#include "../nbd_server.h"
 
 #ifdef __cplusplus
 extern "C" {

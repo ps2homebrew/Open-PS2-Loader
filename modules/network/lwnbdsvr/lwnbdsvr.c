@@ -1,7 +1,7 @@
 
 #include "irx_imports.h"
-#include "lwNBD/nbd_server.h"
-#include "drivers/atad.h"
+#include "nbd_server.h"
+#include "drivers/atad_d.h"
 
 #define MODNAME "lwnbdsvr"
 IRX_ID(MODNAME, 1, 1);
@@ -17,6 +17,11 @@ int _start(int argc, char **argv)
     iop_thread_t nbd_thread;
     int ret, successed_exported_ctx = 0;
 
+    if (argc > 1) {
+        strcpy(gdefaultexport, argv[1]);
+        printf("lwNBD: default export : %s\n", gdefaultexport);
+    }
+
     for (int i = 0; i < 2; i++) {
         ret = atad_ctor(&hdd[i], i);
         if (ret == 0) {
@@ -27,11 +32,11 @@ int _start(int argc, char **argv)
     nbd_contexts[successed_exported_ctx] = NULL;
 
     if (!successed_exported_ctx) {
-        printf("lwnbdsvr: nothing to export.\n");
+        printf("lwNBD: nothing to export.\n");
         return -1;
     }
 
-    printf("lwnbdsvr: init nbd_contexts ok.\n");
+    printf("lwNBD: init %d exports.\n", successed_exported_ctx);
 
     // register exports
     RegisterLibraryEntries(&_exp_lwnbdsvr);
@@ -43,6 +48,7 @@ int _start(int argc, char **argv)
     nbd_thread.option = 0;
     nbd_tid = CreateThread(&nbd_thread);
 
+    // int StartThreadArgs(int thid, int args, void *argp);
     StartThread(nbd_tid, (struct nbd_context **)nbd_contexts);
     return MODULE_RESIDENT_END;
 }

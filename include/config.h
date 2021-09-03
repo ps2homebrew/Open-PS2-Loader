@@ -97,19 +97,20 @@ enum CONFIG_INDEX {
 #define CONFIG_OPL_BOOT_SND_VOLUME      "boot_snd_volume"
 
 // Network config keys
-#define CONFIG_NET_ETH_LINKM   "eth_linkmode"
-#define CONFIG_NET_PS2_DHCP    "ps2_ip_use_dhcp"
-#define CONFIG_NET_PS2_IP      "ps2_ip_addr"
-#define CONFIG_NET_PS2_NETM    "ps2_netmask"
-#define CONFIG_NET_PS2_GATEW   "ps2_gateway"
-#define CONFIG_NET_PS2_DNS     "ps2_dns"
-#define CONFIG_NET_SMB_NB_ADDR "smb_share_nb_addr"
-#define CONFIG_NET_SMB_IP_ADDR "smb_ip"
-#define CONFIG_NET_SMB_NBNS    "smb_share_use_nbns"
-#define CONFIG_NET_SMB_SHARE   "smb_share"
-#define CONFIG_NET_SMB_USER    "smb_user"
-#define CONFIG_NET_SMB_PASSW   "smb_pass"
-#define CONFIG_NET_SMB_PORT    "smb_port"
+#define CONFIG_NET_ETH_LINKM          "eth_linkmode"
+#define CONFIG_NET_PS2_DHCP           "ps2_ip_use_dhcp"
+#define CONFIG_NET_PS2_IP             "ps2_ip_addr"
+#define CONFIG_NET_PS2_NETM           "ps2_netmask"
+#define CONFIG_NET_PS2_GATEW          "ps2_gateway"
+#define CONFIG_NET_PS2_DNS            "ps2_dns"
+#define CONFIG_NET_SMB_NB_ADDR        "smb_share_nb_addr"
+#define CONFIG_NET_SMB_IP_ADDR        "smb_ip"
+#define CONFIG_NET_SMB_NBNS           "smb_share_use_nbns"
+#define CONFIG_NET_SMB_SHARE          "smb_share"
+#define CONFIG_NET_SMB_USER           "smb_user"
+#define CONFIG_NET_SMB_PASSW          "smb_pass"
+#define CONFIG_NET_SMB_PORT           "smb_port"
+#define CONFIG_NET_NBD_DEFAULT_EXPORT "nbd_default_export"
 
 #define CONFIG_KEY_NAME_LEN  32
 #define CONFIG_KEY_VALUE_LEN 256

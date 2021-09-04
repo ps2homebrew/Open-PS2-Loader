@@ -1,5 +1,5 @@
 # Translated by druchapucha, frodosumkin, and Marsi4eg.
-# Last update: Sept. 2, 2021
+# Last update: Sept. 3, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Russian
@@ -281,9 +281,9 @@ Bluetooth-адаптер может плохо работать с контро�
 Настройки контроллера
 Вкл/выкл Block Device Manager.
 Вкл/выкл устройства BDM (напр. USB).
-USB Games
-iLink Games
-MX4SIO Games
+Игры USB
+Игры iLink
+Игры MX4SIO
 Игры PS1
 Режим показа игр PS1
 POPSTARTER.ELF не найден в '%s'!

@@ -1,5 +1,5 @@
 # Translation by danielb
-# Last update: Sept. 2, 2021
+# Last update: Sept. 3, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Portuguese
@@ -53,16 +53,16 @@ Por favor espere
 Erro ao carregar ID do jogo
 Ordenar automaticamente
 Erro ao carregar ficheiro de idioma
-Debug Colors
+Cores de depuração
 Comando não detectado, esperando...
-Cover Art
+Artes
 Ecrâ Panorâmico
 Desligar PS2
 Carregando configurações
 A guardar configurações...
 Iniciar dispositivo
 Atualizar
-BDM Start Mode
+Modo de início BDM
 Modo de inicio para dispositivo HDD
 Modo de inicio para dispositivo Rede
 Modo de inicio para Aplicações
@@ -99,7 +99,7 @@ Renomear
 Apagar
 Iniciar
 Definições de Visualização
-Write Operations
+Operações de escrita
 Lembrar último jogo executado
 Botão de Seleção
 Erro, o jogo está fragmentado
@@ -168,7 +168,7 @@ Velocidade Ethernet e sistema Duplex
 10Mbit Full-duplex
 10Mbit Half-duplex
 Opções do GSM
-GSM Selector
+Seletor GSM
 Permitir que o GSM ative o modo de vídeo escolhido
 Modo de vídeo a ser ativado
 Ajuste horizontal
@@ -180,7 +180,7 @@ Ajustar Overscan
 Saltar FMV
 Saltar vídeos
 Opções de Cheat
-PS2RD Cheat Engine
+Motor de cheat PS2RD
 Permite PS2RD Cheat Engine injetar código nos jogos.
 Modo da PS2RD Cheat Engine
 Auto-Selecionar ou Selecionar cheats de jogo
@@ -205,7 +205,7 @@ Logo PS2
 Exibido para um logotipo de disco válido que corresponde à região da consola.
 Configurar PADEMU
 Definições do Emulador de Comando
-Pad Emulator
+Emulador de comandos
 Ligar/Desligar o emulador para o jogo selecionado.
 Modo do Emulador de Comando
 Selecione o modo do Emulador de Comando.
@@ -213,9 +213,9 @@ DualShock3/4 USB
 DualShock3/4 BT
 Definições para a porta:
 Selecione a porta do Emulador de Comando para as definições.
-Emulation
+Emulação
 Ligar/Desligar o emulador para a porta selecionada.
-Vibration
+Vibração
 Ligar/Desligar vibração na porta selecionada.
 Endereço MAC do adaptador Bluetooth USB:
 Comando DS emparelhado ao endereço MAC:
@@ -233,12 +233,12 @@ Sim
 Não
 O adaptador Bluetooth deve ser completamente compatível com comandos DS3/DS4.
 O adaptador Bluetooth pode não funcionar corretamente com comandos DS3/DS4.
-Multitap Emulation
+Emulação multitap
 Ligar/Desligar a emulação Multitap para o jogo selecionado
 Emulador Multitap na porta
 Selecionar porta para o emulador de Multitap.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Alternativa para comandos DS3 falsos
+Alguns comandos DS3 falsos precisam de solução alternativa, esta opção ativa-a.
 Emular inversão de CAMPO
 Correção para jogos que apresentam falhas nos modos de vídeo progressivo.
 Definições do Controlo Parental
@@ -251,17 +251,17 @@ Opções de compilação:
 Erro - esta password não pode ser usada.
 O ficheiro VMC %s está fragmentado. Continuar com o Cartão de Memoria na ranhura %d?
 Definições de Áudio
-Sound Effects
-Boot Sound
+Efeitos sonoros
+Sons de arranque
 Volume dos sons
 Volume do som de arranque
 Confirmar alteração do modo de vídeo?
 Cache da lista de jogos (HDD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Notificações
+Configuração carregada de %s
+Tema carregado de %s
+Tradução carregada de %s
+Partição %s montada.
 Opções
 Configurações do jogo guardadas.
 %s configurações removidas.
@@ -277,13 +277,13 @@ Gênero
 Data de lançamento
 Desenvolvedor
 Descrição
-Block Devices
+Dispositivos de entrada
 Configurações dos comandos
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
-USB Games
-iLink Games
-MX4SIO Games
+Ligar/desligar o gestor de dispositivos de entrada.
+Ligar/desligar dispositivos de entrada (Ex: USB).
+Jogos USB
+Jogos iLink
+Jogos MX4SIO
 Jogos PS1
 Modo de inicio para Jogos PS1
 POPSTARTER.ELF não encontrado em '%s'!

@@ -191,6 +191,7 @@ unsigned char gDefaultUITextColor[3];
 hdl_game_info_t *gAutoLaunchGame;
 char gOPLPart[128];
 char *gHDDPrefix;
+char gExportName[32];
 
 void moduleUpdateMenu(int mode, int themeChanged, int langChanged)
 {
@@ -898,6 +899,8 @@ static void _loadConfig()
                 sscanf(temp, "%d.%d.%d.%d", &ps2_gateway[0], &ps2_gateway[1], &ps2_gateway[2], &ps2_gateway[3]);
             if (configGetStr(configNet, CONFIG_NET_PS2_DNS, &temp))
                 sscanf(temp, "%d.%d.%d.%d", &ps2_dns[0], &ps2_dns[1], &ps2_dns[2], &ps2_dns[3]);
+
+            configGetStrCopy(configNet, CONFIG_NET_NBD_DEFAULT_EXPORT, gExportName, sizeof(gExportName));
         }
     }
 
@@ -1401,7 +1404,7 @@ static int loadLwnbdSvr(void)
     if (ret == 0) {
         ret = sysLoadModuleBuffer(&ps2atad_irx, size_ps2atad_irx, 0, NULL);
         if (ret >= 0) {
-            ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 0, NULL);
+            ret = sysLoadModuleBuffer(&lwnbdsvr_irx, size_lwnbdsvr_irx, 4, (char *)&gExportName);
             if (ret >= 0)
                 ret = 0;
         }

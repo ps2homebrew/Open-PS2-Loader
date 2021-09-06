@@ -26,6 +26,7 @@ thbase_IMPORTS_end
 
 sysclib_IMPORTS_start
 I_sprintf
+I_strncmp
 I_strcpy
 I_strlen
 I_memset

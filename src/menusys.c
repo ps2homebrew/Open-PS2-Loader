@@ -851,10 +851,11 @@ void menuHandleInputMenu()
             guiShowAbout();
         } else if (id == MENU_SAVE_CHANGES) {
             if (menuCheckParentalLock() == 0) {
-                saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
 #ifdef PADEMU
                 guiGameSavePadEmuGlobalConfig(configGetByType(CONFIG_GAME));
-                saveConfig(CONFIG_GAME, 0);
+                saveConfig(CONFIG_OPL | CONFIG_NETWORK | CONFIG_GAME, 1);
+#else
+                saveConfig(CONFIG_OPL | CONFIG_NETWORK, 1);
 #endif
                 menuSetParentalLockCheckState(1); // Re-enable parental lock check.
             }

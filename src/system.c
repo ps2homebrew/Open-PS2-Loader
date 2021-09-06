@@ -916,13 +916,13 @@ int sysExecElf(const char *path)
 
 int sysCheckMC(void)
 {
-    DIR *mc0_root_dir = opendir("mc0:");
+    DIR *mc0_root_dir = opendir("mc0:/");
     if (mc0_root_dir != NULL) {
         closedir(mc0_root_dir);
         return 0;
     }
 
-    DIR *mc1_root_dir = opendir("mc1:");
+    DIR *mc1_root_dir = opendir("mc1:/");
     if (mc1_root_dir != NULL) {
         closedir(mc1_root_dir);
         return 1;

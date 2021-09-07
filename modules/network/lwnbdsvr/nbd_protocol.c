@@ -58,7 +58,9 @@ nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs)
     nbd_context **ptr_ctx = ctxs;
 
     //temporary workaround
-    nbd_context const *ctx = ctxs[0];
+    nbd_context const *ctx = nbd_context_getDefaultExportByName(ctxs, gdefaultexport);
+    if (ctx == NULL)
+        ctx = ctxs[0];
 
     /*** handshake ***/
 

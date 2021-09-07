@@ -105,9 +105,9 @@ void checkMCFolder(void)
     mkdir(path, 0777);
 
     snprintf(path, sizeof(path), "mc%d:OPL/opl.icn", mcID & 1);
-    fd = open(path, O_RDONLY, 0666);
+    fd = open(path, O_RDONLY);
     if (fd < 0) {
-        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+        fd = openFile(path, O_WRONLY | O_CREAT | O_TRUNC);
         if (fd >= 0) {
             write(fd, &icon_icn, size_icon_icn);
             close(fd);
@@ -117,9 +117,9 @@ void checkMCFolder(void)
     }
 
     snprintf(path, sizeof(path), "mc%d:OPL/icon.sys", mcID & 1);
-    fd = open(path, O_RDONLY, 0666);
+    fd = open(path, O_RDONLY);
     if (fd < 0) {
-        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+        fd = openFile(path, O_WRONLY | O_CREAT | O_TRUNC);
         if (fd >= 0) {
             write(fd, &icon_sys, size_icon_sys);
             close(fd);
@@ -151,11 +151,13 @@ static int checkFile(char *path, int mode)
             if (pos) {
                 memcpy(dirPath, path, (pos - path));
                 dirPath[(pos - path)] = '\0';
-                int res = mkdir(dirPath, 0777);
-                // Non-standard POSIX check: the error value is supposed to be assigned to errno, not the return value
-                if (res >= 0 || res == -EEXIST) {
-                    return 0;
-                }
+                DIR *dir = opendir(dirPath);
+                if (dir == NULL) {
+                    int res = mkdir(dirPath, 0777);
+                    if (res != 0)
+                        return 0;
+                } else
+                    closedir(dir);
             }
         }
     }

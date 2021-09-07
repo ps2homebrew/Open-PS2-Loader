@@ -119,15 +119,35 @@ that contains the preferred partition name (for example `__common`).
 </p>
 </details>
 
+
 <details>
   <summary> <b> NBD Server </b> </summary>
 <p>
 
-NBD server replaced HDL server. For using it, you need a way to run some NBD client on your machine.
+A [NBD](https://en.wikipedia.org/wiki/Network_block_device) server replaced HDL server.
+NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md) and developed as a collaborative open standard.
+The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD), go there to contribute. The main advantage of using NBD is that the client will simulate a similar interface to the OS as if the device was plugged directly into your machine. All your favorite software that worked with the device directly connected to your machine, will work with the device accessible through the network. So you need a NBD client. Here we list some known compatible clients and how to use them.
 
-### Linux
+### nbd-client
+* Linux, [Windows with WSL and custom kernel](https://github.com/microsoft/WSL/issues/5968) 
+ 
+nbd-client requires nbd kernel support. If it isn't loaded, `sudo modprobe nbd` will do.
+  
+connect : 
+```sh
+nbd-client -no-optgo 192.168.1.45 /dev/nbd1
+```
 
-For example, on Windows 10 you can use WSL2. The nbd client will create a block device on the PC. Currently, the only working nbd client on the WSL2 - `nbdfuse`.
+disconnect : 
+```sh
+nbd-client -d /dev/nbd1
+```
+
+You'll generally need sudo to run this commands in root or add your user to the right group usually "disk".
+
+### nbdfuse
+* Linux, Windows with WSL2
+
 An example, how to install HDL game to the HDD:
 
 ```sh
@@ -137,11 +157,10 @@ hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO
 ```
 After you are done, type `umount ps2` to prevent corruption.
 
-On pure Linux, you can also use `nbd-client -no-optgo`.
+### wnbd
+* Windows
 
-### Windows
-
-On Windows systems, you can use [WNBD client](https://cloudbase.it/ceph-for-windows/). Install, reboot, open elevated (with Administrator rights) [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.1#how-to-start-windows-powershell-on-earlier-versions-of-windows) and type the following command:
+[WNBD client](https://cloudbase.it/ceph-for-windows/). Install, reboot, open elevated (with Administrator rights) [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.1#how-to-start-windows-powershell-on-earlier-versions-of-windows) and type the following command:
 
 ```sh
 wnbd-client.exe map hdd0 192.168.1.22

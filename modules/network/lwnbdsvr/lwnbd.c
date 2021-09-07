@@ -1,6 +1,6 @@
 /****************************************************************/ /**
  *
- * @file nbd_server.c
+ * @file lwnbd.c
  *
  * @author   Ronan Bignaux <ronan@aimao.org>
  *
@@ -46,7 +46,7 @@
  */
 
 #include <string.h>
-#include "nbd_server.h"
+#include <lwnbd.h>
 
 char gdefaultexport[32];
 
@@ -57,11 +57,11 @@ static int nbd_context_flush_(nbd_context const *const me);
 /* constructor */
 void nbd_context_ctor(nbd_context *const me)
 {
-    static struct nbd_context_Vtbl const vtbl = {/* vtbl of the nbd_context class */
-                                                 &nbd_context_read_,
-                                                 &nbd_context_write_,
-                                                 &nbd_context_flush_};
-    me->vptr = &vtbl; /* "hook" the vptr to the vtbl */
+    static struct lwnbd_operations const nbdopts = {/* nbdopts of the nbd_context class */
+                                                    &nbd_context_read_,
+                                                    &nbd_context_write_,
+                                                    &nbd_context_flush_};
+    me->vptr = &nbdopts; /* "hook" the vptr to the nbdopts */
 }
 
 /* nbd_context class implementations of its virtual functions... */
@@ -90,11 +90,14 @@ nbd_context *nbd_context_getDefaultExportByName(nbd_context **nbd_contexts, cons
 {
     nbd_context **ptr_ctx = nbd_contexts;
     while (*ptr_ctx) {
-        if (strncmp((*ptr_ctx)->export_name, exportname, 32) == 0)
-            break;
+        if (strncmp((*ptr_ctx)->export_name, exportname, 32) == 0) {
+            LOG("searched for \"%s\" ... found.\n", exportname);
+            return *ptr_ctx;
+        }
         ptr_ctx++;
     }
-    return *ptr_ctx;
+    LOG("searched for \"%s\" ... not found.\n", exportname);
+    return NULL;
 }
 
 /*
@@ -107,10 +110,10 @@ uint32_t nbd_recv(int s, void *mem, size_t len, int flags)
     uint32_t totalRead = 0;
 
     //        LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE("nbd_recv(-, 0x%X, %d)\n", (int)mem, size);
-    // dbgprintf("left = %u\n", left);
+    // dbgLOG("left = %u\n", left);
     do {
         bytesRead = recv(s, mem + totalRead, left, flags);
-        // dbgprintf("bytesRead = %u\n", bytesRead);
+        // dbgLOG("bytesRead = %u\n", bytesRead);
         if (bytesRead <= 0)
             break;
 
@@ -130,8 +133,8 @@ int nbd_init(nbd_context **ctx)
     int tcp_socket, client_socket = -1;
     struct sockaddr_in peer;
     socklen_t addrlen;
-    register int r;
-    nbd_context *ctxt;
+    register err_t r;
+    nbd_context *nego_ctx = NULL;
 
     peer.sin_family = AF_INET;
     peer.sin_port = htons(NBD_SERVER_PORT);
@@ -159,22 +162,21 @@ int nbd_init(nbd_context **ctx)
             if (client_socket < 0)
                 goto error;
 
-            printf("lwNBD: a client connected.\n");
-            ctxt = negotiation_phase(client_socket, ctx);
-            if (ctxt != NULL)
-                r = transmission_phase(client_socket, ctxt);
-            else
-                printf("lwNBD: handshake failed.\n");
-
-            if (r != NBD_SUCCESS)
-                printf("lwNBD: an error occured during transmission phase.\n");
-
+            LOG("a client connected.\n");
+            r = negotiation_phase(client_socket, ctx, &nego_ctx);
+            if (r == 0) {
+                r = transmission_phase(client_socket, nego_ctx);
+                if (r == -1)
+                    LOG("an error occured during transmission phase.\n");
+            } else if (r == -2) {
+                LOG("an error occured during negotiation_phase phase.\n");
+            }
             close(client_socket);
-            printf("lwNBD: a client disconnected.\n");
+            LOG("a client disconnected.\n\n\n");
         }
     }
 error:
-    printf("lwNBD: failed to init server.");
+    LOG("failed to init server.");
     close(tcp_socket);
 
     return 0;

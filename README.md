@@ -149,10 +149,16 @@ Supported: Linux, [Windows with WSL and custom kernel](https://github.com/micros
 nbd-client requires nbd kernel support. If it isn't loaded,
 `sudo modprobe nbd` will do.
 
+list available export:
+
+```sh
+nbd-client -l 192.168.1.45
+```
+
 connect:
 
 ```sh
-nbd-client -no-optgo 192.168.1.45 /dev/nbd1 &
+nbd-client 192.168.1.45 /dev/nbd1
 ```
 
 disconnect:
@@ -167,6 +173,12 @@ add your user to the right group usually "disk".
 ### nbdfuse
 
 Supported: Linux, Windows with WSL2
+
+list available export:
+
+```sh
+nbdinfo --list nbd://192.168.1.45
+```
 
 connect:
 

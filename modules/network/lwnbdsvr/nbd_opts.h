@@ -45,7 +45,7 @@
 #include <sys/socket.h>
 #endif
 
-// #ifndef PS2SDK
+// #ifndef _IOP
 // #include "lwip/opt.h"
 // #else
 // #include "tcpip.h"
@@ -56,6 +56,13 @@
  * @ingroup NBD
  * @{
  */
+
+/**
+  *
+  */
+#if !defined APP_NAME || defined __DOXYGEN__
+#define APP_NAME "lwNBD"
+#endif
 
 /**
  * Enable NBD debug messages

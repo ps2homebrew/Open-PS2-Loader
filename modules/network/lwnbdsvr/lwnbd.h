@@ -1,6 +1,6 @@
 /****************************************************************/ /**
  *
- * @file nbd_server.h
+ * @file lwnbd.h
  *
  * @author   Ronan Bignaux <ronan@aimao.org>
  *
@@ -47,18 +47,21 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define LOG(format, args...) \
+    printf(APP_NAME ": " format, ##args)
+
+#ifdef DEBUG
+#define DEBUGLOG LOG
+#else
+#define DEBUGLOG(args...) \
+    do {                  \
+    } while (0)
+#endif
+
 //#include "lwip/apps/nbd_opts.h"
 //#include "lwip/err.h"
 //#include "lwip/pbuf.h"
 //#include "lwip/mem.h"
-
-#ifdef DEBUG
-#define dbgprintf(args...) printf(args)
-#else
-#define dbgprintf(args...) \
-    do {                   \
-    } while (0)
-#endif
 
 #ifdef __linux__
 #include <sys/socket.h>
@@ -67,15 +70,16 @@
 #include <unistd.h>
 
 #include <assert.h> //todo: move in .c
+
+typedef signed char err_t;
 //TODO : manage endianess
 #define htonll(x) htobe64(x)
 #define ntohll(x) be64toh(x)
 #endif
 
-#ifdef PS2SDK
+#ifdef _IOP
 #include <ps2ip.h>
 #include <sysclib.h>
-
 
 #define assert(expr) \
     ((expr) ||       \
@@ -104,11 +108,17 @@ static inline uint64_t bswap64(uint64_t x)
 #define ntohll(x) bswap64(x)
 #endif
 
+// Missing in stddef.h
+#ifndef offsetof
+#define offsetof(st, m) \
+    ((size_t)((char *)&((st *)0)->m - (char *)0))
+#endif
+
 //TODO: Missing in PS2SK's <stdint.h> , needed for "nbd-protocol.h"
 // https://en.cppreference.com/w/c/types/integer
 #define UINT64_MAX  0xffffffffffffffff
 #define UINT64_C(x) ((x) + (UINT64_MAX - UINT64_MAX))
-#endif
+#endif /* _IOP */
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,11 +129,11 @@ extern "C" {
  * https://github.com/QuantumLeaps/OOP-in-C/blob/master/AN_OOP_in_C.pdf
  */
 
-struct nbd_context_Vtbl;
+struct lwnbd_operations;
 
 typedef struct nbd_context
 {
-    struct nbd_context_Vtbl const *vptr;
+    struct lwnbd_operations const *vptr;
 
     char export_desc[64];
     char export_name[32];
@@ -134,7 +144,7 @@ typedef struct nbd_context
 
 } nbd_context;
 
-struct nbd_context_Vtbl
+struct lwnbd_operations
 {
 
     /**
@@ -174,8 +184,8 @@ int nbd_init(nbd_context **ctx);
 
 // in nbd_protocol.c
 //todo: const ctxs
-nbd_context *negotiation_phase(const int client_socket, nbd_context **ctxs);
-int transmission_phase(const int client_socket, const nbd_context *ctx);
+err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context **ctx);
+err_t transmission_phase(const int client_socket, nbd_context *ctx);
 
 void nbd_context_ctor(nbd_context *const me);
 static inline int nbd_read(nbd_context const *const me, void *buffer, uint64_t offset, uint32_t length)

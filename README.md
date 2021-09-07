@@ -125,20 +125,32 @@ that contains the preferred partition name (for example `__common`).
 <p>
 
 A [NBD](https://en.wikipedia.org/wiki/Network_block_device) server replaced HDL server.
-NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md) and developed as a collaborative open standard.
-The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD), go there to contribute. The main advantage of using NBD is that the client will simulate a similar interface to the OS as if the device was plugged directly into your machine. All your favorite software that worked with the device directly connected to your machine, will work with the device accessible through the network. So you need a NBD client. Here we list some known compatible clients and how to use them.
+NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md) and 
+developed as a collaborative open standard.
+The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD), go there to contribute.
+The main advantage of using NBD is that the client will simulate a similar interface to the 
+OS as if the device was plugged directly into your machine. 
+All your favorite software that worked with the device directly connected to your machine,
+will work with the device accessible through the network. So you need a NBD client. 
+Here we list some known compatible clients and how to use them.
+  
+Currently, only export for HDD is supported by the server. You can use hdl-dump, pfs-shell, or even directly edit disk in some hex editor.
+Example, how to install HDL game to the HDD :
+Connect with your choosen client, then `hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO` and when you're done, disconnect the client.
 
 ### nbd-client
-* Linux, [Windows with WSL and custom kernel](https://github.com/microsoft/WSL/issues/5968) 
+
+Supported: Linux, [Windows with WSL and custom kernel](https://github.com/microsoft/WSL/issues/5968) 
  
 nbd-client requires nbd kernel support. If it isn't loaded, `sudo modprobe nbd` will do.
   
-connect : 
+connect:
+
 ```sh
-nbd-client -no-optgo 192.168.1.45 /dev/nbd1
+nbd-client -no-optgo 192.168.1.45 /dev/nbd1 &
 ```
 
-disconnect : 
+disconnect:
 ```sh
 nbd-client -d /dev/nbd1
 ```
@@ -146,28 +158,39 @@ nbd-client -d /dev/nbd1
 You'll generally need sudo to run this commands in root or add your user to the right group usually "disk".
 
 ### nbdfuse
-* Linux, Windows with WSL2
 
-An example, how to install HDL game to the HDD:
+Supported: Linux, Windows with WSL2
+
+connect:
 
 ```sh
 mkdir ps2
 nbdfuse ps2/ nbd://192.168.1.45 &
-hdl_dump inject_dvd ps2/nbd "Test Game" ./TEST.ISO
 ```
-After you are done, type `umount ps2` to prevent corruption.
+
+disconnect:
+
+```sh
+umount ps2
+```
 
 ### wnbd
-* Windows
+
+Supported: Windows
 
 [WNBD client](https://cloudbase.it/ceph-for-windows/). Install, reboot, open elevated (with Administrator rights) [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.1#how-to-start-windows-powershell-on-earlier-versions-of-windows) and type the following command:
+
+connect:
 
 ```sh
 wnbd-client.exe map hdd0 192.168.1.22
 ```
 
-Now you can use hdl-dump, pfs-shell, or even directly edit disk in some hex editor.
-After you are done, type `wnbd-client.exe unmap hdd0` to prevent corruption.
+disconnect:
+
+```sh
+wnbd-client.exe unmap hdd0
+```
 
 ### Mac OS
 

@@ -128,10 +128,10 @@ NBD is [formally documented](https://github.com/NetworkBlockDevice/nbd/blob/mast
 and developed as a collaborative open standard.
 The current implementation of the server is based on [lwNBD](https://github.com/bignaux/lwNBD),
 go there to contribute.
-The main advantage of using NBD is that the client will simulate a similar interface to
-the OS as if the device was plugged directly into your machine.
-All your favorite software that worked with the device directly connected to your machine,
-will work with the device accessible through the network.
+The main advantage of using NBD is that the client will simulate a similar
+interface to the OS as if the device was plugged directly into your machine.
+All your favorite software that worked with the device directly connected to your
+machine, will work with the device accessible through the network.
 
 Currently, only export for HDD is supported by the server.
 You can use hdl-dump, pfs-shell, or even directly edit disk in some hex editor.
@@ -145,8 +145,9 @@ Here we list some known compatible clients and how to use them.
 ### nbd-client
 
 Supported: Linux, [Windows with WSL and custom kernel](https://github.com/microsoft/WSL/issues/5968)
- 
-nbd-client requires nbd kernel support. If it isn't loaded, `sudo modprobe nbd` will do.
+
+nbd-client requires nbd kernel support. If it isn't loaded,
+`sudo modprobe nbd` will do.
 
 connect:
 

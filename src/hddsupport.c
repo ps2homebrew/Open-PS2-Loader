@@ -701,22 +701,12 @@ static int hddUpdateGameListCache(hdl_games_list_t *cache, hdl_games_list_t *gam
     return result;
 }
 
-static void hddGetAppsPath(char *path, int max)
+static char *hddGetPrefix(void)
 {
-    snprintf(path, max, "%sAPPS", gHDDPrefix);
-}
-
-static void hddGetLegacyAppsPath(char *path, int max)
-{
-    snprintf(path, max, "%sconf_apps.cfg", gHDDPrefix);
-}
-
-static void hddGetLegacyAppsInfo(char *path, int max, char *name)
-{
-    snprintf(path, max, "%sCFG/%s.cfg", gHDDPrefix, name);
+    return gHDDPrefix;
 }
 
 static item_list_t hddGameList = {
-    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", &hddGetTextId, &hddGetAppsPath, &hddGetLegacyAppsPath, &hddGetLegacyAppsInfo, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
+    HDD_MODE, 0, 0, MODE_FLAG_COMPAT_DMA, MENU_MIN_INACTIVE_FRAMES, HDD_MODE_UPDATE_DELAY, "HDD Games", &hddGetTextId, &hddGetPrefix, &hddInit, &hddNeedsUpdate, &hddUpdateGameList,
     &hddGetGameCount, &hddGetGame, &hddGetGameName, &hddGetGameNameLength, &hddGetGameStartup, &hddDeleteGame, &hddRenameGame,
     &hddLaunchGame, &hddGetConfig, &hddGetImage, &hddCleanUp, &hddShutdown, &hddCheckVMC, &hddGetIconId};

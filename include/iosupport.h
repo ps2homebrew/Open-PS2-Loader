@@ -99,12 +99,8 @@ typedef struct
     /// item description in localised form (used if value is not negative)
     int (*itemTextId)(void);
 
-    /// @return path to applications storage on the device (set callback to NULL if not applicable).
-    void (*itemGetAppsPath)(char *path, int max);
-
-    void (*itemGetLegacyAppsPath)(char *path, int max);
-
-    void (*itemGetLegacyAppsInfo)(char *path, int max, char *name);
+    /// @return path to device prefix (set callback to NULL if not applicable).
+    char *(*itemGetPrefix)(void);
 
     void (*itemInit)(void);
 

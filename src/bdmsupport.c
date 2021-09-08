@@ -471,22 +471,12 @@ static int bdmCheckVMC(char *name, int createSize)
     return sysCheckVMC(bdmPrefix, "/", name, createSize, NULL);
 }
 
-static void bdmGetAppsPath(char *path, int max)
+static char *bdmGetPrefix(void)
 {
-    snprintf(path, max, "%sAPPS", bdmPrefix);
-}
-
-static void bdmGetLegacyAppsPath(char *path, int max)
-{
-    snprintf(path, max, "%sconf_apps.cfg", bdmPrefix);
-}
-
-static void bdmGetLegacyAppsInfo(char *path, int max, char *name)
-{
-    snprintf(path, max, "%sCFG/%s.cfg", bdmPrefix, name);
+    return bdmPrefix;
 }
 
 static item_list_t bdmGameList = {
-    BDM_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, BDM_MODE_UPDATE_DELAY, "BDM Games", &bdmGetTextId, &bdmGetAppsPath, &bdmGetLegacyAppsPath, &bdmGetLegacyAppsInfo, &bdmInit, &bdmNeedsUpdate,
+    BDM_MODE, 2, 0, 0, MENU_MIN_INACTIVE_FRAMES, BDM_MODE_UPDATE_DELAY, "BDM Games", &bdmGetTextId, &bdmGetPrefix, &bdmInit, &bdmNeedsUpdate,
     &bdmUpdateGameList, &bdmGetGameCount, &bdmGetGame, &bdmGetGameName, &bdmGetGameNameLength, &bdmGetGameStartup, &bdmDeleteGame, &bdmRenameGame,
     &bdmLaunchGame, &bdmGetConfig, &bdmGetImage, &bdmCleanUp, &bdmShutdown, &bdmCheckVMC, &bdmGetIconId};

@@ -1,5 +1,3 @@
-#define APP_NAME "lwnbdsvr"
-
 #include "irx_imports.h"
 #include <lwnbd.h>
 #include "drivers/atad_d.h"

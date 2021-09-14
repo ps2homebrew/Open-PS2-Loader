@@ -1,25 +1,26 @@
 # lwNBD
 
-*   Description : A Lightweight NBD server
-*   Official repository : <https://github.com/bignaux/lwNBD>
-*   Author : Ronan Bignaux
-*   Licence : BSD
-*   Socket API: lwIP 2.0.0 and Linux supported.
+* Description : A Lightweight NBD server
+* Official repository : <https://github.com/bignaux/lwNBD>
+* Author : Ronan Bignaux
+* Licence : BSD
+* Socket API: lwIP 2.0.0 and Linux supported.
 
 Targeting first the use on Playstation 2 IOP, a 37.5 MHz MIPS processor
 and 2 MB of RAM, lwNBD is designed to run on bare metal or OS embedded system.
 With modulararity and portability in mind, it is developed according to several
 code standards, including :
 
-*   [Object-Oriented Programming in C](https://github.com/QuantumLeaps/OOP-in-C/)
-*   nbdkit implementation naming, using a verbatim copy of their nbd-protocol.h
+* [Object-Oriented Programming in C](https://github.com/QuantumLeaps/OOP-in-C/)
+* nbdkit implementation naming, using a verbatim copy of their nbd-protocol.h
 
 There are 2 examples provided :
 
-*   lwnbd_linux.c is a simple nbd server, that use stdio_d.c driver to
-    serve a list of files as command line parameters.
-*   lwnbdsvr.c an IRX module for [Open-PS2-Loader](https://github.com/ps2homebrew/Open-PS2-Loader).
-    It can export hdd drive.
+* lwnbd_linux.c is a simple nbd server, that use stdio_d.c driver to
+  serve a list of files as command line parameters.
+
+* lwnbdsvr.c an IRX module for [Open-PS2-Loader](https://github.com/ps2homebrew/Open-PS2-Loader).
+  It can export hdd drive.
 
 ## History
 
@@ -42,13 +43,13 @@ i publish this "AS-IS".
 
 Known supported clients :
 
-*   nbdfuse (provided by libnbd), works on windows with WSL2.
-*   nbd-client
-*   Ceph for Windows (wnbd-client.exe)
+* nbdfuse (provided by libnbd), works on windows with WSL2.
+* nbd-client
+* Ceph for Windows (wnbd-client.exe)
 
 ## TODO
 
-*   event loop based on select()
-*   provide a clean API
-*   fix NBD_FLAG_FIXED_NEWSTYLE negotiation
-*   NBD_OPT_INFO/NBD_OPT_GO, the server is not yet able to serve many export or change blocksize.
+* event loop based on select()
+* provide a clean API
+* fix NBD_FLAG_FIXED_NEWSTYLE negotiation
+* NBD_OPT_INFO/NBD_OPT_GO

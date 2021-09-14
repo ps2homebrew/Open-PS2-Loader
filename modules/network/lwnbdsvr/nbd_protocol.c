@@ -67,16 +67,16 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
     size = send(client_socket, &new_hs, sizeof(struct nbd_new_handshake),
                 0);
     if (size < sizeof(struct nbd_new_handshake))
-        goto error;
+        return -1;
 
     size = nbd_recv(client_socket, &cflags, sizeof(cflags), 0);
     if (size < sizeof(cflags))
-        goto error;
+        return -1;
     cflags = htonl(cflags);
 
     if (cflags != gflags) {
         LOG("Unsupported client flags %d\n", cflags);
-        goto error;
+        return -1;
     }
 
     while (1) {
@@ -86,11 +86,11 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
         size = nbd_recv(client_socket, &new_opt, sizeof(struct nbd_new_option),
                         0);
         if (size < sizeof(struct nbd_new_option))
-            goto error;
+            return -1;
 
         new_opt.version = ntohll(new_opt.version);
         if (new_opt.version != NBD_NEW_VERSION)
-            goto error;
+            return -1;
 
         new_opt.option = htonl(new_opt.option);
 #ifdef DEBUG
@@ -122,7 +122,7 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
                 struct nbd_export_name_option_reply handshake_finish;
                 //temporary workaround
                 if (new_opt.optlen > 0) {
-                    *ctx = nbd_context_getDefaultExportByName(ctxs, &nbd_buffer);
+                    *ctx = nbd_context_getDefaultExportByName(ctxs, (const char *)&nbd_buffer);
                 } else
                     *ctx = nbd_context_getDefaultExportByName(ctxs, gdefaultexport);
                 //TODO: is that correct ?
@@ -133,21 +133,18 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
                 memset(handshake_finish.zeroes, 0, sizeof(handshake_finish.zeroes));
                 size = send(client_socket, &handshake_finish,
                             (cflags & NBD_FLAG_NO_ZEROES) ? offsetof(struct nbd_export_name_option_reply, zeroes) : sizeof handshake_finish, 0);
-                return 0;
-                break;
+                return NBD_OPT_EXPORT_NAME;
             }
 
             case NBD_OPT_ABORT:
-                //TODO : test
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
                 fixed_new_option_reply.option = htonl(new_opt.option);
                 fixed_new_option_reply.reply = htonl(NBD_REP_ACK);
                 fixed_new_option_reply.replylen = 0;
                 size = send(client_socket, &fixed_new_option_reply,
                             sizeof(struct nbd_fixed_new_option_reply), 0);
-                goto soft_disconnect;
-                break;
-            // see nbdkit send_newstyle_option_reply_exportnames()
+                return NBD_OPT_ABORT;
+
             case NBD_OPT_LIST: {
                 uint32_t name_len, desc_len, len;
                 fixed_new_option_reply.magic = htonll(NBD_REP_MAGIC);
@@ -192,12 +189,6 @@ err_t negotiation_phase(const int client_socket, nbd_context **ctxs, nbd_context
                 break;
         }
     }
-
-error:
-    LOG("handshake failed.\n");
-    return -2;
-soft_disconnect:
-    return -1;
 }
 
 /** @ingroup nbd
@@ -213,10 +204,10 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
     struct nbd_simple_reply reply;
     struct nbd_request request;
 
-    if (ctx == NULL)
+    if (ctx == NULL) {
         LOG("No context provided.\n");
-
-    reply.magic = htonl(NBD_SIMPLE_REPLY_MAGIC);
+        return -1;
+    }
 
     while (1) {
 
@@ -226,13 +217,13 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
         size = nbd_recv(client_socket, &request, sizeof(struct nbd_request), 0);
         if (size < sizeof(struct nbd_request)) {
             LOG("sizeof nbd_request waited %ld receveid %d\n", sizeof(struct nbd_request), size);
-            goto error;
+            return -1;
         }
 
         request.magic = ntohl(request.magic);
         if (request.magic != NBD_REQUEST_MAGIC) {
             LOG("wrong NBD_REQUEST_MAGIC\n");
-            goto error;
+            return -1;
         }
 
         request.flags = ntohs(request.flags);
@@ -240,6 +231,7 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
         request.offset = ntohll(request.offset);
         request.count = ntohl(request.count);
 
+        reply.magic = htonl(NBD_SIMPLE_REPLY_MAGIC);
         reply.handle = request.handle;
 
 #ifdef DEBUG
@@ -299,11 +291,10 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
                         sendflag = 1;
                     } else {
                         LOG("NBD_CMD_READ : EIO\n");
-                        goto error; // -EIO
-                                    //                    	LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
+                        return -1; // -EIO
+                                   //                    	LWIP_DEBUGF(NBD_DEBUG | LWIP_DBG_STATE, ("nbd: error read\n"));
                     }
                 }
-
                 break;
 
             case NBD_CMD_WRITE:
@@ -353,13 +344,11 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
                 reply.error = ntohl(error);
                 r = send(client_socket, &reply, sizeof(struct nbd_simple_reply),
                          0);
-
                 break;
 
             case NBD_CMD_DISC:
-                //TODO
-                goto soft_disconnect;
-                break;
+                // There is no reply to an NBD_CMD_DISC.
+                return 0;
 
             case NBD_CMD_FLUSH:
                 if (nbd_flush(ctx) == 0)
@@ -376,13 +365,12 @@ err_t transmission_phase(const int client_socket, nbd_context *ctx)
             case NBD_CMD_WRITE_ZEROES:
             case NBD_CMD_BLOCK_STATUS:
             default:
-                /* NBD_REP_ERR_INVALID */
-                goto error;
+                /* The server SHOULD return NBD_EINVAL if it receives an unknown command. */
+                reply.error = ntohl(NBD_EINVAL);
+                r = send(client_socket, &reply, sizeof(struct nbd_simple_reply),
+                         0);
+                break;
         }
     }
-
-soft_disconnect:
-    return 0;
-error:
     return -1;
 }

@@ -105,7 +105,7 @@ nbd_context *nbd_context_getDefaultExportByName(nbd_context **nbd_contexts, cons
  */
 uint32_t nbd_recv(int s, void *mem, size_t len, int flags)
 {
-    uint32_t bytesRead = 0;
+    ssize_t bytesRead;
     uint32_t left = len;
     uint32_t totalRead = 0;
 
@@ -114,7 +114,7 @@ uint32_t nbd_recv(int s, void *mem, size_t len, int flags)
     do {
         bytesRead = recv(s, mem + totalRead, left, flags);
         // dbgLOG("bytesRead = %u\n", bytesRead);
-        if (bytesRead <= 0)
+        if (bytesRead <= 0) // if (bytesRead == -1) failed for nbdfuse, seems it not send NBD_CMD_DISC
             break;
 
         left -= bytesRead;
@@ -164,11 +164,11 @@ int nbd_init(nbd_context **ctx)
 
             LOG("a client connected.\n");
             r = negotiation_phase(client_socket, ctx, &nego_ctx);
-            if (r == 0) {
+            if (r == NBD_OPT_EXPORT_NAME) {
                 r = transmission_phase(client_socket, nego_ctx);
                 if (r == -1)
                     LOG("an error occured during transmission phase.\n");
-            } else if (r == -2) {
+            } else if (r == -1) {
                 LOG("an error occured during negotiation_phase phase.\n");
             }
             close(client_socket);
@@ -178,6 +178,5 @@ int nbd_init(nbd_context **ctx)
 error:
     LOG("failed to init server.");
     close(tcp_socket);
-
     return 0;
 }

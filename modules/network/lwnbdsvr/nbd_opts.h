@@ -41,28 +41,11 @@
 #ifndef LWIP_HDR_APPS_NBD_OPTS_H
 #define LWIP_HDR_APPS_NBD_OPTS_H
 
-#ifdef __linux__
-#include <sys/socket.h>
-#endif
-
-// #ifndef _IOP
-// #include "lwip/opt.h"
-// #else
-// #include "tcpip.h"
-// #endif
-
 /**
  * @defgroup NBD_opts Options
  * @ingroup NBD
  * @{
  */
-
-/**
-  *
-  */
-#if !defined APP_NAME || defined __DOXYGEN__
-#define APP_NAME "lwNBD"
-#endif
 
 /**
  * Enable NBD debug messages

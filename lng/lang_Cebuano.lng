@@ -37,7 +37,7 @@ Ayos
 Pilia
 Kansel
 Lingin
-Krus
+Ekis
 Lista
 Settings sa dula
 Tangtanga ang setting
@@ -236,7 +236,7 @@ Gipasiga / gipalayo ang pagsundog sa Multitap alang sa pinili nga dula.
 Multitap emulator sa port
 Pagpili usa ka port alang sa pagsundog sa Multitap.
 Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Ang pipila nga peke nga DS3 nagkinahanglan us aka solusyon, kini nga kapilian makapagana niini.
 Sundoga ang FIELD Flipping
 Pag-ayo alang sa mga dula nga ning-glitch ubos sa mga progresibo nga mga mode sa video.
 Setting sa Parental Lock
@@ -249,18 +249,18 @@ Opsyon sa build:
 Sayop - dili magamit ang kini nga password.
 Ang VMC% s file nabahinbahin. Padayon sa Memory Card sa slot% d?
 Setting sa Audio
-Sound Effects
-Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+Epekto sa Tingog
+Tunog sa Boot
+Volume ng Epekto sa Tingog
+Volume ng Tunog sa Boot
 Gikumpirma nga "video mode change"?
 Cache Game List (HDD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
-Options
+Mga Pahibalo
+Gikarga ang config gikan sa %s
+Gikarga ang theme gikan sa %s
+Gikarga ang sinultian gikan sa %s
+Mingkayab sa partisyon %s.
+Mga Opsyon
 Nai-save ang "Game settings".
 %s settings ay nai-alis.
 Nag-overwrite sa kasamtangan nga mga setting sa pagkaangay sa dula kung gipaandar.
@@ -277,8 +277,8 @@ Debeloper
 Paghulagway
 Block Devices
 Controller Settings
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
-USB Games
-iLink Games
-MX4SIO Games
+I-on / off ang Block Device Manager.
+Itu-turn on/off ang Block Devices (e.g. USB).
+Dula sa USB
+Dula sa iLink
+Dula sa MX4SIO

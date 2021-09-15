@@ -1,5 +1,5 @@
 # Translation by Lord_Flaya
-# Last update: Sept. 2, 2021
+# Last update: Sept. 10, 2021
 # Updated for OPNPS2LD-v1.1.0-Beta-DB_all-2134-4f5adc5-2021-09-02 and OPNPS2LD-v1.1.0-Beta-ifcaro_all-1779-0265d2a-2021-09-02
 # official thread: https://www.ps2-home.com/forum/viewtopic.php?f=83&t=164
 Swedish
@@ -281,9 +281,9 @@ Blockera enheter
 Kontroll-inställningar
 Slå på/av Blockera enhetshaterare.
 Slå på/av Blockera enheter (T.ex USB).
-USB Games
-iLink Games
-MX4SIO Games
+USB Spel
+iLink Spel
+MX4SIO Spel
 PS1 Spel
 Video läge PS1 Spel
 POPSTARTER.ELF saknas i '%s!

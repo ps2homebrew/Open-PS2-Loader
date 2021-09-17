@@ -32,8 +32,8 @@ Kanselahin ang pag-update?
 %d: Hindi mailista ang mga laro
 %d: Hindi available ang DHCP server
 %d: Walang koneksyon sa network
-Sa
-Mula sa
+Naka-on
+Naka-off
 Ayos
 Piliin
 Kansel
@@ -42,7 +42,7 @@ Cross
 Listahan
 Settings ng laro
 Alisin ang Settings
-I-scroll
+Bilis ng scroll
 Mabagal
 Medium
 Mabilis
@@ -52,7 +52,7 @@ Mangyaring maghintay
 Nagkaroon ng error habang naglo-load ang ID ng Laro
 Awtomatikong pag-uuri
 Error sa paglo-load ng file na wika
-Debug Colors
+Debug na kulay
 Controller Walang natukoy na , naghihintay…
 Cover Art
 Malapad na screen
@@ -61,7 +61,7 @@ Nilo-load ang config
 Sine-save ang config
 Simulan ang aparato
 Refresh
-BDM Start Mode
+BDM aparato simula mode
 HDD aparato simula mode
 ETH aparato simula mode
 Mga application na simulan ang mode
@@ -98,7 +98,7 @@ Rename
 Alisin
 Tumakbo
 Ipakita ang mga setting
-Write Operations
+Operasyon ng pag-write
 Tandaan ang huling play ng laro
 Select button
 Error, fragmented ang laro
@@ -166,7 +166,7 @@ Ethernet speed at duplex setting
 100Mbit half-duplex
 10Mbit full-duplex
 10Mbit half-duplex
-GSM Settings
+Settings ng GSM
 GSM Selector
 Toggles GSM ON or OFF
 Pwersahin ang Custom Display Mode
@@ -236,8 +236,8 @@ Multitap Emulation
 Turns on/off Multitap emulation para sa piling game.
 Multitap emulator on port
 Pumili ng port para sa Multitap emulation.
-Fake DS3 Workaround
-Some fake DS3s need a workaround, this option will enable it.
+Pagsasa-ayos ng Fake DS3
+Nangangalangan ng fake DS3s ng pagsasa-ayos, Maie-enable ng opsyon na ito.
 I-emulate ang FIELD flipping
 Aayusin ang laro na may isyu ng glitch sa progressive video modes.
 Settings ng Parental Lock
@@ -252,15 +252,15 @@ VMC %s na file ay fragmented. Magpatuloy gamit ang Memory Card sa slot %d?
 Settings ng Audio
 Sound Effects
 Boot Sound
-Sound Effects Volume
-Boot Sound Volume
+Volume ng Sound Effects
+Volume ng Boot Sound
 Kumpirmahin "video mode change"?
 Cache Game List (HDD)
-Notifications
-Config loaded from %s
-Theme loaded from %s
-Language loaded from %s
-%s partition mounted.
+Mga notification
+Nai-load ang config sa %s
+Nai-load ang tema sa %s
+Nai-load ang wika sa %s
+Nai-mount na ang partisyon %s.
 Mga Opsyon
 Nai-save ang "Game settings".
 %s settings ay nai-alis.
@@ -273,13 +273,13 @@ Piliin ang settings para alisin.
 Support Forums:
 Pamagat
 Genre
-Nai-eelease
+Nai-release
 Debeloper
 Deskripsyon
 Block Devices
-Controller Settings
-Turn on/off Block Device Manager.
-Turn on/off Block Devices (e.g. USB).
-USB Games
-iLink Games
-MX4SIO Games
+Settings ng Controller
+I-turn on/off ang Block Device Manager.
+I-turn on/off ang Block Devices (halimbawa. USB).
+Games sa USB
+Games sa iLink
+Games sa MX4SIO

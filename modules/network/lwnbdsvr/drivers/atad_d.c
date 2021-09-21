@@ -21,13 +21,13 @@ int atad_ctor(atad_driver *const me, int device)
     me->device = device;
     ata_devinfo_t *dev_info = ata_get_devinfo(me->device);
 
-    static struct nbd_context_Vtbl const vtbl = {
+    static struct lwnbd_operations const nbdopts = {
         &atad_read_,
         &atad_write_,
         &atad_flush_,
     };
     nbd_context_ctor(&me->super); /* call the superclass' ctor */
-    me->super.vptr = &vtbl;       /* override the vptr */
+    me->super.vptr = &nbdopts;    /* override the vptr */
     // int ata_device_sce_identify_drive(int device, void *data);
     strcpy(me->super.export_desc, "PlayStation 2 HDD via ATAD");
     sprintf(me->super.export_name, "%s%d", "hdd", me->device);

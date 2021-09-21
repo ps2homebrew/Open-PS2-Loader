@@ -8,6 +8,14 @@ loadcore_IMPORTS_start
 I_RegisterLibraryEntries
 loadcore_IMPORTS_end
 
+iomanX_IMPORTS_start
+I_open
+I_write
+I_close
+I_getstat
+I_GetDeviceList
+iomanX_IMPORTS_end
+
 ps2ip_IMPORTS_start
 I_lwip_recv
 I_lwip_send
@@ -28,7 +36,9 @@ sysclib_IMPORTS_start
 I_sprintf
 I_strncmp
 I_strcpy
+I_strncpy
 I_strlen
+I_memcpy
 I_memset
 sysclib_IMPORTS_end
 

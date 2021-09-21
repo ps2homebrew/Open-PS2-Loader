@@ -5,6 +5,7 @@
 
 #include <atad.h>
 #include <loadcore.h>
+#include <iomanX.h>
 #include <ps2ip.h>
 #include <stdio.h>
 #include <sysclib.h>

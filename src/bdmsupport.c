@@ -136,6 +136,7 @@ static int bdmNeedsUpdate(void)
     static unsigned int OldGeneration = 0;
     static unsigned char ThemesLoaded = 0;
     static unsigned char LanguagesLoaded = 0;
+    static unsigned char CoresLoaded = 0;
     int result = 0;
     struct stat st;
 
@@ -185,6 +186,12 @@ static int bdmNeedsUpdate(void)
         sprintf(path, "%sLNG", bdmPrefix);
         if (lngAddLanguages(path, "/", bdmGameList.mode) > 0)
             LanguagesLoaded = 1;
+    }
+
+    if (!CoresLoaded) {
+        sprintf(path, "%sCORES", bdmPrefix);
+        if (oplAddCores(path, "/") > 0)
+            CoresLoaded = 1;
     }
 
     sbCreateFolders(bdmPrefix, 1);
@@ -248,11 +255,22 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
     u32 layer1_start, layer1_offset;
     unsigned short int layer1_part;
 
+    const char *temp;
+    int coreID = 0;
+    if (configGetStr(configSet, CONFIG_ITEM_CORE_VERSION, &temp))
+        coreID = oplFindCoreGuiID(temp);
+
+    oplSetGuiCoreValue(coreID);
+    oplGetCoreFiles(coreID, BDM_MODE);
+
     char vmc_name[32], vmc_path[256], have_error = 0;
     int vmc_id, size_mcemu_irx = 0;
     bdm_vmc_infos_t bdm_vmc_infos;
     vmc_superblock_t vmc_superblock;
 
+
+    void **mcemu_irx = coreFile[BDM_MCEMU_IRX].data;
+    int mcirx_size = coreFile[BDM_MCEMU_IRX].size;
     for (vmc_id = 0; vmc_id < 2; vmc_id++) {
         memset(&bdm_vmc_infos, 0, sizeof(bdm_vmc_infos_t));
         configGetVMC(configSet, vmc_name, sizeof(vmc_name), vmc_id);
@@ -300,18 +318,18 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
             }
         }
 
-        for (i = 0; i < size_bdm_mcemu_irx; i++) {
-            if (((u32 *)&bdm_mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
+        for (i = 0; i < mcirx_size; i++) {
+            if (((u32 *)mcemu_irx)[i] == (0xC0DEFAC0 + vmc_id)) {
                 if (bdm_vmc_infos.active)
-                    size_mcemu_irx = size_bdm_mcemu_irx;
-                memcpy(&((u32 *)&bdm_mcemu_irx)[i], &bdm_vmc_infos, sizeof(bdm_vmc_infos_t));
+                    size_mcemu_irx = mcirx_size;
+                memcpy(&((u32 *)mcemu_irx)[i], &bdm_vmc_infos, sizeof(bdm_vmc_infos_t));
                 break;
             }
         }
     }
 
-    void **irx = &bdm_cdvdman_irx;
-    int irx_size = size_bdm_cdvdman_irx;
+    void **irx = coreFile[BDM_CDVDMAN_IRX].data;
+    int irx_size = coreFile[BDM_CDVDMAN_IRX].size;
     compatmask = sbPrepare(game, configSet, irx_size, irx, &index);
     settings = (struct cdvdman_settings_bdm *)((u8 *)irx + index);
     for (i = 0; i < game->parts; i++) {
@@ -387,14 +405,18 @@ static void bdmLaunchGame(int id, config_set_t *configSet)
 
     if (configGetStrCopy(configSet, CONFIG_ITEM_ALTSTARTUP, filename, sizeof(filename)) == 0)
         strcpy(filename, game->startup);
+
     deinit(NO_EXCEPTION, BDM_MODE); // CAREFUL: deinit will call bdmCleanUp, so bdmGames/game will be freed
 
+    char *modeStr = "";
     if (!strcmp(bdmDriver, "usb"))
-        sysLaunchLoaderElf(filename, "BDM_USB_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+        modeStr = "BDM_USB_MODE";
     else if (!strcmp(bdmDriver, "sd") && strlen(bdmDriver) == 2)
-        sysLaunchLoaderElf(filename, "BDM_ILK_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+        modeStr = "BDM_ILK_MODE";
     else if (!strcmp(bdmDriver, "sdc") && strlen(bdmDriver) == 3)
-        sysLaunchLoaderElf(filename, "BDM_M4S_MODE", irx_size, irx, size_mcemu_irx, &bdm_mcemu_irx, EnablePS2Logo, compatmask);
+        modeStr = "BDM_M4S_MODE";
+
+    sysLaunchLoaderElf(filename, modeStr, irx_size, irx, size_mcemu_irx, mcemu_irx, EnablePS2Logo, compatmask);
 }
 
 static config_set_t *bdmGetConfig(int id)

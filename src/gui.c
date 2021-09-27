@@ -205,15 +205,12 @@ void guiShowAbout()
     snprintf(OPLVersion, sizeof(OPLVersion), "Open PS2 Loader %s", OPL_VERSION);
     diaSetLabel(diaAbout, ABOUT_TITLE, OPLVersion);
 
-    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s"
+    snprintf(OPLBuildDetails, sizeof(OPLBuildDetails), "GSM %s - PADEMU"
 #ifdef __RTL
                                                        " - RTL"
 #endif
 #ifdef IGS
                                                        " - IGS %s"
-#endif
-#ifdef PADEMU
-                                                       " - PADEMU"
 #endif
              // Version numbers
              ,
@@ -867,10 +864,10 @@ void guiShowControllerConfig(void)
             gSelectButton = value == 0 ? KEY_CIRCLE : KEY_CROSS;
         else
             gSelectButton = KEY_CIRCLE;
-#ifdef PADEMU
+
         if (result == PADEMU_GLOBAL_BUTTON)
             guiGameShowPadEmuConfig(1);
-#endif
+
         applyConfig(-1, -1);
     }
 }

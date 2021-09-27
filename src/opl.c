@@ -42,10 +42,8 @@
 int configGetStat(config_set_t *configSet, iox_stat_t *stat);
 
 #include <unistd.h>
-#ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
-#endif
 
 #ifdef __EESIO_DEBUG
 #include <sio.h>
@@ -167,10 +165,8 @@ int gPadEmuSource;
 int gFadeDelay;
 int toggleSfx;
 int showCfgPopup;
-#ifdef PADEMU
 int gEnablePadEmu;
 int gPadEmuSettings;
-#endif
 int gScrollSpeed;
 char gExitPath[32];
 int gEnableDebug;
@@ -1835,10 +1831,9 @@ void deinit(int exception, int modeSelected)
     ioBlockOps(1);
     guiExecDeferredOps();
 
-#ifdef PADEMU
     ds34usb_reset();
     ds34bt_reset();
-#endif
+
     unloadPads();
 
     deinitAllSupport(exception, modeSelected);

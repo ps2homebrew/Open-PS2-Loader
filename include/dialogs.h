@@ -135,7 +135,7 @@ enum UI_ITEMS {
     NETUPD_PROGRESS,
     NETUPD_BTN_START,
     NETUPD_BTN_CANCEL,
-#ifdef PADEMU
+
     PADEMU_GLOBAL_BUTTON,
     PADCFG_PADEMU_SOURCE,
     PADCFG_PADEMU_CONFIG,
@@ -166,9 +166,6 @@ enum UI_ITEMS {
     PADCFG_PADEMU_WORKAROUND_STR,
 
     COMPAT_MODE_BASE = 250,
-#else
-    COMPAT_MODE_BASE = 200,
-#endif
 };
 
 #define COMPAT_NOEXIT       0x70000000
@@ -179,10 +176,8 @@ enum UI_ITEMS {
 #define COMPAT_VMC1_DEFINE (COMPAT_VMC1_DEFINE_ID | COMPAT_NOEXIT)
 #define COMPAT_VMC2_DEFINE (COMPAT_VMC2_DEFINE_ID | COMPAT_NOEXIT)
 
-#ifdef PADEMU
 extern struct UIItem diaPadEmuConfig[];
 extern struct UIItem diaPadEmuInfo[];
-#endif
 
 extern struct UIItem diaNetConfig[];
 extern struct UIItem diaUIConfig[];

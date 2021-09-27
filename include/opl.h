@@ -188,17 +188,13 @@ extern int gCheatSource;
 extern int gGSMSource;
 extern int gPadEmuSource;
 
+extern int gEnablePadEmu;
+extern int gPadEmuSettings;
+
 extern int showCfgPopup;
 
 #ifdef IGS
 #define IGS_VERSION "0.1"
-#endif
-
-// ------------------------------------------------------------------------------------------------------------------------
-
-#ifdef PADEMU
-extern int gEnablePadEmu;
-extern int gPadEmuSettings;
 #endif
 
 // ------------------------------------------------------------------------------------------------------------------------

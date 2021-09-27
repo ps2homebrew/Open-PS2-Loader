@@ -26,10 +26,8 @@
 #include "include/pggsm.h"
 #include "include/cheatman.h"
 
-#ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
-#endif
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioInit, fileXioExit, fileXioDevctl
@@ -160,10 +158,9 @@ void sysShutdownDev9(void)
 
 void sysReset(int modload_mask)
 {
-#ifdef PADEMU
     ds34usb_reset();
     ds34bt_reset();
-#endif
+
     fileXioExit();
     SifExitIopHeap();
     SifLoadFileExit();
@@ -230,7 +227,6 @@ void sysReset(int modload_mask)
     sysLoadModuleBuffer(&libsd_irx, size_libsd_irx, 0, NULL);
     sysLoadModuleBuffer(&audsrv_irx, size_audsrv_irx, 0, NULL);
 
-#ifdef PADEMU
     int ds3pads = 1; // only one pad enabled
 
     ds34usb_deinit();
@@ -243,7 +239,6 @@ void sysReset(int modload_mask)
         ds34usb_init();
         ds34bt_init();
     }
-#endif
 
     fileXioInit();
     poweroffInit();
@@ -460,12 +455,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
     irxptr_tab[modcount].info = size_resetspu_irx | SET_OPL_MOD_ID(OPL_MODULE_ID_RESETSPU);
     irxptr_tab[modcount++].ptr = (void *)&resetspu_irx;
 
-#ifdef PADEMU
-#define PADEMU_ARG || gEnablePadEmu
-#else
-#define PADEMU_ARG
-#endif
-    if ((modules & CORE_IRX_USB) PADEMU_ARG) {
+    if ((modules & CORE_IRX_USB) || gEnablePadEmu) {
         irxptr_tab[modcount].info = coreFile[USBD_IRX].size | SET_OPL_MOD_ID(OPL_MODULE_ID_USBD);
         irxptr_tab[modcount++].ptr = coreFile[USBD_IRX].data;
     }
@@ -499,8 +489,7 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
         irxptr_tab[modcount++].ptr = (void *)mcemu_irx;
     }
 
-#ifdef PADEMU
-    if (gEnablePadEmu) {
+    if (oplCoreHasPademu() && gEnablePadEmu) {
         if (gPadEmuSettings & 0xFF) {
             irxptr_tab[modcount].info = coreFile[BT_PADEMU_IRX].size | SET_OPL_MOD_ID(OPL_MODULE_ID_PADEMU);
             irxptr_tab[modcount++].ptr = coreFile[BT_PADEMU_IRX].data;
@@ -509,7 +498,6 @@ static unsigned int sendIrxKernelRAM(const char *startup, const char *mode_str, 
             irxptr_tab[modcount++].ptr = coreFile[USB_PADEMU_IRX].data;
         }
     }
-#endif
 
 #ifdef __INGAME_DEBUG
 #ifdef __DECI2_DEBUG
@@ -794,23 +782,15 @@ void sysLaunchLoaderElf(const char *filename, const char *mode_str, int size_cdv
     }
     sprintf(KernelConfig, "%u %u", (unsigned int)eeloadCopy, (unsigned int)initUserMemory);
 
-#ifdef PADEMU
-#define PADEMU_SPECIFIER " %d, %u"
-#define PADEMU_ARGUMENT  , gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8)
-#else
-#define PADEMU_SPECIFIER
-#define PADEMU_ARGUMENT
-#endif
-
     argc = 0;
-    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d" PADEMU_SPECIFIER,
+    sprintf(config_str, "%s %d %s %d %u.%u.%u.%u %u.%u.%u.%u %u.%u.%u.%u %d %u %d %d %u",
             mode_str, gEnableDebug, gExitPath, gHDDSpindown,
             local_ip_address[0], local_ip_address[1], local_ip_address[2], local_ip_address[3],
             local_netmask[0], local_netmask[1], local_netmask[2], local_netmask[3],
             local_gateway[0], local_gateway[1], local_gateway[2], local_gateway[3],
             gETHOpMode,
             GetCheatsEnabled() ? (unsigned int)GetCheatsList() : 0,
-            GetGSMEnabled() PADEMU_ARGUMENT);
+            GetGSMEnabled(), gEnablePadEmu, (unsigned int)(gPadEmuSettings >> 8));
     argv[argc] = config_str;
     argc++;
 

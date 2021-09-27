@@ -15,10 +15,8 @@
 #include "include/system.h"
 #include "include/guigame.h"
 
-#ifdef PADEMU
 #include <libds34bt.h>
 #include <libds34usb.h>
-#endif
 
 #define NEWLIB_PORT_AWARE
 #include <fileXio_rpc.h> // fileXioDevctl("genvmc:", ***)
@@ -37,10 +35,9 @@ static int GSMFIELDFix;
 
 static int EnableCheat;
 static int CheatMode;
-#ifdef PADEMU
+
 static int EnablePadEmu;
 static int PadEmuSettings;
-#endif
 
 static char hexid[32];
 static char altStartup[32];
@@ -52,9 +49,7 @@ static char configSource[128];
 // forward declarations.
 static void guiGameLoadGSMConfig(config_set_t *configSet, config_set_t *configGame);
 static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *configGame);
-#ifdef PADEMU
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame);
-#endif
 
 int guiGameAltStartupNameHandler(char *text, int maxLen)
 {
@@ -437,7 +432,6 @@ void guiGameShowCheatConfig(void)
 }
 
 // PADEMU
-#ifdef PADEMU
 // from https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface
 static char *bt_ver_str[] = {
     "1.0b",
@@ -771,7 +765,6 @@ void guiGameSavePadEmuGlobalConfig(config_set_t *configGame)
         configSetInt(configGame, CONFIG_ITEM_PADEMUSETTINGS, PadEmuSettings);
     }
 }
-#endif
 
 static int guiGameCompatUpdater(int modified)
 {
@@ -935,11 +928,9 @@ int guiGameSaveConfig(config_set_t *configSet, item_list_t *support)
         configSetInt(configGame, CONFIG_ITEM_CHEATMODE, CheatMode);
     }
 
-#ifdef PADEMU
     /// PADEMU ///
     result = guiGameSavePadEmuGameConfig(configSet, result);
     guiGameSavePadEmuGlobalConfig(configGame);
-#endif
 
     diaGetString(diaCompatConfig, COMPAT_GAMEID, hexid, sizeof(hexid));
     if (hexid[0] != '\0')
@@ -972,11 +963,10 @@ void guiGameRemoveGlobalSettings(config_set_t *configGame)
         configRemoveKey(configGame, CONFIG_ITEM_GSMYOFFSET);
         configRemoveKey(configGame, CONFIG_ITEM_GSMFIELDFIX);
 
-#ifdef PADEMU
         // PADEMU
         configRemoveKey(configGame, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configGame, CONFIG_ITEM_PADEMUSETTINGS);
-#endif
+
         saveConfig(CONFIG_GAME, 0);
     }
 }
@@ -1004,12 +994,11 @@ void guiGameRemoveSettings(config_set_t *configSet)
         configRemoveKey(configSet, CONFIG_ITEM_ENABLECHEAT);
         configRemoveKey(configSet, CONFIG_ITEM_CHEATMODE);
 
-#ifdef PADEMU
         // PADEMU
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSOURCE);
         configRemoveKey(configSet, CONFIG_ITEM_ENABLEPADEMU);
         configRemoveKey(configSet, CONFIG_ITEM_PADEMUSETTINGS);
-#endif
+
         // VMC
         configRemoveVMC(configSet, 0);
         configRemoveVMC(configSet, 1);
@@ -1089,7 +1078,6 @@ static void guiGameLoadCheatsConfig(config_set_t *configSet, config_set_t *confi
     diaSetInt(diaCheatConfig, CHTCFG_CHEATMODE, CheatMode);
 }
 
-#ifdef PADEMU
 static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *configGame)
 {
     EnablePadEmu = 0;
@@ -1125,7 +1113,6 @@ static void guiGameLoadPadEmuConfig(config_set_t *configSet, config_set_t *confi
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_MTAP_PORT, PadEmuMtapPort);
     diaSetInt(diaPadEmuConfig, PADCFG_PADEMU_WORKAROUND, ((PadEmuSettings >> 26) & 1));
 }
-#endif
 
 // loads defaults if no config found
 void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
@@ -1178,11 +1165,9 @@ void guiGameLoadConfig(item_list_t *support, config_set_t *configSet)
         diaSetInt(diaCompatConfig, COMPAT_MODE_BASE + i, (compatMode & (1 << i)) > 0 ? 1 : 0);
 
     guiGameLoadGSMConfig(configSet, configGame);
-
     guiGameLoadCheatsConfig(configSet, configGame);
-#ifdef PADEMU
     guiGameLoadPadEmuConfig(configSet, configGame);
-#endif
+
     /// Find out the current game ID ///
     hexid[0] = '\0';
     configGetStrCopy(configSet, CONFIG_ITEM_DNAS, hexid, sizeof(hexid));

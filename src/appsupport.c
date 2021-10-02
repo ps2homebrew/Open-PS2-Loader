@@ -11,6 +11,8 @@
 #include "include/ethsupport.h"
 #include "include/hddsupport.h"
 
+#include <elf-loader.h>
+
 static int appForceUpdate = 1;
 static int appItemCount = 0;
 
@@ -353,6 +355,8 @@ static void appLaunchItem(int id, config_set_t *configSet)
 {
     int mode, fd;
     const char *filename;
+    char partition[128];
+    char *argv[1];
 
     // Retrieve configuration set by appGetConfig()
     configGetStr(configSet, CONFIG_ITEM_STARTUP, &filename);
@@ -361,13 +365,20 @@ static void appLaunchItem(int id, config_set_t *configSet)
     if (fd >= 0) {
         close(fd);
 
+        strcpy(partition, "");
+
         // To keep the necessary device accessible, we will assume the mode that owns the device which contains the file to boot.
         mode = oplPath2Mode(filename);
         if (mode < 0)
             mode = APP_MODE; // Legacy apps mode on memory card (mc?:/*)
 
+        if (mode == HDD_MODE)
+            snprintf(partition, sizeof(partition), "%s:", gOPLPart);
+
+        argv[0] = (char *)filename;
+
         deinit(UNMOUNT_EXCEPTION, mode); // CAREFUL: deinit will call appCleanUp, so configApps/cur will be freed
-        sysExecElf(filename);
+        LoadELFFromFileWithPartition(filename, partition, 1, argv);
     } else
         guiMsgBox(_l(_STR_ERR_FILE_INVALID), 0, NULL);
 }

@@ -518,7 +518,7 @@ static int texPngLoadAll(GSTEXTURE *texture, const char *filePath, int texId)
             png_set_tRNS_to_alpha(pngPtr);
     }
 
-    png_set_filler(pngPtr, 0x80, PNG_FILLER_AFTER);
+    png_set_filler(pngPtr, 0xff, PNG_FILLER_AFTER);
     png_read_update_info(pngPtr, infoPtr);
 
     void (*texPngReadPixels)(GSTEXTURE * texture, png_bytep * rowPointers, size_t size);

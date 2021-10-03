@@ -93,9 +93,6 @@ typedef struct
     /// 0 = General refresh, which means that it will be refreshed every MENU_GENERAL_UPDATE_DELAY frames, regardless of whether automatic refresh is enabled or not.
     int updateDelay;
 
-    /// item description
-    char *text;
-
     /// item description in localised form (used if value is not negative)
     int (*itemTextId)(void);
 

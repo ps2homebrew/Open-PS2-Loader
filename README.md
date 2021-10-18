@@ -9,6 +9,9 @@ Review the LICENSE file for further details.
 [![Discord](https://img.shields.io/discord/652861436992946216?style=flat&logo=Discord)](https://discord.gg/CVFUa9xh6B)
 [![Mega](https://img.shields.io/badge/Mega-%23D90007.svg?style=flat&logo=Mega&logoColor=white)](https://mega.nz/folder/Ndwi1bAK#oLWNhH_g-h0p4BoT4c556A)
 
+![GitHub all releases](https://img.shields.io/github/downloads/ps2homebrew/Open-PS2-Loader/total?label=Total%20downloads&logo=Github)
+![GitHub release (by tag)](https://img.shields.io/github/downloads/ps2homebrew/Open-PS2-Loader/latest/total?label=Downloads%20%5BLatest%5D&logo=github)
+
 ## Introduction
 
 Open PS2 Loader (OPL) is a 100% Open source game and application loader for
@@ -116,7 +119,14 @@ formatted with the APA partition scheme. OPL will create the `+OPL` partition on
 To avoid this, you can create a text file at the location `hdd0:__common:pfs:OPL/conf_hdd.txt`
 that contains the preferred partition name (for example `__common`).
 
-</p>
+To install games to the HDD you can use:
+
+- [HDL Batch Installer](https://github.com/israpps/HDL-Batch-installer)
+- [HDL Dump](https://github.com/ps2homebrew/hdl-dump)
+- HDL Dump Helper GUI
+- HDL Batch
+  
+  </p>
 </details>
 
 <details>

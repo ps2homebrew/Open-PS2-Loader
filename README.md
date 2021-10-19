@@ -63,13 +63,14 @@ USB modes:
 | Folder | Description                                          | Modes       |
 | ------ | ---------------------------------------------------- | ----------- |
 | `CD`   | for games on CD media - i.e. blue-bottom discs       | USB and SMB |
-| `DVD`  | for DVD5 and DVD9 images if using the NTFS file system on USB or SMB; DVD9 images must be split and placed into the device root if using the FAT32 file system on USB or SMB | USB and SMB |
+| `DVD`  | for DVD5 and DVD9 .iso files; images larger than 4gb must be split if using fat32 on USB  | USB and SMB |
 | `VMC`  | for Virtual Memory Card images - from 8MB up to 64MB | all         |
 | `CFG`  | for saving per-game configuration files              | all         |
 | `ART`  | for game art images                                  | all         |
 | `THM`  | for themes support                                   | all         |
 | `LNG`  | for translation support                              | all         |
 | `CHT`  | for cheats files                                     | all         |
+| `APPS` | for loading ELF executables to the apps tab; _(only required by new app system)_ | all
 
 OPL will automatically create the above directory structure the first time you launch it and enable your favorite device.
 
